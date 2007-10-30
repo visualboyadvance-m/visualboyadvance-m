@@ -1,0 +1,66 @@
+dnl
+dnl libresample configure.in script
+dnl
+dnl Dominic Mazzoni
+dnl
+
+dnl Require autoconf >= 2.13
+AC_PREREQ(2.13)
+
+dnl Init autoconf and make sure configure is being called
+dnl from the right directory
+AC_INIT([src/resample.c])
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_RANLIB
+
+AC_PATH_PROG(AR, ar, no)
+if [[ $AR = "no" ]] ; then
+    AC_MSG_ERROR("Could not find ar - needed to create a library");
+fi
+
+AC_SUBST(TARGETS)
+TARGETS="libresample.a tests/testresample"
+
+AC_CHECK_LIB(sndfile, sf_open, have_libsndfile=yes, have_libsndfile=no)
+
+if [[ $have_libsndfile = "yes" ]] ; then
+	TARGETS="$TARGETS tests/resample-sndfile"
+fi
+
+AC_CHECK_LIB(samplerate, src_simple, have_libsamplerate=yes, have_libsamplerate=no)
+
+if [[ $have_libsamplerate = "yes" ]] ; then
+	TARGETS="$TARGETS tests/compareresample"
+fi
+
+AC_CHECK_HEADERS(inttypes.h)
+
+AC_CONFIG_HEADER(src/config.h:src/configtemplate.h)
+AC_OUTPUT([Makefile])
+
+echo ""
+
+if [[ $have_libsamplerate = "yes" ]] ; then
+	echo "Configured to build tests/resample-sndfile using libsndfile"
+	echo ""
+else
+	echo "Could not find libsndfile - needed if you want to"
+	echo "compile tests/resample-sndfile"
+	echo ""
+fi
+
+if [[ $have_libsamplerate = "yes" ]] ; then
+	echo "Configured to build tests/compareresample to compare against"
+   echo "Erik de Castro Lopo's libsamplerate library."
+	echo ""
+else
+	echo "Could not find libsamplerate - only needed if you want to"
+	echo "compile tests/compareresample to compare their performance."
+	echo ""
+fi
+
+echo "Type 'configure --help' to see options."
+echo ""
+echo "Type 'make' to build libresample and tests."
