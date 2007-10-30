@@ -1,0 +1,4 @@
+Known Bugs:
+
+- fsMaxScale = 1 in Direct3D fullscreen results in wrong image size
+- Direct3D: Menu toggle takes a little too long
