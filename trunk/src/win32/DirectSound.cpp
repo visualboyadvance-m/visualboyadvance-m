@@ -30,6 +30,8 @@
 #include <mmreg.h>
 #include <Dsound.h> //DirectSound
 
+extern bool soundBufferLow;
+
 class DirectSound : public ISound
 {
 private:
@@ -323,12 +325,18 @@ void DirectSound::write()
         DWORD play;
         while(true) {
           dsbSecondary->GetCurrentPosition(&play, NULL);
+		  int BufferLeft = ((soundNextPosition <= play) ?
+			  play - soundNextPosition :
+			  soundBufferTotalLen - soundNextPosition + play);
 
-          if(play < soundNextPosition ||
-             play > soundNextPosition+soundBufferLen) {
-            break;
-          }
-
+          if(BufferLeft > soundBufferLen)
+		  {
+			if (BufferLeft > soundBufferTotalLen - (soundBufferLen * 3))
+				soundBufferLow = true;
+			break;
+		   }
+		   soundBufferLow = false;
+          
           if(dsbEvent) {
             WaitForSingleObject(dsbEvent, 50);
           }
