@@ -89,7 +89,8 @@ BOOL UniVideoModeDlg::OnInitDialog()
 		dm.dmSize = sizeof(DEVMODE);
 		dm.dmDriverExtra = 0;
 		DWORD maxMode;
-		for (DWORD i=0; 0 != EnumDisplaySettings(dd.DeviceName, i, &dm); i++) {}
+		DWORD i;
+		for (i=0; 0 != EnumDisplaySettings(dd.DeviceName, i, &dm); i++) {}
 		maxMode = i-1;
 		listmodes->InitStorage(i, 25);
 		if (WidthList!=0) delete [] WidthList;

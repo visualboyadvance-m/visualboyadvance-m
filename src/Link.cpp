@@ -245,8 +245,8 @@ void LinkUpdate(int ticks){
 		}
 		return;
 	}
-	
-	if(linkid&&!transfer&&linktime>=linkmem->lastlinktime&&linkmem->numtransfers){
+	// ** CRASH ** linkmem is NULL, todo investigate why, added null check
+	if(linkid&&!transfer&&linkmem&&linktime>=linkmem->lastlinktime&&linkmem->numtransfers){
 		linkmem->linkdata[linkid] = READ16LE(&ioMem[0x12a]);
 		
 		if(linkmem->numtransfers==1){
