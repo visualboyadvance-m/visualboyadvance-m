@@ -25,6 +25,9 @@ extern "C"
 {
 void hq3x_16(unsigned char*, unsigned char*, DWORD, DWORD, DWORD, DWORD);
 void hq3x_32(unsigned char*, unsigned char*, DWORD, DWORD, DWORD, DWORD);
+void hq4x_16(unsigned char*, unsigned char*, DWORD, DWORD, DWORD, DWORD);
+void hq4x_32(unsigned char*, unsigned char*, DWORD, DWORD, DWORD, DWORD);
+
 unsigned int   LUT16to32[65536];
 unsigned int   RGBtoYUV[65536];
 }
@@ -64,8 +67,6 @@ int InitLUTs(void)
 
 int hq3xinited=0;
 
-#include <stdio.h>
-
 void hq3x32(unsigned char * pIn,  unsigned int srcPitch,
 			unsigned char *,
 			unsigned char * pOut, unsigned int dstPitch,
@@ -80,7 +81,6 @@ void hq3x32(unsigned char * pIn,  unsigned int srcPitch,
 	}
 	hq3x_32( pIn, pOut, Xres, Yres, dstPitch, srcPitch - (Xres *2) );
 }
-#include <stdio.h>
 
 void hq3x16(unsigned char * pIn,  unsigned int srcPitch,
 			unsigned char *,
@@ -93,4 +93,33 @@ void hq3x16(unsigned char * pIn,  unsigned int srcPitch,
 		hq3xinited=1;
 	}
 	hq3x_16( pIn, pOut, Xres, Yres, dstPitch, srcPitch - (Xres *2));
+}
+
+
+void hq4x16(unsigned char * pIn,  unsigned int srcPitch,
+			unsigned char *,
+			unsigned char * pOut, unsigned int dstPitch,
+			int Xres, int Yres)
+{
+	if (!hq3xinited)
+	{
+		InitLUTs();
+		hq3xinited=1;
+	}
+	hq4x_16( pIn, pOut, Xres, Yres, dstPitch, srcPitch - (Xres *2));
+}
+
+void hq4x32(unsigned char * pIn,  unsigned int srcPitch,
+			unsigned char *,
+			unsigned char * pOut, unsigned int dstPitch,
+			int Xres, int Yres)
+{
+	// NOTICE!  This driver wants 16 bit, not 32 bit input!
+
+	if (!hq3xinited)
+	{
+		InitLUTs();
+		hq3xinited=1;
+	}
+	hq4x_32( pIn, pOut, Xres, Yres, dstPitch, srcPitch - (Xres *2));
 }
