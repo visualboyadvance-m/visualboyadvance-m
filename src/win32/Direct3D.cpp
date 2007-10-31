@@ -378,6 +378,8 @@ bool Direct3DDisplay::initialize()
 	theApp.mode320Available = false;
 	theApp.mode640Available = false;
 	theApp.mode800Available = false;
+	theApp.mode1024Available = false;
+	theApp.mode1280Available = false;
 
 	nModes = pD3D->GetAdapterModeCount(theApp.fsAdapter, D3DFMT_R5G6B5);
 	for (i = 0; i<nModes; i++)
@@ -390,6 +392,11 @@ bool Direct3DDisplay::initialize()
 				theApp.mode640Available = true;
 			if ( (dm.Width == 800) && (dm.Height == 600) )
 				theApp.mode800Available = true;
+			if ( (dm.Width == 1024) && (dm.Height == 768) )
+				theApp.mode1024Available = true;
+			if ( (dm.Width == 1280) && (dm.Height == 1024) )
+				theApp.mode1280Available = true;
+
 		}
 	}
 
