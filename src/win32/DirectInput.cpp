@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include "Reg.h"
 #include "WinResUtil.h"
+#include "Input.h"
 
 #define DIRECTINPUT_VERSION 0x0500
 #include <dinput.h>
@@ -84,7 +85,11 @@ static LPDIRECTINPUT pDirectInput = NULL;
 static int joyDebug = 0;
 static int axisNumber = 0;
 
-USHORT joypad[4][13] = {
+
+KeyList joypad[JOYPADS * KEYS_PER_PAD + MOTION_KEYS]; 
+
+
+USHORT defvalues[JOYPADS * KEYS_PER_PAD + MOTION_KEYS] =
   {
     DIK_LEFT,  DIK_RIGHT,
     DIK_UP,    DIK_DOWN,
@@ -92,121 +97,111 @@ USHORT joypad[4][13] = {
     DIK_RETURN,DIK_BACK,
     DIK_A,     DIK_S,
     DIK_SPACE, DIK_F12,
-    DIK_C
-  },
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }  
+    DIK_C,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,
+    DIK_NUMPAD4, DIK_NUMPAD6, DIK_NUMPAD8, DIK_NUMPAD2
 };
 
-USHORT motion[4] = {
-  DIK_NUMPAD4, DIK_NUMPAD6, DIK_NUMPAD8, DIK_NUMPAD2
-};
 
-static int winReadKey(char *name, int num)
+void winReadKey(const char *name, KeyList& Keys)
+{
+  CString TxtKeyList = regQueryStringValue(name, "");
+  int curPos= 0;
+
+  CString resToken=TxtKeyList.Tokenize(",",curPos);
+  while (resToken != "")
+  {
+	  Keys.AddTail(atoi(resToken));
+	  resToken= TxtKeyList.Tokenize(",",curPos);
+  };
+}
+
+void winReadKey(const char *name, int num, KeyList& Keys)
 {
   char buffer[80];
 
   sprintf(buffer, "Joy%d_%s", num, name);
-
-  return regQueryDwordValue(buffer, (DWORD)-1);
+  winReadKey(name, Keys);
 }
+
 
 void winReadKeys()
 {
-  int key = -1;
 
-  for(int i = 0; i < 4; i++) {
-    key = winReadKey("Left", i);
-    if(key != -1)
-      joypad[i][KEY_LEFT] = key;
-    key = winReadKey("Right", i);
-    if(key != -1)
-      joypad[i][KEY_RIGHT] = key;
-    key = winReadKey("Up", i);
-    if(key != -1)
-      joypad[i][KEY_UP] = key;
-    key = winReadKey("Down", i);
-    if(key != -1)
-      joypad[i][KEY_DOWN] = key;
-    key = winReadKey("A", i);
-    if(key != -1)
-      joypad[i][KEY_BUTTON_A] = key;
-    key = winReadKey("B", i);
-    if(key != -1)
-      joypad[i][KEY_BUTTON_B] = key;
-    key = winReadKey("L", i);
-    if(key != -1)
-      joypad[i][KEY_BUTTON_L] = key;
-    key = winReadKey("R", i);
-    if(key != -1)
-      joypad[i][KEY_BUTTON_R] = key;  
-    key = winReadKey("Start", i);
-    if(key != -1)
-      joypad[i][KEY_BUTTON_START] = key;
-    key = winReadKey("Select", i);
-    if(key != -1)
-      joypad[i][KEY_BUTTON_SELECT] = key;
-    key = winReadKey("Speed", i);
-    if(key != -1)
-      joypad[i][KEY_BUTTON_SPEED] = key;
-    key = winReadKey("Capture", i);
-    if(key != -1)
-      joypad[i][KEY_BUTTON_CAPTURE] = key;
-    key = winReadKey("GS", i);
-    if(key != -1)
-      joypad[i][KEY_BUTTON_GS] = key;
+  for(int i = 0; i < JOYPADS; i++) {
+    winReadKey("Left", i, joypad[JOYPAD(i,KEY_LEFT)]);
+    winReadKey("Right", i, joypad[JOYPAD(i, KEY_RIGHT)]);
+    winReadKey("Up", i, joypad[JOYPAD(i,KEY_UP)]);
+    winReadKey("Down", i, joypad[JOYPAD(i,KEY_DOWN)]);
+    winReadKey("A", i, joypad[JOYPAD(i,KEY_BUTTON_A)]);
+    winReadKey("B", i, joypad[JOYPAD(i,KEY_BUTTON_B)]);
+    winReadKey("L", i, joypad[JOYPAD(i,KEY_BUTTON_L)]);
+    winReadKey("R", i, joypad[JOYPAD(i,KEY_BUTTON_R)]);  
+    winReadKey("Start", i, joypad[JOYPAD(i,KEY_BUTTON_START)]);
+    winReadKey("Select", i, joypad[JOYPAD(i,KEY_BUTTON_SELECT)]);
+    winReadKey("Speed", i, joypad[JOYPAD(i,KEY_BUTTON_SPEED)]);
+    winReadKey("Capture", i, joypad[JOYPAD(i,KEY_BUTTON_CAPTURE)]);
+    winReadKey("GS", i, joypad[JOYPAD(i,KEY_BUTTON_GS)]);
   }
-  key = regQueryDwordValue("Motion_Left", (DWORD)-1);
-  if(key != -1)
-    motion[KEY_LEFT] = key;
-  key = regQueryDwordValue("Motion_Right", (DWORD)-1);
-  if(key != -1)
-    motion[KEY_RIGHT] = key;
-  key = regQueryDwordValue("Motion_Up", (DWORD)-1);
-  if(key != -1)
-    motion[KEY_UP] = key;
-  key = regQueryDwordValue("Motion_Down", (DWORD)-1);
-  if(key != -1)
-    motion[KEY_DOWN] = key;
+  winReadKey("Motion_Left", joypad[MOTION(KEY_LEFT)]);
+  winReadKey("Motion_Right", joypad[MOTION(KEY_RIGHT)]);
+  winReadKey("Motion_Up", joypad[MOTION(KEY_UP)]);
+  winReadKey("Motion_Down", joypad[MOTION(KEY_DOWN)]);
 }
 
-static void winSaveKey(char *name, int num, USHORT value)
+void winSaveKey(char *name, KeyList &value)
+{
+	CString txtKeys;
+   
+	POSITION p = value.GetHeadPosition();
+	while(p!=NULL)
+	{
+		CString tmp;
+		tmp.Format("%d", value.GetNext(p));
+		txtKeys+=tmp;
+		if (p!=NULL)
+			txtKeys+=",";
+	}
+	regSetStringValue(name, txtKeys);
+}
+
+static void winSaveKey(char *name, int num, KeyList& value)
 {
   char buffer[80];
 
   sprintf(buffer, "Joy%d_%s", num, name);
-
-  regSetDwordValue(buffer, value);
+  winSaveKey(buffer, value);
 }
 
 void winSaveKeys()
 {
-  for(int i = 0; i < 4; i++) {
-    winSaveKey("Left", i, joypad[i][KEY_LEFT]);
-    winSaveKey("Right", i, joypad[i][KEY_RIGHT]);
-    winSaveKey("Up", i, joypad[i][KEY_UP]);
-    winSaveKey("Speed", i, joypad[i][KEY_BUTTON_SPEED]);
-    winSaveKey("Capture", i, joypad[i][KEY_BUTTON_CAPTURE]);
-    winSaveKey("GS", i, joypad[i][KEY_BUTTON_GS]);  
-    winSaveKey("Down", i, joypad[i][KEY_DOWN]);
-    winSaveKey("A", i, joypad[i][KEY_BUTTON_A]);
-    winSaveKey("B", i, joypad[i][KEY_BUTTON_B]);
-    winSaveKey("L", i, joypad[i][KEY_BUTTON_L]);
-    winSaveKey("R", i, joypad[i][KEY_BUTTON_R]);  
-    winSaveKey("Start", i, joypad[i][KEY_BUTTON_START]);
-    winSaveKey("Select", i, joypad[i][KEY_BUTTON_SELECT]);
+  for(int i = 0; i < JOYPADS; i++) {
+    winSaveKey("Left", i, joypad[JOYPAD(i,KEY_LEFT)]);
+    winSaveKey("Right", i, joypad[JOYPAD(i,KEY_RIGHT)]);
+    winSaveKey("Up", i, joypad[JOYPAD(i,KEY_UP)]);
+    winSaveKey("Speed", i, joypad[JOYPAD(i,KEY_BUTTON_SPEED)]);
+    winSaveKey("Capture", i, joypad[JOYPAD(i,KEY_BUTTON_CAPTURE)]);
+    winSaveKey("GS", i, joypad[JOYPAD(i,KEY_BUTTON_GS)]);  
+    winSaveKey("Down", i, joypad[JOYPAD(i,KEY_DOWN)]);
+    winSaveKey("A", i, joypad[JOYPAD(i,KEY_BUTTON_A)]);
+    winSaveKey("B", i, joypad[JOYPAD(i,KEY_BUTTON_B)]);
+    winSaveKey("L", i, joypad[JOYPAD(i,KEY_BUTTON_L)]);
+    winSaveKey("R", i, joypad[JOYPAD(i,KEY_BUTTON_R)]);  
+    winSaveKey("Start", i, joypad[JOYPAD(i,KEY_BUTTON_START)]);
+    winSaveKey("Select", i, joypad[JOYPAD(i,KEY_BUTTON_SELECT)]);
   }
   regSetDwordValue("joyVersion", 1);  
 
-  regSetDwordValue("Motion_Left",
-                   motion[KEY_LEFT]);
-  regSetDwordValue("Motion_Right",
-                   motion[KEY_RIGHT]);
-  regSetDwordValue("Motion_Up",
-                   motion[KEY_UP]);
-  regSetDwordValue("Motion_Down",
-                   motion[KEY_DOWN]);
+  winSaveKey("Motion_Left",
+                   joypad[MOTION(KEY_LEFT)]);
+  winSaveKey("Motion_Right",
+                   joypad[MOTION(KEY_RIGHT)]);
+  winSaveKey("Motion_Up",
+                   joypad[MOTION(KEY_UP)]);
+  winSaveKey("Motion_Down",
+                   joypad[MOTION(KEY_DOWN)]);
 }
 
 static BOOL CALLBACK EnumAxesCallback( const DIDEVICEOBJECTINSTANCE* pdidoi,
@@ -335,112 +330,18 @@ static void checkKeys()
   int dev = 0;
   int i;
 
-  for(i = 0; i < numDevices; i++)
-    pDevices[i].needed = 0;
-
-  for(i = 0; i < 4; i++) {
-    dev = joypad[i][KEY_LEFT] >> 8;
-    if(dev < numDevices && dev >= 0)
-      pDevices[dev].needed = 1;
-    else
-      joypad[i][KEY_LEFT] = DIK_LEFT;
-    
-    dev = joypad[i][KEY_RIGHT] >> 8;
-    if(dev < numDevices && dev >= 0)
-      pDevices[dev].needed = 1;
-    else
-      joypad[i][KEY_RIGHT] = DIK_RIGHT;
-    
-    dev = joypad[i][KEY_UP] >> 8;
-    if(dev < numDevices && dev >= 0)
-      pDevices[dev].needed = 1;
-    else
-      joypad[i][KEY_UP] = DIK_UP;
-    
-    dev = joypad[i][KEY_DOWN] >> 8;
-    if(dev < numDevices && dev >= 0)
-      pDevices[dev].needed = 1;
-    else
-      joypad[i][KEY_DOWN] = DIK_DOWN;
-    
-    dev = joypad[i][KEY_BUTTON_A] >> 8;
-    if(dev < numDevices && dev >= 0)
-      pDevices[dev].needed = 1;
-    else
-      joypad[i][KEY_BUTTON_A] = DIK_Z;
-    
-    dev = joypad[i][KEY_BUTTON_B] >> 8;
-    if(dev < numDevices && dev >= 0)
-      pDevices[dev].needed = 1;
-    else
-      joypad[i][KEY_BUTTON_B] = DIK_X;
-    
-    dev = joypad[i][KEY_BUTTON_L] >> 8;
-    if(dev < numDevices && dev >= 0)
-      pDevices[dev].needed = 1;
-    else
-      joypad[i][KEY_BUTTON_L] = DIK_A;
-    
-    dev = joypad[i][KEY_BUTTON_R] >> 8;
-    if(dev < numDevices && dev >= 0)
-      pDevices[dev].needed = 1;
-    else
-      joypad[i][KEY_BUTTON_R] = DIK_S;
-    
-    dev = joypad[i][KEY_BUTTON_START] >> 8;
-    if(dev < numDevices && dev >= 0)
-      pDevices[dev].needed = 1;
-    else
-      joypad[i][KEY_BUTTON_START] = DIK_RETURN;
-    
-    dev = joypad[i][KEY_BUTTON_SELECT] >> 8;
-    if(dev < numDevices && dev >= 0)
-      pDevices[dev].needed = 1;
-    else
-      joypad[i][KEY_BUTTON_SELECT] = DIK_BACK;
-    
-    dev = joypad[i][KEY_BUTTON_SPEED] >> 8;
-    if(dev < numDevices && dev >= 0)
-      pDevices[dev].needed = 1;
-    else
-      joypad[i][KEY_BUTTON_SPEED] = DIK_SPACE;
-    
-    dev = joypad[i][KEY_BUTTON_CAPTURE] >> 8;
-    if(dev < numDevices && dev >= 0)
-      pDevices[dev].needed = 1;
-    else
-      joypad[i][KEY_BUTTON_CAPTURE] = DIK_F12;
-    
-    dev = joypad[i][KEY_BUTTON_GS] >> 8;
-    if(dev < numDevices && dev >= 0)
-      pDevices[dev].needed = 1;
-    else
-      joypad[i][KEY_BUTTON_GS] = DIK_C;
+  for(i = 0; i < (sizeof(joypad) / sizeof(joypad[0])); i++) 
+  {
+	  if (joypad[i].IsEmpty() && defvalues[i]) 
+		  joypad[i].AddTail(defvalues[i]);
+	  POSITION p = joypad[i].GetHeadPosition();
+	  while(p!=NULL)
+	  {
+		  USHORT k = joypad[i].GetNext(p);
+		  if (k > 0 && DEVICEOF(k) < numDevices)
+			  pDevices[DEVICEOF(k)].needed = true;
+	  }
   }
-    
-  dev = motion[KEY_UP] >> 8;
-  if(dev < numDevices && dev >= 0)
-    pDevices[dev].needed = 1;
-  else
-    motion[KEY_UP] = DIK_NUMPAD8;  
-
-  dev = motion[KEY_DOWN] >> 8;
-  if(dev < numDevices && dev >= 0)
-    pDevices[dev].needed = 1;
-  else
-    motion[KEY_DOWN] = DIK_NUMPAD2;  
-
-  dev = motion[KEY_LEFT] >> 8;
-  if(dev < numDevices && dev >= 0)
-    pDevices[dev].needed = 1;
-  else
-    motion[KEY_LEFT] = DIK_NUMPAD4;  
-
-  dev = motion[KEY_RIGHT] >> 8;
-  if(dev < numDevices && dev >= 0)
-    pDevices[dev].needed = 1;
-  else
-    motion[KEY_RIGHT] = DIK_NUMPAD6;  
 }
 
 #define KEYDOWN(buffer,key) (buffer[key] & 0x80)
@@ -623,9 +524,8 @@ static void checkJoypads()
 
 BOOL checkKey(int key)
 {
-  int dev = (key >> 8);
-
-  int k = (key & 255);
+  int dev = DEVICEOF(key);
+  int k =  KEYOF(key);
   
   if(dev == 0) {
     return KEYDOWN(pDevices[0].data,k);
@@ -688,6 +588,17 @@ BOOL checkKey(int key)
   }
 
   return FALSE;
+}
+
+BOOL checkKey(KeyList &k)
+{
+	POSITION p = k.GetHeadPosition();
+	while(p!=NULL)
+	{
+		if (checkKey(k.GetNext(p)))
+			return TRUE;
+	}
+	return FALSE;
 }
 
 DirectInput::DirectInput()
@@ -848,28 +759,28 @@ u32 DirectInput::readDevice(int which)
   if(which >= 0 && which <= 3)
     i = which;
   
-  if(checkKey(joypad[i][KEY_BUTTON_A]))
+  if(checkKey(joypad[JOYPAD(i,KEY_BUTTON_A)]))
     res |= 1;
-  if(checkKey(joypad[i][KEY_BUTTON_B]))
+  if(checkKey(joypad[JOYPAD(i,KEY_BUTTON_B)]))
     res |= 2;
-  if(checkKey(joypad[i][KEY_BUTTON_SELECT]))
+  if(checkKey(joypad[JOYPAD(i,KEY_BUTTON_SELECT)]))
     res |= 4;
-  if(checkKey(joypad[i][KEY_BUTTON_START]))
+  if(checkKey(joypad[JOYPAD(i,KEY_BUTTON_START)]))
     res |= 8;
-  if(checkKey(joypad[i][KEY_RIGHT]))
+  if(checkKey(joypad[JOYPAD(i,KEY_RIGHT)]))
     res |= 16;
-  if(checkKey(joypad[i][KEY_LEFT]))
+  if(checkKey(joypad[JOYPAD(i,KEY_LEFT)]))
     res |= 32;
-  if(checkKey(joypad[i][KEY_UP]))
+  if(checkKey(joypad[JOYPAD(i,KEY_UP)]))
     res |= 64;
-  if(checkKey(joypad[i][KEY_DOWN]))
+  if(checkKey(joypad[JOYPAD(i,KEY_DOWN)]))
     res |= 128;
-  if(checkKey(joypad[i][KEY_BUTTON_R]))
+  if(checkKey(joypad[JOYPAD(i,KEY_BUTTON_R)]))
     res |= 256;
-  if(checkKey(joypad[i][KEY_BUTTON_L]))
+  if(checkKey(joypad[JOYPAD(i,KEY_BUTTON_L)]))
     res |= 512;
   
-  if(checkKey(joypad[i][KEY_BUTTON_GS]))
+  if(checkKey(joypad[JOYPAD(i,KEY_BUTTON_GS)]))
     res |= 4096;
 
   if(theApp.autoFire) {
@@ -902,9 +813,9 @@ u32 DirectInput::readDevice(int which)
     res = theApp.movieLastJoypad;
   }
   // we don't record speed up or screen capture buttons
-  if(checkKey(joypad[i][KEY_BUTTON_SPEED]) || theApp.speedupToggle)
+  if(checkKey(joypad[JOYPAD(i,KEY_BUTTON_SPEED)]) || theApp.speedupToggle)
     res |= 1024;
-  if(checkKey(joypad[i][KEY_BUTTON_CAPTURE]))
+  if(checkKey(joypad[JOYPAD(i,KEY_BUTTON_CAPTURE)]))
     res |= 2048;
 
   return res;
@@ -984,13 +895,13 @@ void DirectInput::checkKeys()
 
 void DirectInput::checkMotionKeys()
 {
-  if(checkKey(motion[KEY_LEFT])) {
+  if(checkKey(joypad[MOTION(KEY_LEFT)])) {
     theApp.sensorX += 3;
     if(theApp.sensorX > 2197)
       theApp.sensorX = 2197;
     if(theApp.sensorX < 2047)
       theApp.sensorX = 2057;
-  } else if(checkKey(motion[KEY_RIGHT])) {
+  } else if(checkKey(joypad[MOTION(KEY_RIGHT)])) {
     theApp.sensorX -= 3;
     if(theApp.sensorX < 1897)
       theApp.sensorX = 1897;
@@ -1006,13 +917,13 @@ void DirectInput::checkMotionKeys()
       theApp.sensorX = 2047;
   }
   
-  if(checkKey(motion[KEY_UP])) {
+  if(checkKey(joypad[MOTION(KEY_UP)])) {
     theApp.sensorY += 3;
     if(theApp.sensorY > 2197)
       theApp.sensorY = 2197;
     if(theApp.sensorY < 2047)
       theApp.sensorY = 2057;
-  } else if(checkKey(motion[KEY_DOWN])) {
+  } else if(checkKey(joypad[MOTION(KEY_DOWN)])) {
     theApp.sensorY -= 3;
     if(theApp.sensorY < 1897)
       theApp.sensorY = 1897;

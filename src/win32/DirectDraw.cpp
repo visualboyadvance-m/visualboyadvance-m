@@ -670,20 +670,6 @@ void DirectDrawDisplay::checkFullScreen()
 
 void DirectDrawDisplay::render()
 {
-// hack - some systems seem to render audio too
-// fast.  This means the audio buffer will slowly drain
-// if vsync is on.  If we drop one out of 800 frames
-// it will keep us "ahead" of the sound.  Better
-// way to handle this is to skip frames when the sound
-// buffer is low.
-   static int ctr = 0;
-   ctr++;
-   if (ctr == 800)
-   {
-	   ctr = 0;
-	   return;
-   }
-// end hack
   HRESULT hret;
 
   if(pDirectDraw == NULL ||

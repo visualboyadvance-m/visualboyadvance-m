@@ -24,14 +24,27 @@
 #include "Joypad.h"
 #include "Input.h"
 
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
 
-extern USHORT joypad[4][13];
-extern USHORT motion[4];
+extern KeyList joypad[JOYPADS * KEYS_PER_PAD + MOTION_KEYS]; 
+
+// Todo: Expand UI to allow user to enter multiple keys here.
+
+int TempReadFirst(KeyList &Key)
+{
+	return Key.GetHead();
+}
+
+void TempWriteFirst(KeyList &Key, int Out)
+{
+	Key.RemoveAll();
+	Key.AddTail(Out);
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // JoypadEditControl
@@ -165,44 +178,44 @@ BOOL JoypadConfig::OnInitDialog()
   
   timerId = SetTimer(0,200,NULL);
   
-  SetWindowLong(up, GWL_USERDATA,joypad[which][KEY_UP]);
-  up.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_UP]));
+  SetWindowLong(up, GWL_USERDATA,TempReadFirst(joypad[JOYPAD(which,KEY_UP)]));
+  up.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[JOYPAD(which,KEY_UP)])));
   
-  SetWindowLong(down, GWL_USERDATA,joypad[which][KEY_DOWN]);
-  down.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_DOWN]));
+  SetWindowLong(down, GWL_USERDATA,TempReadFirst(joypad[JOYPAD(which,KEY_DOWN)]));
+  down.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[JOYPAD(which,KEY_DOWN)])));
 
-  SetWindowLong(left, GWL_USERDATA,joypad[which][KEY_LEFT]);
-  left.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_LEFT]));
+  SetWindowLong(left, GWL_USERDATA,TempReadFirst(joypad[JOYPAD(which,KEY_LEFT)]));
+  left.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[JOYPAD(which,KEY_LEFT)])));
 
-  SetWindowLong(right, GWL_USERDATA,joypad[which][KEY_RIGHT]);
-  right.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_RIGHT]));
+  SetWindowLong(right, GWL_USERDATA,TempReadFirst(joypad[JOYPAD(which,KEY_RIGHT)]));
+  right.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[JOYPAD(which,KEY_RIGHT)])));
 
-  SetWindowLong(buttonA, GWL_USERDATA,joypad[which][KEY_BUTTON_A]);
-  buttonA.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_A]));
+  SetWindowLong(buttonA, GWL_USERDATA,TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_A)]));
+  buttonA.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_A)])));
 
-  SetWindowLong(buttonB, GWL_USERDATA,joypad[which][KEY_BUTTON_B]);
-  buttonB.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_B]));
+  SetWindowLong(buttonB, GWL_USERDATA,TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_B)]));
+  buttonB.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_B)])));
   
-  SetWindowLong(buttonL, GWL_USERDATA,joypad[which][KEY_BUTTON_L]);
-  buttonL.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_L]));
+  SetWindowLong(buttonL, GWL_USERDATA,TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_L)]));
+  buttonL.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_L)])));
 
-  SetWindowLong(buttonR, GWL_USERDATA,joypad[which][KEY_BUTTON_R]);
-  buttonR.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_R]));
+  SetWindowLong(buttonR, GWL_USERDATA,TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_R)]));
+  buttonR.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_R)])));
   
-  SetWindowLong(buttonSelect, GWL_USERDATA,joypad[which][KEY_BUTTON_SELECT]);
-  buttonSelect.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_SELECT]));
+  SetWindowLong(buttonSelect, GWL_USERDATA,TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_SELECT)]));
+  buttonSelect.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_SELECT)])));
 
-  SetWindowLong(buttonStart, GWL_USERDATA,joypad[which][KEY_BUTTON_START]);
-  buttonStart.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_START]));
+  SetWindowLong(buttonStart, GWL_USERDATA,TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_START)]));
+  buttonStart.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_START)])));
 
-  SetWindowLong(speed, GWL_USERDATA,joypad[which][KEY_BUTTON_SPEED]);
-  speed.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_SPEED]));
+  SetWindowLong(speed, GWL_USERDATA,TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_SPEED)]));
+  speed.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_SPEED)])));
   
-  SetWindowLong(capture, GWL_USERDATA,joypad[which][KEY_BUTTON_CAPTURE]);
-  capture.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_CAPTURE]));
+  SetWindowLong(capture, GWL_USERDATA,TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_CAPTURE)]));
+  capture.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_CAPTURE)])));
 
-  SetWindowLong(buttonGS, GWL_USERDATA,joypad[which][KEY_BUTTON_GS]);
-  buttonGS.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_GS]));
+  SetWindowLong(buttonGS, GWL_USERDATA,TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_GS)]));
+  buttonGS.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[JOYPAD(which,KEY_BUTTON_GS)])));
   
   CenterWindow();
 
@@ -214,43 +227,43 @@ void JoypadConfig::assignKey(int id, int key)
 {
   switch(id) {
   case IDC_EDIT_LEFT:
-    joypad[which][KEY_LEFT] = key;
+    TempWriteFirst(joypad[JOYPAD(which,KEY_LEFT)],key);
     break;
   case IDC_EDIT_RIGHT:
-    joypad[which][KEY_RIGHT] = key;
+    TempWriteFirst(joypad[JOYPAD(which,KEY_RIGHT)],key);
     break;
   case IDC_EDIT_UP:
-    joypad[which][KEY_UP] = key;
+    TempWriteFirst(joypad[JOYPAD(which,KEY_UP)],key);
     break;
   case IDC_EDIT_SPEED:
-    joypad[which][KEY_BUTTON_SPEED] = key;
+    TempWriteFirst(joypad[JOYPAD(which,KEY_BUTTON_SPEED)],key);
     break;
   case IDC_EDIT_CAPTURE:
-    joypad[which][KEY_BUTTON_CAPTURE] = key;
+    TempWriteFirst(joypad[JOYPAD(which,KEY_BUTTON_CAPTURE)],key);
     break;    
   case IDC_EDIT_DOWN:
-    joypad[which][KEY_DOWN] = key;
+    TempWriteFirst(joypad[JOYPAD(which,KEY_DOWN)],key);
     break;
   case IDC_EDIT_BUTTON_A:
-    joypad[which][KEY_BUTTON_A] = key;
+    TempWriteFirst(joypad[JOYPAD(which,KEY_BUTTON_A)],key);
     break;
   case IDC_EDIT_BUTTON_B:
-    joypad[which][KEY_BUTTON_B] = key;
+    TempWriteFirst(joypad[JOYPAD(which,KEY_BUTTON_B)],key);
     break;
   case IDC_EDIT_BUTTON_L:
-    joypad[which][KEY_BUTTON_L] = key;
+    TempWriteFirst(joypad[JOYPAD(which,KEY_BUTTON_L)],key);
     break;
   case IDC_EDIT_BUTTON_R:
-    joypad[which][KEY_BUTTON_R] = key;
+    TempWriteFirst(joypad[JOYPAD(which,KEY_BUTTON_R)],key);
     break;
   case IDC_EDIT_BUTTON_START:
-    joypad[which][KEY_BUTTON_START] = key;
+    TempWriteFirst(joypad[JOYPAD(which,KEY_BUTTON_START)],key);
     break;
   case IDC_EDIT_BUTTON_SELECT:
-    joypad[which][KEY_BUTTON_SELECT] = key;
+    TempWriteFirst(joypad[JOYPAD(which,KEY_BUTTON_SELECT)],key);
     break;
   case IDC_EDIT_BUTTON_GS:
-    joypad[which][KEY_BUTTON_GS] = key;
+    TempWriteFirst(joypad[JOYPAD(which,KEY_BUTTON_GS)],key);
     break;
   }
 }
@@ -370,17 +383,17 @@ BOOL MotionConfig::OnInitDialog()
   
   timerId = SetTimer(0,200,NULL);
   
-  SetWindowLong(up, GWL_USERDATA,motion[KEY_UP]);
-  up.SetWindowText(theApp.input->getKeyName(motion[KEY_UP]));
+  SetWindowLong(up, GWL_USERDATA,TempReadFirst(joypad[MOTION(KEY_UP)]));
+  up.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[MOTION(KEY_UP)])));
   
-  SetWindowLong(down, GWL_USERDATA,motion[KEY_DOWN]);
-  down.SetWindowText(theApp.input->getKeyName(motion[KEY_DOWN]));
+  SetWindowLong(down, GWL_USERDATA,TempReadFirst(joypad[MOTION(KEY_DOWN)]));
+  down.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[MOTION(KEY_DOWN)])));
 
-  SetWindowLong(left, GWL_USERDATA,motion[KEY_LEFT]);
-  left.SetWindowText(theApp.input->getKeyName(motion[KEY_LEFT]));
+  SetWindowLong(left, GWL_USERDATA,TempReadFirst(joypad[MOTION(KEY_LEFT)]));
+  left.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[MOTION(KEY_LEFT)])));
 
-  SetWindowLong(right, GWL_USERDATA,motion[KEY_RIGHT]);
-  right.SetWindowText(theApp.input->getKeyName(motion[KEY_RIGHT]));
+  SetWindowLong(right, GWL_USERDATA,TempReadFirst(joypad[MOTION(KEY_RIGHT)]));
+  right.SetWindowText(theApp.input->getKeyName(TempReadFirst(joypad[MOTION(KEY_RIGHT)])));
 
   CenterWindow();
 
@@ -403,16 +416,16 @@ void MotionConfig::assignKey(int id, int key)
 {
   switch(id) {
   case IDC_EDIT_LEFT:
-    motion[KEY_LEFT] = key;
+    TempWriteFirst(joypad[MOTION(KEY_LEFT)],key);
     break;
   case IDC_EDIT_RIGHT:
-    motion[KEY_RIGHT] = key;
+    TempWriteFirst(joypad[MOTION(KEY_RIGHT)],key);
     break;
   case IDC_EDIT_UP:
-    motion[KEY_UP] = key;
+    TempWriteFirst(joypad[MOTION(KEY_UP)],key);
     break;
   case IDC_EDIT_DOWN:
-    motion[KEY_DOWN] = key;
+    TempWriteFirst(joypad[MOTION(KEY_DOWN)],key);
     break;
   }
 }

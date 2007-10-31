@@ -23,6 +23,17 @@
 
 #define JOYCONFIG_MESSAGE (WM_USER + 1000)
 
+typedef CList<USHORT,USHORT> KeyList;
+
+#define JOYPADS 4
+#define MOTION_KEYS 4
+#define KEYS_PER_PAD 13
+#define MOTION(i) ((JOYPADS*KEYS_PER_PAD)+i)
+#define JOYPAD(i,j) ((i*KEYS_PER_PAD)+j)
+
+#define DEVICEOF(key) (key >> 8)
+#define KEYOF(key) (key & 255)
+
 enum {
   KEY_LEFT, KEY_RIGHT,
   KEY_UP, KEY_DOWN,
