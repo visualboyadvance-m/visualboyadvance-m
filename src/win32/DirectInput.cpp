@@ -86,7 +86,7 @@ static int joyDebug = 0;
 static int axisNumber = 0;
 
 
-KeyList joypad[JOYPADS * KEYS_PER_PAD + MOTION_KEYS]; 
+//KeyList joypad[JOYPADS * KEYS_PER_PAD + MOTION_KEYS]; 
 
 
 USHORT defvalues[JOYPADS * KEYS_PER_PAD + MOTION_KEYS] =
@@ -151,7 +151,7 @@ void winReadKeys()
   winReadKey("Motion_Down", joypad[MOTION(KEY_DOWN)]);
 }
 
-void winSaveKey(char *name, KeyList &value)
+void winSaveKey(char *name, KeyList& value)
 {
 	CString txtKeys;
    

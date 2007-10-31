@@ -45,8 +45,9 @@ enum {
 };
 
 class Input {
-
  public:
+  KeyList joypaddata[JOYPADS * KEYS_PER_PAD + MOTION_KEYS];
+
   Input() {};
   virtual ~Input() {};
   
@@ -62,5 +63,7 @@ class Input {
   virtual void loadSettings() = 0;
   virtual void saveSettings() = 0;
 };
+
+#define joypad theApp.input->joypaddata
 
 #endif
