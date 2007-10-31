@@ -35,6 +35,9 @@ static char THIS_FILE[] = __FILE__;
 
 int TempReadFirst(KeyList &Key)
 {
+	if (Key.IsEmpty())
+		return 0;
+
 	return Key.GetHead();
 }
 
