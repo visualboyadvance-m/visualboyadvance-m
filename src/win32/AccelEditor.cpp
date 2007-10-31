@@ -180,12 +180,13 @@ void AccelEditor::OnAssign()
   
   WORD wKey;
   bool bCtrl, bAlt, bShift;
-
+  int index;
+	
   if (!m_key.GetAccelKey(wKey, bCtrl, bAlt, bShift))
     return; // no valid key, abort
 
   int count = m_commands.GetCount();
-  for (int index = 0; index < count; index++) {
+  for (index = 0; index < count; index++) {
 
     wIDCommand = LOWORD(m_commands.GetItemData(index));
     mgr.m_mapAccelTable.Lookup(wIDCommand, pCmdAccel);

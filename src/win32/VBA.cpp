@@ -85,6 +85,8 @@ extern void Simple4x32(u8*,u32,u8*,u8*,u32,int,int);
 
 extern void hq3x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq3x16(u8*,u32,u8*,u8*,u32,int,int);
+extern void hq4x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void hq4x16(u8*,u32,u8*,u8*,u32,int,int);
 
 extern void SmartIB(u8*,u32,int,int);
 extern void SmartIB32(u8*,u32,int,int);
@@ -699,7 +701,7 @@ void VBA::updateFilter()
 			filterMagnification = 3;
 			break;
 		case FILTER_HQ4X:
-			//filterFunction = lq2x;
+			filterFunction = hq4x16;
 			filterMagnification = 4;
 			break;
 		}
@@ -776,8 +778,9 @@ void VBA::updateFilter()
 				b16to32Video=true;
 				break;
 			case FILTER_HQ4X:
-				//filterFunction = lq2x;
+				filterFunction = hq4x32;
 				filterMagnification = 4;
+				b16to32Video=true;
 				break;
 			}
 		}

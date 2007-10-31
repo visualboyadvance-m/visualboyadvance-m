@@ -83,11 +83,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib d3dx9.lib Dsound.lib"
+				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib winmm.lib d3dx9.lib Dsound.lib"
 				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
 				Version=""
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
+				GenerateManifest="false"
 				IgnoreDefaultLibraryNames="nafxcwd.lib;LIBCMTD.lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -356,13 +357,14 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib d3dx9.lib Dsound.lib"
+				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib d3dx9.lib Dsound.lib winmm.lib"
 				ShowProgress="0"
 				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
 				Version=""
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=""
+				GenerateManifest="false"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="nafxcw.lib;LIBCMT.lib"
 				GenerateDebugInformation="false"
@@ -505,6 +507,7 @@
 							>
 							<Tool
 								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
 								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 							/>
@@ -514,6 +517,7 @@
 							>
 							<Tool
 								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
 								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 							/>
@@ -523,6 +527,7 @@
 							>
 							<Tool
 								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
 								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 							/>
@@ -536,6 +541,7 @@
 							>
 							<Tool
 								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
 								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 							/>
@@ -545,6 +551,7 @@
 							>
 							<Tool
 								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
 								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 							/>
@@ -554,14 +561,79 @@
 							>
 							<Tool
 								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
 								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\src\hq4x.cpp"
+						RelativePath=".\src\hq4x_16.asm"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
+								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
+								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Optimized|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
+								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\src\hq4x_32.asm"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
+								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
+								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Optimized|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
+								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\src\hq_shared32.cpp"
