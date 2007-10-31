@@ -31,8 +31,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-extern KeyList joypad[JOYPADS * KEYS_PER_PAD + MOTION_KEYS]; 
-
 // Todo: Expand UI to allow user to enter multiple keys here.
 
 int TempReadFirst(KeyList &Key)
