@@ -105,6 +105,18 @@ static HRESULT WINAPI checkModesAvailable(LPDDSURFACEDESC2 surf, LPVOID lpContex
      surf->ddpfPixelFormat.dwRGBBitCount == 16) {
     theApp.mode800Available = TRUE;
   }
+   if(surf->dwWidth == 1024 &&
+     surf->dwHeight == 768 &&
+     surf->ddpfPixelFormat.dwRGBBitCount == 16) {
+    theApp.mode1024Available = TRUE;
+  }
+    if(surf->dwWidth == 1280 &&
+     surf->dwHeight == 1024 &&
+     surf->ddpfPixelFormat.dwRGBBitCount == 16) {
+    theApp.mode1280Available = TRUE;
+  }
+
+
   return DDENUMRET_OK;
 }
 
@@ -346,6 +358,8 @@ bool DirectDrawDisplay::initialize()
   theApp.mode320Available = false;
   theApp.mode640Available = false;
   theApp.mode800Available = false;
+  theApp.mode1024Available = false;
+  theApp.mode1280Available = false;
   // check for available fullscreen modes
   pDirectDraw->EnumDisplayModes(DDEDM_STANDARDVGAMODES, NULL, NULL,
                                 checkModesAvailable);
@@ -371,7 +385,7 @@ bool DirectDrawDisplay::initialize()
     hret = pDirectDraw->SetDisplayMode(theApp.fsWidth,
                                        theApp.fsHeight,
                                        theApp.fsColorDepth,
-                                       60,
+                                       theApp.fsFrequency,
                                        0);
     if(hret != DD_OK) {
       winlog("Error SetDisplayMode %08x\n", hret);

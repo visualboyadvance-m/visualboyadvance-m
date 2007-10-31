@@ -1286,7 +1286,7 @@ void VBA::loadSettings()
   fsWidth = regQueryDwordValue("fsWidth", 0);
   fsHeight = regQueryDwordValue("fsHeight", 0);
   fsColorDepth = regQueryDwordValue("fsColorDepth", 0);
-  fsFrequency = regQueryDwordValue("fsFrequency", 0);
+  fsFrequency = regQueryDwordValue("fsFrequency", 60);
   fsAdapter = regQueryDwordValue("fsAdapter", 0);
 
   if(videoOption == VIDEO_OTHER)
@@ -1421,27 +1421,32 @@ void VBA::loadSettings()
     fsWidth = 320;
     fsHeight = 240;
     fsColorDepth = 16;
+	fsFrequency = 60;
     break;
   case VIDEO_640x480:
     fsWidth = 640;
     fsHeight = 480;
     fsColorDepth = 16;
-    break;
+	fsFrequency = 60;
+	break;
   case VIDEO_800x600:
     fsWidth = 800;
     fsHeight = 600;
     fsColorDepth = 16;
-    break;
+	fsFrequency = 60;
+	break;
   case VIDEO_1024x768:
     fsWidth = 1024;
     fsHeight = 768;
-    fsColorDepth = 32;
-    break;
+    fsColorDepth = 16;
+	fsFrequency = 60;
+	break;
   case VIDEO_1280x1024:
     fsWidth = 1280;
     fsHeight = 1024;
-    fsColorDepth = 32;
-    break;
+    fsColorDepth = 16;
+	fsFrequency = 60;
+	break;
   }
 
   winGbBorderOn = regQueryDwordValue("borderOn", 0);

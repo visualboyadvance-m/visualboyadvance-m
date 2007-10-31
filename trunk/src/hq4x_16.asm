@@ -3896,11 +3896,9 @@ _hq4x_16:
     add		edi,ebx
     add     edi,ebx
     mov     ebx, [ebp+Xres] ; added, bug - need to add to destination offset
-    shl     ebx, 1
+    shl     ebx, 3
     sub     edi, ebx
-    sub     edi, ebx
-    sub     edi, ebx    
-    sub     edi, ebx    
+    shr     ebx, 2
     dec     dword[linesleft]
     jz      .fin
     add		ebx, [ebp+offset];
