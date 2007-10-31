@@ -147,7 +147,7 @@ int systemColorDepth = 16;
 int systemVerbose = 0;
 int systemDebug = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
-
+bool soundBufferLow = 0;
 void winSignal(int,int);
 void winOutput(char *, u32);
 
@@ -943,8 +943,11 @@ void systemDrawScreen()
       theApp.ifbFunction(pix+theApp.filterWidth*4+4, theApp.filterWidth*4+4,
                          theApp.filterWidth, theApp.filterHeight);
   }
-
-  theApp.display->render();
+  
+  if(!soundBufferLow)
+	  theApp.display->render();
+  else
+	  soundBufferLow = false;
 }
 
 void systemScreenCapture(int captureNumber)
