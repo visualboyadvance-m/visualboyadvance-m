@@ -123,7 +123,7 @@ void winReadKey(const char *name, int num, KeyList& Keys)
   char buffer[80];
 
   sprintf(buffer, "Joy%d_%s", num, name);
-  winReadKey(name, Keys);
+  winReadKey(buffer, Keys);
 }
 
 
