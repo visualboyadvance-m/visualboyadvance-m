@@ -674,7 +674,7 @@ void  gbWriteMemory(register u16 address, register u8 value)
     return;
   }
   
-  if (address<0xE000)
+ if (address<0xE000)
 	{
 		gbMemoryMap[address>>12][address & 0x0fff] = value;
 		return;
@@ -1226,11 +1226,12 @@ u8 gbReadOpcode(register u16 address)
       }
     }
     break;
+if (address>=0xE000 && address<0xFE00)
+	{
+		return gbMemoryMap[(address-0x2000)>>12][address & 0x0fff];
+	}
   }
- if (address>=0xE000 && address<0xFE00)
-{
-  return gbMemoryMap[(address-0x2000)>>12][address & 0x0fff];
-  }
+  return gbMemoryMap[address>>12][address & 0x0fff];
 }
 
 u8 gbReadMemory(register u16 address)
@@ -1394,11 +1395,12 @@ u8 gbReadMemory(register u16 address)
     case 0xff:
       return register_IE;
     }
-  }
-if (address>=0xE000 && address<0xFE00)
+	if (address>=0xE000 && address<0xFE00)
 	{
 		return gbMemoryMap[(address-0x2000)>>12][address & 0x0fff];
 	}
+  }
+  return gbMemoryMap[address>>12][address & 0x0fff];
 }
 
 void gbVblank_interrupt()
