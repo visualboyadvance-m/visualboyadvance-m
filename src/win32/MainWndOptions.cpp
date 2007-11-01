@@ -225,6 +225,7 @@ void MainWnd::OnUpdateOptionsVideoFrameskip9(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsVideoVsync() 
 {
   theApp.vsync = !theApp.vsync;
+  theApp.updateRenderMethod(true);
 }
 
 void MainWnd::OnUpdateOptionsVideoVsync(CCmdUI* pCmdUI) 
@@ -455,6 +456,7 @@ void MainWnd::OnUpdateOptionsVideoRendermethodOpengl(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsVideoTriplebuffering() 
 {
   theApp.tripleBuffering = !theApp.tripleBuffering;
+  theApp.updateRenderMethod(true);
 }
 
 void MainWnd::OnUpdateOptionsVideoTriplebuffering(CCmdUI* pCmdUI) 

@@ -32,6 +32,8 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 // Todo: Expand UI to allow user to enter multiple keys here.
+// these are temporary quick hacks to make the new lists
+// work with the old code.
 
 int TempReadFirst(KeyList &Key)
 {

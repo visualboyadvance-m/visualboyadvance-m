@@ -646,6 +646,9 @@ void MainWnd::OnFileTogglemenu()
   }
 
   theApp.adjustDestRect();
+  if(theApp.display)
+	theApp.display->resize(theApp.dest.right-theApp.dest.left, theApp.dest.bottom-theApp.dest.top);
+
 }
 
 void MainWnd::OnUpdateFileTogglemenu(CCmdUI* pCmdUI) 

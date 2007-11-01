@@ -71,8 +71,8 @@ END
 // Dialog
 //
 
-IDD_LINKTAB DIALOG DISCARDABLE  0, 0, 225, 162
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_LINKTAB DIALOG  0, 0, 225, 162
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Link Options"
 FONT 8, "MS Sans Serif"
 BEGIN
@@ -81,71 +81,58 @@ BEGIN
     PUSHBUTTON      "Cancel",ID_CANCEL,114,140,57,15
 END
 
-IDD_LINKTAB1 DIALOG DISCARDABLE  0, 0, 210, 130
-STYLE WS_CHILD | WS_VISIBLE
+IDD_LINKTAB1 DIALOG  0, 0, 210, 130
+STYLE DS_SETFONT | WS_CHILD | WS_VISIBLE
 FONT 8, "MS Sans Serif"
 BEGIN
     LTEXT           "Link timeout (in milliseconds)",IDC_STATIC,17,12,92,16
     EDITTEXT        IDC_LINKTIMEOUT,116,10,53,14,ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "Single Computer",IDC_LINK_SINGLE,"Button",
-                    BS_AUTORADIOBUTTON,17,27,71,16
-    CONTROL         "Network",IDC_LINK_LAN,"Button",BS_AUTORADIOBUTTON,17,43,
-                    70,16
+    CONTROL         "Single Computer",IDC_LINK_SINGLE,"Button",BS_AUTORADIOBUTTON,17,27,71,16
+    CONTROL         "Network",IDC_LINK_LAN,"Button",BS_AUTORADIOBUTTON,17,43,70,16
 END
 
-IDD_LINKTAB2 DIALOG DISCARDABLE  0, 0, 210, 113
-STYLE WS_CHILD
+IDD_LINKTAB2 DIALOG  0, 0, 210, 113
+STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "2",IDC_LINK2P,"Button",BS_AUTORADIOBUTTON | WS_GROUP,46,
-                    16,21,13
+    CONTROL         "2",IDC_LINK2P,"Button",BS_AUTORADIOBUTTON | WS_GROUP,46,16,21,13
     CONTROL         "3",IDC_LINK3P,"Button",BS_AUTORADIOBUTTON,94,16,21,13
     CONTROL         "4",IDC_LINK4P,"Button",BS_AUTORADIOBUTTON,142,16,21,13
-    CONTROL         "TCP/IP",IDC_LINKTCP,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,54,47,42,14
-    CONTROL         "UDP",IDC_LINKUDP,"Button",BS_AUTORADIOBUTTON | 
-                    WS_DISABLED,121,47,33,14
+    CONTROL         "TCP/IP",IDC_LINKTCP,"Button",BS_AUTORADIOBUTTON | WS_GROUP,54,47,42,14
+    CONTROL         "UDP",IDC_LINKUDP,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,121,47,33,14
     PUSHBUTTON      "Start!",IDC_SERVERSTART,79,89,50,17
     LTEXT           "Select number of players:",IDC_STATIC,60,7,89,10
     LTEXT           "Select protocol:",IDC_STATIC,78,33,53,11
-    CONTROL         "Speed hacks",IDC_SSPEED,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,76,70,57,12
+    CONTROL         "Speed hacks",IDC_SSPEED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,76,70,57,12
 END
 
-IDD_LINKTAB3 DIALOG DISCARDABLE  0, 0, 210, 108
-STYLE WS_CHILD
+IDD_LINKTAB3 DIALOG  0, 0, 210, 108
+STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "TCP/IP",IDC_CLINKTCP,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,58,20,39,12
-    CONTROL         "UDP",IDC_CLINKUDP,"Button",BS_AUTORADIOBUTTON | 
-                    WS_DISABLED,118,20,32,12
+    CONTROL         "TCP/IP",IDC_CLINKTCP,"Button",BS_AUTORADIOBUTTON | WS_GROUP,58,20,39,12
+    CONTROL         "UDP",IDC_CLINKUDP,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,118,20,32,12
     EDITTEXT        IDC_SERVERIP,84,39,79,12,ES_AUTOHSCROLL | WS_GROUP
     PUSHBUTTON      "Connect",IDC_LINKCONNECT,75,81,59,16
     LTEXT           "Select protocol:",IDC_STATIC,78,7,53,9
     LTEXT           "Server IP address or hostname:",IDC_STATIC,7,37,62,18
     LTEXT           "Speed hacks:",IDC_STATIC,7,64,47,10
-    CONTROL         "Off (accurate)",IDC_SPEEDOFF,"Button",
-                    BS_AUTORADIOBUTTON | WS_GROUP,60,63,57,12
-    CONTROL         "On (fast)",IDC_SPEEDON,"Button",BS_AUTORADIOBUTTON,128,
-                    63,48,12
+    CONTROL         "Off (accurate)",IDC_SPEEDOFF,"Button",BS_AUTORADIOBUTTON | WS_GROUP,60,63,57,12
+    CONTROL         "On (fast)",IDC_SPEEDON,"Button",BS_AUTORADIOBUTTON,128,63,48,12
 END
 
-IDD_SERVERWAIT DIALOG DISCARDABLE  0, 0, 186, 90
-STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+IDD_SERVERWAIT DIALOG  0, 0, 186, 90
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Waiting for players"
 FONT 8, "MS Sans Serif"
 BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,63,69,50,14
-    CONTROL         "Progress1",IDC_SERVERWAIT,"msctls_progress32",WS_BORDER,
-                    33,50,120,13
+    CONTROL         "Progress1",IDC_SERVERWAIT,"msctls_progress32",WS_BORDER,33,50,120,13
     LTEXT           "",IDC_STATIC1,7,7,154,8
     LTEXT           "",IDC_STATIC2,7,17,105,8
     LTEXT           "",IDC_STATIC3,7,25,105,8
     LTEXT           "",IDC_STATIC4,7,33,105,8
 END
-
-
 
 IDD_OPENDLG DIALOG  36, 24, 202, 117
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_CONTEXTHELP | WS_POPUP | WS_CAPTION | WS_SYSMENU
@@ -1563,7 +1550,6 @@ BEGIN
                 MENUITEM "Direct&Draw",                 ID_OPTIONS_VIDEO_RENDERMETHOD_DIRECTDRAW
                 MENUITEM "   Emulation only",           ID_OPTIONS_VIDEO_DDRAWEMULATIONONLY
                 MENUITEM "   Use &Video Memory",        ID_OPTIONS_VIDEO_DDRAWUSEVIDEOMEMORY
-                MENUITEM "   Triple Buffering",         ID_OPTIONS_VIDEO_TRIPLEBUFFERING
                 MENUITEM SEPARATOR
                 MENUITEM "Direct&3D",                   ID_OPTIONS_VIDEO_RENDERMETHOD_DIRECT3D
                 MENUITEM "   Filter: Nearest",          ID_OPTIONS_VIDEO_RENDEROPTIONS_D3DNOFILTER
@@ -1576,6 +1562,7 @@ BEGIN
                 MENUITEM "   Vertex: Quads",            ID_OPTIONS_VIDEO_RENDEROPTIONS_GLQUADS
                 MENUITEM SEPARATOR
                 MENUITEM "&VSync",                      ID_OPTIONS_VIDEO_VSYNC
+                MENUITEM "Triple Buffering",            ID_OPTIONS_VIDEO_TRIPLEBUFFERING
             END
             MENUITEM SEPARATOR
             POPUP "Windowed"
@@ -1809,7 +1796,7 @@ BEGIN
             MENUITEM "&Real Colors",                ID_OPTIONS_GAMEBOY_REALCOLORS
             MENUITEM "G&ameboy Colors",             ID_OPTIONS_GAMEBOY_GAMEBOYCOLORS
             MENUITEM "LCD colors",                  ID_OPTIONS_FILTER_LCDCOLORS
-			MENUITEM SEPARATOR
+            MENUITEM SEPARATOR
             MENUITEM "&Colors...",                  ID_OPTIONS_GAMEBOY_COLORS
         END
         POPUP "&Language"
@@ -1821,7 +1808,6 @@ BEGIN
         POPUP "Li&nk"
         BEGIN
             MENUITEM "&Wireless Adapter",           ID_OPTIONS_LINK_WIRELESSADAPTER
-
             MENUITEM "&Log",                        ID_OPTIONS_LINK_LOG
             MENUITEM "&Options...",                 ID_OPTIONS_LINK_OPTIONS
         END
@@ -1959,13 +1945,6 @@ BEGIN
     "X",            ID_FILE_EXIT,           VIRTKEY, CONTROL, NOINVERT
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// RT_MANIFEST
-//
-
-1                       RT_MANIFEST             "VBA.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 //
