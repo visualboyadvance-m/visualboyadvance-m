@@ -586,12 +586,17 @@ bool gbIsGameboyRom(char * file)
 
 void gbCopyMemory(u16 d, u16 s, int count)
 {
-  while(count) {
-    gbMemoryMap[d>>12][d & 0x0fff] = gbMemoryMap[s>>12][s & 0x0fff];
-    s++;
-    d++;
-    count--;
-  }
+	if (s>=0xE000 && s<0xFE00)
+	{
+		s-=0x2000;
+	}
+	while(count) 
+	{
+		gbMemoryMap[d>>12][d & 0x0fff] = gbMemoryMap[s>>12][s & 0x0fff];
+		s++;
+		d++;
+		count--;
+	}
 }
 
 void gbDoHdma()
@@ -669,10 +674,16 @@ void  gbWriteMemory(register u16 address, register u8 value)
     return;
   }
   
-  if(address < 0xfe00) {
-    gbMemoryMap[address>>12][address & 0x0fff] = value;
-    return;
-  }
+  if (address<0xE000)
+	{
+		gbMemoryMap[address>>12][address & 0x0fff] = value;
+		return;
+	}
+	if(address < 0xfe00) 
+	{
+		gbMemoryMap[(address-0x2000)>>12][address & 0x0fff] = value;
+		return;
+	}
   
   if(address < 0xff00) {
     gbMemory[address] = value;
@@ -1155,7 +1166,7 @@ u8 gbReadOpcode(register u16 address)
   if(gbCheatMap[address])
     return gbCheatRead(address);
 
-  switch(address & 0xf000) {
+  switch((address>>12) & 0x000f) {
   case 0x0a:
   case 0x0b:
     if(mapperReadRAM)
@@ -1216,7 +1227,10 @@ u8 gbReadOpcode(register u16 address)
     }
     break;
   }
-  return gbMemoryMap[address>>12][address & 0x0fff];
+ if (address>=0xE000 && address<0xFE00)
+{
+  return gbMemoryMap[(address-0x2000)>>12][address & 0x0fff];
+  }
 }
 
 u8 gbReadMemory(register u16 address)
@@ -1381,8 +1395,10 @@ u8 gbReadMemory(register u16 address)
       return register_IE;
     }
   }
-  
-  return gbMemoryMap[address>>12][address & 0x0fff];
+if (address>=0xE000 && address<0xFE00)
+	{
+		return gbMemoryMap[(address-0x2000)>>12][address & 0x0fff];
+	}
 }
 
 void gbVblank_interrupt()
