@@ -1642,6 +1642,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\res\VBA.manifest"
+			>
+		</File>
 	</Files>
 	<Globals>
 		<Global
