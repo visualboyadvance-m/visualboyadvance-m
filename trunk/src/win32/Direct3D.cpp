@@ -131,7 +131,7 @@ Direct3DDisplay::Direct3DDisplay()
 	width = 0;
 	height = 0;
 	filterDisabled = false;
-	keepAspectRatio = true; // theApp.d3dKeepAspectRatio;
+	keepAspectRatio = false; // theApp.d3dKeepAspectRatio;
 	lockableBuffer = false;
 }
 
