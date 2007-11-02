@@ -7,13 +7,35 @@
 // LinkOptions.h : header file
 //
 
-class CMyTabCtrl : public CTabCtrl
-{
+class CMyTabCtrl : public CTabCtrl {
+	DECLARE_DYNAMIC(CMyTabCtrl)
 public:
 	CMyTabCtrl(void);
 	~CMyTabCtrl(void);
+
+	BOOL IsTabEnabled(int iTab);				// you must override
+	BOOL		TranslatePropSheetMsg(MSG* pMsg);			// call from prop sheet
+	BOOL		SubclassDlgItem(UINT nID, CWnd* pParent);	// non-virtual override
+
+	// helpers
+	int		NextEnabledTab(int iTab, BOOL bWrap);	// get next enabled tab
+	int		PrevEnabledTab(int iTab, BOOL bWrap);	// get prev enabled tab
+	BOOL		SetActiveTab(UINT iNewTab);				// set tab (fail if disabled)
+
 	CDialog *m_tabdialog[3];
+
 	void OnSwitchTabs(void);
+protected:
+	DECLARE_MESSAGE_MAP()
+	afx_msg	void OnSelChanging(NMHDR* pNmh, LRESULT* pRes);
+
+	// MFC overrides
+	virtual	BOOL PreTranslateMessage(MSG* pMsg);
+	virtual	void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
+
+	// override to draw text only; eg, colored text or different font
+	virtual	void OnDrawText(CDC& dc, CRect rc, CString sText, BOOL bDisabled);
+
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -73,6 +95,8 @@ public:
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(LinkOptions)
+	public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	//}}AFX_VIRTUAL
