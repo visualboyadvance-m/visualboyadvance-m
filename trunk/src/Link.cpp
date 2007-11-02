@@ -46,7 +46,7 @@ char linkevent[] = "VBA link event  ";
 static int i, j;
 int linktimeout = 1000;
 int linklog = 0;
-FILE *jjj = NULL;
+FILE *linklogfile = NULL;
 LANLINKDATA lanlink;
 u16 linkdata[4];
 int lspeed = 0;
@@ -123,15 +123,15 @@ void StartLink(WORD value){
 			else UPDATE_REG(0x134, 3);
 			break;
 		case NORMAL8:
-			if(linklog) fprintf(jjj, "Attempt to use 8-bit Normal mode %04x\n", value);
+			if(linklog) fprintf(linklogfile, "Attempt to use 8-bit Normal mode %04x\n", value);
 			UPDATE_REG(0x128, value);
 			break;
 		case NORMAL32:
-			if(linklog) fprintf(jjj, "Attempt to use 32-bit Normal mode %04x %x%x\n", value, READ16LE(&ioMem[0x122]), READ16LE(&ioMem[0x120]));
+			if(linklog) fprintf(linklogfile, "Attempt to use 32-bit Normal mode %04x %x%x\n", value, READ16LE(&ioMem[0x122]), READ16LE(&ioMem[0x120]));
 			UPDATE_REG(0x128, value);
 			break;
 		case UART:
-			if(linklog) fprintf(jjj, "Attempt to use UART mode %04x\n", value);
+			if(linklog) fprintf(linklogfile, "Attempt to use UART mode %04x\n", value);
 			UPDATE_REG(0x128, value);
 			break;
 		default:
@@ -156,8 +156,8 @@ void StartGPLink(u16 value){
 		break;
 	case GP:
 		if(linklog){ 
-			if(value==0x8000) fprintf(jjj, "Circuit reset\n");
-			else if(!adapter) fprintf(jjj, "Attempt to use General-purpose mode %04x\n", value);
+			if(value==0x8000) fprintf(linklogfile, "Circuit reset\n");
+			else if(!adapter) fprintf(linklogfile, "Attempt to use General-purpose mode %04x\n", value);
 		}
 		if(adapter) rfu_state = RFU_INIT;
 		break;
@@ -176,7 +176,7 @@ void StartJOYLink(u16 value){
 		UPDATE_REG(0x140, 0);
 		return;
 	}
-	if(GetSioMode(READ16LE(&ioMem[0x128]), READ16LE(&ioMem[0x134]))==JOYBUS&&linklog) fprintf(jjj, "Attempt to use JOY-BUS mode %04x\n", value);
+	if(GetSioMode(READ16LE(&ioMem[0x128]), READ16LE(&ioMem[0x134]))==JOYBUS&&linklog) fprintf(linklogfile, "Attempt to use JOY-BUS mode %04x\n", value);
 	return;
 }
 
@@ -229,7 +229,7 @@ void LinkUpdate(int ticks){
 					UPDATE_REG(0x122, linkdata[1]);
 					UPDATE_REG(0x124, linkdata[2]);
 					UPDATE_REG(0x126, linkdata[3]);
-					if(linklog) fprintf(jjj, "%04x %04x %04x %04x %10u\n", linkdata[0], linkdata[1], linkdata[2], linkdata[3], savedlinktime);
+					if(linklog) fprintf(linklogfile, "%04x %04x %04x %04x %10u\n", linkdata[0], linkdata[1], linkdata[2], linkdata[3], savedlinktime);
 					oncewait = true;
 				} else  {
 					after = true;
@@ -237,7 +237,7 @@ void LinkUpdate(int ticks){
 						UPDATE_REG(0x122, linkdata[1]);
 						UPDATE_REG(0x124, linkdata[2]);
 						UPDATE_REG(0x126, linkdata[3]);
-						if(linklog) fprintf(jjj, "%04x %04x %04x %04x %10u\n", linkdata[0], linkdata[1], linkdata[2], linkdata[3], savedlinktime);
+						if(linklog) fprintf(linklogfile, "%04x %04x %04x %04x %10u\n", linkdata[0], linkdata[1], linkdata[2], linkdata[3], savedlinktime);
 					}
 
 				}
@@ -273,7 +273,7 @@ void LinkUpdate(int ticks){
 			if(WaitForSingleObject(linksync[linkid], linktimeout)==WAIT_TIMEOUT)
 				linkmem->numtransfers=0;
 			ResetEvent(linksync[linkid]);
-			if(linklog)	fprintf(jjj, "%04x %04x %04x %04x %10u\n", 
+			if(linklog)	fprintf(linklogfile, "%04x %04x %04x %04x %10u\n", 
 				linkmem->linkdata[0], linkmem->linkdata[1], linkmem->linkdata[2], linkmem->linkdata[3], linkmem->lastlinktime);
 		}
 		
@@ -288,7 +288,7 @@ void LinkUpdate(int ticks){
 			if(WaitForSingleObject(linksync[linkid], linktimeout)==WAIT_TIMEOUT)
 				linkmem->numtransfers=0;
 			ResetEvent(linksync[linkid]);
-			if(linklog)	fprintf(jjj, "%04x %04x %04x %04x %10u\n", 
+			if(linklog)	fprintf(linklogfile, "%04x %04x %04x %04x %10u\n", 
 				linkmem->linkdata[0], linkmem->linkdata[1], linkmem->linkdata[2], linkmem->linkdata[3], linkmem->lastlinktime);
 		}
 		transfer = 0;
@@ -659,12 +659,21 @@ int openLinkLog(void){
 	char filename[20];
 	if(linklog){
 		sprintf(filename, "vbalog%1d.txt", vbaid+1);
-		if((jjj=fopen(filename, "wt"))==NULL){
+		if((linklogfile=fopen(filename, "wt"))==NULL){
 			return 0;
 		}
-		fprintf(jjj, "GBA0 GBA1 GBA2 GBA3 clocks between transfers\n");
+		fprintf(linklogfile, "GBA0 GBA1 GBA2 GBA3 clocks between transfers\n");
 	}
 	return 1;
+}
+
+void closeLinkLog()
+{
+	if(linklogfile)
+	{
+		fclose(linklogfile);
+		linklogfile=NULL;
+	}
 }
 
 void CloseLink(void){
@@ -700,7 +709,7 @@ void CloseLink(void){
 		}
 	}
 	regSetDwordValue("LAN", lanlink.active);
-	if(linklog) fclose(jjj);
+	if(linklog) closeLinkLog();
 	closesocket(lanlink.tcpsocket);
 	WSACleanup();
 return;
@@ -1043,7 +1052,7 @@ void LinkSStop(void){
 		UPDATE_REG(0x122, linkdata[1]);
 		UPDATE_REG(0x124, linkdata[2]);
 		UPDATE_REG(0x126, linkdata[3]);
-		if(linklog) fprintf(jjj, "%04x %04x %04x %04x %10u\n", linkdata[0], linkdata[1], linkdata[2], linkdata[3], savedlinktime);
+		if(linklog) fprintf(linklogfile, "%04x %04x %04x %04x %10u\n", linkdata[0], linkdata[1], linkdata[2], linkdata[3], savedlinktime);
 	}
 	return;
 }
