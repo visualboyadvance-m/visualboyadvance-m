@@ -107,10 +107,11 @@ extern void LinkUpdate(void);
 extern void LinkChildStop(void);
 extern void LinkChildSend(u16);
 extern int openLinkLog(void);
+extern void closeLinkLog();
 extern void CloseLanLink(void);
 
 extern LANLINKDATA lanlink;
-extern FILE *jjj;
+extern FILE *linklogfile;
 extern int vbaid;
 extern int linklog;
 extern bool adapter;
