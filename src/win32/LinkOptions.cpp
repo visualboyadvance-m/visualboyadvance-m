@@ -48,7 +48,6 @@ void LinkOptions::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(LinkOptions)
-	DDX_Control(pDX, IDC_TAB1, m_tabctrl);
 	//}}AFX_DATA_MAP
 }
 
@@ -59,13 +58,14 @@ BOOL LinkOptions::OnInitDialog(){
 		
 	CDialog::OnInitDialog();
 
+	m_tabctrl.SubclassDlgItem(IDC_TAB1, this);
+
 	tabitem.mask = TCIF_TEXT;
 		
 	for(i=0;i<3;i++){
 		tabitem.pszText = tabtext[i];
 		m_tabctrl.InsertItem(i, &tabitem);
 	}	
-
 	m_tabctrl.m_tabdialog[0]->Create(IDD_LINKTAB1, this);
 	m_tabctrl.m_tabdialog[1]->Create(IDD_LINKTAB2, this);
 	m_tabctrl.m_tabdialog[2]->Create(IDD_LINKTAB3, this);
@@ -79,6 +79,15 @@ BOOL LinkOptions::OnInitDialog(){
 
 	return TRUE;
 }
+
+
+ BOOL LinkOptions::PreTranslateMessage(MSG* pMsg)
+ {
+   return m_tabctrl.TranslatePropSheetMsg(pMsg) ? TRUE :
+       CDialog::PreTranslateMessage(pMsg);
+ }
+ 
+
 
 
 BEGIN_MESSAGE_MAP(LinkOptions, CDialog)
@@ -205,24 +214,233 @@ void LinkOptions::OnSelchangeTab1(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
+IMPLEMENT_DYNAMIC(CMyTabCtrl, CTabCtrl)
+BEGIN_MESSAGE_MAP(CMyTabCtrl, CTabCtrl)
+	ON_NOTIFY_REFLECT(TCN_SELCHANGING, OnSelChanging)
+END_MESSAGE_MAP()
+
+BOOL CMyTabCtrl::SubclassDlgItem(UINT nID, CWnd* pParent)
+{
+	if (!CTabCtrl::SubclassDlgItem(nID, pParent))
+		return FALSE;
+
+	ModifyStyle(0, TCS_OWNERDRAWFIXED);
+
+	// If first tab is disabled, go to next enabled tab
+	if (!IsTabEnabled(0)) {
+		int iTab = NextEnabledTab(0, TRUE);
+		SetActiveTab(iTab);
+	}
+	return TRUE;
+}
+
+BOOL CMyTabCtrl::IsTabEnabled(int iTab)
+{
+	if (!lanlink.active && iTab > 0)
+		return false;
+	return true;
+}
+
+//////////////////
+// Draw the tab: mimic SysTabControl32, except use gray if tab is disabled
+//
+void CMyTabCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
+{
+	DRAWITEMSTRUCT& ds = *lpDrawItemStruct;
+	
+	int iItem = ds.itemID;
+
+	// Get tab item info
+	char text[128];
+	TCITEM tci;
+	tci.mask = TCIF_TEXT;
+	tci.pszText = text;
+	tci.cchTextMax = sizeof(text);
+	GetItem(iItem, &tci);
+
+	// use draw item DC
+	CDC dc;
+	dc.Attach(ds.hDC);
+
+	// calculate text rectangle and color
+	CRect rc = ds.rcItem;
+	rc += CPoint(1,4);						 // ?? by trial and error
+
+	// draw the text
+	OnDrawText(dc, rc, text, !IsTabEnabled(iItem));
+
+	dc.Detach();
+}
+
+//////////////////
+// Draw tab text. You can override to use different color/font.
+//
+void CMyTabCtrl::OnDrawText(CDC& dc, CRect rc,
+	CString sText, BOOL bDisabled)
+{
+	dc.SetTextColor(GetSysColor(bDisabled ? COLOR_3DHILIGHT : COLOR_BTNTEXT));
+	dc.DrawText(sText, &rc, DT_CENTER|DT_VCENTER);
+
+	if (bDisabled) {
+		// disabled: draw again shifted northwest for shadow effect
+		rc += CPoint(-1,-1);
+		dc.SetTextColor(GetSysColor(COLOR_GRAYTEXT));
+		dc.DrawText(sText, &rc, DT_CENTER|DT_VCENTER);
+	}
+}
+
+//////////////////
+// Selection is changing: disallow if tab is disabled
+//
+void CMyTabCtrl::OnSelChanging(NMHDR* pnmh, LRESULT* pRes)
+{
+	TRACE("CMyTabCtrl::OnSelChanging\n");
+
+	// Figure out index of new tab we are about to go to, as opposed
+	// to the current one we're at. Believe it or not, Windows doesn't
+	// pass this info
+	//
+	TC_HITTESTINFO htinfo;
+	GetCursorPos(&htinfo.pt);
+	ScreenToClient(&htinfo.pt);
+	int iNewTab = HitTest(&htinfo);
+
+	if (iNewTab >= 0 && !IsTabEnabled(iNewTab))
+		*pRes = TRUE; // tab disabled: prevent selection
+}
+
+//////////////////
+// Trap arrow-left key to skip disabled tabs.
+// This is the only way to know where we're coming from--ie from
+// arrow-left (prev) or arrow-right (next).
+//
+BOOL CMyTabCtrl::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == WM_KEYDOWN &&
+		(pMsg->wParam == VK_LEFT || pMsg->wParam == VK_RIGHT)) {
+
+		int iNewTab = (pMsg->wParam == VK_LEFT) ?
+			PrevEnabledTab(GetCurSel(), FALSE) :
+			NextEnabledTab(GetCurSel(), FALSE);
+		if (iNewTab >= 0)
+			SetActiveTab(iNewTab);
+		return TRUE;
+	}
+	return CTabCtrl::PreTranslateMessage(pMsg);
+}
+
+////////////////
+// Translate parent property sheet message. Translates Control-Tab and
+// Control-Shift-Tab keys. These are normally handled by the property
+// sheet, so you must call this function from your prop sheet's
+// PreTranslateMessage function.
+//
+BOOL CMyTabCtrl::TranslatePropSheetMsg(MSG* pMsg)
+{
+	WPARAM key = pMsg->wParam;
+	if (pMsg->message == WM_KEYDOWN && GetAsyncKeyState(VK_CONTROL) < 0 &&
+		(key == VK_TAB || key == VK_PRIOR || key == VK_NEXT)) {
+
+		int iNewTab = (key==VK_PRIOR || GetAsyncKeyState(VK_SHIFT) < 0) ?
+			PrevEnabledTab(GetCurSel(), TRUE) :
+			NextEnabledTab(GetCurSel(), TRUE);
+		if (iNewTab >= 0)
+			SetActiveTab(iNewTab);
+		return TRUE;
+	}
+	return FALSE;
+}
+
+//////////////////
+// Helper to set the active page, when moving backwards (left-arrow and
+// Control-Shift-Tab). Must simulate Windows messages to tell parent I
+// am changing the tab; SetCurSel does not do this!!
+//
+// In normal operation, this fn will always succeed, because I don't call it
+// unless I already know IsTabEnabled() = TRUE; but if you call SetActiveTab
+// with a random value, it could fail.
+//
+BOOL CMyTabCtrl::SetActiveTab(UINT iNewTab)
+{
+	TRACE("CMyTabCtrl::SetActiveTab\n");
+
+	// send the parent TCN_SELCHANGING
+	NMHDR nmh;
+	nmh.hwndFrom = m_hWnd;
+	nmh.idFrom = GetDlgCtrlID();
+	nmh.code = TCN_SELCHANGING;
+
+	if (GetParent()->SendMessage(WM_NOTIFY, nmh.idFrom, (LPARAM)&nmh) >=0) {
+		// OK to change: set the new tab
+		SetCurSel(iNewTab);
+
+		// send parent TCN_SELCHANGE
+		nmh.code = TCN_SELCHANGE;
+		GetParent()->SendMessage(WM_NOTIFY, nmh.idFrom, (LPARAM)&nmh);
+		return TRUE;
+	}
+	return FALSE;
+}
+
+/////////////////
+// Return the index of the next enabled tab after a given index, or -1 if none
+// (0 = first tab).
+// If bWrap is TRUE, wrap from beginning to end; otherwise stop at zero.
+//
+int CMyTabCtrl::NextEnabledTab(int iCurrentTab, BOOL bWrap)
+{
+	int nTabs = GetItemCount();
+	for (int iTab = iCurrentTab+1; iTab != iCurrentTab; iTab++) {
+		if (iTab >= nTabs) {
+			if (!bWrap)
+				return -1;
+			iTab = 0;
+		}
+		if (IsTabEnabled(iTab)) {
+			return iTab;
+		}
+	}
+	return -1;
+}
+
+/////////////////
+// Return the index of the previous enabled tab before a given index, or -1.
+// (0 = first tab).
+// If bWrap is TRUE, wrap from beginning to end; otherwise stop at zero.
+//
+int CMyTabCtrl::PrevEnabledTab(int iCurrentTab, BOOL bWrap)
+{
+	for (int iTab = iCurrentTab-1; iTab != iCurrentTab; iTab--) {
+		if (iTab < 0) {
+			if (!bWrap)
+				return -1;
+			iTab = GetItemCount() - 1;
+		}
+		if (IsTabEnabled(iTab)) {
+			return iTab;
+		}
+	}
+	return -1;
+}
+
+
 void CMyTabCtrl::OnSwitchTabs(void)
 {
-	CRect tabRect, itemRect;
-	int nX, nY, nXc, nYc, i;
+	CRect clientRect, wndRect;
+	int i;
 
-	GetClientRect(&tabRect);
-	GetItemRect(0, &itemRect);
-
-	nX=itemRect.left+10;
-	nY=itemRect.bottom+12;
-	nXc=tabRect.right-itemRect.left-2;
-	nYc=tabRect.bottom-nY+8;
+	GetClientRect(clientRect);
+	AdjustRect(FALSE, clientRect);
+	GetWindowRect(wndRect);
+	GetParent()->ScreenToClient(wndRect);
+	clientRect.OffsetRect(wndRect.left, wndRect.top);
 	
-	if(lanlink.active==0) SetCurSel(0);
+	if(lanlink.active==0)
+		SetCurSel(0);
 
 	for(i=0;i<3;i++){
 		if(i==GetCurSel()){
-			m_tabdialog[i]->SetWindowPos(&wndTop, nX, nY, nXc, nYc, SWP_SHOWWINDOW);
+			m_tabdialog[i]->SetWindowPos(&wndTop, clientRect.left, clientRect.top, clientRect.Width(), clientRect.Height(), SWP_SHOWWINDOW);
 		} else {
 			m_tabdialog[i]->ShowWindow(SW_HIDE);
 		}
@@ -242,12 +460,14 @@ void LinkGeneral::OnRadio1()
 {
 	m_type = 0;
 	lanlink.active = 0;
+	GetParent()->Invalidate();
 }
 
 void LinkGeneral::OnRadio2() 
 {
 	m_type = 1;
 	lanlink.active = 1;
+	GetParent()->Invalidate();
 }
 
 BOOL LinkGeneral::OnInitDialog(){
