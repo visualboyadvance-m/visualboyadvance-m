@@ -122,7 +122,7 @@ extern int InitLink(void);
 extern void CloseLink(void);
 //extern int linkid;
 extern char inifile[];
-extern FILE *jjj;
+extern FILE *linklogfile;
 /* ------------------- */
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -462,9 +462,15 @@ BOOL VBA::InitInstance()
   if(p)
     *p = 0;
   
+  if(!InitLink())
+	return FALSE;;
+
   regInit(winBuffer);
 
   loadSettings();
+
+  if(!openLinkLog())
+    return FALSE;
 
   if(!initInput())
     return FALSE;
@@ -1513,6 +1519,8 @@ void VBA::loadSettings()
    linktimeout = regQueryDwordValue("LinkTimeout", 1000);
 
   linklog = regQueryDwordValue("Linklog", false) ? true : false;
+  if(linklog)
+	  openLinkLog();
 	
   adapter = regQueryDwordValue("RFU", false) ? true : false;
 	

@@ -1741,14 +1741,12 @@ void MainWnd::OnLinkOptions()
 void MainWnd::OnOptionsLinkLog() 
 {
 	if(linklog){
-		if(jjj!=NULL) fclose(jjj);
+		if(linklogfile!=NULL) fclose(linklogfile);
 		linklog = 0;
-		jjj = NULL;
+		linklogfile = NULL;
 	} else {
-		char filename[20];
-		sprintf(filename, "vbalog%1d.txt", vbaid+1);
-		jjj = fopen(filename, "wt");
-		linklog = 1;
+		linklog=1;
+		openLinkLog();
 	}
 }
 
