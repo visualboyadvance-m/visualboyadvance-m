@@ -17,6 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+#include "afxwin.h"
 #if !defined(AFX_JOYPAD_H__FFFB2470_9EEC_4D2D_A5F0_3BF31579999A__INCLUDED_)
 #define AFX_JOYPAD_H__FFFB2470_9EEC_4D2D_A5F0_3BF31579999A__INCLUDED_
 
@@ -32,9 +33,12 @@
 class JoypadEditControl : public CEdit
 {
   // Construction
- public:
+public:
+
   JoypadEditControl();
 
+  KeyList m_Keys;
+ 
   // Attributes
  public:
 
@@ -70,7 +74,6 @@ class JoypadConfig : public CDialog
 {
   // Construction
  public:
-  void assignKeys();
   void assignKey(int id, int key);
   JoypadConfig(int w, CWnd* pParent = NULL);   // standard constructor
 
@@ -90,7 +93,8 @@ class JoypadConfig : public CDialog
   JoypadEditControl  buttonGS;
   JoypadEditControl  buttonB;
   JoypadEditControl  buttonA;
-  //}}AFX_DATA
+
+ //}}AFX_DATA
 
 
   // Overrides
@@ -116,7 +120,9 @@ class JoypadConfig : public CDialog
   virtual BOOL OnInitDialog();
   //}}AFX_MSG
   DECLARE_MESSAGE_MAP()
-    };
+public:
+	afx_msg void OnBnClickedAppendmode();
+};
     /////////////////////////////////////////////////////////////////////////////
 // MotionConfig dialog
 
@@ -161,6 +167,8 @@ class MotionConfig : public CDialog
   DECLARE_MESSAGE_MAP()
     private:
   UINT timerId;
+public:
+	afx_msg void OnBnClickedAppendmode();
 };
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

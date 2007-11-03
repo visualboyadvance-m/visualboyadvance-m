@@ -465,6 +465,8 @@
 #define IDC_BIT_10                      1260
 #define IDC_CHECK_STRETCHTOFIT          1260
 #define IDC_BIT_11                      1261
+#define IDC_CHECK1                      1261
+#define IDC_APPENDMODE                  1261
 #define IDC_BIT_12                      1262
 #define IDC_BIT_13                      1263
 #define IDC_BIT_14                      1264
@@ -704,37 +706,36 @@
 #define ID_OPTIONS_SOUND_PCMINTERPOLATION_CUBIC 40296
 #define ID_OPTIONS_SOUND_PCMINTERPOLATION_FIR 40297
 #define ID_OPTIONS_SOUND_PCMINTERPOLATION_LIBRESAMPLE 40298
-#define ID_OPTIONS_FILTER_LCDCOLORS 40299
-#define IDD_LINKTAB1 40300
-#define IDD_LINKTAB  40301
-#define IDD_LINKTAB2 40302
-#define IDD_LINKTAB3 40303
-#define IDD_SERVERWAIT 40304
-#define IDC_TAB1 40305
-#define IDC_LINK_SINGLE 40306
-#define IDC_LINK_TIMEOUT 40307
-#define IDC_LINK_LAN 40308
-#define IDC_LINK2P 40309
-#define IDC_LINKTCP 40310
-#define IDC_SSPEED 40311
-#define IDC_SERVERSTART 40312
-#define IDC_SERVERIP 40313
-#define IDC_CLINKIP 40314
-#define IDC_SPEEDOFF 40315
-#define IDC_LINKCONNECT 40316
-#define IDC_STATIC4 40317
-#define ID_OPTIONS_LINK_OPTIONS 40318
-#define ID_OPTIONS_LINK_LOG 40319
+#define ID_OPTIONS_FILTER_LCDCOLORS     40299
+#define IDD_LINKTAB1                    40300
+#define IDD_LINKTAB                     40301
+#define IDD_LINKTAB2                    40302
+#define IDD_LINKTAB3                    40303
+#define IDD_SERVERWAIT                  40304
+#define IDC_TAB1                        40305
+#define IDC_LINK_SINGLE                 40306
+#define IDC_LINK_TIMEOUT                40307
+#define IDC_LINK_LAN                    40308
+#define IDC_LINK2P                      40309
+#define IDC_LINKTCP                     40310
+#define IDC_SSPEED                      40311
+#define IDC_SERVERSTART                 40312
+#define IDC_SERVERIP                    40313
+#define IDC_CLINKIP                     40314
+#define IDC_SPEEDOFF                    40315
+#define IDC_LINKCONNECT                 40316
+#define IDC_STATIC4                     40317
+#define ID_OPTIONS_LINK_OPTIONS         40318
+#define ID_OPTIONS_LINK_LOG             40319
 #define ID_OPTIONS_LINK_WIRELESSADAPTER 40320
-#define IDC_LINKTIMEOUT 40321
-#define IDC_CLINKTCP 40322
-#define IDC_SERVERWAIT 40323
-#define IDC_LINKUDP 40324
-#define IDC_LINK3P 40325
-#define IDC_LINK4P 40326
-#define IDC_CLINKUDP 40327
-#define IDC_SPEEDON 40328
-
+#define IDC_LINKTIMEOUT                 40321
+#define IDC_CLINKTCP                    40322
+#define IDC_SERVERWAIT                  40323
+#define IDC_LINKUDP                     40324
+#define IDC_LINK3P                      40325
+#define IDC_LINK4P                      40326
+#define IDC_CLINKUDP                    40327
+#define IDC_SPEEDON                     40328
 
 // Next default values for new objects
 // 
@@ -742,7 +743,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        159
 #define _APS_NEXT_COMMAND_VALUE         40300
-#define _APS_NEXT_CONTROL_VALUE         1261
+#define _APS_NEXT_CONTROL_VALUE         1262
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
 #endif
