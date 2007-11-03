@@ -660,6 +660,7 @@ int openLinkLog(void){
 	if(linklog){
 		sprintf(filename, "vbalog%1d.txt", vbaid+1);
 		if((linklogfile=fopen(filename, "wt"))==NULL){
+			linklog=false;
 			return 0;
 		}
 		fprintf(linklogfile, "GBA0 GBA1 GBA2 GBA3 clocks between transfers\n");
