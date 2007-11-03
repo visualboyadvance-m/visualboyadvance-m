@@ -23,7 +23,8 @@
 
 #define JOYCONFIG_MESSAGE (WM_USER + 1000)
 
-typedef CList<USHORT,USHORT> KeyList;
+typedef CList<int,int> KeyList;
+//typedef CList<USHORT,USHORT> KeyList;
 
 #define JOYPADS 4
 #define MOTION_KEYS 4
