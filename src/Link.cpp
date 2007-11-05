@@ -659,11 +659,11 @@ int openLinkLog(void){
 	char filename[20];
 	if(linklog){
 		sprintf(filename, "vbalog%1d.txt", vbaid+1);
-		if((linklogfile=fopen(filename, "wt"))==NULL){
+		if((linklogfile=fopen(filename, "at"))==NULL){
 			linklog=false;
 			return 0;
 		}
-		fprintf(linklogfile, "GBA0 GBA1 GBA2 GBA3 clocks between transfers\n");
+		fprintf(linklogfile, "----- Log opened -----\n");
 	}
 	return 1;
 }

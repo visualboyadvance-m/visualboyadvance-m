@@ -2568,7 +2568,8 @@ void CPUUpdateRegister(u32 address, u16 value)
     break;
   case 0x100:
     timer0Reload = value;
-    break;
+	interp_rate();
+	break;
   case 0x102:
     timer0Ticks = timer0ClockReload = TIMER_TICKS[value & 3];        
     if(!timer0On && (value & 0x80)) {
@@ -2584,11 +2585,13 @@ void CPUUpdateRegister(u32 address, u16 value)
     timer0On = value & 0x80 ? true : false;
     TM0CNT = value & 0xC7;
     UPDATE_REG(0x102, TM0CNT);
+	interp_rate();
     //    CPUUpdateTicks();
     break;
   case 0x104:
     timer1Reload = value;
-    break;
+	interp_rate();
+	break;
   case 0x106:
     timer1Ticks = timer1ClockReload = TIMER_TICKS[value & 3];        
     if(!timer1On && (value & 0x80)) {
@@ -2604,7 +2607,8 @@ void CPUUpdateRegister(u32 address, u16 value)
     timer1On = value & 0x80 ? true : false;
     TM1CNT = value & 0xC7;
     UPDATE_REG(0x106, TM1CNT);
-    break;
+	interp_rate();
+	break;
   case 0x108:
     timer2Reload = value;
     break;
