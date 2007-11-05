@@ -1,9 +1,6 @@
 #ifndef __SND_INTERP_H__
 #define __SND_INTERP_H__
 
-#include <stdio.h>
-#include <windows.h>
-
 class foo_interpolate
 {
 public:
