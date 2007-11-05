@@ -171,7 +171,7 @@ public:
 		return filled;
 	}
 
-	void push_back(T sample)
+	inline void push_back(T sample)
 	{
 		if (!buffer) buffer = new T[buffer_size];
 		buffer[ptr] = sample;
@@ -179,13 +179,13 @@ public:
 		if (filled < buffer_size) filled++;
 	}
 
-	void erase(int count)
+	inline void erase(int count)
 	{
 		if (count > filled) filled = 0;
 		else filled -= count;
 	}
 
-	T operator[] (int index) const
+	inline T operator[] (int index) const
 	{
 		index += ptr - filled;
 		if (index < 0) index += buffer_size;
@@ -459,7 +459,7 @@ public:
 				in[used] = samples[used];
 			}
 
-			returned = resample_process(resampler, 32767 / lrate, in, count, 0, &used, &out, 1);
+			returned = resample_process(resampler, 32767. / lrate, in, count, 0, &used, &out, 1);
 			if (used)
 			{
 				samples.erase(used);
