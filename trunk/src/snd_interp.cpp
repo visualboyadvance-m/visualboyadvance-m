@@ -1,10 +1,6 @@
 #include <math.h>
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
 #include "../libresample-0.1.3/include/libresample.h"
-
 #include "snd_interp.h"
 
 // this was once borrowed from libmodplug, and was also used to generate the FIR coefficient
@@ -265,8 +261,9 @@ public:
 
 		// wahoo, takes care of drifting
 		if (samples.size() > 2)
-			position+=1;
-		position += lrate;
+			position+=lrate+16383;
+		else
+			position+=lrate;
 
 		return ret;
 	}
@@ -334,10 +331,9 @@ public:
 
 		// wahoo, takes care of drifting
 		if (samples.size() > 8)
-		{
-			position+=1;
-		}
-		position += lrate;
+			position+=lrate+16383;
+		else
+			position+=lrate;
 
 		return ret;
 	}
@@ -401,9 +397,9 @@ public:
 
 		// wahoo, takes care of drifting
 		if (samples.size() > 16)
-			position+=1;
-
-		position+=lrate;
+			position+=lrate+16383;
+		else
+			position+=lrate;
 		return ret;
 	}
 };
