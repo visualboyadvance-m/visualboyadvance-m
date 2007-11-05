@@ -47,7 +47,8 @@
 #define FIFOB_L 0xa4
 #define FIFOB_H 0xa6
 
-extern void soundTick();
+extern void setSoundFn();
+extern void (*psoundTickfn)();
 extern void soundShutdown();
 extern bool soundInit(bool gba=true);
 extern void soundPause();
@@ -62,6 +63,10 @@ extern void soundEvent(u32, u8);
 extern void soundEvent(u32, u16);
 extern void soundTimerOverflow(int);
 extern void soundSetQuality(int);
+extern void setsystemSoundOn(bool value);
+extern void setsoundPaused(bool value);
+extern void setsoundMasterOn(bool value);
+
 
 //extern int SOUND_TICKS;
 extern int SOUND_CLOCK_TICKS;
@@ -69,8 +74,8 @@ extern u8 soundRead(u32);
 extern u16 soundRead16(u32);
 extern u32 soundRead32(u32);
 extern int soundTicks;
-extern int soundPaused;
 extern bool soundOffFlag;
+extern bool soundPaused;
 extern int soundQuality;
 extern int soundBufferLen;
 extern int soundBufferTotalLen;
