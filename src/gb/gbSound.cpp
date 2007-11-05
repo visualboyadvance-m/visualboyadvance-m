@@ -43,7 +43,7 @@ extern u8 soundWavePattern[4][32];
 extern int soundBufferLen;
 extern int soundBufferTotalLen;
 extern int soundQuality;
-extern int soundPaused;
+extern bool soundPaused;
 extern int soundPlay;
 extern int soundTicks;
 extern int SOUND_CLOCK_TICKS;

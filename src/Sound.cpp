@@ -115,7 +115,7 @@ int soundBufferLen = 1470;
 int soundBufferTotalLen = 14700;
 int soundQuality = 2;
 int soundInterpolation = 0;
-int soundPaused = 1;
+bool soundPaused = true;
 int soundPlay = 0;
 int soundTicks = soundQuality * USE_TICKS_AS;
 int SOUND_CLOCK_TICKS = soundQuality * USE_TICKS_AS;
@@ -300,6 +300,103 @@ variable_desc soundSaveStructV2[] = {
   { NULL, 0 }
 };
 
+
+// *** Begin snd_interp code 
+
+
+// and here is the implementation specific code, in a messier state than the stuff above
+
+extern bool timer0On;
+extern int timer0Reload;
+extern int timer0ClockReload;
+extern bool timer1On;
+extern int timer1Reload;
+extern int timer1ClockReload;
+
+extern int SOUND_CLOCK_TICKS;
+extern int soundInterpolation;
+
+inline double calc_rate(int timer)
+{
+	if (timer ? timer1On : timer0On)
+	{
+		return double(SOUND_CLOCK_TICKS) /
+			double((0x10000 - (timer ? timer1Reload : timer0Reload)) * 
+			(timer ? timer1ClockReload : timer0ClockReload));
+	}
+	else
+	{
+		return 1.;
+	}
+}
+
+static foo_interpolate * interp[2];
+
+class foo_interpolate_setup
+{
+public:
+	foo_interpolate_setup()
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			interp[i] = get_filter(0);
+		}
+	}
+
+	~foo_interpolate_setup()
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			delete interp[i];
+		}
+	}
+};
+
+static foo_interpolate_setup blah;
+
+static int interpolation = 0;
+
+void interp_switch(int which)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		delete interp[i];
+		interp[i] = get_filter(which);
+	}
+
+	interpolation = which;
+}
+
+void interp_reset(int ch)
+{
+	setSoundFn();
+#ifdef ENHANCED_RATE
+	interp[ch]->reset();
+#else
+	interp[ch]->reset(calc_rate(ch ? soundDSATimer : soundDSBTimer));
+#endif
+}
+
+
+inline void interp_push(int ch, int sample)
+{
+	interp[ch]->push(sample);
+}
+
+#ifdef ENHANCED_RATE
+inline int interp_pop(int ch, double rate)
+{
+	return interp[ch]->pop(rate);
+#else
+inline int interp_pop(int ch)
+{
+	return interp[ch]->pop();
+#endif
+}
+
+
+// *** End snd_interp code
+
 static void soundEventGB(u32 address, u8 data)
   {
   if ( apu )
@@ -479,7 +576,7 @@ u8 soundRead(u32 address)
   case 0x9c:
   case 0x9e:
     soundEventGB(0xFF30 + (address & 14), data);
-    soundEventGB(0xFF31 + (address & 14), data >> 8);
+    soundEventGB(0xFF31 + (address & 14), 0); // data >> 8);
     break;    
   }
 }
@@ -540,7 +637,7 @@ void soundEvent(u32 address, u16 data)
   case 0x9a:
   case 0x9c:
   case 0x9e:
-    soundEventGB(0xFF30 + (address & 14), data);
+    soundEventGB(0xFF30 + (address & 14), data & 0xff);
     soundEventGB(0xFF31 + (address & 14), data >> 8);  
     break;    
   }
@@ -562,9 +659,33 @@ void soundChannel4()
 {
 }
 
-void soundDirectSoundA()
+#include <stdio.h>
+
+
+inline void soundDirectSoundA()
 {
-  directBuffer[0][soundIndex] = interp_pop(0, calc_rate(soundDSATimer)); //soundDSAValue;
+#ifdef ENHANCED_RATE
+	double cr = calc_rate(soundDSATimer);
+	static int cnt = 0;
+	static double lastcr = 0;
+	static FILE *fp = NULL;
+	
+	if (fp==NULL)
+		fp=fopen("C:\\cr.txt", "at");
+	if (cr!=lastcr)
+	{
+		fprintf(fp, "%f %d\n", lastcr, cnt);
+		cnt=0;
+		lastcr=cr;
+	}
+	else
+		cnt++;
+
+	directBuffer[0][soundIndex] = interp_pop(0, calc_rate(soundDSATimer)); //soundDSAValue;
+#else
+	directBuffer[0][soundIndex] = interp_pop(0); //soundDSAValue;
+#endif
+
 }
 
 void soundDirectSoundATimer()
@@ -592,9 +713,13 @@ void soundDirectSoundATimer()
     soundDSAValue = 0;
 }
 
-void soundDirectSoundB()
+inline void soundDirectSoundB()
 {
-  directBuffer[1][soundIndex] = interp_pop(1, calc_rate(soundDSBTimer)); //soundDSBValue;
+#ifdef ENHANCED_RATE
+	directBuffer[1][soundIndex] = interp_pop(1, calc_rate(soundDSBTimer)); //soundDSBValue;
+#else
+	directBuffer[1][soundIndex] = interp_pop(1); //soundDSBValue;
+#endif
 }
 
 void soundDirectSoundBTimer()
@@ -811,14 +936,31 @@ void soundMix()
     soundFinalWave[soundBufferIndex++] = res;
 }
 
+// soundTick gets called a lot
+// if we are operating normally
+// call normalSoundTick to avoid
+// all the comparison checks.
+
+void normalsoundTick()
+{
+	soundDirectSoundA();
+	soundDirectSoundB();
+    soundMix();
+    soundIndex++;
+    
+    if(2*soundBufferIndex >= soundBufferLen)
+	{
+		systemWriteDataToSoundBuffer();
+	    soundIndex = 0;
+		soundBufferIndex = 0;
+    }
+}
+
+
 void soundTick()
 {
   if(systemSoundOn) {
     if(soundMasterOn && !stopState) {
-      /*soundChannel1();
-      soundChannel2();
-      soundChannel3();
-      soundChannel4();*/
       soundDirectSoundA();
       soundDirectSoundB();
       soundMix();
@@ -833,6 +975,7 @@ void soundTick()
       if(systemSoundOn) {
         if(soundPaused) {
           soundResume();
+		  setSoundFn();
         }      
         
         systemWriteDataToSoundBuffer();
@@ -842,6 +985,41 @@ void soundTick()
     }
   }
 }
+
+void (*psoundTickfn)()=soundTick;
+
+
+void setSoundFn()
+{
+	if (systemSoundOn && !soundPaused && soundMasterOn)
+		psoundTickfn = normalsoundTick;
+	else
+		psoundTickfn = soundTick;
+
+	if (soundInterpolation != interpolation)
+		interp_switch(soundInterpolation);
+
+}
+
+void setsystemSoundOn(bool value)
+{
+	systemSoundOn = value;
+	setSoundFn();
+}
+
+void setsoundPaused(bool value)
+{
+	soundPaused = value;
+	setSoundFn();
+}
+
+void setsoundMasterOn(bool value)
+{
+	soundMasterOn = value;
+	setSoundFn();
+}
+
+
 
 void soundShutdown()
 {
@@ -868,13 +1046,13 @@ void soundShutdown()
 void soundPause()
 {
   systemSoundPause();
-  soundPaused = 1;	
+  setsoundPaused(true);	
 }
 
 void soundResume()
 {
   systemSoundResume();
-  soundPaused = 0;
+  setsoundPaused(false);
 }
 
 void soundEnable(int channels)
@@ -918,12 +1096,12 @@ void soundReset()
 {
   systemSoundReset();
 
-  soundPaused = 1;
+  setsoundPaused(true);
   soundPlay = 0;
   SOUND_CLOCK_TICKS = soundQuality * USE_TICKS_AS;  
   soundTicks = SOUND_CLOCK_TICKS;
   soundNextPosition = 0;
-  soundMasterOn = 1;
+  setsoundMasterOn(true);
   soundIndex = 0;
   soundBufferIndex = 0;
   soundLevel1 = 7;
@@ -1099,7 +1277,7 @@ bool soundInit(bool gba)
       }
     }
 
-    soundPaused = true;
+    setsoundPaused(true);
     return true;
   }
   return false;
