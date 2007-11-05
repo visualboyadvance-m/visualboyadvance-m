@@ -202,14 +202,20 @@ public:
 	foo_null() : sample(0) {}
 	~foo_null() {}
 
+#ifdef ENHANCED_RATE
 	void reset() {}
+#endif
 
 	void push(int psample)
 	{
 		sample = psample;
 	}
 
+#ifdef ENHANCED_RATE
 	int pop(double rate)
+#else
+	int pop()
+#endif
 	{
 		return sample;
 	}
@@ -234,20 +240,33 @@ public:
 
 	~foo_linear() {}
 
+#ifdef ENHANCED_RATE
 	void reset()
 	{
+#else
+	void reset(double rate)
+	{
+		foo_interpolate::reset(rate);		
+#endif
 		position = 0;
 		samples.clear();
 	}
+
 
 	void push(int sample)
 	{
 		samples.push_back(sample);
 	}
 
+#ifdef ENHANCED_RATE
 	int pop(double rate)
 	{
-		int ret, lrate;
+		int lrate;
+#else
+	int pop()
+	{
+#endif
+		int ret;
 
 		if (position > 0x7fff)
 		{
@@ -262,6 +281,7 @@ public:
 		ret += smp(1) * position;
 		ret >>= 15;
 
+#ifdef ENHANCED_RATE	
 		// wahoo, takes care of drifting
 		if (samples.size() > 2)
 		{
@@ -269,6 +289,10 @@ public:
 		}
 
 		lrate = (int)(32768. * rate);
+#else
+		if (samples.size() > 2)
+			position+=1;
+#endif
 		position += lrate;
 
 		return ret;
@@ -308,9 +332,15 @@ public:
 		samples.push_back(sample);
 	}
 
+#ifdef ENHANCED_RATE
 	int pop(double rate)
 	{
-		int ret, lrate;
+		int lrate;
+#else
+	int pop()
+	{
+#endif
+		int ret;
 
 		if (position > 0x7fff)
 		{
@@ -338,10 +368,14 @@ public:
 		// wahoo, takes care of drifting
 		if (samples.size() > 8)
 		{
+#ifdef ENHANCED_RATE
 			rate += (.5 / 32768.);
 		}
-
 		lrate = (int)(32768. * rate);
+#else
+			position+=1;
+		}
+#endif
 		position += lrate;
 
 		return ret;
@@ -367,8 +401,14 @@ public:
 
 	~foo_fir() {}
 
+#ifdef ENHANCED_RATE
 	void reset()
 	{
+#else
+	void reset(double rate)
+	{
+		foo_interpolate::reset(rate);
+#endif
 		position = 0;
 		samples.clear();
 	}
@@ -378,9 +418,15 @@ public:
 		samples.push_back(sample);
 	}
 
+#ifdef ENHANCED_RATE
 	int pop(double rate)
 	{
-		int ret, lrate;
+		int lrate;
+#else
+	int pop()
+	{
+#endif
+		int ret;
 
 		if (position > 0x7fff)
 		{
@@ -404,6 +450,7 @@ public:
 		if (ret > 32767) ret = 32767;
 		else if (ret < -32768) ret = -32768;
 
+#ifdef ENHANCED_RATE
 		// wahoo, takes care of drifting
 		if (samples.size() > 16)
 		{
@@ -412,7 +459,12 @@ public:
 
 		lrate = (int)(32768. * rate);
 		position += lrate;
+#else
+		if (samples.size() > 16)
+			position+=1;
 
+		position+=9929;
+#endif
 		return ret;
 	}
 };
@@ -431,11 +483,22 @@ public:
 
 	~foo_libresample()
 	{
+#ifdef ENHANCED_RATE
 		reset();
+#else
+		reset(1);
+#endif 
+
 	}
 
+#ifdef ENHANCED_RATE
 	void reset()
 	{
+#else
+	void reset(double rate)
+	{
+		foo_interpolate::reset(rate);
+#endif
 		samples.clear();
 		if (resampler)
 		{
@@ -449,10 +512,14 @@ public:
 		samples.push_back(float(sample));
 	}
 
+#ifdef ENHANCED_RATE
 	int pop(double rate)
 	{
+#else
+	int pop()
+	{
+#endif
 		int ret;
-
 		if (!resampler)
 		{
 			resampler = resample_open(0, .25, 44100. / 4000.);
@@ -469,8 +536,11 @@ public:
 				in[used] = samples[used];
 			}
 
+#ifdef ENHANCED_RATE
 			returned = resample_process(resampler, 1. / rate, in, count, 0, &used, &out, 1);
-
+#else	
+			returned = resample_process(resampler, lrate / 32767, in, count, 0, &used, &out, 1);
+#endif
 			if (used)
 			{
 				samples.erase(used);
@@ -505,115 +575,4 @@ foo_interpolate * get_filter(int which)
 	case 4:
 		return new foo_libresample;
 	}
-}
-
-// and here is the implementation specific code, in a messier state than the stuff above
-
-extern bool timer0On;
-extern int timer0Reload;
-extern int timer0ClockReload;
-extern bool timer1On;
-extern int timer1Reload;
-extern int timer1ClockReload;
-
-extern int SOUND_CLOCK_TICKS;
-extern int soundInterpolation;
-
-double calc_rate(int timer)
-{
-	if (timer ? timer1On : timer0On)
-	{
-		return double(SOUND_CLOCK_TICKS) /
-			double((0x10000 - (timer ? timer1Reload : timer0Reload)) * 
-			(timer ? timer1ClockReload : timer0ClockReload));
-	}
-	else
-	{
-		return 1.;
-	}
-}
-
-static foo_interpolate * interp[2];
-
-class foo_interpolate_setup
-{
-public:
-	foo_interpolate_setup()
-	{
-		for (int i = 0; i < 2; i++)
-		{
-			interp[i] = get_filter(0);
-		}
-	}
-
-	~foo_interpolate_setup()
-	{
-		for (int i = 0; i < 2; i++)
-		{
-			delete interp[i];
-		}
-	}
-};
-
-static foo_interpolate_setup blah;
-
-class critical_section
-{
-	CRITICAL_SECTION cs;
-
-public:
-	critical_section() { InitializeCriticalSection(&cs); }
-	~critical_section() { DeleteCriticalSection(&cs); }
-
-	void enter() { EnterCriticalSection(&cs); }
-	void leave() { LeaveCriticalSection(&cs); }
-};
-
-static critical_section interp_sync;
-static int interpolation = 0;
-
-class scopelock
-{
-	critical_section * cs;
-
-public:
-	scopelock(critical_section & pcs) { cs = &pcs; cs->enter(); }
-	~scopelock() { cs->leave(); }
-};
-
-void interp_switch(int which)
-{
-	scopelock sl(interp_sync);
-
-	for (int i = 0; i < 2; i++)
-	{
-		delete interp[i];
-		interp[i] = get_filter(which);
-	}
-
-	interpolation = which;
-}
-
-void interp_reset(int ch)
-{
-	scopelock sl(interp_sync);
-	if (soundInterpolation != interpolation) interp_switch(soundInterpolation);
-
-	interp[ch]->reset();
-}
-
-void interp_push(int ch, int sample)
-{
-	scopelock sl(interp_sync);
-	if (soundInterpolation != interpolation) interp_switch(soundInterpolation);
-
-	interp[ch]->push(sample);
-}
-
-int interp_pop(int ch, double rate)
-{
-	scopelock sl(interp_sync);
-	if (soundInterpolation != interpolation) interp_switch(soundInterpolation);
-
-	return interp[ch]->pop(rate);
 }

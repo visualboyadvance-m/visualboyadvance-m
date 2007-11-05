@@ -242,8 +242,7 @@ bool DirectSound::init()
     return false;
   }
 
-  systemSoundOn = true;
-  
+  setsystemSoundOn(true);
   return true;
 }
 
@@ -343,7 +342,7 @@ void DirectSound::write()
         }
       }
     } else {
-      soundPaused = 1;
+      setsoundPaused(true);
     }
   }
   // Obtain memory address of write block. This will be in two parts
