@@ -158,12 +158,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="3"
 				InlineFunctionExpansion="0"
-				EnableIntrinsicFunctions="false"
-				FavorSizeOrSpeed="0"
-				OmitFramePointers="false"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="false"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)zlib&quot;;&quot;$(SolutionDir)libpng&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;FINAL_VERSION;MMX;_CRT_SECURE_NO_WARNINGS"
 				IgnoreStandardIncludePath="false"
@@ -219,7 +220,7 @@
 				ShowProgress="0"
 				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
 				Version=""
-				LinkIncremental="2"
+				LinkIncremental="0"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=""
 				GenerateManifest="false"
@@ -233,6 +234,7 @@
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"
 				OptimizeForWindows98="1"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -425,6 +427,14 @@
 				<File
 					RelativePath=".\src\2xSaI.cpp"
 					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							WholeProgramOptimization="true"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\src\2xSaImmx.asm"
