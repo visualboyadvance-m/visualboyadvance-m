@@ -96,5 +96,7 @@ extern Gb_Apu       * apu;
  
 extern const BOOST::uint8_t sound_data [Gb_Apu::register_count];
 
+extern void interp_rate();
+
 
 #endif // VBA_SOUND_H

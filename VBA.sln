@@ -13,8 +13,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "libpng\libpng.vcp
 		{34DC39BF-F93A-4573-85BF-789B90B63179} = {34DC39BF-F93A-4573-85BF-789B90B63179}
 	EndProjectSection
 EndProject
-Project("{4CAA2610-1955-4629-BDC1-8133FE0B2087}") = "profiler", "..\profiler\profiler.aqt", "{7260A190-9B72-4227-B01C-29E53BA53413}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32

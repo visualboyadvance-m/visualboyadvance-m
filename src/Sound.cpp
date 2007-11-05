@@ -363,18 +363,22 @@ void interp_switch(int which)
 		delete interp[i];
 		interp[i] = get_filter(which);
 	}
-
+	interp_rate();
 	interpolation = which;
+}
+
+
+void interp_rate()
+{
+	interp[0]->rate(calc_rate(soundDSATimer));
+	interp[1]->rate(calc_rate(soundDSBTimer));
 }
 
 void interp_reset(int ch)
 {
 	setSoundFn();
-#ifdef ENHANCED_RATE
 	interp[ch]->reset();
-#else
-	interp[ch]->reset(calc_rate(ch ? soundDSATimer : soundDSBTimer));
-#endif
+	interp_rate();
 }
 
 
@@ -588,7 +592,6 @@ void soundEvent(u32 address, u16 data)
     data &= 0xFF0F;
     soundControl = data & 0x770F;;
     if(data & 0x0800) {
-	  interp_reset(0);
       soundDSFifoAWriteIndex = 0;
       soundDSFifoAIndex = 0;
       soundDSFifoACount = 0;
@@ -598,7 +601,6 @@ void soundEvent(u32 address, u16 data)
     soundDSAEnabled = (data & 0x0300) ? true : false;
     soundDSATimer = (data & 0x0400) ? 1 : 0;    
     if(data & 0x8000) {
-	  interp_reset(1);
       soundDSFifoBWriteIndex = 0;
       soundDSFifoBIndex = 0;
       soundDSFifoBCount = 0;
@@ -607,7 +609,12 @@ void soundEvent(u32 address, u16 data)
     }
     soundDSBEnabled = (data & 0x3000) ? true : false;
     soundDSBTimer = (data & 0x4000) ? 1 : 0;
-    *((u16 *)&ioMem[address]) = data;    
+	if (data & 0x8000) 
+	{
+		interp_reset(0);
+		interp_reset(1);
+	}
+	*((u16 *)&ioMem[address]) = data;    
     break;
   case FIFOA_L:
   case FIFOA_H:
@@ -704,7 +711,6 @@ void soundDirectSoundATimer()
         soundEvent(FIFOA_H, (u16)0);
       }
     }
-    
     soundDSAValue = (soundDSFifoA[soundDSFifoAIndex]);
 	interp_push(0, (s8)soundDSAValue << 8);
 	soundDSFifoAIndex = (++soundDSFifoAIndex) & 31;

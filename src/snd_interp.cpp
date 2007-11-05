@@ -202,20 +202,14 @@ public:
 	foo_null() : sample(0) {}
 	~foo_null() {}
 
-#ifdef ENHANCED_RATE
 	void reset() {}
-#endif
 
 	void push(int psample)
 	{
 		sample = psample;
 	}
 
-#ifdef ENHANCED_RATE
-	int pop(double rate)
-#else
 	int pop()
-#endif
 	{
 		return sample;
 	}
@@ -240,14 +234,8 @@ public:
 
 	~foo_linear() {}
 
-#ifdef ENHANCED_RATE
 	void reset()
 	{
-#else
-	void reset(double rate)
-	{
-		foo_interpolate::reset(rate);		
-#endif
 		position = 0;
 		samples.clear();
 	}
@@ -258,14 +246,8 @@ public:
 		samples.push_back(sample);
 	}
 
-#ifdef ENHANCED_RATE
-	int pop(double rate)
-	{
-		int lrate;
-#else
 	int pop()
 	{
-#endif
 		int ret;
 
 		if (position > 0x7fff)
@@ -281,18 +263,9 @@ public:
 		ret += smp(1) * position;
 		ret >>= 15;
 
-#ifdef ENHANCED_RATE	
 		// wahoo, takes care of drifting
 		if (samples.size() > 2)
-		{
-			rate += (.5 / 32768.);
-		}
-
-		lrate = (int)(32768. * rate);
-#else
-		if (samples.size() > 2)
 			position+=1;
-#endif
 		position += lrate;
 
 		return ret;
@@ -332,14 +305,8 @@ public:
 		samples.push_back(sample);
 	}
 
-#ifdef ENHANCED_RATE
-	int pop(double rate)
-	{
-		int lrate;
-#else
 	int pop()
 	{
-#endif
 		int ret;
 
 		if (position > 0x7fff)
@@ -368,14 +335,8 @@ public:
 		// wahoo, takes care of drifting
 		if (samples.size() > 8)
 		{
-#ifdef ENHANCED_RATE
-			rate += (.5 / 32768.);
-		}
-		lrate = (int)(32768. * rate);
-#else
 			position+=1;
 		}
-#endif
 		position += lrate;
 
 		return ret;
@@ -401,14 +362,8 @@ public:
 
 	~foo_fir() {}
 
-#ifdef ENHANCED_RATE
 	void reset()
 	{
-#else
-	void reset(double rate)
-	{
-		foo_interpolate::reset(rate);
-#endif
 		position = 0;
 		samples.clear();
 	}
@@ -418,14 +373,8 @@ public:
 		samples.push_back(sample);
 	}
 
-#ifdef ENHANCED_RATE
-	int pop(double rate)
-	{
-		int lrate;
-#else
 	int pop()
 	{
-#endif
 		int ret;
 
 		if (position > 0x7fff)
@@ -450,21 +399,11 @@ public:
 		if (ret > 32767) ret = 32767;
 		else if (ret < -32768) ret = -32768;
 
-#ifdef ENHANCED_RATE
 		// wahoo, takes care of drifting
-		if (samples.size() > 16)
-		{
-			rate += (.5 / 32768.);
-		}
-
-		lrate = (int)(32768. * rate);
-		position += lrate;
-#else
 		if (samples.size() > 16)
 			position+=1;
 
-		position+=9929;
-#endif
+		position+=lrate;
 		return ret;
 	}
 };
@@ -483,22 +422,11 @@ public:
 
 	~foo_libresample()
 	{
-#ifdef ENHANCED_RATE
 		reset();
-#else
-		reset(1);
-#endif 
-
 	}
 
-#ifdef ENHANCED_RATE
 	void reset()
 	{
-#else
-	void reset(double rate)
-	{
-		foo_interpolate::reset(rate);
-#endif
 		samples.clear();
 		if (resampler)
 		{
@@ -512,13 +440,8 @@ public:
 		samples.push_back(float(sample));
 	}
 
-#ifdef ENHANCED_RATE
-	int pop(double rate)
-	{
-#else
 	int pop()
 	{
-#endif
 		int ret;
 		if (!resampler)
 		{
@@ -536,11 +459,7 @@ public:
 				in[used] = samples[used];
 			}
 
-#ifdef ENHANCED_RATE
-			returned = resample_process(resampler, 1. / rate, in, count, 0, &used, &out, 1);
-#else	
-			returned = resample_process(resampler, lrate / 32767, in, count, 0, &used, &out, 1);
-#endif
+			returned = resample_process(resampler, 32767 / lrate, in, count, 0, &used, &out, 1);
 			if (used)
 			{
 				samples.erase(used);

@@ -1,8 +1,8 @@
 #ifndef __SND_INTERP_H__
 #define __SND_INTERP_H__
 
-// simple interface that could easily be recycled
-#define ENHANCED_RATE
+#include <stdio.h>
+#include <windows.h>
 
 class foo_interpolate
 {
@@ -10,24 +10,17 @@ public:
 	foo_interpolate() {}
 	virtual ~foo_interpolate() {};
 
-#ifdef ENHANCED_RATE
 	virtual void reset() = 0;
-#else
+
 	long lrate;
 
-	virtual void reset(double rate)
+	virtual void rate(double rate)
 	{
 		lrate = (int)(32768. * rate);
 	};
-#endif
 
 	virtual void push(int sample) = 0;
-#ifdef ENHANCED_RATE
-	virtual int pop(double rate) = 0;
-#else
 	virtual int pop() = 0;
-#endif 
-
 };
 
 extern foo_interpolate * get_filter(int which);
