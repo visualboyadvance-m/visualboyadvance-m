@@ -837,11 +837,7 @@ void DirectDrawDisplay::render()
           pDirectDraw->FlipToGDISurface();
           ddsPrimary->SetClipper(ddsClipper);
           hret = ddsPrimary->Blt(&theApp.dest, ddsFlip, NULL, DDBLT_ASYNC, NULL);
-          // if using emulation only, then we have to redraw the menu
-          // everytime. It seems like a bug in DirectDraw to me as we not
-          // overwritting the menu area at all.
-          if(theApp.ddrawUsingEmulationOnly)
-            theApp.m_pMainWnd->DrawMenuBar();
+          theApp.m_pMainWnd->DrawMenuBar();
         } else
           hret = ddsPrimary->Flip(NULL, 0);
       }
