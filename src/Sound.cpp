@@ -387,22 +387,15 @@ inline void interp_push(int ch, int sample)
 	interp[ch]->push(sample);
 }
 
-#ifdef ENHANCED_RATE
-inline int interp_pop(int ch, double rate)
-{
-	return interp[ch]->pop(rate);
-#else
 inline int interp_pop(int ch)
 {
 	return interp[ch]->pop();
-#endif
 }
-
 
 // *** End snd_interp code
 
 static void soundEventGB(u32 address, u8 data)
-  {
+{
   if ( apu )
   {
     int divisor = 4 * soundQuality;
