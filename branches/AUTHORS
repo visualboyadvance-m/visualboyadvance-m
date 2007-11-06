@@ -1,0 +1,15 @@
+VisualBoy and VisualBoyAdvance original development:
+
+- Forgotten (see the Contact section in the README)
+
+Current maintainer:
+
+- Sébastien Guignot aka kxu <kxu@users.sourceforge.net>
+
+Contributions:
+
+- Costis <costis@gbaemu.com>: object mosaic, GP32
+- KVA: ARM/THUMB disassembler
+- kxu: GTK+ interface
+- Yann Parmentier aka kohai: new icons
+- Spacy: Windows, Visual Studio 2005, DirectX

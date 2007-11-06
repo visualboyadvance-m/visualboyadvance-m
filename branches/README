@@ -1,0 +1,479 @@
+Welcome to version 1.8.0 of VisualBoyAdvance [SDL].
+This is a GB/GBC/GBA emulator for Windows, Linux, MacOS X and BeOS.
+
+Features
+--------
+
+- configurable GB/GBA keys, including joystick support
+- option to use BIOS file
+- zip/gzip file support
+- directory selection for save state, battery and screen capture
+- fullscreen mode (selectable resolution)
+- video sizes 1x, 2x, 3x and 4x
+- graphic filters Normal, TV Mode, 2xSaI, Super 2xSaI and more
+- interframe blending support
+- same emulation core as VisualBoyAdvance: GB and GBA emulation
+- built-in ARM/THUMB assembly debugger
+- 10 save states accesible through keyboard
+- automatic battery file load/save
+- auto-fire support
+- pause, reset through keyboard
+- 16, 24 and 32 bit desktop support
+- GDB remote debugging (see below for information)
+- auto frameskipping and throttle
+- AGBPrint support for development
+- RTC support
+
+Compiling the sources
+---------------------
+
+See the INSTALL file for compiling instructions. Please note the following
+requisites to compile:
+
+- GCC must be 3.x or greater in order to compile GBA.cpp with -O2. Earlier
+  versions have a problem during optimization that requires an absurd
+  ammount of memory and usually ends up crashing the compiler/computer
+- On Windows, Microsoft Visual C++ 6 or later is needed. Please note that
+  some of the source code will not compile with the shipped header files.
+  You will need to install the most recent Platform SDK from Microsoft.
+
+Installing
+----------
+
+The easiest installation is to place all files in the distribution in the
+same directory.
+
+Per game settings
+-----------------
+
+Version 1.5 introduced the support for per game settings for GBA games. You
+can defined the following settings on a per game basis by using an INI file
+called vba-over.ini in the same directory as the emulator:
+
+rtcEnabled=<0 for false, anything else for true>
+flashSize=<65536 or 131072>
+saveType=<0 for automatic, 1 for EEPROM, 2 for SRAM, 3 for Flash or 4 for
+EEPROM+Sensor>
+
+Use the 4 letter game code to separate settings for each game. Example:
+
+[ABCD]
+rtcEnabled=0
+flashSize=65536
+saveType=0
+
+[ABC2]
+rtcEnabled=1
+flashSize=131072
+saveType=0
+
+Support
+-------
+
+Please support VisualBoyAdvance by making a donation. You can donate money
+using PayPal (www.paypal.com). Use the contact form to find how you can
+send donations. Also, it is recommended that you use the VisualBoyAdvance
+forum on www.ngemu.com message board.
+
+FAQ
+---
+
+See online FAQ for more information: http://vba.ngemu.com/faq.shtml
+
+Please don't email about what you think it is problem before consulting
+the FAQ.
+
+System requirements
+-------------------
+
+Windows: PIII 500Mhz machine for GBA emulation. GB emulation requires far less.
+
+Linux, MacOS X, BeOS:
+  SDL (>= 1.2.2) runtime library must be installed prior to running the
+  program. You can download it from http://www.libsdl.org
+
+Key combinations during emulation
+---------------------------------
+
+- F1...F10: load save state 1...10
+- Shift+F1...F10: save state 1...10
+- Alt+1...4: auto-fire A,B,L,R
+- Ctrl+1...8: enable/disable graphical layers (BG0, BG1, BG2, BG3, OBJ, WIN0,
+  WIN1, OBJWIN)
+- Ctrl+N: pause on next frame
+- Ctrl+R: reset
+- Ctrl+P: pause
+- Ctrl+B: rewind (if enabled and available)
+- F11: enter built-in debugger
+- ESC: exit emulator
+
+Emulation key settings
+----------------------
+
+- Movement: arrow keys
+- Button A: Z
+- Button B: X
+- Button L: A
+- Button R: S
+- Button Start: ENTER
+- Button Select: BACKSPACE
+- Speed up: SPACE
+- Screen capture: F12
+- Motion Left: NUMPAD 4
+- Motion Right: NUMPAD 6
+- Motion Up: NUMPAD 8
+- Motion Down: NUMPAD 2
+
+
+GDB support
+-----------
+
+VisualBoyAdvance now provides GDB remote debugging support. This gives
+developers the full power of GDB to debug GBA applications.
+
+In order to use this, you will need a cross-compiled GDB for either the arm-elf
+or arm-thumb-elf target (used for the --target= option of GDB configure
+script).
+
+You can also use GDB frontends like DDD, CodeMedic, etc... or even GDB/Insight
+for GUI debugger (if using anything other than GDB/Insight, please make sure
+to point to the right GDB executable).
+
+The emulator provides two transport protocols for remote debugging:
+
+- TCP: allows debugging through TCP using port 55555 (or any specified) port.
+  The advantage of using TCP is that it allows true remote debugging but it is
+  slower compared to the pipe method (pipe method does not work on Windows -
+  probably a restriction imposed by the CYGWIN port of GDB).
+- PIPE: allows debugging through a PIPE between the emulator and GDB. This is a
+  lot faster than TCP and recommened on Unix systems.
+
+Using TCP transport
+-------------------
+
+To use the TCP transport, use the flag -Gtcp[:portnum] where portnum is an
+optional port number to be used instead of 55555. VBA will wait for a GDB
+connection on the specified port (printed on screen). Start GDB by passing the
+.elf file, then connect to the emulator by using the command:
+
+target remote <hostname>:<port number>
+
+where hostname is the host where the emulator is running and port number is the
+printed port number.
+
+Using PIPE transport
+--------------------
+
+To use the PIPE transport, start GDB with the .elf file to be debugged. Connect
+to the emulator by using the command:
+
+target remote |<full path to VBA>/VisualBoyAdvance -Gpipe
+
+Debugging with GDB
+------------------
+
+Once you connected to the emulator, you can set breakpoints and debug the
+application. But before doing that, you will need to issue the loda command on
+GDB to load the code into the emulator. Optionally, you can pass the ELF file
+on the emulator's command line (along with the -N option to not parse the debug
+information in the emulator) instead of issuing the load command.
+
+After connecting and optionally loading the file into the debugger, you can
+start debugging: add breakpoints, step, etc...
+
+While using GDB, any console output (see below) will show up in GDB's console.
+
+If you want to break into the GDB, press F11 and it will give you full command
+in GDB again. Pressing ESC will terminate emulation.
+
+You can also detach GDB from the emulator.
+
+
+Console Output
+--------------
+
+There are two forms of console output in this version:
+
+- Mappy style dprint: use the following code (from Mappy's documentation)
+  to get output:
+
+- VBA style: use the following code to get output:
+  // THUMB code
+  void print(char *s)
+  {
+    asm volatile("mov r0, %0;"
+                 "swi 0xff;"
+                 : // no ouput
+                 : "r" (s)
+                 : "r0");
+  }
+  // ARM code
+  void print(char *s)
+  {
+    asm volatile("mov r0, %0;"
+                 "swi 0xff0000;"
+                 : // no ouput
+                 : "r" (s)
+                 : "r0");
+  }
+
+When using GDB, the output will show up in GDB's console. When using the
+built-in debugger, output will go to standard out.
+
+Built-in debugger enhancements
+------------------------------
+
+The built-in debugger has the following enhancements (need debug enabled ELF
+file):
+- ELF file support: both multiple and regular. Please report any messages or
+  problems reading ELF files. C++ classes and some miscellaneous features are
+  not supported yet. Also, method names may be mangled in C++ code.
+- break command: add a breakpoint on a function, line number of file:line
+  number
+- locals command: print the local variables on the current function
+- print command: prints the value of a given expression. Valid expression
+  include *this, ptr->member, var.member, array[0], sizeof(expression), etc...
+- symbols command: list information known about a symbol (or symbols that start
+  with the given name)
+- radix command: sets the output radix to eithe decimal, octal or hex.
+- file and line number when stopped: the debugger will show the file and line
+  number (if available) for the current address
+- fixes to some breakpoint handling problems
+- fixes to break on write function
+
+Profiling
+---------
+
+VisualBoyAdvance has profiling support. It produces output in the format
+supported by GPROF. You need a cross-compiled binary of GPROF (binutils
+GNU package) compiled with --target=arm-thumb-elf (or similar).
+
+The output will always contain the histogram of PC positions at the specified
+frequency even if the code is not compiled with call graph support.
+
+In order to enable profiling, you need to add a call inside your code
+to start it (download vba.s for a ready to use file for GCC):
+
+void monstartup(u32 lowPC, 32 highPC)
+
+This will start profiling for the given address region. If the code was also
+compiled with -pg, call graphs will be recorded.
+
+Other calls for fine grain control:
+
+// control profiling
+// 0 - stops profiling
+// anyother value starts it
+void moncontrol(int mode)
+
+// stop profiling and output gmon.out file
+void moncleanup()
+
+// record call graph (used by GCC)
+// r12 contains previous caller
+// r14 contains function that was called
+void mcount()
+
+GCC bugs
+--------
+
+All versions of GCC previous to the working version 3.3 have bugs when
+generating profiling for thumb functions.
+
+The errors are:
+- mov\tip,lr not a valid instruction (typo in gcc/config/arm/arm.h)
+- LPxx undefined when linking (missing . before LP causes the problem)
+
+You can fix these problems by either recompiling GCC (recommended) or by
+modifying cc1.exe to fix the problems.
+
+In the first option, find the given code in gcc/config/arm/arm.h and fix
+the typos (remove the extra blackslash from the mov ip,lr instruction and
+add the missing dot before LP%d) or change THUMB_FUNCTION_PROFILER to call
+ARM_FUNCTION_PROFILER (the recent changes that were performed in CVS).
+
+If you don't want to compile your own GCC, then you can use an hex editor
+to fix the problems. Locate cc1.exe under <dir>/lib/gcc-lib/<config>/<version>
+and find the mov\tip,lr instruction. Change the extra backslash to a space.
+Locate the .LP string just before the mov instruction and change it to
+.P instead (make sure to place 0 after the P). Then find the text .word
+LP%d and change it to .word .P%d.
+
+Histograms will be output even if the code is not compiled with call graph
+support.
+
+Options configuration
+---------------------
+
+All configurable options are accessible from the configuration file
+VisualBoyAdvance.cfg.
+
+This file is searched in this order:
+
+- current directory
+- user home directory (defined by HOME environment variable)
+- user profile directory (Windows only defined by USERPROFILE directory)
+- executable directory (either relative or defined by PATH variable)
+
+All options are documented in the file supplied with this distribution.
+
+Command line options (override settings in configuration file)
+--------------------------------------------------------------
+
+  -1, --video-1x               1x
+  -2, --video-2x               2x
+  -3, --video-3x               3x
+  -4, --video-4x               4x
+  -F, --fullscreen             Full screen
+  -G, --gdb=PROTOCOL           GNU Remote Stub mode:
+                                tcp      - use TCP at port 55555
+                                tcp:PORT - use TCP at port PORT
+                                pipe     - use pipe transport
+  -N, --no-debug               Don't parse debug information
+  -S, --flash-size=SIZE        Set the Flash size
+      --flash-64k               0 -  64K Flash
+      --flash-128k              1 - 128K Flash
+  -T, --throttle=THROTTLE      Set the desired throttle (5...1000)
+  -Y, --yuv=TYPE               Use YUV overlay for drawing:
+                                0 - YV12
+                                1 - UYVY
+                                2 - YVYU
+                                3 - YUY2
+                                4 - IYUV
+  -b, --bios=BIOS              Use given bios file
+  -c, --config=FILE            Read the given configuration file
+  -d, --debug                  Enter debugger
+  -f, --filter=FILTER          Select filter:
+      --filter-normal            0 - normal mode
+      --filter-tv-mode           1 - TV Mode
+      --filter-2xsai             2 - 2xSaI
+      --filter-super-2xsai       3 - Super 2xSaI
+      --filter-super-eagle       4 - Super Eagle
+      --filter-pixelate          5 - Pixelate
+      --filter-motion-blur       6 - Motion Blur
+      --filter-advmame           7 - AdvanceMAME Scale2x
+      --filter-simple2x          8 - Simple2x
+      --filter-bilinear          9 - Bilinear
+      --filter-bilinear+        10 - Bilinear Plus
+      --filter-scanlines        11 - Scanlines
+      --filter-hq2x             12 - hq2x
+      --filter-lq2x             13 - lq2x
+  -h, --help                   Print this help
+  -i, --ips=PATCH              Apply given IPS patch
+  -p, --profile=[HERTZ]        Enable profiling
+  -s, --frameskip=FRAMESKIP    Set frame skip (0...9)
+  -t, --save-type=TYPE         Set the available save type
+      --save-auto               0 - Automatic (EEPROM, SRAM, FLASH)
+      --save-eeprom             1 - EEPROM
+      --save-sram               2 - SRAM
+      --save-flash              3 - FLASH
+      --save-sensor             4 - EEPROM+Sensor
+      --save-none               5 - NONE
+  -v, --verbose=VERBOSE        Set verbose logging (trace.log)
+                                  1 - SWI
+                                  2 - Unaligned memory access
+                                  4 - Illegal memory write
+                                  8 - Illegal memory read
+                                 16 - DMA 0
+                                 32 - DMA 1
+                                 64 - DMA 2
+                                128 - DMA 3
+                                256 - Undefined instruction
+                                512 - AGBPrint messages
+
+Long options only:
+      --agb-print              Enable AGBPrint support
+      --auto-frameskip         Enable auto frameskipping
+      --ifb-none               No interframe blending
+      --ifb-motion-blur        Interframe motion blur
+      --ifb-smart              Smart interframe blending
+      --no-agb-print           Disable AGBPrint support
+      --no-auto-frameskip      Disable auto frameskipping
+      --no-ips                 Do not apply IPS patch
+      --no-mmx                 Disable MMX support
+      --no-pause-when-inactive Don't pause when inactive
+      --no-rtc                 Disable RTC support
+      --no-show-speed          Don't show emulation speed
+      --no-throttle            Disable thrrotle
+      --pause-when-inactive    Pause when inactive
+      --rtc                    Enable RTC support
+      --show-speed-normal      Show emulation speed
+      --show-speed-detailed    Show detailed speed data
+
+Known bugs
+----------
+
+- loading a save state that uses a different sound quality may hang the
+  emulator. Please only use the 22Khz sound quality save states from the
+  Windows version with this release
+- built-in debugger still has a few bugs
+- disassembler contains a few errors. Please report anything wrong you find
+
+LICENSE
+-------
+
+    VisualBoyAdvance - a Gameboy and GameboyAdvance emulator
+    Copyright (C) 1999-2003 Forgotten
+    Copyright (C) 2004 Forgotten and the VBA development team
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+This program also contains code developed by the University of
+California and is subject to the extra conditions:
+
+Copyright (c) 1991, 1998 The Regents of the University of California.
+All rights reserved.
+ 
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. [rescinded 22 July 1999]
+4. Neither the name of the University nor the names of its contributors
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
+        
+Contact
+-------
+
+Please don't email unless you found some bug. Requests will be ignored and
+deleted. Also, be descriptive when emailing. You have to tell me what version
+of the emulator you are writing about and a good description of the problem.
+Remember, there are several interfaces (Windows, SDL and GTK+) and
+several systems (Windows, Linux, MacOS X and BeOS).
+
+Also, there are still people writing about the old VisualBoy which is no longer
+supported. Also remember I am not paid to work on VisualBoyAdvance. This is
+just a hobby.
+
+Forgotten (http://vba.ngemu.com/contact.shtml)
+kxu <kxu@users.sourceforge.net>
+
+http://vba.ngemu.com
+http://sourceforge.net/projects/vba
+
+Special Thanks
+--------------
+
+PokemonHacker for all his help improving the emulator.
+Costis for his help fixing some of the graphics bugs.
+Snes9x developers for the great emulator and source code.
+Kreed for his great graphic filters.
+SDL team for this amazing library.
+And all users who kindly reported problems.

@@ -1,0 +1,157 @@
+2003-09-03  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/armdis.cpp: fixed thumb disassembly bug with ldsb and ldrh opcodes
+
+2003-08-23  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (updateRenderMethod0): return true if render type did not change
+	* src/bios.cpp (BIOS_CpuSet): fixed bug introduced in previous fix
+	* src/GBA.cpp (CPULoop): fixed slowdown problem introduced in version 1.6
+
+2003-08-09  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/GBA.cpp (CPUCheckDMA): fix minor DMA problem introduced with previous fixes
+	* src/GBA.cpp: fix DMA timings and add DMA hack fix
+	* src/Util.cpp (utilGBAFindSave): change search slightly
+	* src/agbprint.cpp (agbPrintWrite): return true to avoid warning message
+	* src/win32/TileViewer.cpp (OnMapInfo): fixed tile information when in 256 color mode
+	* src/win32/Win32.cpp (initApp): fix bug when initially switching to INI
+
+2003-08-02  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/TileViewer.cpp (render): fixed TileViewer for 256 color display (incorrect tile and address)
+
+2003-08-01  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (initApp): changed default rewind interval to 0 (disabled)
+	* src/bios.cpp (BIOS_CpuFastSet): fixed
+	* src/bios.cpp (BIOS_CpuSet): fixed
+
+2003-07-21  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (fileMoviePlay): added message when playing movie
+	* src/Sound.cpp (soundTick): produce mute sound while in sleep state
+	* src/GBA.cpp (CPULoop): improve stop state/sleep support
+
+2003-07-19  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (updateFileMenu): allow customize in fullscreen (not at 320x240 though)
+
+2003-07-18  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/MapView.cpp (renderTextScreen): fixed rendering when 512x512
+	* src/win32/MapView.cpp (GetTextClickAddress): fixed click address for text screens when size > 256
+
+2003-07-16  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/Sound.cpp (soundEvent): fix sound envelope bug when set to 0
+
+2003-07-15  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/TestEmu.cpp (systemGbBorderOn): fixed TestEmu compilation
+	* src/SDL.cpp: added save type NONE support
+	* src/win32/Win32.cpp (helpBugReport): fixed bug with bug report when emulating GB/GBC program
+
+2003-07-13  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/Util.cpp (utilGBAFindSave): added enhanced save type detection
+
+2003-07-09  Forgotten  <forgotten@users.sourceforge.net>
+	* src/SDL.cpp: rewind default to disabled
+	* src/win32/Win32.cpp: rewind default to disabled
+	* src/win32/RewindInterval.cpp (OnOk): allow a rewind interval between 0 and 600 seconds - 0 to disable it
+	* src/win32/Win32.cpp (fileMoviePlay): put a warning when playing a movie
+	* src/GBA.cpp (CPUReadState): fix sound problem loading old save states
+
+2003-07-08  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/armdis.cpp: fixed thumb disassembly bug
+	* src/win32/Win32.cpp: fix rewind enable and reset when loading a game
+	* src/win32/Reg.cpp (regQueryBinaryValue): fix problem saving binary settings into INI
+
+2003-07-05  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/Mode0.cpp (mode0RenderLineAll): fixed priority between OBJ Win and Windows
+	* src/Mode1.cpp (mode0RenderLineAll): fixed priority between OBJ Win and Windows	
+	* src/Mode2.cpp (mode0RenderLineAll): fixed priority between OBJ Win and Windows
+	* src/Mode3.cpp (mode0RenderLineAll): fixed priority between OBJ Win and Windows
+	* src/Mode4.cpp (mode0RenderLineAll): fixed priority between OBJ Win and Windows
+	* src/Mode5.cpp (mode0RenderLineAll): fixed priority between OBJ Win and Windows
+	
+2003-07-04  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp: menu toggle can have a customizable accelerator
+	* src/win32/Commands.cpp: added file toggle menu
+
+2003-07-02  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/SDL.cpp: fixed type on pause-when-inactive option
+
+2003-06-29  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Reg.cpp (regExportSettingsToINI): also exporting settings for viewers
+
+2003-06-28  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (WindowProc): added rewind interval configuration
+	* src/bios.cpp (BIOS_SndDriverJmpTableCopy): simple emulation of function 0x2a
+
+2003-06-26  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp: added movie version for future updates
+
+2003-06-25  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (helpFAQ): added FAQ menu to take to website
+
+2003-06-24  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (helpBugReport): added bug report option
+	* src/SDL.cpp: added rewind support
+
+2003-06-21  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/GBA.cpp (CPULoadRom): speed up loading
+
+2003-06-20  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/gb/GB.cpp: added rewind support
+
+2003-06-19  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/Cheats.cpp (cheatsCheckKeys): added support for slowdown codes
+	* src/elf.cpp (elfGetAddressSymbol): fix crash debugging the initialization code
+
+2003-06-17  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/GBA.cpp: added rewind support
+	* src/Win32.cpp: added rewind support
+	* src/Util.cpp: added memory gzip support for rewind
+
+2003-06-15  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/Gfx.h (gfxDrawSprites): emulate sprite priority bug
+	* src/GBA.cpp: fix for DMA emulation problems
+
+2003-06-13  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/SDL.cpp: support for automatic SGB border
+	* src/win32/Win32.cpp (systemGbBorderOn): support for automatic SGB border
+	* src/gb/gbSGB.cpp: added support for automatic SGB border
+	* src/GBA.cpp: fixed bug with enable/disable layers introduced in version 1.5.1
+
+2003-06-12  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/SDL.cpp: added sound off/enable support
+	* src/VisualBoyAdvance.cfg: added sound off/enable flags
+	* src/win32/Win32.cpp: added auto hide menu support
+	* src/GBA.cpp, src/gb/GB.cpp: code cleanup
+
+2003-06-11  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp: added movie support
+
+2003-06-10  Forgotten  <forgotten@users.sourceforge.net>
+
+	* GBACheats.cpp: fixed bug with enable/disable cheats
+

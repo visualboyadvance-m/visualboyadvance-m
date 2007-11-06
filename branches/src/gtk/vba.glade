@@ -1,0 +1,3597 @@
+<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
+<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
+
+<glade-interface>
+
+<widget class="GtkWindow" id="MainWindow">
+  <property name="title" translatable="yes">VBA</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
+  <property name="window_position">GTK_WIN_POS_NONE</property>
+  <property name="modal">False</property>
+  <property name="resizable">True</property>
+  <property name="destroy_with_parent">False</property>
+  <property name="skip_taskbar_hint">False</property>
+  <property name="skip_pager_hint">False</property>
+  <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
+
+  <child>
+    <widget class="GtkVBox" id="vbox1">
+      <property name="visible">True</property>
+      <property name="homogeneous">False</property>
+      <property name="spacing">0</property>
+
+      <child>
+	<widget class="GtkHandleBox" id="handlebox1">
+	  <property name="visible">True</property>
+	  <property name="shadow_type">GTK_SHADOW_OUT</property>
+	  <property name="handle_position">GTK_POS_LEFT</property>
+	  <property name="snap_edge">GTK_POS_TOP</property>
+
+	  <child>
+	    <widget class="GtkMenuBar" id="MenuBar">
+	      <property name="visible">True</property>
+
+	      <child>
+		<widget class="GtkMenuItem" id="FileMenu">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">_File</property>
+		  <property name="use_underline">True</property>
+
+		  <child>
+		    <widget class="GtkMenu" id="FileMenu_menu">
+
+		      <child>
+			<widget class="GtkImageMenuItem" id="FileOpen">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Open...</property>
+			  <property name="use_underline">True</property>
+			  <accelerator key="O" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+
+			  <child internal-child="image">
+			    <widget class="GtkImage" id="image128">
+			      <property name="visible">True</property>
+			      <property name="stock">gtk-open</property>
+			      <property name="icon_size">1</property>
+			      <property name="xalign">0.5</property>
+			      <property name="yalign">0.5</property>
+			      <property name="xpad">0</property>
+			      <property name="ypad">0</property>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkSeparatorMenuItem" id="separator1">
+			  <property name="visible">True</property>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="FileLoad">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Load...</property>
+			  <property name="use_underline">True</property>
+			  <accelerator key="L" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="FileSave">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Save...</property>
+			  <property name="use_underline">True</property>
+			  <accelerator key="S" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="LoadGameMenu">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">Loa_d game</property>
+			  <property name="use_underline">True</property>
+
+			  <child>
+			    <widget class="GtkMenu" id="LoadGameMenu_menu">
+
+			      <child>
+				<widget class="GtkMenuItem" id="LoadGameMostRecent">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Most recent</property>
+				  <property name="use_underline">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="LoadGameAuto">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Auto load most recent</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator28">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="LoadGameSlot1">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot1</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F1" modifiers="0" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="LoadGameSlot2">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot2</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F2" modifiers="0" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="LoadGameSlot3">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot3</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F3" modifiers="0" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="LoadGameSlot4">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot4</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F4" modifiers="0" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="LoadGameSlot5">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot5</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F5" modifiers="0" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="LoadGameSlot6">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot6</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F6" modifiers="0" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="LoadGameSlot7">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot7</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F7" modifiers="0" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="LoadGameSlot8">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot8</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F8" modifiers="0" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="LoadGameSlot9">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot9</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F9" modifiers="0" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="LoadGameSlot10">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot10</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F10" modifiers="0" signal="activate"/>
+				</widget>
+			      </child>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="SaveGameMenu">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">S_ave game</property>
+			  <property name="use_underline">True</property>
+
+			  <child>
+			    <widget class="GtkMenu" id="SaveGameMenu_menu">
+
+			      <child>
+				<widget class="GtkMenuItem" id="SaveGameOldest">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Oldest slot</property>
+				  <property name="use_underline">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator27">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="SaveGameSlot1">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot1</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F1" modifiers="GDK_SHIFT_MASK" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="SaveGameSlot2">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot2</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F2" modifiers="GDK_SHIFT_MASK" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="SaveGameSlot3">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot3</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F3" modifiers="GDK_SHIFT_MASK" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="SaveGameSlot4">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot4</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F4" modifiers="GDK_SHIFT_MASK" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="SaveGameSlot5">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot5</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F5" modifiers="GDK_SHIFT_MASK" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="SaveGameSlot6">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot6</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F6" modifiers="GDK_SHIFT_MASK" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="SaveGameSlot7">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot7</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F7" modifiers="GDK_SHIFT_MASK" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="SaveGameSlot8">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot8</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F8" modifiers="GDK_SHIFT_MASK" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="SaveGameSlot9">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot9</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F9" modifiers="GDK_SHIFT_MASK" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="SaveGameSlot10">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Slot10</property>
+				  <property name="use_underline">True</property>
+				  <accelerator key="F10" modifiers="GDK_SHIFT_MASK" signal="activate"/>
+				</widget>
+			      </child>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkSeparatorMenuItem" id="separator2">
+			  <property name="visible">True</property>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkCheckMenuItem" id="FilePause">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Pause</property>
+			  <property name="use_underline">True</property>
+			  <property name="active">False</property>
+			  <accelerator key="P" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="FileReset">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Reset</property>
+			  <property name="use_underline">True</property>
+			  <accelerator key="R" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkSeparatorMenuItem" id="separator3">
+			  <property name="visible">True</property>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="RecentMenu">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">Rece_nt</property>
+			  <property name="use_underline">True</property>
+
+			  <child>
+			    <widget class="GtkMenu" id="RecentMenu_menu">
+
+			      <child>
+				<widget class="GtkMenuItem" id="RecentReset">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Reset</property>
+				  <property name="use_underline">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="RecentFreeze">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Freeze</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator29">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkSeparatorMenuItem" id="separator4">
+			  <property name="visible">True</property>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="ImportMenu">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Import</property>
+			  <property name="use_underline">True</property>
+
+			  <child>
+			    <widget class="GtkMenu" id="ImportMenu_menu">
+
+			      <child>
+				<widget class="GtkMenuItem" id="ImportBatteryFile">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Battery file...</property>
+				  <property name="use_underline">True</property>
+				</widget>
+			      </child>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="ExportMenu">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">E_xport</property>
+			  <property name="use_underline">True</property>
+
+			  <child>
+			    <widget class="GtkMenu" id="ExportMenu_menu">
+
+			      <child>
+				<widget class="GtkMenuItem" id="ExportBatteryFile">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Battery file...</property>
+				  <property name="use_underline">True</property>
+				</widget>
+			      </child>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkSeparatorMenuItem" id="separator5">
+			  <property name="visible">True</property>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="FileScreenCapture">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">Screen capt_ure...</property>
+			  <property name="use_underline">True</property>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkSeparatorMenuItem" id="separator6">
+			  <property name="visible">True</property>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkImageMenuItem" id="FileClose">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Close</property>
+			  <property name="use_underline">True</property>
+
+			  <child internal-child="image">
+			    <widget class="GtkImage" id="image129">
+			      <property name="visible">True</property>
+			      <property name="stock">gtk-close</property>
+			      <property name="icon_size">1</property>
+			      <property name="xalign">0.5</property>
+			      <property name="yalign">0.5</property>
+			      <property name="xpad">0</property>
+			      <property name="ypad">0</property>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkImageMenuItem" id="FileExit">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Exit</property>
+			  <property name="use_underline">True</property>
+			  <accelerator key="X" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+
+			  <child internal-child="image">
+			    <widget class="GtkImage" id="image130">
+			      <property name="visible">True</property>
+			      <property name="stock">gtk-quit</property>
+			      <property name="icon_size">1</property>
+			      <property name="xalign">0.5</property>
+			      <property name="yalign">0.5</property>
+			      <property name="xpad">0</property>
+			      <property name="ypad">0</property>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+		    </widget>
+		  </child>
+		</widget>
+	      </child>
+
+	      <child>
+		<widget class="GtkMenuItem" id="OptionsMenu">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">_Options</property>
+		  <property name="use_underline">True</property>
+
+		  <child>
+		    <widget class="GtkMenu" id="OptionsMenu_menu">
+
+		      <child>
+			<widget class="GtkMenuItem" id="FrameskipMenu">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Frameskip</property>
+			  <property name="use_underline">True</property>
+
+			  <child>
+			    <widget class="GtkMenu" id="FrameskipMenu_menu">
+
+			      <child>
+				<widget class="GtkMenuItem" id="ThrottleMenu">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Throttle</property>
+				  <property name="use_underline">True</property>
+
+				  <child>
+				    <widget class="GtkMenu" id="ThrottleMenu_menu">
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="ThrottleNoThrottle">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_No throttle</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">True</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="Throttle25">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">25%</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">ThrottleNoThrottle</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="Throttle50">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">50%</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">ThrottleNoThrottle</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="Throttle100">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">100%</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">ThrottleNoThrottle</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="Throttle150">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">150%</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">ThrottleNoThrottle</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="Throttle200">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">200%</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">ThrottleNoThrottle</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="ThrottleOther">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_Other...</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">ThrottleNoThrottle</property>
+					</widget>
+				      </child>
+				    </widget>
+				  </child>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator19">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="FrameskipAutomatic">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Automatic</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Frameskip0">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_0</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FrameskipAutomatic</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Frameskip1">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_1</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FrameskipAutomatic</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Frameskip2">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_2</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FrameskipAutomatic</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Frameskip3">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_3</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FrameskipAutomatic</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Frameskip4">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_4</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FrameskipAutomatic</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Frameskip5">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_5</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FrameskipAutomatic</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Frameskip6">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_6</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FrameskipAutomatic</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Frameskip7">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_7</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FrameskipAutomatic</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Frameskip8">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_8</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FrameskipAutomatic</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Frameskip9">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_9</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FrameskipAutomatic</property>
+				</widget>
+			      </child>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="VideoMenu">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Video</property>
+			  <property name="use_underline">True</property>
+
+			  <child>
+			    <widget class="GtkMenu" id="VideoMenu_menu">
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Video1x">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_1x</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Video2x">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_2x</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">Video1x</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Video3x">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_3x</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">Video1x</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Video4x">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_4x</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">Video1x</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Video5x">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_5x</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">Video1x</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Video6x">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_6x</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">Video1x</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator9">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="LayersMenu">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Layers</property>
+				  <property name="use_underline">True</property>
+
+				  <child>
+				    <widget class="GtkMenu" id="LayersMenu_menu">
+
+				      <child>
+					<widget class="GtkCheckMenuItem" id="LayersBg0">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">BG0</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <accelerator key="1" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkCheckMenuItem" id="LayersBg1">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">BG1</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <accelerator key="2" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkCheckMenuItem" id="LayersBg2">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">BG2</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <accelerator key="3" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkCheckMenuItem" id="LayersBg3">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">BG3</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <accelerator key="4" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkCheckMenuItem" id="LayersObj">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">OBJ</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <accelerator key="5" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkCheckMenuItem" id="LayersWin0">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">WIN0</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <accelerator key="6" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkCheckMenuItem" id="LayersWin1">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">WIN1</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <accelerator key="7" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkCheckMenuItem" id="LayersObjWin">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">OBJWIN</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <accelerator key="8" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+					</widget>
+				      </child>
+				    </widget>
+				  </child>
+				</widget>
+			      </child>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="EmulatorMenu">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Emulator</property>
+			  <property name="use_underline">True</property>
+
+			  <child>
+			    <widget class="GtkMenu" id="EmulatorMenu_menu">
+
+			      <child>
+				<widget class="GtkMenuItem" id="EmulatorDirectories">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Directories...</property>
+				  <property name="use_underline">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="EmulatorPauseWhenInactive">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Pause when inactive window</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="ShowSpeedMenu">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Show speed</property>
+				  <property name="use_underline">True</property>
+
+				  <child>
+				    <widget class="GtkMenu" id="ShowSpeedMenu_menu">
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="ShowSpeedNone">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">None</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">True</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="ShowSpeedPercentage">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">Percentage</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">ShowSpeedNone</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="ShowSpeedDetailed">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">Detailed</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">ShowSpeedNone</property>
+					</widget>
+				      </child>
+				    </widget>
+				  </child>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="SaveTypeMenu">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Save type</property>
+				  <property name="use_underline">True</property>
+
+				  <child>
+				    <widget class="GtkMenu" id="SaveTypeMenu_menu">
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="SaveTypeAutomatic">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_Automatic</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">True</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="SaveTypeEeprom">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">EEPROM</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">SaveTypeAutomatic</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="SaveTypeSram">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">SRAM</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">SaveTypeAutomatic</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="SaveTypeFlash">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">Flash</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">SaveTypeAutomatic</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="SaveTypeEepromSensor">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">EEPROM+Sensor</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">SaveTypeAutomatic</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="SaveTypeNone">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">None</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">SaveTypeAutomatic</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkSeparatorMenuItem" id="separator10">
+					  <property name="visible">True</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="SaveTypeFlash64K">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">Flash 64K</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">True</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="SaveTypeFlash128K">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">Flash 128K</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">SaveTypeFlash64K</property>
+					</widget>
+				      </child>
+				    </widget>
+				  </child>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator31">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="EmulatorSelectBios">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Select BIOS file...</property>
+				  <property name="use_underline">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="EmulatorUseBios">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Use BIOS file</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator30">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="ScreenshotFormatMenu">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Screenshot format</property>
+				  <property name="use_underline">True</property>
+
+				  <child>
+				    <widget class="GtkMenu" id="ScreenshotFormatMenu_menu">
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="ScreenshotFormatPNG">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_PNG</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">True</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="ScreenshotFormatBMP">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_BMP</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">ScreenshotFormatPNG</property>
+					</widget>
+				      </child>
+				    </widget>
+				  </child>
+				</widget>
+			      </child>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="SoundMenu">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Sound</property>
+			  <property name="use_underline">True</property>
+
+			  <child>
+			    <widget class="GtkMenu" id="SoundMenu_menu">
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="SoundOff">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">O_ff</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="SoundMute">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Mute</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">SoundOff</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="SoundOn">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_On</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">SoundOff</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator11">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="SoundEcho">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Echo</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="SoundLowPass">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Low pass filter</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="SoundReverseStereo">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Reverse stereo</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator13">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="SoundChannel1">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Channel _1</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="SoundChannel2">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Channel _2</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="SoundChannel3">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Channel _3</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="SoundChannel4">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Channel _4</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="SoundChannelA">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Channel _A</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="SoundChannelB">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Channel _B</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator14">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Sound11Khz">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">11 _Khz</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Sound22Khz">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">22 K_hz</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">Sound11Khz</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Sound44Khz">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">44 Kh_z</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">Sound11Khz</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator15">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="VolumeMenu">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Volume</property>
+				  <property name="use_underline">True</property>
+
+				  <child>
+				    <widget class="GtkMenu" id="VolumeMenu_menu">
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="Volume25">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">25%</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">True</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="Volume50">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">50%</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">Volume25</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="Volume100">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">100%</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">Volume25</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="Volume200">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">200%</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">Volume25</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="Volume300">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">300%</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">Volume25</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="Volume400">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">400%</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">Volume25</property>
+					</widget>
+				      </child>
+				    </widget>
+				  </child>
+				</widget>
+			      </child>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="GameboyMenu">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Gameboy</property>
+			  <property name="use_underline">True</property>
+
+			  <child>
+			    <widget class="GtkMenu" id="GameboyMenu_menu">
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="GameboyBorder">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Border</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="GameboyPrinter">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Printer</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator16">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="GameboyAutomatic">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Automatic</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="GameboyGba">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_GBA</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">GameboyAutomatic</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="GameboyCgb">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_CGB/GBC</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">GameboyAutomatic</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="GameboySgb">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_SGB</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">GameboyAutomatic</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="GameboySgb2">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">SGB_2</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">GameboyAutomatic</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="GameboyGb">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">G_B</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">GameboyAutomatic</property>
+				</widget>
+			      </child>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="FilterMenu">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">F_ilter</property>
+			  <property name="use_underline">True</property>
+
+			  <child>
+			    <widget class="GtkMenu" id="FilterMenu_menu">
+
+			      <child>
+				<widget class="GtkMenuItem" id="InterframeBlendingMenu">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Interframe _blending</property>
+				  <property name="use_underline">True</property>
+
+				  <child>
+				    <widget class="GtkMenu" id="InterframeBlendingMenu_menu">
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="IFBNone">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_None</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">True</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="IFBSmart">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_Smart</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">IFBNone</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkRadioMenuItem" id="IFBMotionBlur">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_Motion Blur</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <property name="group">IFBNone</property>
+					</widget>
+				      </child>
+				    </widget>
+				  </child>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator20">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="FilterNone">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_None</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="FilterTVMode">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_TV Mode</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FilterNone</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Filter2xSaI">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_2xSaI</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FilterNone</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="FilterSuper2xSaI">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Super 2xSaI</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FilterNone</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="FilterSuperEagle">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Super _Eagle</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FilterNone</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="FilterPixelate">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Pixelate</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FilterNone</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="FilterMotionBlur">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Motion Blur</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FilterNone</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="FilterAdvanceMame2x">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_AdvanceMAME 2x</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FilterNone</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="FilterSimple2x">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">S_imple 2x</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FilterNone</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="FilterBilinear">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Bilinea_r</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FilterNone</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="FilterBilinearPlus">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Bilinear Pl_us</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FilterNone</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="FilterScanlines">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">S_canlines</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FilterNone</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="FilterHq2x">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">h_q2x</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FilterNone</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="FilterLq2x">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_lq2x</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">FilterNone</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator17">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkCheckMenuItem" id="FilterDisableMmx">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Disable MMX</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				</widget>
+			      </child>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+
+		      <child>
+			<widget class="GtkMenuItem" id="JoypadMenu">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Joypad</property>
+			  <property name="use_underline">True</property>
+
+			  <child>
+			    <widget class="GtkMenu" id="JoypadMenu_menu">
+
+			      <child>
+				<widget class="GtkMenuItem" id="JoypadConfigureMenu">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Configure</property>
+				  <property name="use_underline">True</property>
+
+				  <child>
+				    <widget class="GtkMenu" id="JoypadConfigureMenu_menu">
+
+				      <child>
+					<widget class="GtkMenuItem" id="JoypadConfigure1">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_1...</property>
+					  <property name="use_underline">True</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkMenuItem" id="JoypadConfigure2">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_2...</property>
+					  <property name="use_underline">True</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkMenuItem" id="JoypadConfigure3">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_3...</property>
+					  <property name="use_underline">True</property>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkMenuItem" id="JoypadConfigure4">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_4...</property>
+					  <property name="use_underline">True</property>
+					</widget>
+				      </child>
+				    </widget>
+				  </child>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator18">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Joypad1">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_1</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Joypad2">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_2</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">Joypad1</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Joypad3">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_3</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">Joypad1</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkRadioMenuItem" id="Joypad4">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_4</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <property name="group">Joypad1</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkSeparatorMenuItem" id="separator24">
+				  <property name="visible">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="AutofireMenu">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Autofire</property>
+				  <property name="use_underline">True</property>
+
+				  <child>
+				    <widget class="GtkMenu" id="AutofireMenu_menu">
+
+				      <child>
+					<widget class="GtkCheckMenuItem" id="AutofireA">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_A</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <accelerator key="1" modifiers="GDK_MOD1_MASK" signal="activate"/>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkCheckMenuItem" id="AutofireB">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_B</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <accelerator key="2" modifiers="GDK_MOD1_MASK" signal="activate"/>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkCheckMenuItem" id="AutofireL">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_L</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <accelerator key="3" modifiers="GDK_MOD1_MASK" signal="activate"/>
+					</widget>
+				      </child>
+
+				      <child>
+					<widget class="GtkCheckMenuItem" id="AutofireR">
+					  <property name="visible">True</property>
+					  <property name="label" translatable="yes">_R</property>
+					  <property name="use_underline">True</property>
+					  <property name="active">False</property>
+					  <accelerator key="4" modifiers="GDK_MOD1_MASK" signal="activate"/>
+					</widget>
+				      </child>
+				    </widget>
+				  </child>
+				</widget>
+			      </child>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+		    </widget>
+		  </child>
+		</widget>
+	      </child>
+
+	      <child>
+		<widget class="GtkMenuItem" id="ToolsMenu">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">_Tools</property>
+		  <property name="use_underline">True</property>
+
+		  <child>
+		    <widget class="GtkMenu" id="ToolsMenu_menu">
+
+		      <child>
+			<widget class="GtkMenuItem" id="GdbMenu">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_GDB</property>
+			  <property name="use_underline">True</property>
+
+			  <child>
+			    <widget class="GtkMenu" id="GdbMenu_menu">
+
+			      <child>
+				<widget class="GtkMenuItem" id="GdbWait">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Wait connection...</property>
+				  <property name="use_underline">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="GdbLoadAndWait">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Load and wait...</property>
+				  <property name="use_underline">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="GdbBreak">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Break</property>
+				  <property name="use_underline">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="GdbDisconnect">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Disconnect</property>
+				  <property name="use_underline">True</property>
+				</widget>
+			      </child>
+			    </widget>
+			  </child>
+			</widget>
+		      </child>
+		    </widget>
+		  </child>
+		</widget>
+	      </child>
+
+	      <child>
+		<widget class="GtkMenuItem" id="HelpMenu">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">_Help</property>
+		  <property name="use_underline">True</property>
+
+		  <child>
+		    <widget class="GtkMenu" id="HelpMenu_menu">
+
+		      <child>
+			<widget class="GtkMenuItem" id="HelpAbout">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_About</property>
+			  <property name="use_underline">True</property>
+			</widget>
+		      </child>
+		    </widget>
+		  </child>
+		</widget>
+	      </child>
+	    </widget>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">False</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkAlignment" id="ScreenContainer">
+	  <property name="visible">True</property>
+	  <property name="xalign">0.5</property>
+	  <property name="yalign">0.5</property>
+	  <property name="xscale">0</property>
+	  <property name="yscale">0</property>
+
+	  <child>
+	    <placeholder/>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+    </widget>
+  </child>
+</widget>
+
+<widget class="GtkDialog" id="AboutDialog">
+  <property name="title" translatable="yes">About VBA</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
+  <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+  <property name="modal">False</property>
+  <property name="resizable">True</property>
+  <property name="destroy_with_parent">True</property>
+  <property name="skip_taskbar_hint">False</property>
+  <property name="skip_pager_hint">False</property>
+  <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+  <property name="has_separator">True</property>
+
+  <child internal-child="vbox">
+    <widget class="GtkVBox" id="dialog-vbox1">
+      <property name="visible">True</property>
+      <property name="homogeneous">False</property>
+      <property name="spacing">0</property>
+
+      <child internal-child="action_area">
+	<widget class="GtkHButtonBox" id="dialog-action_area1">
+	  <property name="visible">True</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
+
+	  <child>
+	    <widget class="GtkButton" id="closebutton1">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-close</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="response_id">-7</property>
+	    </widget>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">False</property>
+	  <property name="fill">True</property>
+	  <property name="pack_type">GTK_PACK_END</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkAlignment" id="AboutIconContainer">
+	  <property name="visible">True</property>
+	  <property name="xalign">0.5</property>
+	  <property name="yalign">0.5</property>
+	  <property name="xscale">0</property>
+	  <property name="yscale">0</property>
+
+	  <child>
+	    <placeholder/>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkLabel" id="VersionLabel">
+	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
+	  <property name="label" translatable="yes"></property>
+	  <property name="use_underline">False</property>
+	  <property name="use_markup">True</property>
+	  <property name="justify">GTK_JUSTIFY_CENTER</property>
+	  <property name="wrap">False</property>
+	  <property name="selectable">True</property>
+	  <property name="xalign">0.5</property>
+	  <property name="yalign">0.5</property>
+	  <property name="xpad">5</property>
+	  <property name="ypad">5</property>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">False</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkLabel" id="label2">
+	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
+	  <property name="label" translatable="yes">An emulator for Gameboy(TM) and GameboyAdvance(TM).</property>
+	  <property name="use_underline">False</property>
+	  <property name="use_markup">False</property>
+	  <property name="justify">GTK_JUSTIFY_CENTER</property>
+	  <property name="wrap">True</property>
+	  <property name="selectable">True</property>
+	  <property name="xalign">0.5</property>
+	  <property name="yalign">0.5</property>
+	  <property name="xpad">5</property>
+	  <property name="ypad">5</property>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">False</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkLabel" id="label24">
+	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
+	  <property name="label" translatable="yes">&lt;i&gt;Special thanks to Yann Parmentier aka &quot;kohai&quot; for the icons.&lt;/i&gt;</property>
+	  <property name="use_underline">False</property>
+	  <property name="use_markup">True</property>
+	  <property name="justify">GTK_JUSTIFY_LEFT</property>
+	  <property name="wrap">False</property>
+	  <property name="selectable">True</property>
+	  <property name="xalign">0.5</property>
+	  <property name="yalign">0.5</property>
+	  <property name="xpad">5</property>
+	  <property name="ypad">5</property>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">False</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkLabel" id="label3">
+	  <property name="visible">True</property>
+	  <property name="can_focus">True</property>
+	  <property name="label" translatable="yes">&lt;small&gt;Copyright (C) 2004 Forgotten and the VBA development team&lt;/small&gt;</property>
+	  <property name="use_underline">False</property>
+	  <property name="use_markup">True</property>
+	  <property name="justify">GTK_JUSTIFY_CENTER</property>
+	  <property name="wrap">True</property>
+	  <property name="selectable">True</property>
+	  <property name="xalign">0.5</property>
+	  <property name="yalign">0.5</property>
+	  <property name="xpad">5</property>
+	  <property name="ypad">5</property>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">False</property>
+	</packing>
+      </child>
+    </widget>
+  </child>
+</widget>
+
+<widget class="GtkDialog" id="ThrottleDialog">
+  <property name="title" translatable="yes">Throttle</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
+  <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+  <property name="modal">False</property>
+  <property name="resizable">True</property>
+  <property name="destroy_with_parent">True</property>
+  <property name="skip_taskbar_hint">False</property>
+  <property name="skip_pager_hint">False</property>
+  <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+  <property name="has_separator">True</property>
+
+  <child internal-child="vbox">
+    <widget class="GtkVBox" id="dialog-vbox2">
+      <property name="visible">True</property>
+      <property name="homogeneous">False</property>
+      <property name="spacing">0</property>
+
+      <child internal-child="action_area">
+	<widget class="GtkHButtonBox" id="dialog-action_area2">
+	  <property name="visible">True</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
+
+	  <child>
+	    <widget class="GtkButton" id="cancelbutton1">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="response_id">-6</property>
+	    </widget>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="okbutton1">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-ok</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="response_id">-5</property>
+	    </widget>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">False</property>
+	  <property name="fill">True</property>
+	  <property name="pack_type">GTK_PACK_END</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkAlignment" id="alignment4">
+	  <property name="visible">True</property>
+	  <property name="xalign">0.5</property>
+	  <property name="yalign">0.5</property>
+	  <property name="xscale">0</property>
+	  <property name="yscale">0</property>
+
+	  <child>
+	    <widget class="GtkHBox" id="hbox1">
+	      <property name="visible">True</property>
+	      <property name="homogeneous">False</property>
+	      <property name="spacing">0</property>
+
+	      <child>
+		<widget class="GtkLabel" id="label4">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Throttle : </property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">1</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="padding">0</property>
+		  <property name="expand">True</property>
+		  <property name="fill">True</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkSpinButton" id="ThrottleSpin">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="climb_rate">1</property>
+		  <property name="digits">0</property>
+		  <property name="numeric">True</property>
+		  <property name="update_policy">GTK_UPDATE_ALWAYS</property>
+		  <property name="snap_to_ticks">True</property>
+		  <property name="wrap">True</property>
+		  <property name="adjustment">100 5 1000 1 25 25</property>
+		</widget>
+		<packing>
+		  <property name="padding">0</property>
+		  <property name="expand">True</property>
+		  <property name="fill">True</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkLabel" id="label5">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes"> %</property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">0</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="padding">0</property>
+		  <property name="expand">True</property>
+		  <property name="fill">True</property>
+		</packing>
+	      </child>
+	    </widget>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+    </widget>
+  </child>
+</widget>
+
+<widget class="GtkDialog" id="DirectoriesDialog">
+  <property name="title" translatable="yes">Directories</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
+  <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+  <property name="modal">False</property>
+  <property name="resizable">True</property>
+  <property name="destroy_with_parent">True</property>
+  <property name="skip_taskbar_hint">False</property>
+  <property name="skip_pager_hint">False</property>
+  <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+  <property name="has_separator">True</property>
+
+  <child internal-child="vbox">
+    <widget class="GtkVBox" id="dialog-vbox3">
+      <property name="visible">True</property>
+      <property name="homogeneous">False</property>
+      <property name="spacing">0</property>
+
+      <child internal-child="action_area">
+	<widget class="GtkHButtonBox" id="dialog-action_area3">
+	  <property name="visible">True</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
+
+	  <child>
+	    <widget class="GtkButton" id="cancelbutton2">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="response_id">-6</property>
+	    </widget>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="okbutton2">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-ok</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="response_id">-5</property>
+	    </widget>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">False</property>
+	  <property name="fill">True</property>
+	  <property name="pack_type">GTK_PACK_END</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkTable" id="table1">
+	  <property name="visible">True</property>
+	  <property name="n_rows">5</property>
+	  <property name="n_columns">4</property>
+	  <property name="homogeneous">False</property>
+	  <property name="row_spacing">0</property>
+	  <property name="column_spacing">0</property>
+
+	  <child>
+	    <widget class="GtkLabel" id="label6">
+	      <property name="visible">True</property>
+	      <property name="label" translatable="yes">GBA roms : </property>
+	      <property name="use_underline">False</property>
+	      <property name="use_markup">False</property>
+	      <property name="justify">GTK_JUSTIFY_LEFT</property>
+	      <property name="wrap">False</property>
+	      <property name="selectable">False</property>
+	      <property name="xalign">1</property>
+	      <property name="yalign">0.5</property>
+	      <property name="xpad">0</property>
+	      <property name="ypad">0</property>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">0</property>
+	      <property name="right_attach">1</property>
+	      <property name="top_attach">0</property>
+	      <property name="bottom_attach">1</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkEntry" id="GBARomsDirEntry">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="editable">True</property>
+	      <property name="visibility">True</property>
+	      <property name="max_length">0</property>
+	      <property name="text" translatable="yes"></property>
+	      <property name="has_frame">True</property>
+	      <property name="invisible_char" translatable="yes">*</property>
+	      <property name="activates_default">False</property>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">1</property>
+	      <property name="right_attach">2</property>
+	      <property name="top_attach">0</property>
+	      <property name="bottom_attach">1</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="GBARomsDirResetButton">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="relief">GTK_RELIEF_NONE</property>
+
+	      <child>
+		<widget class="GtkImage" id="image83">
+		  <property name="visible">True</property>
+		  <property name="stock">gtk-cancel</property>
+		  <property name="icon_size">4</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+	      </child>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">2</property>
+	      <property name="right_attach">3</property>
+	      <property name="top_attach">0</property>
+	      <property name="bottom_attach">1</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="GBARomsDirSelectButton">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="relief">GTK_RELIEF_NONE</property>
+
+	      <child>
+		<widget class="GtkImage" id="image84">
+		  <property name="visible">True</property>
+		  <property name="stock">gtk-open</property>
+		  <property name="icon_size">4</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+	      </child>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">3</property>
+	      <property name="right_attach">4</property>
+	      <property name="top_attach">0</property>
+	      <property name="bottom_attach">1</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkLabel" id="label7">
+	      <property name="visible">True</property>
+	      <property name="label" translatable="yes">GB roms : </property>
+	      <property name="use_underline">False</property>
+	      <property name="use_markup">False</property>
+	      <property name="justify">GTK_JUSTIFY_LEFT</property>
+	      <property name="wrap">False</property>
+	      <property name="selectable">False</property>
+	      <property name="xalign">1</property>
+	      <property name="yalign">0.5</property>
+	      <property name="xpad">0</property>
+	      <property name="ypad">0</property>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">0</property>
+	      <property name="right_attach">1</property>
+	      <property name="top_attach">1</property>
+	      <property name="bottom_attach">2</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="GBRomsDirSelectButton">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="relief">GTK_RELIEF_NONE</property>
+
+	      <child>
+		<widget class="GtkImage" id="image94">
+		  <property name="visible">True</property>
+		  <property name="stock">gtk-open</property>
+		  <property name="icon_size">4</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+	      </child>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">3</property>
+	      <property name="right_attach">4</property>
+	      <property name="top_attach">1</property>
+	      <property name="bottom_attach">2</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkLabel" id="label8">
+	      <property name="visible">True</property>
+	      <property name="label" translatable="yes">Batteries : </property>
+	      <property name="use_underline">False</property>
+	      <property name="use_markup">False</property>
+	      <property name="justify">GTK_JUSTIFY_LEFT</property>
+	      <property name="wrap">False</property>
+	      <property name="selectable">False</property>
+	      <property name="xalign">1</property>
+	      <property name="yalign">0.5</property>
+	      <property name="xpad">0</property>
+	      <property name="ypad">0</property>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">0</property>
+	      <property name="right_attach">1</property>
+	      <property name="top_attach">2</property>
+	      <property name="bottom_attach">3</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkEntry" id="BatteriesDirEntry">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="editable">True</property>
+	      <property name="visibility">True</property>
+	      <property name="max_length">0</property>
+	      <property name="text" translatable="yes"></property>
+	      <property name="has_frame">True</property>
+	      <property name="invisible_char" translatable="yes">*</property>
+	      <property name="activates_default">False</property>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">1</property>
+	      <property name="right_attach">2</property>
+	      <property name="top_attach">2</property>
+	      <property name="bottom_attach">3</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="BatteriesDirSelectButton">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="relief">GTK_RELIEF_NONE</property>
+
+	      <child>
+		<widget class="GtkImage" id="image98">
+		  <property name="visible">True</property>
+		  <property name="stock">gtk-open</property>
+		  <property name="icon_size">4</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+	      </child>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">3</property>
+	      <property name="right_attach">4</property>
+	      <property name="top_attach">2</property>
+	      <property name="bottom_attach">3</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="BatteriesDirResetButton">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="relief">GTK_RELIEF_NONE</property>
+
+	      <child>
+		<widget class="GtkImage" id="image95">
+		  <property name="visible">True</property>
+		  <property name="stock">gtk-cancel</property>
+		  <property name="icon_size">4</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+	      </child>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">2</property>
+	      <property name="right_attach">3</property>
+	      <property name="top_attach">2</property>
+	      <property name="bottom_attach">3</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkLabel" id="label9">
+	      <property name="visible">True</property>
+	      <property name="label" translatable="yes">Saves : </property>
+	      <property name="use_underline">False</property>
+	      <property name="use_markup">False</property>
+	      <property name="justify">GTK_JUSTIFY_LEFT</property>
+	      <property name="wrap">False</property>
+	      <property name="selectable">False</property>
+	      <property name="xalign">1</property>
+	      <property name="yalign">0.5</property>
+	      <property name="xpad">0</property>
+	      <property name="ypad">0</property>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">0</property>
+	      <property name="right_attach">1</property>
+	      <property name="top_attach">3</property>
+	      <property name="bottom_attach">4</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkEntry" id="SavesDirEntry">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="editable">True</property>
+	      <property name="visibility">True</property>
+	      <property name="max_length">0</property>
+	      <property name="text" translatable="yes"></property>
+	      <property name="has_frame">True</property>
+	      <property name="invisible_char" translatable="yes">*</property>
+	      <property name="activates_default">False</property>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">1</property>
+	      <property name="right_attach">2</property>
+	      <property name="top_attach">3</property>
+	      <property name="bottom_attach">4</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="SavesDirResetButton">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="relief">GTK_RELIEF_NONE</property>
+
+	      <child>
+		<widget class="GtkImage" id="image96">
+		  <property name="visible">True</property>
+		  <property name="stock">gtk-cancel</property>
+		  <property name="icon_size">4</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+	      </child>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">2</property>
+	      <property name="right_attach">3</property>
+	      <property name="top_attach">3</property>
+	      <property name="bottom_attach">4</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="SavesDirSelectButton">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="relief">GTK_RELIEF_NONE</property>
+
+	      <child>
+		<widget class="GtkImage" id="image99">
+		  <property name="visible">True</property>
+		  <property name="stock">gtk-open</property>
+		  <property name="icon_size">4</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+	      </child>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">3</property>
+	      <property name="right_attach">4</property>
+	      <property name="top_attach">3</property>
+	      <property name="bottom_attach">4</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkLabel" id="label10">
+	      <property name="visible">True</property>
+	      <property name="label" translatable="yes">Captures : </property>
+	      <property name="use_underline">False</property>
+	      <property name="use_markup">False</property>
+	      <property name="justify">GTK_JUSTIFY_LEFT</property>
+	      <property name="wrap">False</property>
+	      <property name="selectable">False</property>
+	      <property name="xalign">1</property>
+	      <property name="yalign">0.5</property>
+	      <property name="xpad">0</property>
+	      <property name="ypad">0</property>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">0</property>
+	      <property name="right_attach">1</property>
+	      <property name="top_attach">4</property>
+	      <property name="bottom_attach">5</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkEntry" id="CapturesDirEntry">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="editable">True</property>
+	      <property name="visibility">True</property>
+	      <property name="max_length">0</property>
+	      <property name="text" translatable="yes"></property>
+	      <property name="has_frame">True</property>
+	      <property name="invisible_char" translatable="yes">*</property>
+	      <property name="activates_default">False</property>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">1</property>
+	      <property name="right_attach">2</property>
+	      <property name="top_attach">4</property>
+	      <property name="bottom_attach">5</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="CapturesDirResetButton">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="relief">GTK_RELIEF_NONE</property>
+
+	      <child>
+		<widget class="GtkImage" id="image97">
+		  <property name="visible">True</property>
+		  <property name="stock">gtk-cancel</property>
+		  <property name="icon_size">4</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+	      </child>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">2</property>
+	      <property name="right_attach">3</property>
+	      <property name="top_attach">4</property>
+	      <property name="bottom_attach">5</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="CapturesDirSelectButton">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="relief">GTK_RELIEF_NONE</property>
+
+	      <child>
+		<widget class="GtkImage" id="image100">
+		  <property name="visible">True</property>
+		  <property name="stock">gtk-open</property>
+		  <property name="icon_size">4</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+	      </child>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">3</property>
+	      <property name="right_attach">4</property>
+	      <property name="top_attach">4</property>
+	      <property name="bottom_attach">5</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkEntry" id="GBRomsDirEntry">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="editable">True</property>
+	      <property name="visibility">True</property>
+	      <property name="max_length">0</property>
+	      <property name="text" translatable="yes"></property>
+	      <property name="has_frame">True</property>
+	      <property name="invisible_char" translatable="yes">*</property>
+	      <property name="activates_default">False</property>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">1</property>
+	      <property name="right_attach">2</property>
+	      <property name="top_attach">1</property>
+	      <property name="bottom_attach">2</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="GBRomsDirResetButton">
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="relief">GTK_RELIEF_NONE</property>
+
+	      <child>
+		<widget class="GtkImage" id="image101">
+		  <property name="visible">True</property>
+		  <property name="stock">gtk-cancel</property>
+		  <property name="icon_size">4</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+	      </child>
+	    </widget>
+	    <packing>
+	      <property name="left_attach">2</property>
+	      <property name="right_attach">3</property>
+	      <property name="top_attach">1</property>
+	      <property name="bottom_attach">2</property>
+	      <property name="x_options">fill</property>
+	      <property name="y_options">expand</property>
+	    </packing>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+    </widget>
+  </child>
+</widget>
+
+<widget class="GtkDialog" id="JoypadConfigDialog">
+  <property name="title" translatable="yes">Joypad config</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
+  <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+  <property name="modal">False</property>
+  <property name="resizable">True</property>
+  <property name="destroy_with_parent">True</property>
+  <property name="skip_taskbar_hint">False</property>
+  <property name="skip_pager_hint">False</property>
+  <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+  <property name="has_separator">True</property>
+
+  <child internal-child="vbox">
+    <widget class="GtkVBox" id="dialog-vbox4">
+      <property name="visible">True</property>
+      <property name="homogeneous">False</property>
+      <property name="spacing">0</property>
+
+      <child internal-child="action_area">
+	<widget class="GtkHButtonBox" id="dialog-action_area4">
+	  <property name="visible">True</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
+
+	  <child>
+	    <widget class="GtkButton" id="cancelbutton3">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="response_id">-6</property>
+	    </widget>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="JoypadOkButton">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-ok</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="response_id">-5</property>
+	    </widget>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">False</property>
+	  <property name="fill">True</property>
+	  <property name="pack_type">GTK_PACK_END</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkAlignment" id="alignment1">
+	  <property name="visible">True</property>
+	  <property name="xalign">0.5</property>
+	  <property name="yalign">0.5</property>
+	  <property name="xscale">0</property>
+	  <property name="yscale">1</property>
+
+	  <child>
+	    <widget class="GtkTable" id="table2">
+	      <property name="visible">True</property>
+	      <property name="n_rows">12</property>
+	      <property name="n_columns">2</property>
+	      <property name="homogeneous">False</property>
+	      <property name="row_spacing">5</property>
+	      <property name="column_spacing">0</property>
+
+	      <child>
+		<widget class="GtkEntry" id="JoypadUpEntry">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="editable">False</property>
+		  <property name="visibility">True</property>
+		  <property name="max_length">0</property>
+		  <property name="text" translatable="yes"></property>
+		  <property name="has_frame">True</property>
+		  <property name="invisible_char" translatable="yes">*</property>
+		  <property name="activates_default">False</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">1</property>
+		  <property name="right_attach">2</property>
+		  <property name="top_attach">0</property>
+		  <property name="bottom_attach">1</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkLabel" id="label12">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Down : </property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">1</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">0</property>
+		  <property name="right_attach">1</property>
+		  <property name="top_attach">1</property>
+		  <property name="bottom_attach">2</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkLabel" id="label13">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Left : </property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">1</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">0</property>
+		  <property name="right_attach">1</property>
+		  <property name="top_attach">2</property>
+		  <property name="bottom_attach">3</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkLabel" id="label14">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Right : </property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">1</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">0</property>
+		  <property name="right_attach">1</property>
+		  <property name="top_attach">3</property>
+		  <property name="bottom_attach">4</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkLabel" id="label15">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Button A : </property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">1</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">0</property>
+		  <property name="right_attach">1</property>
+		  <property name="top_attach">4</property>
+		  <property name="bottom_attach">5</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkLabel" id="label16">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Button B : </property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">1</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">0</property>
+		  <property name="right_attach">1</property>
+		  <property name="top_attach">5</property>
+		  <property name="bottom_attach">6</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkLabel" id="label17">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Button L : </property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">1</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">0</property>
+		  <property name="right_attach">1</property>
+		  <property name="top_attach">6</property>
+		  <property name="bottom_attach">7</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkLabel" id="label18">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Button R : </property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">1</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">0</property>
+		  <property name="right_attach">1</property>
+		  <property name="top_attach">7</property>
+		  <property name="bottom_attach">8</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkLabel" id="label19">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Select : </property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">1</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">0</property>
+		  <property name="right_attach">1</property>
+		  <property name="top_attach">8</property>
+		  <property name="bottom_attach">9</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkLabel" id="label20">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Start : </property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">1</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">0</property>
+		  <property name="right_attach">1</property>
+		  <property name="top_attach">9</property>
+		  <property name="bottom_attach">10</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkLabel" id="label21">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Speed : </property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">1</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">0</property>
+		  <property name="right_attach">1</property>
+		  <property name="top_attach">10</property>
+		  <property name="bottom_attach">11</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkLabel" id="label22">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Capture : </property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">1</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">0</property>
+		  <property name="right_attach">1</property>
+		  <property name="top_attach">11</property>
+		  <property name="bottom_attach">12</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkEntry" id="JoypadDownEntry">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="editable">False</property>
+		  <property name="visibility">True</property>
+		  <property name="max_length">0</property>
+		  <property name="text" translatable="yes"></property>
+		  <property name="has_frame">True</property>
+		  <property name="invisible_char" translatable="yes">*</property>
+		  <property name="activates_default">False</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">1</property>
+		  <property name="right_attach">2</property>
+		  <property name="top_attach">1</property>
+		  <property name="bottom_attach">2</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkEntry" id="JoypadLeftEntry">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="editable">False</property>
+		  <property name="visibility">True</property>
+		  <property name="max_length">0</property>
+		  <property name="text" translatable="yes"></property>
+		  <property name="has_frame">True</property>
+		  <property name="invisible_char" translatable="yes">*</property>
+		  <property name="activates_default">False</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">1</property>
+		  <property name="right_attach">2</property>
+		  <property name="top_attach">2</property>
+		  <property name="bottom_attach">3</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkEntry" id="JoypadRightEntry">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="editable">False</property>
+		  <property name="visibility">True</property>
+		  <property name="max_length">0</property>
+		  <property name="text" translatable="yes"></property>
+		  <property name="has_frame">True</property>
+		  <property name="invisible_char" translatable="yes">*</property>
+		  <property name="activates_default">False</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">1</property>
+		  <property name="right_attach">2</property>
+		  <property name="top_attach">3</property>
+		  <property name="bottom_attach">4</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkEntry" id="JoypadAEntry">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="editable">False</property>
+		  <property name="visibility">True</property>
+		  <property name="max_length">0</property>
+		  <property name="text" translatable="yes"></property>
+		  <property name="has_frame">True</property>
+		  <property name="invisible_char" translatable="yes">*</property>
+		  <property name="activates_default">False</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">1</property>
+		  <property name="right_attach">2</property>
+		  <property name="top_attach">4</property>
+		  <property name="bottom_attach">5</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkEntry" id="JoypadBEntry">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="editable">False</property>
+		  <property name="visibility">True</property>
+		  <property name="max_length">0</property>
+		  <property name="text" translatable="yes"></property>
+		  <property name="has_frame">True</property>
+		  <property name="invisible_char" translatable="yes">*</property>
+		  <property name="activates_default">False</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">1</property>
+		  <property name="right_attach">2</property>
+		  <property name="top_attach">5</property>
+		  <property name="bottom_attach">6</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkEntry" id="JoypadLEntry">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="editable">False</property>
+		  <property name="visibility">True</property>
+		  <property name="max_length">0</property>
+		  <property name="text" translatable="yes"></property>
+		  <property name="has_frame">True</property>
+		  <property name="invisible_char" translatable="yes">*</property>
+		  <property name="activates_default">False</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">1</property>
+		  <property name="right_attach">2</property>
+		  <property name="top_attach">6</property>
+		  <property name="bottom_attach">7</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkEntry" id="JoypadREntry">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="editable">False</property>
+		  <property name="visibility">True</property>
+		  <property name="max_length">0</property>
+		  <property name="text" translatable="yes"></property>
+		  <property name="has_frame">True</property>
+		  <property name="invisible_char" translatable="yes">*</property>
+		  <property name="activates_default">False</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">1</property>
+		  <property name="right_attach">2</property>
+		  <property name="top_attach">7</property>
+		  <property name="bottom_attach">8</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkEntry" id="JoypadSelectEntry">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="editable">False</property>
+		  <property name="visibility">True</property>
+		  <property name="max_length">0</property>
+		  <property name="text" translatable="yes"></property>
+		  <property name="has_frame">True</property>
+		  <property name="invisible_char" translatable="yes">*</property>
+		  <property name="activates_default">False</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">1</property>
+		  <property name="right_attach">2</property>
+		  <property name="top_attach">8</property>
+		  <property name="bottom_attach">9</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkEntry" id="JoypadStartEntry">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="editable">False</property>
+		  <property name="visibility">True</property>
+		  <property name="max_length">0</property>
+		  <property name="text" translatable="yes"></property>
+		  <property name="has_frame">True</property>
+		  <property name="invisible_char" translatable="yes">*</property>
+		  <property name="activates_default">False</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">1</property>
+		  <property name="right_attach">2</property>
+		  <property name="top_attach">9</property>
+		  <property name="bottom_attach">10</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkEntry" id="JoypadSpeedEntry">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="editable">False</property>
+		  <property name="visibility">True</property>
+		  <property name="max_length">0</property>
+		  <property name="text" translatable="yes"></property>
+		  <property name="has_frame">True</property>
+		  <property name="invisible_char" translatable="yes">*</property>
+		  <property name="activates_default">False</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">1</property>
+		  <property name="right_attach">2</property>
+		  <property name="top_attach">10</property>
+		  <property name="bottom_attach">11</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkEntry" id="JoypadCaptureEntry">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="editable">False</property>
+		  <property name="visibility">True</property>
+		  <property name="max_length">0</property>
+		  <property name="text" translatable="yes"></property>
+		  <property name="has_frame">True</property>
+		  <property name="invisible_char" translatable="yes">*</property>
+		  <property name="activates_default">False</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">1</property>
+		  <property name="right_attach">2</property>
+		  <property name="top_attach">11</property>
+		  <property name="bottom_attach">12</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkLabel" id="label11">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Up : </property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">1</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="left_attach">0</property>
+		  <property name="right_attach">1</property>
+		  <property name="top_attach">0</property>
+		  <property name="bottom_attach">1</property>
+		  <property name="x_options">fill</property>
+		  <property name="y_options">expand</property>
+		</packing>
+	      </child>
+	    </widget>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+    </widget>
+  </child>
+</widget>
+
+<widget class="GtkDialog" id="TcpPortDialog">
+  <property name="title" translatable="yes">TCP port</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
+  <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+  <property name="modal">False</property>
+  <property name="resizable">True</property>
+  <property name="destroy_with_parent">True</property>
+  <property name="skip_taskbar_hint">False</property>
+  <property name="skip_pager_hint">False</property>
+  <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+  <property name="has_separator">True</property>
+
+  <child internal-child="vbox">
+    <widget class="GtkVBox" id="dialog-vbox5">
+      <property name="visible">True</property>
+      <property name="homogeneous">False</property>
+      <property name="spacing">0</property>
+
+      <child internal-child="action_area">
+	<widget class="GtkHButtonBox" id="dialog-action_area5">
+	  <property name="visible">True</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
+
+	  <child>
+	    <widget class="GtkButton" id="cancelbutton4">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="response_id">-6</property>
+	    </widget>
+	  </child>
+
+	  <child>
+	    <widget class="GtkButton" id="okbutton4">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-ok</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="response_id">-5</property>
+	    </widget>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">False</property>
+	  <property name="fill">True</property>
+	  <property name="pack_type">GTK_PACK_END</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkAlignment" id="alignment3">
+	  <property name="visible">True</property>
+	  <property name="xalign">0.5</property>
+	  <property name="yalign">0.5</property>
+	  <property name="xscale">0</property>
+	  <property name="yscale">0</property>
+
+	  <child>
+	    <widget class="GtkHBox" id="hbox2">
+	      <property name="visible">True</property>
+	      <property name="homogeneous">False</property>
+	      <property name="spacing">0</property>
+
+	      <child>
+		<widget class="GtkLabel" id="label23">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Port : </property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">1</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="padding">0</property>
+		  <property name="expand">True</property>
+		  <property name="fill">True</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkSpinButton" id="TcpPortSpin">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="climb_rate">1</property>
+		  <property name="digits">0</property>
+		  <property name="numeric">True</property>
+		  <property name="update_policy">GTK_UPDATE_ALWAYS</property>
+		  <property name="snap_to_ticks">True</property>
+		  <property name="wrap">True</property>
+		  <property name="adjustment">55555 1 65535 1 100 100</property>
+		</widget>
+		<packing>
+		  <property name="padding">0</property>
+		  <property name="expand">True</property>
+		  <property name="fill">True</property>
+		</packing>
+	      </child>
+	    </widget>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+    </widget>
+  </child>
+</widget>
+
+</glade-interface>

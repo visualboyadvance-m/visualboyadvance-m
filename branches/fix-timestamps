@@ -1,0 +1,4 @@
+#! /bin/sh
+touch acinclude.m4 aclocal.m4
+touch configure
+touch `find . -name Makefile.in`

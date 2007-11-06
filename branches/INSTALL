@@ -1,0 +1,309 @@
+What is this?
+-------------
+
+VisualBoyAdvance is a Nintendo (TM) Gameboy and GameboyAdvance emulator with
+debugging capabilities.
+
+How to compile the source
+-------------------------
+
+1. Unix
+-------
+
+ATTENTION: if you extracted the code from CVS, see the README.CVS first or
+your build may fail!
+
+The following software is needed in order to compile:
+
+- libpng: http://www.libpng.org/pub/png/libpng.html
+- zlib: http://www.gzip.org/zlib/
+- libSDL: http://www.libsdl.org
+- nasm (optional for x86 MMX support): http://nasm.sourceforge.net/
+- GCC 3.x: in order to compile VBA, you will GCC 3.x or greater because of
+  a really bad bug in GCC 2.95 where it allocates an immense amount of
+  memory in order to compile GBA.cpp. If you really want to test it with
+  GCC 2.95, try exporting CXXFLAGS=-g to avoid optimizations (or try
+  different levels of optimization like -O1 or -O0)
+
+Extra software needed to compile the GTK+ GUI:
+
+- gtkmm (>= 2.0): http://www.gtkmm.org/
+- libglademm (>= 2.1): http://www.gtkmm.org/
+
+Unpack the sources from the tar.gz file, then run the configure script.
+The following extra options may be used to configure the generated executables:
+
+  --enable-c-core         enable C core (default is no on x86 targets)
+  --enable-profiling      enable profiling (default is yes)
+  --enable-dev            enable development features (default is yes)
+  --with-mmx              use MMX (default is yes on x86 targets)
+
+GUI selection options:
+
+  --enable-sdl            build the SDL interface (default is yes)
+  --enable-gtk            build the GTK+ interface (default is no)
+  --enable-gtk=2.4        build the GTK+ interface with gtkmm 2.4
+
+More options:
+
+  --help                  display all options
+
+After configure completes, just issue the make command. If it all goes well,
+you will have the emulator compiled in the src directory. Issuing the
+make install command will install the executables into the /usr/local/bin
+directory (subject to change).
+
+The emulator code should work in both big and little endian computers.
+
+See the section after the Windows one for more information on the configure
+script.
+
+The binaries are called this way:
+- the SDL interface: VisualBoyAdvance
+- the GTK+ interface: gvba
+
+2. Windows
+----------
+
+2.1 Visual C++ 2005 Express Edition
+-----------------------------------
+
+If you want to use the free express edition of Visual C++ 2005,
+you have to do the following steps prior to the normal setup procedure of Visual C++/Studio 2005:
+!!! You will not be able to build the MFC (GUI) version of VBA, only the SDL build will succeed !!!
+- First download and install VC++ 2005 Express from http://msdn.microsoft.com/vstudio/express/visualC/default.aspx
+- Now follow the guide at http://msdn2.microsoft.com/en-us/library/ms235626.aspx
+- Now continue with section [2.2]
+
+2.2 Visual C++ 2005
+-------------------
+
+Needed software:
+- Microsoft Visual C++ 2005 (buy if not using Express Edition or if MFC build is required)
+ > http://msdn.microsoft.com/visualc/
+ > You do not need the DLL runtimes and the .NET Framework
+- Microsoft Platform SDK (free, optional, essential only for express edition)
+ > http://www.microsoft.com/downloads/details.aspx?FamilyId=E15438AC-60BE-41BD-AA14-7F1E0F19CA0D&displaylang=en
+- Microsoft DirectX 9.0 SDK (free, essential)
+ > http://msdn.com/directx/sdk
+   (August 2006 version as I write these lines)
+- Yasm (free, essential)
+ > http://www.tortall.net/projects/yasm/
+ > Follow the install guide at http://www.tortall.net/projects/yasm/wiki/VisualStudio2005
+- AMD CodeAnalyst (optional, AMD CPU required)
+ > http://developer.amd.com/cawin.aspx?session_id=FB$37649@DJEBIGID
+ > Free and easy profiling for AMD CPUs (32bit and 64bit), Visual Studio 2005 plugin
+ 
+ Those are all packages for now. The VBA source also includes the
+ sources and/or binaries of various free libraries for zip and image support.
+ Those can be accessed through the "dependencies" folder in the main
+ solution file. The main solution file includes references to all files
+ for all platforms. At the moment, only MFC and SDL build targets for
+ 32bit Windows are configured. GTK+ and 64bit Windows support are also possible,
+ but are not yet added for several reasons.
+
+ You can now open the project file: "win32/vba_vs2005.sln".
+ Info: If you use the express edition of VC++ 2005, you will receive three neglectable warnings.
+
+2.3 Visual C++ 6.0 and Visual C++ 2002
+--------------------------------------
+
+Needed software:
+- nasm: see above for URL. Install it in the default directory
+- Microsoft Visual C++ 6.0 or greater: to compile
+
+The win32 directory contains Microsoft Visual Studio workspace files needed
+to compile the project with Microsoft Visual C++ 6.0 or greater.
+
+The gba.dsp workspace compiles the full Windows version and gba_sdl.dsp
+compiles the Windows SDL version.
+
+Solutions for Visual C++ .NET are also available: gba.sln and gba_sdl.sln
+
+The Windows version contains three possible configurations:
+- Debug: full debugging of the emulator is possible
+- Release: optimized version for GBA developers
+- ReleaseNoDev: optimized version without development features
+
+Basic Installation
+==================
+
+   These are generic installation instructions.
+
+   The `configure' shell script attempts to guess correct values for
+various system-dependent variables used during compilation.  It uses
+those values to create a `Makefile' in each directory of the package.
+It may also create one or more `.h' files containing system-dependent
+definitions.  Finally, it creates a shell script `config.status' that
+you can run in the future to recreate the current configuration, a file
+`config.cache' that saves the results of its tests to speed up
+reconfiguring, and a file `config.log' containing compiler output
+(useful mainly for debugging `configure').
+
+   If you need to do unusual things to compile the package, please try
+to figure out how `configure' could check whether to do them, and mail
+diffs or instructions to the address given in the `README' so they can
+be considered for the next release.  If at some point `config.cache'
+contains results you don't want to keep, you may remove or edit it.
+
+   The file `configure.in' is used to create `configure' by a program
+called `autoconf'.  You only need `configure.in' if you want to change
+it or regenerate `configure' using a newer version of `autoconf'.
+
+The simplest way to compile this package is:
+
+  1. `cd' to the directory containing the package's source code and type
+     `./configure' to configure the package for your system.  If you're
+     using `csh' on an old version of System V, you might need to type
+     `sh ./configure' instead to prevent `csh' from trying to execute
+     `configure' itself.
+
+     Running `configure' takes awhile.  While running, it prints some
+     messages telling which features it is checking for.
+
+  2. Type `make' to compile the package.
+
+  3. Optionally, type `make check' to run any self-tests that come with
+     the package.
+
+  4. Type `make install' to install the programs and any data files and
+     documentation.
+
+  5. You can remove the program binaries and object files from the
+     source code directory by typing `make clean'.  To also remove the
+     files that `configure' created (so you can compile the package for
+     a different kind of computer), type `make distclean'.  There is
+     also a `make maintainer-clean' target, but that is intended mainly
+     for the package's developers.  If you use it, you may have to get
+     all sorts of other programs in order to regenerate files that came
+     with the distribution.
+
+Compilers and Options
+=====================
+
+   Some systems require unusual options for compilation or linking that
+the `configure' script does not know about.  You can give `configure'
+initial values for variables by setting them in the environment.  Using
+a Bourne-compatible shell, you can do that on the command line like
+this:
+     CC=c89 CFLAGS=-O2 LIBS=-lposix ./configure
+
+Or on systems that have the `env' program, you can do it like this:
+     env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure
+
+Compiling For Multiple Architectures
+====================================
+
+   You can compile the package for more than one kind of computer at the
+same time, by placing the object files for each architecture in their
+own directory.  To do this, you must use a version of `make' that
+supports the `VPATH' variable, such as GNU `make'.  `cd' to the
+directory where you want the object files and executables to go and run
+the `configure' script.  `configure' automatically checks for the
+source code in the directory that `configure' is in and in `..'.
+
+   If you have to use a `make' that does not supports the `VPATH'
+variable, you have to compile the package for one architecture at a time
+in the source code directory.  After you have installed the package for
+one architecture, use `make distclean' before reconfiguring for another
+architecture.
+
+Installation Names
+==================
+
+   By default, `make install' will install the package's files in
+`/usr/local/bin', `/usr/local/man', etc.  You can specify an
+installation prefix other than `/usr/local' by giving `configure' the
+option `--prefix=PATH'.
+
+   You can specify separate installation prefixes for
+architecture-specific files and architecture-independent files.  If you
+give `configure' the option `--exec-prefix=PATH', the package will use
+PATH as the prefix for installing programs and libraries.
+Documentation and other data files will still use the regular prefix.
+
+   In addition, if you use an unusual directory layout you can give
+options like `--bindir=PATH' to specify different values for particular
+kinds of files.  Run `configure --help' for a list of the directories
+you can set and what kinds of files go in them.
+
+   If the package supports it, you can cause programs to be installed
+with an extra prefix or suffix on their names by giving `configure' the
+option `--program-prefix=PREFIX' or `--program-suffix=SUFFIX'.
+
+Optional Features
+=================
+
+   Some packages pay attention to `--enable-FEATURE' options to
+`configure', where FEATURE indicates an optional part of the package.
+They may also pay attention to `--with-PACKAGE' options, where PACKAGE
+is something like `gnu-as' or `x' (for the X Window System).  The
+`README' should mention any `--enable-' and `--with-' options that the
+package recognizes.
+
+   For packages that use the X Window System, `configure' can usually
+find the X include and library files automatically, but if it doesn't,
+you can use the `configure' options `--x-includes=DIR' and
+`--x-libraries=DIR' to specify their locations.
+
+Specifying the System Type
+==========================
+
+   There may be some features `configure' can not figure out
+automatically, but needs to determine by the type of host the package
+will run on.  Usually `configure' can figure that out, but if it prints
+a message saying it can not guess the host type, give it the
+`--host=TYPE' option.  TYPE can either be a short name for the system
+type, such as `sun4', or a canonical name with three fields:
+     CPU-COMPANY-SYSTEM
+
+See the file `config.sub' for the possible values of each field.  If
+`config.sub' isn't included in this package, then this package doesn't
+need to know the host type.
+
+   If you are building compiler tools for cross-compiling, you can also
+use the `--target=TYPE' option to select the type of system they will
+produce code for and the `--build=TYPE' option to select the type of
+system on which you are compiling the package.
+
+Sharing Defaults
+================
+
+   If you want to set default values for `configure' scripts to share,
+you can create a site shell script called `config.site' that gives
+default values for variables like `CC', `cache_file', and `prefix'.
+`configure' looks for `PREFIX/share/config.site' if it exists, then
+`PREFIX/etc/config.site' if it exists.  Or, you can set the
+`CONFIG_SITE' environment variable to the location of the site script.
+A warning: not all `configure' scripts look for a site script.
+
+Operation Controls
+==================
+
+   `configure' recognizes the following options to control how it
+operates.
+
+`--cache-file=FILE'
+     Use and save the results of the tests in FILE instead of
+     `./config.cache'.  Set FILE to `/dev/null' to disable caching, for
+     debugging `configure'.
+
+`--help'
+     Print a summary of the options to `configure', and exit.
+
+`--quiet'
+`--silent'
+`-q'
+     Do not print messages saying which checks are being made.  To
+     suppress all normal output, redirect it to `/dev/null' (any error
+     messages will still be shown).
+
+`--srcdir=DIR'
+     Look for the package's source code in directory DIR.  Usually
+     `configure' can determine that directory automatically.
+
+`--version'
+     Print the version of Autoconf used to generate the `configure'
+     script, and exit.
+
+`configure' also accepts some other, not widely useful, options.

@@ -1,0 +1,74 @@
+2004-05-20  kxu  <kxu@users.sourceforge.net>
+
+	* src/sdl/SDL.cpp (sdlPollEvents): added SDL_QUIT event support
+
+2004-05-15  kxu  <kxu@users.sourceforge.net>
+
+	* finalized the first release of the GTK+ interface
+
+2004-05-03  kxu  <kxu@users.sourceforge.net>
+
+	* src/elf.cpp (elfCleanUp): fix a missing nullify, causing crashes
+
+2004-05-01  kxu  <kxu@users.sourceforge.net>
+
+	* added gtkmm 2.4 support
+
+2004-04-25  kxu  <kxu@users.sourceforge.net>
+
+	* src/win32/skinButton.cpp: fix skin bugs (patch from Forgotten)
+
+2004-04-19  kxu  <kxu@users.sourceforge.net>
+
+	* src/remote.cpp: added support for z2 (delete break on write) so that gdb can use break on write (patch from Ryan Brown)
+
+2004-04-18  kxu  <kxu@users.sourceforge.net>
+
+	* fix custom controls to use CS_GLOBALCLASS style and fix the GB map view flickering (patch from Forgotten)
+
+2004-03-30  kxu  <kxu@users.sourceforge.net>
+
+	* added the GTK+ interface draft
+
+2004-03-20  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/GBA.cpp: improved memory timing
+
+2004-03-11  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/MainWndFile.cpp: changed import/export battery file to default to battery directory 
+
+2004-03-10  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/DirectSound.cpp (class DirectSound): make destructor virtual to avoid problems when deleting
+	* src/win32/Sound.h (class ISound ): make destructor virtual to avoid problems when changing sound quality
+
+2004-03-09  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/elf.cpp (elfCleanUp): fix corruption on ELF clean up
+
+2004-03-08  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/MapView.cpp (enableButtons): fix radio button bug using keyboard
+	* src/win32/GBMapView.cpp (OnInitDialog): fix radio button bug using keyboard
+	* src/win32/MapView.cpp (GetClickAddress): fixes for rot. bgs
+
+2004-02-29  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/skin.cpp (GetSkinData): allow for JPEG and PNG images to also be loaded
+
+2004-02-24  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/admame.cpp: sync code with Scale2x 2.0
+	* src/Cheats.cpp (cheatsCheckKeys): improve CodeBreaker 0xDxxxxxxx code support
+
+2004-02-17  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/skinButton.cpp (OnPaint): fix GDI problems with selected bitmap being deleted
+	* src/win32/ZoomControl.cpp (OnPaint): fix GDI problems with selected bitmap being deleted
+	* src/win32/PaletteViewControl.cpp (OnPaint): fix GDI problems with selected bitmap being deleted
+	* src/win32/MemoryViewer.cpp (OnPaint): fix GDI problems with selected bitmap being deleted
+	* src/win32/BitmapControl.cpp (OnDraw): fix GDI problems with selected bitmap being deleted
+	* src/win32/VBA.cpp (winSetLanguageOption): patch for searching for base language dll
+	* elf.cpp (elfRead): fix problem caused by previous memory leak fix
+

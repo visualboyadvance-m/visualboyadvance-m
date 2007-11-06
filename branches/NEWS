@@ -1,0 +1,685 @@
+Version 1.8.0:
+Core changes:
+- added almost all AR V3 cheat codes (PokemonHacker)
+- added prefetch emulation
+- added full CBA support (verified for every CBA code type)
+- added emulation for DMA interaction with reading from invalid address 
+- fixed CPU init for 256Mbit roms
+- fixed HuffUnComp bug regarding tree size (SF #984608)
+- fixed RTC support for day of the week (fixed at Sunday before)
+- fixed loading of ELF multiboot files (thanks J.W.)
+- fixed bug on CBA code type 5
+- fixed OBJWIN rendering bug when sprite wraps around (SF #1065447)
+- fixed battery saving bug when save type equals to Flash or Sram 
+- fixed a compilation warning 
+- fixed BIOS ArcTan and ArcTan2 emulation (several bugs)
+- fixed some instruction having incorrect cycles (caused SDL debugger to skip several instructions)
+- fixed lq2x filter (was using hq2x code) 
+- fixed some bugs with IntrWait emulation 
+- fixed some timer bugs 
+- fixed memory timing when loading a save state (was using the timings before loading the state) 
+- fixed bug writing to IO register past 0x4000400 (no mirroring) 
+- initialize sram and flash memory to 0xff instead of 0x00 
+- clean flash/sram on load/reload 
+- ignore 8-bit writes to OBJ and OAM memory 
+- major AR V1/2/3 support by PokemonHacker 
+- simplified GBA emulation loop (easier to understand and maintain) 
+
+Windows:
+- added dialog to edit game overrides
+- added GPL link to Help menu 
+- fixed GB Disassemble crash when going to another address
+- fixed a minor repaint bug when focus changed
+- fixed problem displaying rom names that use & character 
+- fixed palette save name bug
+- moved vsync code to where it should be
+- moved common palette initialization and cleaned up rendering code to use it
+
+SDL versions:
+- SDL debugger improvements adapted from VBA-H: 
+  - break on change
+  - conditional breakpoints (ARM and THUMB)
+  - dump load and save (memory)
+  - edit register (exception of R15)
+  - disassemble to file
+  - save and load state from debugger
+
+Other:
+- fixed some compilation issues (libpng, gtkmm)
+
+Version 1.7.2:
+Core changes:
+- fixed bugs on ELF clean up
+- improved CodeBreaker 0xDxxxxxxx code support
+- updated Scale2x filter to version 2.0
+- improved memory timing
+- added support for z2 (delete break on write) so that gdb can use break on write
+
+Windows:
+- added search for base language dll
+- fixed GDI problems with selected bitmap being deleted
+- added JPEG and PNG support for skins
+- changed import/export battery file to default to battery directory
+- fixed the translation bug with viewers
+- fixed the GB map view flickering
+- fixed skin bugs
+
+SDL versions:
+- now it exits when closing the window
+
+Other:
+- added a new interface using GTK+, which implements a first part of the Windows version
+
+Version 1.7.1:
+Core changes:
+- added SWI call (0xf9 in thumb mode) to exit emulator in SDL version
+- avoid crash when loading an invalid ELF file
+- avoid turning sound on if soundOffFlag is true
+- disabled remove intros option
+- fixed memory leak in ELF support code
+- fixed memory corruption if loading a bigger file than the memory to hold it
+- fixed some compile warnings in the profiling code
+- merged some big endian fixes into the code
+- update battery files more often (a bit after the save memory is last updated)
+
+Gameboy:
+- fixed bug with window support introduced in version 1.7
+- fixed HALT bug when no matching bits for interrupt
+
+Windows:
+- added cartridge save strings to bug report
+- changed default button on disassembly views to Go instead of Close
+- changed power management/screen saver disabling code again to avoid problems
+- fixed compilation problems on VC 7
+- fixed multi-monitor support
+- fixed bug loading memory dumps
+- fixed crash onb map/oam/tile viewers
+- fixed problem 320x240 mode open/save dialogs
+- fixed bug where user selected Gameboy colors were reset and not stored
+- fixed bug rendering the translator URL
+- fixed memory leak in OpenGL code which caused nasty problems
+- store throttle value between restarts of the emulator
+- updated FAQ and URL links to the new site
+
+Version 1.7:
+Core changes:
+- added fixes to video filters done by Flea for Mac OS X
+- added/fixed ArcTan/ArcTan2 emulation
+- added sound volume .25 and.50
+- added hq2x/lq2x filters
+- aded global cheat disable
+- some code clean up
+- fixed some CBA cheat support
+- fixed ARM/Thumb instruction timing, including memory access
+- fixed minor bugs in STMDx ARM instructions
+- fixed ARM LDRx instructions when base equals dest
+
+Gameboy:
+- added support for 8M roms
+- (re)added support for 2-4 playes in SGB mode
+- added sprite limit emulation (thanks Ricky of KiGB)
+- cancel pending EI when imediately followed by DI
+- implemented DI/HALT bug
+- implemented STAT write bug during VBLANK or HBLANK when in GB mode
+- implemented GDMA delay in GBC mode (thanks TM of GEST)
+- fixed priority between OBJ and Window
+- fixed some SGB border problems
+- fixed window rendering problems in some cases 
+- fixed CGB initial background palette to white
+- fixed initial save memory value to 0xFF instead of 0x00 (thanks TM of GEST)
+- fixed LCD interrupts to only occur once per line
+- fixed incorrect display when BG is off
+- modified interrut delay to 6 clock ticks instead of 2
+- moved scanline update to beginning of HBLANK
+
+
+Windows:
+- added predefined Gameboy palettes (thanks Kojote)
+- added GBA IO Viewer to view/modify GBA hardware registers
+- added menu entry to load most recent save state
+- added menu entry to save state into oldest slot
+- added option to auto load the most recent save state upon loading
+- added fullscreen max scale option
+- chnaged the bug report option to be a little more friendly
+- enhanced save state submenus to show date/time of when save was made
+- enhanced logging window to capture data even if not being displayed
+- fixed Direct3D/OpenGL "green" bug with Motion Blur Interframe Blending
+- fixed Direct3D full screen with Gameboy roms
+- fixed minor bugs when saving images in the different viewers
+- fixed power management disabling: should avoid monitor turning off now
+- improved cheat input to be more flexible and easy to enter
+- migrated whole GUI code to MFC
+
+Version 1.6a:
+Core changes:
+- fixed bug introduced in previous fix to CpuFastSet/CpuSet
+- fixed slowdown caused by attempt to speed up emulation
+
+Windows:
+- fixed bug when selecting the same render type
+
+Version 1.6:
+Core changes:
+- added rewind support (initially disabled)
+- added support for slowdown codes
+- added emulation of sprite priority bug (thanks PokemonHacker)
+- added simple emulation for BIOS call 0x2a
+- added enhanced save type detection option (default)
+- added DMA hack for an obscure case
+- improved loading speed
+- fixed sleep/stop state support
+- fixed bug caused by rendering optimizations
+- fixed crash while debugging startup routines
+- fixed DMA emulation
+- fixed priority between OBJ Window and regular windows
+- fixed thumb disassembly bug
+- fixed sound envelope bug when set to 0 to mute sound (thanks PokemonHacker)
+- fixed CpuFastSet/CpuSet bugs (thanks PokemonHacker)
+- fixed warning message when using AGBPrint
+- fixed DMA timings
+
+Windows:
+- added movie recording/playback (joypad movement recording)
+- added support for automatic SGB border display
+- added option to auto hide menu in full screen mode
+- added rewind support
+- added bug report menu to provide needed information for solving problems
+- added FAQ optin to take to the VBA website FAQ
+- menu toggle can now have a customizable accelerator instead of ESC
+- fixed bug on GBA cheats showing the wrong enable state (checkbox was ok)
+- fixed bug enabling/disabling BG layers (introduced in version 1.5.1)
+- fixed export settings to also export viewers settings
+- fixed bug saving keyboard settings in INI file
+- fixed map viewer click address in some cases
+- fixed map viewer rendering for 512x512 screens
+- fixed tile viewer click address and tile number in 256 color mode
+- allow customize to run in fullscreen mode (exception of 320x240 mode)
+
+SDL versions:
+- added support to turn sound off and change channel enable
+- added support for automatic SGB border display
+- added rewind support (CTRL+B)
+- fixed bug enabling/disabling BG layers (introduced in version 1.5.1)
+- fixed typo on pause-when-inactive option which made it not recognized
+
+Version 1.5.1:
+
+Core changes:
+- minor rendering optimization
+- added support for AR codes (thanks parasytic and pokemonhacker)
+- no longer allow L+R or U+D to be reported as pressed
+- fixed RTC problem on last day of the month
+- fixed bug with some cheat codes that caused an invalid ROM patch
+- fixed sound mixing problem with DS ratio
+
+Windows:
+- added skin button support
+- added AVI sound support (thanks to phaeron)
+- all accelerators can now be customized or removed
+- fixed full screen problem in OpenGL mode
+- fixed some problems with stretch to fit
+- main skin region is now optional for pure rectangular skins
+
+SDL version:
+- changed default separator on config file to a equal sign
+- changed pause when inactive default to false to fix problems debugging
+
+Porting:
+- added PowerPC assembly code (thanks Jeffrey Lim)
+
+Version 1.5a:
+
+Windows:
+- fixed skin problems on Win 95/98/Me/2000
+- fixed right-click problem on Win 95/98/Me/2000
+- fixed problem when Gameboy Printer was enabled
+- fixed problem on Flash size menu not showing correct setting
+
+Version 1.5:
+
+Core changes:
+- added AGBPrint support (for developers only)
+- added RTC support
+- added scanlines filter
+- added support for gzip files
+- added support for compressed bios files (zip, gzip)
+- fixes Flash 1M support
+
+Gameboy:
+- added SGB2 support
+
+Windows:
+- added Gameboy tools (Disassembly, Memory Viewer, Tile Viewer, OAM Viewer,
+  Map Viewer and Palette Viewer)
+- added fullscreen mode confirmation for DirectDraw to avoid problems
+- added GDI, Direct3D and OpenGL rendering options
+- added skin support (see readme for information on creating skins)
+- added support for per game configuration of some settings (see readme for
+  details)
+- changed INI support to use emulator directory instead of Windows directory
+
+SDL version:
+- added support for per game configuration of some settings (see readme for
+  details)
+
+Version 1.4:
+
+Core changes:
+- added bilinear and bilinear plus filters
+- added interframe blending support
+- added support to show speed in fullscreen mode (transparent or opaque)
+- added detailed speed display
+- added autoframeskip support
+- added support for ELF DW_FORM_strp (used by newer GCC versions)
+- added support to enable/disable GB/GBC video layers
+- fixed crash when loading a second ELF file
+- fixed missing EMMS instruction in ADVANCEMAME Scale 2x MMX version
+- fixed some timer settings problems (bad copy paste of code)
+
+Windows version:
+- allows AMD CPUs to take advantage of MMX code
+- added support to select video mode for fullscreen mode
+- added fullscreen triple buffering support
+- added support for multiple joypad configuration
+- added support to store settings to INI
+- added export settings from Registry to INI
+- added throttle support (between 5% and 1000%)
+- fixed problem displaying error messages in fullscreen mode
+- fixed tile viewer to display all tiles in 256 mode
+- fixed Visual Studio project files so that they work on other computers
+- fixed problem with disable SFX not being read when program starts
+- fixed (minimized) screen corruption problem when filter is active in
+  fullscreen mode and emulator is minimized
+
+Version 1.3.1:
+
+Core changes:
+- fixed reversed Flash identification for 64k Flash
+
+Version 1.3:
+
+Core changes:
+- added support for Flash 128K (thanks DesktopMan)
+- added checks for out of memory condition
+- added sound volume option
+- fixed message when failed to write battery file (previously always saying
+  failure to open file NULL)
+- fixed sound mixing ratios specified in 0x4000082 (thanks Damian)
+- simulating memory behaviour when no cartridge present (32-bits still
+  incorrect)
+Windows version:
+- automatically apply IPS patch if it exists (configurable)
+- added save/load support in the memory viewer
+- added support for filters in 32-bit mode for all filters
+- added AVI writing support (no sound yet)
+- can now pause emulator before loading any file
+- memory viewer now displays current edit address
+- removed some test code introduced at version 1.1 that slows down the emulator
+- exporting GSA snapshot defaults title to internal name
+- fixed missing check marks on layers menu
+- fixed bug showing maker code/name from some old games
+SDL version:
+- added support for long options
+- added support for passing configuration file name
+- added profiling support (GMON format - see README)
+- added support for filters in 32-bit mode for all filters
+- automatically apply IPS patch if it exists
+- improved search for configuration file: current directory, user directory,
+  executable directory (in order) are searched
+- fixed configuration problem with saveType and removeIntros
+Porting:
+- fixed big endian problems in SGB code
+- fixed big endian problems with rotated sprites
+- fixed big endian sound endianess
+
+Version 1.2:
+
+Core changes:
+- added MidiKey2Freq bios call (thanks Chris Moeller)
+- added AdvanceMAME Scale2x and Simple 2x filters
+- added support for higher frameskip (up to 9)
+- added C core for portability
+- added big endian support
+- added support for movement sensor (thanks Parasyte)
+- added support for selecting save type available
+- fixed another value for the bios protection
+- fixed sound envelope reload bug (thanks jaymzj)
+- fixed timer counter (not changing the value of the counter unless the timer
+  overflows or is restarted)
+- fixed problem on big endian when setting IO memory reable positions
+- fixed reset LCD after disabling forced blank
+- speed up now uses frameskip 9 (6 FPS)
+- improved message when BIOS function cannot be emulated
+Windows changes:
+- added freeze recent list option
+- added 800x600 support
+- support to export GamesharkAdvance save games
+- fixed bug when changing directories in the Directories... dialog
+SDL version:
+- added emulation for motion sensor
+- fixed crash when printing void * variables
+- fixed crash when -b specified incorrectly
+- fixed warning when reading configuration file about disableMMX if compiled
+  without MMX support
+- fixed crash when trying open file that does not exist
+
+Version 1.1:
+
+Core changes:
+- added DMA logging
+- added GBA intro remover
+- fixed an ARM bug for opcodes like OP Rd,Rb,Rm ROR Rs where Rs > 0
+  and Rs % 32 == 0
+- fixed some minor inconsistencies on the THUMB core (no actual bug reported)
+- fixed bug with windows and alpha-bleding the wrong layer
+- fixed sound channel 3 volume
+- fixed the EEPROM battery save bug
+Windows changes:
+- added reset buttons to the directories dialog
+- added Logging console (for internal GBA logging and console output)
+- enhanced Map Viewer with more information about map and clicked spot
+- enhanced Tile Viewer with more information about tiles and clicked spot
+- added speed up toggle
+- fixed a bug configuring hotkeys for some menu options
+- fixed a bug where the joypad configuration dialog had strange colors
+- fixed a crash when opening the Disassemble window when emulating a GB program
+
+Version 1.0a:
+
+Core changes:
+- corrected sound mixing to be more like in version 0.9.1
+Windows changes:
+- fixed battery file load/save when directory not set
+- fixed crashes when directories not set
+- fixed crash when passing image from command line in same directory
+- updated company list for rom information dialogs
+
+Version 1.0:
+
+Core changes:
+- semi-transparent objects are now processed correctly when windows enabled
+- battery files now written even after resetting
+- 16-bit sound rendering
+- fixed some LDM/STM instructions when running in user/system mode
+- added missing LDM/STM instruction formats
+- Div/DivARM BIOS calls work correctly when dividing by 0
+- added sound echo effect
+- added sound low pass filter
+- added reverse stereo support
+Gameboy changes:
+- can now edit palette for mono games
+Windows changes:
+- added option for not stretching viewing data
+- added automatic update option for all viewers (every frame)
+- added tile viewer
+- added disassembler
+- added accelerator editor: user can configure almost all menu items hotkeys
+- added GDB support (will be improved in the next version)
+- memory viewer can now edit memory
+- fixed autofire for L/R buttons which was inverted
+- fixed dialog keyboard navigation
+- fixed bug in map viewer when viewing mode 2 map
+- files should now be saved to the correct directory when directories not set
+SDL changes:
+- fixed autofire for L/R buttons (was not working before)
+- added support for sound quality selection
+
+Version 0.9.1:
+
+Core changes:
+- fixed BG2CNT corruption in some cases
+- fixed rendering of sprites with invalid OBJ Mode
+- fixed 32-bit access to some IO registers
+- fixed some unknown messages when loading ELF files
+- fixed small error when doing a 16-bit write to palette RAM
+- fixed minor bug in CpuFastSet emulation
+- fixed some crashes loading GCC 3.0.4 ELF files
+- fixed minor problem with CPSR (to be consistent with documentation)
+- added single frame stepping (pauses after drawing the next frame)
+- BMP screen capture option
+Windows changes:
+- fixed add cheat dialog disabled buttons
+- fixed bug with 32-bit cheats (Gameshark/Internal)
+- multiple selection on cheat list dialogs now supported
+- easier enable/disable of cheats
+- cheat search dialog shows previous search results
+- cheat lists now restore enabled/disabled status correctly
+- added some new companies to information dialogs
+- Map viewer
+- Palette viewer
+- Memory viewer
+- Sprite viewer
+SDL changes:
+- added development logging option (bios usage, illegal read, illegal writes)
+- call stack information (GCC 3+ (ARM mode only) or ARM SDT)
+
+Version 0.9a:
+
+Core changes:
+- fixed rotation screen bug introduced in version 0.9
+- fixed some memory write corruption
+Windows changes:
+- fixed small bug in 320x240 mode
+- fixed open dialog when in 640x480 mode
+
+Version 0.9:
+
+Core changes:
+- support for enabling/disabling graphical layers
+- correct sound channel 4 emulation
+- support for multiboot files (.MB)
+- support for ELF files
+- fixed some memory leaks
+- fixed LDM/STM instructions (missing formats and wrong behaviour - littleos now works)
+- fixed PUSH/POP instructions
+- fixed misaligned half word reads
+- fixed invalid memory reads
+- fixed IO memory readability and register writing
+- fixed HuffUnComp missing last bytes bug
+- fixed a small DMA bug
+- fixed bug in rotation screens (hoffset demo works again)
+Gameboy changes:
+- correct sound channel 4 emulation
+- fixed bug reading joypad when LCD is off
+- fixed small bug in SGB code
+- fixed bug in SGB Block command
+Windows changes:
+- can now save GB Printer output as well as print
+- 320x240 mode support
+- support for more joystick axes and HAT(POV)
+- separate directory for GB roms
+- option to use old sound synchronization code (to avoid crackle problem)
+- fixed add internal code dialog bug when entering multiple codes
+- fixed closing dialogs by clicking on X
+- fixed handling of root directory for saving
+SDL changes:
+- GDB remote debugging support (see Readme of SDL version for details)
+- YUV support (courtesy of Niels Wagenaar)
+- improvements to embedded debugger (locals, break, print, symbols commands)
+- console output support (Mappy style and a new one)
+- partial ELF support in the internal debugger
+- support for HAT buttons
+
+Version 0.8:
+
+Core changes:
+- correctly initializing IO registers when running without BIOS(Gollum/Costis)
+- support for GSA ROM patching codes and button codes
+- support for CodeBreakerAdvance codes
+- support for separate frameskip for GBA and GB roms
+- reworked the cheat system internal (should improve speed a bit)
+- added a small interrupt latency to avoid interrupt loop
+- fixed 16-bit DMA transfers with decrement options
+- fixed semi-transparent OBJ bug
+- fixed Gameshark Advance snapshot import
+- fixed crash when passing filename without a path on command line
+- fixed ARM LDR/STR with ASR shifted register instructions
+- fixed some disassembly bugs
+- fixed sound mixing (reversed sound)
+- fixed misaligned 16-bit reads
+Gameboy changes:
+- fixed sound mixing (reversed sound)
+- fixed vertical scrolling bug (Kefren bars demo)
+- fixed speed up bug changing sound quality during emulation
+Windows changes:
+- disable screen saver when emulating
+- added option to pause the emulator when window not active
+- added keyboard shortcut for recent files
+- added support for more keyboard keys when configuring controls
+- added sound recording to a wave file
+- fixed Add code dialogs to allow multiple codes entered at once
+- fixed DDraw clipping bug (should work when window partially offscreen)
+SDL changes:
+- added command line flag for frameskip
+- added command line support for bios file
+- fixed configuration file comments on control configuration
+
+Version 0.7.1:
+
+Core changes:
+- sound scratch problem fixed
+- sound mixing improved
+- sound channel 3 new function added
+- Gameshark code support fixed for some codes
+- all cheat codes are validated for wrong characters
+- 64k EEPROM support
+- added BIOS calls protection for BIOS memory area
+- fixed problem with stop mode and loading a save state
+- fixed window behaviour on some undocumented cases (thanks mrquackers)
+Windows version:
+- added new filters to the menu
+- maker name added to ROM information dialogs (thanks to /Fredrik)
+- fixed start up x4 problem
+- fixed GBA cheat search display problem when showing hex numbers
+- added cheat search for GB roms
+SDL version:
+- fixed debugger disassembled line when on breakpoint
+- fixed loading a state with a different sound quality (quality doesn't change)
+
+Version 0.7a:
+
+- fixed slowdown/graphic sync problem
+- fixed x4 problem
+- enabled experimental graphic filters: pixelate and motion blur
+  (need to use regedit to change filter to 5 or 6 respectively)
+- added BIOS calls Stop, IntrWait and SoundBiasReset (missing from 0.7 changes)
+
+Version 0.7:
+
+Core GBA emulation:
+- emulating GBA windows correctly when they wrap around the screen
+- fixed some minor THUMB flag bugs
+- fixed blended sprites priority bug
+- fixed unimplemented ARM LDM opcode
+- not applying SFX to semi-transparent sprites
+- completed mode 5 emulation
+- disable sfx now takes effect immediately
+- screen capture sets the correct extension when name typed
+- MOSAIC support in all video modes and sprites
+- fixes to several of the reported black screen, hangs and missing opcode
+- Gameshark code support
+- import function for battery files, code files and game saves
+- export function for battery files
+Core GB emulation:
+- fixed window priority bug (sprites on top of window)
+- screen capture now being taken before status message is displayed
+- import function for battery files, code files and game saves
+- export function for battery files (no RTC saved in this case)
+SDL versions:
+- fixed some small disassembler bugs
+- fixed keyboard shortcuts with modifier keys (Ctrl, Alt, Shift)
+- added MMX support (default is off)
+- configuration file now in DOS format for the Windows version
+- added break on write support for IRAM and WRAM
+Linux version specific:
+- fixed some bad opcodes
+
+Version 0.6.0.1:
+
+- fixed bug with Japanese and Chinese translations
+- fixed bug with 8-bit or 16-bit freeze cheat codes
+- fixed a small VRAM bug
+
+Version 0.6:
+
+- fixed bug with images patched to save into FlashAdvance instead of EEprom
+- fixed bug reporting register P1
+- fixed DMA loop bug and timing
+- reworked the cheat engine for Gameboy (faster now)
+- GB Pocket Printer support
+- GB MBC7 support (motion sensor)
+- added ROM information dialogs
+- now centering dialog boxes
+- automatically hiding of mouse in full screen
+- Cheat list dialog improved with description for a code
+- screen shot menu option
+- reset recent list option
+- option to disable status messages
+- option to automatically save/load cheat list
+- menu to save/load cheat list
+- using new dialog controls under Windows XP
+- language selectable from menu and easy translation
+
+Version 0.51:
+
+- fixed bugs introduced in version 0.5 (BIOS access)
+- fixed small DMA problem
+- fixed Gameboy frame skip bug (caused missing sprites)
+- fixed bug in MBC 3 code (boy/girl problem in Pokemon Crystal)
+- fixed crash loading more than 3 games without restart
+- added MMX version of the graphic filters (exception of TV Mode)
+- added status message to some actions (load/save state, reset, screen capture)
+- tried to improve message when DirectX missing
+
+Version 0.5:
+
+- fixed bug accessing the BIOS (caused apparent hang in some cases)
+- reverted the ARM to previous version (sound distortion fixed)
+- fixed a bug in the 16-bit and 32-bit cheat search
+- fixed a slowdown on GB emulation
+- fixed screen capture to only take one shot while the button is pressed
+- fixed problem of not saving battery file when using recent menu
+- fixed problem starting from double-click on binary image (association)
+- fixed missing GB filters when selecting files to open
+- removed unimplemented opcode for SWP opcodes
+- added auto-fire option for buttons A, B, L and R
+- added full screen mode (640x480 only - 320x240 will be enabled later)
+- added DirectDraw option for Emulation only (removes filtering problem) and
+  use video memory (may speed up some machines)
+- added graphic filters: TV Mode, 2xSaI, Super 2xSaI and Super Eagle
+  (adapted from Snex9x code). Note: fast machine needed.
+- full screen option to stretch to fit image
+- added option to associate emulator with GB and GBA files
+- added priority option to avoid problems on some machines
+- added dialog with cheats in use
+- added option to freeze memory location: infinite money, lives, etc...
+
+Version 0.4:
+
+- can now play Gameboy and GameboyAdvance games
+- recent menu with 10 recent loaded roms
+- save state slots (like Snes9x)
+- fixed 24-bit screen capture
+- fixed sprite corruption
+- added 3 missing BIOS calls (DiffXbitUnfilter calls)
+- fixed freeze loading VisualBoy 1.4.10 save game
+- fixed reset problems on some CGB games
+- fixed a timing issue that caused blinking sprites
+
+Version 0.3:
+
+- fixed window bug (vertical lines or missing column)
+- fixed some sound mixing problems
+- some speed improvements
+- cheat search engine (based on Snes9x)
+- battery saves are now supported
+- save game loading fixed (crash or no sound problem are gone)
+- disable special effects option (can speedup some machines)
+
+Version 0.21:
+
+- fix to 24-bit mode dark screen problem
+- sound on left speaker problem fixed
+- some ARM opcodes have been corrected (DarkFader's demos now work)
+- rotation bug fix
+- mode 3 backdrop color fix

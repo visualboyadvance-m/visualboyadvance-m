@@ -1,0 +1,18 @@
+# List of source files which containing translatable strings.
+
+src/Cheats.cpp
+src/elf.cpp
+src/GBA.cpp
+src/RTC.cpp
+src/Util.cpp
+src/gb/gbCheats.cpp
+src/gb/gbCodesCB.h
+src/gb/gbCodes.h
+src/gb/GB.cpp
+src/gtk/joypadconfig.cpp
+src/gtk/main.cpp
+src/gtk/system.cpp
+src/gtk/vba.glade
+src/gtk/windowcallbacks.cpp
+src/gtk/window.cpp
+src/prof/prof.cpp

@@ -1,0 +1,15 @@
+After extracting the code from CVS, be sure to do the following if you
+are using the configure script:
+
+./fix-timestamps
+
+Failure to do so will result in problems during compilation on systems
+that have newer versions of GNU automake/autoconf. This is caused by 
+the fact that CVS processes files in alphabetical order and doesn't
+keep timestamps. This does not happen on source distributions.
+
+If you need to regenerate those files, do in this order:
+
+aclocal
+autoconf
+automake -a -c

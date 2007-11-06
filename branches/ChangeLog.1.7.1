@@ -1,0 +1,97 @@
+2004-02-07  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/SDL.cpp (main): disable remove intros option
+	* src/win32/MainWndOptions.cpp (OnUpdateOptionsEmulatorRemoveintrosgba): disable remove intros option
+	* src/win32/MainWnd.cpp: disable remove intros option
+	* src/win32/VBA.cpp: fix power management code
+	* src/win32/MainWnd.cpp (OnMySysCommand): fix power management code
+	* src/win32/MainWndFile.cpp: fix power management code
+
+2004-02-06  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/Sound.cpp (soundSetQuality): avoid turning sound on if sound off is checked
+	* src/gb/gbSound.cpp (gbSoundSetQuality): avoid turning sound on if sound off is checked
+	* src/GBA.cpp (CPUSoftwareInterrupt): added SWI call to exit emulator
+
+2004-02-05  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/MainWnd.cpp (FileRun): update battery file more often
+	* src/win32/VBA.cpp (system10Frames): update battery file more often
+	* src/gb/gbMemory.cpp: update battery file more often
+	* src/gb/GB.cpp: update battery file more often
+	* src/System.h: update battery file more often
+	* src/Sram.cpp (sramWrite): update battery file more often
+	* src/SDL.cpp (main): update battery file more often
+	* src/GBA.cpp: update battery file more often
+	* src/Flash.cpp (flashWrite): update battery file more often
+	* src/EEprom.cpp (eepromWrite): update battery file more often
+
+2004-01-30  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/OpenGL.cpp (render): fix memory leak in OpenGL rendering
+
+2004-01-29  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/gb/gbCodes.h: fix HALT when no matching in IE and IF
+
+2004-01-28  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/prof/prof.cpp: fix compile warnings
+	* src/win32/MainWndTools.cpp: switch to use structure functions
+	* src/win32/MainWndFile.cpp: switch to use structure functions
+	* src/win32/VBA.cpp (VBA): use structure instead of individual functions for emulation
+	* src/win32/VBA.h (class VBA): use structure instead of individual functions for emulation
+	* src/win32/MainWnd.cpp: switch to use structure functions
+	* src/System.h: structure for emulator functions
+	* src/win32/MainWnd.cpp (FileRun): save rom size for later use
+	* src/win32/BugReport.cpp (createReport): include cart save strings to bug report
+
+2004-01-25  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/AboutDialog.cpp (OnInitDialog): fix problem with translator URLs not working correctly and force URL to new site
+	* src/win32/MainWndHelp.cpp (OnHelpFaq): update FAQ URL to new site
+
+2004-01-21  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/Util.cpp (utilLoad): fix possible memory corruption when loading files with a passed in memory location
+
+2004-01-20  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/Port.h (READ32LE): big endian updates from flea
+	* src/GBA.cpp: big endian updates from flea
+	* src/Cheats.cpp: big endian updates from flea
+	* src/win32/VBA.cpp (VBA): initialize default GB color palette
+	* src/win32/Direct3D.cpp (initialize): avoid resetting GB colors set by user
+	* src/win32/OpenGL.cpp (initialize): avoid resetting GB colors set by user
+	* src/win32/GDIDisplay.cpp (initialize): avoid resetting GB colors set by user
+	* src/win32/DirectDraw.cpp (initializeOffscreen): avoid resetting GB colors set by user
+
+2004-01-19  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/gb/GB.cpp (gbEmulate): reset the window line before starting a new frame
+	* src/elf.cpp (elfRead): fix memory leak
+	* src/GBA.cpp (CPULoadRom): avoid crash with invalid ELF file
+
+2004-01-18  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/FileDlg.cpp (FileDlg): fix problem on 320x240 mode
+	* src/win32/ZoomControl.cpp (OnPaint): fix crash on map/oam/tile viewer
+
+2004-01-16  Forgotten  <forgotten@users.sourceforge.net>
+
+	* win32/GBMemoryViewerDlg.cpp (OnLoad): fixed bug loading memory dump
+	* win32/MemoryViewerDlg.cpp (OnLoad): fixed bug loading memory dump
+
+2004-01-15  Forgotten  <forgotten@users.sourceforge.net>
+
+	* win32/VBA.cpp: store throttle value
+
+2004-01-14  Forgotten  <forgotten@users.sourceforge.net>
+
+	* win32/VBA.cpp (adjustDestRect): fix multi-mon support
+	* win32/FileDlg.cpp (FileDlg): fix problem on VC 7.1
+	* win32/MainWnd.cpp (OnActivateApp): fix compile errors on VC 7.1
+	* win32/GBCheatsDlg.cpp: fix compile errors on VC 7.1
+	* win32/GBACheats.cpp: fix compile errors on VC 7.1
+	* bios.cpp: fix compile errors on VC 7.1
+

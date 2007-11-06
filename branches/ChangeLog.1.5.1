@@ -1,0 +1,323 @@
+2003-06-08  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/Sound.cpp (soundMix): fixed sound ratio problem with DS channels
+
+2003-06-04  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/Cheats.cpp (cheatsAdd): fixed bug that changed ROM with some codes
+
+2003-06-03  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/RTC.cpp (rtcWrite): fixed problem on last day of the month
+
+2003-06-02  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/SDL.cpp: changed pause when inactive default to false
+
+2003-05-28  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/arm-new.h: added PowerPC assembly code contributed by Jeffrey Lim
+	* src/thumb.h: added PowerPC assembly code contributed by Jeffrey Lim
+
+2003-05-26  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/skin.cpp: make skin region optional
+	* src/Cheats.cpp (cheatsCheckKeys): extra AR support
+	* src/win32/Win32.cpp (systemReadJoypad): disallow L+R,U+D to be pressed together
+	* src/SDL.cpp (systemReadJoypad): disallow L+R,U+D to be pressed together
+
+2003-05-22  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/Cheats.cpp: add support for AR codes (thanks P.S.)
+
+2003-05-20  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/skinButton.cpp (OnMouseLeave): try to detect when mouse is not over button better
+
+2003-05-14  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/OpenGL.cpp: fix fullscreen problem
+	* src/win32/Win32.cpp: fix stretch to fit problem
+	* src/win32/Direct3D.cpp: fix stretch to fit problem
+	* src/win32/GDIDisplay.cpp: fix speed display
+
+2003-05-13  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/VisualBoyAdvance.cfg: changed separator to equal sign
+	* src/win32/Wnd.cpp: added default and create message support
+	* src/win32/Win32.cpp (WindowProc): update menu with accelerators when changing modes
+	* src/win32/Commands.cpp (winAccelGetID): added method to retrieve accelerator IDs and minimize function
+	* src/win32/skin.cpp: added button support and error messages
+	* src/win32/skinButton.cpp: created
+
+2003-04-24  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/AcceleratorManager.cpp (Load): allow user to delete the default accelerators
+	* src/win32/WriteAVI.cpp (SetSoundFormat): added sound support
+	* src/Mode5.cpp: minor rendering optimization
+	* src/Mode4.cpp: minor rendering optimization
+	* src/Mode3.cpp: minor rendering optimization
+	* src/Mode2.cpp: minor rendering optimization
+	* src/Mode1.cpp: minor rendering optimization	
+	* src/Mode0.cpp: minor rendering optimization
+	* src/GBA.cpp (CPUUpdateRenderBuffers): minor rendering improvement
+
+2003-04-19  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (initApp): fixed Gameboy Printer initialization
+	* src/win32/Win32.cpp (WindowProc): fixed popup menu problem on Win 95/98/Me (unimplemented Unicode functions)
+	* src/win32/AcceleratorManager.cpp (UpdateMenu): take into account Win 95/98/Me
+
+2003-04-15  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/skin.cpp (Hook): moved SetWindowRgn to after resizing and style change
+
+2003-04-07  Forgotten  <forgotten@users.sourceforge.net>
+
+	* VBA:  too many changes to detail...
+
+2003-02-02  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp: added throttle support
+	* src/GBA.cpp (CPUUpdateRegister): fixed some wrong timer assumption (bad copy/paste)
+
+2003-01-29  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp: use registry or INI to store settings
+	* src/win32/Reg.cpp: use registry or INI to store settings
+	* src/win32/AcceleratorManager.cpp: use Reg.cpp to store settings
+
+2003-01-25  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (WindowProc): minimize problem when minimizing emulator in fullscreen mode and filter is active
+	* src/win32/Win32.cpp (updateLayersMenu): added support to enable/disable GB/GBC layers
+
+2003-01-21  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/elf.cpp (elfReadProgram): added support for DW_FORM_strp
+	* src/interframe.cpp: added missing EMMS instructions to GCC inline assembly
+	* src/admame.cpp: added missing EMMS instructions to GCC inline assembly
+
+2003-01-20  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (initApp): fixed disable SFX flag not being read
+
+2003-01-18  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/gb/GB.cpp (gbEmulate): changed interface with emulator for joypad
+	* src/GBA.cpp (CPULoop): changed interface with emulator for joypad
+	* src/win32/Win32.cpp: added support for multiple joypad configuration
+
+2003-01-14  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (initApp): fixed problem when video mode was never selected
+
+2003-01-13  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/SDL.cpp: show detailed speed data
+	               added auto frameskip support
+	               CTRL+F to toggle fullscreen
+
+2003-01-12  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp: added some debugging for DDRAW and DINPUT
+	* src/win32/Win32.cpp: changed rendering when menu is active with triple buffering
+
+2003-01-11  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/GBA.cpp (CPULoop): set emulation speed value
+	* src/win32/Win32.cpp: added support for fullscreen speed display
+	* src/win32/Win32.cpp: support for triple buffering in fullscreen mode
+	* src/gb/GB.cpp (gbEmulate): set emulation speed value
+	* src/SDL.cpp: added support for fullscreen speed display
+
+2003-01-08  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (systemMessage): fixed problem displaying error messages in fullscreen mode
+	* src/win32/Win32.cpp: added support to other resolutions for fullscreen mode
+
+2003-01-05  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (detectMMX): added support for AMD CPUs
+	* src/win32/TileViewer.cpp: now shows all tiles in 256 mode
+	* src/elf.cpp (elfCleanUp): fixed crash when reloading an ELF file
+	* src/win32/Commands.cpp: added interframe blending commands
+	* src/win32/Win32.cpp: added interframe blending support
+	* src/SDL.cpp: added interframe blending support
+
+2003-01-03  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp: added bilinear filter support
+	* src/SDL.cpp: added bilinear filter support
+
+2002-12-11  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/Flash.cpp (flashSetSize): fixed reversed device ID and manufacturer ID
+
+2002-12-09  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (fileExportGSASnapshot): change default title to internal name
+	* src/win32/Win32.cpp (WindowProc): added sound volume option
+	* src/win32/Win32.cpp (updateFileMenu): allow pausing even if not emulating yet
+	* src/win32/Win32.cpp: added AVI writing support
+
+2002-12-02  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Commands.cpp: added missing options
+	* src/win32/Win32.cpp (updateFilter): added 32-bit mode support for Kreed filters
+	* src/SDL.cpp (main): added 32-bit mode support for Kreed filters
+	* src/2xSaI.cpp (Scale_2xSaI): added 32-bit mode support
+
+2002-12-01  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/tvmode.cpp (TVMode32): 32-bit mode support
+	* src/simple2x.cpp (Simple2x32): 32-bit mode support
+	* src/pixel.cpp (Pixelate32): 32-bit mode support
+	* src/motionblur.cpp (MotionBlur32): 32-bit mode support
+	* src/admame.cpp (AdMame2x32): 32-bit mode support
+	* src/SDL.cpp (systemDrawScreen): added support for filters in 32-bit mode
+	* src/win32/Win32.cpp (updateFilter): added support for filters in 32-bit mode
+
+2002-11-29  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/Sound.cpp (soundMix): respect sound rations for CGB and DS
+	* src/GBA.cpp (CPULoadRom): fill memory to simulate no cartridge connected
+
+2002-11-28  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/GBA.cpp (CPULoop): renamed arm-new.cpp and thumb.cpp to .h
+
+2002-11-27  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (fileOpen): add option for no IPS patching
+	* src/SDL.cpp (main): add option for no IPS patching
+
+2002-11-26  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/GBA.cpp (CPULoadRom): check for memory allocation error
+	* src/GBA.cpp (CPUWriteBatteryFile): fixed error message when failed to write battery file
+
+2002-11-25  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/SDL.cpp (systemSoundInit): correct sound type for big endian systems
+	* src/Gfx.h (gfxDrawSprites): fixed big endian problem with rotation sprites
+	* src/bios.cpp (BIOS_MidiKey2Freq): small clean up on logging
+	* src/win32/MemoryViewer.cpp (setCaretPos): show current edit address
+	* src/win32/MemoryViewer.cpp (OnLoad): added load/save memory support
+	* src/win32/RomInfo.cpp (OnInitDialog): fixed bug showing maker code/name in some old GB roms
+
+2002-11-24  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/SDL.cpp: added flag for help and configuration file
+
+2002-11-23  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/GBACheats.cpp: cleaned up some unused stuff 
+	* src/SDL.cpp: added support for long options
+	* src/Flash.cpp: added support for 128K Flash (thanks DesktopMan)
+	* src/GBA.cpp: added support for 128K Flash 	
+
+2002-11-21  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/gb/gbSGB.cpp: fixed big endian problems
+	* src/win32/Win32.cpp (updateVideoMenu): fixed missing check marks on layers menu
+
+2002-11-20  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/SDL.cpp (main): added profiling support
+	* src/GBA.cpp: added profiling support
+	* src/prof/prof.cpp: added profiling support
+
+2002-11-14  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (systemWriteDataToSoundBuffer): remove test code that causes slowdown
+
+2002-11-13  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/SDL.cpp (sdlFindPreferences): improve search for configuration file
+
+2002-11-12  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/SDL.cpp (sdlReadPreferences): fixed incorrect variable being used for saveType
+	(main): removeIntros was not being used
+	(main): apply IPS patch automatically if it exists
+	* src/Util.cpp (utilApplyIPS): added IPS patching code
+	* src/win32/Win32.cpp (fileOpen): apply IPS patch automatically if it exists	
+
+2002-11-07  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/SDL.cpp (main): fixed crash when trying load file that does not exist
+	* src/SDL.cpp (systemUpdateMotionSensor): implemented motion sensor for the SDL version
+
+2002-11-06  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/elf.cpp: fix wrong usage of CPUReadMemory
+	* src/admame.cpp: fixed incorrect #ifdef usage
+	* configure.in: added test for socklen_t type
+	* src/remote.cpp: fix problem compiling in some systems
+	* src/GBA.cpp (CPULoop): added support for movement sensor
+	* src/GBA.cpp (CPUReset): added support for selecting save type available
+
+2002-11-05  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/DirectoriesDlg.cpp (browseForDir): fix bug when changing directory using the Browse button
+
+2002-11-04  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/GBA.cpp (CPUUpdateRegister): do not change timer data when writting to register TMxD. Only a restart or overflow will change the value
+
+2002-11-02  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/GBA.cpp (CPUWriteGSASnapshot): Compute CRC of save
+
+2002-10-31  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/GBA.cpp (CPUWriteGSASnapshot): fixed a few bytes in the snapshot
+	* src/Sound.cpp (soundEvent): fixed envelope reload bugs
+	* src/bios.cpp (BIOS_MidiKey2Freq): Added method (user contribution)
+	* src/Gfx.h: fixed problems in big endian machines
+
+2002-10-29  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/thumb.cpp: fixed bugs in C core 
+
+2002-10-28  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/GBA.cpp (CPUSoftwareInterrupt): improved message about BIOS calls that are not emulated and need a BIOS file
+	* src/GBA.cpp (CPUInit): fix bug setting reable IO positions
+
+2002-10-27  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/SDL.cpp (sdlReadPreferences): Fixed warning if MMX not in use when reading the configuration file
+	* src/SDL.cpp (main): Fixed crash if BIOS file not specified correctly
+	* src/win32/Win32.cpp: Support for higher frameskip 
+	* src/SDL.cpp: Support for higher frameskip 
+
+2002-10-26  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp: Add 800x600 support 
+
+2002-10-25  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (fileExportGSASnapshot): added code
+	* src/win32/ExportGSASnapshot.cpp: Created dialog 
+	* src/win32/Commands.cpp: Added new menu options
+
+2002-10-24  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/GBA.cpp (CPUReadGSASnapshot): Now skipping notes if they exist
+
+2002-10-23  Forgotten  <forgotten@users.sourceforge.net>
+
+	* src/win32/Win32.cpp (initApp): remember freeze recent list flag
+
+2002-10-22  Forgotten  <forgotten@users.sourceforge.net>
+	
+	* win32/.cvsignore: added output directories and MSVC files to ignore
+	* src/win32/.cvsignore: Added vba.aps to ignore list	
+	* src/TestEmu.cpp (systemPauseOnFrame): Added missing return statement
+	* INSTALL: Updated GCC requirements
+	* src/win32/Win32.cpp: added flag to freeze recent list
+	* src/win32/vba.rc: added flag to freeze recent list
+	* Initial Public Version
+
