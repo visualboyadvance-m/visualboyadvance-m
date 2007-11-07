@@ -55,6 +55,7 @@ class Direct3DDisplay : public IDisplay {
 private:
 	LPDIRECT3D9           pD3D;
 	LPDIRECT3DDEVICE9     pDevice;
+	D3DDISPLAYMODE		  mode;
 	D3DPRESENT_PARAMETERS dpp;
 	D3DFORMAT             screenFormat;
 	LPDIRECT3DSURFACE9    emulatedImage;
@@ -71,6 +72,7 @@ private:
 	void destroySurface();
 	void calculateDestRect();
 	bool resetDevice();
+	void setPresentationType();
 
 public:
 	Direct3DDisplay();
@@ -107,6 +109,30 @@ Direct3DDisplay::Direct3DDisplay()
 Direct3DDisplay::~Direct3DDisplay()
 {
 	cleanup();
+}
+
+void Direct3DDisplay::setPresentationType()
+{
+	// Change display mode
+	memset(&dpp, 0, sizeof(dpp));
+	dpp.Windowed = !(theApp.videoOption>=VIDEO_320x240);
+	if (!dpp.Windowed)
+		dpp.BackBufferFormat =
+		(theApp.fsColorDepth == 32) ? D3DFMT_X8R8G8B8 : D3DFMT_R5G6B5;
+	else
+		dpp.BackBufferFormat = mode.Format;
+	dpp.BackBufferCount = 3;
+	dpp.MultiSampleType = D3DMULTISAMPLE_NONE;
+	dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+	dpp.BackBufferWidth = !dpp.Windowed ? theApp.fsWidth : theApp.surfaceSizeX;
+	dpp.BackBufferHeight = !dpp.Windowed ? theApp.fsHeight : theApp.surfaceSizeY;
+	dpp.hDeviceWindow = theApp.m_pMainWnd->GetSafeHwnd();
+	dpp.FullScreen_RefreshRateInHz = dpp.Windowed ? 0 : theApp.fsFrequency;
+	dpp.Flags = theApp.menuToggle ? D3DPRESENTFLAG_LOCKABLE_BACKBUFFER : 0;
+	if (theApp.vsync)
+		dpp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;			// VSync
+	else
+		dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;	// No Sync
 }
 
 
@@ -261,8 +287,9 @@ bool Direct3DDisplay::initialize()
 	theApp.mode320Available = FALSE;
 	theApp.mode640Available = FALSE;
 	theApp.mode800Available = FALSE;
+	theApp.mode1024Available = FALSE;
+	theApp.mode1280Available = FALSE;
 
-	D3DDISPLAYMODE mode;
 	pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &mode);
 	screenFormat = mode.Format;
 
@@ -316,15 +343,7 @@ bool Direct3DDisplay::initialize()
 
 
 	// create device
-	ZeroMemory(&dpp, sizeof(dpp));
-	dpp.Windowed = TRUE;
-	dpp.BackBufferFormat = mode.Format;
-	dpp.BackBufferCount = theApp.tripleBuffering ? 2 : 1;
-	dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	dpp.BackBufferWidth = 0; // use width of hDeviceWindow
-	dpp.BackBufferHeight = 0; // use height of hDeviceWindow
-	dpp.Flags = D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
-	dpp.PresentationInterval = theApp.vsync ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
+	setPresentationType();
 
 	HRESULT hret = pD3D->CreateDevice(
 		D3DADAPTER_DEFAULT,
@@ -584,12 +603,12 @@ void Direct3DDisplay::calculateDestRect()
 void Direct3DDisplay::setOption( const char *option, int value )
 {
 	if( !_tcscmp( option, _T("vsync") ) ) {
-		dpp.PresentationInterval = value ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
+		theApp.vsync = true;
 		resetDevice();
 	}
 
 	if( !_tcscmp( option, _T("tripleBuffering") ) ) {
-		dpp.BackBufferCount = value ? 2 : 1;
+		theApp.tripleBuffering = true;
 		resetDevice();
 	}
 
@@ -618,6 +637,7 @@ bool Direct3DDisplay::resetDevice()
 	HRESULT hr;
 	destroyFont();
 	destroySurface();
+	setPresentationType();
 	if( FAILED( hr = pDevice->Reset( &dpp ) ) ) {
 		//DXTRACE_ERR_MSGBOX( _T("pDevice->Reset failed"), hr );
 		failed = true;
