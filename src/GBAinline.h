@@ -28,6 +28,8 @@ extern bool cpuSramEnabled;
 extern bool cpuFlashEnabled;
 extern bool cpuEEPROMEnabled;
 extern bool cpuEEPROMSensorEnabled;
+extern int lspeed;
+extern void LinkSStop(void);
 extern bool cpuDmaHack;
 extern u32 cpuDmaLast;
 extern bool timer0On;
@@ -90,6 +92,9 @@ static inline u32 CPUReadMemory(u32 address)
     value = READ32LE(((u32 *)&internalRAM[address & 0x7ffC]));
     break;
   case 4:
+ 	  if((address>=0x4000120||address<=0x4000126)&&lspeed)
+		  LinkSStop();
+
     if((address < 0x4000400) && ioReadable[address & 0x3fc]) {
       if(ioReadable[(address & 0x3fc) + 2])
         value = READ32LE(((u32 *)&ioMem[address & 0x3fC]));
@@ -213,6 +218,9 @@ static inline u32 CPUReadHalfWord(u32 address)
     value = READ16LE(((u16 *)&internalRAM[address & 0x7ffe]));
     break;
   case 4:
+  	if((address>=0x4000120||address<=0x4000126)&&lspeed)
+	  LinkSStop();
+
     if((address < 0x4000400) && ioReadable[address & 0x3fe])
     {
       value =  READ16LE(((u16 *)&ioMem[address & 0x3fe]));
@@ -326,6 +334,9 @@ static inline u8 CPUReadByte(u32 address)
   case 3:
     return internalRAM[address & 0x7fff];
   case 4:
+    if((address>=0x4000120||address<=0x4000126)&&lspeed)
+	  LinkSStop();
+
     if((address < 0x4000400) && ioReadable[address & 0x3ff])
       return ioMem[address & 0x3ff];
     else goto unreadable;
