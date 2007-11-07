@@ -100,7 +100,7 @@ BOOL ModeConfirm::OnInitDialog()
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void ModeConfirm::OnTimer(UINT nIDEvent) 
+void ModeConfirm::OnTimer(UINT_PTR nIDEvent) 
 {
   CString buffer;  
   count--;

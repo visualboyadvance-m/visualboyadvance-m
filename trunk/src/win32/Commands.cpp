@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 #include "stdafx.h"
 #include "AcceleratorManager.h"
-#include "..\..\res\resource.h"
+#include "resource.h"
 #include <afxres.h>
 
 #include <afxtempl.h>  // MFC Templates extension
@@ -105,6 +105,8 @@ struct {
   { "OptionsVideoRenderDDRAW", ID_OPTIONS_VIDEO_RENDERMETHOD_DIRECTDRAW },
   { "OptionsVideoRenderD3D", ID_OPTIONS_VIDEO_RENDERMETHOD_DIRECT3D },
   { "OptionsVideoRenderOGL", ID_OPTIONS_VIDEO_RENDERMETHOD_OPENGL },
+  { "OptionsVideoRenderSelectSkin", ID_OPTIONS_VIDEO_RENDEROPTIONS_SELECTSKIN },
+  { "OptionsVideoRenderSkin", ID_OPTIONS_VIDEO_RENDEROPTIONS_SKIN },
   { "OptionsVideoVsync", ID_OPTIONS_VIDEO_VSYNC },
   { "OptionsVideoX1", ID_OPTIONS_VIDEO_X1 },
   { "OptionsVideoX2", ID_OPTIONS_VIDEO_X2 },
@@ -127,13 +129,13 @@ struct {
   { "OptionsEmulatorDirectories", ID_OPTIONS_EMULATOR_DIRECTORIES },
   { "OptionsEmulatorSelectBIOS", ID_OPTIONS_EMULATOR_SELECTBIOSFILE },
   { "OptionsEmulatorUseBIOS", ID_OPTIONS_EMULATOR_USEBIOSFILE },
+  { "OptionsEmulatorGameOverrides", ID_OPTIONS_EMULATOR_GAMEOVERRIDES },
   { "OptionsEmulatorSkipBIOS", ID_OPTIONS_EMULATOR_SKIPBIOS },
   { "OptionsEmulatorShowSpeedNone", ID_OPTIONS_EMULATOR_SHOWSPEED_NONE },
   { "OptionsEmulatorShowSpeedPercentage", ID_OPTIONS_EMULATOR_SHOWSPEED_PERCENTAGE },
   { "OptionsEmulatorShowSpeedDetailed", ID_OPTIONS_EMULATOR_SHOWSPEED_DETAILED },
   { "OptionsEmulatorShowSpeedTransparent", ID_OPTIONS_EMULATOR_SHOWSPEED_TRANSPARENT },
   { "OptionsEmulatorSpeedupToggle", ID_OPTIONS_EMULATOR_SPEEDUPTOGGLE },
-  { "OptionsEmulatorRemoveIntros", ID_OPTIONS_EMULATOR_REMOVEINTROSGBA },
   { "OptionsEmulatorAutoHideMenu", ID_OPTIONS_EMULATOR_AUTOHIDEMENU },
   { "OptionsEmulatorSaveAuto", ID_OPTIONS_EMULATOR_SAVETYPE_AUTOMATIC },
   { "OptionsEmulatorSaveEEPROM", ID_OPTIONS_EMULATOR_SAVETYPE_EEPROM },
@@ -145,9 +147,10 @@ struct {
   { "OptionsEmulatorAutoIPSPatch", ID_OPTIONS_EMULATOR_AUTOMATICALLYIPSPATCH },
   { "OptionsEmulatorAGBPrint", ID_OPTIONS_EMULATOR_AGBPRINT },
   { "OptionsEmulatorRTC", ID_OPTIONS_EMULATOR_REALTIMECLOCK },
+  { "OptionsEmulatorGenericflashcard", ID_OPTIONS_EMULATOR_GENERICFLASHCARD },
   { "OptionsEmulatorRewindInterval", ID_OPTIONS_EMULATOR_REWINDINTERVAL },
   { "OptionsSoundOff", ID_OPTIONS_SOUND_OFF },
-  { "OptionsSoundMute", ID_OPTIONS_SOUND_OFF }, /* mute hax */
+  { "OptionsSoundMute", ID_OPTIONS_SOUND_MUTE },
   { "OptionsSoundOn", ID_OPTIONS_SOUND_ON },
   { "OptionsSoundChannel1", ID_OPTIONS_SOUND_CHANNEL1 },
   { "OptionsSoundChannel2", ID_OPTIONS_SOUND_CHANNEL2 },
@@ -174,6 +177,7 @@ struct {
   { "OptionsFilterSuper2xSaI", ID_OPTIONS_FILTER_SUPER2XSAI },
   { "OptionsFilterSuperEagle", ID_OPTIONS_FILTER_SUPEREAGLE },
   { "OptionsFilterPixelate", ID_OPTIONS_FILTER16BIT_PIXELATEEXPERIMENTAL },
+  { "OptionsFilterMotionBlur", ID_OPTIONS_FILTER16BIT_MOTIONBLUREXPERIMENTAL },
   { "OptionsFilterAdMameScale2x", ID_OPTIONS_FILTER16BIT_ADVANCEMAMESCALE2X },
   { "OptionsFilterSimple2x", ID_OPTIONS_FILTER16BIT_SIMPLE2X },
   { "OptionsFilterBilinear", ID_OPTIONS_FILTER_BILINEAR },
@@ -224,7 +228,8 @@ struct {
   { "ToolsCustomize", ID_TOOLS_CUSTOMIZE },
   { "HelpBugReport", ID_HELP_BUGREPORT },
   { "HelpFAQ", ID_HELP_FAQ },
-  { "HelpAbout", ID_HELP_ABOUT }
+  { "HelpAbout", ID_HELP_ABOUT },
+  { "SystemMinimize", ID_SYSTEM_MINIMIZE }
 };
 
 bool winAccelGetID(const char *command, WORD& id)

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2004-2006 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 extern void BIOS_ArcTan();
 extern void BIOS_ArcTan2();
 extern void BIOS_BitUnPack();
+extern void BIOS_GetBiosChecksum();
 extern void BIOS_BgAffineSet();
 extern void BIOS_CpuSet();
 extern void BIOS_CpuFastSet();

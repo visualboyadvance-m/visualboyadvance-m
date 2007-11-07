@@ -74,7 +74,7 @@ class JoypadConfig : public CDialog
 {
   // Construction
  public:
-  void assignKey(int id, int key);
+  void assignKey(int id, LONG_PTR key);
   JoypadConfig(int w, CWnd* pParent = NULL);   // standard constructor
 
   // Dialog Data

@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "BugReport.h"
 
 #include "../agbprint.h"
+#include "../AutoBuild.h"
 #include "../GBA.h"
 #include "../Globals.h"
 #include "../Port.h"
@@ -215,7 +216,6 @@ CString BugReport::createReport()
   AppendFormat(report, "Using BIOS   : %d\r\n", theApp.useBiosFile);
   AppendFormat(report, "Skip BIOS    : %d\r\n", theApp.skipBiosFile);
   AppendFormat(report, "Disable SFX  : %d\r\n", cpuDisableSfx);
-  AppendFormat(report, "Skip intro   : %d\r\n", theApp.removeIntros);
   AppendFormat(report, "Throttle     : %d\r\n", theApp.throttle);
   AppendFormat(report, "Rewind       : %d\r\n", theApp.rewindTimer);
   AppendFormat(report, "Auto frame   : %d\r\n", theApp.autoFrameSkip);
@@ -226,6 +226,7 @@ CString BugReport::createReport()
   AppendFormat(report, "Green shift  : %08x\r\n", systemGreenShift);
   AppendFormat(report, "Blue shift   : %08x\r\n", systemBlueShift);
   AppendFormat(report, "Layer setting: %04X\r\n", layerSettings);
+  AppendFormat(report, "Mirroring    : %d\r\n", mirroringEnable);
   AppendFormat(report, "Save type    : %d (%d)\r\n", 
                theApp.winSaveType, cpuSaveType);
   AppendFormat(report, "Flash size   : %08X (%08x)\r\n", 

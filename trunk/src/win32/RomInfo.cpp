@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004-2005 Forgotten and the VBA development team
+// Copyright (C) 2004-2006 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -356,6 +356,15 @@ BOOL RomInfoGB::OnInitDialog()
   case 0x06:
     type = "ROM+MBC2+BATT";
     break;
+  case 0x0b:
+    type = "ROM+MMM01";
+    break;
+  case 0x0c:
+    type = "ROM+MMM01+RAM";
+    break;
+  case 0x0d:
+    type = "ROM+MMM01+RAM+BATT";
+    break;
   case 0x0f:
     type = "ROM+MBC3+TIMER+BATT";
     break;
@@ -391,6 +400,18 @@ BOOL RomInfoGB::OnInitDialog()
     break;
   case 0x22:
     type = "ROM+MBC7+BATT";
+    break;
+  case 0x55:
+    type = "GameGenie";
+    break;
+  case 0x56:
+    type = "GameShark V3.0";
+    break;
+  case 0xfc:
+    type = "ROM+POCKET CAMERA";
+    break;
+  case 0xfd:
+    type = "ROM+BANDAI TAMA5";
     break;
   case 0xfe:
     type = "ROM+HuC-3";
@@ -533,51 +554,44 @@ void RomInfoGBA::OnOk()
 BOOL RomInfoGBA::OnInitDialog() 
 {
   CDialog::OnInitDialog();
-  
-  char buffer[32];
 
-  // Game Title
+  char buffer[13];
+
   strncpy(buffer, (const char *)&rom[0xa0], 12);
   buffer[12] = 0;
   GetDlgItem(IDC_ROM_TITLE)->SetWindowText(buffer);
 
-  // Game Code
   strncpy(buffer, (const char *)&rom[0xac], 4);
   buffer[4] = 0;
   GetDlgItem(IDC_ROM_GAME_CODE)->SetWindowText(buffer);
 
-  // Maker Code
   strncpy(buffer, (const char *)&rom[0xb0],2);
   buffer[2] = 0;
   GetDlgItem(IDC_ROM_MAKER_CODE)->SetWindowText(buffer);
 
-  // Maker Code -> Maker Name
   GetDlgItem(IDC_ROM_MAKER_NAME)->SetWindowText(winGBARomInfoFindMakerCode(buffer));
   
-  // Main Unit Code
   sprintf(buffer, "%02x", rom[0xb3]);
   GetDlgItem(IDC_ROM_UNIT_CODE)->SetWindowText(buffer);
 
-  // Device Type
   sprintf(buffer, "%02x", rom[0xb4]);
+  if( rom[0xb4] & 0x80 ) {
+	  strcat(buffer, " (DACS)");
+  }
   GetDlgItem(IDC_ROM_DEVICE_TYPE)->SetWindowText(buffer);
 
-  // ROM Version Number
   sprintf(buffer, "%02x", rom[0xbc]);
   GetDlgItem(IDC_ROM_VERSION)->SetWindowText(buffer);
 
-  // Complement Check
-  int x, crc = 0x19;
-  for(int i = 0xa0; i < 0xbd; i++)
-  {
-	  x = rom[i];
-	  crc += x;
+  u8 crc = 0x19;
+  for(int i = 0xa0; i < 0xbd; i++) {
+    crc += rom[i];
   }
-  crc = (-crc) & 0xFF;
-  char same = (rom[0xbd] == crc) ? '=' : '/'; // Compare
-  sprintf(buffer, "ROM: %02X %c EMU: %02X", rom[0xbd], same, crc);
-  GetDlgItem(IDC_ROM_CRC)->SetWindowText(buffer);
 
+  crc = (-crc) & 255;
+
+  sprintf(buffer, "%02x (%02x)", crc, rom[0xbd]);
+  GetDlgItem(IDC_ROM_CRC)->SetWindowText(buffer);
   CenterWindow();
   
   return TRUE;  // return TRUE unless you set the focus to a control

@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,13 +19,14 @@
 // VBA.cpp : Defines the class behaviors for the application.
 //
 #include "stdafx.h"
-#include <mmsystem.h>
 
 #include "AVIWrite.h"
 #include "LangSelect.h"
 #include "MainWnd.h"
 #include "Reg.h"
-#include "..\..\res\resource.h"
+#include "resource.h"
+#include "resource2.h"
+#include "skin.h"
 #include "WavWriter.h"
 #include "WinResUtil.h"
 
@@ -158,6 +159,23 @@ void (*dbgOutput)(char *, u32) = winOutput;
 extern "C" bool cpu_mmx;
 #endif
 
+namespace Sm60FPS
+{
+  float					K_fCpuSpeed = 98.0f;
+  float					K_fTargetFps = 60.0f * K_fCpuSpeed / 100;
+  float					K_fDT = 1000.0f / K_fTargetFps;
+
+  u32					dwTimeElapse;
+  u32					dwTime0;
+  u32					dwTime1;
+  u32					nFrameCnt;
+  float					fWantFPS;
+  float					fCurFPS;
+  bool					bLastSkip;
+  int					nCurSpeed;
+  int					bSaveMoreCPU;
+};
+
 void directXMessage(const char *msg)
 {
   systemMessage(IDS_DIRECTX_7_REQUIRED,
@@ -193,15 +211,17 @@ VBA::VBA()
   filterType = FILTER_NONE;
   filterWidth = 0;
   filterHeight = 0;
+  fsAdapter = 0;
   fsWidth = 0;
   fsHeight = 0;
   fsColorDepth = 0;
+  fsFrequency = 0;
   fsForceChange = false;
   surfaceSizeX = 0;
   surfaceSizeY = 0;
   sizeX = 0;
   sizeY = 0;
-  videoOption = VIDEO_3X;
+  videoOption = 0;
   fullScreenStretch = false;
   disableStatusMessage = false;
   showSpeed = 0;
@@ -213,7 +233,7 @@ VBA::VBA()
   display = NULL;
   menu = NULL;
   popup = NULL;
-  cartridgeType = 0;
+  cartridgeType = IMAGE_GBA;
   soundInitialized = false;
   useBiosFile = false;
   skipBiosFile = false;
@@ -223,10 +243,11 @@ VBA::VBA()
   autoSaveLoadCheatList = false;
   winout = NULL;
   removeIntros = false;
-  autoIPS = false;
+  autoIPS = true;
   winGbBorderOn = 0;
   winFlashSize = 0x20000;
   winRtcEnable = false;
+  winGenericflashcardEnable = false;
   winSaveType = 0;
   rewindMemory = NULL;
   rewindPos = 0;
@@ -254,6 +275,10 @@ VBA::VBA()
   d3dFilter = 0;
   glFilter = 0;
   glType = 0;
+  skin = NULL;
+  skinName = "";
+  skinEnabled = false;
+  skinButtons = 0;
   regEnabled = false;
   pauseWhenInactive = true;
   speedupToggle = false;
@@ -272,6 +297,7 @@ VBA::VBA()
   winPauseNextFrame = false;
   soundRecording = false;
   soundRecorder = NULL;
+  dsoundDisableHardwareAcceleration = true;
   sound = NULL;
   aviRecording = false;
   aviRecorder = NULL;
@@ -312,6 +338,15 @@ VBA::VBA()
 VBA::~VBA()
 {
   InterframeCleanup();
+
+  char winBuffer[2048];
+
+  GetModuleFileName(NULL, winBuffer, 2048);
+  char *p = strrchr(winBuffer, '\\');
+  if(p)
+    *p = 0;
+  
+  regInit(winBuffer);
 
   saveSettings();
 
@@ -364,6 +399,10 @@ VBA::~VBA()
 
   shutdownDisplay();
 
+  if(skin) {
+    delete skin;
+  }
+
   if(rewindMemory)
     free(rewindMemory);
 }
@@ -372,7 +411,6 @@ VBA::~VBA()
 // The one and only VBA object
 
 VBA theApp;
-//#include <afxdisp.h>
 /////////////////////////////////////////////////////////////////////////////
 // VBA initialization
 
@@ -429,11 +467,13 @@ static int parseCommandLine(char *cmdline, char **argv)
 
 BOOL VBA::InitInstance()
 {
-  AfxEnableControlContainer();
-  // Standard initialization
-  // If you are not using these features and wish to reduce the size
-  //  of your final executable, you should remove from the following
-  //  the specific initialization routines you do not need.
+#if _MSC_VER < 1400
+#ifdef _AFXDLL
+  Enable3dControls();      // Call this when using MFC in a shared DLL
+#else
+  Enable3dControlsStatic();  // Call this when linking to MFC statically
+#endif
+#endif
 
   SetRegistryKey(_T("VBA"));
 
@@ -529,8 +569,17 @@ BOOL VBA::InitInstance()
 void VBA::adjustDestRect()
 {
   POINT point;
+  RECT skinRect;
+  if(skin)
+    skinRect = skin->GetBlitRect();
+  
   point.x = 0;
   point.y = 0;
+
+  if(skin) {
+    point.x = skinRect.left;
+    point.y = skinRect.top;
+  }
 
   m_pMainWnd->ClientToScreen(&point);
   dest.top = point.y;
@@ -538,6 +587,11 @@ void VBA::adjustDestRect()
 
   point.x = surfaceSizeX;
   point.y = surfaceSizeY;
+
+  if(skin) {
+    point.x = skinRect.right;
+    point.y = skinRect.bottom;
+  }
 
   m_pMainWnd->ClientToScreen(&point);
   dest.bottom = point.y;
@@ -551,6 +605,9 @@ void VBA::adjustDestRect()
     dest.right -= windowPositionX;
   }
 
+  if(skin)
+    return;
+  
   int menuSkip = 0;
   
   if(videoOption >= VIDEO_320x240 && menuToggle) {
@@ -574,6 +631,7 @@ void VBA::adjustDestRect()
     }          
   }
 }
+
 
 void VBA::updateIFB()
 {
@@ -621,7 +679,7 @@ void VBA::updateFilter()
 		systemRedShift = 19;
 		systemGreenShift = 11;
 		systemBlueShift = 3;
-		utilUpdateSystemColorMaps(theApp.filterLCD);
+		utilUpdateSystemColorMaps();
 	}
     // END hacky ugly code
 
@@ -807,7 +865,7 @@ void VBA::updateFilter()
 		systemRedShift = 11;
 		systemGreenShift = 6;
 		systemBlueShift = 0;    
-		utilUpdateSystemColorMaps(theApp.filterLCD);
+		utilUpdateSystemColorMaps();
 	}
 }
 
@@ -829,12 +887,11 @@ void VBA::updateMenuBar()
 
   m_menu.Attach(winResLoadMenu(MAKEINTRESOURCE(IDR_MENU)));
   menu = (HMENU)m_menu;
-  
-  if(m_pMainWnd)
-	  m_pMainWnd->SetMenu(&m_menu);
 
-  if (display)
-	  display->clear();
+  // don't set a menu if skin is active
+  if(skin == NULL)
+    if(m_pMainWnd)
+      m_pMainWnd->SetMenu(&m_menu);
 }
 
 void winlog(const char *msg, ...)
@@ -896,6 +953,9 @@ void systemDrawScreen()
     }
   }
 
+  if (Sm60FPS_CanSkipFrame())
+	  return;
+
   if(theApp.aviRecording && !theApp.painting) {
     int width = 240;
     int height = 160;
@@ -941,19 +1001,18 @@ void systemDrawScreen()
     delete bmp;
   }
 
-  if(theApp.ifbFunction) {
-    if(systemColorDepth == 16)
-      theApp.ifbFunction(pix+theApp.filterWidth*2+4, theApp.filterWidth*2+4,
-                         theApp.filterWidth, theApp.filterHeight);
-    else
-      theApp.ifbFunction(pix+theApp.filterWidth*4+4, theApp.filterWidth*4+4,
-                         theApp.filterWidth, theApp.filterHeight);
+  if( theApp.ifbFunction ) {
+	  theApp.ifbFunction( pix + (theApp.filterWidth * (systemColorDepth>>3)) + 4,
+		  (theApp.filterWidth * (systemColorDepth>>3)) + 4,
+		  theApp.filterWidth, theApp.filterHeight );
   }
   
   if(!soundBufferLow)
 	  theApp.display->render();
   else
 	  soundBufferLow = false;
+
+  Sm60FPS_Sleep();
 }
 
 void systemScreenCapture(int captureNumber)
@@ -964,7 +1023,7 @@ void systemScreenCapture(int captureNumber)
 
 u32 systemGetClock()
 {
-	return GetTickCount();
+  return GetTickCount();
 }
 
 void systemMessage(int number, const char *defaultMsg, ...)
@@ -1021,34 +1080,18 @@ void systemFrame()
 void system10Frames(int rate)
 {
   u32 time = systemGetClock();  
-  if(!theApp.wasPaused && theApp.autoFrameSkip && !theApp.throttle) {
+
+  if (theApp.autoFrameSkip)
+  {
     u32 diff = time - theApp.autoFrameSkipLastTime;
-    int speed = 100;
+	Sm60FPS::nCurSpeed = 100;
 
-    if(diff)
-      speed = (1000000/rate)/diff;
-    
-    if(speed >= 98) {
-      theApp.frameskipadjust++;
-
-      if(theApp.frameskipadjust >= 3) {
-        theApp.frameskipadjust=0;
-        if(systemFrameSkip > 0)
-          systemFrameSkip--;
-      }
-    } else {
-      if(speed  < 80)
-        theApp.frameskipadjust -= (90 - speed)/5;
-      else if(systemFrameSkip < 9)
-        theApp.frameskipadjust--;
-
-      if(theApp.frameskipadjust <= -2) {
-        theApp.frameskipadjust += 2;
-        if(systemFrameSkip < 9)
-          systemFrameSkip++;
-      }
-    }    
+    if (diff)
+		Sm60FPS::nCurSpeed = (1000000/rate)/diff;
   }
+
+
+
   if(!theApp.wasPaused && theApp.throttle) {
     if(!speedup) {
       u32 diff = time - theApp.throttleLastTime;
@@ -1163,7 +1206,7 @@ bool systemPauseOnFrame()
 
 void systemGbBorderOn()
 {
-  if(emulating && theApp.cartridgeType == 1 && gbBorderOn) {
+  if(emulating && theApp.cartridgeType == IMAGE_GB && gbBorderOn) {
     theApp.updateWindowSize(theApp.videoOption);
   }
 }
@@ -1271,8 +1314,8 @@ void VBA::loadSettings()
   autoFrameSkip = regQueryDwordValue("autoFrameSkip", FALSE) ? TRUE : FALSE;
   
   vsync = regQueryDwordValue("vsync", false) ? true : false ;
-  synchronize = regQueryDwordValue("synchronize", TRUE) ? true : false;
-  fullScreenStretch = regQueryDwordValue("stretch", FALSE) ? true : false;
+  synchronize = regQueryDwordValue("synchronize", 1) ? true : false;
+  fullScreenStretch = regQueryDwordValue("stretch", 0) ? true : false;
 
   videoOption = regQueryDwordValue("video", VIDEO_3X);
 
@@ -1292,24 +1335,23 @@ void VBA::loadSettings()
   else
     pVideoDriverGUID = &videoDriverGUID;
 
+  fsAdapter = regQueryDwordValue("fsAdapter", 0);
   fsWidth = regQueryDwordValue("fsWidth", 0);
   fsHeight = regQueryDwordValue("fsHeight", 0);
   fsColorDepth = regQueryDwordValue("fsColorDepth", 0);
   fsFrequency = regQueryDwordValue("fsFrequency", 60);
   fsAdapter = regQueryDwordValue("fsAdapter", 0);
 
-  if(videoOption == VIDEO_OTHER)
-  {
-	  if(fsWidth < 0 || fsWidth > 4095 || fsHeight < 0 || fsHeight > 4095)
-		  videoOption = 0;
-	  if(fsColorDepth != 16 && fsColorDepth != 24 && fsColorDepth != 32)
-		  videoOption = 0;
+  if(videoOption == VIDEO_OTHER) {
+    if(fsWidth < 0 || fsWidth > 4095 || fsHeight < 0 || fsHeight > 4095)
+      videoOption = 0;
+    if(fsColorDepth != 16 && fsColorDepth != 24 && fsColorDepth != 32)
+      videoOption = 0;
   }
 
-  renderMethod = (DISPLAY_TYPE)regQueryDwordValue("renderMethod", DIRECT_3D);
-
+  renderMethod = (DISPLAY_TYPE)regQueryDwordValue("renderMethod", DIRECT_DRAW);
   if(renderMethod < GDI || renderMethod > OPENGL)
-    renderMethod = DIRECT_3D;
+    renderMethod = DIRECT_DRAW;
   
   windowPositionX = regQueryDwordValue("windowX", 0);
   if(windowPositionX < 0)
@@ -1352,15 +1394,17 @@ void VBA::loadSettings()
     soundInterpolation = 0;
 
   ddrawEmulationOnly = regQueryDwordValue("ddrawEmulationOnly", false) ? true : false;
-  ddrawUseVideoMemory = regQueryDwordValue("ddrawUseVideoMemory", false) ? true : false;
-  tripleBuffering = regQueryDwordValue("tripleBuffering", true) ? true : false;
+  ddrawUseVideoMemory = regQueryDwordValue("ddrawUseVideoMemory", true) ? true : false;
+  tripleBuffering = regQueryDwordValue("tripleBuffering", false) ? true : false;
 
-  d3dFilter = regQueryDwordValue("d3dFilter", 0);
+  d3dFilter = regQueryDwordValue("d3dFilter", 1);
   if(d3dFilter < 0 || d3dFilter > 1)
-    d3dFilter = 0;
-  glFilter = regQueryDwordValue("glFilter", 0);
+    d3dFilter = 1;
+
+  glFilter = regQueryDwordValue("glFilter", 1);
   if(glFilter < 0 || glFilter > 1)
-    glFilter = 0;
+    glFilter = 1;
+
   glType = regQueryDwordValue("glType", 0);
   if(glType < 0 || glType > 1)
     glType = 0;
@@ -1369,7 +1413,7 @@ void VBA::loadSettings()
   if(filterType < 0 || filterType > 16)
     filterType = 0;
 
-  disableMMX = regQueryDwordValue("disableMMX", 0) ? true: false;
+  disableMMX = regQueryDwordValue("disableMMX", false) ? true: false;
 
   disableStatusMessage = regQueryDwordValue("disableStatus", 0) ? true : false;
 
@@ -1399,7 +1443,7 @@ void VBA::loadSettings()
 
   recentFreeze = regQueryDwordValue("recentFreeze", false) ? true : false;
 
-  autoIPS = regQueryDwordValue("autoIPS", false) ? true : false;
+  autoIPS = regQueryDwordValue("autoIPS", true) ? true : false;
 
   cpuDisableSfx = regQueryDwordValue("disableSfx", 0) ? true : false;
   
@@ -1407,23 +1451,25 @@ void VBA::loadSettings()
   if(winSaveType < 0 || winSaveType > 5)
     winSaveType = 0;
   
-  cpuEnhancedDetection = regQueryDwordValue("enhancedDetection", 1) ? true :
-    false;
-
   ifbType = regQueryDwordValue("ifbType", 0);
   if(ifbType < 0 || ifbType > 2)
     ifbType = 0;
 
-  winFlashSize = regQueryDwordValue("flashSize", 0x20000);
+  winFlashSize = regQueryDwordValue("flashSize", 0x10000);
   if(winFlashSize != 0x10000 && winFlashSize != 0x20000)
-    winFlashSize = 0x20000;
+    winFlashSize = 0x10000;
+  flashSize = winFlashSize;
 
   agbPrintEnable(regQueryDwordValue("agbPrint", 0) ? true : false);
 
-  winRtcEnable = regQueryDwordValue("rtcEnabled", 1) ? true : false;
+  winRtcEnable = regQueryDwordValue("rtcEnabled", 0) ? true : false;
   rtcEnable(winRtcEnable);
 
   autoHideMenu = regQueryDwordValue("autoHideMenu", 0) ? true : false;
+
+  skinEnabled = regQueryDwordValue("skinEnabled", 0) ? true : false;
+
+  skinName = regQueryStringValue("skinName", "");
 
   switch(videoOption) {
   case VIDEO_320x240:
@@ -1460,9 +1506,9 @@ void VBA::loadSettings()
 
   winGbBorderOn = regQueryDwordValue("borderOn", 0);
   gbBorderAutomatic = regQueryDwordValue("borderAutomatic", 0);
-  gbEmulatorType = regQueryDwordValue("emulatorType", 4);
+  gbEmulatorType = regQueryDwordValue("emulatorType", 1);
   if(gbEmulatorType < 0 || gbEmulatorType > 5)
-    gbEmulatorType = 4;
+    gbEmulatorType = 1;
   gbColorOption = regQueryDwordValue("colorOption", 0);
 
   threadPriority = regQueryDwordValue("priority", 2);
@@ -1525,6 +1571,14 @@ void VBA::loadSettings()
   adapter = regQueryDwordValue("RFU", false) ? true : false;
 	
   lanlink.active = regQueryDwordValue("LAN", 0) ? true : false;
+  if (autoFrameSkip)
+  {
+	  throttle = 0;
+	  frameSkip = 0;
+	  systemFrameSkip = 0;
+  }
+
+  Sm60FPS::bSaveMoreCPU = regQueryDwordValue("saveMoreCPU", 0);
 }
 
 void VBA::updateFrameSkip()
@@ -1591,9 +1645,6 @@ void VBA::updateVideoSize(UINT id)
     break;
   }
 
-  if(videoOption == value && value != VIDEO_OTHER)
-    return;
-
   updateWindowSize(value);
 }
 
@@ -1604,15 +1655,18 @@ static void winCheckMenuBarInfo(int& winSizeX, int& winSizeY)
   HINSTANCE hinstDll;
   DWORD dwVersion = 0;
   
-  hinstDll = LoadLibrary("USER32.DLL");
+#ifdef _AFXDLL
+  hinstDll = AfxLoadLibrary("user32.dll");
+#else
+  hinstDll = LoadLibrary( _T("user32.dll") );
+#endif
   
   if(hinstDll) {
-    GETMENUBARINFO func = (GETMENUBARINFO)GetProcAddress(hinstDll,
-                                                         "GetMenuBarInfo");
+	  GETMENUBARINFO func = (GETMENUBARINFO)GetProcAddress(hinstDll, "GetMenuBarInfo");
 
     if(func) {
       MENUBARINFO info;
-      info.cbSize = sizeof(info);
+      info.cbSize = sizeof(MENUBARINFO);
       
       func(AfxGetMainWnd()->GetSafeHwnd(), OBJID_MENU, 0, &info);
       
@@ -1629,7 +1683,11 @@ static void winCheckMenuBarInfo(int& winSizeX, int& winSizeY)
                                         SWP_NOMOVE | SWP_SHOWWINDOW);
       }
     }
-    FreeLibrary(hinstDll);
+#ifdef _AFXDLL
+    AfxFreeLibrary( hinstDll );
+#else
+    FreeLibrary( hinstDll );
+#endif
   }
 }
 
@@ -1693,7 +1751,7 @@ void VBA::updateWindowSize(int value)
 
   videoOption = value;
   
-  if(cartridgeType == 1) {
+  if(cartridgeType == IMAGE_GB) {
     if(gbBorderOn) {
       sizeX = 256;
       sizeY = 224;
@@ -1736,22 +1794,22 @@ void VBA::updateWindowSize(int value)
   case VIDEO_1280x1024:
   case VIDEO_OTHER:
     {
-      float scaleX = 1;
-      float scaleY = 1;
-      scaleX = ((float)fsWidth / sizeX);
-      scaleY = ((float)fsHeight / sizeY);
-      float min = scaleX < scaleY ? scaleX : scaleY;
+      int scaleX = 1;
+      int scaleY = 1;
+      scaleX = (fsWidth / sizeX);
+      scaleY = (fsHeight / sizeY);
+      int min = scaleX < scaleY ? scaleX : scaleY;
       if(fsMaxScale)
         min = min > fsMaxScale ? fsMaxScale : min;
-      surfaceSizeX = (int)(min * sizeX);
-      surfaceSizeY = (int)(min * sizeY);
-	  
-	  if(fullScreenStretch)
-	  {
-		  surfaceSizeX = fsWidth;
-		  surfaceSizeY = fsHeight;
-	  }
-	}
+      surfaceSizeX = min * sizeX;
+      surfaceSizeY = min * sizeY;
+      if((fullScreenStretch && (display != NULL && 
+                                (display->getType() != DIRECT_3D)))
+         || (display != NULL && display->getType() >= DIRECT_3D)) {
+        surfaceSizeX = fsWidth;
+        surfaceSizeY = fsHeight;
+      }
+    }
     break;
   }
 
@@ -1777,6 +1835,7 @@ void VBA::updateWindowSize(int value)
     winSizeX = dest.right-dest.left;
     winSizeY = dest.bottom-dest.top;
 
+    if(skin == NULL) {
       m_pMainWnd->SetWindowPos(0, //HWND_TOPMOST,
                                windowPositionX,
                                windowPositionY,
@@ -1785,12 +1844,16 @@ void VBA::updateWindowSize(int value)
                                SWP_NOMOVE | SWP_SHOWWINDOW);
 
       winCheckMenuBarInfo(winSizeX, winSizeY);
+    }
   }
 
   adjustDestRect();
 
   updateIFB();  
   updateFilter();
+  
+  if(display)
+    display->resize(theApp.dest.right-theApp.dest.left, theApp.dest.bottom-theApp.dest.top);
   
   m_pMainWnd->RedrawWindow(NULL,NULL,RDW_INVALIDATE|RDW_ERASE|RDW_ALLCHILDREN);  
 }
@@ -1802,25 +1865,36 @@ bool VBA::initDisplay()
 
 bool VBA::updateRenderMethod(bool force)
 {
-  bool res = updateRenderMethod0(force);
-  
-  while(!res && renderMethod > 0) {
-    if(renderMethod == OPENGL)
-      renderMethod = DIRECT_3D;
-    else if(renderMethod == DIRECT_3D)
-      renderMethod = DIRECT_DRAW;
-    else if(renderMethod == DIRECT_DRAW) {
-      if(videoOption > VIDEO_4X) {
-        videoOption = VIDEO_2X;
-        force = true;
-      } else
-        renderMethod = GDI;
-    }
-                                    
-    res = updateRenderMethod(force);
-  }
-  return res;  
+	Sm60FPS_Init();
+	bool res = updateRenderMethod0(force);
+
+	while(!res && renderMethod > 0) {
+		if( fsAdapter > 0 ) {
+			fsAdapter = 0;
+		} else {
+			if( videoOption > VIDEO_4X ) {
+				videoOption = VIDEO_1X;
+				force = true;
+			} else {
+				if(renderMethod == OPENGL) {
+					renderMethod = DIRECT_3D;
+				} else {
+					if(renderMethod == DIRECT_3D) {
+						renderMethod = DIRECT_DRAW;
+					} else {
+						if(renderMethod == DIRECT_DRAW) {
+							renderMethod = GDI;
+						}
+					}
+				}
+			}
+		}
+		res = updateRenderMethod(force);
+	}
+
+	return res;
 }
+
 
 bool VBA::updateRenderMethod0(bool force)
 {
@@ -1829,6 +1903,10 @@ bool VBA::updateRenderMethod0(bool force)
   
   if(display) {
     if(display->getType() != renderMethod || force) {
+      if(skin) {
+        delete skin;
+        skin = NULL;
+      }
       initInput = true;
       changingVideoSize = true;
       shutdownDisplay();
@@ -1850,20 +1928,23 @@ bool VBA::updateRenderMethod0(bool force)
   if(display == NULL) {
     switch(renderMethod) {
     case GDI:
-      display = newGDIDisplay();
-      break;
+		display = newGDIDisplay();
+		break;
     case DIRECT_DRAW:
-      display = newDirectDrawDisplay();
-      break;
+		pVideoDriverGUID = NULL;
+		ZeroMemory( &videoDriverGUID, sizeof( GUID ) );
+		display = newDirectDrawDisplay();
+		break;
     case DIRECT_3D:
-      display = newDirect3DDisplay();
-      break;
-    case OPENGL:
-      display = newOpenGLDisplay();
-      break;
+		display = newDirect3DDisplay();
+		break;
+	case OPENGL:
+		display = newOpenGLDisplay();
+		break;
     }
     
     if(display->initialize()) {
+      winUpdateSkin();
       if(initInput) {
         if(!this->initInput()) {
           changingVideoSize = false;
@@ -1890,13 +1971,16 @@ bool VBA::updateRenderMethod0(bool force)
   return true;
 }
 
+
 void VBA::winCheckFullscreen()
 {
-  if(videoOption > VIDEO_4X && tripleBuffering) {
-    if(display)
-      display->checkFullScreen();
-  }
+	if(videoOption > VIDEO_4X && tripleBuffering) {
+		if(display) {
+			display->checkFullScreen();
+		}
+	}
 }
+
 
 void VBA::shutdownDisplay()
 {
@@ -1912,6 +1996,33 @@ void VBA::directXMessage(const char *msg)
   systemMessage(IDS_DIRECTX_7_REQUIRED,
                 "DirectX 7.0 or greater is required to run.\nDownload at http://www.microsoft.com/directx.\n\nError found at: %s",
                 msg);
+}
+
+void VBA::winUpdateSkin()
+{
+#ifndef NOSKINS
+  skinButtons = 0;
+  if(skin) {
+    delete skin;
+    skin = NULL;
+  }
+  
+  if(!skinName.IsEmpty() && skinEnabled && display->isSkinSupported()) {
+    skin = new CSkin();
+    if(skin->Initialize(skinName)) {
+      skin->Hook(m_pMainWnd);
+      skin->Enable(true);
+    } else {
+      delete skin;
+      skin = NULL;
+    }
+  }
+
+  if(!skin) {
+    adjustDestRect();
+    updateMenuBar();
+  }
+#endif
 }
 
 void VBA::updatePriority()
@@ -1999,7 +2110,11 @@ void VBA::winSetLanguageOption(int option, bool force)
         }
         AfxSetResourceHandle(l);
         if(languageModule != NULL)
-          FreeLibrary(languageModule);
+#ifdef _AFXDLL
+          AfxFreeLibrary( languageModule );
+#else
+          FreeLibrary( languageModule );
+#endif
         languageModule = l;
       } else {
         systemMessage(IDS_FAILED_TO_GET_LOCINFO,
@@ -2010,7 +2125,11 @@ void VBA::winSetLanguageOption(int option, bool force)
     break;
   case 1:
     if(languageModule != NULL)
-      FreeLibrary(languageModule);
+#ifdef _AFXDLL
+      AfxFreeLibrary( languageModule );
+#else
+      FreeLibrary( languageModule );
+#endif
     languageModule = NULL;
     AfxSetResourceHandle(AfxGetInstanceHandle());
     break;
@@ -2028,7 +2147,13 @@ void VBA::winSetLanguageOption(int option, bool force)
           }
           AfxSetResourceHandle(l);
           if(languageModule != NULL)
-            FreeLibrary(languageModule);
+		  {
+#ifdef _AFXDLL
+            AfxFreeLibrary( languageModule );
+#else
+            FreeLibrary( languageModule );
+#endif
+		  }
           languageModule = l;
         }
       } else {
@@ -2057,9 +2182,13 @@ HINSTANCE VBA::winLoadLanguage(const char *name)
 {
   CString buffer;
   
-  buffer.Format("vba_%s.dll", name);
+  buffer.Format( _T("vba_%s.dll"), name);
 
-  HINSTANCE l = LoadLibrary(buffer);
+#ifdef _AFXDLL
+  HINSTANCE l = AfxLoadLibrary( buffer );
+#else
+  HMODULE l = LoadLibrary( buffer );
+#endif
   
   if(l == NULL) {
     if(strlen(name) == 3) {
@@ -2069,7 +2198,11 @@ HINSTANCE VBA::winLoadLanguage(const char *name)
       buffer2[2] = 0;
       buffer.Format("vba_%s.dll", buffer2);
 
-      return LoadLibrary(buffer);
+#ifdef _AFXDLL
+	  return AfxLoadLibrary( buffer );
+#else
+	  return LoadLibrary( buffer );
+#endif
     }
   }
   return l;
@@ -2168,11 +2301,11 @@ void VBA::saveSettings()
   }
 
 
+  regSetDwordValue("fsAdapter", fsAdapter);
   regSetDwordValue("fsWidth", fsWidth);
   regSetDwordValue("fsHeight", fsHeight);
   regSetDwordValue("fsColorDepth", fsColorDepth);
   regSetDwordValue("fsFrequency", fsFrequency);
-  regSetDwordValue("fsAdapter", fsAdapter);
 
   regSetDwordValue("renderMethod", renderMethod);
 
@@ -2240,8 +2373,6 @@ void VBA::saveSettings()
   
   regSetDwordValue("saveType", winSaveType);
   
-  regSetDwordValue("enhancedDetection", cpuEnhancedDetection);
-
   regSetDwordValue("ifbType", ifbType);
 
   regSetDwordValue("flashSize", winFlashSize);
@@ -2251,6 +2382,10 @@ void VBA::saveSettings()
   regSetDwordValue("rtcEnabled", winRtcEnable);
 
   regSetDwordValue("autoHideMenu", autoHideMenu);
+
+  regSetDwordValue("skinEnabled", skinEnabled);
+
+  regSetStringValue("skinName", skinName);
 
   regSetDwordValue("borderOn", winGbBorderOn);
   regSetDwordValue("borderAutomatic", gbBorderAutomatic);
@@ -2280,7 +2415,7 @@ void VBA::saveSettings()
   regSetDwordValue("fsMaxScale", fsMaxScale);
   regSetDwordValue("throttle", throttle);
   
-  
+  regSetDwordValue("saveMoreCPU", Sm60FPS::bSaveMoreCPU);
   regSetDwordValue("LinkTimeout", linktimeout);
   regSetDwordValue("Linklog", linklog);
   regSetDwordValue("RFU", adapter);
@@ -2310,4 +2445,74 @@ void winOutput(char *s, u32 addr)
     }
     toolsLog(str);
   }  
+}
+
+
+void Sm60FPS_Init()
+{
+	Sm60FPS::dwTimeElapse = 0;
+	Sm60FPS::fWantFPS = 60.f;
+	Sm60FPS::fCurFPS = 0.f;
+	Sm60FPS::nFrameCnt = 0;
+	Sm60FPS::bLastSkip = false;
+	Sm60FPS::nCurSpeed = 100;
+}
+
+
+bool Sm60FPS_CanSkipFrame()
+{
+  if( theApp.autoFrameSkip ) {
+	  if( Sm60FPS::nFrameCnt == 0 ) {
+		  Sm60FPS::nFrameCnt = 0;
+		  Sm60FPS::dwTimeElapse = 0;
+		  Sm60FPS::dwTime0 = timeGetTime();
+	  } else {
+		  if( Sm60FPS::nFrameCnt >= 10 ) {
+			  Sm60FPS::nFrameCnt = 0;
+			  Sm60FPS::dwTimeElapse = 0;
+
+			  if( Sm60FPS::nCurSpeed > Sm60FPS::K_fCpuSpeed ) {
+				  Sm60FPS::fWantFPS += 1;
+				  if( Sm60FPS::fWantFPS > Sm60FPS::K_fTargetFps ){
+					  Sm60FPS::fWantFPS = Sm60FPS::K_fTargetFps;
+				  }
+			  } else {
+				  if( Sm60FPS::nCurSpeed < (Sm60FPS::K_fCpuSpeed - 5) ) {
+					  Sm60FPS::fWantFPS -= 1;
+					  if( Sm60FPS::fWantFPS < 30.f ) {
+						  Sm60FPS::fWantFPS = 30.f;
+					  }
+				  }
+			  }
+		  } else { // between frame 1-10
+			  Sm60FPS::dwTime1 = timeGetTime();
+			  Sm60FPS::dwTimeElapse += (Sm60FPS::dwTime1 - Sm60FPS::dwTime0);
+			  Sm60FPS::dwTime0 = Sm60FPS::dwTime1;
+			  if( !Sm60FPS::bLastSkip &&
+				  ( (Sm60FPS::fWantFPS < Sm60FPS::K_fTargetFps) || Sm60FPS::bSaveMoreCPU) ) {
+					  Sm60FPS::fCurFPS = (float)Sm60FPS::nFrameCnt * 1000 / Sm60FPS::dwTimeElapse;
+					  if( (Sm60FPS::fCurFPS < Sm60FPS::K_fTargetFps) || Sm60FPS::bSaveMoreCPU ) {
+						  Sm60FPS::bLastSkip = true;
+						  Sm60FPS::nFrameCnt++;
+						  return true;
+					  }
+			  }
+		  }
+	  }
+	  Sm60FPS::bLastSkip = false;
+	  Sm60FPS::nFrameCnt++;
+  }	
+  return false;
+}
+
+
+void Sm60FPS_Sleep()
+{
+	if( theApp.autoFrameSkip ) {
+		u32 dwTimePass = Sm60FPS::dwTimeElapse + (timeGetTime() - Sm60FPS::dwTime0);
+		u32 dwTimeShould = (u32)(Sm60FPS::nFrameCnt * Sm60FPS::K_fDT);
+		if( dwTimeShould > dwTimePass ) {
+			Sleep(dwTimeShould - dwTimePass);
+		}
+	}
 }

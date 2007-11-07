@@ -1,7 +1,7 @@
 // -*- C++ -*-
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,18 +23,26 @@
 #include "System.h"
 #include "Port.h"
 #include "RTC.h"
-#include "Sound.h"
 
 extern bool cpuSramEnabled;
 extern bool cpuFlashEnabled;
 extern bool cpuEEPROMEnabled;
 extern bool cpuEEPROMSensorEnabled;
 extern bool cpuDmaHack;
-extern bool cpuDmaHack2;
 extern u32 cpuDmaLast;
-
-extern int lspeed;
-extern void LinkSStop(void);
+extern bool timer0On;
+extern int timer0Ticks;
+extern int timer0ClockReload;
+extern bool timer1On;
+extern int timer1Ticks;
+extern int timer1ClockReload;
+extern bool timer2On;
+extern int timer2Ticks;
+extern int timer2ClockReload;
+extern bool timer3On;
+extern int timer3Ticks;
+extern int timer3ClockReload;
+extern int cpuTotalTicks;
 
 #define CPUReadByteQuick(addr) \
   map[(addr)>>24].address[(addr) & map[(addr)>>24].mask]
@@ -45,7 +53,7 @@ extern void LinkSStop(void);
 #define CPUReadMemoryQuick(addr) \
   READ32LE(((u32*)&map[(addr)>>24].address[(addr) & map[(addr)>>24].mask]))
 
-inline u32 CPUReadMemory(u32 address)
+static inline u32 CPUReadMemory(u32 address)
 {
 
 #ifdef DEV_VERSION
@@ -82,20 +90,26 @@ inline u32 CPUReadMemory(u32 address)
     value = READ32LE(((u32 *)&internalRAM[address & 0x7ffC]));
     break;
   case 4:
-    	  if((address>=0x4000120||address<=0x4000126)&&lspeed)
-		  LinkSStop();
     if((address < 0x4000400) && ioReadable[address & 0x3fc]) {
       if(ioReadable[(address & 0x3fc) + 2])
-        value = soundRead32(address & 0x3fC);
+        value = READ32LE(((u32 *)&ioMem[address & 0x3fC]));
       else
-        value = soundRead16(address & 0x3fc);
+        value = READ16LE(((u16 *)&ioMem[address & 0x3fc]));
     } else goto unreadable;
     break;
   case 5:
     value = READ32LE(((u32 *)&paletteRAM[address & 0x3fC]));
     break;
   case 6:
-    value = READ32LE(((u32 *)&vram[address & 0x1fffc]));
+    address = (address & 0x1fffc);
+    if (((DISPCNT & 7) >2) && ((address & 0x1C000) == 0x18000))
+    {
+        value = 0;
+        break;
+    }
+    if ((address & 0x18000) == 0x18000)
+      address &= 0x17fff;
+    value = READ32LE(((u32 *)&vram[address]));
     break;
   case 7:
     value = READ32LE(((u32 *)&oam[address & 0x3FC]));
@@ -126,7 +140,7 @@ inline u32 CPUReadMemory(u32 address)
     }
 #endif
 
-    if(cpuDmaHack || cpuDmaHack2) {
+    if(cpuDmaHack) {
       value = cpuDmaLast;
     } else {
       if(armState) {
@@ -164,7 +178,7 @@ inline u32 CPUReadMemory(u32 address)
 
 extern u32 myROM[];
 
-inline u32 CPUReadHalfWord(u32 address)
+static inline u32 CPUReadHalfWord(u32 address)
 {
 #ifdef DEV_VERSION      
   if(address & 1) {
@@ -199,17 +213,39 @@ inline u32 CPUReadHalfWord(u32 address)
     value = READ16LE(((u16 *)&internalRAM[address & 0x7ffe]));
     break;
   case 4:
-if((address>=0x4000120||address<=0x4000126)&&lspeed)
-	  LinkSStop();
     if((address < 0x4000400) && ioReadable[address & 0x3fe])
+    {
       value =  READ16LE(((u16 *)&ioMem[address & 0x3fe]));
+      if (((address & 0x3fe)>0xFF) && ((address & 0x3fe)<0x10E))
+      {
+        if (((address & 0x3fe) == 0x100) && timer0On)
+          value = 0xFFFF - ((timer0Ticks-cpuTotalTicks) >> timer0ClockReload);
+        else
+        if (((address & 0x3fe) == 0x104) && timer1On && !(TM1CNT & 4))
+          value = 0xFFFF - ((timer1Ticks-cpuTotalTicks) >> timer1ClockReload);
+        else
+        if (((address & 0x3fe) == 0x108) && timer2On && !(TM2CNT & 4))
+          value = 0xFFFF - ((timer2Ticks-cpuTotalTicks) >> timer2ClockReload);
+        else
+        if (((address & 0x3fe) == 0x10C) && timer3On && !(TM3CNT & 4))
+          value = 0xFFFF - ((timer3Ticks-cpuTotalTicks) >> timer3ClockReload);
+      }
+    }
     else goto unreadable;
     break;
   case 5:
     value = READ16LE(((u16 *)&paletteRAM[address & 0x3fe]));
     break;
   case 6:
-    value = READ16LE(((u16 *)&vram[address & 0x1fffe]));
+    address = (address & 0x1fffe);
+    if (((DISPCNT & 7) >2) && ((address & 0x1C000) == 0x18000))
+    {
+        value = 0;
+        break;
+    }
+    if ((address & 0x18000) == 0x18000)
+      address &= 0x17fff;
+    value = READ16LE(((u16 *)&vram[address]));
     break;
   case 7:
     value = READ16LE(((u16 *)&oam[address & 0x3fe]));
@@ -242,7 +278,7 @@ if((address>=0x4000120||address<=0x4000126)&&lspeed)
           armNextPC - 4 : armNextPC - 2);
     }
 #endif
-    if(cpuDmaHack2 || cpuDmaHack) {
+    if(cpuDmaHack) {
       value = cpuDmaLast & 0xFFFF;
     } else {
       if(armState) {
@@ -261,7 +297,7 @@ if((address>=0x4000120||address<=0x4000126)&&lspeed)
   return value;
 }
 
-inline u16 CPUReadHalfWordSigned(u32 address)
+static inline u16 CPUReadHalfWordSigned(u32 address)
 {
   u16 value = CPUReadHalfWord(address);
   if((address & 1))
@@ -269,7 +305,7 @@ inline u16 CPUReadHalfWordSigned(u32 address)
   return value;
 }
 
-inline u8 CPUReadByte(u32 address)
+static inline u8 CPUReadByte(u32 address)
 {
   switch(address >> 24) {
   case 0:
@@ -290,15 +326,18 @@ inline u8 CPUReadByte(u32 address)
   case 3:
     return internalRAM[address & 0x7fff];
   case 4:
-   if((address>=0x4000120||address<=0x4000126)&&lspeed)
-	  LinkSStop();
     if((address < 0x4000400) && ioReadable[address & 0x3ff])
-      return soundRead(address & 0x3ff);
+      return ioMem[address & 0x3ff];
     else goto unreadable;
   case 5:
     return paletteRAM[address & 0x3ff];
   case 6:
-    return vram[address & 0x1ffff];
+    address = (address & 0x1ffff);
+    if (((DISPCNT & 7) >2) && ((address & 0x1C000) == 0x18000))
+        return 0;
+    if ((address & 0x18000) == 0x18000)
+      address &= 0x17fff;
+    return vram[address];
   case 7:
     return oam[address & 0x3ff];
   case 8:
@@ -335,7 +374,7 @@ inline u8 CPUReadByte(u32 address)
           armNextPC - 4 : armNextPC - 2);
     }
 #endif
-    if(cpuDmaHack || cpuDmaHack2) {
+    if(cpuDmaHack) {
       return cpuDmaLast & 0xFF;
     } else {
       if(armState) {
@@ -348,12 +387,13 @@ inline u8 CPUReadByte(u32 address)
   }
 }
 
-inline void CPUWriteMemory(u32 address, u32 value)
+static inline void CPUWriteMemory(u32 address, u32 value)
 {
+
 #ifdef DEV_VERSION
   if(address & 3) {
     if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
-      log("Unaliagned word write: %08x to %08x from %08x\n",
+      log("Unaligned word write: %08x to %08x from %08x\n",
           value,
           address,
           armMode ? armNextPC - 4 : armNextPC - 2);
@@ -363,7 +403,7 @@ inline void CPUWriteMemory(u32 address, u32 value)
   
   switch(address >> 24) {
   case 0x02:
-#ifdef SDL
+#ifdef BKPT_SUPPORT
     if(*((u32 *)&freezeWorkRAM[address & 0x3FFFC]))
       cheatsWriteMemory(address & 0x203FFFC,
                         value);
@@ -372,7 +412,7 @@ inline void CPUWriteMemory(u32 address, u32 value)
       WRITE32LE(((u32 *)&workRAM[address & 0x3FFFC]), value);
     break;
   case 0x03:
-#ifdef SDL
+#ifdef BKPT_SUPPORT
     if(*((u32 *)&freezeInternalRAM[address & 0x7ffc]))
       cheatsWriteMemory(address & 0x3007FFC,
                         value);
@@ -387,15 +427,36 @@ inline void CPUWriteMemory(u32 address, u32 value)
     } else goto unwritable;
     break;
   case 0x05:
+#ifdef BKPT_SUPPORT
+    if(*((u32 *)&freezePRAM[address & 0x3fc]))
+      cheatsWriteMemory(address & 0x70003FC,
+                        value);
+    else
+#endif
     WRITE32LE(((u32 *)&paletteRAM[address & 0x3FC]), value);
     break;
   case 0x06:
-    if(address & 0x10000)
-      WRITE32LE(((u32 *)&vram[address & 0x17ffc]), value);
+    address = (address & 0x1fffc);
+    if (((DISPCNT & 7) >2) && ((address & 0x1C000) == 0x18000))
+        return;
+    if ((address & 0x18000) == 0x18000)
+      address &= 0x17fff;
+
+#ifdef BKPT_SUPPORT
+    if(*((u32 *)&freezeVRAM[address]))
+      cheatsWriteMemory(address + 0x06000000, value);
     else
-      WRITE32LE(((u32 *)&vram[address & 0x1fffc]), value);
+#endif
+    
+    WRITE32LE(((u32 *)&vram[address]), value);
     break;
   case 0x07:
+#ifdef BKPT_SUPPORT
+    if(*((u32 *)&freezeOAM[address & 0x3fc]))
+      cheatsWriteMemory(address & 0x70003FC,
+                        value);
+    else
+#endif
     WRITE32LE(((u32 *)&oam[address & 0x3fc]), value);
     break;
   case 0x0D:

@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@
 #include "../System.h"
 #include "../GBA.h"
 #include "../Globals.h"
-#include "../Sound.h"
 
 #include "IOViewerRegs.h"
 
@@ -68,6 +67,22 @@ BEGIN_MESSAGE_MAP(IOViewer, CDialog)
   ON_BN_CLICKED(IDC_AUTO_UPDATE, OnAutoUpdate)
   ON_CBN_SELCHANGE(IDC_ADDRESSES, OnSelchangeAddresses)
 	ON_BN_CLICKED(IDC_APPLY, OnApply)
+  ON_BN_CLICKED(IDC_BIT_0, bitChange)
+  ON_BN_CLICKED(IDC_BIT_1, bitChange)
+  ON_BN_CLICKED(IDC_BIT_2, bitChange)
+  ON_BN_CLICKED(IDC_BIT_3, bitChange)
+  ON_BN_CLICKED(IDC_BIT_4, bitChange)
+  ON_BN_CLICKED(IDC_BIT_5, bitChange)
+  ON_BN_CLICKED(IDC_BIT_6, bitChange)
+  ON_BN_CLICKED(IDC_BIT_7, bitChange)
+  ON_BN_CLICKED(IDC_BIT_8, bitChange)
+  ON_BN_CLICKED(IDC_BIT_9, bitChange)
+  ON_BN_CLICKED(IDC_BIT_10, bitChange)
+  ON_BN_CLICKED(IDC_BIT_11, bitChange)
+  ON_BN_CLICKED(IDC_BIT_12, bitChange)
+  ON_BN_CLICKED(IDC_BIT_13, bitChange)
+  ON_BN_CLICKED(IDC_BIT_14, bitChange)
+  ON_BN_CLICKED(IDC_BIT_15, bitChange)
 	//}}AFX_MSG_MAP
   END_MESSAGE_MAP()
 
@@ -81,10 +96,29 @@ void IOViewer::OnClose()
   DestroyWindow();
 }
 
+void IOViewer::bitChange() 
+{
+  CString buffer;
+  u16 data = 0;
+
+  for(int i = 0; i < 16; i++) {
+    CButton *pWnd = (CButton *)GetDlgItem(IDC_BIT_0 + i);
+	  
+    if(pWnd) {
+      if(pWnd->GetCheck())
+        data |= (1 << i);
+    }
+  }
+
+  buffer.Format("%04X", data);
+  m_value.SetWindowText(buffer);
+}
+
 void IOViewer::OnRefresh() 
 {
   // TODO: Add your control notification handler code here
-  
+
+  update();  
 }
 
 void IOViewer::OnAutoUpdate() 
@@ -165,7 +199,7 @@ void IOViewer::update()
 
   const IOData *sel = &ioViewRegisters[selected];
   u16 data = sel->address ? *sel->address : 
-    (ioMem ? soundRead16(sel->offset) : 0);
+    (ioMem ? *((u16 *)&ioMem[sel->offset]) : 0);
 
   for(int i = 0; i < 16; i++) {
     CButton *pWnd = (CButton *)GetDlgItem(IDC_BIT_0 + i);
@@ -187,6 +221,8 @@ void IOViewer::update()
 
 void IOViewer::OnApply() 
 {
+  if(rom != NULL)
+  {
   const IOData *sel = &ioViewRegisters[selected];
   u16 res = 0;
   for(int i = 0; i < 16; i++) {
@@ -199,4 +235,5 @@ void IOViewer::OnApply()
   }
   CPUWriteHalfWord(0x4000000+sel->offset, res);
   update();
+  }
 }

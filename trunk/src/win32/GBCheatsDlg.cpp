@@ -637,7 +637,7 @@ bool AddGBCheat::addCheat()
 
   m_desc.GetWindowText(buffer);
 
-  int bank = (address >> 16);
+  LONG_PTR bank = (address >> 16);
   address &= 0xFFFF;
 
   if(address >= 0xd000)
@@ -689,9 +689,7 @@ BOOL AddGBCheat::OnInitDialog()
   buffer.Format("%02x:%08x", (address>>16), address&0xFFFF);
   m_address.SetWindowText(buffer);
   m_address.EnableWindow(FALSE);
-  ::SetWindowLong(m_address,
-                  GWL_USERDATA,
-                  address);
+  ::SetWindowLongPtr( m_address.GetSafeHwnd(), GWLP_USERDATA, address);
   
   numberType = regQueryDwordValue("gbCheatsNumberType", 2);
   if(numberType < 0 || numberType > 2)
@@ -826,9 +824,9 @@ void GBCheatList::OnEnable()
     item.iItem = mark;
     if(m_list.GetItem(&item)) {
       if(gbCheatList[item.lParam].enabled)
-        gbCheatDisable(item.lParam);
+        gbCheatDisable((int)item.lParam);
       else
-        gbCheatEnable(item.lParam);
+        gbCheatEnable((int)item.lParam);
       refresh();
     }       
   }
@@ -844,7 +842,7 @@ void GBCheatList::OnRemove()
     item.mask = LVIF_PARAM;
     item.iItem = mark;
     if(m_list.GetItem(&item)) {
-      gbCheatRemove(item.lParam);
+      gbCheatRemove((int)item.lParam);
       refresh();
     }       
   }
@@ -872,9 +870,9 @@ void GBCheatList::OnItemchangedCheatList(NMHDR* pNMHDR, LRESULT* pResult)
       if(((l->uOldState & LVIS_STATEIMAGEMASK)>>12) !=
          (((l->uNewState & LVIS_STATEIMAGEMASK)>>12))) {
         if(m_list.GetCheck(l->iItem))
-          gbCheatEnable(l->lParam);
+          gbCheatEnable((int)l->lParam);
         else
-          gbCheatDisable(l->lParam);
+          gbCheatDisable((int)l->lParam);
         refresh();
       }
     }

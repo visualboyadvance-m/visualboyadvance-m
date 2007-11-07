@@ -765,16 +765,16 @@ void GBACheatList::OnEnable()
   if(mark != -1) {
     LVITEM item;
     for(int i = 0; i < count; i++) {
-      memset(&item,0, sizeof(item));
+      memset(&item, 0, sizeof(item));
       item.mask = LVIF_PARAM|LVIF_STATE;
       item.stateMask = LVIS_SELECTED;
       item.iItem = i;
       if(m_list.GetItem(&item)) {
         if(item.state & LVIS_SELECTED) {
           if(cheatsList[item.lParam].enabled)
-            cheatsDisable(item.lParam);
+            cheatsDisable((int)(item.lParam & 0xFFFFFFFF));
           else
-            cheatsEnable(item.lParam);
+            cheatsEnable((int)(item.lParam & 0xFFFFFFFF));
         }
       }
     }
@@ -796,7 +796,7 @@ void GBACheatList::OnRemove()
       item.stateMask = LVIS_SELECTED;
       if(m_list.GetItem(&item)) {
         if(item.state & LVIS_SELECTED) {
-          cheatsDelete(item.lParam, restoreValues);
+          cheatsDelete((int)(item.lParam & 0xFFFFFFFF), restoreValues);
         }
       }
     }
@@ -838,9 +838,9 @@ void GBACheatList::OnItemchangedCheatList(NMHDR* pNMHDR, LRESULT* pResult)
       if(((l->uOldState & LVIS_STATEIMAGEMASK)>>12) !=
          (((l->uNewState & LVIS_STATEIMAGEMASK)>>12))) {
         if(m_list.GetCheck(l->iItem))
-          cheatsEnable(l->lParam);
+          cheatsEnable((int)(l->lParam & 0xFFFFFFFF));
         else
-          cheatsDisable(l->lParam);
+          cheatsDisable((int)(l->lParam & 0xFFFFFFFF));
         refresh();
       }
     }

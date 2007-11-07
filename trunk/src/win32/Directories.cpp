@@ -26,6 +26,7 @@
 #include "WinResUtil.h"
 
 #include <shlobj.h>
+#include <shlwapi.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -54,27 +55,21 @@ static int CALLBACK browseCallbackProc(HWND hWnd, UINT msg,
 Directories::Directories(CWnd* pParent /*=NULL*/)
   : CDialog(Directories::IDD, pParent)
 {
-  //{{AFX_DATA_INIT(Directories)
-  // NOTE: the ClassWizard will add member initialization here
-  //}}AFX_DATA_INIT
 }
 
 
 void Directories::DoDataExchange(CDataExchange* pDX)
 {
   CDialog::DoDataExchange(pDX);
-  //{{AFX_DATA_MAP(Directories)
   DDX_Control(pDX, IDC_SAVE_PATH, m_savePath);
   DDX_Control(pDX, IDC_ROM_PATH, m_romPath);
   DDX_Control(pDX, IDC_GBROM_PATH, m_gbromPath);
   DDX_Control(pDX, IDC_CAPTURE_PATH, m_capturePath);
   DDX_Control(pDX, IDC_BATTERY_PATH, m_batteryPath);
-  //}}AFX_DATA_MAP
 }
 
 
 BEGIN_MESSAGE_MAP(Directories, CDialog)
-  //{{AFX_MSG_MAP(Directories)
   ON_BN_CLICKED(IDC_BATTERY_DIR, OnBatteryDir)
   ON_BN_CLICKED(IDC_BATTERY_DIR_RESET, OnBatteryDirReset)
   ON_BN_CLICKED(IDC_CAPTURE_DIR, OnCaptureDir)
@@ -85,8 +80,7 @@ BEGIN_MESSAGE_MAP(Directories, CDialog)
   ON_BN_CLICKED(IDC_ROM_DIR_RESET, OnRomDirReset)
   ON_BN_CLICKED(IDC_SAVE_DIR, OnSaveDir)
   ON_BN_CLICKED(IDC_SAVE_DIR_RESET, OnSaveDirReset)
-  //}}AFX_MSG_MAP
-  END_MESSAGE_MAP()
+END_MESSAGE_MAP()
 
   /////////////////////////////////////////////////////////////////////////////
 // Directories message handlers
@@ -206,23 +200,76 @@ void Directories::OnCancel()
 
 void Directories::OnOK() 
 {
-  CString buffer;
-  m_romPath.GetWindowText(buffer);
-  if(!buffer.IsEmpty())
-    regSetStringValue("romdir", buffer);
-  m_gbromPath.GetWindowText(buffer);
-  if(!buffer.IsEmpty())
-    regSetStringValue("gbromdir", buffer);      
-  m_batteryPath.GetWindowText(buffer);
-  if(!buffer.IsEmpty())
-    regSetStringValue("batteryDir", buffer);
-  m_savePath.GetWindowText(buffer);
-  if(!buffer.IsEmpty())
-    regSetStringValue("saveDir", buffer);
-  m_capturePath.GetWindowText(buffer);
-  if(!buffer.IsEmpty())
-    regSetStringValue("captureDir", buffer);      
-  EndDialog(TRUE);
+	char baseDir[MAX_PATH+1];
+	char temp[MAX_PATH+1];
+	GetModuleFileName( NULL, baseDir, MAX_PATH );
+	baseDir[MAX_PATH] = '\0'; // for security reasons
+	PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
+
+
+	CString buffer;
+
+	m_romPath.GetWindowText(buffer);
+	if( !buffer.IsEmpty() )
+		regSetStringValue( "romdir", buffer );
+	if( buffer[0] == '.' ) {
+		strcpy( temp, baseDir );
+		strcat( temp, "\\" );
+		strcat( temp, buffer );
+		buffer = temp;
+	}
+	if( !directoryDoesExist( buffer ) )
+		SHCreateDirectoryEx( NULL, buffer, NULL );
+
+	m_gbromPath.GetWindowText(buffer);
+	if( !buffer.IsEmpty() )
+		regSetStringValue( "gbromdir", buffer );      
+	if( buffer[0] == '.' ) {
+		strcpy( temp, baseDir );
+		strcat( temp, "\\" );
+		strcat( temp, buffer );
+		buffer = temp;
+	}
+	if( !directoryDoesExist( buffer ) )
+		SHCreateDirectoryEx( NULL, buffer, NULL );
+
+	m_batteryPath.GetWindowText(buffer);
+	if( !buffer.IsEmpty() )
+		regSetStringValue( "batteryDir", buffer );
+	if( buffer[0] == '.' ) {
+		strcpy( temp, baseDir );
+		strcat( temp, "\\" );
+		strcat( temp, buffer );
+		buffer = temp;
+	}
+	if( !directoryDoesExist( buffer ) )
+		SHCreateDirectoryEx( NULL, buffer, NULL );
+
+	m_savePath.GetWindowText(buffer);
+	if( !buffer.IsEmpty() )
+		regSetStringValue( "saveDir", buffer );
+	if( buffer[0] == '.' ) {
+		strcpy( temp, baseDir );
+		strcat( temp, "\\" );
+		strcat( temp, buffer );
+		buffer = temp;
+	}
+	if( !directoryDoesExist( buffer ) )
+		SHCreateDirectoryEx( NULL, buffer, NULL );
+
+	m_capturePath.GetWindowText(buffer);
+	if( !buffer.IsEmpty() )
+		regSetStringValue( "captureDir", buffer );
+	if( buffer[0] == '.' ) {
+		strcpy( temp, baseDir );
+		strcat( temp, "\\" );
+		strcat( temp, buffer );
+		buffer = temp;
+	}
+	if( !directoryDoesExist( buffer ) )
+		SHCreateDirectoryEx( NULL, buffer, NULL );
+
+	EndDialog(TRUE);
 }
 
 CString Directories::browseForDir(CString title)

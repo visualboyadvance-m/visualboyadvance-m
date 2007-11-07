@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2004-2006 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,8 +37,11 @@ extern "C" {
 #include "Globals.h"
 #include "RTC.h"
 #include "Port.h"
+
+
+extern "C" {
 #include "memgzio.h"
-#include "gbafilter.h"
+}
 
 #ifndef _MSC_VER
 #define _stricmp strcasecmp
@@ -483,7 +486,7 @@ bool utilIsGBAImage(const char * file)
 {
   cpuIsMultiBoot = false;
   if(strlen(file) > 4) {
-    char * p = (char *)strrchr(file,'.');
+    const char * p = strrchr(file,'.');
 
     if(p != NULL) {
       if(_stricmp(p, ".gba") == 0)
@@ -507,7 +510,7 @@ bool utilIsGBAImage(const char * file)
 bool utilIsGBImage(const char * file)
 {
   if(strlen(file) > 4) {
-    char * p = (char *)strrchr(file,'.');
+    const char * p = strrchr(file,'.');
 
     if(p != NULL) {
       if(_stricmp(p, ".gb") == 0)
@@ -527,7 +530,7 @@ bool utilIsGBImage(const char * file)
 bool utilIsZipFile(const char *file)
 {
   if(strlen(file) > 4) {
-    char * p = (char *)strrchr(file,'.');
+    const char * p = strrchr(file,'.');
 
     if(p != NULL) {
       if(_stricmp(p, ".zip") == 0)
@@ -542,7 +545,7 @@ bool utilIsZipFile(const char *file)
 bool utilIsRarFile(const char *file)
 {
   if(strlen(file) > 4) {
-    const char * p = strrchr(file,'.');
+    char * p = strrchr(file,'.');
 
     if(p != NULL) {
       if(_stricmp(p, ".rar") == 0)
@@ -554,24 +557,10 @@ bool utilIsRarFile(const char *file)
 }
 #endif
 
-bool utilIs7ZipFile(const char *file)
-{
-  if(strlen(file) > 3) {
-    const char * p = strrchr(file,'.');
-
-    if(p != NULL) {
-      if(_stricmp(p, ".7z") == 0)
-        return true;
-    }
-  }
-
-  return false;
-}
-
 bool utilIsGzipFile(const char *file)
 {
   if(strlen(file) > 3) {
-    char * p = (char *)strrchr(file,'.');
+    const char * p = strrchr(file,'.');
 
     if(p != NULL) {
       if(_stricmp(p, ".gz") == 0)
@@ -612,7 +601,7 @@ IMAGE_TYPE utilFindType(const char *file)
     
     if(r != UNZ_OK) {
       unzClose(unz);
-      systemMessage(MSG_BAD_ARCHIVE_FILE, N_("Bad ZIP file %s"), file);
+      systemMessage(MSG_BAD_ZIP_FILE, N_("Bad ZIP file %s"), file);
       return IMAGE_UNKNOWN;
     }
     
@@ -632,7 +621,7 @@ IMAGE_TYPE utilFindType(const char *file)
       
       if(r != UNZ_OK) {
         unzClose(unz);
-        systemMessage(MSG_BAD_ARCHIVE_FILE, N_("Bad ZIP file %s"), file);
+        systemMessage(MSG_BAD_ZIP_FILE, N_("Bad ZIP file %s"), file);
         return IMAGE_UNKNOWN;
       }
       
@@ -654,7 +643,7 @@ IMAGE_TYPE utilFindType(const char *file)
     unzClose(unz);
     
     if(found == IMAGE_UNKNOWN) {
-      systemMessage(MSG_NO_IMAGE_ON_ARCHIVE,
+      systemMessage(MSG_NO_IMAGE_ON_ZIP,
                     N_("No image found on ZIP file %s"), file);
       return found;
     }
@@ -723,7 +712,7 @@ static u8 *utilLoadFromZip(const char *file,
     
   if(r != UNZ_OK) {
     unzClose(unz);
-    systemMessage(MSG_BAD_ARCHIVE_FILE, N_("Bad ZIP file %s"), file);
+    systemMessage(MSG_BAD_ZIP_FILE, N_("Bad ZIP file %s"), file);
     return NULL;
   }
     
@@ -743,7 +732,7 @@ static u8 *utilLoadFromZip(const char *file,
       
     if(r != UNZ_OK) {
       unzClose(unz);
-      systemMessage(MSG_BAD_ARCHIVE_FILE, N_("Bad ZIP file %s"), file);
+      systemMessage(MSG_BAD_ZIP_FILE, N_("Bad ZIP file %s"), file);
       return NULL;
     }
 
@@ -760,7 +749,7 @@ static u8 *utilLoadFromZip(const char *file,
 
   if(!found) {
     unzClose(unz);
-    systemMessage(MSG_NO_IMAGE_ON_ARCHIVE,
+    systemMessage(MSG_NO_IMAGE_ON_ZIP,
                   N_("No image found on ZIP file %s"), file);
     return NULL;
   }
@@ -956,11 +945,11 @@ u8 *utilLoad(const char *file,
     }
     size = fileSize;
   }
-  int read = fileSize <= size ? fileSize : size;
-  int r = fread(image, 1, read, f);
+  size_t read = fileSize <= size ? fileSize : size;
+  size_t r = fread(image, 1, read, f);
   fclose(f);
 
-  if(r != (int)read) {
+  if(r != read) {
     systemMessage(MSG_ERROR_READING_IMAGE,
                   N_("Error reading image %s"), file);
     if(data == NULL)
@@ -1053,22 +1042,22 @@ void utilGBAFindSave(const u8 *data, const int size)
     if(d == 0x52504545) {
       if(memcmp(p, "EEPROM_", 7) == 0) {
         if(saveType == 0)
-          saveType = 1;
+          saveType = 3;
       }
     } else if (d == 0x4D415253) {
       if(memcmp(p, "SRAM_", 5) == 0) {
         if(saveType == 0)
-          saveType = 2;
+          saveType = 1;
       }
     } else if (d == 0x53414C46) {
       if(memcmp(p, "FLASH1M_", 8) == 0) {
         if(saveType == 0) {
-          saveType = 3;
+          saveType = 2;
           flashSize = 0x20000;
         }
       } else if(memcmp(p, "FLASH", 5) == 0) {
         if(saveType == 0) {
-          saveType = 3;
+          saveType = 2;
           flashSize = 0x10000;
         }
       }
@@ -1087,7 +1076,7 @@ void utilGBAFindSave(const u8 *data, const int size)
   flashSetSize(flashSize);
 }
 
-void utilUpdateSystemColorMaps(int lcd)
+void utilUpdateSystemColorMaps()
 {
   switch(systemColorDepth) {
   case 16: 
@@ -1097,7 +1086,6 @@ void utilUpdateSystemColorMaps(int lcd)
           (((i & 0x3e0) >> 5) << systemGreenShift) |
           (((i & 0x7c00) >> 10) << systemBlueShift);
       }
-	  if (lcd == 1) gbafilter_pal(systemColorMap16, 0x10000);
     }
     break;
   case 24:
@@ -1108,7 +1096,6 @@ void utilUpdateSystemColorMaps(int lcd)
           (((i & 0x3e0) >> 5) << systemGreenShift) |
           (((i & 0x7c00) >> 10) << systemBlueShift);
       }
-	  if (lcd == 1) gbafilter_pal32(systemColorMap32, 0x10000);
     }
     break;
   }

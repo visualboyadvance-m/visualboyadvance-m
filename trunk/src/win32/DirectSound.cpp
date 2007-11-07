@@ -1,6 +1,7 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004-2005 Forgotten and the VBA development team
+// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2004-2006 VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,365 +17,367 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+// MFC
 #include "stdafx.h"
-#include "VBA.h"
+
+// Tools
 #include "AVIWrite.h"
-#include "Sound.h"
 #include "WavWriter.h"
 
+// Internals
 #include "../System.h"
 #include "../GBA.h"
 #include "../Globals.h"
 #include "../Sound.h"
 
-#include <mmreg.h>
-#include <Dsound.h> //DirectSound
+// DirectSound8
+#include <Dsound.h>
+#pragma comment( lib, "Dsound" )
+#pragma comment( lib, "Dxguid" )
 
 extern bool soundBufferLow;
 
 class DirectSound : public ISound
 {
 private:
-  HINSTANCE            dsoundDLL;
-  LPDIRECTSOUND        pDirectSound;
-  LPDIRECTSOUNDBUFFER  dsbPrimary;
-  LPDIRECTSOUNDBUFFER  dsbSecondary;
-  LPDIRECTSOUNDNOTIFY  dsbNotify;
-  HANDLE               dsbEvent;
-  WAVEFORMATEX         wfx;
+	LPDIRECTSOUND8       pDirectSound; // DirectSound interface
+	LPDIRECTSOUNDBUFFER  dsbPrimary;   // Primary DirectSound buffer
+	LPDIRECTSOUNDBUFFER  dsbSecondary; // Secondary DirectSound buffer
+	LPDIRECTSOUNDNOTIFY8 dsbNotify;
+	HANDLE               dsbEvent;
+	WAVEFORMATEX         wfx;          // Primary buffer wave format
 
 public:
-  DirectSound();
-  virtual ~DirectSound();
+	DirectSound();
+	virtual ~DirectSound();
 
-  bool init();
-  void pause();
-  void reset();
-  void resume();
-  void write();
+	bool init();   // initialize the primary and secondary sound buffer
+	void pause();  // pause the secondary sound buffer
+	void reset();  // stop and reset the secondary sound buffer
+	void resume(); // resume the secondary sound buffer
+	void write();  // write the emulated sound to the secondary sound buffer
 };
+
 
 DirectSound::DirectSound()
 {
-  dsoundDLL    = NULL;
-  pDirectSound = NULL;
-  dsbPrimary   = NULL;
-  dsbSecondary = NULL;
-  dsbNotify    = NULL;
-  dsbEvent     = NULL;
+	CoInitialize( NULL );
+	
+	pDirectSound  = NULL;
+	dsbPrimary    = NULL;
+	dsbSecondary  = NULL;
+	dsbNotify     = NULL;
+	dsbEvent      = NULL;
 }
+
 
 DirectSound::~DirectSound()
 {
-  if(theApp.aviRecorder != NULL) {
-    delete theApp.aviRecorder;
-    theApp.aviRecorder = NULL;
-    theApp.aviFrameNumber = 0;
-  }
+	if(theApp.aviRecorder) {
+		delete theApp.aviRecorder;
+		theApp.aviRecorder = NULL;
+		theApp.aviFrameNumber = 0;
+	}
+	
+	if(theApp.soundRecording) {
+		if(theApp.soundRecorder) {
+			delete theApp.soundRecorder;
+			theApp.soundRecorder = NULL;
+		}
+		theApp.soundRecording = false;
+	}
+	
+	if(dsbNotify) {
+		dsbNotify->Release();
+		dsbNotify = NULL;
+	}
+	
+	if(dsbEvent) {
+		CloseHandle(dsbEvent);
+		dsbEvent = NULL;
+	}
+	
+	if(pDirectSound) {
+		if(dsbPrimary) {
+			dsbPrimary->Release();
+			dsbPrimary = NULL;
+		}
 
-  if(theApp.soundRecording) {
-    if(theApp.soundRecorder != NULL) {
-      delete theApp.soundRecorder;
-      theApp.soundRecorder = NULL;
-    }
-    theApp.soundRecording = false;
-  }
-  
-  if(dsbNotify != NULL) {
-    dsbNotify->Release();
-    dsbNotify = NULL;
-  }
-
-  if(dsbEvent != NULL) {
-    CloseHandle(dsbEvent);
-    dsbEvent = NULL;
-  }
-  
-  if(pDirectSound != NULL) {
-    if(dsbPrimary != NULL) {
-      dsbPrimary->Release();
-      dsbPrimary = NULL;
-    }
-    
-    if(dsbSecondary != NULL) {
-      dsbSecondary->Release();
-      dsbSecondary = NULL;
-    }
-    
-    pDirectSound->Release();
-    pDirectSound = NULL;
-  }
-  
-  if(dsoundDLL != NULL) {
-    FreeLibrary(dsoundDLL);
-    dsoundDLL = NULL;
-  }
+		if(dsbSecondary) {
+			dsbSecondary->Release();
+			dsbSecondary = NULL;
+		}
+		
+		pDirectSound->Release();
+		pDirectSound = NULL;
+	}
+	
+	CoUninitialize();
 }
+
 
 bool DirectSound::init()
 {
-  HRESULT hr;
+	HRESULT hr;
+	DWORD freq;
+	DSBUFFERDESC dsbdesc;
+	int i;
 
-  dsoundDLL = LoadLibrary("dsound.dll");
-  HRESULT (WINAPI *DSoundCreate)(LPCGUID,LPDIRECTSOUND *,IUnknown *);  
-  if(dsoundDLL != NULL) {    
-    DSoundCreate = (HRESULT (WINAPI *)(LPCGUID,LPDIRECTSOUND *,IUnknown *))
-      GetProcAddress(dsoundDLL, "DirectSoundCreate8");
-    
-    if(DSoundCreate == NULL) {
-      theApp.directXMessage("DirectSoundCreate8");
-      return false;
-    }
-  } else {
-    theApp.directXMessage("dsound.dll");
-    return false;
-  }
-  
-  if((hr = DSoundCreate(NULL,&pDirectSound,NULL) != DS_OK)) {
-    //    errorMessage(myLoadString(IDS_ERROR_SOUND_CREATE), hr);
-    systemMessage(IDS_CANNOT_CREATE_DIRECTSOUND,
-                  "Cannot create DirectSound %08x", hr);
-    pDirectSound = NULL;
-    dsbSecondary = NULL;
-    return false;
-  }
 
-  if((hr=pDirectSound->SetCooperativeLevel((HWND)*theApp.m_pMainWnd,
-                                           DSSCL_EXCLUSIVE)) != DS_OK) {
-    //    errorMessage(myLoadString(IDS_ERROR_SOUND_LEVEL), hr);
-    systemMessage(IDS_CANNOT_SETCOOPERATIVELEVEL,
-                  "Cannot SetCooperativeLevel %08x", hr);
-    return false;
-  }
+	// Initialize DirectSound
+	if( FAILED( hr = DirectSoundCreate8( &DSDEVID_DefaultPlayback, &pDirectSound, NULL ) ) ) {
+		systemMessage( IDS_CANNOT_CREATE_DIRECTSOUND, _T("Cannot create DirectSound %08x"), hr );
+		pDirectSound = NULL;
+		return false;
+	}
 
-  DSBUFFERDESC dsbdesc;
-  ZeroMemory(&dsbdesc,sizeof(DSBUFFERDESC));
-  dsbdesc.dwSize=sizeof(DSBUFFERDESC);
-  dsbdesc.dwFlags = DSBCAPS_PRIMARYBUFFER;
-  
-  if((hr=pDirectSound->CreateSoundBuffer(&dsbdesc,
-                                         &dsbPrimary,
-                                         NULL) != DS_OK)) {
-    //    errorMessage(myLoadString(IDS_ERROR_SOUND_BUFFER),hr);
-    systemMessage(IDS_CANNOT_CREATESOUNDBUFFER,
-                  "Cannot CreateSoundBuffer %08x", hr);
-    return false;
-  }
-  
-  // Set primary buffer format
 
-  memset(&wfx, 0, sizeof(WAVEFORMATEX)); 
-  wfx.wFormatTag = WAVE_FORMAT_PCM; 
-  wfx.nChannels = 2;
-  switch(soundQuality) {
-  case 2:
-    wfx.nSamplesPerSec = 22050;
-    soundBufferLen = 736*2;
-    soundBufferTotalLen = 7360*2;
-    break;
-  case 4:
-    wfx.nSamplesPerSec = 11025;
-    soundBufferLen = 368*2;
-    soundBufferTotalLen = 3680*2;
-    break;
-  default:
-    soundQuality = 1;
-    wfx.nSamplesPerSec = 44100;
-    soundBufferLen = 1470*2;
-    soundBufferTotalLen = 14700*2;
-  }
-  wfx.wBitsPerSample = 16; 
-  wfx.nBlockAlign = (wfx.wBitsPerSample / 8) * wfx.nChannels;
-  wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
+	if( FAILED( hr = pDirectSound->SetCooperativeLevel( theApp.m_pMainWnd->GetSafeHwnd(), DSSCL_EXCLUSIVE ) ) ) {
+		systemMessage( IDS_CANNOT_SETCOOPERATIVELEVEL, _T("Cannot SetCooperativeLevel %08x"), hr );
+		return false;
+	}
 
-  if((hr = dsbPrimary->SetFormat(&wfx)) != DS_OK) {
-    //    errorMessage(myLoadString(IDS_ERROR_SOUND_PRIMARY),hr);
-    systemMessage(IDS_CANNOT_SETFORMAT_PRIMARY,
-                  "Cannot SetFormat for primary %08x", hr);
-    return false;
-  }
-  
-  ZeroMemory(&dsbdesc,sizeof(DSBUFFERDESC));  
-  dsbdesc.dwSize = sizeof(DSBUFFERDESC);
-  dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2|DSBCAPS_CTRLPOSITIONNOTIFY;
-  dsbdesc.dwBufferBytes = soundBufferTotalLen;
-  dsbdesc.lpwfxFormat = &wfx;
 
-  if((hr = pDirectSound->CreateSoundBuffer(&dsbdesc, &dsbSecondary, NULL))
-     != DS_OK) {
-    dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2;
-    if((hr = pDirectSound->CreateSoundBuffer(&dsbdesc, &dsbSecondary, NULL))
-       != DS_OK) {
-      systemMessage(IDS_CANNOT_CREATESOUNDBUFFER_SEC,
-                    "Cannot CreateSoundBuffer secondary %08x", hr);
-      return false;
-    }
-  }
+	// Create primary sound buffer
+	ZeroMemory( &dsbdesc, sizeof(DSBUFFERDESC) );
+	dsbdesc.dwSize = sizeof(DSBUFFERDESC);
+	dsbdesc.dwFlags = DSBCAPS_PRIMARYBUFFER;
+	if( theApp.dsoundDisableHardwareAcceleration ) {
+		dsbdesc.dwFlags |= DSBCAPS_LOCSOFTWARE;
+	}
 
-  dsbSecondary->SetCurrentPosition(0);
+	if( FAILED( hr = pDirectSound->CreateSoundBuffer( &dsbdesc, &dsbPrimary, NULL ) ) ) {
+		systemMessage(IDS_CANNOT_CREATESOUNDBUFFER, _T("Cannot CreateSoundBuffer %08x"), hr);
+		return false;
+	}
 
-  if(!theApp.useOldSync) {
-    hr = dsbSecondary->QueryInterface(IID_IDirectSoundNotify,
-                                      (void **)&dsbNotify);
-    if(!FAILED(hr)) {
-      dsbEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-      
-      DSBPOSITIONNOTIFY notify[10];
-      
-      for(int i = 0; i < 10; i++) {
-        notify[i].dwOffset = i*soundBufferLen;
-        notify[i].hEventNotify = dsbEvent;
-      }
-      if(FAILED(dsbNotify->SetNotificationPositions(10, notify))) {
-        dsbNotify->Release();
-        dsbNotify = NULL;
-        CloseHandle(dsbEvent);
-        dsbEvent = NULL;
-      }
-    }
-  }
-  
-  hr = dsbPrimary->Play(0,0,DSBPLAY_LOOPING);
+	switch(soundQuality)
+	{
+	case 4:
+		freq = 11025;
+		break;
+	case 2:
+		freq = 22050;
+		break;
+	default:
+		soundQuality = 1;
+	case 1:
+		freq = 44100;
+		break;
+	}
+	soundBufferLen = freq*2/30;
+	soundBufferTotalLen = soundBufferLen * 10;
 
-  if(hr != DS_OK) {
-    //    errorMessage(myLoadString(IDS_ERROR_SOUND_PLAYPRIM), hr);
-    systemMessage(IDS_CANNOT_PLAY_PRIMARY, "Cannot Play primary %08x", hr);
-    return false;
-  }
+	ZeroMemory( &wfx, sizeof(WAVEFORMATEX) );
+	wfx.wFormatTag = WAVE_FORMAT_PCM;
+	wfx.nChannels = 2;
+	wfx.nSamplesPerSec = freq;
+	wfx.wBitsPerSample = 16;
+	wfx.nBlockAlign = wfx.nChannels * wfx.wBitsPerSample / 8;
+	wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
 
-  setsystemSoundOn(true);
-  return true;
+	if( FAILED( hr = dsbPrimary->SetFormat( &wfx ) ) ) {
+		systemMessage( IDS_CANNOT_SETFORMAT_PRIMARY, _T("CreateSoundBuffer(primary) failed %08x"), hr );
+		return false;
+	}
+
+
+	// Create secondary sound buffer
+	ZeroMemory( &dsbdesc, sizeof(DSBUFFERDESC) );
+	dsbdesc.dwSize = sizeof(DSBUFFERDESC);
+	dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLPOSITIONNOTIFY | DSBCAPS_GLOBALFOCUS;
+	if( theApp.dsoundDisableHardwareAcceleration ) {
+		dsbdesc.dwFlags |= DSBCAPS_LOCSOFTWARE;
+	}
+	dsbdesc.dwBufferBytes = soundBufferTotalLen;
+	dsbdesc.lpwfxFormat = &wfx;
+
+	if( FAILED( hr = pDirectSound->CreateSoundBuffer( &dsbdesc, &dsbSecondary, NULL ) ) ) {
+		systemMessage( IDS_CANNOT_CREATESOUNDBUFFER, _T("CreateSoundBuffer(secondary) failed %08x"), hr );
+		return false;
+	}
+
+	if( FAILED( hr = dsbSecondary->SetCurrentPosition( 0 ) ) ) {
+		systemMessage( 0, _T("dsbSecondary->SetCurrentPosition failed %08x"), hr );
+		return false;
+	}
+
+
+	if( !theApp.useOldSync ) {
+		if( FAILED( hr = dsbSecondary->QueryInterface( IID_IDirectSoundNotify8, (LPVOID*)&dsbNotify ) ) ) {
+			dsbEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
+			DSBPOSITIONNOTIFY notify[10];		
+			for( i = 0; i < 10; i++ ) {
+				notify[i].dwOffset = i * soundBufferLen;
+				notify[i].hEventNotify = dsbEvent;
+			}
+
+			if( FAILED( dsbNotify->SetNotificationPositions( 10, notify ) ) ) {
+				dsbNotify->Release();
+				dsbNotify = NULL;
+				CloseHandle(dsbEvent);
+				dsbEvent = NULL;
+			}
+		}
+	}
+
+
+	// Play primary buffer
+	if( FAILED( hr = dsbPrimary->Play( 0, 0, DSBPLAY_LOOPING ) ) ) {
+		systemMessage( IDS_CANNOT_PLAY_PRIMARY, _T("Cannot Play primary %08x"), hr );
+		return false;
+	}
+	
+	systemSoundOn = true;
+	
+	return true;
 }
+
 
 void DirectSound::pause()
 {
-  if(dsbSecondary != NULL) {
-    DWORD status = 0;
-    dsbSecondary->GetStatus(&status);
-    
-    if(status & DSBSTATUS_PLAYING) {
-      dsbSecondary->Stop();
-    }
-  }  
+	if( dsbSecondary == NULL ) return;
+	
+	DWORD status;
+
+	dsbSecondary->GetStatus( &status );
+
+	if( status & DSBSTATUS_PLAYING ) dsbSecondary->Stop();
 }
+
 
 void DirectSound::reset()
 {
-  if(dsbSecondary) {
-    dsbSecondary->Stop();
-    dsbSecondary->SetCurrentPosition(0);
-  }  
+	if( dsbSecondary == NULL ) return;
+	
+	dsbSecondary->Stop();
+	
+	dsbSecondary->SetCurrentPosition( 0 );
 }
+
 
 void DirectSound::resume()
 {
-  if(dsbSecondary != NULL) {
-    dsbSecondary->Play(0,0,DSBPLAY_LOOPING);
-  }  
+	if( dsbSecondary == NULL ) return;
+	
+	dsbSecondary->Play( 0, 0, DSBPLAY_LOOPING );
 }
+
 
 void DirectSound::write()
 {
-  int len = soundBufferLen;
-  LPVOID  lpvPtr1; 
-  DWORD   dwBytes1; 
-  LPVOID  lpvPtr2; 
-  DWORD   dwBytes2; 
+	if(!pDirectSound) return;
 
-  if(!pDirectSound)
-    return;
 
-  if(theApp.soundRecording) {
-    if(dsbSecondary) {
-      if(theApp.soundRecorder == NULL) {
-        theApp.soundRecorder = new WavWriter;
-        WAVEFORMATEX format;
-        dsbSecondary->GetFormat(&format, sizeof(format), NULL);
-        if(theApp.soundRecorder->Open(theApp.soundRecordName))
-          theApp.soundRecorder->SetFormat(&format);
-      }
-    }
-      
-    if(theApp.soundRecorder) {
-      theApp.soundRecorder->AddSound((u8 *)soundFinalWave, len);
-    }
-  }
+	HRESULT      hr;
+	DWORD        status = 0;
+	DWORD        play = 0;
+	WAVEFORMATEX format;
+	LPVOID       lpvPtr1;
+	DWORD        dwBytes1 = 0;
+	LPVOID       lpvPtr2;
+	DWORD        dwBytes2 = 0;
 
-  if(theApp.aviRecording) {
-    if(theApp.aviRecorder) {
-      if(dsbSecondary) {
-        if(!theApp.aviRecorder->IsSoundAdded()) {
-          WAVEFORMATEX format;
-          dsbSecondary->GetFormat(&format, sizeof(format), NULL);
-          theApp.aviRecorder->SetSoundFormat(&format);
-        }
-      }
-      
-      theApp.aviRecorder->AddSound((const char *)soundFinalWave, len);
-    }
-  }
-  
-  HRESULT hr;
 
-  if(!speedup && synchronize && !theApp.throttle) {
-    DWORD status=0;
-    hr = dsbSecondary->GetStatus(&status);
-    if(status && DSBSTATUS_PLAYING) {
-      if(!soundPaused) {      
-        DWORD play;
-        while(true) {
-          dsbSecondary->GetCurrentPosition(&play, NULL);
-		  int BufferLeft = ((soundNextPosition <= play) ?
-			  play - soundNextPosition :
-			  soundBufferTotalLen - soundNextPosition + play);
+	if( theApp.soundRecording ) {
+		if( dsbSecondary ) {
+			if( theApp.soundRecorder ) {
+				theApp.soundRecorder->AddSound( (u8 *)soundFinalWave, soundBufferLen );
+			} else {
+				theApp.soundRecorder = new WavWriter;
+				dsbSecondary->GetFormat( &format, sizeof(format), NULL );
+				if( theApp.soundRecorder->Open( theApp.soundRecordName ) ) {
+					theApp.soundRecorder->SetFormat( &format );
+				}
+			}
+		}
+	}
+	
 
-          if(BufferLeft > soundBufferLen)
-		  {
-			if (BufferLeft > soundBufferTotalLen - (soundBufferLen * 3))
-				soundBufferLow = true;
-			break;
-		   }
-		   soundBufferLow = false;
-          
-          if(dsbEvent) {
-            WaitForSingleObject(dsbEvent, 50);
-          }
-        }
-      }
-    } else {
-      setsoundPaused(true);
-    }
-  }
-  // Obtain memory address of write block. This will be in two parts
-  // if the block wraps around.
-  hr = dsbSecondary->Lock(soundNextPosition, soundBufferLen, &lpvPtr1, 
-                          &dwBytes1, &lpvPtr2, &dwBytes2,
-                          0);
-  
-  // If DSERR_BUFFERLOST is returned, restore and retry lock. 
-  if (DSERR_BUFFERLOST == hr) { 
-    dsbSecondary->Restore(); 
-    hr = dsbSecondary->Lock(soundNextPosition, soundBufferLen,&lpvPtr1,
-                            &dwBytes1, &lpvPtr2, &dwBytes2,
-                            0);
-  } 
+	if( theApp.aviRecording ) {
+		if( theApp.aviRecorder ) {
+			if( dsbSecondary ) {
+				if( !theApp.aviRecorder->IsSoundAdded() ) {
+					dsbSecondary->GetFormat( &format, sizeof(format), NULL );
+					theApp.aviRecorder->SetSoundFormat( &format );
+				}
+			}
+			theApp.aviRecorder->AddSound( (const char *)soundFinalWave, soundBufferLen );
+		}
+	}
+	
+	
+	if( !speedup && synchronize && !theApp.throttle ) {
+		hr = dsbSecondary->GetStatus(&status);
+		if( status & DSBSTATUS_PLAYING ) {
+			if( !soundPaused ) {      
+				while( true ) {
+					dsbSecondary->GetCurrentPosition(&play, NULL);
+					  int BufferLeft = ((soundNextPosition <= play) ?
+					  play - soundNextPosition :
+					  soundBufferTotalLen - soundNextPosition + play);
+		
+		          if(BufferLeft > soundBufferLen)
+				  {
+					if (BufferLeft > soundBufferTotalLen - (soundBufferLen * 3))
+						soundBufferLow = true;
+					break;
+				   }
+				   soundBufferLow = false;
+		          
+		          if(dsbEvent) {
+		            WaitForSingleObject(dsbEvent, 50);
+		          }
+		        }
+			}
+		} else {
+			 setsoundPaused(true);
+		}
+	}
+	
 
-  soundNextPosition += soundBufferLen;
-  soundNextPosition = soundNextPosition % soundBufferTotalLen;
-  
-  if SUCCEEDED(hr) { 
-    // Write to pointers. 
-    CopyMemory(lpvPtr1, soundFinalWave, dwBytes1); 
-    if (NULL != lpvPtr2) { 
-      CopyMemory(lpvPtr2, soundFinalWave+dwBytes1, dwBytes2); 
-    } 
-    // Release the data back to DirectSound. 
-    hr = dsbSecondary->Unlock(lpvPtr1, dwBytes1, lpvPtr2, 
-                              dwBytes2);
-  }
+	// Obtain memory address of write block.
+	// This will be in two parts if the block wraps around.
+	if( DSERR_BUFFERLOST == ( hr = dsbSecondary->Lock(
+		soundNextPosition,
+		soundBufferLen,
+		&lpvPtr1,
+		&dwBytes1,
+		&lpvPtr2,
+		&dwBytes2,
+		0 ) ) ) {
+			// If DSERR_BUFFERLOST is returned, restore and retry lock.
+			dsbSecondary->Restore();
+			hr = dsbSecondary->Lock(
+				soundNextPosition,
+				soundBufferLen,
+				&lpvPtr1,
+				&dwBytes1,
+				&lpvPtr2,
+				&dwBytes2,
+				0 );
+	}
+	
+	soundNextPosition += soundBufferLen;
+	soundNextPosition = soundNextPosition % soundBufferTotalLen;
+
+	if( SUCCEEDED( hr ) ) {
+		// Write to pointers.
+		CopyMemory( lpvPtr1, soundFinalWave, dwBytes1 );
+		if ( lpvPtr2 ) {
+			CopyMemory( lpvPtr2, soundFinalWave + dwBytes1, dwBytes2 );
+		}
+		
+		// Release the data back to DirectSound.
+		hr = dsbSecondary->Unlock( lpvPtr1, dwBytes1, lpvPtr2, dwBytes2 );
+	} else {
+		systemMessage( 0, _T("dsbSecondary->Lock() failed: %08x"), hr );
+		return;
+	}
 }
+
 
 ISound *newDirectSound()
 {
-  return new DirectSound();
+	return new DirectSound();
 }

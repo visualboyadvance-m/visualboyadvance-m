@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 # include <unistd.h>
 # include <sys/socket.h>
 # include <netdb.h>
@@ -32,14 +32,15 @@
 # else // ! HAVE_ARPA_INET_H
 #  define socklen_t int
 # endif // ! HAVE_ARPA_INET_H
-#else // WIN32
+# define SOCKET int
+#else // _WIN32
 # include <winsock.h>
 # include <io.h>
 # define socklen_t int
 # define close closesocket
 # define read _read
 # define write _write
-#endif // WIN32
+#endif // _WIN32
 
 #include "GBA.h"
 
@@ -54,8 +55,8 @@ extern void debuggerSignal(int,int);
 
 int remotePort = 55555;
 int remoteSignal = 5;
-int remoteSocket = -1;
-int remoteListenSocket = -1;
+SOCKET remoteSocket = -1;
+SOCKET remoteListenSocket = -1;
 bool remoteConnected = false;
 bool remoteResumed = false;
 
@@ -85,11 +86,11 @@ int remoteTcpRecv(char *data, int len)
 bool remoteTcpInit()
 {
   if(remoteSocket == -1) {
-#ifdef WIN32
+#ifdef _WIN32
     WSADATA wsaData;
     int error = WSAStartup(MAKEWORD(1,1),&wsaData);
-#endif // WIN32
-    int s = socket(PF_INET, SOCK_STREAM, 0);
+#endif // _WIN32
+    SOCKET s = socket(PF_INET, SOCK_STREAM, 0);
     
     remoteListenSocket = s;
     
@@ -131,19 +132,19 @@ bool remoteTcpInit()
     }
     socklen_t len = sizeof(addr);
 
-#ifdef WIN32
+#ifdef _WIN32
     int flag = 0;    
     ioctlsocket(s, FIONBIO, (unsigned long *)&flag);
-#endif // WIN32
-    int s2 = accept(s, (sockaddr *)&addr, &len);
+#endif // _WIN32
+    SOCKET s2 = accept(s, (sockaddr *)&addr, &len);
     if(s2 > 0) {
       fprintf(stderr, "Got a connection from %s %d\n",
               inet_ntoa((in_addr)addr.sin_addr),
               ntohs(addr.sin_port));
     } else {
-#ifdef WIN32
+#ifdef _WIN32
       int error = WSAGetLastError();
-#endif // WIN32
+#endif // _WIN32
     }
     char dummy;
     recv(s2, &dummy, 1, 0);
@@ -230,14 +231,14 @@ void remotePutPacket(char *packet)
   char *hex = "0123456789abcdef";  
   char buffer[1024];
 
-  int count = strlen(packet);
+  size_t count = strlen(packet);
 
   unsigned char csum = 0;
 
   char *p = buffer;
   *p++ = '$';
   
-  for(int i = 0 ;i < count; i++) {
+  for(size_t i = 0 ;i < count; i++) {
     csum += packet[i];
     *p++ = packet[i];
   }
@@ -246,7 +247,7 @@ void remotePutPacket(char *packet)
   *p++ = hex[csum & 15];
   *p++ = 0;
   //  printf("Sending %s\n", buffer);
-  remoteSendFnc(buffer, count + 4);
+  remoteSendFnc(buffer, (int)count + 4);
 
   char c = 0;
   remoteRecvFnc(&c, 1);

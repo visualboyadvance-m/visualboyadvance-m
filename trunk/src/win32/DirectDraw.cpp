@@ -21,8 +21,6 @@
 #define DIRECTDRAW_VERSION 0x0700
 #include <ddraw.h>
 
-#include <mmsystem.h>
-
 #include "../System.h"
 #include "../gb/gbGlobals.h"
 #include "../GBA.h"
@@ -33,7 +31,9 @@
 #include "VBA.h"
 #include "MainWnd.h"
 #include "Reg.h"
-#include "..\..\res\resource.h"
+#include "resource.h"
+
+#include "Display.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -58,18 +58,7 @@ private:
   int                  height;
   bool                 failed;
 
-  volatile unsigned    wait_lastscanline;
-  volatile unsigned    wait_screenheight;
-  volatile unsigned    wait_maxheight;
-  volatile unsigned    wait_firstline;
-  HANDLE               wait_event;
-  UINT                 wait_timerres;
-  UINT                 wait_timerid;
-
   bool initializeOffscreen(int w, int h);
-  bool StartTimer();
-  void StopTimer();
-  static void CALLBACK g_timer_proc( UINT id, UINT msg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2 );
 public:
   DirectDrawDisplay();
   virtual ~DirectDrawDisplay();
@@ -83,9 +72,8 @@ public:
   virtual bool changeRenderSize(int w, int h);
   virtual DISPLAY_TYPE getType() { return DIRECT_DRAW; };
   virtual void setOption(const char *, int) {}
+  virtual bool isSkinSupported() { return true; }
   virtual int selectFullScreenMode(GUID **);  
-
-  void timer_proc( UINT id, UINT msg, DWORD_PTR dw1, DWORD_PTR dw2 );
 };
 
 static HRESULT WINAPI checkModesAvailable(LPDDSURFACEDESC2 surf, LPVOID lpContext)
@@ -144,10 +132,6 @@ DirectDrawDisplay::DirectDrawDisplay()
   width = 0;
   height = 0;
   failed = false;
-  wait_screenheight = 0;
-  wait_event = 0;
-  wait_timerres = 0;
-  wait_timerid = 0;
 }
 
 DirectDrawDisplay::~DirectDrawDisplay()
@@ -158,15 +142,6 @@ DirectDrawDisplay::~DirectDrawDisplay()
 void DirectDrawDisplay::cleanup()
 {
   if(pDirectDraw != NULL) {
-    if ( wait_timerid ) {
-      StopTimer();
-    }
-
-    if ( wait_event ) {
-      CloseHandle( wait_event );
-      wait_event = 0;
-    }
-
     if(ddsClipper != NULL) {
       ddsClipper->Release();
       ddsClipper = NULL;
@@ -192,7 +167,11 @@ void DirectDrawDisplay::cleanup()
   }
 
   if(ddrawDLL != NULL) {
-    FreeLibrary(ddrawDLL);
+#ifdef _AFXDLL
+    AfxFreeLibrary( ddrawDLL );
+#else
+    FreeLibrary( ddrawDLL );
+#endif
     ddrawDLL = NULL;
   }
   width = 0;
@@ -228,13 +207,13 @@ bool DirectDrawDisplay::initialize()
   case VIDEO_1280x1024:
   case VIDEO_OTHER:
     {
-	  float scaleX = ((float)theApp.fsWidth / (float)theApp.sizeX);
-      float scaleY = ((float)theApp.fsHeight / (float)theApp.sizeY);
-      float min = scaleX < scaleY ? scaleX : scaleY;
+      int scaleX = (theApp.fsWidth / theApp.sizeX);
+      int scaleY = (theApp.fsHeight / theApp.sizeY);
+      int min = scaleX < scaleY ? scaleX : scaleY;
       if(theApp.fsMaxScale)
         min = min > theApp.fsMaxScale ? theApp.fsMaxScale : min;
-      theApp.surfaceSizeX = (int)(theApp.sizeX * min);
-	  theApp.surfaceSizeY = (int)(theApp.sizeY * min);
+      theApp.surfaceSizeX = theApp.sizeX * min;
+      theApp.surfaceSizeY = theApp.sizeY * min;
       if(theApp.fullScreenStretch) {
         theApp.surfaceSizeX = theApp.fsWidth;
         theApp.surfaceSizeY = theApp.fsHeight;
@@ -242,7 +221,7 @@ bool DirectDrawDisplay::initialize()
     }
     break;
   }
-
+  
   theApp.rect.left = 0;
   theApp.rect.top = 0;
   theApp.rect.right = theApp.sizeX;
@@ -306,7 +285,12 @@ bool DirectDrawDisplay::initialize()
   if(theApp.pVideoDriverGUID)
     guid = theApp.pVideoDriverGUID;
 
-  ddrawDLL = LoadLibrary("DDRAW.DLL");
+#ifdef _AFXDLL
+  ddrawDLL = AfxLoadLibrary("ddraw.dll");
+#else
+  ddrawDLL = LoadLibrary( _T("ddraw.dll") );
+#endif
+
   HRESULT (WINAPI *DDrawCreateEx)(GUID *,LPVOID *,REFIID,IUnknown *);  
   if(ddrawDLL != NULL) {    
     DDrawCreateEx = (HRESULT (WINAPI *)(GUID *,LPVOID *,REFIID,IUnknown *))
@@ -458,12 +442,6 @@ bool DirectDrawDisplay::initialize()
       ddsPrimary->SetClipper(ddsClipper);
   }
   //  }
-
-  wait_event = CreateEvent( NULL, FALSE, FALSE, NULL );
-
-  if ( ! StartTimer() ) {
-    return FALSE;
-  }
 
   DDPIXELFORMAT px;
 
@@ -633,7 +611,7 @@ bool DirectDrawDisplay::initializeOffscreen(int w, int h)
     winlog("B shift: %d\n", systemBlueShift);
   }
   
-  utilUpdateSystemColorMaps(theApp.filterLCD);
+  utilUpdateSystemColorMaps();
   width = w;
   height = h;
   return true;
@@ -671,6 +649,7 @@ void DirectDrawDisplay::checkFullScreen()
 void DirectDrawDisplay::render()
 {
   HRESULT hret;
+  unsigned int nBytesPerPixel = systemColorDepth>>3;
 
   if(pDirectDraw == NULL ||
      ddsOffscreen == NULL ||
@@ -743,62 +722,9 @@ void DirectDrawDisplay::render()
           copyY = 144;
         }
       }
-      // MMX doesn't seem to be faster to copy the data
-      __asm {
-        mov eax, copyX;
-        mov ebx, copyY;
-        
-        mov esi, pix;
-        mov edi, ddsDesc.lpSurface;
-        mov edx, ddsDesc.lPitch;
-        cmp systemColorDepth, 16;
-        jnz gbaOtherColor;
-        sub edx, eax;
-        sub edx, eax;
-        lea esi,[esi+2*eax+4];
-        shr eax, 1;
-      gbaLoop16bit:
-        mov ecx, eax;
-        repz movsd;
-        inc esi;
-        inc esi;
-        inc esi;
-        inc esi;
-        add edi, edx;
-        dec ebx;
-        jnz gbaLoop16bit;
-        jmp gbaLoopEnd;
-      gbaOtherColor:
-        cmp systemColorDepth, 32;
-        jnz gbaOtherColor2;
-        
-        sub edx, eax;
-        sub edx, eax;
-        sub edx, eax;
-        sub edx, eax;
-        lea esi, [esi+4*eax+4];
-      gbaLoop32bit:
-        mov ecx, eax;
-        repz movsd;
-        add esi, 4;
-        add edi, edx;
-        dec ebx;
-        jnz gbaLoop32bit;
-        jmp gbaLoopEnd;
-      gbaOtherColor2:
-        lea eax, [eax+2*eax];
-        sub edx, eax;
-      gbaLoop24bit:
-        mov ecx, eax;
-        shr ecx, 2;
-        repz movsd;
-        add edi, edx;
-        dec ebx;
-        jnz gbaLoop24bit;
-      gbaLoopEnd:
-      }
+	  copyImage( pix, ddsDesc.lpSurface, copyX, copyY, ddsDesc.lPitch, systemColorDepth );
     }
-    if(theApp.showSpeed && theApp.videoOption > VIDEO_4X) {
+    if(theApp.showSpeed && (theApp.videoOption > VIDEO_4X || theApp.skin != NULL)) {
       char buffer[30];
       if(theApp.showSpeed == 1)
         sprintf(buffer, "%3d%%", systemSpeed);
@@ -826,8 +752,7 @@ void DirectDrawDisplay::render()
 
   if(hret == DD_OK) {
    if(theApp.vsync && !(theApp.tripleBuffering && theApp.videoOption > VIDEO_4X) && !speedup) { // isn't the Flip() call synced unless a certain flag is passed to it?
-      //hret = pDirectDraw->WaitForVerticalBlank(DDWAITVB_BLOCKBEGIN, 0);
-      WaitForSingleObject( wait_event, 100 );
+      hret = pDirectDraw->WaitForVerticalBlank(DDWAITVB_BLOCKBEGIN, 0);
     }
     ddsOffscreen->PageLock(0);
     if(theApp.tripleBuffering && theApp.videoOption > VIDEO_4X) {
@@ -865,7 +790,7 @@ void DirectDrawDisplay::render()
       SetTextColor(hdc, RGB(255,0,0));
       SetBkMode(hdc,TRANSPARENT);      
       TextOut(hdc, theApp.dest.left+10, theApp.dest.bottom - 20, theApp.screenMessageBuffer,
-              strlen(theApp.screenMessageBuffer));
+              (int)_tcslen(theApp.screenMessageBuffer));
       ddsPrimary->ReleaseDC(hdc);
     } else {
       theApp.screenMessage = false;
@@ -883,74 +808,8 @@ int DirectDrawDisplay::selectFullScreenMode(GUID **pGUID)
   return winVideoModeSelect(theApp.m_pMainWnd, pGUID);
 }
 
-bool DirectDrawDisplay::StartTimer()
-{
-  MMRESULT    result;
-
-  TIMECAPS    tc;
-
-  if ( TIMERR_NOERROR == timeGetDevCaps( & tc, sizeof( TIMECAPS ) ) ) {
-    wait_timerres = min( max( tc.wPeriodMin, 1 ), tc.wPeriodMax );
-    timeBeginPeriod( wait_timerres );
-  } else {
-    return false;
-  }    
-
-  result = timeSetEvent( wait_timerres, wait_timerres, & DirectDrawDisplay::g_timer_proc, ( DWORD_PTR ) this, TIME_PERIODIC );
-
-  if (NULL != result) {
-    wait_timerid = (UINT)result;
-    return true;
-  }
-
-  return false;
-}
-
-void DirectDrawDisplay::StopTimer()
-{
-  MMRESULT    result;
-
-  result = timeKillEvent( wait_timerid );
-  if ( TIMERR_NOERROR == result ) {
-    wait_timerid = 0;
-  }
-
-  if ( 0 != wait_timerres ) {
-    timeEndPeriod( wait_timerres );
-    wait_timerres = 0;
-  }
-}
-
-void CALLBACK DirectDrawDisplay::g_timer_proc( UINT id, UINT msg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2 )
-{
-  DirectDrawDisplay * p_this = reinterpret_cast< DirectDrawDisplay * >( dwUser );
-  if ( p_this ) {
-    p_this->timer_proc( id, msg, dw1, dw2 );
-  }
-}
-
-void DirectDrawDisplay::timer_proc( UINT id, UINT msg, DWORD_PTR dw1, DWORD_PTR dw2 )
-{
-  DWORD scanline;
-  if ( pDirectDraw->GetScanLine( & scanline ) == DD_OK ) {
-    unsigned height = GetSystemMetrics( SM_CYSCREEN );
-    if ( wait_screenheight != height ) {
-      wait_screenheight = height;
-      wait_maxheight = height;
-    }
-    if ( scanline >= wait_maxheight ) wait_maxheight = scanline + 1;
-
-    scanline = ( scanline + wait_maxheight - min( theApp.dest.bottom, wait_screenheight ) ) % wait_maxheight;
-
-    if ( scanline < wait_lastscanline ) {
-      PulseEvent( wait_event );
-    }
-
-    wait_lastscanline = scanline;
-  }
-}
-
 IDisplay *newDirectDrawDisplay()
 {
   return new DirectDrawDisplay();
 }
+

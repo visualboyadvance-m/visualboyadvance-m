@@ -131,10 +131,7 @@ extern int getopt ();
 extern int getopt_long ();
 extern int getopt_long_only ();
 
-extern int _getopt_internal (int argc, char *const *argv,
-			     const char *shortopts,
-		             const struct option *longopts, int *longind,
-			     int long_only);
+extern int _getopt_internal ();
 #endif /* __STDC__ */
 
 #ifdef	__cplusplus

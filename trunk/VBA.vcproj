@@ -51,7 +51,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)zlib&quot;;&quot;$(SolutionDir)libpng&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)src\win32\dependencies\zlib&quot;;&quot;$(SolutionDir)src\win32\dependencies\libpng&quot;;&quot;$(SolutionDir)src\win32\dependencies\cximage&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;DEV_VERSION;BKPT_SUPPORT;MMX;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="false"
 				MinimalRebuild="true"
@@ -83,7 +83,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib winmm.lib d3dx9.lib Dsound.lib"
+				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib dxerr9.lib winmm.lib d3dx9.lib d3d9.lib Dsound.lib"
 				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
 				Version=""
 				LinkIncremental="2"
@@ -165,7 +165,7 @@
 				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="false"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)zlib&quot;;&quot;$(SolutionDir)libpng&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)src\win32\dependencies\zlib&quot;;&quot;$(SolutionDir)src\win32\dependencies\libpng&quot;;&quot;$(SolutionDir)src\win32\dependencies\cximage&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;FINAL_VERSION;MMX;_CRT_SECURE_NO_WARNINGS"
 				IgnoreStandardIncludePath="false"
 				GeneratePreprocessedFile="0"
@@ -216,7 +216,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib winmm.lib dxguid.lib ddraw.lib d3dx9.lib Dsound.lib"
+				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib winmm.lib dxguid.lib ddraw.lib d3d9.lib d3dx9.lib Dsound.lib"
 				ShowProgress="0"
 				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
 				Version=""
@@ -308,7 +308,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)zlib&quot;;&quot;$(SolutionDir)libpng&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)src\win32\dependencies\zlib&quot;;&quot;$(SolutionDir)src\win32\dependencies\libpng&quot;;&quot;$(SolutionDir)src\win32\dependencies\cximage&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;FINAL_VERSION;MMX;_CRT_SECURE_NO_WARNINGS"
 				IgnoreStandardIncludePath="false"
 				GeneratePreprocessedFile="0"
@@ -650,14 +650,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\src\lq3x.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\src\lq4x.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\src\portable.cpp"
 						>
 					</File>
@@ -683,16 +675,40 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\getopt.cpp"
+					RelativePath=".\src\getopt.c"
 					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="1"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\src\getopt1.cpp"
+					RelativePath=".\src\getopt1.c"
 					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="1"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\src\memgzio.cpp"
+					RelativePath=".\src\memgzio.c"
 					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="1"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\src\snd_interp.cpp"
@@ -891,6 +907,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\win32\GameOverrides.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\win32\GBACheats.cpp"
 					>
 				</File>
@@ -1003,6 +1023,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\win32\skin.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\skinButton.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\win32\StringTokenizer.cpp"
 					>
 				</File>
@@ -1012,10 +1040,6 @@
 				</File>
 				<File
 					RelativePath=".\src\win32\TileView.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\win32\UniVideoModeDlg.cpp"
 					>
 				</File>
 				<File
@@ -1107,6 +1131,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\win32\display.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\win32\GDIDisplay.cpp"
 					>
 				</File>
@@ -1152,6 +1180,130 @@
 				</File>
 				<File
 					RelativePath=".\src\win32\LinkOptions.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Cximage"
+				>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\tif_xfile.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximabmp.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximadsp.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximaenc.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximaexif.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximagif.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximahist.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximaico.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximainfo.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximaint.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximaj2k.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximajas.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximajbg.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximajpg.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximalpha.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximalyr.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximamng.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximapal.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximapcx.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximapng.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximasel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximatga.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximath.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximatif.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximatran.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximawbmp.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximawmf.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\ximawnd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\dependencies\cximage\xmemfile.cpp"
 					>
 				</File>
 			</Filter>
@@ -1624,15 +1776,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\resource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\res\VBA.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\res\VBA.rc"
+				RelativePath=".\src\win32\VBA.rc"
 				>
 			</File>
 		</Filter>

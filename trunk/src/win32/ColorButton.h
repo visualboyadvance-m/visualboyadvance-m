@@ -20,7 +20,7 @@
 #if !defined(AFX_COLORBUTTON_H__DF02109B_B91C_49FD_954F_74A48B83C314__INCLUDED_)
 #define AFX_COLORBUTTON_H__DF02109B_B91C_49FD_954F_74A48B83C314__INCLUDED_
 
-#include "..\System.h"  // Added by ClassView
+#include "../System.h"  // Added by ClassView
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000

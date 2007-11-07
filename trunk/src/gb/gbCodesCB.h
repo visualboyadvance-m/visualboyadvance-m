@@ -1,7 +1,7 @@
 // -*- C++ -*-
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1282,7 +1282,10 @@
    AF.B.B1|=1<<7;
    break;
  default:
-   systemMessage(0, N_("Unknown opcode %02x at %04x"),
-                 gbReadOpcode(PC.W-1),PC.W-1);
-   emulating = false;
+   if (gbSystemMessage == false)
+   {
+     systemMessage(0, N_("Unknown opcode %02x at %04x"),
+                   gbReadOpcode(PC.W-1),PC.W-1);
+     gbSystemMessage =true;
+   }
    return;

@@ -20,7 +20,7 @@
 #if !defined(AFX_MEMORYVIEWERADDRESSSIZE_H__04605262_2B1D_4EED_A467_B6C56AC2CACD__INCLUDED_)
 #define AFX_MEMORYVIEWERADDRESSSIZE_H__04605262_2B1D_4EED_A467_B6C56AC2CACD__INCLUDED_
 
-#include "..\System.h"  // Added by ClassView
+#include "../System.h"  // Added by ClassView
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000

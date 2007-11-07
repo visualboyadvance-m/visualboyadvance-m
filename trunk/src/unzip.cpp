@@ -154,7 +154,7 @@ typedef struct
 local int unzlocal_getByte(FILE *fin,int *pi)
 {
     unsigned char c;
-        int err = fread(&c, 1, 1, fin);
+        size_t err = fread(&c, 1, 1, fin);
     if (err==1)
     {
         *pi = (int)c;

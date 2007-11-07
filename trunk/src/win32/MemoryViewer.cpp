@@ -535,8 +535,8 @@ void MemoryViewer::moveAddress(s32 offset, int nibbleOff)
 }
 
 LRESULT MemoryViewer::OnWMChar(WPARAM wParam, LPARAM LPARAM)
-{
-  if(OnEditInput(wParam))
+{ // The WM_CHAR message uses Unicode Transformation Format (UTF)-16.
+  if(OnEditInput((UINT)(wParam & 0xFFFF)))
     return 0;
   return 1;
 }

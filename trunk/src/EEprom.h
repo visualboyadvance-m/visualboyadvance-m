@@ -1,7 +1,7 @@
 // -*- C++ -*-
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,10 +20,11 @@
 #ifndef VBA_EEPROM_H
 #define VBA_EEPROM_H
 
-extern void eepromSaveGame(gzFile gzFile);
-extern void eepromReadGame(gzFile gzFile, int version);
+extern void eepromSaveGame(gzFile _gzFile);
+extern void eepromReadGame(gzFile _gzFile, int version);
 extern int eepromRead(u32 address);
 extern void eepromWrite(u32 address, u8 value);
+extern void eepromInit();
 extern void eepromReset();
 extern u8 eepromData[0x2000];
 extern bool eepromInUse;

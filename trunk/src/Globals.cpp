@@ -16,7 +16,12 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#include "Globals.h"
+#include "GBA.h"
+
+#ifdef BKPT_SUPPORT
+int  oldreg[17];
+char oldbuffer[10];
+#endif
 
 reg_pair reg[45];
 memoryMap map[256];
@@ -43,8 +48,8 @@ int layerSettings = 0xff00;
 int layerEnable = 0xff00;
 bool speedHack = false;
 int cpuSaveType = 0;
-bool cpuEnhancedDetection = true;
 bool cheatsEnabled = true;
+bool mirroringEnable = false;
 
 u8 *bios = NULL;
 u8 *rom = NULL;

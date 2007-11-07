@@ -1,6 +1,7 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2005 Forgotten and the VBA development team
+// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005-2006 VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,22 +18,19 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "stdafx.h"
-#include <stdio.h>
+
+#include "Display.h"
 
 #include "../System.h"
 #include "../GBA.h"
 #include "../Globals.h"
-#include "..\gb\gbGlobals.h"
 #include "../Text.h"
 #include "../Util.h"
-#include "UniVideoModeDlg.h"
 
 #include "VBA.h"
 #include "MainWnd.h"
 #include "Reg.h"
-#include "..\..\res\resource.h"
-
-#include "../gbafilter.h"
+#include "resource.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -43,32 +41,27 @@ static char THIS_FILE[] = __FILE__;
 extern void winlog(const char *,...);
 extern int Init_2xSaI(u32);
 extern int systemSpeed;
-extern int winVideoModeSelect(CWnd *, GUID **);
 
-
-class GDIDisplay : public IDisplay
-{
+class GDIDisplay : public IDisplay {
 private:
-	u8 *filterData;
-	u8 info[sizeof(BITMAPINFOHEADER)+256*sizeof(RGBQUAD)];
-	int SelectedFreq, SelectedAdapter;
+  u8 *filterData;
+  u8 info[sizeof(BITMAPINFOHEADER)+256*sizeof(RGBQUAD)];
+  
 public:
-	GDIDisplay();
-	virtual ~GDIDisplay();
+  GDIDisplay();
+  virtual ~GDIDisplay();
 
-	virtual bool changeRenderSize(int w, int h);
-	virtual bool initialize();
-	virtual void cleanup();
-	virtual void render();
-	virtual void checkFullScreen();
-	virtual void renderMenu();
-	virtual void clear();
-	virtual DISPLAY_TYPE getType() { return GDI; };
-	virtual void setOption(const char *, int) {}
-	virtual int selectFullScreenMode(GUID **);
-	virtual int selectFullScreenMode2();
+  virtual bool initialize();
+  virtual void cleanup();
+  virtual void render();
+  virtual void checkFullScreen();
+  virtual void renderMenu();
+  virtual void clear();
+  virtual DISPLAY_TYPE getType() { return GDI; };
+  virtual void setOption(const char *, int) {}
+  virtual bool isSkinSupported() { return true; }
+  virtual int selectFullScreenMode(GUID **);
 };
-
 
 static int calculateShift(u32 mask)
 {
@@ -84,7 +77,7 @@ static int calculateShift(u32 mask)
 
 GDIDisplay::GDIDisplay()
 {
-	filterData = NULL;
+  filterData = (u8 *)malloc(4*4*256*240);
 }
 
 GDIDisplay::~GDIDisplay()
@@ -94,76 +87,52 @@ GDIDisplay::~GDIDisplay()
 
 void GDIDisplay::cleanup()
 {
-	if(filterData)
-	{
-		delete [] filterData;
-		filterData = NULL;
-	}
+  if(filterData) {
+    free(filterData);
+    filterData = NULL;
+  }
 }
 
 bool GDIDisplay::initialize()
 {
-	switch(theApp.cartridgeType)
-	{
-	case 0:
-		theApp.sizeX = 240;
-		theApp.sizeY = 160;
-		break;
-	case 1:
-		if(gbBorderOn)
-		{
-			theApp.sizeX = 256;
-			theApp.sizeY = 224;
-		}
-		else
-		{
-			theApp.sizeX = 160;
-			theApp.sizeY = 144;
-		}
-		break;
-	}
-
-	switch(theApp.videoOption)
-	{
-	case VIDEO_1X:
-		theApp.surfaceSizeX = theApp.sizeX;
-		theApp.surfaceSizeY = theApp.sizeY;
-		break;
-	case VIDEO_2X:
-		theApp.surfaceSizeX = theApp.sizeX * 2;
-		theApp.surfaceSizeY = theApp.sizeY * 2;
-		break;
-	case VIDEO_3X:
-		theApp.surfaceSizeX = theApp.sizeX * 3;
-		theApp.surfaceSizeY = theApp.sizeY * 3;
-		break;
-	case VIDEO_4X:
-		theApp.surfaceSizeX = theApp.sizeX * 4;
-		theApp.surfaceSizeY = theApp.sizeY * 4;
-		break;
-	case VIDEO_320x240:
-	case VIDEO_640x480:
-	case VIDEO_800x600:
-	case VIDEO_1024x768:
-	case VIDEO_1280x1024:
-	case VIDEO_OTHER:
-			float scaleX = ((float)theApp.fsWidth / theApp.sizeX);
-			float scaleY = ((float)theApp.fsHeight / theApp.sizeY);
-			float min = scaleX < scaleY ? scaleX : scaleY;
-			if(theApp.fsMaxScale)
-				min = min > theApp.fsMaxScale ? theApp.fsMaxScale : min;
-			if(theApp.fullScreenStretch)
-			{
-				theApp.surfaceSizeX = theApp.fsWidth;
-				theApp.surfaceSizeY = theApp.fsHeight;
-			}
-			else
-			{
-				theApp.surfaceSizeX = (int)(theApp.sizeX * min);
-				theApp.surfaceSizeY = (int)(theApp.sizeY * min);
-			}
-			break;
-	}
+  theApp.sizeX = 240;
+  theApp.sizeY = 160;
+  switch(theApp.videoOption) {
+  case VIDEO_1X:
+    theApp.surfaceSizeX = theApp.sizeX;
+    theApp.surfaceSizeY = theApp.sizeY;
+    break;
+  case VIDEO_2X:
+    theApp.surfaceSizeX = theApp.sizeX * 2;
+    theApp.surfaceSizeY = theApp.sizeY * 2;
+    break;
+  case VIDEO_3X:
+    theApp.surfaceSizeX = theApp.sizeX * 3;
+    theApp.surfaceSizeY = theApp.sizeY * 3;
+    break;
+  case VIDEO_4X:
+    theApp.surfaceSizeX = theApp.sizeX * 4;
+    theApp.surfaceSizeY = theApp.sizeY * 4;
+    break;
+  case VIDEO_320x240:
+  case VIDEO_640x480:
+  case VIDEO_800x600:
+  case VIDEO_OTHER:
+    {
+      int scaleX = (theApp.fsWidth / theApp.sizeX);
+      int scaleY = (theApp.fsHeight / theApp.sizeY);
+      int min = scaleX < scaleY ? scaleX : scaleY;
+      if(theApp.fsMaxScale)
+        min = min > theApp.fsMaxScale ? theApp.fsMaxScale : min;
+      theApp.surfaceSizeX = theApp.sizeX * min;
+      theApp.surfaceSizeY = theApp.sizeY * min;
+      if(theApp.fullScreenStretch) {
+        theApp.surfaceSizeX = theApp.fsWidth;
+        theApp.surfaceSizeY = theApp.fsHeight;
+      }
+    }
+    break;
+  }
   
   theApp.rect.left = 0;
   theApp.rect.top = 0;
@@ -224,62 +193,11 @@ bool GDIDisplay::initialize()
   theApp.updateMenuBar();
   
   theApp.adjustDestRect();
-
-  // Enumerate available display modes
+  
   theApp.mode320Available = false;
   theApp.mode640Available = false;
   theApp.mode800Available = false;
-  theApp.mode1024Available = false;
-  theApp.mode1280Available = false;
-  DISPLAY_DEVICE dev;
-  dev.cb = sizeof(DISPLAY_DEVICE);
-  EnumDisplayDevices(NULL, 0, &dev, 0);
-  DEVMODE mode;
-  for (DWORD iMode = 0;
-	  TRUE == EnumDisplaySettings(dev.DeviceName, iMode, &mode);
-	  iMode++)
-  {
-	  if ( (mode.dmBitsPerPel == 16) &&
-		  (mode.dmPelsWidth==320) && (mode.dmPelsHeight==240))
-		  theApp.mode320Available = true;
-
-	  if ( (mode.dmBitsPerPel == 16) &&
-		  (mode.dmPelsWidth==640) && (mode.dmPelsHeight==480))
-		  theApp.mode640Available = true;
-
-	  if ( (mode.dmBitsPerPel == 16) &&
-		  (mode.dmPelsWidth==800) && (mode.dmPelsHeight==600))
-		  theApp.mode800Available = true;
-
-	  if ( (mode.dmBitsPerPel == 32) &&
-		  (mode.dmPelsWidth==1024) && (mode.dmPelsHeight==768))
-		  theApp.mode1024Available = true;
-
-	  if ( (mode.dmBitsPerPel == 32) &&
-		  (mode.dmPelsWidth==1280) && (mode.dmPelsHeight==1024))
-		  theApp.mode1280Available = true;
-  }
-
-  // Go into fullscreen
-  if(theApp.videoOption >= VIDEO_320x240)
-  {
-	  mode.dmBitsPerPel	= theApp.fsColorDepth;
-	  mode.dmPelsWidth	= theApp.fsWidth;
-	  mode.dmPelsHeight	= theApp.fsHeight;
-	  mode.dmDisplayFrequency = theApp.fsFrequency;
-	  mode.dmFields		= DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
-	  DISPLAY_DEVICE dd;
-	  dd.cb = sizeof(DISPLAY_DEVICE);
-	  EnumDisplayDevices(NULL, theApp.fsAdapter, &dd, 0);
-	  ChangeDisplaySettingsEx(dd.DeviceName, &mode, NULL, CDS_FULLSCREEN, NULL);
-  }
-  else // Reset from fullscreen
-  {
-	  ChangeDisplaySettings(NULL, 0);
-  }
   
-
-  // Initialize 2xSaI
   HDC dc = GetDC(NULL);
   HBITMAP hbm = CreateCompatibleBitmap(dc, 1, 1);
   BITMAPINFO *bi = (BITMAPINFO *)info;
@@ -291,57 +209,49 @@ bool GDIDisplay::initialize()
   ReleaseDC(NULL, dc);
 
   if(bi->bmiHeader.biCompression == BI_BITFIELDS) {
-	  systemColorDepth = bi->bmiHeader.biBitCount;
-	  if(systemColorDepth == 15)
-		  systemColorDepth = 16;
-	  systemRedShift = calculateShift(*((DWORD *)&bi->bmiColors[0]));
-	  systemGreenShift = calculateShift(*((DWORD *)&bi->bmiColors[1]));
-	  systemBlueShift = calculateShift(*((DWORD *)&bi->bmiColors[2]));
-	  if(systemColorDepth == 16) {
-		  if(systemGreenShift == 6) {
-			  Init_2xSaI(565);
-		  } else {
-			  Init_2xSaI(555);
-		  }
-	  } else if(systemColorDepth == 32)
-		  Init_2xSaI(32);
+    systemColorDepth = bi->bmiHeader.biBitCount;
+    if(systemColorDepth == 15)
+      systemColorDepth = 16;
+    systemRedShift = calculateShift(*((DWORD *)&bi->bmiColors[0]));
+    systemGreenShift = calculateShift(*((DWORD *)&bi->bmiColors[1]));
+    systemBlueShift = calculateShift(*((DWORD *)&bi->bmiColors[2]));
+    if(systemColorDepth == 16) {
+      if(systemGreenShift == 6) {
+        Init_2xSaI(565);
+      } else {
+        Init_2xSaI(555);
+      }
+    } else if(systemColorDepth == 32)
+      Init_2xSaI(32);
   } else {
-	  systemColorDepth = 32;
-	  systemRedShift = 19;
-	  systemGreenShift = 11;
-	  systemBlueShift = 3;
+    systemColorDepth = 32;
+    systemRedShift = 19;
+    systemGreenShift = 11;
+    systemBlueShift = 3;
 
-	  Init_2xSaI(32);    
+    Init_2xSaI(32);    
   }
-
-
-  // Setup system color depth
   theApp.fsColorDepth = systemColorDepth;
   if(systemColorDepth == 24)
-	  theApp.filterFunction = NULL;
+    theApp.filterFunction = NULL;
 #ifdef MMX
   if(!theApp.disableMMX)
-	  cpu_mmx = theApp.detectMMX();
+    cpu_mmx = theApp.detectMMX();
   else
-	  cpu_mmx = 0;
+    cpu_mmx = 0;
 #endif
-
-  utilUpdateSystemColorMaps(theApp.filterLCD );
+  
+  utilUpdateSystemColorMaps();
   theApp.updateFilter();
   theApp.updateIFB();
-
+  
   pWnd->DragAcceptFiles(TRUE);
-
+  
   return TRUE;  
 }
 
-
 void GDIDisplay::clear()
 {
-	CDC *dc = theApp.m_pMainWnd->GetDC();
-	CBrush brush(RGB(0x00, 0x00, 0x00));
-	dc->FillRect(CRect(0, 0, theApp.fsWidth, theApp.fsHeight), &brush);
-	theApp.m_pMainWnd->ReleaseDC(dc);
 }
 
 void GDIDisplay::renderMenu()
@@ -355,125 +265,138 @@ void GDIDisplay::checkFullScreen()
 }
 
 void GDIDisplay::render()
-{
-	unsigned int pitch = theApp.filterWidth * (systemColorDepth / 8) + 4;
+{ 
+  BITMAPINFO *bi = (BITMAPINFO *)info;
+  bi->bmiHeader.biWidth = theApp.filterWidth+1;
+  bi->bmiHeader.biHeight = -theApp.filterHeight;
 
-	BITMAPINFO *bi = (BITMAPINFO *)info;
-	bi->bmiHeader.biWidth = theApp.filterWidth + 1;
-	bi->bmiHeader.biHeight = -theApp.filterHeight;
+  int pitch = theApp.filterWidth * 2 + 4;
+  if(systemColorDepth == 24)
+    pitch = theApp.filterWidth * 3;
+  else if(systemColorDepth == 32)
+    pitch = theApp.filterWidth * 4 + 4;
+  
+  if(theApp.filterFunction) {
+    bi->bmiHeader.biWidth = theApp.filterWidth * 2;
+    bi->bmiHeader.biHeight = -theApp.filterHeight * 2;
+    
+    if(systemColorDepth == 16)
+      (*theApp.filterFunction)(pix+pitch,
+                               pitch,
+                               (u8*)theApp.delta,
+                               (u8*)filterData,
+                               theApp.filterWidth*2*2,
+                               theApp.filterWidth,
+                               theApp.filterHeight);
+    else
+      (*theApp.filterFunction)(pix+pitch,
+                               pitch,
+                               (u8*)theApp.delta,
+                               (u8*)filterData,
+                               theApp.filterWidth*4*2,
+                               theApp.filterWidth,
+                               theApp.filterHeight);
+  }
 
-	if(theApp.filterFunction)
-	{
-		bi->bmiHeader.biWidth = theApp.rect.right;
-		bi->bmiHeader.biHeight = -(int)theApp.rect.bottom;
-		
-		(*theApp.filterFunction)(
-			pix + pitch,
-			pitch,
-			(u8*)theApp.delta,
-			(u8*)filterData,
-			theApp.rect.right * (systemColorDepth / 8),
-			theApp.filterWidth,
-			theApp.filterHeight);
-	}
+  if(theApp.showSpeed && (theApp.videoOption > VIDEO_4X || theApp.skin != NULL)) {
+    char buffer[30];
+    if(theApp.showSpeed == 1)
+      sprintf(buffer, "%3d%%", systemSpeed);
+    else
+      sprintf(buffer, "%3d%%(%d, %d fps)", systemSpeed,
+              systemFrameSkip,
+              theApp.showRenderedFrames);
 
-	POINT p1, p2;
-	p1.x = theApp.dest.left;
-	p1.y = theApp.dest.top;
-	p2.x = theApp.dest.right;
-	p2.y = theApp.dest.bottom;
-	theApp.m_pMainWnd->ScreenToClient(&p1);
-	theApp.m_pMainWnd->ScreenToClient(&p2);
-	
-	CDC *dc = theApp.m_pMainWnd->GetDC();
+    if(theApp.filterFunction) {
+      int p = theApp.filterWidth * 4;
+      if(systemColorDepth == 24)
+        p = theApp.filterWidth * 6;
+      else if(systemColorDepth == 32)
+        p = theApp.filterWidth * 8;
+      if(theApp.showSpeedTransparent)
+        drawTextTransp((u8*)filterData,
+                       p,
+                       10,
+                       theApp.filterHeight*2-10,
+                       buffer);
+      else
+        drawText((u8*)filterData,
+                 p,
+                 10,
+                 theApp.filterHeight*2-10,
+                 buffer);      
+    } else {
+      if(theApp.showSpeedTransparent)
+        drawTextTransp((u8*)pix,
+                       pitch,
+                       10,
+                       theApp.filterHeight-10,
+                       buffer);
+      else
+        drawText((u8*)pix,
+                 pitch,
+                 10,
+                 theApp.filterHeight-10,
+                 buffer);
+    }
+  }
 
-	// Draw bitmap to device
-	StretchDIBits(
-		dc->GetSafeHdc(),
-		p1.x,  p1.y,
-		p2.x - p1.x,
-		p2.y - p1.y,
-		theApp.rect.left, theApp.rect.top,
-		theApp.rect.right - theApp.rect.left,
-		theApp.rect.bottom - theApp.rect.top,
-		theApp.filterFunction ? filterData : pix + pitch,
-		bi,
-		DIB_RGB_COLORS,
-		SRCCOPY);
+  POINT p;
+  p.x = theApp.dest.left;
+  p.y = theApp.dest.top;
+  CWnd *pWnd = theApp.m_pMainWnd;
+  pWnd->ScreenToClient(&p);
+  POINT p2;
+  p2.x = theApp.dest.right;
+  p2.y = theApp.dest.bottom;
+  pWnd->ScreenToClient(&p2);
+  
+  CDC *dc = pWnd->GetDC();
 
-	// Draw frame counter
-	if (theApp.showSpeed && (theApp.videoOption >= VIDEO_320x240))
-	{
-		CString speedText;
-		if (theApp.showSpeed == 1)
-			speedText.AppendFormat("%3d%%", systemSpeed);
-		else
-			speedText.AppendFormat("%3d%%(%d, %d fps)",
-				systemSpeed, systemFrameSkip, theApp.showRenderedFrames);
+  StretchDIBits((HDC)*dc,
+                p.x,
+                p.y,
+                p2.x - p.x,
+                p2.y - p.y,
+                0,
+                0,
+                theApp.rect.right,
+                theApp.rect.bottom,
+                theApp.filterFunction ? filterData : pix+pitch,
+                bi,
+                DIB_RGB_COLORS,
+                SRCCOPY);
 
-		dc->SetTextColor(RGB(0xFF, 0x3F, 0x3F));
-		if (theApp.showSpeedTransparent)
-			dc->SetBkMode(TRANSPARENT);
-		else
-			dc->SetBkMode(OPAQUE);
-		dc->SetBkColor(RGB(0xFF, 0xFF, 0xFF));
-		dc->TextOut(p1.x + 16, p1.y + 16, speedText);
-	}
-
-	// Draw screen message
-	if (theApp.screenMessage)
-	{
-		if ( ((GetTickCount() - theApp.screenMessageTime) < 3000) && !theApp.disableStatusMessage )
-		{
-			dc->SetTextColor(RGB(0x3F, 0x3F, 0xFF));
-			if (theApp.showSpeedTransparent)
-				dc->SetBkMode(TRANSPARENT);
-			else
-				dc->SetBkMode(OPAQUE);
-			dc->SetBkColor(RGB(0xFF, 0xFF, 0xFF));
-			dc->TextOut(p1.x + 16, p2.y - 16, theApp.screenMessageBuffer);
-		}
-		else
-			theApp.screenMessage = false;
-	}
-
-	theApp.m_pMainWnd->ReleaseDC(dc);
+  if(theApp.screenMessage) {
+    if(((GetTickCount() - theApp.screenMessageTime) < 3000) &&
+       !theApp.disableStatusMessage) {
+      dc->SetTextColor(RGB(255,0,0));
+      dc->SetBkMode(TRANSPARENT);
+      dc->TextOut(p.x+10, p2.y - 20, theApp.screenMessageBuffer);
+    } else {
+      theApp.screenMessage = false;
+    }
+  }
+  
+  pWnd->ReleaseDC(dc);
 }
 
-int GDIDisplay::selectFullScreenMode(GUID **pGUID)
+int GDIDisplay::selectFullScreenMode(GUID **)
 {
-	int w, h, b;
-	UniVideoModeDlg dlg(0, &w, &h, &b, &SelectedFreq, &SelectedAdapter);
+  HWND wnd = GetDesktopWindow();
+  RECT r;
+  GetWindowRect(wnd, &r);
+  int w = (r.right - r.left) & 4095;
+  int h = (r.bottom - r.top) & 4095;
+  HDC dc = GetDC(wnd);
+  int c = GetDeviceCaps(dc, BITSPIXEL);
+  ReleaseDC(wnd, dc);
 
-	if (0 == dlg.DoModal())
-	{
-		return (b<<24) + (w<<12) + h;
-	// Bits<<24  |  Width<<12  |  Height
-	}
-	else
-	{
-		return -1;
-	}
+  return (c << 24) | (w << 12) | h;
 }
-
-int GDIDisplay::selectFullScreenMode2()
-{
-	return (SelectedAdapter<<16) + SelectedFreq;
-}
-
-bool GDIDisplay::changeRenderSize(int w, int h)
-{
-	if (filterData)
-	{
-		delete [] filterData;
-		filterData = NULL;
-	}
-	filterData = new u8[w*h*(systemColorDepth>>3)];
-	return true;
-}
-
 
 IDisplay *newGDIDisplay()
 {
   return new GDIDisplay();
 }
+
