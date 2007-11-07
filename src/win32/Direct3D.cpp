@@ -50,6 +50,7 @@ extern "C" bool cpu_mmx;
 extern bool detectMMX();
 #endif
 
+extern int winVideoModeSelect(CWnd *, GUID **);
 
 class Direct3DDisplay : public IDisplay {
 private:
@@ -283,6 +284,7 @@ bool Direct3DDisplay::initialize()
 		DXTRACE_ERR_MSGBOX( _T("Error creating Direct3D object"), 0 );
 		return FALSE;
 	}
+	pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &mode);
 
 	theApp.mode320Available = FALSE;
 	theApp.mode640Available = FALSE;
@@ -290,7 +292,28 @@ bool Direct3DDisplay::initialize()
 	theApp.mode1024Available = FALSE;
 	theApp.mode1280Available = FALSE;
 
-	pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &mode);
+	unsigned int nModes, i;
+	D3DDISPLAYMODE dm;
+
+	nModes = pD3D->GetAdapterModeCount(theApp.fsAdapter, mode.Format);
+	for (i = 0; i<nModes; i++)
+	{
+		if (D3D_OK == pD3D->EnumAdapterModes(theApp.fsAdapter, mode.Format, i, &dm) )
+		{
+			if ( (dm.Width == 320) && (dm.Height == 240) )
+				theApp.mode320Available = true;
+			if ( (dm.Width == 640) && (dm.Height == 480) )
+				theApp.mode640Available = true;
+			if ( (dm.Width == 800) && (dm.Height == 600) )
+				theApp.mode800Available = true;
+			if ( (dm.Width == 1024) && (dm.Height == 768) )
+				theApp.mode1024Available = true;
+			if ( (dm.Width == 1280) && (dm.Height == 1024) )
+				theApp.mode1280Available = true;
+		}
+	}
+
+
 	screenFormat = mode.Format;
 
 	switch(mode.Format) {
@@ -489,32 +512,15 @@ void Direct3DDisplay::resize( int w, int h )
 		resetDevice();
 		calculateDestRect();
 	}
+	if(theApp.videoOption > VIDEO_4X)
+		resetDevice();
+
 }
 
 
-int Direct3DDisplay::selectFullScreenMode( GUID ** )
+int Direct3DDisplay::selectFullScreenMode( GUID **pGUID )
 {
-	HRESULT hr;
-	D3DDISPLAYMODE dm;
-	if( FAILED( hr = pDevice->GetDisplayMode( 0, &dm ) ) ) {
-		DXTRACE_ERR_MSGBOX( _T("pDevice->GetDisplayMode failed"), hr );
-		return false;
-	}
-
-	UINT bitsPerPixel;
-	switch( dm.Format )
-	{
-	case D3DFMT_A2R10G10B10:
-	case D3DFMT_X8R8G8B8:
-		bitsPerPixel = 32;
-		break;
-	case D3DFMT_X1R5G5B5:
-	case D3DFMT_R5G6B5:
-		bitsPerPixel = 16;
-		break;
-	}
-
-	return (bitsPerPixel << 24) | (dm.Width << 12) | dm.Height;
+  return winVideoModeSelect(theApp.m_pMainWnd, pGUID);
 }
 
 
@@ -638,11 +644,17 @@ bool Direct3DDisplay::resetDevice()
 	destroyFont();
 	destroySurface();
 	setPresentationType();
+	if (!theApp.menuToggle)
+		pDevice->SetDialogBoxMode( FALSE );
+
 	if( FAILED( hr = pDevice->Reset( &dpp ) ) ) {
 		//DXTRACE_ERR_MSGBOX( _T("pDevice->Reset failed"), hr );
 		failed = true;
 		return false;
 	}
+	if (theApp.menuToggle)
+		pDevice->SetDialogBoxMode( TRUE );
+
 	createFont();
 	createSurface();
 	failed = false;
