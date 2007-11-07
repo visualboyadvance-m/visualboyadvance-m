@@ -322,7 +322,7 @@ inline double calc_rate(int timer)
 	{
 		return double(SOUND_CLOCK_TICKS) /
 			double((0x10000 - (timer ? timer1Reload : timer0Reload)) * 
-			(timer ? timer1ClockReload : timer0ClockReload));
+			1 << (timer ? timer1ClockReload : timer0ClockReload));
 	}
 	else
 	{
@@ -356,6 +356,13 @@ static foo_interpolate_setup blah;
 
 static int interpolation = 0;
 
+void interp_reset(int ch)
+{
+	setSoundFn();
+	interp[ch]->reset();
+	interp_rate();
+}
+
 void interp_switch(int which)
 {
 	for (int i = 0; i < 2; i++)
@@ -363,8 +370,8 @@ void interp_switch(int which)
 		delete interp[i];
 		interp[i] = get_filter(which);
 	}
-	interp_rate();
 	interpolation = which;
+	interp_rate();
 }
 
 
@@ -374,12 +381,6 @@ void interp_rate()
 	interp[1]->rate(calc_rate(soundDSBTimer));
 }
 
-void interp_reset(int ch)
-{
-	setSoundFn();
-	interp[ch]->reset();
-	interp_rate();
-}
 
 
 inline void interp_push(int ch, int sample)

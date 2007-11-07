@@ -146,7 +146,10 @@ class sample_buffer
 	T * buffer;
 
 public:
-	sample_buffer() : ptr(0), filled(0), buffer(0) {}
+	sample_buffer() : ptr(0), filled(0) 
+	{
+		buffer = new T[buffer_size];
+	}
 	~sample_buffer()
 	{
 		if (buffer) delete [] buffer;
@@ -154,11 +157,6 @@ public:
 
 	void clear()
 	{
-		if (buffer)
-		{
-			delete [] buffer;
-			buffer = 0;
-		}
 		ptr = filled = 0;
 	}
 
@@ -169,7 +167,6 @@ public:
 
 	inline void push_back(T sample)
 	{
-		if (!buffer) buffer = new T[buffer_size];
 		buffer[ptr] = sample;
 		if (++ptr >= buffer_size) ptr = 0;
 		if (filled < buffer_size) filled++;
@@ -259,11 +256,7 @@ public:
 		ret += smp(1) * position;
 		ret >>= 15;
 
-		// wahoo, takes care of drifting
-		if (samples.size() > 2)
-			position+=lrate+16383;
-		else
-			position+=lrate;
+		position+=lrate;
 
 		return ret;
 	}
@@ -329,11 +322,7 @@ public:
 		if (ret > 32767) ret = 32767;
 		else if (ret < -32768) ret = -32768;
 
-		// wahoo, takes care of drifting
-		if (samples.size() > 8)
-			position+=lrate+16383;
-		else
-			position+=lrate;
+		position+=lrate;
 
 		return ret;
 	}
@@ -356,7 +345,10 @@ public:
 		position = 0;
 	}
 
-	~foo_fir() {}
+	~foo_fir() 
+		{
+		position=666;
+		}
 
 	void reset()
 	{
@@ -395,11 +387,7 @@ public:
 		if (ret > 32767) ret = 32767;
 		else if (ret < -32768) ret = -32768;
 
-		// wahoo, takes care of drifting
-		if (samples.size() > 16)
-			position+=lrate+16383;
-		else
-			position+=lrate;
+		position+=lrate;
 		return ret;
 	}
 };
