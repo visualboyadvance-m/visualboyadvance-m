@@ -533,7 +533,9 @@ BOOL checkKey(LONG_PTR key)
 
     if (dev == 0) {
         return KEYDOWN(pDevices[0].data,k);
-    } else {
+	} else if (dev >= numDevices) {
+		return FALSE;
+	} else {
         if (k < 16) {
             LONG_PTR axis = k >> 1;
             LONG value = pDevices[dev].axis[axis].center;
@@ -805,7 +807,7 @@ CString DirectInput::getKeyName(LONG_PTR key)
     if (d == 0) {
         pDevices[0].device->GetObjectInfo( &di, (DWORD)key, DIPH_BYOFFSET );
         winBuffer = di.tszName;
-    } else {
+	} else if (d < numDevices) {
         if (k < 16) {
             if (k < 4) {
                 switch (k) {
@@ -852,6 +854,11 @@ CString DirectInput::getKeyName(LONG_PTR key)
             winBuffer.Format(winResLoadString(IDS_JOY_BUTTON),d,di.tszName);
         }
     }
+	else
+	{
+		// Joystick isn't plugged in.  We can't decipher k, so just show its value.
+		winBuffer.Format("Joy %d (%d)", d, k);
+	}
 
     return winBuffer;
 }
