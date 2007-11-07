@@ -71,6 +71,14 @@
 
 
 extern int emulating;
+extern int linktime;
+extern void StartLink(u16);
+extern void StartJOYLink(u16);
+extern void StartGPLink(u16);
+extern void LinkSSend(u16);
+extern void LinkUpdate(int);
+extern int linktime2;
+
 int SWITicks = 0;
 int IRQTicks = 0;
 
@@ -2979,7 +2987,8 @@ void CPUUpdateRegister(u32 address, u16 value)
     cpuNextEvent = cpuTotalTicks;
     break;
   case 0x128:
-    if(value & 0x80) {
+    StartLink(value);	// Link
+   /* if(value & 0x80) {
       value &= 0xff7f;
       if(value & 1 && (value & 0x4000)) {
         UPDATE_REG(0x12a, 0xFF);
@@ -2988,8 +2997,13 @@ void CPUUpdateRegister(u32 address, u16 value)
         value &= 0x7f7f;
       }
     }
-    UPDATE_REG(0x128, value);
+    UPDATE_REG(0x128, value); */
     break;
+ case 0x12a:
+	  if(lspeed)
+		LinkSSend(value);
+	  UPDATE_REG(0x12a, value);
+	  break;
   case 0x130:
     P1 |= (value & 0x3FF);
     UPDATE_REG(0x130, P1);
@@ -2997,6 +3011,13 @@ void CPUUpdateRegister(u32 address, u16 value)
   case 0x132:
     UPDATE_REG(0x132, value & 0xC3FF);
     break;
+  case 0x134:
+	StartGPLink(value);
+	break;
+  case 0x140:
+	StartJOYLink(value);
+	break;
+
   case 0x200:
     IE = value & 0x3FFF;
     UPDATE_REG(0x200, IE);
@@ -4288,6 +4309,10 @@ void CPULoop(int ticks)
 #endif
 
       ticks -= clockTicks;
+	  /* Link 
+----------------------------------*/		
+	  LinkUpdate(clockTicks);
+/* ----------------------------- */
 
       cpuNextEvent = CPUUpdateTicks();
       
