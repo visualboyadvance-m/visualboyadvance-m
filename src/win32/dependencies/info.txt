@@ -1,0 +1,1 @@
+All those libraries use the Static Multi-Threaded C/C++ [Release / Debug] libraries.

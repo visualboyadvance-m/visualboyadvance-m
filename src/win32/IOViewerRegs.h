@@ -1,7 +1,7 @@
 // -*- C++ -*-
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -258,7 +258,7 @@ const IOData ioViewRegisters[] = {
     }
   },
   {
-    &BG2HOFS, 0x18, "0x4000018-BG8HOFS", 0x01FF,
+    &BG2HOFS, 0x18, "0x4000018-BG2HOFS", 0x01FF,
     {
       "",
       "",
@@ -1119,7 +1119,7 @@ const IOData ioViewRegisters[] = {
     }
   },
   {
-    NULL, 0x82, "0x4000082-SGCNT0_H", 0xFF1F,
+    NULL, 0x82, "0x4000082-SGCNT0_H", 0xFF0F,
     {
       "",
       "Sound 1-4 Volume (2 bits)",

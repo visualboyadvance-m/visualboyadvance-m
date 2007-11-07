@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,9 +27,11 @@
 
 #include "gbCheats.h"
 #include "gbGlobals.h"
+#include "GB.h"
 
 gbCheat gbCheatList[100];
 int gbCheatNumber = 0;
+int gbNextCheat = 0;
 bool gbCheatMap[0x10000];
 
 extern bool cheatsEnabled;
@@ -50,7 +52,7 @@ void gbCheatUpdateMap()
 void gbCheatsSaveGame(gzFile gzFile)
 {
   utilWriteInt(gzFile, gbCheatNumber);
-  if(gbCheatNumber)
+  if(gbCheatNumber>0)
     utilGzWrite(gzFile, &gbCheatList[0], sizeof(gbCheat)*gbCheatNumber);
 }
 
@@ -81,7 +83,7 @@ void gbCheatsReadGame(gzFile gzFile, int version)
   } else {
     gbCheatNumber = utilReadInt(gzFile);
 
-    if(gbCheatNumber) {
+    if(gbCheatNumber>0) {
       utilGzRead(gzFile, &gbCheatList[0], sizeof(gbCheat)*gbCheatNumber);
     }
   }
@@ -163,7 +165,7 @@ bool gbCheatsLoadCheatList(const char *file)
 
 bool gbVerifyGsCode(const char *code)
 {
-  int len = strlen(code);
+  size_t len = strlen(code);
 
   if(len == 0)
     return true;
@@ -179,10 +181,6 @@ bool gbVerifyGsCode(const char *code)
     GBCHEAT_HEX_VALUE(code[7]) << 8 |
     GBCHEAT_HEX_VALUE(code[4]) << 4 |
     GBCHEAT_HEX_VALUE(code[5]);
-
-  if(address < 0xa000 ||
-     address > 0xdfff)
-    return false;
 
   return true;
 }
@@ -220,15 +218,23 @@ void gbAddGsCheat(const char *code, const char *desc)
   gbCheatList[i].compare = 0;
 
   gbCheatList[i].enabled = true;
-  
-  gbCheatMap[gbCheatList[i].address] = true;
-  
+
+  int gsCode = gbCheatList[i].code;
+
+  if ((gsCode !=1) && ((gsCode & 0xF0) !=0x80) && ((gsCode & 0xF0) !=0x90) &&
+      ((gsCode & 0xF0) !=0xA0) && ((gsCode) !=0xF0) && ((gsCode) !=0xF1))
+    systemMessage(MSG_WRONG_GAMESHARK_CODE,
+                  N_("Wrong GameShark code type : %s"), code);
+  else if (((gsCode & 0xF0) ==0xA0) || ((gsCode) ==0xF0) || ((gsCode) ==0xF1))
+    systemMessage(MSG_UNSUPPORTED_GAMESHARK_CODE,
+                  N_("Unsupported GameShark code type : %s"), code);
+
   gbCheatNumber++;
 }
 
 bool gbVerifyGgCode(const char *code)
 {
-  int len = strlen(code);
+  size_t len = strlen(code);
 
   if(len != 11 &&
      len != 7 &&
@@ -313,12 +319,12 @@ void gbAddGgCheat(const char *code, const char *desc)
   
   int i = gbCheatNumber;
 
-  int len = strlen(code);
+  size_t len = strlen(code);
   
   strcpy(gbCheatList[i].cheatCode, code);
   strcpy(gbCheatList[i].cheatDesc, desc);
 
-  gbCheatList[i].code = 1;
+  gbCheatList[i].code = 0x101;
   gbCheatList[i].value = (GBCHEAT_HEX_VALUE(code[0]) << 4) +
     GBCHEAT_HEX_VALUE(code[1]);
   
@@ -338,8 +344,11 @@ void gbAddGgCheat(const char *code, const char *desc)
     compare ^= 0x45;
 
     gbCheatList[i].compare = compare;
-    gbCheatList[i].code = 0;
+    //gbCheatList[i].code = 0;
+    gbCheatList[i].code = 0x100; // fix for compare value
+
   }
+
 
   gbCheatList[i].enabled = true;
   
@@ -425,6 +434,7 @@ bool gbCheatReadGSCodeFile(const char *fileName)
   return true;
 }
 
+// Used to emulated GG codes
 u8 gbCheatRead(u16 address)
 {
   if(!cheatsEnabled)
@@ -437,26 +447,72 @@ u8 gbCheatRead(u16 address)
         if(gbMemoryMap[address>>12][address&0xFFF] == gbCheatList[i].compare)
           return gbCheatList[i].value;
         break;
-      case 0x00:
-      case 0x01:
-      case 0x80:
-        return gbCheatList[i].value;
-      case 0x90:
-      case 0x91:
-      case 0x92:
-      case 0x93:
-      case 0x94:
-      case 0x95:
-      case 0x96:
-      case 0x97:
-        if(address >= 0xd000 && address < 0xe000) {
-          if(((gbMemoryMap[0x0d] - gbWram)/0x1000) ==
-             (gbCheatList[i].code - 0x90))
-            return gbCheatList[i].value;
-        } else
+      case 0x101: // GameGenie 6 digits code support
           return gbCheatList[i].value;
+        break;
       }
     }
   }
   return gbMemoryMap[address>>12][address&0xFFF];
+}
+
+
+// Used to emulate GS codes.
+void gbCheatWrite(bool reboot)
+{
+  if(cheatsEnabled)
+  {
+    u16 address = 0;
+
+    if (gbNextCheat >= gbCheatNumber)
+      gbNextCheat = 0;
+
+    for(int i = gbNextCheat; i < gbCheatNumber; i++) {
+      if(gbCheatList[i].enabled) {
+        address = gbCheatList[i].address;
+        if ((!reboot) && (address >= 0x8000) && !((address>=0xA000) && (address<0xC000)))
+        { // These codes are executed one per one, at each Vblank
+          switch(gbCheatList[i].code) {
+            case 0x01:
+              gbWriteMemory(address, gbCheatList[i].value);
+              gbNextCheat = i+1;
+              return;
+            case 0x90:
+            case 0x91:
+            case 0x92:
+            case 0x93:
+            case 0x94:
+            case 0x95:
+            case 0x96:
+            case 0x97:
+            case 0x98:
+            case 0x99:
+            case 0x9A:
+            case 0x9B:
+            case 0x9C:
+            case 0x9D:
+            case 0x9E:
+            case 0x9F:
+              int oldbank = gbMemory[0xff70];
+              gbWriteMemory(0xff70, gbCheatList[i].code & 0xf);
+              gbWriteMemory(address, gbCheatList[i].value);
+              gbWriteMemory(0xff70, oldbank);
+              gbNextCheat = i+1;
+              return;
+          }
+        }
+        else // These codes are only executed when the game is booted
+        {
+          switch(gbCheatList[i].code & 0xF0) {
+            case 0x80:
+              gbWriteMemory(0x0000, 0x0A);
+              gbWriteMemory(0x4000, gbCheatList[i].value & 0xF);
+              gbWriteMemory(address, gbCheatList[i].value);
+              gbNextCheat = i+1;
+              return;
+          }
+        }
+      }
+    }
+  }
 }

@@ -1,6 +1,8 @@
 #include "System.h"
 #include "Port.h"
 
+extern int RGB_LOW_BITS_MASK;
+
 extern "C"
 {
 
@@ -48,6 +50,7 @@ int Init_2xSaI(u32 BitFormat)
       greenMask = 0x7E0;
       qRGB_COLOR_MASK[0] = qRGB_COLOR_MASK[1] = 0xF7DEF7DE;
       hq2x_init(16);
+      RGB_LOW_BITS_MASK = 0x0821; 
     } else if (BitFormat == 555) {
       colorMask = 0x7BDE7BDE;
       lowPixelMask = 0x04210421;
@@ -57,6 +60,7 @@ int Init_2xSaI(u32 BitFormat)
       greenMask = 0x3E0;
       qRGB_COLOR_MASK[0] = qRGB_COLOR_MASK[1] = 0x7BDE7BDE;
       hq2x_init(15);
+      RGB_LOW_BITS_MASK = 0x0421; 
     } else {
       return 0;
     }
@@ -67,6 +71,7 @@ int Init_2xSaI(u32 BitFormat)
     qlowpixelMask = 0x030303;
     qRGB_COLOR_MASK[0] = qRGB_COLOR_MASK[1] = 0xfefefe;
     hq2x_init(32);
+    RGB_LOW_BITS_MASK = 0x010101; 
   } else
     return 0;
 

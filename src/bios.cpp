@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005-2006 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -100,16 +100,16 @@ void BIOS_ArcTan2()
   }
 #endif
   
-  s16 x = reg[0].I;
-  s16 y = reg[1].I;
-  s16 res = 0;
+  s32 x = reg[0].I;
+  s32 y = reg[1].I;
+  u32 res = 0;
   if (y == 0) {
-    res = 0x8000 & x;
+    res = ((x>>16) & 0x8000);
   } else {
     if (x == 0) {
-      res = (0x8000 & y) + 0x4000;
+      res = ((y>>16) & 0x8000) + 0x4000;
     } else {
-      if (abs(x) > abs(y)) {
+		if ((abs(x) > abs(y)) || ((abs(x) == abs(y)) && (!((x<0) && (y<0))))) {
         reg[1].I = x;
         reg[0].I = y << 14;
         BIOS_Div();
@@ -117,16 +117,16 @@ void BIOS_ArcTan2()
         if (x < 0)
           res = 0x8000 + reg[0].I;
         else
-          res = ((y & 0x8000) << 1 ) + reg[0].I;
+          res = (((y>>16) & 0x8000)<<1) + reg[0].I;
       } else {
         reg[0].I = x << 14;
         BIOS_Div();
         BIOS_ArcTan();
-        res = (0x4000 + (y & 0x8000)) - reg[0].I;
+        res = (0x4000 + ((y>>16) & 0x8000)) - reg[0].I;
       }
     }
   }
-  reg[0].I = ((u32)res) & 0xffff;
+  reg[0].I = res;
   
 #ifdef DEV_VERSION
   if(systemVerbose & VERBOSE_SWI) {
@@ -134,7 +134,7 @@ void BIOS_ArcTan2()
         reg[0].I);
   }
 #endif
-} 
+}  
 
 void BIOS_BitUnPack()
 {
@@ -153,7 +153,11 @@ void BIOS_BitUnPack()
   u32 header = reg[2].I;
   
   int len = CPUReadHalfWord(header);
-  // check address
+    // check address
+  if(((source & 0xe000000) == 0) ||
+     ((source + len) & 0xe000000) == 0)
+    return;
+
   int bits = CPUReadByte(header+2);
   int revbits = 8 - bits; 
   // u32 value = 0;
@@ -177,7 +181,7 @@ void BIOS_BitUnPack()
         break;
       u32 d = b & mask;
       u32 temp = d >> bitcount;
-      if(!temp && addBase) {
+      if(d || addBase) {
         temp += base;
       }
       data |= temp << bitwritecount;
@@ -192,6 +196,11 @@ void BIOS_BitUnPack()
       bitcount += bits;
     }
   }
+}
+
+void BIOS_GetBiosChecksum()
+{
+  reg[0].I=0xBAAE187F;
 }
 
 void BIOS_BgAffineSet()
@@ -278,7 +287,7 @@ void BIOS_CpuSet()
     dest &= 0xFFFFFFFC;
     // fill ?
     if((cnt >> 24) & 1) {
-      u32 value = CPUReadMemory(source);
+        u32 value = (source>0x0EFFFFFF ? 0x1CAD1CAD : CPUReadMemory(source));
       while(count) {
         CPUWriteMemory(dest, value);
         dest += 4;
@@ -287,7 +296,7 @@ void BIOS_CpuSet()
     } else {
       // copy
       while(count) {
-        CPUWriteMemory(dest, CPUReadMemory(source));
+        CPUWriteMemory(dest, (source>0x0EFFFFFF ? 0x1CAD1CAD : CPUReadMemory(source)));
         source += 4;
         dest += 4;
         count--;
@@ -296,7 +305,7 @@ void BIOS_CpuSet()
   } else {
     // 16-bit fill?
     if((cnt >> 24) & 1) {
-      u16 value = CPUReadHalfWord(source);
+      u16 value = (source>0x0EFFFFFF ? 0x1CAD : CPUReadHalfWord(source));
       while(count) {
         CPUWriteHalfWord(dest, value);
         dest += 2;
@@ -305,7 +314,7 @@ void BIOS_CpuSet()
     } else {
       // copy
       while(count) {
-        CPUWriteHalfWord(dest, CPUReadHalfWord(source));
+        CPUWriteHalfWord(dest, (source>0x0EFFFFFF ? 0x1CAD : CPUReadHalfWord(source)));
         source += 2;
         dest += 2;
         count--;
@@ -341,7 +350,7 @@ void BIOS_CpuFastSet()
   if((cnt >> 24) & 1) {
     while(count > 0) {
       // BIOS always transfers 32 bytes at a time
-      u32 value = CPUReadMemory(source);
+      u32 value = (source>0x0EFFFFFF ? 0xBAFFFFFB : CPUReadMemory(source));
       for(int i = 0; i < 8; i++) {
         CPUWriteMemory(dest, value);
         dest += 4;
@@ -353,7 +362,7 @@ void BIOS_CpuFastSet()
     while(count > 0) {
       // BIOS always transfers 32 bytes at a time
       for(int i = 0; i < 8; i++) {
-        CPUWriteMemory(dest, CPUReadMemory(source));
+        CPUWriteMemory(dest, (source>0x0EFFFFFF ? 0xBAFFFFFB :CPUReadMemory(source)));
         source += 4;
         dest += 4;
       }
@@ -864,6 +873,8 @@ void BIOS_RegisterRamReset(u32 flags)
 {
   // no need to trace here. this is only called directly from GBA.cpp
   // to emulate bios initialization
+
+  CPUUpdateRegister(0x0, 0x80);
   
   if(flags) {
     if(flags & 0x01) {
@@ -889,18 +900,16 @@ void BIOS_RegisterRamReset(u32 flags)
 
     if(flags & 0x80) {
       int i;
-      for(i = 0; i < 8; i++)
+      for(i = 0; i < 0x10; i++)
         CPUUpdateRegister(0x200+i*2, 0);
 
-      CPUUpdateRegister(0x202, 0xFFFF);
-
-      for(i = 0; i < 8; i++)
+      for(i = 0; i < 0xF; i++)
         CPUUpdateRegister(0x4+i*2, 0);
 
-      for(i = 0; i < 16; i++)
+      for(i = 0; i < 0x20; i++)
         CPUUpdateRegister(0x20+i*2, 0);
 
-      for(i = 0; i < 24; i++)
+      for(i = 0; i < 0x18; i++)
         CPUUpdateRegister(0xb0+i*2, 0);
 
       CPUUpdateRegister(0x130, 0);
@@ -963,7 +972,7 @@ void BIOS_RLUnCompVram()
   u32 source = reg[0].I;
   u32 dest = reg[1].I;
 
-  u32 header = CPUReadMemory(source);
+  u32 header = CPUReadMemory(source & 0xFFFFFFFC);
   source += 4;
 
   if(((source & 0xe000000) == 0) ||
@@ -1032,7 +1041,7 @@ void BIOS_RLUnCompWram()
   u32 source = reg[0].I;
   u32 dest = reg[1].I;
 
-  u32 header = CPUReadMemory(source);
+  u32 header = CPUReadMemory(source & 0xFFFFFFFC);
   source += 4;
 
   if(((source & 0xe000000) == 0) ||

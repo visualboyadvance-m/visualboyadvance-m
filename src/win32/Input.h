@@ -22,10 +22,6 @@
 #include "../System.h"
 
 #define JOYCONFIG_MESSAGE (WM_USER + 1000)
-
-typedef CList<int,int> KeyList;
-//typedef CList<USHORT,USHORT> KeyList;
-
 #define JOYPADS 4
 #define MOTION_KEYS 4
 #define KEYS_PER_PAD 13
@@ -34,6 +30,8 @@ typedef CList<int,int> KeyList;
 
 #define DEVICEOF(key) (key >> 8)
 #define KEYOF(key) (key & 255)
+
+typedef CList<LONG_PTR,LONG_PTR> KeyList;
 
 enum {
   KEY_LEFT, KEY_RIGHT,
@@ -46,6 +44,7 @@ enum {
 };
 
 class Input {
+
  public:
   KeyList joypaddata[JOYPADS * KEYS_PER_PAD + MOTION_KEYS];
 
@@ -56,7 +55,7 @@ class Input {
 
   virtual bool readDevices() = 0;
   virtual u32 readDevice(int which) = 0;
-  virtual CString getKeyName(int key) = 0;
+  virtual CString getKeyName(LONG_PTR key) = 0;
   virtual void checkKeys() = 0;
   virtual void checkMotionKeys() = 0;
   virtual void checkDevices() = 0;
@@ -64,7 +63,5 @@ class Input {
   virtual void loadSettings() = 0;
   virtual void saveSettings() = 0;
 };
-
-#define joypad theApp.input->joypaddata
 
 #endif

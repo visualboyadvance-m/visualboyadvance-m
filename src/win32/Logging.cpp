@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -225,7 +225,7 @@ BOOL Logging::OnInitDialog()
   m_dma2 = (systemVerbose & 64) != 0;
   m_dma3 = (systemVerbose & 128) != 0;
   m_undefined = (systemVerbose & 256) != 0;
-  m_agbprint = (systemVerbose & 256) != 0;
+  m_agbprint = (systemVerbose & 512) != 0;
   UpdateData(FALSE);
 
   m_log.LimitText(-1);
@@ -237,7 +237,7 @@ BOOL Logging::OnInitDialog()
 
 void Logging::log(const char *s)
 {
-  int size = ::SendMessage(m_log, WM_GETTEXTLENGTH, 0, 0);
+  DWORD size = (DWORD)::SendMessage(m_log, WM_GETTEXTLENGTH, 0, 0);
   m_log.SetSel(size, size);
   m_log.ReplaceSel(s);
 }

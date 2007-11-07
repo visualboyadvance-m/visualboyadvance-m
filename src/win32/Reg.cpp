@@ -20,7 +20,7 @@
 
 static char buffer[2048];
 static HKEY vbKey = NULL;
-static CString regVbaPath;
+static CString *regVbaPath = NULL;
 
 #define VBA_PREF "preferences"
 
@@ -38,7 +38,12 @@ void regInit(const char *path)
                             NULL,
                             &vbKey,
                             &disp);
-  regVbaPath.Format("%s\\vba.ini", path);
+  if( regVbaPath != NULL ) {
+	  delete regVbaPath;
+	  regVbaPath = NULL;
+  }
+  regVbaPath = new CString();
+  regVbaPath->Format("%s\\vba.ini", path);
 }
 
 void regShutdown()
@@ -48,7 +53,7 @@ void regShutdown()
 
 const char *regGetINIPath()
 {
-  return regVbaPath;
+  return *regVbaPath;
 }
 
 char *regQueryStringValue(const char * key, char *def)
@@ -75,7 +80,7 @@ char *regQueryStringValue(const char * key, char *def)
                                       def,
                                       (LPTSTR)buffer,
                                       2048,
-                                      regVbaPath);
+                                      *regVbaPath);
 
   if(res)
     return buffer;
@@ -106,7 +111,7 @@ DWORD regQueryDwordValue(const char * key, DWORD def, bool force)
   return GetPrivateProfileInt(VBA_PREF,
                               key,
                               def,
-                              regVbaPath);
+                              *regVbaPath);
 }
 
 BOOL regQueryBinaryValue(const char * key, char *value, int count)
@@ -134,14 +139,14 @@ BOOL regQueryBinaryValue(const char * key, char *value, int count)
   int size = GetPrivateProfileInt(VBA_PREF,
                                   k,
                                   -1,
-                                  regVbaPath);
+                                  *regVbaPath);
   if(size >= 0 && size < count)
     count = size;
   return GetPrivateProfileStruct(VBA_PREF,
                                  key,
                                  value,
                                  count,
-                                 regVbaPath);
+                                 *regVbaPath);
 }
 
 void regSetStringValue(const char * key, const char * value)
@@ -152,12 +157,12 @@ void regSetStringValue(const char * key, const char * value)
                              NULL,
                              REG_SZ,
                              (const UCHAR *)value,
-                             strlen(value)+1);
+                             lstrlen(value)+1);
   } else {
     WritePrivateProfileString(VBA_PREF,
                               key,
                               value,
-                              regVbaPath);
+                              *regVbaPath);
   }
 }
 
@@ -175,7 +180,7 @@ void regSetDwordValue(const char * key, DWORD value, bool force)
     WritePrivateProfileString(VBA_PREF,
                               key,
                               buffer,
-                              regVbaPath);
+                              *regVbaPath);
   }
 }
 
@@ -196,13 +201,13 @@ void regSetBinaryValue(const char *key, char *value, int count)
     WritePrivateProfileString(VBA_PREF,
                               k,
                               buffer,
-                              regVbaPath);
+                              *regVbaPath);
                            
     WritePrivateProfileStruct(VBA_PREF,
                               key,
                               value,
                               count,
-                              regVbaPath);
+                              *regVbaPath);
   }
 }
 
@@ -215,7 +220,7 @@ void regDeleteValue(char *key)
     WritePrivateProfileString(VBA_PREF,
                               key,
                               NULL,
-                              regVbaPath);
+                              *regVbaPath);
   }
 }
 
@@ -238,7 +243,7 @@ bool regCreateFileType(const char *ext, const char *type)
                         0,
                         REG_SZ,
                         (const UCHAR *)type,
-                        strlen(type)+1);
+                        lstrlen(type)+1);
     RegCloseKey(key);
     return true;
   }
@@ -264,7 +269,7 @@ bool regAssociateType(const char *type, const char *desc, const char *applicatio
                         0,
                         REG_SZ,
                         (const UCHAR *)desc,
-                        strlen(desc)+1);
+                        lstrlen(desc)+1);
     HKEY key2;
     res = RegCreateKeyEx(key,
                          "Shell\\Open\\Command",
@@ -281,7 +286,7 @@ bool regAssociateType(const char *type, const char *desc, const char *applicatio
                           0,
                           REG_SZ,
                           (const UCHAR *)application,
-                          strlen(application)+1);
+                          lstrlen(application)+1);
       RegCloseKey(key2);
       RegCloseKey(key);
       return true;
@@ -318,14 +323,14 @@ static void regExportSettingsToINI(HKEY key, const char *section)
           WritePrivateProfileString(section,
                                     valueName,
                                     temp,
-                                    regVbaPath);
+                                    *regVbaPath);
         }
         break;
       case REG_SZ:
         WritePrivateProfileString(section,
                                   valueName,
                                   buffer,
-                                  regVbaPath);
+                                  *regVbaPath);
         break;
       case REG_BINARY:
         {
@@ -337,12 +342,12 @@ static void regExportSettingsToINI(HKEY key, const char *section)
           WritePrivateProfileString(section,
                                     k,
                                     temp,
-                                    regVbaPath);
+                                    *regVbaPath);
           WritePrivateProfileStruct(section,
                                     valueName,
                                     buffer,
                                     size,
-                                    regVbaPath);
+                                    *regVbaPath);
         }
         break;
       }

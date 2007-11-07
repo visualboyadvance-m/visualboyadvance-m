@@ -121,7 +121,7 @@ class AddGBCheat : public CDialog
 
   // Implementation
  protected:
-  u32 address;
+  LONG_PTR address;
 
   // Generated message map functions
   //{{AFX_MSG(AddGBCheat)

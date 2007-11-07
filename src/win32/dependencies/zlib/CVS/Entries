@@ -1,0 +1,25 @@
+/.cvsignore/1.1/Sat May 13 16:42:49 2006//
+/adler32.c/1.1/Fri May 12 21:27:36 2006//
+/compress.c/1.1/Fri May 12 21:27:36 2006//
+/crc32.c/1.1/Fri May 12 21:27:36 2006//
+/crc32.h/1.1/Fri May 12 21:27:36 2006//
+/deflate.c/1.1/Fri May 12 21:27:36 2006//
+/deflate.h/1.1/Fri May 12 21:27:36 2006//
+/gzio.c/1.1/Fri May 12 21:27:36 2006//
+/infback.c/1.1/Fri May 12 21:27:36 2006//
+/inffast.c/1.1/Fri May 12 21:27:37 2006//
+/inffast.h/1.1/Fri May 12 21:27:37 2006//
+/inffixed.h/1.1/Fri May 12 21:27:37 2006//
+/inflate.c/1.1/Fri May 12 21:27:37 2006//
+/inflate.h/1.1/Fri May 12 21:27:37 2006//
+/inftrees.c/1.1/Fri May 12 21:27:37 2006//
+/inftrees.h/1.1/Fri May 12 21:27:37 2006//
+/trees.c/1.1/Fri May 12 21:27:37 2006//
+/trees.h/1.1/Fri May 12 21:27:37 2006//
+/uncompr.c/1.1/Fri May 12 21:27:37 2006//
+/zconf.h/1.1/Fri May 12 21:27:37 2006//
+/zlib.h/1.1/Fri May 12 21:27:37 2006//
+/zlib.vcproj/1.5/Wed Aug 23 22:13:30 2006//
+/zutil.c/1.1/Fri May 12 21:27:37 2006//
+/zutil.h/1.1/Fri May 12 21:27:37 2006//
+D

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005-2006 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
    break;
  case 0x01: 
    // LD BC, NNNN
-   BC.B.B0=gbReadMemory(PC.W++);
-   BC.B.B1=gbReadMemory(PC.W++);
+   BC.B.B0=gbReadOpcode(PC.W++);
+   BC.B.B1=gbReadOpcode(PC.W++);
    break;
  case 0x02:
    // LD (BC),A
@@ -102,7 +102,9 @@
    opcode = gbReadOpcode(PC.W++);
    if(gbCgbMode) {
      if(gbMemory[0xff4d] & 1) {
+         
        gbSpeedSwitch();
+       //clockTicks += 228*144-(gbSpeed ? 62 : 63);
        
        if(gbSpeed == 0)
          gbMemory[0xff4d] = 0x00;
@@ -113,8 +115,8 @@
    break;
  case 0x11:
    // LD DE, NNNN
-   DE.B.B0=gbReadMemory(PC.W++);
-   DE.B.B1=gbReadMemory(PC.W++);
+   DE.B.B0=gbReadOpcode(PC.W++);
+   DE.B.B1=gbReadOpcode(PC.W++);
    break;
  case 0x12:
    // LD (DE),A
@@ -147,7 +149,7 @@
    break;
  case 0x18:
    // JR NN
-   PC.W+=(s8)gbReadMemory(PC.W)+1;
+   PC.W+=(s8)gbReadOpcode(PC.W)+1;
    break;
  case 0x19:
    // ADD HL,DE
@@ -190,14 +192,14 @@
    if(AF.B.B0&Z_FLAG)
      PC.W++;
    else {
-     PC.W+=(s8)gbReadMemory(PC.W)+1;
+     PC.W+=(s8)gbReadOpcode(PC.W)+1;
      clockTicks++;
    }
    break;
  case 0x21:
    // LD HL,NNNN
-   HL.B.B0=gbReadMemory(PC.W++);
-   HL.B.B1=gbReadMemory(PC.W++);
+   HL.B.B0=gbReadOpcode(PC.W++);
+   HL.B.B1=gbReadOpcode(PC.W++);
    break;   
  case 0x22:
    // LDI (HL),A
@@ -233,7 +235,7 @@
  case 0x28:
    // JR Z,NN
    if(AF.B.B0&Z_FLAG) {
-     PC.W+=(s8)gbReadMemory(PC.W)+1;
+     PC.W+=(s8)gbReadOpcode(PC.W)+1;
      clockTicks++;
    } else
      PC.W++;
@@ -278,14 +280,14 @@
    if(AF.B.B0&C_FLAG)
      PC.W++;
    else {
-     PC.W+=(s8)gbReadMemory(PC.W)+1;
+     PC.W+=(s8)gbReadOpcode(PC.W)+1;
      clockTicks++;
    }
    break;
  case 0x31:
    // LD SP,NNNN
-   SP.B.B0=gbReadMemory(PC.W++);
-   SP.B.B1=gbReadMemory(PC.W++);
+   SP.B.B0=gbReadOpcode(PC.W++);
+   SP.B.B1=gbReadOpcode(PC.W++);
    break;
  case 0x32:
    // LDD (HL),A
@@ -318,7 +320,7 @@
 case 0x38:
   // JR C,NN
   if(AF.B.B0&C_FLAG) {
-    PC.W+=(s8)gbReadMemory(PC.W)+1;
+    PC.W+=(s8)gbReadOpcode(PC.W)+1;
     clockTicks ++;
   } else
     PC.W++;
@@ -575,16 +577,24 @@ case 0x38:
    break;
  case 0x76:
    // HALT
-   if(IFF & 1) {
+   // If an EI is pending, the interrupts are triggered before Halt state !!
+   // Fix Torpedo Range's intro.
+   if (IFF & 0x40)
+   {
+     IFF &= ~0x70;
+     IFF |=1;
      PC.W--;
-     IFF |= 0x80;
-   } else {
-     if((register_IE & register_IF) > 0)
-       IFF |= 0x100;
-     else {
-       PC.W--;
-       IFF |= 0x81;
+   }
+   else
+   {
+     // if (IE & IF) and interrupts are disabeld, 
+     // Halt is cancelled.
+     if ((register_IE & register_IF & 0x1f) && !(IFF & 1))
+     {
+       IFF|=2;
      }
+     else
+       IFF |= 0x80;
    }
    break;
  case 0x77:
@@ -1036,16 +1046,16 @@ case 0x38:
    if(AF.B.B0&Z_FLAG)
      PC.W+=2;
    else {
-     tempRegister.B.B0=gbReadMemory(PC.W++);
-     tempRegister.B.B1=gbReadMemory(PC.W);
+     tempRegister.B.B0=gbReadOpcode(PC.W++);
+     tempRegister.B.B1=gbReadOpcode(PC.W);
      PC.W=tempRegister.W;
      clockTicks++;
    }
    break;
  case 0xc3:
    // JP NNNN
-   tempRegister.B.B0=gbReadMemory(PC.W++);
-   tempRegister.B.B1=gbReadMemory(PC.W);
+   tempRegister.B.B0=gbReadOpcode(PC.W++);
+   tempRegister.B.B1=gbReadOpcode(PC.W);
    PC.W=tempRegister.W;
    break;
  case 0xc4:
@@ -1053,8 +1063,8 @@ case 0x38:
    if(AF.B.B0&Z_FLAG)
      PC.W+=2;
    else {
-     tempRegister.B.B0=gbReadMemory(PC.W++);
-     tempRegister.B.B1=gbReadMemory(PC.W++);
+     tempRegister.B.B0=gbReadOpcode(PC.W++);
+     tempRegister.B.B1=gbReadOpcode(PC.W++);
      gbWriteMemory(--SP.W,PC.B.B1);
      gbWriteMemory(--SP.W,PC.B.B0);
      PC.W=tempRegister.W;
@@ -1096,8 +1106,8 @@ case 0x38:
  case 0xca:
    // JP Z,NNNN
    if(AF.B.B0&Z_FLAG) {
-     tempRegister.B.B0=gbReadMemory(PC.W++);
-     tempRegister.B.B1=gbReadMemory(PC.W);
+     tempRegister.B.B0=gbReadOpcode(PC.W++);
+     tempRegister.B.B1=gbReadOpcode(PC.W);
      PC.W=tempRegister.W;
      clockTicks++;
    } else
@@ -1107,8 +1117,8 @@ case 0x38:
  case 0xcc:
    // CALL Z,NNNN
    if(AF.B.B0&Z_FLAG) {
-     tempRegister.B.B0=gbReadMemory(PC.W++);
-     tempRegister.B.B1=gbReadMemory(PC.W++);
+     tempRegister.B.B0=gbReadOpcode(PC.W++);
+     tempRegister.B.B1=gbReadOpcode(PC.W++);
      gbWriteMemory(--SP.W,PC.B.B1);
      gbWriteMemory(--SP.W,PC.B.B0);
      PC.W=tempRegister.W;
@@ -1118,8 +1128,8 @@ case 0x38:
    break;
  case 0xcd:
    // CALL NNNN
-   tempRegister.B.B0=gbReadMemory(PC.W++);
-   tempRegister.B.B1=gbReadMemory(PC.W++);
+   tempRegister.B.B0=gbReadOpcode(PC.W++);
+   tempRegister.B.B1=gbReadOpcode(PC.W++);
    gbWriteMemory(--SP.W,PC.B.B1);
    gbWriteMemory(--SP.W,PC.B.B0);
    PC.W=tempRegister.W;
@@ -1156,20 +1166,24 @@ case 0x38:
    if(AF.B.B0&C_FLAG)
      PC.W+=2;
    else {
-     tempRegister.B.B0=gbReadMemory(PC.W++);
-     tempRegister.B.B1=gbReadMemory(PC.W);
+     tempRegister.B.B0=gbReadOpcode(PC.W++);
+     tempRegister.B.B1=gbReadOpcode(PC.W);
      PC.W=tempRegister.W;
      clockTicks++;
    }
    break;
    // D3 illegal
+ case 0xd3:
+     PC.W--;
+     IFF = 0;
+   break;
  case 0xd4:
    // CALL NC,NNNN
    if(AF.B.B0&C_FLAG)
      PC.W+=2;
    else {
-     tempRegister.B.B0=gbReadMemory(PC.W++);
-     tempRegister.B.B1=gbReadMemory(PC.W++);
+     tempRegister.B.B0=gbReadOpcode(PC.W++);
+     tempRegister.B.B1=gbReadOpcode(PC.W++);
      gbWriteMemory(--SP.W,PC.B.B1);
      gbWriteMemory(--SP.W,PC.B.B0);
      PC.W=tempRegister.W;
@@ -1200,7 +1214,7 @@ case 0x38:
    if(AF.B.B0&C_FLAG) {
      PC.B.B0=gbReadMemory(SP.W++);
      PC.B.B1=gbReadMemory(SP.W++);
-     clockTicks += 4;
+     clockTicks += 3;
    }
    break;
  case 0xd9:
@@ -1212,19 +1226,23 @@ case 0x38:
  case 0xda:
    // JP C,NNNN
    if(AF.B.B0&C_FLAG) {
-     tempRegister.B.B0=gbReadMemory(PC.W++);
-     tempRegister.B.B1=gbReadMemory(PC.W);
+     tempRegister.B.B0=gbReadOpcode(PC.W++);
+     tempRegister.B.B1=gbReadOpcode(PC.W);
      PC.W=tempRegister.W;
      clockTicks++;
    } else
      PC.W+=2;
    break;
    // DB illegal
+ case 0xdb:
+     PC.W--;
+     IFF = 0;
+   break;
  case 0xdc:
    // CALL C,NNNN
    if(AF.B.B0&C_FLAG) {
-     tempRegister.B.B0=gbReadMemory(PC.W++);
-     tempRegister.B.B1=gbReadMemory(PC.W++);
+     tempRegister.B.B0=gbReadOpcode(PC.W++);
+     tempRegister.B.B1=gbReadOpcode(PC.W++);
      gbWriteMemory(--SP.W,PC.B.B1);
      gbWriteMemory(--SP.W,PC.B.B0);
      PC.W=tempRegister.W;
@@ -1233,6 +1251,10 @@ case 0x38:
      PC.W+=2;
    break;
    // DD illegal
+ case 0xdd:
+     PC.W--;
+     IFF = 0;
+   break;
  case 0xde:
    // SBC NN
    tempValue=gbReadOpcode(PC.W++);
@@ -1262,6 +1284,11 @@ case 0x38:
    break;
    // E3 illegal
    // E4 illegal
+ case 0xe3:
+ case 0xe4:
+     PC.W--;
+     IFF = 0;
+   break;
  case 0xe5:
    // PUSH HL
    gbWriteMemory(--SP.W,HL.B.B1);
@@ -1308,6 +1335,12 @@ case 0x38:
    // EB illegal
    // EC illegal
    // ED illegal
+ case 0xeb:
+ case 0xec:
+ case 0xed:
+     PC.W--;
+     IFF = 0;
+   break;
  case 0xee:
    // XOR NN
    tempValue=gbReadOpcode(PC.W++);
@@ -1336,9 +1369,13 @@ case 0x38:
  case 0xf3:
    // DI
  //   IFF&=0xFE;
-   IFF&=(~0x21);
+     IFF|=0x08;
    break;
    // F4 illegal
+ case 0xf4:
+     PC.W--;
+     IFF = 0;
+   break;
  case 0xf5:
    // PUSH AF
    gbWriteMemory(--SP.W,AF.B.B1);
@@ -1383,10 +1420,23 @@ case 0x38:
    break;
  case 0xfb:
    // EI
-   IFF|=0x20;
+   if (!(IFF & 0x30))
+     // If an EI is executed right before HALT,
+     // the interrupts are triggered before the Halt state !!
+     // Fix Torpedo Range Intro.
+     // IFF |= 0x10 : 1 ticks before the EI enables the interrupts
+     // IFF |= 0x40 : marks that an EI is being executed.
+     IFF|=0x50;
    break;
-   // FC illegal
+   // FC illegal (FC = breakpoint)
+ case 0xfc:
+    breakpoint = true;
+  break;
    // FD illegal
+ case 0xfd:
+     PC.W--;
+     IFF = 0;
+   break;
  case 0xfe:
    // CP NN
    tempValue=gbReadOpcode(PC.W++);
@@ -1401,7 +1451,10 @@ case 0x38:
    PC.W=0x0038;
    break;
  default:
-   systemMessage(0, N_("Unknown opcode %02x at %04x"),
-                 gbReadOpcode(PC.W-1),PC.W-1);
-   emulating = false;
+   if (gbSystemMessage == false)
+   {
+     systemMessage(0, N_("Unknown opcode %02x at %04x"),
+                   gbReadOpcode(PC.W-1),PC.W-1);
+     gbSystemMessage =true;
+   }
    return;

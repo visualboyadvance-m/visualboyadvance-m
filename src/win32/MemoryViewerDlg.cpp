@@ -320,14 +320,59 @@ void MemoryViewerDlg::setCurrentAddress(u32 address)
 
 void MemoryViewerDlg::OnSave() 
 {
-  MemoryViewerAddressSize dlg;
-  CString buffer;
+  if(rom != NULL)
+  {
+    MemoryViewerAddressSize dlg;
+    CString buffer;
 
-  dlg.setAddress(m_viewer.getCurrentAddress());
+    dlg.setAddress(m_viewer.getCurrentAddress());
 
-  LPCTSTR exts[] = { ".dmp" };
+    LPCTSTR exts[] = { ".dmp" };
   
-  if(dlg.DoModal() == IDOK) {
+    if(dlg.DoModal() == IDOK) {
+      CString filter = theApp.winLoadFilter(IDS_FILTER_DUMP);
+      CString title = winResLoadString(IDS_SELECT_DUMP_FILE);
+
+      FileDlg file(this,
+                   buffer,
+                   filter,
+                   0,
+                   "DMP",
+                   exts,
+                   "",
+                   title, 
+                   true);
+      if(file.DoModal() == IDOK) {
+        buffer = file.GetPathName();
+
+        FILE *f = fopen(buffer, "wb");
+      
+        if(f == NULL) {
+          systemMessage(IDS_ERROR_CREATING_FILE, buffer);
+          return;
+        }
+
+        int size = dlg.getSize();
+        u32 addr = dlg.getAddress();
+
+        for(int i = 0; i < size; i++) {
+          fputc(CPUReadByteQuick(addr), f);
+          addr++;
+        }
+
+        fclose(f);
+      }
+    }
+  }
+}
+
+void MemoryViewerDlg::OnLoad() 
+{
+  if(rom != NULL)
+  {
+    CString buffer;
+    LPCTSTR exts[] = { ".dmp" };
+
     CString filter = theApp.winLoadFilter(IDS_FILTER_DUMP);
     CString title = winResLoadString(IDS_SELECT_DUMP_FILE);
 
@@ -338,84 +383,45 @@ void MemoryViewerDlg::OnSave()
                  "DMP",
                  exts,
                  "",
-                 title, 
-                 true);
+                 title,
+                 false);
+  
     if(file.DoModal() == IDOK) {
       buffer = file.GetPathName();
-
-      FILE *f = fopen(buffer, "wb");
-      
+      FILE *f = fopen(buffer, "rb");
       if(f == NULL) {
-        systemMessage(IDS_ERROR_CREATING_FILE, buffer);
+        systemMessage(IDS_CANNOT_OPEN_FILE,
+                      "Cannot open file %s",
+                      buffer);
         return;
       }
+    
+      MemoryViewerAddressSize dlg;    
 
-      int size = dlg.getSize();
-      u32 addr = dlg.getAddress();
+      fseek(f, 0, SEEK_END);
+      int size = ftell(f);
 
-      for(int i = 0; i < size; i++) {
-        fputc(CPUReadByteQuick(addr), f);
-        addr++;
+      fseek(f, 0, SEEK_SET);
+    
+      dlg.setAddress(m_viewer.getCurrentAddress());
+      dlg.setSize(size);
+    
+      if(dlg.DoModal() == IDOK) {
+        int size = dlg.getSize();
+        u32 addr = dlg.getAddress();
+
+        for(int i = 0; i < size; i++) {
+          int c = fgetc(f);
+          if(c == -1)
+            break;
+          CPUWriteByteQuick(addr, c);
+          addr++;
+        }
+        OnRefresh();
       }
-
-      fclose(f);
+      fclose(f);    
     }
   }
-}
-
-void MemoryViewerDlg::OnLoad() 
-{
-  CString buffer;
-  LPCTSTR exts[] = { ".dmp" };
-
-  CString filter = theApp.winLoadFilter(IDS_FILTER_DUMP);
-  CString title = winResLoadString(IDS_SELECT_DUMP_FILE);
-
-  FileDlg file(this,
-               buffer,
-               filter,
-               0,
-               "DMP",
-               exts,
-               "",
-               title,
-               false);
-  
-  if(file.DoModal() == IDOK) {
-    buffer = file.GetPathName();
-    FILE *f = fopen(buffer, "rb");
-    if(f == NULL) {
-      systemMessage(IDS_CANNOT_OPEN_FILE,
-                    "Cannot open file %s",
-                    buffer);
-      return;
-    }
-    
-    MemoryViewerAddressSize dlg;    
-
-    fseek(f, 0, SEEK_END);
-    int size = ftell(f);
-
-    fseek(f, 0, SEEK_SET);
-    
-    dlg.setAddress(m_viewer.getCurrentAddress());
-    dlg.setSize(size);
-    
-    if(dlg.DoModal() == IDOK) {
-      int size = dlg.getSize();
-      u32 addr = dlg.getAddress();
-
-      for(int i = 0; i < size; i++) {
-        int c = fgetc(f);
-        if(c == -1)
-          break;
-        CPUWriteByteQuick(addr, c);
-        addr++;
-      }
-      OnRefresh();
-    }
-    fclose(f);    
-  }  
 }
 
 void MemoryViewerDlg::PostNcDestroy() 

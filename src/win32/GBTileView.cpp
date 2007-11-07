@@ -460,8 +460,8 @@ LRESULT GBTileView::OnMapInfo(WPARAM wParam, LPARAM lParam)
   u8 *colors = (u8 *)lParam;
   zoom.setColors(colors);
 
-  int x = (wParam & 0xFFFF)/8;
-  int y = ((wParam >> 16) & 0xFFFF)/8;
+  int x = (int)((wParam & 0xffff)/8);
+  int y = (int)(((wParam >> 16) & 0xFFFF)/8);
 
   int tiles = 0x0000;
   if(charBase)

@@ -106,6 +106,12 @@ extern void system10Frames(int);
 extern void systemFrame();
 extern void systemGbBorderOn();
 
+extern void Sm60FPS_Init();
+extern bool Sm60FPS_CanSkipFrame();
+extern void Sm60FPS_Sleep();
+extern void DbgMsg(const char *msg, ...);
+extern void winlog(const char *,...);
+
 extern bool systemSoundOn;
 extern u16 systemColorMap16[0x10000];
 extern u32 systemColorMap32[0x10000];
@@ -118,6 +124,7 @@ extern int systemDebug;
 extern int systemVerbose;
 extern int systemFrameSkip;
 extern int systemSaveUpdateCounter;
+extern int systemSpeed;
 
 #define SYSTEM_SAVE_UPDATED 30
 #define SYSTEM_SAVE_NOT_UPDATED 0

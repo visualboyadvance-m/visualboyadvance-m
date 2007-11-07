@@ -75,7 +75,7 @@ struct DialogData       //      dd
   WinHelper::CRect m_rcGrip;
 };
 
-//extern bool regEnabled;
+extern bool regEnabled;
 extern const char *regGetINIPath();
 
 void AssertFailed(char *file, int line, char *exp)
@@ -89,7 +89,7 @@ void AssertFailed(char *file, int line, char *exp)
                        MB_ABORTRETRYIGNORE);
 
   if(res == IDRETRY) {
-    __asm int 3;
+	DebugBreak();
   } else if(res == IDABORT)
     SendMessage(*theApp.m_pMainWnd, WM_QUIT, 0, 0);
 }
@@ -143,7 +143,7 @@ void ApiFailure(char *pcszFilename, int nLine, char *pcszExpression )
   if(nCode == IDABORT) {
     ::SendMessage(*theApp.m_pMainWnd, WM_QUIT, 0, 0);
   } else if(nCode == IDRETRY)
-    __asm int 3;
+	  DebugBreak();
 }
 
 long FASTCALL RegQueryValueExRecursive( HKEY hKey, LPCTSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData )
@@ -164,7 +164,7 @@ long FASTCALL RegQueryValueExRecursive( HKEY hKey, LPCTSTR lpValueName, LPDWORD 
       pszBuffer++;
     }
 
-  /*if(!regEnabled) {*/
+  if(!regEnabled) {
     if(GetPrivateProfileStruct("Viewer",
                                lpValueName,
                                lpData,
@@ -174,7 +174,7 @@ long FASTCALL RegQueryValueExRecursive( HKEY hKey, LPCTSTR lpValueName, LPDWORD 
       return ERROR_SUCCESS;
     }
     return -1;
-  /*}
+  }
   
   bool m_bNeedToCloseKey = false;
   if( pszLast != szBuffer )
@@ -195,7 +195,7 @@ long FASTCALL RegQueryValueExRecursive( HKEY hKey, LPCTSTR lpValueName, LPDWORD 
     {
       R_VERIFY( RegCloseKey( hKey ) == ERROR_SUCCESS );
     }
-  return lRet;*/
+  return lRet;
 }
 
 long FASTCALL RegSetValueExRecursive( HKEY hKey, LPCTSTR lpValueName, DWORD Reserved, DWORD dwType, CONST BYTE* lpData, DWORD cbData )
@@ -216,7 +216,7 @@ long FASTCALL RegSetValueExRecursive( HKEY hKey, LPCTSTR lpValueName, DWORD Rese
       pszBuffer++;
     }
 
-  /*if(!regEnabled) {*/
+  if(!regEnabled) {
     if(WritePrivateProfileStruct("Viewer",
                                  lpValueName,
                                  (LPVOID)lpData,
@@ -225,7 +225,7 @@ long FASTCALL RegSetValueExRecursive( HKEY hKey, LPCTSTR lpValueName, DWORD Rese
       return ERROR_SUCCESS;
     }
     return -1;
-  /*}
+  }
   
   bool m_bNeedToCloseKey = false;
   if( pszLast != szBuffer )
@@ -248,7 +248,7 @@ long FASTCALL RegSetValueExRecursive( HKEY hKey, LPCTSTR lpValueName, DWORD Rese
     {
       R_VERIFY( RegCloseKey( hKey ) == ERROR_SUCCESS );
     }
-  return lRet;*/
+  return lRet;
 }
 
 

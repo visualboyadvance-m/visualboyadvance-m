@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005-2006 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -58,9 +58,12 @@ u8 gbInvertTab[256] = {
 };
 
 u16 gbLineMix[160];
+u16 gbWindowColor[160];
+extern int inUseRegister_WY;
 
 void gbRenderLine()
 {
+  memset(gbLineMix, 0, sizeof(gbLineMix));
   u8 * bank0;
   u8 * bank1;
   if(gbCgbMode) {
@@ -86,10 +89,9 @@ void gbRenderLine()
   if(y >= 144)
     return;
 
-  //  int yLine = (y + gbBorderRowSkip) * gbBorderLineSkip;
-
-  int sx = register_SCX;
-  int sy = register_SCY;
+  int SpritesTicks = gbSpritesTicks[x]*(gbSpeed ? 2 : 4);
+  int sx = gbSCXLine[(gbSpeed ? 0 : 4)+SpritesTicks];
+  int sy = gbSCYLine[(gbSpeed ? 11 : 5)+SpritesTicks];
 
   sy+=y;
 
@@ -113,16 +115,17 @@ void gbRenderLine()
   
   tile_map_address++;
   
-  if((register_LCDC & 16) == 0) {
-    if(tile < 128) tile += 128;
-    else tile -= 128;
-  }
+  if(!(register_LCDC & 0x10))
+        tile ^= 0x80;
 
   int tile_pattern_address = tile_pattern + tile * 16 + by*2;
 
   if(register_LCDC & 0x80) {
     if((register_LCDC & 0x01 || gbCgbMode) && (layerSettings & 0x0100)) {
       while(x < 160) {
+
+
+
         u8 tile_a = 0;
         u8 tile_b = 0;
         
@@ -155,7 +158,7 @@ void gbRenderLine()
           if(gbCgbMode) {
             c = c + (attrs & 7)*4;
           } else {
-            c = gbBgp[c];         
+            c = (gbBgpLine[x+(gbSpeed ? 5 : 11)+SpritesTicks]>>(c<<1)) &3;         
             if(gbSgbMode && !gbCgbMode) {
               int dx = x >> 3;
               int dy = y >> 3;
@@ -168,42 +171,92 @@ void gbRenderLine()
               c = c + 4*palette;
             }
           }
-          gbLineMix[x] = gbColorOption ? gbColorFilter[gbPalette[c]] :
-            gbPalette[c];
+          gbLineMix[x] = gbColorOption ? gbColorFilter[gbPalette[c] & 0x7FFF] :
+            gbPalette[c] & 0x7FFF;
           x++;
           if(x >= 160)
             break;
           bx >>= 1;
         }
-        tx++;
-        if(tx == 32)
-          tx = 0;
+          
         bx = 128;
-        
+       
+        SpritesTicks = gbSpritesTicks[x]*(gbSpeed ? 2 : 4);
+
+        sx = gbSCXLine[x+(gbSpeed ? 0 : 4)+SpritesTicks];
+
+        sy = gbSCYLine[x+(gbSpeed ? 11 : 5)+SpritesTicks];
+
+
+        tx = ((sx+x)>>3) & 0x1f;     
+
+        sy+=y;
+
+        sy &= 255;
+
+        ty = sy >> 3;
+
+        by = sy & 7;
+
+        tile_pattern_address = tile_pattern + tile * 16 + by * 2;
+
+        tile_map_line_y = tile_map + ty * 32;
+
+        tile_map_address = tile_map_line_y + tx;
+
         if(bank1)
           attrs = bank1[tile_map_line_y + tx];
         
         tile = bank0[tile_map_line_y + tx];
-        
-        if((register_LCDC & 16) == 0) {
-          if(tile < 128) tile += 128;
-          else tile -= 128;
-        }
+
+        if(!(register_LCDC & 0x10))
+          tile ^= 0x80;
+
         tile_pattern_address = tile_pattern + tile * 16 + by * 2;
       }
     } else {
-      for(int i = 0; i < 160; i++) {
-        gbLineMix[i] = gbPalette[0];
+      // Use gbBgp[0] instead of 0 (?)
+      // (this fixes white flashes on Last Bible II)
+      // Also added the gbColorOption (fixes Dracula Densetsu II color problems)
+      for(int i = 0; i < 160; i++)
+      {
+        u16 color = gbColorOption ? gbColorFilter[0x7FFF] :
+                    0x7FFF;
+        if (!gbCgbMode)
+        color = gbColorOption ? gbColorFilter[gbPalette[gbBgpLine[i+(gbSpeed ? 5 : 11)+gbSpritesTicks[i]*(gbSpeed ? 2 : 4)]&3] & 0x7FFF] :
+                gbPalette[gbBgpLine[i+(gbSpeed ? 5 : 11)+gbSpritesTicks[i]*(gbSpeed ? 2 : 4)]&3] & 0x7FFF;
+        gbLineMix[i] = color;
         gbLineBuffer[i] = 0;
       }
     }
     
     // do the window display
-    if((register_LCDC & 0x20) && (layerSettings & 0x2000)) {
-      int wy = register_WY;
+    // LCDC.0 also enables/disables the window in !gbCgbMode ?!?!
+    // (tested on real hardware)
+    // This fixes Last Bible II & Zankurou Musouken
+    if((register_LCDC & 0x01 || gbCgbMode) && (register_LCDC & 0x20) &&
+        (layerSettings & 0x2000) && (gbWindowLine != -2)) {
+      int i = 0;
+      // Fix (accurate emulation) for most of the window display problems
+      // (ie. Zen - Intergalactic Ninja, Urusei Yatsura...).
+      if ((gbWindowLine == -1) || (gbWindowLine>144))
+      {
+        inUseRegister_WY = oldRegister_WY;
+        if (register_LY>oldRegister_WY)
+          gbWindowLine = 146;
+     // for (i = 0; i<160; i++)
+     //   gbWindowColor[i] = gbLineMix[i];
+      }
+
+      int wy = inUseRegister_WY;
       
-      if(y >= wy) {
+      if(y >= inUseRegister_WY) {
+
+        if (gbWindowLine == -1)
+          gbWindowLine = 0;
+
         int wx = register_WX;
+        int swx = 0;
         wx -= 7;
         
         if( wx <= 159 && gbWindowLine <= 143) {
@@ -212,10 +265,7 @@ void gbRenderLine()
           
           if((register_LCDC & 0x40) != 0)
             tile_map = 0x1c00;
-          
-          if(gbWindowLine == -1) {
-            gbWindowLine = 0;
-          }
+         
           
           tx = 0;
           ty = gbWindowLine >> 3;
@@ -223,6 +273,25 @@ void gbRenderLine()
           bx = 128;
           by = gbWindowLine & 7;
           
+          // Tries to emulate the 'window scrolling bug' when wx == 0 (ie. wx-7 == -7).
+          // Nothing close to perfect, but good enought for now...
+          if (wx == -7)
+          {
+            swx = 7-((gbSCXLine[0]-1) & 7);
+            bx >>= ((gbSCXLine[0]+((swx != 1) ? 1 : 0)) & 7);
+            if (swx == 1)
+              swx = 2;
+              
+            //bx >>= ((gbSCXLine[0]+(((swx>1) && (swx != 7)) ? 1 : 0)) & 7);
+
+            if ((swx == 7))
+            {
+              //wx = 0;
+              if ((gbWindowLine>0) || (wy == 0))
+                swx = 0;
+            }
+          }
+          else
           if(wx < 0) {
             bx >>= (-wx);
             wx = 0;
@@ -246,6 +315,10 @@ void gbRenderLine()
           }
           
           tile_pattern_address = tile_pattern + tile * 16 + by*2;
+
+          if (wx)
+          for (i = 0; i<swx; i++)
+            gbLineMix[i] = gbWindowColor[i];
 
           while(x < 160) {
             u8 tile_a = 0;
@@ -272,6 +345,8 @@ void gbRenderLine()
               u8 c = (tile_a & bx) != 0 ? 1 : 0;
               c += ((tile_b & bx) != 0 ? 2 : 0);
 
+              if (x>=0)
+              {
               if(attrs & 0x80)
                 gbLineBuffer[x] = 0x300 + c;
               else
@@ -280,8 +355,8 @@ void gbRenderLine()
               if(gbCgbMode) {
                 c = c + (attrs & 7) * 4;
               } else {
-                c = gbBgp[c];         
-                if(gbSgbMode && ! gbCgbMode) {
+                c = (gbBgpLine[x+(gbSpeed ? 5 : 11)+gbSpritesTicks[x]*(gbSpeed ? 2 : 4)]>>(c<<1)) &3;         
+                if(gbSgbMode && !gbCgbMode) {
                   int dx = x >> 3;
                   int dy = y >> 3;
                   
@@ -293,8 +368,9 @@ void gbRenderLine()
                   c = c + 4*palette;            
                 }
               }
-              gbLineMix[x] = gbColorOption ? gbColorFilter[gbPalette[c]] :
-                gbPalette[c];
+              gbLineMix[x] = gbColorOption ? gbColorFilter[gbPalette[c] & 0x7FFF] :
+                gbPalette[c] & 0x7FFF;
+              }
               x++;
               if(x >= 160)
                 break;
@@ -314,13 +390,30 @@ void gbRenderLine()
             }
             tile_pattern_address = tile_pattern + tile * 16 + by * 2;
           }
+
+          //for (i = swx; i<160; i++)
+          //  gbLineMix[i] = gbWindowColor[i];
           gbWindowLine++;
         }
       }
     }
+    else if (gbWindowLine == -2)
+    {
+      inUseRegister_WY = oldRegister_WY;
+      if (register_LY>oldRegister_WY)
+        gbWindowLine = 146;
+      else
+        gbWindowLine = 0;
+    }
   } else {
-    for(int i = 0; i < 160; i++) {
-      gbLineMix[i] = gbPalette[0];
+    u16 color = gbColorOption ? gbColorFilter[0x7FFF] :
+                0x7FFF;
+    if (!gbCgbMode)
+    color = gbColorOption ? gbColorFilter[gbPalette[0] & 0x7FFF] :
+            gbPalette[0] & 0x7FFF;
+    for(int i = 0; i < 160; i++)
+    {
+      gbLineMix[i] = color;
       gbLineBuffer[i] = 0;
     }
   }
@@ -346,8 +439,11 @@ void gbDrawSpriteTile(int tile, int x,int y,int t, int flags,
   
   int init = 0x0000;
 
-  //  int yLine = (y+gbBorderRowSkip) * gbBorderLineSkip;
-
+  for (int i = 0; i<4; i++)
+  {
+    gbObp0[i] = (gbObp0Line[x+11+gbSpritesTicks[x]*(gbSpeed ? 2 : 4)]>>(i<<1)) & 3;
+    gbObp1[i] = (gbObp1Line[x+11+gbSpritesTicks[x]*(gbSpeed ? 2 : 4)]>>(i<<1)) & 3;
+  }
   u8 *pal = gbObp0;
 
   int flipx = (flags & 0x20);
@@ -366,7 +462,7 @@ void gbDrawSpriteTile(int tile, int x,int y,int t, int flags,
   int a = 0;
   int b = 0;
 
-  if(gbCgbMode && flags & 0x08) {
+  if(gbCgbMode && (flags & 0x08)) {
     a = bank1[address++];
     b = bank1[address++];
   } else {
@@ -392,12 +488,14 @@ void gbDrawSpriteTile(int tile, int x,int y,int t, int flags,
       continue;
 
     u16 color = gbLineBuffer[xxx];
-    
-    if(prio) {
+
+    // Fixes OAM-BG priority
+    if(prio && (register_LCDC & 1)) {
       if(color < 0x200 && ((color & 0xFF) != 0))
         continue;
     }
-    if(color >= 0x300 && color != 0x300)
+    // Fixes OAM-BG priority for Moorhuhn 2
+    if(color >= 0x300 && color != 0x300 && (register_LCDC & 1))
       continue;
     else if(color >= 0x200 && color < 0x300) {
       int sprite = color & 0xff;
@@ -412,7 +510,9 @@ void gbDrawSpriteTile(int tile, int x,int y,int t, int flags,
           if(sprite < spriteNumber)
             continue;
         } else {
-          if(spriteX < x+8)
+          // Fixes GB sprites priorities (was '< x + 8' before)
+          // ('A boy and his blob...' sprites' emulation is now correct)
+          if(spriteX < x)
             continue;
         }
       }
@@ -442,18 +542,21 @@ void gbDrawSpriteTile(int tile, int x,int y,int t, int flags,
       }
     }
 
-    gbLineMix[xxx] = gbColorOption ? gbColorFilter[gbPalette[c]] :
-      gbPalette[c];
+    gbLineMix[xxx] = gbColorOption ? gbColorFilter[gbPalette[c] & 0x7FFF] :
+      gbPalette[c] & 0x7FFF;
   }
 }
 
-void gbDrawSprites()
+void gbDrawSprites(bool draw)
 {
   int x = 0;
   int y = 0;
   int count = 0;
   
   int size = (register_LCDC & 4);
+
+  if (!draw)
+    memset (gbSpritesTicks, 0, sizeof(gbSpritesTicks));
 
   if(!(register_LCDC & 0x80))
     return;
@@ -473,11 +576,19 @@ void gbDrawSprites()
       if(x > 0 && y > 0 && x < 168 && y < 160) {
         // check if sprite intersects current line
         int t = yc -y + 16;
-        if(size && t >=0 && t < 16) {
-          gbDrawSpriteTile(tile,x-8,yc,t,flags,size,i);
-          count++;
-        } else if(!size && t >= 0 && t < 8) {
-          gbDrawSpriteTile(tile, x-8, yc, t, flags,size,i);
+        if((size && t >=0 && t < 16) || (!size && t >= 0 && t < 8)) {
+          if (draw)
+            gbDrawSpriteTile(tile,x-8,yc,t,flags,size,i);
+          else
+          {
+            for (int j = x-8; j<300; j++)
+              if (j>=0)
+                if (gbSpeed)
+                  gbSpritesTicks[j] += 5;
+                else
+                  gbSpritesTicks[j] += 2+(count&1);
+
+          }
           count++;
         }
       }
@@ -486,5 +597,5 @@ void gbDrawSprites()
         break;
     }   
   }
+  return;
 }
-

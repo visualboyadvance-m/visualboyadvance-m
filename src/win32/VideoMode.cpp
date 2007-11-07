@@ -28,7 +28,7 @@
 #include "VideoMode.h"
 
 #include "../System.h"
-#include "..\..\res\resource.h"
+#include "resource.h"
 
 
 #ifdef _DEBUG
@@ -100,22 +100,31 @@ DDEnumCallback(GUID *pGUID, LPSTR pDescription, LPSTR pName, LPVOID context)
 
 static HRESULT WINAPI addVideoMode(LPDDSURFACEDESC2 surf, LPVOID lpContext)
 {
-  HWND h = (HWND)lpContext;
-  char buffer[50];
-  
-  switch(surf->ddpfPixelFormat.dwRGBBitCount) {
-  case 16:
-  case 24:
-  case 32:
-    if(surf->dwWidth >= 640 && surf->dwHeight >= 480) {
-      sprintf(buffer, "%4dx%4dx%2d", surf->dwWidth, surf->dwHeight,
-              surf->ddpfPixelFormat.dwRGBBitCount);
-      int pos = ::SendMessage(h, LB_ADDSTRING, 0, (LPARAM)buffer);
-      ::SendMessage(h, LB_SETITEMDATA, pos,
-                    (surf->ddpfPixelFormat.dwRGBBitCount << 24) |
-                    ((surf->dwWidth & 4095) << 12) |
-                    (surf->dwHeight & 4095));
-    }
+	HWND h = (HWND)lpContext;
+	char buffer[50];
+	
+	switch( surf->ddpfPixelFormat.dwRGBBitCount )
+	{
+	case 16:
+	case 24:
+	case 32:
+		sprintf(
+			buffer,
+			_T("%4dx%4dx%2d"),
+			surf->dwWidth,
+			surf->dwHeight,
+			surf->ddpfPixelFormat.dwRGBBitCount
+			);
+		WPARAM pos = ::SendMessage( h, LB_ADDSTRING, 0, (LPARAM)buffer );
+		::SendMessage(
+			h,
+			LB_SETITEMDATA,
+			pos,
+			(surf->ddpfPixelFormat.dwRGBBitCount << 24) |
+			((surf->dwWidth & 4095) << 12) |
+			(surf->dwHeight & 4095)
+			);
+    break;
   }
 
   return DDENUMRET_OK;
@@ -123,7 +132,11 @@ static HRESULT WINAPI addVideoMode(LPDDSURFACEDESC2 surf, LPVOID lpContext)
 
 int winVideoModeSelect(CWnd *pWnd, GUID **guid)
 {
-  HINSTANCE h = LoadLibrary("ddraw.dll");
+#ifdef _AFXDLL
+  HINSTANCE h = AfxLoadLibrary("ddraw.dll");
+#else
+  HMODULE h = LoadLibrary( _T("ddraw.dll") );
+#endif
  
   // If ddraw.dll doesn't exist in the search path,
   // then DirectX probably isn't installed, so fail.
@@ -180,12 +193,14 @@ int winVideoModeSelect(CWnd *pWnd, GUID **guid)
   if(gDriverCnt > 1) {
     VideoDriverSelect d(pWnd);
 
-    selected = d.DoModal();
+    INT_PTR selected = d.DoModal();
 
     if(selected == -1) {
-      // If the library was loaded by calling LoadLibrary(),
-      // then you must use FreeLibrary() to let go of it.
-      FreeLibrary(h);
+#ifdef _AFXDLL
+      AfxFreeLibrary( h );
+#else
+      FreeLibrary( h );
+#endif
       
       return -1;
     }
@@ -203,19 +218,27 @@ int winVideoModeSelect(CWnd *pWnd, GUID **guid)
                                  NULL);
     if(hret != DD_OK) {
       systemMessage(0, "Error during DirectDrawCreateEx: %08x", hret);
-      FreeLibrary(h);
+#ifdef _AFXDLL
+      AfxFreeLibrary( h );
+#else
+      FreeLibrary( h );
+#endif
       return -1;
     }
   } else {
     // should not happen....
     systemMessage(0, "Error getting DirectDrawCreateEx");
-    FreeLibrary(h);
+#ifdef _AFXDLL
+    AfxFreeLibrary( h );
+#else
+    FreeLibrary( h );
+#endif
     return -1;
   }  
   
   VideoMode dlg(ddraw, pWnd);
 
-  int res = dlg.DoModal();
+  INT_PTR res = dlg.DoModal();
 
   if(res != -1) {
     *guid = Drivers[selected].pGUID;
@@ -225,9 +248,13 @@ int winVideoModeSelect(CWnd *pWnd, GUID **guid)
 
   // If the library was loaded by calling LoadLibrary(),
   // then you must use FreeLibrary() to let go of it.
-  FreeLibrary(h);
+#ifdef _AFXDLL
+  AfxFreeLibrary( h );
+#else
+  FreeLibrary( h );
+#endif
 
-  return res;
+  return (int)res;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -278,12 +305,12 @@ void VideoMode::OnCancel()
 
 void VideoMode::OnOk() 
 {
-  int cur = m_modes.GetCurSel();
+  DWORD_PTR cur = m_modes.GetCurSel();
 
   if(cur != -1) {
-    cur = m_modes.GetItemData(cur);
+    cur = m_modes.GetItemData((int)cur);
   }
-  EndDialog(cur);
+  EndDialog((int)cur);
 }
 
 BOOL VideoMode::OnInitDialog() 
@@ -291,8 +318,11 @@ BOOL VideoMode::OnInitDialog()
   CDialog::OnInitDialog();
   
   // check for available fullscreen modes
-  pDirectDraw->EnumDisplayModes(DDEDM_STANDARDVGAMODES, NULL, m_modes.m_hWnd,
-                                addVideoMode);
+  pDirectDraw->EnumDisplayModes(
+	  DDEDM_STANDARDVGAMODES,
+	  NULL,
+	  m_modes.m_hWnd,
+	  addVideoMode);
   
   GetDlgItem(ID_OK)->EnableWindow(FALSE);      
   CenterWindow();

@@ -25,8 +25,8 @@
 #define MSG_SAVE_GAME_USING_BIOS            4
 #define MSG_UNSUPPORTED_SAVE_TYPE           5
 #define MSG_CANNOT_OPEN_FILE                6
-#define MSG_BAD_ARCHIVE_FILE                7
-#define MSG_NO_IMAGE_ON_ARCHIVE             8
+#define MSG_BAD_ZIP_FILE                    7
+#define MSG_NO_IMAGE_ON_ZIP                 8
 #define MSG_ERROR_OPENING_IMAGE             9
 #define MSG_ERROR_READING_IMAGE            10
 #define MSG_UNSUPPORTED_BIOS_FUNCTION      11
@@ -60,3 +60,5 @@
 #define MSG_INVALID_CBA_CODE               39
 #define MSG_CBA_CODE_WARNING               40
 #define MSG_OUT_OF_MEMORY                  41
+#define MSG_WRONG_GAMESHARK_CODE           42
+#define MSG_UNSUPPORTED_GAMESHARK_CODE     43

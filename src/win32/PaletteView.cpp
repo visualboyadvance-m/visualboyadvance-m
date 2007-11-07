@@ -109,51 +109,54 @@ BOOL PaletteView::OnInitDialog()
 
 void PaletteView::save(int which)
 {
-  CString captureBuffer;
+  if(rom != NULL)
+  {
+    CString captureBuffer;
 
-  if(which == 0)
-    captureBuffer = "bg.pal";
-  else
-    captureBuffer = "obj.pal";
+    if(which == 0)
+      captureBuffer = "bg.pal";
+    else
+      captureBuffer = "obj.pal";
 
-  LPCTSTR exts[] = {".pal", ".pal", ".act" };
+    LPCTSTR exts[] = {".pal", ".pal", ".act" };
   
-  CString filter = theApp.winLoadFilter(IDS_FILTER_PAL);
-  CString title = winResLoadString(IDS_SELECT_PALETTE_NAME);
-  FileDlg dlg(this,
-              captureBuffer,
-              filter,
-              1,
-              "PAL",
-              exts,
-              "",
-              title,
-              true);
+    CString filter = theApp.winLoadFilter(IDS_FILTER_PAL);
+    CString title = winResLoadString(IDS_SELECT_PALETTE_NAME);
+    FileDlg dlg(this,
+                captureBuffer,
+                filter,
+                1,
+                "PAL",
+                exts,
+                "",
+                title,
+                true);
 
-  if(dlg.DoModal() == IDCANCEL) {
-    return;
-  }
+    if(dlg.DoModal() == IDCANCEL) {
+      return;
+    }
 
-  captureBuffer = dlg.GetPathName();
+    captureBuffer = dlg.GetPathName();
 
-  PaletteViewControl *p = NULL;
+    PaletteViewControl *p = NULL;
 
-  if(which == 0)
-    p = &paletteView;
-  else
-    p = &paletteViewOBJ;
+    if(which == 0)
+      p = &paletteView;
+    else
+      p = &paletteViewOBJ;
   
-  switch(dlg.getFilterIndex()) {
-  case 0:
-  case 1:
-    p->saveMSPAL(captureBuffer);
-    break;
-  case 2:
-    p->saveJASCPAL(captureBuffer);
-    break;
-  case 3:
-    p->saveAdobe(captureBuffer);
-    break;
+    switch(dlg.getFilterIndex()) {
+    case 0:
+    case 1:
+      p->saveMSPAL(captureBuffer);
+      break;
+    case 2:
+      p->saveJASCPAL(captureBuffer);
+      break;
+    case 3:
+      p->saveAdobe(captureBuffer);
+      break;
+    }
   }
 }
 

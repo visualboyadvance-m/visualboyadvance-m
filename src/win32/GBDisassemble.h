@@ -20,7 +20,7 @@
 #if !defined(AFX_GBDISASSEMBLE_H__3EFD5B47_6DBF_4F63_8F91_A9511EC590EB__INCLUDED_)
 #define AFX_GBDISASSEMBLE_H__3EFD5B47_6DBF_4F63_8F91_A9511EC590EB__INCLUDED_
 
-#include "..\System.h"  // Added by ClassView
+#include "../System.h"  // Added by ClassView
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000

@@ -27,7 +27,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-//#include "..\..\res\resource.h"
+//#include "resource.h"
 #include "../System.h"
 
 #include "AcceleratorManager.h"
@@ -247,7 +247,7 @@ bool CAcceleratorManager::UpdateWndTable()
     }
   }
   
-  int nAccel = arrayACCEL.GetSize();
+  INT_PTR nAccel = arrayACCEL.GetSize();
   LPACCEL lpAccel = (LPACCEL)LocalAlloc(LPTR, nAccel * sizeof(ACCEL));
   if (!lpAccel) {
     for (iLoop = 0; iLoop < nAccel; iLoop++)
@@ -268,7 +268,7 @@ bool CAcceleratorManager::UpdateWndTable()
   }
   arrayACCEL.RemoveAll();
 
-  HACCEL hNewTable = CreateAcceleratorTable(lpAccel, nAccel);
+  HACCEL hNewTable = CreateAcceleratorTable(lpAccel, (int)nAccel);
   if (!hNewTable) {
     ::LocalFree(lpAccel);
     return false;
@@ -709,14 +709,14 @@ bool CAcceleratorManager::Write()
   }
   //  AccelsDatasArray.InsertAt(0, MAKELONG(65535, iCount));
   
-  int count = AccelsDatasArray.GetSize();
+  INT_PTR count = AccelsDatasArray.GetSize();
   DWORD *data = (DWORD *)malloc(count * sizeof(DWORD));
   ASSERT(data != NULL);
 
   for(int index = 0; index < count; index++)
     data[index] = AccelsDatasArray[index];
 
-  regSetBinaryValue("keyboard", (char *)data, count*sizeof(DWORD));
+  regSetBinaryValue("keyboard", (char *)data, (int)(count*sizeof(DWORD)));
 
   AccelsDatasArray.RemoveAll();
   CmdDatasArray.RemoveAll();

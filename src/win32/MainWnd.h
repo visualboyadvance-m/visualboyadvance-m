@@ -1,7 +1,7 @@
 // -*- C++ -*-
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ class MainWnd : public CWnd
   void winMouseOn();
   void screenCapture(int captureNumber);
   HACCEL m_hAccelTable;
-  bool fileOpenSelect();
+  bool fileOpenSelect( bool gb = false );
   afx_msg LRESULT OnConfirmMode(WPARAM, LPARAM);
   afx_msg LRESULT OnMySysCommand(WPARAM, LPARAM);
   afx_msg void OnUpdateFileLoadGameSlot(CCmdUI *pCmdUI);
@@ -70,9 +70,6 @@ class MainWnd : public CWnd
   afx_msg BOOL OnOptionsFilter(UINT nID);
   afx_msg void OnUpdateOptionsPriority(CCmdUI *pCmdUI);
   afx_msg BOOL OnOptionsPriority(UINT nID);
-  afx_msg void OnSetFocus(CWnd * pOldWnd);
-  afx_msg void OnKillFocus(CWnd * pNewWnd);
-
   void updateSoundChannels(UINT nID);
   afx_msg void OnUpdateOptionsSoundVolume(CCmdUI *pCmdUI);
   afx_msg BOOL OnOptionsSoundVolume(UINT nID);
@@ -209,6 +206,10 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsVideoRenderoptionsGltriangle(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsGlquads();
   afx_msg void OnUpdateOptionsVideoRenderoptionsGlquads(CCmdUI* pCmdUI);
+  afx_msg void OnOptionsVideoRenderoptionsSelectskin();
+  afx_msg void OnUpdateOptionsVideoRenderoptionsSelectskin(CCmdUI* pCmdUI);
+  afx_msg void OnOptionsVideoRenderoptionsSkin();
+  afx_msg void OnUpdateOptionsVideoRenderoptionsSkin(CCmdUI* pCmdUI);
   afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
   afx_msg void OnOptionsEmulatorAssociate();
   afx_msg void OnOptionsEmulatorDirectories();
@@ -220,14 +221,14 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsEmulatorPausewheninactive(CCmdUI* pCmdUI);
   afx_msg void OnOptionsEmulatorSpeeduptoggle();
   afx_msg void OnUpdateOptionsEmulatorSpeeduptoggle(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsEmulatorRemoveintrosgba();
-  afx_msg void OnUpdateOptionsEmulatorRemoveintrosgba(CCmdUI* pCmdUI);
   afx_msg void OnOptionsEmulatorAutomaticallyipspatch();
   afx_msg void OnUpdateOptionsEmulatorAutomaticallyipspatch(CCmdUI* pCmdUI);
   afx_msg void OnOptionsEmulatorAgbprint();
   afx_msg void OnUpdateOptionsEmulatorAgbprint(CCmdUI* pCmdUI);
   afx_msg void OnOptionsEmulatorRealtimeclock();
   afx_msg void OnUpdateOptionsEmulatorRealtimeclock(CCmdUI* pCmdUI);
+  afx_msg void OnOptionsEmulatorGenericflashcard();
+  afx_msg void OnUpdateOptionsEmulatorGenericflashcard(CCmdUI* pCmdUI);
   afx_msg void OnOptionsEmulatorAutohidemenu();
   afx_msg void OnUpdateOptionsEmulatorAutohidemenu(CCmdUI* pCmdUI);
   afx_msg void OnOptionsEmulatorRewindinterval();
@@ -256,8 +257,8 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsEmulatorPngformat(CCmdUI* pCmdUI);
   afx_msg void OnOptionsEmulatorBmpformat();
   afx_msg void OnUpdateOptionsEmulatorBmpformat(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsSoundOff(); /* mute hax */
-  afx_msg void OnUpdateOptionsSoundOff(CCmdUI* pCmdUI); /* mute hax */
+  afx_msg void OnOptionsSoundOff();
+  afx_msg void OnUpdateOptionsSoundOff(CCmdUI* pCmdUI);
   afx_msg void OnOptionsSoundMute();
   afx_msg void OnUpdateOptionsSoundMute(CCmdUI* pCmdUI);
   afx_msg void OnOptionsSoundOn();
@@ -407,10 +408,13 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsSoundVolume5x(CCmdUI* pCmdUI);
   afx_msg void OnCheatsDisablecheats();
   afx_msg void OnUpdateCheatsDisablecheats(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsVideoFullscreenmaxscale();
+  afx_msg void OnOptionsVideoFullscreenmaxscale();
+  afx_msg void OnOptionsEmulatorGameoverrides();
+  afx_msg void OnUpdateOptionsEmulatorGameoverrides(CCmdUI* pCmdUI);
+	afx_msg void OnHelpGnupubliclicense();
 	//}}AFX_MSG
   DECLARE_MESSAGE_MAP()
-
+    
     afx_msg BOOL OnFileRecentFile(UINT nID);
   afx_msg BOOL OnFileLoadSlot(UINT nID);
   afx_msg BOOL OnFileSaveSlot(UINT nID);
@@ -420,6 +424,8 @@ class MainWnd : public CWnd
    afx_msg BOOL OnOptionsSoundPcminterpolation(UINT nID);
    afx_msg void OnUpdateOptionsSoundPcminterpolation(CCmdUI *pCmdUI);
 public:
+	afx_msg void OnOptionsSoundHardwareacceleration();
+	afx_msg void OnUpdateOptionsSoundHardwareacceleration(CCmdUI *pCmdUI);
 	afx_msg void OnOptionsVideoFullscreen1280x1024();
 	afx_msg void OnOptionsVideoFullscreen1024x768();
 	afx_msg void OnUpdateOptionsVideoFullscreen1024x768(CCmdUI *pCmdUI);
@@ -429,8 +435,6 @@ public:
 	 void OnUpdateOptionsLinkLog(CCmdUI* pCmdUI) ;
 	 void OnOptionsLinkRFU() ;
 	 void OnUpdateOptionsLinkRFU(CCmdUI* pCmdUI) ;
-
-
 
 };
 
