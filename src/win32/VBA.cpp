@@ -1008,11 +1008,13 @@ void systemDrawScreen()
   }
   
   if(!soundBufferLow)
+  {
 	  theApp.display->render();
+      Sm60FPS_Sleep();
+  }
   else
 	  soundBufferLow = false;
 
-  Sm60FPS_Sleep();
 }
 
 void systemScreenCapture(int captureNumber)
