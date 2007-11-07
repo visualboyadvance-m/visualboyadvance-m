@@ -2,6 +2,7 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
 // Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2004-2006 VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -95,7 +96,6 @@ extern Multi_Buffer * apu_out;
 extern Gb_Apu       * apu;
  
 extern const BOOST::uint8_t sound_data [Gb_Apu::register_count];
-
 extern void interp_rate();
 
 

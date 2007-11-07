@@ -264,14 +264,15 @@ void CAccelsOb::GetString(CString& szBuffer)
     return;
 
   // modifiers part
-  for (int i = 0; i < sizetable(mapVirtSysKeys); i++) {
+  int i;
+  for (i = 0; i < sizetable(mapVirtSysKeys); i++) {
     if (m_cVirt & mapVirtSysKeys[i].wKey) {
       szBuffer += mapVirtSysKeys[i].szKey;
       szBuffer += "+";
     }
   }
   // and virtual key part
-  if (1) for (int i = 0; i < sizetable(mapVirtKeys); i++) {
+  for (i = 0; i < sizetable(mapVirtKeys); i++) {
     if (m_wKey == mapVirtKeys[i].wKey) {
       szBuffer += mapVirtKeys[i].szKey;
       return;

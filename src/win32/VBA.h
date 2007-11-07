@@ -1,7 +1,7 @@
 // -*- C++ -*-
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,26 +20,23 @@
 // VBA.h : main header file for the VBA application
 //
 
-#if !defined(AFX_VBA_H__57514A10_49F9_4B83_A928_0D8A4A7306A3__INCLUDED_)
-#define AFX_VBA_H__57514A10_49F9_4B83_A928_0D8A4A7306A3__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #ifndef __AFXWIN_H__
 #error include 'stdafx.h' before including this file for PCH
 #endif
 
-#include <afxtempl.h>
+#include "stdafx.h"
+#include "resource.h"
+//#include <afxtempl.h>
 
 #include "AcceleratorManager.h"
-#include "..\..\res\resource.h"       // main symbols
 #include "Display.h"
 #include "Input.h"
 #include "IUpdate.h"
 #include "Sound.h"
 #include "../System.h"
+#include "../Util.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // VBA:
@@ -67,6 +64,7 @@ enum pixelFilterType
 
 #define REWIND_SIZE 400000
 
+class CSkin;
 class AVIWrite;
 class WavWriter;
 
@@ -113,7 +111,7 @@ class VBA : public CWinApp
   u8 *delta[257*244*4];
   bool menuToggle;
   IDisplay *display;
-  int cartridgeType;
+  IMAGE_TYPE cartridgeType;
   bool soundInitialized;
   bool useBiosFile;
   bool skipBiosFile;
@@ -129,6 +127,7 @@ class VBA : public CWinApp
   int winGbBorderOn;
   int winFlashSize;
   bool winRtcEnable;
+  bool winGenericflashcardEnable;
   int winSaveType;
   char *rewindMemory;
   int rewindPos;
@@ -158,6 +157,10 @@ class VBA : public CWinApp
   int glFilter;
   int glType;
   bool dinputKeyFocus;
+  CSkin *skin;
+  CString skinName;
+  bool skinEnabled;
+  int skinButtons;
   bool pauseWhenInactive;
   bool speedupToggle;
   bool useOldSync;
@@ -166,7 +169,7 @@ class VBA : public CWinApp
   bool disableMMX;
   int languageOption;
   CString languageName;
-  HINSTANCE languageModule;
+  HMODULE languageModule;
   int renderedFrames;
   Input *input;
   int joypadDefault;
@@ -176,6 +179,7 @@ class VBA : public CWinApp
   bool soundRecording;
   WavWriter *soundRecorder;
   CString soundRecordName;
+  bool dsoundDisableHardwareAcceleration;
   ISound *sound;
   bool aviRecording;
   AVIWrite *aviRecorder;
@@ -241,12 +245,13 @@ class VBA : public CWinApp
   void saveSettings();
   void movieReadNext();
   bool initInput();
-  HINSTANCE winLoadLanguage(const char *name);
+  HMODULE winLoadLanguage(const char *name);
   void winSetLanguageOption(int option, bool force);
-  bool detectMMX();
 #ifdef MMX
+  bool detectMMX();
 #endif
   void updatePriority();
+  void winUpdateSkin();
   void directXMessage(const char *msg);
   void shutdownDisplay();
   void winCheckFullscreen();
@@ -267,14 +272,8 @@ class VBA : public CWinApp
     };
 
     extern VBA theApp;
+	extern int emulating;
 
 #ifdef MMX
     extern "C" bool cpu_mmx;
 #endif
-
-    /////////////////////////////////////////////////////////////////////////////
-
-    //{{AFX_INSERT_LOCATION}}
-    // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_VBA_H__57514A10_49F9_4B83_A928_0D8A4A7306A3__INCLUDED_)

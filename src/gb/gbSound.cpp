@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005-2006 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,9 +23,6 @@
 #include "gbGlobals.h"
 #include "gbSound.h"
 
-#include "../Gb_Apu/Multi_Buffer.h"
-#include "../Gb_Apu/Gb_Apu.h"
-
 extern u8 soundBuffer[6][735];
 extern u16 soundFinalWave[1470];
 extern int soundVolume;
@@ -35,6 +32,7 @@ extern int soundVolume;
 #define NOISE_MAGIC 5
 
 extern int speed;
+extern int gbHardware;
 
 extern void soundResume();
 
@@ -58,11 +56,11 @@ extern int soundBufferIndex;
 int soundVIN = 0;
 extern int soundDebug;
 
-extern Multi_Buffer  * apu_out;
-extern Gb_Apu        * apu;
-
 extern int sound1On;
 extern int sound1ATL;
+int sound1ATLreload;
+int freq1low;
+int freq1high;
 extern int sound1Skip;
 extern int sound1Index;
 extern int sound1Continue;
@@ -79,6 +77,9 @@ extern u8 *sound1Wave;
 
 extern int sound2On;
 extern int sound2ATL;
+int sound2ATLreload;
+int freq2low;
+int freq2high;
 extern int sound2Skip;
 extern int sound2Index;
 extern int sound2Continue;
@@ -90,6 +91,9 @@ extern u8 *sound2Wave;
 
 extern int sound3On;
 extern int sound3ATL;
+int sound3ATLreload;
+int freq3low;
+int freq3high;
 extern int sound3Skip;
 extern int sound3Index;
 extern int sound3Continue;
@@ -99,6 +103,8 @@ extern int sound3Last;
 extern int sound4On;
 extern int sound4Clock;
 extern int sound4ATL;
+int sound4ATLreload;
+int freq4;
 extern int sound4Skip;
 extern int sound4Index;
 extern int sound4ShiftRight;
@@ -126,45 +132,7 @@ extern bool soundLowPass;
 extern bool soundReverse;
 extern bool soundOffFlag;
 
-u8 gbSoundRead(u16 address)
-{
-  if (address < NR10 || address > 0xFF3F || !apu) return gbMemory[address];
-  if (address == NR51) return soundBalance;
-
-  int clock = (SOUND_CLOCK_TICKS - soundTicks) * 95 / (24 * (gbSpeed ? 2 : 1));
-
-  int ret = apu->read_register(clock, address);
-
-  switch ( address )
-  {
-  case NR10:
-    ret |= 0x80; break;
-
-  case NR11:
-  case NR21:
-    ret |= 0x3F; break;
-
-  case NR13:
-  case NR23:
-  case NR31:
-  case NR33:
-    ret = 0xFF; break;
-
-  case NR14:
-  case NR24:
-  case NR34:
-  case NR44:
-    ret |= 0xBF; break;
-
-  case NR30:
-    ret |= 0x7F; break;
-
-  case NR32:
-    ret |= 0x9F; break;
-  }
-
-  return ret;
-}
+bool gbDigitalSound = false;
 
 void gbSoundEvent(register u16 address, register int data)
 {
@@ -178,58 +146,481 @@ void gbSoundEvent(register u16 address, register int data)
     log("Sound event: %08lx %02x\n", address, data);
   }
 #endif
-    if (apu && address >= NR10 && address <= 0xFF3F)
-   {
-     int clock = (SOUND_CLOCK_TICKS - soundTicks) * 95 / (24 * (gbSpeed ? 2 : 1));
-     if (address == NR50)
-     {
-       apu->write_register(clock, address, data);
-     }
-     else if (address == NR51)
-     {
-       soundBalance = data;
-       apu->write_register(clock, address, data & soundEnableFlag);
-     }
-     else
-       apu->write_register(clock, address, data);
-	}
+  switch(address) {
+  case NR10:
+    gbMemory[address] = data | 0x80;
+    sound1SweepATL = sound1SweepATLReload = 344 * ((data >> 4) & 7);
+    sound1SweepSteps = data & 7;
+    sound1SweepUpDown = data & 0x08;
+    sound1SweepStep = 0;
+    break;
+  case NR11:
+    gbMemory[address] = data | 0x3f;
+    sound1Wave = soundWavePattern[data >> 6];
+    sound1ATL  = sound1ATLreload = 172 * (64 - (data & 0x3f));
+    break;
+  case NR12:
+    sound1EnvelopeVolume = data >> 4;
+    sound1EnvelopeUpDown = data & 0x08;
+    sound1EnvelopeATLReload = sound1EnvelopeATL = 689 * (data & 7);
+    break;
+  case NR13:
+    gbMemory[address] = 0xff;
+    freq1low = data;
+    freq = ((((int)(freq1high & 7)) << 8) | freq1low);
+    sound1ATL = sound1ATLreload;
+    freq = 2048 - freq;
+    if(freq) {
+      sound1Skip = SOUND_MAGIC / freq;
+    } else
+      sound1Skip = 0;
+    break;
+  case NR14:
+    gbMemory[address] = data | 0xbf;
+    freq1high = data;
+    freq = ((((int)(freq1high & 7)) << 8) | freq1low);
+    freq = 2048 - freq;
+    sound1ATL = sound1ATLreload;
+    sound1Continue = data & 0x40;
+    if(freq) {
+      sound1Skip = SOUND_MAGIC / freq;
+    } else
+      sound1Skip = 0;
+    if(data & 0x80) {
+      gbMemory[NR52] |= 1;
+      sound1EnvelopeVolume = gbMemory[NR12] >> 4;
+      sound1EnvelopeUpDown = gbMemory[NR12] & 0x08;
+      sound1EnvelopeATLReload = sound1EnvelopeATL = 689 * (gbMemory[NR12] & 7);
+      sound1SweepATL = sound1SweepATLReload = 344 * ((gbMemory[NR10] >> 4) & 7);
+      sound1SweepSteps = gbMemory[NR10] & 7;
+      sound1SweepUpDown = gbMemory[NR10] & 0x08;
+      sound1SweepStep = 0;
+          
+      sound1Index = 0;
+      sound1On = 1;
+    }
+    break;
+  case NR21:
+    gbMemory[address] = data | 0x3f;
+    sound2Wave = soundWavePattern[data >> 6];
+    sound2ATL  = sound2ATLreload = 172 * (64 - (data & 0x3f));
+    break;
+  case NR22:
+    sound2EnvelopeVolume = data >> 4;
+    sound2EnvelopeUpDown = data & 0x08;
+    sound2EnvelopeATLReload = sound2EnvelopeATL = 689 * (data & 7);
+    break;
+  case NR23:
+    gbMemory[address] = 0xff;
+    freq2low = data;
+    freq = (((int)(freq2high & 7)) << 8) | freq2low;
+    sound2ATL = sound2ATLreload;
+    freq = 2048 - freq;
+    if(freq) {
+      sound2Skip = SOUND_MAGIC / freq;
+    } else
+      sound2Skip = 0;
+    break;
+  case NR24:
+    gbMemory[address] = data | 0xbf;
+    freq2high = data;
+    freq = (((int)(freq2high & 7)) << 8) | freq2low;
+    freq = 2048 - freq;
+    sound2ATL = sound2ATLreload;
+    sound2Continue = data & 0x40;
+    if(freq) {
+      sound2Skip = SOUND_MAGIC / freq;
+    } else
+      sound2Skip = 0;
+    if(data & 0x80) {
+      gbMemory[NR52] |= 2;
+      sound2EnvelopeVolume = gbMemory[NR22] >> 4;
+      sound2EnvelopeUpDown = gbMemory[NR22] & 0x08;
+      sound2ATL = sound2ATLreload;
+      sound2EnvelopeATLReload = sound2EnvelopeATL = 689 * (gbMemory[NR22] & 7);
+      
+      sound2Index = 0;
+      sound2On = 1;
+    }
+    break;
+  case NR30:
+    gbMemory[address] = data | 0x7f;
+    if(!(data & 0x80)) {
+      gbMemory[NR52] &= 0xfb;
+      sound3On = 0;
+    }
+    break;
+  case NR31:
+    gbMemory[address] = 0xff;
+    sound3ATL = sound3ATLreload = 172 * (256-data);
+    break;
+  case NR32:
+    gbMemory[address] = data | 0x9f;
+    sound3OutputLevel = (data >> 5) & 3;
+    break;
+  case NR33:
+    gbMemory[address] = 0xff;
+    freq3low = data;
+    freq = 2048 - (((int)(freq3high&7) << 8) | freq3low);
+    if(freq) {
+      sound3Skip = SOUND_MAGIC_2 / freq;
+    } else
+      sound3Skip = 0;
+    break;
+  case NR34:
+    gbMemory[address] = data | 0xbf;
+    freq3high = data;
+    freq = 2048 - (((int)(freq3high&7) << 8) | freq3low);
+    if(freq) {
+      sound3Skip = SOUND_MAGIC_2 / freq;
+    } else {
+      sound3Skip = 0;
+    }
+    sound3Continue = data & 0x40;
+    if((data & 0x80) && (gbMemory[NR30] & 0x80)) {
+      gbMemory[NR52] |= 4;
+      sound3ATL = sound3ATLreload;
+      sound3Index = 0;
+      sound3On = 1;
+    }
+    break;
+  case NR41:
+    sound4ATL  = sound4ATLreload = 172 * (64 - (data & 0x3f));
+    break;
+  case NR42:
+    sound4EnvelopeVolume = data >> 4;
+    sound4EnvelopeUpDown = data & 0x08;
+    sound4EnvelopeATLReload = sound4EnvelopeATL = 689 * (data & 7);
+    break;
+  case NR43:
+    freq = freq4 = soundFreqRatio[data & 7];
+    sound4NSteps = data & 0x08;
+
+    sound4Skip = (freq << 8) / NOISE_MAGIC;
+    
+    sound4Clock = data >> 4;
+
+    freq = freq / soundShiftClock[sound4Clock];
+
+    sound4ShiftSkip = (freq << 8) / NOISE_MAGIC;
+    
+    break;
+  case NR44:
+    gbMemory[address] = data | 0xbf;
+    sound4Continue = data & 0x40;
+    if(data & 0x80) {
+      gbMemory[NR52] |= 8;
+      sound4EnvelopeVolume = gbMemory[NR42] >> 4;
+      sound4EnvelopeUpDown = gbMemory[NR42] & 0x08;
+      sound4ATL = sound4ATLreload;
+      sound4EnvelopeATLReload = sound4EnvelopeATL = 689 * (gbMemory[NR42] & 7);
+
+      sound4On = 1;
+      
+      sound4Index = 0;
+      sound4ShiftIndex = 0;
+      
+      if(sound4NSteps)
+        sound4ShiftRight = 0x7fff;
+      else
+        sound4ShiftRight = 0x7f;
+    }
+    break;
+  case NR50:
+    soundVIN = data & 0x88;
+    soundLevel1 = data & 7;
+    soundLevel2 = (data >> 4) & 7;
+    break;
+  case NR51:
+    soundBalance = (data & soundEnableFlag);
+    break;
+  case NR52:
+    soundMasterOn = data & 0x80;
+    if(!(data & 0x80)) {
+      sound1On = 0;
+      sound2On = 0;
+      sound3On = 0;
+      sound4On = 0;
+      gbMemory[address] &= 0xf0;
+    }
+    gbMemory[address] = data & 0x80 | 0x70 | (gbMemory[address] & 0xf);
+    break;
+  }
+
+  gbDigitalSound = true;
+
+  if(sound1On && sound1EnvelopeVolume != 0)
+    gbDigitalSound = false;
+  if(sound2On && sound2EnvelopeVolume != 0)
+    gbDigitalSound = false;
+  if(sound3On && sound3OutputLevel != 0)
+    gbDigitalSound = false;
+  if(sound4On && sound4EnvelopeVolume != 0)
+    gbDigitalSound = false;
 }
 
  void gbSoundChannel1()
 {
+  int vol = sound1EnvelopeVolume;
+
+  int freq = 0;
+
+  int value = 0;
+  
+  if(sound1On && (sound1ATL || !sound1Continue)) {
+    sound1Index += soundQuality*sound1Skip;
+    sound1Index &= 0x1fffffff;
+
+    value = ((s8)sound1Wave[sound1Index>>24]) * vol;
+  }
+
+  soundBuffer[0][soundIndex] = value;
+
+  
+  if(sound1On) {
+    if(sound1ATL) {
+      sound1ATL-=soundQuality;
+      
+      if(sound1ATL <=0 && sound1Continue) {
+        gbMemory[NR52] &= 0xfe;
+        sound1On = 0;
+      }
+    }
+    
+    if(sound1EnvelopeATL) {
+      sound1EnvelopeATL-=soundQuality;
+      
+      if(sound1EnvelopeATL<=0) {
+        if(sound1EnvelopeUpDown) {
+          if(sound1EnvelopeVolume < 15)
+            sound1EnvelopeVolume++;
+        } else {
+          if(sound1EnvelopeVolume)
+            sound1EnvelopeVolume--;
+        }
+        
+        sound1EnvelopeATL += sound1EnvelopeATLReload;
+      }
+    }
+    
+    if(sound1SweepATL) {
+      sound1SweepATL-=soundQuality;
+      
+      if(sound1SweepATL<=0) {
+        freq = (((int)(freq1high & 7)) << 8) | freq1low;
+          
+        int updown = 1;
+        
+        if(sound1SweepUpDown)
+          updown = -1;
+        
+        int newfreq = 0;
+        if(sound1SweepSteps) {
+          newfreq = freq + updown * freq / (1 << sound1SweepSteps);
+          if(newfreq == freq)
+            newfreq = 0;
+        } else
+          newfreq = freq;
+        
+        if(newfreq < 0) {
+          sound1SweepATL += sound1SweepATLReload;
+        } else if(newfreq > 2047) {
+          sound1SweepATL = 0;
+          sound1On = 0;
+          gbMemory[NR52] &= 0xfe;
+        } else {
+          sound1SweepATL += sound1SweepATLReload;
+          sound1Skip = SOUND_MAGIC/(2048 - newfreq);
+          
+          freq1low = newfreq & 0xff;
+          freq1high = (freq1high & 0xf8) |((newfreq >> 8) & 7);
+        }
+      }
+    }
+  }
 }
 
 void gbSoundChannel2()
 {
+  //  int freq = 0;
+  int vol = sound2EnvelopeVolume;
+
+  int value = 0;
+  
+  if(sound2On && (sound2ATL || !sound2Continue)) {
+    sound2Index += soundQuality*sound2Skip;
+    sound2Index &= 0x1fffffff;
+
+    value = ((s8)sound2Wave[sound2Index>>24]) * vol;
+  }
+  
+  soundBuffer[1][soundIndex] = value;
+    
+  if(sound2On) {
+    if(sound2ATL) {
+      sound2ATL-=soundQuality;
+      
+      if(sound2ATL <= 0 && sound2Continue) {
+        gbMemory[NR52] &= 0xfd;
+        sound2On = 0;
+      }
+    }
+    
+    if(sound2EnvelopeATL) {
+      sound2EnvelopeATL-=soundQuality;
+      
+      if(sound2EnvelopeATL <= 0) {
+        if(sound2EnvelopeUpDown) {
+          if(sound2EnvelopeVolume < 15)
+            sound2EnvelopeVolume++;
+        } else {
+          if(sound2EnvelopeVolume)
+            sound2EnvelopeVolume--;
+        }
+        sound2EnvelopeATL += sound2EnvelopeATLReload;
+      }
+    }
+  }
 }  
 
 void gbSoundChannel3()
 {
+  int value = 0;
+  
+  if(sound3On && (sound3ATL || !sound3Continue)) {
+
+    value = sound3Last;
+
+    sound3Index += soundQuality*sound3Skip;
+    sound3Index &= 0x1fffffff;
+    
+    value = gbMemory[0xff30 + (sound3Index>>25)];
+    
+    if( (sound3Index & 0x01000000)) {
+      value &= 0x0f;
+    } else {
+      value >>= 4;
+    }
+
+    value -= 8;
+    
+    switch(sound3OutputLevel) {
+    case 0:
+      value = 0;
+      break;
+    case 1:
+      break;
+    case 2:
+      value = (value >> 1);
+      break;
+    case 3:
+      value = (value >> 2);
+      break;
+    }
+    sound3Last = value;
+  }
+  
+  soundBuffer[2][soundIndex] = value;
+  
+  if(sound3On) {
+    if(sound3ATL) {
+      sound3ATL-=soundQuality;
+      
+      if(sound3ATL <= 0 && sound3Continue) {
+        gbMemory[NR52] &= 0xfb;
+        sound3On = 0;
+      }
+    }
+  }
 }
 
 void gbSoundChannel4()
 {
+  int vol = sound4EnvelopeVolume;
+
+  int value = 0;
+
+  if(sound4Clock <= 0x0c) {
+    if(sound4On && (sound4ATL || !sound4Continue)) {
+      sound4Index += soundQuality*sound4Skip;
+      sound4ShiftIndex += soundQuality*sound4ShiftSkip;
+
+      if(sound4NSteps) {
+        while(sound4ShiftIndex > 0x1fffff) {
+          sound4ShiftRight = (((sound4ShiftRight << 6) ^
+                               (sound4ShiftRight << 5)) & 0x40) |
+            (sound4ShiftRight >> 1);
+          sound4ShiftIndex -= 0x200000;
+        }
+      } else {
+        while(sound4ShiftIndex > 0x1fffff) {
+          sound4ShiftRight = (((sound4ShiftRight << 14) ^
+                              (sound4ShiftRight << 13)) & 0x4000) |
+            (sound4ShiftRight >> 1);
+
+          sound4ShiftIndex -= 0x200000;   
+        }
+      }
+
+      sound4Index &= 0x1fffff;    
+      sound4ShiftIndex &= 0x1fffff;        
+    
+      value = ((sound4ShiftRight & 1)*2-1) * vol;
+    } else {
+      value = 0;
+    }
+  }
+  
+  soundBuffer[3][soundIndex] = value;
+
+  if(sound4On) {
+    if(sound4ATL) {
+      sound4ATL-=soundQuality;
+      
+      if(sound4ATL <= 0 && sound4Continue) {
+        gbMemory[NR52] &= 0xf7;
+        sound4On = 0;
+      }
+    }
+    
+    if(sound4EnvelopeATL) {
+      sound4EnvelopeATL-=soundQuality;
+      
+      if(sound4EnvelopeATL <= 0) {
+        if(sound4EnvelopeUpDown) {
+          if(sound4EnvelopeVolume < 15)
+            sound4EnvelopeVolume++;
+        } else {
+          if(sound4EnvelopeVolume)
+            sound4EnvelopeVolume--;
+        }
+        sound4EnvelopeATL += sound4EnvelopeATLReload;
+      }
+    }
+  }
 }
 
 void gbSoundMix()
 {
   int res = 0;
- 
-   blip_sample_t out[2] = {0, 0};
- 
-   if ( ! apu_out ) return;
- 
-   while (!apu_out->read_samples(&out[0], 2))
-   {
-     int ticks = SOUND_CLOCK_TICKS * 95 / (24 * (gbSpeed ? 2 : 1));
-     bool was_stereo = apu->end_frame( ticks );
-     apu_out->end_frame( ticks, was_stereo );
-    }
-  
-   res = out[0];
- 
-   //res = (res * 7 * 60) >> 8;
 
+  if(soundBalance & 16) {
+    res += ((s8)soundBuffer[0][soundIndex]);
+  }
+  if(soundBalance & 32) {
+    res += ((s8)soundBuffer[1][soundIndex]);
+  }
+  if(soundBalance & 64) {
+    res += ((s8)soundBuffer[2][soundIndex]);
+  }
+  if(soundBalance & 128) {
+    res += ((s8)soundBuffer[3][soundIndex]);
+  }
+
+  if(gbDigitalSound)
+    res *= soundLevel1*256;
+  else
+    res *= soundLevel1*60;
   
   if(soundEcho) {
     res *= 2;
@@ -273,7 +664,25 @@ void gbSoundMix()
   else
     soundFinalWave[soundBufferIndex++] = res;
   
-  res = out[1];
+  res = 0;
+
+  if(soundBalance & 1) {
+    res += ((s8)soundBuffer[0][soundIndex]);
+  }
+  if(soundBalance & 2) {
+    res += ((s8)soundBuffer[1][soundIndex]);
+  }
+  if(soundBalance & 4) {
+    res += ((s8)soundBuffer[2][soundIndex]);
+  }
+  if(soundBalance & 8) {
+    res += ((s8)soundBuffer[3][soundIndex]);
+  }
+
+  if(gbDigitalSound)
+    res *= soundLevel2*256;
+  else
+    res *= soundLevel2*60;
   
   if(soundEcho) {
     res *= 2;
@@ -325,10 +734,10 @@ void gbSoundTick()
 {
   if(systemSoundOn) {
     if(soundMasterOn) {
-      /*gbSoundChannel1();
+      gbSoundChannel1();
       gbSoundChannel2();
       gbSoundChannel3();
-      gbSoundChannel4();*/
+      gbSoundChannel4();
       
       gbSoundMix();
     } else {
@@ -354,7 +763,7 @@ void gbSoundTick()
 
 void gbSoundReset()
 {
-  soundPaused = 1;
+  soundPaused = true;
   soundPlay = 0;
   SOUND_CLOCK_TICKS = soundQuality * 24;  
   soundTicks = SOUND_CLOCK_TICKS;
@@ -366,43 +775,100 @@ void gbSoundReset()
   soundLevel2 = 7;
   soundVIN = 0;
   
+  sound1On = 0;
+  sound1ATL = 0;
+  sound1Skip = 0;
+  sound1Index = 0;
+  sound1Continue = 0;
+  sound1EnvelopeVolume =  0;
+  sound1EnvelopeATL = 0;
+  sound1EnvelopeUpDown = 0;
+  sound1EnvelopeATLReload = 0;
+  sound1SweepATL = 0;
+  sound1SweepATLReload = 0;
+  sound1SweepSteps = 0;
+  sound1SweepUpDown = 0;
+  sound1SweepStep = 0;
+  sound1Wave = soundWavePattern[2];
+  
+  sound2On = 0;
+  sound2ATL = 0;
+  sound2Skip = 0;
+  sound2Index = 0;
+  sound2Continue = 0;
+  sound2EnvelopeVolume =  0;
+  sound2EnvelopeATL = 0;
+  sound2EnvelopeUpDown = 0;
+  sound2EnvelopeATLReload = 0;
+  sound2Wave = soundWavePattern[2];
+  
+  sound3On = 0;
+  sound3ATL = 0;
+  sound3Skip = 0;
+  sound3Index = 0;
+  sound3Continue = 0;
+  sound3OutputLevel = 0;
+  
+  sound4On = 0;
+  sound4Clock = 0;
+  sound4ATL = 0;
+  sound4Skip = 0;
+  sound4Index = 0;
+  sound4ShiftRight = 0x7f;
+  sound4NSteps = 0;
+  sound4CountDown = 0;
+  sound4Continue = 0;
+  sound4EnvelopeVolume =  0;
+  sound4EnvelopeATL = 0;
+  sound4EnvelopeUpDown = 0;
+  sound4EnvelopeATLReload = 0;
 
   // don't translate
   if(soundDebug) {
     log("*** Sound Init ***\n");
   }
   
-  
-  if (apu_out)
-  {
-    apu_out->clear();
-    apu->reset(false);
- 
-     extern const BOOST::uint8_t sound_data[Gb_Apu::end_addr - Gb_Apu::start_addr + 1];
- 
-     int addr = 0;
- 
-     while (addr < 0x30) {
-       apu->write_register( 0, 0xFF10 + addr, sound_data [ addr ] );
-       addr++;
-     }
-   }
+  gbSoundEvent(0xff10, 0x80);
+  gbSoundEvent(0xff11, 0xbf);
+  gbSoundEvent(0xff12, 0xf3);
+  gbSoundEvent(0xff14, 0xbf);
+  gbSoundEvent(0xff16, 0x3f);
+  gbSoundEvent(0xff17, 0x00);
+  gbSoundEvent(0xff19, 0xbf);
+
+  gbSoundEvent(0xff1a, 0x7f);  
+  gbSoundEvent(0xff1b, 0xff);
+  gbSoundEvent(0xff1c, 0xbf);
+  gbSoundEvent(0xff1e, 0xbf);    
+
+  gbSoundEvent(0xff20, 0xff);
+  gbSoundEvent(0xff21, 0x00);
+  gbSoundEvent(0xff22, 0x00);
+  gbSoundEvent(0xff23, 0xbf);
+  gbSoundEvent(0xff24, 0x77);
+  gbSoundEvent(0xff25, 0xf3);
+
+  if (gbHardware & 0x4)
+    gbSoundEvent(0xff26, 0xf0);
+  else
+    gbSoundEvent(0xff26, 0xf1);
+
   // don't translate
   if(soundDebug) {
     log("*** Sound Init Complete ***\n");
   }
   
-  if (apu)
-   {
-     int addr = 0xff30;
- 
-     while(addr < 0xff40) {
-       /*gbMemory[addr++] = 0x00;
-       gbMemory[addr++] = 0xff;*/
-       gbSoundEvent(addr++, 0x00);
-       gbSoundEvent(addr++, 0xFF);
-     }
-    }
+  sound1On = 0;
+  sound2On = 0;
+  sound3On = 0;
+  sound4On = 0;
+  
+  int addr = 0xff30;
+
+  while(addr < 0xff40) {
+    gbMemory[addr++] = 0x00;
+    gbMemory[addr++] = 0xff;
+  }
 
   memset(soundFinalWave, 0x00, soundBufferLen);
 
@@ -411,7 +877,7 @@ void gbSoundReset()
   soundEchoIndex = 0;
 }
 
-extern bool soundInit(bool gba = true);
+extern bool soundInit(bool gb);
 extern void soundShutdown();
 
 void gbSoundSetQuality(int quality)
@@ -497,6 +963,18 @@ void gbSoundSaveGame(gzFile gzFile)
 {
   utilWriteData(gzFile, gbSoundSaveStruct);
 
+  utilWriteInt(gzFile, sound1ATLreload);
+  utilWriteInt(gzFile, freq1low);
+  utilWriteInt(gzFile, freq1high);
+  utilWriteInt(gzFile, sound2ATLreload);
+  utilWriteInt(gzFile, freq2low);
+  utilWriteInt(gzFile, freq2high);
+  utilWriteInt(gzFile, sound3ATLreload);
+  utilWriteInt(gzFile, freq3low);
+  utilWriteInt(gzFile, freq3high);
+  utilWriteInt(gzFile, sound4ATLreload);
+  utilWriteInt(gzFile, freq4);
+
   utilGzWrite(gzFile, soundBuffer, 4*735);
   utilGzWrite(gzFile, soundFinalWave, 2*735);
   utilGzWrite(gzFile, &soundQuality, sizeof(int));
@@ -505,6 +983,35 @@ void gbSoundSaveGame(gzFile gzFile)
 void gbSoundReadGame(int version,gzFile gzFile)
 {
   utilReadData(gzFile, gbSoundSaveStruct);
+
+  if (version<11)
+  {
+    sound1ATLreload = 172 * (64 - (gbMemory[NR11] & 0x3f));
+    freq1low = gbMemory[NR13];
+    freq1high = gbMemory[NR14] & 7;
+    sound2ATLreload  = 172 * (64 - (gbMemory[NR21] & 0x3f));
+    freq2low = gbMemory[NR23];
+    freq2high = gbMemory[NR24] & 7;
+    sound3ATLreload = 172 * (256 - gbMemory[NR31]);
+    freq3low = gbMemory[NR33];
+    freq3high = gbMemory[NR34] & 7;
+    sound4ATLreload = 172 * (64 - (gbMemory[NR41] & 0x3f));
+    freq4 = soundFreqRatio[gbMemory[NR43] & 7];
+  }
+  else
+  {
+    sound1ATLreload = utilReadInt(gzFile);
+    freq1low = utilReadInt(gzFile);
+    freq1high = utilReadInt(gzFile);
+    sound2ATLreload = utilReadInt(gzFile);
+    freq2low = utilReadInt(gzFile);
+    freq2high = utilReadInt(gzFile);
+    sound3ATLreload = utilReadInt(gzFile);
+    freq3low = utilReadInt(gzFile);
+    freq3high = utilReadInt(gzFile);
+    sound4ATLreload = utilReadInt(gzFile);
+    freq4 = utilReadInt(gzFile);
+  }
 
   soundBufferIndex = soundIndex * 2;
   

@@ -71,10 +71,6 @@ void MaxScale::OnOk()
   CString tmp;
   m_value.GetWindowText(tmp);
   theApp.fsMaxScale = atoi(tmp);
-  theApp.updateWindowSize(theApp.videoOption);
-  if(theApp.display)
-	  theApp.display->clear();
-  this->SetFocus();
   EndDialog(TRUE);
 }
 

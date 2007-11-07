@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005-2006 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,6 +20,12 @@
 #include "../Port.h"
 #include "gbGlobals.h"
 #include "gbMemory.h"
+#include "GB.h"
+u8 gbDaysinMonth [12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+const u8 gbDisabledRam [8] = {0x80, 0xff, 0xf0, 0x00, 0x30, 0xbf, 0xbf, 0xbf};
+extern int gbHardware;
+extern int gbGBCColorType;
+extern gbRegister PC;
 
 mapperMBC1 gbDataMBC1 = {
   0, // RAM enable
@@ -27,7 +33,8 @@ mapperMBC1 gbDataMBC1 = {
   0, // RAM bank
   0, // memory model
   0, // ROM high address
-  0  // RAM address
+  0, // RAM address
+  0  // Rom Bank 0 remapping
 };
 
 // MBC1 ROM write registers
@@ -41,17 +48,25 @@ void mapperMBC1ROM(u16 address, u8 value)
     break;
   case 0x2000: // ROM bank select
     //    value = value & 0x1f;
-    if(value == 0)
-      value = 1;
+    if ((value == 1) && (address == 0x2100))
+      gbDataMBC1.mapperRomBank0Remapping = 1;
+
+    if((value & 0x1f) == 0)
+      value += 1;
     if(value == gbDataMBC1.mapperROMBank)
       break;
 
     tmpAddress = value << 14;
 
     // check current model
+    if (gbDataMBC1.mapperRomBank0Remapping == 3) {
+      tmpAddress = (value & 0xf) << 14;
+      tmpAddress |= (gbDataMBC1.mapperROMHighAddress & 3) << 18;
+    }
+    else
     if(gbDataMBC1.mapperMemoryModel == 0) {
       // model is 16/8, so we have a high address in use
-      tmpAddress |= (gbDataMBC1.mapperROMHighAddress) << 19;
+      tmpAddress |= (gbDataMBC1.mapperROMHighAddress & 3) << 19;
     }
 
     tmpAddress &= gbRomSizeMask;
@@ -63,16 +78,39 @@ void mapperMBC1ROM(u16 address, u8 value)
     break;
   case 0x4000: // RAM bank select
     if(gbDataMBC1.mapperMemoryModel == 1) {
+      if (!gbRamSize)
+      {
+        if (gbDataMBC1.mapperRomBank0Remapping == 3)
+        {
+          gbDataMBC1.mapperROMHighAddress = value & 0x03;
+          tmpAddress = (gbDataMBC1.mapperROMHighAddress) << 18;
+          tmpAddress &= gbRomSizeMask;
+          gbMemoryMap[0x00] = &gbRom[tmpAddress];
+          gbMemoryMap[0x01] = &gbRom[tmpAddress + 0x1000];
+          gbMemoryMap[0x02] = &gbRom[tmpAddress + 0x2000];
+          gbMemoryMap[0x03] = &gbRom[tmpAddress + 0x3000];
+          gbMemoryMap[0x04] = &gbRom[tmpAddress + 0x4000];
+          gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x5000];
+          gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x6000];
+          gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x7000];
+        }
+        else gbDataMBC1.mapperRomBank0Remapping = 0;
+      }
       // 4/32 model, RAM bank switching provided
       value = value & 0x03;
       if(value == gbDataMBC1.mapperRAMBank)
         break;
       tmpAddress = value << 13;
       tmpAddress &= gbRamSizeMask;
-      gbMemoryMap[0x0a] = &gbRam[tmpAddress];
-      gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
+      if(gbRamSize) {
+        gbMemoryMap[0x0a] = &gbRam[tmpAddress];
+        gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
+      }
       gbDataMBC1.mapperRAMBank = value;
       gbDataMBC1.mapperRAMAddress = tmpAddress;
+
+      if (gbDataMBC1.mapperRomBank0Remapping != 3)
+        gbDataMBC1.mapperROMHighAddress = 0;
     } else {
       // 16/8, set the high address
       gbDataMBC1.mapperROMHighAddress = value & 0x03;
@@ -83,10 +121,57 @@ void mapperMBC1ROM(u16 address, u8 value)
       gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
       gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
       gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
+      if(gbRamSize) {
+        gbMemoryMap[0x0a] = &gbRam[0];
+        gbMemoryMap[0x0b] = &gbRam[0x1000];
+      }
+
+      gbDataMBC1.mapperRAMBank = 0;
     }
     break;
   case 0x6000: // memory model select
     gbDataMBC1.mapperMemoryModel = value & 1;
+
+    if(gbDataMBC1.mapperMemoryModel == 1) {
+      // 4/32 model, RAM bank switching provided
+
+      value = gbDataMBC1.mapperRAMBank & 0x03;
+      tmpAddress = value << 13;
+      tmpAddress &= gbRamSizeMask;
+      if(gbRamSize) {
+        gbMemoryMap[0x0a] = &gbRam[gbDataMBC1.mapperRAMAddress];
+        gbMemoryMap[0x0b] = &gbRam[gbDataMBC1.mapperRAMAddress + 0x1000];
+        gbDataMBC1.mapperRomBank0Remapping = 0;
+      }
+      else gbDataMBC1.mapperRomBank0Remapping |=2;
+
+      gbDataMBC1.mapperRAMBank = value;
+      gbDataMBC1.mapperRAMAddress = tmpAddress;
+
+      tmpAddress = gbDataMBC1.mapperROMBank << 14;
+
+
+      tmpAddress &= gbRomSizeMask;
+      gbMemoryMap[0x04] = &gbRom[tmpAddress];
+      gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
+      gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
+      gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
+
+    } else {
+      // 16/8, set the high address
+
+      tmpAddress = gbDataMBC1.mapperROMBank << 14;
+      tmpAddress |= (gbDataMBC1.mapperROMHighAddress) << 19;
+      tmpAddress &= gbRomSizeMask;
+      gbMemoryMap[0x04] = &gbRom[tmpAddress];
+      gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
+      gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
+      gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
+      if(gbRamSize) {
+        gbMemoryMap[0x0a] = &gbRam[0];
+        gbMemoryMap[0x0b] = &gbRam[0x1000];
+      }
+    }
     break;
   }
 }
@@ -102,23 +187,72 @@ void mapperMBC1RAM(u16 address, u8 value)
   }
 }
 
+// MBC1 read RAM
+u8 mapperMBC1ReadRAM(u16 address)
+{
+  
+  if(gbDataMBC1.mapperRAMEnable)
+    return gbMemoryMap[address>>12][address & 0x0fff];
+
+  if (!genericflashcardEnable)
+    return 0xff;
+  else
+  if ((address & 0x1000) >= 0x1000)
+  {
+  // The value returned when reading RAM while it's disabled
+  // is constant, exept for the GBASP hardware.
+  // (actually, is the address that read is out of the ROM, the returned value if 0xff...)
+    if (PC.W>=0xff80)
+      return 0xff;
+    else
+    if ((gbHardware & 0x08) && (gbGBCColorType == 2))
+    {
+      if (address & 1)
+        return 0xfb;
+      else
+        return 0x7a;
+    }
+    else
+      return 0x0a;
+  }
+  else
+    return gbDisabledRam[address & 7];
+}
+
 void memoryUpdateMapMBC1()
 {
   int tmpAddress = gbDataMBC1.mapperROMBank << 14;
 
   // check current model
-  if(gbDataMBC1.mapperMemoryModel == 1) {
-    // model is 16/8, so we have a high address in use
-    tmpAddress |= (gbDataMBC1.mapperROMHighAddress) << 19;
+  if (gbDataMBC1.mapperRomBank0Remapping == 3) {
+    tmpAddress = (gbDataMBC1.mapperROMHighAddress & 3) << 18;
+    tmpAddress &= gbRomSizeMask;
+    gbMemoryMap[0x00] = &gbRom[tmpAddress];
+    gbMemoryMap[0x01] = &gbRom[tmpAddress + 0x1000];
+    gbMemoryMap[0x02] = &gbRom[tmpAddress + 0x2000];
+    gbMemoryMap[0x03] = &gbRom[tmpAddress + 0x3000];
+
+    tmpAddress |= (gbDataMBC1.mapperROMBank & 0xf) << 14;
+    gbMemoryMap[0x04] = &gbRom[tmpAddress];
+    gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
+    gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
+    gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
+  }
+  else
+  {
+    if(gbDataMBC1.mapperMemoryModel == 0) {
+      // model is 16/8, so we have a high address in use
+      tmpAddress |= (gbDataMBC1.mapperROMHighAddress & 3) << 19;
+    }
+
+    tmpAddress &= gbRomSizeMask;
+    gbMemoryMap[0x04] = &gbRom[tmpAddress];
+    gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
+    gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
+    gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
   }
 
-  tmpAddress &= gbRomSizeMask;
-  gbMemoryMap[0x04] = &gbRom[tmpAddress];
-  gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
-  gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
-  gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
-
-  if(gbRamSize) {
+  if((gbRamSize) &&  (gbDataMBC1.mapperMemoryModel == 1)){
     gbMemoryMap[0x0a] = &gbRam[gbDataMBC1.mapperRAMAddress];
     gbMemoryMap[0x0b] = &gbRam[gbDataMBC1.mapperRAMAddress + 0x1000];
   }
@@ -210,7 +344,7 @@ void memoryUpdateMBC3Clock()
   time_t diff = now - gbDataMBC3.mapperLastTime;
   if(diff > 0) {
     // update the clock according to the last update time
-    gbDataMBC3.mapperSeconds += diff % 60;
+    gbDataMBC3.mapperSeconds += (int)(diff % 60);
     if(gbDataMBC3.mapperSeconds > 59) {
       gbDataMBC3.mapperSeconds -= 60;
       gbDataMBC3.mapperMinutes++;
@@ -218,22 +352,22 @@ void memoryUpdateMBC3Clock()
 
     diff /= 60;
 
-    gbDataMBC3.mapperMinutes += diff % 60;
-    if(gbDataMBC3.mapperMinutes > 60) {
+    gbDataMBC3.mapperMinutes += (int)(diff % 60);
+    if(gbDataMBC3.mapperMinutes > 59) {
       gbDataMBC3.mapperMinutes -= 60;
       gbDataMBC3.mapperHours++;
     }
 
     diff /= 60;
 
-    gbDataMBC3.mapperHours += diff % 24;
-    if(gbDataMBC3.mapperHours > 24) {
+    gbDataMBC3.mapperHours += (int)(diff % 24);
+    if(gbDataMBC3.mapperHours > 23) {
       gbDataMBC3.mapperHours -= 24;
       gbDataMBC3.mapperDays++;
     }
     diff /= 24;
 
-    gbDataMBC3.mapperDays += diff;
+    gbDataMBC3.mapperDays += (int)(diff & 0xffffffff);
     if(gbDataMBC3.mapperDays > 255) {
       if(gbDataMBC3.mapperDays > 511) {
         gbDataMBC3.mapperDays %= 512;
@@ -365,7 +499,30 @@ u8 mapperMBC3ReadRAM(u16 address)
         return gbDataMBC3.mapperLControl;
     }
   }
-  return 0;
+
+  if (!genericflashcardEnable)
+    return 0xff;
+  else
+  if ((address & 0x1000) >= 0x1000)
+  {
+  // The value returned when reading RAM while it's disabled
+  // is constant, exept for the GBASP hardware.
+  // (actually, is the address that read is out of the ROM, the returned value if 0xff...)
+    if (PC.W>=0xff80)
+      return 0xff;
+    else
+    if ((gbHardware & 0x08) && (gbGBCColorType == 2))
+    {
+      if (address & 1)
+        return 0xfb;
+      else
+        return 0x7a;
+    }
+    else
+      return 0x0a;
+  }
+  else
+    return gbDisabledRam[address & 7];
 }
 
 void memoryUpdateMapMBC3()
@@ -406,6 +563,7 @@ void mapperMBC5ROM(u16 address, u8 value)
     gbDataMBC5.mapperRAMEnable = ( ( value & 0x0a) == 0x0a ? 1 : 0);
     break;
   case 0x2000: // ROM bank select
+
     if(address < 0x3000) {
       value = value & 0xff;
       if(value == gbDataMBC5.mapperROMBank)
@@ -464,6 +622,38 @@ void mapperMBC5RAM(u16 address, u8 value)
       systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
     }
   }
+}
+
+// MBC5 read RAM
+u8 mapperMBC5ReadRAM(u16 address)
+{
+  
+  if(gbDataMBC5.mapperRAMEnable)
+    return gbMemoryMap[address>>12][address & 0x0fff];
+
+  if (!genericflashcardEnable)
+    return 0xff;
+  else
+  if ((address & 0x1000) >= 0x1000)
+  {
+  // The value returned when reading RAM while it's disabled
+  // is constant, exept for the GBASP hardware.
+  // (actually, is the address that read is out of the ROM, the returned value if 0xff...)
+    if (PC.W>=0xff80)
+      return 0xff;
+    else
+    if ((gbHardware & 0x08) && (gbGBCColorType == 2))
+    {
+      if (address & 1)
+        return 0xfb;
+      else
+        return 0x7a;
+    }
+    else
+      return 0x0a;
+  }
+  else
+    return gbDisabledRam[address & 7];
 }
 
 void memoryUpdateMapMBC5()
@@ -568,7 +758,30 @@ u8 mapperMBC7ReadRAM(u16 address)
   case 0xa080:
     return gbDataMBC7.value;
   }
-  return 0xff;
+
+  if (!genericflashcardEnable)
+    return 0xff;
+  else
+  if ((address & 0x1000) >= 0x1000)
+  {
+  // The value returned when reading RAM while it's disabled
+  // is constant, exept for the GBASP hardware.
+  // (actually, is the address that read is out of the ROM, the returned value if 0xff...)
+    if (PC.W>=0xff80)
+      return 0xff;
+    else
+    if ((gbHardware & 0x08) && (gbGBCColorType == 2))
+    {
+      if (address & 1)
+        return 0xfb;
+      else
+        return 0x7a;
+    }
+    else
+      return 0x0a;
+  }
+  else
+    return gbDisabledRam[address & 7];
 }
 
 // MBC7 RAM write
@@ -717,7 +930,7 @@ void mapperMBC7RAM(u16 address, u8 value)
 
 void memoryUpdateMapMBC7()
 {
-  int tmpAddress = (gbDataMBC5.mapperROMBank << 14);
+  int tmpAddress = (gbDataMBC7.mapperROMBank << 14);
 
   tmpAddress &= gbRomSizeMask;
   gbMemoryMap[0x04] = &gbRom[tmpAddress];
@@ -964,4 +1177,541 @@ void memoryUpdateMapHuC3()
     gbMemoryMap[0x0a] = &gbRam[tmpAddress];
     gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
   }
+}
+
+// TAMA5 (for Tamagotchi 3 (gb)).
+// Very basic (and ugly :p) support, only rom bank switching is actually working...
+mapperTAMA5 gbDataTAMA5 = {
+  1, // RAM enable
+  1, // ROM bank
+  0, // RAM bank
+  0, // RAM address
+  0, // RAM Byte select
+  0, // mapper command number
+  0, // mapper last command;
+  0, // commands 0x0
+  0, // commands 0x1
+  0, // commands 0x2
+  0, // commands 0x3
+  0, // commands 0x4
+  0, // commands 0x5
+  0, // commands 0x6
+  0, // commands 0x7
+  0, // commands 0x8
+  0, // commands 0x9
+  0, // commands 0xa
+  0, // commands 0xb
+  0, // commands 0xc
+  0, // commands 0xd
+  0, // commands 0xe
+  0, // commands 0xf
+  0, // register
+  0, // timer clock latch
+  0, // timer clock register
+  0, // timer seconds
+  0, // timer minutes
+  0, // timer hours
+  0, // timer days
+  0, // timer months
+  0, // timer years
+  0, // timer control
+  0, // timer latched seconds
+  0, // timer latched minutes
+  0, // timer latched hours
+  0, // timer latched days
+  0, // timer latched months
+  0, // timer latched years
+  0, // timer latched control
+  (time_t)-1 // last time
+};
+
+
+void memoryUpdateTAMA5Clock()
+{
+  if ((gbDataTAMA5.mapperYears & 3) == 0)
+      gbDaysinMonth[1] = 29;
+  else
+      gbDaysinMonth[1] = 28;
+
+  time_t now = time(NULL);
+  time_t diff = now - gbDataTAMA5.mapperLastTime;
+  if(diff > 0) {
+    // update the clock according to the last update time
+    gbDataTAMA5.mapperSeconds += (int)(diff % 60);
+    if(gbDataTAMA5.mapperSeconds > 59) {
+      gbDataTAMA5.mapperSeconds -= 60;
+      gbDataTAMA5.mapperMinutes++;
+    }
+
+    diff /= 60;
+
+    gbDataTAMA5.mapperMinutes += (int)(diff % 60);
+    if(gbDataTAMA5.mapperMinutes > 59) {
+      gbDataTAMA5.mapperMinutes -= 60;
+      gbDataTAMA5.mapperHours++;
+    }
+
+    diff /= 60;
+
+    gbDataTAMA5.mapperHours += (int)(diff % 24);
+    diff /= 24;
+    if(gbDataTAMA5.mapperHours > 23) {
+      gbDataTAMA5.mapperHours -= 24;
+      diff++;
+
+    }
+
+    time_t days = diff;
+    while (days)
+    {
+      gbDataTAMA5.mapperDays++;
+      days--;
+      if (gbDataTAMA5.mapperDays>gbDaysinMonth[gbDataTAMA5.mapperMonths-1])
+      {
+        gbDataTAMA5.mapperDays = 1;
+        gbDataTAMA5.mapperMonths++;
+        if (gbDataTAMA5.mapperMonths>12)
+        {
+           gbDataTAMA5.mapperMonths = 1;
+           gbDataTAMA5.mapperYears++;
+           if ((gbDataTAMA5.mapperYears & 3) == 0)
+             gbDaysinMonth[1] = 29;
+           else
+             gbDaysinMonth[1] = 28;
+        }
+      }
+    }
+  }
+  gbDataTAMA5.mapperLastTime = now;
+
+}
+
+
+
+// TAMA5 RAM write
+void mapperTAMA5RAM(u16 address, u8 value)
+{
+  if ((address & 0xffff) <= 0xa001)
+  {
+    switch (address & 1)
+    {
+      case 0: // 'Values' Register
+      {
+        value &= 0xf;
+        gbDataTAMA5.mapperCommands[gbDataTAMA5.mapperCommandNumber] = value;
+        gbMemoryMap[0xa][0] = value;
+
+        int test = gbDataTAMA5.mapperCommands[gbDataTAMA5.mapperCommandNumber & 0x0e] |
+                                    (gbDataTAMA5.mapperCommands[(gbDataTAMA5.mapperCommandNumber & 0x0e) +1]<<4);
+
+        if ((gbDataTAMA5.mapperCommandNumber & 0xe) == 0) // Read Command !!!
+        {
+          gbDataTAMA5.mapperROMBank = gbDataTAMA5.mapperCommands[0] |
+                                     (gbDataTAMA5.mapperCommands[1]<<4);
+
+          int  tmpAddress = (gbDataTAMA5.mapperROMBank << 14);
+
+          tmpAddress &= gbRomSizeMask;
+          gbMemoryMap[0x04] = &gbRom[tmpAddress];
+          gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
+          gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
+          gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
+
+          gbDataTAMA5.mapperCommands[0x0f] = 0;
+        }
+        else if ((gbDataTAMA5.mapperCommandNumber & 0xe) == 4)
+        {
+          gbDataTAMA5.mapperCommands[0x0f] = 1;
+          if (gbDataTAMA5.mapperCommandNumber == 4)
+            gbDataTAMA5.mapperCommands[5] =0; // correct ?
+        }
+        else if ((gbDataTAMA5.mapperCommandNumber & 0xe) == 6)
+        {
+          gbDataTAMA5.mapperRamByteSelect = (gbDataTAMA5.mapperCommands[7]<<4) |
+                                            (gbDataTAMA5.mapperCommands[6]&0x0f);
+
+          // Write Commands !!!
+          if (gbDataTAMA5.mapperCommands[0x0f] && (gbDataTAMA5.mapperCommandNumber == 7))
+          {
+            int data = gbDataTAMA5.mapperCommands[0x04] & 0x0f |
+                      (gbDataTAMA5.mapperCommands[0x05] <<4);
+
+            // Not sure when the write command should reset...
+            // but it doesn't seem to matter.
+            // gbDataTAMA5.mapperCommands[0x0f] = 0;
+
+            if (gbDataTAMA5.mapperRamByteSelect == 0x8) // Timer stuff
+            {
+              switch (data & 0xf)
+              {
+                case 0x7:
+                  gbDataTAMA5.mapperDays = ((gbDataTAMA5.mapperDays)/10)*10 + (data >> 4);
+                  break;
+                case 0x8:
+                  gbDataTAMA5.mapperDays = (gbDataTAMA5.mapperDays%10) + (data >>4)*10;
+                  break;
+                case 0x9:
+                  gbDataTAMA5.mapperMonths = ((gbDataTAMA5.mapperMonths)/10)*10 + (data >> 4);
+                  break;
+                case 0xa:
+                  gbDataTAMA5.mapperMonths = (gbDataTAMA5.mapperMonths%10) + (data >>4)*10;
+                  break;
+                case 0xb:
+                  gbDataTAMA5.mapperYears = ((gbDataTAMA5.mapperYears)%1000) + (data >> 4)*1000;
+                  break;
+                case 0xc:
+                  gbDataTAMA5.mapperYears = (gbDataTAMA5.mapperYears%100) + (gbDataTAMA5.mapperYears/1000)*1000 +
+                                            (data >>4)*100;
+                  break;
+                default :
+                  break;
+              }
+            }
+            else if (gbDataTAMA5.mapperRamByteSelect == 0x18) // Timer stuff again
+            {
+              memoryUpdateTAMA5Clock();
+              gbDataTAMA5.mapperLSeconds = gbDataTAMA5.mapperSeconds;
+              gbDataTAMA5.mapperLMinutes = gbDataTAMA5.mapperMinutes;
+              gbDataTAMA5.mapperLHours   = gbDataTAMA5.mapperHours;
+              gbDataTAMA5.mapperLDays    = gbDataTAMA5.mapperDays;
+              gbDataTAMA5.mapperLMonths   = gbDataTAMA5.mapperMonths;
+              gbDataTAMA5.mapperLYears    = gbDataTAMA5.mapperYears;
+              gbDataTAMA5.mapperLControl = gbDataTAMA5.mapperControl;
+
+              int seconds = (gbDataTAMA5.mapperLSeconds / 10)*16 + gbDataTAMA5.mapperLSeconds %10;
+              int secondsL = (gbDataTAMA5.mapperLSeconds % 10);
+              int secondsH = (gbDataTAMA5.mapperLSeconds / 10);
+              int minutes = (gbDataTAMA5.mapperLMinutes / 10)*16 + gbDataTAMA5.mapperLMinutes %10;
+              int hours = (gbDataTAMA5.mapperLHours / 10)*16 + gbDataTAMA5.mapperLHours %10;
+              int DaysL = gbDataTAMA5.mapperLDays % 10;
+              int DaysH = gbDataTAMA5.mapperLDays /10;
+              int MonthsL = gbDataTAMA5.mapperLMonths % 10;
+              int MonthsH = gbDataTAMA5.mapperLMonths / 10;
+              int Years3 = (gbDataTAMA5.mapperLYears / 100) % 10;
+              int Years4 = (gbDataTAMA5.mapperLYears / 1000);
+
+              switch (data & 0x0f)
+              {
+                // I guess cases 0 and 1 are used for secondsL and secondsH
+                // so the game would update the timer values on screen when
+                // the seconds reset to 0... ?
+                case 0x0:
+                  gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect] = secondsL;
+                  break;
+                case 0x1:
+                  gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect] = secondsH;
+                  break;
+                case 0x7:
+                  gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect] = DaysL; // days low
+                  break;
+                case 0x8:
+                  gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect] = DaysH; // days high
+                  break;
+                case 0x9:
+                  gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect] = MonthsL; // month low
+                  break;
+                case 0xa:
+                  gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect] = MonthsH; // month high
+                  break;
+                case 0xb:
+                  gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect] = Years4; // years 4th digit
+                  break;
+                case 0xc:
+                  gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect] = Years3; // years 3rd digit
+                  break;
+                default :
+                  break;
+              }
+
+              gbTAMA5ram[0x54] = seconds; // incorrect ? (not used by the game) ?
+              gbTAMA5ram[0x64] = minutes;
+              gbTAMA5ram[0x74] = hours;
+              gbTAMA5ram[0x84] = DaysH*16+DaysL; // incorrect ? (not used by the game) ?
+              gbTAMA5ram[0x94] = MonthsH*16+MonthsL; // incorrect ? (not used by the game) ?
+
+              time(&gbDataTAMA5.mapperLastTime);
+
+              gbMemoryMap[0xa][0] = 1;
+            }
+            else if (gbDataTAMA5.mapperRamByteSelect == 0x28) // Timer stuff again
+            {
+              if ((data & 0xf) == 0xb)
+                 gbDataTAMA5.mapperYears = ((gbDataTAMA5.mapperYears>>2)<<2) + (data & 3);
+            }
+            else if (gbDataTAMA5.mapperRamByteSelect == 0x44)
+            {
+              gbDataTAMA5.mapperMinutes = (data/16)*10 + data%16;
+            }
+            else if (gbDataTAMA5.mapperRamByteSelect == 0x54)
+            {
+              gbDataTAMA5.mapperHours = (data/16)*10 + data%16;
+            }
+            else                  
+            {
+              gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect] = data;
+            }
+          }
+        }
+      }
+      break;
+      case 1: // 'Commands' Register
+      {
+        gbMemoryMap[0xa][1] = gbDataTAMA5.mapperCommandNumber = value;
+        
+        // This should be only a 'is the flashrom ready ?' command.
+        // However as I couldn't find any 'copy' command
+        // (that seems to be needed for the saving system to work)
+        // I put it there...
+        if (value == 0x0a)
+        {
+          for (int i = 0; i<0x10; i++)
+            for (int j = 0; j<0x10; j++)
+              if (!(j&2))
+                gbTAMA5ram[(i*0x10)+j | 2] = gbTAMA5ram[(i*0x10)+j];
+          // Enable this to see the content of the flashrom in 0xe000
+          /*for (int k = 0; k<0x100; k++)
+            gbMemoryMap[0xe][k] = gbTAMA5ram[k];*/
+
+          gbMemoryMap[0xa][0] = gbDataTAMA5.mapperRAMEnable = 1;
+        }
+        else
+        {
+          if ((value & 0x0e) == 0x0c)
+          {
+            gbDataTAMA5.mapperRamByteSelect = gbDataTAMA5.mapperCommands[6] |
+                                             (gbDataTAMA5.mapperCommands[7]<<4);
+
+            u8 byte = gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect];
+
+            gbMemoryMap[0xa][0] = (value & 1) ? byte >> 4 : byte & 0x0f;
+
+            gbDataTAMA5.mapperCommands[0x0f] = 0;
+          }
+        }
+        break;
+      }
+    }
+  }
+  else
+  {
+    if(gbDataTAMA5.mapperRAMEnable) {
+      if(gbDataTAMA5.mapperRAMBank != -1) {
+        if(gbRamSize) {
+          gbMemoryMap[address>>12][address & 0x0fff] = value;
+          systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
+        }
+      }
+    } 
+  }
+}
+
+
+// TAMA5 read RAM
+u8 mapperTAMA5ReadRAM(u16 address)
+{
+  return gbMemoryMap[address>>12][address & 0xfff];
+}
+
+
+void memoryUpdateMapTAMA5()
+{
+  int tmpAddress = (gbDataTAMA5.mapperROMBank << 14);
+
+  tmpAddress &= gbRomSizeMask;
+  gbMemoryMap[0x04] = &gbRom[tmpAddress];
+  gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
+  gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
+  gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
+
+  if(gbRamSize) {
+    tmpAddress = 0 << 13;
+    tmpAddress &= gbRamSizeMask;
+    gbMemoryMap[0x0a] = &gbRam[tmpAddress];
+    gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
+  }
+}
+
+// MMM01 Used in Momotarou collection (however the rom is corrupted)
+mapperMMM01 gbDataMMM01 ={
+  0, // RAM enable
+  1, // ROM bank
+  0, // RAM bank
+  0, // memory model
+  0, // ROM high address
+  0, // RAM address
+  0  // Rom Bank 0 remapping
+};
+
+// MMM01 ROM write registers
+void mapperMMM01ROM(u16 address, u8 value)
+{
+  int tmpAddress = 0;
+
+  switch(address & 0x6000) {
+  case 0x0000: // RAM enable register
+    gbDataMMM01.mapperRAMEnable = ( ( value & 0x0a) == 0x0a ? 1 : 0);
+    break;
+  case 0x2000: // ROM bank select
+    //    value = value & 0x1f;
+    if(value == 0)
+      value = 1;
+    if(value == gbDataMMM01.mapperROMBank)
+      break;
+
+    tmpAddress = value << 14;
+
+    // check current model
+    if(gbDataMMM01.mapperMemoryModel == 0) {
+      // model is 16/8, so we have a high address in use
+      tmpAddress |= (gbDataMMM01.mapperROMHighAddress) << 19;
+    }
+    else
+      tmpAddress |= gbDataMMM01.mapperRomBank0Remapping << 18;
+
+    tmpAddress &= gbRomSizeMask;
+    gbDataMMM01.mapperROMBank = value;
+    gbMemoryMap[0x04] = &gbRom[tmpAddress];
+    gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
+    gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
+    gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
+    break;
+  case 0x4000: // RAM bank select
+    if(gbDataMMM01.mapperMemoryModel == 1) {
+      // 4/32 model, RAM bank switching provided
+      value = value & 0x03;
+      if(value == gbDataMBC1.mapperRAMBank)
+        break;
+      tmpAddress = value << 13;
+      tmpAddress &= gbRamSizeMask;
+      gbMemoryMap[0x0a] = &gbRam[tmpAddress];
+      gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
+      gbDataMMM01.mapperRAMBank = value;
+      gbDataMMM01.mapperRAMAddress = tmpAddress;
+    } else {
+      // 16/8, set the high address
+      gbDataMMM01.mapperROMHighAddress = value & 0x03;
+      tmpAddress = gbDataMMM01.mapperROMBank << 14;
+      tmpAddress |= (gbDataMMM01.mapperROMHighAddress) << 19;
+      tmpAddress &= gbRomSizeMask;
+      gbMemoryMap[0x04] = &gbRom[tmpAddress];
+      gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
+      gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
+      gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
+
+      gbDataMMM01.mapperRomBank0Remapping = ((value<<1) | (value & 0x40 ? 1 : 0)) & 0xff;
+      tmpAddress = gbDataMMM01.mapperRomBank0Remapping << 18;
+      tmpAddress &= gbRomSizeMask;
+      gbMemoryMap[0x00] = &gbRom[tmpAddress];
+      gbMemoryMap[0x01] = &gbRom[tmpAddress + 0x1000];
+      gbMemoryMap[0x02] = &gbRom[tmpAddress + 0x2000];
+      gbMemoryMap[0x03] = &gbRom[tmpAddress + 0x3000];
+    }
+    break;
+  case 0x6000: // memory model select
+    gbDataMMM01.mapperMemoryModel = value & 1;
+    break;
+  }
+}
+
+// MMM01 RAM write
+void mapperMMM01RAM(u16 address, u8 value)
+{
+  if(gbDataMMM01.mapperRAMEnable) {
+    if(gbRamSize) {
+      gbMemoryMap[address >> 12][address & 0x0fff] = value;
+      systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
+    }
+  }
+}
+
+void memoryUpdateMapMMM01()
+{
+  int tmpAddress = gbDataMMM01.mapperROMBank << 14;
+
+  // check current model
+  if(gbDataMMM01.mapperMemoryModel == 1) {
+    // model is 16/8, so we have a high address in use
+    tmpAddress |= (gbDataMMM01.mapperROMHighAddress) << 19;
+  }
+
+  tmpAddress &= gbRomSizeMask;
+  gbMemoryMap[0x04] = &gbRom[tmpAddress];
+  gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
+  gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
+  gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
+
+  tmpAddress = gbDataMMM01.mapperRomBank0Remapping << 18;
+  tmpAddress &= gbRomSizeMask;
+  gbMemoryMap[0x00] = &gbRom[tmpAddress];
+  gbMemoryMap[0x01] = &gbRom[tmpAddress + 0x1000];
+  gbMemoryMap[0x02] = &gbRom[tmpAddress + 0x2000];
+  gbMemoryMap[0x03] = &gbRom[tmpAddress + 0x3000];
+
+  if(gbRamSize) {
+    gbMemoryMap[0x0a] = &gbRam[gbDataMMM01.mapperRAMAddress];
+    gbMemoryMap[0x0b] = &gbRam[gbDataMMM01.mapperRAMAddress + 0x1000];
+  }
+}
+
+// GameGenie ROM write registers
+void mapperGGROM(u16 address, u8 value)
+{
+  int tmpAddress = 0;
+
+  switch(address & 0x6000) {
+  case 0x0000: // RAM enable register
+    break;
+  case 0x2000: // GameGenie has only a half bank
+    break;
+  case 0x4000: // GameGenie has no RAM
+      if ((address >=0x4001) && (address <= 0x4020)) // GG Hardware Registers
+        gbMemoryMap[address >> 12][address & 0x0fff] = value;
+    break;
+  case 0x6000: // GameGenie has only a half bank
+    break;
+  }
+}
+
+
+// GS3 Used to emulate the GS V3.0 rom bank switching
+mapperGS3 gbDataGS3 = { 1 }; // ROM bank
+
+void mapperGS3ROM(u16 address, u8 value)
+{
+  int tmpAddress = 0;
+
+  switch(address & 0x6000) {
+  case 0x0000: // GS has no ram
+    break;
+  case 0x2000: // GS has no 'classic' ROM bank select
+    break;
+  case 0x4000: // GS has no ram
+    break;
+  case 0x6000: // 0x6000 area is RW, and used for GS hardware registers
+
+    if (address == 0x7FE1) // This is the (half) ROM bank select register
+    {
+      if(value == gbDataGS3.mapperROMBank)
+        break;
+      tmpAddress = value << 13;
+
+      tmpAddress &= gbRomSizeMask;
+      gbDataGS3.mapperROMBank = value;
+      gbMemoryMap[0x04] = &gbRom[tmpAddress];
+      gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
+    }
+    else
+      gbMemoryMap[address>>12][address & 0x0fff] = value;
+    break;
+  }
+}
+
+void memoryUpdateMapGS3()
+{
+  int tmpAddress = gbDataGS3.mapperROMBank << 13;
+
+  tmpAddress &= gbRomSizeMask;
+  // GS can only change a half ROM bank
+  gbMemoryMap[0x04] = &gbRom[tmpAddress];
+  gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
 }

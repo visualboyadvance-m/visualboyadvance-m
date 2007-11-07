@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -118,6 +118,7 @@ void Disassemble::OnAutomatic()
 void Disassemble::OnArm() 
 {
   mode = 1;
+  address&=0xfffffffC;
   refresh();
 }
 
@@ -133,21 +134,30 @@ void Disassemble::OnGo()
   CString buffer;
   m_address.GetWindowText(buffer);
   sscanf(buffer, "%x", &address);
+  if (mode==1)
+      address&=0xfffffffc;
+  else if (mode==2)
+      address&=0xfffffffe;
   refresh();
 }
 
 void Disassemble::OnGopc() 
 {
+  if(rom != NULL)
+  {
   if(armState)
     address = armNextPC - 16;
   else
     address = armNextPC - 8;
 
   refresh();
+  }
 }
 
 void Disassemble::OnNext() 
 {
+  if(rom != NULL)
+  {
   CPULoop(1);
   if(armState) {
     u32 total = address+count*4;
@@ -163,6 +173,7 @@ void Disassemble::OnNext()
     }
   }
   refresh();
+  }
 }
 
 void Disassemble::OnRefresh() 
@@ -173,6 +184,7 @@ void Disassemble::OnRefresh()
 void Disassemble::OnThumb() 
 {
   mode = 2;
+  address&=0xfffffffe;
   refresh();
 }
 

@@ -31,7 +31,7 @@
 #include "ZoomControl.h"
 #include "ResizeDlg.h"
 #include "IUpdate.h"
-#include "..\System.h"  // Added by ClassView
+#include "../System.h"  // Added by ClassView
 
 /////////////////////////////////////////////////////////////////////////////
 // MapView dialog

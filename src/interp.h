@@ -40,11 +40,6 @@
 static unsigned interp_mask[2];
 static unsigned interp_bits_per_pixel;
 
-typedef unsigned short interp_uint16;
-typedef unsigned int interp_uint32;
-
-#define restrict
-
 #define INTERP_16_MASK_1(v) (v & interp_mask[0])
 #define INTERP_16_MASK_2(v) (v & interp_mask[1])
 

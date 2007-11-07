@@ -75,7 +75,24 @@ class Directories : public CDialog
   virtual void OnOK();
   //}}AFX_MSG
   DECLARE_MESSAGE_MAP()
-    };
+private:
+
+	bool directoryDoesExist(const char *directory)
+	{ // returns true if the directory does exist
+		HANDLE hDir;
+		hDir = CreateFile(
+			directory,
+			GENERIC_READ,
+			FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+			NULL,
+			OPEN_EXISTING,
+			FILE_FLAG_BACKUP_SEMANTICS,
+			NULL );
+		bool retval = (hDir == INVALID_HANDLE_VALUE) ? false : true;
+		CloseHandle( hDir );
+		return retval;
+	}
+};
 
     //{{AFX_INSERT_LOCATION}}
     // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

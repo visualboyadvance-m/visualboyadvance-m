@@ -21,7 +21,7 @@
 #define AFX_GBCOLORDLG_H__8D6126EF_06BB_48CF_ABB3_2CC4B1B60358__INCLUDED_
 
 #include "ColorButton.h"  // Added by ClassView
-#include "..\System.h"  // Added by ClassView
+#include "../System.h"  // Added by ClassView
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000

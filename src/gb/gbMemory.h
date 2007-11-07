@@ -1,7 +1,7 @@
 // -*- C++ -*-
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2004-2006 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ struct mapperMBC1 {
   int mapperMemoryModel;
   int mapperROMHighAddress;
   int mapperRAMAddress;
+  int mapperRomBank0Remapping;
 };
 
 struct mapperMBC2 {
@@ -106,15 +107,62 @@ struct mapperHuC3 {
   int mapperRegister8;
 };
 
+struct mapperTAMA5 {
+  int mapperRAMEnable;
+  int mapperROMBank;
+  int mapperRAMBank;
+  int mapperRAMAddress;
+  int mapperRamByteSelect;
+  int mapperCommandNumber;
+  int mapperLastCommandNumber;
+  int mapperCommands[0x10];
+  int mapperRegister;
+  int mapperClockLatch;
+  int mapperClockRegister;
+  int mapperSeconds;
+  int mapperMinutes;
+  int mapperHours;
+  int mapperDays;
+  int mapperMonths;
+  int mapperYears;
+  int mapperControl;
+  int mapperLSeconds;
+  int mapperLMinutes;
+  int mapperLHours;
+  int mapperLDays;
+  int mapperLMonths;
+  int mapperLYears;
+  int mapperLControl;
+  time_t mapperLastTime;
+};
+
+struct mapperMMM01 {
+  int mapperRAMEnable;
+  int mapperROMBank;
+  int mapperRAMBank;
+  int mapperMemoryModel;
+  int mapperROMHighAddress;
+  int mapperRAMAddress;
+  int mapperRomBank0Remapping;
+};
+
+struct mapperGS3 {
+  int mapperROMBank;
+};
+
 extern mapperMBC1 gbDataMBC1;
 extern mapperMBC2 gbDataMBC2;
 extern mapperMBC3 gbDataMBC3;
 extern mapperMBC5 gbDataMBC5;
 extern mapperHuC1 gbDataHuC1;
 extern mapperHuC3 gbDataHuC3;
+extern mapperTAMA5 gbDataTAMA5;
+extern mapperMMM01 gbDataMMM01;
+extern mapperGS3 gbDataGS3;
 
 void mapperMBC1ROM(u16,u8);
 void mapperMBC1RAM(u16,u8);
+u8 mapperMBC1ReadRAM(u16);
 void mapperMBC2ROM(u16,u8);
 void mapperMBC2RAM(u16,u8);
 void mapperMBC3ROM(u16,u8);
@@ -122,6 +170,7 @@ void mapperMBC3RAM(u16,u8);
 u8 mapperMBC3ReadRAM(u16);
 void mapperMBC5ROM(u16,u8);
 void mapperMBC5RAM(u16,u8);
+u8 mapperMBC5ReadRAM(u16);
 void mapperMBC7ROM(u16,u8);
 void mapperMBC7RAM(u16,u8);
 u8 mapperMBC7ReadRAM(u16);
@@ -130,7 +179,13 @@ void mapperHuC1RAM(u16,u8);
 void mapperHuC3ROM(u16,u8);
 void mapperHuC3RAM(u16,u8);
 u8 mapperHuC3ReadRAM(u16);
-
+void mapperTAMA5RAM(u16,u8);
+u8 mapperTAMA5ReadRAM(u16);
+void memoryUpdateTAMA5Clock();
+void mapperMMM01ROM(u16,u8);
+void mapperMMM01RAM(u16,u8);
+void mapperGGROM(u16,u8);
+void mapperGS3ROM(u16,u8);
 //extern void (*mapper)(u16,u8);
 //extern void (*mapperRAM)(u16,u8);
 //extern u8 (*mapperReadRAM)(u16);
@@ -142,7 +197,9 @@ extern void memoryUpdateMapMBC5();
 extern void memoryUpdateMapMBC7();
 extern void memoryUpdateMapHuC1();
 extern void memoryUpdateMapHuC3();
-
+extern void memoryUpdateMapTAMA5();
+extern void memoryUpdateMapMMM01();
+extern void memoryUpdateMapGS3();
 
 
 

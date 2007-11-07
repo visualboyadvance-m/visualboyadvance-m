@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -118,6 +118,8 @@ bool rtcWrite(u32 address, u16 value)
               rtcClockData.dataLen = 1;
               rtcClockData.data[0] = 0x40;
               rtcClockData.state = DATA;
+              break;
+            case 0x64:
               break;
             case 0x65:
               {

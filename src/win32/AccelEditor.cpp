@@ -156,7 +156,7 @@ void AccelEditor::OnSelchangeCommands()
       pAccel->GetString(szBuffer);
       index = m_currents.AddString(szBuffer);
       // and a pointer to the accel object.
-      m_currents.SetItemData(index, (DWORD)pAccel);
+      m_currents.SetItemData(index, (DWORD_PTR)pAccel);
     }
   }
   // Init the key editor
@@ -180,12 +180,12 @@ void AccelEditor::OnAssign()
   
   WORD wKey;
   bool bCtrl, bAlt, bShift;
-  int index;
-	
+
   if (!m_key.GetAccelKey(wKey, bCtrl, bAlt, bShift))
     return; // no valid key, abort
 
   int count = m_commands.GetCount();
+  int index;
   for (index = 0; index < count; index++) {
 
     wIDCommand = LOWORD(m_commands.GetItemData(index));
@@ -235,7 +235,7 @@ void AccelEditor::OnAssign()
   pAccel->GetString(szBuffer);
 
   index = m_currents.AddString(szBuffer);
-  m_currents.SetItemData(index, (DWORD)pAccel);
+  m_currents.SetItemData(index, (DWORD_PTR)pAccel);
 
   // Reset the key editor.
   m_key.ResetKey();

@@ -27,7 +27,7 @@
 //
 #include "stdafx.h"
 #include "Hyperlink.h"
-#include "..\..\res\resource.h"
+#include "resource.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // AboutDialog dialog
@@ -60,7 +60,6 @@ class AboutDialog : public CDialog
   // Generated message map functions
   //{{AFX_MSG(AboutDialog)
   virtual BOOL OnInitDialog();
-  virtual void OnOK();
   //}}AFX_MSG
 
 

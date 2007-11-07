@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -117,8 +117,8 @@ const Opcodes thumbOpcodes[] = {
   {0xfa00, 0x5800, "ldr%b %r0, [%r3, %r6]"},
   // Format 8
   {0xfe00, 0x5200, "strh %r0, [%r3, %r6]"},
-  {0xfe00, 0x5600, "ldrh %r0, [%r3, %r6]"},
-  {0xfe00, 0x5a00, "ldsb %r0, [%r3, %r6]"},
+  {0xfe00, 0x5600, "ldsb %r0, [%r3, %r6]"},
+  {0xfe00, 0x5a00, "ldrh %r0, [%r3, %r6]"},
   {0xfe00, 0x5e00, "ldsh %r0, [%r3, %r6]"},
   // Format 9
   {0xe800, 0x6000, "str%B %r0, [%r3, %p]"},

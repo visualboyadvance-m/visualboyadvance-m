@@ -1,0 +1,56 @@
+#ifndef _MAC
+#include "../AutoBuild.h"
+
+#if _MSC_VER >= 1400
+// use modern icon
+IDI_ICON                ICON    DISCARDABLE     "vbavista.ico"
+#else
+// use traditional icon
+IDI_ICON                ICON    DISCARDABLE     "gbadvance.ico"
+#endif
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION FILEVER
+ PRODUCTVERSION PRODUCTVER
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x29L
+#else
+ FILEFLAGS 0x28L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "VisualBoyAdvance comes with NO WARRANTY. Use it at your own risk.\0"
+            VALUE "CompanyName", "http://vba.ngemu.com/\0"
+            VALUE "FileDescription", "VisualBoyAdvance emulator\0"
+            VALUE "FileVersion", STRFILEVER
+            VALUE "InternalName", "VisualBoyAdvance\0"
+            VALUE "LegalCopyright", "Copyright © 2006 VBA development team\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "VisualBoyAdvance.exe\0"
+            VALUE "PrivateBuild", "0\0"
+            VALUE "ProductName", "VisualBoyAdvance emulator\0"
+            VALUE "ProductVersion", STRPRODUCTVER
+            VALUE "SpecialBuild", "0\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC

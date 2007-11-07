@@ -19,8 +19,9 @@
 // AboutDialog.cpp : implementation file
 //
 
+#include "stdafx.h"
 #include "AboutDialog.h"
-#include "..\..\res\resource.h"
+#include "../AutoBuild.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -63,15 +64,13 @@ BOOL AboutDialog::OnInitDialog()
 {
   CDialog::OnInitDialog();
   
+  CWnd *p = GetDlgItem(IDC_TRANSLATOR_URL);
+  if(p) {
+    m_translator.SubclassDlgItem(IDC_TRANSLATOR_URL, this);
+  }
+
   m_link.SetWindowText("http://vba.ngemu.com");
 
   return TRUE;  // return TRUE unless you set the focus to a control
   // EXCEPTION: OCX Property Pages should return FALSE
-}
-
-void AboutDialog::OnOK() 
-{
-  // TODO: Add extra validation here
-  
-  CDialog::OnOK();
 }

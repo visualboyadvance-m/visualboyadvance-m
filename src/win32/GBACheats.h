@@ -20,7 +20,7 @@
 #if !defined(AFX_GBACHEATS_H__FC31D47D_52C8_42B2_95C7_7C3FD09316A4__INCLUDED_)
 #define AFX_GBACHEATS_H__FC31D47D_52C8_42B2_95C7_7C3FD09316A4__INCLUDED_
 
-#include "..\System.h"  // Added by ClassView
+#include "../System.h"  // Added by ClassView
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000

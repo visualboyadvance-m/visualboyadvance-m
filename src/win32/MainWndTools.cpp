@@ -51,7 +51,7 @@ static char THIS_FILE[] = __FILE__;
 
 extern bool debugger;
 extern int emulating;
-extern int remoteSocket;
+extern SOCKET remoteSocket;
 
 extern void remoteCleanUp();
 extern void remoteSetSockets(SOCKET, SOCKET);
@@ -205,7 +205,7 @@ void MainWnd::OnToolsDebugGdb()
       remoteSetSockets(wait.getListenSocket(), wait.getSocket());
       debugger = true;
       emulating = 1;
-      theApp.cartridgeType = 0;
+      theApp.cartridgeType = IMAGE_GBA;
       theApp.filename = "\\gnu_stub";
       rom = (u8 *)malloc(0x2000000);
       workRAM = (u8 *)calloc(1, 0x40000);
@@ -214,7 +214,7 @@ void MainWnd::OnToolsDebugGdb()
       paletteRAM = (u8 *)calloc(1,0x400);
       vram = (u8 *)calloc(1, 0x20000);
       oam = (u8 *)calloc(1, 0x400);
-      pix = (u8 *)calloc(1, 4 * 240 * 160);
+      pix = (u8 *)calloc(1, 4 * 241 * 162);
       ioMem = (u8 *)calloc(1, 0x400);
       
       theApp.emulator = GBASystem;

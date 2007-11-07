@@ -22,26 +22,28 @@
 #include "Associate.h"
 #include "Directories.h"
 #include "FileDlg.h"
+#include "GameOverrides.h"
+#include "LinkOptions.h"
 #include "GBColorDlg.h"
 #include "Joypad.h"
 #include "MaxScale.h"
 #include "ModeConfirm.h"
 #include "Reg.h"
 #include "RewindInterval.h"
+#include "skin.h"
 #include "Throttle.h"
 #include "WinResUtil.h"
-#include "LinkOptions.h"
 
 #include "../System.h"
 #include "../agbprint.h"
 #include "../GBA.h"
 #include "../Globals.h"
 #include "../Sound.h"
-#include "../Util.h"
 #include "../gb/GB.h"
 #include "../gb/gbGlobals.h"
 #include "../gb/gbPrinter.h"
 #include "../Link.h"
+#include <tchar.h>
 
 extern int emulating;
 
@@ -52,6 +54,7 @@ extern void CPUUpdateRenderBuffers(bool force);
 void MainWnd::OnOptionsFrameskipThrottleNothrottle() 
 {
   theApp.throttle = 0;  
+  theApp.autoFrameSkip = false;
 }
 
 void MainWnd::OnUpdateOptionsFrameskipThrottleNothrottle(CCmdUI* pCmdUI) 
@@ -62,6 +65,7 @@ void MainWnd::OnUpdateOptionsFrameskipThrottleNothrottle(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle25() 
 {
   theApp.throttle = 25;  
+  theApp.autoFrameSkip = false;
 }
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle25(CCmdUI* pCmdUI) 
@@ -72,6 +76,7 @@ void MainWnd::OnUpdateOptionsFrameskipThrottle25(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle50() 
 {
   theApp.throttle = 50;  
+  theApp.autoFrameSkip = false;
 }
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle50(CCmdUI* pCmdUI) 
@@ -82,6 +87,7 @@ void MainWnd::OnUpdateOptionsFrameskipThrottle50(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle100() 
 {
   theApp.throttle = 100;  
+  theApp.autoFrameSkip = false;
 }
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle100(CCmdUI* pCmdUI) 
@@ -92,6 +98,7 @@ void MainWnd::OnUpdateOptionsFrameskipThrottle100(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle150() 
 {
   theApp.throttle = 150;  
+  theApp.autoFrameSkip = false;
 }
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle150(CCmdUI* pCmdUI) 
@@ -102,6 +109,7 @@ void MainWnd::OnUpdateOptionsFrameskipThrottle150(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle200() 
 {
   theApp.throttle = 200;  
+  theApp.autoFrameSkip = false;
 }
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle200(CCmdUI* pCmdUI) 
@@ -109,13 +117,18 @@ void MainWnd::OnUpdateOptionsFrameskipThrottle200(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(theApp.throttle == 200);
 }
 
+
 void MainWnd::OnOptionsFrameskipThrottleOther() 
 {
-  Throttle dlg;
-  int v = dlg.DoModal();
-  if(v)
-    theApp.throttle = v;
+	Throttle dlg;
+	int v = (int)dlg.DoModal();
+	
+	if( v ) {
+		theApp.throttle = v;
+		theApp.autoFrameSkip = false;
+	}
 }
+
 
 void MainWnd::OnUpdateOptionsFrameskipThrottleOther(CCmdUI* pCmdUI) 
 {
@@ -129,7 +142,13 @@ void MainWnd::OnOptionsFrameskipAutomatic()
 {
   theApp.autoFrameSkip = !theApp.autoFrameSkip;
   if(!theApp.autoFrameSkip && emulating)
-    theApp.updateFrameSkip();
+	  theApp.updateFrameSkip();
+  else
+  {
+	  theApp.throttle = false;
+	  frameSkip = 0;
+	  systemFrameSkip = 0;
+  }
 }
 
 void MainWnd::OnUpdateOptionsFrameskipAutomatic(CCmdUI* pCmdUI) 
@@ -146,26 +165,28 @@ BOOL MainWnd::OnOptionsFrameskip(UINT nID)
   case ID_OPTIONS_VIDEO_FRAMESKIP_3:
   case ID_OPTIONS_VIDEO_FRAMESKIP_4:
   case ID_OPTIONS_VIDEO_FRAMESKIP_5:
-    if(theApp.cartridgeType == 0) {
+    if(theApp.cartridgeType == IMAGE_GBA) {
       frameSkip = nID - ID_OPTIONS_VIDEO_FRAMESKIP_0;
     } else {
       gbFrameSkip = nID - ID_OPTIONS_VIDEO_FRAMESKIP_0;
     }
     if(emulating)
       theApp.updateFrameSkip();
+	theApp.autoFrameSkip = false;
     return TRUE;
     break;
   case ID_OPTIONS_VIDEO_FRAMESKIP_6:
   case ID_OPTIONS_VIDEO_FRAMESKIP_7:
   case ID_OPTIONS_VIDEO_FRAMESKIP_8:
   case ID_OPTIONS_VIDEO_FRAMESKIP_9:
-    if(theApp.cartridgeType == 0) {
+    if(theApp.cartridgeType == IMAGE_GBA) {
       frameSkip = 6 + nID - ID_OPTIONS_VIDEO_FRAMESKIP_6;
     } else {
       gbFrameSkip = 6 + nID - ID_OPTIONS_VIDEO_FRAMESKIP_6;
     }
     if(emulating)
       theApp.updateFrameSkip();
+	theApp.autoFrameSkip = false;
     return TRUE;
     break;
   }
@@ -174,59 +195,63 @@ BOOL MainWnd::OnOptionsFrameskip(UINT nID)
 
 void MainWnd::OnUpdateOptionsVideoFrameskip0(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(theApp.cartridgeType == 0 ? frameSkip == 0 : gbFrameSkip == 0);  
+  pCmdUI->SetCheck(theApp.cartridgeType == IMAGE_GBA ? frameSkip == 0 : gbFrameSkip == 0);  
 }
 
 void MainWnd::OnUpdateOptionsVideoFrameskip1(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(theApp.cartridgeType == 0 ? frameSkip == 1 : gbFrameSkip == 1);
+  pCmdUI->SetCheck(theApp.cartridgeType == IMAGE_GBA ? frameSkip == 1 : gbFrameSkip == 1);
 }
 
 void MainWnd::OnUpdateOptionsVideoFrameskip2(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(theApp.cartridgeType == 0 ? frameSkip == 2 : gbFrameSkip == 2);
+  pCmdUI->SetCheck(theApp.cartridgeType == IMAGE_GBA ? frameSkip == 2 : gbFrameSkip == 2);
 }
 
 void MainWnd::OnUpdateOptionsVideoFrameskip3(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(theApp.cartridgeType == 0 ? frameSkip == 3 : gbFrameSkip == 3);
+  pCmdUI->SetCheck(theApp.cartridgeType == IMAGE_GBA ? frameSkip == 3 : gbFrameSkip == 3);
 }
 
 void MainWnd::OnUpdateOptionsVideoFrameskip4(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(theApp.cartridgeType == 0 ? frameSkip == 4 : gbFrameSkip == 4);
+  pCmdUI->SetCheck(theApp.cartridgeType == IMAGE_GBA ? frameSkip == 4 : gbFrameSkip == 4);
 }
 
 void MainWnd::OnUpdateOptionsVideoFrameskip5(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(theApp.cartridgeType == 0 ? frameSkip == 5 : gbFrameSkip == 5);
+  pCmdUI->SetCheck(theApp.cartridgeType == IMAGE_GBA ? frameSkip == 5 : gbFrameSkip == 5);
 }
 
 void MainWnd::OnUpdateOptionsVideoFrameskip6(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(theApp.cartridgeType == 0 ? frameSkip == 6 : gbFrameSkip == 6);
+  pCmdUI->SetCheck(theApp.cartridgeType == IMAGE_GBA ? frameSkip == 6 : gbFrameSkip == 6);
 }
 
 void MainWnd::OnUpdateOptionsVideoFrameskip7(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(theApp.cartridgeType == 0 ? frameSkip == 7 : gbFrameSkip == 7);
+  pCmdUI->SetCheck(theApp.cartridgeType == IMAGE_GBA ? frameSkip == 7 : gbFrameSkip == 7);
 }
 
 void MainWnd::OnUpdateOptionsVideoFrameskip8(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(theApp.cartridgeType == 0 ? frameSkip == 8 : gbFrameSkip == 8);
+  pCmdUI->SetCheck(theApp.cartridgeType == IMAGE_GBA ? frameSkip == 8 : gbFrameSkip == 8);
 }
 
 void MainWnd::OnUpdateOptionsVideoFrameskip9(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(theApp.cartridgeType == 0 ? frameSkip == 9 : gbFrameSkip == 9);
+  pCmdUI->SetCheck(theApp.cartridgeType == IMAGE_GBA ? frameSkip == 9 : gbFrameSkip == 9);
 }
+
 
 void MainWnd::OnOptionsVideoVsync() 
 {
-  theApp.vsync = !theApp.vsync;
-  theApp.updateRenderMethod(true);
+	theApp.vsync = !theApp.vsync;
+	if( theApp.display ) {
+		theApp.display->setOption( _T("vsync"), theApp.vsync );
+	}
 }
+
 
 void MainWnd::OnUpdateOptionsVideoVsync(CCmdUI* pCmdUI) 
 {
@@ -285,10 +310,11 @@ void MainWnd::OnUpdateOptionsVideoFullscreen1280x1024(CCmdUI *pCmdUI)
 
 BOOL MainWnd::OnOptionVideoSize(UINT nID)
 {
-  theApp.updateVideoSize(nID);
-  theApp.m_pMainWnd->PostMessage(VBA_CONFIRM_MODE);
-  return TRUE;
+	theApp.updateVideoSize(nID);
+	theApp.m_pMainWnd->PostMessage(VBA_CONFIRM_MODE);
+	return TRUE;
 }
+
 
 void MainWnd::OnOptionsVideoFullscreen320x240() 
 {
@@ -332,9 +358,7 @@ void MainWnd::OnOptionsVideoFullscreen()
       theApp.fsForceChange = true;
       theApp.fsWidth = width;
       theApp.fsHeight = height;
-	  theApp.fsFrequency = (theApp.display->selectFullScreenMode2() & 0xFFFF);
-	  theApp.fsAdapter = theApp.display->selectFullScreenMode2();
-	  theApp.fsAdapter = (theApp.fsAdapter & 0xFFFF0000) >> 16;
+	  theApp.fsFrequency = 60;
       theApp.fsColorDepth = colorDepth;
       theApp.pVideoDriverGUID = pGUID;
       if(pGUID) {
@@ -360,22 +384,28 @@ void MainWnd::OnUpdateOptionsVideoFullscreen(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsVideoDisablesfx() 
 {
   cpuDisableSfx = !cpuDisableSfx;
-  if(emulating && theApp.cartridgeType == 0)
+  if(emulating && theApp.cartridgeType == IMAGE_GBA)
     CPUUpdateRender();
 }
 
 void MainWnd::OnUpdateOptionsVideoDisablesfx(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(!cpuDisableSfx);
+  pCmdUI->SetCheck(cpuDisableSfx);
 }
+
 
 void MainWnd::OnOptionsVideoFullscreenstretchtofit() 
 {
-  theApp.fullScreenStretch = !theApp.fullScreenStretch;
-  theApp.updateWindowSize(theApp.videoOption);
-  if(theApp.display)
-    theApp.display->clear();
+	theApp.fullScreenStretch = !theApp.fullScreenStretch;
+	theApp.updateWindowSize( theApp.videoOption );
+	if( theApp.display ) {
+		if( emulating ) {
+			theApp.display->clear( );
+		}
+		theApp.display->setOption( _T("fullScreenStretch"), theApp.fullScreenStretch );
+	}
 }
+
 
 void MainWnd::OnUpdateOptionsVideoFullscreenstretchtofit(CCmdUI* pCmdUI) 
 {
@@ -453,31 +483,44 @@ void MainWnd::OnUpdateOptionsVideoRendermethodOpengl(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(theApp.renderMethod == OPENGL);
 }
 
+
 void MainWnd::OnOptionsVideoTriplebuffering() 
 {
-  theApp.tripleBuffering = !theApp.tripleBuffering;
-  theApp.updateRenderMethod(true);
+	theApp.tripleBuffering = !theApp.tripleBuffering;
+	if( theApp.display ) {
+		theApp.display->setOption( _T("tripleBuffering"), theApp.tripleBuffering );
+	}
 }
+
 
 void MainWnd::OnUpdateOptionsVideoTriplebuffering(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(theApp.tripleBuffering);
+	pCmdUI->SetCheck(theApp.tripleBuffering);
 }
 
 void MainWnd::OnOptionsVideoDdrawemulationonly() 
 {
-  theApp.ddrawEmulationOnly = !theApp.ddrawEmulationOnly;
+	theApp.ddrawEmulationOnly = !theApp.ddrawEmulationOnly;
+	if( theApp.display ) {
+		theApp.display->setOption( _T("ddrawEmulationOnly"), theApp.ddrawEmulationOnly );
+	}
 }
+
 
 void MainWnd::OnUpdateOptionsVideoDdrawemulationonly(CCmdUI* pCmdUI) 
 {
   pCmdUI->SetCheck(theApp.ddrawEmulationOnly);
 }
 
+
 void MainWnd::OnOptionsVideoDdrawusevideomemory() 
 {
-  theApp.ddrawUseVideoMemory = !theApp.ddrawUseVideoMemory;
+	theApp.ddrawUseVideoMemory = !theApp.ddrawUseVideoMemory;
+	if( theApp.display ) {
+		theApp.display->setOption( _T("ddrawUseVideoMemory"), theApp.ddrawUseVideoMemory );
+	}
 }
+
 
 void MainWnd::OnUpdateOptionsVideoDdrawusevideomemory(CCmdUI* pCmdUI) 
 {
@@ -486,9 +529,10 @@ void MainWnd::OnUpdateOptionsVideoDdrawusevideomemory(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsVideoRenderoptionsD3dnofilter() 
 {
-  theApp.d3dFilter = 0;
-  if(theApp.display)
-    theApp.display->setOption("d3dFilter", 0);
+	theApp.d3dFilter = 0;
+	if( theApp.display ) {
+		theApp.display->setOption( _T("d3dFilter"), theApp.d3dFilter );
+	}
 }
 
 void MainWnd::OnUpdateOptionsVideoRenderoptionsD3dnofilter(CCmdUI* pCmdUI) 
@@ -496,64 +540,143 @@ void MainWnd::OnUpdateOptionsVideoRenderoptionsD3dnofilter(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(theApp.d3dFilter == 0);
 }
 
+
 void MainWnd::OnOptionsVideoRenderoptionsD3dbilinear() 
 {
-  theApp.d3dFilter = 1;
-  if(theApp.display)
-    theApp.display->setOption("d3dFilter", 1);
+	theApp.d3dFilter = 1;
+	if( theApp.display ) {
+		theApp.display->setOption( _T("d3dFilter"), theApp.d3dFilter );
+	}
 }
+
 
 void MainWnd::OnUpdateOptionsVideoRenderoptionsD3dbilinear(CCmdUI* pCmdUI) 
 {
   pCmdUI->SetCheck(theApp.d3dFilter == 1);
 }
 
+
 void MainWnd::OnOptionsVideoRenderoptionsGlnearest() 
 {
-  theApp.glFilter = 0;
-  if(theApp.display)
-    theApp.display->setOption("glFilter", 0);
+	theApp.glFilter = 0;
+	if( theApp.display ) {
+		theApp.display->setOption( _T("glFilter"), theApp.glFilter );
+	}
 }
+
 
 void MainWnd::OnUpdateOptionsVideoRenderoptionsGlnearest(CCmdUI* pCmdUI) 
 {
   pCmdUI->SetCheck(theApp.glFilter == 0);
 }
 
+
 void MainWnd::OnOptionsVideoRenderoptionsGlbilinear() 
 {
-  theApp.glFilter = 1;
-  if(theApp.display)
-    theApp.display->setOption("glFilter", 1);
+	theApp.glFilter = 1;
+	if( theApp.display ) {
+		theApp.display->setOption( _T("glFilter"), theApp.glFilter );
+	}
 }
+
 
 void MainWnd::OnUpdateOptionsVideoRenderoptionsGlbilinear(CCmdUI* pCmdUI) 
 {
   pCmdUI->SetCheck(theApp.glFilter == 1);
 }
 
+
 void MainWnd::OnOptionsVideoRenderoptionsGltriangle() 
 {
-  theApp.glType = 0;
-  if(theApp.display)
-    theApp.display->setOption("glType", 0);
+	theApp.glType = 0;
+	if( theApp.display ) {
+		theApp.display->setOption( _T("glType"), theApp.glType );
+	}
 }
+
 
 void MainWnd::OnUpdateOptionsVideoRenderoptionsGltriangle(CCmdUI* pCmdUI) 
 {
   pCmdUI->SetCheck(theApp.glType == 0);
 }
 
+
 void MainWnd::OnOptionsVideoRenderoptionsGlquads() 
 {
-  theApp.glType = 1;
-  if(theApp.display)
-    theApp.display->setOption("glType", 1);
+	theApp.glType = 1;
+	if( theApp.display ) {
+		theApp.display->setOption( _T("glType"), theApp.glType );
+	}
 }
+
 
 void MainWnd::OnUpdateOptionsVideoRenderoptionsGlquads(CCmdUI* pCmdUI) 
 {
   pCmdUI->SetCheck(theApp.glType == 1);
+}
+
+void MainWnd::OnOptionsVideoRenderoptionsSelectskin() 
+{
+#ifndef NOSKINS
+  LPCTSTR exts[] = {".ini" };
+  CString filter = winLoadFilter(IDS_FILTER_INI);
+  CString title = winResLoadString(IDS_SELECT_SKIN_FILE);
+
+  FileDlg dlg(this,
+              theApp.skinName,
+              filter,
+              0,
+              "INI",
+              exts,
+              "", 
+              title,
+              false);
+
+  if(dlg.DoModal() == IDCANCEL) {
+    return;
+  }
+
+  bool result = false;
+  if(!theApp.skinEnabled) {
+    theApp.skinEnabled = !theApp.skinEnabled;    
+    regSetDwordValue("skinEnabled", theApp.skinEnabled);
+  }
+
+  if(theApp.skin && theApp.skinEnabled) {
+    delete theApp.skin;
+    theApp.skin = NULL;
+  }
+
+  theApp.skinName = dlg.GetPathName();
+
+  theApp.winUpdateSkin();
+  theApp.winAccelMgr.UpdateMenu(theApp.menu);
+#else
+	systemMessage( 0, _T("This build of VBA does not support skins!") );
+#endif
+}
+
+void MainWnd::OnUpdateOptionsVideoRenderoptionsSelectskin(CCmdUI* pCmdUI) 
+{
+  pCmdUI->Enable(theApp.display && theApp.display->isSkinSupported() &&
+                 theApp.videoOption <= VIDEO_4X);
+}
+
+void MainWnd::OnOptionsVideoRenderoptionsSkin() 
+{
+#ifndef NOSKINS
+  theApp.skinEnabled = !theApp.skinEnabled;
+  theApp.updateRenderMethod(true);
+  theApp.winAccelMgr.UpdateMenu(theApp.menu);
+#else
+	systemMessage( 0, _T("This build of VBA does not support skins!") );
+#endif
+}
+
+void MainWnd::OnUpdateOptionsVideoRenderoptionsSkin(CCmdUI* pCmdUI) 
+{
+  pCmdUI->SetCheck(theApp.skinEnabled);
+  pCmdUI->Enable(theApp.display && theApp.display->isSkinSupported() && theApp.videoOption <= VIDEO_4X);
 }
 
 void MainWnd::OnOptionsEmulatorAssociate() 
@@ -583,6 +706,8 @@ void MainWnd::OnUpdateOptionsEmulatorDisablestatusmessages(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsEmulatorSynchronize() 
 {
   synchronize = !synchronize;
+  if (synchronize)
+	  theApp.throttle = false;
 }
 
 void MainWnd::OnUpdateOptionsEmulatorSynchronize(CCmdUI* pCmdUI) 
@@ -608,17 +733,6 @@ void MainWnd::OnOptionsEmulatorSpeeduptoggle()
 void MainWnd::OnUpdateOptionsEmulatorSpeeduptoggle(CCmdUI* pCmdUI) 
 {
   pCmdUI->SetCheck(theApp.speedupToggle);
-}
-
-void MainWnd::OnOptionsEmulatorRemoveintrosgba() 
-{
-  //  theApp.removeIntros = !theApp.removeIntros;
-}
-
-void MainWnd::OnUpdateOptionsEmulatorRemoveintrosgba(CCmdUI* pCmdUI) 
-{
-  pCmdUI->Enable(false);
-  //  pCmdUI->SetCheck(theApp.removeIntros);
 }
 
 void MainWnd::OnOptionsEmulatorAutomaticallyipspatch() 
@@ -656,32 +770,52 @@ void MainWnd::OnOptionsEmulatorAutohidemenu()
   theApp.autoHideMenu = !theApp.autoHideMenu;
 }
 
+void MainWnd::OnOptionsEmulatorGenericflashcard() 
+{
+  if(emulating && theApp.cartridgeType == IMAGE_GB)
+  theApp.winGenericflashcardEnable = !theApp.winGenericflashcardEnable;
+}
+
+void MainWnd::OnUpdateOptionsEmulatorGenericflashcard(CCmdUI* pCmdUI) 
+{
+  if(emulating && theApp.cartridgeType == IMAGE_GB)
+  pCmdUI->SetCheck(theApp.winGenericflashcardEnable);
+    else
+  pCmdUI->SetCheck(false);
+
+  pCmdUI->Enable(emulating && theApp.cartridgeType == IMAGE_GB);
+}
+
 void MainWnd::OnUpdateOptionsEmulatorAutohidemenu(CCmdUI* pCmdUI) 
 {
   pCmdUI->SetCheck(theApp.autoHideMenu);
 }
 
+
 void MainWnd::OnOptionsEmulatorRewindinterval() 
 {
-  RewindInterval dlg(theApp.rewindTimer/6);
-  int v = dlg.DoModal();
-
-  if(v >= 0) {
-    theApp.rewindTimer = v*6; // convert to a multiple of 10 frames
-    regSetDwordValue("rewindTimer", v);
-    if(v == 0) {
-      if(theApp.rewindMemory)
-        free(theApp.rewindMemory);
-      theApp.rewindMemory = NULL;
-      theApp.rewindCount = 0;
-      theApp.rewindCounter = 0;
-      theApp.rewindSaveNeeded = false;
-    } else {
-      if(theApp.rewindMemory == NULL)
-        theApp.rewindMemory = (char *)malloc(8*REWIND_SIZE);
-    }
-  }
+	RewindInterval dlg(theApp.rewindTimer/6);
+	int v = (int)dlg.DoModal();
+	
+	if( v >= 0 ) {
+		theApp.rewindTimer = v*6; // convert to a multiple of 10 frames
+		regSetDwordValue("rewindTimer", v);
+		if(v == 0) {
+			if(theApp.rewindMemory) {
+				free(theApp.rewindMemory);
+				theApp.rewindMemory = NULL;
+			}
+			theApp.rewindCount = 0;
+			theApp.rewindCounter = 0;
+			theApp.rewindSaveNeeded = false;
+		} else {
+			if(theApp.rewindMemory == NULL) {
+				theApp.rewindMemory = (char *)malloc(8*REWIND_SIZE);
+			}
+		}
+	}
 }
+
 
 BOOL MainWnd::OnOptionsEmulatorShowSpeed(UINT nID)
 {
@@ -791,7 +925,9 @@ void MainWnd::OnOptionsEmulatorSavetypeFlash512k()
 
 void MainWnd::OnUpdateOptionsEmulatorSavetypeFlash512k(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(theApp.winFlashSize == 0x10000);
+  // changed theApp.winFlashSize to flashSize to reflect the actual
+  // flashsize value used by the emu (it can change upon battery loading)
+  pCmdUI->SetCheck(flashSize == 0x10000);
 }
 
 void MainWnd::OnOptionsEmulatorSavetypeFlash1m() 
@@ -802,7 +938,9 @@ void MainWnd::OnOptionsEmulatorSavetypeFlash1m()
 
 void MainWnd::OnUpdateOptionsEmulatorSavetypeFlash1m(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(theApp.winFlashSize == 0x20000);
+  // changed theApp.winFlashSize to flashSize to reflect the actual
+  // flashsize value used by the emu (it can change upon battery loading)
+  pCmdUI->SetCheck(flashSize == 0x20000);
 }
 
 void MainWnd::OnOptionsEmulatorUsebiosfile() 
@@ -873,6 +1011,7 @@ void MainWnd::OnOptionsSoundOff()
 {
   soundOffFlag = true;
   soundShutdown();
+  theApp.soundInitialized = false;
 }
 
 void MainWnd::OnUpdateOptionsSoundOff(CCmdUI* pCmdUI) 
@@ -893,17 +1032,17 @@ void MainWnd::OnUpdateOptionsSoundMute(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsSoundOn() 
 {
-  //if(soundOffFlag) {
+  if(soundOffFlag) {
     soundOffFlag = false;
-	//soundInit(!theApp.cartridgeType);
-  //}
+   // soundInit();
+  }
   soundEnable(0x30f);
 }
 
 void MainWnd::OnUpdateOptionsSoundOn(CCmdUI* pCmdUI) 
 {
-  //int active = soundGetEnable() & 0x30f;
-  pCmdUI->SetCheck(/*active != 0 &&*/ !soundOffFlag);
+  int active = soundGetEnable() & 0x30f;
+  pCmdUI->SetCheck(active != 0 && !soundOffFlag);
 }
 
 void MainWnd::OnOptionsSoundUseoldsynchronization() 
@@ -1022,8 +1161,6 @@ void MainWnd::OnUpdateOptionsSoundVolume5x(CCmdUI* pCmdUI)
 void MainWnd::updateSoundChannels(UINT id)
 {
   int flag = 0;
-
-  if ( soundOffFlag ) return; // mute hax
       
   if(id == ID_OPTIONS_SOUND_CHANNEL1)
     flag = 1;
@@ -1520,8 +1657,9 @@ void MainWnd::OnUpdateOptionsFilterDisablemmx(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsFilterLcdcolors()
 {
+// todo: depreciated
   theApp.filterLCD = !theApp.filterLCD;
-  utilUpdateSystemColorMaps(theApp.filterLCD);
+  utilUpdateSystemColorMaps();
 }
 
 void MainWnd::OnUpdateOptionsFilterLcdcolors(CCmdUI *pCmdUI)
@@ -1710,15 +1848,15 @@ LRESULT MainWnd::OnConfirmMode(WPARAM, LPARAM)
 
 void MainWnd::winConfirmMode()
 {
-  if(theApp.renderMethod == DIRECT_DRAW && theApp.videoOption > VIDEO_4X) {
-    theApp.winCheckFullscreen();
-    ModeConfirm dlg(theApp.m_pMainWnd);
-
-    if(!dlg.DoModal()) {
-      theApp.updateVideoSize(ID_OPTIONS_VIDEO_X2);
-    }
-  }
-  theApp.winAccelMgr.UpdateMenu(theApp.menu);
+	if( theApp.videoOption > VIDEO_4X ) {
+		theApp.winCheckFullscreen();
+		ModeConfirm dlg(theApp.m_pMainWnd);
+		
+		if(!dlg.DoModal()) {
+			theApp.updateVideoSize(ID_OPTIONS_VIDEO_X2);
+		}
+	}
+	theApp.winAccelMgr.UpdateMenu(theApp.menu);
 }
 
 void MainWnd::OnOptionsVideoFullscreenmaxscale() 
@@ -1728,6 +1866,10 @@ void MainWnd::OnOptionsVideoFullscreenmaxscale()
   theApp.winCheckFullscreen();
 
   dlg.DoModal();
+
+  if( theApp.display ) {
+	  theApp.display->setOption( _T("maxScale"), theApp.fsMaxScale );
+  }
 }
 
 
@@ -1767,4 +1909,30 @@ void MainWnd::OnOptionsLinkRFU()
 void MainWnd::OnUpdateOptionsLinkRFU(CCmdUI* pCmdUI) 
 {
 	pCmdUI->SetCheck(adapter);
+}
+
+
+void MainWnd::OnOptionsEmulatorGameoverrides() 
+{
+  if(emulating && theApp.cartridgeType == 0) {
+    GameOverrides dlg(this);
+    dlg.DoModal();
+  }
+}
+
+void MainWnd::OnUpdateOptionsEmulatorGameoverrides(CCmdUI* pCmdUI) 
+{
+  pCmdUI->Enable(emulating && (theApp.cartridgeType == 0));
+}
+
+void MainWnd::OnOptionsSoundHardwareacceleration()
+{
+  theApp.dsoundDisableHardwareAcceleration = !theApp.dsoundDisableHardwareAcceleration;
+  systemSoundShutdown();
+  systemSoundInit();
+}
+
+void MainWnd::OnUpdateOptionsSoundHardwareacceleration(CCmdUI *pCmdUI)
+{
+  pCmdUI->SetCheck(!theApp.dsoundDisableHardwareAcceleration);
 }

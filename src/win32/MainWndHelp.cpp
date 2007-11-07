@@ -44,3 +44,9 @@ void MainWnd::OnHelpBugreport()
 
   dlg.DoModal();
 }
+
+void MainWnd::OnHelpGnupubliclicense() 
+{
+  ::ShellExecute(0, _T("open"), "http://www.gnu.org/licenses/gpl.html", 
+                 0, 0, SW_SHOWNORMAL);	
+}

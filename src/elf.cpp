@@ -820,7 +820,7 @@ char *elfReadString(u8 *data, int *bytesRead)
     *bytesRead = 1;
     return NULL;
   }
-  *bytesRead = strlen((char *)data) + 1;
+  *bytesRead = (int)strlen((char *)data) + 1;
   return (char *)data;
 }
 
@@ -961,8 +961,7 @@ u8 *elfReadAttribute(u8 *data, ELFAttr *attr)
     data += bytes;
     break;
   case DW_FORM_ref_addr:
-    attr->value = (elfDebugInfo->infodata + elfRead4Bytes(data)) -
-      elfGetCompileUnitForData(data)->top;
+    attr->value = (u32)((elfDebugInfo->infodata + elfRead4Bytes(data)) - elfGetCompileUnitForData(data)->top);
     data += 4;
     break;
   case DW_FORM_ref4:
@@ -970,11 +969,7 @@ u8 *elfReadAttribute(u8 *data, ELFAttr *attr)
     data += 4;
     break;
   case DW_FORM_ref_udata:
-    attr->value = (elfDebugInfo->infodata +
-                   (elfGetCompileUnitForData(data)->top -
-                    elfDebugInfo->infodata) +
-                   elfReadLEB128(data, &bytes)) -
-      elfCurrentUnit->top;
+    attr->value = (u32)((elfDebugInfo->infodata + (elfGetCompileUnitForData(data)->top - elfDebugInfo->infodata) + elfReadLEB128(data, &bytes)) - elfCurrentUnit->top);
     data += bytes;
     break;    
   case DW_FORM_indirect:
@@ -1070,7 +1065,7 @@ void elfParseCFA(u8 *top)
   ELFcie *cies = NULL;
   
   while(data < end) {
-    u32 offset = data - topOffset;
+    u32 offset = (u32)(data - topOffset);
     u32 len = elfRead4Bytes(data);
     data += 4;
 
@@ -1110,7 +1105,7 @@ void elfParseCFA(u8 *top)
       cie->returnAddress = *data++;
 
       cie->data = data;
-      cie->dataLen = dataEnd - data;
+      cie->dataLen = (u32)(dataEnd - data);
     } else {
       ELFfde *fde = (ELFfde *)calloc(1, sizeof(ELFfde));
 
@@ -1136,7 +1131,7 @@ void elfParseCFA(u8 *top)
       data += 4;
 
       fde->data = data;
-      fde->dataLen = dataEnd - data;
+      fde->dataLen = (u32)(dataEnd - data);
 
       if((elfFdeCount %10) == 0) {
         elfFdes = (ELFfde **)realloc(elfFdes, (elfFdeCount+10) *
@@ -2762,7 +2757,7 @@ bool elfReadProgram(ELFHeader *eh, u8 *data, int& size, bool parseDebug)
     
     while(ddata < end) {
       unit = elfParseCompUnit(ddata, abbrevdata);
-      unit->offset = ddata-debugdata;
+      unit->offset = (u32)(ddata-debugdata);
       elfParseLineInfo(unit, data);
       if(last == NULL)
         elfCompileUnits = unit;

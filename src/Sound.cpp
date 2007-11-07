@@ -659,40 +659,17 @@ void soundChannel4()
 {
 }
 
-#include <stdio.h>
-
 
 inline void soundDirectSoundA()
 {
-#ifdef ENHANCED_RATE
-	double cr = calc_rate(soundDSATimer);
-	static int cnt = 0;
-	static double lastcr = 0;
-	static FILE *fp = NULL;
-	
-	if (fp==NULL)
-		fp=fopen("C:\\cr.txt", "at");
-	if (cr!=lastcr)
-	{
-		fprintf(fp, "%f %d\n", lastcr, cnt);
-		cnt=0;
-		lastcr=cr;
-	}
-	else
-		cnt++;
-
-	directBuffer[0][soundIndex] = interp_pop(0, calc_rate(soundDSATimer)); //soundDSAValue;
-#else
 	directBuffer[0][soundIndex] = interp_pop(0); //soundDSAValue;
-#endif
-
 }
 
 void soundDirectSoundATimer()
 {
   if(soundDSAEnabled) {
     if(soundDSFifoACount <= 16) {
-      cpuDmaHack2 = CPUCheckDMA(3, 2);
+      CPUCheckDMA(3, 2);
       if(soundDSFifoACount <= 16) {
         soundEvent(FIFOA_L, (u16)0);
         soundEvent(FIFOA_H, (u16)0);
@@ -714,18 +691,15 @@ void soundDirectSoundATimer()
 
 inline void soundDirectSoundB()
 {
-#ifdef ENHANCED_RATE
-	directBuffer[1][soundIndex] = interp_pop(1, calc_rate(soundDSBTimer)); //soundDSBValue;
-#else
 	directBuffer[1][soundIndex] = interp_pop(1); //soundDSBValue;
-#endif
 }
 
 void soundDirectSoundBTimer()
 {
   if(soundDSBEnabled) {
     if(soundDSFifoBCount <= 16) {
-      cpuDmaHack2 = CPUCheckDMA(3, 4);
+	//cpuDmaHack2 = 
+	  CPUCheckDMA(3, 4);
       if(soundDSFifoBCount <= 16) {
         soundEvent(FIFOB_L, (u16)0);
         soundEvent(FIFOB_H, (u16)0);

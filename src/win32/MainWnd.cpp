@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005-2006 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,12 +24,14 @@
 #include "MainWnd.h"
 
 #include <winsock.h>
+#include <shlwapi.h>
 
 #include "FileDlg.h"
 #include "Reg.h"
 #include "WinResUtil.h"
 
 #include "../System.h"
+#include "../AutoBuild.h"
 #include "../cheatSearch.h"
 #include "../GBA.h"
 #include "../Globals.h"
@@ -41,9 +43,6 @@
 #include "../RTC.h"
 #include "../Sound.h"
 #include "../Util.h"
-#include ".\mainwnd.h"
-
-#include "../Link.h"	// Link
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -54,6 +53,7 @@ static char THIS_FILE[] = __FILE__;
 #define VBA_CONFIRM_MODE WM_APP + 100
 
 extern void remoteCleanUp();
+extern int gbHardware;
 
 /////////////////////////////////////////////////////////////////////////////
 // MainWnd
@@ -179,6 +179,10 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_VIDEO_RENDEROPTIONS_GLTRIANGLE, OnUpdateOptionsVideoRenderoptionsGltriangle)
   ON_COMMAND(ID_OPTIONS_VIDEO_RENDEROPTIONS_GLQUADS, OnOptionsVideoRenderoptionsGlquads)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_VIDEO_RENDEROPTIONS_GLQUADS, OnUpdateOptionsVideoRenderoptionsGlquads)
+  ON_COMMAND(ID_OPTIONS_VIDEO_RENDEROPTIONS_SELECTSKIN, OnOptionsVideoRenderoptionsSelectskin)
+  ON_UPDATE_COMMAND_UI(ID_OPTIONS_VIDEO_RENDEROPTIONS_SELECTSKIN, OnUpdateOptionsVideoRenderoptionsSelectskin)
+  ON_COMMAND(ID_OPTIONS_VIDEO_RENDEROPTIONS_SKIN, OnOptionsVideoRenderoptionsSkin)
+  ON_UPDATE_COMMAND_UI(ID_OPTIONS_VIDEO_RENDEROPTIONS_SKIN, OnUpdateOptionsVideoRenderoptionsSkin)
   ON_WM_CONTEXTMENU()
   ON_COMMAND(ID_OPTIONS_EMULATOR_ASSOCIATE, OnOptionsEmulatorAssociate)
   ON_COMMAND(ID_OPTIONS_EMULATOR_DIRECTORIES, OnOptionsEmulatorDirectories)
@@ -190,14 +194,14 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_PAUSEWHENINACTIVE, OnUpdateOptionsEmulatorPausewheninactive)
   ON_COMMAND(ID_OPTIONS_EMULATOR_SPEEDUPTOGGLE, OnOptionsEmulatorSpeeduptoggle)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_SPEEDUPTOGGLE, OnUpdateOptionsEmulatorSpeeduptoggle)
-  ON_COMMAND(ID_OPTIONS_EMULATOR_REMOVEINTROSGBA, OnOptionsEmulatorRemoveintrosgba)
-  ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_REMOVEINTROSGBA, OnUpdateOptionsEmulatorRemoveintrosgba)
   ON_COMMAND(ID_OPTIONS_EMULATOR_AUTOMATICALLYIPSPATCH, OnOptionsEmulatorAutomaticallyipspatch)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_AUTOMATICALLYIPSPATCH, OnUpdateOptionsEmulatorAutomaticallyipspatch)
   ON_COMMAND(ID_OPTIONS_EMULATOR_AGBPRINT, OnOptionsEmulatorAgbprint)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_AGBPRINT, OnUpdateOptionsEmulatorAgbprint)
   ON_COMMAND(ID_OPTIONS_EMULATOR_REALTIMECLOCK, OnOptionsEmulatorRealtimeclock)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_REALTIMECLOCK, OnUpdateOptionsEmulatorRealtimeclock)
+  ON_COMMAND(ID_OPTIONS_EMULATOR_GENERICFLASHCARD, OnOptionsEmulatorGenericflashcard)
+  ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_GENERICFLASHCARD, OnUpdateOptionsEmulatorGenericflashcard)
   ON_COMMAND(ID_OPTIONS_EMULATOR_AUTOHIDEMENU, OnOptionsEmulatorAutohidemenu)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_AUTOHIDEMENU, OnUpdateOptionsEmulatorAutohidemenu)
   ON_COMMAND(ID_OPTIONS_EMULATOR_REWINDINTERVAL, OnOptionsEmulatorRewindinterval)
@@ -226,10 +230,10 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_PNGFORMAT, OnUpdateOptionsEmulatorPngformat)
   ON_COMMAND(ID_OPTIONS_EMULATOR_BMPFORMAT, OnOptionsEmulatorBmpformat)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_BMPFORMAT, OnUpdateOptionsEmulatorBmpformat)
-//  ON_COMMAND(ID_OPTIONS_SOUND_OFF, OnOptionsSoundOff) /* mute hax */
-//  ON_UPDATE_COMMAND_UI(ID_OPTIONS_SOUND_OFF, OnUpdateOptionsSoundOff) /* mute hax */
-  ON_COMMAND(ID_OPTIONS_SOUND_OFF, OnOptionsSoundMute) /* mute hax */
-  ON_UPDATE_COMMAND_UI(ID_OPTIONS_SOUND_OFF, OnUpdateOptionsSoundMute) /* mute hax */
+  ON_COMMAND(ID_OPTIONS_SOUND_OFF, OnOptionsSoundOff)
+  ON_UPDATE_COMMAND_UI(ID_OPTIONS_SOUND_OFF, OnUpdateOptionsSoundOff)
+  ON_COMMAND(ID_OPTIONS_SOUND_MUTE, OnOptionsSoundMute)
+  ON_UPDATE_COMMAND_UI(ID_OPTIONS_SOUND_MUTE, OnUpdateOptionsSoundMute)
   ON_COMMAND(ID_OPTIONS_SOUND_ON, OnOptionsSoundOn)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_SOUND_ON, OnUpdateOptionsSoundOn)
   ON_COMMAND(ID_OPTIONS_SOUND_USEOLDSYNCHRONIZATION, OnOptionsSoundUseoldsynchronization)
@@ -374,7 +378,9 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
 	ON_COMMAND(ID_CHEATS_DISABLECHEATS, OnCheatsDisablecheats)
 	ON_UPDATE_COMMAND_UI(ID_CHEATS_DISABLECHEATS, OnUpdateCheatsDisablecheats)
 	ON_COMMAND(ID_OPTIONS_VIDEO_FULLSCREENMAXSCALE, OnOptionsVideoFullscreenmaxscale)
-
+	ON_COMMAND(ID_OPTIONS_EMULATOR_GAMEOVERRIDES, OnOptionsEmulatorGameoverrides)
+	ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_GAMEOVERRIDES, OnUpdateOptionsEmulatorGameoverrides)
+	ON_COMMAND(ID_HELP_GNUPUBLICLICENSE, OnHelpGnupubliclicense)
 	ON_COMMAND(ID_OPTIONS_LINK_OPTIONS, OnLinkOptions)
 	ON_COMMAND(ID_OPTIONS_LINK_LOG, OnOptionsLinkLog)
 	ON_UPDATE_COMMAND_UI(ID_OPTIONS_LINK_LOG, OnUpdateOptionsLinkLog)
@@ -391,6 +397,7 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_COMMAND_EX_RANGE(ID_OPTIONS_VIDEO_X1, ID_OPTIONS_VIDEO_X4, OnOptionVideoSize)
   ON_COMMAND_EX_RANGE(ID_OPTIONS_VIDEO_LAYERS_BG0, ID_OPTIONS_VIDEO_LAYERS_OBJWIN, OnVideoLayer)
   ON_UPDATE_COMMAND_UI_RANGE(ID_OPTIONS_VIDEO_LAYERS_BG0, ID_OPTIONS_VIDEO_LAYERS_OBJWIN, OnUpdateVideoLayer)
+  ON_COMMAND(ID_SYSTEM_MINIMIZE, OnSystemMinimize)
   ON_COMMAND_EX_RANGE(ID_OPTIONS_EMULATOR_SHOWSPEED_NONE, ID_OPTIONS_EMULATOR_SHOWSPEED_TRANSPARENT, OnOptionsEmulatorShowSpeed)
   ON_UPDATE_COMMAND_UI_RANGE(ID_OPTIONS_EMULATOR_SHOWSPEED_NONE, ID_OPTIONS_EMULATOR_SHOWSPEED_TRANSPARENT, OnUpdateOptionsEmulatorShowSpeed)
   ON_COMMAND_EX_RANGE(ID_OPTIONS_SOUND_VOLUME_1X, ID_OPTIONS_SOUND_VOLUME_4X, OnOptionsSoundVolume)
@@ -398,7 +405,7 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_COMMAND_EX_RANGE(ID_OPTIONS_PRIORITY_HIGHEST, ID_OPTIONS_PRIORITY_BELOWNORMAL, OnOptionsPriority)
   ON_UPDATE_COMMAND_UI_RANGE(ID_OPTIONS_PRIORITY_HIGHEST, ID_OPTIONS_PRIORITY_BELOWNORMAL, OnUpdateOptionsPriority)
   ON_COMMAND_EX_RANGE(ID_OPTIONS_FILTER_NORMAL, ID_OPTIONS_FILTER_TVMODE, OnOptionsFilter)
-  ON_COMMAND_EX(ID_OPTIONS_FILTER16BIT_PIXELATEEXPERIMENTAL, OnOptionsFilter)
+  ON_COMMAND_EX_RANGE(ID_OPTIONS_FILTER16BIT_PIXELATEEXPERIMENTAL, ID_OPTIONS_FILTER16BIT_MOTIONBLUREXPERIMENTAL, OnOptionsFilter)
   ON_COMMAND_EX_RANGE(ID_OPTIONS_FILTER16BIT_ADVANCEMAMESCALE2X, ID_OPTIONS_FILTER16BIT_SIMPLE2X, OnOptionsFilter)
   ON_COMMAND_EX_RANGE(ID_OPTIONS_FILTER_BILINEAR, ID_OPTIONS_FILTER_BILINEARPLUS, OnOptionsFilter)
   ON_COMMAND_EX_RANGE(ID_OPTIONS_FILTER_SCANLINES, ID_OPTIONS_FILTER_SCANLINES, OnOptionsFilter)
@@ -408,7 +415,7 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_COMMAND_EX(ID_OPTIONS_FILTER_SIMPLE3X, OnOptionsFilter)
   ON_COMMAND_EX(ID_OPTIONS_FILTER_SIMPLE4X, OnOptionsFilter)
   ON_UPDATE_COMMAND_UI_RANGE(ID_OPTIONS_FILTER_NORMAL, ID_OPTIONS_FILTER_TVMODE, OnUpdateOptionsFilter)
-  ON_UPDATE_COMMAND_UI(ID_OPTIONS_FILTER16BIT_PIXELATEEXPERIMENTAL, OnUpdateOptionsFilter)
+  ON_UPDATE_COMMAND_UI_RANGE(ID_OPTIONS_FILTER16BIT_PIXELATEEXPERIMENTAL, ID_OPTIONS_FILTER16BIT_MOTIONBLUREXPERIMENTAL, OnUpdateOptionsFilter)
   ON_UPDATE_COMMAND_UI_RANGE(ID_OPTIONS_FILTER16BIT_ADVANCEMAMESCALE2X, ID_OPTIONS_FILTER16BIT_SIMPLE2X, OnUpdateOptionsFilter)
   ON_UPDATE_COMMAND_UI_RANGE(ID_OPTIONS_FILTER_BILINEAR, ID_OPTIONS_FILTER_BILINEARPLUS, OnUpdateOptionsFilter)
   ON_UPDATE_COMMAND_UI_RANGE(ID_OPTIONS_FILTER_SCANLINES, ID_OPTIONS_FILTER_SCANLINES, OnUpdateOptionsFilter)
@@ -425,6 +432,8 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI_RANGE(ID_OPTIONS_JOYPAD_AUTOFIRE_A, ID_OPTIONS_JOYPAD_AUTOFIRE_R, OnUpdateOptionsJoypadAutofire)
   ON_MESSAGE(VBA_CONFIRM_MODE, OnConfirmMode)
   ON_MESSAGE(WM_SYSCOMMAND, OnMySysCommand)
+  ON_COMMAND(ID_OPTIONS_SOUND_HARDWAREACCELERATION, &MainWnd::OnOptionsSoundHardwareacceleration)
+  ON_UPDATE_COMMAND_UI(ID_OPTIONS_SOUND_HARDWAREACCELERATION, &MainWnd::OnUpdateOptionsSoundHardwareacceleration)
   ON_COMMAND(ID_OPTIONS_VIDEO_FULLSCREEN1280X1024, OnOptionsVideoFullscreen1280x1024)
   ON_COMMAND(ID_OPTIONS_VIDEO_FULLSCREEN1024X768, OnOptionsVideoFullscreen1024x768)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_VIDEO_FULLSCREEN1024X768, OnUpdateOptionsVideoFullscreen1024x768)
@@ -443,6 +452,7 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
 
 void MainWnd::OnClose() 
 {
+  emulating = false;
   CWnd::OnClose();
 
   delete this;
@@ -493,13 +503,40 @@ bool MainWnd::FileRun()
     return false;
   }
   systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
-  theApp.cartridgeType = (int)type;
+  theApp.cartridgeType = type;
   if(type == IMAGE_GB) {
+    genericflashcardEnable = theApp.winGenericflashcardEnable;
+
+
     if(!gbLoadRom(theApp.szFile))
       return false;
+
+    gbGetHardwareType();
+
+    // used for the handling of the gb Boot Rom
+    if (gbHardware & 5)
+    {
+      char tempName[2048];
+      GetModuleFileName(NULL, tempName, 2048);
+
+      char *p = strrchr(tempName, '\\');
+      if(p)
+        *p = 0;
+    
+      strcat(tempName, "\\DMG_ROM.bin");
+
+      skipBios = theApp.skipBiosFile ? true : false;
+      gbCPUInit(tempName, theApp.useBiosFile ? true : false);
+    }
+
+    
+  
+    gbReset();
     theApp.emulator = GBSystem;
     gbBorderOn = theApp.winGbBorderOn;
     theApp.romSize = gbRomSize;
+
+
     if(theApp.autoIPS) {
       int size = gbRomSize;
       utilApplyIPS(ipsname, &gbRom, &size);
@@ -516,14 +553,11 @@ bool MainWnd::FileRun()
       return false;
 
     theApp.romSize = size;
-    
+   
     flashSetSize(theApp.winFlashSize);
     rtcEnable(theApp.winRtcEnable);
     cpuSaveType = theApp.winSaveType;
 
-    //    if(cpuEnhancedDetection && winSaveType == 0) {
-    //      utilGBAFindSave(rom, size);
-    //    }
     GetModuleFileName(NULL, tempName, 2048);
 
     char *p = strrchr(tempName, '\\');
@@ -556,6 +590,12 @@ bool MainWnd::FileRun()
                              tempName);
     if(i != (UINT)-1 && (i <= 5))
       cpuSaveType = (int)i;
+    i = GetPrivateProfileInt(buffer,
+                             "mirroringEnabled",
+                             -1,
+                             tempName);
+    if(i != (UINT)-1)
+      doMirroring (i == 0 ? false : true);
     
     theApp.emulator = GBASystem;
     /* disabled due to problems
@@ -579,10 +619,8 @@ bool MainWnd::FileRun()
     else
       soundReset();
   } else {
-    //if(!soundOffFlag) /* mute hax */
-      soundInit(!theApp.cartridgeType);
-    if ( soundOffFlag )
-      soundDisable(0x30f);
+    if(!soundOffFlag)
+      soundInit(!(theApp.cartridgeType==1));
     theApp.soundInitialized = true;
   }
 
@@ -595,7 +633,7 @@ bool MainWnd::FileRun()
     CPUInit((char *)(LPCTSTR)theApp.biosFileName, theApp.useBiosFile ? true : false);
     CPUReset();
   }
-  
+
   readBatteryFile();
 
   if(theApp.autoSaveLoadCheatList)
@@ -760,6 +798,16 @@ void MainWnd::winSaveCheatListDefault()
   else
     name = theApp.filename;
   CString dir = regQueryStringValue("saveDir", NULL);
+  if( dir[0] == '.' ) {
+	  // handle as relative path
+	  char baseDir[MAX_PATH+1];
+	  GetModuleFileName( NULL, baseDir, MAX_PATH );
+	  baseDir[MAX_PATH] = '\0'; // for security reasons
+	  PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
+	  strcat( baseDir, "\\" );
+	  strcat( baseDir, dir );
+	  dir = baseDir;
+	}
 
   if(!dir.GetLength())
     dir = getDirFromFile(filename);
@@ -792,6 +840,16 @@ void MainWnd::winLoadCheatListDefault()
   else
     name = theApp.filename;
   CString dir = regQueryStringValue("saveDir", NULL);
+  if( dir[0] == '.' ) {
+	  // handle as relative path
+	  char baseDir[MAX_PATH+1];
+	  GetModuleFileName( NULL, baseDir, MAX_PATH );
+	  baseDir[MAX_PATH] = '\0'; // for security reasons
+	  PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
+	  strcat( baseDir, "\\" );
+	  strcat( baseDir, dir );
+	  dir = baseDir;
+	}
 
   if(!dir.GetLength())
     dir = getDirFromFile(filename);
@@ -854,6 +912,16 @@ void MainWnd::writeBatteryFile()
     buffer = theApp.filename;
 
   CString saveDir = regQueryStringValue("batteryDir", NULL);
+  if( saveDir[0] == '.' ) {
+	  // handle as relative path
+	  char baseDir[MAX_PATH+1];
+	  GetModuleFileName( NULL, baseDir, MAX_PATH );
+	  baseDir[MAX_PATH] = '\0'; // for security reasons
+	  PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
+	  strcat( baseDir, "\\" );
+	  strcat( baseDir, saveDir );
+	  saveDir = baseDir;
+	}
 
   if(saveDir.IsEmpty())
     saveDir = getDirFromFile(theApp.filename);
@@ -881,6 +949,16 @@ void MainWnd::readBatteryFile()
     buffer = theApp.filename;
 
   CString saveDir = regQueryStringValue("batteryDir", NULL);
+  if( saveDir[0] == '.' ) {
+	  // handle as relative path
+	  char baseDir[MAX_PATH+1];
+	  GetModuleFileName( NULL, baseDir, MAX_PATH );
+	  baseDir[MAX_PATH] = '\0'; // for security reasons
+	  PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
+	  strcat( baseDir, "\\" );
+	  strcat( baseDir, saveDir );
+	  saveDir = baseDir;
+	}
 
   if(saveDir.IsEmpty())
     saveDir = getDirFromFile(theApp.filename);
@@ -924,38 +1002,127 @@ bool MainWnd::writeSaveGame(const char *name)
 void MainWnd::OnContextMenu(CWnd* pWnd, CPoint point) 
 {
   winMouseOn();
-}
+  if(theApp.skin) {
+    if(theApp.popup == NULL) {
+      theApp.winAccelMgr.UpdateMenu(theApp.menu);
+      theApp.popup = CreatePopupMenu();
+      if(theApp.menu != NULL) {
+        int count = GetMenuItemCount(theApp.menu);
+        OSVERSIONINFO info;
+        info.dwOSVersionInfoSize = sizeof(info);
+        GetVersionEx(&info);
 
-bool MainWnd::fileOpenSelect()
-{
-  theApp.dir = "";
-  CString initialDir = regQueryStringValue("romdir",".");
-  if(!initialDir.IsEmpty())
-    theApp.dir = initialDir;
-
-  int selectedFilter = regQueryDwordValue("selectedFilter", 0);
-  if(selectedFilter < 0 || selectedFilter > 2)
-    selectedFilter = 0;
-
-  theApp.szFile = "";
-
-  LPCTSTR exts[] = { "" };
-  CString filter = winLoadFilter(IDS_FILTER_ROM);
-  CString title = winResLoadString(IDS_SELECT_ROM);
-
-  FileDlg dlg(this, "", filter, selectedFilter, "", exts, theApp.dir, title, false);
-
-  if(dlg.DoModal() == IDOK) {
-    regSetDwordValue("selectedFilter", dlg.m_ofn.nFilterIndex);
-    theApp.szFile = dlg.GetPathName();
-    theApp.dir = theApp.szFile.Left(dlg.m_ofn.nFileOffset);
-    if(theApp.dir.GetLength() > 3 && theApp.dir[theApp.dir.GetLength()-1] == '\\')
-      theApp.dir = theApp.dir.Left(theApp.dir.GetLength()-1);
-    regSetStringValue("romdir", theApp.dir);
-    return true;
+        if(info.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
+          for(int i = 0; i < count; i++) {
+            char buffer[256];
+            MENUITEMINFO info;
+            ZeroMemory(&info, sizeof(info));
+            info.cbSize = sizeof(info) - sizeof(HBITMAP);
+            info.fMask = MIIM_STRING | MIIM_SUBMENU;
+            info.dwTypeData = buffer;
+            info.cch = 256;
+            if(!GetMenuItemInfo(theApp.menu, i, MF_BYPOSITION, &info)) {
+            }
+            if(!AppendMenu(theApp.popup, MF_POPUP|MF_STRING, (UINT_PTR)info.hSubMenu, buffer)) {
+            }
+          }
+        } else {
+          for(int i = 0; i < count; i++) {
+            wchar_t buffer[256];
+            MENUITEMINFOW info;
+            ZeroMemory(&info, sizeof(info));
+            info.cbSize = sizeof(info) - sizeof(HBITMAP);
+            info.fMask = MIIM_STRING | MIIM_SUBMENU;
+            info.dwTypeData = buffer;
+            info.cch = 256;
+            if(!GetMenuItemInfoW(theApp.menu, i, MF_BYPOSITION, &info)) {
+            }
+            if(!AppendMenuW(theApp.popup, MF_POPUP|MF_STRING, (UINT_PTR)info.hSubMenu, buffer)) {
+            }
+          }
+        }
+      }
+    }
+    int x = point.x;
+    int y = point.y;
+    if(x == -1 && y == -1) {
+      x = (theApp.dest.left + theApp.dest.right) / 2;
+      y = (theApp.dest.top + theApp.dest.bottom) / 2;
+    }
+    if(!TrackPopupMenu(theApp.popup, 0, x, y, 0, m_hWnd, NULL)) {
+    }
   }
-  return false;
 }
+
+void MainWnd::OnSystemMinimize()
+{
+  ShowWindow(SW_SHOWMINIMIZED);
+}
+
+
+bool MainWnd::fileOpenSelect( bool gb )
+{
+	theApp.dir = _T("");
+	CString initialDir;
+	if( gb ) {
+		initialDir = regQueryStringValue( _T("gbromdir"), _T(".") );
+	} else {
+		initialDir = regQueryStringValue( _T("romdir"), _T(".") );
+	}
+	
+	if( initialDir[0] == '.' ) {
+		// handle as relative path
+		char baseDir[MAX_PATH+1];
+		GetModuleFileName( NULL, baseDir, MAX_PATH );
+		baseDir[MAX_PATH] = '\0'; // for security reasons
+		PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
+		strcat( baseDir, "\\" );
+		strcat( baseDir, initialDir );
+		initialDir = baseDir;
+	}
+
+	if( !initialDir.IsEmpty() ) {
+		theApp.dir = initialDir;
+	}
+
+	int selectedFilter = 0;
+	if( !gb ) {
+		selectedFilter = regQueryDwordValue( _T("selectedFilter"), 0);
+		if( (selectedFilter < 0) || (selectedFilter > 2) ) {
+			selectedFilter = 0;
+		}
+	}
+	
+	theApp.szFile = _T("");
+	
+	LPCTSTR exts[] = { _T(""), _T(""), _T(""), _T("") };
+	CString filter;
+	CString title;
+	if( gb ) {
+		filter = winLoadFilter( IDS_FILTER_GBROM );
+		title = winResLoadString( IDS_SELECT_ROM );
+	} else {
+		filter = winLoadFilter( IDS_FILTER_ROM );
+		title = winResLoadString( IDS_SELECT_ROM );
+	}
+
+	FileDlg dlg( this, _T(""), filter, selectedFilter, _T(""), exts, theApp.dir, title, false);
+
+	if( dlg.DoModal() == IDOK ) {
+		if( !gb ) {
+			regSetDwordValue( _T("selectedFilter"), dlg.m_ofn.nFilterIndex );
+		}
+		theApp.szFile = dlg.GetPathName();
+		theApp.dir = theApp.szFile.Left( dlg.m_ofn.nFileOffset );
+		if( (theApp.dir.GetLength() > 3) && (theApp.dir[theApp.dir.GetLength()-1] == _T('\\')) ) {
+			theApp.dir = theApp.dir.Left( theApp.dir.GetLength() - 1 );
+		}
+		SetCurrentDirectory( theApp.dir );
+		return true;
+	}
+	return false;
+}
+
 
 void MainWnd::OnPaint() 
 {
@@ -986,6 +1153,16 @@ void MainWnd::screenCapture(int captureNumber)
   CString buffer;
   
   CString captureDir = regQueryStringValue("captureDir", "");
+  if( captureDir[0] == '.' ) {
+	  // handle as relative path
+	  char baseDir[MAX_PATH+1];
+	  GetModuleFileName( NULL, baseDir, MAX_PATH );
+	  baseDir[MAX_PATH] = '\0'; // for security reasons
+	  PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
+	  strcat( baseDir, "\\" );
+	  strcat( baseDir, captureDir );
+	  captureDir = baseDir;
+	}
   int index = theApp.filename.ReverseFind('\\');
   
   CString name;
@@ -1013,6 +1190,15 @@ void MainWnd::screenCapture(int captureNumber)
                   name,
                   captureNumber,
                   ext);
+
+  // check if file exists
+  DWORD dwAttr = GetFileAttributes( buffer );
+  if( dwAttr != INVALID_FILE_ATTRIBUTES ) {
+	  // screenshot file already exists
+	  screenCapture(++captureNumber);
+	  // this will recursively use the first non-existent screenshot number
+	  return;
+  }
 
   if(theApp.captureFormat == 0)
     theApp.emulator.emuWritePNG(buffer);
@@ -1126,12 +1312,3 @@ LRESULT MainWnd::OnMySysCommand(WPARAM wParam, LPARAM lParam)
   return Default();
 }
 
-void MainWnd::OnSetFocus(CWnd * pOldWnd)
-{
-	theApp.dinputKeyFocus = true;
-}
-
-void MainWnd::OnKillFocus(CWnd * pNewWnd)
-{
-	theApp.dinputKeyFocus = false;
-}

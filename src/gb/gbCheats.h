@@ -50,6 +50,7 @@ extern void gbCheatRemoveAll();
 extern void gbCheatEnable(int);
 extern void gbCheatDisable(int);
 extern u8 gbCheatRead(u16);
+extern void gbCheatWrite(bool);
 
 extern int gbCheatNumber;
 extern gbCheat gbCheatList[100];

@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+#include <memory.h>
 #include "GBA.h"
 #include "EEprom.h"
 #include "Util.h"
@@ -41,6 +42,11 @@ variable_desc eepromSaveData[] = {
   { &eepromBuffer[0], 16 },
   { NULL, 0 }
 };
+
+void eepromInit()
+{
+  memset(eepromData, 255, sizeof(eepromData));
+}
 
 void eepromReset()
 {

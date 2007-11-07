@@ -1,6 +1,6 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ extern gbRegister DE;
 extern gbRegister HL;
 extern gbRegister SP;
 extern gbRegister PC;
+extern u8 register_LY;
 extern u16 IFF;
 extern int gbDis(char *, u16);
 
@@ -114,8 +115,9 @@ void GBDisassemble::OnNext()
 void GBDisassemble::OnGo() 
 {
   CString buffer;
+
   m_address.GetWindowText(buffer);
-  sscanf(buffer, "%x", &address);
+  sscanf(buffer, "%hx", &address);
   refresh();
 }
 
@@ -242,6 +244,8 @@ void GBDisassemble::refresh()
   GetDlgItem(IDC_R5)->SetWindowText(buffer);  
   sprintf(buffer, "%04x", IFF);
   GetDlgItem(IDC_R6)->SetWindowText(buffer);  
+  sprintf(buffer, "%04x", register_LY);
+  GetDlgItem(IDC_LY)->SetWindowText(buffer);
 
   m_z = (AF.B.B0 & 0x80) != 0;
   m_n = (AF.B.B0 & 0x40) != 0;

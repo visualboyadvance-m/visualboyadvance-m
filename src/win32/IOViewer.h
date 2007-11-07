@@ -1,7 +1,7 @@
 // -*- C++ -*-
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2005 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ class IOViewer : public ResizeDlg, IUpdateListener
   // Construction
  public:
   void update();
+  void bitChange();
   bool autoUpdate;
   int selected;
   IOViewer(CWnd* pParent = NULL);   // standard constructor

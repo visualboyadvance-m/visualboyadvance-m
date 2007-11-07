@@ -20,7 +20,7 @@
 #if !defined(AFX_BITMAPCONTROL_H__2434AADB_B6A5_4E43_AA16_7B65B6F7FA26__INCLUDED_)
 #define AFX_BITMAPCONTROL_H__2434AADB_B6A5_4E43_AA16_7B65B6F7FA26__INCLUDED_
 
-#include "..\System.h"  // Added by ClassView
+#include "../System.h"  // Added by ClassView
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000

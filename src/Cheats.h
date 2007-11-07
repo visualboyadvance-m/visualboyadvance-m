@@ -1,7 +1,7 @@
 // -*- C++ -*-
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2004-2006 Forgotten and the VBA development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ extern void cheatsDeleteAll(bool restore);
 extern void cheatsEnable(int number);
 extern void cheatsDisable(int number);
 extern void cheatsSaveGame(gzFile file);
-extern void cheatsReadGame(gzFile file);
+extern void cheatsReadGame(gzFile file, int version);
 extern void cheatsSaveCheatList(const char *file);
 extern bool cheatsLoadCheatList(const char *file);
 extern void cheatsWriteMemory(u32, u32);
