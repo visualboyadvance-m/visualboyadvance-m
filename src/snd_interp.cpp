@@ -1,6 +1,6 @@
 #include <math.h>
 
-#include "../libresample-0.1.3/include/libresample.h"
+#include "libresample-0.1.3/include/libresample.h"
 #include "snd_interp.h"
 
 // this was once borrowed from libmodplug, and was also used to generate the FIR coefficient
