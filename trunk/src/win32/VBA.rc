@@ -1552,7 +1552,6 @@ BEGIN
                 MENUITEM "&OpenGL",                     ID_OPTIONS_VIDEO_RENDERMETHOD_OPENGL
                 MENUITEM "   Filter: Nearest",          ID_OPTIONS_VIDEO_RENDEROPTIONS_GLNEAREST
                 MENUITEM "   Filter: Bilinear",         ID_OPTIONS_VIDEO_RENDEROPTIONS_GLBILINEAR
-                MENUITEM "   Filter: Anisotropic",      ID_OPTIONS_VIDEO_RENDEROPTIONS_GLANISOTROPIC
                 MENUITEM "   Vertex: Triangle",         ID_OPTIONS_VIDEO_RENDEROPTIONS_GLTRIANGLE
                 MENUITEM "   Vertex: Quads",            ID_OPTIONS_VIDEO_RENDEROPTIONS_GLQUADS
                 MENUITEM SEPARATOR

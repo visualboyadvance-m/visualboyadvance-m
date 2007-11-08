@@ -35,10 +35,6 @@
 #include <gl/glext.h>
 typedef BOOL (APIENTRY *PFNWGLSWAPINTERVALFARPROC)( int );
 
-#ifndef GL_TEXTURE_MAX_ANISOTROPY_EXT
-	#define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE
-#endif
-
 extern int Init_2xSaI(u32);
 extern void winlog(const char *,...);
 extern int systemSpeed;
@@ -497,13 +493,6 @@ void OpenGLDisplay::updateFiltering( int value )
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		break;
-	case 2:
-		float largest_supported_anisotropy;
-	    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-	    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, largest_supported_anisotropy);
-		break;
-
-
 	}
 	
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
