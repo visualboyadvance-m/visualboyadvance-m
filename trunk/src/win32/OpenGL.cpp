@@ -32,7 +32,12 @@
 
 // OpenGL
 #include <gl/GL.h> // main include file
+#include <gl/glext.h>
 typedef BOOL (APIENTRY *PFNWGLSWAPINTERVALFARPROC)( int );
+
+#ifndef GL_TEXTURE_MAX_ANISOTROPY_EXT
+	#define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE
+#endif
 
 extern int Init_2xSaI(u32);
 extern void winlog(const char *,...);
