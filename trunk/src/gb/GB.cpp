@@ -998,7 +998,7 @@ void  gbWriteMemory(register u16 address, register u8 value)
     case 0x3d:
     case 0x3e:
     case 0x3f: {
-      gbMemory[address] = value;
+      SOUND_EVENT(address,value);
       return;
     }
 
@@ -1783,6 +1783,11 @@ u8 gbReadMemory(register u16 address)
   }
 
   if(address >= 0xff00) {
+
+    if (address >= 0xFF10 && address <= 0xFF3F) {
+      return gbSoundRead(address);
+    }
+
     switch(address & 0x00ff) {
     case 0x00:
       {
@@ -3527,6 +3532,8 @@ static bool gbWriteSaveState(gzFile gzFile)
   utilGzWrite(gzFile, &gbDataMMM01, sizeof(gbDataMMM01));
 
   utilGzWrite(gzFile, gbPalette, 128 * sizeof(u16));
+
+  for (int i = 0xFF10; i <= 0xFF3F; i++) gbMemory[i] = gbReadMemory(i);
   
   utilGzWrite(gzFile, &gbMemory[0x8000], 0x8000);
   
@@ -3717,6 +3724,8 @@ static bool gbReadSaveState(gzFile gzFile)
   }
   
   utilGzRead(gzFile, &gbMemory[0x8000], 0x8000);
+
+  for (int i = 0xFF10; i <= 0xFF3F; i++) gbSoundEvent(i, gbMemory[i]);
 
   if(gbRamSize && gbRam) {
     if (version < 11)

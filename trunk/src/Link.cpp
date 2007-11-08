@@ -53,7 +53,7 @@ int lspeed = 0;
 lserver ls;
 lclient lc;
 bool oncewait = false, after = false;
-bool adapter = true;
+bool adapter = false;
 u8 rfu_cmd, rfu_qsend, rfu_qrecv;
 int rfu_state, rfu_polarity, linktime2, counter, rfu_masterq;
 int transferend, numtransfers = 0;

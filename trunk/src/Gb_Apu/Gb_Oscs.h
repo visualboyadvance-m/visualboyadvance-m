@@ -57,10 +57,17 @@ struct Gb_Square : Gb_Env
 
 struct Gb_Noise : Gb_Env
 {
+	bool gba;
 	typedef Blip_Synth<blip_med_quality,1> Synth;
 	Synth const* synth;
 	unsigned bits;
 	
+	bool write_register( int, int );
+	void reset(bool igba)
+	{
+		gba = igba;
+		Gb_Env::reset();
+	}
 	void run( gb_time_t, gb_time_t, int playing );
 };
 
