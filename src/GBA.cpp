@@ -90,6 +90,7 @@ u32 busPrefetchCount = 0;
 int cpuDmaTicksToUpdate = 0;
 int cpuDmaCount = 0;
 bool cpuDmaHack = false;
+bool cpuDmaHack2 = false;
 u32 cpuDmaLast = 0;
 int dummyAddress = 0;
 
@@ -2313,11 +2314,15 @@ void doDMA(u32 &s, u32 &d, u32 si, u32 di, u32 c, int transfer32)
 
 }
 
-void CPUCheckDMA(int reason, int dmamask)
+bool CPUCheckDMA(int reason, int dmamask)
 {
+  bool res = false;
+  cpuDmaHack = 0;
+
   // DMA 0
   if((DM0CNT_H & 0x8000) && (dmamask & 1)) {
     if(((DM0CNT_H >> 12) & 3) == reason) {
+      res = true;
       u32 sourceIncrement = 4;
       u32 destIncrement = 4;
       switch((DM0CNT_H >> 7) & 3) {
@@ -2375,6 +2380,8 @@ void CPUCheckDMA(int reason, int dmamask)
   // DMA 1
   if((DM1CNT_H & 0x8000) && (dmamask & 2)) {
     if(((DM1CNT_H >> 12) & 3) == reason) {
+      res = true;
+
       u32 sourceIncrement = 4;
       u32 destIncrement = 4;
       switch((DM1CNT_H >> 7) & 3) {
@@ -2444,6 +2451,7 @@ void CPUCheckDMA(int reason, int dmamask)
   // DMA 2
   if((DM2CNT_H & 0x8000) && (dmamask & 4)) {
     if(((DM2CNT_H >> 12) & 3) == reason) {
+		res = true;
       u32 sourceIncrement = 4;
       u32 destIncrement = 4;
       switch((DM2CNT_H >> 7) & 3) {
@@ -2514,6 +2522,7 @@ void CPUCheckDMA(int reason, int dmamask)
   // DMA 3
   if((DM3CNT_H & 0x8000) && (dmamask & 8)) {
     if(((DM3CNT_H >> 12) & 3) == reason) {
+		res = true;
       u32 sourceIncrement = 4;
       u32 destIncrement = 4;
       switch((DM3CNT_H >> 7) & 3) {
@@ -2565,6 +2574,8 @@ void CPUCheckDMA(int reason, int dmamask)
       }
     }
   }
+  cpuDmaHack = false;
+  return res;
 }
 
 void CPUUpdateRegister(u32 address, u16 value)
@@ -3846,6 +3857,8 @@ void CPULoop(int ticks)
   int timerOverflow = 0;
   // variable used by the CPU core
   cpuTotalTicks = 0;
+   if(cpuDmaHack2)
+    cpuNextEvent = 1;
   cpuBreakLoop = false;
   cpuNextEvent = CPUUpdateTicks();
   if(cpuNextEvent > ticks)
@@ -4044,7 +4057,7 @@ void CPULoop(int ticks)
                 IF |= 1;
                 UPDATE_REG(0x202, IF);
               }
-              CPUCheckDMA(1, 0x0f);
+              cpuDmaHack2 = CPUCheckDMA(1, 0x0f);
               if(frameCount >= framesToSkip) {
                 systemDrawScreen();
                 frameCount = 0;
@@ -4164,7 +4177,7 @@ void CPULoop(int ticks)
             DISPSTAT |= 2;
             UPDATE_REG(0x04, DISPSTAT);
             lcdTicks += 224;
-            CPUCheckDMA(2, 0x0f);
+            cpuDmaHack2 = CPUCheckDMA(2, 0x0f);
             if(DISPSTAT & 16) {
               IF |= 2;
               UPDATE_REG(0x202, IF);
@@ -4327,6 +4340,9 @@ void CPULoop(int ticks)
         cpuDmaHack = true;
         goto updateLoop;
       }
+
+//	  if(cpuDmaHack2)
+  //      cpuNextEvent = 1;
 
       if(IF && (IME & 1) && armIrqEnable) {
         int res = IF & IE;

@@ -172,6 +172,7 @@ void Gb_Square::run( gb_time_t time, gb_time_t end_time, int playing )
 void Gb_Noise::run( gb_time_t time, gb_time_t end_time, int playing )
 {
 	int amp = volume & playing;
+
 	int tap = 13 - (regs [3] & 8);
 	if ( bits >> tap & 2 )
 		amp = -amp;
@@ -197,7 +198,7 @@ void Gb_Noise::run( gb_time_t time, gb_time_t end_time, int playing )
 		const blip_resampled_time_t resampled_period =
 				output->resampled_duration( period );
 		blip_resampled_time_t resampled_time = output->resampled_time( time );
-		unsigned bits = this->bits;
+//		unsigned bits = this->bits;
 		int delta = amp * 2;
 		
 		do
@@ -215,7 +216,7 @@ void Gb_Noise::run( gb_time_t time, gb_time_t end_time, int playing )
 		}
 		while ( time < end_time );
 		
-		this->bits = bits;
+		//this->bits = bits;
 		last_amp = delta >> 1;
 	}
 	delay = time - end_time;
@@ -227,7 +228,7 @@ void Gb_Wave::reset(bool gba)
 {
 	volume_forced = 0;
 	wave_pos = 0;
-	wave_mode = gba;
+	wave_mode = (gba ? 1 : 0);
 	wave_size = 32;
 	wave_bank = 0;
 	memset( wave, 0, sizeof wave );
@@ -268,6 +269,33 @@ inline void Gb_Wave::write_register( int reg, int data )
 				length = 256;
 		}
 	}
+}
+
+bool Gb_Noise::write_register( int reg, int data )
+{
+	switch ( reg )
+	{
+	case 1:
+		length = 64 - (regs [1] & 0x3f);
+		break;
+	
+	case 2:
+		if ( !(data >> 4) )
+			enabled = false;
+		break;
+	
+	case 4:
+		if ( data & trigger )
+		{
+			env_delay = regs [2] & 7;
+			volume = regs [2] >> (4 + (gba ? 1 : 0));
+			enabled = true;
+			if ( length == 0 )
+				length = 64;
+			return true;
+		}
+	}
+	return false;
 }
 
 void Gb_Wave::run( gb_time_t time, gb_time_t end_time, int playing )

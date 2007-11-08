@@ -320,7 +320,7 @@ void Blip_Synth_::volume_unit( double new_unit )
 				factor *= 2.0;
 			}
 			
-			if ( shift )
+	//		if ( shift )
 			{
 				kernel_unit >>= shift;
 				assert( kernel_unit > 0 ); // fails if volume unit is too low

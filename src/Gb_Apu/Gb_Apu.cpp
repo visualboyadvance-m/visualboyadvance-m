@@ -107,7 +107,7 @@ void Gb_Apu::reset(bool igba)
 	square1.reset();
 	square2.reset();
 	wave.reset(gba = igba);
-	noise.reset();
+	noise.reset(igba);
 	noise.bits = 1;
 	wave.wave_pos = 0;
 	

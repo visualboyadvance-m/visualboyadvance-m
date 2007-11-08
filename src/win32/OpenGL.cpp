@@ -32,7 +32,10 @@
 
 // OpenGL
 #include <gl/GL.h> // main include file
+#ifdef HAS_GLEXT
 #include <gl/glext.h>
+#endif
+
 typedef BOOL (APIENTRY *PFNWGLSWAPINTERVALFARPROC)( int );
 
 extern int Init_2xSaI(u32);
