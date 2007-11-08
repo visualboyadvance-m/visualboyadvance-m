@@ -585,6 +585,20 @@ void MainWnd::OnUpdateOptionsVideoRenderoptionsGlbilinear(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(theApp.glFilter == 1);
 }
 
+void MainWnd::OnOptionsVideoRenderoptionsGlanisotropic() 
+{
+	theApp.glFilter = 2;
+	if( theApp.display ) {
+		theApp.display->setOption( _T("glFilter"), theApp.glFilter );
+	}
+}
+
+
+void MainWnd::OnUpdateOptionsVideoRenderoptionsGlanisotropic(CCmdUI* pCmdUI) 
+{
+  pCmdUI->SetCheck(theApp.glFilter == 2);
+}
+
 
 void MainWnd::OnOptionsVideoRenderoptionsGltriangle() 
 {

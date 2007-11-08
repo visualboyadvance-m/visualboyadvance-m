@@ -508,7 +508,7 @@
 #define IDC_BIT_15                      1265
 #define IDC_MIRRORING                   1266
 #define IDC_LY                          1267
-#define IDC_APPENDMODE					1268
+#define IDC_APPENDMODE                  1268
 #define ID_HELP_ABOUT                   40001
 #define ID_FILE_EXIT                    40002
 #define ID_OPTIONS_VIDEO_FRAMESKIP_0    40003
@@ -765,7 +765,6 @@
 #define ID_OPTIONS_SOUND_PCMINTERPOLATION_FIR 40297
 #define ID_OPTIONS_SOUND_PCMINTERPOLATION_LIBRESAMPLE 40298
 #define ID_OPTIONS_FILTER_LCDCOLORS     40299
-#define ID_OPTIONS_EMULATOR_REMOVEINTROSGBA 40331
 #define IDD_LINKTAB1                    40300
 #define IDD_LINKTAB                     40301
 #define IDD_LINKTAB2                    40302
@@ -794,13 +793,16 @@
 #define IDC_LINK4P                      40326
 #define IDC_CLINKUDP                    40327
 #define IDC_SPEEDON                     40328
+#define ID_OPTIONS_EMULATOR_REMOVEINTROSGBA 40331
+#define ID_Menu                         40332
+#define ID_OPTIONS_VIDEO_RENDEROPTIONS_GLANISOTROPIC 40333
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        159
-#define _APS_NEXT_COMMAND_VALUE         40332
+#define _APS_NEXT_COMMAND_VALUE         40334
 #define _APS_NEXT_CONTROL_VALUE         1269
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
