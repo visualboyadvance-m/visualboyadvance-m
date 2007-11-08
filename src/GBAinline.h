@@ -23,6 +23,7 @@
 #include "System.h"
 #include "Port.h"
 #include "RTC.h"
+#include "Sound.h"
 
 extern bool cpuSramEnabled;
 extern bool cpuFlashEnabled;
@@ -31,6 +32,7 @@ extern bool cpuEEPROMSensorEnabled;
 extern int lspeed;
 extern void LinkSStop(void);
 extern bool cpuDmaHack;
+extern bool cpuDmaHack2;
 extern u32 cpuDmaLast;
 extern bool timer0On;
 extern int timer0Ticks;
@@ -92,14 +94,13 @@ static inline u32 CPUReadMemory(u32 address)
     value = READ32LE(((u32 *)&internalRAM[address & 0x7ffC]));
     break;
   case 4:
- 	  if((address>=0x4000120||address<=0x4000126)&&lspeed)
+    	  if((address>=0x4000120||address<=0x4000126)&&lspeed)
 		  LinkSStop();
-
     if((address < 0x4000400) && ioReadable[address & 0x3fc]) {
       if(ioReadable[(address & 0x3fc) + 2])
-        value = READ32LE(((u32 *)&ioMem[address & 0x3fC]));
+        value = soundRead32(address & 0x3fC);
       else
-        value = READ16LE(((u16 *)&ioMem[address & 0x3fc]));
+        value = soundRead16(address & 0x3fc);
     } else goto unreadable;
     break;
   case 5:
@@ -145,7 +146,7 @@ static inline u32 CPUReadMemory(u32 address)
     }
 #endif
 
-    if(cpuDmaHack) {
+    if(cpuDmaHack || cpuDmaHack2) {
       value = cpuDmaLast;
     } else {
       if(armState) {
@@ -218,12 +219,11 @@ static inline u32 CPUReadHalfWord(u32 address)
     value = READ16LE(((u16 *)&internalRAM[address & 0x7ffe]));
     break;
   case 4:
-  	if((address>=0x4000120||address<=0x4000126)&&lspeed)
+if((address>=0x4000120||address<=0x4000126)&&lspeed)
 	  LinkSStop();
-
     if((address < 0x4000400) && ioReadable[address & 0x3fe])
     {
-      value =  READ16LE(((u16 *)&ioMem[address & 0x3fe]));
+      value =  soundRead16(address & 0x3fe);
       if (((address & 0x3fe)>0xFF) && ((address & 0x3fe)<0x10E))
       {
         if (((address & 0x3fe) == 0x100) && timer0On)
@@ -286,7 +286,7 @@ static inline u32 CPUReadHalfWord(u32 address)
           armNextPC - 4 : armNextPC - 2);
     }
 #endif
-    if(cpuDmaHack) {
+    if(cpuDmaHack2 || cpuDmaHack) {
       value = cpuDmaLast & 0xFFFF;
     } else {
       if(armState) {
@@ -334,11 +334,10 @@ static inline u8 CPUReadByte(u32 address)
   case 3:
     return internalRAM[address & 0x7fff];
   case 4:
-    if((address>=0x4000120||address<=0x4000126)&&lspeed)
+   if((address>=0x4000120||address<=0x4000126)&&lspeed)
 	  LinkSStop();
-
     if((address < 0x4000400) && ioReadable[address & 0x3ff])
-      return ioMem[address & 0x3ff];
+      return soundRead(address & 0x3ff);
     else goto unreadable;
   case 5:
     return paletteRAM[address & 0x3ff];
@@ -385,7 +384,7 @@ static inline u8 CPUReadByte(u32 address)
           armNextPC - 4 : armNextPC - 2);
     }
 #endif
-    if(cpuDmaHack) {
+    if(cpuDmaHack || cpuDmaHack2) {
       return cpuDmaLast & 0xFF;
     } else {
       if(armState) {
