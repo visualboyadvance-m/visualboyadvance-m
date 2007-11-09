@@ -2574,7 +2574,7 @@ bool CPUCheckDMA(int reason, int dmamask)
       }
     }
   }
-  cpuDmaHack = false;
+  //cpuDmaHack = false;
   return res;
 }
 
@@ -2999,7 +2999,7 @@ void CPUUpdateRegister(u32 address, u16 value)
     break;
   case 0x128:
     StartLink(value);	// Link
-   /* if(value & 0x80) {
+/*    if(value & 0x80) {
       value &= 0xff7f;
       if(value & 1 && (value & 0x4000)) {
         UPDATE_REG(0x12a, 0xFF);
@@ -3008,13 +3008,13 @@ void CPUUpdateRegister(u32 address, u16 value)
         value &= 0x7f7f;
       }
     }
-    UPDATE_REG(0x128, value); */
+    UPDATE_REG(0x128, value);*/
     break;
  case 0x12a:
 	  if(lspeed)
 		LinkSSend(value);
 	  UPDATE_REG(0x12a, value);
-	  break;
+	  break; 
   case 0x130:
     P1 |= (value & 0x3FF);
     UPDATE_REG(0x130, P1);
@@ -3022,9 +3022,10 @@ void CPUUpdateRegister(u32 address, u16 value)
   case 0x132:
     UPDATE_REG(0x132, value & 0xC3FF);
     break;
+	/*  breaks sonic games
   case 0x134:
 	StartGPLink(value);
-	break;
+	break;*/
   case 0x140:
 	StartJOYLink(value);
 	break;
@@ -3857,7 +3858,7 @@ void CPULoop(int ticks)
   int timerOverflow = 0;
   // variable used by the CPU core
   cpuTotalTicks = 0;
-   if(cpuDmaHack2)
+  // if(cpuDmaHack2)
     cpuNextEvent = 1;
   cpuBreakLoop = false;
   cpuNextEvent = CPUUpdateTicks();
@@ -4342,7 +4343,7 @@ void CPULoop(int ticks)
       }
 
 //	  if(cpuDmaHack2)
-  //      cpuNextEvent = 1;
+  //	       cpuNextEvent = 1;
 
       if(IF && (IME & 1) && armIrqEnable) {
         int res = IF & IE;
