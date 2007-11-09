@@ -23,7 +23,6 @@
 #include "System.h"
 #include "Port.h"
 #include "RTC.h"
-#include "Sound.h"
 
 extern bool cpuSramEnabled;
 extern bool cpuFlashEnabled;
@@ -98,9 +97,9 @@ static inline u32 CPUReadMemory(u32 address)
 		  LinkSStop();
     if((address < 0x4000400) && ioReadable[address & 0x3fc]) {
       if(ioReadable[(address & 0x3fc) + 2])
-        value = soundRead32(address & 0x3fC);
+        value = READ32LE(((u32 *)&ioMem[address & 0x3fC]));
       else
-        value = soundRead16(address & 0x3fc);
+        value = READ16LE(((u16 *)&ioMem[address & 0x3fc]));
     } else goto unreadable;
     break;
   case 5:
@@ -223,7 +222,7 @@ if((address>=0x4000120||address<=0x4000126)&&lspeed)
 	  LinkSStop();
     if((address < 0x4000400) && ioReadable[address & 0x3fe])
     {
-      value =  soundRead16(address & 0x3fe);
+      value =  READ16LE(((u16 *)&ioMem[address & 0x3fe]));
       if (((address & 0x3fe)>0xFF) && ((address & 0x3fe)<0x10E))
       {
         if (((address & 0x3fe) == 0x100) && timer0On)
@@ -337,7 +336,7 @@ static inline u8 CPUReadByte(u32 address)
    if((address>=0x4000120||address<=0x4000126)&&lspeed)
 	  LinkSStop();
     if((address < 0x4000400) && ioReadable[address & 0x3ff])
-      return soundRead(address & 0x3ff);
+      return ioMem[address & 0x3ff];
     else goto unreadable;
   case 5:
     return paletteRAM[address & 0x3ff];

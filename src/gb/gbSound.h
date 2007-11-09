@@ -22,7 +22,6 @@
 #define NR12 0xff12
 #define NR13 0xff13
 #define NR14 0xff14
-#define NR20 0xff15
 #define NR21 0xff16
 #define NR22 0xff17
 #define NR23 0xff18
@@ -32,7 +31,6 @@
 #define NR32 0xff1c
 #define NR33 0xff1d
 #define NR34 0xff1e
-#define NR40 0xff1f
 #define NR41 0xff20
 #define NR42 0xff21
 #define NR43 0xff22
@@ -55,8 +53,6 @@ extern void gbSoundSaveGame(gzFile);
 extern void gbSoundReadGame(int,gzFile);
 extern void gbSoundEvent(register u16, register int);
 extern void gbSoundSetQuality(int);
-
-extern u8 gbSoundRead(u16 address);
 
 extern int soundTicks;
 extern int soundQuality;

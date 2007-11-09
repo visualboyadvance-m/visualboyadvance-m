@@ -620,7 +620,7 @@ bool MainWnd::FileRun()
       soundReset();
   } else {
     if(!soundOffFlag)
-      soundInit(!(theApp.cartridgeType==1));
+      soundInit();
     theApp.soundInitialized = true;
   }
 
