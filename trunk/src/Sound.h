@@ -21,6 +21,8 @@
 #ifndef VBA_SOUND_H
 #define VBA_SOUND_H
 
+#include "System.h"
+
 #define NR10 0x60
 #define NR11 0x62
 #define NR12 0x63
@@ -51,7 +53,7 @@
 extern void setSoundFn();
 extern void (*psoundTickfn)();
 extern void soundShutdown();
-extern bool soundInit(bool gba=true);
+extern bool soundInit();
 extern void soundPause();
 extern void soundResume();
 extern void soundEnable(int);
@@ -67,13 +69,9 @@ extern void soundSetQuality(int);
 extern void setsystemSoundOn(bool value);
 extern void setsoundPaused(bool value);
 extern void setsoundMasterOn(bool value);
+extern void interp_rate();
 
-
-//extern int SOUND_TICKS;
 extern int SOUND_CLOCK_TICKS;
-extern u8 soundRead(u32);
-extern u16 soundRead16(u32);
-extern u32 soundRead32(u32);
 extern int soundTicks;
 extern bool soundOffFlag;
 extern bool soundPaused;
@@ -88,15 +86,5 @@ extern int soundInterpolation;
 extern bool soundEcho;
 extern bool soundLowPass;
 extern bool soundReverse;
-
-#include "Gb_Apu/Multi_Buffer.h"
-#include "Gb_Apu/Gb_Apu.h"
-
-extern Multi_Buffer * apu_out;
-extern Gb_Apu       * apu;
- 
-extern const BOOST::uint8_t sound_data [Gb_Apu::register_count];
-extern void interp_rate();
-
 
 #endif // VBA_SOUND_H

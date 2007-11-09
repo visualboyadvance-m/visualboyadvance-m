@@ -875,7 +875,7 @@ void soundDirectSoundATimer()
 
 void soundDirectSoundB()
 {
-  soundBuffer[5][soundIndex] = soundDSBValue;
+  soundBuffer[5][soundIndex] = interp_pop(1);
 }
 
 void soundDirectSoundBTimer()

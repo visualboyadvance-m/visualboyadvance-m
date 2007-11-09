@@ -191,7 +191,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib winmm.lib dxguid.lib ddraw.lib d3d9.lib d3dx9.lib Dsound.lib zlib.lib libpng.lib"
+				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib winmm.lib dxguid.lib ddraw.lib d3d9.lib d3dx9.lib Dsound.lib"
 				ShowProgress="0"
 				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
 				Version=""
@@ -1115,26 +1115,6 @@
 				</File>
 				<File
 					RelativePath=".\src\win32\OpenGL.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Blargg"
-				>
-				<File
-					RelativePath=".\src\Gb_Apu\Blip_Buffer.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Gb_Apu\Gb_Apu.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Gb_Apu\Gb_Oscs.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Gb_Apu\Multi_Buffer.cpp"
 					>
 				</File>
 			</Filter>
