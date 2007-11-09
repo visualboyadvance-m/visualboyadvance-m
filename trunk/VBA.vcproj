@@ -51,7 +51,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)src\win32\dependencies\zlib&quot;;&quot;$(SolutionDir)src\win32\dependencies\libpng&quot;;&quot;$(SolutionDir)src\win32\dependencies\cximage&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\dependencies\zlib&quot;;&quot;$(SolutionDir)..\dependencies\libpng&quot;;&quot;$(SolutionDir)..\dependencies\cximage&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;DEV_VERSION;BKPT_SUPPORT;MMX;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="false"
 				MinimalRebuild="true"
@@ -163,7 +163,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories=".\src\win32\dependencies\zlib;.\src\win32\dependencies\libpng;.\src\win32\dependencies\cximage"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\dependencies\zlib&quot;;&quot;$(SolutionDir)..\dependencies\libpng&quot;;&quot;$(SolutionDir)..\dependencies\cximage&quot;"
 				PreprocessorDefinitions="WIN32;WINVER=0x0500;NDEBUG;_WINDOWS;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
@@ -172,7 +172,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -283,7 +283,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)src\win32\dependencies\zlib&quot;;&quot;$(SolutionDir)src\win32\dependencies\libpng&quot;;&quot;$(SolutionDir)src\win32\dependencies\cximage&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\dependencies\zlib&quot;;&quot;$(SolutionDir)..\dependencies\libpng&quot;;&quot;$(SolutionDir)..\dependencies\cximage&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;FINAL_VERSION;MMX;_CRT_SECURE_NO_WARNINGS"
 				IgnoreStandardIncludePath="false"
 				GeneratePreprocessedFile="0"

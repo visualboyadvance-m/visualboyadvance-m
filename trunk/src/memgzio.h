@@ -11,8 +11,6 @@
 
 #if defined(HAVE_ZUTIL_H) || defined(_WIN32) 	 
 # include <zutil.h>
-#else
-# include "../win32/dependencies/zlib/zutil.h"
 #endif
 
 gzFile ZEXPORT memgzopen(char *memory, int, const char *);
