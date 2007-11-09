@@ -191,7 +191,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib winmm.lib dxguid.lib ddraw.lib d3d9.lib d3dx9.lib Dsound.lib"
+				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib winmm.lib dxguid.lib ddraw.lib d3d9.lib d3dx9.lib Dsound.lib zlib.lib libpng.lib"
 				ShowProgress="0"
 				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
 				Version=""
