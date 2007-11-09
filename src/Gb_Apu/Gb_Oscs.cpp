@@ -198,7 +198,7 @@ void Gb_Noise::run( gb_time_t time, gb_time_t end_time, int playing )
 		const blip_resampled_time_t resampled_period =
 				output->resampled_duration( period );
 		blip_resampled_time_t resampled_time = output->resampled_time( time );
-//		unsigned bits = this->bits;
+		unsigned bits = this->bits;
 		int delta = amp * 2;
 		
 		do
@@ -216,7 +216,7 @@ void Gb_Noise::run( gb_time_t time, gb_time_t end_time, int playing )
 		}
 		while ( time < end_time );
 		
-		//this->bits = bits;
+		this->bits = bits;
 		last_amp = delta >> 1;
 	}
 	delay = time - end_time;
