@@ -101,9 +101,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\dependencies\zlib&quot;;&quot;$(SolutionDir)..\dependencies\libpng&quot;;&quot;$(SolutionDir)..\dependencies\cximage&quot;;$(SolutionDir)..\dependencies\File_Extractor-0.4.2\zlib&quot;;&quot;$(SolutionDir)..\dependencies\File_Extractor-0.4.2&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\dependencies\zlib&quot;;&quot;$(SolutionDir)..\dependencies\libpng&quot;;&quot;$(SolutionDir)..\dependencies\cximage&quot;;&quot;$(SolutionDir)..\dependencies\File_Extractor-0.4.2\zlib&quot;;&quot;$(SolutionDir)..\dependencies\File_Extractor-0.4.2&quot;"
 				PreprocessorDefinitions="FEX_ENABLE_RAR"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
