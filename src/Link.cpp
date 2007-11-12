@@ -37,10 +37,9 @@ int linktime = 0;
 u8 tspeed=3;
 u8 transfer=0;
 LINKDATA *linkmem=NULL;
-int linkid = 1, vbaid = 1;
+int linkid = 0, vbaid = 0;
 HANDLE linksync[4];
 int savedlinktime=0;
-char inifile[] = "vba1.ini";
 HANDLE mmf=NULL;
 char linkevent[] = "VBA link event  ";
 static int i, j;
@@ -54,6 +53,7 @@ lserver ls;
 lclient lc;
 bool oncewait = false, after = false;
 bool adapter = false;
+bool linkenable = false;
 u8 rfu_cmd, rfu_qsend, rfu_qrecv;
 int rfu_state, rfu_polarity, linktime2, counter, rfu_masterq;
 int transferend, numtransfers = 0;
@@ -71,6 +71,22 @@ DWORD WINAPI LinkServerThread(void *);
 int StartServer(void);
 int GetSioMode(u16, u16);
 u16 StartRFU(u16);
+
+char *MakeInstanceFilename(const char *Input)
+{
+	if (vbaid == 0)
+		return (char *)Input;
+
+	static char *result=NULL;
+	if (result!=NULL)
+		free(result);
+	
+	result = (char *)malloc(strlen(Input)+3); 
+	char *p = strrchr((char *)Input, '.');
+	sprintf(result, "%.*s-%d.%s", (int)(p-Input), Input, vbaid+1, p+1); 
+	return result;
+}
+
 
 void StartLink(WORD value){
 	if(ioMem==NULL)	return;
@@ -160,6 +176,8 @@ void StartGPLink(u16 value){
 			else if(!adapter) fprintf(linklogfile, "Attempt to use General-purpose mode %04x\n", value);
 		}
 		if(adapter) rfu_state = RFU_INIT;
+		// This was not there, but sonic games won't start if it's not here.
+		UPDATE_REG(0x134, value);
 		break;
 	case JOYBUS:
 		UPDATE_REG(0x134, value);
@@ -549,7 +567,6 @@ int InitLink(void){
 	BOOL disable = true;
 
 	linkid = 0;
-	inifile[3]='1';
 	
 	if(WSAStartup(MAKEWORD(1,1), &wsadata)!=0){
 		WSACleanup();
@@ -588,7 +605,6 @@ int InitLink(void){
 		vbaid = 0;
 
 	if(vbaid==0){
-		inifile[3]='1';
 		linkid = 0;
 		if(linkmem->linkflags&LINK_PARENTLOST){
 			linkmem->numgbas++;
@@ -615,6 +631,7 @@ int InitLink(void){
 		vbaid=linkmem->numgbas;
 		linkid = vbaid;
 		linkmem->numgbas++;
+
 		linklog = 0;
 		if(linkmem->numgbas>4){
 			linkmem->numgbas=4;
@@ -625,7 +642,6 @@ int InitLink(void){
 			CloseHandle(mmf);
 			return 0;
 		}
-		inifile[3]=(char)linkmem->numgbas+'0';
 		for(i=0;i<4;i++){
 			linkevent[15]=(char)i+'1';
 			if((linksync[i]=OpenEvent(EVENT_ALL_ACCESS, false, linkevent))==NULL){
