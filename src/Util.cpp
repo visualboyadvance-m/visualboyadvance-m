@@ -25,8 +25,10 @@ extern "C" {
 #include <png.h>
 }
 
-#if 0
-#include "unrarlib.h"
+#ifdef HAS_FILE_EXTRACTOR
+#include <Zip_Extractor.h>
+#include <Rar_Extractor.h>
+#include <Zip7_Extractor.h>
 #endif
 
 #include "System.h"
@@ -541,11 +543,11 @@ bool utilIsZipFile(const char *file)
   return false;  
 }
 
-#if 0
+#ifdef HAS_FILE_EXTRACTOR
 bool utilIsRarFile(const char *file)
 {
   if(strlen(file) > 4) {
-    char * p = strrchr(file,'.');
+    const char * p = strrchr(file,'.');
 
     if(p != NULL) {
       if(_stricmp(p, ".rar") == 0)
@@ -555,6 +557,21 @@ bool utilIsRarFile(const char *file)
 
   return false;  
 }
+
+bool utilIs7ZipFile(const char *file)
+{
+  if(strlen(file) > 3) {
+    const char * p = strrchr(file,'.');
+
+    if(p != NULL) {
+      if(_stricmp(p, ".7z") == 0)
+        return true;
+    }
+  }
+
+  return false;
+}
+
 #endif
 
 bool utilIsGzipFile(const char *file)
@@ -588,7 +605,70 @@ void utilGetBaseName(const char *file, char *buffer)
 IMAGE_TYPE utilFindType(const char *file)
 {
   char buffer[2048];
+#ifdef HAS_FILE_EXTRACTOR
+  int type = -1;
+  if (utilIsZipFile(file)) type = 0;
+  else if (utilIsRarFile(file)) type = 1;
+  else if (utilIs7ZipFile(file)) type = 2;
   
+  if(type >= 0) {
+    
+    Std_File_Reader in;
+    File_Extractor * ex = 0;
+
+    switch (type) {
+      case 0: ex = new Zip_Extractor; break;
+      case 1: ex = new Rar_Extractor; break;
+      case 2: ex = new Zip7_Extractor; break;
+      default: type = -1; break;
+    }
+
+    if (!ex) {
+      systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+                    "archive extractor");
+      return IMAGE_UNKNOWN;
+    }
+    
+    if(in.open(file) != NULL) {
+      delete ex;
+      systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s"), file);
+      return IMAGE_UNKNOWN;
+    }
+    
+    if(ex->open(&in) != NULL) {
+      delete ex;
+      systemMessage(MSG_BAD_ZIP_FILE, N_("Bad archive file %s"), file);
+      return IMAGE_UNKNOWN;
+    }
+
+    ex->scan_only();
+    
+    IMAGE_TYPE found = IMAGE_UNKNOWN;
+    
+    while(!ex->done()) {
+      if(utilIsGBAImage(ex->name())) {
+        found = IMAGE_GBA;
+        break;
+      }
+
+      if(utilIsGBImage(ex->name())) {
+        found = IMAGE_GB;
+        break;
+      }
+        
+      if(ex->next() != NULL)
+        break;
+    }
+    delete ex;
+    
+    if(found == IMAGE_UNKNOWN) {
+      systemMessage(MSG_NO_IMAGE_ON_ZIP,
+                    N_("No image found on archive file %s"), file);
+      return found;
+    }
+    return found;
+
+#else
   if(utilIsZipFile(file)) {
     unzFile unz = unzOpen(file);
     
@@ -648,30 +728,6 @@ IMAGE_TYPE utilFindType(const char *file)
       return found;
     }
     return found;
-#if 0
-  } else if(utilIsRarFile(file)) {
-    IMAGE_TYPE found = IMAGE_UNKNOWN;
-    
-    ArchiveList_struct *rarList = NULL;
-    if(urarlib_list((void *)file, (ArchiveList_struct *)&rarList)) {
-      ArchiveList_struct *p = rarList;
-
-      while(p) {
-        if(utilIsGBAImage(p->item.Name)) {
-          found = IMAGE_GBA;
-          break;
-        }
-
-        if(utilIsGBImage(p->item.Name)) {
-          found = IMAGE_GB;
-          break;
-        }
-        p = p->next;
-      }
-      
-      urarlib_freelist(rarList);
-    }
-    return found;
 #endif
   } else {
     if(utilIsGzipFile(file))
@@ -695,6 +751,94 @@ static int utilGetSize(int size)
   return res;
 }
 
+#ifdef HAS_FILE_EXTRACTOR
+static u8 *utilLoadFromFE(const char *file,
+                           int type,
+                           bool (*accept)(const char *),
+                           u8 *data,
+                           int &size)
+{
+  Std_File_Reader in;
+  File_Extractor * ex = 0;
+
+  switch (type) {
+    case 0: ex = new Zip_Extractor; break;
+    case 1: ex = new Rar_Extractor; break;
+    case 2: ex = new Zip7_Extractor; break;
+    default: type = -1; break;
+  }
+
+  if (!ex) {
+    if (type >= 0) {
+      systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+                    "data");
+    }
+    return NULL;
+  }
+  
+  if(in.open(file) != NULL) {
+    delete ex;
+    systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s"), file);
+    return NULL;
+  }
+  
+  if(ex->open(&in) != NULL) {
+    delete ex;
+    systemMessage(MSG_BAD_ZIP_FILE, N_("Bad archive file %s"), file);
+    return NULL;
+  }
+  
+  bool found = false;
+  
+  while(!ex->done()) {
+    if(accept(ex->name())) {
+      found = true;
+      break;
+    }
+  
+    if(ex->next() != NULL)
+      break;
+  }
+  
+  if(!found) {
+    delete ex;
+    systemMessage(MSG_NO_IMAGE_ON_ZIP,
+                  N_("No image found on archive file %s"), file);
+    return NULL;
+  }
+  
+  int fileSize = ex->size();
+  if(size == 0 || data == NULL)
+    size = fileSize;
+  int read = fileSize <= size ? fileSize : size;
+
+  u8 *image = data;
+  if(image == NULL) 
+  {
+    image = (u8 *)malloc(utilGetSize(size));
+    if(image == NULL) {
+      delete ex;
+      systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+                    "data");
+      return NULL;
+    }
+  }
+  Mem_Writer mwimage(image, size, 1);
+  const char * err = ex->extract(mwimage);
+  
+  if(err != NULL) {
+    systemMessage(MSG_ERROR_READING_IMAGE,
+                  N_("Error reading image %s"), ex->name());
+    delete ex;
+	if (data==NULL)
+		free(image);
+    return NULL;
+  }  
+  delete ex;
+  size = fileSize;
+  return image;
+}
+#else
 static u8 *utilLoadFromZip(const char *file,
                            bool (*accept)(const char *),
                            u8 *data,
@@ -798,6 +942,7 @@ static u8 *utilLoadFromZip(const char *file,
 
   return image;
 }
+#endif
 
 static u8 *utilLoadGzipFile(const char *file,
                             bool (*accept)(const char *),
@@ -854,62 +999,23 @@ static u8 *utilLoadGzipFile(const char *file,
   return image;  
 }
 
-#if 0
-static u8 *utilLoadRarFile(const char *file,
-                           bool (*accept)(const char *),
-                           u8 *data,
-                           int &size)
-{
-  char buffer[2048];
-
-  ArchiveList_struct *rarList = NULL;
-  if(urarlib_list((void *)file, (ArchiveList_struct *)&rarList)) {
-    ArchiveList_struct *p = rarList;
-    
-    bool found = false;
-    while(p) {
-      if(accept(p->item.Name)) {
-        strcpy(buffer, p->item.Name);
-        found = true;
-        break;
-      }
-      p = p->next;
-    }
-    if(found) {
-      void *memory = NULL;
-      unsigned long lsize = 0;
-      size = p->item.UnpSize;
-      int r = urarlib_get((void *)&memory, &lsize, buffer, (void *)file, "");
-      if(!r) {
-        systemMessage(MSG_ERROR_READING_IMAGE,
-                      N_("Error reading image %s"), buffer);
-        urarlib_freelist(rarList);
-        return NULL;
-      }
-      u8 *image = (u8 *)memory;
-      if(data != NULL) {
-        memcpy(image, data, size);
-      }
-      urarlib_freelist(rarList);
-      return image;
-    }
-    systemMessage(MSG_NO_IMAGE_ON_ZIP,
-                  N_("No image found on RAR file %s"), file);
-    urarlib_freelist(rarList);
-    return NULL;
-  }
-  // nothing found
-  return NULL;
-}
-#endif
-
 u8 *utilLoad(const char *file,
              bool (*accept)(const char *),
              u8 *data,
              int &size)
 {
+#ifdef HAS_FILE_EXTRACTOR
+  int type = -1;
+  if (utilIsZipFile(file)) type = 0;
+  else if (utilIsRarFile(file)) type = 1;
+  else if (utilIs7ZipFile(file)) type = 2;
+
+  if(type>=0) {
+    return utilLoadFromFE(file, type, accept, data, size);
+#else
   if(utilIsZipFile(file)) {
     return utilLoadFromZip(file, accept, data, size);
+#endif
   }
   if(utilIsGzipFile(file)) {
     return utilLoadGzipFile(file, accept, data, size);
