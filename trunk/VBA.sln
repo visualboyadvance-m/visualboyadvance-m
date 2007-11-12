@@ -2,9 +2,10 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VisualBoyAdvance", "VBA.vcproj", "{6D4C5EC8-933F-4C05-A1BF-498E658576DF}"
 	ProjectSection(ProjectDependencies) = postProject
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0} = {7AEC599C-7C82-4F00-AA60-411E0A359CB0}
 		{B938FBD9-C7F9-4BF7-8C27-68865D1FA092} = {B938FBD9-C7F9-4BF7-8C27-68865D1FA092}
-		{DB5C12E9-BCD3-4517-8708-475C0D1D88CE} = {DB5C12E9-BCD3-4517-8708-475C0D1D88CE}
 		{96E945F7-0377-48DA-A5F8-1C192DE9F25F} = {96E945F7-0377-48DA-A5F8-1C192DE9F25F}
+		{DB5C12E9-BCD3-4517-8708-475C0D1D88CE} = {DB5C12E9-BCD3-4517-8708-475C0D1D88CE}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\dependencies\zlib\zlib.vcproj", "{B938FBD9-C7F9-4BF7-8C27-68865D1FA092}"
@@ -12,6 +13,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "..\dependencies\libpng\libpng.vcproj", "{96E945F7-0377-48DA-A5F8-1C192DE9F25F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cximage", "..\dependencies\cximage\cximage.vcproj", "{DB5C12E9-BCD3-4517-8708-475C0D1D88CE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "File_Extractor", "..\dependencies\File_Extractor-0.4.2\File_Extractor.vcproj", "{7AEC599C-7C82-4F00-AA60-411E0A359CB0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +47,12 @@ Global
 		{DB5C12E9-BCD3-4517-8708-475C0D1D88CE}.Optimized|Win32.Build.0 = Release|Win32
 		{DB5C12E9-BCD3-4517-8708-475C0D1D88CE}.Release|Win32.ActiveCfg = Release|Win32
 		{DB5C12E9-BCD3-4517-8708-475C0D1D88CE}.Release|Win32.Build.0 = Release|Win32
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0}.Debug|Win32.Build.0 = Debug|Win32
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0}.Optimized|Win32.ActiveCfg = Release|Win32
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0}.Optimized|Win32.Build.0 = Release|Win32
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0}.Release|Win32.ActiveCfg = Release|Win32
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
