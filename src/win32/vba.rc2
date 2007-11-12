@@ -34,15 +34,15 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "Comments", "VisualBoyAdvance comes with NO WARRANTY. Use it at your own risk.\0"
-            VALUE "CompanyName", "http://vba.ngemu.com/\0"
-            VALUE "FileDescription", "VisualBoyAdvance emulator\0"
+            VALUE "CompanyName", "https://vbam.bountysource.com/\0"
+            VALUE "FileDescription", "VBA-M :  VisualBoyAdvance emulator\0"
             VALUE "FileVersion", STRFILEVER
             VALUE "InternalName", "VisualBoyAdvance\0"
             VALUE "LegalCopyright", "Copyright © 2006 VBA development team\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "VisualBoyAdvance.exe\0"
             VALUE "PrivateBuild", "0\0"
-            VALUE "ProductName", "VisualBoyAdvance emulator\0"
+            VALUE "ProductName", "VBA-M - Modified VisualBoyAdvance\0"
             VALUE "ProductVersion", STRPRODUCTVER
             VALUE "SpecialBuild", "0\0"
         END
