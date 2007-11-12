@@ -43,6 +43,7 @@
 #include "../RTC.h"
 #include "../Sound.h"
 #include "../Util.h"
+#include "../Link.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -386,6 +387,9 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
 	ON_UPDATE_COMMAND_UI(ID_OPTIONS_LINK_LOG, OnUpdateOptionsLinkLog)
 	ON_COMMAND(ID_OPTIONS_LINK_WIRELESSADAPTER, OnOptionsLinkRFU)
 	ON_UPDATE_COMMAND_UI(ID_OPTIONS_LINK_WIRELESSADAPTER, OnUpdateOptionsLinkRFU)
+	ON_COMMAND(ID_OPTIONS_LINK_ENABLE, OnOptionsLinkEnable)
+	ON_UPDATE_COMMAND_UI(ID_OPTIONS_LINK_ENABLE, OnUpdateOptionsLinkEnable)
+
 	//}}AFX_MSG_MAP
   ON_COMMAND_EX_RANGE(ID_FILE_MRU_FILE1, ID_FILE_MRU_FILE10, OnFileRecentFile)
   ON_COMMAND_EX_RANGE(ID_FILE_LOADGAME_SLOT1, ID_FILE_LOADGAME_SLOT10, OnFileLoadSlot)
@@ -932,7 +936,7 @@ void MainWnd::writeBatteryFile()
     filename.Format("%s\\%s.sav", saveDir, buffer);
 
   if(theApp.emulator.emuWriteBattery)
-    theApp.emulator.emuWriteBattery(filename);
+    theApp.emulator.emuWriteBattery(MakeInstanceFilename((const char *)filename));
 }
 
 
@@ -971,7 +975,7 @@ void MainWnd::readBatteryFile()
   bool res = false;
 
   if(theApp.emulator.emuReadBattery)
-    res = theApp.emulator.emuReadBattery(filename);
+    res = theApp.emulator.emuReadBattery(MakeInstanceFilename(filename));
 
   if(res)
     systemScreenMessage(winResLoadString(IDS_LOADED_BATTERY));

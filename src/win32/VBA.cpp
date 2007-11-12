@@ -482,16 +482,16 @@ BOOL VBA::InitInstance()
   systemVerbose = GetPrivateProfileInt("config",
                                        "verbose",
                                        0,
-                                       "VBA.ini");
+                                       MakeInstanceFilename("VBA.ini"));
   
   systemDebug = GetPrivateProfileInt("config",
                                      "debug",
                                      0,
-                                     "VBA.ini");
+                                     MakeInstanceFilename("VBA.ini"));
   ddrawDebug = GetPrivateProfileInt("config",
                                     "ddrawDebug",
                                     0,
-                                    "VBA.ini") ? true : false;
+                                    MakeInstanceFilename("VBA.ini")) ? true : false;
 
   wndClass = AfxRegisterWndClass(0, LoadCursor(IDC_ARROW), (HBRUSH)GetStockObject(BLACK_BRUSH), LoadIcon(IDI_ICON));
   
@@ -1571,6 +1571,7 @@ void VBA::loadSettings()
 	  openLinkLog();
 	
   adapter = regQueryDwordValue("RFU", false) ? true : false;
+  linkenable = regQueryDwordValue("linkEnabled", false) ? true : false;
 	
   lanlink.active = regQueryDwordValue("LAN", 0) ? true : false;
   if (autoFrameSkip)
@@ -2421,6 +2422,7 @@ void VBA::saveSettings()
   regSetDwordValue("LinkTimeout", linktimeout);
   regSetDwordValue("Linklog", linklog);
   regSetDwordValue("RFU", adapter);
+  regSetDwordValue("linkEnabled", linkenable);
 }
 
 void winSignal(int, int)

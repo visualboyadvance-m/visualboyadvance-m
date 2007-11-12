@@ -433,12 +433,13 @@ public:
 	afx_msg void OnOptionsVideoFullscreen1024x768();
 	afx_msg void OnUpdateOptionsVideoFullscreen1024x768(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateOptionsVideoFullscreen1280x1024(CCmdUI *pCmdUI);
-     void OnLinkOptions();
-	 void OnOptionsLinkLog() ;
-	 void OnUpdateOptionsLinkLog(CCmdUI* pCmdUI) ;
-	 void OnOptionsLinkRFU() ;
-	 void OnUpdateOptionsLinkRFU(CCmdUI* pCmdUI) ;
-
+    afx_msg void OnLinkOptions();
+	afx_msg void OnOptionsLinkLog() ;
+	afx_msg void OnUpdateOptionsLinkLog(CCmdUI* pCmdUI) ;
+	afx_msg void OnOptionsLinkRFU() ;
+	afx_msg void OnUpdateOptionsLinkRFU(CCmdUI* pCmdUI) ;
+	afx_msg void OnOptionsLinkEnable() ;
+	afx_msg void OnUpdateOptionsLinkEnable(CCmdUI* pCmdUI) ;
 };
 
 /////////////////////////////////////////////////////////////////////////////
