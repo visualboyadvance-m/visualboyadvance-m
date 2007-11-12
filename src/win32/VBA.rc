@@ -133,19 +133,20 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,90,102,50,14,WS_GROUP
 END
 
-IDD_ABOUT DIALOGEX 0, 0, 157, 78
+IDD_ABOUT DIALOGEX 0, 0, 157, 105
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "About"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    ICON            101,IDC_STATIC,6,6,20,20
+    ICON            101,IDC_STATIC,6,6,21,20
     CTEXT           "VisualBoyAdvance Emulator",IDC_STATIC,30,6,120,8
     CTEXT           "Copyright © 2006 VBA development team",IDC_STATIC,6,36,144,8
-    CTEXT           "http://vba.ngemu.com",IDC_URL,6,66,144,8
-    CTEXT           "Contribution by Costis",IDC_STATIC,6,48,144,8
+    CTEXT           "http://vbam.bountysource.com",IDC_URL,7,90,144,8
+    CTEXT           "Contributions by Costis",IDC_STATIC,6,48,144,8
     CTEXT           "Version",IDC_STATIC,30,18,60,8
     CTEXT           "",IDC_VERSION,90,18,60,8,SS_NOPREFIX
+    LTEXT           "Modified by VBA-M development team, Spacy, kode54...",IDC_STATIC,7,62,143,21
 END
 
 IDD_DIRECTORIES DIALOGEX 0, 0, 220, 301
@@ -1123,7 +1124,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 150
         TOPMARGIN, 7
-        BOTTOMMARGIN, 71
+        BOTTOMMARGIN, 98
     END
 
     IDD_DIRECTORIES, DIALOG
