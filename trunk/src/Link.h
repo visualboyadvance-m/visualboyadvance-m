@@ -109,12 +109,14 @@ extern void LinkChildSend(u16);
 extern int openLinkLog(void);
 extern void closeLinkLog();
 extern void CloseLanLink(void);
+extern char *MakeInstanceFilename(const char *Input);
 
 extern LANLINKDATA lanlink;
 extern FILE *linklogfile;
 extern int vbaid;
 extern int linklog;
 extern bool adapter;
+extern bool linkenable;
 extern int linktimeout;
 extern lclient lc;
 extern int linkid;

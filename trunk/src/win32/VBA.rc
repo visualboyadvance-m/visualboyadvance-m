@@ -1799,6 +1799,7 @@ BEGIN
         END
         POPUP "Li&nk"
         BEGIN
+            MENUITEM "Enable GBA Linking",          ID_OPTIONS_LINK_ENABLE
             MENUITEM "&Wireless Adapter",           ID_OPTIONS_LINK_WIRELESSADAPTER
             MENUITEM "&Log",                        ID_OPTIONS_LINK_LOG
             MENUITEM "&Options...",                 ID_OPTIONS_LINK_OPTIONS
@@ -1888,7 +1889,7 @@ BEGIN
     "N",            ID_DEBUG_NEXTFRAME,     VIRTKEY, CONTROL, NOINVERT
     "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
     "P",            ID_FILE_PAUSE,          VIRTKEY, CONTROL, NOINVERT
-	VK_PAUSE,		ID_FILE_PAUSE,		    VIRTKEY, NOINVERT
+    VK_PAUSE,       ID_FILE_PAUSE,          VIRTKEY, NOINVERT
     "R",            ID_FILE_RESET,          VIRTKEY, CONTROL, NOINVERT
     "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
     VK_ESCAPE,      ID_FILE_TOGGLEMENU,     VIRTKEY, NOINVERT

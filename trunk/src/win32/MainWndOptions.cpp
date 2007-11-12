@@ -1905,6 +1905,16 @@ void MainWnd::OnOptionsLinkRFU()
 	}
 }
 
+void MainWnd::OnUpdateOptionsLinkEnable(CCmdUI* pCmdUI) 
+{
+	pCmdUI->SetCheck(linkenable);
+}
+
+void MainWnd::OnOptionsLinkEnable() 
+{
+	linkenable = !linkenable;
+}
+
 void MainWnd::OnUpdateOptionsLinkRFU(CCmdUI* pCmdUI) 
 {
 	pCmdUI->SetCheck(adapter);
