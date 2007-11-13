@@ -145,6 +145,10 @@ int systemRedShift = 0;
 int systemBlueShift = 0;
 int systemGreenShift = 0;
 int systemColorDepth = 16;
+int realsystemRedShift = 0;
+int realsystemBlueShift = 0;
+int realsystemGreenShift = 0;
+int realsystemColorDepth = 16;
 int systemVerbose = 0;
 int systemDebug = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
@@ -675,10 +679,10 @@ void VBA::updateFilter()
 	if ( b16to32Video )
 	{
 		b16to32Video = false;
-		systemColorDepth = 32;
-		systemRedShift = 19;
-		systemGreenShift = 11;
-		systemBlueShift = 3;
+		systemColorDepth = realsystemColorDepth;
+		systemRedShift = realsystemRedShift;
+		systemGreenShift = realsystemGreenShift;
+		systemBlueShift = realsystemBlueShift;
 		utilUpdateSystemColorMaps();
 	}
     // END hacky ugly code
@@ -859,11 +863,15 @@ void VBA::updateFilter()
 	if( display )
 		display->changeRenderSize(rect.right, rect.bottom);
 
-	if (b16to32Video)
-	{		
+	if (b16to32Video && systemColorDepth!=16)
+	{
+		realsystemColorDepth = systemColorDepth;
 		systemColorDepth = 16;
+		realsystemRedShift = systemRedShift;
 		systemRedShift = 11;
+		realsystemGreenShift = systemGreenShift;		
 		systemGreenShift = 6;
+		realsystemBlueShift = systemBlueShift;		
 		systemBlueShift = 0;    
 		utilUpdateSystemColorMaps();
 	}

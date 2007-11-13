@@ -27,8 +27,10 @@
 #include "../Text.h"
 #include "../Util.h"
 #include "../gb/gbGlobals.h"
+#include "..\memgzio.h"
 
 #include <cmath>
+#include "glFont.h"
 
 // OpenGL
 #include <gl/GL.h> // main include file
@@ -57,7 +59,7 @@ extern bool detectMMX();
 class OpenGLDisplay : public IDisplay {
 private:
 	HDC hDC;
-	HGLRC hglrc;
+	HGLRC hRC;
 	GLuint texture;
 	int width;
 	int height;
@@ -65,18 +67,22 @@ private:
 	u8 *filterData;
 	RECT destRect;
 	bool failed;
+	GLFONT font;
 
 	void initializeMatrices( int w, int h );
 	bool initializeTexture( int w, int h );
 	void updateFiltering( int value );
 	void setVSync( int interval = 1 );
 	void calculateDestRect( int w, int h );
+	void initializeFont();
 
 public:
 	OpenGLDisplay();
 	virtual ~OpenGLDisplay();
 	virtual DISPLAY_TYPE getType() { return OPENGL; };
 	
+	virtual void EnableOpenGL();
+	virtual void DisableOpenGL();
 	virtual bool initialize();
 	virtual void cleanup();
 	virtual void render();
@@ -88,17 +94,51 @@ public:
 	virtual int  selectFullScreenMode( GUID ** );
 };
 
+#include "gzglfont.h"
+
+void OpenGLDisplay::initializeFont()
+{
+    int ret;
+    z_stream strm;
+	char *buf = (char *)malloc(GZGLFONT_SIZE);
+
+    /* allocate inflate state */
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+    strm.avail_in = 0;
+    strm.next_in = Z_NULL;
+    ret = inflateInit2(&strm, 16+MAX_WBITS);
+    if (ret != Z_OK)
+        return;
+
+    strm.avail_in = sizeof(gzglfont);
+    strm.next_in = gzglfont;
+    strm.avail_out = GZGLFONT_SIZE;
+	strm.next_out = (Bytef *)buf;
+    ret = inflate(&strm, Z_NO_FLUSH);
+	if (ret==Z_STREAM_END)
+	{
+		glGenTextures( 1, &texture );
+		glFontCreate(&font, (char *)buf, texture);
+		texture=0;
+	}
+	free(buf);
+    (void)inflateEnd(&strm);
+}
+
+
 
 OpenGLDisplay::OpenGLDisplay()
 {
 	hDC = NULL;
-	hglrc = NULL;
+	hRC = NULL;
 	texture = 0;
 	width = 0;
 	height = 0;
 	size = 0.0f;
-	filterData = (u8 *)malloc(4*4*256*240);
 	failed = false;
+	filterData = NULL;
 }
 
 
@@ -108,29 +148,49 @@ OpenGLDisplay::~OpenGLDisplay()
 }
 
 
+void OpenGLDisplay::EnableOpenGL()
+{
+	PIXELFORMATDESCRIPTOR pfd;
+	int format;
+	
+	// get the device context (DC)
+	hDC = GetDC( theApp.m_pMainWnd->GetSafeHwnd() );
+	
+	// set the pixel format for the DC
+	ZeroMemory( &pfd, sizeof( pfd ) );
+	pfd.nSize = sizeof( pfd );
+	pfd.nVersion = 1;
+	pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+	pfd.iPixelType = PFD_TYPE_RGBA;
+	pfd.cColorBits = 24;
+	pfd.cDepthBits = 16;
+	pfd.iLayerType = PFD_MAIN_PLANE;
+	format = ChoosePixelFormat( hDC, &pfd );
+	SetPixelFormat( hDC, format, &pfd );
+	
+	// create and enable the render context (RC)
+	hRC = wglCreateContext( hDC );
+	wglMakeCurrent( hDC, hRC );
+}
+
+void OpenGLDisplay::DisableOpenGL()
+{
+	wglMakeCurrent( NULL, NULL );
+	wglDeleteContext( hRC );
+	ReleaseDC( theApp.m_pMainWnd->GetSafeHwnd(), hDC );
+}
+
 void OpenGLDisplay::cleanup()
 {
 	if(texture != 0) {
 		glDeleteTextures(1, &texture);
 		texture = 0;
 	}
-
-	if(hglrc != NULL) {
-		wglDeleteContext(hglrc);
-		wglMakeCurrent(NULL, NULL);
-		hglrc = NULL;
-	}
-	
-	if(hDC != NULL) {
-		ReleaseDC(*theApp.m_pMainWnd, hDC);
-		hDC = NULL;
-	}
-	
+	DisableOpenGL();	
 	if(filterData) {
 		free(filterData);
 		filterData = NULL;
 	}
-	
 	width = 0;
 	height = 0;
 	size = 0.0f;
@@ -209,7 +269,7 @@ bool OpenGLDisplay::initialize()
 	theApp.dest.right = theApp.surfaceSizeX;
 	theApp.dest.bottom = theApp.surfaceSizeY;
 
-	DWORD style = WS_POPUP | WS_VISIBLE;
+	DWORD style = WS_POPUPWINDOW | WS_VISIBLE;
 	DWORD styleEx = 0;
 
 	if( theApp.videoOption <= VIDEO_4X )
@@ -253,77 +313,22 @@ bool OpenGLDisplay::initialize()
 	}
 	
 	theApp.updateMenuBar();
-	
 	theApp.adjustDestRect();
-	
 	theApp.mode320Available = FALSE;
 	theApp.mode640Available = FALSE;
 	theApp.mode800Available = FALSE;
+	theApp.mode1024Available = FALSE;
+	theApp.mode1280Available = FALSE;
 
-	CDC *dc = pWnd->GetDC();
-	HDC hDC = dc->GetSafeHdc();
-
-	PIXELFORMATDESCRIPTOR pfd = { 
-		sizeof(PIXELFORMATDESCRIPTOR),
-		1,                     // version number 
-		PFD_DRAW_TO_WINDOW |   // support window 
-		PFD_SUPPORT_OPENGL |   // support OpenGL 
-		PFD_DOUBLEBUFFER,      // double buffered 
-		PFD_TYPE_RGBA,         // RGBA type 
-		24,                    // 24-bit color depth 
-		0, 0, 0, 0, 0, 0,      // color bits ignored 
-		0,                     // no alpha buffer 
-		0,                     // shift bit ignored 
-		0,                     // no accumulation buffer 
-		0, 0, 0, 0,            // accum bits ignored 
-		32,                    // 32-bit z-buffer     
-		0,                     // no stencil buffer 
-		0,                     // no auxiliary buffer 
-		PFD_MAIN_PLANE,        // main layer 
-		0,                     // reserved 
-		0, 0, 0                // layer masks ignored 
-	};
-	
-	int  iPixelFormat; 
-	if( !(iPixelFormat = ChoosePixelFormat( hDC, &pfd )) ) {
-		winlog( "Failed ChoosePixelFormat\n" );
-		return false;
-	}
-	
-	// obtain detailed information about
-	// the device context's first pixel format
-	if( !( DescribePixelFormat(
-		hDC,
-		iPixelFormat,
-		sizeof(PIXELFORMATDESCRIPTOR),
-		&pfd ) ) )
-	{
-		winlog( "Failed DescribePixelFormat\n" );
-		return false;
-	}
-	
-	if( !SetPixelFormat( hDC, iPixelFormat, &pfd ) ) {
-		winlog( "Failed SetPixelFormat\n" );
-		return false;
-	}
-	
-	if( !( hglrc = wglCreateContext( hDC ) ) ) {
-		winlog( "Failed wglCreateContext\n" );
-		return false;
-	}
-	
-	if( !wglMakeCurrent(hDC, hglrc) ) {
-		winlog( "Failed wglMakeCurrent\n" );
-		return false;
-	}
-	
-	pWnd->ReleaseDC( dc );
-	
-	// setup 2D gl environment
+	EnableOpenGL();
+	initializeFont();
 	glPushAttrib( GL_ENABLE_BIT );
 	glDisable( GL_DEPTH_TEST );
 	glDisable( GL_CULL_FACE );
 	glEnable( GL_TEXTURE_2D );
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
 
 	initializeMatrices( theApp.surfaceSizeX, theApp.surfaceSizeY );
 
@@ -359,6 +364,7 @@ bool OpenGLDisplay::initialize()
 
 void OpenGLDisplay::clear()
 {
+	glClearColor(0.0,0.0,0.0,1.0);
 	glClear( GL_COLOR_BUFFER_BIT );
 }
 
@@ -375,7 +381,8 @@ void OpenGLDisplay::render()
 {
 	clear();
 
-	int pitch = theApp.filterWidth * 4 + 4;
+
+	int pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
 	u8 *data = pix + ( theApp.sizeX + 1 ) * 4;
 	
 	// apply pixel filter
@@ -386,46 +393,46 @@ void OpenGLDisplay::render()
 			pitch,
 			(u8*)theApp.delta,
 			(u8*)filterData,
-			theApp.filterWidth * 4 * 2,
+			width * 4 ,
 			theApp.filterWidth,
 			theApp.filterHeight);
 	}
 
 	// Texturemap complete texture to surface
 	// so we have free scaling and antialiasing
-	int mult;
+	
 	if( theApp.filterFunction ) {
-		glPixelStorei( GL_UNPACK_ROW_LENGTH, theApp.sizeX << 1 );
-		mult = 2;
+		glPixelStorei( GL_UNPACK_ROW_LENGTH, width);
 	} else {
 		glPixelStorei( GL_UNPACK_ROW_LENGTH, theApp.sizeX + 1 );
-		mult = 1;
 	}
-	
-	glTexSubImage2D(
+
+    glTexSubImage2D(
 		GL_TEXTURE_2D,
 		0,
 		0,
 		0,
-		mult * theApp.sizeX,
-		mult * theApp.sizeY,
+		width,
+		height,
 		GL_RGBA,
 		GL_UNSIGNED_BYTE,
 		data );
 
+
+	
 	if( theApp.glType == 0 ) {
 		glBegin( GL_TRIANGLE_STRIP );
 
 		glTexCoord2f( 0.0f, 0.0f );
 		glVertex3i( 0, 0, 0 );
 
-		glTexCoord2f( (float)(mult * theApp.sizeX) / size, 0.0f );
+		glTexCoord2f( (float)(width) / size, 0.0f );
 		glVertex3i( theApp.surfaceSizeX, 0, 0 );
 
-		glTexCoord2f( 0.0f, (float)(mult * theApp.sizeY) / size );
+		glTexCoord2f( 0.0f, (float)(height) / size );
 		glVertex3i( 0, theApp.surfaceSizeY, 0 );
 
-		glTexCoord2f( (float)(mult * theApp.sizeX) / size, (float)(mult * theApp.sizeY) / size );
+		glTexCoord2f( (float)(width) / size, (float)(height) / size );
 		glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
 
 		glEnd();
@@ -435,46 +442,62 @@ void OpenGLDisplay::render()
 		glTexCoord2f( 0.0f, 0.0f );
 		glVertex3i( 0, 0, 0 );
 
-		glTexCoord2f( (float)(mult * theApp.sizeX) / size, 0.0f );
+		glTexCoord2f( (float)(width) / size, 0.0f );
 		glVertex3i( theApp.surfaceSizeX, 0, 0 );
 
-		glTexCoord2f( (float)(mult * theApp.sizeX) / size, (float)(mult * theApp.sizeY) / size );
+		glTexCoord2f( (float)(width) / size, (float)(height) / size );
 		glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
 
-		glTexCoord2f( 0.0f, (float)(mult * theApp.sizeY) / size );
+		glTexCoord2f( 0.0f, (float)(height) / size );
 		glVertex3i( 0, theApp.surfaceSizeY, 0 );
 
 		glEnd();
+
 	}
-
-	CDC *dc = theApp.m_pMainWnd->GetDC();
-
-	SwapBuffers( dc->GetSafeHdc() );
-	// since OpenGL draws on the back buffer,
-	// we have to swap it to the front buffer to see it
 	
-	// draw informations with GDI on the front buffer
-	dc->SetBkMode( theApp.showSpeedTransparent ? TRANSPARENT : OPAQUE );
-	if( theApp.showSpeed && ( theApp.videoOption > VIDEO_4X ) ) {
+	if( theApp.showSpeed ) { // && ( theApp.videoOption > VIDEO_4X ) ) {
 		char buffer[30];
 		if( theApp.showSpeed == 1 ) {
 			sprintf( buffer, "%3d%%", systemSpeed );
 		} else {
 			sprintf( buffer, "%3d%%(%d, %d fps)", systemSpeed, systemFrameSkip, theApp.showRenderedFrames );
 		}
-		dc->SetTextColor( RGB(0x00, 0x00, 0xFF) );
-		dc->TextOut( 10, 20, buffer );
+		glFontBegin(&font);
+		glPushMatrix();
+		float fontscale = (float)theApp.surfaceSizeX / 100.0;
+		glScalef(fontscale, fontscale, fontscale);
+		glColor4f(1.0f, 0.25f, 0.25f, 1.0f);
+		glFontTextOut(buffer, (theApp.surfaceSizeX-(strlen(buffer)*11))/(fontscale*2), (theApp.surfaceSizeY-20)/fontscale, 0);
+		glPopMatrix();
+		glFontEnd();
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		glBindTexture( GL_TEXTURE_2D, texture );
 	}
 	if( theApp.screenMessage ) {
 		if( ( ( GetTickCount() - theApp.screenMessageTime ) < 3000 ) && !theApp.disableStatusMessage ) {
-			dc->SetTextColor( RGB(0xFF, 0x00, 0x00) );
-			dc->TextOut( 10, theApp.surfaceSizeY - 20, theApp.screenMessageBuffer );
+			glFontBegin(&font);
+			glPushMatrix();
+
+			float fontscale = (float)theApp.surfaceSizeX / 100.0;
+			glScalef(fontscale, fontscale, fontscale);
+			glColor4f(1.0f, 0.25f, 0.25f, 1.0f);
+			glFontTextOut((char *)((const char *)theApp.screenMessageBuffer), (theApp.surfaceSizeX-(theApp.screenMessageBuffer.GetLength()*11))/(fontscale*2), (theApp.surfaceSizeY-40)/fontscale, 0);
+			glPopMatrix();
+			glFontEnd();
+			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			glBindTexture( GL_TEXTURE_2D, texture );
 		} else {
 			theApp.screenMessage = false;
 		}
 	}
 
-	theApp.m_pMainWnd->ReleaseDC( dc );
+
+	glFlush();
+	SwapBuffers( hDC );
+	// since OpenGL draws on the back buffer,
+	// we have to swap it to the front buffer to see it
+	
+	// draw informations with GDI on the front buffer
 }
 
 
@@ -602,6 +625,10 @@ bool OpenGLDisplay::changeRenderSize( int w, int h )
 			failed = true;
 			return false;
 		}
+		if (filterData)
+			free(filterData);
+		filterData = (u8 *)malloc(4*w*h);
+
 	}
 	
 	return true;
