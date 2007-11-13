@@ -202,27 +202,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\fex\Rar_Extractor.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\fex\Rar_Extractor.h"
-				>
-			</File>
-			<File
 				RelativePath=".\fex\Single_File_Extractor.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\fex\Single_File_Extractor.h"
-				>
-			</File>
-			<File
-				RelativePath=".\fex\unrarlib.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\fex\unrarlib.h"
 				>
 			</File>
 			<File
@@ -298,46 +282,6 @@
 				</File>
 				<File
 					RelativePath=".\7z_C\LZMA_C\LzmaDecode.c"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="rar"
-				>
-				<File
-					RelativePath=".\unrar\archive.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\unrar\model.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\unrar\Rar_Extractor_Impl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\unrar\rarmisc.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\unrar\rarvm.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\unrar\suballoc.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\unrar\unpack.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\unrar\unpack15.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\unrar\unpack20.cpp"
 					>
 				</File>
 			</Filter>

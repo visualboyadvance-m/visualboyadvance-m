@@ -27,7 +27,6 @@ extern "C" {
 
 #ifdef HAS_FILE_EXTRACTOR
 #include <Zip_Extractor.h>
-#include <Rar_Extractor.h>
 #include <Zip7_Extractor.h>
 #endif
 
@@ -544,19 +543,6 @@ bool utilIsZipFile(const char *file)
 }
 
 #ifdef HAS_FILE_EXTRACTOR
-bool utilIsRarFile(const char *file)
-{
-  if(strlen(file) > 4) {
-    const char * p = strrchr(file,'.');
-
-    if(p != NULL) {
-      if(_stricmp(p, ".rar") == 0)
-        return true;
-    }
-  }
-
-  return false;  
-}
 
 bool utilIs7ZipFile(const char *file)
 {
@@ -608,8 +594,7 @@ IMAGE_TYPE utilFindType(const char *file)
 #ifdef HAS_FILE_EXTRACTOR
   int type = -1;
   if (utilIsZipFile(file)) type = 0;
-  else if (utilIsRarFile(file)) type = 1;
-  else if (utilIs7ZipFile(file)) type = 2;
+  else if (utilIs7ZipFile(file)) type = 1;
   
   if(type >= 0) {
     
@@ -618,8 +603,7 @@ IMAGE_TYPE utilFindType(const char *file)
 
     switch (type) {
       case 0: ex = new Zip_Extractor; break;
-      case 1: ex = new Rar_Extractor; break;
-      case 2: ex = new Zip7_Extractor; break;
+      case 1: ex = new Zip7_Extractor; break;
       default: type = -1; break;
     }
 
@@ -763,8 +747,7 @@ static u8 *utilLoadFromFE(const char *file,
 
   switch (type) {
     case 0: ex = new Zip_Extractor; break;
-    case 1: ex = new Rar_Extractor; break;
-    case 2: ex = new Zip7_Extractor; break;
+    case 1: ex = new Zip7_Extractor; break;
     default: type = -1; break;
   }
 
@@ -1007,8 +990,7 @@ u8 *utilLoad(const char *file,
 #ifdef HAS_FILE_EXTRACTOR
   int type = -1;
   if (utilIsZipFile(file)) type = 0;
-  else if (utilIsRarFile(file)) type = 1;
-  else if (utilIs7ZipFile(file)) type = 2;
+  else if (utilIs7ZipFile(file)) type = 1;
 
   if(type>=0) {
     return utilLoadFromFE(file, type, accept, data, size);
@@ -1020,11 +1002,6 @@ u8 *utilLoad(const char *file,
   if(utilIsGzipFile(file)) {
     return utilLoadGzipFile(file, accept, data, size);
   }
-#if 0
-  if(utilIsRarFile(file)) {
-    return utilLoadRarFile(file, accept, data, size);
-  }
-#endif
   
   u8 *image = data;
 
