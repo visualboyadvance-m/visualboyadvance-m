@@ -26,7 +26,7 @@ struct IOData {
 };
 
 const IOData ioViewRegisters[] = {
-  { 
+  {
     &DISPCNT, 0, "0x4000000-DISPCNT", 0xFFF7,
     {
       "",

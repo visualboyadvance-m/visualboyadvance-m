@@ -95,12 +95,12 @@ void BitmapControl::OnDraw(CDC* dc)
   if(stretch) {
     bmpInfo->bmiHeader.biWidth = w;
     bmpInfo->bmiHeader.biHeight = -h;
-    
+
     StretchDIBits(memDC.GetSafeHdc(),
                   0,
                   0,
                   w1,
-                  h1, 
+                  h1,
                   0,
                   0,
                   w,
@@ -111,7 +111,7 @@ void BitmapControl::OnDraw(CDC* dc)
                   SRCCOPY);
   } else {
     FillOutsideRect(&memDC, CBrush::FromHandle(GetSysColorBrush(COLOR_BTNFACE)));
-    
+
     bmpInfo->bmiHeader.biWidth = w;
     bmpInfo->bmiHeader.biHeight = -h;
     SetDIBitsToDevice(memDC.GetSafeHdc(),
@@ -133,7 +133,7 @@ void BitmapControl::OnDraw(CDC* dc)
   memDC.SelectObject(pOldBitmap);
 
   bitmap.DeleteObject();
-  memDC.DeleteDC();  
+  memDC.DeleteDC();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -154,18 +154,18 @@ void BitmapControl::Dump(CDumpContext& dc) const
 /////////////////////////////////////////////////////////////////////////////
 // BitmapControl message handlers
 
-BOOL BitmapControl::OnEraseBkgnd(CDC* pDC) 
+BOOL BitmapControl::OnEraseBkgnd(CDC* pDC)
 {
   return TRUE;
 }
 
-void BitmapControl::OnSize(UINT nType, int cx, int cy) 
+void BitmapControl::OnSize(UINT nType, int cx, int cy)
 {
   if(!stretch)
     CScrollView::OnSize(nType, cx, cy);
 }
 
-void BitmapControl::OnLButtonDown(UINT nFlags, CPoint pt) 
+void BitmapControl::OnLButtonDown(UINT nFlags, CPoint pt)
 {
   if(!data)
     return;
@@ -173,14 +173,14 @@ void BitmapControl::OnLButtonDown(UINT nFlags, CPoint pt)
   int y = pt.y;
 
   WPARAM point;
-  
+
   if(stretch) {
     RECT rect;
     GetClientRect(&rect);
-  
+
     int height = rect.bottom - rect.top;
     int width = rect.right - rect.left;
-  
+
     int xx = (x * w) / width;
     int yy = (y * h) / height;
 
@@ -207,7 +207,7 @@ void BitmapControl::OnLButtonDown(UINT nFlags, CPoint pt)
       return;
 
     point = p.x | (p.y<<16);
-    
+
     int xxx = p.x / 8;
     int yyy = p.y / 8;
 
@@ -217,7 +217,7 @@ void BitmapControl::OnLButtonDown(UINT nFlags, CPoint pt)
                                    i * w * 3], 8 * 3);
     }
   }
-  
+
   GetParent()->SendMessage(WM_MAPINFO,
                            point,
                            (LPARAM)colors);
@@ -282,6 +282,6 @@ bool BitmapControl::getStretch()
   return stretch;
 }
 
-void BitmapControl::PostNcDestroy() 
+void BitmapControl::PostNcDestroy()
 {
 }

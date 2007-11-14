@@ -204,7 +204,7 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsVideoRenderoptionsGlbilinear(CCmdUI* pCmdUI);
   afx_msg void OnUpdateOptionsVideoRenderoptionsGlanisotropic(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsGlanisotropic();
- 
+
   afx_msg void OnOptionsVideoRenderoptionsGltriangle();
   afx_msg void OnUpdateOptionsVideoRenderoptionsGltriangle(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsGlquads();
@@ -419,13 +419,13 @@ class MainWnd : public CWnd
 	afx_msg void OnHelpGnupubliclicense();
 	//}}AFX_MSG
   DECLARE_MESSAGE_MAP()
-    
+
     afx_msg BOOL OnFileRecentFile(UINT nID);
   afx_msg BOOL OnFileLoadSlot(UINT nID);
   afx_msg BOOL OnFileSaveSlot(UINT nID);
   afx_msg void OnOptionsFilterLcdcolors();
   afx_msg void OnUpdateOptionsFilterLcdcolors(CCmdUI *pCmdUI);
- 
+
    afx_msg BOOL OnOptionsSoundPcminterpolation(UINT nID);
    afx_msg void OnUpdateOptionsSoundPcminterpolation(CCmdUI *pCmdUI);
 public:

@@ -89,21 +89,21 @@ BEGIN_MESSAGE_MAP(IOViewer, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // IOViewer message handlers
 
-void IOViewer::OnClose() 
+void IOViewer::OnClose()
 {
   theApp.winRemoveUpdateListener(this);
-  
+
   DestroyWindow();
 }
 
-void IOViewer::bitChange() 
+void IOViewer::bitChange()
 {
   CString buffer;
   u16 data = 0;
 
   for(int i = 0; i < 16; i++) {
     CButton *pWnd = (CButton *)GetDlgItem(IDC_BIT_0 + i);
-	  
+
     if(pWnd) {
       if(pWnd->GetCheck())
         data |= (1 << i);
@@ -114,39 +114,39 @@ void IOViewer::bitChange()
   m_value.SetWindowText(buffer);
 }
 
-void IOViewer::OnRefresh() 
+void IOViewer::OnRefresh()
 {
   // TODO: Add your control notification handler code here
 
-  update();  
+  update();
 }
 
-void IOViewer::OnAutoUpdate() 
+void IOViewer::OnAutoUpdate()
 {
   autoUpdate = !autoUpdate;
   if(autoUpdate) {
     theApp.winAddUpdateListener(this);
   } else {
-    theApp.winRemoveUpdateListener(this);    
-  }  
+    theApp.winRemoveUpdateListener(this);
+  }
 }
 
-void IOViewer::OnSelchangeAddresses() 
+void IOViewer::OnSelchangeAddresses()
 {
   selected = m_address.GetCurSel();
- 
+
   update();
 }
 
-void IOViewer::PostNcDestroy() 
+void IOViewer::PostNcDestroy()
 {
   delete this;
 }
 
-BOOL IOViewer::OnInitDialog() 
+BOOL IOViewer::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   // winCenterWindow(getHandle());
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_END()
@@ -168,18 +168,18 @@ BOOL IOViewer::OnInitDialog()
 
   RECT cbSize;
   int Height;
-  
+
   m_address.GetClientRect(&cbSize);
   Height = m_address.GetItemHeight(0);
   Height += m_address.GetItemHeight(0) * (10);
-  
+
   // Note: The use of SM_CYEDGE assumes that we're using Windows '95
   // Now add on the height of the border of the edit box
   Height += GetSystemMetrics(SM_CYEDGE) * 2;  // top & bottom edges
-  
+
   // The height of the border of the drop-down box
   Height += GetSystemMetrics(SM_CYEDGE) * 2;  // top & bottom edges
-  
+
   // now set the size of the window
   m_address.SetWindowPos(NULL,
                          0, 0,
@@ -188,7 +188,7 @@ BOOL IOViewer::OnInitDialog()
 
   m_address.SetCurSel(0);
   update();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -198,7 +198,7 @@ void IOViewer::update()
   CString buffer;
 
   const IOData *sel = &ioViewRegisters[selected];
-  u16 data = sel->address ? *sel->address : 
+  u16 data = sel->address ? *sel->address :
     (ioMem ? *((u16 *)&ioMem[sel->offset]) : 0);
 
   for(int i = 0; i < 16; i++) {
@@ -219,7 +219,7 @@ void IOViewer::update()
   m_value.SetWindowText(buffer);
 }
 
-void IOViewer::OnApply() 
+void IOViewer::OnApply()
 {
   if(rom != NULL)
   {
@@ -227,7 +227,7 @@ void IOViewer::OnApply()
   u16 res = 0;
   for(int i = 0; i < 16; i++) {
     CButton *pWnd = (CButton *)GetDlgItem(IDC_BIT_0 + i);
-	  
+
     if(pWnd) {
       if(pWnd->GetCheck())
         res |= (1 << i);

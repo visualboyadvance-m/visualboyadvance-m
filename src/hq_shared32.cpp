@@ -134,7 +134,7 @@ void Interp3(unsigned char * pc, unsigned int c1, unsigned int c2)
 void Interp4(unsigned char * pc, unsigned int c1, unsigned int c2, unsigned int c3)
 {
 #ifdef _MSC_VER
-#ifdef MMX	
+#ifdef MMX
 	__asm
 	{
 		mov        eax, pc
@@ -290,7 +290,7 @@ bool Diff(unsigned int c1, unsigned int c2)
         pcmpgtd	mm4, trV
 		por		mm2, mm3
 		por		mm2, mm4
-		
+
 		movd	retval, mm2
 
 		EMMS

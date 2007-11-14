@@ -22,7 +22,7 @@
 // Version : 1.0                       * Author : T.Maurel
 // Date    : 17.08.98
 //
-// Remarks : 
+// Remarks :
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -207,7 +207,7 @@ CAccelsOb::CAccelsOb()
 CAccelsOb::CAccelsOb(CAccelsOb* pFrom)
 {
   ASSERT(pFrom != NULL);
-  
+
   m_cVirt = pFrom->m_cVirt;
   m_wKey = pFrom->m_wKey;
   m_bLocked = pFrom->m_bLocked;
@@ -231,7 +231,7 @@ CAccelsOb::CAccelsOb(BYTE cVirt, WORD wKey, bool bLocked)
 CAccelsOb::CAccelsOb(LPACCEL pACCEL)
 {
   ASSERT(pACCEL != NULL);
-  
+
   m_cVirt = pACCEL->fVirt;
   m_wKey = pACCEL->key;
   m_bLocked = false;
@@ -246,7 +246,7 @@ CAccelsOb& CAccelsOb::operator=(const CAccelsOb& from)
   m_cVirt = from.m_cVirt;
   m_wKey = from.m_wKey;
   m_bLocked = from.m_bLocked;
-  
+
   return *this;
 }
 
@@ -290,18 +290,18 @@ bool CAccelsOb::IsEqual(WORD wKey, bool bCtrl, bool bAlt, bool bShift)
   //        CString szTemp;
   //        GetString(szTemp);
 
-  
+
   bool m_bCtrl = (m_cVirt & FCONTROL) ? true : false;
   bool bRet = (bCtrl == m_bCtrl);
-  
+
   bool m_bAlt = (m_cVirt & FALT) ? true : false;
   bRet &= (bAlt == m_bAlt);
-  
+
   bool m_bShift = (m_cVirt & FSHIFT) ? true : false;
   bRet &= (bShift == m_bShift);
-  
+
   bRet &= static_cast<bool>(m_wKey == wKey);
-  
+
   return bRet;
 }
 
@@ -316,7 +316,7 @@ DWORD CAccelsOb::GetData()
     cLocalCodes = DEFAULT_ACCEL;
   else
     cLocalCodes = USER_ACCEL;
-  
+
   WORD bCodes = MAKEWORD(m_cVirt, cLocalCodes);
   return MAKELONG(m_wKey, bCodes);
 }
@@ -328,10 +328,10 @@ DWORD CAccelsOb::GetData()
 bool CAccelsOb::SetData(DWORD dwDatas)
 {
   m_wKey = LOWORD(dwDatas);
-  
+
   WORD bCodes = HIWORD(dwDatas);
   m_cVirt = LOBYTE(bCodes);
-  
+
   BYTE cLocalCodes = HIBYTE(bCodes);
   m_bLocked = static_cast<bool>(cLocalCodes == DEFAULT_ACCEL);
   return true;
@@ -388,10 +388,10 @@ CCmdAccelOb::CCmdAccelOb(WORD wIDCommand, LPCTSTR szCommand)
 CCmdAccelOb::CCmdAccelOb(BYTE cVirt, WORD wIDCommand, WORD wKey, LPCTSTR szCommand, bool bLocked)
 {
   ASSERT(szCommand != NULL);
-  
+
   m_wIDCommand = wIDCommand;
   m_szCommand = szCommand;
-  
+
   CAccelsOb* pAccel = DEBUG_NEW CAccelsOb(cVirt, wKey, bLocked);
   ASSERT(pAccel != NULL);
   m_Accels.AddTail(pAccel);
@@ -439,10 +439,10 @@ void CCmdAccelOb::Add(CAccelsOb* pAccel)
 CCmdAccelOb& CCmdAccelOb::operator=(const CCmdAccelOb& from)
 {
   Reset();
-  
+
   m_wIDCommand = from.m_wIDCommand;
   m_szCommand = from.m_szCommand;
-  
+
   CAccelsOb* pAccel;
   POSITION pos = from.m_Accels.GetHeadPosition();
   while (pos != NULL) {
@@ -480,7 +480,7 @@ void CCmdAccelOb::Reset()
 {
   m_wIDCommand = 0;
   m_szCommand = "Empty command";
-  
+
   CAccelsOb* pAccel;
   POSITION pos = m_Accels.GetHeadPosition();
   while (pos != NULL) {

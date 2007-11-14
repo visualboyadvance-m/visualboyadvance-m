@@ -17,10 +17,10 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
- case 0x00: 
+ case 0x00:
    // NOP
    break;
- case 0x01: 
+ case 0x01:
    // LD BC, NNNN
    BC.B.B0=gbReadOpcode(PC.W++);
    BC.B.B1=gbReadOpcode(PC.W++);
@@ -33,14 +33,14 @@
    // INC BC
    BC.W++;
    break;
- case 0x04: 
+ case 0x04:
    // INC B
-   BC.B.B1++; 
+   BC.B.B1++;
    AF.B.B0= (AF.B.B0 & C_FLAG)|ZeroTable[BC.B.B1]| (BC.B.B1&0x0F? 0:H_FLAG);
    break;
  case 0x05:
    // DEC B
-   BC.B.B1--; 
+   BC.B.B1--;
    AF.B.B0= N_FLAG|(AF.B.B0 & C_FLAG)|ZeroTable[BC.B.B1]|
      ((BC.B.B1&0x0F)==0x0F? H_FLAG:0);
    break;
@@ -75,7 +75,7 @@
  case 0x0b:
    // DEC BC
    BC.W--;
-   break;   
+   break;
  case 0x0c:
    // INC C
    BC.B.B0++;
@@ -86,7 +86,7 @@
    BC.B.B0--;
    AF.B.B0= N_FLAG|(AF.B.B0 & C_FLAG)|ZeroTable[BC.B.B0]|
      ((BC.B.B0&0x0F)==0x0F? H_FLAG:0);
-   break;   
+   break;
  case 0x0e:
    // LD C, NN
    BC.B.B0=gbReadOpcode(PC.W++);
@@ -102,10 +102,10 @@
    opcode = gbReadOpcode(PC.W++);
    if(gbCgbMode) {
      if(gbMemory[0xff4d] & 1) {
-         
+
        gbSpeedSwitch();
        //clockTicks += 228*144-(gbSpeed ? 62 : 63);
-       
+
        if(gbSpeed == 0)
          gbMemory[0xff4d] = 0x00;
        else
@@ -161,7 +161,7 @@
  case 0x1a:
    // LD A,(DE)
    AF.B.B1=gbReadMemory(DE.W);
-   break;   
+   break;
  case 0x1b:
    // DEC DE
    DE.W--;
@@ -180,7 +180,7 @@
  case 0x1e:
    // LD E,NN
    DE.B.B0=gbReadOpcode(PC.W++);
-   break;   
+   break;
  case 0x1f:
    // RRA
    tempValue=AF.B.B1&0x01;
@@ -200,7 +200,7 @@
    // LD HL,NNNN
    HL.B.B0=gbReadOpcode(PC.W++);
    HL.B.B1=gbReadOpcode(PC.W++);
-   break;   
+   break;
  case 0x22:
    // LDI (HL),A
    gbWriteMemory(HL.W++,AF.B.B1);
@@ -254,7 +254,7 @@
  case 0x2b:
    // DEC HL
    HL.W--;
-   break;   
+   break;
  case 0x2c:
    // INC L
    HL.B.B0++;
@@ -269,7 +269,7 @@
  case 0x2e:
    // LD L,NN
    HL.B.B0=gbReadOpcode(PC.W++);
-   break;   
+   break;
  case 0x2f:
    // CPL
    AF.B.B1 ^= 255;
@@ -316,7 +316,7 @@
  case 0x37:
    // SCF
    AF.B.B0 = AF.B.B0 & Z_FLAG | C_FLAG;
-   break;   
+   break;
 case 0x38:
   // JR C,NN
   if(AF.B.B0&C_FLAG) {
@@ -587,7 +587,7 @@ case 0x38:
    }
    else
    {
-     // if (IE & IF) and interrupts are disabeld, 
+     // if (IE & IF) and interrupts are disabeld,
      // Halt is cancelled.
      if ((register_IE & register_IF & 0x1f) && !(IFF & 1))
      {
@@ -1309,7 +1309,7 @@ case 0x38:
  case 0xe8:
    // ADD SP,NN
    offset = (s8)gbReadOpcode(PC.W++);
-   
+
    if(offset >= 0) {
      tempRegister.W = SP.W + offset;
      AF.B.B0 = (SP.W > tempRegister.W ? C_FLAG : 0) |

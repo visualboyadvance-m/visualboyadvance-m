@@ -141,7 +141,7 @@ void winReadKeys()
     winReadKey("A", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_A)]);
     winReadKey("B", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_B)]);
     winReadKey("L", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_L)]);
-    winReadKey("R", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_R)]);  
+    winReadKey("R", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_R)]);
     winReadKey("Start", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_START)]);
     winReadKey("Select", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_SELECT)]);
     winReadKey("Speed", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_SPEED)]);
@@ -157,7 +157,7 @@ void winReadKeys()
 void winSaveKey(char *name, KeyList& value)
 {
 	CString txtKeys;
-   
+
 	POSITION p = value.GetHeadPosition();
 	while(p!=NULL)
 	{
@@ -186,16 +186,16 @@ void winSaveKeys()
     winSaveKey("Up", i, theApp.input->joypaddata[JOYPAD(i,KEY_UP)]);
     winSaveKey("Speed", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_SPEED)]);
     winSaveKey("Capture", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_CAPTURE)]);
-    winSaveKey("GS", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_GS)]);  
+    winSaveKey("GS", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_GS)]);
     winSaveKey("Down", i, theApp.input->joypaddata[JOYPAD(i,KEY_DOWN)]);
     winSaveKey("A", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_A)]);
     winSaveKey("B", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_B)]);
     winSaveKey("L", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_L)]);
-    winSaveKey("R", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_R)]);  
+    winSaveKey("R", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_R)]);
     winSaveKey("Start", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_START)]);
     winSaveKey("Select", i, theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_SELECT)]);
   }
-  regSetDwordValue("joyVersion", 1);  
+  regSetDwordValue("joyVersion", 1);
 
   winSaveKey("Motion_Left",
                    theApp.input->joypaddata[MOTION(KEY_LEFT)]);
@@ -327,9 +327,9 @@ static void checkKeys()
   LONG_PTR dev = 0;
   int i;
 
-  for(i = 0; i < (sizeof(theApp.input->joypaddata) / sizeof(theApp.input->joypaddata[0])); i++) 
+  for(i = 0; i < (sizeof(theApp.input->joypaddata) / sizeof(theApp.input->joypaddata[0])); i++)
   {
-	  if (theApp.input->joypaddata[i].IsEmpty() && defvalues[i]) 
+	  if (theApp.input->joypaddata[i].IsEmpty() && defvalues[i])
 		  theApp.input->joypaddata[i].AddTail(defvalues[i]);
 	  POSITION p = theApp.input->joypaddata[i].GetHeadPosition();
 	  while(p!=NULL)
@@ -728,7 +728,7 @@ u32 DirectInput::readDevice(int which)
   int i = theApp.joypadDefault;
   if(which >= 0 && which <= 3)
     i = which;
-  
+
   if(checkKey(theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_A)]))
     res |= 1;
   if(checkKey(theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_B)]))
@@ -749,7 +749,7 @@ u32 DirectInput::readDevice(int which)
     res |= 256;
   if(checkKey(theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_L)]))
     res |= 512;
-  
+
   if(checkKey(theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_GS)]))
     res |= 4096;
 
@@ -891,7 +891,7 @@ void DirectInput::checkMotionKeys()
     if(theApp.sensorX > 2047)
       theApp.sensorX = 2047;
   }
-  
+
   if(checkKey(theApp.input->joypaddata[MOTION(KEY_UP)])) {
     theApp.sensorY += 3;
     if(theApp.sensorY > 2197)
@@ -912,7 +912,7 @@ void DirectInput::checkMotionKeys()
     theApp.sensorY += 2;
     if(theApp.sensorY > 2047)
       theApp.sensorY = 2047;
-  }  
+  }
 }
 
 Input *newDirectInput()

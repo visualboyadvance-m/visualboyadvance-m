@@ -57,7 +57,7 @@ extern void remoteCleanUp();
 extern void remoteSetSockets(SOCKET, SOCKET);
 extern void toolsLogging();
 
-void MainWnd::OnToolsDisassemble() 
+void MainWnd::OnToolsDisassemble()
 {
   if(theApp.cartridgeType == 0) {
     Disassemble *dlg = new Disassemble();
@@ -70,34 +70,34 @@ void MainWnd::OnToolsDisassemble()
   }
 }
 
-void MainWnd::OnUpdateToolsDisassemble(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsDisassemble(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);
 }
 
-void MainWnd::OnToolsLogging() 
+void MainWnd::OnToolsLogging()
 {
   toolsLogging();
 }
 
-void MainWnd::OnUpdateToolsLogging(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsLogging(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);
 }
 
-void MainWnd::OnToolsIoviewer() 
+void MainWnd::OnToolsIoviewer()
 {
   IOViewer *dlg = new IOViewer;
   dlg->Create(IDD_IO_VIEWER,this);
   dlg->ShowWindow(SW_SHOW);
 }
 
-void MainWnd::OnUpdateToolsIoviewer(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsIoviewer(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.videoOption <= VIDEO_4X && theApp.cartridgeType == 0);
 }
 
-void MainWnd::OnToolsMapview() 
+void MainWnd::OnToolsMapview()
 {
   if(theApp.cartridgeType == 0) {
     MapView *dlg = new MapView;
@@ -110,12 +110,12 @@ void MainWnd::OnToolsMapview()
   }
 }
 
-void MainWnd::OnUpdateToolsMapview(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsMapview(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);
 }
 
-void MainWnd::OnToolsMemoryviewer() 
+void MainWnd::OnToolsMemoryviewer()
 {
   if(theApp.cartridgeType == 0) {
     MemoryViewerDlg *dlg = new MemoryViewerDlg;
@@ -128,12 +128,12 @@ void MainWnd::OnToolsMemoryviewer()
   }
 }
 
-void MainWnd::OnUpdateToolsMemoryviewer(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsMemoryviewer(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);
 }
 
-void MainWnd::OnToolsOamviewer() 
+void MainWnd::OnToolsOamviewer()
 {
   if(theApp.cartridgeType == 0) {
     OamView *dlg = new OamView;
@@ -146,12 +146,12 @@ void MainWnd::OnToolsOamviewer()
   }
 }
 
-void MainWnd::OnUpdateToolsOamviewer(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsOamviewer(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);  
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);
 }
 
-void MainWnd::OnToolsPaletteview() 
+void MainWnd::OnToolsPaletteview()
 {
   if(theApp.cartridgeType == 0) {
     PaletteView *dlg = new PaletteView;
@@ -164,12 +164,12 @@ void MainWnd::OnToolsPaletteview()
   }
 }
 
-void MainWnd::OnUpdateToolsPaletteview(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsPaletteview(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);  
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);
 }
 
-void MainWnd::OnToolsTileviewer() 
+void MainWnd::OnToolsTileviewer()
 {
   if(theApp.cartridgeType == 0) {
     TileView *dlg = new TileView;
@@ -182,19 +182,19 @@ void MainWnd::OnToolsTileviewer()
   }
 }
 
-void MainWnd::OnUpdateToolsTileviewer(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsTileviewer(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);  
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);
 }
 
-void MainWnd::OnDebugNextframe() 
+void MainWnd::OnDebugNextframe()
 {
   if(theApp.paused)
     theApp.paused = false;
   theApp.winPauseNextFrame = true;
 }
 
-void MainWnd::OnToolsDebugGdb() 
+void MainWnd::OnToolsDebugGdb()
 {
   theApp.winCheckFullscreen();
   GDBPortDlg dlg;
@@ -216,21 +216,21 @@ void MainWnd::OnToolsDebugGdb()
       oam = (u8 *)calloc(1, 0x400);
       pix = (u8 *)calloc(1, 4 * 241 * 162);
       ioMem = (u8 *)calloc(1, 0x400);
-      
+
       theApp.emulator = GBASystem;
-      
+
       CPUInit(theApp.biosFileName, theApp.useBiosFile ? true : false);
-      CPUReset();    
+      CPUReset();
     }
   }
 }
 
-void MainWnd::OnUpdateToolsDebugGdb(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsDebugGdb(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.videoOption <= VIDEO_4X && remoteSocket == -1);
 }
 
-void MainWnd::OnToolsDebugLoadandwait() 
+void MainWnd::OnToolsDebugLoadandwait()
 {
   theApp.winCheckFullscreen();
   if(fileOpenSelect()) {
@@ -254,12 +254,12 @@ void MainWnd::OnToolsDebugLoadandwait()
   }
 }
 
-void MainWnd::OnUpdateToolsDebugLoadandwait(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsDebugLoadandwait(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.videoOption <= VIDEO_4X && remoteSocket == -1);
 }
 
-void MainWnd::OnToolsDebugBreak() 
+void MainWnd::OnToolsDebugBreak()
 {
   if(armState) {
     armNextPC -= 4;
@@ -271,29 +271,29 @@ void MainWnd::OnToolsDebugBreak()
   debugger = true;
 }
 
-void MainWnd::OnUpdateToolsDebugBreak(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsDebugBreak(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.videoOption <= VIDEO_4X && remoteSocket != -1);
 }
 
-void MainWnd::OnToolsDebugDisconnect() 
+void MainWnd::OnToolsDebugDisconnect()
 {
   remoteCleanUp();
   debugger = false;
 }
 
-void MainWnd::OnUpdateToolsDebugDisconnect(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsDebugDisconnect(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.videoOption <= VIDEO_4X && remoteSocket != -1);
 }
 
-void MainWnd::OnOptionsSoundStartrecording() 
+void MainWnd::OnOptionsSoundStartrecording()
 {
   theApp.winCheckFullscreen();
   CString captureBuffer;
 
   CString capdir = regQueryStringValue("soundRecordDir", NULL);
-  
+
   if(capdir.IsEmpty())
     capdir = getDirFromFile(theApp.filename);
 
@@ -301,16 +301,16 @@ void MainWnd::OnOptionsSoundStartrecording()
   CString title = winResLoadString(IDS_SELECT_WAV_NAME);
 
   LPCTSTR exts[] = { ".WAV" };
-  
+
   FileDlg dlg(this, "", filter, 1, "WAV", exts, capdir, title, true);
-  
+
   if(dlg.DoModal() == IDCANCEL) {
     return;
   }
 
   captureBuffer = theApp.soundRecordName =  dlg.GetPathName();
   theApp.soundRecording = true;
-  
+
   if(dlg.m_ofn.nFileOffset > 0) {
     captureBuffer = captureBuffer.Left(dlg.m_ofn.nFileOffset);
   }
@@ -322,12 +322,12 @@ void MainWnd::OnOptionsSoundStartrecording()
   regSetStringValue("soundRecordDir", captureBuffer);
 }
 
-void MainWnd::OnUpdateOptionsSoundStartrecording(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateOptionsSoundStartrecording(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(!theApp.soundRecording);
 }
 
-void MainWnd::OnOptionsSoundStoprecording() 
+void MainWnd::OnOptionsSoundStoprecording()
 {
   if(theApp.soundRecorder) {
     delete theApp.soundRecorder;
@@ -336,18 +336,18 @@ void MainWnd::OnOptionsSoundStoprecording()
   theApp.soundRecording = false;
 }
 
-void MainWnd::OnUpdateOptionsSoundStoprecording(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateOptionsSoundStoprecording(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.soundRecording);
 }
 
-void MainWnd::OnToolsRecordStartavirecording() 
+void MainWnd::OnToolsRecordStartavirecording()
 {
   theApp.winCheckFullscreen();
   CString captureBuffer;
 
   CString capdir = regQueryStringValue("aviRecordDir", NULL);
-  
+
   if(capdir.IsEmpty())
     capdir = getDirFromFile(theApp.filename);
 
@@ -355,9 +355,9 @@ void MainWnd::OnToolsRecordStartavirecording()
   CString title = winResLoadString(IDS_SELECT_AVI_NAME);
 
   LPCTSTR exts[] = { ".AVI" };
-  
+
   FileDlg dlg(this, "", filter, 1, "AVI", exts, capdir, title, true);
-  
+
   if(dlg.DoModal() == IDCANCEL) {
     return;
   }
@@ -365,7 +365,7 @@ void MainWnd::OnToolsRecordStartavirecording()
   captureBuffer = theApp.soundRecordName =  dlg.GetPathName();
   theApp.aviRecordName = captureBuffer;
   theApp.aviRecording = true;
-  
+
   if(dlg.m_ofn.nFileOffset > 0) {
     captureBuffer = captureBuffer.Left(dlg.m_ofn.nFileOffset);
   }
@@ -378,12 +378,12 @@ void MainWnd::OnToolsRecordStartavirecording()
   regSetStringValue("aviRecordDir", captureBuffer);
 }
 
-void MainWnd::OnUpdateToolsRecordStartavirecording(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsRecordStartavirecording(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(!theApp.aviRecording);
 }
 
-void MainWnd::OnToolsRecordStopavirecording() 
+void MainWnd::OnToolsRecordStopavirecording()
 {
   if(theApp.aviRecorder != NULL) {
     delete theApp.aviRecorder;
@@ -393,34 +393,34 @@ void MainWnd::OnToolsRecordStopavirecording()
   theApp.aviRecording = false;
 }
 
-void MainWnd::OnUpdateToolsRecordStopavirecording(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsRecordStopavirecording(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.aviRecording);
 }
 
-void MainWnd::OnToolsRecordStartmovierecording() 
+void MainWnd::OnToolsRecordStartmovierecording()
 {
   theApp.winCheckFullscreen();
   CString captureBuffer;
   CString capdir = regQueryStringValue("movieRecordDir", "");
-  
+
   if(capdir.IsEmpty())
     capdir = getDirFromFile(theApp.filename);
 
   CString filter = theApp.winLoadFilter(IDS_FILTER_VMV);
   CString title = winResLoadString(IDS_SELECT_MOVIE_NAME);
-  
+
   LPCTSTR exts[] = { ".VMV" };
 
   FileDlg dlg(this, "", filter, 1, "VMV", exts, capdir, title, true);
-  
+
   if(dlg.DoModal() == IDCANCEL) {
     return;
   }
-  
+
   CString movieName = dlg.GetPathName();
   captureBuffer = movieName;
-  
+
   if(dlg.m_ofn.nFileOffset > 0) {
     captureBuffer = captureBuffer.Left(dlg.m_ofn.nFileOffset);
   }
@@ -431,11 +431,11 @@ void MainWnd::OnToolsRecordStartmovierecording()
     captureBuffer = captureBuffer.Left(len-1);
 
   regSetStringValue("movieRecordDir", captureBuffer);
-  
+
   theApp.movieFile = fopen(movieName, "wb");
 
   if(!theApp.movieFile) {
-    systemMessage(IDS_CANNOT_OPEN_FILE, "Cannot open file %s", 
+    systemMessage(IDS_CANNOT_OPEN_FILE, "Cannot open file %s",
                   (const char *)movieName);
     return;
   }
@@ -452,17 +452,17 @@ void MainWnd::OnToolsRecordStartmovierecording()
     theApp.movieRecording = true;
     theApp.moviePlaying = false;
   } else {
-    systemMessage(IDS_CANNOT_OPEN_FILE, "Cannot open file %s", 
-                  (const char *)movieName);  
+    systemMessage(IDS_CANNOT_OPEN_FILE, "Cannot open file %s",
+                  (const char *)movieName);
   }
 }
 
-void MainWnd::OnUpdateToolsRecordStartmovierecording(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsRecordStartmovierecording(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(!theApp.movieRecording);
 }
 
-void MainWnd::OnToolsRecordStopmovierecording() 
+void MainWnd::OnToolsRecordStopmovierecording()
 {
   if(theApp.movieRecording) {
     if(theApp.movieFile != NULL) {
@@ -479,12 +479,12 @@ void MainWnd::OnToolsRecordStopmovierecording()
   }
 }
 
-void MainWnd::OnUpdateToolsRecordStopmovierecording(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsRecordStopmovierecording(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.movieRecording);
 }
 
-void MainWnd::OnToolsPlayStartmovieplaying() 
+void MainWnd::OnToolsPlayStartmovieplaying()
 {
   static bool moviePlayMessage = false;
 
@@ -500,7 +500,7 @@ void MainWnd::OnToolsPlayStartmovieplaying()
 
   CString captureBuffer;
   CString capdir = regQueryStringValue("movieRecordDir", "");
-  
+
   if(capdir.IsEmpty())
     capdir = getDirFromFile(theApp.filename);
 
@@ -510,25 +510,25 @@ void MainWnd::OnToolsPlayStartmovieplaying()
   LPCTSTR exts[] = { ".VMV" };
 
   FileDlg dlg(this, "", filter, 1, "VMV", exts, capdir, title, false);
-  
+
   if(dlg.DoModal() == IDCANCEL) {
     return;
   }
 
   CString movieName = dlg.GetPathName();
   captureBuffer = movieName;
-  
+
   theApp.movieFile = fopen(movieName, "rb");
 
   if(!theApp.movieFile) {
-    systemMessage(IDS_CANNOT_OPEN_FILE, "Cannot open file %s", 
+    systemMessage(IDS_CANNOT_OPEN_FILE, "Cannot open file %s",
                   (const char *)movieName);
     return;
   }
   int version = 0;
   fread(&version, 1, sizeof(int), theApp.movieFile);
   if(version != 1) {
-    systemMessage(IDS_UNSUPPORTED_MOVIE_VERSION, 
+    systemMessage(IDS_UNSUPPORTED_MOVIE_VERSION,
                   "Unsupported movie version %d.",
                   version);
     fclose(theApp.movieFile);
@@ -543,17 +543,17 @@ void MainWnd::OnToolsPlayStartmovieplaying()
     theApp.movieLastJoypad = 0;
     theApp.movieReadNext();
   } else {
-    systemMessage(IDS_CANNOT_OPEN_FILE, "Cannot open file %s", 
+    systemMessage(IDS_CANNOT_OPEN_FILE, "Cannot open file %s",
                   (const char *)movieName);
   }
 }
 
-void MainWnd::OnUpdateToolsPlayStartmovieplaying(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsPlayStartmovieplaying(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(!theApp.moviePlaying);
 }
 
-void MainWnd::OnToolsPlayStopmovieplaying() 
+void MainWnd::OnToolsPlayStopmovieplaying()
 {
   if(theApp.moviePlaying) {
     if(theApp.movieFile != NULL) {
@@ -565,12 +565,12 @@ void MainWnd::OnToolsPlayStopmovieplaying()
   }
 }
 
-void MainWnd::OnUpdateToolsPlayStopmovieplaying(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsPlayStopmovieplaying(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.moviePlaying);
 }
 
-void MainWnd::OnToolsRewind() 
+void MainWnd::OnToolsRewind()
 {
   if(emulating && theApp.emulator.emuReadMemState && theApp.rewindMemory && theApp.rewindCount) {
     theApp.rewindPos = --theApp.rewindPos & 7;
@@ -580,12 +580,12 @@ void MainWnd::OnToolsRewind()
   }
 }
 
-void MainWnd::OnUpdateToolsRewind(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsRewind(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.rewindMemory != NULL && emulating && theApp.rewindCount);
 }
 
-void MainWnd::OnToolsCustomize() 
+void MainWnd::OnToolsCustomize()
 {
   AccelEditor dlg;
 
@@ -597,7 +597,7 @@ void MainWnd::OnToolsCustomize()
   }
 }
 
-void MainWnd::OnUpdateToolsCustomize(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateToolsCustomize(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(theApp.videoOption != VIDEO_320x240);
 }

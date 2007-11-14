@@ -85,10 +85,10 @@ END_MESSAGE_MAP()
   /////////////////////////////////////////////////////////////////////////////
 // Directories message handlers
 
-BOOL Directories::OnInitDialog() 
+BOOL Directories::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   CString p = regQueryStringValue("romdir", NULL);
   if(!p.IsEmpty()) {
     int len = p.GetLength();
@@ -97,7 +97,7 @@ BOOL Directories::OnInitDialog()
         p = p.Left(len-1);
     GetDlgItem(IDC_ROM_PATH)->SetWindowText(p);
   }
-  
+
   p = regQueryStringValue("gbromdir", NULL);
   if(!p.IsEmpty()) {
     int len = p.GetLength();
@@ -106,7 +106,7 @@ BOOL Directories::OnInitDialog()
         p = p.Left(len-1);
     GetDlgItem(IDC_GBROM_PATH)->SetWindowText(p);
   }
-  
+
   p = regQueryStringValue("batteryDir", NULL);
   if(!p.IsEmpty())
     GetDlgItem(IDC_BATTERY_PATH)->SetWindowText( p);
@@ -116,14 +116,14 @@ BOOL Directories::OnInitDialog()
   p = regQueryStringValue("captureDir", NULL);
   if(!p.IsEmpty())
     GetDlgItem(IDC_CAPTURE_PATH)->SetWindowText(p);
-  
+
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void Directories::OnBatteryDir() 
+void Directories::OnBatteryDir()
 {
   m_batteryPath.GetWindowText(initialFolderDir);
   CString p = browseForDir(winResLoadString(IDS_SELECT_BATTERY_DIR));
@@ -131,13 +131,13 @@ void Directories::OnBatteryDir()
     m_batteryPath.SetWindowText(p);
 }
 
-void Directories::OnBatteryDirReset() 
+void Directories::OnBatteryDirReset()
 {
   regDeleteValue("batteryDir");
   m_batteryPath.SetWindowText("");
 }
 
-void Directories::OnCaptureDir() 
+void Directories::OnCaptureDir()
 {
   m_capturePath.GetWindowText(initialFolderDir);
   CString p = browseForDir(winResLoadString(IDS_SELECT_CAPTURE_DIR));
@@ -145,13 +145,13 @@ void Directories::OnCaptureDir()
     m_capturePath.SetWindowText(p);
 }
 
-void Directories::OnCaptureDirReset() 
+void Directories::OnCaptureDirReset()
 {
   regDeleteValue("captureDir");
-  m_capturePath.SetWindowText("");  
+  m_capturePath.SetWindowText("");
 }
 
-void Directories::OnGbromDir() 
+void Directories::OnGbromDir()
 {
   m_gbromPath.GetWindowText(initialFolderDir);
   CString p = browseForDir(winResLoadString(IDS_SELECT_ROM_DIR));
@@ -159,13 +159,13 @@ void Directories::OnGbromDir()
     m_gbromPath.SetWindowText(p);
 }
 
-void Directories::OnGbromDirReset() 
+void Directories::OnGbromDirReset()
 {
   regDeleteValue("gbromdir");
-  m_gbromPath.SetWindowText("");  
+  m_gbromPath.SetWindowText("");
 }
 
-void Directories::OnRomDir() 
+void Directories::OnRomDir()
 {
   m_romPath.GetWindowText(initialFolderDir);
   CString p = browseForDir(winResLoadString(IDS_SELECT_ROM_DIR));
@@ -173,13 +173,13 @@ void Directories::OnRomDir()
     m_romPath.SetWindowText(p);
 }
 
-void Directories::OnRomDirReset() 
+void Directories::OnRomDirReset()
 {
   regDeleteValue("romdir");
   m_romPath.SetWindowText("");
 }
 
-void Directories::OnSaveDir() 
+void Directories::OnSaveDir()
 {
   m_savePath.GetWindowText(initialFolderDir);
   CString p = browseForDir(winResLoadString(IDS_SELECT_SAVE_DIR));
@@ -187,18 +187,18 @@ void Directories::OnSaveDir()
     m_savePath.SetWindowText(p);
 }
 
-void Directories::OnSaveDirReset() 
+void Directories::OnSaveDirReset()
 {
   regDeleteValue("saveDir");
-  m_savePath.SetWindowText("");  
+  m_savePath.SetWindowText("");
 }
 
-void Directories::OnCancel() 
+void Directories::OnCancel()
 {
   EndDialog(FALSE);
 }
 
-void Directories::OnOK() 
+void Directories::OnOK()
 {
 	char baseDir[MAX_PATH+1];
 	char temp[MAX_PATH+1];
@@ -223,7 +223,7 @@ void Directories::OnOK()
 
 	m_gbromPath.GetWindowText(buffer);
 	if( !buffer.IsEmpty() )
-		regSetStringValue( "gbromdir", buffer );      
+		regSetStringValue( "gbromdir", buffer );
 	if( buffer[0] == '.' ) {
 		strcpy( temp, baseDir );
 		strcat( temp, "\\" );
@@ -277,9 +277,9 @@ CString Directories::browseForDir(CString title)
   static char buffer[1024];
   LPMALLOC pMalloc;
   LPITEMIDLIST pidl;
-  
+
   CString res;
-  
+
   if(SUCCEEDED(SHGetMalloc(&pMalloc))) {
     BROWSEINFO bi;
     ZeroMemory(&bi, sizeof(bi));
@@ -289,9 +289,9 @@ CString Directories::browseForDir(CString title)
     bi.ulFlags = BIF_RETURNONLYFSDIRS;
     bi.lpfn = browseCallbackProc;
     bi.lParam = (LPARAM)(LPCTSTR)initialFolderDir;
-    
+
     pidl = SHBrowseForFolder(&bi);
-    
+
     if(pidl) {
       if(SHGetPathFromIDList(pidl, buffer)) {
         res = buffer;

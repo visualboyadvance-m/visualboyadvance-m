@@ -98,70 +98,70 @@ BEGIN_MESSAGE_MAP(Logging, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // Logging message handlers
 
-void Logging::OnOk() 
+void Logging::OnOk()
 {
   EndDialog(TRUE);
 
   instance = NULL;
 }
 
-void Logging::OnClear() 
+void Logging::OnClear()
 {
   text = "";
   m_log.SetWindowText("");
 }
 
-void Logging::OnVerboseAgbprint() 
+void Logging::OnVerboseAgbprint()
 {
   systemVerbose ^= 512;
 }
 
-void Logging::OnVerboseDma0() 
+void Logging::OnVerboseDma0()
 {
   systemVerbose ^= 16;
 }
 
-void Logging::OnVerboseDma1() 
+void Logging::OnVerboseDma1()
 {
   systemVerbose ^= 32;
 }
 
-void Logging::OnVerboseDma2() 
+void Logging::OnVerboseDma2()
 {
   systemVerbose ^= 64;
 }
 
-void Logging::OnVerboseDma3() 
+void Logging::OnVerboseDma3()
 {
   systemVerbose ^= 128;
 }
 
-void Logging::OnVerboseIllegalRead() 
+void Logging::OnVerboseIllegalRead()
 {
   systemVerbose ^= 8;
 }
 
-void Logging::OnVerboseIllegalWrite() 
+void Logging::OnVerboseIllegalWrite()
 {
   systemVerbose ^= 4;
 }
 
-void Logging::OnVerboseSwi() 
+void Logging::OnVerboseSwi()
 {
   systemVerbose ^= 1;
 }
 
-void Logging::OnVerboseUnalignedAccess() 
+void Logging::OnVerboseUnalignedAccess()
 {
   systemVerbose ^= 2;
 }
 
-void Logging::OnVerboseUndefined() 
+void Logging::OnVerboseUndefined()
 {
   systemVerbose ^= 256;
 }
 
-void Logging::OnSave() 
+void Logging::OnSave()
 {
   int len = m_log.GetWindowTextLength();
 
@@ -186,25 +186,25 @@ void Logging::OnSave()
   free(mem);
 }
 
-void Logging::OnErrspaceLog() 
+void Logging::OnErrspaceLog()
 {
   systemMessage(0, "Error allocating space");
 }
 
-void Logging::OnMaxtextLog() 
+void Logging::OnMaxtextLog()
 {
   systemMessage(0, "Max text length reached %d", m_log.GetLimitText());
 }
 
-void Logging::PostNcDestroy() 
+void Logging::PostNcDestroy()
 {
   delete this;
 }
 
-BOOL Logging::OnInitDialog() 
+BOOL Logging::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_ENTRY( IDC_LOG, DS_SizeY|DS_SizeX)
     DIALOG_SIZER_ENTRY( ID_OK, DS_MoveY)
@@ -230,7 +230,7 @@ BOOL Logging::OnInitDialog()
 
   m_log.LimitText(-1);
   m_log.SetWindowText(text);
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -242,12 +242,12 @@ void Logging::log(const char *s)
   m_log.ReplaceSel(s);
 }
 
-void Logging::OnClose() 
+void Logging::OnClose()
 {
   EndDialog(FALSE);
 
   instance = NULL;
-  
+
   CDialog::OnClose();
 }
 

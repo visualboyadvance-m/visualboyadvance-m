@@ -24,7 +24,7 @@
 
 extern int emulating;
 
-void MainWnd::OnHelpAbout() 
+void MainWnd::OnHelpAbout()
 {
   theApp.winCheckFullscreen();
   AboutDialog dlg;
@@ -32,21 +32,21 @@ void MainWnd::OnHelpAbout()
   dlg.DoModal();
 }
 
-void MainWnd::OnHelpFaq() 
+void MainWnd::OnHelpFaq()
 {
-  ::ShellExecute(0, _T("open"), "http://vba.ngemu.com/faq.shtml", 
+  ::ShellExecute(0, _T("open"), "http://vba.ngemu.com/faq.shtml",
                  0, 0, SW_SHOWNORMAL);
 }
 
-void MainWnd::OnHelpBugreport() 
+void MainWnd::OnHelpBugreport()
 {
   BugReport dlg(theApp.m_pMainWnd);
 
   dlg.DoModal();
 }
 
-void MainWnd::OnHelpGnupubliclicense() 
+void MainWnd::OnHelpGnupubliclicense()
 {
-  ::ShellExecute(0, _T("open"), "http://www.gnu.org/licenses/gpl.html", 
-                 0, 0, SW_SHOWNORMAL);	
+  ::ShellExecute(0, _T("open"), "http://www.gnu.org/licenses/gpl.html",
+                 0, 0, SW_SHOWNORMAL);
 }

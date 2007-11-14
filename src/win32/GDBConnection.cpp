@@ -47,7 +47,7 @@ GDBPortDlg::GDBPortDlg(CWnd* pParent /*=NULL*/)
   //}}AFX_DATA_INIT
   port = 55555;
   sock = INVALID_SOCKET;
-  
+
   if(!initialized) {
     WSADATA wsaData;
 
@@ -90,10 +90,10 @@ SOCKET GDBPortDlg::getSocket()
 }
 
 
-BOOL GDBPortDlg::OnInitDialog() 
+BOOL GDBPortDlg::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   CString buffer;
 
   buffer.Format("%d", port);
@@ -101,17 +101,17 @@ BOOL GDBPortDlg::OnInitDialog()
   m_port.SetWindowText(buffer);
 
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void GDBPortDlg::OnOk() 
+void GDBPortDlg::OnOk()
 {
   CString buffer;
 
   m_port.GetWindowText(buffer);
-  
+
   sockaddr_in address;
   address.sin_family = AF_INET;
   address.sin_addr.s_addr = inet_addr("0.0.0.0");
@@ -144,12 +144,12 @@ void GDBPortDlg::OnOk()
   }
 }
 
-void GDBPortDlg::OnCancel() 
+void GDBPortDlg::OnCancel()
 {
   OnClose();
 }
 
-void GDBPortDlg::OnClose() 
+void GDBPortDlg::OnClose()
 {
   EndDialog(FALSE);
 }
@@ -186,10 +186,10 @@ BEGIN_MESSAGE_MAP(GDBWaitingDlg, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // GDBWaitingDlg message handlers
 
-BOOL GDBWaitingDlg::OnInitDialog() 
+BOOL GDBWaitingDlg::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   CString buffer;
 
   buffer.Format("%d", port);
@@ -202,7 +202,7 @@ BOOL GDBWaitingDlg::OnInitDialog()
                              (HWND )*this,
                              SOCKET_MESSAGE,
                              FD_ACCEPT);
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -211,10 +211,10 @@ LRESULT GDBWaitingDlg::OnSocketAccept(WPARAM wParam, LPARAM lParam)
 {
   if(LOWORD(lParam) == FD_ACCEPT) {
     WSAAsyncSelect(listenSocket, (HWND)*this, 0, 0);
-    
-    int flag = 0;    
+
+    int flag = 0;
     ioctlsocket(listenSocket, FIONBIO, (unsigned long *)&flag);
-    
+
     SOCKET s = accept(listenSocket, NULL, NULL);
     if(s != INVALID_SOCKET) {
       char dummy;
@@ -232,12 +232,12 @@ LRESULT GDBWaitingDlg::OnSocketAccept(WPARAM wParam, LPARAM lParam)
   return TRUE;
 }
 
-void GDBWaitingDlg::OnCancel() 
+void GDBWaitingDlg::OnCancel()
 {
   OnClose();
 }
 
-void GDBWaitingDlg::OnClose() 
+void GDBWaitingDlg::OnClose()
 {
   if(sock != INVALID_SOCKET) {
     closesocket(sock);

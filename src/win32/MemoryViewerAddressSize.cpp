@@ -64,10 +64,10 @@ BEGIN_MESSAGE_MAP(MemoryViewerAddressSize, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // MemoryViewerAddressSize message handlers
 
-BOOL MemoryViewerAddressSize::OnInitDialog() 
+BOOL MemoryViewerAddressSize::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   CString buffer;
   if(address != 0xFFFFFFFF) {
     buffer.Format("%08X", address);
@@ -81,15 +81,15 @@ BOOL MemoryViewerAddressSize::OnInitDialog()
 
   if(size == -1 && address != 0xFFFFFFFF)
     m_size.SetFocus();
-  
+
   m_address.LimitText(9);
   m_size.LimitText(9);
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void MemoryViewerAddressSize::OnOk() 
+void MemoryViewerAddressSize::OnOk()
 {
   CString buffer;
 
@@ -99,7 +99,7 @@ void MemoryViewerAddressSize::OnOk()
     return;
   }
   sscanf(buffer, "%x", &address);
-  
+
   m_size.GetWindowText(buffer);
   if(buffer.IsEmpty()) {
     m_size.SetFocus();
@@ -109,7 +109,7 @@ void MemoryViewerAddressSize::OnOk()
   EndDialog(TRUE);
 }
 
-void MemoryViewerAddressSize::OnCancel() 
+void MemoryViewerAddressSize::OnCancel()
 {
   EndDialog(FALSE);
 }

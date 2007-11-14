@@ -65,9 +65,9 @@ static void SmartIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
   u16 *src1 = (u16 *)frm1;
   u16 *src2 = (u16 *)frm2;
   u16 *src3 = (u16 *)frm3;
-  
+
   int count = width >> 2;
-    
+
   for(int i = 0; i < height; i++) {
 #ifdef __GNUC__
     asm volatile (
@@ -97,15 +97,15 @@ static void SmartIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
                   "paddw %%mm2, %%mm1\n" // E+F
                   "pand %%mm4, %%mm1\n" // (E+F) & res
                   "pandn %%mm0, %%mm4\n" // color& !res
-                  
+
                   "por %%mm1, %%mm4\n"
                   "movq %%mm4, 0(%0)\n" // src0 = res
-                  
+
                   "addl $8, %0\n"
                   "addl $8, %1\n"
                   "addl $8, %2\n"
                   "addl $8, %3\n"
-                  
+
                   "decl %4\n"
                   "jnz 0b\n"
                   "pop %4\n"
@@ -126,7 +126,7 @@ static void SmartIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
       movq mm1, qword ptr [ebx]; // src1
       movq mm2, qword ptr [ecx]; // src2
       movq mm3, qword ptr [edx]; // src3
-      movq qword ptr [edx], mm0; // src3 = src0           
+      movq qword ptr [edx], mm0; // src3 = src0
       movq mm4, mm0;
       movq mm5, mm1;
       pcmpeqw mm5, mm2; // src1 == src2 (A)
@@ -145,10 +145,10 @@ static void SmartIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
       paddw mm1, mm2; // E+F
       pand mm1, mm4; // (E+F) & res
       pandn mm4, mm0; // color & !res
-      
+
       por mm4, mm1;
       movq qword ptr [eax], mm4; // src0 = res
-                  
+
       add eax, 8;
       add ebx, 8;
       add ecx, 8;
@@ -168,12 +168,12 @@ static void SmartIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
     src2+=2;
     src3+=2;
   }
-                
+
   /* Swap buffers around */
   u8 *temp = frm1;
   frm1 = frm3;
   frm3 = frm2;
-  frm2 = temp;  
+  frm2 = temp;
 }
 #endif
 
@@ -190,7 +190,7 @@ void SmartIB(u8 *srcPtr, u32 srcPitch, int width, int height)
 #endif
 
   u16 colorMask = ~RGB_LOW_BITS_MASK;
-  
+
   u16 *src0 = (u16 *)srcPtr;
   u16 *src1 = (u16 *)frm1;
   u16 *src2 = (u16 *)frm2;
@@ -211,7 +211,7 @@ void SmartIB(u8 *srcPtr, u32 srcPitch, int width, int height)
       src3[pos] = color; /* oldest buffer now holds newest frame */
       pos++;
     }
-  
+
   /* Swap buffers around */
   u8 *temp = frm1;
   frm1 = frm3;
@@ -228,9 +228,9 @@ static void SmartIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
   u32 *src3 = (u32 *)frm3;
 
   int count = width >> 1;
-  
+
   for(int i = 0; i < height; i++) {
-#ifdef __GNUC__    
+#ifdef __GNUC__
     asm volatile (
                   "push %4\n"
                   "movq 0(%5), %%mm7\n" // colorMask
@@ -258,15 +258,15 @@ static void SmartIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
                   "paddd %%mm2, %%mm1\n" // E+F
                   "pand %%mm4, %%mm1\n" // (E+F) & res
                   "pandn %%mm0, %%mm4\n" // color& !res
-                  
+
                   "por %%mm1, %%mm4\n"
                   "movq %%mm4, 0(%0)\n" // src0 = res
-                  
+
                   "addl $8, %0\n"
                   "addl $8, %1\n"
                   "addl $8, %2\n"
                   "addl $8, %3\n"
-                  
+
                   "decl %4\n"
                   "jnz 0b\n"
                   "pop %4\n"
@@ -287,7 +287,7 @@ static void SmartIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
       movq mm1, qword ptr [ebx]; // src1
       movq mm2, qword ptr [ecx]; // src2
       movq mm3, qword ptr [edx]; // src3
-      movq qword ptr [edx], mm0; // src3 = src0           
+      movq qword ptr [edx], mm0; // src3 = src0
       movq mm4, mm0;
       movq mm5, mm1;
       pcmpeqd mm5, mm2; // src1 == src2 (A)
@@ -306,10 +306,10 @@ static void SmartIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
       paddd mm1, mm2; // E+F
       pand mm1, mm4; // (E+F) & res
       pandn mm4, mm0; // color & !res
-      
+
       por mm4, mm1;
       movq qword ptr [eax], mm4; // src0 = res
-                  
+
       add eax, 8;
       add ebx, 8;
       add ecx, 8;
@@ -324,7 +324,7 @@ static void SmartIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
       emms;
     }
 #endif
-    
+
     src0++;
     src1++;
     src2++;
@@ -334,7 +334,7 @@ static void SmartIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
   u8 *temp = frm1;
   frm1 = frm3;
   frm3 = frm2;
-  frm2 = temp;  
+  frm2 = temp;
 }
 #endif
 
@@ -349,7 +349,7 @@ void SmartIB32(u8 *srcPtr, u32 srcPitch, int width, int height)
     return;
   }
 #endif
-  
+
   u32 *src0 = (u32 *)srcPtr;
   u32 *src1 = (u32 *)frm1;
   u32 *src2 = (u32 *)frm2;
@@ -372,7 +372,7 @@ void SmartIB32(u8 *srcPtr, u32 srcPitch, int width, int height)
       src3[pos] = color; /* oldest buffer now holds newest frame */
       pos++;
     }
-  
+
   /* Swap buffers around */
   u8 *temp = frm1;
   frm1 = frm3;
@@ -387,9 +387,9 @@ static void MotionBlurIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
   u16 *src1 = (u16 *)frm1;
 
   int count = width >> 2;
-  
+
   for(int i = 0; i < height; i++) {
-#ifdef __GNUC__    
+#ifdef __GNUC__
     asm volatile (
                   "push %2\n"
                   "movq 0(%3), %%mm7\n" // colorMask
@@ -404,10 +404,10 @@ static void MotionBlurIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
                   "paddw %%mm1, %%mm0\n" // E+F
 
                   "movq %%mm0, 0(%0)\n" // src0 = res
-                  
+
                   "addl $8, %0\n"
                   "addl $8, %1\n"
-                  
+
                   "decl %2\n"
                   "jnz 0b\n"
                   "pop %2\n"
@@ -432,7 +432,7 @@ static void MotionBlurIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
       paddw mm0, mm1; // E+F
 
       movq qword ptr [eax], mm0; // src0 = res
-                  
+
       add eax, 8;
       add ebx, 8;
 
@@ -461,9 +461,9 @@ void MotionBlurIB(u8 *srcPtr, u32 srcPitch, int width, int height)
     return;
   }
 #endif
-  
+
   u16 colorMask = ~RGB_LOW_BITS_MASK;
-  
+
   u16 *src0 = (u16 *)srcPtr;
   u16 *src1 = (u16 *)frm1;
 
@@ -486,10 +486,10 @@ static void MotionBlurIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
   u32 *src0 = (u32 *)srcPtr;
   u32 *src1 = (u32 *)frm1;
 
-  int count = width >> 1;  
+  int count = width >> 1;
 
   for(int i = 0; i < height; i++) {
-#ifdef __GNUC__    
+#ifdef __GNUC__
     asm volatile (
                   "push %2\n"
                   "movq 0(%3), %%mm7\n" // colorMask
@@ -504,10 +504,10 @@ static void MotionBlurIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
                   "paddd %%mm1, %%mm0\n" // E+F
 
                   "movq %%mm0, 0(%0)\n" // src0 = res
-                  
+
                   "addl $8, %0\n"
                   "addl $8, %1\n"
-                  
+
                   "decl %2\n"
                   "jnz 0b\n"
                   "pop %2\n"
@@ -532,7 +532,7 @@ static void MotionBlurIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int height)
       paddd mm0, mm1; // E+F
 
       movq qword ptr [eax], mm0; // src0 = res
-                  
+
       add eax, 8;
       add ebx, 8;
 
@@ -561,7 +561,7 @@ void MotionBlurIB32(u8 *srcPtr, u32 srcPitch, int width, int height)
     return;
   }
 #endif
-  
+
   u32 *src0 = (u32 *)srcPtr;
   u32 *src1 = (u32 *)frm1;
 

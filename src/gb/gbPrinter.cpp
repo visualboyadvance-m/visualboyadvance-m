@@ -78,7 +78,7 @@ void gbPrinterShowData()
   pal[3].g = 0;
   pal[3].b = 0;
   set_palette(pal);
-  acquire_screen();  
+  acquire_screen();
   u8 *data = gbPrinterData;
   for(int y = 0; y < 0x12; y++) {
     for(int x = 0; x < 0x14; x++) {
@@ -100,7 +100,7 @@ void gbPrinterShowData()
   release_screen();
   while(!keypressed()) {
   }
-  */  
+  */
 }
 
 void gbPrinterReceiveData()
@@ -165,12 +165,12 @@ u8 gbPrinterSend(u8 b)
       gbPrinterPacket[gbPrinterCount++] = b;
       gbPrinterState++;
     } else {
-      // todo: handle failure      
+      // todo: handle failure
       gbPrinterReset();
     }
     break;
   case 1:
-    // receiving preamble    
+    // receiving preamble
     if(b == 0x33) {
       gbPrinterPacket[gbPrinterCount++] = b;
       gbPrinterState++;

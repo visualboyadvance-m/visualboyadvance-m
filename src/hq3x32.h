@@ -242,7 +242,7 @@
         case 50:
         {
           PIXEL00_1M
-			  
+
 		if (Diff(c[2], c[6]))
           {
             PIXEL01_C

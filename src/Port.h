@@ -47,10 +47,10 @@ static inline u32 swap32(u32 v)
 
 #define WRITE16LE(base, value) \
   __asm__ ("sthbrx %0, 0, %1" : : "r" (value), "r" (base) : "memory")
-  
+
 #define WRITE32LE(base, value) \
   __asm__ ("stwbrx %0, 0, %1" : : "r" (value), "r" (base) : "memory")
-  
+
 #else
 #define READ16LE(x) \
   swap16(*((u16 *)(x)))

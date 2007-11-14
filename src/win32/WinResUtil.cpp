@@ -46,10 +46,10 @@ UCHAR *winResGetResource(LPCTSTR resType, LPCTSTR resName)
 HMENU winResLoadMenu(LPCTSTR menuName)
 {
   UCHAR * b = winResGetResource(RT_MENU, menuName);
-  
+
   if(b != NULL) {
     HMENU menu = LoadMenuIndirect((CONST MENUTEMPLATE *)b);
-    
+
     if(menu != NULL)
       return menu;
   }
@@ -64,9 +64,9 @@ int winResDialogBox(LPCTSTR boxName,
 {
   /*
     UCHAR * b = winResGetResource(RT_DIALOG, boxName);
-  
+
     if(b != NULL) {
-    
+
     return DialogBoxIndirectParam(hInstance,
     (LPCDLGTEMPLATE)b,
     parent,
@@ -97,7 +97,7 @@ CString winResLoadString(UINT id)
 {
   int stId = id / 16 + 1;
   HINSTANCE inst = winResGetInstance(RT_STRING, MAKEINTRESOURCE(stId));
-  
+
   CString res;
   if(res.LoadString(id))
     return res;

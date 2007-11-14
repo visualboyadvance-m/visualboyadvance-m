@@ -68,7 +68,7 @@ class CAcceleratorManager : public CObject {
   bool Load();
   bool Write();
   // Get the initials accels, not the user's
-  bool Default(); 
+  bool Default();
   // Save a copy in the 2 maps called xxxSaved, which are used in case
   // of Default(), to reload the defaults accels.
   bool CreateDefaultTable();

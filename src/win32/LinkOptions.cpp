@@ -29,7 +29,7 @@ CMyTabCtrl::~CMyTabCtrl()
 	m_tabdialog[0]->DestroyWindow();
 	m_tabdialog[1]->DestroyWindow();
 	m_tabdialog[2]->DestroyWindow();
-	
+
 	delete m_tabdialog[0];
 	delete m_tabdialog[1];
 	delete m_tabdialog[2];
@@ -55,17 +55,17 @@ BOOL LinkOptions::OnInitDialog(){
 	TCITEM tabitem;
 	char tabtext[3][8] = {"General", "Server", "Client"};
 	int i;
-		
+
 	CDialog::OnInitDialog();
 
 	m_tabctrl.SubclassDlgItem(IDC_TAB1, this);
 
 	tabitem.mask = TCIF_TEXT;
-		
+
 	for(i=0;i<3;i++){
 		tabitem.pszText = tabtext[i];
 		m_tabctrl.InsertItem(i, &tabitem);
-	}	
+	}
 	m_tabctrl.m_tabdialog[0]->Create(IDD_LINKTAB1, this);
 	m_tabctrl.m_tabdialog[1]->Create(IDD_LINKTAB2, this);
 	m_tabctrl.m_tabdialog[2]->Create(IDD_LINKTAB3, this);
@@ -86,7 +86,7 @@ BOOL LinkOptions::OnInitDialog(){
    return m_tabctrl.TranslatePropSheetMsg(pMsg) ? TRUE :
        CDialog::PreTranslateMessage(pMsg);
  }
- 
+
 
 
 
@@ -198,17 +198,17 @@ END_MESSAGE_MAP()
 BOOL LinkServer::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	
+
 	m_numplayers = lanlink.numgbas;
 	m_prottype = lanlink.type;
 	m_speed = lanlink.speed;
-	
+
 	UpdateData(FALSE);
 
 	return TRUE;
 }
 
-void LinkOptions::OnSelchangeTab1(NMHDR* pNMHDR, LRESULT* pResult) 
+void LinkOptions::OnSelchangeTab1(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	m_tabctrl.OnSwitchTabs();
 	*pResult = 0;
@@ -247,7 +247,7 @@ BOOL CMyTabCtrl::IsTabEnabled(int iTab)
 void CMyTabCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
 	DRAWITEMSTRUCT& ds = *lpDrawItemStruct;
-	
+
 	int iItem = ds.itemID;
 
 	// Get tab item info
@@ -434,7 +434,7 @@ void CMyTabCtrl::OnSwitchTabs(void)
 	GetWindowRect(wndRect);
 	GetParent()->ScreenToClient(wndRect);
 	clientRect.OffsetRect(wndRect.left, wndRect.top);
-	
+
 	if(lanlink.active==0)
 		SetCurSel(0);
 
@@ -449,21 +449,21 @@ void CMyTabCtrl::OnSwitchTabs(void)
 }
 
 
-void LinkOptions::OnOk() 
+void LinkOptions::OnOk()
 {
 	GetAllData((LinkGeneral*)m_tabctrl.m_tabdialog[0]);
 	CDialog::OnOK();
-	return;		
+	return;
 }
 
-void LinkGeneral::OnRadio1() 
+void LinkGeneral::OnRadio1()
 {
 	m_type = 0;
 	lanlink.active = 0;
 	GetParent()->Invalidate();
 }
 
-void LinkGeneral::OnRadio2() 
+void LinkGeneral::OnRadio2()
 {
 	m_type = 1;
 	lanlink.active = 1;
@@ -475,11 +475,11 @@ BOOL LinkGeneral::OnInitDialog(){
 	char timeout[6];
 
 	CDialog::OnInitDialog();
-	
+
 	m_timeout.LimitText(5);
 	sprintf(timeout, "%d", linktimeout);
 	m_timeout.SetWindowText(timeout);
-	
+
 	m_type = lanlink.active;
 
 	UpdateData(FALSE);
@@ -488,19 +488,19 @@ BOOL LinkGeneral::OnInitDialog(){
 }
 
 
-void LinkOptions::OnCancel() 
+void LinkOptions::OnCancel()
 {
 	CDialog::OnCancel();
 	return;
 }
 
-void LinkServer::OnServerStart() 
+void LinkServer::OnServerStart()
 {
 	int errorcode;
 	ServerWait dlg;
 
 	UpdateData(TRUE);
-	
+
 	lanlink.numgbas = m_numplayers+1;
 	lanlink.type = m_prottype;
 	lanlink.server = 1;
@@ -513,19 +513,19 @@ void LinkServer::OnServerStart()
 		MessageBox(message, "Error", MB_OK);
 		return;
 	}
-		
+
 	dlg.DoModal();
-	
+
 	return;
 }
 
 BOOL LinkClient::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	
+
 	m_prottype = lanlink.type;
 	m_hacks = lanlink.speed;
-	
+
 	UpdateData(FALSE);
 
 	return TRUE;
@@ -559,9 +559,9 @@ void LinkClient::OnLinkConnect()
 void LinkOptions::GetAllData(LinkGeneral *src)
 {
 	char timeout[6];
-	
+
 	src->UpdateData(true);
-	
+
 	src->m_timeout.GetWindowText(timeout, 5);
 	sscanf(timeout, "%d", &linktimeout);
 
@@ -615,25 +615,25 @@ void ServerWait::OnCancel()
 	CDialog::OnCancel();
 }
 
-BOOL LinkGeneral::PreTranslateMessage(MSG* pMsg) 
+BOOL LinkGeneral::PreTranslateMessage(MSG* pMsg)
 {
 	if(pMsg->message==WM_KEYDOWN)
 		if(pMsg->wParam==VK_RETURN||pMsg->wParam==VK_ESCAPE)
 			pMsg->wParam = NULL;
-	
+
 	return CDialog::PreTranslateMessage(pMsg);
 }
 
-BOOL LinkClient::PreTranslateMessage(MSG* pMsg) 
+BOOL LinkClient::PreTranslateMessage(MSG* pMsg)
 {
 	if(pMsg->message==WM_KEYDOWN)
 		if(pMsg->wParam==VK_RETURN||pMsg->wParam==VK_ESCAPE)
 			pMsg->wParam = NULL;
-	
+
 	return CDialog::PreTranslateMessage(pMsg);
 }
 
-BOOL LinkServer::PreTranslateMessage(MSG* pMsg) 
+BOOL LinkServer::PreTranslateMessage(MSG* pMsg)
 {
 	if(pMsg->message==WM_KEYDOWN)
 		if(pMsg->wParam==VK_RETURN||pMsg->wParam==VK_ESCAPE)

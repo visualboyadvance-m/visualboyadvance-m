@@ -80,7 +80,7 @@ public:
 	OpenGLDisplay();
 	virtual ~OpenGLDisplay();
 	virtual DISPLAY_TYPE getType() { return OPENGL; };
-	
+
 	virtual void EnableOpenGL();
 	virtual void DisableOpenGL();
 	virtual bool initialize();
@@ -152,10 +152,10 @@ void OpenGLDisplay::EnableOpenGL()
 {
 	PIXELFORMATDESCRIPTOR pfd;
 	int format;
-	
+
 	// get the device context (DC)
 	hDC = GetDC( theApp.m_pMainWnd->GetSafeHwnd() );
-	
+
 	// set the pixel format for the DC
 	ZeroMemory( &pfd, sizeof( pfd ) );
 	pfd.nSize = sizeof( pfd );
@@ -167,7 +167,7 @@ void OpenGLDisplay::EnableOpenGL()
 	pfd.iLayerType = PFD_MAIN_PLANE;
 	format = ChoosePixelFormat( hDC, &pfd );
 	SetPixelFormat( hDC, format, &pfd );
-	
+
 	// create and enable the render context (RC)
 	hRC = wglCreateContext( hDC );
 	wglMakeCurrent( hDC, hRC );
@@ -186,7 +186,7 @@ void OpenGLDisplay::cleanup()
 		glDeleteTextures(1, &texture);
 		texture = 0;
 	}
-	DisableOpenGL();	
+	DisableOpenGL();
 	if(filterData) {
 		free(filterData);
 		filterData = NULL;
@@ -280,7 +280,7 @@ bool OpenGLDisplay::initialize()
 	if( theApp.videoOption <= VIDEO_4X )
 		AdjustWindowRectEx( &theApp.dest, style, TRUE, styleEx );
 	else
-		AdjustWindowRectEx( &theApp.dest, style, FALSE, styleEx );    
+		AdjustWindowRectEx( &theApp.dest, style, FALSE, styleEx );
 
 	int winSizeX = theApp.dest.right - theApp.dest.left;
 	int winSizeY = theApp.dest.bottom - theApp.dest.top;
@@ -306,12 +306,12 @@ bool OpenGLDisplay::initialize()
 		x,y,winSizeX,winSizeY,
 		NULL,
 		0 );
-	
+
 	if (!(HWND)*pWnd) {
 		winlog("Error creating Window %08x\n", GetLastError());
 		return FALSE;
 	}
-	
+
 	theApp.updateMenuBar();
 	theApp.adjustDestRect();
 	theApp.mode320Available = FALSE;
@@ -346,19 +346,19 @@ bool OpenGLDisplay::initialize()
 	systemBlueShift = 19;
 	systemColorDepth = 32;
 	theApp.fsColorDepth = 32;
-	
+
 	Init_2xSaI(32);
-	
+
 	utilUpdateSystemColorMaps();
 	theApp.updateFilter();
 	theApp.updateIFB();
-	
+
 	if(failed)
 		return false;
-	
+
 	pWnd->DragAcceptFiles(TRUE);
 
-	return TRUE;  
+	return TRUE;
 }
 
 
@@ -384,7 +384,7 @@ void OpenGLDisplay::render()
 
 	int pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
 	u8 *data = pix + ( theApp.sizeX + 1 ) * 4;
-	
+
 	// apply pixel filter
 	if(theApp.filterFunction) {
 		data = filterData;
@@ -400,7 +400,7 @@ void OpenGLDisplay::render()
 
 	// Texturemap complete texture to surface
 	// so we have free scaling and antialiasing
-	
+
 	if( theApp.filterFunction ) {
 		glPixelStorei( GL_UNPACK_ROW_LENGTH, width);
 	} else {
@@ -434,7 +434,7 @@ void OpenGLDisplay::render()
 		glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
 
 		glEnd();
-	} 
+	}
 	if(theApp.glType == 1)
 	{
 		glBegin( GL_QUADS );
@@ -473,7 +473,7 @@ void OpenGLDisplay::render()
 		glEnd();
 	}
 
-	
+
 	if( theApp.showSpeed ) { // && ( theApp.videoOption > VIDEO_4X ) ) {
 		char buffer[30];
 		if( theApp.showSpeed == 1 ) {
@@ -515,7 +515,7 @@ void OpenGLDisplay::render()
 	SwapBuffers( hDC );
 	// since OpenGL draws on the back buffer,
 	// we have to swap it to the front buffer to see it
-	
+
 	// draw informations with GDI on the front buffer
 }
 
@@ -539,7 +539,7 @@ void OpenGLDisplay::updateFiltering( int value )
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		break;
 	}
-	
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 }
@@ -610,7 +610,7 @@ bool OpenGLDisplay::initializeTexture( int w, int h )
 
 	width = w;
 	height = h;
-	
+
 	return ( glGetError() == GL_NO_ERROR) ? true : false;
 }
 
@@ -618,7 +618,7 @@ bool OpenGLDisplay::initializeTexture( int w, int h )
 void OpenGLDisplay::setVSync( int interval )
 {
 	const char *extensions = (const char *)glGetString( GL_EXTENSIONS );
-	
+
 	if( strstr( extensions, "WGL_EXT_swap_control" ) == 0 ) {
 		winlog( "Error: WGL_EXT_swap_control extension not supported on your computer.\n" );
 		return;
@@ -639,7 +639,7 @@ bool OpenGLDisplay::changeRenderSize( int w, int h )
 			glDeleteTextures( 1, &texture );
 			texture = 0;
 		}
-		
+
 		if( !initializeTexture( w, h ) ) {
 			failed = true;
 			return false;
@@ -649,7 +649,7 @@ bool OpenGLDisplay::changeRenderSize( int w, int h )
 		filterData = (u8 *)malloc(4*w*h);
 
 	}
-	
+
 	return true;
 }
 

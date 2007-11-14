@@ -61,22 +61,22 @@ BEGIN_MESSAGE_MAP(Throttle, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // Throttle message handlers
 
-BOOL Throttle::OnInitDialog() 
+BOOL Throttle::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void Throttle::OnCancel() 
+void Throttle::OnCancel()
 {
   EndDialog(false);
 }
 
-void Throttle::OnOk() 
+void Throttle::OnOk()
 {
   UpdateData();
 

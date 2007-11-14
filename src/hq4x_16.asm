@@ -890,19 +890,19 @@ NEWSYM hq4x_16
     mov     ebx,[nextline]
     movq    mm7,[esi+ebx]
     movd    eax,mm5
-    movzx   edx,ax  
+    movzx   edx,ax
     mov     [w1],edx
     mov     [w2],edx
     shr     eax,16
     mov     [w3],eax
     movd    eax,mm6
-    movzx   edx,ax  
+    movzx   edx,ax
     mov     [w4],edx
     mov     [w5],edx
     shr     eax,16
     mov     [w6],eax
     movd    eax,mm7
-    movzx   edx,ax  
+    movzx   edx,ax
     mov     [w7],edx
     mov     [w8],edx
     shr     eax,16
@@ -915,31 +915,31 @@ NEWSYM hq4x_16
     mov     ebx,[nextline]
     movq    mm7,[esi+ebx-2]
     movd    eax,mm5
-    movzx   edx,ax  
+    movzx   edx,ax
     mov     [w1],edx
     shr     eax,16
     mov     [w2],eax
     psrlq   mm5,32
     movd    eax,mm5
-    movzx   edx,ax  
+    movzx   edx,ax
     mov     [w3],edx
     movd    eax,mm6
-    movzx   edx,ax  
+    movzx   edx,ax
     mov     [w4],edx
     shr     eax,16
     mov     [w5],eax
     psrlq   mm6,32
     movd    eax,mm6
-    movzx   edx,ax  
+    movzx   edx,ax
     mov     [w6],edx
     movd    eax,mm7
-    movzx   edx,ax  
+    movzx   edx,ax
     mov     [w7],edx
     shr     eax,16
     mov     [w8],eax
     psrlq   mm7,32
     movd    eax,mm7
-    movzx   edx,ax  
+    movzx   edx,ax
     mov     [w9],edx
 .flags
     mov     ebx,RGBtoYUV
@@ -3870,19 +3870,19 @@ NEWSYM hq4x_16
     psrlq   mm6,32
     psrlq   mm7,32
     movd    eax,mm5
-    movzx   edx,ax  
+    movzx   edx,ax
     mov     [w1],edx
     shr     eax,16
     mov     [w2],eax
     mov     [w3],eax
     movd    eax,mm6
-    movzx   edx,ax  
+    movzx   edx,ax
     mov     [w4],edx
     shr     eax,16
     mov     [w5],eax
     mov     [w6],eax
     movd    eax,mm7
-    movzx   edx,ax  
+    movzx   edx,ax
     mov     [w7],edx
     shr     eax,16
     mov     [w8],eax

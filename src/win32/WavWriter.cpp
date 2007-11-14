@@ -100,7 +100,7 @@ void WavWriter::SetFormat(const WAVEFORMATEX *format)
   // start data header
   u8 data2[4] = { 'd', 'a', 't', 'a' };
   fwrite(data2, 1, 4, m_file);
-  
+
   m_posSize = ftell(m_file);
   // write 0 for data chunk size. Filled out during Close()
   utilPutDword(data, 0);

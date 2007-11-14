@@ -31,7 +31,7 @@
 
 extern int emulating;
 
-void MainWnd::OnCheatsSearchforcheats() 
+void MainWnd::OnCheatsSearchforcheats()
 {
   theApp.winCheckFullscreen();
   if(theApp.cartridgeType == 0) {
@@ -43,12 +43,12 @@ void MainWnd::OnCheatsSearchforcheats()
   }
 }
 
-void MainWnd::OnUpdateCheatsSearchforcheats(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateCheatsSearchforcheats(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(emulating);
 }
 
-void MainWnd::OnCheatsCheatlist() 
+void MainWnd::OnCheatsCheatlist()
 {
   theApp.winCheckFullscreen();
   if(theApp.cartridgeType == 0) {
@@ -60,22 +60,22 @@ void MainWnd::OnCheatsCheatlist()
   }
 }
 
-void MainWnd::OnUpdateCheatsCheatlist(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateCheatsCheatlist(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(emulating);
 }
 
-void MainWnd::OnCheatsAutomaticsaveloadcheats() 
+void MainWnd::OnCheatsAutomaticsaveloadcheats()
 {
   theApp.autoSaveLoadCheatList = !theApp.autoSaveLoadCheatList;
 }
 
-void MainWnd::OnUpdateCheatsAutomaticsaveloadcheats(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateCheatsAutomaticsaveloadcheats(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(theApp.autoSaveLoadCheatList);
 }
 
-void MainWnd::OnCheatsLoadcheatlist() 
+void MainWnd::OnCheatsLoadcheatlist()
 {
   theApp.winCheckFullscreen();
   CString buffer;
@@ -109,12 +109,12 @@ void MainWnd::OnCheatsLoadcheatlist()
   }
 }
 
-void MainWnd::OnUpdateCheatsLoadcheatlist(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateCheatsLoadcheatlist(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(emulating);
 }
 
-void MainWnd::OnCheatsSavecheatlist() 
+void MainWnd::OnCheatsSavecheatlist()
 {
   theApp.winCheckFullscreen();
   CString buffer;
@@ -148,17 +148,17 @@ void MainWnd::OnCheatsSavecheatlist()
   }
 }
 
-void MainWnd::OnUpdateCheatsSavecheatlist(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateCheatsSavecheatlist(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(emulating);
 }
 
-void MainWnd::OnCheatsDisablecheats() 
+void MainWnd::OnCheatsDisablecheats()
 {
   cheatsEnabled = !cheatsEnabled;
 }
 
-void MainWnd::OnUpdateCheatsDisablecheats(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateCheatsDisablecheats(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(!cheatsEnabled);
 }

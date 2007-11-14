@@ -41,7 +41,7 @@ class PaletteViewControl : public CWnd
   int selected;
  protected:
   u16 palette[256];
-  int paletteAddress;  
+  int paletteAddress;
   // Construction
  public:
   PaletteViewControl();

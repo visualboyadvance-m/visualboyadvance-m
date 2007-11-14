@@ -63,7 +63,7 @@ static GUID                *gpSelectedDriverGUID;
 // Desc: This call back is used to determine the existing available DDraw
 //       devices, so the user can pick which one to run on.
 //-----------------------------------------------------------------------------
-BOOL WINAPI 
+BOOL WINAPI
 DDEnumCallbackEx(GUID *pGUID, LPSTR pDescription, LPSTR pName, LPVOID pContext, HMONITOR hm)
 {
   if (pGUID)
@@ -92,7 +92,7 @@ DDEnumCallbackEx(GUID *pGUID, LPSTR pDescription, LPSTR pName, LPVOID pContext, 
 // Name: DDEnumCallback()
 // Desc: This callback is used only with old versions of DDraw.
 //-----------------------------------------------------------------------------
-BOOL WINAPI 
+BOOL WINAPI
 DDEnumCallback(GUID *pGUID, LPSTR pDescription, LPSTR pName, LPVOID context)
 {
   return (DDEnumCallbackEx(pGUID, pDescription, pName, context, NULL));
@@ -102,7 +102,7 @@ static HRESULT WINAPI addVideoMode(LPDDSURFACEDESC2 surf, LPVOID lpContext)
 {
 	HWND h = (HWND)lpContext;
 	char buffer[50];
-	
+
 	switch( surf->ddpfPixelFormat.dwRGBBitCount )
 	{
 	case 16:
@@ -137,46 +137,46 @@ int winVideoModeSelect(CWnd *pWnd, GUID **guid)
 #else
   HMODULE h = LoadLibrary( _T("ddraw.dll") );
 #endif
- 
+
   // If ddraw.dll doesn't exist in the search path,
   // then DirectX probably isn't installed, so fail.
   if (!h)
     return -1;
-  
+
   gDriverCnt = 0;
-  
+
   // Note that you must know which version of the
   // function to retrieve (see the following text).
   // For this example, we use the ANSI version.
   LPDIRECTDRAWENUMERATEEX lpDDEnumEx;
   lpDDEnumEx = (LPDIRECTDRAWENUMERATEEX)
     GetProcAddress(h,"DirectDrawEnumerateExA");
- 
-  // If the function is there, call it to enumerate all display 
+
+  // If the function is there, call it to enumerate all display
   // devices attached to the desktop, and any non-display DirectDraw
   // devices.
   if (lpDDEnumEx)
-    lpDDEnumEx(DDEnumCallbackEx, NULL, 
+    lpDDEnumEx(DDEnumCallbackEx, NULL,
                DDENUM_ATTACHEDSECONDARYDEVICES |
-               DDENUM_NONDISPLAYDEVICES 
+               DDENUM_NONDISPLAYDEVICES
                );
   else {
     /*
      * We must be running on an old version of DirectDraw.
      * Therefore MultiMon isn't supported. Fall back on
-     * DirectDrawEnumerate to enumerate standard devices on a 
+     * DirectDrawEnumerate to enumerate standard devices on a
      * single-monitor system.
      */
     BOOL (WINAPI *lpDDEnum)(LPDDENUMCALLBACK, LPVOID);
-    
+
     lpDDEnum = (BOOL (WINAPI *)(LPDDENUMCALLBACK, LPVOID))
       GetProcAddress(h, "DirectDrawEnumerateA");
     if(lpDDEnum)
       lpDDEnum(DDEnumCallback,NULL);
-    
+
     /* Note that it could be handy to let the OldCallback function
-     * be a wrapper for a DDEnumCallbackEx. 
-     * 
+     * be a wrapper for a DDEnumCallbackEx.
+     *
      * Such a function would look like:
      *    BOOL FAR PASCAL OldCallback(GUID FAR *lpGUID,
      *                                LPSTR pDesc,
@@ -201,12 +201,12 @@ int winVideoModeSelect(CWnd *pWnd, GUID **guid)
 #else
       FreeLibrary( h );
 #endif
-      
+
       return -1;
     }
   }
 
-  HRESULT (WINAPI *DDrawCreateEx)(GUID *,LPVOID *,REFIID,IUnknown *);  
+  HRESULT (WINAPI *DDrawCreateEx)(GUID *,LPVOID *,REFIID,IUnknown *);
   DDrawCreateEx = (HRESULT (WINAPI *)(GUID *,LPVOID *,REFIID,IUnknown *))
     GetProcAddress(h, "DirectDrawCreateEx");
 
@@ -234,8 +234,8 @@ int winVideoModeSelect(CWnd *pWnd, GUID **guid)
     FreeLibrary( h );
 #endif
     return -1;
-  }  
-  
+  }
+
   VideoMode dlg(ddraw, pWnd);
 
   INT_PTR res = dlg.DoModal();
@@ -291,19 +291,19 @@ BEGIN_MESSAGE_MAP(VideoMode, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // VideoMode message handlers
 
-void VideoMode::OnSelchangeModes() 
+void VideoMode::OnSelchangeModes()
 {
   int item = m_modes.GetCurSel();
 
   GetDlgItem(ID_OK)->EnableWindow(item != -1);
 }
 
-void VideoMode::OnCancel() 
+void VideoMode::OnCancel()
 {
   EndDialog(-1);
 }
 
-void VideoMode::OnOk() 
+void VideoMode::OnOk()
 {
   DWORD_PTR cur = m_modes.GetCurSel();
 
@@ -313,18 +313,18 @@ void VideoMode::OnOk()
   EndDialog((int)cur);
 }
 
-BOOL VideoMode::OnInitDialog() 
+BOOL VideoMode::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   // check for available fullscreen modes
   pDirectDraw->EnumDisplayModes(
 	  DDEDM_STANDARDVGAMODES,
 	  NULL,
 	  m_modes.m_hWnd,
 	  addVideoMode);
-  
-  GetDlgItem(ID_OK)->EnableWindow(FALSE);      
+
+  GetDlgItem(ID_OK)->EnableWindow(FALSE);
   CenterWindow();
 
   return TRUE;  // return TRUE unless you set the focus to a control
@@ -364,32 +364,32 @@ BEGIN_MESSAGE_MAP(VideoDriverSelect, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // VideoDriverSelect message handlers
 
-void VideoDriverSelect::OnCancel() 
+void VideoDriverSelect::OnCancel()
 {
   EndDialog(-1);
 }
 
-void VideoDriverSelect::OnOk() 
+void VideoDriverSelect::OnOk()
 {
   EndDialog(m_drivers.GetCurSel());
 }
 
-BOOL VideoDriverSelect::OnInitDialog() 
+BOOL VideoDriverSelect::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   for(int i = 0; i < gDriverCnt; i++) {
     m_drivers.AddString(Drivers[i].szDescription);
   }
-  
-  GetDlgItem(ID_OK)->EnableWindow(FALSE);      
+
+  GetDlgItem(ID_OK)->EnableWindow(FALSE);
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void VideoDriverSelect::OnSelchangeDrivers() 
+void VideoDriverSelect::OnSelchangeDrivers()
 {
 	GetDlgItem(ID_OK)->EnableWindow(m_drivers.GetCurSel() != -1);
 }
