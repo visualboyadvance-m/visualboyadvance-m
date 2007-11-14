@@ -23,32 +23,32 @@
 void mode3RenderLine()
 {
   u16 *palette = (u16 *)paletteRAM;
-  
+
   if(DISPCNT & 0x80) {
     for(int x = 0; x < 240; x++) {
       lineMix[x] = 0x7fff;
     }
-    gfxLastVCOUNT = VCOUNT;    
+    gfxLastVCOUNT = VCOUNT;
     return;
   }
 
   if(layerEnable & 0x0400) {
     int changed = gfxBG2Changed;
-    
+
     if(gfxLastVCOUNT > VCOUNT)
       changed = 3;
-    
+
     gfxDrawRotScreen16Bit(BG2CNT, BG2X_L, BG2X_H,
                           BG2Y_L, BG2Y_H, BG2PA, BG2PB,
                           BG2PC, BG2PD,
-                          gfxBG2X, gfxBG2Y, changed,                      
+                          gfxBG2X, gfxBG2Y, changed,
                           line2);
   }
 
   gfxDrawSprites(lineOBJ);
 
   u32 background = (READ16LE(&palette[0]) | 0x30000000);
-  
+
   for(int x = 0; x < 240; x++) {
     u32 color = background;
     u8 top = 0x20;
@@ -67,12 +67,12 @@ void mode3RenderLine()
       // semi-transparent OBJ
       u32 back = background;
       u8 top2 = 0x20;
-      
+
       if(line2[x] < back) {
         back = line2[x];
         top2 = 0x04;
       }
-      
+
       if(top2 & (BLDMOD>>8))
         color = gfxAlphaBlend(color, back,
                               coeff[COLEV & 0x1F],
@@ -87,25 +87,25 @@ void mode3RenderLine()
           if(BLDMOD & top)
             color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
           break;
-        }         
+        }
       }
-    }    
-      
+    }
+
     lineMix[x] = color;
   }
   gfxBG2Changed = 0;
-  gfxLastVCOUNT = VCOUNT;      
+  gfxLastVCOUNT = VCOUNT;
 }
 
 void mode3RenderLineNoWindow()
 {
   u16 *palette = (u16 *)paletteRAM;
-  
+
   if(DISPCNT & 0x80) {
     for(int x = 0; x < 240; x++) {
       lineMix[x] = 0x7fff;
     }
-    gfxLastVCOUNT = VCOUNT;    
+    gfxLastVCOUNT = VCOUNT;
     return;
   }
 
@@ -114,18 +114,18 @@ void mode3RenderLineNoWindow()
 
     if(gfxLastVCOUNT > VCOUNT)
       changed = 3;
-    
+
     gfxDrawRotScreen16Bit(BG2CNT, BG2X_L, BG2X_H,
                           BG2Y_L, BG2Y_H, BG2PA, BG2PB,
                           BG2PC, BG2PD,
-                          gfxBG2X, gfxBG2Y, changed,                      
+                          gfxBG2X, gfxBG2Y, changed,
                           line2);
   }
 
   gfxDrawSprites(lineOBJ);
 
   u32 background = (READ16LE(&palette[0]) | 0x30000000);
-  
+
   for(int x = 0; x < 240; x++) {
     u32 color = background;
     u8 top = 0x20;
@@ -149,26 +149,26 @@ void mode3RenderLineNoWindow()
           if(top & BLDMOD) {
             u32 back = background;
             u8 top2 = 0x20;
-            
+
             if(line2[x] < back) {
               if(top != 0x04) {
                 back = line2[x];
                 top2 = 0x04;
               }
             }
-            
+
             if((u8)(lineOBJ[x]>>24) < (u8)(back >> 24)) {
               if(top != 0x10) {
                 back = lineOBJ[x];
                 top2 = 0x10;
               }
             }
-            
+
             if(top2 & (BLDMOD>>8))
               color = gfxAlphaBlend(color, back,
                                     coeff[COLEV & 0x1F],
                                     coeff[(COLEV >> 8) & 0x1F]);
-            
+
           }
         }
         break;
@@ -185,12 +185,12 @@ void mode3RenderLineNoWindow()
       // semi-transparent OBJ
       u32 back = background;
       u8 top2 = 0x20;
-      
+
       if(line2[x] < back) {
         back = line2[x];
         top2 = 0x04;
       }
-      
+
       if(top2 & (BLDMOD>>8))
         color = gfxAlphaBlend(color, back,
                               coeff[COLEV & 0x1F],
@@ -205,25 +205,25 @@ void mode3RenderLineNoWindow()
           if(BLDMOD & top)
             color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
           break;
-        }         
+        }
       }
-    }    
-      
+    }
+
     lineMix[x] = color;
   }
   gfxBG2Changed = 0;
-  gfxLastVCOUNT = VCOUNT;  
+  gfxLastVCOUNT = VCOUNT;
 }
 
 void mode3RenderLineAll()
 {
   u16 *palette = (u16 *)paletteRAM;
-  
+
   if(DISPCNT & 0x80) {
     for(int x = 0; x < 240; x++) {
       lineMix[x] = 0x7fff;
     }
-    gfxLastVCOUNT = VCOUNT;    
+    gfxLastVCOUNT = VCOUNT;
     return;
   }
 
@@ -242,35 +242,35 @@ void mode3RenderLineAll()
   if(layerEnable & 0x4000) {
     u8 v0 = WIN1V >> 8;
     u8 v1 = WIN1V & 255;
-    inWindow1 = ((v0 == v1) && (v0 >= 0xe8));    
+    inWindow1 = ((v0 == v1) && (v0 >= 0xe8));
     if(v1 >= v0)
       inWindow1 |= (VCOUNT >= v0 && VCOUNT < v1);
     else
       inWindow1 |= (VCOUNT >= v0 || VCOUNT < v1);
   }
-  
+
   if(layerEnable & 0x0400) {
     int changed = gfxBG2Changed;
 
     if(gfxLastVCOUNT > VCOUNT)
       changed = 3;
-    
+
     gfxDrawRotScreen16Bit(BG2CNT, BG2X_L, BG2X_H,
                           BG2Y_L, BG2Y_H, BG2PA, BG2PB,
                           BG2PC, BG2PD,
-                          gfxBG2X, gfxBG2Y, changed,                      
+                          gfxBG2X, gfxBG2Y, changed,
                           line2);
   }
 
   gfxDrawSprites(lineOBJ);
   gfxDrawOBJWin(lineOBJWin);
-  
+
   u8 inWin0Mask = WININ & 0xFF;
   u8 inWin1Mask = WININ >> 8;
   u8 outMask = WINOUT & 0xFF;
 
   u32 background = (READ16LE(&palette[0]) | 0x30000000);
-  
+
   for(int x = 0; x < 240; x++) {
     u32 color = background;
     u8 top = 0x20;
@@ -290,7 +290,7 @@ void mode3RenderLineAll()
         mask = inWin0Mask;
       }
     }
-    
+
     if((mask & 4) && (line2[x] < color)) {
       color = line2[x];
       top = 0x04;
@@ -311,26 +311,26 @@ void mode3RenderLineAll()
             if(top & BLDMOD) {
               u32 back = background;
               u8 top2 = 0x20;
-              
+
               if((mask & 4) && line2[x] < back) {
                 if(top != 0x04) {
                   back = line2[x];
                   top2 = 0x04;
                 }
               }
-              
+
               if((mask & 16) && (u8)(lineOBJ[x]>>24) < (u8)(back >> 24)) {
                 if(top != 0x10) {
                   back = lineOBJ[x];
                   top2 = 0x10;
                 }
               }
-              
+
               if(top2 & (BLDMOD>>8))
                 color = gfxAlphaBlend(color, back,
                                       coeff[COLEV & 0x1F],
                                       coeff[(COLEV >> 8) & 0x1F]);
-              
+
             }
           }
           break;
@@ -347,12 +347,12 @@ void mode3RenderLineAll()
         // semi-transparent OBJ
         u32 back = background;
         u8 top2 = 0x20;
-        
+
         if((mask & 4) && line2[x] < back) {
           back = line2[x];
           top2 = 0x04;
         }
-        
+
         if(top2 & (BLDMOD>>8))
           color = gfxAlphaBlend(color, back,
                                 coeff[COLEV & 0x1F],
@@ -367,19 +367,19 @@ void mode3RenderLineAll()
             if(BLDMOD & top)
               color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
             break;
-          }       
-        }       
+          }
+        }
       }
     } else if(color & 0x00010000) {
       // semi-transparent OBJ
       u32 back = background;
       u8 top2 = 0x20;
-      
+
       if((mask & 4) && line2[x] < back) {
         back = line2[x];
         top2 = 0x04;
       }
-      
+
       if(top2 & (BLDMOD>>8))
         color = gfxAlphaBlend(color, back,
                               coeff[COLEV & 0x1F],
@@ -394,12 +394,12 @@ void mode3RenderLineAll()
           if(BLDMOD & top)
             color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
           break;
-        }         
-      }       
+        }
+      }
     }
-      
+
     lineMix[x] = color;
   }
   gfxBG2Changed = 0;
-  gfxLastVCOUNT = VCOUNT;  
+  gfxLastVCOUNT = VCOUNT;
 }

@@ -14,7 +14,7 @@
 
 #line 1 "expr.y"
 
-namespace std {  
+namespace std {
 #include <stdio.h>
 #include <memory.h>
 #include <stdlib.h>
@@ -22,16 +22,16 @@ namespace std {
 }
 
 using namespace std;
- 
+
 #include "System.h"
 #include "elf.h"
-#include "exprNode.h" 
+#include "exprNode.h"
 
 extern int yyerror(char *);
-extern int yylex(); 
+extern int yylex();
 extern char *yytext;
 
-  
+
 //#define YYERROR_VERBOSE 1
 //#define YYDEBUG 1
 

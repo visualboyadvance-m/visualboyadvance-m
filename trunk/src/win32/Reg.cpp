@@ -62,14 +62,14 @@ char *regQueryStringValue(const char * key, char *def)
   if(regEnabled) {
     DWORD type = 0;
     DWORD size = 2048;
-    
+
     LONG res = RegQueryValueEx(vbKey,
                                key,
                                NULL,
                                &type,
                                (UCHAR *)buffer,
                                &size);
-    
+
     if(res == ERROR_SUCCESS && type == REG_SZ)
       return buffer;
 
@@ -95,14 +95,14 @@ DWORD regQueryDwordValue(const char * key, DWORD def, bool force)
     DWORD type = 0;
     DWORD size = sizeof(DWORD);
     DWORD result = 0;
-    
+
     LONG res = RegQueryValueEx(vbKey,
                                key,
                                NULL,
                                &type,
                                (UCHAR *)&result,
                                &size);
-    
+
     if(res == ERROR_SUCCESS && type == REG_DWORD)
       return result;
 
@@ -121,15 +121,15 @@ BOOL regQueryBinaryValue(const char * key, char *value, int count)
     DWORD type = 0;
     DWORD size = count;
     DWORD result = 0;
-    
-    
+
+
     LONG res = RegQueryValueEx(vbKey,
                                key,
                                NULL,
                                &type,
                                (UCHAR *)value,
                                &size);
-    
+
     if(res == ERROR_SUCCESS && type == REG_BINARY)
       return TRUE;
 
@@ -198,12 +198,12 @@ void regSetBinaryValue(const char *key, char *value, int count)
     CString k = key;
     k += "Count";
     wsprintf(buffer, "%u", count);
-    
+
     WritePrivateProfileString(VBA_PREF,
                               k,
                               buffer,
                               *regVbaPath);
-                           
+
     WritePrivateProfileStruct(VBA_PREF,
                               key,
                               value,
@@ -292,7 +292,7 @@ bool regAssociateType(const char *type, const char *desc, const char *applicatio
       RegCloseKey(key);
       return true;
     }
-    
+
     RegCloseKey(key);
   }
   return false;
@@ -314,7 +314,7 @@ static void regExportSettingsToINI(HKEY key, const char *section)
                             &type,
                             (LPBYTE)buffer,
                             &size);
-      
+
     if(res == ERROR_SUCCESS) {
       switch(type) {
       case REG_DWORD:
@@ -336,7 +336,7 @@ static void regExportSettingsToINI(HKEY key, const char *section)
       case REG_BINARY:
         {
           char temp[256];
-          
+
           wsprintf(temp, "%u", size);
           CString k = valueName;
           k += "Count";
@@ -359,14 +359,14 @@ static void regExportSettingsToINI(HKEY key, const char *section)
 }
 
 void regExportSettingsToINI()
-{ 
+{
   if(vbKey != NULL) {
     regExportSettingsToINI(vbKey, VBA_PREF);
   }
 
   HKEY key;
 
-  if(RegOpenKey(HKEY_CURRENT_USER, 
+  if(RegOpenKey(HKEY_CURRENT_USER,
                 "Software\\Emulators\\VisualBoyAdvance\\Viewer", &key) ==
      ERROR_SUCCESS) {
     regExportSettingsToINI(key, "Viewer");

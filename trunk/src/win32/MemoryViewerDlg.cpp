@@ -73,14 +73,14 @@ void GBAMemoryViewer::readData(u32 address, int len, u8 *data)
     for(int i = 0; i < len; i++) {
       *data++ = 0;
       address++;
-    }    
+    }
   }
 }
 
 void GBAMemoryViewer::editData(u32 address, int size, int mask, u32 value)
 {
   u32 oldValue;
-  
+
   switch(size) {
   case 8:
     oldValue = (CPUReadByteQuick(address) & mask) | value;
@@ -143,10 +143,10 @@ BEGIN_MESSAGE_MAP(MemoryViewerDlg, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // MemoryViewerDlg message handlers
 
-BOOL MemoryViewerDlg::OnInitDialog() 
+BOOL MemoryViewerDlg::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_ENTRY( IDC_VIEWER, DS_SizeX | DS_SizeY )
     DIALOG_SIZER_ENTRY( IDC_REFRESH, DS_MoveY)
@@ -162,7 +162,7 @@ BOOL MemoryViewerDlg::OnInitDialog()
             HKEY_CURRENT_USER,
             "Software\\Emulators\\VisualBoyAdvance\\Viewer\\MemoryView",
             NULL);
-  
+
   m_viewer.setDialog(this);
   m_viewer.ShowScrollBar(SB_VERT, TRUE);
   m_viewer.EnableScrollBar(SB_VERT, ESB_ENABLE_BOTH);
@@ -185,18 +185,18 @@ BOOL MemoryViewerDlg::OnInitDialog()
 
   RECT cbSize;
   int Height;
-  
+
   m_addresses.GetClientRect(&cbSize);
   Height = m_addresses.GetItemHeight(-1);
   Height += m_addresses.GetItemHeight(0) * (9);
-  
+
   // Note: The use of SM_CYEDGE assumes that we're using Windows '95
   // Now add on the height of the border of the edit box
   Height += GetSystemMetrics(SM_CYEDGE) * 2;  // top & bottom edges
-  
+
   // The height of the border of the drop-down box
   Height += GetSystemMetrics(SM_CYEDGE) * 2;  // top & bottom edges
-  
+
   // now set the size of the window
   m_addresses.SetWindowPos(NULL,
                            0, 0,
@@ -212,19 +212,19 @@ BOOL MemoryViewerDlg::OnInitDialog()
   UpdateData(FALSE);
 
   m_current.SetFont(CFont::FromHandle((HFONT)GetStockObject(SYSTEM_FIXED_FONT)));
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void MemoryViewerDlg::OnClose() 
+void MemoryViewerDlg::OnClose()
 {
   theApp.winRemoveUpdateListener(this);
-  
+
   DestroyWindow();
 }
 
-void MemoryViewerDlg::OnRefresh() 
+void MemoryViewerDlg::OnRefresh()
 {
   m_viewer.Invalidate();
 }
@@ -235,40 +235,40 @@ void MemoryViewerDlg::update()
 }
 
 
-void MemoryViewerDlg::On8Bit() 
+void MemoryViewerDlg::On8Bit()
 {
   m_viewer.setSize(0);
   regSetDwordValue("memViewerDataSize", 0);
 }
 
-void MemoryViewerDlg::On16Bit() 
+void MemoryViewerDlg::On16Bit()
 {
   m_viewer.setSize(1);
   regSetDwordValue("memViewerDataSize", 1);
 }
 
-void MemoryViewerDlg::On32Bit() 
+void MemoryViewerDlg::On32Bit()
 {
   m_viewer.setSize(2);
   regSetDwordValue("memViewerDataSize", 2);
 }
 
-void MemoryViewerDlg::OnAutoUpdate() 
+void MemoryViewerDlg::OnAutoUpdate()
 {
   autoUpdate = !autoUpdate;
   if(autoUpdate) {
     theApp.winAddUpdateListener(this);
   } else {
-    theApp.winRemoveUpdateListener(this);    
-  }  
+    theApp.winRemoveUpdateListener(this);
+  }
 }
 
-void MemoryViewerDlg::OnGo() 
+void MemoryViewerDlg::OnGo()
 {
   CString buffer;
-  
+
   m_address.GetWindowText(buffer);
-  
+
   u32 address;
   sscanf(buffer, "%x", &address);
   if(m_viewer.getSize() == 1)
@@ -278,10 +278,10 @@ void MemoryViewerDlg::OnGo()
   m_viewer.setAddress(address);
 }
 
-void MemoryViewerDlg::OnSelchangeAddresses() 
+void MemoryViewerDlg::OnSelchangeAddresses()
 {
   int cur = m_addresses.GetCurSel();
-  
+
   switch(cur) {
   case 0:
     m_viewer.setAddress(0);
@@ -318,7 +318,7 @@ void MemoryViewerDlg::setCurrentAddress(u32 address)
   m_current.SetWindowText(buffer);
 }
 
-void MemoryViewerDlg::OnSave() 
+void MemoryViewerDlg::OnSave()
 {
   if(rom != NULL)
   {
@@ -328,7 +328,7 @@ void MemoryViewerDlg::OnSave()
     dlg.setAddress(m_viewer.getCurrentAddress());
 
     LPCTSTR exts[] = { ".dmp" };
-  
+
     if(dlg.DoModal() == IDOK) {
       CString filter = theApp.winLoadFilter(IDS_FILTER_DUMP);
       CString title = winResLoadString(IDS_SELECT_DUMP_FILE);
@@ -340,13 +340,13 @@ void MemoryViewerDlg::OnSave()
                    "DMP",
                    exts,
                    "",
-                   title, 
+                   title,
                    true);
       if(file.DoModal() == IDOK) {
         buffer = file.GetPathName();
 
         FILE *f = fopen(buffer, "wb");
-      
+
         if(f == NULL) {
           systemMessage(IDS_ERROR_CREATING_FILE, buffer);
           return;
@@ -366,7 +366,7 @@ void MemoryViewerDlg::OnSave()
   }
 }
 
-void MemoryViewerDlg::OnLoad() 
+void MemoryViewerDlg::OnLoad()
 {
   if(rom != NULL)
   {
@@ -385,7 +385,7 @@ void MemoryViewerDlg::OnLoad()
                  "",
                  title,
                  false);
-  
+
     if(file.DoModal() == IDOK) {
       buffer = file.GetPathName();
       FILE *f = fopen(buffer, "rb");
@@ -395,17 +395,17 @@ void MemoryViewerDlg::OnLoad()
                       buffer);
         return;
       }
-    
-      MemoryViewerAddressSize dlg;    
+
+      MemoryViewerAddressSize dlg;
 
       fseek(f, 0, SEEK_END);
       int size = ftell(f);
 
       fseek(f, 0, SEEK_SET);
-    
+
       dlg.setAddress(m_viewer.getCurrentAddress());
       dlg.setSize(size);
-    
+
       if(dlg.DoModal() == IDOK) {
         int size = dlg.getSize();
         u32 addr = dlg.getAddress();
@@ -419,12 +419,12 @@ void MemoryViewerDlg::OnLoad()
         }
         OnRefresh();
       }
-      fclose(f);    
+      fclose(f);
     }
   }
 }
 
-void MemoryViewerDlg::PostNcDestroy() 
+void MemoryViewerDlg::PostNcDestroy()
 {
   delete this;
 }

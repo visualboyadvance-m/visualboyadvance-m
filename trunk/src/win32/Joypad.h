@@ -38,7 +38,7 @@ public:
   JoypadEditControl();
 
   KeyList m_Keys;
- 
+
   // Attributes
  public:
 

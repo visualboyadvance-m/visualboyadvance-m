@@ -93,11 +93,11 @@ void lrsLpFilter(double c[], int N, double frq, double Beta, int Num)
       c[i] = sin(2.0*temp*frq)/temp; /* Analog sinc function, cutoff = frq */
    }
 
-   /* 
+   /*
     * Calculate and Apply Kaiser window to ideal lowpass filter.
     * Note: last window value is IBeta which is NOT zero.
     * You're supposed to really truncate the window here, not ramp
-    * it to zero. This helps reduce the first sidelobe. 
+    * it to zero. This helps reduce the first sidelobe.
     */
    IBeta = 1.0/Izero(Beta);
    inm1 = 1.0/((double)(N-1));
@@ -125,7 +125,7 @@ float lrsFilterUp(float Imp[],  /* impulse response */
    float v, t;
 
    Ph *= Npc; /* Npc is number of values per 1/delta in impulse response */
-   
+
    v = 0.0; /* The output value */
    Hp = &Imp[(int)Ph];
    End = &Imp[Nwing];
@@ -153,8 +153,8 @@ float lrsFilterUp(float Imp[],  /* impulse response */
          v += t;			/* The filter output */
          Hp += Npc;		/* Filter coeff step */
          Xp += Inc;		/* Input signal step. NO CHECK ON BOUNDS */
-      } 
-   else 
+      }
+   else
       while (Hp < End) {
          t = *Hp;		/* Get filter coeff */
          t *= *Xp;		/* Mult coeff by input sample */
@@ -162,7 +162,7 @@ float lrsFilterUp(float Imp[],  /* impulse response */
          Hp += Npc;		/* Filter coeff step */
          Xp += Inc;		/* Input signal step. NO CHECK ON BOUNDS */
       }
-   
+
    return v;
 }
 
@@ -179,7 +179,7 @@ float lrsFilterUD(float Imp[],  /* impulse response */
    float *Hp, *Hdp, *End;
    float v, t;
    double Ho;
-    
+
    v = 0.0; /* The output value */
    Ho = Ph*dhb;
    End = &Imp[Nwing];
@@ -202,7 +202,7 @@ float lrsFilterUD(float Imp[],  /* impulse response */
          Ho += dhb;		/* IR step */
          Xp += Inc;		/* Input signal step. NO CHECK ON BOUNDS */
       }
-   else 
+   else
       while ((Hp = &Imp[(int)Ho]) < End) {
          t = *Hp;		/* Get IR sample */
          t *= *Xp;		/* Mult coeff by input sample */

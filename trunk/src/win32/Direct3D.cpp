@@ -89,13 +89,13 @@ public:
 	virtual bool changeRenderSize( int w, int h );
 	virtual void resize( int w, int h );
 	virtual void setOption( const char *option, int value );
-	virtual int  selectFullScreenMode( GUID ** );  
+	virtual int  selectFullScreenMode( GUID ** );
 };
 
 
 Direct3DDisplay::Direct3DDisplay()
 {
-	pD3D = NULL;  
+	pD3D = NULL;
 	pDevice = NULL;
 	screenFormat = D3DFMT_X8R8G8B8;
 	width = 0;
@@ -213,7 +213,7 @@ bool Direct3DDisplay::initialize()
 		}
 		break;
 	}
-	
+
 	theApp.rect.left = 0;
 	theApp.rect.top = 0;
 	theApp.rect.right = theApp.sizeX;
@@ -223,39 +223,39 @@ bool Direct3DDisplay::initialize()
 	theApp.dest.top = 0;
 	theApp.dest.right = theApp.surfaceSizeX;
 	theApp.dest.bottom = theApp.surfaceSizeY;
-	
+
 
 	DWORD style = WS_POPUP | WS_VISIBLE;
 	DWORD styleEx = 0;
-	
+
 	if(theApp.videoOption <= VIDEO_4X) {
 		style |= WS_OVERLAPPEDWINDOW;
 	} else {
 		styleEx = 0;
 	}
-	
+
 	if(theApp.videoOption <= VIDEO_4X) {
 		AdjustWindowRectEx(&theApp.dest, style, TRUE, styleEx);
 	} else {
-		AdjustWindowRectEx(&theApp.dest, style, FALSE, styleEx);    
+		AdjustWindowRectEx(&theApp.dest, style, FALSE, styleEx);
 	}
-	
+
 	int winSizeX = theApp.dest.right-theApp.dest.left;
 	int winSizeY = theApp.dest.bottom-theApp.dest.top;
-	
+
 	if(theApp.videoOption > VIDEO_4X) {
 		winSizeX = theApp.fsWidth;
 		winSizeY = theApp.fsHeight;
 	}
 
 	int x = 0, y = 0;
-	
+
 	if(theApp.videoOption <= VIDEO_4X) {
 		x = theApp.windowPositionX;
 		y = theApp.windowPositionY;
 	}
-	
-	
+
+
 	// Create a window
 	MainWnd *pWnd = new MainWnd;
 	theApp.m_pMainWnd = pWnd;
@@ -334,7 +334,7 @@ bool Direct3DDisplay::initialize()
 	  systemColorDepth = 16;
 	  systemRedShift = 11;
 	  systemGreenShift = 6;
-	  systemBlueShift = 0;    
+	  systemBlueShift = 0;
 	  Init_2xSaI(565);
 	  break;
   case D3DFMT_X1R5G5B5:
@@ -388,7 +388,7 @@ bool Direct3DDisplay::initialize()
 
 	if(failed) return false;
 
-	return TRUE;  
+	return TRUE;
 }
 
 
@@ -414,11 +414,11 @@ void Direct3DDisplay::render()
 	if( failed ) return;
 	if(!pDevice) return;
 	if( FAILED( pDevice->TestCooperativeLevel() ) ) return;
-	
+
 	clear();
-	
+
 	pDevice->BeginScene();
-	
+
 	// copy pix to emulatedImage and apply pixel filter if selected
 	HRESULT hr;
 	D3DLOCKED_RECT lr;
@@ -476,7 +476,7 @@ void Direct3DDisplay::render()
 		} else {
 			sprintf( buffer, "%3d%%(%d, %d fps)", systemSpeed, systemFrameSkip, theApp.showRenderedFrames );
 		}
-		
+
 		r.top = 4;
 		r.bottom = 20;
 		pFont->DrawText( NULL, buffer, -1, &r, 0, color );
@@ -605,7 +605,7 @@ void Direct3DDisplay::calculateDestRect()
 	}
 }
 
-	
+
 void Direct3DDisplay::setOption( const char *option, int value )
 {
 	if( !_tcscmp( option, _T("vsync") ) ) {

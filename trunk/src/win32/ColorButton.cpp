@@ -63,7 +63,7 @@ void ColorButton::PreSubclassWindow()
 void ColorButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
   ASSERT(lpDrawItemStruct);
-  
+
   int r = (color & 0x1f) << 3;
   int g = (color & 0x3e0) >> 2;
   int b = (color & 0x7c00) >> 7;
@@ -82,8 +82,8 @@ void ColorButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
     DrawEdge(dc, &rect, EDGE_RAISED, BF_RECT);
 
   InflateRect(&rect, -margins.cx, -margins.cy);
-  
-  HBRUSH br = CreateSolidBrush((state & ODS_DISABLED) ? 
+
+  HBRUSH br = CreateSolidBrush((state & ODS_DISABLED) ?
                                ::GetSysColor(COLOR_3DFACE) : RGB(r,g,b));
 
   FillRect(dc, &rect, br);
@@ -92,7 +92,7 @@ void ColorButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
     InflateRect(&rect, -1, -1);
     DrawFocusRect(dc, &rect);
   }
-  
+
   DeleteObject(br);
 }
 

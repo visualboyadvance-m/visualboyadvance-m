@@ -63,17 +63,17 @@ BEGIN_MESSAGE_MAP(GSACodeSelect, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // GSACodeSelect message handlers
 
-void GSACodeSelect::OnCancel() 
+void GSACodeSelect::OnCancel()
 {
   EndDialog(-1);
 }
 
-void GSACodeSelect::OnOk() 
+void GSACodeSelect::OnOk()
 {
   EndDialog(m_games.GetCurSel());
 }
 
-void GSACodeSelect::OnSelchangeGameList() 
+void GSACodeSelect::OnSelchangeGameList()
 {
   int item = m_games.GetCurSel();
   CWnd *ok = GetDlgItem(ID_OK);
@@ -81,12 +81,12 @@ void GSACodeSelect::OnSelchangeGameList()
   ok->EnableWindow(item != -1);
 }
 
-BOOL GSACodeSelect::OnInitDialog() 
+BOOL GSACodeSelect::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   char buffer[1024];
-  
+
   FILE *f = m_file;
   int games = 0;
   int len = 0;
@@ -99,7 +99,7 @@ BOOL GSACodeSelect::OnInitDialog()
     m_games.AddString(buffer);
     int codes = 0;
     fread(&codes, 1, 4, f);
-    
+
     while(codes > 0) {
       fread(&len, 1, 4, f);
       fseek(f, len, SEEK_CUR);
@@ -114,7 +114,7 @@ BOOL GSACodeSelect::OnInitDialog()
   }
   GetDlgItem(ID_OK)->EnableWindow(FALSE);
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }

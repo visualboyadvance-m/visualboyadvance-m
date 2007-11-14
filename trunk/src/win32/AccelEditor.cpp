@@ -70,10 +70,10 @@ BEGIN_MESSAGE_MAP(AccelEditor, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // AccelEditor message handlers
 
-BOOL AccelEditor::OnInitDialog() 
+BOOL AccelEditor::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_ENTRY( IDC_STATIC1, DS_MoveX)
     DIALOG_SIZER_ENTRY( IDC_STATIC2, DS_MoveY)
@@ -97,7 +97,7 @@ BOOL AccelEditor::OnInitDialog()
             NULL);
 
   InitCommands();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -108,7 +108,7 @@ void AccelEditor::InitCommands()
   m_alreadyAffected.SetWindowText("");
 
   POSITION pos = mgr.m_mapAccelString.GetStartPosition();
-  
+
   while(pos != NULL) {
     CString command;
     WORD wID;
@@ -123,17 +123,17 @@ void AccelEditor::InitCommands()
     OnSelchangeCommands();
 }
 
-void AccelEditor::OnCancel() 
+void AccelEditor::OnCancel()
 {
   EndDialog(FALSE);
 }
 
-void AccelEditor::OnOk() 
+void AccelEditor::OnOk()
 {
   EndDialog(TRUE);
 }
 
-void AccelEditor::OnSelchangeCommands() 
+void AccelEditor::OnSelchangeCommands()
 {
   // Check if some commands exist.
   int index = m_commands.GetCurSel();
@@ -144,7 +144,7 @@ void AccelEditor::OnSelchangeCommands()
   m_currents.ResetContent();
 
   CCmdAccelOb* pCmdAccel;
-  
+
   if (mgr.m_mapAccelTable.Lookup(wIDCommand, pCmdAccel)) {
     CAccelsOb* pAccel;
     CString szBuffer;
@@ -164,20 +164,20 @@ void AccelEditor::OnSelchangeCommands()
 
 }
 
-void AccelEditor::OnReset() 
+void AccelEditor::OnReset()
 {
   mgr.Default();
   InitCommands(); // update the listboxes.
 }
 
-void AccelEditor::OnAssign() 
+void AccelEditor::OnAssign()
 {
   // Control if it's not already affected
   CCmdAccelOb* pCmdAccel;
   CAccelsOb* pAccel;
   WORD wIDCommand;
   POSITION pos;
-  
+
   WORD wKey;
   bool bCtrl, bAlt, bShift;
 
@@ -241,13 +241,13 @@ void AccelEditor::OnAssign()
   m_key.ResetKey();
 }
 
-void AccelEditor::OnRemove() 
+void AccelEditor::OnRemove()
 {
   // Some controls
   int indexCurrent = m_currents.GetCurSel();
   if (indexCurrent == LB_ERR)
     return;
-  
+
   // 2nd part.
   int indexCmd = m_commands.GetCurSel();
   if (indexCmd == LB_ERR)

@@ -53,7 +53,7 @@ static variable_desc flashSaveData[] = {
 static variable_desc flashSaveData2[] = {
   { &flashState, sizeof(int) },
   { &flashReadState, sizeof(int) },
-  { &flashSize, sizeof(int) },  
+  { &flashSize, sizeof(int) },
   { &flashSaveMemory[0], 0x20000 },
   { NULL, 0 }
 };

@@ -58,7 +58,7 @@ struct EmulatedSystem {
   // write battery file
   bool (*emuWriteBattery)(const char *);
   // load state
-  bool (*emuReadState)(const char *);  
+  bool (*emuReadState)(const char *);
   // save state
   bool (*emuWriteState)(const char *);
   // load memory state (rewind)

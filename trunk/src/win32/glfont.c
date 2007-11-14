@@ -36,43 +36,43 @@ int glFontCreate (GLFONT *Font, char *Buffer, int Tex)
 
 	//Get number of characters
 	Num = Font->IntEnd - Font->IntStart + 1;
-	
+
 	//Allocate memory for characters
 	if ((Font->Char = (GLFONTCHAR *)malloc(
 		sizeof(GLFONTCHAR) * Num)) == NULL)
 		return FALSE;
-	
+
 	//Read glFont characters
 	memcpy(Font->Char, Buffer, sizeof(GLFONTCHAR)*Num);
 	Buffer+=sizeof(GLFONTCHAR)*Num;
 
 	//Get texture size
 	Num = Font->TexWidth * Font->TexHeight * 2;
-	
+
 	//Allocate memory for texture data
 	if ((TexBytes = (char *)malloc(Num)) == NULL)
 		return FALSE;
-	
+
 	//Read texture data
 	memcpy(TexBytes, Buffer, sizeof(char)*Num);
 	Buffer+=sizeof(char)*Num;
 
 	//Set texture attributes
-	glBindTexture(GL_TEXTURE_2D, Font->Tex);  
+	glBindTexture(GL_TEXTURE_2D, Font->Tex);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
 		GL_CLAMP);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
 		GL_CLAMP);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-		GL_LINEAR); 
+		GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 		GL_LINEAR);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
-		GL_MODULATE);  
-	
+		GL_MODULATE);
+
 	//Create texture
 	glTexImage2D(GL_TEXTURE_2D, 0, 2, Font->TexWidth,
-		Font->TexHeight, 0, GL_LUMINANCE_ALPHA, 
+		Font->TexHeight, 0, GL_LUMINANCE_ALPHA,
 		GL_UNSIGNED_BYTE, (void *)TexBytes);
 
 	//Clean up
@@ -95,7 +95,7 @@ void glFontBegin (GLFONT *Font)
 		glFont = Font;
 	else
 		glFont = NULL;
-	
+
 	//Bind to font texture
 	glBindTexture(GL_TEXTURE_2D, Font->Tex);
 }
@@ -106,29 +106,29 @@ void glFontEnd (void)
 	glFont = NULL;
 }
 //*********************************************************
-void glFontTextOut (char *String, float x, float y, 
+void glFontTextOut (char *String, float x, float y,
 	float z)
 {
 	int Length, i;
 	GLFONTCHAR *Char;
 
-	//Return if we don't have a valid glFont 
+	//Return if we don't have a valid glFont
 	if (glFont == NULL)
 		return;
-	
+
 	//Get length of string
 	Length = strlen(String);
-	
+
 	//Begin rendering quads
 	glBegin(GL_QUADS);
-	
+
 	//Loop through characters
 	for (i = 0; i < Length; i++)
 	{
 		//Get pointer to glFont character
 		Char = &glFont->Char[(int)String[i] -
 			glFont->IntStart];
-		
+
 		//Specify vertices and texture coordinates
 		glTexCoord2f(Char->tx1, Char->ty1);
 		glVertex3f(x, y - Char->dy, z);
@@ -138,7 +138,7 @@ void glFontTextOut (char *String, float x, float y,
 		glVertex3f(x + Char->dx, y, z);
 		glTexCoord2f(Char->tx2, Char->ty1);
 		glVertex3f(x + Char->dx, y - Char->dy, z);
-	
+
 		//Move to next character
 		x += Char->dx;
 	}

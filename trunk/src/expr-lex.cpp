@@ -662,7 +662,7 @@ YY_RULE_SETUP
 #line 45 "expr.l"
 {
         return TOKEN_DOT;
-}       
+}
         YY_BREAK
 case 5:
 YY_RULE_SETUP

@@ -105,7 +105,7 @@ END_MESSAGE_MAP()
   /////////////////////////////////////////////////////////////////////////////
 // GBCheatSearch message handlers
 
-void GBCheatSearch::OnOk() 
+void GBCheatSearch::OnOk()
 {
   if(data)
     free(data);
@@ -113,10 +113,10 @@ void GBCheatSearch::OnOk()
   EndDialog(TRUE);
 }
 
-void GBCheatSearch::OnAddCheat() 
+void GBCheatSearch::OnAddCheat()
 {
   int mark = m_list.GetSelectionMark();
-  
+
   if(mark != -1) {
     LVITEM item;
     memset(&item,0, sizeof(item));
@@ -129,7 +129,7 @@ void GBCheatSearch::OnAddCheat()
   }
 }
 
-void GBCheatSearch::OnSearch() 
+void GBCheatSearch::OnSearch()
 {
   CString buffer;
   if(valueType == 0)
@@ -160,14 +160,14 @@ void GBCheatSearch::OnSearch()
                      numberType == 0,
                      value);
   }
-  
+
   addChanges(true);
 
   if(updateValues)
     cheatSearchUpdateValues(&cheatSearchData);
 }
 
-void GBCheatSearch::OnStart() 
+void GBCheatSearch::OnStart()
 {
   if(cheatSearchData.count == 0) {
     int i = 0;
@@ -199,14 +199,14 @@ void GBCheatSearch::OnStart()
       block->saved = (u8*)malloc(0x8000);
       block->size = 0x8000;
       block->bits = (u8 *)malloc(0x8000 >> 3);
-      i++;        
+      i++;
     } else {
       block->offset = 0xc000;
       block->data = &gbMemory[0xc000];
       block->saved = (u8*)malloc(0x2000);
       block->size = 0x2000;
       block->bits = (u8 *)malloc(0x2000 >> 3);
-      i++;    
+      i++;
     }
     cheatSearchData.count = i;
   }
@@ -215,7 +215,7 @@ void GBCheatSearch::OnStart()
   GetDlgItem(IDC_SEARCH)->EnableWindow(TRUE);
 }
 
-void GBCheatSearch::OnUpdate() 
+void GBCheatSearch::OnUpdate()
 {
   if(GetDlgItem(IDC_UPDATE)->SendMessage(BM_GETCHECK,
                                          0,
@@ -226,7 +226,7 @@ void GBCheatSearch::OnUpdate()
   regSetDwordValue("gbCheatsUpdate", updateValues);
 }
 
-BOOL GBCheatSearch::OnInitDialog() 
+BOOL GBCheatSearch::OnInitDialog()
 {
   CDialog::OnInitDialog();
 
@@ -239,12 +239,12 @@ BOOL GBCheatSearch::OnInitDialog()
 
   temp = winResLoadString(IDS_NEW_VALUE);
   m_list.InsertColumn(2, temp, LVCFMT_CENTER, 125, 2);
-  
+
   m_list.SetFont(CFont::FromHandle((HFONT)GetStockObject(SYSTEM_FIXED_FONT)),
                  TRUE);
 
   m_list.SetExtendedStyle(LVS_EX_FULLROWSELECT);
-  
+
   if(!cheatSearchData.count) {
     GetDlgItem(IDC_SEARCH)->EnableWindow(FALSE);
     GetDlgItem(IDC_ADD_CHEAT)->EnableWindow(FALSE);
@@ -253,46 +253,46 @@ BOOL GBCheatSearch::OnInitDialog()
   valueType = regQueryDwordValue("gbCheatsValueType", 0);
   if(valueType < 0 || valueType > 1)
     valueType = 2;
-  
+
   searchType = regQueryDwordValue("gbCheatsSearchType",
                                   SEARCH_EQ);
   if(searchType < 0 || searchType > 5)
     searchType = 0;
-  
+
   numberType = regQueryDwordValue("gbCheatsNumberType", 2);
   if(numberType < 0 || numberType > 2)
     numberType = 2;
-  
+
   sizeType = regQueryDwordValue("gbCheatsSizeType", 0);
   if(sizeType < 0 || sizeType > 2)
     sizeType = 0;
-  
+
   updateValues = regQueryDwordValue("gbCheatsUpdate", 0) ?
     true : false;
-  
+
   UpdateData(FALSE);
 
   if(valueType == 0)
     m_value.EnableWindow(FALSE);
-  
+
   CenterWindow();
 
   if(cheatSearchData.count) {
     addChanges(false);
   }
 
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void GBCheatSearch::OnGetdispinfoCheatList(NMHDR* pNMHDR, LRESULT* pResult) 
+void GBCheatSearch::OnGetdispinfoCheatList(NMHDR* pNMHDR, LRESULT* pResult)
 {
   LV_DISPINFO* info = (LV_DISPINFO*)pNMHDR;
   if(info->item.mask & LVIF_TEXT) {
     int index = info->item.iItem;
     int col = info->item.iSubItem;
-    
+
     switch(col) {
     case 0:
       strcpy(info->item.pszText, data[index].address);
@@ -308,7 +308,7 @@ void GBCheatSearch::OnGetdispinfoCheatList(NMHDR* pNMHDR, LRESULT* pResult)
   *pResult = TRUE;
 }
 
-void GBCheatSearch::OnItemchangedCheatList(NMHDR* pNMHDR, LRESULT* pResult) 
+void GBCheatSearch::OnItemchangedCheatList(NMHDR* pNMHDR, LRESULT* pResult)
 {
   GetDlgItem(IDC_ADD_CHEAT)->EnableWindow(m_list.GetSelectionMark() != -1);
 }
@@ -340,24 +340,24 @@ void GBCheatSearch::addChange(int index, int bank, u16 address, int offset, u32 
   case 0:
     sprintf(data[index].oldValue, "%d", oldValue);
     sprintf(data[index].newValue, "%d", newValue);
-    break;        
+    break;
   case 1:
     sprintf(data[index].oldValue, "%u", oldValue);
     sprintf(data[index].newValue, "%u", newValue);
-    break;    
+    break;
   case 2:
     switch(sizeType) {
     case 0:
       sprintf(data[index].oldValue, "%02x", oldValue);
-      sprintf(data[index].newValue, "%02x", newValue);      
+      sprintf(data[index].newValue, "%02x", newValue);
       break;
     case 1:
       sprintf(data[index].oldValue, "%04x", oldValue);
-      sprintf(data[index].newValue, "%04x", newValue);      
+      sprintf(data[index].newValue, "%04x", newValue);
       break;
     case 2:
       sprintf(data[index].oldValue, "%08x", oldValue);
-      sprintf(data[index].newValue, "%08x", newValue);      
+      sprintf(data[index].newValue, "%08x", newValue);
       break;
     }
   }
@@ -366,7 +366,7 @@ void GBCheatSearch::addChange(int index, int bank, u16 address, int offset, u32 
 void GBCheatSearch::addChanges(bool showMsg)
 {
   int count = cheatSearchGetCount(&cheatSearchData, sizeType);
-    
+
   m_list.DeleteAllItems();
 
   if(count > 1000) {
@@ -375,7 +375,7 @@ void GBCheatSearch::addChanges(bool showMsg)
                     "Search produced %d results. Please refine better",
                     count);
     return;
-  }  
+  }
 
   if(count == 0) {
     if(showMsg)
@@ -383,13 +383,13 @@ void GBCheatSearch::addChanges(bool showMsg)
                     "Search produced no results");
     return;
   }
-  
-  m_list.SetItemCount(count);  
+
+  m_list.SetItemCount(count);
   if(data)
     free(data);
 
   data = (WinGbCheatsData *)calloc(count, sizeof(WinGbCheatsData));
-  
+
   int inc = 1;
   switch(sizeType) {
   case 1:
@@ -399,12 +399,12 @@ void GBCheatSearch::addChanges(bool showMsg)
     inc = 4;
     break;
   }
-  
+
   int index = 0;
   if(numberType == 0) {
     for(int i = 0; i < cheatSearchData.count; i++) {
       CheatSearchBlock *block = &cheatSearchData.blocks[i];
-      
+
       for(int j = 0; j < block->size; j+= inc) {
         if(IS_BIT_SET(block->bits, j)) {
           addChange(index++,
@@ -423,7 +423,7 @@ void GBCheatSearch::addChanges(bool showMsg)
   } else {
     for(int i = 0; i < cheatSearchData.count; i++) {
       CheatSearchBlock *block = &cheatSearchData.blocks[i];
-      
+
       for(int j = 0; j < block->size; j+= inc) {
         if(IS_BIT_SET(block->bits, j)) {
           addChange(index++,
@@ -456,7 +456,7 @@ void GBCheatSearch::addChanges(bool showMsg)
 
     m_list.SetItemText(i, 1, LPSTR_TEXTCALLBACK);
     m_list.SetItemText(i, 2, LPSTR_TEXTCALLBACK);
-  }  
+  }
 }
 
 void GBCheatSearch::OnValueType(UINT id)
@@ -470,7 +470,7 @@ void GBCheatSearch::OnValueType(UINT id)
   case IDC_SPECIFIC_VALUE:
     valueType = 1;
     m_value.EnableWindow(TRUE);
-    regSetDwordValue("gbCheatsValueType", 1);   
+    regSetDwordValue("gbCheatsValueType", 1);
     break;
   }
 }
@@ -598,12 +598,12 @@ BEGIN_MESSAGE_MAP(AddGBCheat, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // AddGBCheat message handlers
 
-void AddGBCheat::OnCancel() 
+void AddGBCheat::OnCancel()
 {
   EndDialog(FALSE);
 }
 
-void AddGBCheat::OnOk() 
+void AddGBCheat::OnOk()
 {
   // add cheat
   if(addCheat()) {
@@ -618,12 +618,12 @@ bool AddGBCheat::addCheat()
 
   u32 value;
   m_value.GetWindowText(buffer);
-  
+
   if(buffer.IsEmpty()) {
     systemMessage(IDS_VALUE_CANNOT_BE_EMPTY, "Value cannot be empty");
     return false;
   }
-  
+
   switch(numberType) {
   case 0:
     sscanf(buffer, "%d", &value);
@@ -644,7 +644,7 @@ bool AddGBCheat::addCheat()
     bank += 0x90;
   else
     bank = 0x01;
-  
+
   switch(sizeType) {
   case 0:
     code.Format("%02X%02X%02X%02X", bank, value, address&0xFF, address>>8);
@@ -657,7 +657,7 @@ bool AddGBCheat::addCheat()
     address++;
     code.Format("%02X%02X%02X%02X", bank, value>>8, address&0xFF,
                 address>>8);
-    gbAddGsCheat(code, buffer);    
+    gbAddGsCheat(code, buffer);
     break;
   case 2:
     code.Format("%02X%02X%02X%02X", bank, value&0xFF, address&0xFF,
@@ -674,45 +674,45 @@ bool AddGBCheat::addCheat()
     address++;
     code.Format("%02X%02X%02X%02X", bank, value>>24, address&0xFF,
                 address>>8);
-    gbAddGsCheat(code, buffer);    
+    gbAddGsCheat(code, buffer);
     break;
   }
-  
+
   return true;
 }
 
-BOOL AddGBCheat::OnInitDialog() 
+BOOL AddGBCheat::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   CString buffer;
   buffer.Format("%02x:%08x", (address>>16), address&0xFFFF);
   m_address.SetWindowText(buffer);
   m_address.EnableWindow(FALSE);
   ::SetWindowLongPtr( m_address.GetSafeHwnd(), GWLP_USERDATA, address);
-  
+
   numberType = regQueryDwordValue("gbCheatsNumberType", 2);
   if(numberType < 0 || numberType > 2)
     numberType = 2;
-  
+
   sizeType = regQueryDwordValue("gbCheatsSizeType", 0);
   if(sizeType < 0 || sizeType > 2)
     sizeType = 0;
 
   UpdateData(FALSE);
-  
+
   m_desc.LimitText(32);
-  
+
   if(address != 0) {
     GetDlgItem(IDC_SIZE_8)->EnableWindow(FALSE);
     GetDlgItem(IDC_SIZE_16)->EnableWindow(FALSE);
     GetDlgItem(IDC_SIZE_32)->EnableWindow(FALSE);
     GetDlgItem(IDC_HEXADECIMAL)->EnableWindow(FALSE);
     GetDlgItem(IDC_UNSIGNED)->EnableWindow(FALSE);
-    GetDlgItem(IDC_SIGNED)->EnableWindow(FALSE);        
+    GetDlgItem(IDC_SIGNED)->EnableWindow(FALSE);
   }
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -791,12 +791,12 @@ BEGIN_MESSAGE_MAP(GBCheatList, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // GBCheatList message handlers
 
-void GBCheatList::OnOk() 
+void GBCheatList::OnOk()
 {
   EndDialog(TRUE);
 }
 
-void GBCheatList::OnAddGgCheat() 
+void GBCheatList::OnAddGgCheat()
 {
   CString temp = winResLoadString(IDS_ADD_GG_CODE);
   AddGBCode dlg(winGbCheatAddVerifyGg, 11, temp);
@@ -804,7 +804,7 @@ void GBCheatList::OnAddGgCheat()
   refresh();
 }
 
-void GBCheatList::OnAddGsCheat() 
+void GBCheatList::OnAddGsCheat()
 {
   CString temp = winResLoadString(IDS_ADD_GS_CODE);
 
@@ -813,10 +813,10 @@ void GBCheatList::OnAddGsCheat()
   refresh();
 }
 
-void GBCheatList::OnEnable() 
+void GBCheatList::OnEnable()
 {
   int mark = m_list.GetSelectionMark();
-  
+
   if(mark != -1) {
     LVITEM item;
     memset(&item,0, sizeof(item));
@@ -828,14 +828,14 @@ void GBCheatList::OnEnable()
       else
         gbCheatEnable((int)item.lParam);
       refresh();
-    }       
+    }
   }
 }
 
-void GBCheatList::OnRemove() 
+void GBCheatList::OnRemove()
 {
   int mark = m_list.GetSelectionMark();
-  
+
   if(mark != -1) {
     LVITEM item;
     memset(&item,0, sizeof(item));
@@ -844,17 +844,17 @@ void GBCheatList::OnRemove()
     if(m_list.GetItem(&item)) {
       gbCheatRemove((int)item.lParam);
       refresh();
-    }       
+    }
   }
 }
 
-void GBCheatList::OnRemoveAll() 
+void GBCheatList::OnRemoveAll()
 {
   gbCheatRemoveAll();
   refresh();
 }
 
-void GBCheatList::OnItemchangedCheatList(NMHDR* pNMHDR, LRESULT* pResult) 
+void GBCheatList::OnItemchangedCheatList(NMHDR* pNMHDR, LRESULT* pResult)
 {
   if(m_list.GetSelectionMark() != -1) {
     GetDlgItem(IDC_REMOVE)->EnableWindow(TRUE);
@@ -863,7 +863,7 @@ void GBCheatList::OnItemchangedCheatList(NMHDR* pNMHDR, LRESULT* pResult)
     GetDlgItem(IDC_REMOVE)->EnableWindow(FALSE);
     GetDlgItem(IDC_ENABLE)->EnableWindow(FALSE);
   }
-  
+
   if(!duringRefresh) {
     LPNMLISTVIEW l = (LPNMLISTVIEW)pNMHDR;
     if(l->uChanged & LVIF_STATE) {
@@ -876,10 +876,10 @@ void GBCheatList::OnItemchangedCheatList(NMHDR* pNMHDR, LRESULT* pResult)
         refresh();
       }
     }
-  }    
+  }
 }
 
-BOOL GBCheatList::OnInitDialog() 
+BOOL GBCheatList::OnInitDialog()
 {
   CDialog::OnInitDialog();
 
@@ -889,18 +889,18 @@ BOOL GBCheatList::OnInitDialog()
   m_list.InsertColumn(1, temp, LVCFMT_LEFT, 200, 1);
   temp = winResLoadString(IDS_STATUS);
   m_list.InsertColumn(2, temp, LVCFMT_LEFT, 80, 2);
-  
+
   m_list.SetFont(CFont::FromHandle((HFONT)GetStockObject(SYSTEM_FIXED_FONT)),
                  TRUE);
 
   m_list.SetExtendedStyle(LVS_EX_CHECKBOXES |
                           LVS_EX_FULLROWSELECT);
-  
+
   refresh();
   GetDlgItem(IDC_REMOVE)->EnableWindow(FALSE);
   GetDlgItem(IDC_ENABLE)->EnableWindow(FALSE);
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -908,14 +908,14 @@ BOOL GBCheatList::OnInitDialog()
 void GBCheatList::refresh()
 {
   duringRefresh = true;
-  
+
   m_list.DeleteAllItems();
-  
+
   char buffer[2];
-  
+
   for(int i = 0; i < gbCheatNumber; i++) {
     LVITEM item;
-    
+
     item.mask = LVIF_TEXT | LVIF_PARAM | LVIF_STATE;
     item.iItem = i;
     item.iSubItem = 0;
@@ -926,10 +926,10 @@ void GBCheatList::refresh()
     m_list.InsertItem(&item);
 
     m_list.SetCheck(i, (gbCheatList[i].enabled ? TRUE : FALSE));
-    
+
     m_list.SetItemText(i, 1, gbCheatList[i].cheatDesc);
-    
-    buffer[0] = (gbCheatList[i].enabled) ? 'E' : 'D';    
+
+    buffer[0] = (gbCheatList[i].enabled) ? 'E' : 'D';
     buffer[1] = 0;
     m_list.SetItemText(i, 2, buffer);
   }
@@ -972,13 +972,13 @@ BEGIN_MESSAGE_MAP(AddGBCode, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // AddGBCode message handlers
 
-void AddGBCode::OnOk() 
+void AddGBCode::OnOk()
 {
   CString desc;
   CString buffer;
   m_code.GetWindowText(buffer);
   m_desc.GetWindowText(desc);
-  
+
   StringTokenizer st(buffer, " \t\n\r");
   const char *t = st.next();
   while(t) {
@@ -988,20 +988,20 @@ void AddGBCode::OnOk()
   EndDialog(TRUE);
 }
 
-void AddGBCode::OnCancel() 
+void AddGBCode::OnCancel()
 {
   EndDialog(FALSE);
 }
 
-BOOL AddGBCode::OnInitDialog() 
+BOOL AddGBCode::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   m_code.LimitText(1024);
   m_desc.LimitText(32);
   SetWindowText(addTitle);
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }

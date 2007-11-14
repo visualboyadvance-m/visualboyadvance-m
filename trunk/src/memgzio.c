@@ -118,7 +118,7 @@ local MEMFILE *memOpen(char *memory, int available, char mode)
     memory[3] = ' ';
     *((int *)(memory+4)) = 0;
   } else {
-    if(memory[0] != 'V' || memory[1] != 'B' || memory[2] != 'A' || 
+    if(memory[0] != 'V' || memory[1] != 'B' || memory[2] != 'A' ||
        memory[3] != ' ') {
       free(f);
       return NULL;
@@ -130,11 +130,11 @@ local MEMFILE *memOpen(char *memory, int available, char mode)
   return f;
 }
 
-local size_t memWrite(const void *buffer, size_t size, size_t count, 
+local size_t memWrite(const void *buffer, size_t size, size_t count,
                       MEMFILE *file)
 {
   size_t total = size*count;
-  
+
   if(file->mode != 'w') {
     file->error = 1;
     return 0;
@@ -149,11 +149,11 @@ local size_t memWrite(const void *buffer, size_t size, size_t count,
   return total;
 }
 
-local size_t memRead(void *buffer, size_t size, size_t count, 
+local size_t memRead(void *buffer, size_t size, size_t count,
                      MEMFILE *file)
 {
   size_t total = size*count;
-  
+
   if(file->mode != 'r') {
     file->error = 1;
     return 0;
@@ -211,7 +211,7 @@ local int memPrintf(MEMFILE *f, const char *format, ...)
   char buffer[80];
   va_list list;
   int len;
-  
+
   va_start(list, format);
   len = vsprintf(buffer, format, list);
   va_end(list);
@@ -272,7 +272,7 @@ local gzFile gz_open (memory, available, mode)
 	}
     } while (*p++ && m != fmode + sizeof(fmode));
     if (s->mode == '\0') return destroy(s), (gzFile)Z_NULL;
-    
+
     if (s->mode == 'w') {
 #ifdef NO_DEFLATE
         err = Z_STREAM_ERROR;
@@ -324,7 +324,7 @@ local gzFile gz_open (memory, available, mode)
 	check_header(s); /* skip the .gz header */
 	s->startpos = (memTell(s->file) - s->stream.avail_in);
     }
-    
+
     return (gzFile)s;
 }
 
@@ -621,10 +621,10 @@ local int do_flush (file, flush)
 	if (len == 0 && s->z_err == Z_BUF_ERROR) s->z_err = Z_OK;
 
         /* deflate has finished flushing only when it hasn't used up
-         * all the available space in the output buffer: 
+         * all the available space in the output buffer:
          */
         done = (s->stream.avail_out != 0 || s->z_err == Z_STREAM_END);
- 
+
         if (s->z_err != Z_OK && s->z_err != Z_STREAM_END) break;
     }
     return  s->z_err == Z_STREAM_END ? Z_OK : s->z_err;
@@ -694,6 +694,6 @@ long ZEXPORT memtell(file)
     mem_stream *s = (mem_stream*)file;
 
     if (s == NULL) return Z_STREAM_ERROR;
-    
+
     return memTell(s->file);
 }

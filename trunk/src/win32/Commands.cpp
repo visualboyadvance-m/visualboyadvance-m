@@ -167,7 +167,7 @@ struct {
   { "OptionsSoundVolume1x", ID_OPTIONS_SOUND_VOLUME_1X },
   { "OptionsSoundVolume2x", ID_OPTIONS_SOUND_VOLUME_2X },
   { "OptionsSoundVolume3x", ID_OPTIONS_SOUND_VOLUME_3X },
-  { "OptionsSoundVolume4x", ID_OPTIONS_SOUND_VOLUME_4X },  
+  { "OptionsSoundVolume4x", ID_OPTIONS_SOUND_VOLUME_4X },
   { "OptionsGameboyBorder", ID_OPTIONS_GAMEBOY_BORDER },
   { "OptionsGameboyBorderAutomatic", ID_OPTIONS_GAMEBOY_BORDERAUTOMATIC },
   { "OptionsGameboyColors", ID_OPTIONS_GAMEBOY_COLORS },
@@ -236,13 +236,13 @@ bool winAccelGetID(const char *command, WORD& id)
 {
   if(!initialized) {
     int count = sizeof(winAccelCommands)/sizeof(winAccelCommands[0]);
-    
+
     for(int i = 0; i < count; i++) {
-      winAccelStrings.SetAt(winAccelCommands[i].command, winAccelCommands[i].id);      
+      winAccelStrings.SetAt(winAccelCommands[i].command, winAccelCommands[i].id);
     }
     initialized = true;
   }
-  
+
   return winAccelStrings.Lookup(command, id) ? true : false;
 }
 

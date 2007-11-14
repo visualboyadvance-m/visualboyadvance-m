@@ -63,28 +63,28 @@ BEGIN_MESSAGE_MAP(ModeConfirm, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // ModeConfirm message handlers
 
-void ModeConfirm::OnCancel() 
+void ModeConfirm::OnCancel()
 {
   EndDialog(FALSE);
 }
 
-void ModeConfirm::OnOk() 
+void ModeConfirm::OnOk()
 {
   EndDialog(TRUE);
 }
 
-void ModeConfirm::OnDestroy() 
+void ModeConfirm::OnDestroy()
 {
   CDialog::OnDestroy();
-  
+
   KillTimer(timer);
   timer = 0;
 }
 
-BOOL ModeConfirm::OnInitDialog() 
+BOOL ModeConfirm::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   timer = SetTimer(0, 1000, NULL);
 
   count = 10;
@@ -95,19 +95,19 @@ BOOL ModeConfirm::OnInitDialog()
   GetDlgItem(IDC_TIMER)->SetWindowText(buffer);
 
   CenterWindow(theApp.m_pMainWnd);
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void ModeConfirm::OnTimer(UINT_PTR nIDEvent) 
+void ModeConfirm::OnTimer(UINT_PTR nIDEvent)
 {
-  CString buffer;  
+  CString buffer;
   count--;
   if(count == 0)
     EndDialog(FALSE);
   buffer.Format("%d", count);
   GetDlgItem(IDC_TIMER)->SetWindowText(buffer);
-  
+
   CDialog::OnTimer(nIDEvent);
 }

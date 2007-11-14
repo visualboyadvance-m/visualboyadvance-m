@@ -79,7 +79,7 @@ void hq3x32(unsigned char * pIn,  unsigned int srcPitch,
 				*p = (*p & 0xFF0000) >> 16 |
 				     (*p & 0x0000FF) << 16 |
 					 (*p & 0x00FF00);
-				 p++;			
+				 p++;
 			}
 			p += offset;
 		}
@@ -138,7 +138,7 @@ void hq4x32(unsigned char * pIn,  unsigned int srcPitch,
 				*p = (*p & 0xFF0000) >> 16 |
 				     (*p & 0x0000FF) << 16 |
 					 (*p & 0x00FF00);
-				 p++;			
+				 p++;
 			}
 			p += offset;
 		}

@@ -50,10 +50,10 @@ class FileDlg
   virtual int getFilterIndex();
   virtual void OnTypeChange(HWND hwnd);
   FileDlg(CWnd *parent, LPCTSTR file, LPCTSTR filter,
-          int filterIndex, LPCTSTR ext, LPCTSTR *exts, LPCTSTR initialDir, 
+          int filterIndex, LPCTSTR ext, LPCTSTR *exts, LPCTSTR initialDir,
           LPCTSTR title, bool save);
   virtual ~FileDlg();
-  
+
  protected:
   bool isSave;
   LPCTSTR *extensions;

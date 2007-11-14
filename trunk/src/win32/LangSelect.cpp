@@ -62,21 +62,21 @@ BEGIN_MESSAGE_MAP(LangSelect, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // LangSelect message handlers
 
-void LangSelect::OnCancel() 
+void LangSelect::OnCancel()
 {
   EndDialog(FALSE);
 }
 
-void LangSelect::OnOk() 
+void LangSelect::OnOk()
 {
   m_langString.GetWindowText(theApp.languageName);
   EndDialog(TRUE);
 }
 
-BOOL LangSelect::OnInitDialog() 
+BOOL LangSelect::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   char lbuffer[10];
   if(GetLocaleInfo(LOCALE_SYSTEM_DEFAULT, LOCALE_SABBREVLANGNAME,
                    lbuffer, 10)) {
@@ -84,14 +84,14 @@ BOOL LangSelect::OnInitDialog()
   } else {
     m_langName.SetWindowText("???");
   }
-  
+
   if(!theApp.languageName.IsEmpty())
     m_langString.SetWindowText(theApp.languageName);
-      
+
   m_langString.LimitText(3);
-  
+
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }

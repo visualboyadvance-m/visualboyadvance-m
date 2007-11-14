@@ -92,7 +92,7 @@ void MemoryViewer::setAddress(u32 a)
       u16 addr = address;
       if((u16)(addr+(displayedLines<<4)) < addr) {
         address = 0xffff - (displayedLines<<4) + 1;
-      }      
+      }
     } else {
       if((address+(displayedLines<<4)) < address) {
         address = 0xffffffff - (displayedLines<<4) + 1;
@@ -115,11 +115,11 @@ void MemoryViewer::setSize(int s)
     maxNibble = 3;
   else
     maxNibble = 7;
-  
+
   InvalidateRect(NULL, TRUE);
 }
 
-BOOL MemoryViewer::OnEraseBkgnd(CDC* pDC) 
+BOOL MemoryViewer::OnEraseBkgnd(CDC* pDC)
 {
   return TRUE;
 }
@@ -146,48 +146,48 @@ void MemoryViewer::updateScrollInfo(int lines)
                 TRUE);
 }
 
-void MemoryViewer::OnPaint() 
+void MemoryViewer::OnPaint()
 {
   CPaintDC dc(this); // device context for painting
-  
+
   RECT rect;
   GetClientRect(&rect);
   int w = rect.right - rect.left;
   int h = rect.bottom - rect.top - 6;
-  
+
   CDC memDC;
   memDC.CreateCompatibleDC(&dc);
   CBitmap bitmap, *pOldBitmap;
   bitmap.CreateCompatibleBitmap(&dc, w, rect.bottom - rect.top);
   pOldBitmap = memDC.SelectObject(&bitmap);
-  
+
   memDC.FillRect(&rect, CBrush::FromHandle((HBRUSH)GetStockObject(WHITE_BRUSH)));
   memDC.DrawEdge(&rect, EDGE_ETCHED, BF_RECT);
-  
+
   CFont *oldFont = memDC.SelectObject(CFont::FromHandle(font));
-  
+
   fontSize = memDC.GetTextExtent("0", 1);
-  
+
   int lines = h / fontSize.cy;
-  
+
   displayedLines = lines;
-  
+
   updateScrollInfo(lines);
-  
+
   u32 addr = address;
-  
+
   memDC.SetTextColor(RGB(0,0,0));
-  
+
   u8 data[32];
-  
+
   RECT r;
   r.top = 3;
   r.left = 3;
   r.bottom = r.top+fontSize.cy;
   r.right = rect.right-3;
-  
+
   int line = 0;
-  
+
   for(int i = 0; i < lines; i++) {
     CString buffer;
     if(addressSize)
@@ -198,9 +198,9 @@ void MemoryViewer::OnPaint()
     r.left += 10*fontSize.cx;
     beginHex = r.left;
     readData(addr, 16, data);
-    
+
     int j;
-    
+
     if(dataSize == 0) {
       for(j = 0; j < 16; j++) {
         buffer.Format("%02X", data[j]);
@@ -213,7 +213,7 @@ void MemoryViewer::OnPaint()
         buffer.Format("%04X", data[j] | data[j+1]<<8);
         memDC.DrawText(buffer, &r, DT_TOP | DT_LEFT | DT_NOPREFIX);
         r.left += 5*fontSize.cx;
-      }      
+      }
     }
     if(dataSize == 2) {
       for(j = 0; j < 16; j += 4) {
@@ -221,11 +221,11 @@ void MemoryViewer::OnPaint()
                       data[j+2] << 16 | data[j+3] << 24);
         memDC.DrawText(buffer, &r, DT_TOP | DT_LEFT | DT_NOPREFIX);
         r.left += 9*fontSize.cx;
-      }            
+      }
     }
-    
+
     line = r.left;
-    
+
     r.left += fontSize.cx;
     beginAscii = r.left;
     buffer.Empty();
@@ -236,7 +236,7 @@ void MemoryViewer::OnPaint()
       } else
         buffer += '.';
     }
-    
+
     memDC.DrawText(buffer, &r, DT_TOP | DT_LEFT | DT_NOPREFIX);
     addr += 16;
     if(addressSize)
@@ -248,26 +248,26 @@ void MemoryViewer::OnPaint()
   CPen pen;
   pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
   CPen *old = memDC.SelectObject(&pen);
-  
+
   memDC.MoveTo(3+fontSize.cx*9, 3);
   memDC.LineTo(3+fontSize.cx*9, 3+displayedLines*fontSize.cy);
-  
+
   memDC.MoveTo(line, 3);
   memDC.LineTo(line, 3+displayedLines*fontSize.cy);
-  
+
   memDC.SelectObject(old);
   pen.DeleteObject();
-  
+
   memDC.SelectObject(oldFont);
-  
+
   dc.BitBlt(0, 0, w, rect.bottom - rect.top, &memDC, 0, 0, SRCCOPY);
-  
+
   memDC.SelectObject(pOldBitmap);
   memDC.DeleteDC();
   bitmap.DeleteObject();
 }
 
-void MemoryViewer::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
+void MemoryViewer::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
   int address = this->address;
   switch(nSBCode) {
@@ -291,7 +291,7 @@ void MemoryViewer::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
     break;
   case SB_THUMBTRACK:
     {
-      int page = displayedLines * 16;      
+      int page = displayedLines * 16;
       SCROLLINFO si;
       ZeroMemory(&si, sizeof(si));
       si.cbSize = sizeof(si);
@@ -304,7 +304,7 @@ void MemoryViewer::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
   setAddress(address);
 }
 
-UINT MemoryViewer::OnGetDlgCode() 
+UINT MemoryViewer::OnGetDlgCode()
 {
   return DLGC_WANTALLKEYS;
 }
@@ -335,7 +335,7 @@ void MemoryViewer::setCaretPos()
 
   if(dlg)
     dlg->setCurrentAddress(editAddress);
-  
+
   if(editAddress < address || editAddress > (address -1 + (displayedLines<<4))) {
     destroyEditCaret();
     return;
@@ -377,7 +377,7 @@ void MemoryViewer::setCaretPos()
   ShowCaret();
 }
 
-void MemoryViewer::OnLButtonDown(UINT nFlags, CPoint point) 
+void MemoryViewer::OnLButtonDown(UINT nFlags, CPoint point)
 {
   int x = point.x;
   int y = point.y;
@@ -400,7 +400,7 @@ void MemoryViewer::OnLButtonDown(UINT nFlags, CPoint point)
     sub = 9*fontSize.cx;
     break;
   }
-  
+
   editAddress = address + (line<<4);
   if(x >= beginHex && x < beforeAscii) {
     x -= beginHex;
@@ -416,7 +416,7 @@ void MemoryViewer::OnLButtonDown(UINT nFlags, CPoint point)
     editAscii = false;
   } else if(x >= beginAscii) {
     int afterAscii = beginAscii+16*fontSize.cx;
-    if(x >= afterAscii) 
+    if(x >= afterAscii)
       x = afterAscii-1;
     editAddress += (x-beginAscii)/fontSize.cx;
     editNibble = 0;
@@ -431,19 +431,19 @@ void MemoryViewer::OnLButtonDown(UINT nFlags, CPoint point)
   setCaretPos();
 }
 
-void MemoryViewer::OnSetFocus(CWnd* pOldWnd) 
+void MemoryViewer::OnSetFocus(CWnd* pOldWnd)
 {
   setCaretPos();
   InvalidateRect(NULL, TRUE);
 }
 
-void MemoryViewer::OnKillFocus(CWnd* pNewWnd) 
+void MemoryViewer::OnKillFocus(CWnd* pNewWnd)
 {
   destroyEditCaret();
   InvalidateRect(NULL, TRUE);
 }
 
-void MemoryViewer::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
+void MemoryViewer::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
   bool isShift = (GetKeyState(VK_SHIFT) & 0x80000000) == 0x80000000;
 
@@ -463,7 +463,7 @@ void MemoryViewer::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
       moveAddress(-((maxNibble+1)>>1),0);
     else
       moveAddress(0, -1);
-    break;  
+    break;
   case VK_DOWN:
     moveAddress(16, 0);
     break;

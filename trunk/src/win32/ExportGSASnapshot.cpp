@@ -48,7 +48,7 @@ ExportGSASnapshot::ExportGSASnapshot(CString filename, CString title, CWnd* pPar
   m_filename = filename;
   char date[100];
   char time[100];
-  
+
   GetDateFormat(LOCALE_USER_DEFAULT,
                 DATE_SHORTDATE,
                 NULL,
@@ -89,21 +89,21 @@ BEGIN_MESSAGE_MAP(ExportGSASnapshot, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // ExportGSASnapshot message handlers
 
-BOOL ExportGSASnapshot::OnInitDialog() 
+BOOL ExportGSASnapshot::OnInitDialog()
 {
   CDialog::OnInitDialog();
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void ExportGSASnapshot::OnCancel() 
+void ExportGSASnapshot::OnCancel()
 {
   EndDialog(FALSE);
 }
 
-void ExportGSASnapshot::OnOk() 
+void ExportGSASnapshot::OnOk()
 {
   UpdateData(TRUE);
 
@@ -112,6 +112,6 @@ void ExportGSASnapshot::OnOk()
   if(!result)
     systemMessage(MSG_ERROR_CREATING_FILE, "Error creating file %s",
                   m_filename);
-  
+
   EndDialog(TRUE);
 }

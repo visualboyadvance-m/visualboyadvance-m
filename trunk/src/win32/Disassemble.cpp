@@ -99,37 +99,37 @@ BEGIN_MESSAGE_MAP(Disassemble, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // Disassemble message handlers
 
-void Disassemble::OnAutoUpdate() 
+void Disassemble::OnAutoUpdate()
 {
   autoUpdate = !autoUpdate;
   if(autoUpdate) {
     theApp.winAddUpdateListener(this);
   } else {
-    theApp.winRemoveUpdateListener(this);    
-  }  
+    theApp.winRemoveUpdateListener(this);
+  }
 }
 
-void Disassemble::OnAutomatic() 
+void Disassemble::OnAutomatic()
 {
   mode = 0;
   refresh();
 }
 
-void Disassemble::OnArm() 
+void Disassemble::OnArm()
 {
   mode = 1;
   address&=0xfffffffC;
   refresh();
 }
 
-void Disassemble::OnClose() 
+void Disassemble::OnClose()
 {
   theApp.winRemoveUpdateListener(this);
-  
+
   DestroyWindow();
 }
 
-void Disassemble::OnGo() 
+void Disassemble::OnGo()
 {
   CString buffer;
   m_address.GetWindowText(buffer);
@@ -141,7 +141,7 @@ void Disassemble::OnGo()
   refresh();
 }
 
-void Disassemble::OnGopc() 
+void Disassemble::OnGopc()
 {
   if(rom != NULL)
   {
@@ -154,7 +154,7 @@ void Disassemble::OnGopc()
   }
 }
 
-void Disassemble::OnNext() 
+void Disassemble::OnNext()
 {
   if(rom != NULL)
   {
@@ -176,22 +176,22 @@ void Disassemble::OnNext()
   }
 }
 
-void Disassemble::OnRefresh() 
+void Disassemble::OnRefresh()
 {
   refresh();
 }
 
-void Disassemble::OnThumb() 
+void Disassemble::OnThumb()
 {
   mode = 2;
   address&=0xfffffffe;
   refresh();
 }
 
-BOOL Disassemble::OnInitDialog() 
+BOOL Disassemble::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_ENTRY( IDC_DISASSEMBLE, DS_SizeY)
     DIALOG_SIZER_ENTRY( IDC_REFRESH, DS_MoveY)
@@ -216,24 +216,24 @@ BOOL Disassemble::OnInitDialog()
   si.nPos = 50;
   si.nPage = 0;
   GetDlgItem(IDC_VSCROLL)->SetScrollInfo(SB_CTL, &si, TRUE);
-  
+
   CFont *font = CFont::FromHandle((HFONT)GetStockObject(SYSTEM_FIXED_FONT));
-  
+
   m_list.SetFont(font, FALSE);
   for(int i = 0; i < 17; i++)
     GetDlgItem(IDC_R0+i)->SetFont(font, FALSE);
 
   GetDlgItem(IDC_MODE)->SetFont(font, FALSE);
-  
+
 
   m_address.LimitText(8);
   refresh();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void Disassemble::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
+void Disassemble::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
   switch(nSBCode) {
   case SB_LINEDOWN:
@@ -282,7 +282,7 @@ void Disassemble::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
     break;
   }
   refresh();
-  
+
   CDialog::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
@@ -290,16 +290,16 @@ void Disassemble::refresh()
 {
   if(rom == NULL)
     return;
-  
+
   bool arm = armState;
-  
+
   if(mode != 0) {
     if(mode == 1)
       arm = true;
     else
       arm = false;
   }
-  
+
   int h = m_list.GetItemHeight(0);
   RECT r;
   m_list.GetClientRect(&r);
@@ -308,7 +308,7 @@ void Disassemble::refresh()
   m_list.ResetContent();
   if(!emulating && theApp.cartridgeType == 0)
     return;
-  
+
   char buffer[80];
   u32 addr = address;
   int i;
@@ -328,7 +328,7 @@ void Disassemble::refresh()
     m_list.SetCurSel(sel);
 
   CPUUpdateCPSR();
-  
+
   for(i = 0; i < 17; i++) {
     sprintf(buffer, "%08x", reg[i].I);
     GetDlgItem(IDC_R0+i)->SetWindowText(buffer);
@@ -355,7 +355,7 @@ void Disassemble::update()
   refresh();
 }
 
-void Disassemble::PostNcDestroy() 
+void Disassemble::PostNcDestroy()
 {
   delete this;
 }

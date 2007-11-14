@@ -489,15 +489,15 @@ void hq2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 {
   u16 *dst0 = (u16 *)dstPtr;
   u16 *dst1 = dst0 + (dstPitch >> 1);
-  
+
   u16 *src0 = (u16 *)srcPtr;
   u16 *src1 = src0 + (srcPitch >> 1);
   u16 *src2 = src1 + (srcPitch >> 1);
-  
+
   hq2x_16_def(dst0, dst1, src0, src0, src1, width);
-  
+
   int count = height;
-  
+
   count -= 2;
   while(count) {
     dst0 += dstPitch;
@@ -518,14 +518,14 @@ void hq2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 {
   u32 *dst0 = (u32 *)dstPtr;
   u32 *dst1 = dst0 + (dstPitch >> 2);
-  
+
   u32 *src0 = (u32 *)srcPtr;
   u32 *src1 = src0 + (srcPitch >> 2);
   u32 *src2 = src1 + (srcPitch >> 2);
   hq2x_32_def(dst0, dst1, src0, src0, src1, width);
-  
+
   int count = height;
-  
+
   count -= 2;
   while(count) {
     dst0 += dstPitch >> 1;
@@ -546,15 +546,15 @@ void lq2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 {
   u16 *dst0 = (u16 *)dstPtr;
   u16 *dst1 = dst0 + (dstPitch >> 1);
-  
+
   u16 *src0 = (u16 *)srcPtr;
   u16 *src1 = src0 + (srcPitch >> 1);
   u16 *src2 = src1 + (srcPitch >> 1);
-  
+
   lq2x_16_def(dst0, dst1, src0, src0, src1, width);
-  
+
   int count = height;
-  
+
   count -= 2;
   while(count) {
     dst0 += dstPitch;
@@ -575,14 +575,14 @@ void lq2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 {
   u32 *dst0 = (u32 *)dstPtr;
   u32 *dst1 = dst0 + (dstPitch >> 2);
-  
+
   u32 *src0 = (u32 *)srcPtr;
   u32 *src1 = src0 + (srcPitch >> 2);
   u32 *src2 = src1 + (srcPitch >> 2);
   lq2x_32_def(dst0, dst1, src0, src0, src1, width);
-  
+
   int count = height;
-  
+
   count -= 2;
   while(count) {
     dst0 += dstPitch >> 1;

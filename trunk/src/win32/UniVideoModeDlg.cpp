@@ -63,10 +63,10 @@ int UniVideoModeDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 }
 
 
-BOOL UniVideoModeDlg::OnInitDialog() 
+BOOL UniVideoModeDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	
+
 	CButton* check_stretchtofit = (CButton*)GetDlgItem(IDC_CHECK_STRETCHTOFIT);
 	check_stretchtofit->SetCheck(theApp.fullScreenStretch ? BST_CHECKED : BST_UNCHECKED);
 
@@ -188,7 +188,7 @@ BOOL UniVideoModeDlg::OnInitDialog()
 			FreqList[i+nModes16] = f;
 		}
 
-		// Clean up		
+		// Clean up
 		pD3D->Release();
 		pD3D = NULL;
 		if(d3dDLL != NULL)
@@ -246,8 +246,8 @@ void UniVideoModeDlg::OnStnClickedDisplaydevice()
 
 	case DIRECT_DRAW:
 		break;
-	
-	
+
+
 	case DIRECT_3D:
 		iDisplayDevice++;
 		if (iDisplayDevice == nAdapters) iDisplayDevice = 0;

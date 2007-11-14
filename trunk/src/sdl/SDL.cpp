@@ -64,11 +64,11 @@ extern bool soundLowPass;
 extern bool soundReverse;
 extern int Init_2xSaI(u32);
 extern void _2xSaI(u8*,u32,u8*,u8*,u32,int,int);
-extern void _2xSaI32(u8*,u32,u8*,u8*,u32,int,int);  
+extern void _2xSaI32(u8*,u32,u8*,u8*,u32,int,int);
 extern void Super2xSaI(u8*,u32,u8*,u8*,u32,int,int);
 extern void Super2xSaI32(u8*,u32,u8*,u8*,u32,int,int);
 extern void SuperEagle(u8*,u32,u8*,u8*,u32,int,int);
-extern void SuperEagle32(u8*,u32,u8*,u8*,u32,int,int);  
+extern void SuperEagle32(u8*,u32,u8*,u8*,u32,int,int);
 extern void Pixelate(u8*,u32,u8*,u8*,u32,int,int);
 extern void Pixelate32(u8*,u32,u8*,u8*,u32,int,int);
 extern void MotionBlur(u8*,u32,u8*,u8*,u32,int,int);
@@ -192,7 +192,7 @@ static int rewindTimer = 0;
 #define _stricmp strcasecmp
 
 bool sdlButtons[4][12] = {
-  { false, false, false, false, false, false, 
+  { false, false, false, false, false, false,
     false, false, false, false, false, false },
   { false, false, false, false, false, false,
     false, false, false, false, false, false },
@@ -308,7 +308,7 @@ u16 defaultMotion[4] = {
 
 struct option sdlOptions[] = {
   { "agb-print", no_argument, &sdlAgbPrint, 1 },
-  { "auto-frameskip", no_argument, &autoFrameSkip, 1 },  
+  { "auto-frameskip", no_argument, &autoFrameSkip, 1 },
   { "bios", required_argument, 0, 'b' },
   { "config", required_argument, 0, 'c' },
   { "debug", no_argument, 0, 'd' },
@@ -360,7 +360,7 @@ struct option sdlOptions[] = {
   { "show-speed-normal", no_argument, &showSpeed, 1 },
   { "show-speed-detailed", no_argument, &showSpeed, 2 },
   { "throttle", required_argument, 0, 'T' },
-  { "verbose", required_argument, 0, 'v' },  
+  { "verbose", required_argument, 0, 'v' },
   { "video-1x", no_argument, &sizeOption, 0 },
   { "video-2x", no_argument, &sizeOption, 1 },
   { "video-3x", no_argument, &sizeOption, 2 },
@@ -400,21 +400,21 @@ extern bool gbIsGameboyRom(char *);
   sdlStretcher[sdlStretcherPos++] = 0x06;\
   sdlStretcher[sdlStretcherPos++] = 0x83;\
   sdlStretcher[sdlStretcherPos++] = 0xc6;\
-  sdlStretcher[sdlStretcherPos++] = 0x02;  
+  sdlStretcher[sdlStretcherPos++] = 0x02;
 
 #define SDL_LOADL \
   sdlStretcher[sdlStretcherPos++] = 0x8b;\
   sdlStretcher[sdlStretcherPos++] = 0x06;\
   sdlStretcher[sdlStretcherPos++] = 0x83;\
   sdlStretcher[sdlStretcherPos++] = 0xc6;\
-  sdlStretcher[sdlStretcherPos++] = 0x04;  
+  sdlStretcher[sdlStretcherPos++] = 0x04;
 
 #define SDL_LOADL2 \
   sdlStretcher[sdlStretcherPos++] = 0x8b;\
   sdlStretcher[sdlStretcherPos++] = 0x06;\
   sdlStretcher[sdlStretcherPos++] = 0x83;\
   sdlStretcher[sdlStretcherPos++] = 0xc6;\
-  sdlStretcher[sdlStretcherPos++] = 0x03;  
+  sdlStretcher[sdlStretcherPos++] = 0x03;
 
 #define SDL_STOREW \
   sdlStretcher[sdlStretcherPos++] = 0x66;\
@@ -422,21 +422,21 @@ extern bool gbIsGameboyRom(char *);
   sdlStretcher[sdlStretcherPos++] = 0x07;\
   sdlStretcher[sdlStretcherPos++] = 0x83;\
   sdlStretcher[sdlStretcherPos++] = 0xc7;\
-  sdlStretcher[sdlStretcherPos++] = 0x02;  
+  sdlStretcher[sdlStretcherPos++] = 0x02;
 
 #define SDL_STOREL \
   sdlStretcher[sdlStretcherPos++] = 0x89;\
   sdlStretcher[sdlStretcherPos++] = 0x07;\
   sdlStretcher[sdlStretcherPos++] = 0x83;\
   sdlStretcher[sdlStretcherPos++] = 0xc7;\
-  sdlStretcher[sdlStretcherPos++] = 0x04;  
+  sdlStretcher[sdlStretcherPos++] = 0x04;
 
 #define SDL_STOREL2 \
   sdlStretcher[sdlStretcherPos++] = 0x89;\
   sdlStretcher[sdlStretcherPos++] = 0x07;\
   sdlStretcher[sdlStretcherPos++] = 0x83;\
   sdlStretcher[sdlStretcherPos++] = 0xc7;\
-  sdlStretcher[sdlStretcherPos++] = 0x03;  
+  sdlStretcher[sdlStretcherPos++] = 0x03;
 
 #define SDL_RET \
   sdlStretcher[sdlStretcherPos++] = 0xc3;
@@ -823,7 +823,7 @@ void sdlCheckDirectory(char *dir)
   if(*p == '/' ||
      *p == '\\')
     *p = 0;
-  
+
   if(stat(dir, &buf) == 0) {
     if(!(buf.st_mode & S_IFDIR)) {
       fprintf(stderr, "Error: %s is not a directory\n", dir);
@@ -840,9 +840,9 @@ char *sdlGetFilename(char *name)
   static char filebuffer[2048];
 
   int len = strlen(name);
-  
+
   char *p = name + len - 1;
-  
+
   while(true) {
     if(*p == '/' ||
        *p == '\\') {
@@ -854,7 +854,7 @@ char *sdlGetFilename(char *name)
     if(len == 0)
       break;
   }
-  
+
   if(len == 0)
     strcpy(filebuffer, name);
   else
@@ -878,11 +878,11 @@ FILE *sdlFindFile(const char *name)
 #endif // ! _WIN32
 
   fprintf(stderr, "Searching for file %s\n", name);
-  
+
   if(GETCWD(buffer, 2048)) {
     fprintf(stderr, "Searching current directory: %s\n", buffer);
   }
-  
+
   FILE *f = fopen(name, "r");
   if(f != NULL) {
     return f;
@@ -924,7 +924,7 @@ FILE *sdlFindFile(const char *name)
       strncpy(buffer, path, 4096);
       buffer[4095] = 0;
       char *tok = strtok(buffer, PATH_SEP);
-      
+
       while(tok) {
         sprintf(path, "%s%c%s", tok, FILE_SEP, EXE_NAME);
         f = fopen(path, "r");
@@ -960,7 +960,7 @@ FILE *sdlFindFile(const char *name)
 void sdlReadPreferences(FILE *f)
 {
   char buffer[2048];
-  
+
   while(1) {
     char *s = fgets(buffer, 2048, f);
 
@@ -968,10 +968,10 @@ void sdlReadPreferences(FILE *f)
       break;
 
     char *p  = strchr(s, '#');
-    
+
     if(p)
       *p = 0;
-    
+
     char *token = strtok(s, " \t\n\r=");
 
     if(!token)
@@ -1099,7 +1099,7 @@ void sdlReadPreferences(FILE *f)
     } else if(!strcmp(key, "gbFrameSkip")) {
       gbFrameSkip = sdlFromHex(value);
       if(gbFrameSkip < 0 || gbFrameSkip > 9)
-        gbFrameSkip = 0;      
+        gbFrameSkip = 0;
     } else if(!strcmp(key, "video")) {
       sizeOption = sdlFromHex(value);
       if(sizeOption < 0 || sizeOption > 3)
@@ -1147,7 +1147,7 @@ void sdlReadPreferences(FILE *f)
       case 4:
         break;
       default:
-        fprintf(stderr, "Unknown sound quality %d. Defaulting to 22Khz\n", 
+        fprintf(stderr, "Unknown sound quality %d. Defaulting to 22Khz\n",
                 soundQuality);
         soundQuality = 2;
         break;
@@ -1251,7 +1251,7 @@ static void sdlApplyPerImagePreferences()
   char readBuffer[2048];
 
   bool found = false;
-  
+
   while(1) {
     char *s = fgets(readBuffer, 2048, f);
 
@@ -1259,10 +1259,10 @@ static void sdlApplyPerImagePreferences()
       break;
 
     char *p  = strchr(s, ';');
-    
+
     if(p)
       *p = 0;
-    
+
     char *token = strtok(s, " \t\n\r=");
 
     if(!token)
@@ -1298,7 +1298,7 @@ static void sdlApplyPerImagePreferences()
       char *value = strtok(NULL, "\t\n\r=");
       if(value == NULL)
         continue;
-      
+
       if(!strcmp(token, "rtcEnabled"))
         rtcEnable(atoi(value) == 0 ? false : true);
       else if(!strcmp(token, "flashSize")) {
@@ -1320,7 +1320,7 @@ static void sdlApplyPerImagePreferences()
 static int sdlCalculateShift(u32 mask)
 {
   int m = 0;
-  
+
   while(mask) {
     m++;
     mask >>= 1;
@@ -1358,7 +1358,7 @@ void sdlWriteState(int num)
             num+1);
   else
     sprintf(stateName,"%s%d.sgm", filename, num+1);
-  
+
   if(emulator.emuWriteState)
     emulator.emuWriteState(stateName);
 
@@ -1393,7 +1393,7 @@ void sdlWriteBattery()
 
   if(batteryDir[0])
     sprintf(buffer, "%s/%s.sav", batteryDir, sdlGetFilename(filename));
-  else  
+  else
     sprintf(buffer, "%s.sav", filename);
 
   emulator.emuWriteBattery(buffer);
@@ -1404,12 +1404,12 @@ void sdlWriteBattery()
 void sdlReadBattery()
 {
   char buffer[1048];
-  
+
   if(batteryDir[0])
     sprintf(buffer, "%s/%s.sav", batteryDir, sdlGetFilename(filename));
-  else 
+  else
     sprintf(buffer, "%s.sav", filename);
-  
+
   bool res = false;
 
   res = emulator.emuReadBattery(buffer);
@@ -1453,7 +1453,7 @@ void sdlUpdateJoyButton(int which,
       int b = joypad[j][i] & 0xfff;
       if(dev) {
         dev--;
-        
+
         if((dev == which) && (b >= 128) && (b == (button+128))) {
           sdlButtons[j][i] = pressed;
         }
@@ -1470,7 +1470,7 @@ void sdlUpdateJoyButton(int which,
         sdlMotionButtons[i] = pressed;
       }
     }
-  }  
+  }
 }
 
 void sdlUpdateJoyHat(int which,
@@ -1484,7 +1484,7 @@ void sdlUpdateJoyHat(int which,
       int a = joypad[j][i] & 0xfff;
       if(dev) {
         dev--;
-        
+
         if((dev == which) && (a>=32) && (a < 48) && (((a&15)>>2) == hat)) {
           int dir = a & 3;
           int v = 0;
@@ -1533,7 +1533,7 @@ void sdlUpdateJoyHat(int which,
         sdlMotionButtons[i] = (v ? true : false);
       }
     }
-  }      
+  }
 }
 
 void sdlUpdateJoyAxis(int which,
@@ -1547,7 +1547,7 @@ void sdlUpdateJoyAxis(int which,
       int a = joypad[j][i] & 0xfff;
       if(dev) {
         dev--;
-        
+
         if((dev == which) && (a < 32) && ((a>>1) == axis)) {
           sdlButtons[j][i] = (a & 1) ? (value > 16384) : (value < -16384);
         }
@@ -1564,7 +1564,7 @@ void sdlUpdateJoyAxis(int which,
         sdlMotionButtons[i] = (a & 1) ? (value > 16384) : (value < -16384);
       }
     }
-  }  
+  }
 }
 
 bool sdlCheckJoyKey(int key)
@@ -1579,7 +1579,7 @@ bool sdlCheckJoyKey(int key)
     if(button >= SDL_JoystickNumButtons(sdlDevices[dev]))
       return false;
   } else if (what < 0x20) {
-    // joystick axis    
+    // joystick axis
     what >>= 1;
     if(what >= SDL_JoystickNumAxes(sdlDevices[dev]))
       return false;
@@ -1612,18 +1612,18 @@ void sdlCheckKeys()
       if(dev) {
         dev--;
         bool ok = false;
-        
+
         if(sdlDevices) {
           if(dev < sdlNumDevices) {
             if(sdlDevices[dev] == NULL) {
               sdlDevices[dev] = SDL_JoystickOpen(dev);
             }
-            
+
             ok = sdlCheckJoyKey(joypad[j][i]);
           } else
             ok = false;
         }
-        
+
         if(!ok)
           joypad[j][i] = defaultJoypad[i];
         else
@@ -1637,18 +1637,18 @@ void sdlCheckKeys()
     if(dev) {
       dev--;
       bool ok = false;
-      
+
       if(sdlDevices) {
         if(dev < sdlNumDevices) {
           if(sdlDevices[dev] == NULL) {
             sdlDevices[dev] = SDL_JoystickOpen(dev);
           }
-          
+
           ok = sdlCheckJoyKey(motion[i]);
         } else
           ok = false;
       }
-      
+
       if(!ok)
         motion[i] = defaultMotion[i];
       else
@@ -1682,7 +1682,7 @@ void sdlPollEvents()
             if(emulating)
               soundPause();
           }
-          
+
           memset(delta,255,sizeof(delta));
         }
       }
@@ -1729,10 +1729,10 @@ void sdlPollEvents()
       case SDLK_b:
         if(!(event.key.keysym.mod & MOD_NOCTRL) &&
            (event.key.keysym.mod & KMOD_CTRL)) {
-          if(emulating && emulator.emuReadMemState && rewindMemory 
+          if(emulating && emulator.emuReadMemState && rewindMemory
              && rewindCount) {
             rewindPos = (rewindPos - 1) & 7;
-            emulator.emuReadMemState(&rewindMemory[REWIND_SIZE*rewindPos], 
+            emulator.emuReadMemState(&rewindMemory[REWIND_SIZE*rewindPos],
                                      REWIND_SIZE);
             rewindCount--;
             rewindCounter = 0;
@@ -1799,12 +1799,12 @@ void sdlPollEvents()
       case SDLK_4:
         if(!(event.key.keysym.mod & MOD_NOALT) &&
            (event.key.keysym.mod & KMOD_ALT)) {
-          const char *disableMessages[4] = 
+          const char *disableMessages[4] =
             { "autofire A disabled",
               "autofire B disabled",
               "autofire R disabled",
               "autofire L disabled"};
-          const char *enableMessages[4] = 
+          const char *enableMessages[4] =
             { "autofire A",
               "autofire B",
               "autofire R",
@@ -1950,12 +1950,12 @@ int main(int argc, char **argv)
   fprintf(stderr, "VisualBoyAdvance version %s [SDL]\n", VERSION);
 
   arg0 = argv[0];
-  
+
   captureDir[0] = 0;
   saveDir[0] = 0;
   batteryDir[0] = 0;
   ipsname[0] = 0;
-  
+
   int op = -1;
 
   frameSkip = 2;
@@ -1966,7 +1966,7 @@ int main(int argc, char **argv)
   sdlReadPreferences();
 
   sdlPrintUsage = 0;
-  
+
   while((op = getopt_long(argc,
                           argv,
                           "FNT:Y:G:D:b:c:df:hi:p::s:t:v:1234",
@@ -2128,7 +2128,7 @@ int main(int argc, char **argv)
     case 'v':
       if(optarg) {
         systemVerbose = atoi(optarg);
-      } else 
+      } else
         systemVerbose = 0;
       break;
     case '1':
@@ -2169,7 +2169,7 @@ int main(int argc, char **argv)
 
   rtcEnable(sdlRtcEnable ? true : false);
   agbPrintEnable(sdlAgbPrint ? true : false);
-  
+
   if(!debuggerStub) {
     if(optind >= argc) {
       systemMessage(0,"Missing image name");
@@ -2194,7 +2194,7 @@ int main(int argc, char **argv)
   if(optind < argc) {
     char *szFile = argv[optind];
     u32 len = strlen(szFile);
-    if (len > SYSMSG_BUFFER_SIZE) 
+    if (len > SYSMSG_BUFFER_SIZE)
     {
       fprintf(stderr,"%s :%s: File name too long\n",argv[0],szFile);
       exit(-1);
@@ -2208,7 +2208,7 @@ int main(int argc, char **argv)
 
     if(ipsname[0] == 0)
       sprintf(ipsname, "%s.ips", filename);
-    
+
     bool failed = false;
 
     IMAGE_TYPE type = utilFindType(szFile);
@@ -2218,12 +2218,12 @@ int main(int argc, char **argv)
       exit(-1);
     }
     cartridgeType = (int)type;
-    
+
     if(type == IMAGE_GB) {
       failed = !gbLoadRom(szFile);
       if(!failed) {
         gbGetHardwareType();
-        
+
         // used for the handling of the gb Boot Rom
         if (gbHardware & 5)
         {
@@ -2236,7 +2236,7 @@ int main(int argc, char **argv)
 			    gbCPUInit(tempName, useBios);
         }
         else useBios = false;
-        
+
         gbReset();
         cartridgeType = IMAGE_GB;
         emulator = GBSystem;
@@ -2257,7 +2257,7 @@ int main(int argc, char **argv)
         sdlApplyPerImagePreferences();
 
         doMirroring(mirroringEnable);
-        
+
         cartridgeType = 0;
         emulator = GBASystem;
 
@@ -2266,7 +2266,7 @@ int main(int argc, char **argv)
           WRITE32LE(&rom[0], 0xea00002e);
         }
         */
-        
+
         CPUInit(biosFileName, useBios);
         CPUReset();
         if(sdlAutoIPS) {
@@ -2278,7 +2278,7 @@ int main(int argc, char **argv)
         }
       }
     }
-    
+
     if(failed) {
       systemMessage(0, "Failed to load file %s", szFile);
       exit(-1);
@@ -2297,22 +2297,22 @@ int main(int argc, char **argv)
     ioMem = (u8 *)calloc(1, 0x400);
 
     emulator = GBASystem;
-    
+
     CPUInit(biosFileName, useBios);
-    CPUReset();    
+    CPUReset();
   }
-  
+
   sdlReadBattery();
-  
-  if(debuggerStub) 
+
+  if(debuggerStub)
     remoteInit();
-  
+
   int flags = SDL_INIT_VIDEO|SDL_INIT_AUDIO|
     SDL_INIT_TIMER|SDL_INIT_NOPARACHUTE;
 
   if(soundOffFlag)
     flags ^= SDL_INIT_AUDIO;
-  
+
   if(SDL_Init(flags)) {
     systemMessage(0, "Failed to init SDL: %s", SDL_GetError());
     exit(-1);
@@ -2321,9 +2321,9 @@ int main(int argc, char **argv)
   if(SDL_InitSubSystem(SDL_INIT_JOYSTICK)) {
     systemMessage(0, "Failed to init joystick support: %s", SDL_GetError());
   }
-  
+
   sdlCheckKeys();
-  
+
   if(cartridgeType == 0) {
     srcWidth = 240;
     srcHeight = 160;
@@ -2335,7 +2335,7 @@ int main(int argc, char **argv)
       gbBorderLineSkip = 256;
       gbBorderColumnSkip = 48;
       gbBorderRowSkip = 40;
-    } else {      
+    } else {
       srcWidth = 160;
       srcHeight = 144;
       gbBorderLineSkip = 160;
@@ -2347,24 +2347,24 @@ int main(int argc, char **argv)
     srcWidth = 320;
     srcHeight = 240;
   }
-  
+
   destWidth = (sizeOption+1)*srcWidth;
   destHeight = (sizeOption+1)*srcHeight;
-  
+
   surface = SDL_SetVideoMode(destWidth, destHeight, 16,
                              SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|
                              (fullscreen ? SDL_FULLSCREEN : 0));
-  
+
   if(surface == NULL) {
     systemMessage(0, "Failed to set video mode");
     SDL_Quit();
     exit(-1);
   }
-  
+
   systemRedShift = sdlCalculateShift(surface->format->Rmask);
   systemGreenShift = sdlCalculateShift(surface->format->Gmask);
   systemBlueShift = sdlCalculateShift(surface->format->Bmask);
-  
+
   systemColorDepth = surface->format->BitsPerPixel;
   if(systemColorDepth == 15)
     systemColorDepth = 16;
@@ -2376,7 +2376,7 @@ int main(int argc, char **argv)
     systemGreenShift = 11;
     systemBlueShift =  19;
   }
-  
+
   if(systemColorDepth != 16 && systemColorDepth != 24 &&
      systemColorDepth != 32) {
     fprintf(stderr,"Unsupported color depth '%d'.\nOnly 16, 24 and 32 bit color depths are supported\n", systemColorDepth);
@@ -2403,7 +2403,7 @@ int main(int argc, char **argv)
 #endif
 
   fprintf(stderr,"Color depth: %d\n", systemColorDepth);
-  
+
   if(systemColorDepth == 16) {
     if(sdlCalculateMaskWidth(surface->format->Gmask) == 6) {
       Init_2xSaI(565);
@@ -2520,7 +2520,7 @@ int main(int argc, char **argv)
       break;
     }
   }
-  
+
   if(systemColorDepth == 16) {
     switch(ifbType) {
     case 0:
@@ -2554,7 +2554,7 @@ int main(int argc, char **argv)
     delta = (u8*)malloc(322*242*4);
     memset(delta, 255, 322*242*4);
   }
-  
+
   emulating = 1;
   renderedFrames = 0;
 
@@ -2562,7 +2562,7 @@ int main(int argc, char **argv)
     soundInit();
 
   autoFrameSkipLastTime = throttleLastTime = systemGetClock();
-  
+
   SDL_WM_SetCaption("VisualBoyAdvance", NULL);
 
   while(emulating) {
@@ -2576,7 +2576,7 @@ int main(int argc, char **argv)
           if(rewindCount > 8)
             rewindCount = 8;
           if(emulator.emuWriteMemState &&
-             emulator.emuWriteMemState(&rewindMemory[rewindPos*REWIND_SIZE], 
+             emulator.emuWriteMemState(&rewindMemory[rewindPos*REWIND_SIZE],
                                        REWIND_SIZE)) {
             rewindPos = (rewindPos + 1) & 7;
             if(rewindCount == 8)
@@ -2596,7 +2596,7 @@ int main(int argc, char **argv)
         SDL_ShowCursor(SDL_DISABLE);
     }
   }
-  
+
   emulating = 0;
   fprintf(stderr,"Shutting down\n");
   remoteCleanUp();
@@ -2611,7 +2611,7 @@ int main(int argc, char **argv)
     free(delta);
     delta = NULL;
   }
-  
+
   SDL_Quit();
   return 0;
 }
@@ -2620,10 +2620,10 @@ void systemMessage(int num, const char *msg, ...)
 {
   char buffer[SYSMSG_BUFFER_SIZE*2];
   va_list valist;
-  
+
   va_start(valist, msg);
   vsprintf(buffer, msg, valist);
-  
+
   fprintf(stderr, "%s\n", buffer);
   va_end(valist);
 }
@@ -2631,12 +2631,12 @@ void systemMessage(int num, const char *msg, ...)
 void systemDrawScreen()
 {
   renderedFrames++;
-  
+
   if(yuv) {
     Draw_Overlay(surface, sizeOption+1);
     return;
   }
-  
+
   SDL_LockSurface(surface);
 
   if(screenMessage) {
@@ -2646,7 +2646,7 @@ void systemDrawScreen()
     if(((systemGetClock() - screenMessageTime) < 3000) &&
        !disableStatusMessages) {
       drawText(pix, srcPitch, 10, srcHeight - 20,
-               screenMessageBuffer); 
+               screenMessageBuffer);
     } else {
       screenMessage = false;
     }
@@ -2658,7 +2658,7 @@ void systemDrawScreen()
     else
       ifbFunction(pix+destWidth*2+4, destWidth*2+4, srcWidth, srcHeight);
   }
-  
+
   if(filterFunction) {
     if(systemColorDepth == 16)
       filterFunction(pix+destWidth+4,destWidth+4, delta,
@@ -2694,7 +2694,7 @@ void systemDrawScreen()
       break;
     case 1:
       for(i = 0; i < srcHeight; i++) {
-        SDL_CALL_STRETCHER;     
+        SDL_CALL_STRETCHER;
         dest += destPitch;
         SDL_CALL_STRETCHER;
         src += srcPitch;
@@ -2747,8 +2747,8 @@ void systemDrawScreen()
                surface->pitch,
                10,
                surface->h-20,
-               buffer);        
-  }  
+               buffer);
+  }
 
   SDL_UnlockSurface(surface);
   //  SDL_UpdateRect(surface, 0, 0, destWidth, destHeight);
@@ -2764,9 +2764,9 @@ u32 systemReadJoypad(int which)
 {
   if(which < 0 || which > 3)
     which = sdlDefaultJoypad;
-  
+
   u32 res = 0;
-  
+
   if(sdlButtons[which][KEY_BUTTON_A])
     res |= 1;
   if(sdlButtons[which][KEY_BUTTON_B])
@@ -2805,7 +2805,7 @@ u32 systemReadJoypad(int which)
       res |= autoFire;
     autoFireToggle = !autoFireToggle;
   }
-  
+
   return res;
 }
 
@@ -2819,7 +2819,7 @@ void systemShowSpeed(int speed)
   systemSpeed = speed;
 
   showRenderedFrames = renderedFrames;
-  renderedFrames = 0;  
+  renderedFrames = 0;
 
   if(!fullscreen && showSpeed) {
     char buffer[80];
@@ -2840,14 +2840,14 @@ void systemFrame()
 
 void system10Frames(int rate)
 {
-  u32 time = systemGetClock();  
+  u32 time = systemGetClock();
   if(!wasPaused && autoFrameSkip && !throttle) {
     u32 diff = time - autoFrameSkipLastTime;
     int speed = 100;
 
     if(diff)
       speed = (1000000/rate)/diff;
-    
+
     if(speed >= 98) {
       frameskipadjust++;
 
@@ -2867,15 +2867,15 @@ void system10Frames(int rate)
         if(systemFrameSkip < 9)
           systemFrameSkip++;
       }
-    }    
+    }
   }
   if(!wasPaused && throttle) {
     if(!speedup) {
       u32 diff = time - throttleLastTime;
-      
+
       int target = (1000000/(rate*throttle));
       int d = (target - diff);
-      
+
       if(d > 0) {
         SDL_Delay(d);
       }
@@ -3102,7 +3102,7 @@ void systemUpdateMotionSensor()
     sensorY += 2;
     if(sensorY > 2047)
       sensorY = 2047;
-  }    
+  }
 }
 
 int systemGetSensorX()
@@ -3127,7 +3127,7 @@ void systemScreenMessage(const char *msg)
     strncpy(screenMessageBuffer, msg, 20);
     screenMessageBuffer[20] = 0;
   } else
-    strcpy(screenMessageBuffer, msg);  
+    strcpy(screenMessageBuffer, msg);
 }
 
 bool systemCanChangeSoundQuality()
@@ -3153,7 +3153,7 @@ bool systemPauseOnFrame()
 
 void Init_Overlay(SDL_Surface *gbascreen, int overlaytype)
 {
-  
+
   overlay = SDL_CreateYUVOverlay( GBA_WIDTH,
                                   GBA_HEIGHT,
                                   overlaytype, gbascreen);
@@ -3170,7 +3170,7 @@ void Init_Overlay(SDL_Surface *gbascreen, int overlaytype)
 
 void Quit_Overlay(void)
 {
-  
+
   SDL_FreeYUVOverlay(overlay);
 }
 
@@ -3189,16 +3189,16 @@ inline void ConvertRGBtoYV12(SDL_Overlay *o)
   int x,y;
   int yuv[3];
   Uint8 *p,*op[3];
-  
+
   SDL_LockYUVOverlay(o);
-  
+
   /* Black initialization */
   /*
     memset(o->pixels[0],0,o->pitches[0]*o->h);
     memset(o->pixels[1],128,o->pitches[1]*((o->h+1)/2));
     memset(o->pixels[2],128,o->pitches[2]*((o->h+1)/2));
   */
-  
+
   /* Convert */
   for(y=0; y<160 && y<o->h; y++) {
     p=(Uint8 *)pix+srcPitch*y;
@@ -3215,7 +3215,7 @@ inline void ConvertRGBtoYV12(SDL_Overlay *o)
       p+=4;//s->format->BytesPerPixel;
     }
   }
-  
+
   SDL_UnlockYUVOverlay(o);
 }
 
@@ -3224,16 +3224,16 @@ inline void ConvertRGBtoIYUV(SDL_Overlay *o)
   int x,y;
   int yuv[3];
   Uint8 *p,*op[3];
-  
+
   SDL_LockYUVOverlay(o);
-  
+
   /* Black initialization */
   /*
     memset(o->pixels[0],0,o->pitches[0]*o->h);
     memset(o->pixels[1],128,o->pitches[1]*((o->h+1)/2));
     memset(o->pixels[2],128,o->pitches[2]*((o->h+1)/2));
   */
-  
+
   /* Convert */
   for(y=0; y<160 && y<o->h; y++) {
     p=(Uint8 *)pix+srcPitch*y;
@@ -3250,7 +3250,7 @@ inline void ConvertRGBtoIYUV(SDL_Overlay *o)
       p+=4; //s->format->BytesPerPixel;
     }
   }
-  
+
   SDL_UnlockYUVOverlay(o);
 }
 
@@ -3259,9 +3259,9 @@ inline void ConvertRGBtoUYVY(SDL_Overlay *o)
   int x,y;
   int yuv[3];
   Uint8 *p,*op;
-  
+
   SDL_LockYUVOverlay(o);
-  
+
   for(y=0; y<160 && y<o->h; y++) {
     p=(Uint8 *)pix+srcPitch*y;
     op=o->pixels[0]+o->pitches[0]*y;
@@ -3273,11 +3273,11 @@ inline void ConvertRGBtoUYVY(SDL_Overlay *o)
         *(op++)=yuv[2];
       } else
         *(op++)=yuv[0];
-      
+
       p+=4; //s->format->BytesPerPixel;
     }
   }
-  
+
   SDL_UnlockYUVOverlay(o);
 }
 
@@ -3286,9 +3286,9 @@ inline void ConvertRGBtoYVYU(SDL_Overlay *o)
   int x,y;
   int yuv[3];
   Uint8 *p,*op;
-  
+
   SDL_LockYUVOverlay(o);
-  
+
   for(y=0; y<160 && y<o->h; y++) {
     p=(Uint8 *)pix+srcPitch*y;
     op=o->pixels[0]+o->pitches[0]*y;
@@ -3302,11 +3302,11 @@ inline void ConvertRGBtoYVYU(SDL_Overlay *o)
         *op=yuv[0];
         op+=2;
       }
-      
+
       p+=4; //s->format->BytesPerPixel;
     }
   }
-  
+
   SDL_UnlockYUVOverlay(o);
 }
 
@@ -3315,9 +3315,9 @@ inline void ConvertRGBtoYUY2(SDL_Overlay *o)
   int x,y;
   int yuv[3];
   Uint8 *p,*op;
-  
+
   SDL_LockYUVOverlay(o);
-  
+
   for(y=0; y<160 && y<o->h; y++) {
     p=(Uint8 *)pix+srcPitch*y;
     op=o->pixels[0]+o->pitches[0]*y;
@@ -3331,11 +3331,11 @@ inline void ConvertRGBtoYUY2(SDL_Overlay *o)
         *op=yuv[0];
         op+=2;
       }
-      
+
       p+=4; //s->format->BytesPerPixel;
     }
   }
-  
+
   SDL_UnlockYUVOverlay(o);
 }
 
@@ -3362,16 +3362,16 @@ inline void Convert32bit(SDL_Surface *display)
     exit(1);
     break;
   }
-  
+
 }
 
 
 inline void Draw_Overlay(SDL_Surface *display, int size)
 {
   SDL_LockYUVOverlay(overlay);
-  
+
   Convert32bit(display);
-  
+
   overlay_rect.x = 0;
   overlay_rect.y = 0;
   overlay_rect.w = GBA_WIDTH  * size;
@@ -3391,10 +3391,10 @@ void systemGbBorderOn()
 
   destWidth = (sizeOption+1)*srcWidth;
   destHeight = (sizeOption+1)*srcHeight;
-  
+
   surface = SDL_SetVideoMode(destWidth, destHeight, 16,
                              SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|
-                             (fullscreen ? SDL_FULLSCREEN : 0));  
+                             (fullscreen ? SDL_FULLSCREEN : 0));
 #ifndef C_CORE
   sdlMakeStretcher(srcWidth);
 #else
@@ -3420,19 +3420,19 @@ void systemGbBorderOn()
       RGB_LOW_BITS_MASK = 0x821;
     } else {
       Init_2xSaI(555);
-      RGB_LOW_BITS_MASK = 0x421;      
+      RGB_LOW_BITS_MASK = 0x421;
     }
     if(cartridgeType == 2) {
       for(int i = 0; i < 0x10000; i++) {
         systemColorMap16[i] = (((i >> 1) & 0x1f) << systemBlueShift) |
           (((i & 0x7c0) >> 6) << systemGreenShift) |
-          (((i & 0xf800) >> 11) << systemRedShift);  
-      }      
+          (((i & 0xf800) >> 11) << systemRedShift);
+      }
     } else {
       for(int i = 0; i < 0x10000; i++) {
         systemColorMap16[i] = ((i & 0x1f) << systemRedShift) |
           (((i & 0x3e0) >> 5) << systemGreenShift) |
-          (((i & 0x7c00) >> 10) << systemBlueShift);  
+          (((i & 0x7c00) >> 10) << systemBlueShift);
       }
     }
     srcPitch = srcWidth * 2+4;
@@ -3446,7 +3446,7 @@ void systemGbBorderOn()
     for(int i = 0; i < 0x10000; i++) {
       systemColorMap32[i] = ((i & 0x1f) << systemRedShift) |
         (((i & 0x3e0) >> 5) << systemGreenShift) |
-        (((i & 0x7c00) >> 10) << systemBlueShift);  
+        (((i & 0x7c00) >> 10) << systemBlueShift);
     }
     if(systemColorDepth == 32)
       srcPitch = srcWidth*4 + 4;

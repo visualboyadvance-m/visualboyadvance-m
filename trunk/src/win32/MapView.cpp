@@ -52,9 +52,9 @@ MapView::MapView(CWnd* pParent /*=NULL*/)
   //{{AFX_DATA_INIT(MapView)
   //}}AFX_DATA_INIT
   autoUpdate = false;
-  
+
   memset(&bmpInfo.bmiHeader, 0, sizeof(bmpInfo.bmiHeader));
-  
+
   bmpInfo.bmiHeader.biSize = sizeof(bmpInfo.bmiHeader);
   bmpInfo.bmiHeader.biWidth = 1024;
   bmpInfo.bmiHeader.biHeight = -1024;
@@ -65,7 +65,7 @@ MapView::MapView(CWnd* pParent /*=NULL*/)
 
   mapView.setData(data);
   mapView.setBmpInfo(&bmpInfo);
-  
+
   control = BG0CNT;
 
   bg = 0;
@@ -144,7 +144,7 @@ void MapView::renderTextScreen(u16 control)
 
   w = sizeX;
   h = sizeY;
-  
+
   if(control & 0x80) {
     for(int y = 0; y < sizeY; y++) {
       int yy = y & 255;
@@ -158,24 +158,24 @@ void MapView::renderTextScreen(u16 control)
 
       for(int x = 0; x < sizeX; x++) {
         u16 data = *screenSource;
-      
+
         int tile = data & 0x3FF;
         int tileX = (x & 7);
         int tileY = y & 7;
-        
+
         if(data & 0x0400)
           tileX = 7 - tileX;
         if(data & 0x0800)
           tileY = 7 - tileY;
 
         u8 c = charBase[tile * 64 + tileY * 8 + tileX];
-        
+
         u16 color = palette[c];
-        
+
         *bmp++ = ((color >> 10) & 0x1f) << 3;
         *bmp++ = ((color >> 5) & 0x1f) << 3;
-        *bmp++ = (color & 0x1f) << 3;      
-      
+        *bmp++ = (color & 0x1f) << 3;
+
         if(data & 0x0400) {
           if(tileX == 0)
             screenSource++;
@@ -199,7 +199,7 @@ void MapView::renderTextScreen(u16 control)
 
       for(int x = 0; x < sizeX; x++) {
         u16 data = *screenSource;
-        
+
         int tile = data & 0x3FF;
         int tileX = (x & 7);
         int tileY = y & 7;
@@ -208,9 +208,9 @@ void MapView::renderTextScreen(u16 control)
           tileX = 7 - tileX;
         if(data & 0x0800)
           tileY = 7 - tileY;
-        
+
         u8 color = charBase[tile * 32 + tileY * 4 + (tileX>>1)];
-        
+
         if(tileX & 1) {
           color = (color >> 4);
         } else {
@@ -223,7 +223,7 @@ void MapView::renderTextScreen(u16 control)
         *bmp++ = ((color2 >> 10) & 0x1f) << 3;
         *bmp++ = ((color2 >> 5) & 0x1f) << 3;
         *bmp++ = (color2 & 0x1f) << 3;
-        
+
         if(data & 0x0400) {
           if(tileX == 0)
             screenSource++;
@@ -232,7 +232,7 @@ void MapView::renderTextScreen(u16 control)
 
         if(x == 255 && sizeX > 256) {
           screenSource = screenBase + 0x400 + ((yy>>3)*32);
-        }        
+        }
       }
     }
   }
@@ -299,15 +299,15 @@ void MapView::renderRotScreen(u16 control)
 
   w = sizeX;
   h = sizeY;
-  
+
   if(control & 0x80) {
     for(int y = 0; y < sizeY; y++) {
       for(int x = 0; x < sizeX; x++) {
         int tile = screenBase[(x>>3) + (y>>3)*(w>>3)];
-        
+
         int tileX = (x & 7);
         int tileY = y & 7;
-        
+
         u8 color = charBase[tile * 64 + tileY * 8 + tileX];
         u16 color2 = palette[color];
 
@@ -320,30 +320,30 @@ void MapView::renderRotScreen(u16 control)
     for(int y = 0; y < sizeY; y++) {
       for(int x = 0; x < sizeX; x++) {
         int tile = screenBase[(x>>3) + (y>>3)*(w>>3)];
-        
+
         int tileX = (x & 7);
         int tileY = y & 7;
-        
+
         u8 color = charBase[tile * 64 + tileY * 8 + tileX];
         u16 color2 = palette[color];
 
         *bmp++ = ((color2 >> 10) & 0x1f) << 3;
         *bmp++ = ((color2 >> 5) & 0x1f) << 3;
-        *bmp++ = (color2 & 0x1f) << 3;        
+        *bmp++ = (color2 & 0x1f) << 3;
       }
-    }    
+    }
   }
 
   u32 xx;
   u32 yy;
-  
+
   switch(bg) {
   case 2:
     xx = BG2X_L | BG2X_H << 16;
     yy = BG2Y_L | BG2Y_H << 16;
 
-    /*    
-          renderView(xx, yy, 
+    /*
+          renderView(xx, yy,
           BG2PA, BG2PC,
           BG2PB, BG2PD,
           (sizeX -1) <<8,
@@ -354,8 +354,8 @@ void MapView::renderRotScreen(u16 control)
   case 3:
     xx = BG3X_L | BG3X_H << 16;
     yy = BG3Y_L | BG3Y_H << 16;
-    /*    
-          renderView(xx, yy, 
+    /*
+          renderView(xx, yy,
           BG3PA, BG3PC,
           BG3PB, BG3PD,
           (sizeX -1) <<8,
@@ -401,7 +401,7 @@ void MapView::renderMode2()
     control = BG2CNT;
     renderRotScreen(control);
     break;
-  }  
+  }
 }
 
 void MapView::renderMode3()
@@ -411,13 +411,13 @@ void MapView::renderMode3()
 
   w = 240;
   h = 160;
-  
+
   for(int y = 0; y < 160; y++) {
     for(int x = 0; x < 240; x++) {
       u16 data = *src++;
       *bmp++ = ((data >> 10) & 0x1f) << 3;
       *bmp++ = ((data >> 5) & 0x1f) << 3;
-      *bmp++ = (data & 0x1f) << 3;      
+      *bmp++ = (data & 0x1f) << 3;
     }
   }
   bg = 2;
@@ -429,17 +429,17 @@ void MapView::renderMode4()
   u8 *bmp = data;
   u8 *src = frame ? &vram[0xa000] : &vram[0];
   u16 *pal = (u16 *)&paletteRAM[0];
-  
+
   w = 240;
   h = 160;
-  
+
   for(int y = 0; y < 160; y++) {
     for(int x = 0; x < 240; x++) {
       u8 c = *src++;
       u16 data = pal[c];
       *bmp++ = ((data >> 10) & 0x1f) << 3;
       *bmp++ = ((data >> 5) & 0x1f) << 3;
-      *bmp++ = (data & 0x1f) << 3;      
+      *bmp++ = (data & 0x1f) << 3;
     }
   }
   bg = 2;
@@ -453,22 +453,22 @@ void MapView::renderMode5()
 
   w = 160;
   h = 128;
-  
+
   for(int y = 0; y < 128; y++) {
     for(int x = 0; x < 160; x++) {
       u16 data = *src++;
       *bmp++ = ((data >> 10) & 0x1f) << 3;
       *bmp++ = ((data >> 5) & 0x1f) << 3;
-      *bmp++ = (data & 0x1f) << 3;      
+      *bmp++ = (data & 0x1f) << 3;
     }
   }
   bg = 2;
 }
 
 
-void MapView::OnRefresh() 
+void MapView::OnRefresh()
 {
-  paint();  
+  paint();
 }
 
 void MapView::paint()
@@ -492,7 +492,7 @@ void MapView::paint()
     control = BG3CNT;
     break;
   }
-  
+
   switch(mode) {
   case 0:
     renderMode0();
@@ -521,7 +521,7 @@ void MapView::paint()
   }
   enableButtons(mode);
   SIZE s;
-  
+
   if(mapView.getStretch()) {
     mapView.setSize(w, h);
     s.cx = s.cy = 1;
@@ -536,9 +536,9 @@ void MapView::paint()
   mapView.refresh();
 
   CString buffer;
-  
+
   u32 charBase = ((control >> 2) & 0x03) * 0x4000 + 0x6000000;
-  u32 screenBase = ((control >> 8) & 0x1f) * 0x800 + 0x6000000;  
+  u32 screenBase = ((control >> 8) & 0x1f) * 0x800 + 0x6000000;
 
   buffer.Format("%d", mode);
   m_mode.SetWindowText(buffer);
@@ -549,7 +549,7 @@ void MapView::paint()
   } else {
     buffer.Format("0x%08X", screenBase);
     m_mapbase.SetWindowText(buffer);
-    
+
     buffer.Format("0x%08X", charBase);
     m_charbase.SetWindowText(buffer);
   }
@@ -568,10 +568,10 @@ void MapView::paint()
                            control & 0x2000 ? "1" : "0");
 }
 
-BOOL MapView::OnInitDialog() 
+BOOL MapView::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_ENTRY( IDC_MAP_VIEW, DS_SizeX | DS_SizeY )
     DIALOG_SIZER_ENTRY( IDC_REFRESH, DS_MoveY)
@@ -580,7 +580,7 @@ BOOL MapView::OnInitDialog()
     DIALOG_SIZER_ENTRY( IDC_COLOR, DS_MoveY)
     DIALOG_SIZER_ENTRY( IDC_R, DS_MoveY)
     DIALOG_SIZER_ENTRY( IDC_G, DS_MoveY)
-    DIALOG_SIZER_ENTRY( IDC_B, DS_MoveY)    
+    DIALOG_SIZER_ENTRY( IDC_B, DS_MoveY)
     DIALOG_SIZER_END()
     SetData(sz,
             TRUE,
@@ -596,12 +596,12 @@ BOOL MapView::OnInitDialog()
     mapView.setStretch(true);
   ((CButton *)GetDlgItem(IDC_STRETCH))->SetCheck(s);
   paint();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void MapView::PostNcDestroy() 
+void MapView::PostNcDestroy()
 {
   delete this;
 }
@@ -639,13 +639,13 @@ void MapView::enableButtons(int mode)
     enable[1] = false;
     enable[2] = false;
     enable[3] = false;
-    break;    
+    break;
   case 5:
     enable[0] = false;
     enable[1] = false;
     enable[2] = false;
     enable[3] = false;
-    break;    
+    break;
   }
   GetDlgItem(IDC_BG0)->EnableWindow(enable[0]);
   GetDlgItem(IDC_BG1)->EnableWindow(enable[1]);
@@ -672,60 +672,60 @@ void MapView::enableButtons(int mode)
   CheckRadioButton(IDC_FRAME_0, IDC_FRAME_1, id);
 }
 
-void MapView::OnFrame0() 
+void MapView::OnFrame0()
 {
   frame = 0;
-  paint();  
+  paint();
 }
 
-void MapView::OnFrame1() 
+void MapView::OnFrame1()
 {
   frame = 1;
   paint();
 }
 
-void MapView::OnBg0() 
+void MapView::OnBg0()
 {
   bg = 0;
   control = BG0CNT;
   paint();
 }
 
-void MapView::OnBg1() 
+void MapView::OnBg1()
 {
   bg = 1;
   control = BG1CNT;
   paint();
 }
 
-void MapView::OnBg2() 
+void MapView::OnBg2()
 {
   bg = 2;
   control = BG2CNT;
   paint();
 }
 
-void MapView::OnBg3() 
+void MapView::OnBg3()
 {
   bg = 3;
   control = BG3CNT;
   paint();
 }
 
-void MapView::OnStretch() 
+void MapView::OnStretch()
 {
   mapView.setStretch(!mapView.getStretch());
   paint();
-  regSetDwordValue("mapViewStretch", mapView.getStretch());  
+  regSetDwordValue("mapViewStretch", mapView.getStretch());
 }
 
-void MapView::OnAutoUpdate() 
+void MapView::OnAutoUpdate()
 {
   autoUpdate = !autoUpdate;
   if(autoUpdate) {
     theApp.winAddUpdateListener(this);
   } else {
-    theApp.winRemoveUpdateListener(this);    
+    theApp.winRemoveUpdateListener(this);
   }
 }
 
@@ -734,10 +734,10 @@ void MapView::update()
   paint();
 }
 
-void MapView::OnClose() 
+void MapView::OnClose()
 {
   theApp.winRemoveUpdateListener(this);
-  
+
   DestroyWindow();
 }
 
@@ -764,7 +764,7 @@ u32 MapView::GetClickAddress(int x, int y)
   int mode = DISPCNT & 7;
 
   u32 base = ((control >> 8) & 0x1f) * 0x800 + 0x6000000;
-  
+
   // all text bgs (16 bits)
   if(mode == 0 ||(mode < 3 && bg < 2) || mode == 6 || mode == 7) {
     return GetTextClickAddress(base, x, y);
@@ -788,7 +788,7 @@ LRESULT MapView::OnMapInfo(WPARAM wParam, LPARAM lParam)
 
   int x = (int)(wParam & 0xffff);
   int y = (int)(wParam >> 16);
-  
+
   CString buffer;
   buffer.Format("(%d,%d)", x, y);
   GetDlgItem(IDC_XY)->SetWindowText(buffer);
@@ -797,7 +797,7 @@ LRESULT MapView::OnMapInfo(WPARAM wParam, LPARAM lParam)
   buffer.Format("0x%08X", address);
   GetDlgItem(IDC_ADDRESS)->SetWindowText(buffer);
 
-  int mode = DISPCNT & 7;  
+  int mode = DISPCNT & 7;
   if(mode >= 3 && mode <=5) {
     // bitmap modes
     GetDlgItem(IDC_TILE_NUM)->SetWindowText("---");
@@ -826,7 +826,7 @@ LRESULT MapView::OnMapInfo(WPARAM wParam, LPARAM lParam)
     GetDlgItem(IDC_FLIP)->SetWindowText("--");
     GetDlgItem(IDC_PALETTE_NUM)->SetWindowText("---");
   }
-  
+
   return TRUE;
 }
 
@@ -834,7 +834,7 @@ LRESULT MapView::OnColInfo(WPARAM wParam, LPARAM lParam)
 {
   u16 c = (u16)wParam;
 
-  color.setColor(c);  
+  color.setColor(c);
 
   int r = (c & 0x1f);
   int g = (c & 0x3e0) >> 5;
@@ -856,7 +856,7 @@ LRESULT MapView::OnColInfo(WPARAM wParam, LPARAM lParam)
 void MapView::saveBMP(const char *name)
 {
   u8 writeBuffer[1024 * 3];
-  
+
   FILE *fp = fopen(name,"wb");
 
   if(!fp) {
@@ -913,7 +913,7 @@ void MapView::saveBMP(const char *name)
     }
     pixU8 -= 2*3*w;
     fwrite(writeBuffer, 1, 3*w, fp);
-    
+
     b = writeBuffer;
   }
 
@@ -925,14 +925,14 @@ void MapView::saveBMP(const char *name)
 void MapView::savePNG(const char *name)
 {
   u8 writeBuffer[1024 * 3];
-  
+
   FILE *fp = fopen(name,"wb");
 
   if(!fp) {
     systemMessage(MSG_ERROR_CREATING_FILE, "Error creating file %s", name);
     return;
   }
-  
+
   png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
                                                 NULL,
                                                 NULL,
@@ -981,16 +981,16 @@ void MapView::savePNG(const char *name)
       int blue = *pixU8++;
       int green = *pixU8++;
       int red = *pixU8++;
-      
+
       *b++ = red;
       *b++ = green;
       *b++ = blue;
     }
     png_write_row(png_ptr,writeBuffer);
-    
+
     b = writeBuffer;
   }
-  
+
   png_write_end(png_ptr, info_ptr);
 
   png_destroy_write_struct(&png_ptr, &info_ptr);

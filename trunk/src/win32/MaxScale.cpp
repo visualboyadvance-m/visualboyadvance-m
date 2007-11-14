@@ -61,12 +61,12 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // MaxScale message handlers
 
-void MaxScale::OnCancel() 
+void MaxScale::OnCancel()
 {
   EndDialog(FALSE);
 }
 
-void MaxScale::OnOk() 
+void MaxScale::OnOk()
 {
   CString tmp;
   m_value.GetWindowText(tmp);
@@ -74,16 +74,16 @@ void MaxScale::OnOk()
   EndDialog(TRUE);
 }
 
-BOOL MaxScale::OnInitDialog() 
+BOOL MaxScale::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	
+
 	CString temp;
 
   temp.Format("%d", theApp.fsMaxScale);
 
   m_value.SetWindowText(temp);
-	
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
