@@ -55,3 +55,4 @@ ${RESAMPLEDIR}/libresample.a:
 
 clean:
 	rm -f vba ${OBJECTS} ${LIB}
+	make -C ${RESAMPLEDIR} -f Make clean
