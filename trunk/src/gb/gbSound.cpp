@@ -824,10 +824,11 @@ void gbSoundReset()
   sound4EnvelopeATLReload = 0;
 
   // don't translate
+#ifndef FINAL_VERSION
   if(soundDebug) {
     log("*** Sound Init ***\n");
   }
-  
+#endif
   gbSoundEvent(0xff10, 0x80);
   gbSoundEvent(0xff11, 0xbf);
   gbSoundEvent(0xff12, 0xf3);
@@ -854,10 +855,11 @@ void gbSoundReset()
     gbSoundEvent(0xff26, 0xf1);
 
   // don't translate
+#ifndef FINAL_VERSION
   if(soundDebug) {
     log("*** Sound Init Complete ***\n");
   }
-  
+#endif
   sound1On = 0;
   sound2On = 0;
   sound3On = 0;

@@ -18,10 +18,9 @@
 ;along with this program; if not, write to the Free Software
 ;Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-GLOBAL _hq4x_32
+%include "macros.mac"
 
-EXTERN _LUT16to32
-EXTERN _RGBtoYUV
+EXTSYM LUT16to32,RGBtoYUV
 
 SECTION .bss
 linesleft resd 1
@@ -71,12 +70,12 @@ SECTION .text
     jz      %%fin
     mov     edx,[%1]
     shl     edx,2
-    add     edx,_RGBtoYUV
+    add     edx,RGBtoYUV
     movd    mm1,[edx]
     movq    mm5,mm1
     mov     edx,[%2]
     shl     edx,2
-    add     edx,_RGBtoYUV
+    add     edx,RGBtoYUV
     movd    mm2,[edx]
     psubusb mm1,mm2
     psubusb mm2,mm5
@@ -798,7 +797,7 @@ Yres         equ 20
 pitch        equ 24
 offset       equ 28
 
-_hq4x_32:
+NEWSYM hq4x_32
     push ebp
     mov ebp,esp
     pushad
@@ -874,7 +873,7 @@ _hq4x_32:
     movzx   edx,ax  
     mov     [w9],edx
 .flags
-    mov     ebx,_RGBtoYUV
+    mov     ebx,RGBtoYUV
     mov     eax,[w5]
     xor     ecx,ecx
     movd    mm5,[ebx+eax*4]
@@ -942,7 +941,7 @@ _hq4x_32:
 .noflag8
     cmp     dword[cross],0
     jnz     .testflag1
-    mov     ebx,_LUT16to32
+    mov     ebx,LUT16to32
     mov     eax,[ebx+eax*4]
     mov     ebx,[ebp+pitch]
     AUXADDRESS
@@ -1020,7 +1019,7 @@ _hq4x_32:
     jz      .noflag9
     or      ecx,128
 .noflag9
-    mov  ebx,_LUT16to32
+    mov  ebx,LUT16to32
     mov  eax,[ebx+eax*4]
     mov  edx,[w2]
     mov  edx,[ebx+edx*4]
