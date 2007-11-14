@@ -67,7 +67,7 @@ u16 rtcRead(u32 address)
       return rtcClockData.byte0;
     }
   }
-  
+
   return READ16LE((&rom[address & 0x1FFFFFE]));
 }
 
@@ -83,7 +83,7 @@ bool rtcWrite(u32 address, u16 value)
 {
   if(!rtcEnabled)
     return false;
-  
+
   if(address == 0x80000c8) {
     rtcClockData.byte2 = (u8)value; // enable ?
   } else if(address == 0x80000c6) {
@@ -95,7 +95,7 @@ bool rtcWrite(u32 address, u16 value)
           rtcClockData.bits = 0;
           rtcClockData.command = 0;
       } else if(!(rtcClockData.byte0 & 1) && (value & 1)) { // bit transfer
-        rtcClockData.byte0 = (u8)value;        
+        rtcClockData.byte0 = (u8)value;
         switch(rtcClockData.state) {
         case COMMAND:
           rtcClockData.command |= ((value & 2) >> 1) << (7-rtcClockData.bits);
@@ -128,7 +128,7 @@ bool rtcWrite(u32 address, u16 value)
 
                 time( &long_time );                /* Get time as long integer. */
                 newtime = localtime( &long_time ); /* Convert to local time. */
-                
+
                 rtcClockData.dataLen = 7;
                 rtcClockData.data[0] = toBCD(newtime->tm_year);
                 rtcClockData.data[1] = toBCD(newtime->tm_mon+1);
@@ -139,7 +139,7 @@ bool rtcWrite(u32 address, u16 value)
                 rtcClockData.data[6] = toBCD(newtime->tm_sec);
                 rtcClockData.state = DATA;
               }
-              break;              
+              break;
             case 0x67:
               {
                 struct tm *newtime;
@@ -147,7 +147,7 @@ bool rtcWrite(u32 address, u16 value)
 
                 time( &long_time );                /* Get time as long integer. */
                 newtime = localtime( &long_time ); /* Convert to local time. */
-                
+
                 rtcClockData.dataLen = 3;
                 rtcClockData.data[0] = toBCD(newtime->tm_hour);
                 rtcClockData.data[1] = toBCD(newtime->tm_min);
@@ -201,7 +201,7 @@ bool rtcWrite(u32 address, u16 value)
 void rtcReset()
 {
   memset(&rtcClockData, 0, sizeof(rtcClockData));
-  
+
   rtcClockData.byte0 = 0;
   rtcClockData.byte1 = 0;
   rtcClockData.byte2 = 0;

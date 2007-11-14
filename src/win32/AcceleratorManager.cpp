@@ -246,7 +246,7 @@ bool CAcceleratorManager::UpdateWndTable()
       arrayACCEL.Add(pACCEL);
     }
   }
-  
+
   INT_PTR nAccel = arrayACCEL.GetSize();
   LPACCEL lpAccel = (LPACCEL)LocalAlloc(LPTR, nAccel * sizeof(ACCEL));
   if (!lpAccel) {
@@ -258,7 +258,7 @@ bool CAcceleratorManager::UpdateWndTable()
   }
 
   for (iLoop = 0; iLoop < nAccel; iLoop++) {
-    
+
     pACCEL = arrayACCEL.GetAt(iLoop);
     lpAccel[iLoop].fVirt = pACCEL->fVirt;
     lpAccel[iLoop].key = pACCEL->key;
@@ -419,7 +419,7 @@ bool CAcceleratorManager::CreateEntry(WORD wIDCommand, LPCTSTR szCommand)
 bool CAcceleratorManager::GetStringFromACCEL(ACCEL* pACCEL, CString& szAccel)
 {
   ASSERT(pACCEL != NULL);
-  
+
   CAccelsOb accel(pACCEL);
   accel.GetString(szAccel);
 
@@ -493,7 +493,7 @@ void CAcceleratorManager::UpdateMenu(HMENU menu)
   OSVERSIONINFO info;
   info.dwOSVersionInfoSize = sizeof(info);
   GetVersionEx(&info);
-  
+
   if(info.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
     MENUITEMINFO info;
     char ss[128];
@@ -502,7 +502,7 @@ void CAcceleratorManager::UpdateMenu(HMENU menu)
     info.fMask = MIIM_ID | MIIM_SUBMENU;
     for(int i = 0; i < count; i++) {
       GetMenuItemInfo(menu, i, TRUE, &info);
-      
+
       if(info.hSubMenu != NULL) {
         UpdateMenu(info.hSubMenu);
       } else {
@@ -518,15 +518,15 @@ void CAcceleratorManager::UpdateMenu(HMENU menu)
           int index = str.Find('\t');
           if(index != -1)
             str = str.Left(index);
-          
+
           WORD command = info.wID;
-          
+
           CCmdAccelOb *o;
           if(m_mapAccelTable.Lookup(command, o)) {
             if(o->m_Accels.GetCount()) {
               POSITION pos = o->m_Accels.GetHeadPosition();
               CAccelsOb *accel = o->m_Accels.GetNext(pos);
-              
+
               CString s;
               accel->GetString(s);
               str += "\t";
@@ -542,13 +542,13 @@ void CAcceleratorManager::UpdateMenu(HMENU menu)
     MENUITEMINFO info;
     wchar_t ss[128];
     wchar_t str[512];
-    
+
     ZeroMemory(&info, sizeof(info));
     info.cbSize = sizeof(info);
     info.fMask = MIIM_ID | MIIM_SUBMENU;
     for(int i = 0; i < count; i++) {
       GetMenuItemInfo(menu, i, TRUE, &info);
-      
+
       if(info.hSubMenu != NULL) {
         UpdateMenu(info.hSubMenu);
       } else {
@@ -562,19 +562,19 @@ void CAcceleratorManager::UpdateMenu(HMENU menu)
           GetMenuItemInfoW(menu, i, MF_BYPOSITION, &info2);
 
           wcscpy(str, ss);
-          
+
           wchar_t *p = wcschr(str, '\t');
           if(p)
             *p = 0;
-          
+
           CCmdAccelOb *o;
           WORD command = info.wID;
           if(m_mapAccelTable.Lookup(command, o)) {
             if(o->m_Accels.GetCount()) {
               POSITION pos = o->m_Accels.GetHeadPosition();
-              
+
               CAccelsOb *accel = o->m_Accels.GetNext(pos);
-              
+
               CString s;
               accel->GetString(s);
 
@@ -618,7 +618,7 @@ bool CAcceleratorManager::Load(HKEY hRegKey, LPCTSTR szRegKey)
     CCmdAccelOb* pCmdAccel;
     CAccelsOb* pAccel;
     DWORD dwIDAccelData, dwAccelData;
-    BOOL bExistID;    
+    BOOL bExistID;
     int iIndex = 0;
     if(count) {
       WORD wKey;
@@ -628,10 +628,10 @@ bool CAcceleratorManager::Load(HKEY hRegKey, LPCTSTR szRegKey)
         m_mapAccelTable.GetNextAssoc(pos, wKey, pCmdAccel);
         pCmdAccel->DeleteUserAccels();
       }
-      
+
       while(iIndex < count) {
         dwIDAccelData = data[iIndex++];
-        
+
         WORD wIDCommand = LOWORD(dwIDAccelData);
         bExistID = m_mapAccelTable.Lookup(wIDCommand, pCmdAccel);
 
@@ -679,12 +679,12 @@ bool CAcceleratorManager::Write()
 {
   CDWordArray AccelsDatasArray;
   CDWordArray CmdDatasArray;
-  
+
   int iCount = 0;
   CCmdAccelOb* pCmdAccel;
   CAccelsOb* pAccel;
   DWORD dwAccelData;
-  
+
   WORD wKey;
   POSITION pos = m_mapAccelTable.GetStartPosition();
   while (pos != NULL) {
@@ -702,13 +702,13 @@ bool CAcceleratorManager::Write()
 
     if (CmdDatasArray.GetSize() > 0) {
       CmdDatasArray.InsertAt(0, MAKELONG(pCmdAccel->m_wIDCommand, CmdDatasArray.GetSize()));
-      
+
       AccelsDatasArray.Append(CmdDatasArray);
       iCount++;
     }
   }
   //  AccelsDatasArray.InsertAt(0, MAKELONG(65535, iCount));
-  
+
   INT_PTR count = AccelsDatasArray.GetSize();
   DWORD *data = (DWORD *)malloc(count * sizeof(DWORD));
   ASSERT(data != NULL);
@@ -736,7 +736,7 @@ bool CAcceleratorManager::CreateDefaultTable()
 {
   if (m_bDefaultTable)
     return false;
-        
+
   CCmdAccelOb* pCmdAccel;
   CCmdAccelOb* pNewCmdAccel;
 
@@ -749,14 +749,14 @@ bool CAcceleratorManager::CreateDefaultTable()
     m_mapAccelTable.GetNextAssoc(pos, wKey, pCmdAccel);
     pNewCmdAccel = new CCmdAccelOb;
     ASSERT(pNewCmdAccel != NULL);
-    
+
     POSITION pos = pCmdAccel->m_Accels.GetHeadPosition();
     while (pos != NULL) {
       pAccel = pCmdAccel->m_Accels.GetNext(pos);
       if (!pAccel->m_bLocked) {
         pNewAccel = new CAccelsOb;
         ASSERT(pNewAccel != NULL);
-  
+
         *pNewAccel = *pAccel;
         pNewCmdAccel->m_Accels.AddTail(pNewAccel);
       }
@@ -764,9 +764,9 @@ bool CAcceleratorManager::CreateDefaultTable()
     if (pNewCmdAccel->m_Accels.GetCount() != 0) {
       pNewCmdAccel->m_wIDCommand = pCmdAccel->m_wIDCommand;
       pNewCmdAccel->m_szCommand = pCmdAccel->m_szCommand;
-      
+
       m_mapAccelTableSaved.SetAt(wKey, pNewCmdAccel);
-    } else 
+    } else
       delete pNewCmdAccel;
   }
 

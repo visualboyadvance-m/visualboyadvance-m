@@ -54,7 +54,7 @@ void GBMemoryViewer::readData(u32 address, int len, u8 *data)
     for(int i = 0; i < len; i++) {
       *data++ = 0;
       addr++;
-    }    
+    }
   }
 }
 
@@ -95,7 +95,7 @@ void GBMemoryViewer::editData(u32 address, int size, int mask, u32 value)
     GB_WRITEBYTE_QUICK(addr+2, (oldValue >> 16));
     GB_WRITEBYTE_QUICK(addr+3, (oldValue >> 24));
     break;
-  }    
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -143,10 +143,10 @@ BEGIN_MESSAGE_MAP(GBMemoryViewerDlg, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // GBMemoryViewerDlg message handlers
 
-BOOL GBMemoryViewerDlg::OnInitDialog() 
+BOOL GBMemoryViewerDlg::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_ENTRY( IDC_VIEWER, DS_SizeX | DS_SizeY )
     DIALOG_SIZER_ENTRY( IDC_REFRESH, DS_MoveY)
@@ -162,7 +162,7 @@ BOOL GBMemoryViewerDlg::OnInitDialog()
             HKEY_CURRENT_USER,
             "Software\\Emulators\\VisualBoyAdvance\\Viewer\\GBMemoryView",
             NULL);
-  
+
   m_viewer.setDialog(this);
   m_viewer.ShowScrollBar(SB_VERT, TRUE);
   m_viewer.EnableScrollBar(SB_VERT, ESB_ENABLE_BOTH);
@@ -185,18 +185,18 @@ BOOL GBMemoryViewerDlg::OnInitDialog()
 
   RECT cbSize;
   int Height;
-  
+
   m_addresses.GetClientRect(&cbSize);
   Height = m_addresses.GetItemHeight(-1);
   Height += m_addresses.GetItemHeight(0) * (9);
-  
+
   // Note: The use of SM_CYEDGE assumes that we're using Windows '95
   // Now add on the height of the border of the edit box
   Height += GetSystemMetrics(SM_CYEDGE) * 2;  // top & bottom edges
-  
+
   // The height of the border of the drop-down box
   Height += GetSystemMetrics(SM_CYEDGE) * 2;  // top & bottom edges
-  
+
   // now set the size of the window
   m_addresses.SetWindowPos(NULL,
                            0, 0,
@@ -212,19 +212,19 @@ BOOL GBMemoryViewerDlg::OnInitDialog()
   UpdateData(FALSE);
 
   m_current.SetFont(CFont::FromHandle((HFONT)GetStockObject(SYSTEM_FIXED_FONT)));
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void GBMemoryViewerDlg::OnClose() 
+void GBMemoryViewerDlg::OnClose()
 {
   theApp.winRemoveUpdateListener(this);
-  
+
   DestroyWindow();
 }
 
-void GBMemoryViewerDlg::OnRefresh() 
+void GBMemoryViewerDlg::OnRefresh()
 {
   m_viewer.Invalidate();
 }
@@ -234,40 +234,40 @@ void GBMemoryViewerDlg::update()
   OnRefresh();
 }
 
-void GBMemoryViewerDlg::On8Bit() 
+void GBMemoryViewerDlg::On8Bit()
 {
   m_viewer.setSize(0);
   regSetDwordValue("memViewerDataSize", 0);
 }
 
-void GBMemoryViewerDlg::On16Bit() 
+void GBMemoryViewerDlg::On16Bit()
 {
   m_viewer.setSize(1);
   regSetDwordValue("memViewerDataSize", 1);
 }
 
-void GBMemoryViewerDlg::On32Bit() 
+void GBMemoryViewerDlg::On32Bit()
 {
   m_viewer.setSize(2);
   regSetDwordValue("memViewerDataSize", 2);
 }
 
-void GBMemoryViewerDlg::OnAutoUpdate() 
+void GBMemoryViewerDlg::OnAutoUpdate()
 {
   autoUpdate = !autoUpdate;
   if(autoUpdate) {
     theApp.winAddUpdateListener(this);
   } else {
-    theApp.winRemoveUpdateListener(this);    
-  }  
+    theApp.winRemoveUpdateListener(this);
+  }
 }
 
-void GBMemoryViewerDlg::OnGo() 
+void GBMemoryViewerDlg::OnGo()
 {
   CString buffer;
-  
+
   m_address.GetWindowText(buffer);
-  
+
   u32 address;
   sscanf(buffer, "%x", &address);
   if(m_viewer.getSize() == 1)
@@ -277,10 +277,10 @@ void GBMemoryViewerDlg::OnGo()
   m_viewer.setAddress(address);
 }
 
-void GBMemoryViewerDlg::OnSelchangeAddresses() 
+void GBMemoryViewerDlg::OnSelchangeAddresses()
 {
   int cur = m_addresses.GetCurSel();
-  
+
   switch(cur) {
   case 0:
     m_viewer.setAddress(0x0000);
@@ -317,7 +317,7 @@ void GBMemoryViewerDlg::setCurrentAddress(u32 address)
   m_current.SetWindowText(buffer);
 }
 
-void GBMemoryViewerDlg::OnSave() 
+void GBMemoryViewerDlg::OnSave()
 {
   MemoryViewerAddressSize dlg;
   CString buffer;
@@ -328,11 +328,11 @@ void GBMemoryViewerDlg::OnSave()
 
   CString filter = theApp.winLoadFilter(IDS_FILTER_DUMP);
   CString title = winResLoadString(IDS_SELECT_DUMP_FILE);
-  
+
   if(dlg.DoModal() == IDOK) {
     FileDlg file(this,
                  buffer,
-                 filter, 
+                 filter,
                  0,
                  "DMP",
                  exts,
@@ -342,7 +342,7 @@ void GBMemoryViewerDlg::OnSave()
     if(file.DoModal() == IDOK) {
       buffer = file.GetPathName();
       FILE *f = fopen(buffer, "wb");
-      
+
       if(f == NULL) {
         systemMessage(IDS_ERROR_CREATING_FILE, buffer);
         return;
@@ -361,23 +361,23 @@ void GBMemoryViewerDlg::OnSave()
   }
 }
 
-void GBMemoryViewerDlg::OnLoad() 
+void GBMemoryViewerDlg::OnLoad()
 {
   CString buffer;
   LPCTSTR exts[] = { ".dmp" };
   CString filter = theApp.winLoadFilter(IDS_FILTER_DUMP);
   CString title = winResLoadString(IDS_SELECT_DUMP_FILE);
-  
+
   FileDlg file(this,
                buffer,
-               filter, 
+               filter,
                0,
                "DMP",
                exts,
                "",
-               title, 
+               title,
                false);
-  
+
   if(file.DoModal() == IDOK) {
     buffer = file.GetPathName();
     FILE *f = fopen(buffer, "rb");
@@ -387,17 +387,17 @@ void GBMemoryViewerDlg::OnLoad()
                     buffer);
       return;
     }
-    
-    MemoryViewerAddressSize dlg;    
+
+    MemoryViewerAddressSize dlg;
 
     fseek(f, 0, SEEK_END);
     int size = ftell(f);
 
     fseek(f, 0, SEEK_SET);
-    
+
     dlg.setAddress(m_viewer.getCurrentAddress());
     dlg.setSize(size);
-    
+
     if(dlg.DoModal() == IDOK) {
       int size = dlg.getSize();
       u16 addr = dlg.getAddress() & 0xffff;
@@ -411,11 +411,11 @@ void GBMemoryViewerDlg::OnLoad()
       }
       OnRefresh();
     }
-    fclose(f);    
-  }  
+    fclose(f);
+  }
 }
 
-void GBMemoryViewerDlg::PostNcDestroy() 
+void GBMemoryViewerDlg::PostNcDestroy()
 {
   delete this;
 }

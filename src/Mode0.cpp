@@ -30,7 +30,7 @@ void mode0RenderLine()
     }
     return;
   }
-  
+
   if(layerEnable & 0x0100) {
     gfxDrawTextScreen(BG0CNT, BG0HOFS, BG0VOFS, line0);
   }
@@ -38,7 +38,7 @@ void mode0RenderLine()
   if(layerEnable & 0x0200) {
     gfxDrawTextScreen(BG1CNT, BG1HOFS, BG1VOFS, line1);
   }
-  
+
   if(layerEnable & 0x0400) {
     gfxDrawTextScreen(BG2CNT, BG2HOFS, BG2VOFS, line2);
   }
@@ -50,11 +50,11 @@ void mode0RenderLine()
   gfxDrawSprites(lineOBJ);
 
   u32 backdrop = (READ16LE(&palette[0]) | 0x30000000);
-  
+
   for(int x = 0; x < 240; x++) {
     u32 color = backdrop;
     u8 top = 0x20;
-    
+
     if(line0[x] < color) {
       color = line0[x];
       top = 0x01;
@@ -74,7 +74,7 @@ void mode0RenderLine()
       color = line3[x];
       top = 0x08;
     }
-    
+
     if((u8)(lineOBJ[x]>>24) < (u8)(color >> 24)) {
       color = lineOBJ[x];
       top = 0x10;
@@ -84,17 +84,17 @@ void mode0RenderLine()
       // semi-transparent OBJ
       u32 back = backdrop;
       u8 top2 = 0x20;
-      
+
       if((u8)(line0[x]>>24) < (u8)(back >> 24)) {
         back = line0[x];
         top2 = 0x01;
       }
-      
+
       if((u8)(line1[x]>>24) < (u8)(back >> 24)) {
         back = line1[x];
         top2 = 0x02;
       }
-      
+
       if((u8)(line2[x]>>24) < (u8)(back >> 24)) {
         back = line2[x];
         top2 = 0x04;
@@ -119,8 +119,8 @@ void mode0RenderLine()
             if(BLDMOD & top)
               color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
             break;
-          }       
-        }      
+          }
+        }
     }
 
     lineMix[x] = color;
@@ -137,7 +137,7 @@ void mode0RenderLineNoWindow()
     }
     return;
   }
-  
+
   if(layerEnable & 0x0100) {
     gfxDrawTextScreen(BG0CNT, BG0HOFS, BG0VOFS, line0);
   }
@@ -145,7 +145,7 @@ void mode0RenderLineNoWindow()
   if(layerEnable & 0x0200) {
     gfxDrawTextScreen(BG1CNT, BG1HOFS, BG1VOFS, line1);
   }
-  
+
   if(layerEnable & 0x0400) {
     gfxDrawTextScreen(BG2CNT, BG2HOFS, BG2VOFS, line2);
   }
@@ -159,11 +159,11 @@ void mode0RenderLineNoWindow()
   u32 backdrop = (READ16LE(&palette[0]) | 0x30000000);
 
   int effect = (BLDMOD >> 6) & 3;
-  
+
   for(int x = 0; x < 240; x++) {
     u32 color = backdrop;
     u8 top = 0x20;
-    
+
     if(line0[x] < color) {
       color = line0[x];
       top = 0x01;
@@ -183,7 +183,7 @@ void mode0RenderLineNoWindow()
       color = line3[x];
       top = 0x08;
     }
-    
+
     if(lineOBJ[x] < (color & 0xFF000000)) {
       color = lineOBJ[x];
       top = 0x10;
@@ -204,40 +204,40 @@ void mode0RenderLineNoWindow()
                 top2 = 0x01;
               }
             }
-            
+
             if(line1[x] < (back & 0xFF000000)) {
               if(top != 0x02) {
                 back = line1[x];
                 top2 = 0x02;
               }
             }
-            
+
             if(line2[x] < (back & 0xFF000000)) {
               if(top != 0x04) {
                 back = line2[x];
                 top2 = 0x04;
               }
             }
-            
+
             if(line3[x] < (back & 0xFF000000)) {
               if(top != 0x08) {
                 back = line3[x];
                 top2 = 0x08;
               }
             }
-            
+
             if(lineOBJ[x] < (back & 0xFF000000)) {
               if(top != 0x10) {
                 back = lineOBJ[x];
                 top2 = 0x10;
               }
             }
-            
+
             if(top2 & (BLDMOD>>8))
               color = gfxAlphaBlend(color, back,
                                     coeff[COLEV & 0x1F],
                                     coeff[(COLEV >> 8) & 0x1F]);
-            
+
           }
         }
         break;
@@ -254,17 +254,17 @@ void mode0RenderLineNoWindow()
       // semi-transparent OBJ
       u32 back = backdrop;
       u8 top2 = 0x20;
-      
+
       if(line0[x] < back) {
         back = line0[x];
         top2 = 0x01;
       }
-      
+
       if(line1[x] < (back & 0xFF000000)) {
         back = line1[x];
         top2 = 0x02;
       }
-      
+
       if(line2[x] < (back & 0xFF000000)) {
         back = line2[x];
         top2 = 0x04;
@@ -289,7 +289,7 @@ void mode0RenderLineNoWindow()
           if(BLDMOD & top)
             color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
           break;
-        }         
+        }
       }
     }
 
@@ -323,13 +323,13 @@ void mode0RenderLineAll()
   if(layerEnable & 0x4000) {
     u8 v0 = WIN1V >> 8;
     u8 v1 = WIN1V & 255;
-    inWindow1 = ((v0 == v1) && (v0 >= 0xe8));    
+    inWindow1 = ((v0 == v1) && (v0 >= 0xe8));
     if(v1 >= v0)
       inWindow1 |= (VCOUNT >= v0 && VCOUNT < v1);
     else
       inWindow1 |= (VCOUNT >= v0 || VCOUNT < v1);
   }
-  
+
   if((layerEnable & 0x0100)) {
     gfxDrawTextScreen(BG0CNT, BG0HOFS, BG0VOFS, line0);
   }
@@ -337,7 +337,7 @@ void mode0RenderLineAll()
   if((layerEnable & 0x0200)) {
     gfxDrawTextScreen(BG1CNT, BG1HOFS, BG1VOFS, line1);
   }
-  
+
   if((layerEnable & 0x0400)) {
     gfxDrawTextScreen(BG2CNT, BG2HOFS, BG2VOFS, line2);
   }
@@ -347,14 +347,14 @@ void mode0RenderLineAll()
   }
 
   gfxDrawSprites(lineOBJ);
-  gfxDrawOBJWin(lineOBJWin);  
+  gfxDrawOBJWin(lineOBJWin);
 
   u32 backdrop = (READ16LE(&palette[0]) | 0x30000000);
 
   u8 inWin0Mask = WININ & 0xFF;
   u8 inWin1Mask = WININ >> 8;
   u8 outMask = WINOUT & 0xFF;
-  
+
   for(int x = 0; x < 240; x++) {
     u32 color = backdrop;
     u8 top = 0x20;
@@ -374,32 +374,32 @@ void mode0RenderLineAll()
         mask = inWin0Mask;
       }
     }
-    
+
     if((mask & 1) && (line0[x] < color)) {
       color = line0[x];
       top = 0x01;
     }
-    
+
     if((mask & 2) && ((u8)(line1[x]>>24) < (u8)(color >> 24))) {
       color = line1[x];
       top = 0x02;
     }
-    
+
     if((mask & 4) && ((u8)(line2[x]>>24) < (u8)(color >> 24))) {
       color = line2[x];
       top = 0x04;
     }
-    
+
     if((mask & 8) && ((u8)(line3[x]>>24) < (u8)(color >> 24))) {
       color = line3[x];
       top = 0x08;
     }
-    
+
     if((mask & 16) && ((u8)(lineOBJ[x]>>24) < (u8)(color >> 24))) {
       color = lineOBJ[x];
       top = 0x10;
     }
-    
+
     // special FX on in the window
     if(mask & 32) {
       if(!(color & 0x00010000)) {
@@ -417,35 +417,35 @@ void mode0RenderLineAll()
                   top2 = 0x01;
                 }
               }
-              
+
               if((mask & 2) && (u8)(line1[x]>>24) < (u8)(back >> 24)) {
                 if(top != 0x02) {
                   back = line1[x];
                   top2 = 0x02;
                 }
               }
-              
+
               if((mask & 4) && (u8)(line2[x]>>24) < (u8)(back >> 24)) {
                 if(top != 0x04) {
                   back = line2[x];
                   top2 = 0x04;
                 }
               }
-              
+
               if((mask & 8) && (u8)(line3[x]>>24) < (u8)(back >> 24)) {
                 if(top != 0x08) {
                   back = line3[x];
                   top2 = 0x08;
                 }
               }
-              
+
               if((mask & 16) && (u8)(lineOBJ[x]>>24) < (u8)(back >> 24)) {
                 if(top != 0x10) {
                   back = lineOBJ[x];
                   top2 = 0x10;
                 }
               }
-              
+
               if(top2 & (BLDMOD>>8))
                 color = gfxAlphaBlend(color, back,
                 coeff[COLEV & 0x1F],
@@ -466,27 +466,27 @@ void mode0RenderLineAll()
         // semi-transparent OBJ
         u32 back = backdrop;
         u8 top2 = 0x20;
-        
+
         if((mask & 1) && ((u8)(line0[x]>>24) < (u8)(back >> 24))) {
           back = line0[x];
           top2 = 0x01;
         }
-        
+
         if((mask & 2) && ((u8)(line1[x]>>24) < (u8)(back >> 24))) {
           back = line1[x];
           top2 = 0x02;
         }
-        
+
         if((mask & 4) && ((u8)(line2[x]>>24) < (u8)(back >> 24))) {
           back = line2[x];
           top2 = 0x04;
         }
-        
+
         if((mask & 8) && ((u8)(line3[x]>>24) < (u8)(back >> 24))) {
           back = line3[x];
           top2 = 0x08;
         }
-        
+
         if(top2 & (BLDMOD>>8))
           color = gfxAlphaBlend(color, back,
           coeff[COLEV & 0x1F],
@@ -501,34 +501,34 @@ void mode0RenderLineAll()
             if(BLDMOD & top)
               color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
             break;
-          }       
+          }
         }
       }
     } else if(color & 0x00010000) {
       // semi-transparent OBJ
       u32 back = backdrop;
       u8 top2 = 0x20;
-      
+
       if((mask & 1) && ((u8)(line0[x]>>24) < (u8)(back >> 24))) {
         back = line0[x];
         top2 = 0x01;
       }
-      
+
       if((mask & 2) && ((u8)(line1[x]>>24) < (u8)(back >> 24))) {
         back = line1[x];
         top2 = 0x02;
       }
-      
+
       if((mask & 4) && ((u8)(line2[x]>>24) < (u8)(back >> 24))) {
         back = line2[x];
         top2 = 0x04;
       }
-      
+
       if((mask & 8) && ((u8)(line3[x]>>24) < (u8)(back >> 24))) {
         back = line3[x];
         top2 = 0x08;
       }
-      
+
       if(top2 & (BLDMOD>>8))
         color = gfxAlphaBlend(color, back,
         coeff[COLEV & 0x1F],
@@ -543,10 +543,10 @@ void mode0RenderLineAll()
           if(BLDMOD & top)
             color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
           break;
-        }         
+        }
       }
     }
-    
+
     lineMix[x] = color;
   }
 }

@@ -46,7 +46,7 @@ class GDIDisplay : public IDisplay {
 private:
   u8 *filterData;
   u8 info[sizeof(BITMAPINFOHEADER)+256*sizeof(RGBQUAD)];
-  
+
 public:
   GDIDisplay();
   virtual ~GDIDisplay();
@@ -66,7 +66,7 @@ public:
 static int calculateShift(u32 mask)
 {
   int m = 0;
-  
+
   while(mask) {
     m++;
     mask >>= 1;
@@ -133,7 +133,7 @@ bool GDIDisplay::initialize()
     }
     break;
   }
-  
+
   theApp.rect.left = 0;
   theApp.rect.top = 0;
   theApp.rect.right = theApp.sizeX;
@@ -146,7 +146,7 @@ bool GDIDisplay::initialize()
 
   DWORD style = WS_POPUP | WS_VISIBLE;
   DWORD styleEx = 0;
-  
+
   if(theApp.videoOption <= VIDEO_4X)
     style |= WS_OVERLAPPEDWINDOW;
   else
@@ -155,7 +155,7 @@ bool GDIDisplay::initialize()
   if(theApp.videoOption <= VIDEO_4X)
     AdjustWindowRectEx(&theApp.dest, style, TRUE, styleEx);
   else
-    AdjustWindowRectEx(&theApp.dest, style, FALSE, styleEx);    
+    AdjustWindowRectEx(&theApp.dest, style, FALSE, styleEx);
 
   int winSizeX = theApp.dest.right-theApp.dest.left;
   int winSizeY = theApp.dest.bottom-theApp.dest.top;
@@ -164,7 +164,7 @@ bool GDIDisplay::initialize()
     winSizeX = theApp.fsWidth;
     winSizeY = theApp.fsHeight;
   }
-  
+
   int x = 0;
   int y = 0;
 
@@ -172,7 +172,7 @@ bool GDIDisplay::initialize()
     x = theApp.windowPositionX;
     y = theApp.windowPositionY;
   }
-  
+
   // Create a window
   MainWnd *pWnd = new MainWnd;
   theApp.m_pMainWnd = pWnd;
@@ -184,26 +184,26 @@ bool GDIDisplay::initialize()
                  x,y,winSizeX,winSizeY,
                  NULL,
                  0);
-  
+
   if (!(HWND)*pWnd) {
     winlog("Error creating Window %08x\n", GetLastError());
     return FALSE;
   }
-  
+
   theApp.updateMenuBar();
-  
+
   theApp.adjustDestRect();
-  
+
   theApp.mode320Available = false;
   theApp.mode640Available = false;
   theApp.mode800Available = false;
-  
+
   HDC dc = GetDC(NULL);
   HBITMAP hbm = CreateCompatibleBitmap(dc, 1, 1);
   BITMAPINFO *bi = (BITMAPINFO *)info;
   ZeroMemory(bi, sizeof(info));
   bi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-  GetDIBits(dc, hbm, 0, 1, NULL, (LPBITMAPINFO)info, DIB_RGB_COLORS);  
+  GetDIBits(dc, hbm, 0, 1, NULL, (LPBITMAPINFO)info, DIB_RGB_COLORS);
   GetDIBits(dc, hbm, 0, 1, NULL, (LPBITMAPINFO)info, DIB_RGB_COLORS);
   DeleteObject(hbm);
   ReleaseDC(NULL, dc);
@@ -229,7 +229,7 @@ bool GDIDisplay::initialize()
     systemGreenShift = 11;
     systemBlueShift = 3;
 
-    Init_2xSaI(32);    
+    Init_2xSaI(32);
   }
   theApp.fsColorDepth = systemColorDepth;
   if(systemColorDepth == 24)
@@ -240,14 +240,14 @@ bool GDIDisplay::initialize()
   else
     cpu_mmx = 0;
 #endif
-  
+
   utilUpdateSystemColorMaps();
   theApp.updateFilter();
   theApp.updateIFB();
-  
+
   pWnd->DragAcceptFiles(TRUE);
-  
-  return TRUE;  
+
+  return TRUE;
 }
 
 void GDIDisplay::clear()
@@ -265,7 +265,7 @@ void GDIDisplay::checkFullScreen()
 }
 
 void GDIDisplay::render()
-{ 
+{
   BITMAPINFO *bi = (BITMAPINFO *)info;
   bi->bmiHeader.biWidth = theApp.filterWidth+1;
   bi->bmiHeader.biHeight = -theApp.filterHeight;
@@ -275,11 +275,11 @@ void GDIDisplay::render()
     pitch = theApp.filterWidth * 3;
   else if(systemColorDepth == 32)
     pitch = theApp.filterWidth * 4 + 4;
-  
+
   if(theApp.filterFunction) {
     bi->bmiHeader.biWidth = theApp.filterWidth * 2;
     bi->bmiHeader.biHeight = -theApp.filterHeight * 2;
-    
+
     if(systemColorDepth == 16)
       (*theApp.filterFunction)(pix+pitch,
                                pitch,
@@ -324,7 +324,7 @@ void GDIDisplay::render()
                  p,
                  10,
                  theApp.filterHeight*2-10,
-                 buffer);      
+                 buffer);
     } else {
       if(theApp.showSpeedTransparent)
         drawTextTransp((u8*)pix,
@@ -350,7 +350,7 @@ void GDIDisplay::render()
   p2.x = theApp.dest.right;
   p2.y = theApp.dest.bottom;
   pWnd->ScreenToClient(&p2);
-  
+
   CDC *dc = pWnd->GetDC();
 
   StretchDIBits((HDC)*dc,
@@ -377,7 +377,7 @@ void GDIDisplay::render()
       theApp.screenMessage = false;
     }
   }
-  
+
   pWnd->ReleaseDC(dc);
 }
 

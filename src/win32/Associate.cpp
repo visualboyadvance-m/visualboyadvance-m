@@ -74,22 +74,22 @@ BEGIN_MESSAGE_MAP(Associate, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // Associate message handlers
 
-BOOL Associate::OnInitDialog() 
+BOOL Associate::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void Associate::OnCancel() 
+void Associate::OnCancel()
 {
   EndDialog(FALSE);
 }
 
-void Associate::OnOk() 
+void Associate::OnOk()
 {
   UpdateData();
 
@@ -117,7 +117,7 @@ void Associate::OnOk()
     regAssociateType("VisualBoyAdvance.Binary",
                      "Binary",
                      commandPath);
-  
+
     for(int i = 0; i < 7; i++) {
       if(mask & (1<<i)) {
         regCreateFileType(types[i],"VisualBoyAdvance.Binary");

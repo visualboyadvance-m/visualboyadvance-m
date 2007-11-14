@@ -62,12 +62,12 @@ BEGIN_MESSAGE_MAP(RewindInterval, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // RewindInterval message handlers
 
-void RewindInterval::OnCancel() 
+void RewindInterval::OnCancel()
 {
   EndDialog(-1);
 }
 
-void RewindInterval::OnOk() 
+void RewindInterval::OnOk()
 {
   CString buffer;
 
@@ -78,15 +78,15 @@ void RewindInterval::OnOk()
   if(v >= 0 && v <= 600) {
     EndDialog(v);
   } else
-    systemMessage(IDS_INVALID_INTERVAL_VALUE, 
+    systemMessage(IDS_INVALID_INTERVAL_VALUE,
                   "Invalid rewind interval value. Please enter a number "
                   "between 0 and 600 seconds");
 }
 
-BOOL RewindInterval::OnInitDialog() 
+BOOL RewindInterval::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   m_interval.LimitText(3);
 
   CString buffer;
@@ -94,7 +94,7 @@ BOOL RewindInterval::OnInitDialog()
   m_interval.SetWindowText(buffer);
 
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }

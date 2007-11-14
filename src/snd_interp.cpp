@@ -6,7 +6,7 @@
 // this was once borrowed from libmodplug, and was also used to generate the FIR coefficient
 // tables that ZSNES uses for its "FIR" interpolation mode
 
-/* 
+/*
   ------------------------------------------------------------------------------------------------
    fir interpolation doc,
 	(derived from "an engineer's guide to fir digital filters", n.j. loy)
@@ -146,7 +146,7 @@ class sample_buffer
 	T * buffer;
 
 public:
-	sample_buffer() : ptr(0), filled(0) 
+	sample_buffer() : ptr(0), filled(0)
 	{
 		buffer = new T[buffer_size];
 	}
@@ -345,7 +345,7 @@ public:
 		position = 0;
 	}
 
-	~foo_fir() 
+	~foo_fir()
 		{
 		position=666;
 		}

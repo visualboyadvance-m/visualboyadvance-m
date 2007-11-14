@@ -79,7 +79,7 @@ void runtest(int srclen, double freq, double factor,
       printf("   Expected ~%d, got %d samples out\n",
              expectedlen, out);
    }
-   
+
    sum = 0.0;
    sumsq = 0.0;
    errcount = 0.0;

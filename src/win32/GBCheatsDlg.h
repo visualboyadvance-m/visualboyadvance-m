@@ -30,7 +30,7 @@
 // GBCheatSearch dialog
 
 struct WinGbCheatsData {
-  int  bank;  
+  int  bank;
   u16  addr;
   char address[9];
   char oldValue[12];

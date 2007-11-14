@@ -105,7 +105,7 @@ int main(int argc, char **argv)
             dstinfo.format = formatinfo.format |
                (srcinfo.format & SF_FORMAT_SUBMASK);
             break;
-         }            
+         }
       }
    }
 

@@ -56,12 +56,12 @@ BEGIN_MESSAGE_MAP(ColorControl, CWnd)
   /////////////////////////////////////////////////////////////////////////////
 // ColorControl message handlers
 
-void ColorControl::OnPaint() 
+void ColorControl::OnPaint()
 {
   CPaintDC dc(this); // device context for painting
 }
 
-BOOL ColorControl::OnEraseBkgnd(CDC* pDC) 
+BOOL ColorControl::OnEraseBkgnd(CDC* pDC)
 {
   int r = (color & 0x1f) << 3;
   int g = (color & 0x3e0) >> 2;

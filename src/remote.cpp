@@ -91,22 +91,22 @@ bool remoteTcpInit()
     int error = WSAStartup(MAKEWORD(1,1),&wsaData);
 #endif // _WIN32
     SOCKET s = socket(PF_INET, SOCK_STREAM, 0);
-    
+
     remoteListenSocket = s;
-    
+
     if(s < 0) {
       fprintf(stderr,"Error opening socket\n");
       exit(-1);
     }
     int tmp = 1;
-    setsockopt (s, SOL_SOCKET, SO_REUSEADDR, (char *) &tmp, sizeof (tmp));    
-    
+    setsockopt (s, SOL_SOCKET, SO_REUSEADDR, (char *) &tmp, sizeof (tmp));
+
     //    char hostname[256];
     //    gethostname(hostname, 256);
-    
+
     //    hostent *ent = gethostbyname(hostname);
     //    unsigned long a = *((unsigned long *)ent->h_addr);
-    
+
     sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_port = htons(remotePort);
@@ -122,10 +122,10 @@ bool remoteTcpInit()
       fprintf(stderr,"Error binding \n");
       exit(-1);
     }
-    
+
     fprintf(stderr,"Listening for a connection at port %d\n",
             ntohs(addr.sin_port));
-    
+
     if(listen(s, 1)) {
       fprintf(stderr, "Error listening\n");
       exit(-1);
@@ -133,7 +133,7 @@ bool remoteTcpInit()
     socklen_t len = sizeof(addr);
 
 #ifdef _WIN32
-    int flag = 0;    
+    int flag = 0;
     ioctlsocket(s, FIONBIO, (unsigned long *)&flag);
 #endif // _WIN32
     SOCKET s2 = accept(s, (sockaddr *)&addr, &len);
@@ -166,10 +166,10 @@ void remoteTcpCleanUp()
     remoteSocket = -1;
   }
   if(remoteListenSocket > 0) {
-    fprintf(stderr, "Closing listen socket\n");    
+    fprintf(stderr, "Closing listen socket\n");
     close(remoteListenSocket);
     remoteListenSocket = -1;
-  }  
+  }
 }
 
 int remotePipeSend(char *data, int len)
@@ -192,7 +192,7 @@ bool remotePipeInit()
     fprintf(stderr, "ACK not received\n");
     exit(-1);
   }
-  
+
   return true;
 }
 
@@ -216,7 +216,7 @@ void remoteSetProtocol(int p)
     remoteSendFnc = remotePipeSend;
     remoteRecvFnc = remotePipeRecv;
     remoteInitFnc = remotePipeInit;
-    remoteCleanUpFnc = remotePipeCleanUp;    
+    remoteCleanUpFnc = remotePipeCleanUp;
   }
 }
 
@@ -228,7 +228,7 @@ void remoteInit()
 
 void remotePutPacket(const char *packet)
 {
-  const char *hex = "0123456789abcdef";  
+  const char *hex = "0123456789abcdef";
   char buffer[1024];
 
   size_t count = strlen(packet);
@@ -237,7 +237,7 @@ void remotePutPacket(const char *packet)
 
   char *p = buffer;
   *p++ = '$';
-  
+
   for(size_t i = 0 ;i < count; i++) {
     csum += packet[i];
     *p++ = packet[i];
@@ -283,7 +283,7 @@ void remoteOutput(char *s, u32 addr)
 
   char *d = buffer;
   *d++ = 'O';
-  
+
   if(s) {
     char c = *s++;
     while(c) {
@@ -339,10 +339,10 @@ void remoteSendStatus()
           (v >> 8) & 255,
           (v >> 16) & 255,
           (v >> 24) & 255);
-  s += 12;  
+  s += 12;
   *s = 0;
   //  printf("Sending %s\n", buffer);
-  remotePutPacket(buffer);  
+  remotePutPacket(buffer);
 }
 
 void remoteBinaryWrite(char *p)
@@ -368,8 +368,8 @@ void remoteBinaryWrite(char *p)
       break;
     }
   }
-  //  printf("ROM is %08x\n", debuggerReadMemory(0x8000254));  
-  remotePutPacket("OK");  
+  //  printf("ROM is %08x\n", debuggerReadMemory(0x8000254));
+  remotePutPacket("OK");
 }
 
 void remoteMemoryWrite(char *p)
@@ -397,7 +397,7 @@ void remoteMemoryWrite(char *p)
     address++;
   }
   //  printf("ROM is %08x\n", debuggerReadMemory(0x8000254));
-  remotePutPacket("OK");  
+  remotePutPacket("OK");
 }
 
 void remoteMemoryRead(char *p)
@@ -409,7 +409,7 @@ void remoteMemoryRead(char *p)
 
   char buffer[1024];
 
-  char *s = buffer;  
+  char *s = buffer;
   for(int i = 0; i < count; i++) {
     u8 b = debuggerReadByte(address);
     sprintf(s, "%02x", b);
@@ -452,14 +452,14 @@ void remoteWriteWatch(char *p, bool active)
     remotePutPacket("E01");
     return;
   }
-    
+
   if(address > 0x203ffff && address < 0x3000000) {
     remotePutPacket("E01");
     return;
   }
-  
+
   u32 final = address + count;
-  
+
   if(address < 0x2040000 && final > 0x2040000) {
     remotePutPacket("E01");
     return;
@@ -474,8 +474,8 @@ void remoteWriteWatch(char *p, bool active)
     else
       freezeInternalRAM[address & 0x7fff] = active;
     address++;
-  }  
-  
+  }
+
   remotePutPacket("OK");
 }
 
@@ -531,9 +531,9 @@ void remoteWriteRegister(char *p)
   u32 v = 0;
 
   u8 data[4] = {0,0,0,0};
-  
+
   int i = 0;
-  
+
   while(c != '#') {
     u8 b = 0;
     if(c <= '9')
@@ -574,11 +574,11 @@ void remoteStubMain()
     remoteSendStatus();
     remoteResumed = false;
   }
-  
+
   while(1) {
     char buffer[1024];
     int res = remoteRecvFnc(buffer, 1024);
-    
+
     if(res == -1) {
       fprintf(stderr, "GDB connection lost\n");
 #ifdef SDL
@@ -675,13 +675,13 @@ void remoteStubMain()
       break;
     default:
       {
-        *(strchr(p, '#') + 3) = 0;      
+        *(strchr(p, '#') + 3) = 0;
         fprintf(stderr, "Unknown packet %s\n", --p);
         remotePutPacket("");
       }
       break;
     }
-  }    
+  }
 }
 
 void remoteStubSignal(int sig, int number)

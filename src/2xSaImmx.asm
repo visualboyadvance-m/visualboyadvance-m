@@ -102,7 +102,7 @@ _2xSaISuper2xSaILine:
          mov ebx, [ebp+srcPitch]                        ;ebx contains the source pitch
          mov ecx, [ebp+width]                           ;ecx contains the number of pixels to process
          ; eax now points to colorB1
-         sub eax, ebx                                           ;eax points to B1 which is the base 
+         sub eax, ebx                                           ;eax points to B1 which is the base
 
 ; Main Loop
 .Loop:   push ecx
@@ -153,7 +153,7 @@ _2xSaISuper2xSaILine:
 
          packsswb mm7, mm7
          movd ecx, mm7
-         test ecx, ecx                          
+         test ecx, ecx
          jz near .SKIP_PROCESS          ;no, so we can skip
 
          ;End Delta
@@ -432,7 +432,7 @@ _2xSaISuper2xSaILine:
          pcmpgtw mm0, mm1
 
          por mm7, [Mask35]
-         por mm0, [Mask26] 
+         por mm0, [Mask26]
          movq [Mask35], mm7
          movq [Mask26], mm0
 
@@ -440,7 +440,7 @@ _2xSaISuper2xSaILine:
 
          ;Start the ASSEMBLY !!!        eh... compose all the results together to form the final image...
 
-                 
+
          movq mm0, [eax+ebx+color5]
          movq mm1, [eax+ebx+ebx+color2]
          movq mm2, mm0
@@ -516,7 +516,7 @@ _2xSaISuper2xSaILine:
                  pand mm6, mm2
                  por mm7, mm6
 
-                 
+
                  movq mm6, mm7
                  pcmpeqw mm6, mm5
                  pand mm7, mm0
@@ -527,8 +527,8 @@ _2xSaISuper2xSaILine:
                  movq [final1a], mm7                    ;finished  1a
 
 
-         
-             ;--------------------------------           
+
+             ;--------------------------------
 
                  movq mm7, [Mask35]
                  push eax
@@ -568,7 +568,7 @@ _2xSaISuper2xSaILine:
                  pand mm6, mm2
                  por mm7, mm6
 
-                 
+
                  movq mm6, mm7
                  pcmpeqw mm6, mm5
                  pand mm7, mm0
@@ -580,7 +580,7 @@ _2xSaISuper2xSaILine:
 
 
                  ;--------------------------------------------
- 
+
 
 %ifdef dfhsdfhsdahdsfhdsfh
                    if (color6 == color3 && color3 == colorA1 && color2 != colorA2 && color3 != colorA0)
@@ -647,7 +647,7 @@ _2xSaISuper2xSaILine:
 
                  movq mm4, [Mask35]
                  movq mm3, [Mask26]
-                 
+
                  movq mm6, mm4
                  pand mm6, mm7
                  pxor mm4, mm6
@@ -679,7 +679,7 @@ _2xSaISuper2xSaILine:
                  movq [final2b], mm0
 
                  ;-----------------------------------
-                 
+
 
                  pxor mm7, mm7
                  movq mm0, [eax+colorB0]
@@ -721,7 +721,7 @@ _2xSaISuper2xSaILine:
 
                  movq mm4, [Mask35]
                  movq mm3, [Mask26]
-                 
+
                  movq mm6, mm4
                  pand mm6, mm7
                  pxor mm4, mm6
@@ -751,7 +751,7 @@ _2xSaISuper2xSaILine:
                  por mm0, mm3
                  por mm0, mm2
                  movq [final1b], mm0
-                 
+
           ;---------
 
                  movq mm0, [final1a]
@@ -2052,7 +2052,7 @@ Bits565:
          mov [eax+4], edx
          mov eax, 0
          jmp end3
-end3:   
+end3:
          pop edx
          mov esp, ebp
          pop ebp

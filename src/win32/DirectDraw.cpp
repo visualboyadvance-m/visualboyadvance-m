@@ -73,7 +73,7 @@ public:
   virtual DISPLAY_TYPE getType() { return DIRECT_DRAW; };
   virtual void setOption(const char *, int) {}
   virtual bool isSkinSupported() { return true; }
-  virtual int selectFullScreenMode(GUID **);  
+  virtual int selectFullScreenMode(GUID **);
 };
 
 static HRESULT WINAPI checkModesAvailable(LPDDSURFACEDESC2 surf, LPVOID lpContext)
@@ -114,10 +114,10 @@ static int ffs(UINT mask)
   if (mask) {
     while (!(mask & (1 << m)))
       m++;
-    
+
     return (m);
   }
-  
+
   return (0);
 }
 
@@ -156,12 +156,12 @@ void DirectDrawDisplay::cleanup()
       ddsOffscreen->Release();
       ddsOffscreen = NULL;
     }
-    
+
     if(ddsPrimary != NULL) {
       ddsPrimary->Release();
       ddsPrimary = NULL;
     }
-    
+
     pDirectDraw->Release();
     pDirectDraw = NULL;
   }
@@ -221,7 +221,7 @@ bool DirectDrawDisplay::initialize()
     }
     break;
   }
-  
+
   theApp.rect.left = 0;
   theApp.rect.top = 0;
   theApp.rect.right = theApp.sizeX;
@@ -234,7 +234,7 @@ bool DirectDrawDisplay::initialize()
 
   DWORD style = WS_POPUP | WS_VISIBLE;
   DWORD styleEx = 0;
-  
+
   if(theApp.videoOption <= VIDEO_4X)
     style |= WS_OVERLAPPEDWINDOW;
   else
@@ -243,7 +243,7 @@ bool DirectDrawDisplay::initialize()
   if(theApp.videoOption <= VIDEO_4X)
     AdjustWindowRectEx(&theApp.dest, style, TRUE, styleEx);
   else
-    AdjustWindowRectEx(&theApp.dest, style, FALSE, styleEx);    
+    AdjustWindowRectEx(&theApp.dest, style, FALSE, styleEx);
 
   int winSizeX = theApp.dest.right-theApp.dest.left;
   int winSizeY = theApp.dest.bottom-theApp.dest.top;
@@ -267,17 +267,17 @@ bool DirectDrawDisplay::initialize()
                  x,y,winSizeX,winSizeY,
                  NULL,
                  0);
-  
+
   if (!(HWND)*pWnd) {
     winlog("Error creating Window %08x\n", GetLastError());
     return FALSE;
   }
 
-  
+
   theApp.updateMenuBar();
-  
+
   theApp.adjustDestRect();
-  
+
   GUID *guid = NULL;
   if(theApp.ddrawEmulationOnly)
     guid = (GUID *)DDCREATE_EMULATIONONLY;
@@ -291,8 +291,8 @@ bool DirectDrawDisplay::initialize()
   ddrawDLL = LoadLibrary( _T("ddraw.dll") );
 #endif
 
-  HRESULT (WINAPI *DDrawCreateEx)(GUID *,LPVOID *,REFIID,IUnknown *);  
-  if(ddrawDLL != NULL) {    
+  HRESULT (WINAPI *DDrawCreateEx)(GUID *,LPVOID *,REFIID,IUnknown *);
+  if(ddrawDLL != NULL) {
     DDrawCreateEx = (HRESULT (WINAPI *)(GUID *,LPVOID *,REFIID,IUnknown *))
       GetProcAddress(ddrawDLL, "DirectDrawCreateEx");
 
@@ -306,12 +306,12 @@ bool DirectDrawDisplay::initialize()
   }
 
   theApp.ddrawUsingEmulationOnly = theApp.ddrawEmulationOnly;
-  
+
   HRESULT hret = DDrawCreateEx(guid,
                                (void **)&pDirectDraw,
                                IID_IDirectDraw7,
                                NULL);
-    
+
   if(hret != DD_OK) {
     winlog("Error creating DirectDraw object %08x\n", hret);
     if(theApp.ddrawEmulationOnly) {
@@ -338,7 +338,7 @@ bool DirectDrawDisplay::initialize()
     for(i = 0; i < (int)hel.dwSize; i+=4)
       winlog("HEL CAPS %2d: %08x\n", i>>2, *p++);
   }
-  
+
   theApp.mode320Available = false;
   theApp.mode640Available = false;
   theApp.mode800Available = false;
@@ -347,7 +347,7 @@ bool DirectDrawDisplay::initialize()
   // check for available fullscreen modes
   pDirectDraw->EnumDisplayModes(DDEDM_STANDARDVGAMODES, NULL, NULL,
                                 checkModesAvailable);
-  
+
   DWORD flags = DDSCL_NORMAL;
 
   if(theApp.videoOption >= VIDEO_320x240)
@@ -355,16 +355,16 @@ bool DirectDrawDisplay::initialize()
       DDSCL_ALLOWREBOOT |
       DDSCL_EXCLUSIVE |
       DDSCL_FULLSCREEN;
-  
-  hret = pDirectDraw->SetCooperativeLevel(pWnd->m_hWnd,  
+
+  hret = pDirectDraw->SetCooperativeLevel(pWnd->m_hWnd,
                                           flags);
 
   if(hret != DD_OK) {
-    winlog("Error SetCooperativeLevel %08x\n", hret);    
+    winlog("Error SetCooperativeLevel %08x\n", hret);
     //    errorMessage(myLoadString(IDS_ERROR_DISP_DRAWLEVEL), hret);
     return FALSE;
   }
-  
+
   if(theApp.videoOption > VIDEO_4X) {
     hret = pDirectDraw->SetDisplayMode(theApp.fsWidth,
                                        theApp.fsHeight,
@@ -377,7 +377,7 @@ bool DirectDrawDisplay::initialize()
       return FALSE;
     }
   }
-  
+
   DDSURFACEDESC2 ddsd;
   ZeroMemory(&ddsd,sizeof(ddsd));
   ddsd.dwSize = sizeof(ddsd);
@@ -391,10 +391,10 @@ bool DirectDrawDisplay::initialize()
       ddsd.dwBackBufferCount = 2;
     }
   }
-  
+
   hret = pDirectDraw->CreateSurface(&ddsd, &ddsPrimary, NULL);
   if(hret != DD_OK) {
-    winlog("Error primary CreateSurface %08x\n", hret);    
+    winlog("Error primary CreateSurface %08x\n", hret);
     //    errorMessage(myLoadString(IDS_ERROR_DISP_DRAWSURFACE), hret);
     return FALSE;
   }
@@ -417,7 +417,7 @@ bool DirectDrawDisplay::initialize()
     // the second is the backbuffer and the third is the flip
     // surface
     caps.dwCaps = DDSCAPS_BACKBUFFER;
-    
+
     hret = ddsPrimary->GetAttachedSurface(&caps, &ddsFlip);
     if(hret != DD_OK) {
       winlog("Failed to get attached surface %08x", hret);
@@ -472,8 +472,8 @@ bool DirectDrawDisplay::initialize()
     return false;
 
   pWnd->DragAcceptFiles(TRUE);
-  
-  return true;  
+
+  return true;
 }
 
 bool DirectDrawDisplay::changeRenderSize(int w, int h)
@@ -494,7 +494,7 @@ bool DirectDrawDisplay::changeRenderSize(int w, int h)
 bool DirectDrawDisplay::initializeOffscreen(int w, int h)
 {
   DDSURFACEDESC2 ddsd;
-  
+
   ZeroMemory(&ddsd, sizeof(ddsd));
   ddsd.dwSize = sizeof(ddsd);
   ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
@@ -507,10 +507,10 @@ bool DirectDrawDisplay::initializeOffscreen(int w, int h)
   HRESULT hret = pDirectDraw->CreateSurface(&ddsd, &ddsOffscreen, NULL);
 
   if(hret != DD_OK) {
-    winlog("Error offscreen CreateSurface %08x\n", hret);    
+    winlog("Error offscreen CreateSurface %08x\n", hret);
     if(theApp.ddrawUseVideoMemory) {
       regSetDwordValue("ddrawUseVideoMemory", 0);
-    }    
+    }
     //    errorMessage(myLoadString(IDS_ERROR_DISP_DRAWSURFACE2), hret);
     return false;
   }
@@ -525,7 +525,7 @@ bool DirectDrawDisplay::initializeOffscreen(int w, int h)
     winlog("Offscreen CAPS 3: %08x\n", caps.dwCaps3);
     winlog("Offscreen CAPS 4: %08x\n", caps.dwCaps4);
   }
-  
+
   DDPIXELFORMAT px;
 
   px.dwSize = sizeof(px);
@@ -538,7 +538,7 @@ bool DirectDrawDisplay::initializeOffscreen(int w, int h)
       winlog("Pixel format %d %08x\n", ii, pdword[ii]);
     }
   }
-  
+
   switch(px.dwRGBBitCount) {
   case 15:
   case 16:
@@ -560,7 +560,7 @@ bool DirectDrawDisplay::initializeOffscreen(int w, int h)
     winlog("G Mask: %08x\n", px.dwGBitMask);
     winlog("B Mask: %08x\n", px.dwBBitMask);
   }
-  
+
   systemRedShift = ffs(px.dwRBitMask);
   systemGreenShift = ffs(px.dwGBitMask);
   systemBlueShift = ffs(px.dwBBitMask);
@@ -571,7 +571,7 @@ bool DirectDrawDisplay::initializeOffscreen(int w, int h)
   else
     cpu_mmx = 0;
 #endif
-  
+
   if((px.dwFlags&DDPF_RGB) != 0 &&
      px.dwRBitMask == 0xF800 &&
      px.dwGBitMask == 0x07E0 &&
@@ -610,7 +610,7 @@ bool DirectDrawDisplay::initializeOffscreen(int w, int h)
     winlog("G shift: %d\n", systemGreenShift);
     winlog("B shift: %d\n", systemBlueShift);
   }
-  
+
   utilUpdateSystemColorMaps();
   width = w;
   height = h;
@@ -631,7 +631,7 @@ void DirectDrawDisplay::clear()
   ddsFlip->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &fx);
   ddsPrimary->Flip(NULL, 0);
   ddsFlip->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &fx);
-  ddsPrimary->Flip(NULL, 0);    
+  ddsPrimary->Flip(NULL, 0);
 }
 
 void DirectDrawDisplay::renderMenu()
@@ -657,7 +657,7 @@ void DirectDrawDisplay::render()
     return;
 
   DDSURFACEDESC2 ddsDesc;
-  
+
   ZeroMemory(&ddsDesc, sizeof(ddsDesc));
 
   ddsDesc.dwSize = sizeof(ddsDesc);
@@ -675,7 +675,7 @@ void DirectDrawDisplay::render()
     hret = ddsPrimary->Restore();
     if(hret == DD_OK) {
       hret = ddsOffscreen->Restore();
-      
+
       if(hret == DD_OK) {
         hret = ddsOffscreen->Lock(NULL,
                                   &ddsDesc,
@@ -685,11 +685,11 @@ void DirectDrawDisplay::render()
 #endif
                                   DDLOCK_SURFACEMEMORYPTR,
                                   NULL);
-        
+
       }
     }
   }
-    
+
   if(hret == DD_OK) {
     if(theApp.filterFunction) {
       if(systemColorDepth == 16)
@@ -708,11 +708,11 @@ void DirectDrawDisplay::render()
                                  ddsDesc.lPitch,
                                  theApp.filterWidth,
                                  theApp.filterHeight);
-        
+
     } else {
       int copyX = 240;
       int copyY = 160;
-      
+
       if(theApp.cartridgeType == 1) {
         if(gbBorderOn) {
           copyX = 256;
@@ -743,7 +743,7 @@ void DirectDrawDisplay::render()
                  ddsDesc.lPitch,
                  theApp.rect.left+10,
                  theApp.rect.bottom-10,
-                 buffer);        
+                 buffer);
     }
   } else if(theApp.ddrawDebug)
     winlog("Error during lock: %08x\n", hret);
@@ -768,10 +768,10 @@ void DirectDrawDisplay::render()
       }
     } else {
       hret = ddsPrimary->Blt(&theApp.dest, ddsOffscreen, NULL,DDBLT_ASYNC,NULL);
-      
+
       if(hret == DDERR_SURFACELOST) {
         hret = ddsPrimary->Restore();
-        
+
         if(hret == DD_OK) {
           hret = ddsPrimary->Blt(&theApp.dest, ddsOffscreen, NULL, DDBLT_ASYNC, NULL);
         }
@@ -788,7 +788,7 @@ void DirectDrawDisplay::render()
       HDC hdc;
       ddsPrimary->GetDC(&hdc);
       SetTextColor(hdc, RGB(255,0,0));
-      SetBkMode(hdc,TRANSPARENT);      
+      SetBkMode(hdc,TRANSPARENT);
       TextOut(hdc, theApp.dest.left+10, theApp.dest.bottom - 20, theApp.screenMessageBuffer,
               (int)_tcslen(theApp.screenMessageBuffer));
       ddsPrimary->ReleaseDC(hdc);
@@ -796,11 +796,11 @@ void DirectDrawDisplay::render()
       theApp.screenMessage = false;
     }
   }
-  
+
   if(hret != DD_OK) {
     if(theApp.ddrawDebug)
       winlog("Error on update screen: %08x\n", hret);
-  }  
+  }
 }
 
 int DirectDrawDisplay::selectFullScreenMode(GUID **pGUID)

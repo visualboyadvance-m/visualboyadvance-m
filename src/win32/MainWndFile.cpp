@@ -42,7 +42,7 @@ extern void remoteCleanUp();
 extern void InterframeCleanup();
 
 
-void MainWnd::OnFileOpen() 
+void MainWnd::OnFileOpen()
 {
 	theApp.winCheckFullscreen();
 	if( fileOpenSelect( false ) ) {
@@ -51,7 +51,7 @@ void MainWnd::OnFileOpen()
 }
 
 
-void MainWnd::OnFilePause() 
+void MainWnd::OnFilePause()
 {
   theApp.paused = !theApp.paused;
   if(emulating) {
@@ -64,12 +64,12 @@ void MainWnd::OnFilePause()
   }
 }
 
-void MainWnd::OnUpdateFilePause(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFilePause(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.paused);  
+  pCmdUI->SetCheck(theApp.paused);
 }
 
-void MainWnd::OnFileReset() 
+void MainWnd::OnFileReset()
 {
   if(emulating) {
     theApp.emulator.emuReset();
@@ -77,18 +77,18 @@ void MainWnd::OnFileReset()
   }
 }
 
-void MainWnd::OnUpdateFileReset(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileReset(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(emulating);
 }
 
-void MainWnd::OnUpdateFileRecentFreeze(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileRecentFreeze(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(theApp.recentFreeze);
 
   if(pCmdUI->m_pMenu == NULL)
     return;
-  
+
   CMenu *pMenu = pCmdUI->m_pMenu;
 
   int i;
@@ -125,24 +125,24 @@ BOOL MainWnd::OnFileRecentFile(UINT nID)
   return TRUE;
 }
 
-void MainWnd::OnFileRecentReset() 
+void MainWnd::OnFileRecentReset()
 {
   int i = 0;
   for(i = 0; i < 10; i++)
     theApp.recentFiles[i] = "";
 }
 
-void MainWnd::OnFileRecentFreeze() 
+void MainWnd::OnFileRecentFreeze()
 {
   theApp.recentFreeze = !theApp.recentFreeze;
 }
 
-void MainWnd::OnFileExit() 
+void MainWnd::OnFileExit()
 {
   SendMessage(WM_CLOSE);
 }
 
-void MainWnd::OnFileClose() 
+void MainWnd::OnFileClose()
 {
   // save battery file before we change the filename...
   if(rom != NULL || gbRom != NULL) {
@@ -158,13 +158,13 @@ void MainWnd::OnFileClose()
   systemSetTitle("VisualBoyAdvance");
 }
 
-void MainWnd::OnUpdateFileClose(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileClose(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(emulating);
 }
 
 
-void MainWnd::OnFileOpengameboy() 
+void MainWnd::OnFileOpengameboy()
 {
 	theApp.winCheckFullscreen();
 	if( fileOpenSelect( true ) ) {
@@ -173,7 +173,7 @@ void MainWnd::OnFileOpengameboy()
 }
 
 
-void MainWnd::OnFileLoad() 
+void MainWnd::OnFileLoad()
 {
   theApp.winCheckFullscreen();
   CString buffer;
@@ -218,13 +218,13 @@ void MainWnd::OnFileLoad()
     theApp.rewindCount = 0;
     theApp.rewindCounter = 0;
     theApp.rewindSaveNeeded = false;
-  
+
     if(res)
-      systemScreenMessage(winResLoadString(IDS_LOADED_STATE));  
+      systemScreenMessage(winResLoadString(IDS_LOADED_STATE));
   }
 }
 
-void MainWnd::OnUpdateFileLoad(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileLoad(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(emulating);
 }
@@ -265,7 +265,7 @@ BOOL MainWnd::OnFileLoadSlot(UINT nID)
 
   CString format = winResLoadString(IDS_LOADED_STATE_N);
   buffer.Format(format, nID);
- 
+
   bool res = loadSaveGame(filename);
 
   if (theApp.paused)
@@ -282,7 +282,7 @@ BOOL MainWnd::OnFileLoadSlot(UINT nID)
   return res;
 }
 
-void MainWnd::OnFileSave() 
+void MainWnd::OnFileSave()
 {
   theApp.winCheckFullscreen();
   CString buffer;
@@ -324,11 +324,11 @@ void MainWnd::OnFileSave()
   if(dlg.DoModal() == IDOK) {
     bool res = writeSaveGame(dlg.GetPathName());
     if(res)
-      systemScreenMessage(winResLoadString(IDS_WROTE_STATE));  
+      systemScreenMessage(winResLoadString(IDS_WROTE_STATE));
   }
 }
 
-void MainWnd::OnUpdateFileSave(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileSave(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(emulating);
 }
@@ -371,15 +371,15 @@ BOOL MainWnd::OnFileSaveSlot(UINT nID)
 
   CString format = winResLoadString(IDS_WROTE_STATE_N);
   buffer.Format(format, nID);
-  
+
   systemScreenMessage(buffer);
 
   systemDrawScreen();
-  
+
   return res;
 }
 
-void MainWnd::OnFileImportBatteryfile() 
+void MainWnd::OnFileImportBatteryfile()
 {
   theApp.winCheckFullscreen();
   LPCTSTR exts[] = { ".sav" };
@@ -402,10 +402,10 @@ void MainWnd::OnFileImportBatteryfile()
     saveDir = getDirFromFile(theApp.filename);
 
   FileDlg dlg(this, "", filter, 0, "", exts, saveDir, title, false);
-  
+
   if(dlg.DoModal() == IDCANCEL)
     return;
-  
+
   CString str1 = winResLoadString(IDS_SAVE_WILL_BE_LOST);
   CString str2 = winResLoadString(IDS_CONFIRM_ACTION);
 
@@ -413,11 +413,11 @@ void MainWnd::OnFileImportBatteryfile()
                 str2,
                 MB_OKCANCEL) == IDCANCEL)
     return;
-  
+
   bool res = false;
 
   res = theApp.emulator.emuReadBattery(dlg.GetPathName());
-  
+
   if(!res)
     systemMessage(MSG_CANNOT_OPEN_FILE, "Cannot open file %s", dlg.GetPathName());
   else {
@@ -426,12 +426,12 @@ void MainWnd::OnFileImportBatteryfile()
   }
 }
 
-void MainWnd::OnUpdateFileImportBatteryfile(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileImportBatteryfile(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(emulating);  
+  pCmdUI->Enable(emulating);
 }
 
-void MainWnd::OnFileImportGamesharkcodefile() 
+void MainWnd::OnFileImportGamesharkcodefile()
 {
   theApp.winCheckFullscreen();
   LPCTSTR exts[] = { "" };
@@ -439,7 +439,7 @@ void MainWnd::OnFileImportGamesharkcodefile()
   CString title = winResLoadString(IDS_SELECT_CODE_FILE);
 
   FileDlg dlg(this, "", filter, 0, "", exts, "", title, false);
-  
+
   if(dlg.DoModal() == IDCANCEL)
     return;
 
@@ -450,7 +450,7 @@ void MainWnd::OnFileImportGamesharkcodefile()
                 str2,
                 MB_OKCANCEL) == IDCANCEL)
     return;
-  
+
   bool res = false;
   CString file = dlg.GetPathName();
   if(theApp.cartridgeType == 1)
@@ -460,12 +460,12 @@ void MainWnd::OnFileImportGamesharkcodefile()
   }
 }
 
-void MainWnd::OnUpdateFileImportGamesharkcodefile(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileImportGamesharkcodefile(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(emulating);  
+  pCmdUI->Enable(emulating);
 }
 
-void MainWnd::OnFileImportGamesharksnapshot() 
+void MainWnd::OnFileImportGamesharksnapshot()
 {
   theApp.winCheckFullscreen();
   LPCTSTR exts[] = { ".gbs" };
@@ -473,7 +473,7 @@ void MainWnd::OnFileImportGamesharksnapshot()
   CString title = winResLoadString(IDS_SELECT_SNAPSHOT_FILE);
 
   FileDlg dlg(this, "", filter, 0, "", exts, "", title, false);
-  
+
   if(dlg.DoModal() == IDCANCEL)
     return;
 
@@ -491,12 +491,12 @@ void MainWnd::OnFileImportGamesharksnapshot()
     CPUReadGSASnapshot(dlg.GetPathName());
 }
 
-void MainWnd::OnUpdateFileImportGamesharksnapshot(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileImportGamesharksnapshot(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(emulating);  
+  pCmdUI->Enable(emulating);
 }
 
-void MainWnd::OnFileExportBatteryfile() 
+void MainWnd::OnFileExportBatteryfile()
 {
   theApp.winCheckFullscreen();
   CString name;
@@ -554,19 +554,19 @@ void MainWnd::OnFileExportBatteryfile()
                   dlg.GetPathName());
 }
 
-void MainWnd::OnUpdateFileExportBatteryfile(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileExportBatteryfile(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(emulating);  
+  pCmdUI->Enable(emulating);
 }
 
-void MainWnd::OnFileExportGamesharksnapshot() 
+void MainWnd::OnFileExportGamesharksnapshot()
 {
   theApp.winCheckFullscreen();
   if(eepromInUse) {
     systemMessage(IDS_EEPROM_NOT_SUPPORTED, "EEPROM saves cannot be exported");
     return;
   }
-  
+
   CString name;
 
   int index = theApp.filename.ReverseFind('\\');
@@ -577,7 +577,7 @@ void MainWnd::OnFileExportGamesharksnapshot()
     name = theApp.filename;
 
   LPCTSTR exts[] = {".sps" };
-  
+
   CString filter = winLoadFilter(IDS_FILTER_SPS);
   CString title = winResLoadString(IDS_SELECT_SNAPSHOT_FILE);
 
@@ -602,12 +602,12 @@ void MainWnd::OnFileExportGamesharksnapshot()
   dlg2.DoModal();
 }
 
-void MainWnd::OnUpdateFileExportGamesharksnapshot(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileExportGamesharksnapshot(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(emulating && theApp.cartridgeType == 0);  
+  pCmdUI->Enable(emulating && theApp.cartridgeType == 0);
 }
 
-void MainWnd::OnFileScreencapture() 
+void MainWnd::OnFileScreencapture()
 {
   theApp.winCheckFullscreen();
   CString name;
@@ -638,14 +638,14 @@ void MainWnd::OnFileScreencapture()
 
   if(theApp.captureFormat != 0)
     ext = "bmp";
-  
+
   if(isDriveRoot(capdir))
     filename.Format("%s%s.%s", capdir, name, ext);
   else
     filename.Format("%s\\%s.%s", capdir, name, ext);
 
   LPCTSTR exts[] = {".png", ".bmp" };
-    
+
   CString filter = winLoadFilter(IDS_FILTER_PNG);
   CString title = winResLoadString(IDS_SELECT_CAPTURE_NAME);
 
@@ -661,7 +661,7 @@ void MainWnd::OnFileScreencapture()
 
   if(dlg.DoModal() == IDCANCEL)
     return;
-  
+
   if(dlg.getFilterIndex() == 2)
     theApp.emulator.emuWriteBMP(dlg.GetPathName());
   else
@@ -670,12 +670,12 @@ void MainWnd::OnFileScreencapture()
   systemScreenMessage(winResLoadString(IDS_SCREEN_CAPTURE));
 }
 
-void MainWnd::OnUpdateFileScreencapture(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileScreencapture(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(emulating);  
+  pCmdUI->Enable(emulating);
 }
 
-void MainWnd::OnFileRominformation() 
+void MainWnd::OnFileRominformation()
 {
   theApp.winCheckFullscreen();
   if(theApp.cartridgeType == 0) {
@@ -687,16 +687,16 @@ void MainWnd::OnFileRominformation()
   }
 }
 
-void MainWnd::OnUpdateFileRominformation(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileRominformation(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(emulating);  
+  pCmdUI->Enable(emulating);
 }
 
-void MainWnd::OnFileTogglemenu() 
+void MainWnd::OnFileTogglemenu()
 {
   if(theApp.videoOption <= VIDEO_4X)
     return;
-  
+
   theApp.menuToggle = !theApp.menuToggle;
 
   if(theApp.menuToggle) {
@@ -705,7 +705,7 @@ void MainWnd::OnFileTogglemenu()
       if(theApp.display)
         theApp.display->checkFullScreen();
       DrawMenuBar();
-    }    
+    }
   } else {
     SetMenu(NULL);
     DestroyMenu(theApp.menu);
@@ -716,15 +716,15 @@ void MainWnd::OnFileTogglemenu()
     theApp.display->resize(theApp.dest.right-theApp.dest.left, theApp.dest.bottom-theApp.dest.top);
 }
 
-void MainWnd::OnUpdateFileTogglemenu(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileTogglemenu(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption > VIDEO_4X);  
+  pCmdUI->Enable(theApp.videoOption > VIDEO_4X);
 }
 
 bool MainWnd::fileImportGSACodeFile(CString& fileName)
 {
   FILE *f = fopen(fileName, "rb");
-  
+
   if(f == NULL) {
     systemMessage(MSG_CANNOT_OPEN_FILE, "Cannot open file %s", fileName);
     return false;
@@ -746,7 +746,7 @@ bool MainWnd::fileImportGSACodeFile(CString& fileName)
     systemMessage(MSG_UNSUPPORTED_CODE_FILE, "Unsupported code file %s",
                   fileName);
     return false;
-  }    
+  }
   fseek(f, 0x1e, SEEK_SET);
   fread(&len, 1, 4, f);
   INT_PTR game = 0;
@@ -757,7 +757,7 @@ bool MainWnd::fileImportGSACodeFile(CString& fileName)
   fclose(f);
 
   bool v3 = false;
-  
+
   int index = fileName.ReverseFind('.');
 
   if(index != -1) {
@@ -768,11 +768,11 @@ bool MainWnd::fileImportGSACodeFile(CString& fileName)
   if(game != -1) {
     return cheatsImportGSACodeFile(fileName, (int)game, v3);
   }
-  
+
   return true;
 }
 
-void MainWnd::OnFileSavegameOldestslot() 
+void MainWnd::OnFileSavegameOldestslot()
 {
   if(!emulating)
     return;
@@ -809,7 +809,7 @@ void MainWnd::OnFileSavegameOldestslot()
   CString str;
   time_t time = (time_t)-1;
   int found = 0;
-    
+
   for(int i = 0; i < 10; i++) {
     name.Format("%s%s%d.sgm", saveDir, filename, i+1);
 
@@ -826,7 +826,7 @@ void MainWnd::OnFileSavegameOldestslot()
   OnFileSaveSlot(ID_FILE_SAVEGAME_SLOT1+found);
 }
 
-void MainWnd::OnUpdateFileSavegameOldestslot(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileSavegameOldestslot(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(emulating);
   if(pCmdUI->m_pSubMenu != NULL) {
@@ -873,12 +873,12 @@ void MainWnd::OnUpdateFileSavegameOldestslot(CCmdUI* pCmdUI)
       }
       pMenu->ModifyMenu(ID_FILE_SAVEGAME_SLOT1+i, MF_STRING|MF_BYCOMMAND, ID_FILE_SAVEGAME_SLOT1+i, str);
     }
-    
+
     theApp.winAccelMgr.UpdateMenu(pMenu->GetSafeHmenu());
   }
 }
 
-void MainWnd::OnFileLoadgameMostrecent() 
+void MainWnd::OnFileLoadgameMostrecent()
 {
   if(!emulating)
     return;
@@ -915,7 +915,7 @@ void MainWnd::OnFileLoadgameMostrecent()
   CString str;
   time_t time = 0;
   int found = -1;
-    
+
   for(int i = 0; i < 10; i++) {
     name.Format("%s%s%d.sgm", saveDir, filename, i+1);
 
@@ -924,14 +924,14 @@ if(status.m_mtime.GetTime() < time) {
         time = status.m_mtime.GetTime();
         found = i;
       }
-    } 
+    }
   }
   if(found != -1) {
     OnFileLoadSlot(ID_FILE_LOADGAME_SLOT1+found);
   }
 }
 
-void MainWnd::OnUpdateFileLoadgameMostrecent(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileLoadgameMostrecent(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(emulating);
 
@@ -967,7 +967,7 @@ void MainWnd::OnUpdateFileLoadgameMostrecent(CCmdUI* pCmdUI)
     CString name;
     CFileStatus status;
     CString str;
-    
+
     for(int i = 0; i < 10; i++) {
       name.Format("%s%s%d.sgm", saveDir, filename, i+1);
 
@@ -994,12 +994,12 @@ void MainWnd::OnUpdateFileSaveGameSlot(CCmdUI *pCmdUI)
   pCmdUI->Enable(emulating);
 }
 
-void MainWnd::OnFileLoadgameAutoloadmostrecent() 
+void MainWnd::OnFileLoadgameAutoloadmostrecent()
 {
   theApp.autoLoadMostRecent = !theApp.autoLoadMostRecent;
 }
 
-void MainWnd::OnUpdateFileLoadgameAutoloadmostrecent(CCmdUI* pCmdUI) 
+void MainWnd::OnUpdateFileLoadgameAutoloadmostrecent(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(theApp.autoLoadMostRecent);
 }

@@ -42,7 +42,7 @@ typedef struct DialogSizerSizingItem    //      sdi
 #define DIALOG_SIZER_END()      { 0xFFFFFFFF, 0xFFFFFFFF } };
 
 class ResizeDlg : public CDialog {
-  void *dd;  
+  void *dd;
  public:
   ResizeDlg(UINT id, CWnd *parent = NULL);
 

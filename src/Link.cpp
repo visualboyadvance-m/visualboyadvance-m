@@ -80,10 +80,10 @@ char *MakeInstanceFilename(const char *Input)
 	static char *result=NULL;
 	if (result!=NULL)
 		free(result);
-	
-	result = (char *)malloc(strlen(Input)+3); 
+
+	result = (char *)malloc(strlen(Input)+3);
 	char *p = strrchr((char *)Input, '.');
-	sprintf(result, "%.*s-%d.%s", (int)(p-Input), Input, vbaid+1, p+1); 
+	sprintf(result, "%.*s-%d.%s", (int)(p-Input), Input, vbaid+1, p+1);
 	return result;
 }
 
@@ -97,7 +97,7 @@ void StartLink(WORD value){
 		switch(GetSioMode(value, READ16LE(&ioMem[0x134]))){
 		case MULTIPLAYER:
 			if(value & 0x80){
-				if(!linkid){  
+				if(!linkid){
 					if(!transfer){
 						if(lanlink.active){
 							if(lanlink.connected){
@@ -171,7 +171,7 @@ void StartGPLink(u16 value){
 		return;
 		break;
 	case GP:
-		if(linklog){ 
+		if(linklog){
 			if(value==0x8000) fprintf(linklogfile, "Circuit reset\n");
 			else if(!adapter) fprintf(linklogfile, "Attempt to use General-purpose mode %04x\n", value);
 		}
@@ -266,12 +266,12 @@ void LinkUpdate(int ticks){
 	// ** CRASH ** linkmem is NULL, todo investigate why, added null check
 	if(linkid&&!transfer&&linkmem&&linktime>=linkmem->lastlinktime&&linkmem->numtransfers){
 		linkmem->linkdata[linkid] = READ16LE(&ioMem[0x12a]);
-		
+
 		if(linkmem->numtransfers==1){
 			linktime = 0;
 			if(WaitForSingleObject(linksync[linkid], linktimeout)==WAIT_TIMEOUT) linkmem->numtransfers=0;
 		} else linktime -= linkmem->lastlinktime;
-		
+
 		switch((linkmem->linkcmd[0])>>8){
 		case 'M':
 			tspeed = (linkmem->linkcmd[0]) & 3;
@@ -282,7 +282,7 @@ void LinkUpdate(int ticks){
 			break;
 		}
 	}
-	
+
 	if(!transfer) return;
 
 	if(transfer&&linktime>=trtimedata[transfer-1][tspeed]&&transfer<=linkmem->numgbas){
@@ -291,11 +291,11 @@ void LinkUpdate(int ticks){
 			if(WaitForSingleObject(linksync[linkid], linktimeout)==WAIT_TIMEOUT)
 				linkmem->numtransfers=0;
 			ResetEvent(linksync[linkid]);
-			if(linklog)	fprintf(linklogfile, "%04x %04x %04x %04x %10u\n", 
+			if(linklog)	fprintf(linklogfile, "%04x %04x %04x %04x %10u\n",
 				linkmem->linkdata[0], linkmem->linkdata[1], linkmem->linkdata[2], linkmem->linkdata[3], linkmem->lastlinktime);
 		}
-		
-			
+
+
 		UPDATE_REG(0x11e + (transfer<<1), linkmem->linkdata[transfer-1]);
 		transfer++;
 	}
@@ -306,7 +306,7 @@ void LinkUpdate(int ticks){
 			if(WaitForSingleObject(linksync[linkid], linktimeout)==WAIT_TIMEOUT)
 				linkmem->numtransfers=0;
 			ResetEvent(linksync[linkid]);
-			if(linklog)	fprintf(linklogfile, "%04x %04x %04x %04x %10u\n", 
+			if(linklog)	fprintf(linklogfile, "%04x %04x %04x %04x %10u\n",
 				linkmem->linkdata[0], linkmem->linkdata[1], linkmem->linkdata[2], linkmem->linkdata[3], linkmem->lastlinktime);
 		}
 		transfer = 0;
@@ -318,7 +318,7 @@ void LinkUpdate(int ticks){
 		UPDATE_REG(0x128, (READ16LE(&ioMem[0x128]) & 0xff0f) | (linkid << 4));
 		linkmem->linkdata[linkid] = 0xffff;
 	}
-	
+
 	return;
 }
 
@@ -361,7 +361,7 @@ u16 StartRFU(u16 value){
 				UPDATE_REG(0x120, a);
 				break;
 			case RFU_COMM:
-				if(a==0x9966){ 
+				if(a==0x9966){
 					rfu_cmd = ioMem[0x120];
 					if((rfu_qsend=ioMem[0x121])!=0){
 						rfu_state = RFU_SEND;
@@ -506,7 +506,7 @@ u16 StartRFU(u16 value){
 					if(counter==0){
 						UPDATE_REG(0x120, 0x61f1);
 						UPDATE_REG(0x122, 0);
-						counter++;	
+						counter++;
 						break;
 					}
 					UPDATE_REG(0x120, linkmem->rfu_bdata[1-vbaid][counter-1]&0xffff);
@@ -517,7 +517,7 @@ u16 StartRFU(u16 value){
 					if(linkid>0){
 						UPDATE_REG(0x120, rfu_masterdata[counter]&0xffff);
 						UPDATE_REG(0x122, rfu_masterdata[counter++]>>16);
-					} else {					
+					} else {
 						UPDATE_REG(0x120, linkmem->rfu_data[1-vbaid][counter]&0xffff);
 						UPDATE_REG(0x122, linkmem->rfu_data[1-vbaid][counter++]>>16);
 					}
@@ -545,7 +545,7 @@ u16 StartRFU(u16 value){
 					break;
 				}
 				break;
-			}	
+			}
 			transfer = 1;
 		}
 		if(rfu_polarity) value ^= 4;	// sometimes it's the other way around
@@ -567,32 +567,32 @@ int InitLink(void){
 	BOOL disable = true;
 
 	linkid = 0;
-	
+
 	if(WSAStartup(MAKEWORD(1,1), &wsadata)!=0){
 		WSACleanup();
 		return 0;
 	}
-	
+
 	if((lanlink.tcpsocket=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP))==INVALID_SOCKET){
 		MessageBox(NULL, "Couldn't create socket.", "Error!", MB_OK);
 		WSACleanup();
 		return 0;
 	}
 
-	setsockopt(lanlink.tcpsocket, IPPROTO_TCP, TCP_NODELAY, (char*)&disable, sizeof(BOOL)); 
+	setsockopt(lanlink.tcpsocket, IPPROTO_TCP, TCP_NODELAY, (char*)&disable, sizeof(BOOL));
 
-	if((mmf=CreateFileMapping((HANDLE)0xffffffff, NULL, PAGE_READWRITE, 0, sizeof(LINKDATA), "VBA link memory"))==NULL){	  
+	if((mmf=CreateFileMapping((HANDLE)0xffffffff, NULL, PAGE_READWRITE, 0, sizeof(LINKDATA), "VBA link memory"))==NULL){
 		closesocket(lanlink.tcpsocket);
 		WSACleanup();
 		MessageBox(NULL, "Error creating file mapping", "Error", MB_OK|MB_ICONEXCLAMATION);
 		return 0;
 	}
-		
+
 	if(GetLastError() == ERROR_ALREADY_EXISTS)
 		vbaid = 1;
 	else
  		vbaid = 0;
-		  
+
 	if((linkmem=(LINKDATA *)MapViewOfFile(mmf, FILE_MAP_WRITE, 0, 0, sizeof(LINKDATA)))==NULL){
 		closesocket(lanlink.tcpsocket);
 		WSACleanup();
@@ -708,7 +708,7 @@ void CloseLink(void){
 			for(i=1;i<=lanlink.numgbas;i++){
 				if(lanlink.type==0){
 					send(ls.tcpsocket[i], outbuffer, 12, 0);
-				} 
+				}
 				closesocket(ls.tcpsocket[i]);
 			}
 		}
@@ -767,17 +767,17 @@ int lserver::Init(void *serverdlg){
 	}
 	lanlink.terminate = false;
 	linkid = 0;
-	
+
 	gethostname(str, 100);
 	((ServerWait*)serverdlg)->m_serveraddress.Format("Server IP address is: %s", inet_ntoa(*(LPIN_ADDR)(gethostbyname(str)->h_addr_list[0])));
-	
+
 	lanlink.thread = CreateThread(NULL, 0, LinkServerThread, serverdlg, 0, &nothing);
 
 	return 0;
 
 }
 
-DWORD WINAPI LinkServerThread(void *serverdlg){	
+DWORD WINAPI LinkServerThread(void *serverdlg){
 	fd_set fdset;
 	timeval wsocktimeout;
 	char inbuffer[256], outbuffer[256];
@@ -790,7 +790,7 @@ DWORD WINAPI LinkServerThread(void *serverdlg){
 	wsocktimeout.tv_sec = 1;
 	wsocktimeout.tv_usec = 0;
 	i = 0;
-	
+
 	while(i<lanlink.numgbas){
 		fdset.fd_count = 1;
 		fdset.fd_array[0] = lanlink.tcpsocket;
@@ -817,7 +817,7 @@ DWORD WINAPI LinkServerThread(void *serverdlg){
 	}
 	MessageBox(NULL, "All players connected", "Link", MB_OK);
 	((ServerWait*)serverdlg)->SendMessage(WM_CLOSE, 0, 0);
-		
+
 	for(i=1;i<=lanlink.numgbas;i++){
 		outbuffer[0] = 4;
 		send(ls.tcpsocket[i], outbuffer, 4, 0);
@@ -923,11 +923,11 @@ lclient::lclient(void){
 int lclient::Init(LPHOSTENT hostentry, void *waitdlg){
 	unsigned long notblock = 1;
 	DWORD nothing;
-	
+
 	serverinfo.sin_family = AF_INET;
 	serverinfo.sin_port = htons(5738);
 	serverinfo.sin_addr = *((LPIN_ADDR)*hostentry->h_addr_list);
-	
+
 	if(ioctlsocket(lanlink.tcpsocket, FIONBIO, &notblock)==SOCKET_ERROR)
 		return WSAGetLastError();
 
@@ -965,24 +965,24 @@ DWORD WINAPI LinkClientThread(void *waitdlg){
 			((ServerWait*)waitdlg)->m_prgctrl.StepIt();
 		} while(select(0, NULL, &fdset, NULL, &wsocktimeout)!=1&&connect(lanlink.tcpsocket, (LPSOCKADDR)&lc.serverinfo, sizeof(SOCKADDR_IN))!=0);
 	}
-	
+
 	ioctlsocket(lanlink.tcpsocket, FIONBIO, &block);
 
 	numbytes = 0;
-	while(numbytes<4) 
+	while(numbytes<4)
 		numbytes += recv(lanlink.tcpsocket, inbuffer+numbytes, 16, 0);
 	linkid = (int)u16inbuffer[0];
 	lanlink.numgbas = (int)u16inbuffer[1];
-	
+
 	((ServerWait*)waitdlg)->m_serveraddress.Format("Connected as #%d", linkid+1);
 	if(lanlink.numgbas!=linkid)	((ServerWait*)waitdlg)->m_plconn[0].Format("Waiting for %d players to join", lanlink.numgbas-linkid);
 	else ((ServerWait*)waitdlg)->m_plconn[0].Format("All players joined.");
-		
+
 	numbytes = 0;
 	inbuffer[0] = 1;
-	while(numbytes<inbuffer[0]) 
+	while(numbytes<inbuffer[0])
 		numbytes += recv(lanlink.tcpsocket, inbuffer+numbytes, 16, 0);
-		
+
 	MessageBox(NULL, "Connected.", "Link", MB_OK);
 	((ServerWait*)waitdlg)->SendMessage(WM_CLOSE, 0, 0);
 
@@ -996,7 +996,7 @@ DWORD WINAPI LinkClientThread(void *waitdlg){
 
 void lclient::CheckConn(void){
 	if((numbytes=recv(lanlink.tcpsocket, inbuffer, 256, 0))>0){
-		while(numbytes<inbuffer[0]) 
+		while(numbytes<inbuffer[0])
 			numbytes += recv(lanlink.tcpsocket, inbuffer+numbytes, 256, 0);
 		if(inbuffer[1]==-32){
 				outbuffer[0] = 4;
@@ -1030,7 +1030,7 @@ void lclient::Recv(void){
 	}
 	numbytes = 0;
 	inbuffer[0] = 1;
-	while(numbytes<inbuffer[0]) 
+	while(numbytes<inbuffer[0])
 		numbytes += recv(lanlink.tcpsocket, inbuffer+numbytes, 256, 0);
 	if(inbuffer[1]==-32){
 		outbuffer[0] = 4;
@@ -1064,7 +1064,7 @@ void LinkSStop(void){
 			lc.Recv();
 		}
 		else ls.Recv();
-			
+
 		oncewait = true;
 		UPDATE_REG(0x122, linkdata[1]);
 		UPDATE_REG(0x124, linkdata[2]);

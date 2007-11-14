@@ -71,7 +71,7 @@ BEGIN_MESSAGE_MAP(BugReport, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // BugReport message handlers
 
-void BugReport::OnCopy() 
+void BugReport::OnCopy()
 {
   OpenClipboard();
 
@@ -79,38 +79,38 @@ void BugReport::OnCopy()
   CString report;
   m_report.GetWindowText(report);
 
-  HGLOBAL hglbCopy = GlobalAlloc(GMEM_MOVEABLE, 
-                                 (report.GetLength() + 1) * sizeof(CHAR)); 
-  if (hglbCopy == NULL) { 
-    CloseClipboard(); 
+  HGLOBAL hglbCopy = GlobalAlloc(GMEM_MOVEABLE,
+                                 (report.GetLength() + 1) * sizeof(CHAR));
+  if (hglbCopy == NULL) {
+    CloseClipboard();
     return;
-  } 
- 
-  // Lock the handle and copy the text to the buffer. 
- 
-  LPSTR lptstrCopy = (LPSTR)GlobalLock(hglbCopy); 
-  memcpy(lptstrCopy, (const char *)report, 
-         report.GetLength() * sizeof(CHAR)); 
-  lptstrCopy[report.GetLength()] = (TCHAR) 0;    // null character 
-  GlobalUnlock(hglbCopy); 
- 
-  // Place the handle on the clipboard. 
-  
-  SetClipboardData(CF_TEXT, hglbCopy);   
+  }
+
+  // Lock the handle and copy the text to the buffer.
+
+  LPSTR lptstrCopy = (LPSTR)GlobalLock(hglbCopy);
+  memcpy(lptstrCopy, (const char *)report,
+         report.GetLength() * sizeof(CHAR));
+  lptstrCopy[report.GetLength()] = (TCHAR) 0;    // null character
+  GlobalUnlock(hglbCopy);
+
+  // Place the handle on the clipboard.
+
+  SetClipboardData(CF_TEXT, hglbCopy);
   CloseClipboard();
 
   systemMessage(IDS_BUG_REPORT, "Bug report has been copied to the Clipboard");
 }
 
-void BugReport::OnOk() 
+void BugReport::OnOk()
 {
   EndDialog(TRUE);
 }
 
-BOOL BugReport::OnInitDialog() 
+BOOL BugReport::OnInitDialog()
 {
   CDialog::OnInitDialog();
-	
+
   CenterWindow();
 
   CString report = createReport();
@@ -118,7 +118,7 @@ BOOL BugReport::OnInitDialog()
   m_report.SetFont(CFont::FromHandle((HFONT)GetStockObject(SYSTEM_FIXED_FONT)));
 
   m_report.SetWindowText(report);
-	
+
   return TRUE;  // return TRUE unless you set the focus to a control
   // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -167,7 +167,7 @@ CString BugReport::createReport()
       strncpy(buffer, (const char *)&rom[0xa0], 12);
       buffer[12] = 0;
       AppendFormat(report, "Internal name: %s\r\n", buffer);
-      
+
       strncpy(buffer, (const char *)&rom[0xac], 4);
       buffer[4] = 0;
       AppendFormat(report, "Game code    : %s\r\n", buffer);
@@ -177,7 +177,7 @@ CString BugReport::createReport()
       u32 *end = (u32 *)((char *)rom+theApp.romSize);
       while(p  < end) {
         u32 d = READ32LE(p);
-    
+
         if(d == 0x52504545) {
           if(memcmp(p, "EEPROM_", 7) == 0) {
             res += (const char *)p;
@@ -212,7 +212,7 @@ CString BugReport::createReport()
       AppendFormat(report, "Game title   : %s\r\n", buffer);
     }
   }
-  
+
   AppendFormat(report, "Using BIOS   : %d\r\n", theApp.useBiosFile);
   AppendFormat(report, "Skip BIOS    : %d\r\n", theApp.skipBiosFile);
   AppendFormat(report, "Disable SFX  : %d\r\n", cpuDisableSfx);
@@ -227,9 +227,9 @@ CString BugReport::createReport()
   AppendFormat(report, "Blue shift   : %08x\r\n", systemBlueShift);
   AppendFormat(report, "Layer setting: %04X\r\n", layerSettings);
   AppendFormat(report, "Mirroring    : %d\r\n", mirroringEnable);
-  AppendFormat(report, "Save type    : %d (%d)\r\n", 
+  AppendFormat(report, "Save type    : %d (%d)\r\n",
                theApp.winSaveType, cpuSaveType);
-  AppendFormat(report, "Flash size   : %08X (%08x)\r\n", 
+  AppendFormat(report, "Flash size   : %08X (%08x)\r\n",
                theApp.winFlashSize, flashSize);
   AppendFormat(report, "RTC          : %d (%d)\r\n", theApp.winRtcEnable,
                rtcIsEnabled());

@@ -66,20 +66,20 @@ BEGIN_MESSAGE_MAP(GameOverrides, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // GameOverrides message handlers
 
-void GameOverrides::OnOK() 
+void GameOverrides::OnOK()
 {
   char tempName[2048];
-  
+
   GetModuleFileName(NULL, tempName, 2048);
-  
+
   char *p = strrchr(tempName, '\\');
   if(p)
     *p = 0;
-  
+
   char buffer[5];
   strncpy(buffer, (const char *)&rom[0xac], 4);
   buffer[4] = 0;
-  
+
   strcat(tempName, "\\vba-over.ini");
 
   char comment[0xFF];
@@ -149,7 +149,7 @@ void GameOverrides::OnOK()
   CDialog::OnOK();
 }
 
-void GameOverrides::OnDefaults() 
+void GameOverrides::OnDefaults()
 {
   m_rtc.SetCurSel(0);
   m_flashSize.SetCurSel(0);
@@ -157,17 +157,17 @@ void GameOverrides::OnDefaults()
   m_mirroring.SetCurSel(0);
 }
 
-void GameOverrides::OnCancel() 
+void GameOverrides::OnCancel()
 {
   CDialog::OnCancel();
 }
 
-BOOL GameOverrides::OnInitDialog() 
+BOOL GameOverrides::OnInitDialog()
 {
   CDialog::OnInitDialog();
 
   char tempName[2048];
-  
+
   const char *rtcValues[] = {
     "Default",
     "Disabled",
@@ -209,15 +209,15 @@ BOOL GameOverrides::OnInitDialog()
   }
 
   GetModuleFileName(NULL, tempName, 2048);
-  
+
   char *p = strrchr(tempName, '\\');
   if(p)
     *p = 0;
-  
+
   char buffer[5];
   strncpy(buffer, (const char *)&rom[0xac], 4);
   buffer[4] = 0;
-  
+
   strcat(tempName, "\\vba-over.ini");
 
   m_name.SetWindowText(buffer);
@@ -259,7 +259,7 @@ BOOL GameOverrides::OnInitDialog()
   default:
     m_flashSize.SetCurSel(0);
   }
-  
+
   v = GetPrivateProfileInt(buffer,
                            "saveType",
                            -1,
@@ -270,7 +270,7 @@ BOOL GameOverrides::OnInitDialog()
     m_saveType.SetCurSel(v+1);
   else
     m_saveType.SetCurSel(0);
-  
+
   v = GetPrivateProfileInt(buffer,
                            "mirroringEnabled",
                             -1,

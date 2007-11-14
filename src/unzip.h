@@ -17,7 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-/* unzip.h -- IO for uncompress .zip files using zlib 
+/* unzip.h -- IO for uncompress .zip files using zlib
    Version 0.15 beta, Mar 19th, 1998,
 
    Copyright (C) 1998 Gilles Vollant
@@ -52,7 +52,7 @@
 
 
 */
-/* for more info about .ZIP format, see 
+/* for more info about .ZIP format, see
       ftp://ftp.cdrom.com/pub/infozip/doc/appnote-970311-iz.zip
    PkWare has also a specification at :
       ftp://ftp.pkware.com/probdesc.zip */
@@ -71,7 +71,7 @@ extern "C" {
 #if defined(STRICTUNZIP) || defined(STRICTZIPUNZIP)
 /* like the STRICT of WIN32, we define a pointer that cannot be converted
     from (void*) without cast */
-typedef struct TagunzFile__ { int unused; } unzFile__; 
+typedef struct TagunzFile__ { int unused; } unzFile__;
 typedef unzFile__ *unzFile;
 #else
 typedef voidp unzFile;
@@ -88,7 +88,7 @@ typedef voidp unzFile;
 #define UNZ_CRCERROR                    (-105)
 
 /* tm_unz contain date/time info */
-typedef struct tm_unz_s 
+typedef struct tm_unz_s
 {
         uInt tm_sec;            /* seconds after the minute - [0,59] */
         uInt tm_min;            /* minutes after the hour - [0,59] */
@@ -117,8 +117,8 @@ typedef struct unz_file_info_s
     uLong compression_method;   /* compression method              2 bytes */
     uLong dosDate;              /* last mod file date in Dos fmt   4 bytes */
     uLong crc;                  /* crc-32                          4 bytes */
-    uLong compressed_size;      /* compressed size                 4 bytes */ 
-    uLong uncompressed_size;    /* uncompressed size               4 bytes */ 
+    uLong compressed_size;      /* compressed size                 4 bytes */
+    uLong uncompressed_size;    /* uncompressed size               4 bytes */
     uLong size_filename;        /* filename length                 2 bytes */
     uLong size_file_extra;      /* extra field length              2 bytes */
     uLong size_file_comment;    /* file comment length             2 bytes */
@@ -195,7 +195,7 @@ extern int ZEXPORT  unzGoToNextFile OF((unzFile file));
   return UNZ_END_OF_LIST_OF_FILE if the actual file was the latest.
 */
 
-extern int ZEXPORT  unzLocateFile OF((unzFile file, 
+extern int ZEXPORT  unzLocateFile OF((unzFile file,
                                      const char *szFileName,
                                      int iCaseSensitivity));
 /*
@@ -246,8 +246,8 @@ extern int ZEXPORT  unzCloseCurrentFile OF((unzFile file));
   Return UNZ_CRCERROR if all the file was read but the CRC is not good
 */
 
-                                                                                                
-extern int ZEXPORT  unzReadCurrentFile OF((unzFile file, 
+
+extern int ZEXPORT  unzReadCurrentFile OF((unzFile file,
                                           voidp buf,
                                           unsigned len));
 /*
@@ -268,7 +268,7 @@ extern z_off_t ZEXPORT  unztell OF((unzFile file));
 
 extern int ZEXPORT  unzeof OF((unzFile file));
 /*
-  return 1 if the end of file was reached, 0 elsewhere 
+  return 1 if the end of file was reached, 0 elsewhere
 */
 
 extern int ZEXPORT  unzGetLocalExtrafield OF((unzFile file,
@@ -283,7 +283,7 @@ extern int ZEXPORT  unzGetLocalExtrafield OF((unzFile file,
 
   if buf!=NULL, len is the size of the buffer, the extra header is copied in
         buf.
-  the return value is the number of bytes copied in buf, or (if <0) 
+  the return value is the number of bytes copied in buf, or (if <0)
         the error code
 */
 

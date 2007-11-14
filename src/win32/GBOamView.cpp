@@ -52,9 +52,9 @@ GBOamView::GBOamView(CWnd* pParent /*=NULL*/)
   m_stretch = FALSE;
   //}}AFX_DATA_INIT
   autoUpdate = false;
-  
+
   memset(&bmpInfo.bmiHeader, 0, sizeof(bmpInfo.bmiHeader));
-  
+
   bmpInfo.bmiHeader.biSize = sizeof(bmpInfo.bmiHeader);
   bmpInfo.bmiHeader.biWidth = 8;
   bmpInfo.bmiHeader.biHeight = 16;
@@ -109,7 +109,7 @@ void GBOamView::paint()
 {
   if(gbRom == NULL)
     return;
-  
+
   render();
   oamView.setSize(w,h);
   oamView.refresh();
@@ -124,7 +124,7 @@ void GBOamView::update()
 void GBOamView::setAttributes(int y, int x, int tile, int flags)
 {
   CString buffer;
-  
+
   int flipH = flags & 0x20;
   int flipV = flags & 0x40;
   int prio = (flags & 0x80) >> 7;
@@ -146,7 +146,7 @@ void GBOamView::setAttributes(int y, int x, int tile, int flags)
 
   buffer.Format("%d", bank);
   GetDlgItem(IDC_BANK)->SetWindowText(buffer);
-  
+
   buffer.Empty();
   if(flipH)
     buffer += 'H';
@@ -171,16 +171,16 @@ void GBOamView::render()
   u16 addr = number * 4 + 0xfe00;
 
   int size = register_LCDC & 4;
-  
+
   u8 y = gbMemory[addr++];
   u8 x = gbMemory[addr++];
   u8 tile = gbMemory[addr++];
   if(size)
     tile &= 254;
   u8 flags = gbMemory[addr++];
-  
+
   u8 *bmp = data;
-  
+
   w = 8;
   h = size ? 16 : 8;
 
@@ -200,19 +200,19 @@ void GBOamView::render()
     bank0 = &gbMemory[0x8000];
     bank1 = NULL;
   }
-  
+
   int init = 0x0000;
 
   u8 *pal = gbObp0;
 
   if((flags & 0x10))
     pal = gbObp1;
-  
+
   for(int yy = 0; yy < h; yy++) {
     int address = init + tile * 16 + 2*yy;
     int a = 0;
     int b = 0;
-    
+
     if(gbCgbMode && flags & 0x08) {
       a = bank1[address++];
       b = bank1[address++];
@@ -220,7 +220,7 @@ void GBOamView::render()
       a = bank0[address++];
       b = bank0[address++];
     }
-    
+
     for(int xx = 0; xx < 8; xx++) {
       u8 mask = 1 << (7-xx);
       u8 c = 0;
@@ -228,14 +228,14 @@ void GBOamView::render()
         c++;
       if( (b & mask))
         c+=2;
-      
+
       // make sure that sprites will work even in CGB mode
       if(gbCgbMode) {
         c = c + (flags & 0x07)*4 + 32;
       } else {
         c = pal[c];
       }
-      
+
       u16 color = gbPalette[c];
       *bmp++ = ((color >> 10) & 0x1f) << 3;
       *bmp++ = ((color >> 5) & 0x1f) << 3;
@@ -247,7 +247,7 @@ void GBOamView::render()
 void GBOamView::saveBMP(const char *name)
 {
   u8 writeBuffer[1024 * 3];
-  
+
   FILE *fp = fopen(name,"wb");
 
   if(!fp) {
@@ -304,7 +304,7 @@ void GBOamView::saveBMP(const char *name)
     }
     pixU8 -= 2*3*w;
     fwrite(writeBuffer, 1, 3*w, fp);
-    
+
     b = writeBuffer;
   }
 
@@ -315,14 +315,14 @@ void GBOamView::saveBMP(const char *name)
 void GBOamView::savePNG(const char *name)
 {
   u8 writeBuffer[1024 * 3];
-  
+
   FILE *fp = fopen(name,"wb");
 
   if(!fp) {
     systemMessage(MSG_ERROR_CREATING_FILE, "Error creating file %s", name);
     return;
   }
-  
+
   png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
                                                 NULL,
                                                 NULL,
@@ -371,16 +371,16 @@ void GBOamView::savePNG(const char *name)
       int blue = *pixU8++;
       int green = *pixU8++;
       int red = *pixU8++;
-      
+
       *b++ = red;
       *b++ = green;
       *b++ = blue;
     }
     png_write_row(png_ptr,writeBuffer);
-    
+
     b = writeBuffer;
   }
-  
+
   png_write_end(png_ptr, info_ptr);
 
   png_destroy_write_struct(&png_ptr, &info_ptr);
@@ -410,7 +410,7 @@ void GBOamView::save()
               theApp.captureFormat ? "BMP" : "PNG",
               exts,
               "",
-              title, 
+              title,
               true);
 
   if(dlg.DoModal() == IDCANCEL) {
@@ -421,13 +421,13 @@ void GBOamView::save()
   if(dlg.getFilterIndex() == 2)
     saveBMP(captureBuffer);
   else
-    savePNG(captureBuffer);  
+    savePNG(captureBuffer);
 }
 
-BOOL GBOamView::OnInitDialog() 
+BOOL GBOamView::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_ENTRY( IDC_OAM_VIEW, DS_SizeX | DS_SizeY )
     DIALOG_SIZER_ENTRY( IDC_OAM_VIEW_ZOOM, DS_MoveX)
@@ -437,7 +437,7 @@ BOOL GBOamView::OnInitDialog()
     DIALOG_SIZER_ENTRY( IDC_COLOR, DS_MoveY)
     DIALOG_SIZER_ENTRY( IDC_R, DS_MoveY)
     DIALOG_SIZER_ENTRY( IDC_G, DS_MoveY)
-    DIALOG_SIZER_ENTRY( IDC_B, DS_MoveY)    
+    DIALOG_SIZER_ENTRY( IDC_B, DS_MoveY)
     DIALOG_SIZER_END()
     SetData(sz,
             TRUE,
@@ -452,32 +452,32 @@ BOOL GBOamView::OnInitDialog()
   if(m_stretch)
     oamView.setStretch(true);
   UpdateData(FALSE);
-  
+
   paint();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void GBOamView::OnStretch() 
+void GBOamView::OnStretch()
 {
   oamView.setStretch(!oamView.getStretch());
   paint();
-  regSetDwordValue("GBOamViewStretch", oamView.getStretch());  
+  regSetDwordValue("GBOamViewStretch", oamView.getStretch());
 }
 
-void GBOamView::OnAutoUpdate() 
+void GBOamView::OnAutoUpdate()
 {
   autoUpdate = !autoUpdate;
   if(autoUpdate) {
     theApp.winAddUpdateListener(this);
   } else {
-    theApp.winRemoveUpdateListener(this);    
-  }  
+    theApp.winRemoveUpdateListener(this);
+  }
 }
 
 
-void GBOamView::OnChangeSprite() 
+void GBOamView::OnChangeSprite()
 {
   CString buffer;
   m_sprite.GetWindowText(buffer);
@@ -492,10 +492,10 @@ void GBOamView::OnChangeSprite()
   updateScrollInfo();
 }
 
-void GBOamView::OnClose() 
+void GBOamView::OnClose()
 {
   theApp.winRemoveUpdateListener(this);
-  
+
   DestroyWindow();
 }
 
@@ -503,7 +503,7 @@ LRESULT GBOamView::OnMapInfo(WPARAM, LPARAM lParam)
 {
   u8 *colors = (u8 *)lParam;
   oamZoom.setColors(colors);
-  
+
   return TRUE;
 }
 
@@ -511,7 +511,7 @@ LRESULT GBOamView::OnColInfo(WPARAM wParam, LPARAM lParam)
 {
   u16 c = (u16)wParam;
 
-  color.setColor(c);  
+  color.setColor(c);
 
   int r = (c & 0x1f);
   int g = (c & 0x3e0) >> 5;
@@ -543,11 +543,11 @@ void GBOamView::updateScrollInfo()
   si.nPos = number;
   GetDlgItem(IDC_SCROLLBAR)->SetScrollInfo(SB_CTL,
                                            &si,
-                                           TRUE);    
+                                           TRUE);
 }
 
 
-void GBOamView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
+void GBOamView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
   switch(nSBCode) {
   case SB_BOTTOM:
@@ -586,14 +586,14 @@ void GBOamView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
   }
 
   updateScrollInfo();
-  
+
   CString buffer;
   buffer.Format("%d", number);
   m_sprite.SetWindowText(buffer);
   paint();
 }
 
-void GBOamView::PostNcDestroy() 
+void GBOamView::PostNcDestroy()
 {
   delete this;
 }

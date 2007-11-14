@@ -87,12 +87,12 @@ BEGIN_MESSAGE_MAP(SkinButton, CWnd)
   /////////////////////////////////////////////////////////////////////////////
 // SkinButton message handlers
 
-BOOL SkinButton::OnEraseBkgnd(CDC* pDC) 
+BOOL SkinButton::OnEraseBkgnd(CDC* pDC)
 {
   return TRUE;
 }
 
-void SkinButton::OnPaint() 
+void SkinButton::OnPaint()
 {
   PAINTSTRUCT ps;
   HDC hDC = ::BeginPaint(m_hWnd, &ps);
@@ -204,7 +204,7 @@ LRESULT SkinButton::OnMouseMoveMsg(WPARAM wParam, LPARAM lParam)
   return Default();
 }
 
-void SkinButton::OnKillFocus(CWnd* pNewWnd) 
+void SkinButton::OnKillFocus(CWnd* pNewWnd)
 {
   mouseOver = false;
   Invalidate();
@@ -212,13 +212,13 @@ void SkinButton::OnKillFocus(CWnd* pNewWnd)
   CWnd::OnKillFocus(pNewWnd);
 }
 
-void SkinButton::OnCaptureChanged(CWnd *pWnd) 
+void SkinButton::OnCaptureChanged(CWnd *pWnd)
 {
   if(mouseOver) {
     ReleaseCapture();
     Invalidate();
   }
-  
+
   CWnd::OnCaptureChanged(pWnd);
 }
 
@@ -233,7 +233,7 @@ LRESULT SkinButton::OnMouseLeaveMsg(WPARAM wParam, LPARAM lParam)
   return Default();
 }
 
-void SkinButton::OnContextMenu(CWnd* pWnd, CPoint point) 
+void SkinButton::OnContextMenu(CWnd* pWnd, CPoint point)
 {
 }
 
@@ -318,7 +318,7 @@ void SkinButton::GetRect(RECT& r)
   r = rect;
 }
 
-BOOL SkinButton::CreateButton(const char *name, DWORD style, const RECT& r, 
+BOOL SkinButton::CreateButton(const char *name, DWORD style, const RECT& r,
                               CWnd *parent, UINT id)
 {
   return CWnd::Create("BUTTON",

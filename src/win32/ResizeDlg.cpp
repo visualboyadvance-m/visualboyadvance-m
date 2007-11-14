@@ -10,11 +10,11 @@
 
   Permission is granted to anyone to use this software for any purpose, including
   commercial applications, and to alter it and redistribute it freely, subject
-  to the following restrictions: 
+  to the following restrictions:
 
   1) The origin of this software must not be misrepresented; you must not claim
   that you wrote the original software. If you use this software in a product,
-  an acknowledgment in the product documentation is requested but not required. 
+  an acknowledgment in the product documentation is requested but not required.
   2) Altered source versions must be plainly marked as such, and must not be
   misrepresented as being the original software. Altered source is encouraged
   to be submitted back to the original author so it can be shared with the
@@ -104,13 +104,13 @@ void ApiFailure(char *pcszFilename, int nLine, char *pcszExpression )
                          NULL, dwLastError,
                          MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                          (LPTSTR) &lpMsgBuf, 0, NULL );
-  
+
   char szExeName[ MAX_PATH ];
-  
+
   if( !GetModuleFileName( NULL, szExeName, countof( szExeName ) ) )
     strcpy( szExeName, "<No Program Name>" );
-  
-  
+
+
   char szMessage[ 1024 ];
   _snprintf( szMessage, countof( szMessage )
              , "API VERIFY Failure!"
@@ -131,7 +131,7 @@ void ApiFailure(char *pcszFilename, int nLine, char *pcszExpression )
              , dwLastError
              , lpMsgBuf
              );
-  
+
   (void)LocalFree( (LPVOID)lpMsgBuf );
   HWND hwndParent = ::GetActiveWindow();
   hwndParent = ::GetLastActivePopup( hwndParent );
@@ -151,7 +151,7 @@ long FASTCALL RegQueryValueExRecursive( HKEY hKey, LPCTSTR lpValueName, LPDWORD 
   TCHAR szBuffer[ 256 ];
   R_ASSERT( lstrlen( lpValueName ) < countof( szBuffer ) );
   (void)lstrcpy( szBuffer, lpValueName );
-  
+
   LPTSTR pszBuffer = szBuffer;
   LPTSTR pszLast = szBuffer;
   while( *pszBuffer )
@@ -175,7 +175,7 @@ long FASTCALL RegQueryValueExRecursive( HKEY hKey, LPCTSTR lpValueName, LPDWORD 
     }
     return -1;
   }
-  
+
   bool m_bNeedToCloseKey = false;
   if( pszLast != szBuffer )
     {
@@ -189,7 +189,7 @@ long FASTCALL RegQueryValueExRecursive( HKEY hKey, LPCTSTR lpValueName, LPDWORD 
       hKey = hkeyTemp;
       m_bNeedToCloseKey = true;
     }
-  
+
   long lRet = RegQueryValueEx( hKey, lpValueName, lpReserved, lpType, lpData, lpcbData );
   if( m_bNeedToCloseKey )
     {
@@ -203,7 +203,7 @@ long FASTCALL RegSetValueExRecursive( HKEY hKey, LPCTSTR lpValueName, DWORD Rese
   TCHAR szBuffer[ 256 ];
   R_ASSERT( lstrlen( lpValueName ) < countof( szBuffer ) );
   (void)lstrcpy( szBuffer, lpValueName );
-  
+
   LPTSTR pszBuffer = szBuffer;
   LPTSTR pszLast = szBuffer;
   while( *pszBuffer )
@@ -226,7 +226,7 @@ long FASTCALL RegSetValueExRecursive( HKEY hKey, LPCTSTR lpValueName, DWORD Rese
     }
     return -1;
   }
-  
+
   bool m_bNeedToCloseKey = false;
   if( pszLast != szBuffer )
     {
@@ -242,7 +242,7 @@ long FASTCALL RegSetValueExRecursive( HKEY hKey, LPCTSTR lpValueName, DWORD Rese
       hKey = hkeyTemp;
       m_bNeedToCloseKey = true;
     }
-  
+
   long lRet = RegSetValueEx( hKey, lpValueName, Reserved, dwType, lpData, cbData );
   if( m_bNeedToCloseKey )
     {
@@ -279,9 +279,9 @@ void ResizeDlgUpdateGripper( HWND hwnd, DialogData *pdd )
   if( pdd->m_bShowSizingGrip )
     {
       WinHelper::CRect rcOld( pdd->m_rcGrip );
-      
+
       ResizeDlgUpdateGripperRect( pdd->m_sizeClient.cx, pdd->m_sizeClient.cy, pdd->m_rcGrip );
-      
+
       //
       //        We also need to invalidate the combined area of the old and new rectangles
       //        otherwise we would have trail of grippers when we sized the dialog larger
@@ -323,7 +323,7 @@ void *ResizeDlg::AddDialogData()
   if( !pdd ) {
     pdd = (DialogData *)calloc(1, sizeof(DialogData));
   }
-  
+
   if( pdd ) {
     //
     //  Store some sizes etc. for later.
@@ -331,8 +331,8 @@ void *ResizeDlg::AddDialogData()
     GetWindowRect( rc );
     pdd->m_ptSmallest.x = rc.Width();
     pdd->m_ptSmallest.y = rc.Height();
-    
-    
+
+
     GetClientRect( rc );
     pdd->m_sizeClient = rc.Size();
     dd = pdd;
@@ -349,7 +349,7 @@ BOOL ResizeDlg::SetData(const DialogSizerSizingItem *psd,
   //
   //    Setting a dialog sizeable involves subclassing the window and handling it's
   //    WM_SIZE messages, if we have a hkRootSave and pcszName then we will also be loading/saving
-  //    the size and position of the window from the registry. We load from the registry when we 
+  //    the size and position of the window from the registry. We load from the registry when we
   //    subclass the window and we save to the registry when we get a WM_DESTROY.
   //
   //    It will return non-zero for success and zero if it fails
@@ -385,10 +385,10 @@ BOOL ResizeDlg::SetData(const DialogSizerSizingItem *psd,
           pdd->m_ptLargest.y = psizeMax->cy;
           pdd->m_bLargestSet = true;
         }
-        
+
         //
         //      If the there was save info passed in then we need to make damn good use of it
-        //      by attempting to load the RegistryData structure 
+        //      by attempting to load the RegistryData structure
         if( hkRootSave && pcszName ) {
           RegistryData rd;
           DWORD dwSize = sizeof( RegistryData );
@@ -396,7 +396,7 @@ BOOL ResizeDlg::SetData(const DialogSizerSizingItem *psd,
           if( RegQueryValueExRecursive( hkRootSave, pcszName, NULL, &dwType, reinterpret_cast<LPBYTE>( &rd ), &dwSize ) == ERROR_SUCCESS && dwSize == sizeof( rd ) ) {
             if( !(GetWindowLong( *this, GWL_STYLE ) & WS_VISIBLE) )
               rd.m_wpl.showCmd = SW_HIDE;
-            
+
             VAPI( SetWindowPlacement( &rd.m_wpl ) );
           }
         }
@@ -424,42 +424,42 @@ void ResizeDlg::UpdateWindowSize(const int cx, const int cy, HWND hwnd)
         VAPI( ::GetWindowRect( hwndChild, rc ) );
         (void)::MapWindowPoints( ::GetDesktopWindow(),  hwnd,
                                  (LPPOINT)&rc, 2 );
-        
+
         //
         //      Adjust the window horizontally
         if( psd->uSizeInfo & DS_MoveX ) {
           rc.left += nDeltaX;
           rc.right += nDeltaX;
         }
-        
+
         //
         //      Adjust the window vertically
         if( psd->uSizeInfo & DS_MoveY ) {
           rc.top += nDeltaY;
           rc.bottom += nDeltaY;
         }
-        
+
         //
         //      Size the window horizontally
         if( psd->uSizeInfo & DS_SizeX ) {
           rc.right += nDeltaX;
         }
-        
+
         //
         //      Size the window vertically
         if( psd->uSizeInfo & DS_SizeY ) {
           rc.bottom += nDeltaY;
         }
-        
+
         (void)def.DeferWindowPos( hwndChild, NULL, rc,
                                   SWP_NOACTIVATE | SWP_NOZORDER );
       }
       psd++;
     }
-    
+
     pdd->m_sizeClient.cx = cx;
     pdd->m_sizeClient.cy = cy;
-    
+
     //
     //  If we have a sizing grip enabled then adjust it's position
     ResizeDlgUpdateGripper( hwnd, pdd );
@@ -532,7 +532,7 @@ BOOL ResizeDlg::OnWndMsg(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT *res )
     {
       //
       //        Our opportunty for cleanup.
-      //        Simply acquire all of our objects, free the appropriate memory and remove the 
+      //        Simply acquire all of our objects, free the appropriate memory and remove the
       //        properties from the window. If we do not remove the properties then they will constitute
       //        a resource leak.
       DialogData *pdd = (DialogData*)dd;
@@ -540,20 +540,20 @@ BOOL ResizeDlg::OnWndMsg(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT *res )
         RegistryData rd;
         rd.m_wpl.length = sizeof( rd.m_wpl );
         VAPI( GetWindowPlacement( &rd.m_wpl ) );
-        
+
         if( pdd->hkRootSave && pdd->pcszName ) {
           (void)RegSetValueExRecursive( pdd->hkRootSave, pdd->pcszName,
                                         NULL, REG_BINARY,
                                         reinterpret_cast<LPBYTE>( &rd ),
                                         sizeof( rd ) );
         }
-        
+
         if( pdd->psd ) {
           free(pdd->psd);
         }
         free(pdd);
       }
-      
+
     }
     break;
   }

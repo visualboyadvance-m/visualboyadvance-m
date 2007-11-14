@@ -44,7 +44,7 @@ void AssignKey(KeyList &Key, int Out)
 CString GetKeyListName(KeyList& Keys)
 {
 	CString txtKeys;
-   
+
 	POSITION p = Keys.GetHeadPosition();
 	while(p!=NULL)
 	{
@@ -88,7 +88,7 @@ BEGIN_MESSAGE_MAP(JoypadEditControl, CEdit)
 // JoypadEditControl message handlers
 
 
-void JoypadEditControl::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags) 
+void JoypadEditControl::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 }
 
@@ -158,12 +158,12 @@ END_MESSAGE_MAP()
   /////////////////////////////////////////////////////////////////////////////
 // JoypadConfig message handlers
 
-void JoypadConfig::OnCancel() 
+void JoypadConfig::OnCancel()
 {
   EndDialog(FALSE);
 }
 
-void JoypadConfig::OnOk() 
+void JoypadConfig::OnOk()
 {
   AssignKeys(up.m_Keys,theApp.input->joypaddata[JOYPAD(which,KEY_UP)]);
   AssignKeys(speed.m_Keys,theApp.input->joypaddata[JOYPAD(which,KEY_BUTTON_SPEED)]);
@@ -183,34 +183,34 @@ void JoypadConfig::OnOk()
   EndDialog(TRUE);
 }
 
-void JoypadConfig::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags) 
+void JoypadConfig::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 }
 
-void JoypadConfig::OnDestroy() 
+void JoypadConfig::OnDestroy()
 {
   CDialog::OnDestroy();
-  
+
   KillTimer(timerId);
 }
 
-void JoypadConfig::OnTimer(UINT_PTR nIDEvent) 
+void JoypadConfig::OnTimer(UINT_PTR nIDEvent)
 {
   theApp.input->checkDevices();
-  
+
   CDialog::OnTimer(nIDEvent);
 }
 
-void JoypadConfig::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
+void JoypadConfig::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 }
 
-BOOL JoypadConfig::OnInitDialog() 
+BOOL JoypadConfig::OnInitDialog()
 {
   CDialog::OnInitDialog();
 
   bAppendMode = FALSE;
-  
+
   timerId = SetTimer(0,50,NULL);
 
   CopyKeys(up.m_Keys,theApp.input->joypaddata[JOYPAD(which,KEY_UP)]);
@@ -240,7 +240,7 @@ BOOL JoypadConfig::OnInitDialog()
   speed.SetWindowText(GetKeyListName(theApp.input->joypaddata[JOYPAD(which,KEY_BUTTON_SPEED)]));
   capture.SetWindowText(GetKeyListName(theApp.input->joypaddata[JOYPAD(which,KEY_BUTTON_CAPTURE)]));
   buttonGS.SetWindowText(GetKeyListName(theApp.input->joypaddata[JOYPAD(which,KEY_BUTTON_GS)]));
-  
+
   CenterWindow();
 
   return TRUE;  // return TRUE unless you set the focus to a control
@@ -264,7 +264,7 @@ void JoypadConfig::assignKey(int id, LONG_PTR key)
     break;
   case IDC_EDIT_CAPTURE:
     AssignKey(theApp.input->joypaddata[JOYPAD(which,KEY_BUTTON_CAPTURE)],key);
-    break;    
+    break;
   case IDC_EDIT_DOWN:
     AssignKey(theApp.input->joypaddata[JOYPAD(which,KEY_DOWN)],key);
     break;
@@ -332,34 +332,34 @@ END_MESSAGE_MAP()
   /////////////////////////////////////////////////////////////////////////////
 // MotionConfig message handlers
 
-void MotionConfig::OnCancel() 
+void MotionConfig::OnCancel()
 {
   EndDialog(FALSE);
 }
 
-void MotionConfig::OnOk() 
+void MotionConfig::OnOk()
 {
   assignKeys();
   theApp.input->checkKeys();
   EndDialog( TRUE);
 }
 
-void MotionConfig::OnDestroy() 
+void MotionConfig::OnDestroy()
 {
   CDialog::OnDestroy();
-  
+
   KillTimer(timerId);
 }
 
-BOOL MotionConfig::OnInitDialog() 
+BOOL MotionConfig::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   timerId = SetTimer(0,50,NULL);
-  
+
   CopyKeys(up.m_Keys, theApp.input->joypaddata[MOTION(KEY_UP)]);
   up.SetWindowText(GetKeyListName(theApp.input->joypaddata[MOTION(KEY_UP)]));
-  
+
   CopyKeys(down.m_Keys, theApp.input->joypaddata[MOTION(KEY_DOWN)]);
   down.SetWindowText(GetKeyListName(theApp.input->joypaddata[MOTION(KEY_DOWN)]));
 
@@ -375,14 +375,14 @@ BOOL MotionConfig::OnInitDialog()
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void MotionConfig::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
+void MotionConfig::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 }
 
-void MotionConfig::OnTimer(UINT nIDEvent) 
+void MotionConfig::OnTimer(UINT nIDEvent)
 {
   theApp.input->checkDevices();
-  
+
   CDialog::OnTimer(nIDEvent);
 }
 

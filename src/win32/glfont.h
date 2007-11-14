@@ -1,6 +1,6 @@
 //*********************************************************
 //GLFONT.H -- Header for GLFONT.CPP
-//Copyright (c) 1998 Brad Fish 
+//Copyright (c) 1998 Brad Fish
 //See glFont.txt for terms of use
 //November 10, 1998
 //*********************************************************

@@ -49,7 +49,7 @@ StringTokenizer::~StringTokenizer()
 const char *StringTokenizer::next()
 {
   int index = m_right.FindOneOf(m_delim);
-  
+
   while(index == 0) {
     m_right = m_right.Right(m_right.GetLength()-1);
     index = m_right.FindOneOf(m_delim);

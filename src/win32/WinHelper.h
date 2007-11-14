@@ -5,7 +5,7 @@
   Owner:  russf@gipsysoft.com
   Purpose:        Windows helper functions, classes, structures and macros
   that make life a little easier
-  These should all be zero impact classes etc. that is they 
+  These should all be zero impact classes etc. that is they
   should *not* have a cpp file associated with them.
   ----------------------------------------------------------------------*/
 #ifndef WINHELPER_H
@@ -78,9 +78,9 @@ namespace WinHelper
       //      Return the SIZE of the rectangle;
       inline CSize Size() const { CSize s( Width(), Height() ); return s; }
       //      Return the top left of the rectangle
-      inline POINT TopLeft() const { POINT pt = { left, top }; return pt; }   
+      inline POINT TopLeft() const { POINT pt = { left, top }; return pt; }
       //      Return the bottom right of the rectangle
-      inline POINT BottomRight() const { POINT pt = { right, bottom }; return pt; }   
+      inline POINT BottomRight() const { POINT pt = { right, bottom }; return pt; }
       //      Set the rectangles left, top, right and bottom
       inline void Set( int xLeft, int yTop, int xRight, int yBottom) { top = yTop; bottom = yBottom; right = xRight; left = xLeft; }
       //      Return true if the rectangle contains all zeros

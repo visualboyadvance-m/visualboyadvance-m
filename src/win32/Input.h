@@ -50,7 +50,7 @@ class Input {
 
   Input() {};
   virtual ~Input() {};
-  
+
   virtual bool initialize() = 0;
 
   virtual bool readDevices() = 0;

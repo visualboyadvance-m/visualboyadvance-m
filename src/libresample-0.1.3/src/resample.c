@@ -73,7 +73,7 @@ void *resample_dup(const void *	handle)
    memcpy(hp->Y, cpy->Y, hp->YSize * sizeof(float));
    hp->Yp = cpy->Yp;
    hp->Time = cpy->Time;
-   
+
    return (void *)hp;
 }
 
@@ -100,7 +100,7 @@ void *resample_open(int highQuality, double minFactor, double maxFactor)
 
    hp->minFactor = minFactor;
    hp->maxFactor = maxFactor;
- 
+
    if (highQuality)
       hp->Nmult = 35;
    else
@@ -145,7 +145,7 @@ void *resample_open(int highQuality, double minFactor, double maxFactor)
    hp->X = (float *)malloc((hp->XSize + hp->Xoff) * sizeof(float));
    hp->Xp = hp->Xoff;
    hp->Xread = hp->Xoff;
-   
+
    /* Need Xoff zeros at begining of X buffer */
    for(i=0; i<hp->Xoff; i++)
       hp->X[i]=0;
@@ -157,7 +157,7 @@ void *resample_open(int highQuality, double minFactor, double maxFactor)
    hp->Yp = 0;
 
    hp->Time = (double)hp->Xoff; /* Current-time pointer for converter */
-   
+
    return (void *)hp;
 }
 
@@ -280,7 +280,7 @@ int resample_process(void   *handle,
       #ifdef DEBUG
       printf("Nout: %d\n", Nout);
       #endif
-      
+
       hp->Time -= Nx;         /* Move converter Nx samples back in time */
       hp->Xp += Nx;           /* Advance by number of samples processed */
 
@@ -303,7 +303,7 @@ int resample_process(void   *handle,
 
       hp->Xread = Nreuse;  /* Pos in input buff to read new data into */
       hp->Xp = hp->Xoff;
-      
+
       /* Check to see if output buff overflowed (shouldn't happen!) */
       if (Nout > hp->YSize) {
          #ifdef DEBUG

@@ -54,7 +54,7 @@ GBTileView::GBTileView(CWnd* pParent /*=NULL*/)
   m_stretch = FALSE;
   //}}AFX_DATA_INIT
   autoUpdate = false;
-  
+
   memset(&bmpInfo, 0, sizeof(bmpInfo));
 
   bmpInfo.bmiHeader.biSize = sizeof(bmpInfo.bmiHeader);
@@ -117,7 +117,7 @@ BEGIN_MESSAGE_MAP(GBTileView, CDialog)
 void GBTileView::saveBMP(const char *name)
 {
   u8 writeBuffer[1024 * 3];
-  
+
   FILE *fp = fopen(name,"wb");
 
   if(!fp) {
@@ -174,7 +174,7 @@ void GBTileView::saveBMP(const char *name)
     }
     pixU8 -= 2*3*w;
     fwrite(writeBuffer, 1, 3*w, fp);
-    
+
     b = writeBuffer;
   }
 
@@ -185,14 +185,14 @@ void GBTileView::saveBMP(const char *name)
 void GBTileView::savePNG(const char *name)
 {
   u8 writeBuffer[1024 * 3];
-  
+
   FILE *fp = fopen(name,"wb");
 
   if(!fp) {
     systemMessage(MSG_ERROR_CREATING_FILE, "Error creating file %s", name);
     return;
   }
-  
+
   png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
                                                 NULL,
                                                 NULL,
@@ -241,16 +241,16 @@ void GBTileView::savePNG(const char *name)
       int blue = *pixU8++;
       int green = *pixU8++;
       int red = *pixU8++;
-      
+
       *b++ = red;
       *b++ = green;
       *b++ = blue;
     }
     png_write_row(png_ptr,writeBuffer);
-    
+
     b = writeBuffer;
   }
-  
+
   png_write_end(png_ptr, info_ptr);
 
   png_destroy_write_struct(&png_ptr, &info_ptr);
@@ -259,7 +259,7 @@ void GBTileView::savePNG(const char *name)
 }
 
 
-void GBTileView::OnSave() 
+void GBTileView::OnSave()
 {
   CString captureBuffer;
 
@@ -292,7 +292,7 @@ void GBTileView::OnSave()
   if(theApp.captureFormat)
     saveBMP(captureBuffer);
   else
-    savePNG(captureBuffer);  
+    savePNG(captureBuffer);
 }
 
 void GBTileView::renderTile(int tile, int x, int y, u8 *charBase)
@@ -303,11 +303,11 @@ void GBTileView::renderTile(int tile, int x, int y, u8 *charBase)
     u8 mask = 0x80;
     u8 tile_a = charBase[tile*16+j*2];
     u8 tile_b = charBase[tile*16+j*2+1];
-    
+
     for(int i = 0; i < 8; i++) {
       u8 c = (tile_a & mask) ? 1 : 0;
       c += ((tile_b & mask) ? 2 : 0);
-      
+
       if(gbCgbMode) {
         c = c + palette*4;
       } else {
@@ -335,7 +335,7 @@ void GBTileView::render()
   u8 *charBase = (gbVram != NULL) ?
     (bank ? &gbVram[0x2000+tiles] : &gbVram[tiles]) :
     &gbMemory[0x8000+tiles];
- 
+
   int tile = 0;
   for(int y = 0; y < 16; y++) {
     for(int x = 0; x < 16; x++) {
@@ -360,10 +360,10 @@ void GBTileView::update()
 }
 
 
-BOOL GBTileView::OnInitDialog() 
+BOOL GBTileView::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_ENTRY( IDC_TILE_VIEW, DS_SizeX | DS_SizeY )
     DIALOG_SIZER_ENTRY( IDC_COLOR, DS_MoveY)
@@ -392,27 +392,27 @@ BOOL GBTileView::OnInitDialog()
   if(m_stretch)
     tileView.setStretch(true);
   UpdateData(FALSE);
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void GBTileView::OnClose() 
+void GBTileView::OnClose()
 {
   theApp.winRemoveUpdateListener(this);
-  
+
   DestroyWindow();
 }
 
 
-void GBTileView::OnAutoUpdate() 
+void GBTileView::OnAutoUpdate()
 {
   autoUpdate = !autoUpdate;
   if(autoUpdate) {
     theApp.winAddUpdateListener(this);
   } else {
-    theApp.winRemoveUpdateListener(this);    
-  }  
+    theApp.winRemoveUpdateListener(this);
+  }
 }
 
 void GBTileView::paint()
@@ -423,36 +423,36 @@ void GBTileView::paint()
   }
 }
 
-void GBTileView::OnCharbase0() 
+void GBTileView::OnCharbase0()
 {
   charBase = 0;
   paint();
 }
 
-void GBTileView::OnCharbase1() 
+void GBTileView::OnCharbase1()
 {
   charBase = 1;
   paint();
 }
 
-void GBTileView::OnBank0() 
+void GBTileView::OnBank0()
 {
   bank = 0;
   paint();
 }
 
-void GBTileView::OnBank1() 
+void GBTileView::OnBank1()
 {
   bank = 1;
   paint();
 }
 
 
-void GBTileView::OnStretch() 
+void GBTileView::OnStretch()
 {
   tileView.setStretch(!tileView.getStretch());
   paint();
-  regSetDwordValue("tileViewStretch", tileView.getStretch());  
+  regSetDwordValue("tileViewStretch", tileView.getStretch());
 }
 
 LRESULT GBTileView::OnMapInfo(WPARAM wParam, LPARAM lParam)
@@ -477,7 +477,7 @@ LRESULT GBTileView::OnMapInfo(WPARAM wParam, LPARAM lParam)
 
   buffer.Format("%04x", address);
   GetDlgItem(IDC_ADDRESS)->SetWindowText(buffer);
-  
+
   return TRUE;
 }
 
@@ -485,7 +485,7 @@ LRESULT GBTileView::OnColInfo(WPARAM wParam, LPARAM)
 {
   u16 c = (u16)wParam;
 
-  color.setColor(c);  
+  color.setColor(c);
 
   int r = (c & 0x1f);
   int g = (c & 0x3e0) >> 5;
@@ -504,7 +504,7 @@ LRESULT GBTileView::OnColInfo(WPARAM wParam, LPARAM)
   return TRUE;
 }
 
-void GBTileView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
+void GBTileView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
   switch(nSBCode) {
   case TB_THUMBPOSITION:
@@ -518,7 +518,7 @@ void GBTileView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 }
 
 
-void GBTileView::PostNcDestroy() 
+void GBTileView::PostNcDestroy()
 {
   delete this;
 }

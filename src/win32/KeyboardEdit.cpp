@@ -59,7 +59,7 @@ BEGIN_MESSAGE_MAP(CKeyboardEdit, CEdit)
 #pragma warning( disable : 4706 )
   /////////////////////////////////////////////////////////////////////////////
 // CKeyboardEdit message handlers
-BOOL CKeyboardEdit::PreTranslateMessage (MSG* pMsg) 
+BOOL CKeyboardEdit::PreTranslateMessage (MSG* pMsg)
 {
   bool bPressed;
   if ((bPressed = (pMsg->message == WM_KEYDOWN)) || pMsg->message == WM_KEYUP || (bPressed = (pMsg->message == WM_SYSKEYDOWN)) || pMsg->message == WM_SYSKEYUP) {
@@ -82,7 +82,7 @@ BOOL CKeyboardEdit::PreTranslateMessage (MSG* pMsg)
     DisplayKeyboardString ();
     return TRUE;
   }
-        
+
   return CEdit::PreTranslateMessage(pMsg);
 }
 #pragma warning( default : 4706 )
@@ -125,7 +125,7 @@ void CKeyboardEdit::ResetKey ()
   m_bCtrlPressed = false;
   m_bAltPressed = false;
   m_bShiftPressed = false;
-  
+
   m_bKeyDefined = false;
   if(m_hWnd != NULL)
     SetWindowText(_T(""));
@@ -138,7 +138,7 @@ bool CKeyboardEdit::GetAccelKey(WORD& wVirtKey, bool& bCtrl, bool& bAlt, bool& b
 {
   if (!m_bKeyDefined)
     return false;
-  
+
   wVirtKey = m_wVirtKey;
   bAlt = m_bAltPressed;
   bCtrl = m_bCtrlPressed;

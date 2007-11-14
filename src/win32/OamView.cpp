@@ -53,9 +53,9 @@ OamView::OamView(CWnd* pParent /*=NULL*/)
   m_stretch = FALSE;
   //}}AFX_DATA_INIT
   autoUpdate = false;
-  
+
   memset(&bmpInfo.bmiHeader, 0, sizeof(bmpInfo.bmiHeader));
-  
+
   bmpInfo.bmiHeader.biSize = sizeof(bmpInfo.bmiHeader);
   bmpInfo.bmiHeader.biWidth = 32;
   bmpInfo.bmiHeader.biHeight = 32;
@@ -110,7 +110,7 @@ void OamView::paint()
 {
   if(oam == NULL || paletteRAM == NULL || vram == NULL)
     return;
-  
+
   render();
   oamView.setSize(w,h);
   oamView.refresh();
@@ -126,7 +126,7 @@ void OamView::update()
 void OamView::setAttributes(u16 a0, u16 a1, u16 a2)
 {
   CString buffer;
-  
+
   int y = a0 & 255;
   int rot = a0 & 512;
   int mode = (a0 >> 10) & 3;
@@ -195,7 +195,7 @@ void OamView::setAttributes(u16 a0, u16 a1, u16 a2)
     buffer += 'D';
   else
     buffer += ' ';
-  
+
   GetDlgItem(IDC_FLAGS)->SetWindowText(buffer);
 }
 
@@ -204,18 +204,18 @@ void OamView::render()
   int m=0;
   if(oam == NULL || paletteRAM == NULL || vram == NULL)
     return;
-  
+
   u16 *sprites = &((u16 *)oam)[4*number];
   u16 *spritePalette = &((u16 *)paletteRAM)[0x100];
   u8 *bmp = data;
-  
+
   u16 a0 = *sprites++;
   u16 a1 = *sprites++;
   u16 a2 = *sprites++;
-  
+
   int sizeY = 8;
   int sizeX = 8;
-  
+
   switch(((a0 >>12) & 0x0c)|(a1>>14)) {
   case 0:
     break;
@@ -264,9 +264,9 @@ void OamView::render()
   h = sizeY;
 
   setAttributes(a0,a1,a2);
-  
+
   int sy = (a0 & 255);
-  
+
   if(a0 & 0x2000) {
     int c = (a2 & 0x3FF);
     //          if((DISPCNT & 7) > 2 && (c < 512))
@@ -276,7 +276,7 @@ void OamView::render()
       inc = sizeX >> 2;
     else
       c &= 0x3FE;
-    
+
     for(int y = 0; y < sizeY; y++) {
       for(int x = 0; x < sizeX; x++) {
         u32 color = vram[0x10000 + (((c + (y>>3) * inc)*
@@ -292,7 +292,7 @@ void OamView::render()
     int c = (a2 & 0x3FF);
     //      if((DISPCNT & 7) > 2 && (c < 512))
     //          continue;
-    
+
     int inc = 32;
     if(DISPCNT & 0x40)
       inc = sizeX >> 3;
@@ -306,11 +306,11 @@ void OamView::render()
           color >>= 4;
         else
           color &= 0x0F;
-        
+
         color = spritePalette[palette+color];
         *bmp++ = ((color >> 10) & 0x1f) << 3;
         *bmp++ = ((color >> 5) & 0x1f) << 3;
-        *bmp++ = (color & 0x1f) << 3;            
+        *bmp++ = (color & 0x1f) << 3;
       }
     }
   }
@@ -319,7 +319,7 @@ void OamView::render()
 void OamView::saveBMP(const char *name)
 {
   u8 writeBuffer[1024 * 3];
-  
+
   FILE *fp = fopen(name,"wb");
 
   if(!fp) {
@@ -376,7 +376,7 @@ void OamView::saveBMP(const char *name)
     }
     pixU8 -= 2*3*w;
     fwrite(writeBuffer, 1, 3*w, fp);
-    
+
     b = writeBuffer;
   }
 
@@ -388,14 +388,14 @@ void OamView::saveBMP(const char *name)
 void OamView::savePNG(const char *name)
 {
   u8 writeBuffer[1024 * 3];
-  
+
   FILE *fp = fopen(name,"wb");
 
   if(!fp) {
     systemMessage(MSG_ERROR_CREATING_FILE, "Error creating file %s", name);
     return;
   }
-  
+
   png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
                                                 NULL,
                                                 NULL,
@@ -444,16 +444,16 @@ void OamView::savePNG(const char *name)
       int blue = *pixU8++;
       int green = *pixU8++;
       int red = *pixU8++;
-      
+
       *b++ = red;
       *b++ = green;
       *b++ = blue;
     }
     png_write_row(png_ptr,writeBuffer);
-    
+
     b = writeBuffer;
   }
-  
+
   png_write_end(png_ptr, info_ptr);
 
   png_destroy_write_struct(&png_ptr, &info_ptr);
@@ -461,7 +461,7 @@ void OamView::savePNG(const char *name)
   fclose(fp);
 }
 
-void OamView::OnSave() 
+void OamView::OnSave()
 {
   if(rom != NULL)
   {
@@ -495,14 +495,14 @@ void OamView::OnSave()
     if(dlg.getFilterIndex() == 2)
       saveBMP(captureBuffer);
     else
-      savePNG(captureBuffer); 
+      savePNG(captureBuffer);
   }
 }
 
-BOOL OamView::OnInitDialog() 
+BOOL OamView::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_ENTRY( IDC_OAM_VIEW, DS_SizeX | DS_SizeY )
     DIALOG_SIZER_ENTRY( IDC_OAM_VIEW_ZOOM, DS_MoveX)
@@ -512,7 +512,7 @@ BOOL OamView::OnInitDialog()
     DIALOG_SIZER_ENTRY( IDC_COLOR, DS_MoveY)
     DIALOG_SIZER_ENTRY( IDC_R, DS_MoveY)
     DIALOG_SIZER_ENTRY( IDC_G, DS_MoveY)
-    DIALOG_SIZER_ENTRY( IDC_B, DS_MoveY)    
+    DIALOG_SIZER_ENTRY( IDC_B, DS_MoveY)
     DIALOG_SIZER_END()
     SetData(sz,
             TRUE,
@@ -527,32 +527,32 @@ BOOL OamView::OnInitDialog()
   if(m_stretch)
     oamView.setStretch(true);
   UpdateData(FALSE);
-  
+
   paint();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void OamView::OnStretch() 
+void OamView::OnStretch()
 {
   oamView.setStretch(!oamView.getStretch());
   paint();
-  regSetDwordValue("oamViewStretch", oamView.getStretch());  
+  regSetDwordValue("oamViewStretch", oamView.getStretch());
 }
 
 
-void OamView::OnAutoUpdate() 
+void OamView::OnAutoUpdate()
 {
   autoUpdate = !autoUpdate;
   if(autoUpdate) {
     theApp.winAddUpdateListener(this);
   } else {
-    theApp.winRemoveUpdateListener(this);    
-  }  
+    theApp.winRemoveUpdateListener(this);
+  }
 }
 
-void OamView::OnChangeSprite() 
+void OamView::OnChangeSprite()
 {
   CString buffer;
   m_sprite.GetWindowText(buffer);
@@ -567,10 +567,10 @@ void OamView::OnChangeSprite()
   updateScrollInfo();
 }
 
-void OamView::OnClose() 
+void OamView::OnClose()
 {
   theApp.winRemoveUpdateListener(this);
-  
+
   DestroyWindow();
 }
 
@@ -578,7 +578,7 @@ LRESULT OamView::OnMapInfo(WPARAM wParam, LPARAM lParam)
 {
   u8 *colors = (u8 *)lParam;
   oamZoom.setColors(colors);
-  
+
   return TRUE;
 }
 
@@ -586,7 +586,7 @@ LRESULT OamView::OnColInfo(WPARAM wParam, LPARAM lParam)
 {
   u16 c = (u16)wParam;
 
-  color.setColor(c);  
+  color.setColor(c);
 
   int r = (c & 0x1f);
   int g = (c & 0x3e0) >> 5;
@@ -617,10 +617,10 @@ void OamView::updateScrollInfo()
   si.nPos = number;
   GetDlgItem(IDC_SCROLLBAR)->SetScrollInfo(SB_CTL,
                                            &si,
-                                           TRUE);    
+                                           TRUE);
 }
 
-void OamView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
+void OamView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
   switch(nSBCode) {
   case SB_BOTTOM:
@@ -659,14 +659,14 @@ void OamView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
   }
 
   updateScrollInfo();
-  
+
   CString buffer;
   buffer.Format("%d", number);
   m_sprite.SetWindowText(buffer);
   paint();
 }
 
-void OamView::PostNcDestroy() 
+void OamView::PostNcDestroy()
 {
   delete this;
 }

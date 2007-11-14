@@ -22,7 +22,7 @@
 // Version : 1.0                       * Author : T.Maurel
 // Date    : 17.08.98
 //
-// Remarks : 
+// Remarks :
 //
 ////////////////////////////////////////////////////////////////////////////////
 #ifndef __CMDACCEL_OB_INCLUDE
