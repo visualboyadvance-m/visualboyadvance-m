@@ -226,9 +226,9 @@ void remoteInit()
     remoteInitFnc();
 }
 
-void remotePutPacket(char *packet)
+void remotePutPacket(const char *packet)
 {
-  char *hex = "0123456789abcdef";  
+  const char *hex = "0123456789abcdef";  
   char buffer[1024];
 
   size_t count = strlen(packet);
