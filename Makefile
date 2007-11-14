@@ -1,10 +1,10 @@
 CC=gcc
 CPPC=g++
-CFLAGS=-W -Wall -Wno-unused -DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DFINAL_VERSION -DSDL -DSYSCONFDIR="home"
+CFLAGS=-W -Wall -Wno-unused -DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DFINAL_VERSION -DC_CORE -DSDL -DSYSCONFDIR="home"
 CXXFLAGS=${CFLAGS}
 ASM=nasm
 ASMFLAGS=-w-orphan-labels -f elf -DELF -O1 -Isrc/
-LFLAGS=-lz -lpng -s -lSDL
+LFLAGS=-lz -lpng -lSDL -s
 
 MAINDIR=src
 SDLDIR=src/sdl
