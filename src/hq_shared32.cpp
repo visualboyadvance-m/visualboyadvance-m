@@ -17,15 +17,16 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "hq_shared32.h"
+#define __STDC_CONSTANT_MACROS
+#include <stdint.h>
 
-const unsigned __int64 reg_blank = 0x0000000000000000;
-const unsigned __int64 const7    = 0x0000000700070007;
-const unsigned __int64 treshold  = 0x0000000000300706;
+const uint64_t reg_blank = UINT64_C(0x0000000000000000);
+const uint64_t const7    = UINT64_C(0x0000000700070007);
+const uint64_t treshold  = UINT64_C(0x0000000000300706);
 
 void Interp1(unsigned char * pc, unsigned int c1, unsigned int c2)
 {
-	//*((int*)pc) = (c1*3+c2)/4;
-
+#ifdef _MSC_VER
 #ifdef MMX
 	__asm
 	{
@@ -52,12 +53,14 @@ void Interp1(unsigned char * pc, unsigned int c1, unsigned int c2)
 		mov        [eax], edx
 	}
 #endif
+#else
+  *((int*)pc) = (c1*3+c2)/4;
+#endif
 }
 
 void Interp2(unsigned char * pc, unsigned int c1, unsigned int c2, unsigned int c3)
 {
-	//*((int*)pc) = (c1*2+c2+c3)/4;
-
+#ifdef _MSC_VER
 #ifdef MMX
 	__asm
 	{
@@ -84,14 +87,14 @@ void Interp2(unsigned char * pc, unsigned int c1, unsigned int c2, unsigned int 
 		mov        [eax], edx
 	}
 #endif
+#else
+  *((int*)pc) = (c1*2+c2+c3)/4;
+#endif
 }
 
 void Interp3(unsigned char * pc, unsigned int c1, unsigned int c2)
 {
-	//*((int*)pc) = (c1*7+c2)/8;
-	//*((int*)pc) = ((((c1 & 0x00FF00)*7 + (c2 & 0x00FF00) ) & 0x0007F800) +
-	//	            (((c1 & 0xFF00FF)*7 + (c2 & 0xFF00FF) ) & 0x07F807F8)) >> 3;
-
+#ifdef _MSC_VER
 #ifdef MMX
 	__asm
 	{
@@ -121,14 +124,16 @@ void Interp3(unsigned char * pc, unsigned int c1, unsigned int c2)
 		mov		[eax], ecx
 	}
 #endif
+#else
+  *((int*)pc) = (c1*7+c2)/8;
+  *((int*)pc) = ((((c1 & 0x00FF00)*7 + (c2 & 0x00FF00) ) & 0x0007F800) +
+                (((c1 & 0xFF00FF)*7 + (c2 & 0xFF00FF) ) & 0x07F807F8)) >> 3;
+#endif
 }
 
 void Interp4(unsigned char * pc, unsigned int c1, unsigned int c2, unsigned int c3)
 {
-	//*((int*)pc) = (c1*2+(c2+c3)*7)/16;
-	//*((int*)pc) = ((((c1 & 0x00FF00)*2 + ((c2 & 0x00FF00) + (c3 & 0x00FF00))*7 ) & 0x000FF000) +
-	//              (((c1 & 0xFF00FF)*2 + ((c2 & 0xFF00FF) + (c3 & 0xFF00FF))*7 ) & 0x0FF00FF0)) >> 4;
-
+#ifdef _MSC_VER
 #ifdef MMX	
 	__asm
 	{
@@ -183,12 +188,16 @@ void Interp4(unsigned char * pc, unsigned int c1, unsigned int c2, unsigned int 
 		mov		[ebx], eax
 	}
 #endif
+#else
+  *((int*)pc) = (c1*2+(c2+c3)*7)/16;
+  *((int*)pc) = ((((c1 & 0x00FF00)*2 + ((c2 & 0x00FF00) + (c3 & 0x00FF00))*7 ) & 0x000FF000) +
+                (((c1 & 0xFF00FF)*2 + ((c2 & 0xFF00FF) + (c3 & 0xFF00FF))*7 ) & 0x0FF00FF0)) >> 4;
+#endif
 }
 
 void Interp5(unsigned char * pc, unsigned int c1, unsigned int c2)
 {
-	//*((int*)pc) = (c1+c2)/2;
-
+#ifdef _MSC_VER
 #ifdef MMX
 	__asm
 	{
@@ -209,6 +218,9 @@ void Interp5(unsigned char * pc, unsigned int c1, unsigned int c2)
 		shr        edx, 1
 		mov        [eax], edx
 	}
+#endif
+#else
+  *((int*)pc) = (c1+c2)/2;
 #endif
 }
 

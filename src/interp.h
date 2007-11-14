@@ -31,6 +31,12 @@
 #ifndef __INTERP_H
 #define __INTERP_H
 
+#define __STDC_CONSTANT_MACROS
+#include <stdint.h>
+
+typedef uint16_t interp_uint16;
+typedef uint32_t interp_uint32;
+
 /***************************************************************************/
 /* Basic types */
 
