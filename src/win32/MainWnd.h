@@ -209,6 +209,8 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsVideoRenderoptionsGltriangle(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsGlquads();
   afx_msg void OnUpdateOptionsVideoRenderoptionsGlquads(CCmdUI* pCmdUI);
+    afx_msg void OnOptionsVideoRenderoptionsGlpolygons();
+  afx_msg void OnUpdateOptionsVideoRenderoptionsGlpolygons(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsSelectskin();
   afx_msg void OnUpdateOptionsVideoRenderoptionsSelectskin(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsSkin();

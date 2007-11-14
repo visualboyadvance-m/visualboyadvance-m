@@ -1416,7 +1416,7 @@ void VBA::loadSettings()
     glFilter = 1;
 
   glType = regQueryDwordValue("glType", 0);
-  if(glType < 0 || glType > 1)
+  if(glType < 0 || glType > 2)
     glType = 0;
 
   filterType = regQueryDwordValue("filter", 0);
