@@ -14,8 +14,27 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
 #include "memgzio.h"
+
+#ifndef local
+#define local static
+#endif
+
+#ifndef DEF_MEM_LEVEL
+#  define DEF_MEM_LEVEL 8
+#endif
+
+#ifndef OS_CODE
+#define OS_CODE 3
+#endif
+
+#ifndef zmemcpy
+#define zmemcpy memcpy
+#endif
+
 
 /*struct internal_state {int dummy;};*/ /* for buggy compilers */
 

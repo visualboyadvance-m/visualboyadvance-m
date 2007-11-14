@@ -25,19 +25,19 @@
 typedef struct {
   u8 mask;
   u8 value;
-  char *mnen;
+  const char *mnen;
 } GBOPCODE;
 
 #define GB_READ(x) gbMemoryMap[(x)>>12][(x)&0xfff]
 
-static char *registers[] =
+static const char *registers[] =
   { "B", "C", "D", "E", "H", "L", "(HL)", "A" };
 
-static char *registers16[] =
+static const char *registers16[] =
   { "BC", "DE", "HL", "SP", // for some operations
     "BC", "DE", "HL", "AF" }; // for push/pop
 
-static char *cond[] =
+static const char *cond[] =
   { "NZ", "Z", "NC", "C" };
 
 static char hexDigits[16] = {
@@ -145,7 +145,7 @@ static char *addHex16(char *p, u16 value)
   return addHex(p, value & 255);
 }
 
-static char *addStr(char *p, char *s)
+static char *addStr(char *p, const char *s)
 {
   while(*s) {
     *p++ = *s++;
@@ -163,7 +163,7 @@ int gbDis(char *buffer, u16 address)
   
   u8 opcode = GB_READ(address);
   address++;
-  char *mnen;
+  const char *mnen;
   GBOPCODE *op;
   if(opcode == 0xcb) {
     opcode = GB_READ(address);
