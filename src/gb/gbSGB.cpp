@@ -22,7 +22,7 @@
 #include "../System.h"
 #include "../Port.h"
 #include "../Util.h"
-#include "GB.h"
+#include "gb.h"
 #include "gbGlobals.h"
 
 extern u8 *pix;
