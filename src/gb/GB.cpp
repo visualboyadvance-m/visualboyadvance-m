@@ -23,7 +23,7 @@
 
 #include "../System.h"
 #include "../NLS.h"
-#include "GB.h"
+#include "gb.h"
 #include "gbCheats.h"
 #include "gbGlobals.h"
 #include "gbMemory.h"
