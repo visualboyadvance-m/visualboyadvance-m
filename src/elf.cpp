@@ -282,7 +282,7 @@ CompileUnit *elfGetCompileUnit(u32 addr)
   return NULL;
 }
 
-char *elfGetAddressSymbol(u32 addr)
+const char *elfGetAddressSymbol(u32 addr)
 {
   static char buffer[256];
 
@@ -293,7 +293,7 @@ char *elfGetAddressSymbol(u32 addr)
     while(func) {
       if(addr >= func->lowPC && addr < func->highPC) {
         int offset = addr - func->lowPC;
-        char *name = func->name;
+        const char *name = func->name;
         if(!name)
           name = "";
         if(offset)
@@ -311,7 +311,7 @@ char *elfGetAddressSymbol(u32 addr)
       Symbol *s = &elfSymbols[i];
       if((addr >= s->value)  && addr < (s->value+s->size)) {
         int offset = addr-s->value;
-        char *name = s->name;
+        const char *name = s->name;
         if(name == NULL)
           name = "";
         if(offset)
@@ -468,7 +468,7 @@ bool elfGetObject(char *name, Function *f, CompileUnit *u, Object **o)
   return false;
 }
 
-char *elfGetSymbol(int i, u32 *value, u32 *size, int *type)
+const char *elfGetSymbol(int i, u32 *value, u32 *size, int *type)
 {
   if(i < elfSymbolsCount) {
     Symbol *s = &elfSymbols[i];
@@ -649,7 +649,7 @@ void elfPrintCallChain(u32 address)
   memcpy(&regs[0], &reg[0], sizeof(reg_pair) * 15);
   
   while(count < 20) {
-    char *addr = elfGetAddressSymbol(address);
+    const char *addr = elfGetAddressSymbol(address);
     if(*addr == 0)
       addr = "???";
     
@@ -864,7 +864,7 @@ u8 *elfReadSection(u8 *data, ELFSectionHeader *sh)
   return data + READ32LE(&sh->offset);
 }
 
-ELFSectionHeader *elfGetSectionByName(char *name)
+ELFSectionHeader *elfGetSectionByName(const char *name)
 {
   for(int i = 0; i < elfSectionHeadersCount; i++) {
     if(strcmp(name,

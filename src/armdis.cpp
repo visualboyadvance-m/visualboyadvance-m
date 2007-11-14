@@ -30,7 +30,7 @@
 struct Opcodes {
   u32 mask;
   u32 cval;
-  char *mnemonic;
+  const char *mnemonic;
 };
 
 #define debuggerReadMemory(addr) \
@@ -246,7 +246,7 @@ int disArm(u32 offset, char *dest, int flags){
     *dest++ = ' ';
   }
 
-  char *src = sp->mnemonic;
+  const char *src = sp->mnemonic;
   while (*src){
     if (*src!='%')
       *dest++ = *src++;
@@ -561,7 +561,7 @@ int disThumb(u32 offset, char *dest, int flags){
     *dest++ = ' ';
   }
         
-  char *src = sp->mnemonic;
+  const char *src = sp->mnemonic;
   while (*src){
     if (*src!='%')
       *dest++ = *src++;
@@ -620,7 +620,7 @@ int disThumb(u32 offset, char *dest, int flags){
                                          ((opcode & 0xff)<<2));
           *dest++ = '$';
           dest = addHex(dest, 32, value);
-          char *s = elfGetAddressSymbol(value);
+          const char *s = elfGetAddressSymbol(value);
           if(*s) {
             *dest++ = ' ';
             dest = addStr(dest, s);
@@ -632,7 +632,7 @@ int disThumb(u32 offset, char *dest, int flags){
           u32 value = (offset&0xfffffffc)+4+((opcode & 0xff)<<2);
           *dest++ = '$';
           dest = addHex(dest, 32, value);
-          char *s = elfGetAddressSymbol(value);
+          const char *s = elfGetAddressSymbol(value);
           if(*s) {
             *dest++ = ' ';
             dest = addStr(dest, s);
@@ -723,7 +723,7 @@ int disThumb(u32 offset, char *dest, int flags){
           add = (add<<12)|((nopcode&0x7ff)<<1);
           *dest++ = '$';
           dest = addHex(dest,32, offset+4+add);
-          char *s = elfGetAddressSymbol(offset+4+add);
+          const char *s = elfGetAddressSymbol(offset+4+add);
           if(*s) {
             *dest++ = ' ';
             *dest++ = '(';

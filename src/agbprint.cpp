@@ -67,7 +67,7 @@ bool agbPrintIsEnabled()
   return agbPrintEnabled;
 }
 
-extern void (*dbgOutput)(char *, u32);
+extern void (*dbgOutput)(const char *, u32);
  
 void agbPrintFlush()
 {
