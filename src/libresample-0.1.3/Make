@@ -1,0 +1,7 @@
+ALL: libresample.a
+
+Makefile:
+	./configure
+
+libresample.a: Makefile
+	make
