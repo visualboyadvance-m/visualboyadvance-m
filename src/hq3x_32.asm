@@ -18,10 +18,9 @@
 ;along with this program; if not, write to the Free Software
 ;Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-GLOBAL _hq3x_32
+%include "macros.mac"
 
-EXTERN _LUT16to32
-EXTERN _RGBtoYUV
+EXTSYM LUT16to32,RGBtoYUV
 
 SECTION .bss
 linesleft resd 1
@@ -61,7 +60,7 @@ SECTION .text
     mov     edx,[%1]
     cmp     edx,[%2]
     je      %%fin
-    mov     ecx,_RGBtoYUV
+    mov     ecx,RGBtoYUV
     movd    mm1,[ecx+edx*4]
     movq    mm5,mm1
     mov     edx,[%2]
@@ -370,7 +369,7 @@ Yres         equ 20
 pitch        equ 24
 offset       equ 28
 
-_hq3x_32:
+NEWSYM hq3x_32
     push ebp
     mov ebp,esp
     pushad
@@ -446,7 +445,7 @@ _hq3x_32:
     movzx   edx,ax  
     mov     [w9],edx
 .flags
-    mov     ebx,_RGBtoYUV
+    mov     ebx,RGBtoYUV
     mov     eax,[w5]
     xor     ecx,ecx
     movd    mm5,[ebx+eax*4]
@@ -515,7 +514,7 @@ _hq3x_32:
     test    ecx,ecx
     jnz     .testflag1
     mov     ecx,[cross]
-    mov     ebx,_LUT16to32
+    mov     ebx,LUT16to32
     mov     eax,[ebx+eax*4]
     jmp     [FuncTable2+ecx*4]
 .testflag1
@@ -575,7 +574,7 @@ _hq3x_32:
     jz      .noflag9
     or      ecx,128
 .noflag9
-    mov  ebx,_LUT16to32
+    mov  ebx,LUT16to32
     mov  eax,[ebx+eax*4]
     mov  edx,[w2]
     mov  edx,[ebx+edx*4]
