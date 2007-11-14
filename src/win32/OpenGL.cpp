@@ -418,8 +418,6 @@ void OpenGLDisplay::render()
 		GL_UNSIGNED_BYTE,
 		data );
 
-
-	
 	if( theApp.glType == 0 ) {
 		glBegin( GL_TRIANGLE_STRIP );
 
@@ -436,7 +434,9 @@ void OpenGLDisplay::render()
 		glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
 
 		glEnd();
-	} else {
+	} 
+	if(theApp.glType == 1)
+	{
 		glBegin( GL_QUADS );
 
 		glTexCoord2f( 0.0f, 0.0f );
@@ -454,6 +454,25 @@ void OpenGLDisplay::render()
 		glEnd();
 
 	}
+	if(theApp.glType == 2)
+	{
+		glBegin( GL_POLYGON );
+
+		glTexCoord2f( 0.0f, 0.0f );
+		glVertex3i( 0, 0, 0 );
+
+		glTexCoord2f( (float)(width) / size, 0.0f );
+		glVertex3i( theApp.surfaceSizeX, 0, 0 );
+
+		glTexCoord2f( (float)(width) / size, (float)(height) / size );
+		glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
+
+		glTexCoord2f( 0.0f, (float)(height) / size );
+		glVertex3i( 0, theApp.surfaceSizeY, 0 );
+
+		glEnd();
+	}
+
 	
 	if( theApp.showSpeed ) { // && ( theApp.videoOption > VIDEO_4X ) ) {
 		char buffer[30];
