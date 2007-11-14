@@ -38,10 +38,10 @@ static blargg_err_t gzip_reader_read( void* file, void* out, long* count )
 blargg_err_t Gzip_Reader::open( File_Reader* new_in )
 {
 	close();
-	
+
 	RETURN_ERR( inflater.begin( gzip_reader_read, new_in ) );
 	RETURN_ERR( inflater.set_mode( inflater.mode_auto ) );
-	
+
 	size_ = -1; // defer seeking to end of file until size is actually needed
 	in    = new_in;
 	return 0;
@@ -69,7 +69,7 @@ long Gzip_Reader::remain() const
 	{
 		if ( !in )
 			return 0;
-		
+
 		// need to cast away constness to change cached value
 		if ( ((Gzip_Reader*) this)->calc_size() )
 			return -1;

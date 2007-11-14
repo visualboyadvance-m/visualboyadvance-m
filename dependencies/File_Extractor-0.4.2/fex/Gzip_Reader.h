@@ -12,10 +12,10 @@ public:
 	error_t open( File_Reader* );
 	void close();
 	long tell() const { return tell_; }
-	
+
 	// True if file is compressed
 	bool deflated() const { return inflater.deflated(); }
-	
+
 public:
 	Gzip_Reader();
 	~Gzip_Reader();
@@ -27,7 +27,7 @@ private:
 	long tell_;
 	long size_;
 	Zlib_Inflater inflater;
-	
+
 	error_t calc_size();
 	blargg_err_t read_( void* out, long* count );
 };

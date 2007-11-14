@@ -1,6 +1,6 @@
 /*
  * File:	xfile.h
- * Purpose:	General Purpose File Class 
+ * Purpose:	General Purpose File Class
  */
 /*
   --------------------------------------------------------------------------------
@@ -9,7 +9,7 @@
 
 	CxFile (c)  11/May/2002 Davide Pizzolato - www.xdp.it
 	CxFile version 2.00 23/Aug/2002
-	
+
 	Special thanks to Chris Shearer Cooper for new features, enhancements and bugfixes
 
 	Covered code is provided under this license on an "as is" basis, without warranty
@@ -24,7 +24,7 @@
 
 	Permission is hereby granted to use, copy, modify, and distribute this
 	source code, or portions hereof, for any purpose, including commercial applications,
-	freely and without fee, subject to the following restrictions: 
+	freely and without fee, subject to the following restrictions:
 
 	1. The origin of this software must not be misrepresented; you must not
 	claim that you wrote the original software. If you use this software

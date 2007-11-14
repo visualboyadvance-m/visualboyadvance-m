@@ -28,7 +28,7 @@
    as international virtual keycodes.  We'll follow in the footsteps of X11...
    The names of the keys
  */
- 
+
 typedef enum {
 	/* The keyboard syms have been cleverly chosen to map to ASCII */
 	SDLK_UNKNOWN		= 0,
@@ -71,7 +71,7 @@ typedef enum {
 	SDLK_GREATER		= 62,
 	SDLK_QUESTION		= 63,
 	SDLK_AT			= 64,
-	/* 
+	/*
 	   Skip uppercase letters
 	 */
 	SDLK_LEFTBRACKET	= 91,

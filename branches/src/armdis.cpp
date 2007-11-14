@@ -135,11 +135,11 @@ const Opcodes thumbOpcodes[] = {
   // Format 13
   {0xff00, 0xb000, "add sp, %s"},
   // Format 14
-  {0xffff, 0xb500, "push {lr}"},  
+  {0xffff, 0xb500, "push {lr}"},
   {0xff00, 0xb400, "push {%l}"},
   {0xff00, 0xb500, "push {%l,lr}"},
   {0xffff, 0xbd00, "pop {pc}"},
-  {0xff00, 0xbd00, "pop {%l,pc}"},  
+  {0xff00, 0xbd00, "pop {%l,pc}"},
   {0xff00, 0xbc00, "pop {%l}"},
   // Format 15
   {0xf800, 0xc000, "stmia %r8!, {%l}"},
@@ -232,7 +232,7 @@ char* addHex(char *dest, int siz, u32 val){
 
 int disArm(u32 offset, char *dest, int flags){
   u32 opcode = debuggerReadMemory(offset);
-        
+
   const Opcodes *sp = armOpcodes;
   while( sp->cval != (opcode & sp->mask) )
     sp++;
@@ -431,7 +431,7 @@ int disArm(u32 offset, char *dest, int flags){
           if(opcode & 0x00100000)
             dest = addStr(dest, armMultLoadStore[8+((opcode>>23)&3)]);
           else
-            dest = addStr(dest, armMultLoadStore[4+((opcode>>23)&3)]);      
+            dest = addStr(dest, armMultLoadStore[4+((opcode>>23)&3)]);
         } else
           dest = addStr(dest, armMultLoadStore[(opcode>>23)&3]);
         break;
@@ -540,18 +540,18 @@ int disArm(u32 offset, char *dest, int flags){
     }
   }
   *dest++ = 0;
-        
+
   return 4;
 }
 
 int disThumb(u32 offset, char *dest, int flags){
   u32 opcode = debuggerReadHalfWord(offset);
-        
+
   const Opcodes *sp = thumbOpcodes;
   int ret = 2;
   while( sp->cval != (opcode & sp->mask) )
     sp++;
-        
+
   if (flags&DIS_VIEW_ADDRESS){
     dest = addHex(dest, 32, offset);
     *dest++ = ' ';
@@ -560,7 +560,7 @@ int disThumb(u32 offset, char *dest, int flags){
     dest = addHex(dest, 16, opcode);
     *dest++ = ' ';
   }
-        
+
   char *src = sp->mnemonic;
   while (*src){
     if (*src!='%')
@@ -636,7 +636,7 @@ int disThumb(u32 offset, char *dest, int flags){
           if(*s) {
             *dest++ = ' ';
             dest = addStr(dest, s);
-          }          
+          }
         }
         break;
       case 'b':

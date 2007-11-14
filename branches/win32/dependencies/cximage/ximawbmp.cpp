@@ -24,7 +24,7 @@ bool CxImageWBMP::Decode(CxFile *hFile)
 		throw "Not a WBMP";
 
 	if (wbmpHead.Type != 0)
-		throw "Unsupported WBMP type";			
+		throw "Unsupported WBMP type";
 
 	if (wbmpHead.ImageHeight==0 || wbmpHead.ImageWidth==0)
 		throw "Corrupted WBMP";

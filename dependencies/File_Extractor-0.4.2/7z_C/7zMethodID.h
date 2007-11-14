@@ -6,7 +6,7 @@
 #include "7zTypes.h"
 
 #define kMethodIDSize 15
-	
+
 typedef struct _CMethodID
 {
 	Byte ID[kMethodIDSize];

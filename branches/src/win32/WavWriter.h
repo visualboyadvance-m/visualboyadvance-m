@@ -30,7 +30,7 @@
 
 #include <mmreg.h>
 
-class WavWriter  
+class WavWriter
 {
  private:
   FILE *m_file;

@@ -60,10 +60,10 @@ BEGIN_MESSAGE_MAP(AboutDialog, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // AboutDialog message handlers
 
-BOOL AboutDialog::OnInitDialog() 
+BOOL AboutDialog::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   CWnd *p = GetDlgItem(IDC_TRANSLATOR_URL);
   if(p) {
     m_translator.SubclassDlgItem(IDC_TRANSLATOR_URL, this);

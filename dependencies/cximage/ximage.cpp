@@ -6,7 +6,7 @@
 #include "ximage.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// CxImage 
+// CxImage
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * Initialize the internal structures
@@ -48,7 +48,7 @@ bool CxImage::Destroy()
 {
 	//free this only if it's valid and it's not a ghost
 	if (info.pGhost==NULL){
-		if (pLayers) { 
+		if (pLayers) {
 			for(long n=0; n<info.nNumLayers;n++){ delete pLayers[n]; }
 			free(pLayers); pLayers=0;
 		}
@@ -191,7 +191,7 @@ void* CxImage::Create(DWORD dwWidth, DWORD dwHeight, DWORD wBpp, DWORD imagetype
     head.biHeight = dwHeight;	// fill in height from parameter
     head.biPlanes = 1;			// must be 1
     head.biBitCount = (WORD)wBpp;		// from parameter
-    head.biCompression = BI_RGB;    
+    head.biCompression = BI_RGB;
     head.biSizeImage = info.dwEffWidth * dwHeight;
 //    head.biXPelsPerMeter = 0; See SetXDPI
 //    head.biYPelsPerMeter = 0; See SetYDPI
@@ -230,7 +230,7 @@ void* CxImage::Create(DWORD dwWidth, DWORD dwHeight, DWORD wBpp, DWORD imagetype
  * \return pointer to the image pixels. <b> USE CAREFULLY </b>
  */
 BYTE* CxImage::GetBits(DWORD row)
-{ 
+{
 	if (pDib){
 		if (row) {
 			if (row<(DWORD)head.biHeight){
@@ -479,7 +479,7 @@ int CxImage::CompareColors(const void *elem1, const void *elem2)
 
 	int g1 = (int)RGB2GRAY(c1->rgbRed,c1->rgbGreen,c1->rgbBlue);
 	int g2 = (int)RGB2GRAY(c2->rgbRed,c2->rgbGreen,c2->rgbBlue);
-	
+
 	return (g1-g2);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -487,7 +487,7 @@ int CxImage::CompareColors(const void *elem1, const void *elem2)
  * simply calls "if (memblock) free(memblock);".
  * Useful when calling Encode for a memory buffer,
  * from a DLL compiled with different memory management options.
- * CxImage::FreeMemory will use the same memory environment used by Encode. 
+ * CxImage::FreeMemory will use the same memory environment used by Encode.
  */
 void CxImage::FreeMemory(void* memblock)
 {

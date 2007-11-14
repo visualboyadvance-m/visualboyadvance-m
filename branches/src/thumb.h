@@ -25,7 +25,7 @@
 			   for (xxx=0; xxx<18; xxx++){ \
 				   oldreg[xxx]=reg[xxx].I; \
 			   } \
-		   } 
+		   }
 
 
 #ifdef C_CORE
@@ -813,7 +813,7 @@ switch(opcode >> 8) {
      int source = (opcode >> 3) & 0x07;
      int shift = (opcode >> 6) & 0x1f;
      u32 value;
-     
+
      if(shift) {
        LSL_RD_RM_I5;
      } else {
@@ -839,7 +839,7 @@ switch(opcode >> 8) {
      int source = (opcode >> 3) & 0x07;
      int shift = (opcode >> 6) & 0x1f;
      u32 value;
-     
+
      if(shift) {
        LSR_RD_RM_I5;
      } else {
@@ -860,13 +860,13 @@ switch(opcode >> 8) {
  case 0x15:
  case 0x16:
  case 0x17:
-   {     
+   {
      // ASR Rd, Rm, #Imm 5
      int dest = opcode & 0x07;
      int source = (opcode >> 3) & 0x07;
      int shift = (opcode >> 6) & 0x1f;
      u32 value;
-     
+
      if(shift) {
        ASR_RD_RM_I5;
      } else {
@@ -975,31 +975,31 @@ case 0x28:
  case 0x30:
    // ADD R0,#Offset8
    ADD_RN_O8(0);
-   break;   
+   break;
  case 0x31:
    // ADD R1,#Offset8
    ADD_RN_O8(1);
-   break;   
+   break;
  case 0x32:
    // ADD R2,#Offset8
    ADD_RN_O8(2);
-   break;   
+   break;
  case 0x33:
    // ADD R3,#Offset8
    ADD_RN_O8(3);
-   break;   
+   break;
  case 0x34:
    // ADD R4,#Offset8
    ADD_RN_O8(4);
-   break;   
+   break;
  case 0x35:
    // ADD R5,#Offset8
    ADD_RN_O8(5);
-   break;   
+   break;
  case 0x36:
    // ADD R6,#Offset8
    ADD_RN_O8(6);
-   break;   
+   break;
  case 0x37:
    // ADD R7,#Offset8
    ADD_RN_O8(7);
@@ -1046,7 +1046,7 @@ case 0x28:
        reg[dest].I &= reg[(opcode >> 3)&7].I;
        N_FLAG = reg[dest].I & 0x80000000 ? true : false;
        Z_FLAG = reg[dest].I ? false : true;
-#ifdef BKPT_SUPPORT     
+#ifdef BKPT_SUPPORT
 #define THUMB_CONSOLE_OUTPUT(a,b) \
   if((opcode == 0x4000) && (reg[0].I == 0xC0DED00D)) {\
     extern void (*dbgOutput)(char *, u32);\
@@ -1082,7 +1082,7 @@ case 0x28:
            value = 0;
            C_FLAG = false;
          }
-         reg[dest].I = value;        
+         reg[dest].I = value;
        }
        N_FLAG = reg[dest].I & 0x80000000 ? true : false;
        Z_FLAG = reg[dest].I ? false : true;
@@ -1104,7 +1104,7 @@ case 0x28:
            value = 0;
            C_FLAG = false;
          }
-         reg[dest].I = value;        
+         reg[dest].I = value;
        }
        N_FLAG = reg[dest].I & 0x80000000 ? true : false;
        Z_FLAG = reg[dest].I ? false : true;
@@ -1124,7 +1124,7 @@ case 0x28:
        if(value) {
          if(value < 32) {
            ASR_RD_RS;
-           reg[dest].I = value;        
+           reg[dest].I = value;
          } else {
            if(reg[dest].I & 0x80000000){
              reg[dest].I = 0xFFFFFFFF;
@@ -1154,7 +1154,7 @@ case 0x28:
        // SBC Rd, Rs
        int dest = opcode & 0x07;
        u32 value = reg[(opcode >> 3)&7].I;
-       
+
        // SBC
        SBC_RD_RS;
      }
@@ -1164,7 +1164,7 @@ case 0x28:
      {
        int dest = opcode & 7;
        u32 value = reg[(opcode >> 3)&7].B.B0;
-       
+
        if(value) {
          value = value & 0x1f;
          if(value == 0) {
@@ -1222,7 +1222,7 @@ case 0x28:
    switch((opcode >> 6) & 3) {
    case 0x00:
      {
-       // ORR Rd, Rs       
+       // ORR Rd, Rs
        int dest = opcode & 7;
        reg[dest].I |= reg[(opcode >> 3) & 7].I;
        Z_FLAG = reg[dest].I ? false : true;
@@ -1293,7 +1293,7 @@ case 0x28:
          THUMB_PREFETCH;
          clockTicks = codeTicksAccessSeq16(armNextPC)+1;
          clockTicks += clockTicks+codeTicksAccess16(armNextPC)+1;
-       }       
+       }
        break;
      case 3:
        // ADD Hd, Hs
@@ -1304,7 +1304,7 @@ case 0x28:
          reg[15].I += 2;
          THUMB_PREFETCH;
          clockTicks = codeTicksAccessSeq16(armNextPC)+1;
-         clockTicks += clockTicks+codeTicksAccess16(armNextPC)+1;     
+         clockTicks += clockTicks+codeTicksAccess16(armNextPC)+1;
        }
        break;
      }
@@ -1368,7 +1368,7 @@ case 0x28:
          reg[15].I += 2;
          THUMB_PREFETCH;
          clockTicks = codeTicksAccessSeq16(armNextPC)+1;
-         clockTicks += clockTicks+codeTicksAccess16(armNextPC)+1; 
+         clockTicks += clockTicks+codeTicksAccess16(armNextPC)+1;
        }
        break;
      case 3:
@@ -1385,8 +1385,8 @@ case 0x28:
          reg[15].I += 2;
          THUMB_PREFETCH;
          clockTicks = codeTicksAccessSeq16(armNextPC)+1;
-         clockTicks += clockTicks+codeTicksAccess16(armNextPC)+1; 
-       }   
+         clockTicks += clockTicks+codeTicksAccess16(armNextPC)+1;
+       }
        break;
      }
    }
@@ -1436,7 +1436,7 @@ case 0x28:
              codeTicksAccess16(armNextPC) + 3;
        } else {
          armState = true;
-         reg[15].I &= 0xFFFFFFFC;       
+         reg[15].I &= 0xFFFFFFFC;
          armNextPC = reg[15].I;
          reg[15].I += 4;
          ARM_PREFETCH;
@@ -1654,7 +1654,7 @@ case 0x28:
                       reg[opcode&7].W.W0);
      clockTicks = dataTicksAccess16(address) + codeTicksAccess16(armNextPC) + 2;
    }
-   break;   
+   break;
  case 0x88:
  case 0x89:
  case 0x8a:
@@ -1690,7 +1690,7 @@ case 0x28:
      CPUWriteMemory(address, reg[regist].I);
      clockTicks = dataTicksAccess32(address) + codeTicksAccess16(armNextPC) + 2;
    }
-   break;      
+   break;
  case 0x98:
  case 0x99:
  case 0x9a:
@@ -1704,7 +1704,7 @@ case 0x28:
    u8 regist = (opcode >> 8) & 7;
      if (!busPrefetchCount)
        busPrefetch = busPrefetchEnable;
-     u32 address = reg[13].I + ((opcode&255)<<2);   
+     u32 address = reg[13].I + ((opcode&255)<<2);
      reg[regist].I = CPUReadMemoryQuick(address);
      clockTicks = 3 + dataTicksAccess32(address) +
          codeTicksAccess16(armNextPC);
@@ -1723,7 +1723,7 @@ case 0x28:
    u8 regist = (opcode >> 8) & 7;
    reg[regist].I = (reg[15].I & 0xFFFFFFFC) + ((opcode&255)<<2);
      }
-   break;   
+   break;
  case 0xa8:
  case 0xa9:
  case 0xaa:
@@ -1737,7 +1737,7 @@ case 0x28:
    u8 regist = (opcode >> 8) & 7;
    reg[regist].I = reg[13].I + ((opcode&255)<<2);
      }
-   break;     
+   break;
  case 0xb0:
    {
      // ADD SP, Imm
@@ -1828,7 +1828,7 @@ case 0x28:
      reg[13].I = temp;
      clockTicks += codeTicksAccess16(armNextPC)+2;
    }
-   break;   
+   break;
  case 0xbd:
    // POP {Rlist, PC}
    {
@@ -1858,7 +1858,7 @@ case 0x28:
      busPrefetchCount=0;
      clockTicks += codeTicksAccess16(armNextPC) + codeTicksAccess16(armNextPC) + 3;
    }
-   break;      
+   break;
 #define THUMB_STM_REG(val,r,b) \
   if(opcode & (val)) {\
     CPUWriteMemory(address, reg[(r)].I);\
@@ -1897,7 +1897,7 @@ case 0x28:
      THUMB_STM_REG(128, 7, regist);
      clockTicks = codeTicksAccess16(armNextPC)+1;
    }
-   break;   
+   break;
 #define THUMB_LDM_REG(val,r) \
   if(opcode & (val)) {\
     reg[(r)].I = CPUReadMemory(address);\
@@ -1953,14 +1953,14 @@ case 0x28:
          codeTicksAccess16(armNextPC)+3;
      busPrefetchCount=0;
    }
-   break;      
+   break;
  case 0xd1:
    // BNE offset
    if(!Z_FLAG) {
 #ifdef BKPT_SUPPORT
 		 UPDATE_OLD_REG
 #endif
-     reg[15].I += ((s8)(opcode & 0xFF)) << 1;       
+     reg[15].I += ((s8)(opcode & 0xFF)) << 1;
      armNextPC = reg[15].I;
      reg[15].I += 2;
      THUMB_PREFETCH;
@@ -1968,14 +1968,14 @@ case 0x28:
          codeTicksAccess16(armNextPC)+3;
      busPrefetchCount=0;
    }
-   break;   
+   break;
  case 0xd2:
    // BCS offset
    if(C_FLAG) {
 #ifdef BKPT_SUPPORT
 		 UPDATE_OLD_REG
 #endif
-     reg[15].I += ((s8)(opcode & 0xFF)) << 1;       
+     reg[15].I += ((s8)(opcode & 0xFF)) << 1;
      armNextPC = reg[15].I;
      reg[15].I += 2;
      THUMB_PREFETCH;
@@ -1983,14 +1983,14 @@ case 0x28:
          codeTicksAccess16(armNextPC)+3;
      busPrefetchCount=0;
    }
-   break;   
+   break;
  case 0xd3:
    // BCC offset
    if(!C_FLAG) {
 #ifdef BKPT_SUPPORT
 		 UPDATE_OLD_REG
 #endif
-     reg[15].I += ((s8)(opcode & 0xFF)) << 1;       
+     reg[15].I += ((s8)(opcode & 0xFF)) << 1;
      armNextPC = reg[15].I;
      reg[15].I += 2;
      THUMB_PREFETCH;
@@ -1998,14 +1998,14 @@ case 0x28:
          codeTicksAccess16(armNextPC)+3;
      busPrefetchCount=0;
    }
-   break;   
+   break;
  case 0xd4:
    // BMI offset
    if(N_FLAG) {
 #ifdef BKPT_SUPPORT
 		 UPDATE_OLD_REG
 #endif
-     reg[15].I += ((s8)(opcode & 0xFF)) << 1;       
+     reg[15].I += ((s8)(opcode & 0xFF)) << 1;
      armNextPC = reg[15].I;
      reg[15].I += 2;
      THUMB_PREFETCH;
@@ -2013,14 +2013,14 @@ case 0x28:
          codeTicksAccess16(armNextPC)+3;
      busPrefetchCount=0;
    }
-   break;   
+   break;
  case 0xd5:
    // BPL offset
    if(!N_FLAG) {
 #ifdef BKPT_SUPPORT
 		 UPDATE_OLD_REG
 #endif
-     reg[15].I += ((s8)(opcode & 0xFF)) << 1;       
+     reg[15].I += ((s8)(opcode & 0xFF)) << 1;
      armNextPC = reg[15].I;
      reg[15].I += 2;
      THUMB_PREFETCH;
@@ -2028,14 +2028,14 @@ case 0x28:
          codeTicksAccess16(armNextPC)+3;
      busPrefetchCount=0;
    }
-   break;   
+   break;
  case 0xd6:
    // BVS offset
    if(V_FLAG) {
 #ifdef BKPT_SUPPORT
 		 UPDATE_OLD_REG
 #endif
-     reg[15].I += ((s8)(opcode & 0xFF)) << 1;       
+     reg[15].I += ((s8)(opcode & 0xFF)) << 1;
      armNextPC = reg[15].I;
      reg[15].I += 2;
      THUMB_PREFETCH;
@@ -2043,14 +2043,14 @@ case 0x28:
          codeTicksAccess16(armNextPC)+3;
      busPrefetchCount=0;
    }
-   break;   
+   break;
  case 0xd7:
    // BVC offset
    if(!V_FLAG) {
 #ifdef BKPT_SUPPORT
 		 UPDATE_OLD_REG
 #endif
-     reg[15].I += ((s8)(opcode & 0xFF)) << 1;       
+     reg[15].I += ((s8)(opcode & 0xFF)) << 1;
      armNextPC = reg[15].I;
      reg[15].I += 2;
      THUMB_PREFETCH;
@@ -2058,14 +2058,14 @@ case 0x28:
          codeTicksAccess16(armNextPC)+3;
      busPrefetchCount=0;
    }
-   break;   
+   break;
  case 0xd8:
    // BHI offset
    if(C_FLAG && !Z_FLAG) {
 #ifdef BKPT_SUPPORT
 		 UPDATE_OLD_REG
 #endif
-     reg[15].I += ((s8)(opcode & 0xFF)) << 1;       
+     reg[15].I += ((s8)(opcode & 0xFF)) << 1;
      armNextPC = reg[15].I;
      reg[15].I += 2;
      THUMB_PREFETCH;
@@ -2073,14 +2073,14 @@ case 0x28:
          codeTicksAccess16(armNextPC)+3;
      busPrefetchCount=0;
    }
-   break;   
+   break;
  case 0xd9:
    // BLS offset
    if(!C_FLAG || Z_FLAG) {
 #ifdef BKPT_SUPPORT
 		 UPDATE_OLD_REG
 #endif
-     reg[15].I += ((s8)(opcode & 0xFF)) << 1;       
+     reg[15].I += ((s8)(opcode & 0xFF)) << 1;
      armNextPC = reg[15].I;
      reg[15].I += 2;
      THUMB_PREFETCH;
@@ -2088,14 +2088,14 @@ case 0x28:
          codeTicksAccess16(armNextPC)+3;
      busPrefetchCount=0;
    }
-   break;   
+   break;
  case 0xda:
    // BGE offset
    if(N_FLAG == V_FLAG) {
 #ifdef BKPT_SUPPORT
 		 UPDATE_OLD_REG
 #endif
-     reg[15].I += ((s8)(opcode & 0xFF)) << 1;       
+     reg[15].I += ((s8)(opcode & 0xFF)) << 1;
      armNextPC = reg[15].I;
      reg[15].I += 2;
      THUMB_PREFETCH;
@@ -2103,14 +2103,14 @@ case 0x28:
          codeTicksAccess16(armNextPC)+3;
      busPrefetchCount=0;
    }
-   break;   
+   break;
  case 0xdb:
    // BLT offset
    if(N_FLAG != V_FLAG) {
 #ifdef BKPT_SUPPORT
 		 UPDATE_OLD_REG
 #endif
-     reg[15].I += ((s8)(opcode & 0xFF)) << 1;       
+     reg[15].I += ((s8)(opcode & 0xFF)) << 1;
      armNextPC = reg[15].I;
      reg[15].I += 2;
      THUMB_PREFETCH;
@@ -2118,14 +2118,14 @@ case 0x28:
          codeTicksAccess16(armNextPC)+3;
      busPrefetchCount=0;
    }
-   break;   
+   break;
  case 0xdc:
    // BGT offset
    if(!Z_FLAG && (N_FLAG == V_FLAG)) {
 #ifdef BKPT_SUPPORT
 		 UPDATE_OLD_REG
 #endif
-     reg[15].I += ((s8)(opcode & 0xFF)) << 1;       
+     reg[15].I += ((s8)(opcode & 0xFF)) << 1;
      armNextPC = reg[15].I;
      reg[15].I += 2;
      THUMB_PREFETCH;
@@ -2133,14 +2133,14 @@ case 0x28:
          codeTicksAccess16(armNextPC)+3;
      busPrefetchCount=0;
    }
-   break;   
+   break;
  case 0xdd:
    // BLE offset
    if(Z_FLAG || (N_FLAG != V_FLAG)) {
 #ifdef BKPT_SUPPORT
 		 UPDATE_OLD_REG
 #endif
-     reg[15].I += ((s8)(opcode & 0xFF)) << 1;       
+     reg[15].I += ((s8)(opcode & 0xFF)) << 1;
      armNextPC = reg[15].I;
      reg[15].I += 2;
      THUMB_PREFETCH;
@@ -2148,7 +2148,7 @@ case 0x28:
          codeTicksAccess16(armNextPC)+3;
      busPrefetchCount=0;
    }
-   break;   
+   break;
  case 0xdf:
      {
    // SWI #comment
@@ -2191,7 +2191,7 @@ case 0x28:
      reg[14].I = reg[15].I + (offset << 12);
      clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
    }
-   break;      
+   break;
  case 0xf4:
  case 0xf5:
  case 0xf6:
@@ -2202,7 +2202,7 @@ case 0x28:
      reg[14].I = reg[15].I + ((offset << 12) | 0xFF800000);
      clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
    }
-   break;   
+   break;
  case 0xf8:
  case 0xf9:
  case 0xfa:
@@ -2230,7 +2230,7 @@ case 0x28:
    // BKPT #comment
    extern void (*dbgSignal)(int,int);
    reg[15].I -= 2;
-   armNextPC -= 2;   
+   armNextPC -= 2;
    dbgSignal(5, opcode & 255);
    return;
 #endif

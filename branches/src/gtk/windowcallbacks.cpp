@@ -1253,7 +1253,7 @@ void Window::vOnGDBWait()
   poDialog->set_transient_for(*this);
 
   int iPort = 55555;
-  poSpin->set_value(iPort);  
+  poSpin->set_value(iPort);
 
   bool bOk = false;
   if (poDialog->run() == Gtk::RESPONSE_OK)
@@ -1347,7 +1347,7 @@ void Window::vOnGDBLoadAndWait()
   poDialog->set_transient_for(*this);
 
   int iPort = 55555;
-  poSpin->set_value(iPort);  
+  poSpin->set_value(iPort);
 
   bool bOk = false;
   if (poDialog->run() == Gtk::RESPONSE_OK)

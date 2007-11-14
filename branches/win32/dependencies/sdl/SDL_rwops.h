@@ -68,7 +68,7 @@ typedef struct SDL_RWops {
 		void*  h;
 	    } win32io;
 #endif
-#ifdef HAVE_STDIO_H 
+#ifdef HAVE_STDIO_H
 	    struct {
 		int autoclose;
 	 	FILE *fp;

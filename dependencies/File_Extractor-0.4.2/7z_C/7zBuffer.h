@@ -7,7 +7,7 @@
 #include "7zTypes.h"
 
 typedef struct _CSzByteBuffer
-{    
+{
 	size_t Capacity;
 	Byte *Items;
 }CSzByteBuffer;

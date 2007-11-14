@@ -86,7 +86,7 @@ bool CxImage::LayerDelete(long position)
 ////////////////////////////////////////////////////////////////////////////////
 void CxImage::LayerDeleteAll()
 {
-	if (pLayers) { 
+	if (pLayers) {
 		for(long n=0; n<info.nNumLayers;n++){ delete pLayers[n]; }
 		free(pLayers); pLayers=0;
 	}

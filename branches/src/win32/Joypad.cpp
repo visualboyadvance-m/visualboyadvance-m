@@ -116,45 +116,45 @@ BEGIN_MESSAGE_MAP(JoypadConfig, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // JoypadConfig message handlers
 
-void JoypadConfig::OnCancel() 
+void JoypadConfig::OnCancel()
 {
   EndDialog(FALSE);
 }
 
-void JoypadConfig::OnOk() 
+void JoypadConfig::OnOk()
 {
   assignKeys();
   theApp.input->checkKeys();
   EndDialog(TRUE);
 }
 
-void JoypadConfig::OnDestroy() 
+void JoypadConfig::OnDestroy()
 {
   CDialog::OnDestroy();
-  
+
   KillTimer(timerId);
 }
 
-void JoypadConfig::OnTimer(UINT_PTR nIDEvent) 
+void JoypadConfig::OnTimer(UINT_PTR nIDEvent)
 {
   theApp.input->checkDevices();
-  
+
   CDialog::OnTimer(nIDEvent);
 }
 
-void JoypadConfig::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
+void JoypadConfig::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 }
 
-BOOL JoypadConfig::OnInitDialog() 
+BOOL JoypadConfig::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   timerId = SetTimer(0,50,NULL);
-  
+
   SetWindowLongPtr(up, GWLP_USERDATA,joypad[which][KEY_UP]);
   up.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_UP]));
-  
+
   SetWindowLongPtr(down, GWLP_USERDATA,joypad[which][KEY_DOWN]);
   down.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_DOWN]));
 
@@ -169,13 +169,13 @@ BOOL JoypadConfig::OnInitDialog()
 
   SetWindowLongPtr(buttonB, GWLP_USERDATA,joypad[which][KEY_BUTTON_B]);
   buttonB.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_B]));
-  
+
   SetWindowLongPtr(buttonL, GWLP_USERDATA,joypad[which][KEY_BUTTON_L]);
   buttonL.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_L]));
 
   SetWindowLongPtr(buttonR, GWLP_USERDATA,joypad[which][KEY_BUTTON_R]);
   buttonR.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_R]));
-  
+
   SetWindowLongPtr(buttonSelect, GWLP_USERDATA,joypad[which][KEY_BUTTON_SELECT]);
   buttonSelect.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_SELECT]));
 
@@ -184,13 +184,13 @@ BOOL JoypadConfig::OnInitDialog()
 
   SetWindowLongPtr(speed, GWLP_USERDATA,joypad[which][KEY_BUTTON_SPEED]);
   speed.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_SPEED]));
-  
+
   SetWindowLongPtr(capture, GWLP_USERDATA,joypad[which][KEY_BUTTON_CAPTURE]);
   capture.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_CAPTURE]));
 
   SetWindowLongPtr(buttonGS, GWLP_USERDATA,joypad[which][KEY_BUTTON_GS]);
   buttonGS.SetWindowText(theApp.input->getKeyName(joypad[which][KEY_BUTTON_GS]));
-  
+
   CenterWindow();
 
   return TRUE;  // return TRUE unless you set the focus to a control
@@ -214,7 +214,7 @@ void JoypadConfig::assignKey(int id, LONG_PTR key)
     break;
   case IDC_EDIT_CAPTURE:
     joypad[which][KEY_BUTTON_CAPTURE] = key;
-    break;    
+    break;
   case IDC_EDIT_DOWN:
     joypad[which][KEY_DOWN] = key;
     break;
@@ -269,7 +269,7 @@ void JoypadConfig::assignKeys()
 
   id = IDC_EDIT_BUTTON_R;
   assignKey(id, GetWindowLongPtr(buttonR, GWLP_USERDATA));
-  
+
   id = IDC_EDIT_BUTTON_SELECT;
   assignKey(id, GetWindowLongPtr(buttonSelect, GWLP_USERDATA));
 
@@ -325,34 +325,34 @@ BEGIN_MESSAGE_MAP(MotionConfig, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // MotionConfig message handlers
 
-void MotionConfig::OnCancel() 
+void MotionConfig::OnCancel()
 {
   EndDialog(FALSE);
 }
 
-void MotionConfig::OnOk() 
+void MotionConfig::OnOk()
 {
   assignKeys();
   theApp.input->checkKeys();
   EndDialog( TRUE);
 }
 
-void MotionConfig::OnDestroy() 
+void MotionConfig::OnDestroy()
 {
   CDialog::OnDestroy();
-  
+
   KillTimer(timerId);
 }
 
-BOOL MotionConfig::OnInitDialog() 
+BOOL MotionConfig::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   timerId = SetTimer(0,200,NULL);
-  
+
   SetWindowLongPtr(up, GWLP_USERDATA,motion[KEY_UP]);
   up.SetWindowText(theApp.input->getKeyName(motion[KEY_UP]));
-  
+
   SetWindowLongPtr(down, GWLP_USERDATA,motion[KEY_DOWN]);
   down.SetWindowText(theApp.input->getKeyName(motion[KEY_DOWN]));
 
@@ -368,14 +368,14 @@ BOOL MotionConfig::OnInitDialog()
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void MotionConfig::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
+void MotionConfig::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 }
 
-void MotionConfig::OnTimer(UINT_PTR nIDEvent) 
+void MotionConfig::OnTimer(UINT_PTR nIDEvent)
 {
   theApp.input->checkDevices();
-  
+
   CDialog::OnTimer(nIDEvent);
 }
 

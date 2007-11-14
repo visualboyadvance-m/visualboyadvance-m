@@ -55,7 +55,7 @@ TileView::TileView(CWnd* pParent /*=NULL*/)
   m_stretch = FALSE;
   //}}AFX_DATA_INIT
   autoUpdate = false;
-  
+
   memset(&bmpInfo, 0, sizeof(bmpInfo));
 
   bmpInfo.bmiHeader.biSize = sizeof(bmpInfo.bmiHeader);
@@ -121,7 +121,7 @@ BEGIN_MESSAGE_MAP(TileView, CDialog)
 void TileView::saveBMP(const char *name)
 {
   u8 writeBuffer[1024 * 3];
-  
+
   FILE *fp = fopen(name,"wb");
 
   if(!fp) {
@@ -178,7 +178,7 @@ void TileView::saveBMP(const char *name)
     }
     pixU8 -= 2*3*w;
     fwrite(writeBuffer, 1, 3*w, fp);
-    
+
     b = writeBuffer;
   }
 
@@ -189,14 +189,14 @@ void TileView::saveBMP(const char *name)
 void TileView::savePNG(const char *name)
 {
   u8 writeBuffer[1024 * 3];
-  
+
   FILE *fp = fopen(name,"wb");
 
   if(!fp) {
     systemMessage(MSG_ERROR_CREATING_FILE, "Error creating file %s", name);
     return;
   }
-  
+
   png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
                                                 NULL,
                                                 NULL,
@@ -245,16 +245,16 @@ void TileView::savePNG(const char *name)
       int blue = *pixU8++;
       int green = *pixU8++;
       int red = *pixU8++;
-      
+
       *b++ = red;
       *b++ = green;
       *b++ = blue;
     }
     png_write_row(png_ptr,writeBuffer);
-    
+
     b = writeBuffer;
   }
-  
+
   png_write_end(png_ptr, info_ptr);
 
   png_destroy_write_struct(&png_ptr, &info_ptr);
@@ -263,7 +263,7 @@ void TileView::savePNG(const char *name)
 }
 
 
-void TileView::OnSave() 
+void TileView::OnSave()
 {
   if(rom != NULL)
   {
@@ -314,7 +314,7 @@ void TileView::renderTile256(int tile, int x, int y, u8 *charBase, u16 *palette)
 
       *bmp++ = ((color >> 10) & 0x1f) << 3;
       *bmp++ = ((color >> 5) & 0x1f) << 3;
-      *bmp++ = (color & 0x1f) << 3;      
+      *bmp++ = (color & 0x1f) << 3;
 
     }
     bmp += 31*24; // advance line
@@ -354,7 +354,7 @@ void TileView::render()
 {
   u16 *palette = (u16 *)paletteRAM;
   u8 *charBase = &vram[this->charBase * 0x4000];
- 
+
   int maxY;
 
   if(is256Colors) {
@@ -386,7 +386,7 @@ void TileView::render()
       maxY = 16;
     for(int y = 0; y < maxY; y++) {
       for(int x = 0; x < 32; x++) {
-        renderTile16(tile, x, y, charBase, palette);    
+        renderTile16(tile, x, y, charBase, palette);
         tile++;
       }
     }
@@ -409,10 +409,10 @@ void TileView::update()
 }
 
 
-BOOL TileView::OnInitDialog() 
+BOOL TileView::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_ENTRY( IDC_TILE_VIEW, DS_SizeX | DS_SizeY )
     DIALOG_SIZER_ENTRY( IDC_COLOR, DS_MoveY)
@@ -442,27 +442,27 @@ BOOL TileView::OnInitDialog()
   if(m_stretch)
     tileView.setStretch(true);
   UpdateData(FALSE);
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void TileView::OnClose() 
+void TileView::OnClose()
 {
   theApp.winRemoveUpdateListener(this);
-  
+
   DestroyWindow();
 }
 
 
-void TileView::OnAutoUpdate() 
+void TileView::OnAutoUpdate()
 {
   autoUpdate = !autoUpdate;
   if(autoUpdate) {
     theApp.winAddUpdateListener(this);
   } else {
-    theApp.winRemoveUpdateListener(this);    
-  }  
+    theApp.winRemoveUpdateListener(this);
+  }
 }
 
 
@@ -475,53 +475,53 @@ void TileView::paint()
 }
 
 
-void TileView::On16Colors() 
+void TileView::On16Colors()
 {
   is256Colors = 0;
   paint();
 }
 
-void TileView::On256Colors() 
+void TileView::On256Colors()
 {
   is256Colors = 1;
   paint();
 }
 
-void TileView::OnCharbase0() 
+void TileView::OnCharbase0()
 {
   charBase = 0;
   paint();
 }
 
-void TileView::OnCharbase1() 
+void TileView::OnCharbase1()
 {
   charBase = 1;
   paint();
 }
 
-void TileView::OnCharbase2() 
+void TileView::OnCharbase2()
 {
   charBase = 2;
   paint();
 }
 
-void TileView::OnCharbase3() 
+void TileView::OnCharbase3()
 {
   charBase = 3;
   paint();
 }
 
-void TileView::OnCharbase4() 
+void TileView::OnCharbase4()
 {
   charBase = 4;
   paint();
 }
 
-void TileView::OnStretch() 
+void TileView::OnStretch()
 {
   tileView.setStretch(!tileView.getStretch());
   paint();
-  regSetDwordValue("tileViewStretch", tileView.getStretch());  
+  regSetDwordValue("tileViewStretch", tileView.getStretch());
 }
 
 LRESULT TileView::OnMapInfo(WPARAM wParam, LPARAM lParam)
@@ -544,7 +544,7 @@ LRESULT TileView::OnMapInfo(WPARAM wParam, LPARAM lParam)
 
   buffer.Format("%08x", address);
   GetDlgItem(IDC_ADDRESS)->SetWindowText(buffer);
-  
+
   return TRUE;
 }
 
@@ -552,7 +552,7 @@ LRESULT TileView::OnColInfo(WPARAM wParam, LPARAM)
 {
   u16 c = (u16)wParam;
 
-  color.setColor(c);  
+  color.setColor(c);
 
   int r = (c & 0x1f);
   int g = (c & 0x3e0) >> 5;
@@ -571,7 +571,7 @@ LRESULT TileView::OnColInfo(WPARAM wParam, LPARAM)
   return TRUE;
 }
 
-void TileView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
+void TileView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
   switch(nSBCode) {
   case TB_THUMBPOSITION:
@@ -584,7 +584,7 @@ void TileView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
   paint();
 }
 
-void TileView::PostNcDestroy() 
+void TileView::PostNcDestroy()
 {
   delete this;
 }

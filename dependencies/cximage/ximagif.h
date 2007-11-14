@@ -38,7 +38,7 @@
 
 #if CXIMAGE_SUPPORT_GIF
 
-typedef short int       code_int;   
+typedef short int       code_int;
 
 /* Various error codes used by decoder */
 #define OUT_OF_MEMORY -10
@@ -125,7 +125,7 @@ public:
 
 //	bool Load(const char * imageFileName){ return CxImage::Load(imageFileName,CXIMAGE_FORMAT_GIF);}
 //	bool Save(const char * imageFileName){ return CxImage::Save(imageFileName,CXIMAGE_FORMAT_GIF);}
-	
+
 	bool Decode(CxFile * fp);
 	bool Decode(FILE *fp) { CxIOFile file(fp); return Decode(&file); }
 
@@ -153,7 +153,7 @@ protected:
 	void EncodeComment(CxFile *fp);
 	bool EncodeRGB(CxFile *fp);
 	void GifMix(CxImage & imgsrc2, struct_image & imgdesc);
-	
+
 	struct_gifgce gifgce;
 
 	int             curx, cury;

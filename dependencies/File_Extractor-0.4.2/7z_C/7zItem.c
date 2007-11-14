@@ -69,7 +69,7 @@ static int SzFolderFindBindPairForOutStream(CFolder *folder, UInt32 outStreamInd
 }
 
 CFileSize SzFolderGetUnPackSize(CFolder *folder)
-{ 
+{
 	int i = (int)SzFolderGetNumOutStreams(folder);
 	if (i == 0)
 		return 0;

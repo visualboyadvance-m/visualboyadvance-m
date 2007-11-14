@@ -117,7 +117,7 @@ DWORD CxImage::GetFlags() const
  *  - 0x00??0000 = blend modes
  *  - 0x0000???? = layer id or user flags
  *
- * \param bLockReservedFlags protects the "reserved" and "blend modes" flags 
+ * \param bLockReservedFlags protects the "reserved" and "blend modes" flags
  */
 void CxImage::SetFlags(DWORD flags, bool bLockReservedFlags)
 {
@@ -302,7 +302,7 @@ void CxImage::SetProgress(long p)
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * Used to quit the slow loops or the codecs.
- * - SetEscape(-1) before Decode forces the function to exit, right after  
+ * - SetEscape(-1) before Decode forces the function to exit, right after
  *   the image width and height are available ( for bmp, jpg, gif, tif )
  */
 void CxImage::SetEscape(long i)

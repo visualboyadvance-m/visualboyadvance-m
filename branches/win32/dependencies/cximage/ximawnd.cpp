@@ -5,7 +5,7 @@
 
 #include "ximage.h"
 
-#include "ximaiter.h" 
+#include "ximaiter.h"
 #include "ximabmp.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -138,7 +138,7 @@ bool CxImage::CreateFromHANDLE(HANDLE hMem)
 						memcpy(bf,lpVoid+pHead->biSize,12);
 						// transform into RGB
 						Bitfield2RGB(lpVoid+pHead->biSize+12,(WORD)bf[0],(WORD)bf[1],(WORD)bf[2],(BYTE)pHead->biBitCount);
-					} else 
+					} else
 						throw "unknown compression";
 				}
 				break;
@@ -283,7 +283,7 @@ bool CxImage::CreateFromHANDLE(HANDLE hMem)
 										int nNumBytes = sizeof(BYTE) * status_byte;
 										memcpy((void *)(iter.GetRow(scanline) + bits), lpDIBBits, nNumBytes);
 										lpDIBBits += nNumBytes;
-										// align run length to even number of bytes 
+										// align run length to even number of bytes
 										if ((status_byte & 1) == 1)
 											second_byte = *(lpDIBBits++);
 										bits += status_byte;
@@ -354,7 +354,7 @@ HBITMAP CxImage::MakeBitmap(HDC hdc)
 /**
  * Bitmap resource constructor
  * \param hbmp : bitmap resource handle
- * \param hpal : (optional) palette, useful for 8bpp DC 
+ * \param hpal : (optional) palette, useful for 8bpp DC
  * \return true if everything is ok
  */
 bool CxImage::CreateFromHBITMAP(HBITMAP hbmp, HPALETTE hpal)
@@ -362,7 +362,7 @@ bool CxImage::CreateFromHBITMAP(HBITMAP hbmp, HPALETTE hpal)
 	if (!Destroy())
 		return false;
 
-	if (hbmp) { 
+	if (hbmp) {
         BITMAP bm;
 		// get informations about the bitmap
         GetObject(hbmp, sizeof(BITMAP), (LPSTR) &bm);
@@ -402,7 +402,7 @@ bool CxImage::CreateFromHICON(HICON hico)
 	if (!Destroy())
 		return false;
 
-	if (hico) { 
+	if (hico) {
 		ICONINFO iinfo;
 		GetIconInfo(hico,&iinfo);
 		if (!CreateFromHBITMAP(iinfo.hbmColor))
@@ -448,7 +448,7 @@ long CxImage::Draw(HDC hdc, long x, long y, long cx, long cy, RECT* pClipRect, b
 	bool bTransparent = info.nBkgndIndex != -1;
 	bool bAlpha = pAlpha != 0;
 
-	RECT mainbox; // (experimental) 
+	RECT mainbox; // (experimental)
 	if (pClipRect){
 		GetClipBox(hdc,&mainbox);
 		HRGN rgn = CreateRectRgnIndirect(pClipRect);
@@ -470,7 +470,7 @@ long CxImage::Draw(HDC hdc, long x, long y, long cx, long cy, RECT* pClipRect, b
 
 	if (!(bTransparent || bAlpha || info.bAlphaPaletteEnabled)){
 		if (cx==head.biWidth && cy==head.biHeight){ //NORMAL
-			SetStretchBltMode(hdc,COLORONCOLOR);	
+			SetStretchBltMode(hdc,COLORONCOLOR);
 			SetDIBitsToDevice(hdc, x, y, cx, cy, 0, 0, 0, cy,
 						info.pImage,(BITMAPINFO*)pDib,DIB_RGB_COLORS);
 		} else { //STRETCH
@@ -582,7 +582,7 @@ long CxImage::Draw(HDC hdc, long x, long y, long cx, long cy, RECT* pClipRect, b
 				float fy=(float)head.biHeight/(float)cy;
 				float dx,dy;
 				long sx,sy;
-				
+
 				for(yy=0;yy<desth;yy++){
 					dy = head.biHeight-(ymax-yy-y)*fy;
 					sy = max(0L,(long)floor(dy));
@@ -628,18 +628,18 @@ long CxImage::Draw(HDC hdc, long x, long y, long cx, long cy, RECT* pClipRect, b
 						//if ((head.biClrUsed && ci!=cit) || ((!head.biClrUsed||bSmooth) && *pc!=*pct) || !bTransparent){
 						if ((head.biClrUsed && ci!=cit) || (!head.biClrUsed && *pc!=*pct) || !bTransparent){
 							// DJT, assume many pixels are fully transparent or opaque and thus avoid multiplication
-							if (a == 0) {			// Transparent, retain dest 
-								pdst+=3; 
-							} else if (a == 255) {	// opaque, ignore dest 
-								*pdst++= c.rgbBlue; 
-								*pdst++= c.rgbGreen; 
-								*pdst++= c.rgbRed; 
-							} else {				// semi transparent 
+							if (a == 0) {			// Transparent, retain dest
+								pdst+=3;
+							} else if (a == 255) {	// opaque, ignore dest
+								*pdst++= c.rgbBlue;
+								*pdst++= c.rgbGreen;
+								*pdst++= c.rgbRed;
+							} else {				// semi transparent
 								a1=(BYTE)~a;
-								*pdst++=(BYTE)((*pdst * a1 + a * c.rgbBlue)>>8); 
-								*pdst++=(BYTE)((*pdst * a1 + a * c.rgbGreen)>>8); 
-								*pdst++=(BYTE)((*pdst * a1 + a * c.rgbRed)>>8); 
-							} 
+								*pdst++=(BYTE)((*pdst * a1 + a * c.rgbBlue)>>8);
+								*pdst++=(BYTE)((*pdst * a1 + a * c.rgbGreen)>>8);
+								*pdst++=(BYTE)((*pdst * a1 + a * c.rgbRed)>>8);
+							}
 						} else {
 							pdst+=3;
 						}
@@ -673,18 +673,18 @@ long CxImage::Draw(HDC hdc, long x, long y, long cx, long cy, RECT* pClipRect, b
 						//if (*pc!=*pct || !bTransparent){
 						if ((head.biClrUsed && ci!=cit) || (!head.biClrUsed && *pc!=*pct) || !bTransparent){
 							// DJT, assume many pixels are fully transparent or opaque and thus avoid multiplication
-							if (a == 0) {			// Transparent, retain dest 
-								pdst+=3; 
-							} else if (a == 255) {	// opaque, ignore dest 
-								*pdst++= c.rgbBlue; 
-								*pdst++= c.rgbGreen; 
-								*pdst++= c.rgbRed; 
-							} else {				// semi transparent 
+							if (a == 0) {			// Transparent, retain dest
+								pdst+=3;
+							} else if (a == 255) {	// opaque, ignore dest
+								*pdst++= c.rgbBlue;
+								*pdst++= c.rgbGreen;
+								*pdst++= c.rgbRed;
+							} else {				// semi transparent
 								a1=(BYTE)~a;
-								*pdst++=(BYTE)((*pdst * a1 + a * c.rgbBlue)>>8); 
-								*pdst++=(BYTE)((*pdst * a1 + a * c.rgbGreen)>>8); 
-								*pdst++=(BYTE)((*pdst * a1 + a * c.rgbRed)>>8); 
-							} 
+								*pdst++=(BYTE)((*pdst * a1 + a * c.rgbBlue)>>8);
+								*pdst++=(BYTE)((*pdst * a1 + a * c.rgbGreen)>>8);
+								*pdst++=(BYTE)((*pdst * a1 + a * c.rgbRed)>>8);
+							}
 						} else {
 							pdst+=3;
 						}
@@ -730,12 +730,12 @@ long CxImage::Draw2(HDC hdc, long x, long y, long cx, long cy)
 	bool bTransparent = (info.nBkgndIndex != -1);
 
 	if (!bTransparent){
-		SetStretchBltMode(hdc,COLORONCOLOR);	
+		SetStretchBltMode(hdc,COLORONCOLOR);
 		StretchDIBits(hdc, x, y, cx, cy, 0, 0, head.biWidth, head.biHeight,
 						info.pImage,(BITMAPINFO*)pDib, DIB_RGB_COLORS,SRCCOPY);
 	} else {
 		// draw image with transparent background
-		const int safe = 0; // or else GDI fails in the following - sometimes 
+		const int safe = 0; // or else GDI fails in the following - sometimes
 		RECT rcDst = {x+safe, y+safe, x+cx, y+cy};
 		if (RectVisible(hdc, &rcDst)){
 		/////////////////////////////////////////////////////////////////
@@ -799,7 +799,7 @@ long CxImage::Stretch(HDC hdc, long xoffset, long yoffset, long xsize, long ysiz
 {
 	if((pDib)&&(hdc)) {
 		//palette must be correctly filled
-		SetStretchBltMode(hdc,COLORONCOLOR);	
+		SetStretchBltMode(hdc,COLORONCOLOR);
 		StretchDIBits(hdc, xoffset, yoffset,
 					xsize, ysize, 0, 0, head.biWidth, head.biHeight,
 					info.pImage,(BITMAPINFO*)pDib,DIB_RGB_COLORS,dwRop);
@@ -917,16 +917,16 @@ long CxImage::DrawStringEx(HDC hdc, long x, long y, CXTEXTINFO *pTextType, bool 
 {
 	if (!IsValid())
         return -1;
-    
+
 	//get the background
 	HDC pDC;
 	if (hdc) pDC=hdc; else pDC = ::GetDC(0);
 	HDC TmpDC=CreateCompatibleDC(pDC);
-   	
+
     //choose the font
 	HFONT m_Font;
     m_Font=CreateFontIndirect( &pTextType->lfont );
-    
+
     // get colors in RGBQUAD
     RGBQUAD p_forecolor = RGBtoRGBQUAD(pTextType->fcolor);
     RGBQUAD p_backcolor = RGBtoRGBQUAD(pTextType->bcolor);
@@ -958,7 +958,7 @@ long CxImage::DrawStringEx(HDC hdc, long x, long y, CXTEXTINFO *pTextType, bool 
 	SetBkMode(TmpDC,OPAQUE);
 	//Set text position;
 	RECT pos = {0,0,0,0};
-	
+
     // get text length and number of lines
     long i=0, numlines=1, len=(long)_tcsclen(pTextType->text);
     while (i<len)
@@ -970,8 +970,8 @@ long CxImage::DrawStringEx(HDC hdc, long x, long y, CXTEXTINFO *pTextType, bool 
 	::DrawText(TmpDC, pTextType->text, len, &pos, /*DT_EDITCONTROL|DT_EXTERNALLEADING|*/DT_NOPREFIX | DT_CALCRECT );
 
     // increase only if it's really italics, and only one line height
-	if ( pTextType->lfont.lfItalic ) 
-        pos.right += pos.bottom/2/numlines; 
+	if ( pTextType->lfont.lfItalic )
+        pos.right += pos.bottom/2/numlines;
 
     // background frame and rounding radius
 	int frame = 0, roundR = 0;
@@ -999,7 +999,7 @@ long CxImage::DrawStringEx(HDC hdc, long x, long y, CXTEXTINFO *pTextType, bool 
 	memset(pbase,0,height*((((24 * width) + 31) / 32) * 4));
 
 	::DrawText(TmpDC,pTextType->text,len, &pos, /*DT_EDITCONTROL|DT_EXTERNALLEADING|*/DT_NOPREFIX| pTextType->align );
-    
+
 	CxImage itext;
 	itext.CreateFromHBITMAP(TmpBmp);
     y=head.biHeight-y-1;
@@ -1013,12 +1013,12 @@ long CxImage::DrawStringEx(HDC hdc, long x, long y, CXTEXTINFO *pTextType, bool 
     else if ( pTextType->align == DT_RIGHT )
         x -= width;
     if (x<0) x=0;
-    
+
     //draw the background first, if it exists
     long ix,iy;
     if ( pTextType->opaque )
     {
-        int ixf=0; 
+        int ixf=0;
         for (ix=0;ix<width;ix++)
         {
             if ( ix<=roundR )
@@ -1050,7 +1050,7 @@ long CxImage::DrawStringEx(HDC hdc, long x, long y, CXTEXTINFO *pTextType, bool 
 			}
 		}
     }
-	
+
     // draw the text itself
     for (ix=0;ix<width;ix++)
     {
@@ -1074,21 +1074,21 @@ void CxImage::InitTextInfo( CXTEXTINFO *txt )
 {
 
     memset( txt, 0, sizeof(CXTEXTINFO));
-    
+
     // LOGFONT defaults
-    txt->lfont.lfHeight        = -36; 
-    txt->lfont.lfCharSet       = EASTEUROPE_CHARSET; // just for Central-European users 
+    txt->lfont.lfHeight        = -36;
+    txt->lfont.lfCharSet       = EASTEUROPE_CHARSET; // just for Central-European users
     txt->lfont.lfWeight        = FW_NORMAL;
-    txt->lfont.lfWidth         = 0; 
-    txt->lfont.lfEscapement    = 0; 
-    txt->lfont.lfOrientation   = 0; 
-    txt->lfont.lfItalic        = FALSE; 
-    txt->lfont.lfUnderline     = FALSE; 
-    txt->lfont.lfStrikeOut     = FALSE; 
-    txt->lfont.lfOutPrecision  = OUT_DEFAULT_PRECIS; 
-    txt->lfont.lfClipPrecision = CLIP_DEFAULT_PRECIS; 
-    txt->lfont.lfQuality       = PROOF_QUALITY; 
-    txt->lfont.lfPitchAndFamily= DEFAULT_PITCH | FF_DONTCARE ; 
+    txt->lfont.lfWidth         = 0;
+    txt->lfont.lfEscapement    = 0;
+    txt->lfont.lfOrientation   = 0;
+    txt->lfont.lfItalic        = FALSE;
+    txt->lfont.lfUnderline     = FALSE;
+    txt->lfont.lfStrikeOut     = FALSE;
+    txt->lfont.lfOutPrecision  = OUT_DEFAULT_PRECIS;
+    txt->lfont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+    txt->lfont.lfQuality       = PROOF_QUALITY;
+    txt->lfont.lfPitchAndFamily= DEFAULT_PITCH | FF_DONTCARE ;
     _stprintf( txt->lfont.lfFaceName, _T("Arial")); //use TCHAR mappings <Cesar M>
 
     // initial colors
@@ -1100,7 +1100,7 @@ void CxImage::InitTextInfo( CXTEXTINFO *txt )
     txt->b_opacity = 0.0;   // default: opaque background
     txt->b_outline = 0;     // default: no outline (OUTLINE NOT IMPLEMENTED AT THIS TIME)
     txt->b_round   = 20;    // default: rounding radius is 20% of the rectangle height
-    // the text 
+    // the text
     _stprintf( txt->text, _T("Sample Text 01234õû")); // text use TCHAR mappings <Cesar M>
     txt->align = DT_CENTER;
     return;

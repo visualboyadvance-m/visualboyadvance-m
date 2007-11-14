@@ -160,7 +160,7 @@ int gbDis(char *buffer, u16 address)
   u16 addr = address;
   sprintf(p, "%04x        ", address);
   p += 12;
-  
+
   u8 opcode = GB_READ(address);
   address++;
   char *mnen;
@@ -175,7 +175,7 @@ int gbDis(char *buffer, u16 address)
   }
   while(op->value != (opcode & op->mask)) op++;
   mnen = op->mnen;
-    
+
   u8 b0, b1;
   s8 disp;
   int shift;

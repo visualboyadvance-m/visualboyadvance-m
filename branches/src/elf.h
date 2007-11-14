@@ -206,7 +206,7 @@ struct Function {
 
 struct LineInfoItem {
   u32 address;
-  char *file;  
+  char *file;
   int line;
 };
 
@@ -235,7 +235,7 @@ struct CompileUnit {
   ELFAbbrev **abbrevs;
   ARanges *ranges;
   char *name;
-  char *compdir;  
+  char *compdir;
   u32 lowPC;
   u32 highPC;
   bool hasLineInfo;
@@ -245,7 +245,7 @@ struct CompileUnit {
   Function *lastFunction;
   Object *variables;
   Type *types;
-  CompileUnit *next;  
+  CompileUnit *next;
 };
 
 struct DebugInfo {

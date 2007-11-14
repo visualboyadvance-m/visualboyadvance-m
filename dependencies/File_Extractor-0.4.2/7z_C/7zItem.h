@@ -30,7 +30,7 @@ typedef struct _CFolder
 	CCoderInfo *Coders;
 	UInt32 NumBindPairs;
 	CBindPair *BindPairs;
-	UInt32 NumPackStreams; 
+	UInt32 NumPackStreams;
 	UInt32 *PackStreams;
 	CFileSize *UnPackSizes;
 	int UnPackCRCDefined;
@@ -51,7 +51,7 @@ typedef struct _CFileItem
 	/*
 	CArchiveFileTime LastWriteTime;
 	CFileSize StartPos;
-	UInt32 Attributes; 
+	UInt32 Attributes;
 	*/
 	CFileSize Size;
 	UInt32 FileCRC;

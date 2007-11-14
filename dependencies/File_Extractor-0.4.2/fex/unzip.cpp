@@ -25,11 +25,11 @@ inline unzError log_error( const char* str )
 {
 	if ( !str )
 		return UNZ_OK;
-	
+
 	#ifndef NDEBUG
 		fprintf( stderr, "unzip Error: %s\n", str );
 	#endif
-	
+
 	return UNZ_INTERNALERROR;
 }
 
@@ -42,10 +42,10 @@ int unzStringFileNameCompare( const char* x, const char* y, int case_sensitive )
 			case_sensitive = 2;
 		#endif
 	}
-	
+
 	if ( case_sensitive == 1 )
 		return strcmp( x, y );
-	
+
 	int xx, yy;
 	do
 	{
@@ -84,7 +84,7 @@ unzError unzGoToNextFile( unzFile fex )
 {
 	if ( fex->done() )
 		return UNZ_END_OF_LIST_OF_FILE;
-	
+
 	unzError err = log_error( fex->next() );
 	if ( !err && fex->done() )
 		err = UNZ_END_OF_LIST_OF_FILE;
@@ -113,24 +113,24 @@ unzError unzGetCurrentFileInfo( unzFile fex, unz_file_info* info_out,
 {
 	// extra and comment aren't supported
 	assert( !extra_out && !comment_out );
-	
+
 	if ( fex->done() )
 		return UNZ_END_OF_LIST_OF_FILE;
-	
+
 	size_t name_len = strlen( fex->name() );
 	if ( info_out )
 	{
 		info_out->uncompressed_size = fex->size();
 		info_out->size_filename = name_len;
 	}
-	
+
 	if ( filename_out )
 	{
 		if ( filename_size <= name_len )
 			return UNZ_PARAMERROR;
 		strcpy( filename_out, fex->name() );
 	}
-	
+
 	return UNZ_OK;
 }
 
@@ -138,10 +138,10 @@ unzError unzOpenCurrentFile( unzFile fex )
 {
 	if ( fex->done() )
 		return UNZ_END_OF_LIST_OF_FILE;
-	
+
 	// fails if you try to re-open file again (I can add support if necessary)
 	assert( fex->remain() == fex->size() );
-	
+
 	// fex automatically opens on first read
 	return UNZ_OK;
 }

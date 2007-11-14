@@ -20,7 +20,7 @@
 #ifndef VBA_WIN32_SOUND_H
 #define VBA_WIN32_SOUND_H
 
-class ISound 
+class ISound
 {
  public:
   virtual ~ISound() {};

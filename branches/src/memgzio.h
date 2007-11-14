@@ -9,7 +9,7 @@
  * Adapted from original gzio.c from zlib library by Forgotten
  */
 
-#if defined(HAVE_ZUTIL_H) || defined(_WIN32) 	 
+#if defined(HAVE_ZUTIL_H) || defined(_WIN32)
 # include <zutil.h>
 #else
 # include "../win32/dependencies/zlib/zutil.h"

@@ -319,19 +319,19 @@ bool CxImage::Encode(CxFile *hFile, DWORD imagetype)
 #if CXIMAGE_SUPPORT_JASPER
 	if (
  #if	CXIMAGE_SUPPORT_JP2
-		imagetype==CXIMAGE_FORMAT_JP2 || 
+		imagetype==CXIMAGE_FORMAT_JP2 ||
  #endif
  #if	CXIMAGE_SUPPORT_JPC
-		imagetype==CXIMAGE_FORMAT_JPC || 
+		imagetype==CXIMAGE_FORMAT_JPC ||
  #endif
  #if	CXIMAGE_SUPPORT_PGX
-		imagetype==CXIMAGE_FORMAT_PGX || 
+		imagetype==CXIMAGE_FORMAT_PGX ||
  #endif
  #if	CXIMAGE_SUPPORT_PNM
-		imagetype==CXIMAGE_FORMAT_PNM || 
+		imagetype==CXIMAGE_FORMAT_PNM ||
  #endif
  #if	CXIMAGE_SUPPORT_RAS
-		imagetype==CXIMAGE_FORMAT_RAS || 
+		imagetype==CXIMAGE_FORMAT_RAS ||
  #endif
 		 false ){
 		CxImageJAS newima;
@@ -582,7 +582,7 @@ bool CxImage::LoadResource(HRSRC hRes, DWORD imagetype, HMODULE hModule)
  * \param filename: file name
  * \param imagetype: file format, see ENUM_CXIMAGE_FORMATS
  */
-// 
+//
 // > filename: file name
 // > imagetype: specify the image format (CXIMAGE_FORMAT_BMP,...)
 // For UNICODE support: char -> TCHAR
@@ -885,19 +885,19 @@ bool CxImage::Decode(CxFile *hFile, DWORD imagetype)
 #if CXIMAGE_SUPPORT_JASPER
 	if (
  #if	CXIMAGE_SUPPORT_JP2
-		imagetype==CXIMAGE_FORMAT_JP2 || 
+		imagetype==CXIMAGE_FORMAT_JP2 ||
  #endif
  #if	CXIMAGE_SUPPORT_JPC
-		imagetype==CXIMAGE_FORMAT_JPC || 
+		imagetype==CXIMAGE_FORMAT_JPC ||
  #endif
  #if	CXIMAGE_SUPPORT_PGX
-		imagetype==CXIMAGE_FORMAT_PGX || 
+		imagetype==CXIMAGE_FORMAT_PGX ||
  #endif
  #if	CXIMAGE_SUPPORT_PNM
-		imagetype==CXIMAGE_FORMAT_PNM || 
+		imagetype==CXIMAGE_FORMAT_PNM ||
  #endif
  #if	CXIMAGE_SUPPORT_RAS
-		imagetype==CXIMAGE_FORMAT_RAS || 
+		imagetype==CXIMAGE_FORMAT_RAS ||
  #endif
 		 false ){
 		CxImageJAS newima;

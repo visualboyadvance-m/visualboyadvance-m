@@ -6,14 +6,14 @@
 #include "7zCrc.h"
 
 SZ_RESULT SzExtract(
-		ISzInStream *inStream, 
+		ISzInStream *inStream,
 		CArchiveDatabaseEx *db,
 		UInt32 fileIndex,
 		UInt32 *blockIndex,
-		Byte **outBuffer, 
+		Byte **outBuffer,
 		size_t *outBufferSize,
-		size_t *offset, 
-		size_t *outSizeProcessed, 
+		size_t *offset,
+		size_t *outSizeProcessed,
 		ISzAlloc *allocMain,
 		ISzAlloc *allocTemp)
 {
@@ -42,9 +42,9 @@ SZ_RESULT SzExtract(
 		*blockIndex = folderIndex;
 		allocMain->Free(*outBuffer);
 		*outBuffer = 0;
-		
+
 		RINOK(inStream->Seek(inStream, SzArDbGetFolderStreamPos(db, folderIndex, 0)));
-		
+
 		#ifndef _LZMA_IN_CB
 		if (packSize != 0)
 		{
@@ -68,12 +68,12 @@ SZ_RESULT SzExtract(
 			if (res == SZ_OK)
 			{
 				size_t outRealSize;
-				res = SzDecode(db->Database.PackSizes + 
-					db->FolderStartPackStreamIndex[folderIndex], folder, 
+				res = SzDecode(db->Database.PackSizes +
+					db->FolderStartPackStreamIndex[folderIndex], folder,
 					#ifdef _LZMA_IN_CB
 					inStream,
 					#else
-					inBuffer, 
+					inBuffer,
 					#endif
 					*outBuffer, (size_t)unPackSize, &outRealSize, allocTemp);
 				if (res == SZ_OK)
@@ -97,7 +97,7 @@ SZ_RESULT SzExtract(
 	}
 	if (res == SZ_OK)
 	{
-		UInt32 i; 
+		UInt32 i;
 		CFileItem *fileItem = db->Database.Files + fileIndex;
 		*offset = 0;
 		for(i = db->FolderStartFileIndex[folderIndex]; i < fileIndex; i++)

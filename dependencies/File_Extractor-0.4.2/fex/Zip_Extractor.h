@@ -32,7 +32,7 @@ private:
 	unsigned long correct_crc;
 	int method;
 	Zlib_Inflater buf;
-	
+
 	blargg_err_t fill_buf( long offset, long buf_size, long initial_read );
 	blargg_err_t update_info( bool advance_first );
 	blargg_err_t first_read( long count );

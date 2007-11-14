@@ -12,7 +12,7 @@ class Single_File_Extractor : public File_Extractor {
 public:
 	// Set reported name of file
 	void set_name( const char* );
-	
+
 public:
 	Single_File_Extractor();
 	~Single_File_Extractor();

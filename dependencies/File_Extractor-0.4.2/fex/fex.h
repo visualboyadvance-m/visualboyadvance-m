@@ -67,7 +67,7 @@ fex_err_t fex_data( File_Extractor*, const char** data_out );
 
 /**** Archive types ****/
 
-/* fex_type_t is a pointer to this structure. For example, fex_zip_type->extension is 
+/* fex_type_t is a pointer to this structure. For example, fex_zip_type->extension is
 "ZIP" and ex_zip_type->new_fex() is equilvant to 'new Zip_Extractor' (in C++). */
 struct fex_type_t_
 {

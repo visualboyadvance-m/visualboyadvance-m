@@ -414,7 +414,7 @@ class MainWnd : public CWnd
 	afx_msg void OnHelpGnupubliclicense();
 	//}}AFX_MSG
   DECLARE_MESSAGE_MAP()
-    
+
     afx_msg BOOL OnFileRecentFile(UINT nID);
   afx_msg BOOL OnFileLoadSlot(UINT nID);
   afx_msg BOOL OnFileSaveSlot(UINT nID);

@@ -30,7 +30,7 @@ bool CxImageJAS::Decode(CxFile *hFile, DWORD imagetype)
 
 	CxFileJas src(hFile,in);
 
-	if (!(image = jas_image_decode(in, -1, 0))) 
+	if (!(image = jas_image_decode(in, -1, 0)))
 		throw "error: cannot load image data";
 
 	long x,y,w,h,depth,cmptno;

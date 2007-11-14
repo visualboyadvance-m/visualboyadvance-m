@@ -142,7 +142,7 @@ void profStartup(u32 lowpc, u32 highpc)
   char *buffer;
   int o;
   profile_segment *newseg = (profile_segment*)calloc(1,sizeof(profile_segment));
-  
+
   if (newseg) {
     newseg->next = first_segment;
     first_segment = newseg;
@@ -181,13 +181,13 @@ void profStartup(u32 lowpc, u32 highpc)
   newseg->tos = (struct tostruct *) calloc(1, newseg->tolimit * sizeof( struct tostruct ) );
   if ( newseg->tos == NULL ) {
     systemMessage(0, MSG);
-    
+
     free(buffer);
     buffer = NULL;
-    
+
     free(newseg->froms);
     newseg->froms = NULL;
-    
+
     return;
   }
   newseg->tos[0].link = 0;
@@ -212,7 +212,7 @@ void profCleanup()
   int toindex;
   struct gmon_hdr ghdr;
   profile_segment *seg = first_segment;
-  
+
   profControl(0);
   fd = fopen( "gmon.out" , "wb" );
   if ( fd == NULL ) {
@@ -235,7 +235,7 @@ void profCleanup()
   while(seg) {
 
     hist_num_bins = seg->ssiz;
-  
+
   if(profWrite8(fd, GMON_TAG_TIME_HIST) ||
        profWrite32(fd, (u32)seg->s_lowpc) ||
        profWrite32(fd, (u32)seg->s_highpc) ||
@@ -251,7 +251,7 @@ void profCleanup()
 
   u16 count;
   int i;
-  
+
   for(i = 0; i < hist_num_bins; ++i) {
     profPut16((char *)&count, hist_sample[i]);
 
@@ -261,7 +261,7 @@ void profCleanup()
       return;
     }
   }
-  
+
     endfrom = seg->s_textsize / (HASHFRACTION * sizeof(*seg->froms));
   for ( fromindex = 0 ; fromindex < endfrom ; fromindex++ ) {
       if ( seg->froms[fromindex] == 0 ) {
@@ -297,7 +297,7 @@ void profCount()
    * find the return address for mcount,
    * and the return address for mcount's caller.
    */
-  
+
   /* selfpc = pc pushed by mcount call.
      This identifies the function that was just entered.  */
   selfpc = (char *) reg[14].I;
@@ -397,14 +397,14 @@ void profCount()
       *frompcindex = (unsigned short)toindex;
       goto done;
     }
-    
+
   }
  done:
   profiling--;
   /* and fall through */
  out:
   return;  /* normal return restores saved registers */
-  
+
  overflow:
   profiling++; /* halt further profiling */
 #define TOLIMIT "mcount: tos overflow\n"

@@ -51,7 +51,7 @@ bool CxImageGIF::Decode(CxFile *fp)
 	// Global colour map?
 	if (dscgif.pflds & 0x80)
 		fp->Read(TabCol.paleta,sizeof(struct rgb_color)*TabCol.sogct,1);
-	else 
+	else
 		bTrueColor++;	//first chance for a truecolor gif
 
 	long first_transparent_index;
@@ -138,7 +138,7 @@ bool CxImageGIF::Decode(CxFile *fp)
 						backimage.Clear((BYTE)first_transparent_index);
 					}
 				}
-				
+
 				//active frame
 				Create(image.w, image.h, bpp, CXIMAGE_FORMAT_GIF);
 
@@ -218,7 +218,7 @@ bool CxImageGIF::Decode(CxFile *fp)
 				} else {
 					fp->Seek(-(ibfmax - ibf - 1), SEEK_CUR);
 				}
-				
+
 				if (info.nFrame==iImage) bContinue=false; else iImage++;
 
 				break;
@@ -423,7 +423,7 @@ bool CxImageGIF::Encode(CxFile * fp, CxImage ** pImages, int pagecount, bool bLo
 	EncodeComment(fp);
 
 	ghost.EncodeBody(fp);
-	
+
 	for (int i=2; i<=pagecount; i++){
 		if (pImages[i-1]==NULL) throw "Bad image pointer";
 		ghost.Ghost(pImages[i-1]);
@@ -465,7 +465,7 @@ void CxImageGIF::EncodeHeader(CxFile *fp)
 
 	if (head.biClrUsed!=0){
 		RGBQUAD* pPal = GetPalette();
-		for(DWORD i=0; i<head.biClrUsed; ++i) 
+		for(DWORD i=0; i<head.biClrUsed; ++i)
 		{
 			fp->PutC(pPal[i].rgbRed);
 			fp->PutC(pPal[i].rgbGreen);
@@ -485,7 +485,7 @@ void CxImageGIF::EncodeExtension(CxFile *fp)
 	gifgce.dispmeth = m_dispmeth;
 	gifgce.res = 0;
 	gifgce.delaytime = (WORD)info.dwFrameDelay;
-	gifgce.transpcolindex = (BYTE)info.nBkgndIndex;	   
+	gifgce.transpcolindex = (BYTE)info.nBkgndIndex;
 	fp->PutC(sizeof(gifgce));
 	fp->Write(&gifgce, sizeof(gifgce), 1);
 	fp->PutC(0);
@@ -500,9 +500,9 @@ void CxImageGIF::EncodeLoopExtension(CxFile *fp)
 	fp->Write("NETSCAPE2.0",11,1);
 	fp->PutC(3);			//byte 15  : 3 (hex 0x03) Length of Data Sub-Block (three bytes of data to follow)
 	fp->PutC(1);			//byte 16  : 1 (hex 0x01)
-	Putword(m_loops,fp); //bytes 17 to 18 : 0 to 65535, an unsigned integer in lo-hi byte format. 
+	Putword(m_loops,fp); //bytes 17 to 18 : 0 to 65535, an unsigned integer in lo-hi byte format.
 						//This indicate the number of iterations the loop should be executed.
-	fp->PutC(0);			//bytes 19       : 0 (hex 0x00) a Data Sub-block Terminator. 
+	fp->PutC(0);			//bytes 19       : 0 (hex 0x00) a Data Sub-block Terminator.
 }
 ////////////////////////////////////////////////////////////////////////////////
 void CxImageGIF::EncodeBody(CxFile *fp, bool bLocalColorMap)
@@ -525,7 +525,7 @@ void CxImageGIF::EncodeBody(CxFile *fp, bool bLocalColorMap)
 	if (bLocalColorMap){
 		Flags|=0x87;
 		RGBQUAD* pPal = GetPalette();
-		for(DWORD i=0; i<head.biClrUsed; ++i) 
+		for(DWORD i=0; i<head.biClrUsed; ++i)
 		{
 			fp->PutC(pPal[i].rgbRed);
 			fp->PutC(pPal[i].rgbGreen);
@@ -660,12 +660,12 @@ void CxImageGIF::compressNONE( int init_bits, CxFile* outfile)
 
 	output( (code_int)ClearCode );
 
-	while ( ent != EOF ) {    
+	while ( ent != EOF ) {
 		c = GifNextPixel();
 
 		output ( (code_int) ent );
 		ent = c;
-		if ( free_ent < maxmaxcode ) {  
+		if ( free_ent < maxmaxcode ) {
 			free_ent++;
 		} else {
 			free_ent=(short)(ClearCode+2);
@@ -716,7 +716,7 @@ void CxImageGIF::compressLZW( int init_bits, CxFile* outfile)
 	cl_hash((long)HSIZE);        /* clear hash table */
 	output( (code_int)ClearCode );
 
-	while ( (c = GifNextPixel( )) != EOF ) {    
+	while ( (c = GifNextPixel( )) != EOF ) {
 
 		fcode = (long) (((long) c << MAXBITSCODES) + ent);
 		i = (((code_int)c << hshift) ^ ent);    /* xor hashing */
@@ -735,7 +735,7 @@ probe:
 nomatch:
 		output ( (code_int) ent );
 		ent = c;
-		if ( free_ent < maxmaxcode ) {  
+		if ( free_ent < maxmaxcode ) {
 			CodeTabOf (i) = free_ent++; /* code -> hashtable */
 			HashTabOf (i) = fcode;
 		} else {
@@ -791,7 +791,7 @@ void CxImageGIF::output( code_int  code)
 				maxcode = (short)MAXCODE(n_bits);
 		}
 	}
-	
+
 	if( code == EOFCode ) {
 		 // At EOF, write the rest of the buffer.
 		while( cur_bits > 0 ) {
@@ -799,7 +799,7 @@ void CxImageGIF::output( code_int  code)
 			cur_accum >>= 8;
 			cur_bits -= 8;
 		}
-	
+
 		flush_char();
 		g_outfile->Flush();
 
@@ -835,7 +835,7 @@ void CxImageGIF::cl_hash(register long hsize)
 		*(htab_p-3)=m1;
 		*(htab_p-2)=m1;
 		*(htab_p-1)=m1;
-		
+
 		htab_p-=16;
 	} while ((i-=16) >=0);
 
@@ -1213,7 +1213,7 @@ int CxImageGIF::get_num_frames(CxFile *fp,struct_TabCol* TabColSrc,struct_dscgif
 				} else {
 					fp->Seek(-(ibfmax - ibf - 1), SEEK_CUR);
 				}
-		
+
 				break;
 				}
 			case ';': //terminator
@@ -1296,22 +1296,22 @@ void CxImageGIF::GifMix(CxImage & imgsrc2, struct_image & imgdesc)
  * documentation for any purpose and without fee is hereby granted, provided
  * that the above copyright notice appear in all copies and that both that
  * copyright notice and this permission notice appear in supporting
- * documentation.  This software is provided "AS IS." The Hutchison Avenue 
- * Software Corporation disclaims all warranties, either express or implied, 
- * including but not limited to implied warranties of merchantability and 
+ * documentation.  This software is provided "AS IS." The Hutchison Avenue
+ * Software Corporation disclaims all warranties, either express or implied,
+ * including but not limited to implied warranties of merchantability and
  * fitness for a particular purpose, with respect to this code and accompanying
- * documentation. 
- * 
- * The miGIF compression routines do not, strictly speaking, generate files 
- * conforming to the GIF spec, since the image data is not LZW-compressed 
- * (this is the point: in order to avoid transgression of the Unisys patent 
- * on the LZW algorithm.)  However, miGIF generates data streams that any 
+ * documentation.
+ *
+ * The miGIF compression routines do not, strictly speaking, generate files
+ * conforming to the GIF spec, since the image data is not LZW-compressed
+ * (this is the point: in order to avoid transgression of the Unisys patent
+ * on the LZW algorithm.)  However, miGIF generates data streams that any
  * reasonably sane LZW decompresser will decompress to what we want.
  *
- * miGIF compression uses run length encoding. It compresses horizontal runs 
+ * miGIF compression uses run length encoding. It compresses horizontal runs
  * of pixels of the same color. This type of compression gives good results
- * on images with many runs, for example images with lines, text and solid 
- * shapes on a solid-colored background. It gives little or no compression 
+ * on images with many runs, for example images with lines, text and solid
+ * shapes on a solid-colored background. It gives little or no compression
  * on images with few runs, for example digital or scanned photos.
  *
  *                               der Mouse

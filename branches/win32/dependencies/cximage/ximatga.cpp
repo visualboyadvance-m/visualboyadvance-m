@@ -64,7 +64,7 @@ bool CxImageTGA::Decode(CxFile *hFile)
 #endif //CXIMAGE_SUPPORT_ALPHA
 
 	if (!IsValid()) throw "TGA Create failed";
-	
+
 	if (info.nEscape) throw "Cancelled"; // <vho> - cancel decoding
 
 	if (tgaHead.CmapType != 0){ // read the palette
@@ -81,7 +81,7 @@ bool CxImageTGA::Decode(CxFile *hFile)
 	bool bYReversed = ((tgaHead.ImagDesc & 32) == 32);
 
     CImageIterator iter(this);
-	BYTE rleLeftover = 255; //for images with illegal packet boundary 
+	BYTE rleLeftover = 255; //for images with illegal packet boundary
 	BYTE* pDest;
     for (int y=0; y < tgaHead.ImageHeight; y++){
 
@@ -137,7 +137,7 @@ bool CxImageTGA::Encode(CxFile * hFile)
     tgaHead.PixelDepth=(BYTE)head.biBitCount;	// Pixel Depth
     tgaHead.ImagDesc=0;					// Image Descriptor
 
-	if (pAlpha && head.biBitCount==24) tgaHead.PixelDepth=32; 
+	if (pAlpha && head.biBitCount==24) tgaHead.PixelDepth=32;
 
 	hFile->Write(&tgaHead,sizeof(TGAHEADER),1);
 
@@ -151,7 +151,7 @@ bool CxImageTGA::Encode(CxFile * hFile)
 		}
 		hFile->Write(&pal,256*sizeof(rgb_color),1);
 	}
-	
+
 	CImageIterator iter(this);
 	BYTE* pDest;
 	if (pAlpha==0 || head.biBitCount==8){
@@ -214,7 +214,7 @@ BYTE CxImageTGA::ExpandCompressedLine(BYTE* pDest,TGAHEADER* ptgaHead,CxFile *hF
 #endif //CXIMAGE_SUPPORT_ALPHA
 				}
 				break;
-					 } 
+					 }
 			case 24: {
 				rgb_color triple;
 				hFile->Read(&triple,3,1);

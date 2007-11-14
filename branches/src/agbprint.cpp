@@ -68,7 +68,7 @@ bool agbPrintIsEnabled()
 }
 
 extern void (*dbgOutput)(char *, u32);
- 
+
 void agbPrintFlush()
 {
   u16 get = debuggerReadHalfWord(0x9fe20fc);
@@ -78,7 +78,7 @@ void agbPrintFlush()
   if(address != 0xfd0000 && address != 0x1fd0000) {
     dbgOutput("Did you forget to call AGBPrintInit?\n", 0);
     // get rid of the text otherwise we will continue to be called
-    debuggerWriteHalfWord(0x9fe20fc, put);    
+    debuggerWriteHalfWord(0x9fe20fc, put);
     return;
   }
 

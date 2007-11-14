@@ -92,19 +92,19 @@ BEGIN_MESSAGE_MAP(GBDisassemble, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // GBDisassemble message handlers
 
-void GBDisassemble::OnClose() 
+void GBDisassemble::OnClose()
 {
   theApp.winRemoveUpdateListener(this);
-  
+
   DestroyWindow();
 }
 
-void GBDisassemble::OnRefresh() 
+void GBDisassemble::OnRefresh()
 {
   refresh();
 }
 
-void GBDisassemble::OnNext() 
+void GBDisassemble::OnNext()
 {
   gbEmulate(1);
   if(PC.W < address || PC.W >= lastAddress)
@@ -112,7 +112,7 @@ void GBDisassemble::OnNext()
   refresh();
 }
 
-void GBDisassemble::OnGo() 
+void GBDisassemble::OnGo()
 {
   CString buffer;
 
@@ -121,27 +121,27 @@ void GBDisassemble::OnGo()
   refresh();
 }
 
-void GBDisassemble::OnGopc() 
+void GBDisassemble::OnGopc()
 {
   address = PC.W;
 
   refresh();
 }
 
-void GBDisassemble::OnAutoUpdate() 
+void GBDisassemble::OnAutoUpdate()
 {
   autoUpdate = !autoUpdate;
   if(autoUpdate) {
     theApp.winAddUpdateListener(this);
   } else {
-    theApp.winRemoveUpdateListener(this);    
-  }  
+    theApp.winRemoveUpdateListener(this);
+  }
 }
 
-BOOL GBDisassemble::OnInitDialog() 
+BOOL GBDisassemble::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_ENTRY( IDC_DISASSEMBLE, DS_SizeY)
     DIALOG_SIZER_ENTRY( IDC_REFRESH, DS_MoveY)
@@ -168,21 +168,21 @@ BOOL GBDisassemble::OnInitDialog()
   GetDlgItem(IDC_VSCROLL)->SetScrollInfo(SB_CTL, &si, TRUE);
   CFont *font = CFont::FromHandle((HFONT)GetStockObject(SYSTEM_FIXED_FONT));
   m_list.SetFont(font);
-  
+
   for(int i = 0; i < 6; i++)
     GetDlgItem(IDC_R0+i)->SetFont(font);
 
   m_address.LimitText(4);
   refresh();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void GBDisassemble::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
+void GBDisassemble::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
   char buffer[80];
-  
+
   switch(nSBCode) {
   case SB_LINEDOWN:
     address += gbDis(buffer, address);
@@ -198,7 +198,7 @@ void GBDisassemble::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
     break;
   }
   refresh();
-  
+
   CDialog::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
@@ -206,7 +206,7 @@ void GBDisassemble::refresh()
 {
   if(gbRom == NULL)
     return;
-  
+
   int h = m_list.GetItemHeight(0);
   RECT r;
   m_list.GetClientRect(&r);
@@ -215,7 +215,7 @@ void GBDisassemble::refresh()
   m_list.ResetContent();
   if(!emulating || theApp.cartridgeType != 1)
     return;
-  
+
   char buffer[80];
   u16 addr = address;
   int i;
@@ -233,17 +233,17 @@ void GBDisassemble::refresh()
   sprintf(buffer, "%04x", AF.W);
   GetDlgItem(IDC_R0)->SetWindowText(buffer);
   sprintf(buffer, "%04x", BC.W);
-  GetDlgItem(IDC_R1)->SetWindowText(buffer);  
+  GetDlgItem(IDC_R1)->SetWindowText(buffer);
   sprintf(buffer, "%04x", DE.W);
-  GetDlgItem(IDC_R2)->SetWindowText(buffer);  
+  GetDlgItem(IDC_R2)->SetWindowText(buffer);
   sprintf(buffer, "%04x", HL.W);
-  GetDlgItem(IDC_R3)->SetWindowText(buffer);  
+  GetDlgItem(IDC_R3)->SetWindowText(buffer);
   sprintf(buffer, "%04x", SP.W);
-  GetDlgItem(IDC_R4)->SetWindowText(buffer);  
+  GetDlgItem(IDC_R4)->SetWindowText(buffer);
   sprintf(buffer, "%04x", PC.W);
-  GetDlgItem(IDC_R5)->SetWindowText(buffer);  
+  GetDlgItem(IDC_R5)->SetWindowText(buffer);
   sprintf(buffer, "%04x", IFF);
-  GetDlgItem(IDC_R6)->SetWindowText(buffer);  
+  GetDlgItem(IDC_R6)->SetWindowText(buffer);
   sprintf(buffer, "%04x", register_LY);
   GetDlgItem(IDC_LY)->SetWindowText(buffer);
 
@@ -260,7 +260,7 @@ void GBDisassemble::update()
   refresh();
 }
 
-void GBDisassemble::PostNcDestroy() 
+void GBDisassemble::PostNcDestroy()
 {
   delete this;
 }

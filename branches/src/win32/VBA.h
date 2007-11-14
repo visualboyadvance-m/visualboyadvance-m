@@ -188,13 +188,13 @@ class VBA : public CWinApp
   bool autoLoadMostRecent;
   int fsMaxScale;
   int romSize;
- 
+
   CList<IUpdateListener *, IUpdateListener*&> updateList;
   int updateCount;
 
   CAcceleratorManager winAccelMgr;
   HACCEL hAccel;
-  
+
   RECT rect;
   RECT dest;
 

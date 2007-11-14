@@ -59,7 +59,7 @@ void CxImage::AlphaClear()
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * Sets the alpha level for the whole image 
+ * Sets the alpha level for the whole image
  */
 void CxImage::AlphaSet(BYTE level)
 {
@@ -126,7 +126,7 @@ bool CxImage::AlphaSet(CxImage &from)
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * Sets the alpha level for a single pixel 
+ * Sets the alpha level for a single pixel
  */
 void CxImage::AlphaSet(const long x,const long y,const BYTE level)
 {
@@ -134,7 +134,7 @@ void CxImage::AlphaSet(const long x,const long y,const BYTE level)
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * Gets the alpha level for a single pixel 
+ * Gets the alpha level for a single pixel
  */
 BYTE CxImage::AlphaGet(const long x,const long y)
 {
@@ -167,7 +167,7 @@ BYTE CxImage::BlindAlphaGet(const long x,const long y)
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * Resets the alpha palette 
+ * Resets the alpha palette
  */
 void CxImage::AlphaPaletteClear()
 {
@@ -180,7 +180,7 @@ void CxImage::AlphaPaletteClear()
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * Checks if the image has a valid alpha palette. 
+ * Checks if the image has a valid alpha palette.
  */
 bool CxImage::AlphaPaletteIsValid()
 {
@@ -275,7 +275,7 @@ bool CxImage::AlphaMirror()
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * Exports the alpha channel in a 8bpp grayscale image. 
+ * Exports the alpha channel in a 8bpp grayscale image.
  */
 bool CxImage::AlphaSplit(CxImage *dest)
 {
@@ -297,7 +297,7 @@ bool CxImage::AlphaSplit(CxImage *dest)
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * Exports the alpha palette channel in a 8bpp grayscale image. 
+ * Exports the alpha palette channel in a 8bpp grayscale image.
  */
 bool CxImage::AlphaPaletteSplit(CxImage *dest)
 {

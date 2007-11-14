@@ -133,7 +133,7 @@ inline void set_be32( void* p, blargg_ulong n )
 		#define GET_BE32( addr )        (*(BOOST::uint32_t*) (addr))
 		#define SET_BE16( addr, data )  (void) (*(BOOST::uint16_t*) (addr) = (data))
 		#define SET_BE32( addr, data )  (void) (*(BOOST::uint32_t*) (addr) = (data))
-		
+
 		#if BLARGG_CPU_POWERPC
 			// PowerPC has special byte-reversed instructions
 			#if defined (__MWERKS__)

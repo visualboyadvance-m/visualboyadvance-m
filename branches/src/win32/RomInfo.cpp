@@ -305,34 +305,34 @@ BEGIN_MESSAGE_MAP(RomInfoGB, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // RomInfoGB message handlers
 
-void RomInfoGB::OnOk() 
+void RomInfoGB::OnOk()
 {
   EndDialog(TRUE);
 }
 
-BOOL RomInfoGB::OnInitDialog() 
+BOOL RomInfoGB::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   char buffer[128];
-  
+
   strncpy(buffer, (const char *)&rom[0x134], 15);
   buffer[15] = 0;
   GetDlgItem(IDC_ROM_TITLE)->SetWindowText(buffer);
 
   sprintf(buffer, "%02x", rom[0x143]);
   GetDlgItem(IDC_ROM_COLOR)->SetWindowText(buffer);
-  
+
   strncpy(buffer, (const char *)&rom[0x144],2);
   buffer[2] = 0;
   GetDlgItem(IDC_ROM_MAKER_CODE)->SetWindowText(buffer);
 
   if(rom[0x14b] != 0x33) {
     sprintf(buffer, "%02X", rom[0x14b]);
-    GetDlgItem(IDC_ROM_MAKER_CODE)->SetWindowText(buffer);    
+    GetDlgItem(IDC_ROM_MAKER_CODE)->SetWindowText(buffer);
   }
   GetDlgItem(IDC_ROM_MAKER_NAME2)->SetWindowText(winGBARomInfoFindMakerCode(buffer));
-  
+
   sprintf(buffer, "%02x", rom[0x146]);
   GetDlgItem(IDC_ROM_UNIT_CODE)->SetWindowText(buffer);
 
@@ -484,7 +484,7 @@ BOOL RomInfoGB::OnInitDialog()
 
   sprintf(buffer, "%02x", rom[0x14b]);
   GetDlgItem(IDC_ROM_LIC_CODE)->SetWindowText(buffer);
-  
+
   sprintf(buffer, "%02x", rom[0x14c]);
   GetDlgItem(IDC_ROM_VERSION)->SetWindowText(buffer);
 
@@ -495,7 +495,7 @@ BOOL RomInfoGB::OnInitDialog()
   }
 
   crc = 256 - crc;
-  
+
   sprintf(buffer, "%02x (%02x)", crc, rom[0x14d]);
   GetDlgItem(IDC_ROM_CRC)->SetWindowText(buffer);
 
@@ -510,7 +510,7 @@ BOOL RomInfoGB::OnInitDialog()
   GetDlgItem(IDC_ROM_CHECKSUM)->SetWindowText(buffer);
 
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -546,12 +546,12 @@ BEGIN_MESSAGE_MAP(RomInfoGBA, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // RomInfoGBA message handlers
 
-void RomInfoGBA::OnOk() 
+void RomInfoGBA::OnOk()
 {
   EndDialog(TRUE);
 }
 
-BOOL RomInfoGBA::OnInitDialog() 
+BOOL RomInfoGBA::OnInitDialog()
 {
   CDialog::OnInitDialog();
 
@@ -570,7 +570,7 @@ BOOL RomInfoGBA::OnInitDialog()
   GetDlgItem(IDC_ROM_MAKER_CODE)->SetWindowText(buffer);
 
   GetDlgItem(IDC_ROM_MAKER_NAME)->SetWindowText(winGBARomInfoFindMakerCode(buffer));
-  
+
   sprintf(buffer, "%02x", rom[0xb3]);
   GetDlgItem(IDC_ROM_UNIT_CODE)->SetWindowText(buffer);
 
@@ -593,7 +593,7 @@ BOOL RomInfoGBA::OnInitDialog()
   sprintf(buffer, "%02x (%02x)", crc, rom[0xbd]);
   GetDlgItem(IDC_ROM_CRC)->SetWindowText(buffer);
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }

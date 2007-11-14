@@ -85,7 +85,7 @@ extern DECLSPEC SDL_Cursor * SDLCALL SDL_CreateCursor
 
 /*
  * Set the currently active cursor to the specified one.
- * If the cursor is currently visible, the change will be immediately 
+ * If the cursor is currently visible, the change will be immediately
  * represented on the display.
  */
 extern DECLSPEC void SDLCALL SDL_SetCursor(SDL_Cursor *cursor);

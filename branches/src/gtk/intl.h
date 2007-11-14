@@ -35,7 +35,7 @@
 # define gettext(String) (String)
 # define dgettext(Domain,String) (String)
 # define dcgettext(Domain,String,Type) (String)
-# define bindtextdomain(Domain,Directory) (Domain) 
+# define bindtextdomain(Domain,Directory) (Domain)
 #endif
 
 

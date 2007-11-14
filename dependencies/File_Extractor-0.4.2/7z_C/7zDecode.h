@@ -15,7 +15,7 @@ SZ_RESULT SzDecode(const CFileSize *packSizes, const CFolder *folder,
 		#else
 		const Byte *inBuffer,
 		#endif
-		Byte *outBuffer, size_t outSize, 
+		Byte *outBuffer, size_t outSize,
 		size_t *outSizeProcessed, ISzAlloc *allocMain);
 
 #endif

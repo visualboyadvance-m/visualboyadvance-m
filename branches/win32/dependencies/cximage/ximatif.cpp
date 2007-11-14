@@ -59,14 +59,14 @@ bool CxImageTIF::Decode(CxFile * hFile)
 	info.nNumFrames = TIFFNumberOfDirectories(m_tif);
 
 	if (!TIFFSetDirectory(m_tif, (uint16)info.nFrame))
-		throw "Error: page not present in TIFF file";			
+		throw "Error: page not present in TIFF file";
 
 	//get image info
 	TIFFGetField(m_tif, TIFFTAG_IMAGEWIDTH, &width);
 	TIFFGetField(m_tif, TIFFTAG_IMAGELENGTH, &height);
 	TIFFGetField(m_tif, TIFFTAG_SAMPLESPERPIXEL, &samplesperpixel);
 	TIFFGetField(m_tif, TIFFTAG_BITSPERSAMPLE, &bitspersample);
-	TIFFGetField(m_tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);   
+	TIFFGetField(m_tif, TIFFTAG_ROWSPERSTRIP, &rowsperstrip);
 	TIFFGetField(m_tif, TIFFTAG_PHOTOMETRIC, &photometric);
 	TIFFGetField(m_tif, TIFFTAG_ORIENTATION, &orientation);
 
@@ -151,7 +151,7 @@ bool CxImageTIF::Decode(CxFile * hFile)
 
 		raster = (uint32*)_TIFFmalloc(width * height * sizeof (uint32));
 		if (raster == NULL) throw "No space for raster buffer";
-			
+
 		// Read the image in one chunk into an RGBA array
 		if(!TIFFReadRGBAImage(m_tif, width, height, raster, 1)) {
 				_TIFFfree(raster);
@@ -187,7 +187,7 @@ bool CxImageTIF::Decode(CxFile * hFile)
 		pal=(RGBQUAD*)calloc(256,sizeof(RGBQUAD));
 		if (pal==NULL) throw "Unable to allocate TIFF palette";
 
-		// set up the colormap based on photometric	
+		// set up the colormap based on photometric
 		switch(photometric) {
 			case PHOTOMETRIC_MINISBLACK:	// bitmap and greyscale image types
 			case PHOTOMETRIC_MINISWHITE:
@@ -213,7 +213,7 @@ bool CxImageTIF::Decode(CxFile * hFile)
 				uint16 *red;
 				uint16 *green;
 				uint16 *blue;
-				TIFFGetField(m_tif, TIFFTAG_COLORMAP, &red, &green, &blue); 
+				TIFFGetField(m_tif, TIFFTAG_COLORMAP, &red, &green, &blue);
 
 				// Is the palette 16 or 8 bits ?
 				BOOL Palette16Bits = FALSE;
@@ -230,11 +230,11 @@ bool CxImageTIF::Decode(CxFile * hFile)
 					if (Palette16Bits) {
 						pal[i].rgbRed =(BYTE) CVT(red[i]);
 						pal[i].rgbGreen = (BYTE) CVT(green[i]);
-						pal[i].rgbBlue = (BYTE) CVT(blue[i]);           
+						pal[i].rgbBlue = (BYTE) CVT(blue[i]);
 					} else {
 						pal[i].rgbRed = (BYTE) red[i];
 						pal[i].rgbGreen = (BYTE) green[i];
-						pal[i].rgbBlue = (BYTE) blue[i];        
+						pal[i].rgbBlue = (BYTE) blue[i];
 					}
 				}
 				break;
@@ -260,7 +260,7 @@ bool CxImageTIF::Decode(CxFile * hFile)
 			bitsize = TIFFTileSize(m_tif) * (int)(1+width/tw);
 			tilebuf = (BYTE*)malloc(TIFFTileSize(m_tif));
 		}
-		
+
 		bits = (BYTE*)malloc(bitsize);
 		if (bits==NULL){
 			throw "CxImageTIF can't allocate memory";
@@ -543,7 +543,7 @@ bool CxImageTIF::EncodeBody(TIFF *m_tif, bool multipage, int page, int pagecount
 			break;
 		case 24:
 		case 32:
-			photometric = PHOTOMETRIC_RGB;			
+			photometric = PHOTOMETRIC_RGB;
 			break;
 	}
 
@@ -570,7 +570,7 @@ bool CxImageTIF::EncodeBody(TIFF *m_tif, bool multipage, int page, int pagecount
 	TIFFSetField(m_tif, TIFFTAG_SAMPLESPERPIXEL, samplesperpixel);
 	TIFFSetField(m_tif, TIFFTAG_BITSPERSAMPLE, bitspersample);
 	TIFFSetField(m_tif, TIFFTAG_PHOTOMETRIC, photometric);
-	TIFFSetField(m_tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);	// single image plane 
+	TIFFSetField(m_tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);	// single image plane
 	TIFFSetField(m_tif, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
 
 	uint32 rowsperstrip = TIFFDefaultStripSize(m_tif, (uint32) -1);  //<REC> gives better compression
@@ -649,7 +649,7 @@ bool CxImageTIF::EncodeBody(TIFF *m_tif, bool multipage, int page, int pagecount
 	// read the DIB lines from bottom to top and save them in the TIF
 
 	BYTE *bits;
-	switch(bitcount) {				
+	switch(bitcount) {
 		case 1 :
 		case 4 :
 		case 8 :
@@ -678,7 +678,7 @@ bool CxImageTIF::EncodeBody(TIFF *m_tif, bool multipage, int page, int pagecount
 			}
 #endif //CXIMAGE_SUPPORT_ALPHA
 			break;
-		}				
+		}
 		case 24:
 		{
 			BYTE *buffer = (BYTE *)malloc(info.dwEffWidth);
@@ -702,7 +702,7 @@ bool CxImageTIF::EncodeBody(TIFF *m_tif, bool multipage, int page, int pagecount
 			}
 			free(buffer);
 			break;
-		}				
+		}
 		case 32 :
 		{
 #if CXIMAGE_SUPPORT_ALPHA
@@ -731,7 +731,7 @@ bool CxImageTIF::EncodeBody(TIFF *m_tif, bool multipage, int page, int pagecount
 			free(buffer);
 #endif //CXIMAGE_SUPPORT_ALPHA
 			break;
-		}				
+		}
 	}
 	return true;
 }

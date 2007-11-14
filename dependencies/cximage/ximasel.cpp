@@ -17,7 +17,7 @@ bool CxImage::SelectionIsValid()
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * Gets the smallest rectangle that contains the selection 
+ * Gets the smallest rectangle that contains the selection
  */
 void CxImage::SelectionGetBox(RECT& r)
 {
@@ -267,8 +267,8 @@ bool CxImage::SelectionAddPolygon(POINT *points, long npoints)
 		for(y=ymin;y<ymax;y++){
 			for(x=xmin;x<xmax;x++){
 				if (plocal[x+y*head.biWidth]==0){
-					// Subject: FLOOD FILL ROUTINE              Date: 12-23-97 (00:57)       
-					// Author:  Petter Holmberg                 Code: QB, QBasic, PDS        
+					// Subject: FLOOD FILL ROUTINE              Date: 12-23-97 (00:57)
+					// Author:  Petter Holmberg                 Code: QB, QBasic, PDS
 					// Origin:  petter.holmberg@usa.net         Packet: GRAPHICS.ABC
 					first=0;
 					last=1;
@@ -329,7 +329,7 @@ bool CxImage::SelectionAddPolygon(POINT *points, long npoints)
 							fx--;
 							fxx--;
 						} while(1);
-						
+
 						first++;
 						if (first == npix) first = 0;
 					}
@@ -435,7 +435,7 @@ bool CxImage::SelectionSplit(CxImage *dest)
  */
 bool CxImage::SelectionToHRGN(HRGN& region)
 {
-	if (pSelection && region){           
+	if (pSelection && region){
         for(int y = 0; y < head.biHeight; y++){
             HRGN hTemp = NULL;
             int iStart = -1;

@@ -14,16 +14,16 @@ void InitCrcTable()
 		UInt32 r = i;
 		int j;
 		for (j = 0; j < 8; j++)
-			if (r & 1) 
+			if (r & 1)
 				r = (r >> 1) ^ kCrcPoly;
-			else     
+			else
 				r >>= 1;
 		g_CrcTable[i] = r;
 	}
 }
 
 void CrcInit(UInt32 *crc) { *crc = 0xFFFFFFFF; }
-UInt32 CrcGetDigest(UInt32 *crc) { return *crc ^ 0xFFFFFFFF; } 
+UInt32 CrcGetDigest(UInt32 *crc) { return *crc ^ 0xFFFFFFFF; }
 
 void CrcUpdateByte(UInt32 *crc, Byte b)
 {

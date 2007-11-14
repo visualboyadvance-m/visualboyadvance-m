@@ -51,7 +51,7 @@ GBPrinterDlg::GBPrinterDlg(CWnd* pParent /*=NULL*/)
   m_scale = -1;
   //}}AFX_DATA_INIT
   bitmap = (BITMAPINFO *)bitmapHeader;
-  
+
   bitmap->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
   bitmap->bmiHeader.biWidth = 160;
   bitmap->bmiHeader.biHeight = -144;
@@ -82,7 +82,7 @@ GBPrinterDlg::GBPrinterDlg(CWnd* pParent /*=NULL*/)
     bitmap->bmiColors[3].rgbGreen =
     bitmap->bmiColors[3].rgbRed =
     0;
-  bitmap->bmiColors[3].rgbReserved = 0;  
+  bitmap->bmiColors[3].rgbReserved = 0;
 }
 
 
@@ -114,7 +114,7 @@ BEGIN_MESSAGE_MAP(GBPrinterDlg, CDialog)
 void GBPrinterDlg::saveAsBMP(const char *name)
 {
   u8 writeBuffer[512 * 3];
-  
+
   FILE *fp = fopen(name,"wb");
 
   if(!fp) {
@@ -163,17 +163,17 @@ void GBPrinterDlg::saveAsBMP(const char *name)
   for(int y = 0; y < 144; y++) {
     for(int x = 0; x < 160; x++) {
       u8 c = *p++;
-      
+
       *b++ = bitmap->bmiColors[c].rgbBlue;
       *b++ = bitmap->bmiColors[c].rgbGreen;
       *b++ = bitmap->bmiColors[c].rgbRed;
     }
     p -= 2*(160);
     fwrite(writeBuffer, 1, 3*160, fp);
-    
+
     b = writeBuffer;
   }
-  
+
   fclose(fp);
 }
 
@@ -181,7 +181,7 @@ void GBPrinterDlg::saveAsBMP(const char *name)
 void GBPrinterDlg::saveAsPNG(const char *name)
 {
   u8 writeBuffer[160 * 3];
-  
+
   FILE *fp = fopen(name,"wb");
 
   if(!fp) {
@@ -189,7 +189,7 @@ void GBPrinterDlg::saveAsPNG(const char *name)
                   name);
     return;
   }
-  
+
   png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
                                                 NULL,
                                                 NULL,
@@ -200,13 +200,13 @@ void GBPrinterDlg::saveAsPNG(const char *name)
   }
 
   png_infop info_ptr = png_create_info_struct(png_ptr);
-  
+
   if(!info_ptr) {
     png_destroy_write_struct(&png_ptr,NULL);
     fclose(fp);
     return;
   }
-  
+
   if(setjmp(png_ptr->jmpbuf)) {
     png_destroy_write_struct(&png_ptr,NULL);
     fclose(fp);
@@ -241,19 +241,19 @@ void GBPrinterDlg::saveAsPNG(const char *name)
       *b++ = bitmap->bmiColors[c].rgbBlue;
     }
     png_write_row(png_ptr,writeBuffer);
-        
+
     b = writeBuffer;
   }
-  
+
   png_write_end(png_ptr, info_ptr);
 
   png_destroy_write_struct(&png_ptr, &info_ptr);
 
-  fclose(fp);  
+  fclose(fp);
 }
 
 
-void GBPrinterDlg::OnSave() 
+void GBPrinterDlg::OnSave()
 {
   CString captureBuffer;
 
@@ -289,7 +289,7 @@ void GBPrinterDlg::OnSave()
     saveAsPNG(captureBuffer);
 }
 
-void GBPrinterDlg::OnPrint() 
+void GBPrinterDlg::OnPrint()
 {
   CPrintDialog dlg(FALSE);
 
@@ -305,7 +305,7 @@ void GBPrinterDlg::OnPrint()
     float fLogPelsX2 = 0;
     float fLogPelsY1 = 0;
     float fLogPelsY2 = 0;
-    float fScaleX = 0, fScaleY = 0;    
+    float fScaleX = 0, fScaleY = 0;
     CDC *winDC = NULL;
     memset(&di, 0, sizeof(di));
     di.cbSize = sizeof(DOCINFO);
@@ -332,7 +332,7 @@ void GBPrinterDlg::OnPrint()
 
     fLogPelsX2 = (float)dc.GetDeviceCaps(LOGPIXELSX);
     fLogPelsY2 = (float)dc.GetDeviceCaps(LOGPIXELSY);
-    
+
     if(fLogPelsX1 > fLogPelsX2)
       fScaleX = fLogPelsX1 / fLogPelsX2;
     else
@@ -345,7 +345,7 @@ void GBPrinterDlg::OnPrint()
 
     fScaleX *= (scale+1);
     fScaleY *= (scale+1);
-    
+
     if(StretchDIBits(dc,
                      0,
                      0,
@@ -397,59 +397,59 @@ void GBPrinterDlg::processData(u8 *data)
         }
       }
     }
-  }  
+  }
 }
 
 
-BOOL GBPrinterDlg::OnInitDialog() 
+BOOL GBPrinterDlg::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   scale = regQueryDwordValue("printerScale", 0);
   if(scale < 0 || scale > 3)
     scale = 0;
   m_scale = scale;
   UpdateData(FALSE);
-  
+
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void GBPrinterDlg::OnOk() 
+void GBPrinterDlg::OnOk()
 {
   EndDialog(TRUE);
 }
 
-void GBPrinterDlg::On1x() 
+void GBPrinterDlg::On1x()
 {
   regSetDwordValue("printerScale", 0);
   scale = 0;
 }
 
-void GBPrinterDlg::On2x() 
+void GBPrinterDlg::On2x()
 {
   regSetDwordValue("printerScale", 1);
   scale = 1;
 }
 
-void GBPrinterDlg::On3x() 
+void GBPrinterDlg::On3x()
 {
   regSetDwordValue("printerScale", 2);
   scale = 2;
 }
 
-void GBPrinterDlg::On4x() 
+void GBPrinterDlg::On4x()
 {
   regSetDwordValue("printerScale", 3);
   scale = 3;
 }
 
-void GBPrinterDlg::OnPaint() 
+void GBPrinterDlg::OnPaint()
 {
   CPaintDC dc(this); // device context for painting
-  
+
   RECT rect;
   CWnd *h = GetDlgItem(IDC_GB_PRINTER);
   h->GetWindowRect(&rect);
@@ -464,7 +464,7 @@ void GBPrinterDlg::OnPaint()
   ScreenToClient((POINT *)&p);
   rect.right = p.x-1;
   rect.bottom = p.y-1;
-  
+
   StretchDIBits(dc,
                 rect.left,
                 rect.top,

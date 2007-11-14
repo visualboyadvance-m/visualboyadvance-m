@@ -50,11 +50,11 @@
 #define GMONVERSION     0x00051879
 
 /* Size of the old BSD gmon header */
-#define GMON_HDRSIZE_OLDBSD_32 (4 + 4 + 4) 
+#define GMON_HDRSIZE_OLDBSD_32 (4 + 4 + 4)
 
 /* FIXME: Checking host compiler defines here means that we can't
    use a cross gprof alpha OSF.  */
-#if defined(__alpha__) && defined (__osf__) 
+#if defined(__alpha__) && defined (__osf__)
 #define GMON_HDRSIZE_OLDBSD_64 (8 + 8 + 4 + 4)
 #else
 #define GMON_HDRSIZE_OLDBSD_64 (8 + 8 + 4)

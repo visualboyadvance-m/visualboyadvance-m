@@ -84,10 +84,10 @@ BEGIN_MESSAGE_MAP(GBPaletteView, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // GBPaletteView message handlers
 
-BOOL GBPaletteView::OnInitDialog() 
+BOOL GBPaletteView::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_END()
     SetData(sz,
@@ -98,13 +98,13 @@ BOOL GBPaletteView::OnInitDialog()
 
   paletteView.init(32, 64, 128);
   paletteViewOBJ.init(32, 64, 128);
-  
+
   paletteView.setPaletteAddress(0);
-  paletteView.refresh();  
-  
+  paletteView.refresh();
+
   paletteViewOBJ.setPaletteAddress(32);
-  paletteViewOBJ.refresh();  
-  
+  paletteViewOBJ.refresh();
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -119,7 +119,7 @@ void GBPaletteView::save(int which)
     captureBuffer = "obj.pal";
 
   LPCTSTR exts[] = {".pal", ".pal", ".act" };
-  
+
   CString filter = theApp.winLoadFilter(IDS_FILTER_PAL);
   CString title = winResLoadString(IDS_SELECT_PALETTE_NAME);
   FileDlg dlg(this,
@@ -144,7 +144,7 @@ void GBPaletteView::save(int which)
     p = &paletteView;
   else
     p = &paletteViewOBJ;
-  
+
   switch(dlg.getFilterIndex()) {
   case 0:
   case 1:
@@ -160,20 +160,20 @@ void GBPaletteView::save(int which)
 }
 
 
-void GBPaletteView::OnSaveBg() 
+void GBPaletteView::OnSaveBg()
 {
   save(0);
 }
 
-void GBPaletteView::OnSaveObj() 
+void GBPaletteView::OnSaveObj()
 {
   save(1);
 }
 
-void GBPaletteView::OnRefresh2() 
+void GBPaletteView::OnRefresh2()
 {
   paletteView.refresh();
-  paletteViewOBJ.refresh();  
+  paletteViewOBJ.refresh();
 }
 
 void GBPaletteView::update()
@@ -182,21 +182,21 @@ void GBPaletteView::update()
 }
 
 
-void GBPaletteView::OnAutoUpdate() 
+void GBPaletteView::OnAutoUpdate()
 {
   autoUpdate = !autoUpdate;
   if(autoUpdate) {
     theApp.winAddUpdateListener(this);
   } else {
-    theApp.winRemoveUpdateListener(this);    
-  }  
+    theApp.winRemoveUpdateListener(this);
+  }
 }
 
 
-void GBPaletteView::OnClose() 
+void GBPaletteView::OnClose()
 {
   theApp.winRemoveUpdateListener(this);
-  
+
   DestroyWindow();
 }
 
@@ -208,7 +208,7 @@ LRESULT GBPaletteView::OnPalInfo(WPARAM wParam, LPARAM lParam)
 
   bool isOBJ = address >= 32;
   address &= 31;
-  
+
   buffer.Format("%d", address);
   GetDlgItem(IDC_ADDRESS)->SetWindowText(buffer);
 
@@ -235,11 +235,11 @@ LRESULT GBPaletteView::OnPalInfo(WPARAM wParam, LPARAM lParam)
     paletteView.setSelected(-1);
   else
     paletteViewOBJ.setSelected(-1);
-  
+
   return TRUE;
 }
 
-void GBPaletteView::PostNcDestroy() 
+void GBPaletteView::PostNcDestroy()
 {
   delete this;
 }

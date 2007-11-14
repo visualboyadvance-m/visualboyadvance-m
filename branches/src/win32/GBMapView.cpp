@@ -54,9 +54,9 @@ GBMapView::GBMapView(CWnd* pParent /*=NULL*/)
   // NOTE: the ClassWizard will add member initialization here
   //}}AFX_DATA_INIT
   autoUpdate = false;
-  
+
   memset(&bmpInfo.bmiHeader, 0, sizeof(bmpInfo.bmiHeader));
-  
+
   bmpInfo.bmiHeader.biSize = sizeof(bmpInfo.bmiHeader);
   bmpInfo.bmiHeader.biWidth = 1024;
   bmpInfo.bmiHeader.biHeight = -1024;
@@ -67,7 +67,7 @@ GBMapView::GBMapView(CWnd* pParent /*=NULL*/)
 
   mapView.setData(data);
   mapView.setBmpInfo(&bmpInfo);
-  
+
   bg = 0;
   bank = 0;
 }
@@ -113,7 +113,7 @@ GBMapView::~GBMapView()
 void GBMapView::saveBMP(const char *name)
 {
   u8 writeBuffer[1024 * 3];
-  
+
   FILE *fp = fopen(name,"wb");
 
   if(!fp) {
@@ -170,7 +170,7 @@ void GBMapView::saveBMP(const char *name)
     }
     pixU8 -= 2*3*w;
     fwrite(writeBuffer, 1, 3*w, fp);
-    
+
     b = writeBuffer;
   }
 
@@ -180,14 +180,14 @@ void GBMapView::saveBMP(const char *name)
 void GBMapView::savePNG(const char *name)
 {
   u8 writeBuffer[1024 * 3];
-  
+
   FILE *fp = fopen(name,"wb");
 
   if(!fp) {
     systemMessage(MSG_ERROR_CREATING_FILE, "Error creating file %s", name);
     return;
   }
-  
+
   png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
                                                 NULL,
                                                 NULL,
@@ -236,16 +236,16 @@ void GBMapView::savePNG(const char *name)
       int blue = *pixU8++;
       int green = *pixU8++;
       int red = *pixU8++;
-      
+
       *b++ = red;
       *b++ = green;
       *b++ = blue;
     }
     png_write_row(png_ptr,writeBuffer);
-    
+
     b = writeBuffer;
   }
-  
+
   png_write_end(png_ptr, info_ptr);
 
   png_destroy_write_struct(&png_ptr, &info_ptr);
@@ -253,7 +253,7 @@ void GBMapView::savePNG(const char *name)
   fclose(fp);
 }
 
-void GBMapView::OnSave() 
+void GBMapView::OnSave()
 {
   CString filename;
 
@@ -273,7 +273,7 @@ void GBMapView::OnSave()
               theApp.captureFormat ? "BMP" : "PNG",
               exts,
               "",
-              title, 
+              title,
               true);
 
   if(dlg.DoModal() == IDCANCEL) {
@@ -305,14 +305,14 @@ void GBMapView::render()
   int tile_pattern = 0x0000;
   if(bank == 1)
     tile_pattern = 0x0800;
-  
+
   w = 256;
   h = 256;
-  
+
   int tile = 0;
   for(int y = 0; y < 32; y++) {
     for(int x = 0; x < 32; x++) {
-      u8 *bmp = &data[y * 8 * 32 * 24 + x*24];      
+      u8 *bmp = &data[y * 8 * 32 * 24 + x*24];
       u8 attrs = 0;
       if(bank1 != NULL)
         attrs = bank1[tile_map_address];
@@ -327,10 +327,10 @@ void GBMapView::render()
         int tile_pattern_address = attrs & 0x40 ?
           tile_pattern + tile*16 + (7-j)*2:
           tile_pattern + tile*16+j*2;
-        
+
         u8 tile_a = 0;
         u8 tile_b = 0;
-        
+
         if(attrs & 0x08) {
           tile_a = bank1[tile_pattern_address++];
           tile_b = bank1[tile_pattern_address];
@@ -338,27 +338,27 @@ void GBMapView::render()
           tile_a = bank0[tile_pattern_address++];
           tile_b = bank0[tile_pattern_address];
         }
-        
+
         if(attrs & 0x20) {
           tile_a = gbInvertTab[tile_a];
           tile_b = gbInvertTab[tile_b];
         }
-        
+
         u8 mask = 0x80;
-        
+
         while(mask > 0) {
           u8 c = (tile_a & mask) ? 1 : 0;
           c += (tile_b & mask) ? 2 : 0;
-          
+
           if(gbCgbMode)
             c = c + (attrs & 7)*4;
-          
+
           u16 color = gbPalette[c];
-          
+
           *bmp++ = ((color >> 10) & 0x1f) << 3;
           *bmp++ = ((color >> 5) & 0x1f) << 3;
           *bmp++ = (color & 0x1f) << 3;
-          
+
           mask >>= 1;
         }
         bmp += 31*24;
@@ -372,7 +372,7 @@ void GBMapView::paint()
   if(gbRom == NULL)
     return;
   render();
-  
+
   SIZE s;
   if(mapView.getStretch()) {
     mapView.setSize(w, h);
@@ -388,7 +388,7 @@ void GBMapView::paint()
   mapView.refresh();
 }
 
-void GBMapView::OnRefresh() 
+void GBMapView::OnRefresh()
 {
   paint();
 }
@@ -398,10 +398,10 @@ void GBMapView::update()
   paint();
 }
 
-BOOL GBMapView::OnInitDialog() 
+BOOL GBMapView::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_ENTRY( IDC_MAP_VIEW, DS_SizeX | DS_SizeY )
     DIALOG_SIZER_ENTRY( IDC_REFRESH, DS_MoveY)
@@ -410,7 +410,7 @@ BOOL GBMapView::OnInitDialog()
     DIALOG_SIZER_ENTRY( IDC_COLOR, DS_MoveY)
     DIALOG_SIZER_ENTRY( IDC_R, DS_MoveY)
     DIALOG_SIZER_ENTRY( IDC_G, DS_MoveY)
-    DIALOG_SIZER_ENTRY( IDC_B, DS_MoveY)    
+    DIALOG_SIZER_ENTRY( IDC_B, DS_MoveY)
     DIALOG_SIZER_END()
     SetData(sz,
             TRUE,
@@ -437,51 +437,51 @@ BOOL GBMapView::OnInitDialog()
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void GBMapView::OnBg0() 
+void GBMapView::OnBg0()
 {
   bg = 0;
   paint();
 }
 
-void GBMapView::OnBg1() 
+void GBMapView::OnBg1()
 {
   bg = 1;
   paint();
 }
 
-void GBMapView::OnBank0() 
+void GBMapView::OnBank0()
 {
   bank = 0;
   paint();
 }
 
-void GBMapView::OnBank1() 
+void GBMapView::OnBank1()
 {
   bank = 1;
   paint();
 }
 
-void GBMapView::OnStretch() 
+void GBMapView::OnStretch()
 {
   mapView.setStretch(!mapView.getStretch());
   paint();
-  regSetDwordValue("mapViewStretch", mapView.getStretch());  
+  regSetDwordValue("mapViewStretch", mapView.getStretch());
 }
 
-void GBMapView::OnAutoUpdate() 
+void GBMapView::OnAutoUpdate()
 {
   autoUpdate = !autoUpdate;
   if(autoUpdate) {
     theApp.winAddUpdateListener(this);
   } else {
-    theApp.winRemoveUpdateListener(this);    
+    theApp.winRemoveUpdateListener(this);
   }
 }
 
-void GBMapView::OnClose() 
+void GBMapView::OnClose()
 {
   theApp.winRemoveUpdateListener(this);
-  
+
   DestroyWindow();
 }
 
@@ -501,7 +501,7 @@ LRESULT GBMapView::OnMapInfo(WPARAM wParam, LPARAM lParam)
 
   int x = (int)(wParam & 0xffff);
   int y = (int)(wParam >> 16);
-  
+
   CString buffer;
   buffer.Format("(%d,%d)", x, y);
   GetDlgItem(IDC_XY)->SetWindowText(buffer);
@@ -522,21 +522,21 @@ LRESULT GBMapView::OnMapInfo(WPARAM wParam, LPARAM lParam)
     if(tile > 128) tile -= 128;
     else tile += 128;
   }
-  
+
   buffer.Format("%d", tile);
   GetDlgItem(IDC_TILE_NUM)->SetWindowText(buffer);
-  
+
   buffer.Empty();
   buffer += attrs & 0x20 ? 'H' : '-';
   buffer += attrs & 0x40 ? 'V' : '-';
   GetDlgItem(IDC_FLIP)->SetWindowText(buffer);
-  
+
   if(gbCgbMode) {
     buffer.Format("%d", (attrs & 7));
   } else
     buffer = "---";
   GetDlgItem(IDC_PALETTE_NUM)->SetWindowText(buffer);
-  
+
   buffer.Empty();
   if(gbCgbMode)
     buffer += attrs & 0x80 ? 'P' : '-';
@@ -551,7 +551,7 @@ LRESULT GBMapView::OnColInfo(WPARAM wParam, LPARAM)
 {
   u16 c = (u16)wParam;
 
-  color.setColor(c);  
+  color.setColor(c);
 
   int r = (c & 0x1f);
   int g = (c & 0x3e0) >> 5;
@@ -570,7 +570,7 @@ LRESULT GBMapView::OnColInfo(WPARAM wParam, LPARAM)
   return TRUE;
 }
 
-void GBMapView::PostNcDestroy() 
+void GBMapView::PostNcDestroy()
 {
   delete this;
   CDialog::PostNcDestroy();

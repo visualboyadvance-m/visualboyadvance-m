@@ -4,7 +4,7 @@
  * 07/Aug/2001 Davide Pizzolato - www.xdp.it
  * CxImage version 5.99c 17/Oct/2004
  */
- 
+
 #include "ximajpg.h"
 
 #if CXIMAGE_SUPPORT_JPG
@@ -12,7 +12,7 @@
 #include "../jpeg/jmorecfg.h"
 
 #include "ximaiter.h"
-         
+
 #include <setjmp.h>
 
 struct jpg_error_mgr {
@@ -131,7 +131,7 @@ bool CxImageJPG::Decode(CxFile * hFile)
 	if ((GetCodecOption(CXIMAGE_FORMAT_JPG) & DECODE_NOSMOOTH) != 0)
 		cinfo.do_fancy_upsampling = FALSE;
 
-//<DP>: Load true color images as RGB (no quantize) 
+//<DP>: Load true color images as RGB (no quantize)
 /* Step 4: set parameters for decompression */
 /*  if (cinfo.jpeg_color_space!=JCS_GRAYSCALE) {
  *	cinfo.quantize_colors = TRUE;
@@ -211,10 +211,10 @@ bool CxImageJPG::Decode(CxFile * hFile)
 	while (cinfo.output_scanline < cinfo.output_height) {
 
 		if (info.nEscape) longjmp(jerr.setjmp_buffer, 1); // <vho> - cancel decoding
-		
+
 		(void) jpeg_read_scanlines(&cinfo, buffer, 1);
 		// info.nProgress = (long)(100*cinfo.output_scanline/cinfo.output_height);
-		//<DP> Step 6a: CMYK->RGB */ 
+		//<DP> Step 6a: CMYK->RGB */
 		if ((cinfo.num_components==4)&&(cinfo.quantize_colors==FALSE)){
 			BYTE k,*dst,*src;
 			dst=iter.GetRow();
@@ -270,7 +270,7 @@ bool CxImageJPG::Encode(CxFile * hFile)
 	if (head.biClrUsed!=0 && !IsGrayScale()){
 		strcpy(info.szLastError,"JPEG can save only RGB or GreyScale images");
 		return false;
-	}	
+	}
 
 	// necessary for EXIF, and for roll backs
 	long pos=hFile->Tell();
@@ -318,7 +318,7 @@ bool CxImageJPG::Encode(CxFile * hFile)
 		jpeg_destroy_compress(&cinfo);
 		return 0;
 	}
-	
+
 	/* Now we can initialize the JPEG compression object. */
 	jpeg_create_compress(&cinfo);
 	/* Step 2: specify data destination (eg, a file) */

@@ -126,14 +126,14 @@ static __inline__ Uint32 SDL_Swap32(Uint32 x) {
 #if defined(__GNUC__) && defined(__i386__)
 static __inline__ Uint64 SDL_Swap64(Uint64 x)
 {
-	union { 
+	union {
 		struct { Uint32 a,b; } s;
 		Uint64 u;
 	} v;
 	v.u = x;
-	__asm__("bswapl %0 ; bswapl %1 ; xchgl %0,%1" 
-	        : "=r" (v.s.a), "=r" (v.s.b) 
-	        : "0" (v.s.a), "1" (v.s.b)); 
+	__asm__("bswapl %0 ; bswapl %1 ; xchgl %0,%1"
+	        : "=r" (v.s.a), "=r" (v.s.b)
+	        : "0" (v.s.a), "1" (v.s.b));
 	return v.u;
 }
 #elif defined(__GNUC__) && defined(__x86_64__)

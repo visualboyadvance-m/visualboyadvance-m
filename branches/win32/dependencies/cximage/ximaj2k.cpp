@@ -113,7 +113,7 @@ bool CxImageJ2K::Encode(CxFile * hFile)
 
 	long w=head.biWidth;
 	long h=head.biHeight;
- 
+
 	tcp->numlayers=1;
 	for (i=0;i<tcp->numlayers;i++) tcp->rates[i]=(w*h*GetJpegQuality())/600;
 
@@ -161,7 +161,7 @@ bool CxImageJ2K::Encode(CxFile * hFile)
     } else {
         return 0;
     }
-	
+
     cp->tdx=img->x1-img->x0;
 	cp->tdy=img->y1-img->y0;
 
@@ -194,7 +194,7 @@ bool CxImageJ2K::Encode(CxFile * hFile)
     } else {
 		hFile->Write(dest, len, 1);
 	}
-	
+
 	free(dest);
 	j2k_destroy(&img,&cp);
 

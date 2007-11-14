@@ -28,7 +28,7 @@ fex_type_t_ const fex_gz_type          [1] = {{ "GZ", &new_single_file }};
 fex_type_t_ const fex_single_file_type [1] = {{ ""  , &new_single_file }};
 
 Single_File_Extractor::~Single_File_Extractor() { close(); }
-	
+
 void Single_File_Extractor::close_() { gr.close();  }
 
 void Single_File_Extractor::set_name( const char* n )
@@ -39,7 +39,7 @@ void Single_File_Extractor::set_name( const char* n )
 void Single_File_Extractor::open_filter_( const char* path, Std_File_Reader* file )
 {
 	file->make_unbuffered(); // faster since Gzip_Reader already buffers data
-	
+
 	const char* name = strrchr( path, '\\' ); // DOS
 	if ( !name )
 		name = strrchr( path, '/' ); // UNIX
@@ -53,11 +53,11 @@ void Single_File_Extractor::open_filter_( const char* path, Std_File_Reader* fil
 blargg_err_t Single_File_Extractor::open_()
 {
 	RETURN_ERR( gr.open( &file() ) );
-	
+
 	size_ = gr.remain();
 	if ( size_ < 0 )
 		return "Read error";
-	
+
 	set_info( size_, name );
 	return 0;
 }

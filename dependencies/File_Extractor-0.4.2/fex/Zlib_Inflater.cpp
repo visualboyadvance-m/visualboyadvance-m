@@ -27,7 +27,7 @@ static const char* get_zlib_err( int code )
 	assert( code != Z_OK );
 	if ( code == Z_MEM_ERROR )
 		return "Out of memory";
-	
+
 	const char* str = zError( code );
 	if ( code == Z_DATA_ERROR )
 		str = Zlib_Inflater::corrupt_error;
@@ -45,7 +45,7 @@ void Zlib_Inflater::end()
 			check( false );
 	}
 	buf.clear();
-	
+
 	static z_stream const empty = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	memcpy( &zbuf, &empty, sizeof zbuf );
 }
@@ -75,15 +75,15 @@ blargg_err_t Zlib_Inflater::begin( callback_t new_callback, void* new_user_data,
 {
 	callback  = new_callback;
 	user_data = new_user_data;
-	
+
 	end();
-	
+
 	if ( !new_buf_size || (new_buf_size && buf.resize( new_buf_size )) )
 	{
 		RETURN_ERR( buf.resize( 4 * block_size ) );
 		initial_read = 0;
 	}
-	
+
 	// Fill buffer with some data, less than normal buffer size since caller might
 	// just be examining beginning of file.
 	return fill_buf( initial_read ? initial_read : block_size );
@@ -93,7 +93,7 @@ blargg_err_t Zlib_Inflater::set_mode( mode_t mode, long data_offset )
 {
 	zbuf.next_in  += data_offset;
 	zbuf.avail_in -= data_offset;
-	
+
 	if ( mode == mode_auto )
 	{
 		// examine buffer for gzip header
@@ -103,20 +103,20 @@ blargg_err_t Zlib_Inflater::set_mode( mode_t mode, long data_offset )
 				zbuf.next_in [0] == 0x1F && zbuf.next_in [1] == 0x8B )
 			mode = mode_ungz;
 	}
-	
+
 	if ( mode != mode_copy )
 	{
 		int wb = MAX_WBITS + 16; // have zlib handle gzip header
 		if ( mode == mode_raw_deflate )
 			wb = -MAX_WBITS;
-		
+
 		int zerr = inflateInit2( &zbuf, wb );
 		if ( zerr )
 		{
 			zbuf.next_in = 0;
 			return get_zlib_err( zerr );
 		}
-		
+
 		deflated_ = true;
 	}
 	return 0;
@@ -141,23 +141,23 @@ blargg_err_t Zlib_Inflater::read( void* out, long* count_io )
 					end();
 					break; // no more data to inflate
 				}
-				
+
 				if ( err && (err != Z_BUF_ERROR || old_avail_in) )
 					return get_zlib_err( err );
-				
+
 				if ( !zbuf.avail_out )
 				{
 					remain = 0;
 					break; // requested number of bytes inflate
 				}
-				
+
 				if ( zbuf.avail_in )
 				{
 					// inflate() should never leave input if there's still space for output
 					assert( false );
 					return corrupt_error;
 				}
-				
+
 				RETURN_ERR( fill_buf( buf.size() ) );
 				if ( !zbuf.avail_in )
 					return corrupt_error; // stream didn't end but there's no more data
@@ -180,13 +180,13 @@ blargg_err_t Zlib_Inflater::read( void* out, long* count_io )
 					zbuf.next_in  += count;
 					zbuf.avail_in -= count;
 				}
-				
+
 				if ( !zbuf.avail_in && zbuf.next_in < buf.end() )
 				{
 					end();
 					break;
 				}
-				
+
 				// read large request directly
 				if ( remain + zbuf.total_out % block_size >= buf.size() )
 				{
@@ -195,17 +195,17 @@ blargg_err_t Zlib_Inflater::read( void* out, long* count_io )
 					zbuf.total_out += count;
 					out = (char*) out + count;
 					remain -= count;
-					
+
 					if ( remain )
 					{
 						end();
 						break;
 					}
 				}
-				
+
 				if ( !remain )
 					break;
-				
+
 				RETURN_ERR( fill_buf( buf.size() - zbuf.total_out % block_size ) );
 			}
 		}

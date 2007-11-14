@@ -71,10 +71,10 @@ fex_err_t fex_open_type( fex_type_t type, const char* path, File_Extractor** out
 	*out = 0;
 	if ( !type )
 		return fex_wrong_file_type;
-	
+
 	File_Extractor* fex = type->new_fex();
 	CHECK_ALLOC( fex );
-	
+
 	fex_err_t err = fex->open( path );
 	if ( err )
 		delete fex;
@@ -90,20 +90,20 @@ const char* fex_identify_header( void const* header )
 	{
 		case 0x52457E5E:
 		case 0x52617221: return "RAR";
-		
+
 		case 0x377ABCAF: return "7Z";
-		
+
 		case 0x504B0304:
 		case 0x504B0506: return "ZIP";
-		
+
 		// TODO: also identify other archive types *not* supported?
 		// unsupported types, to avoid opening them in Single_File_Extractor
 		//case 0x53495421: return "SIT";
 	}
-	
+
 	if ( (four >> 16) == 0x1F8B )
 		return "GZ";
-	
+
 	return "";
 }
 
@@ -122,16 +122,16 @@ fex_type_t fex_identify_extension( const char* extension_ )
 	char const* end = strrchr( extension_, '.' );
 	if ( end )
 		extension_ = end + 1;
-	
+
 	char extension [6];
 	to_uppercase( extension_, sizeof extension, extension );
-	
+
 	fex_type_t result = 0;
 	for ( fex_type_t const* types = fex_type_list_; *types; types++ )
 	{
 		if ( !*(*types)->extension )
 			result = *types; // fex_single_file_type, so use if nothing else matches
-		
+
 		if ( !strcmp( extension, (*types)->extension ) )
 			return *types;
 	}
@@ -149,14 +149,14 @@ fex_err_t fex_identify_file( const char* path, fex_type_t* type_out )
 		RETURN_ERR( in.read( header, sizeof header ) );
 		*type_out = fex_identify_extension( fex_identify_header( header ) );
 	}
-	return 0;   
+	return 0;
 }
 
 fex_err_t fex_open( const char* path, File_Extractor** out )
 {
 	require( path && out );
 	*out = 0;
-	
+
 	fex_type_t type;
 	RETURN_ERR( fex_identify_file( path, &type ) );
 	return fex_open_type( type, path, out );

@@ -171,11 +171,11 @@ RGBQUAD CxImage::GetPixelColor(long x,long y, bool bGetAlpha)
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * This is (a bit) faster version of GetPixelColor. 
+ * This is (a bit) faster version of GetPixelColor.
  * It tests bounds only in debug mode (_DEBUG defined).
- * 
- * It is an error to request out-of-borders pixel with this method. 
- * In DEBUG mode an exception will be thrown, and data will be violated in non-DEBUG mode. 
+ *
+ * It is an error to request out-of-borders pixel with this method.
+ * In DEBUG mode an exception will be thrown, and data will be violated in non-DEBUG mode.
  * \author ***bd*** 2.2004
  */
 RGBQUAD CxImage::BlindGetPixelColor(const long x,const long y)
@@ -364,7 +364,7 @@ bool CxImage::GetPaletteColor(BYTE i, BYTE* r, BYTE* g, BYTE* b)
 	if (ppal) {
 		*r = ppal[i].rgbRed;
 		*g = ppal[i].rgbGreen;
-		*b = ppal[i].rgbBlue; 
+		*b = ppal[i].rgbBlue;
 		return true;
 	}
 	return false;
@@ -556,7 +556,7 @@ void CxImage::SetClrImportant(DWORD ncolors)
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * Returns pointer to pixel. Currently implemented only for truecolor images.
- *  
+ *
  * \param  x,y - coordinates
  *
  * \return pointer to first byte of pixel data
@@ -591,7 +591,7 @@ void CxImage::DrawLine(int StartX, int EndX, int StartY, int EndY, RGBQUAD color
 	int y2 = EndY;
 
 	int xinc1,xinc2,yinc1,yinc2;      // Increasing values
-	int den, num, numadd,numpixels;   
+	int den, num, numadd,numpixels;
 	int deltax = abs(x2 - x1);        // The difference between the x's
 	int deltay = abs(y2 - y1);        // The difference between the y's
 
@@ -631,12 +631,12 @@ void CxImage::DrawLine(int StartX, int EndX, int StartY, int EndY, RGBQUAD color
 		numadd = deltax;
 		numpixels = deltay;         // There are more y-values than x-values
 	}
-	
+
 	for (int curpixel = 0; curpixel <= numpixels; curpixel++)
 	{
 		// Draw the current pixel
 		SetPixelColor(x,y,color,bSetAlpha);
-		
+
 		num += numadd;              // Increase the numerator by the top of the fraction
 		if (num >= den)             // Check if numerator >= denominator
 		{

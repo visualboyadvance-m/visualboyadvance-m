@@ -37,20 +37,20 @@ blargg_err_t File_Extractor::open( const char* path )
 {
 	Std_File_Reader* in = BLARGG_NEW Std_File_Reader;
 	CHECK_ALLOC( in );
-	
+
 	blargg_err_t err = in->open( path );
 	if ( !err )
 	{
 		open_filter_( path, in );
 		err = this->open( in );
 	}
-	
+
 	if ( err )
 	{
 		delete in;
 		return err;
 	}
-	
+
 	own_file();
 	return 0;
 }
@@ -119,7 +119,7 @@ blargg_err_t File_Extractor::next()
 {
 	if ( done() )
 		return "End of archive";
-	
+
 	clear_file();
 	blargg_err_t err = next_();
 	if ( err )
@@ -133,11 +133,11 @@ blargg_err_t File_Extractor::rewind()
 {
 	if ( !reader_ )
 		return "No open archive";
-	
+
 	done_      = false;
 	scan_only_ = false;
 	clear_file();
-	
+
 	blargg_err_t err = rewind_();
 	if ( err )
 	{
@@ -153,7 +153,7 @@ blargg_err_t File_Extractor::data_( byte const*& out )
 {
 	if ( !own_data_ )
 		CHECK_ALLOC( own_data_ = (byte*) malloc( size_ ? size_ : 1 ) );
-	
+
 	out = own_data_;
 	return read_once( own_data_, size_ );
 }
@@ -171,10 +171,10 @@ unsigned char const* File_Extractor::data( blargg_err_t* error_out )
 		if ( error )
 			free_data();
 	}
-	
+
 	if ( error_out )
 		*error_out = error;
-	
+
 	return data_ptr_;
 }
 
@@ -183,7 +183,7 @@ blargg_err_t File_Extractor::extract( Data_Writer& out )
 	blargg_err_t error;
 	byte const* p = data( &error );
 	RETURN_ERR( error );
-	
+
 	return out.write( p, size_ );
 }
 
@@ -204,7 +204,7 @@ long File_Extractor::read_avail( void* out, long count )
 		long r = remain();
 		if ( count > r )
 			count = r;
-		
+
 		if ( read( out, count ) )
 			count = -1;
 	}
@@ -215,7 +215,7 @@ blargg_err_t File_Extractor::read( void* out, long count )
 {
 	if ( count > remain() )
 		return "End of file";
-	
+
 	if ( count == size_ && !data_ptr_ )
 	{
 		// avoid temporary buffer when reading entire file in one call
@@ -230,12 +230,12 @@ blargg_err_t File_Extractor::read( void* out, long count )
 			data( &err ); // sets data_ptr_
 			RETURN_ERR( err );
 		}
-	
+
 		memcpy( out, data_ptr_ + data_pos_, count );
 	}
 	data_pos_ += count;
 	if ( data_pos_ == size_ )
 		free_data();
-	
+
 	return 0;
 }

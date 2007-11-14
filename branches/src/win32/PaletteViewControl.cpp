@@ -39,7 +39,7 @@ bool PaletteViewControl::isRegistered = false;
 PaletteViewControl::PaletteViewControl()
 {
   memset(&bmpInfo.bmiHeader, 0, sizeof(bmpInfo.bmiHeader));
-  
+
   bmpInfo.bmiHeader.biSize = sizeof(bmpInfo.bmiHeader);
   bmpInfo.bmiHeader.biWidth = 256;
   bmpInfo.bmiHeader.biHeight = -256;
@@ -54,7 +54,7 @@ PaletteViewControl::PaletteViewControl()
   colors = 256;
 
   paletteAddress = 0;
-  
+
   ZeroMemory(palette, 512);
 
   selected = -1;
@@ -87,7 +87,7 @@ void PaletteViewControl::init(int c, int w, int h)
   this->colors = c;
 
   bmpInfo.bmiHeader.biWidth = w;
-  bmpInfo.bmiHeader.biHeight = -h;  
+  bmpInfo.bmiHeader.biHeight = -h;
 }
 
 
@@ -140,7 +140,7 @@ bool PaletteViewControl::saveMSPAL(const char *name)
   utilPutWord(&data[0], 0x0300);
   utilPutWord(&data[2], 256); // causes problems if not 16 or 256
   fwrite(data, 1, 4, f);
-  
+
   for(int i = 0; i < colors; i++) {
     u16 c = palette[i];
     int r = (c & 0x1f) << 3;
@@ -170,7 +170,7 @@ bool PaletteViewControl::saveJASCPAL(const char *name)
     return false;
 
   fprintf(f, "JASC-PAL\r\n0100\r\n256\r\n");
-  
+
   for(int i = 0; i < colors; i++) {
     u16 c = palette[i];
     int r = (c & 0x1f) << 3;
@@ -185,7 +185,7 @@ bool PaletteViewControl::saveJASCPAL(const char *name)
   }
   fclose(f);
 
-  return true;  
+  return true;
 }
 
 void PaletteViewControl::setPaletteAddress(int address)
@@ -274,7 +274,7 @@ void PaletteViewControl::render(u16 color, int x, int y)
     *start++ = b;
     *start++ = g;
     *start++ = r;
-    
+
     start += skip;
   }
 }
@@ -290,7 +290,7 @@ void PaletteViewControl::refresh()
   InvalidateRect(NULL, FALSE);
 }
 
-void PaletteViewControl::OnLButtonDown(UINT nFlags, CPoint point) 
+void PaletteViewControl::OnLButtonDown(UINT nFlags, CPoint point)
 {
   int x = point.x;
   int y = point.y;
@@ -304,33 +304,33 @@ void PaletteViewControl::OnLButtonDown(UINT nFlags, CPoint point)
   int multY = h / sh;
 
   setSelected(x/mult + (y/multY)*sw);
-  
+
   GetParent()->SendMessage(WM_PALINFO,
                            palette[x/mult+(y/multY)*sw],
                            paletteAddress+(x/mult+(y/multY)*sw));
 }
 
-BOOL PaletteViewControl::OnEraseBkgnd(CDC* pDC) 
+BOOL PaletteViewControl::OnEraseBkgnd(CDC* pDC)
 {
   return TRUE;
 }
 
 
-void PaletteViewControl::OnPaint() 
+void PaletteViewControl::OnPaint()
 {
   CPaintDC dc(this); // device context for painting
-  
+
   RECT rect;
   GetClientRect(&rect);
   int w = rect.right - rect.left;
   int h = rect.bottom - rect.top;
-  
+
   CDC memDC;
   memDC.CreateCompatibleDC(&dc);
   CBitmap bitmap, *pOldBitmap;
   bitmap.CreateCompatibleBitmap(&dc, w, h);
   pOldBitmap = memDC.SelectObject(&bitmap);
-  
+
   StretchDIBits(memDC.GetSafeHdc(),
                 0,
                 0,
@@ -372,7 +372,7 @@ void PaletteViewControl::OnPaint()
     int startY = (selected / sw)*multY+1;
     int endX = startX + mult-2;
     int endY = startY + multY-2;
-    
+
     memDC.MoveTo(startX, startY);
     memDC.LineTo(endX, startY);
     memDC.LineTo(endX, endY);
@@ -382,7 +382,7 @@ void PaletteViewControl::OnPaint()
     memDC.SelectObject(old);
     pen.DeleteObject();
   }
-  
+
   dc.BitBlt(0,0,w,h,
             &memDC,0,0,SRCCOPY);
 

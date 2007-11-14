@@ -427,7 +427,7 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   /////////////////////////////////////////////////////////////////////////////
 // MainWnd message handlers
 
-void MainWnd::OnClose() 
+void MainWnd::OnClose()
 {
   emulating = false;
   CWnd::OnClose();
@@ -444,14 +444,14 @@ bool MainWnd::FileRun()
     writeBatteryFile();
     cheatSearchCleanup(&cheatSearchData);
     theApp.emulator.emuCleanUp();
-    remoteCleanUp(); 
-    emulating = false;   
+    remoteCleanUp();
+    emulating = false;
   }
   char tempName[2048];
   char file[2048];
-  
+
   utilGetBaseName(theApp.szFile, tempName);
-  
+
   _fullpath(file, tempName, 1024);
   theApp.filename = file;
 
@@ -460,7 +460,7 @@ bool MainWnd::FileRun()
     theApp.filename = theApp.filename.Left(index);
 
   CString ipsname;
-  ipsname.Format("%s.ips", theApp.filename);  
+  ipsname.Format("%s.ips", theApp.filename);
 
   if(!theApp.dir.GetLength()) {
     int index = theApp.filename.ReverseFind('\\');
@@ -496,15 +496,15 @@ bool MainWnd::FileRun()
       char *p = strrchr(tempName, '\\');
       if(p)
         *p = 0;
-    
+
       strcat(tempName, "\\DMG_ROM.bin");
 
       skipBios = theApp.skipBiosFile ? true : false;
       gbCPUInit(tempName, theApp.useBiosFile ? true : false);
     }
 
-    
-  
+
+
     gbReset();
     theApp.emulator = GBSystem;
     gbBorderOn = theApp.winGbBorderOn;
@@ -527,7 +527,7 @@ bool MainWnd::FileRun()
       return false;
 
     theApp.romSize = size;
-   
+
     flashSetSize(theApp.winFlashSize);
     rtcEnable(theApp.winRtcEnable);
     cpuSaveType = theApp.winSaveType;
@@ -537,13 +537,13 @@ bool MainWnd::FileRun()
     char *p = strrchr(tempName, '\\');
     if(p)
       *p = 0;
-    
+
     char buffer[5];
     strncpy(buffer, (const char *)&rom[0xac], 4);
     buffer[4] = 0;
 
     strcat(tempName, "\\vba-over.ini");
-    
+
     UINT i = GetPrivateProfileInt(buffer,
                                   "rtcEnabled",
                                   -1,
@@ -570,14 +570,14 @@ bool MainWnd::FileRun()
                              tempName);
     if(i != (UINT)-1)
       doMirroring (i == 0 ? false : true);
-    
+
     theApp.emulator = GBASystem;
     /* disabled due to problems
     if(theApp.removeIntros && rom != NULL) {
       *((u32 *)rom)= 0xea00002e;
     }
     */
-    
+
     if(theApp.autoIPS) {
       int size = 0x2000000;
       utilApplyIPS(ipsname, &rom, &size);
@@ -586,7 +586,7 @@ bool MainWnd::FileRun()
       }
     }
   }
-    
+
   if(theApp.soundInitialized) {
     if(theApp.cartridgeType == 1)
       gbSoundReset();
@@ -608,7 +608,7 @@ bool MainWnd::FileRun()
 
   if(theApp.autoSaveLoadCheatList)
     winLoadCheatListDefault();
-  
+
   theApp.addRecentFile(theApp.szFile);
 
   theApp.updateWindowSize(theApp.videoOption);
@@ -617,7 +617,7 @@ bool MainWnd::FileRun()
 
   if(theApp.autoHideMenu && theApp.videoOption > VIDEO_4X && theApp.menuToggle)
     OnFileTogglemenu();
- 
+
   emulating = true;
 
   if(theApp.autoLoadMostRecent)
@@ -630,19 +630,19 @@ bool MainWnd::FileRun()
   theApp.rewindCount = 0;
   theApp.rewindCounter = 0;
   theApp.rewindSaveNeeded = false;
-  
+
   return true;
 }
 
-void MainWnd::OnInitMenuPopup(CMenu* pMenu, UINT nIndex, BOOL bSysMenu) 
+void MainWnd::OnInitMenuPopup(CMenu* pMenu, UINT nIndex, BOOL bSysMenu)
 {
   ASSERT(pMenu != NULL);
-  
+
   CCmdUI state;
   state.m_pMenu = pMenu;
   ASSERT(state.m_pOther == NULL);
   ASSERT(state.m_pParentMenu == NULL);
-  
+
   // determine if menu is popup in top-level menu and set m_pOther to
   //  it if so (m_pParentMenu == NULL indicates that it is secondary popup)
   HMENU hParentMenu;
@@ -663,14 +663,14 @@ void MainWnd::OnInitMenuPopup(CMenu* pMenu, UINT nIndex, BOOL bSysMenu)
       }
     }
   }
-  
+
   state.m_nIndexMax = pMenu->GetMenuItemCount();
   for (state.m_nIndex = 0; state.m_nIndex < state.m_nIndexMax;
        state.m_nIndex++) {
     state.m_nID = pMenu->GetMenuItemID(state.m_nIndex);
     if (state.m_nID == 0)
       continue; // menu separator or invalid cmd - ignore it
-    
+
     ASSERT(state.m_pOther == NULL);
     ASSERT(state.m_pMenu != NULL);
     if (state.m_nID == (UINT)-1) {
@@ -689,7 +689,7 @@ void MainWnd::OnInitMenuPopup(CMenu* pMenu, UINT nIndex, BOOL bSysMenu)
       state.m_pSubMenu = NULL;
       state.DoUpdate(this, state.m_nID < 0xF000);
     }
-    
+
     // adjust for menu deletions and additions
     UINT nCount = pMenu->GetMenuItemCount();
     if (nCount < state.m_nIndexMax) {
@@ -703,15 +703,15 @@ void MainWnd::OnInitMenuPopup(CMenu* pMenu, UINT nIndex, BOOL bSysMenu)
   }
 }
 
-void MainWnd::OnMove(int x, int y) 
+void MainWnd::OnMove(int x, int y)
 {
   CWnd::OnMove(x, y);
-  
+
   if(!theApp.changingVideoSize) {
     if(this) {
       if(!IsIconic()) {
         RECT r;
-            
+
         GetWindowRect(&r);
         theApp.windowPositionX = r.left;
         theApp.windowPositionY = r.top;
@@ -723,10 +723,10 @@ void MainWnd::OnMove(int x, int y)
   }
 }
 
-void MainWnd::OnSize(UINT nType, int cx, int cy) 
+void MainWnd::OnSize(UINT nType, int cx, int cy)
 {
   CWnd::OnSize(nType, cx, cy);
-  
+
   if(!theApp.changingVideoSize) {
     if(this) {
       if(!IsIconic()) {
@@ -750,7 +750,7 @@ void MainWnd::OnSize(UINT nType, int cx, int cy)
             soundPause();
           }
         }
-        theApp.iconic = true;                  
+        theApp.iconic = true;
       }
     }
   }
@@ -951,7 +951,7 @@ CString MainWnd::winLoadFilter(UINT id)
 {
   CString res = winResLoadString(id);
   res.Replace('_','|');
-  
+
   return res;
 }
 
@@ -969,7 +969,7 @@ bool MainWnd::writeSaveGame(const char *name)
   return false;
 }
 
-void MainWnd::OnContextMenu(CWnd* pWnd, CPoint point) 
+void MainWnd::OnContextMenu(CWnd* pWnd, CPoint point)
 {
   winMouseOn();
   if(theApp.skin) {
@@ -1039,7 +1039,7 @@ bool MainWnd::fileOpenSelect( bool gb )
 	} else {
 		initialDir = regQueryStringValue( _T("romdir"), _T(".") );
 	}
-	
+
 	if( initialDir[0] == '.' ) {
 		// handle as relative path
 		char baseDir[MAX_PATH+1];
@@ -1062,9 +1062,9 @@ bool MainWnd::fileOpenSelect( bool gb )
 			selectedFilter = 0;
 		}
 	}
-	
+
 	theApp.szFile = _T("");
-	
+
 	LPCTSTR exts[] = { _T(""), _T(""), _T(""), _T("") };
 	CString filter;
 	CString title;
@@ -1094,10 +1094,10 @@ bool MainWnd::fileOpenSelect( bool gb )
 }
 
 
-void MainWnd::OnPaint() 
+void MainWnd::OnPaint()
 {
   CPaintDC dc(this); // device context for painting
-  
+
   if(emulating) {
     theApp.painting = true;
     systemDrawScreen();
@@ -1106,7 +1106,7 @@ void MainWnd::OnPaint()
   }
 }
 
-BOOL MainWnd::PreTranslateMessage(MSG* pMsg) 
+BOOL MainWnd::PreTranslateMessage(MSG* pMsg)
 {
   if (CWnd::PreTranslateMessage(pMsg))
     return TRUE;
@@ -1114,14 +1114,14 @@ BOOL MainWnd::PreTranslateMessage(MSG* pMsg)
   if(pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {
     return theApp.hAccel != NULL &&  ::TranslateAccelerator(m_hWnd, theApp.hAccel, pMsg);
   }
-  
+
   return FALSE;
 }
 
 void MainWnd::screenCapture(int captureNumber)
 {
   CString buffer;
-  
+
   CString captureDir = regQueryStringValue("captureDir", "");
   if( captureDir[0] == '.' ) {
 	  // handle as relative path
@@ -1134,20 +1134,20 @@ void MainWnd::screenCapture(int captureNumber)
 	  captureDir = baseDir;
 	}
   int index = theApp.filename.ReverseFind('\\');
-  
+
   CString name;
   if(index != -1)
     name = theApp.filename.Right(theApp.filename.GetLength()-index-1);
   else
     name = theApp.filename;
-  
+
   if(captureDir.IsEmpty())
     captureDir = getDirFromFile(theApp.filename);
 
   LPCTSTR ext = "png";
   if(theApp.captureFormat != 0)
     ext = "bmp";
-  
+
   if(isDriveRoot(captureDir))
     buffer.Format("%s%s_%02d.%s",
                   captureDir,
@@ -1188,24 +1188,24 @@ void MainWnd::winMouseOn()
     theApp.mouseCounter = 0;
 }
 
-void MainWnd::OnMouseMove(UINT nFlags, CPoint point) 
+void MainWnd::OnMouseMove(UINT nFlags, CPoint point)
 {
   winMouseOn();
-  
+
   CWnd::OnMouseMove(nFlags, point);
 }
 
-void MainWnd::OnInitMenu(CMenu* pMenu) 
+void MainWnd::OnInitMenu(CMenu* pMenu)
 {
   CWnd::OnInitMenu(pMenu);
-  
-  soundPause();  
+
+  soundPause();
 }
 
-void MainWnd::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized) 
+void MainWnd::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 {
   CWnd::OnActivate(nState, pWndOther, bMinimized);
-  
+
   bool a = (nState == WA_ACTIVE) || (nState == WA_CLICKACTIVE);
 
   if(a && theApp.input) {
@@ -1225,7 +1225,7 @@ void MainWnd::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
       theApp.active = a;
     }
 
-    memset(theApp.delta,255,sizeof(theApp.delta));        
+    memset(theApp.delta,255,sizeof(theApp.delta));
   }
 
   if(theApp.paused && emulating)
@@ -1244,7 +1244,7 @@ void MainWnd::OnActivateApp(BOOL bActive, DWORD hTask)
 #endif
 {
   CWnd::OnActivateApp(bActive, hTask);
-  
+
   if(theApp.tripleBuffering && theApp.videoOption > VIDEO_4X) {
     if(bActive) {
       if(theApp.display)
@@ -1253,7 +1253,7 @@ void MainWnd::OnActivateApp(BOOL bActive, DWORD hTask)
   }
 }
 
-void MainWnd::OnDropFiles(HDROP hDropInfo) 
+void MainWnd::OnDropFiles(HDROP hDropInfo)
 {
   char szFile[1024];
 

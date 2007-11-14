@@ -62,9 +62,9 @@ enum {
 extern CheatSearchData cheatSearchData;
 extern void cheatSearchCleanup(CheatSearchData *cs);
 extern void cheatSearchStart(const CheatSearchData *cs);
-extern void cheatSearch(const CheatSearchData *cs, int compare, int size, 
+extern void cheatSearch(const CheatSearchData *cs, int compare, int size,
                         bool isSigned);
-extern void cheatSearchValue(const CheatSearchData *cs, int compare, int size, 
+extern void cheatSearchValue(const CheatSearchData *cs, int compare, int size,
                              bool isSigned, u32 value);
 extern int cheatSearchGetCount(const CheatSearchData *cs, int size);
 extern void cheatSearchUpdateValues(const CheatSearchData *cs);

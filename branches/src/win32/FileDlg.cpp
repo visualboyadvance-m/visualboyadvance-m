@@ -64,7 +64,7 @@ static UINT_PTR CALLBACK HookFuncOldStyle(HWND hwnd,
     if(msg == WM_COMMAND) {
       if(HIWORD(wParam) == CBN_SELCHANGE) {
         if(LOWORD(wParam) == cmb1) {
-          // call method with combobox handle to keep 
+          // call method with combobox handle to keep
           // behaviour there
           instance->OnTypeChange((HWND)lParam);
           return 1;
@@ -83,7 +83,7 @@ static UINT_PTR CALLBACK HookFuncOldStyle(HWND hwnd,
 //////////////////////////////////////////////////////////////////////
 
 FileDlg::FileDlg(CWnd *parent, LPCTSTR file, LPCTSTR filter,
-                 int filterIndex, LPCTSTR ext, LPCTSTR *exts, LPCTSTR initialDir, 
+                 int filterIndex, LPCTSTR ext, LPCTSTR *exts, LPCTSTR initialDir,
                  LPCTSTR title, bool save)
 {
   OSVERSIONINFO info;
@@ -91,7 +91,7 @@ FileDlg::FileDlg(CWnd *parent, LPCTSTR file, LPCTSTR filter,
   GetVersionEx(&info);
   m_file = file;
   int size = sizeof(OPENFILENAME);
-  
+
   // avoid problems if OPENFILENAME is already defined with the extended fields
   // needed for the enhanced open/save dialog
 #if _WIN32_WINNT < 0x0500
@@ -114,9 +114,9 @@ FileDlg::FileDlg(CWnd *parent, LPCTSTR file, LPCTSTR filter,
   m_ofn.Flags = OFN_PATHMUSTEXIST | OFN_ENABLESIZING | OFN_ENABLEHOOK;
   m_ofn.Flags |= OFN_EXPLORER;
   m_filter = filter;
-  
+
   char *p = m_filter.GetBuffer(0);
-  
+
   while ((p = strchr(p, '|')) != NULL)
     *p++ = 0;
   m_ofn.lpstrFilter = m_filter;
@@ -150,7 +150,7 @@ void FileDlg::OnTypeChange(HWND hwnd)
 
   if(fileNameControl == NULL)
     return;
-  
+
   CString filename;
   GetWindowText(fileNameControl, filename.GetBuffer(MAX_PATH), MAX_PATH);
   filename.ReleaseBuffer();
@@ -162,9 +162,9 @@ void FileDlg::OnTypeChange(HWND hwnd)
   LRESULT sel = ::SendMessage(typeControl, CB_GETCURSEL, 0, 0);
 
   ASSERT(sel != -1);
-  
+
   LPCTSTR typeName = extensions[sel];
-  
+
   if(filename.GetLength() == 0) {
     if(strlen(typeName) != 0)
       filename.Format("*%s", typeName);

@@ -33,11 +33,11 @@ typedef struct profile_segment {
   u32  s_lowpc;
   u32  s_highpc;
   unsigned long s_textsize;
-  
+
   int ssiz;
   char *sbuf;
   int s_scale;
-  
+
   struct profile_segment *next;
 
 } profile_segment;

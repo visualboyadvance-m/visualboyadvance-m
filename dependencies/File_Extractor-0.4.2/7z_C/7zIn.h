@@ -6,10 +6,10 @@
 #include "7zHeader.h"
 #include "7zItem.h"
 #include "7zAlloc.h"
- 
+
 typedef struct _CInArchiveInfo
 {
-	CFileSize StartPositionAfterHeader; 
+	CFileSize StartPositionAfterHeader;
 	CFileSize DataStartPosition;
 }CInArchiveInfo;
 
@@ -35,9 +35,9 @@ typedef struct _ISzInStream
 			void *object,           /* pointer to ISzInStream itself */
 			void **buffer,          /* out: pointer to buffer with data */
 			size_t maxRequiredSize, /* max required size to read */
-			size_t *processedSize); /* real processed size. 
+			size_t *processedSize); /* real processed size.
 									 processedSize can be less than maxRequiredSize.
-									 If processedSize == 0, then there are no more 
+									 If processedSize == 0, then there are no more
 									 bytes in stream. */
 	#else
 	SZ_RESULT (*Read)(void *object, void *buffer, size_t size, size_t *processedSize);
@@ -45,11 +45,11 @@ typedef struct _ISzInStream
 	SZ_RESULT (*Seek)(void *object, CFileSize pos);
 } ISzInStream;
 
- 
+
 int SzArchiveOpen(
-		ISzInStream *inStream, 
+		ISzInStream *inStream,
 		CArchiveDatabaseEx *db,
-		ISzAlloc *allocMain, 
+		ISzAlloc *allocMain,
 		ISzAlloc *allocTemp);
- 
+
 #endif

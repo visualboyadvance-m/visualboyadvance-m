@@ -9,7 +9,7 @@
 
 #if CXIMAGE_SUPPORT_BMP
 
-#include "ximaiter.h" 
+#include "ximaiter.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 #if CXIMAGE_SUPPORT_ENCODE
@@ -197,7 +197,7 @@ bool CxImageBMP::Decode(CxFile * hFile)
 										low_nibble = !low_nibble;
 									}
 									if ((((status_byte+1) >> 1) & 1 )== 1)
-										hFile->Read(&second_byte, sizeof(BYTE), 1);												
+										hFile->Read(&second_byte, sizeof(BYTE), 1);
 									break;
 							};
 							break;
@@ -215,7 +215,7 @@ bool CxImageBMP::Decode(CxFile * hFile)
 									if ((DWORD)(sline+bits) < (DWORD)(info.pImage+head.biSizeImage)){
 										*(sline + bits) = (BYTE)(second_byte & 0xF0);
 									}
-								}				
+								}
 								low_nibble = !low_nibble;
 							}
 						}
@@ -259,11 +259,11 @@ bool CxImageBMP::Decode(CxFile * hFile)
 								}
 								default :
 									hFile->Read((void *)(iter.GetRow(scanline) + bits), sizeof(BYTE) * status_byte, 1);
-									// align run length to even number of bytes 
+									// align run length to even number of bytes
 									if ((status_byte & 1) == 1)
-										hFile->Read(&second_byte, sizeof(BYTE), 1);												
-									bits += status_byte;													
-									break;								
+										hFile->Read(&second_byte, sizeof(BYTE), 1);
+									bits += status_byte;
+									break;
 							};
 							break;
 						default :
@@ -272,7 +272,7 @@ bool CxImageBMP::Decode(CxFile * hFile)
 							for (unsigned i = 0; i < status_byte; i++) {
 								if ((DWORD)bits<info.dwEffWidth){
 									*(sline + bits) = second_byte;
-									bits++;					
+									bits++;
 								} else {
 									bContinue = FALSE;
 									break;
@@ -283,7 +283,7 @@ bool CxImageBMP::Decode(CxFile * hFile)
 				}
 				break;
 			}
-			default :								
+			default :
 				throw "compression type not supported";
 		}
 	}

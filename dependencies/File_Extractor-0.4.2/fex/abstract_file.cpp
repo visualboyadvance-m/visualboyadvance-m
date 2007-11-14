@@ -31,10 +31,10 @@ blargg_err_t Std_File_Writer::open( const char* path )
 	file_ = fopen( path, "wb" );
 	if ( !file_ )
 		return "Couldn't open file for writing";
-		
+
 	// TODO: increase file buffer size?
 	//setvbuf( file_, 0, _IOFBF, 32 * 1024L );
-	
+
 	return 0;
 }
 
@@ -86,7 +86,7 @@ blargg_err_t Mem_Writer::write( const void* p, long s )
 	{
 		if ( mode == fixed )
 			return "Tried to write more data than expected";
-		
+
 		if ( mode == ignore_excess )
 		{
 			s = remain;
@@ -95,20 +95,20 @@ blargg_err_t Mem_Writer::write( const void* p, long s )
 		{
 			long new_allocated = size_ + s;
 			new_allocated += (new_allocated >> 1) + 2048;
-			
+
 			void* p = realloc( data_, new_allocated );
 			if ( !p )
 				return "Out of memory";
-			
+
 			data_     = (char*) p;
 			allocated = new_allocated;
 		}
 	}
-	
+
 	assert( size_ + s <= allocated );
 	memcpy( data_ + size_, p, s );
 	size_ += s;
-	
+
 	return 0;
 }
 

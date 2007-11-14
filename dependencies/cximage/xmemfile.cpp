@@ -78,7 +78,7 @@ size_t CxMemFile::Write(const void *buffer, size_t size, size_t count)
 	m_Position += nCount;
 
 	if (m_Position > (long)m_Size) m_Size = m_Position;
-	
+
 	return count;
 }
 //////////////////////////////////////////////////////////
@@ -138,7 +138,7 @@ bool CxMemFile::PutC(unsigned char c)
 	m_Position += 1;
 
 	if (m_Position > (long)m_Size) m_Size = m_Position;
-	
+
 	return true;
 }
 //////////////////////////////////////////////////////////

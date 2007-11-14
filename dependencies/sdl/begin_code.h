@@ -42,7 +42,7 @@
 # elif defined(__WIN32__)
 #  ifdef __BORLANDC__
 #   ifdef BUILD_SDL
-#    define DECLSPEC 
+#    define DECLSPEC
 #   else
 #    define DECLSPEC	__declspec(dllimport)
 #   endif
@@ -84,7 +84,7 @@
 #endif /* SDLCALL */
 
 /* Removed DECLSPEC on Symbian OS because SDL cannot be a DLL in EPOC */
-#ifdef __SYMBIAN32__ 
+#ifdef __SYMBIAN32__
 #undef DECLSPEC
 #define DECLSPEC
 #endif /* __SYMBIAN32__ */

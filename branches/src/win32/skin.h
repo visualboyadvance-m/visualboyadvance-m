@@ -61,7 +61,7 @@ class CSkin
 
   // tell the class if it has a window subclassed.
   bool      m_bHooked;
-      
+
   // skin retrieval helper
   bool      GetSkinData(const char *skin);
 
@@ -94,7 +94,7 @@ class CSkin
   // ----------------------------------------------------------------------------
   bool Initialize(const char *);
 
-      
+
   // ----------------------------------------------------------------------------
   // destroy skin resources and free allocated resources
   // ----------------------------------------------------------------------------

@@ -57,14 +57,14 @@ static inline u32 CPUReadMemory(u32 address)
 {
 
 #ifdef DEV_VERSION
-  if(address & 3) {  
+  if(address & 3) {
     if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
       log("Unaligned word read: %08x at %08x\n", address, armMode ?
           armNextPC - 4 : armNextPC - 2);
     }
   }
 #endif
-  
+
   u32 value;
   switch(address >> 24) {
   case 0:
@@ -76,7 +76,7 @@ static inline u32 CPUReadMemory(u32 address)
               armNextPC - 4 : armNextPC - 2);
         }
 #endif
-        
+
         value = READ32LE(((u32 *)&biosProtected));
       }
       else goto unreadable;
@@ -120,7 +120,7 @@ static inline u32 CPUReadMemory(u32 address)
   case 11:
   case 12:
     value = READ32LE(((u32 *)&rom[address&0x1FFFFFC]));
-    break;    
+    break;
   case 13:
     if(cpuEEPROMEnabled)
       // no need to swap this
@@ -156,7 +156,7 @@ static inline u32 CPUReadMemory(u32 address)
 #ifdef C_CORE
     int shift = (address & 3) << 3;
     value = (value >> shift) | (value << (32 - shift));
-#else    
+#else
 #ifdef __GNUC__
     asm("and $3, %%ecx;"
         "shl $3 ,%%ecx;"
@@ -180,7 +180,7 @@ extern u32 myROM[];
 
 static inline u32 CPUReadHalfWord(u32 address)
 {
-#ifdef DEV_VERSION      
+#ifdef DEV_VERSION
   if(address & 1) {
     if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
       log("Unaligned halfword read: %08x at %08x\n", address, armMode ?
@@ -188,9 +188,9 @@ static inline u32 CPUReadHalfWord(u32 address)
     }
   }
 #endif
-  
+
   u32 value;
-  
+
   switch(address >> 24) {
   case 0:
     if (reg[15].I >> 24) {
@@ -259,7 +259,7 @@ static inline u32 CPUReadHalfWord(u32 address)
       value = rtcRead(address);
     else
       value = READ16LE(((u16 *)&rom[address & 0x1FFFFFE]));
-    break;    
+    break;
   case 13:
     if(cpuEEPROMEnabled)
       // no need to swap this
@@ -293,7 +293,7 @@ static inline u32 CPUReadHalfWord(u32 address)
   if(address & 1) {
     value = (value >> 8) | (value << 24);
   }
-  
+
   return value;
 }
 
@@ -345,7 +345,7 @@ static inline u8 CPUReadByte(u32 address)
   case 10:
   case 11:
   case 12:
-    return rom[address & 0x1FFFFFF];        
+    return rom[address & 0x1FFFFFF];
   case 13:
     if(cpuEEPROMEnabled)
       return eepromRead(address);
@@ -400,7 +400,7 @@ static inline void CPUWriteMemory(u32 address, u32 value)
     }
   }
 #endif
-  
+
   switch(address >> 24) {
   case 0x02:
 #ifdef BKPT_SUPPORT
@@ -447,7 +447,7 @@ static inline void CPUWriteMemory(u32 address, u32 value)
       cheatsWriteMemory(address + 0x06000000, value);
     else
 #endif
-    
+
     WRITE32LE(((u32 *)&vram[address]), value);
     break;
   case 0x07:

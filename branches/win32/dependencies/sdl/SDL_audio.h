@@ -114,7 +114,7 @@ extern DECLSPEC char * SDLCALL SDL_AudioDriverName(char *namebuf, int maxlen);
  * structure pointed to by 'obtained'.  If 'obtained' is NULL, the audio
  * data passed to the callback function will be guaranteed to be in the
  * requested format, and will be automatically converted to the hardware
- * audio format if necessary.  This function returns -1 if it failed 
+ * audio format if necessary.  This function returns -1 if it failed
  * to open the audio device, or couldn't set up the audio thread.
  *
  * When filling in the desired audio spec structure,
@@ -180,11 +180,11 @@ extern DECLSPEC void SDLCALL SDL_PauseAudio(int pause_on);
  * filled with the audio data format of the wave data, and sets
  * 'audio_buf' to a malloc()'d buffer containing the audio data,
  * and sets 'audio_len' to the length of that audio buffer, in bytes.
- * You need to free the audio buffer with SDL_FreeWAV() when you are 
+ * You need to free the audio buffer with SDL_FreeWAV() when you are
  * done with it.
  *
- * This function returns NULL and sets the SDL error message if the 
- * wave file cannot be opened, uses an unknown data format, or is 
+ * This function returns NULL and sets the SDL error message if the
+ * wave file cannot be opened, uses an unknown data format, or is
  * corrupt.  Currently raw and MS-ADPCM WAVE files are supported.
  */
 extern DECLSPEC SDL_AudioSpec * SDLCALL SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec, Uint8 **audio_buf, Uint32 *audio_len);

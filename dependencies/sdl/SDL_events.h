@@ -249,7 +249,7 @@ extern DECLSPEC void SDLCALL SDL_PumpEvents(void);
    If 'action' is SDL_PEEKEVENT, up to 'numevents' events at the front
    of the event queue, matching 'mask', will be returned and will not
    be removed from the queue.
-   If 'action' is SDL_GETEVENT, up to 'numevents' events at the front 
+   If 'action' is SDL_GETEVENT, up to 'numevents' events at the front
    of the event queue, matching 'mask', will be returned and will be
    removed from the queue.
    This function returns the number of events actually stored, or -1
@@ -291,11 +291,11 @@ extern DECLSPEC int SDLCALL SDL_PushEvent(SDL_Event *event);
 typedef int (SDLCALL *SDL_EventFilter)(const SDL_Event *event);
 /*
   If the filter returns 1, then the event will be added to the internal queue.
-  If it returns 0, then the event will be dropped from the queue, but the 
+  If it returns 0, then the event will be dropped from the queue, but the
   internal state will still be updated.  This allows selective filtering of
   dynamically arriving events.
 
-  WARNING:  Be very careful of what you do in the event filter function, as 
+  WARNING:  Be very careful of what you do in the event filter function, as
             it may run in a different thread!
 
   There is one caveat when dealing with the SDL_QUITEVENT event type.  The
@@ -318,7 +318,7 @@ extern DECLSPEC SDL_EventFilter SDLCALL SDL_GetEventFilter(void);
   If 'state' is set to SDL_IGNORE, that event will be automatically dropped
   from the event queue and will not event be filtered.
   If 'state' is set to SDL_ENABLE, that event will be processed normally.
-  If 'state' is set to SDL_QUERY, SDL_EventState() will return the 
+  If 'state' is set to SDL_QUERY, SDL_EventState() will return the
   current processing state of the specified event.
 */
 #define SDL_QUERY	-1

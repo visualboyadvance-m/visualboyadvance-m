@@ -42,7 +42,7 @@ extern "C" {
 
 /* Get the number of milliseconds since the SDL library initialization.
  * Note that this value wraps if the program runs for more than ~49 days.
- */ 
+ */
 extern DECLSPEC Uint32 SDLCALL SDL_GetTicks(void);
 
 /* Wait a specified number of milliseconds before returning */
@@ -53,7 +53,7 @@ typedef Uint32 (SDLCALL *SDL_TimerCallback)(Uint32 interval);
 
 /* Set a callback to run after the specified number of milliseconds has
  * elapsed. The callback function is passed the current timer interval
- * and returns the next timer interval.  If the returned value is the 
+ * and returns the next timer interval.  If the returned value is the
  * same as the one passed in, the periodic alarm continues, otherwise a
  * new alarm is scheduled.  If the callback returns 0, the periodic alarm
  * is cancelled.
@@ -66,7 +66,7 @@ typedef Uint32 (SDLCALL *SDL_TimerCallback)(Uint32 interval);
  * The maximum resolution of this timer is 10 ms, which means that if
  * you request a 16 ms timer, your callback will run approximately 20 ms
  * later on an unloaded system.  If you wanted to set a flag signaling
- * a frame update at 30 frames per second (every 33 ms), you might set a 
+ * a frame update at 30 frames per second (every 33 ms), you might set a
  * timer for 30 ms:
  *   SDL_SetTimer((33/10)*10, flag_update);
  *

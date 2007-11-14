@@ -61,7 +61,7 @@ public:
 DirectSound::DirectSound()
 {
 	CoInitialize( NULL );
-	
+
 	pDirectSound  = NULL;
 	dsbPrimary    = NULL;
 	dsbSecondary  = NULL;
@@ -77,7 +77,7 @@ DirectSound::~DirectSound()
 		theApp.aviRecorder = NULL;
 		theApp.aviFrameNumber = 0;
 	}
-	
+
 	if(theApp.soundRecording) {
 		if(theApp.soundRecorder) {
 			delete theApp.soundRecorder;
@@ -85,17 +85,17 @@ DirectSound::~DirectSound()
 		}
 		theApp.soundRecording = false;
 	}
-	
+
 	if(dsbNotify) {
 		dsbNotify->Release();
 		dsbNotify = NULL;
 	}
-	
+
 	if(dsbEvent) {
 		CloseHandle(dsbEvent);
 		dsbEvent = NULL;
 	}
-	
+
 	if(pDirectSound) {
 		if(dsbPrimary) {
 			dsbPrimary->Release();
@@ -106,11 +106,11 @@ DirectSound::~DirectSound()
 			dsbSecondary->Release();
 			dsbSecondary = NULL;
 		}
-		
+
 		pDirectSound->Release();
 		pDirectSound = NULL;
 	}
-	
+
 	CoUninitialize();
 }
 
@@ -205,7 +205,7 @@ bool DirectSound::init()
 	if( !theApp.useOldSync ) {
 		if( FAILED( hr = dsbSecondary->QueryInterface( IID_IDirectSoundNotify8, (LPVOID*)&dsbNotify ) ) ) {
 			dsbEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
-			DSBPOSITIONNOTIFY notify[10];		
+			DSBPOSITIONNOTIFY notify[10];
 			for( i = 0; i < 10; i++ ) {
 				notify[i].dwOffset = i * soundBufferLen;
 				notify[i].hEventNotify = dsbEvent;
@@ -226,9 +226,9 @@ bool DirectSound::init()
 		systemMessage( IDS_CANNOT_PLAY_PRIMARY, _T("Cannot Play primary %08x"), hr );
 		return false;
 	}
-	
+
 	systemSoundOn = true;
-	
+
 	return true;
 }
 
@@ -236,7 +236,7 @@ bool DirectSound::init()
 void DirectSound::pause()
 {
 	if( dsbSecondary == NULL ) return;
-	
+
 	DWORD status;
 
 	dsbSecondary->GetStatus( &status );
@@ -248,9 +248,9 @@ void DirectSound::pause()
 void DirectSound::reset()
 {
 	if( dsbSecondary == NULL ) return;
-	
+
 	dsbSecondary->Stop();
-	
+
 	dsbSecondary->SetCurrentPosition( 0 );
 }
 
@@ -258,7 +258,7 @@ void DirectSound::reset()
 void DirectSound::resume()
 {
 	if( dsbSecondary == NULL ) return;
-	
+
 	dsbSecondary->Play( 0, 0, DSBPLAY_LOOPING );
 }
 
@@ -291,7 +291,7 @@ void DirectSound::write()
 			}
 		}
 	}
-	
+
 
 	if( theApp.aviRecording ) {
 		if( theApp.aviRecorder ) {
@@ -304,12 +304,12 @@ void DirectSound::write()
 			theApp.aviRecorder->AddSound( (const char *)soundFinalWave, soundBufferLen );
 		}
 	}
-	
-	
+
+
 	if( !speedup && synchronize && !theApp.throttle ) {
 		hr = dsbSecondary->GetStatus(&status);
 		if( status & DSBSTATUS_PLAYING ) {
-			if( !soundPaused ) {      
+			if( !soundPaused ) {
 				while( true ) {
 					dsbSecondary->GetCurrentPosition(&play, NULL);
 					if( ( play < soundNextPosition ) || ( play > (soundNextPosition + soundBufferLen) ) ) {
@@ -324,7 +324,7 @@ void DirectSound::write()
 			soundPaused = 1;
 		}
 	}
-	
+
 
 	// Obtain memory address of write block.
 	// This will be in two parts if the block wraps around.
@@ -347,7 +347,7 @@ void DirectSound::write()
 				&dwBytes2,
 				0 );
 	}
-	
+
 	soundNextPosition += soundBufferLen;
 	soundNextPosition = soundNextPosition % soundBufferTotalLen;
 
@@ -357,7 +357,7 @@ void DirectSound::write()
 		if ( lpvPtr2 ) {
 			CopyMemory( lpvPtr2, soundFinalWave + dwBytes1, dwBytes2 );
 		}
-		
+
 		// Release the data back to DirectSound.
 		hr = dsbSecondary->Unlock( lpvPtr1, dwBytes1, lpvPtr2, dwBytes2 );
 	} else {

@@ -41,7 +41,7 @@ SZ_RESULT SzDecode(const CFileSize *packSizes, const CFolder *folder,
 		#else
 		const Byte *inBuffer,
 		#endif
-		Byte *outBuffer, size_t outSize, 
+		Byte *outBuffer, size_t outSize,
 		size_t *outSizeProcessed, ISzAlloc *allocMain)
 {
 	UInt32 si;
@@ -103,7 +103,7 @@ SZ_RESULT SzDecode(const CFileSize *packSizes, const CFolder *folder,
 		lzmaCallback.InCallback.Read = LzmaReadImp;
 		#endif
 
-		if (LzmaDecodeProperties(&state.Properties, coder->Properties.Items, 
+		if (LzmaDecodeProperties(&state.Properties, coder->Properties.Items,
 				coder->Properties.Capacity) != LZMA_RESULT_OK)
 			return SZE_FAIL;
 

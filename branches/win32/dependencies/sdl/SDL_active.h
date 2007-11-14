@@ -40,7 +40,7 @@ extern "C" {
 #define SDL_APPACTIVE		0x04		/* The application is active */
 
 /* Function prototypes */
-/* 
+/*
  * This function returns the current state of the application, which is a
  * bitwise combination of SDL_APPMOUSEFOCUS, SDL_APPINPUTFOCUS, and
  * SDL_APPACTIVE.  If SDL_APPACTIVE is set, then the user is able to

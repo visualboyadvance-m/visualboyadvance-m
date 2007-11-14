@@ -69,9 +69,9 @@ void gbCheatsReadGame(gzFile gzFile, int version)
         gbAddGgCheat(tmpCheat.cheatCode, tmpCheat.cheatDesc);
       }
     }
-  
+
     int gbGsOn = utilReadInt(gzFile);
-    
+
     if(gbGsOn) {
       int n = utilReadInt(gzFile);
       gbXxCheat tmpCheat;
@@ -112,7 +112,7 @@ bool gbCheatsLoadCheatList(const char *file)
   gbCheatNumber = 0;
 
   gbCheatUpdateMap();
-  
+
   int count = 0;
 
   FILE *f = fopen(file, "rb");
@@ -126,7 +126,7 @@ bool gbCheatsLoadCheatList(const char *file)
     fclose(f);
     return false;
   }
-     
+
   if(version != 1) {
     systemMessage(MSG_UNSUPPORTED_CHEAT_LIST_VERSION,
                   N_("Unsupported cheat list version %d"), version);
@@ -146,12 +146,12 @@ bool gbCheatsLoadCheatList(const char *file)
     fclose(f);
     return false;
   }
-  
+
   if(fread(&count, 1, sizeof(count), f) != sizeof(count)) {
     fclose(f);
     return false;
   }
-  
+
   if(fread(gbCheatList, 1, sizeof(gbCheatList), f) != sizeof(gbCheatList)) {
     fclose(f);
     return false;
@@ -159,7 +159,7 @@ bool gbCheatsLoadCheatList(const char *file)
 
   gbCheatNumber = count;
   gbCheatUpdateMap();
-  
+
   return true;
 }
 
@@ -169,7 +169,7 @@ bool gbVerifyGsCode(const char *code)
 
   if(len == 0)
     return true;
-  
+
   if(len != 8)
     return false;
 
@@ -198,12 +198,12 @@ void gbAddGsCheat(const char *code, const char *desc)
                   N_("Invalid GameShark code: %s"), code);
     return;
   }
-  
+
   int i = gbCheatNumber;
 
   strcpy(gbCheatList[i].cheatCode, code);
   strcpy(gbCheatList[i].cheatDesc, desc);
-  
+
   gbCheatList[i].code = GBCHEAT_HEX_VALUE(code[0]) << 4 |
     GBCHEAT_HEX_VALUE(code[1]);
 
@@ -244,7 +244,7 @@ bool gbVerifyGgCode(const char *code)
 
   if(len == 0)
     return true;
-  
+
   if(!GBCHEAT_IS_HEX(code[0]))
     return false;
   if(!GBCHEAT_IS_HEX(code[1]))
@@ -296,7 +296,7 @@ bool gbVerifyGgCode(const char *code)
   compare ^= 0x45;
 
   int cloak = (GBCHEAT_HEX_VALUE(code[8])) ^ (GBCHEAT_HEX_VALUE(code[9]));
-  
+
   if(cloak >=1 && cloak <= 7)
     return false;
 
@@ -316,27 +316,27 @@ void gbAddGgCheat(const char *code, const char *desc)
                   N_("Invalid GameGenie code: %s"), code);
     return;
   }
-  
+
   int i = gbCheatNumber;
 
   size_t len = strlen(code);
-  
+
   strcpy(gbCheatList[i].cheatCode, code);
   strcpy(gbCheatList[i].cheatDesc, desc);
 
   gbCheatList[i].code = 0x101;
   gbCheatList[i].value = (GBCHEAT_HEX_VALUE(code[0]) << 4) +
     GBCHEAT_HEX_VALUE(code[1]);
-  
+
   gbCheatList[i].address = (GBCHEAT_HEX_VALUE(code[2]) << 8) +
     (GBCHEAT_HEX_VALUE(code[4]) << 4) +
     (GBCHEAT_HEX_VALUE(code[5])) +
     ((GBCHEAT_HEX_VALUE(code[6]) ^ 0x0f) << 12);
 
   gbCheatList[i].compare = 0;
-  
+
   if(len != 7 && len != 8) {
-    
+
     int compare = (GBCHEAT_HEX_VALUE(code[8]) << 4) +
       (GBCHEAT_HEX_VALUE(code[10]));
     compare = compare ^ 0xff;
@@ -351,9 +351,9 @@ void gbAddGgCheat(const char *code, const char *desc)
 
 
   gbCheatList[i].enabled = true;
-  
+
   gbCheatMap[gbCheatList[i].address] = true;
-  
+
   gbCheatNumber++;
 }
 
@@ -364,12 +364,12 @@ void gbCheatRemove(int i)
                   N_("Invalid cheat to remove %d"), i);
     return;
   }
-  
+
   if((i+1) <  gbCheatNumber) {
     memcpy(&gbCheatList[i], &gbCheatList[i+1], sizeof(gbCheat)*
            (gbCheatNumber-i-1));
   }
-  
+
   gbCheatNumber--;
 
   gbCheatUpdateMap();
@@ -404,12 +404,12 @@ void gbCheatDisable(int i)
 bool gbCheatReadGSCodeFile(const char *fileName)
 {
   FILE *file = fopen(fileName, "rb");
-    
+
   if(!file) {
     systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s"), fileName);
     return false;
   }
-  
+
   fseek(file, 0x18, SEEK_SET);
   int count = 0;
   fread(&count, 1, 2, file);
@@ -419,7 +419,7 @@ bool gbCheatReadGSCodeFile(const char *fileName)
   char code[9];
   int i;
   for(i = 0; i < count; i++) {
-    fread(&dummy, 1, 2, file);    
+    fread(&dummy, 1, 2, file);
     fread(desc, 1, 12, file);
     desc[12] = 0;
     fread(code, 1, 8, file);

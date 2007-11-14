@@ -85,10 +85,10 @@ BEGIN_MESSAGE_MAP(PaletteView, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // PaletteView message handlers
 
-BOOL PaletteView::OnInitDialog() 
+BOOL PaletteView::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   DIALOG_SIZER_START( sz )
     DIALOG_SIZER_END()
     SetData(sz,
@@ -96,13 +96,13 @@ BOOL PaletteView::OnInitDialog()
             HKEY_CURRENT_USER,
             "Software\\Emulators\\VisualBoyAdvance\\Viewer\\PaletteView",
             NULL);
-  
+
   paletteView.setPaletteAddress(0);
-  paletteView.refresh();  
-  
+  paletteView.refresh();
+
   paletteViewOBJ.setPaletteAddress(0x200);
-  paletteViewOBJ.refresh();  
-  
+  paletteViewOBJ.refresh();
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -119,7 +119,7 @@ void PaletteView::save(int which)
       captureBuffer = "obj.pal";
 
     LPCTSTR exts[] = {".pal", ".pal", ".act" };
-  
+
     CString filter = theApp.winLoadFilter(IDS_FILTER_PAL);
     CString title = winResLoadString(IDS_SELECT_PALETTE_NAME);
     FileDlg dlg(this,
@@ -144,7 +144,7 @@ void PaletteView::save(int which)
       p = &paletteView;
     else
       p = &paletteViewOBJ;
-  
+
     switch(dlg.getFilterIndex()) {
     case 0:
     case 1:
@@ -160,20 +160,20 @@ void PaletteView::save(int which)
   }
 }
 
-void PaletteView::OnSaveBg() 
+void PaletteView::OnSaveBg()
 {
   save(0);
 }
 
-void PaletteView::OnSaveObj() 
+void PaletteView::OnSaveObj()
 {
   save(1);
 }
 
-void PaletteView::OnRefresh2() 
+void PaletteView::OnRefresh2()
 {
   paletteView.refresh();
-  paletteViewOBJ.refresh();  
+  paletteViewOBJ.refresh();
 }
 
 void PaletteView::update()
@@ -182,20 +182,20 @@ void PaletteView::update()
 }
 
 
-void PaletteView::OnAutoUpdate() 
+void PaletteView::OnAutoUpdate()
 {
   autoUpdate = !autoUpdate;
   if(autoUpdate) {
     theApp.winAddUpdateListener(this);
   } else {
-    theApp.winRemoveUpdateListener(this);    
-  }  
+    theApp.winRemoveUpdateListener(this);
+  }
 }
 
-void PaletteView::OnClose() 
+void PaletteView::OnClose()
 {
   theApp.winRemoveUpdateListener(this);
-  
+
   DestroyWindow();
 }
 
@@ -208,8 +208,8 @@ LRESULT PaletteView::OnPalInfo(WPARAM wParam, LPARAM lParam)
   if(address >= 0x200)
     address = 0x5000200 + 2*(address & 255);
   else
-    address = 0x5000000 + 2*(address & 255); 
-  
+    address = 0x5000000 + 2*(address & 255);
+
   buffer.Format("0x%08X", address);
   GetDlgItem(IDC_ADDRESS)->SetWindowText(buffer);
 
@@ -235,11 +235,11 @@ LRESULT PaletteView::OnPalInfo(WPARAM wParam, LPARAM lParam)
     paletteView.setSelected(-1);
   } else
     paletteViewOBJ.setSelected(-1);
-  
+
   return TRUE;
 }
 
-void PaletteView::PostNcDestroy() 
+void PaletteView::PostNcDestroy()
 {
   delete this;
 }

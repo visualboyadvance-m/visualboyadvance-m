@@ -36,14 +36,14 @@ struct Zip7_Extractor_Impl
 {
 	ISzInStream         stream; // must be first
 	CArchiveDatabaseEx  db;
-	
+
 	// SzExtract state
 	UInt32  block_index;
 	Byte*   buf;
 	size_t  buf_size;
-	
+
 	File_Reader* in;
-	
+
 #ifdef _LZMA_IN_CB
 	enum { read_buf_size = 32 * 1024L };
 	char read_buf [read_buf_size];
@@ -72,7 +72,7 @@ extern "C"
 		return SZ_OK;
 	}
 #endif
-	
+
 	static SZ_RESULT zip7_seek_( void* data, CFileSize offset )
 	{
 		Zip7_Extractor_Impl* impl = (Zip7_Extractor_Impl*) data;
@@ -118,7 +118,7 @@ blargg_err_t Zip7_Extractor::open_()
 	impl->block_index = (unsigned) -1;
 	impl->buf         = 0;
 	impl->buf_size    = 0;
-	
+
 	InitCrcTable();
 	SzArDbExInit( &impl->db );
 	int code = SzArchiveOpen( &impl->stream, &impl->db, &alloc, &alloc_temp );
@@ -159,14 +159,14 @@ blargg_err_t Zip7_Extractor::next_()
 		}
 	}
 	set_done();
-	return 0; 
+	return 0;
 }
 
 blargg_err_t Zip7_Extractor::data_( byte const*& out )
 {
 	if ( !impl )
 		return "Archive not open";
-	
+
 	size_t offset = 0;
 	size_t size = 0;
 	RETURN_ERR( zip7_err( SzExtract( &impl->stream, &impl->db, index,

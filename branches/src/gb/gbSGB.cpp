@@ -91,12 +91,12 @@ void gbSgbReset()
   memset(gbSgbPacket, 0, 16 * 7);
   memset(gbSgbBorderChar, 0, 32*256);
   memset(gbSgbBorder, 0, 2048);
-  
+
   int i;
   for(i = 1; i < 2048; i+=2) {
     gbSgbBorder[i] = 1 << 2;
   }
-  
+
   for(i = 0; i < 32; i++) {
     gbPalette[i*4] = (0x1f) | (0x1f << 5) | (0x1f << 10);
     gbPalette[i*4+1] = (0x15) | (0x15 << 5) | (0x15 << 10);
@@ -123,7 +123,7 @@ void gbSgbShutdown()
   if(gbSgbBorder != NULL) {
     free(gbSgbBorder);
     gbSgbBorder = NULL;
-  }  
+  }
 }
 
 void gbSgbFillScreen(u16 color)
@@ -178,7 +178,7 @@ void gbSgbRenderScreenToBuffer()
   u16 patternAddress = 0x8800;
 
   int flag = 1;
-  
+
   if(register_LCDC & 0x10) {
     patternAddress = 0x8000;
     flag = 0;
@@ -209,7 +209,7 @@ void gbSgbDrawBorderTile(int x, int y, int tile, int attr)
   u16 *dest = (u16*)pix + ((y+1) * (256+2)) + x;
   u8 *dest8 = (u8*)pix + ((y*256)+x)*3;
   u32 *dest32 = (u32*)pix + ((y+1)*257) + x;
-  
+
   u8 *tileAddress = &gbSgbBorderChar[tile * 32];
   u8 *tileAddress2 = &gbSgbBorderChar[tile * 32 + 16];
 
@@ -221,10 +221,10 @@ void gbSgbDrawBorderTile(int x, int y, int tile, int attr)
     palette += 4;
 
   palette *= 16;
-  
+
   u8 xx = 0;
   u8 yy = 0;
-  
+
   int flipX = attr & 0x40;
   int flipY = attr & 0x80;
 
@@ -234,9 +234,9 @@ void gbSgbDrawBorderTile(int x, int y, int tile, int attr)
     u8 b = *tileAddress++;
     u8 c = *tileAddress2++;
     u8 d = *tileAddress2++;
-    
+
     while(mask > 0) {
-      
+
       u8 color = 0;
       if(a & mask)
         color++;
@@ -249,7 +249,7 @@ void gbSgbDrawBorderTile(int x, int y, int tile, int attr)
 
       u8 xxx = xx;
       u8 yyy = yy;
-      
+
       if(flipX)
         xxx = 7 - xx;
       if(flipY)
@@ -290,12 +290,12 @@ void gbSgbRenderBorder()
 {
   if(gbBorderOn) {
     u8 *fromAddress = gbSgbBorder;
-  
+
     for(u8 y = 0; y < 28; y++) {
       for(u8 x = 0; x< 32; x++) {
         u8 tile = *fromAddress++;
         u8 attr = *fromAddress++;
-        
+
         gbSgbDrawBorderTile(x*8,y*8,tile,attr);
       }
     }
@@ -307,9 +307,9 @@ void gbSgbPicture()
   gbSgbRenderScreenToBuffer();
 
   memcpy(gbSgbBorder, gbSgbScreenBuffer, 2048);
-  
+
   u16 *paletteAddr = (u16 *)&gbSgbScreenBuffer[2048];
-  
+
   for(int i = 64; i < 128; i++) {
     gbPalette[i] = READ16LE(paletteAddr++);
   }
@@ -321,9 +321,9 @@ void gbSgbPicture()
     systemGbBorderOn();
   }
 
-  if(gbBorderOn && !gbSgbMask) 
+  if(gbBorderOn && !gbSgbMask)
     gbSgbRenderBorder();
-  
+
   if(gbSgbMode && gbCgbMode && gbSgbCGBSupport > 4) {
     gbSgbCGBSupport = 0;
     gbSgbMode = 0;
@@ -340,15 +340,15 @@ void gbSgbSetPalette(int a,int b,u16 *p)
 {
   u16 bit00 = READ16LE(p++);
   int i;
-  
+
   for(i = 1; i < 4; i++) {
     gbPalette[a*4+i] = READ16LE(p++);
   }
-  
+
   for(i = 1; i < 4; i++) {
     gbPalette[b*4+i] = READ16LE(p++);
   }
-  
+
   gbPalette[0] = gbPalette[4] = gbPalette[8] = gbPalette[12] = bit00;
   if(gbBorderOn && !gbSgbMask)
     gbSgbRenderBorder();
@@ -357,9 +357,9 @@ void gbSgbSetPalette(int a,int b,u16 *p)
 void gbSgbScpPalette()
 {
   gbSgbRenderScreenToBuffer();
-  
+
   u16 *fromAddress = (u16 *)gbSgbScreenBuffer;
-  
+
   for(int i = 0; i < 512*4; i++) {
     gbSgbSCPPalette[i] = READ16LE(fromAddress++);
   }
@@ -399,7 +399,7 @@ void gbSgbSetPalette()
   if(atf & 0x80) {
     gbSgbSetATF(atf & 0x3f);
   }
-  
+
   if(atf & 0x40) {
     gbSgbMask = 0;
     if(gbBorderOn)
@@ -418,7 +418,7 @@ void gbSgbAttributeBlock()
     nDataSet = 1;
 
   while(nDataSet) {
-    u8 controlCode = (*fromAddress++) & 7;    
+    u8 controlCode = (*fromAddress++) & 7;
     u8 paletteDesignation = (*fromAddress++) & 0x3f;
     u8 startH = (*fromAddress++) & 0x1f;
     u8 startV = (*fromAddress++) & 0x1f;
@@ -426,7 +426,7 @@ void gbSgbAttributeBlock()
     u8 endV   = (*fromAddress++) & 0x1f;
 
     u8 * toAddress = gbSgbATF;
-    
+
     for(u8 y = 0; y < 18; y++) {
       for(u8 x = 0; x < 20; x++) {
         if(x < startH || y < startV ||
@@ -444,7 +444,7 @@ void gbSgbAttributeBlock()
           if(controlCode & 0x02)
             *toAddress = (paletteDesignation>>2) & 0x03;
           else if(controlCode == 0x01)
-            *toAddress = paletteDesignation & 0x03;         
+            *toAddress = paletteDesignation & 0x03;
         }
         toAddress++;
       }
@@ -461,9 +461,9 @@ void gbSgbSetColumnPalette(u8 col, u8 p)
     col = 19;
 
   p &= 3;
-  
+
   u8 *toAddress = &gbSgbATF[col];
-  
+
   for(u8 y = 0; y < 18; y++) {
     *toAddress = p;
     toAddress += 20;
@@ -478,9 +478,9 @@ void gbSgbSetRowPalette(u8 row, u8 p)
     row = 17;
 
   p &= 3;
-  
+
   u8 *toAddress = &gbSgbATF[row*20];
-  
+
   for(u8 x = 0; x < 20; x++) {
     *toAddress++ = p;
   }
@@ -516,7 +516,7 @@ void gbSgbAttributeDivide()
       else if ( i > coord)
         gbSgbSetColumnPalette(i, colorBR);
       else
-        gbSgbSetColumnPalette(i, colorOL);      
+        gbSgbSetColumnPalette(i, colorOL);
     }
   }
 }
@@ -561,7 +561,7 @@ void gbSgbAttributeCharacter()
   u8 s = 6;
   u8 *fromAddress = &gbSgbPacket[6];
   u8 v = *fromAddress++;
-  
+
   if(style) {
     while(nDataSet) {
       u8 p = (v >> s) & 3;
@@ -593,14 +593,14 @@ void gbSgbAttributeCharacter()
         if(startV == 18)
           break;
       }
-      
+
       if(s)
         s -= 2;
       else {
         s = 6;
         v = *fromAddress++;
         nDataSet--;
-      }      
+      }
     }
   }
 }
@@ -608,7 +608,7 @@ void gbSgbAttributeCharacter()
 void gbSgbSetATFList()
 {
   gbSgbRenderScreenToBuffer();
-  
+
   u8 *fromAddress = gbSgbScreenBuffer;
   u8 *toAddress   = gbSgbATFList;
 
@@ -631,7 +631,7 @@ void gbSgbMaskEnable()
   int gbSgbMaskFlag = gbSgbPacket[1] & 3;
 
   gbSgbMask = gbSgbMaskFlag;
-  
+
   switch(gbSgbMaskFlag) {
   case 1:
     break;
@@ -652,14 +652,14 @@ void gbSgbMaskEnable()
 void gbSgbChrTransfer()
 {
   gbSgbRenderScreenToBuffer();
-  
+
   int address = (gbSgbPacket[1] & 1) * (128*32);
 
   if(gbSgbPacket[1] & 1)
     gbSgbCGBSupport |= 2;
   else
     gbSgbCGBSupport |= 1;
-  
+
   memcpy(&gbSgbBorderChar[address], gbSgbScreenBuffer, 128 * 32);
 
   if(gbBorderAutomatic && !gbBorderOn && gbSgbCGBSupport > 4) {
@@ -676,7 +676,7 @@ void gbSgbChrTransfer()
     gbSgbMask = 0;
     gbSgbRenderBorder();
     gbReset();
-  }  
+  }
 
   if(gbSgbCGBSupport > 4)
     gbSgbCGBSupport = 0;
@@ -787,13 +787,13 @@ void gbSgbDoBitTransfer(u8 value)
           gbSgbReadingController &= 3;
         }
       }
-      gbSgbPacketTimeout = 0;      
+      gbSgbPacketTimeout = 0;
     } else {
       if(value == 0x10)
         gbSgbReadingController |= 0x2;
       else if(value == 0x20)
         gbSgbReadingController |= 0x01;
-      gbSgbPacketTimeout = 0;      
+      gbSgbPacketTimeout = 0;
     }
     gbSgbPacketTimeout = 0;
     break;
@@ -887,7 +887,7 @@ void gbSgbSaveGame(gzFile gzFile)
 
   utilGzWrite(gzFile, gbSgbBorder, 2048);
   utilGzWrite(gzFile, gbSgbBorderChar, 32*256);
-  
+
   utilGzWrite(gzFile, gbSgbPacket, 16*7);
 
   utilGzWrite(gzFile, gbSgbSCPPalette, 4 * 512 * sizeof(u16));
@@ -908,7 +908,7 @@ void gbSgbReadGame(gzFile gzFile, int version)
     utilGzRead(gzFile, gbSgbBorder, 2048);
     utilGzRead(gzFile, gbSgbBorderChar, 32*256);
   }
-  
+
   utilGzRead(gzFile, gbSgbPacket, 16*7);
 
   utilGzRead(gzFile, gbSgbSCPPalette, 4 * 512 * sizeof(u16));

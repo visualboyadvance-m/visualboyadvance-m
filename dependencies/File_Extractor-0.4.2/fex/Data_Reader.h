@@ -10,23 +10,23 @@
 class Data_Reader {
 public:
 	virtual ~Data_Reader() { }
-	
+
 	static const char eof_error []; // returned by read() when request goes beyond end
-	
+
 	// Reads at most n bytes and returns number actually read, or negative if error.
 	// Trying to read past end of file is NOT considered an error.
 	virtual long read_avail( void*, long n ) BLARGG_PURE( { (void) n; return 0; } )
-	
+
 	// Read exactly n bytes and returns error if they couldn't ALL be read.
 	// Reading past end of file results in eof_error.
 	virtual blargg_err_t read( void*, long n );
-	
+
 	// Number of bytes remaining until end of file
 	virtual long remain() const BLARGG_PURE( { return 0; } )
-	
+
 	// Reads and discards n bytes. Skipping past end of file results in eof_error.
 	virtual blargg_err_t skip( long n );
-	
+
 public:
 	Data_Reader() { }
 	typedef blargg_err_t error_t; // deprecated
@@ -42,13 +42,13 @@ class File_Reader : public Data_Reader {
 public:
 	// Size of file
 	virtual long size() const BLARGG_PURE( { return 0; } )
-	
+
 	// Current position in file
 	virtual long tell() const BLARGG_PURE( { return 0; } )
-	
+
 	// Goes to new position
 	virtual blargg_err_t seek( long ) BLARGG_PURE( { return 0; } )
-	
+
 	long remain() const;
 	blargg_err_t skip( long n );
 };
@@ -58,11 +58,11 @@ class Std_File_Reader : public File_Reader {
 public:
 	blargg_err_t open( const char* path );
 	void close();
-	
+
 	// Switches to unbuffered mode. Useful if you are doing your
 	// own buffering already.
 	void make_unbuffered();
-	
+
 public:
 	Std_File_Reader();
 	~Std_File_Reader();
@@ -79,7 +79,7 @@ private:
 class Mem_File_Reader : public File_Reader {
 public:
 	Mem_File_Reader( const void* begin, long size );
-	
+
 public:
 	long size() const;
 	long read_avail( void*, long );
@@ -144,7 +144,7 @@ class Gzip_File_Reader : public File_Reader {
 public:
 	blargg_err_t open( const char* path );
 	void close();
-	
+
 public:
 	Gzip_File_Reader();
 	~Gzip_File_Reader();

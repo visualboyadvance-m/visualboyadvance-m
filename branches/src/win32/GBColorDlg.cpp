@@ -38,25 +38,25 @@ static u16 defaultPalettes[][24] = {
     0x6200, 0x7E10, 0x7C10, 0x5000,  0x6200, 0x7E10, 0x7C10, 0x5000,
   },
   {
-    0x4008, 0x4000, 0x2000, 0x2008,  0x4008, 0x4000, 0x2000, 0x2008, 
+    0x4008, 0x4000, 0x2000, 0x2008,  0x4008, 0x4000, 0x2000, 0x2008,
   },
   {
-    0x43F0, 0x03E0, 0x4200, 0x2200,  0x43F0, 0x03E0, 0x4200, 0x2200, 
+    0x43F0, 0x03E0, 0x4200, 0x2200,  0x43F0, 0x03E0, 0x4200, 0x2200,
   },
   {
-    0x43FF, 0x03FF, 0x221F, 0x021F,  0x43FF, 0x03FF, 0x221F, 0x021F, 
+    0x43FF, 0x03FF, 0x221F, 0x021F,  0x43FF, 0x03FF, 0x221F, 0x021F,
   },
   {
-    0x621F, 0x7E1F, 0x7C1F, 0x2010,  0x621F, 0x7E1F, 0x7C1F, 0x2010, 
+    0x621F, 0x7E1F, 0x7C1F, 0x2010,  0x621F, 0x7E1F, 0x7C1F, 0x2010,
   },
   {
-    0x621F, 0x401F, 0x001F, 0x2010,  0x621F, 0x401F, 0x001F, 0x2010, 
+    0x621F, 0x401F, 0x001F, 0x2010,  0x621F, 0x401F, 0x001F, 0x2010,
   },
   {
-    0x1B8E, 0x02C0, 0x0DA0, 0x1140,  0x1B8E, 0x02C0, 0x0DA0, 0x1140, 
+    0x1B8E, 0x02C0, 0x0DA0, 0x1140,  0x1B8E, 0x02C0, 0x0DA0, 0x1140,
   },
   {
-    0x7BDE, /*0x23F0*/ 0x5778, /*0x5DC0*/ 0x5640, 0x0000,  0x7BDE, /*0x3678*/ 0x529C, /*0x0980*/ 0x2990, 0x0000, 
+    0x7BDE, /*0x23F0*/ 0x5778, /*0x5DC0*/ 0x5640, 0x0000,  0x7BDE, /*0x3678*/ 0x529C, /*0x0980*/ 0x2990, 0x0000,
   }
 };
 
@@ -101,19 +101,19 @@ BEGIN_MESSAGE_MAP(GBColorDlg, CDialog)
   /////////////////////////////////////////////////////////////////////////////
 // GBColorDlg message handlers
 
-void GBColorDlg::OnDefault() 
+void GBColorDlg::OnDefault()
 {
-  setWhich(0);  
+  setWhich(0);
 }
 
-void GBColorDlg::OnReset() 
+void GBColorDlg::OnReset()
 {
   int s = which * 8;
   colors[s++] = (0x1f) | (0x1f << 5) | (0x1f << 10);
   colors[s++] = (0x15) | (0x15 << 5) | (0x15 << 10);
   colors[s++] = (0x0c) | (0x0c << 5) | (0x0c << 10);
   colors[s++] = 0;
-  
+
   colors[s++] = (0x1f) | (0x1f << 5) | (0x1f << 10);
   colors[s++] = (0x15) | (0x15 << 5) | (0x15 << 10);
   colors[s++] = (0x0c) | (0x0c << 5) | (0x0c << 10);
@@ -121,30 +121,30 @@ void GBColorDlg::OnReset()
   setWhich(which);
 }
 
-void GBColorDlg::OnUser1() 
+void GBColorDlg::OnUser1()
 {
-  setWhich(1);  
+  setWhich(1);
 }
 
-void GBColorDlg::OnUser2() 
+void GBColorDlg::OnUser2()
 {
-  setWhich(2);  
+  setWhich(2);
 }
 
-void GBColorDlg::OnCancel() 
+void GBColorDlg::OnCancel()
 {
   EndDialog(FALSE);
 }
 
-void GBColorDlg::OnOk() 
+void GBColorDlg::OnOk()
 {
   EndDialog(TRUE);
 }
 
-BOOL GBColorDlg::OnInitDialog() 
+BOOL GBColorDlg::OnInitDialog()
 {
   CDialog::OnInitDialog();
-  
+
   colorControls[0].SubclassDlgItem(IDC_COLOR_BG0, this);
   colorControls[1].SubclassDlgItem(IDC_COLOR_BG1, this);
   colorControls[2].SubclassDlgItem(IDC_COLOR_BG2, this);
@@ -177,18 +177,18 @@ BOOL GBColorDlg::OnInitDialog()
 
   RECT cbSize;
   int Height;
-  
+
   m_predefined.GetClientRect(&cbSize);
   Height = m_predefined.GetItemHeight(0);
   Height += m_predefined.GetItemHeight(0) * (10);
-  
+
   // Note: The use of SM_CYEDGE assumes that we're using Windows '95
   // Now add on the height of the border of the edit box
   Height += GetSystemMetrics(SM_CYEDGE) * 2;  // top & bottom edges
-  
+
   // The height of the border of the drop-down box
   Height += GetSystemMetrics(SM_CYEDGE) * 2;  // top & bottom edges
-  
+
   // now set the size of the window
   m_predefined.SetWindowPos(NULL,
                             0, 0,
@@ -199,7 +199,7 @@ BOOL GBColorDlg::OnInitDialog()
   setWhich(which);
 
   CenterWindow();
-  
+
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -221,7 +221,7 @@ u16 * GBColorDlg::getColors()
 void GBColorDlg::OnColorClicked(UINT id)
 {
   id -= IDC_COLOR_BG0;
-  
+
   u16 color = colors[which*8+id];
 
   COLORREF colorInit =
@@ -233,11 +233,11 @@ void GBColorDlg::OnColorClicked(UINT id)
   if(IDOK == dlg.DoModal())
   {
     COLORREF c = dlg.GetColor();
-    
+
     colors[which*8+id] = (u16)((c >> 3) & 0x1f | ((c >> 11) & 0x1f) << 5 | ((c >> 19) & 0x1f) << 10);
 
     colorControls[id].setColor(colors[which*8+id]);
-  }  
+  }
 }
 
 int GBColorDlg::getWhich()
@@ -246,7 +246,7 @@ int GBColorDlg::getWhich()
 }
 
 
-void GBColorDlg::OnSelchangePredefined() 
+void GBColorDlg::OnSelchangePredefined()
 {
 	int sel = m_predefined.GetCurSel();
 

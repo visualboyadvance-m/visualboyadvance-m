@@ -64,7 +64,7 @@ static mng_bool mymngprocessheader( mng_handle mng, mng_uint32 width, mng_uint32
 	// the final environment.
 
 	mngstuff *mymng = (mngstuff *)mng_get_userdata(mng);
-	
+
 	mymng->width  = width;
 	mymng->height = height;
 	mymng->bpp    = 24;
@@ -183,7 +183,7 @@ bool CxImageMNG::Decode(CxFile *hFile)
 	try {
 		// set up the mng decoder for our stream
 		hmng = mng_initialize(&mnginfo, mymngalloc, mymngfree, MNG_NULL);
-		if (hmng == NULL) throw "could not initialize libmng";			
+		if (hmng == NULL) throw "could not initialize libmng";
 
 		// set the file we want to play
 		mnginfo.file = hFile;
@@ -272,7 +272,7 @@ bool CxImageMNG::Encode(CxFile *hFile)
 
 		// set up the mng decoder for our stream
 		hmng = mng_initialize(&mnginfo, mymngalloc, mymngfree, MNG_NULL);
-		if (hmng == NULL) throw "could not initialize libmng";			
+		if (hmng == NULL) throw "could not initialize libmng";
 
 		mng_setcb_openstream(hmng, mymngopenstreamwrite );
 		mng_setcb_closestream(hmng, mymngclosestream);
@@ -296,7 +296,7 @@ bool CxImageMNG::Encode(CxFile *hFile)
 void CxImageMNG::WritePNG( mng_handle hMNG, int Frame, int FrameCount )
 {
 	mngstuff *mymng = (mngstuff *)mng_get_userdata(hMNG);
-	
+
 	int OffsetX=0,OffsetY=0,OffsetW=mymng->width,OffsetH=mymng->height;
 
 	BYTE *tmpbuffer = new BYTE[ (mymng->effwdt+1) * mymng->height];
@@ -304,28 +304,28 @@ void CxImageMNG::WritePNG( mng_handle hMNG, int Frame, int FrameCount )
 
 	// Write DEFI chunk.
 	mng_putchunk_defi( hMNG, 0, 0, 0, MNG_TRUE, OffsetX, OffsetY, MNG_FALSE, 0, 0, 0, 0 );
- 		 
+
 	// Write Header:
 	mng_putchunk_ihdr(
-		hMNG, 
-		OffsetW, OffsetH, 
-		MNG_BITDEPTH_8, 
-		MNG_COLORTYPE_RGB, 
-		MNG_COMPRESSION_DEFLATE, 
-		MNG_FILTER_ADAPTIVE, 
-		MNG_INTERLACE_NONE 
+		hMNG,
+		OffsetW, OffsetH,
+		MNG_BITDEPTH_8,
+		MNG_COLORTYPE_RGB,
+		MNG_COMPRESSION_DEFLATE,
+		MNG_FILTER_ADAPTIVE,
+		MNG_INTERLACE_NONE
 	);
 
 	// transfer data, add Filterbyte:
 	for( int Row=0; Row<OffsetH; Row++ ){
 		// First Byte in each Scanline is Filterbyte: Currently 0 -> No Filter.
-		tmpbuffer[Row*(mymng->effwdt+1)]=0; 
+		tmpbuffer[Row*(mymng->effwdt+1)]=0;
 		// Copy the scanline: (reverse order)
-		memcpy(tmpbuffer+Row*(mymng->effwdt+1)+1, 
+		memcpy(tmpbuffer+Row*(mymng->effwdt+1)+1,
 			mymng->image+((OffsetH-1-(OffsetY+Row))*(mymng->effwdt))+OffsetX,mymng->effwdt);
 		// swap red and blue components
 		RGBtoBGR(tmpbuffer+Row*(mymng->effwdt+1)+1,mymng->effwdt);
-	} 
+	}
 
 	// Compress data with ZLib (Deflate):
 	BYTE *dstbuffer = new BYTE[(mymng->effwdt+1)*OffsetH];

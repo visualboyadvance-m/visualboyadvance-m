@@ -21,7 +21,7 @@ protected:
 private:
 	Zip7_Extractor_Impl* impl;
 	int index;
-	
+
 	blargg_err_t extract_();
 };
 

@@ -55,7 +55,7 @@ END_MESSAGE_MAP()
   /////////////////////////////////////////////////////////////////////////////
 // Hyperlink message handlers
 
-void Hyperlink::PreSubclassWindow() 
+void Hyperlink::PreSubclassWindow()
 {
   DWORD dwStyle = GetStyle();
   ::SetWindowLong(GetSafeHwnd(), GWL_STYLE, dwStyle | SS_NOTIFY);
@@ -69,10 +69,10 @@ void Hyperlink::PreSubclassWindow()
   font->GetLogFont(&lg);
 
   lg.lfUnderline = TRUE;
-  
+
   m_underlineFont.CreateFontIndirect(&lg);
   SetFont(&m_underlineFont);
-	
+
   CStatic::PreSubclassWindow();
 }
 
@@ -80,18 +80,18 @@ void Hyperlink::OnClicked()
 {
   CString url;
   GetWindowText(url);
-  ::ShellExecute(0, _T("open"), url, 
+  ::ShellExecute(0, _T("open"), url,
                  0, 0, SW_SHOWNORMAL);
 }
 
-HBRUSH Hyperlink::CtlColor(CDC* pDC, UINT nCtlColor) 
+HBRUSH Hyperlink::CtlColor(CDC* pDC, UINT nCtlColor)
 {
   pDC->SetTextColor(RGB(0,0,240));
-	
+
   return (HBRUSH)GetStockObject(NULL_BRUSH);
 }
 
-BOOL Hyperlink::OnEraseBkgnd(CDC* pDC) 
+BOOL Hyperlink::OnEraseBkgnd(CDC* pDC)
 {
   CRect rect;
   GetClientRect(rect);
@@ -100,7 +100,7 @@ BOOL Hyperlink::OnEraseBkgnd(CDC* pDC)
   return TRUE;
 }
 
-void Hyperlink::OnMouseMove(UINT nFlags, CPoint point) 
+void Hyperlink::OnMouseMove(UINT nFlags, CPoint point)
 {
   if(!m_over) {
     m_over = true;

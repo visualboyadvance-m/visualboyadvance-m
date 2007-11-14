@@ -65,7 +65,7 @@ DEF_MIN_MAX( double )
 // for built-in types, so they take arguments by value
 
 // TODO: remove
-inline int min( int x, int y ) 
+inline int min( int x, int y )
 template<class T>
 inline T min( T x, T y )
 {

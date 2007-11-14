@@ -72,27 +72,27 @@ void ZoomControl::registerClass()
     wc.lpszMenuName = NULL;
     wc.lpszClassName = "VbaZoomControl";
     AfxRegisterClass(&wc);
-    isRegistered = true;    
+    isRegistered = true;
   }
 }
 
-void ZoomControl::OnPaint() 
+void ZoomControl::OnPaint()
 {
   CPaintDC dc(this); // device context for painting
-  
+
   RECT rect;
   GetClientRect(&rect);
 
   int w = rect.right - rect.left;
   int h = rect.bottom - rect.top;
-  
+
   CDC memDC ;
   memDC.CreateCompatibleDC(&dc);
   CBitmap bitmap, *pOldBitmap;
   bitmap.CreateCompatibleBitmap(&dc, w, h);
 
   pOldBitmap = memDC.SelectObject(&bitmap);
-  
+
   int multX = w / 8;
   int multY = h / 8;
 
@@ -132,7 +132,7 @@ void ZoomControl::OnPaint()
     int startY = (selected / 8)*multY+1;
     int endX = startX + multX-2;
     int endY = startY + multY-2;
-    
+
     memDC.MoveTo(startX, startY);
     memDC.LineTo(endX, startY);
     memDC.LineTo(endX, endY);
@@ -152,11 +152,11 @@ void ZoomControl::OnPaint()
   memDC.DeleteDC();
 }
 
-void ZoomControl::OnLButtonDown(UINT nFlags, CPoint point) 
+void ZoomControl::OnLButtonDown(UINT nFlags, CPoint point)
 {
   RECT rect;
   GetClientRect(&rect);
-  
+
   int height = rect.bottom - rect.top;
   int width = rect.right - rect.left;
 
@@ -164,12 +164,12 @@ void ZoomControl::OnLButtonDown(UINT nFlags, CPoint point)
   int multY = height / 8;
 
   selected = point.x / multX + 8 * (point.y / multY);
-  
+
   int c = point.x / multX + 8 * (point.y/multY);
   u16 color = colors[c*3] << 7 |
     colors[c*3+1] << 2 |
     (colors[c*3+2] >> 3);
-  
+
   GetParent()->PostMessage(WM_COLINFO,
                            color,
                            0);
@@ -177,7 +177,7 @@ void ZoomControl::OnLButtonDown(UINT nFlags, CPoint point)
   Invalidate();
 }
 
-BOOL ZoomControl::OnEraseBkgnd(CDC* pDC) 
+BOOL ZoomControl::OnEraseBkgnd(CDC* pDC)
 {
   return TRUE;
 }

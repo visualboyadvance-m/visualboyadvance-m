@@ -30,7 +30,7 @@ bool CxImageICO::Decode(CxFile *hFile)
 		int c;
 		for (c = 0; c < icon_header.idCount; c++)
 			hFile->Read(icon_list + c, sizeof(ICONDIRENTRY), 1);
-		
+
 		if ((page>=0)&&(page<icon_header.idCount)){
 
 			// get the bit count for the colors in the icon <CoreyRLucier>
@@ -90,7 +90,7 @@ bool CxImageICO::Decode(CxFile *hFile)
 					bool bNeedAlpha = false;
 					if (!AlphaIsValid()){
 						AlphaCreate();
-					} else { 
+					} else {
 						bNeedAlpha=true; //32bit icon
 					}
 					for (int y = 0; y < head.biHeight; y++) {
@@ -135,7 +135,7 @@ bool CxImageICO::Decode(CxFile *hFile)
 
 					// <vho> - Transparency support w/o Alpha support
 					if (c <= 8){ // only for icons with less than 256 colors (XP icons need alpha).
-						  
+
 						// find a color index, which is not used in the image
 						// it is almost sure to find one, bcs. nobody uses all possible colors for an icon
 
@@ -180,7 +180,7 @@ bool CxImageICO::Decode(CxFile *hFile)
 					SetTransIndex(0); //empty mask, set black as transparent color
 					Negative();
 				}
-			} 
+			}
 			free(mask);
 
 			free(icon_list);

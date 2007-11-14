@@ -301,7 +301,7 @@ bool CxImagePNG::Encode(CxFile *hFile)
 		png_destroy_write_struct(&png_ptr,  (png_infopp)&info_ptr);
 		throw "Error saving PNG file";
 	}
-            
+
 	int row_stride = info.dwEffWidth;
 	/* set up the output control */
 	//png_init_io(png_ptr, hFile);
@@ -345,8 +345,8 @@ bool CxImagePNG::Encode(CxFile *hFile)
 
 	/* set the palette if there is one */
 	if (GetPalette()){
-		png_set_IHDR(png_ptr, info_ptr, info_ptr->width, info_ptr->height, info_ptr->bit_depth, 
-					PNG_COLOR_TYPE_PALETTE, info_ptr->interlace_type, 
+		png_set_IHDR(png_ptr, info_ptr, info_ptr->width, info_ptr->height, info_ptr->bit_depth,
+					PNG_COLOR_TYPE_PALETTE, info_ptr->interlace_type,
 					PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 		info_ptr->valid |= PNG_INFO_PLTE;
 
@@ -394,7 +394,7 @@ bool CxImagePNG::Encode(CxFile *hFile)
 		for (int i=0; i<nc; i++)
 			GetPaletteColor(i, &info_ptr->palette[i].red, &info_ptr->palette[i].green, &info_ptr->palette[i].blue);
 
-	}  
+	}
 
 #if CXIMAGE_SUPPORT_ALPHA	// <vho>
 	//Merge the transparent color with the alpha channel
@@ -426,7 +426,7 @@ bool CxImagePNG::Encode(CxFile *hFile)
 
 		/* write the file information */
 		png_write_info(png_ptr, info_ptr);
-		
+
 		//<Ranger> "10+row_stride" fix heap deallocation problem during debug???
 		BYTE *row_pointers = new BYTE[10+row_stride];
 
@@ -450,7 +450,7 @@ bool CxImagePNG::Encode(CxFile *hFile)
 				ay--;
 			} while(iter.PrevRow());
 		}
-		
+
 		delete [] row_pointers;
 	}
 	else
@@ -460,11 +460,11 @@ bool CxImagePNG::Encode(CxFile *hFile)
 		png_write_info(png_ptr, info_ptr);
 		/* If you are only writing one row at a time, this works */
 		BYTE *row_pointers = new BYTE[10+row_stride];
- 
+
 		//interlace handling
 		int num_pass = png_set_interlace_handling(png_ptr);
 		for (int pass = 0; pass < num_pass; pass++){
-			
+
 			//write image
 			iter.Upset();
 			do	{
@@ -476,7 +476,7 @@ bool CxImagePNG::Encode(CxFile *hFile)
 			} while(iter.PrevRow());
 
 		}
-		
+
 		delete [] row_pointers;
 	}
 

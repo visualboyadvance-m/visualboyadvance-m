@@ -56,9 +56,9 @@ Node *exprNodeIdentifier()
   Node *n = (Node *)calloc(1, sizeof(Node));
   n->name = strdup(yytext);
 
-  exprNodeClean(n->name);  
+  exprNodeClean(n->name);
   exprNodeClean(n);
-  
+
   n->print = exprNodeIdentifierPrint;
   n->resolve = exprNodeIdentifierResolve;
   return n;
@@ -89,7 +89,7 @@ Node *exprNodeNumber()
   exprNodeClean(n);
   n->location = atoi(yytext);
   n->type = &exprNodeType;
-  n->locType = LOCATION_value;  
+  n->locType = LOCATION_value;
   n->print = exprNodeNumberPrint;
   n->resolve = exprNodeNumberResolve;
   return n;
@@ -109,9 +109,9 @@ Node *exprNodeStar(Node *exp)
 {
   Node *n = (Node *)calloc(1, sizeof(Node));
   exprNodeClean(n);
-  
+
   n->expression = exp;
-  
+
   n->print = exprNodeStarPrint;
   n->resolve = exprNodeStarResolve;
   return n;
@@ -149,10 +149,10 @@ Node *exprNodeDot(Node *exp, Node *ident)
 {
   Node *n = (Node *)calloc(1, sizeof(Node));
   exprNodeClean(n);
-  
+
   n->expression = exp;
   n->name = ident->name;
-  
+
   n->print = exprNodeDotPrint;
   n->resolve = exprNodeDotResolve;
   return n;
@@ -162,7 +162,7 @@ bool exprNodeDotResolve(Node *n, Function *f, CompileUnit *u)
 {
   if(n->expression->resolve(n->expression, f, u)) {
     TypeEnum tt = n->expression->type->type;
-    
+
     if(tt == TYPE_struct ||
        tt == TYPE_union) {
       u32 loc = n->expression->location;
@@ -206,10 +206,10 @@ Node *exprNodeArrow(Node *exp, Node *ident)
 {
   Node *n = (Node *)calloc(1, sizeof(Node));
   exprNodeClean(n);
-  
+
   n->expression = exp;
   n->name = ident->name;
-  
+
   n->print = exprNodeArrowPrint;
   n->resolve = exprNodeArrowResolve;
   return n;
@@ -224,7 +224,7 @@ bool exprNodeArrowResolve(Node *n, Function *f, CompileUnit *u)
       return false;
     }
     tt = n->expression->type->pointer->type;
-    
+
     if(tt == TYPE_struct ||
        tt == TYPE_union) {
       u32 loc = debuggerReadMemory(n->expression->location);
@@ -268,9 +268,9 @@ Node *exprNodeAddr(Node *exp)
 {
   Node *n = (Node *)calloc(1, sizeof(Node));
   exprNodeClean(n);
-  
+
   n->expression = exp;
-  
+
   n->print = exprNodeAddrPrint;
   n->resolve = exprNodeAddrResolve;
   return n;
@@ -303,9 +303,9 @@ Node *exprNodeSizeof(Node *exp)
 {
   Node *n = (Node *)calloc(1, sizeof(Node));
   exprNodeClean(n);
-  
+
   n->expression = exp;
-  
+
   n->print = exprNodeSizeofPrint;
   n->resolve = exprNodeSizeofResolve;
   return n;
@@ -333,10 +333,10 @@ Node *exprNodeArray(Node *exp, Node *number)
 {
   Node *n = (Node *)calloc(1, sizeof(Node));
   exprNodeClean(n);
-  
+
   n->expression = exp;
   n->value = number->location;
-  
+
   n->print = exprNodeArrayPrint;
   n->resolve = exprNodeArrayResolve;
   return n;
@@ -349,7 +349,7 @@ int exprNodeGetSize(Array *a, int index)
     return a->type->size;
   } else {
     int size = a->bounds[a->maxBounds-1] * a->type->size;
-    
+
     for(int i = index; i < a->maxBounds-1; i++) {
       size *= a->bounds[i];
     }
@@ -369,7 +369,7 @@ bool exprNodeArrayResolve(Node *n, Function *f, CompileUnit *u)
 
     if(tt == TYPE_array) {
       Array *a = n->expression->type->array;
-      
+
       u32 loc = n->expression->location;
       Type *t = a->type;
       if(a->maxBounds > 1) {

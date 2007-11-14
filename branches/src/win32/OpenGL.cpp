@@ -72,7 +72,7 @@ public:
 	OpenGLDisplay();
 	virtual ~OpenGLDisplay();
 	virtual DISPLAY_TYPE getType() { return OPENGL; };
-	
+
 	virtual bool initialize();
 	virtual void cleanup();
 	virtual void render();
@@ -116,17 +116,17 @@ void OpenGLDisplay::cleanup()
 		wglMakeCurrent(NULL, NULL);
 		hglrc = NULL;
 	}
-	
+
 	if(hDC != NULL) {
 		ReleaseDC(*theApp.m_pMainWnd, hDC);
 		hDC = NULL;
 	}
-	
+
 	if(filterData) {
 		free(filterData);
 		filterData = NULL;
 	}
-	
+
 	width = 0;
 	height = 0;
 	size = 0.0f;
@@ -216,7 +216,7 @@ bool OpenGLDisplay::initialize()
 	if( theApp.videoOption <= VIDEO_4X )
 		AdjustWindowRectEx( &theApp.dest, style, TRUE, styleEx );
 	else
-		AdjustWindowRectEx( &theApp.dest, style, FALSE, styleEx );    
+		AdjustWindowRectEx( &theApp.dest, style, FALSE, styleEx );
 
 	int winSizeX = theApp.dest.right - theApp.dest.left;
 	int winSizeY = theApp.dest.bottom - theApp.dest.top;
@@ -242,16 +242,16 @@ bool OpenGLDisplay::initialize()
 		x,y,winSizeX,winSizeY,
 		NULL,
 		0 );
-	
+
 	if (!(HWND)*pWnd) {
 		winlog("Error creating Window %08x\n", GetLastError());
 		return FALSE;
 	}
-	
+
 	theApp.updateMenuBar();
-	
+
 	theApp.adjustDestRect();
-	
+
 	theApp.mode320Available = FALSE;
 	theApp.mode640Available = FALSE;
 	theApp.mode800Available = FALSE;
@@ -259,33 +259,33 @@ bool OpenGLDisplay::initialize()
 	CDC *dc = pWnd->GetDC();
 	HDC hDC = dc->GetSafeHdc();
 
-	PIXELFORMATDESCRIPTOR pfd = { 
+	PIXELFORMATDESCRIPTOR pfd = {
 		sizeof(PIXELFORMATDESCRIPTOR),
-		1,                     // version number 
-		PFD_DRAW_TO_WINDOW |   // support window 
-		PFD_SUPPORT_OPENGL |   // support OpenGL 
-		PFD_DOUBLEBUFFER,      // double buffered 
-		PFD_TYPE_RGBA,         // RGBA type 
-		24,                    // 24-bit color depth 
-		0, 0, 0, 0, 0, 0,      // color bits ignored 
-		0,                     // no alpha buffer 
-		0,                     // shift bit ignored 
-		0,                     // no accumulation buffer 
-		0, 0, 0, 0,            // accum bits ignored 
-		32,                    // 32-bit z-buffer     
-		0,                     // no stencil buffer 
-		0,                     // no auxiliary buffer 
-		PFD_MAIN_PLANE,        // main layer 
-		0,                     // reserved 
-		0, 0, 0                // layer masks ignored 
+		1,                     // version number
+		PFD_DRAW_TO_WINDOW |   // support window
+		PFD_SUPPORT_OPENGL |   // support OpenGL
+		PFD_DOUBLEBUFFER,      // double buffered
+		PFD_TYPE_RGBA,         // RGBA type
+		24,                    // 24-bit color depth
+		0, 0, 0, 0, 0, 0,      // color bits ignored
+		0,                     // no alpha buffer
+		0,                     // shift bit ignored
+		0,                     // no accumulation buffer
+		0, 0, 0, 0,            // accum bits ignored
+		32,                    // 32-bit z-buffer
+		0,                     // no stencil buffer
+		0,                     // no auxiliary buffer
+		PFD_MAIN_PLANE,        // main layer
+		0,                     // reserved
+		0, 0, 0                // layer masks ignored
 	};
-	
-	int  iPixelFormat; 
+
+	int  iPixelFormat;
 	if( !(iPixelFormat = ChoosePixelFormat( hDC, &pfd )) ) {
 		winlog( "Failed ChoosePixelFormat\n" );
 		return false;
 	}
-	
+
 	// obtain detailed information about
 	// the device context's first pixel format
 	if( !( DescribePixelFormat(
@@ -297,24 +297,24 @@ bool OpenGLDisplay::initialize()
 		winlog( "Failed DescribePixelFormat\n" );
 		return false;
 	}
-	
+
 	if( !SetPixelFormat( hDC, iPixelFormat, &pfd ) ) {
 		winlog( "Failed SetPixelFormat\n" );
 		return false;
 	}
-	
+
 	if( !( hglrc = wglCreateContext( hDC ) ) ) {
 		winlog( "Failed wglCreateContext\n" );
 		return false;
 	}
-	
+
 	if( !wglMakeCurrent(hDC, hglrc) ) {
 		winlog( "Failed wglMakeCurrent\n" );
 		return false;
 	}
-	
+
 	pWnd->ReleaseDC( dc );
-	
+
 	// setup 2D gl environment
 	glPushAttrib( GL_ENABLE_BIT );
 	glDisable( GL_DEPTH_TEST );
@@ -337,19 +337,19 @@ bool OpenGLDisplay::initialize()
 	systemBlueShift = 19;
 	systemColorDepth = 32;
 	theApp.fsColorDepth = 32;
-	
+
 	Init_2xSaI(32);
-	
+
 	utilUpdateSystemColorMaps();
 	theApp.updateFilter();
 	theApp.updateIFB();
-	
+
 	if(failed)
 		return false;
-	
+
 	pWnd->DragAcceptFiles(TRUE);
 
-	return TRUE;  
+	return TRUE;
 }
 
 
@@ -373,7 +373,7 @@ void OpenGLDisplay::render()
 
 	int pitch = theApp.filterWidth * 4 + 4;
 	u8 *data = pix + ( theApp.sizeX + 1 ) * 4;
-	
+
 	// apply pixel filter
 	if(theApp.filterFunction) {
 		data = filterData;
@@ -397,7 +397,7 @@ void OpenGLDisplay::render()
 		glPixelStorei( GL_UNPACK_ROW_LENGTH, theApp.sizeX + 1 );
 		mult = 1;
 	}
-	
+
 	glTexSubImage2D(
 		GL_TEXTURE_2D,
 		0,
@@ -448,7 +448,7 @@ void OpenGLDisplay::render()
 	SwapBuffers( dc->GetSafeHdc() );
 	// since OpenGL draws on the back buffer,
 	// we have to swap it to the front buffer to see it
-	
+
 	// draw informations with GDI on the front buffer
 	dc->SetBkMode( theApp.showSpeedTransparent ? TRANSPARENT : OPAQUE );
 	if( theApp.showSpeed && ( theApp.videoOption > VIDEO_4X ) ) {
@@ -493,7 +493,7 @@ void OpenGLDisplay::updateFiltering( int value )
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		break;
 	}
-	
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 }
@@ -564,7 +564,7 @@ bool OpenGLDisplay::initializeTexture( int w, int h )
 
 	width = w;
 	height = h;
-	
+
 	return ( glGetError() == GL_NO_ERROR) ? true : false;
 }
 
@@ -572,7 +572,7 @@ bool OpenGLDisplay::initializeTexture( int w, int h )
 void OpenGLDisplay::setVSync( int interval )
 {
 	const char *extensions = (const char *)glGetString( GL_EXTENSIONS );
-	
+
 	if( strstr( extensions, "WGL_EXT_swap_control" ) == 0 ) {
 		winlog( "Error: WGL_EXT_swap_control extension not supported on your computer.\n" );
 		return;
@@ -593,13 +593,13 @@ bool OpenGLDisplay::changeRenderSize( int w, int h )
 			glDeleteTextures( 1, &texture );
 			texture = 0;
 		}
-		
+
 		if( !initializeTexture( w, h ) ) {
 			failed = true;
 			return false;
 		}
 	}
-	
+
 	return true;
 }
 

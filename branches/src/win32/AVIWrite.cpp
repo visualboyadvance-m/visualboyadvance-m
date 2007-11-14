@@ -27,7 +27,7 @@ AVIWrite::AVIWrite()
   m_streamCompressed = NULL;
   m_streamSound = NULL;
   m_samplesSound = 0;
-  
+
   AVIFileInit();
 }
 
@@ -38,7 +38,7 @@ AVIWrite::~AVIWrite()
 
   if(m_streamCompressed)
     AVIStreamClose(m_streamCompressed);
-  
+
   if(m_stream)
     AVIStreamClose(m_stream);
 
@@ -65,13 +65,13 @@ void AVIWrite::SetSoundFormat(WAVEFORMATEX *format)
   m_soundHeader.dwInitialFrames = 1;
   m_soundHeader.dwRate = format->nAvgBytesPerSec;
   m_soundHeader.dwSampleSize = format->nBlockAlign;
-  
+
   // create the sound stream
   if(FAILED(AVIFileCreateStream(m_file, &m_streamSound, &m_soundHeader))) {
     m_failed = true;
     return;
   }
-  
+
   // setup the sound stream format
   if(FAILED(AVIStreamSetFormat(m_streamSound, 0 , (void *)&m_soundFormat,
                                sizeof(WAVEFORMATEX)))) {
@@ -104,7 +104,7 @@ bool AVIWrite::Open(const char *filename)
     m_failed = true;
     return false;
   }
-      
+
   ZeroMemory(&m_options, sizeof(AVICOMPRESSOPTIONS));
   m_arrayOptions[0] = &m_options;
 
@@ -113,13 +113,13 @@ bool AVIWrite::Open(const char *filename)
     m_failed = true;
     return false;
   }
-  
+
   // create the compressed stream
   if(FAILED(AVIMakeCompressedStream(&m_streamCompressed, m_stream, &m_options, NULL))) {
     m_failed = true;
     return false;
   }
-  
+
   // setup the video stream format
   if(FAILED( AVIStreamSetFormat(m_streamCompressed, 0,
                                 &m_bitmap,
@@ -160,7 +160,7 @@ bool AVIWrite::AddFrame(const int frame, const char *bmp)
 {
   if (m_failed)
     return false;
-  
+
   // write the frame to the video stream
   if(FAILED(AVIStreamWrite(m_streamCompressed,
                            frame,
