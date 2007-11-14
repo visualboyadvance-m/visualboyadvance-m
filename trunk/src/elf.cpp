@@ -419,7 +419,7 @@ bool elfGetCurrentFunction(u32 addr, Function **f, CompileUnit **u)
   return false;
 }
 
-bool elfGetObject(char *name, Function *f, CompileUnit *u, Object **o)
+bool elfGetObject(const char *name, Function *f, CompileUnit *u, Object **o)
 {
   if(f && u) {
     Object *v = f->variables;
