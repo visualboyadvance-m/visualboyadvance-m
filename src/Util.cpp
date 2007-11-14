@@ -1082,7 +1082,7 @@ gzFile utilGzOpen(const char *file, const char *mode)
   return gzopen(file, mode);
 }
 
-gzFile utilMemGzOpen(char *memory, int available, char *mode)
+gzFile utilMemGzOpen(char *memory, int available, const char *mode)
 {
   utilGzWriteFunc = memgzwrite;
   utilGzReadFunc = memgzread;

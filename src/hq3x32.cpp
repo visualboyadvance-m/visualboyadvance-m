@@ -15,24 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-#include "win32/stdafx.h"
-#include "win32/VBA.h"
 #include "Util.h"
-
-#include <windows.h>
+#include <stdint.h>
 
 extern "C"
 {
-void hq3x_16(unsigned char*, unsigned char*, DWORD, DWORD, DWORD, DWORD);
-void hq3x_32(unsigned char*, unsigned char*, DWORD, DWORD, DWORD, DWORD);
-void hq4x_16(unsigned char*, unsigned char*, DWORD, DWORD, DWORD, DWORD);
-void hq4x_32(unsigned char*, unsigned char*, DWORD, DWORD, DWORD, DWORD);
+void hq3x_16(unsigned char*, unsigned char*, uint32_t, uint32_t, uint32_t, uint32_t);
+void hq3x_32(unsigned char*, unsigned char*, uint32_t, uint32_t, uint32_t, uint32_t);
+void hq4x_16(unsigned char*, unsigned char*, uint32_t, uint32_t, uint32_t, uint32_t);
+void hq4x_32(unsigned char*, unsigned char*, uint32_t, uint32_t, uint32_t, uint32_t);
 
 unsigned int   LUT16to32[65536];
 unsigned int   RGBtoYUV[65536];
 }
 
-int InitLUTs(void)
+void InitLUTs(void)
 {
   int i, j, k, r, g, b, Y, u, v;
 
@@ -51,18 +48,6 @@ int InitLUTs(void)
     v = 128 + ((-r + 2*g -b)>>3);
     RGBtoYUV[ (i << 11) + (j << 5) + k ] = (Y<<16) + (u<<8) + v;
   }
-
-  int nMMXsupport = 0;
-
-  __asm
-  {
-    mov  eax, 1
-    cpuid
-    and  edx, 0x00800000
-    mov  nMMXsupport, edx
-  }
-
-  return nMMXsupport;
 }
 
 int hq3xinited=0;
