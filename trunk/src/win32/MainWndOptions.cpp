@@ -614,6 +614,20 @@ void MainWnd::OnUpdateOptionsVideoRenderoptionsGlquads(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(theApp.glType == 1);
 }
 
+void MainWnd::OnOptionsVideoRenderoptionsGlpolygons()
+{
+	theApp.glType = 2;
+	if( theApp.display ) {
+		theApp.display->setOption( _T("glType"), theApp.glType );
+	}
+}
+
+
+void MainWnd::OnUpdateOptionsVideoRenderoptionsGlpolygons(CCmdUI* pCmdUI) 
+{
+  pCmdUI->SetCheck(theApp.glType == 2);
+}
+
 void MainWnd::OnOptionsVideoRenderoptionsSelectskin() 
 {
 #ifndef NOSKINS
