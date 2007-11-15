@@ -20,9 +20,7 @@
 #ifndef VBA_SYSTEM_H
 #define VBA_SYSTEM_H
 
-#ifndef _MSC_VER
 #include <stdint.h>
-#endif 
 
 #include "unzip.h"
 
@@ -30,7 +28,7 @@
 #define NULL 0
 #endif
 
-#ifndef _MSC_VER
+
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -41,13 +39,7 @@ typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
 
-#else
-typedef unsigned __int64 u64;
-typedef signed char s8;
-typedef signed short s16;
-typedef signed int s32;
-typedef signed __int64 s64;
-#endif
+
 
 typedef unsigned char u8;
 typedef unsigned short u16;
