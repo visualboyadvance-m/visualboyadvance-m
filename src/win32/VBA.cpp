@@ -154,10 +154,10 @@ int systemDebug = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 bool soundBufferLow = 0;
 void winSignal(int,int);
-void winOutput(char *, u32);
+void winOutput(const char *, u32);
 
 void (*dbgSignal)(int,int) = winSignal;
-void (*dbgOutput)(char *, u32) = winOutput;
+void (*dbgOutput)(const char *, u32) = winOutput;
 
 #ifdef MMX
 extern "C" bool cpu_mmx;
@@ -2440,7 +2440,7 @@ void winSignal(int, int)
 #define CPUReadByteQuick(addr) \
   map[(addr)>>24].address[(addr) & map[(addr)>>24].mask]
 
-void winOutput(char *s, u32 addr)
+void winOutput(const char *s, u32 addr)
 {
   if(s) {
     toolsLog(s);

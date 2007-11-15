@@ -1049,7 +1049,7 @@ case 0x28:
 #ifdef BKPT_SUPPORT
 #define THUMB_CONSOLE_OUTPUT(a,b) \
   if((opcode == 0x4000) && (reg[0].I == 0xC0DED00D)) {\
-    extern void (*dbgOutput)(char *, u32);\
+    extern void (*dbgOutput)(const char *, u32);\
     dbgOutput((a), (b));\
   }
 #else
