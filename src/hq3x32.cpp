@@ -17,7 +17,13 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "Util.h"
 #define __STDC_CONSTANT_MACROS
+
+#ifndef _MSC_VER
 #include <stdint.h>
+#else
+typedef unsigned int uint32_t;
+#endif
+
 
 extern "C"
 {
