@@ -406,19 +406,10 @@ void MotionConfig::assignKey(int id, int key)
 
 void MotionConfig::assignKeys()
 {
-  int id;
-
-  id = IDC_EDIT_UP;
-  assignKey(id, GetWindowLong(up, GWL_USERDATA));
-
-  id = IDC_EDIT_DOWN;
-  assignKey(id, GetWindowLong(down, GWL_USERDATA));
-
-  id = IDC_EDIT_LEFT;
-  assignKey(id, GetWindowLong(left, GWL_USERDATA));
-
-  id = IDC_EDIT_RIGHT;
-  assignKey(id, GetWindowLong(right, GWL_USERDATA));
+  AssignKeys(up.m_Keys,theApp.input->joypaddata[MOTION(KEY_UP)]);
+  AssignKeys(down.m_Keys, theApp.input->joypaddata[MOTION(KEY_DOWN)]);
+  AssignKeys(left.m_Keys, theApp.input->joypaddata[MOTION(KEY_LEFT)]);
+  AssignKeys(right.m_Keys, theApp.input->joypaddata[MOTION(KEY_RIGHT)]);
 }
 
 void JoypadConfig::OnBnClickedAppendmode()
