@@ -343,7 +343,7 @@ static inline u8 CPUReadByte(u32 address)
 #ifdef LINK_EMULATION
    if(linkenable&&(address>=0x4000120||address<=0x4000126)&&lspeed)
 	  LinkSStop();
-#endif 
+#endif
     if((address < 0x4000400) && ioReadable[address & 0x3ff])
       return ioMem[address & 0x3ff];
     else goto unreadable;
