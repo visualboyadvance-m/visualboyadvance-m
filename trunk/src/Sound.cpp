@@ -278,7 +278,7 @@ variable_desc soundSaveStruct[] = {
   { &soundDSBEnabled, sizeof(int) },
   { &soundDSBTimer, sizeof(int) },
   { &soundDSFifoB[0], 32 },
-  { &soundDSBValue, sizeof(int) },
+  { &soundDSBValue, sizeof(u8) },
   { &soundBuffer[0][0], 6*735 },
   { &soundFinalWave[0], 2*735 },
   { NULL, 0 }
