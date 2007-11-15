@@ -18,12 +18,7 @@
 #include "Util.h"
 #define __STDC_CONSTANT_MACROS
 
-#ifndef _MSC_VER
 #include <stdint.h>
-#else
-typedef unsigned int uint32_t;
-#endif
-
 
 extern "C"
 {

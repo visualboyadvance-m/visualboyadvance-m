@@ -19,12 +19,9 @@
 #include "hq_shared32.h"
 #define __STDC_CONSTANT_MACROS
 
-#ifndef _MSC_VER
+
 #include <stdint.h>
-#else
-typedef unsigned __int64 uint64_t;
-#define UINT64_C(x) x;
-#endif 
+
 
 const uint64_t reg_blank = UINT64_C(0x0000000000000000);
 const uint64_t const7    = UINT64_C(0x0000000700070007);
