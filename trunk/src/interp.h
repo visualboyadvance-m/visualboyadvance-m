@@ -32,7 +32,13 @@
 #define __INTERP_H
 
 #define __STDC_CONSTANT_MACROS
+
+#ifndef _MSC_VER
 #include <stdint.h>
+#else
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+#endif
 
 typedef uint16_t interp_uint16;
 typedef uint32_t interp_uint32;
