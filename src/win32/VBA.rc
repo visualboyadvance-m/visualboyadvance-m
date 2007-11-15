@@ -133,20 +133,20 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,90,102,50,14,WS_GROUP
 END
 
-IDD_ABOUT DIALOGEX 0, 0, 157, 105
+IDD_ABOUT DIALOGEX 0, 0, 179, 118
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "About"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     ICON            101,IDC_STATIC,6,6,21,20
-    CTEXT           "VisualBoyAdvance Emulator",IDC_STATIC,30,6,120,8
-    CTEXT           "Copyright © 2006 VBA development team",IDC_STATIC,6,36,144,8
-    CTEXT           "https://vbam.bountysource.com",IDC_URL,7,90,144,8
-    CTEXT           "Contributions by Costis",IDC_STATIC,6,48,144,8
-    CTEXT           "Version",IDC_STATIC,30,18,60,8
-    CTEXT           "",IDC_VERSION,90,18,60,8,SS_NOPREFIX
-    LTEXT           "Modified by VBA-M development team, Spacy, kode54...",IDC_STATIC,7,62,143,21
+    CTEXT           "VisualBoyAdvance Emulator",IDC_STATIC,34,7,120,8
+    CTEXT           "Copyright © 2006 VBA development team",IDC_STATIC,16,36,144,8
+    CTEXT           "https://vbam.bountysource.com",IDC_URL,7,95,165,8
+    CTEXT           "Contributions by Costis",IDC_STATIC,17,49,144,8
+    CTEXT           "Version",IDC_STATIC,47,17,27,8
+    CTEXT           "",IDC_VERSION,80,18,60,8,SS_NOPREFIX
+    LTEXT           "Modified by VBA-M development team, Spacy, kode54...",IDC_STATIC,18,62,141,21
 END
 
 IDD_DIRECTORIES DIALOGEX 0, 0, 220, 301
@@ -174,10 +174,10 @@ BEGIN
     PUSHBUTTON      "Reset",IDC_CAPTURE_DIR_RESET,120,258,90,12
     CONTROL         "You can either select or enter absolute paths to directories,\nor you can use relative paths by beginning with a . (point).\nExamples:   c:\\emulation\\roms   |   .\\battery   |   ..\\snapshots\\gba",IDC_STATIC,
                     "Static",SS_LEFTNOWORDWRAP | WS_GROUP,6,6,210,30,WS_EX_STATICEDGE
-    GROUPBOX        "Game Boy Advance ROM Images",IDC_STATIC,6,42,210,42
-    GROUPBOX        "Game Boy / Game Boy Color ROM Images",IDC_STATIC,6,90,210,42
-    GROUPBOX        "Game Boy Internal Battery Saves",IDC_STATIC,6,138,210,42
-    GROUPBOX        "Visual Boy Advance Save Games",IDC_STATIC,6,186,210,42
+    GROUPBOX        "Gameboy Advance ROM Images",IDC_STATIC,6,42,210,42
+    GROUPBOX        "Gameboy / Gameboy Color ROM Images",IDC_STATIC,6,90,210,42
+    GROUPBOX        "Gameboy Internal Battery Saves",IDC_STATIC,6,138,210,42
+    GROUPBOX        "VisualBoyAdvance Save Games",IDC_STATIC,6,186,210,42
     GROUPBOX        "Screenshots",IDC_STATIC,6,234,210,42
 END
 
@@ -313,10 +313,10 @@ BEGIN
     GROUPBOX        "GB Types",IDC_STATIC,3,3,50,69
 END
 
-IDD_GBA_ROM_INFO DIALOG  0, 0, 220, 142
+IDD_GBA_ROM_INFO DIALOGEX 0, 0, 220, 142
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Rom information"
-FONT 8, "MS Sans Serif"
+CAPTION "ROM Information"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",ID_OK,84,121,50,14
     LTEXT           "Game title:",IDC_STATIC,7,10,60,8
@@ -337,10 +337,10 @@ BEGIN
     LTEXT           "",IDC_ROM_MAKER_NAME,80,52,133,8,SS_NOPREFIX
 END
 
-IDD_GB_ROM_INFO DIALOG  0, 0, 220, 225
+IDD_GB_ROM_INFO DIALOGEX 0, 0, 220, 225
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Rom information"
-FONT 8, "MS Sans Serif"
+CAPTION "ROM Information"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",ID_OK,84,200,50,14
     LTEXT           "Game title:",IDC_STATIC,7,10,60,8
@@ -560,10 +560,10 @@ BEGIN
     EDITTEXT        IDC_CURRENT_ADDRESS,291,139,82,14,ES_RIGHT | ES_AUTOHSCROLL | WS_DISABLED
 END
 
-IDD_OAM_VIEW DIALOG  0, 0, 234, 185
+IDD_OAM_VIEW DIALOGEX 0, 0, 234, 185
 STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "Oam Viewer"
-FONT 8, "MS Sans Serif"
+CAPTION "OAM Viewer"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     EDITTEXT        IDC_SPRITE,7,19,76,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     SCROLLBAR       IDC_SCROLLBAR,7,33,76,11
@@ -781,10 +781,10 @@ BEGIN
     GROUPBOX        "Verbose",IDC_STATIC,7,7,93,142
 END
 
-IDD_EXPORT_SPS DIALOG  0, 0, 248, 148
+IDD_EXPORT_SPS DIALOGEX 0, 0, 248, 148
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Export Gameshark Snapshot"
-FONT 8, "MS Sans Serif"
+CAPTION "Export GameShark Snapshot"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     EDITTEXT        IDC_TITLE,84,7,157,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DESC,84,27,157,14,ES_AUTOHSCROLL
@@ -1122,9 +1122,9 @@ BEGIN
     IDD_ABOUT, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 150
+        RIGHTMARGIN, 172
         TOPMARGIN, 7
-        BOTTOMMARGIN, 98
+        BOTTOMMARGIN, 111
     END
 
     IDD_DIRECTORIES, DIALOG
@@ -1526,9 +1526,9 @@ BEGIN
             MENUITEM "&Gameshark Snapshot...",      ID_FILE_EXPORT_GAMESHARKSNAPSHOT
         END
         MENUITEM SEPARATOR
-        MENUITEM "Screen capture...",           ID_FILE_SCREENCAPTURE
-        MENUITEM "Rom information...",          ID_FILE_ROMINFORMATION
-        MENUITEM "Toggle menu",                 ID_FILE_TOGGLEMENU
+        MENUITEM "Screen Capture...",           ID_FILE_SCREENCAPTURE
+        MENUITEM "ROM Information...",          ID_FILE_ROMINFORMATION
+        MENUITEM "Toggle Menu",                 ID_FILE_TOGGLEMENU
         MENUITEM SEPARATOR
         MENUITEM "Close",                       ID_FILE_CLOSE
         MENUITEM SEPARATOR
@@ -1957,7 +1957,7 @@ END
 STRINGTABLE 
 BEGIN
     IDS_ERROR_CREATING_FILE "Error creating file %s"
-    IDS_FAILED_TO_READ_SGM  "Battery file's size incompatible with the rom settings %s (%d).\nWarning : save of the battery file is now disabled !"
+    IDS_FAILED_TO_READ_SGM  "Battery file's size incompatible with the ROM settings %s (%d).\nWarning : save of the battery file is now disabled !"
     IDS_FAILED_TO_READ_RTC  "Failed to read RTC from save game %s (continuing)"
     IDS_UNSUPPORTED_VB_SGM  "Unsupported VisualBoy save game version %d"
     IDS_CANNOT_LOAD_SGM_FOR "Cannot load save game for %s. Playing %s"
@@ -2062,14 +2062,14 @@ BEGIN
     IDS_FAILED_TO_LOAD_LIBRARY "Failed to load library %s"
     IDS_FAILED_TO_GET_LOCINFO "Failed to get locale information"
     IDS_SELECT_CHEAT_LIST_NAME "Select cheat list name"
-    IDS_FILTER_BIOS         "Gameboy Advance_*.BIN;*.AGB;*.GBA;*.BIOS;*.ZIP;*.Z;*.RAR;*.7Z;*.GZ__"
-    IDS_FILTER_ROM          "All Gameboy Advance_*.BIN;*.AGB;*.GBA;*.MB;*.ELF;*.GB;*.SGB;*.CGB;*.GBC;*.ZIP;*.7Z;*.RAR;*.Z;*.GZ_Gameboy Advance_*.BIN;*.AGB;*.GBA_Gameboy_*.GB;*.SGB;*.CGB;*.GBC__"
+    IDS_FILTER_BIOS         "Gameboy Advance BIOS_*.BIN;*.AGB;*.GBA;*.BIOS;*.ZIP;*.Z;*.7Z;*.GZ__"
+    IDS_FILTER_ROM          "All Gameboy _*.BIN;*.AGB;*.GBA;*.MB;*.ELF;*.GB;*.SGB;*.CGB;*.GBC;*.ZIP;*.7Z;*.Z;*.GZ_Gameboy Advance_*.BIN;*.AGB;*.GBA_Gameboy_*.GB;*.SGB_Color Gameboy_*.CGB;*.GBC__"
     IDS_FILTER_SGM          "VisualBoyAdvance Save Game_*.SGM__"
     IDS_FILTER_CHEAT_LIST   "VisualBoyAdvance Cheat List_*.CLT__"
     IDS_FILTER_PNG          "PNG Image_*.PNG_BMP Image_*.BMP__"
     IDS_LOADED_CHEATS       "Loaded cheats"
     IDS_ERROR_DISP_COLOR    "Unsupported display setting for color depth: %d bits. \nWindows desktop must be in either 16-bit, 24-bit or 32-bit mode for this program to work in window mode."
-    IDS_ADD_GSA_CODE        "Add GamesharkAdvance code"
+    IDS_ADD_GSA_CODE        "Add GameSharkAdvance code"
     IDS_FILTER_SPS          "Gameshark Snapshot_*.SPS__"
     IDS_SELECT_SNAPSHOT_FILE "Select snapshot file"
     IDS_FILTER_SAV          "Battery file_*.SAV_Flash save_*.DAT__"
@@ -2103,7 +2103,7 @@ BEGIN
     IDS_ADD_CBA_CODE        "Add CodeBreakerAdvance code"
     IDS_FILTER_WAV          "Wave file_*.WAV__"
     IDS_SELECT_WAV_NAME     "Select wave file name"
-    IDS_FILTER_GBROM        "All Gameboy_*.GB;*.SGB;*.CGB;*.GBC;*.ZIP;*.7Z;*.RAR;*.Z;*.GZ_Gameboy_*.GB_Super Gameboy_*.SGB_Color Gameboy_*.CGB;*.GBC__"
+    IDS_FILTER_GBROM        "All Gameboy_*.GB;*.SGB;*.CGB;*.GBC;*.ZIP;*.7Z;*.Z;*.GZ_Gameboy_*.GB_Super Gameboy_*.SGB_Color Gameboy_*.CGB;*.GBC__"
     IDS_FILTER_PAL          "Windows Palette (*.PAL)_*.PAL_PaintShop Palette (*.PAL)_*.PAL_Adobe Color Table (*.ACT)_*.ACT__"
     IDS_SELECT_PALETTE_NAME "Select palette name:"
     IDS_SEARCH_PRODUCED_NO_RESULTS "Search produced no results."
