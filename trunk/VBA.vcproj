@@ -158,7 +158,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/D_ST_MODEL&#x0D;&#x0A;/D_SECURE_SCL=0"
+				AdditionalOptions="/D_ST_MODEL&#x0D;&#x0A;/D_SECURE_SCL=0&#x0D;&#x0A;/Zc:forScope-"
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
@@ -503,7 +503,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasmw.exe -D__DJGPP__ -O1  -Isrc/  -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -537,7 +537,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasmw.exe -D__DJGPP__ -O1  -Isrc/   -f  win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -571,7 +571,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasmw.exe -D__DJGPP__ -O1 -Isrc/   -f  win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -605,7 +605,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasmw.exe -D__DJGPP__ -O1 -Isrc/  -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
