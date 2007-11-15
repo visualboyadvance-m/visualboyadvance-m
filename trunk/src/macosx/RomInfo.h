@@ -1,6 +1,6 @@
 ///////  Rom Info
 //////   Included by SDL.m
-    
+
 
 /*struct WinGBACompanyName {
   char *code;
@@ -202,7 +202,7 @@ if (showInfo)
         buffer[12] = 0;
         NSString * name = [[NSString alloc] initWithCString:buffer];
         [gSDLMain romInfoName:name];
-        
+
         strncpy(buffer, (const char *)&rom[0xac], 4);
         buffer[4] = 0;
         NSString * gameCode = [[NSString alloc] initWithCString:buffer];
@@ -216,7 +216,7 @@ if (showInfo)
         strcpy(maker, winGBARomInfoFindMakerCode(buffer));
         NSString * makerString = [[NSString alloc] initWithCString:maker];
         [gSDLMain romInfoMaker:makerString];
-  
+
         sprintf(buffer, "%02x", rom[0xb3]);
         NSString * unitCode = [[NSString alloc] initWithCString:buffer];
         [gSDLMain romInfoUnitCode:unitCode];
@@ -229,6 +229,6 @@ if (showInfo)
         NSString * version = [[NSString alloc] initWithCString:buffer];
         [gSDLMain romInfoVersion:version];
         }
-    
-    
+
+
 ///////

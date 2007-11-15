@@ -2538,7 +2538,7 @@ static bool debuggerCondEvaluate(int num)
   }
 }
 
-/*extern*/ void debuggerOutput(char *s, u32 addr)
+/*extern*/ void debuggerOutput(const char *s, u32 addr)
 {
   if(s)
     printf(s);

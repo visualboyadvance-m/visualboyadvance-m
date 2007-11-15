@@ -79,7 +79,7 @@ extern void StartGPLink(u16);
 extern void LinkSSend(u16);
 extern void LinkUpdate(int);
 extern int linktime2;
-#endif 
+#endif
 
 int SWITicks = 0;
 int IRQTicks = 0;
@@ -1913,7 +1913,7 @@ void CPUSoftwareInterrupt(int comment)
   if(armState) comment >>= 16;
 #ifdef BKPT_SUPPORT
   if(comment == 0xff) {
-    extern void (*dbgOutput)(char *, u32);
+    extern void (*dbgOutput)(const char *, u32);
     dbgOutput(NULL, reg[0].I);
     return;
   }

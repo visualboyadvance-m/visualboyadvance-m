@@ -107,7 +107,7 @@ extern void remoteStubSignal(int,int);
 extern void remoteOutput(char *, u32);
 extern void remoteSetProtocol(int);
 extern void remoteSetPort(int);
-extern void debuggerOutput(char *, u32);
+extern void debuggerOutput(const char *, u32);
 
 extern void CPUUpdateRenderBuffers(bool);
 extern int gbHardware;
@@ -264,7 +264,7 @@ extern void debuggerMain();
 
 void (*dbgMain)() = debuggerMain;
 void (*dbgSignal)(int,int) = debuggerSignal;
-void (*dbgOutput)(char *, u32) = debuggerOutput;
+void (*dbgOutput)(const char *, u32) = debuggerOutput;
 
 int  mouseCounter = 0;
 int autoFire = 0;
