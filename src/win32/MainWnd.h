@@ -211,6 +211,13 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsVideoRenderoptionsGlquads(CCmdUI* pCmdUI);
     afx_msg void OnOptionsVideoRenderoptionsGlpolygons();
   afx_msg void OnUpdateOptionsVideoRenderoptionsGlpolygons(CCmdUI* pCmdUI);
+
+      afx_msg void OnOptionsVideoRenderoptionsGlACID();
+  afx_msg void OnUpdateOptionsVideoRenderoptionsGlACID(CCmdUI* pCmdUI);
+        afx_msg void OnOptionsVideoRenderoptionsGlPulsation();
+  afx_msg void OnUpdateOptionsVideoRenderoptionsGlPulsation(CCmdUI* pCmdUI);
+  afx_msg void OnOptionsVideoRenderoptionsGlNone();
+  afx_msg void OnUpdateOptionsVideoRenderoptionsGlNone(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsSelectskin();
   afx_msg void OnUpdateOptionsVideoRenderoptionsSelectskin(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsSkin();
@@ -414,6 +421,7 @@ class MainWnd : public CWnd
   afx_msg void OnCheatsDisablecheats();
   afx_msg void OnUpdateCheatsDisablecheats(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoFullscreenmaxscale();
+  afx_msg void OnOptionsSelectPlugin();
   afx_msg void OnOptionsEmulatorGameoverrides();
   afx_msg void OnUpdateOptionsEmulatorGameoverrides(CCmdUI* pCmdUI);
 	afx_msg void OnHelpGnupubliclicense();

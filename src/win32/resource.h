@@ -96,6 +96,8 @@
 #define IDD_MAX_SCALE                   154
 #define IDD_BUG_REPORT                  155
 #define IDD_GAME_OVERRIDES              156
+#define IDD_SELECT                      159
+#define IDD_SELECT_PLUGIN               159
 #define IDC_R0                          1000
 #define IDC_EDIT_UP                     1000
 #define IDC_R1                          1001
@@ -799,6 +801,10 @@
 #define ID_OPTIONS_LINK_ENABLE          40335
 #define ID_RENDERAPI_VERTEX             40336
 #define ID_OPTIONS_VIDEO_RENDEROPTIONS_GLPOLYGONS 40337
+
+#define ID_OPTIONS_FILTER_PLUGIN        40343
+#define ID_OPTIONS_SELECT_PLUGIN        40344
+#define IDC_COMBO_PLUGIN                40345
 
 // Next default values for new objects
 //

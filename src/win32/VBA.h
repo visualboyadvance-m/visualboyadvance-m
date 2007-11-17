@@ -54,6 +54,7 @@ enum pixelFilterType
 	FILTER_NONE,
 
 	FILTER_SIMPLE2X, FILTER_PIXELATE, FILTER_TVMODE, FILTER_SCANLINES,
+    FILTER_PLUGIN,
 	FILTER_BILINEAR, FILTER_BILINEARPLUS, FILTER_MAMESCALE2X,
 	FILTER_2XSAI, FILTER_SUPER2XSAI, FILTER_SUPEREAGLE, FILTER_LQ2X, FILTER_HQ2X,
 
@@ -85,6 +86,7 @@ class VBA : public CWinApp
   void (*ifbFunction)(u8*,u32,int,int);
   int ifbType;
   int filterType;
+  char pluginName[MAX_PATH];
   int filterWidth;
   int filterHeight;
   int filterMagnification;

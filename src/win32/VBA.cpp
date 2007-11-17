@@ -29,6 +29,7 @@
 #include "skin.h"
 #include "WavWriter.h"
 #include "WinResUtil.h"
+#include "rpi.h"
 
 #include "../System.h"
 #include "../agbprint.h"
@@ -341,6 +342,7 @@ VBA::VBA()
 
 VBA::~VBA()
 {
+  rpiCleanup();
   InterframeCleanup();
 
   char winBuffer[2048];
@@ -708,6 +710,10 @@ void VBA::updateFilter()
 			filterFunction = NULL;
 			filterMagnification = 1;
 			break;
+        case FILTER_PLUGIN:
+	    if (rpiInit(pluginName))
+		filterFunction = rpiFilter;
+		break;
 		case FILTER_TVMODE:
 			filterFunction = ScanlinesTV;
 			filterMagnification = 2;
@@ -784,6 +790,10 @@ void VBA::updateFilter()
 				filterFunction = NULL;
 				filterMagnification = 1;
 				break;
+            	case FILTER_PLUGIN:
+	            if (rpiInit(pluginName))
+		        filterFunction = rpiFilter;
+		        break;
 			case FILTER_TVMODE:
 				filterFunction = ScanlinesTV32;
 				filterMagnification = 2;
@@ -854,8 +864,16 @@ void VBA::updateFilter()
 		}
 	}
 
+ if (filterType == FILTER_PLUGIN)
+	  {
+		  rect.right = sizeX * rpiScaleFactor();
+		  rect.bottom = sizeY * rpiScaleFactor();
+	  }
+	  else
+	  {
 	rect.right = sizeX * filterMagnification;
 	rect.bottom = sizeY * filterMagnification;
+}
 
 	if( filterType != FILTER_NONE )
 		memset(delta, 0xFF, sizeof(delta));
@@ -1329,6 +1347,8 @@ void VBA::loadSettings()
 
   videoOption = regQueryDwordValue("video", VIDEO_3X);
 
+  strcpy(pluginName, regQueryStringValue("pluginName", "Scale2x.rpi"));
+
   if(videoOption < VIDEO_1X || videoOption > VIDEO_OTHER)
     videoOption = VIDEO_3X;
 
@@ -1420,7 +1440,7 @@ void VBA::loadSettings()
     glType = 0;
 
   filterType = regQueryDwordValue("filter", 0);
-  if(filterType < 0 || filterType > 16)
+  if(filterType < 0 || filterType > 17)
     filterType = 0;
 
   disableMMX = regQueryDwordValue("disableMMX", false) ? true: false;
@@ -2425,7 +2445,7 @@ void VBA::saveSettings()
   regSetDwordValue("cheatsEnabled", cheatsEnabled);
   regSetDwordValue("fsMaxScale", fsMaxScale);
   regSetDwordValue("throttle", throttle);
-
+  regSetStringValue("pluginName", pluginName);
   regSetDwordValue("saveMoreCPU", Sm60FPS::bSaveMoreCPU);
   regSetDwordValue("LinkTimeout", linktimeout);
   regSetDwordValue("Linklog", linklog);
