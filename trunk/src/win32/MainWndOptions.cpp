@@ -33,6 +33,7 @@
 #include "skin.h"
 #include "Throttle.h"
 #include "WinResUtil.h"
+#include "SelectPlugin.h"
 
 #include "../System.h"
 #include "../agbprint.h"
@@ -627,6 +628,7 @@ void MainWnd::OnUpdateOptionsVideoRenderoptionsGlpolygons(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(theApp.glType == 2);
 }
+
 
 void MainWnd::OnOptionsVideoRenderoptionsSelectskin()
 {
@@ -1507,6 +1509,9 @@ BOOL MainWnd::OnOptionsFilter(UINT nID)
 	case ID_OPTIONS_FILTER_TVMODE:
 		theApp.filterType = FILTER_TVMODE;
 		break;
+case ID_OPTIONS_FILTER_PLUGIN:
+    theApp.filterType = FILTER_PLUGIN;
+    break;
 	case ID_OPTIONS_FILTER_2XSAI:
 		theApp.filterType = FILTER_2XSAI;
 		break;
@@ -1576,6 +1581,9 @@ void MainWnd::OnUpdateOptionsFilter(CCmdUI *pCmdUI)
   case ID_OPTIONS_FILTER_SUPER2XSAI:
     pCmdUI->SetCheck(theApp.filterType == FILTER_SUPER2XSAI);
     break;
+  case ID_OPTIONS_FILTER_PLUGIN:
+  pCmdUI->SetCheck(theApp.filterType == FILTER_PLUGIN);
+  break;
   case ID_OPTIONS_FILTER_SUPEREAGLE:
     pCmdUI->SetCheck(theApp.filterType == FILTER_SUPEREAGLE);
     break;
@@ -1958,4 +1966,14 @@ void MainWnd::OnOptionsSoundHardwareacceleration()
 void MainWnd::OnUpdateOptionsSoundHardwareacceleration(CCmdUI *pCmdUI)
 {
   pCmdUI->SetCheck(!theApp.dsoundDisableHardwareAcceleration);
+}
+
+void MainWnd::OnOptionsSelectPlugin() 
+{
+  SelectPlugin dlg;
+
+  if (dlg.DoModal() == IDOK && theApp.filterType == FILTER_PLUGIN)
+  {
+	theApp.updateFilter();
+  }
 }

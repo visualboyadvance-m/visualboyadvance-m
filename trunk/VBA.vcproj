@@ -467,6 +467,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\win32\rpi.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\scanline.cpp"
 					>
 				</File>
@@ -999,6 +1003,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\win32\SelectPlugin.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\win32\skin.cpp"
 					>
 				</File>
@@ -1220,6 +1228,10 @@
 			<Filter
 				Name="Filters"
 				>
+				<File
+					RelativePath=".\src\win32\rpi.h"
+					>
+				</File>
 				<Filter
 					Name="HQ"
 					>
@@ -1510,6 +1522,10 @@
 				</File>
 				<File
 					RelativePath=".\src\win32\RomInfo.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\SelectPlugin.h"
 					>
 				</File>
 				<File
