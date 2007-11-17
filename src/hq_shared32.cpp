@@ -29,7 +29,7 @@ const uint64_t treshold  = UINT64_C(0x0000000000300706);
 
 void Interp1(unsigned char * pc, unsigned int c1, unsigned int c2)
 {
-#ifdef _MSC_VER
+#if (defined(_MSC_VER) && !defined(C_CORE))
 #ifdef MMX
 	__asm
 	{
@@ -63,7 +63,7 @@ void Interp1(unsigned char * pc, unsigned int c1, unsigned int c2)
 
 void Interp2(unsigned char * pc, unsigned int c1, unsigned int c2, unsigned int c3)
 {
-#ifdef _MSC_VER
+#if (defined(_MSC_VER) && !defined(C_CORE))
 #ifdef MMX
 	__asm
 	{
@@ -97,7 +97,7 @@ void Interp2(unsigned char * pc, unsigned int c1, unsigned int c2, unsigned int 
 
 void Interp3(unsigned char * pc, unsigned int c1, unsigned int c2)
 {
-#ifdef _MSC_VER
+#if (defined(_MSC_VER) && !defined(C_CORE))
 #ifdef MMX
 	__asm
 	{
@@ -136,7 +136,7 @@ void Interp3(unsigned char * pc, unsigned int c1, unsigned int c2)
 
 void Interp4(unsigned char * pc, unsigned int c1, unsigned int c2, unsigned int c3)
 {
-#ifdef _MSC_VER
+#if (defined(_MSC_VER) && !defined(C_CORE))
 #ifdef MMX
 	__asm
 	{
@@ -157,7 +157,6 @@ void Interp4(unsigned char * pc, unsigned int c1, unsigned int c2, unsigned int 
 		EMMS
 	}
 #else
-
 	__asm
 	{
 		mov		eax, [c1]
@@ -200,7 +199,7 @@ void Interp4(unsigned char * pc, unsigned int c1, unsigned int c2, unsigned int 
 
 void Interp5(unsigned char * pc, unsigned int c1, unsigned int c2)
 {
-#ifdef _MSC_VER
+#if (defined(_MSC_VER) && !defined(C_CORE))
 #ifdef MMX
 	__asm
 	{
