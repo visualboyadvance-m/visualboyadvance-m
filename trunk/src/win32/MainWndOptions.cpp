@@ -1049,7 +1049,7 @@ void MainWnd::OnOptionsSoundOn()
 {
   if(soundOffFlag) {
     soundOffFlag = false;
-   // soundInit();
+    soundInit();
   }
   soundEnable(0x30f);
 }
