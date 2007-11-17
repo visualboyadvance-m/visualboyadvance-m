@@ -36,6 +36,7 @@
 #pragma comment( lib, "Dxguid" )
 
 extern bool soundBufferLow;
+extern void setsystemSoundOn(bool value);
 
 class DirectSound : public ISound
 {
@@ -228,8 +229,7 @@ bool DirectSound::init()
 		return false;
 	}
 
-	systemSoundOn = true;
-
+	setsystemSoundOn(true);
 	return true;
 }
 

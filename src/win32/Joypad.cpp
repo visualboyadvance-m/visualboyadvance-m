@@ -379,7 +379,7 @@ void MotionConfig::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 }
 
-void MotionConfig::OnTimer(UINT nIDEvent)
+void MotionConfig::OnTimer(UINT_PTR nIDEvent)
 {
   theApp.input->checkDevices();
 
