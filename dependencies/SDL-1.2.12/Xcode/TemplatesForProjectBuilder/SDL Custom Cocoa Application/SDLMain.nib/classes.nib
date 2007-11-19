@@ -1,0 +1,21 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {changeNumberOfSprites = id; selectUpdateMode = id; }; 
+            CLASS = MyController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_framesPerSecond" = id; "_numSprites" = id; "_view" = id; "_window" = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = MyCustomView; LANGUAGE = ObjC; SUPERCLASS = NSQuickDrawView; }, 
+        {CLASS = MyCustomWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
+        {
+            CLASS = SDLMain; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"_controller" = id; }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

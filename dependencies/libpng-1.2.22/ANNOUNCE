@@ -1,0 +1,53 @@
+
+Libpng 1.2.22 - October 13, 2007
+
+This is a public release of libpng, intended for use in production codes.
+
+Files available for download:
+
+Source files with LF line endings (for Unix/Linux) and with a
+"configure" script
+
+   libpng-1.2.22.tar.gz
+   libpng-1.2.22.tar.bz2
+
+Source files with LF line endings (for Unix/Linux) without the
+"configure" script
+
+   libpng-1.2.22-no-config.tar.gz
+   libpng-1.2.22-no-config.tar.bz2
+
+Source files with CRLF line endings (for Windows), without the
+"configure" script
+
+   lpng1222.zip
+   lpng1222.tar.bz2
+
+Project files
+
+   libpng-1.2.22-project-netware.zip
+   libpng-1.2.22-project-wince.zip
+
+Other information:
+
+   libpng-1.2.22-README.txt
+   libpng-1.2.22-KNOWNBUGS.txt
+   libpng-1.2.22-LICENSE.txt
+   libpng-1.2.22-Y2K-compliance.txt
+
+Changes since the last public release (1.2.21):
+
+version 1.2.22 [October 13, 2007]
+
+  Again, fixed logical vs bitwise NOT in pngrtran.c, bug introduced
+    in 1.2.19.
+  Fixed string length error in pngset.c (caused crashes while decoding iCCP)
+  Add terminating NULL after each instance of png_strncpy().
+  Fix two off-by-one terminating NULL after png_strncpy().
+
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+(subscription required; visit 
+https://lists.sourceforge.net/lists/listinfo/png-mng-implement
+to subscribe) or to glennrp at users.sourceforge.net
+
+Glenn R-P

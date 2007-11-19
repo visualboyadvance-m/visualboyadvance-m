@@ -1,0 +1,17 @@
+{
+	FilesToRename = {
+		"SDLApp_Prefix.pch" = "ÇPROJECTNAMEÈ_Prefix.pch";
+	};
+	FilesToMacroExpand = (
+		"ÇPROJECTNAMEÈ_Prefix.pch",
+		"Info.plist",
+		"English.lproj/InfoPlist.strings",
+		"MyController.h",
+		"MyController.m",
+		"MyCustomView.h",
+		"MyCustomView.m",
+		"MyCustomWindow.h",
+		"MyCustomWindow.m",
+	);
+	Description = "This project builds an SDL-based application that draws into a custom Cocoa window and view and interfaces with native Cocoa widgets.";
+}
