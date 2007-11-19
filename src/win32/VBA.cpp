@@ -711,9 +711,10 @@ void VBA::updateFilter()
 			filterMagnification = 1;
 			break;
         case FILTER_PLUGIN:
-	    if (rpiInit(pluginName))
-		filterFunction = rpiFilter;
-		break;
+	        if (rpiInit(pluginName))
+		    filterFunction = rpiFilter;
+		    filterMagnification = rpiScaleFactor();
+		    break;
 		case FILTER_TVMODE:
 			filterFunction = ScanlinesTV;
 			filterMagnification = 2;
@@ -790,9 +791,10 @@ void VBA::updateFilter()
 				filterFunction = NULL;
 				filterMagnification = 1;
 				break;
-            	case FILTER_PLUGIN:
+            case FILTER_PLUGIN:
 	            if (rpiInit(pluginName))
 		        filterFunction = rpiFilter;
+				filterMagnification = rpiScaleFactor();
 		        break;
 			case FILTER_TVMODE:
 				filterFunction = ScanlinesTV32;
@@ -864,16 +866,9 @@ void VBA::updateFilter()
 		}
 	}
 
- if (filterType == FILTER_PLUGIN)
-	  {
-		  rect.right = sizeX * rpiScaleFactor();
-		  rect.bottom = sizeY * rpiScaleFactor();
-	  }
-	  else
-	  {
 	rect.right = sizeX * filterMagnification;
 	rect.bottom = sizeY * filterMagnification;
-}
+
 
 	if( filterType != FILTER_NONE )
 		memset(delta, 0xFF, sizeof(delta));
