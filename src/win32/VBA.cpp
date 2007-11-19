@@ -795,6 +795,7 @@ void VBA::updateFilter()
 	            if (rpiInit(pluginName))
 		        filterFunction = rpiFilter;
 				filterMagnification = rpiScaleFactor();
+				b16to32Video=true;
 		        break;
 			case FILTER_TVMODE:
 				filterFunction = ScanlinesTV32;
