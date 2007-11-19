@@ -36,7 +36,7 @@ SDLOBJ=${SDLDIR}/debugger.o ${SDLDIR}/SDL.o ${SDLDIR}/dummy.o
 OBJECTS=${MAINOBJ} ${DMGOBJ} ${SDLOBJ}
 LIB=${RESAMPLEDIR}/libresample.a
 
-.SUFFIXES: .c .cpp
+.SUFFIXES: .c .cpp .asm
 
 %.o: %.c
 	${CC} ${CFLAGS} -o $@ -c $<
