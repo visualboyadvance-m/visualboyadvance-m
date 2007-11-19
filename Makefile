@@ -4,7 +4,8 @@ CFLAGS=-W -Wall -Wno-unused -DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DFINAL_VERSI
 CXXFLAGS=${CFLAGS}
 ASM=nasm
 ASMFLAGS=-w-orphan-labels -f elf -DELF -O1 -Isrc/
-LFLAGS=-lz -lpng -lSDL -s
+LFLAGS=-lz -lpng `sdl-config --libs`
+STRIP=strip -s
 
 MAINDIR=src
 SDLDIR=src/sdl
@@ -50,6 +51,7 @@ ALL: vba
 
 vba: ${OBJECTS} ${LIB}
 	$(CPPC) -o $@ ${OBJECTS} ${LIB} ${LFLAGS}
+	$(STRIP) $@
 
 ${RESAMPLEDIR}/libresample.a:
 	make -C ${RESAMPLEDIR} -f Make

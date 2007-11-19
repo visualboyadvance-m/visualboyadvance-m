@@ -19,7 +19,7 @@ u32 Buffer16Size = 0;
 bool rpiInit(const char *sPluginName)
 {
 	rpiCleanup();
-	
+
 	char sBuffer[256];
 	char *ptr;
 
@@ -29,7 +29,7 @@ bool rpiInit(const char *sPluginName)
 		*ptr = '\0';
 	strcat(sBuffer, "\\plugins\\");
 	strcat(sBuffer, sPluginName);
-	
+
   	rpiDLL = LoadLibrary(sBuffer);
   	if (!rpiDLL)
   		return false;
@@ -62,7 +62,7 @@ bool rpiInit(const char *sPluginName)
 	else if (Flags == RPI_OUT_SCL3)
 	{
 		nScaleFactor = 3;
-	} 
+	}
 	else if (Flags == RPI_OUT_SCL4)
 	{
 		nScaleFactor = 4;
@@ -80,7 +80,7 @@ void rpiFilter(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch,
 	u8 *pBuff;
 
 	if (realsystemColorDepth == 32)
-	{ 
+	{
 		// Kega filters are 16 bit only.  Assumes we've forced 16 bit input
 		ASSERT(systemColorDepth == 16);
 		u32 bufferNeeded = dstPitch * (height + nScaleFactor) * nScaleFactor;
@@ -101,7 +101,7 @@ void rpiFilter(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch,
 	MyPlugOutput.SrcPtr = srcPtr;
 	MyPlugOutput.SrcPitch = srcPitch;
 	MyPlugOutput.SrcW = width;
-	// Without this funky math on the height value, the RPI filter isn't fully 
+	// Without this funky math on the height value, the RPI filter isn't fully
 	// rendering the frame.  I don't like passing in values that seem
 	// to be greater than the buffer size, but it's the only way to get
 	// proper results.
@@ -109,7 +109,7 @@ void rpiFilter(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch,
 	MyPlugOutput.DstPtr = pBuff;
 	MyPlugOutput.DstPitch = dstPitch;
 	MyPlugOutput.DstW = width * nScaleFactor;
-	MyPlugOutput.DstH = (height+(nScaleFactor/2)) * nScaleFactor;  
+	MyPlugOutput.DstH = (height+(nScaleFactor/2)) * nScaleFactor;
 	MyPlugOutput.OutW = width * nScaleFactor;
 	MyPlugOutput.OutH = (height+(nScaleFactor/2)) * nScaleFactor;
 
@@ -173,7 +173,7 @@ int rpiScaleFactor()
 
 void rpiCleanup()
 {
-	if (rpiDLL != NULL) 
+	if (rpiDLL != NULL)
 	{
 		FreeLibrary(rpiDLL);
 		rpiDLL = NULL;
