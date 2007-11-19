@@ -6,56 +6,74 @@ ASM=nasm
 ASMFLAGS=-w-orphan-labels -f elf -DELF -O1 -Isrc/
 LFLAGS=-lz -lpng `sdl-config --libs`
 STRIP=strip -s
+DEL=rm -f
+OE=.o
+OUT=vba
+
+ifeq ($(PLATFORM),win)
+  ASMFLAGS=-w-orphan-labels -f win32 -O1 -Isrc/
+  LFLAGS=-lz -lpng -lSDL -lwsock32
+  DELETECOMMAND = del
+  OE=.obj
+  OUT=vba.exe
+endif
+
+ifeq ($(PLATFORM),win-cross)
+  CC=i586-mingw32-gcc
+  CPPC=i586-mingw32-g++
+  ASMFLAGS=-w-orphan-labels -f win32 -O1 -Isrc/
+  LFLAGS=-lz -lpng -lSDL -lwsock32
+  STRIP=i586-mingw32-strip -s
+  OE=.obj
+  OUT=vba.exe
+endif
+
 
 MAINDIR=src
 SDLDIR=src/sdl
 DMGDIR=src/gb
-RESAMPLEDIR=src/libresample-0.1.3
+RESAMPLEDIR=src/libresample-0.1.3/src
 
-ASMOBJ=${MAINDIR}/hq3x_16.o ${MAINDIR}/hq3x_32.o ${MAINDIR}/hq4x_16.o ${MAINDIR}/hq4x_32.o
+ASMOBJ=${MAINDIR}/hq3x_16${OE} ${MAINDIR}/hq3x_32${OE} ${MAINDIR}/hq4x_16${OE} ${MAINDIR}/hq4x_32${OE}
 CALTERNOBJ=
 
-MAINOBJ=${MAINDIR}/2xSaI.o ${MAINDIR}/admame.o ${MAINDIR}/agbprint.o ${MAINDIR}/armdis.o \
-${MAINDIR}/bilinear.o ${MAINDIR}/bios.o ${MAINDIR}/Cheats.o ${MAINDIR}/CheatSearch.o \
-${MAINDIR}/EEprom.o ${MAINDIR}/elf.o ${MAINDIR}/Flash.o ${MAINDIR}/GBA.o \
-${MAINDIR}/gbafilter.o ${MAINDIR}/Gfx.o ${MAINDIR}/Globals.o ${MAINDIR}/interframe.o \
-${MAINDIR}/hq2x.o ${MAINDIR}/Mode0.o \
-${MAINDIR}/Mode1.o ${MAINDIR}/Mode2.o ${MAINDIR}/Mode3.o ${MAINDIR}/Mode4.o \
-${MAINDIR}/Mode5.o ${MAINDIR}/motionblur.o ${MAINDIR}/pixel.o ${MAINDIR}/portable.o \
-${MAINDIR}/remote.o ${MAINDIR}/RTC.o ${MAINDIR}/scanline.o ${MAINDIR}/simpleFilter.o \
-${MAINDIR}/snd_interp.o ${MAINDIR}/Sound.o ${MAINDIR}/Sram.o ${MAINDIR}/Text.o \
-${MAINDIR}/unzip.o ${MAINDIR}/Util.o ${MAINDIR}/exprNode.o ${MAINDIR}/getopt.o \
-${MAINDIR}/getopt1.o ${MAINDIR}/memgzio.o ${MAINDIR}/expr-lex.o ${MAINDIR}/expr.o
+MAINOBJ=${MAINDIR}/2xSaI${OE} ${MAINDIR}/admame${OE} ${MAINDIR}/agbprint${OE} ${MAINDIR}/armdis${OE} \
+${MAINDIR}/bilinear${OE} ${MAINDIR}/bios${OE} ${MAINDIR}/Cheats${OE} ${MAINDIR}/CheatSearch${OE} \
+${MAINDIR}/EEprom${OE} ${MAINDIR}/elf${OE} ${MAINDIR}/Flash${OE} ${MAINDIR}/GBA${OE} \
+${MAINDIR}/gbafilter${OE} ${MAINDIR}/Gfx${OE} ${MAINDIR}/Globals${OE} ${MAINDIR}/interframe${OE} \
+${MAINDIR}/hq2x${OE} ${MAINDIR}/Mode0${OE} \
+${MAINDIR}/Mode1${OE} ${MAINDIR}/Mode2${OE} ${MAINDIR}/Mode3${OE} ${MAINDIR}/Mode4${OE} \
+${MAINDIR}/Mode5${OE} ${MAINDIR}/motionblur${OE} ${MAINDIR}/pixel${OE} ${MAINDIR}/portable${OE} \
+${MAINDIR}/remote${OE} ${MAINDIR}/RTC${OE} ${MAINDIR}/scanline${OE} ${MAINDIR}/simpleFilter${OE} \
+${MAINDIR}/snd_interp${OE} ${MAINDIR}/Sound${OE} ${MAINDIR}/Sram${OE} ${MAINDIR}/Text${OE} \
+${MAINDIR}/unzip${OE} ${MAINDIR}/Util${OE} ${MAINDIR}/exprNode${OE} ${MAINDIR}/getopt${OE} \
+${MAINDIR}/getopt1${OE} ${MAINDIR}/memgzio${OE} ${MAINDIR}/expr-lex${OE} ${MAINDIR}/expr${OE}
 
-DMGOBJ=${DMGDIR}/GB.o ${DMGDIR}/gbCheats.o ${DMGDIR}/gbDis.o ${DMGDIR}/gbGfx.o \
-${DMGDIR}/gbGlobals.o ${DMGDIR}/gbMemory.o ${DMGDIR}/gbPrinter.o ${DMGDIR}/gbSGB.o \
-${DMGDIR}/gbSound.o
+DMGOBJ=${DMGDIR}/GB${OE} ${DMGDIR}/gbCheats${OE} ${DMGDIR}/gbDis${OE} ${DMGDIR}/gbGfx${OE} \
+${DMGDIR}/gbGlobals${OE} ${DMGDIR}/gbMemory${OE} ${DMGDIR}/gbPrinter${OE} ${DMGDIR}/gbSGB${OE} \
+${DMGDIR}/gbSound${OE}
 
-SDLOBJ=${SDLDIR}/debugger.o ${SDLDIR}/SDL.o ${SDLDIR}/dummy.o
+SDLOBJ=${SDLDIR}/debugger${OE} ${SDLDIR}/SDL${OE} ${SDLDIR}/dummy${OE}
 
 OBJECTS=${MAINOBJ} ${DMGOBJ} ${SDLOBJ}
-LIB=${RESAMPLEDIR}/libresample.a
+LIB=${RESAMPLEDIR}/filterkit${OE} ${RESAMPLEDIR}/resample${OE} ${RESAMPLEDIR}/resamplesubs${OE}
 
 .SUFFIXES: .c .cpp .asm
 
-%.o: %.c
+%${OE}: %.c
 	${CC} ${CFLAGS} -o $@ -c $<
 
-%.o: %.cpp
+%${OE}: %.cpp
 	${CPPC} ${CXXFLAGS} -o $@ -c $<
 
-%.o: %.asm
+%${OE}: %.asm
 	${ASM} ${ASMFLAGS} -o $@ $<
 
-ALL: vba
+ALL: ${OUT}
 
-vba: ${OBJECTS} ${LIB}
+${OUT}: ${OBJECTS} ${LIB}
 	$(CPPC) -o $@ ${OBJECTS} ${LIB} ${LFLAGS}
 	$(STRIP) $@
 
-${RESAMPLEDIR}/libresample.a:
-	make -C ${RESAMPLEDIR} -f Make
-
 clean:
-	rm -f vba ${OBJECTS} ${LIB}
-	make -C ${RESAMPLEDIR} -f Make clean
+	$(DEL) vba ${OBJECTS} ${LIB}
