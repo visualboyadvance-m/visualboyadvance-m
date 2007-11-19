@@ -48,7 +48,7 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // SelectPlugin message handlers
 
-void SelectPlugin::OnOK() 
+void SelectPlugin::OnOK()
 {
 	// TODO: Add extra validation here
 	if (m_comboPlugin.GetCount() > 0)
@@ -61,17 +61,17 @@ void SelectPlugin::OnOK()
 	CDialog::OnOK();
 }
 
-void SelectPlugin::OnCancel() 
+void SelectPlugin::OnCancel()
 {
 	// TODO: Add extra cleanup here
-	
+
 	CDialog::OnCancel();
 }
 
-BOOL SelectPlugin::OnInitDialog() 
+BOOL SelectPlugin::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	
+
 	m_comboPlugin.ResetContent();
 
 	int nPluginCnt = EnumPlugins();
@@ -90,7 +90,7 @@ BOOL SelectPlugin::OnInitDialog()
 		}
 	}
 
-	
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -114,12 +114,12 @@ int SelectPlugin::EnumPlugins()
 
 	memset(&FindFileData, 0, sizeof(FindFileData));
 	hFind = FindFirstFile(sFindFile, &FindFileData);
-	if (hFind != INVALID_HANDLE_VALUE) 
+	if (hFind != INVALID_HANDLE_VALUE)
 	{
 		if (GetPluginDesc(FindFileData.cFileName, &plugDesc))
 			rpiPool.push_back(plugDesc);
 
-		while (true) 
+		while (true)
 		{
 			memset(&FindFileData, 0, sizeof(FindFileData));
 			if (!FindNextFile(hFind, &FindFileData))

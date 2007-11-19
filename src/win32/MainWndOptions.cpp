@@ -1968,7 +1968,7 @@ void MainWnd::OnUpdateOptionsSoundHardwareacceleration(CCmdUI *pCmdUI)
   pCmdUI->SetCheck(!theApp.dsoundDisableHardwareAcceleration);
 }
 
-void MainWnd::OnOptionsSelectPlugin() 
+void MainWnd::OnOptionsSelectPlugin()
 {
   SelectPlugin dlg;
 
