@@ -90,7 +90,7 @@
 # endif
 #endif
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 #include <string.h>
 #endif
 
