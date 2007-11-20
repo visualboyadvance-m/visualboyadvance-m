@@ -47,7 +47,7 @@ Changes in version 0.1.3:
 
 * resample-sndfile clips output to -1...1 (thanks to Glenn Maynard)
 
-Usage notes:  
+Usage notes:
 
 - If the output buffer you pass is too small, resample_process
   may not use any input samples because its internal output

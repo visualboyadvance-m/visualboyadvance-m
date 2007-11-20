@@ -34,14 +34,18 @@ SDLDIR=src/sdl
 DMGDIR=src/gb
 RESAMPLEDIR=src/libresample-0.1.3/src
 
-ASMOBJ=${MAINDIR}/hq3x_16${OE} ${MAINDIR}/hq3x_32${OE} ${MAINDIR}/hq4x_16${OE} ${MAINDIR}/hq4x_32${OE}
-CALTERNOBJ=
+
+ASMOBJ=${MAINDIR}/hq3x_16${OE} ${MAINDIR}/hq3x_32${OE} ${MAINDIR}/hq4x_16${OE} ${MAINDIR}/hq4x_32${OE} \
+${MAINDIR}/hq3x32${OE}
+
+CALTERNOBJ=${MAINDIR}/hq3x16c${OE} ${MAINDIR}/hq3x32c${OE} ${MAINDIR}/hq4x16c${OE} ${MAINDIR}/hq4x32c${OE} \
+${MAINDIR}/hq_shared32${OE}
 
 MAINOBJ=${MAINDIR}/2xSaI${OE} ${MAINDIR}/admame${OE} ${MAINDIR}/agbprint${OE} ${MAINDIR}/armdis${OE} \
 ${MAINDIR}/bilinear${OE} ${MAINDIR}/bios${OE} ${MAINDIR}/Cheats${OE} ${MAINDIR}/CheatSearch${OE} \
 ${MAINDIR}/EEprom${OE} ${MAINDIR}/elf${OE} ${MAINDIR}/Flash${OE} ${MAINDIR}/GBA${OE} \
 ${MAINDIR}/gbafilter${OE} ${MAINDIR}/Gfx${OE} ${MAINDIR}/Globals${OE} ${MAINDIR}/interframe${OE} \
-${MAINDIR}/hq2x${OE} ${MAINDIR}/Mode0${OE} \
+${MAINDIR}/hq2x${OE}  ${MAINDIR}/Mode0${OE} \
 ${MAINDIR}/Mode1${OE} ${MAINDIR}/Mode2${OE} ${MAINDIR}/Mode3${OE} ${MAINDIR}/Mode4${OE} \
 ${MAINDIR}/Mode5${OE} ${MAINDIR}/motionblur${OE} ${MAINDIR}/pixel${OE} ${MAINDIR}/portable${OE} \
 ${MAINDIR}/remote${OE} ${MAINDIR}/RTC${OE} ${MAINDIR}/scanline${OE} ${MAINDIR}/simpleFilter${OE} \
@@ -55,7 +59,7 @@ ${DMGDIR}/gbSound${OE}
 
 SDLOBJ=${SDLDIR}/debugger${OE} ${SDLDIR}/SDL${OE} ${SDLDIR}/dummy${OE}
 
-OBJECTS=${MAINOBJ} ${DMGOBJ} ${SDLOBJ}
+OBJECTS=${MAINOBJ} ${DMGOBJ} ${SDLOBJ} ${CALTERNOBJ}
 LIB=${RESAMPLEDIR}/filterkit${OE} ${RESAMPLEDIR}/resample${OE} ${RESAMPLEDIR}/resamplesubs${OE}
 
 .SUFFIXES: .c .cpp .asm
