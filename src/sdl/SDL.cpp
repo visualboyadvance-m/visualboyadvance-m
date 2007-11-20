@@ -2697,21 +2697,14 @@ void systemDrawScreen()
   }
 
   if(filterFunction) {
-    if(systemColorDepth == 16) {
-      filterFunction(pix+destWidth+4,destWidth+4, delta,
-                     (u8*)surface->pixels,surface->pitch,
-                     srcWidth,
-                     srcHeight);
-    } else {
-      unsigned int destw = destWidth*(filter_enlarge == 2 ? 2 : 1)+4;
-      filterFunction(pix+destw,
-                     destw,
-                     delta,
-                     (u8*)surface->pixels,
-                     surface->pitch,
-                     srcWidth,
-                     srcHeight);
-    }
+    unsigned int destw = destWidth*((systemColorDepth == 16) ? 2 : 4) / filter_enlarge + 4;
+    filterFunction(pix+destw,
+                    destw,
+                    delta,
+                    (u8*)surface->pixels,
+                    surface->pitch,
+                    srcWidth,
+                    srcHeight);
   } else {
     int destPitch = surface->pitch;
     u8 *src = pix;
