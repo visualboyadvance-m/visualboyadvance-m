@@ -101,7 +101,7 @@ bool changeType;
 - (void) closePrefsNull:(id)sender
 {
     [prefsWindow orderOut:self];
-    
+
     paused = false;
     SDL_PauseAudio(paused);
     wasPaused = false;
@@ -198,10 +198,10 @@ bool changeType;
     [prefs setInteger:[realtimeClock indexOfSelectedItem] forKey:@"rtcEnabled"];
     [prefs setInteger:[interframe indexOfSelectedItem] forKey:@"ifbType"];
     [prefs setInteger:[changeFileType indexOfSelectedItem] forKey:@"changeType"];
-        
+
     [prefsWindow orderOut:self];
     [prefs synchronize];
-        
+
         paused = !paused;
         SDL_PauseAudio(paused);
         if(paused)
@@ -214,10 +214,10 @@ bool changeType;
     BOOL isOK;
     NSString * path = [NSString stringWithString:@"~/Library/Preferences/VisualBoyAdvance.plist"];
     path = [path stringByExpandingTildeInPath];
-    
+
     if( [[NSFileManager defaultManager] fileExistsAtPath:path] )
             isOK = [[NSFileManager defaultManager] removeFileAtPath:path handler:nil];
-            
+
     sdlSetDefaultPreferences();
     [self loadConfig];
 }
@@ -239,11 +239,11 @@ bool changeType;
 {
     NSNumber *fileType = [NSNumber numberWithUnsignedLong:'Cart'];
     NSNumber *fileCreator = [NSNumber numberWithUnsignedLong:'vboy'];
-    
+
     NSString * fileString = [[NSString alloc] initWithCString:filename];
-    
+
     [[NSFileManager defaultManager] changeFileAttributes:[NSDictionary dictionaryWithObject:fileType forKey:NSFileHFSTypeCode] atPath:fileString];
-    
+
     [[NSFileManager defaultManager] changeFileAttributes:[NSDictionary dictionaryWithObject:fileCreator forKey:NSFileHFSCreatorCode] atPath:fileString];
 }
 
@@ -251,11 +251,11 @@ bool changeType;
 {
     NSNumber *fileType = [NSNumber numberWithUnsignedLong:'savf'];
     NSNumber *fileCreator = [NSNumber numberWithUnsignedLong:'vboy'];
-    
+
     NSString * fileString = [[NSString alloc] initWithCString:filename];
-    
+
     [[NSFileManager defaultManager] changeFileAttributes:[NSDictionary dictionaryWithObject:fileType forKey:NSFileHFSTypeCode] atPath:fileString];
-    
+
     [[NSFileManager defaultManager] changeFileAttributes:[NSDictionary dictionaryWithObject:fileCreator forKey:NSFileHFSCreatorCode] atPath:fileString];
 }
 
@@ -263,11 +263,11 @@ bool changeType;
 {
     NSNumber *fileType = [NSNumber numberWithUnsignedLong:'sgmf'];
     NSNumber *fileCreator = [NSNumber numberWithUnsignedLong:'vboy'];
-    
+
     NSString * fileString = [[NSString alloc] initWithCString:statename];
-    
+
     [[NSFileManager defaultManager] changeFileAttributes:[NSDictionary dictionaryWithObject:fileType forKey:NSFileHFSTypeCode] atPath:fileString];
-    
+
     [[NSFileManager defaultManager] changeFileAttributes:[NSDictionary dictionaryWithObject:fileCreator forKey:NSFileHFSCreatorCode] atPath:fileString];
 }
 
@@ -286,18 +286,18 @@ bool changeType;
 {
     char parentdir[MAXPATHLEN];
     char *c;
-    
+
     strncpy ( parentdir, gArgv[0], sizeof(parentdir) );
     c = (char*) parentdir;
 
     while (*c != '\0')     /* go to end */
         c++;
-    
+
     while (*c != '/')      /* back up to parent */
         c--;
-    
+
     *c++ = '\0';             /* cut off last part (binary name) */
-  
+
     if (shouldChdir)
     {
       assert ( chdir (parentdir) == 0 );   /* chdir to the binary app's parent */
@@ -349,7 +349,7 @@ bool changeType;
 /* Called when the internal event loop has just started running */
 - (void) applicationDidFinishLaunching: (NSNotification *) note
 {
-    
+
     gSDLMain = self;
 
     /* Set the working directory to the .app's parent directory */
@@ -408,7 +408,7 @@ if (emulating)
 else
     return YES;
 }
-    
+
 -(void) openCheatCBA:(id)sender
 {
     [cheatWindow makeKeyAndOrderFront:self];
@@ -453,7 +453,7 @@ sdlReadState(0);
 
 // This is completely crazy.  sdlEmuReset is declared in MainClass.h, which
 // is included in SDL.mm, but then it is defined in SDL.mm.  Madness.
-// Restructure this. 
+// Restructure this.
 -(void) resetEmulation:(id)sender
 {
     sdlEmuReset();
@@ -774,7 +774,7 @@ int main (int argc, char **argv)
 
     /* Copy the arguments into a global variable */
     int i;
-    
+
     /* This is passed if we are launched by double-clicking */
     if ( argc >= 2 && strncmp (argv[1], "-psn", 4) == 0 ) {
         gArgc = 1;
