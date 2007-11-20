@@ -89,6 +89,10 @@ extern void hq2x(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq2x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void lq2x(u8*,u32,u8*,u8*,u32,int,int);
 extern void lq2x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void hq3x16(u8*,u32,u8*,u8*,u32,int,int);
+extern void hq3x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void hq4x16(u8*,u32,u8*,u8*,u32,int,int);
+extern void hq4x32(u8*,u32,u8*,u8*,u32,int,int);
 
 extern void SmartIB(u8*,u32,int,int);
 extern void SmartIB32(u8*,u32,int,int);
@@ -153,6 +157,8 @@ int sensorY = 2047;
 
 int filter = 0;
 u8 *delta = NULL;
+
+int filter_enlarge = 2;
 
 int sdlPrintUsage = 0;
 int disableMMX = 0;
@@ -327,6 +333,8 @@ struct option sdlOptions[] = {
   { "filter-scanlines", no_argument, &filter, 11 },
   { "filter-hq2x", no_argument, &filter, 12 },
   { "filter-lq2x", no_argument, &filter, 13 },
+  { "filter-hq3x", no_argument, &filter, 14 },
+  { "filter-hq4x", no_argument, &filter, 15 },
   { "flash-size", required_argument, 0, 'S' },
   { "flash-64k", no_argument, &sdlFlashSize, 0 },
   { "flash-128k", no_argument, &sdlFlashSize, 1 },
@@ -1114,7 +1122,7 @@ void sdlReadPreferences(FILE *f)
       strcpy(biosFileName, value);
     } else if(!strcmp(key, "filter")) {
       filter = sdlFromHex(value);
-      if(filter < 0 || filter > 13)
+      if(filter < 0 || filter > 15)
         filter = 0;
     } else if(!strcmp(key, "disableStatus")) {
       disableStatusMessages = sdlFromHex(value) ? true : false;
@@ -1899,6 +1907,8 @@ Options:\n\
       --filter-scanlines        11 - Scanlines\n\
       --filter-hq2x             12 - hq2x\n\
       --filter-lq2x             13 - lq2x\n\
+      --filter-hq3x             14 - hq3x\n\
+      --filter-hq4x             15 - hq4x\n\
   -h, --help                   Print this help\n\
   -i, --ips=PATCH              Apply given IPS patch\n\
   -p, --profile=[HERTZ]        Enable profiling\n\
@@ -2178,8 +2188,14 @@ int main(int argc, char **argv)
     }
   }
 
+  switch (filter)
+  {
+    case 14: filter_enlarge = 3; break;
+    case 15: filter_enlarge = 4; break;
+  }
+
   if(filter) {
-    sizeOption = 1;
+    sizeOption = filter_enlarge-1;
   }
 
   for(int i = 0; i < 24;) {
@@ -2467,6 +2483,12 @@ int main(int argc, char **argv)
     case 13:
       filterFunction = lq2x;
       break;
+    case 14:
+      filterFunction = hq3x16;
+      break;
+    case 15:
+      filterFunction = hq4x16;
+      break;
     default:
       filterFunction = NULL;
       break;
@@ -2514,6 +2536,12 @@ int main(int argc, char **argv)
       break;
     case 13:
       filterFunction = lq2x32;
+      break;
+    case 14:
+      filterFunction = hq3x32;
+      break;
+    case 15:
+      filterFunction = hq4x32;
       break;
     default:
       filterFunction = NULL;
@@ -2669,19 +2697,21 @@ void systemDrawScreen()
   }
 
   if(filterFunction) {
-    if(systemColorDepth == 16)
+    if(systemColorDepth == 16) {
       filterFunction(pix+destWidth+4,destWidth+4, delta,
                      (u8*)surface->pixels,surface->pitch,
                      srcWidth,
                      srcHeight);
-    else
-      filterFunction(pix+destWidth*2+4,
-                     destWidth*2+4,
+    } else {
+      unsigned int destw = destWidth*(filter_enlarge == 2 ? 2 : 1)+4;
+      filterFunction(pix+destw,
+                     destw,
                      delta,
                      (u8*)surface->pixels,
                      surface->pitch,
                      srcWidth,
                      srcHeight);
+    }
   } else {
     int destPitch = surface->pitch;
     u8 *src = pix;

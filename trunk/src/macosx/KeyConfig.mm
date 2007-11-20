@@ -72,7 +72,7 @@ int poll()
 
 int config_main()
 {
-  
+
   if(SDL_Init(SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_NOPARACHUTE)) {
     printf("Failed to init SDL: %s\n", SDL_GetError());
     exit(-1);
@@ -87,22 +87,22 @@ int config_main()
 //  if (NULL == surface) {
 //     printf("Failed to set video mode: %s\n", SDL_GetError());
 //  }
-	 
+
   int numJoy = SDL_NumJoysticks();
-  
+
   int i;
   for(i = 0; i < numJoy; i++) {
     SDL_JoystickOpen(i);
   }
   SDL_JoystickEventState(SDL_ENABLE);
-  
+
   /*printf("%i joysticks were found.\n\n", SDL_NumJoysticks() );
   printf("The names of the joysticks are:\n");
-		
-    for( i=0; i < SDL_NumJoysticks(); i++ ) 
+
+    for( i=0; i < SDL_NumJoysticks(); i++ )
     {
         printf("    %s\n", SDL_JoystickName(i));
     }*/
-    
+
     return SDL_NumJoysticks();
 }
