@@ -75,8 +75,12 @@ extern void MotionBlur(u8*,u32,u8*,u8*,u32,int,int);
 extern void MotionBlur32(u8*,u32,u8*,u8*,u32,int,int);
 extern void AdMame2x(u8*,u32,u8*,u8*,u32,int,int);
 extern void AdMame2x32(u8*,u32,u8*,u8*,u32,int,int);
-//extern void Simple2x(u8*,u32,u8*,u8*,u32,int,int);
+extern void Simple2x16(u8*,u32,u8*,u8*,u32,int,int);
 extern void Simple2x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void Simple3x16(u8*,u32,u8*,u8*,u32,int,int);
+extern void Simple3x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void Simple4x16(u8*,u32,u8*,u8*,u32,int,int);
+extern void Simple4x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void Bilinear(u8*,u32,u8*,u8*,u32,int,int);
 extern void Bilinear32(u8*,u32,u8*,u8*,u32,int,int);
 extern void BilinearPlus(u8*,u32,u8*,u8*,u32,int,int);
@@ -327,14 +331,16 @@ struct option sdlOptions[] = {
   { "filter-pixelate", no_argument, &filter, 5 },
   { "filter-motion-blur", no_argument, &filter, 6 },
   { "filter-advmame", no_argument, &filter, 7 },
-  //{ "filter-simple2x", no_argument, &filter, 8 },
-  { "filter-bilinear", no_argument, &filter, 9 },
-  { "filter-bilinear+", no_argument, &filter, 10 },
-  { "filter-scanlines", no_argument, &filter, 11 },
-  { "filter-hq2x", no_argument, &filter, 12 },
-  { "filter-lq2x", no_argument, &filter, 13 },
-  { "filter-hq3x", no_argument, &filter, 14 },
-  { "filter-hq4x", no_argument, &filter, 15 },
+  { "filter-simple2x", no_argument, &filter, 8 },
+  { "filter-simple3x", no_argument, &filter, 9 },
+  { "filter-simple4x", no_argument, &filter, 10 },
+  { "filter-bilinear", no_argument, &filter, 11 },
+  { "filter-bilinear+", no_argument, &filter, 12 },
+  { "filter-scanlines", no_argument, &filter, 13 },
+  { "filter-lq2x", no_argument, &filter, 14 },
+  { "filter-hq2x", no_argument, &filter, 15 },
+  { "filter-hq3x", no_argument, &filter, 16 },
+  { "filter-hq4x", no_argument, &filter, 17 },
   { "flash-size", required_argument, 0, 'S' },
   { "flash-64k", no_argument, &sdlFlashSize, 0 },
   { "flash-128k", no_argument, &sdlFlashSize, 1 },
@@ -1122,7 +1128,7 @@ void sdlReadPreferences(FILE *f)
       strcpy(biosFileName, value);
     } else if(!strcmp(key, "filter")) {
       filter = sdlFromHex(value);
-      if(filter < 0 || filter > 15)
+      if(filter < 0 || filter > 17)
         filter = 0;
     } else if(!strcmp(key, "disableStatus")) {
       disableStatusMessages = sdlFromHex(value) ? true : false;
@@ -1902,13 +1908,15 @@ Options:\n\
       --filter-motion-blur       6 - Motion Blur\n\
       --filter-advmame           7 - AdvanceMAME Scale2x\n\
       --filter-simple2x          8 - Simple2x\n\
-      --filter-bilinear          9 - Bilinear\n\
-      --filter-bilinear+        10 - Bilinear Plus\n\
-      --filter-scanlines        11 - Scanlines\n\
-      --filter-hq2x             12 - hq2x\n\
-      --filter-lq2x             13 - lq2x\n\
-      --filter-hq3x             14 - hq3x\n\
-      --filter-hq4x             15 - hq4x\n\
+      --filter-simple3x          9 - Simple3x\n\
+      --filter-simple4x         10 - Simple4x\n\
+      --filter-bilinear         11 - Bilinear\n\
+      --filter-bilinear+        12 - Bilinear Plus\n\
+      --filter-scanlines        13 - Scanlines\n\
+      --filter-hq2x             14 - hq2x\n\
+      --filter-lq2x             15 - lq2x\n\
+      --filter-hq3x             16 - hq3x\n\
+      --filter-hq4x             17 - hq4x\n\
   -h, --help                   Print this help\n\
   -i, --ips=PATCH              Apply given IPS patch\n\
   -p, --profile=[HERTZ]        Enable profiling\n\
@@ -2190,8 +2198,8 @@ int main(int argc, char **argv)
 
   switch (filter)
   {
-    case 14: filter_enlarge = 3; break;
-    case 15: filter_enlarge = 4; break;
+    case 9: case 16: filter_enlarge = 3; break;
+    case 10: case 17: filter_enlarge = 4; break;
   }
 
   if(filter) {
@@ -2465,28 +2473,34 @@ int main(int argc, char **argv)
     case 7:
       filterFunction = AdMame2x;
       break;
-//    case 8:
-//      filterFunction = Simple2x;
-//      break;
+    case 8:
+      filterFunction = Simple2x16;
+      break;
     case 9:
-      filterFunction = Bilinear;
+      filterFunction = Simple3x16;
       break;
     case 10:
-      filterFunction = BilinearPlus;
+      filterFunction = Simple4x16;
       break;
     case 11:
-      filterFunction = Scanlines;
+      filterFunction = Bilinear;
       break;
     case 12:
-      filterFunction = hq2x;
+      filterFunction = BilinearPlus;
       break;
     case 13:
-      filterFunction = lq2x;
+      filterFunction = Scanlines;
       break;
     case 14:
-      filterFunction = hq3x16;
+      filterFunction = lq2x;
       break;
     case 15:
+      filterFunction = hq2x;
+      break;
+    case 16:
+      filterFunction = hq3x16;
+      break;
+    case 17:
       filterFunction = hq4x16;
       break;
     default:
@@ -2523,24 +2537,30 @@ int main(int argc, char **argv)
       filterFunction = Simple2x32;
       break;
     case 9:
-      filterFunction = Bilinear32;
+      filterFunction = Simple3x32;
       break;
     case 10:
-      filterFunction = BilinearPlus32;
+      filterFunction = Simple4x32;
       break;
     case 11:
-      filterFunction = Scanlines32;
+      filterFunction = Bilinear32;
       break;
     case 12:
-      filterFunction = hq2x32;
+      filterFunction = BilinearPlus32;
       break;
     case 13:
-      filterFunction = lq2x32;
+      filterFunction = Scanlines32;
       break;
     case 14:
-      filterFunction = hq3x32_32;
+      filterFunction = lq2x32;
       break;
     case 15:
+      filterFunction = hq2x32;
+      break;
+    case 16:
+      filterFunction = hq3x32_32;
+      break;
+    case 17:
       filterFunction = hq4x32_32;
       break;
     default:
