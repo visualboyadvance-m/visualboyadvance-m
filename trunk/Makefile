@@ -76,4 +76,4 @@ ${OUT}: ${OBJECTS} ${LIB}
 	$(STRIP) $@
 
 clean:
-	$(DEL) vba ${OBJECTS} ${LIB}
+	$(DEL) ${OUT} ${OBJECTS} ${LIB}
