@@ -28,7 +28,6 @@ ifeq ($(PLATFORM),win-cross)
   OUT=vba.exe
 endif
 
-
 MAINDIR=src
 SDLDIR=src/sdl
 DMGDIR=src/gb
@@ -59,8 +58,15 @@ ${DMGDIR}/gbSound${OE}
 
 SDLOBJ=${SDLDIR}/debugger${OE} ${SDLDIR}/SDL${OE} ${SDLDIR}/dummy${OE}
 
-OBJECTS=${MAINOBJ} ${DMGOBJ} ${SDLOBJ} ${CALTERNOBJ}
+OBJECTS=${MAINOBJ} ${DMGOBJ} ${SDLOBJ}
 LIB=${RESAMPLEDIR}/filterkit${OE} ${RESAMPLEDIR}/resample${OE} ${RESAMPLEDIR}/resamplesubs${OE}
+
+ifeq ($(USEASM),yes)
+OBJECTS+=${ASMOBJ}
+else
+OBJECTS+=${CALTERNOBJ}
+endif
+
 
 .SUFFIXES: .c .cpp .asm
 

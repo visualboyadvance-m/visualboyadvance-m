@@ -55,13 +55,12 @@ void InitLUTs(void)
 int hq3xinited=0;
 extern int realsystemRedShift, realsystemBlueShift;
 
+//16 bit input, see below for 32 bit input
 void hq3x32(unsigned char * pIn,  unsigned int srcPitch,
 			unsigned char *,
 			unsigned char * pOut, unsigned int dstPitch,
 			int Xres, int Yres)
 {
-	// NOTICE!  This driver wants 16 bit, not 32 bit input!
-
 	if (!hq3xinited)
 	{
 		InitLUTs();
@@ -114,13 +113,12 @@ void hq4x16(unsigned char * pIn,  unsigned int srcPitch,
 	hq4x_16( pIn, pOut, Xres, Yres, dstPitch, srcPitch - (Xres *2));
 }
 
+//16 bit input, see below for 32 bit input
 void hq4x32(unsigned char * pIn,  unsigned int srcPitch,
 			unsigned char *,
 			unsigned char * pOut, unsigned int dstPitch,
 			int Xres, int Yres)
 {
-	// NOTICE!  This driver wants 16 bit, not 32 bit input!
-
 	if (!hq3xinited)
 	{
 		InitLUTs();
@@ -144,4 +142,27 @@ void hq4x32(unsigned char * pIn,  unsigned int srcPitch,
 			p += offset;
 		}
 	}
+}
+
+static inline void convert32bpp_16bpp(unsigned char *pIn, unsigned int width)
+{
+  for (unsigned int i = 0; i < width; i+=4)
+  {
+    unsigned int p4 = ((unsigned int)pIn[i+2] << 16) | (unsigned int) (pIn[i+1] << 8) | pIn[i+0];
+    unsigned short p2 = ((p4 >> 8)&0xF800) | ((p4 >> 5)&0x07E0) | ((p4 >> 3)&0x001F);
+    pIn[i/2] = (p2 >> 0);
+    pIn[i/2+1] = (p2 >> 8);
+  }
+}
+
+void hq3x32_32(unsigned char *pIn,  unsigned int srcPitch, unsigned char *, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres)
+{
+  convert32bpp_16bpp(pIn, srcPitch*Yres);
+  hq3x32(pIn, srcPitch/2, 0, pOut, dstPitch, Xres, Yres);
+}
+
+void hq4x32_32(unsigned char *pIn,  unsigned int srcPitch, unsigned char *, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres)
+{
+  convert32bpp_16bpp(pIn, srcPitch*Yres);
+  hq4x32(pIn, srcPitch/2, 0, pOut, dstPitch, Xres, Yres);
 }

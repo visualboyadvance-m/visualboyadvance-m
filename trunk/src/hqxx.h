@@ -271,7 +271,7 @@ void hq3x16(unsigned char * pIn,  unsigned int srcPitch,
 			unsigned char * pOut, unsigned int dstPitch,
 			int Xres, int Yres)
 #elif defined(_32BIT)
-void hq3x32(unsigned char * pIn,  unsigned int srcPitch,
+void hq3x32_32(unsigned char * pIn,  unsigned int srcPitch,
 			unsigned char *,
 			unsigned char * pOut, unsigned int dstPitch,
 			int Xres, int Yres)
@@ -283,7 +283,7 @@ void hq4x16(unsigned char * pIn,  unsigned int srcPitch,
 			unsigned char * pOut, unsigned int dstPitch,
 			int Xres, int Yres)
 #elif defined(_32BIT)
-void hq4x32(unsigned char * pIn,  unsigned int srcPitch,
+void hq4x32_32(unsigned char * pIn,  unsigned int srcPitch,
 			unsigned char *,
 			unsigned char * pOut, unsigned int dstPitch,
 			int Xres, int Yres)

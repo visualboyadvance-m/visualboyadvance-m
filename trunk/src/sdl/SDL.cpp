@@ -90,9 +90,9 @@ extern void hq2x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void lq2x(u8*,u32,u8*,u8*,u32,int,int);
 extern void lq2x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq3x16(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq3x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void hq3x32_32(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq4x16(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq4x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void hq4x32_32(u8*,u32,u8*,u8*,u32,int,int);
 
 extern void SmartIB(u8*,u32,int,int);
 extern void SmartIB32(u8*,u32,int,int);
@@ -2538,10 +2538,10 @@ int main(int argc, char **argv)
       filterFunction = lq2x32;
       break;
     case 14:
-      filterFunction = hq3x32;
+      filterFunction = hq3x32_32;
       break;
     case 15:
-      filterFunction = hq4x32;
+      filterFunction = hq4x32_32;
       break;
     default:
       filterFunction = NULL;
