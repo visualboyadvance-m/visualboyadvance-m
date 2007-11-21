@@ -27,18 +27,18 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE
 BEGIN
     "#include ""afxres.h""\r\n"
     "#include ""resource2.h""\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE
 BEGIN
     "#include ""vba.rc2""\0"
 END
@@ -1124,7 +1124,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_OPENDLG, DIALOG
     BEGIN
@@ -1475,7 +1475,7 @@ END
 // Menu
 //
 
-IDR_MENU MENU 
+IDR_MENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -1885,7 +1885,7 @@ END
 // Accelerator
 //
 
-IDR_ACCELERATOR ACCELERATORS 
+IDR_ACCELERATOR ACCELERATORS
 BEGIN
     "C",            ID_CHEATS_SEARCHFORCHEATS, VIRTKEY, CONTROL, NOINVERT
     "N",            ID_DEBUG_NEXTFRAME,     VIRTKEY, CONTROL, NOINVERT
@@ -1948,7 +1948,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_UNSUPPORTED_VBA_SGM "Unsupported VisualBoyAdvance save game version %d"
     IDS_CANNOT_LOAD_SGM     "Cannot load save game for %s"
@@ -1960,7 +1960,7 @@ BEGIN
     IDS_NO_IMAGE_ON_ZIP     "No image found on ZIP file %s"
     IDS_ERROR_OPENING_IMAGE "Error opening image %s"
     IDS_ERROR_READING_IMAGE "Error reading image %s"
-    IDS_UNSUPPORTED_BIOS_FUNCTION 
+    IDS_UNSUPPORTED_BIOS_FUNCTION
                             "Unsupported BIOS function %02x called from %08x. A BIOS file is needed in order to get correct behaviour."
     IDS_INVALID_BIOS_FILE_SIZE "Invalid BIOS file size"
     IDS_INVALID_CHEAT_CODE  "Invalid cheat code '%s'. Supported formats are:\nXXXXXXXX:YY, XXXXXXXX:YYYY, XXXXXXXX:YYYYYYYY."
@@ -1968,7 +1968,7 @@ BEGIN
     IDS_UNKNOWN_THUMB_OPCODE "Unknown opcode %04x from %08x"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ERROR_CREATING_FILE "Error creating file %s"
     IDS_FAILED_TO_READ_SGM  "Battery file's size incompatible with the ROM settings %s (%d).\nWarning : save of the battery file is now disabled !"
@@ -1988,11 +1988,11 @@ BEGIN
     IDS_UNSUPPORTED_CHEAT_LIST_VERSION "Unsupported cheat list version %d"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_DIRECTX_7_REQUIRED  "DirectX 7.0 or greater is required to run.\nDownload at http://www.microsoft.com/directx.\n\nError found at: %s"
     IDS_DISABLING_VIDEO_MEMORY "Disabling Use Video Memory setting"
-    IDS_SETTING_WILL_BE_EFFECTIVE 
+    IDS_SETTING_WILL_BE_EFFECTIVE
                             "Setting will be effective the next time you start the emulator"
     IDS_DISABLING_EMULATION_ONLY "Disabling Emulation Only setting"
     IDS_FAILED_TO_OPEN_FILE "Failed to open file %s"
@@ -2004,13 +2004,13 @@ BEGIN
     IDS_CANNOT_SETFORMAT_PRIMARY "Cannot SetFormat for primary %08x"
     IDS_CANNOT_CREATESOUNDBUFFER_SEC "Cannot CreateSoundBuffer secondary %08x"
     IDS_CANNOT_PLAY_PRIMARY "Cannot Play primary %08x"
-    IDS_SEARCH_PRODUCED_TOO_MANY 
+    IDS_SEARCH_PRODUCED_TOO_MANY
                             "Search produced %d results. Please refine better"
     IDS_NUMBER_CANNOT_BE_EMPTY "Number cannot be empty"
     IDS_INVALID_ADDRESS     "Invalid address: %08x"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_MISALIGNED_HALFWORD "Misaligned half-word address: %08x"
     IDS_MISALIGNED_WORD     "Misaligned word address: %08x"
@@ -2030,7 +2030,7 @@ BEGIN
     IDS_SELECT_BATTERY_DIR  "Select Battery directory:"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_SELECT_SAVE_DIR     "Select Save Directory:"
     IDS_SELECT_CAPTURE_DIR  "Select Capture directory:"
@@ -2050,7 +2050,7 @@ BEGIN
     IDS_LOADED_STATE_N      "Loaded state %d"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_WROTE_STATE         "Wrote state"
     IDS_WROTE_STATE_N       "Wrote state %d"
@@ -2070,7 +2070,7 @@ BEGIN
     IDS_UNKNOWN             "Unknown"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_NONE                "None"
     IDS_FAILED_TO_LOAD_LIBRARY "Failed to load library %s"
@@ -2090,11 +2090,11 @@ BEGIN
     IDS_SELECT_BATTERY_FILE "Select battery file"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_UNSUPPORTED_CHEAT_LIST_TYPE "Unsupported cheat list type %d"
     IDS_INVALID_GSA_CODE    "Invalid GSA code. Format is XXXXXXXXYYYYYYYY."
-    IDS_CANNOT_IMPORT_SNAPSHOT_FOR 
+    IDS_CANNOT_IMPORT_SNAPSHOT_FOR
                             "Cannot import snapshot for %s. Current game is %s"
     IDS_UNSUPPORTED_SNAPSHOT_FILE "Unsupported snapshot file %s"
     IDS_UNSUPPORTED_ARM_MODE "Unsupported ARM mode %02x"
@@ -2105,7 +2105,7 @@ BEGIN
     IDS_OUT_OF_MEMORY       "Failed to allocate memory for %s"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_FILTER_GBS          "Gameboy Snapshot_*.GBS__"
     IDS_FILTER_GCF          "Gameshark Code File_*.GCF__"
@@ -2125,7 +2125,7 @@ BEGIN
     IDS_ERROR_LISTENING     "Error listening on socket."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ERROR_CREATING_SOCKET "Error creating socket."
     IDS_ACK_NOT_RECEIVED    "ACK not received from GDB."
@@ -2135,7 +2135,7 @@ BEGIN
     IDS_SELECT_DUMP_FILE    "Select dump file name"
     IDS_FILTER_AVI          "AVI File_*.AVI__"
     IDS_SELECT_AVI_NAME     "Select AVI file name"
-    IDS_INVALID_THROTTLE_VALUE 
+    IDS_INVALID_THROTTLE_VALUE
                             "Invalid throttle value. Please enter a number between 5 and 1000."
     IDS_FILTER_INI          "Skin INI File_*.INI__"
     IDS_SELECT_SKIN_FILE    "Select the skin file name"
@@ -2146,9 +2146,9 @@ BEGIN
     IDS_END_OF_MOVIE        "end of movie"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
-    IDS_INVALID_INTERVAL_VALUE 
+    IDS_INVALID_INTERVAL_VALUE
                             "Invalid rewind interval value. Please enter a number between 0 and 600 seconds."
     IDS_REGISTRY            "VisualBoyAdvance no longer uses the registry to store its settings. Your previous settings have been exported into the file: %s"
     IDS_MOVIE_PLAY          "Playing a movie will load a save state which may erase your previous battery saves. Please be sure to have a saved state if you don't want to loose any previous data."
