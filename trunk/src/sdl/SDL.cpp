@@ -22,10 +22,13 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <GL/gl.h>
+#include <GL/glext.h>
 
 #include "../AutoBuild.h"
 
 #include <SDL/SDL.h>
+
 #include "../GBA.h"
 #include "../agbprint.h"
 #include "../Flash.h"
@@ -170,6 +173,11 @@ int disableMMX = 0;
 int cartridgeType = 3;
 int sizeOption = 0;
 int captureFormat = 0;
+
+int openGL = 0;
+int textureSize = 256;
+GLuint screenTexture = 0;
+u8 *filterPix = 0;
 
 int pauseWhenInactive = 0;
 int active = 1;
@@ -357,10 +365,14 @@ struct option sdlOptions[] = {
   { "no-debug", no_argument, 0, 'N' },
   { "no-ips", no_argument, &sdlAutoIPS, 0 },
   { "no-mmx", no_argument, &disableMMX, 1 },
+  { "no-opengl", no_argument, &openGL, 0 },
   { "no-pause-when-inactive", no_argument, &pauseWhenInactive, 0 },
   { "no-rtc", no_argument, &sdlRtcEnable, 0 },
   { "no-show-speed", no_argument, &showSpeed, 0 },
   { "no-throttle", no_argument, &throttle, 0 },
+  { "opengl", required_argument, 0, 'O' },
+  { "opengl-nearest", no_argument, &openGL, 1 },
+  { "opengl-bilinear", no_argument, &openGL, 2 },
   { "pause-when-inactive", no_argument, &pauseWhenInactive, 1 },
   { "profile", optional_argument, 0, 'p' },
   { "rtc", no_argument, &sdlRtcEnable, 1 },
@@ -1098,6 +1110,8 @@ void sdlReadPreferences(FILE *f)
       joypad[4][KEY_BUTTON_SPEED] = sdlFromHex(value);
     } else if(!strcmp(key, "Joy4_Capture")) {
       joypad[4][KEY_BUTTON_CAPTURE] = sdlFromHex(value);
+    } else if(!strcmp(key, "openGL")) {
+     openGL = sdlFromHex(value);
     } else if(!strcmp(key, "Motion_Left")) {
       motion[KEY_LEFT] = sdlFromHex(value);
     } else if(!strcmp(key, "Motion_Right")) {
@@ -1227,6 +1241,50 @@ void sdlReadPreferences(FILE *f)
       fprintf(stderr, "Unknown configuration key %s\n", key);
     }
   }
+}
+
+
+
+void sdlOpenGLInit(int w, int h)
+{
+  float screenAspect = (float) srcWidth / srcHeight,
+        windowAspect = (float) w / h;
+
+  if(glIsTexture(screenTexture))
+  glDeleteTextures(1, &screenTexture);
+
+  glDisable(GL_CULL_FACE);
+  glEnable(GL_TEXTURE_2D);
+
+  if(windowAspect == screenAspect)
+    glViewport(0, 0, w, h);
+  else if (windowAspect < screenAspect) {
+    int height = (int)(w / screenAspect);
+    glViewport(0, (h - height) / 2, w, height);
+  } else {
+    int width = (int)(h * screenAspect);
+    glViewport((w - width) / 2, 0, width, h);
+  }
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+
+  glOrtho(0.0, 1.0, 1.0, 0.0, 0.0, 1.0);
+
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+
+  glGenTextures(1, &screenTexture);
+  glBindTexture(GL_TEXTURE_2D, screenTexture);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                  openGL == 2 ? GL_LINEAR : GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  openGL == 2 ? GL_LINEAR : GL_NEAREST);
+
+  textureSize = filterFunction ? 512 : 256;
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureSize, textureSize, 0,
+               GL_BGRA, GL_UNSIGNED_BYTE, NULL);
 }
 
 void sdlReadPreferences()
@@ -1773,9 +1831,11 @@ void sdlPollEvents()
           fullscreen = !fullscreen;
           if(fullscreen)
             flags |= SDL_FULLSCREEN;
+           if(openGL)
+            flags |= SDL_OPENGL | SDL_RESIZABLE;
           SDL_SetVideoMode(destWidth, destHeight, systemColorDepth, flags);
-          //          if(SDL_WM_ToggleFullScreen(surface))
-          //            fullscreen = !fullscreen;
+         if(openGL)
+         sdlOpenGLInit(destWidth, destHeight);
         }
         break;
       case SDLK_F11:
@@ -1790,6 +1850,15 @@ void sdlPollEvents()
         }
         debugger = true;
         break;
+      case SDL_VIDEORESIZE:
+	  if (openGL)
+	  {
+      SDL_SetVideoMode(event.resize.w, event.resize.h, 16,
+                       SDL_OPENGL | SDL_RESIZABLE |
+                       (fullscreen ? SDL_FULLSCREEN : 0));
+      sdlOpenGLInit(event.resize.w, event.resize.h);
+	  }
+      break;
       case SDLK_F1:
       case SDLK_F2:
       case SDLK_F3:
@@ -1879,6 +1948,10 @@ Options:\n\
   -2, --video-2x               2x\n\
   -3, --video-3x               3x\n\
   -4, --video-4x               4x\n\
+  -O, --opengl=MODE            Set OpenGL texture filter\n\
+      --no-opengl               0 - Disable OpenGL\n\
+      --opengl-nearest          1 - No filtering\n\
+      --opengl-bilinear         2 - Bilinear filtering\n\
   -F, --fullscreen             Full screen\n\
   -G, --gdb=PROTOCOL           GNU Remote Stub mode:\n\
                                 tcp      - use TCP at port 55555\n\
@@ -1987,7 +2060,7 @@ int main(int argc, char **argv)
 
   while((op = getopt_long(argc,
                           argv,
-                          "FNT:Y:G:D:b:c:df:hi:p::s:t:v:1234",
+                           "FNO:T:Y:G:D:b:c:df:hi:p::s:t:v:1234",
                           sdlOptions,
                           NULL)) != -1) {
     switch(op) {
@@ -2164,6 +2237,15 @@ int main(int argc, char **argv)
     case '?':
       sdlPrintUsage = 1;
       break;
+    case 'O':
+      if(optarg) {
+       openGL = atoi(optarg);
+        if (openGL < 0 || openGL > 2)
+         openGL = 1;
+     } else
+        openGL = 0;
+    break;
+
     }
   }
 
@@ -2176,6 +2258,9 @@ int main(int argc, char **argv)
   if(disableMMX)
     cpu_mmx = 0;
 #endif
+
+if(openGL)
+yuv = false;
 
   if(rewindTimer)
     rewindMemory = (char *)malloc(8*REWIND_SIZE);
@@ -2203,7 +2288,9 @@ int main(int argc, char **argv)
   }
 
   if(filter) {
+    if(!openGL)
     sizeOption = filter_enlarge-1;
+
   }
 
   for(int i = 0; i < 24;) {
@@ -2375,9 +2462,15 @@ int main(int argc, char **argv)
   destWidth = (sizeOption+1)*srcWidth;
   destHeight = (sizeOption+1)*srcHeight;
 
-  surface = SDL_SetVideoMode(destWidth, destHeight, 16,
-                             SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|
-                             (fullscreen ? SDL_FULLSCREEN : 0));
+  flags = SDL_ANYFORMAT | (fullscreen ? SDL_FULLSCREEN : 0);
+   if(openGL) {
+   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    flags |= SDL_OPENGL | SDL_RESIZABLE;
+  } else
+    flags |= SDL_HWSURFACE | SDL_DOUBLEBUF;
+
+  surface = SDL_SetVideoMode(destWidth, destHeight, 16, flags);
+
 
   if(surface == NULL) {
     systemMessage(0, "Failed to set video mode");
@@ -2603,6 +2696,12 @@ int main(int argc, char **argv)
     memset(delta, 255, 322*242*4);
   }
 
+if(openGL) {
+    filterPix = (u8 *)calloc(1, 4 * 4 * 256 * 240);
+    sdlOpenGLInit(destWidth, destHeight);
+  }
+
+
   emulating = 1;
   renderedFrames = 0;
 
@@ -2660,9 +2759,17 @@ int main(int argc, char **argv)
     delta = NULL;
   }
 
+  if(filterPix) {
+    free(filterPix);
+    filterPix = NULL;
+ }
+
   SDL_Quit();
   return 0;
 }
+
+
+
 
 #ifdef __WIN32__
 extern "C" {
@@ -2693,7 +2800,7 @@ void systemDrawScreen()
     Draw_Overlay(surface, sizeOption+1);
     return;
   }
-
+  if(!openGL)
   SDL_LockSurface(surface);
 
   if(screenMessage) {
@@ -2715,6 +2822,47 @@ void systemDrawScreen()
     else
       ifbFunction(pix+destWidth*2+4, destWidth*2+4, srcWidth, srcHeight);
   }
+
+if (openGL) {
+    int mult = 1;
+
+    if(filterFunction) {
+      int pitch = srcWidth * 4 + 4;
+
+      filterFunction(pix + pitch,
+                     pitch,
+                     delta,
+                     (u8*)filterPix,
+                     srcWidth * 4 * 2,
+                     srcWidth,
+                     srcHeight);
+
+      glPixelStorei(GL_UNPACK_ROW_LENGTH, srcWidth << 1);
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, srcWidth << 1, srcHeight << 1,
+                      GL_BGRA, GL_UNSIGNED_BYTE, filterPix);
+      mult = 2;
+    } else {
+      glPixelStorei(GL_UNPACK_ROW_LENGTH, srcWidth + 1);
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, srcWidth, srcHeight,
+                      GL_BGRA, GL_UNSIGNED_BYTE, pix + ((srcWidth + 1) << 2));
+    }
+
+    glBegin(GL_TRIANGLE_STRIP);
+      glTexCoord2f(0.0f, 0.0f);
+      glVertex3i(0, 0, 0);
+      glTexCoord2f(mult * srcWidth / (GLfloat) textureSize, 0.0f);
+      glVertex3i(1, 0, 0);
+      glTexCoord2f(0.0f, mult * srcHeight / (GLfloat) textureSize);
+      glVertex3i(0, 1, 0);
+      glTexCoord2f(mult * srcWidth / (GLfloat) textureSize,
+                  mult * srcHeight / (GLfloat) textureSize);
+      glVertex3i(1, 1, 0);
+    glEnd();
+
+   SDL_GL_SwapBuffers();
+  } else {
+
+
 
   if(filterFunction) {
     unsigned int destw = destWidth*((systemColorDepth == 16) ? 2 : 4) / filter_enlarge + 4;
@@ -2805,6 +2953,8 @@ void systemDrawScreen()
   SDL_UnlockSurface(surface);
   //  SDL_UpdateRect(surface, 0, 0, destWidth, destHeight);
   SDL_Flip(surface);
+}
+
 }
 
 bool systemReadJoypads()
@@ -3435,6 +3585,7 @@ inline void Draw_Overlay(SDL_Surface *display, int size)
 
 void systemGbBorderOn()
 {
+  long flags;
   srcWidth = 256;
   srcHeight = 224;
   gbBorderLineSkip = 256;
@@ -3444,9 +3595,15 @@ void systemGbBorderOn()
   destWidth = (sizeOption+1)*srcWidth;
   destHeight = (sizeOption+1)*srcHeight;
 
-  surface = SDL_SetVideoMode(destWidth, destHeight, 16,
-                             SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|
-                             (fullscreen ? SDL_FULLSCREEN : 0));
+  flags = SDL_ANYFORMAT | (fullscreen ? SDL_FULLSCREEN : 0);
+ if(openGL) {
+   flags |= SDL_OPENGL | SDL_RESIZABLE;
+  } else
+  flags |= SDL_HWSURFACE | SDL_DOUBLEBUF;
+
+ surface = SDL_SetVideoMode(destWidth, destHeight, 16, flags);
+ if(openGL)
+  sdlOpenGLInit(destWidth, destHeight);
 #ifndef C_CORE
   sdlMakeStretcher(srcWidth);
 #else
