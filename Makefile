@@ -1,6 +1,6 @@
 CC=gcc
 CPPC=g++
-CFLAGS=-W -Wall -Wno-unused -DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DFINAL_VERSION -DC_CORE -DSDL -DSYSCONFDIR="home"
+CFLAGS=-W -Wall -Wno-unused -DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DFINAL_VERSION -DC_CORE -DSDL -DSYSCONFDIR="home" -DUSE_OPENGL
 CXXFLAGS=${CFLAGS}
 ASM=nasm
 ASMFLAGS=-w-orphan-labels -f elf -DELF -O1 -Isrc/
@@ -12,7 +12,7 @@ OUT=vba
 
 ifeq ($(PLATFORM),win)
   ASMFLAGS=-w-orphan-labels -f win32 -O1 -Isrc/
-  LFLAGS=-lz -lpng -lSDL -lwsock32
+  LFLAGS=-lz -lpng -lSDL -lwsock32 -lopengl32
   DELETECOMMAND = del
   OE=.obj
   OUT=vba.exe
@@ -22,7 +22,7 @@ ifeq ($(PLATFORM),win-cross)
   CC=i586-mingw32-gcc
   CPPC=i586-mingw32-g++
   ASMFLAGS=-w-orphan-labels -f win32 -O1 -Isrc/
-  LFLAGS=-lz -lpng -lSDL -lwsock32
+  LFLAGS=-lz -lpng -lSDL -lwsock32 -lopengl32
   STRIP=i586-mingw32-strip -s
   OE=.obj
   OUT=vba.exe
