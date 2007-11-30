@@ -94,7 +94,6 @@
 #define IDD_REWIND_INTERVAL             150
 #define IDD_IO_VIEWER                   151
 #define IDD_MAX_SCALE                   154
-#define IDD_BUG_REPORT                  155
 #define IDD_GAME_OVERRIDES              156
 #define IDD_SELECT                      159
 #define IDD_SELECT_PLUGIN               159
@@ -488,9 +487,7 @@
 #define IDC_BIT_1                       1251
 #define IDC_PREDEFINED                  1251
 #define IDC_BIT_2                       1252
-#define IDC_BUG_REPORT                  1252
 #define IDC_BIT_3                       1253
-#define IDC_COPY                        1253
 #define IDC_BIT_4                       1254
 #define IDC_NAME                        1254
 #define IDC_BIT_5                       1255
@@ -801,13 +798,12 @@
 #define ID_OPTIONS_LINK_ENABLE          40335
 #define ID_RENDERAPI_VERTEX             40336
 #define ID_OPTIONS_VIDEO_RENDEROPTIONS_GLPOLYGONS 40337
-
 #define ID_OPTIONS_FILTER_PLUGIN        40343
 #define ID_OPTIONS_SELECT_PLUGIN        40344
 #define IDC_COMBO_PLUGIN                40345
 
 // Next default values for new objects
-//
+// 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        159

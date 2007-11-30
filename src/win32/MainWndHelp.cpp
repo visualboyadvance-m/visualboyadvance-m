@@ -20,7 +20,6 @@
 #include "MainWnd.h"
 
 #include "AboutDialog.h"
-#include "BugReport.h"
 
 extern int emulating;
 
@@ -34,19 +33,18 @@ void MainWnd::OnHelpAbout()
 
 void MainWnd::OnHelpFaq()
 {
-  ::ShellExecute(0, _T("open"), "http://vba.ngemu.com/faq.shtml",
+  ::ShellExecute(0, _T("open"), "vba-m_help.chm",
                  0, 0, SW_SHOWNORMAL);
 }
 
 void MainWnd::OnHelpBugreport()
 {
-  BugReport dlg(theApp.m_pMainWnd);
-
-  dlg.DoModal();
+  ::ShellExecute(0, _T("open"), "http://forums.ngemu.com/vba-m/",
+                 0, 0, SW_SHOWNORMAL);
 }
 
 void MainWnd::OnHelpGnupubliclicense()
 {
-  ::ShellExecute(0, _T("open"), "http://www.gnu.org/licenses/gpl.html",
+  ::ShellExecute(0, _T("open"), "http://www.gnu.org/licenses/old-licenses/gpl-2.0.html",
                  0, 0, SW_SHOWNORMAL);
 }
