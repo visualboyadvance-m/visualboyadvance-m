@@ -1376,7 +1376,7 @@ void VBA::loadSettings()
   }
 
   renderMethod = (DISPLAY_TYPE)regQueryDwordValue("renderMethod", DIRECT_DRAW);
-  if(renderMethod < GDI || renderMethod > OPENGL)
+  if(renderMethod < DIRECT_DRAW || renderMethod > OPENGL)
     renderMethod = DIRECT_DRAW;
 
   windowPositionX = regQueryDwordValue("windowX", 0);
@@ -1908,14 +1908,10 @@ bool VBA::updateRenderMethod(bool force)
 				} else {
 					if(renderMethod == DIRECT_3D) {
 						renderMethod = DIRECT_DRAW;
-					} else {
-						if(renderMethod == DIRECT_DRAW) {
-							renderMethod = GDI;
 						}
 					}
 				}
 			}
-		}
 		res = updateRenderMethod(force);
 	}
 
@@ -1954,9 +1950,6 @@ bool VBA::updateRenderMethod0(bool force)
   }
   if(display == NULL) {
     switch(renderMethod) {
-    case GDI:
-		display = newGDIDisplay();
-		break;
     case DIRECT_DRAW:
 		pVideoDriverGUID = NULL;
 		ZeroMemory( &videoDriverGUID, sizeof( GUID ) );
