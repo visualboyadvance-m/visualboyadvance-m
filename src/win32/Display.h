@@ -20,10 +20,9 @@
 #pragma once
 
 enum DISPLAY_TYPE {
-  GDI = 0,
-  DIRECT_DRAW = 1,
-  DIRECT_3D = 2,
-  OPENGL = 3
+  DIRECT_DRAW = 0,
+  DIRECT_3D = 1,
+  OPENGL = 2
 };
 
 class IDisplay {
