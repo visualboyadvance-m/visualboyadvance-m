@@ -1,4 +1,5 @@
 Known Bugs:
 
-- fsMaxScale = 1 in Direct3D fullscreen results in wrong image size
+- Direct3D: fsMaxScale = 1 in fullscreen mode with visible menu results in too small height of the image
 - Direct3D: Menu toggle takes a little too long
+- Direct3D: VSync will be disabled in full screen mode while the menu is visible in order to work around poor performance
