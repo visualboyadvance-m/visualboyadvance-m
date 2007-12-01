@@ -2030,7 +2030,7 @@ void VBA::directXMessage(const char *msg)
 
 void VBA::winUpdateSkin()
 {
-#ifndef NOSKINS
+#ifndef NO_SKINS
   skinButtons = 0;
   if(skin) {
     delete skin;
