@@ -1564,7 +1564,9 @@ static INSN_REGPARM void arm121(u32 opcode)
     LDRSTR_INIT(CALC_OFFSET, CALC_ADDRESS);             \
     LOAD_DATA;                                          \
     if (dest != base)                                   \
+    {                                                   \
         WRITEBACK;                                      \
+    }                                                   \
     clockTicks = 0;                                     \
     if (dest == 15) {                                   \
         reg[15].I &= 0xFFFFFFFC;                        \
@@ -2858,7 +2860,7 @@ static void tester(void) {
     int i;for(i=0;i<op;i++)if(armInsnTable[op]==armInsnTable[i])break;if(i<op)continue;
     for(i=0;i<16;i++)reg[i].I=0x3100000;
     clock_t s=clock();for(i=0;i<10000000;i++)armInsnTable[op](0);clock_t e=clock();
-    fprintf(f,"arm%03X %6d\n",op,e-s);fflush(f);
+    fprintf(f,"arm%03X %6ld\n",op,e-s);fflush(f);
   }fclose(f);
 }
 
