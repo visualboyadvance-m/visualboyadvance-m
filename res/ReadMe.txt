@@ -1,19 +1,19 @@
-VisualBoyAdvance S1.7.6
+VisualBoyAdvance-M
 Nintendo Game Boy / Game Boy Advance Emulator
+
+Based on official VBA Version 1.7.2
+Original Project Homepage: vba.ngemu.com
 
 This program is distributed under the GNU General Public License
 http://www.gnu.org/licenses/gpl.html
 
-VBA Official Version 1.7.2 with changes by Spacy
-Spacy51@gmx.de (Write in english or in german)
-Special Build Aturhors Homepage: www.spacyhacks.de.vu
-Original Project Homepage: vba.ngemu.com
 
-My aim:
-I want to make this emulator fit my needs and hopefully the needs of others,
-which want a light-weight small, fast and multimedial emulator for the GBA
-that makes as much use of the power of modern PCs as possible (but with sense).
-If you need one of the removed features, just use the original VBA emulator.
+
+Aim:
+Combine the best features of the VBA forks in one build.
+Multi-platform support.
+
+
 
 Thanks go to:
 suanyuan    For help in compilation and other fixes
@@ -21,8 +21,10 @@ Tauwasser   For help in assembler
 WingX       For fixing a linker error
 
 
-The following changes have been made:
 
+-------------------
+Changes from VBA-S:
+-------------------
 S1.7.6:
 Emu:
 - Readded MMX macro
