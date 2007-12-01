@@ -1902,7 +1902,7 @@ void MainWnd::OnOptionsSelectPlugin()
 
 void MainWnd::OnSkinUse()
 {
-#ifndef NOSKINS
+#ifndef NO_SKINS
 	theApp.skinEnabled = !theApp.skinEnabled;
 	theApp.updateRenderMethod(true);
 	theApp.winAccelMgr.UpdateMenu(theApp.menu);
@@ -1913,7 +1913,7 @@ void MainWnd::OnSkinUse()
 
 void MainWnd::OnUpdateSkinUse(CCmdUI *pCmdUI)
 {
-#ifndef NOSKINS
+#ifndef NO_SKINS
 	pCmdUI->SetCheck( theApp.skinEnabled );
 	pCmdUI->Enable( theApp.display && theApp.display->isSkinSupported() && theApp.videoOption <= VIDEO_4X );
 #endif
@@ -1921,7 +1921,7 @@ void MainWnd::OnUpdateSkinUse(CCmdUI *pCmdUI)
 
 void MainWnd::OnSkinSelect()
 {
-#ifndef NOSKINS
+#ifndef NO_SKINS
 	LPCTSTR exts[] = { ".ini" };
 	CString filter = winLoadFilter( IDS_FILTER_INI );
 	CString title = winResLoadString( IDS_SELECT_SKIN_FILE );
@@ -1963,7 +1963,7 @@ void MainWnd::OnSkinSelect()
 
 void MainWnd::OnUpdateSkinSelect(CCmdUI *pCmdUI)
 {
-#ifndef NOSKINS
+#ifndef NO_SKINS
 	pCmdUI->Enable(
 		theApp.display &&
 		theApp.display->isSkinSupported() &&
