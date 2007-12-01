@@ -734,7 +734,10 @@ bool Direct3DDisplay::resetDevice()
 	if( !pDevice ) return false;
 
 	HRESULT hr;
-	destroyFont();
+	if( pFont ) {
+		// prepares font for rest
+		pFont->OnLostDevice();
+	}
 	destroyTexture();
 	prepareDisplayMode();
 
@@ -751,7 +754,10 @@ bool Direct3DDisplay::resetDevice()
 		return false;
 	}
 
-	createFont();
+	if( pFont ) {
+		// re-aquires font resources
+		pFont->OnResetDevice();
+	}
 	createTexture();
 	setOption( _T("d3dFilter"), theApp.d3dFilter );
 	failed = false;
