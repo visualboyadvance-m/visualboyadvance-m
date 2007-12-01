@@ -500,13 +500,13 @@ void Direct3DDisplay::render()
 			sprintf( buffer, "%3d%%(%d, %d fps)", systemSpeed, systemFrameSkip, theApp.showRenderedFrames );
 		}
 
-		pFont->DrawText( NULL, buffer, -1, &r, DT_LEFT | DT_TOP, color );
+		pFont->DrawText( NULL, buffer, -1, &r, DT_CENTER | DT_TOP, color );
 	}
 
 	if( theApp.screenMessage ) {
 		color = theApp.showSpeedTransparent ? D3DCOLOR_ARGB(0x7F, 0xFF, 0x00, 0x00) : D3DCOLOR_ARGB(0xFF, 0xFF, 0x00, 0x00);
 		if( ( ( GetTickCount() - theApp.screenMessageTime ) < 3000 ) && !theApp.disableStatusMessage && pFont ) {
-			pFont->DrawText( NULL, theApp.screenMessageBuffer, -1, &r, DT_LEFT | DT_BOTTOM, color );
+			pFont->DrawText( NULL, theApp.screenMessageBuffer, -1, &r, DT_CENTER | DT_BOTTOM, color );
 		} else {
 			theApp.screenMessage = false;
 		}
