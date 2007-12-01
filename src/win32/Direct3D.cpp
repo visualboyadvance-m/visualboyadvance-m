@@ -447,14 +447,30 @@ void Direct3DDisplay::render()
 {
 	if( failed ) return;
 	if(!pDevice) return;
-	if( FAILED( pDevice->TestCooperativeLevel() ) ) return;
+
+	// Multi-Tasking fix
+	HRESULT hr = pDevice->TestCooperativeLevel();
+	if( FAILED( hr ) ) {
+		switch( hr ) {
+		case D3DERR_DEVICELOST:
+			// The device has been lost but cannot be reset at this time.
+			// Therefore, rendering is not possible.
+			return;
+		case D3DERR_DEVICENOTRESET:
+			// The device has been lost but can be reset at this time.
+			resetDevice();
+			return;
+		default:
+			DXTRACE_ERR( _T("ERROR: D3D device has serious problems"), hr );
+			return;
+		}
+	}
 
 	clear();
 
 	pDevice->BeginScene();
 
 	// copy pix to emulatedImage and apply pixel filter if selected
-	HRESULT hr;
 	D3DLOCKED_RECT lr;
 	
 	if( FAILED( hr = emulatedImage->LockRect( 0, &lr, NULL, D3DLOCK_DISCARD ) ) ) {
