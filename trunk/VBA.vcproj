@@ -2113,6 +2113,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\win32\skin.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\win32\StringTokenizer.h"
 					>
 				</File>
@@ -2268,7 +2272,7 @@
 	<Globals>
 		<Global
 			Name="RESOURCE_FILE"
-			Value="res\VBA.rc"
+			Value="src\win32\VBA.rc"
 		/>
 	</Globals>
 </VisualStudioProject>

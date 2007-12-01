@@ -38,6 +38,8 @@
 #include "../System.h"
 #include "../Util.h"
 
+#include "skin.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // VBA:
 // See VBA.cpp for the implementation of this class
@@ -65,7 +67,7 @@ enum pixelFilterType
 
 #define REWIND_SIZE 400000
 
-class CSkin;
+//class CSkin;
 class AVIWrite;
 class WavWriter;
 
