@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "GBA.h"
+#include "GBAcpu.h"
 #include "GBAinline.h"
 #include "Globals.h"
 #include "Gfx.h"
@@ -41,29 +42,6 @@
 #ifdef PROFILING
 #include "prof/prof.h"
 #endif
-
-#define UPDATE_REG(address, value)\
-  {\
-    WRITE16LE(((u16 *)&ioMem[address]),value);\
-  }\
-
-#define ARM_PREFETCH \
-  {\
-    cpuPrefetch[0] = CPUReadMemoryQuick(armNextPC);\
-    cpuPrefetch[1] = CPUReadMemoryQuick(armNextPC+4);\
-  }
-
-#define THUMB_PREFETCH \
-  {\
-    cpuPrefetch[0] = CPUReadHalfWordQuick(armNextPC);\
-    cpuPrefetch[1] = CPUReadHalfWordQuick(armNextPC+2);\
-  }
-
-#define ARM_PREFETCH_NEXT \
-  cpuPrefetch[1] = CPUReadMemoryQuick(armNextPC+4);
-
-#define THUMB_PREFETCH_NEXT\
-  cpuPrefetch[1] = CPUReadHalfWordQuick(armNextPC+2);
 
 #ifdef __GNUC__
 #define _stricmp strcasecmp
@@ -118,12 +96,14 @@ int profilingTicksReload = 0;
 static profile_segment *profilSegment = NULL;
 #endif
 
+#ifdef BKPT_SUPPORT
 u8 freezeWorkRAM[0x40000];
 u8 freezeInternalRAM[0x8000];
 u8 freezeVRAM[0x18000];
 u8 freezePRAM[0x400];
 u8 freezeOAM[0x400];
 bool debugger_last;
+#endif
 
 int lcdTicks = (useBios && !skipBios) ? 1008 : 208;
 u8 timerOnOffDelay = 0;
@@ -522,208 +502,6 @@ void cpuEnableProfiling(int hz)
 #endif
 
 
-// Waitstates when accessing data
-inline int dataTicksAccess16(u32 address) // DATA 8/16bits NON SEQ
-{
-  int addr = (address>>24)&15;
-  int value =  memoryWait[addr];
-
-  if ((addr>=0x08) || (addr < 0x02))
-  {
-    busPrefetchCount=0;
-    busPrefetch=false;
-  }
-  else if (busPrefetch)
-  {
-    int waitState = value;
-    if (!waitState)
-      waitState = 1;
-    busPrefetchCount = ((++busPrefetchCount)<<waitState) - 1;
-  }
-
-  return value;
-}
-
-inline int dataTicksAccess32(u32 address) // DATA 32bits NON SEQ
-{
-  int addr = (address>>24)&15;
-  int value = memoryWait32[addr];
-
-  if ((addr>=0x08) || (addr < 0x02))
-  {
-    busPrefetchCount=0;
-    busPrefetch=false;
-  }
-  else if (busPrefetch)
-  {
-    int waitState = value;
-    if (!waitState)
-      waitState = 1;
-    busPrefetchCount = ((++busPrefetchCount)<<waitState) - 1;
-  }
-
-  return value;
-}
-
-inline int dataTicksAccessSeq16(u32 address)// DATA 8/16bits SEQ
-{
-  int addr = (address>>24)&15;
-  int value = memoryWaitSeq[addr];
-
-  if ((addr>=0x08) || (addr < 0x02))
-  {
-    busPrefetchCount=0;
-    busPrefetch=false;
-  }
-  else if (busPrefetch)
-  {
-    int waitState = value;
-    if (!waitState)
-      waitState = 1;
-    busPrefetchCount = ((++busPrefetchCount)<<waitState) - 1;
-  }
-
-  return value;
-}
-
-inline int dataTicksAccessSeq32(u32 address)// DATA 32bits SEQ
-{
-  int addr = (address>>24)&15;
-  int value =  memoryWaitSeq32[addr];
-
-  if ((addr>=0x08) || (addr < 0x02))
-  {
-    busPrefetchCount=0;
-    busPrefetch=false;
-  }
-  else if (busPrefetch)
-  {
-    int waitState = value;
-    if (!waitState)
-      waitState = 1;
-    busPrefetchCount = ((++busPrefetchCount)<<waitState) - 1;
-  }
-
-  return value;
-}
-
-
-// Waitstates when executing opcode
-inline int codeTicksAccess16(u32 address) // THUMB NON SEQ
-{
-  int addr = (address>>24)&15;
-
-  if ((addr>=0x08) && (addr<=0x0D))
-  {
-    if (busPrefetchCount&0x1)
-    {
-      if (busPrefetchCount&0x2)
-      {
-        busPrefetchCount = ((busPrefetchCount&0xFF)>>2) | (busPrefetchCount&0xFFFFFF00);
-        return 0;
-      }
-      busPrefetchCount = ((busPrefetchCount&0xFF)>>1) | (busPrefetchCount&0xFFFFFF00);
-      return memoryWaitSeq[addr]-1;
-    }
-    else
-    {
-      busPrefetchCount=0;
-      return memoryWait[addr];
-    }
-  }
-  else
-  {
-    busPrefetchCount = 0;
-    return memoryWait[addr];
-  }
-}
-
-inline int codeTicksAccess32(u32 address) // ARM NON SEQ
-{
-  int addr = (address>>24)&15;
-
-  if ((addr>=0x08) && (addr<=0x0D))
-  {
-    if (busPrefetchCount&0x1)
-    {
-      if (busPrefetchCount&0x2)
-      {
-        busPrefetchCount = ((busPrefetchCount&0xFF)>>2) | (busPrefetchCount&0xFFFFFF00);
-        return 0;
-      }
-      busPrefetchCount = ((busPrefetchCount&0xFF)>>1) | (busPrefetchCount&0xFFFFFF00);
-      return memoryWaitSeq[addr] - 1;
-    }
-    else
-    {
-      busPrefetchCount = 0;
-      return memoryWait32[addr];
-    }
-  }
-  else
-  {
-    busPrefetchCount = 0;
-    return memoryWait32[addr];
-  }
-}
-
-inline int codeTicksAccessSeq16(u32 address) // THUMB SEQ
-{
-  int addr = (address>>24)&15;
-
-  if ((addr>=0x08) && (addr<=0x0D))
-  {
-    if (busPrefetchCount&0x1)
-    {
-      busPrefetchCount = ((busPrefetchCount&0xFF)>>1) | (busPrefetchCount&0xFFFFFF00);
-      return 0;
-    }
-    else
-    if (busPrefetchCount>0xFF)
-    {
-      busPrefetchCount=0;
-      return memoryWait[addr];
-    }
-    else
-      return memoryWaitSeq[addr];
-  }
-  else
-  {
-    busPrefetchCount = 0;
-    return memoryWaitSeq[addr];
-  }
-}
-
-inline int codeTicksAccessSeq32(u32 address) // ARM SEQ
-{
-  int addr = (address>>24)&15;
-
-  if ((addr>=0x08) && (addr<=0x0D))
-  {
-    if (busPrefetchCount&0x1)
-    {
-      if (busPrefetchCount&0x2)
-      {
-        busPrefetchCount = ((busPrefetchCount&0xFF)>>2) | (busPrefetchCount&0xFFFFFF00);
-        return 0;
-      }
-      busPrefetchCount = ((busPrefetchCount&0xFF)>>1) | (busPrefetchCount&0xFFFFFF00);
-      return memoryWaitSeq[addr];
-    }
-    else
-    if (busPrefetchCount>0xFF)
-    {
-      busPrefetchCount=0;
-      return memoryWait32[addr];
-    }
-    else
-      return memoryWaitSeq32[addr];
-  }
-  else
-  {
-    return memoryWaitSeq32[addr];
-  }
-}
 
 
 inline int CPUUpdateTicks()
@@ -2316,15 +2094,14 @@ void doDMA(u32 &s, u32 &d, u32 si, u32 di, u32 c, int transfer32)
 
 }
 
-bool CPUCheckDMA(int reason, int dmamask)
+void CPUCheckDMA(int reason, int dmamask)
 {
-  bool res = false;
-  cpuDmaHack = 0;
+
 
   // DMA 0
   if((DM0CNT_H & 0x8000) && (dmamask & 1)) {
     if(((DM0CNT_H >> 12) & 3) == reason) {
-      res = true;
+     
       u32 sourceIncrement = 4;
       u32 destIncrement = 4;
       switch((DM0CNT_H >> 7) & 3) {
@@ -2382,7 +2159,7 @@ bool CPUCheckDMA(int reason, int dmamask)
   // DMA 1
   if((DM1CNT_H & 0x8000) && (dmamask & 2)) {
     if(((DM1CNT_H >> 12) & 3) == reason) {
-      res = true;
+     
 
       u32 sourceIncrement = 4;
       u32 destIncrement = 4;
@@ -2453,7 +2230,7 @@ bool CPUCheckDMA(int reason, int dmamask)
   // DMA 2
   if((DM2CNT_H & 0x8000) && (dmamask & 4)) {
     if(((DM2CNT_H >> 12) & 3) == reason) {
-		res = true;
+	
       u32 sourceIncrement = 4;
       u32 destIncrement = 4;
       switch((DM2CNT_H >> 7) & 3) {
@@ -2524,7 +2301,7 @@ bool CPUCheckDMA(int reason, int dmamask)
   // DMA 3
   if((DM3CNT_H & 0x8000) && (dmamask & 8)) {
     if(((DM3CNT_H >> 12) & 3) == reason) {
-		res = true;
+	
       u32 sourceIncrement = 4;
       u32 destIncrement = 4;
       switch((DM3CNT_H >> 7) & 3) {
@@ -2577,7 +2354,7 @@ bool CPUCheckDMA(int reason, int dmamask)
     }
   }
   //cpuDmaHack = false;
-  return res;
+
 }
 
 void CPUUpdateRegister(u32 address, u16 value)
@@ -3187,248 +2964,6 @@ void applyTimer ()
   timerOnOffDelay = 0;
 }
 
-void CPUWriteHalfWord(u32 address, u16 value)
-{
-#ifdef DEV_VERSION
-  if(address & 1) {
-    if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
-      log("Unaligned halfword write: %04x to %08x from %08x\n",
-          value,
-          address,
-          armMode ? armNextPC - 4 : armNextPC - 2);
-    }
-  }
-#endif
-
-  switch(address >> 24) {
-  case 2:
-#ifdef BKPT_SUPPORT
-    if(*((u16 *)&freezeWorkRAM[address & 0x3FFFE]))
-      cheatsWriteHalfWord(address & 0x203FFFE,
-                          value);
-    else
-#endif
-      WRITE16LE(((u16 *)&workRAM[address & 0x3FFFE]),value);
-    break;
-  case 3:
-#ifdef BKPT_SUPPORT
-    if(*((u16 *)&freezeInternalRAM[address & 0x7ffe]))
-      cheatsWriteHalfWord(address & 0x3007ffe,
-                          value);
-    else
-#endif
-      WRITE16LE(((u16 *)&internalRAM[address & 0x7ffe]), value);
-    break;
-  case 4:
-    if(address < 0x4000400)
-      CPUUpdateRegister(address & 0x3fe, value);
-    else goto unwritable;
-    break;
-  case 5:
-#ifdef BKPT_SUPPORT
-    if(*((u16 *)&freezePRAM[address & 0x03fe]))
-      cheatsWriteHalfWord(address & 0x70003fe,
-                          value);
-    else
-#endif
-    WRITE16LE(((u16 *)&paletteRAM[address & 0x3fe]), value);
-    break;
-  case 6:
-    address = (address & 0x1fffe);
-    if (((DISPCNT & 7) >2) && ((address & 0x1C000) == 0x18000))
-        return;
-    if ((address & 0x18000) == 0x18000)
-      address &= 0x17fff;
-#ifdef BKPT_SUPPORT
-    if(*((u16 *)&freezeVRAM[address]))
-      cheatsWriteHalfWord(address + 0x06000000,
-                          value);
-    else
-#endif
-    WRITE16LE(((u16 *)&vram[address]), value);
-    break;
-  case 7:
-#ifdef BKPT_SUPPORT
-    if(*((u16 *)&freezeOAM[address & 0x03fe]))
-      cheatsWriteHalfWord(address & 0x70003fe,
-                          value);
-    else
-#endif
-    WRITE16LE(((u16 *)&oam[address & 0x3fe]), value);
-    break;
-  case 8:
-  case 9:
-    if(address == 0x80000c4 || address == 0x80000c6 || address == 0x80000c8) {
-      if(!rtcWrite(address, value))
-        goto unwritable;
-    } else if(!agbPrintWrite(address, value)) goto unwritable;
-    break;
-  case 13:
-    if(cpuEEPROMEnabled) {
-      eepromWrite(address, (u8)value);
-      break;
-    }
-    goto unwritable;
-  case 14:
-    if(!eepromInUse | cpuSramEnabled | cpuFlashEnabled) {
-      (*cpuSaveGameFunc)(address, (u8)value);
-      break;
-    }
-    goto unwritable;
-  default:
-  unwritable:
-#ifdef DEV_VERSION
-    if(systemVerbose & VERBOSE_ILLEGAL_WRITE) {
-      log("Illegal halfword write: %04x to %08x from %08x\n",
-          value,
-          address,
-          armMode ? armNextPC - 4 : armNextPC - 2);
-    }
-#endif
-    break;
-  }
-}
-
-void CPUWriteByte(u32 address, u8 b)
-{
-  switch(address >> 24) {
-  case 2:
-#ifdef BKPT_SUPPORT
-      if(freezeWorkRAM[address & 0x3FFFF])
-        cheatsWriteByte(address & 0x203FFFF, b);
-      else
-#endif
-        workRAM[address & 0x3FFFF] = b;
-    break;
-  case 3:
-#ifdef BKPT_SUPPORT
-    if(freezeInternalRAM[address & 0x7fff])
-      cheatsWriteByte(address & 0x3007fff, b);
-    else
-#endif
-      internalRAM[address & 0x7fff] = b;
-    break;
-  case 4:
-    if(address < 0x4000400) {
-      switch(address & 0x3FF) {
-      case 0x301:
-	if(b == 0x80)
-	  stopState = true;
-	holdState = 1;
-	holdType = -1;
-  cpuNextEvent = cpuTotalTicks;
-	break;
-      case 0x60:
-      case 0x61:
-      case 0x62:
-      case 0x63:
-      case 0x64:
-      case 0x65:
-      case 0x68:
-      case 0x69:
-      case 0x6c:
-      case 0x6d:
-      case 0x70:
-      case 0x71:
-      case 0x72:
-      case 0x73:
-      case 0x74:
-      case 0x75:
-      case 0x78:
-      case 0x79:
-      case 0x7c:
-      case 0x7d:
-      case 0x80:
-      case 0x81:
-      case 0x84:
-      case 0x85:
-      case 0x90:
-      case 0x91:
-      case 0x92:
-      case 0x93:
-      case 0x94:
-      case 0x95:
-      case 0x96:
-      case 0x97:
-      case 0x98:
-      case 0x99:
-      case 0x9a:
-      case 0x9b:
-      case 0x9c:
-      case 0x9d:
-      case 0x9e:
-      case 0x9f:
-	soundEvent(address&0xFF, b);
-	break;
-      default:
-	if(address & 1)
-	  CPUUpdateRegister(address & 0x3fe,
-			    ((READ16LE(((u16 *)&ioMem[address & 0x3fe])))
-			     & 0x00FF) |
-			    b<<8);
-	else
-	  CPUUpdateRegister(address & 0x3fe,
-			    ((READ16LE(((u16 *)&ioMem[address & 0x3fe])) & 0xFF00) | b));
-      }
-      break;
-    } else goto unwritable;
-    break;
-  case 5:
-    // no need to switch
-    *((u16 *)&paletteRAM[address & 0x3FE]) = (b << 8) | b;
-    break;
-  case 6:
-    address = (address & 0x1fffe);
-    if (((DISPCNT & 7) >2) && ((address & 0x1C000) == 0x18000))
-        return;
-    if ((address & 0x18000) == 0x18000)
-      address &= 0x17fff;
-
-    // no need to switch
-    // byte writes to OBJ VRAM are ignored
-    if ((address) < objTilesAddress[((DISPCNT&7)+1)>>2])
-    {
-#ifdef BKPT_SUPPORT
-      if(freezeVRAM[address])
-        cheatsWriteByte(address + 0x06000000, b);
-      else
-#endif
-            *((u16 *)&vram[address]) = (b << 8) | b;
-    }
-    break;
-  case 7:
-    // no need to switch
-    // byte writes to OAM are ignored
-    //    *((u16 *)&oam[address & 0x3FE]) = (b << 8) | b;
-    break;
-  case 13:
-    if(cpuEEPROMEnabled) {
-      eepromWrite(address, b);
-      break;
-    }
-    goto unwritable;
-  case 14:
-      if (!(saveType == 5) && (!eepromInUse | cpuSramEnabled | cpuFlashEnabled)) {
-
-    //if(!cpuEEPROMEnabled && (cpuSramEnabled | cpuFlashEnabled)) {
-
-        (*cpuSaveGameFunc)(address, b);
-      break;
-    }
-    // default
-  default:
-  unwritable:
-#ifdef DEV_VERSION
-    if(systemVerbose & VERBOSE_ILLEGAL_WRITE) {
-      log("Illegal byte write: %02x to %08x from %08x\n",
-          b,
-          address,
-          armMode ? armNextPC - 4 : armNextPC -2 );
-    }
-#endif
-    break;
-  }
-}
 
 u8 cpuBitsSet[256];
 u8 cpuLowestBitSet[256];
@@ -3883,7 +3418,7 @@ void CPULoop(int ticks)
   // variable used by the CPU core
   cpuTotalTicks = 0;
 #ifdef LINK_EMULATION
-  if(linkenable && cpuDmaHack2)
+  if(linkenable)
     cpuNextEvent = 1;
 #endif
   cpuBreakLoop = false;
@@ -3929,28 +3464,17 @@ void CPULoop(int ticks)
 #endif /* FINAL_VERSION */
 
     if(!holdState && !SWITicks) {
-
-      // Emulates the Cheat System (m) code
-      if((cheatsEnabled) && (mastercode) && (mastercode == armNextPC))
-      {
-        u32 joy = 0;
-        if(systemReadJoypads())
-          joy = systemReadJoypad(-1);
-        u32 ext = (joy >> 10);
-        cpuTotalTicks += cheatsCheckKeys(P1^0x3FF, ext);
-      }
-
-      if ((armNextPC & 0x0803FFFF) == 0x08020000)
-        busPrefetchCount=0x100;
-
       if(armState) {
-#include "arm-new.h"
+        if (!armExecute())
+          return;
       } else {
-#include "thumb.h"
-      }
-    } else
+        if (!thumbExecute())
+          return;
+	  
+	}
+	  }
       clockTicks = CPUUpdateTicks();
-
+	
     cpuTotalTicks += clockTicks;
 
 
@@ -4084,7 +3608,7 @@ void CPULoop(int ticks)
                 IF |= 1;
                 UPDATE_REG(0x202, IF);
               }
-              cpuDmaHack2 = CPUCheckDMA(1, 0x0f);
+              CPUCheckDMA(1, 0x0f);
               if(frameCount >= framesToSkip) {
                 systemDrawScreen();
                 frameCount = 0;
@@ -4204,7 +3728,7 @@ void CPULoop(int ticks)
             DISPSTAT |= 2;
             UPDATE_REG(0x04, DISPSTAT);
             lcdTicks += 224;
-            cpuDmaHack2 = CPUCheckDMA(2, 0x0f);
+            CPUCheckDMA(2, 0x0f);
             if(DISPSTAT & 16) {
               IF |= 2;
               UPDATE_REG(0x202, IF);
@@ -4367,7 +3891,7 @@ void CPULoop(int ticks)
         goto updateLoop;
       }
 #ifdef LINK_EMULATION
-	  if(linkenable && cpuDmaHack2)
+	  if(linkenable)
   	       cpuNextEvent = 1;
 #endif
       if(IF && (IME & 1) && armIrqEnable) {
