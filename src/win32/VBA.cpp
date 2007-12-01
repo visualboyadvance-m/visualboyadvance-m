@@ -711,9 +711,14 @@ void VBA::updateFilter()
 			filterMagnification = 1;
 			break;
         case FILTER_PLUGIN:
-	        if (rpiInit(pluginName))
-		    filterFunction = rpiFilter;
-		    filterMagnification = rpiScaleFactor();
+			if( rpiInit( pluginName ) ) {
+				filterFunction = rpiFilter;
+				filterMagnification = rpiScaleFactor();
+			} else {
+				filterType = FILTER_NONE;
+				updateFilter();
+				return;
+			}
 		    break;
 		case FILTER_TVMODE:
 			filterFunction = ScanlinesTV;
@@ -792,11 +797,16 @@ void VBA::updateFilter()
 				filterMagnification = 1;
 				break;
             case FILTER_PLUGIN:
-	            if (rpiInit(pluginName))
-		        filterFunction = rpiFilter;
-				filterMagnification = rpiScaleFactor();
-				b16to32Video=true;
-		        break;
+				if( rpiInit( pluginName ) ) {
+					filterFunction = rpiFilter;
+					filterMagnification = rpiScaleFactor();
+					b16to32Video=true;
+				} else {
+					filterType = FILTER_NONE;
+					updateFilter();
+					return;
+				}
+				break;
 			case FILTER_TVMODE:
 				filterFunction = ScanlinesTV32;
 				filterMagnification = 2;
