@@ -44,7 +44,9 @@
 #include "prof/prof.h"
 #endif
 
+#ifdef _MSC_VER
 #define snprintf _snprintf
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 
