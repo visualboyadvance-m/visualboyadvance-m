@@ -1,6 +1,6 @@
 CC=gcc
 CPPC=g++
-CFLAGS=-W -Wall -Wno-unused -DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DFINAL_VERSION -DC_CORE -DSDL -DSYSCONFDIR="home" -DUSE_OPENGL
+CFLAGS=-W -Wall -Wno-unused -DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DFINAL_VERSION -DBKPT_SUPPORT -DC_CORE -DSDL -DSYSCONFDIR="home" -DUSE_OPENGL
 CXXFLAGS=${CFLAGS}
 ASM=nasm
 ASMFLAGS=-w-orphan-labels -f elf -DELF -O1 -Isrc/
@@ -44,7 +44,7 @@ MAINOBJ=${MAINDIR}/2xSaI${OE} ${MAINDIR}/admame${OE} ${MAINDIR}/agbprint${OE} ${
 ${MAINDIR}/bilinear${OE} ${MAINDIR}/bios${OE} ${MAINDIR}/Cheats${OE} ${MAINDIR}/CheatSearch${OE} \
 ${MAINDIR}/EEprom${OE} ${MAINDIR}/elf${OE} ${MAINDIR}/Flash${OE} ${MAINDIR}/GBA${OE} \
 ${MAINDIR}/gbafilter${OE} ${MAINDIR}/Gfx${OE} ${MAINDIR}/Globals${OE} ${MAINDIR}/interframe${OE} \
-${MAINDIR}/hq2x${OE}  ${MAINDIR}/Mode0${OE} \
+${MAINDIR}/hq2x${OE} ${MAINDIR}/GBA-thumb${OE} ${MAINDIR}/GBA-arm${OE} ${MAINDIR}/Mode0${OE} \
 ${MAINDIR}/Mode1${OE} ${MAINDIR}/Mode2${OE} ${MAINDIR}/Mode3${OE} ${MAINDIR}/Mode4${OE} \
 ${MAINDIR}/Mode5${OE} ${MAINDIR}/motionblur${OE} ${MAINDIR}/pixel${OE} ${MAINDIR}/portable${OE} \
 ${MAINDIR}/remote${OE} ${MAINDIR}/RTC${OE} ${MAINDIR}/scanline${OE} ${MAINDIR}/simpleFilter${OE} \
