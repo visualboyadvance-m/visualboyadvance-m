@@ -448,6 +448,10 @@ public:
 	afx_msg void OnUpdateOptionsLinkRFU(CCmdUI* pCmdUI) ;
 	afx_msg void OnOptionsLinkEnable() ;
 	afx_msg void OnUpdateOptionsLinkEnable(CCmdUI* pCmdUI) ;
+	afx_msg void OnSkinUse();
+	afx_msg void OnUpdateSkinUse(CCmdUI *pCmdUI);
+	afx_msg void OnSkinSelect();
+	afx_msg void OnUpdateSkinSelect(CCmdUI *pCmdUI);
 };
 
 /////////////////////////////////////////////////////////////////////////////
