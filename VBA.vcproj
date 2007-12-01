@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="VisualBoyAdvance"
 	ProjectGUID="{6D4C5EC8-933F-4C05-A1BF-498E658576DF}"
 	RootNamespace="VBA"
@@ -87,7 +87,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib dxerr9.lib winmm.lib d3dx9.lib d3d9.lib Dsound.lib HtmlHelp.lib"
+				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib winmm.lib Dsound.lib HtmlHelp.lib"
 				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
 				Version=""
 				LinkIncremental="2"
@@ -101,6 +101,114 @@
 				EnableCOMDATFolding="1"
 				OptimizeForWindows98="1"
 				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				ExcludedFromBuild="true"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			UseOfMFC="1"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				ExcludedFromBuild="true"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="MASM"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="false"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
+				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\dependencies\msvc&quot;;&quot;$(SolutionDir)..\dependencies\zlib&quot;;&quot;$(SolutionDir)..\dependencies\libpng&quot;;&quot;$(SolutionDir)..\dependencies\cximage&quot;;$(SolutionDir)..\dependencies\File_Extractor-0.4.2\fex"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;DEV_VERSION;BKPT_SUPPORT;CRT_SECURE_NO_WARNINGS;HAS_FILE_EXTRACTOR;C_CORE"
+				StringPooling="false"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				SmallerTypeCheck="false"
+				RuntimeLibrary="1"
+				StructMemberAlignment="0"
+				BufferSecurityCheck="false"
+				EnableFunctionLevelLinking="false"
+				EnableEnhancedInstructionSet="0"
+				TreatWChar_tAsBuiltInType="false"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories=""
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+				ExcludedFromBuild="true"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib winmm.lib Dsound.lib"
+				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
+				Version=""
+				LinkIncremental="2"
+				AdditionalLibraryDirectories=""
+				GenerateManifest="true"
+				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;amd64&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
+				IgnoreDefaultLibraryNames="nafxcwd.lib;LIBCMTD.lib"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeReferences="1"
+				EnableCOMDATFolding="1"
+				OptimizeForWindows98="1"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -196,7 +304,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib winmm.lib dxguid.lib ddraw.lib d3d9.lib d3dx9.lib Dsound.lib htmlhelp.lib"
+				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib winmm.lib dxguid.lib ddraw.lib Dsound.lib htmlhelp.lib"
 				ShowProgress="0"
 				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
 				Version=""
@@ -217,6 +325,128 @@
 				OptimizeForWindows98="1"
 				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+				ExcludedFromBuild="true"
+				RelativePath=""
+				UnloadBeforeCopy="false"
+				RegisterOutput="false"
+				VirtualDirectoryName=""
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				ExcludedFromBuild="true"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			UseOfMFC="1"
+			UseOfATL="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			ManagedExtensions="0"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				ExcludedFromBuild="true"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="MASM"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="false"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/D_ST_MODEL&#x0D;&#x0A;/D_SECURE_SCL=0&#x0D;&#x0A;/Zc:forScope-&#x0D;&#x0A;/MP"
+				Optimization="2"
+				InlineFunctionExpansion="2"
+				FavorSizeOrSpeed="1"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\dependencies\msvc&quot;;&quot;$(SolutionDir)..\dependencies\zlib&quot;;&quot;$(SolutionDir)..\dependencies\libpng&quot;;&quot;$(SolutionDir)..\dependencies\cximage&quot;;$(SolutionDir)..\dependencies\File_Extractor-0.4.2\fex"
+				PreprocessorDefinitions="WIN32;WINVER=0x0500;NDEBUG;_WINDOWS;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="false"
+				EnableEnhancedInstructionSet="1"
+				FloatingPointModel="2"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories=""
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+				ExcludedFromBuild="true"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				RegisterOutput="false"
+				IgnoreImportLibrary="false"
+				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib winmm.lib dxguid.lib ddraw.lib Dsound.lib"
+				ShowProgress="0"
+				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
+				Version=""
+				LinkIncremental="0"
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories=""
+				GenerateManifest="true"
+				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;amd64&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
+				IgnoreAllDefaultLibraries="false"
+				IgnoreDefaultLibraryNames="nafxcw.lib;LIBCMT.lib"
+				GenerateDebugInformation="false"
+				AssemblyDebug="2"
+				GenerateMapFile="false"
+				MapExports="false"
+				SubSystem="2"
+				OptimizeReferences="0"
+				EnableCOMDATFolding="0"
+				OptimizeForWindows98="1"
+				LinkTimeCodeGeneration="1"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -340,7 +570,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib d3dx9.lib Dsound.lib winmm.lib"
+				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib Dsound.lib winmm.lib"
 				ShowProgress="0"
 				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
 				Version=""
@@ -392,236 +622,6 @@
 				Description="Compressing exe with best UPX compression..."
 				CommandLine="upx --best --crp-ms=999999 --nrv2d &quot;$(TargetPath)&quot;"
 				ExcludedFromBuild="false"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Debug|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="1"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-				ExcludedFromBuild="true"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="MASM"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="false"
-				TargetEnvironment="3"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="/MP"
-				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\dependencies\msvc&quot;;&quot;$(SolutionDir)..\dependencies\zlib&quot;;&quot;$(SolutionDir)..\dependencies\libpng&quot;;&quot;$(SolutionDir)..\dependencies\cximage&quot;;$(SolutionDir)..\dependencies\File_Extractor-0.4.2\fex"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;DEV_VERSION;BKPT_SUPPORT;CRT_SECURE_NO_WARNINGS;HAS_FILE_EXTRACTOR;C_CORE"
-				StringPooling="false"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				SmallerTypeCheck="false"
-				RuntimeLibrary="1"
-				StructMemberAlignment="0"
-				BufferSecurityCheck="false"
-				EnableFunctionLevelLinking="false"
-				EnableEnhancedInstructionSet="0"
-				TreatWChar_tAsBuiltInType="false"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories=""
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-				ExcludedFromBuild="true"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib dxerr9.lib winmm.lib d3dx9.lib d3d9.lib Dsound.lib"
-				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
-				Version=""
-				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
-				GenerateManifest="true"
-				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;amd64&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
-				IgnoreDefaultLibraryNames="nafxcwd.lib;LIBCMTD.lib"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				OptimizeReferences="1"
-				EnableCOMDATFolding="1"
-				OptimizeForWindows98="1"
-				TargetMachine="17"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				ExcludedFromBuild="true"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="1"
-			UseOfATL="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			ManagedExtensions="0"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-				ExcludedFromBuild="true"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="MASM"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="false"
-				TargetEnvironment="3"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="/D_ST_MODEL&#x0D;&#x0A;/D_SECURE_SCL=0&#x0D;&#x0A;/Zc:forScope-&#x0D;&#x0A;/MP"
-				Optimization="2"
-				InlineFunctionExpansion="2"
-				FavorSizeOrSpeed="1"
-				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\dependencies\msvc&quot;;&quot;$(SolutionDir)..\dependencies\zlib&quot;;&quot;$(SolutionDir)..\dependencies\libpng&quot;;&quot;$(SolutionDir)..\dependencies\cximage&quot;;$(SolutionDir)..\dependencies\File_Extractor-0.4.2\fex"
-				PreprocessorDefinitions="WIN32;WINVER=0x0500;NDEBUG;_WINDOWS;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR"
-				RuntimeLibrary="0"
-				BufferSecurityCheck="false"
-				EnableEnhancedInstructionSet="1"
-				FloatingPointModel="2"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="0"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories=""
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-				ExcludedFromBuild="true"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				RegisterOutput="false"
-				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib winmm.lib dxguid.lib ddraw.lib d3d9.lib d3dx9.lib Dsound.lib"
-				ShowProgress="0"
-				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
-				Version=""
-				LinkIncremental="0"
-				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories=""
-				GenerateManifest="true"
-				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;amd64&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
-				IgnoreAllDefaultLibraries="false"
-				IgnoreDefaultLibraryNames="nafxcw.lib;LIBCMT.lib"
-				GenerateDebugInformation="false"
-				AssemblyDebug="2"
-				GenerateMapFile="false"
-				MapExports="false"
-				SubSystem="2"
-				OptimizeReferences="0"
-				EnableCOMDATFolding="0"
-				OptimizeForWindows98="1"
-				LinkTimeCodeGeneration="1"
-				TargetMachine="17"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-				ExcludedFromBuild="true"
-				RelativePath=""
-				UnloadBeforeCopy="false"
-				RegisterOutput="false"
-				VirtualDirectoryName=""
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				ExcludedFromBuild="true"
 			/>
 		</Configuration>
 		<Configuration
@@ -716,7 +716,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib d3dx9.lib Dsound.lib winmm.lib"
+				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib Dsound.lib winmm.lib"
 				ShowProgress="0"
 				OutputFile="$(ProjectDir)VisualBoyAdvance.exe"
 				Version=""
@@ -816,26 +816,6 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-							Description="Assembling $(InputFileName)..."
-							CommandLine="nasmw.exe -D__DJGPP__ -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-							Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Optimized|Win32"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-							Description="Assembling $(InputFileName)..."
-							CommandLine="nasmw.exe -D__DJGPP__ -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-							Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Debug|x64"
 						>
 						<Tool
@@ -846,12 +826,32 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Assembling $(InputFileName)..."
+							CommandLine="nasmw.exe -D__DJGPP__ -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+							Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|x64"
 						>
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Assembling $(InputFileName)..."
 							CommandLine="nasmw.exe -D__DJGPP__ -Isrc/ -O1 -f win64 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+							Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Optimized|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Assembling $(InputFileName)..."
+							CommandLine="nasmw.exe -D__DJGPP__ -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 							Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 						/>
 					</FileConfiguration>
@@ -931,26 +931,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCustomBuildTool"
-								Description="Assembling $(InputFileName)..."
-								CommandLine="nasmw.exe -D__DJGPP__ -O1  -Isrc/  -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Optimized|Win32"
-							>
-							<Tool
-								Name="VCCustomBuildTool"
-								Description="Assembling $(InputFileName)..."
-								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Debug|x64"
 							>
 							<Tool
@@ -961,12 +941,32 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
+								CommandLine="nasmw.exe -D__DJGPP__ -O1  -Isrc/  -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
 								CommandLine="nasmw.exe -D__DJGPP__ -Isrc/ -O1 -f win64 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Optimized|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
+								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -995,26 +995,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCustomBuildTool"
-								Description="Assembling $(InputFileName)..."
-								CommandLine="nasmw.exe -D__DJGPP__ -O1  -Isrc/   -f  win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Optimized|Win32"
-							>
-							<Tool
-								Name="VCCustomBuildTool"
-								Description="Assembling $(InputFileName)..."
-								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Debug|x64"
 							>
 							<Tool
@@ -1025,12 +1005,32 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
+								CommandLine="nasmw.exe -D__DJGPP__ -O1  -Isrc/   -f  win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
 								CommandLine="nasmw.exe -D__DJGPP__ -Isrc/ -O1 -f win64 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Optimized|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
+								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -1059,26 +1059,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCustomBuildTool"
-								Description="Assembling $(InputFileName)..."
-								CommandLine="nasmw.exe -D__DJGPP__ -O1 -Isrc/   -f  win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Optimized|Win32"
-							>
-							<Tool
-								Name="VCCustomBuildTool"
-								Description="Assembling $(InputFileName)..."
-								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Debug|x64"
 							>
 							<Tool
@@ -1089,12 +1069,32 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
+								CommandLine="nasmw.exe -D__DJGPP__ -O1 -Isrc/   -f  win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
 								CommandLine="nasmw.exe -D__DJGPP__ -Isrc/ -O1 -f win64 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Optimized|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
+								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -1123,26 +1123,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCustomBuildTool"
-								Description="Assembling $(InputFileName)..."
-								CommandLine="nasmw.exe -D__DJGPP__ -O1 -Isrc/  -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Optimized|Win32"
-							>
-							<Tool
-								Name="VCCustomBuildTool"
-								Description="Assembling $(InputFileName)..."
-								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Debug|x64"
 							>
 							<Tool
@@ -1153,12 +1133,32 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
+								CommandLine="nasmw.exe -D__DJGPP__ -O1 -Isrc/  -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
 								CommandLine="nasmw.exe -D__DJGPP__ -Isrc/ -O1 -f win64 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Optimized|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								Description="Assembling $(InputFileName)..."
+								CommandLine="nasmw.exe -D__DJGPP__ -O1 -f win32 -o &quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 								Outputs="&quot;$(ProjectDir)$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -1706,22 +1706,6 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							CompileAs="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Optimized|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							CompileAs="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Debug|x64"
 						>
 						<Tool
@@ -1730,7 +1714,23 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="1"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							CompileAs="1"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Optimized|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"

@@ -450,14 +450,18 @@ void MainWnd::OnUpdateOptionsVideoRendermethodDirectdraw(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsVideoRendermethodDirect3d()
 {
+#ifndef NO_D3D
   theApp.renderMethod = DIRECT_3D;
   theApp.updateRenderMethod(false);
   theApp.winAccelMgr.UpdateMenu(theApp.menu);
+#endif
 }
 
 void MainWnd::OnUpdateOptionsVideoRendermethodDirect3d(CCmdUI* pCmdUI)
 {
+#ifndef NO_D3D
   pCmdUI->SetCheck(theApp.renderMethod == DIRECT_3D);
+#endif
 }
 
 void MainWnd::OnOptionsVideoRendermethodOpengl()

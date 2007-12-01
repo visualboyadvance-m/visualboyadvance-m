@@ -100,8 +100,10 @@ extern void toolsLog(const char *);
 
 extern IDisplay *newGDIDisplay();
 extern IDisplay *newDirectDrawDisplay();
-extern IDisplay *newDirect3DDisplay();
 extern IDisplay *newOpenGLDisplay();
+#ifndef NO_D3D
+extern IDisplay *newDirect3DDisplay();
+#endif
 
 extern Input *newDirectInput();
 
@@ -1386,8 +1388,13 @@ void VBA::loadSettings()
   }
 
   renderMethod = (DISPLAY_TYPE)regQueryDwordValue("renderMethod", DIRECT_DRAW);
-  if(renderMethod < DIRECT_DRAW || renderMethod > OPENGL)
-    renderMethod = DIRECT_DRAW;
+  if( ( renderMethod != DIRECT_DRAW ) && ( renderMethod != OPENGL )
+#ifndef NO_D3D
+	  && ( renderMethod != DIRECT_3D )
+#endif
+	  ) {
+		  renderMethod = DIRECT_DRAW;
+  }
 
   windowPositionX = regQueryDwordValue("windowX", 0);
   if(windowPositionX < 0)
@@ -1914,14 +1921,18 @@ bool VBA::updateRenderMethod(bool force)
 				force = true;
 			} else {
 				if(renderMethod == OPENGL) {
+#ifndef NO_D3D
 					renderMethod = DIRECT_3D;
 				} else {
 					if(renderMethod == DIRECT_3D) {
+#endif
 						renderMethod = DIRECT_DRAW;
 						}
 					}
 				}
+#ifndef NO_D3D
 			}
+#endif
 		res = updateRenderMethod(force);
 	}
 
@@ -1965,12 +1976,14 @@ bool VBA::updateRenderMethod0(bool force)
 		ZeroMemory( &videoDriverGUID, sizeof( GUID ) );
 		display = newDirectDrawDisplay();
 		break;
-    case DIRECT_3D:
-		display = newDirect3DDisplay();
-		break;
 	case OPENGL:
 		display = newOpenGLDisplay();
 		break;
+#ifndef NO_D3D
+    case DIRECT_3D:
+		display = newDirect3DDisplay();
+		break;
+#endif
     }
 
     if(display->initialize()) {
