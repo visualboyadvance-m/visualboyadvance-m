@@ -26,7 +26,7 @@
 #include "../System.h"
 #include "../GBA.h"
 #include "../Globals.h"
-
+#include "../GBAinline.h"
 #include "IOViewerRegs.h"
 
 #ifdef _DEBUG
