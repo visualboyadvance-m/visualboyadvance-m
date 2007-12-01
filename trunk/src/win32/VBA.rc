@@ -1533,8 +1533,6 @@ BEGIN
         BEGIN
             POPUP "Render API"
             BEGIN
-                MENUITEM "Windows &GDI",                ID_OPTIONS_VIDEO_RENDERMETHOD_GDI
-                MENUITEM SEPARATOR
                 MENUITEM "Direct&Draw",                 ID_OPTIONS_VIDEO_RENDERMETHOD_DIRECTDRAW
                 MENUITEM "   Emulation only",           ID_OPTIONS_VIDEO_DDRAWEMULATIONONLY
                 MENUITEM "   Use &Video Memory",        ID_OPTIONS_VIDEO_DDRAWUSEVIDEOMEMORY

@@ -436,18 +436,6 @@ void MainWnd::OnUpdateVideoLayer(CCmdUI *pCmdUI)
   }
 }
 
-void MainWnd::OnOptionsVideoRendermethodGdi()
-{
-  theApp.renderMethod = GDI;
-  theApp.updateRenderMethod(false);
-  theApp.winAccelMgr.UpdateMenu(theApp.menu);
-}
-
-void MainWnd::OnUpdateOptionsVideoRendermethodGdi(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(theApp.renderMethod == GDI);
-}
-
 void MainWnd::OnOptionsVideoRendermethodDirectdraw()
 {
   theApp.renderMethod = DIRECT_DRAW;

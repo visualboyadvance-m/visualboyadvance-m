@@ -1681,10 +1681,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\win32\GDIDisplay.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\win32\glfont.c"
 					>
 					<FileConfiguration

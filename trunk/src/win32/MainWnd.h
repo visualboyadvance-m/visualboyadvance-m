@@ -180,8 +180,6 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsVideoDisablesfx(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoFullscreenstretchtofit();
   afx_msg void OnUpdateOptionsVideoFullscreenstretchtofit(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsVideoRendermethodGdi();
-  afx_msg void OnUpdateOptionsVideoRendermethodGdi(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRendermethodDirectdraw();
   afx_msg void OnUpdateOptionsVideoRendermethodDirectdraw(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRendermethodDirect3d();
