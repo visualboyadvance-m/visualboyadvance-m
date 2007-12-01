@@ -18,6 +18,12 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+#ifndef NO_D3D
+
+#pragma comment( lib, "d3d9.lib" )
+#pragma comment( lib, "d3dx9.lib" )
+#pragma comment( lib, "dxerr9.lib" )
+
 #include "stdafx.h"
 
 #include "Display.h"
@@ -769,3 +775,5 @@ IDisplay *newDirect3DDisplay()
 {
 	return new Direct3DDisplay();
 }
+
+#endif
