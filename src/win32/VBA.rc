@@ -1786,13 +1786,21 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "&Colors...",                  ID_OPTIONS_GAMEBOY_COLORS
         END
-        POPUP "&Language"
+        POPUP "&User Interface"
         BEGIN
-            MENUITEM "&System",                     ID_OPTIONS_LANGUAGE_SYSTEM
-            MENUITEM "&English",                    ID_OPTIONS_LANGUAGE_ENGLISH
-            MENUITEM "&Other...",                   ID_OPTIONS_LANGUAGE_OTHER
+            POPUP "&Language"
+            BEGIN
+                MENUITEM "&System",                     ID_OPTIONS_LANGUAGE_SYSTEM
+                MENUITEM "&English",                    ID_OPTIONS_LANGUAGE_ENGLISH
+                MENUITEM "&Other...",                   ID_OPTIONS_LANGUAGE_OTHER
+            END
+            POPUP "&Skin"
+            BEGIN
+                MENUITEM "&Use",                        ID_SKIN_USE
+                MENUITEM "&Select",                     ID_SKIN_SELECT
+            END
         END
-        POPUP "Li&nk"
+        POPUP "&Link"
         BEGIN
             MENUITEM "Enable GBA Linking",          ID_OPTIONS_LINK_ENABLE
             MENUITEM "&Wireless Adapter",           ID_OPTIONS_LINK_WIRELESSADAPTER
