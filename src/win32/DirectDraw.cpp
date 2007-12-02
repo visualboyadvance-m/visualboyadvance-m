@@ -180,8 +180,6 @@ void DirectDrawDisplay::cleanup()
 
 bool DirectDrawDisplay::initialize()
 {
-	if( !theApp.preInitialize() ) return false;
-
   GUID *guid = NULL;
   if(theApp.ddrawEmulationOnly)
     guid = (GUID *)DDCREATE_EMULATIONONLY;
