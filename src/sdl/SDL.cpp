@@ -59,6 +59,12 @@
 # include "getopt.h"
 #endif // ! __GNUC__
 
+#ifdef _WIN32
+#define INTERNAL_DEPTH_16
+#else
+#define INTERNAL_DEPTH_32
+#endif
+
 #ifdef MMX
 extern "C" bool cpu_mmx;
 #endif
@@ -97,9 +103,18 @@ extern void hq2x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void lq2x(u8*,u32,u8*,u8*,u32,int,int);
 extern void lq2x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq3x16(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq3x32_32(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq4x16(u8*,u32,u8*,u8*,u32,int,int);
+
+#ifdef INTERNAL_DEPTH_16
+extern void hq3x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void hq4x32(u8*,u32,u8*,u8*,u32,int,int);
+#else
+extern void hq3x32_32(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq4x32_32(u8*,u32,u8*,u8*,u32,int,int);
+#define hq3x32 hq3x32_32
+#define hq4x32 hq4x32_32
+#endif
+
 
 extern void SmartIB(u8*,u32,int,int);
 extern void SmartIB32(u8*,u32,int,int);
@@ -2651,10 +2666,10 @@ yuv = false;
       filterFunction = hq2x32;
       break;
     case 16:
-      filterFunction = hq3x32_32;
+      filterFunction = hq3x32;
       break;
     case 17:
-      filterFunction = hq4x32_32;
+      filterFunction = hq4x32;
       break;
     default:
       filterFunction = NULL;
