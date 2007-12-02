@@ -199,8 +199,6 @@ void OpenGLDisplay::cleanup()
 
 bool OpenGLDisplay::initialize()
 {
-	if( !theApp.preInitialize() ) return false;
-	
 	theApp.mode320Available = FALSE;
 	theApp.mode640Available = FALSE;
 	theApp.mode800Available = FALSE;

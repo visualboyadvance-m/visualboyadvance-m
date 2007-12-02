@@ -2112,30 +2112,32 @@ bool VBA::updateRenderMethod0(bool force)
 #endif
     }
 
-    if(display->initialize()) {
-      winUpdateSkin();
-      if(initInput) {
-        if(!this->initInput()) {
-          changingVideoSize = false;
-          AfxPostQuitMessage(0);
-          return false;
-        }
-        input->checkKeys();
-        updateMenuBar();
-        changingVideoSize = false;
-        updateWindowSize(videoOption);
+	if( preInitialize() ) {
+		if( display->initialize() ) {
+			winUpdateSkin();
+			if( initInput ) {
+				if( !this->initInput() ) {
+					changingVideoSize = false;
+					AfxPostQuitMessage(0);
+					return false;
+				}
+				input->checkKeys();
+				updateMenuBar();
+				changingVideoSize = false;
+				updateWindowSize(videoOption);
 
-        m_pMainWnd->ShowWindow(SW_SHOW);
-        m_pMainWnd->UpdateWindow();
-        m_pMainWnd->SetFocus();
+				m_pMainWnd->ShowWindow(SW_SHOW);
+				m_pMainWnd->UpdateWindow();
+				m_pMainWnd->SetFocus();
 
-        return true;
-      } else {
-        changingVideoSize = false;
-        return true;
-      }
-    }
-    changingVideoSize = false;
+				return true;
+			} else {
+				changingVideoSize = false;
+				return true;
+			}
+		}
+	}
+	changingVideoSize = false;
   }
   return true;
 }

@@ -192,8 +192,6 @@ bool Direct3DDisplay::initialize()
 	TRACE( _T("Initializing Direct3D renderer {\n") );
 #endif
 
-	if( !theApp.preInitialize() ) return false;
-
 	initializing = true;
 
 	// load Direct3D v9
