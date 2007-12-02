@@ -1,6 +1,0 @@
-This demonstrates the use of PNG_USER_CONFIG and pngusr.h
-
-To build a minimal write-only encoder, run
-    gather.sh  # to collect needed files from pngminus, libpng, and zlib
-    make -f makefile.std
- 
