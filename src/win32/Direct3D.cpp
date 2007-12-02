@@ -484,7 +484,15 @@ void Direct3DDisplay::render()
 		return;
 	} else {
 		if( !theApp.filterFunction ) {
-			copyImage( pix, lr.pBits, theApp.sizeX, theApp.sizeY, lr.Pitch, systemColorDepth );
+			copyImage(
+				pix,
+				lr.pBits,
+				(systemColorDepth == 32) ? theApp.sizeX
+				: theApp.sizeX + 1, // TODO: workaround results in one pixel black border at right side
+				theApp.sizeY,
+				lr.Pitch,
+				systemColorDepth
+				);
 		} else {
 			u32 pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
 			theApp.filterFunction( pix + pitch,

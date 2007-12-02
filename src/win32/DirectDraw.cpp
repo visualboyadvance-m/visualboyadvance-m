@@ -722,6 +722,9 @@ void DirectDrawDisplay::render()
           copyY = 144;
         }
       }
+	  if( systemColorDepth == 16 ) {
+		  copyX++; // TODO: workaround results in one pixel black border at right side
+	  }
 	  copyImage( pix, ddsDesc.lpSurface, copyX, copyY, ddsDesc.lPitch, systemColorDepth );
     }
     if(theApp.showSpeed && (theApp.videoOption > VIDEO_4X || theApp.skin != NULL)) {
