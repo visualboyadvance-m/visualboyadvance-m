@@ -180,103 +180,7 @@ void DirectDrawDisplay::cleanup()
 
 bool DirectDrawDisplay::initialize()
 {
-  theApp.sizeX = 240;
-  theApp.sizeY = 160;
-
-  switch(theApp.videoOption) {
-  case VIDEO_1X:
-    theApp.surfaceSizeX = theApp.sizeX;
-    theApp.surfaceSizeY = theApp.sizeY;
-    break;
-  case VIDEO_2X:
-    theApp.surfaceSizeX = theApp.sizeX * 2;
-    theApp.surfaceSizeY = theApp.sizeY * 2;
-    break;
-  case VIDEO_3X:
-    theApp.surfaceSizeX = theApp.sizeX * 3;
-    theApp.surfaceSizeY = theApp.sizeY * 3;
-    break;
-  case VIDEO_4X:
-    theApp.surfaceSizeX = theApp.sizeX * 4;
-    theApp.surfaceSizeY = theApp.sizeY * 4;
-    break;
-  case VIDEO_320x240:
-  case VIDEO_640x480:
-  case VIDEO_800x600:
-  case VIDEO_1024x768:
-  case VIDEO_1280x1024:
-  case VIDEO_OTHER:
-    {
-      int scaleX = (theApp.fsWidth / theApp.sizeX);
-      int scaleY = (theApp.fsHeight / theApp.sizeY);
-      int min = scaleX < scaleY ? scaleX : scaleY;
-      if(theApp.fsMaxScale)
-        min = min > theApp.fsMaxScale ? theApp.fsMaxScale : min;
-      theApp.surfaceSizeX = theApp.sizeX * min;
-      theApp.surfaceSizeY = theApp.sizeY * min;
-      if(theApp.fullScreenStretch) {
-        theApp.surfaceSizeX = theApp.fsWidth;
-        theApp.surfaceSizeY = theApp.fsHeight;
-      }
-    }
-    break;
-  }
-
-  theApp.rect.left = 0;
-  theApp.rect.top = 0;
-  theApp.rect.right = theApp.sizeX;
-  theApp.rect.bottom = theApp.sizeY;
-
-  theApp.dest.left = 0;
-  theApp.dest.top = 0;
-  theApp.dest.right = theApp.surfaceSizeX;
-  theApp.dest.bottom = theApp.surfaceSizeY;
-
-  DWORD style = WS_POPUP | WS_VISIBLE;
-  DWORD styleEx = 0;
-
-  if(theApp.videoOption <= VIDEO_4X)
-    style |= WS_OVERLAPPEDWINDOW;
-  else
-    styleEx = WS_EX_TOPMOST;
-
-  if(theApp.videoOption <= VIDEO_4X)
-    AdjustWindowRectEx(&theApp.dest, style, TRUE, styleEx);
-  else
-    AdjustWindowRectEx(&theApp.dest, style, FALSE, styleEx);
-
-  int winSizeX = theApp.dest.right-theApp.dest.left;
-  int winSizeY = theApp.dest.bottom-theApp.dest.top;
-
-  int x = 0;
-  int y = 0;
-
-  if(theApp.videoOption <= VIDEO_4X) {
-    x = theApp.windowPositionX;
-    y = theApp.windowPositionY;
-  }
-
-  // Create a window
-  MainWnd *pWnd = new MainWnd;
-  theApp.m_pMainWnd = pWnd;
-
-  pWnd->CreateEx(styleEx,
-                 theApp.wndClass,
-                 "VisualBoyAdvance",
-                 style,
-                 x,y,winSizeX,winSizeY,
-                 NULL,
-                 0);
-
-  if (!(HWND)*pWnd) {
-    winlog("Error creating Window %08x\n", GetLastError());
-    return FALSE;
-  }
-
-
-  theApp.updateMenuBar();
-
-  theApp.adjustDestRect();
+	if( !theApp.preInitialize() ) return false;
 
   GUID *guid = NULL;
   if(theApp.ddrawEmulationOnly)
@@ -356,7 +260,7 @@ bool DirectDrawDisplay::initialize()
       DDSCL_EXCLUSIVE |
       DDSCL_FULLSCREEN;
 
-  hret = pDirectDraw->SetCooperativeLevel(pWnd->m_hWnd,
+  hret = pDirectDraw->SetCooperativeLevel(theApp.m_pMainWnd->GetSafeHwnd(),
                                           flags);
 
   if(hret != DD_OK) {
@@ -432,7 +336,7 @@ bool DirectDrawDisplay::initialize()
   //  if(videoOption <= VIDEO_4X) {
   hret = pDirectDraw->CreateClipper(0, &ddsClipper, NULL);
   if(hret == DD_OK) {
-    ddsClipper->SetHWnd(0, pWnd->m_hWnd);
+    ddsClipper->SetHWnd(0, theApp.m_pMainWnd->GetSafeHwnd());
     if(theApp.videoOption > VIDEO_4X) {
       if(theApp.tripleBuffering)
         ddsFlip->SetClipper(ddsClipper);
@@ -470,8 +374,6 @@ bool DirectDrawDisplay::initialize()
 
   if(failed)
     return false;
-
-  pWnd->DragAcceptFiles(TRUE);
 
   return true;
 }

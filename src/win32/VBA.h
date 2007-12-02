@@ -259,6 +259,7 @@ class VBA : public CWinApp
   void directXMessage(const char *msg);
   void shutdownDisplay();
   void winCheckFullscreen();
+  bool preInitialize();
   bool updateRenderMethod0(bool force);
   bool updateRenderMethod(bool force);
   bool initDisplay();

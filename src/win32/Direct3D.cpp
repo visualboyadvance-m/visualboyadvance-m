@@ -192,132 +192,16 @@ bool Direct3DDisplay::initialize()
 	TRACE( _T("Initializing Direct3D renderer {\n") );
 #endif
 
+	if( !theApp.preInitialize() ) return false;
+
 	initializing = true;
-
-	switch( theApp.cartridgeType )
-	{
-	case IMAGE_GBA:
-		theApp.sizeX = 240;
-		theApp.sizeY = 160;
-		break;
-	case IMAGE_GB:
-		if(gbBorderOn) {
-			theApp.sizeX = 256;
-			theApp.sizeY = 224;
-		} else {
-			theApp.sizeX = 160;
-			theApp.sizeY = 144;
-		}
-		break;
-	}
-
-
-	switch(theApp.videoOption)
-	{
-	case VIDEO_1X:
-		theApp.surfaceSizeX = theApp.sizeX;
-		theApp.surfaceSizeY = theApp.sizeY;
-		break;
-	case VIDEO_2X:
-		theApp.surfaceSizeX = theApp.sizeX * 2;
-		theApp.surfaceSizeY = theApp.sizeY * 2;
-		break;
-	case VIDEO_3X:
-		theApp.surfaceSizeX = theApp.sizeX * 3;
-		theApp.surfaceSizeY = theApp.sizeY * 3;
-		break;
-	case VIDEO_4X:
-		theApp.surfaceSizeX = theApp.sizeX * 4;
-		theApp.surfaceSizeY = theApp.sizeY * 4;
-		break;
-	case VIDEO_320x240:
-	case VIDEO_640x480:
-	case VIDEO_800x600:
-	case VIDEO_1024x768:
-	case VIDEO_1280x1024:
-	case VIDEO_OTHER:
-		float scaleX = ((float)theApp.fsWidth / theApp.sizeX);
-		float scaleY = ((float)theApp.fsHeight / theApp.sizeY);
-		float min = (scaleX < scaleY) ? scaleX : scaleY;
-		if(theApp.fullScreenStretch) {
-			theApp.surfaceSizeX = theApp.fsWidth;
-			theApp.surfaceSizeY = theApp.fsHeight;
-		} else {
-			theApp.surfaceSizeX = (int)(theApp.sizeX * min);
-			theApp.surfaceSizeY = (int)(theApp.sizeY * min);
-		}
-		break;
-	}
-
-	theApp.rect.left = 0;
-	theApp.rect.top = 0;
-	theApp.rect.right = theApp.sizeX;
-	theApp.rect.bottom = theApp.sizeY;
-
-	theApp.dest.left = 0;
-	theApp.dest.top = 0;
-	theApp.dest.right = theApp.surfaceSizeX;
-	theApp.dest.bottom = theApp.surfaceSizeY;
-
-
-	DWORD style = WS_POPUP | WS_VISIBLE;
-	DWORD styleEx = 0;
-
-	if(theApp.videoOption <= VIDEO_4X) {
-		style |= WS_OVERLAPPEDWINDOW;
-	} else {
-		styleEx = 0;
-	}
-
-	if(theApp.videoOption <= VIDEO_4X) {
-		AdjustWindowRectEx(&theApp.dest, style, TRUE, styleEx);
-	} else {
-		AdjustWindowRectEx(&theApp.dest, style, FALSE, styleEx);
-	}
-
-	int winSizeX = theApp.dest.right-theApp.dest.left;
-	int winSizeY = theApp.dest.bottom-theApp.dest.top;
-
-	if(theApp.videoOption > VIDEO_4X) {
-		winSizeX = theApp.fsWidth;
-		winSizeY = theApp.fsHeight;
-	}
-
-	int x = 0, y = 0;
-
-	if(theApp.videoOption <= VIDEO_4X) {
-		x = theApp.windowPositionX;
-		y = theApp.windowPositionY;
-	}
-
-
-	// Create a window
-	MainWnd *pWnd = new MainWnd;
-	theApp.m_pMainWnd = pWnd;
-
-	pWnd->CreateEx(styleEx,
-		theApp.wndClass,
-		_T("VisualBoyAdvance"),
-		style,
-		x,y,winSizeX,winSizeY,
-		NULL,
-		0);
-
-	if( !((HWND)*pWnd) ) {
-		DXTRACE_ERR_MSGBOX( _T("Error creating window"), 0 );
-		return FALSE;
-	}
-	pWnd->DragAcceptFiles(TRUE);
-	theApp.updateMenuBar();
-	theApp.adjustDestRect();
-
 
 	// load Direct3D v9
 	pD3D = Direct3DCreate9( D3D_SDK_VERSION );
 
 	if(pD3D == NULL) {
 		DXTRACE_ERR_MSGBOX( _T("Error creating Direct3D object"), 0 );
-		return FALSE;
+		return false;
 	}
 	pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &mode);
 
@@ -406,7 +290,7 @@ bool Direct3DDisplay::initialize()
 	HRESULT hret = pD3D->CreateDevice(
 		D3DADAPTER_DEFAULT,
 		D3DDEVTYPE_HAL,
-		pWnd->GetSafeHwnd(),
+		theApp.m_pMainWnd->GetSafeHwnd(),
 		D3DCREATE_SOFTWARE_VERTEXPROCESSING,
 		&dpp,
 		&pDevice);
