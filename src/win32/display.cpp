@@ -21,7 +21,7 @@
 
 void copyImage( void *source, void *destination, unsigned int width, unsigned int height, unsigned int destinationPitch, unsigned int colorDepth )
 {
-#ifdef ASM
+#ifndef C_CORE
 
 	// Copy the image at [source] to the locked Direct3D texture
 	__asm
@@ -75,7 +75,7 @@ gbaLoop24bit:
 gbaLoopEnd:
 	}
 
-#else // #ifdef ASM
+#else // #ifndef C_CORE
 
 	// optimized C version
 	register unsigned int lineSize;
@@ -120,4 +120,3 @@ gbaLoopEnd:
 
 #endif
 }
-
