@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="libpng"
 	ProjectGUID="{96E945F7-0377-48DA-A5F8-1C192DE9F25F}"
 	RootNamespace="libpng"
@@ -20,10 +20,11 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)_temp"
 			ConfigurationType="4"
 			CharacterSet="0"
+			BuildLogFile="$(IntDir)\$(ProjectName)_BuildLog.htm"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -51,6 +52,7 @@
 				EnableEnhancedInstructionSet="1"
 				DisableLanguageExtensions="true"
 				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="$(IntDir)\$(ProjectName).pdb"
 				WarningLevel="1"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
@@ -67,72 +69,6 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalOptions="/MACHINE:X86"
-				AdditionalLibraryDirectories=""
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
-			CharacterSet="0"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\zlib"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
-				RuntimeLibrary="0"
-				EnableEnhancedInstructionSet="1"
-				DisableLanguageExtensions="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="1"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
-				CompileAs="1"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-				AdditionalOptions="/MACHINE:X86"
 				AdditionalLibraryDirectories=""
 			/>
 			<Tool
@@ -153,10 +89,11 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)_temp"
 			ConfigurationType="4"
 			CharacterSet="0"
+			BuildLogFile="$(IntDir)\$(ProjectName)_BuildLog.htm"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -185,6 +122,7 @@
 				EnableEnhancedInstructionSet="0"
 				DisableLanguageExtensions="true"
 				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="$(IntDir)\$(ProjectName).pdb"
 				WarningLevel="1"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -201,7 +139,72 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalOptions="/MACHINE:X64"
+				AdditionalLibraryDirectories=""
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)_temp"
+			ConfigurationType="4"
+			CharacterSet="0"
+			BuildLogFile="$(IntDir)\$(ProjectName)_BuildLog.htm"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="..\zlib"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
+				RuntimeLibrary="0"
+				EnableEnhancedInstructionSet="1"
+				DisableLanguageExtensions="true"
+				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="$(IntDir)\$(ProjectName).pdb"
+				WarningLevel="1"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="3"
+				CompileAs="1"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
 				AdditionalLibraryDirectories=""
 			/>
 			<Tool
@@ -222,10 +225,11 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)_temp"
 			ConfigurationType="4"
 			CharacterSet="0"
+			BuildLogFile="$(IntDir)\$(ProjectName)_BuildLog.htm"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -248,9 +252,10 @@
 				AdditionalIncludeDirectories="..\zlib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="0"
-				EnableEnhancedInstructionSet="1"
+				EnableEnhancedInstructionSet="0"
 				DisableLanguageExtensions="true"
 				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="$(IntDir)\$(ProjectName).pdb"
 				WarningLevel="1"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -267,7 +272,6 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalOptions="/MACHINE:X86"
 				AdditionalLibraryDirectories=""
 			/>
 			<Tool

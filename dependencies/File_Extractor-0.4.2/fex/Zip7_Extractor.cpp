@@ -8,12 +8,12 @@
 #include <stddef.h>
 
 extern "C" {
-	#include "7z_C/LZMA_C/LzmaTypes.h"
+	#include "../7z_C/LZMA_C/LzmaTypes.h"
 }
-#include "7z_C/7zTypes.h"
+#include "../7z_C/7zTypes.h"
 extern "C" {
-	#include "7z_C/7zExtract.h"
-	#include "7z_C/7zCrc.h"
+	#include "../7z_C/7zExtract.h"
+	#include "../7z_C/7zCrc.h"
 }
 
 /* Copyright (C) 2005-2006 Shay Green. This module is free software; you
