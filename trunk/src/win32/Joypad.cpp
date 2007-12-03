@@ -35,8 +35,20 @@ BOOL bAppendMode;
 
 void AssignKey(KeyList &Key, int Out)
 {
-	if (!bAppendMode)
+	if( !bAppendMode ) {
 		Key.RemoveAll();
+	} else {
+		POSITION pos = Key.GetHeadPosition();
+		if( pos != NULL ) {
+			// the list is not empty
+			while( true ) {
+				// we don't want to assign the same key twice
+				if( Key.GetAt( pos ) == Out ) return;
+				if( pos == Key.GetTailPosition() ) break;
+				Key.GetNext( pos );
+			}
+		}
+	}
 	Key.AddTail(Out);
 }
 
