@@ -21,7 +21,6 @@
 #include <memory.h>
 #include <stdarg.h>
 #include <string.h>
-
 #include "GBA.h"
 #include "GBAcpu.h"
 #include "GBAinline.h"
@@ -786,6 +785,7 @@ static bool CPUReadState(gzFile gzFile)
     timer1Ticks = ((0x10000 - TM1D) << timer1ClockReload) - timer1Ticks;
     timer2Ticks = ((0x10000 - TM2D) << timer2ClockReload) - timer2Ticks;
     timer3Ticks = ((0x10000 - TM3D) << timer3ClockReload) - timer3Ticks;
+    interp_rate();
   }
 
   // set pointers!
@@ -2730,6 +2730,7 @@ void CPUUpdateRegister(u32 address, u16 value)
     break;
  case 0x100:
     timer0Reload = value;
+	interp_rate();
     break;
   case 0x102:
     timer0Value = value;
@@ -2738,6 +2739,7 @@ void CPUUpdateRegister(u32 address, u16 value)
     break;
   case 0x104:
     timer1Reload = value;
+	interp_rate();
     break;
   case 0x106:
     timer1Value = value;
@@ -2781,6 +2783,15 @@ void CPUUpdateRegister(u32 address, u16 value)
 	    UPDATE_REG(0x128, value);
 	}
     break;
+ case 0x12a:
+ #ifdef LINK_EMULATION
+ if(linkenable && lspeed)
+    LinkSSend(value);
+  #endif
+  {
+ UPDATE_REG(0x134, value);
+  }
+  break;
   case 0x130:
     P1 |= (value & 0x3FF);
     UPDATE_REG(0x130, P1);
