@@ -205,7 +205,7 @@ bool DirectSound::init()
 
 
 	if( !theApp.useOldSync ) {
-		if( FAILED( hr = dsbSecondary->QueryInterface( IID_IDirectSoundNotify8, (LPVOID*)&dsbNotify ) ) ) {
+		if( SUCCEEDED( hr = dsbSecondary->QueryInterface( IID_IDirectSoundNotify8, (LPVOID*)&dsbNotify ) ) ) {
 			dsbEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
 			DSBPOSITIONNOTIFY notify[10];
 			for( i = 0; i < 10; i++ ) {
