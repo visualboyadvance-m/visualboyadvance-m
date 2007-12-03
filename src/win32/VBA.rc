@@ -144,21 +144,21 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,90,102,50,14,WS_GROUP
 END
 
-IDD_ABOUT DIALOGEX 0, 0, 179, 140
+IDD_ABOUT DIALOGEX 0, 0, 179, 143
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "About"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    ICON            101,IDC_STATIC,6,6,21,20
+    ICON            101,IDC_STATIC,6,6,20,20
     CTEXT           "VisualBoyAdvance Emulator",IDC_STATIC,34,7,120,8
     CTEXT           "Copyright © 2007 VBA development team",IDC_STATIC,16,36,144,8
-    CTEXT           "https://vbam.bountysource.com",IDC_URL,7,116,165,8
+    CTEXT           "https://vbam.bountysource.com",IDC_URL,6,126,165,8
     CTEXT           "Contributions by Costis and original VBA Team",IDC_STATIC,7,49,165,8
     CTEXT           "Version",IDC_STATIC,47,17,27,8
     CTEXT           "",IDC_VERSION,80,18,60,8,SS_NOPREFIX
-    GROUPBOX        "VBA Development Team",IDC_STATIC,7,61,165,48
-    LTEXT           "mudlord\nNach\nJonas Quinn\nDJRobX",IDC_STATIC,15,70,143,32
+    GROUPBOX        "VBA Development Team",IDC_STATIC,7,61,165,59
+    LTEXT           "mudlord\nNach\nJonas Quinn\nDJRobX\nSpacy",IDC_STATIC,15,70,143,44
 END
 
 IDD_DIRECTORIES DIALOGEX 0, 0, 220, 301
@@ -1125,7 +1125,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 172
         TOPMARGIN, 7
-        BOTTOMMARGIN, 133
+        BOTTOMMARGIN, 136
     END
 
     IDD_DIRECTORIES, DIALOG
@@ -1559,9 +1559,9 @@ BEGIN
                 MENUITEM "&3x Size",                    ID_OPTIONS_VIDEO_X3
                 MENUITEM "&4x Size",                    ID_OPTIONS_VIDEO_X4
             END
-            POPUP "Full-screen"
+            POPUP "Fullscreen"
             BEGIN
-                MENUITEM "&Select...",                  ID_OPTIONS_VIDEO_FULLSCREEN
+                MENUITEM "&Custom...",                  ID_OPTIONS_VIDEO_FULLSCREEN
                 MENUITEM SEPARATOR
                 MENUITEM "320x240x16",                  ID_OPTIONS_VIDEO_FULLSCREEN320X240
                 MENUITEM "640x480x16",                  ID_OPTIONS_VIDEO_FULLSCREEN640X480
@@ -1573,9 +1573,8 @@ BEGIN
                 MENUITEM "Stretch to &fit",             ID_OPTIONS_VIDEO_FULLSCREENSTRETCHTOFIT
             END
             MENUITEM SEPARATOR
-            POPUP "&Frame skip"
+            POPUP "&Frame Skip"
             BEGIN
-                MENUITEM "&Synchronize",                ID_OPTIONS_EMULATOR_SYNCHRONIZE
                 MENUITEM "&Automatic",                  ID_OPTIONS_FRAMESKIP_AUTOMATIC
                 MENUITEM SEPARATOR
                 MENUITEM "&No frame skip",              ID_OPTIONS_VIDEO_FRAMESKIP_0
@@ -1607,9 +1606,7 @@ BEGIN
         POPUP "&Pixel Filter"
         BEGIN
             MENUITEM "&Disable Filters",            ID_OPTIONS_FILTER_NORMAL
-            MENUITEM "Use Filter Plugin",           ID_OPTIONS_FILTER_PLUGIN
-            MENUITEM "Select Filter Plugin ...",    ID_OPTIONS_SELECT_PLUGIN
-            POPUP "Magnification"
+            POPUP "&Magnification"
             BEGIN
                 POPUP "&2X"
                 BEGIN
@@ -1642,6 +1639,10 @@ BEGIN
                     MENUITEM "&HQ4x",                       ID_OPTIONS_FILTER_HQ4X
                 END
             END
+            MENUITEM SEPARATOR
+            MENUITEM "&Use Filter Plugin",          ID_OPTIONS_FILTER_PLUGIN
+            MENUITEM "Select Filter &Plugin ...",   ID_OPTIONS_SELECT_PLUGIN
+            MENUITEM SEPARATOR
             POPUP "&Interframe Blending"
             BEGIN
                 MENUITEM "&None",                       ID_OPTIONS_FILTER_INTERFRAMEBLENDING_NONE
@@ -1649,20 +1650,33 @@ BEGIN
                 MENUITEM "&Smart",                      ID_OPTIONS_FILTER_INTERFRAMEBLENDING_SMART
             END
             MENUITEM SEPARATOR
-            MENUITEM "&Disable MMX",                ID_OPTIONS_FILTER_DISABLEMMX
+            MENUITEM "Disable &MMX",                ID_OPTIONS_FILTER_DISABLEMMX
         END
         POPUP "&Audio"
         BEGIN
+            MENUITEM "&On",                         ID_OPTIONS_SOUND_ON
+            MENUITEM "O&ff",                        ID_OPTIONS_SOUND_OFF
+            MENUITEM SEPARATOR
+            MENUITEM "&Sync game to audio",         ID_OPTIONS_EMULATOR_SYNCHRONIZE
+            MENUITEM "Use &old synchronization",    ID_OPTIONS_SOUND_USEOLDSYNCHRONIZATION
+            MENUITEM SEPARATOR
             POPUP "&Volume"
             BEGIN
-                MENUITEM "&0.25X",                      ID_OPTIONS_SOUND_VOLUME_25X
-                MENUITEM "0.&5X",                       ID_OPTIONS_SOUND_VOLUME_5X
-                MENUITEM "&1x",                         ID_OPTIONS_SOUND_VOLUME_1X
-                MENUITEM "&2x",                         ID_OPTIONS_SOUND_VOLUME_2X
-                MENUITEM "&3x",                         ID_OPTIONS_SOUND_VOLUME_3X
-                MENUITEM "&4x",                         ID_OPTIONS_SOUND_VOLUME_4X
+                MENUITEM "&Mute",                       ID_OPTIONS_SOUND_MUTE
+                MENUITEM SEPARATOR
+                MENUITEM "2&5%",                        ID_OPTIONS_SOUND_VOLUME_25X
+                MENUITEM "5&0%",                        ID_OPTIONS_SOUND_VOLUME_5X
+                MENUITEM "&100%",                       ID_OPTIONS_SOUND_VOLUME_1X
+                MENUITEM "&200%",                       ID_OPTIONS_SOUND_VOLUME_2X
+                MENUITEM "&300%",                       ID_OPTIONS_SOUND_VOLUME_3X
+                MENUITEM "&400%",                       ID_OPTIONS_SOUND_VOLUME_4X
             END
-            MENUITEM SEPARATOR
+            POPUP "Sampling Rate"
+            BEGIN
+                MENUITEM "&11025 Hz",                   ID_OPTIONS_SOUND_11KHZ
+                MENUITEM "&22050 Hz",                   ID_OPTIONS_SOUND_22KHZ
+                MENUITEM "&44100 Hz",                   ID_OPTIONS_SOUND_44KHZ
+            END
             POPUP "PCM interpolation"
             BEGIN
                 MENUITEM "None",                        ID_OPTIONS_SOUND_PCMINTERPOLATION_NONE
@@ -1672,26 +1686,19 @@ BEGIN
                 MENUITEM "libresample",                 ID_OPTIONS_SOUND_PCMINTERPOLATION_LIBRESAMPLE
             END
             MENUITEM SEPARATOR
-            MENUITEM "O&ff",                        ID_OPTIONS_SOUND_OFF
-            MENUITEM "&Mute",                       ID_OPTIONS_SOUND_MUTE
-            MENUITEM "&On",                         ID_OPTIONS_SOUND_ON
-            MENUITEM SEPARATOR
             MENUITEM "&Echo",                       ID_OPTIONS_SOUND_ECHO
             MENUITEM "&Low pass filter",            ID_OPTIONS_SOUND_LOWPASSFILTER
             MENUITEM "&Reverse Stereo",             ID_OPTIONS_SOUND_REVERSESTEREO
             MENUITEM SEPARATOR
-            MENUITEM "11 &Khz",                     ID_OPTIONS_SOUND_11KHZ
-            MENUITEM "22 K&hz",                     ID_OPTIONS_SOUND_22KHZ
-            MENUITEM "44 Kh&z",                     ID_OPTIONS_SOUND_44KHZ
-            MENUITEM SEPARATOR
-            MENUITEM "Channel &1",                  ID_OPTIONS_SOUND_CHANNEL1, CHECKED
-            MENUITEM "Channel &2",                  ID_OPTIONS_SOUND_CHANNEL2, CHECKED
-            MENUITEM "Channel &3",                  ID_OPTIONS_SOUND_CHANNEL3, CHECKED
-            MENUITEM "Channel &4",                  ID_OPTIONS_SOUND_CHANNEL4, CHECKED
-            MENUITEM "Direct Sound &A",             ID_OPTIONS_SOUND_DIRECTSOUNDA, CHECKED
-            MENUITEM "Direct Sound &B",             ID_OPTIONS_SOUND_DIRECTSOUNDB, CHECKED
-            MENUITEM SEPARATOR
-            MENUITEM "Use old &synchronization",    ID_OPTIONS_SOUND_USEOLDSYNCHRONIZATION
+            POPUP "Sound Channels"
+            BEGIN
+                MENUITEM "Channel &1",                  ID_OPTIONS_SOUND_CHANNEL1, CHECKED
+                MENUITEM "Channel &2",                  ID_OPTIONS_SOUND_CHANNEL2, CHECKED
+                MENUITEM "Channel &3",                  ID_OPTIONS_SOUND_CHANNEL3, CHECKED
+                MENUITEM "Channel &4",                  ID_OPTIONS_SOUND_CHANNEL4, CHECKED
+                MENUITEM "Direct Sound &A",             ID_OPTIONS_SOUND_DIRECTSOUNDA, CHECKED
+                MENUITEM "Direct Sound &B",             ID_OPTIONS_SOUND_DIRECTSOUNDB, CHECKED
+            END
         END
         POPUP "&Input"
         BEGIN
@@ -1733,7 +1740,7 @@ BEGIN
                 MENUITEM "&Normal",                     ID_OPTIONS_PRIORITY_NORMAL
                 MENUITEM "&Below Normal",               ID_OPTIONS_PRIORITY_BELOWNORMAL
             END
-            MENUITEM "Remove intros (GBA)",         ID_OPTIONS_EMULATOR_REMOVEINTROSGBA
+            MENUITEM "&Remove intros (GBA)",        ID_OPTIONS_EMULATOR_REMOVEINTROSGBA
             MENUITEM "Automatic IPS patching",      ID_OPTIONS_EMULATOR_AUTOMATICALLYIPSPATCH
             MENUITEM "Pause when inactive",         ID_OPTIONS_EMULATOR_PAUSEWHENINACTIVE
             MENUITEM "AGB Print",                   ID_OPTIONS_EMULATOR_AGBPRINT
@@ -1764,8 +1771,11 @@ BEGIN
             MENUITEM "Skip BIOS",                   ID_OPTIONS_EMULATOR_SKIPBIOS
             MENUITEM "S&elect BIOS file...",        ID_OPTIONS_EMULATOR_SELECTBIOSFILE
             MENUITEM SEPARATOR
-            MENUITEM "PNG Screenshots",             ID_OPTIONS_EMULATOR_PNGFORMAT
-            MENUITEM "BMP Screenshots",             ID_OPTIONS_EMULATOR_BMPFORMAT
+            POPUP "Screenshot &Format"
+            BEGIN
+                MENUITEM "&PNG",                        ID_OPTIONS_EMULATOR_PNGFORMAT
+                MENUITEM "&BMP",                        ID_OPTIONS_EMULATOR_BMPFORMAT
+            END
         END
         POPUP "&Gameboy"
         BEGIN
