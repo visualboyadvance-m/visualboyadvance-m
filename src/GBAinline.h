@@ -32,16 +32,10 @@ extern bool stopState;
 extern bool holdState;
 extern int holdType;
 extern int cpuNextEvent;
-
 extern bool cpuSramEnabled;
 extern bool cpuFlashEnabled;
 extern bool cpuEEPROMEnabled;
 extern bool cpuEEPROMSensorEnabled;
-#ifdef LINK_EMULATION
-extern int lspeed;
-extern bool linkenable;
-extern void LinkSStop(void);
-#endif /* LINK_EMULATION */
 extern bool cpuDmaHack;
 extern u32 cpuDmaLast;
 extern bool timer0On;
@@ -71,14 +65,14 @@ static inline u32 CPUReadMemory(u32 address)
 {
 
 #ifdef DEV_VERSION
-  if(address & 3) {
+  if(address & 3) {  
     if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
       log("Unaligned word read: %08x at %08x\n", address, armMode ?
           armNextPC - 4 : armNextPC - 2);
     }
   }
 #endif
-
+  
   u32 value;
   switch(address >> 24) {
   case 0:
@@ -90,7 +84,7 @@ static inline u32 CPUReadMemory(u32 address)
               armNextPC - 4 : armNextPC - 2);
         }
 #endif
-
+        
         value = READ32LE(((u32 *)&biosProtected));
       }
       else goto unreadable;
@@ -104,10 +98,6 @@ static inline u32 CPUReadMemory(u32 address)
     value = READ32LE(((u32 *)&internalRAM[address & 0x7ffC]));
     break;
   case 4:
-#ifdef LINK_EMULATION
-   	  if(linkenable && (address>=0x4000120||address<=0x4000126)&&lspeed)
-		  LinkSStop();
-#endif
     if((address < 0x4000400) && ioReadable[address & 0x3fc]) {
       if(ioReadable[(address & 0x3fc) + 2])
         value = READ32LE(((u32 *)&ioMem[address & 0x3fC]));
@@ -138,7 +128,7 @@ static inline u32 CPUReadMemory(u32 address)
   case 11:
   case 12:
     value = READ32LE(((u32 *)&rom[address&0x1FFFFFC]));
-    break;
+    break;    
   case 13:
     if(cpuEEPROMEnabled)
       // no need to swap this
@@ -174,7 +164,7 @@ static inline u32 CPUReadMemory(u32 address)
 #ifdef C_CORE
     int shift = (address & 3) << 3;
     value = (value >> shift) | (value << (32 - shift));
-#else
+#else    
 #ifdef __GNUC__
     asm("and $3, %%ecx;"
         "shl $3 ,%%ecx;"
@@ -198,7 +188,7 @@ extern u32 myROM[];
 
 static inline u32 CPUReadHalfWord(u32 address)
 {
-#ifdef DEV_VERSION
+#ifdef DEV_VERSION      
   if(address & 1) {
     if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
       log("Unaligned halfword read: %08x at %08x\n", address, armMode ?
@@ -206,9 +196,9 @@ static inline u32 CPUReadHalfWord(u32 address)
     }
   }
 #endif
-
+  
   u32 value;
-
+  
   switch(address >> 24) {
   case 0:
     if (reg[15].I >> 24) {
@@ -231,10 +221,6 @@ static inline u32 CPUReadHalfWord(u32 address)
     value = READ16LE(((u16 *)&internalRAM[address & 0x7ffe]));
     break;
   case 4:
-#ifdef LINK_EMULATION
-	if(linkenable && (address>=0x4000120||address<=0x4000126)&&lspeed)
-	  LinkSStop();
-#endif
     if((address < 0x4000400) && ioReadable[address & 0x3fe])
     {
       value =  READ16LE(((u16 *)&ioMem[address & 0x3fe]));
@@ -281,7 +267,7 @@ static inline u32 CPUReadHalfWord(u32 address)
       value = rtcRead(address);
     else
       value = READ16LE(((u16 *)&rom[address & 0x1FFFFFE]));
-    break;
+    break;    
   case 13:
     if(cpuEEPROMEnabled)
       // no need to swap this
@@ -315,7 +301,7 @@ static inline u32 CPUReadHalfWord(u32 address)
   if(address & 1) {
     value = (value >> 8) | (value << 24);
   }
-
+  
   return value;
 }
 
@@ -348,10 +334,6 @@ static inline u8 CPUReadByte(u32 address)
   case 3:
     return internalRAM[address & 0x7fff];
   case 4:
-#ifdef LINK_EMULATION
-   if(linkenable&&(address>=0x4000120||address<=0x4000126)&&lspeed)
-	  LinkSStop();
-#endif
     if((address < 0x4000400) && ioReadable[address & 0x3ff])
       return ioMem[address & 0x3ff];
     else goto unreadable;
@@ -371,7 +353,7 @@ static inline u8 CPUReadByte(u32 address)
   case 10:
   case 11:
   case 12:
-    return rom[address & 0x1FFFFFF];
+    return rom[address & 0x1FFFFFF];        
   case 13:
     if(cpuEEPROMEnabled)
       return eepromRead(address);
@@ -426,7 +408,7 @@ static inline void CPUWriteMemory(u32 address, u32 value)
     }
   }
 #endif
-
+  
   switch(address >> 24) {
   case 0x02:
 #ifdef BKPT_SUPPORT
@@ -473,7 +455,7 @@ static inline void CPUWriteMemory(u32 address, u32 value)
       cheatsWriteMemory(address + 0x06000000, value);
     else
 #endif
-
+    
     WRITE32LE(((u32 *)&vram[address]), value);
     break;
   case 0x07:
@@ -753,4 +735,5 @@ static inline void CPUWriteByte(u32 address, u8 b)
     break;
   }
 }
+
 #endif //VBA_GBAinline_H
