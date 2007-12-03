@@ -1606,11 +1606,11 @@ BEGIN
         END
         POPUP "&Pixel Filter"
         BEGIN
-            MENUITEM "Filter Plugin",               ID_OPTIONS_FILTER_PLUGIN
+            MENUITEM "&Disable Filters",            ID_OPTIONS_FILTER_NORMAL
+            MENUITEM "Use Filter Plugin",           ID_OPTIONS_FILTER_PLUGIN
             MENUITEM "Select Filter Plugin ...",    ID_OPTIONS_SELECT_PLUGIN
             POPUP "Magnification"
             BEGIN
-                MENUITEM "&None",                       ID_OPTIONS_FILTER_NORMAL
                 POPUP "&2X"
                 BEGIN
                     MENUITEM "&Simple 2x",                  ID_OPTIONS_FILTER16BIT_SIMPLE2X
