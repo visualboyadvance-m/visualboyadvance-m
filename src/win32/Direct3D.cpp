@@ -160,6 +160,15 @@ void Direct3DDisplay::prepareDisplayMode()
 
 
 #ifdef _DEBUG
+	// make debugging full screen easier
+	if( dpp.Windowed == FALSE ) {
+		dpp.Windowed = TRUE;
+		dpp.BackBufferFormat = D3DFMT_UNKNOWN;
+		dpp.BackBufferCount = 0;
+		dpp.FullScreen_RefreshRateInHz = 0;
+		dpp.Flags = 0;
+	}
+
 	TRACE( _T("prepareDisplayMode:\n") );
 	TRACE( _T("%i x %i @ %iHz:\n"), dpp.BackBufferWidth, dpp.BackBufferHeight, dpp.FullScreen_RefreshRateInHz );
 	TRACE( _T("Buffer Count: %i\n"), dpp.BackBufferCount+1 );
