@@ -998,7 +998,8 @@ void  gbWriteMemory(register u16 address, register u8 value)
     case 0x3d:
     case 0x3e:
     case 0x3f: {
-      gbMemory[address] = value;
+      SOUND_EVENT(address,value);
+      //gbMemory[address] = value;
       return;
     }
 
@@ -1783,6 +1784,9 @@ u8 gbReadMemory(register u16 address)
   }
 
   if(address >= 0xff00) {
+	if ( address >= 0xFF10 && address <= 0xFF3F )
+		return gbSoundRead( address );
+	
     switch(address & 0x00ff) {
     case 0x00:
       {
@@ -2057,8 +2061,8 @@ void gbSpeedSwitch()
     gbLcdLYIncrementTicksDelayed *= 2;
     gbLcdLYIncrementTicksDelayed--;
     gbSerialTicks *= 2;
-    SOUND_CLOCK_TICKS = soundQuality * 24 * 2;
-    soundTicks *= 2;
+    //SOUND_CLOCK_TICKS = soundQuality * 24 * 2;
+    //soundTicks *= 2;
     gbLine99Ticks = 3;
   } else {
     gbSpeed = 0;
@@ -2080,8 +2084,8 @@ void gbSpeedSwitch()
     gbLcdLYIncrementTicksDelayed++;
     gbLcdLYIncrementTicksDelayed >>= 1;
     gbSerialTicks /= 2;
-    SOUND_CLOCK_TICKS = soundQuality * 24;
-    soundTicks /= 2;
+    //SOUND_CLOCK_TICKS = soundQuality * 24;
+    //soundTicks /= 2;
     gbLine99Ticks = 1;
     if (gbHardware & 8)
       gbLine99Ticks++;
@@ -4312,8 +4316,8 @@ int gbGetNextEvent (int clockTicks)
   if(gbTimerOn && (((gbInternalTimer) & gbTimerMask[gbTimerMode])+1 < clockTicks))
     clockTicks = ((gbInternalTimer) & gbTimerMask[gbTimerMode])+1;
 
-  if(soundTicks && (soundTicks < clockTicks))
-    clockTicks = soundTicks;
+  //if(soundTicks && (soundTicks < clockTicks))
+  //  clockTicks = soundTicks;
 
   if ((clockTicks<=0) || (gbInterruptWait))
       clockTicks = 1;
@@ -5205,7 +5209,9 @@ void gbEmulate(int ticksToStop)
 
 
     soundTicks -= clockTicks;
-
+	if ( !gbSpeed )
+		soundTicks -= clockTicks;
+	
     while(soundTicks < 0) {
       soundTicks += SOUND_CLOCK_TICKS;
 
