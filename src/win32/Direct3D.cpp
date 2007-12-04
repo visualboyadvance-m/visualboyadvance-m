@@ -62,7 +62,7 @@ extern int winVideoModeSelect(CWnd *, GUID **);
 
 class Direct3DDisplay : public IDisplay {
 private:
-	bool                  initializing;
+	bool                  initialized;
 	LPDIRECT3D9           pD3D;
 	LPDIRECT3DDEVICE9     pDevice;
 	D3DDISPLAYMODE		  mode;
@@ -111,7 +111,7 @@ public:
 
 Direct3DDisplay::Direct3DDisplay()
 {
-	initializing = false;
+	initialized = false;
 	pD3D = NULL;
 	pDevice = NULL;
 	screenFormat = D3DFMT_X8R8G8B8;
@@ -200,8 +200,6 @@ bool Direct3DDisplay::initialize()
 #ifdef _DEBUG
 	TRACE( _T("Initializing Direct3D renderer {\n") );
 #endif
-
-	initializing = true;
 
 	// load Direct3D v9
 	pD3D = Direct3DCreate9( D3D_SDK_VERSION );
@@ -311,9 +309,9 @@ bool Direct3DDisplay::initialize()
 	setOption( _T("d3dFilter"), theApp.d3dFilter );
 	calculateDestRect();
 
-	initializing = false;
-
 	if(failed) return false;
+
+	initialized = true;
 
 #ifdef _DEBUG
 	TRACE( _T("} Finished Direct3D renderer initialization\n\n") );
@@ -457,7 +455,7 @@ bool Direct3DDisplay::changeRenderSize( int w, int h )
 
 void Direct3DDisplay::resize( int w, int h )
 {
-	if( initializing ) {
+	if( !initialized ) {
 		return;
 	}
 
@@ -640,7 +638,7 @@ bool Direct3DDisplay::resetDevice()
 
 	HRESULT hr;
 	if( pFont ) {
-		// prepares font for rest
+		// prepares font for reset
 		pFont->OnLostDevice();
 	}
 	destroyTexture();
