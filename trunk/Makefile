@@ -32,10 +32,13 @@ MAINDIR=src
 SDLDIR=src/sdl
 DMGDIR=src/gb
 RESAMPLEDIR=src/libresample-0.1.3/src
-
+GBAPUDIR=src/gb/gb_apu
 
 ASMOBJ=${MAINDIR}/hq3x_16${OE} ${MAINDIR}/hq3x_32${OE} ${MAINDIR}/hq4x_16${OE} ${MAINDIR}/hq4x_32${OE} \
 ${MAINDIR}/hq3x32${OE}
+
+GBAPUOBJ=${GBAPUDIR}/Blip_Buffer${OE} ${GBAPUDIR}/Effects_Buffer${OE} ${GBAPUDIR}/Gb_Apu${OE} \
+${GBAPUDIR}/Gb_Apu_State${OE} ${GBAPUDIR}/Gb_Oscs${OE} ${GBAPUDIR}/Multi_Buffer${OE}
 
 CALTERNOBJ=${MAINDIR}/hq3x16c${OE} ${MAINDIR}/hq3x32c${OE} ${MAINDIR}/hq4x16c${OE} ${MAINDIR}/hq4x32c${OE} \
 ${MAINDIR}/hq_shared32${OE}
@@ -58,7 +61,7 @@ ${DMGDIR}/gbSound${OE}
 
 SDLOBJ=${SDLDIR}/debugger${OE} ${SDLDIR}/SDL${OE} ${SDLDIR}/dummy${OE}
 
-OBJECTS=${MAINOBJ} ${DMGOBJ} ${SDLOBJ}
+OBJECTS=${MAINOBJ} ${DMGOBJ} ${SDLOBJ} ${GBAPUOBJ}
 LIB=${RESAMPLEDIR}/filterkit${OE} ${RESAMPLEDIR}/resample${OE} ${RESAMPLEDIR}/resamplesubs${OE}
 
 ifeq ($(USEASM),yes)
