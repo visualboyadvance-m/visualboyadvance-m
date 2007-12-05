@@ -50,7 +50,6 @@
 #define FIFOB_L 0xa4
 #define FIFOB_H 0xa6
 
-extern void setSoundFn();
 extern void (*psoundTickfn)();
 extern void soundShutdown();
 extern bool soundInit();
@@ -68,7 +67,6 @@ extern void soundTimerOverflow(int);
 extern void soundSetQuality(int);
 extern void setsystemSoundOn(bool value);
 extern void setsoundPaused(bool value);
-extern void setsoundMasterOn(bool value);
 extern void interp_rate();
 
 extern int SOUND_CLOCK_TICKS;

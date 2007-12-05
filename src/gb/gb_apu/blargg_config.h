@@ -1,11 +1,11 @@
-// Gb_Snd_Emu 0.2.0 user configuration file. Don't replace when updating library.
+// $package user configuration file. Don't replace when updating library.
 
 #ifndef BLARGG_CONFIG_H
 #define BLARGG_CONFIG_H
 
 // Uncomment to have Gb_Apu run at 4x normal clock rate (16777216 Hz), useful in
 // a Game Boy Advance emulator.
-//#define GB_APU_OVERCLOCK 4
+#define GB_APU_OVERCLOCK 4
 
 // Uncomment to enable platform-specific (and possibly non-portable) optimizations.
 //#define BLARGG_NONPORTABLE 1
