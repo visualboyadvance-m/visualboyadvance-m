@@ -2,19 +2,20 @@ Developer Information File:
 
 - Don't use the global optimization switch (/Og) because it causes a black screen in Metroid Prime.
 
-- Project Configurations:
-	- Debug:     Debug ON  | Optimizations OFF | UPX OFF
-	- Release:   Debug OFF | Optimizations OFF | UPX OFF
-	- Optimized: Debug OFF | Optimizations ON  | UPX ON
 
-Software Used:
-OPTIONAL	UPX 1.25 +/-
-NEEDED		nasm 0.98.39 +/-
-INCLUDED	zlib 1.2.3 +/-
-INCLUDED	libpng 1.2.8 +/-
-NEEDED		Microsoft Platform SDK 2003 SP1 +/-
-NEEDED		Microsoft DirectX 9.0c SDK (June 2005) +
-NEEDED		Microsoft Visual Studio .NET Professional 2003 German +
+Software needed to compile:
+nasm 0.99.06     +/-
+DirectX 9.0c SDK +
+
+Optional:
+OpenAL SDK       +/-
 
 +	newer is ok
 +/-	newer and older is ok
+
+
+
+Download locations:
+NASM:        http://nasm.sourceforge.net
+DirectX SDK: http://msdn2.microsoft.com/en-us/xna/aa937788.aspx
+OpenAL SDK:  http://openal.org/downloads.html
