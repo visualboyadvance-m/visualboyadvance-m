@@ -452,6 +452,10 @@ public:
 	afx_msg void OnUpdateSkinUse(CCmdUI *pCmdUI);
 	afx_msg void OnSkinSelect();
 	afx_msg void OnUpdateSkinSelect(CCmdUI *pCmdUI);
+	afx_msg void OnOutputapiDirectsound();
+	afx_msg void OnUpdateOutputapiDirectsound(CCmdUI *pCmdUI);
+	afx_msg void OnOutputapiOpenal();
+	afx_msg void OnUpdateOutputapiOpenal(CCmdUI *pCmdUI);
 };
 
 /////////////////////////////////////////////////////////////////////////////

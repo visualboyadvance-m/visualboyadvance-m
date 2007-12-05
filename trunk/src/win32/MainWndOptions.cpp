@@ -1975,3 +1975,35 @@ void MainWnd::OnUpdateSkinSelect(CCmdUI *pCmdUI)
 		);
 #endif
 }
+
+void MainWnd::OnOutputapiDirectsound()
+{
+	if( theApp.audioAPI != DIRECTSOUND ) {
+		theApp.audioAPI = DIRECTSOUND;
+		systemSoundShutdown();
+		systemSoundInit();
+	}
+}
+
+void MainWnd::OnUpdateOutputapiDirectsound(CCmdUI *pCmdUI)
+{
+	pCmdUI->SetCheck( ( theApp.audioAPI == DIRECTSOUND ) ? 1 : 0 );
+}
+
+void MainWnd::OnOutputapiOpenal()
+{
+#ifndef NO_OAL
+	if( theApp.audioAPI != OPENAL ) {
+		theApp.audioAPI = OPENAL;
+		systemSoundShutdown();
+		systemSoundInit();
+	}
+#endif
+}
+
+void MainWnd::OnUpdateOutputapiOpenal(CCmdUI *pCmdUI)
+{
+#ifndef NO_OAL
+	pCmdUI->SetCheck( ( theApp.audioAPI == OPENAL ) ? 1 : 0 );
+#endif
+}
