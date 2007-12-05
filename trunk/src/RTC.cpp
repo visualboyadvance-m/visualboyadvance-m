@@ -59,12 +59,16 @@ bool rtcIsEnabled()
 u16 rtcRead(u32 address)
 {
   if(rtcEnabled) {
-    if(address == 0x80000c8)
+    switch(address){
+    case 0x80000c8:
       return rtcClockData.byte2;
-    else if(address == 0x80000c6)
+      break;
+    case 0x80000c6:
       return rtcClockData.byte1;
-    else if(address == 0x80000c4) {
+      break;
+    case 0x80000c4:
       return rtcClockData.byte0;
+      break;
     }
   }
 
@@ -188,7 +192,7 @@ bool rtcWrite(u32 address, u16 value)
             }
           }
           break;
-		default:
+	default:
           break;
         }
       } else
