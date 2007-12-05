@@ -108,6 +108,9 @@ extern IDisplay *newDirect3DDisplay();
 extern Input *newDirectInput();
 
 extern ISound *newDirectSound();
+#ifndef NO_OAL
+extern ISound *newOpenAL();
+#endif
 
 extern void remoteStubSignal(int, int);
 extern void remoteOutput(char *, u32);
@@ -274,6 +277,7 @@ VBA::VBA()
   changingVideoSize = false;
   pVideoDriverGUID = NULL;
   renderMethod = DIRECT_DRAW;
+  audioAPI = DIRECTSOUND;
   iconic = false;
   ddrawEmulationOnly = false;
   ddrawUsingEmulationOnly = false;
@@ -1189,7 +1193,18 @@ bool systemSoundInit()
   if(theApp.sound)
     delete theApp.sound;
 
-  theApp.sound = newDirectSound();
+  switch( theApp.audioAPI )
+  {
+  case DIRECTSOUND:
+	  theApp.sound = newDirectSound();
+	  break;
+#ifndef NO_OAL
+  case OPENAL:
+	  theApp.sound = newOpenAL();
+	  break;
+#endif
+  }
+
   return theApp.sound->init();
 }
 
@@ -1394,6 +1409,15 @@ void VBA::loadSettings()
 #endif
 	  ) {
 		  renderMethod = DIRECT_DRAW;
+  }
+
+  audioAPI = (AUDIO_API)regQueryDwordValue( "audioAPI", DIRECTSOUND );
+  if( ( audioAPI != DIRECTSOUND )
+#ifndef NO_OAL
+	  && ( audioAPI != OPENAL )
+#endif
+	  ) {
+		  audioAPI = DIRECTSOUND;
   }
 
   windowPositionX = regQueryDwordValue("windowX", 0);
@@ -2479,6 +2503,7 @@ void VBA::saveSettings()
   regSetDwordValue("fsFrequency", fsFrequency);
 
   regSetDwordValue("renderMethod", renderMethod);
+  regSetDwordValue( "audioAPI", audioAPI );
 
   regSetDwordValue("windowX", windowPositionX);
   regSetDwordValue("windowY", windowPositionY);

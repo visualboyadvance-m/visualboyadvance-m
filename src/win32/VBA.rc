@@ -1654,11 +1654,18 @@ BEGIN
         END
         POPUP "&Audio"
         BEGIN
+            POPUP "Output API"
+            BEGIN
+                MENUITEM "DirectSound",                 ID_OUTPUTAPI_DIRECTSOUND
+                MENUITEM "   Use &old synchronization", ID_OPTIONS_SOUND_USEOLDSYNCHRONIZATION
+                MENUITEM SEPARATOR
+                MENUITEM "OpenAL",                      ID_OUTPUTAPI_OPENAL
+                MENUITEM SEPARATOR
+                MENUITEM "&Sync game to audio",         ID_OPTIONS_EMULATOR_SYNCHRONIZE
+            END
+            MENUITEM SEPARATOR
             MENUITEM "&On",                         ID_OPTIONS_SOUND_ON
             MENUITEM "O&ff",                        ID_OPTIONS_SOUND_OFF
-            MENUITEM SEPARATOR
-            MENUITEM "&Sync game to audio",         ID_OPTIONS_EMULATOR_SYNCHRONIZE
-            MENUITEM "Use &old synchronization",    ID_OPTIONS_SOUND_USEOLDSYNCHRONIZATION
             MENUITEM SEPARATOR
             POPUP "&Volume"
             BEGIN

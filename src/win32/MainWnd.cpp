@@ -452,6 +452,10 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_SKIN_USE, &MainWnd::OnUpdateSkinUse)
   ON_COMMAND(ID_SKIN_SELECT, &MainWnd::OnSkinSelect)
   ON_UPDATE_COMMAND_UI(ID_SKIN_SELECT, &MainWnd::OnUpdateSkinSelect)
+  ON_COMMAND(ID_OUTPUTAPI_DIRECTSOUND, &MainWnd::OnOutputapiDirectsound)
+  ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_DIRECTSOUND, &MainWnd::OnUpdateOutputapiDirectsound)
+  ON_COMMAND(ID_OUTPUTAPI_OPENAL, &MainWnd::OnOutputapiOpenal)
+  ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_OPENAL, &MainWnd::OnUpdateOutputapiOpenal)
   END_MESSAGE_MAP()
 
 

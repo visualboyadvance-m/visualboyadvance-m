@@ -152,6 +152,7 @@ class VBA : public CWinApp
   GUID videoDriverGUID;
   GUID *pVideoDriverGUID;
   DISPLAY_TYPE renderMethod;
+  AUDIO_API audioAPI;
   bool iconic;
   bool ddrawEmulationOnly;
   bool ddrawUsingEmulationOnly;
