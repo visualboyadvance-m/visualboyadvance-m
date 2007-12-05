@@ -63,10 +63,12 @@ extern int SOUND_CLOCK_TICKS;
 struct gb_effects_config_t
 {
 	bool enabled;   // false = disable all effects
+	
 	float echo;     // 0.0 = none, 1.0 = lots
 	float stereo;   // 0.0 = channels in center, 1.0 = channels on left/right
 	bool surround;  // true = put some channels in back
 };
+
 // Can be changed at any time, probably from another thread too.
 // Sound will notice changes during next 1/100 second.
 extern gb_effects_config_t gb_effects_config;
