@@ -20,6 +20,13 @@
 #ifndef VBA_WIN32_SOUND_H
 #define VBA_WIN32_SOUND_H
 
+enum AUDIO_API {
+	DIRECTSOUND
+#ifndef NO_OAL
+	, OPENAL
+#endif
+};
+
 class ISound
 {
  public:
