@@ -3722,6 +3722,15 @@ void CPULoop(int ticks)
         }       
       }
 
+	    // we shouldn't be doing sound in stop state, but we loose synchronization
+      // if sound is disabled, so in stop state, soundTick will just produce
+      // mute sound
+      soundTicks -= clockTicks;
+      if(soundTicks <= 0) {
+        psoundTickfn();
+        soundTicks += SOUND_CLOCK_TICKS;
+      }
+
       if(!stopState) {
         if(timer0On) {
           timer0Ticks -= clockTicks;
@@ -3828,14 +3837,7 @@ void CPULoop(int ticks)
 
       timerOverflow = 0;
 
-      // we shouldn't be doing sound in stop state, but we loose synchronization
-      // if sound is disabled, so in stop state, soundTick will just produce
-      // mute sound
-      soundTicks -= clockTicks;
-      if(soundTicks <= 0) {
-        psoundTickfn();
-        soundTicks += SOUND_CLOCK_TICKS;
-      }
+    
 
 #ifdef PROFILING
       profilingTicks -= clockTicks;
