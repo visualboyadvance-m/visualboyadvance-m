@@ -137,12 +137,25 @@ void gbSoundTick()
 		end_frame( SOUND_CLOCK_TICKS * ticks_to_time );
 		
 		flush_samples();
+
+		gb_effects_config.enabled = soundEcho;
 		
 		// Update effects config if it was changed
 		if ( memcmp( &gb_effects_config_current, &gb_effects_config,
 				sizeof gb_effects_config ) )
 			apply_effects();
 	}
+}
+
+static void reset_apu()
+{
+	// Use DMG or CGB sound differences based on type of game
+	gb_apu->reset( gbHardware & 1 ? gb_apu->mode_dmg : gb_apu->mode_cgb );
+	
+	if ( stereo_buffer )
+		stereo_buffer->clear();
+	
+	soundTicks = SOUND_CLOCK_TICKS;
 }
 
 static void remake_stereo_buffer()
@@ -163,21 +176,26 @@ static void remake_stereo_buffer()
 	stereo_buffer->set_channel_count( chan_count, chan_types );
 	
 	if ( !gb_apu )
+	{
 		gb_apu = new Gb_Apu;
+		reset_apu();
+	}
 	
 	apply_effects();
-	
-	// Use DMG or CGB sound differences based on type of game
-	gb_apu->reset( gbHardware & 1 ? gb_apu->mode_dmg : gb_apu->mode_cgb );
 }
 
 void gbSoundReset()
 {
+	gb_effects_config.echo     = 0.20;
+	gb_effects_config.stereo   = 0.15;
+	gb_effects_config.surround = false;
+	
+	SOUND_CLOCK_TICKS = 20000;
+	
 	remake_stereo_buffer();
+	reset_apu();
 	
 	soundPaused       = 1;
-	SOUND_CLOCK_TICKS = 20000;
-	soundTicks        = SOUND_CLOCK_TICKS;
 	soundNextPosition = 0;
 
 	// don't translate
@@ -253,12 +271,142 @@ void gbSoundSetQuality(int quality)
 	}
 }
 
+static char dummy_buf [735 * 2];
+
+#define SKIP( type, name ) { dummy_buf, sizeof (type) }
+
+// funny expr at end ensures that type matches type of variable
+#define LOAD( type, name ) { &name, sizeof (name) + (&name - (type*) &name) }
+
+static variable_desc gbsound_format [] =
+{
+	SKIP( int, soundPaused ),
+	SKIP( int, soundPlay ),
+	SKIP( int, soundTicks ),
+	SKIP( int, SOUND_CLOCK_TICKS ),
+	SKIP( int, soundLevel1 ),
+	SKIP( int, soundLevel2 ),
+	SKIP( int, soundBalance ),
+	SKIP( int, soundMasterOn ),
+	SKIP( int, soundIndex ),
+	SKIP( int, soundVIN ),
+	SKIP( int, soundOn [0] ),
+	SKIP( int, soundATL [0] ),
+	SKIP( int, sound1Skip ),
+	SKIP( int, soundIndex [0] ),
+	SKIP( int, sound1Continue ),
+	SKIP( int, soundEnvelopeVolume [0] ),
+	SKIP( int, soundEnvelopeATL [0] ),
+	SKIP( int, sound1EnvelopeATLReload ),
+	SKIP( int, sound1EnvelopeUpDown ),
+	SKIP( int, sound1SweepATL ),
+	SKIP( int, sound1SweepATLReload ),
+	SKIP( int, sound1SweepSteps ),
+	SKIP( int, sound1SweepUpDown ),
+	SKIP( int, sound1SweepStep ),
+	SKIP( int, soundOn [1] ),
+	SKIP( int, soundATL [1] ),
+	SKIP( int, sound2Skip ),
+	SKIP( int, soundIndex [1] ),
+	SKIP( int, sound2Continue ),
+	SKIP( int, soundEnvelopeVolume [1] ),
+	SKIP( int, soundEnvelopeATL [1] ),
+	SKIP( int, sound2EnvelopeATLReload ),
+	SKIP( int, sound2EnvelopeUpDown ),
+	SKIP( int, soundOn [2] ),
+	SKIP( int, soundATL [2] ),
+	SKIP( int, sound3Skip ),
+	SKIP( int, soundIndex [2] ),
+	SKIP( int, sound3Continue ),
+	SKIP( int, sound3OutputLevel ),
+	SKIP( int, soundOn [3] ),
+	SKIP( int, soundATL [3] ),
+	SKIP( int, sound4Skip ),
+	SKIP( int, soundIndex [3] ),
+	SKIP( int, sound4Clock ),
+	SKIP( int, sound4ShiftRight ),
+	SKIP( int, sound4ShiftSkip ),
+	SKIP( int, sound4ShiftIndex ),
+	SKIP( int, sound4NSteps ),
+	SKIP( int, sound4CountDown ),
+	SKIP( int, sound4Continue ),
+	SKIP( int, soundEnvelopeVolume [2] ),
+	SKIP( int, soundEnvelopeATL [2] ),
+	SKIP( int, sound4EnvelopeATLReload ),
+	SKIP( int, sound4EnvelopeUpDown ),
+	SKIP( int, soundEnableFlag ),
+	{ NULL, 0 }
+};
+
+static variable_desc gbsound_format2 [] =
+{
+	SKIP( int, sound1ATLreload ),
+	SKIP( int, freq1low ),
+	SKIP( int, freq1high ),
+	SKIP( int, sound2ATLreload ),
+	SKIP( int, freq2low ),
+	SKIP( int, freq2high ),
+	SKIP( int, sound3ATLreload ),
+	SKIP( int, freq3low ),
+	SKIP( int, freq3high ),
+	SKIP( int, sound4ATLreload ),
+	SKIP( int, freq4 ),
+	{ NULL, 0 }
+};
+
+static variable_desc gbsound_format3 [] =
+{
+	SKIP( u8[2*735], soundBuffer ),
+	SKIP( u8[2*735], soundBuffer ),
+	SKIP( u16[735], soundFinalWave ),
+	{ NULL, 0 }
+};
+
 void gbSoundSaveGame(gzFile gzFile)
 {
 	// TODO: implement
 }
 
+enum {
+	nr10 = 0,
+	nr11, nr12, nr13, nr14,
+	nr20, nr21, nr22, nr23, nr24,
+	nr30, nr31, nr32, nr33, nr34,
+	nr40, nr41, nr42, nr43, nr44,
+	nr50, nr51, nr52
+};
+
 void gbSoundReadGame(int version,gzFile gzFile)
 {
-	// TODO: implement
+	return; // TODO: apparently GB save states don't work in the main emulator
+	
+	// Load state
+	utilReadData( gzFile, gbsound_format );
+
+	if ( version >= 11 )
+		utilReadData( gzFile, gbsound_format2 );
+	
+	utilReadData( gzFile, gbsound_format3 );
+
+	int quality = 1;
+	if ( version >= 7 )
+		quality = utilReadInt( gzFile );
+	
+	gbSoundSetQuality( quality );
+	
+	// Convert to format Gb_Apu uses
+	reset_apu();
+	gb_apu_state_t s;
+	gb_apu->save_state( &s ); // use fresh values for anything not restored
+	
+	// Only some registers are properly preserved
+	static int const regs_to_copy [] = {
+		nr10, nr11, nr12, nr21, nr22, nr30, nr32, nr42, nr43, nr50, nr51, nr52, -1
+	};
+	for ( int i = 0; regs_to_copy [i] >= 0; i++ )
+		s.regs [regs_to_copy [i]] = gbMemory [0xFF10 + regs_to_copy [i]];
+	
+	memcpy( &s.regs [0x20], &gbMemory [0xFF30], 0x10 ); // wave
+	
+	gb_apu->load_state( s );
 }

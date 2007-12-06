@@ -7,6 +7,8 @@
 // a Game Boy Advance emulator.
 #define GB_APU_OVERCLOCK 4
 
+#define GB_APU_CUSTOM_STATE 1
+
 // Uncomment to enable platform-specific (and possibly non-portable) optimizations.
 //#define BLARGG_NONPORTABLE 1
 

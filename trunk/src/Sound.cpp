@@ -27,39 +27,41 @@
 #include "Util.h"
 #include "Port.h"
 
+#ifdef _WIN32
+//#include <float.h>
+#endif
+
 #include "gb/gb_apu/Gb_Apu.h"
 #include "gb/gb_apu/Multi_Buffer.h"
 
-#define USE_TICKS_AS  380
-
 extern bool stopState;      // TODO: silence sound when true
 
-int soundQuality       = 2; // sample rate = 44100 / soundQuality
-int soundInterpolation = 0; // 1 if PCM should have low-pass filtering
-int soundVolume        = 0; // emulator volume code (not linear)
+int soundQuality       = 2;
+int soundInterpolation = 0;
+float soundFiltering   = 1;
+static float soundFiltering_;
+int soundVolume        = 0;
 static int soundVolume_;
 bool soundEcho         = false;
-bool soundLowPass      = false;
-bool soundReverse      = false;
 int soundEnableFlag    = 0x3ff; // emulator channels enabled
 
-// Number of 16.8 MHz clocks until soundTick() will be called
-int soundTicks = soundQuality * USE_TICKS_AS;
+int const SOUND_CLOCK_TICKS_ = 167772;
+int SOUND_CLOCK_TICKS = SOUND_CLOCK_TICKS_;
+int soundTicks = SOUND_CLOCK_TICKS_;
 
-// Number of 16.8 MHz clocks between calls to soundTick()
-int SOUND_CLOCK_TICKS = soundQuality * USE_TICKS_AS;
-
-u16 soundFinalWave [1470];      // 16-bit SIGNED stereo sample buffer
-int soundBufferLen = 1470;      // size of sound buffer in BYTES
+u16 soundFinalWave [1470];
+int soundBufferLen = 1470;
 int soundBufferTotalLen = 14700;
 
- void interp_rate() { /* empty for now */ }
-
-// Unknown purpose
 int soundDebug        = 0;
 u32 soundNextPosition = 0;
 bool soundOffFlag     = false;
 bool soundPaused      = true;
+
+bool soundLowPass = false;
+bool soundReverse = false;
+
+void interp_rate() { /* empty for now */ }
 
 class Gba_Pcm {
 public:
@@ -83,15 +85,17 @@ public:
 	void write_control( int data );
 	void write_fifo( int data );
 	void timer_overflowed( int which_timer );
-
-private:
+	
+	// public only so save state routines can access it
 	int  readIndex;
 	int  count;
 	int  writeIndex;
-	bool enabled;
-	int  timer;
 	u8   fifo [32];
 	int  dac;
+private:
+	
+	int  timer;
+	bool enabled;
 };
 
 static Gba_Pcm_Fifo     pcm [2];
@@ -157,7 +161,7 @@ void Gba_Pcm::update( int dac )
 	{
 		blip_time_t time = blip_time();
 		
-		dac >>= shift;
+		dac = (s8) dac >> shift;
 		int delta = dac - last_amp;
 		if ( delta )
 		{
@@ -193,7 +197,7 @@ void Gba_Pcm_Fifo::timer_overflowed( int which_timer )
 			CPUCheckDMA( 3, which ? 4 : 2 );
 			if ( count <= 16 )
 			{
-				// Not filled by DMA, so fill with silence
+				// Not filled by DMA, so fill with 16 bytes of silence
 				int reg = which ? FIFOB_L : FIFOA_L;
 				for ( int n = 4; n--; )
 				{
@@ -205,7 +209,7 @@ void Gba_Pcm_Fifo::timer_overflowed( int which_timer )
 		
 		// Read next sample from FIFO
 		count--;
-		dac = (s8) fifo [readIndex];
+		dac = fifo [readIndex];
 		readIndex = (readIndex + 1) & 31;
 		pcm.update( dac );
 	}
@@ -299,15 +303,20 @@ static void apply_volume( bool apu_only = false )
 	}
 }
 
+static void write_SGCNT0_H( int data )
+{
+	WRITE16LE( &ioMem [SGCNT0_H], data & 0x770F );
+	pcm [0].write_control( data      );
+	pcm [1].write_control( data >> 4 );
+	apply_volume( true );
+}
+
 void soundEvent(u32 address, u16 data)
 {
 	switch ( address )
 	{
 	case SGCNT0_H:
-		WRITE16LE( &ioMem[address], data );
-		pcm [0].write_control( data      );
-		pcm [1].write_control( data >> 4 );
-		apply_volume( true );
+		write_SGCNT0_H( data );
 		break;
 	
 	case FIFOA_L:
@@ -351,6 +360,9 @@ static void end_frame( blip_time_t time )
 
 static void flush_samples()
 {
+	// soundBufferLen should have a whole number of sample pairs
+	assert( soundBufferLen % (2 * sizeof *soundFinalWave) == 0 );
+	
 	// number of samples in output buffer
 	int const out_buf_size = soundBufferLen / sizeof *soundFinalWave;
 	
@@ -368,6 +380,22 @@ static void flush_samples()
 	}
 }
 
+static void apply_filtering()
+{
+	soundFiltering_ = soundFiltering;
+	
+	int const base_freq = (int) (32768 - soundFiltering_ * 16384);
+	int const nyquist = stereo_buffer->sample_rate() / 2;
+	
+	for ( int i = 0; i < 3; i++ )
+	{
+		int cutoff = base_freq >> i;
+		if ( cutoff > nyquist )
+			cutoff = nyquist;
+		pcm_synth [i].treble_eq( blip_eq_t( 0, 0, stereo_buffer->sample_rate(), cutoff ) );
+	}
+}
+
 static void soundTick()
 {
  	if ( systemSoundOn && gb_apu && stereo_buffer )
@@ -376,6 +404,9 @@ static void soundTick()
 		end_frame( SOUND_CLOCK_TICKS );
 		
 		flush_samples();
+		
+		if ( soundFiltering_ != soundFiltering )
+			apply_filtering();
 		
 		if ( soundVolume_ != soundVolume )
 			apply_volume();
@@ -386,9 +417,9 @@ void (*psoundTickfn)() = soundTick;
 
 static void apply_muting()
 {
-
-if ( !stereo_buffer || !ioMem )
-	return;
+	if ( !stereo_buffer || !ioMem )
+		return;
+	
 	// PCM
 	apply_control();
 	
@@ -406,8 +437,27 @@ if ( !stereo_buffer || !ioMem )
 	}
 }
 
+static void reset_apu()
+{
+	gb_apu->reset( gb_apu->mode_agb, true );
+	
+	if ( stereo_buffer )
+		stereo_buffer->clear();
+	
+	soundTicks = SOUND_CLOCK_TICKS;
+}
+
 static void remake_stereo_buffer()
 {
+	if ( !ioMem )
+		return;
+	
+#ifdef _WIN32
+	// Direct3D might mess with FPU mode. Try uncommenting if more sound problems
+	// occur (also need to uncomment #include <float.h> above).
+	//_fpreset();
+#endif
+
 	// Clears pointers kept to old stereo_buffer
 	pcm [0].pcm.init();
 	pcm [1].pcm.init();
@@ -424,17 +474,14 @@ static void remake_stereo_buffer()
 	// PCM
 	pcm [0].which = 0;
 	pcm [1].which = 1;
-	for ( int i = 0; i < 3; i++ )
-	{
-		int freq = 32768 >> i;
-		pcm_synth [i].treble_eq( blip_eq_t( 0, 0, sample_rate, freq / 2 ) );
-	}
+	apply_filtering();
 	
 	// APU
 	if ( !gb_apu )
+	{
 		gb_apu = new Gb_Apu; // TODO: handle out of memory
-	
-	gb_apu->reset( gb_apu->mode_agb, true );
+		reset_apu();
+	}
 	
 	apply_muting();
 	apply_volume();
@@ -458,7 +505,7 @@ void soundShutdown()
 void soundPause()
 {
 	systemSoundPause();
-	setsoundPaused(true);   
+	setsoundPaused(true);
 }
 
 void soundResume()
@@ -489,10 +536,11 @@ void soundReset()
 	systemSoundReset();
 	
 	remake_stereo_buffer();
+	reset_apu();
 	
 	setsoundPaused(true);
-	SOUND_CLOCK_TICKS = 167772;
-	soundTicks        = SOUND_CLOCK_TICKS;
+	SOUND_CLOCK_TICKS = SOUND_CLOCK_TICKS_;
+	soundTicks        = SOUND_CLOCK_TICKS_;
 	
 	soundNextPosition = 0;
 	
@@ -533,12 +581,235 @@ void soundSetQuality(int quality)
 	}
 }
 
-void soundSaveGame(gzFile gzFile)
+static int dummy_state [16];
+
+#define SKIP( type, name ) { dummy_state, sizeof (type) }
+
+#define LOAD( type, name ) { &name, sizeof (type) }
+
+static struct {
+	gb_apu_state_t apu;
+	
+	// old state
+	u8 soundDSAValue;
+	int soundDSBValue;
+} state;
+
+// Old GBA sound state format
+static variable_desc old_gba_state [] =
 {
-	// TODO: implement
+	SKIP( int, soundPaused ),
+	SKIP( int, soundPlay ),
+	SKIP( int, soundTicks ),
+	SKIP( int, SOUND_CLOCK_TICKS ),
+	SKIP( int, soundLevel1 ),
+	SKIP( int, soundLevel2 ),
+	SKIP( int, soundBalance ),
+	SKIP( int, soundMasterOn ),
+	SKIP( int, soundIndex ),
+	SKIP( int, sound1On ),
+	SKIP( int, sound1ATL ),
+	SKIP( int, sound1Skip ),
+	SKIP( int, sound1Index ),
+	SKIP( int, sound1Continue ),
+	SKIP( int, sound1EnvelopeVolume ),
+	SKIP( int, sound1EnvelopeATL ),
+	SKIP( int, sound1EnvelopeATLReload ),
+	SKIP( int, sound1EnvelopeUpDown ),
+	SKIP( int, sound1SweepATL ),
+	SKIP( int, sound1SweepATLReload ),
+	SKIP( int, sound1SweepSteps ),
+	SKIP( int, sound1SweepUpDown ),
+	SKIP( int, sound1SweepStep ),
+	SKIP( int, sound2On ),
+	SKIP( int, sound2ATL ),
+	SKIP( int, sound2Skip ),
+	SKIP( int, sound2Index ),
+	SKIP( int, sound2Continue ),
+	SKIP( int, sound2EnvelopeVolume ),
+	SKIP( int, sound2EnvelopeATL ),
+	SKIP( int, sound2EnvelopeATLReload ),
+	SKIP( int, sound2EnvelopeUpDown ),
+	SKIP( int, sound3On ),
+	SKIP( int, sound3ATL ),
+	SKIP( int, sound3Skip ),
+	SKIP( int, sound3Index ),
+	SKIP( int, sound3Continue ),
+	SKIP( int, sound3OutputLevel ),
+	SKIP( int, sound4On ),
+	SKIP( int, sound4ATL ),
+	SKIP( int, sound4Skip ),
+	SKIP( int, sound4Index ),
+	SKIP( int, sound4Clock ),
+	SKIP( int, sound4ShiftRight ),
+	SKIP( int, sound4ShiftSkip ),
+	SKIP( int, sound4ShiftIndex ),
+	SKIP( int, sound4NSteps ),
+	SKIP( int, sound4CountDown ),
+	SKIP( int, sound4Continue ),
+	SKIP( int, sound4EnvelopeVolume ),
+	SKIP( int, sound4EnvelopeATL ),
+	SKIP( int, sound4EnvelopeATLReload ),
+	SKIP( int, sound4EnvelopeUpDown ),
+	LOAD( int, soundEnableFlag ),
+	SKIP( int, soundControl ),
+	LOAD( int, pcm [0].readIndex ),
+	LOAD( int, pcm [0].count ),
+	LOAD( int, pcm [0].writeIndex ),
+	SKIP( u8,  soundDSAEnabled ), // was bool, which was one byte on MS compiler
+	SKIP( int, soundDSATimer ),
+	LOAD( u8 [32], pcm [0].fifo ),
+	LOAD( u8,  state.soundDSAValue ),
+	LOAD( int, pcm [1].readIndex ),
+	LOAD( int, pcm [1].count ),
+	LOAD( int, pcm [1].writeIndex ),
+	SKIP( int, soundDSBEnabled ),
+	SKIP( int, soundDSBTimer ),
+	LOAD( u8 [32], pcm [1].fifo ),
+	LOAD( int, state.soundDSBValue ),
+	
+	// skipped manually
+	//LOAD( int, soundBuffer[0][0], 6*735 },
+	//LOAD( int, soundFinalWave[0], 2*735 },
+	{ NULL, 0 }
+};
+
+variable_desc old_gba_state2 [] =
+{
+	LOAD( u8 [0x20], state.apu.regs [0x20] ),
+	SKIP( int, sound3Bank ),
+	SKIP( int, sound3DataSize ),
+	SKIP( int, sound3ForcedOutput ),
+	{ NULL, 0 }
+};
+
+// New state format
+static variable_desc gba_state [] =
+{
+	// PCM
+	LOAD( int, pcm [0].readIndex ),
+	LOAD( int, pcm [0].count ),
+	LOAD( int, pcm [0].writeIndex ),
+	LOAD(u8[32],pcm[0].fifo ),
+	LOAD( int, pcm [0].dac ),
+	
+	SKIP( int [4], room_for_expansion ),
+	
+	LOAD( int, pcm [1].readIndex ),
+	LOAD( int, pcm [1].count ),
+	LOAD( int, pcm [1].writeIndex ),
+	LOAD(u8[32],pcm[1].fifo ),
+	LOAD( int, pcm [1].dac ),
+	
+	SKIP( int [4], room_for_expansion ),
+	
+	// APU
+	LOAD( u8 [0x40], state.apu.regs ),      // last values written to registers and wave RAM (both banks)
+	LOAD( int, state.apu.frame_time ),      // clocks until next frame sequencer action
+	LOAD( int, state.apu.frame_phase ),     // next step frame sequencer will run
+	
+	LOAD( int, state.apu.sweep_freq ),      // sweep's internal frequency register
+	LOAD( int, state.apu.sweep_delay ),     // clocks until next sweep action
+	LOAD( int, state.apu.sweep_enabled ),
+	LOAD( int, state.apu.sweep_neg ),       // obscure internal flag
+	LOAD( int, state.apu.noise_divider ),
+	LOAD( int, state.apu.wave_buf ),        // last read byte of wave RAM
+	
+	LOAD( int [4], state.apu.delay ),       // clocks until next channel action
+	LOAD( int [4], state.apu.length_ctr ),
+	LOAD( int [4], state.apu.phase ),       // square/wave phase, noise LFSR
+	LOAD( int [4], state.apu.enabled ),     // internal enabled flag
+	
+	LOAD( int [3], state.apu.env_delay ),   // clocks until next envelope action
+	LOAD( int [3], state.apu.env_volume ),
+	LOAD( int [3], state.apu.env_enabled ),
+	
+	SKIP( int [13], room_for_expansion ),
+	
+	// Emulator
+	LOAD( int, soundEnableFlag ),
+	
+	SKIP( int [15], room_for_expansion ),
+	
+	{ NULL, 0 }
+};
+
+// Reads and discards count bytes from in
+static void skip_read( gzFile in, int count )
+{
+	char buf [512];
+	
+	while ( count )
+	{
+		int n = sizeof buf;
+		if ( n > count )
+			n = count;
+		
+		count -= n;
+		utilGzRead( in, buf, n );
+	}
 }
 
-void soundReadGame(gzFile gzFile, int version)
+void soundSaveGame( gzFile out )
 {
-	// TODO: implement
+	gb_apu->save_state( &state.apu );
+	
+	// Be sure areas for expansion get written as zero
+	memset( dummy_state, 0, sizeof dummy_state );
+	
+	utilWriteData( out, gba_state );
+}
+
+static void soundReadGameOld( gzFile in, int version )
+{
+	// Read main data
+	utilReadData( in, old_gba_state );
+	skip_read( in, 6*735 + 2*735 );
+	
+	// Copy APU regs
+	static int const regs_to_copy [] = {
+		NR10, NR11, NR12, NR13, NR14,
+		      NR21, NR22, NR23, NR24,
+		NR30, NR31, NR32, NR33, NR34,
+		      NR41, NR42, NR43, NR44,
+		NR50, NR51, NR52, -1
+	};
+	
+	ioMem [NR52] |= 0x80; // old sound played even when this wasn't set (power on)
+	
+	for ( int i = 0; regs_to_copy [i] >= 0; i++ )
+		state.apu.regs [gba_to_gb_sound( regs_to_copy [i] ) - 0xFF10] = ioMem [regs_to_copy [i]];
+	
+	// Copy wave RAM to both banks
+	memcpy( &state.apu.regs [0x20], &ioMem [0x90], 0x10 );
+	memcpy( &state.apu.regs [0x30], &ioMem [0x90], 0x10 );
+	
+	// Read both banks of wave RAM if available
+	if ( version >= SAVE_GAME_VERSION_3 )
+		utilReadData( in, old_gba_state2 );
+	
+	// Restore PCM
+	pcm [0].dac = state.soundDSAValue;
+	pcm [1].dac = state.soundDSBValue;
+	
+	int quality = utilReadInt( in ); // ignore this crap
+}
+
+#include <stdio.h>
+
+void soundReadGame( gzFile in, int version )
+{
+	// Prepare APU and default state
+	reset_apu();
+	gb_apu->save_state( &state.apu );
+	
+	if ( version > SAVE_GAME_VERSION_9 )
+		utilReadData( in, gba_state );
+	else
+		soundReadGameOld( in, version );
+	
+	gb_apu->load_state( state.apu );
+	write_SGCNT0_H( READ16LE( &ioMem [SGCNT0_H] ) & 0x770F );
+	
+	apply_muting();
 }

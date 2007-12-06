@@ -148,6 +148,7 @@ class VBA : public CWinApp
   u32 autoFrameSkipLastTime;
   bool autoFrameSkip;
   bool vsync;
+  bool OpenALAudiomixing;
   bool changingVideoSize;
   GUID videoDriverGUID;
   GUID *pVideoDriverGUID;

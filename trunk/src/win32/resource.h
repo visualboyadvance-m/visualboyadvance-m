@@ -806,13 +806,14 @@
 #define IDC_COMBO_PLUGIN                40345
 #define ID_OUTPUTAPI_DIRECTSOUND        40346
 #define ID_OUTPUTAPI_OPENAL             40347
+#define ID_OUTPUTAPI_SOFTWAREMIXING     40348
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        159
-#define _APS_NEXT_COMMAND_VALUE         40348
+#define _APS_NEXT_COMMAND_VALUE         40349
 #define _APS_NEXT_CONTROL_VALUE         1269
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
