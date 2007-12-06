@@ -151,11 +151,8 @@ OpenGLDisplay::~OpenGLDisplay()
 void OpenGLDisplay::EnableOpenGL()
 {
 	PIXELFORMATDESCRIPTOR pfd;
-	int format;
-
 	// get the device context (DC)
 	hDC = GetDC( theApp.m_pMainWnd->GetSafeHwnd() );
-
 	// set the pixel format for the DC
 	ZeroMemory( &pfd, sizeof( pfd ) );
 	pfd.nSize = sizeof( pfd );
@@ -165,12 +162,8 @@ void OpenGLDisplay::EnableOpenGL()
 	pfd.cColorBits = 24;
 	pfd.cDepthBits = 16;
 	pfd.iLayerType = PFD_MAIN_PLANE;
-	format = ChoosePixelFormat( hDC, &pfd );
-	SetPixelFormat( hDC, format, &pfd );
-
-	// create and enable the render context (RC)
-	hRC = wglCreateContext( hDC );
-	wglMakeCurrent( hDC, hRC );
+    SetPixelFormat (GetDC (theApp.m_pMainWnd->GetSafeHwnd()), ChoosePixelFormat ( GetDC (theApp.m_pMainWnd->GetSafeHwnd()), &pfd), &pfd);
+    wglMakeCurrent (GetDC (theApp.m_pMainWnd->GetSafeHwnd()), wglCreateContext(GetDC (theApp.m_pMainWnd->GetSafeHwnd()) ) );
 }
 
 void OpenGLDisplay::DisableOpenGL()
