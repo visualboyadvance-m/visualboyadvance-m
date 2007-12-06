@@ -160,11 +160,7 @@ bool OpenAL::init()
 	winlog( "OpenAL::init\n" );
 	assert( initialized == false );
 
-    if (theApp.OpenALAudiomixing)
-	{
-	device = alcOpenDevice( "Generic Software" );
-	}
-	device = alcOpenDevice( NULL );
+    device = alcOpenDevice( theApp.OpenALAudiomixing ? "Generic Software" : NULL );
 	assert( device != NULL );
 
 	context = alcCreateContext( device, NULL );
