@@ -278,6 +278,9 @@ VBA::VBA()
   pVideoDriverGUID = NULL;
   renderMethod = DIRECT_DRAW;
   audioAPI = DIRECTSOUND;
+#ifndef NO_OAL
+  oalDevice = NULL;
+#endif
   iconic = false;
   ddrawEmulationOnly = false;
   ddrawUsingEmulationOnly = false;
@@ -304,7 +307,6 @@ VBA::VBA()
   input = NULL;
   joypadDefault = 0;
   autoFire = 0;
-  OpenALAudiomixing = false;
   autoFireToggle = false;
   winPauseNextFrame = false;
   soundRecording = false;
@@ -418,6 +420,12 @@ VBA::~VBA()
 
   if(rewindMemory)
     free(rewindMemory);
+
+#ifndef NO_OAL
+  if( oalDevice ) {
+	  free( oalDevice );
+  }
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1421,7 +1429,6 @@ void VBA::loadSettings()
 		  audioAPI = DIRECTSOUND;
   }
 
-  OpenALAudiomixing = regQueryDwordValue( "OpenALAudiomixing", 0 );
   windowPositionX = regQueryDwordValue("windowX", 0);
   if(windowPositionX < 0)
     windowPositionX = 0;
@@ -1649,6 +1656,15 @@ void VBA::loadSettings()
   }
 
   Sm60FPS::bSaveMoreCPU = regQueryDwordValue("saveMoreCPU", 0);
+
+#ifndef NO_OAL
+  buffer = regQueryStringValue( "oalDevice", "" );
+  if( oalDevice ) {
+	  free( oalDevice );
+  }
+  oalDevice = (TCHAR*)malloc( ( buffer.GetLength() + 1 ) * sizeof( TCHAR ) );
+  _tcscpy( oalDevice, buffer.GetBuffer() );
+#endif
 }
 
 void VBA::updateFrameSkip()
@@ -2484,8 +2500,6 @@ void VBA::saveSettings()
 
   regSetDwordValue("autoFrameSkip", autoFrameSkip);
 
-  regSetDwordValue( "OpenALAudiomixing", OpenALAudiomixing);
-
   regSetDwordValue("vsync", vsync);
   regSetDwordValue("synchronize", synchronize);
   regSetDwordValue("stretch", fullScreenStretch);
@@ -2620,6 +2634,10 @@ void VBA::saveSettings()
   regSetDwordValue("Linklog", linklog);
   regSetDwordValue("RFU", adapter);
   regSetDwordValue("linkEnabled", linkenable);
+
+#ifndef NO_OAL
+  regSetStringValue( "oalDevice", oalDevice );
+#endif
 }
 
 void winSignal(int, int)

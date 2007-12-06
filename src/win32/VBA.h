@@ -148,12 +148,14 @@ class VBA : public CWinApp
   u32 autoFrameSkipLastTime;
   bool autoFrameSkip;
   bool vsync;
-  bool OpenALAudiomixing;
   bool changingVideoSize;
   GUID videoDriverGUID;
   GUID *pVideoDriverGUID;
   DISPLAY_TYPE renderMethod;
   AUDIO_API audioAPI;
+#ifndef NO_OAL
+  TCHAR *oalDevice;
+#endif
   bool iconic;
   bool ddrawEmulationOnly;
   bool ddrawUsingEmulationOnly;
