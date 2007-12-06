@@ -25,11 +25,6 @@ extern "C" {
 #include <png.h>
 }
 
-#ifdef HAS_FILE_EXTRACTOR
-#include <Zip_Extractor.h>
-#include <Zip7_Extractor.h>
-#endif
-
 #include "System.h"
 #include "NLS.h"
 #include "Util.h"
@@ -38,6 +33,10 @@ extern "C" {
 #include "Globals.h"
 #include "RTC.h"
 #include "Port.h"
+
+#ifdef HAS_FILE_EXTRACTOR
+#include <fex.h>
+#endif
 
 
 extern "C" {
@@ -542,24 +541,6 @@ bool utilIsZipFile(const char *file)
   return false;
 }
 
-#ifdef HAS_FILE_EXTRACTOR
-
-bool utilIs7ZipFile(const char *file)
-{
-  if(strlen(file) > 3) {
-    const char * p = strrchr(file,'.');
-
-    if(p != NULL) {
-      if(_stricmp(p, ".7z") == 0)
-        return true;
-    }
-  }
-
-  return false;
-}
-
-#endif
-
 bool utilIsGzipFile(const char *file)
 {
   if(strlen(file) > 3) {
@@ -578,7 +559,8 @@ bool utilIsGzipFile(const char *file)
 
 void utilGetBaseName(const char *file, char *buffer)
 {
-  strcpy(buffer, file);
+  if(buffer != file) // allows conversion in place
+    strcpy(buffer, file);
 
   if(utilIsGzipFile(file)) {
     char *p = strrchr(buffer, '.');
@@ -588,143 +570,67 @@ void utilGetBaseName(const char *file, char *buffer)
   }
 }
 
+// Opens and scans archive using accept(). Returns File_Extractor if found.
+// If error or not found, displays message and returns NULL.
+static File_Extractor* scan_arc(const char *file, bool (*accept)(const char *),
+		char (&buffer) [2048] )
+{
+	File_Extractor* fe;
+	fex_err_t err = fex_open( file, &fe );
+	if(!fe)
+	{
+		systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s: %s"), file, err);
+		return NULL;
+	}
+
+	// Scan filenames
+	bool found=false;
+	while(!fex_done(fe)) {
+		strncpy(buffer,fex_name(fe),sizeof buffer);
+		buffer [sizeof buffer-1] = '\0';
+
+		utilGetBaseName(buffer, buffer); // strip .gz or .z off end
+
+		if(accept(buffer)) {
+			found = true;
+			break;
+		}
+
+		fex_err_t err = fex_next(fe);
+		if(err) {
+			systemMessage(MSG_BAD_ZIP_FILE, N_("Cannot read archive %s: %s"), file, err);
+			fex_close(fe);
+			return NULL;
+		}
+	}
+
+	if(!found) {
+		systemMessage(MSG_NO_IMAGE_ON_ZIP,
+									N_("No image found in file %s"), file);
+		fex_close(fe);
+		return NULL;
+	}
+	return fe;
+}
+
+static bool utilIsImage(const char *file)
+{
+	return utilIsGBAImage(file) || utilIsGBImage(file);
+}
+
 IMAGE_TYPE utilFindType(const char *file)
 {
-  char buffer[2048];
-#ifdef HAS_FILE_EXTRACTOR
-  int type = -1;
-  if (utilIsZipFile(file)) type = 0;
-  else if (utilIs7ZipFile(file)) type = 1;
+	char buffer [2048];
+	if ( !utilIsImage( file ) ) // TODO: utilIsArchive() instead?
+	{
+		File_Extractor* fe = scan_arc(file,utilIsImage,buffer);
+		if(!fe)
+			return IMAGE_UNKNOWN;
+		fex_close(fe);
+		file = buffer;
+	}
 
-  if(type >= 0) {
-
-    Std_File_Reader in;
-    File_Extractor * ex = 0;
-
-    switch (type) {
-      case 0: ex = new Zip_Extractor; break;
-      case 1: ex = new Zip7_Extractor; break;
-      default: type = -1; break;
-    }
-
-    if (!ex) {
-      systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
-                    "archive extractor");
-      return IMAGE_UNKNOWN;
-    }
-
-    if(in.open(file) != NULL) {
-      delete ex;
-      systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s"), file);
-      return IMAGE_UNKNOWN;
-    }
-
-    if(ex->open(&in) != NULL) {
-      delete ex;
-      systemMessage(MSG_BAD_ZIP_FILE, N_("Bad archive file %s"), file);
-      return IMAGE_UNKNOWN;
-    }
-
-    ex->scan_only();
-
-    IMAGE_TYPE found = IMAGE_UNKNOWN;
-
-    while(!ex->done()) {
-      if(utilIsGBAImage(ex->name())) {
-        found = IMAGE_GBA;
-        break;
-      }
-
-      if(utilIsGBImage(ex->name())) {
-        found = IMAGE_GB;
-        break;
-      }
-
-      if(ex->next() != NULL)
-        break;
-    }
-    delete ex;
-
-    if(found == IMAGE_UNKNOWN) {
-      systemMessage(MSG_NO_IMAGE_ON_ZIP,
-                    N_("No image found on archive file %s"), file);
-      return found;
-    }
-    return found;
-
-#else
-  if(utilIsZipFile(file)) {
-    unzFile unz = unzOpen(file);
-
-    if(unz == NULL) {
-      systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s"), file);
-      return IMAGE_UNKNOWN;
-    }
-
-    int r = unzGoToFirstFile(unz);
-
-    if(r != UNZ_OK) {
-      unzClose(unz);
-      systemMessage(MSG_BAD_ZIP_FILE, N_("Bad ZIP file %s"), file);
-      return IMAGE_UNKNOWN;
-    }
-
-    IMAGE_TYPE found = IMAGE_UNKNOWN;
-
-    unz_file_info info;
-
-    while(true) {
-      r = unzGetCurrentFileInfo(unz,
-                                &info,
-                                buffer,
-                                sizeof(buffer),
-                                NULL,
-                                0,
-                                NULL,
-                                0);
-
-      if(r != UNZ_OK) {
-        unzClose(unz);
-        systemMessage(MSG_BAD_ZIP_FILE, N_("Bad ZIP file %s"), file);
-        return IMAGE_UNKNOWN;
-      }
-
-      if(utilIsGBAImage(buffer)) {
-        found = IMAGE_GBA;
-        break;
-      }
-
-      if(utilIsGBImage(buffer)) {
-        found = IMAGE_GB;
-        break;
-      }
-
-      r = unzGoToNextFile(unz);
-
-      if(r != UNZ_OK)
-        break;
-    }
-    unzClose(unz);
-
-    if(found == IMAGE_UNKNOWN) {
-      systemMessage(MSG_NO_IMAGE_ON_ZIP,
-                    N_("No image found on ZIP file %s"), file);
-      return found;
-    }
-    return found;
-#endif
-  } else {
-    if(utilIsGzipFile(file))
-      utilGetBaseName(file, buffer);
-    else
-      strcpy(buffer, file);
-
-    if(utilIsGBAImage(buffer))
-      return IMAGE_GBA;
-    if(utilIsGBImage(buffer))
-      return IMAGE_GB;
-  }
-  return IMAGE_UNKNOWN;
+	return utilIsGBAImage(file) ? IMAGE_GBA : IMAGE_GB;
 }
 
 static int utilGetSize(int size)
@@ -735,314 +641,50 @@ static int utilGetSize(int size)
   return res;
 }
 
-#ifdef HAS_FILE_EXTRACTOR
-static u8 *utilLoadFromFE(const char *file,
-                           int type,
-                           bool (*accept)(const char *),
-                           u8 *data,
-                           int &size)
-{
-  Std_File_Reader in;
-  File_Extractor * ex = 0;
-
-  switch (type) {
-    case 0: ex = new Zip_Extractor; break;
-    case 1: ex = new Zip7_Extractor; break;
-    default: type = -1; break;
-  }
-
-  if (!ex) {
-    if (type >= 0) {
-      systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
-                    "data");
-    }
-    return NULL;
-  }
-
-  if(in.open(file) != NULL) {
-    delete ex;
-    systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s"), file);
-    return NULL;
-  }
-
-  if(ex->open(&in) != NULL) {
-    delete ex;
-    systemMessage(MSG_BAD_ZIP_FILE, N_("Bad archive file %s"), file);
-    return NULL;
-  }
-
-  bool found = false;
-
-  while(!ex->done()) {
-    if(accept(ex->name())) {
-      found = true;
-      break;
-    }
-
-    if(ex->next() != NULL)
-      break;
-  }
-
-  if(!found) {
-    delete ex;
-    systemMessage(MSG_NO_IMAGE_ON_ZIP,
-                  N_("No image found on archive file %s"), file);
-    return NULL;
-  }
-
-  int fileSize = ex->size();
-  if(size == 0 || data == NULL)
-    size = fileSize;
-  int read = fileSize <= size ? fileSize : size;
-
-  u8 *image = data;
-  if(image == NULL)
-  {
-    image = (u8 *)malloc(utilGetSize(size));
-    if(image == NULL) {
-      delete ex;
-      systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
-                    "data");
-      return NULL;
-    }
-  }
-  Mem_Writer mwimage(image, size, 1);
-  const char * err = ex->extract(mwimage);
-
-  if(err != NULL) {
-    systemMessage(MSG_ERROR_READING_IMAGE,
-                  N_("Error reading image %s"), ex->name());
-    delete ex;
-	if (data==NULL)
-		free(image);
-    return NULL;
-  }
-  delete ex;
-  size = fileSize;
-  return image;
-}
-#else
-static u8 *utilLoadFromZip(const char *file,
-                           bool (*accept)(const char *),
-                           u8 *data,
-                           int &size)
-{
-  char buffer[2048];
-
-  unzFile unz = unzOpen(file);
-
-  if(unz == NULL) {
-    systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s"), file);
-    return NULL;
-  }
-  int r = unzGoToFirstFile(unz);
-
-  if(r != UNZ_OK) {
-    unzClose(unz);
-    systemMessage(MSG_BAD_ZIP_FILE, N_("Bad ZIP file %s"), file);
-    return NULL;
-  }
-
-  bool found = false;
-
-  unz_file_info info;
-
-  while(true) {
-    r = unzGetCurrentFileInfo(unz,
-                              &info,
-                              buffer,
-                              sizeof(buffer),
-                              NULL,
-                              0,
-                              NULL,
-                              0);
-
-    if(r != UNZ_OK) {
-      unzClose(unz);
-      systemMessage(MSG_BAD_ZIP_FILE, N_("Bad ZIP file %s"), file);
-      return NULL;
-    }
-
-    if(accept(buffer)) {
-      found = true;
-      break;
-    }
-
-    r = unzGoToNextFile(unz);
-
-    if(r != UNZ_OK)
-      break;
-  }
-
-  if(!found) {
-    unzClose(unz);
-    systemMessage(MSG_NO_IMAGE_ON_ZIP,
-                  N_("No image found on ZIP file %s"), file);
-    return NULL;
-  }
-
-  int fileSize = info.uncompressed_size;
-  if(size == 0)
-    size = fileSize;
-  r = unzOpenCurrentFile(unz);
-
-  if(r != UNZ_OK) {
-    unzClose(unz);
-    systemMessage(MSG_ERROR_OPENING_IMAGE, N_("Error opening image %s"), buffer);
-    return NULL;
-  }
-
-  u8 *image = data;
-
-  if(image == NULL) {
-    image = (u8 *)malloc(utilGetSize(size));
-    if(image == NULL) {
-      unzCloseCurrentFile(unz);
-      unzClose(unz);
-      systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
-                    "data");
-      return NULL;
-    }
-    size = fileSize;
-  }
-  int read = fileSize <= size ? fileSize : size;
-  r = unzReadCurrentFile(unz,
-                         image,
-                         read);
-
-  unzCloseCurrentFile(unz);
-  unzClose(unz);
-
-  if(r != (int)read) {
-    systemMessage(MSG_ERROR_READING_IMAGE,
-                  N_("Error reading image %s"), buffer);
-    if(data == NULL)
-      free(image);
-    return NULL;
-  }
-
-  size = fileSize;
-
-  return image;
-}
-#endif
-
-static u8 *utilLoadGzipFile(const char *file,
-                            bool (*accept)(const char *),
-                            u8 *data,
-                            int &size)
-{
-  FILE *f = fopen(file, "rb");
-
-  if(f == NULL) {
-    systemMessage(MSG_ERROR_OPENING_IMAGE, N_("Error opening image %s"), file);
-    return NULL;
-  }
-
-  fseek(f, -4, SEEK_END);
-  int fileSize = fgetc(f) | (fgetc(f) << 8) | (fgetc(f) << 16) | (fgetc(f) << 24);
-  fclose(f);
-  if(size == 0)
-    size = fileSize;
-
-  gzFile gz = gzopen(file, "rb");
-
-  if(gz == NULL) {
-    // should not happen, but who knows?
-    systemMessage(MSG_ERROR_OPENING_IMAGE, N_("Error opening image %s"), file);
-    return NULL;
-  }
-
-  u8 *image = data;
-
-  if(image == NULL) {
-    image = (u8 *)malloc(utilGetSize(size));
-    if(image == NULL) {
-      systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
-                    "data");
-      fclose(f);
-      return NULL;
-    }
-    size = fileSize;
-  }
-  int read = fileSize <= size ? fileSize : size;
-  int r = gzread(gz, image, read);
-  gzclose(gz);
-
-  if(r != (int)read) {
-    systemMessage(MSG_ERROR_READING_IMAGE,
-                  N_("Error reading image %s"), file);
-    if(data == NULL)
-      free(image);
-    return NULL;
-  }
-
-  size = fileSize;
-
-  return image;
-}
-
 u8 *utilLoad(const char *file,
              bool (*accept)(const char *),
              u8 *data,
              int &size)
 {
-#ifdef HAS_FILE_EXTRACTOR
-  int type = -1;
-  if (utilIsZipFile(file)) type = 0;
-  else if (utilIs7ZipFile(file)) type = 1;
+	// find image file
+	char buffer [2048];
+	File_Extractor* fe = scan_arc(file,accept,buffer);
+	if(!fe)
+		return NULL;
 
-  if(type>=0) {
-    return utilLoadFromFE(file, type, accept, data, size);
-#else
-  if(utilIsZipFile(file)) {
-    return utilLoadFromZip(file, accept, data, size);
-#endif
-  }
-  if(utilIsGzipFile(file)) {
-    return utilLoadGzipFile(file, accept, data, size);
-  }
+	// Allocate space for image
+	int fileSize = fex_size(fe);
+	if(size == 0)
+		size = fileSize;
 
-  u8 *image = data;
+	u8 *image = data;
 
-  FILE *f = fopen(file, "rb");
+	if(image == NULL) {
+		image = (u8 *)malloc(utilGetSize(size));
+		if(image == NULL) {
+			fex_close(fe);
+			systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+										"data");
+			return NULL;
+		}
+		size = fileSize;
+	}
 
-  if(!f) {
-    systemMessage(MSG_ERROR_OPENING_IMAGE, N_("Error opening image %s"), file);
-    return NULL;
-  }
+	// Read image
+	int read = fileSize <= size ? fileSize : size;
+	fex_err_t err = fex_read(fe, image, read); // TODO: change to fex_read_once
+	fex_close(fe);
+	if(err) {
+		systemMessage(MSG_ERROR_READING_IMAGE,
+									N_("Error reading image from %s: %s"), buffer, err);
+		if(data == NULL)
+			free(image);
+		return NULL;
+	}
 
-  fseek(f,0,SEEK_END);
-  int fileSize = ftell(f);
-  fseek(f,0,SEEK_SET);
-  if(size == 0)
-    size = fileSize;
+	size = fileSize;
 
-  if(image == NULL) {
-    image = (u8 *)malloc(utilGetSize(size));
-    if(image == NULL) {
-      systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
-                    "data");
-      fclose(f);
-      return NULL;
-    }
-    size = fileSize;
-  }
-  size_t read = fileSize <= size ? fileSize : size;
-  size_t r = fread(image, 1, read, f);
-  fclose(f);
-
-  if(r != read) {
-    systemMessage(MSG_ERROR_READING_IMAGE,
-                  N_("Error reading image %s"), file);
-    if(data == NULL)
-      free(image);
-    return NULL;
-  }
-
-  size = fileSize;
-
-  return image;
+	return image;
 }
 
 void utilWriteInt(gzFile gzFile, int i)
