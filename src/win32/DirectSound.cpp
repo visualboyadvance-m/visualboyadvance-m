@@ -156,7 +156,9 @@ bool DirectSound::init()
 	}
 
 	freq = 44100 / soundQuality;
-	soundBufferLen = freq*2*2/60;
+	// calculate the number of samples per frame first
+	// then multiply it with the size of a sample frame (16 bit * stereo)
+	soundBufferLen = ( freq / 60 ) * 4;
 	soundBufferTotalLen = soundBufferLen * 10;
 
 	ZeroMemory( &wfx, sizeof(WAVEFORMATEX) );

@@ -178,9 +178,9 @@ bool OpenAL::init()
 	assert( AL_NO_ERROR == alGetError() );
 
 	freq = 44100 / soundQuality;
-
-	soundBufferLen = freq * 2 * 2 / 60;
-	// 16bit stereo, buffer can store the sound for 1 frame in 60Hz
+	// calculate the number of samples per frame first
+	// then multiply it with the size of a sample frame (16 bit * stereo)
+	soundBufferLen = ( freq / 60 ) * 4;
 
 
 	setsystemSoundOn( true );
