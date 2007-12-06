@@ -51,7 +51,7 @@ int soundTicks = SOUND_CLOCK_TICKS_;
 
 u16 soundFinalWave [1470];
 int soundBufferLen = 1470;
-int soundBufferTotalLen = 14700;
+
 
 int soundDebug        = 0;
 u32 soundNextPosition = 0;
