@@ -456,6 +456,7 @@ public:
 	afx_msg void OnUpdateOutputapiDirectsound(CCmdUI *pCmdUI);
 	afx_msg void OnOutputapiOpenal();
 	afx_msg void OnUpdateOutputapiOpenal(CCmdUI *pCmdUI);
+	afx_msg void OnOutputapiOalconfiguration();
 };
 
 /////////////////////////////////////////////////////////////////////////////

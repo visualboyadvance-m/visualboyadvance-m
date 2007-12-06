@@ -62,7 +62,6 @@ public:
 private:
 	bool           initialized;
 	bool           buffersLoaded;
-	bool           playing;
 	ALCdevice     *device;
 	ALCcontext    *context;
 	ALuint         buffer[NBUFFERS];
@@ -80,7 +79,6 @@ OpenAL::OpenAL()
 {
 	initialized = false;
 	buffersLoaded = false;
-	playing = false;
 	device = NULL;
 	context = NULL;
 	memset( buffer, 0, NBUFFERS * sizeof( ALuint ) );
@@ -121,7 +119,7 @@ void OpenAL::debugState()
 	alGetSourcei( source, AL_SOURCE_STATE, &value );
 	assert( AL_NO_ERROR == alGetError() );
 
-	winlog( " playing = %i\n", playing );
+	winlog( " soundPaused = %i\n", soundPaused );
 	winlog( " Source:\n" );
 	winlog( "  State: " );
 	switch( value )
@@ -160,7 +158,11 @@ bool OpenAL::init()
 	winlog( "OpenAL::init\n" );
 	assert( initialized == false );
 
-    device = alcOpenDevice( theApp.OpenALAudiomixing ? "Generic Software" : NULL );
+	if( theApp.oalDevice ) {
+		device = alcOpenDevice( theApp.oalDevice );
+	} else {
+		device = alcOpenDevice( NULL );
+	}
 	assert( device != NULL );
 
 	context = alcCreateContext( device, NULL );
@@ -175,20 +177,7 @@ bool OpenAL::init()
 	alGenSources( 1, &source );
 	assert( AL_NO_ERROR == alGetError() );
 
-	switch( soundQuality )
-	{
-	case 4:
-		freq = 11025;
-		break;
-	case 2:
-		freq = 22050;
-		break;
-	default:
-		soundQuality = 1;
-	case 1:
-		freq = 44100;
-		break;
-	}
+	freq = 44100 / soundQuality;
 
 	soundBufferLen = freq * 2 * 2 / 60;
 	// 16bit stereo, buffer can store the sound for 1 frame in 60Hz
@@ -204,7 +193,6 @@ void OpenAL::resume()
 {
 	winlog( "OpenAL::resume\n" );
 	assert( initialized );
-	playing = true;
 	if( !buffersLoaded ) return;
 	debugState();
 
@@ -224,7 +212,6 @@ void OpenAL::pause()
 {
 	winlog( "OpenAL::pause\n" );
 	assert( initialized );
-	playing = false;
 	if( !buffersLoaded ) return;
 	debugState();
 
@@ -244,7 +231,6 @@ void OpenAL::reset()
 {
 	winlog( "OpenAL::reset\n" );
 	assert( initialized );
-	playing = false;
 	if( !buffersLoaded ) return;
 	debugState();
 
@@ -319,7 +305,7 @@ void OpenAL::write()
 	// start playing the source if necessary
 	alGetSourcei( source, AL_SOURCE_STATE, &sourceState );
 	assert( AL_NO_ERROR == alGetError() );
-	if( playing && ( sourceState != AL_PLAYING ) ) {
+	if( !soundPaused && ( sourceState != AL_PLAYING ) ) {
 		alSourcePlay( source );
 		assert( AL_NO_ERROR == alGetError() );
 	}

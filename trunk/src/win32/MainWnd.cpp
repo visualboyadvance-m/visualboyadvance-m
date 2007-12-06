@@ -456,6 +456,7 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_DIRECTSOUND, &MainWnd::OnUpdateOutputapiDirectsound)
   ON_COMMAND(ID_OUTPUTAPI_OPENAL, &MainWnd::OnOutputapiOpenal)
   ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_OPENAL, &MainWnd::OnUpdateOutputapiOpenal)
+  ON_COMMAND(ID_OUTPUTAPI_OALCONFIGURATION, &MainWnd::OnOutputapiOalconfiguration)
   END_MESSAGE_MAP()
 
 

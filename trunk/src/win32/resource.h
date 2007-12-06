@@ -97,6 +97,7 @@
 #define IDD_GAME_OVERRIDES              156
 #define IDD_SELECT                      159
 #define IDD_SELECT_PLUGIN               159
+#define IDD_OAL_CONFIG                  160
 #define IDC_R0                          1000
 #define IDC_EDIT_UP                     1000
 #define IDC_R1                          1001
@@ -379,6 +380,7 @@
 #define IDC_SAVE_OBJ                    1138
 #define IDC_MAP_VIEW_ZOOM               1138
 #define IDS_MOVIE_PLAY                  1138
+#define IDS_OAL_NODEVICE                1139
 #define IDC_VIEWER                      1140
 #define IDC_ADDRESSES                   1141
 #define IDC_GO                          1143
@@ -508,6 +510,7 @@
 #define IDC_MIRRORING                   1266
 #define IDC_LY                          1267
 #define IDC_APPENDMODE                  1268
+#define IDC_DEVICE                      1269
 #define ID_HELP_ABOUT                   40001
 #define ID_FILE_EXIT                    40002
 #define ID_OPTIONS_VIDEO_FRAMESKIP_0    40003
@@ -807,14 +810,16 @@
 #define ID_OUTPUTAPI_DIRECTSOUND        40346
 #define ID_OUTPUTAPI_OPENAL             40347
 #define ID_OUTPUTAPI_SOFTWAREMIXING     40348
+#define ID_OUTPUTAPI_CONFIGURATION      40349
+#define ID_OUTPUTAPI_OALCONFIGURATION   40350
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        159
-#define _APS_NEXT_COMMAND_VALUE         40349
-#define _APS_NEXT_CONTROL_VALUE         1269
+#define _APS_NEXT_RESOURCE_VALUE        161
+#define _APS_NEXT_COMMAND_VALUE         40351
+#define _APS_NEXT_CONTROL_VALUE         1270
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
 #endif
