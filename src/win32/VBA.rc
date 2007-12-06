@@ -13,6 +13,54 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// German (Germany) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_OAL_CONFIG DIALOGEX 0, 0, 167, 53
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "OpenAL configuration"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,66,36,48,12
+    PUSHBUTTON      "Cancel",IDCANCEL,114,36,48,12
+    COMBOBOX        IDC_DEVICE,6,18,156,36,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Select device:",IDC_STATIC,6,6,156,12
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_OAL_CONFIG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 160
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 46
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // German (Germany) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
@@ -1660,6 +1708,7 @@ BEGIN
                 MENUITEM "   Use &old synchronization", ID_OPTIONS_SOUND_USEOLDSYNCHRONIZATION
                 MENUITEM SEPARATOR
                 MENUITEM "OpenAL",                      ID_OUTPUTAPI_OPENAL
+                MENUITEM "  Configuration...",          ID_OUTPUTAPI_OALCONFIGURATION
                 MENUITEM SEPARATOR
                 MENUITEM "&Sync game to audio",         ID_OPTIONS_EMULATOR_SYNCHRONIZE
             END
@@ -2151,6 +2200,7 @@ BEGIN
                             "Invalid rewind interval value. Please enter a number between 0 and 600 seconds."
     IDS_REGISTRY            "VisualBoyAdvance no longer uses the registry to store its settings. Your previous settings have been exported into the file: %s"
     IDS_MOVIE_PLAY          "Playing a movie will load a save state which may erase your previous battery saves. Please be sure to have a saved state if you don't want to loose any previous data."
+    IDS_OAL_NODEVICE        "There are no sound devices present on this system."
 END
 
 #endif    // English (U.S.) resources

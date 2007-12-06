@@ -34,6 +34,7 @@
 #include "Throttle.h"
 #include "WinResUtil.h"
 #include "SelectPlugin.h"
+#include "OALConfig.h"
 
 #include "../System.h"
 #include "../agbprint.h"
@@ -1990,3 +1991,24 @@ void MainWnd::OnUpdateOutputapiOpenal(CCmdUI *pCmdUI)
 #endif
 }
 
+void MainWnd::OnOutputapiOalconfiguration()
+{
+#ifndef NO_OAL
+	OALConfig dlg;
+
+	dlg.selectedDevice = theApp.oalDevice;
+	
+	if( dlg.DoModal() == IDOK ) {
+		if( theApp.oalDevice ) {
+			free( theApp.oalDevice );
+			theApp.oalDevice = NULL;
+		}
+
+		theApp.oalDevice = (TCHAR*)malloc( (dlg.selectedDevice.GetLength() + 1) * sizeof( TCHAR ) );
+		_tcscpy( theApp.oalDevice, dlg.selectedDevice.GetBuffer() );
+
+		systemSoundShutdown();
+		systemSoundInit();
+	}
+#endif
+}
