@@ -2484,6 +2484,8 @@ void VBA::saveSettings()
 
   regSetDwordValue("autoFrameSkip", autoFrameSkip);
 
+  regSetDwordValue( "OpenALAudiomixing", OpenALAudiomixing);
+
   regSetDwordValue("vsync", vsync);
   regSetDwordValue("synchronize", synchronize);
   regSetDwordValue("stretch", fullScreenStretch);

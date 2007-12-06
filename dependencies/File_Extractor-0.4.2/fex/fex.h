@@ -77,7 +77,7 @@ struct fex_type_t_
 
 /* Archive type constants for each supported file type */
 extern struct fex_type_t_ const fex_7z_type [1], fex_gz_type [1],
-		fex_rar_type [1], fex_zip_type [1], fex_single_file_type [1];
+		fex_zip_type [1], fex_single_file_type [1];
 typedef struct fex_type_t_ const* fex_type_t;
 
 /* Pointer to array of archive types, with NULL entry at end. Allows a program linked
