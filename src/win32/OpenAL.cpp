@@ -106,8 +106,8 @@ OpenAL::~OpenAL()
 
 	alcDestroyContext( context );
 	assert( AL_NO_ERROR == alGetError() );
-
-	assert( ALC_TRUE == alcCloseDevice( device ) );
+	
+	alcCloseDevice( device );
 	assert( AL_NO_ERROR == alGetError() );
 }
 
