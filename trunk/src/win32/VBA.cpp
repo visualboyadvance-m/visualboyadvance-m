@@ -1658,7 +1658,7 @@ void VBA::loadSettings()
   Sm60FPS::bSaveMoreCPU = regQueryDwordValue("saveMoreCPU", 0);
 
 #ifndef NO_OAL
-  buffer = regQueryStringValue( "oalDevice", "" );
+  buffer = regQueryStringValue( "oalDevice", "Generic Software" );
   if( oalDevice ) {
 	  free( oalDevice );
   }
