@@ -35,7 +35,6 @@
 #pragma comment( lib, "Dsound" )
 #pragma comment( lib, "Dxguid" )
 
-int soundBufferTotalLen = 14700;
 extern bool soundBufferLow;
 extern void setsystemSoundOn(bool value);
 
@@ -48,8 +47,8 @@ private:
 	LPDIRECTSOUNDNOTIFY8 dsbNotify;
 	HANDLE               dsbEvent;
 	WAVEFORMATEX         wfx;          // Primary buffer wave format
+	int                  soundBufferTotalLen;
 	
-
 public:
 	DirectSound();
 	virtual ~DirectSound();
@@ -71,7 +70,8 @@ DirectSound::DirectSound()
 	dsbSecondary  = NULL;
 	dsbNotify     = NULL;
 	dsbEvent      = NULL;
-	
+
+	soundBufferTotalLen = 14700;	
 }
 
 
@@ -155,21 +155,8 @@ bool DirectSound::init()
 		return false;
 	}
 
-	switch(soundQuality)
-	{
-	case 4:
-		freq = 11025;
-		break;
-	case 2:
-		freq = 22050;
-		break;
-	default:
-		soundQuality = 1;
-	case 1:
-		freq = 44100;
-		break;
-	}
-	soundBufferLen = freq/60*4;
+	freq = 44100 / soundQuality;
+	soundBufferLen = freq*2*2/60;
 	soundBufferTotalLen = soundBufferLen * 10;
 
 	ZeroMemory( &wfx, sizeof(WAVEFORMATEX) );
@@ -313,7 +300,7 @@ void DirectSound::write()
 	if( !speedup && synchronize && !theApp.throttle ) {
 		hr = dsbSecondary->GetStatus(&status);
 		if( status & DSBSTATUS_PLAYING ) {
-			if( soundPaused ) {
+			if( !soundPaused ) {
 				while( true ) {
 					dsbSecondary->GetCurrentPosition(&play, NULL);
 					  int BufferLeft = ((soundNextPosition <= play) ?
