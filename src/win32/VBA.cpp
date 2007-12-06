@@ -1459,7 +1459,7 @@ void VBA::loadSettings()
     soundVolume = 0;
 
   soundInterpolation = regQueryDwordValue("soundInterpolation", 0);
-  if(soundInterpolation < 0 || soundInterpolation > 4)
+  if(soundInterpolation < 0 || soundInterpolation > 1)
     soundInterpolation = 0;
 
   ddrawEmulationOnly = regQueryDwordValue("ddrawEmulationOnly", false) ? true : false;
