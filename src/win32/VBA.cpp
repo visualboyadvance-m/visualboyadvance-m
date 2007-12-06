@@ -304,6 +304,7 @@ VBA::VBA()
   input = NULL;
   joypadDefault = 0;
   autoFire = 0;
+  OpenALAudiomixing = false;
   autoFireToggle = false;
   winPauseNextFrame = false;
   soundRecording = false;
@@ -1420,6 +1421,7 @@ void VBA::loadSettings()
 		  audioAPI = DIRECTSOUND;
   }
 
+  OpenALAudiomixing = regQueryDwordValue( "OpenALAudiomixing", 0 );
   windowPositionX = regQueryDwordValue("windowX", 0);
   if(windowPositionX < 0)
     windowPositionX = 0;

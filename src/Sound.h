@@ -69,20 +69,26 @@ extern void setsystemSoundOn(bool value);
 extern void setsoundPaused(bool value);
 extern void interp_rate();
 
-extern int SOUND_CLOCK_TICKS;
-extern int soundTicks;
-extern bool soundOffFlag;
-extern bool soundPaused;
-extern int soundQuality;
-extern int soundBufferLen;
-extern int soundBufferTotalLen;
-extern u32 soundNextPosition;
-extern u16 soundFinalWave[1470];
-extern int soundVolume;
-extern int soundInterpolation;
+extern int SOUND_CLOCK_TICKS;   // Number of 16.8 MHz clocks between calls to soundTick()
+extern int soundTicks;          // Number of 16.8 MHz clocks until soundTick() will be called
+extern int soundQuality;        // sample rate = 44100 / soundQuality
+extern int soundBufferLen;      // size of sound buffer in BYTES
+extern u16 soundFinalWave[1470];// 16-bit SIGNED stereo sample buffer
+extern int soundVolume;         // emulator volume code (not linear)
 
-extern bool soundEcho;
+extern int soundInterpolation;  // 1 if PCM should have low-pass filtering
+extern float soundFiltering;    // 0.0 = none, 1.0 = max (only if soundInterpolation!=0)
+
+extern bool soundEcho;          // enables echo for GB, not GBA
+
+// Not used anymore
 extern bool soundLowPass;
 extern bool soundReverse;
+
+// Unknown purpose
+extern int soundBufferTotalLen;
+extern u32 soundNextPosition;
+extern bool soundPaused;
+extern bool soundOffFlag;
 
 #endif // VBA_SOUND_H

@@ -2007,3 +2007,4 @@ void MainWnd::OnUpdateOutputapiOpenal(CCmdUI *pCmdUI)
 	pCmdUI->SetCheck( ( theApp.audioAPI == OPENAL ) ? 1 : 0 );
 #endif
 }
+

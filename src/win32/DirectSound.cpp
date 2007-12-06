@@ -166,7 +166,7 @@ bool DirectSound::init()
 		freq = 44100;
 		break;
 	}
-	soundBufferLen = freq*2/30;
+	soundBufferLen = freq/60*4;
 	soundBufferTotalLen = soundBufferLen * 10;
 
 	ZeroMemory( &wfx, sizeof(WAVEFORMATEX) );
@@ -310,7 +310,7 @@ void DirectSound::write()
 	if( !speedup && synchronize && !theApp.throttle ) {
 		hr = dsbSecondary->GetStatus(&status);
 		if( status & DSBSTATUS_PLAYING ) {
-			if( !soundPaused ) {
+			if( soundPaused ) {
 				while( true ) {
 					dsbSecondary->GetCurrentPosition(&play, NULL);
 					  int BufferLeft = ((soundNextPosition <= play) ?
