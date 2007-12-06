@@ -1204,15 +1204,6 @@ BOOL MainWnd::OnOptionsSoundPcminterpolation(UINT nID)
   case ID_OPTIONS_SOUND_PCMINTERPOLATION_LINEAR:
     soundInterpolation = 1;
     break;
-  case ID_OPTIONS_SOUND_PCMINTERPOLATION_CUBIC:
-    soundInterpolation = 2;
-    break;
-  case ID_OPTIONS_SOUND_PCMINTERPOLATION_FIR:
-    soundInterpolation = 3;
-    break;
-  case ID_OPTIONS_SOUND_PCMINTERPOLATION_LIBRESAMPLE:
-    soundInterpolation = 4;
-    break;
 
   default:
     return FALSE;
@@ -1230,15 +1221,6 @@ void MainWnd::OnUpdateOptionsSoundPcminterpolation(CCmdUI *pCmdUI)
     break;
   case ID_OPTIONS_SOUND_PCMINTERPOLATION_LINEAR:
     pCmdUI->SetCheck(soundInterpolation == 1);
-    break;
-  case ID_OPTIONS_SOUND_PCMINTERPOLATION_CUBIC:
-    pCmdUI->SetCheck(soundInterpolation == 2);
-    break;
-  case ID_OPTIONS_SOUND_PCMINTERPOLATION_FIR:
-    pCmdUI->SetCheck(soundInterpolation == 3);
-    break;
-  case ID_OPTIONS_SOUND_PCMINTERPOLATION_LIBRESAMPLE:
-    pCmdUI->SetCheck(soundInterpolation == 4);
     break;
 
   default:

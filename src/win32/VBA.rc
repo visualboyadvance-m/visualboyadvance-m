@@ -1686,16 +1686,11 @@ BEGIN
             END
             POPUP "PCM interpolation"
             BEGIN
-                MENUITEM "None",                        ID_OPTIONS_SOUND_PCMINTERPOLATION_NONE
-                MENUITEM "Linear",                      ID_OPTIONS_SOUND_PCMINTERPOLATION_LINEAR
-                MENUITEM "Cubic",                       ID_OPTIONS_SOUND_PCMINTERPOLATION_CUBIC
-                MENUITEM "FIR (Kaiser 4T)",             ID_OPTIONS_SOUND_PCMINTERPOLATION_FIR
-                MENUITEM "libresample",                 ID_OPTIONS_SOUND_PCMINTERPOLATION_LIBRESAMPLE
+                MENUITEM "On",                          ID_OPTIONS_SOUND_PCMINTERPOLATION_LINEAR
+                MENUITEM "Off",                         ID_OPTIONS_SOUND_PCMINTERPOLATION_NONE
             END
             MENUITEM SEPARATOR
             MENUITEM "&Echo",                       ID_OPTIONS_SOUND_ECHO
-            MENUITEM "&Low pass filter",            ID_OPTIONS_SOUND_LOWPASSFILTER
-            MENUITEM "&Reverse Stereo",             ID_OPTIONS_SOUND_REVERSESTEREO
             MENUITEM SEPARATOR
             POPUP "Sound Channels"
             BEGIN
