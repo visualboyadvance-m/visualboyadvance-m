@@ -35,6 +35,7 @@
 #pragma comment( lib, "Dsound" )
 #pragma comment( lib, "Dxguid" )
 
+int soundBufferTotalLen = 14700;
 extern bool soundBufferLow;
 extern void setsystemSoundOn(bool value);
 
@@ -47,6 +48,7 @@ private:
 	LPDIRECTSOUNDNOTIFY8 dsbNotify;
 	HANDLE               dsbEvent;
 	WAVEFORMATEX         wfx;          // Primary buffer wave format
+	
 
 public:
 	DirectSound();
@@ -69,6 +71,7 @@ DirectSound::DirectSound()
 	dsbSecondary  = NULL;
 	dsbNotify     = NULL;
 	dsbEvent      = NULL;
+	
 }
 
 
