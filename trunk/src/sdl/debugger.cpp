@@ -435,12 +435,17 @@ static void debuggerPrintMember(Function *f,
     int off = m->bitOffset;
     int size = m->byteSize;
     u32 v = 0;
-    if(size == 1)
+    switch(size){
+    case 1:
       v = debuggerReadByte(location);
-      else if(size == 2)
-        v = debuggerReadHalfWord(location);
-      else if(size == 4)
-        v = debuggerReadMemory(location);
+      break;
+    case 2:
+      v = debuggerReadHalfWord(location);
+      break;
+    default:
+      v = debuggerReadMemory(location);
+    break;
+    }
 
       while(bitSize) {
         int top = size*8 - off;
@@ -454,12 +459,17 @@ static void debuggerPrintMember(Function *f,
           bitSize -= (top+1);
           location -= size;
           off = 0;
-          if(size == 1)
-            v = debuggerReadByte(location);
-          else if(size == 2)
-            v = debuggerReadHalfWord(location);
-          else
-            v = debuggerReadMemory(location);
+         switch(size){
+         case 1:
+           v = debuggerReadByte(location);
+           break;
+         case 2:
+           v = debuggerReadHalfWord(location);
+           break;
+         default:
+           v = debuggerReadMemory(location);
+         break;
+         }
         }
       }
       debuggerPrintBaseType(m->type, value, location, LOCATION_memory,
