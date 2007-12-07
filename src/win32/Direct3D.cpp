@@ -152,11 +152,6 @@ void Direct3DDisplay::prepareDisplayMode()
 	dpp.PresentationInterval = theApp.vsync ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 	// D3DPRESENT_INTERVAL_ONE means VSync ON
 
-	if( theApp.vsync && ( dpp.Windowed == FALSE ) && theApp.menuToggle ) {
-		// HACK: VSync will be disabled when the menu is opened in full screen mode
-		dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-	}
-
 
 #ifdef _DEBUG
 	// make debugging full screen easier
