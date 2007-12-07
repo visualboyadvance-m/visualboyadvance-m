@@ -67,7 +67,6 @@ public:
   virtual void cleanup();
   virtual void render();
   virtual void checkFullScreen();
-  virtual void renderMenu();
   virtual void clear();
   virtual bool changeRenderSize(int w, int h);
   virtual DISPLAY_TYPE getType() { return DIRECT_DRAW; };
@@ -532,12 +531,6 @@ void DirectDrawDisplay::clear()
   ddsPrimary->Flip(NULL, 0);
   ddsFlip->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &fx);
   ddsPrimary->Flip(NULL, 0);
-}
-
-void DirectDrawDisplay::renderMenu()
-{
-  checkFullScreen();
-  theApp.m_pMainWnd->DrawMenuBar();
 }
 
 void DirectDrawDisplay::checkFullScreen()

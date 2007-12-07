@@ -34,7 +34,6 @@ class IDisplay {
   virtual void cleanup() = 0;
   virtual void render() = 0;
   virtual void checkFullScreen() {};
-  virtual void renderMenu() {};
   virtual void clear() = 0;
   virtual bool changeRenderSize(int w, int h) { return true; };
   virtual void resize(int w, int h) {};
