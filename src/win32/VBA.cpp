@@ -333,6 +333,7 @@ VBA::VBA()
   fsMaxScale = 0;
   romSize = 0;
   lastWindowed = VIDEO_3X;
+  lastFullscreen = VIDEO_1024x768;
 
   updateCount = 0;
 
@@ -1356,6 +1357,8 @@ void VBA::loadSettings()
 {
   CString buffer;
 
+  lastFullscreen = (VIDEO_SIZE)regQueryDwordValue("lastFullscreen", VIDEO_1024x768);
+
   languageOption = regQueryDwordValue("language", 1);
   if(languageOption < 0 || languageOption > 2)
     languageOption = 1;
@@ -1801,6 +1804,8 @@ void VBA::updateWindowSize(int value)
     changingVideoSize = true;
 	if( videoOption <= VIDEO_4X ) {
 		lastWindowed = (VIDEO_SIZE)videoOption; // save for when leaving full screen
+	} else {
+		lastFullscreen = (VIDEO_SIZE)videoOption; // save for when using quick switch to fullscreen
 	}
     shutdownDisplay();
     if(input) {
@@ -2645,6 +2650,7 @@ void VBA::saveSettings()
   regSetDwordValue("Linklog", linklog);
   regSetDwordValue("RFU", adapter);
   regSetDwordValue("linkEnabled", linkenable);
+  regSetDwordValue("lastFullscreen", lastFullscreen);
 
 #ifndef NO_OAL
   regSetStringValue( "oalDevice", oalDevice );
