@@ -41,7 +41,7 @@
 #include "../Util.h"
 #include "../gb/gbGlobals.h"
 #include "../gb/gbPrinter.h"
-#include "../ereader.h"
+
 /* Link
 ---------------------*/
 #include "../Link.h"
@@ -1359,10 +1359,6 @@ void VBA::loadSettings()
 
   lastFullscreen = (VIDEO_SIZE)regQueryDwordValue("lastFullscreen", VIDEO_1024x768);
 
- eReaderSaveRAW = regQueryDwordValue("eReaderSaveRAW",1);
-  if(eReaderSaveRAW < 0 || eReaderSaveRAW > 1)
-    eReaderSaveRAW = 1;
-    
   languageOption = regQueryDwordValue("language", 1);
   if(languageOption < 0 || languageOption > 2)
     languageOption = 1;
@@ -2510,7 +2506,6 @@ void VBA::movieReadNext()
 
 void VBA::saveSettings()
 {
-  regSetDwordValue("eReaderSaveRAW", eReaderSaveRAW);
   regSetDwordValue("language", languageOption);
 
   regSetStringValue("languageName", languageName);
