@@ -45,7 +45,7 @@
 // See VBA.cpp for the implementation of this class
 //
 
-enum {
+enum VIDEO_SIZE{
   VIDEO_1X, VIDEO_2X, VIDEO_3X, VIDEO_4X,
   VIDEO_320x240, VIDEO_640x480, VIDEO_800x600, VIDEO_1024x768, VIDEO_1280x1024,
   VIDEO_OTHER
@@ -209,6 +209,7 @@ class VBA : public CWinApp
   bool autoLoadMostRecent;
   int fsMaxScale;
   int romSize;
+  VIDEO_SIZE lastWindowed;
 
   CList<IUpdateListener *, IUpdateListener*&> updateList;
   int updateCount;
