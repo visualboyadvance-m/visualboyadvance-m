@@ -694,8 +694,10 @@ void MainWnd::OnUpdateFileRominformation(CCmdUI* pCmdUI)
 
 void MainWnd::OnFileTogglemenu()
 {
-  if(theApp.videoOption <= VIDEO_4X)
-    return;
+  if(theApp.videoOption <= VIDEO_4X) {
+	  theApp.updateWindowSize( theApp.lastFullscreen );
+	  return;
+  }
 
   if( theApp.renderMethod != DIRECT_DRAW ) {
 	  // display API does not support GDI objects in fullscreen
@@ -724,7 +726,8 @@ void MainWnd::OnFileTogglemenu()
 
 void MainWnd::OnUpdateFileTogglemenu(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption > VIDEO_4X);
+	// HACK: when uncommented, Esc key will not be send to MainWnd
+	//pCmdUI->Enable(theApp.videoOption > VIDEO_4X);
 }
 
 bool MainWnd::fileImportGSACodeFile(CString& fileName)
