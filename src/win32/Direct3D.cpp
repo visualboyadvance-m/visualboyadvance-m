@@ -101,7 +101,6 @@ public:
 	virtual void clear();
 	virtual void render();
 
-	virtual void renderMenu();
 	virtual bool changeRenderSize( int w, int h );
 	virtual void resize( int w, int h );
 	virtual void setOption( const char *option, int value );
@@ -318,15 +317,6 @@ bool Direct3DDisplay::initialize()
 #endif
 
 	return TRUE;
-}
-
-
-void Direct3DDisplay::renderMenu()
-{
-	//checkFullScreen();
-	if(theApp.m_pMainWnd) {
-		theApp.m_pMainWnd->DrawMenuBar();
-	}
 }
 
 
