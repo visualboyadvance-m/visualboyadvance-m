@@ -42,6 +42,11 @@
 #include "prof/prof.h"
 #endif
 
+/* EReader
+----------------------------*/
+#include "ereader.h"
+/* ----------------------- */
+
 #ifdef __GNUC__
 #define _stricmp strcasecmp
 #endif
@@ -1732,8 +1737,21 @@ void CPUSoftwareInterrupt(int comment)
           VCOUNT);
     }
 #endif
-    CPUSoftwareInterrupt();
-    return;
+   	if((comment & 0xF8) != 0xE0)
+	{
+		CPUSoftwareInterrupt();
+		return;
+	}
+	else
+	{
+/* ------- EReader -------- */
+	  if(CheckEReaderRegion())
+		BIOS_EReader_ScanCard(comment);
+	  else
+		CPUSoftwareInterrupt();
+	  return;
+/* ------------------------ */
+	}
   }
   // This would be correct, but it causes problems if uncommented
   //  else {
@@ -1961,6 +1979,19 @@ void CPUSoftwareInterrupt(int comment)
   case 0x1F:
     BIOS_MidiKey2Freq();
     break;
+/* ------- EReader -------- */
+  case 0xE0:
+  case 0xE1:
+  case 0xE2:
+  case 0xE3:
+  case 0xE4:
+  case 0xE5:
+  case 0xE6:
+  case 0xE7:
+	  if(CheckEReaderRegion())
+		BIOS_EReader_ScanCard(comment);
+	  break;
+/* ------------------------ */
   case 0x2A:
     BIOS_SndDriverJmpTableCopy();
     // let it go, because we don't really emulate this function
@@ -3064,6 +3095,20 @@ void CPUReset()
         break;
       }
   }
+ /*--------- EReader -----------*/
+  switch(CheckEReaderRegion())
+  {
+  case 1: //US
+	  EReaderWriteMemory(0x8009134,0x46C0DFE0);
+	  break;
+  case 2:
+	  EReaderWriteMemory(0x8008A8C,0x46C0DFE0);
+	  break;
+  case 3:
+	  EReaderWriteMemory(0x80091A8,0x46C0DFE0);
+	  break;
+  }
+/*----------------------------*/
   rtcReset();
   // clean registers
   memset(&reg[0], 0, sizeof(reg));
