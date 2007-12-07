@@ -361,7 +361,6 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_WM_MOUSEMOVE()
   ON_WM_INITMENU()
   ON_WM_ACTIVATE()
-  ON_WM_ACTIVATEAPP()
   ON_WM_DROPFILES()
   ON_COMMAND(ID_FILE_SAVEGAME_OLDESTSLOT, OnFileSavegameOldestslot)
   ON_UPDATE_COMMAND_UI(ID_FILE_SAVEGAME_OLDESTSLOT, OnUpdateFileSavegameOldestslot)
@@ -1277,22 +1276,6 @@ void MainWnd::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
     systemDrawScreen();
     theApp.painting = false;
     theApp.renderedFrames--;
-  }
-}
-
-#if _MSC_VER <= 1200
-void MainWnd::OnActivateApp(BOOL bActive, HTASK hTask)
-#else
-void MainWnd::OnActivateApp(BOOL bActive, DWORD hTask)
-#endif
-{
-  CWnd::OnActivateApp(bActive, hTask);
-
-  if(theApp.tripleBuffering && theApp.videoOption > VIDEO_4X) {
-    if(bActive) {
-      if(theApp.display)
-        theApp.display->clear();
-    }
   }
 }
 
