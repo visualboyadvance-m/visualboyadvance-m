@@ -2,7 +2,7 @@
 // Copyright (C) 1999-2003 Forgotten
 // Copyright (C) 2004 Forgotten and the VBA development team
 // Copyright (C) 2005-2006 VBA development team
-// Copyright (C) 2007 VBA-M team
+// Copyright (C) 2007 VBA-M development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -144,11 +144,7 @@ void Direct3DDisplay::prepareDisplayMode()
 	dpp.BackBufferHeight = !dpp.Windowed ? theApp.fsHeight : theApp.surfaceSizeY;
 	dpp.hDeviceWindow = theApp.m_pMainWnd->GetSafeHwnd();
 	dpp.FullScreen_RefreshRateInHz = dpp.Windowed ? 0 : theApp.fsFrequency;
-	if( ( dpp.Windowed == FALSE ) && theApp.menuToggle ) {
-		dpp.Flags = D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
-	} else {
-		dpp.Flags = 0;
-	}
+	dpp.Flags = 0;
 	dpp.PresentationInterval = theApp.vsync ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 	// D3DPRESENT_INTERVAL_ONE means VSync ON
 
@@ -581,13 +577,13 @@ void Direct3DDisplay::calculateDestRect()
 void Direct3DDisplay::setOption( const char *option, int value )
 {
 	if( !_tcscmp( option, _T("vsync") ) ) {
-		// theApp.vsync has already been changed by the menu handler
+		// value of theApp.vsync has already been changed by the menu handler
 		// 'value' has the same value as theApp.vsync
 		resetDevice();
 	}
 
 	if( !_tcscmp( option, _T("tripleBuffering") ) ) {
-		// theApp.tripleBuffering has already been changed by the menu handler
+		// value of theApp.tripleBuffering has already been changed by the menu handler
 		// 'value' has the same value as theApp.tripleBuffering
 		resetDevice();
 	}
@@ -627,13 +623,6 @@ bool Direct3DDisplay::resetDevice()
 	}
 	destroyTexture();
 	prepareDisplayMode();
-
-	if( dpp.Windowed == FALSE ) {
-		// SetDialogBoxMode needs D3DPRESENTFLAG_LOCKABLE_BACKBUFFER
-		if( FAILED( hr = pDevice->SetDialogBoxMode( theApp.menuToggle ? TRUE : FALSE ) ) ) {
-			DXTRACE_ERR( _T("can not switch to dialog box mode"), hr );
-		}
-	}
 
 	if( FAILED( hr = pDevice->Reset( &dpp ) ) ) {
 		DXTRACE_ERR( _T("pDevice->Reset failed\n"), hr );

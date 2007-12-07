@@ -210,6 +210,7 @@ class VBA : public CWinApp
   int fsMaxScale;
   int romSize;
   VIDEO_SIZE lastWindowed;
+  VIDEO_SIZE lastFullscreen;
 
   CList<IUpdateListener *, IUpdateListener*&> updateList;
   int updateCount;
