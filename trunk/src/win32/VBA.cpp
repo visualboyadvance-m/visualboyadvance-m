@@ -332,6 +332,7 @@ VBA::VBA()
   autoLoadMostRecent = false;
   fsMaxScale = 0;
   romSize = 0;
+  lastWindowed = VIDEO_3X;
 
   updateCount = 0;
 
@@ -930,6 +931,10 @@ void VBA::updateMenuBar()
     // force popup recreation if language changed
     DestroyMenu(popup);
     popup = NULL;
+  }
+
+  if( ( renderMethod != DIRECT_DRAW ) && ( videoOption >= VIDEO_320x240 ) ) {
+	  return;
   }
 
   m_menu.Attach(winResLoadMenu(MAKEINTRESOURCE(IDR_MENU)));
@@ -1794,6 +1799,9 @@ void VBA::updateWindowSize(int value)
      fsForceChange) {
     fsForceChange = false;
     changingVideoSize = true;
+	if( videoOption <= VIDEO_4X ) {
+		lastWindowed = (VIDEO_SIZE)videoOption; // save for when leaving full screen
+	}
     shutdownDisplay();
     if(input) {
       delete input;
@@ -1826,7 +1834,10 @@ void VBA::updateWindowSize(int value)
       return;
     }
     input->checkKeys();
-    updateMenuBar();
+	
+	if( renderMethod == DIRECT_DRAW ) {
+		updateMenuBar();
+	}
     changingVideoSize = FALSE;
     updateWindowSize(videoOption);
     return;

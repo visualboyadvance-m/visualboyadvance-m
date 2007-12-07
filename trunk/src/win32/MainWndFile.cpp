@@ -697,6 +697,12 @@ void MainWnd::OnFileTogglemenu()
   if(theApp.videoOption <= VIDEO_4X)
     return;
 
+  if( theApp.renderMethod != DIRECT_DRAW ) {
+	  // display API does not support GDI objects in fullscreen
+	  theApp.updateWindowSize( theApp.lastWindowed );
+	  return;
+  }
+
   theApp.menuToggle = !theApp.menuToggle;
 
   if(theApp.menuToggle) {

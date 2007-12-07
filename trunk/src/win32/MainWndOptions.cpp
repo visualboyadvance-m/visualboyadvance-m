@@ -313,7 +313,9 @@ void MainWnd::OnUpdateOptionsVideoFullscreen1280x1024(CCmdUI *pCmdUI)
 BOOL MainWnd::OnOptionVideoSize(UINT nID)
 {
 	theApp.updateVideoSize(nID);
-	theApp.m_pMainWnd->PostMessage(VBA_CONFIRM_MODE);
+	if( theApp.renderMethod == DIRECT_DRAW ) {
+		theApp.m_pMainWnd->PostMessage(VBA_CONFIRM_MODE);
+	}
 	return TRUE;
 }
 
@@ -372,7 +374,9 @@ void MainWnd::OnOptionsVideoFullscreen()
         regSetDwordValue("defaultVideoDriver", TRUE);
       }
       theApp.updateVideoSize(ID_OPTIONS_VIDEO_FULLSCREEN);
-      theApp.m_pMainWnd->PostMessage(VBA_CONFIRM_MODE);
+	  if( theApp.renderMethod == DIRECT_DRAW ) {
+		  theApp.m_pMainWnd->PostMessage(VBA_CONFIRM_MODE);
+	  }
     }
   }
   theApp.winAccelMgr.UpdateMenu(theApp.menu);
