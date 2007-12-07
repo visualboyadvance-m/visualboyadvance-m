@@ -86,7 +86,6 @@ public:
 	virtual bool initialize();
 	virtual void cleanup();
 	virtual void render();
-	virtual void renderMenu();
 	virtual void clear();
 	virtual bool changeRenderSize( int w, int h );
 	virtual void resize( int w, int h );
@@ -242,14 +241,6 @@ void OpenGLDisplay::clear()
 {
 	glClearColor(0.0,0.0,0.0,1.0);
 	glClear( GL_COLOR_BUFFER_BIT );
-}
-
-
-void OpenGLDisplay::renderMenu()
-{
-	checkFullScreen();
-	if( theApp.m_pMainWnd )
-		theApp.m_pMainWnd->DrawMenuBar();
 }
 
 
