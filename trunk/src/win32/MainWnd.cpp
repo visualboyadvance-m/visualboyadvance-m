@@ -769,6 +769,8 @@ void MainWnd::OnSize(UINT nType, int cx, int cy)
 {
   CWnd::OnSize(nType, cx, cy);
 
+  bool redraw = ( ( cx < theApp.surfaceSizeX ) || ( cy < theApp.surfaceSizeY ) );
+
   if(!theApp.changingVideoSize) {
     if(this) {
       if(!IsIconic()) {
@@ -784,6 +786,12 @@ void MainWnd::OnSize(UINT nType, int cx, int cy)
           theApp.adjustDestRect();
           if(theApp.display)
             theApp.display->resize(theApp.dest.right-theApp.dest.left, theApp.dest.bottom-theApp.dest.top);
+		  if( redraw && emulating ) {
+			  theApp.painting = true;
+			  systemDrawScreen();
+			  theApp.painting = false;
+			  theApp.renderedFrames--;
+		  }
         }
       } else {
         if(emulating) {
