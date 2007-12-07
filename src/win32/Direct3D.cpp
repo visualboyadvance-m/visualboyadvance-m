@@ -154,7 +154,7 @@ void Direct3DDisplay::prepareDisplayMode()
 	// D3DPRESENT_INTERVAL_ONE means VSync ON
 
 	if( theApp.vsync && ( dpp.Windowed == FALSE ) && theApp.menuToggle ) {
-		// VSync will be disabled when the menu is opened in full screen mode
+		// HACK: VSync will be disabled when the menu is opened in full screen mode
 		dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 	}
 
@@ -459,12 +459,11 @@ void Direct3DDisplay::resize( int w, int h )
 		return;
 	}
 
-	if( (w != dpp.BackBufferWidth) || (h != dpp.BackBufferHeight) ) {
+	if( (w != dpp.BackBufferWidth) ||
+		(h != dpp.BackBufferHeight) ||
+		(theApp.videoOption > VIDEO_4X) ) {
 		resetDevice();
 		calculateDestRect();
-	}
-	if( theApp.videoOption > VIDEO_4X ) {
-		resetDevice();
 	}
 }
 
