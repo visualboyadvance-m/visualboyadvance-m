@@ -46,6 +46,7 @@
 #include "../gb/gbPrinter.h"
 #include "../Link.h"
 #include <tchar.h>
+#include "../ereader.h"
 
 extern int emulating;
 
@@ -893,6 +894,19 @@ void MainWnd::OnOptionsEmulatorUsebiosfile()
 {
   if(!theApp.biosFileName.IsEmpty())
     theApp.useBiosFile = !theApp.useBiosFile;
+}
+
+void MainWnd::OnOptionsEmulatorEreader()
+{
+	if(eReaderSaveRAW == 1)
+		eReaderSaveRAW = 0;
+	else
+		eReaderSaveRAW = 1;
+}
+
+void MainWnd::OnUpdateOptionsEmulatorEreader(CCmdUI* pCmdUI)
+{
+  pCmdUI->SetCheck(eReaderSaveRAW == 1);
 }
 
 void MainWnd::OnUpdateOptionsEmulatorUsebiosfile(CCmdUI* pCmdUI)

@@ -69,31 +69,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
 
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "#include ""resource2.h""\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "#include ""vba.rc2""\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -1499,6 +1474,31 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "#include ""resource2.h""\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#include ""vba.rc2""\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
@@ -1817,7 +1817,7 @@ BEGIN
                 MENUITEM "Flash 64 KB",                 ID_OPTIONS_EMULATOR_SAVETYPE_FLASH512K
                 MENUITEM "Flash 128 KB",                ID_OPTIONS_EMULATOR_SAVETYPE_FLASH1M
             END
-            MENUITEM SEPARATOR
+            MENUITEM "Save E-Reader RAW File",      ID_OPTIONS_EMULATOR_EREADER
             MENUITEM "&Use BIOS file",              ID_OPTIONS_EMULATOR_USEBIOSFILE
             MENUITEM "Skip BIOS",                   ID_OPTIONS_EMULATOR_SKIPBIOS
             MENUITEM "S&elect BIOS file...",        ID_OPTIONS_EMULATOR_SELECTBIOSFILE
