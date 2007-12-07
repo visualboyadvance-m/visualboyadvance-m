@@ -258,9 +258,6 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsEmulatorSavetypeFlash512k(CCmdUI* pCmdUI);
   afx_msg void OnOptionsEmulatorSavetypeFlash1m();
   afx_msg void OnUpdateOptionsEmulatorSavetypeFlash1m(CCmdUI* pCmdUI);
-
-  afx_msg void OnOptionsEmulatorEreader();
-  afx_msg void OnUpdateOptionsEmulatorEreader(CCmdUI* pCmdUI);
   afx_msg void OnOptionsEmulatorUsebiosfile();
   afx_msg void OnUpdateOptionsEmulatorUsebiosfile(CCmdUI* pCmdUI);
   afx_msg void OnOptionsEmulatorSkipbios();
