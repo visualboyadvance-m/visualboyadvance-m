@@ -524,7 +524,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Assembling $(InputFileName)..."
-							CommandLine="nasm -D__DJGPP__ -f win32 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+							CommandLine="nasm -d__DJGPP__ -O1 -fwin32 -g -Xvc -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 							Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 						/>
 					</FileConfiguration>
@@ -534,7 +534,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Assembling $(InputFileName)..."
-							CommandLine="nasm -D__DJGPP__ -f win64 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+							CommandLine="nasm -d__DJGPP__ -O1 -fwin64 -g -Xvc -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 							Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 						/>
 					</FileConfiguration>
@@ -544,7 +544,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Assembling $(InputFileName)..."
-							CommandLine="nasm -D__DJGPP__ -f win32 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+							CommandLine="nasm -d__DJGPP__ -O1 -fwin32 -Xvc -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 							Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 						/>
 					</FileConfiguration>
@@ -554,7 +554,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Assembling $(InputFileName)..."
-							CommandLine="nasm -D__DJGPP__ -f win64 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+							CommandLine="nasm -d__DJGPP__ -O1 -fwin64 -Xvc -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 							Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 						/>
 					</FileConfiguration>
@@ -619,7 +619,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win32 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin32 -g -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -629,7 +629,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win64 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin64 -g -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -639,7 +639,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win32 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin32 -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -649,7 +649,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win64 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin64 -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -663,7 +663,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win32 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin32 -g -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -673,7 +673,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win64 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin64 -g -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -683,7 +683,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win32 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin32 -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -693,7 +693,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win64 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin64 -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -707,7 +707,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win32 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin32 -g -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -717,7 +717,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win64 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin64 -g -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -727,7 +727,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win32 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin32 -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -737,7 +737,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win64 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin64 -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -751,7 +751,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win32 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin32 -g -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -761,7 +761,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win64 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin64 -g -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -771,7 +771,7 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win32 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin32 -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
@@ -781,13 +781,17 @@
 							<Tool
 								Name="VCCustomBuildTool"
 								Description="Assembling $(InputFileName)..."
-								CommandLine="nasm -D__DJGPP__ -O1 -Isrc/ -f win64 -o &quot;$(IntDir)\$(InputName).obj&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+								CommandLine="nasm -O1 -isrc/ -fwin64 -Xvc -w-orphan-labels -o&quot;$(IntDir)\$(InputName).obj&quot; -- &quot;$(InputPath)&quot;"
 								Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 							/>
 						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\src\hq_shared32.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\macros.mac"
 						>
 					</File>
 					<File
