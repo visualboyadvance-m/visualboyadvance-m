@@ -38,7 +38,7 @@
 #include <assert.h>
 
 
-#define NBUFFERS 5
+#define NBUFFERS 8
 //#define LOGALL
 // LOGALL writes very detailed informations to vba-trace.log
 
@@ -278,8 +278,9 @@ void OpenAL::write()
 			// wait until at least one buffer has finished
 			while( nBuffersProcessed == 0 ) {
 				winlog( " waiting...\n" );
-				// wait for 1/10 of the time one buffer needs to have finished
-				Sleep( soundBufferLen * 1000 / ( freq * 2 * 2 * 10 ) );
+				// wait for about half the time one buffer needs to finish
+				// unoptimized: ( sourceBufferLen * 1000 ) / ( freq * 2 * 2 ) * 1/2
+				Sleep( soundBufferLen / ( freq >> 7 ) );
 				alGetSourcei( source, AL_BUFFERS_PROCESSED, &nBuffersProcessed );
 				assert( AL_NO_ERROR == alGetError() );
 			}
