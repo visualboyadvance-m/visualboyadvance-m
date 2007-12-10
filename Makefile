@@ -31,7 +31,6 @@ endif
 MAINDIR=src
 SDLDIR=src/sdl
 DMGDIR=src/gb
-RESAMPLEDIR=src/libresample-0.1.3/src
 GBAPUDIR=src/gb/gb_apu
 
 ASMOBJ=${MAINDIR}/hq3x_16${OE} ${MAINDIR}/hq3x_32${OE} ${MAINDIR}/hq4x_16${OE} ${MAINDIR}/hq4x_32${OE} \
@@ -62,7 +61,7 @@ ${DMGDIR}/gbSound${OE}
 SDLOBJ=${SDLDIR}/debugger${OE} ${SDLDIR}/SDL${OE} ${SDLDIR}/dummy${OE}
 
 OBJECTS=${MAINOBJ} ${DMGOBJ} ${SDLOBJ} ${GBAPUOBJ}
-LIB=${RESAMPLEDIR}/filterkit${OE} ${RESAMPLEDIR}/resample${OE} ${RESAMPLEDIR}/resamplesubs${OE}
+LIB=
 
 ifeq ($(USEASM),yes)
 OBJECTS+=${ASMOBJ}
