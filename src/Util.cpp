@@ -34,10 +34,7 @@ extern "C" {
 #include "RTC.h"
 #include "Port.h"
 
-#ifdef HAS_FILE_EXTRACTOR
-#include <fex.h>
-#endif
-
+#include "fex.h"
 
 extern "C" {
 #include "memgzio.h"
@@ -575,8 +572,8 @@ void utilGetBaseName(const char *file, char *buffer)
 static File_Extractor* scan_arc(const char *file, bool (*accept)(const char *),
 		char (&buffer) [2048] )
 {
-	File_Extractor* fe;
-	fex_err_t err = fex_open( file, &fe );
+	fex_err_t err;
+	File_Extractor* fe = fex_open( file, &err );
 	if(!fe)
 	{
 		systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s: %s"), file, err);
@@ -672,7 +669,7 @@ u8 *utilLoad(const char *file,
 
 	// Read image
 	int read = fileSize <= size ? fileSize : size;
-	fex_err_t err = fex_read(fe, image, read); // TODO: change to fex_read_once
+	fex_err_t err = fex_read_once(fe, image, read);
 	fex_close(fe);
 	if(err) {
 		systemMessage(MSG_ERROR_READING_IMAGE,
