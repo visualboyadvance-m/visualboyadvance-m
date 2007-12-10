@@ -26,10 +26,10 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 // modify the copy in blargg_config.h, NOT this one.
 #if FEX_ENABLE_RAR
 #define FEX_TYPE_LIST \
-	fex_7z_type, fex_gz_type, fex_rar_type, fex_zip_type, fex_bin_type
+	fex_7z_type, fex_gz_type, fex_zip_type, fex_bin_type
 #else
 #define FEX_TYPE_LIST \
-	fex_7z_type, fex_gz_type,               fex_zip_type, fex_bin_type
+	fex_7z_type, fex_gz_type, fex_zip_type, fex_bin_type
 #endif
 
 #endif
