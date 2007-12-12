@@ -69,31 +69,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
 
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "#include ""resource2.h""\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "#include ""vba.rc2""\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -1499,6 +1474,31 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "#include ""resource2.h""\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#include ""vba.rc2""\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
@@ -2201,6 +2201,7 @@ BEGIN
     IDS_REGISTRY            "VisualBoyAdvance no longer uses the registry to store its settings. Your previous settings have been exported into the file: %s"
     IDS_MOVIE_PLAY          "Playing a movie will load a save state which may erase your previous battery saves. Please be sure to have a saved state if you don't want to loose any previous data."
     IDS_OAL_NODEVICE        "There are no sound devices present on this system."
+    IDS_OAL_NODLL           "OpenAL32.dll could not be found on your system. Please install the runtime from http://openal.org"
 END
 
 #endif    // English (U.S.) resources

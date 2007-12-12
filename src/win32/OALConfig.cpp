@@ -9,7 +9,7 @@
 // OpenAL
 #include <al.h>
 #include <alc.h>
-#pragma comment( lib, "OpenAL32.lib" )
+#include "LoadOAL.h"
 
 
 // OALConfig dialog
@@ -35,7 +35,7 @@ void OALConfig::DoDataExchange(CDataExchange* pDX)
 	if( !pDX->m_bSaveAndValidate ) {
 		// enumerate devices
 		const ALchar *devices = NULL;
-		devices = alcGetString( NULL, ALC_DEVICE_SPECIFIER );
+		devices = ALFunction.alcGetString( NULL, ALC_DEVICE_SPECIFIER );
 		if( strlen( devices ) ) {
 			while( *devices ) {
 				cbDevice.AddString( devices );
@@ -53,6 +53,11 @@ void OALConfig::DoDataExchange(CDataExchange* pDX)
 BOOL OALConfig::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+
+	if( !LoadOAL10Library( NULL, &ALFunction ) ) {
+		systemMessage( IDS_OAL_NODLL, "OpenAL32.dll could not be found on your system. Please install the runtime from http://openal.org" );
+		return false;
+	}
 
 	return TRUE;
 }

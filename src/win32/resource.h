@@ -382,6 +382,7 @@
 #define IDS_MOVIE_PLAY                  1138
 #define IDS_OAL_NODEVICE                1139
 #define IDC_VIEWER                      1140
+#define IDS_OAL_NODLL                   1140
 #define IDC_ADDRESSES                   1141
 #define IDC_GO                          1143
 #define IDC_8_BIT                       1144

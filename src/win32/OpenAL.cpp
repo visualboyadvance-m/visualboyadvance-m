@@ -25,7 +25,7 @@
 // OpenAL
 #include <al.h>
 #include <alc.h>
-#pragma comment( lib, "OpenAL32.lib" )
+#include "LoadOAL.h"
 
 // Windows
 #include <windows.h> // for 'Sleep' function
@@ -60,6 +60,7 @@ public:
 	void write();  // write the emulated sound to the secondary sound buffer
 
 private:
+	OPENALFNTABLE  ALFunction;
 	bool           initialized;
 	bool           buffersLoaded;
 	ALCdevice     *device;
@@ -89,26 +90,28 @@ OpenAL::OpenAL()
 
 OpenAL::~OpenAL()
 {
-	alSourceStop( source );
-	assert( AL_NO_ERROR == alGetError() );
+	if( !initialized ) return;
 
-	alSourcei( source, AL_BUFFER, 0 );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alSourceStop( source );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 
-	alDeleteSources( 1, &source );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alSourcei( source, AL_BUFFER, 0 );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 
-	alDeleteBuffers( NBUFFERS, buffer );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alDeleteSources( 1, &source );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 
-	alcMakeContextCurrent( NULL );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alDeleteBuffers( NBUFFERS, buffer );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 
-	alcDestroyContext( context );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alcMakeContextCurrent( NULL );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
+
+	ALFunction.alcDestroyContext( context );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 	
-	alcCloseDevice( device );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alcCloseDevice( device );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 }
 
 #ifdef LOGALL
@@ -116,8 +119,8 @@ void OpenAL::debugState()
 {
 
 	ALint value = 0;
-	alGetSourcei( source, AL_SOURCE_STATE, &value );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alGetSourcei( source, AL_SOURCE_STATE, &value );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 
 	winlog( " soundPaused = %i\n", soundPaused );
 	winlog( " Source:\n" );
@@ -142,12 +145,12 @@ void OpenAL::debugState()
 	}
 
 
-	alGetSourcei( source, AL_BUFFERS_QUEUED, &value );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alGetSourcei( source, AL_BUFFERS_QUEUED, &value );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 	winlog( "  Buffers in queue: %i\n", value );
 
-	alGetSourcei( source, AL_BUFFERS_PROCESSED, &value );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alGetSourcei( source, AL_BUFFERS_PROCESSED, &value );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 	winlog( "  Buffers processed: %i\n", value );
 }
 #endif
@@ -158,24 +161,29 @@ bool OpenAL::init()
 	winlog( "OpenAL::init\n" );
 	assert( initialized == false );
 
+	if( !LoadOAL10Library( NULL, &ALFunction ) ) {
+		systemMessage( IDS_OAL_NODLL, "OpenAL32.dll could not be found on your system. Please install the runtime from http://openal.org" );
+		return false;
+	}
+
 	if( theApp.oalDevice ) {
-		device = alcOpenDevice( theApp.oalDevice );
+		device = ALFunction.alcOpenDevice( theApp.oalDevice );
 	} else {
-		device = alcOpenDevice( NULL );
+		device = ALFunction.alcOpenDevice( NULL );
 	}
 	assert( device != NULL );
 
-	context = alcCreateContext( device, NULL );
+	context = ALFunction.alcCreateContext( device, NULL );
 	assert( context != NULL );
 
-	ALCboolean retVal = alcMakeContextCurrent( context );
+	ALCboolean retVal = ALFunction.alcMakeContextCurrent( context );
 	assert( ALC_TRUE == retVal );
 
-	alGenBuffers( NBUFFERS, buffer );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alGenBuffers( NBUFFERS, buffer );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 
-	alGenSources( 1, &source );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alGenSources( 1, &source );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 
 	freq = 44100 / soundQuality;
 	// calculate the number of samples per frame first
@@ -191,18 +199,18 @@ bool OpenAL::init()
 
 void OpenAL::resume()
 {
+	if( !initialized ) return;
 	winlog( "OpenAL::resume\n" );
-	assert( initialized );
 	if( !buffersLoaded ) return;
 	debugState();
 
 
 	ALint sourceState = 0;
-	alGetSourcei( source, AL_SOURCE_STATE, &sourceState );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alGetSourcei( source, AL_SOURCE_STATE, &sourceState );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 	if( sourceState != AL_PLAYING ) {
-		alSourcePlay( source );
-		assert( AL_NO_ERROR == alGetError() );
+		ALFunction.alSourcePlay( source );
+		assert( AL_NO_ERROR == ALFunction.alGetError() );
 	}
 	debugState();
 }
@@ -210,18 +218,18 @@ void OpenAL::resume()
 
 void OpenAL::pause()
 {
+	if( !initialized ) return;
 	winlog( "OpenAL::pause\n" );
-	assert( initialized );
 	if( !buffersLoaded ) return;
 	debugState();
 
 
 	ALint sourceState = 0;
-	alGetSourcei( source, AL_SOURCE_STATE, &sourceState );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alGetSourcei( source, AL_SOURCE_STATE, &sourceState );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 	if( sourceState == AL_PLAYING ) {
-		alSourcePause( source );
-		assert( AL_NO_ERROR == alGetError() );
+		ALFunction.alSourcePause( source );
+		assert( AL_NO_ERROR == ALFunction.alGetError() );
 	}
 	debugState();
 }
@@ -229,17 +237,17 @@ void OpenAL::pause()
 
 void OpenAL::reset()
 {
+	if( !initialized ) return;
 	winlog( "OpenAL::reset\n" );
-	assert( initialized );
 	if( !buffersLoaded ) return;
 	debugState();
 
 	ALint sourceState = 0;
-	alGetSourcei( source, AL_SOURCE_STATE, &sourceState );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alGetSourcei( source, AL_SOURCE_STATE, &sourceState );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 	if( sourceState != AL_STOPPED ) {
-		alSourceStop( source );
-		assert( AL_NO_ERROR == alGetError() );
+		ALFunction.alSourceStop( source );
+		assert( AL_NO_ERROR == ALFunction.alGetError() );
 	}
 	debugState();
 }
@@ -247,8 +255,8 @@ void OpenAL::reset()
 
 void OpenAL::write()
 {
+	if( !initialized ) return;
 	winlog( "OpenAL::write\n" );
-	assert( initialized );
 
 	debugState();
 
@@ -260,19 +268,19 @@ void OpenAL::write()
 		winlog( " initial buffer filling\n" );
 		for( int i = 0 ; i < NBUFFERS ; i++ ) {
 			// filling the buffers explicitly with silence would be cleaner...
-			alBufferData( buffer[i], AL_FORMAT_STEREO16, soundFinalWave, soundBufferLen, freq );
-			assert( AL_NO_ERROR == alGetError() );
+			ALFunction.alBufferData( buffer[i], AL_FORMAT_STEREO16, soundFinalWave, soundBufferLen, freq );
+			assert( AL_NO_ERROR == ALFunction.alGetError() );
 		}
 
-		alSourceQueueBuffers( source, NBUFFERS, buffer );
-		assert( AL_NO_ERROR == alGetError() );
+		ALFunction.alSourceQueueBuffers( source, NBUFFERS, buffer );
+		assert( AL_NO_ERROR == ALFunction.alGetError() );
 
 		buffersLoaded = true;
 	} else {
 		// ==normal buffer refreshing==
 		nBuffersProcessed = 0;
-		alGetSourcei( source, AL_BUFFERS_PROCESSED, &nBuffersProcessed );
-		assert( AL_NO_ERROR == alGetError() );
+		ALFunction.alGetSourcei( source, AL_BUFFERS_PROCESSED, &nBuffersProcessed );
+		assert( AL_NO_ERROR == ALFunction.alGetError() );
 
 		if( !speedup && synchronize && !theApp.throttle ) {
 			// wait until at least one buffer has finished
@@ -281,8 +289,8 @@ void OpenAL::write()
 				// wait for about half the time one buffer needs to finish
 				// unoptimized: ( sourceBufferLen * 1000 ) / ( freq * 2 * 2 ) * 1/2
 				Sleep( soundBufferLen / ( freq >> 7 ) );
-				alGetSourcei( source, AL_BUFFERS_PROCESSED, &nBuffersProcessed );
-				assert( AL_NO_ERROR == alGetError() );
+				ALFunction.alGetSourcei( source, AL_BUFFERS_PROCESSED, &nBuffersProcessed );
+				assert( AL_NO_ERROR == ALFunction.alGetError() );
 			}
 		} else {
 			if( nBuffersProcessed == 0 ) return;
@@ -292,23 +300,23 @@ void OpenAL::write()
 
 		// tempBuffer contains the Buffer ID for the unqueued Buffer
 		tempBuffer = 0;
-		alSourceUnqueueBuffers( source, 1, &tempBuffer );
-		assert( AL_NO_ERROR == alGetError() );
+		ALFunction.alSourceUnqueueBuffers( source, 1, &tempBuffer );
+		assert( AL_NO_ERROR == ALFunction.alGetError() );
 
-		alBufferData( tempBuffer, AL_FORMAT_STEREO16, soundFinalWave, soundBufferLen, freq );
-		assert( AL_NO_ERROR == alGetError() );
+		ALFunction.alBufferData( tempBuffer, AL_FORMAT_STEREO16, soundFinalWave, soundBufferLen, freq );
+		assert( AL_NO_ERROR == ALFunction.alGetError() );
 
 		// refill buffer
-		alSourceQueueBuffers( source, 1, &tempBuffer );
-		assert( AL_NO_ERROR == alGetError() );
+		ALFunction.alSourceQueueBuffers( source, 1, &tempBuffer );
+		assert( AL_NO_ERROR == ALFunction.alGetError() );
 	}
 
 	// start playing the source if necessary
-	alGetSourcei( source, AL_SOURCE_STATE, &sourceState );
-	assert( AL_NO_ERROR == alGetError() );
+	ALFunction.alGetSourcei( source, AL_SOURCE_STATE, &sourceState );
+	assert( AL_NO_ERROR == ALFunction.alGetError() );
 	if( !soundPaused && ( sourceState != AL_PLAYING ) ) {
-		alSourcePlay( source );
-		assert( AL_NO_ERROR == alGetError() );
+		ALFunction.alSourcePlay( source );
+		assert( AL_NO_ERROR == ALFunction.alGetError() );
 	}
 }
 
