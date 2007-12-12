@@ -3,6 +3,11 @@
 #pragma once
 #include "afxwin.h"
 
+// OpenAL
+#include <al.h>
+#include <alc.h>
+#include "LoadOAL.h"
+
 
 // OALConfig dialog
 
@@ -24,6 +29,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 private:
 	CComboBox cbDevice;
+	OPENALFNTABLE ALFunction;
 public:
 	CString selectedDevice;
 };

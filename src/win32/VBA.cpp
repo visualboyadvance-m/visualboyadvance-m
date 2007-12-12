@@ -1214,7 +1214,7 @@ bool systemSoundInit()
 	  theApp.sound = newDirectSound();
 	  break;
 #ifndef NO_OAL
-  case OPENAL:
+  case OPENAL_SOUND:
 	  theApp.sound = newOpenAL();
 	  break;
 #endif
@@ -1431,7 +1431,7 @@ void VBA::loadSettings()
   audioAPI = (AUDIO_API)regQueryDwordValue( "audioAPI", DIRECTSOUND );
   if( ( audioAPI != DIRECTSOUND )
 #ifndef NO_OAL
-	  && ( audioAPI != OPENAL )
+	  && ( audioAPI != OPENAL_SOUND )
 #endif
 	  ) {
 		  audioAPI = DIRECTSOUND;

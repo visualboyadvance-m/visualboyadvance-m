@@ -1980,8 +1980,8 @@ void MainWnd::OnUpdateOutputapiDirectsound(CCmdUI *pCmdUI)
 void MainWnd::OnOutputapiOpenal()
 {
 #ifndef NO_OAL
-	if( theApp.audioAPI != OPENAL ) {
-		theApp.audioAPI = OPENAL;
+	if( theApp.audioAPI != OPENAL_SOUND ) {
+		theApp.audioAPI = OPENAL_SOUND;
 		systemSoundShutdown();
 		systemSoundInit();
 	}
@@ -1991,7 +1991,7 @@ void MainWnd::OnOutputapiOpenal()
 void MainWnd::OnUpdateOutputapiOpenal(CCmdUI *pCmdUI)
 {
 #ifndef NO_OAL
-	pCmdUI->SetCheck( ( theApp.audioAPI == OPENAL ) ? 1 : 0 );
+	pCmdUI->SetCheck( ( theApp.audioAPI == OPENAL_SOUND ) ? 1 : 0 );
 #endif
 }
 
