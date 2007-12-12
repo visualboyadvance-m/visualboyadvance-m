@@ -23,7 +23,7 @@
 enum AUDIO_API {
 	DIRECTSOUND
 #ifndef NO_OAL
-	, OPENAL
+	, OPENAL_SOUND
 #endif
 };
 
