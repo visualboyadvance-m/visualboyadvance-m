@@ -625,6 +625,19 @@ void MainWnd::OnUpdateOptionsVideoRenderoptionsGlpolygons(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(theApp.glType == 2);
 }
 
+void MainWnd::OnUpdateOptionsVideoRenderingoptionsGLSLShaders(CCmdUI* pCmdUI)
+{
+  pCmdUI->SetCheck(theApp.GLSLShaders);
+}
+
+void MainWnd::OnOptionsVideoRenderingoptionsGLSLShaders()
+{
+	theApp.GLSLShaders = !theApp.GLSLShaders;
+	if( theApp.GLSLShaders ) {
+		theApp.display->setOption( _T("GLSLShaders"), theApp.GLSLShaders );
+	}
+}
+
 void MainWnd::OnOptionsEmulatorAssociate()
 {
   theApp.winCheckFullscreen();

@@ -50,9 +50,9 @@ ${MAINDIR}/hq2x${OE} ${MAINDIR}/GBA-thumb${OE} ${MAINDIR}/GBA-arm${OE} ${MAINDIR
 ${MAINDIR}/Mode1${OE} ${MAINDIR}/Mode2${OE} ${MAINDIR}/Mode3${OE} ${MAINDIR}/Mode4${OE} \
 ${MAINDIR}/Mode5${OE} ${MAINDIR}/motionblur${OE} ${MAINDIR}/pixel${OE} ${MAINDIR}/portable${OE} \
 ${MAINDIR}/remote${OE} ${MAINDIR}/RTC${OE} ${MAINDIR}/scanline${OE} ${MAINDIR}/simpleFilter${OE} \
-${MAINDIR}/snd_interp${OE} ${MAINDIR}/Sound${OE} ${MAINDIR}/Sram${OE} ${MAINDIR}/Text${OE} \
+${MAINDIR}/fex_mini${OE} ${MAINDIR}/Sound${OE} ${MAINDIR}/Sram${OE} ${MAINDIR}/Text${OE} \
 ${MAINDIR}/unzip${OE} ${MAINDIR}/Util${OE} ${MAINDIR}/exprNode${OE} ${MAINDIR}/getopt${OE} \
-${MAINDIR}/getopt1${OE} ${MAINDIR}/memgzio${OE} ${MAINDIR}/expr-lex${OE} ${MAINDIR}/expr${OE}
+${MAINDIR}/getopt1${OE} ${MAINDIR}/memgzio${OE} ${MAINDIR}/expr-lex${OE} ${MAINDIR}/expr${OE} \
 
 DMGOBJ=${DMGDIR}/GB${OE} ${DMGDIR}/gbCheats${OE} ${DMGDIR}/gbDis${OE} ${DMGDIR}/gbGfx${OE} \
 ${DMGDIR}/gbGlobals${OE} ${DMGDIR}/gbMemory${OE} ${DMGDIR}/gbPrinter${OE} ${DMGDIR}/gbSGB${OE} \
