@@ -68,7 +68,7 @@ struct File_Extractor
 	void* user_data;
 	fex_user_cleanup_t user_cleanup;
 
-	char* name() { return (char*) (this + 1); }
+	char* name() const { return (char*) (this + 1); }
 };
 
 // Always identify as single file extractor
