@@ -28,7 +28,7 @@ File_Extractor* fex_open( const char* path, fex_err_t* err_out );
 int fex_done( File_Extractor const* );
 
 /* Name of current file. */
-const char* fex_name( File_Extractor const* );
+const char* fex_name( File_Extractor* );
 
 /* Size of current file. */
 long fex_size( File_Extractor const* );
