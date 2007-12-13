@@ -150,7 +150,7 @@ void      fex_set_user_cleanup  ( File_Extractor* fe, fex_user_cleanup_t func ) 
 
 fex_type_t fex_type             ( File_Extractor const* )                       { return fex_bin_type; }
 int       fex_done              ( File_Extractor const* fe )                    { return fe->done; }
-const char* fex_name            ( File_Extractor const* fe )                    { return fe->name(); }
+const char* fex_name            ( File_Extractor* fe )                           { return fe->name(); }
 unsigned long fex_dos_date      ( File_Extractor const* )                       { return 0; }
 long      fex_size              ( File_Extractor const* fe )                    { return fe->size; }
 long      fex_remain            ( File_Extractor const* fe )                    { return fe->size - FILE_GZ(ftell,gztell)( fe->file ); }

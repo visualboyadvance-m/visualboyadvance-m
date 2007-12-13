@@ -32,6 +32,8 @@
 #include <cmath>
 #include "glFont.h"
 
+#pragma comment(lib,"glew32.lib")
+#include <GL/glew.h>
 // OpenGL
 #include <gl/GL.h> // main include file
 #ifdef HAS_GLEXT
@@ -68,6 +70,9 @@ private:
 	RECT destRect;
 	bool failed;
 	GLFONT font;
+	char *VertexShaderSource,*FragmentShaderSource;
+    int VertexShader,FragmentShader;
+    int ShaderProgram;
 
 	void initializeMatrices( int w, int h );
 	bool initializeTexture( int w, int h );
@@ -75,6 +80,10 @@ private:
 	void setVSync( int interval = 1 );
 	void calculateDestRect( int w, int h );
 	void initializeFont();
+	void InitShader();
+	void DeInitShader();
+	void rasterise();
+
 
 public:
 	OpenGLDisplay();
@@ -93,8 +102,10 @@ public:
 	virtual int  selectFullScreenMode( GUID ** );
 };
 
-#include "gzglfont.h"
 
+
+#include "gzglfont.h"
+char *readShaderFile(char *FileName);
 void OpenGLDisplay::initializeFont()
 {
     int ret;
@@ -126,7 +137,61 @@ void OpenGLDisplay::initializeFont()
     (void)inflateEnd(&strm);
 }
 
+char *readShaderFile(char *FileName) {
+	FILE *fp;
+	char *DATA = NULL;
 
+	int flength = 0;
+
+	fp = fopen(FileName,"rt");
+
+    fseek(fp, 0, SEEK_END);
+    flength = ftell(fp);
+    rewind(fp);
+
+	DATA = (char *)malloc(sizeof(char) * (flength+1));
+	flength = fread(DATA, sizeof(char), flength, fp);
+	DATA[flength] = '\0';
+		
+	fclose(fp);	
+
+	return DATA;
+}
+
+void OpenGLDisplay::DeInitShader () {
+	glDetachObjectARB(ShaderProgram,VertexShader);
+	glDetachObjectARB(ShaderProgram,FragmentShader);
+	glDeleteObjectARB(ShaderProgram);
+}
+
+void OpenGLDisplay::InitShader () {
+	GLEW_ARB_vertex_shader;
+	GLEW_ARB_fragment_shader;
+
+	VertexShader = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+	FragmentShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+
+	VertexShaderSource = readShaderFile("vertex_shader.vert");
+	FragmentShaderSource = readShaderFile("fragment_shader.frag");
+
+	const char * VS = VertexShaderSource;
+	const char * FS = FragmentShaderSource;
+
+	glShaderSourceARB(VertexShader, 1, &VS,NULL);
+	glShaderSourceARB(FragmentShader, 1, &FS,NULL);
+		
+	free(VertexShaderSource);free(FragmentShaderSource);
+		
+	glCompileShaderARB(VertexShader);
+	glCompileShaderARB(FragmentShader);
+		
+	ShaderProgram = glCreateProgramObjectARB();
+			
+	glAttachObjectARB(ShaderProgram,VertexShader);
+	glAttachObjectARB(ShaderProgram,FragmentShader);
+
+	glLinkProgramARB(ShaderProgram);
+}
 
 OpenGLDisplay::OpenGLDisplay()
 {
@@ -143,6 +208,7 @@ OpenGLDisplay::OpenGLDisplay()
 
 OpenGLDisplay::~OpenGLDisplay()
 {
+	DeInitShader();
 	cleanup();
 }
 
@@ -205,8 +271,8 @@ bool OpenGLDisplay::initialize()
 	glEnable( GL_TEXTURE_2D );
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
-
+	glewInit();
+	
 	initializeMatrices( theApp.surfaceSizeX, theApp.surfaceSizeY );
 
 	setVSync( theApp.vsync );
@@ -243,12 +309,8 @@ void OpenGLDisplay::clear()
 	glClear( GL_COLOR_BUFFER_BIT );
 }
 
-
-void OpenGLDisplay::render()
+void OpenGLDisplay::rasterise()
 {
-	clear();
-
-
 	int pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
 	u8 *data = pix + ( theApp.sizeX + 1 ) * 4;
 
@@ -273,17 +335,7 @@ void OpenGLDisplay::render()
 	} else {
 		glPixelStorei( GL_UNPACK_ROW_LENGTH, theApp.sizeX + 1 );
 	}
-
-    glTexSubImage2D(
-		GL_TEXTURE_2D,
-		0,
-		0,
-		0,
-		width,
-		height,
-		GL_RGBA,
-		GL_UNSIGNED_BYTE,
-		data );
+    glTexSubImage2D(GL_TEXTURE_2D,0,0,0,width,height,GL_RGBA,GL_UNSIGNED_BYTE,data );
 
 	if( theApp.glType == 0 ) {
 		glBegin( GL_TRIANGLE_STRIP );
@@ -377,12 +429,30 @@ void OpenGLDisplay::render()
 		}
 	}
 
+}
 
+void OpenGLDisplay::render()
+{ 
+	clear();
+	if (theApp.GLSLShaders){
+	InitShader();
+	glUseProgramObjectARB(ShaderProgram);
+    int texture_location = glGetUniformLocationARB(ShaderProgram, "ShaderTexture");
+	glUniform1iARB(texture_location, 0);
+	}
+	else{
+	glUseProgramObjectARB(NULL);
+	DeInitShader();
+	}
+	rasterise();
+	
 	glFlush();
+	
+
 	SwapBuffers( hDC );
 	// since OpenGL draws on the back buffer,
 	// we have to swap it to the front buffer to see it
-
+    
 	// draw informations with GDI on the front buffer
 }
 

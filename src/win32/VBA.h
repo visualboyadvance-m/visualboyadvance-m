@@ -163,6 +163,7 @@ class VBA : public CWinApp
   bool ddrawUseVideoMemory;
   int d3dFilter;
   int glFilter;
+  int GLSLShaders;
   int glType;
   bool dinputKeyFocus;
   CSkin *skin;
