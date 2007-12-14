@@ -61,7 +61,6 @@ ${DMGDIR}/gbSound${OE}
 SDLOBJ=${SDLDIR}/debugger${OE} ${SDLDIR}/SDL${OE} ${SDLDIR}/dummy${OE}
 
 OBJECTS=${MAINOBJ} ${DMGOBJ} ${SDLOBJ} ${GBAPUOBJ}
-LIB=
 
 ifeq ($(USEASM),yes)
 OBJECTS+=${ASMOBJ}
@@ -83,9 +82,9 @@ endif
 
 ALL: ${OUT}
 
-${OUT}: ${OBJECTS} ${LIB}
-	$(CPPC) -o $@ ${OBJECTS} ${LIB} ${LFLAGS}
+${OUT}: ${OBJECTS} 
+	$(CPPC) -o $@ ${OBJECTS} ${LFLAGS}
 	$(STRIP) $@
 
 clean:
-	$(DEL) ${OUT} ${OBJECTS} ${LIB}
+	$(DEL) ${OUT} ${OBJECTS} 

@@ -37,7 +37,7 @@
 #include "../RTC.h"
 #include "../Sound.h"
 #include "../Text.h"
-#include "../unzip.h"
+#include "zlib.h"
 #include "../Util.h"
 #include "../gb/gb.h"
 #include "../gb/gbGlobals.h"
@@ -285,7 +285,7 @@ char screenMessageBuffer[21];
 u32  screenMessageTime = 0;
 
 // Patch #1382692 by deathpudding.
-const  int        sdlSoundSamples  = 2048;
+const  int        sdlSoundSamples  = 4096;
 const  int        sdlSoundAlign    = 4;
 const  int        sdlSoundCapacity = sdlSoundSamples * 2;
 const  int        sdlSoundTotalLen = sdlSoundCapacity + sdlSoundAlign;
@@ -3171,7 +3171,7 @@ SDL_mutexP(sdlSoundMutex);
   const int nAvail = soundBufferUsed();
   if (len > nAvail)
     len = nAvail;
-  const int nAvail2 = ((sdlSoundTotalLen - sdlSoundRPos) + sdlSoundTotalLen) % sdlSoundTotalLen;
+  const int nAvail2 = sdlSoundTotalLen - sdlSoundRPos;
   if (len >= nAvail2) {
     memcpy(stream, &sdlSoundBuffer[sdlSoundRPos], nAvail2);
     sdlSoundRPos = 0;
@@ -3186,47 +3186,47 @@ SDL_mutexP(sdlSoundMutex);
   SDL_CondSignal(sdlSoundCond);
   SDL_mutexV(sdlSoundMutex);
 }
+
 void systemWriteDataToSoundBuffer()
 {
-    if (SDL_GetAudioStatus() != SDL_AUDIO_PLAYING)
+  if (SDL_GetAudioStatus() != SDL_AUDIO_PLAYING)
   {
     SDL_PauseAudio(0);
   }
- int       remain = soundBufferLen;
-  const u8 *wave   = reinterpret_cast<const u8 *>(soundFinalWave);
-  if (remain <= 0)
-    return;
+
+  int remain = soundBufferLen;
+  const u8 *wave = reinterpret_cast<const u8 *>(soundFinalWave);
+
   SDL_mutexP(sdlSoundMutex);
+
   int n;
   while (remain >= (n = soundBufferFree())) {
-    const int nAvail = ((sdlSoundTotalLen - sdlSoundWPos) + sdlSoundTotalLen) % sdlSoundTotalLen;
-    if (n >= nAvail) {
-      memcpy(&sdlSoundBuffer[sdlSoundWPos], wave, nAvail);
-      sdlSoundWPos  = 0;
-      wave       += nAvail;
-      remain     -= nAvail;
-      n          -= nAvail;
-	}
+  const int nAvail = (sdlSoundTotalLen - sdlSoundWPos) < n ? (sdlSoundTotalLen - sdlSoundWPos) : n;
+   memcpy(&sdlSoundBuffer[sdlSoundWPos], wave, nAvail);
+   sdlSoundWPos = (sdlSoundWPos + nAvail) % sdlSoundTotalLen;
+    wave        += nAvail;
+    remain      -= nAvail;
+
 	if (!emulating || speedup || throttle) {
-     SDL_mutexV(sdlSoundMutex);
+       SDL_mutexV(sdlSoundMutex);
       return;
     }
     SDL_CondWait(sdlSoundCond, sdlSoundMutex);
-   }
-  const int nAvail = ((sdlSoundTotalLen - sdlSoundWPos) + sdlSoundTotalLen) % sdlSoundTotalLen;
+}
+
+const int nAvail = sdlSoundTotalLen - sdlSoundWPos;
   if (remain >= nAvail) {
     memcpy(&sdlSoundBuffer[sdlSoundWPos], wave, nAvail);
     sdlSoundWPos = 0;
     wave   += nAvail;
     remain -= nAvail;
-   }
+  }
   if (remain > 0) {
     memcpy(&sdlSoundBuffer[sdlSoundWPos], wave, remain);
     sdlSoundWPos = (sdlSoundWPos + remain) % sdlSoundTotalLen;
   }
   SDL_mutexV(sdlSoundMutex);
- }
-  
+}
 
 bool systemSoundInit()
 {
