@@ -20,7 +20,9 @@ OALConfig::OALConfig(CWnd* pParent /*=NULL*/)
 	: CDialog(OALConfig::IDD, pParent)
 	, selectedDevice(_T(""))
 {
-
+	if( !LoadOAL10Library( NULL, &ALFunction ) ) {
+		systemMessage( IDS_OAL_NODLL, "OpenAL32.dll could not be found on your system. Please install the runtime from http://openal.org" );
+	}
 }
 
 OALConfig::~OALConfig()
@@ -54,10 +56,6 @@ BOOL OALConfig::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	if( !LoadOAL10Library( NULL, &ALFunction ) ) {
-		systemMessage( IDS_OAL_NODLL, "OpenAL32.dll could not be found on your system. Please install the runtime from http://openal.org" );
-		return false;
-	}
 
 	return TRUE;
 }
