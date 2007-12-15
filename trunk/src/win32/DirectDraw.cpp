@@ -569,7 +569,7 @@ void DirectDrawDisplay::render()
     if(hret == DD_OK) {
       hret = ddsOffscreen->Restore();
 
-      if(hret == DD_OK) {
+	  if(hret == DD_OK) {
         hret = ddsOffscreen->Lock(NULL,
                                   &ddsDesc,
                                   DDLOCK_WRITEONLY|
@@ -580,46 +580,49 @@ void DirectDrawDisplay::render()
                                   NULL);
 
       }
-    }
+	}
   }
 
   if(hret == DD_OK) {
-    if(theApp.filterFunction) {
-      if(systemColorDepth == 16)
-        (*theApp.filterFunction)(pix+theApp.filterWidth*2+4,
-                                 theApp.filterWidth*2+4,
-                                 (u8*)theApp.delta,
-                                 (u8*)ddsDesc.lpSurface,
-                                 ddsDesc.lPitch,
-                                 theApp.filterWidth,
-                                 theApp.filterHeight);
-      else
-        (*theApp.filterFunction)(pix+theApp.filterWidth*4+4,
-                                 theApp.filterWidth*4+4,
-                                 (u8*)theApp.delta,
-                                 (u8*)ddsDesc.lpSurface,
-                                 ddsDesc.lPitch,
-                                 theApp.filterWidth,
-                                 theApp.filterHeight);
-
-    } else {
-      int copyX = 240;
-      int copyY = 160;
-
-      if(theApp.cartridgeType == 1) {
-        if(gbBorderOn) {
-          copyX = 256;
-          copyY = 224;
-        } else {
-          copyX = 160;
-          copyY = 144;
-        }
-      }
-	  if( systemColorDepth == 16 ) {
-		  copyX++; // TODO: workaround results in one pixel black border at right side
+	  unsigned short pitch = theApp.sizeX * ( systemColorDepth >> 3 ) + 4;
+	  if( theApp.filterFunction ) {
+		  // pixel filter enabled
+		  theApp.filterFunction(
+			  pix + pitch,
+			  pitch,
+			  (u8*)theApp.delta,
+			  (u8*)ddsDesc.lpSurface,
+			  ddsDesc.lPitch,
+			  theApp.sizeX,
+			  theApp.sizeY
+			  );
+	  } else {
+		  // pixel filter disabled
+		  switch( systemColorDepth )
+		  {
+		  case 32:
+			  cpyImg32(				  
+				  (unsigned char *)ddsDesc.lpSurface,
+				  ddsDesc.lPitch,
+				  pix + pitch,
+				  pitch,
+				  theApp.sizeX,
+				  theApp.sizeY
+				  );
+			  break;
+		  case 16:
+			  cpyImg16(
+				  (unsigned char *)ddsDesc.lpSurface,
+				  ddsDesc.lPitch,
+				  pix + pitch,
+				  pitch,
+				  theApp.sizeX,
+				  theApp.sizeY
+				  );
+			  break;
+		  }
 	  }
-	  copyImage( pix, ddsDesc.lpSurface, copyX, copyY, ddsDesc.lPitch, systemColorDepth );
-    }
+
     if(theApp.showSpeed && (theApp.videoOption > VIDEO_4X || theApp.skin != NULL)) {
       char buffer[30];
       if(theApp.showSpeed == 1)
