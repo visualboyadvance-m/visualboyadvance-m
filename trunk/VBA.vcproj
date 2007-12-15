@@ -1340,10 +1340,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\win32\display.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\win32\glfont.c"
 					>
 					<FileConfiguration
