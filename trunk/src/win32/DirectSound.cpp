@@ -182,21 +182,19 @@ bool DirectSound::init()
 	}
 
 
-	if( !theApp.useOldSync ) {
-		if( SUCCEEDED( hr = dsbSecondary->QueryInterface( IID_IDirectSoundNotify8, (LPVOID*)&dsbNotify ) ) ) {
-			dsbEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
-			DSBPOSITIONNOTIFY notify[10];
-			for( i = 0; i < 10; i++ ) {
-				notify[i].dwOffset = i * soundBufferLen;
-				notify[i].hEventNotify = dsbEvent;
-			}
+	if( SUCCEEDED( hr = dsbSecondary->QueryInterface( IID_IDirectSoundNotify8, (LPVOID*)&dsbNotify ) ) ) {
+		dsbEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
+		DSBPOSITIONNOTIFY notify[10];
+		for( i = 0; i < 10; i++ ) {
+			notify[i].dwOffset = i * soundBufferLen;
+			notify[i].hEventNotify = dsbEvent;
+		}
 
-			if( FAILED( dsbNotify->SetNotificationPositions( 10, notify ) ) ) {
-				dsbNotify->Release();
-				dsbNotify = NULL;
-				CloseHandle(dsbEvent);
-				dsbEvent = NULL;
-			}
+		if( FAILED( dsbNotify->SetNotificationPositions( 10, notify ) ) ) {
+			dsbNotify->Release();
+			dsbNotify = NULL;
+			CloseHandle(dsbEvent);
+			dsbEvent = NULL;
 		}
 	}
 

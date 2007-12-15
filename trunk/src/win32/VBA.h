@@ -172,7 +172,6 @@ class VBA : public CWinApp
   int skinButtons;
   bool pauseWhenInactive;
   bool speedupToggle;
-  bool useOldSync;
   bool winGbPrinterEnabled;
   int threadPriority;
   bool disableMMX;
