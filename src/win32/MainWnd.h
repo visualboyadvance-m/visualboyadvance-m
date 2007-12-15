@@ -452,6 +452,7 @@ public:
 	afx_msg void OnOutputapiOpenal();
 	afx_msg void OnUpdateOutputapiOpenal(CCmdUI *pCmdUI);
 	afx_msg void OnOutputapiOalconfiguration();
+	afx_msg void OnUpdateOutputapiOalconfiguration(CCmdUI *pCmdUI);
 };
 
 /////////////////////////////////////////////////////////////////////////////
