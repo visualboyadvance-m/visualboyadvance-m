@@ -457,6 +457,7 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_OPENAL, &MainWnd::OnUpdateOutputapiOpenal)
   ON_COMMAND(ID_OUTPUTAPI_OALCONFIGURATION, &MainWnd::OnOutputapiOalconfiguration)
   ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_OALCONFIGURATION, &MainWnd::OnUpdateOutputapiOalconfiguration)
+  ON_WM_MOVING()
   END_MESSAGE_MAP()
 
 
@@ -746,10 +747,19 @@ void MainWnd::OnInitMenuPopup(CMenu* pMenu, UINT nIndex, BOOL bSysMenu)
   }
 }
 
+void MainWnd::OnMoving(UINT fwSide, LPRECT pRect)
+{
+	CWnd::OnMoving(fwSide, pRect);
+	
+	if( emulating ) {
+		soundPause();
+	}
+}
+
 void MainWnd::OnMove(int x, int y)
 {
   CWnd::OnMove(x, y);
-
+  
   if(!theApp.changingVideoSize) {
     if(this) {
       if(!IsIconic()) {
@@ -1262,10 +1272,8 @@ void MainWnd::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
   if(a && theApp.input) {
     theApp.active = a;
     theApp.input->activate();
-    if(!theApp.paused) {
-      if(emulating) {
-        soundResume();
-      }
+    if(!theApp.paused && emulating) {
+      soundResume();
     }
   } else {
     theApp.wasPaused = true;
