@@ -1006,18 +1006,6 @@ void MainWnd::OnUpdateOptionsSoundOn(CCmdUI* pCmdUI)
   pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
 }
 
-void MainWnd::OnOptionsSoundUseoldsynchronization()
-{
-  theApp.useOldSync = !theApp.useOldSync;
-  systemMessage(IDS_SETTING_WILL_BE_EFFECTIVE,
-                "Setting will be effective the next time you start the emulator");
-}
-
-void MainWnd::OnUpdateOptionsSoundUseoldsynchronization(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(theApp.useOldSync);
-}
-
 void MainWnd::OnOptionsSoundEcho()
 {
   soundEcho = !soundEcho;
