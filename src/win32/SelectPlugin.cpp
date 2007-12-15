@@ -82,7 +82,7 @@ BOOL SelectPlugin::OnInitDialog()
 
 		for (int ii = 0; ii < rpiPool.size(); ii++)
 		{
-			if (stricmp(theApp.pluginName, rpiPool[ii].sFile) == 0)
+			if (_stricmp(theApp.pluginName, rpiPool[ii].sFile) == 0)
 			{
 				m_comboPlugin.SetCurSel(ii);
 				break;
