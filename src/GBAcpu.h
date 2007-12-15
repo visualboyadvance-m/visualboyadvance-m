@@ -289,7 +289,7 @@ inline int codeTicksAccessSeq32(u32 address) // ARM SEQ
 // Emulates the Cheat System (m) code
 inline void cpuMasterCodeCheck()
 {
-  if((cheatsEnabled) && (mastercode) && (mastercode == armNextPC))
+  if((mastercode) && (mastercode == armNextPC))
   {
     u32 joy = 0;
     if(systemReadJoypads())

@@ -2295,7 +2295,9 @@ static insnfunc_t thumbInsnTable[1024] = {
 int thumbExecute()
 {
   do {
-    cpuMasterCodeCheck();
+	  if( cheatsEnabled ) {
+		  cpuMasterCodeCheck();
+	  }
 
     //if ((armNextPC & 0x0803FFFF) == 0x08020000)
     //    busPrefetchCount=0x100;
