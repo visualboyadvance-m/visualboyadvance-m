@@ -77,20 +77,6 @@ DirectSound::DirectSound()
 
 DirectSound::~DirectSound()
 {
-	if(theApp.aviRecorder) {
-		delete theApp.aviRecorder;
-		theApp.aviRecorder = NULL;
-		theApp.aviFrameNumber = 0;
-	}
-
-	if(theApp.soundRecording) {
-		if(theApp.soundRecorder) {
-			delete theApp.soundRecorder;
-			theApp.soundRecorder = NULL;
-		}
-		theApp.soundRecording = false;
-	}
-
 	if(dsbNotify) {
 		dsbNotify->Release();
 		dsbNotify = NULL;

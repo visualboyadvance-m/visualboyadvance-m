@@ -391,16 +391,6 @@ VBA::~VBA()
     movieLastJoypad = 0;
   }
 
-  if(aviRecorder) {
-    delete aviRecorder;
-    aviRecording = false;
-  }
-
-  if(soundRecorder) {
-    delete soundRecorder;
-    soundRecorder = NULL;
-  }
-  soundRecording = false;
   soundPause();
   soundShutdown();
 
@@ -1204,33 +1194,49 @@ int systemGetSensorY()
   return theApp.sensorY;
 }
 
+
 bool systemSoundInit()
 {
-  if(theApp.sound)
-    delete theApp.sound;
-
-  switch( theApp.audioAPI )
-  {
-  case DIRECTSOUND:
-	  theApp.sound = newDirectSound();
-	  break;
+	systemSoundShutdown();
+	
+	switch( theApp.audioAPI )
+	{
+	case DIRECTSOUND:
+		theApp.sound = newDirectSound();
+		break;
 #ifndef NO_OAL
-  case OPENAL_SOUND:
-	  theApp.sound = newOpenAL();
-	  break;
+	case OPENAL_SOUND:
+		theApp.sound = newOpenAL();
+		break;
 #endif
-  }
+	}
 
-  return theApp.sound->init();
+	return theApp.sound->init();
 }
 
 
 void systemSoundShutdown()
 {
-  if(theApp.sound)
-    delete theApp.sound;
-  theApp.sound = NULL;
+	if( theApp.aviRecorder ) {
+		delete theApp.aviRecorder;
+		theApp.aviRecorder = NULL;
+		theApp.aviFrameNumber = 0;
+	}
+
+	if( theApp.soundRecording ) {
+		if( theApp.soundRecorder ) {
+			delete theApp.soundRecorder;
+			theApp.soundRecorder = NULL;
+		}
+		theApp.soundRecording = false;
+	}
+
+	if( theApp.sound ) {
+		delete theApp.sound;
+		theApp.sound = NULL;
+	}
 }
+
 
 void systemSoundPause()
 {
