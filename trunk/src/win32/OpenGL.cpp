@@ -82,7 +82,6 @@ private:
 	void initializeFont();
 	void InitShader();
 	void DeInitShader();
-	void rasterise();
 
 
 public:
@@ -309,8 +308,20 @@ void OpenGLDisplay::clear()
 	glClear( GL_COLOR_BUFFER_BIT );
 }
 
-void OpenGLDisplay::rasterise()
-{
+void OpenGLDisplay::render()
+{ 
+	clear();
+	if (theApp.GLSLShaders){
+	InitShader();
+	glUseProgramObjectARB(ShaderProgram);
+    int texture_location = glGetUniformLocationARB(ShaderProgram, "OGL2Texture");
+	glUniform1iARB(texture_location, 0);
+	}
+	else{
+	glUseProgramObjectARB(NULL);
+	DeInitShader();
+	}
+	
 	int pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
 	u8 *data = pix + ( theApp.sizeX + 1 ) * 4;
 
@@ -428,23 +439,6 @@ void OpenGLDisplay::rasterise()
 			theApp.screenMessage = false;
 		}
 	}
-
-}
-
-void OpenGLDisplay::render()
-{ 
-	clear();
-	if (theApp.GLSLShaders){
-	InitShader();
-	glUseProgramObjectARB(ShaderProgram);
-    int texture_location = glGetUniformLocationARB(ShaderProgram, "ShaderTexture");
-	glUniform1iARB(texture_location, 0);
-	}
-	else{
-	glUseProgramObjectARB(NULL);
-	DeInitShader();
-	}
-	rasterise();
 	
 	glFlush();
 	
