@@ -1252,8 +1252,43 @@ void systemSoundResume()
 
 void systemWriteDataToSoundBuffer()
 {
-  if(theApp.sound)
-    theApp.sound->write();
+	if( theApp.soundRecording ) {
+		if( theApp.soundRecorder ) {
+			theApp.soundRecorder->AddSound( (const u8 *)soundFinalWave, soundBufferLen );
+		} else {
+			WAVEFORMATEX format;
+			format.cbSize = 0;
+			format.wFormatTag = WAVE_FORMAT_PCM;
+			format.nChannels = 2;
+			format.nSamplesPerSec = 44100 / soundQuality;
+			format.wBitsPerSample = 16;
+			format.nBlockAlign = format.nChannels * ( format.wBitsPerSample >> 3 );
+			format.nAvgBytesPerSec = format.nSamplesPerSec * format.nBlockAlign;
+			theApp.soundRecorder = new WavWriter;
+			if( theApp.soundRecorder->Open( theApp.soundRecordName ) ) {
+				theApp.soundRecorder->SetFormat( &format );
+			}
+		}
+	}
+
+	if( theApp.aviRecording && theApp.aviRecorder ) {
+		if( !theApp.aviRecorder->IsSoundAdded() ) {
+			WAVEFORMATEX format;
+			format.cbSize = 0;
+			format.wFormatTag = WAVE_FORMAT_PCM;
+			format.nChannels = 2;
+			format.nSamplesPerSec = 44100 / soundQuality;
+			format.wBitsPerSample = 16;
+			format.nBlockAlign = format.nChannels * ( format.wBitsPerSample >> 3 );
+			format.nAvgBytesPerSec = format.nSamplesPerSec * format.nBlockAlign;
+			theApp.aviRecorder->SetSoundFormat( &format );
+		}
+		theApp.aviRecorder->AddSound( (const char *)soundFinalWave, soundBufferLen );
+	}
+
+	if( theApp.sound ) {
+		theApp.sound->write();
+	}	
 }
 
 bool systemCanChangeSoundQuality()

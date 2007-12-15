@@ -264,40 +264,10 @@ void DirectSound::write()
 	HRESULT      hr;
 	DWORD        status = 0;
 	DWORD        play = 0;
-	WAVEFORMATEX format;
 	LPVOID       lpvPtr1;
 	DWORD        dwBytes1 = 0;
 	LPVOID       lpvPtr2;
 	DWORD        dwBytes2 = 0;
-
-
-	if( theApp.soundRecording ) {
-		if( dsbSecondary ) {
-			if( theApp.soundRecorder ) {
-				theApp.soundRecorder->AddSound( (u8 *)soundFinalWave, soundBufferLen );
-			} else {
-				theApp.soundRecorder = new WavWriter;
-				dsbSecondary->GetFormat( &format, sizeof(format), NULL );
-				if( theApp.soundRecorder->Open( theApp.soundRecordName ) ) {
-					theApp.soundRecorder->SetFormat( &format );
-				}
-			}
-		}
-	}
-
-
-	if( theApp.aviRecording ) {
-		if( theApp.aviRecorder ) {
-			if( dsbSecondary ) {
-				if( !theApp.aviRecorder->IsSoundAdded() ) {
-					dsbSecondary->GetFormat( &format, sizeof(format), NULL );
-					theApp.aviRecorder->SetSoundFormat( &format );
-				}
-			}
-			theApp.aviRecorder->AddSound( (const char *)soundFinalWave, soundBufferLen );
-		}
-	}
-
 
 	if( !speedup && synchronize && !theApp.throttle ) {
 		hr = dsbSecondary->GetStatus(&status);
