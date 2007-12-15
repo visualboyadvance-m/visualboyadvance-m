@@ -1643,7 +1643,7 @@ void VBA::loadSettings()
   autoLoadMostRecent = regQueryDwordValue("autoLoadMostRecent", false) ? true :
     false;
 
-  cheatsEnabled = regQueryDwordValue("cheatsEnabled", true) ? true : false;
+  cheatsEnabled = regQueryDwordValue("cheatsEnabled", false) ? true : false;
 
   fsMaxScale = regQueryDwordValue("fsMaxScale", 0);
 
