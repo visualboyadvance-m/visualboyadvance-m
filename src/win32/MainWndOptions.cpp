@@ -976,6 +976,7 @@ void MainWnd::OnOptionsSoundOff()
 void MainWnd::OnUpdateOptionsSoundOff(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(soundOffFlag);
+  pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
 }
 
 void MainWnd::OnOptionsSoundMute()
@@ -1002,6 +1003,7 @@ void MainWnd::OnUpdateOptionsSoundOn(CCmdUI* pCmdUI)
 {
   int active = soundGetEnable() & 0x30f;
   pCmdUI->SetCheck(active != 0 && !soundOffFlag);
+  pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
 }
 
 void MainWnd::OnOptionsSoundUseoldsynchronization()
@@ -1057,6 +1059,7 @@ void MainWnd::OnOptionsSound11khz()
 void MainWnd::OnUpdateOptionsSound11khz(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(soundQuality == 4);
+  pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
 }
 
 void MainWnd::OnOptionsSound22khz()
@@ -1070,6 +1073,7 @@ void MainWnd::OnOptionsSound22khz()
 void MainWnd::OnUpdateOptionsSound22khz(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(soundQuality == 2);
+  pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
 }
 
 void MainWnd::OnOptionsSound44khz()
@@ -1083,6 +1087,7 @@ void MainWnd::OnOptionsSound44khz()
 void MainWnd::OnUpdateOptionsSound44khz(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(soundQuality == 1);
+  pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
 }
 
 BOOL MainWnd::OnOptionsSoundVolume(UINT nID)
@@ -1988,6 +1993,7 @@ void MainWnd::OnOutputapiDirectsound()
 void MainWnd::OnUpdateOutputapiDirectsound(CCmdUI *pCmdUI)
 {
 	pCmdUI->SetCheck( ( theApp.audioAPI == DIRECTSOUND ) ? 1 : 0 );
+	pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
 }
 
 void MainWnd::OnOutputapiOpenal()
@@ -2005,6 +2011,7 @@ void MainWnd::OnUpdateOutputapiOpenal(CCmdUI *pCmdUI)
 {
 #ifndef NO_OAL
 	pCmdUI->SetCheck( ( theApp.audioAPI == OPENAL_SOUND ) ? 1 : 0 );
+	pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
 #endif
 }
 
@@ -2027,5 +2034,12 @@ void MainWnd::OnOutputapiOalconfiguration()
 		systemSoundShutdown();
 		systemSoundInit();
 	}
+#endif
+}
+
+void MainWnd::OnUpdateOutputapiOalconfiguration(CCmdUI *pCmdUI)
+{
+#ifndef NO_OAL
+	pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
 #endif
 }
