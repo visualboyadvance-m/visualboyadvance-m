@@ -38,7 +38,7 @@
 #include <assert.h>
 
 
-#define NBUFFERS 8
+#define NBUFFERS 5
 //#define LOGALL
 // LOGALL writes very detailed informations to vba-trace.log
 
@@ -281,6 +281,11 @@ void OpenAL::write()
 		nBuffersProcessed = 0;
 		ALFunction.alGetSourcei( source, AL_BUFFERS_PROCESSED, &nBuffersProcessed );
 		assert( AL_NO_ERROR == ALFunction.alGetError() );
+
+		if( nBuffersProcessed == NBUFFERS ) {
+			static int i = 0;
+			log( "OpenAL: Buffers were not refilled fast enough (%i)\n", i++ );
+		}
 
 		if( !speedup && synchronize && !theApp.throttle ) {
 			// wait until at least one buffer has finished
