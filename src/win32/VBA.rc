@@ -1706,7 +1706,6 @@ BEGIN
             POPUP "Output API"
             BEGIN
                 MENUITEM "DirectSound",                 ID_OUTPUTAPI_DIRECTSOUND
-                MENUITEM "   Use &old synchronization", ID_OPTIONS_SOUND_USEOLDSYNCHRONIZATION
                 MENUITEM SEPARATOR
                 MENUITEM "OpenAL",                      ID_OUTPUTAPI_OPENAL
                 MENUITEM "  Configuration...",          ID_OUTPUTAPI_OALCONFIGURATION

@@ -273,8 +273,6 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsSoundMute(CCmdUI* pCmdUI);
   afx_msg void OnOptionsSoundOn();
   afx_msg void OnUpdateOptionsSoundOn(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsSoundUseoldsynchronization();
-  afx_msg void OnUpdateOptionsSoundUseoldsynchronization(CCmdUI* pCmdUI);
   afx_msg void OnOptionsSoundEcho();
   afx_msg void OnUpdateOptionsSoundEcho(CCmdUI* pCmdUI);
   afx_msg void OnOptionsSoundLowpassfilter();

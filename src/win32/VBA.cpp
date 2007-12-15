@@ -297,7 +297,6 @@ VBA::VBA()
   regEnabled = false;
   pauseWhenInactive = true;
   speedupToggle = false;
-  useOldSync = false;
   winGbPrinterEnabled = false;
   threadPriority = 2;
   disableMMX = false;
@@ -1564,9 +1563,6 @@ void VBA::loadSettings()
   pauseWhenInactive = regQueryDwordValue("pauseWhenInactive", 1) ?
     true : false;
 
-  useOldSync = regQueryDwordValue("useOldSync", 0) ?
-    TRUE : FALSE;
-
   captureFormat = regQueryDwordValue("captureFormat", 0);
 
   removeIntros = regQueryDwordValue("removeIntros", false) ? true : false;
@@ -2635,8 +2631,6 @@ void VBA::saveSettings()
   regSetDwordValue("gbPrinter", winGbPrinterEnabled);
 
   regSetDwordValue("pauseWhenInactive", pauseWhenInactive);
-
-  regSetDwordValue("useOldSync", useOldSync);
 
   regSetDwordValue("captureFormat", captureFormat);
 
