@@ -1554,6 +1554,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\GBAcpu.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\GBAinline.h"
 					>
 				</File>
