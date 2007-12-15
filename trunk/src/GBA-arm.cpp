@@ -2867,7 +2867,9 @@ static void tester(void) {
 int armExecute()
 {
     do {
-        cpuMasterCodeCheck();
+		if( cheatsEnabled ) {
+			cpuMasterCodeCheck();
+		}
 
         if ((armNextPC & 0x0803FFFF) == 0x08020000)
           busPrefetchCount = 0x100;
