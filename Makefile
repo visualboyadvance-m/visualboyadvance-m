@@ -32,6 +32,8 @@ MAINDIR=src
 SDLDIR=src/sdl
 DMGDIR=src/gb
 GBAPUDIR=src/gb/gb_apu
+FEXDIR=../dependencies/File_Extractor-0.4.3
+
 
 ASMOBJ=${MAINDIR}/hq3x_16${OE} ${MAINDIR}/hq3x_32${OE} ${MAINDIR}/hq4x_16${OE} ${MAINDIR}/hq4x_32${OE} \
 ${MAINDIR}/hq3x32${OE}
@@ -50,9 +52,9 @@ ${MAINDIR}/hq2x${OE} ${MAINDIR}/GBA-thumb${OE} ${MAINDIR}/GBA-arm${OE} ${MAINDIR
 ${MAINDIR}/Mode1${OE} ${MAINDIR}/Mode2${OE} ${MAINDIR}/Mode3${OE} ${MAINDIR}/Mode4${OE} \
 ${MAINDIR}/Mode5${OE} ${MAINDIR}/motionblur${OE} ${MAINDIR}/pixel${OE} ${MAINDIR}/portable${OE} \
 ${MAINDIR}/remote${OE} ${MAINDIR}/RTC${OE} ${MAINDIR}/scanline${OE} ${MAINDIR}/simpleFilter${OE} \
-${MAINDIR}/fex_mini${OE} ${MAINDIR}/Sound${OE} ${MAINDIR}/Sram${OE} ${MAINDIR}/Text${OE} \
-${MAINDIR}/unzip${OE} ${MAINDIR}/Util${OE} ${MAINDIR}/exprNode${OE} ${MAINDIR}/getopt${OE} \
-${MAINDIR}/getopt1${OE} ${MAINDIR}/memgzio${OE} ${MAINDIR}/expr-lex${OE} ${MAINDIR}/expr${OE} \
+${MAINDIR}/Sound${OE} ${MAINDIR}/Sram${OE} ${MAINDIR}/Text${OE} ${MAINDIR}/Util${OE} \
+${MAINDIR}/expr${OE} ${MAINDIR}/exprNode${OE} ${MAINDIR}/expr-lex${OE} ${MAINDIR}/getopt${OE} \
+${MAINDIR}/getopt1${OE} ${MAINDIR}/memgzio${OE} 
 
 DMGOBJ=${DMGDIR}/GB${OE} ${DMGDIR}/gbCheats${OE} ${DMGDIR}/gbDis${OE} ${DMGDIR}/gbGfx${OE} \
 ${DMGDIR}/gbGlobals${OE} ${DMGDIR}/gbMemory${OE} ${DMGDIR}/gbPrinter${OE} ${DMGDIR}/gbSGB${OE} \
@@ -67,6 +69,13 @@ OBJECTS+=${ASMOBJ}
 else
 OBJECTS+=${CALTERNOBJ}
 endif
+
+ifeq ($(USEFEX),yes)
+LFLAGS+=-l:${FEXDIR}/libfex.a
+else  
+OBJECTS+=${MAINDIR}/fex_mini${OE} 
+endif
+
 
 
 .SUFFIXES: .c .cpp .asm

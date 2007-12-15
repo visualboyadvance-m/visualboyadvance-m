@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 
-#include "unzip.h"
+#include <zlib.h>
 
 #ifndef NULL
 #define NULL 0
