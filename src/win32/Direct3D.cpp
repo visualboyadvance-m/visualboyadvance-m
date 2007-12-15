@@ -353,25 +353,43 @@ void Direct3DDisplay::render()
 		DXTRACE_ERR_MSGBOX( _T("Can not lock texture"), hr );
 		return;
 	} else {
-		if( !theApp.filterFunction ) {
-			copyImage(
-				pix,
-				lr.pBits,
-				(systemColorDepth == 32) ? theApp.sizeX
-				: theApp.sizeX + 1, // TODO: workaround results in one pixel black border at right side
-				theApp.sizeY,
-				lr.Pitch,
-				systemColorDepth
-				);
-		} else {
-			u32 pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
-			theApp.filterFunction( pix + pitch,
+		unsigned short pitch = theApp.sizeX * ( systemColorDepth >> 3 ) + 4;
+		if( theApp.filterFunction ) {
+			// pixel filter enabled
+			theApp.filterFunction(
+				pix + pitch,
 				pitch,
 				(u8*)theApp.delta,
 				(u8*)lr.pBits,
 				lr.Pitch,
-				theApp.filterWidth,
-				theApp.filterHeight);
+				theApp.sizeX,
+				theApp.sizeY
+				);
+		} else {
+			// pixel filter disabled
+			switch( systemColorDepth )
+			{
+			case 32:
+				cpyImg32(
+					(unsigned char *)lr.pBits,
+					lr.Pitch,
+					pix + pitch,
+					pitch,
+					theApp.sizeX,
+					theApp.sizeY
+					);
+				break;
+			case 16:
+				cpyImg16(
+					(unsigned char *)lr.pBits,
+					lr.Pitch,
+					pix + pitch,
+					pitch,
+					theApp.sizeX,
+					theApp.sizeY
+					);
+				break;
+			}
 		}
 		emulatedImage->UnlockRect( 0 );
 	}

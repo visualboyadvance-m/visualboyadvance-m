@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <memory.h>
+
 enum DISPLAY_TYPE {
   DIRECT_DRAW = 0,
   DIRECT_3D = 1,
@@ -43,46 +45,27 @@ class IDisplay {
   virtual int selectFullScreenMode(GUID **) = 0;
 };
 
-inline void copyImage( void *source, void *destination, unsigned int width, unsigned int height, unsigned int destinationPitch, unsigned int colorDepth )
+inline void cpyImg32( unsigned char *dst, unsigned int dstPitch, unsigned char *src, unsigned int srcPitch, unsigned short width, unsigned short height )
 {
 	// fast, iterative C version
-	register unsigned int lineSize;
-	register unsigned char *src, *dst;
-	switch(colorDepth)
-	{
-	case 16:
-		lineSize = width<<1;
-		src = ((unsigned char*)source) + lineSize + 4;
-		dst = (unsigned char*)destination;
-		do {
-			MoveMemory( dst, src, lineSize );
-				src+=lineSize;
-				dst+=lineSize;
-			src += 2;
-			dst += (destinationPitch - lineSize);
-		} while ( --height);
-		break;
-	case 32:
-		lineSize = width<<2;
-		src = ((unsigned char*)source) + lineSize + 4;
-		dst = (unsigned char*)destination;
-		do {
-			MoveMemory( dst, src, lineSize );
-				src+=lineSize;
-				dst+=lineSize;
-			src += 4;
-			dst += (destinationPitch - lineSize);
-		} while ( --height);
-		break;
-	}
+	// copies an width*height array of visible pixels from src to dst
+	// srcPitch and dstPitch are the number of garbage bytes after a scanline
+	register unsigned short lineSize = width<<2;
 
-	// compact but slow C version
-	//unsigned int nBytesPerPixel = colorDepth>>3;
-	//unsigned int i, x, y, srcPitch = (width+1) * nBytesPerPixel;
-	//unsigned char * src = ((unsigned char*)source)+srcPitch;
-	//unsigned char * dst = (unsigned char*)destination;
-	//for (y=0;y<height;y++) //Width
-		//for (x=0;x<width;x++) //Height
-			//for (i=0;i<nBytesPerPixel;i++) //Byte# Of Pixel
-				//*(dst+i+(x*nBytesPerPixel)+(y*destinationPitch)) = *(src+i+(x*nBytesPerPixel)+(y*srcPitch));
+	while( height-- ) {
+		memcpy( dst, src, lineSize );
+		src += srcPitch;
+		dst += dstPitch;
+	}
+}
+
+inline void cpyImg16( unsigned char *dst, unsigned int dstPitch, unsigned char *src, unsigned int srcPitch, unsigned short width, unsigned short height )
+{
+	register unsigned short lineSize = width<<1;
+
+	while( height-- ) {
+		memcpy( dst, src, lineSize );
+		src += srcPitch;
+		dst += dstPitch;
+	}
 }
