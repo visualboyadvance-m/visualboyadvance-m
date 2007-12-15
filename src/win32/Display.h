@@ -43,4 +43,46 @@ class IDisplay {
   virtual int selectFullScreenMode(GUID **) = 0;
 };
 
-void copyImage( void *source, void *destination, unsigned int width, unsigned int height, unsigned int destinationPitch, unsigned int colorDepth );
+inline void copyImage( void *source, void *destination, unsigned int width, unsigned int height, unsigned int destinationPitch, unsigned int colorDepth )
+{
+	// fast, iterative C version
+	register unsigned int lineSize;
+	register unsigned char *src, *dst;
+	switch(colorDepth)
+	{
+	case 16:
+		lineSize = width<<1;
+		src = ((unsigned char*)source) + lineSize + 4;
+		dst = (unsigned char*)destination;
+		do {
+			MoveMemory( dst, src, lineSize );
+				src+=lineSize;
+				dst+=lineSize;
+			src += 2;
+			dst += (destinationPitch - lineSize);
+		} while ( --height);
+		break;
+	case 32:
+		lineSize = width<<2;
+		src = ((unsigned char*)source) + lineSize + 4;
+		dst = (unsigned char*)destination;
+		do {
+			MoveMemory( dst, src, lineSize );
+				src+=lineSize;
+				dst+=lineSize;
+			src += 4;
+			dst += (destinationPitch - lineSize);
+		} while ( --height);
+		break;
+	}
+
+	// compact but slow C version
+	//unsigned int nBytesPerPixel = colorDepth>>3;
+	//unsigned int i, x, y, srcPitch = (width+1) * nBytesPerPixel;
+	//unsigned char * src = ((unsigned char*)source)+srcPitch;
+	//unsigned char * dst = (unsigned char*)destination;
+	//for (y=0;y<height;y++) //Width
+		//for (x=0;x<width;x++) //Height
+			//for (i=0;i<nBytesPerPixel;i++) //Byte# Of Pixel
+				//*(dst+i+(x*nBytesPerPixel)+(y*destinationPitch)) = *(src+i+(x*nBytesPerPixel)+(y*srcPitch));
+}
