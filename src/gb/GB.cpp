@@ -29,7 +29,6 @@
 #include "gbMemory.h"
 #include "gbSGB.h"
 #include "gbSound.h"
-#include "../unzip.h"
 #include "../Util.h"
 
 #ifdef __GNUC__

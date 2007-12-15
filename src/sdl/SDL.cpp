@@ -37,7 +37,6 @@
 #include "../RTC.h"
 #include "../Sound.h"
 #include "../Text.h"
-#include "zlib.h"
 #include "../Util.h"
 #include "../gb/gb.h"
 #include "../gb/gbGlobals.h"
