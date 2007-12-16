@@ -17,6 +17,11 @@
 
 #ifndef NO_OAL
 
+
+// === LOGALL writes very detailed informations to vba-trace.log ===
+//#define LOGALL
+
+
 #include "stdafx.h" // includes VBA.h for 'theApp.throttle'
 
 // Interface
@@ -36,11 +41,6 @@
 
 // Debug
 #include <assert.h>
-
-
-#define NBUFFERS 5
-//#define LOGALL
-// LOGALL writes very detailed informations to vba-trace.log
 
 #ifndef LOGALL
 #define winlog //
@@ -65,7 +65,7 @@ private:
 	bool           buffersLoaded;
 	ALCdevice     *device;
 	ALCcontext    *context;
-	ALuint         buffer[NBUFFERS];
+	ALuint        *buffer;
 	ALuint         tempBuffer;
 	ALuint         source;
 	int            freq;
@@ -82,7 +82,8 @@ OpenAL::OpenAL()
 	buffersLoaded = false;
 	device = NULL;
 	context = NULL;
-	memset( buffer, 0, NBUFFERS * sizeof( ALuint ) );
+	buffer = (ALuint*)malloc( theApp.oalBufferCount * sizeof( ALuint ) );
+	memset( buffer, 0, theApp.oalBufferCount * sizeof( ALuint ) );
 	tempBuffer = 0;
 	source = 0;
 }
@@ -101,8 +102,10 @@ OpenAL::~OpenAL()
 	ALFunction.alDeleteSources( 1, &source );
 	assert( AL_NO_ERROR == ALFunction.alGetError() );
 
-	ALFunction.alDeleteBuffers( NBUFFERS, buffer );
+	ALFunction.alDeleteBuffers( theApp.oalBufferCount, buffer );
 	assert( AL_NO_ERROR == ALFunction.alGetError() );
+
+	free( buffer );
 
 	ALFunction.alcMakeContextCurrent( NULL );
 	assert( AL_NO_ERROR == ALFunction.alGetError() );
@@ -179,7 +182,7 @@ bool OpenAL::init()
 	ALCboolean retVal = ALFunction.alcMakeContextCurrent( context );
 	assert( ALC_TRUE == retVal );
 
-	ALFunction.alGenBuffers( NBUFFERS, buffer );
+	ALFunction.alGenBuffers( theApp.oalBufferCount, buffer );
 	assert( AL_NO_ERROR == ALFunction.alGetError() );
 
 	ALFunction.alGenSources( 1, &source );
@@ -266,13 +269,13 @@ void OpenAL::write()
 	if( !buffersLoaded ) {
 		// ==initial buffer filling==
 		winlog( " initial buffer filling\n" );
-		for( int i = 0 ; i < NBUFFERS ; i++ ) {
+		for( int i = 0 ; i < theApp.oalBufferCount ; i++ ) {
 			// filling the buffers explicitly with silence would be cleaner...
 			ALFunction.alBufferData( buffer[i], AL_FORMAT_STEREO16, soundFinalWave, soundBufferLen, freq );
 			assert( AL_NO_ERROR == ALFunction.alGetError() );
 		}
 
-		ALFunction.alSourceQueueBuffers( source, NBUFFERS, buffer );
+		ALFunction.alSourceQueueBuffers( source, theApp.oalBufferCount, buffer );
 		assert( AL_NO_ERROR == ALFunction.alGetError() );
 
 		buffersLoaded = true;
@@ -282,7 +285,7 @@ void OpenAL::write()
 		ALFunction.alGetSourcei( source, AL_BUFFERS_PROCESSED, &nBuffersProcessed );
 		assert( AL_NO_ERROR == ALFunction.alGetError() );
 
-		if( nBuffersProcessed == NBUFFERS ) {
+		if( nBuffersProcessed == theApp.oalBufferCount ) {
 			static int i = 0;
 			log( "OpenAL: Buffers were not refilled fast enough (%i)\n", i++ );
 		}
