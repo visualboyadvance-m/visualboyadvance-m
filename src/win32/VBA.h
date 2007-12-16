@@ -193,8 +193,8 @@ class VBA : public CWinApp
   bool aviRecording;
   AVIWrite *aviRecorder;
   CString aviRecordName;
-  int aviFrameNumber;
   bool painting;
+  unsigned int skipAudioFrames;
   bool movieRecording;
   bool moviePlaying;
   int movieFrame;

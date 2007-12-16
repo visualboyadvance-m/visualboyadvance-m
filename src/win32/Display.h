@@ -45,6 +45,7 @@ class IDisplay {
   virtual int selectFullScreenMode(GUID **) = 0;
 };
 
+
 inline void cpyImg32( unsigned char *dst, unsigned int dstPitch, unsigned char *src, unsigned int srcPitch, unsigned short width, unsigned short height )
 {
 	// fast, iterative C version
@@ -59,6 +60,32 @@ inline void cpyImg32( unsigned char *dst, unsigned int dstPitch, unsigned char *
 	}
 }
 
+
+inline void cpyImg32bmp( unsigned char *dst, unsigned char *src, unsigned int srcPitch, unsigned short width, unsigned short height )
+{
+	// dst will be an upside down bitmap with 24bit colors
+	// pix must contain 32bit colors (XRGB)
+	unsigned short srcLineSize = width<<2;
+	dst += height * width * 3; // move to the last scanline
+	register unsigned char r, g, b;
+
+	while( height-- ) {
+		unsigned short x = width;
+		src += srcLineSize;
+		while( x-- ) {
+			--src; // ignore one of 4 bytes
+			b = *--src;
+			g = *--src;
+			r = *--src;
+			*--dst = b;
+			*--dst = g;
+			*--dst = r;
+		}
+		src += srcPitch;
+	}
+}
+
+
 inline void cpyImg16( unsigned char *dst, unsigned int dstPitch, unsigned char *src, unsigned int srcPitch, unsigned short width, unsigned short height )
 {
 	register unsigned short lineSize = width<<1;
@@ -67,5 +94,19 @@ inline void cpyImg16( unsigned char *dst, unsigned int dstPitch, unsigned char *
 		memcpy( dst, src, lineSize );
 		src += srcPitch;
 		dst += dstPitch;
+	}
+}
+
+
+inline void cpyImg16bmp( unsigned char *dst, unsigned char *src, unsigned int srcPitch, unsigned short width, unsigned short height )
+{
+	// dst will be an upside down bitmap with 16bit colors
+	register unsigned short lineSize = width<<1;
+	dst += ( height - 1 ) * lineSize; // move to the last scanline
+
+	while( height-- ) {
+		memcpy( dst, src, lineSize );
+		src += srcPitch;
+		dst -= lineSize;
 	}
 }
