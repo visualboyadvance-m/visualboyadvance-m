@@ -1,7 +1,5 @@
-// -*- C++ -*-
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
-// Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2007 VBA-M development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,33 +15,33 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+
+#include "stdafx.h"
 #include <vfw.h>
 
-class AVIWrite {
- public:
-  AVIWrite();
-  virtual ~AVIWrite();
 
-  bool Open(const char *filename);
-  virtual bool AddFrame(const int number, const char * bmp);
-  void SetFPS(int fps);
-  void SetVideoFormat(BITMAPINFOHEADER *);
-  bool IsSoundAdded();
-  void SetSoundFormat(WAVEFORMATEX *);
-  bool AddSound(const char *sound, int len);
+// info: recreate the whole AVIWrite object if any method fails
+class AVIWrite
+{
+public:
+	AVIWrite();
+	virtual ~AVIWrite();
 
- private:
-  int m_fps;
-  WAVEFORMATEX m_soundFormat;
-  BITMAPINFOHEADER m_bitmap;
-  AVISTREAMINFO m_header;
-  AVISTREAMINFO m_soundHeader;
-  PAVIFILE m_file;
-  PAVISTREAM m_stream;
-  PAVISTREAM m_streamCompressed;
-  PAVISTREAM m_streamSound;
-  AVICOMPRESSOPTIONS m_options;
-  AVICOMPRESSOPTIONS *m_arrayOptions[1];
-  int m_samplesSound;
-  bool m_failed;
+	bool CreateAVIFile( LPCTSTR filename );
+	bool CreateVideoStream( LONG imageWidth, LONG imageHeight, WORD colorBits, DWORD framesPerSecond );
+	bool CreateAudioStream( WORD channelCount, DWORD sampleRate, WORD sampleBits );
+	bool AddVideoFrame( LPVOID imageData );
+	bool AddAudioFrame( LPVOID soundData );
+
+private:
+	bool m_failed;
+	PAVIFILE m_file;
+	PAVISTREAM m_videoStream;
+	PAVISTREAM m_audioStream;
+	DWORD m_frameRate;
+	LONG m_frameCounter;
+	LONG m_sampleCounter;
+	LONG m_videoFrameSize;
+	LONG m_audioFrameSize;
+	WORD m_audioBlockAlign;
 };

@@ -1,6 +1,5 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
-// Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2007 VBA-M development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,172 +15,242 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#include "stdafx.h"
+
 #include "AVIWrite.h"
+#pragma comment( lib, "vfw32.lib" )
+
 
 AVIWrite::AVIWrite()
 {
-  m_failed = false;
-  m_file = NULL;
-  m_stream = NULL;
-  m_streamCompressed = NULL;
-  m_streamSound = NULL;
-  m_samplesSound = 0;
+	m_failed = false;
+	m_file = NULL;
+	m_videoStream = NULL;
+	m_audioStream = NULL;
+	m_frameRate = 0;
+	m_frameCounter = 0;
+	m_sampleCounter = 0;
+	m_videoFrameSize = 0;
+	m_audioFrameSize = 0;
 
-  AVIFileInit();
+	AVIFileInit();
 }
+
 
 AVIWrite::~AVIWrite()
 {
-  if(m_streamSound)
-    AVIStreamClose(m_streamSound);
+	if( m_audioStream ) {
+		AVIStreamRelease( m_audioStream );
+	}
 
-  if(m_streamCompressed)
-    AVIStreamClose(m_streamCompressed);
+	if( m_videoStream ) {
+		AVIStreamRelease( m_videoStream );
+	}
 
-  if(m_stream)
-    AVIStreamClose(m_stream);
+	if( m_file ) {
+		AVIFileRelease( m_file );
+	}
 
-  if(m_file)
-    AVIFileClose(m_file);
-
-  AVIFileExit();
+	AVIFileExit();
 }
 
-void AVIWrite::SetVideoFormat(BITMAPINFOHEADER *bh)
+
+bool AVIWrite::CreateAVIFile( LPCTSTR filename )
 {
-  // force size to 0x28 to avoid extra fields
-  memcpy(&m_bitmap, bh, 0x28);
+	if( m_file || m_failed ) return false;
+
+	HRESULT err = 0;
+
+	// -- create the AVI file --
+	err = AVIFileOpen(
+		&m_file,
+		filename,
+		OF_CREATE | OF_WRITE | OF_SHARE_EXCLUSIVE,
+		NULL
+		);
+
+	if( FAILED( err ) ) {
+		m_failed = true;
+		return false;
+	}
+
+	return true;
 }
 
-void AVIWrite::SetSoundFormat(WAVEFORMATEX *format)
+
+// colorBits: 16, 24 or 32
+bool AVIWrite::CreateVideoStream( LONG imageWidth, LONG imageHeight, WORD colorBits, DWORD framesPerSecond )
 {
-  memcpy(&m_soundFormat, format, sizeof(WAVEFORMATEX));
-  ZeroMemory(&m_soundHeader, sizeof(AVISTREAMINFO));
-  // setup the sound stream header
-  m_soundHeader.fccType = streamtypeAUDIO;
-  m_soundHeader.dwQuality = (DWORD)-1;
-  m_soundHeader.dwScale = format->nBlockAlign;
-  m_soundHeader.dwInitialFrames = 1;
-  m_soundHeader.dwRate = format->nAvgBytesPerSec;
-  m_soundHeader.dwSampleSize = format->nBlockAlign;
+	if( m_videoStream || m_failed ) return false;
 
-  // create the sound stream
-  if(FAILED(AVIFileCreateStream(m_file, &m_streamSound, &m_soundHeader))) {
-    m_failed = true;
-    return;
-  }
+	HRESULT err = 0;
+	AVISTREAMINFO videoInfo;
+	BITMAPINFOHEADER bitmapInfo;
+	ZeroMemory( &videoInfo, sizeof( videoInfo ) );
+	ZeroMemory( &bitmapInfo, sizeof( bitmapInfo ) );
 
-  // setup the sound stream format
-  if(FAILED(AVIStreamSetFormat(m_streamSound, 0 , (void *)&m_soundFormat,
-                               sizeof(WAVEFORMATEX)))) {
-    m_failed = true;
-    return;
-  }
+	// -- initialize the video stream information --
+	videoInfo.fccType = streamtypeVIDEO;
+	videoInfo.dwScale = 1;
+	videoInfo.dwRate = framesPerSecond;
+	videoInfo.dwSuggestedBufferSize = imageWidth * imageHeight * ( colorBits >> 3 );
+
+	// -- create the video stream --
+	err = AVIFileCreateStream(
+		m_file,
+		&m_videoStream,
+		&videoInfo
+		);
+
+	if( FAILED( err ) ) {
+		m_failed = true;
+		return false;
+	}
+
+
+	// -- initialize the video stream format --
+	bitmapInfo.biSize = sizeof( bitmapInfo );
+	bitmapInfo.biWidth = imageWidth;
+	bitmapInfo.biHeight = imageHeight;
+	bitmapInfo.biBitCount = colorBits;
+	bitmapInfo.biPlanes = 1;
+	bitmapInfo.biCompression = BI_RGB;
+	bitmapInfo.biSizeImage = imageWidth * imageHeight * ( colorBits >> 3 );
+
+	// -- set the video stream format --
+	err = AVIStreamSetFormat(
+		m_videoStream,
+		0,
+		&bitmapInfo,
+		sizeof( bitmapInfo )
+		);
+
+	if( FAILED( err ) ) {
+		m_failed = true;
+		return false;
+	}
+
+	m_frameRate = framesPerSecond;
+	m_videoFrameSize = imageWidth * imageHeight * ( colorBits >> 3 );
+
+	return true;
 }
 
-bool AVIWrite::Open(const char *filename)
+
+// call AddVideoStream() first
+// channelCount: max. 2
+// sampleBits: max. 16
+bool AVIWrite::CreateAudioStream( WORD channelCount, DWORD sampleRate, WORD sampleBits )
 {
-  // create the AVI file
-  if(FAILED(AVIFileOpen(&m_file,
-                        filename,
-                        OF_WRITE | OF_CREATE,
-                        NULL))) {
-    m_failed = true;
-    return false;
-  }
-  // setup the video stream information
-  ZeroMemory(&m_header, sizeof(AVISTREAMINFO));
-  m_header.fccType = streamtypeVIDEO;
-  m_header.dwScale = 1;
-  m_header.dwRate = m_fps;
-  m_header.dwSuggestedBufferSize  = m_bitmap.biSizeImage;
+	if( m_audioStream || m_failed ) return false;
 
-  // create the video stream
-  if(FAILED(AVIFileCreateStream(m_file,
-                                &m_stream,
-                                &m_header))) {
-    m_failed = true;
-    return false;
-  }
+	HRESULT err = 0;
+	AVISTREAMINFO audioInfo;
+	WAVEFORMATEX waveInfo;
+	ZeroMemory( &audioInfo, sizeof( audioInfo ) );
+	ZeroMemory( &waveInfo, sizeof( waveInfo ) );
 
-  ZeroMemory(&m_options, sizeof(AVICOMPRESSOPTIONS));
-  m_arrayOptions[0] = &m_options;
+	// -- initialize the audio stream information --
+	audioInfo.fccType = streamtypeAUDIO;
+	audioInfo.dwQuality = (DWORD)-1;
+	audioInfo.dwScale = channelCount * ( sampleBits >> 3 );
+	audioInfo.dwRate = channelCount * ( sampleBits >> 3 ) * sampleRate;
+	audioInfo.dwInitialFrames = 1;
+	audioInfo.dwSampleSize = channelCount * ( sampleBits >> 3 );
+	audioInfo.dwSuggestedBufferSize = 0;
 
-  // call the dialog to setup the compress options to be used
-  if(!AVISaveOptions(AfxGetApp()->m_pMainWnd->GetSafeHwnd(), 0, 1, &m_stream, m_arrayOptions)) {
-    m_failed = true;
-    return false;
-  }
+	// -- create the audio stream --
+	err = AVIFileCreateStream(
+		m_file,
+		&m_audioStream,
+		&audioInfo
+		);
 
-  // create the compressed stream
-  if(FAILED(AVIMakeCompressedStream(&m_streamCompressed, m_stream, &m_options, NULL))) {
-    m_failed = true;
-    return false;
-  }
+	if( FAILED( err ) ) {
+		m_failed = true;
+		return false;
+	}
 
-  // setup the video stream format
-  if(FAILED( AVIStreamSetFormat(m_streamCompressed, 0,
-                                &m_bitmap,
-                                m_bitmap.biSize +
-                                m_bitmap.biClrUsed * sizeof(RGBQUAD)))) {
-    m_failed = true;
-    return false;
-  }
 
-  return true;
+	// -- initialize the audio stream format --
+	waveInfo.wFormatTag = WAVE_FORMAT_PCM;
+	waveInfo.nChannels = channelCount;
+	waveInfo.nSamplesPerSec = sampleRate;
+	waveInfo.nAvgBytesPerSec = channelCount * ( sampleBits >> 3 ) * sampleRate;
+	waveInfo.nBlockAlign = channelCount * ( sampleBits >> 3 );
+	waveInfo.wBitsPerSample = sampleBits;
+	waveInfo.cbSize = 0;
+
+	// -- set the audio stream format --
+	err = AVIStreamSetFormat(
+		m_audioStream,
+		0,
+		&waveInfo,
+		sizeof( waveInfo )
+		);
+
+	if( FAILED( err ) ) {
+		m_failed = true;
+		return false;
+	}
+
+	m_audioBlockAlign = channelCount * ( sampleBits >> 3 );
+	m_audioFrameSize = channelCount * ( sampleBits >> 3 ) * ( sampleRate / m_frameRate );
+
+	return true;
 }
 
-bool AVIWrite::AddSound(const char *sound, int len)
+
+bool AVIWrite::AddVideoFrame( LPVOID imageData )
 {
-  // return if we failed somewhere already
-  if(m_failed)
-    return false;
+	if( !m_videoStream || m_failed ) return false;
 
-  int samples = len / m_soundFormat.nBlockAlign;
+	HRESULT err = 0;
 
-  if(FAILED(AVIStreamWrite(m_streamSound,
-                           m_samplesSound,
-                           samples,
-                           (LPVOID)sound,
-                           len,
-                           0,
-                           NULL,
-                           NULL))) {
-    m_failed = true;
-    return false;
-  }
-  m_samplesSound += samples;
+	err = AVIStreamWrite(
+		m_videoStream,
+		m_frameCounter,
+		1,
+		imageData,
+		m_videoFrameSize,
+		AVIIF_KEYFRAME,
+		NULL,
+		NULL
+		);
 
-  return true;
+	if( FAILED( err ) ) {
+		m_failed = true;
+		return false;
+	}
+
+	m_frameCounter++;
+
+	return true;
 }
 
-bool AVIWrite::AddFrame(const int frame, const char *bmp)
-{
-  if (m_failed)
-    return false;
 
-  // write the frame to the video stream
-  if(FAILED(AVIStreamWrite(m_streamCompressed,
-                           frame,
-                           1,
-                           (LPVOID)bmp,
-                           m_bitmap.biSizeImage,
-                           AVIIF_KEYFRAME,
-                           NULL,
-                           NULL))) {
-    m_failed = true;
-    return false;
-  }
-  return true;
-}
-
-bool AVIWrite::IsSoundAdded()
+bool AVIWrite::AddAudioFrame( LPVOID soundData )
 {
-  return m_streamSound != NULL;
-}
+	if( !m_audioStream || m_failed ) return false;
 
-void AVIWrite::SetFPS(int f)
-{
-  m_fps = f;
+	HRESULT err = 0;
+
+	err = AVIStreamWrite(
+		m_audioStream,
+		m_sampleCounter,
+		m_audioFrameSize / m_audioBlockAlign,
+		soundData,
+		m_audioFrameSize,
+		0,
+		NULL,
+		NULL
+		);
+
+	if( FAILED( err ) ) {
+		m_failed = true;
+		return false;
+	}
+	
+	m_sampleCounter += m_audioFrameSize / m_audioBlockAlign;
+
+	return true;
 }
