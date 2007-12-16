@@ -7,6 +7,7 @@
 #include <al.h>
 #include <alc.h>
 #include "LoadOAL.h"
+#include "afxcmn.h"
 
 
 // OALConfig dialog
@@ -28,10 +29,14 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 private:
-	CComboBox cbDevice;
 	OPENALFNTABLE ALFunction;
+	CComboBox m_cbDevice;
+	CSliderCtrl m_sliderBufferCount;
+	CStatic m_bufferInfo;
 public:
 	CString selectedDevice;
+	int bufferCount;
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 };
 
 #endif

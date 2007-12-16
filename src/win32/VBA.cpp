@@ -280,6 +280,7 @@ VBA::VBA()
   audioAPI = DIRECTSOUND;
 #ifndef NO_OAL
   oalDevice = NULL;
+  oalBufferCount = 5;
 #endif
   iconic = false;
   ddrawEmulationOnly = false;
@@ -1714,6 +1715,8 @@ void VBA::loadSettings()
   }
   oalDevice = (TCHAR*)malloc( ( buffer.GetLength() + 1 ) * sizeof( TCHAR ) );
   _tcscpy( oalDevice, buffer.GetBuffer() );
+
+  oalBufferCount = regQueryDwordValue( "oalBufferCount", 5 );
 #endif
 }
 
@@ -2695,6 +2698,7 @@ void VBA::saveSettings()
 
 #ifndef NO_OAL
   regSetStringValue( "oalDevice", oalDevice );
+  regSetDwordValue( "oalBufferCount", oalBufferCount );
 #endif
 }
 
