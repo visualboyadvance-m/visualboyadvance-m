@@ -148,7 +148,9 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_COMMAND(ID_OPTIONS_VIDEO_FULLSCREEN800X600, OnOptionsVideoFullscreen800x600)
   ON_COMMAND(ID_OPTIONS_VIDEO_FULLSCREEN, OnOptionsVideoFullscreen)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_VIDEO_FULLSCREEN, OnUpdateOptionsVideoFullscreen)
+  ON_WM_MOVING()
   ON_WM_MOVE()
+  ON_WM_SIZING()
   ON_WM_SIZE()
   ON_COMMAND(ID_OPTIONS_VIDEO_DISABLESFX, OnOptionsVideoDisablesfx)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_VIDEO_DISABLESFX, OnUpdateOptionsVideoDisablesfx)
@@ -445,8 +447,6 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_FILTER_LCDCOLORS, OnUpdateOptionsFilterLcdcolors)
   ON_COMMAND_EX_RANGE(ID_OPTIONS_SOUND_PCMINTERPOLATION_NONE, ID_OPTIONS_SOUND_PCMINTERPOLATION_LIBRESAMPLE, OnOptionsSoundPcminterpolation)
   ON_UPDATE_COMMAND_UI_RANGE(ID_OPTIONS_SOUND_PCMINTERPOLATION_NONE, ID_OPTIONS_SOUND_PCMINTERPOLATION_LIBRESAMPLE, OnUpdateOptionsSoundPcminterpolation)
-  ON_WM_SETFOCUS()
-  ON_WM_KILLFOCUS()
   ON_COMMAND(ID_SKIN_USE, &MainWnd::OnSkinUse)
   ON_UPDATE_COMMAND_UI(ID_SKIN_USE, &MainWnd::OnUpdateSkinUse)
   ON_COMMAND(ID_SKIN_SELECT, &MainWnd::OnSkinSelect)
@@ -457,7 +457,6 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_OPENAL, &MainWnd::OnUpdateOutputapiOpenal)
   ON_COMMAND(ID_OUTPUTAPI_OALCONFIGURATION, &MainWnd::OnOutputapiOalconfiguration)
   ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_OALCONFIGURATION, &MainWnd::OnUpdateOutputapiOalconfiguration)
-  ON_WM_MOVING()
   END_MESSAGE_MAP()
 
 
@@ -774,6 +773,15 @@ void MainWnd::OnMove(int x, int y)
       }
     }
   }
+}
+
+void MainWnd::OnSizing(UINT fwSide, LPRECT pRect)
+{
+	CWnd::OnSizing(fwSide, pRect);
+
+	if( emulating ) {
+		soundPause();
+	}
 }
 
 void MainWnd::OnSize(UINT nType, int cx, int cy)
