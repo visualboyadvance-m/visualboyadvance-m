@@ -2009,8 +2009,13 @@ void MainWnd::OnOutputapiOalconfiguration()
 	OALConfig dlg;
 
 	dlg.selectedDevice = theApp.oalDevice;
+	dlg.bufferCount = theApp.oalBufferCount;
 	
 	if( dlg.DoModal() == IDOK ) {
+		systemSoundShutdown();
+		// do this before changing any values OpenAL
+		// might need for successful cleanup
+
 		if( theApp.oalDevice ) {
 			free( theApp.oalDevice );
 			theApp.oalDevice = NULL;
@@ -2018,8 +2023,8 @@ void MainWnd::OnOutputapiOalconfiguration()
 
 		theApp.oalDevice = (TCHAR*)malloc( (dlg.selectedDevice.GetLength() + 1) * sizeof( TCHAR ) );
 		_tcscpy( theApp.oalDevice, dlg.selectedDevice.GetBuffer() );
+		theApp.oalBufferCount = dlg.bufferCount;
 
-		systemSoundShutdown();
 		systemSoundInit();
 	}
 #endif

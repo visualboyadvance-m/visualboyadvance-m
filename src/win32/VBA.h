@@ -155,6 +155,7 @@ class VBA : public CWinApp
   AUDIO_API audioAPI;
 #ifndef NO_OAL
   TCHAR *oalDevice;
+  int oalBufferCount;
 #endif
   bool iconic;
   bool ddrawEmulationOnly;

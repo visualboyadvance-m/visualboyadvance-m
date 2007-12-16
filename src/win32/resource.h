@@ -512,6 +512,8 @@
 #define IDC_LY                          1267
 #define IDC_APPENDMODE                  1268
 #define IDC_DEVICE                      1269
+#define IDC_SLIDER_BUFFERCOUNT          1270
+#define IDC_BUFFERINFO                  1271
 #define ID_HELP_ABOUT                   40001
 #define ID_FILE_EXIT                    40002
 #define ID_OPTIONS_VIDEO_FRAMESKIP_0    40003
@@ -821,7 +823,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        161
 #define _APS_NEXT_COMMAND_VALUE         40353
-#define _APS_NEXT_CONTROL_VALUE         1270
+#define _APS_NEXT_CONTROL_VALUE         1272
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
 #endif
