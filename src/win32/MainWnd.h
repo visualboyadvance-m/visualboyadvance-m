@@ -452,6 +452,7 @@ public:
 	afx_msg void OnOutputapiOalconfiguration();
 	afx_msg void OnUpdateOutputapiOalconfiguration(CCmdUI *pCmdUI);
 	afx_msg void OnMoving(UINT fwSide, LPRECT pRect);
+	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 };
 
 /////////////////////////////////////////////////////////////////////////////
