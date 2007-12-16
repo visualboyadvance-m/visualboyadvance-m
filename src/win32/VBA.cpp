@@ -1,6 +1,7 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
 // Copyright (C) 2005 Forgotten and the VBA development team
+// Copyright (C) 2007 VBA-M development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -316,8 +317,8 @@ VBA::VBA()
   sound = NULL;
   aviRecording = false;
   aviRecorder = NULL;
-  aviFrameNumber = 0;
   painting = false;
+  skipAudioFrames = 0;
   movieRecording = false;
   moviePlaying = false;
   movieFrame = 0;
@@ -1000,49 +1001,32 @@ void systemDrawScreen()
   if (Sm60FPS_CanSkipFrame())
 	  return;
 
-  if(theApp.aviRecording && !theApp.painting) {
-    int width = 240;
-    int height = 160;
-    switch(theApp.cartridgeType) {
-    case 0:
-      width = 240;
-      height = 160;
-      break;
-    case 1:
-      if(gbBorderOn) {
-        width = 256;
-        height = 224;
-      } else {
-        width = 160;
-        height = 144;
-      }
-      break;
-    }
-
-    if(theApp.aviRecorder == NULL) {
-      theApp.aviRecorder = new AVIWrite();
-      theApp.aviFrameNumber = 0;
-
-      theApp.aviRecorder->SetFPS(60);
-
-      BITMAPINFOHEADER bi;
-      memset(&bi, 0, sizeof(bi));
-      bi.biSize = 0x28;
-      bi.biPlanes = 1;
-      bi.biBitCount = 24;
-      bi.biWidth = width;
-      bi.biHeight = height;
-      bi.biSizeImage = 3*width*height;
-      theApp.aviRecorder->SetVideoFormat(&bi);
-      theApp.aviRecorder->Open(theApp.aviRecordName);
-    }
-
-    char *bmp = new char[width*height*3];
-
-    utilWriteBMP(bmp, width, height, pix);
-    theApp.aviRecorder->AddFrame(theApp.aviFrameNumber, bmp);
-
-    delete bmp;
+  if( theApp.aviRecording ) {
+	  if( theApp.painting ) {
+		  theApp.skipAudioFrames++;
+	  } else {
+		  unsigned char *bmp;
+		  unsigned short srcPitch = theApp.sizeX * ( systemColorDepth >> 3 ) + 4;
+		  switch( systemColorDepth )
+		  {
+		  case 16:
+			  bmp = new unsigned char[ theApp.sizeX * theApp.sizeY * 2 ];
+			  cpyImg16bmp( bmp, pix + srcPitch, srcPitch, theApp.sizeX, theApp.sizeY );
+			  break;
+		  case 32:
+			  // use 24 bit colors to reduce video size
+			  bmp = new unsigned char[ theApp.sizeX * theApp.sizeY * 3 ];
+			  cpyImg32bmp( bmp, pix + srcPitch, srcPitch, theApp.sizeX, theApp.sizeY );
+			  break;
+		  }
+		  if( false == theApp.aviRecorder->AddVideoFrame( bmp ) ) {
+			  systemMessage( IDS_AVI_CANNOT_WRITE_VIDEO, "Cannot write video frame to AVI file." );
+			  delete theApp.aviRecorder;
+			  theApp.aviRecorder = NULL;
+			  theApp.aviRecording = false;
+		  }
+		  delete bmp;
+	  }
   }
 
   if( theApp.ifbFunction ) {
@@ -1115,13 +1099,14 @@ void systemShowSpeed(int speed)
   }
 }
 
+
 void systemFrame()
 {
-  if(theApp.aviRecording)
-    theApp.aviFrameNumber++;
-  if(theApp.movieRecording || theApp.moviePlaying)
-    theApp.movieFrame++;
+	if( theApp.movieRecording || theApp.moviePlaying ) {
+		theApp.movieFrame++;
+	}
 }
+
 
 void system10Frames(int rate)
 {
@@ -1220,17 +1205,17 @@ void systemSoundShutdown()
 	if( theApp.aviRecorder ) {
 		delete theApp.aviRecorder;
 		theApp.aviRecorder = NULL;
-		theApp.aviFrameNumber = 0;
 	}
+	theApp.aviRecording = false;
 
-	if( theApp.soundRecording ) {
-		if( theApp.soundRecorder ) {
-			delete theApp.soundRecorder;
-			theApp.soundRecorder = NULL;
-		}
-		theApp.soundRecording = false;
+
+	if( theApp.soundRecorder ) {
+		delete theApp.soundRecorder;
+		theApp.soundRecorder = NULL;
 	}
+	theApp.soundRecording = false;
 
+	
 	if( theApp.sound ) {
 		delete theApp.sound;
 		theApp.sound = NULL;
@@ -1278,18 +1263,16 @@ void systemWriteDataToSoundBuffer()
 	}
 
 	if( theApp.aviRecording && theApp.aviRecorder ) {
-		if( !theApp.aviRecorder->IsSoundAdded() ) {
-			WAVEFORMATEX format;
-			format.cbSize = 0;
-			format.wFormatTag = WAVE_FORMAT_PCM;
-			format.nChannels = 2;
-			format.nSamplesPerSec = 44100 / soundQuality;
-			format.wBitsPerSample = 16;
-			format.nBlockAlign = format.nChannels * ( format.wBitsPerSample >> 3 );
-			format.nAvgBytesPerSec = format.nSamplesPerSec * format.nBlockAlign;
-			theApp.aviRecorder->SetSoundFormat( &format );
+		if( theApp.skipAudioFrames ) {
+			theApp.skipAudioFrames--;
+		} else {
+			if( false == theApp.aviRecorder->AddAudioFrame( soundFinalWave ) ) {
+				systemMessage( IDS_AVI_CANNOT_WRITE_AUDIO, "Cannot write audio frame to AVI file." );
+				delete theApp.aviRecorder;
+				theApp.aviRecorder = NULL;
+				theApp.aviRecording = false;
+			}
 		}
-		theApp.aviRecorder->AddSound( (const char *)soundFinalWave, soundBufferLen );
 	}
 
 	if( theApp.sound ) {

@@ -42,6 +42,7 @@
 
 #include "../GBA.h"
 #include "../Globals.h"
+#include "../Sound.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -341,61 +342,117 @@ void MainWnd::OnUpdateOptionsSoundStoprecording(CCmdUI* pCmdUI)
   pCmdUI->Enable(theApp.soundRecording);
 }
 
+
 void MainWnd::OnToolsRecordStartavirecording()
 {
-  theApp.winCheckFullscreen();
-  CString captureBuffer;
+	theApp.winCheckFullscreen();
+	
+	CString captureBuffer;
+	CString capdir = regQueryStringValue( "aviRecordDir", NULL );
+	
+	if( capdir.IsEmpty() ) {
+		capdir = getDirFromFile( theApp.filename );
+	}
+	
+	CString filter = theApp.winLoadFilter( IDS_FILTER_AVI );
+	CString title = winResLoadString( IDS_SELECT_AVI_NAME );
+	
+	LPCTSTR exts[] = { ".AVI" };
+	
+	FileDlg dlg( this, "", filter, 1, "AVI", exts, capdir, title, true );
+	
+	if( dlg.DoModal() == IDCANCEL ) {
+		return;
+	}
+	
+	captureBuffer = theApp.soundRecordName =  dlg.GetPathName();
+	theApp.aviRecordName = captureBuffer;
+	theApp.aviRecording = true;
+	
+	if( dlg.m_ofn.nFileOffset > 0 ) {
+		captureBuffer = captureBuffer.Left( dlg.m_ofn.nFileOffset );
+	}
+	
+	int len = captureBuffer.GetLength();
+	
+	if( ( len > 3 ) && captureBuffer[ len - 1 ] == '\\' ) {
+		captureBuffer = captureBuffer.Left( len - 1 );
+	}
+	
+	regSetStringValue( "aviRecordDir", captureBuffer );
 
-  CString capdir = regQueryStringValue("aviRecordDir", NULL);
 
-  if(capdir.IsEmpty())
-    capdir = getDirFromFile(theApp.filename);
+	// create AVI file
+	bool ret;
 
-  CString filter = theApp.winLoadFilter(IDS_FILTER_AVI);
-  CString title = winResLoadString(IDS_SELECT_AVI_NAME);
+	if( theApp.aviRecorder ) {
+		delete theApp.aviRecorder;
+		theApp.aviRecorder = NULL;
+	}
+	theApp.aviRecorder = new AVIWrite();
 
-  LPCTSTR exts[] = { ".AVI" };
+	// create AVI file
+	ret = theApp.aviRecorder->CreateAVIFile( theApp.aviRecordName );
+	if( !ret ) {
+		systemMessage( IDS_AVI_CANNOT_CREATE_AVI, "Cannot create AVI file." );
+		delete theApp.aviRecorder;
+		theApp.aviRecorder = NULL;
+		theApp.aviRecording = false;
+		return;
+	}
 
-  FileDlg dlg(this, "", filter, 1, "AVI", exts, capdir, title, true);
+	// add video stream
+	ret = theApp.aviRecorder->CreateVideoStream(
+		theApp.sizeX,
+		theApp.sizeY,
+		( systemColorDepth == 32 ) ? 24 : 16,
+		60
+		);
+	if( !ret ) {
+		systemMessage( IDS_AVI_CANNOT_CREATE_VIDEO, "Cannot create video stream in AVI file." );
+		delete theApp.aviRecorder;
+		theApp.aviRecorder = NULL;
+		theApp.aviRecording = false;
+		return;
+	}
 
-  if(dlg.DoModal() == IDCANCEL) {
-    return;
-  }
-
-  captureBuffer = theApp.soundRecordName =  dlg.GetPathName();
-  theApp.aviRecordName = captureBuffer;
-  theApp.aviRecording = true;
-
-  if(dlg.m_ofn.nFileOffset > 0) {
-    captureBuffer = captureBuffer.Left(dlg.m_ofn.nFileOffset);
-  }
-
-  int len = captureBuffer.GetLength();
-
-  if(len > 3 && captureBuffer[len-1] == '\\')
-    captureBuffer = captureBuffer.Left(len-1);
-
-  regSetStringValue("aviRecordDir", captureBuffer);
+	// add audio stream
+	if( !soundOffFlag ) {
+		ret = theApp.aviRecorder->CreateAudioStream(
+			2,
+			44100 / soundQuality,
+			16
+			);
+		if( !ret ) {
+			systemMessage( IDS_AVI_CANNOT_CREATE_AUDIO, "Cannot create audio stream in AVI file." );
+			delete theApp.aviRecorder;
+			theApp.aviRecorder = NULL;
+			theApp.aviRecording = false;
+			return;
+		}
+	}
 }
+
 
 void MainWnd::OnUpdateToolsRecordStartavirecording(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(!theApp.aviRecording);
+	pCmdUI->Enable( !theApp.aviRecording && emulating );
 }
+
 
 void MainWnd::OnToolsRecordStopavirecording()
 {
-  if(theApp.aviRecorder != NULL) {
-    delete theApp.aviRecorder;
-    theApp.aviRecorder = NULL;
-    theApp.aviFrameNumber = 0;
-  }
-  theApp.aviRecording = false;
+	if( theApp.aviRecorder ) {
+		delete theApp.aviRecorder;
+		theApp.aviRecorder = NULL;
+	}
+	theApp.aviRecording = false;
 }
+
 
 void MainWnd::OnUpdateToolsRecordStopavirecording(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.aviRecording);
+  pCmdUI->Enable( theApp.aviRecording );
 }
 
 void MainWnd::OnToolsRecordStartmovierecording()

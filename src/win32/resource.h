@@ -380,9 +380,7 @@
 #define IDC_SAVE_OBJ                    1138
 #define IDC_MAP_VIEW_ZOOM               1138
 #define IDS_MOVIE_PLAY                  1138
-#define IDS_OAL_NODEVICE                1139
 #define IDC_VIEWER                      1140
-#define IDS_OAL_NODLL                   1140
 #define IDC_ADDRESSES                   1141
 #define IDC_GO                          1143
 #define IDC_8_BIT                       1144
@@ -514,6 +512,13 @@
 #define IDC_DEVICE                      1269
 #define IDC_SLIDER_BUFFERCOUNT          1270
 #define IDC_BUFFERINFO                  1271
+#define IDS_OAL_NODEVICE                2000
+#define IDS_OAL_NODLL                   2001
+#define IDS_AVI_CANNOT_CREATE_AVI       2002
+#define IDS_AVI_CANNOT_CREATE_VIDEO     2003
+#define IDS_AVI_CANNOT_CREATE_AUDIO     2004
+#define IDS_AVI_CANNOT_WRITE_VIDEO      2005
+#define IDS_AVI_CANNOT_WRITE_AUDIO      2006
 #define ID_HELP_ABOUT                   40001
 #define ID_FILE_EXIT                    40002
 #define ID_OPTIONS_VIDEO_FRAMESKIP_0    40003
