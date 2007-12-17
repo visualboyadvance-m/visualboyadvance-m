@@ -406,10 +406,11 @@ void MainWnd::OnToolsRecordStartavirecording()
 		theApp.sizeX,
 		theApp.sizeY,
 		( systemColorDepth == 32 ) ? 24 : 16,
-		60
+		60,
+		this->GetSafeHwnd()
 		);
 	if( !ret ) {
-		systemMessage( IDS_AVI_CANNOT_CREATE_VIDEO, "Cannot create video stream in AVI file." );
+		systemMessage( IDS_AVI_CANNOT_CREATE_VIDEO, "Cannot create video stream in AVI file. Make sure the selected codec supports input in RGB24 color space!" );
 		delete theApp.aviRecorder;
 		theApp.aviRecorder = NULL;
 		theApp.aviRecording = false;
@@ -421,7 +422,8 @@ void MainWnd::OnToolsRecordStartavirecording()
 		ret = theApp.aviRecorder->CreateAudioStream(
 			2,
 			44100 / soundQuality,
-			16
+			16,
+			this->GetSafeHwnd()
 			);
 		if( !ret ) {
 			systemMessage( IDS_AVI_CANNOT_CREATE_AUDIO, "Cannot create audio stream in AVI file." );
