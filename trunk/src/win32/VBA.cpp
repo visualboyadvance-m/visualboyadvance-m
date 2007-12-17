@@ -1262,7 +1262,7 @@ void systemWriteDataToSoundBuffer()
 		}
 	}
 
-	if( theApp.aviRecording && theApp.aviRecorder ) {
+	if( theApp.aviRecording && theApp.aviRecorder && !soundOffFlag ) {
 		if( theApp.skipAudioFrames ) {
 			theApp.skipAudioFrames--;
 		} else {
