@@ -2132,7 +2132,7 @@ void gbGetHardwareType()
 {
   gbCgbMode = 0;
   gbSgbMode = 0;
-  if((gbRom[0x143] & 0x80) && !((gbRom[0x146] == 0x03) && (gbBorderAutomatic))) {
+  if(gbRom[0x143] & 0x80) {
     if((gbEmulatorType == 0) ||
        gbEmulatorType == 1 ||
        gbEmulatorType == 4) {
