@@ -535,30 +535,42 @@ void MainWnd::OnUpdateOptionsVideoDdrawusevideomemory(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsVideoRenderoptionsD3dnofilter()
 {
+#ifndef NO_D3D
 	theApp.d3dFilter = 0;
 	if( theApp.display ) {
 		theApp.display->setOption( _T("d3dFilter"), theApp.d3dFilter );
 	}
+#endif
 }
 
 void MainWnd::OnUpdateOptionsVideoRenderoptionsD3dnofilter(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.d3dFilter == 0);
+#ifndef NO_D3D
+	pCmdUI->SetCheck(theApp.d3dFilter == 0);
+#else
+	pCmdUI->Enable( FALSE );
+#endif
 }
 
 
 void MainWnd::OnOptionsVideoRenderoptionsD3dbilinear()
 {
+#ifndef NO_D3D
 	theApp.d3dFilter = 1;
 	if( theApp.display ) {
 		theApp.display->setOption( _T("d3dFilter"), theApp.d3dFilter );
 	}
+#endif
 }
 
 
 void MainWnd::OnUpdateOptionsVideoRenderoptionsD3dbilinear(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.d3dFilter == 1);
+#ifndef NO_D3D
+	pCmdUI->SetCheck(theApp.d3dFilter == 1);
+#else
+	pCmdUI->Enable( FALSE );
+#endif
 }
 
 
