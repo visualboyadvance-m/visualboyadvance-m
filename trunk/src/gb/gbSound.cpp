@@ -186,8 +186,8 @@ static void remake_stereo_buffer()
 
 void gbSoundReset()
 {
-	gb_effects_config.echo     = 0.20;
-	gb_effects_config.stereo   = 0.15;
+	gb_effects_config.echo     = 0.20f;
+	gb_effects_config.stereo   = 0.15f;
 	gb_effects_config.surround = false;
 	
 	SOUND_CLOCK_TICKS = 20000;
