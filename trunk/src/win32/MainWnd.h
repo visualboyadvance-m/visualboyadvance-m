@@ -202,20 +202,12 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsVideoRenderoptionsGlbilinear(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderingoptionsGLSLShaders();
   afx_msg void OnUpdateOptionsVideoRenderingoptionsGLSLShaders(CCmdUI* pCmdUI);
-
   afx_msg void OnOptionsVideoRenderoptionsGltriangle();
   afx_msg void OnUpdateOptionsVideoRenderoptionsGltriangle(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsGlquads();
   afx_msg void OnUpdateOptionsVideoRenderoptionsGlquads(CCmdUI* pCmdUI);
-    afx_msg void OnOptionsVideoRenderoptionsGlpolygons();
+  afx_msg void OnOptionsVideoRenderoptionsGlpolygons();
   afx_msg void OnUpdateOptionsVideoRenderoptionsGlpolygons(CCmdUI* pCmdUI);
-
-      afx_msg void OnOptionsVideoRenderoptionsGlACID();
-  afx_msg void OnUpdateOptionsVideoRenderoptionsGlACID(CCmdUI* pCmdUI);
-        afx_msg void OnOptionsVideoRenderoptionsGlPulsation();
-  afx_msg void OnUpdateOptionsVideoRenderoptionsGlPulsation(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsVideoRenderoptionsGlNone();
-  afx_msg void OnUpdateOptionsVideoRenderoptionsGlNone(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsSelectskin();
   afx_msg void OnUpdateOptionsVideoRenderoptionsSelectskin(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsSkin();
