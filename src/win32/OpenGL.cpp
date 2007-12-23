@@ -140,7 +140,7 @@ char *readShaderFile(char *FileName) {
 	FILE *fp;
 	char *DATA = NULL;
 
-	int flength = 0;
+	size_t flength = 0;
 
 	fp = fopen(FileName,"rt");
 
@@ -413,7 +413,7 @@ void OpenGLDisplay::render()
 		}
 		glFontBegin(&font);
 		glPushMatrix();
-		float fontscale = (float)theApp.surfaceSizeX / 100.0;
+		float fontscale = (float)theApp.surfaceSizeX / 100.0f;
 		glScalef(fontscale, fontscale, fontscale);
 		glColor4f(1.0f, 0.25f, 0.25f, 1.0f);
 		glFontTextOut(buffer, (theApp.surfaceSizeX-(strlen(buffer)*11))/(fontscale*2), (theApp.surfaceSizeY-20)/fontscale, 0);
@@ -427,7 +427,7 @@ void OpenGLDisplay::render()
 			glFontBegin(&font);
 			glPushMatrix();
 
-			float fontscale = (float)theApp.surfaceSizeX / 100.0;
+			float fontscale = (float)theApp.surfaceSizeX / 100.0f;
 			glScalef(fontscale, fontscale, fontscale);
 			glColor4f(1.0f, 0.25f, 0.25f, 1.0f);
 			glFontTextOut((char *)((const char *)theApp.screenMessageBuffer), (theApp.surfaceSizeX-(theApp.screenMessageBuffer.GetLength()*11))/(fontscale*2), (theApp.surfaceSizeY-40)/fontscale, 0);
