@@ -33,7 +33,7 @@ static char THIS_FILE[] = __FILE__;
 
 BOOL bAppendMode;
 
-void AssignKey(KeyList &Key, int Out)
+void AssignKey(KeyList &Key, LONG_PTR Out)
 {
 	if( !bAppendMode ) {
 		Key.RemoveAll();

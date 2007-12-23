@@ -20,7 +20,7 @@ class SelectPlugin : public CDialog
 // Construction
 public:
 	SelectPlugin(CWnd* pParent = NULL);   // standard constructor
-	int EnumPlugins();
+	size_t EnumPlugins();
 	bool GetPluginDesc(const char *sRpi, PluginDesc *pDesc);
 
 // Dialog Data
