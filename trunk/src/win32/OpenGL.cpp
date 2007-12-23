@@ -35,7 +35,6 @@
 // OpenGL
 #include <gl/GL.h> // main include file
 #include <GL/glu.h>
-#include <GL/glaux.h>
 #ifdef HAS_GLEXT
 #include <gl/glext.h>
 #endif
@@ -54,6 +53,8 @@ PFNGLLINKPROGRAMARBPROC          glLinkProgramARB          = NULL;
 PFNGLGETUNIFORMLOCATIONARBPROC   glGetUniformLocationARB   = NULL;
 PFNGLUNIFORM4FARBPROC            glUniform4fARB            = NULL;
 PFNGLUNIFORM1IARBPROC            glUniform1iARB            = NULL;
+
+
 
 
 extern int Init_2xSaI(u32);
@@ -86,7 +87,6 @@ private:
 	GLFONT font;
 	int VertexShader,FragmentShader,textureLocation,ShaderProgram,g_location_grayScaleWeights;
 	char *VertexShaderSource,*FragmentShaderSource;
-    int ShaderProgram;
 
 	void initializeMatrices( int w, int h );
 	bool initializeTexture( int w, int h );
@@ -308,7 +308,6 @@ bool OpenGLDisplay::initialize()
 	glEnable( GL_TEXTURE_2D );
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-	glewInit();
 	
 	initializeMatrices( theApp.surfaceSizeX, theApp.surfaceSizeY );
 
@@ -356,7 +355,7 @@ void OpenGLDisplay::render()
 	}
 	else{
 	glUseProgramObjectARB(NULL);
-	DeInitShader();
+	DeInitGLSLShader();
 	}
 	
 	int pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
