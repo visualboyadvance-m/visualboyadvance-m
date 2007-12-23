@@ -32,15 +32,29 @@
 #include <cmath>
 #include "glFont.h"
 
-#pragma comment(lib,"glew32.lib")
-#include <GL/glew.h>
 // OpenGL
 #include <gl/GL.h> // main include file
+#include <GL/glu.h>
+#include <GL/glaux.h>
 #ifdef HAS_GLEXT
 #include <gl/glext.h>
 #endif
 
 typedef BOOL (APIENTRY *PFNWGLSWAPINTERVALFARPROC)( int );
+PFNGLCREATEPROGRAMOBJECTARBPROC  glCreateProgramObjectARB  = NULL;
+PFNGLDELETEOBJECTARBPROC         glDeleteObjectARB         = NULL;
+PFNGLUSEPROGRAMOBJECTARBPROC     glUseProgramObjectARB     = NULL;
+PFNGLCREATESHADEROBJECTARBPROC   glCreateShaderObjectARB   = NULL;
+PFNGLSHADERSOURCEARBPROC         glShaderSourceARB         = NULL;
+PFNGLCOMPILESHADERARBPROC        glCompileShaderARB        = NULL;
+PFNGLGETOBJECTPARAMETERIVARBPROC glGetObjectParameterivARB = NULL;
+PFNGLATTACHOBJECTARBPROC         glAttachObjectARB         = NULL;
+PFNGLGETINFOLOGARBPROC           glGetInfoLogARB           = NULL;
+PFNGLLINKPROGRAMARBPROC          glLinkProgramARB          = NULL;
+PFNGLGETUNIFORMLOCATIONARBPROC   glGetUniformLocationARB   = NULL;
+PFNGLUNIFORM4FARBPROC            glUniform4fARB            = NULL;
+PFNGLUNIFORM1IARBPROC            glUniform1iARB            = NULL;
+
 
 extern int Init_2xSaI(u32);
 extern void winlog(const char *,...);
@@ -70,8 +84,8 @@ private:
 	RECT destRect;
 	bool failed;
 	GLFONT font;
+	int VertexShader,FragmentShader,textureLocation,ShaderProgram,g_location_grayScaleWeights;
 	char *VertexShaderSource,*FragmentShaderSource;
-    int VertexShader,FragmentShader;
     int ShaderProgram;
 
 	void initializeMatrices( int w, int h );
@@ -80,9 +94,9 @@ private:
 	void setVSync( int interval = 1 );
 	void calculateDestRect( int w, int h );
 	void initializeFont();
-	void InitShader();
-	void DeInitShader();
-
+	void InitGLSLShader();
+	void DeInitGLSLShader();
+	void SetGLSLShaderConstants();
 
 public:
 	OpenGLDisplay();
@@ -157,21 +171,26 @@ char *readShaderFile(char *FileName) {
 	return DATA;
 }
 
-void OpenGLDisplay::DeInitShader () {
-	glDetachObjectARB(ShaderProgram,VertexShader);
-	glDetachObjectARB(ShaderProgram,FragmentShader);
-	glDeleteObjectARB(ShaderProgram);
-}
+void OpenGLDisplay::InitGLSLShader (void) {
+	glCreateProgramObjectARB  = (PFNGLCREATEPROGRAMOBJECTARBPROC)wglGetProcAddress("glCreateProgramObjectARB");
+    glDeleteObjectARB         = (PFNGLDELETEOBJECTARBPROC)wglGetProcAddress("glDeleteObjectARB");
+    glUseProgramObjectARB     = (PFNGLUSEPROGRAMOBJECTARBPROC)wglGetProcAddress("glUseProgramObjectARB");
+    glCreateShaderObjectARB   = (PFNGLCREATESHADEROBJECTARBPROC)wglGetProcAddress("glCreateShaderObjectARB");
+    glShaderSourceARB         = (PFNGLSHADERSOURCEARBPROC)wglGetProcAddress("glShaderSourceARB");
+    glCompileShaderARB        = (PFNGLCOMPILESHADERARBPROC)wglGetProcAddress("glCompileShaderARB");
+    glGetObjectParameterivARB = (PFNGLGETOBJECTPARAMETERIVARBPROC)wglGetProcAddress("glGetObjectParameterivARB");
+    glAttachObjectARB         = (PFNGLATTACHOBJECTARBPROC)wglGetProcAddress("glAttachObjectARB");
+    glGetInfoLogARB           = (PFNGLGETINFOLOGARBPROC)wglGetProcAddress("glGetInfoLogARB");
+    glLinkProgramARB          = (PFNGLLINKPROGRAMARBPROC)wglGetProcAddress("glLinkProgramARB");
+    glGetUniformLocationARB   = (PFNGLGETUNIFORMLOCATIONARBPROC)wglGetProcAddress("glGetUniformLocationARB");
+    glUniform4fARB            = (PFNGLUNIFORM4FARBPROC)wglGetProcAddress("glUniform4fARB");
+	glUniform1iARB            = (PFNGLUNIFORM1IARBPROC)wglGetProcAddress("glUniform1iARB");
 
-void OpenGLDisplay::InitShader () {
-	GLEW_ARB_vertex_shader;
-	GLEW_ARB_fragment_shader;
-
-	VertexShader = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+    VertexShader = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
 	FragmentShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
 
-	VertexShaderSource = readShaderFile("vertex_shader.vert");
-	FragmentShaderSource = readShaderFile("fragment_shader.frag");
+	VertexShaderSource = readShaderFile("texture.vert");
+	FragmentShaderSource = readShaderFile("texture.frag");
 
 	const char * VS = VertexShaderSource;
 	const char * FS = FragmentShaderSource;
@@ -189,7 +208,26 @@ void OpenGLDisplay::InitShader () {
 	glAttachObjectARB(ShaderProgram,VertexShader);
 	glAttachObjectARB(ShaderProgram,FragmentShader);
 
-	glLinkProgramARB(ShaderProgram);
+	glLinkProgramARB(ShaderProgram);	 
+}
+
+void OpenGLDisplay::SetGLSLShaderConstants()
+{
+	//get shader uniforms and shader weights
+	textureLocation = glGetUniformLocationARB( ShaderProgram, "testTexture" );
+	g_location_grayScaleWeights = glGetUniformLocationARB( ShaderProgram, "grayScaleWeights" );
+	glUniform1iARB( textureLocation, 1 );
+
+    // Load the grey scale weights for the luminance filter.
+    float fGrayScaleWeights[] = { 0.30f, 0.59f, 0.11f, 0.0f };
+    glUniform4fARB( g_location_grayScaleWeights, fGrayScaleWeights[0], 
+    fGrayScaleWeights[1], fGrayScaleWeights[2], fGrayScaleWeights[3] );
+
+}
+void OpenGLDisplay::DeInitGLSLShader (void) {
+	glDeleteObjectARB(VertexShader);
+	glDeleteObjectARB(FragmentShader);
+	glDeleteObjectARB(ShaderProgram);
 }
 
 OpenGLDisplay::OpenGLDisplay()
@@ -207,7 +245,7 @@ OpenGLDisplay::OpenGLDisplay()
 
 OpenGLDisplay::~OpenGLDisplay()
 {
-	DeInitShader();
+	DeInitGLSLShader();
 	cleanup();
 }
 
@@ -312,10 +350,9 @@ void OpenGLDisplay::render()
 { 
 	clear();
 	if (theApp.GLSLShaders){
-	InitShader();
-	glUseProgramObjectARB(ShaderProgram);
-    int texture_location = glGetUniformLocationARB(ShaderProgram, "OGL2Texture");
-	glUniform1iARB(texture_location, 0);
+	InitGLSLShader();
+    glUseProgramObjectARB( ShaderProgram );
+	SetGLSLShaderConstants();
 	}
 	else{
 	glUseProgramObjectARB(NULL);
@@ -348,9 +385,10 @@ void OpenGLDisplay::render()
 	}
     glTexSubImage2D(GL_TEXTURE_2D,0,0,0,width,height,GL_RGBA,GL_UNSIGNED_BYTE,data );
 
-	if( theApp.glType == 0 ) {
+	 switch(  theApp.glType )
+     {
+        case 0: 
 		glBegin( GL_TRIANGLE_STRIP );
-
 		glTexCoord2f( 0.0f, 0.0f );
 		glVertex3i( 0, 0, 0 );
 
@@ -364,9 +402,8 @@ void OpenGLDisplay::render()
 		glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
 
 		glEnd();
-	}
-	if(theApp.glType == 1)
-	{
+        break;
+		case 1:  
 		glBegin( GL_QUADS );
 
 		glTexCoord2f( 0.0f, 0.0f );
@@ -382,10 +419,8 @@ void OpenGLDisplay::render()
 		glVertex3i( 0, theApp.surfaceSizeY, 0 );
 
 		glEnd();
-
-	}
-	if(theApp.glType == 2)
-	{
+        break;
+        case 2:     
 		glBegin( GL_POLYGON );
 
 		glTexCoord2f( 0.0f, 0.0f );
@@ -401,7 +436,9 @@ void OpenGLDisplay::render()
 		glVertex3i( 0, theApp.surfaceSizeY, 0 );
 
 		glEnd();
-	}
+        break;
+  }
+
 
 
 	if( theApp.showSpeed ) { // && ( theApp.videoOption > VIDEO_4X ) ) {
