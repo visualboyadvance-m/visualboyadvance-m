@@ -78,8 +78,6 @@ END_MESSAGE_MAP()
 
 // OALConfig message handlers
 
-#endif
-
 void OALConfig::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	CString info;
@@ -89,3 +87,5 @@ void OALConfig::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 	CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
 }
+
+#endif
