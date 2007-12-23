@@ -19,7 +19,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 int const fixed_shift = 12;
 #define TO_FIXED( f )   fixed_t ((f) * ((fixed_t) 1 << fixed_shift))
-#define FROM_FIXED( f ) (f >> fixed_shift)
+#define FROM_FIXED( f ) ((f) >> fixed_shift)
 
 int const max_read = 2560; // determines minimum delay
 
@@ -505,7 +505,7 @@ void Effects_Buffer::mix_effects( blip_sample_t* out_, int pair_count )
 			int bufs_remain = bufs_size;
 			do
 			{
-				if ( buf->non_silent() && buf->echo == echo_phase )
+				if ( buf->non_silent() && ( buf->echo == (bool)echo_phase ) )
 				{
 					stereo_fixed_t* BLIP_RESTRICT out = (stereo_fixed_t*) &echo [echo_pos];
 					int const bass = BLIP_READER_BASS( *buf );
