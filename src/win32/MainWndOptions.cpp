@@ -465,20 +465,28 @@ void MainWnd::OnOptionsVideoRendermethodDirect3d()
 void MainWnd::OnUpdateOptionsVideoRendermethodDirect3d(CCmdUI* pCmdUI)
 {
 #ifndef NO_D3D
-  pCmdUI->SetCheck(theApp.renderMethod == DIRECT_3D);
+	pCmdUI->SetCheck(theApp.renderMethod == DIRECT_3D);
+#else
+	pCmdUI->Enable( FALSE );
 #endif
 }
 
 void MainWnd::OnOptionsVideoRendermethodOpengl()
 {
+#ifndef NO_OGL
   theApp.renderMethod = OPENGL;
   theApp.updateRenderMethod(false);
   theApp.winAccelMgr.UpdateMenu(theApp.menu);
+#endif
 }
 
 void MainWnd::OnUpdateOptionsVideoRendermethodOpengl(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.renderMethod == OPENGL);
+#ifndef NO_OGL
+	pCmdUI->SetCheck(theApp.renderMethod == OPENGL);
+#else
+	pCmdUI->Enable( FALSE );
+#endif
 }
 
 
@@ -556,86 +564,122 @@ void MainWnd::OnUpdateOptionsVideoRenderoptionsD3dbilinear(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsVideoRenderoptionsGlnearest()
 {
+#ifndef NO_OGL
 	theApp.glFilter = 0;
 	if( theApp.display ) {
 		theApp.display->setOption( _T("glFilter"), theApp.glFilter );
 	}
+#endif
 }
 
 
 void MainWnd::OnUpdateOptionsVideoRenderoptionsGlnearest(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.glFilter == 0);
+#ifndef NO_OGL
+	pCmdUI->SetCheck(theApp.glFilter == 0);
+#else
+	pCmdUI->Enable( FALSE );
+#endif
 }
 
 
 void MainWnd::OnOptionsVideoRenderoptionsGlbilinear()
 {
+#ifndef NO_OGL
 	theApp.glFilter = 1;
 	if( theApp.display ) {
 		theApp.display->setOption( _T("glFilter"), theApp.glFilter );
 	}
+#endif
 }
 
 
 void MainWnd::OnUpdateOptionsVideoRenderoptionsGlbilinear(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.glFilter == 1);
+#ifndef NO_OGL
+	pCmdUI->SetCheck(theApp.glFilter == 1);
+#else
+	pCmdUI->Enable( FALSE );
+#endif
 }
 
 void MainWnd::OnOptionsVideoRenderoptionsGltriangle()
 {
+#ifndef NO_OGL
 	theApp.glType = 0;
 	if( theApp.display ) {
 		theApp.display->setOption( _T("glType"), theApp.glType );
 	}
+#endif
 }
 
 
 void MainWnd::OnUpdateOptionsVideoRenderoptionsGltriangle(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.glType == 0);
+#ifndef NO_OGL
+	pCmdUI->SetCheck(theApp.glType == 0);
+#else
+	pCmdUI->Enable( FALSE );
+#endif
 }
 
 
 void MainWnd::OnOptionsVideoRenderoptionsGlquads()
 {
+#ifndef NO_OGL
 	theApp.glType = 1;
 	if( theApp.display ) {
 		theApp.display->setOption( _T("glType"), theApp.glType );
 	}
+#endif
 }
 
 
 void MainWnd::OnUpdateOptionsVideoRenderoptionsGlquads(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.glType == 1);
+#ifndef NO_OGL
+	pCmdUI->SetCheck(theApp.glType == 1);
+#else
+	pCmdUI->Enable( FALSE );
+#endif
 }
 
 void MainWnd::OnOptionsVideoRenderoptionsGlpolygons()
 {
+#ifndef NO_OGL
 	theApp.glType = 2;
 	if( theApp.display ) {
 		theApp.display->setOption( _T("glType"), theApp.glType );
 	}
+#endif
 }
 
 void MainWnd::OnUpdateOptionsVideoRenderoptionsGlpolygons(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.glType == 2);
+#ifndef NO_OGL
+	pCmdUI->SetCheck(theApp.glType == 2);
+#else
+	pCmdUI->Enable( FALSE );
+#endif
 }
 
 void MainWnd::OnUpdateOptionsVideoRenderingoptionsGLSLShaders(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.GLSLShaders);
+#ifndef NO_OGL
+	pCmdUI->SetCheck(theApp.GLSLShaders);
+#else
+	pCmdUI->Enable( FALSE );
+#endif
 }
 
 void MainWnd::OnOptionsVideoRenderingoptionsGLSLShaders()
 {
+#ifndef NO_OGL
 	theApp.GLSLShaders = !theApp.GLSLShaders;
 	if( theApp.GLSLShaders ) {
 		theApp.display->setOption( _T("GLSLShaders"), theApp.GLSLShaders );
 	}
+#endif
 }
 
 void MainWnd::OnOptionsEmulatorAssociate()
@@ -2000,6 +2044,8 @@ void MainWnd::OnUpdateOutputapiOpenal(CCmdUI *pCmdUI)
 #ifndef NO_OAL
 	pCmdUI->SetCheck( ( theApp.audioAPI == OPENAL_SOUND ) ? 1 : 0 );
 	pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
+#else
+	pCmdUI->Enable( FALSE );
 #endif
 }
 
@@ -2034,5 +2080,7 @@ void MainWnd::OnUpdateOutputapiOalconfiguration(CCmdUI *pCmdUI)
 {
 #ifndef NO_OAL
 	pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
+#else
+	pCmdUI->Enable( FALSE );
 #endif
 }

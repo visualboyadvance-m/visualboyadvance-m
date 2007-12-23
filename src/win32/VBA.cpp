@@ -101,7 +101,9 @@ extern void toolsLog(const char *);
 
 extern IDisplay *newGDIDisplay();
 extern IDisplay *newDirectDrawDisplay();
+#ifndef NO_OGL
 extern IDisplay *newOpenGLDisplay();
+#endif
 #ifndef NO_D3D
 extern IDisplay *newDirect3DDisplay();
 #endif
@@ -1445,7 +1447,10 @@ void VBA::loadSettings()
   }
 
   renderMethod = (DISPLAY_TYPE)regQueryDwordValue("renderMethod", DIRECT_DRAW);
-  if( ( renderMethod != DIRECT_DRAW ) && ( renderMethod != OPENGL )
+  if( ( renderMethod != DIRECT_DRAW )
+#ifndef NO_OGL
+	  && ( renderMethod != OPENGL )
+#endif
 #ifndef NO_D3D
 	  && ( renderMethod != DIRECT_3D )
 #endif
@@ -2121,34 +2126,19 @@ bool VBA::preInitialize()
 
 bool VBA::updateRenderMethod(bool force)
 {
-	Sm60FPS_Init();
-	bool res = updateRenderMethod0(force);
+	bool ret = true;
 
-	while(!res && renderMethod > 0) {
-		if( fsAdapter > 0 ) {
-			fsAdapter = 0;
-		} else {
-			if( videoOption > VIDEO_4X ) {
-				videoOption = VIDEO_1X;
-				force = true;
-			} else {
-				if(renderMethod == OPENGL) {
-#ifndef NO_D3D
-					renderMethod = DIRECT_3D;
-				} else {
-					if(renderMethod == DIRECT_3D) {
-#endif
-						renderMethod = DIRECT_DRAW;
-						}
-					}
-				}
-#ifndef NO_D3D
-			}
-#endif
-		res = updateRenderMethod(force);
+	Sm60FPS_Init();
+
+	if( !updateRenderMethod0( force ) ) {
+		// fall back to safe configuration
+		renderMethod = DIRECT_DRAW;
+		fsAdapter = 0;
+		videoOption = VIDEO_1X;
+		ret = updateRenderMethod( true );
 	}
 
-	return res;
+	return ret;
 }
 
 
@@ -2183,19 +2173,22 @@ bool VBA::updateRenderMethod0(bool force)
   }
   if(display == NULL) {
     switch(renderMethod) {
-    case DIRECT_DRAW:
-		pVideoDriverGUID = NULL;
-		ZeroMemory( &videoDriverGUID, sizeof( GUID ) );
-		display = newDirectDrawDisplay();
-		break;
+#ifndef NO_OGL
 	case OPENGL:
 		display = newOpenGLDisplay();
 		break;
+#endif
 #ifndef NO_D3D
     case DIRECT_3D:
 		display = newDirect3DDisplay();
 		break;
 #endif
+    case DIRECT_DRAW:
+	default:
+		pVideoDriverGUID = NULL;
+		ZeroMemory( &videoDriverGUID, sizeof( GUID ) );
+		display = newDirectDrawDisplay();
+		break;
     }
 
 	if( preInitialize() ) {
