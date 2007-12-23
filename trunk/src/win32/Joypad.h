@@ -166,7 +166,7 @@ class MotionConfig : public CDialog
   //}}AFX_MSG
   DECLARE_MESSAGE_MAP()
     private:
-  UINT timerId;
+  UINT_PTR timerId;
 public:
 	afx_msg void OnBnClickedAppendmode();
 };

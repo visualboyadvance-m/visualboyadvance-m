@@ -74,7 +74,7 @@ BOOL SelectPlugin::OnInitDialog()
 
 	m_comboPlugin.ResetContent();
 
-	int nPluginCnt = EnumPlugins();
+	size_t nPluginCnt = EnumPlugins();
 	if (nPluginCnt > 0)
 	{
 		for (int i = 0; i < rpiPool.size(); i++)
@@ -95,7 +95,7 @@ BOOL SelectPlugin::OnInitDialog()
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-int SelectPlugin::EnumPlugins()
+size_t SelectPlugin::EnumPlugins()
 {
 	rpiPool.clear();
 
