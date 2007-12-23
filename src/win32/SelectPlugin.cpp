@@ -54,7 +54,7 @@ void SelectPlugin::OnOK()
 	if (m_comboPlugin.GetCount() > 0)
 	{
 		int nSel = m_comboPlugin.GetCurSel();
-		if (nSel >= 0 && nSel < rpiPool.size())
+		if (nSel >= 0 && nSel < (int)rpiPool.size())
 			strcpy(theApp.pluginName, rpiPool[nSel].sFile);
 	}
 
@@ -77,10 +77,10 @@ BOOL SelectPlugin::OnInitDialog()
 	size_t nPluginCnt = EnumPlugins();
 	if (nPluginCnt > 0)
 	{
-		for (int i = 0; i < rpiPool.size(); i++)
+		for (size_t i = 0; i < rpiPool.size(); i++)
 			m_comboPlugin.AddString(rpiPool[i].sDesc);
 
-		for (int ii = 0; ii < rpiPool.size(); ii++)
+		for (size_t ii = 0; ii < rpiPool.size(); ii++)
 		{
 			if (_stricmp(theApp.pluginName, rpiPool[ii].sFile) == 0)
 			{
