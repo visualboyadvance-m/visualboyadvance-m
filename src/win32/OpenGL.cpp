@@ -37,9 +37,9 @@
 // OpenGL
 #include <gl/GL.h> // main include file
 #include <GL/glu.h>
-#ifdef HAS_GLEXT
+
 #include <gl/glext.h>
-#endif
+
 
 typedef BOOL (APIENTRY *PFNWGLSWAPINTERVALFARPROC)( int );
 PFNGLCREATEPROGRAMOBJECTARBPROC  glCreateProgramObjectARB  = NULL;
@@ -117,10 +117,7 @@ public:
 	virtual int  selectFullScreenMode( GUID ** );
 };
 
-
-
 #include "gzglfont.h"
-char *readShaderFile(char *FileName);
 void OpenGLDisplay::initializeFont()
 {
     int ret;
@@ -174,20 +171,6 @@ char *readShaderFile(char *FileName) {
 }
 
 void OpenGLDisplay::InitGLSLShader (void) {
-	glCreateProgramObjectARB  = (PFNGLCREATEPROGRAMOBJECTARBPROC)wglGetProcAddress("glCreateProgramObjectARB");
-    glDeleteObjectARB         = (PFNGLDELETEOBJECTARBPROC)wglGetProcAddress("glDeleteObjectARB");
-    glUseProgramObjectARB     = (PFNGLUSEPROGRAMOBJECTARBPROC)wglGetProcAddress("glUseProgramObjectARB");
-    glCreateShaderObjectARB   = (PFNGLCREATESHADEROBJECTARBPROC)wglGetProcAddress("glCreateShaderObjectARB");
-    glShaderSourceARB         = (PFNGLSHADERSOURCEARBPROC)wglGetProcAddress("glShaderSourceARB");
-    glCompileShaderARB        = (PFNGLCOMPILESHADERARBPROC)wglGetProcAddress("glCompileShaderARB");
-    glGetObjectParameterivARB = (PFNGLGETOBJECTPARAMETERIVARBPROC)wglGetProcAddress("glGetObjectParameterivARB");
-    glAttachObjectARB         = (PFNGLATTACHOBJECTARBPROC)wglGetProcAddress("glAttachObjectARB");
-    glGetInfoLogARB           = (PFNGLGETINFOLOGARBPROC)wglGetProcAddress("glGetInfoLogARB");
-    glLinkProgramARB          = (PFNGLLINKPROGRAMARBPROC)wglGetProcAddress("glLinkProgramARB");
-    glGetUniformLocationARB   = (PFNGLGETUNIFORMLOCATIONARBPROC)wglGetProcAddress("glGetUniformLocationARB");
-    glUniform4fARB            = (PFNGLUNIFORM4FARBPROC)wglGetProcAddress("glUniform4fARB");
-	glUniform1iARB            = (PFNGLUNIFORM1IARBPROC)wglGetProcAddress("glUniform1iARB");
-
     VertexShader = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
 	FragmentShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
 
@@ -216,7 +199,7 @@ void OpenGLDisplay::InitGLSLShader (void) {
 void OpenGLDisplay::SetGLSLShaderConstants()
 {
 	//get shader uniforms and shader weights
-	textureLocation = glGetUniformLocationARB( ShaderProgram, "testTexture" );
+	textureLocation = glGetUniformLocationARB( ShaderProgram, "OGL2Texture" );
 	g_location_grayScaleWeights = glGetUniformLocationARB( ShaderProgram, "grayScaleWeights" );
 	glUniform1iARB( textureLocation, 1 );
 
@@ -227,9 +210,16 @@ void OpenGLDisplay::SetGLSLShaderConstants()
 
 }
 void OpenGLDisplay::DeInitGLSLShader (void) {
-	glDeleteObjectARB(VertexShader);
-	glDeleteObjectARB(FragmentShader);
-	glDeleteObjectARB(ShaderProgram);
+	if (VertexShader != 0){
+    glDeleteObjectARB(VertexShader);
+	}
+	if (FragmentShader != 0){
+    glDeleteObjectARB(FragmentShader);
+	}
+	if (FragmentShader != 0){
+    glDeleteObjectARB(ShaderProgram);
+	}
+	
 }
 
 OpenGLDisplay::OpenGLDisplay()
@@ -247,7 +237,6 @@ OpenGLDisplay::OpenGLDisplay()
 
 OpenGLDisplay::~OpenGLDisplay()
 {
-	DeInitGLSLShader();
 	cleanup();
 }
 
@@ -279,6 +268,9 @@ void OpenGLDisplay::DisableOpenGL()
 
 void OpenGLDisplay::cleanup()
 {
+    
+    DeInitGLSLShader();
+
 	if(texture != 0) {
 		glDeleteTextures(1, &texture);
 		texture = 0;
@@ -310,6 +302,23 @@ bool OpenGLDisplay::initialize()
 	glEnable( GL_TEXTURE_2D );
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+	if(theApp.GLSLShaders)
+	{
+	glCreateProgramObjectARB  = (PFNGLCREATEPROGRAMOBJECTARBPROC)wglGetProcAddress("glCreateProgramObjectARB");
+    glDeleteObjectARB         = (PFNGLDELETEOBJECTARBPROC)wglGetProcAddress("glDeleteObjectARB");
+    glUseProgramObjectARB     = (PFNGLUSEPROGRAMOBJECTARBPROC)wglGetProcAddress("glUseProgramObjectARB");
+    glCreateShaderObjectARB   = (PFNGLCREATESHADEROBJECTARBPROC)wglGetProcAddress("glCreateShaderObjectARB");
+    glShaderSourceARB         = (PFNGLSHADERSOURCEARBPROC)wglGetProcAddress("glShaderSourceARB");
+    glCompileShaderARB        = (PFNGLCOMPILESHADERARBPROC)wglGetProcAddress("glCompileShaderARB");
+    glGetObjectParameterivARB = (PFNGLGETOBJECTPARAMETERIVARBPROC)wglGetProcAddress("glGetObjectParameterivARB");
+    glAttachObjectARB         = (PFNGLATTACHOBJECTARBPROC)wglGetProcAddress("glAttachObjectARB");
+    glGetInfoLogARB           = (PFNGLGETINFOLOGARBPROC)wglGetProcAddress("glGetInfoLogARB");
+    glLinkProgramARB          = (PFNGLLINKPROGRAMARBPROC)wglGetProcAddress("glLinkProgramARB");
+    glGetUniformLocationARB   = (PFNGLGETUNIFORMLOCATIONARBPROC)wglGetProcAddress("glGetUniformLocationARB");
+    glUniform4fARB            = (PFNGLUNIFORM4FARBPROC)wglGetProcAddress("glUniform4fARB");
+	glUniform1iARB            = (PFNGLUNIFORM1IARBPROC)wglGetProcAddress("glUniform1iARB");
+	}
 	
 	initializeMatrices( theApp.surfaceSizeX, theApp.surfaceSizeY );
 
@@ -355,10 +364,11 @@ void OpenGLDisplay::render()
     glUseProgramObjectARB( ShaderProgram );
 	SetGLSLShaderConstants();
 	}
-	else{
-	glUseProgramObjectARB(NULL);
+	else
+	{
 	DeInitGLSLShader();
 	}
+	
 	
 	int pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
 	u8 *data = pix + ( theApp.sizeX + 1 ) * 4;
