@@ -1595,9 +1595,6 @@ BEGIN
                 MENUITEM "&OpenGL",                     ID_OPTIONS_VIDEO_RENDERMETHOD_OPENGL
                 MENUITEM "   Filter: Nearest",          ID_OPTIONS_VIDEO_RENDEROPTIONS_GLNEAREST
                 MENUITEM "   Filter: Bilinear",         ID_OPTIONS_VIDEO_RENDEROPTIONS_GLBILINEAR
-                MENUITEM "   Vertex: Triangle",         ID_OPTIONS_VIDEO_RENDEROPTIONS_GLTRIANGLE
-                MENUITEM "   Vertex: Quads",            ID_OPTIONS_VIDEO_RENDEROPTIONS_GLQUADS
-                MENUITEM "   Vertex: Polygons",         ID_OPTIONS_VIDEO_RENDEROPTIONS_GLPOLYGONS
                 MENUITEM "   GLSL Shaders",             ID_OPTIONS_VIDEO_RENDEROPTIONS_GLSLSHADERS
                 MENUITEM SEPARATOR
                 MENUITEM "&VSync",                      ID_OPTIONS_VIDEO_VSYNC

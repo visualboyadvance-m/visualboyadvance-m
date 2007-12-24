@@ -615,65 +615,6 @@ void MainWnd::OnUpdateOptionsVideoRenderoptionsGlbilinear(CCmdUI* pCmdUI)
 #endif
 }
 
-void MainWnd::OnOptionsVideoRenderoptionsGltriangle()
-{
-#ifndef NO_OGL
-	theApp.glType = 0;
-	if( theApp.display ) {
-		theApp.display->setOption( _T("glType"), theApp.glType );
-	}
-#endif
-}
-
-
-void MainWnd::OnUpdateOptionsVideoRenderoptionsGltriangle(CCmdUI* pCmdUI)
-{
-#ifndef NO_OGL
-	pCmdUI->SetCheck(theApp.glType == 0);
-#else
-	pCmdUI->Enable( FALSE );
-#endif
-}
-
-
-void MainWnd::OnOptionsVideoRenderoptionsGlquads()
-{
-#ifndef NO_OGL
-	theApp.glType = 1;
-	if( theApp.display ) {
-		theApp.display->setOption( _T("glType"), theApp.glType );
-	}
-#endif
-}
-
-
-void MainWnd::OnUpdateOptionsVideoRenderoptionsGlquads(CCmdUI* pCmdUI)
-{
-#ifndef NO_OGL
-	pCmdUI->SetCheck(theApp.glType == 1);
-#else
-	pCmdUI->Enable( FALSE );
-#endif
-}
-
-void MainWnd::OnOptionsVideoRenderoptionsGlpolygons()
-{
-#ifndef NO_OGL
-	theApp.glType = 2;
-	if( theApp.display ) {
-		theApp.display->setOption( _T("glType"), theApp.glType );
-	}
-#endif
-}
-
-void MainWnd::OnUpdateOptionsVideoRenderoptionsGlpolygons(CCmdUI* pCmdUI)
-{
-#ifndef NO_OGL
-	pCmdUI->SetCheck(theApp.glType == 2);
-#else
-	pCmdUI->Enable( FALSE );
-#endif
-}
 
 void MainWnd::OnUpdateOptionsVideoRenderingoptionsGLSLShaders(CCmdUI* pCmdUI)
 {
