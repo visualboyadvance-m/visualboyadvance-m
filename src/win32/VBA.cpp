@@ -293,7 +293,6 @@ VBA::VBA()
   d3dFilter = 0;
   glFilter = 0;
   GLSLShaders = 0;
-  glType = 0;
   skin = NULL;
   skinName = "";
   skinEnabled = false;
@@ -1523,9 +1522,6 @@ void VBA::loadSettings()
   if(GLSLShaders < 0 || GLSLShaders > 1)
     GLSLShaders = 0;
 
-  glType = regQueryDwordValue("glType", 0);
-  if(glType < 0 || glType > 2)
-    glType = 0;
 
   filterType = regQueryDwordValue("filter", 0);
   if(filterType < 0 || filterType > 17)
@@ -2593,7 +2589,6 @@ void VBA::saveSettings()
   regSetDwordValue("d3dFilter", d3dFilter);
   regSetDwordValue("glFilter", glFilter);
   regSetDwordValue("GLSLShaders", GLSLShaders);
-  regSetDwordValue("glType", glType);
 
   regSetDwordValue("filter", filterType);
 

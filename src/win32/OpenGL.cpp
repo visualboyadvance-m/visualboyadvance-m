@@ -395,63 +395,23 @@ void OpenGLDisplay::render()
 		glPixelStorei( GL_UNPACK_ROW_LENGTH, theApp.sizeX + 1 );
 	}
     glTexSubImage2D(GL_TEXTURE_2D,0,0,0,width,height,GL_RGBA,GL_UNSIGNED_BYTE,data );
+   
+	glBegin( GL_QUADS );
 
-	 switch(  theApp.glType )
-     {
-        case 0: 
-		glBegin( GL_TRIANGLE_STRIP );
-		glTexCoord2f( 0.0f, 0.0f );
-		glVertex3i( 0, 0, 0 );
+	glTexCoord2f( 0.0f, 0.0f );
+	glVertex3i( 0, 0, 0 );
 
-		glTexCoord2f( (float)(width) / size, 0.0f );
-		glVertex3i( theApp.surfaceSizeX, 0, 0 );
+	glTexCoord2f( (float)(width) / size, 0.0f );
+	glVertex3i( theApp.surfaceSizeX, 0, 0 );
 
-		glTexCoord2f( 0.0f, (float)(height) / size );
-		glVertex3i( 0, theApp.surfaceSizeY, 0 );
+	glTexCoord2f( (float)(width) / size, (float)(height) / size );
+	glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
 
-		glTexCoord2f( (float)(width) / size, (float)(height) / size );
-		glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
+	glTexCoord2f( 0.0f, (float)(height) / size );
+	glVertex3i( 0, theApp.surfaceSizeY, 0 );
 
-		glEnd();
-        break;
-		case 1:  
-		glBegin( GL_QUADS );
-
-		glTexCoord2f( 0.0f, 0.0f );
-		glVertex3i( 0, 0, 0 );
-
-		glTexCoord2f( (float)(width) / size, 0.0f );
-		glVertex3i( theApp.surfaceSizeX, 0, 0 );
-
-		glTexCoord2f( (float)(width) / size, (float)(height) / size );
-		glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
-
-		glTexCoord2f( 0.0f, (float)(height) / size );
-		glVertex3i( 0, theApp.surfaceSizeY, 0 );
-
-		glEnd();
-        break;
-        case 2:     
-		glBegin( GL_POLYGON );
-
-		glTexCoord2f( 0.0f, 0.0f );
-		glVertex3i( 0, 0, 0 );
-
-		glTexCoord2f( (float)(width) / size, 0.0f );
-		glVertex3i( theApp.surfaceSizeX, 0, 0 );
-
-		glTexCoord2f( (float)(width) / size, (float)(height) / size );
-		glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
-
-		glTexCoord2f( 0.0f, (float)(height) / size );
-		glVertex3i( 0, theApp.surfaceSizeY, 0 );
-
-		glEnd();
-        break;
-  }
-
-
-
+	glEnd();
+       
 	if( theApp.showSpeed ) { // && ( theApp.videoOption > VIDEO_4X ) ) {
 		char buffer[30];
 		if( theApp.showSpeed == 1 ) {

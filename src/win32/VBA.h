@@ -165,7 +165,6 @@ class VBA : public CWinApp
   int d3dFilter;
   int glFilter;
   int GLSLShaders;
-  int glType;
   bool dinputKeyFocus;
   CSkin *skin;
   CString skinName;
