@@ -787,10 +787,6 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\src\hq_shared32.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\src\macros.mac"
 						>
 					</File>
@@ -1494,18 +1490,10 @@
 					>
 				</File>
 				<Filter
-					Name="HQ"
+					Name="HQ2x"
 					>
 					<File
 						RelativePath=".\src\hq2x.h"
-						>
-					</File>
-					<File
-						RelativePath=".\src\hq3x32.h"
-						>
-					</File>
-					<File
-						RelativePath=".\src\hq_shared32.h"
 						>
 					</File>
 					<File
