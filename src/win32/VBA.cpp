@@ -86,10 +86,17 @@ extern void Simple3x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void Simple4x16(u8*,u32,u8*,u8*,u32,int,int);
 extern void Simple4x32(u8*,u32,u8*,u8*,u32,int,int);
 
-extern void hq3x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq3x16(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq4x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq4x16(u8*,u32,u8*,u8*,u32,int,int);
+#ifdef MMX
+extern void hq3x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void hq4x32(u8*,u32,u8*,u8*,u32,int,int);
+#else
+extern void hq3x32_32(u8*,u32,u8*,u8*,u32,int,int);
+extern void hq4x32_32(u8*,u32,u8*,u8*,u32,int,int);
+#define hq3x32 hq3x32_32
+#define hq4x32 hq4x32_32
+#endif
 
 extern void SmartIB(u8*,u32,int,int);
 extern void SmartIB32(u8*,u32,int,int);
