@@ -17,6 +17,7 @@ Known preprocessor switches:
 
 
 Download locations:
-NASM:        http://nasm.sourceforge.net
-DirectX SDK: http://msdn2.microsoft.com/en-us/xna/aa937788.aspx
-OpenAL SDK:  http://openal.org/downloads.html
+NASM:         http://nasm.sourceforge.net
+DirectX SDK:  http://msdn2.microsoft.com/en-us/xna/aa937788.aspx
+OpenAL SDK:   http://openal.org/downloads.html
+OpenGL files: http://www.opengl.org/registry/
