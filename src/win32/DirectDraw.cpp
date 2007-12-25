@@ -558,7 +558,7 @@ void DirectDrawDisplay::render()
   hret = ddsOffscreen->Lock(NULL,
                             &ddsDesc,
                             DDLOCK_WRITEONLY|
-#ifndef FINAL_VERSION
+#ifdef _DEBUG
                             DDLOCK_NOSYSLOCK|
 #endif
                             DDLOCK_SURFACEMEMORYPTR,
@@ -573,7 +573,7 @@ void DirectDrawDisplay::render()
         hret = ddsOffscreen->Lock(NULL,
                                   &ddsDesc,
                                   DDLOCK_WRITEONLY|
-#ifndef FINAL_VERSION
+#ifdef _DEBUG
                                   DDLOCK_NOSYSLOCK|
 #endif
                                   DDLOCK_SURFACEMEMORYPTR,

@@ -57,7 +57,7 @@ static int clockTicks;
 
 static INSN_REGPARM void armUnknownInsn(u32 opcode)
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
     if (systemVerbose & VERBOSE_UNDEFINED) {
         log("Undefined ARM instruction %08x at %08x\n", opcode,
             armNextPC-4);

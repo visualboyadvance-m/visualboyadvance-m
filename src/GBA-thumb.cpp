@@ -53,7 +53,7 @@ static int clockTicks;
 
 static INSN_REGPARM void thumbUnknownInsn(u32 opcode)
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_UNDEFINED)
     log("Undefined THUMB instruction %04x at %08x\n", opcode, armNextPC-2);
 #endif

@@ -62,7 +62,7 @@ s16 sineTable[256] = {
 
 void BIOS_ArcTan()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("ArcTan: %08x (VCOUNT=%2d)\n",
         reg[0].I,
@@ -81,7 +81,7 @@ void BIOS_ArcTan()
   a = ((s32)reg[0].I * b) >> 16;
   reg[0].I = a;
 
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("ArcTan: return=%08x\n",
         reg[0].I);
@@ -91,7 +91,7 @@ void BIOS_ArcTan()
 
 void BIOS_ArcTan2()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("ArcTan2: %08x,%08x (VCOUNT=%2d)\n",
         reg[0].I,
@@ -128,7 +128,7 @@ void BIOS_ArcTan2()
   }
   reg[0].I = res;
 
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("ArcTan2: return=%08x\n",
         reg[0].I);
@@ -138,7 +138,7 @@ void BIOS_ArcTan2()
 
 void BIOS_BitUnPack()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("BitUnPack: %08x,%08x,%08x (VCOUNT=%2d)\n",
         reg[0].I,
@@ -205,7 +205,7 @@ void BIOS_GetBiosChecksum()
 
 void BIOS_BgAffineSet()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("BgAffineSet: %08x,%08x,%08x (VCOUNT=%2d)\n",
         reg[0].I,
@@ -263,7 +263,7 @@ void BIOS_BgAffineSet()
 
 void BIOS_CpuSet()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("CpuSet: 0x%08x,0x%08x,0x%08x (VCOUNT=%d)\n", reg[0].I, reg[1].I,
         reg[2].I, VCOUNT);
@@ -325,7 +325,7 @@ void BIOS_CpuSet()
 
 void BIOS_CpuFastSet()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("CpuFastSet: 0x%08x,0x%08x,0x%08x (VCOUNT=%d)\n", reg[0].I, reg[1].I,
         reg[2].I, VCOUNT);
@@ -373,7 +373,7 @@ void BIOS_CpuFastSet()
 
 void BIOS_Diff8bitUnFilterWram()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("Diff8bitUnFilterWram: 0x%08x,0x%08x (VCOUNT=%d)\n", reg[0].I,
         reg[1].I, VCOUNT);
@@ -406,7 +406,7 @@ void BIOS_Diff8bitUnFilterWram()
 
 void BIOS_Diff8bitUnFilterVram()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("Diff8bitUnFilterVram: 0x%08x,0x%08x (VCOUNT=%d)\n", reg[0].I,
         reg[1].I, VCOUNT);
@@ -449,7 +449,7 @@ void BIOS_Diff8bitUnFilterVram()
 
 void BIOS_Diff16bitUnFilter()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("Diff16bitUnFilter: 0x%08x,0x%08x (VCOUNT=%d)\n", reg[0].I,
         reg[1].I, VCOUNT);
@@ -486,7 +486,7 @@ void BIOS_Diff16bitUnFilter()
 
 void BIOS_Div()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("Div: 0x%08x,0x%08x (VCOUNT=%d)\n",
         reg[0].I,
@@ -504,7 +504,7 @@ void BIOS_Div()
     s32 temp = (s32)reg[0].I;
     reg[3].I = temp < 0 ? (u32)-temp : (u32)temp;
   }
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("Div: return=0x%08x,0x%08x,0x%08x\n",
         reg[0].I,
@@ -516,7 +516,7 @@ void BIOS_Div()
 
 void BIOS_DivARM()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("DivARM: 0x%08x, (VCOUNT=%d)\n",
         reg[0].I,
@@ -532,7 +532,7 @@ void BIOS_DivARM()
 
 void BIOS_HuffUnComp()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("HuffUnComp: 0x%08x,0x%08x (VCOUNT=%d)\n",
         reg[0].I,
@@ -678,7 +678,7 @@ void BIOS_HuffUnComp()
 
 void BIOS_LZ77UnCompVram()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("LZ77UnCompVram: 0x%08x,0x%08x (VCOUNT=%d)\n",
         reg[0].I,
@@ -769,7 +769,7 @@ void BIOS_LZ77UnCompVram()
 
 void BIOS_LZ77UnCompWram()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("LZ77UnCompWram: 0x%08x,0x%08x (VCOUNT=%d)\n", reg[0].I, reg[1].I,
         VCOUNT);
@@ -826,7 +826,7 @@ void BIOS_LZ77UnCompWram()
 
 void BIOS_ObjAffineSet()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("ObjAffineSet: 0x%08x,0x%08x,0x%08x,0x%08x (VCOUNT=%d)\n",
         reg[0].I,
@@ -947,7 +947,7 @@ void BIOS_RegisterRamReset(u32 flags)
 
 void BIOS_RegisterRamReset()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("RegisterRamReset: 0x%08x (VCOUNT=%d)\n",
         reg[0].I,
@@ -960,7 +960,7 @@ void BIOS_RegisterRamReset()
 
 void BIOS_RLUnCompVram()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("RLUnCompVram: 0x%08x,0x%08x (VCOUNT=%d)\n",
         reg[0].I,
@@ -1029,7 +1029,7 @@ void BIOS_RLUnCompVram()
 
 void BIOS_RLUnCompWram()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("RLUnCompWram: 0x%08x,0x%08x (VCOUNT=%d)\n",
         reg[0].I,
@@ -1076,7 +1076,7 @@ void BIOS_RLUnCompWram()
 
 void BIOS_SoftReset()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("SoftReset: (VCOUNT=%d)\n", VCOUNT);
   }
@@ -1110,7 +1110,7 @@ void BIOS_SoftReset()
 
 void BIOS_Sqrt()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("Sqrt: %08x (VCOUNT=%2d)\n",
         reg[0].I,
@@ -1118,7 +1118,7 @@ void BIOS_Sqrt()
   }
 #endif
   reg[0].I = (u32)sqrt((double)reg[0].I);
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("Sqrt: return=%08x\n",
         reg[0].I);
@@ -1128,7 +1128,7 @@ void BIOS_Sqrt()
 
 void BIOS_MidiKey2Freq()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("MidiKey2Freq: WaveData=%08x mk=%08x fp=%08x\n",
         reg[0].I,
@@ -1142,7 +1142,7 @@ void BIOS_MidiKey2Freq()
   tmp = pow((double)2.f, tmp / 12.f);
   reg[0].I = (int)((double)freq / tmp);
 
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("MidiKey2Freq: return %08x\n",
         reg[0].I);
@@ -1152,7 +1152,7 @@ void BIOS_MidiKey2Freq()
 
 void BIOS_SndDriverJmpTableCopy()
 {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   if(systemVerbose & VERBOSE_SWI) {
     log("SndDriverJmpTableCopy: dest=%08x\n",
         reg[0].I);
