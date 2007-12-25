@@ -142,14 +142,10 @@ CString BugReport::createReport()
   CString report = "";
   AppendFormat(report, "Emu version  : %s\r\n", VERSION);
   AppendFormat(report, "Emu Type     : %s\r\n",
-#ifdef FINAL_VERSION
-#ifdef DEV_VERSION
-               "Development Version"
-#else
-               "Normal Version"
-#endif
-#else
+#ifdef DEBUG
                "Debug Version"
+#else
+               "Release Version"
 #endif
                );
 

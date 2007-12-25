@@ -6,8 +6,8 @@ Developer Information File
 
 Known preprocessor switches:
 - SDL: Defined for the SDL version
-- DEV_VERSION: Enables logging
-- FINAL_VERSION: Defined for release versions
+- GBA_LOGGING: Enables logging for the GBA core
+- FINAL_VERSION: Defined for release versions, disables additional GBA logging and completely disables GB logging. Increases the amount of CPU cycles being emulated in one go.
 - BKPT_SUPPORT
 - MMX: Enable MMX instruction set
 - NO_OGL: Exclude OpenGL code

@@ -180,7 +180,7 @@ static DebuggerCommand debuggerCommands[] = {
 #ifndef FINAL_VERSION
   { "trace", debuggerDebug,       "Set the trace level", "<value>" },
 #endif
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
   { "verbose", debuggerVerbose,     "Change verbose setting", "<value>" },
 #endif
   { "where", debuggerWhere,   "Show the call chain (if available)", NULL },

@@ -1721,7 +1721,7 @@ void CPUSoftwareInterrupt(int comment)
   }
 #endif
   if(useBios) {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
     if(systemVerbose & VERBOSE_SWI) {
       log("SWI: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
           armState ? armNextPC - 4: armNextPC -2,
@@ -1748,7 +1748,7 @@ void CPUSoftwareInterrupt(int comment)
     BIOS_RegisterRamReset();
     break;
   case 0x02:
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
     if(systemVerbose & VERBOSE_SWI) {
       log("Halt: (VCOUNT = %2d)\n",
           VCOUNT);      
@@ -1759,7 +1759,7 @@ void CPUSoftwareInterrupt(int comment)
     cpuNextEvent = cpuTotalTicks;
     break;
   case 0x03:
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
     if(systemVerbose & VERBOSE_SWI) {
       log("Stop: (VCOUNT = %2d)\n",
           VCOUNT);      
@@ -1771,7 +1771,7 @@ void CPUSoftwareInterrupt(int comment)
     cpuNextEvent = cpuTotalTicks;
     break;
   case 0x04:
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
     if(systemVerbose & VERBOSE_SWI) {
       log("IntrWait: 0x%08x,0x%08x (VCOUNT = %2d)\n",
           reg[0].I,
@@ -1782,7 +1782,7 @@ void CPUSoftwareInterrupt(int comment)
     CPUSoftwareInterrupt();
     break;    
   case 0x05:
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
     if(systemVerbose & VERBOSE_SWI) {
       log("VBlankIntrWait: (VCOUNT = %2d)\n", 
           VCOUNT);      
@@ -1945,7 +1945,7 @@ void CPUSoftwareInterrupt(int comment)
     BIOS_Diff16bitUnFilter();
     break;
   case 0x19:
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
     if(systemVerbose & VERBOSE_SWI) {
       log("SoundBiasSet: 0x%08x (VCOUNT = %2d)\n",
           reg[0].I,
@@ -1964,7 +1964,7 @@ void CPUSoftwareInterrupt(int comment)
     BIOS_SndDriverJmpTableCopy();
     // let it go, because we don't really emulate this function
   default:
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
     if(systemVerbose & VERBOSE_SWI) {
       log("SWI: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
           armState ? armNextPC - 4: armNextPC -2,
@@ -2115,7 +2115,7 @@ void CPUCheckDMA(int reason, int dmamask)
         destIncrement = 0;
         break;
       }      
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
       if(systemVerbose & VERBOSE_DMA0) {
         int count = (DM0CNT_L ? DM0CNT_L : 0x4000) << 1;
         if(DM0CNT_H & 0x0400)
@@ -2173,7 +2173,7 @@ void CPUCheckDMA(int reason, int dmamask)
         break;
       }      
       if(reason == 3) {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
         if(systemVerbose & VERBOSE_DMA1) {
           log("DMA1: s=%08x d=%08x c=%04x count=%08x\n", dma1Source, dma1Dest,
               DM1CNT_H,
@@ -2183,7 +2183,7 @@ void CPUCheckDMA(int reason, int dmamask)
         doDMA(dma1Source, dma1Dest, sourceIncrement, 0, 4,
               0x0400);
       } else {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
         if(systemVerbose & VERBOSE_DMA1) {
           int count = (DM1CNT_L ? DM1CNT_L : 0x4000) << 1;
           if(DM1CNT_H & 0x0400)
@@ -2242,7 +2242,7 @@ void CPUCheckDMA(int reason, int dmamask)
         break;
       }      
       if(reason == 3) {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
         if(systemVerbose & VERBOSE_DMA2) {
           int count = (4) << 2;
           log("DMA2: s=%08x d=%08x c=%04x count=%08x\n", dma2Source, dma2Dest,
@@ -2253,7 +2253,7 @@ void CPUCheckDMA(int reason, int dmamask)
         doDMA(dma2Source, dma2Dest, sourceIncrement, 0, 4,
               0x0400);
       } else {
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
         if(systemVerbose & VERBOSE_DMA2) {
           int count = (DM2CNT_L ? DM2CNT_L : 0x4000) << 1;
           if(DM2CNT_H & 0x0400)
@@ -2311,7 +2311,7 @@ void CPUCheckDMA(int reason, int dmamask)
         destIncrement = 0;
         break;
       }      
-#ifdef DEV_VERSION
+#ifdef GBA_LOGGING
       if(systemVerbose & VERBOSE_DMA3) {
         int count = (DM3CNT_L ? DM3CNT_L : 0x10000) << 1;
         if(DM3CNT_H & 0x0400)
