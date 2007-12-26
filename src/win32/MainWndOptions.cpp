@@ -53,110 +53,101 @@ extern int emulating;
 
 extern void CPUUpdateRenderBuffers(bool force);
 
+
 void MainWnd::OnOptionsFrameskipThrottleNothrottle()
 {
-  theApp.throttle = 0;
-  theApp.autoFrameSkip = false;
+	theApp.updateThrottle( 0 ); // disable
 }
+
 
 void MainWnd::OnUpdateOptionsFrameskipThrottleNothrottle(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.throttle == 0);
+	pCmdUI->SetCheck( theApp.throttle == 0 );
 }
+
 
 void MainWnd::OnOptionsFrameskipThrottle25()
 {
-  theApp.throttle = 25;
-  theApp.autoFrameSkip = false;
+	theApp.updateThrottle( 25 );
 }
+
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle25(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.throttle == 25);
+	pCmdUI->SetCheck( theApp.throttle == 25 );
 }
+
 
 void MainWnd::OnOptionsFrameskipThrottle50()
 {
-  theApp.throttle = 50;
-  theApp.autoFrameSkip = false;
+	theApp.updateThrottle( 50 );
 }
+
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle50(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.throttle == 50);
+	pCmdUI->SetCheck( theApp.throttle == 50 );
 }
+
 
 void MainWnd::OnOptionsFrameskipThrottle100()
 {
-  theApp.throttle = 100;
-  theApp.autoFrameSkip = false;
+	theApp.updateThrottle( 100 );
 }
+
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle100(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.throttle == 100);
+	pCmdUI->SetCheck( theApp.throttle == 100 );
 }
+
 
 void MainWnd::OnOptionsFrameskipThrottle150()
 {
-  theApp.throttle = 150;
-  theApp.autoFrameSkip = false;
+	theApp.updateThrottle( 150 );
 }
+
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle150(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.throttle == 150);
+	pCmdUI->SetCheck( theApp.throttle == 150 );
 }
+
 
 void MainWnd::OnOptionsFrameskipThrottle200()
 {
-  theApp.throttle = 200;
-  theApp.autoFrameSkip = false;
+	theApp.updateThrottle( 200 );
 }
+
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle200(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.throttle == 200);
+	pCmdUI->SetCheck( theApp.throttle == 200 );
 }
 
 
 void MainWnd::OnOptionsFrameskipThrottleOther()
 {
 	Throttle dlg;
-	int v = (int)dlg.DoModal();
+	unsigned short v = (unsigned short)dlg.DoModal();
 
 	if( v ) {
-		theApp.throttle = v;
-		theApp.autoFrameSkip = false;
+		theApp.updateThrottle( v );
 	}
 }
 
 
 void MainWnd::OnUpdateOptionsFrameskipThrottleOther(CCmdUI* pCmdUI)
 {
-  int throttle = theApp.throttle;
-  pCmdUI->SetCheck(throttle != 0 && throttle != 25 &&
-                   throttle != 50 && throttle != 100 &&
-                   throttle != 150 && throttle != 200);
+	pCmdUI->SetCheck(
+		( theApp.throttle != 0 ) &&
+		( theApp.throttle != 25 ) &&
+		( theApp.throttle != 50 ) &&
+		( theApp.throttle != 100 ) &&
+		( theApp.throttle != 150 ) &&
+		( theApp.throttle != 200 ) );
 }
 
-void MainWnd::OnOptionsFrameskipAutomatic()
-{
-  theApp.autoFrameSkip = !theApp.autoFrameSkip;
-  if(!theApp.autoFrameSkip && emulating)
-	  theApp.updateFrameSkip();
-  else
-  {
-	  theApp.throttle = false;
-	  frameSkip = 0;
-	  systemFrameSkip = 0;
-  }
-}
-
-void MainWnd::OnUpdateOptionsFrameskipAutomatic(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(theApp.autoFrameSkip);
-}
 
 BOOL MainWnd::OnOptionsFrameskip(UINT nID)
 {
@@ -174,7 +165,7 @@ BOOL MainWnd::OnOptionsFrameskip(UINT nID)
     }
     if(emulating)
       theApp.updateFrameSkip();
-	theApp.autoFrameSkip = false;
+	theApp.updateThrottle( 0 );
     return TRUE;
     break;
   case ID_OPTIONS_VIDEO_FRAMESKIP_6:
@@ -188,7 +179,7 @@ BOOL MainWnd::OnOptionsFrameskip(UINT nID)
     }
     if(emulating)
       theApp.updateFrameSkip();
-	theApp.autoFrameSkip = false;
+	theApp.updateThrottle( 0 );
     return TRUE;
     break;
   }

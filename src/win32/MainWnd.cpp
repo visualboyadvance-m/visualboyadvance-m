@@ -122,8 +122,6 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_COMMAND(ID_OPTIONS_FRAMESKIP_THROTTLE_150, OnOptionsFrameskipThrottle150)
   ON_COMMAND(ID_OPTIONS_FRAMESKIP_THROTTLE_200, OnOptionsFrameskipThrottle200)
   ON_COMMAND(ID_OPTIONS_FRAMESKIP_THROTTLE_OTHER, OnOptionsFrameskipThrottleOther)
-  ON_COMMAND(ID_OPTIONS_FRAMESKIP_AUTOMATIC, OnOptionsFrameskipAutomatic)
-  ON_UPDATE_COMMAND_UI(ID_OPTIONS_FRAMESKIP_AUTOMATIC, OnUpdateOptionsFrameskipAutomatic)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_VIDEO_FRAMESKIP_0, OnUpdateOptionsVideoFrameskip0)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_VIDEO_FRAMESKIP_1, OnUpdateOptionsVideoFrameskip1)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_VIDEO_FRAMESKIP_2, OnUpdateOptionsVideoFrameskip2)
@@ -662,7 +660,7 @@ bool MainWnd::FileRun()
 
   theApp.frameskipadjust = 0;
   theApp.renderedFrames = 0;
-  theApp.autoFrameSkipLastTime = theApp.throttleLastTime = systemGetClock();
+  theApp.autoFrameSkipLastTime = systemGetClock();
 
   theApp.rewindCount = 0;
   theApp.rewindCounter = 0;

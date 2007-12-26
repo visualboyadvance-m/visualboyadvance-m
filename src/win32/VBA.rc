@@ -1623,34 +1623,6 @@ BEGIN
                 MENUITEM "Stretch to &fit",             ID_OPTIONS_VIDEO_FULLSCREENSTRETCHTOFIT
             END
             MENUITEM SEPARATOR
-            POPUP "&Frame Skip"
-            BEGIN
-                MENUITEM "&Automatic",                  ID_OPTIONS_FRAMESKIP_AUTOMATIC
-                MENUITEM SEPARATOR
-                MENUITEM "&No frame skip",              ID_OPTIONS_VIDEO_FRAMESKIP_0
-                MENUITEM "&1 frame",                    ID_OPTIONS_VIDEO_FRAMESKIP_1
-                MENUITEM "&2 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_2
-                MENUITEM "&3 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_3
-                MENUITEM "&4 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_4
-                MENUITEM "&5 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_5
-                MENUITEM "&6 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_6
-                MENUITEM "&7 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_7
-                MENUITEM "&8 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_8
-                MENUITEM "&9 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_9
-                MENUITEM SEPARATOR
-                MENUITEM "Turbo mode",                  ID_OPTIONS_EMULATOR_SPEEDUPTOGGLE
-            END
-            POPUP "Throttle"
-            BEGIN
-                MENUITEM "No throttle",                 ID_OPTIONS_FRAMESKIP_THROTTLE_NOTHROTTLE
-                MENUITEM "25%",                         ID_OPTIONS_FRAMESKIP_THROTTLE_25
-                MENUITEM "50%",                         ID_OPTIONS_FRAMESKIP_THROTTLE_50
-                MENUITEM "100%",                        ID_OPTIONS_FRAMESKIP_THROTTLE_100
-                MENUITEM "150%",                        ID_OPTIONS_FRAMESKIP_THROTTLE_150
-                MENUITEM "200%",                        ID_OPTIONS_FRAMESKIP_THROTTLE_200
-                MENUITEM "&Other...",                   ID_OPTIONS_FRAMESKIP_THROTTLE_OTHER
-            END
-            MENUITEM SEPARATOR
             MENUITEM "D&isable status messages",    ID_OPTIONS_EMULATOR_DISABLESTATUSMESSAGES
         END
         POPUP "&Pixel Filter"
@@ -1779,6 +1751,34 @@ BEGIN
                 MENUITEM "&R",                          ID_OPTIONS_JOYPAD_AUTOFIRE_R
             END
             MENUITEM "Rewind interval...",          ID_OPTIONS_EMULATOR_REWINDINTERVAL
+        END
+        POPUP "&Speed"
+        BEGIN
+            POPUP "&Throttle"
+            BEGIN
+                MENUITEM "25%",                         ID_OPTIONS_FRAMESKIP_THROTTLE_25
+                MENUITEM "50%",                         ID_OPTIONS_FRAMESKIP_THROTTLE_50
+                MENUITEM "100%",                        ID_OPTIONS_FRAMESKIP_THROTTLE_100
+                MENUITEM "150%",                        ID_OPTIONS_FRAMESKIP_THROTTLE_150
+                MENUITEM "200%",                        ID_OPTIONS_FRAMESKIP_THROTTLE_200
+                MENUITEM "&Other...",                   ID_OPTIONS_FRAMESKIP_THROTTLE_OTHER
+                MENUITEM "No throttle",                 ID_OPTIONS_FRAMESKIP_THROTTLE_NOTHROTTLE
+            END
+            MENUITEM SEPARATOR
+            POPUP "&Frame Skip"
+            BEGIN
+                MENUITEM "&No frame skip",              ID_OPTIONS_VIDEO_FRAMESKIP_0
+                MENUITEM "&1 frame",                    ID_OPTIONS_VIDEO_FRAMESKIP_1
+                MENUITEM "&2 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_2
+                MENUITEM "&3 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_3
+                MENUITEM "&4 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_4
+                MENUITEM "&5 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_5
+                MENUITEM "&6 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_6
+                MENUITEM "&7 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_7
+                MENUITEM "&8 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_8
+                MENUITEM "&9 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_9
+            END
+            MENUITEM "Turbo mode",                  ID_OPTIONS_EMULATOR_SPEEDUPTOGGLE
         END
         MENUITEM SEPARATOR
         POPUP "&Emulator"

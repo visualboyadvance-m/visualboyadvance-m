@@ -181,7 +181,7 @@ extern "C" bool cpu_mmx;
 
 namespace Sm60FPS
 {
-  float					K_fCpuSpeed = 98.0f;
+  float					K_fCpuSpeed = 100.0f; // was 98.0f before, but why?
   float					K_fTargetFps = 60.0f * K_fCpuSpeed / 100;
   float					K_fDT = 1000.0f / K_fTargetFps;
 
@@ -280,7 +280,6 @@ VBA::VBA()
   tripleBuffering = true;
   autoHideMenu = false;
   throttle = 0;
-  throttleLastTime = 0;
   autoFrameSkipLastTime = 0;
   autoFrameSkip = false;
   vsync = false;
@@ -919,6 +918,25 @@ void VBA::updateFilter()
 }
 
 
+void VBA::updateThrottle( unsigned short throttle )
+{
+	this->throttle = throttle;
+
+	if( throttle == 0 ) {
+		autoFrameSkip = false;
+		return;
+	} else {
+		Sm60FPS::K_fCpuSpeed = (float)throttle;
+		Sm60FPS::K_fTargetFps = 60.0f * Sm60FPS::K_fCpuSpeed / 100;
+		Sm60FPS::K_fDT = 1000.0f / Sm60FPS::K_fTargetFps;
+		autoFrameSkip = true;
+		frameSkip = 0;
+		systemFrameSkip = 0;
+		return;
+	}
+}
+
+
 void VBA::updateMenuBar()
 {
   if(menu != NULL) {
@@ -1118,32 +1136,20 @@ void systemFrame()
 
 void system10Frames(int rate)
 {
-  u32 time = systemGetClock();
+	if( theApp.autoFrameSkip )
+	{
+		u32 time = systemGetClock();
+		u32 diff = time - theApp.autoFrameSkipLastTime;
+		theApp.autoFrameSkipLastTime = time;
+		if( diff ) {
+			// countermeasure against div/0 when debugging
+			Sm60FPS::nCurSpeed = (1000000/rate)/diff;
+		} else {
+			Sm60FPS::nCurSpeed = 100;
+		}
+	}
 
-  if (theApp.autoFrameSkip)
-  {
-    u32 diff = time - theApp.autoFrameSkipLastTime;
-	Sm60FPS::nCurSpeed = 100;
 
-    if (diff)
-		Sm60FPS::nCurSpeed = (1000000/rate)/diff;
-  }
-
-
-
-  if(!theApp.wasPaused && theApp.throttle) {
-    if(!speedup) {
-      u32 diff = time - theApp.throttleLastTime;
-
-      int target = (1000000/(rate*theApp.throttle));
-      int d = (target - diff);
-
-      if(d > 0) {
-        Sleep(d);
-      }
-    }
-    theApp.throttleLastTime = systemGetClock();
-  }
   if(theApp.rewindMemory) {
     if(++theApp.rewindCounter >= (theApp.rewindTimer)) {
       theApp.rewindSaveNeeded = true;
@@ -1158,7 +1164,6 @@ void system10Frames(int rate)
   }
 
   theApp.wasPaused = false;
-  theApp.autoFrameSkipLastTime = time;
 }
 
 void systemScreenMessage(const char *msg)
@@ -1411,8 +1416,6 @@ void VBA::loadSettings()
   gbFrameSkip = regQueryDwordValue("gbFrameSkip", 0);
   if(gbFrameSkip < 0 || gbFrameSkip > 9)
     gbFrameSkip = 0;
-
-  autoFrameSkip = regQueryDwordValue("autoFrameSkip", FALSE) ? TRUE : FALSE;
 
   vsync = regQueryDwordValue("vsync", false) ? true : false ;
   synchronize = regQueryDwordValue("synchronize", 1) ? true : false;
@@ -1676,9 +1679,7 @@ void VBA::loadSettings()
 
   fsMaxScale = regQueryDwordValue("fsMaxScale", 0);
 
-  throttle = regQueryDwordValue("throttle", 0);
-  if(throttle < 5 || throttle > 1000)
-    throttle = 0;
+  updateThrottle( (unsigned short)regQueryDwordValue( "throttle", 0 ) );
 
    linktimeout = regQueryDwordValue("LinkTimeout", 1000);
 
@@ -1690,12 +1691,6 @@ void VBA::loadSettings()
   linkenable = regQueryDwordValue("linkEnabled", false) ? true : false;
 
   lanlink.active = regQueryDwordValue("LAN", 0) ? true : false;
-  if (autoFrameSkip)
-  {
-	  throttle = 0;
-	  frameSkip = 0;
-	  systemFrameSkip = 0;
-  }
 
   Sm60FPS::bSaveMoreCPU = regQueryDwordValue("saveMoreCPU", 0);
 
@@ -2537,8 +2532,6 @@ void VBA::saveSettings()
   regSetDwordValue("frameSkip", frameSkip);
 
   regSetDwordValue("gbFrameSkip", gbFrameSkip);
-
-  regSetDwordValue("autoFrameSkip", autoFrameSkip);
 
   regSetDwordValue("vsync", vsync);
   regSetDwordValue("synchronize", synchronize);
