@@ -143,8 +143,7 @@ class VBA : public CWinApp
   int captureFormat;
   bool tripleBuffering;
   bool autoHideMenu;
-  int throttle;
-  u32 throttleLastTime;
+  unsigned short throttle;
   u32 autoFrameSkipLastTime;
   bool autoFrameSkip;
   bool vsync;
@@ -236,6 +235,7 @@ class VBA : public CWinApp
   void adjustDestRect();
   void updateIFB();
   void updateFilter();
+  void updateThrottle( unsigned short throttle );
   void updateMenuBar();
   void winAddUpdateListener(IUpdateListener *l);
   void winRemoveUpdateListener(IUpdateListener *l);

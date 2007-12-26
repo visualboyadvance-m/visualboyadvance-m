@@ -148,8 +148,6 @@ class MainWnd : public CWnd
   afx_msg void OnOptionsFrameskipThrottle150();
   afx_msg void OnOptionsFrameskipThrottle200();
   afx_msg void OnOptionsFrameskipThrottleOther();
-  afx_msg void OnOptionsFrameskipAutomatic();
-  afx_msg void OnUpdateOptionsFrameskipAutomatic(CCmdUI* pCmdUI);
   afx_msg void OnUpdateOptionsVideoFrameskip0(CCmdUI* pCmdUI);
   afx_msg void OnUpdateOptionsVideoFrameskip1(CCmdUI* pCmdUI);
   afx_msg void OnUpdateOptionsVideoFrameskip2(CCmdUI* pCmdUI);

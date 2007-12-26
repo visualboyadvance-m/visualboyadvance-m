@@ -821,13 +821,14 @@
 #define ID_OUTPUTAPI_OALCONFIGURATION   40350
 #define ID_RENDERAPI_FILTER             40351
 #define ID_OPTIONS_VIDEO_RENDEROPTIONS_GLSLSHADERS 40352
+#define ID_OPTIONS_SPEED                40353
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        161
-#define _APS_NEXT_COMMAND_VALUE         40353
+#define _APS_NEXT_COMMAND_VALUE         40354
 #define _APS_NEXT_CONTROL_VALUE         1272
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
