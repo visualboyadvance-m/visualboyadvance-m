@@ -39,6 +39,7 @@
 #include "TileView.h"
 #include "WavWriter.h"
 #include "WinResUtil.h"
+#include "Logging.h"
 
 #include "../GBA.h"
 #include "../Globals.h"
@@ -56,7 +57,6 @@ extern SOCKET remoteSocket;
 
 extern void remoteCleanUp();
 extern void remoteSetSockets(SOCKET, SOCKET);
-extern void toolsLogging();
 
 void MainWnd::OnToolsDisassemble()
 {
