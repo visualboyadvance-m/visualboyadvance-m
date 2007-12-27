@@ -43,6 +43,7 @@
 #include <assert.h>
 
 #ifndef LOGALL
+// replace logging functions with comments
 #define winlog //
 #define debugState() //
 #endif
@@ -53,11 +54,11 @@ public:
 	OpenAL();
 	virtual ~OpenAL();
 
-	bool init();   // initialize the primary and secondary sound buffer
+	bool init();   // initialize the sound buffer queue
 	void pause();  // pause the secondary sound buffer
 	void reset();  // stop and reset the secondary sound buffer
-	void resume(); // resume the secondary sound buffer
-	void write();  // write the emulated sound to the secondary sound buffer
+	void resume(); // play/resume the secondary sound buffer
+	void write();  // write the emulated sound to a sound buffer
 
 private:
 	OPENALFNTABLE  ALFunction;
@@ -189,6 +190,7 @@ bool OpenAL::init()
 	assert( AL_NO_ERROR == ALFunction.alGetError() );
 
 	freq = 44100 / soundQuality;
+
 	// calculate the number of samples per frame first
 	// then multiply it with the size of a sample frame (16 bit * stereo)
 	soundBufferLen = ( freq / 60 ) * 4;
@@ -270,7 +272,8 @@ void OpenAL::write()
 		// ==initial buffer filling==
 		winlog( " initial buffer filling\n" );
 		for( int i = 0 ; i < theApp.oalBufferCount ; i++ ) {
-			// filling the buffers explicitly with silence would be cleaner...
+			// Filling the buffers explicitly with silence would be cleaner,
+			// but the very first sample is usually silence anyway.
 			ALFunction.alBufferData( buffer[i], AL_FORMAT_STEREO16, soundFinalWave, soundBufferLen, freq );
 			assert( AL_NO_ERROR == ALFunction.alGetError() );
 		}
