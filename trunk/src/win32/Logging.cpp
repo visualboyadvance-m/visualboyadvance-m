@@ -237,9 +237,10 @@ BOOL Logging::OnInitDialog()
 
 void Logging::log(const char *s)
 {
-  DWORD size = (DWORD)::SendMessage(m_log, WM_GETTEXTLENGTH, 0, 0);
-  m_log.SetSel(size, size);
-  m_log.ReplaceSel(s);
+	CString text;
+	m_log.GetWindowText( text );
+	text.Insert( 0, s );
+	m_log.SetWindowText( text );
 }
 
 void Logging::OnClose()
