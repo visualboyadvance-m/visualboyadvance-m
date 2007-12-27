@@ -29,6 +29,7 @@ bool regEnabled = true;
 
 void regInit(const char *path)
 {
+	if( regEnabled ) {
   DWORD disp = 0;
   LONG res = RegCreateKeyEx(HKEY_CURRENT_USER,
                             "Software\\Emulators\\VisualBoyAdvance",
@@ -39,6 +40,7 @@ void regInit(const char *path)
                             NULL,
                             &vbKey,
                             &disp);
+	}
   if( regVbaPath != NULL ) {
 	  delete regVbaPath;
 	  regVbaPath = NULL;
