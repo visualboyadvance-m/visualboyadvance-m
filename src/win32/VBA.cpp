@@ -30,6 +30,7 @@
 #include "skin.h"
 #include "WavWriter.h"
 #include "WinResUtil.h"
+#include "Logging.h"
 #include "rpi.h"
 
 #include "../System.h"
@@ -103,8 +104,6 @@ extern void SmartIB32(u8*,u32,int,int);
 extern void MotionBlurIB(u8*,u32,int,int);
 extern void InterlaceIB(u8*,u32,int,int);
 extern void MotionBlurIB32(u8*,u32,int,int);
-
-extern void toolsLog(const char *);
 
 extern IDisplay *newGDIDisplay();
 extern IDisplay *newDirectDrawDisplay();

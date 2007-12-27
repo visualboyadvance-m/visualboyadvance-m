@@ -29,6 +29,7 @@
 #include "FileDlg.h"
 #include "Reg.h"
 #include "WinResUtil.h"
+#include "Logging.h"
 
 #include "../System.h"
 #include "../AutoBuild.h"
@@ -665,6 +666,8 @@ bool MainWnd::FileRun()
   theApp.rewindCount = 0;
   theApp.rewindCounter = 0;
   theApp.rewindSaveNeeded = false;
+
+  toolsClearLog();
 
   return true;
 }
