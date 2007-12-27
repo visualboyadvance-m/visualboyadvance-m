@@ -286,7 +286,7 @@ void OpenAL::write()
 		assert( AL_NO_ERROR == ALFunction.alGetError() );
 
 		if( nBuffersProcessed == theApp.oalBufferCount ) {
-			if( theApp.throttle >= 100 ) {
+			if( ( theApp.throttle >= 100 ) || ( theApp.throttle == 0 ) ) {
 				// we only want to know about it when we are emulating at full speed (or faster)
 				static int i = 0;
 				log( "OpenAL: Buffers were not refilled fast enough (%i)\n", i++ );
