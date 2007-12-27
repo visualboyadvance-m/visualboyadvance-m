@@ -89,6 +89,7 @@ private:
 	GLFONT font;
 	int VertexShader,FragmentShader,textureLocation,ShaderProgram,g_location_grayScaleWeights;
 	char *VertexShaderSource,*FragmentShaderSource;
+	bool shaderFuncInited;
 
 	void initializeMatrices( int w, int h );
 	bool initializeTexture( int w, int h );
@@ -210,6 +211,8 @@ void OpenGLDisplay::SetGLSLShaderConstants()
 
 }
 void OpenGLDisplay::DeInitGLSLShader (void) {
+	if( !shaderFuncInited ) return;
+
 	if (VertexShader != 0){
     glDeleteObjectARB(VertexShader);
 	}
@@ -219,7 +222,7 @@ void OpenGLDisplay::DeInitGLSLShader (void) {
 	if (FragmentShader != 0){
     glDeleteObjectARB(ShaderProgram);
 	}
-	
+	shaderFuncInited = false;
 }
 
 OpenGLDisplay::OpenGLDisplay()
@@ -232,6 +235,7 @@ OpenGLDisplay::OpenGLDisplay()
 	size = 0.0f;
 	failed = false;
 	filterData = NULL;
+	shaderFuncInited = false;
 }
 
 
@@ -268,8 +272,7 @@ void OpenGLDisplay::DisableOpenGL()
 
 void OpenGLDisplay::cleanup()
 {
-    
-    DeInitGLSLShader();
+	DeInitGLSLShader();
 
 	if(texture != 0) {
 		glDeleteTextures(1, &texture);
@@ -318,6 +321,7 @@ bool OpenGLDisplay::initialize()
     glGetUniformLocationARB   = (PFNGLGETUNIFORMLOCATIONARBPROC)wglGetProcAddress("glGetUniformLocationARB");
     glUniform4fARB            = (PFNGLUNIFORM4FARBPROC)wglGetProcAddress("glUniform4fARB");
 	glUniform1iARB            = (PFNGLUNIFORM1IARBPROC)wglGetProcAddress("glUniform1iARB");
+	shaderFuncInited = true;
 	}
 	
 	initializeMatrices( theApp.surfaceSizeX, theApp.surfaceSizeY );
@@ -359,14 +363,10 @@ void OpenGLDisplay::clear()
 void OpenGLDisplay::render()
 { 
 	clear();
-	if (theApp.GLSLShaders){
+	if (theApp.GLSLShaders && shaderFuncInited){
 	InitGLSLShader();
     glUseProgramObjectARB( ShaderProgram );
 	SetGLSLShaderConstants();
-	}
-	else
-	{
-	DeInitGLSLShader();
 	}
 	
 	
