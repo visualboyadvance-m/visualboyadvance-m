@@ -243,6 +243,11 @@ void Logging::log(const char *s)
 	m_log.SetWindowText( text );
 }
 
+void Logging::clearLog()
+{
+	m_log.SetWindowText( "" );
+}
+
 void Logging::OnClose()
 {
   EndDialog(FALSE);
@@ -285,4 +290,11 @@ void toolsLog(const char *s)
   if(Logging::instance != NULL) {
     Logging::instance->log(str);
   }
+}
+
+void toolsClearLog()
+{
+	if( Logging::instance ) {
+		Logging::instance->clearLog();
+	}
 }

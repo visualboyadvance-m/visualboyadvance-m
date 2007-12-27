@@ -36,6 +36,7 @@ class Logging : public ResizeDlg
   // Construction
  public:
   void log(const char *);
+  void clearLog();
   Logging(CWnd* pParent = NULL);   // standard constructor
 
   // Dialog Data
@@ -94,5 +95,10 @@ class Logging : public ResizeDlg
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+
+void toolsLogging();
+void toolsLog(const char *s);
+void toolsClearLog();
+
 
 #endif // !defined(AFX_LOGGING_H__222FC21A_D40D_450D_8A1C_D33305E47B85__INCLUDED_)
