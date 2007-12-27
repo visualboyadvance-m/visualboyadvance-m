@@ -674,6 +674,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\src\win32\Reg.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Text.cpp"
 					>
 				</File>
@@ -971,10 +975,6 @@
 				</File>
 				<File
 					RelativePath=".\src\win32\PaletteViewControl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\win32\Reg.cpp"
 					>
 				</File>
 				<File
@@ -1380,6 +1380,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\win32\Reg.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Text.h"
 					>
 				</File>
@@ -1533,10 +1537,6 @@
 				</File>
 				<File
 					RelativePath=".\src\win32\PaletteViewControl.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\win32\Reg.h"
 					>
 				</File>
 				<File
