@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="VisualBoyAdvance"
 	ProjectGUID="{6D4C5EC8-933F-4C05-A1BF-498E658576DF}"
 	RootNamespace="VBA"
@@ -307,7 +307,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib OpenGL32.Lib dinput8.lib winmm.lib dxguid.lib ddraw.lib Dsound.lib htmlhelp.lib"
+				AdditionalDependencies="nafxcw.lib LIBCMT.lib dinput8.lib winmm.lib dxguid.lib ddraw.lib Dsound.lib htmlhelp.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
 				Version=""
