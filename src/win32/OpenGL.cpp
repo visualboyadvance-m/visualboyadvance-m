@@ -2,7 +2,7 @@
 // Copyright (C) 1999-2003 Forgotten
 // Copyright (C) 2004 Forgotten and the VBA development team
 // Copyright (C) 2005-2006 VBA development team
-
+// Copyright (C) 2007-2008 VBA-M development team
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2, or(at your option)
@@ -19,10 +19,16 @@
 
 #ifndef NO_OGL
 
+//OpenGL library
+#pragma comment( lib, "opengl32.lib" )
+
+// MFC
 #include "stdafx.h"
 
+//GUI
 #include "MainWnd.h"
 
+// Internals
 #include "../System.h"
 #include "../GBA.h"
 #include "../Globals.h"
@@ -31,17 +37,19 @@
 #include "../gb/gbGlobals.h"
 #include "..\memgzio.h"
 
+//Math
 #include <cmath>
-#include "glFont.h"
 
 // OpenGL
 #include <gl/GL.h> // main include file
 #include <GL/glu.h>
-
+#include "glFont.h"
 #include <gl/glext.h>
 
 
 typedef BOOL (APIENTRY *PFNWGLSWAPINTERVALFARPROC)( int );
+/*We need to declare the procs for these functions like this
+If anyone's got a better solution, I'd love to see it =D */
 PFNGLCREATEPROGRAMOBJECTARBPROC  glCreateProgramObjectARB  = NULL;
 PFNGLDELETEOBJECTARBPROC         glDeleteObjectARB         = NULL;
 PFNGLUSEPROGRAMOBJECTARBPROC     glUseProgramObjectARB     = NULL;
@@ -80,16 +88,14 @@ private:
 	HDC hDC;
 	HGLRC hRC;
 	GLuint texture;
-	int width;
-	int height;
+	int width,height;
 	float size;
 	u8 *filterData;
 	RECT destRect;
-	bool failed;
+	bool failed,shaderFuncInited;
 	GLFONT font;
 	int VertexShader,FragmentShader,textureLocation,ShaderProgram,g_location_grayScaleWeights;
 	char *VertexShaderSource,*FragmentShaderSource;
-	bool shaderFuncInited;
 
 	void initializeMatrices( int w, int h );
 	bool initializeTexture( int w, int h );
@@ -119,6 +125,7 @@ public:
 };
 
 #include "gzglfont.h"
+//Load GL font
 void OpenGLDisplay::initializeFont()
 {
     int ret;
@@ -149,7 +156,7 @@ void OpenGLDisplay::initializeFont()
 	free(buf);
     (void)inflateEnd(&strm);
 }
-
+//Load shader files
 char *readShaderFile(char *FileName) {
 	FILE *fp;
 	char *DATA = NULL;
@@ -170,13 +177,15 @@ char *readShaderFile(char *FileName) {
 
 	return DATA;
 }
-
+//Init and compile shaders
 void OpenGLDisplay::InitGLSLShader (void) {
+    //create GLSL shader objects
     VertexShader = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
 	FragmentShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
 
-	VertexShaderSource = readShaderFile("texture.vert");
-	FragmentShaderSource = readShaderFile("texture.frag");
+	//Read shader text files
+	VertexShaderSource = readShaderFile("vertex_shader.vert");
+	FragmentShaderSource = readShaderFile("fragment_shader.frag");
 
 	const char * VS = VertexShaderSource;
 	const char * FS = FragmentShaderSource;
@@ -185,18 +194,18 @@ void OpenGLDisplay::InitGLSLShader (void) {
 	glShaderSourceARB(FragmentShader, 1, &FS,NULL);
 		
 	free(VertexShaderSource);free(FragmentShaderSource);
-		
+	//compile shaders
 	glCompileShaderARB(VertexShader);
 	glCompileShaderARB(FragmentShader);
-		
+	//create shader program object
 	ShaderProgram = glCreateProgramObjectARB();
-			
+	//attach VS/FS to shader program object
 	glAttachObjectARB(ShaderProgram,VertexShader);
 	glAttachObjectARB(ShaderProgram,FragmentShader);
-
+    //link the object
 	glLinkProgramARB(ShaderProgram);	 
 }
-
+//set shader samplers and constants
 void OpenGLDisplay::SetGLSLShaderConstants()
 {
 	//get shader uniforms and shader weights
@@ -204,12 +213,13 @@ void OpenGLDisplay::SetGLSLShaderConstants()
 	g_location_grayScaleWeights = glGetUniformLocationARB( ShaderProgram, "grayScaleWeights" );
 	glUniform1iARB( textureLocation, 1 );
 
-    // Load the grey scale weights for the luminance filter.
+    // Load the greyscale weights for the luminance (B/W) filter.
     float fGrayScaleWeights[] = { 0.30f, 0.59f, 0.11f, 0.0f };
     glUniform4fARB( g_location_grayScaleWeights, fGrayScaleWeights[0], 
     fGrayScaleWeights[1], fGrayScaleWeights[2], fGrayScaleWeights[3] );
 
 }
+//Delete shaders
 void OpenGLDisplay::DeInitGLSLShader (void) {
 	if( !shaderFuncInited ) return;
 
@@ -225,6 +235,7 @@ void OpenGLDisplay::DeInitGLSLShader (void) {
 	shaderFuncInited = false;
 }
 
+//OpenGL class constructor
 OpenGLDisplay::OpenGLDisplay()
 {
 	hDC = NULL;
@@ -238,13 +249,13 @@ OpenGLDisplay::OpenGLDisplay()
 	shaderFuncInited = false;
 }
 
-
+//OpenHL class destroyer
 OpenGLDisplay::~OpenGLDisplay()
 {
 	cleanup();
 }
 
-
+//Set OpenGL PFD and contexts
 void OpenGLDisplay::EnableOpenGL()
 {
 	PIXELFORMATDESCRIPTOR pfd;
@@ -262,14 +273,14 @@ void OpenGLDisplay::EnableOpenGL()
     SetPixelFormat (GetDC (theApp.m_pMainWnd->GetSafeHwnd()), ChoosePixelFormat ( GetDC (theApp.m_pMainWnd->GetSafeHwnd()), &pfd), &pfd);
     wglMakeCurrent (GetDC (theApp.m_pMainWnd->GetSafeHwnd()), wglCreateContext(GetDC (theApp.m_pMainWnd->GetSafeHwnd()) ) );
 }
-
+//Remove contexts
 void OpenGLDisplay::DisableOpenGL()
 {
 	wglMakeCurrent( NULL, NULL );
 	wglDeleteContext( hRC );
 	ReleaseDC( theApp.m_pMainWnd->GetSafeHwnd(), hDC );
 }
-
+//Remove resources used
 void OpenGLDisplay::cleanup()
 {
 	DeInitGLSLShader();
@@ -288,7 +299,7 @@ void OpenGLDisplay::cleanup()
 	size = 0.0f;
 }
 
-
+//init renderer
 bool OpenGLDisplay::initialize()
 {
 	theApp.mode320Available = FALSE;
@@ -308,6 +319,7 @@ bool OpenGLDisplay::initialize()
 
 	if(theApp.GLSLShaders)
 	{
+	//load shader functions
 	glCreateProgramObjectARB  = (PFNGLCREATEPROGRAMOBJECTARBPROC)wglGetProcAddress("glCreateProgramObjectARB");
     glDeleteObjectARB         = (PFNGLDELETEOBJECTARBPROC)wglGetProcAddress("glDeleteObjectARB");
     glUseProgramObjectARB     = (PFNGLUSEPROGRAMOBJECTARBPROC)wglGetProcAddress("glUseProgramObjectARB");
@@ -353,16 +365,19 @@ bool OpenGLDisplay::initialize()
 	return TRUE;
 }
 
-
+//clear colour buffer 
 void OpenGLDisplay::clear()
 {
 	glClearColor(0.0,0.0,0.0,1.0);
 	glClear( GL_COLOR_BUFFER_BIT );
 }
-
+//main render func
 void OpenGLDisplay::render()
 { 
 	clear();
+
+	/* Might need to relocate?
+	Jeez, damn me losing old code that works well :/*/
 	if (theApp.GLSLShaders && shaderFuncInited){
 	InitGLSLShader();
     glUseProgramObjectARB( ShaderProgram );
@@ -449,22 +464,19 @@ void OpenGLDisplay::render()
 	}
 	
 	glFlush();
-	
-
 	SwapBuffers( hDC );
 	// since OpenGL draws on the back buffer,
-	// we have to swap it to the front buffer to see it
+	// we have to swap it to the front buffer to see the content
     
-	// draw informations with GDI on the front buffer
 }
 
-
+//resize screen
 void OpenGLDisplay::resize( int w, int h )
 {
 	initializeMatrices( w, h );
 }
 
-
+//update filtering methods
 void OpenGLDisplay::updateFiltering( int value )
 {
 	switch( value )
@@ -483,7 +495,7 @@ void OpenGLDisplay::updateFiltering( int value )
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 }
 
-
+//init projection matrixes and viewports
 void OpenGLDisplay::initializeMatrices( int w, int h )
 {
 	if( theApp.fullScreenStretch ) {
@@ -511,7 +523,7 @@ void OpenGLDisplay::initializeMatrices( int w, int h )
 	glLoadIdentity();
 }
 
-
+//init font texture
 bool OpenGLDisplay::initializeTexture( int w, int h )
 {
 	// size = 2^n
@@ -520,6 +532,8 @@ bool OpenGLDisplay::initializeTexture( int w, int h )
 	// w = 256 > size = 512 = 2^9
 	// w = 300 > size = 512 = 2^9
 	// OpenGL textures have to be square and a power of 2
+	// We could use methods that allow tex's to not be powers of two
+	// but that requires extra OGL extensions
 
 	float n1 = log10( (float)w ) / log10( 2.0f );
 	float n2 = log10( (float)h ) / log10( 2.0f );
@@ -553,7 +567,7 @@ bool OpenGLDisplay::initializeTexture( int w, int h )
 	return ( glGetError() == GL_NO_ERROR) ? true : false;
 }
 
-
+//turn vsync on or off
 void OpenGLDisplay::setVSync( int interval )
 {
 	const char *extensions = (const char *)glGetString( GL_EXTENSIONS );
@@ -570,7 +584,7 @@ void OpenGLDisplay::setVSync( int interval )
 	}
 }
 
-
+//change render size for fonts and filter data
 bool OpenGLDisplay::changeRenderSize( int w, int h )
 {
 	if( (width != w) || (height != h) ) {
@@ -592,7 +606,7 @@ bool OpenGLDisplay::changeRenderSize( int w, int h )
 	return true;
 }
 
-
+//calculate RECTs
 void OpenGLDisplay::calculateDestRect( int w, int h )
 {
 	float scaleX = (float)w / (float)width;
@@ -617,7 +631,7 @@ void OpenGLDisplay::calculateDestRect( int w, int h )
 	}
 }
 
-
+//config options
 void OpenGLDisplay::setOption( const char *option, int value )
 {
 	if( !_tcscmp( option, _T("vsync") ) ) {
@@ -637,7 +651,7 @@ void OpenGLDisplay::setOption( const char *option, int value )
 	}
 }
 
-
+//set fullscreen mode
 int OpenGLDisplay::selectFullScreenMode( GUID ** )
 {
 	HWND wnd = GetDesktopWindow();
