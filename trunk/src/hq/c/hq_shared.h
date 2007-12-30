@@ -21,6 +21,37 @@
 	hq filter by Maxim Stepin ( http://hiend3d.com )
 */
 
+#ifdef RGB555
+// 5 bits for green
+#define GMASK 0x03E0
+#define RBMASK 0x7C1F
+// MASK << 1
+#define GSHIFT1MASK 0x000007C0
+#define RBSHIFT1MASK 0x0000F83E
+// MASK << 2
+#define GSHIFT2MASK 0x00000F80
+#define RBSHIFT2MASK 0x0001F07C
+// MASK << 3
+#define GSHIFT3MASK 0x00001F00
+#define RBSHIFT3MASK 0x0003E0F8
+// MASK << 4
+#define GSHIFT4MASK 0x00003E00
+#define RBSHIFT4MASK 0x0007C1F0
+#else
+// RGB565
+// 6 bits for green
+#define GMASK 0x07E0
+#define RBMASK 0xF81F
+#define GSHIFT1MASK 0x00000FC0
+#define RBSHIFT1MASK 0x0001F03E
+#define GSHIFT2MASK 0x00001F80
+#define RBSHIFT2MASK 0x0003E07C
+#define GSHIFT3MASK 0x00003F00
+#define RBSHIFT3MASK 0x0007C0F8
+#define GSHIFT4MASK 0x00007E00
+#define RBSHIFT4MASK 0x000F81F0
+#endif
+
 
 // we only need the 32bit version because our YUV format has 32bits
 #define abs_32( value )  ( value & 0x7FFFFFFF )
@@ -47,6 +78,7 @@ inline bool Diff( unsigned int YUV1, unsigned int YUV2 )
 #define Interp1_32( pc, c1, c2 ) \
 ( \
 	*( (unsigned int *)(pc) ) = \
+	( (c1) == (c2) ) ? c1 : \
 	( \
 		( ( \
 			( ( (c1) & 0x00FF00 ) * 3 ) + \
@@ -66,6 +98,7 @@ inline bool Diff( unsigned int YUV1, unsigned int YUV2 )
 #define Interp2_32( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned int *)(pc) ) = \
+	( (c1) == (c2) == (c3) ) ? c1 : \
 	( \
 		( ( \
 			( ( (c1) & 0x00FF00 ) * 2 ) + \
@@ -87,6 +120,7 @@ inline bool Diff( unsigned int YUV1, unsigned int YUV2 )
 #define Interp3_32( pc, c1, c2 ) \
 ( \
 	*( (unsigned int *)(pc) ) = \
+	( (c1) == (c2) ) ? c1 : \
 	( \
 		( ( \
 			( ( (c1) & 0x00FF00 ) * 7 ) + \
@@ -106,6 +140,7 @@ inline bool Diff( unsigned int YUV1, unsigned int YUV2 )
 #define Interp4_32( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned int *)(pc) ) = \
+	( (c1) == (c2) == (c3) ) ? c1 : \
 	( \
 	( ( ( ( (c1) & 0x00FF00 ) * 2 ) + ( ( ( (c2) & 0x00FF00 ) + ( (c3) & 0x00FF00 ) ) * 7 ) ) & 0x000FF000 ) + \
 	( ( ( ( (c1) & 0xFF00FF ) * 2 ) + ( ( ( (c2) & 0xFF00FF ) + ( (c3) & 0xFF00FF ) ) * 7 ) ) & 0x0FF00FF0 ) \
@@ -118,6 +153,7 @@ inline bool Diff( unsigned int YUV1, unsigned int YUV2 )
 #define Interp5_32( pc, c1, c2 ) \
 ( \
 	*( (unsigned int *)(pc) ) = \
+	( (c1) == (c2) ) ? c1 : \
 	( \
 		( ( \
 			( (c1) & 0x00FF00 ) + \
@@ -137,6 +173,7 @@ inline bool Diff( unsigned int YUV1, unsigned int YUV2 )
 #define Interp6_32( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned int *)(pc) ) = \
+	( (c1) == (c2) == (c3) ) ? c1 : \
 	( \
 		( ( \
 			( ( (c1) & 0x00FF00 ) * 5 ) + \
@@ -158,6 +195,7 @@ inline bool Diff( unsigned int YUV1, unsigned int YUV2 )
 #define Interp7_32( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned int *)(pc) ) = \
+	( (c1) == (c2) == (c3) ) ? c1 : \
 	( \
 		( ( \
 			( ( (c1) & 0x00FF00 ) * 6 ) + \
@@ -179,6 +217,7 @@ inline bool Diff( unsigned int YUV1, unsigned int YUV2 )
 #define Interp8_32( pc, c1, c2 ) \
 ( \
 	*( (unsigned int *)(pc) ) = \
+	( (c1) == (c2) ) ? c1 : \
 	( \
 		( ( \
 			( ( (c1) & 0x00FF00 ) * 5 ) + \
@@ -229,16 +268,17 @@ inline unsigned int RGBtoYUV_32( unsigned int c )
 #define Interp1_16( pc, c1, c2 ) \
 ( \
 	*( (unsigned short *)(pc) ) = \
+	( (c1) == (c2) ) ? c1 : \
 	( \
 		( ( \
-			( ( (c1) & 0x07E0 ) * 3 ) + \
-			( (c2) & 0x07E0 ) \
-		) & 0x00001F80 ) \
+			( ( (c1) & GMASK ) * 3 ) + \
+			( (c2) & GMASK ) \
+		) & GSHIFT2MASK ) \
 		+ \
 		( ( \
-			( ( (c1) & 0xF81F ) * 3 ) + \
-			( (c2) & 0xF81F ) \
-		) & 0x0003E07C ) \
+			( ( (c1) & RBMASK ) * 3 ) + \
+			( (c2) & RBMASK ) \
+		) & RBSHIFT2MASK ) \
 	) >> 2 \
 )
 
@@ -248,18 +288,19 @@ inline unsigned int RGBtoYUV_32( unsigned int c )
 #define Interp2_16( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned short *)(pc) ) = \
+	( (c1) == (c2) == (c3) ) ? c1 : \
 	( \
 		( ( \
-			( ( (c1) & 0x07E0 ) * 2 ) + \
-			( (c2) & 0x07E0 ) + \
-			( (c3) & 0x07E0 ) \
-		) & 0x00001F80 ) \
+			( ( (c1) & GMASK ) * 2 ) + \
+			( (c2) & GMASK ) + \
+			( (c3) & GMASK ) \
+		) & GSHIFT2MASK ) \
 		+ \
 		( ( \
-			( ( (c1) & 0xF81F ) * 2 ) + \
-			( (c2) & 0xF81F ) + \
-			( (c3) & 0xF81F ) \
-		) & 0x0003E07C ) \
+			( ( (c1) & RBMASK ) * 2 ) + \
+			( (c2) & RBMASK ) + \
+			( (c3) & RBMASK ) \
+		) & RBSHIFT2MASK ) \
 	) >> 2 \
 )
 
@@ -269,16 +310,17 @@ inline unsigned int RGBtoYUV_32( unsigned int c )
 #define Interp3_16( pc, c1, c2 ) \
 ( \
 	*( (unsigned short *)(pc) ) = \
+	( (c1) == (c2) ) ? c1 : \
 	( \
 		( ( \
-			( ( (c1) & 0x07E0 ) * 7 ) + \
-			( (c2) & 0x07E0 ) \
-		) & 0x00003F00 ) \
+			( ( (c1) & GMASK ) * 7 ) + \
+			( (c2) & GMASK ) \
+		) & GSHIFT3MASK ) \
 		+ \
 		( ( \
-			( ( (c1) & 0xF81F ) * 7 ) + \
-			( (c2) & 0xF81F ) \
-		) & 0x0007C0F8 ) \
+			( ( (c1) & RBMASK ) * 7 ) + \
+			( (c2) & RBMASK ) \
+		) & RBSHIFT3MASK ) \
 	) >> 3 \
 )
 
@@ -288,9 +330,10 @@ inline unsigned int RGBtoYUV_32( unsigned int c )
 #define Interp4_16( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned short *)(pc) ) = \
+	( (c1) == (c2) == (c3) ) ? c1 : \
 	( \
-	( ( ( ( (c1) & 0x07E0 ) * 2 ) + ( ( ( (c2) & 0x07E0 ) + ( (c3) & 0x07E0 ) ) * 7 ) ) & 0x00007E00 ) + \
-	( ( ( ( (c1) & 0xF81F ) * 2 ) + ( ( ( (c2) & 0xF81F ) + ( (c3) & 0xF81F ) ) * 7 ) ) & 0x000F81F0 ) \
+	( ( ( ( (c1) & GMASK ) * 2 ) + ( ( ( (c2) & GMASK ) + ( (c3) & GMASK ) ) * 7 ) ) & GSHIFT4MASK ) + \
+	( ( ( ( (c1) & RBMASK ) * 2 ) + ( ( ( (c2) & RBMASK ) + ( (c3) & RBMASK ) ) * 7 ) ) & RBSHIFT4MASK ) \
 	) >> 4 \
 )
 
@@ -300,16 +343,17 @@ inline unsigned int RGBtoYUV_32( unsigned int c )
 #define Interp5_16( pc, c1, c2 ) \
 ( \
 	*( (unsigned short *)(pc) ) = \
+	( (c1) == (c2) ) ? c1 : \
 	( \
 		( ( \
-			( (c1) & 0x07E0 ) + \
-			( (c2) & 0x07E0 ) \
-		) & 0x00000FC0 ) \
+			( (c1) & GMASK ) + \
+			( (c2) & GMASK ) \
+		) & GSHIFT1MASK ) \
 		+ \
 		( ( \
-			( (c1) & 0xF81F ) + \
-			( (c2) & 0xF81F ) \
-		) & 0x0001F03E ) \
+			( (c1) & RBMASK ) + \
+			( (c2) & RBMASK ) \
+		) & RBSHIFT1MASK ) \
 	) >> 1 \
 )
 
@@ -319,18 +363,19 @@ inline unsigned int RGBtoYUV_32( unsigned int c )
 #define Interp6_16( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned short *)(pc) ) = \
+	( (c1) == (c2) == (c3) ) ? c1 : \
 	( \
 		( ( \
-			( ( (c1) & 0x07E0 ) * 5 ) + \
-			( ( (c2) & 0x07E0 ) * 2 ) + \
-			( (c3) & 0x07E0 ) \
-		) & 0x00003F00 ) \
+			( ( (c1) & GMASK ) * 5 ) + \
+			( ( (c2) & GMASK ) * 2 ) + \
+			( (c3) & GMASK ) \
+		) & GSHIFT3MASK ) \
 		+ \
 		( ( \
-			( ( (c1) & 0xF81F ) * 5 ) + \
-			( ( (c2) & 0xF81F ) * 2 ) + \
-			( (c3) & 0xF81F ) \
-		) & 0x0007C0F8 ) \
+			( ( (c1) & RBMASK ) * 5 ) + \
+			( ( (c2) & RBMASK ) * 2 ) + \
+			( (c3) & RBMASK ) \
+		) & RBSHIFT3MASK ) \
 	) >> 3 \
 )
 
@@ -340,18 +385,19 @@ inline unsigned int RGBtoYUV_32( unsigned int c )
 #define Interp7_16( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned short *)(pc) ) = \
+	( (c1) == (c2) == (c3) ) ? c1 : \
 	( \
 		( ( \
-			( ( (c1) & 0x07E0 ) * 6 ) + \
-			( (c2) & 0x07E0 ) + \
-			( (c3) & 0x07E0 ) \
-		) & 0x00003F00 ) \
+			( ( (c1) & GMASK ) * 6 ) + \
+			( (c2) & GMASK ) + \
+			( (c3) & GMASK ) \
+		) & GSHIFT3MASK ) \
 		+ \
 		( ( \
-			( ( (c1) & 0xF81F ) * 6 ) + \
-			( (c2) & 0xF81F ) + \
-			( (c3) & 0xF81F ) \
-		) & 0x0007C0F8 ) \
+			( ( (c1) & RBMASK ) * 6 ) + \
+			( (c2) & RBMASK ) + \
+			( (c3) & RBMASK ) \
+		) & RBSHIFT3MASK ) \
 	) >> 3 \
 )
 
@@ -361,16 +407,17 @@ inline unsigned int RGBtoYUV_32( unsigned int c )
 #define Interp8_16( pc, c1, c2 ) \
 ( \
 	*( (unsigned short *)(pc) ) = \
+	( (c1) == (c2) ) ? c1 : \
 	( \
 		( ( \
-			( ( (c1) & 0x07E0 ) * 5 ) + \
-			( ( (c2) & 0x07E0 ) * 3 ) \
-		) & 0x00003F00 ) \
+			( ( (c1) & GMASK ) * 5 ) + \
+			( ( (c2) & GMASK ) * 3 ) \
+		) & GSHIFT3MASK ) \
 		+ \
 		( ( \
-			( ( (c1) & 0xF81F ) * 5 ) + \
-			( ( (c2) & 0xF81F ) * 3 ) \
-		) & 0x0007C0F8 ) \
+			( ( (c1) & RBMASK ) * 5 ) + \
+			( ( (c2) & RBMASK ) * 3 ) \
+		) & RBSHIFT3MASK ) \
 	) >> 3 \
 )
 
@@ -382,9 +429,15 @@ inline unsigned int RGBtoYUV_16( unsigned short c )
 	// Division through 3 slows down the emulation about 10% !!!
 
 	register unsigned char r, g, b;
+#ifdef RGB555
+	r = ( c & 0x7C00 ) >> 7;
+	g = ( c & 0x03E0 ) >> 2;
+	b = ( c & 0x001F ) << 3;
+#else
 	r = ( c & 0xF800 ) >> 8;
 	g = ( c & 0x07E0 ) >> 3;
 	b = ( c & 0x001F ) << 3;
+#endif
 
 	return ( (r + g + b) << 14 ) +
 		( ( r - b + 512 ) << 4 ) +
