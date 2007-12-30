@@ -49,3 +49,16 @@
 	#include "hq_base.h"
 	#undef _HQ4X
 #undef _32BIT
+
+
+
+#undef GMASK
+#undef RBMASK
+#undef GSHIFT1MASK
+#undef RBSHIFT1MASK
+#undef GSHIFT2MASK
+#undef RBSHIFT2MASK
+#undef GSHIFT3MASK
+#undef RBSHIFT3MASK
+#undef GSHIFT4MASK
+#undef RBSHIFT4MASK
