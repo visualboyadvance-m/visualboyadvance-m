@@ -239,18 +239,18 @@ inline unsigned int RGBtoYUV_32( unsigned int c )
 	// Division through 3 slows down the emulation about 10% !!!
 
 	register unsigned char r, g, b;
-	r = ( c & 0x000000FF );
-	g = ( c & 0x0000FF00 ) >> 8;
-	b = ( c & 0x00FF0000 ) >> 16;
+	b = c & 0x0000FF;
+	g = ( c & 0x00FF00 ) >> 8;
+	r = c & >> 16;
 	return ( (r + g + b) << 14 ) +
 		( ( r - b + 512 ) << 4 ) +
 		( ( 2*g - r - b ) >> 3 ) + 128;
 
 	// unoptimized:
 	//unsigned char r, g, b, Y, u, v;
-	//r = (c & 0x000000FF);
+	//b = (c & 0x000000FF);
 	//g = (c & 0x0000FF00) >> 8;
-	//b = (c & 0x00FF0000) >> 16;
+	//r = (c & 0x00FF0000) >> 16;
 	//Y = (r + g + b) >> 2;
 	//u = 128 + ((r - b) >> 2);
 	//v = 128 + ((-r + 2*g -b)>>3);
