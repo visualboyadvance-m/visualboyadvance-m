@@ -3,3 +3,7 @@ Known Bugs:
 - Direct3D: fsMaxScale = 1 in fullscreen mode with visible menu results in too small height of the image
 - Direct3D: Menu toggle takes a little too long
 - Direct3D: VSync will be disabled in full screen mode while the menu is visible in order to work around poor performance
+- Linking: Doesnt work quite right yet.
+- OpenGL: Fragment shaders do not work quite as well as original test build (Mudlord)
+- Audio core: assertation error occurs when disabling GB sound
+- x64: Needs optimizations (x64 native code, whatever)
