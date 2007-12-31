@@ -2,7 +2,7 @@
 // Copyright (C) 1999-2003 Forgotten
 // Copyright (C) 2004 Forgotten and the VBA development team
 // Copyright (C) 2005-2006 VBA development team
-// Copyright (C) 2007 VBA-M development team
+// Copyright (C) 2007-2008 VBA-M development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

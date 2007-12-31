@@ -3,6 +3,7 @@
 // This plugin uses (modified) code by Maxim Stepin - see "hq2x16.asm" for info
 // The original code and description of the algorithm can be found at:
 // http://www.hiend3d.com/hq2x.html
+// Modified by suanyuan
 //---------------------------------------------------------------------------------------------------------------------------
 #include	<windows.h>
 
