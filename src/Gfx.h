@@ -297,6 +297,11 @@ static inline void gfxDrawRotScreen(u16 control,
     break;
   }
 
+  int maskX = sizeX-1;
+  int maskY = sizeY-1;
+
+  int yshift = ((control >> 14) & 3)+4;
+
   int dx = pa & 0x7FFF;
   if(pa & 0x8000)
     dx |= 0xFFFF8000;
@@ -343,12 +348,8 @@ static inline void gfxDrawRotScreen(u16 control,
   int yyy = (realY >> 8);
 
   if(control & 0x2000) {
-    xxx %= sizeX;
-    yyy %= sizeY;
-    if(xxx < 0)
-      xxx += sizeX;
-    if(yyy < 0)
-      yyy += sizeY;
+    xxx &= maskX;
+    yyy &= maskY;
   }
 
   if(control & 0x80) {
@@ -359,7 +360,7 @@ static inline void gfxDrawRotScreen(u16 control,
          yyy >= sizeY) {
         line[x] = 0x80000000;
       } else {
-        int tile = screenBase[(xxx>>3) + (yyy>>3)*(sizeX>>3)];
+        int tile = screenBase[(xxx>>3) + ((yyy>>3)<<yshift)];
 
         int tileX = (xxx & 7);
         int tileY = yyy & 7;
@@ -375,12 +376,8 @@ static inline void gfxDrawRotScreen(u16 control,
       yyy = (realY >> 8);
 
       if(control & 0x2000) {
-        xxx %= sizeX;
-        yyy %= sizeY;
-        if(xxx < 0)
-          xxx += sizeX;
-        if(yyy < 0)
-          yyy += sizeY;
+        xxx &= maskX;
+        yyy &= maskY;
       }
     }
   } else {
@@ -391,7 +388,7 @@ static inline void gfxDrawRotScreen(u16 control,
          yyy >= sizeY) {
         line[x] = 0x80000000;
       } else {
-        int tile = screenBase[(xxx>>3) + (yyy>>3)*(sizeX>>3)];
+        int tile = screenBase[(xxx>>3) + ((yyy>>3)<<yshift)];
 
         int tileX = (xxx & 7);
         int tileY = yyy & 7;
@@ -407,12 +404,8 @@ static inline void gfxDrawRotScreen(u16 control,
       yyy = (realY >> 8);
 
       if(control & 0x2000) {
-        xxx %= sizeX;
-        yyy %= sizeY;
-        if(xxx < 0)
-          xxx += sizeX;
-        if(yyy < 0)
-          yyy += sizeY;
+        xxx &= maskX;
+        yyy &= maskY;
       }
     }
   }

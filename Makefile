@@ -1,9 +1,9 @@
 CC=gcc
 CPPC=g++
-CFLAGS=-W -Wall -Wno-unused -O3 -DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DFINAL_VERSION -DBKPT_SUPPORT -DC_CORE -DSDL -DSYSCONFDIR="home" -DUSE_OPENGL
+CFLAGS=-W -Wall -Wno-unused -O3 -DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DFINAL_VERSION -DBKPT_SUPPORT -DSDL -DSYSCONFDIR="home" -DUSE_OPENGL
 CXXFLAGS=${CFLAGS}
 ASM=nasm
-ASMFLAGS=-w-orphan-labels -f elf -DELF -O1 -Isrc/
+ASMFLAGS=-w-orphan-labels -f elf -DELF -O1 -Isrc/hq/asm/
 LFLAGS=-lz -lpng -lGL `sdl-config --libs`
 STRIP=strip -s
 DEL=rm -f
@@ -11,7 +11,7 @@ OE=.o
 OUT=vba
 
 ifeq ($(PLATFORM),win)
-  ASMFLAGS=-w-orphan-labels -f win32 -O1 -Isrc/
+  ASMFLAGS=-w-orphan-labels -f win32 -O1 -Isrc/hq/asm/
   LFLAGS=-lz -lpng -lSDL -lwsock32 -lopengl32
   DELETECOMMAND = del
   OE=.obj
@@ -21,7 +21,7 @@ endif
 ifeq ($(PLATFORM),win-cross)
   CC=i586-mingw32-gcc
   CPPC=i586-mingw32-g++
-  ASMFLAGS=-w-orphan-labels -f win32 -O1 -Isrc/
+  ASMFLAGS=-w-orphan-labels -f win32 -O1 -Isrc/hq/asm/
   LFLAGS=-lz -lpng -lSDL -lwsock32 -lopengl32
   STRIP=i586-mingw32-strip -s
   OE=.obj
@@ -33,16 +33,17 @@ SDLDIR=src/sdl
 DMGDIR=src/gb
 GBAPUDIR=src/gb/gb_apu
 FEXDIR=../dependencies/File_Extractor-0.4.3
+HQCDIR=src/hq/c
+HQASMDIR=src/hq/asm
 
 
-ASMOBJ=${MAINDIR}/hq3x_16${OE} ${MAINDIR}/hq3x_32${OE} ${MAINDIR}/hq4x_16${OE} ${MAINDIR}/hq4x_32${OE} \
-${MAINDIR}/hq3x32${OE}
+ASMOBJ=${HQASMDIR}/hq3x_16${OE} ${HQASMDIR}/hq3x_32${OE} ${HQASMDIR}/hq4x_16${OE} \
+${HQASMDIR}/hq4x_32${OE} ${HQASMDIR}/hq3x32${OE}
 
 GBAPUOBJ=${GBAPUDIR}/Blip_Buffer${OE} ${GBAPUDIR}/Effects_Buffer${OE} ${GBAPUDIR}/Gb_Apu${OE} \
 ${GBAPUDIR}/Gb_Apu_State${OE} ${GBAPUDIR}/Gb_Oscs${OE} ${GBAPUDIR}/Multi_Buffer${OE}
 
-CALTERNOBJ=${MAINDIR}/hq3x16c${OE} ${MAINDIR}/hq3x32c${OE} ${MAINDIR}/hq4x16c${OE} ${MAINDIR}/hq4x32c${OE} \
-${MAINDIR}/hq_shared32${OE}
+CALTERNOBJ=${HQCDIR}/hq_implementation${OE}
 
 MAINOBJ=${MAINDIR}/2xSaI${OE} ${MAINDIR}/admame${OE} ${MAINDIR}/agbprint${OE} ${MAINDIR}/armdis${OE} \
 ${MAINDIR}/bilinear${OE} ${MAINDIR}/bios${OE} ${MAINDIR}/Cheats${OE} ${MAINDIR}/CheatSearch${OE} \
@@ -68,6 +69,7 @@ ifeq ($(USEASM),yes)
 OBJECTS+=${ASMOBJ}
 else
 OBJECTS+=${CALTERNOBJ}
+CFLAGS+=-DC_CORE
 endif
 
 ifeq ($(USEFEX),yes)
