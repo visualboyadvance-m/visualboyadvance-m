@@ -324,95 +324,95 @@ static INSN_REGPARM void thumbBreakpoint(u32 opcode)
   #define ADD_RN_O8(d) \
      asm ("andl $0xFF, %%eax;"\
           "addl %%eax, %0;"\
-          "setsb N_FLAG;"\
-          "setzb Z_FLAG;"\
-          "setcb C_FLAG;"\
-          "setob V_FLAG;"\
+          "setsb _N_FLAG;"\
+          "setzb _Z_FLAG;"\
+          "setcb _C_FLAG;"\
+          "setob _V_FLAG;"\
           : "=m" (reg[(d)].I));
   #define CMN_RD_RS \
      asm ("add %0, %1;"\
-          "setsb N_FLAG;"\
-          "setzb Z_FLAG;"\
-          "setcb C_FLAG;"\
-          "setob V_FLAG;"\
+          "setsb _N_FLAG;"\
+          "setzb _Z_FLAG;"\
+          "setcb _C_FLAG;"\
+          "setob _V_FLAG;"\
           : \
           : "r" (value), "r" (reg[dest].I):"1");
   #define ADC_RD_RS \
-     asm ("bt $0, C_FLAG;"\
+     asm ("bt $0, _C_FLAG;"\
           "adc %1, %%ebx;"\
-          "setsb N_FLAG;"\
-          "setzb Z_FLAG;"\
-          "setcb C_FLAG;"\
-          "setob V_FLAG;"\
+          "setsb _N_FLAG;"\
+          "setzb _Z_FLAG;"\
+          "setcb _C_FLAG;"\
+          "setob _V_FLAG;"\
           : "=b" (reg[dest].I)\
           : "r" (value), "b" (reg[dest].I));
   #define SUB_RN_O8(d) \
      asm ("andl $0xFF, %%eax;"\
           "subl %%eax, %0;"\
-          "setsb N_FLAG;"\
-          "setzb Z_FLAG;"\
-          "setncb C_FLAG;"\
-          "setob V_FLAG;"\
+          "setsb _N_FLAG;"\
+          "setzb _Z_FLAG;"\
+          "setncb _C_FLAG;"\
+          "setob _V_FLAG;"\
           : "=m" (reg[(d)].I));
   #define MOV_RN_O8(d) \
      asm ("andl $0xFF, %%eax;"\
-          "movb $0, N_FLAG;"\
+          "movb $0, _N_FLAG;"\
           "movl %%eax, %0;"\
-          "setzb Z_FLAG;"\
+          "setzb _Z_FLAG;"\
           : "=m" (reg[(d)].I));
   #define CMP_RN_O8(d) \
      asm ("andl $0xFF, %%eax;"\
           "cmpl %%eax, %0;"\
-          "setsb N_FLAG;"\
-          "setzb Z_FLAG;"\
-          "setncb C_FLAG;"\
-          "setob V_FLAG;"\
+          "setsb _N_FLAG;"\
+          "setzb _Z_FLAG;"\
+          "setncb _C_FLAG;"\
+          "setob _V_FLAG;"\
           : \
           : "m" (reg[(d)].I));
   #define SBC_RD_RS \
-     asm volatile ("bt $0, C_FLAG;"\
+     asm volatile ("bt $0, _C_FLAG;"\
                    "cmc;"\
                    "sbb %1, %%ebx;"\
-                   "setsb N_FLAG;"\
-                   "setzb Z_FLAG;"\
-                   "setncb C_FLAG;"\
-                   "setob V_FLAG;"\
+                   "setsb _N_FLAG;"\
+                   "setzb _Z_FLAG;"\
+                   "setncb _C_FLAG;"\
+                   "setob _V_FLAG;"\
                    : "=b" (reg[dest].I)\
                    : "r" (value), "b" (reg[dest].I) : "cc", "memory");
   #define LSL_RD_RS \
          asm ("shl %%cl, %%eax;"\
-              "setcb C_FLAG;"\
+              "setcb _C_FLAG;"\
               : "=a" (value)\
               : "a" (reg[dest].I), "c" (value));
   #define LSR_RD_RS \
          asm ("shr %%cl, %%eax;"\
-              "setcb C_FLAG;"\
+              "setcb _C_FLAG;"\
               : "=a" (value)\
               : "a" (reg[dest].I), "c" (value));
   #define ASR_RD_RS \
          asm ("sar %%cl, %%eax;"\
-              "setcb C_FLAG;"\
+              "setcb _C_FLAG;"\
               : "=a" (value)\
               : "a" (reg[dest].I), "c" (value));
   #define ROR_RD_RS \
          asm ("ror %%cl, %%eax;"\
-              "setcb C_FLAG;"\
+              "setcb _C_FLAG;"\
               : "=a" (value)\
               : "a" (reg[dest].I), "c" (value));
   #define NEG_RD_RS \
      asm ("neg %%ebx;"\
-          "setsb N_FLAG;"\
-          "setzb Z_FLAG;"\
-          "setncb C_FLAG;"\
-          "setob V_FLAG;"\
+          "setsb _N_FLAG;"\
+          "setzb _Z_FLAG;"\
+          "setncb _C_FLAG;"\
+          "setob _V_FLAG;"\
           : "=b" (reg[dest].I)\
           : "b" (reg[source].I));
   #define CMP_RD_RS \
      asm ("sub %0, %1;"\
-          "setsb N_FLAG;"\
-          "setzb Z_FLAG;"\
-          "setncb C_FLAG;"\
-          "setob V_FLAG;"\
+          "setsb _N_FLAG;"\
+          "setzb _Z_FLAG;"\
+          "setncb _C_FLAG;"\
+          "setob _V_FLAG;"\
           : \
           : "r" (value), "r" (reg[dest].I):"1");
   #define IMM5_INSN(OP,N) \
@@ -420,75 +420,75 @@ static INSN_REGPARM void thumbBreakpoint(u32 opcode)
          "shrl $1,%%eax;"            \
          "andl $7,%%ecx;"            \
          "andl $0x1C,%%eax;"         \
-         "movl reg(%%eax),%%edx;"    \
+         "movl _reg(%%eax),%%edx;"    \
          OP                          \
-         "setsb N_FLAG;"             \
-         "setzb Z_FLAG;"             \
-         "movl %%edx,reg(,%%ecx,4);" \
+         "setsb _N_FLAG;"             \
+         "setzb _Z_FLAG;"             \
+         "movl %%edx,_reg(,%%ecx,4);" \
          : : "i" (N))
   #define IMM5_INSN_0(OP)            \
      asm("movl %%eax,%%ecx;"         \
          "shrl $1,%%eax;"            \
          "andl $7,%%ecx;"            \
          "andl $0x1C,%%eax;"         \
-         "movl reg(%%eax),%%edx;"    \
+         "movl _reg(%%eax),%%edx;"    \
          OP                          \
-         "setsb N_FLAG;"             \
-         "setzb Z_FLAG;"             \
-         "movl %%edx,reg(,%%ecx,4);" \
+         "setsb _N_FLAG;"             \
+         "setzb _Z_FLAG;"             \
+         "movl %%edx,_reg(,%%ecx,4);" \
          : : )
   #define IMM5_LSL \
          "shll %0,%%edx;"\
-         "setcb C_FLAG;"
+         "setcb _C_FLAG;"
   #define IMM5_LSL_0 \
          "testl %%edx,%%edx;"
   #define IMM5_LSR \
          "shrl %0,%%edx;"\
-         "setcb C_FLAG;"
+         "setcb _C_FLAG;"
   #define IMM5_LSR_0 \
          "testl %%edx,%%edx;"\
-         "setsb C_FLAG;"\
+         "setsb _C_FLAG;"\
          "xorl %%edx,%%edx;"
   #define IMM5_ASR \
          "sarl %0,%%edx;"\
-         "setcb C_FLAG;"
+         "setcb _C_FLAG;"
   #define IMM5_ASR_0 \
          "sarl $31,%%edx;"\
-         "setsb C_FLAG;"
+         "setsb _C_FLAG;"
   #define THREEARG_INSN(OP,N) \
      asm("movl %%eax,%%edx;"       \
          "shrl $1,%%edx;"          \
          "andl $0x1C,%%edx;"       \
          "andl $7,%%eax;"          \
-         "movl reg(%%edx),%%ecx;"  \
+         "movl _reg(%%edx),%%ecx;"  \
          OP(N)                     \
-         "setsb N_FLAG;"           \
-         "setzb Z_FLAG;"           \
-         "movl %%ecx,reg(,%%eax,4)"::)
+         "setsb _N_FLAG;"           \
+         "setzb _Z_FLAG;"           \
+         "movl %%ecx,_reg(,%%eax,4)"::)
   #define ADD_RD_RS_RN(N)          \
-         "add (reg+"#N"*4),%%ecx;" \
-         "setcb C_FLAG;"           \
-         "setob V_FLAG;"
+         "add (_reg+"#N"*4),%%ecx;" \
+         "setcb _C_FLAG;"           \
+         "setob _V_FLAG;"
   #define ADD_RD_RS_O3(N)          \
          "add $"#N",%%ecx;"        \
-         "setcb C_FLAG;"           \
-         "setob V_FLAG;"
+         "setcb _C_FLAG;"           \
+         "setob _V_FLAG;"
   #define ADD_RD_RS_O3_0(N)        \
-         "movb $0,C_FLAG;"         \
+         "movb $0,_C_FLAG;"         \
          "add $0,%%ecx;"           \
-         "movb $0,V_FLAG;"
+         "movb $0,_V_FLAG;"
   #define SUB_RD_RS_RN(N) \
-         "sub (reg+"#N"*4),%%ecx;" \
-         "setncb C_FLAG;"          \
-         "setob V_FLAG;"
+         "sub (_reg+"#N"*4),%%ecx;" \
+         "setncb _C_FLAG;"          \
+         "setob _V_FLAG;"
   #define SUB_RD_RS_O3(N) \
          "sub $"#N",%%ecx;"        \
-         "setncb C_FLAG;"          \
-         "setob V_FLAG;"
+         "setncb _C_FLAG;"          \
+         "setob _V_FLAG;"
   #define SUB_RD_RS_O3_0(N)        \
-         "movb $1,C_FLAG;"         \
+         "movb $1,_C_FLAG;"         \
          "sub $0,%%ecx;"           \
-         "movb $0,V_FLAG;"
+         "movb $0,_V_FLAG;"
 #endif
 #else // !__GNUC__
   #define ADD_RD_RS_RN(N) \
