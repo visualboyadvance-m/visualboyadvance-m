@@ -314,7 +314,11 @@ bool Direct3DDisplay::initialize()
 void Direct3DDisplay::clear()
 {
 	if( pDevice ) {
+#ifdef _DEBUG
+		pDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0xFF,0x00,0xFF), 0.0f, 0 );
+#else
 		pDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0x00,0x00,0x00), 0.0f, 0 );
+#endif
 	}
 }
 
