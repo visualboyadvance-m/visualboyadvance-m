@@ -321,10 +321,10 @@ static void count(u32 opcode, int cond_res)
  #define EMIT1(op,arg)        #op" "arg"; "
  #define EMIT2(op,src,dest)   #op" "src", "dest"; "
  #define CONST(val)           "$"#val
- #define VAR(var)             #var
- #define VARL(var)            #var
- #define REGREF1(index)       "reg("index")"
- #define REGREF2(index,scale) "reg(,"index","#scale")"
+ #define VAR(var)             "_"#var
+ #define VARL(var)            "_"#var
+ #define REGREF1(index)       "_reg("index")"
+ #define REGREF2(index,scale) "_reg(,"index","#scale")"
  #define LABEL(n)             #n": "
  #define LABELREF(n,dir)      #n#dir
  #define al "%%al"
@@ -697,7 +697,7 @@ static void count(u32 opcode, int cond_res)
         : "0" (offset), "c" (shift));
 
 #define RRX_OFFSET \
-    asm("btl $0, C_FLAG;"               \
+    asm("btl $0, _C_FLAG;"               \
         "rcr $1, %0"                    \
         : "=r" (offset)                 \
         : "0" (offset));
