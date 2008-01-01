@@ -1592,6 +1592,7 @@ BEGIN
                 MENUITEM "Direct&3D",                   ID_OPTIONS_VIDEO_RENDERMETHOD_DIRECT3D
                 MENUITEM "   Filter: Nearest",          ID_OPTIONS_VIDEO_RENDEROPTIONS_D3DNOFILTER
                 MENUITEM "   Filter: Bilinear",         ID_OPTIONS_VIDEO_RENDEROPTIONS_D3DBILINEAR
+                MENUITEM "   Motion Blur",              ID_RENDERAPI_D3DMOTIONBLUR
                 MENUITEM SEPARATOR
                 MENUITEM "&OpenGL",                     ID_OPTIONS_VIDEO_RENDERMETHOD_OPENGL
                 MENUITEM "   Filter: Nearest",          ID_OPTIONS_VIDEO_RENDEROPTIONS_GLNEAREST

@@ -68,7 +68,8 @@ private:
 	D3DDISPLAYMODE		  mode;
 	D3DPRESENT_PARAMETERS dpp;
 	D3DFORMAT             screenFormat;
-	LPDIRECT3DTEXTURE9    emulatedImage;
+	LPDIRECT3DTEXTURE9    emulatedImage[2];
+	unsigned char         mbCurrentTexture; // current texture for motion blur
 	int                   width;
 	int                   height;
 	RECT                  destRect;
@@ -82,6 +83,12 @@ private:
 	// Vertices order:
 	// 1 3
 	// 0 2
+
+	struct TRANSP_VERTEX {
+		FLOAT x, y, z, rhw;
+		D3DCOLOR color;
+		FLOAT tx, ty;
+	} transpVertices[4];
 
 	void createFont();
 	void destroyFont();
@@ -118,7 +125,9 @@ Direct3DDisplay::Direct3DDisplay()
 	height = 0;
 	failed = false;
 	pFont = NULL;
-	emulatedImage = NULL;
+	emulatedImage[0] = NULL;
+	emulatedImage[1] = NULL;
+	mbCurrentTexture = 0;
 }
 
 
@@ -297,6 +306,7 @@ bool Direct3DDisplay::initialize()
 	createFont();
 	createTexture();
 	setOption( _T("d3dFilter"), theApp.d3dFilter );
+	setOption( _T("motionBlur"), theApp.d3dMotionBlur );
 	calculateDestRect();
 
 	if(failed) return false;
@@ -353,7 +363,7 @@ void Direct3DDisplay::render()
 	// copy pix to emulatedImage and apply pixel filter if selected
 	D3DLOCKED_RECT lr;
 	
-	if( FAILED( hr = emulatedImage->LockRect( 0, &lr, NULL, D3DLOCK_DISCARD ) ) ) {
+	if( FAILED( hr = emulatedImage[ mbCurrentTexture ]->LockRect( 0, &lr, NULL, D3DLOCK_DISCARD ) ) ) {
 		DXTRACE_ERR_MSGBOX( _T("Can not lock texture"), hr );
 		return;
 	} else {
@@ -395,15 +405,28 @@ void Direct3DDisplay::render()
 				break;
 			}
 		}
-		emulatedImage->UnlockRect( 0 );
+		emulatedImage[ mbCurrentTexture ]->UnlockRect( 0 );
 	}
 
-	// set emulatedImage as active texture
-	pDevice->SetTexture( 0, emulatedImage );
+
+	// set current emulatedImage as active texture
+	pDevice->SetTexture( 0, emulatedImage[ mbCurrentTexture ] );
 
 	// render textured triangles
 	pDevice->SetFVF( D3DFVF_XYZRHW | D3DFVF_TEX1 );
 	pDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(VERTEX) );
+
+
+	if( theApp.d3dMotionBlur ) {
+		// set old emulatedImage as active texture
+		mbCurrentTexture ^= 1; // XOR 1 = switch 0/1
+		pDevice->SetTexture( 0, emulatedImage[ mbCurrentTexture ] );
+
+		// render textured triangles
+		pDevice->SetFVF( D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1 );
+		pDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, transpVertices, sizeof(TRANSP_VERTEX) );
+	}
+
 
 	// render speed and status messages
 	D3DCOLOR color;
@@ -511,16 +534,32 @@ void Direct3DDisplay::destroyFont()
 
 void Direct3DDisplay::createTexture()
 {
-	if( !emulatedImage ) {
+	if( !emulatedImage[0] ) {
 		HRESULT hr = pDevice->CreateTexture(
 			width, height, 1, // 1 level, no mipmaps
 			D3DUSAGE_DYNAMIC, dpp.BackBufferFormat,
 			D3DPOOL_DEFAULT, // anything else won't work
-			&emulatedImage,
+			&emulatedImage[0],
 			NULL );
 
 		if( FAILED( hr ) ) {
-			DXTRACE_ERR_MSGBOX( _T("createTexture failed"), hr );
+			DXTRACE_ERR_MSGBOX( _T("createTexture(0) failed"), hr );
+			return;
+		}
+
+	}
+
+	if( !emulatedImage[1] && theApp.d3dMotionBlur ) {
+		HRESULT hr = pDevice->CreateTexture(
+			width, height, 1, // 1 level, no mipmaps
+			D3DUSAGE_DYNAMIC, dpp.BackBufferFormat,
+			D3DPOOL_DEFAULT, // anything else won't work
+			&emulatedImage[1],
+			NULL );
+
+		if( FAILED( hr ) ) {
+			DXTRACE_ERR_MSGBOX( _T("createTexture(1) failed"), hr );
+			return;
 		}
 	}
 }
@@ -528,9 +567,14 @@ void Direct3DDisplay::createTexture()
 
 void Direct3DDisplay::destroyTexture()
 {
-	if( emulatedImage ) {
-		emulatedImage->Release();
-		emulatedImage = NULL;
+	if( emulatedImage[0] ) {
+		emulatedImage[0]->Release();
+		emulatedImage[0] = NULL;
+	}
+
+	if( emulatedImage[1] ) {
+		emulatedImage[1]->Release();
+		emulatedImage[1] = NULL;
 	}
 }
 
@@ -593,6 +637,39 @@ void Direct3DDisplay::calculateDestRect()
 	Vertices[3].rhw = 1.0f;
 	Vertices[3].tx = 1.0f;
 	Vertices[3].ty = 0.0f;
+
+	if( theApp.d3dMotionBlur ) {
+		// configure semi-transparent triangles
+		D3DCOLOR semiTrans = D3DCOLOR_ARGB( 0x7F, 0xFF, 0xFF, 0xFF );
+		transpVertices[0].x = Vertices[0].x;
+		transpVertices[0].y = Vertices[0].y;
+		transpVertices[0].z = Vertices[0].z;
+		transpVertices[0].rhw = Vertices[0].rhw;
+		transpVertices[0].color = semiTrans;
+		transpVertices[0].tx = Vertices[0].tx;
+		transpVertices[0].ty = Vertices[0].ty;
+		transpVertices[1].x = Vertices[1].x;
+		transpVertices[1].y = Vertices[1].y;
+		transpVertices[1].z = Vertices[1].z;
+		transpVertices[1].rhw = Vertices[1].rhw;
+		transpVertices[1].color = semiTrans;
+		transpVertices[1].tx = Vertices[1].tx;
+		transpVertices[1].ty = Vertices[1].ty;
+		transpVertices[2].x = Vertices[2].x;
+		transpVertices[2].y = Vertices[2].y;
+		transpVertices[2].z = Vertices[2].z;
+		transpVertices[2].rhw = Vertices[2].rhw;
+		transpVertices[2].color = semiTrans;
+		transpVertices[2].tx = Vertices[2].tx;
+		transpVertices[2].ty = Vertices[2].ty;
+		transpVertices[3].x = Vertices[3].x;
+		transpVertices[3].y = Vertices[3].y;
+		transpVertices[3].z = Vertices[3].z;
+		transpVertices[3].rhw = Vertices[3].rhw;
+		transpVertices[3].color = semiTrans;
+		transpVertices[3].tx = Vertices[3].tx;
+		transpVertices[3].ty = Vertices[3].ty;
+	}
 }
 
 
@@ -631,6 +708,27 @@ void Direct3DDisplay::setOption( const char *option, int value )
 	if( !_tcscmp( option, _T("fullScreenStretch") ) ) {
 		calculateDestRect();
 	}
+
+	if( !_tcscmp( option, _T("motionBlur") ) ) {
+		switch( value )
+		{
+		case 0:
+			mbCurrentTexture = 0;
+			pDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
+			break;
+		case 1:
+			// enable vertex alpha blending
+			pDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
+			pDevice->SetRenderState( D3DRS_DIFFUSEMATERIALSOURCE, D3DMCS_COLOR1 );
+			pDevice->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
+			pDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
+			// apply vertex alpha values to texture
+			pDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE );
+			calculateDestRect();
+			createTexture(); // create the second texture
+			break;
+		}
+	}
 }
 
 
@@ -658,6 +756,7 @@ bool Direct3DDisplay::resetDevice()
 	}
 	createTexture();
 	setOption( _T("d3dFilter"), theApp.d3dFilter );
+	setOption( _T("motionBlur"), theApp.d3dMotionBlur );
 	failed = false;
 	return true;
 }

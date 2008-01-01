@@ -161,7 +161,10 @@ class VBA : public CWinApp
   bool ddrawUsingEmulationOnly;
   bool ddrawDebug;
   bool ddrawUseVideoMemory;
+#ifndef NO_D3D
   int d3dFilter;
+  bool d3dMotionBlur;
+#endif
   int glFilter;
   int GLSLShaders;
   bool dinputKeyFocus;
