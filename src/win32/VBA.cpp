@@ -287,7 +287,10 @@ VBA::VBA()
   ddrawUsingEmulationOnly = false;
   ddrawDebug = false;
   ddrawUseVideoMemory = false;
+#ifndef NO_D3D
   d3dFilter = 0;
+  d3dMotionBlur = false;
+#endif
   glFilter = 0;
   GLSLShaders = 0;
   skin = NULL;
@@ -1517,9 +1520,13 @@ void VBA::loadSettings()
   ddrawUseVideoMemory = regQueryDwordValue("ddrawUseVideoMemory", true) ? true : false;
   tripleBuffering = regQueryDwordValue("tripleBuffering", false) ? true : false;
 
+#ifndef NO_D3D
   d3dFilter = regQueryDwordValue("d3dFilter", 1);
   if(d3dFilter < 0 || d3dFilter > 1)
     d3dFilter = 1;
+
+  d3dMotionBlur = ( regQueryDwordValue("d3dMotionBlur", 0) == 1 ) ? true : false;
+#endif
 
   glFilter = regQueryDwordValue("glFilter", 1);
   if(glFilter < 0 || glFilter > 1)
@@ -2583,7 +2590,11 @@ void VBA::saveSettings()
   regSetDwordValue("ddrawUseVideoMemory", ddrawUseVideoMemory);
   regSetDwordValue("tripleBuffering", tripleBuffering);
 
+#ifndef NO_D3D
   regSetDwordValue("d3dFilter", d3dFilter);
+  regSetDwordValue("d3dMotionBlur", d3dMotionBlur ? 1 : 0);
+#endif
+
   regSetDwordValue("glFilter", glFilter);
   regSetDwordValue("GLSLShaders", GLSLShaders);
 

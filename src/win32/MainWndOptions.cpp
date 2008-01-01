@@ -2028,3 +2028,22 @@ void MainWnd::OnUpdateOutputapiOalconfiguration(CCmdUI *pCmdUI)
 	pCmdUI->Enable( FALSE );
 #endif
 }
+
+void MainWnd::OnRenderapiD3dmotionblur()
+{
+#ifndef NO_D3D
+	theApp.d3dMotionBlur = !theApp.d3dMotionBlur;
+	if( theApp.display ) {
+		theApp.display->setOption( _T("motionBlur"), theApp.d3dMotionBlur ? 1 : 0 );
+	}
+#endif
+}
+
+void MainWnd::OnUpdateRenderapiD3dmotionblur(CCmdUI *pCmdUI)
+{
+#ifndef NO_D3D
+	pCmdUI->SetCheck( theApp.d3dMotionBlur ? 1 : 0 );
+#else
+	pCmdUI->Enable( FALSE );
+#endif
+}
