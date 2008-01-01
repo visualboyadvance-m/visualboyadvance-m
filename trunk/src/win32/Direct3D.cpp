@@ -70,6 +70,7 @@ private:
 	D3DFORMAT             screenFormat;
 	LPDIRECT3DTEXTURE9    emulatedImage[2];
 	unsigned char         mbCurrentTexture; // current texture for motion blur
+	bool                  mbTextureEmpty;
 	int                   width;
 	int                   height;
 	RECT                  destRect;
@@ -128,6 +129,7 @@ Direct3DDisplay::Direct3DDisplay()
 	emulatedImage[0] = NULL;
 	emulatedImage[1] = NULL;
 	mbCurrentTexture = 0;
+	mbTextureEmpty = true;
 }
 
 
@@ -409,22 +411,30 @@ void Direct3DDisplay::render()
 	}
 
 
-	// set current emulatedImage as active texture
-	pDevice->SetTexture( 0, emulatedImage[ mbCurrentTexture ] );
-
-	// render textured triangles
-	pDevice->SetFVF( D3DFVF_XYZRHW | D3DFVF_TEX1 );
-	pDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(VERTEX) );
-
-
-	if( theApp.d3dMotionBlur ) {
-		// set old emulatedImage as active texture
-		mbCurrentTexture ^= 1; // XOR 1 = switch 0/1
+	if( !theApp.d3dMotionBlur ) {
+		// draw the current frame to the screen
 		pDevice->SetTexture( 0, emulatedImage[ mbCurrentTexture ] );
-
-		// render textured triangles
-		pDevice->SetFVF( D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1 );
-		pDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, transpVertices, sizeof(TRANSP_VERTEX) );
+		pDevice->SetFVF( D3DFVF_XYZRHW | D3DFVF_TEX1 );
+		pDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(VERTEX) );
+	} else {
+		// Motion Blur enabled
+		if( !mbTextureEmpty ) {
+			// draw previous frame to the screen
+			pDevice->SetTexture( 0, emulatedImage[ mbCurrentTexture ^ 1 ] );
+			pDevice->SetFVF( D3DFVF_XYZRHW | D3DFVF_TEX1 );
+			pDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(VERTEX) );
+			// draw the current frame with transparency to the screen
+			pDevice->SetTexture( 0, emulatedImage[ mbCurrentTexture ] );
+			pDevice->SetFVF( D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1 );
+			pDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, transpVertices, sizeof(TRANSP_VERTEX) );
+		} else {
+			mbTextureEmpty = false;
+			// draw the current frame to the screen
+			pDevice->SetTexture( 0, emulatedImage[ mbCurrentTexture ] );
+			pDevice->SetFVF( D3DFVF_XYZRHW | D3DFVF_TEX1 );
+			pDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(VERTEX) );
+		}
+		mbCurrentTexture ^= 1; // switch current texture
 	}
 
 
@@ -561,6 +571,8 @@ void Direct3DDisplay::createTexture()
 			DXTRACE_ERR_MSGBOX( _T("createTexture(1) failed"), hr );
 			return;
 		}
+
+		mbTextureEmpty = true;
 	}
 }
 
