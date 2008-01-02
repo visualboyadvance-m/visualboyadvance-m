@@ -241,7 +241,7 @@ inline unsigned int RGBtoYUV_32( unsigned int c )
 	register unsigned char r, g, b;
 	b = c & 0x0000FF;
 	g = ( c & 0x00FF00 ) >> 8;
-	r = ( c & 0xFF0000 ) >> 16;
+	r = c >> 16;
 	return ( (r + g + b) << 14 ) +
 		( ( r - b + 512 ) << 4 ) +
 		( ( 2*g - r - b ) >> 3 ) + 128;
