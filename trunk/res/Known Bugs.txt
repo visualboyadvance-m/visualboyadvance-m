@@ -1,7 +1,13 @@
 Known Bugs:
 
 - Linking: Doesnt work quite right yet.
-- OpenGL: Fragment shaders do not work quite as well as original test build (Mudlord)
+- OpenGL: Custom fragment/vertex shaders do not work quite as well as original test build (Mudlord)
+- OpenGL: Custom fullscreen resolutions will not work when filters are enabled. 
+  - Since other fullscreen OGL reses are disabled, I should disable custom OGL resolution
+    switching (Mudlord).
+- OpenGL: Various context handling issues with OGL mode. The emulator should restart whenever is
+  enabled, thus eliminating these issues when switching graphics APIs. I don't why this didnt happen
+  in the first place, when it should. (Mudlord)
 - Audio core: assertation error occurs when disabling GB sound
 - x64: Needs optimizations (x64 native code, whatever)
 - Wrong bit depth image is displayed for 2 frames when switching from/to HQ3x/4x ASM
