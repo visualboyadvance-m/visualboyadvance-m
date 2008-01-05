@@ -372,8 +372,6 @@ void Direct3DDisplay::render()
 
 	pDevice->BeginScene();
 
-	pDevice->SetSamplerState( 0, D3DSAMP_BORDERCOLOR, D3DCOLOR_XRGB( 0x00, 0xFF, 0x00 ) );
-
 	// copy pix to emulatedImage and apply pixel filter if selected
 	D3DLOCKED_RECT lr;
 
@@ -670,28 +668,28 @@ void Direct3DDisplay::calculateDestRect()
 	FLOAT textureX = (FLOAT)width / (FLOAT)textureSize;
 	FLOAT textureY = (FLOAT)height / (FLOAT)textureSize;
 
-
 	// configure triangles
-	Vertices[0].x = (FLOAT)destRect.left;
-	Vertices[0].y = (FLOAT)destRect.bottom;
+	Vertices[0].x = (FLOAT)destRect.left - 0.5f;
+	// -0.5f is necessary in order to match texture alignment to display pixels
+	Vertices[0].y = (FLOAT)destRect.bottom - 0.5f;
 	Vertices[0].z = 0.0f;
 	Vertices[0].rhw = 1.0f;
 	Vertices[0].tx = 0.0f;
 	Vertices[0].ty = textureY;
-	Vertices[1].x = (FLOAT)destRect.left;
-	Vertices[1].y = (FLOAT)destRect.top;
+	Vertices[1].x = (FLOAT)destRect.left - 0.5f;
+	Vertices[1].y = (FLOAT)destRect.top - 0.5f;
 	Vertices[1].z = 0.0f;
 	Vertices[1].rhw = 1.0f;
 	Vertices[1].tx = 0.0f;
 	Vertices[1].ty = 0.0f;
-	Vertices[2].x = (FLOAT)destRect.right;
-	Vertices[2].y = (FLOAT)destRect.bottom;
+	Vertices[2].x = (FLOAT)destRect.right - 0.5f;
+	Vertices[2].y = (FLOAT)destRect.bottom - 0.5f;
 	Vertices[2].z = 0.0f;
 	Vertices[2].rhw = 1.0f;
 	Vertices[2].tx = textureX;
 	Vertices[2].ty = textureY;
-	Vertices[3].x = (FLOAT)destRect.right;
-	Vertices[3].y = (FLOAT)destRect.top;
+	Vertices[3].x = (FLOAT)destRect.right - 0.5f;
+	Vertices[3].y = (FLOAT)destRect.top - 0.5f;
 	Vertices[3].z = 0.0f;
 	Vertices[3].rhw = 1.0f;
 	Vertices[3].tx = textureX;
