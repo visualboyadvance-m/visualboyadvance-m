@@ -445,6 +445,8 @@ public:
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnRenderapiD3dmotionblur();
 	afx_msg void OnUpdateRenderapiD3dmotionblur(CCmdUI *pCmdUI);
+	afx_msg void OnNcLButtonDown(UINT nHitTest, CPoint point);
+	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
 };
 
 /////////////////////////////////////////////////////////////////////////////
