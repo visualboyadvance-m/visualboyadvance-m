@@ -38,6 +38,9 @@
 #include "../gb/gbGlobals.h"
 
 // Direct3D
+#ifdef _DEBUG
+#define D3D_DEBUG_INFO
+#endif
 #define DIRECT3D_VERSION 0x0900
 #include <d3d9.h>      // main include file
 #include <D3dx9core.h> // required for font rendering
@@ -71,11 +74,12 @@ private:
 	LPDIRECT3DTEXTURE9    emulatedImage[2];
 	unsigned char         mbCurrentTexture; // current texture for motion blur
 	bool                  mbTextureEmpty;
-	int                   width;
-	int                   height;
+	unsigned int          width, height;
+	unsigned int          textureSize;
 	RECT                  destRect;
 	bool                  failed;
 	ID3DXFont             *pFont;
+	bool                  rectangleFillsScreen;
 
 	struct VERTEX {
 		FLOAT x, y, z, rhw; // screen coordinates
@@ -93,7 +97,7 @@ private:
 
 	void createFont();
 	void destroyFont();
-	void createTexture();
+	void createTexture( unsigned int textureWidth, unsigned int textureHeight );
 	void destroyTexture();
 	void calculateDestRect();
 	bool resetDevice();
@@ -124,12 +128,14 @@ Direct3DDisplay::Direct3DDisplay()
 	screenFormat = D3DFMT_X8R8G8B8;
 	width = 0;
 	height = 0;
+	textureSize = 0;
 	failed = false;
 	pFont = NULL;
 	emulatedImage[0] = NULL;
 	emulatedImage[1] = NULL;
 	mbCurrentTexture = 0;
 	mbTextureEmpty = true;
+	rectangleFillsScreen = false;
 }
 
 
@@ -306,10 +312,11 @@ bool Direct3DDisplay::initialize()
 	}
 
 	createFont();
-	createTexture();
+	// width and height will be set from a prior call to changeRenderSize() before initialize()
+	createTexture( width, height );
+	calculateDestRect();
 	setOption( _T("d3dFilter"), theApp.d3dFilter );
 	setOption( _T("motionBlur"), theApp.d3dMotionBlur );
-	calculateDestRect();
 
 	if(failed) return false;
 
@@ -358,13 +365,18 @@ void Direct3DDisplay::render()
 		}
 	}
 
-	clear();
+	if( !rectangleFillsScreen ) {
+		// performance: clear only when you must
+		clear();
+	}
 
 	pDevice->BeginScene();
 
+	pDevice->SetSamplerState( 0, D3DSAMP_BORDERCOLOR, D3DCOLOR_XRGB( 0x00, 0xFF, 0x00 ) );
+
 	// copy pix to emulatedImage and apply pixel filter if selected
 	D3DLOCKED_RECT lr;
-	
+
 	if( FAILED( hr = emulatedImage[ mbCurrentTexture ]->LockRect( 0, &lr, NULL, D3DLOCK_DISCARD ) ) ) {
 		DXTRACE_ERR_MSGBOX( _T("Can not lock texture"), hr );
 		return;
@@ -478,10 +490,11 @@ void Direct3DDisplay::render()
 bool Direct3DDisplay::changeRenderSize( int w, int h )
 {
 	if( (w != width) || (h != height) ) {
-		width = w; height = h;
+		width = (unsigned int)w;
+		height = (unsigned int)h;
 		if( pDevice ) {
 			destroyTexture();
-			createTexture();
+			createTexture( width, height );
 			calculateDestRect();
 		}
 	}
@@ -542,13 +555,33 @@ void Direct3DDisplay::destroyFont()
 }
 
 
-void Direct3DDisplay::createTexture()
+// when either textureWidth or textureHeight is 0, last texture size will be used
+void Direct3DDisplay::createTexture( unsigned int textureWidth, unsigned int textureHeight )
 {
+	if( ( textureWidth != 0 ) && ( textureWidth != 0 ) ) {
+		// calculate next possible square texture size
+		textureSize = 1;
+		unsigned int reqSizeMin = ( textureWidth > textureHeight ) ? textureWidth : textureHeight;
+		while( textureSize < reqSizeMin ) {
+			textureSize <<= 1; // multiply by 2
+		}
+	} else {
+		// do not recalculate texture size
+
+		if( textureSize == 0 ) {
+			DXTRACE_MSG( _T("Error: createTexture: textureSize == 0") );
+			return;
+		}
+	}
+
+
 	if( !emulatedImage[0] ) {
 		HRESULT hr = pDevice->CreateTexture(
-			width, height, 1, // 1 level, no mipmaps
-			D3DUSAGE_DYNAMIC, dpp.BackBufferFormat,
-			D3DPOOL_DEFAULT, // anything else won't work
+			textureSize, textureSize,
+			1, // 1 level, no mipmaps
+			D3DUSAGE_DYNAMIC, // dynamic textures can be locked
+			dpp.BackBufferFormat,
+			D3DPOOL_DEFAULT,
 			&emulatedImage[0],
 			NULL );
 
@@ -561,9 +594,11 @@ void Direct3DDisplay::createTexture()
 
 	if( !emulatedImage[1] && theApp.d3dMotionBlur ) {
 		HRESULT hr = pDevice->CreateTexture(
-			width, height, 1, // 1 level, no mipmaps
-			D3DUSAGE_DYNAMIC, dpp.BackBufferFormat,
-			D3DPOOL_DEFAULT, // anything else won't work
+			textureSize, textureSize,
+			1,
+			D3DUSAGE_DYNAMIC,
+			dpp.BackBufferFormat,
+			D3DPOOL_DEFAULT,
 			&emulatedImage[1],
 			NULL );
 
@@ -594,6 +629,7 @@ void Direct3DDisplay::destroyTexture()
 void Direct3DDisplay::calculateDestRect()
 {
 	if( theApp.fullScreenStretch ) {
+		rectangleFillsScreen = true; // no clear() necessary
 		destRect.left = 0;
 		destRect.top = 0;
 		destRect.right = dpp.BackBufferWidth;   // for some reason there'l be a black
@@ -620,34 +656,45 @@ void Direct3DDisplay::calculateDestRect()
 			destRect.top += diff;
 			destRect.bottom += diff;
 		}
+
+		if( ( destRect.left == 0 ) &&
+			( destRect.top == 0 ) &&
+			( destRect.right == dpp.BackBufferWidth ) &&
+			( destRect.bottom == dpp.BackBufferHeight ) ) {
+				rectangleFillsScreen = true;
+		} else {
+				rectangleFillsScreen = false;
+		}
 	}
 
+	FLOAT textureX = (FLOAT)width / (FLOAT)textureSize;
+	FLOAT textureY = (FLOAT)height / (FLOAT)textureSize;
 
 
 	// configure triangles
 	Vertices[0].x = (FLOAT)destRect.left;
 	Vertices[0].y = (FLOAT)destRect.bottom;
-	Vertices[0].z = 0.5f;
+	Vertices[0].z = 0.0f;
 	Vertices[0].rhw = 1.0f;
 	Vertices[0].tx = 0.0f;
-	Vertices[0].ty = 1.0f;
+	Vertices[0].ty = textureY;
 	Vertices[1].x = (FLOAT)destRect.left;
 	Vertices[1].y = (FLOAT)destRect.top;
-	Vertices[1].z = 0.5f;
+	Vertices[1].z = 0.0f;
 	Vertices[1].rhw = 1.0f;
 	Vertices[1].tx = 0.0f;
 	Vertices[1].ty = 0.0f;
 	Vertices[2].x = (FLOAT)destRect.right;
 	Vertices[2].y = (FLOAT)destRect.bottom;
-	Vertices[2].z = 0.5f;
+	Vertices[2].z = 0.0f;
 	Vertices[2].rhw = 1.0f;
-	Vertices[2].tx = 1.0f;
-	Vertices[2].ty = 1.0f;
+	Vertices[2].tx = textureX;
+	Vertices[2].ty = textureY;
 	Vertices[3].x = (FLOAT)destRect.right;
 	Vertices[3].y = (FLOAT)destRect.top;
-	Vertices[3].z = 0.5f;
+	Vertices[3].z = 0.0f;
 	Vertices[3].rhw = 1.0f;
-	Vertices[3].tx = 1.0f;
+	Vertices[3].tx = textureX;
 	Vertices[3].ty = 0.0f;
 
 	if( theApp.d3dMotionBlur ) {
@@ -737,7 +784,7 @@ void Direct3DDisplay::setOption( const char *option, int value )
 			// apply vertex alpha values to texture
 			pDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE );
 			calculateDestRect();
-			createTexture(); // create the second texture
+			createTexture( 0, 0 ); // create the second texture
 			break;
 		}
 	}
@@ -766,7 +813,7 @@ bool Direct3DDisplay::resetDevice()
 		// re-aquires font resources
 		pFont->OnResetDevice();
 	}
-	createTexture();
+	createTexture( 0, 0 );
 	setOption( _T("d3dFilter"), theApp.d3dFilter );
 	setOption( _T("motionBlur"), theApp.d3dMotionBlur );
 	failed = false;
