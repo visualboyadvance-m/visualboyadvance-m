@@ -4,4 +4,6 @@ Known Bugs:
 - OpenGL: Fragment shaders do not work quite as well as original test build (Mudlord)
 - Audio core: assertation error occurs when disabling GB sound
 - x64: Needs optimizations (x64 native code, whatever)
-- Wrong bit depth image is displayed for some frames when switching from/to Hq3x/4x ASM (most probably caused by 16bit to 32bit hack)
+- Wrong bit depth image is displayed for 2 frames when switching from/to HQ3x/4x ASM
+ - This is caused by the 16bit hack which does not re-process the emulated image.
+   It results in the display devices treating the image at pix with the wrong bit depth.
