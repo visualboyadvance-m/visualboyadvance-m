@@ -452,6 +452,8 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_OALCONFIGURATION, &MainWnd::OnUpdateOutputapiOalconfiguration)
   ON_COMMAND(ID_RENDERAPI_D3DMOTIONBLUR, &MainWnd::OnRenderapiD3dmotionblur)
   ON_UPDATE_COMMAND_UI(ID_RENDERAPI_D3DMOTIONBLUR, &MainWnd::OnUpdateRenderapiD3dmotionblur)
+  ON_WM_NCLBUTTONDOWN()
+  ON_WM_WINDOWPOSCHANGING()
   END_MESSAGE_MAP()
 
 
@@ -1328,4 +1330,24 @@ LRESULT MainWnd::OnMySysCommand(WPARAM wParam, LPARAM lParam)
       return 0;
   }
   return Default();
+}
+
+void MainWnd::OnNcLButtonDown(UINT nHitTest, CPoint point)
+{
+	// pause sound before process is halted
+	if( emulating ) {
+		soundPause();
+	}
+
+	CWnd::OnNcLButtonDown(nHitTest, point);
+}
+
+void MainWnd::OnWindowPosChanging(WINDOWPOS* lpwndpos)
+{
+	CWnd::OnWindowPosChanging(lpwndpos);
+
+	// pause sound before changing window position/size
+	if( emulating ) {
+		soundPause();
+	}
 }
