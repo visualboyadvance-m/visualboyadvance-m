@@ -27,10 +27,6 @@
 #include "Util.h"
 #include "Port.h"
 
-#ifdef _WIN32
-//#include <float.h>
-#endif
-
 #include "gb/gb_apu/Gb_Apu.h"
 #include "gb/gb_apu/Multi_Buffer.h"
 
@@ -451,12 +447,6 @@ static void remake_stereo_buffer()
 	if ( !ioMem )
 		return;
 	
-#ifdef _WIN32
-	// Direct3D might mess with FPU mode. Try uncommenting if more sound problems
-	// occur (also need to uncomment #include <float.h> above).
-	//_fpreset();
-#endif
-
 	// Clears pointers kept to old stereo_buffer
 	pcm [0].pcm.init();
 	pcm [1].pcm.init();
