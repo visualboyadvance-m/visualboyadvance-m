@@ -1777,48 +1777,6 @@ void VBA::updateVideoSize(UINT id)
   updateWindowSize(value);
 }
 
-typedef BOOL (WINAPI *GETMENUBARINFO)(HWND, LONG, LONG, PMENUBARINFO);
-
-static void winCheckMenuBarInfo(int& winSizeX, int& winSizeY)
-{
-  HINSTANCE hinstDll;
-  DWORD dwVersion = 0;
-
-#ifdef _AFXDLL
-  hinstDll = AfxLoadLibrary("user32.dll");
-#else
-  hinstDll = LoadLibrary( _T("user32.dll") );
-#endif
-
-  if(hinstDll) {
-	  GETMENUBARINFO func = (GETMENUBARINFO)GetProcAddress(hinstDll, "GetMenuBarInfo");
-
-    if(func) {
-      MENUBARINFO info;
-      info.cbSize = sizeof(MENUBARINFO);
-
-      func(AfxGetMainWnd()->GetSafeHwnd(), OBJID_MENU, 0, &info);
-
-      int menuHeight = GetSystemMetrics(SM_CYMENU);
-
-      if((info.rcBar.bottom - info.rcBar.top) > menuHeight) {
-        winSizeY += (info.rcBar.bottom - info.rcBar.top) - menuHeight + 1;
-        theApp.m_pMainWnd->SetWindowPos(
-                                        0, //HWND_TOPMOST,
-                                        theApp.windowPositionX,
-                                        theApp.windowPositionY,
-                                        winSizeX,
-                                        winSizeY,
-                                        SWP_NOMOVE | SWP_SHOWWINDOW);
-      }
-    }
-#ifdef _AFXDLL
-    AfxFreeLibrary( hinstDll );
-#else
-    FreeLibrary( hinstDll );
-#endif
-  }
-}
 
 void VBA::updateWindowSize(int value)
 {
@@ -1980,7 +1938,21 @@ void VBA::updateWindowSize(int value)
                                winSizeY,
                                SWP_NOMOVE | SWP_SHOWWINDOW);
 
-      winCheckMenuBarInfo(winSizeX, winSizeY);
+	  // content of old seperate 'winCheckMenuBarInfo' function:
+      MENUBARINFO info;
+      info.cbSize = sizeof(MENUBARINFO);
+	  theApp.m_pMainWnd->GetMenuBarInfo(OBJID_MENU, 0, &info);
+      int menuHeight = GetSystemMetrics(SM_CYMENU); // includes white line
+      if((info.rcBar.bottom - info.rcBar.top) > menuHeight) {
+        winSizeY += (info.rcBar.bottom - info.rcBar.top) - menuHeight + 1;
+        m_pMainWnd->SetWindowPos(
+                                        0, //HWND_TOPMOST,
+                                        theApp.windowPositionX,
+                                        theApp.windowPositionY,
+                                        winSizeX,
+                                        winSizeY,
+                                        SWP_NOMOVE | SWP_SHOWWINDOW);
+      }
     }
   }
 
@@ -1994,6 +1966,7 @@ void VBA::updateWindowSize(int value)
 
   m_pMainWnd->RedrawWindow(NULL,NULL,RDW_INVALIDATE|RDW_ERASE|RDW_ALLCHILDREN);
 }
+
 
 bool VBA::initDisplay()
 {
