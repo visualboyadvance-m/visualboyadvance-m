@@ -775,11 +775,33 @@ void MainWnd::OnMove(int x, int y)
 }
 
 void MainWnd::OnSizing(UINT fwSide, LPRECT pRect)
-{
+{	// the OnSizing event only occurs in windowed mode
 	CWnd::OnSizing(fwSide, pRect);
 
+	// pause sound to prevent low sound buffers
 	if( emulating ) {
 		soundPause();
+	}
+
+	// maintain minimal window size
+	RECT size = { 0, 0, theApp.sizeX, theApp.sizeY };
+	AdjustWindowRectEx(
+		&size,
+		WS_POPUP | WS_VISIBLE | WS_OVERLAPPEDWINDOW,
+		FALSE,
+		0 );
+	MENUBARINFO mbi;
+	mbi.cbSize = sizeof(MENUBARINFO);
+	this->GetMenuBarInfo( OBJID_MENU, 0, &mbi );
+	const LONG menuHeight = mbi.rcBar.bottom - mbi.rcBar.top + 1;
+	// +1 because of that white line, wherever it comes from
+	const LONG width = size.right - size.left;
+	const LONG height = size.bottom - size.top + menuHeight;
+	if( ( pRect->right - pRect->left ) < width ) {
+		pRect->right = pRect->left + width;
+	}
+	if( ( pRect->bottom - pRect->top ) < height ) {
+		pRect->bottom = pRect->top + height;
 	}
 }
 
