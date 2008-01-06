@@ -303,6 +303,7 @@ bool Direct3DDisplay::initialize()
 		D3DADAPTER_DEFAULT,
 		D3DDEVTYPE_HAL,
 		theApp.m_pMainWnd->GetSafeHwnd(),
+		D3DCREATE_FPU_PRESERVE |
 		D3DCREATE_SOFTWARE_VERTEXPROCESSING,
 		&dpp,
 		&pDevice);
