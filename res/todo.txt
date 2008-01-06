@@ -1,0 +1,4 @@
+Important:
+
+Unimportant:
+- Enable full screen frequency selection
