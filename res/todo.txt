@@ -1,4 +1,4 @@
 Important:
 
 Unimportant:
-- Enable full screen frequency selection
+- DDraw, D3D, OGL: Add full screen device & frequency selection
