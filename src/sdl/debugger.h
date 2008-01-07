@@ -18,3 +18,5 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 extern void debuggerMain();
+extern void debuggerOutput(const char *, u32);
+extern void debuggerSignal(int,int);
