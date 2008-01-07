@@ -37,6 +37,8 @@
 #include "../Util.h"
 #include "../gb/gbGlobals.h"
 
+#include <memory.h>
+
 // Direct3D
 #ifdef _DEBUG
 #define D3D_DEBUG_INFO
@@ -97,6 +99,7 @@ private:
 
 	void createFont();
 	void destroyFont();
+	bool clearTexture( LPDIRECT3DTEXTURE9 texture, size_t textureHeight );
 	void createTexture( unsigned int textureWidth, unsigned int textureHeight );
 	void destroyTexture();
 	void calculateDestRect();
@@ -375,8 +378,9 @@ void Direct3DDisplay::render()
 
 	// copy pix to emulatedImage and apply pixel filter if selected
 	D3DLOCKED_RECT lr;
+	const RECT target = { 0, 0, width, height };
 
-	if( FAILED( hr = emulatedImage[ mbCurrentTexture ]->LockRect( 0, &lr, NULL, D3DLOCK_DISCARD ) ) ) {
+	if( FAILED( hr = emulatedImage[ mbCurrentTexture ]->LockRect( 0, &lr, &target, 0 ) ) ) {
 		DXTRACE_ERR_MSGBOX( _T("Can not lock texture"), hr );
 		return;
 	} else {
@@ -554,6 +558,23 @@ void Direct3DDisplay::destroyFont()
 }
 
 
+// fill texture completely with black
+bool Direct3DDisplay::clearTexture( LPDIRECT3DTEXTURE9 texture, size_t textureHeight )
+{
+	D3DLOCKED_RECT lr;
+	HRESULT hr;
+
+	if( FAILED( hr = texture->LockRect( 0, &lr, NULL, 0 ) ) ) {
+		DXTRACE_ERR_MSGBOX( _T("Can not lock texture"), hr );
+		return false;
+	} else {
+		memset( lr.pBits, 0x00, lr.Pitch * textureHeight );
+		texture->UnlockRect( 0 );
+		return true;
+	}
+}
+
+
 // when either textureWidth or textureHeight is 0, last texture size will be used
 void Direct3DDisplay::createTexture( unsigned int textureWidth, unsigned int textureHeight )
 {
@@ -589,6 +610,9 @@ void Direct3DDisplay::createTexture( unsigned int textureWidth, unsigned int tex
 			return;
 		}
 
+		// initialize whole texture with black since we might see
+		// the initial noise when using bilinear texture filtering
+		clearTexture( emulatedImage[0], textureSize );
 	}
 
 	if( !emulatedImage[1] && theApp.d3dMotionBlur ) {
@@ -606,6 +630,7 @@ void Direct3DDisplay::createTexture( unsigned int textureWidth, unsigned int tex
 			return;
 		}
 
+		clearTexture( emulatedImage[1], textureSize );
 		mbTextureEmpty = true;
 	}
 }
