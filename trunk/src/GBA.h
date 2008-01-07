@@ -106,6 +106,7 @@ extern bool CPUWritePNGFile(const char *);
 extern bool CPUWriteBMPFile(const char *);
 extern void CPUCleanUp();
 extern void CPUUpdateRender();
+extern void CPUUpdateRenderBuffers(bool);
 extern bool CPUReadMemState(char *, int);
 extern bool CPUReadState(const char *);
 extern bool CPUWriteMemState(char *, int);

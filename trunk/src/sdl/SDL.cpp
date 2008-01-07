@@ -32,14 +32,15 @@
 #include "../GBA.h"
 #include "../agbprint.h"
 #include "../Flash.h"
-#include "../Port.h"
-#include "debugger.h"
 #include "../RTC.h"
 #include "../Sound.h"
 #include "../Text.h"
 #include "../Util.h"
 #include "../gb/gb.h"
 #include "../gb/gbGlobals.h"
+
+#include "debugger.h"
+#include "filters.h"
 
 #ifndef _WIN32
 # include <unistd.h>
@@ -55,14 +56,8 @@
 # include "../getopt.h"
 #else // ! __GNUC__
 # define HAVE_DECL_GETOPT 1
-# include "getopt.h"
+# include <getopt.h>
 #endif // ! __GNUC__
-
-#ifdef _WIN32
-#define INTERNAL_DEPTH_16
-#else
-#define INTERNAL_DEPTH_32
-#endif
 
 #ifdef MMX
 extern "C" bool cpu_mmx;
@@ -70,59 +65,11 @@ extern "C" bool cpu_mmx;
 extern bool soundEcho;
 extern bool soundLowPass;
 extern bool soundReverse;
-extern int Init_2xSaI(u32);
-extern void _2xSaI(u8*,u32,u8*,u8*,u32,int,int);
-extern void _2xSaI32(u8*,u32,u8*,u8*,u32,int,int);
-extern void Super2xSaI(u8*,u32,u8*,u8*,u32,int,int);
-extern void Super2xSaI32(u8*,u32,u8*,u8*,u32,int,int);
-extern void SuperEagle(u8*,u32,u8*,u8*,u32,int,int);
-extern void SuperEagle32(u8*,u32,u8*,u8*,u32,int,int);
-extern void Pixelate(u8*,u32,u8*,u8*,u32,int,int);
-extern void Pixelate32(u8*,u32,u8*,u8*,u32,int,int);
-extern void MotionBlur(u8*,u32,u8*,u8*,u32,int,int);
-extern void MotionBlur32(u8*,u32,u8*,u8*,u32,int,int);
-extern void AdMame2x(u8*,u32,u8*,u8*,u32,int,int);
-extern void AdMame2x32(u8*,u32,u8*,u8*,u32,int,int);
-extern void Simple2x16(u8*,u32,u8*,u8*,u32,int,int);
-extern void Simple2x32(u8*,u32,u8*,u8*,u32,int,int);
-extern void Simple3x16(u8*,u32,u8*,u8*,u32,int,int);
-extern void Simple3x32(u8*,u32,u8*,u8*,u32,int,int);
-extern void Simple4x16(u8*,u32,u8*,u8*,u32,int,int);
-extern void Simple4x32(u8*,u32,u8*,u8*,u32,int,int);
-extern void Bilinear(u8*,u32,u8*,u8*,u32,int,int);
-extern void Bilinear32(u8*,u32,u8*,u8*,u32,int,int);
-extern void BilinearPlus(u8*,u32,u8*,u8*,u32,int,int);
-extern void BilinearPlus32(u8*,u32,u8*,u8*,u32,int,int);
-extern void Scanlines(u8*,u32,u8*,u8*,u32,int,int);
-extern void Scanlines32(u8*,u32,u8*,u8*,u32,int,int);
-extern void ScanlinesTV(u8*,u32,u8*,u8*,u32,int,int);
-extern void ScanlinesTV32(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq2x(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq2x32(u8*,u32,u8*,u8*,u32,int,int);
-extern void lq2x(u8*,u32,u8*,u8*,u32,int,int);
-extern void lq2x32(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq3x16(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq4x16(u8*,u32,u8*,u8*,u32,int,int);
-
-#ifdef INTERNAL_DEPTH_16
-extern void hq3x32(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq4x32(u8*,u32,u8*,u8*,u32,int,int);
-#else
-extern void hq3x32_32(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq4x32_32(u8*,u32,u8*,u8*,u32,int,int);
-#define hq3x32 hq3x32_32
-#define hq4x32 hq4x32_32
-#endif
-
 
 extern void SmartIB(u8*,u32,int,int);
 extern void SmartIB32(u8*,u32,int,int);
 extern void MotionBlurIB(u8*,u32,int,int);
 extern void MotionBlurIB32(u8*,u32,int,int);
-
-void Init_Overlay(SDL_Surface *surface, int overlaytype);
-void Quit_Overlay(void);
-void Draw_Overlay(SDL_Surface *surface, int size);
 
 extern void remoteInit();
 extern void remoteCleanUp();
@@ -131,9 +78,7 @@ extern void remoteStubSignal(int,int);
 extern void remoteOutput(const char *, u32);
 extern void remoteSetProtocol(int);
 extern void remoteSetPort(int);
-extern void debuggerOutput(const char *, u32);
 
-extern void CPUUpdateRenderBuffers(bool);
 extern int gbHardware;
 
 struct EmulatedSystem emulator = {
@@ -154,8 +99,6 @@ struct EmulatedSystem emulator = {
 };
 
 SDL_Surface *surface = NULL;
-SDL_Overlay *overlay = NULL;
-SDL_Rect overlay_rect;
 
 int systemSpeed = 0;
 int systemRedShift = 0;
@@ -176,16 +119,15 @@ int destHeight = 0;
 int sensorX = 2047;
 int sensorY = 2047;
 
-int filter = 0;
+int filter = (int)kStretch1x;
 u8 *delta = NULL;
 
-int filter_enlarge = 2;
+int filter_enlarge = 1;
 
 int sdlPrintUsage = 0;
 int disableMMX = 0;
 
 int cartridgeType = 3;
-int sizeOption = 0;
 int captureFormat = 0;
 
 int openGL = 0;
@@ -258,9 +200,6 @@ bool debugger = false;
 bool debuggerStub = false;
 int fullscreen = 0;
 bool systemSoundOn = false;
-bool yuv = false;
-int yuvType = 0;
-bool removeIntros = false;
 int sdlFlashSize = 0;
 int sdlAutoIPS = 1;
 int sdlRtcEnable = 0;
@@ -268,8 +207,6 @@ int sdlAgbPrint = 0;
 int sdlMirroringEnable = 0;
 
 int sdlDefaultJoypad = 0;
-
-extern void debuggerSignal(int,int);
 
 void (*dbgMain)() = debuggerMain;
 void (*dbgSignal)(int,int) = debuggerSignal;
@@ -312,13 +249,6 @@ static inline int soundBufferUsed()
 
 
 char *arg0;
-
-#ifndef C_CORE
-u8 sdlStretcher[16384];
-int sdlStretcherPos;
-#else
-void (*sdlStretcher)(u8 *, u8*) = NULL;
-#endif
 
 enum {
   KEY_LEFT, KEY_RIGHT,
@@ -366,24 +296,6 @@ struct option sdlOptions[] = {
   { "config", required_argument, 0, 'c' },
   { "debug", no_argument, 0, 'd' },
   { "filter", required_argument, 0, 'f' },
-  { "filter-normal", no_argument, &filter, 0 },
-  { "filter-tv-mode", no_argument, &filter, 1 },
-  { "filter-2xsai", no_argument, &filter, 2 },
-  { "filter-super-2xsai", no_argument, &filter, 3 },
-  { "filter-super-eagle", no_argument, &filter, 4 },
-  { "filter-pixelate", no_argument, &filter, 5 },
-  { "filter-motion-blur", no_argument, &filter, 6 },
-  { "filter-advmame", no_argument, &filter, 7 },
-  { "filter-simple2x", no_argument, &filter, 8 },
-  { "filter-simple3x", no_argument, &filter, 9 },
-  { "filter-simple4x", no_argument, &filter, 10 },
-  { "filter-bilinear", no_argument, &filter, 11 },
-  { "filter-bilinear+", no_argument, &filter, 12 },
-  { "filter-scanlines", no_argument, &filter, 13 },
-  { "filter-lq2x", no_argument, &filter, 14 },
-  { "filter-hq2x", no_argument, &filter, 15 },
-  { "filter-hq3x", no_argument, &filter, 16 },
-  { "filter-hq4x", no_argument, &filter, 17 },
   { "flash-size", required_argument, 0, 'S' },
   { "flash-64k", no_argument, &sdlFlashSize, 0 },
   { "flash-128k", no_argument, &sdlFlashSize, 1 },
@@ -422,444 +334,8 @@ struct option sdlOptions[] = {
   { "show-speed-detailed", no_argument, &showSpeed, 2 },
   { "throttle", required_argument, 0, 'T' },
   { "verbose", required_argument, 0, 'v' },
-  { "video-1x", no_argument, &sizeOption, 0 },
-  { "video-2x", no_argument, &sizeOption, 1 },
-  { "video-3x", no_argument, &sizeOption, 2 },
-  { "video-4x", no_argument, &sizeOption, 3 },
-  { "yuv", required_argument, 0, 'Y' },
   { NULL, no_argument, NULL, 0 }
 };
-
-extern bool CPUIsGBAImage(char *);
-extern bool gbIsGameboyRom(char *);
-
-#ifndef C_CORE
-#define SDL_LONG(val) \
-  *((u32 *)&sdlStretcher[sdlStretcherPos]) = val;\
-  sdlStretcherPos+=4;
-
-#define SDL_AND_EAX(val) \
-  sdlStretcher[sdlStretcherPos++] = 0x25;\
-  SDL_LONG(val);
-
-#define SDL_AND_EBX(val) \
-  sdlStretcher[sdlStretcherPos++] = 0x81;\
-  sdlStretcher[sdlStretcherPos++] = 0xe3;\
-  SDL_LONG(val);
-
-#define SDL_OR_EAX_EBX \
-  sdlStretcher[sdlStretcherPos++] = 0x09;\
-  sdlStretcher[sdlStretcherPos++] = 0xd8;
-
-#define SDL_LOADL_EBX \
-  sdlStretcher[sdlStretcherPos++] = 0x8b;\
-  sdlStretcher[sdlStretcherPos++] = 0x1f;
-
-#define SDL_LOADW \
-  sdlStretcher[sdlStretcherPos++] = 0x66;\
-  sdlStretcher[sdlStretcherPos++] = 0x8b;\
-  sdlStretcher[sdlStretcherPos++] = 0x06;\
-  sdlStretcher[sdlStretcherPos++] = 0x83;\
-  sdlStretcher[sdlStretcherPos++] = 0xc6;\
-  sdlStretcher[sdlStretcherPos++] = 0x02;
-
-#define SDL_LOADL \
-  sdlStretcher[sdlStretcherPos++] = 0x8b;\
-  sdlStretcher[sdlStretcherPos++] = 0x06;\
-  sdlStretcher[sdlStretcherPos++] = 0x83;\
-  sdlStretcher[sdlStretcherPos++] = 0xc6;\
-  sdlStretcher[sdlStretcherPos++] = 0x04;
-
-#define SDL_LOADL2 \
-  sdlStretcher[sdlStretcherPos++] = 0x8b;\
-  sdlStretcher[sdlStretcherPos++] = 0x06;\
-  sdlStretcher[sdlStretcherPos++] = 0x83;\
-  sdlStretcher[sdlStretcherPos++] = 0xc6;\
-  sdlStretcher[sdlStretcherPos++] = 0x03;
-
-#define SDL_STOREW \
-  sdlStretcher[sdlStretcherPos++] = 0x66;\
-  sdlStretcher[sdlStretcherPos++] = 0x89;\
-  sdlStretcher[sdlStretcherPos++] = 0x07;\
-  sdlStretcher[sdlStretcherPos++] = 0x83;\
-  sdlStretcher[sdlStretcherPos++] = 0xc7;\
-  sdlStretcher[sdlStretcherPos++] = 0x02;
-
-#define SDL_STOREL \
-  sdlStretcher[sdlStretcherPos++] = 0x89;\
-  sdlStretcher[sdlStretcherPos++] = 0x07;\
-  sdlStretcher[sdlStretcherPos++] = 0x83;\
-  sdlStretcher[sdlStretcherPos++] = 0xc7;\
-  sdlStretcher[sdlStretcherPos++] = 0x04;
-
-#define SDL_STOREL2 \
-  sdlStretcher[sdlStretcherPos++] = 0x89;\
-  sdlStretcher[sdlStretcherPos++] = 0x07;\
-  sdlStretcher[sdlStretcherPos++] = 0x83;\
-  sdlStretcher[sdlStretcherPos++] = 0xc7;\
-  sdlStretcher[sdlStretcherPos++] = 0x03;
-
-#define SDL_RET \
-  sdlStretcher[sdlStretcherPos++] = 0xc3;
-
-#define SDL_PUSH_EAX \
-  sdlStretcher[sdlStretcherPos++] = 0x50;
-
-#define SDL_PUSH_ECX \
-  sdlStretcher[sdlStretcherPos++] = 0x51;
-
-#define SDL_PUSH_EBX \
-  sdlStretcher[sdlStretcherPos++] = 0x53;
-
-#define SDL_PUSH_ESI \
-  sdlStretcher[sdlStretcherPos++] = 0x56;
-
-#define SDL_PUSH_EDI \
-  sdlStretcher[sdlStretcherPos++] = 0x57;
-
-#define SDL_POP_EAX \
-  sdlStretcher[sdlStretcherPos++] = 0x58;
-
-#define SDL_POP_ECX \
-  sdlStretcher[sdlStretcherPos++] = 0x59;
-
-#define SDL_POP_EBX \
-  sdlStretcher[sdlStretcherPos++] = 0x5b;
-
-#define SDL_POP_ESI \
-  sdlStretcher[sdlStretcherPos++] = 0x5e;
-
-#define SDL_POP_EDI \
-  sdlStretcher[sdlStretcherPos++] = 0x5f;
-
-#define SDL_MOV_ECX(val) \
-  sdlStretcher[sdlStretcherPos++] = 0xb9;\
-  SDL_LONG(val);
-
-#define SDL_REP_MOVSB \
-  sdlStretcher[sdlStretcherPos++] = 0xf3;\
-  sdlStretcher[sdlStretcherPos++] = 0xa4;
-
-#define SDL_REP_MOVSW \
-  sdlStretcher[sdlStretcherPos++] = 0xf3;\
-  sdlStretcher[sdlStretcherPos++] = 0x66;\
-  sdlStretcher[sdlStretcherPos++] = 0xa5;
-
-#define SDL_REP_MOVSL \
-  sdlStretcher[sdlStretcherPos++] = 0xf3;\
-  sdlStretcher[sdlStretcherPos++] = 0xa5;
-
-void sdlMakeStretcher(int width)
-{
-  sdlStretcherPos = 0;
-  switch(systemColorDepth) {
-  case 16:
-    if(sizeOption) {
-      SDL_PUSH_EAX;
-      SDL_PUSH_ESI;
-      SDL_PUSH_EDI;
-      for(int i = 0; i < width; i++) {
-        SDL_LOADW;
-        SDL_STOREW;
-        SDL_STOREW;
-        if(sizeOption > 1) {
-          SDL_STOREW;
-        }
-        if(sizeOption > 2) {
-          SDL_STOREW;
-        }
-      }
-      SDL_POP_EDI;
-      SDL_POP_ESI;
-      SDL_POP_EAX;
-      SDL_RET;
-    } else {
-      SDL_PUSH_ESI;
-      SDL_PUSH_EDI;
-      SDL_PUSH_ECX;
-      SDL_MOV_ECX(width);
-      SDL_REP_MOVSW;
-      SDL_POP_ECX;
-      SDL_POP_EDI;
-      SDL_POP_ESI;
-      SDL_RET;
-    }
-    break;
-  case 24:
-    if(sizeOption) {
-      SDL_PUSH_EAX;
-      SDL_PUSH_ESI;
-      SDL_PUSH_EDI;
-      int w = width - 1;
-      for(int i = 0; i < w; i++) {
-        SDL_LOADL2;
-        SDL_STOREL2;
-        SDL_STOREL2;
-        if(sizeOption > 1) {
-          SDL_STOREL2;
-        }
-        if(sizeOption > 2) {
-          SDL_STOREL2;
-        }
-      }
-      // need to write the last one
-      SDL_LOADL2;
-      SDL_STOREL2;
-      if(sizeOption > 1) {
-        SDL_STOREL2;
-      }
-      if(sizeOption > 2) {
-        SDL_STOREL2;
-      }
-      SDL_AND_EAX(0x00ffffff);
-      SDL_PUSH_EBX;
-      SDL_LOADL_EBX;
-      SDL_AND_EBX(0xff000000);
-      SDL_OR_EAX_EBX;
-      SDL_POP_EBX;
-      SDL_STOREL2;
-      SDL_POP_EDI;
-      SDL_POP_ESI;
-      SDL_POP_EAX;
-      SDL_RET;
-    } else {
-      SDL_PUSH_ESI;
-      SDL_PUSH_EDI;
-      SDL_PUSH_ECX;
-      SDL_MOV_ECX(3*width);
-      SDL_REP_MOVSB;
-      SDL_POP_ECX;
-      SDL_POP_EDI;
-      SDL_POP_ESI;
-      SDL_RET;
-    }
-    break;
-  case 32:
-    if(sizeOption) {
-      SDL_PUSH_EAX;
-      SDL_PUSH_ESI;
-      SDL_PUSH_EDI;
-      for(int i = 0; i < width; i++) {
-        SDL_LOADL;
-        SDL_STOREL;
-        SDL_STOREL;
-        if(sizeOption > 1) {
-          SDL_STOREL;
-        }
-        if(sizeOption > 2) {
-          SDL_STOREL;
-        }
-      }
-      SDL_POP_EDI;
-      SDL_POP_ESI;
-      SDL_POP_EAX;
-      SDL_RET;
-    } else {
-      SDL_PUSH_ESI;
-      SDL_PUSH_EDI;
-      SDL_PUSH_ECX;
-      SDL_MOV_ECX(width);
-      SDL_REP_MOVSL;
-      SDL_POP_ECX;
-      SDL_POP_EDI;
-      SDL_POP_ESI;
-      SDL_RET;
-    }
-    break;
-  }
-}
-
-#ifdef _MSC_VER
-#define SDL_CALL_STRETCHER \
-  {\
-    __asm mov eax, stretcher\
-    __asm mov edi, dest\
-    __asm mov esi, src\
-    __asm call eax\
-  }
-#else
-#define SDL_CALL_STRETCHER \
-        asm volatile("call *%%eax"::"a" (stretcher),"S" (src),"D" (dest))
-#endif
-#else
-#define SDL_CALL_STRETCHER \
-       sdlStretcher(src, dest)
-
-void sdlStretch16x1(u8 *src, u8 *dest)
-{
-  u16 *s = (u16 *)src;
-  u16 *d = (u16 *)dest;
-  for(int i = 0; i < srcWidth; i++)
-    *d++ = *s++;
-}
-
-void sdlStretch16x2(u8 *src, u8 *dest)
-{
-  u16 *s = (u16 *)src;
-  u16 *d = (u16 *)dest;
-  for(int i = 0; i < srcWidth; i++) {
-    *d++ = *s;
-    *d++ = *s++;
-  }
-}
-
-void sdlStretch16x3(u8 *src, u8 *dest)
-{
-  u16 *s = (u16 *)src;
-  u16 *d = (u16 *)dest;
-  for(int i = 0; i < srcWidth; i++) {
-    *d++ = *s;
-    *d++ = *s;
-    *d++ = *s++;
-  }
-}
-
-void sdlStretch16x4(u8 *src, u8 *dest)
-{
-  u16 *s = (u16 *)src;
-  u16 *d = (u16 *)dest;
-  for(int i = 0; i < srcWidth; i++) {
-    *d++ = *s;
-    *d++ = *s;
-    *d++ = *s;
-    *d++ = *s++;
-  }
-}
-
-void (*sdlStretcher16[4])(u8 *, u8 *) = {
-  sdlStretch16x1,
-  sdlStretch16x2,
-  sdlStretch16x3,
-  sdlStretch16x4
-};
-
-void sdlStretch32x1(u8 *src, u8 *dest)
-{
-  u32 *s = (u32 *)src;
-  u32 *d = (u32 *)dest;
-  for(int i = 0; i < srcWidth; i++)
-    *d++ = *s++;
-}
-
-void sdlStretch32x2(u8 *src, u8 *dest)
-{
-  u32 *s = (u32 *)src;
-  u32 *d = (u32 *)dest;
-  for(int i = 0; i < srcWidth; i++) {
-    *d++ = *s;
-    *d++ = *s++;
-  }
-}
-
-void sdlStretch32x3(u8 *src, u8 *dest)
-{
-  u32 *s = (u32 *)src;
-  u32 *d = (u32 *)dest;
-  for(int i = 0; i < srcWidth; i++) {
-    *d++ = *s;
-    *d++ = *s;
-    *d++ = *s++;
-  }
-}
-
-void sdlStretch32x4(u8 *src, u8 *dest)
-{
-  u32 *s = (u32 *)src;
-  u32 *d = (u32 *)dest;
-  for(int i = 0; i < srcWidth; i++) {
-    *d++ = *s;
-    *d++ = *s;
-    *d++ = *s;
-    *d++ = *s++;
-  }
-}
-
-void (*sdlStretcher32[4])(u8 *, u8 *) = {
-  sdlStretch32x1,
-  sdlStretch32x2,
-  sdlStretch32x3,
-  sdlStretch32x4
-};
-
-void sdlStretch24x1(u8 *src, u8 *dest)
-{
-  u8 *s = src;
-  u8 *d = dest;
-  for(int i = 0; i < srcWidth; i++) {
-    *d++ = *s++;
-    *d++ = *s++;
-    *d++ = *s++;
-  }
-}
-
-void sdlStretch24x2(u8 *src, u8 *dest)
-{
-  u8 *s = (u8 *)src;
-  u8 *d = (u8 *)dest;
-  for(int i = 0; i < srcWidth; i++) {
-    *d++ = *s;
-    *d++ = *(s+1);
-    *d++ = *(s+2);
-    s += 3;
-    *d++ = *s;
-    *d++ = *(s+1);
-    *d++ = *(s+2);
-    s += 3;
-  }
-}
-
-void sdlStretch24x3(u8 *src, u8 *dest)
-{
-  u8 *s = (u8 *)src;
-  u8 *d = (u8 *)dest;
-  for(int i = 0; i < srcWidth; i++) {
-    *d++ = *s;
-    *d++ = *(s+1);
-    *d++ = *(s+2);
-    s += 3;
-    *d++ = *s;
-    *d++ = *(s+1);
-    *d++ = *(s+2);
-    s += 3;
-    *d++ = *s;
-    *d++ = *(s+1);
-    *d++ = *(s+2);
-    s += 3;
-  }
-}
-
-void sdlStretch24x4(u8 *src, u8 *dest)
-{
-  u8 *s = (u8 *)src;
-  u8 *d = (u8 *)dest;
-  for(int i = 0; i < srcWidth; i++) {
-    *d++ = *s;
-    *d++ = *(s+1);
-    *d++ = *(s+2);
-    s += 3;
-    *d++ = *s;
-    *d++ = *(s+1);
-    *d++ = *(s+2);
-    s += 3;
-    *d++ = *s;
-    *d++ = *(s+1);
-    *d++ = *(s+2);
-    s += 3;
-    *d++ = *s;
-    *d++ = *(s+1);
-    *d++ = *(s+2);
-    s += 3;
-  }
-}
-
-void (*sdlStretcher24[4])(u8 *, u8 *) = {
-  sdlStretch24x1,
-  sdlStretch24x2,
-  sdlStretch24x3,
-  sdlStretch24x4
-};
-
-#endif
 
 u32 sdlFromHex(char *s)
 {
@@ -1163,10 +639,6 @@ void sdlReadPreferences(FILE *f)
       gbFrameSkip = sdlFromHex(value);
       if(gbFrameSkip < 0 || gbFrameSkip > 9)
         gbFrameSkip = 0;
-    } else if(!strcmp(key, "video")) {
-      sizeOption = sdlFromHex(value);
-      if(sizeOption < 0 || sizeOption > 3)
-        sizeOption = 1;
     } else if(!strcmp(key, "fullScreen")) {
       fullscreen = sdlFromHex(value) ? 1 : 0;
     } else if(!strcmp(key, "useBios")) {
@@ -1231,8 +703,6 @@ void sdlReadPreferences(FILE *f)
       soundVolume = sdlFromHex(value);
       if(soundVolume < 0 || soundVolume > 3)
         soundVolume = 0;
-    } else if(!strcmp(key, "removeIntros")) {
-      removeIntros = sdlFromHex(value) ? true : false;
     } else if(!strcmp(key, "saveType")) {
       cpuSaveType = sdlFromHex(value);
       if(cpuSaveType < 0 || cpuSaveType > 5)
@@ -1277,8 +747,6 @@ void sdlReadPreferences(FILE *f)
     }
   }
 }
-
-
 
 void sdlOpenGLInit(int w, int h)
 {
@@ -1523,6 +991,50 @@ void sdlReadBattery()
 
   if(res)
     systemScreenMessage("Loaded battery");
+}
+
+void sdlInitVideo() {
+  int flags;
+
+  filter_enlarge = getFilterEnlargeFactor((Filter)filter);
+  destWidth = filter_enlarge * srcWidth;
+  destHeight = filter_enlarge * srcHeight;
+
+  flags = SDL_ANYFORMAT | (fullscreen ? SDL_FULLSCREEN : 0);
+  if(openGL) {
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    flags |= SDL_OPENGL | SDL_RESIZABLE;
+  } else
+    flags |= SDL_HWSURFACE | SDL_DOUBLEBUF;
+
+  surface = SDL_SetVideoMode(destWidth, destHeight, 16, flags);
+
+  if(surface == NULL) {
+    systemMessage(0, "Failed to set video mode");
+    SDL_Quit();
+    exit(-1);
+  }
+
+  if(openGL) {
+    free(filterPix);
+    filterPix = (u8 *)calloc(1, 4 * destWidth * destHeight);
+    sdlOpenGLInit(destWidth, destHeight);
+  }
+
+  systemRedShift = sdlCalculateShift(surface->format->Rmask);
+  systemGreenShift = sdlCalculateShift(surface->format->Gmask);
+  systemBlueShift = sdlCalculateShift(surface->format->Bmask);
+
+  systemColorDepth = surface->format->BitsPerPixel;
+
+  if(systemColorDepth == 16) {
+    srcPitch = srcWidth*2 + 4;
+  } else {
+    if(systemColorDepth == 32)
+      srcPitch = srcWidth*4 + 4;
+    else
+      srcPitch = srcWidth*3;
+  }
 }
 
 #define MOD_KEYS    (KMOD_CTRL|KMOD_SHIFT|KMOD_ALT|KMOD_META)
@@ -1864,13 +1376,22 @@ void sdlPollEvents()
            (event.key.keysym.mod & KMOD_CTRL)) {
           int flags = 0;
           fullscreen = !fullscreen;
-          if(fullscreen)
-            flags |= SDL_FULLSCREEN;
-           if(openGL)
-            flags |= SDL_OPENGL | SDL_RESIZABLE;
-          SDL_SetVideoMode(destWidth, destHeight, systemColorDepth, flags);
-         if(openGL)
-         sdlOpenGLInit(destWidth, destHeight);
+          sdlInitVideo();
+        }
+        break;
+      case SDLK_g:
+        if(!(event.key.keysym.mod & MOD_NOCTRL) &&
+           (event.key.keysym.mod & KMOD_CTRL)) {
+		  filterFunction = 0;
+		  while (!filterFunction)
+		  {
+			filter += 1;
+			filter %= kInvalidFilter;
+		    filterFunction = initFilter((Filter)filter, systemColorDepth, srcWidth);
+          }
+		  if (getFilterEnlargeFactor((Filter)filter) != filter_enlarge)
+		    sdlInitVideo();
+		  systemScreenMessage(getFilterName((Filter)filter));
         }
         break;
       case SDLK_F11:
@@ -1928,8 +1449,8 @@ void sdlPollEvents()
               "autofire R",
               "autofire L"};
           int mask = 1 << (event.key.keysym.sym - SDLK_1);
-    if(event.key.keysym.sym > SDLK_2)
-      mask <<= 6;
+          if(event.key.keysym.sym > SDLK_2)
+            mask <<= 6;
           if(autoFire & mask) {
             autoFire &= ~mask;
             systemScreenMessage(disableMessages[event.key.keysym.sym - SDLK_1]);
@@ -1937,7 +1458,7 @@ void sdlPollEvents()
             autoFire |= mask;
             systemScreenMessage(enableMessages[event.key.keysym.sym - SDLK_1]);
           }
-        } if(!(event.key.keysym.mod & MOD_NOCTRL) &&
+        } else if(!(event.key.keysym.mod & MOD_NOCTRL) &&
              (event.key.keysym.mod & KMOD_CTRL)) {
           int mask = 0x0100 << (event.key.keysym.sym - SDLK_1);
           layerSettings ^= mask;
@@ -1979,10 +1500,6 @@ void usage(char *cmd)
   printf("\
 \n\
 Options:\n\
-  -1, --video-1x               1x\n\
-  -2, --video-2x               2x\n\
-  -3, --video-3x               3x\n\
-  -4, --video-4x               4x\n\
   -O, --opengl=MODE            Set OpenGL texture filter\n\
       --no-opengl               0 - Disable OpenGL\n\
       --opengl-nearest          1 - No filtering\n\
@@ -1997,40 +1514,18 @@ Options:\n\
       --flash-64k               0 -  64K Flash\n\
       --flash-128k              1 - 128K Flash\n\
   -T, --throttle=THROTTLE      Set the desired throttle (5...1000)\n\
-  -Y, --yuv=TYPE               Use YUV overlay for drawing:\n\
-                                0 - YV12\n\
-                                1 - UYVY\n\
-                                2 - YVYU\n\
-                                3 - YUY2\n\
-                                4 - IYUV\n\
   -b, --bios=BIOS              Use given bios file\n\
   -c, --config=FILE            Read the given configuration file\n\
   -d, --debug                  Enter debugger\n\
   -f, --filter=FILTER          Select filter:\n\
-      --filter-normal            0 - normal mode\n\
-      --filter-tv-mode           1 - TV Mode\n\
-      --filter-2xsai             2 - 2xSaI\n\
-      --filter-super-2xsai       3 - Super 2xSaI\n\
-      --filter-super-eagle       4 - Super Eagle\n\
-      --filter-pixelate          5 - Pixelate\n\
-      --filter-motion-blur       6 - Motion Blur\n\
-      --filter-advmame           7 - AdvanceMAME Scale2x\n\
-      --filter-simple2x          8 - Simple2x\n\
-      --filter-simple3x          9 - Simple3x\n\
-      --filter-simple4x         10 - Simple4x\n\
-      --filter-bilinear         11 - Bilinear\n\
-      --filter-bilinear+        12 - Bilinear Plus\n\
-      --filter-scanlines        13 - Scanlines\n\
-      --filter-hq2x             14 - hq2x\n\
-      --filter-lq2x             15 - lq2x\n\
-      --filter-hq3x             16 - hq3x\n\
-      --filter-hq4x             17 - hq4x\n\
+");
+  for (int i  = 0; i < (int)kInvalidFilter; i++)
+	  printf("                                %d - %s\n", i, getFilterName((Filter)i));
+  printf("\
   -h, --help                   Print this help\n\
   -i, --ips=PATCH              Apply given IPS patch\n\
   -p, --profile=[HERTZ]        Enable profiling\n\
   -s, --frameskip=FRAMESKIP    Set frame skip (0...9)\n\
-");
-  printf("\
   -t, --save-type=TYPE         Set the available save type\n\
       --save-auto               0 - Automatic (EEPROM, SRAM, FLASH)\n\
       --save-eeprom             1 - EEPROM\n\
@@ -2140,33 +1635,7 @@ int main(int argc, char **argv)
         strcpy(ipsname, optarg);
       }
       break;
-    case 'Y':
-      yuv = true;
-      if(optarg) {
-        yuvType = atoi(optarg);
-        switch(yuvType) {
-        case 0:
-          yuvType = SDL_YV12_OVERLAY;
-          break;
-        case 1:
-          yuvType = SDL_UYVY_OVERLAY;
-          break;
-        case 2:
-          yuvType = SDL_YVYU_OVERLAY;
-          break;
-        case 3:
-          yuvType = SDL_YUY2_OVERLAY;
-          break;
-        case 4:
-          yuvType = SDL_IYUV_OVERLAY;
-          break;
-        default:
-          yuvType = SDL_YV12_OVERLAY;
-        }
-      } else
-        yuvType = SDL_YV12_OVERLAY;
-      break;
-    case 'G':
+   case 'G':
       dbgMain = remoteStubMain;
       dbgSignal = remoteStubSignal;
       dbgOutput = remoteOutput;
@@ -2259,18 +1728,6 @@ int main(int argc, char **argv)
       } else
         systemVerbose = 0;
       break;
-    case '1':
-      sizeOption = 0;
-      break;
-    case '2':
-      sizeOption = 1;
-      break;
-    case '3':
-      sizeOption = 2;
-      break;
-    case '4':
-      sizeOption = 3;
-      break;
     case '?':
       sdlPrintUsage = 1;
       break;
@@ -2296,9 +1753,6 @@ int main(int argc, char **argv)
     cpu_mmx = 0;
 #endif
 
-if(openGL)
-yuv = false;
-
   if(rewindTimer)
     rewindMemory = (char *)malloc(8*REWIND_SIZE);
 
@@ -2316,18 +1770,6 @@ yuv = false;
       usage(argv[0]);
       exit(-1);
     }
-  }
-
-  switch (filter)
-  {
-    case 9: case 16: filter_enlarge = 3; break;
-    case 10: case 17: filter_enlarge = 4; break;
-  }
-
-  if(filter) {
-    if(!openGL)
-    sizeOption = filter_enlarge-1;
-
   }
 
   for(int i = 0; i < 24;) {
@@ -2408,12 +1850,6 @@ yuv = false;
 
         cartridgeType = 0;
         emulator = GBASystem;
-
-        /* disabled due to problems
-        if(removeIntros && rom != NULL) {
-          WRITE32LE(&rom[0], 0xea00002e);
-        }
-        */
 
         CPUInit(biosFileName, useBios);
         CPUReset();
@@ -2496,40 +1932,16 @@ yuv = false;
     srcHeight = 240;
   }
 
-  destWidth = (sizeOption+1)*srcWidth;
-  destHeight = (sizeOption+1)*srcHeight;
+  sdlInitVideo();
 
-  flags = SDL_ANYFORMAT | (fullscreen ? SDL_FULLSCREEN : 0);
-   if(openGL) {
-   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    flags |= SDL_OPENGL | SDL_RESIZABLE;
-  } else
-    flags |= SDL_HWSURFACE | SDL_DOUBLEBUF;
-
-  surface = SDL_SetVideoMode(destWidth, destHeight, 16, flags);
-
-
-  if(surface == NULL) {
-    systemMessage(0, "Failed to set video mode");
-    SDL_Quit();
+  filterFunction = initFilter((Filter)filter, systemColorDepth, srcWidth);
+  if (!filterFunction) {
+    fprintf(stderr,"Unable to init filter\n");
     exit(-1);
   }
 
-  systemRedShift = sdlCalculateShift(surface->format->Rmask);
-  systemGreenShift = sdlCalculateShift(surface->format->Gmask);
-  systemBlueShift = sdlCalculateShift(surface->format->Bmask);
-
-  systemColorDepth = surface->format->BitsPerPixel;
   if(systemColorDepth == 15)
     systemColorDepth = 16;
-
-  if(yuv) {
-    Init_Overlay(surface, yuvType);
-    systemColorDepth = 32;
-    systemRedShift = 3;
-    systemGreenShift = 11;
-    systemBlueShift =  19;
-  }
 
   if(systemColorDepth != 16 && systemColorDepth != 24 &&
      systemColorDepth != 32) {
@@ -2537,166 +1949,13 @@ yuv = false;
     exit(-1);
   }
 
-#ifndef C_CORE
-  sdlMakeStretcher(srcWidth);
-#else
-  switch(systemColorDepth) {
-  case 16:
-    sdlStretcher = sdlStretcher16[sizeOption];
-    break;
-  case 24:
-    sdlStretcher = sdlStretcher24[sizeOption];
-    break;
-  case 32:
-    sdlStretcher = sdlStretcher32[sizeOption];
-    break;
-  default:
-    fprintf(stderr, "Unsupported resolution: %d\n", systemColorDepth);
-    exit(-1);
-  }
-#endif
-
   fprintf(stderr,"Color depth: %d\n", systemColorDepth);
-
-  if(systemColorDepth == 16) {
-    if(sdlCalculateMaskWidth(surface->format->Gmask) == 6) {
-      Init_2xSaI(565);
-    } else {
-      Init_2xSaI(555);
-    }
-    srcPitch = srcWidth * 2+4;
-  } else {
-    if(systemColorDepth != 32)
-      filterFunction = NULL;
-    Init_2xSaI(32);
-    if(systemColorDepth == 32)
-      srcPitch = srcWidth*4 + 4;
-    else
-      srcPitch = srcWidth*3;
-  }
 
   utilUpdateSystemColorMaps();
 
-  if(systemColorDepth != 32) {
-    switch(filter) {
-    case 0:
-      filterFunction = NULL;
-      break;
-    case 1:
-      filterFunction = ScanlinesTV;
-      break;
-    case 2:
-      filterFunction = _2xSaI;
-      break;
-    case 3:
-      filterFunction = Super2xSaI;
-      break;
-    case 4:
-      filterFunction = SuperEagle;
-      break;
-    case 5:
-      filterFunction = Pixelate;
-      break;
-    case 6:
-      filterFunction = MotionBlur;
-      break;
-    case 7:
-      filterFunction = AdMame2x;
-      break;
-    case 8:
-      filterFunction = Simple2x16;
-      break;
-    case 9:
-      filterFunction = Simple3x16;
-      break;
-    case 10:
-      filterFunction = Simple4x16;
-      break;
-    case 11:
-      filterFunction = Bilinear;
-      break;
-    case 12:
-      filterFunction = BilinearPlus;
-      break;
-    case 13:
-      filterFunction = Scanlines;
-      break;
-    case 14:
-      filterFunction = lq2x;
-      break;
-    case 15:
-      filterFunction = hq2x;
-      break;
-    case 16:
-      filterFunction = hq3x16;
-      break;
-    case 17:
-      filterFunction = hq4x16;
-      break;
-    default:
-      filterFunction = NULL;
-      break;
-    }
-  } else {
-    switch(filter) {
-    case 0:
-      filterFunction = NULL;
-      break;
-    case 1:
-      filterFunction = ScanlinesTV32;
-      break;
-    case 2:
-      filterFunction = _2xSaI32;
-      break;
-    case 3:
-      filterFunction = Super2xSaI32;
-      break;
-    case 4:
-      filterFunction = SuperEagle32;
-      break;
-    case 5:
-      filterFunction = Pixelate32;
-      break;
-    case 6:
-      filterFunction = MotionBlur32;
-      break;
-    case 7:
-      filterFunction = AdMame2x32;
-      break;
-    case 8:
-      filterFunction = Simple2x32;
-      break;
-    case 9:
-      filterFunction = Simple3x32;
-      break;
-    case 10:
-      filterFunction = Simple4x32;
-      break;
-    case 11:
-      filterFunction = Bilinear32;
-      break;
-    case 12:
-      filterFunction = BilinearPlus32;
-      break;
-    case 13:
-      filterFunction = Scanlines32;
-      break;
-    case 14:
-      filterFunction = lq2x32;
-      break;
-    case 15:
-      filterFunction = hq2x32;
-      break;
-    case 16:
-      filterFunction = hq3x32;
-      break;
-    case 17:
-      filterFunction = hq4x32;
-      break;
-    default:
-      filterFunction = NULL;
-      break;
-    }
+  if(delta == NULL) {
+    delta = (u8*)malloc(322*242*4);
+    memset(delta, 255, 322*242*4);
   }
 
   if(systemColorDepth == 16) {
@@ -2727,17 +1986,6 @@ yuv = false;
     }
   } else
     ifbFunction = NULL;
-
-  if(delta == NULL) {
-    delta = (u8*)malloc(322*242*4);
-    memset(delta, 255, 322*242*4);
-  }
-
-if(openGL) {
-    filterPix = (u8 *)calloc(1, 4 * 4 * 256 * 240);
-    sdlOpenGLInit(destWidth, destHeight);
-  }
-
 
   emulating = 1;
   renderedFrames = 0;
@@ -2833,12 +2081,8 @@ void systemDrawScreen()
 {
   renderedFrames++;
 
-  if(yuv) {
-    Draw_Overlay(surface, sizeOption+1);
-    return;
-  }
   if(!openGL)
-  SDL_LockSurface(surface);
+    SDL_LockSurface(surface);
 
   if(screenMessage) {
     if(cartridgeType == 1 && gbBorderOn) {
@@ -2860,48 +2104,36 @@ void systemDrawScreen()
       ifbFunction(pix+destWidth*2+4, destWidth*2+4, srcWidth, srcHeight);
   }
 
-if (openGL) {
-    int mult = 1;
-
-    if(filterFunction) {
+  if (openGL) {
       int pitch = srcWidth * 4 + 4;
 
       filterFunction(pix + pitch,
                      pitch,
                      delta,
                      (u8*)filterPix,
-                     srcWidth * 4 * 2,
+                     srcWidth * 4 * filter_enlarge,
                      srcWidth,
                      srcHeight);
 
-      glPixelStorei(GL_UNPACK_ROW_LENGTH, srcWidth << 1);
-      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, srcWidth << 1, srcHeight << 1,
+      glPixelStorei(GL_UNPACK_ROW_LENGTH, destWidth);
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
                       GL_BGRA, GL_UNSIGNED_BYTE, filterPix);
-      mult = 2;
-    } else {
-      glPixelStorei(GL_UNPACK_ROW_LENGTH, srcWidth + 1);
-      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, srcWidth, srcHeight,
-                      GL_BGRA, GL_UNSIGNED_BYTE, pix + ((srcWidth + 1) << 2));
-    }
 
     glBegin(GL_TRIANGLE_STRIP);
       glTexCoord2f(0.0f, 0.0f);
       glVertex3i(0, 0, 0);
-      glTexCoord2f(mult * srcWidth / (GLfloat) textureSize, 0.0f);
+      glTexCoord2f(filter_enlarge * srcWidth / (GLfloat) textureSize, 0.0f);
       glVertex3i(1, 0, 0);
-      glTexCoord2f(0.0f, mult * srcHeight / (GLfloat) textureSize);
+      glTexCoord2f(0.0f, filter_enlarge * srcHeight / (GLfloat) textureSize);
       glVertex3i(0, 1, 0);
-      glTexCoord2f(mult * srcWidth / (GLfloat) textureSize,
-                  mult * srcHeight / (GLfloat) textureSize);
+      glTexCoord2f(filter_enlarge * srcWidth / (GLfloat) textureSize,
+                  filter_enlarge * srcHeight / (GLfloat) textureSize);
       glVertex3i(1, 1, 0);
     glEnd();
 
    SDL_GL_SwapBuffers();
   } else {
 
-
-
-  if(filterFunction) {
     unsigned int destw = destWidth*((systemColorDepth == 16) ? 2 : 4) / filter_enlarge + 4;
     filterFunction(pix+destw,
                     destw,
@@ -2910,60 +2142,6 @@ if (openGL) {
                     surface->pitch,
                     srcWidth,
                     srcHeight);
-  } else {
-    int destPitch = surface->pitch;
-    u8 *src = pix;
-    u8 *dest = (u8*)surface->pixels;
-    int i;
-    u32 *stretcher = (u32 *)sdlStretcher;
-    if(systemColorDepth == 16)
-      src += srcPitch;
-    int option = sizeOption;
-    if(yuv)
-      option = 0;
-    switch(sizeOption) {
-    case 0:
-      for(i = 0; i < srcHeight; i++) {
-        SDL_CALL_STRETCHER;
-        src += srcPitch;
-        dest += destPitch;
-      }
-      break;
-    case 1:
-      for(i = 0; i < srcHeight; i++) {
-        SDL_CALL_STRETCHER;
-        dest += destPitch;
-        SDL_CALL_STRETCHER;
-        src += srcPitch;
-        dest += destPitch;
-      }
-      break;
-    case 2:
-      for(i = 0; i < srcHeight; i++) {
-        SDL_CALL_STRETCHER;
-        dest += destPitch;
-        SDL_CALL_STRETCHER;
-        dest += destPitch;
-        SDL_CALL_STRETCHER;
-        src += srcPitch;
-        dest += destPitch;
-      }
-      break;
-    case 3:
-      for(i = 0; i < srcHeight; i++) {
-        SDL_CALL_STRETCHER;
-        dest += destPitch;
-        SDL_CALL_STRETCHER;
-        dest += destPitch;
-        SDL_CALL_STRETCHER;
-        dest += destPitch;
-        SDL_CALL_STRETCHER;
-        src += srcPitch;
-        dest += destPitch;
-      }
-      break;
-    }
-  }
 
   if(showSpeed && fullscreen) {
     char buffer[50];
@@ -3166,7 +2344,7 @@ static void soundCallback(void *,u8 *stream,int len)
  if (len <= 0 || !emulating)
      return;
 
-SDL_mutexP(sdlSoundMutex);
+  SDL_mutexP(sdlSoundMutex);
   const int nAvail = soundBufferUsed();
   if (len > nAvail)
     len = nAvail;
@@ -3255,8 +2433,8 @@ bool systemSoundInit()
     return false;
   }
 
- sdlSoundCond  = SDL_CreateCond();
- sdlSoundMutex = SDL_CreateMutex();
+  sdlSoundCond  = SDL_CreateCond();
+  sdlSoundMutex = SDL_CreateMutex();
 
   sdlSoundRPos = sdlSoundWPos = 0;
   systemSoundOn = true;
@@ -3390,242 +2568,6 @@ bool systemPauseOnFrame()
   return false;
 }
 
-// Code donated by Niels Wagenaar (BoycottAdvance)
-
-// GBA screensize.
-#define GBA_WIDTH   240
-#define GBA_HEIGHT  160
-
-void Init_Overlay(SDL_Surface *gbascreen, int overlaytype)
-{
-
-  overlay = SDL_CreateYUVOverlay( GBA_WIDTH,
-                                  GBA_HEIGHT,
-                                  overlaytype, gbascreen);
-  fprintf(stderr, "Created %dx%dx%d %s %s overlay\n",
-          overlay->w,overlay->h,overlay->planes,
-          overlay->hw_overlay?"hardware":"software",
-          overlay->format==SDL_YV12_OVERLAY?"YV12":
-          overlay->format==SDL_IYUV_OVERLAY?"IYUV":
-          overlay->format==SDL_YUY2_OVERLAY?"YUY2":
-          overlay->format==SDL_UYVY_OVERLAY?"UYVY":
-          overlay->format==SDL_YVYU_OVERLAY?"YVYU":
-          "Unknown");
-}
-
-void Quit_Overlay(void)
-{
-
-  SDL_FreeYUVOverlay(overlay);
-}
-
-/* NOTE: These RGB conversion functions are not intended for speed,
-   only as examples.
-*/
-inline void RGBtoYUV(Uint8 *rgb, int *yuv)
-{
-  yuv[0] = (int)((0.257 * rgb[0]) + (0.504 * rgb[1]) + (0.098 * rgb[2]) + 16);
-  yuv[1] = (int)(128 - (0.148 * rgb[0]) - (0.291 * rgb[1]) + (0.439 * rgb[2]));
-  yuv[2] = (int)(128 + (0.439 * rgb[0]) - (0.368 * rgb[1]) - (0.071 * rgb[2]));
-}
-
-inline void ConvertRGBtoYV12(SDL_Overlay *o)
-{
-  int x,y;
-  int yuv[3];
-  Uint8 *p,*op[3];
-
-  SDL_LockYUVOverlay(o);
-
-  /* Black initialization */
-  /*
-    memset(o->pixels[0],0,o->pitches[0]*o->h);
-    memset(o->pixels[1],128,o->pitches[1]*((o->h+1)/2));
-    memset(o->pixels[2],128,o->pitches[2]*((o->h+1)/2));
-  */
-
-  /* Convert */
-  for(y=0; y<160 && y<o->h; y++) {
-    p=(Uint8 *)pix+srcPitch*y;
-    op[0]=o->pixels[0]+o->pitches[0]*y;
-    op[1]=o->pixels[1]+o->pitches[1]*(y/2);
-    op[2]=o->pixels[2]+o->pitches[2]*(y/2);
-    for(x=0; x<240 && x<o->w; x++) {
-      RGBtoYUV(p,yuv);
-      *(op[0]++)=yuv[0];
-      if(x%2==0 && y%2==0) {
-        *(op[1]++)=yuv[2];
-        *(op[2]++)=yuv[1];
-      }
-      p+=4;//s->format->BytesPerPixel;
-    }
-  }
-
-  SDL_UnlockYUVOverlay(o);
-}
-
-inline void ConvertRGBtoIYUV(SDL_Overlay *o)
-{
-  int x,y;
-  int yuv[3];
-  Uint8 *p,*op[3];
-
-  SDL_LockYUVOverlay(o);
-
-  /* Black initialization */
-  /*
-    memset(o->pixels[0],0,o->pitches[0]*o->h);
-    memset(o->pixels[1],128,o->pitches[1]*((o->h+1)/2));
-    memset(o->pixels[2],128,o->pitches[2]*((o->h+1)/2));
-  */
-
-  /* Convert */
-  for(y=0; y<160 && y<o->h; y++) {
-    p=(Uint8 *)pix+srcPitch*y;
-    op[0]=o->pixels[0]+o->pitches[0]*y;
-    op[1]=o->pixels[1]+o->pitches[1]*(y/2);
-    op[2]=o->pixels[2]+o->pitches[2]*(y/2);
-    for(x=0; x<240 && x<o->w; x++) {
-      RGBtoYUV(p,yuv);
-      *(op[0]++)=yuv[0];
-      if(x%2==0 && y%2==0) {
-        *(op[1]++)=yuv[1];
-        *(op[2]++)=yuv[2];
-      }
-      p+=4; //s->format->BytesPerPixel;
-    }
-  }
-
-  SDL_UnlockYUVOverlay(o);
-}
-
-inline void ConvertRGBtoUYVY(SDL_Overlay *o)
-{
-  int x,y;
-  int yuv[3];
-  Uint8 *p,*op;
-
-  SDL_LockYUVOverlay(o);
-
-  for(y=0; y<160 && y<o->h; y++) {
-    p=(Uint8 *)pix+srcPitch*y;
-    op=o->pixels[0]+o->pitches[0]*y;
-    for(x=0; x<240 && x<o->w; x++) {
-      RGBtoYUV(p,yuv);
-      if(x%2==0) {
-        *(op++)=yuv[1];
-        *(op++)=yuv[0];
-        *(op++)=yuv[2];
-      } else
-        *(op++)=yuv[0];
-
-      p+=4; //s->format->BytesPerPixel;
-    }
-  }
-
-  SDL_UnlockYUVOverlay(o);
-}
-
-inline void ConvertRGBtoYVYU(SDL_Overlay *o)
-{
-  int x,y;
-  int yuv[3];
-  Uint8 *p,*op;
-
-  SDL_LockYUVOverlay(o);
-
-  for(y=0; y<160 && y<o->h; y++) {
-    p=(Uint8 *)pix+srcPitch*y;
-    op=o->pixels[0]+o->pitches[0]*y;
-    for(x=0; x<240 && x<o->w; x++) {
-      RGBtoYUV(p,yuv);
-      if(x%2==0) {
-        *(op++)=yuv[0];
-        *(op++)=yuv[2];
-        op[1]=yuv[1];
-      } else {
-        *op=yuv[0];
-        op+=2;
-      }
-
-      p+=4; //s->format->BytesPerPixel;
-    }
-  }
-
-  SDL_UnlockYUVOverlay(o);
-}
-
-inline void ConvertRGBtoYUY2(SDL_Overlay *o)
-{
-  int x,y;
-  int yuv[3];
-  Uint8 *p,*op;
-
-  SDL_LockYUVOverlay(o);
-
-  for(y=0; y<160 && y<o->h; y++) {
-    p=(Uint8 *)pix+srcPitch*y;
-    op=o->pixels[0]+o->pitches[0]*y;
-    for(x=0; x<240 && x<o->w; x++) {
-      RGBtoYUV(p,yuv);
-      if(x%2==0) {
-        *(op++)=yuv[0];
-        *(op++)=yuv[1];
-        op[1]=yuv[2];
-      } else {
-        *op=yuv[0];
-        op+=2;
-      }
-
-      p+=4; //s->format->BytesPerPixel;
-    }
-  }
-
-  SDL_UnlockYUVOverlay(o);
-}
-
-inline void Convert32bit(SDL_Surface *display)
-{
-  switch(overlay->format) {
-  case SDL_YV12_OVERLAY:
-    ConvertRGBtoYV12(overlay);
-    break;
-  case SDL_UYVY_OVERLAY:
-    ConvertRGBtoUYVY(overlay);
-    break;
-  case SDL_YVYU_OVERLAY:
-    ConvertRGBtoYVYU(overlay);
-    break;
-  case SDL_YUY2_OVERLAY:
-    ConvertRGBtoYUY2(overlay);
-    break;
-  case SDL_IYUV_OVERLAY:
-    ConvertRGBtoIYUV(overlay);
-    break;
-  default:
-    fprintf(stderr, "cannot convert RGB picture to obtained YUV format!\n");
-    exit(1);
-    break;
-  }
-
-}
-
-
-inline void Draw_Overlay(SDL_Surface *display, int size)
-{
-  SDL_LockYUVOverlay(overlay);
-
-  Convert32bit(display);
-
-  overlay_rect.x = 0;
-  overlay_rect.y = 0;
-  overlay_rect.w = GBA_WIDTH  * size;
-  overlay_rect.h = GBA_HEIGHT * size;
-
-  SDL_DisplayYUVOverlay(overlay, &overlay_rect);
-  SDL_UnlockYUVOverlay(overlay);
-}
-
 void systemGbBorderOn()
 {
   long flags;
@@ -3635,43 +2577,14 @@ void systemGbBorderOn()
   gbBorderColumnSkip = 48;
   gbBorderRowSkip = 40;
 
-  destWidth = (sizeOption+1)*srcWidth;
-  destHeight = (sizeOption+1)*srcHeight;
+  sdlInitVideo();
 
-  flags = SDL_ANYFORMAT | (fullscreen ? SDL_FULLSCREEN : 0);
- if(openGL) {
-   flags |= SDL_OPENGL | SDL_RESIZABLE;
-  } else
-  flags |= SDL_HWSURFACE | SDL_DOUBLEBUF;
-
- surface = SDL_SetVideoMode(destWidth, destHeight, 16, flags);
- if(openGL)
-  sdlOpenGLInit(destWidth, destHeight);
-#ifndef C_CORE
-  sdlMakeStretcher(srcWidth);
-#else
-  switch(systemColorDepth) {
-  case 16:
-    sdlStretcher = sdlStretcher16[sizeOption];
-    break;
-  case 24:
-    sdlStretcher = sdlStretcher24[sizeOption];
-    break;
-  case 32:
-    sdlStretcher = sdlStretcher32[sizeOption];
-    break;
-  default:
-    fprintf(stderr, "Unsupported resolution: %d\n", systemColorDepth);
-    exit(-1);
-  }
-#endif
+  filterFunction = initFilter((Filter)filter, systemColorDepth, srcWidth);
 
   if(systemColorDepth == 16) {
     if(sdlCalculateMaskWidth(surface->format->Gmask) == 6) {
-      Init_2xSaI(565);
       RGB_LOW_BITS_MASK = 0x821;
     } else {
-      Init_2xSaI(555);
       RGB_LOW_BITS_MASK = 0x421;
     }
     if(cartridgeType == 2) {
@@ -3689,12 +2602,7 @@ void systemGbBorderOn()
     }
     srcPitch = srcWidth * 2+4;
   } else {
-    if(systemColorDepth != 32)
-      filterFunction = NULL;
     RGB_LOW_BITS_MASK = 0x010101;
-    if(systemColorDepth == 32) {
-      Init_2xSaI(32);
-    }
     for(int i = 0; i < 0x10000; i++) {
       systemColorMap32[i] = ((i & 0x1f) << systemRedShift) |
         (((i & 0x3e0) >> 5) << systemGreenShift) |
