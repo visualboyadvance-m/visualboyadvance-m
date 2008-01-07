@@ -52,16 +52,16 @@ ${MAINDIR}/gbafilter${OE} ${MAINDIR}/Gfx${OE} ${MAINDIR}/Globals${OE} ${MAINDIR}
 ${MAINDIR}/hq2x${OE} ${MAINDIR}/GBA-thumb${OE} ${MAINDIR}/GBA-arm${OE} ${MAINDIR}/Mode0${OE} \
 ${MAINDIR}/Mode1${OE} ${MAINDIR}/Mode2${OE} ${MAINDIR}/Mode3${OE} ${MAINDIR}/Mode4${OE} \
 ${MAINDIR}/Mode5${OE} ${MAINDIR}/motionblur${OE} ${MAINDIR}/pixel${OE} \
-${MAINDIR}/remote${OE} ${MAINDIR}/RTC${OE} ${MAINDIR}/scanline${OE} ${MAINDIR}/simpleFilter${OE} \
+${MAINDIR}/remote${OE} ${MAINDIR}/RTC${OE} ${MAINDIR}/scanline${OE} \
 ${MAINDIR}/Sound${OE} ${MAINDIR}/Sram${OE} ${MAINDIR}/Text${OE} ${MAINDIR}/Util${OE} \
-${MAINDIR}/expr${OE} ${MAINDIR}/exprNode${OE} ${MAINDIR}/expr-lex${OE} ${MAINDIR}/getopt${OE} \
-${MAINDIR}/getopt1${OE} ${MAINDIR}/memgzio${OE} 
+${MAINDIR}/expr${OE} ${MAINDIR}/exprNode${OE} ${MAINDIR}/expr-lex${OE} \
+${MAINDIR}/memgzio${OE} 
 
 DMGOBJ=${DMGDIR}/GB${OE} ${DMGDIR}/gbCheats${OE} ${DMGDIR}/gbDis${OE} ${DMGDIR}/gbGfx${OE} \
 ${DMGDIR}/gbGlobals${OE} ${DMGDIR}/gbMemory${OE} ${DMGDIR}/gbPrinter${OE} ${DMGDIR}/gbSGB${OE} \
 ${DMGDIR}/gbSound${OE}
 
-SDLOBJ=${SDLDIR}/debugger${OE} ${SDLDIR}/SDL${OE} ${SDLDIR}/dummy${OE}
+SDLOBJ=${SDLDIR}/debugger${OE} ${SDLDIR}/SDL${OE} ${SDLDIR}/dummy${OE} ${SDLDIR}/filters${OE}
 
 OBJECTS=${MAINOBJ} ${DMGOBJ} ${SDLOBJ} ${GBAPUOBJ}
 
