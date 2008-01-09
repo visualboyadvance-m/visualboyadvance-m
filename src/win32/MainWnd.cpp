@@ -216,11 +216,6 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_SAVETYPE_FLASH512K, OnUpdateOptionsEmulatorSavetypeFlash512k)
   ON_COMMAND(ID_OPTIONS_EMULATOR_SAVETYPE_FLASH1M, OnOptionsEmulatorSavetypeFlash1m)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_SAVETYPE_FLASH1M, OnUpdateOptionsEmulatorSavetypeFlash1m)
-  ON_COMMAND(ID_OPTIONS_EMULATOR_USEBIOSFILE, OnOptionsEmulatorUsebiosfile)
-  ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_USEBIOSFILE, OnUpdateOptionsEmulatorUsebiosfile)
-  ON_COMMAND(ID_OPTIONS_EMULATOR_SKIPBIOS, OnOptionsEmulatorSkipbios)
-  ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_SKIPBIOS, OnUpdateOptionsEmulatorSkipbios)
-  ON_COMMAND(ID_OPTIONS_EMULATOR_SELECTBIOSFILE, OnOptionsEmulatorSelectbiosfile)
   ON_COMMAND(ID_OPTIONS_EMULATOR_PNGFORMAT, OnOptionsEmulatorPngformat)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_PNGFORMAT, OnUpdateOptionsEmulatorPngformat)
   ON_COMMAND(ID_OPTIONS_EMULATOR_BMPFORMAT, OnOptionsEmulatorBmpformat)
@@ -454,6 +449,7 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_RENDERAPI_D3DMOTIONBLUR, &MainWnd::OnUpdateRenderapiD3dmotionblur)
   ON_WM_NCLBUTTONDOWN()
   ON_WM_WINDOWPOSCHANGING()
+  ON_COMMAND(ID_EMULATOR_BIOSFILES, &MainWnd::OnEmulatorBiosfiles)
   END_MESSAGE_MAP()
 
 
@@ -526,17 +522,8 @@ bool MainWnd::FileRun()
     // used for the handling of the gb Boot Rom
     if (gbHardware & 5)
     {
-      char tempName[2048];
-      GetModuleFileName(NULL, tempName, 2048);
-
-      char *p = strrchr(tempName, '\\');
-      if(p)
-        *p = 0;
-
-      strcat(tempName, "\\DMG_ROM.bin");
-
-      skipBios = theApp.skipBiosFile ? true : false;
-      gbCPUInit(tempName, theApp.useBiosFile ? true : false);
+      skipBios = theApp.skipBiosFile;
+	  gbCPUInit(theApp.biosFileNameGB, theApp.useBiosFileGB);
     }
 
 
@@ -640,7 +627,7 @@ bool MainWnd::FileRun()
 
   if(type == IMAGE_GBA) {
     skipBios = theApp.skipBiosFile ? true : false;
-    CPUInit((char *)(LPCTSTR)theApp.biosFileName, theApp.useBiosFile ? true : false);
+    CPUInit((char *)(LPCTSTR)theApp.biosFileNameGBA, theApp.useBiosFileGBA ? true : false);
     CPUReset();
   }
 

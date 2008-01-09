@@ -98,6 +98,7 @@
 #define IDD_SELECT                      159
 #define IDD_SELECT_PLUGIN               159
 #define IDD_OAL_CONFIG                  160
+#define IDD_BIOS                        161
 #define IDC_R0                          1000
 #define IDC_EDIT_UP                     1000
 #define IDC_R1                          1001
@@ -512,6 +513,13 @@
 #define IDC_DEVICE                      1269
 #define IDC_SLIDER_BUFFERCOUNT          1270
 #define IDC_BUFFERINFO                  1271
+#define IDC_GB_BIOS_PATH                1272
+#define IDC_GBA_BIOS_PATH               1273
+#define IDC_SKIP_BOOT_LOGO              1274
+#define IDC_ENABLE_GB_BIOS              1275
+#define IDC_ENABLE_GBA_BIOS             1276
+#define IDC_SELECT_GB_BIOS_PATH         1277
+#define IDC_SELECT_GBA_BIOS_PATH        1278
 #define IDS_OAL_NODEVICE                2000
 #define IDS_OAL_NODLL                   2001
 #define IDS_AVI_CANNOT_CREATE_AVI       2002
@@ -824,14 +832,15 @@
 #define ID_OPTIONS_SPEED                40353
 #define ID_RENDERAPI_MOTIONBLUR         40354
 #define ID_RENDERAPI_D3DMOTIONBLUR      40355
+#define ID_EMULATOR_BIOSFILES           40356
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        161
-#define _APS_NEXT_COMMAND_VALUE         40356
-#define _APS_NEXT_CONTROL_VALUE         1272
+#define _APS_NEXT_RESOURCE_VALUE        162
+#define _APS_NEXT_COMMAND_VALUE         40357
+#define _APS_NEXT_CONTROL_VALUE         1278
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
 #endif

@@ -1197,6 +1197,8 @@ bool CPUIsGBABios(const char * file)
         return true;
       if(_stricmp(p, ".bios") == 0)
         return true;
+      if(_stricmp(p, ".rom") == 0)
+        return true;
     }
   }
   
