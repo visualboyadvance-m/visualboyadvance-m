@@ -626,8 +626,8 @@ bool MainWnd::FileRun()
 #endif
 
   if(type == IMAGE_GBA) {
-    skipBios = theApp.skipBiosFile ? true : false;
-    CPUInit((char *)(LPCTSTR)theApp.biosFileNameGBA, theApp.useBiosFileGBA ? true : false);
+    skipBios = theApp.skipBiosFile;
+    CPUInit(theApp.biosFileNameGBA.GetString(), theApp.useBiosFileGBA);
     CPUReset();
   }
 
