@@ -1,9 +1,9 @@
 Important:
-- Many games show emulation warnings in the log window (unaligned read, bad read/write addresse)
- - Metroid Fusion, Advance Wars 2...
+- Many games show emulation warnings in the log window (unaligned read, bad read/write address)
+ - Test: Metroid Fusion, Advance Wars 2
 
 - Gfx.cpp/h optimization
- - Test: final fantasy 4 airship intro
+ - Test: Final Fantasy 4 airship intro
 
 - Improve automatic 64k/128k flash save detection
 
