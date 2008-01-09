@@ -58,10 +58,6 @@ public:
 
   // Generated message map functions
  protected:
-  //{{AFX_MSG(JoypadEditControl)
-  afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
-  //}}AFX_MSG
-
   DECLARE_MESSAGE_MAP()
     };
 
@@ -116,12 +112,12 @@ class JoypadConfig : public CDialog
   afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
   afx_msg void OnDestroy();
   afx_msg void OnTimer(UINT_PTR nIDEvent);
-  afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
   virtual BOOL OnInitDialog();
   //}}AFX_MSG
   DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedAppendmode();
+	afx_msg void OnBnClickedClearAll();
 };
     /////////////////////////////////////////////////////////////////////////////
 // MotionConfig dialog
@@ -161,7 +157,6 @@ class MotionConfig : public CDialog
   afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
   afx_msg void OnDestroy();
   virtual BOOL OnInitDialog();
-  afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
   afx_msg void OnTimer(UINT_PTR nIDEvent);
   //}}AFX_MSG
   DECLARE_MESSAGE_MAP()

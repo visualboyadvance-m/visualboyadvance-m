@@ -520,6 +520,8 @@
 #define IDC_ENABLE_GBA_BIOS             1276
 #define IDC_SELECT_GB_BIOS_PATH         1277
 #define IDC_SELECT_GBA_BIOS_PATH        1278
+#define IDC_BUTTON1                     1278
+#define IDC_CLEAR_ALL                   1278
 #define IDS_OAL_NODEVICE                2000
 #define IDS_OAL_NODLL                   2001
 #define IDS_AVI_CANNOT_CREATE_AVI       2002
@@ -840,7 +842,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        162
 #define _APS_NEXT_COMMAND_VALUE         40357
-#define _APS_NEXT_CONTROL_VALUE         1278
+#define _APS_NEXT_CONTROL_VALUE         1279
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
 #endif
