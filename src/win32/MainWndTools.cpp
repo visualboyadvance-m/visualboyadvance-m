@@ -234,7 +234,7 @@ void MainWnd::OnUpdateToolsDebugGdb(CCmdUI* pCmdUI)
 void MainWnd::OnToolsDebugLoadandwait()
 {
   theApp.winCheckFullscreen();
-  if(fileOpenSelect()) {
+  if(fileOpenSelect(0)) {
     if(FileRun()) {
       if(theApp.cartridgeType != 0) {
         systemMessage(IDS_ERROR_NOT_GBA_IMAGE, "Error: not a GBA image");

@@ -1,6 +1,7 @@
 // VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
 // Copyright (C) 1999-2003 Forgotten
 // Copyright (C) 2004 Forgotten and the VBA development team
+// Copyright (C) 2008 VBA-M development team
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,9 +16,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-// Directories.cpp : implementation file
-//
 
 #include "stdafx.h"
 #include "vba.h"
@@ -63,6 +61,7 @@ void Directories::DoDataExchange(CDataExchange* pDX)
   CDialog::DoDataExchange(pDX);
   DDX_Control(pDX, IDC_SAVE_PATH, m_savePath);
   DDX_Control(pDX, IDC_ROM_PATH, m_romPath);
+  DDX_Control(pDX, IDC_GBCROM_PATH, m_gbcromPath);
   DDX_Control(pDX, IDC_GBROM_PATH, m_gbromPath);
   DDX_Control(pDX, IDC_CAPTURE_PATH, m_capturePath);
   DDX_Control(pDX, IDC_BATTERY_PATH, m_batteryPath);
@@ -71,15 +70,11 @@ void Directories::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(Directories, CDialog)
   ON_BN_CLICKED(IDC_BATTERY_DIR, OnBatteryDir)
-  ON_BN_CLICKED(IDC_BATTERY_DIR_RESET, OnBatteryDirReset)
   ON_BN_CLICKED(IDC_CAPTURE_DIR, OnCaptureDir)
-  ON_BN_CLICKED(IDC_CAPTURE_DIR_RESET, OnCaptureDirReset)
   ON_BN_CLICKED(IDC_GBROM_DIR, OnGbromDir)
-  ON_BN_CLICKED(IDC_GBROM_DIR_RESET, OnGbromDirReset)
   ON_BN_CLICKED(IDC_ROM_DIR, OnRomDir)
-  ON_BN_CLICKED(IDC_ROM_DIR_RESET, OnRomDirReset)
   ON_BN_CLICKED(IDC_SAVE_DIR, OnSaveDir)
-  ON_BN_CLICKED(IDC_SAVE_DIR_RESET, OnSaveDirReset)
+  ON_BN_CLICKED(IDC_GBCROM_DIR, OnGbcromDir)
 END_MESSAGE_MAP()
 
   /////////////////////////////////////////////////////////////////////////////
@@ -87,40 +82,36 @@ END_MESSAGE_MAP()
 
 BOOL Directories::OnInitDialog()
 {
-  CDialog::OnInitDialog();
+	CDialog::OnInitDialog();
+	CString p;
+	
+	p = regQueryStringValue("romdir", NULL);
+	if(!p.IsEmpty())
+		GetDlgItem(IDC_ROM_PATH)->SetWindowText(p);
+	
+	p = regQueryStringValue("gbcromdir", NULL);
+	if(!p.IsEmpty())
+		GetDlgItem(IDC_GBCROM_PATH)->SetWindowText(p);
 
-  CString p = regQueryStringValue("romdir", NULL);
-  if(!p.IsEmpty()) {
-    int len = p.GetLength();
-    if(len > 0)
-      if(p[len-1] == '\\')
-        p = p.Left(len-1);
-    GetDlgItem(IDC_ROM_PATH)->SetWindowText(p);
-  }
+	p = regQueryStringValue("gbromdir", NULL);
+	if(!p.IsEmpty())
+		GetDlgItem(IDC_GBROM_PATH)->SetWindowText(p);
 
-  p = regQueryStringValue("gbromdir", NULL);
-  if(!p.IsEmpty()) {
-    int len = p.GetLength();
-    if(len > 0)
-      if(p[len-1] == '\\')
-        p = p.Left(len-1);
-    GetDlgItem(IDC_GBROM_PATH)->SetWindowText(p);
-  }
+	p = regQueryStringValue("batteryDir", NULL);
+	if(!p.IsEmpty())
+		GetDlgItem(IDC_BATTERY_PATH)->SetWindowText( p);
 
-  p = regQueryStringValue("batteryDir", NULL);
-  if(!p.IsEmpty())
-    GetDlgItem(IDC_BATTERY_PATH)->SetWindowText( p);
-  p = regQueryStringValue("saveDir", NULL);
-  if(!p.IsEmpty())
-    GetDlgItem(IDC_SAVE_PATH)->SetWindowText(p);
-  p = regQueryStringValue("captureDir", NULL);
-  if(!p.IsEmpty())
-    GetDlgItem(IDC_CAPTURE_PATH)->SetWindowText(p);
+	p = regQueryStringValue("saveDir", NULL);
+	if(!p.IsEmpty())
+		GetDlgItem(IDC_SAVE_PATH)->SetWindowText(p);
 
-  CenterWindow();
+	p = regQueryStringValue("captureDir", NULL);
+	if(!p.IsEmpty())
+		GetDlgItem(IDC_CAPTURE_PATH)->SetWindowText(p);
 
-  return TRUE;  // return TRUE unless you set the focus to a control
-                // EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
+	// return TRUE unless you set the focus to a control
+	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
 void Directories::OnBatteryDir()
@@ -131,24 +122,12 @@ void Directories::OnBatteryDir()
     m_batteryPath.SetWindowText(p);
 }
 
-void Directories::OnBatteryDirReset()
-{
-  regDeleteValue("batteryDir");
-  m_batteryPath.SetWindowText("");
-}
-
 void Directories::OnCaptureDir()
 {
   m_capturePath.GetWindowText(initialFolderDir);
   CString p = browseForDir(winResLoadString(IDS_SELECT_CAPTURE_DIR));
   if(!p.IsEmpty())
     m_capturePath.SetWindowText(p);
-}
-
-void Directories::OnCaptureDirReset()
-{
-  regDeleteValue("captureDir");
-  m_capturePath.SetWindowText("");
 }
 
 void Directories::OnGbromDir()
@@ -159,10 +138,12 @@ void Directories::OnGbromDir()
     m_gbromPath.SetWindowText(p);
 }
 
-void Directories::OnGbromDirReset()
+void Directories::OnGbcromDir()
 {
-  regDeleteValue("gbromdir");
-  m_gbromPath.SetWindowText("");
+  m_gbcromPath.GetWindowText(initialFolderDir);
+  CString p = browseForDir(winResLoadString(IDS_SELECT_ROM_DIR));
+  if(!p.IsEmpty())
+    m_gbcromPath.SetWindowText(p);
 }
 
 void Directories::OnRomDir()
@@ -173,24 +154,12 @@ void Directories::OnRomDir()
     m_romPath.SetWindowText(p);
 }
 
-void Directories::OnRomDirReset()
-{
-  regDeleteValue("romdir");
-  m_romPath.SetWindowText("");
-}
-
 void Directories::OnSaveDir()
 {
   m_savePath.GetWindowText(initialFolderDir);
   CString p = browseForDir(winResLoadString(IDS_SELECT_SAVE_DIR));
   if(!p.IsEmpty())
     m_savePath.SetWindowText(p);
-}
-
-void Directories::OnSaveDirReset()
-{
-  regDeleteValue("saveDir");
-  m_savePath.SetWindowText("");
 }
 
 void Directories::OnCancel()
@@ -212,6 +181,18 @@ void Directories::OnOK()
 	m_romPath.GetWindowText(buffer);
 	if( !buffer.IsEmpty() )
 		regSetStringValue( "romdir", buffer );
+	if( buffer[0] == '.' ) {
+		strcpy( temp, baseDir );
+		strcat( temp, "\\" );
+		strcat( temp, buffer );
+		buffer = temp;
+	}
+	if( !directoryDoesExist( buffer ) )
+		SHCreateDirectoryEx( NULL, buffer, NULL );
+
+	m_gbcromPath.GetWindowText(buffer);
+	if( !buffer.IsEmpty() )
+		regSetStringValue( "gbcromdir", buffer );
 	if( buffer[0] == '.' ) {
 		strcpy( temp, baseDir );
 		strcat( temp, "\\" );
@@ -301,4 +282,21 @@ CString Directories::browseForDir(CString title)
     }
   }
   return res;
+}
+
+// returns true if the directory does exist
+bool Directories::directoryDoesExist(const char *directory)
+{ 
+	HANDLE hDir;
+	hDir = CreateFile(
+		directory,
+		GENERIC_READ,
+		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		NULL,
+		OPEN_EXISTING,
+		FILE_FLAG_BACKUP_SEMANTICS,
+		NULL );
+	bool retval = (hDir == INVALID_HANDLE_VALUE) ? false : true;
+	CloseHandle( hDir );
+	return retval;
 }

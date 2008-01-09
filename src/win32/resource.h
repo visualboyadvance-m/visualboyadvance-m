@@ -185,8 +185,10 @@
 #define IDC_CAPTURE_DIR_RESET           1032
 #define IDC_LT                          1033
 #define IDS_CANNOT_CREATESOUNDBUFFER    1033
+#define IDC_GBCROM_PATH                 1033
 #define IDC_LE                          1034
 #define IDS_CANNOT_SETFORMAT_PRIMARY    1034
+#define IDC_GBCROM_DIR                  1034
 #define IDC_GT                          1035
 #define IDS_CANNOT_CREATESOUNDBUFFER_SEC 1035
 #define IDC_GE                          1036
@@ -520,7 +522,6 @@
 #define IDC_ENABLE_GBA_BIOS             1276
 #define IDC_SELECT_GB_BIOS_PATH         1277
 #define IDC_SELECT_GBA_BIOS_PATH        1278
-#define IDC_BUTTON1                     1278
 #define IDC_CLEAR_ALL                   1278
 #define IDS_OAL_NODEVICE                2000
 #define IDS_OAL_NODLL                   2001
@@ -529,6 +530,7 @@
 #define IDS_AVI_CANNOT_CREATE_AUDIO     2004
 #define IDS_AVI_CANNOT_WRITE_VIDEO      2005
 #define IDS_AVI_CANNOT_WRITE_AUDIO      2006
+#define IDS_FILTER_GBCROM               2007
 #define ID_HELP_ABOUT                   40001
 #define ID_FILE_EXIT                    40002
 #define ID_OPTIONS_VIDEO_FRAMESKIP_0    40003
@@ -835,13 +837,15 @@
 #define ID_RENDERAPI_MOTIONBLUR         40354
 #define ID_RENDERAPI_D3DMOTIONBLUR      40355
 #define ID_EMULATOR_BIOSFILES           40356
+#define ID_FILE_OPENGBC                 40357
+#define ID_FILE_OPEN_GBC                40358
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        162
-#define _APS_NEXT_COMMAND_VALUE         40357
+#define _APS_NEXT_COMMAND_VALUE         40359
 #define _APS_NEXT_CONTROL_VALUE         1279
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
