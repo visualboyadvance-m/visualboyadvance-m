@@ -2,3 +2,4 @@ Important:
 
 Unimportant:
 - DDraw, D3D, OGL: Add full screen device & frequency selection
+- Verify BIOS files by checksums instead by file extension

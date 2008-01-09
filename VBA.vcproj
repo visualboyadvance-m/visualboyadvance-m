@@ -862,6 +862,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\win32\BIOSDialog.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\win32\BitmapControl.cpp"
 					>
 				</File>
@@ -1420,6 +1424,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\win32\BIOSDialog.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\win32\BitmapControl.h"
 					>
 				</File>
@@ -1817,22 +1825,8 @@
 					RelativePath=".\src\hq\asm\hq3x32.cpp"
 					>
 					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Debug|x64"
 						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"

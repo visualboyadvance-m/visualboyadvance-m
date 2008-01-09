@@ -220,7 +220,7 @@ void MainWnd::OnToolsDebugGdb()
 
       theApp.emulator = GBASystem;
 
-      CPUInit(theApp.biosFileName, theApp.useBiosFile ? true : false);
+      CPUInit(theApp.biosFileNameGBA, theApp.useBiosFileGBA ? true : false);
       CPUReset();
     }
   }

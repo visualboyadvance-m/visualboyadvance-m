@@ -13,11 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// German (Germany) resources
+// English (U.S.) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
-LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
 
@@ -39,43 +39,6 @@ BEGIN
     CONTROL         "",IDC_SLIDER_BUFFERCOUNT,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | WS_TABSTOP,12,48,144,24
     CTEXT           "bufferInfo",IDC_BUFFERINFO,12,72,144,12,0,WS_EX_DLGMODALFRAME
 END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
-BEGIN
-    IDD_OAL_CONFIG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 160
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 107
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-#endif    // German (Germany) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
 
 IDD_SELECT_PLUGIN DIALOG  0, 0, 201, 120
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
@@ -194,23 +157,23 @@ CAPTION "Directories"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     GROUPBOX        "Gameboy Advance ROM Images",IDC_STATIC,6,6,210,42
-    EDITTEXT        IDC_ROM_PATH,12,18,198,12,ES_RIGHT | ES_AUTOHSCROLL
+    EDITTEXT        IDC_ROM_PATH,12,18,198,12,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse...",IDC_ROM_DIR,12,30,90,12
     PUSHBUTTON      "Reset",IDC_ROM_DIR_RESET,120,30,90,12
     GROUPBOX        "Gameboy / Gameboy Color ROM Images",IDC_STATIC,6,48,210,42
-    EDITTEXT        IDC_GBROM_PATH,12,60,198,12,ES_RIGHT | ES_AUTOHSCROLL
+    EDITTEXT        IDC_GBROM_PATH,12,60,198,12,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse...",IDC_GBROM_DIR,12,72,90,12
     PUSHBUTTON      "Reset",IDC_GBROM_DIR_RESET,120,72,84,12
     GROUPBOX        "Gameboy Internal Battery Saves",IDC_STATIC,6,90,210,42
-    EDITTEXT        IDC_BATTERY_PATH,12,102,198,12,ES_RIGHT | ES_AUTOHSCROLL
+    EDITTEXT        IDC_BATTERY_PATH,12,102,198,12,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse...",IDC_BATTERY_DIR,12,114,90,12
     PUSHBUTTON      "Reset",IDC_BATTERY_DIR_RESET,120,114,90,12
     GROUPBOX        "VisualBoyAdvance Save Games",IDC_STATIC,6,132,210,42
-    EDITTEXT        IDC_SAVE_PATH,12,144,198,12,ES_RIGHT | ES_AUTOHSCROLL
+    EDITTEXT        IDC_SAVE_PATH,12,144,198,12,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse...",IDC_SAVE_DIR,12,156,90,12
     PUSHBUTTON      "Reset",IDC_SAVE_DIR_RESET,120,156,90,12
     GROUPBOX        "Screenshots",IDC_STATIC,6,174,210,42
-    EDITTEXT        IDC_CAPTURE_PATH,12,186,198,12,ES_RIGHT | ES_AUTOHSCROLL
+    EDITTEXT        IDC_CAPTURE_PATH,12,186,198,12,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse...",IDC_CAPTURE_DIR,12,198,90,12
     PUSHBUTTON      "Reset",IDC_CAPTURE_DIR_RESET,120,198,90,12
     DEFPUSHBUTTON   "OK",IDOK,120,234,90,12
@@ -1133,6 +1096,25 @@ BEGIN
     EDITTEXT        IDC_COMMENT,84,24,180,12,ES_AUTOHSCROLL
 END
 
+IDD_BIOS DIALOGEX 0, 0, 220, 126
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "BIOS Files"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,84,102,60,18
+    PUSHBUTTON      "Cancel",IDCANCEL,150,102,60,18
+    GROUPBOX        "Game Boy mono",IDC_STATIC,6,6,210,30
+    GROUPBOX        "Game Boy Advance",IDC_STATIC,6,48,210,30
+    EDITTEXT        IDC_GB_BIOS_PATH,12,18,180,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_GBA_BIOS_PATH,12,60,180,12,ES_AUTOHSCROLL
+    GROUPBOX        "Options",IDC_STATIC,6,90,72,30
+    CONTROL         "Skip boot logo",IDC_SKIP_BOOT_LOGO,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,12,102,60,12
+    CONTROL         "Enable",IDC_ENABLE_GB_BIOS,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,174,6,36,8
+    CONTROL         "Enable",IDC_ENABLE_GBA_BIOS,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,174,48,36,8
+    PUSHBUTTON      "...",IDC_SELECT_GB_BIOS_PATH,192,18,18,12
+    PUSHBUTTON      "...",IDC_SELECT_GBA_BIOS_PATH,192,60,18,12
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1142,6 +1124,14 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO 
 BEGIN
+    IDD_OAL_CONFIG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 160
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 107
+    END
+
     IDD_OPENDLG, DIALOG
     BEGIN
         RIGHTMARGIN, 165
@@ -1474,6 +1464,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 105
     END
+
+    IDD_BIOS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 213
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -1786,6 +1784,7 @@ BEGIN
         BEGIN
             MENUITEM "&Associate...",               ID_OPTIONS_EMULATOR_ASSOCIATE
             MENUITEM "&Directories...",             ID_OPTIONS_EMULATOR_DIRECTORIES
+            MENUITEM "BIOS Files...",               ID_EMULATOR_BIOSFILES
             POPUP "&Priority"
             BEGIN
                 MENUITEM "&Highest",                    ID_OPTIONS_PRIORITY_HIGHEST
@@ -1819,10 +1818,6 @@ BEGIN
                 MENUITEM "Flash 64 KB",                 ID_OPTIONS_EMULATOR_SAVETYPE_FLASH512K
                 MENUITEM "Flash 128 KB",                ID_OPTIONS_EMULATOR_SAVETYPE_FLASH1M
             END
-            MENUITEM SEPARATOR
-            MENUITEM "&Use BIOS file",              ID_OPTIONS_EMULATOR_USEBIOSFILE
-            MENUITEM "Skip BIOS",                   ID_OPTIONS_EMULATOR_SKIPBIOS
-            MENUITEM "S&elect BIOS file...",        ID_OPTIONS_EMULATOR_SELECTBIOSFILE
             MENUITEM SEPARATOR
             POPUP "Screenshot &Format"
             BEGIN
@@ -2084,7 +2079,6 @@ STRINGTABLE
 BEGIN
     IDS_SELECT_SAVE_DIR     "Select Save Directory:"
     IDS_SELECT_CAPTURE_DIR  "Select Capture directory:"
-    IDS_SELECT_BIOS_FILE    "Select BIOS file"
     IDS_RESET               "Reset"
     IDS_AUTOFIRE_A_DISABLED "autofire A disabled"
     IDS_AUTOFIRE_A          "autofire A"
@@ -2126,7 +2120,6 @@ BEGIN
     IDS_FAILED_TO_LOAD_LIBRARY "Failed to load library %s"
     IDS_FAILED_TO_GET_LOCINFO "Failed to get locale information"
     IDS_SELECT_CHEAT_LIST_NAME "Select cheat list name"
-    IDS_FILTER_BIOS         "Gameboy Advance BIOS_*.BIN;*.AGB;*.GBA;*.BIOS;*.ZIP;*.Z;*.7Z;*.GZ__"
     IDS_FILTER_ROM          "All Gameboy _*.BIN;*.AGB;*.GBA;*.MB;*.ELF;*.GB;*.SGB;*.CGB;*.GBC;*.ZIP;*.7Z;*.Z;*.GZ_Gameboy Advance_*.BIN;*.AGB;*.GBA_Gameboy_*.GB;*.SGB_Gameboy Color_*.CGB;*.GBC__"
     IDS_FILTER_SGM          "VisualBoyAdvance Save Game_*.SGM__"
     IDS_FILTER_CHEAT_LIST   "VisualBoyAdvance Cheat List_*.CLT__"
