@@ -2,12 +2,49 @@ Important:
 - Many games show emulation warnings in the log window (unaligned read, bad read/write addresse)
  - Metroid Fusion, Advance Wars 2...
 
+- Gfx.cpp/h optimization
+ - Test: final fantasy 4 airship intro
+
+- Improve automatic 64k/128k flash save detection
+
 - HQ3x/4x ASM implementation produces wrong interpolation on the image's border
  - This has already been fixed in the C version; look at hq_base.h / line 343 - 372. The ASM version most likely only has something like skipLine instead of skipLinePlus and skipLineMinus, which is however necessary in order to work correctly.
 
+- Fix OpenGL issues
+
+- Remove 16 bit hack for filters
+ - Not compatible to software motion blur (display corruption)
+
+- Add selection for compressed archives with more than one ROM in them
 
 
-Unimportant:
+
+Less important:
+- Add documentation for VBA-M (configuration guide)
+
 - DDraw, D3D, OGL: Add full screen device & frequency selection
 
-- Verify BIOS files by checksums instead by file extension
+- Improve AVI recording (produces asynchronous files)
+
+- Enable audio stream compression for AVI files
+
+- Add stereo upmixing support to OpenAL
+
+- Verify BIOS files by checksum instead by file extension
+
+- Merge HQ2x/LQ2x C code into code for HQ3x/4x
+
+- Apply pixel filter to sprites and BG seperately for better image quality
+
+- Create Visual Studio project using SDL makefile
+
+
+
+Performance:
+- Apply HQ3x/4x optimizations from C version to ASM version
+
+- Apply pixel filter only to changed parts of the image
+
+- Make use of multi-core CPUs
+
+- Make use of 64 bit CPUs
