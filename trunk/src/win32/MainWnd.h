@@ -248,11 +248,6 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsEmulatorSavetypeFlash512k(CCmdUI* pCmdUI);
   afx_msg void OnOptionsEmulatorSavetypeFlash1m();
   afx_msg void OnUpdateOptionsEmulatorSavetypeFlash1m(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsEmulatorUsebiosfile();
-  afx_msg void OnUpdateOptionsEmulatorUsebiosfile(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsEmulatorSkipbios();
-  afx_msg void OnUpdateOptionsEmulatorSkipbios(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsEmulatorSelectbiosfile();
   afx_msg void OnOptionsEmulatorPngformat();
   afx_msg void OnUpdateOptionsEmulatorPngformat(CCmdUI* pCmdUI);
   afx_msg void OnOptionsEmulatorBmpformat();
@@ -447,6 +442,7 @@ public:
 	afx_msg void OnUpdateRenderapiD3dmotionblur(CCmdUI *pCmdUI);
 	afx_msg void OnNcLButtonDown(UINT nHitTest, CPoint point);
 	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
+	afx_msg void OnEmulatorBiosfiles();
 };
 
 /////////////////////////////////////////////////////////////////////////////

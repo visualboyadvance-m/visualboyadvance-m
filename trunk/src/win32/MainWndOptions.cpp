@@ -35,6 +35,7 @@
 #include "WinResUtil.h"
 #include "SelectPlugin.h"
 #include "OALConfig.h"
+#include "BIOSDialog.h"
 
 #include "../System.h"
 #include "../agbprint.h"
@@ -888,50 +889,6 @@ void MainWnd::OnUpdateOptionsEmulatorSavetypeFlash1m(CCmdUI* pCmdUI)
   // changed theApp.winFlashSize to flashSize to reflect the actual
   // flashsize value used by the emu (it can change upon battery loading)
   pCmdUI->SetCheck(flashSize == 0x20000);
-}
-
-void MainWnd::OnOptionsEmulatorUsebiosfile()
-{
-  if(!theApp.biosFileName.IsEmpty())
-    theApp.useBiosFile = !theApp.useBiosFile;
-}
-
-void MainWnd::OnUpdateOptionsEmulatorUsebiosfile(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(theApp.useBiosFile);
-  pCmdUI->Enable(!theApp.biosFileName.IsEmpty());
-}
-
-void MainWnd::OnOptionsEmulatorSkipbios()
-{
-  theApp.skipBiosFile = !theApp.skipBiosFile;
-}
-
-void MainWnd::OnUpdateOptionsEmulatorSkipbios(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(theApp.skipBiosFile);
-}
-
-void MainWnd::OnOptionsEmulatorSelectbiosfile()
-{
-  theApp.winCheckFullscreen();
-  LPCTSTR exts[] = { "" };
-  CString filter = winLoadFilter(IDS_FILTER_BIOS);
-  CString title = winResLoadString(IDS_SELECT_BIOS_FILE);
-
-  FileDlg dlg(this,
-              theApp.biosFileName,
-              filter,
-              0,
-              "BIOS",
-              exts,
-              "",
-              title,
-              false);
-
-  if(dlg.DoModal() == IDOK) {
-    theApp.biosFileName = dlg.GetPathName();
-  }
 }
 
 void MainWnd::OnOptionsEmulatorPngformat()
@@ -2046,4 +2003,24 @@ void MainWnd::OnUpdateRenderapiD3dmotionblur(CCmdUI *pCmdUI)
 #else
 	pCmdUI->Enable( FALSE );
 #endif
+}
+
+void MainWnd::OnEmulatorBiosfiles()
+{
+	theApp.winCheckFullscreen();
+
+	BIOSDialog dlg;
+	dlg.m_enableBIOS_GBA = theApp.useBiosFileGBA ? TRUE : FALSE;
+	dlg.m_enableBIOS_GB = theApp.useBiosFileGB ? TRUE : FALSE;
+	dlg.m_skipLogo = theApp.skipBiosFile ? TRUE : FALSE;
+	dlg.m_pathGBA = theApp.biosFileNameGBA;
+	dlg.m_pathGB = theApp.biosFileNameGB;
+
+	if( IDOK == dlg.DoModal() ) {
+		theApp.useBiosFileGBA = dlg.m_enableBIOS_GBA == TRUE;
+		theApp.useBiosFileGB = dlg.m_enableBIOS_GB == TRUE;
+		theApp.skipBiosFile = dlg.m_skipLogo == TRUE;
+		theApp.biosFileNameGBA = dlg.m_pathGBA;
+		theApp.biosFileNameGB = dlg.m_pathGB;
+	}
 }
