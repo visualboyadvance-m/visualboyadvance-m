@@ -1,4 +1,7 @@
 Important:
+- HQ3x/4x ASM implementation produces wrong interpolation on the image's border
+ - This has already been fixed in the C version; look at hq_base.h / line 343 - 372. The ASM version most likely only has something like skipLine instead of skipLinePlus and skipLineMinus, which is however necessary in order to work correctly.
+
 
 Unimportant:
 - DDraw, D3D, OGL: Add full screen device & frequency selection

@@ -62,7 +62,7 @@ CString GetKeyListName(KeyList& Keys)
 	{
 		txtKeys+=theApp.input->getKeyName(Keys.GetNext(p));
 		if (p!=NULL)
-			txtKeys+=", ";
+			txtKeys+=_T(", ");
 	}
 	return txtKeys;
 }
@@ -90,19 +90,12 @@ JoypadEditControl::~JoypadEditControl()
 
 
 BEGIN_MESSAGE_MAP(JoypadEditControl, CEdit)
-  //{{AFX_MSG_MAP(JoypadEditControl)
-  ON_WM_CHAR()
-  //}}AFX_MSG_MAP
   ON_MESSAGE(JOYCONFIG_MESSAGE, OnJoyConfig)
   END_MESSAGE_MAP()
 
   /////////////////////////////////////////////////////////////////////////////
 // JoypadEditControl message handlers
 
-
-void JoypadEditControl::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
-{
-}
 
 LRESULT JoypadEditControl::OnJoyConfig(WPARAM wParam, LPARAM lParam)
 {
@@ -165,6 +158,7 @@ BEGIN_MESSAGE_MAP(JoypadConfig, CDialog)
   ON_WM_TIMER()
   ON_WM_KEYDOWN()
   ON_BN_CLICKED(IDC_APPENDMODE, &JoypadConfig::OnBnClickedAppendmode)
+  ON_BN_CLICKED(IDC_CLEAR_ALL, &JoypadConfig::OnBnClickedClearAll)
 END_MESSAGE_MAP()
 
   /////////////////////////////////////////////////////////////////////////////
@@ -211,10 +205,6 @@ void JoypadConfig::OnTimer(UINT_PTR nIDEvent)
   theApp.input->checkDevices();
 
   CDialog::OnTimer(nIDEvent);
-}
-
-void JoypadConfig::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
-{
 }
 
 BOOL JoypadConfig::OnInitDialog()
@@ -387,10 +377,6 @@ BOOL MotionConfig::OnInitDialog()
                 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void MotionConfig::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
-{
-}
-
 void MotionConfig::OnTimer(UINT_PTR nIDEvent)
 {
   theApp.input->checkDevices();
@@ -432,4 +418,35 @@ void JoypadConfig::OnBnClickedAppendmode()
 void MotionConfig::OnBnClickedAppendmode()
 {
 	bAppendMode = (::SendMessage(GetDlgItem(IDC_APPENDMODE)->GetSafeHwnd(), BM_GETCHECK, 0, 0L) != 0);
+}
+
+void JoypadConfig::OnBnClickedClearAll()
+{
+	up.m_Keys.RemoveAll();
+	speed.m_Keys.RemoveAll();
+	right.m_Keys.RemoveAll();
+	left.m_Keys.RemoveAll();
+	down.m_Keys.RemoveAll();
+	capture.m_Keys.RemoveAll();
+	buttonStart.m_Keys.RemoveAll();
+	buttonSelect.m_Keys.RemoveAll();
+	buttonR.m_Keys.RemoveAll();
+	buttonL.m_Keys.RemoveAll();
+	buttonGS.m_Keys.RemoveAll();
+	buttonB.m_Keys.RemoveAll();
+	buttonA.m_Keys.RemoveAll();
+
+	up.SetWindowText( _T("") );
+	speed.SetWindowText( _T("") );
+	right.SetWindowText( _T("") );
+	left.SetWindowText( _T("") );
+	down.SetWindowText( _T("") );
+	capture.SetWindowText( _T("") );
+	buttonStart.SetWindowText( _T("") );
+	buttonSelect.SetWindowText( _T("") );
+	buttonR.SetWindowText( _T("") );
+	buttonL.SetWindowText( _T("") );
+	buttonGS.SetWindowText( _T("") );
+	buttonB.SetWindowText( _T("") );
+	buttonA.SetWindowText( _T("") );
 }
