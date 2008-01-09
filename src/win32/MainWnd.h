@@ -55,7 +55,7 @@ class MainWnd : public CWnd
   void winMouseOn();
   void screenCapture(int captureNumber);
   HACCEL m_hAccelTable;
-  bool fileOpenSelect( bool gb = false );
+  bool fileOpenSelect( int system );
   afx_msg LRESULT OnConfirmMode(WPARAM, LPARAM);
   afx_msg LRESULT OnMySysCommand(WPARAM, LPARAM);
   afx_msg void OnUpdateFileLoadGameSlot(CCmdUI *pCmdUI);
@@ -443,6 +443,7 @@ public:
 	afx_msg void OnNcLButtonDown(UINT nHitTest, CPoint point);
 	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
 	afx_msg void OnEmulatorBiosfiles();
+	afx_msg void OnFileOpenGbc();
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -45,7 +45,7 @@ extern void InterframeCleanup();
 void MainWnd::OnFileOpen()
 {
 	theApp.winCheckFullscreen();
-	if( fileOpenSelect( false ) ) {
+	if( fileOpenSelect( 0 ) ) {
 		FileRun();
 	}
 }
@@ -167,7 +167,16 @@ void MainWnd::OnUpdateFileClose(CCmdUI* pCmdUI)
 void MainWnd::OnFileOpengameboy()
 {
 	theApp.winCheckFullscreen();
-	if( fileOpenSelect( true ) ) {
+	if( fileOpenSelect( 2 ) ) {
+		FileRun();
+	}
+}
+
+
+void MainWnd::OnFileOpenGbc()
+{
+	theApp.winCheckFullscreen();
+	if( fileOpenSelect( 1 ) ) {
 		FileRun();
 	}
 }

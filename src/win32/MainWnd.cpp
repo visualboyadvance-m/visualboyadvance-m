@@ -450,6 +450,7 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_WM_NCLBUTTONDOWN()
   ON_WM_WINDOWPOSCHANGING()
   ON_COMMAND(ID_EMULATOR_BIOSFILES, &MainWnd::OnEmulatorBiosfiles)
+  ON_COMMAND(ID_FILE_OPEN_GBC, &MainWnd::OnFileOpenGbc)
   END_MESSAGE_MAP()
 
 
@@ -1107,14 +1108,43 @@ void MainWnd::OnSystemMinimize()
 }
 
 
-bool MainWnd::fileOpenSelect( bool gb )
+bool MainWnd::fileOpenSelect( int system )
 {
 	theApp.dir = _T("");
 	CString initialDir;
-	if( gb ) {
-		initialDir = regQueryStringValue( _T("gbromdir"), _T(".") );
-	} else {
+	int selectedFilter = 0;
+	LPCTSTR exts[] = { _T(""), _T(""), _T(""), _T("") };
+	CString filter;
+	CString title;
+	switch( system )
+	{
+	case 0:
+		// GBA
 		initialDir = regQueryStringValue( _T("romdir"), _T(".") );
+		selectedFilter = regQueryDwordValue( _T("selectedFilter"), 0);
+		if( (selectedFilter < 0) || (selectedFilter > 2) ) {
+			selectedFilter = 0;
+		}
+		filter = winLoadFilter( IDS_FILTER_ROM );
+		break;
+	case 1:
+		// GBC
+		initialDir = regQueryStringValue( _T("gbcromdir"), _T(".") );
+		// TODO: memorize selected filter for GBC as well
+		filter = winLoadFilter( IDS_FILTER_GBCROM );
+		break;
+	case 2:
+		// GB
+		initialDir = regQueryStringValue( _T("gbromdir"), _T(".") );
+		// TODO: memorize selected filter for GB as well
+		filter = winLoadFilter( IDS_FILTER_GBROM );
+		break;
+	}
+	
+	title = winResLoadString( IDS_SELECT_ROM );
+
+	if( !initialDir.IsEmpty() ) {
+		theApp.dir = initialDir;
 	}
 
 	if( initialDir[0] == '.' ) {
@@ -1128,35 +1158,13 @@ bool MainWnd::fileOpenSelect( bool gb )
 		initialDir = baseDir;
 	}
 
-	if( !initialDir.IsEmpty() ) {
-		theApp.dir = initialDir;
-	}
-
-	int selectedFilter = 0;
-	if( !gb ) {
-		selectedFilter = regQueryDwordValue( _T("selectedFilter"), 0);
-		if( (selectedFilter < 0) || (selectedFilter > 2) ) {
-			selectedFilter = 0;
-		}
-	}
-
 	theApp.szFile = _T("");
 
-	LPCTSTR exts[] = { _T(""), _T(""), _T(""), _T("") };
-	CString filter;
-	CString title;
-	if( gb ) {
-		filter = winLoadFilter( IDS_FILTER_GBROM );
-		title = winResLoadString( IDS_SELECT_ROM );
-	} else {
-		filter = winLoadFilter( IDS_FILTER_ROM );
-		title = winResLoadString( IDS_SELECT_ROM );
-	}
 
 	FileDlg dlg( this, _T(""), filter, selectedFilter, _T(""), exts, theApp.dir, title, false);
 
 	if( dlg.DoModal() == IDOK ) {
-		if( !gb ) {
+		if( system == 0 ) {
 			regSetDwordValue( _T("selectedFilter"), dlg.m_ofn.nFilterIndex );
 		}
 		theApp.szFile = dlg.GetPathName();
