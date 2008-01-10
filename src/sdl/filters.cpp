@@ -52,8 +52,8 @@ extern void lq2x(u8*,u32,u8*,u8*,u32,int,int);
 extern void lq2x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq3x16(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq4x16(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq3x32(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq4x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void hq3x32_32(u8*,u32,u8*,u8*,u32,int,int);
+extern void hq4x32_32(u8*,u32,u8*,u8*,u32,int,int);
 
 struct FilterDesc {
 	char name[30];
@@ -79,9 +79,9 @@ const FilterDesc Filters[] = {
   { "lq2x", 2, lq2x, 0, lq2x32 },
   { "hq2x", 2, hq2x, 0, hq2x32 },
   { "Stretch 3x", 3, sdlStretch3x, sdlStretch3x, sdlStretch3x },
-  { "hq3x", 3, hq3x16, 0, hq3x32 },
+  { "hq3x", 3, hq3x16, 0, hq3x32_32 },
   { "Stretch 4x", 4, sdlStretch4x, sdlStretch4x, sdlStretch4x },
-  { "hq4x", 4, hq4x16, 0, hq4x32 }
+  { "hq4x", 4, hq4x16, 0, hq4x32_32 }
 };
 
 int getFilterEnlargeFactor(const Filter f)
@@ -117,29 +117,29 @@ FilterFunc initFilter(const Filter f, const int colorDepth, const int srcWidth)
   if (func)
     switch (f) {
       case kStretch1x:
-  	    sdlStretchInit(colorDepth, 0, srcWidth);
+        sdlStretchInit(colorDepth, 0, srcWidth);
         break;
       case kStretch2x:
-	    sdlStretchInit(colorDepth, 1, srcWidth);
+        sdlStretchInit(colorDepth, 1, srcWidth);
         break;
       case kStretch3x:
-	    sdlStretchInit(colorDepth, 2, srcWidth);
+        sdlStretchInit(colorDepth, 2, srcWidth);
         break;
       case kStretch4x:
-	    sdlStretchInit(colorDepth, 3, srcWidth);
+        sdlStretchInit(colorDepth, 3, srcWidth);
         break;
       case k2xSaI:
-	  case kSuper2xSaI:
-	  case kSuperEagle:
-	    if (colorDepth == 15) Init_2xSaI(555);
-		else if (colorDepth == 16) Init_2xSaI(565);
-		else Init_2xSaI(colorDepth);
+      case kSuper2xSaI:
+      case kSuperEagle:
+        if (colorDepth == 15) Init_2xSaI(555);
+        else if (colorDepth == 16) Init_2xSaI(565);
+        else Init_2xSaI(colorDepth);
         break;
-	  case khq2x:
-	  case klq2x:
-		hq2x_init(colorDepth);
-	    break;
-	  default:
+      case khq2x:
+      case klq2x:
+        hq2x_init(colorDepth);
+        break;
+      default:
         break;
     }
 
@@ -614,4 +614,5 @@ void sdlStretch4x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32
         dstPtr += dstPitch;
       }
 }
+
 
