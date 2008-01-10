@@ -785,7 +785,7 @@ void sdlOpenGLInit(int w, int h)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                   openGL == 2 ? GL_LINEAR : GL_NEAREST);
 
-  textureSize = filterFunction ? 512 : 256;
+  textureSize = 256 * filter_enlarge;
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureSize, textureSize, 0,
                GL_BGRA, GL_UNSIGNED_BYTE, NULL);
 }
@@ -1287,6 +1287,15 @@ void sdlPollEvents()
     case SDL_QUIT:
       emulating = 0;
       break;
+    case SDL_VIDEORESIZE:
+      if (openGL)
+      {
+        SDL_SetVideoMode(event.resize.w, event.resize.h, 16,
+                       SDL_OPENGL | SDL_RESIZABLE |
+                       (fullscreen ? SDL_FULLSCREEN : 0));
+        sdlOpenGLInit(event.resize.w, event.resize.h);
+      }
+      break;
     case SDL_ACTIVEEVENT:
       if(pauseWhenInactive && (event.active.state & SDL_APPINPUTFOCUS)) {
         active = event.active.gain;
@@ -1406,15 +1415,6 @@ void sdlPollEvents()
         }
         debugger = true;
         break;
-      case SDL_VIDEORESIZE:
-	  if (openGL)
-	  {
-      SDL_SetVideoMode(event.resize.w, event.resize.h, 16,
-                       SDL_OPENGL | SDL_RESIZABLE |
-                       (fullscreen ? SDL_FULLSCREEN : 0));
-      sdlOpenGLInit(event.resize.w, event.resize.h);
-	  }
-      break;
       case SDLK_F1:
       case SDLK_F2:
       case SDLK_F3:
