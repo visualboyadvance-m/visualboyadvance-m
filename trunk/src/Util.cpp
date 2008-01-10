@@ -457,20 +457,6 @@ bool utilIsGBImage(const char * file)
   return false;
 }
 
-bool utilIsZipFile(const char *file)
-{
-  if(strlen(file) > 4) {
-    const char * p = strrchr(file,'.');
-
-    if(p != NULL) {
-      if(_stricmp(p, ".zip") == 0)
-        return true;
-    }
-  }
-
-  return false;
-}
-
 bool utilIsGzipFile(const char *file)
 {
   if(strlen(file) > 3) {
@@ -487,7 +473,8 @@ bool utilIsGzipFile(const char *file)
   return false;
 }
 
-void utilGetBaseName(const char *file, char *buffer)
+// strip .gz or .z off end
+void utilStripDoubleExtension(const char *file, char *buffer)
 {
   if(buffer != file) // allows conversion in place
     strcpy(buffer, file);
@@ -519,7 +506,7 @@ static File_Extractor* scan_arc(const char *file, bool (*accept)(const char *),
 		strncpy(buffer,fex_name(fe),sizeof buffer);
 		buffer [sizeof buffer-1] = '\0';
 
-		utilGetBaseName(buffer, buffer); // strip .gz or .z off end
+		utilStripDoubleExtension(buffer, buffer);
 
 		if(accept(buffer)) {
 			found = true;
@@ -578,7 +565,7 @@ u8 *utilLoad(const char *file,
 {
 	// find image file
 	char buffer [2048];
-	File_Extractor* fe = scan_arc(file,accept,buffer);
+	File_Extractor *fe = scan_arc(file,accept,buffer);
 	if(!fe)
 		return NULL;
 
@@ -590,6 +577,7 @@ u8 *utilLoad(const char *file,
 	u8 *image = data;
 
 	if(image == NULL) {
+		// allocate buffer memory if none was passed to the function
 		image = (u8 *)malloc(utilGetSize(size));
 		if(image == NULL) {
 			fex_close(fe);
@@ -601,7 +589,7 @@ u8 *utilLoad(const char *file,
 	}
 
 	// Read image
-	int read = fileSize <= size ? fileSize : size;
+	int read = fileSize <= size ? fileSize : size; // do not read beyond file
 	fex_err_t err = fex_read_once(fe, image, read);
 	fex_close(fe);
 	if(err) {
