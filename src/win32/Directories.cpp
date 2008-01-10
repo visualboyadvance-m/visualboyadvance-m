@@ -267,10 +267,11 @@ CString Directories::browseForDir(CString title)
     bi.hwndOwner = m_hWnd;
     bi.lpszTitle = title;
     bi.pidlRoot = 0;
-    bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_EDITBOX | BIF_NEWDIALOGSTYLE;
+    bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_USENEWUI;
     bi.lpfn = browseCallbackProc;
     bi.lParam = (LPARAM)(LPCTSTR)initialFolderDir;
 
+	CoInitialize( NULL ); // required by BIF_USENEWUI
     pidl = SHBrowseForFolder(&bi);
 
     if(pidl) {
