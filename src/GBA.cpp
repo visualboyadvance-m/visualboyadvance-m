@@ -1300,9 +1300,7 @@ int CPULoadRom(const char *szFile)
     return 0;
   }
 
-  u8 *whereToLoad = rom;
-  if(cpuIsMultiBoot)
-    whereToLoad = workRAM;
+  u8 *whereToLoad = cpuIsMultiBoot ? workRAM : rom;
 
   if(CPUIsELF(szFile)) {
     FILE *f = fopen(szFile, "rb");

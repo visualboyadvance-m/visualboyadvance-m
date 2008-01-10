@@ -483,9 +483,9 @@ bool MainWnd::FileRun()
   char tempName[2048];
   char file[2048];
 
-  utilGetBaseName(theApp.szFile, tempName);
+  utilStripDoubleExtension(theApp.szFile, tempName);
 
-  _fullpath(file, tempName, 1024);
+  _fullpath(file, tempName, 2048);
   theApp.filename = file;
 
   int index = theApp.filename.ReverseFind('.');
@@ -569,7 +569,7 @@ bool MainWnd::FileRun()
     strcat(tempName, "\\vba-over.ini");
 
     UINT i = GetPrivateProfileInt(buffer,
-                                  "rtcEnabled",
+					                "rtcEnabled",
                                   -1,
                                   tempName);
     if(i != (UINT)-1)
