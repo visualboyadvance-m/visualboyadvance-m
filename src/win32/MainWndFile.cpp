@@ -391,7 +391,7 @@ BOOL MainWnd::OnFileSaveSlot(UINT nID)
 void MainWnd::OnFileImportBatteryfile()
 {
   theApp.winCheckFullscreen();
-  LPCTSTR exts[] = { ".sav" };
+  LPCTSTR exts[] = { ".sav", ".dat" };
   CString filter = winLoadFilter(IDS_FILTER_SAV);
   CString title = winResLoadString(IDS_SELECT_BATTERY_FILE);
 
