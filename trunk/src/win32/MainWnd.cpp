@@ -482,6 +482,7 @@ bool MainWnd::FileRun()
   }
   char tempName[2048];
   char file[2048];
+  CString oldFile = theApp.filename;
 
   utilStripDoubleExtension(theApp.szFile, tempName);
 
@@ -491,6 +492,12 @@ bool MainWnd::FileRun()
   int index = theApp.filename.ReverseFind('.');
   if(index != -1)
     theApp.filename = theApp.filename.Left(index);
+
+  if( theApp.filename != oldFile ) {
+	  // clear cheat list when another game is loaded
+	  cheatsDeleteAll( false );
+	  gbCheatRemoveAll();
+  }
 
   CString ipsname;
   ipsname.Format("%s.ips", theApp.filename);
