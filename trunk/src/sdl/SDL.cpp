@@ -119,10 +119,10 @@ int destHeight = 0;
 int sensorX = 2047;
 int sensorY = 2047;
 
-int filter = (int)kStretch1x;
+int filter = (int)kStretch2x;
 u8 *delta = NULL;
 
-int filter_enlarge = 1;
+int filter_enlarge = 2;
 
 int sdlPrintUsage = 0;
 int disableMMX = 0;
@@ -1007,7 +1007,7 @@ void sdlInitVideo() {
   } else
     flags |= SDL_HWSURFACE | SDL_DOUBLEBUF;
 
-  surface = SDL_SetVideoMode(destWidth, destHeight, 16, flags);
+  surface = SDL_SetVideoMode(destWidth, destHeight, 0, flags);
 
   if(surface == NULL) {
     systemMessage(0, "Failed to set video mode");
@@ -1290,7 +1290,7 @@ void sdlPollEvents()
     case SDL_VIDEORESIZE:
       if (openGL)
       {
-        SDL_SetVideoMode(event.resize.w, event.resize.h, 16,
+        SDL_SetVideoMode(event.resize.w, event.resize.h, 0,
                        SDL_OPENGL | SDL_RESIZABLE |
                        (fullscreen ? SDL_FULLSCREEN : 0));
         sdlOpenGLInit(event.resize.w, event.resize.h);
@@ -1790,7 +1790,7 @@ int main(int argc, char **argv)
       exit(-1);
     }
 
-    utilGetBaseName(szFile, filename);
+    utilStripDoubleExtension(szFile, filename);
     char *p = strrchr(filename, '.');
 
     if(p)
@@ -1936,7 +1936,7 @@ int main(int argc, char **argv)
 
   filterFunction = initFilter((Filter)filter, systemColorDepth, srcWidth);
   if (!filterFunction) {
-    fprintf(stderr,"Unable to init filter\n");
+    fprintf(stderr,"Unable to init filter '%s'\n", getFilterName((Filter)filter));
     exit(-1);
   }
 
@@ -2077,98 +2077,88 @@ void systemMessage(int num, const char *msg, ...)
   va_end(valist);
 }
 
-void systemDrawScreen()
+void drawScreenMessage(u8 *screen, int pitch, int x, int y, unsigned int duration)
 {
-  renderedFrames++;
-
-  if(!openGL)
-    SDL_LockSurface(surface);
-
   if(screenMessage) {
     if(cartridgeType == 1 && gbBorderOn) {
       gbSgbRenderBorder();
     }
-    if(((systemGetClock() - screenMessageTime) < 3000) &&
+    if(((systemGetClock() - screenMessageTime) < duration) &&
        !disableStatusMessages) {
-      drawText(pix, srcPitch, 10, srcHeight - 20,
+      drawText(screen, pitch, x, y,
                screenMessageBuffer);
     } else {
       screenMessage = false;
     }
   }
+}
 
-  if(ifbFunction) {
-    if(systemColorDepth == 16)
-      ifbFunction(pix+destWidth+4, destWidth+4, srcWidth, srcHeight);
-    else
-      ifbFunction(pix+destWidth*2+4, destWidth*2+4, srcWidth, srcHeight);
+void drawSpeed(u8 *screen, int pitch, int x, int y)
+{
+  char buffer[50];
+  if(showSpeed == 1)
+    sprintf(buffer, "%d%%", systemSpeed);
+  else
+    sprintf(buffer, "%3d%%(%d, %d fps)", systemSpeed,
+            systemFrameSkip,
+            showRenderedFrames);
+  if(showSpeedTransparent)
+    drawTextTransp(screen, pitch, x, y, buffer);
+  else
+    drawText(screen, pitch, x, y, buffer);
+}
+
+void systemDrawScreen()
+{
+  unsigned int destPitch = destWidth * (systemColorDepth >> 3);
+  u8 *screen;
+
+  renderedFrames++;
+
+  if (openGL)
+    screen = filterPix;
+  else {
+    screen = (u8*)surface->pixels;
+    SDL_LockSurface(surface);
   }
 
+  if (ifbFunction)
+    ifbFunction(pix + srcPitch, srcPitch, srcWidth, srcHeight);
+
+  filterFunction(pix + srcPitch, srcPitch, delta, screen,
+                 destPitch, srcWidth, srcHeight);
+
+  drawScreenMessage(screen, destPitch, 10, destHeight - 20, 3000);
+
+  if (showSpeed && fullscreen)
+    drawSpeed(screen, destPitch, 10, 20);
+
   if (openGL) {
-      int pitch = srcWidth * 4 + 4;
-
-      filterFunction(pix + pitch,
-                     pitch,
-                     delta,
-                     (u8*)filterPix,
-                     srcWidth * 4 * filter_enlarge,
-                     srcWidth,
-                     srcHeight);
-
-      glPixelStorei(GL_UNPACK_ROW_LENGTH, destWidth);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, destWidth);
+    if (systemColorDepth == 16)
       glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
-                      GL_BGRA, GL_UNSIGNED_BYTE, filterPix);
+                      GL_RGB, GL_UNSIGNED_SHORT_5_6_5, screen);
+    else
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
+                      GL_BGRA, GL_UNSIGNED_BYTE, screen);
 
     glBegin(GL_TRIANGLE_STRIP);
       glTexCoord2f(0.0f, 0.0f);
       glVertex3i(0, 0, 0);
-      glTexCoord2f(filter_enlarge * srcWidth / (GLfloat) textureSize, 0.0f);
+      glTexCoord2f(destWidth / (GLfloat) textureSize, 0.0f);
       glVertex3i(1, 0, 0);
-      glTexCoord2f(0.0f, filter_enlarge * srcHeight / (GLfloat) textureSize);
+      glTexCoord2f(0.0f, destHeight / (GLfloat) textureSize);
       glVertex3i(0, 1, 0);
-      glTexCoord2f(filter_enlarge * srcWidth / (GLfloat) textureSize,
-                  filter_enlarge * srcHeight / (GLfloat) textureSize);
+      glTexCoord2f(destWidth / (GLfloat) textureSize,
+                  destHeight / (GLfloat) textureSize);
       glVertex3i(1, 1, 0);
     glEnd();
 
-   SDL_GL_SwapBuffers();
+    SDL_GL_SwapBuffers();
   } else {
-
-    unsigned int destw = destWidth*((systemColorDepth == 16) ? 2 : 4) / filter_enlarge + 4;
-    filterFunction(pix+destw,
-                    destw,
-                    delta,
-                    (u8*)surface->pixels,
-                    surface->pitch,
-                    srcWidth,
-                    srcHeight);
-
-  if(showSpeed && fullscreen) {
-    char buffer[50];
-    if(showSpeed == 1)
-      sprintf(buffer, "%d%%", systemSpeed);
-    else
-      sprintf(buffer, "%3d%%(%d, %d fps)", systemSpeed,
-              systemFrameSkip,
-              showRenderedFrames);
-    if(showSpeedTransparent)
-      drawTextTransp((u8*)surface->pixels,
-                     surface->pitch,
-                     10,
-                     surface->h-20,
-                     buffer);
-    else
-      drawText((u8*)surface->pixels,
-               surface->pitch,
-               10,
-               surface->h-20,
-               buffer);
+    SDL_UnlockSurface(surface);
+    SDL_Flip(surface);
   }
-
-  SDL_UnlockSurface(surface);
-  //  SDL_UpdateRect(surface, 0, 0, destWidth, destHeight);
-  SDL_Flip(surface);
-}
 
 }
 
@@ -2600,7 +2590,6 @@ void systemGbBorderOn()
           (((i & 0x7c00) >> 10) << systemBlueShift);
       }
     }
-    srcPitch = srcWidth * 2+4;
   } else {
     RGB_LOW_BITS_MASK = 0x010101;
     for(int i = 0; i < 0x10000; i++) {
@@ -2608,9 +2597,5 @@ void systemGbBorderOn()
         (((i & 0x3e0) >> 5) << systemGreenShift) |
         (((i & 0x7c00) >> 10) << systemBlueShift);
     }
-    if(systemColorDepth == 32)
-      srcPitch = srcWidth*4 + 4;
-    else
-      srcPitch = srcWidth*3;
   }
 }
