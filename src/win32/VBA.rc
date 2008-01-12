@@ -141,7 +141,7 @@ FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     ICON            101,IDC_STATIC,6,6,20,20
     CTEXT           "VisualBoyAdvance Emulator",IDC_STATIC,34,7,120,8
-    CTEXT           "Copyright © 2007 VBA development team",IDC_STATIC,16,36,144,8
+    CTEXT           "Copyright © 2008 VBA development team",IDC_STATIC,16,36,144,8
     CTEXT           "https://vbam.bountysource.com",IDC_URL,6,126,165,8
     CTEXT           "Contributions by Costis and original VBA Team",IDC_STATIC,7,49,165,8
     CTEXT           "Version",IDC_STATIC,47,17,27,8
