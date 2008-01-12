@@ -5,17 +5,14 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stddef.h>
 
 extern "C" {
-	#include "../7z_C/LZMA_C/LzmaTypes.h"
-}
-#include "../7z_C/7zTypes.h"
-extern "C" {
-	#include "../7z_C/7zExtract.h"
+	#include "../7z_C/Archive/7z/7zExtract.h"
 	#include "../7z_C/7zCrc.h"
 }
 
-/* Copyright (C) 2005-2007 Shay Green. This module is free software; you
+/* Copyright (C) 2005-2008 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
 General Public License as published by the Free Software Foundation; either
 version 2.1 of the License, or (at your option) any later version. This
@@ -120,7 +117,7 @@ blargg_err_t Zip7_Extractor::open_()
 	impl->buf         = 0;
 	impl->buf_size    = 0;
 
-	InitCrcTable();
+	CrcGenerateTable();
 	SzArDbExInit( &impl->db );
 	int code = SzArchiveOpen( &impl->stream, &impl->db, &alloc, &alloc_temp );
 	RETURN_ERR( (code == SZE_ARCHIVE_ERROR ? fex_wrong_file_type : zip7_err( code )) );
@@ -155,6 +152,10 @@ blargg_err_t Zip7_Extractor::next_()
 		CFileItem const& item = impl->db.Database.Files [index];
 		if ( !item.IsDirectory )
 		{
+			// TODO: support date
+			// stored as 64-bit value, divide by 10000000 (ten million) to get seconds
+			//item.LastWriteTime.Low + (.High << 32)
+			
 			set_info( item.Size, item.Name );
 			return 0;
 		}
