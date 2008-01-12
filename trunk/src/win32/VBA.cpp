@@ -1445,11 +1445,10 @@ void VBA::loadSettings()
     pVideoDriverGUID = &videoDriverGUID;
 
   fsAdapter = regQueryDwordValue("fsAdapter", 0);
-  fsWidth = regQueryDwordValue("fsWidth", 0);
-  fsHeight = regQueryDwordValue("fsHeight", 0);
-  fsColorDepth = regQueryDwordValue("fsColorDepth", 0);
+  fsWidth = regQueryDwordValue("fsWidth", 800);
+  fsHeight = regQueryDwordValue("fsHeight", 600);
+  fsColorDepth = regQueryDwordValue("fsColorDepth", 32);
   fsFrequency = regQueryDwordValue("fsFrequency", 60);
-  fsAdapter = regQueryDwordValue("fsAdapter", 0);
 
   if(videoOption == VIDEO_OTHER) {
     if(fsWidth < 0 || fsWidth > 4095 || fsHeight < 0 || fsHeight > 4095)
