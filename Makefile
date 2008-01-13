@@ -1,3 +1,4 @@
+MACHINE= $(shell uname -s)
 CC=gcc
 CPPC=g++
 CFLAGS=-W -Wall -Wno-unused -O3 -DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DFINAL_VERSION -DBKPT_SUPPORT -DSDL -DSYSCONFDIR="home" -DUSE_OPENGL -DC_CORE
@@ -9,6 +10,10 @@ STRIP=strip -s
 DEL=rm -f
 OE=.o
 OUT=vba
+
+ifeq ($(MACHINE),Darwin)
+	LFLAGS=-lz -lpng -framework OpenGL `sdl-config --libs`
+endif
 
 ifeq ($(PLATFORM),win)
   ASMFLAGS=-w-orphan-labels -f win32 -O1 -Isrc/hq/asm/
