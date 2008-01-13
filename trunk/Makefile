@@ -77,7 +77,7 @@ OBJECTS+=${CALTERNOBJ}
 endif
 
 ifeq ($(USEFEX),yes)
-LFLAGS+=-l:${FEXDIR}/libfex.a
+LFLAGS+=-L${FEXDIR} -lfex
 else
 OBJECTS+=${MAINDIR}/fex_mini${OE}
 endif
