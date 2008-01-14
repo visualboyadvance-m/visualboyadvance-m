@@ -121,7 +121,7 @@ public:
 	virtual bool changeRenderSize( int w, int h );
 	virtual void resize( int w, int h );
 	virtual void setOption( const char *, int );
-	virtual int  selectFullScreenMode( GUID ** );
+	virtual bool selectFullScreenMode( VIDEO_MODE &mode );
 };
 
 #include "gzglfont.h"
@@ -652,17 +652,19 @@ void OpenGLDisplay::setOption( const char *option, int value )
 }
 
 //set fullscreen mode
-int OpenGLDisplay::selectFullScreenMode( GUID ** )
+bool OpenGLDisplay::selectFullScreenMode( VIDEO_MODE &mode )
 {
+	// TODO: Add display mode enumeration dialog
 	HWND wnd = GetDesktopWindow();
 	RECT r;
 	GetWindowRect( wnd, &r );
-	int w = ( r.right - r.left ) & 0xFFF;
-	int h = ( r.bottom - r.top ) & 0xFFF;
+	mode.width = (unsigned short)( r.right - r.left );
+	mode.height = (unsigned short)( r.bottom - r.top );
 	HDC dc = GetDC( wnd );
-	int c = GetDeviceCaps( dc, BITSPIXEL );
+	mode.bitDepth = GetDeviceCaps( dc, BITSPIXEL );
 	ReleaseDC( wnd, dc );
-	return (c << 24) | (w << 12) | h;
+	return true;
+//  return false; when cancel is clicked
 }
 
 
