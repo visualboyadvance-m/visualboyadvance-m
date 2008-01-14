@@ -8,9 +8,41 @@
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #include "afxres.h"
-#include "resource2.h"
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// German (Germany) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.\0"
+END
+
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // German (Germany) resources
+/////////////////////////////////////////////////////////////////////////////
+
 
 /////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
@@ -20,6 +52,55 @@
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,8,0,0
+ PRODUCTVERSION 1,8,0,0
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "VBA-M comes with NO WARRANTY. Use it at your own risk."
+            VALUE "CompanyName", "http://vba-m.ngemu.com/"
+            VALUE "FileDescription", "GB & GBA emulator for Windows"
+            VALUE "FileVersion", "1, 8, 0, 0"
+            VALUE "InternalName", "VBA-M"
+            VALUE "LegalCopyright", "Copyright © 2008 VBA-M development team"
+            VALUE "OriginalFilename", "VisualBoyAdvance.exe"
+            VALUE "ProductName", "VBA-M - A VisualBoyAdvance Fork"
+            VALUE "ProductVersion", "1, 8, 0, 0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MAINICON            ICON                    "VBA-M.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -139,7 +220,7 @@ EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "About"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    ICON            101,IDC_STATIC,6,6,20,20
+    ICON            IDI_MAINICON,IDC_STATIC,6,6,16,16
     CTEXT           "VisualBoyAdvance Emulator",IDC_STATIC,34,7,120,8
     CTEXT           "Copyright © 2008 VBA development team",IDC_STATIC,16,36,144,8
     CTEXT           "https://vbam.bountysource.com",IDC_URL,6,126,165,8
@@ -1473,31 +1554,6 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "#include ""resource2.h""\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "#include ""vba.rc2""\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
@@ -2219,7 +2275,8 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-#include "vba.rc2"
+
+
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 

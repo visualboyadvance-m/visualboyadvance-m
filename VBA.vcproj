@@ -78,7 +78,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG;_MSC_VER=1400"
+				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
 				AdditionalIncludeDirectories=""
 			/>
@@ -295,7 +295,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG;_MSC_VER=1400"
+				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
 				AdditionalIncludeDirectories=""
 			/>
@@ -488,7 +488,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source"
+			Name="source"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
@@ -1204,7 +1204,7 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Header"
+			Name="header"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
@@ -1678,7 +1678,7 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Res"
+			Name="resources"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
@@ -1703,11 +1703,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\win32\VBA.rc"
+				RelativePath=".\src\win32\VBA-M.ico"
 				>
 			</File>
 			<File
-				RelativePath=".\src\win32\vba.rc2"
+				RelativePath=".\src\win32\VBA.rc"
 				>
 			</File>
 		</Filter>
