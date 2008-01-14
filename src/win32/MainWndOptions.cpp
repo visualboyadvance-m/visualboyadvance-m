@@ -337,42 +337,47 @@ void MainWnd::OnOptionsVideoFullscreen1280x1024()
 	OnOptionVideoSize(ID_OPTIONS_VIDEO_FULLSCREEN1280X1024);
 }
 
+
 void MainWnd::OnOptionsVideoFullscreen()
 {
   theApp.winCheckFullscreen();
-  GUID *pGUID = NULL;
-  int size = theApp.display->selectFullScreenMode(&pGUID);
-  if(size != -1) {
-    int width = (size >> 12) & 4095;
-    int height = (size & 4095);
-    int colorDepth = (size >> 24);
-    if(width != theApp.fsWidth ||
-       height != theApp.fsHeight ||
-       colorDepth != theApp.fsColorDepth ||
-       pGUID != theApp.pVideoDriverGUID ||
-       theApp.videoOption != VIDEO_OTHER) {
-      theApp.fsForceChange = true;
-      theApp.fsWidth = width;
-      theApp.fsHeight = height;
-	  theApp.fsFrequency = 60;
-      theApp.fsColorDepth = colorDepth;
-      theApp.pVideoDriverGUID = pGUID;
-      if(pGUID) {
-        theApp.videoDriverGUID = *pGUID;
-        regSetDwordValue("defaultVideoDriver", FALSE);
-        regSetBinaryValue("videoDriverGUID",
-                          (char *)pGUID, sizeof(GUID));
-      } else {
-        regSetDwordValue("defaultVideoDriver", TRUE);
-      }
-      theApp.updateVideoSize(ID_OPTIONS_VIDEO_FULLSCREEN);
-	  if( theApp.renderMethod == DIRECT_DRAW ) {
-		  theApp.m_pMainWnd->PostMessage(VBA_CONFIRM_MODE);
+
+  IDisplay::VIDEO_MODE mode;
+  ZeroMemory( &mode, sizeof(IDisplay::VIDEO_MODE) );
+
+  if( theApp.display->selectFullScreenMode( mode ) ) {
+	  if( ( mode.width != theApp.fsWidth ) ||
+		  ( mode.height != theApp.fsHeight ) ||
+		  ( mode.bitDepth != theApp.fsColorDepth ) ||
+		  ( mode.frequency != theApp.fsFrequency ) ||
+		  ( mode.adapter_ddraw != theApp.pVideoDriverGUID ) ||
+		  ( mode.adapter != theApp.fsAdapter ) ||
+		  ( theApp.videoOption != VIDEO_OTHER ) )
+	  {
+		  theApp.fsForceChange = true;
+		  theApp.fsWidth = mode.width;
+		  theApp.fsHeight = mode.height;
+		  theApp.fsFrequency = mode.frequency;
+		  theApp.fsColorDepth = mode.bitDepth;
+		  theApp.pVideoDriverGUID = mode.adapter_ddraw;
+		  theApp.fsAdapter = mode.adapter;
+		  if( mode.adapter_ddraw ) {
+			  theApp.videoDriverGUID = *mode.adapter_ddraw;
+			  regSetDwordValue( "defaultVideoDriver", FALSE );
+			  regSetBinaryValue( "videoDriverGUID",
+				  (char *)mode.adapter_ddraw, sizeof(GUID) );
+		  } else {
+			  regSetDwordValue( "defaultVideoDriver", TRUE );
+		  }
+		  theApp.updateVideoSize( ID_OPTIONS_VIDEO_FULLSCREEN );
+		  if( theApp.renderMethod == DIRECT_DRAW ) {
+			  theApp.m_pMainWnd->PostMessage(VBA_CONFIRM_MODE);
+		  }
 	  }
-    }
   }
   theApp.winAccelMgr.UpdateMenu(theApp.menu);
 }
+
 
 void MainWnd::OnUpdateOptionsVideoFullscreen(CCmdUI* pCmdUI)
 {
