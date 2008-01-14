@@ -26,7 +26,6 @@
 #include "MainWnd.h"
 #include "Reg.h"
 #include "resource.h"
-#include "resource2.h"
 #include "skin.h"
 #include "WavWriter.h"
 #include "WinResUtil.h"
@@ -512,7 +511,7 @@ BOOL VBA::InitInstance()
                                     0,
                                     MakeInstanceFilename("VBA.ini")) ? true : false;
 
-  wndClass = AfxRegisterWndClass(0, LoadCursor(IDC_ARROW), (HBRUSH)GetStockObject(BLACK_BRUSH), LoadIcon(IDI_ICON));
+  wndClass = AfxRegisterWndClass(0, LoadCursor(IDC_ARROW), (HBRUSH)GetStockObject(BLACK_BRUSH), LoadIcon(IDI_MAINICON));
 
   char winBuffer[2048];
 
