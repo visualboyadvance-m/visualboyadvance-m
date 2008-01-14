@@ -72,7 +72,7 @@ public:
   virtual DISPLAY_TYPE getType() { return DIRECT_DRAW; };
   virtual void setOption(const char *, int) {}
   virtual bool isSkinSupported() { return true; }
-  virtual int selectFullScreenMode(GUID **);
+  virtual bool selectFullScreenMode( VIDEO_MODE &mode );
 };
 
 static HRESULT WINAPI checkModesAvailable(LPDDSURFACEDESC2 surf, LPVOID lpContext)
@@ -702,9 +702,18 @@ void DirectDrawDisplay::render()
   }
 }
 
-int DirectDrawDisplay::selectFullScreenMode(GUID **pGUID)
+bool DirectDrawDisplay::selectFullScreenMode( VIDEO_MODE &mode )
 {
-  return winVideoModeSelect(theApp.m_pMainWnd, pGUID);
+	int ret = winVideoModeSelect( theApp.m_pMainWnd, &mode.adapter_ddraw );
+
+	if( ret == -1 ) {
+		return false;
+	} else {
+		mode.width = (ret >> 12) & 0xFFF;
+		mode.height = ret & 0xFFF;
+		mode.bitDepth = ret >> 24;
+		return true;
+	}
 }
 
 IDisplay *newDirectDrawDisplay()

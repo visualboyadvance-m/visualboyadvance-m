@@ -32,6 +32,16 @@ class IDisplay {
   IDisplay() {};
   virtual ~IDisplay() {};
 
+  struct VIDEO_MODE
+  {
+	  GUID          *adapter_ddraw;
+	  unsigned char  adapter;
+	  unsigned short width;
+	  unsigned short height;
+	  unsigned char  bitDepth;
+	  unsigned char  frequency;
+  };
+
   virtual bool initialize() = 0;
   virtual void cleanup() = 0;
   virtual void render() = 0;
@@ -42,7 +52,7 @@ class IDisplay {
   virtual void setOption(const char *option, int value) {};
   virtual DISPLAY_TYPE getType() = 0;
   virtual bool isSkinSupported() { return false; }
-  virtual int selectFullScreenMode(GUID **) = 0;
+  virtual bool selectFullScreenMode( VIDEO_MODE &mode ) = 0;
 };
 
 

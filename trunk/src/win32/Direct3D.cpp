@@ -63,8 +63,6 @@ extern "C" bool cpu_mmx;
 extern bool detectMMX();
 #endif
 
-extern int winVideoModeSelect(CWnd *, GUID **);
-
 class Direct3DDisplay : public IDisplay {
 private:
 	bool                  initialized;
@@ -119,7 +117,7 @@ public:
 	virtual bool changeRenderSize( int w, int h );
 	virtual void resize( int w, int h );
 	virtual void setOption( const char *option, int value );
-	virtual int  selectFullScreenMode( GUID ** );
+	virtual bool selectFullScreenMode( VIDEO_MODE &mode );
 };
 
 
@@ -520,9 +518,34 @@ void Direct3DDisplay::resize( int w, int h )
 }
 
 
-int Direct3DDisplay::selectFullScreenMode( GUID **pGUID )
+bool Direct3DDisplay::selectFullScreenMode( VIDEO_MODE &mode )
 {
-  return winVideoModeSelect(theApp.m_pMainWnd, pGUID);
+	// TODO: Add display mode enumeration dialog
+	if( !pD3D ) return false;
+	D3DDISPLAYMODE m;
+	pD3D->GetAdapterDisplayMode( D3DADAPTER_DEFAULT, &m );
+	mode.adapter = D3DADAPTER_DEFAULT;
+	mode.width = m.Width;
+	mode.height = m.Height;
+	mode.frequency = m.RefreshRate;
+	switch( m.Format )
+	{
+	case D3DFMT_X1R5G5B5:
+	case D3DFMT_R5G6B5:
+		mode.bitDepth = 16;
+		break;
+	case D3DFMT_R8G8B8:
+		mode.bitDepth = 24;
+		break;
+	case D3DFMT_X8R8G8B8:
+		mode.bitDepth = 32;
+		break;
+	default:
+		return false;
+		break;
+	}
+	return true;
+//  return false; when cancel is clicked
 }
 
 
