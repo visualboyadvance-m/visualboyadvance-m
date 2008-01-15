@@ -100,6 +100,7 @@
 #define IDD_SELECT_PLUGIN               159
 #define IDD_OAL_CONFIG                  160
 #define IDD_BIOS                        161
+#define IDD_FULLSCREEN                  162
 #define IDC_R0                          1000
 #define IDC_EDIT_UP                     1000
 #define IDC_R1                          1001
@@ -524,6 +525,10 @@
 #define IDC_SELECT_GB_BIOS_PATH         1277
 #define IDC_SELECT_GBA_BIOS_PATH        1278
 #define IDC_CLEAR_ALL                   1278
+#define IDC_COMBO_RESOLUTION            1280
+#define IDC_COMBO_COLOR_DEPTH           1281
+#define IDC_COMBO_REFRESH_RATE          1282
+#define IDC_COMBO_DEVICE                1283
 #define IDS_OAL_NODEVICE                2000
 #define IDS_OAL_NODLL                   2001
 #define IDS_AVI_CANNOT_CREATE_AVI       2002
@@ -845,9 +850,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        162
+#define _APS_NEXT_RESOURCE_VALUE        163
 #define _APS_NEXT_COMMAND_VALUE         40359
-#define _APS_NEXT_CONTROL_VALUE         1279
+#define _APS_NEXT_CONTROL_VALUE         1284
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
 #endif
