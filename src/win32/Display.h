@@ -34,12 +34,12 @@ class IDisplay {
 
   struct VIDEO_MODE
   {
-	  GUID          *adapter_ddraw;
-	  unsigned char  adapter;
-	  unsigned short width;
-	  unsigned short height;
-	  unsigned char  bitDepth;
-	  unsigned char  frequency;
+	  GUID        *adapter_ddraw;
+	  unsigned int adapter;
+	  unsigned int width;
+	  unsigned int height;
+	  unsigned int bitDepth;
+	  unsigned int frequency;
   };
 
   virtual bool initialize() = 0;
