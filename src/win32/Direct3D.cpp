@@ -29,6 +29,7 @@
 #include "Display.h"
 
 #include "MainWnd.h"
+#include "FullscreenSettings.h"
 
 #include "../System.h"
 #include "../GBA.h"
@@ -161,7 +162,7 @@ void Direct3DDisplay::prepareDisplayMode()
 	dpp.BackBufferWidth = !dpp.Windowed ? theApp.fsWidth : theApp.surfaceSizeX;
 	dpp.BackBufferHeight = !dpp.Windowed ? theApp.fsHeight : theApp.surfaceSizeY;
 	dpp.hDeviceWindow = theApp.m_pMainWnd->GetSafeHwnd();
-	dpp.FullScreen_RefreshRateInHz = dpp.Windowed ? 0 : theApp.fsFrequency;
+	dpp.FullScreen_RefreshRateInHz = ( dpp.Windowed == TRUE ) ? 0 : theApp.fsFrequency;
 	dpp.Flags = 0;
 	dpp.PresentationInterval = theApp.vsync ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 	// D3DPRESENT_INTERVAL_ONE means VSync ON
@@ -216,7 +217,7 @@ bool Direct3DDisplay::initialize()
 		DXTRACE_ERR_MSGBOX( _T("Error creating Direct3D object"), 0 );
 		return false;
 	}
-	pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &mode);
+	pD3D->GetAdapterDisplayMode(theApp.fsAdapter, &mode);
 
 	theApp.mode320Available = FALSE;
 	theApp.mode640Available = FALSE;
@@ -249,11 +250,12 @@ bool Direct3DDisplay::initialize()
 	screenFormat = mode.Format;
 
 	switch(mode.Format) {
-  case D3DFMT_R8G8B8:
-	  systemColorDepth = 24;
-	  systemRedShift = 19;
-	  systemGreenShift = 11;
-	  systemBlueShift = 3;
+  case D3DFMT_A2R10G10B10:
+	  systemColorDepth = 32;
+	  systemRedShift = 25;
+	  systemGreenShift = 15;
+	  systemBlueShift = 5;
+	  Init_2xSaI(32); // TODO: verify
 	  break;
   case D3DFMT_X8R8G8B8:
 	  systemColorDepth = 32;
@@ -298,10 +300,11 @@ bool Direct3DDisplay::initialize()
 
 
 	// create device
+	// Direct3D will use the selected full screen adapter for windowed mode as well
 	prepareDisplayMode();
 
 	HRESULT hret = pD3D->CreateDevice(
-		D3DADAPTER_DEFAULT,
+		theApp.fsAdapter,
 		D3DDEVTYPE_HAL,
 		theApp.m_pMainWnd->GetSafeHwnd(),
 		D3DCREATE_FPU_PRESERVE |
@@ -520,32 +523,32 @@ void Direct3DDisplay::resize( int w, int h )
 
 bool Direct3DDisplay::selectFullScreenMode( VIDEO_MODE &mode )
 {
-	// TODO: Add display mode enumeration dialog
-	if( !pD3D ) return false;
-	D3DDISPLAYMODE m;
-	pD3D->GetAdapterDisplayMode( D3DADAPTER_DEFAULT, &m );
-	mode.adapter = D3DADAPTER_DEFAULT;
-	mode.width = m.Width;
-	mode.height = m.Height;
-	mode.frequency = m.RefreshRate;
-	switch( m.Format )
-	{
-	case D3DFMT_X1R5G5B5:
-	case D3DFMT_R5G6B5:
-		mode.bitDepth = 16;
-		break;
-	case D3DFMT_R8G8B8:
-		mode.bitDepth = 24;
-		break;
-	case D3DFMT_X8R8G8B8:
-		mode.bitDepth = 32;
-		break;
-	default:
+	FullscreenSettings dlg;
+	dlg.setAPI( this->getType() );
+	INT_PTR ret = dlg.DoModal();
+	if( ret == IDOK ) {
+		mode.adapter = dlg.m_device;
+		switch( dlg.m_colorDepth )
+		{
+		case 30:
+			// TODO: support
+			return false;
+			break;
+		case 24:
+			mode.bitDepth = 32;
+			break;
+		case 16:
+		case 15:
+			mode.bitDepth = 16;
+			break;
+		}
+		mode.width = dlg.m_width;
+		mode.height = dlg.m_height;
+		mode.frequency = dlg.m_refreshRate;
+		return true;
+	} else {
 		return false;
-		break;
 	}
-	return true;
-//  return false; when cancel is clicked
 }
 
 

@@ -20,8 +20,7 @@ Important:
 
 
 Less important:
-- Update 7-Zip code from 4.23 to current (4.57)
- -> Dropped: New 7-Zip code has too many problems, bad documentation
+- Support D3DFMT_A2R10G10B10 (10 bit per color component) color format
 
 - Add documentation for VBA-M (configuration guide)
 
