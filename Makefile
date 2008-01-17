@@ -1,7 +1,7 @@
 MACHINE= $(shell uname -s)
 CC=gcc
 CPPC=g++
-CFLAGS=-W -Wall -Wno-unused -O3 -DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DFINAL_VERSION -DBKPT_SUPPORT -DSDL -DSYSCONFDIR="home" -DUSE_OPENGL -DC_CORE
+CFLAGS=-W -Wall -Wno-unused -O3 -DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DBKPT_SUPPORT -DSDL -DSYSCONFDIR="home" -DUSE_OPENGL -DC_CORE
 CXXFLAGS=${CFLAGS}
 ASM=nasm
 ASMFLAGS=-w-orphan-labels -f elf -DELF -O1 -Isrc/hq/asm/
@@ -9,7 +9,7 @@ LFLAGS=-lz -lpng -lGL `sdl-config --libs`
 STRIP=strip -s
 DEL=rm -f
 OE=.o
-OUT=vba
+OUT=vbam
 
 ifeq ($(MACHINE),Darwin)
 	LFLAGS=-lz -lpng -framework OpenGL `sdl-config --libs`
@@ -20,7 +20,7 @@ ifeq ($(PLATFORM),win)
   LFLAGS=-lz -lpng -lSDL -lwsock32 -lopengl32
   DELETECOMMAND = del
   OE=.obj
-  OUT=vba.exe
+  OUT=vbam.exe
 endif
 
 ifeq ($(PLATFORM),win-cross)
@@ -30,7 +30,11 @@ ifeq ($(PLATFORM),win-cross)
   LFLAGS=-lz -lpng -lSDL -lwsock32 -lopengl32
   STRIP=i586-mingw32-strip -s
   OE=.obj
-  OUT=vba.exe
+  OUT=vbam.exe
+endif
+
+ifndef $(PREFIX)
+  PREFIX=/usr/local
 endif
 
 MAINDIR=src
@@ -102,4 +106,8 @@ ${OUT}: ${OBJECTS}
 	$(STRIP) $@
 
 clean:
-	$(DEL) ${OUT} ${OBJECTS} 
+	$(DEL) ${OUT} ${OBJECTS}
+
+install: ${OUT}
+	install -d $(DESTDIR)$(PREFIX)/bin
+	install ./${OUT} $(DESTDIR)$(PREFIX)/bin
