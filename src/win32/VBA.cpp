@@ -30,7 +30,6 @@
 #include "MainWnd.h"
 #include "Reg.h"
 #include "resource.h"
-#include "skin.h"
 #include "WavWriter.h"
 #include "WinResUtil.h"
 #include "Logging.h"
@@ -293,10 +292,6 @@ VBA::VBA()
 #endif
   glFilter = 0;
   GLSLShaders = 0;
-  skin = NULL;
-  skinName = "";
-  skinEnabled = false;
-  skinButtons = 0;
   regEnabled = false;
   pauseWhenInactive = true;
   speedupToggle = false;
@@ -408,10 +403,6 @@ VBA::~VBA()
     delete input;
 
   shutdownDisplay();
-
-  if(skin) {
-    delete skin;
-  }
 
   if(rewindMemory)
     free(rewindMemory);
@@ -579,17 +570,9 @@ BOOL VBA::InitInstance()
 void VBA::adjustDestRect()
 {
   POINT point;
-  RECT skinRect;
-  if(skin)
-    skinRect = skin->GetBlitRect();
 
   point.x = 0;
   point.y = 0;
-
-  if(skin) {
-    point.x = skinRect.left;
-    point.y = skinRect.top;
-  }
 
   m_pMainWnd->ClientToScreen(&point);
   dest.top = point.y;
@@ -597,11 +580,6 @@ void VBA::adjustDestRect()
 
   point.x = surfaceSizeX;
   point.y = surfaceSizeY;
-
-  if(skin) {
-    point.x = skinRect.right;
-    point.y = skinRect.bottom;
-  }
 
   m_pMainWnd->ClientToScreen(&point);
   dest.bottom = point.y;
@@ -614,9 +592,6 @@ void VBA::adjustDestRect()
     dest.bottom-= windowPositionY;
     dest.right -= windowPositionX;
   }
-
-  if(skin)
-    return;
 
   int menuSkip = 0;
 
@@ -953,9 +928,7 @@ void VBA::updateMenuBar()
   m_menu.Attach(winResLoadMenu(MAKEINTRESOURCE(IDR_MENU)));
   menu = (HMENU)m_menu;
 
-  // don't set a menu if skin is active
-  if(skin == NULL)
-    if(m_pMainWnd)
+  if(m_pMainWnd)
       m_pMainWnd->SetMenu(&m_menu);
 }
 
@@ -1572,10 +1545,6 @@ void VBA::loadSettings()
   winRtcEnable = regQueryDwordValue("rtcEnabled", 0) ? true : false;
   rtcEnable(winRtcEnable);
 
-  skinEnabled = regQueryDwordValue("skinEnabled", 0) ? true : false;
-
-  skinName = regQueryStringValue("skinName", "");
-
   switch(videoOption) {
   case VIDEO_320x240:
     fsWidth = 320;
@@ -1906,7 +1875,6 @@ void VBA::updateWindowSize(int value)
     winSizeX = dest.right-dest.left;
     winSizeY = dest.bottom-dest.top;
 
-    if(skin == NULL) {
       m_pMainWnd->SetWindowPos(0, //HWND_TOPMOST,
                                windowPositionX,
                                windowPositionY,
@@ -1919,7 +1887,8 @@ void VBA::updateWindowSize(int value)
       info.cbSize = sizeof(MENUBARINFO);
 	  theApp.m_pMainWnd->GetMenuBarInfo(OBJID_MENU, 0, &info);
       int menuHeight = GetSystemMetrics(SM_CYMENU); // includes white line
-      if((info.rcBar.bottom - info.rcBar.top) > menuHeight) {
+      if((info.rcBar.bottom - info.rcBar.top) > menuHeight)
+	  {
         winSizeY += (info.rcBar.bottom - info.rcBar.top) - menuHeight + 1;
         m_pMainWnd->SetWindowPos(
                                         0, //HWND_TOPMOST,
@@ -1929,7 +1898,6 @@ void VBA::updateWindowSize(int value)
                                         winSizeY,
                                         SWP_NOMOVE | SWP_SHOWWINDOW);
       }
-    }
   }
 
   adjustDestRect();
@@ -2100,10 +2068,6 @@ bool VBA::updateRenderMethod0(bool force)
 
   if(display) {
     if(display->getType() != renderMethod || force) {
-      if(skin) {
-        delete skin;
-        skin = NULL;
-      }
       initInput = true;
       changingVideoSize = true;
       shutdownDisplay();
@@ -2138,7 +2102,6 @@ bool VBA::updateRenderMethod0(bool force)
 
 	if( preInitialize() ) {
 		if( display->initialize() ) {
-			winUpdateSkin();
 			if( initInput ) {
 				if( !this->initInput() ) {
 					changingVideoSize = false;
@@ -2181,33 +2144,6 @@ void VBA::directXMessage(const char *msg)
   systemMessage(IDS_DIRECTX_7_REQUIRED,
                 "DirectX 7.0 or greater is required to run.\nDownload at http://www.microsoft.com/directx.\n\nError found at: %s",
                 msg);
-}
-
-void VBA::winUpdateSkin()
-{
-#ifndef NO_SKINS
-  skinButtons = 0;
-  if(skin) {
-    delete skin;
-    skin = NULL;
-  }
-
-  if(!skinName.IsEmpty() && skinEnabled && display->isSkinSupported()) {
-    skin = new CSkin();
-    if(skin->Initialize(skinName)) {
-      skin->Hook(m_pMainWnd);
-      skin->Enable(true);
-    } else {
-      delete skin;
-      skin = NULL;
-    }
-  }
-
-  if(!skin) {
-    adjustDestRect();
-    updateMenuBar();
-  }
-#endif
 }
 
 void VBA::updatePriority()
@@ -2560,10 +2496,6 @@ void VBA::saveSettings()
   regSetDwordValue("agbPrint", agbPrintIsEnabled());
 
   regSetDwordValue("rtcEnabled", winRtcEnable);
-
-  regSetDwordValue("skinEnabled", skinEnabled);
-
-  regSetStringValue("skinName", skinName);
 
   regSetDwordValue("borderOn", winGbBorderOn);
   regSetDwordValue("borderAutomatic", gbBorderAutomatic);

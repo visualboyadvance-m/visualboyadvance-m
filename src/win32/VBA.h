@@ -38,8 +38,6 @@
 #include "../System.h"
 #include "../Util.h"
 
-#include "skin.h"
-
 /////////////////////////////////////////////////////////////////////////////
 // VBA:
 // See VBA.cpp for the implementation of this class
@@ -67,7 +65,6 @@ enum pixelFilterType
 
 #define REWIND_SIZE 400000
 
-//class CSkin;
 class AVIWrite;
 class WavWriter;
 
@@ -163,10 +160,6 @@ class VBA : public CWinApp
   int glFilter;
   int GLSLShaders;
   bool dinputKeyFocus;
-  CSkin *skin;
-  CString skinName;
-  bool skinEnabled;
-  int skinButtons;
   bool pauseWhenInactive;
   bool speedupToggle;
   bool winGbPrinterEnabled;
@@ -259,7 +252,6 @@ class VBA : public CWinApp
   bool detectMMX();
 #endif
   void updatePriority();
-  void winUpdateSkin();
   void directXMessage(const char *msg);
   void shutdownDisplay();
   bool preInitialize();

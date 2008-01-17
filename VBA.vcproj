@@ -55,7 +55,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\dependencies\zlib;..\dependencies\libpng\src;&quot;..\dependencies\File_Extractor-0.4.3\fex&quot;;..\dependencies\cximage;..\dependencies\msvc"
+				AdditionalIncludeDirectories="..\dependencies\zlib;..\dependencies\libpng\src;&quot;..\dependencies\File_Extractor-0.4.3\fex&quot;;..\dependencies\msvc"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;MMX;BKPT_SUPPORT;GBA_LOGGING"
 				StringPooling="false"
 				MinimalRebuild="true"
@@ -164,7 +164,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\dependencies\zlib;..\dependencies\libpng\src;&quot;..\dependencies\File_Extractor-0.4.3\fex&quot;;..\dependencies\cximage;..\dependencies\msvc"
+				AdditionalIncludeDirectories="..\dependencies\zlib;..\dependencies\libpng\src;&quot;..\dependencies\File_Extractor-0.4.3\fex&quot;;..\dependencies\msvc"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;BKPT_SUPPORT;GBA_LOGGING;C_CORE;NO_ASM"
 				StringPooling="false"
 				MinimalRebuild="true"
@@ -278,7 +278,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\dependencies\zlib;..\dependencies\libpng\src;&quot;..\dependencies\File_Extractor-0.4.3\fex&quot;;..\dependencies\cximage;..\dependencies\msvc"
+				AdditionalIncludeDirectories="..\dependencies\zlib;..\dependencies\libpng\src;&quot;..\dependencies\File_Extractor-0.4.3\fex&quot;;..\dependencies\msvc"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;MMX;BKPT_SUPPORT;GBA_LOGGING;FINAL_VERSION"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
@@ -401,7 +401,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\dependencies\zlib;..\dependencies\libpng\src;&quot;..\dependencies\File_Extractor-0.4.3\fex&quot;;..\dependencies\cximage;..\dependencies\msvc"
+				AdditionalIncludeDirectories="..\dependencies\zlib;..\dependencies\libpng\src;&quot;..\dependencies\File_Extractor-0.4.3\fex&quot;;..\dependencies\msvc"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;BKPT_SUPPORT;GBA_LOGGING;FINAL_VERSION;C_CORE;NO_ASM"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
@@ -998,14 +998,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\win32\skin.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\win32\skinButton.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\win32\StringTokenizer.cpp"
 					>
 				</File>
@@ -1557,10 +1549,6 @@
 				</File>
 				<File
 					RelativePath=".\src\win32\SelectPlugin.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\win32\skin.h"
 					>
 				</File>
 				<File
