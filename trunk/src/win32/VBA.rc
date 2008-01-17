@@ -1616,7 +1616,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Screen Capture...",           ID_FILE_SCREENCAPTURE
         MENUITEM "ROM Information...",          ID_FILE_ROMINFORMATION
-        MENUITEM "Toggle Menu",                 ID_FILE_TOGGLEMENU
+        MENUITEM "Toggle Fullscreen",           ID_FILE_TOGGLEMENU
         MENUITEM SEPARATOR
         MENUITEM "Close",                       ID_FILE_CLOSE
         MENUITEM SEPARATOR
@@ -1859,11 +1859,17 @@ BEGIN
                 MENUITEM "Flash 64 KB",                 ID_OPTIONS_EMULATOR_SAVETYPE_FLASH512K
                 MENUITEM "Flash 128 KB",                ID_OPTIONS_EMULATOR_SAVETYPE_FLASH1M
             END
-            MENUITEM SEPARATOR
             POPUP "Screenshot &Format"
             BEGIN
                 MENUITEM "&PNG",                        ID_OPTIONS_EMULATOR_PNGFORMAT
                 MENUITEM "&BMP",                        ID_OPTIONS_EMULATOR_BMPFORMAT
+            END
+            MENUITEM SEPARATOR
+            POPUP "UI &Language"
+            BEGIN
+                MENUITEM "&System",                     ID_OPTIONS_LANGUAGE_SYSTEM
+                MENUITEM "&English",                    ID_OPTIONS_LANGUAGE_ENGLISH
+                MENUITEM "&Other...",                   ID_OPTIONS_LANGUAGE_OTHER
             END
         END
         POPUP "&Gameboy"
@@ -1884,20 +1890,6 @@ BEGIN
             MENUITEM "LCD colors",                  ID_OPTIONS_FILTER_LCDCOLORS
             MENUITEM SEPARATOR
             MENUITEM "&Colors...",                  ID_OPTIONS_GAMEBOY_COLORS
-        END
-        POPUP "&User Interface"
-        BEGIN
-            POPUP "&Language"
-            BEGIN
-                MENUITEM "&System",                     ID_OPTIONS_LANGUAGE_SYSTEM
-                MENUITEM "&English",                    ID_OPTIONS_LANGUAGE_ENGLISH
-                MENUITEM "&Other...",                   ID_OPTIONS_LANGUAGE_OTHER
-            END
-            POPUP "&Skin"
-            BEGIN
-                MENUITEM "&Use",                        ID_SKIN_USE
-                MENUITEM "&Select",                     ID_SKIN_SELECT
-            END
         END
         POPUP "&Link", GRAYED
         BEGIN

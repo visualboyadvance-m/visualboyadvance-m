@@ -29,7 +29,6 @@
 #include "MaxScale.h"
 #include "Reg.h"
 #include "RewindInterval.h"
-#include "skin.h"
 #include "Throttle.h"
 #include "WinResUtil.h"
 #include "SelectPlugin.h"
@@ -1744,77 +1743,6 @@ void MainWnd::OnOptionsSelectPlugin()
   }
 }
 
-void MainWnd::OnSkinUse()
-{
-#ifndef NO_SKINS
-	theApp.skinEnabled = !theApp.skinEnabled;
-	theApp.updateRenderMethod(true);
-	theApp.winAccelMgr.UpdateMenu(theApp.menu);
-#else
-	systemMessage( 0, _T("This build of VBA does not support skins!") );
-#endif
-}
-
-void MainWnd::OnUpdateSkinUse(CCmdUI *pCmdUI)
-{
-#ifndef NO_SKINS
-	pCmdUI->SetCheck( theApp.skinEnabled );
-	pCmdUI->Enable( theApp.display && theApp.display->isSkinSupported() && theApp.videoOption <= VIDEO_4X );
-#endif
-}
-
-void MainWnd::OnSkinSelect()
-{
-#ifndef NO_SKINS
-	LPCTSTR exts[] = { ".ini" };
-	CString filter = winLoadFilter( IDS_FILTER_INI );
-	CString title = winResLoadString( IDS_SELECT_SKIN_FILE );
-
-	FileDlg dlg(
-		this,
-		theApp.skinName,
-		filter,
-		0,
-		"INI",
-		exts,
-		"",
-		title,
-		false);
-
-	if( dlg.DoModal() == IDCANCEL ) {
-		return;
-	}
-	
-	bool result = false;
-	if( !theApp.skinEnabled ) {
-		theApp.skinEnabled = !theApp.skinEnabled;
-		regSetDwordValue( "skinEnabled", theApp.skinEnabled );
-	}
-
-	if( theApp.skin && theApp.skinEnabled ) {
-		delete theApp.skin;
-		theApp.skin = NULL;
-	}
-
-	theApp.skinName = dlg.GetPathName();
-
-	theApp.winUpdateSkin();
-	theApp.winAccelMgr.UpdateMenu( theApp.menu );
-#else
-	systemMessage( 0, _T("This build of VBA does not support skins!") );
-#endif
-}
-
-void MainWnd::OnUpdateSkinSelect(CCmdUI *pCmdUI)
-{
-#ifndef NO_SKINS
-	pCmdUI->Enable(
-		theApp.display &&
-		theApp.display->isSkinSupported() &&
-		theApp.videoOption <= VIDEO_4X
-		);
-#endif
-}
 
 void MainWnd::OnOutputapiDirectsound()
 {

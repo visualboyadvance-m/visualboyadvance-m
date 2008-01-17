@@ -200,10 +200,6 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsVideoRenderoptionsGlquads(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsGlpolygons();
   afx_msg void OnUpdateOptionsVideoRenderoptionsGlpolygons(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsVideoRenderoptionsSelectskin();
-  afx_msg void OnUpdateOptionsVideoRenderoptionsSelectskin(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsVideoRenderoptionsSkin();
-  afx_msg void OnUpdateOptionsVideoRenderoptionsSkin(CCmdUI* pCmdUI);
   afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
   afx_msg void OnOptionsEmulatorAssociate();
   afx_msg void OnOptionsEmulatorDirectories();
@@ -418,10 +414,6 @@ public:
 	afx_msg void OnUpdateOptionsLinkRFU(CCmdUI* pCmdUI) ;
 	afx_msg void OnOptionsLinkEnable() ;
 	afx_msg void OnUpdateOptionsLinkEnable(CCmdUI* pCmdUI) ;
-	afx_msg void OnSkinUse();
-	afx_msg void OnUpdateSkinUse(CCmdUI *pCmdUI);
-	afx_msg void OnSkinSelect();
-	afx_msg void OnUpdateSkinSelect(CCmdUI *pCmdUI);
 	afx_msg void OnOutputapiDirectsound();
 	afx_msg void OnUpdateOutputapiDirectsound(CCmdUI *pCmdUI);
 	afx_msg void OnOutputapiOpenal();
