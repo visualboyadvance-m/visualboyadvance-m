@@ -1662,32 +1662,6 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="doc"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-			<File
-				RelativePath=".\res\DevInfo.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\res\gpl.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\res\Known Bugs.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\res\ReadMe.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\src\win32\VBA-M.ico"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="hq"
 			>
 			<Filter
