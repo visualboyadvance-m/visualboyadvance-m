@@ -33,7 +33,6 @@ class IDisplay {
 
   struct VIDEO_MODE
   {
-	  GUID        *adapter_ddraw;
 	  unsigned int adapter;
 	  unsigned int width;
 	  unsigned int height;
@@ -44,7 +43,6 @@ class IDisplay {
   virtual bool initialize() = 0;
   virtual void cleanup() = 0;
   virtual void render() = 0;
-  virtual void checkFullScreen() {};
   virtual void clear() = 0;
   virtual bool changeRenderSize(int w, int h) { return true; };
   virtual void resize(int w, int h) {};

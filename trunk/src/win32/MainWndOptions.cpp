@@ -27,7 +27,6 @@
 #include "GBColorDlg.h"
 #include "Joypad.h"
 #include "MaxScale.h"
-#include "ModeConfirm.h"
 #include "Reg.h"
 #include "RewindInterval.h"
 #include "skin.h"
@@ -49,8 +48,6 @@
 #include <tchar.h>
 
 extern int emulating;
-
-#define VBA_CONFIRM_MODE WM_APP + 100
 
 extern void CPUUpdateRenderBuffers(bool force);
 
@@ -337,8 +334,6 @@ void MainWnd::OnOptionsVideoFullscreen1280x1024()
 
 void MainWnd::OnOptionsVideoFullscreen()
 {
-  theApp.winCheckFullscreen();
-
   IDisplay::VIDEO_MODE mode;
   ZeroMemory( &mode, sizeof(IDisplay::VIDEO_MODE) );
 
@@ -347,7 +342,6 @@ void MainWnd::OnOptionsVideoFullscreen()
 		  ( mode.height != theApp.fsHeight ) ||
 		  ( mode.bitDepth != theApp.fsColorDepth ) ||
 		  ( mode.frequency != theApp.fsFrequency ) ||
-		  ( mode.adapter_ddraw != theApp.pVideoDriverGUID ) ||
 		  ( mode.adapter != theApp.fsAdapter ) ||
 		  ( theApp.videoOption != VIDEO_OTHER ) )
 	  {
@@ -356,16 +350,7 @@ void MainWnd::OnOptionsVideoFullscreen()
 		  theApp.fsHeight = mode.height;
 		  theApp.fsFrequency = mode.frequency;
 		  theApp.fsColorDepth = mode.bitDepth;
-		  theApp.pVideoDriverGUID = mode.adapter_ddraw;
 		  theApp.fsAdapter = mode.adapter;
-		  if( mode.adapter_ddraw ) {
-			  theApp.videoDriverGUID = *mode.adapter_ddraw;
-			  regSetDwordValue( "defaultVideoDriver", FALSE );
-			  regSetBinaryValue( "videoDriverGUID",
-				  (char *)mode.adapter_ddraw, sizeof(GUID) );
-		  } else {
-			  regSetDwordValue( "defaultVideoDriver", TRUE );
-		  }
 		  theApp.updateVideoSize( ID_OPTIONS_VIDEO_FULLSCREEN );
 	  }
   }
@@ -589,14 +574,12 @@ void MainWnd::OnOptionsVideoRenderingoptionsGLSLShaders()
 
 void MainWnd::OnOptionsEmulatorAssociate()
 {
-  theApp.winCheckFullscreen();
   Associate dlg;
   dlg.DoModal();
 }
 
 void MainWnd::OnOptionsEmulatorDirectories()
 {
-  theApp.winCheckFullscreen();
   Directories dlg;
   dlg.DoModal();
 }
@@ -673,11 +656,6 @@ void MainWnd::OnUpdateOptionsEmulatorRealtimeclock(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(theApp.winRtcEnable);
 }
 
-void MainWnd::OnOptionsEmulatorAutohidemenu()
-{
-  theApp.autoHideMenu = !theApp.autoHideMenu;
-}
-
 void MainWnd::OnOptionsEmulatorGenericflashcard()
 {
   if(emulating && theApp.cartridgeType == IMAGE_GB)
@@ -693,12 +671,6 @@ void MainWnd::OnUpdateOptionsEmulatorGenericflashcard(CCmdUI* pCmdUI)
 
   pCmdUI->Enable(emulating && theApp.cartridgeType == IMAGE_GB);
 }
-
-void MainWnd::OnUpdateOptionsEmulatorAutohidemenu(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(theApp.autoHideMenu);
-}
-
 
 void MainWnd::OnOptionsEmulatorRewindinterval()
 {
@@ -1271,7 +1243,6 @@ void MainWnd::OnUpdateOptionsGameboyGameboycolors(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsGameboyColors()
 {
-  theApp.winCheckFullscreen();
   GBColorDlg dlg;
   if(dlg.DoModal()) {
     gbPaletteOption = dlg.getWhich();
@@ -1536,7 +1507,6 @@ void MainWnd::OnUpdateOptionsLanguageEnglish(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsLanguageOther()
 {
-  theApp.winCheckFullscreen();
   theApp.winSetLanguageOption(2, false);
   theApp.winAccelMgr.UpdateMenu(theApp.menu);
 }
@@ -1549,7 +1519,6 @@ void MainWnd::OnUpdateOptionsLanguageOther(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsJoypadConfigure1()
 {
-  theApp.winCheckFullscreen();
   JoypadConfig dlg(0);
   dlg.DoModal();
 }
@@ -1561,7 +1530,6 @@ void MainWnd::OnUpdateOptionsJoypadConfigure1(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsJoypadConfigure2()
 {
-  theApp.winCheckFullscreen();
   JoypadConfig dlg(1);
   dlg.DoModal();
 }
@@ -1573,7 +1541,6 @@ void MainWnd::OnUpdateOptionsJoypadConfigure2(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsJoypadConfigure3()
 {
-  theApp.winCheckFullscreen();
   JoypadConfig dlg(2);
   dlg.DoModal();
 }
@@ -1585,7 +1552,6 @@ void MainWnd::OnUpdateOptionsJoypadConfigure3(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsJoypadConfigure4()
 {
-  theApp.winCheckFullscreen();
   JoypadConfig dlg(3);
   dlg.DoModal();
 }
@@ -1608,7 +1574,6 @@ void MainWnd::OnUpdateOptionsJoypadDefault(CCmdUI *pCmdUI)
 
 void MainWnd::OnOptionsJoypadMotionconfigure()
 {
-  theApp.winCheckFullscreen();
   MotionConfig dlg;
   dlg.DoModal();
 }
@@ -1683,32 +1648,9 @@ void MainWnd::OnUpdateOptionsJoypadAutofire(CCmdUI *pCmdUI)
   pCmdUI->SetCheck(check);
 }
 
-LRESULT MainWnd::OnConfirmMode(WPARAM, LPARAM)
-{
-  // we need to do this separately or the window will not have the right
-  // parent. must be related to the way MFC does modal dialogs
-  winConfirmMode();
-  return 0;
-}
-
-void MainWnd::winConfirmMode()
-{
-	if( theApp.videoOption > VIDEO_4X ) {
-		theApp.winCheckFullscreen();
-		ModeConfirm dlg(theApp.m_pMainWnd);
-
-		if(!dlg.DoModal()) {
-			theApp.updateVideoSize(ID_OPTIONS_VIDEO_X2);
-		}
-	}
-	theApp.winAccelMgr.UpdateMenu(theApp.menu);
-}
-
 void MainWnd::OnOptionsVideoFullscreenmaxscale()
 {
   MaxScale dlg;
-
-  theApp.winCheckFullscreen();
 
   dlg.DoModal();
 
@@ -1967,8 +1909,6 @@ void MainWnd::OnUpdateRenderapiD3dmotionblur(CCmdUI *pCmdUI)
 
 void MainWnd::OnEmulatorBiosfiles()
 {
-	theApp.winCheckFullscreen();
-
 	BIOSDialog dlg;
 	dlg.m_enableBIOS_GBA = theApp.useBiosFileGBA ? TRUE : FALSE;
 	dlg.m_enableBIOS_GB = theApp.useBiosFileGB ? TRUE : FALSE;

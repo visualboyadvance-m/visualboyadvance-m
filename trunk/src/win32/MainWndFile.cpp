@@ -44,7 +44,6 @@ extern void InterframeCleanup();
 
 void MainWnd::OnFileOpen()
 {
-	theApp.winCheckFullscreen();
 	if( fileOpenSelect( 0 ) ) {
 		FileRun();
 	}
@@ -166,7 +165,6 @@ void MainWnd::OnUpdateFileClose(CCmdUI* pCmdUI)
 
 void MainWnd::OnFileOpengameboy()
 {
-	theApp.winCheckFullscreen();
 	if( fileOpenSelect( 2 ) ) {
 		FileRun();
 	}
@@ -175,7 +173,6 @@ void MainWnd::OnFileOpengameboy()
 
 void MainWnd::OnFileOpenGbc()
 {
-	theApp.winCheckFullscreen();
 	if( fileOpenSelect( 1 ) ) {
 		FileRun();
 	}
@@ -184,7 +181,6 @@ void MainWnd::OnFileOpenGbc()
 
 void MainWnd::OnFileLoad()
 {
-  theApp.winCheckFullscreen();
   CString buffer;
   CString filename;
 
@@ -293,7 +289,6 @@ BOOL MainWnd::OnFileLoadSlot(UINT nID)
 
 void MainWnd::OnFileSave()
 {
-  theApp.winCheckFullscreen();
   CString buffer;
   CString filename;
 
@@ -390,7 +385,6 @@ BOOL MainWnd::OnFileSaveSlot(UINT nID)
 
 void MainWnd::OnFileImportBatteryfile()
 {
-  theApp.winCheckFullscreen();
   LPCTSTR exts[] = { ".sav", ".dat" };
   CString filter = winLoadFilter(IDS_FILTER_SAV);
   CString title = winResLoadString(IDS_SELECT_BATTERY_FILE);
@@ -442,7 +436,6 @@ void MainWnd::OnUpdateFileImportBatteryfile(CCmdUI* pCmdUI)
 
 void MainWnd::OnFileImportGamesharkcodefile()
 {
-  theApp.winCheckFullscreen();
   LPCTSTR exts[] = { "" };
   CString filter = theApp.cartridgeType == 0 ? winLoadFilter(IDS_FILTER_SPC) : winLoadFilter(IDS_FILTER_GCF);
   CString title = winResLoadString(IDS_SELECT_CODE_FILE);
@@ -476,7 +469,6 @@ void MainWnd::OnUpdateFileImportGamesharkcodefile(CCmdUI* pCmdUI)
 
 void MainWnd::OnFileImportGamesharksnapshot()
 {
-  theApp.winCheckFullscreen();
   LPCTSTR exts[] = { ".gbs" };
   CString filter = theApp.cartridgeType == 1 ? winLoadFilter(IDS_FILTER_GBS) : winLoadFilter(IDS_FILTER_SPS);
   CString title = winResLoadString(IDS_SELECT_SNAPSHOT_FILE);
@@ -507,7 +499,6 @@ void MainWnd::OnUpdateFileImportGamesharksnapshot(CCmdUI* pCmdUI)
 
 void MainWnd::OnFileExportBatteryfile()
 {
-  theApp.winCheckFullscreen();
   CString name;
 
   int index = theApp.filename.ReverseFind('\\');
@@ -570,7 +561,6 @@ void MainWnd::OnUpdateFileExportBatteryfile(CCmdUI* pCmdUI)
 
 void MainWnd::OnFileExportGamesharksnapshot()
 {
-  theApp.winCheckFullscreen();
   if(eepromInUse) {
     systemMessage(IDS_EEPROM_NOT_SUPPORTED, "EEPROM saves cannot be exported");
     return;
@@ -618,7 +608,6 @@ void MainWnd::OnUpdateFileExportGamesharksnapshot(CCmdUI* pCmdUI)
 
 void MainWnd::OnFileScreencapture()
 {
-  theApp.winCheckFullscreen();
   CString name;
   CString filename;
 
@@ -686,7 +675,6 @@ void MainWnd::OnUpdateFileScreencapture(CCmdUI* pCmdUI)
 
 void MainWnd::OnFileRominformation()
 {
-  theApp.winCheckFullscreen();
   if(theApp.cartridgeType == 0) {
     RomInfoGBA dlg(rom);
     dlg.DoModal();
@@ -703,34 +691,13 @@ void MainWnd::OnUpdateFileRominformation(CCmdUI* pCmdUI)
 
 void MainWnd::OnFileTogglemenu()
 {
-  if(theApp.videoOption <= VIDEO_4X) {
-	  theApp.updateWindowSize( theApp.lastFullscreen );
-	  return;
-  }
-
-  if(( theApp.renderMethod != -1 ))  { //either D3D OR OGL
-	  // display API does not support GDI objects in fullscreen
-	  theApp.updateWindowSize( theApp.lastWindowed );
-	  return;
-  }
-
-  theApp.menuToggle = !theApp.menuToggle;
-
-  if(theApp.menuToggle) {
-    theApp.updateMenuBar();
-    if(theApp.tripleBuffering) {
-      if(theApp.display)
-        theApp.display->checkFullScreen();
-      DrawMenuBar();
-    }
-  } else {
-    SetMenu(NULL);
-    DestroyMenu(theApp.menu);
-  }
-
-  theApp.adjustDestRect();
-  if(theApp.display)
-    theApp.display->resize(theApp.dest.right-theApp.dest.left, theApp.dest.bottom-theApp.dest.top);
+	if( theApp.videoOption <= VIDEO_4X ) {
+		// switch to full screen
+		theApp.updateWindowSize( theApp.lastFullscreen );
+	} else {
+		// switch to windowed mode
+		theApp.updateWindowSize( theApp.lastWindowed );
+	}
 }
 
 void MainWnd::OnUpdateFileTogglemenu(CCmdUI* pCmdUI)

@@ -33,7 +33,6 @@ extern int emulating;
 
 void MainWnd::OnCheatsSearchforcheats()
 {
-  theApp.winCheckFullscreen();
   if(theApp.cartridgeType == 0) {
     GBACheatSearch dlg;
     dlg.DoModal();
@@ -50,7 +49,6 @@ void MainWnd::OnUpdateCheatsSearchforcheats(CCmdUI* pCmdUI)
 
 void MainWnd::OnCheatsCheatlist()
 {
-  theApp.winCheckFullscreen();
   if(theApp.cartridgeType == 0) {
     GBACheatList dlg;
     dlg.DoModal();
@@ -77,7 +75,6 @@ void MainWnd::OnUpdateCheatsAutomaticsaveloadcheats(CCmdUI* pCmdUI)
 
 void MainWnd::OnCheatsLoadcheatlist()
 {
-  theApp.winCheckFullscreen();
   CString buffer;
   CString filename;
 
@@ -116,7 +113,6 @@ void MainWnd::OnUpdateCheatsLoadcheatlist(CCmdUI* pCmdUI)
 
 void MainWnd::OnCheatsSavecheatlist()
 {
-  theApp.winCheckFullscreen();
   CString buffer;
   CString filename;
 
