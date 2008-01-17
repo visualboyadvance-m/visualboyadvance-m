@@ -1,6 +1,6 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "resource.h"
+#include "resource."
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -893,17 +893,6 @@ BEGIN
     LTEXT           "Size:",IDC_STATIC,7,29,65,8
 END
 
-IDD_MODES DIALOG  0, 0, 208, 129
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Select video mode"
-FONT 8, "MS Sans Serif"
-BEGIN
-    LISTBOX         IDC_MODES,7,18,194,80,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    DEFPUSHBUTTON   "OK",ID_OK,45,108,50,14
-    PUSHBUTTON      "Cancel",ID_CANCEL,112,108,50,14
-    LTEXT           "Available video modes:",IDC_STATIC,7,7,194,8
-END
-
 IDD_DRIVERS DIALOG  0, 0, 208, 121
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Select video driver"
@@ -1089,17 +1078,6 @@ BEGIN
     LTEXT           "Value:",IDC_STATIC,7,165,38,8
     LTEXT           "Click on a color for more information",IDC_STATIC,7,7,182,8
     CONTROL         "Automatic update",IDC_AUTO_UPDATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,178,71,10
-END
-
-IDD_MODE_CONFIRM DIALOG  0, 0, 186, 57
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Confirm mode"
-FONT 8, "MS Sans Serif"
-BEGIN
-    DEFPUSHBUTTON   "OK",ID_OK,31,36,50,14
-    PUSHBUTTON      "Cancel",ID_CANCEL,103,36,50,14
-    CTEXT           "Do you want to keep the current mode?",IDC_STATIC,7,7,172,8
-    CTEXT           "",IDC_TIMER,7,19,172,8,SS_NOPREFIX,WS_EX_TOOLWINDOW
 END
 
 IDD_REWIND_INTERVAL DIALOG  0, 0, 186, 68
@@ -1460,14 +1438,6 @@ BEGIN
         BOTTOMMARGIN, 60
     END
 
-    IDD_MODES, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 201
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 122
-    END
-
     IDD_DRIVERS, DIALOG
     BEGIN
         LEFTMARGIN, 7
@@ -1522,14 +1492,6 @@ BEGIN
         RIGHTMARGIN, 189
         TOPMARGIN, 7
         BOTTOMMARGIN, 227
-    END
-
-    IDD_MODE_CONFIRM, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 179
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 50
     END
 
     IDD_REWIND_INTERVAL, DIALOG
@@ -1877,7 +1839,6 @@ BEGIN
             MENUITEM "AGB Print",                   ID_OPTIONS_EMULATOR_AGBPRINT
             MENUITEM "Real Time Clock",             ID_OPTIONS_EMULATOR_REALTIMECLOCK
             MENUITEM "&Game Overrides...",          ID_OPTIONS_EMULATOR_GAMEOVERRIDES
-            MENUITEM "Auto hide menu",              ID_OPTIONS_EMULATOR_AUTOHIDEMENU
             POPUP "Show speed"
             BEGIN
                 MENUITEM "None",                        ID_OPTIONS_EMULATOR_SHOWSPEED_NONE

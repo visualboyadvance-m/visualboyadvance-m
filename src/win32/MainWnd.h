@@ -56,7 +56,6 @@ class MainWnd : public CWnd
   void screenCapture(int captureNumber);
   HACCEL m_hAccelTable;
   bool fileOpenSelect( int system );
-  afx_msg LRESULT OnConfirmMode(WPARAM, LPARAM);
   afx_msg LRESULT OnMySysCommand(WPARAM, LPARAM);
   afx_msg void OnUpdateFileLoadGameSlot(CCmdUI *pCmdUI);
   afx_msg void OnUpdateFileSaveGameSlot(CCmdUI *pCmdUI);
@@ -78,7 +77,6 @@ class MainWnd : public CWnd
   afx_msg void OnSystemMinimize();
   afx_msg void OnUpdateVideoLayer(CCmdUI* pCmdUI);
   afx_msg BOOL OnVideoLayer(UINT nID);
-  void winConfirmMode();
   afx_msg BOOL OnOptionVideoSize(UINT nID);
   afx_msg BOOL OnOptionsFrameskip(UINT nID);
   bool fileImportGSACodeFile(CString& fileName);
@@ -225,8 +223,6 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsEmulatorRealtimeclock(CCmdUI* pCmdUI);
   afx_msg void OnOptionsEmulatorGenericflashcard();
   afx_msg void OnUpdateOptionsEmulatorGenericflashcard(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsEmulatorAutohidemenu();
-  afx_msg void OnUpdateOptionsEmulatorAutohidemenu(CCmdUI* pCmdUI);
   afx_msg void OnOptionsEmulatorRewindinterval();
   afx_msg void OnOptionsEmulatorSavetypeAutomatic();
   afx_msg void OnUpdateOptionsEmulatorSavetypeAutomatic(CCmdUI* pCmdUI);

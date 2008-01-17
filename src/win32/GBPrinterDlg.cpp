@@ -486,7 +486,6 @@ void systemGbPrint(u8 *data,
                    int palette,
                    int contrast)
 {
-  theApp.winCheckFullscreen();
   GBPrinterDlg printer;
   printer.processData(data);
   printer.DoModal();

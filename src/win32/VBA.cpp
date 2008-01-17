@@ -17,8 +17,12 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-// VBA.cpp : Defines the class behaviors for the application.
-//
+#ifdef NO_D3D
+#ifdef NO_OGL
+#error NO_D3D and NO_OGL must not be defined at the same time.
+#endif
+#endif
+
 #include "stdafx.h"
 
 #include "AVIWrite.h"
@@ -271,13 +275,11 @@ VBA::VBA()
   rewindTimer = 0;
   captureFormat = 0;
   tripleBuffering = true;
-  autoHideMenu = false;
   throttle = 0;
   autoFrameSkipLastTime = 0;
   autoFrameSkip = false;
   vsync = false;
   changingVideoSize = false;
-  pVideoDriverGUID = NULL;
   renderMethod = DIRECT_3D;
   audioAPI = DIRECTSOUND;
 #ifndef NO_OAL
@@ -528,8 +530,6 @@ BOOL VBA::InitInstance()
   if(!initDisplay()) {
     if(videoOption >= VIDEO_320x240) {
       regSetDwordValue("video", VIDEO_1X);
-      if(pVideoDriverGUID)
-        regSetDwordValue("defaultVideoDriver", TRUE);
     }
     return FALSE;
   }
@@ -1087,8 +1087,6 @@ void systemMessage(int number, const char *defaultMsg, ...)
   va_start(valist, defaultMsg);
   buffer.FormatV(msg, valist);
 
-  theApp.winCheckFullscreen();
-
   AfxGetApp()->m_pMainWnd->MessageBox(buffer, winResLoadString(IDS_ERROR), MB_OK|MB_ICONERROR);
 
   va_end(valist);
@@ -1422,19 +1420,6 @@ void VBA::loadSettings()
   if(videoOption < VIDEO_1X || videoOption > VIDEO_OTHER)
     videoOption = VIDEO_3X;
 
-  bool defaultVideoDriver = regQueryDwordValue("defaultVideoDriver", true) ?
-    true : false;
-
-  if(!regQueryBinaryValue("videoDriverGUID", (char *)&videoDriverGUID,
-                          sizeof(GUID))) {
-    defaultVideoDriver = TRUE;
-  }
-
-  if(defaultVideoDriver)
-    pVideoDriverGUID = NULL;
-  else
-    pVideoDriverGUID = &videoDriverGUID;
-
   fsAdapter = regQueryDwordValue("fsAdapter", 0);
   fsWidth = regQueryDwordValue("fsWidth", 800);
   fsHeight = regQueryDwordValue("fsHeight", 600);
@@ -1449,12 +1434,13 @@ void VBA::loadSettings()
   }
 
   renderMethod = (DISPLAY_TYPE)regQueryDwordValue("renderMethod", DIRECT_3D);
-  if( ( renderMethod != DIRECT_3D )
+  if( ( renderMethod != DIRECT_3D ) && ( renderMethod != OPENGL ) ) {
 #ifndef NO_OGL
-	  && ( renderMethod != OPENGL )
+	  renderMethod = OPENGL;
 #endif
-	  ) {
-		  renderMethod = DIRECT_3D;
+#ifndef NO_D3D
+	  renderMethod = DIRECT_3D;
+#endif
   }
 
   audioAPI = (AUDIO_API)regQueryDwordValue( "audioAPI", DIRECTSOUND );
@@ -1585,8 +1571,6 @@ void VBA::loadSettings()
 
   winRtcEnable = regQueryDwordValue("rtcEnabled", 0) ? true : false;
   rtcEnable(winRtcEnable);
-
-  autoHideMenu = regQueryDwordValue("autoHideMenu", 0) ? true : false;
 
   skinEnabled = regQueryDwordValue("skinEnabled", 0) ? true : false;
 
@@ -1815,8 +1799,6 @@ void VBA::updateWindowSize(int value)
          videoOption == VIDEO_1280x1024 ||
          videoOption == VIDEO_OTHER) {
         regSetDwordValue("video", VIDEO_1X);
-        if(pVideoDriverGUID)
-          regSetDwordValue("defaultVideoDriver", TRUE);
       }
       changingVideoSize = false;
       AfxPostQuitMessage(0);
@@ -2185,16 +2167,6 @@ bool VBA::updateRenderMethod0(bool force)
 }
 
 
-void VBA::winCheckFullscreen()
-{
-	if(videoOption > VIDEO_4X && tripleBuffering) {
-		if(display) {
-			display->checkFullScreen();
-		}
-	}
-}
-
-
 void VBA::shutdownDisplay()
 {
   if(display != NULL) {
@@ -2504,14 +2476,6 @@ void VBA::saveSettings()
 
   regSetDwordValue("video", videoOption);
 
-  regSetDwordValue("defaultVideoDriver", pVideoDriverGUID == NULL);
-
-  if(pVideoDriverGUID) {
-    regSetBinaryValue("videoDriverGUID", (char *)&videoDriverGUID,
-                      sizeof(GUID));
-  }
-
-
   regSetDwordValue("fsAdapter", fsAdapter);
   regSetDwordValue("fsWidth", fsWidth);
   regSetDwordValue("fsHeight", fsHeight);
@@ -2596,8 +2560,6 @@ void VBA::saveSettings()
   regSetDwordValue("agbPrint", agbPrintIsEnabled());
 
   regSetDwordValue("rtcEnabled", winRtcEnable);
-
-  regSetDwordValue("autoHideMenu", autoHideMenu);
 
   regSetDwordValue("skinEnabled", skinEnabled);
 
