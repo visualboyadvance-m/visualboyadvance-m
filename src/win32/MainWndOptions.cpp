@@ -305,9 +305,6 @@ void MainWnd::OnUpdateOptionsVideoFullscreen1280x1024(CCmdUI *pCmdUI)
 BOOL MainWnd::OnOptionVideoSize(UINT nID)
 {
 	theApp.updateVideoSize(nID);
-	if( theApp.renderMethod == DIRECT_DRAW ) {
-		theApp.m_pMainWnd->PostMessage(VBA_CONFIRM_MODE);
-	}
 	return TRUE;
 }
 
@@ -370,9 +367,6 @@ void MainWnd::OnOptionsVideoFullscreen()
 			  regSetDwordValue( "defaultVideoDriver", TRUE );
 		  }
 		  theApp.updateVideoSize( ID_OPTIONS_VIDEO_FULLSCREEN );
-		  if( theApp.renderMethod == DIRECT_DRAW ) {
-			  theApp.m_pMainWnd->PostMessage(VBA_CONFIRM_MODE);
-		  }
 	  }
   }
   theApp.winAccelMgr.UpdateMenu(theApp.menu);
@@ -438,17 +432,6 @@ void MainWnd::OnUpdateVideoLayer(CCmdUI *pCmdUI)
   }
 }
 
-void MainWnd::OnOptionsVideoRendermethodDirectdraw()
-{
-  theApp.renderMethod = DIRECT_DRAW;
-  theApp.updateRenderMethod(false);
-  theApp.winAccelMgr.UpdateMenu(theApp.menu);
-}
-
-void MainWnd::OnUpdateOptionsVideoRendermethodDirectdraw(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(theApp.renderMethod == DIRECT_DRAW);
-}
 
 void MainWnd::OnOptionsVideoRendermethodDirect3d()
 {
@@ -501,34 +484,6 @@ void MainWnd::OnUpdateOptionsVideoTriplebuffering(CCmdUI* pCmdUI)
 	pCmdUI->SetCheck(theApp.tripleBuffering);
 }
 
-void MainWnd::OnOptionsVideoDdrawemulationonly()
-{
-	theApp.ddrawEmulationOnly = !theApp.ddrawEmulationOnly;
-	if( theApp.display ) {
-		theApp.display->setOption( _T("ddrawEmulationOnly"), theApp.ddrawEmulationOnly );
-	}
-}
-
-
-void MainWnd::OnUpdateOptionsVideoDdrawemulationonly(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(theApp.ddrawEmulationOnly);
-}
-
-
-void MainWnd::OnOptionsVideoDdrawusevideomemory()
-{
-	theApp.ddrawUseVideoMemory = !theApp.ddrawUseVideoMemory;
-	if( theApp.display ) {
-		theApp.display->setOption( _T("ddrawUseVideoMemory"), theApp.ddrawUseVideoMemory );
-	}
-}
-
-
-void MainWnd::OnUpdateOptionsVideoDdrawusevideomemory(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(theApp.ddrawUseVideoMemory);
-}
 
 void MainWnd::OnOptionsVideoRenderoptionsD3dnofilter()
 {

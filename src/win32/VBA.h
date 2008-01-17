@@ -159,10 +159,6 @@ class VBA : public CWinApp
   int oalBufferCount;
 #endif
   bool iconic;
-  bool ddrawEmulationOnly;
-  bool ddrawUsingEmulationOnly;
-  bool ddrawDebug;
-  bool ddrawUseVideoMemory;
 #ifndef NO_D3D
   int d3dFilter;
   bool d3dMotionBlur;

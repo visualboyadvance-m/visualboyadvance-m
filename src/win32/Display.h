@@ -22,9 +22,8 @@
 #include <memory.h>
 
 enum DISPLAY_TYPE {
-  DIRECT_DRAW = 0,
-  DIRECT_3D = 1,
-  OPENGL = 2
+  DIRECT_3D = 0,
+  OPENGL = 1
 };
 
 class IDisplay {

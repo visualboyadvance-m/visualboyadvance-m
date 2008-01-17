@@ -186,10 +186,6 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsVideoRendermethodOpengl(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoTriplebuffering();
   afx_msg void OnUpdateOptionsVideoTriplebuffering(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsVideoDdrawemulationonly();
-  afx_msg void OnUpdateOptionsVideoDdrawemulationonly(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsVideoDdrawusevideomemory();
-  afx_msg void OnUpdateOptionsVideoDdrawusevideomemory(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsD3dnofilter();
   afx_msg void OnUpdateOptionsVideoRenderoptionsD3dnofilter(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsD3dbilinear();
