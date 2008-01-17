@@ -1666,10 +1666,6 @@ BEGIN
         BEGIN
             POPUP "Render API"
             BEGIN
-                MENUITEM "Direct&Draw",                 ID_OPTIONS_VIDEO_RENDERMETHOD_DIRECTDRAW
-                MENUITEM "   Emulation only",           ID_OPTIONS_VIDEO_DDRAWEMULATIONONLY
-                MENUITEM "   Use &Video Memory",        ID_OPTIONS_VIDEO_DDRAWUSEVIDEOMEMORY
-                MENUITEM SEPARATOR
                 MENUITEM "Direct&3D",                   ID_OPTIONS_VIDEO_RENDERMETHOD_DIRECT3D
                 MENUITEM "   Filter: Nearest",          ID_OPTIONS_VIDEO_RENDEROPTIONS_D3DNOFILTER
                 MENUITEM "   Filter: Bilinear",         ID_OPTIONS_VIDEO_RENDEROPTIONS_D3DBILINEAR
