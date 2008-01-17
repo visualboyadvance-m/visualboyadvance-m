@@ -278,17 +278,13 @@ VBA::VBA()
   vsync = false;
   changingVideoSize = false;
   pVideoDriverGUID = NULL;
-  renderMethod = DIRECT_DRAW;
+  renderMethod = DIRECT_3D;
   audioAPI = DIRECTSOUND;
 #ifndef NO_OAL
   oalDevice = NULL;
   oalBufferCount = 5;
 #endif
   iconic = false;
-  ddrawEmulationOnly = false;
-  ddrawUsingEmulationOnly = false;
-  ddrawDebug = false;
-  ddrawUseVideoMemory = false;
 #ifndef NO_D3D
   d3dFilter = 0;
   d3dMotionBlur = false;
@@ -506,10 +502,6 @@ BOOL VBA::InitInstance()
                                      "debug",
                                      0,
                                      MakeInstanceFilename("VBA.ini"));
-  ddrawDebug = GetPrivateProfileInt("config",
-                                    "ddrawDebug",
-                                    0,
-                                    MakeInstanceFilename("VBA.ini")) ? true : false;
 
   wndClass = AfxRegisterWndClass(0, LoadCursor(IDC_ARROW), (HBRUSH)GetStockObject(BLACK_BRUSH), LoadIcon(IDI_MAINICON));
 
@@ -954,7 +946,7 @@ void VBA::updateMenuBar()
     popup = NULL;
   }
 
-  if( ( renderMethod != DIRECT_DRAW ) && ( videoOption >= VIDEO_320x240 ) ) {
+  if( ( videoOption >= VIDEO_320x240 ) ) {
 	  return;
   }
 
@@ -1456,16 +1448,13 @@ void VBA::loadSettings()
       videoOption = 0;
   }
 
-  renderMethod = (DISPLAY_TYPE)regQueryDwordValue("renderMethod", DIRECT_DRAW);
-  if( ( renderMethod != DIRECT_DRAW )
+  renderMethod = (DISPLAY_TYPE)regQueryDwordValue("renderMethod", DIRECT_3D);
+  if( ( renderMethod != DIRECT_3D )
 #ifndef NO_OGL
 	  && ( renderMethod != OPENGL )
 #endif
-#ifndef NO_D3D
-	  && ( renderMethod != DIRECT_3D )
-#endif
 	  ) {
-		  renderMethod = DIRECT_DRAW;
+		  renderMethod = DIRECT_3D;
   }
 
   audioAPI = (AUDIO_API)regQueryDwordValue( "audioAPI", DIRECTSOUND );
@@ -1525,8 +1514,6 @@ void VBA::loadSettings()
   if(soundInterpolation < 0 || soundInterpolation > 1)
     soundInterpolation = 0;
 
-  ddrawEmulationOnly = regQueryDwordValue("ddrawEmulationOnly", false) ? true : false;
-  ddrawUseVideoMemory = regQueryDwordValue("ddrawUseVideoMemory", true) ? true : false;
   tripleBuffering = regQueryDwordValue("tripleBuffering", false) ? true : false;
 
 #ifndef NO_D3D
@@ -1842,9 +1829,7 @@ void VBA::updateWindowSize(int value)
     }
     input->checkKeys();
 	
-	if( renderMethod == DIRECT_DRAW ) {
-		updateMenuBar();
-	}
+	
     changingVideoSize = FALSE;
     updateWindowSize(videoOption);
     return;
@@ -2116,7 +2101,7 @@ bool VBA::updateRenderMethod(bool force)
 
 	if( !updateRenderMethod0( force ) ) {
 		// fall back to safe configuration
-		renderMethod = DIRECT_DRAW;
+		renderMethod = DIRECT_3D;
 		fsAdapter = 0;
 		videoOption = VIDEO_1X;
 		ret = updateRenderMethod( true );
@@ -2167,12 +2152,6 @@ bool VBA::updateRenderMethod0(bool force)
 		display = newDirect3DDisplay();
 		break;
 #endif
-    case DIRECT_DRAW:
-	default:
-		pVideoDriverGUID = NULL;
-		ZeroMemory( &videoDriverGUID, sizeof( GUID ) );
-		display = newDirectDrawDisplay();
-		break;
     }
 
 	if( preInitialize() ) {
@@ -2572,9 +2551,6 @@ void VBA::saveSettings()
   regSetDwordValue("soundVolume", soundVolume);
 
   regSetDwordValue("soundInterpolation", soundInterpolation);
-
-  regSetDwordValue("ddrawEmulationOnly", ddrawEmulationOnly);
-  regSetDwordValue("ddrawUseVideoMemory", ddrawUseVideoMemory);
   regSetDwordValue("tripleBuffering", tripleBuffering);
 
 #ifndef NO_D3D
