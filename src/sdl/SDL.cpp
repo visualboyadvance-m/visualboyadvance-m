@@ -22,6 +22,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <cmath>
 #ifdef __APPLE__
     #include <OpenGL/glu.h>
     #include <OpenGL/glext.h>
@@ -120,6 +121,8 @@ int srcWidth = 0;
 int srcHeight = 0;
 int destWidth = 0;
 int destHeight = 0;
+int desktopWidth = 0;
+int desktopHeight = 0;
 
 int sensorX = 2047;
 int sensorY = 2047;
@@ -147,12 +150,13 @@ int RGB_LOW_BITS_MASK=0x821;
 u32 systemColorMap32[0x10000];
 u16 systemColorMap16[0x10000];
 u16 systemGbPalette[24];
-void (*filterFunction)(u8*,u32,u8*,u8*,u32,int,int) = NULL;
+FilterFunc filterFunction = NULL;
 void (*ifbFunction)(u8*,u32,int,int) = NULL;
 int ifbType = 0;
 char filename[2048];
 char ipsname[2048];
 char biosFileName[2048];
+char gbBiosFileName[2048];
 char captureDir[2048];
 char saveDir[2048];
 char batteryDir[2048];
@@ -412,11 +416,11 @@ FILE *sdlFindFile(const char *name)
 #ifdef _WIN32
 #define PATH_SEP ";"
 #define FILE_SEP '\\'
-#define EXE_NAME "VisualBoyAdvance-SDL.exe"
+#define EXE_NAME "vbam.exe"
 #else // ! _WIN32
 #define PATH_SEP ":"
 #define FILE_SEP '/'
-#define EXE_NAME "VisualBoyAdvance"
+#define EXE_NAME "vbam"
 #endif // ! _WIN32
 
   fprintf(stderr, "Searching for file %s\n", name);
@@ -652,6 +656,8 @@ void sdlReadPreferences(FILE *f)
       skipBios = sdlFromHex(value) ? true : false;
     } else if(!strcmp(key, "biosFile")) {
       strcpy(biosFileName, value);
+    } else if(!strcmp(key, "gbBiosFile")) {
+      strcpy(gbBiosFileName, value);
     } else if(!strcmp(key, "filter")) {
       filter = sdlFromHex(value);
       if(filter < 0 || filter > 17)
@@ -790,9 +796,22 @@ void sdlOpenGLInit(int w, int h)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                   openGL == 2 ? GL_LINEAR : GL_NEAREST);
 
-  textureSize = 256 * filter_enlarge;
+  // Calculate texture size as a the smallest working power of two
+  float n1 = log10((float)destWidth ) / log10( 2.0f);
+  float n2 = log10((float)destHeight ) / log10( 2.0f);
+  float n = (n1 > n2)? n1 : n2;
+
+    // round up
+  if (((float)((int)n)) != n)
+    n = ((float)((int)n)) + 1.0f;
+
+  textureSize = (int)pow(2.0f, n);
+
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureSize, textureSize, 0,
                GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+
+  glClearColor(0.0,0.0,0.0,1.0);
+  glClear( GL_COLOR_BUFFER_BIT );
 }
 
 void sdlReadPreferences()
@@ -998,8 +1017,16 @@ void sdlReadBattery()
     systemScreenMessage("Loaded battery");
 }
 
+void sdlReadDesktopVideoMode() {
+  const SDL_VideoInfo* vInfo = SDL_GetVideoInfo();
+  desktopWidth = vInfo->current_w;
+  desktopHeight = vInfo->current_h;
+}
+
 void sdlInitVideo() {
   int flags;
+  int screenWidth;
+  int screenHeight;
 
   filter_enlarge = getFilterEnlargeFactor((Filter)filter);
   destWidth = filter_enlarge * srcWidth;
@@ -1012,18 +1039,20 @@ void sdlInitVideo() {
   } else
     flags |= SDL_HWSURFACE | SDL_DOUBLEBUF;
 
-  surface = SDL_SetVideoMode(destWidth, destHeight, 0, flags);
+  if (fullscreen && openGL) {
+    screenWidth = desktopWidth;
+    screenHeight = desktopHeight;
+  } else {
+    screenWidth = destWidth;
+    screenHeight = destHeight;
+  }
+  
+  surface = SDL_SetVideoMode(screenWidth, screenHeight, 0, flags);
 
   if(surface == NULL) {
     systemMessage(0, "Failed to set video mode");
     SDL_Quit();
     exit(-1);
-  }
-
-  if(openGL) {
-    free(filterPix);
-    filterPix = (u8 *)calloc(1, 4 * destWidth * destHeight);
-    sdlOpenGLInit(destWidth, destHeight);
   }
 
   systemRedShift = sdlCalculateShift(surface->format->Rmask);
@@ -1040,6 +1069,13 @@ void sdlInitVideo() {
     else
       srcPitch = srcWidth*3;
   }
+
+  if(openGL) {
+    free(filterPix);
+    filterPix = (u8 *)calloc(1, (systemColorDepth >> 3) * destWidth * destHeight);
+    sdlOpenGLInit(screenWidth, screenHeight);
+  }
+
 }
 
 #define MOD_KEYS    (KMOD_CTRL|KMOD_SHIFT|KMOD_ALT|KMOD_META)
@@ -1573,7 +1609,7 @@ Long options only:\n\
 
 int main(int argc, char **argv)
 {
-  fprintf(stderr, "VisualBoyAdvance version %s [SDL]\n", VERSION);
+  fprintf(stderr, "VBA-M version %s [SDL]\n", VERSION);
 
   arg0 = argv[0];
 
@@ -1821,16 +1857,7 @@ int main(int argc, char **argv)
 
         // used for the handling of the gb Boot Rom
         if (gbHardware & 5)
-        {
-			    char tempName[0x800];
-			    strcpy(tempName, arg0);
-			    char *p = strrchr(tempName, '\\');
-			    if(p) { *p = 0x00; }
-			    strcat(tempName, "\\DMG_ROM.bin");
-          fprintf(stderr, "%s\n", tempName);
-			    gbCPUInit(tempName, useBios);
-        }
-        else useBios = false;
+          gbCPUInit(gbBiosFileName, useBios);
 
         gbReset();
         cartridgeType = IMAGE_GB;
@@ -1936,6 +1963,8 @@ int main(int argc, char **argv)
     srcWidth = 320;
     srcHeight = 240;
   }
+
+  sdlReadDesktopVideoMode();
 
   sdlInitVideo();
 
@@ -2565,7 +2594,6 @@ bool systemPauseOnFrame()
 
 void systemGbBorderOn()
 {
-  long flags;
   srcWidth = 256;
   srcHeight = 224;
   gbBorderLineSkip = 256;
@@ -2575,32 +2603,4 @@ void systemGbBorderOn()
   sdlInitVideo();
 
   filterFunction = initFilter((Filter)filter, systemColorDepth, srcWidth);
-
-  if(systemColorDepth == 16) {
-    if(sdlCalculateMaskWidth(surface->format->Gmask) == 6) {
-      RGB_LOW_BITS_MASK = 0x821;
-    } else {
-      RGB_LOW_BITS_MASK = 0x421;
-    }
-    if(cartridgeType == 2) {
-      for(int i = 0; i < 0x10000; i++) {
-        systemColorMap16[i] = (((i >> 1) & 0x1f) << systemBlueShift) |
-          (((i & 0x7c0) >> 6) << systemGreenShift) |
-          (((i & 0xf800) >> 11) << systemRedShift);
-      }
-    } else {
-      for(int i = 0; i < 0x10000; i++) {
-        systemColorMap16[i] = ((i & 0x1f) << systemRedShift) |
-          (((i & 0x3e0) >> 5) << systemGreenShift) |
-          (((i & 0x7c00) >> 10) << systemBlueShift);
-      }
-    }
-  } else {
-    RGB_LOW_BITS_MASK = 0x010101;
-    for(int i = 0; i < 0x10000; i++) {
-      systemColorMap32[i] = ((i & 0x1f) << systemRedShift) |
-        (((i & 0x3e0) >> 5) << systemGreenShift) |
-        (((i & 0x7c00) >> 10) << systemBlueShift);
-    }
-  }
 }

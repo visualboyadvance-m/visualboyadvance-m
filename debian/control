@@ -1,0 +1,13 @@
+Source: vbam
+Section: games
+Priority: extra
+Maintainer: Bastien Bouclet <bgkweb@gmail.com>
+Build-Depends: debhelper (>= 5), zlib1g-dev, libpng12-dev, libsdl1.2-dev, libgl1-mesa-dev
+Standards-Version: 3.7.2
+
+Package: vbam
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Nintendo GameBoy Advance emulator
+ VBA-M is a Nintendo GameBoy Advance emulator. It runs homebrew and commercial games.
+ This version is based on the SDL library.
