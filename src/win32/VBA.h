@@ -144,14 +144,11 @@ class VBA : public CWinApp
   int rewindTimer;
   int captureFormat;
   bool tripleBuffering;
-  bool autoHideMenu;
   unsigned short throttle;
   u32 autoFrameSkipLastTime;
   bool autoFrameSkip;
   bool vsync;
   bool changingVideoSize;
-  GUID videoDriverGUID;
-  GUID *pVideoDriverGUID;
   DISPLAY_TYPE renderMethod;
   AUDIO_API audioAPI;
 #ifndef NO_OAL
@@ -265,7 +262,6 @@ class VBA : public CWinApp
   void winUpdateSkin();
   void directXMessage(const char *msg);
   void shutdownDisplay();
-  void winCheckFullscreen();
   bool preInitialize();
   bool updateRenderMethod0(bool force);
   bool updateRenderMethod(bool force);

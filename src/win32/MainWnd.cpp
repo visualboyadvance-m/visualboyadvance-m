@@ -52,8 +52,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-#define VBA_CONFIRM_MODE WM_APP + 100
-
 extern void remoteCleanUp();
 extern int gbHardware;
 
@@ -191,8 +189,6 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_REALTIMECLOCK, OnUpdateOptionsEmulatorRealtimeclock)
   ON_COMMAND(ID_OPTIONS_EMULATOR_GENERICFLASHCARD, OnOptionsEmulatorGenericflashcard)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_GENERICFLASHCARD, OnUpdateOptionsEmulatorGenericflashcard)
-  ON_COMMAND(ID_OPTIONS_EMULATOR_AUTOHIDEMENU, OnOptionsEmulatorAutohidemenu)
-  ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_AUTOHIDEMENU, OnUpdateOptionsEmulatorAutohidemenu)
   ON_COMMAND(ID_OPTIONS_EMULATOR_REWINDINTERVAL, OnOptionsEmulatorRewindinterval)
   ON_COMMAND(ID_OPTIONS_EMULATOR_SAVETYPE_AUTOMATIC, OnOptionsEmulatorSavetypeAutomatic)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_SAVETYPE_AUTOMATIC, OnUpdateOptionsEmulatorSavetypeAutomatic)
@@ -417,7 +413,6 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI_RANGE(ID_OPTIONS_JOYPAD_DEFAULTJOYPAD_1, ID_OPTIONS_JOYPAD_DEFAULTJOYPAD_4, OnUpdateOptionsJoypadDefault)
   ON_COMMAND_EX_RANGE(ID_OPTIONS_JOYPAD_AUTOFIRE_A, ID_OPTIONS_JOYPAD_AUTOFIRE_R, OnOptionsJoypadAutofire)
   ON_UPDATE_COMMAND_UI_RANGE(ID_OPTIONS_JOYPAD_AUTOFIRE_A, ID_OPTIONS_JOYPAD_AUTOFIRE_R, OnUpdateOptionsJoypadAutofire)
-  ON_MESSAGE(VBA_CONFIRM_MODE, OnConfirmMode)
   ON_MESSAGE(WM_SYSCOMMAND, OnMySysCommand)
   ON_COMMAND(ID_OPTIONS_SOUND_HARDWAREACCELERATION, &MainWnd::OnOptionsSoundHardwareacceleration)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_SOUND_HARDWAREACCELERATION, &MainWnd::OnUpdateOptionsSoundHardwareacceleration)
@@ -643,9 +638,6 @@ bool MainWnd::FileRun()
   theApp.updateWindowSize(theApp.videoOption);
 
   theApp.updateFrameSkip();
-
-  if(theApp.autoHideMenu && theApp.videoOption > VIDEO_4X && theApp.menuToggle)
-    OnFileTogglemenu();
 
   emulating = true;
 

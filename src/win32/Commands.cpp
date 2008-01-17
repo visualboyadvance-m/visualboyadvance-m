@@ -132,7 +132,6 @@ struct {
   { "OptionsEmulatorShowSpeedDetailed", ID_OPTIONS_EMULATOR_SHOWSPEED_DETAILED },
   { "OptionsEmulatorShowSpeedTransparent", ID_OPTIONS_EMULATOR_SHOWSPEED_TRANSPARENT },
   { "OptionsEmulatorSpeedupToggle", ID_OPTIONS_EMULATOR_SPEEDUPTOGGLE },
-  { "OptionsEmulatorAutoHideMenu", ID_OPTIONS_EMULATOR_AUTOHIDEMENU },
   { "OptionsEmulatorSaveAuto", ID_OPTIONS_EMULATOR_SAVETYPE_AUTOMATIC },
   { "OptionsEmulatorSaveEEPROM", ID_OPTIONS_EMULATOR_SAVETYPE_EEPROM },
   { "OptionsEmulatorSaveSRAM", ID_OPTIONS_EMULATOR_SAVETYPE_SRAM },

@@ -197,7 +197,6 @@ void MainWnd::OnDebugNextframe()
 
 void MainWnd::OnToolsDebugGdb()
 {
-  theApp.winCheckFullscreen();
   GDBPortDlg dlg;
 
   if(dlg.DoModal()) {
@@ -233,7 +232,6 @@ void MainWnd::OnUpdateToolsDebugGdb(CCmdUI* pCmdUI)
 
 void MainWnd::OnToolsDebugLoadandwait()
 {
-  theApp.winCheckFullscreen();
   if(fileOpenSelect(0)) {
     if(FileRun()) {
       if(theApp.cartridgeType != 0) {
@@ -290,7 +288,6 @@ void MainWnd::OnUpdateToolsDebugDisconnect(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsSoundStartrecording()
 {
-  theApp.winCheckFullscreen();
   CString captureBuffer;
 
   CString capdir = regQueryStringValue("soundRecordDir", NULL);
@@ -345,8 +342,6 @@ void MainWnd::OnUpdateOptionsSoundStoprecording(CCmdUI* pCmdUI)
 
 void MainWnd::OnToolsRecordStartavirecording()
 {
-	theApp.winCheckFullscreen();
-	
 	CString captureBuffer;
 	CString capdir = regQueryStringValue( "aviRecordDir", NULL );
 	
@@ -459,7 +454,6 @@ void MainWnd::OnUpdateToolsRecordStopavirecording(CCmdUI* pCmdUI)
 
 void MainWnd::OnToolsRecordStartmovierecording()
 {
-  theApp.winCheckFullscreen();
   CString captureBuffer;
   CString capdir = regQueryStringValue("movieRecordDir", "");
 
