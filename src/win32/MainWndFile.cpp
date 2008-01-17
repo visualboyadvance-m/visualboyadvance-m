@@ -708,7 +708,7 @@ void MainWnd::OnFileTogglemenu()
 	  return;
   }
 
-  if(( theApp.renderMethod = DIRECT_3D ) | (theApp.renderMethod = OPENGL ))  {
+  if(( theApp.renderMethod != -1 ))  { //either D3D OR OGL
 	  // display API does not support GDI objects in fullscreen
 	  theApp.updateWindowSize( theApp.lastWindowed );
 	  return;
