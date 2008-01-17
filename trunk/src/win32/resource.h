@@ -84,7 +84,6 @@
 #define IDD_EXPORT_SPS                  138
 #define IDD_ADDR_SIZE                   139
 #define IDD_MODES                       140
-#define IDD_DRIVERS                     142
 #define IDD_THROTTLE                    143
 #define IDD_GB_DISASSEMBLE              144
 #define IDD_GB_OAM_VIEW                 145
