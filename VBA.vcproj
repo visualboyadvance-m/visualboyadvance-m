@@ -2035,10 +2035,6 @@
 				</File>
 			</Filter>
 		</Filter>
-		<File
-			RelativePath=".\src\win32\resource"
-			>
-		</File>
 	</Files>
 	<Globals>
 		<Global
