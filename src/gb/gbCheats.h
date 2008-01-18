@@ -53,7 +53,7 @@ extern u8 gbCheatRead(u16);
 extern void gbCheatWrite(bool);
 
 extern int gbCheatNumber;
-extern gbCheat gbCheatList[100];
+extern gbCheat gbCheatList[1000];
 extern bool gbCheatMap[0x10000];
 #endif
 

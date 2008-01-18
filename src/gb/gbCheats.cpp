@@ -29,7 +29,7 @@
 #include "gbGlobals.h"
 #include "gb.h"
 
-gbCheat gbCheatList[100];
+gbCheat gbCheatList[1000];
 int gbCheatNumber = 0;
 int gbNextCheat = 0;
 bool gbCheatMap[0x10000];
@@ -187,7 +187,7 @@ bool gbVerifyGsCode(const char *code)
 
 void gbAddGsCheat(const char *code, const char *desc)
 {
-  if(gbCheatNumber > 99) {
+  if(gbCheatNumber > 999) {
     systemMessage(MSG_MAXIMUM_NUMBER_OF_CHEATS,
                   N_("Maximum number of cheats reached."));
     return;
@@ -305,7 +305,7 @@ bool gbVerifyGgCode(const char *code)
 
 void gbAddGgCheat(const char *code, const char *desc)
 {
-  if(gbCheatNumber > 99) {
+  if(gbCheatNumber > 999) {
     systemMessage(MSG_MAXIMUM_NUMBER_OF_CHEATS,
                   N_("Maximum number of cheats reached."));
     return;
