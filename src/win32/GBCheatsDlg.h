@@ -171,7 +171,9 @@ class GBCheatList : public CDialog
   virtual BOOL OnInitDialog();
   //}}AFX_MSG
   DECLARE_MESSAGE_MAP()
-    };
+public:
+	afx_msg void OnNMDblclkCheatList(NMHDR *pNMHDR, LRESULT *pResult);
+};
 
     /////////////////////////////////////////////////////////////////////////////
 // AddGBCode dialog
@@ -187,6 +189,9 @@ class AddGBCode : public CDialog
   enum { IDD = IDD_ADD_CHEAT_DLG };
   CEdit  m_desc;
   CEdit  m_code;
+  CString m_descVal;
+  CString m_codeVal;
+  bool m_onlyOneLine;
   //}}AFX_DATA
 
   int addLength;

@@ -602,10 +602,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\Cheats.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\CheatSearch.cpp"
 					>
 				</File>
@@ -695,6 +691,10 @@
 				</File>
 				<File
 					RelativePath=".\src\bios.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Cheats.cpp"
 					>
 				</File>
 				<File
@@ -1095,6 +1095,10 @@
 				>
 				<File
 					RelativePath=".\src\win32\stdafx.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\VBA-M.ico"
 					>
 				</File>
 				<File

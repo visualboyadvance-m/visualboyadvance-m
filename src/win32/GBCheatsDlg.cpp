@@ -39,14 +39,12 @@ static char THIS_FILE[] = __FILE__;
 
 static bool winGbCheatAddVerifyGs(const char *code, const char *desc)
 {
-  gbAddGsCheat(code, desc);
-  return true;
+  return gbAddGsCheat(code, desc);
 }
 
 static bool winGbCheatAddVerifyGg(const char *code, const char *desc)
 {
-  gbAddGgCheat(code, desc);
-  return true;
+  return gbAddGgCheat(code, desc);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -786,7 +784,8 @@ BEGIN_MESSAGE_MAP(GBCheatList, CDialog)
   ON_BN_CLICKED(IDC_REMOVE_ALL, OnRemoveAll)
   ON_NOTIFY(LVN_ITEMCHANGED, IDC_CHEAT_LIST, OnItemchangedCheatList)
   //}}AFX_MSG_MAP
-  END_MESSAGE_MAP()
+  ON_NOTIFY(NM_DBLCLK, IDC_CHEAT_LIST, &GBCheatList::OnNMDblclkCheatList)
+END_MESSAGE_MAP()
 
   /////////////////////////////////////////////////////////////////////////////
 // GBCheatList message handlers
@@ -949,16 +948,17 @@ AddGBCode::AddGBCode(bool (*verify)(const char *,const char*), int len, const ch
   addVerify = verify;
   addLength = len;
   addTitle = title;
+  m_onlyOneLine = false;
 }
 
 
 void AddGBCode::DoDataExchange(CDataExchange* pDX)
 {
   CDialog::DoDataExchange(pDX);
-  //{{AFX_DATA_MAP(AddGBCode)
   DDX_Control(pDX, IDC_DESC, m_desc);
   DDX_Control(pDX, IDC_CODE, m_code);
-  //}}AFX_DATA_MAP
+  DDX_Text(pDX, IDC_DESC, m_descVal);
+  DDX_Text(pDX, IDC_CODE, m_codeVal);
 }
 
 
@@ -982,15 +982,19 @@ void AddGBCode::OnOk()
   StringTokenizer st(buffer, " \t\n\r");
   const char *t = st.next();
   while(t) {
-    addVerify(t, desc);
-    t = st.next();
+	  if( !addVerify(t, desc) ) {
+		  EndDialog( IDABORT );
+		  return;
+	  }
+	  if( m_onlyOneLine ) break;
+	  t = st.next();
   }
-  EndDialog(TRUE);
+  EndDialog( IDOK );
 }
 
 void AddGBCode::OnCancel()
 {
-  EndDialog(FALSE);
+  EndDialog( IDCANCEL );
 }
 
 BOOL AddGBCode::OnInitDialog()
@@ -1004,4 +1008,42 @@ BOOL AddGBCode::OnInitDialog()
 
   return TRUE;  // return TRUE unless you set the focus to a control
                 // EXCEPTION: OCX Property Pages should return FALSE
+}
+
+void GBCheatList::OnNMDblclkCheatList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	int selection = m_list.GetSelectionMark();
+	// get index value of corresponding code in cheatlist
+	if( selection == -1 ) return;
+	
+	LVITEM item;
+	ZeroMemory( &item, sizeof(item) );
+	item.mask = LVIF_PARAM;
+	item.iItem = selection;
+	if( FALSE == m_list.GetItem( &item ) ) return;
+	
+	// modify code
+	INT_PTR res;
+	if( gbVerifyGsCode( gbCheatList[ item.lParam ].cheatCode ) ) {
+		CString temp = winResLoadString(IDS_ADD_GS_CODE);
+		AddGBCode dlg( winGbCheatAddVerifyGs, 8, temp );
+		dlg.m_codeVal = gbCheatList[ item.lParam ].cheatCode;
+		dlg.m_descVal = gbCheatList[ item.lParam ].cheatDesc;
+		dlg.m_onlyOneLine = true;
+		res = dlg.DoModal();
+	} else if( gbVerifyGgCode( gbCheatList[ item.lParam ].cheatCode ) ) {
+		CString temp = winResLoadString(IDS_ADD_GG_CODE);
+		AddGBCode dlg( winGbCheatAddVerifyGg, 11, temp );
+		dlg.m_codeVal = gbCheatList[ item.lParam ].cheatCode;
+		dlg.m_descVal = gbCheatList[ item.lParam ].cheatDesc;
+		dlg.m_onlyOneLine = true;
+		res = dlg.DoModal();
+	}
+
+	if( res == IDOK ) {
+		gbCheatRemove( item.lParam ); // remove old cheat
+		refresh();
+	}
+
+	*pResult = 0;
 }
