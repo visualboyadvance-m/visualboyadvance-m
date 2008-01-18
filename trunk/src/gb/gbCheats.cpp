@@ -185,18 +185,18 @@ bool gbVerifyGsCode(const char *code)
   return true;
 }
 
-void gbAddGsCheat(const char *code, const char *desc)
+bool gbAddGsCheat(const char *code, const char *desc)
 {
   if(gbCheatNumber > 999) {
     systemMessage(MSG_MAXIMUM_NUMBER_OF_CHEATS,
                   N_("Maximum number of cheats reached."));
-    return;
+    return false;
   }
 
   if(!gbVerifyGsCode(code)) {
     systemMessage(MSG_INVALID_GAMESHARK_CODE,
                   N_("Invalid GameShark code: %s"), code);
-    return;
+    return false;
   }
 
   int i = gbCheatNumber;
@@ -230,6 +230,8 @@ void gbAddGsCheat(const char *code, const char *desc)
                   N_("Unsupported GameShark code type : %s"), code);
 
   gbCheatNumber++;
+
+  return true;
 }
 
 bool gbVerifyGgCode(const char *code)
@@ -303,18 +305,18 @@ bool gbVerifyGgCode(const char *code)
   return true;
 }
 
-void gbAddGgCheat(const char *code, const char *desc)
+bool gbAddGgCheat(const char *code, const char *desc)
 {
   if(gbCheatNumber > 999) {
     systemMessage(MSG_MAXIMUM_NUMBER_OF_CHEATS,
                   N_("Maximum number of cheats reached."));
-    return;
+    return false;
   }
 
   if(!gbVerifyGgCode(code)) {
     systemMessage(MSG_INVALID_GAMEGENIE_CODE,
                   N_("Invalid GameGenie code: %s"), code);
-    return;
+    return false;
   }
 
   int i = gbCheatNumber;
@@ -355,6 +357,8 @@ void gbAddGgCheat(const char *code, const char *desc)
   gbCheatMap[gbCheatList[i].address] = true;
 
   gbCheatNumber++;
+
+  return true;
 }
 
 void gbCheatRemove(int i)
