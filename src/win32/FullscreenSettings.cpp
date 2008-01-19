@@ -278,6 +278,7 @@ void FullscreenSettings::OnOK()
 {
 	if( failed ) return;
 
+#ifndef NO_D3D
 	int selection;
 
 	selection = combo_device.GetCurSel();
@@ -314,7 +315,7 @@ void FullscreenSettings::OnOK()
 	m_width = (unsigned int)mode.Width;
 	m_height = (unsigned int)mode.Height;
 	m_refreshRate = (unsigned int)mode.RefreshRate;
-
+#endif
 
 	CDialog::OnOK();
 }
