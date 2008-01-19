@@ -1407,14 +1407,16 @@ void VBA::loadSettings()
   }
 
   renderMethod = (DISPLAY_TYPE)regQueryDwordValue("renderMethod", DIRECT_3D);
-  if( ( renderMethod != DIRECT_3D ) && ( renderMethod != OPENGL ) ) {
-#ifndef NO_OGL
-	  renderMethod = OPENGL;
-#endif
-#ifndef NO_D3D
+#ifdef NO_OGL
+  if( renderMethod == OPENGL ) {
 	  renderMethod = DIRECT_3D;
-#endif
   }
+#endif
+#ifdef NO_D3D
+  if( renderMethod == DIRECT_3D ) {
+	  renderMethod = OPENGL;
+  }
+#endif
 
   audioAPI = (AUDIO_API)regQueryDwordValue( "audioAPI", DIRECTSOUND );
   if( ( audioAPI != DIRECTSOUND )
