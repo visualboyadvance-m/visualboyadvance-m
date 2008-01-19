@@ -88,7 +88,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib dinput8.lib dxguid.lib ddraw.lib winmm.lib Dsound.lib"
+				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib dinput8.lib dxguid.lib winmm.lib Dsound.lib"
 				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
 				Version=""
 				LinkIncremental="2"
@@ -197,7 +197,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib dinput8.lib dxguid.lib ddraw.lib winmm.lib Dsound.lib"
+				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib dinput8.lib dxguid.lib winmm.lib Dsound.lib"
 				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
 				Version=""
 				LinkIncremental="2"
@@ -307,7 +307,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib dinput8.lib winmm.lib dxguid.lib ddraw.lib Dsound.lib"
+				AdditionalDependencies="nafxcw.lib LIBCMT.lib dinput8.lib winmm.lib dxguid.lib Dsound.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
 				Version=""
@@ -430,7 +430,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib dinput8.lib winmm.lib dxguid.lib ddraw.lib Dsound.lib"
+				AdditionalDependencies="nafxcw.lib LIBCMT.lib dinput8.lib winmm.lib dxguid.lib Dsound.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
 				Version=""
