@@ -60,7 +60,7 @@ ${MAINDIR}/EEprom${OE} ${MAINDIR}/elf${OE} ${MAINDIR}/Flash${OE} ${MAINDIR}/GBA$
 ${MAINDIR}/gbafilter${OE} ${MAINDIR}/Gfx${OE} ${MAINDIR}/Globals${OE} ${MAINDIR}/interframe${OE} \
 ${MAINDIR}/hq2x${OE} ${MAINDIR}/GBA-thumb${OE} ${MAINDIR}/GBA-arm${OE} ${MAINDIR}/Mode0${OE} \
 ${MAINDIR}/Mode1${OE} ${MAINDIR}/Mode2${OE} ${MAINDIR}/Mode3${OE} ${MAINDIR}/Mode4${OE} \
-${MAINDIR}/Mode5${OE} ${MAINDIR}/motionblur${OE} ${MAINDIR}/pixel${OE} \
+${MAINDIR}/Mode5${OE} ${MAINDIR}/pixel${OE} \
 ${MAINDIR}/remote${OE} ${MAINDIR}/RTC${OE} ${MAINDIR}/scanline${OE} \
 ${MAINDIR}/Sound${OE} ${MAINDIR}/Sram${OE} ${MAINDIR}/Text${OE} ${MAINDIR}/Util${OE} \
 ${MAINDIR}/expr${OE} ${MAINDIR}/exprNode${OE} ${MAINDIR}/expr-lex${OE} \
