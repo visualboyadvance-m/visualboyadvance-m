@@ -60,8 +60,6 @@
 
 extern void Pixelate(u8*,u32,u8*,u8*,u32,int,int);
 extern void Pixelate32(u8*,u32,u8*,u8*,u32,int,int);
-extern void MotionBlur(u8*,u32,u8*,u8*,u32,int,int);
-extern void MotionBlur32(u8*,u32,u8*,u8*,u32,int,int);
 extern void _2xSaI(u8*,u32,u8*,u8*,u32,int,int);
 extern void _2xSaI32(u8*,u32,u8*,u8*,u32,int,int);
 extern void Super2xSaI(u8*,u32,u8*,u8*,u32,int,int);
@@ -96,7 +94,6 @@ extern void hq4x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void SmartIB(u8*,u32,int,int);
 extern void SmartIB32(u8*,u32,int,int);
 extern void MotionBlurIB(u8*,u32,int,int);
-extern void InterlaceIB(u8*,u32,int,int);
 extern void MotionBlurIB32(u8*,u32,int,int);
 
 extern IDisplay *newGDIDisplay();
