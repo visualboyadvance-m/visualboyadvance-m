@@ -20,11 +20,12 @@ Important:
 
 
 Less important:
+- Add GBA cheat editing support (GB already has)
+ - Look at Cheats.cpp (Core) and GBACheats.cpp (GUI)
+
 - Support D3DFMT_A2R10G10B10 (10 bit per color component) color format
 
 - Add documentation for VBA-M (configuration guide)
-
-- DDraw, D3D, OGL: Add full screen device & frequency selection
 
 - Improve AVI recording (produces asynchronous files)
 
