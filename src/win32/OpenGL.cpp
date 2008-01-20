@@ -564,7 +564,11 @@ bool OpenGLDisplay::initializeTexture( int w, int h )
 	width = w;
 	height = h;
 
-	return ( glGetError() == GL_NO_ERROR) ? true : false;
+	//return ( glGetError() == GL_NO_ERROR) ? true : false;
+	// Workaround: We usually get GL_INVALID_VALUE, but somehow it works nevertheless
+	// In consequence, we must not treat it as an error or else the app behaves as if an error occured.
+	// This in the end results in theApp->input not being created = no input when switching from D3D to OGL
+	return true;
 }
 
 //turn vsync on or off
