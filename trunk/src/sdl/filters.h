@@ -23,7 +23,7 @@
 
 // List of available filters
 enum Filter { kStretch1x, kStretch2x, k2xSaI, kSuper2xSaI, kSuperEagle, kPixelate,
-				kMotionBlur, kAdMame2x, kBilinear, kBilinearPlus, kScanlines, kScanlinesTV,
+				kAdMame2x, kBilinear, kBilinearPlus, kScanlines, kScanlinesTV,
 				klq2x, khq2x, kStretch3x, khq3x, kStretch4x, khq4x, kInvalidFilter };
 
 // Function pointer type for a filter function
