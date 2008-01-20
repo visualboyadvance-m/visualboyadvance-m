@@ -27,6 +27,7 @@
 
 //GUI
 #include "MainWnd.h"
+#include "FullscreenSettings.h"
 
 // Internals
 #include "../System.h"
@@ -96,6 +97,7 @@ private:
 	GLFONT font;
 	int VertexShader,FragmentShader,textureLocation,ShaderProgram,g_location_grayScaleWeights;
 	char *VertexShaderSource,*FragmentShaderSource;
+	DWORD currentAdapter;
 
 	void initializeMatrices( int w, int h );
 	bool initializeTexture( int w, int h );
@@ -247,6 +249,7 @@ OpenGLDisplay::OpenGLDisplay()
 	failed = false;
 	filterData = NULL;
 	shaderFuncInited = false;
+	currentAdapter = 0;
 }
 
 //OpenHL class destroyer
@@ -297,6 +300,13 @@ void OpenGLDisplay::cleanup()
 	width = 0;
 	height = 0;
 	size = 0.0f;
+
+	DISPLAY_DEVICE dev;
+	ZeroMemory( &dev, sizeof(dev) );
+	dev.cb = sizeof(dev);
+	EnumDisplayDevices( NULL, currentAdapter, &dev, 0 );
+	// restore default video mode
+	ChangeDisplaySettingsEx( dev.DeviceName, NULL, NULL, 0, NULL );
 }
 
 //init renderer
@@ -307,6 +317,32 @@ bool OpenGLDisplay::initialize()
 	theApp.mode800Available = FALSE;
 	theApp.mode1024Available = FALSE;
 	theApp.mode1280Available = FALSE;
+
+	
+	currentAdapter = theApp.fsAdapter;
+	DISPLAY_DEVICE dev;
+	ZeroMemory( &dev, sizeof(dev) );
+	dev.cb = sizeof(dev);
+	EnumDisplayDevices( NULL, currentAdapter, &dev, 0 );
+	if( theApp.videoOption >= VIDEO_320x240 ) {
+		// enter full screen mode
+		DEVMODE mode;
+		ZeroMemory( &mode, sizeof(mode) );
+		mode.dmSize = sizeof(mode);
+		mode.dmBitsPerPel = theApp.fsColorDepth;
+		mode.dmPelsWidth = theApp.fsWidth;
+		mode.dmPelsHeight = theApp.fsHeight;
+		mode.dmDisplayFrequency = theApp.fsFrequency;
+		mode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
+		LONG ret = ChangeDisplaySettingsEx( dev.DeviceName, &mode, NULL, CDS_FULLSCREEN, NULL );
+		if( ret != DISP_CHANGE_SUCCESSFUL ) {
+			systemMessage( 0, "Can not change display mode!" );
+			failed = true;
+		}
+	} else {
+		// restore default mode
+		ChangeDisplaySettingsEx( dev.DeviceName, NULL, NULL, 0, NULL );
+	}
 
 	EnableOpenGL();
 	initializeFont();
@@ -362,7 +398,7 @@ bool OpenGLDisplay::initialize()
 	if(failed)
 		return false;
 
-	return TRUE;
+	return true;
 }
 
 //clear colour buffer 
@@ -658,17 +694,32 @@ void OpenGLDisplay::setOption( const char *option, int value )
 //set fullscreen mode
 bool OpenGLDisplay::selectFullScreenMode( VIDEO_MODE &mode )
 {
-	// TODO: Add display mode enumeration dialog
-	HWND wnd = GetDesktopWindow();
-	RECT r;
-	GetWindowRect( wnd, &r );
-	mode.width = (unsigned short)( r.right - r.left );
-	mode.height = (unsigned short)( r.bottom - r.top );
-	HDC dc = GetDC( wnd );
-	mode.bitDepth = GetDeviceCaps( dc, BITSPIXEL );
-	ReleaseDC( wnd, dc );
-	return true;
-//  return false; when cancel is clicked
+	FullscreenSettings dlg;
+	dlg.setAPI( this->getType() );
+	INT_PTR ret = dlg.DoModal();
+	if( ret == IDOK ) {
+		mode.adapter = dlg.m_device;
+		switch( dlg.m_colorDepth )
+		{
+		case 30:
+			// TODO: support
+			return false;
+			break;
+		case 24:
+			mode.bitDepth = 32;
+			break;
+		case 16:
+		case 15:
+			mode.bitDepth = 16;
+			break;
+		}
+		mode.width = dlg.m_width;
+		mode.height = dlg.m_height;
+		mode.frequency = dlg.m_refreshRate;
+		return true;
+	} else {
+		return false;
+	}
 }
 
 
