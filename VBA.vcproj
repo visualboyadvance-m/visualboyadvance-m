@@ -574,10 +574,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\motionblur.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\pixel.cpp"
 					>
 				</File>

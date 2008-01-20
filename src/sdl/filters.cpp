@@ -34,8 +34,6 @@ extern void SuperEagle(u8*,u32,u8*,u8*,u32,int,int);
 extern void SuperEagle32(u8*,u32,u8*,u8*,u32,int,int);
 extern void Pixelate(u8*,u32,u8*,u8*,u32,int,int);
 extern void Pixelate32(u8*,u32,u8*,u8*,u32,int,int);
-extern void MotionBlur(u8*,u32,u8*,u8*,u32,int,int);
-extern void MotionBlur32(u8*,u32,u8*,u8*,u32,int,int);
 extern void AdMame2x(u8*,u32,u8*,u8*,u32,int,int);
 extern void AdMame2x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void Bilinear(u8*,u32,u8*,u8*,u32,int,int);
@@ -70,7 +68,6 @@ const FilterDesc Filters[] = {
   { "Super 2xSaI", 2, Super2xSaI, 0, Super2xSaI32 },
   { "Super Eagle", 2, SuperEagle, 0, SuperEagle32 },
   { "Pixelate", 2, Pixelate, 0, Pixelate32 },
-  { "Motion Blur", 2, MotionBlur, 0, MotionBlur32 },
   { "AdvanceMAME Scale2x", 2, AdMame2x, 0, AdMame2x32 },
   { "Bilinear", 2, Bilinear, 0, Bilinear32 },
   { "Bilinear Plus", 2, BilinearPlus, 0, BilinearPlus32 },
