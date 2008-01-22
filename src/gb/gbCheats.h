@@ -56,7 +56,7 @@ bool gbVerifyGgCode(const char *code);
 
 
 extern int gbCheatNumber;
-extern gbCheat gbCheatList[1000];
+extern gbCheat gbCheatList[100];
 extern bool gbCheatMap[0x10000];
 #endif
 
