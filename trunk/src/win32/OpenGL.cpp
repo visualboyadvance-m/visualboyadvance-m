@@ -95,6 +95,7 @@ private:
 	u8 *filterData;
 	RECT destRect;
 	bool failed;
+	bool initialized;
 	GLFONT font;
 	int pitch;
 	GLuint displaylist; 
@@ -170,6 +171,7 @@ OpenGLDisplay::OpenGLDisplay()
 	height = 0;
 	size = 0.0f;
 	failed = false;
+	initialized = false;
 	filterData = NULL;
 	currentAdapter = 0;
 }
@@ -234,6 +236,8 @@ void OpenGLDisplay::cleanup()
 	EnumDisplayDevices( NULL, currentAdapter, &dev, 0 );
 	// restore default video mode
 	ChangeDisplaySettingsEx( dev.DeviceName, NULL, NULL, 0, NULL );
+
+	initialized = false;
 }
 
 //init renderer
@@ -270,6 +274,9 @@ bool OpenGLDisplay::initialize()
 		// restore default mode
 		ChangeDisplaySettingsEx( dev.DeviceName, NULL, NULL, 0, NULL );
 	}
+
+	width = theApp.rect.right;
+	height = theApp.rect.bottom;
 
 	EnableOpenGL();
 	initializeFont();
@@ -309,6 +316,7 @@ bool OpenGLDisplay::initialize()
 	if(failed)
 		return false;
 
+	initialized = true;
 	return true;
 }
 
@@ -422,13 +430,15 @@ void OpenGLDisplay::render()
 //resize screen
 void OpenGLDisplay::resize( int w, int h )
 {
-	initializeMatrices( w, h );
-	/* Display lists are not mutable, so we have to do this*/
-	if (displaylist)
-	{
-	glDeleteLists(displaylist, 1);
-	displaylist = 0;
-	renderlist();
+	if( initialized ) {
+		initializeMatrices( w, h );
+		/* Display lists are not mutable, so we have to do this*/
+		if (displaylist)
+		{
+			glDeleteLists(displaylist, 1);
+			displaylist = 0;
+			renderlist();
+		}
 	}
 }
 
@@ -548,18 +558,20 @@ void OpenGLDisplay::setVSync( int interval )
 bool OpenGLDisplay::changeRenderSize( int w, int h )
 {
 	if( (width != w) || (height != h) ) {
-		if( texture != 0 ) {
-			glDeleteTextures( 1, &texture );
-			texture = 0;
-		}
+		if( initialized ) {
+			if( texture != 0 ) {
+				glDeleteTextures( 1, &texture );
+				texture = 0;
+			}
 
-		if( !initializeTexture( w, h ) ) {
-			failed = true;
-			return false;
+			if( !initializeTexture( w, h ) ) {
+				failed = true;
+				return false;
+			}
+			if (filterData)
+				free(filterData);
+			filterData = (u8 *)malloc(4*w*h);
 		}
-		if (filterData)
-			free(filterData);
-		filterData = (u8 *)malloc(4*w*h);
 	}
 	if (displaylist)
 	{
@@ -575,6 +587,7 @@ void OpenGLDisplay::calculateDestRect( int w, int h )
 {
 	float scaleX = (float)w / (float)width;
 	float scaleY = (float)h / (float)height;
+
 	float min = (scaleX < scaleY) ? scaleX : scaleY;
 	if( theApp.fsMaxScale && (min > theApp.fsMaxScale) ) {
 		min = (float)theApp.fsMaxScale;
