@@ -552,25 +552,6 @@ void MainWnd::OnUpdateOptionsVideoRenderoptionsGlbilinear(CCmdUI* pCmdUI)
 }
 
 
-void MainWnd::OnUpdateOptionsVideoRenderingoptionsGLSLShaders(CCmdUI* pCmdUI)
-{
-#ifndef NO_OGL
-	pCmdUI->SetCheck(theApp.GLSLShaders);
-#else
-	pCmdUI->Enable( FALSE );
-#endif
-}
-
-void MainWnd::OnOptionsVideoRenderingoptionsGLSLShaders()
-{
-#ifndef NO_OGL
-	theApp.GLSLShaders = !theApp.GLSLShaders;
-	if( theApp.GLSLShaders ) {
-		theApp.display->setOption( _T("GLSLShaders"), theApp.GLSLShaders );
-	}
-#endif
-}
-
 void MainWnd::OnOptionsEmulatorAssociate()
 {
   Associate dlg;

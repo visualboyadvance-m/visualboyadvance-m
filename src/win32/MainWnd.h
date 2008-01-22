@@ -192,14 +192,6 @@ class MainWnd : public CWnd
   afx_msg void OnUpdateOptionsVideoRenderoptionsGlnearest(CCmdUI* pCmdUI);
   afx_msg void OnOptionsVideoRenderoptionsGlbilinear();
   afx_msg void OnUpdateOptionsVideoRenderoptionsGlbilinear(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsVideoRenderingoptionsGLSLShaders();
-  afx_msg void OnUpdateOptionsVideoRenderingoptionsGLSLShaders(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsVideoRenderoptionsGltriangle();
-  afx_msg void OnUpdateOptionsVideoRenderoptionsGltriangle(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsVideoRenderoptionsGlquads();
-  afx_msg void OnUpdateOptionsVideoRenderoptionsGlquads(CCmdUI* pCmdUI);
-  afx_msg void OnOptionsVideoRenderoptionsGlpolygons();
-  afx_msg void OnUpdateOptionsVideoRenderoptionsGlpolygons(CCmdUI* pCmdUI);
   afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
   afx_msg void OnOptionsEmulatorAssociate();
   afx_msg void OnOptionsEmulatorDirectories();
