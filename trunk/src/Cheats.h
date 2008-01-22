@@ -51,5 +51,5 @@ extern void cheatsWriteHalfWord(u32, u16);
 extern void cheatsWriteByte(u32, u8);
 extern int cheatsCheckKeys(u32,u32);
 extern int cheatsNumber;
-extern CheatsData cheatsList[1000];
+extern CheatsData cheatsList[100];
 #endif // GBA_CHEATS_H
