@@ -288,7 +288,6 @@ VBA::VBA()
   d3dMotionBlur = false;
 #endif
   glFilter = 0;
-  GLSLShaders = 0;
   regEnabled = false;
   pauseWhenInactive = true;
   speedupToggle = false;
@@ -1486,10 +1485,6 @@ void VBA::loadSettings()
   if(glFilter < 0 || glFilter > 1)
     glFilter = 1;
 
-  GLSLShaders = regQueryDwordValue("GLSLShaders", 0);
-  if(GLSLShaders < 0 || GLSLShaders > 1)
-    GLSLShaders = 0;
-
 
   filterType = regQueryDwordValue("filter", 0);
   if(filterType < 0 || filterType > 17)
@@ -2458,7 +2453,6 @@ void VBA::saveSettings()
 #endif
 
   regSetDwordValue("glFilter", glFilter);
-  regSetDwordValue("GLSLShaders", GLSLShaders);
 
   regSetDwordValue("filter", filterType);
 

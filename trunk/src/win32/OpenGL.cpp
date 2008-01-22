@@ -40,6 +40,7 @@
 
 //Math
 #include <cmath>
+#include <sys/stat.h>
 
 // OpenGL
 #include <gl/GL.h> // main include file
@@ -93,10 +94,12 @@ private:
 	float size;
 	u8 *filterData;
 	RECT destRect;
-	bool failed,shaderFuncInited;
+	bool failed;
 	GLFONT font;
-	int VertexShader,FragmentShader,textureLocation,ShaderProgram,g_location_grayScaleWeights;
-	char *VertexShaderSource,*FragmentShaderSource;
+	int pitch;
+	GLuint displaylist; 
+	u8 *data;
+	GLhandleARB v,f,p,t;
 	DWORD currentAdapter;
 
 	void initializeMatrices( int w, int h );
@@ -105,9 +108,7 @@ private:
 	void setVSync( int interval = 1 );
 	void calculateDestRect( int w, int h );
 	void initializeFont();
-	void InitGLSLShader();
-	void DeInitGLSLShader();
-	void SetGLSLShaderConstants();
+	void renderlist();
 
 public:
 	OpenGLDisplay();
@@ -158,84 +159,6 @@ void OpenGLDisplay::initializeFont()
 	free(buf);
     (void)inflateEnd(&strm);
 }
-//Load shader files
-char *readShaderFile(char *FileName) {
-	FILE *fp;
-	char *DATA = NULL;
-
-	size_t flength = 0;
-
-	fp = fopen(FileName,"rt");
-
-    fseek(fp, 0, SEEK_END);
-    flength = ftell(fp);
-    rewind(fp);
-
-	DATA = (char *)malloc(sizeof(char) * (flength+1));
-	flength = fread(DATA, sizeof(char), flength, fp);
-	DATA[flength] = '\0';
-		
-	fclose(fp);	
-
-	return DATA;
-}
-//Init and compile shaders
-void OpenGLDisplay::InitGLSLShader (void) {
-    //create GLSL shader objects
-    VertexShader = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-	FragmentShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-
-	//Read shader text files
-	VertexShaderSource = readShaderFile("vertex_shader.vert");
-	FragmentShaderSource = readShaderFile("fragment_shader.frag");
-
-	const char * VS = VertexShaderSource;
-	const char * FS = FragmentShaderSource;
-
-	glShaderSourceARB(VertexShader, 1, &VS,NULL);
-	glShaderSourceARB(FragmentShader, 1, &FS,NULL);
-		
-	free(VertexShaderSource);free(FragmentShaderSource);
-	//compile shaders
-	glCompileShaderARB(VertexShader);
-	glCompileShaderARB(FragmentShader);
-	//create shader program object
-	ShaderProgram = glCreateProgramObjectARB();
-	//attach VS/FS to shader program object
-	glAttachObjectARB(ShaderProgram,VertexShader);
-	glAttachObjectARB(ShaderProgram,FragmentShader);
-    //link the object
-	glLinkProgramARB(ShaderProgram);	 
-}
-//set shader samplers and constants
-void OpenGLDisplay::SetGLSLShaderConstants()
-{
-	//get shader uniforms and shader weights
-	textureLocation = glGetUniformLocationARB( ShaderProgram, "OGL2Texture" );
-	g_location_grayScaleWeights = glGetUniformLocationARB( ShaderProgram, "grayScaleWeights" );
-	glUniform1iARB( textureLocation, 1 );
-
-    // Load the greyscale weights for the luminance (B/W) filter.
-    float fGrayScaleWeights[] = { 0.30f, 0.59f, 0.11f, 0.0f };
-    glUniform4fARB( g_location_grayScaleWeights, fGrayScaleWeights[0], 
-    fGrayScaleWeights[1], fGrayScaleWeights[2], fGrayScaleWeights[3] );
-
-}
-//Delete shaders
-void OpenGLDisplay::DeInitGLSLShader (void) {
-	if( !shaderFuncInited ) return;
-
-	if (VertexShader != 0){
-    glDeleteObjectARB(VertexShader);
-	}
-	if (FragmentShader != 0){
-    glDeleteObjectARB(FragmentShader);
-	}
-	if (FragmentShader != 0){
-    glDeleteObjectARB(ShaderProgram);
-	}
-	shaderFuncInited = false;
-}
 
 //OpenGL class constructor
 OpenGLDisplay::OpenGLDisplay()
@@ -248,11 +171,10 @@ OpenGLDisplay::OpenGLDisplay()
 	size = 0.0f;
 	failed = false;
 	filterData = NULL;
-	shaderFuncInited = false;
 	currentAdapter = 0;
 }
 
-//OpenHL class destroyer
+//OpenGL class destroyer
 OpenGLDisplay::~OpenGLDisplay()
 {
 	cleanup();
@@ -286,12 +208,17 @@ void OpenGLDisplay::DisableOpenGL()
 //Remove resources used
 void OpenGLDisplay::cleanup()
 {
-	DeInitGLSLShader();
-
 	if(texture != 0) {
 		glDeleteTextures(1, &texture);
 		texture = 0;
 	}
+    
+	if (displaylist)
+	{
+	glDeleteLists(displaylist, 1);
+	displaylist = 0;
+	}
+
 	DisableOpenGL();
 	if(filterData) {
 		free(filterData);
@@ -352,25 +279,6 @@ bool OpenGLDisplay::initialize()
 	glEnable( GL_TEXTURE_2D );
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
-	if(theApp.GLSLShaders)
-	{
-	//load shader functions
-	glCreateProgramObjectARB  = (PFNGLCREATEPROGRAMOBJECTARBPROC)wglGetProcAddress("glCreateProgramObjectARB");
-    glDeleteObjectARB         = (PFNGLDELETEOBJECTARBPROC)wglGetProcAddress("glDeleteObjectARB");
-    glUseProgramObjectARB     = (PFNGLUSEPROGRAMOBJECTARBPROC)wglGetProcAddress("glUseProgramObjectARB");
-    glCreateShaderObjectARB   = (PFNGLCREATESHADEROBJECTARBPROC)wglGetProcAddress("glCreateShaderObjectARB");
-    glShaderSourceARB         = (PFNGLSHADERSOURCEARBPROC)wglGetProcAddress("glShaderSourceARB");
-    glCompileShaderARB        = (PFNGLCOMPILESHADERARBPROC)wglGetProcAddress("glCompileShaderARB");
-    glGetObjectParameterivARB = (PFNGLGETOBJECTPARAMETERIVARBPROC)wglGetProcAddress("glGetObjectParameterivARB");
-    glAttachObjectARB         = (PFNGLATTACHOBJECTARBPROC)wglGetProcAddress("glAttachObjectARB");
-    glGetInfoLogARB           = (PFNGLGETINFOLOGARBPROC)wglGetProcAddress("glGetInfoLogARB");
-    glLinkProgramARB          = (PFNGLLINKPROGRAMARBPROC)wglGetProcAddress("glLinkProgramARB");
-    glGetUniformLocationARB   = (PFNGLGETUNIFORMLOCATIONARBPROC)wglGetProcAddress("glGetUniformLocationARB");
-    glUniform4fARB            = (PFNGLUNIFORM4FARBPROC)wglGetProcAddress("glUniform4fARB");
-	glUniform1iARB            = (PFNGLUNIFORM1IARBPROC)wglGetProcAddress("glUniform1iARB");
-	shaderFuncInited = true;
-	}
 	
 	initializeMatrices( theApp.surfaceSizeX, theApp.surfaceSizeY );
 
@@ -394,6 +302,9 @@ bool OpenGLDisplay::initialize()
 	utilUpdateSystemColorMaps();
 	theApp.updateFilter();
 	theApp.updateIFB();
+	pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
+	data = pix + ( theApp.sizeX + 1 ) * 4;
+	renderlist();
 
 	if(failed)
 		return false;
@@ -407,22 +318,36 @@ void OpenGLDisplay::clear()
 	glClearColor(0.0,0.0,0.0,1.0);
 	glClear( GL_COLOR_BUFFER_BIT );
 }
+
+//dlist
+void OpenGLDisplay::renderlist()
+{
+	displaylist = glGenLists(1); //set the cube list to Generate a List
+    glNewList(displaylist,GL_COMPILE); //compile the new list
+    glBegin( GL_QUADS );
+
+	glTexCoord2f( 0.0f, 0.0f );
+	glVertex3i( 0, 0, 0 );
+
+	glTexCoord2f( (float)(width) / size, 0.0f );
+	glVertex3i( theApp.surfaceSizeX, 0, 0 );
+
+	glTexCoord2f( (float)(width) / size, (float)(height) / size );
+	glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
+
+	glTexCoord2f( 0.0f, (float)(height) / size );
+	glVertex3i( 0, theApp.surfaceSizeY, 0 );
+	glEnd();
+	glEndList();
+}
+
 //main render func
 void OpenGLDisplay::render()
 { 
 	clear();
 
-	/* Might need to relocate?
-	Jeez, damn me losing old code that works well :/*/
-	if (theApp.GLSLShaders && shaderFuncInited){
-	InitGLSLShader();
-    glUseProgramObjectARB( ShaderProgram );
-	SetGLSLShaderConstants();
-	}
-	
-	
-	int pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
-	u8 *data = pix + ( theApp.sizeX + 1 ) * 4;
+	pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
+	data = pix + ( theApp.sizeX + 1 ) * 4;
 
 	// apply pixel filter
 	if(theApp.filterFunction) {
@@ -446,22 +371,10 @@ void OpenGLDisplay::render()
 		glPixelStorei( GL_UNPACK_ROW_LENGTH, theApp.sizeX + 1 );
 	}
     glTexSubImage2D(GL_TEXTURE_2D,0,0,0,width,height,GL_RGBA,GL_UNSIGNED_BYTE,data );
-   
-	glBegin( GL_QUADS );
+    
 
-	glTexCoord2f( 0.0f, 0.0f );
-	glVertex3i( 0, 0, 0 );
-
-	glTexCoord2f( (float)(width) / size, 0.0f );
-	glVertex3i( theApp.surfaceSizeX, 0, 0 );
-
-	glTexCoord2f( (float)(width) / size, (float)(height) / size );
-	glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
-
-	glTexCoord2f( 0.0f, (float)(height) / size );
-	glVertex3i( 0, theApp.surfaceSizeY, 0 );
-
-	glEnd();
+	glCallList(displaylist); 
+ 
        
 	if( theApp.showSpeed ) { // && ( theApp.videoOption > VIDEO_4X ) ) {
 		char buffer[30];
@@ -510,6 +423,13 @@ void OpenGLDisplay::render()
 void OpenGLDisplay::resize( int w, int h )
 {
 	initializeMatrices( w, h );
+	/* Display lists are not mutable, so we have to do this*/
+	if (displaylist)
+	{
+	glDeleteLists(displaylist, 1);
+	displaylist = 0;
+	renderlist();
+	}
 }
 
 //update filtering methods
@@ -640,9 +560,13 @@ bool OpenGLDisplay::changeRenderSize( int w, int h )
 		if (filterData)
 			free(filterData);
 		filterData = (u8 *)malloc(4*w*h);
-
 	}
-
+	if (displaylist)
+	{
+	glDeleteLists(displaylist, 1);
+	displaylist = 0;
+	renderlist();
+	}
 	return true;
 }
 

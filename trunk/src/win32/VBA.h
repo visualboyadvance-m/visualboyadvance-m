@@ -158,7 +158,6 @@ class VBA : public CWinApp
   bool d3dMotionBlur;
 #endif
   int glFilter;
-  int GLSLShaders;
   bool dinputKeyFocus;
   bool pauseWhenInactive;
   bool speedupToggle;

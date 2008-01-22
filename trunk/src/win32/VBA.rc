@@ -1582,7 +1582,6 @@ BEGIN
                 MENUITEM "&OpenGL",                     ID_OPTIONS_VIDEO_RENDERMETHOD_OPENGL
                 MENUITEM "   Filter: Nearest",          ID_OPTIONS_VIDEO_RENDEROPTIONS_GLNEAREST
                 MENUITEM "   Filter: Bilinear",         ID_OPTIONS_VIDEO_RENDEROPTIONS_GLBILINEAR
-                MENUITEM "   GLSL Shaders",             ID_OPTIONS_VIDEO_RENDEROPTIONS_GLSLSHADERS
                 MENUITEM SEPARATOR
                 MENUITEM "&VSync",                      ID_OPTIONS_VIDEO_VSYNC
                 MENUITEM "Triple Buffering",            ID_OPTIONS_VIDEO_TRIPLEBUFFERING
@@ -1837,7 +1836,7 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "&Colors...",                  ID_OPTIONS_GAMEBOY_COLORS
         END
-        POPUP "&Link", GRAYED
+        POPUP "&Link"
         BEGIN
             MENUITEM "Enable GBA Linking",          ID_OPTIONS_LINK_ENABLE
             MENUITEM "&Wireless Adapter",           ID_OPTIONS_LINK_WIRELESSADAPTER
