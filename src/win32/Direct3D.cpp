@@ -72,6 +72,7 @@ private:
 	D3DDISPLAYMODE		  mode;
 	D3DPRESENT_PARAMETERS dpp;
 	D3DFORMAT             screenFormat;
+	LPDIRECT3DTEXTURE9    tempImage;
 	LPDIRECT3DTEXTURE9    emulatedImage[2];
 	unsigned char         mbCurrentTexture; // current texture for motion blur
 	bool                  mbTextureEmpty;
@@ -133,6 +134,7 @@ Direct3DDisplay::Direct3DDisplay()
 	textureSize = 0;
 	failed = false;
 	pFont = NULL;
+	tempImage = NULL;
 	emulatedImage[0] = NULL;
 	emulatedImage[1] = NULL;
 	mbCurrentTexture = 0;
@@ -377,11 +379,11 @@ void Direct3DDisplay::render()
 
 	pDevice->BeginScene();
 
-	// copy pix to emulatedImage and apply pixel filter if selected
+	// copy pix to tempImage and apply pixel filter if selected
 	D3DLOCKED_RECT lr;
 	const RECT target = { 0, 0, width, height };
 
-	if( FAILED( hr = emulatedImage[ mbCurrentTexture ]->LockRect( 0, &lr, &target, 0 ) ) ) {
+	if( FAILED( hr = tempImage->LockRect( 0, &lr, &target, 0 ) ) ) {
 		DXTRACE_ERR_MSGBOX( _T("Can not lock texture"), hr );
 		return;
 	} else {
@@ -423,7 +425,8 @@ void Direct3DDisplay::render()
 				break;
 			}
 		}
-		emulatedImage[ mbCurrentTexture ]->UnlockRect( 0 );
+		tempImage->UnlockRect( 0 );
+		pDevice->UpdateTexture( tempImage, emulatedImage[ mbCurrentTexture ] );
 	}
 
 
@@ -621,11 +624,32 @@ void Direct3DDisplay::createTexture( unsigned int textureWidth, unsigned int tex
 	}
 
 
+	if( !tempImage ) {
+		HRESULT hr = pDevice->CreateTexture(
+			textureSize, textureSize,
+			1, // 1 level, no mipmaps
+			0, // dynamic textures can be locked
+			dpp.BackBufferFormat,
+			D3DPOOL_SYSTEMMEM,
+			&tempImage,
+			NULL );
+
+		if( FAILED( hr ) ) {
+			DXTRACE_ERR_MSGBOX( _T("createTexture(temp) failed"), hr );
+			return;
+		}
+
+		// initialize whole texture with black since we might see
+		// the initial noise when using bilinear texture filtering
+		clearTexture( tempImage, textureSize );
+	}
+
+
 	if( !emulatedImage[0] ) {
 		HRESULT hr = pDevice->CreateTexture(
 			textureSize, textureSize,
 			1, // 1 level, no mipmaps
-			D3DUSAGE_DYNAMIC, // dynamic textures can be locked
+			0,
 			dpp.BackBufferFormat,
 			D3DPOOL_DEFAULT,
 			&emulatedImage[0],
@@ -635,17 +659,13 @@ void Direct3DDisplay::createTexture( unsigned int textureWidth, unsigned int tex
 			DXTRACE_ERR_MSGBOX( _T("createTexture(0) failed"), hr );
 			return;
 		}
-
-		// initialize whole texture with black since we might see
-		// the initial noise when using bilinear texture filtering
-		clearTexture( emulatedImage[0], textureSize );
 	}
 
 	if( !emulatedImage[1] && theApp.d3dMotionBlur ) {
 		HRESULT hr = pDevice->CreateTexture(
 			textureSize, textureSize,
 			1,
-			D3DUSAGE_DYNAMIC,
+			0,
 			dpp.BackBufferFormat,
 			D3DPOOL_DEFAULT,
 			&emulatedImage[1],
@@ -656,7 +676,6 @@ void Direct3DDisplay::createTexture( unsigned int textureWidth, unsigned int tex
 			return;
 		}
 
-		clearTexture( emulatedImage[1], textureSize );
 		mbTextureEmpty = true;
 	}
 }
@@ -664,6 +683,11 @@ void Direct3DDisplay::createTexture( unsigned int textureWidth, unsigned int tex
 
 void Direct3DDisplay::destroyTexture()
 {
+	if( tempImage ) {
+		tempImage->Release();
+		tempImage = NULL;
+	}
+
 	if( emulatedImage[0] ) {
 		emulatedImage[0]->Release();
 		emulatedImage[0] = NULL;
