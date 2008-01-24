@@ -1,3 +1,11 @@
+vbam (0.svn333-1) unstable; urgency=low
+
+  * Added a man page
+  * Added a default configuration file
+  * Updated VBA-M to r333
+
+ -- Bastien Bouclet <bgkweb@gmail.com>  Tue, 22 Jan 2008 22:06:31 +0100
+
 vbam (0.svn307-1) unstable; urgency=low
 
   * Initial release

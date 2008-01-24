@@ -1,7 +1,8 @@
 MACHINE= $(shell uname -s)
+SYSCONFDIR=/etc
 CC=gcc
 CPPC=g++
-CFLAGS=-W -Wall -Wno-unused -O3 -DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DBKPT_SUPPORT -DSDL -DSYSCONFDIR="home" -DUSE_OPENGL -DC_CORE
+CFLAGS=-W -Wall -Wno-unused -O3 -DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DBKPT_SUPPORT -DSDL -DSYSCONFDIR=\"$(SYSCONFDIR)\" -DUSE_OPENGL -DC_CORE
 CXXFLAGS=${CFLAGS}
 ASM=nasm
 ASMFLAGS=-w-orphan-labels -f elf -DELF -O1 -Isrc/hq/asm/
@@ -47,7 +48,7 @@ HQASMDIR=src/hq/asm
 
 
 ASMOBJ=${HQASMDIR}/hq3x_16${OE} ${HQASMDIR}/hq3x_32${OE} ${HQASMDIR}/hq4x_16${OE} \
-${HQASMDIR}/hq4x_32${OE} ${HQASMDIR}/hq3x32${OE}
+${HQASMDIR}/hq4x_32${OE} ${HQASMDIR}/hq3x32${OE} ${MAINDIR}/2xSaImmx${OE}
 
 GBAPUOBJ=${GBAPUDIR}/Blip_Buffer${OE} ${GBAPUDIR}/Effects_Buffer${OE} ${GBAPUDIR}/Gb_Apu${OE} \
 ${GBAPUDIR}/Gb_Apu_State${OE} ${GBAPUDIR}/Gb_Oscs${OE} ${GBAPUDIR}/Multi_Buffer${OE}
@@ -62,7 +63,7 @@ ${MAINDIR}/hq2x${OE} ${MAINDIR}/GBA-thumb${OE} ${MAINDIR}/GBA-arm${OE} ${MAINDIR
 ${MAINDIR}/Mode1${OE} ${MAINDIR}/Mode2${OE} ${MAINDIR}/Mode3${OE} ${MAINDIR}/Mode4${OE} \
 ${MAINDIR}/Mode5${OE} ${MAINDIR}/pixel${OE} \
 ${MAINDIR}/remote${OE} ${MAINDIR}/RTC${OE} ${MAINDIR}/scanline${OE} \
-${MAINDIR}/Sound${OE} ${MAINDIR}/Sram${OE} ${MAINDIR}/Text${OE} ${MAINDIR}/Util${OE} \
+${MAINDIR}/Sound${OE} ${MAINDIR}/Sram${OE} ${MAINDIR}/Util${OE} \
 ${MAINDIR}/expr${OE} ${MAINDIR}/exprNode${OE} ${MAINDIR}/expr-lex${OE} \
 ${MAINDIR}/memgzio${OE} 
 
@@ -70,12 +71,14 @@ DMGOBJ=${DMGDIR}/GB${OE} ${DMGDIR}/gbCheats${OE} ${DMGDIR}/gbDis${OE} ${DMGDIR}/
 ${DMGDIR}/gbGlobals${OE} ${DMGDIR}/gbMemory${OE} ${DMGDIR}/gbPrinter${OE} ${DMGDIR}/gbSGB${OE} \
 ${DMGDIR}/gbSound${OE}
 
-SDLOBJ=${SDLDIR}/debugger${OE} ${SDLDIR}/SDL${OE} ${SDLDIR}/dummy${OE} ${SDLDIR}/filters${OE}
+SDLOBJ=${SDLDIR}/debugger${OE} ${SDLDIR}/SDL${OE} ${SDLDIR}/dummy${OE} ${SDLDIR}/filters${OE} \
+${SDLDIR}/text${OE}
 
 OBJECTS=${MAINOBJ} ${DMGOBJ} ${SDLOBJ} ${GBAPUOBJ}
 
 ifeq ($(USEASM),yes)
 OBJECTS+=${ASMOBJ}
+CXXFLAGS+=-DMMX
 else
 OBJECTS+=${CALTERNOBJ}
 endif
@@ -110,4 +113,6 @@ clean:
 
 install: ${OUT}
 	install -d $(DESTDIR)$(PREFIX)/bin
+	install -d $(DESTDIR)$(SYSCONFDIR)
 	install ./${OUT} $(DESTDIR)$(PREFIX)/bin
+	install ./${SDLDIR}/VisualBoyAdvance.cfg-example $(DESTDIR)$(SYSCONFDIR)/VisualBoyAdvance.cfg

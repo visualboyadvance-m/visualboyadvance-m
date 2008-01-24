@@ -33,7 +33,6 @@
 #include "../System.h"
 #include "../GBA.h"
 #include "../Globals.h"
-#include "../Text.h"
 #include "../Util.h"
 #include "../gb/gbGlobals.h"
 #include "..\memgzio.h"
@@ -330,7 +329,7 @@ void OpenGLDisplay::clear()
 //dlist
 void OpenGLDisplay::renderlist()
 {
-	displaylist = glGenLists(1); //set the cube list to Generate a List
+	displaylist = glGenLists(1); //Generate a List
     glNewList(displaylist,GL_COMPILE); //compile the new list
     glBegin( GL_QUADS );
 

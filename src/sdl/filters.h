@@ -21,6 +21,10 @@
 
 #include "../System.h"
 
+      //
+      // Screen filters
+      //
+
 // List of available filters
 enum Filter { kStretch1x, kStretch2x, k2xSaI, kSuper2xSaI, kSuperEagle, kPixelate,
 				kAdMame2x, kBilinear, kBilinearPlus, kScanlines, kScanlinesTV,
@@ -37,5 +41,21 @@ int getFilterEnlargeFactor(const Filter f);
 
 // Get the display name for a filter
 char* getFilterName(const Filter f);
+
+      //
+      // Interframe filters
+      //
+
+// List of available IFB filters
+enum IFBFilter { kIFBNone, kIBMotionBlur, kIBSmart, kInvalidIFBFilter };
+
+// Function pointer type for an IFB filter function
+typedef void(*IFBFilterFunc)(u8*, u32, int, int);
+
+// Initialize an IFB filter and get the corresponding filter function pointer
+IFBFilterFunc initIFBFilter(const IFBFilter f, const int colorDepth);
+
+// Get the display name for an IFB filter
+char* getIFBFilterName(const IFBFilter f);
 
 #endif // VBA_SDL_FILTERS_H

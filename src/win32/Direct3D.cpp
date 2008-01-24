@@ -34,7 +34,6 @@
 #include "../System.h"
 #include "../GBA.h"
 #include "../Globals.h"
-#include "../Text.h"
 #include "../Util.h"
 #include "../gb/gbGlobals.h"
 
