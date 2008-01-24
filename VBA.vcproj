@@ -670,10 +670,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\Text.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\Util.cpp"
 					>
 				</File>
@@ -1373,10 +1369,6 @@
 				</File>
 				<File
 					RelativePath=".\src\win32\Reg.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Text.h"
 					>
 				</File>
 				<File
