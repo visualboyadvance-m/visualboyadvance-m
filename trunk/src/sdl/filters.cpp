@@ -18,6 +18,10 @@
 
 #include "filters.h"
 
+      //
+      // Screen filters
+      //
+
 extern int Init_2xSaI(u32);
 extern void hq2x_init(unsigned);
 extern bool sdlStretchInit(int colorDepth, int sizeMultiplier, int srcWidth);
@@ -142,6 +146,57 @@ FilterFunc initFilter(const Filter f, const int colorDepth, const int srcWidth)
 
   return func;
 }
+
+      //
+      // Interframe blending filters
+      //
+
+extern void SmartIB(u8*,u32,int,int);
+extern void SmartIB32(u8*,u32,int,int);
+extern void MotionBlurIB(u8*,u32,int,int);
+extern void MotionBlurIB32(u8*,u32,int,int);
+
+struct IFBFilterDesc {
+	char name[30];
+	IFBFilterFunc func16;
+	IFBFilterFunc func32;
+};
+
+const IFBFilterDesc IFBFilters[] = {
+  { "No interframe blending", 0, 0 },
+  { "Interframe motion blur", MotionBlurIB, MotionBlurIB32 },
+  { "Smart interframe blending", SmartIB, SmartIB32 }
+};
+
+IFBFilterFunc initIFBFilter(const IFBFilter f, const int colorDepth)
+{
+  IFBFilterFunc func;
+
+  switch (colorDepth) {
+    case 15:
+    case 16:
+      func = IFBFilters[f].func16;
+      break;
+    case 32:
+      func = IFBFilters[f].func32;
+      break;
+    case 24:
+    default:
+	  func = 0;
+      break;
+  }
+
+  return func;
+}
+
+char* getIFBFilterName(const IFBFilter f)
+{
+	return (char*)IFBFilters[f].name;
+}
+
+      //
+      // Optimized stretchers implementation
+      //
 
 #ifndef C_CORE
 u8 sdlStretcher[16384];

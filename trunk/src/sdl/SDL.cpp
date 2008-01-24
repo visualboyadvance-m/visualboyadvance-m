@@ -40,13 +40,13 @@
 #include "../Flash.h"
 #include "../RTC.h"
 #include "../Sound.h"
-#include "../Text.h"
 #include "../Util.h"
 #include "../gb/gb.h"
 #include "../gb/gbGlobals.h"
 
 #include "debugger.h"
 #include "filters.h"
+#include "text.h"
 
 #ifndef _WIN32
 # include <unistd.h>
@@ -59,23 +59,15 @@
 #ifndef __GNUC__
 # define HAVE_DECL_GETOPT 0
 # define __STDC__ 1
-# include "../getopt.h"
+# include "getopt.h"
 #else // ! __GNUC__
 # define HAVE_DECL_GETOPT 1
 # include <getopt.h>
 #endif // ! __GNUC__
 
-#ifdef MMX
-extern "C" bool cpu_mmx;
-#endif
 extern bool soundEcho;
 extern bool soundLowPass;
 extern bool soundReverse;
-
-extern void SmartIB(u8*,u32,int,int);
-extern void SmartIB32(u8*,u32,int,int);
-extern void MotionBlurIB(u8*,u32,int,int);
-extern void MotionBlurIB32(u8*,u32,int,int);
 
 extern void remoteInit();
 extern void remoteCleanUp();
@@ -127,13 +119,12 @@ int desktopHeight = 0;
 int sensorX = 2047;
 int sensorY = 2047;
 
-int filter = (int)kStretch2x;
+Filter filter = kStretch2x;
 u8 *delta = NULL;
 
 int filter_enlarge = 2;
 
 int sdlPrintUsage = 0;
-int disableMMX = 0;
 
 int cartridgeType = 3;
 int captureFormat = 0;
@@ -150,9 +141,9 @@ int RGB_LOW_BITS_MASK=0x821;
 u32 systemColorMap32[0x10000];
 u16 systemColorMap16[0x10000];
 u16 systemGbPalette[24];
-FilterFunc filterFunction = NULL;
-void (*ifbFunction)(u8*,u32,int,int) = NULL;
-int ifbType = 0;
+FilterFunc filterFunction = 0;
+IFBFilterFunc ifbFunction = 0;
+IFBFilter ifbType = kIFBNone;
 char filename[2048];
 char ipsname[2048];
 char biosFileName[2048];
@@ -160,6 +151,10 @@ char gbBiosFileName[2048];
 char captureDir[2048];
 char saveDir[2048];
 char batteryDir[2048];
+char* homeDir = NULL;
+
+// Directory within homedir to use for default save location.
+#define DOT_DIR ".vbam"
 
 static char *rewindMemory = NULL;
 static int rewindPos = 0;
@@ -305,6 +300,7 @@ struct option sdlOptions[] = {
   { "config", required_argument, 0, 'c' },
   { "debug", no_argument, 0, 'd' },
   { "filter", required_argument, 0, 'f' },
+  { "ifb-filter", required_argument, 0, 'I' },
   { "flash-size", required_argument, 0, 'S' },
   { "flash-64k", no_argument, &sdlFlashSize, 0 },
   { "flash-128k", no_argument, &sdlFlashSize, 1 },
@@ -312,15 +308,11 @@ struct option sdlOptions[] = {
   { "fullscreen", no_argument, &fullscreen, 1 },
   { "gdb", required_argument, 0, 'G' },
   { "help", no_argument, &sdlPrintUsage, 1 },
-  { "ifb-none", no_argument, &ifbType, 0 },
-  { "ifb-motion-blur", no_argument, &ifbType, 1 },
-  { "ifb-smart", no_argument, &ifbType, 2 },
   { "ips", required_argument, 0, 'i' },
   { "no-agb-print", no_argument, &sdlAgbPrint, 0 },
   { "no-auto-frameskip", no_argument, &autoFrameSkip, 0 },
   { "no-debug", no_argument, 0, 'N' },
   { "no-ips", no_argument, &sdlAutoIPS, 0 },
-  { "no-mmx", no_argument, &disableMMX, 1 },
   { "no-opengl", no_argument, &openGL, 0 },
   { "no-pause-when-inactive", no_argument, &pauseWhenInactive, 0 },
   { "no-rtc", no_argument, &sdlRtcEnable, 0 },
@@ -434,11 +426,9 @@ FILE *sdlFindFile(const char *name)
     return f;
   }
 
-  char *home = getenv("HOME");
-
-  if(home != NULL) {
-    fprintf(stderr, "Searching home directory: %s\n", home);
-    sprintf(path, "%s%c%s", home, FILE_SEP, name);
+  if(homeDir) {
+    fprintf(stderr, "Searching home directory: %s%c%s\n", homeDir, FILE_SEP, DOT_DIR);
+    sprintf(path, "%s%c%s%c%s", homeDir, FILE_SEP, DOT_DIR, FILE_SEP, name);
     f = fopen(path, "r");
     if(f != NULL)
       return f;
@@ -454,11 +444,11 @@ FILE *sdlFindFile(const char *name)
       return f;
   }
 #else // ! _WIN32
-    fprintf(stderr, "Searching system config directory: %s\n", SYSCONFDIR);
-    sprintf(path, "%s%c%s", SYSCONFDIR, FILE_SEP, name);
-    f = fopen(path, "r");
-    if(f != NULL)
-      return f;
+  fprintf(stderr, "Searching system config directory: %s\n", SYSCONFDIR);
+  sprintf(path, "%s%c%s", SYSCONFDIR, FILE_SEP, name);
+  f = fopen(path, "r");
+  if(f != NULL)
+    return f;
 #endif // ! _WIN32
 
   if(!strchr(arg0, '/') &&
@@ -659,9 +649,9 @@ void sdlReadPreferences(FILE *f)
     } else if(!strcmp(key, "gbBiosFile")) {
       strcpy(gbBiosFileName, value);
     } else if(!strcmp(key, "filter")) {
-      filter = sdlFromHex(value);
-      if(filter < 0 || filter > 17)
-        filter = 0;
+      filter = (Filter)sdlFromHex(value);
+      if(filter < kStretch1x || filter >= kInvalidFilter)
+        filter = kStretch2x;
     } else if(!strcmp(key, "disableStatus")) {
       disableStatusMessages = sdlFromHex(value) ? true : false;
     } else if(!strcmp(key, "borderOn")) {
@@ -723,9 +713,9 @@ void sdlReadPreferences(FILE *f)
       if(sdlFlashSize != 0 && sdlFlashSize != 1)
         sdlFlashSize = 0;
     } else if(!strcmp(key, "ifbType")) {
-      ifbType = sdlFromHex(value);
-      if(ifbType < 0 || ifbType > 2)
-        ifbType = 0;
+      ifbType = (IFBFilter)sdlFromHex(value);
+     if(ifbType < kIFBNone || ifbType >= kInvalidIFBFilter)
+        ifbType = kIFBNone;
     } else if(!strcmp(key, "showSpeed")) {
       showSpeed = sdlFromHex(value);
       if(showSpeed < 0 || showSpeed > 2)
@@ -738,10 +728,6 @@ void sdlReadPreferences(FILE *f)
       throttle = sdlFromHex(value);
       if(throttle != 0 && (throttle < 5 || throttle > 1000))
         throttle = 0;
-    } else if(!strcmp(key, "disableMMX")) {
-#ifdef MMX
-      cpu_mmx = sdlFromHex(value) ? false : true;
-#endif
     } else if(!strcmp(key, "pauseWhenInactive")) {
       pauseWhenInactive = sdlFromHex(value) ? true : false;
     } else if(!strcmp(key, "agbPrint")) {
@@ -928,26 +914,6 @@ static int sdlCalculateShift(u32 mask)
   return m-5;
 }
 
-static int sdlCalculateMaskWidth(u32 mask)
-{
-  int m = 0;
-  int mask2 = mask;
-
-  while(mask2) {
-    m++;
-    mask2 >>= 1;
-  }
-
-  int m2 = 0;
-  mask2 = mask;
-  while(!(mask2 & 1)) {
-    m2++;
-    mask2 >>= 1;
-  }
-
-  return m - m2;
-}
-
 void sdlWriteState(int num)
 {
   char stateName[2048];
@@ -955,6 +921,8 @@ void sdlWriteState(int num)
   if(saveDir[0])
     sprintf(stateName, "%s/%s%d.sgm", saveDir, sdlGetFilename(filename),
             num+1);
+  else if (homeDir)
+    sprintf(stateName, "%s/%s/%s%d.sgm", homeDir, DOT_DIR, sdlGetFilename(filename), num + 1);
   else
     sprintf(stateName,"%s%d.sgm", filename, num+1);
 
@@ -974,6 +942,8 @@ void sdlReadState(int num)
   if(saveDir[0])
     sprintf(stateName, "%s/%s%d.sgm", saveDir, sdlGetFilename(filename),
             num+1);
+  else if (homeDir)
+    sprintf(stateName, "%s/%s/%s%d.sgm", homeDir, DOT_DIR, sdlGetFilename(filename), num + 1);
   else
     sprintf(stateName,"%s%d.sgm", filename, num+1);
 
@@ -992,6 +962,8 @@ void sdlWriteBattery()
 
   if(batteryDir[0])
     sprintf(buffer, "%s/%s.sav", batteryDir, sdlGetFilename(filename));
+  else if (homeDir)
+    sprintf(buffer, "%s/%s/%s.sav", homeDir, DOT_DIR, sdlGetFilename(filename));
   else
     sprintf(buffer, "%s.sav", filename);
 
@@ -1006,6 +978,8 @@ void sdlReadBattery()
 
   if(batteryDir[0])
     sprintf(buffer, "%s/%s.sav", batteryDir, sdlGetFilename(filename));
+  else if (homeDir)
+    sprintf(buffer, "%s/%s/%s.sav", homeDir, DOT_DIR, sdlGetFilename(filename));
   else
     sprintf(buffer, "%s.sav", filename);
 
@@ -1028,7 +1002,7 @@ void sdlInitVideo() {
   int screenWidth;
   int screenHeight;
 
-  filter_enlarge = getFilterEnlargeFactor((Filter)filter);
+  filter_enlarge = getFilterEnlargeFactor(filter);
   destWidth = filter_enlarge * srcWidth;
   destHeight = filter_enlarge * srcHeight;
 
@@ -1432,16 +1406,15 @@ void sdlPollEvents()
       case SDLK_g:
         if(!(event.key.keysym.mod & MOD_NOCTRL) &&
            (event.key.keysym.mod & KMOD_CTRL)) {
-		  filterFunction = 0;
-		  while (!filterFunction)
-		  {
-			filter += 1;
-			filter %= kInvalidFilter;
-		    filterFunction = initFilter((Filter)filter, systemColorDepth, srcWidth);
+		      filterFunction = 0;
+		      while (!filterFunction)
+		      {
+			      filter = (Filter)((filter + 1) % kInvalidFilter);
+		        filterFunction = initFilter(filter, systemColorDepth, srcWidth);
           }
-		  if (getFilterEnlargeFactor((Filter)filter) != filter_enlarge)
-		    sdlInitVideo();
-		  systemScreenMessage(getFilterName((Filter)filter));
+		      if (getFilterEnlargeFactor(filter) != filter_enlarge)
+		        sdlInitVideo();
+		      systemScreenMessage(getFilterName(filter));
         }
         break;
       case SDLK_F11:
@@ -1550,6 +1523,11 @@ Options:\n\
                                 tcp      - use TCP at port 55555\n\
                                 tcp:PORT - use TCP at port PORT\n\
                                 pipe     - use pipe transport\n\
+  -I, --ifb-filter=FILTER      Select interframe blending filter:\n\
+");
+  for (int i  = 0; i < (int)kInvalidIFBFilter; i++)
+	  printf("                                %d - %s\n", i, getIFBFilterName((IFBFilter)i));
+  printf("\
   -N, --no-debug               Don't parse debug information\n\
   -S, --flash-size=SIZE        Set the Flash size\n\
       --flash-64k               0 -  64K Flash\n\
@@ -1589,13 +1567,9 @@ Options:\n\
 Long options only:\n\
       --agb-print              Enable AGBPrint support\n\
       --auto-frameskip         Enable auto frameskipping\n\
-      --ifb-none               No interframe blending\n\
-      --ifb-motion-blur        Interframe motion blur\n\
-      --ifb-smart              Smart interframe blending\n\
       --no-agb-print           Disable AGBPrint support\n\
       --no-auto-frameskip      Disable auto frameskipping\n\
       --no-ips                 Do not apply IPS patch\n\
-      --no-mmx                 Disable MMX support\n\
       --no-pause-when-inactive Don't pause when inactive\n\
       --no-rtc                 Disable RTC support\n\
       --no-show-speed          Don't show emulation speed\n\
@@ -1625,17 +1599,25 @@ int main(int argc, char **argv)
 
   parseDebug = true;
 
+  char buf[1024];
+  struct stat s;
+  
+  // Get home dir
+  homeDir = getenv("HOME");
+  snprintf(buf, 1024, "%s/%s", homeDir, DOT_DIR);
+  // Make dot dir if not existent
+  if (stat(buf, &s) == -1 || !S_ISDIR(s.st_mode))
+    mkdir(buf, 0755);
+
   sdlReadPreferences();
 
   sdlPrintUsage = 0;
 
   while((op = getopt_long(argc,
                           argv,
-                           "FNO:T:Y:G:D:b:c:df:hi:p::s:t:v:1234",
+                           "FNO:T:Y:G:I:D:b:c:df:hi:p::s:t:v:",
                           sdlOptions,
                           NULL)) != -1) {
-    if (optarg)
-	optarg++;
     switch(op) {
     case 0:
       // long option already processed by getopt_long
@@ -1717,9 +1699,16 @@ int main(int argc, char **argv)
       break;
     case 'f':
       if(optarg) {
-        filter = atoi(optarg);
+        filter = (Filter)atoi(optarg);
       } else {
-        filter = 0;
+        filter = kStretch2x;
+      }
+      break;
+    case 'I':
+      if(optarg) {
+        ifbType = (IFBFilter)atoi(optarg);
+      } else {
+        ifbType = kIFBNone;
       }
       break;
     case 'p':
@@ -1788,11 +1777,6 @@ int main(int argc, char **argv)
     usage(argv[0]);
     exit(-1);
   }
-
-#ifdef MMX
-  if(disableMMX)
-    cpu_mmx = 0;
-#endif
 
   if(rewindTimer)
     rewindMemory = (char *)malloc(8*REWIND_SIZE);
@@ -1968,9 +1952,9 @@ int main(int argc, char **argv)
 
   sdlInitVideo();
 
-  filterFunction = initFilter((Filter)filter, systemColorDepth, srcWidth);
+  filterFunction = initFilter(filter, systemColorDepth, srcWidth);
   if (!filterFunction) {
-    fprintf(stderr,"Unable to init filter '%s'\n", getFilterName((Filter)filter));
+    fprintf(stderr,"Unable to init filter '%s'\n", getFilterName(filter));
     exit(-1);
   }
 
@@ -1992,34 +1976,7 @@ int main(int argc, char **argv)
     memset(delta, 255, 322*242*4);
   }
 
-  if(systemColorDepth == 16) {
-    switch(ifbType) {
-    case 0:
-    default:
-      ifbFunction = NULL;
-      break;
-    case 1:
-      ifbFunction = MotionBlurIB;
-      break;
-    case 2:
-      ifbFunction = SmartIB;
-      break;
-    }
-  } else if(systemColorDepth == 32) {
-    switch(ifbType) {
-    case 0:
-    default:
-      ifbFunction = NULL;
-      break;
-    case 1:
-      ifbFunction = MotionBlurIB32;
-      break;
-    case 2:
-      ifbFunction = SmartIB32;
-      break;
-    }
-  } else
-    ifbFunction = NULL;
+  ifbFunction = initIFBFilter(ifbType, systemColorDepth);
 
   emulating = 1;
   renderedFrames = 0;
@@ -2120,7 +2077,7 @@ void drawScreenMessage(u8 *screen, int pitch, int x, int y, unsigned int duratio
     if(((systemGetClock() - screenMessageTime) < duration) &&
        !disableStatusMessages) {
       drawText(screen, pitch, x, y,
-               screenMessageBuffer);
+               screenMessageBuffer, false);
     } else {
       screenMessage = false;
     }
@@ -2136,10 +2093,8 @@ void drawSpeed(u8 *screen, int pitch, int x, int y)
     sprintf(buffer, "%3d%%(%d, %d fps)", systemSpeed,
             systemFrameSkip,
             showRenderedFrames);
-  if(showSpeedTransparent)
-    drawTextTransp(screen, pitch, x, y, buffer);
-  else
-    drawText(screen, pitch, x, y, buffer);
+            
+  drawText(screen, pitch, x, y, buffer, showSpeedTransparent);
 }
 
 void systemDrawScreen()
@@ -2348,6 +2303,8 @@ void systemScreenCapture(int a)
   if(captureFormat) {
     if(captureDir[0])
       sprintf(buffer, "%s/%s%02d.bmp", captureDir, sdlGetFilename(filename), a);
+    else if (homeDir)
+      sprintf(buffer, "%s/%s/%s%02d.bmp", homeDir, DOT_DIR, sdlGetFilename(filename), a);
     else
       sprintf(buffer, "%s%02d.bmp", filename, a);
 
@@ -2355,6 +2312,8 @@ void systemScreenCapture(int a)
   } else {
     if(captureDir[0])
       sprintf(buffer, "%s/%s%02d.png", captureDir, sdlGetFilename(filename), a);
+    else if (homeDir)
+      sprintf(buffer, "%s/%s/%s%02d.png", homeDir, DOT_DIR, sdlGetFilename(filename), a);
     else
       sprintf(buffer, "%s%02d.png", filename, a);
     emulator.emuWritePNG(buffer);
@@ -2602,5 +2561,5 @@ void systemGbBorderOn()
 
   sdlInitVideo();
 
-  filterFunction = initFilter((Filter)filter, systemColorDepth, srcWidth);
+  filterFunction = initFilter(filter, systemColorDepth, srcWidth);
 }
