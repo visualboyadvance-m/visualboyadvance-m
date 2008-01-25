@@ -606,46 +606,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\getopt.c"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							CompileAs="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|x64"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							CompileAs="1"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\src\getopt1.c"
-					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							CompileAs="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|x64"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							CompileAs="1"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
 					RelativePath=".\src\memgzio.c"
 					>
 					<FileConfiguration
@@ -1349,10 +1309,6 @@
 				</File>
 				<File
 					RelativePath=".\src\CheatSearch.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\getopt.h"
 					>
 				</File>
 				<File
