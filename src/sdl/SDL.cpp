@@ -1573,7 +1573,7 @@ Long options only:\n\
       --no-pause-when-inactive Don't pause when inactive\n\
       --no-rtc                 Disable RTC support\n\
       --no-show-speed          Don't show emulation speed\n\
-      --no-throttle            Disable thrrotle\n\
+      --no-throttle            Disable throttle\n\
       --pause-when-inactive    Pause when inactive\n\
       --rtc                    Enable RTC support\n\
       --show-speed-normal      Show emulation speed\n\
