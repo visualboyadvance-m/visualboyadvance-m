@@ -1,4 +1,6 @@
 Important:
+- Close all dialogs (like logging) before entering fullscreen to prevent dead-lock with D3D
+
 - Many games show emulation warnings in the log window (unaligned read, bad read/write address)
  - Test: Metroid Fusion, Advance Wars 2
 
