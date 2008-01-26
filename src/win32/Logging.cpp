@@ -268,6 +268,14 @@ void toolsLogging()
   }
 }
 
+void toolsLoggingClose()
+{
+  if(Logging::instance != NULL) {
+    Logging::instance->DestroyWindow();
+    Logging::instance = NULL;
+  }
+}
+
 void toolsLog(const char *s)
 {
   CString str;

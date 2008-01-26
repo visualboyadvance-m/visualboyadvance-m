@@ -97,6 +97,7 @@ class Logging : public ResizeDlg
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 void toolsLogging();
+void toolsLoggingClose();
 void toolsLog(const char *s);
 void toolsClearLog();
 

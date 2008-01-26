@@ -27,6 +27,7 @@
 #include "RomInfo.h"
 #include "Reg.h"
 #include "WinResUtil.h"
+#include "Logging.h"
 
 #include "../GBA.h"
 #include "../Globals.h"
@@ -689,10 +690,12 @@ void MainWnd::OnUpdateFileRominformation(CCmdUI* pCmdUI)
   pCmdUI->Enable(emulating);
 }
 
+//OnFileToggleFullscreen
 void MainWnd::OnFileTogglemenu()
 {
 	if( theApp.videoOption <= VIDEO_4X ) {
 		// switch to full screen
+		toolsLoggingClose(); // close log dialog
 		theApp.updateWindowSize( theApp.lastFullscreen );
 	} else {
 		// switch to windowed mode
