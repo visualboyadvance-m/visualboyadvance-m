@@ -186,6 +186,14 @@ namespace Sm60FPS
   int					bSaveMoreCPU;
 };
 
+#ifdef LOG_PERFORMANCE
+#ifndef PERFORMANCE_INTERVAL
+#define PERFORMANCE_INTERVAL 3600
+#endif
+int systemSpeedTable[PERFORMANCE_INTERVAL];
+unsigned int systemSpeedCounter;
+#endif
+
 void directXMessage(const char *msg)
 {
   systemMessage(IDS_DIRECTX_7_REQUIRED,
@@ -880,6 +888,11 @@ void VBA::updateFilter()
 		systemBlueShift = 0;
 		utilUpdateSystemColorMaps();
 	}
+
+#ifdef LOG_PERFORMANCE
+	memset( systemSpeedTable, 0x00, sizeof(systemSpeedTable) );
+	systemSpeedCounter = 0;
+#endif
 }
 
 
@@ -1092,6 +1105,10 @@ void systemFrame()
 	if( theApp.movieRecording || theApp.moviePlaying ) {
 		theApp.movieFrame++;
 	}
+
+#ifdef LOG_PERFORMANCE
+	systemSpeedTable[systemSpeedCounter++ % PERFORMANCE_INTERVAL] = systemSpeed;
+#endif
 }
 
 
@@ -1125,6 +1142,19 @@ void system10Frames(int rate)
   }
 
   theApp.wasPaused = false;
+
+#ifdef LOG_PERFORMANCE
+  if( systemSpeedCounter >= PERFORMANCE_INTERVAL ) {
+	  // log performance every PERFORMANCE_INTERVAL frames
+	  float a = 0.0f;
+	  for( unsigned short i = 0 ; i < PERFORMANCE_INTERVAL ; i++ ) {
+		  a += (float)systemSpeedTable[i];
+	  }
+	  a /= (float)PERFORMANCE_INTERVAL;
+	  log( _T("Speed: %f\n"), a );
+	  systemSpeedCounter = 0;
+  }
+#endif
 }
 
 void systemScreenMessage(const char *msg)
