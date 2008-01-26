@@ -81,7 +81,7 @@ struct {
   { "FileExportGamesharkSnapshot", ID_FILE_EXPORT_GAMESHARKSNAPSHOT },
   { "FileScreenCapture", ID_FILE_SCREENCAPTURE },
   { "FileRomInformation", ID_FILE_ROMINFORMATION },
-  { "FileToggleMenu", ID_FILE_TOGGLEMENU },
+  { "FileToggleFullscreen", ID_FILE_TOGGLEMENU },
   { "FileClose", ID_FILE_CLOSE },
   { "FileExit", ID_FILE_EXIT },
   { "OptionsFrameSkip0", ID_OPTIONS_VIDEO_FRAMESKIP_0 },
