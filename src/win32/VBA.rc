@@ -12,6 +12,37 @@
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
+/////////////////////////////////////////////////////////////////////////////
+// German (Germany) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.\0"
+END
+
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // German (Germany) resources
+/////////////////////////////////////////////////////////////////////////////
+
 
 /////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
@@ -183,21 +214,24 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,90,102,50,14,WS_GROUP
 END
 
-IDD_ABOUT DIALOGEX 0, 0, 179, 143
+IDD_ABOUT DIALOGEX 0, 0, 179, 153
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "About"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    ICON            IDI_MAINICON,IDC_STATIC,6,6,16,16
-    CTEXT           "VisualBoyAdvance Emulator",IDC_STATIC,34,7,120,8
-    CTEXT           "Copyright © 2008 VBA development team",IDC_STATIC,16,36,144,8
-    CTEXT           "https://vbam.bountysource.com",IDC_URL,6,126,165,8
-    CTEXT           "Contributions by Costis and original VBA Team",IDC_STATIC,7,49,165,8
-    CTEXT           "Version",IDC_STATIC,47,17,27,8
-    CTEXT           "",IDC_VERSION,80,18,60,8,SS_NOPREFIX
-    GROUPBOX        "VBA Development Team",IDC_STATIC,7,61,165,59
-    LTEXT           "mudlord\nNach\nJonas Quinn\nDJRobX\nSpacy",IDC_STATIC,15,70,143,44
+    ICON            IDI_MAINICON,IDC_STATIC,6,6,21,20
+    CTEXT           "VisualBoyAdvance Emulator",IDC_STATIC,36,6,138,8
+    CTEXT           "Copyright © 2008 VBA-M development team",IDC_STATIC,6,48,168,8
+    CTEXT           "https://vbam.bountysource.com",IDC_URL,6,138,168,8
+    RTEXT           "Version:",IDC_STATIC,36,18,54,8
+    LTEXT           "",IDC_VERSION,96,18,78,8,SS_NOPREFIX
+    GROUPBOX        "VBA-M dev team:",IDC_STATIC,6,72,90,60
+    CTEXT           "mudlord\nNach\nJonas Quinn\nDJRobX\nSpacy",IDC_STATIC,12,84,78,42
+    RTEXT           "Date compiled:",IDC_STATIC,36,30,54,8
+    LTEXT           "",IDC_DATE,96,30,78,8,SS_NOPREFIX
+    GROUPBOX        "Thanks go to:",IDC_STATIC,102,72,72,60
+    CTEXT           "Orig. VBA team\nCostis",IDC_STATIC,108,84,60,42
 END
 
 IDD_DIRECTORIES DIALOGEX 0, 0, 222, 270
@@ -1173,7 +1207,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 172
         TOPMARGIN, 7
-        BOTTOMMARGIN, 136
+        BOTTOMMARGIN, 146
     END
 
     IDD_DIRECTORIES, DIALOG
