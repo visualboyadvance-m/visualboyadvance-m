@@ -36,19 +36,19 @@ static char THIS_FILE[] = __FILE__;
 AboutDialog::AboutDialog(CWnd* pParent /*=NULL*/)
   : CDialog(AboutDialog::IDD, pParent)
 {
-  //{{AFX_DATA_INIT(AboutDialog)
-  m_version = _T(VERSION);
-  //}}AFX_DATA_INIT
+	m_version = _T(VERSION);
+	m_date = _T(__DATE__);
 }
 
 
 void AboutDialog::DoDataExchange(CDataExchange* pDX)
 {
-  CDialog::DoDataExchange(pDX);
-  //{{AFX_DATA_MAP(AboutDialog)
-  DDX_Text(pDX, IDC_VERSION, m_version);
-  DDX_Control(pDX, IDC_URL, m_link);
-  //}}AFX_DATA_MAP
+	CDialog::DoDataExchange(pDX);
+	//{{AFX_DATA_MAP(AboutDialog)
+	DDX_Text(pDX, IDC_VERSION, m_version);
+	DDX_Control(pDX, IDC_URL, m_link);
+	//}}AFX_DATA_MAP
+	DDX_Text(pDX, IDC_DATE, m_date);
 }
 
 

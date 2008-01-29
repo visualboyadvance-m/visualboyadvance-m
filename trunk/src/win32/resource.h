@@ -459,6 +459,8 @@
 #define IDC_PORT                        1217
 #define IDC_VSCROLL                     1218
 #define IDC_VERSION                     1219
+#define IDC_VERSION2                    1220
+#define IDC_DATE                        1220
 #define IDC_VERBOSE_SWI                 1223
 #define IDC_VERBOSE_UNALIGNED_ACCESS    1224
 #define IDC_VERBOSE_ILLEGAL_WRITE       1225
