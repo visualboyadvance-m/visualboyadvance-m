@@ -435,7 +435,7 @@ FILE *sdlFindFile(const char *name)
   }
 
 #ifdef _WIN32
-  home = getenv("USERPROFILE");
+  char *home = getenv("USERPROFILE");
   if(home != NULL) {
     fprintf(stderr, "Searching user profile directory: %s\n", home);
     sprintf(path, "%s%c%s", home, FILE_SEP, name);
@@ -1602,12 +1602,16 @@ int main(int argc, char **argv)
   char buf[1024];
   struct stat s;
   
+#ifndef _WIN32
   // Get home dir
   homeDir = getenv("HOME");
   snprintf(buf, 1024, "%s/%s", homeDir, DOT_DIR);
   // Make dot dir if not existent
   if (stat(buf, &s) == -1 || !S_ISDIR(s.st_mode))
     mkdir(buf, 0755);
+#else
+  homeDir = 0;
+#endif
 
   sdlReadPreferences();
 
@@ -2123,6 +2127,7 @@ void systemDrawScreen()
     drawSpeed(screen, destPitch, 10, 20);
 
   if (openGL) {
+    glClear( GL_COLOR_BUFFER_BIT );
     glPixelStorei(GL_UNPACK_ROW_LENGTH, destWidth);
     if (systemColorDepth == 16)
       glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,

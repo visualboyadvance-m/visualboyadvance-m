@@ -40,7 +40,7 @@ ifndef $(PREFIX)
 endif
 
 ifndef VERSION
-  SVNVERSION=$(shell test -d .svn && svnversion -n .)
+  -SVNVERSION=$(shell test -d .svn && svnversion -n .)
   BADCHARS=$(findstring :,$(SVNVERSION))$(findstring S,$(SVNVERSION))
   ifeq ($(BADCHARS),)
     ifneq ($(SVNVERSION),)
@@ -66,7 +66,7 @@ HQASMDIR=src/hq/asm
 
 
 ASMOBJ=${HQASMDIR}/hq3x_16${OE} ${HQASMDIR}/hq3x_32${OE} ${HQASMDIR}/hq4x_16${OE} \
-${HQASMDIR}/hq4x_32${OE} ${HQASMDIR}/hq3x32${OE} ${MAINDIR}/2xSaImmx${OE}
+${HQASMDIR}/hq4x_32${OE} ${HQASMDIR}/hq3x32${OE}
 
 GBAPUOBJ=${GBAPUDIR}/Blip_Buffer${OE} ${GBAPUDIR}/Effects_Buffer${OE} ${GBAPUDIR}/Gb_Apu${OE} \
 ${GBAPUDIR}/Gb_Apu_State${OE} ${GBAPUDIR}/Gb_Oscs${OE} ${GBAPUDIR}/Multi_Buffer${OE}
@@ -96,7 +96,6 @@ OBJECTS=${MAINOBJ} ${DMGOBJ} ${SDLOBJ} ${GBAPUOBJ}
 
 ifeq ($(USEASM),yes)
 OBJECTS+=${ASMOBJ}
-CXXFLAGS+=-DMMX
 else
 OBJECTS+=${CALTERNOBJ}
 endif
