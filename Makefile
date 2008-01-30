@@ -11,6 +11,7 @@ STRIP=strip -s
 DEL=rm -f
 OE=.o
 OUT=vbam
+BASEVERSION=1.8.0
 
 ifeq ($(MACHINE),Darwin)
 	LFLAGS=-lz -lpng -framework OpenGL `sdl-config --libs`
@@ -37,6 +38,23 @@ endif
 ifndef $(PREFIX)
   PREFIX=/usr/local
 endif
+
+ifndef VERSION
+  SVNVERSION=$(shell test -d .svn && svnversion -n .)
+  BADCHARS=$(findstring :,$(SVNVERSION))$(findstring S,$(SVNVERSION))
+  ifeq ($(BADCHARS),)
+    ifneq ($(SVNVERSION),)
+      ifneq ($(SVNVERSION),exported)
+        VERSION=$(BASEVERSION)-r$(subst M,,$(SVNVERSION))
+      endif
+    endif
+  endif
+endif
+
+ifdef VERSION
+  CXXFLAGS+=-DVERSION=\"$(VERSION)\"
+endif
+
 
 MAINDIR=src
 SDLDIR=src/sdl
