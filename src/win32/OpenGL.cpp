@@ -46,28 +46,7 @@
 #include <GL/glu.h>
 #include "glFont.h"
 #include <gl/glext.h>
-
-
 typedef BOOL (APIENTRY *PFNWGLSWAPINTERVALFARPROC)( int );
-/*We need to declare the procs for these functions like this
-If anyone's got a better solution, I'd love to see it =D */
-PFNGLCREATEPROGRAMOBJECTARBPROC  glCreateProgramObjectARB  = NULL;
-PFNGLDELETEOBJECTARBPROC         glDeleteObjectARB         = NULL;
-PFNGLUSEPROGRAMOBJECTARBPROC     glUseProgramObjectARB     = NULL;
-PFNGLCREATESHADEROBJECTARBPROC   glCreateShaderObjectARB   = NULL;
-PFNGLSHADERSOURCEARBPROC         glShaderSourceARB         = NULL;
-PFNGLCOMPILESHADERARBPROC        glCompileShaderARB        = NULL;
-PFNGLGETOBJECTPARAMETERIVARBPROC glGetObjectParameterivARB = NULL;
-PFNGLATTACHOBJECTARBPROC         glAttachObjectARB         = NULL;
-PFNGLGETINFOLOGARBPROC           glGetInfoLogARB           = NULL;
-PFNGLLINKPROGRAMARBPROC          glLinkProgramARB          = NULL;
-PFNGLGETUNIFORMLOCATIONARBPROC   glGetUniformLocationARB   = NULL;
-PFNGLUNIFORM4FARBPROC            glUniform4fARB            = NULL;
-PFNGLUNIFORM1IARBPROC            glUniform1iARB            = NULL;
-
-
-
-
 extern int Init_2xSaI(u32);
 extern void winlog(const char *,...);
 extern int systemSpeed;
@@ -94,7 +73,6 @@ private:
 	u8 *filterData;
 	RECT destRect;
 	bool failed;
-	bool initialized;
 	GLFONT font;
 	int pitch;
 	GLuint displaylist; 
@@ -170,7 +148,6 @@ OpenGLDisplay::OpenGLDisplay()
 	height = 0;
 	size = 0.0f;
 	failed = false;
-	initialized = false;
 	filterData = NULL;
 	currentAdapter = 0;
 }
@@ -235,8 +212,6 @@ void OpenGLDisplay::cleanup()
 	EnumDisplayDevices( NULL, currentAdapter, &dev, 0 );
 	// restore default video mode
 	ChangeDisplaySettingsEx( dev.DeviceName, NULL, NULL, 0, NULL );
-
-	initialized = false;
 }
 
 //init renderer
@@ -273,9 +248,6 @@ bool OpenGLDisplay::initialize()
 		// restore default mode
 		ChangeDisplaySettingsEx( dev.DeviceName, NULL, NULL, 0, NULL );
 	}
-
-	width = theApp.rect.right;
-	height = theApp.rect.bottom;
 
 	EnableOpenGL();
 	initializeFont();
@@ -315,7 +287,6 @@ bool OpenGLDisplay::initialize()
 	if(failed)
 		return false;
 
-	initialized = true;
 	return true;
 }
 
@@ -329,7 +300,7 @@ void OpenGLDisplay::clear()
 //dlist
 void OpenGLDisplay::renderlist()
 {
-	displaylist = glGenLists(1); //Generate a List
+	displaylist = glGenLists(1); //set the cube list to Generate a List
     glNewList(displaylist,GL_COMPILE); //compile the new list
     glBegin( GL_QUADS );
 
@@ -429,15 +400,13 @@ void OpenGLDisplay::render()
 //resize screen
 void OpenGLDisplay::resize( int w, int h )
 {
-	if( initialized ) {
-		initializeMatrices( w, h );
-		/* Display lists are not mutable, so we have to do this*/
-		if (displaylist)
-		{
-			glDeleteLists(displaylist, 1);
-			displaylist = 0;
-			renderlist();
-		}
+	initializeMatrices( w, h );
+	/* Display lists are not mutable, so we have to do this*/
+	if (displaylist)
+	{
+	glDeleteLists(displaylist, 1);
+	displaylist = 0;
+	renderlist();
 	}
 }
 
@@ -486,6 +455,12 @@ void OpenGLDisplay::initializeMatrices( int w, int h )
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	if (displaylist)
+	{
+		glDeleteLists(displaylist, 1);
+		displaylist = 0;
+		renderlist();
+	}
 }
 
 //init font texture
@@ -557,20 +532,18 @@ void OpenGLDisplay::setVSync( int interval )
 bool OpenGLDisplay::changeRenderSize( int w, int h )
 {
 	if( (width != w) || (height != h) ) {
-		if( initialized ) {
-			if( texture != 0 ) {
-				glDeleteTextures( 1, &texture );
-				texture = 0;
-			}
-
-			if( !initializeTexture( w, h ) ) {
-				failed = true;
-				return false;
-			}
-			if (filterData)
-				free(filterData);
-			filterData = (u8 *)malloc(4*w*h);
+		if( texture != 0 ) {
+			glDeleteTextures( 1, &texture );
+			texture = 0;
 		}
+
+		if( !initializeTexture( w, h ) ) {
+			failed = true;
+			return false;
+		}
+		if (filterData)
+			free(filterData);
+		filterData = (u8 *)malloc(4*w*h);
 	}
 	if (displaylist)
 	{
@@ -586,7 +559,6 @@ void OpenGLDisplay::calculateDestRect( int w, int h )
 {
 	float scaleX = (float)w / (float)width;
 	float scaleY = (float)h / (float)height;
-
 	float min = (scaleX < scaleY) ? scaleX : scaleY;
 	if( theApp.fsMaxScale && (min > theApp.fsMaxScale) ) {
 		min = (float)theApp.fsMaxScale;
@@ -604,6 +576,12 @@ void OpenGLDisplay::calculateDestRect( int w, int h )
 		LONG diff = (h - destRect.bottom) / 2;
 		destRect.top += diff;
 		destRect.bottom += diff;
+	}
+	if (displaylist)
+	{
+		glDeleteLists(displaylist, 1);
+		displaylist = 0;
+		renderlist();
 	}
 }
 
