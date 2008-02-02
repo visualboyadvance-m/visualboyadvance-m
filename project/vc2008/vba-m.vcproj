@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="9,00"
+	Name="vba-m"
+	ProjectGUID="{714B3EF3-5D43-421F-A97E-447540E7C137}"
+	RootNamespace="vba-m"
+	Keyword="MakeFileProj"
+	TargetFrameworkVersion="196613"
+	>
+	<Platforms>
+		<Platform
+			Name="Win32"
+		/>
+	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
+	<Configurations>
+		<Configuration
+			Name="debug|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="qmake -makefile -win32 -Wall ../qmake/vba-m.pro&#x0D;&#x0A;nmake $(ConfigurationName)"
+				ReBuildCommandLine="qmake -makefile -win32 -Wall ../qmake/vba-m.pro&#x0D;&#x0A;nmake $(ConfigurationName)"
+				CleanCommandLine="nmake distclean&#x0D;&#x0A;rmdir /S /Q debug&#x0D;&#x0A;rmdir /S /Q release&#x0D;&#x0A;"
+				Output="$(OutDir)/VisualBoyAdvance.exe"
+				PreprocessorDefinitions="WIN32;_DEBUG"
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+		<Configuration
+			Name="release|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="qmake -makefile -win32 -Wall ../qmake/vba-m.pro&#x0D;&#x0A;nmake $(ConfigurationName)"
+				ReBuildCommandLine="qmake -makefile -win32 -Wall ../qmake/vba-m.pro&#x0D;&#x0A;nmake $(ConfigurationName)"
+				CleanCommandLine="nmake distclean&#x0D;&#x0A;rmdir /S /Q debug&#x0D;&#x0A;rmdir /S /Q release&#x0D;&#x0A;"
+				Output="$(OutDir)/VisualBoyAdvance.exe"
+				PreprocessorDefinitions="WIN32;NDEBUG"
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+		<Filter
+			Name="GUI"
+			>
+			<Filter
+				Name="main"
+				>
+				<File
+					RelativePath="..\..\src\qt\main.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\qt\main.h"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Makefile"
+			>
+			<File
+				RelativePath="..\qmake\vba-m.pro"
+				>
+			</File>
+		</Filter>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>
