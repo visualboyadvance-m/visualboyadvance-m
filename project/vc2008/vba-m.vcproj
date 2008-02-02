@@ -24,8 +24,8 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="qmake -makefile -win32 -Wall ../qmake/vba-m.pro&#x0D;&#x0A;nmake $(ConfigurationName)"
-				ReBuildCommandLine="qmake -makefile -win32 -Wall ../qmake/vba-m.pro&#x0D;&#x0A;nmake $(ConfigurationName)"
+				BuildCommandLine="qmake -makefile -win32 -Wall ../qmake/vba-m.pro&#x0D;&#x0A;nmake debug"
+				ReBuildCommandLine=""
 				CleanCommandLine="nmake distclean&#x0D;&#x0A;rmdir /S /Q debug&#x0D;&#x0A;rmdir /S /Q release&#x0D;&#x0A;"
 				Output="$(OutDir)/VisualBoyAdvance.exe"
 				PreprocessorDefinitions="WIN32;_DEBUG"
@@ -44,8 +44,8 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="qmake -makefile -win32 -Wall ../qmake/vba-m.pro&#x0D;&#x0A;nmake $(ConfigurationName)"
-				ReBuildCommandLine="qmake -makefile -win32 -Wall ../qmake/vba-m.pro&#x0D;&#x0A;nmake $(ConfigurationName)"
+				BuildCommandLine="qmake -makefile -win32 -Wall ../qmake/vba-m.pro&#x0D;&#x0A;nmake release&#x0D;&#x0A;upx -9 &quot;$(TargetPath)&quot;"
+				ReBuildCommandLine=""
 				CleanCommandLine="nmake distclean&#x0D;&#x0A;rmdir /S /Q debug&#x0D;&#x0A;rmdir /S /Q release&#x0D;&#x0A;"
 				Output="$(OutDir)/VisualBoyAdvance.exe"
 				PreprocessorDefinitions="WIN32;NDEBUG"
