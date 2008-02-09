@@ -21,8 +21,8 @@
 
 #if defined __cplusplus
 // Add C++ includes here
-#include <QtGui>
-#include <QtOpenGL>
+#include <QtGui/QtGui>
+#include <QtOpenGL/QtOpenGL>
 #endif
 
 #endif // #ifndef PRECOMPILE_H
