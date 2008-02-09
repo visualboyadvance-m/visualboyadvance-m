@@ -16,9 +16,13 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef PRECOMPILE_H
+#define PRECOMPILE_H
 
-#include "precompile.h"
+#if defined __cplusplus
+// Add C++ includes here
+#include <QtGui>
+#include <QtOpenGL>
+#endif
 
-#endif // #ifndef MAIN_H
+#endif // #ifndef PRECOMPILE_H
