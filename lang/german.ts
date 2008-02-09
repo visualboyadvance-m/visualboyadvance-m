@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="de_DE">
+<defaultcodec></defaultcodec>
 <context>
     <name>MainWnd</name>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="73"/>
+        <location filename="../src/qt/MainWnd.cpp" line="29"/>
         <source>VBA-M</source>
         <translation></translation>
     </message>
@@ -88,9 +89,14 @@
         <translation>OpenGL ist NICHT verfügbar!</translation>
     </message>
     <message>
+        <location filename="../src/qt/MainWnd.cpp" line="73"/>
+        <source>About VBA-M</source>
+        <translation>Über VBA-M</translation>
+    </message>
+    <message>
         <location filename="../src/qt/MainWnd.cpp" line="115"/>
-        <source>OpenGL</source>
-        <translation></translation>
+        <source>About OpenGL</source>
+        <translation>Über OpenGL</translation>
     </message>
 </context>
 </TS>
