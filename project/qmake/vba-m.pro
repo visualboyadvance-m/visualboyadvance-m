@@ -1,5 +1,5 @@
 TEMPLATE = app
-CONFIG += qt
+CONFIG += qt release
 QT += opengl
 TARGET = VisualBoyAdvance
 
