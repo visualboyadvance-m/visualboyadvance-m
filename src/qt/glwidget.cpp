@@ -16,9 +16,27 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
-#ifndef MAIN_H
-#define MAIN_H
+#include "glwidget.h"
 
-#include "precompile.h"
+GLWidget::GLWidget( QWidget *parent )
+	: QGLWidget( parent )
+{
+}
 
-#endif // #ifndef MAIN_H
+GLWidget::~GLWidget()
+{
+}
+
+void GLWidget::initializeGL()
+{
+	qglClearColor( QColor( 0xFF, 0x00, 0xFF ) );
+}
+
+void GLWidget::paintGL()
+{
+	glClear( GL_COLOR_BUFFER_BIT );
+}
+
+void GLWidget::resizeGL( int width, int height )
+{
+}

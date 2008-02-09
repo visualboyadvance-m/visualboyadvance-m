@@ -24,10 +24,10 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="qmake -makefile -win32 -Wall ../qmake/vba-m.pro&#x0D;&#x0A;nmake debug&#x0D;&#x0A;lupdate  ../qmake/vba-m.pro"
+				BuildCommandLine="qmake -makefile -win32 -Wall ..\qmake\vba-m.pro&#x0D;&#x0A;nmake debug&#x0D;&#x0A;lupdate  ..\qmake\vba-m.pro"
 				ReBuildCommandLine=""
 				CleanCommandLine="nmake distclean&#x0D;&#x0A;rmdir /S /Q debug&#x0D;&#x0A;rmdir /S /Q release&#x0D;&#x0A;"
-				Output="$(OutDir)/VisualBoyAdvance.exe"
+				Output="$(OutDir)\VisualBoyAdvance.exe"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				IncludeSearchPath=""
 				ForcedIncludes=""
@@ -47,7 +47,7 @@
 				BuildCommandLine="qmake -makefile -win32 -Wall ..\qmake\vba-m.pro&#x0D;&#x0A;nmake release&#x0D;&#x0A;upx -9 &quot;$(TargetPath)&quot;&#x0D;&#x0A;lrelease  ..\qmake\vba-m.pro&#x0D;&#x0A;echo &quot;Copying translation files to release directory...&quot;&#x0D;&#x0A;mkdir $(OutDir)\lang&#x0D;&#x0A;copy /Y ..\..\lang\*.qm $(OutDir)\lang"
 				ReBuildCommandLine=""
 				CleanCommandLine="nmake distclean&#x0D;&#x0A;rmdir /S /Q debug&#x0D;&#x0A;rmdir /S /Q release&#x0D;&#x0A;"
-				Output="$(OutDir)/VisualBoyAdvance.exe"
+				Output="$(OutDir)\VisualBoyAdvance.exe"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				IncludeSearchPath=""
 				ForcedIncludes=""
@@ -62,6 +62,7 @@
 	<Files>
 		<Filter
 			Name="GUI"
+			Filter="cpp;h"
 			>
 			<Filter
 				Name="main"
@@ -72,6 +73,18 @@
 				</File>
 				<File
 					RelativePath="..\..\src\qt\main.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="MainWnd"
+				>
+				<File
+					RelativePath="..\..\src\qt\mainwnd.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\qt\mainwnd.h"
 					>
 				</File>
 			</Filter>
@@ -93,6 +106,26 @@
 				RelativePath="..\..\lang\german.ts"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="Other"
+			>
+			<File
+				RelativePath="..\..\src\qt\precompile.h"
+				>
+			</File>
+			<Filter
+				Name="OpenGL"
+				>
+				<File
+					RelativePath="..\..\src\qt\glwidget.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\qt\glwidget.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

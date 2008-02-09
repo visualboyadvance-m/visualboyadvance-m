@@ -16,9 +16,27 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef MAINWND_H
+#define MAINWND_H
 
 #include "precompile.h"
 
-#endif // #ifndef MAIN_H
+class MainWnd : public QMainWindow
+{
+	Q_OBJECT
+
+public:
+	MainWnd::MainWnd( QWidget *parent = 0 );
+	MainWnd::~MainWnd();
+
+private:
+	void createMenus();
+	bool createDisplay();
+
+private slots:
+	void showAbout();
+	void showAboutQt();
+	void showAboutOpenGL();
+};
+
+#endif // #ifndef MAINWND_H

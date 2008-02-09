@@ -16,9 +16,23 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef GL_WIDGET_H
+#define GL_WIDGET_H
 
 #include "precompile.h"
 
-#endif // #ifndef MAIN_H
+class GLWidget : public QGLWidget
+{
+	Q_OBJECT
+
+public:
+	GLWidget( QWidget *parent = 0 );
+	~GLWidget();
+
+protected:
+	void initializeGL();
+	void paintGL();
+	void resizeGL( int width, int height );
+};
+
+#endif // #ifndef GL_WIDGET_H
