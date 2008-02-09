@@ -70,7 +70,7 @@ bool MainWnd::createDisplay()
 
 void MainWnd::showAbout()
 {
-	QMessageBox::about( this, tr( "VBA-M" ),
+	QMessageBox::about( this, tr( "About VBA-M" ),
 		tr( "This program is licensed under terms of the GNU General Public License." ) );
 }
 
@@ -112,6 +112,6 @@ void MainWnd::showAboutOpenGL()
 		info = tr( "OpenGL is NOT available!" );
 	}
 
-	QMessageBox *test = new QMessageBox( QMessageBox::NoIcon, tr( "OpenGL" ), info, QMessageBox::NoButton, this );
+	QMessageBox *test = new QMessageBox( QMessageBox::NoIcon, tr( "About OpenGL" ), info, QMessageBox::NoButton, this );
 	test->show();
 }
