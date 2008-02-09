@@ -80,11 +80,11 @@
 				Name="MainWnd"
 				>
 				<File
-					RelativePath="..\..\src\qt\mainwnd.cpp"
+					RelativePath="..\..\src\qt\MainWnd.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\qt\mainwnd.h"
+					RelativePath="..\..\src\qt\MainWnd.h"
 					>
 				</File>
 			</Filter>

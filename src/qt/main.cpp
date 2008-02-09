@@ -18,7 +18,7 @@
 
 #include "main.h"
 
-#include "mainwnd.h"
+#include "MainWnd.h"
 
 int main( int argc, char *argv[] )
 {

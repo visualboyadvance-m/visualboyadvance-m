@@ -1,0 +1,11 @@
+How to create a new translation:
+
+- Add "TRANSLATIONS += language.ts" to vba-m.pro
+- Call "lupdate vba-m.pro" to create the .ts file
+- Edit & translate the .ts file with the "Qt Linguist" tool
+- Call "lrelease vba-m.pro" to create the compiled .qm file
+- Load the language file in the application:
+<<
+QTranslator translator;
+translator.load( "language" ); // without .qm ending
+>>
