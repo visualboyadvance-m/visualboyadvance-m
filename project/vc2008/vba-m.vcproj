@@ -24,9 +24,9 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="qmake -makefile -win32 &quot;CONFIG+=debug&quot; ..\qmake\vba-m.pro&#x0D;&#x0A;nmake debug&#x0D;&#x0A;lupdate  ..\qmake\vba-m.pro"
+				BuildCommandLine="qmake -makefile -win32 &quot;CONFIG+=debug&quot; ..\qmake\vba-m.pro&#x0D;&#x0A;nmake debug"
 				ReBuildCommandLine=""
-				CleanCommandLine="nmake distclean&#x0D;&#x0A;rmdir /S /Q debug&#x0D;&#x0A;rmdir /S /Q release&#x0D;&#x0A;"
+				CleanCommandLine="nmake distclean&#x0D;&#x0A;rmdir /S /Q debug&#x0D;&#x0A;rmdir /S /Q release"
 				Output="$(OutDir)\VisualBoyAdvance.exe"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				IncludeSearchPath=""
@@ -44,9 +44,9 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="qmake -makefile -win32 ..\qmake\vba-m.pro&#x0D;&#x0A;nmake release&#x0D;&#x0A;upx -9 &quot;$(TargetPath)&quot;&#x0D;&#x0A;lrelease  ..\qmake\vba-m.pro&#x0D;&#x0A;echo &quot;Copying translation files to release directory...&quot;&#x0D;&#x0A;mkdir $(OutDir)\lang&#x0D;&#x0A;copy /Y ..\..\lang\*.qm $(OutDir)\lang"
+				BuildCommandLine="qmake -makefile -win32 ..\qmake\vba-m.pro&#x0D;&#x0A;nmake release&#x0D;&#x0A;upx --best &quot;$(TargetPath)&quot;"
 				ReBuildCommandLine=""
-				CleanCommandLine="nmake distclean&#x0D;&#x0A;rmdir /S /Q debug&#x0D;&#x0A;rmdir /S /Q release&#x0D;&#x0A;"
+				CleanCommandLine="nmake distclean&#x0D;&#x0A;rmdir /S /Q debug&#x0D;&#x0A;rmdir /S /Q release"
 				Output="$(OutDir)\VisualBoyAdvance.exe"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				IncludeSearchPath=""
@@ -95,19 +95,6 @@
 			>
 			<File
 				RelativePath="..\qmake\vba-m.pro"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Translations"
-			Filter="ts;qm"
-			>
-			<File
-				RelativePath="..\..\lang\german.ts"
-				>
-			</File>
-			<File
-				RelativePath="..\..\lang\spanish.ts"
 				>
 			</File>
 		</Filter>
