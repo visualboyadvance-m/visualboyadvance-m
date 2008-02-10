@@ -11,3 +11,17 @@ For Windows:
 - Execute the "release.cmd" script to compile it to a .qm file
 
 - The .qm file can now be loaded & used by the application
+
+
+
+For Linux:
+
+- Add "TRANSLATIONS += path/to/language.ts" to vba-m.pro
+
+- Type lrelease vba-m.pro
+
+- Edit & translate the .ts file with the "Qt Linguist" tool
+
+- In Qt Linguist, go to File -> release as. This will compile it into a .qm file
+
+- The .qm file can now be loaded & used by the application
