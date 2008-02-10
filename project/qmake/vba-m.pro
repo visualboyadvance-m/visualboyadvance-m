@@ -15,3 +15,4 @@ HEADERS += ../../src/qt/glwidget.h
 SOURCES += ../../src/qt/glwidget.cpp
 
 TRANSLATIONS += ../../lang/german.ts
+TRANSLATIONS += ../../lang/spanish.ts

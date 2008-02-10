@@ -106,6 +106,10 @@
 				RelativePath="..\..\lang\german.ts"
 				>
 			</File>
+			<File
+				RelativePath="..\..\lang\spanish.ts"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Other"
