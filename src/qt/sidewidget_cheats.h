@@ -15,44 +15,22 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-
-#ifndef MAINWND_H
-#define MAINWND_H
+#ifndef SIDEWIDGET_CHEAT_H
+#define SIDEWIDGET_CHEAT_H
 
 #include "precompile.h"
 
-class MainWnd : public QMainWindow
+#include "ui_sidewidget_cheats.h"
+
+class SideWidget_Cheats : public QWidget
 {
 	Q_OBJECT
 
 public:
-	MainWnd::MainWnd( QWidget *parent = 0, QApplication *app = 0, QTranslator **trans = 0 );
-	MainWnd::~MainWnd();
-
-public slots:
-	bool loadTranslation( QString file );
+	SideWidget_Cheats( QWidget *parent = 0 );
 
 private:
-	void createActions();
-	void createMenus();
-	void createDockWidgets();
-	bool createDisplay();
-
-	QApplication *theApp;
-	QTranslator **translator;
-	QMenu *fileMenu;
-	QMenu *settingsMenu;
-	QAction *enableTranslationAct;
-	QMenu *toolsMenu;
-	QMenu *helpMenu;
-	QDockWidget *dockWidget_cheats;
-
-private slots:
-	bool selectLanguage();
-	bool enableTranslation( bool enable );
-	void showAbout();
-	void showAboutOpenGL();
-	void showAboutQt();
+	Ui::sidewidget_cheats ui;
 };
 
-#endif // #ifndef MAINWND_H
+#endif // #ifndef SIDEWIDGET_CHEAT_H
