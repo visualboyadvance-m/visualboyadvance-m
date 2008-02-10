@@ -29,7 +29,7 @@
 				CleanCommandLine="nmake distclean&#x0D;&#x0A;rmdir /S /Q debug&#x0D;&#x0A;rmdir /S /Q release"
 				Output="$(OutDir)\VisualBoyAdvance.exe"
 				PreprocessorDefinitions="WIN32;_DEBUG"
-				IncludeSearchPath=""
+				IncludeSearchPath="&quot;$(ProjectDir)&quot;"
 				ForcedIncludes=""
 				AssemblySearchPath=""
 				ForcedUsingAssemblies=""
@@ -49,7 +49,7 @@
 				CleanCommandLine="nmake distclean&#x0D;&#x0A;rmdir /S /Q debug&#x0D;&#x0A;rmdir /S /Q release"
 				Output="$(OutDir)\VisualBoyAdvance.exe"
 				PreprocessorDefinitions="WIN32;NDEBUG"
-				IncludeSearchPath=""
+				IncludeSearchPath="&quot;$(ProjectDir)&quot;"
 				ForcedIncludes=""
 				AssemblySearchPath=""
 				ForcedUsingAssemblies=""
@@ -87,6 +87,26 @@
 					RelativePath="..\..\src\qt\MainWnd.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="side widgets"
+				>
+				<Filter
+					Name="cheats"
+					>
+					<File
+						RelativePath="..\..\src\qt\sidewidget_cheats.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\qt\sidewidget_cheats.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\qt\sidewidget_cheats.ui"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
