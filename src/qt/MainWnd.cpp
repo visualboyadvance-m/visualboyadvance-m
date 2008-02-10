@@ -20,8 +20,14 @@
 
 #include "glwidget.h"
 
-MainWnd::MainWnd( QWidget *parent )
-	: QMainWindow( parent )
+MainWnd::MainWnd( QWidget *parent, QApplication *app, QTranslator **trans )
+	: QMainWindow( parent ),
+	theApp( app ),
+	translator( trans ),
+	fileMenu( 0 ),
+	settingsMenu( 0 ),
+	toolsMenu( 0 ),
+	helpMenu( 0 )
 {
 	createDisplay();
 
@@ -37,22 +43,43 @@ MainWnd::~MainWnd()
 
 void MainWnd::createMenus()
 {
-	QMenu *fileMenu = menuBar()->addMenu( tr( "&File" ) );
-	QMenu *settingsMenu = menuBar()->addMenu( tr( "&Settings" ) );
-	QMenu *toolsMenu = menuBar()->addMenu( tr( "&Tools" ) );
-	QMenu *helpMenu = menuBar()->addMenu( tr( "&Help" ) );
+	if( fileMenu ) {
+		delete fileMenu;
+		fileMenu = 0;
+	}
 
-	QAction *showAboutOpenGLAct = new QAction( tr( "About &OpenGL..." ), this );
-	connect( showAboutOpenGLAct, SIGNAL( triggered() ), this, SLOT( showAboutOpenGL() ) );
-	helpMenu->addAction( showAboutOpenGLAct );
+	if( settingsMenu ) {
+		delete settingsMenu;
+		settingsMenu = 0;
+	}
 
-	QAction *showAboutAct = new QAction( tr( "About &VBA-M..." ), this );
-	connect( showAboutAct, SIGNAL( triggered() ), this, SLOT( showAbout() ) );
-	helpMenu->addAction( showAboutAct );
+	if( toolsMenu ) {
+		delete toolsMenu;
+		toolsMenu = 0;
+	}
 
-	QAction *showAboutQtAct = new QAction( tr( "About &Qt..." ), this );
-	connect( showAboutQtAct, SIGNAL( triggered() ), this, SLOT( showAboutQt() ) );
-	helpMenu->addAction( showAboutQtAct );
+	if( helpMenu ) {
+		delete helpMenu;
+		helpMenu = 0;
+	}
+
+	// File menu
+	fileMenu = menuBar()->addMenu( tr( "&File" ) );
+	fileMenu->addAction( tr( "Exit" ), this, SLOT( close() ) );
+
+	// Settings menu
+	settingsMenu = menuBar()->addMenu( tr( "&Settings" ) );
+	settingsMenu->addAction( tr( "Select translation..." ), this, SLOT( selectTranslation() ) );
+
+	// Tools menu
+	toolsMenu = menuBar()->addMenu( tr( "&Tools" ) );
+
+	// Help menu
+	helpMenu = menuBar()->addMenu( tr( "&Help" ) );
+
+	helpMenu->addAction( tr( "About &VBA-M..." ), this, SLOT( showAbout() ) );
+	helpMenu->addAction( tr( "About &OpenGL..." ), this, SLOT( showAboutOpenGL() ) );
+	helpMenu->addAction( tr( "About &Qt..." ), this, SLOT( showAboutQt() ) );
 }
 
 bool MainWnd::createDisplay()
@@ -66,6 +93,33 @@ bool MainWnd::createDisplay()
 	}
 
 	return false;
+}
+
+void MainWnd::selectTranslation()
+{
+	QString file = QFileDialog::getOpenFileName(
+		this,
+		tr( "Select translation" ),
+		"lang",
+		tr( "Translation files (*.qm)" ) );
+
+	if( file.isNull() ) return;
+	if( !file.endsWith( tr( ".qm" ), Qt::CaseInsensitive ) ) return;
+
+	// load translation
+	if( *translator != 0 ) {
+		theApp->removeTranslator( *translator );
+		delete *translator;
+		*translator = 0;
+	}
+	file.chop( 3 ); // remove file extension ".qm"
+	*translator = new QTranslator();
+	(*translator)->load( file );
+	theApp->installTranslator( *translator );
+
+	// apply translation
+	createMenus();
+	// the user might have to restart the application to apply changes completely
 }
 
 void MainWnd::showAbout()
