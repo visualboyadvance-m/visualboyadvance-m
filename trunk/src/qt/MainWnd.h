@@ -26,7 +26,7 @@ class MainWnd : public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWnd::MainWnd( QWidget *parent = 0 );
+	MainWnd::MainWnd( QWidget *parent = 0, QApplication *app = 0, QTranslator **trans = 0 );
 	MainWnd::~MainWnd();
 
 private:
@@ -34,9 +34,18 @@ private:
 	bool createDisplay();
 
 private slots:
+	void selectTranslation();
 	void showAbout();
-	void showAboutQt();
 	void showAboutOpenGL();
+	void showAboutQt();
+
+private:
+	QApplication *theApp;
+	QTranslator **translator;
+	QMenu *fileMenu;
+	QMenu *settingsMenu;
+	QMenu *toolsMenu;
+	QMenu *helpMenu;
 };
 
 #endif // #ifndef MAINWND_H
