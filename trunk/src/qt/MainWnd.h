@@ -29,23 +29,28 @@ public:
 	MainWnd::MainWnd( QWidget *parent = 0, QApplication *app = 0, QTranslator **trans = 0 );
 	MainWnd::~MainWnd();
 
+public slots:
+	bool loadTranslation( QString file );
+
 private:
+	void createActions();
 	void createMenus();
 	bool createDisplay();
 
-private slots:
-	void selectTranslation();
-	void showAbout();
-	void showAboutOpenGL();
-	void showAboutQt();
-
-private:
 	QApplication *theApp;
 	QTranslator **translator;
 	QMenu *fileMenu;
 	QMenu *settingsMenu;
+	QAction *enableTranslationAct;
 	QMenu *toolsMenu;
 	QMenu *helpMenu;
+
+private slots:
+	bool selectLanguage();
+	bool enableTranslation( bool enable );
+	void showAbout();
+	void showAboutOpenGL();
+	void showAboutQt();
 };
 
 #endif // #ifndef MAINWND_H

@@ -27,18 +27,40 @@ MainWnd::MainWnd( QWidget *parent, QApplication *app, QTranslator **trans )
 	fileMenu( 0 ),
 	settingsMenu( 0 ),
 	toolsMenu( 0 ),
-	helpMenu( 0 )
+	helpMenu( 0 ),
+	enableTranslationAct( 0 )
 {
 	createDisplay();
 
 	setMinimumSize( 320, 240 );
 	setWindowTitle( tr( "VBA-M" ) );
 
+	createActions();
 	createMenus();
 }
 
 MainWnd::~MainWnd()
 {
+}
+
+void MainWnd::createActions()
+{
+	bool enabled, checked;
+
+	if( enableTranslationAct != 0 ) {
+		enabled = enableTranslationAct->isEnabled(); // memorize state
+		checked = enableTranslationAct->isChecked();
+		delete enableTranslationAct;
+		enableTranslationAct = 0;
+	} else {
+		enabled = false;
+		checked = false;
+	}
+	enableTranslationAct = new QAction( tr( "Enable translation" ), this );
+	enableTranslationAct->setEnabled( enabled );
+	enableTranslationAct->setCheckable( true );
+	enableTranslationAct->setChecked( checked );
+	connect( enableTranslationAct, SIGNAL( toggled( bool ) ), this, SLOT( enableTranslation( bool ) ) );
 }
 
 void MainWnd::createMenus()
@@ -63,16 +85,21 @@ void MainWnd::createMenus()
 		helpMenu = 0;
 	}
 
+
 	// File menu
 	fileMenu = menuBar()->addMenu( tr( "&File" ) );
 	fileMenu->addAction( tr( "Exit" ), this, SLOT( close() ) );
 
+
 	// Settings menu
 	settingsMenu = menuBar()->addMenu( tr( "&Settings" ) );
-	settingsMenu->addAction( tr( "Select translation..." ), this, SLOT( selectTranslation() ) );
+	settingsMenu->addAction( tr( "Select language..." ), this, SLOT( selectLanguage() ) );
+	settingsMenu->addAction( enableTranslationAct );
+
 
 	// Tools menu
 	toolsMenu = menuBar()->addMenu( tr( "&Tools" ) );
+
 
 	// Help menu
 	helpMenu = menuBar()->addMenu( tr( "&Help" ) );
@@ -95,31 +122,67 @@ bool MainWnd::createDisplay()
 	return false;
 }
 
-void MainWnd::selectTranslation()
+bool MainWnd::selectLanguage()
 {
 	QString file = QFileDialog::getOpenFileName(
 		this,
-		tr( "Select translation" ),
+		tr( "Select language" ),
 		"lang",
-		tr( "Translation files (*.qm)" ) );
+		tr( "Language files (*.qm)" ) );
 
-	if( file.isNull() ) return;
-	if( !file.endsWith( tr( ".qm" ), Qt::CaseInsensitive ) ) return;
+	if( file.isNull() ) return false;
 
-	// load translation
+	bool ret = loadTranslation( file );
+	ret &= enableTranslation( true );
+
+	if( ret == false ) {
+		QMessageBox::critical( this, tr( "Error!" ), tr( "Language file can not be loaded!" ) );
+	}
+	return ret;
+}
+
+bool MainWnd::loadTranslation( QString file )
+{
+	if( !file.endsWith( tr( ".qm" ), Qt::CaseInsensitive ) ) return false;
+
+	// remove current translation
+	enableTranslation( false );
 	if( *translator != 0 ) {
-		theApp->removeTranslator( *translator );
 		delete *translator;
 		*translator = 0;
 	}
+
 	file.chop( 3 ); // remove file extension ".qm"
+
+	// load new translation
 	*translator = new QTranslator();
-	(*translator)->load( file );
-	theApp->installTranslator( *translator );
+	bool ret = (*translator)->load( file );
+	enableTranslationAct->setEnabled( ret );
+	return ret;
+}
+
+bool MainWnd::enableTranslation( bool enable )
+{
+	if( enable ) {
+		if( *translator != 0 ) {
+			theApp->installTranslator( *translator );
+			enableTranslationAct->setChecked( true );
+		} else {
+			return false;
+		}
+	} else {
+		if( *translator != 0 ) {
+			theApp->removeTranslator( *translator );
+		} else {
+			return false;
+		}
+	}
 
 	// apply translation
-	createMenus();
 	// the user might have to restart the application to apply changes completely
+	createActions();
+	createMenus();
+	return true;
 }
 
 void MainWnd::showAbout()
