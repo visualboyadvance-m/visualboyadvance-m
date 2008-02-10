@@ -19,6 +19,7 @@
 #include "MainWnd.h"
 
 #include "glwidget.h"
+#include "sidewidget_cheats.h"
 
 MainWnd::MainWnd( QWidget *parent, QApplication *app, QTranslator **trans )
 	: QMainWindow( parent ),
@@ -28,7 +29,8 @@ MainWnd::MainWnd( QWidget *parent, QApplication *app, QTranslator **trans )
 	settingsMenu( 0 ),
 	toolsMenu( 0 ),
 	helpMenu( 0 ),
-	enableTranslationAct( 0 )
+	enableTranslationAct( 0 ),
+	dockWidget_cheats( 0 )
 {
 	createDisplay();
 
@@ -37,6 +39,7 @@ MainWnd::MainWnd( QWidget *parent, QApplication *app, QTranslator **trans )
 
 	createActions();
 	createMenus();
+	createDockWidgets();
 }
 
 MainWnd::~MainWnd()
@@ -107,6 +110,21 @@ void MainWnd::createMenus()
 	helpMenu->addAction( tr( "About &VBA-M..." ), this, SLOT( showAbout() ) );
 	helpMenu->addAction( tr( "About &OpenGL..." ), this, SLOT( showAboutOpenGL() ) );
 	helpMenu->addAction( tr( "About &Qt..." ), this, SLOT( showAboutQt() ) );
+}
+
+void MainWnd::createDockWidgets()
+{
+	if( dockWidget_cheats != 0 ) {
+		delete dockWidget_cheats;
+		dockWidget_cheats = 0;
+	}
+
+	// Cheat Widget
+	dockWidget_cheats = new QDockWidget( tr( "Cheats" ), this );
+	SideWidget_Cheats *sw_cheats = new SideWidget_Cheats( dockWidget_cheats );
+	dockWidget_cheats->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
+	dockWidget_cheats->setWidget( sw_cheats );
+	addDockWidget( Qt::LeftDockWidgetArea, dockWidget_cheats );
 }
 
 bool MainWnd::createDisplay()
@@ -182,13 +200,19 @@ bool MainWnd::enableTranslation( bool enable )
 	// the user might have to restart the application to apply changes completely
 	createActions();
 	createMenus();
+	createDockWidgets();
 	return true;
 }
 
 void MainWnd::showAbout()
 {
-	QMessageBox::about( this, tr( "About VBA-M" ),
-		tr( "This program is licensed under terms of the GNU General Public License." ) );
+	QString info;
+	info += tr ( "This program is licensed under terms of the GNU General Public License." );
+
+	// translators may use this string to give informations about the language file
+	info += tr ( "\nNo language file loaded." );
+
+	QMessageBox::about( this, tr( "About VBA-M" ), info );
 }
 
 void MainWnd::showAboutQt()
