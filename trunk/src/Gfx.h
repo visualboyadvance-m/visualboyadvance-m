@@ -159,7 +159,7 @@ static inline void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs,
 
   if(mosaicOn) {
     if((VCOUNT % mosaicY) != 0) {
-      mosaicY = (VCOUNT / mosaicY) * mosaicY;
+      mosaicY = VCOUNT - (VCOUNT % mosaicY);
       yyy = (vofs + mosaicY) & maskY;
     }
   }
@@ -181,6 +181,9 @@ static inline void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs,
       int tileX = (xxx & 7);
       int tileY = yyy & 7;
 
+      if(tileX == 7)
+        screenSource++;
+
       if(data & 0x0400)
         tileX = 7 - tileX;
       if(data & 0x0800)
@@ -190,11 +193,6 @@ static inline void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs,
 
       line[x] = color ? (READ16LE(&palette[color]) | prio): 0x80000000;
 
-      if(data & 0x0400) {
-        if(tileX == 0)
-          screenSource++;
-      } else if(tileX == 7)
-        screenSource++;
       xxx++;
       if(xxx == 256) {
         if(sizeX > 256)
@@ -218,6 +216,9 @@ static inline void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs,
       int tileX = (xxx & 7);
       int tileY = yyy & 7;
 
+      if(tileX == 7)
+        screenSource++;
+
       if(data & 0x0400)
         tileX = 7 - tileX;
       if(data & 0x0800)
@@ -231,14 +232,9 @@ static inline void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs,
         color &= 0x0F;
       }
 
-      int pal = (READ16LE(screenSource)>>8) & 0xF0;
+      int pal = (data>>8) & 0xF0;
       line[x] = color ? (READ16LE(&palette[pal + color])|prio): 0x80000000;
 
-      if(data & 0x0400) {
-        if(tileX == 0)
-          screenSource++;
-      } else if(tileX == 7)
-        screenSource++;
       xxx++;
       if(xxx == 256) {
         if(sizeX > 256)
@@ -345,44 +341,28 @@ static inline void gfxDrawRotScreen(u16 control,
     realY -= y*dmy;
   }
 
-  int xxx = (realX >> 8);
-  int yyy = (realY >> 8);
-
   if(control & 0x2000) {
-    xxx &= maskX;
-    yyy &= maskY;
-  }
-
-  if(control & 0x80) {
     for(int x = 0; x < 240; x++) {
-      if(xxx < 0 ||
-         yyy < 0 ||
-         xxx >= sizeX ||
-         yyy >= sizeY) {
-        line[x] = 0x80000000;
-      } else {
-        int tile = screenBase[(xxx>>3) + ((yyy>>3)<<yshift)];
+      int xxx = (realX >> 8) & maskX;
+      int yyy = (realY >> 8) & maskY;
 
-        int tileX = (xxx & 7);
-        int tileY = yyy & 7;
+      int tile = screenBase[(xxx>>3) + ((yyy>>3)<<yshift)];
 
-        u8 color = charBase[(tile<<6) + (tileY<<3) + tileX];
+      int tileX = (xxx & 7);
+      int tileY = yyy & 7;
 
-        line[x] = color ? (READ16LE(&palette[color])|prio): 0x80000000;
-      }
+      u8 color = charBase[(tile<<6) + (tileY<<3) + tileX];
+
+      line[x] = color ? (READ16LE(&palette[color])|prio): 0x80000000;
+
       realX += dx;
       realY += dy;
-
-      xxx = (realX >> 8);
-      yyy = (realY >> 8);
-
-      if(control & 0x2000) {
-        xxx &= maskX;
-        yyy &= maskY;
-      }
     }
   } else {
     for(int x = 0; x < 240; x++) {
+      int xxx = (realX >> 8);
+      int yyy = (realY >> 8);
+
       if(xxx < 0 ||
          yyy < 0 ||
          xxx >= sizeX ||
@@ -400,14 +380,6 @@ static inline void gfxDrawRotScreen(u16 control,
       }
       realX += dx;
       realY += dy;
-
-      xxx = (realX >> 8);
-      yyy = (realY >> 8);
-
-      if(control & 0x2000) {
-        xxx &= maskX;
-        yyy &= maskY;
-      }
     }
   }
 
@@ -583,7 +555,7 @@ static inline void gfxDrawRotScreen256(u16 control,
 
   if(control & 0x40) {
     int mosaicY = ((MOSAIC & 0xF0)>>4) + 1;
-    int y = (VCOUNT / mosaicY) * mosaicY;
+    int y = VCOUNT - (VCOUNT % mosaicY);
     realX = startX + y*dmx;
     realY = startY + y*dmy;
   }
@@ -684,7 +656,7 @@ static inline void gfxDrawRotScreen16Bit160(u16 control,
 
   if(control & 0x40) {
     int mosaicY = ((MOSAIC & 0xF0)>>4) + 1;
-    int y = (VCOUNT / mosaicY) * mosaicY;
+    int y = VCOUNT - (VCOUNT % mosaicY);
     realX = startX + y*dmx;
     realY = startY + y*dmy;
   }
@@ -1508,21 +1480,13 @@ static inline void gfxDrawOBJWin(u32 *lineOBJWin)
 
 static inline u32 gfxIncreaseBrightness(u32 color, int coeff)
 {
-  int r = (color & 0x1F);
-  int g = ((color >> 5) & 0x1F);
-  int b = ((color >> 10) & 0x1F);
+  color &= 0xffff;
+  color = ((color << 16) | color) & 0x3E07C1F;
 
-  r = r + (((31 - r) * coeff) >> 4);
-  g = g + (((31 - g) * coeff) >> 4);
-  b = b + (((31 - b) * coeff) >> 4);
-  if(r > 31)
-    r = 31;
-  if(g > 31)
-    g = 31;
-  if(b > 31)
-    b = 31;
-  color = (color & 0xFFFF0000) | (b << 10) | (g << 5) | r;
-  return color;
+  color = color + (((0x3E07C1F - color) * coeff) >> 4);
+  color &= 0x3E07C1F;
+
+  return (color >> 16) | color;
 }
 
 static inline void gfxIncreaseBrightness(u32 *line, int coeff)
@@ -1548,22 +1512,12 @@ static inline void gfxIncreaseBrightness(u32 *line, int coeff)
 
 static inline u32 gfxDecreaseBrightness(u32 color, int coeff)
 {
-  int r = (color & 0x1F);
-  int g = ((color >> 5) & 0x1F);
-  int b = ((color >> 10) & 0x1F);
+  color &= 0xffff;
+  color = ((color << 16) | color) & 0x3E07C1F;
 
-  r = r - ((r * coeff) >> 4);
-  g = g - ((g * coeff) >> 4);
-  b = b - ((b * coeff) >> 4);
-  if(r < 0)
-    r = 0;
-  if(g < 0)
-    g = 0;
-  if(b < 0)
-    b = 0;
-  color = (color & 0xFFFF0000) | (b << 10) | (g << 5) | r;
+  color = color - (((color * coeff) >> 4) & 0x3E07C1F);
 
-  return color;
+  return (color >> 16) | color;
 }
 
 static inline void gfxDecreaseBrightness(u32 *line, int coeff)
@@ -1590,25 +1544,25 @@ static inline void gfxDecreaseBrightness(u32 *line, int coeff)
 static inline u32 gfxAlphaBlend(u32 color, u32 color2, int ca, int cb)
 {
   if(color < 0x80000000) {
-    int r = (color & 0x1F);
-    int g = ((color >> 5) & 0x1F);
-    int b = ((color >> 10) & 0x1F);
-    int r0 = (color2 & 0x1F);
-    int g0 = ((color2 >> 5) & 0x1F);
-    int b0 = ((color2 >> 10) & 0x1F);
+    color&=0xffff;
+    color2&=0xffff;
 
-    r = ((r * ca) + (r0 * cb)) >> 4;
-    g = ((g * ca) + (g0 * cb)) >> 4;
-    b = ((b * ca) + (b0 * cb)) >> 4;
+    color = ((color << 16) | color) & 0x03E07C1F;
+    color2 = ((color2 << 16) | color2) & 0x03E07C1F;
+    color = ((color * ca) + (color2 * cb)) >> 4;
 
-    if(r > 31)
-      r = 31;
-    if(g > 31)
-      g = 31;
-    if(b > 31)
-      b = 31;
+    if ((ca + cb)>16)
+    {
+      if (color & 0x20)
+        color |= 0x1f;
+      if (color & 0x8000)
+        color |= 0x7C00;
+      if (color & 0x4000000)
+        color |= 0x03E00000;
+    }
 
-    return (color & 0xFFFF0000) | (b << 10) | (g << 5) | r;
+    color &= 0x03E07C1F;
+    color = (color >> 16) | color;
   }
   return color;
 }

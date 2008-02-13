@@ -376,99 +376,7 @@ void mode1RenderLineAll()
       top = 0x10;
     }
 
-    // special FX on the window
-    if(mask & 32) {
-      if(!(color & 0x00010000)) {
-        switch((BLDMOD >> 6) & 3) {
-        case 0:
-          break;
-        case 1:
-          {
-            if(top & BLDMOD) {
-              u32 back = backdrop;
-              u8 top2 = 0x20;
-              if((mask & 1) && (u8)(line0[x]>>24) < (u8)(back >> 24)) {
-                if(top != 0x01) {
-                  back = line0[x];
-                  top2 = 0x01;
-                }
-              }
-
-              if((mask & 2) && (u8)(line1[x]>>24) < (u8)(back >> 24)) {
-                if(top != 0x02) {
-                  back = line1[x];
-                  top2 = 0x02;
-                }
-              }
-
-              if((mask & 4) && (u8)(line2[x]>>24) < (u8)(back >> 24)) {
-                if(top != 0x04) {
-                  back = line2[x];
-                  top2 = 0x04;
-                }
-              }
-
-              if((mask & 16) && (u8)(lineOBJ[x]>>24) < (u8)(back >> 24)) {
-                if(top != 0x10) {
-                  back = lineOBJ[x];
-                  top2 = 0x10;
-                }
-              }
-
-              if(top2 & (BLDMOD>>8))
-                color = gfxAlphaBlend(color, back,
-                                      coeff[COLEV & 0x1F],
-                                      coeff[(COLEV >> 8) & 0x1F]);
-            }
-          }
-          break;
-        case 2:
-          if(BLDMOD & top)
-            color = gfxIncreaseBrightness(color, coeff[COLY & 0x1F]);
-          break;
-        case 3:
-          if(BLDMOD & top)
-            color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
-          break;
-        }
-      } else {
-        // semi-transparent OBJ
-        u32 back = backdrop;
-        u8 top2 = 0x20;
-
-        if((mask & 1) && (u8)(line0[x]>>24) < (u8)(back >> 24)) {
-          back = line0[x];
-          top2 = 0x01;
-        }
-
-        if((mask & 2) && (u8)(line1[x]>>24) < (u8)(back >> 24)) {
-          back = line1[x];
-          top2 = 0x02;
-        }
-
-        if((mask & 4) && (u8)(line2[x]>>24) < (u8)(back >> 24)) {
-          back = line2[x];
-          top2 = 0x04;
-        }
-
-        if(top2 & (BLDMOD>>8))
-          color = gfxAlphaBlend(color, back,
-                                coeff[COLEV & 0x1F],
-                                coeff[(COLEV >> 8) & 0x1F]);
-        else {
-          switch((BLDMOD >> 6) & 3) {
-          case 2:
-            if(BLDMOD & top)
-              color = gfxIncreaseBrightness(color, coeff[COLY & 0x1F]);
-            break;
-          case 3:
-            if(BLDMOD & top)
-              color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
-            break;
-          }
-        }
-      }
-    } else if(color & 0x00010000) {
+    if(color & 0x00010000) {
       // semi-transparent OBJ
       u32 back = backdrop;
       u8 top2 = 0x20;
@@ -503,6 +411,61 @@ void mode1RenderLineAll()
             color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
           break;
         }
+      }
+    } else if(mask & 32) {
+      // special FX on the window
+      switch((BLDMOD >> 6) & 3) {
+      case 0:
+        break;
+      case 1:
+        {
+          if(top & BLDMOD) {
+            u32 back = backdrop;
+            u8 top2 = 0x20;
+
+            if((mask & 1) && (u8)(line0[x]>>24) < (u8)(back >> 24)) {
+              if(top != 0x01) {
+                back = line0[x];
+                top2 = 0x01;
+              }
+            }
+
+            if((mask & 2) && (u8)(line1[x]>>24) < (u8)(back >> 24)) {
+              if(top != 0x02) {
+                back = line1[x];
+                top2 = 0x02;
+              }
+            }
+
+            if((mask & 4) && (u8)(line2[x]>>24) < (u8)(back >> 24)) {
+              if(top != 0x04) {
+                back = line2[x];
+                top2 = 0x04;
+              }
+            }
+
+            if((mask & 16) && (u8)(lineOBJ[x]>>24) < (u8)(back >> 24)) {
+              if(top != 0x10) {
+                back = lineOBJ[x];
+                top2 = 0x10;
+              }
+            }
+
+            if(top2 & (BLDMOD>>8))
+              color = gfxAlphaBlend(color, back,
+                                    coeff[COLEV & 0x1F],
+                                    coeff[(COLEV >> 8) & 0x1F]);
+          }
+        }
+        break;
+      case 2:
+        if(BLDMOD & top)
+          color = gfxIncreaseBrightness(color, coeff[COLY & 0x1F]);
+        break;
+      case 3:
+        if(BLDMOD & top)
+          color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
+        break;
       }
     }
 
