@@ -21,6 +21,7 @@
 #include "glwidget.h"
 #include "sidewidget_cheats.h"
 
+
 MainWnd::MainWnd( QWidget *parent, QApplication *app, QTranslator **trans )
 	: QMainWindow( parent ),
 	theApp( app ),
@@ -37,18 +38,21 @@ MainWnd::MainWnd( QWidget *parent, QApplication *app, QTranslator **trans )
 	setMinimumSize( 320, 240 );
 	setWindowTitle( tr( "VBA-M" ) );
 
+	createDockWidgets();
 	createActions();
 	createMenus();
-	createDockWidgets();
 }
+
 
 MainWnd::~MainWnd()
 {
 }
 
+
 void MainWnd::createActions()
 {
 	bool enabled, checked;
+
 
 	if( enableTranslationAct != 0 ) {
 		enabled = enableTranslationAct->isEnabled(); // memorize state
@@ -65,6 +69,7 @@ void MainWnd::createActions()
 	enableTranslationAct->setChecked( checked );
 	connect( enableTranslationAct, SIGNAL( toggled( bool ) ), this, SLOT( enableTranslation( bool ) ) );
 }
+
 
 void MainWnd::createMenus()
 {
@@ -102,6 +107,9 @@ void MainWnd::createMenus()
 
 	// Tools menu
 	toolsMenu = menuBar()->addMenu( tr( "&Tools" ) );
+	QAction *toggleCheats = dockWidget_cheats->toggleViewAction();
+	toggleCheats->setText( tr( "Show cheats sidebar" ) );
+	toolsMenu->addAction( toggleCheats ) ;
 
 
 	// Help menu
@@ -111,6 +119,7 @@ void MainWnd::createMenus()
 	helpMenu->addAction( tr( "About &OpenGL..." ), this, SLOT( showAboutOpenGL() ) );
 	helpMenu->addAction( tr( "About &Qt..." ), this, SLOT( showAboutQt() ) );
 }
+
 
 void MainWnd::createDockWidgets()
 {
@@ -125,7 +134,9 @@ void MainWnd::createDockWidgets()
 	dockWidget_cheats->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
 	dockWidget_cheats->setWidget( sw_cheats );
 	addDockWidget( Qt::LeftDockWidgetArea, dockWidget_cheats );
+	dockWidget_cheats->hide();
 }
+
 
 bool MainWnd::createDisplay()
 {
@@ -139,6 +150,7 @@ bool MainWnd::createDisplay()
 
 	return false;
 }
+
 
 bool MainWnd::selectLanguage()
 {
@@ -158,6 +170,7 @@ bool MainWnd::selectLanguage()
 	}
 	return ret;
 }
+
 
 bool MainWnd::loadTranslation( QString file )
 {
@@ -179,6 +192,7 @@ bool MainWnd::loadTranslation( QString file )
 	return ret;
 }
 
+
 bool MainWnd::enableTranslation( bool enable )
 {
 	if( enable ) {
@@ -198,11 +212,12 @@ bool MainWnd::enableTranslation( bool enable )
 
 	// apply translation
 	// the user might have to restart the application to apply changes completely
+	createDockWidgets();
 	createActions();
 	createMenus();
-	createDockWidgets();
 	return true;
 }
+
 
 void MainWnd::showAbout()
 {
@@ -215,10 +230,12 @@ void MainWnd::showAbout()
 	QMessageBox::about( this, tr( "About VBA-M" ), info );
 }
 
+
 void MainWnd::showAboutQt()
 {
 	QMessageBox::aboutQt( this );
 }
+
 
 void MainWnd::showAboutOpenGL()
 {
