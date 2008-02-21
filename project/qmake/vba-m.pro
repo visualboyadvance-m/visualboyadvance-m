@@ -4,7 +4,10 @@ QT += opengl
 TARGET = VisualBoyAdvance
 
 RESOURCES += ../../src/qt/vba-m.qrc
-RC_FILE = ../../src/qt/vba-m.rc
+
+win32 {
+	RC_FILE = ../../src/qt/vba-m.rc
+}
 
 TRANSLATIONS += ../../lang/german.ts
 TRANSLATIONS += ../../lang/spanish.ts
