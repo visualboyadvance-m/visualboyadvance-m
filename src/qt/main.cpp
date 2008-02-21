@@ -25,7 +25,7 @@ int main( int argc, char *argv[] )
 	QApplication theApp( argc, argv );
 	QTranslator *translator = 0;
 
-	MainWnd *mainWnd = new MainWnd( 0, &theApp, &translator );
+	MainWnd *mainWnd = new MainWnd( 0, &translator );
 	mainWnd->show();
 
 	return theApp.exec();

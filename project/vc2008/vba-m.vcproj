@@ -143,11 +143,11 @@
 			</File>
 			<File
 				RelativePath="..\..\src\qt\vba-m.qrc"
+				FileType="13"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\qt\vba-m.rc"
-				FileType="5"
 				>
 			</File>
 		</Filter>
