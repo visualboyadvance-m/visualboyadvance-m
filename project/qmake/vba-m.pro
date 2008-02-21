@@ -3,9 +3,11 @@ CONFIG += qt release
 QT += opengl
 TARGET = VisualBoyAdvance
 
+RESOURCES += ../../src/qt/vba-m.qrc
+RC_FILE = ../../src/qt/vba-m.rc
+
 TRANSLATIONS += ../../lang/german.ts
 TRANSLATIONS += ../../lang/spanish.ts
-RESOURCES += ../../src/qt/vba-m.qrc
 
 PRECOMPILED_HEADER = ../../src/qt/precompile.h
 
@@ -23,6 +25,7 @@ HEADERS += ../../src/qt/sidewidget_cheats.h
 SOURCES += ../../src/qt/sidewidget_cheats.cpp
 
 HEADERS += ../../src/qt/MainOptions.h
-HEADERS += ../../src/qt/configdialog.h
 SOURCES += ../../src/qt/MainOptions.cpp
+
+HEADERS += ../../src/qt/configdialog.h
 SOURCES += ../../src/qt/configdialog.cpp
