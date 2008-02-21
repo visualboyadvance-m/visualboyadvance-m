@@ -26,8 +26,8 @@ class MainWnd : public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWnd::MainWnd( QWidget *parent = 0, QApplication *app = 0, QTranslator **trans = 0 );
-	MainWnd::~MainWnd();
+	MainWnd( QWidget *parent = 0, QApplication *app = 0, QTranslator **trans = 0 );
+	~MainWnd();
 
 public slots:
 	bool loadTranslation( QString file );
