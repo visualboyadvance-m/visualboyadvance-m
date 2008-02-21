@@ -94,31 +94,31 @@ void MainWnd::createMenus()
 
 
 	// File menu
-	fileMenu = menuBar()->addMenu( tr( "&File" ) );
+	fileMenu = menuBar()->addMenu( tr( "File" ) );
 	fileMenu->addAction( QIcon( ":/resources/open.png" ), tr( "Open ROM" ), this, SLOT( showOpenROM() ) );
 	fileMenu->addAction( QIcon( ":/resources/exit.png" ), tr( "Exit" ), this, SLOT( close() ) );
 
 
 	// Settings menu
-	settingsMenu = menuBar()->addMenu( tr( "&Settings" ) );
+	settingsMenu = menuBar()->addMenu( tr( "Settings" ) );
 	settingsMenu->addAction( QIcon( ":/resources/settings.png" ), tr( "Main options..." ), this, SLOT( showMainOptions() ) );
 	settingsMenu->addAction( QIcon( ":/resources/locale.png" ), tr( "Select language..." ), this, SLOT( selectLanguage() ) );
 	settingsMenu->addAction( enableTranslationAct );
 
 
 	// Tools menu
-	toolsMenu = menuBar()->addMenu( tr( "&Tools" ) );
+	toolsMenu = menuBar()->addMenu( tr( "Tools" ) );
 	QAction *toggleCheats = dockWidget_cheats->toggleViewAction();
 	toggleCheats->setText( tr( "Show cheats sidebar" ) );
 	toolsMenu->addAction( toggleCheats ) ;
 
 
 	// Help menu
-	helpMenu = menuBar()->addMenu( tr( "&Help" ) );
+	helpMenu = menuBar()->addMenu( tr( "Help" ) );
 
-	helpMenu->addAction( QIcon( ":/resources/vba-m.png" ), tr( "About &VBA-M..." ), this, SLOT( showAbout() ) );
-	helpMenu->addAction( QIcon( ":/resources/gl.png" ), tr( "About &OpenGL..." ), this, SLOT( showAboutOpenGL() ) );
-	helpMenu->addAction( QIcon( ":/resources/qt_logo.png" ), tr( "About &Qt..." ), qApp, SLOT( aboutQt() ) );
+	helpMenu->addAction( QIcon( ":/resources/vba-m.png" ), tr( "About VBA-M..." ), this, SLOT( showAbout() ) );
+	helpMenu->addAction( QIcon( ":/resources/gl.png" ), tr( "About OpenGL..." ), this, SLOT( showAboutOpenGL() ) );
+	helpMenu->addAction( QIcon( ":/resources/qt_logo.png" ), tr( "About Qt..." ), qApp, SLOT( aboutQt() ) );
 }
 
 
@@ -244,7 +244,7 @@ void MainWnd::showOpenROM()
 void MainWnd::showMainOptions()
 {
 	ConfigDialog dialog;
-        dialog.exec();
+	dialog.exec();
 }
 
 

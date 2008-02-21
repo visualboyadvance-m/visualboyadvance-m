@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="de_DE">
-<defaultcodec></defaultcodec>
 <context>
     <name>@default</name>
     <message>
@@ -60,99 +59,205 @@
     </message>
 </context>
 <context>
+    <name>ConfigDialog</name>
+    <message>
+        <location filename="../src/qt/configdialog.cpp" line="26"/>
+        <source>Close</source>
+        <translation>Schließen</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/configdialog.cpp" line="62"/>
+        <source>Options</source>
+        <translation>Optionen</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/configdialog.cpp" line="70"/>
+        <source>Video</source>
+        <translation>Grafik</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/configdialog.cpp" line="76"/>
+        <source>Sound</source>
+        <translation>Sound</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/configdialog.cpp" line="82"/>
+        <source>Input</source>
+        <translation>Eingabe</translation>
+    </message>
+</context>
+<context>
+    <name>InputOptionsPage</name>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="49"/>
+        <source>Input Keys</source>
+        <translation>Tastenzuweisung</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="51"/>
+        <source>Start:</source>
+        <translation>Start:</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="54"/>
+        <source>Select:</source>
+        <translation>Select:</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="57"/>
+        <source>Up:</source>
+        <translation>Hoch:</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="60"/>
+        <source>Down:</source>
+        <translation>Runter:</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="63"/>
+        <source>Left:</source>
+        <translation>Links:</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="66"/>
+        <source>Right:</source>
+        <translation>Rechts:</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="69"/>
+        <source>A:</source>
+        <translation>A:</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="72"/>
+        <source>B:</source>
+        <translation>B:</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="75"/>
+        <source>L:</source>
+        <translation>L:</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="78"/>
+        <source>R:</source>
+        <translation>R:</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="81"/>
+        <source>Gameshark:</source>
+        <translation>Gameshark:</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="84"/>
+        <source>Speed Up:</source>
+        <translation>Beschleunigen:</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="87"/>
+        <source>Screenshot:</source>
+        <translation>Screenshot:</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="90"/>
+        <source>Multiple key assignments</source>
+        <translation>Mehrfachzuweisungen</translation>
+    </message>
+</context>
+<context>
     <name>MainWnd</name>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="39"/>
+        <location filename="../src/qt/MainWnd.cpp" line="38"/>
         <source>VBA-M</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/qt/MainWnd.cpp" line="98"/>
         <source>&amp;File</source>
-        <translation>&amp;Datei</translation>
+        <translation type="obsolete">&amp;Datei</translation>
     </message>
     <message>
         <location filename="../src/qt/MainWnd.cpp" line="103"/>
         <source>&amp;Settings</source>
-        <translation>&amp;Einstellungen</translation>
+        <translation type="obsolete">&amp;Einstellungen</translation>
     </message>
     <message>
         <location filename="../src/qt/MainWnd.cpp" line="109"/>
         <source>&amp;Tools</source>
-        <translation>&amp;Werkzeuge</translation>
+        <translation type="obsolete">&amp;Werkzeuge</translation>
     </message>
     <message>
         <location filename="../src/qt/MainWnd.cpp" line="116"/>
         <source>&amp;Help</source>
-        <translation>&amp;Hilfe</translation>
+        <translation type="obsolete">&amp;Hilfe</translation>
     </message>
     <message>
         <location filename="../src/qt/MainWnd.cpp" line="119"/>
         <source>About &amp;OpenGL...</source>
-        <translation>Über &amp;OpenGL...</translation>
+        <translation type="obsolete">Über &amp;OpenGL...</translation>
     </message>
     <message>
         <location filename="../src/qt/MainWnd.cpp" line="118"/>
         <source>About &amp;VBA-M...</source>
-        <translation>Über &amp;VBA-M...</translation>
+        <translation type="obsolete">Über &amp;VBA-M...</translation>
     </message>
     <message>
         <location filename="../src/qt/MainWnd.cpp" line="120"/>
         <source>About &amp;Qt...</source>
-        <translation>Über &amp;Qt...</translation>
+        <translation type="obsolete">Über &amp;Qt...</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="225"/>
+        <location filename="../src/qt/MainWnd.cpp" line="226"/>
         <source>This program is licensed under terms of the GNU General Public License.</source>
         <translation>Dieses Programm ist unter den Bedingungen der GNU General Public License lizenziert.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="246"/>
+        <location filename="../src/qt/MainWnd.cpp" line="257"/>
         <source>OpenGL version 2.1 is present.</source>
         <translation>OpenGL Version 2.1 ist verfügbar.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="249"/>
+        <location filename="../src/qt/MainWnd.cpp" line="260"/>
         <source>OpenGL version 2.0 is present.</source>
         <translation>OpenGL Version 2.0 ist verfügbar.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="252"/>
+        <location filename="../src/qt/MainWnd.cpp" line="263"/>
         <source>OpenGL version 1.5 is present.</source>
         <translation>OpenGL Version 1.5 ist verfügbar.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="255"/>
+        <location filename="../src/qt/MainWnd.cpp" line="266"/>
         <source>OpenGL version 1.4 is present.</source>
         <translation>OpenGL Version 1.4 ist verfügbar.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="258"/>
+        <location filename="../src/qt/MainWnd.cpp" line="269"/>
         <source>OpenGL version 1.3 is present.</source>
         <translation>OpenGL Version 1.3 ist verfügbar.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="261"/>
+        <location filename="../src/qt/MainWnd.cpp" line="272"/>
         <source>OpenGL version 1.2 is present.</source>
         <translation>OpenGL Version 1.2 ist verfügbar.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="264"/>
+        <location filename="../src/qt/MainWnd.cpp" line="275"/>
         <source>OpenGL version 1.1 is present.</source>
         <translation>OpenGL Version 1.1 ist verfügbar.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="270"/>
+        <location filename="../src/qt/MainWnd.cpp" line="281"/>
         <source>OpenGL is NOT available!</source>
         <translation>OpenGL ist NICHT verfügbar!</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="230"/>
+        <location filename="../src/qt/MainWnd.cpp" line="231"/>
         <source>About VBA-M</source>
         <translation>Über VBA-M</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="273"/>
+        <location filename="../src/qt/MainWnd.cpp" line="284"/>
         <source>About OpenGL</source>
         <translation>Über OpenGL</translation>
     </message>
@@ -172,7 +277,7 @@
         <translation type="obsolete">Übersetzungsdateien (*.qm)</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="177"/>
+        <location filename="../src/qt/MainWnd.cpp" line="178"/>
         <source>.qm</source>
         <translation></translation>
     </message>
@@ -182,51 +287,134 @@
         <translation>Beenden</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="104"/>
+        <location filename="../src/qt/MainWnd.cpp" line="105"/>
         <source>Select language...</source>
         <translation>Sprache auswählen...</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="159"/>
+        <location filename="../src/qt/MainWnd.cpp" line="160"/>
         <source>Select language</source>
         <translation>Sprache auswählen</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="161"/>
+        <location filename="../src/qt/MainWnd.cpp" line="162"/>
         <source>Language files (*.qm)</source>
         <translation>Sprachdateien (*.qm)</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="169"/>
+        <location filename="../src/qt/MainWnd.cpp" line="170"/>
         <source>Error!</source>
         <translation>Fehler!</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="169"/>
+        <location filename="../src/qt/MainWnd.cpp" line="170"/>
         <source>Language file can not be loaded!</source>
         <translation>Sprachdatei kann nicht geladen werden!</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="66"/>
+        <location filename="../src/qt/MainWnd.cpp" line="65"/>
         <source>Enable translation</source>
         <translation>Übersetzung aktivieren</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="228"/>
+        <location filename="../src/qt/MainWnd.cpp" line="229"/>
         <source>
 No language file loaded.</source>
         <translation>
 Deutsche Übersetzung von spacy.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="132"/>
+        <location filename="../src/qt/MainWnd.cpp" line="133"/>
         <source>Cheats</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="111"/>
+        <location filename="../src/qt/MainWnd.cpp" line="112"/>
         <source>Show cheats sidebar</source>
         <translation>Cheats-Seitenleiste anzeigen</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainWnd.cpp" line="97"/>
+        <source>File</source>
+        <translation>Datei</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainWnd.cpp" line="98"/>
+        <source>Open ROM</source>
+        <translation>ROM laden</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainWnd.cpp" line="103"/>
+        <source>Settings</source>
+        <translation>Einstellungen</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainWnd.cpp" line="104"/>
+        <source>Main options...</source>
+        <translation>Optionen...</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainWnd.cpp" line="110"/>
+        <source>Tools</source>
+        <translation>Werkzeuge</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainWnd.cpp" line="117"/>
+        <source>Help</source>
+        <translation>Hilfe</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainWnd.cpp" line="119"/>
+        <source>About VBA-M...</source>
+        <translation>Über VBA-M...</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainWnd.cpp" line="120"/>
+        <source>About OpenGL...</source>
+        <translation>Über OpenGL...</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainWnd.cpp" line="121"/>
+        <source>About Qt...</source>
+        <translation>Über Qt...</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainWnd.cpp" line="238"/>
+        <source>Enter ROM loader code here.</source>
+        <translation>Funktionalität noch nicht vorhanden.</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainWnd.cpp" line="240"/>
+        <source>Status</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>VideoOptionsPage</name>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="24"/>
+        <source>Renderer Selection</source>
+        <translation>Auswahl der Schnittstelle</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="25"/>
+        <source>Renderer:</source>
+        <translation>Schnittstelle:</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="27"/>
+        <source>OGL</source>
+        <translation>OpenGL</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="28"/>
+        <source>D3D</source>
+        <translation>Direct3D</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainOptions.cpp" line="29"/>
+        <source>QPainter</source>
+        <translation>QPainter (Qt)</translation>
     </message>
 </context>
 <context>
