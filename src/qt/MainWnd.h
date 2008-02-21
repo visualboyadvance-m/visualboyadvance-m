@@ -53,8 +53,8 @@ private slots:
 	void showAbout();
 	void showAboutOpenGL();
 	void showAboutQt();
-        void showOpenROM();
-        void showMainOptions();
+	void showOpenROM();
+	void showMainOptions();
 };
 
 #endif // #ifndef MAINWND_H

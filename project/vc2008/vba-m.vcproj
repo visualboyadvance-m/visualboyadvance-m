@@ -29,7 +29,7 @@
 				CleanCommandLine="nmake distclean&#x0D;&#x0A;rmdir /S /Q debug&#x0D;&#x0A;rmdir /S /Q release"
 				Output="$(OutDir)\VisualBoyAdvance.exe"
 				PreprocessorDefinitions="WIN32;_DEBUG"
-				IncludeSearchPath="&quot;$(ProjectDir)&quot;;D:\qt\4.3.3\include"
+				IncludeSearchPath="&quot;$(ProjectDir)&quot;"
 				ForcedIncludes=""
 				AssemblySearchPath=""
 				ForcedUsingAssemblies=""
@@ -49,7 +49,7 @@
 				CleanCommandLine="nmake distclean&#x0D;&#x0A;rmdir /S /Q debug&#x0D;&#x0A;rmdir /S /Q release"
 				Output="$(OutDir)\VisualBoyAdvance.exe"
 				PreprocessorDefinitions="WIN32;NDEBUG"
-				IncludeSearchPath="&quot;$(ProjectDir)&quot;;D:\qt\4.3.3\include"
+				IncludeSearchPath="&quot;$(ProjectDir)&quot;"
 				ForcedIncludes=""
 				AssemblySearchPath=""
 				ForcedUsingAssemblies=""
@@ -108,13 +108,41 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="Config Dialog"
+				>
+				<File
+					RelativePath="..\..\src\qt\configdialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\qt\configdialog.h"
+					>
+				</File>
+				<Filter
+					Name="Pages"
+					>
+					<File
+						RelativePath="..\..\src\qt\MainOptions.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\qt\MainOptions.h"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
-			Name="Makefile"
+			Name="Build"
 			Filter="pro"
 			>
 			<File
 				RelativePath="..\qmake\vba-m.pro"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\qt\vba-m.qrc"
 				>
 			</File>
 		</Filter>
