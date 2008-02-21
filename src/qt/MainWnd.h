@@ -26,7 +26,7 @@ class MainWnd : public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWnd( QWidget *parent = 0, QApplication *app = 0, QTranslator **trans = 0 );
+	MainWnd( QWidget *parent = 0, QTranslator **trans = 0 );
 	~MainWnd();
 
 public slots:
@@ -38,7 +38,6 @@ private:
 	void createDockWidgets();
 	bool createDisplay();
 
-	QApplication *theApp;
 	QTranslator **translator;
 	QMenu *fileMenu;
 	QMenu *settingsMenu;
@@ -52,7 +51,6 @@ private slots:
 	bool enableTranslation( bool enable );
 	void showAbout();
 	void showAboutOpenGL();
-	void showAboutQt();
 	void showOpenROM();
 	void showMainOptions();
 };

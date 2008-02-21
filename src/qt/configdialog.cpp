@@ -60,6 +60,7 @@ ConfigDialog::ConfigDialog()
 
 
 	setWindowTitle(tr("Options"));
+	setWindowIcon( QIcon( ":/resources/settings.png" ) );
 }
 
 void ConfigDialog::createIcons()
