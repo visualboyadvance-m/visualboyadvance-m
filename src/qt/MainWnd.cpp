@@ -19,6 +19,7 @@
 #include "MainWnd.h"
 
 #include "glwidget.h"
+#include "configdialog.h"
 #include "sidewidget_cheats.h"
 
 
@@ -34,7 +35,6 @@ MainWnd::MainWnd( QWidget *parent, QApplication *app, QTranslator **trans )
 	dockWidget_cheats( 0 )
 {
 	createDisplay();
-
 	setMinimumSize( 320, 240 );
 	setWindowTitle( tr( "VBA-M" ) );
 
@@ -248,10 +248,8 @@ void MainWnd::showOpenROM()
 
 void MainWnd::showMainOptions()
 {
-	QString info;
-	info += tr ( "Placeholder for opening options widget." );
-
-	QMessageBox::about( this, tr( "Status" ), info );
+	ConfigDialog dialog;
+        dialog.exec();
 }
 
 

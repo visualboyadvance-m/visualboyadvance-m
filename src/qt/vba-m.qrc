@@ -1,0 +1,7 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+   <file>resources/video.png</file>
+   <file>resources/input.png</file>
+   <file>resources/sound.png</file>
+</qresource>
+</RCC>
