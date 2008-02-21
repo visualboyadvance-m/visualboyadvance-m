@@ -15,30 +15,27 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
- #ifndef CONFIGDIALOG_H
- #define CONFIGDIALOG_H
 
- #include <QDialog>
+#ifndef CONFIGDIALOG_H
+#define CONFIGDIALOG_H
 
- class QListWidget;
- class QListWidgetItem;
- class QStackedWidget;
+#include "precompile.h"
 
- class ConfigDialog : public QDialog
- {
-     Q_OBJECT
+class ConfigDialog : public QDialog
+{
+	Q_OBJECT
 
- public:
-     ConfigDialog();
+public:
+	ConfigDialog();
+	
+public slots:
+	void changePage( QListWidgetItem *current, QListWidgetItem *previous );
 
- public slots:
-     void changePage(QListWidgetItem *current, QListWidgetItem *previous);
+private:
+	void createIcons();
+	
+	QListWidget *contentsWidget;
+	QStackedWidget *pagesWidget;
+};
 
- private:
-     void createIcons();
-
-     QListWidget *contentsWidget;
-     QStackedWidget *pagesWidget;
- };
-
- #endif 
+#endif

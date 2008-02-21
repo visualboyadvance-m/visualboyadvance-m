@@ -16,29 +16,27 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
-
-
 #ifndef MAINOPTIONS_H
 #define MAINOPTIONS_H
 
- #include <QWidget>
+#include "precompile.h"
 
- class VideoOptionsPage : public QWidget
- {
- public:
-     VideoOptionsPage(QWidget *parent = 0);
- };
+class VideoOptionsPage : public QWidget
+{
+public:
+	VideoOptionsPage(QWidget *parent = 0);
+};
 
- class InputOptionsPage : public QWidget
- {
- public:
-     InputOptionsPage(QWidget *parent = 0);
- };
+class InputOptionsPage : public QWidget
+{
+public:
+	InputOptionsPage(QWidget *parent = 0);
+};
 
- class SoundOptionsPage : public QWidget
- {
- public:
-     SoundOptionsPage(QWidget *parent = 0);
- };
+class SoundOptionsPage : public QWidget
+{
+public:
+	SoundOptionsPage(QWidget *parent = 0);
+};
 
- #endif 
+#endif

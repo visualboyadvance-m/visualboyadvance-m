@@ -15,80 +15,82 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
- #include <QtGui>
 
- #include "configdialog.h"
- #include "MainOptions.h"
+#include "configdialog.h"
 
- ConfigDialog::ConfigDialog()
- {
-     contentsWidget = new QListWidget;
-     contentsWidget->setViewMode(QListView::IconMode);
-     contentsWidget->setIconSize(QSize(64, 64));
-     contentsWidget->setMovement(QListView::Static);
-     contentsWidget->setResizeMode(QListView::Adjust);
-     contentsWidget->setMaximumWidth(130);
-     contentsWidget->setSpacing(12);
+#include "MainOptions.h"
 
-     pagesWidget = new QStackedWidget;
-     pagesWidget->addWidget(new VideoOptionsPage);
-     pagesWidget->addWidget(new SoundOptionsPage);
-     pagesWidget->addWidget(new InputOptionsPage);
+ConfigDialog::ConfigDialog()
+{
+	// close button
+	QPushButton *closeButton = new QPushButton( tr( "Close" ) );
+	closeButton->setMaximumSize( closeButton->sizeHint() );
+	connect( closeButton, SIGNAL( clicked() ), this, SLOT( close() ) );
 
-     QPushButton *closeButton = new QPushButton(tr("Close"));
+	// settings
+	pagesWidget = new QStackedWidget;
+	pagesWidget->addWidget( new VideoOptionsPage( pagesWidget ) );
+	pagesWidget->addWidget( new SoundOptionsPage( pagesWidget ) );
+	pagesWidget->addWidget( new InputOptionsPage( pagesWidget ) );
 
-     createIcons();
-     contentsWidget->setCurrentRow(0);
+	// item box
+	contentsWidget = new QListWidget;
+	contentsWidget->setViewMode( QListView::IconMode );
+	contentsWidget->setIconSize( QSize( 64, 64 ) );
+	contentsWidget->setUniformItemSizes( true ); // enable optimizations
+	contentsWidget->setMovement( QListView::Static );
+	contentsWidget->setResizeMode( QListView::Adjust );
+	contentsWidget->setFlow( QListView::TopToBottom );
+	contentsWidget->setSpacing( 8 );
+	createIcons();
+	contentsWidget->setCurrentRow( 0 );
+	// set optimal width
+	int width = contentsWidget->sizeHintForColumn( 0 ) + 16; // not 100% accurate yet!
+	contentsWidget->setMinimumWidth( width );
+	contentsWidget->setMaximumWidth( width );
 
-     connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
+	// set up layout
+	QVBoxLayout *verticalLayout = new QVBoxLayout;
+	verticalLayout->addWidget( pagesWidget );
+	verticalLayout->addWidget( closeButton, 0, Qt::AlignRight );
 
-     QHBoxLayout *horizontalLayout = new QHBoxLayout;
-     horizontalLayout->addWidget(contentsWidget);
-     horizontalLayout->addWidget(pagesWidget, 1);
+	QHBoxLayout *horizontalLayout = new QHBoxLayout( this );
+	horizontalLayout->addWidget( contentsWidget );
+	horizontalLayout->addLayout( verticalLayout );
 
-     QHBoxLayout *buttonsLayout = new QHBoxLayout;
-     buttonsLayout->addStretch(1);
-     buttonsLayout->addWidget(closeButton);
 
-     QVBoxLayout *mainLayout = new QVBoxLayout;
-     mainLayout->addLayout(horizontalLayout);
-     mainLayout->addStretch(1);
-     mainLayout->addSpacing(12);
-     mainLayout->addLayout(buttonsLayout);
-     setLayout(mainLayout);
+	setWindowTitle(tr("Options"));
+}
 
-     setWindowTitle(tr("VBA-M Options"));
- }
+void ConfigDialog::createIcons()
+{
+	QListWidgetItem *VideoButton = new QListWidgetItem(contentsWidget); // automatically inserts item into parent
+	VideoButton->setIcon(QIcon(":/resources/video.png"));
+	VideoButton->setText(tr("Video"));
+	VideoButton->setTextAlignment(Qt::AlignHCenter);
+	VideoButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
- void ConfigDialog::createIcons()
- {
-     QListWidgetItem *VideoButton = new QListWidgetItem(contentsWidget);
-     VideoButton->setIcon(QIcon(":/resources/video.png"));
-     VideoButton->setText(tr("Video"));
-     VideoButton->setTextAlignment(Qt::AlignHCenter);
-     VideoButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	QListWidgetItem *SoundButton = new QListWidgetItem(contentsWidget);
+	SoundButton->setIcon(QIcon(":/resources/sound.png"));
+	SoundButton->setText(tr("Sound"));
+	SoundButton->setTextAlignment(Qt::AlignHCenter);
+	SoundButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
-     QListWidgetItem *SoundButton = new QListWidgetItem(contentsWidget);
-     SoundButton->setIcon(QIcon(":/resources/sound.png"));
-     SoundButton->setText(tr("Sound"));
-     SoundButton->setTextAlignment(Qt::AlignHCenter);
-     SoundButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	QListWidgetItem *InputButton = new QListWidgetItem(contentsWidget);
+	InputButton->setIcon(QIcon(":/resources/input.png"));
+	InputButton->setText(tr("Input"));
+	InputButton->setTextAlignment(Qt::AlignHCenter);
+	InputButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
-     QListWidgetItem *InputButton = new QListWidgetItem(contentsWidget);
-     InputButton->setIcon(QIcon(":/resources/input.png"));
-     InputButton->setText(tr("Input"));
-     InputButton->setTextAlignment(Qt::AlignHCenter);
-     InputButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	connect(contentsWidget,
+		SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
+		this, SLOT(changePage(QListWidgetItem *, QListWidgetItem*)));
+}
 
-     connect(contentsWidget,
-             SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
-             this, SLOT(changePage(QListWidgetItem *, QListWidgetItem*)));
- }
+void ConfigDialog::changePage(QListWidgetItem *current, QListWidgetItem *previous)
+{
+	if (!current)
+		current = previous;
 
- void ConfigDialog::changePage(QListWidgetItem *current, QListWidgetItem *previous)
- {
-     if (!current)
-         current = previous;
-
-     pagesWidget->setCurrentIndex(contentsWidget->row(current));
- } 
+	pagesWidget->setCurrentIndex(contentsWidget->row(current));
+}
