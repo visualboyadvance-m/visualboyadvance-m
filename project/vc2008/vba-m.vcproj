@@ -145,6 +145,11 @@
 				RelativePath="..\..\src\qt\vba-m.qrc"
 				>
 			</File>
+			<File
+				RelativePath="..\..\src\qt\vba-m.rc"
+				FileType="5"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Other"
