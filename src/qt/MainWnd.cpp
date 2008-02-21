@@ -96,13 +96,13 @@ void MainWnd::createMenus()
 
 	// File menu
 	fileMenu = menuBar()->addMenu( tr( "&File" ) );
-        fileMenu->addAction( tr( "Open ROM" ), this, SLOT( showOpenROM() ) );
+	fileMenu->addAction( tr( "Open ROM" ), this, SLOT( showOpenROM() ) );
 	fileMenu->addAction( tr( "Exit" ), this, SLOT( close() ) );
 
 
 	// Settings menu
 	settingsMenu = menuBar()->addMenu( tr( "&Settings" ) );
-        settingsMenu->addAction( tr( "Main options..." ), this, SLOT( showMainOptions() ));
+	settingsMenu->addAction( tr( "Main options..." ), this, SLOT( showMainOptions() ) );
 	settingsMenu->addAction( tr( "Select language..." ), this, SLOT( selectLanguage() ) );
 	settingsMenu->addAction( enableTranslationAct );
 
