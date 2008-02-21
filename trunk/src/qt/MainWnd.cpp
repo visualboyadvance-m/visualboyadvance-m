@@ -96,11 +96,13 @@ void MainWnd::createMenus()
 
 	// File menu
 	fileMenu = menuBar()->addMenu( tr( "&File" ) );
+        fileMenu->addAction( tr( "Open ROM" ), this, SLOT( showOpenROM() ) );
 	fileMenu->addAction( tr( "Exit" ), this, SLOT( close() ) );
 
 
 	// Settings menu
 	settingsMenu = menuBar()->addMenu( tr( "&Settings" ) );
+        settingsMenu->addAction( tr( "Main options..." ), this, SLOT( showMainOptions() ));
 	settingsMenu->addAction( tr( "Select language..." ), this, SLOT( selectLanguage() ) );
 	settingsMenu->addAction( enableTranslationAct );
 
@@ -234,6 +236,22 @@ void MainWnd::showAbout()
 void MainWnd::showAboutQt()
 {
 	QMessageBox::aboutQt( this );
+}
+
+void MainWnd::showOpenROM()
+{
+	QString info;
+	info += tr ( "Enter ROM loader code here." );
+
+	QMessageBox::about( this, tr( "Status" ), info );
+}
+
+void MainWnd::showMainOptions()
+{
+	QString info;
+	info += tr ( "Placeholder for opening options widget." );
+
+	QMessageBox::about( this, tr( "Status" ), info );
 }
 
 
