@@ -23,9 +23,8 @@
 #include "sidewidget_cheats.h"
 
 
-MainWnd::MainWnd( QWidget *parent, QApplication *app, QTranslator **trans )
+MainWnd::MainWnd( QWidget *parent, QTranslator **trans )
 	: QMainWindow( parent ),
-	theApp( app ),
 	translator( trans ),
 	fileMenu( 0 ),
 	settingsMenu( 0 ),
@@ -96,14 +95,14 @@ void MainWnd::createMenus()
 
 	// File menu
 	fileMenu = menuBar()->addMenu( tr( "&File" ) );
-	fileMenu->addAction( tr( "Open ROM" ), this, SLOT( showOpenROM() ) );
-	fileMenu->addAction( tr( "Exit" ), this, SLOT( close() ) );
+	fileMenu->addAction( QIcon( ":/resources/open.png" ), tr( "Open ROM" ), this, SLOT( showOpenROM() ) );
+	fileMenu->addAction( QIcon( ":/resources/exit.png" ), tr( "Exit" ), this, SLOT( close() ) );
 
 
 	// Settings menu
 	settingsMenu = menuBar()->addMenu( tr( "&Settings" ) );
-	settingsMenu->addAction( tr( "Main options..." ), this, SLOT( showMainOptions() ) );
-	settingsMenu->addAction( tr( "Select language..." ), this, SLOT( selectLanguage() ) );
+	settingsMenu->addAction( QIcon( ":/resources/settings.png" ), tr( "Main options..." ), this, SLOT( showMainOptions() ) );
+	settingsMenu->addAction( QIcon( ":/resources/locale.png" ), tr( "Select language..." ), this, SLOT( selectLanguage() ) );
 	settingsMenu->addAction( enableTranslationAct );
 
 
@@ -117,9 +116,9 @@ void MainWnd::createMenus()
 	// Help menu
 	helpMenu = menuBar()->addMenu( tr( "&Help" ) );
 
-	helpMenu->addAction( tr( "About &VBA-M..." ), this, SLOT( showAbout() ) );
-	helpMenu->addAction( tr( "About &OpenGL..." ), this, SLOT( showAboutOpenGL() ) );
-	helpMenu->addAction( tr( "About &Qt..." ), this, SLOT( showAboutQt() ) );
+	helpMenu->addAction( QIcon( ":/resources/vba-m.png" ), tr( "About &VBA-M..." ), this, SLOT( showAbout() ) );
+	helpMenu->addAction( QIcon( ":/resources/gl.png" ), tr( "About &OpenGL..." ), this, SLOT( showAboutOpenGL() ) );
+	helpMenu->addAction( QIcon( ":/resources/qt_logo.png" ), tr( "About &Qt..." ), qApp, SLOT( aboutQt() ) );
 }
 
 
@@ -199,14 +198,14 @@ bool MainWnd::enableTranslation( bool enable )
 {
 	if( enable ) {
 		if( *translator != 0 ) {
-			theApp->installTranslator( *translator );
+			qApp->installTranslator( *translator );
 			enableTranslationAct->setChecked( true );
 		} else {
 			return false;
 		}
 	} else {
 		if( *translator != 0 ) {
-			theApp->removeTranslator( *translator );
+			qApp->removeTranslator( *translator );
 		} else {
 			return false;
 		}
@@ -233,11 +232,6 @@ void MainWnd::showAbout()
 }
 
 
-void MainWnd::showAboutQt()
-{
-	QMessageBox::aboutQt( this );
-}
-
 void MainWnd::showOpenROM()
 {
 	QString info;
@@ -245,6 +239,7 @@ void MainWnd::showOpenROM()
 
 	QMessageBox::about( this, tr( "Status" ), info );
 }
+
 
 void MainWnd::showMainOptions()
 {
@@ -287,5 +282,6 @@ void MainWnd::showAboutOpenGL()
 	}
 
 	QMessageBox *test = new QMessageBox( QMessageBox::NoIcon, tr( "About OpenGL" ), info, QMessageBox::NoButton, this );
+	test->setWindowIcon( QIcon( ":/resources/gl.png" ) );
 	test->show();
 }
