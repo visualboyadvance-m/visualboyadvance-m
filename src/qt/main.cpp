@@ -23,9 +23,11 @@
 int main( int argc, char *argv[] )
 {
 	QApplication theApp( argc, argv );
+	// create/open ini file for settings
+	QSettings settings( "vba-m.ini", QSettings::IniFormat, &theApp );
 	QTranslator *translator = 0;
 
-	MainWnd *mainWnd = new MainWnd( 0, &translator );
+	MainWnd *mainWnd = new MainWnd( &translator, &settings, 0 );
 	mainWnd->show();
 
 	return theApp.exec();
