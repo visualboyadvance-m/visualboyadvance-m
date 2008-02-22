@@ -36,7 +36,7 @@ MainWnd::MainWnd( QTranslator **trans, QSettings *settings, QWidget *parent )
 {
 	createDisplay();
 	setMinimumSize( 320, 240 );
-	setWindowTitle( tr( "VBA-M" ) );
+	setWindowTitle( "VBA-M" );
 
 	createDockWidgets();
 	createActions();
@@ -81,7 +81,7 @@ void MainWnd::saveSettings()
 	v = saveState();
 	settings->setValue( "MainWnd/state", v );
 
-	v = enableTranslationAct->isEnabled();
+	v = enableTranslationAct->isChecked();
 	settings->setValue( "App/language_enable", v );
 }
 
