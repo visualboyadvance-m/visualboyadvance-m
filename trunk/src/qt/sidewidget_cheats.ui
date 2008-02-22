@@ -5,13 +5,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>143</width>
-    <height>126</height>
+    <width>160</width>
+    <height>320</height>
    </rect>
   </property>
   <property name="minimumSize" >
    <size>
-    <width>96</width>
+    <width>160</width>
     <height>0</height>
    </size>
   </property>
@@ -20,18 +20,25 @@
   </property>
   <layout class="QVBoxLayout" >
    <item>
-    <widget class="QCheckBox" name="enableCheatsCheckbox" >
-     <property name="text" >
-      <string>Enable</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QCheckBox" name="enableCheatsCheckbox" >
+       <property name="text" >
+        <string>Enable</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="searchForCheatsButton" >
+       <property name="text" >
+        <string>Search...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="searchForCheatsButton" >
-     <property name="text" >
-      <string>Search...</string>
-     </property>
-    </widget>
+    <widget class="QListWidget" name="cheatListWidget" />
    </item>
   </layout>
  </widget>
