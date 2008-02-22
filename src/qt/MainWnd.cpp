@@ -262,9 +262,11 @@ bool MainWnd::enableTranslation( bool enable )
 
 	// apply translation
 	// the user might have to restart the application to apply changes completely
+	QByteArray windowState = saveState();
 	createDockWidgets();
 	createActions();
 	createMenus();
+	restoreState( windowState );
 	return true;
 }
 
