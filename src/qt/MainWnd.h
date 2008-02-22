@@ -26,19 +26,24 @@ class MainWnd : public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWnd( QWidget *parent = 0, QTranslator **trans = 0 );
+	MainWnd( QTranslator **trans, QSettings *settings, QWidget *parent = 0 );
 	~MainWnd();
 
 public slots:
-	bool loadTranslation( QString file );
+	void closeEvent( QCloseEvent * );
 
 private:
+	void loadSettings();
+	void saveSettings();
+	bool loadTranslation();
 	void createActions();
 	void createMenus();
 	void createDockWidgets();
 	bool createDisplay();
 
 	QTranslator **translator;
+	QString languageFile;
+	QSettings *settings;
 	QMenu *fileMenu;
 	QMenu *settingsMenu;
 	QAction *enableTranslationAct;
