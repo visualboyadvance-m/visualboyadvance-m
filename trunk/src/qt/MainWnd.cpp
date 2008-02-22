@@ -23,9 +23,10 @@
 #include "sidewidget_cheats.h"
 
 
-MainWnd::MainWnd( QWidget *parent, QTranslator **trans )
+MainWnd::MainWnd( QTranslator **trans, QSettings *settings, QWidget *parent )
 	: QMainWindow( parent ),
 	translator( trans ),
+	settings( settings ),
 	fileMenu( 0 ),
 	settingsMenu( 0 ),
 	toolsMenu( 0 ),
@@ -40,11 +41,48 @@ MainWnd::MainWnd( QWidget *parent, QTranslator **trans )
 	createDockWidgets();
 	createActions();
 	createMenus();
+
+	loadSettings();
 }
 
 
 MainWnd::~MainWnd()
 {
+}
+
+
+void MainWnd::loadSettings()
+{
+	QVariant v;
+
+	v = settings->value( "MainWnd/state" );
+	if( v.isValid() ) {
+		restoreState( v.toByteArray() );
+	}
+	
+	v = settings->value( "App/language_file" );
+	if( v.isValid() ) {
+		languageFile = v.toString();
+		if( loadTranslation() ) {
+			// only enable language if it loaded correctly
+			v = settings->value( "App/language_enable" );
+			enableTranslation( v.toBool() );
+		}
+	}
+}
+
+
+void MainWnd::saveSettings()
+{
+	QVariant v;
+	
+	// state of toolbars and dock widgets
+	// all memorizable widgets need an objectName!
+	v = saveState();
+	settings->setValue( "MainWnd/state", v );
+
+	v = enableTranslationAct->isEnabled();
+	settings->setValue( "App/language_enable", v );
 }
 
 
@@ -131,6 +169,7 @@ void MainWnd::createDockWidgets()
 
 	// Cheat Widget
 	dockWidget_cheats = new QDockWidget( tr( "Cheats" ), this );
+	dockWidget_cheats->setObjectName( "dockWidget_cheats" ); // necessary for MainWnd::saveState
 	SideWidget_Cheats *sw_cheats = new SideWidget_Cheats( dockWidget_cheats );
 	dockWidget_cheats->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
 	dockWidget_cheats->setWidget( sw_cheats );
@@ -153,6 +192,12 @@ bool MainWnd::createDisplay()
 }
 
 
+void MainWnd::closeEvent( QCloseEvent * )
+{
+	saveSettings();
+}
+
+
 bool MainWnd::selectLanguage()
 {
 	QString file = QFileDialog::getOpenFileName(
@@ -163,7 +208,9 @@ bool MainWnd::selectLanguage()
 
 	if( file.isNull() ) return false;
 
-	bool ret = loadTranslation( file );
+	languageFile = file;
+
+	bool ret = loadTranslation();
 	ret &= enableTranslation( true );
 
 	if( ret == false ) {
@@ -173,9 +220,11 @@ bool MainWnd::selectLanguage()
 }
 
 
-bool MainWnd::loadTranslation( QString file )
+bool MainWnd::loadTranslation()
 {
-	if( !file.endsWith( tr( ".qm" ), Qt::CaseInsensitive ) ) return false;
+	settings->setValue( "App/language_file", languageFile );
+	if( !languageFile.endsWith( tr( ".qm" ), Qt::CaseInsensitive ) ) return false;
+	QString file = languageFile;
 
 	// remove current translation
 	enableTranslation( false );
