@@ -18,6 +18,7 @@
 
 #include "MainWnd.h"
 
+#include "version.h"
 #include "glwidget.h"
 #include "configdialog.h"
 #include "sidewidget_cheats.h"
@@ -273,11 +274,15 @@ bool MainWnd::enableTranslation( bool enable )
 
 void MainWnd::showAbout()
 {
-	QString info;
-	info += tr ( "This program is licensed under terms of the GNU General Public License." );
+	QString info( "VisualBoyAdvance-M\n" );
+	info += tr( "Version" ) + " " + VERSION_STR + "\n";
+
+	info += tr( "Compile date:" ) + " " + __DATE__ + "\n";
 
 	// translators may use this string to give informations about the language file
-	info += tr ( "\nNo language file loaded." );
+	info += "\n" + tr ( "No language file loaded." ) + "\n";
+
+	info += "\n" + tr ( "This program is licensed under terms of the GNU General Public License." );
 
 	QMessageBox::about( this, tr( "About VBA-M" ), info );
 }
