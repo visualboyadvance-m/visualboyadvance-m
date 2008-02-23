@@ -158,6 +158,10 @@
 				RelativePath="..\..\src\qt\precompile.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\src\qt\version.h"
+				>
+			</File>
 			<Filter
 				Name="OpenGL"
 				>
