@@ -19,7 +19,6 @@
 #include "MainWnd.h"
 
 #include "version.h"
-//#include "glwidget.h"
 #include "configdialog.h"
 #include "sidewidget_cheats.h"
 
@@ -69,6 +68,11 @@ void MainWnd::loadSettings()
 {
 	QVariant v;
 
+	v = settings->value( "MainWnd/geometry");
+	if( v.isValid() ) {
+		restoreGeometry( v.toByteArray() );
+	}
+
 	v = settings->value( "MainWnd/state" );
 	if( v.isValid() ) {
 		restoreState( v.toByteArray() );
@@ -90,6 +94,9 @@ void MainWnd::saveSettings()
 {
 	QVariant v;
 	
+	v = saveGeometry();
+	settings->setValue( "MainWnd/geometry", v );
+
 	// state of toolbars and dock widgets
 	// all memorizable widgets need an objectName!
 	v = saveState();

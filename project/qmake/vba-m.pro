@@ -22,9 +22,6 @@ SOURCES += ../../src/qt/main.cpp
 HEADERS += ../../src/qt/MainWnd.h
 SOURCES += ../../src/qt/MainWnd.cpp
 
-HEADERS += ../../src/qt/glwidget.h
-SOURCES += ../../src/qt/glwidget.cpp
-
 FORMS += ../../src/qt/sidewidget_cheats.ui
 HEADERS += ../../src/qt/sidewidget_cheats.h
 SOURCES += ../../src/qt/sidewidget_cheats.cpp
