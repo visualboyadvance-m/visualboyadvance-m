@@ -24,9 +24,9 @@ VideoOptionsPage::VideoOptionsPage(QWidget *parent)
 	QGroupBox *RenderGroup = new QGroupBox(tr("Renderer Selection"));
 	QLabel *RenderLabel = new QLabel(tr("Renderer:"));
 	QComboBox *RenderCombo = new QComboBox;
-	RenderCombo->addItem(tr("OGL"));
-	RenderCombo->addItem(tr("D3D"));
-	RenderCombo->addItem(tr("QPainter"));
+	RenderCombo->addItem("OpenGL");
+	//RenderCombo->addItem(tr("D3D"));
+	RenderCombo->addItem("QPainter");
 
 	QHBoxLayout *RenderLayout = new QHBoxLayout;
 	RenderLayout->addWidget(RenderLabel);

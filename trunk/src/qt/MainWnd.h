@@ -22,6 +22,7 @@
 #include "precompile.h"
 
 #include "EmuManager.h"
+#include "GraphicsOutput.h"
 
 class MainWnd : public QMainWindow
 {
@@ -53,6 +54,7 @@ private:
 	QMenu *helpMenu;
 	QDockWidget *dockWidget_cheats;
 	EmuManager *emuManager;
+	GraphicsOutput *graphicsOutput;
 
 private slots:
 	bool selectLanguage();
