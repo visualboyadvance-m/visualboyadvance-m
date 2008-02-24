@@ -16,14 +16,26 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
-#ifndef PRECOMPILE_H
-#define PRECOMPILE_H
+#ifndef EMUMANAGER_H
+#define EMUMANAGER_H
 
-#if defined __cplusplus
-// Add C++ includes here
-#include <QtGui/QtGui>
-#include <QtOpenGL/QtOpenGL>
-#include <malloc.h>
-#endif
+#include "precompile.h"
 
-#endif // #ifndef PRECOMPILE_H
+// class to abstract emulation control
+class EmuManager
+{
+public:
+	EmuManager();
+	~EmuManager();
+
+	void setROM( QString &file );
+	QString &getROM();
+
+	bool loadROM();
+
+private:
+	QString romPath;
+	unsigned char *romBuffer;
+};
+
+#endif // #ifndef EMUMANAGER_H

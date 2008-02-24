@@ -21,6 +21,8 @@
 
 #include "precompile.h"
 
+#include "EmuManager.h"
+
 class MainWnd : public QMainWindow
 {
 	Q_OBJECT
@@ -50,6 +52,7 @@ private:
 	QMenu *toolsMenu;
 	QMenu *helpMenu;
 	QDockWidget *dockWidget_cheats;
+	EmuManager *emuManager;
 
 private slots:
 	bool selectLanguage();

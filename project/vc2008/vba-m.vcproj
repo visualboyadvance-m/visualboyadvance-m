@@ -174,6 +174,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="EmuManager"
+				>
+				<File
+					RelativePath="..\..\src\qt\EmuManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\qt\EmuManager.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

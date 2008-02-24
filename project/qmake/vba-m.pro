@@ -14,6 +14,8 @@ TRANSLATIONS += ../../lang/spanish.ts
 
 PRECOMPILED_HEADER = ../../src/qt/precompile.h
 
+HEADERS += ../../src/qt/version.h
+
 HEADERS += ../../src/qt/main.h
 SOURCES += ../../src/qt/main.cpp
 
@@ -32,3 +34,6 @@ SOURCES += ../../src/qt/MainOptions.cpp
 
 HEADERS += ../../src/qt/configdialog.h
 SOURCES += ../../src/qt/configdialog.cpp
+
+HEADERS += ../../src/qt/EmuManager.h
+SOURCES += ../../src/qt/EmuManager.cpp
