@@ -33,7 +33,8 @@ MainWnd::MainWnd( QTranslator **trans, QSettings *settings, QWidget *parent )
 	toolsMenu( 0 ),
 	helpMenu( 0 ),
 	enableTranslationAct( 0 ),
-	dockWidget_cheats( 0 )
+	dockWidget_cheats( 0 ),
+	emuManager( 0 )
 {
 	createDisplay();
 	setMinimumSize( 320, 240 );
@@ -44,11 +45,17 @@ MainWnd::MainWnd( QTranslator **trans, QSettings *settings, QWidget *parent )
 	createMenus();
 
 	loadSettings();
+
+	emuManager = new EmuManager();
 }
 
 
 MainWnd::~MainWnd()
 {
+	if( emuManager != 0 ) {
+		delete emuManager;
+		emuManager = 0;
+	}
 }
 
 
@@ -290,10 +297,21 @@ void MainWnd::showAbout()
 
 void MainWnd::showOpenROM()
 {
-	QString info;
-	info += tr ( "Enter ROM loader code here." );
+	QString file = QFileDialog::getOpenFileName(
+		this,
+		tr( "Select ROM" ),
+		"",
+		tr( "Game Boy Advance ROMs (*.gba);;All Files (*.*)" ) );
 
-	QMessageBox::about( this, tr( "Status" ), info );
+	if( file.isNull() ) return;
+
+	emuManager->setROM( file );
+	if( !emuManager->loadROM() ) {
+		QMessageBox::critical( this, tr( "Error!" ), tr( "Can not load ROM!" ) );
+		return;
+	}
+	
+	// TODO: start emulation
 }
 
 
