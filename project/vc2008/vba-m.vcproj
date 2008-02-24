@@ -132,6 +132,18 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="IO"
+				>
+				<File
+					RelativePath="..\..\src\qt\GraphicsOutput.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\qt\GraphicsOutput.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Build"

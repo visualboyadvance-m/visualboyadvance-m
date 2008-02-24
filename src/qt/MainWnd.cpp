@@ -19,7 +19,7 @@
 #include "MainWnd.h"
 
 #include "version.h"
-#include "glwidget.h"
+//#include "glwidget.h"
 #include "configdialog.h"
 #include "sidewidget_cheats.h"
 
@@ -34,7 +34,8 @@ MainWnd::MainWnd( QTranslator **trans, QSettings *settings, QWidget *parent )
 	helpMenu( 0 ),
 	enableTranslationAct( 0 ),
 	dockWidget_cheats( 0 ),
-	emuManager( 0 )
+	emuManager( 0 ),
+	graphicsOutput( 0 )
 {
 	createDisplay();
 	setMinimumSize( 320, 240 );
@@ -55,6 +56,11 @@ MainWnd::~MainWnd()
 	if( emuManager != 0 ) {
 		delete emuManager;
 		emuManager = 0;
+	}
+
+	if( graphicsOutput != 0 ) {
+		delete graphicsOutput;
+		graphicsOutput = 0;
 	}
 }
 
@@ -188,15 +194,24 @@ void MainWnd::createDockWidgets()
 
 bool MainWnd::createDisplay()
 {
-	if( !QGLFormat::hasOpenGL() ) return false;
-
-	GLWidget *ogl = new GLWidget( this );
-	if( ogl->isValid() ) {
-		setCentralWidget( ogl );
-		return true;
+	if( graphicsOutput != 0 ) {
+		delete graphicsOutput;
+		graphicsOutput = 0;
 	}
 
-	return false;
+	graphicsOutput = new GraphicsOutput( this );
+
+	if( !graphicsOutput->setAPI( GraphicsOutput::QPAINTER ) ) return false;
+
+	setCentralWidget( graphicsOutput );
+
+	QTimer *timer = new QTimer( this );
+	connect( timer, SIGNAL( timeout() ), graphicsOutput, SLOT( render() ) );
+	timer->start( 15 ); // set to 0 for idle time processing
+	// 1000 / 60 = 60 fps, but only results to 40 fps in reality.
+	// possible workaround: call timer more often and return or wait if too early
+
+	return true;
 }
 
 
