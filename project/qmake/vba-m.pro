@@ -37,3 +37,6 @@ SOURCES += ../../src/qt/configdialog.cpp
 
 HEADERS += ../../src/qt/EmuManager.h
 SOURCES += ../../src/qt/EmuManager.cpp
+
+HEADERS += ../../src/qt/GraphicsOutput.h
+SOURCES += ../../src/qt/GraphicsOutput.cpp
