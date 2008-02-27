@@ -27,13 +27,13 @@ class ConfigDialog : public QDialog
 
 public:
 	ConfigDialog();
-	
+
 public slots:
 	void changePage( QListWidgetItem *current, QListWidgetItem *previous );
 
 private:
 	void createIcons();
-	
+
 	QListWidget *contentsWidget;
 	QStackedWidget *pagesWidget;
 };

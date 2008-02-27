@@ -33,14 +33,14 @@ Effects_Buffer::Effects_Buffer( int max_bufs, long echo_size_ ) : Multi_Buffer( 
 	bufs_max    = max( max_bufs, (int) extra_chans );
 	no_echo     = true;
 	no_effects  = true;
-	
+
 	// defaults
 	config_.enabled   = false;
 	config_.delay [0] = 120;
 	config_.delay [1] = 122;
 	config_.feedback  = 0.2f;
 	config_.treble    = 0.4f;
-	
+
 	static float const sep = 0.8f;
 	config_.side_chans [0].pan = -sep;
 	config_.side_chans [1].pan = +sep;
@@ -104,18 +104,18 @@ void Effects_Buffer::bass_freq( int freq )
 blargg_err_t Effects_Buffer::set_channel_count( int count, int const* types )
 {
 	RETURN_ERR( Multi_Buffer::set_channel_count( count, types ) );
-	
+
 	delete_bufs();
-	
+
 	mixer.samples_read = 0;
-	
+
 	RETURN_ERR( chans.resize( count + extra_chans ) );
-	
+
 	RETURN_ERR( new_bufs( min( bufs_max, count + extra_chans ) ) );
-	
+
 	for ( int i = bufs_size; --i >= 0; )
 		RETURN_ERR( bufs [i].set_sample_rate( sample_rate(), length() ) );
-	
+
 	for ( int i = chans.size(); --i >= 0; )
 	{
 		chan_t& ch = chans [i];
@@ -127,12 +127,12 @@ blargg_err_t Effects_Buffer::set_channel_count( int count, int const* types )
 	// side channels with echo
 	chans [2].cfg.echo = true;
 	chans [3].cfg.echo = true;
-	
+
 	clock_rate( clock_rate_ );
 	bass_freq( bass_freq_ );
 	apply_config();
 	clear();
-	
+
 	return 0;
 }
 
@@ -148,7 +148,7 @@ void Effects_Buffer::clear()
 	s.low_pass [0] = 0;
 	s.low_pass [1] = 0;
 	mixer.samples_read = 0;
-	
+
 	for ( int i = bufs_size; --i >= 0; )
 		bufs [i].clear();
 	clear_echo();
@@ -179,7 +179,7 @@ Simple_Effects_Buffer::Simple_Effects_Buffer() :
 void Simple_Effects_Buffer::apply_config()
 {
 	Effects_Buffer::config_t& c = Effects_Buffer::config();
-	
+
 	c.enabled = config_.enabled;
 	if ( c.enabled )
 	{
@@ -187,22 +187,22 @@ void Simple_Effects_Buffer::apply_config()
 		c.delay [1] = 122;
 		c.feedback  = config_.echo * 0.7f;
 		c.treble    = 0.6f - 0.3f * config_.echo;
-		
+
 		float sep = config_.stereo + 0.80f;
 		if ( sep > 1.0f )
 			sep = 1.0f;
-		
+
 		c.side_chans [0].pan = -sep;
 		c.side_chans [1].pan = +sep;
-		
+
 		for ( int i = channel_count(); --i >= 0; )
 		{
 			chan_config_t& ch = Effects_Buffer::chan_config( i );
-			
+
 			ch.pan      = 0.0f;
 			ch.surround = config_.surround;
 			ch.echo     = false;
-			
+
 			int const type = (channel_types() ? channel_types() [i] : 0);
 			if ( !(type & noise_type) )
 			{
@@ -226,7 +226,7 @@ void Simple_Effects_Buffer::apply_config()
 			}
 		}
 	}
-	
+
 	Effects_Buffer::apply_config();
 }
 
@@ -245,19 +245,19 @@ int Effects_Buffer::max_delay() const
 void Effects_Buffer::apply_config()
 {
 	int i;
-	
+
 	if ( !bufs_size )
 		return;
-	
+
 	s.treble = TO_FIXED( config_.treble );
-	
+
 	bool echo_dirty = false;
-	
+
 	fixed_t old_feedback = s.feedback;
 	s.feedback = TO_FIXED( config_.feedback );
 	if ( !old_feedback && s.feedback )
 		echo_dirty = true;
-	
+
 	// delays
 	for ( i = stereo; --i >= 0; )
 	{
@@ -270,14 +270,14 @@ void Effects_Buffer::apply_config()
 			echo_dirty = true;
 		}
 	}
-	
+
 	// side channels
 	for ( i = 2; --i >= 0; )
 	{
 		chans [i+2].cfg.vol = chans [i].cfg.vol = config_.side_chans [i].vol * 0.5f;
 		chans [i+2].cfg.pan = chans [i].cfg.pan = config_.side_chans [i].pan;
 	}
-	
+
 	// convert volumes
 	for ( i = chans.size(); --i >= 0; )
 	{
@@ -287,9 +287,9 @@ void Effects_Buffer::apply_config()
 		if ( ch.cfg.surround )
 			ch.vol [0] = -ch.vol [0];
 	}
-	
+
 	assign_buffers();
-	
+
 	// set side channels
 	for ( i = chans.size(); --i >= 0; )
 	{
@@ -297,9 +297,9 @@ void Effects_Buffer::apply_config()
 		ch.channel.left  = chans [ch.cfg.echo*2  ].channel.center;
 		ch.channel.right = chans [ch.cfg.echo*2+1].channel.center;
 	}
-	
+
 	bool old_echo = !no_echo && !no_effects;
-	
+
 	// determine whether effects and echo are needed at all
 	no_effects = true;
 	no_echo    = true;
@@ -308,22 +308,22 @@ void Effects_Buffer::apply_config()
 		chan_t& ch = chans [i];
 		if ( ch.cfg.echo && s.feedback )
 			no_echo = false;
-		
+
 		if ( ch.vol [0] != TO_FIXED( 1 ) || ch.vol [1] != TO_FIXED( 1 ) )
 			no_effects = false;
 	}
 	if ( !no_echo )
 		no_effects = false;
-	
+
 	if (    chans [0].vol [0] != TO_FIXED( 1 ) ||
 			chans [0].vol [1] != TO_FIXED( 0 ) ||
 			chans [1].vol [0] != TO_FIXED( 0 ) ||
 			chans [1].vol [1] != TO_FIXED( 1 ) )
 		no_effects = false;
-	
+
 	if ( !config_.enabled )
 		no_effects = true;
-	
+
 	if ( no_effects )
 	{
 		for ( i = chans.size(); --i >= 0; )
@@ -334,14 +334,14 @@ void Effects_Buffer::apply_config()
 			ch.channel.right  = &bufs [1];
 		}
 	}
-	
+
 	mixer.bufs [0] = &bufs [0];
 	mixer.bufs [1] = &bufs [1];
 	mixer.bufs [2] = &bufs [2];
-	
+
 	if ( echo_dirty || (!old_echo && (!no_echo && !no_effects)) )
 		clear_echo();
-	
+
 	channels_changed();
 }
 
@@ -359,7 +359,7 @@ void Effects_Buffer::assign_buffers()
 		if ( x >= (int) chans.size() )
 			x -= (chans.size() - 2);
 		chan_t& ch = chans [x];
-		
+
 		int b = 0;
 		for ( ; b < buf_count; b++ )
 		{
@@ -368,7 +368,7 @@ void Effects_Buffer::assign_buffers()
 					(ch.cfg.echo == bufs [b].echo || !s.feedback) )
 				break;
 		}
-		
+
 		if ( b >= buf_count )
 		{
 			if ( buf_count < bufs_max )
@@ -399,15 +399,15 @@ void Effects_Buffer::assign_buffers()
 					}
 					CALC_LEVELS( ch.vol,       ch_sum,  ch_diff,  ch_surround );
 					CALC_LEVELS( bufs [h].vol, buf_sum, buf_diff, buf_surround );
-					
+
 					fixed_t dist = abs( ch_sum - buf_sum ) + abs( ch_diff - buf_diff );
-					
+
 					if ( ch_surround != buf_surround )
 						dist += TO_FIXED( 1 ) / 2;
-					
+
 					if ( s.feedback && ch.cfg.echo != bufs [h].echo )
 						dist += TO_FIXED( 1 ) / 2;
-					
+
 					if ( best_dist > dist )
 					{
 						best_dist = dist;
@@ -416,7 +416,7 @@ void Effects_Buffer::assign_buffers()
 				}
 			}
 		}
-		
+
 		//dprintf( "ch %d->buf %d\n", x, b );
 		ch.channel.center = &bufs [b];
 	}
@@ -434,7 +434,7 @@ void Effects_Buffer::end_frame( blip_time_t time )
 long Effects_Buffer::read_samples( blip_sample_t* out, long out_size )
 {
 	out_size = min( out_size, samples_avail() );
-	
+
 	int pair_count = int (out_size >> 1);
 	require( pair_count * stereo == out_size ); // must read an even number of samples
 	if ( pair_count )
@@ -452,7 +452,7 @@ long Effects_Buffer::read_samples( blip_sample_t* out, long out_size )
 				int count = max_read;
 				if ( count > pairs_remain )
 					count = pairs_remain;
-				
+
 				if ( no_echo )
 				{
 					// optimization: clear echo here to keep mix_effects() a leaf function
@@ -460,20 +460,20 @@ long Effects_Buffer::read_samples( blip_sample_t* out, long out_size )
 					memset( echo.begin(), 0, count * stereo * sizeof echo [0] );
 				}
 				mix_effects( out, count );
-				
+
 				blargg_long new_echo_pos = echo_pos + count * stereo;
 				if ( new_echo_pos >= echo_size )
 					new_echo_pos -= echo_size;
 				echo_pos = new_echo_pos;
 				assert( echo_pos < echo_size );
-				
+
 				out += count * stereo;
 				mixer.samples_read += count;
 				pairs_remain -= count;
 			}
 			while ( pairs_remain );
 		}
-		
+
 		if ( samples_avail() <= 0 || immediate_removal() )
 		{
 			for ( int i = bufs_size; --i >= 0; )
@@ -494,7 +494,7 @@ long Effects_Buffer::read_samples( blip_sample_t* out, long out_size )
 void Effects_Buffer::mix_effects( blip_sample_t* out_, int pair_count )
 {
 	typedef fixed_t stereo_fixed_t [stereo];
-	
+
 	// add channels with echo, do echo, add channels without echo, then convert to 16-bit and output
 	int echo_phase = 1;
 	do
@@ -513,7 +513,7 @@ void Effects_Buffer::mix_effects( blip_sample_t* out_, int pair_count )
 					BLIP_READER_ADJ_( in, mixer.samples_read );
 					fixed_t const vol_0 = buf->vol [0];
 					fixed_t const vol_1 = buf->vol [1];
-					
+
 					int count = unsigned (echo_size - echo_pos) / stereo;
 					int remain = pair_count;
 					if ( count > remain )
@@ -522,42 +522,42 @@ void Effects_Buffer::mix_effects( blip_sample_t* out_, int pair_count )
 					{
 						remain -= count;
 						BLIP_READER_ADJ_( in, count );
-						
+
 						out += count;
 						int offset = -count;
 						do
 						{
 							fixed_t s = BLIP_READER_READ( in );
 							BLIP_READER_NEXT_IDX_( in, bass, offset );
-							
+
 							out [offset] [0] += s * vol_0;
 							out [offset] [1] += s * vol_1;
 						}
 						while ( ++offset );
-						
+
 						out = (stereo_fixed_t*) echo.begin();
 						count = remain;
 					}
 					while ( remain );
-					
+
 					BLIP_READER_END( in, *buf );
 				}
 				buf++;
 			}
 			while ( --bufs_remain );
 		}
-		
+
 		// add echo
 		if ( echo_phase && !no_echo )
 		{
 			fixed_t const feedback = s.feedback;
 			fixed_t const treble   = s.treble;
-			
+
 			int i = 1;
 			do
 			{
 				fixed_t low_pass = s.low_pass [i];
-				
+
 				fixed_t* echo_end = &echo [echo_size + i];
 				fixed_t const* BLIP_RESTRICT in_pos = &echo [echo_pos + i];
 				blargg_long out_offset = echo_pos + i + s.delay [i];
@@ -565,7 +565,7 @@ void Effects_Buffer::mix_effects( blip_sample_t* out_, int pair_count )
 					out_offset -= echo_size;
 				assert( out_offset < echo_size );
 				fixed_t* BLIP_RESTRICT out_pos = &echo [out_offset];
-				
+
 				// break into up to three chunks to avoid having to handle wrap-around
 				// in middle of core loop
 				int remain = pair_count;
@@ -579,7 +579,7 @@ void Effects_Buffer::mix_effects( blip_sample_t* out_, int pair_count )
 					if ( count > remain )
 						count = remain;
 					remain -= count;
-					
+
 					in_pos  += count * stereo;
 					out_pos += count * stereo;
 					int offset = -count;
@@ -589,19 +589,19 @@ void Effects_Buffer::mix_effects( blip_sample_t* out_, int pair_count )
 						out_pos [offset * stereo] = FROM_FIXED( low_pass ) * feedback;
 					}
 					while ( ++offset );
-					
+
 					if (  in_pos >= echo_end )  in_pos -= echo_size;
 					if ( out_pos >= echo_end ) out_pos -= echo_size;
 				}
 				while ( remain );
-				
+
 				s.low_pass [i] = low_pass;
 			}
 			while ( --i >= 0 );
 		}
 	}
 	while ( --echo_phase >= 0 );
-	
+
 	// clamp to 16 bits
 	{
 		stereo_fixed_t const* BLIP_RESTRICT in = (stereo_fixed_t*) &echo [echo_pos];
@@ -621,15 +621,15 @@ void Effects_Buffer::mix_effects( blip_sample_t* out_, int pair_count )
 			{
 				fixed_t in_0 = FROM_FIXED( in [offset] [0] );
 				fixed_t in_1 = FROM_FIXED( in [offset] [1] );
-				
+
 				BLIP_CLAMP( in_0, in_0 );
 				out [offset] [0] = (blip_sample_t) in_0;
-				
+
 				BLIP_CLAMP( in_1, in_1 );
 				out [offset] [1] = (blip_sample_t) in_1;
 			}
 			while ( ++offset );
-			
+
 			in = (stereo_fixed_t*) echo.begin();
 			count = remain;
 		}

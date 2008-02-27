@@ -723,7 +723,7 @@ void MainWnd::OnInitMenuPopup(CMenu* pMenu, UINT nIndex, BOOL bSysMenu)
 void MainWnd::OnMoving(UINT fwSide, LPRECT pRect)
 {
 	CWnd::OnMoving(fwSide, pRect);
-	
+
 	if( emulating ) {
 		soundPause();
 	}
@@ -732,7 +732,7 @@ void MainWnd::OnMoving(UINT fwSide, LPRECT pRect)
 void MainWnd::OnMove(int x, int y)
 {
   CWnd::OnMove(x, y);
-  
+
   if(!theApp.changingVideoSize) {
     if(this) {
       if(!IsIconic()) {
@@ -1077,7 +1077,7 @@ bool MainWnd::fileOpenSelect( int system )
 		filter = winLoadFilter( IDS_FILTER_GBROM );
 		break;
 	}
-	
+
 	title = winResLoadString( IDS_SELECT_ROM );
 
 	if( !initialDir.IsEmpty() ) {

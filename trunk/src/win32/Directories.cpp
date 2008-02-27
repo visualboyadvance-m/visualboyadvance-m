@@ -84,11 +84,11 @@ BOOL Directories::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 	CString p;
-	
+
 	p = regQueryStringValue("romdir", NULL);
 	if(!p.IsEmpty())
 		GetDlgItem(IDC_ROM_PATH)->SetWindowText(p);
-	
+
 	p = regQueryStringValue("gbcromdir", NULL);
 	if(!p.IsEmpty())
 		GetDlgItem(IDC_GBCROM_PATH)->SetWindowText(p);
@@ -287,7 +287,7 @@ CString Directories::browseForDir(CString title)
 
 // returns true if the directory does exist
 bool Directories::directoryDoesExist(const char *directory)
-{ 
+{
 	HANDLE hDir;
 	hDir = CreateFile(
 		directory,

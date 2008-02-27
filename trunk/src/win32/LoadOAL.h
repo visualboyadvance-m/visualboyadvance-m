@@ -20,8 +20,8 @@
 // Complete list of functions available in AL 1.0 implementations
 
 typedef void           (ALAPIENTRY *LPALENABLE)( ALenum capability );
-typedef void           (ALAPIENTRY *LPALDISABLE)( ALenum capability ); 
-typedef ALboolean      (ALAPIENTRY *LPALISENABLED)( ALenum capability ); 
+typedef void           (ALAPIENTRY *LPALDISABLE)( ALenum capability );
+typedef ALboolean      (ALAPIENTRY *LPALISENABLED)( ALenum capability );
 typedef const ALchar*  (ALAPIENTRY *LPALGETSTRING)( ALenum param );
 typedef void           (ALAPIENTRY *LPALGETBOOLEANV)( ALenum param, ALboolean* data );
 typedef void           (ALAPIENTRY *LPALGETINTEGERV)( ALenum param, ALint* data );
@@ -43,13 +43,13 @@ typedef void           (ALAPIENTRY *LPALGETLISTENERF)( ALenum param, ALfloat* va
 typedef void           (ALAPIENTRY *LPALGETLISTENER3F)( ALenum param, ALfloat *value1, ALfloat *value2, ALfloat *value3 );
 typedef void           (ALAPIENTRY *LPALGETLISTENERFV)( ALenum param, ALfloat* values );
 typedef void           (ALAPIENTRY *LPALGETLISTENERI)( ALenum param, ALint* value );
-typedef void           (ALAPIENTRY *LPALGENSOURCES)( ALsizei n, ALuint* sources ); 
+typedef void           (ALAPIENTRY *LPALGENSOURCES)( ALsizei n, ALuint* sources );
 typedef void           (ALAPIENTRY *LPALDELETESOURCES)( ALsizei n, const ALuint* sources );
-typedef ALboolean      (ALAPIENTRY *LPALISSOURCE)( ALuint sid ); 
-typedef void           (ALAPIENTRY *LPALSOURCEF)( ALuint sid, ALenum param, ALfloat value); 
+typedef ALboolean      (ALAPIENTRY *LPALISSOURCE)( ALuint sid );
+typedef void           (ALAPIENTRY *LPALSOURCEF)( ALuint sid, ALenum param, ALfloat value);
 typedef void           (ALAPIENTRY *LPALSOURCE3F)( ALuint sid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
 typedef void           (ALAPIENTRY *LPALSOURCEFV)( ALuint sid, ALenum param, const ALfloat* values );
-typedef void           (ALAPIENTRY *LPALSOURCEI)( ALuint sid, ALenum param, ALint value); 
+typedef void           (ALAPIENTRY *LPALSOURCEI)( ALuint sid, ALenum param, ALint value);
 typedef void           (ALAPIENTRY *LPALGETSOURCEF)( ALuint sid, ALenum param, ALfloat* value );
 typedef void           (ALAPIENTRY *LPALGETSOURCE3F)( ALuint sid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3);
 typedef void           (ALAPIENTRY *LPALGETSOURCEFV)( ALuint sid, ALenum param, ALfloat* values );

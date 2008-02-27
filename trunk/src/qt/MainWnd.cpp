@@ -77,7 +77,7 @@ void MainWnd::loadSettings()
 	if( v.isValid() ) {
 		restoreState( v.toByteArray() );
 	}
-	
+
 	v = settings->value( "App/language_file" );
 	if( v.isValid() ) {
 		languageFile = v.toString();
@@ -93,7 +93,7 @@ void MainWnd::loadSettings()
 void MainWnd::saveSettings()
 {
 	QVariant v;
-	
+
 	v = saveGeometry();
 	settings->setValue( "MainWnd/geometry", v );
 
@@ -332,7 +332,7 @@ void MainWnd::showOpenROM()
 		QMessageBox::critical( this, tr( "Error!" ), tr( "Can not load ROM!" ) );
 		return;
 	}
-	
+
 	// TODO: start emulation
 }
 
@@ -351,28 +351,28 @@ void MainWnd::showAboutOpenGL()
 		QGLFormat::OpenGLVersionFlags flags = QGLFormat::openGLVersionFlags();
 		if( flags & QGLFormat::OpenGL_Version_2_1 ) {
 			info = tr( "OpenGL version 2.1 is present." );
-		} else 
+		} else
 		if( flags & QGLFormat::OpenGL_Version_2_0 ) {
 			info = tr( "OpenGL version 2.0 is present." );
-		} else 
+		} else
 		if( flags & QGLFormat::OpenGL_Version_1_5 ) {
 			info = tr( "OpenGL version 1.5 is present." );
-		} else 
+		} else
 		if( flags & QGLFormat::OpenGL_Version_1_4 ) {
 			info = tr( "OpenGL version 1.4 is present." );
-		} else 
+		} else
 		if( flags & QGLFormat::OpenGL_Version_1_3 ) {
 			info = tr( "OpenGL version 1.3 is present." );
-		} else 
+		} else
 		if( flags & QGLFormat::OpenGL_Version_1_2 ) {
 			info = tr( "OpenGL version 1.2 is present." );
-		} else 
+		} else
 		if( flags & QGLFormat::OpenGL_Version_1_1 ) {
 			info = tr( "OpenGL version 1.1 is present." );
-		} else 
+		} else
 		if( flags & QGLFormat::OpenGL_Version_None ) {
 			info = tr( "OpenGL is NOT available!" );
-		} 
+		}
 	} else {
 		info = tr( "OpenGL is NOT available!" );
 	}

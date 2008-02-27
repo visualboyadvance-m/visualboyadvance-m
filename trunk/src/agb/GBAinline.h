@@ -65,14 +65,14 @@ static inline u32 CPUReadMemory(u32 address)
 {
 
 #ifdef GBA_LOGGING
-  if(address & 3) {  
+  if(address & 3) {
     if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
       log("Unaligned word read: %08x at %08x\n", address, armMode ?
           armNextPC - 4 : armNextPC - 2);
     }
   }
 #endif
-  
+
   u32 value;
   switch(address >> 24) {
   case 0:
@@ -84,7 +84,7 @@ static inline u32 CPUReadMemory(u32 address)
               armNextPC - 4 : armNextPC - 2);
         }
 #endif
-        
+
         value = READ32LE(((u32 *)&biosProtected));
       }
       else goto unreadable;
@@ -128,7 +128,7 @@ static inline u32 CPUReadMemory(u32 address)
   case 11:
   case 12:
     value = READ32LE(((u32 *)&rom[address&0x1FFFFFC]));
-    break;    
+    break;
   case 13:
     if(cpuEEPROMEnabled)
       // no need to swap this
@@ -164,7 +164,7 @@ static inline u32 CPUReadMemory(u32 address)
 #ifdef C_CORE
     int shift = (address & 3) << 3;
     value = (value >> shift) | (value << (32 - shift));
-#else    
+#else
 #ifdef __GNUC__
     asm("and $3, %%ecx;"
         "shl $3 ,%%ecx;"
@@ -188,7 +188,7 @@ extern u32 myROM[];
 
 static inline u32 CPUReadHalfWord(u32 address)
 {
-#ifdef GBA_LOGGING      
+#ifdef GBA_LOGGING
   if(address & 1) {
     if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
       log("Unaligned halfword read: %08x at %08x\n", address, armMode ?
@@ -196,9 +196,9 @@ static inline u32 CPUReadHalfWord(u32 address)
     }
   }
 #endif
-  
+
   u32 value;
-  
+
   switch(address >> 24) {
   case 0:
     if (reg[15].I >> 24) {
@@ -267,7 +267,7 @@ static inline u32 CPUReadHalfWord(u32 address)
       value = rtcRead(address);
     else
       value = READ16LE(((u16 *)&rom[address & 0x1FFFFFE]));
-    break;    
+    break;
   case 13:
     if(cpuEEPROMEnabled)
       // no need to swap this
@@ -301,7 +301,7 @@ static inline u32 CPUReadHalfWord(u32 address)
   if(address & 1) {
     value = (value >> 8) | (value << 24);
   }
-  
+
   return value;
 }
 
@@ -353,7 +353,7 @@ static inline u8 CPUReadByte(u32 address)
   case 10:
   case 11:
   case 12:
-    return rom[address & 0x1FFFFFF];        
+    return rom[address & 0x1FFFFFF];
   case 13:
     if(cpuEEPROMEnabled)
       return eepromRead(address);
@@ -408,7 +408,7 @@ static inline void CPUWriteMemory(u32 address, u32 value)
     }
   }
 #endif
-  
+
   switch(address >> 24) {
   case 0x02:
 #ifdef BKPT_SUPPORT
@@ -455,7 +455,7 @@ static inline void CPUWriteMemory(u32 address, u32 value)
       cheatsWriteMemory(address + 0x06000000, value);
     else
 #endif
-    
+
     WRITE32LE(((u32 *)&vram[address]), value);
     break;
   case 0x07:
@@ -505,7 +505,7 @@ static inline void CPUWriteHalfWord(u32 address, u16 value)
     }
   }
 #endif
-  
+
   switch(address >> 24) {
   case 2:
 #ifdef BKPT_SUPPORT
@@ -524,7 +524,7 @@ static inline void CPUWriteHalfWord(u32 address, u16 value)
     else
 #endif
       WRITE16LE(((u16 *)&internalRAM[address & 0x7ffe]), value);
-    break;    
+    break;
   case 4:
     if(address < 0x4000400)
       CPUUpdateRegister(address & 0x3fe, value);
@@ -551,7 +551,7 @@ static inline void CPUWriteHalfWord(u32 address, u16 value)
                           value);
     else
 #endif
-    WRITE16LE(((u16 *)&vram[address]), value); 
+    WRITE16LE(((u16 *)&vram[address]), value);
     break;
   case 7:
 #ifdef BKPT_SUPPORT
@@ -603,7 +603,7 @@ static inline void CPUWriteByte(u32 address, u8 b)
       if(freezeWorkRAM[address & 0x3FFFF])
         cheatsWriteByte(address & 0x203FFFF, b);
       else
-#endif  
+#endif
         workRAM[address & 0x3FFFF] = b;
     break;
   case 3:
@@ -663,7 +663,7 @@ static inline void CPUWriteByte(u32 address, u8 b)
       case 0x9c:
       case 0x9d:
       case 0x9e:
-      case 0x9f:      
+      case 0x9f:
 	soundEvent(address&0xFF, b);
 	break;
       default:
@@ -690,7 +690,7 @@ static inline void CPUWriteByte(u32 address, u8 b)
     if ((address & 0x18000) == 0x18000)
       address &= 0x17fff;
 
-    // no need to switch 
+    // no need to switch
     // byte writes to OBJ VRAM are ignored
     if ((address) < objTilesAddress[((DISPCNT&7)+1)>>2])
     {
@@ -698,7 +698,7 @@ static inline void CPUWriteByte(u32 address, u8 b)
       if(freezeVRAM[address])
         cheatsWriteByte(address + 0x06000000, b);
       else
-#endif  
+#endif
             *((u16 *)&vram[address]) = (b << 8) | b;
     }
     break;
@@ -706,7 +706,7 @@ static inline void CPUWriteByte(u32 address, u8 b)
     // no need to switch
     // byte writes to OAM are ignored
     //    *((u16 *)&oam[address & 0x3FE]) = (b << 8) | b;
-    break;    
+    break;
   case 13:
     if(cpuEEPROMEnabled) {
       eepromWrite(address, b);
@@ -716,7 +716,7 @@ static inline void CPUWriteByte(u32 address, u8 b)
   case 14:
       if (!(saveType == 5) && (!eepromInUse | cpuSramEnabled | cpuFlashEnabled)) {
 
-    //if(!cpuEEPROMEnabled && (cpuSramEnabled | cpuFlashEnabled)) { 
+    //if(!cpuEEPROMEnabled && (cpuSramEnabled | cpuFlashEnabled)) {
 
         (*cpuSaveGameFunc)(address, b);
       break;

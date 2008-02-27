@@ -1020,7 +1020,7 @@ void sdlInitVideo() {
     screenWidth = destWidth;
     screenHeight = destHeight;
   }
-  
+
   surface = SDL_SetVideoMode(screenWidth, screenHeight, 0, flags);
 
   if(surface == NULL) {
@@ -1601,7 +1601,7 @@ int main(int argc, char **argv)
 
   char buf[1024];
   struct stat s;
-  
+
 #ifndef _WIN32
   // Get home dir
   homeDir = getenv("HOME");
@@ -2097,7 +2097,7 @@ void drawSpeed(u8 *screen, int pitch, int x, int y)
     sprintf(buffer, "%3d%%(%d, %d fps)", systemSpeed,
             systemFrameSkip,
             showRenderedFrames);
-            
+
   drawText(screen, pitch, x, y, buffer, showSpeedTransparent);
 }
 

@@ -1015,13 +1015,13 @@ void GBCheatList::OnNMDblclkCheatList(NMHDR *pNMHDR, LRESULT *pResult)
 	int selection = m_list.GetSelectionMark();
 	// get index value of corresponding code in cheatlist
 	if( selection == -1 ) return;
-	
+
 	LVITEM item;
 	ZeroMemory( &item, sizeof(item) );
 	item.mask = LVIF_PARAM;
 	item.iItem = selection;
 	if( FALSE == m_list.GetItem( &item ) ) return;
-	
+
 	// modify code
 	INT_PTR res;
 	if( gbVerifyGsCode( gbCheatList[ item.lParam ].cheatCode ) ) {
