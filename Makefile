@@ -74,11 +74,11 @@ ${GBAPUDIR}/Gb_Apu_State${OE} ${GBAPUDIR}/Gb_Oscs${OE} ${GBAPUDIR}/Multi_Buffer$
 
 CALTERNOBJ=${HQCDIR}/hq_implementation${OE}
 
-MAINOBJ=${MAINDIR}/2xSaI${OE} ${MAINDIR}/admame${OE} ${AGBDIR}agbprint${OE} ${MAINDIR}/armdis${OE} \
+MAINOBJ=${MAINDIR}/2xSaI${OE} ${MAINDIR}/admame${OE} ${AGBDIR}/agbprint${OE} ${MAINDIR}/armdis${OE} \
 ${MAINDIR}/bilinear${OE} ${MAINDIR}/bios${OE} ${MAINDIR}/Cheats${OE} ${MAINDIR}/CheatSearch${OE} \
-${MAINDIR}/EEprom${OE} ${MAINDIR}/elf${OE} ${MAINDIR}/Flash${OE} ${AGBDIR}GBA${OE} \
-${AGBDIR}gbafilter${OE} ${AGBDIR}GBAGfx${OE} ${MAINDIR}/Globals${OE} ${MAINDIR}/interframe${OE} \
-${MAINDIR}/hq2x${OE} ${AGBDIR}GBA-thumb${OE} ${AGBDIR}GBA-arm${OE} ${MAINDIR}/Mode0${OE} \
+${MAINDIR}/EEprom${OE} ${MAINDIR}/elf${OE} ${MAINDIR}/Flash${OE} ${AGBDIR}/GBA${OE} \
+${AGBDIR}/gbafilter${OE} ${AGBDIR}/GBAGfx${OE} ${MAINDIR}/Globals${OE} ${MAINDIR}/interframe${OE} \
+${MAINDIR}/hq2x${OE} ${AGBDIR}/GBA-thumb${OE} ${AGBDIR}/GBA-arm${OE} ${MAINDIR}/Mode0${OE} \
 ${MAINDIR}/Mode1${OE} ${MAINDIR}/Mode2${OE} ${MAINDIR}/Mode3${OE} ${MAINDIR}/Mode4${OE} \
 ${MAINDIR}/Mode5${OE} ${MAINDIR}/pixel${OE} \
 ${MAINDIR}/remote${OE} ${MAINDIR}/RTC${OE} ${MAINDIR}/scanline${OE} \
