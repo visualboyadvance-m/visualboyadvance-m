@@ -29,7 +29,7 @@
 #include "../System.h"
 #include "../NLS.h"
 #include "../Util.h"
-#include "../gb/gbGlobals.h"
+#include "../dmg/gbGlobals.h"
 
 extern "C" {
 #include <png.h>

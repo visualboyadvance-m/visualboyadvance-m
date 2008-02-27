@@ -41,7 +41,7 @@
 #include "WinResUtil.h"
 #include "Logging.h"
 
-#include "../GBA.h"
+#include "../agb/GBA.h"
 #include "../Globals.h"
 #include "../Sound.h"
 

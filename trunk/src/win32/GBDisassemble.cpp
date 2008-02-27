@@ -24,8 +24,8 @@
 #include "GBDisassemble.h"
 
 #include "../System.h"
-#include "../gb/GB.h"
-#include "../gb/gbGlobals.h"
+#include "../dmg/GB.h"
+#include "../dmg/gbGlobals.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

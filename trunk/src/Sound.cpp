@@ -22,13 +22,13 @@
 
 #include "Sound.h"
 
-#include "GBA.h"
+#include "agb/GBA.h"
 #include "Globals.h"
 #include "Util.h"
 #include "Port.h"
 
-#include "gb/gb_apu/Gb_Apu.h"
-#include "gb/gb_apu/Multi_Buffer.h"
+#include "dmg/gb_apu/Gb_Apu.h"
+#include "dmg/gb_apu/Multi_Buffer.h"
 
 extern bool stopState;      // TODO: silence sound when true
 

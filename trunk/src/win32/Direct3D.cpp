@@ -32,10 +32,10 @@
 #include "FullscreenSettings.h"
 
 #include "../System.h"
-#include "../GBA.h"
+#include "../agb/GBA.h"
 #include "../Globals.h"
 #include "../Util.h"
-#include "../gb/gbGlobals.h"
+#include "../dmg/gbGlobals.h"
 
 #include <memory.h>
 

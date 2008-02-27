@@ -21,8 +21,8 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#include "GBA.h"
-#include "GBAinline.h"
+#include "agb/GBA.h"
+#include "agb/GBAinline.h"
 #include "Cheats.h"
 #include "Globals.h"
 #include "NLS.h"

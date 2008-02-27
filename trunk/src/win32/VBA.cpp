@@ -36,22 +36,22 @@
 #include "rpi.h"
 
 #include "../System.h"
-#include "../agbprint.h"
+#include "../agb/agbprint.h"
 #include "../cheatSearch.h"
-#include "../GBA.h"
+#include "../agb/GBA.h"
 #include "../Globals.h"
 #include "../RTC.h"
 #include "../Sound.h"
 #include "../Util.h"
-#include "../gb/gbGlobals.h"
-#include "../gb/gbPrinter.h"
+#include "../dmg/gbGlobals.h"
+#include "../dmg/gbPrinter.h"
 
 /* Link
 ---------------------*/
-#include "../Link.h"
+#include "../agb/GBALink.h"
 /* ---------------- */
 
-#include "../gbafilter.h"
+#include "../agb/gbafilter.h"
 
 #ifdef SDL
 #pragma comment( lib, "SDL" )

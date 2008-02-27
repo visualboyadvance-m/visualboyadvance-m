@@ -17,7 +17,7 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "stdafx.h"
-#include "..\Link.h"
+#include "..\agb\GBALink.h"
 
 static char buffer[2048];
 static HKEY vbKey = NULL;

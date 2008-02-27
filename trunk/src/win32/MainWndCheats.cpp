@@ -25,9 +25,9 @@
 #include "Reg.h"
 #include "WinResUtil.h"
 
-#include "../GBA.h"
+#include "../agb/GBA.h"
 #include "../Globals.h"
-#include "../gb/gbCheats.h"
+#include "../dmg/gbCheats.h"
 
 extern int emulating;
 

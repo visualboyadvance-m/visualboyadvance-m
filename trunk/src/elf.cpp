@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "GBA.h"
+#include "agb/GBA.h"
 #include "Port.h"
 #include "elf.h"
 #include "NLS.h"
