@@ -27,7 +27,7 @@
 
 // Internals
 #include "../System.h"
-#include "../GBA.h"
+#include "../agb/GBA.h"
 #include "../Globals.h"
 #include "../Sound.h"
 

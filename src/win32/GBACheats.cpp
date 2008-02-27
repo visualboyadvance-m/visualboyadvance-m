@@ -26,7 +26,7 @@
 #include "../System.h"
 #include "../Cheats.h"
 #include "../CheatSearch.h"
-#include "../GBA.h"
+#include "../agb/GBA.h"
 #include "../Globals.h"
 
 #include "Reg.h"

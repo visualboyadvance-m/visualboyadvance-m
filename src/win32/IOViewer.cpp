@@ -24,9 +24,9 @@
 #include "IOViewer.h"
 
 #include "../System.h"
-#include "../GBA.h"
+#include "../agb/GBA.h"
 #include "../Globals.h"
-#include "../GBAinline.h"
+#include "../agb/GBAinline.h"
 #include "IOViewerRegs.h"
 
 #ifdef _DEBUG

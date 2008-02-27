@@ -602,7 +602,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\gbafilter.cpp"
+					RelativePath=".\src\agb\gbafilter.cpp"
 					>
 				</File>
 				<File
@@ -638,7 +638,7 @@
 				Name="GBA"
 				>
 				<File
-					RelativePath=".\src\agbprint.cpp"
+					RelativePath=".\src\agb\agbprint.cpp"
 					>
 				</File>
 				<File
@@ -662,19 +662,19 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\GBA-arm.cpp"
+					RelativePath=".\src\agb\gba-arm.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\GBA-thumb.cpp"
+					RelativePath=".\src\agb\gba-thumb.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\GBA.cpp"
+					RelativePath=".\src\agb\gba.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Gfx.cpp"
+					RelativePath=".\src\agb\gbagfx.cpp"
 					>
 				</File>
 				<File
@@ -1130,11 +1130,11 @@
 				Name="Linking"
 				>
 				<File
-					RelativePath=".\src\Link.cpp"
+					RelativePath=".\src\agb\gbalink.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Link.h"
+					RelativePath=".\src\agb\gbalink.h"
 					>
 				</File>
 				<File
@@ -1240,7 +1240,7 @@
 				Name="GBA"
 				>
 				<File
-					RelativePath=".\src\agbprint.h"
+					RelativePath=".\src\agb\agbprint.h"
 					>
 				</File>
 				<File
@@ -1260,19 +1260,19 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\GBA.h"
+					RelativePath=".\src\agb\gba.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\GBAcpu.h"
+					RelativePath=".\src\agb\gbacpu.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\GBAinline.h"
+					RelativePath=".\src\agb\gbainline.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Gfx.h"
+					RelativePath=".\src\agb\gbagfx.h"
 					>
 				</File>
 				<File

@@ -27,7 +27,7 @@
 #include "WinResUtil.h"
 
 #include "../System.h"
-#include "../GBA.h"
+#include "../agb/GBA.h"
 #include "../Globals.h"
 #include "../NLS.h"
 #include "../Util.h"

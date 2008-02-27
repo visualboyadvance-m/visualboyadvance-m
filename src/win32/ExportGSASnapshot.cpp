@@ -23,7 +23,7 @@
 #include "vba.h"
 #include "ExportGSASnapshot.h"
 
-#include "../GBA.h"
+#include "../agb/GBA.h"
 #include "../NLS.h"
 
 #ifdef _DEBUG

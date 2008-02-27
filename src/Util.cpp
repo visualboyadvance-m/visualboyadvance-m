@@ -29,7 +29,7 @@ extern "C" {
 #include "NLS.h"
 #include "Util.h"
 #include "Flash.h"
-#include "GBA.h"
+#include "agb/GBA.h"
 #include "Globals.h"
 #include "RTC.h"
 #include "Port.h"
