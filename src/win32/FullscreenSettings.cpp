@@ -254,7 +254,7 @@ void FullscreenSettings::OnCbnSelchangeComboColorDepth()
 		selection = combo_color_depth.GetCurSel();
 		if( selection == LB_ERR ) return;
 		D3DFORMAT format = (D3DFORMAT)combo_color_depth.GetItemData( selection );
-		
+
 		// enumerate resolutions
 		HRESULT res;
 		D3DDISPLAYMODE mode;
@@ -373,7 +373,7 @@ void FullscreenSettings::OnCbnSelchangeComboResolution()
 		selection = combo_resolution.GetCurSel();
 		if( selection == LB_ERR ) return;
 		UINT iMode = (UINT)combo_resolution.GetItemData( selection );
-		
+
 		// enumerate refresh rates
 		HRESULT res;
 		D3DDISPLAYMODE mode, mode2;

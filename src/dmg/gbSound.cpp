@@ -92,7 +92,7 @@ static void flush_samples()
 {
 	// number of samples in output buffer
 	int const out_buf_size = soundBufferLen / sizeof *soundFinalWave;
-	
+
 	// Keep filling and writing soundFinalWave until it can't be fully filled
 	while ( stereo_buffer->samples_avail() >= out_buf_size )
 	{
@@ -115,13 +115,13 @@ static gb_effects_config_t gb_effects_config_current;
 static void apply_effects()
 {
 	gb_effects_config_current = gb_effects_config;
-		
+
 	stereo_buffer->config().enabled  = gb_effects_config_current.enabled;
 	stereo_buffer->config().echo     = gb_effects_config_current.echo;
 	stereo_buffer->config().stereo   = gb_effects_config_current.stereo;
 	stereo_buffer->config().surround = gb_effects_config_current.surround;
 	stereo_buffer->apply_config();
-	
+
 	for ( int i = 0; i < chan_count; i++ )
 	{
 		Multi_Buffer::channel_t ch = stereo_buffer->channel( i );
@@ -135,11 +135,11 @@ void gbSoundTick()
 	{
 		// Run sound hardware to present
 		end_frame( SOUND_CLOCK_TICKS * ticks_to_time );
-		
+
 		flush_samples();
 
 		gb_effects_config.enabled = soundEcho;
-		
+
 		// Update effects config if it was changed
 		if ( memcmp( &gb_effects_config_current, &gb_effects_config,
 				sizeof gb_effects_config ) )
@@ -151,10 +151,10 @@ static void reset_apu()
 {
 	// Use DMG or CGB sound differences based on type of game
 	gb_apu->reset( gbHardware & 1 ? gb_apu->mode_dmg : gb_apu->mode_cgb );
-	
+
 	if ( stereo_buffer )
 		stereo_buffer->clear();
-	
+
 	soundTicks = SOUND_CLOCK_TICKS;
 }
 
@@ -163,24 +163,24 @@ static void remake_stereo_buffer()
 	// Stereo_Buffer
 	delete stereo_buffer;
 	stereo_buffer = 0;
-	
+
 	stereo_buffer = new Simple_Effects_Buffer; // TODO: handle out of memory
 	stereo_buffer->set_sample_rate( 44100 / soundQuality ); // TODO: handle out of memory
 	stereo_buffer->clock_rate( gb_apu->clock_rate );
-	
+
 	// APU
 	static int const chan_types [chan_count] = {
 		Multi_Buffer::wave_type+1, Multi_Buffer::wave_type+2,
 		Multi_Buffer::wave_type+3, Multi_Buffer::mixed_type+1
 	};
 	stereo_buffer->set_channel_count( chan_count, chan_types );
-	
+
 	if ( !gb_apu )
 	{
 		gb_apu = new Gb_Apu;
 		reset_apu();
 	}
-	
+
 	apply_effects();
 }
 
@@ -189,12 +189,12 @@ void gbSoundReset()
 	gb_effects_config.echo     = 0.20f;
 	gb_effects_config.stereo   = 0.15f;
 	gb_effects_config.surround = false;
-	
+
 	SOUND_CLOCK_TICKS = 20000;
-	
+
 	remake_stereo_buffer();
 	reset_apu();
-	
+
 	soundPaused       = 1;
 	soundNextPosition = 0;
 
@@ -254,10 +254,10 @@ void gbSoundSetQuality(int quality)
 		{
 			if ( !soundOffFlag )
 				soundShutdown();
-				
+
 			soundQuality      = quality;
 			soundNextPosition = 0;
-			
+
 			if ( !soundOffFlag )
 				soundInit();
 		}
@@ -266,7 +266,7 @@ void gbSoundSetQuality(int quality)
 			soundQuality      = quality;
 			soundNextPosition = 0;
 		}
-		
+
 		remake_stereo_buffer();
 	}
 }
@@ -379,34 +379,34 @@ enum {
 void gbSoundReadGame(int version,gzFile gzFile)
 {
 	return; // TODO: apparently GB save states don't work in the main emulator
-	
+
 	// Load state
 	utilReadData( gzFile, gbsound_format );
 
 	if ( version >= 11 )
 		utilReadData( gzFile, gbsound_format2 );
-	
+
 	utilReadData( gzFile, gbsound_format3 );
 
 	int quality = 1;
 	if ( version >= 7 )
 		quality = utilReadInt( gzFile );
-	
+
 	gbSoundSetQuality( quality );
-	
+
 	// Convert to format Gb_Apu uses
 	reset_apu();
 	gb_apu_state_t s;
 	gb_apu->save_state( &s ); // use fresh values for anything not restored
-	
+
 	// Only some registers are properly preserved
 	static int const regs_to_copy [] = {
 		nr10, nr11, nr12, nr21, nr22, nr30, nr32, nr42, nr43, nr50, nr51, nr52, -1
 	};
 	for ( int i = 0; regs_to_copy [i] >= 0; i++ )
 		s.regs [regs_to_copy [i]] = gbMemory [0xFF10 + regs_to_copy [i]];
-	
+
 	memcpy( &s.regs [0x20], &gbMemory [0xFF30], 0x10 ); // wave
-	
+
 	gb_apu->load_state( s );
 }

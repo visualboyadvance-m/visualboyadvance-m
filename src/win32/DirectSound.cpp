@@ -49,7 +49,7 @@ private:
 	HANDLE               dsbEvent;
 	WAVEFORMATEX         wfx;          // Primary buffer wave format
 	int                  soundBufferTotalLen;
-	
+
 public:
 	DirectSound();
 	virtual ~DirectSound();
@@ -72,7 +72,7 @@ DirectSound::DirectSound()
 	dsbNotify     = NULL;
 	dsbEvent      = NULL;
 
-	soundBufferTotalLen = 14700;	
+	soundBufferTotalLen = 14700;
 }
 
 

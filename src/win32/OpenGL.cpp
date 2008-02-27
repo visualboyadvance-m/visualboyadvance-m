@@ -75,7 +75,7 @@ private:
 	bool failed;
 	GLFONT font;
 	int pitch;
-	GLuint displaylist; 
+	GLuint displaylist;
 	u8 *data;
 	GLhandleARB v,f,p,t;
 	DWORD currentAdapter;
@@ -191,7 +191,7 @@ void OpenGLDisplay::cleanup()
 		glDeleteTextures(1, &texture);
 		texture = 0;
 	}
-    
+
 	if (displaylist)
 	{
 	glDeleteLists(displaylist, 1);
@@ -301,7 +301,7 @@ bool OpenGLDisplay::initialize()
 	if( theApp.videoOption <= VIDEO_4X )
 		AdjustWindowRectEx( &theApp.dest, style, TRUE, styleEx );
 	else
-		AdjustWindowRectEx( &theApp.dest, style, FALSE, styleEx );    
+		AdjustWindowRectEx( &theApp.dest, style, FALSE, styleEx );
 
 	int winSizeX = theApp.dest.right - theApp.dest.left;
 	int winSizeY = theApp.dest.bottom - theApp.dest.top;
@@ -327,14 +327,14 @@ bool OpenGLDisplay::initialize()
 		x,y,winSizeX,winSizeY,
 		NULL,
 		0 );
-	
+
 	if (!(HWND)*pWnd) {
 		winlog("Error creating Window %08x\n", GetLastError());
 		return FALSE;
 	}
-	
+
 	theApp.updateMenuBar();
-	
+
 	theApp.adjustDestRect();
 	theApp.mode320Available = FALSE;
 	theApp.mode640Available = FALSE;
@@ -342,7 +342,7 @@ bool OpenGLDisplay::initialize()
 	theApp.mode1024Available = FALSE;
 	theApp.mode1280Available = FALSE;
 
-	
+
 	currentAdapter = theApp.fsAdapter;
 	DISPLAY_DEVICE dev;
 	ZeroMemory( &dev, sizeof(dev) );
@@ -376,7 +376,7 @@ bool OpenGLDisplay::initialize()
 	glEnable( GL_TEXTURE_2D );
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 	initializeMatrices( theApp.surfaceSizeX, theApp.surfaceSizeY );
 
 	setVSync( theApp.vsync );
@@ -409,7 +409,7 @@ bool OpenGLDisplay::initialize()
 	return true;
 }
 
-//clear colour buffer 
+//clear colour buffer
 void OpenGLDisplay::clear()
 {
 	glClearColor(0.0,0.0,0.0,1.0);
@@ -440,7 +440,7 @@ void OpenGLDisplay::renderlist()
 
 //main render func
 void OpenGLDisplay::render()
-{ 
+{
 	clear();
 
 	pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
@@ -468,11 +468,11 @@ void OpenGLDisplay::render()
 		glPixelStorei( GL_UNPACK_ROW_LENGTH, theApp.sizeX + 1 );
 	}
     glTexSubImage2D(GL_TEXTURE_2D,0,0,0,width,height,GL_RGBA,GL_UNSIGNED_BYTE,data );
-    
 
-	glCallList(displaylist); 
- 
-       
+
+	glCallList(displaylist);
+
+
 	if( theApp.showSpeed ) { // && ( theApp.videoOption > VIDEO_4X ) ) {
 		char buffer[30];
 		if( theApp.showSpeed == 1 ) {
@@ -508,12 +508,12 @@ void OpenGLDisplay::render()
 			theApp.screenMessage = false;
 		}
 	}
-	
+
 	glFlush();
 	SwapBuffers( hDC );
 	// since OpenGL draws on the back buffer,
 	// we have to swap it to the front buffer to see the content
-    
+
 }
 
 //resize screen

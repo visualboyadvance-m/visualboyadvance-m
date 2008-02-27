@@ -84,7 +84,7 @@ void Gb_Sweep_Square::calc_sweep( bool update )
 	int const delta = sweep_freq >> shift;
 	sweep_neg = (regs [0] & 0x08) != 0;
 	int const freq = sweep_freq + (sweep_neg ? -delta : delta);
-	
+
 	if ( freq > 0x7FF )
 	{
 		enabled = false;
@@ -92,7 +92,7 @@ void Gb_Sweep_Square::calc_sweep( bool update )
 	else if ( shift && update )
 	{
 		sweep_freq = freq;
-		
+
 		regs [3] = freq & 0xFF;
 		regs [4] = (regs [4] & ~0x07) | (freq >> 8 & 0x07);
 	}
@@ -132,13 +132,13 @@ int Gb_Wave::access( unsigned addr ) const
 int Gb_Osc::write_trig( int frame_phase, int max_len, int old_data )
 {
 	int data = regs [4];
-	
+
 	if ( (frame_phase & 1) && !(old_data & length_enabled) && length_ctr )
 	{
 		if ( (data & length_enabled) || cgb_02 )
 			length_ctr--;
 	}
-	
+
 	if ( data & trigger_mask )
 	{
 		enabled = true;
@@ -149,10 +149,10 @@ int Gb_Osc::write_trig( int frame_phase, int max_len, int old_data )
 				length_ctr--;
 		}
 	}
-	
+
 	if ( !length_ctr )
 		enabled = false;
-	
+
 	return data & trigger_mask;
 }
 
@@ -170,7 +170,7 @@ inline void Gb_Env::zombie_volume( int old, int data )
 				if ( old & 7 )
 					v++;
 			}
-			
+
 			v = 16 - v;
 		}
 		else if ( (old & 0x0F) == 8 )
@@ -185,7 +185,7 @@ inline void Gb_Env::zombie_volume( int old, int data )
 			v++;
 		else if ( !(old & 8) )
 			v += 2;
-		
+
 		if ( (old ^ data) & 8 )
 			v = 16 - v;
 	}
@@ -195,26 +195,26 @@ inline void Gb_Env::zombie_volume( int old, int data )
 bool Gb_Env::write_register( int frame_phase, int reg, int old, int data )
 {
 	int const max_len = 64;
-	
+
 	switch ( reg )
 	{
 	case 1:
 		length_ctr = max_len - (data & (max_len - 1));
 		break;
-	
+
 	case 2:
 		if ( !dac_enabled() )
 			enabled = false;
-		
+
 		zombie_volume( old, data );
-		
+
 		if ( (data & 7) && env_delay == 8 )
 		{
 			env_delay = 1;
 			clock_envelope(); // TODO: really happens at next length clock
 		}
 		break;
-	
+
 	case 4:
 		if ( write_trig( frame_phase, max_len, old ) )
 		{
@@ -252,7 +252,7 @@ inline void Gb_Sweep_Square::write_register( int frame_phase, int reg, int old_d
 {
 	if ( reg == 0 && sweep_enabled && sweep_neg && !(data & 0x08) )
 		enabled = false; // sweep negate disabled after used
-	
+
 	if ( Gb_Square::write_register( frame_phase, reg, old_data, data ) )
 	{
 		sweep_freq = frequency();
@@ -277,18 +277,18 @@ void Gb_Wave::corrupt_wave()
 inline void Gb_Wave::write_register( int frame_phase, int reg, int old_data, int data )
 {
 	int const max_len = 256;
-	
+
 	switch ( reg )
 	{
 	case 0:
 		if ( !dac_enabled() )
 			enabled = false;
 		break;
-	
+
 	case 1:
 		length_ctr = max_len - data;
 		break;
-	
+
 	case 4:
 		bool was_enabled = enabled;
 		if ( write_trig( frame_phase, max_len, old_data ) )
@@ -298,7 +298,7 @@ inline void Gb_Wave::write_register( int frame_phase, int reg, int old_data, int
 			else if ( mode == Gb_Apu::mode_dmg && was_enabled &&
 					(unsigned) (delay - 2 * clk_mul) < 2 * clk_mul )
 				corrupt_wave();
-			
+
 			phase = 0;
 			delay    = period() + 6 * clk_mul;
 		}
@@ -334,7 +334,7 @@ void Gb_Square::run( blip_time_t time, blip_time_t end_time )
 		duty = 8 - duty;
 	}
 	int ph = (this->phase + duty_offset) & 7;
-	
+
 	// Determine what will be generated
 	int vol = 0;
 	Blip_Buffer* const out = this->output;
@@ -345,18 +345,18 @@ void Gb_Square::run( blip_time_t time, blip_time_t end_time )
 		{
 			if ( enabled )
 				vol = this->volume;
-			
+
 			amp = -dac_bias;
 			if ( mode == Gb_Apu::mode_agb )
 				amp = -(vol >> 1);
-			
+
 			// Play inaudible frequencies as constant amplitude
 			if ( frequency() >= 0x7FA && delay < 32 * clk_mul )
 			{
 				amp += (vol * duty) >> 3;
 				vol = 0;
 			}
-			
+
 			if ( ph < duty )
 			{
 				amp += vol;
@@ -365,7 +365,7 @@ void Gb_Square::run( blip_time_t time, blip_time_t end_time )
 		}
 		update_amp( time, amp );
 	}
-	
+
 	// Generate wave
 	time += delay;
 	if ( time < end_time )
@@ -393,7 +393,7 @@ void Gb_Square::run( blip_time_t time, blip_time_t end_time )
 				time += per;
 			}
 			while ( time < end_time );
-			
+
 			if ( delta != vol )
 				last_amp -= delta;
 		}
@@ -407,34 +407,34 @@ void Gb_Square::run( blip_time_t time, blip_time_t end_time )
 static unsigned run_lfsr( unsigned s, unsigned mask, int count )
 {
 	bool const optimized = true; // set to false to use only unoptimized loop in middle
-	
+
 	// optimization used in several places:
 	// ((s & (1 << b)) << n) ^ ((s & (1 << b)) << (n + 1)) = (s & (1 << b)) * (3 << n)
-	
+
 	if ( mask == 0x4000 && optimized )
 	{
 		if ( count >= 32767 )
 			count %= 32767;
-		
+
 		// Convert from Fibonacci to Galois configuration,
 		// shifted left 1 bit
 		s ^= (s & 1) * 0x8000;
-		
+
 		// Each iteration is equivalent to clocking LFSR 255 times
 		while ( (count -= 255) > 0 )
 			s ^= ((s & 0xE) << 12) ^ ((s & 0xE) << 11) ^ (s >> 3);
 		count += 255;
-		
+
 		// Each iteration is equivalent to clocking LFSR 15 times
 		// (interesting similarity to single clocking below)
 		while ( (count -= 15) > 0 )
 			s ^= ((s & 2) * (3 << 13)) ^ (s >> 1);
 		count += 15;
-		
+
 		// Remaining singles
 		while ( --count >= 0 )
 			s = ((s & 2) * (3 << 13)) ^ (s >> 1);
-		
+
 		// Convert back to Fibonacci configuration
 		s &= 0x7FFF;
 	}
@@ -452,29 +452,29 @@ static unsigned run_lfsr( unsigned s, unsigned mask, int count )
 			if ( !count )
 				count = 127; // must run at least once
 		}
-		
+
 		// Need to keep one extra bit of history
 		s = s << 1 & 0xFF;
-		
+
 		// Convert from Fibonacci to Galois configuration,
 		// shifted left 2 bits
 		s ^= (s & 2) * 0x80;
-		
+
 		// Each iteration is equivalent to clocking LFSR 7 times
 		// (interesting similarity to single clocking below)
 		while ( (count -= 7) > 0 )
 			s ^= ((s & 4) * (3 << 5)) ^ (s >> 1);
 		count += 7;
-		
+
 		// Remaining singles
 		while ( --count >= 0 )
 			s = ((s & 4) * (3 << 5)) ^ (s >> 1);
-		
+
 		// Convert back to Fibonacci configuration and
 		// repeat last 8 bits above significant 7
 		s = (s << 7 & 0x7F80) | (s >> 1 & 0x7F);
 	}
-	
+
 	return s;
 }
 
@@ -490,28 +490,28 @@ void Gb_Noise::run( blip_time_t time, blip_time_t end_time )
 		{
 			if ( enabled )
 				vol = this->volume;
-			
+
 			amp = -dac_bias;
 			if ( mode == Gb_Apu::mode_agb )
 				amp = -(vol >> 1);
-			
+
 			if ( !(phase & 1) )
 			{
 				amp += vol;
 				vol = -vol;
 			}
 		}
-		
+
 		// AGB negates final output
 		if ( mode == Gb_Apu::mode_agb )
 		{
 			vol = -vol;
 			amp    = -amp;
 		}
-		
+
 		update_amp( time, amp );
 	}
-	
+
 	// Run timer and calculate time of next LFSR clock
 	static byte const period1s [8] = { 1, 2, 4, 6, 8, 10, 12, 14 };
 	int const period1 = period1s [regs [3] & 7] * clk_mul;
@@ -519,18 +519,18 @@ void Gb_Noise::run( blip_time_t time, blip_time_t end_time )
 		int extra = (end_time - time) - delay;
 		int const per2 = this->period2();
 		time += delay + ((divider ^ (per2 >> 1)) & (per2 - 1)) * period1;
-		
+
 		int count = (extra < 0 ? 0 : (extra + period1 - 1) / period1);
 		divider = (divider - count) & period2_mask;
 		delay = count * period1 - extra;
 	}
-	
+
 	// Generate wave
 	if ( time < end_time )
 	{
 		unsigned const mask = this->lfsr_mask();
 		unsigned bits = this->phase;
-		
+
 		int per = period2( period1 * 8 );
 		if ( period2_index() >= 0xE )
 		{
@@ -560,7 +560,7 @@ void Gb_Noise::run( blip_time_t time, blip_time_t end_time )
 				time += per;
 			}
 			while ( time < end_time );
-			
+
 			if ( delta == vol )
 				last_amp += delta;
 		}
@@ -575,7 +575,7 @@ void Gb_Wave::run( blip_time_t time, blip_time_t end_time )
 	int const volume_shift = 2;
 	int const volume_idx = regs [2] >> 5 & (agb_mask | 3); // 2 bits on DMG/CGB, 3 on AGB
 	int const volume_mul = volumes [volume_idx];
-	
+
 	// Determine what will be generated
 	int playing = false;
 	Blip_Buffer* const out = this->output;
@@ -586,27 +586,27 @@ void Gb_Wave::run( blip_time_t time, blip_time_t end_time )
 		{
 			// Play inaudible frequencies as constant amplitude
 			amp = 8 << 4; // really depends on average of all samples in wave
-			
+
 			// if delay is larger, constant amplitude won't start yet
 			if ( frequency() <= 0x7FB || delay > 15 * clk_mul )
 			{
 				if ( volume_mul )
 					playing = (int) enabled;
-				
+
 				amp = (sample_buf << (phase << 2 & 4) & 0xF0) * playing;
 			}
-			
+
 			amp = ((amp * volume_mul) >> (volume_shift + 4)) - dac_bias;
 		}
 		update_amp( time, amp );
 	}
-	
+
 	// Generate wave
 	time += delay;
 	if ( time < end_time )
 	{
 		byte const* wave = this->wave_ram;
-		
+
 		// wave size and bank
 		int const size20_mask = 0x20;
 		int const flags = regs [0] & agb_mask;
@@ -617,10 +617,10 @@ void Gb_Wave::run( blip_time_t time, blip_time_t end_time )
 			swap_banks = flags & size20_mask;
 			wave += bank_size/2 - (swap_banks >> 1);
 		}
-		
+
 		int ph = this->phase ^ swap_banks;
 		ph = (ph + 1) & wave_mask; // pre-advance
-		
+
 		int const per = this->period();
 		if ( !playing )
 		{
@@ -638,10 +638,10 @@ void Gb_Wave::run( blip_time_t time, blip_time_t end_time )
 				// Extract nybble
 				int nybble = wave [ph >> 1] << (ph << 2 & 4) & 0xF0;
 				ph = (ph + 1) & wave_mask;
-				
+
 				// Scale by volume
 				int amp = (nybble * volume_mul) >> (volume_shift + 4);
-				
+
 				int delta = amp - lamp;
 				if ( delta )
 				{
@@ -654,11 +654,11 @@ void Gb_Wave::run( blip_time_t time, blip_time_t end_time )
 			this->last_amp = lamp - dac_bias;
 		}
 		ph = (ph - 1) & wave_mask; // undo pre-advance and mask position
-		
+
 		// Keep track of last byte read
 		if ( enabled )
 			sample_buf = wave [ph >> 1];
-		
+
 		this->phase = ph ^ swap_banks; // undo swapped banks
 	}
 	delay = time - end_time;

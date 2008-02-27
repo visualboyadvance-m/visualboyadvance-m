@@ -1785,7 +1785,7 @@ u8 gbReadMemory(register u16 address)
   if(address >= 0xff00) {
 	if ( address >= 0xFF10 && address <= 0xFF3F )
 		return gbSoundRead( address );
-	
+
     switch(address & 0x00ff) {
     case 0x00:
       {
@@ -5212,7 +5212,7 @@ void gbEmulate(int ticksToStop)
     soundTicks -= clockTicks;
 	if ( !gbSpeed )
 		soundTicks -= clockTicks;
-	
+
     while(soundTicks < 0) {
       soundTicks += SOUND_CLOCK_TICKS;
 

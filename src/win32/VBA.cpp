@@ -1187,7 +1187,7 @@ int systemGetSensorY()
 bool systemSoundInit()
 {
 	systemSoundShutdown();
-	
+
 	switch( theApp.audioAPI )
 	{
 	case DIRECTSOUND:
@@ -1219,7 +1219,7 @@ void systemSoundShutdown()
 	}
 	theApp.soundRecording = false;
 
-	
+
 	if( theApp.sound ) {
 		delete theApp.sound;
 		theApp.sound = NULL;
@@ -1281,7 +1281,7 @@ void systemWriteDataToSoundBuffer()
 
 	if( theApp.sound ) {
 		theApp.sound->write();
-	}	
+	}
 }
 
 bool systemCanChangeSoundQuality()
@@ -1803,8 +1803,8 @@ void VBA::updateWindowSize(int value)
       return;
     }
     input->checkKeys();
-	
-	
+
+
     changingVideoSize = FALSE;
     updateWindowSize(videoOption);
     return;

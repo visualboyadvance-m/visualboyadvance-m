@@ -86,7 +86,7 @@ void GraphicsOutput::paintEvent( QPaintEvent *event )
 	}
 
 	painter.setPen( QColor( 0x00, 0xFF, 0x00 ) );
-	painter.setFont( QFont( "Arial", 14, QFont::Bold ) ); 
+	painter.setFont( QFont( "Arial", 14, QFont::Bold ) );
 	painter.drawText( rect(), Qt::AlignCenter, "Frame Number " + QString::number( counter++ ) +
 		"\nFPS: " + QString::number( fps ) );
 

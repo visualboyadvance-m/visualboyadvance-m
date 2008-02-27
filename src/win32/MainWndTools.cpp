@@ -344,36 +344,36 @@ void MainWnd::OnToolsRecordStartavirecording()
 {
 	CString captureBuffer;
 	CString capdir = regQueryStringValue( "aviRecordDir", NULL );
-	
+
 	if( capdir.IsEmpty() ) {
 		capdir = getDirFromFile( theApp.filename );
 	}
-	
+
 	CString filter = theApp.winLoadFilter( IDS_FILTER_AVI );
 	CString title = winResLoadString( IDS_SELECT_AVI_NAME );
-	
+
 	LPCTSTR exts[] = { ".AVI" };
-	
+
 	FileDlg dlg( this, "", filter, 1, "AVI", exts, capdir, title, true );
-	
+
 	if( dlg.DoModal() == IDCANCEL ) {
 		return;
 	}
-	
+
 	captureBuffer = theApp.soundRecordName =  dlg.GetPathName();
 	theApp.aviRecordName = captureBuffer;
 	theApp.aviRecording = true;
-	
+
 	if( dlg.m_ofn.nFileOffset > 0 ) {
 		captureBuffer = captureBuffer.Left( dlg.m_ofn.nFileOffset );
 	}
-	
+
 	int len = captureBuffer.GetLength();
-	
+
 	if( ( len > 3 ) && captureBuffer[ len - 1 ] == '\\' ) {
 		captureBuffer = captureBuffer.Left( len - 1 );
 	}
-	
+
 	regSetStringValue( "aviRecordDir", captureBuffer );
 
 

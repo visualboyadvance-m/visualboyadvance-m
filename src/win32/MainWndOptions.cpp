@@ -1768,7 +1768,7 @@ void MainWnd::OnOutputapiOalconfiguration()
 
 	dlg.selectedDevice = theApp.oalDevice;
 	dlg.bufferCount = theApp.oalBufferCount;
-	
+
 	if( dlg.DoModal() == IDOK ) {
 		systemSoundShutdown();
 		// do this before changing any values OpenAL

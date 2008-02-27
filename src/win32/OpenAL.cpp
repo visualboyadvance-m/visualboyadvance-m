@@ -113,7 +113,7 @@ OpenAL::~OpenAL()
 
 	ALFunction.alcDestroyContext( context );
 	assert( AL_NO_ERROR == ALFunction.alGetError() );
-	
+
 	ALFunction.alcCloseDevice( device );
 	assert( AL_NO_ERROR == ALFunction.alGetError() );
 }
@@ -309,7 +309,7 @@ void OpenAL::write()
 		} else {
 			if( nBuffersProcessed == 0 ) return;
 		}
-		
+
 		assert( nBuffersProcessed > 0 );
 
 		// tempBuffer contains the Buffer ID for the unqueued Buffer
