@@ -178,7 +178,7 @@ long Stereo_Buffer::read_samples( blip_sample_t* out, long out_size )
 	if ( pair_count )
 	{
 		mixer.read_pairs( out, pair_count );
-		
+
 		if ( samples_avail() <= 0 || immediate_removal() )
 		{
 			for ( int i = bufs_size; --i >= 0; )
@@ -219,7 +219,7 @@ void Stereo_Mixer::mix_mono( blip_sample_t* out_, int count )
 	int const bass = BLIP_READER_BASS( *bufs [2] );
 	BLIP_READER_BEGIN( center, *bufs [2] );
 	BLIP_READER_ADJ_( center, samples_read );
-	
+
 	typedef blip_sample_t stereo_blip_sample_t [stereo];
 	stereo_blip_sample_t* BLIP_RESTRICT out = (stereo_blip_sample_t*) out_ + count;
 	int offset = -count;
@@ -228,33 +228,33 @@ void Stereo_Mixer::mix_mono( blip_sample_t* out_, int count )
 		blargg_long s = BLIP_READER_READ( center );
 		BLIP_READER_NEXT_IDX_( center, bass, offset );
 		BLIP_CLAMP( s, s );
-		
+
 		out [offset] [0] = (blip_sample_t) s;
 		out [offset] [1] = (blip_sample_t) s;
 	}
 	while ( ++offset );
-	
+
 	BLIP_READER_END( center, *bufs [2] );
 }
 
 void Stereo_Mixer::mix_stereo( blip_sample_t* out_, int count )
 {
 	blip_sample_t* BLIP_RESTRICT out = out_ + count * stereo;
-	
+
 	// do left + center and right + center separately to reduce register load
 	Tracked_Blip_Buffer* const* buf = &bufs [2];
 	while ( true ) // loop runs twice
 	{
 		--buf;
 		--out;
-		
+
 		int const bass = BLIP_READER_BASS( *bufs [2] );
 		BLIP_READER_BEGIN( side,   **buf );
 		BLIP_READER_BEGIN( center, *bufs [2] );
-		
+
 		BLIP_READER_ADJ_( side,   samples_read );
 		BLIP_READER_ADJ_( center, samples_read );
-		
+
 		int offset = -count;
 		do
 		{
@@ -263,17 +263,17 @@ void Stereo_Mixer::mix_stereo( blip_sample_t* out_, int count )
 			BLIP_READER_NEXT_IDX_( side,   bass, offset );
 			BLIP_READER_NEXT_IDX_( center, bass, offset );
 			BLIP_CLAMP( s, s );
-			
+
 			++offset; // before write since out is decremented to slightly before end
 			out [offset * stereo] = (blip_sample_t) s;
 		}
 		while ( offset );
-		
+
 		BLIP_READER_END( side,   **buf );
-		
+
 		if ( buf != bufs )
 			continue;
-		
+
 		// only end center once
 		BLIP_READER_END( center, *bufs [2] );
 		break;

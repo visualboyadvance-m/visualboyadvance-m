@@ -21,7 +21,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 	#define REFLECT( x, y ) (save ?       (io->y) = (x) :         (x) = (io->y)          )
 #else
 	#define REFLECT( x, y ) (save ? set_val( io->y, x ) : (void) ((x) = get_val( io->y )))
-	
+
 	static blargg_ulong get_val( byte const* p )
 	{
 		return  p [3] * 0x1000000 + p [2] * 0x10000 + p [1] * 0x100 + p [0];
@@ -41,34 +41,34 @@ inline const char* Gb_Apu::save_load( gb_apu_state_t* io, bool save )
 	#if !GB_APU_CUSTOM_STATE
 		assert( sizeof (gb_apu_state_t) == 256 );
 	#endif
-	
+
 	int format = io->format0;
 	REFLECT( format, format );
 	if ( format != io->format0 )
 		return "Unsupported sound save state format";
-	
+
 	int version = 0;
 	REFLECT( version, version );
-	
+
 	// Registers and wave RAM
 	assert( regs_size == sizeof io->regs );
 	if ( save )
 		memcpy( io->regs, regs, sizeof io->regs );
 	else
 		memcpy( regs, io->regs, sizeof     regs );
-	
+
 	// Frame sequencer
 	REFLECT( frame_time,  frame_time  );
 	REFLECT( frame_phase, frame_phase );
-	
+
 	REFLECT( square1.sweep_freq,    sweep_freq );
 	REFLECT( square1.sweep_delay,   sweep_delay );
 	REFLECT( square1.sweep_enabled, sweep_enabled );
 	REFLECT( square1.sweep_neg,     sweep_neg );
-	
+
 	REFLECT( noise.divider,         noise_divider );
 	REFLECT( wave.sample_buf,       wave_buf );
-	
+
 	return 0;
 }
 
@@ -82,7 +82,7 @@ inline void Gb_Apu::save_load2( gb_apu_state_t* io, bool save )
 		REFLECT( osc.length_ctr, length_ctr [i] );
 		REFLECT( osc.phase,      phase      [i] );
 		REFLECT( osc.enabled,    enabled    [i] );
-		
+
 		if ( i != 2 )
 		{
 			int j = min( i, 2 );
@@ -98,7 +98,7 @@ void Gb_Apu::save_state( gb_apu_state_t* out )
 {
 	(void) save_load( out, true );
 	save_load2( out, true );
-	
+
 	#if !GB_APU_CUSTOM_STATE
 		memset( out->unused, 0, sizeof out->unused );
 	#endif
@@ -108,11 +108,11 @@ blargg_err_t Gb_Apu::load_state( gb_apu_state_t const& in )
 {
 	RETURN_ERR( save_load( CONST_CAST(gb_apu_state_t*,&in), false ) );
 	save_load2( CONST_CAST(gb_apu_state_t*,&in), false );
-	
+
 	apply_stereo();
 	synth_volume( 0 );          // suppress output for the moment
 	run_until_( last_time );    // get last_amp updated
 	apply_volume();             // now use correct volume
-	
+
 	return 0;
 }

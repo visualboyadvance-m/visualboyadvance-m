@@ -165,7 +165,7 @@ public:
 			typedef struct see_blargg_common_h int8_t;
 			typedef struct see_blargg_common_h uint8_t;
 		#endif
-		
+
 		#if USHRT_MAX == 0xFFFF
 			typedef short           int16_t;
 			typedef unsigned short  uint16_t;
@@ -174,7 +174,7 @@ public:
 			typedef struct see_blargg_common_h int16_t;
 			typedef struct see_blargg_common_h uint16_t;
 		#endif
-		
+
 		#if ULONG_MAX == 0xFFFFFFFF
 			typedef long            int32_t;
 			typedef unsigned long   uint32_t;

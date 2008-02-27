@@ -110,7 +110,7 @@ static fex_err_t fex_open_( const char* path, File_Extractor** fe_out )
 			return err;
 		}
 	#endif
-	
+
 	// open file
 	fe->file = FILE_GZ(fopen,gzopen)( path, "rb" );
 	if ( !fe->file )
@@ -118,14 +118,14 @@ static fex_err_t fex_open_( const char* path, File_Extractor** fe_out )
 		free( fe );
 		return "Couldn't open file";
 	}
-	
+
 	// get normal size
 	#ifndef HAVE_ZLIB_H
 		fseek( fe->file, 0, SEEK_END );
 		fe->size = ftell( fe->file );
 		rewind( fe->file );
 	#endif
-	
+
 	*fe_out = fe;
 	return 0;
 }

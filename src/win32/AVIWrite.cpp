@@ -137,7 +137,7 @@ bool AVIWrite::CreateVideoStream( LONG imageWidth, LONG imageHeight, WORD colorB
 			settings[0],
 			NULL
 			);
-		
+
 		AVISaveOptionsFree( 1, settings );
 		if( FAILED( err ) ) {
 			m_failed = true;
@@ -293,7 +293,7 @@ bool AVIWrite::AddAudioFrame( LPVOID soundData )
 		m_failed = true;
 		return false;
 	}
-	
+
 	m_sampleCounter += m_audioFrameSize / m_audioBlockAlign;
 
 	return true;

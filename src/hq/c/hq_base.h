@@ -312,7 +312,7 @@ int Xres, int Yres )
 	// yuv[1-9] allows reusage of calculated YUV values
 	int x, y;
 	unsigned int linePlus, lineMinus;
-	
+
 	COLORTYPE c[10]; // c[0] not used
 	// +----+----+----+
 	// |    |    |    |
