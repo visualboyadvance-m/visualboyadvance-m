@@ -28,8 +28,8 @@
 
 #include "../System.h"
 #include "../CheatSearch.h"
-#include "../gb/gbCheats.h"
-#include "../gb/gbGlobals.h"
+#include "../dmg/gbCheats.h"
+#include "../dmg/gbGlobals.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

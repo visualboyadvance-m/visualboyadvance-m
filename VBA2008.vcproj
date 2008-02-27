@@ -974,39 +974,39 @@
 				Name="GB"
 				>
 				<File
-					RelativePath=".\src\gb\gb.cpp"
+					RelativePath=".\src\dmg\gb.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbCheats.cpp"
+					RelativePath=".\src\dmg\gbCheats.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbDis.cpp"
+					RelativePath=".\src\dmg\gbDis.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbGfx.cpp"
+					RelativePath=".\src\dmg\gbGfx.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbGlobals.cpp"
+					RelativePath=".\src\dmg\gbGlobals.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbMemory.cpp"
+					RelativePath=".\src\dmg\gbMemory.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbPrinter.cpp"
+					RelativePath=".\src\dmg\gbPrinter.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbSGB.cpp"
+					RelativePath=".\src\dmg\gbSGB.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbSound.cpp"
+					RelativePath=".\src\dmg\gbSound.cpp"
 					>
 				</File>
 			</Filter>
@@ -1372,39 +1372,39 @@
 				Name="GB"
 				>
 				<File
-					RelativePath=".\src\gb\gb.h"
+					RelativePath=".\src\dmg\gb.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbCheats.h"
+					RelativePath=".\src\dmg\gbCheats.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbCodes.h"
+					RelativePath=".\src\dmg\gbCodes.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbCodesCB.h"
+					RelativePath=".\src\dmg\gbCodesCB.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbGlobals.h"
+					RelativePath=".\src\dmg\gbGlobals.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbMemory.h"
+					RelativePath=".\src\dmg\gbMemory.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbPrinter.h"
+					RelativePath=".\src\dmg\gbPrinter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbSGB.h"
+					RelativePath=".\src\dmg\gbSGB.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbSound.h"
+					RelativePath=".\src\dmg\gbSound.h"
 					>
 				</File>
 			</Filter>

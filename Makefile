@@ -58,8 +58,8 @@ endif
 
 MAINDIR=src
 SDLDIR=src/sdl
-DMGDIR=src/gb
-GBAPUDIR=src/gb/gb_apu
+DMGDIR=src/dmg
+GBAPUDIR=src/dmg/gb_apu
 FEXDIR=../dependencies/File_Extractor-0.4.3
 HQCDIR=src/hq/c
 HQASMDIR=src/hq/asm

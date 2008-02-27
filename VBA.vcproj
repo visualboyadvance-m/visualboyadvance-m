@@ -726,66 +726,66 @@
 				Name="GB"
 				>
 				<File
-					RelativePath=".\src\gb\gb.cpp"
+					RelativePath=".\src\dmg\gb.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbCheats.cpp"
+					RelativePath=".\src\dmg\gbCheats.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbDis.cpp"
+					RelativePath=".\src\dmg\gbDis.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbGfx.cpp"
+					RelativePath=".\src\dmg\gbGfx.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbGlobals.cpp"
+					RelativePath=".\src\dmg\gbGlobals.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbMemory.cpp"
+					RelativePath=".\src\dmg\gbMemory.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbPrinter.cpp"
+					RelativePath=".\src\dmg\gbPrinter.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbSGB.cpp"
+					RelativePath=".\src\dmg\gbSGB.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbSound.cpp"
+					RelativePath=".\src\dmg\gbSound.cpp"
 					>
 				</File>
 				<Filter
 					Name="GB APU"
 					>
 					<File
-						RelativePath=".\src\gb\gb_apu\Blip_Buffer.cpp"
+						RelativePath=".\src\dmg\gb_apu\Blip_Buffer.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\src\gb\gb_apu\Effects_Buffer.cpp"
+						RelativePath=".\src\dmg\gb_apu\Effects_Buffer.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\src\gb\gb_apu\Gb_Apu.cpp"
+						RelativePath=".\src\dmg\gb_apu\Gb_Apu.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\src\gb\gb_apu\Gb_Apu_State.cpp"
+						RelativePath=".\src\dmg\gb_apu\Gb_Apu_State.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\src\gb\gb_apu\Gb_Oscs.cpp"
+						RelativePath=".\src\dmg\gb_apu\Gb_Oscs.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\src\gb\gb_apu\Multi_Buffer.cpp"
+						RelativePath=".\src\dmg\gb_apu\Multi_Buffer.cpp"
 						>
 					</File>
 				</Filter>
@@ -1156,74 +1156,74 @@
 				Name="GB"
 				>
 				<File
-					RelativePath=".\src\gb\gb.h"
+					RelativePath=".\src\dmg\gb.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbCheats.h"
+					RelativePath=".\src\dmg\gbCheats.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbCodes.h"
+					RelativePath=".\src\dmg\gbCodes.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbCodesCB.h"
+					RelativePath=".\src\dmg\gbCodesCB.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbGlobals.h"
+					RelativePath=".\src\dmg\gbGlobals.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbMemory.h"
+					RelativePath=".\src\dmg\gbMemory.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbPrinter.h"
+					RelativePath=".\src\dmg\gbPrinter.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbSGB.h"
+					RelativePath=".\src\dmg\gbSGB.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\gb\gbSound.h"
+					RelativePath=".\src\dmg\gbSound.h"
 					>
 				</File>
 				<Filter
 					Name="GB APU"
 					>
 					<File
-						RelativePath=".\src\gb\gb_apu\blargg_common.h"
+						RelativePath=".\src\dmg\gb_apu\blargg_common.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\gb\gb_apu\blargg_config.h"
+						RelativePath=".\src\dmg\gb_apu\blargg_config.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\gb\gb_apu\blargg_source.h"
+						RelativePath=".\src\dmg\gb_apu\blargg_source.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\gb\gb_apu\Blip_Buffer.h"
+						RelativePath=".\src\dmg\gb_apu\Blip_Buffer.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\gb\gb_apu\Effects_Buffer.h"
+						RelativePath=".\src\dmg\gb_apu\Effects_Buffer.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\gb\gb_apu\Gb_Apu.h"
+						RelativePath=".\src\dmg\gb_apu\Gb_Apu.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\gb\gb_apu\Gb_Oscs.h"
+						RelativePath=".\src\dmg\gb_apu\Gb_Oscs.h"
 						>
 					</File>
 					<File
-						RelativePath=".\src\gb\gb_apu\Multi_Buffer.h"
+						RelativePath=".\src\dmg\gb_apu\Multi_Buffer.h"
 						>
 					</File>
 				</Filter>
