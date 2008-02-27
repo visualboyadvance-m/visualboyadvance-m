@@ -34,7 +34,7 @@
 #include "../GBA.h"
 #include "../Globals.h"
 #include "../Util.h"
-#include "../gb/gbGlobals.h"
+#include "../dmg/gbGlobals.h"
 #include "..\memgzio.h"
 
 //Math
@@ -97,8 +97,9 @@ public:
 	virtual void DisableOpenGL();
 	virtual bool initialize();
 	virtual void cleanup();
-	virtual void render();
 	virtual void clear();
+	virtual void render();
+
 	virtual bool changeRenderSize( int w, int h );
 	virtual void resize( int w, int h );
 	virtual void setOption( const char *, int );
@@ -217,6 +218,124 @@ void OpenGLDisplay::cleanup()
 //init renderer
 bool OpenGLDisplay::initialize()
 {
+	switch( theApp.cartridgeType )
+	{
+	case IMAGE_GBA:
+		theApp.sizeX = 240;
+		theApp.sizeY = 160;
+		break;
+	case IMAGE_GB:
+		if ( gbBorderOn )
+		{
+			theApp.sizeX = 256;
+			theApp.sizeY = 224;
+		}
+		else
+		{
+			theApp.sizeX = 160;
+			theApp.sizeY = 144;
+		}
+		break;
+	}
+
+
+	switch(theApp.videoOption)
+	{
+	case VIDEO_1X:
+		theApp.surfaceSizeX = theApp.sizeX;
+		theApp.surfaceSizeY = theApp.sizeY;
+		break;
+	case VIDEO_2X:
+		theApp.surfaceSizeX = theApp.sizeX * 2;
+		theApp.surfaceSizeY = theApp.sizeY * 2;
+		break;
+	case VIDEO_3X:
+		theApp.surfaceSizeX = theApp.sizeX * 3;
+		theApp.surfaceSizeY = theApp.sizeY * 3;
+		break;
+	case VIDEO_4X:
+		theApp.surfaceSizeX = theApp.sizeX * 4;
+		theApp.surfaceSizeY = theApp.sizeY * 4;
+		break;
+	case VIDEO_320x240:
+	case VIDEO_640x480:
+	case VIDEO_800x600:
+	case VIDEO_1024x768:
+	case VIDEO_1280x960:
+	case VIDEO_OTHER:
+		{
+			if( theApp.fullScreenStretch ) {
+				theApp.surfaceSizeX = theApp.fsWidth;
+				theApp.surfaceSizeY = theApp.fsHeight;
+			} else {
+				float scaleX = (float)theApp.fsWidth / (float)theApp.sizeX;
+				float scaleY = (float)theApp.fsHeight / (float)theApp.sizeY;
+				float min = ( scaleX < scaleY ) ? scaleX : scaleY;
+				if( theApp.fsMaxScale )
+					min = ( min > (float)theApp.fsMaxScale ) ? (float)theApp.fsMaxScale : min;
+				theApp.surfaceSizeX = (int)((float)theApp.sizeX * min);
+				theApp.surfaceSizeY = (int)((float)theApp.sizeY * min);
+			}
+		}
+		break;
+	}
+
+	theApp.rect.left = 0;
+	theApp.rect.top = 0;
+	theApp.rect.right = theApp.sizeX;
+	theApp.rect.bottom = theApp.sizeY;
+
+	theApp.dest.left = 0;
+	theApp.dest.top = 0;
+	theApp.dest.right = theApp.surfaceSizeX;
+	theApp.dest.bottom = theApp.surfaceSizeY;
+
+	DWORD style = WS_POPUP | WS_VISIBLE;
+	DWORD styleEx = 0;
+
+	if( theApp.videoOption <= VIDEO_4X )
+		style |= WS_OVERLAPPEDWINDOW;
+	else
+		styleEx = 0;
+
+	if( theApp.videoOption <= VIDEO_4X )
+		AdjustWindowRectEx( &theApp.dest, style, TRUE, styleEx );
+	else
+		AdjustWindowRectEx( &theApp.dest, style, FALSE, styleEx );    
+
+	int winSizeX = theApp.dest.right - theApp.dest.left;
+	int winSizeY = theApp.dest.bottom - theApp.dest.top;
+	int x = 0, y = 0;
+
+	if( theApp.videoOption <= VIDEO_4X ) {
+		x = theApp.windowPositionX;
+		y = theApp.windowPositionY;
+	} else {
+		winSizeX = theApp.fsWidth;
+		winSizeY = theApp.fsHeight;
+	}
+
+	// Create a window
+	MainWnd *pWnd = new MainWnd;
+	theApp.m_pMainWnd = pWnd;
+
+	pWnd->CreateEx(
+		styleEx,
+		theApp.wndClass,
+		"VisualBoyAdvance",
+		style,
+		x,y,winSizeX,winSizeY,
+		NULL,
+		0 );
+	
+	if (!(HWND)*pWnd) {
+		winlog("Error creating Window %08x\n", GetLastError());
+		return FALSE;
+	}
+	
+	theApp.updateMenuBar();
+	
+	theApp.adjustDestRect();
 	theApp.mode320Available = FALSE;
 	theApp.mode640Available = FALSE;
 	theApp.mode800Available = FALSE;
