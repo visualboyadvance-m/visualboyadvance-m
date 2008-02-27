@@ -23,7 +23,7 @@
 
 #include "System.h"
 #include "Port.h"
-#include "GBA.h"
+#include "agb/GBA.h"
 #include "armdis.h"
 #include "elf.h"
 

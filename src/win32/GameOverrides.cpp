@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "vba.h"
 #include "GameOverrides.h"
-#include "../GBA.h"
+#include "../agb/GBA.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

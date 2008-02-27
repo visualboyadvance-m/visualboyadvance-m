@@ -29,13 +29,13 @@
 #include "WinResUtil.h"
 #include "Logging.h"
 
-#include "../GBA.h"
+#include "../agb/GBA.h"
 #include "../Globals.h"
 #include "../NLS.h"
 #include "../Sound.h"
-#include "../gb/GB.h"
-#include "../gb/gbCheats.h"
-#include "../gb/gbGlobals.h"
+#include "../dmg/GB.h"
+#include "../dmg/gbCheats.h"
+#include "../dmg/gbGlobals.h"
 
 extern int emulating;
 

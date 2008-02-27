@@ -25,7 +25,7 @@
 
 #include "../System.h"
 #include "../armdis.h"
-#include "../GBA.h"
+#include "../agb/GBA.h"
 #include "../Globals.h"
 
 #ifdef _DEBUG

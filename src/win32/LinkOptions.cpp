@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "vba.h"
 #include "LinkOptions.h"
-#include "../Link.h"
+#include "../agb/GBALink.h"
 
 extern int lspeed;
 extern lserver ls;

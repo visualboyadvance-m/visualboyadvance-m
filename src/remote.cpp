@@ -42,7 +42,7 @@
 # define write _write
 #endif // _WIN32
 
-#include "GBA.h"
+#include "agb/GBA.h"
 
 extern bool debugger;
 extern void CPUUpdateCPSR();

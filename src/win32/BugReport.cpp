@@ -23,15 +23,15 @@
 #include "vba.h"
 #include "BugReport.h"
 
-#include "../agbprint.h"
+#include "../agb/agbprint.h"
 #include "../AutoBuild.h"
-#include "../GBA.h"
+#include "../agb/GBA.h"
 #include "../Globals.h"
 #include "../Port.h"
 #include "../RTC.h"
 #include "../Sound.h"
-#include "../gb/gbCheats.h"
-#include "../gb/gbGlobals.h"
+#include "../dmg/gbCheats.h"
+#include "../dmg/gbGlobals.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

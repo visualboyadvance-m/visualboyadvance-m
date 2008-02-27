@@ -34,17 +34,17 @@
 #include "../System.h"
 #include "../AutoBuild.h"
 #include "../cheatSearch.h"
-#include "../GBA.h"
+#include "../agb/GBA.h"
 #include "../Globals.h"
 #include "../Flash.h"
 #include "../Globals.h"
-#include "../gb/GB.h"
-#include "../gb/gbCheats.h"
-#include "../gb/gbGlobals.h"
+#include "../dmg/GB.h"
+#include "../dmg/gbCheats.h"
+#include "../dmg/gbGlobals.h"
 #include "../RTC.h"
 #include "../Sound.h"
 #include "../Util.h"
-#include "../Link.h"
+#include "../agb/GBALink.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

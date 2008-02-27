@@ -31,7 +31,7 @@
 
 // Internals
 #include "../System.h"
-#include "../GBA.h"
+#include "../agb/GBA.h"
 #include "../Globals.h"
 #include "../Util.h"
 #include "../dmg/gbGlobals.h"

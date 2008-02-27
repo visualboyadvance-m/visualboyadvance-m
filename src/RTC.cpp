@@ -17,7 +17,7 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "System.h"
-#include "GBA.h"
+#include "agb/GBA.h"
 #include "Globals.h"
 #include "Port.h"
 #include "Util.h"
