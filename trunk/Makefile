@@ -73,7 +73,7 @@ ${GBAPUDIR}/Gb_Apu_State${OE} ${GBAPUDIR}/Gb_Oscs${OE} ${GBAPUDIR}/Multi_Buffer$
 
 CALTERNOBJ=${HQCDIR}/hq_implementation${OE}
 
-MAINOBJ=${MAINDIR}/2xSaI${OE} ${MAINDIR}/admame${OE} ${MAINDIR}/agbprint${OE} ${MAINDIR}/armdis${OE} \
+MAINOBJ=${MAINDIR}/2xSaI${OE} ${MAINDIR}/admame${OE} ${MAINDIR}/agb/agbprint${OE} ${MAINDIR}/armdis${OE} \
 ${MAINDIR}/bilinear${OE} ${MAINDIR}/bios${OE} ${MAINDIR}/Cheats${OE} ${MAINDIR}/CheatSearch${OE} \
 ${MAINDIR}/EEprom${OE} ${MAINDIR}/elf${OE} ${MAINDIR}/Flash${OE} ${MAINDIR}/agb/GBA${OE} \
 ${MAINDIR}/agb/gbafilter${OE} ${MAINDIR}/agb/GBAGFX${OE} ${MAINDIR}/Globals${OE} ${MAINDIR}/interframe${OE} \
