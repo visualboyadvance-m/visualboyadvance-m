@@ -202,57 +202,57 @@
         <translation type="obsolete">Über &amp;Qt...</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="307"/>
+        <location filename="../src/qt/MainWnd.cpp" line="314"/>
         <source>This program is licensed under terms of the GNU General Public License.</source>
         <translation>Dieses Programm ist unter den Bedingungen der GNU General Public License lizenziert.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="346"/>
+        <location filename="../src/qt/MainWnd.cpp" line="353"/>
         <source>OpenGL version 2.1 is present.</source>
         <translation>OpenGL Version 2.1 ist verfügbar.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="349"/>
+        <location filename="../src/qt/MainWnd.cpp" line="356"/>
         <source>OpenGL version 2.0 is present.</source>
         <translation>OpenGL Version 2.0 ist verfügbar.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="352"/>
+        <location filename="../src/qt/MainWnd.cpp" line="359"/>
         <source>OpenGL version 1.5 is present.</source>
         <translation>OpenGL Version 1.5 ist verfügbar.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="355"/>
+        <location filename="../src/qt/MainWnd.cpp" line="362"/>
         <source>OpenGL version 1.4 is present.</source>
         <translation>OpenGL Version 1.4 ist verfügbar.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="358"/>
+        <location filename="../src/qt/MainWnd.cpp" line="365"/>
         <source>OpenGL version 1.3 is present.</source>
         <translation>OpenGL Version 1.3 ist verfügbar.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="361"/>
+        <location filename="../src/qt/MainWnd.cpp" line="368"/>
         <source>OpenGL version 1.2 is present.</source>
         <translation>OpenGL Version 1.2 ist verfügbar.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="364"/>
+        <location filename="../src/qt/MainWnd.cpp" line="371"/>
         <source>OpenGL version 1.1 is present.</source>
         <translation>OpenGL Version 1.1 ist verfügbar.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="370"/>
+        <location filename="../src/qt/MainWnd.cpp" line="377"/>
         <source>OpenGL is NOT available!</source>
         <translation>OpenGL ist NICHT verfügbar!</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="309"/>
+        <location filename="../src/qt/MainWnd.cpp" line="316"/>
         <source>About VBA-M</source>
         <translation>Über VBA-M</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="373"/>
+        <location filename="../src/qt/MainWnd.cpp" line="380"/>
         <source>About OpenGL</source>
         <translation>Über OpenGL</translation>
     </message>
@@ -272,42 +272,42 @@
         <translation type="obsolete">Übersetzungsdateien (*.qm)</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="249"/>
+        <location filename="../src/qt/MainWnd.cpp" line="256"/>
         <source>.qm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="151"/>
+        <location filename="../src/qt/MainWnd.cpp" line="158"/>
         <source>Exit</source>
         <translation>Beenden</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="157"/>
+        <location filename="../src/qt/MainWnd.cpp" line="164"/>
         <source>Select language...</source>
         <translation>Sprache auswählen...</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="228"/>
+        <location filename="../src/qt/MainWnd.cpp" line="235"/>
         <source>Select language</source>
         <translation>Sprache auswählen</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="230"/>
+        <location filename="../src/qt/MainWnd.cpp" line="237"/>
         <source>Language files (*.qm)</source>
         <translation>Sprachdateien (*.qm)</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="325"/>
+        <location filename="../src/qt/MainWnd.cpp" line="332"/>
         <source>Error!</source>
         <translation>Fehler!</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="240"/>
+        <location filename="../src/qt/MainWnd.cpp" line="247"/>
         <source>Language file can not be loaded!</source>
         <translation>Sprachdatei kann nicht geladen werden!</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="117"/>
+        <location filename="../src/qt/MainWnd.cpp" line="124"/>
         <source>Enable translation</source>
         <translation>Übersetzung aktivieren</translation>
     </message>
@@ -319,57 +319,57 @@ No language file loaded.</source>
 Deutsche Übersetzung von spacy.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="185"/>
+        <location filename="../src/qt/MainWnd.cpp" line="192"/>
         <source>Cheats</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="164"/>
+        <location filename="../src/qt/MainWnd.cpp" line="171"/>
         <source>Show cheats sidebar</source>
         <translation>Cheats-Seitenleiste anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="149"/>
+        <location filename="../src/qt/MainWnd.cpp" line="156"/>
         <source>File</source>
         <translation>Datei</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="150"/>
+        <location filename="../src/qt/MainWnd.cpp" line="157"/>
         <source>Open ROM</source>
         <translation>ROM laden</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="155"/>
+        <location filename="../src/qt/MainWnd.cpp" line="162"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="156"/>
+        <location filename="../src/qt/MainWnd.cpp" line="163"/>
         <source>Main options...</source>
         <translation>Optionen...</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="162"/>
+        <location filename="../src/qt/MainWnd.cpp" line="169"/>
         <source>Tools</source>
         <translation>Werkzeuge</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="169"/>
+        <location filename="../src/qt/MainWnd.cpp" line="176"/>
         <source>Help</source>
         <translation>Hilfe</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="171"/>
+        <location filename="../src/qt/MainWnd.cpp" line="178"/>
         <source>About VBA-M...</source>
         <translation>Über VBA-M...</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="172"/>
+        <location filename="../src/qt/MainWnd.cpp" line="179"/>
         <source>About OpenGL...</source>
         <translation>Über OpenGL...</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="173"/>
+        <location filename="../src/qt/MainWnd.cpp" line="180"/>
         <source>About Qt...</source>
         <translation>Über Qt...</translation>
     </message>
@@ -379,34 +379,39 @@ Deutsche Übersetzung von spacy.</translation>
         <translation type="obsolete">Funktionalität noch nicht vorhanden.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="300"/>
+        <location filename="../src/qt/MainWnd.cpp" line="307"/>
         <source>Version</source>
         <translation>Version</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="302"/>
+        <location filename="../src/qt/MainWnd.cpp" line="309"/>
         <source>Compile date:</source>
         <translation>Bau-Datum:</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="305"/>
+        <location filename="../src/qt/MainWnd.cpp" line="312"/>
         <source>No language file loaded.</source>
         <translation>Deutsche Übersetzung von spacy.</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="317"/>
+        <location filename="../src/qt/MainWnd.cpp" line="324"/>
         <source>Select ROM</source>
         <translation>Bitte ROM auswählen</translation>
     </message>
     <message>
         <location filename="../src/qt/MainWnd.cpp" line="319"/>
         <source>Game Boy Advance ROMs (*.gba);;All Files (*.*)</source>
-        <translation>Game Boy Advance ROMs (*.gba);;Alle Dateien (*.*)</translation>
+        <translation type="obsolete">Game Boy Advance ROMs (*.gba);;Alle Dateien (*.*)</translation>
     </message>
     <message>
-        <location filename="../src/qt/MainWnd.cpp" line="325"/>
+        <location filename="../src/qt/MainWnd.cpp" line="332"/>
         <source>Can not load ROM!</source>
         <translation>ROM kann nicht geladen werden!</translation>
+    </message>
+    <message>
+        <location filename="../src/qt/MainWnd.cpp" line="326"/>
+        <source>All ROMs (*.dmg *.sgb *.cgb *.agb *.gb *.gbc *.gba *.bin *.zip *.gz *.rar *.7z *.jma);;Game Boy ROMs (*.dmg *.gb);;Super Game Boy ROMs (*.sgb);;Game Boy Color ROMs (*.cgb *.gbc);;Game Boy Advance ROMs (*.agb *.gba);;Compressed ROMs (*.zip *.gz *.rar *.7z *.jma);;All Files (*.* *)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
