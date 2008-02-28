@@ -323,7 +323,7 @@ void MainWnd::showOpenROM()
 		this,
 		tr( "Select ROM" ),
 		"",
-		tr( "Game Boy Advance ROMs (*.gba);;All Files (*.*)" ) );
+		tr( "All ROMs (*.dmg *.sgb *.cgb *.agb *.gb *.gbc *.gba *.bin *.zip *.gz *.rar *.7z *.jma);;Game Boy ROMs (*.dmg *.gb);;Super Game Boy ROMs (*.sgb);;Game Boy Color ROMs (*.cgb *.gbc);;Game Boy Advance ROMs (*.agb *.gba);;Compressed ROMs (*.zip *.gz *.rar *.7z *.jma);;All Files (*.* *)" ) );
 
 	if( file.isNull() ) return;
 
