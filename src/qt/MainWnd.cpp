@@ -29,9 +29,9 @@ MainWnd::MainWnd( QTranslator **trans, QSettings *settings, QWidget *parent )
 	settings( settings ),
 	fileMenu( 0 ),
 	settingsMenu( 0 ),
+	enableTranslationAct( 0 ),
 	toolsMenu( 0 ),
 	helpMenu( 0 ),
-	enableTranslationAct( 0 ),
 	dockWidget_cheats( 0 ),
 	emuManager( 0 ),
 	graphicsOutput( 0 )
