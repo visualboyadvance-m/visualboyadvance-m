@@ -55,7 +55,7 @@ void GraphicsOutput::render()
 }
 
 
-void GraphicsOutput::paintEvent( QPaintEvent *event )
+void GraphicsOutput::paintEvent( QPaintEvent * )
 {
 	if( m_api == NONE ) return;
 
