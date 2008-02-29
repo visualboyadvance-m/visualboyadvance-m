@@ -17,10 +17,62 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <memory.h>
-
+#include "../Brunni/common.h"
 #include "../agb/GBA.h"
 #include "gbGlobals.h"
 #include "gbSGB.h"
+
+/** BRUNNI ADDED CODE **/
+int gblModeColorIt=0;
+byte tilePalList[384];
+short tilePalPalette[NB_PALETTES][4];
+byte tilePalCrc[384 / 8];
+short tileMapTileList[384];
+int gb_lastVramCrc;
+u8 *gbExternalVram;
+
+void tilePalReinit()		{
+	int i;
+	memset(tilePalList, 0, sizeof(tilePalList));
+	for (i=0;i<numberof(tileMapTileList);i++)
+		tileMapTileList[i] = i;
+}
+
+void tilePalInit()		{
+	memset(tilePalCrc, 0, sizeof(tilePalCrc));
+	gb_lastVramCrc = 0;
+}
+
+int tileMapGetVramChecksum()		{
+	int i;
+	u32 crc = 0;
+	u8 *vram = &gbMemory[0x8000];
+
+	for (i=0;i<384;i++)		{
+		if (tilePalCrc[i >> 3] & (1 << (i & 7)))
+			crc = crc32(crc, vram + i * 16, 16);
+	}
+	return crc;
+}
+
+void exiting_lcdc()		{
+	//Do nothing in GBC mode (VBA uses another VRAM address)
+	if (!gblModeColorIt || gbCgbMode)
+		return;
+
+	u32 crc = tileMapGetVramChecksum();
+	if (crc != gb_lastVramCrc /*|| gblConfigAutoShowCrc*/)		{
+		OuvreFichierPalette(crc, NULL);
+		if (gblConfigAutoShowCrc)		{
+			char temp[256];
+			sprintf(temp, "New VRAM CRC: %08x", crc);
+			systemScreenMessage(temp);
+		}
+		gb_lastVramCrc = crc;
+	}
+}
+
+/** END BRUNNI **/
 
 u8 gbInvertTab[256] = {
   0x00,0x80,0x40,0xc0,0x20,0xa0,0x60,0xe0,
@@ -66,14 +118,19 @@ void gbRenderLine()
   memset(gbLineMix, 0, sizeof(gbLineMix));
   u8 * bank0;
   u8 * bank1;
+  //Brunni/
+  u8 * externalVram = NULL;
   if(gbCgbMode) {
     bank0 = &gbVram[0x0000];
     bank1 = &gbVram[0x2000];
   } else {
     bank0 = &gbMemory[0x8000];
     bank1 = NULL;
+	//Brunni/ Additional memory for custom tiles - we should have done just like the GBC, two banks
+	if (gblModeColorIt)
+		externalVram = getGbExtVramAddr();
   }
-
+  
   int tile_map = 0x1800;
   if((register_LCDC & 8) != 0)
     tile_map = 0x1c00;
@@ -128,6 +185,25 @@ void gbRenderLine()
 
         u8 tile_a = 0;
         u8 tile_b = 0;
+		u8 colorItPaletteNb = 0, colorItUseExtVram = 0;
+
+		//Brunni/ Pattern change (custom tile)
+		if (gblModeColorIt)		{
+			//Brunni/ Get the tile number (+128 if LCDC bit4 is zero)
+			s16 tilenb = (tile_pattern >> 4) + tile;
+			colorItPaletteNb = tilePalList[tilenb];
+			
+			//Brunni/ Select the associated custom tile
+			tilenb = tileMapTileList[tilenb];
+
+			//Brunni/ Does it use additional GB vram? ("bank 1")
+			if (tilenb >= 512)
+				colorItUseExtVram = 1, tilenb -= 512;
+
+			//Brunni/ Nothing to do => return to the normal range (within current bank)
+			tilenb -= (tile_pattern >> 4);
+			tile_pattern_address = tile_pattern + tilenb * 16 + by * 2;
+		}
 
         if(attrs & 0x40) {
           tile_pattern_address = tile_pattern + tile * 16 + (7-by)*2;
@@ -136,6 +212,11 @@ void gbRenderLine()
         if(attrs & 0x08) {
           tile_a = bank1[tile_pattern_address++];
           tile_b = bank1[tile_pattern_address];
+		}
+		else if (colorItUseExtVram)	{
+          //Brunni/ "bank 1" (additional GB vram)
+          tile_a = externalVram[tile_pattern_address++];
+          tile_b = externalVram[tile_pattern_address];
         } else {
           tile_a = bank0[tile_pattern_address++];
           tile_b = bank0[tile_pattern_address];
@@ -170,6 +251,10 @@ void gbRenderLine()
 
               c = c + 4*palette;
             }
+
+			//Brunni/ Find the right palette
+			if (gblModeColorIt)
+				c += 4 * colorItPaletteNb;
           }
           gbLineMix[x] = gbColorOption ? gbColorFilter[gbPalette[c] & 0x7FFF] :
             gbPalette[c] & 0x7FFF;
@@ -323,6 +408,25 @@ void gbRenderLine()
           while(x < 160) {
             u8 tile_a = 0;
             u8 tile_b = 0;
+			u8 colorItPaletteNb = 0, colorItUseExtVram = 0;
+
+			//Brunni/ Define the actual palette and custom pattern for this tile
+			if (gblModeColorIt)		{
+				//Brunni/ Get the tile number (+128 if LCDC bit4 is zero)
+				s16 tilenb = (tile_pattern >> 4) + tile;
+				colorItPaletteNb = tilePalList[tilenb];
+				
+				//Brunni/ Select the associated custom tile
+				tilenb = tileMapTileList[tilenb];
+
+				//Brunni/ Does it use additional GB vram? ("bank 1")
+				if (tilenb >= 512)
+					colorItUseExtVram = 1, tilenb -= 512;
+
+				//Brunni/ Nothing to do => return to the normal range (within current bank)
+				tilenb -= (tile_pattern >> 4);
+				tile_pattern_address = tile_pattern + tilenb * 16 + by * 2;
+			}
 
             if(attrs & 0x40) {
               tile_pattern_address = tile_pattern + tile * 16 + (7-by)*2;
@@ -331,6 +435,11 @@ void gbRenderLine()
             if(attrs & 0x08) {
               tile_a = bank1[tile_pattern_address++];
               tile_b = bank1[tile_pattern_address];
+			}
+			else if (colorItUseExtVram)	{
+			  //Brunni/ "bank 1" (additional GB vram)
+			  tile_a = externalVram[tile_pattern_address++];
+			  tile_b = externalVram[tile_pattern_address];
             } else {
               tile_a = bank0[tile_pattern_address++];
               tile_b = bank0[tile_pattern_address];
@@ -367,6 +476,9 @@ void gbRenderLine()
 
                   c = c + 4*palette;
                 }
+				//Brunni/ Find the right palette
+				if (gblModeColorIt)
+					c += 4 * colorItPaletteNb;
               }
               gbLineMix[x] = gbColorOption ? gbColorFilter[gbPalette[c] & 0x7FFF] :
                 gbPalette[c] & 0x7FFF;
@@ -424,6 +536,8 @@ void gbDrawSpriteTile(int tile, int x,int y,int t, int flags,
 {
   u8 * bank0;
   u8 * bank1;
+  //Brunni/
+  u8 * externalVram = NULL;
   if(gbCgbMode) {
     if(register_VBK & 1) {
       bank0 = &gbVram[0x0000];
@@ -435,6 +549,8 @@ void gbDrawSpriteTile(int tile, int x,int y,int t, int flags,
   } else {
     bank0 = &gbMemory[0x8000];
     bank1 = NULL;
+	if (gblModeColorIt)
+		externalVram = getGbExtVramAddr();
   }
 
   int init = 0x0000;
@@ -461,10 +577,27 @@ void gbDrawSpriteTile(int tile, int x,int y,int t, int flags,
   int address = init + tile * 16 + 2*t;
   int a = 0;
   int b = 0;
+  u8 colorItPaletteNb = 0, colorItUseExtVram = 0;
+
+  //Brunni/ Define the actual palette and custom pattern for this tile
+  if (gblModeColorIt)		{
+    //Brunni/ Get the tile number (+128 if LCDC bit4 is zero)
+    colorItPaletteNb = tilePalList[tile];
+	//Brunni/ Associated custom tile
+	tile = tileMapTileList[tile];
+	//Brunni/ Same way as BGs => additional GB vram
+	if (tile >= 512)
+		colorItUseExtVram = 1, tile -= 512;
+	address = init + tile * 16 + 2*t;
+  }
 
   if(gbCgbMode && (flags & 0x08)) {
     a = bank1[address++];
     b = bank1[address++];
+  } else if (colorItUseExtVram)	{
+    //Brunni/ "bank 1" (additional GB vram)
+    a = externalVram[address++];
+    b = externalVram[address++];
   } else {
     a = bank0[address++];
     b = bank0[address++];
@@ -538,6 +671,11 @@ void gbDrawSpriteTile(int tile, int x,int y,int t, int flags,
 
         c = c + 4*palette;
       } else {
+		//Brunni/ Set the color palette
+        if (gblModeColorIt)
+		  c += 4 * colorItPaletteNb;
+		else
+		  //Brunni/ Normal GB behaviour (first 4 colors for the BG, etc.)
         c += 4;
       }
     }
@@ -589,6 +727,9 @@ void gbDrawSprites(bool draw)
                   gbSpritesTicks[j] += 2+(count&1);
 
           }
+          count++;
+        } else if(!size && t >= 0 && t < 8) {
+          gbDrawSpriteTile(tile, x-8, yc, t, flags,size,i);
           count++;
         }
       }

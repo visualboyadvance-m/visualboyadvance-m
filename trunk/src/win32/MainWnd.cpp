@@ -30,7 +30,7 @@
 #include "Reg.h"
 #include "WinResUtil.h"
 #include "Logging.h"
-
+#include "../Brunni/common.h"
 #include "../System.h"
 #include "../AutoBuild.h"
 #include "../cheatSearch.h"
@@ -54,6 +54,8 @@ static char THIS_FILE[] = __FILE__;
 
 extern void remoteCleanUp();
 extern int gbHardware;
+//Brunni/ Routine that checks when the configuration file has been modified
+void startCheckRoutine(char *fullFileName);
 
 /////////////////////////////////////////////////////////////////////////////
 // MainWnd
@@ -535,6 +537,21 @@ bool MainWnd::FileRun()
         theApp.romSize = size;
       }
     }
+
+	//Brunni/ Try to load the palette configuration file
+	VirtualFileInit();
+	if (theApp.gbColorization)		{
+		gblModeColorIt = CheckFichierPalette(theApp.szFile.GetBuffer());
+		if (gblModeColorIt)		{
+			char name[2048];
+			OuvreFichierPalette(0, "init");
+			_fullpath(name, gblColorItPaletteFileName, 1024);
+			//Brunni/ To be informed when the file changes
+			startCheckRoutine(name);
+		}
+	}
+	else
+		gblModeColorIt = 0;
   } else {
     int size = CPULoadRom(theApp.szFile);
     if(!size)
@@ -1238,7 +1255,8 @@ void MainWnd::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
     }
   } else {
     theApp.wasPaused = true;
-    if(theApp.pauseWhenInactive) {
+	//Brunni/ Always disable this in ColorIt debug mode
+	if(theApp.pauseWhenInactive && !gblConfigAutoShowCrc) {
       if(emulating) {
         soundPause();
       }

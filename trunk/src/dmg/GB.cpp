@@ -4011,6 +4011,12 @@ void gbCleanUp()
 
   gbSgbShutdown();
 
+  //Brunni/
+  if (gbExternalVram != NULL)		{
+    free(gbExternalVram);
+    gbExternalVram = NULL;
+  }
+
   if(gbVram != NULL) {
     free(gbVram);
     gbVram = NULL;

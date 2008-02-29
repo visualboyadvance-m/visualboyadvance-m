@@ -177,6 +177,7 @@ void AccelEditor::OnAssign()
   CAccelsOb* pAccel;
   WORD wIDCommand;
   POSITION pos;
+  int index;
 
   WORD wKey;
   bool bCtrl, bAlt, bShift;
@@ -199,10 +200,10 @@ void AccelEditor::OnAssign()
         m_alreadyAffected.SetWindowText(pCmdAccel->m_szCommand);
         m_key.SetSel(0, -1);
         return; // abort
-      }
-    }
-  }
-
+       }
+     }
+   }
+ 
   // OK, we can add the accel key in the currently selected group
   index = m_commands.GetCurSel();
   if (index == LB_ERR)

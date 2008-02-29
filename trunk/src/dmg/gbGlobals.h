@@ -34,6 +34,8 @@ extern u8 *gbWram;
 extern u8 *gbMemory;
 extern u16 *gbLineBuffer;
 extern u8 *gbTAMA5ram;
+//Brunni/ Used for custom tiles
+extern u8 *gbExternalVram;
 
 extern u8 *gbMemoryMap[16];
 
@@ -85,5 +87,7 @@ extern int gbDmaTicks;
 
 extern void gbRenderLine();
 extern void gbDrawSprites(bool);
+//Brunni/ Needs to be called when the screen switches from "blank" to "normal"
+extern void exiting_lcdc();
 
 extern u8 (*gbSerialFunction)(u8);
