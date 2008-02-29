@@ -45,7 +45,7 @@
 #include "../Util.h"
 #include "../dmg/gbGlobals.h"
 #include "../dmg/gbPrinter.h"
-
+#include "../Brunni/common.h"
 /* Link
 ---------------------*/
 #include "../agb/GBALink.h"
@@ -2656,3 +2656,64 @@ void Sm60FPS_Sleep()
 		}
 	}
 }
+
+//Brunni/ Check when the configuration file is modified
+void FileCheckThread(void* fname)
+{
+	char *fileName;
+	char dirName[1024];
+
+	fileName = extractFilePath((char*)fname, dirName, 1);
+
+  HANDLE hDir = CreateFile((char*)dirName,	// File name
+    FILE_LIST_DIRECTORY,                // access (read/write) mode
+    FILE_SHARE_READ|FILE_SHARE_DELETE,  // share mode
+    NULL,                               // security descriptor
+    OPEN_EXISTING,                      // how to create
+    FILE_FLAG_BACKUP_SEMANTICS,         // file attributes
+    NULL                                // file with attributes to copy
+  );
+
+  FILE_NOTIFY_INFORMATION Buffer[1024];
+  DWORD BytesReturned;
+  while (ReadDirectoryChangesW(
+                                hDir,                                 // handle to directory
+                                &Buffer,                              // read results buffer
+                                sizeof(Buffer),                       // length of buffer
+                                FALSE,                                // monitoring option
+                                FILE_NOTIFY_CHANGE_SECURITY|
+                                FILE_NOTIFY_CHANGE_CREATION|
+                                FILE_NOTIFY_CHANGE_LAST_ACCESS|
+                                FILE_NOTIFY_CHANGE_LAST_WRITE|
+                                FILE_NOTIFY_CHANGE_SIZE|
+                                FILE_NOTIFY_CHANGE_ATTRIBUTES|
+                                FILE_NOTIFY_CHANGE_DIR_NAME|
+                                FILE_NOTIFY_CHANGE_FILE_NAME,         // filter conditions
+                                &BytesReturned,                       // bytes returned
+                                NULL,                                 // overlapped buffer
+                                NULL                                  // completion routine
+                                ))
+    {
+		int i=0;
+		do		{
+			CString str = CString(Buffer[i].FileName).Left(Buffer[i].FileNameLength / 2);
+			if (!str.Compare(fileName))			{
+				//C'est le bon fichier
+				if (Buffer[0].Action == FILE_ACTION_MODIFIED)		{
+					gb_lastVramCrc = 0;
+					exiting_lcdc();
+				}
+			}
+	/*      m_Sec.Lock();
+		  int item = pList1->InsertItem(pList1->GetItemCount(), CString(Buffer[i].FileName).Left(Buffer[i].FileNameLength / 2) + " - " + helper_txt );
+			  pList1->SetItemText(item, 1, tm.Format("%Y/%m/%d/ - %H:%M:%S"));*/
+	//      m_Sec.Unlock();
+		} while (!Buffer[++i].NextEntryOffset);
+	}
+}
+
+void startCheckRoutine(char *fullFileName)		{
+	//Begin checking for an update of the file
+	_beginthread(FileCheckThread, 0, fullFileName);
+}
+

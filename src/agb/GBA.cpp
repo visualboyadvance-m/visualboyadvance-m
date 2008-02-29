@@ -25,7 +25,7 @@
 #include "GBAcpu.h"
 #include "GBAinline.h"
 #include "../Globals.h"
-#include "GBAGFX.h"
+#include "GBAGfx.h"
 #include "../EEprom.h"
 #include "../Flash.h"
 #include "../Sound.h"

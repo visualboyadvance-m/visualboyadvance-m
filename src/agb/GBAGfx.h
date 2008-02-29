@@ -22,7 +22,7 @@
 #define VBA_GFX_H
 
 #include "GBA.h"
-#include "gbaGfx.h"
+#include "GBAGfx.h"
 #include "../Globals.h"
 
 #include "../Port.h"
