@@ -7,3 +7,8 @@ DJRobX
 Nach
 Jonas Quinn
 Spacy
+
+
+The Qt build uses Icons from the KDE project:
+http://kde.org/
+svn://anonsvn.kde.org/home/kde/trunk/KDE/kdebase/runtime/pics/oxygen
