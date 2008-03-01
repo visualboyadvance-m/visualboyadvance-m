@@ -3,37 +3,42 @@ CONFIG += qt release
 QT += opengl
 TARGET = VisualBoyAdvance
 
-RESOURCES += ../../src/qt/vba-m.qrc
+# Directory Locations
+M_DIR_QT = ../../src/qt/
+M_DIR_LANG = ../../lang/
+
+RESOURCES += $${M_DIR_QT}vba-m.qrc
 
 win32 {
-	RC_FILE = ../../src/qt/vba-m.rc
+	RC_FILE = $${M_DIR_QT}vba-m.rc
 }
 
-TRANSLATIONS += ../../lang/german.ts
-TRANSLATIONS += ../../lang/spanish.ts
+#  Language Files
+TRANSLATIONS += $${M_DIR_LANG}german.ts
+TRANSLATIONS += $${M_DIR_LANG}spanish.ts
 
-PRECOMPILED_HEADER = ../../src/qt/precompile.h
+PRECOMPILED_HEADER = $${M_DIR_QT}precompile.h
 
-HEADERS += ../../src/qt/version.h
+HEADERS += $${M_DIR_QT}version.h
 
-HEADERS += ../../src/qt/main.h
-SOURCES += ../../src/qt/main.cpp
+HEADERS += $${M_DIR_QT}main.h
+SOURCES += $${M_DIR_QT}main.cpp
 
-HEADERS += ../../src/qt/MainWnd.h
-SOURCES += ../../src/qt/MainWnd.cpp
+HEADERS += $${M_DIR_QT}MainWnd.h
+SOURCES += $${M_DIR_QT}MainWnd.cpp
 
-FORMS += ../../src/qt/sidewidget_cheats.ui
-HEADERS += ../../src/qt/sidewidget_cheats.h
-SOURCES += ../../src/qt/sidewidget_cheats.cpp
+FORMS += $${M_DIR_QT}sidewidget_cheats.ui
+HEADERS += $${M_DIR_QT}sidewidget_cheats.h
+SOURCES += $${M_DIR_QT}sidewidget_cheats.cpp
 
-HEADERS += ../../src/qt/MainOptions.h
-SOURCES += ../../src/qt/MainOptions.cpp
+HEADERS += $${M_DIR_QT}MainOptions.h
+SOURCES += $${M_DIR_QT}MainOptions.cpp
 
-HEADERS += ../../src/qt/configdialog.h
-SOURCES += ../../src/qt/configdialog.cpp
+HEADERS += $${M_DIR_QT}configdialog.h
+SOURCES += $${M_DIR_QT}configdialog.cpp
 
-HEADERS += ../../src/qt/EmuManager.h
-SOURCES += ../../src/qt/EmuManager.cpp
+HEADERS += $${M_DIR_QT}EmuManager.h
+SOURCES += $${M_DIR_QT}EmuManager.cpp
 
-HEADERS += ../../src/qt/GraphicsOutput.h
-SOURCES += ../../src/qt/GraphicsOutput.cpp
+HEADERS += $${M_DIR_QT}GraphicsOutput.h
+SOURCES += $${M_DIR_QT}GraphicsOutput.cpp
