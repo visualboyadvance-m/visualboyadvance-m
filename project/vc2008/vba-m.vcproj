@@ -175,18 +175,6 @@
 				>
 			</File>
 			<Filter
-				Name="OpenGL"
-				>
-				<File
-					RelativePath="..\..\src\qt\glwidget.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\qt\glwidget.h"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="EmuManager"
 				>
 				<File
