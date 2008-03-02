@@ -48,7 +48,6 @@ extern bool debugger;
 extern void CPUUpdateCPSR();
 #ifdef SDL
 extern void (*dbgMain)();
-extern void (*dbgSignal)(int,int);
 extern void debuggerMain();
 extern void debuggerSignal(int,int);
 #endif
