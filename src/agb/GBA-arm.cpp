@@ -68,7 +68,6 @@ static INSN_REGPARM void armUnknownInsn(u32 opcode)
 #ifdef BKPT_SUPPORT
 static INSN_REGPARM void armBreakpoint(u32 opcode)
 {
-    extern void (*dbgSignal)(int,int);
     reg[15].I -= 4;
     armNextPC -= 4;
     dbgSignal(5, (opcode & 0x0f) | ((opcode>>4) & 0xfff0));
@@ -119,7 +118,6 @@ static void count(u32 opcode, int cond_res)
 
 #ifdef BKPT_SUPPORT
 #define CONSOLE_OUTPUT(a,b) do { \
-    extern void (*dbgOutput)(char *, u32);                      \
     if ((opcode == 0xe0000000) && (reg[0].I == 0xC0DED00D)) {   \
         dbgOutput((a), (b));                                    \
 } while (0)

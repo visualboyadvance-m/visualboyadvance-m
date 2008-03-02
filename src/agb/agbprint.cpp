@@ -67,8 +67,6 @@ bool agbPrintIsEnabled()
   return agbPrintEnabled;
 }
 
-extern void (*dbgOutput)(const char *, u32);
-
 void agbPrintFlush()
 {
   u16 get = debuggerReadHalfWord(0x9fe20fc);

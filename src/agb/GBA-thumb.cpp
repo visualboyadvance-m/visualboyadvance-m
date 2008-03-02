@@ -62,7 +62,6 @@ static INSN_REGPARM void thumbUnknownInsn(u32 opcode)
 #ifdef BKPT_SUPPORT
 static INSN_REGPARM void thumbBreakpoint(u32 opcode)
 {
-  extern void (*dbgSignal)(int,int);
   reg[15].I -= 2;
   armNextPC -= 2;
   dbgSignal(5, opcode & 255);
@@ -75,7 +74,6 @@ static INSN_REGPARM void thumbBreakpoint(u32 opcode)
 #ifdef BKPT_SUPPORT
 # define THUMB_CONSOLE_OUTPUT(a,b) do {                     \
     if ((opcode == 0x4000) && (reg[0].I == 0xC0DED00D)) {   \
-      extern void (*dbgOutput)(const char *, u32);                \
       dbgOutput((a), (b));                                  \
     }                                                       \
 } while (0)

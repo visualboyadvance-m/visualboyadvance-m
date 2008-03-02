@@ -21,9 +21,11 @@
 #include <string.h>
 #include <zlib.h>
 
+#ifndef NO_PNG
 extern "C" {
 #include <png.h>
 }
+#endif
 
 #include "System.h"
 #include "NLS.h"
@@ -58,6 +60,7 @@ static int (ZEXPORT *utilGzCloseFunc)(gzFile) = NULL;
 
 bool utilWritePNGFile(const char *fileName, int w, int h, u8 *pix)
 {
+#ifndef NO_PNG
   u8 writeBuffer[512 * 3];
 
   FILE *fp = fopen(fileName,"wb");
@@ -182,6 +185,9 @@ bool utilWritePNGFile(const char *fileName, int w, int h, u8 *pix)
   fclose(fp);
 
   return true;
+#else
+  return false;
+#endif
 }
 
 void utilPutDword(u8 *p, u32 value)
