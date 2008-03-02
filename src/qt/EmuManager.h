@@ -19,7 +19,11 @@
 #ifndef EMUMANAGER_H
 #define EMUMANAGER_H
 
+
 #include "precompile.h"
+
+#include "emu.h"
+
 
 // class to abstract emulation control
 class EmuManager
@@ -37,5 +41,6 @@ private:
 	QString romPath;
 	unsigned char *romBuffer;
 };
+
 
 #endif // #ifndef EMUMANAGER_H

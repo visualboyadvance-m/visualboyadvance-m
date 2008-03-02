@@ -1685,7 +1685,6 @@ void CPUSoftwareInterrupt(int comment)
   if(armState) comment >>= 16;
 #ifdef BKPT_SUPPORT
   if(comment == 0xff) {
-    extern void (*dbgOutput)(const char *, u32);
     dbgOutput(NULL, reg[0].I);
     return;
   }

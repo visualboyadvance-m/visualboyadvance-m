@@ -111,6 +111,9 @@ extern void Sm60FPS_Sleep();
 extern void DbgMsg(const char *msg, ...);
 extern void winlog(const char *,...);
 
+extern void dbgOutput(const char *s, u32 addr);
+extern void dbgSignal(int sig,int number);
+
 extern bool systemSoundOn;
 extern u16 systemColorMap16[0x10000];
 extern u32 systemColorMap32[0x10000];
