@@ -22,7 +22,6 @@
 #define VBA_GFX_H
 
 #include "GBA.h"
-#include "gbaGfx.h"
 #include "../Globals.h"
 
 #include "../Port.h"
