@@ -22,6 +22,7 @@
 #include "GBA.h"
 #include "../Globals.h"
 #include "../Port.h"
+#include "../System.h"
 
 #define debuggerWriteHalfWord(addr, value) \
   WRITE16LE((u16*)&map[(addr)>>24].address[(addr) & map[(addr)>>24].mask], (value))
