@@ -35,14 +35,14 @@
 
 #include <SDL/SDL.h>
 
-#include "../GBA.h"
-#include "../agbprint.h"
+#include "../agb/GBA.h"
+#include "../agb/agbprint.h"
 #include "../Flash.h"
 #include "../RTC.h"
 #include "../Sound.h"
 #include "../Util.h"
-#include "../gb/gb.h"
-#include "../gb/gbGlobals.h"
+#include "../dmg/gb.h"
+#include "../dmg/gbGlobals.h"
 
 #include "debugger.h"
 #include "filters.h"
