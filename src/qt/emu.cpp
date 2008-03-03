@@ -34,6 +34,9 @@ int systemColorDepth = 32;
 int systemDebug = 0;
 int systemVerbose = 0;
 
+void (*dbgSignal)( int sig, int number ) = debuggerSignal;
+void (*dbgOutput)( const char *s, u32 addr ) = debuggerOutput;
+
 
 bool systemReadJoypads()
 {
@@ -117,13 +120,13 @@ bool systemPauseOnFrame()
 }
 
 
-void dbgOutput( const char *s, u32 addr )
+void debuggerOutput( const char *s, u32 addr )
 {
 	// TODO: implement
 }
 
 
-void dbgSignal( int sig,int number )
+void debuggerSignal( int sig,int number )
 {
 	// TODO: implement
 }
