@@ -47,9 +47,10 @@ int systemGetSensorY();
 u32 systemGetClock();
 
 void systemMessage( int number, const char *defaultMsg, ... );
-void dbgOutput( const char *s, u32 addr );
-void dbgSignal( int sig,int number );
 void winlog( const char *msg, ... );
+
+void debuggerSignal( int sig,int number );
+void debuggerOutput( const char *s, u32 addr );
 
 bool systemPauseOnFrame();
 void systemScreenCapture( int captureNumber );
