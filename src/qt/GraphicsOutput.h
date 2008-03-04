@@ -34,8 +34,7 @@ public:
 	{
 		NONE,
 		QPAINTER,
-		OPENGL,
-		DIRECT3D
+		OPENGL
 	};
 
 	bool setAPI( DISPLAY_API api );

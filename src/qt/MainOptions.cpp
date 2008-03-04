@@ -25,7 +25,6 @@ VideoOptionsPage::VideoOptionsPage(QWidget *parent)
 	QLabel *RenderLabel = new QLabel(tr("Renderer:"));
 	QComboBox *RenderCombo = new QComboBox;
 	RenderCombo->addItem("OpenGL");
-	//RenderCombo->addItem(tr("D3D"));
 	RenderCombo->addItem("QPainter");
 
 	QHBoxLayout *RenderLayout = new QHBoxLayout;
