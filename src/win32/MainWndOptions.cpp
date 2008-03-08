@@ -36,14 +36,14 @@
 #include "BIOSDialog.h"
 
 #include "../System.h"
-#include "../agbprint.h"
-#include "../GBA.h"
+#include "../agb/agbprint.h"
+#include "../agb/GBA.h"
 #include "../Globals.h"
 #include "../Sound.h"
-#include "../gb/GB.h"
-#include "../gb/gbGlobals.h"
-#include "../gb/gbPrinter.h"
-#include "../Link.h"
+#include "../dmg/GB.h"
+#include "../dmg/gbGlobals.h"
+#include "../dmg/gbPrinter.h"
+#include "../agb/GBALink.h"
 #include <tchar.h>
 
 extern int emulating;

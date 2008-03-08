@@ -444,8 +444,6 @@ void MainWnd::OnClose()
 {
   emulating = false;
   CWnd::OnClose();
-
-  delete this;
 }
 
 bool MainWnd::FileRun()
@@ -767,7 +765,7 @@ void MainWnd::OnSizing(UINT fwSide, LPRECT pRect)
 		0 );
 	MENUBARINFO mbi;
 	mbi.cbSize = sizeof(MENUBARINFO);
-	this->GetMenuBarInfo( OBJID_MENU, 0, &mbi );
+	GetMenuBarInfo( this->GetSafeHwnd(), OBJID_MENU, 0, &mbi );
 	const LONG menuHeight = mbi.rcBar.bottom - mbi.rcBar.top + 1;
 	// +1 because of that white line, wherever it comes from
 	const LONG width = size.right - size.left;
