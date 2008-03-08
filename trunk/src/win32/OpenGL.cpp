@@ -261,7 +261,7 @@ bool OpenGLDisplay::initialize()
 	case VIDEO_640x480:
 	case VIDEO_800x600:
 	case VIDEO_1024x768:
-	case VIDEO_1280x960:
+	case VIDEO_1280x1024:
 	case VIDEO_OTHER:
 		{
 			if( theApp.fullScreenStretch ) {
