@@ -23,3 +23,24 @@ NASM:         http://nasm.sourceforge.net
 DirectX SDK:  http://msdn2.microsoft.com/en-us/xna/aa937788.aspx
 OpenAL SDK:   http://openal.org/downloads.html
 OpenGL files: http://www.opengl.org/registry/
+zlib:         http://zlib.net/
+libpng:       http://libpng.org/pub/png/libpng.html
+
+
+
+#################################
+# Visual C++ 2008 project files #
+#################################
+
+There are two solution files for Visual C++ 2008:
+
+The Windows MFC GUI version project files are located in the root of the vba-m sources (VBA2008.sln).
+In order to compile it, you have to compile zlib and libpng first and set your compiler's INCLUDE and LIB path accordantly.
+If you also need Microsoft's DirectX SDK.
+If you want to enable OpenAL sound output, install the OpenAL SDK. If you do not want it, #define NO_OAL.
+Some pixel filters come with assembler code compatible to the NASM syntax. Extract NASM somewhere and add it to your PATH environment variable. All .asm files should be handled with the "nasm.rules" build rules file.
+
+The new Qt GUI version can be found in /project/vc2008.
+It uses the qmake file in /project/qmake and can be compiled with the Visual C++ 2008 Express Edition.
+Qt has to be compiled with the Microsoft compiler first, in order to use it.
+The dependencies folder is not yet necessary.

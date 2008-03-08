@@ -1909,7 +1909,7 @@ void VBA::updateWindowSize(int value)
 	  // content of old seperate 'winCheckMenuBarInfo' function:
       MENUBARINFO info;
       info.cbSize = sizeof(MENUBARINFO);
-	  theApp.m_pMainWnd->GetMenuBarInfo(OBJID_MENU, 0, &info);
+	  GetMenuBarInfo( theApp.m_pMainWnd->GetSafeHwnd(), OBJID_MENU, 0, &info );
       int menuHeight = GetSystemMetrics(SM_CYMENU); // includes white line
       if((info.rcBar.bottom - info.rcBar.top) > menuHeight)
 	  {
