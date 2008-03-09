@@ -319,98 +319,110 @@ static INSN_REGPARM void thumbBreakpoint(u32 opcode)
                 V_FLAG = (Flags >> 26) & 1;			\
             }
 #else
+  #define EMIT1(op,arg)        #op" "arg"; "
+  #define EMIT2(op,src,dest)   #op" "src", "dest"; "
+  #define CONST(val)           "$"#val
+  #define ASMVAR(cvar)         ASMVAR2 (__USER_LABEL_PREFIX__, cvar)
+  #define ASMVAR2(prefix,cvar) STRING (prefix) cvar
+  #define STRING(x)            #x
+  #define VAR(var)             ASMVAR(#var)
+  #define REGREF1(index)       ASMVAR("reg("index")")
+  #define REGREF2(index,scale) ASMVAR("reg(,"index","#scale")")
+  #define eax "%%eax"
+  #define ecx "%%ecx"
+  #define edx "%%edx"
   #define ADD_RN_O8(d) \
      asm ("andl $0xFF, %%eax;"\
           "addl %%eax, %0;"\
-          "setsb _N_FLAG;"\
-          "setzb _Z_FLAG;"\
-          "setcb _C_FLAG;"\
-          "setob _V_FLAG;"\
+          EMIT1(setsb, VAR(N_FLAG)) \
+          EMIT1(setzb, VAR(Z_FLAG)) \
+          EMIT1(setcb, VAR(C_FLAG)) \
+          EMIT1(setob, VAR(V_FLAG)) \
           : "=m" (reg[(d)].I));
   #define CMN_RD_RS \
      asm ("add %0, %1;"\
-          "setsb _N_FLAG;"\
-          "setzb _Z_FLAG;"\
-          "setcb _C_FLAG;"\
-          "setob _V_FLAG;"\
+          EMIT1(setsb, VAR(N_FLAG)) \
+          EMIT1(setzb, VAR(Z_FLAG)) \
+          EMIT1(setcb, VAR(C_FLAG)) \
+          EMIT1(setob, VAR(V_FLAG)) \
           : \
           : "r" (value), "r" (reg[dest].I):"1");
   #define ADC_RD_RS \
-     asm ("bt $0, _C_FLAG;"\
+     asm (EMIT2(bt,CONST(0),VAR(C_FLAG)) \
           "adc %1, %%ebx;"\
-          "setsb _N_FLAG;"\
-          "setzb _Z_FLAG;"\
-          "setcb _C_FLAG;"\
-          "setob _V_FLAG;"\
+          EMIT1(setsb, VAR(N_FLAG)) \
+          EMIT1(setzb, VAR(Z_FLAG)) \
+          EMIT1(setcb, VAR(C_FLAG)) \
+          EMIT1(setob, VAR(V_FLAG)) \
           : "=b" (reg[dest].I)\
           : "r" (value), "b" (reg[dest].I));
   #define SUB_RN_O8(d) \
      asm ("andl $0xFF, %%eax;"\
           "subl %%eax, %0;"\
-          "setsb _N_FLAG;"\
-          "setzb _Z_FLAG;"\
-          "setncb _C_FLAG;"\
-          "setob _V_FLAG;"\
+          EMIT1(setsb, VAR(N_FLAG)) \
+          EMIT1(setzb, VAR(Z_FLAG)) \
+          EMIT1(setncb, VAR(C_FLAG)) \
+          EMIT1(setob, VAR(V_FLAG)) \
           : "=m" (reg[(d)].I));
   #define MOV_RN_O8(d) \
      asm ("andl $0xFF, %%eax;"\
-          "movb $0, _N_FLAG;"\
+          EMIT2(movb,CONST(0),VAR(N_FLAG)) \
           "movl %%eax, %0;"\
-          "setzb _Z_FLAG;"\
+          EMIT1(setzb, VAR(Z_FLAG)) \
           : "=m" (reg[(d)].I));
   #define CMP_RN_O8(d) \
      asm ("andl $0xFF, %%eax;"\
           "cmpl %%eax, %0;"\
-          "setsb _N_FLAG;"\
-          "setzb _Z_FLAG;"\
-          "setncb _C_FLAG;"\
-          "setob _V_FLAG;"\
+          EMIT1(setsb, VAR(N_FLAG)) \
+          EMIT1(setzb, VAR(Z_FLAG)) \
+          EMIT1(setncb, VAR(C_FLAG)) \
+          EMIT1(setob, VAR(V_FLAG)) \
           : \
           : "m" (reg[(d)].I));
   #define SBC_RD_RS \
-     asm volatile ("bt $0, _C_FLAG;"\
+     asm volatile (EMIT2(bt,CONST(0),VAR(C_FLAG)) \
                    "cmc;"\
                    "sbb %1, %%ebx;"\
-                   "setsb _N_FLAG;"\
-                   "setzb _Z_FLAG;"\
-                   "setncb _C_FLAG;"\
-                   "setob _V_FLAG;"\
+                   EMIT1(setsb, VAR(N_FLAG)) \
+                   EMIT1(setzb, VAR(Z_FLAG)) \
+                   EMIT1(setncb, VAR(C_FLAG)) \
+                   EMIT1(setob, VAR(V_FLAG)) \
                    : "=b" (reg[dest].I)\
                    : "r" (value), "b" (reg[dest].I) : "cc", "memory");
   #define LSL_RD_RS \
          asm ("shl %%cl, %%eax;"\
-              "setcb _C_FLAG;"\
+              EMIT1(setcb, VAR(C_FLAG)) \
               : "=a" (value)\
               : "a" (reg[dest].I), "c" (value));
   #define LSR_RD_RS \
          asm ("shr %%cl, %%eax;"\
-              "setcb _C_FLAG;"\
+              EMIT1(setcb, VAR(C_FLAG)) \
               : "=a" (value)\
               : "a" (reg[dest].I), "c" (value));
   #define ASR_RD_RS \
          asm ("sar %%cl, %%eax;"\
-              "setcb _C_FLAG;"\
+              EMIT1(setcb, VAR(C_FLAG)) \
               : "=a" (value)\
               : "a" (reg[dest].I), "c" (value));
   #define ROR_RD_RS \
          asm ("ror %%cl, %%eax;"\
-              "setcb _C_FLAG;"\
+              EMIT1(setcb, VAR(C_FLAG)) \
               : "=a" (value)\
               : "a" (reg[dest].I), "c" (value));
   #define NEG_RD_RS \
      asm ("neg %%ebx;"\
-          "setsb _N_FLAG;"\
-          "setzb _Z_FLAG;"\
-          "setncb _C_FLAG;"\
-          "setob _V_FLAG;"\
+          EMIT1(setsb, VAR(N_FLAG)) \
+          EMIT1(setzb, VAR(Z_FLAG)) \
+          EMIT1(setncb, VAR(C_FLAG)) \
+          EMIT1(setob, VAR(V_FLAG)) \
           : "=b" (reg[dest].I)\
           : "b" (reg[source].I));
   #define CMP_RD_RS \
      asm ("sub %0, %1;"\
-          "setsb _N_FLAG;"\
-          "setzb _Z_FLAG;"\
-          "setncb _C_FLAG;"\
-          "setob _V_FLAG;"\
+          EMIT1(setsb, VAR(N_FLAG)) \
+          EMIT1(setzb, VAR(Z_FLAG)) \
+          EMIT1(setncb, VAR(C_FLAG)) \
+          EMIT1(setob, VAR(V_FLAG)) \
           : \
           : "r" (value), "r" (reg[dest].I):"1");
   #define IMM5_INSN(OP,N) \
@@ -418,75 +430,76 @@ static INSN_REGPARM void thumbBreakpoint(u32 opcode)
          "shrl $1,%%eax;"            \
          "andl $7,%%ecx;"            \
          "andl $0x1C,%%eax;"         \
-         "movl _reg(%%eax),%%edx;"    \
+         EMIT2(movl, REGREF1(eax), edx) \
          OP                          \
-         "setsb _N_FLAG;"             \
-         "setzb _Z_FLAG;"             \
-         "movl %%edx,_reg(,%%ecx,4);" \
+         EMIT1(setsb, VAR(N_FLAG)) \
+         EMIT1(setzb, VAR(Z_FLAG)) \
+         EMIT2(movl, edx, REGREF2(ecx,4)) \
          : : "i" (N))
   #define IMM5_INSN_0(OP)            \
      asm("movl %%eax,%%ecx;"         \
          "shrl $1,%%eax;"            \
          "andl $7,%%ecx;"            \
          "andl $0x1C,%%eax;"         \
-         "movl _reg(%%eax),%%edx;"    \
+         EMIT2(movl, REGREF1(eax), edx) \
          OP                          \
-         "setsb _N_FLAG;"             \
-         "setzb _Z_FLAG;"             \
-         "movl %%edx,_reg(,%%ecx,4);" \
+         EMIT1(setsb, VAR(N_FLAG)) \
+         EMIT1(setzb, VAR(Z_FLAG)) \
+         EMIT2(movl, edx, REGREF2(ecx,4)) \
          : : )
   #define IMM5_LSL \
          "shll %0,%%edx;"\
-         "setcb _C_FLAG;"
+         EMIT1(setcb, VAR(C_FLAG))
   #define IMM5_LSL_0 \
          "testl %%edx,%%edx;"
   #define IMM5_LSR \
          "shrl %0,%%edx;"\
-         "setcb _C_FLAG;"
+         EMIT1(setcb, VAR(C_FLAG))
   #define IMM5_LSR_0 \
          "testl %%edx,%%edx;"\
-         "setsb _C_FLAG;"\
+         EMIT1(setsb, VAR(C_FLAG)) \
          "xorl %%edx,%%edx;"
   #define IMM5_ASR \
          "sarl %0,%%edx;"\
-         "setcb _C_FLAG;"
+         EMIT1(setcb, VAR(C_FLAG))
   #define IMM5_ASR_0 \
          "sarl $31,%%edx;"\
-         "setsb _C_FLAG;"
+         EMIT1(setsb, VAR(C_FLAG))
   #define THREEARG_INSN(OP,N) \
      asm("movl %%eax,%%edx;"       \
          "shrl $1,%%edx;"          \
          "andl $0x1C,%%edx;"       \
          "andl $7,%%eax;"          \
-         "movl _reg(%%edx),%%ecx;"  \
+         EMIT2(movl, REGREF1(edx), ecx) \
          OP(N)                     \
-         "setsb _N_FLAG;"           \
-         "setzb _Z_FLAG;"           \
-         "movl %%ecx,_reg(,%%eax,4)"::)
+         EMIT1(setsb, VAR(N_FLAG)) \
+         EMIT1(setzb, VAR(Z_FLAG)) \
+         EMIT2(movl, ecx, REGREF2(eax,4)) \
+         : : )
   #define ADD_RD_RS_RN(N)          \
-         "add (_reg+"#N"*4),%%ecx;" \
-         "setcb _C_FLAG;"           \
-         "setob _V_FLAG;"
+         EMIT2(add,VAR(reg)"+"#N"*4",ecx) \
+         EMIT1(setcb, VAR(C_FLAG)) \
+         EMIT1(setob, VAR(V_FLAG))
   #define ADD_RD_RS_O3(N)          \
          "add $"#N",%%ecx;"        \
-         "setcb _C_FLAG;"           \
-         "setob _V_FLAG;"
+         EMIT1(setcb, VAR(C_FLAG)) \
+         EMIT1(setob, VAR(V_FLAG))
   #define ADD_RD_RS_O3_0(N)        \
-         "movb $0,_C_FLAG;"         \
+         EMIT2(movb,CONST(0),VAR(C_FLAG)) \
          "add $0,%%ecx;"           \
-         "movb $0,_V_FLAG;"
+         EMIT2(movb,CONST(0),VAR(V_FLAG))
   #define SUB_RD_RS_RN(N) \
-         "sub (_reg+"#N"*4),%%ecx;" \
-         "setncb _C_FLAG;"          \
-         "setob _V_FLAG;"
+         EMIT2(sub,VAR(reg)"+"#N"*4",ecx) \
+         EMIT1(setncb, VAR(C_FLAG)) \
+         EMIT1(setob, VAR(V_FLAG))
   #define SUB_RD_RS_O3(N) \
          "sub $"#N",%%ecx;"        \
-         "setncb _C_FLAG;"          \
-         "setob _V_FLAG;"
+         EMIT1(setncb, VAR(C_FLAG)) \
+         EMIT1(setob, VAR(V_FLAG))
   #define SUB_RD_RS_O3_0(N)        \
-         "movb $1,_C_FLAG;"         \
+         EMIT2(movb,CONST(1),VAR(C_FLAG)) \
          "sub $0,%%ecx;"           \
-         "movb $0,_V_FLAG;"
+         EMIT2(movb,CONST(0),VAR(V_FLAG))
 #endif
 #else // !__GNUC__
   #define ADD_RD_RS_RN(N) \
