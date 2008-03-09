@@ -12,7 +12,7 @@ Nintendo Game Boy / Game Boy Advance Emulator
 
 Based on official VBA
 Original Project Homepage: vba.ngemu.com
-New Project Homepage: vbam.ngemu.com
+New Project Homepage: vba-m.ngemu.com
 
 The Qt build uses icons from the KDE project:
 http://kde.org/
