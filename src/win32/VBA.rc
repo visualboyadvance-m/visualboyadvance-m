@@ -9,38 +9,9 @@
 //
 #include "afxres.h"
 
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
-
-/////////////////////////////////////////////////////////////////////////////
-// German (Germany) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
-#ifdef _WIN32
-LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
-#pragma code_page(1252)
-#endif //_WIN32
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "\r\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-#endif    // German (Germany) resources
-/////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1698,6 +1669,8 @@ BEGIN
             BEGIN
                 MENUITEM "DirectSound",                 ID_OUTPUTAPI_DIRECTSOUND
                 MENUITEM SEPARATOR
+                MENUITEM "XAudio2",                     ID_OUTPUTAPI_XAUDIO2
+                MENUITEM SEPARATOR
                 MENUITEM "OpenAL",                      ID_OUTPUTAPI_OPENAL
                 MENUITEM "  Configuration...",          ID_OUTPUTAPI_OALCONFIGURATION
                 MENUITEM SEPARATOR
@@ -2219,6 +2192,12 @@ BEGIN
     IDS_AVI_CANNOT_WRITE_VIDEO "Cannot write video frame to AVI file."
     IDS_AVI_CANNOT_WRITE_AUDIO "Cannot write audio frame to AVI file."
     IDS_FILTER_GBCROM       "Game Boy Color ROMs_*.GBC;*.CGB;*.ZIP;*.7Z;*.Z;*.GZ__"
+    IDS_COM_FAILURE         "The COM (Component Object Model) failed to initialize!"
+    IDS_XAUDIO2_FAILURE     "The XAudio2 interface failed to initialize!"
+    IDS_XAUDIO2_CANNOT_CREATE_MASTERINGVOICE 
+                            "XAudio2: Creating mastering voice failed!"
+    IDS_XAUDIO2_CANNOT_CREATE_SOURCEVOICE 
+                            "XAudio2: Creating source voice failed!"
 END
 
 #endif    // English (U.S.) resources
@@ -2242,7 +2221,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 
 2 TEXTINCLUDE 
 BEGIN
-    "#include ""afxres.h""\r\0"
+    "#include ""afxres.h""\r\r\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -2250,13 +2229,4 @@ END
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////
 
-
-
-#ifndef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// Generated from the TEXTINCLUDE 3 resource.
-//
-/////////////////////////////////////////////////////////////////////////////
-#endif    // not APSTUDIO_INVOKED
 

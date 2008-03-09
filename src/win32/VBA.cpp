@@ -111,6 +111,9 @@ extern ISound *newDirectSound();
 #ifndef NO_OAL
 extern ISound *newOpenAL();
 #endif
+#ifndef NO_XAUDIO2
+extern ISound *newXAudio2_Output();
+#endif
 
 extern void remoteStubSignal(int, int);
 extern void remoteOutput(char *, u32);
@@ -902,7 +905,6 @@ void VBA::updateThrottle( unsigned short throttle )
 
 	if( throttle == 0 ) {
 		autoFrameSkip = false;
-		return;
 	} else {
 		Sm60FPS::K_fCpuSpeed = (float)throttle;
 		Sm60FPS::K_fTargetFps = 60.0f * Sm60FPS::K_fCpuSpeed / 100;
@@ -910,7 +912,10 @@ void VBA::updateThrottle( unsigned short throttle )
 		autoFrameSkip = true;
 		frameSkip = 0;
 		systemFrameSkip = 0;
-		return;
+	}
+
+	if( theApp.sound ) {
+		theApp.sound->setThrottle( throttle );
 	}
 }
 
@@ -1198,9 +1203,20 @@ bool systemSoundInit()
 		theApp.sound = newOpenAL();
 		break;
 #endif
+#ifndef NO_XAUDIO2
+	case XAUDIO2:
+		theApp.sound = newXAudio2_Output();
+		break;
+#endif
 	}
 
-	return theApp.sound->init();
+	bool retVal = theApp.sound->init();
+
+	if( retVal ) {
+		theApp.sound->setThrottle( theApp.throttle );
+	}
+
+	return retVal;
 }
 
 
@@ -1448,6 +1464,9 @@ void VBA::loadSettings()
   if( ( audioAPI != DIRECTSOUND )
 #ifndef NO_OAL
 	  && ( audioAPI != OPENAL_SOUND )
+#endif
+#ifndef NO_XAUDIO2
+	  && ( audioAPI != XAUDIO2 )
 #endif
 	  ) {
 		  audioAPI = DIRECTSOUND;

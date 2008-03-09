@@ -422,6 +422,9 @@ public:
 	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
 	afx_msg void OnEmulatorBiosfiles();
 	afx_msg void OnFileOpenGbc();
+	afx_msg void OnNcRButtonDown(UINT nHitTest, CPoint point);
+	afx_msg void OnOutputapiXaudio2();
+	afx_msg void OnUpdateOutputapiXaudio2(CCmdUI *pCmdUI);
 };
 
 /////////////////////////////////////////////////////////////////////////////
