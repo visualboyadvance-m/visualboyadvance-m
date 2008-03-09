@@ -32,9 +32,7 @@
 #include "../Sound.h"
 
 // DirectSound8
-#include <Dsound.h>
-#pragma comment( lib, "Dsound" )
-#pragma comment( lib, "Dxguid" )
+#include <dsound.h>
 
 extern bool soundBufferLow;
 extern void setsystemSoundOn(bool value);
@@ -64,7 +62,10 @@ public:
 
 DirectSound::DirectSound()
 {
-	CoInitialize( NULL );
+	if( S_OK != CoInitializeEx( NULL, COINIT_MULTITHREADED ) ) {
+		systemMessage( IDS_COM_FAILURE, NULL );
+		return;
+	}
 
 	pDirectSound  = NULL;
 	dsbPrimary    = NULL;
@@ -114,14 +115,17 @@ bool DirectSound::init()
 	DSBUFFERDESC dsbdesc;
 	int i;
 
-
-	// Initialize DirectSound
-	if( FAILED( hr = DirectSoundCreate8( &DSDEVID_DefaultPlayback, &pDirectSound, NULL ) ) ) {
-		systemMessage( IDS_CANNOT_CREATE_DIRECTSOUND, _T("Cannot create DirectSound %08x"), hr );
-		pDirectSound = NULL;
+	hr = CoCreateInstance( CLSID_DirectSound8, NULL, CLSCTX_INPROC_SERVER, IID_IDirectSound8, (LPVOID *)&pDirectSound );
+	if( hr != S_OK ) {
+		systemMessage( IDS_CANNOT_CREATE_DIRECTSOUND, NULL, hr );
 		return false;
 	}
 
+	pDirectSound->Initialize( &DSDEVID_DefaultPlayback );
+	if( hr != DS_OK ) {
+		systemMessage( IDS_CANNOT_CREATE_DIRECTSOUND, NULL, hr );
+		return false;
+	}
 
 	if( FAILED( hr = pDirectSound->SetCooperativeLevel( theApp.m_pMainWnd->GetSafeHwnd(), DSSCL_EXCLUSIVE ) ) ) {
 		systemMessage( IDS_CANNOT_SETCOOPERATIVELEVEL, _T("Cannot SetCooperativeLevel %08x"), hr );

@@ -2624,7 +2624,7 @@ bool Sm60FPS_CanSkipFrame()
 	  if( Sm60FPS::nFrameCnt == 0 ) {
 		  Sm60FPS::nFrameCnt = 0;
 		  Sm60FPS::dwTimeElapse = 0;
-		  Sm60FPS::dwTime0 = timeGetTime();
+		  Sm60FPS::dwTime0 = GetTickCount();
 	  } else {
 		  if( Sm60FPS::nFrameCnt >= 10 ) {
 			  Sm60FPS::nFrameCnt = 0;
@@ -2644,7 +2644,7 @@ bool Sm60FPS_CanSkipFrame()
 				  }
 			  }
 		  } else { // between frame 1-10
-			  Sm60FPS::dwTime1 = timeGetTime();
+			  Sm60FPS::dwTime1 = GetTickCount();
 			  Sm60FPS::dwTimeElapse += (Sm60FPS::dwTime1 - Sm60FPS::dwTime0);
 			  Sm60FPS::dwTime0 = Sm60FPS::dwTime1;
 			  if( !Sm60FPS::bLastSkip &&
@@ -2668,7 +2668,7 @@ bool Sm60FPS_CanSkipFrame()
 void Sm60FPS_Sleep()
 {
 	if( theApp.autoFrameSkip ) {
-		u32 dwTimePass = Sm60FPS::dwTimeElapse + (timeGetTime() - Sm60FPS::dwTime0);
+		u32 dwTimePass = Sm60FPS::dwTimeElapse + (GetTickCount() - Sm60FPS::dwTime0);
 		u32 dwTimeShould = (u32)(Sm60FPS::nFrameCnt * Sm60FPS::K_fDT);
 		if( dwTimeShould > dwTimePass ) {
 			Sleep(dwTimeShould - dwTimePass);

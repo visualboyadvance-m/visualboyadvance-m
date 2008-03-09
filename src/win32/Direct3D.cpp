@@ -20,9 +20,9 @@
 
 #ifndef NO_D3D
 
-#pragma comment( lib, "d3d9.lib" )
-#pragma comment( lib, "d3dx9.lib" )
-#pragma comment( lib, "dxerr9.lib" )
+#pragma comment( lib, "d3d9" )
+#pragma comment( lib, "d3dx9" )
+#pragma comment( lib, "DxErr9" )
 
 #include "stdafx.h"
 
