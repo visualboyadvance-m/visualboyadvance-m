@@ -155,16 +155,35 @@ bool XAudio2_Output::init()
 {
 	if( failed || initialized ) return false;
 
+	// Initialize XAudio2 using COM
 	HRESULT hr;
-	UINT32 flags = 0;
 
+	hr = CoCreateInstance(
 #ifdef _DEBUG
-	flags |= XAUDIO2_DEBUG_ENGINE;
+		__uuidof( XAudio2_Debug ),
+#else
+		__uuidof( XAudio2 ),
 #endif
+		NULL,
+		CLSCTX_INPROC_SERVER,
+		__uuidof( IXAudio2 ),
+		(LPVOID *)&xaud
+		);
+	if( hr != S_OK ) {
+		systemMessage( IDS_XAUDIO2_FAILURE, NULL );
+		failed = true;
+		return false;
+	}
 
-	hr = XAudio2Create( &xaud, flags );
-
-	if( FAILED( hr ) ) {
+	hr = xaud->Initialize(
+#ifdef _DEBUG
+		XAUDIO2_DEBUG_ENGINE,
+#else
+		0,
+#endif
+		XAUDIO2_DEFAULT_PROCESSOR
+		);
+	if( hr != S_OK ) {
 		systemMessage( IDS_XAUDIO2_FAILURE, NULL );
 		failed = true;
 		return false;

@@ -85,7 +85,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib Vfw32.Lib OpenGL32.Lib dinput8.lib dxguid.lib ddraw.lib winmm.lib Dsound.lib HtmlHelp.lib zlib1.lib libpng13.lib"
+				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib zlib1.lib libpng13.lib"
 				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
 				Version=""
 				LinkIncremental="2"
@@ -193,7 +193,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib Vfw32.Lib OpenGL32.Lib dinput8.lib winmm.lib dxguid.lib ddraw.lib Dsound.lib htmlhelp.lib zlib1.lib libpng13.lib"
+				AdditionalDependencies="nafxcw.lib LIBCMT.lib zlib1.lib libpng13.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
 				Version=""

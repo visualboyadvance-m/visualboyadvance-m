@@ -23,7 +23,7 @@
 
 
 #ifndef NO_D3D
-#pragma comment( lib, "d3d9.lib" )
+#pragma comment( lib, "d3d9" )
 #ifdef _DEBUG
 #define D3D_DEBUG_INFO
 #endif

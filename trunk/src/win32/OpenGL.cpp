@@ -20,7 +20,7 @@
 #ifndef NO_OGL
 
 //OpenGL library
-#pragma comment( lib, "opengl32.lib" )
+#pragma comment( lib, "OpenGL32" )
 
 // MFC
 #include "stdafx.h"

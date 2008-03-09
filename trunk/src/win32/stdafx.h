@@ -30,7 +30,6 @@
 // Enable STRICT type checking
 #define STRICT
 
-
 #include <afxwin.h>
 #include <afxcmn.h>
 #include <afxdlgs.h>
