@@ -14,7 +14,7 @@ Based on official VBA
 Original Project Homepage: vba.ngemu.com
 New Project Homepage: vbam.ngemu.com
 
-The Qt build uses Icons from the KDE project:
+The Qt build uses icons from the KDE project:
 http://kde.org/
 svn://anonsvn.kde.org/home/kde/trunk/KDE/kdebase/runtime/pics/oxygen
 
@@ -41,14 +41,14 @@ GFX: ~32MB VRAM, DirectX9 drivers
 File Dependencies
 ===================
 
-VBA-M Requires the following files, in order to run.
+VBA-M requires the following files, in order to run.
 
 libpng13.dll
 zlib1.dll
 D3DX9_37.DLL
 
 The first two are available from http://vba-m.ngemu.com/vbam/vbacompiles/msvc2008/dll.7z,
-While the last requires an update to DirectX, you can use the following tool to update - http://vba-m.ngemu.com/vbam/vbacompiles/msvc2008/Directx_9c_webupdater.zip
+while the last requires an update to DirectX, you can use the following tool to update - http://vba-m.ngemu.com/vbam/vbacompiles/msvc2008/Directx_9c_webupdater.zip
 
 
 ==============
