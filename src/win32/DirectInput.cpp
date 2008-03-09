@@ -28,8 +28,9 @@
 #include "WinResUtil.h"
 
 #define DIRECTINPUT_VERSION 0x0800
-#include <Dinput.h>
-#pragma comment(lib, "Dinput8")
+#include <dinput.h>
+#pragma comment( lib, "dinput8" )
+#pragma comment( lib, "dxguid" )
 
 
 #ifdef _DEBUG
@@ -608,7 +609,8 @@ BOOL checkKey(KeyList &k)
 }
 
 DirectInput::DirectInput()
-{}
+{
+}
 
 DirectInput::~DirectInput()
 {
@@ -631,27 +633,21 @@ DirectInput::~DirectInput()
     }
 }
 
-
 bool DirectInput::initialize()
 {
-
-    HRESULT hr;
-
-    hr = DirectInput8Create(
-             AfxGetInstanceHandle(),
-             DIRECTINPUT_VERSION,
-             IID_IDirectInput8,
-             (LPVOID*)&pDirectInput,
-             NULL );
-
-    if ( hr != DI_OK ) {
-        return false;
-    }
+	HRESULT hr;
+	
+	hr = DirectInput8Create(
+		GetModuleHandle( NULL ),
+		DIRECTINPUT_VERSION,
+		IID_IDirectInput8,
+		(LPVOID *)&pDirectInput,
+		NULL );
+	ASSERT( hr == DI_OK );
+	if( hr != DI_OK ) return false;
 
 
-
-
-    hr = pDirectInput->EnumDevices(DI8DEVCLASS_GAMECTRL,
+	hr = pDirectInput->EnumDevices(DI8DEVCLASS_GAMECTRL,
                                    DIEnumDevicesCallback2,
                                    NULL,
                                    DIEDFL_ATTACHEDONLY);

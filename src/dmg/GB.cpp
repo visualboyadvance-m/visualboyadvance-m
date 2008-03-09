@@ -5255,18 +5255,18 @@ void gbEmulate(int ticksToStop)
         while(synchronizeTicks < 0) {
           synchronizeTicks += SYNCHRONIZE_CLOCK_TICKS;
 
-          DWORD now = timeGetTime();
+          DWORD now = GetTickCount();
           gbElapsedTime += (now - timeNow);
 
           if(gbElapsedTime < 50) {
             DWORD diff = 50 - gbElapsedTime;
             Sleep(diff);
-            timeNow = timeGetTime();
+            timeNow = GetTickCount();
             elapsedTime = timeNow - now - diff;
             if((int)elapsedTime < 0)
               elapsedTime = 0;
           } else {
-            timeNow = timeGetTime();
+            timeNow = GetTickCount();
             elapsedTime = 0;
           }
         }

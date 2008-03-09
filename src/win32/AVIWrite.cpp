@@ -17,7 +17,7 @@
 
 
 #include "AVIWrite.h"
-#pragma comment( lib, "vfw32.lib" )
+#pragma comment( lib, "Vfw32" )
 
 
 AVIWrite::AVIWrite()
