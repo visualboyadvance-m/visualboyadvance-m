@@ -97,6 +97,9 @@ Less important:
 
 - Create Visual Studio project using SDL makefile
 
+- Add device enumeration & buffer count selection for XAudio2
+  - Current buffer count: 4
+
 
 
 Performance:
@@ -128,7 +131,10 @@ Known Bugs:
 - Wrong bit depth image is displayed for 2 frames when switching from/to HQ3x/4x ASM
  - This is caused by the 16bit hack which does not re-process the emulated image.
    It results in the display devices treating the image at pix with the wrong bit depth.
-
+- Opening the OpenAL configuration dialog while using XAudio2 results in a crash.
+  - This issue seems to be related to OpenAL and nothing can be done about it.
+  - Caused by: OALConfig.cpp: line 41: "ALFunction.alcGetString( NULL, ALC_DEVICE_SPECIFIER );"
+  - Does not happen with DirectSound for some reason.
 
 =================
 Credits

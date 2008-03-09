@@ -1463,23 +1463,11 @@
 			Name="Documentation"
 			>
 			<File
-				RelativePath=".\doc\authors.txt"
-				>
-			</File>
-			<File
 				RelativePath=".\doc\DevInfo.txt"
 				>
 			</File>
 			<File
-				RelativePath=".\doc\Known Bugs.txt"
-				>
-			</File>
-			<File
 				RelativePath=".\doc\ReadMe.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\doc\todo.txt"
 				>
 			</File>
 		</Filter>
