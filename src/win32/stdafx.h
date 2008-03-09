@@ -26,7 +26,6 @@
 // Target for Windows 2000 (Required by GetMenuBar and other functions)
 #define NTDDI_VERSION NTDDI_WIN2K // new
 #define _WIN32_WINNT 0x0500       // old
-//#define WINVER 0x0500
 
 // Enable STRICT type checking
 #define STRICT
@@ -36,3 +35,4 @@
 #include <afxcmn.h>
 #include <afxdlgs.h>
 #include "VBA.h"
+#include "resource.h"

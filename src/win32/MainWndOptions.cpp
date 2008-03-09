@@ -1740,6 +1740,27 @@ void MainWnd::OnUpdateOutputapiDirectsound(CCmdUI *pCmdUI)
 	pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
 }
 
+void MainWnd::OnOutputapiXaudio2()
+{
+#ifndef NO_XAUDIO2
+	if( theApp.audioAPI != XAUDIO2 ) {
+		theApp.audioAPI = XAUDIO2;
+		systemSoundShutdown();
+		systemSoundInit();
+	}
+#endif
+}
+
+void MainWnd::OnUpdateOutputapiXaudio2(CCmdUI *pCmdUI)
+{
+#ifndef NO_XAUDIO2
+	pCmdUI->SetCheck( ( theApp.audioAPI == XAUDIO2 ) ? 1 : 0 );
+	pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
+#else
+	pCmdUI->Enable( FALSE );
+#endif
+}
+
 void MainWnd::OnOutputapiOpenal()
 {
 #ifndef NO_OAL

@@ -901,6 +901,10 @@
 					RelativePath=".\src\win32\OpenGL.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\src\win32\XAudio2.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Linking"
@@ -1438,36 +1442,44 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Res"
+			Name="Resources"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\res\DevInfo.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\res\gpl.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\res\Known Bugs.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\res\ReadMe.txt"
-				>
-			</File>
-			<File
 				RelativePath=".\src\win32\resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\win32\VBA-M.ico"
 				>
 			</File>
 			<File
 				RelativePath=".\src\win32\VBA.rc"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="Documentation"
+			>
 			<File
-				RelativePath=".\src\win32\vba.rc2"
+				RelativePath=".\doc\authors.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\doc\DevInfo.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\doc\Known Bugs.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\doc\ReadMe.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\doc\todo.txt"
 				>
 			</File>
 		</Filter>

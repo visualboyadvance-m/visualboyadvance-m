@@ -538,6 +538,10 @@
 #define IDS_AVI_CANNOT_WRITE_VIDEO      2005
 #define IDS_AVI_CANNOT_WRITE_AUDIO      2006
 #define IDS_FILTER_GBCROM               2007
+#define IDS_COM_FAILURE                 2008
+#define IDS_XAUDIO2_FAILURE             2009
+#define IDS_XAUDIO2_CANNOT_CREATE_MASTERINGVOICE 2010
+#define IDS_XAUDIO2_CANNOT_CREATE_SOURCEVOICE 2011
 #define ID_HELP_ABOUT                   40001
 #define ID_FILE_EXIT                    40002
 #define ID_OPTIONS_VIDEO_FRAMESKIP_0    40003
@@ -845,13 +849,14 @@
 #define ID_EMULATOR_BIOSFILES           40356
 #define ID_FILE_OPENGBC                 40357
 #define ID_FILE_OPEN_GBC                40358
+#define ID_OUTPUTAPI_XAUDIO2            40359
 
 // Next default values for new objects
-//
+// 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        163
-#define _APS_NEXT_COMMAND_VALUE         40359
+#define _APS_NEXT_COMMAND_VALUE         40360
 #define _APS_NEXT_CONTROL_VALUE         1284
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
