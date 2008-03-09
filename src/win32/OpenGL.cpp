@@ -315,23 +315,7 @@ bool OpenGLDisplay::initialize()
 		winSizeY = theApp.fsHeight;
 	}
 
-	// Create a window
-	MainWnd *pWnd = new MainWnd;
-	theApp.m_pMainWnd = pWnd;
-
-	pWnd->CreateEx(
-		styleEx,
-		theApp.wndClass,
-		"VisualBoyAdvance",
-		style,
-		x,y,winSizeX,winSizeY,
-		NULL,
-		0 );
-
-	if (!(HWND)*pWnd) {
-		winlog("Error creating Window %08x\n", GetLastError());
-		return FALSE;
-	}
+	
 
 	theApp.updateMenuBar();
 
