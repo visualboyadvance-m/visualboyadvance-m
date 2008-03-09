@@ -434,6 +434,9 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_WM_WINDOWPOSCHANGING()
   ON_COMMAND(ID_EMULATOR_BIOSFILES, &MainWnd::OnEmulatorBiosfiles)
   ON_COMMAND(ID_FILE_OPEN_GBC, &MainWnd::OnFileOpenGbc)
+  ON_WM_NCRBUTTONDOWN()
+  ON_COMMAND(ID_OUTPUTAPI_XAUDIO2, &MainWnd::OnOutputapiXaudio2)
+  ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_XAUDIO2, &MainWnd::OnUpdateOutputapiXaudio2)
   END_MESSAGE_MAP()
 
 
@@ -1302,4 +1305,14 @@ void MainWnd::OnWindowPosChanging(WINDOWPOS* lpwndpos)
 	if( emulating ) {
 		soundPause();
 	}
+}
+
+void MainWnd::OnNcRButtonDown(UINT nHitTest, CPoint point)
+{
+	// pause sound before process is halted
+	if( emulating ) {
+		soundPause();
+	}
+
+	CWnd::OnNcRButtonDown(nHitTest, point);
 }
