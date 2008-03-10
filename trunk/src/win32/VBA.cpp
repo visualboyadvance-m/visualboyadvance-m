@@ -219,6 +219,11 @@ BEGIN_MESSAGE_MAP(VBA, CWinApp)
 
 VBA::VBA()
 {
+  // COINIT_MULTITHREADED is not supported by SHBrowseForFolder with BIF_USENEWUI
+  // OpenAL also causes trouble when COINIT_MULTITHREADED is used
+  if( S_OK != CoInitializeEx( NULL, COINIT_APARTMENTTHREADED ) ) {
+	  systemMessage( IDS_COM_FAILURE, NULL );
+  }
   mode320Available = false;
   mode640Available = false;
   mode800Available = false;
@@ -419,6 +424,8 @@ VBA::~VBA()
 	  free( oalDevice );
   }
 #endif
+  
+  CoUninitialize();
 }
 
 /////////////////////////////////////////////////////////////////////////////

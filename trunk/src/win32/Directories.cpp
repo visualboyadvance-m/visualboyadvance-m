@@ -271,7 +271,6 @@ CString Directories::browseForDir(CString title)
     bi.lpfn = browseCallbackProc;
     bi.lParam = (LPARAM)(LPCTSTR)initialFolderDir;
 
-	CoInitialize( NULL ); // required by BIF_USENEWUI
     pidl = SHBrowseForFolder(&bi);
 
     if(pidl) {
