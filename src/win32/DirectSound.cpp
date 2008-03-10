@@ -62,11 +62,6 @@ public:
 
 DirectSound::DirectSound()
 {
-	if( S_OK != CoInitializeEx( NULL, COINIT_MULTITHREADED ) ) {
-		systemMessage( IDS_COM_FAILURE, NULL );
-		return;
-	}
-
 	pDirectSound  = NULL;
 	dsbPrimary    = NULL;
 	dsbSecondary  = NULL;
@@ -103,8 +98,6 @@ DirectSound::~DirectSound()
 		pDirectSound->Release();
 		pDirectSound = NULL;
 	}
-
-	CoUninitialize();
 }
 
 

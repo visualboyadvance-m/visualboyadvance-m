@@ -45,10 +45,22 @@ class XAudio2_BufferNotify : public IXAudio2VoiceCallback
 public:
 	HANDLE hBufferEndEvent;
 
-	XAudio2_BufferNotify() { hBufferEndEvent = CreateEvent( NULL, FALSE, FALSE, NULL ); }
-	~XAudio2_BufferNotify() { CloseHandle( hBufferEndEvent ); }
+	XAudio2_BufferNotify() {
+		hBufferEndEvent = NULL;
+		hBufferEndEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
+		ASSERT( hBufferEndEvent != NULL );
+	}
 
-    STDMETHOD_( void, OnBufferEnd ) ( void *pBufferContext ) { SetEvent( hBufferEndEvent ); }
+	~XAudio2_BufferNotify() {
+		CloseHandle( hBufferEndEvent );
+		hBufferEndEvent = NULL;
+	}
+
+    STDMETHOD_( void, OnBufferEnd ) ( void *pBufferContext ) {
+		ASSERT( hBufferEndEvent != NULL );
+		SetEvent( hBufferEndEvent );
+	}
+
 
 	// dummies:
 	STDMETHOD_( void, OnVoiceProcessingPassStart ) () {}
@@ -115,12 +127,6 @@ XAudio2_Output::XAudio2_Output()
 	sVoice = NULL;
 	ZeroMemory( &buf, sizeof( buf ) );
 	ZeroMemory( &vState, sizeof( vState ) );
-
-	if( S_OK != CoInitializeEx( NULL, COINIT_MULTITHREADED ) ) {
-		systemMessage( IDS_COM_FAILURE, NULL );
-		failed = true;
-		return;
-	}
 }
 
 
@@ -146,8 +152,6 @@ XAudio2_Output::~XAudio2_Output()
 	if( xaud ) {
 		xaud->Release();
 	}
-
-	CoUninitialize();
 }
 
 
