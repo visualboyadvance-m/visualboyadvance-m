@@ -111,6 +111,9 @@ Performance:
 
 - Make use of 64 bit CPUs
 
+- Have a look at the liboil optimization library
+  - http://liboil.freedesktop.org/wiki/
+
 
 ====================
 Currently Known Bugs
@@ -125,16 +128,12 @@ Known Bugs:
 - OpenGL: Various context handling issues with OGL mode. The emulator should restart whenever is
   enabled, thus eliminating these issues when switching graphics APIs. I don't why this didnt happen
   in the first place, when it should. (Mudlord)
-- Audio core: assertation error occurs when disabling GB sound
+- Audio core: assertation error occurs when disabling sound in GB mode
   - I think its best we mute sound instead, since some games rely on audio for timing.
     Plus, blargg's GB_Snd_Emu is extremely optimized stuff. (Mudlord)
 - Wrong bit depth image is displayed for 2 frames when switching from/to HQ3x/4x ASM
  - This is caused by the 16bit hack which does not re-process the emulated image.
    It results in the display devices treating the image at pix with the wrong bit depth.
-- Opening the OpenAL configuration dialog while using XAudio2 results in a crash.
-  - This issue seems to be related to OpenAL and nothing can be done about it.
-  - Caused by: OALConfig.cpp: line 41: "ALFunction.alcGetString( NULL, ALC_DEVICE_SPECIFIER );"
-  - Does not happen with DirectSound for some reason.
 
 =================
 Credits
