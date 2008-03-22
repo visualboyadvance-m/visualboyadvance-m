@@ -21,18 +21,70 @@
 VideoOptionsPage::VideoOptionsPage(QWidget *parent)
 	: QWidget(parent)
 {
-	QGroupBox *RenderGroup = new QGroupBox(tr("Renderer Selection"));
+	QGroupBox *RenderGroup = new QGroupBox(tr("Renderer Options"));
 	QLabel *RenderLabel = new QLabel(tr("Renderer:"));
 	QComboBox *RenderCombo = new QComboBox;
 	RenderCombo->addItem("OpenGL");
 	RenderCombo->addItem("QPainter");
 
+        QLabel *ResLabel = new QLabel(tr("Resolution:"));
+        QComboBox *ResCombo = new QComboBox;
+	ResCombo->addItem("320x200");
+	ResCombo->addItem("320x240");
+        ResCombo->addItem("400x300");
+        ResCombo->addItem("512x384");
+        ResCombo->addItem("640x480");
+        ResCombo->addItem("800x600");
+        ResCombo->addItem("1024x768");
+        ResCombo->addItem("1280x1024");
+
+        QLabel *SWFilterLabel = new QLabel(tr("Software Filter:"));
+        QComboBox *SWFilterCombo = new QComboBox;
+	SWFilterCombo->addItem("2xSai");
+	SWFilterCombo->addItem("HQ2X");
+        SWFilterCombo->addItem("HQ3X");
+        SWFilterCombo->addItem("HQ4X");
+        SWFilterCombo->addItem("Super Eagle");
+        SWFilterCombo->addItem("SuperScale");
+        SWFilterCombo->addItem("Bilinear Plus");
+
+        QLabel *HWFilterLabel = new QLabel(tr("Hardware Filter:"));
+        QComboBox *HWFilterCombo = new QComboBox;
+	HWFilterCombo->addItem("Nearest");
+	HWFilterCombo->addItem("Bilinear");
+
 	QHBoxLayout *RenderLayout = new QHBoxLayout;
 	RenderLayout->addWidget(RenderLabel);
 	RenderLayout->addWidget(RenderCombo);
+        
+        QHBoxLayout *ResLayout = new QHBoxLayout;
+        ResLayout->addWidget(ResLabel);
+	ResLayout->addWidget(ResCombo);
+
+        QHBoxLayout *SWFilterLayout = new QHBoxLayout;
+        SWFilterLayout->addWidget(SWFilterLabel);
+	SWFilterLayout->addWidget(SWFilterCombo);
+
+        QHBoxLayout *HWFilterLayout = new QHBoxLayout;
+        HWFilterLayout->addWidget(HWFilterLabel);
+	HWFilterLayout->addWidget(HWFilterCombo);
+        
+        QCheckBox *TripleBufCheckBox = new QCheckBox(tr("Triple Buffering"));
+        QCheckBox *VerticalSyncCheckBox = new QCheckBox(tr("Vertical Sync"));
+        QCheckBox *DisableStatCheckBox = new QCheckBox(tr("Disable status messages"));
+
+
+        QGridLayout *CheckLayout = new QGridLayout;
+        CheckLayout->addWidget(TripleBufCheckBox, 3, 2);
+        CheckLayout->addWidget(VerticalSyncCheckBox, 4, 2);
+        CheckLayout->addWidget(DisableStatCheckBox, 5, 2);
 
 	QVBoxLayout *configLayout = new QVBoxLayout;
 	configLayout->addLayout(RenderLayout);
+        configLayout->addLayout(ResLayout);
+        configLayout->addLayout(HWFilterLayout);
+        configLayout->addLayout(SWFilterLayout);
+        configLayout->addLayout(CheckLayout);
 	RenderGroup->setLayout(configLayout);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -135,4 +187,53 @@ InputOptionsPage::InputOptionsPage(QWidget *parent)
 SoundOptionsPage::SoundOptionsPage(QWidget *parent)
 : QWidget(parent)
 {
+       	QGroupBox *SoundGroup = new QGroupBox(tr("Sound Options"));
+
+       	QLabel *APILabel = new QLabel(tr("Sound API:"));
+       	QComboBox *APICombo = new QComboBox;
+       	APICombo->addItem("DirectSound");
+       	APICombo->addItem("OpenAL");
+       	APICombo->addItem("XAudio2");
+       	APICombo->addItem("OSS");
+
+       	QLabel *SRLabel = new QLabel(tr("Sample Rate:"));
+       	QComboBox *SRCombo = new QComboBox;
+       	SRCombo->addItem("11025 Hz");
+       	SRCombo->addItem("22050 Hz");
+       	SRCombo->addItem("44100 Hz");
+       	SRCombo->addItem("48000 Hz");
+
+
+       	QHBoxLayout *APILayout = new QHBoxLayout;
+       	APILayout->addWidget(APILabel);
+       	APILayout->addWidget(APICombo);
+       
+       	QHBoxLayout *SRLayout = new QHBoxLayout;
+       	SRLayout->addWidget(SRLabel);
+       	SRLayout->addWidget(SRCombo);
+
+       	QCheckBox *SoundSyncCheckBox = new QCheckBox(tr("Sync game to audio"));
+	QCheckBox *MuteAudioCheckBox = new QCheckBox(tr("Mute audio"));
+	QCheckBox *InterpolateCheckBox = new QCheckBox(tr("Interpolate audio"));
+        QCheckBox *EchoCheckBox = new QCheckBox(tr("GB audio echo"));
+
+
+       	QGridLayout *CheckLayout = new QGridLayout;
+       	CheckLayout->addWidget(SoundSyncCheckBox, 3, 2);
+       	CheckLayout->addWidget(MuteAudioCheckBox, 4, 2);
+       	CheckLayout->addWidget(InterpolateCheckBox, 5, 2);
+        CheckLayout->addWidget(EchoCheckBox, 6, 2);
+
+
+       	QVBoxLayout *configLayout = new QVBoxLayout;
+       	configLayout->addLayout(APILayout);
+       	configLayout->addLayout(SRLayout);
+        configLayout->addLayout(CheckLayout);
+       	SoundGroup->setLayout(configLayout);
+
+
+	QVBoxLayout *mainLayout = new QVBoxLayout;
+	mainLayout->addWidget(SoundGroup);
+	mainLayout->addStretch(1);
+	setLayout(mainLayout);
 }
