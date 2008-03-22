@@ -32,7 +32,7 @@ System Requirements
 ===================
 
 OS:  Windows 2000 - Vista (x86 or x64)
-CPU: 700MHz minimum for GBA emulation, CPU requirements increase if Filters are to be used.
+CPU: 700MHz minimum for GBA emulation, CPU requirements increase if filters are to be used.
 RAM: ~64MB free
 GFX: ~32MB VRAM, DirectX9 drivers
 
