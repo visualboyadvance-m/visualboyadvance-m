@@ -97,7 +97,7 @@ LONG_PTR defvalues[JOYPADS * KEYS_PER_PAD + MOTION_KEYS] =
   {
     DIK_LEFT,  DIK_RIGHT,
     DIK_UP,    DIK_DOWN,
-    DIK_Z,     DIK_X,
+    DIK_X,     DIK_Z,
     DIK_RETURN,DIK_BACK,
     DIK_A,     DIK_S,
     DIK_SPACE, DIK_F12,
