@@ -148,3 +148,6 @@ DJRobX
 Nach
 Jonas Quinn
 Spacy
+
+Special Thanks go to:
+chrono - ASM genius, fixed a bug in the HQ3x/4x filters and made them thread-safe
