@@ -381,7 +381,10 @@ NEWSYM hq3x_32
     mov     ebx,[ebp+Xres]
     shl     ebx,1
     mov     dword[prevline],0
-    mov     dword[nextline],ebx
+    mov     eax, ebx
+    add     eax, [ebp+offset]
+    mov     dword[nextline],eax
+
 .loopy
     mov     ecx,[ebp+Xres]
     sub     ecx,2                 ; x={Xres-2, Xres-1} are special cases.
