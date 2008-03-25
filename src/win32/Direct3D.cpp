@@ -20,6 +20,9 @@
 
 #ifndef NO_D3D
 
+// The number of pixel-filter threads to be created
+#define NTHREADS 4
+
 #pragma comment( lib, "d3d9" )
 #pragma comment( lib, "d3dx9" )
 #pragma comment( lib, "DxErr9" )
@@ -38,6 +41,7 @@
 #include "../dmg/gbGlobals.h"
 
 #include <memory.h>
+#include <cassert>
 
 // Direct3D
 #ifdef _DEBUG
@@ -63,6 +67,33 @@ extern "C" bool cpu_mmx;
 extern bool detectMMX();
 #endif
 
+struct PFTHREAD_DATA {
+	void (*filterFunction)(u8*,u32,u8*,u8*,u32,int,int);
+	u8 *sourcePointer;
+	u32 sourcePitch;
+	u8 *deltaPointer;
+	u8* destPointer;
+	u32 destPitch;
+	int width;
+	int height;
+};
+
+DWORD WINAPI pfthread_func( LPVOID lpParameter )
+{
+	PFTHREAD_DATA *data = (PFTHREAD_DATA*)lpParameter;
+
+	data->filterFunction(
+		data->sourcePointer,
+		data->sourcePitch,
+		data->deltaPointer,
+		data->destPointer,
+		data->destPitch,
+		data->width,
+		data->height );
+
+	return 0;
+}
+
 class Direct3DDisplay : public IDisplay {
 private:
 	bool                  initialized;
@@ -81,6 +112,8 @@ private:
 	bool                  failed;
 	ID3DXFont             *pFont;
 	bool                  rectangleFillsScreen;
+	PFTHREAD_DATA         *pfthread_data;
+	HANDLE                *hThreads;
 
 	struct VERTEX {
 		FLOAT x, y, z, rhw; // screen coordinates
@@ -139,6 +172,8 @@ Direct3DDisplay::Direct3DDisplay()
 	mbCurrentTexture = 0;
 	mbTextureEmpty = true;
 	rectangleFillsScreen = false;
+	pfthread_data = NULL;
+	hThreads = NULL;
 }
 
 
@@ -190,6 +225,16 @@ void Direct3DDisplay::prepareDisplayMode()
 
 void Direct3DDisplay::cleanup()
 {
+	if( hThreads ) {
+		free( hThreads );
+		hThreads = NULL;
+	}
+
+	if( pfthread_data ) {
+		free( pfthread_data );
+		pfthread_data = NULL;
+	}
+
 	destroyFont();
 	destroyTexture();
 
@@ -324,6 +369,18 @@ bool Direct3DDisplay::initialize()
 	setOption( _T("d3dFilter"), theApp.d3dFilter );
 	setOption( _T("motionBlur"), theApp.d3dMotionBlur );
 
+	// create pfthread_data
+	pfthread_data = (PFTHREAD_DATA*)malloc( sizeof(PFTHREAD_DATA) * NTHREADS );
+	if( !pfthread_data ) {
+		failed = true;
+	}
+
+	// create thread handles
+	hThreads = (HANDLE*)malloc( sizeof(HANDLE) * NTHREADS );
+	if( !hThreads ) {
+		failed = true;
+	}
+
 	if(failed) return false;
 
 	initialized = true;
@@ -386,8 +443,64 @@ void Direct3DDisplay::render()
 		DXTRACE_ERR_MSGBOX( _T("Can not lock texture"), hr );
 		return;
 	} else {
-		unsigned short pitch = theApp.sizeX * ( systemColorDepth >> 3 ) + 4;
+		u32 pitch = theApp.sizeX * ( systemColorDepth >> 3 ) + 4;
 		if( theApp.filterFunction ) {
+			u8 *start = pix + pitch;
+			int src_height_per_thread = theApp.sizeY / NTHREADS;
+			int src_height_remaining = theApp.sizeY - ( ( theApp.sizeY / NTHREADS ) * NTHREADS );
+			u32 src_bytes_per_thread = pitch * src_height_per_thread;
+
+			int dst_height_per_thread = src_height_per_thread * theApp.filterMagnification;
+			u32 dst_bytes_per_thread = lr.Pitch * dst_height_per_thread;
+
+			// Use Multi Threading
+			assert( NTHREADS > 0 );
+			for( int i = ( NTHREADS - 1 ) ; i > -1 ; i-- ) {
+				// create last thread first because it could have more work than the others (for eg. if NTHREADS = 3)
+				// (last thread has to process the remaining lines if (height / NTHREADS) is not an integer)
+
+				// configure thread
+				pfthread_data[i].filterFunction = theApp.filterFunction;
+				pfthread_data[i].sourcePointer = start + ( i * src_bytes_per_thread );
+				pfthread_data[i].sourcePitch = pitch;
+				pfthread_data[i].deltaPointer = (u8*)theApp.delta; // TODO: check if thread-safe
+				pfthread_data[i].destPointer = ( (u8*)lr.pBits ) + ( i * dst_bytes_per_thread );
+				pfthread_data[i].destPitch = lr.Pitch;
+				pfthread_data[i].width = theApp.sizeX;
+				
+				if( i == ( NTHREADS - 1 ) ) {
+					// last thread
+					pfthread_data[i].height = src_height_per_thread + src_height_remaining;
+				} else {
+					// other thread
+					pfthread_data[i].height = src_height_per_thread;
+				}
+
+				// create thread
+				hThreads[i] = CreateThread(
+					NULL,
+					0,
+					pfthread_func,
+					&pfthread_data[i],
+					0,
+					NULL );
+				assert( hThreads[i] != NULL );
+			}
+
+			// Wait until every thread has finished.
+			WaitForMultipleObjects(
+				NTHREADS,
+				hThreads,
+				TRUE,
+				INFINITE );
+
+			// Close all thread handles.
+			for( int i = 0 ; i < NTHREADS ; i++ ) {
+				CloseHandle( hThreads[i] );
+			}
+
+
+			/* without threads
 			// pixel filter enabled
 			theApp.filterFunction(
 				pix + pitch,
@@ -398,6 +511,7 @@ void Direct3DDisplay::render()
 				theApp.sizeX,
 				theApp.sizeY
 				);
+			*/
 		} else {
 			// pixel filter disabled
 			switch( systemColorDepth )
