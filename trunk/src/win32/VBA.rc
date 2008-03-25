@@ -190,7 +190,7 @@ EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "About"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    ICON            IDI_MAINICON,IDC_STATIC,6,6,21,20
+    ICON            IDI_MAINICON,IDC_STATIC,6,6,20,20
     CTEXT           "VisualBoyAdvance Emulator",IDC_STATIC,36,6,138,8
     CTEXT           "Copyright © 2008 VBA-M development team",IDC_STATIC,6,48,168,8
     CTEXT           "https://vbam.bountysource.com",IDC_URL,6,138,168,8
@@ -201,7 +201,7 @@ BEGIN
     RTEXT           "Date compiled:",IDC_STATIC,36,30,54,8
     LTEXT           "",IDC_DATE,96,30,78,8,SS_NOPREFIX
     GROUPBOX        "Thanks go to:",IDC_STATIC,102,72,72,60
-    CTEXT           "Orig. VBA team\nCostis",IDC_STATIC,108,84,60,42
+    CTEXT           "Orig. VBA team\nCostis\nchrono",IDC_STATIC,108,84,60,42
 END
 
 IDD_DIRECTORIES DIALOGEX 0, 0, 222, 270
@@ -2229,4 +2229,15 @@ END
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////
 
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
 
