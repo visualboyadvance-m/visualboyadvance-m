@@ -1,4 +1,4 @@
-;hq3x filter
+;hq3x filter (thread-safe version)
 ;32bpp output
 ;----------------------------------------------------------
 ;Copyright (C) 2003 MaxSt ( maxst@hiend3d.com )
@@ -23,29 +23,6 @@
 EXTSYM LUT16to32,RGBtoYUV
 
 SECTION .bss
-linesleft resd 1
-xcounter  resd 1
-cross     resd 1
-nextline  resd 1
-prevline  resd 1
-w1        resd 1
-w2        resd 1
-w3        resd 1
-w4        resd 1
-w5        resd 1
-w6        resd 1
-w7        resd 1
-w8        resd 1
-w9        resd 1
-c1        resd 1
-c2        resd 1
-c3        resd 1
-c4        resd 1
-c5        resd 1
-c6        resd 1
-c7        resd 1
-c8        resd 1
-c9        resd 1
 
 SECTION .data
 
@@ -183,27 +160,27 @@ SECTION .text
 %endmacro
 
 %macro PIXEL00_1M 0
-    Interp1 [edi],eax,[c1]
+    Interp1 [edi],eax,dword[ebp-c1]
 %endmacro
 
 %macro PIXEL00_1U 0
-    Interp1 [edi],eax,[c2]
+    Interp1 [edi],eax,dword[ebp-c2]
 %endmacro
 
 %macro PIXEL00_1L 0
-    Interp1 [edi],eax,[c4]
+    Interp1 [edi],eax,dword[ebp-c4]
 %endmacro
 
 %macro PIXEL00_2 0
-    Interp2 [edi],eax,[c4],[c2]
+    Interp2 [edi],eax,dword[ebp-c4],dword[ebp-c2]
 %endmacro
 
 %macro PIXEL00_4 0
-    Interp4 [edi],[c4],[c2]
+    Interp4 [edi],dword[ebp-c4],dword[ebp-c2]
 %endmacro
 
 %macro PIXEL00_5 0
-    Interp5 [edi],[c4],[c2]
+    Interp5 [edi],dword[ebp-c4],dword[ebp-c2]
 %endmacro
 
 %macro PIXEL00_C 0
@@ -211,15 +188,15 @@ SECTION .text
 %endmacro
 
 %macro PIXEL01_1 0
-    Interp1 [edi+4],eax,[c2]
+    Interp1 [edi+4],eax,dword[ebp-c2]
 %endmacro
 
 %macro PIXEL01_3 0
-    Interp3 [edi+4],[c2]
+    Interp3 [edi+4],dword[ebp-c2]
 %endmacro
 
 %macro PIXEL01_6 0
-    Interp1 [edi+4],[c2],eax
+    Interp1 [edi+4],dword[ebp-c2],eax
 %endmacro
 
 %macro PIXEL01_C 0
@@ -227,27 +204,27 @@ SECTION .text
 %endmacro
 
 %macro PIXEL02_1M 0
-    Interp1 [edi+8],eax,[c3]
+    Interp1 [edi+8],eax,dword[ebp-c3]
 %endmacro
 
 %macro PIXEL02_1U 0
-    Interp1 [edi+8],eax,[c2]
+    Interp1 [edi+8],eax,dword[ebp-c2]
 %endmacro
 
 %macro PIXEL02_1R 0
-    Interp1 [edi+8],eax,[c6]
+    Interp1 [edi+8],eax,dword[ebp-c6]
 %endmacro
 
 %macro PIXEL02_2 0
-    Interp2 [edi+8],eax,[c2],[c6]
+    Interp2 [edi+8],eax,dword[ebp-c2],dword[ebp-c6]
 %endmacro
 
 %macro PIXEL02_4 0
-    Interp4 [edi+8],[c2],[c6]
+    Interp4 [edi+8],dword[ebp-c2],dword[ebp-c6]
 %endmacro
 
 %macro PIXEL02_5 0
-    Interp5 [edi+8],[c2],[c6]
+    Interp5 [edi+8],dword[ebp-c2],dword[ebp-c6]
 %endmacro
 
 %macro PIXEL02_C 0
@@ -255,15 +232,15 @@ SECTION .text
 %endmacro
 
 %macro PIXEL10_1 0
-    Interp1 [edi+ebx],eax,[c4]
+    Interp1 [edi+ebx],eax,dword[ebp-c4]
 %endmacro
 
 %macro PIXEL10_3 0
-    Interp3 [edi+ebx],[c4]
+    Interp3 [edi+ebx],dword[ebp-c4]
 %endmacro
 
 %macro PIXEL10_6 0
-    Interp1 [edi+ebx],[c4],eax
+    Interp1 [edi+ebx],dword[ebp-c4],eax
 %endmacro
 
 %macro PIXEL10_C 0
@@ -275,15 +252,15 @@ SECTION .text
 %endmacro
 
 %macro PIXEL12_1 0
-    Interp1 [edi+ebx+8],eax,[c6]
+    Interp1 [edi+ebx+8],eax,dword[ebp-c6]
 %endmacro
 
 %macro PIXEL12_3 0
-    Interp3 [edi+ebx+8],[c6]
+    Interp3 [edi+ebx+8],dword[ebp-c6]
 %endmacro
 
 %macro PIXEL12_6 0
-    Interp1 [edi+ebx+8],[c6],eax
+    Interp1 [edi+ebx+8],dword[ebp-c6],eax
 %endmacro
 
 %macro PIXEL12_C 0
@@ -291,27 +268,27 @@ SECTION .text
 %endmacro
 
 %macro PIXEL20_1M 0
-    Interp1 [edi+ebx*2],eax,[c7]
+    Interp1 [edi+ebx*2],eax,dword[ebp-c7]
 %endmacro
 
 %macro PIXEL20_1D 0
-    Interp1 [edi+ebx*2],eax,[c8]
+    Interp1 [edi+ebx*2],eax,dword[ebp-c8]
 %endmacro
 
 %macro PIXEL20_1L 0
-    Interp1 [edi+ebx*2],eax,[c4]
+    Interp1 [edi+ebx*2],eax,dword[ebp-c4]
 %endmacro
 
 %macro PIXEL20_2 0
-    Interp2 [edi+ebx*2],eax,[c8],[c4]
+    Interp2 [edi+ebx*2],eax,dword[ebp-c8],dword[ebp-c4]
 %endmacro
 
 %macro PIXEL20_4 0
-    Interp4 [edi+ebx*2],[c8],[c4]
+    Interp4 [edi+ebx*2],dword[ebp-c8],dword[ebp-c4]
 %endmacro
 
 %macro PIXEL20_5 0
-    Interp5 [edi+ebx*2],[c8],[c4]
+    Interp5 [edi+ebx*2],dword[ebp-c8],dword[ebp-c4]
 %endmacro
 
 %macro PIXEL20_C 0
@@ -319,15 +296,15 @@ SECTION .text
 %endmacro
 
 %macro PIXEL21_1 0
-    Interp1 [edi+ebx*2+4],eax,[c8]
+    Interp1 [edi+ebx*2+4],eax,dword[ebp-c8]
 %endmacro
 
 %macro PIXEL21_3 0
-    Interp3 [edi+ebx*2+4],[c8]
+    Interp3 [edi+ebx*2+4],dword[ebp-c8]
 %endmacro
 
 %macro PIXEL21_6 0
-    Interp1 [edi+ebx*2+4],[c8],eax
+    Interp1 [edi+ebx*2+4],dword[ebp-c8],eax
 %endmacro
 
 %macro PIXEL21_C 0
@@ -335,27 +312,27 @@ SECTION .text
 %endmacro
 
 %macro PIXEL22_1M 0
-    Interp1 [edi+ebx*2+8],eax,[c9]
+    Interp1 [edi+ebx*2+8],eax,dword[ebp-c9]
 %endmacro
 
 %macro PIXEL22_1D 0
-    Interp1 [edi+ebx*2+8],eax,[c8]
+    Interp1 [edi+ebx*2+8],eax,dword[ebp-c8]
 %endmacro
 
 %macro PIXEL22_1R 0
-    Interp1 [edi+ebx*2+8],eax,[c6]
+    Interp1 [edi+ebx*2+8],eax,dword[ebp-c6]
 %endmacro
 
 %macro PIXEL22_2 0
-    Interp2 [edi+ebx*2+8],eax,[c6],[c8]
+    Interp2 [edi+ebx*2+8],eax,dword[ebp-c6],dword[ebp-c8]
 %endmacro
 
 %macro PIXEL22_4 0
-    Interp4 [edi+ebx*2+8],[c6],[c8]
+    Interp4 [edi+ebx*2+8],dword[ebp-c6],dword[ebp-c8]
 %endmacro
 
 %macro PIXEL22_5 0
-    Interp5 [edi+ebx*2+8],[c6],[c8]
+    Interp5 [edi+ebx*2+8],dword[ebp-c6],dword[ebp-c8]
 %endmacro
 
 %macro PIXEL22_C 0
@@ -369,95 +346,120 @@ Yres         equ 20
 pitch        equ 24
 offset       equ 28
 
+linesleft equ 4
+xcounter  equ 8
+cross     equ 12
+nextline  equ 16
+prevline  equ 20
+w1        equ 24
+w2        equ 28
+w3        equ 32
+w4        equ 36
+w5        equ 40
+w6        equ 44
+w7        equ 48
+w8        equ 52
+w9        equ 56
+c1        equ 60
+c2        equ 64
+c3        equ 68
+c4        equ 72
+c5        equ 76
+c6        equ 80
+c7        equ 84
+c8        equ 88
+c9        equ 92
+localsize equ 92
+
 NEWSYM hq3x_32
     push ebp
     mov ebp,esp
+    sub esp, localsize
     pushad
 
     mov     esi,[ebp+inbuffer]
     mov     edi,[ebp+outbuffer]
     mov     edx,[ebp+Yres]
-    mov     [linesleft],edx
+    mov     [ebp-linesleft],edx
     mov     ebx,[ebp+Xres]
     shl     ebx,1
-    mov     dword[prevline],0
+    mov     dword[ebp-prevline],0
     mov     eax, ebx
     add     eax, [ebp+offset]
-    mov     dword[nextline],eax
-
+    mov     dword[ebp-nextline],eax
 .loopy
     mov     ecx,[ebp+Xres]
     sub     ecx,2                 ; x={Xres-2, Xres-1} are special cases.
-    mov     dword[xcounter],ecx
+    mov     dword[ebp-xcounter],ecx
     ; x=0 - special case
-    mov     ebx,[prevline]
+    mov     ebx,[ebp-prevline]
     movq    mm5,[esi+ebx]
     movq    mm6,[esi]
-    mov     ebx,[nextline]
+    mov     ebx,[ebp-nextline]
     movq    mm7,[esi+ebx]
     movd    eax,mm5
     movzx   edx,ax
-    mov     [w1],edx
-    mov     [w2],edx
+    mov     [ebp-w1],edx
+    mov     [ebp-w2],edx
     shr     eax,16
-    mov     [w3],eax
+    mov     [ebp-w3],eax
     movd    eax,mm6
     movzx   edx,ax
-    mov     [w4],edx
-    mov     [w5],edx
+    mov     [ebp-w4],edx
+    mov     [ebp-w5],edx
     shr     eax,16
-    mov     [w6],eax
+    mov     [ebp-w6],eax
     movd    eax,mm7
     movzx   edx,ax
-    mov     [w7],edx
-    mov     [w8],edx
+    mov     [ebp-w7],edx
+    mov     [ebp-w8],edx
     shr     eax,16
-    mov     [w9],eax
+    mov     [ebp-w9],eax
     jmp     .flags
 .loopx
-    mov     ebx,[prevline]
+    mov     ebx,[ebp-prevline]
     movq    mm5,[esi+ebx-2]
     movq    mm6,[esi-2]
-    mov     ebx,[nextline]
+    mov     ebx,[ebp-nextline]
     movq    mm7,[esi+ebx-2]
     movd    eax,mm5
     movzx   edx,ax
-    mov     [w1],edx
+    mov     [ebp-w1],edx
     shr     eax,16
-    mov     [w2],eax
+    mov     [ebp-w2],eax
     psrlq   mm5,32
     movd    eax,mm5
     movzx   edx,ax
-    mov     [w3],edx
+    mov     [ebp-w3],edx
     movd    eax,mm6
     movzx   edx,ax
-    mov     [w4],edx
+    mov     [ebp-w4],edx
     shr     eax,16
-    mov     [w5],eax
+    mov     [ebp-w5],eax
     psrlq   mm6,32
     movd    eax,mm6
     movzx   edx,ax
-    mov     [w6],edx
+    mov     [ebp-w6],edx
     movd    eax,mm7
     movzx   edx,ax
-    mov     [w7],edx
+    mov     [ebp-w7],edx
     shr     eax,16
-    mov     [w8],eax
+    mov     [ebp-w8],eax
     psrlq   mm7,32
     movd    eax,mm7
     movzx   edx,ax
-    mov     [w9],edx
+    mov     [ebp-w9],edx
 .flags
     mov     ebx,RGBtoYUV
-    mov     eax,[w5]
+    mov     eax,[ebp-w5]
     xor     ecx,ecx
     movd    mm5,[ebx+eax*4]
-    mov     dword[cross],0
+    mov     dword[ebp-cross],0
 
-    mov     edx,[w2]
+    mov     edx,[ebp-w2]
     cmp     eax,edx
     je      .noflag2
-    or      dword[cross],1
+    or      dword[ebp-cross],1
     movq    mm1,mm5
     movd    mm2,[ebx+edx*4]
     psubusb mm1,mm2
@@ -469,10 +471,10 @@ NEWSYM hq3x_32
     jz      .noflag2
     or      ecx,2
 .noflag2
-    mov     edx,[w4]
+    mov     edx,[ebp-w4]
     cmp     eax,edx
     je      .noflag4
-    or      dword[cross],2
+    or      dword[ebp-cross],2
     movq    mm1,mm5
     movd    mm2,[ebx+edx*4]
     psubusb mm1,mm2
@@ -484,10 +486,10 @@ NEWSYM hq3x_32
     jz      .noflag4
     or      ecx,8
 .noflag4
-    mov     edx,[w6]
+    mov     edx,[ebp-w6]
     cmp     eax,edx
     je      .noflag6
-    or      dword[cross],4
+    or      dword[ebp-cross],4
     movq    mm1,mm5
     movd    mm2,[ebx+edx*4]
     psubusb mm1,mm2
@@ -499,10 +501,10 @@ NEWSYM hq3x_32
     jz      .noflag6
     or      ecx,16
 .noflag6
-    mov     edx,[w8]
+    mov     edx,[ebp-w8]
     cmp     eax,edx
     je      .noflag8
-    or      dword[cross],8
+    or      dword[ebp-cross],8
     movq    mm1,mm5
     movd    mm2,[ebx+edx*4]
     psubusb mm1,mm2
@@ -516,12 +518,12 @@ NEWSYM hq3x_32
 .noflag8
     test    ecx,ecx
     jnz     .testflag1
-    mov     ecx,[cross]
+    mov     ecx,[ebp-cross]
     mov     ebx,LUT16to32
     mov     eax,[ebx+eax*4]
     jmp     [FuncTable2+ecx*4]
 .testflag1
-    mov     edx,[w1]
+    mov     edx,[ebp-w1]
     cmp     eax,edx
     je      .noflag1
     movq    mm1,mm5
@@ -535,7 +537,7 @@ NEWSYM hq3x_32
     jz      .noflag1
     or      ecx,1
 .noflag1
-    mov     edx,[w3]
+    mov     edx,[ebp-w3]
     cmp     eax,edx
     je      .noflag3
     movq    mm1,mm5
@@ -549,7 +551,7 @@ NEWSYM hq3x_32
     jz      .noflag3
     or      ecx,4
 .noflag3
-    mov     edx,[w7]
+    mov     edx,[ebp-w7]
     cmp     eax,edx
     je      .noflag7
     movq    mm1,mm5
@@ -563,7 +565,7 @@ NEWSYM hq3x_32
     jz      .noflag7
     or      ecx,32
 .noflag7
-    mov     edx,[w9]
+    mov     edx,[ebp-w9]
     cmp     eax,edx
     je      .noflag9
     movq    mm1,mm5
@@ -579,32 +581,32 @@ NEWSYM hq3x_32
 .noflag9
     mov  ebx,LUT16to32
     mov  eax,[ebx+eax*4]
-    mov  edx,[w2]
+    mov  edx,[ebp-w2]
     mov  edx,[ebx+edx*4]
-    mov  [c2],edx
-    mov  edx,[w4]
+    mov  [ebp-c2],edx
+    mov  edx,[ebp-w4]
     mov  edx,[ebx+edx*4]
-    mov  [c4],edx
-    mov  edx,[w6]
+    mov  [ebp-c4],edx
+    mov  edx,[ebp-w6]
     mov  edx,[ebx+edx*4]
-    mov  [c6],edx
-    mov  edx,[w8]
+    mov  [ebp-c6],edx
+    mov  edx,[ebp-w8]
     mov  edx,[ebx+edx*4]
-    mov  [c8],edx
+    mov  [ebp-c8],edx
     test ecx,0x005A
     jz  .switch
-    mov  edx,[w1]
+    mov  edx,[ebp-w1]
     mov  edx,[ebx+edx*4]
-    mov  [c1],edx
-    mov  edx,[w3]
+    mov  [ebp-c1],edx
+    mov  edx,[ebp-w3]
     mov  edx,[ebx+edx*4]
-    mov  [c3],edx
-    mov  edx,[w7]
+    mov  [ebp-c3],edx
+    mov  edx,[ebp-w7]
     mov  edx,[ebx+edx*4]
-    mov  [c7],edx
-    mov  edx,[w9]
+    mov  [ebp-c7],edx
+    mov  edx,[ebp-w9]
     mov  edx,[ebx+edx*4]
-    mov  [c9],edx
+    mov  [ebp-c9],edx
 .switch
     mov  ebx,[ebp+pitch]
     jmp  [FuncTable+ecx*4]
@@ -638,41 +640,41 @@ NEWSYM hq3x_32
 ;   the same, only optimized
     mov ecx,eax
     shl ecx,1
-    add ecx,[c2]
+    add ecx,[ebp-c2]
     mov edx,ecx
-    add edx,[c4]
+    add edx,[ebp-c4]
     shr edx,2
     mov [edi],edx
     mov edx,ecx
     add edx,eax
     shr edx,2
     mov [edi+4],edx
-    add ecx,[c6]
+    add ecx,[ebp-c6]
     shr ecx,2
     mov [edi+8],ecx
     mov ecx,eax
     shl ecx,2
     sub ecx,eax
     mov edx,ecx
-    add edx,[c4]
+    add edx,[ebp-c4]
     shr edx,2
     mov [edi+ebx],edx
     mov [edi+ebx+4],eax
-    add ecx,[c6]
+    add ecx,[ebp-c6]
     shr ecx,2
     mov [edi+ebx+8],ecx
     mov ecx,eax
     shl ecx,1
-    add ecx,[c8]
+    add ecx,[ebp-c8]
     mov edx,ecx
-    add edx,[c4]
+    add edx,[ebp-c4]
     shr edx,2
     mov [edi+ebx*2],edx
     mov edx,ecx
     add edx,eax
     shr edx,2
     mov [edi+ebx*2+4],edx
-    add ecx,[c6]
+    add ecx,[ebp-c6]
     shr ecx,2
     mov [edi+ebx*2+8],ecx
     jmp .loopx_end
@@ -847,7 +849,7 @@ NEWSYM hq3x_32
 ..@flag18
 ..@flag50
     PIXEL00_1M
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_1M,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_1M,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
     PIXEL10_1
     PIXEL11
     PIXEL20_2
@@ -862,7 +864,7 @@ NEWSYM hq3x_32
     PIXEL10_1
     PIXEL11
     PIXEL20_1M
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL21_C,PIXEL22_1M,PIXEL12_3,PIXEL21_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL21_C,PIXEL22_1M,PIXEL12_3,PIXEL21_3,PIXEL22_4
     jmp .loopx_end
 ..@flag72
 ..@flag76
@@ -871,12 +873,12 @@ NEWSYM hq3x_32
     PIXEL02_2
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_1M,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_1M,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
     PIXEL22_1M
     jmp .loopx_end
 ..@flag10
 ..@flag138
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
     PIXEL02_1M
     PIXEL11
     PIXEL12_1
@@ -961,7 +963,7 @@ NEWSYM hq3x_32
 ..@flag22
 ..@flag54
     PIXEL00_1M
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
     PIXEL10_1
     PIXEL11
     PIXEL20_2
@@ -976,7 +978,7 @@ NEWSYM hq3x_32
     PIXEL10_1
     PIXEL11
     PIXEL20_1M
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
     jmp .loopx_end
 ..@flag104
 ..@flag108
@@ -985,12 +987,12 @@ NEWSYM hq3x_32
     PIXEL02_2
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
     PIXEL22_1M
     jmp .loopx_end
 ..@flag11
 ..@flag139
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
     PIXEL02_1M
     PIXEL11
     PIXEL12_1
@@ -1000,7 +1002,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag19
 ..@flag51
-    DiffOrNot w2,w6,PIXEL00_1L,PIXEL01_C,PIXEL02_1M,PIXEL12_C,PIXEL00_2,PIXEL01_6,PIXEL02_5,PIXEL12_1
+    DiffOrNot ebp-w2,ebp-w6,PIXEL00_1L,PIXEL01_C,PIXEL02_1M,PIXEL12_C,PIXEL00_2,PIXEL01_6,PIXEL02_5,PIXEL12_1
     PIXEL10_1
     PIXEL11
     PIXEL20_2
@@ -1009,7 +1011,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag146
 ..@flag178
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_1M,PIXEL12_C,PIXEL22_1D,PIXEL01_1,PIXEL02_5,PIXEL12_6,PIXEL22_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_1M,PIXEL12_C,PIXEL22_1D,PIXEL01_1,PIXEL02_5,PIXEL12_6,PIXEL22_2
     PIXEL00_1M
     PIXEL10_1
     PIXEL11
@@ -1018,7 +1020,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag84
 ..@flag85
-    DiffOrNot w6,w8,PIXEL02_1U,PIXEL12_C,PIXEL21_C,PIXEL22_1M,PIXEL02_2,PIXEL12_6,PIXEL21_1,PIXEL22_5
+    DiffOrNot ebp-w6,ebp-w8,PIXEL02_1U,PIXEL12_C,PIXEL21_C,PIXEL22_1M,PIXEL02_2,PIXEL12_6,PIXEL21_1,PIXEL22_5
     PIXEL00_2
     PIXEL01_1
     PIXEL10_1
@@ -1027,7 +1029,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag112
 ..@flag113
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL20_1L,PIXEL21_C,PIXEL22_1M,PIXEL12_1,PIXEL20_2,PIXEL21_6,PIXEL22_5
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL20_1L,PIXEL21_C,PIXEL22_1M,PIXEL12_1,PIXEL20_2,PIXEL21_6,PIXEL22_5
     PIXEL00_2
     PIXEL01_1
     PIXEL02_1M
@@ -1036,7 +1038,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag200
 ..@flag204
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_1M,PIXEL21_C,PIXEL22_1R,PIXEL10_1,PIXEL20_5,PIXEL21_6,PIXEL22_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_1M,PIXEL21_C,PIXEL22_1R,PIXEL10_1,PIXEL20_5,PIXEL21_6,PIXEL22_2
     PIXEL00_1M
     PIXEL01_1
     PIXEL02_2
@@ -1045,7 +1047,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag73
 ..@flag77
-    DiffOrNot w8,w4,PIXEL00_1U,PIXEL10_C,PIXEL20_1M,PIXEL21_C,PIXEL00_2,PIXEL10_6,PIXEL20_5,PIXEL21_1
+    DiffOrNot ebp-w8,ebp-w4,PIXEL00_1U,PIXEL10_C,PIXEL20_1M,PIXEL21_C,PIXEL00_2,PIXEL10_6,PIXEL20_5,PIXEL21_1
     PIXEL01_1
     PIXEL02_2
     PIXEL11
@@ -1054,7 +1056,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag42
 ..@flag170
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL01_C,PIXEL10_C,PIXEL20_1D,PIXEL00_5,PIXEL01_1,PIXEL10_6,PIXEL20_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL01_C,PIXEL10_C,PIXEL20_1D,PIXEL00_5,PIXEL01_1,PIXEL10_6,PIXEL20_2
     PIXEL02_1M
     PIXEL11
     PIXEL12_1
@@ -1063,7 +1065,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag14
 ..@flag142
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL01_C,PIXEL02_1R,PIXEL10_C,PIXEL00_5,PIXEL01_6,PIXEL02_2,PIXEL10_1
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL01_C,PIXEL02_1R,PIXEL10_C,PIXEL00_5,PIXEL01_6,PIXEL02_2,PIXEL10_1
     PIXEL11
     PIXEL12_1
     PIXEL20_1M
@@ -1160,9 +1162,9 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag26
 ..@flag31
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL10_C,PIXEL00_4,PIXEL10_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL10_C,PIXEL00_4,PIXEL10_3
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_C,PIXEL12_C,PIXEL02_4,PIXEL12_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_C,PIXEL12_C,PIXEL02_4,PIXEL12_3
     PIXEL11
     PIXEL20_1M
     PIXEL21_1
@@ -1171,12 +1173,12 @@ NEWSYM hq3x_32
 ..@flag82
 ..@flag214
     PIXEL00_1M
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL01_3,PIXEL02_4
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL01_3,PIXEL02_4
     PIXEL10_1
     PIXEL11
     PIXEL12_C
     PIXEL20_1M
-    DiffOrNot w6,w8,PIXEL21_C,PIXEL22_C,PIXEL21_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL21_C,PIXEL22_C,PIXEL21_3,PIXEL22_4
     jmp .loopx_end
 ..@flag88
 ..@flag248
@@ -1184,22 +1186,22 @@ NEWSYM hq3x_32
     PIXEL01_1
     PIXEL02_1M
     PIXEL11
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL10_3,PIXEL20_4
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL10_3,PIXEL20_4
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL22_C,PIXEL12_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL22_C,PIXEL12_3,PIXEL22_4
     jmp .loopx_end
 ..@flag74
 ..@flag107
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL00_4,PIXEL01_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL00_4,PIXEL01_3
     PIXEL02_1M
     PIXEL10_C
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL20_C,PIXEL21_C,PIXEL20_4,PIXEL21_3
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_C,PIXEL21_C,PIXEL20_4,PIXEL21_3
     PIXEL22_1M
     jmp .loopx_end
 ..@flag27
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
     PIXEL02_1M
     PIXEL11
     PIXEL12_C
@@ -1209,7 +1211,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag86
     PIXEL00_1M
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
     PIXEL10_1
     PIXEL11
     PIXEL20_1M
@@ -1223,7 +1225,7 @@ NEWSYM hq3x_32
     PIXEL10_C
     PIXEL11
     PIXEL20_1M
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
     jmp .loopx_end
 ..@flag106
     PIXEL00_1M
@@ -1231,12 +1233,12 @@ NEWSYM hq3x_32
     PIXEL02_1M
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
     PIXEL22_1M
     jmp .loopx_end
 ..@flag30
     PIXEL00_1M
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
     PIXEL10_C
     PIXEL11
     PIXEL20_1M
@@ -1250,7 +1252,7 @@ NEWSYM hq3x_32
     PIXEL10_1
     PIXEL11
     PIXEL20_1M
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
     jmp .loopx_end
 ..@flag120
     PIXEL00_1M
@@ -1258,11 +1260,11 @@ NEWSYM hq3x_32
     PIXEL02_1M
     PIXEL11
     PIXEL12_C
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
     PIXEL22_1M
     jmp .loopx_end
 ..@flag75
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
     PIXEL02_1M
     PIXEL11
     PIXEL12_1
@@ -1403,9 +1405,9 @@ NEWSYM hq3x_32
     PIXEL22_1D
     jmp .loopx_end
 ..@flag58
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL00_2
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_1M,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_1M,PIXEL02_2
     PIXEL10_C
     PIXEL11
     PIXEL12_C
@@ -1416,13 +1418,13 @@ NEWSYM hq3x_32
 ..@flag83
     PIXEL00_1L
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_1M,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_1M,PIXEL02_2
     PIXEL10_1
     PIXEL11
     PIXEL12_C
     PIXEL20_1M
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_1M,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_1M,PIXEL22_2
     jmp .loopx_end
 ..@flag92
     PIXEL00_1M
@@ -1431,36 +1433,36 @@ NEWSYM hq3x_32
     PIXEL10_C
     PIXEL11
     PIXEL12_C
-    DiffOrNot w8,w4,PIXEL20_1M,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_1M,PIXEL20_2
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_1M,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_1M,PIXEL22_2
     jmp .loopx_end
 ..@flag202
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL00_2
     PIXEL01_C
     PIXEL02_1M
     PIXEL10_C
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL20_1M,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_1M,PIXEL20_2
     PIXEL21_C
     PIXEL22_1R
     jmp .loopx_end
 ..@flag78
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL00_2
     PIXEL01_C
     PIXEL02_1R
     PIXEL10_C
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL20_1M,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_1M,PIXEL20_2
     PIXEL21_C
     PIXEL22_1M
     jmp .loopx_end
 ..@flag154
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL00_2
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_1M,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_1M,PIXEL02_2
     PIXEL10_C
     PIXEL11
     PIXEL12_C
@@ -1471,13 +1473,13 @@ NEWSYM hq3x_32
 ..@flag114
     PIXEL00_1M
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_1M,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_1M,PIXEL02_2
     PIXEL10_1
     PIXEL11
     PIXEL12_C
     PIXEL20_1L
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_1M,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_1M,PIXEL22_2
     jmp .loopx_end
 ..@flag89
     PIXEL00_1U
@@ -1486,24 +1488,24 @@ NEWSYM hq3x_32
     PIXEL10_C
     PIXEL11
     PIXEL12_C
-    DiffOrNot w8,w4,PIXEL20_1M,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_1M,PIXEL20_2
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_1M,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_1M,PIXEL22_2
     jmp .loopx_end
 ..@flag90
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL00_2
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_1M,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_1M,PIXEL02_2
     PIXEL10_C
     PIXEL11
     PIXEL12_C
-    DiffOrNot w8,w4,PIXEL20_1M,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_1M,PIXEL20_2
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_1M,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_1M,PIXEL22_2
     jmp .loopx_end
 ..@flag55
 ..@flag23
-    DiffOrNot w2,w6,PIXEL00_1L,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL00_2,PIXEL01_6,PIXEL02_5,PIXEL12_1
+    DiffOrNot ebp-w2,ebp-w6,PIXEL00_1L,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL00_2,PIXEL01_6,PIXEL02_5,PIXEL12_1
     PIXEL10_1
     PIXEL11
     PIXEL20_2
@@ -1512,7 +1514,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag182
 ..@flag150
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL22_1D,PIXEL01_1,PIXEL02_5,PIXEL12_6,PIXEL22_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL22_1D,PIXEL01_1,PIXEL02_5,PIXEL12_6,PIXEL22_2
     PIXEL00_1M
     PIXEL10_1
     PIXEL11
@@ -1521,7 +1523,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag213
 ..@flag212
-    DiffOrNot w6,w8,PIXEL02_1U,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL02_2,PIXEL12_6,PIXEL21_1,PIXEL22_5
+    DiffOrNot ebp-w6,ebp-w8,PIXEL02_1U,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL02_2,PIXEL12_6,PIXEL21_1,PIXEL22_5
     PIXEL00_2
     PIXEL01_1
     PIXEL10_1
@@ -1530,7 +1532,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag241
 ..@flag240
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL20_1L,PIXEL21_C,PIXEL22_C,PIXEL12_1,PIXEL20_2,PIXEL21_6,PIXEL22_5
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL20_1L,PIXEL21_C,PIXEL22_C,PIXEL12_1,PIXEL20_2,PIXEL21_6,PIXEL22_5
     PIXEL00_2
     PIXEL01_1
     PIXEL02_1M
@@ -1539,7 +1541,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag236
 ..@flag232
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL22_1R,PIXEL10_1,PIXEL20_5,PIXEL21_6,PIXEL22_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL22_1R,PIXEL10_1,PIXEL20_5,PIXEL21_6,PIXEL22_2
     PIXEL00_1M
     PIXEL01_1
     PIXEL02_2
@@ -1548,7 +1550,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag109
 ..@flag105
-    DiffOrNot w8,w4,PIXEL00_1U,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL00_2,PIXEL10_6,PIXEL20_5,PIXEL21_1
+    DiffOrNot ebp-w8,ebp-w4,PIXEL00_1U,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL00_2,PIXEL10_6,PIXEL20_5,PIXEL21_1
     PIXEL01_1
     PIXEL02_2
     PIXEL11
@@ -1557,7 +1559,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag171
 ..@flag43
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL20_1D,PIXEL00_5,PIXEL01_1,PIXEL10_6,PIXEL20_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL20_1D,PIXEL00_5,PIXEL01_1,PIXEL10_6,PIXEL20_2
     PIXEL02_1M
     PIXEL11
     PIXEL12_1
@@ -1566,7 +1568,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag143
 ..@flag15
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL02_1R,PIXEL10_C,PIXEL00_5,PIXEL01_6,PIXEL02_2,PIXEL10_1
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL02_1R,PIXEL10_C,PIXEL00_5,PIXEL01_6,PIXEL02_2,PIXEL10_1
     PIXEL11
     PIXEL12_1
     PIXEL20_1M
@@ -1579,11 +1581,11 @@ NEWSYM hq3x_32
     PIXEL02_1U
     PIXEL11
     PIXEL12_C
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
     PIXEL22_1M
     jmp .loopx_end
 ..@flag203
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
     PIXEL02_1M
     PIXEL11
     PIXEL12_1
@@ -1593,7 +1595,7 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag62
     PIXEL00_1M
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
     PIXEL10_C
     PIXEL11
     PIXEL20_1D
@@ -1607,11 +1609,11 @@ NEWSYM hq3x_32
     PIXEL10_1
     PIXEL11
     PIXEL20_1M
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
     jmp .loopx_end
 ..@flag118
     PIXEL00_1M
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
     PIXEL10_1
     PIXEL11
     PIXEL20_1L
@@ -1625,7 +1627,7 @@ NEWSYM hq3x_32
     PIXEL10_C
     PIXEL11
     PIXEL20_1M
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
     jmp .loopx_end
 ..@flag110
     PIXEL00_1M
@@ -1633,11 +1635,11 @@ NEWSYM hq3x_32
     PIXEL02_1R
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
     PIXEL22_1M
     jmp .loopx_end
 ..@flag155
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
     PIXEL02_1M
     PIXEL11
     PIXEL12_C
@@ -1739,12 +1741,12 @@ NEWSYM hq3x_32
     PIXEL02_1U
     PIXEL10_C
     PIXEL11
-    DiffOrNot w8,w4,PIXEL20_1M,PIXEL20_2
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_1M,PIXEL20_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
     jmp .loopx_end
 ..@flag158
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL00_2
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL00_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
     PIXEL10_C
     PIXEL11
     PIXEL20_1M
@@ -1752,26 +1754,26 @@ NEWSYM hq3x_32
     PIXEL22_1D
     jmp .loopx_end
 ..@flag234
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL00_2
     PIXEL01_C
     PIXEL02_1M
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
     PIXEL22_1R
     jmp .loopx_end
 ..@flag242
     PIXEL00_1M
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_1M,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_1M,PIXEL02_2
     PIXEL10_1
     PIXEL11
     PIXEL20_1L
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
     jmp .loopx_end
 ..@flag59
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
-    DiffOrNot w2,w6,PIXEL02_1M,PIXEL02_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_1M,PIXEL02_2
     PIXEL11
     PIXEL12_C
     PIXEL20_1D
@@ -1784,62 +1786,62 @@ NEWSYM hq3x_32
     PIXEL02_1M
     PIXEL11
     PIXEL12_C
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
-    DiffOrNot w6,w8,PIXEL22_1M,PIXEL22_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_1M,PIXEL22_2
     jmp .loopx_end
 ..@flag87
     PIXEL00_1L
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
     PIXEL10_1
     PIXEL11
     PIXEL20_1M
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_1M,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_1M,PIXEL22_2
     jmp .loopx_end
 ..@flag79
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
     PIXEL02_1R
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL20_1M,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_1M,PIXEL20_2
     PIXEL21_C
     PIXEL22_1M
     jmp .loopx_end
 ..@flag122
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL00_2
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_1M,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_1M,PIXEL02_2
     PIXEL11
     PIXEL12_C
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
-    DiffOrNot w6,w8,PIXEL22_1M,PIXEL22_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_1M,PIXEL22_2
     jmp .loopx_end
 ..@flag94
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL00_2
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL00_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
     PIXEL10_C
     PIXEL11
-    DiffOrNot w8,w4,PIXEL20_1M,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_1M,PIXEL20_2
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_1M,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_1M,PIXEL22_2
     jmp .loopx_end
 ..@flag218
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL00_2
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_1M,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_1M,PIXEL02_2
     PIXEL10_C
     PIXEL11
-    DiffOrNot w8,w4,PIXEL20_1M,PIXEL20_2
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_1M,PIXEL20_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
     jmp .loopx_end
 ..@flag91
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
-    DiffOrNot w2,w6,PIXEL02_1M,PIXEL02_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_1M,PIXEL02_2
     PIXEL11
     PIXEL12_C
-    DiffOrNot w8,w4,PIXEL20_1M,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_1M,PIXEL20_2
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_1M,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_1M,PIXEL22_2
     jmp .loopx_end
 ..@flag229
     PIXEL00_2
@@ -1886,9 +1888,9 @@ NEWSYM hq3x_32
     PIXEL22_1D
     jmp .loopx_end
 ..@flag186
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL00_2
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_1M,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_1M,PIXEL02_2
     PIXEL10_C
     PIXEL11
     PIXEL12_C
@@ -1899,13 +1901,13 @@ NEWSYM hq3x_32
 ..@flag115
     PIXEL00_1L
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_1M,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_1M,PIXEL02_2
     PIXEL10_1
     PIXEL11
     PIXEL12_C
     PIXEL20_1L
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_1M,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_1M,PIXEL22_2
     jmp .loopx_end
 ..@flag93
     PIXEL00_1U
@@ -1914,18 +1916,18 @@ NEWSYM hq3x_32
     PIXEL10_C
     PIXEL11
     PIXEL12_C
-    DiffOrNot w8,w4,PIXEL20_1M,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_1M,PIXEL20_2
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_1M,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_1M,PIXEL22_2
     jmp .loopx_end
 ..@flag206
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL00_2
     PIXEL01_C
     PIXEL02_1R
     PIXEL10_C
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL20_1M,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_1M,PIXEL20_2
     PIXEL21_C
     PIXEL22_1R
     jmp .loopx_end
@@ -1937,13 +1939,13 @@ NEWSYM hq3x_32
     PIXEL10_C
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL20_1M,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_1M,PIXEL20_2
     PIXEL21_C
     PIXEL22_1R
     jmp .loopx_end
 ..@flag174
 ..@flag46
-    DiffOrNot w4,w2,PIXEL00_1M,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_1M,PIXEL00_2
     PIXEL01_C
     PIXEL02_1R
     PIXEL10_C
@@ -1957,7 +1959,7 @@ NEWSYM hq3x_32
 ..@flag147
     PIXEL00_1L
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_1M,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_1M,PIXEL02_2
     PIXEL10_1
     PIXEL11
     PIXEL12_C
@@ -1975,7 +1977,7 @@ NEWSYM hq3x_32
     PIXEL12_C
     PIXEL20_1L
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_1M,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_1M,PIXEL22_2
     jmp .loopx_end
 ..@flag189
     PIXEL00_1U
@@ -2001,20 +2003,20 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag126
     PIXEL00_1M
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_4,PIXEL12_3
     PIXEL11
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_4,PIXEL21_3
     PIXEL22_1M
     jmp .loopx_end
 ..@flag219
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_4,PIXEL01_3,PIXEL10_3
     PIXEL02_1M
     PIXEL11
     PIXEL20_1M
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_4
     jmp .loopx_end
 ..@flag125
-    DiffOrNot w8,w4,PIXEL00_1U,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL00_2,PIXEL10_6,PIXEL20_5,PIXEL21_1
+    DiffOrNot ebp-w8,ebp-w4,PIXEL00_1U,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL00_2,PIXEL10_6,PIXEL20_5,PIXEL21_1
     PIXEL01_1
     PIXEL02_1U
     PIXEL11
@@ -2022,7 +2024,7 @@ NEWSYM hq3x_32
     PIXEL22_1M
     jmp .loopx_end
 ..@flag221
-    DiffOrNot w6,w8,PIXEL02_1U,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL02_2,PIXEL12_6,PIXEL21_1,PIXEL22_5
+    DiffOrNot ebp-w6,ebp-w8,PIXEL02_1U,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL02_2,PIXEL12_6,PIXEL21_1,PIXEL22_5
     PIXEL00_1U
     PIXEL01_1
     PIXEL10_C
@@ -2030,7 +2032,7 @@ NEWSYM hq3x_32
     PIXEL20_1M
     jmp .loopx_end
 ..@flag207
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL02_1R,PIXEL10_C,PIXEL00_5,PIXEL01_6,PIXEL02_2,PIXEL10_1
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL02_1R,PIXEL10_C,PIXEL00_5,PIXEL01_6,PIXEL02_2,PIXEL10_1
     PIXEL11
     PIXEL12_1
     PIXEL20_1M
@@ -2038,7 +2040,7 @@ NEWSYM hq3x_32
     PIXEL22_1R
     jmp .loopx_end
 ..@flag238
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL22_1R,PIXEL10_1,PIXEL20_5,PIXEL21_6,PIXEL22_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL22_1R,PIXEL10_1,PIXEL20_5,PIXEL21_6,PIXEL22_2
     PIXEL00_1M
     PIXEL01_C
     PIXEL02_1R
@@ -2046,7 +2048,7 @@ NEWSYM hq3x_32
     PIXEL12_1
     jmp .loopx_end
 ..@flag190
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL22_1D,PIXEL01_1,PIXEL02_5,PIXEL12_6,PIXEL22_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL22_1D,PIXEL01_1,PIXEL02_5,PIXEL12_6,PIXEL22_2
     PIXEL00_1M
     PIXEL10_C
     PIXEL11
@@ -2054,7 +2056,7 @@ NEWSYM hq3x_32
     PIXEL21_1
     jmp .loopx_end
 ..@flag187
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL20_1D,PIXEL00_5,PIXEL01_1,PIXEL10_6,PIXEL20_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL20_1D,PIXEL00_5,PIXEL01_1,PIXEL10_6,PIXEL20_2
     PIXEL02_1M
     PIXEL11
     PIXEL12_C
@@ -2062,7 +2064,7 @@ NEWSYM hq3x_32
     PIXEL22_1D
     jmp .loopx_end
 ..@flag243
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL20_1L,PIXEL21_C,PIXEL22_C,PIXEL12_1,PIXEL20_2,PIXEL21_6,PIXEL22_5
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL20_1L,PIXEL21_C,PIXEL22_C,PIXEL12_1,PIXEL20_2,PIXEL21_6,PIXEL22_5
     PIXEL00_1L
     PIXEL01_C
     PIXEL02_1M
@@ -2070,7 +2072,7 @@ NEWSYM hq3x_32
     PIXEL11
     jmp .loopx_end
 ..@flag119
-    DiffOrNot w2,w6,PIXEL00_1L,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL00_2,PIXEL01_6,PIXEL02_5,PIXEL12_1
+    DiffOrNot ebp-w2,ebp-w6,PIXEL00_1L,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL00_2,PIXEL01_6,PIXEL02_5,PIXEL12_1
     PIXEL10_1
     PIXEL11
     PIXEL20_1L
@@ -2085,13 +2087,13 @@ NEWSYM hq3x_32
     PIXEL10_C
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL20_C,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_C,PIXEL20_2
     PIXEL21_C
     PIXEL22_1R
     jmp .loopx_end
 ..@flag175
 ..@flag47
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL00_2
     PIXEL01_C
     PIXEL02_1R
     PIXEL10_C
@@ -2105,7 +2107,7 @@ NEWSYM hq3x_32
 ..@flag151
     PIXEL00_1L
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_C,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_C,PIXEL02_2
     PIXEL10_1
     PIXEL11
     PIXEL12_C
@@ -2123,30 +2125,30 @@ NEWSYM hq3x_32
     PIXEL12_C
     PIXEL20_1L
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_C,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_C,PIXEL22_2
     jmp .loopx_end
 ..@flag250
     PIXEL00_1M
     PIXEL01_C
     PIXEL02_1M
     PIXEL11
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL10_3,PIXEL20_4
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL10_3,PIXEL20_4
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL22_C,PIXEL12_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL22_C,PIXEL12_3,PIXEL22_4
     jmp .loopx_end
 ..@flag123
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL00_4,PIXEL01_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL00_4,PIXEL01_3
     PIXEL02_1M
     PIXEL10_C
     PIXEL11
     PIXEL12_C
-    DiffOrNot w8,w4,PIXEL20_C,PIXEL21_C,PIXEL20_4,PIXEL21_3
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_C,PIXEL21_C,PIXEL20_4,PIXEL21_3
     PIXEL22_1M
     jmp .loopx_end
 ..@flag95
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL10_C,PIXEL00_4,PIXEL10_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL10_C,PIXEL00_4,PIXEL10_3
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_C,PIXEL12_C,PIXEL02_4,PIXEL12_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_C,PIXEL12_C,PIXEL02_4,PIXEL12_3
     PIXEL11
     PIXEL20_1M
     PIXEL21_C
@@ -2154,12 +2156,12 @@ NEWSYM hq3x_32
     jmp .loopx_end
 ..@flag222
     PIXEL00_1M
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL01_3,PIXEL02_4
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL01_3,PIXEL02_4
     PIXEL10_C
     PIXEL11
     PIXEL12_C
     PIXEL20_1M
-    DiffOrNot w6,w8,PIXEL21_C,PIXEL22_C,PIXEL21_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL21_C,PIXEL22_C,PIXEL21_3,PIXEL22_4
     jmp .loopx_end
 ..@flag252
     PIXEL00_1M
@@ -2167,9 +2169,9 @@ NEWSYM hq3x_32
     PIXEL02_1U
     PIXEL11
     PIXEL12_C
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL10_3,PIXEL20_4
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL10_3,PIXEL20_4
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_C,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_C,PIXEL22_2
     jmp .loopx_end
 ..@flag249
     PIXEL00_1U
@@ -2177,34 +2179,34 @@ NEWSYM hq3x_32
     PIXEL02_1M
     PIXEL10_C
     PIXEL11
-    DiffOrNot w8,w4,PIXEL20_C,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_C,PIXEL20_2
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL22_C,PIXEL12_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL22_C,PIXEL12_3,PIXEL22_4
     jmp .loopx_end
 ..@flag235
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL00_4,PIXEL01_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL00_4,PIXEL01_3
     PIXEL02_1M
     PIXEL10_C
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL20_C,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_C,PIXEL20_2
     PIXEL21_C
     PIXEL22_1R
     jmp .loopx_end
 ..@flag111
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL00_2
     PIXEL01_C
     PIXEL02_1R
     PIXEL10_C
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL20_C,PIXEL21_C,PIXEL20_4,PIXEL21_3
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_C,PIXEL21_C,PIXEL20_4,PIXEL21_3
     PIXEL22_1M
     jmp .loopx_end
 ..@flag63
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL00_2
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_C,PIXEL12_C,PIXEL02_4,PIXEL12_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_C,PIXEL12_C,PIXEL02_4,PIXEL12_3
     PIXEL10_C
     PIXEL11
     PIXEL20_1D
@@ -2212,9 +2214,9 @@ NEWSYM hq3x_32
     PIXEL22_1M
     jmp .loopx_end
 ..@flag159
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL10_C,PIXEL00_4,PIXEL10_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL10_C,PIXEL00_4,PIXEL10_3
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_C,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_C,PIXEL02_2
     PIXEL11
     PIXEL12_C
     PIXEL20_1M
@@ -2224,29 +2226,29 @@ NEWSYM hq3x_32
 ..@flag215
     PIXEL00_1L
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_C,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_C,PIXEL02_2
     PIXEL10_1
     PIXEL11
     PIXEL12_C
     PIXEL20_1M
-    DiffOrNot w6,w8,PIXEL21_C,PIXEL22_C,PIXEL21_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL21_C,PIXEL22_C,PIXEL21_3,PIXEL22_4
     jmp .loopx_end
 ..@flag246
     PIXEL00_1M
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL01_3,PIXEL02_4
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL01_3,PIXEL02_4
     PIXEL10_1
     PIXEL11
     PIXEL12_C
     PIXEL20_1L
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_C,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_C,PIXEL22_2
     jmp .loopx_end
 ..@flag254
     PIXEL00_1M
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL01_3,PIXEL02_4
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL01_3,PIXEL02_4
     PIXEL11
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL10_3,PIXEL20_4
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL10_3,PIXEL20_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL21_C,PIXEL22_C,PIXEL12_3,PIXEL21_3,PIXEL22_2
     jmp .loopx_end
 ..@flag253
     PIXEL00_1U
@@ -2255,39 +2257,39 @@ NEWSYM hq3x_32
     PIXEL10_C
     PIXEL11
     PIXEL12_C
-    DiffOrNot w8,w4,PIXEL20_C,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_C,PIXEL20_2
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_C,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_C,PIXEL22_2
     jmp .loopx_end
 ..@flag251
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL00_4,PIXEL01_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL00_4,PIXEL01_3
     PIXEL02_1M
     PIXEL11
-    DiffOrNot w8,w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_2,PIXEL21_3
-    DiffOrNot w6,w8,PIXEL12_C,PIXEL22_C,PIXEL12_3,PIXEL22_4
+    DiffOrNot ebp-w8,ebp-w4,PIXEL10_C,PIXEL20_C,PIXEL21_C,PIXEL10_3,PIXEL20_2,PIXEL21_3
+    DiffOrNot ebp-w6,ebp-w8,PIXEL12_C,PIXEL22_C,PIXEL12_3,PIXEL22_4
     jmp .loopx_end
 ..@flag239
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL00_2
     PIXEL01_C
     PIXEL02_1R
     PIXEL10_C
     PIXEL11
     PIXEL12_1
-    DiffOrNot w8,w4,PIXEL20_C,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_C,PIXEL20_2
     PIXEL21_C
     PIXEL22_1R
     jmp .loopx_end
 ..@flag127
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_2,PIXEL01_3,PIXEL10_3
-    DiffOrNot w2,w6,PIXEL02_C,PIXEL12_C,PIXEL02_4,PIXEL12_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL01_C,PIXEL10_C,PIXEL00_2,PIXEL01_3,PIXEL10_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_C,PIXEL12_C,PIXEL02_4,PIXEL12_3
     PIXEL11
-    DiffOrNot w8,w4,PIXEL20_C,PIXEL21_C,PIXEL20_4,PIXEL21_3
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_C,PIXEL21_C,PIXEL20_4,PIXEL21_3
     PIXEL22_1M
     jmp .loopx_end
 ..@flag191
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL00_2
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_C,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_C,PIXEL02_2
     PIXEL10_C
     PIXEL11
     PIXEL12_C
@@ -2296,33 +2298,33 @@ NEWSYM hq3x_32
     PIXEL22_1D
     jmp .loopx_end
 ..@flag223
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL10_C,PIXEL00_4,PIXEL10_3
-    DiffOrNot w2,w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_2,PIXEL12_3
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL10_C,PIXEL00_4,PIXEL10_3
+    DiffOrNot ebp-w2,ebp-w6,PIXEL01_C,PIXEL02_C,PIXEL12_C,PIXEL01_3,PIXEL02_2,PIXEL12_3
     PIXEL11
     PIXEL20_1M
-    DiffOrNot w6,w8,PIXEL21_C,PIXEL22_C,PIXEL21_3,PIXEL22_4
+    DiffOrNot ebp-w6,ebp-w8,PIXEL21_C,PIXEL22_C,PIXEL21_3,PIXEL22_4
     jmp .loopx_end
 ..@flag247
     PIXEL00_1L
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_C,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_C,PIXEL02_2
     PIXEL10_1
     PIXEL11
     PIXEL12_C
     PIXEL20_1L
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_C,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_C,PIXEL22_2
     jmp .loopx_end
 ..@flag255
-    DiffOrNot w4,w2,PIXEL00_C,PIXEL00_2
+    DiffOrNot ebp-w4,ebp-w2,PIXEL00_C,PIXEL00_2
     PIXEL01_C
-    DiffOrNot w2,w6,PIXEL02_C,PIXEL02_2
+    DiffOrNot ebp-w2,ebp-w6,PIXEL02_C,PIXEL02_2
     PIXEL10_C
     PIXEL11
     PIXEL12_C
-    DiffOrNot w8,w4,PIXEL20_C,PIXEL20_2
+    DiffOrNot ebp-w8,ebp-w4,PIXEL20_C,PIXEL20_2
     PIXEL21_C
-    DiffOrNot w6,w8,PIXEL22_C,PIXEL22_2
+    DiffOrNot ebp-w6,ebp-w8,PIXEL22_C,PIXEL22_2
     jmp .loopx_end
 
 ..@cross0
@@ -2338,7 +2340,7 @@ NEWSYM hq3x_32
     mov     [edi+ebx*2+8],eax
     jmp     .loopx_end
 ..@cross1
-    mov     ecx,[w2]
+    mov     ecx,[ebp-w2]
     mov     edx,eax
     shl     edx,2
     add     edx,[ebx+ecx*4]
@@ -2356,7 +2358,7 @@ NEWSYM hq3x_32
     mov     [edi+ebx*2+8],eax
     jmp     .loopx_end
 ..@cross2
-    mov     ecx,[w4]
+    mov     ecx,[ebp-w4]
     mov     edx,eax
     shl     edx,2
     add     edx,[ebx+ecx*4]
@@ -2374,7 +2376,7 @@ NEWSYM hq3x_32
     mov     [edi+ebx*2+8],eax
     jmp     .loopx_end
 ..@cross4
-    mov     ecx,[w6]
+    mov     ecx,[ebp-w6]
     mov     edx,eax
     shl     edx,2
     add     edx,[ebx+ecx*4]
@@ -2392,7 +2394,7 @@ NEWSYM hq3x_32
     mov     [edi+ebx*2+8],edx
     jmp     .loopx_end
 ..@cross8
-    mov     ecx,[w8]
+    mov     ecx,[ebp-w8]
     mov     edx,eax
     shl     edx,2
     add     edx,[ebx+ecx*4]
@@ -2410,93 +2412,93 @@ NEWSYM hq3x_32
     mov     [edi+ebx*2+8],edx
     jmp     .loopx_end
 ..@crossN
-    mov     edx,[w2]
+    mov     edx,[ebp-w2]
     mov     ecx,[ebx+edx*4]
-    mov     [c2],ecx
-    mov     edx,[w4]
+    mov     [ebp-c2],ecx
+    mov     edx,[ebp-w4]
     mov     ecx,[ebx+edx*4]
-    mov     [c4],ecx
-    mov     edx,[w6]
+    mov     [ebp-c4],ecx
+    mov     edx,[ebp-w6]
     mov     ecx,[ebx+edx*4]
-    mov     [c6],ecx
-    mov     edx,[w8]
+    mov     [ebp-c6],ecx
+    mov     edx,[ebp-w8]
     mov     ecx,[ebx+edx*4]
-    mov     [c8],ecx
+    mov     [ebp-c8],ecx
     mov     ebx,[ebp+pitch]
     jmp     ..@flag0
 
 .loopx_end
     add     esi,2
     add     edi,12
-    dec     dword[xcounter]
+    dec     dword[ebp-xcounter]
     jle     .xres_2
     jmp     .loopx
 .xres_2
     ; x=Xres-2 - special case
     jl      .xres_1
-    mov     ebx,[prevline]
+    mov     ebx,[ebp-prevline]
     movq    mm5,[esi+ebx-4]
     movq    mm6,[esi-4]
-    mov     ebx,[nextline]
+    mov     ebx,[ebp-nextline]
     movq    mm7,[esi+ebx-4]
     psrlq   mm5,16
     psrlq   mm6,16
     psrlq   mm7,16
     movd    eax,mm5
     movzx   edx,ax
-    mov     [w1],edx
+    mov     [ebp-w1],edx
     shr     eax,16
-    mov     [w2],eax
+    mov     [ebp-w2],eax
     psrlq   mm5,32
     movd    eax,mm5
-    mov     [w3],eax
+    mov     [ebp-w3],eax
     movd    eax,mm6
     movzx   edx,ax
-    mov     [w4],edx
+    mov     [ebp-w4],edx
     shr     eax,16
-    mov     [w5],eax
+    mov     [ebp-w5],eax
     psrlq   mm6,32
     movd    eax,mm6
-    mov     [w6],eax
+    mov     [ebp-w6],eax
     movd    eax,mm7
     movzx   edx,ax
-    mov     [w7],edx
+    mov     [ebp-w7],edx
     shr     eax,16
-    mov     [w8],eax
+    mov     [ebp-w8],eax
     psrlq   mm7,32
     movd    eax,mm7
-    mov     [w9],eax
+    mov     [ebp-w9],eax
     jmp     .flags
 .xres_1
-    cmp     dword[xcounter],-1
+    cmp     dword[ebp-xcounter],-1
     jl      .nexty
     ; x=Xres-1 - special case
-    mov     ebx,[prevline]
+    mov     ebx,[ebp-prevline]
     movq    mm5,[esi+ebx-6]
     movq    mm6,[esi-6]
-    mov     ebx,[nextline]
+    mov     ebx,[ebp-nextline]
     movq    mm7,[esi+ebx-6]
     psrlq   mm5,32
     psrlq   mm6,32
     psrlq   mm7,32
     movd    eax,mm5
     movzx   edx,ax
-    mov     [w1],edx
+    mov     [ebp-w1],edx
     shr     eax,16
-    mov     [w2],eax
-    mov     [w3],eax
+    mov     [ebp-w2],eax
+    mov     [ebp-w3],eax
     movd    eax,mm6
     movzx   edx,ax
-    mov     [w4],edx
+    mov     [ebp-w4],edx
     shr     eax,16
-    mov     [w5],eax
-    mov     [w6],eax
+    mov     [ebp-w5],eax
+    mov     [ebp-w6],eax
     movd    eax,mm7
     movzx   edx,ax
-    mov     [w7],edx
+    mov     [ebp-w7],edx
     shr     eax,16
-    mov     [w8],eax
-    mov     [w9],eax
+    mov     [ebp-w8],eax
+    mov     [ebp-w9],eax
     jmp     .flags
 .nexty
     add		esi,[ebp+offset] ; added - move source pointer past end-of-line blanks
@@ -2509,19 +2511,19 @@ NEWSYM hq3x_32
     sub     edi, ebx
     sub     edi, ebx
 	shr     ebx, 1
-    dec     dword[linesleft]
+    dec     dword[ebp-linesleft]
     jz      .fin
     add		ebx, [ebp+offset];
-    cmp     dword[linesleft],1
+    cmp     dword[ebp-linesleft],1
     je      .lastline
-    mov     dword[nextline],ebx
+    mov     dword[ebp-nextline],ebx
     neg     ebx
-    mov     dword[prevline],ebx
+    mov     dword[ebp-prevline],ebx
     jmp     .loopy
 .lastline
-    mov     dword[nextline],0
+    mov     dword[ebp-nextline],0
     neg     ebx
-    mov     dword[prevline],ebx
+    mov     dword[ebp-prevline],ebx
     jmp     .loopy
 .fin
     emms

@@ -21,7 +21,7 @@
 #ifndef NO_D3D
 
 // The number of pixel-filter threads to be created
-#define NTHREADS 4
+#define NTHREADS ( theApp.maxCpuCores )
 
 #pragma comment( lib, "d3d9" )
 #pragma comment( lib, "d3dx9" )
@@ -454,7 +454,7 @@ void Direct3DDisplay::render()
 			u32 dst_bytes_per_thread = lr.Pitch * dst_height_per_thread;
 
 			// Use Multi Threading
-			assert( NTHREADS > 0 );
+			assert( ( NTHREADS > 0 ) && ( NTHREADS < MAXIMUM_PROCESSORS ) );
 			for( int i = ( NTHREADS - 1 ) ; i > -1 ; i-- ) {
 				// create last thread first because it could have more work than the others (for eg. if NTHREADS = 3)
 				// (last thread has to process the remaining lines if (height / NTHREADS) is not an integer)
@@ -819,7 +819,7 @@ void Direct3DDisplay::calculateDestRect()
 		rectangleFillsScreen = true; // no clear() necessary
 		destRect.left = 0;
 		destRect.top = 0;
-		destRect.right = dpp.BackBufferWidth;   // for some reason there'l be a black
+		destRect.right = dpp.BackBufferWidth;   // for some reason there will be a black
 		destRect.bottom = dpp.BackBufferHeight; // border line when using -1 at the end
 	} else {
 		// use aspect ratio

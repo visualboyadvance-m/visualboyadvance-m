@@ -24,12 +24,6 @@
 
 #include "System.h"
 
-static u8 row_cur[3*322];
-static u8 row_next[3*322];
-
-static u8 *rgb_row_cur = row_cur;
-static u8 *rgb_row_next = row_next;
-
 #define RGB(r,g,b) ((r)>>3) << systemRedShift |\
   ((g) >> 3) << systemGreenShift |\
   ((b) >> 3) << systemBlueShift\
@@ -83,6 +77,11 @@ static void fill_rgb_row_32(u32 *from, int src_width, u8 *row, int width)
 void Bilinear(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
               u8 *dstPtr, u32 dstPitch, int width, int height)
 {
+  u8 row_cur[3*322];
+  u8 row_next[3*322];
+  u8 *rgb_row_cur = row_cur;
+  u8 *rgb_row_next = row_next;
+
   u16 *to = (u16 *)dstPtr;
   u16 *to_odd = (u16 *)(dstPtr + dstPitch);
 
@@ -161,6 +160,11 @@ void Bilinear(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 void BilinearPlus(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
                   u8 *dstPtr, u32 dstPitch, int width, int height)
 {
+  u8 row_cur[3*322];
+  u8 row_next[3*322];
+  u8 *rgb_row_cur = row_cur;
+  u8 *rgb_row_next = row_next;
+
   u16 *to = (u16 *)dstPtr;
   u16 *to_odd = (u16 *)(dstPtr + dstPitch);
 
@@ -250,6 +254,11 @@ void BilinearPlus(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 void Bilinear32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
                 u8 *dstPtr, u32 dstPitch, int width, int height)
 {
+  u8 row_cur[3*322];
+  u8 row_next[3*322];
+  u8 *rgb_row_cur = row_cur;
+  u8 *rgb_row_next = row_next;
+
   u32 *to = (u32 *)dstPtr;
   u32 *to_odd = (u32 *)(dstPtr + dstPitch);
 
@@ -330,6 +339,11 @@ void Bilinear32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 void BilinearPlus32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
                     u8 *dstPtr, u32 dstPitch, int width, int height)
 {
+  u8 row_cur[3*322];
+  u8 row_next[3*322];
+  u8 *rgb_row_cur = row_cur;
+  u8 *rgb_row_next = row_next;
+
   u32 *to = (u32 *)dstPtr;
   u32 *to_odd = (u32 *)(dstPtr + dstPitch);
 

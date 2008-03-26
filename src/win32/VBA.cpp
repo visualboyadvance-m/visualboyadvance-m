@@ -24,6 +24,7 @@
 #endif
 
 #include "stdafx.h"
+#include <intrin.h>
 
 #include "AVIWrite.h"
 #include "LangSelect.h"
@@ -207,16 +208,6 @@ void directXMessage(const char *msg)
 /////////////////////////////////////////////////////////////////////////////
 // VBA
 
-BEGIN_MESSAGE_MAP(VBA, CWinApp)
-  //{{AFX_MSG_MAP(VBA)
-  // NOTE - the ClassWizard will add and remove mapping macros here.
-  //    DO NOT EDIT what you see in these blocks of generated code!
-  //}}AFX_MSG_MAP
-  END_MESSAGE_MAP()
-
-  /////////////////////////////////////////////////////////////////////////////
-// VBA construction
-
 VBA::VBA()
 {
   // COINIT_MULTITHREADED is not supported by SHBrowseForFolder with BIF_USENEWUI
@@ -229,6 +220,7 @@ VBA::VBA()
   mode800Available = false;
   mode1024Available = false;
   mode1280Available = false;
+  maxCpuCores = 1;
   windowPositionX = 0;
   windowPositionY = 0;
   filterFunction = NULL;
@@ -1486,6 +1478,14 @@ void VBA::loadSettings()
   if(windowPositionY < 0)
     windowPositionY = 0;
 
+  maxCpuCores = regQueryDwordValue("maxCpuCores", 0);
+  if(maxCpuCores < 0) {
+	  maxCpuCores = 0;
+  }
+  if(maxCpuCores == 0) {
+	  maxCpuCores = detectCpuCores();
+  }
+
   useBiosFileGBA = ( regQueryDwordValue("useBiosGBA", 0) == 1 ) ? true : false;
 
   useBiosFileGB = ( regQueryDwordValue("useBiosGB", 0) == 1 ) ? true : false;
@@ -2474,6 +2474,8 @@ void VBA::saveSettings()
   regSetDwordValue("windowX", windowPositionX);
   regSetDwordValue("windowY", windowPositionY);
 
+  regSetDwordValue("maxCpuCores", maxCpuCores);
+
   regSetDwordValue("useBiosGBA", useBiosFileGBA);
 
   regSetDwordValue("useBiosGB", useBiosFileGB);
@@ -2585,6 +2587,17 @@ void VBA::saveSettings()
   regSetStringValue( "oalDevice", oalDevice );
   regSetDwordValue( "oalBufferCount", oalBufferCount );
 #endif
+}
+
+int VBA::detectCpuCores()
+{
+	int CPUInfo[4];
+
+	__cpuid( CPUInfo, 1 );
+
+	int processor_count = ( CPUInfo[1] & 0x00FF0000 ) >> 16;
+
+	return processor_count;
 }
 
 void winSignal(int, int)
