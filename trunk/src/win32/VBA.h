@@ -79,6 +79,7 @@ class VBA : public CWinApp
   bool mode800Available;
   bool mode1024Available;
   bool mode1280Available;
+  int maxCpuCores; // maximum number of CPU cores VBA should use, 0 means auto-detect
   int windowPositionX;
   int windowPositionY;
   void (*filterFunction)(u8*,u32,u8*,u8*,u32,int,int);
@@ -262,13 +263,10 @@ class VBA : public CWinApp
   void updateFrameSkip();
   void loadSettings();
   void addRecentFile(CString file);
-  //{{AFX_MSG(VBA)
-  afx_msg void OnAppAbout();
-  // NOTE - the ClassWizard will add and remove member functions here.
-  //    DO NOT EDIT what you see in these blocks of generated code !
-  //}}AFX_MSG
-  DECLARE_MESSAGE_MAP()
-    };
+
+  private:
+  int detectCpuCores();
+};
 
     extern VBA theApp;
 	extern int emulating;

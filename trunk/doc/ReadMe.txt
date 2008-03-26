@@ -63,9 +63,6 @@ Important:
 
 - Improve automatic 64k/128k flash save detection
 
-- HQ3x/4x ASM implementation produces wrong interpolation on the image's border
- - This has already been fixed in the C version; look at hq_base.h / line 343 - 372. The ASM version most likely only has something like skipLine instead of skipLinePlus and skipLineMinus, which is however necessary in order to work correctly.
-
 - Fix OpenGL issues
 
 - Remove 16 bit hack for filters
@@ -107,7 +104,7 @@ Performance:
 
 - Apply pixel filter only to changed parts of the image
 
-- Make use of multi-core CPUs
+- Make even more use of multi-core CPUs
 
 - Make use of 64 bit CPUs
 
@@ -150,4 +147,6 @@ Jonas Quinn
 Spacy
 
 Special Thanks go to:
-chrono - ASM genius, fixed a bug in the HQ3x/4x filters and made them thread-safe
+chrono:
+ASM genius, fixed a bug in the HQ3x/4x filters.
+Made HQ3x/4x and Bilinear filters (ASM versions) thread-safe
