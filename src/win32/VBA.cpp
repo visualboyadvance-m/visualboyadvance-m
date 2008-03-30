@@ -2597,6 +2597,9 @@ int VBA::detectCpuCores()
 
 	int processor_count = ( CPUInfo[1] & 0x00FF0000 ) >> 16;
 
+	// some CPUs probably do not support this instruction properly
+	if( processor_count < 1 ) processor_count = 1;
+
 	return processor_count;
 }
 

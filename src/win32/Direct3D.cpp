@@ -21,7 +21,7 @@
 #ifndef NO_D3D
 
 // The number of pixel-filter threads to be created
-#define NTHREADS ( theApp.maxCpuCores )
+#define NTHREADS ( nThreads )
 
 #pragma comment( lib, "d3d9" )
 #pragma comment( lib, "d3dx9" )
@@ -114,6 +114,7 @@ private:
 	bool                  rectangleFillsScreen;
 	PFTHREAD_DATA         *pfthread_data;
 	HANDLE                *hThreads;
+	int                   nThreads;
 
 	struct VERTEX {
 		FLOAT x, y, z, rhw; // screen coordinates
@@ -174,6 +175,8 @@ Direct3DDisplay::Direct3DDisplay()
 	rectangleFillsScreen = false;
 	pfthread_data = NULL;
 	hThreads = NULL;
+	nThreads = theApp.maxCpuCores;
+	if( nThreads > 16 ) nThreads = 16;
 }
 
 
