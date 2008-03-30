@@ -1479,9 +1479,6 @@ void VBA::loadSettings()
     windowPositionY = 0;
 
   maxCpuCores = regQueryDwordValue("maxCpuCores", 0);
-  if(maxCpuCores < 0) {
-	  maxCpuCores = 0;
-  }
   if(maxCpuCores == 0) {
 	  maxCpuCores = detectCpuCores();
   }
@@ -2589,18 +2586,13 @@ void VBA::saveSettings()
 #endif
 }
 
-int VBA::detectCpuCores()
+unsigned int VBA::detectCpuCores()
 {
-	int CPUInfo[4];
+	SYSTEM_INFO info;
 
-	__cpuid( CPUInfo, 1 );
+	GetSystemInfo( &info );
 
-	int processor_count = ( CPUInfo[1] & 0x00FF0000 ) >> 16;
-
-	// some CPUs probably do not support this instruction properly
-	if( processor_count < 1 ) processor_count = 1;
-
-	return processor_count;
+	return info.dwNumberOfProcessors;
 }
 
 void winSignal(int, int)

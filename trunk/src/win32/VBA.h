@@ -79,7 +79,7 @@ class VBA : public CWinApp
   bool mode800Available;
   bool mode1024Available;
   bool mode1280Available;
-  int maxCpuCores; // maximum number of CPU cores VBA should use, 0 means auto-detect
+  unsigned int maxCpuCores; // maximum number of CPU cores VBA should use, 0 means auto-detect
   int windowPositionX;
   int windowPositionY;
   void (*filterFunction)(u8*,u32,u8*,u8*,u32,int,int);
@@ -265,7 +265,7 @@ class VBA : public CWinApp
   void addRecentFile(CString file);
 
   private:
-  int detectCpuCores();
+  unsigned int detectCpuCores();
 };
 
     extern VBA theApp;
