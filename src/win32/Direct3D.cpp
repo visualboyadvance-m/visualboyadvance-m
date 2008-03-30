@@ -20,9 +20,6 @@
 
 #ifndef NO_D3D
 
-// The number of pixel-filter threads to be created
-#define NTHREADS ( nThreads )
-
 #pragma comment( lib, "d3d9" )
 #pragma comment( lib, "d3dx9" )
 #pragma comment( lib, "DxErr9" )
@@ -114,7 +111,7 @@ private:
 	bool                  rectangleFillsScreen;
 	PFTHREAD_DATA         *pfthread_data;
 	HANDLE                *hThreads;
-	int                   nThreads;
+	unsigned int           nThreads;
 
 	struct VERTEX {
 		FLOAT x, y, z, rhw; // screen coordinates
@@ -373,13 +370,13 @@ bool Direct3DDisplay::initialize()
 	setOption( _T("motionBlur"), theApp.d3dMotionBlur );
 
 	// create pfthread_data
-	pfthread_data = (PFTHREAD_DATA*)malloc( sizeof(PFTHREAD_DATA) * NTHREADS );
+	pfthread_data = (PFTHREAD_DATA*)malloc( sizeof(PFTHREAD_DATA) * nThreads );
 	if( !pfthread_data ) {
 		failed = true;
 	}
 
 	// create thread handles
-	hThreads = (HANDLE*)malloc( sizeof(HANDLE) * NTHREADS );
+	hThreads = (HANDLE*)malloc( sizeof(HANDLE) * nThreads );
 	if( !hThreads ) {
 		failed = true;
 	}
@@ -449,18 +446,19 @@ void Direct3DDisplay::render()
 		u32 pitch = theApp.sizeX * ( systemColorDepth >> 3 ) + 4;
 		if( theApp.filterFunction ) {
 			u8 *start = pix + pitch;
-			int src_height_per_thread = theApp.sizeY / NTHREADS;
-			int src_height_remaining = theApp.sizeY - ( ( theApp.sizeY / NTHREADS ) * NTHREADS );
+			int src_height_per_thread = theApp.sizeY / nThreads;
+			int src_height_remaining = theApp.sizeY - ( ( theApp.sizeY / nThreads ) * nThreads );
 			u32 src_bytes_per_thread = pitch * src_height_per_thread;
 
 			int dst_height_per_thread = src_height_per_thread * theApp.filterMagnification;
 			u32 dst_bytes_per_thread = lr.Pitch * dst_height_per_thread;
 
+			unsigned int i = nThreads - 1;
+
 			// Use Multi Threading
-			assert( ( NTHREADS > 0 ) && ( NTHREADS < MAXIMUM_PROCESSORS ) );
-			for( int i = ( NTHREADS - 1 ) ; i > -1 ; i-- ) {
-				// create last thread first because it could have more work than the others (for eg. if NTHREADS = 3)
-				// (last thread has to process the remaining lines if (height / NTHREADS) is not an integer)
+			do {
+				// create last thread first because it could have more work than the others (for eg. if nThreads = 3)
+				// (last thread has to process the remaining lines if (height / nThreads) is not an integer)
 
 				// configure thread
 				pfthread_data[i].filterFunction = theApp.filterFunction;
@@ -471,7 +469,7 @@ void Direct3DDisplay::render()
 				pfthread_data[i].destPitch = lr.Pitch;
 				pfthread_data[i].width = theApp.sizeX;
 				
-				if( i == ( NTHREADS - 1 ) ) {
+				if( i == ( nThreads - 1 ) ) {
 					// last thread
 					pfthread_data[i].height = src_height_per_thread + src_height_remaining;
 				} else {
@@ -488,17 +486,17 @@ void Direct3DDisplay::render()
 					0,
 					NULL );
 				assert( hThreads[i] != NULL );
-			}
+			} while ( i-- );
 
 			// Wait until every thread has finished.
 			WaitForMultipleObjects(
-				NTHREADS,
+				nThreads,
 				hThreads,
 				TRUE,
 				INFINITE );
 
 			// Close all thread handles.
-			for( int i = 0 ; i < NTHREADS ; i++ ) {
+			for( i = 0 ; i < nThreads ; i++ ) {
 				CloseHandle( hThreads[i] );
 			}
 
