@@ -425,6 +425,8 @@ public:
 	afx_msg void OnNcRButtonDown(UINT nHitTest, CPoint point);
 	afx_msg void OnOutputapiXaudio2();
 	afx_msg void OnUpdateOutputapiXaudio2(CCmdUI *pCmdUI);
+	afx_msg void OnPixelfilterMultiThreading();
+	afx_msg void OnUpdatePixelfilterMultiThreading(CCmdUI *pCmdUI);
 };
 
 /////////////////////////////////////////////////////////////////////////////

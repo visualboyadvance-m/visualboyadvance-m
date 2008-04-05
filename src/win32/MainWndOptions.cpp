@@ -1854,3 +1854,13 @@ void MainWnd::OnEmulatorBiosfiles()
 		theApp.biosFileNameGB = dlg.m_pathGB;
 	}
 }
+
+void MainWnd::OnPixelfilterMultiThreading()
+{
+	theApp.filterMT = !theApp.filterMT;
+}
+
+void MainWnd::OnUpdatePixelfilterMultiThreading(CCmdUI *pCmdUI)
+{
+	pCmdUI->SetCheck( theApp.filterMT ? 1 : 0 );
+}

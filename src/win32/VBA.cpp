@@ -215,6 +215,8 @@ VBA::VBA()
   if( S_OK != CoInitializeEx( NULL, COINIT_APARTMENTTHREADED ) ) {
 	  systemMessage( IDS_COM_FAILURE, NULL );
   }
+
+  // ! keep in mind that many of the following values will be really initialized in loadSettings()
   mode320Available = false;
   mode640Available = false;
   mode800Available = false;
@@ -229,6 +231,7 @@ VBA::VBA()
   filterType = FILTER_NONE;
   filterWidth = 0;
   filterHeight = 0;
+  filterMT = false;
   fsAdapter = 0;
   fsWidth = 0;
   fsHeight = 0;
@@ -1543,6 +1546,8 @@ void VBA::loadSettings()
   if(filterType < 0 || filterType > 17)
     filterType = 0;
 
+  filterMT = ( 1 == regQueryDwordValue("filterEnableMultiThreading", 0) );
+
   disableMMX = regQueryDwordValue("disableMMX", false) ? true: false;
 
   disableStatusMessage = regQueryDwordValue("disableStatus", 0) ? true : false;
@@ -1681,7 +1686,7 @@ void VBA::loadSettings()
 
   updateThrottle( (unsigned short)regQueryDwordValue( "throttle", 0 ) );
 
-   linktimeout = regQueryDwordValue("LinkTimeout", 1000);
+  linktimeout = regQueryDwordValue("LinkTimeout", 1000);
 
   linklog = regQueryDwordValue("Linklog", false) ? true : false;
   if(linklog)
@@ -1704,6 +1709,11 @@ void VBA::loadSettings()
 
   oalBufferCount = regQueryDwordValue( "oalBufferCount", 5 );
 #endif
+
+  if( ( maxCpuCores == 1 ) && filterMT ) {
+	  // multi-threading use useless for just one core
+	  filterMT = false;
+  }
 }
 
 void VBA::updateFrameSkip()
@@ -2510,6 +2520,8 @@ void VBA::saveSettings()
   regSetDwordValue("glFilter", glFilter);
 
   regSetDwordValue("filter", filterType);
+
+  regSetDwordValue("filterEnableMultiThreading", filterMT ? 1 : 0);
 
   regSetDwordValue("LCDFilter", filterLCD);
 
