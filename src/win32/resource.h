@@ -850,13 +850,14 @@
 #define ID_FILE_OPENGBC                 40357
 #define ID_FILE_OPEN_GBC                40358
 #define ID_OUTPUTAPI_XAUDIO2            40359
+#define ID_PIXELFILTER_MULTI            40360
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        163
-#define _APS_NEXT_COMMAND_VALUE         40360
+#define _APS_NEXT_COMMAND_VALUE         40361
 #define _APS_NEXT_CONTROL_VALUE         1284
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
