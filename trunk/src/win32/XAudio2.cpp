@@ -255,6 +255,13 @@ void XAudio2_Output::write()
 
 		if( vState.BuffersQueued < NBUFFERS ) {
 			// there is at least one free buffer
+#ifdef _DEBUG
+			if( vState.BuffersQueued == 0 ) {
+				// buffers ran dry
+				static int i = 0;
+				log( "XAudio2: Buffers were not refilled fast enough (%i)\n", i++ );
+			}
+#endif
 			break;
 		} else {
 			// the maximum number of buffers is currently queued
