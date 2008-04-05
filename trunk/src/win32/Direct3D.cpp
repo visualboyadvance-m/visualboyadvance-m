@@ -173,7 +173,7 @@ Direct3DDisplay::Direct3DDisplay()
 	pfthread_data = NULL;
 	hThreads = NULL;
 	nThreads = theApp.maxCpuCores;
-	if( nThreads > 16 ) nThreads = 16;
+	if( nThreads > 8 ) nThreads = 8;
 }
 
 
@@ -444,75 +444,75 @@ void Direct3DDisplay::render()
 		return;
 	} else {
 		u32 pitch = theApp.sizeX * ( systemColorDepth >> 3 ) + 4;
+
 		if( theApp.filterFunction ) {
-			u8 *start = pix + pitch;
-			int src_height_per_thread = theApp.sizeY / nThreads;
-			int src_height_remaining = theApp.sizeY - ( ( theApp.sizeY / nThreads ) * nThreads );
-			u32 src_bytes_per_thread = pitch * src_height_per_thread;
+			if( theApp.filterMT ) {
+				u8 *start = pix + pitch;
+				int src_height_per_thread = theApp.sizeY / nThreads;
+				int src_height_remaining = theApp.sizeY - ( ( theApp.sizeY / nThreads ) * nThreads );
+				u32 src_bytes_per_thread = pitch * src_height_per_thread;
 
-			int dst_height_per_thread = src_height_per_thread * theApp.filterMagnification;
-			u32 dst_bytes_per_thread = lr.Pitch * dst_height_per_thread;
+				int dst_height_per_thread = src_height_per_thread * theApp.filterMagnification;
+				u32 dst_bytes_per_thread = lr.Pitch * dst_height_per_thread;
 
-			unsigned int i = nThreads - 1;
+				unsigned int i = nThreads - 1;
 
-			// Use Multi Threading
-			do {
-				// create last thread first because it could have more work than the others (for eg. if nThreads = 3)
-				// (last thread has to process the remaining lines if (height / nThreads) is not an integer)
+				// Use Multi Threading
+				do {
+					// create last thread first because it could have more work than the others (for eg. if nThreads = 3)
+					// (last thread has to process the remaining lines if (height / nThreads) is not an integer)
 
-				// configure thread
-				pfthread_data[i].filterFunction = theApp.filterFunction;
-				pfthread_data[i].sourcePointer = start + ( i * src_bytes_per_thread );
-				pfthread_data[i].sourcePitch = pitch;
-				pfthread_data[i].deltaPointer = (u8*)theApp.delta; // TODO: check if thread-safe
-				pfthread_data[i].destPointer = ( (u8*)lr.pBits ) + ( i * dst_bytes_per_thread );
-				pfthread_data[i].destPitch = lr.Pitch;
-				pfthread_data[i].width = theApp.sizeX;
-				
-				if( i == ( nThreads - 1 ) ) {
-					// last thread
-					pfthread_data[i].height = src_height_per_thread + src_height_remaining;
-				} else {
-					// other thread
-					pfthread_data[i].height = src_height_per_thread;
+					// configure thread
+					pfthread_data[i].filterFunction = theApp.filterFunction;
+					pfthread_data[i].sourcePointer = start + ( i * src_bytes_per_thread );
+					pfthread_data[i].sourcePitch = pitch;
+					pfthread_data[i].deltaPointer = (u8*)theApp.delta; // TODO: check if thread-safe
+					pfthread_data[i].destPointer = ( (u8*)lr.pBits ) + ( i * dst_bytes_per_thread );
+					pfthread_data[i].destPitch = lr.Pitch;
+					pfthread_data[i].width = theApp.sizeX;
+					
+					if( i == ( nThreads - 1 ) ) {
+						// last thread
+						pfthread_data[i].height = src_height_per_thread + src_height_remaining;
+					} else {
+						// other thread
+						pfthread_data[i].height = src_height_per_thread;
+					}
+
+					// create thread
+					hThreads[i] = CreateThread(
+						NULL,
+						0,
+						pfthread_func,
+						&pfthread_data[i],
+						0,
+						NULL );
+					assert( hThreads[i] != NULL );
+				} while ( i-- );
+
+				// Wait until every thread has finished.
+				WaitForMultipleObjects(
+					nThreads,
+					hThreads,
+					TRUE,
+					INFINITE );
+
+				// Close all thread handles.
+				for( i = 0 ; i < nThreads ; i++ ) {
+					CloseHandle( hThreads[i] );
 				}
-
-				// create thread
-				hThreads[i] = CreateThread(
-					NULL,
-					0,
-					pfthread_func,
-					&pfthread_data[i],
-					0,
-					NULL );
-				assert( hThreads[i] != NULL );
-			} while ( i-- );
-
-			// Wait until every thread has finished.
-			WaitForMultipleObjects(
-				nThreads,
-				hThreads,
-				TRUE,
-				INFINITE );
-
-			// Close all thread handles.
-			for( i = 0 ; i < nThreads ; i++ ) {
-				CloseHandle( hThreads[i] );
+			} else {
+				// multi-threading disabled
+				theApp.filterFunction(
+					pix + pitch,
+					pitch,
+					(u8*)theApp.delta,
+					(u8*)lr.pBits,
+					lr.Pitch,
+					theApp.sizeX,
+					theApp.sizeY
+					);
 			}
-
-
-			/* without threads
-			// pixel filter enabled
-			theApp.filterFunction(
-				pix + pitch,
-				pitch,
-				(u8*)theApp.delta,
-				(u8*)lr.pBits,
-				lr.Pitch,
-				theApp.sizeX,
-				theApp.sizeY
-				);
-			*/
 		} else {
 			// pixel filter disabled
 			switch( systemColorDepth )

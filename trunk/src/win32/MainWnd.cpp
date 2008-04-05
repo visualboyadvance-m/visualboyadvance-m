@@ -437,6 +437,8 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_WM_NCRBUTTONDOWN()
   ON_COMMAND(ID_OUTPUTAPI_XAUDIO2, &MainWnd::OnOutputapiXaudio2)
   ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_XAUDIO2, &MainWnd::OnUpdateOutputapiXaudio2)
+  ON_COMMAND(ID_PIXELFILTER_MULTI, &MainWnd::OnPixelfilterMultiThreading)
+  ON_UPDATE_COMMAND_UI(ID_PIXELFILTER_MULTI, &MainWnd::OnUpdatePixelfilterMultiThreading)
   END_MESSAGE_MAP()
 
 
