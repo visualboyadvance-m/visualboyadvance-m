@@ -118,16 +118,10 @@ Currently Known Bugs
 Known Bugs:
 
 - Linking: Doesnt work quite right yet.
-- OpenGL: Custom fragment/vertex shaders do not work quite as well as original test build (Mudlord)
-- OpenGL: Custom fullscreen resolutions will not work when filters are enabled. 
-  - Since other fullscreen OGL reses are disabled, I should disable custom OGL resolution
-    switching (Mudlord).
-- OpenGL: Various context handling issues with OGL mode. The emulator should restart whenever is
-  enabled, thus eliminating these issues when switching graphics APIs. I don't why this didnt happen
-  in the first place, when it should. (Mudlord)
 - Audio core: assertation error occurs when disabling sound in GB mode
   - I think its best we mute sound instead, since some games rely on audio for timing.
     Plus, blargg's GB_Snd_Emu is extremely optimized stuff. (Mudlord)
+  - blargg's core implementation broke Dwedit's GBC emu.
 - Wrong bit depth image is displayed for 2 frames when switching from/to HQ3x/4x ASM
  - This is caused by the 16bit hack which does not re-process the emulated image.
    It results in the display devices treating the image at pix with the wrong bit depth.
