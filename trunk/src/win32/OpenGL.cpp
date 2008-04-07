@@ -75,9 +75,7 @@ private:
 	bool failed;
 	GLFONT font;
 	int pitch;
-	GLuint displaylist;
 	u8 *data;
-	GLhandleARB v,f,p,t;
 	DWORD currentAdapter;
 
 	void initializeMatrices( int w, int h );
@@ -190,12 +188,6 @@ void OpenGLDisplay::cleanup()
 	if(texture != 0) {
 		glDeleteTextures(1, &texture);
 		texture = 0;
-	}
-
-	if (displaylist)
-	{
-	glDeleteLists(displaylist, 1);
-	displaylist = 0;
 	}
 
 	DisableOpenGL();
@@ -385,7 +377,6 @@ bool OpenGLDisplay::initialize()
 	theApp.updateIFB();
 	pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
 	data = pix + ( theApp.sizeX + 1 ) * 4;
-	renderlist();
 
 	if(failed)
 		return false;
@@ -398,28 +389,6 @@ void OpenGLDisplay::clear()
 {
 	glClearColor(0.0,0.0,0.0,1.0);
 	glClear( GL_COLOR_BUFFER_BIT );
-}
-
-//dlist
-void OpenGLDisplay::renderlist()
-{
-	displaylist = glGenLists(1); //set the cube list to Generate a List
-    glNewList(displaylist,GL_COMPILE); //compile the new list
-    glBegin( GL_QUADS );
-
-	glTexCoord2f( 0.0f, 0.0f );
-	glVertex3i( 0, 0, 0 );
-
-	glTexCoord2f( (float)(width) / size, 0.0f );
-	glVertex3i( theApp.surfaceSizeX, 0, 0 );
-
-	glTexCoord2f( (float)(width) / size, (float)(height) / size );
-	glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
-
-	glTexCoord2f( 0.0f, (float)(height) / size );
-	glVertex3i( 0, theApp.surfaceSizeY, 0 );
-	glEnd();
-	glEndList();
 }
 
 //main render func
@@ -454,7 +423,20 @@ void OpenGLDisplay::render()
     glTexSubImage2D(GL_TEXTURE_2D,0,0,0,width,height,GL_RGBA,GL_UNSIGNED_BYTE,data );
 
 
-	glCallList(displaylist);
+	 glBegin( GL_QUADS );
+
+	glTexCoord2f( 0.0f, 0.0f );
+	glVertex3i( 0, 0, 0 );
+
+	glTexCoord2f( (float)(width) / size, 0.0f );
+	glVertex3i( theApp.surfaceSizeX, 0, 0 );
+
+	glTexCoord2f( (float)(width) / size, (float)(height) / size );
+	glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
+
+	glTexCoord2f( 0.0f, (float)(height) / size );
+	glVertex3i( 0, theApp.surfaceSizeY, 0 );
+	glEnd();
 
 
 	if( theApp.showSpeed ) { // && ( theApp.videoOption > VIDEO_4X ) ) {
@@ -504,13 +486,7 @@ void OpenGLDisplay::render()
 void OpenGLDisplay::resize( int w, int h )
 {
 	initializeMatrices( w, h );
-	/* Display lists are not mutable, so we have to do this*/
-	if (displaylist)
-	{
-	glDeleteLists(displaylist, 1);
-	displaylist = 0;
-	renderlist();
-	}
+	
 }
 
 //update filtering methods
@@ -558,12 +534,7 @@ void OpenGLDisplay::initializeMatrices( int w, int h )
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	if (displaylist)
-	{
-		glDeleteLists(displaylist, 1);
-		displaylist = 0;
-		renderlist();
-	}
+	
 }
 
 //init font texture
@@ -648,12 +619,7 @@ bool OpenGLDisplay::changeRenderSize( int w, int h )
 			free(filterData);
 		filterData = (u8 *)malloc(4*w*h);
 	}
-	if (displaylist)
-	{
-	glDeleteLists(displaylist, 1);
-	displaylist = 0;
-	renderlist();
-	}
+	
 	return true;
 }
 
@@ -680,12 +646,7 @@ void OpenGLDisplay::calculateDestRect( int w, int h )
 		destRect.top += diff;
 		destRect.bottom += diff;
 	}
-	if (displaylist)
-	{
-		glDeleteLists(displaylist, 1);
-		displaylist = 0;
-		renderlist();
-	}
+	
 }
 
 //config options
