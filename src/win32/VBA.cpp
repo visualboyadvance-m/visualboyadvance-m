@@ -250,7 +250,6 @@ VBA::VBA()
   showRenderedFrames = 0;
   screenMessage = false;
   screenMessageTime = 0;
-  menuToggle = true;
   display = NULL;
   menu = NULL;
   popup = NULL;
@@ -602,27 +601,20 @@ void VBA::adjustDestRect()
     dest.right -= windowPositionX;
   }
 
-  int menuSkip = 0;
-
-  if(videoOption >= VIDEO_320x240 && menuToggle) {
-    int m = GetSystemMetrics(SM_CYMENU);
-    menuSkip = m;
-    dest.bottom -=m;
-  }
-
   if(videoOption > VIDEO_4X) {
-    int top = (fsHeight - surfaceSizeY) / 2;
-    int left = (fsWidth - surfaceSizeX) / 2;
-    dest.top += top;
-    dest.bottom += top;
-    dest.left += left;
-    dest.right += left;
-    if(fullScreenStretch) {
-      dest.top = 0+menuSkip;
-      dest.left = 0;
-      dest.right = fsWidth;
-      dest.bottom = fsHeight;
-    }
+	  if(fullScreenStretch) {
+		  dest.top = 0;
+		  dest.left = 0;
+		  dest.right = fsWidth;
+		  dest.bottom = fsHeight;
+	  } else {
+		  int top = (fsHeight - surfaceSizeY) / 2;
+		  int left = (fsWidth - surfaceSizeX) / 2;
+		  dest.top += top;
+		  dest.bottom += top;
+		  dest.left += left;
+		  dest.right += left;
+	  }
   }
 }
 
@@ -1926,7 +1918,6 @@ void VBA::updateWindowSize(int value)
 
     style |= WS_OVERLAPPEDWINDOW;
 
-    menuToggle = TRUE;
     AdjustWindowRectEx(&dest, style, TRUE, 0); //WS_EX_TOPMOST);
 
     winSizeX = dest.right-dest.left;
@@ -1944,7 +1935,7 @@ void VBA::updateWindowSize(int value)
       info.cbSize = sizeof(MENUBARINFO);
 	  GetMenuBarInfo( theApp.m_pMainWnd->GetSafeHwnd(), OBJID_MENU, 0, &info );
       int menuHeight = GetSystemMetrics(SM_CYMENU); // includes white line
-      if((info.rcBar.bottom - info.rcBar.top) > menuHeight)
+      if((info.rcBar.bottom - info.rcBar.top) > menuHeight) // check for double height menu
 	  {
         winSizeY += (info.rcBar.bottom - info.rcBar.top) - menuHeight + 1;
         m_pMainWnd->SetWindowPos(
