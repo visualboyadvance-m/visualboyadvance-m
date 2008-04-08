@@ -112,7 +112,6 @@ class VBA : public CWinApp
   CString screenMessageBuffer;
   DWORD screenMessageTime;
   u8 *delta[257*244*4];
-  bool menuToggle;
   IDisplay *display;
   IMAGE_TYPE cartridgeType;
   bool soundInitialized;
