@@ -561,7 +561,9 @@ void MainWnd::OnOptionsEmulatorAssociate()
 void MainWnd::OnOptionsEmulatorDirectories()
 {
   Directories dlg;
+  dlg.m_alwaysLastRomDir = theApp.alwaysLastDir ? BST_CHECKED : BST_UNCHECKED;
   dlg.DoModal();
+  theApp.alwaysLastDir = ( dlg.m_alwaysLastRomDir == BST_CHECKED );
 }
 
 void MainWnd::OnOptionsEmulatorDisablestatusmessages()

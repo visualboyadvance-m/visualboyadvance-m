@@ -530,6 +530,8 @@
 #define IDC_COMBO_COLOR_DEPTH           1281
 #define IDC_COMBO_REFRESH_RATE          1282
 #define IDC_COMBO_DEVICE                1283
+#define IDC_CHECK1                      1284
+#define IDC_ALWAYSLASTROMDIR            1284
 #define IDS_OAL_NODEVICE                2000
 #define IDS_OAL_NODLL                   2001
 #define IDS_AVI_CANNOT_CREATE_AVI       2002
@@ -858,7 +860,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        163
 #define _APS_NEXT_COMMAND_VALUE         40361
-#define _APS_NEXT_CONTROL_VALUE         1284
+#define _APS_NEXT_CONTROL_VALUE         1285
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
 #endif

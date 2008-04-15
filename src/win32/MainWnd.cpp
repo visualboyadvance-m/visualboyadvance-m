@@ -1056,11 +1056,18 @@ bool MainWnd::fileOpenSelect( int system )
 	LPCTSTR exts[] = { _T(""), _T(""), _T(""), _T("") };
 	CString filter;
 	CString title;
+
+	if( theApp.alwaysLastDir ) {
+		initialDir = regQueryStringValue( _T("lastDir"), _T(".") );
+	}
+
 	switch( system )
 	{
 	case 0:
 		// GBA
-		initialDir = regQueryStringValue( _T("romdir"), _T(".") );
+		if( !theApp.alwaysLastDir ) {
+			initialDir = regQueryStringValue( _T("romdir"), _T(".") );
+		}
 		selectedFilter = regQueryDwordValue( _T("selectedFilter"), 0);
 		if( (selectedFilter < 0) || (selectedFilter > 2) ) {
 			selectedFilter = 0;
@@ -1069,13 +1076,17 @@ bool MainWnd::fileOpenSelect( int system )
 		break;
 	case 1:
 		// GBC
-		initialDir = regQueryStringValue( _T("gbcromdir"), _T(".") );
+		if( !theApp.alwaysLastDir ) {
+			initialDir = regQueryStringValue( _T("gbcromdir"), _T(".") );
+		}
 		// TODO: memorize selected filter for GBC as well
 		filter = winLoadFilter( IDS_FILTER_GBCROM );
 		break;
 	case 2:
 		// GB
-		initialDir = regQueryStringValue( _T("gbromdir"), _T(".") );
+		if( !theApp.alwaysLastDir ) {
+			initialDir = regQueryStringValue( _T("gbromdir"), _T(".") );
+		}
 		// TODO: memorize selected filter for GB as well
 		filter = winLoadFilter( IDS_FILTER_GBROM );
 		break;
@@ -1113,6 +1124,7 @@ bool MainWnd::fileOpenSelect( int system )
 			theApp.dir = theApp.dir.Left( theApp.dir.GetLength() - 1 );
 		}
 		SetCurrentDirectory( theApp.dir );
+		regSetStringValue( _T("lastDir"), theApp.dir );
 		return true;
 	}
 	return false;
