@@ -264,6 +264,7 @@ VBA::VBA()
   paused = false;
   recentFreeze = false;
   autoSaveLoadCheatList = false;
+  alwaysLastDir = false;
   winout = NULL;
   removeIntros = false;
   autoIPS = true;
@@ -1638,6 +1639,9 @@ void VBA::loadSettings()
   autoSaveLoadCheatList = regQueryDwordValue("autoSaveCheatList", 0) ?
     true : false;
 
+  alwaysLastDir =
+	  ( regQueryDwordValue( "alwaysUseLastRomDirectory", 0 ) == 1 ) ? true : false;
+
   gbPaletteOption = regQueryDwordValue("gbPaletteOption", 0);
   if(gbPaletteOption < 0)
     gbPaletteOption = 0;
@@ -2556,6 +2560,8 @@ void VBA::saveSettings()
   regSetDwordValue("priority", threadPriority);
 
   regSetDwordValue("autoSaveCheatList", autoSaveLoadCheatList);
+
+  regSetDwordValue("alwaysUseLastRomDirectory", alwaysLastDir ? 1 : 0);
 
   regSetDwordValue("gbPaletteOption", gbPaletteOption);
 
