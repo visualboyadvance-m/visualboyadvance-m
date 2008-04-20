@@ -1499,17 +1499,17 @@ void Window::vShowSpeed(int _iSpeed)
 {
   char csTitle[50];
 
-  /*if (m_eShowSpeed == ShowPercentage)
+  if (m_eShowSpeed == ShowPercentage)
   {
     snprintf(csTitle, 50, "VBA - %d%%", _iSpeed);
     set_title(csTitle);
   }
   else if (m_eShowSpeed == ShowDetailed)
-  {*/
+  {
     snprintf(csTitle, 50, "VBA - %d%% (%d, %d fps)",
              _iSpeed, systemFrameSkip, systemFPS);
     set_title(csTitle);
-  //}
+  }
 }
 
 void Window::vComputeFrameskip(int _iRate)

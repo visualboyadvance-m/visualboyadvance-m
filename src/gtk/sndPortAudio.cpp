@@ -129,8 +129,6 @@ bool systemSoundInit()
 
     soundbufsize = (soundBufferLen + 1) * 4;
 
-    fprintf(stderr, "i %d %d\n", soundbufsize, sampleRate);
-
     stereodata16 = new u16[soundbufsize];
     memset(stereodata16, 0, soundbufsize);
     soundpos = 0;
