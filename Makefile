@@ -91,7 +91,7 @@ ${DMGDIR}/gbGlobals${OE} ${DMGDIR}/gbMemory${OE} ${DMGDIR}/gbPrinter${OE} ${DMGD
 ${DMGDIR}/gbSound${OE}
 
 SDLOBJ=${SDLDIR}/debugger${OE} ${SDLDIR}/SDL${OE} ${SDLDIR}/dummy${OE} ${SDLDIR}/filters${OE} \
-${SDLDIR}/text${OE}
+${SDLDIR}/text${OE} ${SDLDIR}/sndSDL${OE}
 
 OBJECTS=${MAINOBJ} ${DMGOBJ} ${SDLOBJ} ${GBAPUOBJ}
 
