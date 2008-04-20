@@ -25,7 +25,7 @@ build: build-stamp
 build-stamp: 
 	dh_testdir
 
-	# No ASM optimized version since it is i386 specific
+	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DDATA_INSTALL_DIR:PATH=share/VisualBoyAdvanceM .
 	$(MAKE)
 	#docbook-to-man debian/vbam.sgml > vbam.1
 
@@ -35,6 +35,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp
+	rm -f CMakeCache.txt
 
 	# Add here commands to clean up after the build process.
 	-$(MAKE) clean
@@ -48,8 +49,9 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/vbam.
-	$(MAKE) PREFIX=/usr DESTDIR=$(CURDIR)/debian/vbam install
-
+	$(MAKE) DESTDIR=$(CURDIR)/debian/vbam install
+	install -c -m 644 -D debian/gvbam.desktop debian/vbam/usr/share/applications/gvbam.desktop
+	install -c -m 644 -D src/gtk/icons/vba-m.png debian/vbam/usr/share/pixmaps/vbam-icon.png
 
 # Build architecture-independent files here.
 binary-indep: build install
