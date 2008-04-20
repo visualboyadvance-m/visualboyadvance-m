@@ -107,6 +107,7 @@ int systemDebug = 0;
 int systemVerbose = 0;
 int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
+int systemThrottle = 0;
 
 int srcPitch = 0;
 int srcWidth = 0;
@@ -191,7 +192,6 @@ int frameskipadjust = 0;
 int showRenderedFrames = 0;
 int renderedFrames = 0;
 
-int throttle = 0;
 u32 throttleLastTime = 0;
 u32 autoFrameSkipLastTime = 0;
 
@@ -203,7 +203,6 @@ bool pauseNextFrame = false;
 bool debugger = false;
 bool debuggerStub = false;
 int fullscreen = 0;
-bool systemSoundOn = false;
 int sdlFlashSize = 0;
 int sdlAutoIPS = 1;
 int sdlRtcEnable = 0;
@@ -223,34 +222,6 @@ bool autoFireToggle = false;
 bool screenMessage = false;
 char screenMessageBuffer[21];
 u32  screenMessageTime = 0;
-
-// Patch #1382692 by deathpudding.
-const  int        sdlSoundSamples  = 4096;
-const  int        sdlSoundAlign    = 4;
-const  int        sdlSoundCapacity = sdlSoundSamples * 2;
-const  int        sdlSoundTotalLen = sdlSoundCapacity + sdlSoundAlign;
-static u8         sdlSoundBuffer[sdlSoundTotalLen];
-static int        sdlSoundRPos;
-static int        sdlSoundWPos;
-static SDL_cond  *sdlSoundCond;
-static SDL_mutex *sdlSoundMutex;
-
-static inline int soundBufferFree()
-{
-  int ret = sdlSoundRPos - sdlSoundWPos - sdlSoundAlign;
-  if (ret < 0)
-    ret += sdlSoundTotalLen;
-  return ret;
-}
-
-static inline int soundBufferUsed()
-{
-  int ret = sdlSoundWPos - sdlSoundRPos;
-  if (ret < 0)
-    ret += sdlSoundTotalLen;
-  return ret;
-}
-
 
 char *arg0;
 
@@ -317,7 +288,7 @@ struct option sdlOptions[] = {
   { "no-pause-when-inactive", no_argument, &pauseWhenInactive, 0 },
   { "no-rtc", no_argument, &sdlRtcEnable, 0 },
   { "no-show-speed", no_argument, &showSpeed, 0 },
-  { "no-throttle", no_argument, &throttle, 0 },
+  { "no-throttle", no_argument, &systemThrottle, 0 },
   { "opengl", required_argument, 0, 'O' },
   { "opengl-nearest", no_argument, &openGL, 1 },
   { "opengl-bilinear", no_argument, &openGL, 2 },
@@ -725,9 +696,9 @@ void sdlReadPreferences(FILE *f)
     } else if(!strcmp(key, "autoFrameSkip")) {
       autoFrameSkip = sdlFromHex(value);
     } else if(!strcmp(key, "throttle")) {
-      throttle = sdlFromHex(value);
-      if(throttle != 0 && (throttle < 5 || throttle > 1000))
-        throttle = 0;
+      systemThrottle = sdlFromHex(value);
+      if(systemThrottle != 0 && (systemThrottle < 5 || systemThrottle > 1000))
+        systemThrottle = 0;
     } else if(!strcmp(key, "pauseWhenInactive")) {
       pauseWhenInactive = sdlFromHex(value) ? true : false;
     } else if(!strcmp(key, "agbPrint")) {
@@ -1753,7 +1724,7 @@ int main(int argc, char **argv)
         int t = atoi(optarg);
         if(t < 5 || t > 1000)
           t = 0;
-        throttle = t;
+        systemThrottle = t;
       }
       break;
     case 'v':
@@ -2242,7 +2213,7 @@ void systemFrame()
 void system10Frames(int rate)
 {
   u32 time = systemGetClock();
-  if(!wasPaused && autoFrameSkip && !throttle) {
+  if(!wasPaused && autoFrameSkip && !systemThrottle) {
     u32 diff = time - autoFrameSkipLastTime;
     int speed = 100;
 
@@ -2270,11 +2241,11 @@ void system10Frames(int rate)
       }
     }
   }
-  if(!wasPaused && throttle) {
+  if(!wasPaused && systemThrottle) {
     if(!speedup) {
       u32 diff = time - throttleLastTime;
 
-      int target = (1000000/(rate*throttle));
+      int target = (1000000/(rate*systemThrottle));
       int d = (target - diff);
 
       if(d > 0) {
@@ -2325,143 +2296,6 @@ void systemScreenCapture(int a)
   }
 
   systemScreenMessage("Screen capture");
-}
-
-static void soundCallback(void *,u8 *stream,int len)
-{
- if (len <= 0 || !emulating)
-     return;
-
-  SDL_mutexP(sdlSoundMutex);
-  const int nAvail = soundBufferUsed();
-  if (len > nAvail)
-    len = nAvail;
-  const int nAvail2 = sdlSoundTotalLen - sdlSoundRPos;
-  if (len >= nAvail2) {
-    memcpy(stream, &sdlSoundBuffer[sdlSoundRPos], nAvail2);
-    sdlSoundRPos = 0;
-    stream += nAvail2;
-    len    -= nAvail2;
-  }
-  if (len > 0) {
-    memcpy(stream, &sdlSoundBuffer[sdlSoundRPos], len);
-    sdlSoundRPos = (sdlSoundRPos + len) % sdlSoundTotalLen;
-    stream += len;
-  }
-  SDL_CondSignal(sdlSoundCond);
-  SDL_mutexV(sdlSoundMutex);
-}
-
-void systemWriteDataToSoundBuffer()
-{
-  if (SDL_GetAudioStatus() != SDL_AUDIO_PLAYING)
-  {
-    SDL_PauseAudio(0);
-  }
-
-  int remain = soundBufferLen;
-  const u8 *wave = reinterpret_cast<const u8 *>(soundFinalWave);
-
-  SDL_mutexP(sdlSoundMutex);
-
-  int n;
-  while (remain >= (n = soundBufferFree())) {
-  const int nAvail = (sdlSoundTotalLen - sdlSoundWPos) < n ? (sdlSoundTotalLen - sdlSoundWPos) : n;
-   memcpy(&sdlSoundBuffer[sdlSoundWPos], wave, nAvail);
-   sdlSoundWPos = (sdlSoundWPos + nAvail) % sdlSoundTotalLen;
-    wave        += nAvail;
-    remain      -= nAvail;
-
-	if (!emulating || speedup || throttle) {
-       SDL_mutexV(sdlSoundMutex);
-      return;
-    }
-    SDL_CondWait(sdlSoundCond, sdlSoundMutex);
-}
-
-const int nAvail = sdlSoundTotalLen - sdlSoundWPos;
-  if (remain >= nAvail) {
-    memcpy(&sdlSoundBuffer[sdlSoundWPos], wave, nAvail);
-    sdlSoundWPos = 0;
-    wave   += nAvail;
-    remain -= nAvail;
-  }
-  if (remain > 0) {
-    memcpy(&sdlSoundBuffer[sdlSoundWPos], wave, remain);
-    sdlSoundWPos = (sdlSoundWPos + remain) % sdlSoundTotalLen;
-  }
-  SDL_mutexV(sdlSoundMutex);
-}
-
-bool systemSoundInit()
-{
-  SDL_AudioSpec audio;
-
-  switch(soundQuality) {
-  case 1:
-    audio.freq = 44100;
-    soundBufferLen = 1470*2;
-    break;
-  case 2:
-    audio.freq = 22050;
-    soundBufferLen = 736*2;
-    break;
-  case 4:
-    audio.freq = 11025;
-    soundBufferLen = 368*2;
-    break;
-  }
-  audio.format=AUDIO_S16SYS;
-  audio.channels = 2;
-  audio.samples = 1024;
-  audio.callback = soundCallback;
-  audio.userdata = NULL;
-  if(SDL_OpenAudio(&audio, NULL)) {
-    fprintf(stderr,"Failed to open audio: %s\n", SDL_GetError());
-    return false;
-  }
-
-  sdlSoundCond  = SDL_CreateCond();
-  sdlSoundMutex = SDL_CreateMutex();
-
-  sdlSoundRPos = sdlSoundWPos = 0;
-  systemSoundOn = true;
-  return true;
-
-}
-
-void systemSoundShutdown()
-{
-  SDL_mutexP(sdlSoundMutex);
- int iSave = emulating;
-  emulating = 0;
-  SDL_CondSignal(sdlSoundCond);
-  SDL_mutexV(sdlSoundMutex);
-
-  SDL_DestroyCond(sdlSoundCond);
-  sdlSoundCond = NULL;
-
-  SDL_DestroyMutex(sdlSoundMutex);
-  sdlSoundMutex = NULL;
-
-  SDL_CloseAudio();
-
-  emulating = iSave;
-  systemSoundOn = false;
-}
-
-void systemSoundPause()
-{
-  SDL_PauseAudio(1);
-}
-
-void systemSoundResume()
-{
-  SDL_PauseAudio(0);
-}
-
-void systemSoundReset()
-{
 }
 
 u32 systemGetClock()
