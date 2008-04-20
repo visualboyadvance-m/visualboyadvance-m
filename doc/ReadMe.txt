@@ -31,7 +31,7 @@ Multi-platform support.
 System Requirements
 ===================
 
-OS:  Windows 2000 - Vista (x86 or x64)
+OS:  Windows 2000 - Vista (x86 or x64), Linux
 CPU: 700MHz minimum for GBA emulation, CPU requirements increase if filters are to be used.
 RAM: ~64MB free
 GFX: ~32MB VRAM, DirectX9 drivers
@@ -63,12 +63,14 @@ Important:
 
 - Improve automatic 64k/128k flash save detection
 
-- Fix OpenGL issues
+- Fix OpenGL issues 
 
 - Remove 16 bit hack for filters
  - Not compatible to software motion blur (display corruption)
 
 - Add selection for compressed archives with more than one ROM in them
+
+- Finalise Qt4 GUI system
 
 
 
@@ -144,3 +146,9 @@ Special Thanks go to:
 chrono:
 ASM genius, fixed a bug in the HQ3x/4x filters.
 Made HQ3x/4x and Bilinear filters (ASM versions) thread-safe
+bgKu: 
+GTK GUI port
+Various assistance with Linux issues
+blargg: 
+Assistance with the implementation of his highly accurate GB audio core
+Implemented his unreleased File_Extractor library
