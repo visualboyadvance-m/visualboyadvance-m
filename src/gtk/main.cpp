@@ -18,9 +18,6 @@
 
 #include <limits.h>
 #include <stdlib.h>
-#include "../getopt.h"
-
-#include <list>
 
 #include <gtkmm/main.h>
 #include <gtkmm/window.h>
@@ -32,46 +29,6 @@
 
 using Gnome::Glade::Xml;
 
-static const char * csProgramName;
-
-static int iShowHelp;
-static int iShowVersion;
-
-// Non-characters used for long options that have no equivalent short option
-enum
-{
-  IGNORED_OPTION = CHAR_MAX + 1
-};
-
-static const char csShortOptions[] = "V";
-
-static const struct option astLongOptions[] =
-{
-  { "help",    no_argument, &iShowHelp, IGNORED_OPTION },
-  { "version", no_argument, NULL,       'V'            },
-  { 0, 0, 0, 0 }
-};
-
-static void vUsage(int iStatus)
-{
-  if (iStatus != 0)
-  {
-    g_printerr(_("Try `%s --help' for more information.\n"), csProgramName);
-  }
-  else
-  {
-    g_print(_("Usage: %s [option ...] [file]\n"), csProgramName);
-    g_print(_("\
-\n\
-Options:\n\
-      --help            Output this help.\n\
-  -V, --version         Output version information.\n\
-"));
-  }
-
-  exit(iStatus);
-}
-
 static void vSetDefaultWindowIcon()
 {
   Glib::RefPtr<Gdk::Pixbuf> pixBuf= Gdk::Pixbuf::create_from_file(PKGDATADIR "/icons/vba-m.png");
@@ -80,7 +37,8 @@ static void vSetDefaultWindowIcon()
 
 int main(int argc, char * argv[])
 {
-  csProgramName = argv[0];
+  bool bShowVersion = false;
+  Glib::OptionGroup::vecustrings listRemaining;
 
 #ifdef ENABLE_NLS
   setlocale(LC_ALL, "");
@@ -90,34 +48,41 @@ int main(int argc, char * argv[])
 #endif // ENABLE_NLS
 
   Gtk::Main oKit(argc, argv);
+  
+  Glib::OptionContext oContext;
+  Glib::OptionGroup oGroup("main_group", _("Main VBA-M options"));
+  
+  Glib::OptionEntry oVersion;
+  oVersion.set_long_name("version");
+  oVersion.set_short_name('v');
+  oVersion.set_description(_("Output version information."));
+  oGroup.add_entry(oVersion, bShowVersion);
 
-  int iOpt;
-  while ((iOpt = getopt_long(argc, argv, csShortOptions, astLongOptions, NULL))
-         != -1)
+  Glib::OptionEntry oFileName;
+  oFileName.set_long_name(G_OPTION_REMAINING);
+  oFileName.set_description(G_OPTION_REMAINING);
+  oGroup.add_entry(oFileName, listRemaining);
+
+  oContext.set_main_group(oGroup);
+
+  try
   {
-    switch (iOpt)
-    {
-    case 'V':
-      iShowVersion = 1;
-      break;
-    case 0:
-      // Long options
-      break;
-    default:
-      vUsage(1);
-      break;
-    }
+    oContext.parse(argc, argv);
+  }
+  catch (const Glib::Error& e)
+  {
+    Gtk::MessageDialog oDialog(e.what(),
+                               false,
+                               Gtk::MESSAGE_ERROR,
+                               Gtk::BUTTONS_OK);
+    oDialog.run();
+    return 1;
   }
 
-  if (iShowVersion)
+  if (bShowVersion)
   {
     g_print(_("VisualBoyAdvance version %s [GTK+]\n"), VERSION);
     exit(0);
-  }
-
-  if (iShowHelp)
-  {
-    vUsage(0);
   }
 
   vSetDefaultWindowIcon();
@@ -140,7 +105,7 @@ int main(int argc, char * argv[])
   VBA::Window * poWindow = NULL;
   poXml->get_widget_derived<VBA::Window>("MainWindow", poWindow);
 
-  if (optind < argc)
+  if (listRemaining.size() == 1)
   {
     // Display the window before loading the file
     poWindow->show();
@@ -149,7 +114,7 @@ int main(int argc, char * argv[])
       Gtk::Main::iteration();
     }
 
-    poWindow->bLoadROM(argv[optind]);
+    poWindow->bLoadROM(listRemaining[0]);
   }
 
   Gtk::Main::run(*poWindow);
