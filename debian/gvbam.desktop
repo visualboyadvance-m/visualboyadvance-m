@@ -6,5 +6,5 @@ Name=VBA-M
 GenericName=GameBoy Advance Emulator
 Comment=Nindendo GameBoy Advance Emulator
 Exec=gvbam
-Icon=vbam-icon.png
+Icon=vbam-icon.svg
 Categories=Application;Game;Emulator;GTK

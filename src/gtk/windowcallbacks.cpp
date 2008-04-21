@@ -1226,22 +1226,33 @@ void Window::vOnGDBDisconnect()
 
 void Window::vOnHelpAbout()
 {
-  Glib::RefPtr<Xml> poXml;
-  poXml = Xml::create(PKGDATADIR "/vba.glade", "AboutDialog");
+  Gtk::AboutDialog oAboutDialog;
+  
+  oAboutDialog.set_transient_for(*this);
 
-  Gtk::Dialog * poDialog = dynamic_cast<Gtk::Dialog *>(poXml->get_widget("AboutDialog"));
-  poDialog->set_transient_for(*this);
+  oAboutDialog.set_name("VBA-M");
+  oAboutDialog.set_version(VERSION);
+  oAboutDialog.set_comments(_("Nintendo GameBoy Advance emulator."));
+  oAboutDialog.set_license("GPL");
 
-  Gtk::Image oIcon(PKGDATADIR "/vba-64.png");
-  oIcon.show();
-  Gtk::Container * poIconContainer = dynamic_cast<Gtk::Container *>(poXml->get_widget("AboutIconContainer"));
-  poIconContainer->add(oIcon);
+  oAboutDialog.set_website("http://vba-m.ngemu.com");
 
-  Gtk::Label * poLabel  = dynamic_cast<Gtk::Label *>(poXml->get_widget("VersionLabel"));
-  poLabel->set_markup("<b><big>" PACKAGE " " VERSION "</big></b>");
-
-  poDialog->run();
-  delete poDialog;
+  std::list<Glib::ustring> list_authors;
+  list_authors.push_back("Forgotten");
+  list_authors.push_back("kxu");
+  list_authors.push_back("Pokemonhacker");
+  list_authors.push_back("Spacy51");
+  list_authors.push_back("mudlord");
+  list_authors.push_back("Nach");
+  list_authors.push_back("jbo_85");
+  list_authors.push_back("bgK");
+  oAboutDialog.set_authors(list_authors);
+  
+  std::list<Glib::ustring> list_artists;
+  list_artists.push_back("Matteo Drera");
+  oAboutDialog.set_artists(list_artists);
+  
+  oAboutDialog.run();
 }
 
 bool Window::bOnEmuIdle()
