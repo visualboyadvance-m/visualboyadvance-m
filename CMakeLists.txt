@@ -140,6 +140,7 @@ SET(SRC_GTK
     src/gtk/filters.cpp
     src/gtk/joypadconfig.cpp
     src/gtk/screenarea.cpp
+    src/gtk/screenarea-gtk.cpp
     src/gtk/tools.cpp
     src/gtk/window.cpp
     src/gtk/sndPortAudio.cpp
