@@ -24,8 +24,6 @@ namespace VBA
 {
 
 ScreenArea::ScreenArea(int _iWidth, int _iHeight, int _iScale) :
-  m_puiPixels(NULL),
-  m_puiDelta(NULL),
   m_vFilter2x(NULL),
   m_vFilterIB(NULL),
   m_bShowCursor(true)
@@ -35,7 +33,6 @@ ScreenArea::ScreenArea(int _iWidth, int _iHeight, int _iScale) :
   m_iWidth  = _iWidth;
   m_iHeight = _iHeight;
   m_iScale  = _iScale;
-  vUpdateSize();
 
   set_events(Gdk::EXPOSURE_MASK
              | Gdk::POINTER_MOTION_MASK
@@ -56,16 +53,6 @@ ScreenArea::ScreenArea(int _iWidth, int _iHeight, int _iScale) :
 
 ScreenArea::~ScreenArea()
 {
-  if (m_puiPixels != NULL)
-  {
-    delete[] m_puiPixels;
-  }
-
-  if (m_puiDelta != NULL)
-  {
-    delete[] m_puiDelta;
-  }
-
   if (m_poEmptyCursor != NULL)
   {
     delete m_poEmptyCursor;
@@ -105,103 +92,6 @@ void ScreenArea::vSetFilterIB(EFilterIB _eFilterIB)
   m_vFilterIB = pvGetFilterIB(_eFilterIB, FilterDepth32);
 }
 
-void ScreenArea::vDrawPixels(u8 * _puiData)
-{
-  if (m_vFilterIB != NULL)
-  {
-    m_vFilterIB(_puiData + m_iAreaWidth * 2 + 4,
-                m_iAreaWidth * 2 + 4,
-                m_iWidth,
-                m_iHeight);
-  }
-
-  if (m_iScale == 1)
-  {
-    u32 * puiSrc = (u32 *)_puiData + m_iWidth + 1;
-    u32 * puiPixel = m_puiPixels;
-    for (int y = 0; y < m_iHeight; y++)
-    {
-      for (int x = 0; x < m_iWidth; x++)
-      {
-        *puiPixel++ = *puiSrc++;
-      }
-      puiSrc++;
-    }
-  }
-  else if (m_iScale == 2 && m_vFilter2x != NULL)
-  {
-    m_vFilter2x(_puiData + m_iAreaWidth * 2 + 4,
-                m_iAreaWidth * 2 + 4,
-                m_puiDelta,
-                (u8 *)m_puiPixels,
-                m_iRowStride,
-                m_iWidth,
-                m_iHeight);
-  }
-  else
-  {
-    u32 * puiSrc = (u32 *)_puiData + m_iWidth + 1;
-    u32 * puiSrc2;
-    u32 * puiPixel = m_puiPixels;
-    for (int y = 0; y < m_iHeight; y++)
-    {
-      for (int j = 0; j < m_iScale; j++)
-      {
-        puiSrc2 = puiSrc;
-        for (int x = 0; x < m_iWidth; x++)
-        {
-          for (int i = 0; i < m_iScale; i++)
-          {
-            *puiPixel++ = *puiSrc2;
-          }
-          puiSrc2++;
-        }
-      }
-      puiSrc = puiSrc2 + 1;
-    }
-  }
-
-  queue_draw_area(0, 0, m_iAreaWidth, m_iAreaHeight);
-}
-
-void ScreenArea::vDrawColor(u32 _uiColor)
-{
-  _uiColor = GUINT32_TO_BE(_uiColor) << 8;
-
-  u32 * puiPixel = m_puiPixels;
-  u32 * puiEnd   = m_puiPixels + m_iAreaWidth * m_iAreaHeight;
-  while (puiPixel != puiEnd)
-  {
-    *puiPixel++ = _uiColor;
-  }
-
-  queue_draw_area(0, 0, m_iAreaWidth, m_iAreaHeight);
-}
-
-void ScreenArea::vUpdateSize()
-{
-  if (m_puiPixels != NULL)
-  {
-    delete[] m_puiPixels;
-  }
-
-  if (m_puiDelta != NULL)
-  {
-    delete[] m_puiDelta;
-  }
-
-  m_iAreaWidth  = m_iScale * m_iWidth;
-  m_iAreaHeight = m_iScale * m_iHeight;
-  m_iRowStride  = m_iAreaWidth * 4;
-
-  m_puiPixels = new u32[m_iAreaWidth * m_iAreaHeight];
-
-  m_puiDelta = new u8[(m_iWidth + 2) * (m_iHeight + 2) * 4];
-  memset(m_puiDelta, 255, (m_iWidth + 2) * (m_iHeight + 2) * 4);
-
-  set_size_request(m_iAreaWidth, m_iAreaHeight);
-}
-
 void ScreenArea::vStartCursorTimeout()
 {
   m_oCursorSig.disconnect();
@@ -225,37 +115,6 @@ void ScreenArea::vShowCursor()
 {
   get_window()->set_cursor();
   m_bShowCursor = true;
-}
-
-bool ScreenArea::on_expose_event(GdkEventExpose * _pstEvent)
-{
-  if (_pstEvent->area.x + _pstEvent->area.width > m_iAreaWidth
-      || _pstEvent->area.y + _pstEvent->area.height > m_iAreaHeight)
-  {
-    return false;
-  }
-
-  guchar * puiAreaPixels = (guchar *)m_puiPixels;
-
-  if (_pstEvent->area.x != 0)
-  {
-    puiAreaPixels += _pstEvent->area.x << 2;
-  }
-
-  if (_pstEvent->area.y != 0)
-  {
-    puiAreaPixels += _pstEvent->area.y * m_iRowStride;
-  }
-
-  get_window()->draw_rgb_32_image(get_style()->get_fg_gc(get_state()),
-                                  _pstEvent->area.x,
-                                  _pstEvent->area.y,
-                                  _pstEvent->area.width,
-                                  _pstEvent->area.height,
-                                  Gdk::RGB_DITHER_MAX,
-                                  puiAreaPixels,
-                                  m_iRowStride);
-  return true;
 }
 
 bool ScreenArea::on_motion_notify_event(GdkEventMotion * _pstEvent)

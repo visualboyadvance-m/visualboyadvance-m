@@ -33,7 +33,7 @@
 #include "../System.h"
 
 #include "configfile.h"
-#include "screenarea.h"
+#include "screenarea-gtk.h"
 #include "filters.h"
 #include "input.h"
 #include "joypadconfig.h"
@@ -232,7 +232,7 @@ private:
 
   Gtk::FileChooserDialog * m_poFileOpenDialog;
 
-  ScreenArea *         m_poScreenArea;
+  ScreenAreaGtk *      m_poScreenArea;
   Gtk::Menu *          m_poRecentMenu;
   Gtk::MenuItem *      m_poRecentResetItem;
   Gtk::CheckMenuItem * m_poFilePauseItem;
