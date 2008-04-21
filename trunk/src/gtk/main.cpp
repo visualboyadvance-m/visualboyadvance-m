@@ -29,12 +29,6 @@
 
 using Gnome::Glade::Xml;
 
-static void vSetDefaultWindowIcon()
-{
-  Glib::RefPtr<Gdk::Pixbuf> pixBuf= Gdk::Pixbuf::create_from_file(PKGDATADIR "/icons/vba-m.png");
-  Gtk::Window::set_default_icon(pixBuf);
-}
-
 int main(int argc, char * argv[])
 {
   bool bShowVersion = false;
@@ -85,7 +79,7 @@ int main(int argc, char * argv[])
     exit(0);
   }
 
-  vSetDefaultWindowIcon();
+  Gtk::Window::set_default_icon_from_file(PKGDATADIR "/icons/gbadvance.svg");
 
   Glib::RefPtr<Xml> poXml;
   try
