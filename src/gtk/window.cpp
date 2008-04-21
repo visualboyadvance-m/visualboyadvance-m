@@ -93,6 +93,8 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 
   vInitSystem();
 
+  vSetDefaultTitle();
+
   Gtk::Container * poC;
   poC = dynamic_cast<Gtk::Container *>(_poXml->get_widget("ScreenContainer"));
   m_poScreenArea = Gtk::manage(new ScreenArea(m_iScreenWidth, m_iScreenHeight));
