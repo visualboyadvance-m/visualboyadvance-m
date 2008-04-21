@@ -1235,7 +1235,7 @@ void Window::vOnHelpAbout()
   oAboutDialog.set_comments(_("Nintendo GameBoy Advance emulator."));
   oAboutDialog.set_license("GPL");
 
-  oAboutDialog.set_website("http://vba-m.ngemu.com");
+  oAboutDialog.set_website("http://vba-m.ngemu.com/");
 
   std::list<Glib::ustring> list_authors;
   list_authors.push_back("Forgotten");
