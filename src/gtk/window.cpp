@@ -1384,6 +1384,7 @@ bool Window::bLoadROM(const std::string & _rsFile)
     {
       m_eCartridge = CartridgeGB;
       m_stEmulator = GBSystem;
+      gbReset();
     }
   }
   else if (eType == IMAGE_GBA)
