@@ -51,7 +51,7 @@ install: build
 	# Add here commands to install the package into debian/vbam.
 	$(MAKE) DESTDIR=$(CURDIR)/debian/vbam install
 	install -c -m 644 -D debian/gvbam.desktop debian/vbam/usr/share/applications/gvbam.desktop
-	install -c -m 644 -D src/gtk/icons/vba-m.png debian/vbam/usr/share/pixmaps/vbam-icon.png
+	install -c -m 644 -D src/gtk/icons/gbadvance.svg debian/vbam/usr/share/pixmaps/vbam-icon.svg
 
 # Build architecture-independent files here.
 binary-indep: build install
