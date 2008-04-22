@@ -32,7 +32,10 @@ namespace VBA
 {
 
 ScreenAreaXv::ScreenAreaXv(int _iWidth, int _iHeight, int _iScale) :
-  ScreenArea(_iWidth, _iHeight, _iScale)
+  ScreenArea(_iWidth, _iHeight, _iScale),
+  m_puiPixels(0),
+  m_puiDelta(0),
+  m_iFilterScale(1)
 {
   XvAdaptorInfo *pAdaptors;
   unsigned int iNumAdaptors;
@@ -102,18 +105,52 @@ ScreenAreaXv::ScreenAreaXv(int _iWidth, int _iHeight, int _iScale) :
 ScreenAreaXv::~ScreenAreaXv()
 {
   XShmDetach(m_pDisplay, &m_oShm);
+  
+  if (m_puiPixels != NULL)
+  {
+    delete[] m_puiPixels;
+  }
+
+  if (m_puiDelta != NULL)
+  {
+    delete[] m_puiDelta;
+  }
 }
 
 void ScreenAreaXv::vDrawPixels(u8 * _puiData)
 {
   GtkWidget *pDrawingArea = GTK_WIDGET(this->gobj());
   GdkGC *gc = pDrawingArea->style->bg_gc[GTK_WIDGET_STATE (pDrawingArea)];
+  u32 * puiPixels = (u32 *)_puiData;
 
-  const int iSrcPitch = (m_iWidth + 4) * sizeof(u16);
-  const int iDstPitch = m_iWidth * sizeof(u32) + 4;
+  const int iSrcPitch = m_iWidth * sizeof(u32) + 4;
+  const int iScaledWidth = m_iFilterScale * m_iWidth;
+  const int iScaledHeight = m_iFilterScale * m_iHeight;
+  const int iScaledPitch = iScaledWidth * sizeof(u32) + 4;
+  const int iDstPitch = (iScaledWidth + 4) * sizeof(u16);
 
-  vRGB32toYUY2((unsigned char*)m_pXvImage->data, m_iWidth, m_iHeight, iSrcPitch,
-               _puiData + iDstPitch, m_iWidth + 4, m_iHeight + 4, iDstPitch);
+  if (m_vFilterIB != NULL)
+  {
+    m_vFilterIB(_puiData + iSrcPitch,
+                iSrcPitch,
+                m_iWidth,
+                m_iHeight);
+  }
+
+  if (m_iScale == 2 && m_vFilter2x != NULL)
+  {
+    m_vFilter2x(_puiData + iSrcPitch,
+                iSrcPitch,
+                m_puiDelta,
+                (u8 *)m_puiPixels,
+                iScaledPitch,
+                m_iWidth,
+                m_iHeight);
+    puiPixels = m_puiPixels;
+  }
+
+  vRGB32toYUY2((unsigned char*)m_pXvImage->data, iScaledWidth, iScaledHeight, iDstPitch,
+               (u8 *)puiPixels + iScaledPitch, iScaledWidth + 4, iScaledHeight + 4, iScaledPitch);
 
   gdk_display_sync(gtk_widget_get_display(pDrawingArea));
 
@@ -123,9 +160,9 @@ void ScreenAreaXv::vDrawPixels(u8 * _puiData)
                 GDK_GC_XGC (gc),
                 m_pXvImage,
                 0, 0,
-                m_iWidth, m_iHeight,
+                iScaledWidth, iScaledHeight,
                 0, 0,
-                m_iAreaWidth, m_iAreaHeight,
+                m_iAreaWidth + 4, m_iAreaHeight + 4,
                 True);
 
   gdk_display_sync(gtk_widget_get_display(pDrawingArea));
@@ -137,10 +174,25 @@ void ScreenAreaXv::vDrawColor(u32 _uiColor)
 
 void ScreenAreaXv::vUpdateSize()
 {
+  if (m_puiPixels != NULL)
+  {
+    delete[] m_puiPixels;
+  }
+
+  if (m_puiDelta != NULL)
+  {
+    delete[] m_puiDelta;
+  }
 
   if (m_oShm.shmid)
   {
     XShmDetach(m_pDisplay, &m_oShm);
+  }
+
+  m_iFilterScale = 1;  
+  if (m_iScale == 2 && m_vFilter2x != NULL)
+  {
+    m_iFilterScale = 2;
   }
 
   m_iAreaWidth  = m_iScale * m_iWidth;
@@ -150,8 +202,8 @@ void ScreenAreaXv::vUpdateSize()
                               m_iXvPortId,
                               m_iFormat,  
                               0,
-                              m_iWidth + 4,
-                              m_iHeight + 4,
+                              m_iFilterScale * m_iWidth + 4,
+                              m_iFilterScale * m_iHeight + 4,
                               &m_oShm);
   
   m_oShm.shmid = shmget(IPC_PRIVATE, m_pXvImage->data_size, IPC_CREAT | 0777);
@@ -162,17 +214,22 @@ void ScreenAreaXv::vUpdateSize()
   
   XShmAttach(m_pDisplay, &m_oShm);
 
+  m_puiPixels = new u32[m_iAreaWidth * m_iAreaHeight];
+
+  m_puiDelta = new u8[(m_iWidth + 2) * (m_iHeight + 2) * 4];
+  memset(m_puiDelta, 255, (m_iWidth + 2) * (m_iHeight + 2) * 4);
+
   set_size_request(m_iAreaWidth, m_iAreaHeight);
 }
 
 void ScreenAreaXv::vRGB32toYUY2 (unsigned char* dest_ptr,
-                 int            dest_width,
-                 int            dest_height,
-                 int            dest_pitch,
-                 unsigned char* src_ptr,
-                 int            src_width,
-                 int            src_height,
-                 int            src_pitch)
+                                 int            dest_width,
+                                 int            dest_height,
+                                 int            dest_pitch,
+                                 unsigned char* src_ptr,
+                                 int            src_width,
+                                 int            src_height,
+                                 int            src_pitch)
 {
     unsigned char* pSrc    = NULL;
     unsigned char* pDst    = NULL;
