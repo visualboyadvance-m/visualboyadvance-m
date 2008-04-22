@@ -33,6 +33,8 @@
 #include "menuitem.h"
 #include "tools.h"
 #include "intl.h"
+#include "screenarea-gtk.h"
+#include "screenarea-xvideo.h"
 
 extern int systemRenderedFrames;
 extern int systemFPS;
@@ -95,13 +97,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 
   vSetDefaultTitle();
 
-  Gtk::Container * poC;
-  poC = dynamic_cast<Gtk::Container *>(_poXml->get_widget("ScreenContainer"));
-  m_poScreenArea = Gtk::manage(new ScreenAreaGtk(m_iScreenWidth, m_iScreenHeight));
-  poC->add(*m_poScreenArea);
-  vDrawDefaultScreen();
-  m_poScreenArea->show();
-
   // Get config
   //
   vInitConfig();
@@ -122,6 +117,8 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   {
     vSaveConfig(m_sConfigFile);
   }
+
+  vInitScreenArea();
 
   vCreateFileOpenDialog();
   vLoadHistoryFromConfig();
@@ -857,6 +854,36 @@ Window::~Window()
   m_poInstance = NULL;
 }
 
+void Window::vInitScreenArea()
+{
+  Gtk::Container * poC;
+  bool bUseXv;
+  
+  poC = dynamic_cast<Gtk::Container *>(m_poXml->get_widget("ScreenContainer"));
+  bUseXv = m_poDisplayConfig->oGetKey<bool>("use_Xv");
+  
+  if (bUseXv)
+  {
+    try
+    {
+      m_poScreenArea = Gtk::manage(new ScreenAreaXv(m_iScreenWidth, m_iScreenHeight));
+    }
+    catch (std::exception e)
+    {
+      fprintf(stderr, "Unable to initialise Xv output, falling back to GTK+\n");
+      m_poScreenArea = Gtk::manage(new ScreenAreaGtk(m_iScreenWidth, m_iScreenHeight));
+    }
+  }
+  else
+  {
+    m_poScreenArea = Gtk::manage(new ScreenAreaGtk(m_iScreenWidth, m_iScreenHeight));
+  }
+  
+  poC->add(*m_poScreenArea);
+  vDrawDefaultScreen();
+  m_poScreenArea->show();
+}
+
 void Window::vInitSystem()
 {
 #if G_BYTE_ORDER == G_LITTLE_ENDIAN
@@ -963,6 +990,7 @@ void Window::vInitConfig()
   m_poDisplayConfig->vSetKey("pause_when_inactive", true           );
   m_poDisplayConfig->vSetKey("filter2x",            FilterNone     );
   m_poDisplayConfig->vSetKey("filterIB",            FilterIBNone   );
+  m_poDisplayConfig->vSetKey("use_Xv",              false          );
 
   // Sound section
   //
