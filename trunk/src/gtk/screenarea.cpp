@@ -85,6 +85,7 @@ void ScreenArea::vSetScale(int _iScale)
 void ScreenArea::vSetFilter2x(EFilter2x _eFilter2x)
 {
   m_vFilter2x = pvGetFilter2x(_eFilter2x, FilterDepth32);
+  vUpdateSize();
 }
 
 void ScreenArea::vSetFilterIB(EFilterIB _eFilterIB)

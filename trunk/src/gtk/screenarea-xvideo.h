@@ -46,16 +46,19 @@ private:
   int m_iFormat;
   u16* m_paYUY;
   XShmSegmentInfo m_oShm;
+  u32 *    m_puiPixels;
+  u8 *     m_puiDelta;
+  int      m_iFilterScale;
 
   void vUpdateSize();
   void vRGB32toYUY2 (unsigned char* dest_ptr,
-                 int            dest_width,
-                 int            dest_height,
-                 int            dest_pitch,
-                 unsigned char* src_ptr,
-                 int            src_width,
-                 int            src_height,
-                 int            src_pitch);
+                     int            dest_width,
+                     int            dest_height,
+                     int            dest_pitch,
+                     unsigned char* src_ptr,
+                     int            src_width,
+                     int            src_height,
+                     int            src_pitch);
 };
 
 } // namespace VBA
