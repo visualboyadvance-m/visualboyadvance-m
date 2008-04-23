@@ -103,15 +103,13 @@ void ScreenAreaGtk::vDrawPixels(u8 * _puiData)
   queue_draw_area(0, 0, m_iAreaWidth, m_iAreaHeight);
 }
 
-void ScreenAreaGtk::vDrawColor(u32 _uiColor)
+void ScreenAreaGtk::vDrawBlackScreen()
 {
-  _uiColor = GUINT32_TO_BE(_uiColor) << 8;
-
   u32 * puiPixel = m_puiPixels;
   u32 * puiEnd   = m_puiPixels + m_iAreaWidth * m_iAreaHeight;
   while (puiPixel != puiEnd)
   {
-    *puiPixel++ = _uiColor;
+    *puiPixel++ = 0;
   }
 
   queue_draw_area(0, 0, m_iAreaWidth, m_iAreaHeight);

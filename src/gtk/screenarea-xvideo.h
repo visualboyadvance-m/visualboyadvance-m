@@ -37,7 +37,10 @@ public:
   ScreenAreaXv(int _iWidth, int _iHeight, int _iScale = 1);
   virtual ~ScreenAreaXv();
   void vDrawPixels(u8 * _puiData);
-  void vDrawColor(u32 _uiColor); // 0xRRGGBB
+  void vDrawBlackScreen();
+
+protected:
+  bool on_configure_event(GdkEventConfigure * event);
 
 private:
   Display *m_pDisplay;
@@ -48,9 +51,11 @@ private:
   XShmSegmentInfo m_oShm;
   u32 *    m_puiPixels;
   u8 *     m_puiDelta;
-  int      m_iFilterScale;
+  int      m_iAreaTop;
+  int      m_iAreaLeft;
 
   void vUpdateSize();
+  void vOnWidgetResize();
   void vRGB32toYUY2 (unsigned char* dest_ptr,
                      int            dest_width,
                      int            dest_height,
