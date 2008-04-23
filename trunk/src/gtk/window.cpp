@@ -856,10 +856,11 @@ Window::~Window()
 
 void Window::vInitScreenArea()
 {
-  Gtk::Container * poC;
+  Gtk::Alignment * poC;
   bool bUseXv;
   
-  poC = dynamic_cast<Gtk::Container *>(m_poXml->get_widget("ScreenContainer"));
+  poC = dynamic_cast<Gtk::Alignment *>(m_poXml->get_widget("ScreenContainer"));
+  poC->set(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER, 0.0, 0.0);
   bUseXv = m_poDisplayConfig->oGetKey<bool>("use_Xv");
   
   if (bUseXv)
@@ -867,6 +868,9 @@ void Window::vInitScreenArea()
     try
     {
       m_poScreenArea = Gtk::manage(new ScreenAreaXv(m_iScreenWidth, m_iScreenHeight));
+
+      // The Xv screen area can handle resizes
+      poC->set(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER, 1.0, 1.0);
     }
     catch (std::exception e)
     {
@@ -1518,7 +1522,7 @@ void Window::vDrawScreen()
 
 void Window::vDrawDefaultScreen()
 {
-  m_poScreenArea->vDrawColor(0x000000); // Black
+  m_poScreenArea->vDrawBlackScreen();
 }
 
 void Window::vSetDefaultTitle()

@@ -31,11 +31,15 @@
 namespace VBA
 {
 
+template<typename T> T min( T x, T y ) { return x < y ? x : y; }
+template<typename T> T max( T x, T y ) { return x > y ? x : y; }
+
 ScreenAreaXv::ScreenAreaXv(int _iWidth, int _iHeight, int _iScale) :
   ScreenArea(_iWidth, _iHeight, _iScale),
   m_puiPixels(0),
   m_puiDelta(0),
-  m_iFilterScale(1)
+  m_iAreaTop(0),
+  m_iAreaLeft(0)
 {
   XvAdaptorInfo *pAdaptors;
   unsigned int iNumAdaptors;
@@ -161,19 +165,23 @@ void ScreenAreaXv::vDrawPixels(u8 * _puiData)
                 m_pXvImage,
                 0, 0,
                 iScaledWidth, iScaledHeight,
-                0, 0,
+                m_iAreaLeft, m_iAreaTop,
                 m_iAreaWidth + 4, m_iAreaHeight + 4,
                 True);
 
   gdk_display_sync(gtk_widget_get_display(pDrawingArea));
 }
 
-void ScreenAreaXv::vDrawColor(u32 _uiColor)
+void ScreenAreaXv::vDrawBlackScreen()
 {
+  modify_bg(get_state(), Gdk::Color("black"));
 }
 
 void ScreenAreaXv::vUpdateSize()
 {
+  const int iScaledWidth = m_iFilterScale * m_iWidth;
+  const int iScaledHeight = m_iFilterScale * m_iHeight;
+  
   if (m_puiPixels != NULL)
   {
     delete[] m_puiPixels;
@@ -189,21 +197,14 @@ void ScreenAreaXv::vUpdateSize()
     XShmDetach(m_pDisplay, &m_oShm);
   }
 
-  m_iFilterScale = 1;  
-  if (m_iScale == 2 && m_vFilter2x != NULL)
-  {
-    m_iFilterScale = 2;
-  }
-
-  m_iAreaWidth  = m_iScale * m_iWidth;
-  m_iAreaHeight = m_iScale * m_iHeight;
+  vOnWidgetResize();
   
   m_pXvImage = XvShmCreateImage(m_pDisplay,
                               m_iXvPortId,
-                              m_iFormat,  
+                              m_iFormat,
                               0,
-                              m_iFilterScale * m_iWidth + 4,
-                              m_iFilterScale * m_iHeight + 4,
+                              iScaledWidth + 4,
+                              iScaledHeight + 4,
                               &m_oShm);
   
   m_oShm.shmid = shmget(IPC_PRIVATE, m_pXvImage->data_size, IPC_CREAT | 0777);
@@ -214,12 +215,12 @@ void ScreenAreaXv::vUpdateSize()
   
   XShmAttach(m_pDisplay, &m_oShm);
 
-  m_puiPixels = new u32[m_iAreaWidth * m_iAreaHeight];
+  m_puiPixels = new u32[iScaledWidth * iScaledHeight];
 
   m_puiDelta = new u8[(m_iWidth + 2) * (m_iHeight + 2) * 4];
   memset(m_puiDelta, 255, (m_iWidth + 2) * (m_iHeight + 2) * 4);
 
-  set_size_request(m_iAreaWidth, m_iAreaHeight);
+  set_size_request(m_iScale * m_iWidth, m_iScale* m_iHeight);
 }
 
 void ScreenAreaXv::vRGB32toYUY2 (unsigned char* dest_ptr,
@@ -278,6 +279,22 @@ void ScreenAreaXv::vRGB32toYUY2 (unsigned char* dest_ptr,
             pDst += 2;
         }
     }
+}
+
+void ScreenAreaXv::vOnWidgetResize()
+{
+  double dAspectRatio = m_iWidth / (double)m_iHeight;
+  
+  m_iAreaHeight = min<int>(get_height(), get_width() / dAspectRatio);
+  m_iAreaWidth = min<int>(get_width(), get_height() * dAspectRatio);
+  
+  m_iAreaTop = (get_height() - m_iAreaHeight) / 2;
+  m_iAreaLeft = (get_width() - m_iAreaWidth) / 2;
+}
+
+bool ScreenAreaXv::on_configure_event(GdkEventConfigure * event)
+{
+  vOnWidgetResize();
 }
 
 } // namespace VBA

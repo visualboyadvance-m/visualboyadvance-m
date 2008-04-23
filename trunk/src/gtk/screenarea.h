@@ -39,7 +39,7 @@ public:
   void vSetFilter2x(EFilter2x _eFilter2x);
   void vSetFilterIB(EFilterIB _eFilterIB);
   virtual void vDrawPixels(u8 * _puiData) = 0;
-  virtual void vDrawColor(u32 _uiColor) = 0; // 0xRRGGBB
+  virtual void vDrawBlackScreen() = 0;
 
 protected:
   virtual bool on_motion_notify_event(GdkEventMotion * _pstEvent);
@@ -50,6 +50,7 @@ protected:
   int      m_iWidth;
   int      m_iHeight;
   int      m_iScale;
+  int      m_iFilterScale;
   int      m_iAreaWidth;
   int      m_iAreaHeight;
   Filter2x m_vFilter2x;

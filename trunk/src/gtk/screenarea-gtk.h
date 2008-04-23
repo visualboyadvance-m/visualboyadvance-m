@@ -31,7 +31,7 @@ public:
   ScreenAreaGtk(int _iWidth, int _iHeight, int _iScale = 1);
   virtual ~ScreenAreaGtk();
   void vDrawPixels(u8 * _puiData);
-  void vDrawColor(u32 _uiColor); // 0xRRGGBB
+  void vDrawBlackScreen();
 
 protected:
   bool on_expose_event(GdkEventExpose * _pstEvent);
