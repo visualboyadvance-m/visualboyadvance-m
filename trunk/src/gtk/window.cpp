@@ -837,6 +837,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 Window::~Window()
 {
   vOnFileClose();
+  vUnInitSystem();
   vSaveHistoryToConfig();
   vSaveJoypadsToConfig();
   vSaveConfig(m_sConfigFile);
@@ -933,6 +934,11 @@ void Window::vInitSystem()
   }
 
   Init_2xSaI(32);
+}
+
+void Window::vUnInitSystem()
+{
+  systemSoundShutdown();
 }
 
 void Window::vInitConfig()
