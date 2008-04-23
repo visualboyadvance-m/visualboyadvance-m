@@ -279,6 +279,7 @@ private:
   ESoundQuality  m_eSoundQuality;
 
   void vInitSystem();
+  void vUnInitSystem();
   void vInitConfig();
   void vCheckConfig();
   void vInitScreenArea();
