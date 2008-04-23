@@ -26,7 +26,8 @@ namespace VBA
 ScreenArea::ScreenArea(int _iWidth, int _iHeight, int _iScale) :
   m_vFilter2x(NULL),
   m_vFilterIB(NULL),
-  m_bShowCursor(true)
+  m_bShowCursor(true),
+  m_iFilterScale(1)
 {
   g_assert(_iWidth >= 1 && _iHeight >= 1 && _iScale >= 1);
 
@@ -85,6 +86,13 @@ void ScreenArea::vSetScale(int _iScale)
 void ScreenArea::vSetFilter2x(EFilter2x _eFilter2x)
 {
   m_vFilter2x = pvGetFilter2x(_eFilter2x, FilterDepth32);
+  
+  m_iFilterScale = 1;  
+  if (m_iScale == 2 && m_vFilter2x != NULL)
+  {
+    m_iFilterScale = 2;
+  }
+  
   vUpdateSize();
 }
 
