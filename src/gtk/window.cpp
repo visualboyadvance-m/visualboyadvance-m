@@ -124,14 +124,39 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
     vSaveConfig(m_sConfigFile);
   }
 
-  vInitScreenArea();
-
   vCreateFileOpenDialog();
   vLoadHistoryFromConfig();
   vLoadJoypadsFromConfig();
 
   Gtk::MenuItem *      poMI;
   Gtk::CheckMenuItem * poCMI;
+
+  // Video output menu
+  //
+  struct
+  {
+    const char *       m_csName;
+    const EVideoOutput m_eVideoOutput;
+  }
+  astVideoOutput[] =
+  {
+    { "VideoOpenGL", OutputOpenGL },
+    { "VideoCairo",  OutputGtk    },
+    { "VideoXv",     OutputXvideo }
+  };
+  EVideoOutput eDefaultVideoOutput = (EVideoOutput)m_poDisplayConfig->oGetKey<int>("output");
+  for (guint i = 0; i < G_N_ELEMENTS(astVideoOutput); i++)
+  {
+    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astVideoOutput[i].m_csName));
+    if (astVideoOutput[i].m_eVideoOutput == eDefaultVideoOutput)
+    {
+      poCMI->set_active();
+      vOnVideoOutputToggled(poCMI, eDefaultVideoOutput);
+    }
+    poCMI->signal_toggled().connect(sigc::bind(
+                                      sigc::mem_fun(*this, &Window::vOnVideoOutputToggled),
+                                      poCMI, astVideoOutput[i].m_eVideoOutput));
+  }
 
   // File menu
   //
@@ -861,17 +886,17 @@ Window::~Window()
   m_poInstance = NULL;
 }
 
-void Window::vInitScreenArea()
+void Window::vInitScreenArea(EVideoOutput _eVideoOutput)
 {
   Gtk::Alignment * poC;
 
   poC = dynamic_cast<Gtk::Alignment *>(m_poXml->get_widget("ScreenContainer"));
+  poC->remove();
   poC->set(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER, 0.0, 0.0);
-  EVideoOutput eVideoOutput = (EVideoOutput)m_poDisplayConfig->oGetKey<int>("output");
-
+  
   try
   {
-    switch (eVideoOutput)
+    switch (_eVideoOutput)
     {
 #ifdef USE_OPENGL
       case OutputOpenGL:
