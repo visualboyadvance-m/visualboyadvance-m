@@ -36,6 +36,10 @@
 #include "screenarea-gtk.h"
 #include "screenarea-xvideo.h"
 
+#ifdef USE_OPENGL
+#include "screenarea-opengl.h"
+#endif // USE_OPENGL
+
 extern int systemRenderedFrames;
 extern int systemFPS;
 extern bool debugger;
@@ -84,7 +88,9 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_iFilterIBMin    (FirstFilterIB),
   m_iFilterIBMax    (LastFilterIB),
   m_iJoypadMin      (1),
-  m_iJoypadMax      (4)
+  m_iJoypadMax      (4),
+  m_iVideoOutputMin (OutputGtk),
+  m_iVideoOutputMax (OutputXvideo)
 {
   m_poXml            = _poXml;
   m_poFileOpenDialog = NULL;
@@ -858,32 +864,37 @@ Window::~Window()
 void Window::vInitScreenArea()
 {
   Gtk::Alignment * poC;
-  bool bUseXv;
-  
+
   poC = dynamic_cast<Gtk::Alignment *>(m_poXml->get_widget("ScreenContainer"));
   poC->set(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER, 0.0, 0.0);
-  bUseXv = m_poDisplayConfig->oGetKey<bool>("use_Xv");
-  
-  if (bUseXv)
-  {
-    try
-    {
-      m_poScreenArea = Gtk::manage(new ScreenAreaXv(m_iScreenWidth, m_iScreenHeight));
+  EVideoOutput eVideoOutput = (EVideoOutput)m_poDisplayConfig->oGetKey<int>("output");
 
-      // The Xv screen area can handle resizes
-      poC->set(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER, 1.0, 1.0);
-    }
-    catch (std::exception e)
+  try
+  {
+    switch (eVideoOutput)
     {
-      fprintf(stderr, "Unable to initialise Xv output, falling back to GTK+\n");
-      m_poScreenArea = Gtk::manage(new ScreenAreaGtk(m_iScreenWidth, m_iScreenHeight));
+#ifdef USE_OPENGL
+      case OutputOpenGL:
+        m_poScreenArea = Gtk::manage(new ScreenAreaGl(m_iScreenWidth, m_iScreenHeight));
+        poC->set(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER, 1.0, 1.0);
+        break;
+#endif // USE_OPENGL
+      case OutputXvideo:
+        m_poScreenArea = Gtk::manage(new ScreenAreaXv(m_iScreenWidth, m_iScreenHeight));
+        poC->set(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER, 1.0, 1.0);
+        break;
+      case OutputGtk:
+      default:
+        m_poScreenArea = Gtk::manage(new ScreenAreaGtk(m_iScreenWidth, m_iScreenHeight));
+        break;
     }
   }
-  else
+  catch (std::exception e)
   {
+    fprintf(stderr, "Unable to initialise output, falling back to GTK+\n");
     m_poScreenArea = Gtk::manage(new ScreenAreaGtk(m_iScreenWidth, m_iScreenHeight));
   }
-  
+
   poC->add(*m_poScreenArea);
   vDrawDefaultScreen();
   m_poScreenArea->show();
@@ -1000,7 +1011,12 @@ void Window::vInitConfig()
   m_poDisplayConfig->vSetKey("pause_when_inactive", true           );
   m_poDisplayConfig->vSetKey("filter2x",            FilterNone     );
   m_poDisplayConfig->vSetKey("filterIB",            FilterIBNone   );
-  m_poDisplayConfig->vSetKey("use_Xv",              false          );
+#ifdef USE_OPENGL
+  m_poDisplayConfig->vSetKey("output",              OutputOpenGL   );
+#else
+  m_poDisplayConfig->vSetKey("output",              OutputGtk      );
+#endif // USE_OPENGL
+
 
   // Sound section
   //
@@ -1171,6 +1187,13 @@ void Window::vCheckConfig()
   if (iValue != iAdjusted)
   {
     m_poDisplayConfig->vSetKey("filterIB", iAdjusted);
+  }
+
+  iValue = m_poDisplayConfig->oGetKey<int>("output");
+  iAdjusted = CLAMP(iValue, m_iVideoOutputMin, m_iVideoOutputMax);
+  if (iValue != iAdjusted)
+  {
+    m_poDisplayConfig->vSetKey("output", iAdjusted);
   }
 
   // Sound section

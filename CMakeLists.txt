@@ -16,6 +16,7 @@ PKG_CHECK_MODULES ( GLADEMM libglademm-2.4 )
 PKG_CHECK_MODULES ( PORTAUDIO portaudio-2.0 )
 PKG_CHECK_MODULES ( SDL sdl )
 PKG_CHECK_MODULES ( XV xv )
+PKG_CHECK_MODULES ( GTKGLMM gtkglextmm-x11-1.2 )
 
 IF( SDL_FOUND )
     SET( CAN_BUILD_VBAM 1 )
@@ -143,6 +144,7 @@ SET(SRC_GTK
     src/gtk/screenarea.cpp
     src/gtk/screenarea-gtk.cpp
     src/gtk/screenarea-xvideo.cpp
+    src/gtk/screenarea-opengl.cpp
     src/gtk/tools.cpp
     src/gtk/window.cpp
     src/gtk/sndPortAudio.cpp
@@ -157,7 +159,8 @@ ENDIF(CMAKE_ASM_COMPILER_LOADED AND USEASM)
 include_directories(
     ${GTKMM_INCLUDE_DIRS}
     ${GLADEMM_INCLUDE_DIRS}
-    ${SDL_INCLUDE_DIR}
+    ${SDL_INCLUDE_DIRS}
+    ${GTKGLMM_INCLUDE_DIRS}
 )
 
 ADD_LIBRARY (
@@ -210,6 +213,7 @@ IF( CAN_BUILD_GVBAM )
         ${GLADEMM_LIBRARIES}
         ${PORTAUDIO_LIBRARIES}
         ${XV_LIBRARIES}
+        ${GTKGLMM_LIBRARIES}
     )
     
     INSTALL(PROGRAMS gvbam DESTINATION bin)
