@@ -590,6 +590,18 @@ void Window::vOnThrottleOther(Gtk::CheckMenuItem * _poCMI)
   vSelectBestThrottleItem();
 }
 
+void Window::vOnVideoOutputToggled(Gtk::CheckMenuItem * _poCMI, int _iOutput)
+{
+  if (! _poCMI->get_active())
+  {
+    return;
+  }
+
+  m_poDisplayConfig->vSetKey("output", _iOutput);
+
+  vInitScreenArea((EVideoOutput)_iOutput);
+}
+
 void Window::vOnVideoScaleToggled(Gtk::CheckMenuItem * _poCMI, int _iScale)
 {
   if (! _poCMI->get_active())
