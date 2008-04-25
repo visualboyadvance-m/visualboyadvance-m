@@ -33,7 +33,7 @@
 #include "menuitem.h"
 #include "tools.h"
 #include "intl.h"
-#include "screenarea-gtk.h"
+#include "screenarea-cairo.h"
 #include "screenarea-xvideo.h"
 
 #ifdef USE_OPENGL
@@ -89,7 +89,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_iFilterIBMax    (LastFilterIB),
   m_iJoypadMin      (1),
   m_iJoypadMax      (4),
-  m_iVideoOutputMin (OutputGtk),
+  m_iVideoOutputMin (OutputCairo),
   m_iVideoOutputMax (OutputXvideo)
 {
   m_poXml            = _poXml;
@@ -141,7 +141,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   astVideoOutput[] =
   {
     { "VideoOpenGL", OutputOpenGL },
-    { "VideoCairo",  OutputGtk    },
+    { "VideoCairo",  OutputCairo  },
     { "VideoXv",     OutputXvideo }
   };
   EVideoOutput eDefaultVideoOutput = (EVideoOutput)m_poDisplayConfig->oGetKey<int>("output");
@@ -892,7 +892,7 @@ void Window::vInitScreenArea(EVideoOutput _eVideoOutput)
 
   poC = dynamic_cast<Gtk::Alignment *>(m_poXml->get_widget("ScreenContainer"));
   poC->remove();
-  poC->set(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER, 0.0, 0.0);
+  poC->set(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER, 1.0, 1.0);
   
   try
   {
@@ -901,23 +901,21 @@ void Window::vInitScreenArea(EVideoOutput _eVideoOutput)
 #ifdef USE_OPENGL
       case OutputOpenGL:
         m_poScreenArea = Gtk::manage(new ScreenAreaGl(m_iScreenWidth, m_iScreenHeight));
-        poC->set(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER, 1.0, 1.0);
         break;
 #endif // USE_OPENGL
       case OutputXvideo:
         m_poScreenArea = Gtk::manage(new ScreenAreaXv(m_iScreenWidth, m_iScreenHeight));
-        poC->set(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER, 1.0, 1.0);
         break;
-      case OutputGtk:
+      case OutputCairo:
       default:
-        m_poScreenArea = Gtk::manage(new ScreenAreaGtk(m_iScreenWidth, m_iScreenHeight));
+        m_poScreenArea = Gtk::manage(new ScreenAreaCairo(m_iScreenWidth, m_iScreenHeight));
         break;
     }
   }
   catch (std::exception e)
   {
-    fprintf(stderr, "Unable to initialise output, falling back to GTK+\n");
-    m_poScreenArea = Gtk::manage(new ScreenAreaGtk(m_iScreenWidth, m_iScreenHeight));
+    fprintf(stderr, "Unable to initialise output, falling back to Cairo\n");
+    m_poScreenArea = Gtk::manage(new ScreenAreaCairo(m_iScreenWidth, m_iScreenHeight));
   }
 
   poC->add(*m_poScreenArea);
@@ -1039,7 +1037,7 @@ void Window::vInitConfig()
 #ifdef USE_OPENGL
   m_poDisplayConfig->vSetKey("output",              OutputOpenGL   );
 #else
-  m_poDisplayConfig->vSetKey("output",              OutputGtk      );
+  m_poDisplayConfig->vSetKey("output",              OutputCairo    );
 #endif // USE_OPENGL
 
 

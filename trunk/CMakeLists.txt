@@ -46,8 +46,8 @@ ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VE
 ADD_DEFINITIONS (-DVERSION='"${VERSION}"' -DPKGDATADIR='"${PKGDATADIR}"' -DPACKAGE='')
 
 SET( CMAKE_ASM_FLAGS "-Isrc/hq/asm/ -O1 -DELF")
-SET( CMAKE_C_FLAGS "-O3")
-SET( CMAKE_CXX_FLAGS "-O3")
+SET( CMAKE_C_FLAGS "-O3 -Wall")
+SET( CMAKE_CXX_FLAGS "-O3 -Wall")
 
 SET(SRC_MAIN
     src/2xSaI.cpp
@@ -142,7 +142,7 @@ SET(SRC_GTK
     src/gtk/filters.cpp
     src/gtk/joypadconfig.cpp
     src/gtk/screenarea.cpp
-    src/gtk/screenarea-gtk.cpp
+    src/gtk/screenarea-cairo.cpp
     src/gtk/screenarea-xvideo.cpp
     src/gtk/screenarea-opengl.cpp
     src/gtk/tools.cpp

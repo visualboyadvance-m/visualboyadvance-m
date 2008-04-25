@@ -17,34 +17,40 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#ifndef __VBA_SCREENAREA_GTK_H__
-#define __VBA_SCREENAREA_GTK_H__
+#ifndef __VBA_SCREENAREA_CAIRO_H__
+#define __VBA_SCREENAREA_CAIRO_H__
 
 #include "screenarea.h"
 
 namespace VBA
 {
 
-class ScreenAreaGtk : public ScreenArea
+class ScreenAreaCairo : public ScreenArea
 {
 public:
-  ScreenAreaGtk(int _iWidth, int _iHeight, int _iScale = 1);
-  virtual ~ScreenAreaGtk();
+  ScreenAreaCairo(int _iWidth, int _iHeight, int _iScale = 1);
+  virtual ~ScreenAreaCairo();
   void vDrawPixels(u8 * _puiData);
   void vDrawBlackScreen();
 
 protected:
+  bool on_configure_event(GdkEventConfigure * event);
   bool on_expose_event(GdkEventExpose * _pstEvent);
 
 private:
-  int      m_iRowStride;
+  double   m_dScaleFactor;
+  int      m_iAreaTop;
+  int      m_iAreaLeft;
   u32 *    m_puiPixels;
   u8 *     m_puiDelta;
+  int      m_iScaledWidth;
+  int      m_iScaledHeight;
 
   void vUpdateSize();
+  void vOnWidgetResize();
 };
 
 } // namespace VBA
 
 
-#endif // __VBA_SCREENAREA_GTK_H__
+#endif // __VBA_SCREENAREA_CAIRO_H__

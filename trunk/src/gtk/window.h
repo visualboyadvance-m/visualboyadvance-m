@@ -133,7 +133,7 @@ protected:
 
   enum EVideoOutput
   {
-    OutputGtk,
+    OutputCairo,
     OutputOpenGL,
     OutputXvideo
   };
