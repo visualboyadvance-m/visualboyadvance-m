@@ -131,6 +131,13 @@ protected:
     EmulatorSGB2
   };
 
+  enum EVideoOutput
+  {
+    OutputGtk,
+    OutputOpenGL,
+    OutputXvideo
+  };
+
   virtual void vOnFileOpen();
   virtual void vOnFileLoad();
   virtual void vOnFileSave();
@@ -215,6 +222,8 @@ private:
   const int m_iFilterIBMax;
   const int m_iJoypadMin;
   const int m_iJoypadMax;
+  const int m_iVideoOutputMin;
+  const int m_iVideoOutputMax;
 
   static Window * m_poInstance;
 

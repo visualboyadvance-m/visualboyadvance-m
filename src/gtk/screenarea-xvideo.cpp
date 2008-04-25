@@ -141,7 +141,7 @@ void ScreenAreaXv::vDrawPixels(u8 * _puiData)
                 m_iHeight);
   }
 
-  if (m_iScale == 2 && m_vFilter2x != NULL)
+  if (m_vFilter2x != NULL)
   {
     m_vFilter2x(_puiData + iSrcPitch,
                 iSrcPitch,
