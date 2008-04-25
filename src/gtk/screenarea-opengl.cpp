@@ -36,7 +36,6 @@ ScreenAreaGl::ScreenAreaGl(int _iWidth, int _iHeight, int _iScale) :
   Glib::RefPtr<Gdk::GL::Config> glconfig;
 
   glconfig = Gdk::GL::Config::create(Gdk::GL::MODE_RGB    |
-                                //     Gdk::GL::MODE_DEPTH  |
                                      Gdk::GL::MODE_DOUBLE);
   if (!glconfig)
     {
@@ -173,6 +172,8 @@ bool ScreenAreaGl::on_expose_event(GdkEventExpose * _pstEvent)
     glwindow->swap_buffers();
     
   glwindow->gl_end();
+  
+  return true;
 }
 
 } // namespace VBA
