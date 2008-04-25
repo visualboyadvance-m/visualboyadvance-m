@@ -159,6 +159,7 @@ protected:
   virtual void vOnFrameskipToggled(Gtk::CheckMenuItem * _poCMI, int _iValue);
   virtual void vOnThrottleToggled(Gtk::CheckMenuItem * _poCMI, int _iPercent);
   virtual void vOnThrottleOther(Gtk::CheckMenuItem * _poCMI);
+  virtual void vOnVideoOutputToggled(Gtk::CheckMenuItem * _poCMI, int _iOutput);
   virtual void vOnVideoScaleToggled(Gtk::CheckMenuItem * _poCMI, int _iScale);
   virtual void vOnLayerToggled(Gtk::CheckMenuItem * _poCMI, int _iLayer);
   virtual void vOnDirectories();
@@ -291,7 +292,7 @@ private:
   void vUnInitSystem();
   void vInitConfig();
   void vCheckConfig();
-  void vInitScreenArea();
+  void vInitScreenArea(EVideoOutput _eVideoOutput);
   void vLoadConfig(const std::string & _rsFile);
   void vSaveConfig(const std::string & _rsFile);
   void vLoadHistoryFromConfig();
