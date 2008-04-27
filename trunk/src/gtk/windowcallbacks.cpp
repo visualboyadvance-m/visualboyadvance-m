@@ -154,7 +154,7 @@ void Window::vOnFileSave()
 void Window::vOnLoadGameMostRecent()
 {
   int    iMostRecent = -1;
-  time_t uiTimeMax;
+  time_t uiTimeMax = 0;
 
   for (int i = 0; i < 10; i++)
   {
@@ -190,7 +190,7 @@ void Window::vOnLoadGame(int _iSlot)
 void Window::vOnSaveGameOldest()
 {
   int    iOldest = -1;
-  time_t uiTimeMin;
+  time_t uiTimeMin = 0;
 
   for (int i = 0; i < 10; i++)
   {

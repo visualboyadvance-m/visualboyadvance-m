@@ -24,10 +24,10 @@ namespace VBA
 {
 
 ScreenArea::ScreenArea(int _iWidth, int _iHeight, int _iScale) :
+  m_iFilterScale(1),
   m_vFilter2x(NULL),
   m_vFilterIB(NULL),
-  m_bShowCursor(true),
-  m_iFilterScale(1)
+  m_bShowCursor(true)
 {
   g_assert(_iWidth >= 1 && _iHeight >= 1 && _iScale >= 1);
 
