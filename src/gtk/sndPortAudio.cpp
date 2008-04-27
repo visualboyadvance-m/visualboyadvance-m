@@ -25,7 +25,7 @@ static u32 soundoffset;
 static volatile u32 soundpos;
 static u32 soundbufsize;
 
-static int audioFree()
+static unsigned int audioFree()
 {
    if (soundoffset > soundpos)
       return soundbufsize - soundoffset + soundpos;
@@ -39,7 +39,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
                             PaStreamCallbackFlags statusFlags,
                             void *userData )
 {
-    const int outBufferLength = framesPerBuffer * sizeof(u16) * 2;
+    const unsigned int outBufferLength = framesPerBuffer * sizeof(u16) * 2;
     u8 *out = (u8*)outputBuffer;
     
     if (!emulating || soundPaused)
@@ -53,7 +53,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
 
     u8 *soundbuf = (u8 *)stereodata16;
     
-    for (int i = 0; i < outBufferLength; i++)
+    for (unsigned int i = 0; i < outBufferLength; i++)
     {
         if (soundpos >= soundbufsize)
             soundpos = 0;
@@ -69,7 +69,7 @@ void systemWriteDataToSoundBuffer()
 {
     u32 copy1size = 0, copy2size = 0;
 
-    while (emulating && !speedup & !systemThrottle && (audioFree() < soundBufferLen))
+    while (emulating && !speedup & !systemThrottle && (audioFree() < (unsigned int)soundBufferLen))
     {
 #ifndef _WIN32
         usleep(1000);
@@ -78,7 +78,7 @@ void systemWriteDataToSoundBuffer()
 #endif
     }
 
-    if ((soundbufsize - soundoffset) < soundBufferLen)
+    if ((soundbufsize - soundoffset) < (unsigned int)soundBufferLen)
     {
         copy1size = (soundbufsize - soundoffset);
         copy2size = soundBufferLen - copy1size;
@@ -101,7 +101,6 @@ void systemWriteDataToSoundBuffer()
 bool systemSoundInit()
 {
     int sampleRate;
-    int buffersize = 0;
     
     err = Pa_Initialize();
     if (err != paNoError) goto error;
@@ -117,6 +116,7 @@ bool systemSoundInit()
             sampleRate = 44100;
             soundBufferLen = 1470*2;
         break;
+        default:
         case 2:
             sampleRate = 22050;
             soundBufferLen = 736*2;
