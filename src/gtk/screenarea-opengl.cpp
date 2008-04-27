@@ -28,10 +28,10 @@ template<typename T> T max( T x, T y ) { return x > y ? x : y; }
 
 ScreenAreaGl::ScreenAreaGl(int _iWidth, int _iHeight, int _iScale) :
   ScreenArea(_iWidth, _iHeight, _iScale),
-  m_puiPixels(NULL),
-  m_puiDelta(NULL),
   m_iScaledWidth(_iWidth),
-  m_iScaledHeight(_iHeight)
+  m_iScaledHeight(_iHeight),
+  m_puiPixels(NULL),
+  m_puiDelta(NULL)
 {
   Glib::RefPtr<Gdk::GL::Config> glconfig;
 
@@ -135,6 +135,7 @@ void ScreenAreaGl::vUpdateSize()
 
   m_puiPixels = new u32[(m_iScaledWidth + 1) * m_iScaledHeight];
   m_puiDelta = new u8[(m_iWidth + 2) * (m_iHeight + 2) * sizeof(u32)];
+  memset(m_puiPixels, 0, (m_iScaledWidth + 1) * m_iScaledHeight * sizeof(u32));
   memset(m_puiDelta, 255, (m_iWidth + 2) * (m_iHeight + 2) * sizeof(u32));
 
   set_size_request(m_iScale * m_iWidth, m_iScale * m_iHeight);
@@ -152,6 +153,8 @@ void ScreenAreaGl::vOnWidgetResize()
 bool ScreenAreaGl::on_configure_event(GdkEventConfigure * event)
 {
   vOnWidgetResize();
+  
+  return true;
 }
 
 bool ScreenAreaGl::on_expose_event(GdkEventExpose * _pstEvent)

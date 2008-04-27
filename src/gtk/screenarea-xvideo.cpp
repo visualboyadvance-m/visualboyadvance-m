@@ -216,8 +216,8 @@ void ScreenAreaXv::vUpdateSize()
   XShmAttach(m_pDisplay, &m_oShm);
 
   m_puiPixels = new u32[iScaledWidth * iScaledHeight];
-
   m_puiDelta = new u8[(m_iWidth + 2) * (m_iHeight + 2) * 4];
+  memset(m_puiPixels, 0, iScaledWidth * iScaledHeight * sizeof(u32));
   memset(m_puiDelta, 255, (m_iWidth + 2) * (m_iHeight + 2) * 4);
 
   set_size_request(m_iScale * m_iWidth, m_iScale* m_iHeight);
@@ -295,6 +295,8 @@ void ScreenAreaXv::vOnWidgetResize()
 bool ScreenAreaXv::on_configure_event(GdkEventConfigure * event)
 {
   vOnWidgetResize();
+  
+  return true;
 }
 
 } // namespace VBA
