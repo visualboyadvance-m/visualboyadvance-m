@@ -1339,7 +1339,7 @@ void Window::vUpdateHistoryMenu()
     Glib::ustring sLabel = Glib::path_get_basename(*it);
     VBA::ImageMenuItem * poIMI = Gtk::manage(new VBA::ImageMenuItem(*poImage, sLabel));
 
-    m_oTooltips.set_tip(*poIMI, *it);
+    poIMI->set_tooltip_text(*it);
 
     poIMI->signal_activate().connect(sigc::bind(
                                       sigc::mem_fun(*this, &Window::vOnRecentFile),

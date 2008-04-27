@@ -264,8 +264,6 @@ private:
 
   std::list<Gtk::Widget *> m_listSensitiveWhenPlaying;
 
-  Gtk::Tooltips m_oTooltips;
-
   sigc::connection m_oEmuSig;
 
   std::vector<JoypadConfig> m_oJoypads;
