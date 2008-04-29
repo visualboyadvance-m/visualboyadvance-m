@@ -159,6 +159,7 @@ protected:
   virtual void vOnFrameskipToggled(Gtk::CheckMenuItem * _poCMI, int _iValue);
   virtual void vOnThrottleToggled(Gtk::CheckMenuItem * _poCMI, int _iPercent);
   virtual void vOnThrottleOther(Gtk::CheckMenuItem * _poCMI);
+  virtual void vOnVideoFullscreen();
   virtual void vOnVideoOutputToggled(Gtk::CheckMenuItem * _poCMI, int _iOutput);
   virtual void vOnVideoScaleToggled(Gtk::CheckMenuItem * _poCMI, int _iScale);
   virtual void vOnLayerToggled(Gtk::CheckMenuItem * _poCMI, int _iLayer);
@@ -198,6 +199,7 @@ protected:
   virtual bool on_focus_out_event(GdkEventFocus * _pstEvent);
   virtual bool on_key_press_event(GdkEventKey * _pstEvent);
   virtual bool on_key_release_event(GdkEventKey * _pstEvent);
+  virtual bool on_window_state_event(GdkEventWindowState* _pstEvent);
 
 private:
   // Config limits
@@ -248,6 +250,7 @@ private:
   Gtk::CheckMenuItem * m_poFilePauseItem;
   Gtk::CheckMenuItem * m_poUseBiosItem;
   Gtk::CheckMenuItem * m_poSoundOffItem;
+  Gtk::MenuBar *       m_poMenuBar;
 
   struct SGameSlot
   {
@@ -269,6 +272,7 @@ private:
   std::vector<JoypadConfig> m_oJoypads;
   Keymap * m_poKeymap;
 
+  int m_bFullscreen;
   int m_iScreenWidth;
   int m_iScreenHeight;
 
@@ -311,6 +315,7 @@ private:
   void vSetThrottle(int _iPercent);
   void vSelectBestThrottleItem();
   void vUpdateGameSlots();
+  void vToggleFullscreen();
 };
 
 } // namespace VBA
