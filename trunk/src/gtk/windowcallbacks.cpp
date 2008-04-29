@@ -590,6 +590,11 @@ void Window::vOnThrottleOther(Gtk::CheckMenuItem * _poCMI)
   vSelectBestThrottleItem();
 }
 
+void Window::vOnVideoFullscreen()
+{
+  vToggleFullscreen();
+}
+
 void Window::vOnVideoOutputToggled(Gtk::CheckMenuItem * _poCMI, int _iOutput)
 {
   if (! _poCMI->get_active())
@@ -1323,6 +1328,13 @@ bool Window::on_key_press_event(GdkEventKey * _pstEvent)
 {
   EKey eKey;
 
+  // The menu accelerators are disabled when it is hidden
+  if (_pstEvent->keyval == GDK_F11 && !m_poMenuBar->is_visible())
+  {
+    vToggleFullscreen();
+    return true;
+  }
+
   if ((_pstEvent->state & Gtk::AccelGroup::get_default_mod_mask())
       || (eKey = m_poKeymap->eGetKey(_pstEvent->hardware_keycode)) == KeyNone)
   {
@@ -1428,6 +1440,16 @@ bool Window::on_key_release_event(GdkEventKey * _pstEvent)
   case KeyNone:
     break;
   }
+  return true;
+}
+
+bool Window::on_window_state_event(GdkEventWindowState* _pstEvent)
+{
+  if (_pstEvent->changed_mask & GDK_WINDOW_STATE_FULLSCREEN)
+  {
+    m_bFullscreen = _pstEvent->new_window_state & GDK_WINDOW_STATE_FULLSCREEN;
+  }
+  
   return true;
 }
 

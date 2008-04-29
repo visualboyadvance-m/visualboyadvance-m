@@ -599,6 +599,20 @@
                         <child>
                           <widget class="GtkMenu" id="VideoMenu_menu">
                             <child>
+                              <widget class="GtkImageMenuItem" id="VideoFullscreen">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">gtk-fullscreen</property>
+                                <property name="use_underline">True</property>
+                                <property name="use_stock">True</property>
+                                <accelerator key="F11" signal="activate"/>
+                              </widget>
+                            </child>
+                            <child>
+                              <widget class="GtkSeparatorMenuItem" id="separatormenuitem1">
+                                <property name="visible">True</property>
+                              </widget>
+                            </child>
+                            <child>
                               <widget class="GtkRadioMenuItem" id="VideoOpenGL">
                                 <property name="visible">True</property>
                                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
