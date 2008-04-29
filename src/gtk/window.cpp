@@ -90,7 +90,8 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_iJoypadMin      (1),
   m_iJoypadMax      (4),
   m_iVideoOutputMin (OutputCairo),
-  m_iVideoOutputMax (OutputXvideo)
+  m_iVideoOutputMax (OutputXvideo),
+  m_bFullscreen     (false)
 {
   m_poXml            = _poXml;
   m_poFileOpenDialog = NULL;
@@ -130,6 +131,9 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 
   Gtk::MenuItem *      poMI;
   Gtk::CheckMenuItem * poCMI;
+
+  // Menu bar
+  m_poMenuBar = dynamic_cast<Gtk::MenuBar *>(_poXml->get_widget("MenuBar"));
 
   // Video output menu
   //
@@ -827,6 +831,11 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
                                       sigc::mem_fun(*this, &Window::vOnAutofireToggled),
                                       poCMI, astAutofire[i].m_eKeyFlag));
   }
+
+  // Fullscreen menu
+  //
+  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("VideoFullscreen"));
+  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnVideoFullscreen));
 
   // GDB menu
   //
@@ -1950,6 +1959,20 @@ void Window::vUpdateGameSlots()
       poLabel->set_text(csPrefix + sDateTime);
       m_apoSaveGameItem[i]->set_sensitive();
     }
+  }
+}
+
+void Window::vToggleFullscreen()
+{
+  if(!m_bFullscreen)
+  {
+    fullscreen();
+    m_poMenuBar->hide();
+  }
+  else
+  {
+    unfullscreen();
+    m_poMenuBar->show();
   }
 }
 
