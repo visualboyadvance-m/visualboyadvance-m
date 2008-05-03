@@ -30,7 +30,6 @@
 #include "../Sound.h"
 #include "../Util.h"
 
-#include "menuitem.h"
 #include "tools.h"
 #include "intl.h"
 #include "screenarea-cairo.h"
@@ -99,6 +98,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_iScreenHeight    = m_iGBAScreenHeight;
   m_eCartridge       = CartridgeNone;
   m_uiJoypadState    = 0;
+  m_poKeymap         = NULL;
 
   vInitSystem();
 
@@ -1339,6 +1339,8 @@ void Window::vUpdateHistoryMenu()
 {
   vClearHistoryMenu();
 
+  Glib::RefPtr<Gtk::AccelGroup> poAccelGroup = get_accel_group();
+
   guint uiAccelKey = GDK_F1;
   for (std::list<std::string>::const_iterator it = m_listHistory.begin();
        it != m_listHistory.end();
@@ -1346,7 +1348,7 @@ void Window::vUpdateHistoryMenu()
   {
     Gtk::Image * poImage = Gtk::manage(new Gtk::Image(Gtk::Stock::OPEN, Gtk::ICON_SIZE_MENU));
     Glib::ustring sLabel = Glib::path_get_basename(*it);
-    VBA::ImageMenuItem * poIMI = Gtk::manage(new VBA::ImageMenuItem(*poImage, sLabel));
+    Gtk::ImageMenuItem * poIMI = Gtk::manage(new Gtk::ImageMenuItem(*poImage, sLabel));
 
     poIMI->set_tooltip_text(*it);
 
@@ -1354,8 +1356,7 @@ void Window::vUpdateHistoryMenu()
                                       sigc::mem_fun(*this, &Window::vOnRecentFile),
                                       *it));
 
-    poIMI->set_accel_key(Gtk::AccelKey(uiAccelKey, Gdk::CONTROL_MASK));
-    poIMI->accelerate(*this);
+    poIMI->add_accelerator("activate", poAccelGroup, uiAccelKey, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
 
     poIMI->show();
     m_poRecentMenu->items().push_back(*poIMI);
