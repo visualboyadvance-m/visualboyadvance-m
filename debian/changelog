@@ -1,3 +1,9 @@
+vbam (0.svn500-1) hardy; urgency=low
+
+  * Updated VBA-M to r500
+
+ -- Bastien Bouclet <bgk@users.sourceforge.net>  Sun, 29 Apr 2008 21:16:23 +0200
+
 vbam (0.svn484-1) gutsy; urgency=low
 
   * Added a GTK+ binary
