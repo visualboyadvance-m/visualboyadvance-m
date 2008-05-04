@@ -50,6 +50,8 @@ D3DX9_37.DLL
 The first two are available from http://vba-m.ngemu.com/vbam/vbacompiles/msvc2008/dll.7z,
 while the last requires an update to DirectX, you can use the following tool to update - http://vba-m.ngemu.com/vbam/vbacompiles/msvc2008/Directx_9c_webupdater.zip
 
+The OpenAL runtime may be downloaded from http://openal.org/downloads.html
+
 
 ==============
 To Do List
@@ -63,7 +65,7 @@ Important:
 
 - Improve automatic 64k/128k flash save detection
 
-- Fix OpenGL issues 
+- Fix OpenGL issues
 
 - Remove 16 bit hack for filters
  - Not compatible to software motion blur (display corruption)
@@ -128,9 +130,10 @@ Known Bugs:
  - This is caused by the 16bit hack which does not re-process the emulated image.
    It results in the display devices treating the image at pix with the wrong bit depth.
 
-=================
+
+=======
 Credits
-=================
+=======
 
 VisualBoy and VisualBoy Advance Developers:
 Forgotten
@@ -142,13 +145,19 @@ Nach
 Jonas Quinn
 Spacy
 
-Special Thanks go to:
+
+==============
+Special Thanks
+==============
+
 chrono:
-ASM genius, fixed a bug in the HQ3x/4x filters.
-Made HQ3x/4x and Bilinear filters (ASM versions) thread-safe
-bgKu: 
-GTK GUI port
-Various assistance with Linux issues
-blargg: 
-Assistance with the implementation of his highly accurate GB audio core
-Implemented his unreleased File_Extractor library
+- Fixed a bug in the HQ3x/4x filters
+- Made HQ3x/4x and Bilinear filters (ASM versions) thread-safe
+
+bgKu:
+- GTK GUI port
+- Various assistance with Linux issues
+
+blargg:
+- Assistance with the implementation of his highly accurate GB audio core
+- Implemented his unreleased File_Extractor library
