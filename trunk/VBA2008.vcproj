@@ -85,7 +85,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib zlib1.lib libpng13.lib"
+				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib zlibd.lib libpngd.lib"
 				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
 				Version=""
 				LinkIncremental="2"
@@ -193,7 +193,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib zlib1.lib libpng13.lib"
+				AdditionalDependencies="nafxcw.lib LIBCMT.lib zlib.lib libpng.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
 				Version=""
