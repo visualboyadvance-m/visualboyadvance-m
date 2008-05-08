@@ -31,6 +31,8 @@
     #include <GL/glext.h>
 #endif
 
+#include <time.h>
+
 #include "../AutoBuild.h"
 
 #include <SDL/SDL.h>
@@ -43,6 +45,7 @@
 #include "../Util.h"
 #include "../dmg/gb.h"
 #include "../dmg/gbGlobals.h"
+#include "../Cheats.h"
 
 #include "debugger.h"
 #include "filters.h"
@@ -158,27 +161,59 @@ char* homeDir = NULL;
 #define DOT_DIR ".vbam"
 
 static char *rewindMemory = NULL;
+static int *rewindSerials = NULL; 
 static int rewindPos = 0;
+static int rewindSerial = 0;
 static int rewindTopPos = 0;
 static int rewindCounter = 0;
 static int rewindCount = 0;
 static bool rewindSaveNeeded = false;
 static int rewindTimer = 0;
 
+static int sdlSaveKeysSwitch = 0;
+// if 0, then SHIFT+F# saves, F# loads (old VBA, ...)
+// if 1, then SHIFT+F# loads, F# saves (linux snes9x, ...)
+// if 2, then F5 decreases slot number, F6 increases, F7 saves, F8 loads
+
+static int saveSlotPosition = 0; // default is the slot from normal F1
+// internal slot number for undoing the last load
+#define SLOT_POS_LOAD_BACKUP 8
+// internal slot number for undoing the last save
+#define SLOT_POS_SAVE_BACKUP 9
+
+static int sdlOpenglScale = 1;
+// will scale window on init by this much
+static int sdlSoundToggledOff = 0;
+// allow up to 100 IPS patches given on commandline
+#define IPS_MAX_NUM 100
+int	sdl_ips_num	= 0;
+char *	(sdl_ips_names[IPS_MAX_NUM])	= { NULL }; // and so on
+
+#define REWIND_NUM 8
 #define REWIND_SIZE 400000
 #define SYSMSG_BUFFER_SIZE 1024
 
 #define _stricmp strcasecmp
 
-bool sdlButtons[4][12] = {
+#define SDLBUTTONS_NUM 14
+
+bool sdlButtons[4][SDLBUTTONS_NUM] = {
   { false, false, false, false, false, false,
-    false, false, false, false, false, false },
+    false, false, false, false, false, false,
+    false, false
+  },
   { false, false, false, false, false, false,
-    false, false, false, false, false, false },
+    false, false, false, false, false, false,
+    false, false
+  },
   { false, false, false, false, false, false,
-    false, false, false, false, false, false },
+    false, false, false, false, false, false,
+    false, false
+  },
   { false, false, false, false, false, false,
-    false, false, false, false, false, false }
+    false, false, false, false, false, false,
+    false, false
+  }
 };
 
 bool sdlMotionButtons[4] = { false, false, false, false };
@@ -211,6 +246,11 @@ int sdlMirroringEnable = 0;
 
 int sdlDefaultJoypad = 0;
 
+static int        ignore_first_resize_event = 0;
+
+/* forward */
+void systemConsoleMessage(const char*);
+
 void (*dbgMain)() = debuggerMain;
 void (*dbgSignal)(int,int) = debuggerSignal;
 void (*dbgOutput)(const char *, u32) = debuggerOutput;
@@ -231,29 +271,32 @@ enum {
   KEY_BUTTON_A, KEY_BUTTON_B,
   KEY_BUTTON_START, KEY_BUTTON_SELECT,
   KEY_BUTTON_L, KEY_BUTTON_R,
-  KEY_BUTTON_SPEED, KEY_BUTTON_CAPTURE
+  KEY_BUTTON_SPEED, KEY_BUTTON_CAPTURE,
+  KEY_BUTTON_AUTO_A, KEY_BUTTON_AUTO_B
 };
 
-u16 joypad[4][12] = {
+u16 joypad[4][SDLBUTTONS_NUM] = {
   { SDLK_LEFT,  SDLK_RIGHT,
     SDLK_UP,    SDLK_DOWN,
     SDLK_z,     SDLK_x,
     SDLK_RETURN,SDLK_BACKSPACE,
     SDLK_a,     SDLK_s,
-    SDLK_SPACE, SDLK_F12
+    SDLK_SPACE, SDLK_F12,
+    SDLK_q,	SDLK_w,
   },
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 };
 
-u16 defaultJoypad[12] = {
+u16 defaultJoypad[SDLBUTTONS_NUM] = {
   SDLK_LEFT,  SDLK_RIGHT,
   SDLK_UP,    SDLK_DOWN,
   SDLK_z,     SDLK_x,
   SDLK_RETURN,SDLK_BACKSPACE,
   SDLK_a,     SDLK_s,
-  SDLK_SPACE, SDLK_F12
+  SDLK_SPACE, SDLK_F12,
+  SDLK_q,     SDLK_w
 };
 
 u16 motion[4] = {
@@ -263,6 +306,10 @@ u16 motion[4] = {
 u16 defaultMotion[4] = {
   SDLK_KP4, SDLK_KP6, SDLK_KP8, SDLK_KP2
 };
+
+int sdlPreparedCheats	= 0;
+#define MAX_CHEATS 100
+const char * sdlPreparedCheatCodes[MAX_CHEATS];
 
 struct option sdlOptions[] = {
   { "agb-print", no_argument, &sdlAgbPrint, 1 },
@@ -306,6 +353,7 @@ struct option sdlOptions[] = {
   { "show-speed-detailed", no_argument, &showSpeed, 2 },
   { "throttle", required_argument, 0, 'T' },
   { "verbose", required_argument, 0, 'v' },
+  { "cheat", required_argument, 0, 1000 },
   { NULL, no_argument, NULL, 0 }
 };
 
@@ -567,30 +615,46 @@ void sdlReadPreferences(FILE *f)
       joypad[2][KEY_BUTTON_SPEED] = sdlFromHex(value);
     } else if(!strcmp(key, "Joy2_Capture")) {
       joypad[2][KEY_BUTTON_CAPTURE] = sdlFromHex(value);
-    } else if(!strcmp(key,"Joy4_Left")) {
-      joypad[4][KEY_LEFT] = sdlFromHex(value);
-    } else if(!strcmp(key, "Joy4_Right")) {
-      joypad[4][KEY_RIGHT] = sdlFromHex(value);
-    } else if(!strcmp(key, "Joy4_Up")) {
-      joypad[4][KEY_UP] = sdlFromHex(value);
-    } else if(!strcmp(key, "Joy4_Down")) {
-      joypad[4][KEY_DOWN] = sdlFromHex(value);
-    } else if(!strcmp(key, "Joy4_A")) {
-      joypad[4][KEY_BUTTON_A] = sdlFromHex(value);
-    } else if(!strcmp(key, "Joy4_B")) {
-      joypad[4][KEY_BUTTON_B] = sdlFromHex(value);
-    } else if(!strcmp(key, "Joy4_L")) {
-      joypad[4][KEY_BUTTON_L] = sdlFromHex(value);
-    } else if(!strcmp(key, "Joy4_R")) {
-      joypad[4][KEY_BUTTON_R] = sdlFromHex(value);
-    } else if(!strcmp(key, "Joy4_Start")) {
-      joypad[4][KEY_BUTTON_START] = sdlFromHex(value);
-    } else if(!strcmp(key, "Joy4_Select")) {
-      joypad[4][KEY_BUTTON_SELECT] = sdlFromHex(value);
-    } else if(!strcmp(key, "Joy4_Speed")) {
-      joypad[4][KEY_BUTTON_SPEED] = sdlFromHex(value);
-    } else if(!strcmp(key, "Joy4_Capture")) {
-      joypad[4][KEY_BUTTON_CAPTURE] = sdlFromHex(value);
+    } else if(!strcmp(key,"Joy3_Left")) {
+      joypad[3][KEY_LEFT] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy3_Right")) {
+      joypad[3][KEY_RIGHT] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy3_Up")) {
+      joypad[3][KEY_UP] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy3_Down")) {
+      joypad[3][KEY_DOWN] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy3_A")) {
+      joypad[3][KEY_BUTTON_A] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy3_B")) {
+      joypad[3][KEY_BUTTON_B] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy3_L")) {
+      joypad[3][KEY_BUTTON_L] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy3_R")) {
+      joypad[3][KEY_BUTTON_R] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy3_Start")) {
+      joypad[3][KEY_BUTTON_START] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy3_Select")) {
+      joypad[3][KEY_BUTTON_SELECT] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy3_Speed")) {
+      joypad[3][KEY_BUTTON_SPEED] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy3_Capture")) {
+      joypad[3][KEY_BUTTON_CAPTURE] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy0_AutoA")) {
+      joypad[0][KEY_BUTTON_AUTO_A] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy0_AutoB")) {
+      joypad[0][KEY_BUTTON_AUTO_B] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy1_AutoA")) {
+      joypad[1][KEY_BUTTON_AUTO_A] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy1_AutoB")) {
+      joypad[1][KEY_BUTTON_AUTO_B] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy2_AutoA")) {
+      joypad[2][KEY_BUTTON_AUTO_A] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy2_AutoB")) {
+      joypad[2][KEY_BUTTON_AUTO_B] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy3_AutoA")) {
+      joypad[3][KEY_BUTTON_AUTO_A] = sdlFromHex(value);
+    } else if(!strcmp(key, "Joy3_AutoB")) {
+      joypad[3][KEY_BUTTON_AUTO_B] = sdlFromHex(value);
     } else if(!strcmp(key, "openGL")) {
      openGL = sdlFromHex(value);
     } else if(!strcmp(key, "Motion_Left")) {
@@ -710,6 +774,10 @@ void sdlReadPreferences(FILE *f)
       if(rewindTimer < 0 || rewindTimer > 600)
         rewindTimer = 0;
       rewindTimer *= 6;  // convert value to 10 frames multiple
+    } else if(!strcmp(key, "saveKeysSwitch")) {
+      sdlSaveKeysSwitch = sdlFromHex(value);
+    } else if(!strcmp(key, "openGLscale")) {
+      sdlOpenglScale = sdlFromHex(value);
     } else {
       fprintf(stderr, "Unknown configuration key %s\n", key);
     }
@@ -885,9 +953,13 @@ static int sdlCalculateShift(u32 mask)
   return m-5;
 }
 
-void sdlWriteState(int num)
+/* returns filename of savestate num, in static buffer (not reentrant, no need to free,
+ * but value won't survive much - so if you want to remember it, dup it)
+ * You may use the buffer for something else though - until you call sdlStateName again
+ */
+static char * sdlStateName(int num)
 {
-  char stateName[2048];
+  static char stateName[2048];
 
   if(saveDir[0])
     sprintf(stateName, "%s/%s%d.sgm", saveDir, sdlGetFilename(filename),
@@ -897,34 +969,96 @@ void sdlWriteState(int num)
   else
     sprintf(stateName,"%s%d.sgm", filename, num+1);
 
+  return stateName;
+}
+
+void sdlWriteState(int num)
+{
+  char * stateName;
+
+  stateName = sdlStateName(num);
+
   if(emulator.emuWriteState)
     emulator.emuWriteState(stateName);
 
-  sprintf(stateName, "Wrote state %d", num+1);
-  systemScreenMessage(stateName);
+  // now we reuse the stateName buffer - 2048 bytes fit in a lot
+  if (num == SLOT_POS_LOAD_BACKUP)
+  {
+    sprintf(stateName, "Current state backed up to %d", num+1);
+    systemScreenMessage(stateName);
+  }
+  else if (num>=0)
+  {
+    sprintf(stateName, "Wrote state %d", num+1);
+    systemScreenMessage(stateName);
+  }
 
   systemDrawScreen();
 }
 
 void sdlReadState(int num)
 {
-  char stateName[2048];
+  char * stateName;
 
-  if(saveDir[0])
-    sprintf(stateName, "%s/%s%d.sgm", saveDir, sdlGetFilename(filename),
-            num+1);
-  else if (homeDir)
-    sprintf(stateName, "%s/%s/%s%d.sgm", homeDir, DOT_DIR, sdlGetFilename(filename), num + 1);
-  else
-    sprintf(stateName,"%s%d.sgm", filename, num+1);
-
+  stateName = sdlStateName(num);
   if(emulator.emuReadState)
     emulator.emuReadState(stateName);
 
-  sprintf(stateName, "Loaded state %d", num+1);
+  if (num == SLOT_POS_LOAD_BACKUP)
+  {
+	  sprintf(stateName, "Last load UNDONE");
+  } else
+  if (num == SLOT_POS_SAVE_BACKUP)
+  {
+	  sprintf(stateName, "Last save UNDONE");
+  }
+  else
+  {
+	  sprintf(stateName, "Loaded state %d", num+1);
+  }
   systemScreenMessage(stateName);
 
   systemDrawScreen();
+}
+
+/*
+ * perform savestate exchange
+ * - put the savestate in slot "to" to slot "backup" (unless backup == to)
+ * - put the savestate in slot "from" to slot "to" (unless from == to)
+ */
+void sdlWriteBackupStateExchange(int from, int to, int backup)
+{
+  char * dmp;
+  char * stateNameOrig	= NULL;
+  char * stateNameDest	= NULL;
+  char * stateNameBack	= NULL;
+
+  dmp		= sdlStateName(from);
+  stateNameOrig = (char*)realloc(stateNameOrig, strlen(dmp) + 1);
+  strcpy(stateNameOrig, dmp);
+  dmp		= sdlStateName(to);
+  stateNameDest = (char*)realloc(stateNameDest, strlen(dmp) + 1);
+  strcpy(stateNameDest, dmp);
+  dmp		= sdlStateName(backup);
+  stateNameBack = (char*)realloc(stateNameBack, strlen(dmp) + 1);
+  strcpy(stateNameBack, dmp);
+
+  /* on POSIX, rename would not do anything anyway for identical names, but let's check it ourselves anyway */
+  if (to != backup) {
+	  if (-1 == rename(stateNameDest, stateNameBack)) {
+		fprintf(stderr, "savestate backup: can't backup old state %s to %s", stateNameDest, stateNameBack );
+		perror(": ");
+	  }
+  }
+  if (to != from) {
+	  if (-1 == rename(stateNameOrig, stateNameDest)) {
+		fprintf(stderr, "savestate backup: can't move new state %s to %s", stateNameOrig, stateNameDest );
+		perror(": ");
+	  }
+  }
+
+  systemConsoleMessage("Savestate store and backup committed"); // with timestamp and newline
+  fprintf(stderr, "to slot %d, backup in %d, using temporary slot %d\n", to+1, backup+1, from+1);
 }
 
 void sdlWriteBattery()
@@ -974,6 +1108,7 @@ void sdlInitVideo() {
   int screenHeight;
 
   filter_enlarge = getFilterEnlargeFactor(filter);
+
   destWidth = filter_enlarge * srcWidth;
   destHeight = filter_enlarge * srcHeight;
 
@@ -1016,9 +1151,27 @@ void sdlInitVideo() {
   }
 
   if(openGL) {
+    int scaledWidth = screenWidth * sdlOpenglScale;
+    int scaledHeight = screenHeight * sdlOpenglScale;
+
     free(filterPix);
     filterPix = (u8 *)calloc(1, (systemColorDepth >> 3) * destWidth * destHeight);
     sdlOpenGLInit(screenWidth, screenHeight);
+
+    if (	(!fullscreen)
+	&&	sdlOpenglScale	> 1
+	&&	scaledWidth	< desktopWidth
+	&&	scaledHeight	< desktopHeight
+    ) {
+        SDL_SetVideoMode(scaledWidth, scaledHeight, 0,
+                       SDL_OPENGL | SDL_RESIZABLE |
+                       (fullscreen ? SDL_FULLSCREEN : 0));
+        sdlOpenGLInit(scaledWidth, scaledHeight);
+	/* xKiv: it would seem that SDL_RESIZABLE causes the *previous* dimensions to be immediately
+	 * reported back via the SDL_VIDEORESIZE event
+	 */
+	ignore_first_resize_event	= 1;
+    }
   }
 
 }
@@ -1032,7 +1185,7 @@ void sdlUpdateKey(int key, bool down)
 {
   int i;
   for(int j = 0; j < 4; j++) {
-    for(i = 0 ; i < 12; i++) {
+    for(i = 0 ; i < SDLBUTTONS_NUM; i++) {
       if((joypad[j][i] & 0xf000) == 0) {
         if(key == joypad[j][i])
           sdlButtons[j][i] = down;
@@ -1053,7 +1206,7 @@ void sdlUpdateJoyButton(int which,
 {
   int i;
   for(int j = 0; j < 4; j++) {
-    for(i = 0; i < 12; i++) {
+    for(i = 0; i < SDLBUTTONS_NUM; i++) {
       int dev = (joypad[j][i] >> 12);
       int b = joypad[j][i] & 0xfff;
       if(dev) {
@@ -1084,7 +1237,7 @@ void sdlUpdateJoyHat(int which,
 {
   int i;
   for(int j = 0; j < 4; j++) {
-    for(i = 0; i < 12; i++) {
+    for(i = 0; i < SDLBUTTONS_NUM; i++) {
       int dev = (joypad[j][i] >> 12);
       int a = joypad[j][i] & 0xfff;
       if(dev) {
@@ -1147,7 +1300,7 @@ void sdlUpdateJoyAxis(int which,
 {
   int i;
   for(int j = 0; j < 4; j++) {
-    for(i = 0; i < 12; i++) {
+    for(i = 0; i < SDLBUTTONS_NUM; i++) {
       int dev = (joypad[j][i] >> 12);
       int a = joypad[j][i] & 0xfff;
       if(dev) {
@@ -1212,7 +1365,7 @@ void sdlCheckKeys()
   bool usesJoy = false;
 
   for(int j = 0; j < 4; j++) {
-    for(i = 0; i < 12; i++) {
+    for(i = 0; i < SDLBUTTONS_NUM; i++) {
       int dev = joypad[j][i] >> 12;
       if(dev) {
         dev--;
@@ -1265,6 +1418,130 @@ void sdlCheckKeys()
     SDL_JoystickEventState(SDL_ENABLE);
 }
 
+/*
+ * 04.02.2008 (xKiv): factored out from sdlPollEvents
+ *
+ */
+void change_rewind(int howmuch)
+{
+	if(	emulating && emulator.emuReadMemState && rewindMemory
+	&&	rewindCount
+	) {
+		rewindPos = (rewindPos + rewindCount + howmuch) % rewindCount;
+		emulator.emuReadMemState(
+				&rewindMemory[REWIND_SIZE*rewindPos],
+				REWIND_SIZE
+		);
+		rewindCounter = 0;
+		{
+			char rewindMsgBuffer[50];
+			snprintf(rewindMsgBuffer, 50, "Rewind to %1d [%d]", rewindPos+1, rewindSerials[rewindPos]);
+			rewindMsgBuffer[49]	= 0;
+			systemConsoleMessage(rewindMsgBuffer);
+		}
+	}
+}
+
+/*
+ * handle the F* keys (for savestates)
+ * given the slot number and state of the SHIFT modifier, save or restore
+ * (in savemode 3, saveslot is stored in saveSlotPosition and num means:
+ *  4 .. F5: decrease slot number (down to 0)
+ *  5 .. F6: increase slot number (up to 7, because 8 and 9 are reserved for backups)
+ *  6 .. F7: save state
+ *  7 .. F8: load state
+ *  (these *should* be configurable)
+ *  other keys are ignored
+ * )
+ */
+static void sdlHandleSavestateKey(int num, int shifted)
+{
+	int action	= -1;
+	// 0: load
+	// 1: save
+	int backuping	= 1; // controls whether we are doing savestate backups
+
+	if ( sdlSaveKeysSwitch == 2 )
+	{
+		// ignore "shifted"
+		switch (num)
+		{
+			// nb.: saveSlotPosition is base 0, but to the user, we show base 1 indexes (F## numbers)!
+			case 4:
+				if (saveSlotPosition > 0)
+				{
+					saveSlotPosition--;
+					fprintf(stderr, "Changed savestate slot to %d.\n", saveSlotPosition + 1);
+				} else
+					fprintf(stderr, "Can't decrease slotnumber below 1.\n");
+				return; // handled
+			case 5:
+				if (saveSlotPosition < 7)
+				{
+					saveSlotPosition++;
+					fprintf(stderr, "Changed savestate slot to %d.\n", saveSlotPosition + 1);
+				} else
+					fprintf(stderr, "Can't increase slotnumber above 8.\n");
+				return; // handled
+			case 6:
+				action	= 1; // save
+				break;
+			case 7:
+				action	= 0; // load
+				break;
+			default:
+				// explicitly ignore
+				return; // handled
+		}
+	}
+
+	if (sdlSaveKeysSwitch == 0 ) /* "classic" VBA: shifted is save */
+	{
+		if (shifted)
+			action	= 1; // save
+		else	action	= 0; // load
+		saveSlotPosition	= num;
+	}
+	if (sdlSaveKeysSwitch == 1 ) /* "xKiv" VBA: shifted is load */
+	{
+		if (!shifted)
+			action	= 1; // save
+		else	action	= 0; // load
+		saveSlotPosition	= num;
+	}
+
+	if (action < 0 || action > 1)
+	{
+		fprintf(
+				stderr,
+				"sdlHandleSavestateKey(%d,%d), mode %d: unexpected action %d.\n",
+				num,
+				shifted,
+				sdlSaveKeysSwitch,
+				action
+		);
+	}
+
+	if (action)
+	{        /* save */
+		if (backuping)
+		{
+			sdlWriteState(-1); // save to a special slot
+			sdlWriteBackupStateExchange(-1, saveSlotPosition, SLOT_POS_SAVE_BACKUP); // F10
+		} else {
+			sdlWriteState(saveSlotPosition);
+		}
+	} else { /* load */
+		if (backuping)
+		{
+			/* first back up where we are now */
+			sdlWriteState(SLOT_POS_LOAD_BACKUP); // F9
+		}
+		sdlReadState(saveSlotPosition);
+        }
+
+} // sdlHandleSavestateKey
+
 void sdlPollEvents()
 {
   SDL_Event event;
@@ -1274,6 +1551,11 @@ void sdlPollEvents()
       emulating = 0;
       break;
     case SDL_VIDEORESIZE:
+      if (ignore_first_resize_event)
+      {
+	      ignore_first_resize_event	= 0;
+	      break;
+      }
       if (openGL)
       {
         SDL_SetVideoMode(event.resize.w, event.resize.h, 0,
@@ -1342,18 +1624,56 @@ void sdlPollEvents()
         break;
       case SDLK_b:
         if(!(event.key.keysym.mod & MOD_NOCTRL) &&
+           (event.key.keysym.mod & KMOD_CTRL))
+		change_rewind(-1);
+	break;
+      case SDLK_v:
+        if(!(event.key.keysym.mod & MOD_NOCTRL) &&
+           (event.key.keysym.mod & KMOD_CTRL))
+		change_rewind(+1);
+	break;
+      case SDLK_h:
+        if(!(event.key.keysym.mod & MOD_NOCTRL) &&
+           (event.key.keysym.mod & KMOD_CTRL))
+		change_rewind(0);
+	break;
+      case SDLK_j:
+        if(!(event.key.keysym.mod & MOD_NOCTRL) &&
+           (event.key.keysym.mod & KMOD_CTRL))
+		change_rewind( (rewindTopPos - rewindPos) * ((rewindTopPos>rewindPos) ? +1:-1) );
+	break;
+      case SDLK_e:
+        if(!(event.key.keysym.mod & MOD_NOCTRL) &&
            (event.key.keysym.mod & KMOD_CTRL)) {
-          if(emulating && emulator.emuReadMemState && rewindMemory
-             && rewindCount) {
-            rewindPos = (rewindPos - 1) & 7;
-            emulator.emuReadMemState(&rewindMemory[REWIND_SIZE*rewindPos],
-                                     REWIND_SIZE);
-            rewindCount--;
-            rewindCounter = 0;
-            systemScreenMessage("Rewind");
-          }
-        }
-        break;
+		cheatsEnabled = !cheatsEnabled;
+		systemConsoleMessage(cheatsEnabled?"Cheats on":"Cheats off");
+	}
+	break;
+	
+      case SDLK_s:
+        if(!(event.key.keysym.mod & MOD_NOCTRL) &&
+           (event.key.keysym.mod & KMOD_CTRL)
+	) {
+		if (sdlSoundToggledOff) { // was off
+			// restore saved state
+			soundEnable(sdlSoundToggledOff);
+			soundDisable(~sdlSoundToggledOff);
+			sdlSoundToggledOff	= 0;
+			systemConsoleMessage("Sound toggled on");
+		} else { // was on
+			sdlSoundToggledOff	= soundGetEnable();
+			soundEnable(0);
+			soundDisable(sdlSoundToggledOff);
+			systemConsoleMessage("Sound toggled off");
+			if (!sdlSoundToggledOff) {
+				// if ON actually meant "all channels off" for some reason,
+				// remember that on "toggle to ON" we should unmute everything
+				sdlSoundToggledOff	= 0x3ff;
+			}
+		}
+	}
+	break;
+
       case SDLK_p:
         if(!(event.key.keysym.mod & MOD_NOCTRL) &&
            (event.key.keysym.mod & KMOD_CTRL)) {
@@ -1361,6 +1681,7 @@ void sdlPollEvents()
           SDL_PauseAudio(paused);
           if(paused)
             wasPaused = true;
+	  systemConsoleMessage(paused?"Pause on":"Pause off");
         }
         break;
       case SDLK_ESCAPE:
@@ -1382,7 +1703,7 @@ void sdlPollEvents()
 		      {
 			      filter = (Filter)((filter + 1) % kInvalidFilter);
 		        filterFunction = initFilter(filter, systemColorDepth, srcWidth);
-          }
+		      }
 		      if (getFilterEnlargeFactor(filter) != filter_enlarge)
 		        sdlInitVideo();
 		      systemScreenMessage(getFilterName(filter));
@@ -1408,13 +1729,26 @@ void sdlPollEvents()
       case SDLK_F6:
       case SDLK_F7:
       case SDLK_F8:
-      case SDLK_F9:
-      case SDLK_F10:
         if(!(event.key.keysym.mod & MOD_NOSHIFT) &&
            (event.key.keysym.mod & KMOD_SHIFT)) {
-          sdlWriteState(event.key.keysym.sym-SDLK_F1);
+		sdlHandleSavestateKey( event.key.keysym.sym - SDLK_F1, 1); // with SHIFT
         } else if(!(event.key.keysym.mod & MOD_KEYS)) {
-          sdlReadState(event.key.keysym.sym-SDLK_F1);
+		sdlHandleSavestateKey( event.key.keysym.sym - SDLK_F1, 0); // without SHIFT
+	}
+        break;
+      /* backups - only load */
+      case SDLK_F9:
+        /* F9 is "load backup" - saved state from *just before* the last restore */
+        if ( ! (event.key.keysym.mod & MOD_NOSHIFT) ) /* must work with or without shift, but only without other modifiers*/
+	{
+          sdlReadState(SLOT_POS_LOAD_BACKUP);
+        }
+        break;
+      case SDLK_F10:
+        /* F10 is "save backup" - what was in the last overwritten savestate before we overwrote it*/
+        if ( ! (event.key.keysym.mod & MOD_NOSHIFT) ) /* must work with or without shift, but only without other modifiers*/
+	{
+          sdlReadState(SLOT_POS_SAVE_BACKUP);
         }
         break;
       case SDLK_1:
@@ -1549,7 +1883,47 @@ Long options only:\n\
       --rtc                    Enable RTC support\n\
       --show-speed-normal      Show emulation speed\n\
       --show-speed-detailed    Show detailed speed data\n\
+      --cheat 'CHEAT'          add a cheat\n\
 ");
+}
+
+/*
+ * 04.02.2008 (xKiv) factored out, reformatted, more usefuler rewinds browsing scheme
+ */
+void handleRewinds()
+{
+	int curSavePos; // where we are saving today [1]
+
+	rewindCount++;  // how many rewinds will be stored after this store
+	if(rewindCount > REWIND_NUM)
+		rewindCount = REWIND_NUM;
+
+	curSavePos	= (rewindTopPos + 1) % rewindCount; // [1] depends on previous
+
+	if(
+			emulator.emuWriteMemState
+		&&
+			emulator.emuWriteMemState(
+				&rewindMemory[curSavePos*REWIND_SIZE],
+				REWIND_SIZE
+			)
+	) {
+		char rewMsgBuf[100];
+		snprintf(rewMsgBuf, 100, "Remembered rewind %1d (of %1d), serial %d.", curSavePos+1, rewindCount, rewindSerial);
+		rewMsgBuf[99]	= 0;
+		systemConsoleMessage(rewMsgBuf);
+		rewindSerials[curSavePos]	= rewindSerial;
+
+		// set up next rewind save
+		// - don't clobber the current rewind position, unless it is the original top
+		if (rewindPos == rewindTopPos) {
+			rewindPos = curSavePos;
+		}
+		// - new identification and top
+		rewindSerial++;
+		rewindTopPos = curSavePos;
+		// for the rest of the code, rewindTopPos will be where the newest rewind got stored
+	}
 }
 
 int main(int argc, char **argv)
@@ -1597,6 +1971,19 @@ int main(int argc, char **argv)
     case 0:
       // long option already processed by getopt_long
       break;
+    case 1000:
+      // --cheat
+      if (sdlPreparedCheats >= MAX_CHEATS) {
+	      fprintf(stderr, "Warning: cannot add more than %d cheats.\n", MAX_CHEATS);
+	      break;
+      }
+      {
+	      char * cpy;
+	      cpy	= (char *)malloc(1 + strlen(optarg));
+	      strcpy(cpy, optarg);
+	      sdlPreparedCheatCodes[sdlPreparedCheats++]	= cpy;
+      }
+      break;
     case 'b':
       useBios = true;
       if(optarg == NULL) {
@@ -1630,7 +2017,14 @@ int main(int argc, char **argv)
       if(optarg == NULL) {
         fprintf(stderr, "Missing IPS name\n");
         exit(-1);
-        strcpy(ipsname, optarg);
+      }
+//        strcpy(ipsname, optarg);
+      if (sdl_ips_num >= IPS_MAX_NUM) {
+        fprintf(stderr, "Too many IPS patches given at %s (max is %d). Ignoring.\n", optarg, IPS_MAX_NUM);
+      } else {
+        sdl_ips_names[sdl_ips_num]	= (char *)malloc(1 + strlen(optarg));
+        strcpy(sdl_ips_names[sdl_ips_num], optarg);
+        sdl_ips_num++;
       }
       break;
    case 'G':
@@ -1753,8 +2147,10 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
-  if(rewindTimer)
-    rewindMemory = (char *)malloc(8*REWIND_SIZE);
+  if(rewindTimer) {
+    rewindMemory = (char *)malloc(REWIND_NUM*REWIND_SIZE);
+    rewindSerials = (int *)calloc(REWIND_NUM, sizeof(int)); // init to zeroes
+  }
 
   if(sdlFlashSize == 0)
     flashSetSize(0x10000);
@@ -1796,8 +2192,15 @@ int main(int argc, char **argv)
     if(p)
       *p = 0;
 
-    if(ipsname[0] == 0)
+//    if(ipsname[0] == 0)
+//      sprintf(ipsname, "%s.ips", filename);
+    if (sdl_ips_num == 0)
+    {
+      // no patch given yet - look for ROMBASENAME.ips
       sprintf(ipsname, "%s.ips", filename);
+      sdl_ips_names[0]	= ipsname;
+      sdl_ips_num++;
+    }
 
     bool failed = false;
 
@@ -1822,8 +2225,12 @@ int main(int argc, char **argv)
         cartridgeType = IMAGE_GB;
         emulator = GBSystem;
         if(sdlAutoIPS) {
-          int size = gbRomSize;
-          utilApplyIPS(ipsname, &gbRom, &size);
+          int size = gbRomSize, patchnum;
+//          utilApplyIPS(ipsname, &gbRom, &size);
+          for (patchnum = 0; patchnum < sdl_ips_num; patchnum++) {
+            fprintf(stderr, "Trying IPS patch %s.\n", sdl_ips_names[patchnum]);
+            utilApplyIPS(sdl_ips_names[patchnum], &gbRom, &size);
+	  }
           if(size != gbRomSize) {
             extern bool gbUpdateSizes();
             gbUpdateSizes();
@@ -1845,8 +2252,12 @@ int main(int argc, char **argv)
         CPUInit(biosFileName, useBios);
         CPUReset();
         if(sdlAutoIPS) {
-          int size = 0x2000000;
-          utilApplyIPS(ipsname, &rom, &size);
+          int size = 0x2000000, patchnum;
+//          utilApplyIPS(ipsname, &rom, &size);
+          for (patchnum = 0; patchnum < sdl_ips_num; patchnum++) {
+            fprintf(stderr, "Trying IPS patch %s.\n", sdl_ips_names[patchnum]);
+            utilApplyIPS(sdl_ips_names[patchnum], &rom, &size);
+	  }
           if(size != 0x2000000) {
             CPUReset();
           }
@@ -1963,6 +2374,27 @@ int main(int argc, char **argv)
 
   SDL_WM_SetCaption("VisualBoyAdvance", NULL);
 
+  // now we can enable cheats?
+  {
+	int i;
+	for (i=0; i<sdlPreparedCheats; i++) {
+		const char *	p;
+		int	l;
+		p	= sdlPreparedCheatCodes[i];
+		l	= strlen(p);
+		if (l == 17 && p[8] == ':') {
+			fprintf(stderr,"Adding cheat code %s\n", p);
+			cheatsAddCheatCode(p, p);
+		} else if (l == 13 && p[8] == ' ') {
+			fprintf(stderr,"Adding CBA cheat code %s\n", p);
+			cheatsAddCBACode(p, p);
+		} else {
+			fprintf(stderr,"Unknown format for cheat code %s\n", p);
+		}
+	}
+  }
+
+
   while(emulating) {
     if(!paused && active) {
       if(debugger && emulator.emuHasDebugger)
@@ -1970,16 +2402,7 @@ int main(int argc, char **argv)
       else {
         emulator.emuMain(emulator.emuCount);
         if(rewindSaveNeeded && rewindMemory && emulator.emuWriteMemState) {
-          rewindCount++;
-          if(rewindCount > 8)
-            rewindCount = 8;
-          if(emulator.emuWriteMemState &&
-             emulator.emuWriteMemState(&rewindMemory[rewindPos*REWIND_SIZE],
-                                       REWIND_SIZE)) {
-            rewindPos = (rewindPos + 1) & 7;
-            if(rewindCount == 8)
-              rewindTopPos = (rewindTopPos + 1) & 7;
-          }
+		handleRewinds();
         }
 
         rewindSaveNeeded = false;
@@ -2134,6 +2557,8 @@ bool systemReadJoypads()
 
 u32 systemReadJoypad(int which)
 {
+  int realAutoFire	= autoFire;
+
   if(which < 0 || which > 3)
     which = sdlDefaultJoypad;
 
@@ -2159,6 +2584,10 @@ u32 systemReadJoypad(int which)
     res |= 256;
   if(sdlButtons[which][KEY_BUTTON_L])
     res |= 512;
+  if(sdlButtons[which][KEY_BUTTON_AUTO_A])
+    realAutoFire ^= 1;
+  if(sdlButtons[which][KEY_BUTTON_AUTO_B])
+    realAutoFire ^= 2;
 
   // disallow L+R or U+D of being pressed at the same time
   if((res & 48) == 48)
@@ -2171,10 +2600,10 @@ u32 systemReadJoypad(int which)
   if(sdlButtons[which][KEY_BUTTON_CAPTURE])
     res |= 2048;
 
-  if(autoFire) {
-    res &= (~autoFire);
+  if(realAutoFire) {
+    res &= (~realAutoFire);
     if(autoFireToggle)
-      res |= autoFire;
+      res |= realAutoFire;
     autoFireToggle = !autoFireToggle;
   }
 
@@ -2364,8 +2793,30 @@ void systemGbPrint(u8 *data,int pages,int feed,int palette, int contrast)
 {
 }
 
+/* xKiv: added timestamp */
+void systemConsoleMessage(const char *msg)
+{
+  time_t now_time;
+  struct tm now_time_broken;
+
+  now_time		= time(NULL);
+  now_time_broken	= *(localtime( &now_time ));
+  fprintf(
+		stderr,
+		"%02d:%02d:%02d %02d.%02d.%4d: %s\n",
+		now_time_broken.tm_hour,
+		now_time_broken.tm_min,
+		now_time_broken.tm_sec,
+		now_time_broken.tm_mday,
+		now_time_broken.tm_mon + 1,
+		now_time_broken.tm_year + 1900,
+		msg
+  );
+}
+
 void systemScreenMessage(const char *msg)
 {
+
   screenMessage = true;
   screenMessageTime = systemGetClock();
   if(strlen(msg) > 20) {
@@ -2373,6 +2824,8 @@ void systemScreenMessage(const char *msg)
     screenMessageBuffer[20] = 0;
   } else
     strcpy(screenMessageBuffer, msg);
+
+  systemConsoleMessage(msg);
 }
 
 bool systemCanChangeSoundQuality()
