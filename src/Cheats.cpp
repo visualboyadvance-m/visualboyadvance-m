@@ -1470,12 +1470,12 @@ bool cheatsVerifyCheatCode(const char *code, const char *desc)
 {
   size_t len = strlen(code);
   if(len != 11 && len != 13 && len != 17) {
-    systemMessage(MSG_INVALID_CHEAT_CODE, N_("Invalid cheat code '%s'"), code);
+    systemMessage(MSG_INVALID_CHEAT_CODE, N_("Invalid cheat code '%s': wrong length"), code);
     return false;
   }
 
   if(code[8] != ':') {
-    systemMessage(MSG_INVALID_CHEAT_CODE, N_("Invalid cheat code '%s'"), code);
+    systemMessage(MSG_INVALID_CHEAT_CODE, N_("Invalid cheat code '%s': no colon"), code);
     return false;
   }
 
@@ -1484,7 +1484,7 @@ bool cheatsVerifyCheatCode(const char *code, const char *desc)
     if(!CHEAT_IS_HEX(code[i])) {
       // wrong cheat
       systemMessage(MSG_INVALID_CHEAT_CODE,
-                    N_("Invalid cheat code '%s'"), code);
+                    N_("Invalid cheat code '%s': first part is not hex"), code);
       return false;
     }
   }
@@ -1492,7 +1492,7 @@ bool cheatsVerifyCheatCode(const char *code, const char *desc)
     if(!CHEAT_IS_HEX(code[i])) {
       // wrong cheat
       systemMessage(MSG_INVALID_CHEAT_CODE,
-                    N_("Invalid cheat code '%s'"), code);
+                    N_("Invalid cheat code '%s' second part is not hex"), code);
       return false;
     }
   }
