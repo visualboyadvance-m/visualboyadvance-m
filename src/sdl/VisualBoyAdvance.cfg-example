@@ -34,6 +34,8 @@
 # Select        BACKSPACE   (0008)
 # Speed up      SPACE       (0020)
 # Capture       F12         (0125)
+# Auto A        Q           (0071)
+# Auto B        W           (0077)
 #
 Joy0_Left=0114
 Joy0_Right=0113
@@ -47,6 +49,8 @@ Joy0_Start=000d
 Joy0_Select=0008
 Joy0_Speed=0020
 Joy0_Capture=0125
+Joy0_AutoA=0071
+Joy0_AutoB=0077
 
 # Motion support keys. Same format as above
 #
@@ -65,6 +69,9 @@ Motion_Down=0102
 # OpenGL mode:
 # 0 = don't use OpenGL, 1 = no texture filtering, 2 = bilinear filtering
 openGL=0
+# when using OpenGL scaling and 'no filter' (called the 1x filter, number 0),
+# make the window this many times taller and wider:
+openGLscale=1
 
 # Frame skip setting. Allowed values are from 0 to 5 only.
 frameSkip=0
@@ -203,5 +210,12 @@ soundEnable=30f
 
 # The interval between the rewind saves
 # Minimum of 0 seconds to disable rewind support, 
-# Maximum of 60 minutes. Value in seconds (hexadecimal numbers)
+# Maximum of 10 minutes (258). Value in seconds (hexadecimal numbers)
 rewindTimer=0
+
+# type of save/load keyboard control
+# if 0, then SHIFT+F# saves, F# loads (old VBA, ...)
+# if 1, then SHIFT+F# loads, F# saves (linux snes9x, ...)
+# if 2, then F5 decreases slot number, F6 increases, F7 saves, F8 loads // not implemented
+saveKeysSwitch=2
+
