@@ -425,13 +425,10 @@ bool utilIsGBAImage(const char * file)
     const char * p = strrchr(file,'.');
 
     if(p != NULL) {
-      if(_stricmp(p, ".gba") == 0)
-        return true;
-      if(_stricmp(p, ".agb") == 0)
-        return true;
-      if(_stricmp(p, ".bin") == 0)
-        return true;
-      if(_stricmp(p, ".elf") == 0)
+      if((_stricmp(p, ".agb") == 0) ||
+         (_stricmp(p, ".gba") == 0) ||
+         (_stricmp(p, ".bin") == 0) ||
+         (_stricmp(p, ".elf") == 0))
         return true;
       if(_stricmp(p, ".mb") == 0) {
         cpuIsMultiBoot = true;
@@ -449,13 +446,11 @@ bool utilIsGBImage(const char * file)
     const char * p = strrchr(file,'.');
 
     if(p != NULL) {
-      if(_stricmp(p, ".gb") == 0)
-        return true;
-      if(_stricmp(p, ".gbc") == 0)
-        return true;
-      if(_stricmp(p, ".cgb") == 0)
-        return true;
-      if(_stricmp(p, ".sgb") == 0)
+      if((_stricmp(p, ".dmg") == 0) ||
+         (_stricmp(p, ".gb") == 0) ||
+         (_stricmp(p, ".gbc") == 0) ||
+         (_stricmp(p, ".cgb") == 0) ||
+         (_stricmp(p, ".sgb") == 0))
         return true;
     }
   }
