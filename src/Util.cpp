@@ -416,6 +416,11 @@ void utilApplyIPS(const char *ips, u8 **r, int *s)
   fclose(f);
 }
 
+//TODO: Modify ZSNES code for this
+void utilApplyUPS(const char *ips, u8 **r, int *s)
+{
+}
+
 extern bool cpuIsMultiBoot;
 
 bool utilIsGBAImage(const char * file)
