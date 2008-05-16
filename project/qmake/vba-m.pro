@@ -2,7 +2,7 @@ TEMPLATE = app
 CONFIG += qt release
 QT += opengl
 TARGET = VisualBoyAdvance
-DEFINES += BKPT_SUPPORT
+DEFINES += BKPT_SUPPORT NO_PNG
 
 # Directory Locations
 M_DIR_QT = ../../src/qt/

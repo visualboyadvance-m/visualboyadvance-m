@@ -45,4 +45,12 @@ public:
 	SoundOptionsPage(QWidget *parent = 0);
 };
 
+class DirecOptionsPage : public QWidget
+{
+	Q_OBJECT
+
+public:
+	DirecOptionsPage(QWidget *parent = 0);
+};
+
 #endif
