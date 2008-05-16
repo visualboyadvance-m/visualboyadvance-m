@@ -32,6 +32,8 @@ ConfigDialog::ConfigDialog()
 	pagesWidget->addWidget( new VideoOptionsPage( pagesWidget ) );
 	pagesWidget->addWidget( new SoundOptionsPage( pagesWidget ) );
 	pagesWidget->addWidget( new InputOptionsPage( pagesWidget ) );
+	//pagesWidget->addWidget( new DirecOptionsPage( pagesWidget ) );
+	//mudlord: I need to work this shit out......Yuck.
 
 	// item box
 	contentsWidget = new QListWidget;
@@ -58,7 +60,6 @@ ConfigDialog::ConfigDialog()
 	horizontalLayout->addWidget( contentsWidget );
 	horizontalLayout->addLayout( verticalLayout );
 
-
 	setWindowTitle(tr("Options"));
 	setWindowIcon( QIcon( ":/resources/settings.png" ) );
 }
@@ -82,6 +83,12 @@ void ConfigDialog::createIcons()
 	InputButton->setText(tr("Input"));
 	InputButton->setTextAlignment(Qt::AlignHCenter);
 	InputButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
+ 	/*QListWidgetItem *DirecButton = new QListWidgetItem(contentsWidget);
+	DirecButton->setIcon(QIcon(":/resources/folder-orange.png"));
+	DirecButton->setText(tr("Directory"));
+	DirecButton->setTextAlignment(Qt::AlignHCenter);
+	DirecButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);*/
 
 	connect(contentsWidget,
 		SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
