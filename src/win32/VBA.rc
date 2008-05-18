@@ -7,12 +7,9 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
-
-
+#include "afxres.h"
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
-
 
 /////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
@@ -193,15 +190,15 @@ BEGIN
     ICON            IDI_MAINICON,IDC_STATIC,6,6,20,20
     CTEXT           "VisualBoyAdvance Emulator",IDC_STATIC,36,6,138,8
     CTEXT           "Copyright © 2008 VBA-M development team",IDC_STATIC,6,48,168,8
-    CTEXT           "https://vbam.bountysource.com",IDC_URL,6,138,168,8
+    CTEXT           "http://vba-m.ngemu.com",IDC_URL,7,138,168,8
     RTEXT           "Version:",IDC_STATIC,36,18,54,8
     LTEXT           "",IDC_VERSION,96,18,78,8,SS_NOPREFIX
-    GROUPBOX        "VBA-M dev team:",IDC_STATIC,6,72,90,60
-    CTEXT           "mudlord\nNach\nJonas Quinn\nDJRobX\nSpacy",IDC_STATIC,12,84,78,42
+    GROUPBOX        "VBA-M dev team:",IDC_STATIC,7,65,90,66
+    CTEXT           "mudlord\nNach\nJonas Quinn\nDJRobX\nSpacy\nSquall Leonhart",IDC_STATIC,15,76,76,50
     RTEXT           "Date compiled:",IDC_STATIC,36,30,54,8
     LTEXT           "",IDC_DATE,96,30,78,8,SS_NOPREFIX
-    GROUPBOX        "Thanks go to:",IDC_STATIC,102,72,72,60
-    CTEXT           "Orig. VBA team\nCostis\nchrono",IDC_STATIC,108,84,60,42
+    GROUPBOX        "Thanks go to:",IDC_STATIC,100,65,72,66
+    CTEXT           "Orig. VBA team\nCostis\nchrono\nxKiv\nbgKu",IDC_STATIC,103,77,60,42
 END
 
 IDD_DIRECTORIES DIALOGEX 0, 0, 222, 270
@@ -1902,8 +1899,8 @@ BEGIN
     END
     POPUP "&Help"
     BEGIN
-        MENUITEM "VBA-M Help",                  ID_HELP_FAQ
-        MENUITEM "VBA-M Support Forum",         ID_HELP_BUGREPORT
+        MENUITEM "Report Bugs",                 ID_HELP_BUGREPORT
+        MENUITEM "VBA-M Support Forum",         ID_HELP_FAQ
         MENUITEM "License...",                  ID_HELP_GNUPUBLICLICENSE
         MENUITEM SEPARATOR
         MENUITEM "&About VBA-M...",             ID_HELP_ABOUT
@@ -2224,6 +2221,16 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\r\0"
+END
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\0"
 END
 
 #endif    // APSTUDIO_INVOKED

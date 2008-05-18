@@ -32,13 +32,13 @@ void MainWnd::OnHelpAbout()
 
 void MainWnd::OnHelpFaq()
 {
-  ::ShellExecute(0, _T("open"), "vba-m_help.chm",
+  ::ShellExecute(0, _T("open"), "http://vba-m.ngemu.com/forum/",
                  0, 0, SW_SHOWNORMAL);
 }
 
 void MainWnd::OnHelpBugreport()
 {
-  ::ShellExecute(0, _T("open"), "http://forums.ngemu.com/vba-m/",
+  ::ShellExecute(0, _T("open"), "http://sourceforge.net/tracker/?atid=1023154&group_id=212795&func=browse",
                  0, 0, SW_SHOWNORMAL);
 }
 
