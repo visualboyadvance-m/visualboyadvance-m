@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 #include <zlib.h>
 #include "protect.h"
 
-static void *memmem(uint8_t *haystack, size_t haystacklen, uint8_t *needle, size_t needlelen)
+static uint8_t *memmem(const uint8_t *haystack, size_t haystacklen, const uint8_t *needle, size_t needlelen)
 {
   if (needlelen <= haystacklen)
   {
@@ -14,7 +15,7 @@ static void *memmem(uint8_t *haystack, size_t haystacklen, uint8_t *needle, size
     {
       if (!memcmp(haystack, needle, needlelen))
       {
-        return((char *)haystack);
+        return((uint8_t *)haystack);
       }
       ++haystack;
     }
@@ -64,7 +65,7 @@ int ExecutableValid(const char *executable_filename)
       rewind(fp);
       fread(buffer, 1, file_size, fp);
 
-      if ((p  = memmem(buffer, file_size, (const void *)data, sizeof(data))))
+      if ((p  = memmem(buffer, file_size, (const uint8_t *)data, sizeof(data))))
       {
         size_t length_till_data = p-buffer;
         uint32_t crc1, crc2, crc3, crc4;
