@@ -53,7 +53,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;..\dependencies\File_Extractor-0.4.3\fex&quot;;..\dependencies\msvc"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;DEV_VERSION;BKPT_SUPPORT;MMX;ASM;_CRT_SECURE_NO_WARNINGS;HAS_FILE_EXTRACTOR"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;DEV_VERSION;BKPT_SUPPORT;GBA_LOGGING;MMX;ASM;_CRT_SECURE_NO_WARNINGS;HAS_FILE_EXTRACTOR"
 				StringPooling="false"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
