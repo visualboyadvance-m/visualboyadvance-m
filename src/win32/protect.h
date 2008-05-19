@@ -1,5 +1,5 @@
-//#ifdef PROTECT_H
-//#define PROTECT_H
+#ifdef ___PROTECT_H_
+#define ___PROTECT_H_
 
 #if defined(__cplusplus)
 extern "C" {
@@ -13,4 +13,4 @@ int ExecutableValid(const char *executable_filename);
 }
 #endif
 
-//#endif
+#endif
