@@ -35,13 +35,15 @@ libpng:       http://libpng.org/pub/png/libpng.html
 
 There are two solution files for Visual C++ 2008:
 
-The Windows MFC GUI version project files are located in the root of the vba-m sources (VBA2008.sln).
+===Win32/MFC===
+The Windows MFC GUI version project files are located in the root of the VBA-M sources (VBA2008.sln).
 In order to compile it, you have to compile zlib and libpng first and set your compiler's INCLUDE and LIB path accordantly.
-If you also need Microsoft's DirectX SDK.
+You also need Microsoft's DirectX SDK (At least for DirectInput).
 If you want to enable OpenAL sound output, install the OpenAL SDK. If you do not want it, #define NO_OAL.
-Some pixel filters come with assembler code compatible to the NASM syntax. Extract NASM somewhere and add it to your PATH environment variable. All .asm files should be handled with the "nasm.rules" build rules file.
+Some pixel filters come with assembler code compatible to the NASM syntax. Extract NASM somewhere and add it to your PATH environment variable. All .asm files should be handled with the "nasm.rules" build rules file, also in the source root.
 
-The new Qt GUI version can be found in /project/vc2008.
-It uses the qmake file in /project/qmake and can be compiled with the Visual C++ 2008 Express Edition.
-Qt has to be compiled with the Microsoft compiler first, in order to use it.
-The dependencies folder is not yet necessary.
+===Win32/Qt===
+The MS Visual C++ 2008 Express-compatible project file can be found in /project/vc2008.
+It uses the qmake file in /project/qmake.
+IMPORTANT: The Qt-sources have to be compiled with the Microsoft compiler first, in order to use it. The default distribution was compiled with mingw and will not work with the MS Compiler.
+The dependencies folder is not (yet) necessary.
