@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="VisualBoyAdvance"
 	ProjectGUID="{6D4C5EC8-933F-4C05-A1BF-498E658576DF}"
 	RootNamespace="VBA"
@@ -193,7 +193,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib LIBCMT.lib zlib.lib libpng.lib"
+				AdditionalDependencies="nafxcw.lib zlib.lib libpng.lib LIBCMT.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
 				Version=""
@@ -841,6 +841,14 @@
 			<Filter
 				Name="Main"
 				>
+				<File
+					RelativePath=".\src\win32\protect.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\protect.h"
+					>
+				</File>
 				<File
 					RelativePath=".\src\win32\stdafx.cpp"
 					>

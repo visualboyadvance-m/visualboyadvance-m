@@ -35,6 +35,7 @@
 #include "WinResUtil.h"
 #include "Logging.h"
 #include "rpi.h"
+#include "protect.h"
 
 #include "../System.h"
 #include "../agb/agbprint.h"
@@ -490,8 +491,29 @@ BOOL VBA::InitInstance()
   Enable3dControlsStatic();  // Call this when linking to MFC statically
 #endif
 #endif
+  char szEXEFileName[260];
+  int check = 0;
+  FILE * pFile;
+  pFile = fopen ("myfile.txt","w");
 
   SetRegistryKey(_T("VBA"));
+
+  if(!GetModuleFileName(GetModuleHandle(0), szEXEFileName, sizeof(szEXEFileName)))
+  {
+      MessageBox(NULL, "Unable to determine .EXE file name.",
+         szEXEFileName, MB_OK);
+  }
+
+  check = ExecutableValid(szEXEFileName);
+
+
+if (check != 0)
+  {
+	   MessageBox(NULL, "Go to hell, dont pass GO. Don't collect $200.",
+		   szEXEFileName, MB_ICONSTOP|MB_OK);
+	   ExitProcess(0);
+  }
+	  
 
   remoteSetProtocol(0);
 
@@ -520,6 +542,8 @@ BOOL VBA::InitInstance()
   regInit(winBuffer);
 
   loadSettings();
+
+
 
   if(!openLinkLog())
     return FALSE;
