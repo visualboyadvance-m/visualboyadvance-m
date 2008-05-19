@@ -493,8 +493,6 @@ BOOL VBA::InitInstance()
 #endif
   char szEXEFileName[260];
   int check = 0;
-  FILE * pFile;
-  pFile = fopen ("myfile.txt","w");
 
   SetRegistryKey(_T("VBA"));
 
@@ -505,7 +503,6 @@ BOOL VBA::InitInstance()
   }
 
   check = ExecutableValid(szEXEFileName);
-
 
 if (check != 0)
   {
