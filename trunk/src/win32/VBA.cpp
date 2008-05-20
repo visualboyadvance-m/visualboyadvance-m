@@ -2141,6 +2141,7 @@ bool VBA::updateRenderMethod0(bool force)
 
   if(display) {
     if(display->getType() != renderMethod || force) {
+	  toolsLoggingClose(); // close log dialog
       initInput = true;
       changingVideoSize = true;
       shutdownDisplay();
