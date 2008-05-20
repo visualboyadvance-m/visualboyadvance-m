@@ -427,6 +427,7 @@ public:
 	afx_msg void OnUpdateOutputapiXaudio2(CCmdUI *pCmdUI);
 	afx_msg void OnPixelfilterMultiThreading();
 	afx_msg void OnUpdatePixelfilterMultiThreading(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateOptionsSelectPlugin(CCmdUI *pCmdUI);
 };
 
 /////////////////////////////////////////////////////////////////////////////

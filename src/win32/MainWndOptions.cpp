@@ -1363,6 +1363,7 @@ void MainWnd::OnUpdateOptionsFilter(CCmdUI *pCmdUI)
     pCmdUI->SetCheck(theApp.filterType == FILTER_SUPER2XSAI);
     break;
   case ID_OPTIONS_FILTER_PLUGIN:
+    pCmdUI->Enable( !theApp.filterMT );
     pCmdUI->SetCheck(theApp.filterType == FILTER_PLUGIN);
     break;
   case ID_OPTIONS_FILTER_SUPEREAGLE:
@@ -1405,6 +1406,11 @@ void MainWnd::OnUpdateOptionsFilter(CCmdUI *pCmdUI)
     pCmdUI->SetCheck(theApp.filterType == FILTER_HQ4X);
     break;
   }
+}
+
+void MainWnd::OnUpdateOptionsSelectPlugin(CCmdUI *pCmdUI)
+{
+	pCmdUI->Enable( !theApp.filterMT );
 }
 
 BOOL MainWnd::OnOptionsFilterIFB(UINT nID)
@@ -1869,5 +1875,6 @@ void MainWnd::OnPixelfilterMultiThreading()
 
 void MainWnd::OnUpdatePixelfilterMultiThreading(CCmdUI *pCmdUI)
 {
+	pCmdUI->Enable( theApp.filterType != FILTER_PLUGIN );
 	pCmdUI->SetCheck( theApp.filterMT ? 1 : 0 );
 }

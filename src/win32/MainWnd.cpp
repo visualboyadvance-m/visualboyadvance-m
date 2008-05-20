@@ -439,6 +439,7 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_XAUDIO2, &MainWnd::OnUpdateOutputapiXaudio2)
   ON_COMMAND(ID_PIXELFILTER_MULTI, &MainWnd::OnPixelfilterMultiThreading)
   ON_UPDATE_COMMAND_UI(ID_PIXELFILTER_MULTI, &MainWnd::OnUpdatePixelfilterMultiThreading)
+  ON_UPDATE_COMMAND_UI(ID_OPTIONS_SELECT_PLUGIN, &MainWnd::OnUpdateOptionsSelectPlugin)
   END_MESSAGE_MAP()
 
 
