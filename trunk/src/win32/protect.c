@@ -8,17 +8,24 @@
 
 static uint8_t *memmem(const uint8_t *haystack, size_t haystacklen, const uint8_t *needle, size_t needlelen)
 {
-  if (needlelen <= haystacklen)
+  if (needlelen)
   {
-    haystacklen -= needlelen-1;
-    while (haystacklen--)
+    if (needlelen <= haystacklen)
     {
-      if (!memcmp(haystack, needle, needlelen))
+      haystacklen -= needlelen-1;
+      while (haystacklen--)
       {
-        return((uint8_t *)haystack);
+        if (!memcmp(haystack, needle, needlelen))
+        {
+          return((uint8_t *)haystack);
+        }
+        ++haystack;
       }
-      ++haystack;
     }
+  }
+  else
+  {
+    return((uint8_t *)haystack);
   }
   return(0);
 }
