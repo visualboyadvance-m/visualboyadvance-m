@@ -6,6 +6,16 @@
 #include <zlib.h>
 #include "protect.h"
 
+#ifdef _DEBUG
+
+//For building debug builds, no security ever
+int ExecutableValid(const char *executable_filename)
+{
+  return(0);
+}
+
+#else
+
 static uint8_t *memmem(const uint8_t *haystack, size_t haystacklen, const uint8_t *needle, size_t needlelen)
 {
   if (needlelen)
@@ -118,3 +128,5 @@ int ExecutableValid(const char *executable_filename)
 
   return(retval);
 }
+
+#endif
