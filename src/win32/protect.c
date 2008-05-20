@@ -81,14 +81,12 @@ int ExecutableValid(const char *executable_filename)
         crc1 = crc32(crc1, (const Bytef *)buffer, length_till_data);
         crc2 = crc32(crc1, (const Bytef *)data, sizeof(data));
         crc3 = crc32(crc3, (const Bytef *)p+sizeof(data), file_size-(length_till_data+sizeof(data)));
+        crc4 = crc32(crc4, (const Bytef *)(data+1), sizeof(data)-sizeof(uint32_t));
 
-        data[sizeof(data)/sizeof(uint32_t)-1] += sizeof(data); //Seriously "what the heck", right? ;-)
-        crc4 = crc32(crc4, (const Bytef *)(data+2), sizeof(data)-sizeof(uint32_t)*2);
-
-        if ((crc1 == data[sizeof(data)/sizeof(uint32_t)-4]) &&
-            (crc3 == data[sizeof(data)/sizeof(uint32_t)-3]) &&
-            (crc4 == data[1]) &&
-            (crc32_combine(crc2, crc3, file_size-(length_till_data+sizeof(data))) == data[sizeof(data)/sizeof(uint32_t)-2]) &&
+        if ((data[sizeof(data)/sizeof(uint32_t)-4] == crc1) &&
+            (data[sizeof(data)/sizeof(uint32_t)-3] == crc3) &&
+            (data[sizeof(data)/sizeof(uint32_t)-2] == crc32_combine(crc2, crc3, file_size-(length_till_data+sizeof(data)))) &&
+            (data[sizeof(data)/sizeof(uint32_t)-1] == crc4) &&
             (file_size == data[2]) &&
             (data[3] == ((uint32_t *)(buffer+file_size))[-2]) &&
             (data[4] == ((uint32_t *)(buffer+file_size))[-1]))
