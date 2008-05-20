@@ -254,7 +254,6 @@ void XAudio2_Output::write()
 		ASSERT( vState.BuffersQueued <= NBUFFERS );
 
 		if( vState.BuffersQueued < NBUFFERS ) {
-			// there is at least one free buffer
 #ifdef _DEBUG
 			if( vState.BuffersQueued == 0 ) {
 				// buffers ran dry
@@ -264,6 +263,7 @@ void XAudio2_Output::write()
 				}
 			}
 #endif
+			// there is at least one free buffer
 			break;
 		} else {
 			// the maximum number of buffers is currently queued
