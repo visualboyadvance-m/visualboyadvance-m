@@ -41,16 +41,11 @@ GFX: ~32MB VRAM, DirectX9 drivers
 File Dependencies
 ===================
 
-VBA-M requires the following files, in order to run.
+"D3DX9_37.DLL" requires an update to DirectX.
+You can use the following tool to update it:
+http://vba-m.ngemu.com/vbam/vbacompiles/msvc2008/Directx_9c_webupdater.zip
 
-libpng13.dll
-zlib1.dll
-D3DX9_37.DLL
-
-The first two are available from http://vba-m.ngemu.com/vbam/vbacompiles/msvc2008/dll.7z,
-while the last requires an update to DirectX, you can use the following tool to update - http://vba-m.ngemu.com/vbam/vbacompiles/msvc2008/Directx_9c_webupdater.zip
-
-The OpenAL runtime may be downloaded from http://openal.org/downloads.html
+In order to use OpenAL sound, the OpenAL runtime has to be downloaded and installed from http://openal.org/downloads.html
 
 
 ==============
