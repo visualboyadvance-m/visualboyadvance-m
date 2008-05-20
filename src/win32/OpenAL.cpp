@@ -291,10 +291,12 @@ void OpenAL::write()
 
 #ifdef _DEBUG
 		if( nBuffersProcessed == theApp.oalBufferCount ) {
+			// we only want to know about it when we are emulating at full speed or faster:
 			if( ( theApp.throttle >= 100 ) || ( theApp.throttle == 0 ) ) {
-				// we only want to know about it when we are emulating at full speed (or faster)
-				static int i = 0;
-				log( "OpenAL: Buffers were not refilled fast enough (%i)\n", i++ );
+				if( systemVerbose & VERBOSE_SOUNDOUTPUT ) {
+					static int i = 0;
+					log( "OpenAL: Buffers were not refilled fast enough (i=%i)\n", i++ );
+				}
 			}
 		}
 #endif
