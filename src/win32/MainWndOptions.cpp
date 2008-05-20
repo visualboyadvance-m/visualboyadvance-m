@@ -1286,9 +1286,13 @@ BOOL MainWnd::OnOptionsFilter(UINT nID)
 	case ID_OPTIONS_FILTER_TVMODE:
 		theApp.filterType = FILTER_TVMODE;
 		break;
-case ID_OPTIONS_FILTER_PLUGIN:
-    theApp.filterType = FILTER_PLUGIN;
-    break;
+	case ID_OPTIONS_FILTER_PLUGIN:
+		theApp.filterType = FILTER_PLUGIN;
+		if( strcmp( theApp.pluginName, "" ) == 0 ) {
+			// open select plugin dialog when none selected
+			OnOptionsSelectPlugin();
+		}
+		break;
 	case ID_OPTIONS_FILTER_2XSAI:
 		theApp.filterType = FILTER_2XSAI;
 		break;
@@ -1359,8 +1363,8 @@ void MainWnd::OnUpdateOptionsFilter(CCmdUI *pCmdUI)
     pCmdUI->SetCheck(theApp.filterType == FILTER_SUPER2XSAI);
     break;
   case ID_OPTIONS_FILTER_PLUGIN:
-  pCmdUI->SetCheck(theApp.filterType == FILTER_PLUGIN);
-  break;
+    pCmdUI->SetCheck(theApp.filterType == FILTER_PLUGIN);
+    break;
   case ID_OPTIONS_FILTER_SUPEREAGLE:
     pCmdUI->SetCheck(theApp.filterType == FILTER_SUPEREAGLE);
     break;
@@ -1720,8 +1724,9 @@ void MainWnd::OnOptionsSelectPlugin()
 {
   SelectPlugin dlg;
 
-  if (dlg.DoModal() == IDOK && theApp.filterType == FILTER_PLUGIN)
+  if (dlg.DoModal() == IDOK)
   {
+	theApp.filterType = FILTER_PLUGIN;
 	theApp.updateFilter();
   }
 }
