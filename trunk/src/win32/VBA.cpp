@@ -1446,7 +1446,7 @@ void VBA::loadSettings()
 
   videoOption = regQueryDwordValue("video", VIDEO_3X);
 
-  strcpy(pluginName, regQueryStringValue("pluginName", "Scale2x.rpi"));
+  strcpy(pluginName, regQueryStringValue("pluginName", ""));
 
   if(videoOption < VIDEO_1X || videoOption > VIDEO_OTHER)
     videoOption = VIDEO_3X;
