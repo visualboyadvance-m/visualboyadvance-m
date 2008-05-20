@@ -63,7 +63,6 @@ extern int cpuTotalTicks;
 
 static inline u32 CPUReadMemory(u32 address)
 {
-
 #ifdef GBA_LOGGING
   if(address & 3) {
     if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {

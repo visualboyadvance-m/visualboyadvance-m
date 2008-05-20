@@ -289,7 +289,6 @@ void OpenAL::write()
 		ALFunction.alGetSourcei( source, AL_BUFFERS_PROCESSED, &nBuffersProcessed );
 		ASSERT_SUCCESS;
 
-#ifdef _DEBUG
 		if( nBuffersProcessed == theApp.oalBufferCount ) {
 			// we only want to know about it when we are emulating at full speed or faster:
 			if( ( theApp.throttle >= 100 ) || ( theApp.throttle == 0 ) ) {
@@ -299,7 +298,6 @@ void OpenAL::write()
 				}
 			}
 		}
-#endif
 
 		if( !speedup && synchronize && !theApp.throttle ) {
 			// wait until at least one buffer has finished

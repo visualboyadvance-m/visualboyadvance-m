@@ -254,7 +254,6 @@ void XAudio2_Output::write()
 		ASSERT( vState.BuffersQueued <= NBUFFERS );
 
 		if( vState.BuffersQueued < NBUFFERS ) {
-#ifdef _DEBUG
 			if( vState.BuffersQueued == 0 ) {
 				// buffers ran dry
 				if( systemVerbose & VERBOSE_SOUNDOUTPUT ) {
@@ -262,7 +261,6 @@ void XAudio2_Output::write()
 					log( "XAudio2: Buffers were not refilled fast enough (i=%i)\n", i++ );
 				}
 			}
-#endif
 			// there is at least one free buffer
 			break;
 		} else {
