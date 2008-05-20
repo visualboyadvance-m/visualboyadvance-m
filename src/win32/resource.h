@@ -477,6 +477,8 @@
 #define IDC_TITLE                       1234
 #define IDC_VERBOSE_AGBPRINT            1234
 #define IDC_CURRENT_ADDRESS             1235
+#define IDC_VERBOSE_AGBPRINT2           1235
+#define IDC_VERBOSE_SOUNDOUTPUT         1235
 #define IDC_NOTES                       1236
 #define IDC_CURRENT_ADDRESS_LABEL       1236
 #define IDC_LOAD                        1238

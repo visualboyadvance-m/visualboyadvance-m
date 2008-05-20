@@ -7,9 +7,11 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include "afxres.h"
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
+
 
 /////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
@@ -810,26 +812,27 @@ BEGIN
     LTEXT           "",IDC_PORT,143,7,36,8,SS_NOPREFIX
 END
 
-IDD_LOGGING DIALOG  0, 0, 366, 218
+IDD_LOGGING DIALOGEX 0, 0, 381, 221
 STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Logging"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "SWI",IDC_VERBOSE_SWI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,17,87,10
-    CONTROL         "Unaligned memory",IDC_VERBOSE_UNALIGNED_ACCESS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,30,87,10
-    CONTROL         "Illegal write",IDC_VERBOSE_ILLEGAL_WRITE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,43,87,10
-    CONTROL         "Illegal read",IDC_VERBOSE_ILLEGAL_READ,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,56,87,10
-    CONTROL         "DMA 0",IDC_VERBOSE_DMA0,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,69,87,10
-    CONTROL         "DMA 1",IDC_VERBOSE_DMA1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,82,87,10
-    CONTROL         "DMA 2",IDC_VERBOSE_DMA2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,95,87,10
-    CONTROL         "DMA 3",IDC_VERBOSE_DMA3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,108,87,10
-    CONTROL         "Undefined instruction",IDC_VERBOSE_UNDEFINED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,121,87,10
-    CONTROL         "AGBPrint",IDC_VERBOSE_AGBPRINT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,134,87,10
-    EDITTEXT        IDC_LOG,107,7,252,183,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
-    PUSHBUTTON      "Save...",IDC_SAVE,75,197,50,14
-    PUSHBUTTON      "Clear",IDC_CLEAR,137,197,50,14
-    DEFPUSHBUTTON   "OK",ID_OK,197,197,50,14
-    GROUPBOX        "Verbose",IDC_STATIC,7,7,93,142
+    CONTROL         "SWI",IDC_VERBOSE_SWI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,18,90,12
+    CONTROL         "Unaligned memory",IDC_VERBOSE_UNALIGNED_ACCESS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,36,90,12
+    CONTROL         "Illegal write",IDC_VERBOSE_ILLEGAL_WRITE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,54,90,12
+    CONTROL         "Illegal read",IDC_VERBOSE_ILLEGAL_READ,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,72,90,12
+    CONTROL         "DMA 0",IDC_VERBOSE_DMA0,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,90,90,12
+    CONTROL         "DMA 1",IDC_VERBOSE_DMA1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,108,90,12
+    CONTROL         "DMA 2",IDC_VERBOSE_DMA2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,126,90,12
+    CONTROL         "DMA 3",IDC_VERBOSE_DMA3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,144,90,12
+    CONTROL         "Undefined instruction",IDC_VERBOSE_UNDEFINED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,162,90,12
+    CONTROL         "AGBPrint",IDC_VERBOSE_AGBPRINT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,180,90,12
+    EDITTEXT        IDC_LOG,114,6,258,192,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
+    PUSHBUTTON      "Save...",IDC_SAVE,114,204,48,12
+    PUSHBUTTON      "Clear",IDC_CLEAR,168,204,48,12
+    DEFPUSHBUTTON   "OK",ID_OK,324,204,48,12
+    GROUPBOX        "Verbose",IDC_STATIC,6,6,102,210
+    CONTROL         "Sound output",IDC_VERBOSE_SOUNDOUTPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,198,90,12
 END
 
 IDD_EXPORT_SPS DIALOGEX 0, 0, 248, 148
@@ -1373,9 +1376,9 @@ BEGIN
     IDD_LOGGING, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 359
+        RIGHTMARGIN, 374
         TOPMARGIN, 7
-        BOTTOMMARGIN, 211
+        BOTTOMMARGIN, 214
     END
 
     IDD_EXPORT_SPS, DIALOG
@@ -2200,42 +2203,6 @@ BEGIN
 END
 
 #endif    // English (U.S.) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English (Australia) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENA)
-#ifdef _WIN32
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
-#pragma code_page(1252)
-#endif //_WIN32
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""afxres.h""\r\r\0"
-END
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "\r\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-#endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
