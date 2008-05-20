@@ -36,7 +36,7 @@
 // Internals
 #include "../Sound.h" // for soundBufferLen, soundFinalWave and soundQuality
 #include "../System.h" // for systemMessage()
-#include "../Globals.h" // for 'speedup' and 'synchronize'
+#include "../Globals.h"
 
 
 // Synchronization Event
@@ -258,8 +258,10 @@ void XAudio2_Output::write()
 #ifdef _DEBUG
 			if( vState.BuffersQueued == 0 ) {
 				// buffers ran dry
-				static int i = 0;
-				log( "XAudio2: Buffers were not refilled fast enough (%i)\n", i++ );
+				if( systemVerbose & VERBOSE_SOUNDOUTPUT ) {
+					static unsigned int i = 0;
+					log( "XAudio2: Buffers were not refilled fast enough (i=%i)\n", i++ );
+				}
 			}
 #endif
 			break;

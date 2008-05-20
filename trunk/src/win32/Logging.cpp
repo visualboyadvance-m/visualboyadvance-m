@@ -25,6 +25,8 @@
 #include "FileDlg.h"
 #include "Logging.h"
 
+#include "../Globals.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -39,6 +41,7 @@ CString Logging::text;
 
 Logging::Logging(CWnd* pParent /*=NULL*/)
   : ResizeDlg(Logging::IDD, pParent)
+  , m_sound_output(FALSE)
 {
   //{{AFX_DATA_INIT(Logging)
   m_swi = FALSE;
@@ -57,25 +60,23 @@ Logging::Logging(CWnd* pParent /*=NULL*/)
 
 void Logging::DoDataExchange(CDataExchange* pDX)
 {
-  CDialog::DoDataExchange(pDX);
-  //{{AFX_DATA_MAP(Logging)
-  DDX_Control(pDX, IDC_LOG, m_log);
-  DDX_Check(pDX, IDC_VERBOSE_SWI, m_swi);
-  DDX_Check(pDX, IDC_VERBOSE_UNALIGNED_ACCESS, m_unaligned_access);
-  DDX_Check(pDX, IDC_VERBOSE_ILLEGAL_WRITE, m_illegal_write);
-  DDX_Check(pDX, IDC_VERBOSE_ILLEGAL_READ, m_illegal_read);
-  DDX_Check(pDX, IDC_VERBOSE_DMA0, m_dma0);
-  DDX_Check(pDX, IDC_VERBOSE_DMA1, m_dma1);
-  DDX_Check(pDX, IDC_VERBOSE_DMA2, m_dma2);
-  DDX_Check(pDX, IDC_VERBOSE_DMA3, m_dma3);
-  DDX_Check(pDX, IDC_VERBOSE_AGBPRINT, m_agbprint);
-  DDX_Check(pDX, IDC_VERBOSE_UNDEFINED, m_undefined);
-  //}}AFX_DATA_MAP
+	CDialog::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LOG, m_log);
+	DDX_Check(pDX, IDC_VERBOSE_SWI, m_swi);
+	DDX_Check(pDX, IDC_VERBOSE_UNALIGNED_ACCESS, m_unaligned_access);
+	DDX_Check(pDX, IDC_VERBOSE_ILLEGAL_WRITE, m_illegal_write);
+	DDX_Check(pDX, IDC_VERBOSE_ILLEGAL_READ, m_illegal_read);
+	DDX_Check(pDX, IDC_VERBOSE_DMA0, m_dma0);
+	DDX_Check(pDX, IDC_VERBOSE_DMA1, m_dma1);
+	DDX_Check(pDX, IDC_VERBOSE_DMA2, m_dma2);
+	DDX_Check(pDX, IDC_VERBOSE_DMA3, m_dma3);
+	DDX_Check(pDX, IDC_VERBOSE_AGBPRINT, m_agbprint);
+	DDX_Check(pDX, IDC_VERBOSE_UNDEFINED, m_undefined);
+	DDX_Check(pDX, IDC_VERBOSE_SOUNDOUTPUT, m_sound_output);
 }
 
 
 BEGIN_MESSAGE_MAP(Logging, CDialog)
-  //{{AFX_MSG_MAP(Logging)
   ON_BN_CLICKED(ID_OK, OnOk)
   ON_BN_CLICKED(IDC_CLEAR, OnClear)
   ON_BN_CLICKED(IDC_VERBOSE_AGBPRINT, OnVerboseAgbprint)
@@ -88,14 +89,15 @@ BEGIN_MESSAGE_MAP(Logging, CDialog)
   ON_BN_CLICKED(IDC_VERBOSE_SWI, OnVerboseSwi)
   ON_BN_CLICKED(IDC_VERBOSE_UNALIGNED_ACCESS, OnVerboseUnalignedAccess)
   ON_BN_CLICKED(IDC_VERBOSE_UNDEFINED, OnVerboseUndefined)
+  ON_BN_CLICKED(IDC_VERBOSE_SOUNDOUTPUT, OnVerboseSoundoutput)
   ON_BN_CLICKED(IDC_SAVE, OnSave)
   ON_EN_ERRSPACE(IDC_LOG, OnErrspaceLog)
   ON_EN_MAXTEXT(IDC_LOG, OnMaxtextLog)
   ON_WM_CLOSE()
-  //}}AFX_MSG_MAP
-  END_MESSAGE_MAP()
+END_MESSAGE_MAP()
 
-  /////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////
 // Logging message handlers
 
 void Logging::OnOk()
@@ -111,54 +113,59 @@ void Logging::OnClear()
   m_log.SetWindowText("");
 }
 
-void Logging::OnVerboseAgbprint()
-{
-  systemVerbose ^= 512;
-}
-
-void Logging::OnVerboseDma0()
-{
-  systemVerbose ^= 16;
-}
-
-void Logging::OnVerboseDma1()
-{
-  systemVerbose ^= 32;
-}
-
-void Logging::OnVerboseDma2()
-{
-  systemVerbose ^= 64;
-}
-
-void Logging::OnVerboseDma3()
-{
-  systemVerbose ^= 128;
-}
-
-void Logging::OnVerboseIllegalRead()
-{
-  systemVerbose ^= 8;
-}
-
-void Logging::OnVerboseIllegalWrite()
-{
-  systemVerbose ^= 4;
-}
-
 void Logging::OnVerboseSwi()
 {
-  systemVerbose ^= 1;
+	systemVerbose ^= VERBOSE_SWI;
 }
 
 void Logging::OnVerboseUnalignedAccess()
 {
-  systemVerbose ^= 2;
+	systemVerbose ^= VERBOSE_UNALIGNED_MEMORY;
+}
+
+void Logging::OnVerboseIllegalWrite()
+{
+	systemVerbose ^= VERBOSE_ILLEGAL_WRITE;
+}
+
+void Logging::OnVerboseIllegalRead()
+{
+	systemVerbose ^= VERBOSE_ILLEGAL_READ;
+}
+
+void Logging::OnVerboseDma0()
+{
+	systemVerbose ^= VERBOSE_DMA0;
+}
+
+void Logging::OnVerboseDma1()
+{
+	systemVerbose ^= VERBOSE_DMA1;
+}
+
+void Logging::OnVerboseDma2()
+{
+	systemVerbose ^= VERBOSE_DMA2;
+}
+
+void Logging::OnVerboseDma3()
+{
+	systemVerbose ^= VERBOSE_DMA3;
 }
 
 void Logging::OnVerboseUndefined()
 {
-  systemVerbose ^= 256;
+	systemVerbose ^= VERBOSE_UNDEFINED;
+}
+
+void Logging::OnVerboseAgbprint()
+{
+	systemVerbose ^= VERBOSE_AGBPRINT;
+}
+
+void Logging::OnVerboseSoundoutput()
+{
+	systemVerbose ^= VERBOSE_SOUNDOUTPUT;
 }
 
 void Logging::OnSave()
@@ -216,16 +223,17 @@ BOOL Logging::OnInitDialog()
             HKEY_CURRENT_USER,
             "Software\\Emulators\\VisualBoyAdvance\\Viewer\\LogView",
             NULL);
-  m_swi = (systemVerbose & 1) != 0;
-  m_unaligned_access = (systemVerbose & 2) != 0;
-  m_illegal_write = (systemVerbose & 4) != 0;
-  m_illegal_read = (systemVerbose & 8) != 0;
-  m_dma0 = (systemVerbose & 16) != 0;
-  m_dma1 = (systemVerbose & 32) != 0;
-  m_dma2 = (systemVerbose & 64) != 0;
-  m_dma3 = (systemVerbose & 128) != 0;
-  m_undefined = (systemVerbose & 256) != 0;
-  m_agbprint = (systemVerbose & 512) != 0;
+  m_swi =              (systemVerbose & VERBOSE_SWI) != 0;
+  m_unaligned_access = (systemVerbose & VERBOSE_UNALIGNED_MEMORY) != 0;
+  m_illegal_write =    (systemVerbose & VERBOSE_ILLEGAL_WRITE) != 0;
+  m_illegal_read =     (systemVerbose & VERBOSE_ILLEGAL_READ) != 0;
+  m_dma0 =             (systemVerbose & VERBOSE_DMA0) != 0;
+  m_dma1 =             (systemVerbose & VERBOSE_DMA1) != 0;
+  m_dma2 =             (systemVerbose & VERBOSE_DMA2) != 0;
+  m_dma3 =             (systemVerbose & VERBOSE_DMA3) != 0;
+  m_undefined =        (systemVerbose & VERBOSE_UNDEFINED) != 0;
+  m_agbprint =         (systemVerbose & VERBOSE_AGBPRINT) != 0;
+  m_sound_output =     (systemVerbose & VERBOSE_SOUNDOUTPUT) != 0;
   UpdateData(FALSE);
 
   m_log.LimitText(-1);
