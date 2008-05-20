@@ -1,4 +1,4 @@
-#ifdef ___PROTECT_H_
+#ifndef ___PROTECT_H_
 #define ___PROTECT_H_
 
 #if defined(__cplusplus)

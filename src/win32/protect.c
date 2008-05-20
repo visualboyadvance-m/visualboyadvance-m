@@ -83,9 +83,16 @@ int ExecutableValid(const char *executable_filename)
         crc3 = crc32(crc3, (const Bytef *)p+sizeof(data), file_size-(length_till_data+sizeof(data)));
         crc4 = crc32(crc4, (const Bytef *)(data+1), sizeof(data)-sizeof(uint32_t));
 
+        crc1 = crc32_combine(crc1, crc3, file_size-(length_till_data+sizeof(data)));
+        crc2 = crc32_combine(crc2, crc3, file_size-(length_till_data+sizeof(data)));
+
+        crc3 = adler32(0L, Z_NULL, 0);
+        crc3 = adler32(crc3, (const Bytef *)buffer, length_till_data);
+        crc3 = adler32(crc3, (const Bytef *)p+sizeof(data), file_size-(length_till_data+sizeof(data)));
+
         if ((data[sizeof(data)/sizeof(uint32_t)-4] == crc1) &&
             (data[sizeof(data)/sizeof(uint32_t)-3] == crc3) &&
-            (data[sizeof(data)/sizeof(uint32_t)-2] == crc32_combine(crc2, crc3, file_size-(length_till_data+sizeof(data)))) &&
+            (data[sizeof(data)/sizeof(uint32_t)-2] == crc2) &&
             (data[sizeof(data)/sizeof(uint32_t)-1] == crc4) &&
             (file_size == data[2]) &&
             (data[3] == ((uint32_t *)(buffer+file_size))[-2]) &&
