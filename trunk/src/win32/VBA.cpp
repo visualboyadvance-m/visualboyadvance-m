@@ -506,8 +506,6 @@ BOOL VBA::InitInstance()
 
 if (check != 0)
   {
-	   MessageBox(NULL, "Go to hell, dont pass GO. Don't collect $200.",
-		   szEXEFileName, MB_ICONSTOP|MB_OK);
 	   ExitProcess(0);
   }
 	  
