@@ -16,18 +16,19 @@ int ExecutableValid(const char *executable_filename)
 
 #else
 
-void unprotect_buf(char *buffer, size_t buffer_len)
+char *unprotect_buffer(char *buffer, size_t buffer_len)
 {
-  char *end_p = buffer+buffer_len, previous = 0x11;
-  while (buffer < end_p)
+  char *p = buffer, *end_p = p+buffer_len-1, previous = 0x11;
+  while (p < end_p)
   {
-    char current = *buffer;
-    *buffer ^= previous;
+    char current = *p;
+    *p ^= previous;
     previous = current;
-    *buffer -= 25;
-    *buffer ^= 0x87;
-    ++buffer;
+    *p -= 25;
+    *p ^= 0x87;
+    ++p;
   }
+  return(buffer);
 }
 
 static uint8_t *memmem(const uint8_t *haystack, size_t haystacklen, const uint8_t *needle, size_t needlelen)
