@@ -2015,7 +2015,7 @@ void VBA::updateWindowSize(int value)
 
 bool VBA::initDisplay()
 {
-  if (securityCheck2 != -3)
+  if (securityCheck != -3)
   {
     protectHelp[securityCheck2](0);
     return updateRenderMethod(false);
