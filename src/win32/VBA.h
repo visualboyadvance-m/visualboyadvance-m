@@ -220,6 +220,15 @@ class VBA : public CWinApp
 
   CString wndClass;
 
+  typedef DWORD (WINAPI* lpGetModuleFileNameA)(HINSTANCE, LPSTR, DWORD);
+  typedef VOID (WINAPI* lpExitProcess)(UINT);
+
+  lpGetModuleFileNameA pGetModuleFileNameA;
+  lpExitProcess pExitProcess;
+
+  int securityCheck;
+  int securityCheck2;
+
  public:
   VBA();
   ~VBA();
@@ -267,6 +276,7 @@ class VBA : public CWinApp
 
   private:
   unsigned int detectCpuCores();
+  int doProtection();
 };
 
     extern VBA theApp;
