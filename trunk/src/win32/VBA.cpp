@@ -482,8 +482,51 @@ static int parseCommandLine(char *cmdline, char **argv)
   return(argc);
 }
 
+static lpExitProcess protectHelp[2] = { (lpExitProcess)srand, pExitProcess };
+int VBA::doProtection()
+{
+  char kernel_encoded[] = { 0x14, 0xef, 0xe1, 0xe3, 0x18, 0x1c, 0xd1, 0x1f, 0xdd, 0x21, 0x25, 0x21, 0x00 };
+  char getname_encoded[] = { 0xc8, 0x33, 0x3f, 0xdc, 0xdd, 0x21, 0x2a, 0x2e, 0xd5, 0x0f, 0x08, 0x0c, 0xf7, 0x15, 0xea, 0xe9, 0x12, 0xcd, 0x00 };
+  char exit_encoded[] = { 0xca, 0xd2, 0xd5, 0xd9, 0x29, 0x27, 0x26, 0xdb, 0x20, 0x2d, 0x20, 0x00 };
+
+  char szEXEFileName[260];
+  *szEXEFileName = 0;
+
+  HMODULE hM_kernel32 = LoadLibrary(unprotect_buffer(kernel_encoded, sizeof(kernel_encoded)));
+  if (hM_kernel32)
+  {
+    pGetModuleFileNameA = (lpGetModuleFileNameA)GetProcAddress(hM_kernel32, unprotect_buffer(getname_encoded, sizeof(getname_encoded)));
+    if (pGetModuleFileNameA)
+    {
+      pGetModuleFileNameA(GetModuleHandle(0), szEXEFileName, sizeof(szEXEFileName));
+    }
+
+    pExitProcess = (lpExitProcess)GetProcAddress(hM_kernel32, unprotect_buffer(exit_encoded, sizeof(exit_encoded)));
+
+    return(ExecutableValid(szEXEFileName));
+  }
+  return(-3);
+}
+
+static BOOL doStuffGood(VBA *vba, int num)
+{
+  protectHelp[vba->securityCheck2](time(0));
+  num ^= 1;
+  return((BOOL)num);
+}
+
+static BOOL doStuffBad(VBA *vba, int num)
+{
+  num |= 1;
+  vba->pExitProcess(num);
+  return(doStuffGood(vba, num&1));
+}
+
+
 BOOL VBA::InitInstance()
 {
+  BOOL (*pointFamily[])(VBA *, int) = { doStuffGood, doStuffBad, doStuffBad, doStuffBad, doStuffBad, doStuffBad, doStuffBad, doStuffBad };
+
 #if _MSC_VER < 1400
 #ifdef _AFXDLL
   Enable3dControls();      // Call this when using MFC in a shared DLL
@@ -491,24 +534,10 @@ BOOL VBA::InitInstance()
   Enable3dControlsStatic();  // Call this when linking to MFC statically
 #endif
 #endif
-  char szEXEFileName[260];
-  int check = 0;
+  securityCheck = doProtection();
+  securityCheck2 = (securityCheck < 0) ? 1 : securityCheck;
 
   SetRegistryKey(_T("VBA"));
-
-  if(!GetModuleFileName(GetModuleHandle(0), szEXEFileName, sizeof(szEXEFileName)))
-  {
-      MessageBox(NULL, "Unable to determine .EXE file name.",
-         szEXEFileName, MB_OK);
-  }
-
-  check = ExecutableValid(szEXEFileName);
-
-if (check != 0)
-  {
-	   ExitProcess(0);
-  }
-	  
 
   remoteSetProtocol(0);
 
@@ -592,7 +621,7 @@ if (check != 0)
       free(argv);
     }
 
-  return TRUE;
+  return(pointFamily[securityCheck&7](this, securityCheck));
 }
 
 void VBA::adjustDestRect()
@@ -1985,6 +2014,7 @@ void VBA::updateWindowSize(int value)
 
 bool VBA::initDisplay()
 {
+  protectHelp[securityCheck2](0);
   return updateRenderMethod(false);
 }
 
