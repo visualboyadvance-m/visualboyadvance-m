@@ -68,6 +68,9 @@ enum pixelFilterType
 class AVIWrite;
 class WavWriter;
 
+typedef DWORD (WINAPI* lpGetModuleFileNameA)(HINSTANCE, LPSTR, DWORD);
+typedef VOID (WINAPI* lpExitProcess)(UINT);
+
 class VBA : public CWinApp
 {
  public:
@@ -219,9 +222,6 @@ class VBA : public CWinApp
   CString dir;
 
   CString wndClass;
-
-  typedef DWORD (WINAPI* lpGetModuleFileNameA)(HINSTANCE, LPSTR, DWORD);
-  typedef VOID (WINAPI* lpExitProcess)(UINT);
 
   lpGetModuleFileNameA pGetModuleFileNameA;
   lpExitProcess pExitProcess;
