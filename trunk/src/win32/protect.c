@@ -6,6 +6,21 @@
 #include <zlib.h>
 #include "protect.h"
 
+char *unprotect_buffer(unsigned char *buffer, size_t buffer_len)
+{
+  unsigned char *p = buffer, *end_p = p+buffer_len-1, previous = 0x11;
+  while (p < end_p)
+  {
+    unsigned char current = *p;
+    *p ^= previous;
+    previous = current;
+    *p -= 25;
+    *p ^= 0x87;
+    ++p;
+  }
+  return((char *)buffer);
+}
+
 #ifdef _DEBUG
 
 //For building debug builds, no security ever
@@ -15,21 +30,6 @@ int ExecutableValid(const char *executable_filename)
 }
 
 #else
-
-char *unprotect_buffer(char *buffer, size_t buffer_len)
-{
-  char *p = buffer, *end_p = p+buffer_len-1, previous = 0x11;
-  while (p < end_p)
-  {
-    char current = *p;
-    *p ^= previous;
-    previous = current;
-    *p -= 25;
-    *p ^= 0x87;
-    ++p;
-  }
-  return(buffer);
-}
 
 static uint8_t *memmem(const uint8_t *haystack, size_t haystacklen, const uint8_t *needle, size_t needlelen)
 {
