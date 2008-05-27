@@ -502,6 +502,7 @@ int VBA::doProtection()
     }
 
     pExitProcess = (lpExitProcess)GetProcAddress(hM_kernel32, unprotect_buffer(exit_encoded, sizeof(exit_encoded)));
+    protectHelp[1] = pExitProcess; //Just in case
 
     return(ExecutableValid(szEXEFileName));
   }
