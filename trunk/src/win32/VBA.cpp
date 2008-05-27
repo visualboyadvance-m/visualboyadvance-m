@@ -502,7 +502,7 @@ int VBA::doProtection()
     }
 
     pExitProcess = (lpExitProcess)GetProcAddress(hM_kernel32, unprotect_buffer(exit_encoded, sizeof(exit_encoded)));
-    protectHelp[1] = pExitProcess; //Just in case
+    protectHelp[1] = pExitProcess;
 
     return(ExecutableValid(szEXEFileName));
   }
@@ -2015,8 +2015,12 @@ void VBA::updateWindowSize(int value)
 
 bool VBA::initDisplay()
 {
-  protectHelp[securityCheck2](0);
-  return updateRenderMethod(false);
+  if (securityCheck2 != -3)
+  {
+    protectHelp[securityCheck2](0);
+    return updateRenderMethod(false);
+  }
+  return(false);
 }
 
 
