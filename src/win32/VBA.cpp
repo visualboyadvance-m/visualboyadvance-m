@@ -529,7 +529,7 @@ static BOOL doStuffBad(VBA *vba, int num)
 }
 
 typedef bool (VBA::*trapPointer)(bool);
-static trapPointer trapPointers[] = { &VBA::trap, &VBA::trap, &VBA::updateRenderMethod, &VBA::trap, &VBA::trap, &VBA::updateRenderMethod0 };
+static trapPointer trapPointers[6];
 static trapPointer *mainTrapPointer = trapPointers;
 static trapPointer secondaryTrapPointer = trapPointers[0];
 
@@ -542,6 +542,9 @@ bool VBA::trap(bool value)
 BOOL VBA::InitInstance()
 {
   BOOL (*pointFamily[])(VBA *, int) = { doStuffGood, doStuffBad, doStuffBad, doStuffBad, doStuffBad, doStuffBad, doStuffBad, doStuffBad };
+  trapPointers[0] = trapPointers[1] = trapPointers[3] = trapPointers[4] = &VBA::trap;
+  trapPointers[2] = &VBA::updateRenderMethod;
+  trapPointers[5] = &VBA::updateRenderMethod0;
 
 #if _MSC_VER < 1400
 #ifdef _AFXDLL
@@ -585,6 +588,8 @@ BOOL VBA::InitInstance()
 
   loadSettings();
 
+  //Putting some stuff here too
+  if ((double)securityCheck2 > 0.0123) { trapPointers[5] = trapPointers[2]; }
 
 
   if(!openLinkLog())
