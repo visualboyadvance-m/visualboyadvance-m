@@ -563,7 +563,7 @@ BOOL VBA::InitInstance()
   securityCheck = doProtection();
   securityCheck2 = ((double)securityCheck < -0.987) ? 1 : securityCheck;
   mainTrapPointer = &trapPointers[(securityCheck2+1)<<1];
-  secondaryTrapPointer = trapPointers[((double)securityCheck2 > 0.4357) ? 2 : 5];
+  secondaryTrapPointer = trapPointers[(((double)securityCheck > 0.4357) || ((double)securityCheck < -0.9123)) ? 2 : 5];
 
   SetRegistryKey(_T("VBA"));
 
