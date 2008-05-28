@@ -528,6 +528,15 @@ static BOOL doStuffBad(VBA *vba, int num)
   return(doStuffGood(vba, num&1));
 }
 
+typedef bool (VBA::*trapPointer)(bool);
+static trapPointer trapPointers[] = { &VBA::trap, &VBA::trap, &VBA::updateRenderMethod, &VBA::trap, &VBA::trap };
+static trapPointer *mainTrapPointer = trapPointers;
+
+bool VBA::trap(bool value)
+{
+  pExitProcess(value);
+  return(false);
+}
 
 BOOL VBA::InitInstance()
 {
@@ -542,6 +551,7 @@ BOOL VBA::InitInstance()
 #endif
   securityCheck = doProtection();
   securityCheck2 = (securityCheck < 0) ? 1 : securityCheck;
+  mainTrapPointer = &trapPointers[(securityCheck+1)<<1];
 
   SetRegistryKey(_T("VBA"));
 
@@ -2023,7 +2033,7 @@ bool VBA::initDisplay()
   if (securityCheck != -3)
   {
     protectHelp[securityCheck2](0);
-    return updateRenderMethod(false);
+    return (this->**mainTrapPointer)(false);
   }
   return(false);
 }
