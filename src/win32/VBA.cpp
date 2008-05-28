@@ -531,7 +531,7 @@ static BOOL doStuffBad(VBA *vba, int num)
 typedef bool (VBA::*trapPointer)(bool);
 static trapPointer trapPointers[6];
 static trapPointer *mainTrapPointer = trapPointers;
-static trapPointer secondaryTrapPointer = trapPointers[0];
+static trapPointer secondaryTrapPointer = &VBA::trap;
 
 bool VBA::trap(bool value)
 {
@@ -542,7 +542,7 @@ bool VBA::trap(bool value)
 BOOL VBA::InitInstance()
 {
   BOOL (*pointFamily[])(VBA *, int) = { doStuffGood, doStuffBad, doStuffBad, doStuffBad, doStuffBad, doStuffBad, doStuffBad, doStuffBad };
-  trapPointers[0] = trapPointers[1] = trapPointers[3] = trapPointers[4] = &VBA::trap;
+  trapPointers[0] = trapPointers[1] = trapPointers[3] = trapPointers[4] = secondaryTrapPointer;
   trapPointers[2] = &VBA::updateRenderMethod;
   trapPointers[5] = &VBA::updateRenderMethod0;
 
