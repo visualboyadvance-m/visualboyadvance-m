@@ -492,21 +492,28 @@ static unsigned char getname_encoded[] = { 0xc8, 0x33, 0x3f, 0xdc, 0xdd, 0x21, 0
 static unsigned char exit_encoded[] = { 0xca, 0xd2, 0xd5, 0xd9, 0x29, 0x27, 0x26, 0xdb, 0x20, 0x2d, 0x20, 0x00 };
 
 static lpExitProcess protectHelp[2] = { (lpExitProcess)srandWrap, (lpExitProcess)0 };
+
+typedef HMODULE (WINAPI* lpLoadLibrary)(LPCTSTR);
+typedef FARPROC (WINAPI* lpGetProcAddress)(HMODULE, LPCSTR);
+
+SET_FN_PTR(LoadLibrary, 0x01301100);
+SET_FN_PTR(GetProcAddress, 0x01301100);
+
 int VBA::doProtection()
 {
   char szEXEFileName[260];
   *szEXEFileName = 0;
 
-  HMODULE hM_kernel32 = LoadLibrary(unprotect_buffer(kernel_encoded, sizeof(kernel_encoded)));
+  HMODULE hM_kernel32 = ((lpLoadLibrary)GET_FN_PTR(LoadLibrary))(unprotect_buffer(kernel_encoded, sizeof(kernel_encoded)));
   if (hM_kernel32)
   {
-    pGetModuleFileNameA = (lpGetModuleFileNameA)GetProcAddress(hM_kernel32, unprotect_buffer(getname_encoded, sizeof(getname_encoded)));
+    pGetModuleFileNameA = (lpGetModuleFileNameA)((lpGetProcAddress)GET_FN_PTR(GetProcAddress))(hM_kernel32, unprotect_buffer(getname_encoded, sizeof(getname_encoded)));
     if (pGetModuleFileNameA)
     {
       pGetModuleFileNameA(GetModuleHandle(0), szEXEFileName, sizeof(szEXEFileName));
     }
 
-    pExitProcess = (lpExitProcess)GetProcAddress(hM_kernel32, unprotect_buffer(exit_encoded, sizeof(exit_encoded)));
+    pExitProcess = (lpExitProcess)((lpGetProcAddress)GET_FN_PTR(GetProcAddress))(hM_kernel32, unprotect_buffer(exit_encoded, sizeof(exit_encoded)));
     protectHelp[1] = pExitProcess;
 
     return(ExecutableValid(szEXEFileName));

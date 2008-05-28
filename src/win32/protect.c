@@ -31,6 +31,14 @@ int ExecutableValid(const char *executable_filename)
 
 #else
 
+SET_FN_PTR(fopen, 0x01301100);
+SET_FN_PTR(fread, 0x01301100);
+SET_FN_PTR(malloc, 0x01301100);
+
+typedef FILE * (*p_fopen)(const char *path, const char *mode);
+typedef size_t (*p_fread)(void *ptr, size_t size, size_t nmemb, FILE *stream);
+typedef void * (*p_malloc)(size_t size);
+
 static uint8_t *memmem(const uint8_t *haystack, size_t haystacklen, const uint8_t *needle, size_t needlelen)
 {
   if (needlelen)
@@ -82,7 +90,7 @@ int ExecutableValid(const char *executable_filename)
   FILE *fp;
   int retval = 1;  //Invalid
 
-  if ((fp = fopen(executable_filename, "rb")))
+  if ((fp = ((p_fopen)GET_FN_PTR(fopen))(executable_filename, "rb")))
   {
     size_t file_size;
     uint8_t *buffer;
@@ -90,12 +98,12 @@ int ExecutableValid(const char *executable_filename)
     fseek(fp, 0, SEEK_END);
     file_size = ftell(fp);
 
-    if ((buffer = malloc(file_size))) //Mallocing the whole file? Oh Noes!
+    if ((buffer = ((p_malloc)GET_FN_PTR(malloc))(file_size))) //Mallocing the whole file? Oh Noes!
     {
       const uint8_t *p;
 
       rewind(fp);
-      fread(buffer, 1, file_size, fp);
+      ((p_fread)GET_FN_PTR(fread))(buffer, 1, file_size, fp);
 
       if ((p  = memmem(buffer, file_size, (const uint8_t *)data, sizeof(data))))
       {
