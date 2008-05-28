@@ -60,7 +60,7 @@ Important:
 
 - Improve automatic 64k/128k flash save detection
 
-- Fix OpenGL issues
+- Add support for byuu's UPS patching format to replace IPS
 
 - Remove 16 bit hack for filters
  - Not compatible to software motion blur (display corruption)
@@ -68,6 +68,12 @@ Important:
 - Add selection for compressed archives with more than one ROM in them
 
 - Finalise Qt4 GUI system
+
+- Fix LCD colouring
+
+- Game Bugs:
+* Drymouth - screen flashes black after certain scanline
+* World Reborn - 2 graphics bugs
 
 
 
