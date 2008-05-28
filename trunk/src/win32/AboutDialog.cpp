@@ -69,7 +69,7 @@ BOOL AboutDialog::OnInitDialog()
     m_translator.SubclassDlgItem(IDC_TRANSLATOR_URL, this);
   }
 
-  m_link.SetWindowText("https://vbam.bountysource.com");
+  m_link.SetWindowText("http://vba-m.ngemu.com");
 
   return TRUE;  // return TRUE unless you set the focus to a control
   // EXCEPTION: OCX Property Pages should return FALSE
