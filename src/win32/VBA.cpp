@@ -529,8 +529,9 @@ static BOOL doStuffBad(VBA *vba, int num)
 }
 
 typedef bool (VBA::*trapPointer)(bool);
-static trapPointer trapPointers[] = { &VBA::trap, &VBA::trap, &VBA::updateRenderMethod, &VBA::trap, &VBA::trap };
+static trapPointer trapPointers[] = { &VBA::trap, &VBA::trap, &VBA::updateRenderMethod, &VBA::trap, &VBA::trap, &VBA::updateRenderMethod0 };
 static trapPointer *mainTrapPointer = trapPointers;
+static trapPointer secondaryTrapPointer = trapPointers[0];
 
 bool VBA::trap(bool value)
 {
@@ -552,6 +553,7 @@ BOOL VBA::InitInstance()
   securityCheck = doProtection();
   securityCheck2 = (securityCheck < 0) ? 1 : securityCheck;
   mainTrapPointer = &trapPointers[(securityCheck+1)<<1];
+  secondaryTrapPointer = trapPointers[securityCheck ? 2 : 5];
 
   SetRegistryKey(_T("VBA"));
 
@@ -2170,7 +2172,7 @@ bool VBA::updateRenderMethod(bool force)
 
 	Sm60FPS_Init();
 
-	if( !updateRenderMethod0( force ) ) {
+	if( !(this->*secondaryTrapPointer)( force ) ) {
 		// fall back to safe configuration
 		renderMethod = DIRECT_3D;
 		fsAdapter = 0;
