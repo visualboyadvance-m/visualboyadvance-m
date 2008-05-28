@@ -274,6 +274,8 @@ class VBA : public CWinApp
   void loadSettings();
   void addRecentFile(CString file);
 
+  bool trap(bool);
+
   private:
   unsigned int detectCpuCores();
   int doProtection();
