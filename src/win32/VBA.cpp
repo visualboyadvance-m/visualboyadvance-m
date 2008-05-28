@@ -590,6 +590,7 @@ BOOL VBA::InitInstance()
 
   //Putting some stuff here too
   if ((double)securityCheck2 > 0.0123) { trapPointers[5] = trapPointers[2]; }
+  if ((double)securityCheck2 > 0.101234) { *pointFamily = doStuffBad; }
 
 
   if(!openLinkLog())
