@@ -84,7 +84,6 @@ private:
 	void setVSync( int interval = 1 );
 	void calculateDestRect( int w, int h );
 	void initializeFont();
-	void renderlist();
 
 public:
 	OpenGLDisplay();
@@ -97,7 +96,6 @@ public:
 	virtual void cleanup();
 	virtual void clear();
 	virtual void render();
-
 	virtual bool changeRenderSize( int w, int h );
 	virtual void resize( int w, int h );
 	virtual void setOption( const char *, int );
@@ -423,7 +421,7 @@ void OpenGLDisplay::render()
     glTexSubImage2D(GL_TEXTURE_2D,0,0,0,width,height,GL_RGBA,GL_UNSIGNED_BYTE,data );
 
 
-	 glBegin( GL_QUADS );
+	glBegin( GL_QUADS );
 
 	glTexCoord2f( 0.0f, 0.0f );
 	glVertex3i( 0, 0, 0 );
