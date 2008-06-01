@@ -43,8 +43,6 @@ ScreenAreaXv::ScreenAreaXv(int _iWidth, int _iHeight, int _iScale) :
 {
   XvAdaptorInfo *pAdaptors;
   unsigned int iNumAdaptors;
-  XvImageFormatValues *pFormats;
-  int iNumFormats;
   GdkWindow *pRoot;
 
   memset(&m_oShm, 0, sizeof(m_oShm));
@@ -82,22 +80,29 @@ ScreenAreaXv::ScreenAreaXv(int _iWidth, int _iHeight, int _iScale) :
     throw std::exception();
   }
 
-  /* Try to find an RGB format */
-  pFormats = XvListImageFormats(m_pDisplay, m_iXvPortId, &iNumFormats);
-  
   m_iFormat = FOURCC_YUY2;
+
+  /* FIXME: RGB mode is disabled for now. Someone with a graphic card that allows
+            RGB overlays should try to fix it.
+
+  XvImageFormatValues *pFormats;
+  int iNumFormats;
+
+  // Try to find an RGB format
+  pFormats = XvListImageFormats(m_pDisplay, m_iXvPortId, &iNumFormats);
   
   for (int i = 0; i < iNumFormats; i++)
   {
     if (pFormats[i].id == 0x3 || pFormats[i].type == XvRGB)
     {
-      /* Try to find a 32-bit mode */
+      // Try to find a 32-bit mode
       if (pFormats[i].bits_per_pixel == 32)
       {
         m_iFormat = pFormats[i].id;
       }
     }
   }
+  */
 
   Atom oAtom = XInternAtom(m_pDisplay, "XV_AUTOPAINT_COLORKEY", True);
   if (oAtom != None) 

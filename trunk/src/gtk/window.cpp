@@ -98,6 +98,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_iScreenHeight    = m_iGBAScreenHeight;
   m_eCartridge       = CartridgeNone;
   m_uiJoypadState    = 0;
+  m_uiAutofireState  = 0;
   m_poKeymap         = NULL;
 
   vInitSystem();
