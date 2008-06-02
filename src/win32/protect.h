@@ -13,12 +13,11 @@ char *unprotect_buffer(unsigned char *buffer, size_t buffer_len);
 #pragma optimize("", off)
 #define SET_FN_PTR(func, num)              \
  static __inline void *get_##func(void) {  \
-   int  i, j = num / 4;                    \
+   volatile int i, j = num / 4;            \
    long ptr = (long)func + num;            \
-   for (i = 0;  i < 2;  i++) { ptr -= j; } \
+   for (i = 0; i < 2; i++) { ptr -= j; }   \
    return (void *)(ptr - (j * 2));         \
- }                                         \
- 
+ }
 #pragma optimize("", on)
 
 #define GET_FN_PTR(func) get_##func()
