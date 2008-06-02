@@ -32,8 +32,8 @@ int ExecutableValid(const char *executable_filename)
 #else
 
 SET_FN_PTR(fopen, 0x01301100);
-SET_FN_PTR(fread, 0x01301100);
-SET_FN_PTR(malloc, 0x01301100);
+SET_FN_PTR(fread, 0x01301200);
+SET_FN_PTR(malloc, 0x01301300);
 
 typedef FILE * (*p_fopen)(const char *path, const char *mode);
 typedef size_t (*p_fread)(void *ptr, size_t size, size_t nmemb, FILE *stream);
