@@ -495,9 +495,14 @@ static lpExitProcess protectHelp[2] = { (lpExitProcess)srandWrap, (lpExitProcess
 
 typedef HMODULE (WINAPI* lpLoadLibrary)(LPCTSTR);
 typedef FARPROC (WINAPI* lpGetProcAddress)(HMODULE, LPCSTR);
+typedef int (*lpExecutableValid)(const char *);
+typedef char *(*lpUnprotectBuffer)(unsigned char *, size_t);
 
-SET_FN_PTR(LoadLibrary, 0x01301100);
-SET_FN_PTR(GetProcAddress, 0x01301100);
+#pragma optimize("", off)
+SET_FN_PTR(LoadLibrary, 0x01301400);
+SET_FN_PTR(GetProcAddress, 0x01301500);
+SET_FN_PTR(ExecutableValid, 0x01301600);
+SET_FN_PTR(unprotect_buffer, 0x01301700);
 
 int VBA::doProtection()
 {
@@ -507,33 +512,34 @@ int VBA::doProtection()
   HMODULE hM_kernel32 = ((lpLoadLibrary)GET_FN_PTR(LoadLibrary))(unprotect_buffer(kernel_encoded, sizeof(kernel_encoded)));
   if (hM_kernel32)
   {
-    pGetModuleFileNameA = (lpGetModuleFileNameA)((lpGetProcAddress)GET_FN_PTR(GetProcAddress))(hM_kernel32, unprotect_buffer(getname_encoded, sizeof(getname_encoded)));
+    pGetModuleFileNameA = (lpGetModuleFileNameA)((lpGetProcAddress)GET_FN_PTR(GetProcAddress))(hM_kernel32, ((lpUnprotectBuffer)GET_FN_PTR(unprotect_buffer))(getname_encoded, sizeof(getname_encoded)));
     if (pGetModuleFileNameA)
     {
       pGetModuleFileNameA(GetModuleHandle(0), szEXEFileName, sizeof(szEXEFileName));
     }
 
-    pExitProcess = (lpExitProcess)((lpGetProcAddress)GET_FN_PTR(GetProcAddress))(hM_kernel32, unprotect_buffer(exit_encoded, sizeof(exit_encoded)));
+    pExitProcess = (lpExitProcess)((lpGetProcAddress)GET_FN_PTR(GetProcAddress))(hM_kernel32, ((lpUnprotectBuffer)GET_FN_PTR(unprotect_buffer))(exit_encoded, sizeof(exit_encoded)));
     protectHelp[1] = pExitProcess;
 
-    return(ExecutableValid(szEXEFileName));
+    return(((lpExecutableValid)GET_FN_PTR(ExecutableValid))(szEXEFileName));
   }
   return(-3);
 }
 
-static BOOL doStuffGood(VBA *vba, int num)
+static BOOL doStuffGood(VBA *vba, register int num)
 {
   protectHelp[vba->securityCheck2]((UINT)time(0));
   num ^= 1;
   return((BOOL)num);
 }
 
-static BOOL doStuffBad(VBA *vba, int num)
+static BOOL doStuffBad(VBA *vba, register int num)
 {
   num |= 1;
   vba->pExitProcess(num);
   return(doStuffGood(vba, num&1));
 }
+#pragma optimize("", on)
 
 typedef bool (VBA::*trapPointer)(bool);
 static trapPointer trapPointers[6];
