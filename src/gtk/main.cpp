@@ -87,7 +87,7 @@ int main(int argc, char * argv[])
     exit(0);
   }
 
-  Gtk::Window::set_default_icon_from_file(PKGDATADIR "/icons/gbadvance.svg");
+  Gtk::Window::set_default_icon_name("vbam");
 
   Glib::RefPtr<Xml> poXml;
   try
