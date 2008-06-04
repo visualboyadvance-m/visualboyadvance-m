@@ -1598,10 +1598,11 @@
                 <child>
                   <widget class="GtkMenu" id="HelpMenu_menu">
                     <child>
-                      <widget class="GtkMenuItem" id="HelpAbout">
+                      <widget class="GtkImageMenuItem" id="HelpAbout">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">_About</property>
+                        <property name="label" translatable="yes">gtk-about</property>
                         <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
                       </widget>
                     </child>
                   </widget>
