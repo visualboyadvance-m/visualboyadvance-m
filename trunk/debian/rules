@@ -25,7 +25,7 @@ build: build-stamp
 build-stamp: 
 	dh_testdir
 
-	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DDATA_INSTALL_DIR:PATH=share/VisualBoyAdvanceM .
+	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr .
 	$(MAKE)
 	#docbook-to-man debian/vbam.sgml > vbam.1
 
@@ -50,8 +50,6 @@ install: build
 
 	# Add here commands to install the package into debian/vbam.
 	$(MAKE) DESTDIR=$(CURDIR)/debian/vbam install
-	install -c -m 644 -D debian/gvbam.desktop debian/vbam/usr/share/applications/gvbam.desktop
-	install -c -m 644 -D src/gtk/icons/gbadvance.svg debian/vbam/usr/share/pixmaps/vbam-icon.svg
 
 # Build architecture-independent files here.
 binary-indep: build install

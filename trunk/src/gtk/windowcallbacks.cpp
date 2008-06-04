@@ -1251,6 +1251,7 @@ void Window::vOnHelpAbout()
   oAboutDialog.set_version(VERSION);
   oAboutDialog.set_comments(_("Nintendo GameBoy Advance emulator."));
   oAboutDialog.set_license("GPL");
+  oAboutDialog.set_logo_icon_name("vbam");
 
   oAboutDialog.set_website("http://vba-m.ngemu.com/");
 
