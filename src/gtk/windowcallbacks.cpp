@@ -618,80 +618,40 @@ void Window::vOnDirectories()
   struct
   {
     const char * m_csKey;
-    const char * m_csEntry;
-    const char * m_csResetButton;
-    const char * m_csSelectButton;
+    const char * m_csFileChooserButton;
   }
   astRow[] =
   {
-    { "gba_roms",  "GBARomsDirEntry",   "GBARomsDirResetButton",   "GBARomsDirSelectButton"   },
-    { "gb_roms",   "GBRomsDirEntry",    "GBRomsDirResetButton",    "GBRomsDirSelectButton"    },
-    { "batteries", "BatteriesDirEntry", "BatteriesDirResetButton", "BatteriesDirSelectButton" },
-    { "saves",     "SavesDirEntry",     "SavesDirResetButton",     "SavesDirSelectButton"     },
-    { "captures",  "CapturesDirEntry",  "CapturesDirResetButton",  "CapturesDirSelectButton"  }
+    { "gba_roms",  "GBARomsDirEntry"   },
+    { "gb_roms",   "GBRomsDirEntry"    },
+    { "batteries", "BatteriesDirEntry" },
+    { "saves",     "SavesDirEntry"     },
+    { "captures",  "CapturesDirEntry"  }
   };
 
   for (guint i = 0; i < G_N_ELEMENTS(astRow); i++)
   {
-    Gtk::Entry *  poEntry  = dynamic_cast<Gtk::Entry *>(poXml->get_widget(astRow[i].m_csEntry));
-    Gtk::Button * poReset  = dynamic_cast<Gtk::Button *>(poXml->get_widget(astRow[i].m_csResetButton));
-    Gtk::Button * poSelect = dynamic_cast<Gtk::Button *>(poXml->get_widget(astRow[i].m_csSelectButton));
+    Gtk::FileChooserButton * poFileChooserButton = dynamic_cast<Gtk::FileChooserButton *>(poXml->get_widget(astRow[i].m_csFileChooserButton));
 
-    poEntry->set_text(m_poDirConfig->sGetKey(astRow[i].m_csKey));
-
-    poReset->signal_clicked().connect(sigc::bind(
-                                        sigc::mem_fun(*this, &Window::vOnDirectoryReset),
-                                        poEntry));
-    poSelect->signal_clicked().connect(sigc::bind(
-                                         sigc::mem_fun(*this, &Window::vOnDirectorySelect),
-                                         poEntry));
+    poFileChooserButton->set_current_folder(m_poDirConfig->sGetKey(astRow[i].m_csKey));
   }
 
   Gtk::Dialog * poDialog = dynamic_cast<Gtk::Dialog *>(poXml->get_widget("DirectoriesDialog"));
   poDialog->set_transient_for(*this);
+  poDialog->run();
 
-  if (poDialog->run() == Gtk::RESPONSE_OK)
+  for (guint i = 0; i < G_N_ELEMENTS(astRow); i++)
   {
-    for (guint i = 0; i < G_N_ELEMENTS(astRow); i++)
-    {
-      Gtk::Entry * poEntry = dynamic_cast<Gtk::Entry *>(poXml->get_widget(astRow[i].m_csEntry));
-      Glib::ustring sDir = poEntry->get_text();
-      if (! Glib::file_test(sDir, Glib::FILE_TEST_IS_DIR))
-      {
-        sDir = "";
-      }
-      m_poDirConfig->vSetKey(astRow[i].m_csKey, sDir);
-    }
+    Gtk::FileChooserButton * poFileChooserButton = dynamic_cast<Gtk::FileChooserButton *>(poXml->get_widget(astRow[i].m_csFileChooserButton));
+    Glib::ustring sDir = poFileChooserButton->get_current_folder();
 
-    // Needed if saves dir changed
-    vUpdateGameSlots();
+    m_poDirConfig->vSetKey(astRow[i].m_csKey, sDir);
   }
+
+  // Needed if saves dir changed
+  vUpdateGameSlots();
 
   delete poDialog;
-}
-
-void Window::vOnDirectoryReset(Gtk::Entry * _poEntry)
-{
-  _poEntry->set_text("");
-}
-
-void Window::vOnDirectorySelect(Gtk::Entry * _poEntry)
-{
-  Gtk::FileChooserDialog oDialog(*this, _("Select directory"),
-                                 Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
-  oDialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-  oDialog.add_button(Gtk::Stock::OK,     Gtk::RESPONSE_OK);
-
-  if (_poEntry->get_text() != "")
-  {
-    oDialog.add_shortcut_folder(_poEntry->get_text());
-    oDialog.set_current_folder(_poEntry->get_text());
-  }
-
-  if (oDialog.run() == Gtk::RESPONSE_OK)
-  {
-    _poEntry->set_text(oDialog.get_filename());
-  }
 }
 
 void Window::vOnPauseWhenInactiveToggled(Gtk::CheckMenuItem * _poCMI)
