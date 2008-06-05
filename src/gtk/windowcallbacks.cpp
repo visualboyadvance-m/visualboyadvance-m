@@ -1229,6 +1229,8 @@ void Window::vOnHelpAbout()
   
   std::list<Glib::ustring> list_artists;
   list_artists.push_back("Matteo Drera");
+  list_artists.push_back("Jakub Steiner");
+  list_artists.push_back("JonesLee");
   oAboutDialog.set_artists(list_artists);
   
   oAboutDialog.run();
