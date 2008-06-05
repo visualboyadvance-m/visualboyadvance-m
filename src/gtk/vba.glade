@@ -917,38 +917,6 @@
                                 <property name="use_underline">True</property>
                               </widget>
                             </child>
-                            <child>
-                              <widget class="GtkSeparatorMenuItem" id="separator30">
-                                <property name="visible">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkMenuItem" id="ScreenshotFormatMenu">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">Screenshot format</property>
-                                <property name="use_underline">True</property>
-                                <child>
-                                  <widget class="GtkMenu" id="ScreenshotFormatMenu_menu">
-                                    <child>
-                                      <widget class="GtkRadioMenuItem" id="ScreenshotFormatPNG">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">_PNG</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="active">True</property>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkRadioMenuItem" id="ScreenshotFormatBMP">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">_BMP</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="group">ScreenshotFormatPNG</property>
-                                      </widget>
-                                    </child>
-                                  </widget>
-                                </child>
-                              </widget>
-                            </child>
                           </widget>
                         </child>
                       </widget>
