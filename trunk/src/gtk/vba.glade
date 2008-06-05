@@ -292,29 +292,6 @@
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Rece_nt</property>
                         <property name="use_underline">True</property>
-                        <child>
-                          <widget class="GtkMenu" id="RecentMenu_menu">
-                            <child>
-                              <widget class="GtkMenuItem" id="RecentReset">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Reset</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkCheckMenuItem" id="RecentFreeze">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Freeze</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkSeparatorMenuItem" id="separator29">
-                                <property name="visible">True</property>
-                              </widget>
-                            </child>
-                          </widget>
-                        </child>
                       </widget>
                     </child>
                     <child>

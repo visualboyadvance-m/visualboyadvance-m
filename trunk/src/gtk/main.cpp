@@ -45,15 +45,17 @@ int main(int argc, char * argv[])
   bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
 #endif // ENABLE_NLS
 
+  Glib::set_application_name(_("VBA-M"));
+
   Gtk::Main oKit(argc, argv);
-  
+
 #ifdef USE_OPENGL
   Gtk::GL::init(argc, argv);
 #endif // USE_OPENGL
-  
+
   Glib::OptionContext oContext;
   Glib::OptionGroup oGroup("main_group", _("Main VBA-M options"));
-  
+
   Glib::OptionEntry oVersion;
   oVersion.set_long_name("version");
   oVersion.set_short_name('v');
