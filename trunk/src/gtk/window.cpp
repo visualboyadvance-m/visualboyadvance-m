@@ -107,10 +107,10 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 
   // Get config
   //
-  vInitConfig();
-
   m_sUserDataDir = Glib::get_home_dir() + "/.gvba";
   m_sConfigFile  = m_sUserDataDir + "/config";
+
+  vInitConfig();
 
   if (! Glib::file_test(m_sUserDataDir, Glib::FILE_TEST_EXISTS))
   {
@@ -180,7 +180,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
     char csName[20];
     snprintf(csName, 20, "LoadGameSlot%d", i + 1);
     m_apoLoadGameItem[i] = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget(csName));
-    snprintf(csName, 20, "LoadGameSlot%d", i + 1);
+    snprintf(csName, 20, "SaveGameSlot%d", i + 1);
     m_apoSaveGameItem[i] = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget(csName));
 
     m_apoLoadGameItem[i]->signal_activate().connect(sigc::bind(
@@ -968,11 +968,11 @@ void Window::vInitConfig()
   // Directories section
   //
   m_poDirConfig = m_oConfig.poAddSection("Directories");
-  m_poDirConfig->vSetKey("gb_roms",   "" );
-  m_poDirConfig->vSetKey("gba_roms",  "" );
-  m_poDirConfig->vSetKey("batteries", "" );
-  m_poDirConfig->vSetKey("saves",     "" );
-  m_poDirConfig->vSetKey("captures",  "" );
+  m_poDirConfig->vSetKey("gb_roms",   Glib::get_home_dir());
+  m_poDirConfig->vSetKey("gba_roms",  Glib::get_home_dir());
+  m_poDirConfig->vSetKey("batteries", m_sUserDataDir);
+  m_poDirConfig->vSetKey("saves",     m_sUserDataDir);
+  m_poDirConfig->vSetKey("captures",  m_sUserDataDir);
 
   // Core section
   //
@@ -1068,27 +1068,27 @@ void Window::vCheckConfig()
   sValue = m_poDirConfig->sGetKey("gb_roms");
   if (sValue != "" && ! Glib::file_test(sValue, Glib::FILE_TEST_IS_DIR))
   {
-    m_poDirConfig->vSetKey("gb_roms", "");
+    m_poDirConfig->vSetKey("gb_roms", Glib::get_home_dir());
   }
   sValue = m_poDirConfig->sGetKey("gba_roms");
   if (sValue != "" && ! Glib::file_test(sValue, Glib::FILE_TEST_IS_DIR))
   {
-    m_poDirConfig->vSetKey("gba_roms", "");
+    m_poDirConfig->vSetKey("gba_roms", Glib::get_home_dir());
   }
   sValue = m_poDirConfig->sGetKey("batteries");
   if (sValue != "" && ! Glib::file_test(sValue, Glib::FILE_TEST_IS_DIR))
   {
-    m_poDirConfig->vSetKey("batteries", "");
+    m_poDirConfig->vSetKey("batteries", m_sUserDataDir);
   }
   sValue = m_poDirConfig->sGetKey("saves");
   if (sValue != "" && ! Glib::file_test(sValue, Glib::FILE_TEST_IS_DIR))
   {
-    m_poDirConfig->vSetKey("saves", "");
+    m_poDirConfig->vSetKey("saves", m_sUserDataDir);
   }
   sValue = m_poDirConfig->sGetKey("captures");
   if (sValue != "" && ! Glib::file_test(sValue, Glib::FILE_TEST_IS_DIR))
   {
-    m_poDirConfig->vSetKey("captures", "");
+    m_poDirConfig->vSetKey("captures", m_sUserDataDir);
   }
 
   // Core section
@@ -1575,15 +1575,14 @@ void Window::vComputeFrameskip(int _iRate)
 void Window::vCaptureScreen(int _iNum)
 {
   std::string sBaseName;
-  std::string sCaptureDir = m_poDirConfig->sGetKey("captures");
-  if (sCaptureDir == "")
+  std::string sDir = m_poDirConfig->sGetKey("captures");
+  if (sDir == "")
   {
-    sBaseName = sCutSuffix(m_sRomFile);
+    sDir = m_sUserDataDir;
   }
-  else
-  {
-    sBaseName = sCaptureDir + "/" + sCutSuffix(Glib::path_get_basename(m_sRomFile));
-  }
+
+  sBaseName = sDir + "/" + sCutSuffix(Glib::path_get_basename(m_sRomFile));
+
 
   char * csFile = g_strdup_printf("%s_%02d.png",
                                   sBaseName.c_str(),
@@ -1625,16 +1624,23 @@ void Window::vCreateFileOpenDialog()
   poDialog->add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
   poDialog->add_button(Gtk::Stock::OPEN,   Gtk::RESPONSE_OK);
 
-  if (sGBDir != "")
+  try
   {
-    poDialog->add_shortcut_folder(sGBDir);
-    poDialog->set_current_folder(sGBDir);
-  }
+    if (sGBDir != "")
+    {
+      poDialog->add_shortcut_folder(sGBDir);
+      poDialog->set_current_folder(sGBDir);
+    }
 
-  if (sGBADir != "" && sGBADir != sGBDir)
+    if (sGBADir != "" && sGBADir != sGBDir)
+    {
+      poDialog->add_shortcut_folder(sGBADir);
+      poDialog->set_current_folder(sGBADir);
+    }
+  }
+  catch (const Gtk::FileChooserError& e)
   {
-    poDialog->add_shortcut_folder(sGBADir);
-    poDialog->set_current_folder(sGBADir);
+    // Most likely the shortcut already exists, so do nothing
   }
 
   const char * acsPattern[] =
@@ -1681,12 +1687,10 @@ void Window::vLoadBattery()
   std::string sDir = m_poDirConfig->sGetKey("batteries");
   if (sDir == "")
   {
-    sBattery = sCutSuffix(m_sRomFile) + ".sav";
+    sDir = m_sUserDataDir;
   }
-  else
-  {
-    sBattery = sDir + "/" + sCutSuffix(Glib::path_get_basename(m_sRomFile)) + ".sav";
-  }
+
+  sBattery = sDir + "/" + sCutSuffix(Glib::path_get_basename(m_sRomFile)) + ".sav";
 
   if (m_stEmulator.emuReadBattery(sBattery.c_str()))
   {
@@ -1700,12 +1704,10 @@ void Window::vSaveBattery()
   std::string sDir = m_poDirConfig->sGetKey("batteries");
   if (sDir == "")
   {
-    sBattery = sCutSuffix(m_sRomFile) + ".sav";
+    sDir = m_sUserDataDir;
   }
-  else
-  {
-    sBattery = sDir + "/" + sCutSuffix(Glib::path_get_basename(m_sRomFile)) + ".sav";
-  }
+
+  sBattery = sDir + "/" + sCutSuffix(Glib::path_get_basename(m_sRomFile)) + ".sav";
 
   if (m_stEmulator.emuWriteBattery(sBattery.c_str()))
   {
@@ -1792,12 +1794,10 @@ void Window::vUpdateGameSlots()
     std::string sDir = m_poDirConfig->sGetKey("saves");
     if (sDir == "")
     {
-      sFileBase = sCutSuffix(m_sRomFile);
+      sDir = m_sUserDataDir;
     }
-    else
-    {
-      sFileBase = sDir + "/" + sCutSuffix(Glib::path_get_basename(m_sRomFile));
-    }
+
+    sFileBase = sDir + "/" + sCutSuffix(Glib::path_get_basename(m_sRomFile));
 
     const char * csDateFormat = _("%Y/%m/%d %H:%M:%S");
 

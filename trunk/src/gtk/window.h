@@ -162,8 +162,6 @@ protected:
   virtual void vOnVideoScaleToggled(Gtk::CheckMenuItem * _poCMI, int _iScale);
   virtual void vOnLayerToggled(Gtk::CheckMenuItem * _poCMI, int _iLayer);
   virtual void vOnDirectories();
-  virtual void vOnDirectoryReset(Gtk::Entry * _poEntry);
-  virtual void vOnDirectorySelect(Gtk::Entry * _poEntry);
   virtual void vOnPauseWhenInactiveToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnSelectBios();
   virtual void vOnUseBiosToggled(Gtk::CheckMenuItem * _poCMI);
