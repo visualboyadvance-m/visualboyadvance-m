@@ -20,16 +20,9 @@
                     <child>
                       <widget class="GtkImageMenuItem" id="FileOpen">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">_Open...</property>
+                        <property name="label" translatable="yes">gtk-open</property>
                         <property name="use_underline">True</property>
-                        <accelerator key="O" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                        <child internal-child="image">
-                          <widget class="GtkImage" id="menu-item-image4">
-                            <property name="visible">True</property>
-                            <property name="stock">gtk-open</property>
-                            <property name="icon_size">1</property>
-                          </widget>
-                        </child>
+                	<property name="use_stock">True</property>
                       </widget>
                     </child>
                     <child>
@@ -48,8 +41,9 @@
                     <child>
                       <widget class="GtkMenuItem" id="FileSave">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">_Save...</property>
+                        <property name="label" translatable="yes">gtk-save-as</property>
                         <property name="use_underline">True</property>
+                	<property name="use_stock">True</property>
                         <accelerator key="S" modifiers="GDK_CONTROL_MASK" signal="activate"/>
                       </widget>
                     </child>
@@ -274,7 +268,8 @@
                     <child>
                       <widget class="GtkCheckMenuItem" id="FilePause">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">_Pause</property>
+                        <property name="label" translatable="yes">gtk-media-pause</property>
+                        <property name="use_stock">True</property>
                         <property name="use_underline">True</property>
                         <accelerator key="P" modifiers="GDK_CONTROL_MASK" signal="activate"/>
                       </widget>
@@ -383,30 +378,18 @@
                     <child>
                       <widget class="GtkImageMenuItem" id="FileClose">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">_Close</property>
+                        <property name="label" translatable="yes">gtk-close</property>
+                        <property name="use_stock">True</property>
                         <property name="use_underline">True</property>
-                        <child internal-child="image">
-                          <widget class="GtkImage" id="menu-item-image5">
-                            <property name="visible">True</property>
-                            <property name="stock">gtk-close</property>
-                            <property name="icon_size">1</property>
-                          </widget>
-                        </child>
                       </widget>
                     </child>
                     <child>
                       <widget class="GtkImageMenuItem" id="FileExit">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">_Exit</property>
+                        <property name="label" translatable="yes">gtk-quit</property>
+                        <property name="use_stock">True</property>
                         <property name="use_underline">True</property>
                         <accelerator key="X" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                        <child internal-child="image">
-                          <widget class="GtkImage" id="menu-item-image6">
-                            <property name="visible">True</property>
-                            <property name="stock">gtk-quit</property>
-                            <property name="icon_size">1</property>
-                          </widget>
-                        </child>
                       </widget>
                     </child>
                   </widget>
@@ -1593,8 +1576,9 @@
             <child>
               <widget class="GtkMenuItem" id="HelpMenu">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">_Help</property>
+                <property name="label" translatable="yes">gtk-help</property>
                 <property name="use_underline">True</property>
+                <property name="use_stock">True</property>
                 <child>
                   <widget class="GtkMenu" id="HelpMenu_menu">
                     <child>
