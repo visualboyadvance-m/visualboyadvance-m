@@ -127,7 +127,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   }
 
   vCreateFileOpenDialog();
-  vLoadHistoryFromConfig();
   vLoadJoypadsFromConfig();
 
   Gtk::MenuItem *      poMI;
@@ -233,18 +232,22 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 
   // Recent menu
   //
-  m_poRecentMenu = dynamic_cast<Gtk::Menu *>(_poXml->get_widget("RecentMenu_menu"));
-  vUpdateHistoryMenu();
+  m_poRecentManager = Gtk::RecentManager::get_default();
 
-  m_poRecentResetItem = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("RecentReset"));
-  m_poRecentResetItem->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnRecentReset));
+  Gtk::RecentFilter oRecentFilter;
+  oRecentFilter.add_application( Glib::get_application_name() );
 
-  poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("RecentFreeze"));
-  poCMI->set_active(m_poHistoryConfig->oGetKey<bool>("freeze"));
-  vOnRecentFreezeToggled(poCMI);
-  poCMI->signal_toggled().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnRecentFreezeToggled),
-                                    poCMI));
+  m_poRecentChooserMenu = Gtk::manage( new Gtk::RecentChooserMenu(m_poRecentManager) );
+  m_poRecentChooserMenu->set_show_numbers();
+  m_poRecentChooserMenu->set_show_tips();
+  m_poRecentChooserMenu->set_local_only();
+  m_poRecentChooserMenu->add_filter(oRecentFilter);
+  m_poRecentChooserMenu->signal_item_activated().connect(
+                                                   sigc::mem_fun(*this, &Window::vOnRecentFile));
+
+
+  m_poRecentMenu = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("RecentMenu"));
+  m_poRecentMenu->set_submenu(static_cast<Gtk::Menu &>(*m_poRecentChooserMenu));
 
   // Import menu
   //
@@ -853,7 +856,6 @@ Window::~Window()
 {
   vOnFileClose();
   vUnInitSystem();
-  vSaveHistoryToConfig();
   vSaveJoypadsToConfig();
   vSaveConfig(m_sConfigFile);
 
@@ -962,21 +964,6 @@ void Window::vUnInitSystem()
 void Window::vInitConfig()
 {
   m_oConfig.vClear();
-
-  // History section
-  //
-  m_poHistoryConfig = m_oConfig.poAddSection("History");
-  m_poHistoryConfig->vSetKey("freeze", false );
-  m_poHistoryConfig->vSetKey("0",      ""    );
-  m_poHistoryConfig->vSetKey("1",      ""    );
-  m_poHistoryConfig->vSetKey("2",      ""    );
-  m_poHistoryConfig->vSetKey("3",      ""    );
-  m_poHistoryConfig->vSetKey("4",      ""    );
-  m_poHistoryConfig->vSetKey("5",      ""    );
-  m_poHistoryConfig->vSetKey("6",      ""    );
-  m_poHistoryConfig->vSetKey("7",      ""    );
-  m_poHistoryConfig->vSetKey("8",      ""    );
-  m_poHistoryConfig->vSetKey("9",      ""    );
 
   // Directories section
   //
@@ -1252,83 +1239,11 @@ void Window::vSaveConfig(const std::string & _rsFile)
   }
 }
 
-void Window::vLoadHistoryFromConfig()
-{
-  char csKey[] = "0";
-  for (int i = 0; i < 10; i++, csKey[0]++)
-  {
-    std::string sFile = m_poHistoryConfig->sGetKey(csKey);
-    if (sFile == "")
-    {
-      break;
-    }
-    m_listHistory.push_back(sFile);
-  }
-}
-
-void Window::vSaveHistoryToConfig()
-{
-  char csKey[] = "0";
-  for (std::list<std::string>::const_iterator it = m_listHistory.begin();
-       it != m_listHistory.end();
-       it++, csKey[0]++)
-  {
-    m_poHistoryConfig->vSetKey(csKey, *it);
-  }
-}
-
 void Window::vHistoryAdd(const std::string & _rsFile)
 {
-  if (m_poHistoryConfig->oGetKey<bool>("freeze"))
-  {
-    return;
-  }
+  std::string sURL = "file://" + _rsFile;
 
-  m_listHistory.remove(_rsFile);
-  m_listHistory.push_front(_rsFile);
-  if (m_listHistory.size() > 10)
-  {
-    m_listHistory.pop_back();
-  }
-
-  vUpdateHistoryMenu();
-}
-
-void Window::vClearHistoryMenu()
-{
-  Gtk::Menu_Helpers::MenuList::iterator it = m_poRecentMenu->items().begin();
-  for (int i = 0; i < 3; i++, it++)
-    ;
-
-  m_poRecentMenu->items().erase(it, m_poRecentMenu->items().end());
-}
-
-void Window::vUpdateHistoryMenu()
-{
-  vClearHistoryMenu();
-
-  Glib::RefPtr<Gtk::AccelGroup> poAccelGroup = get_accel_group();
-
-  guint uiAccelKey = GDK_F1;
-  for (std::list<std::string>::const_iterator it = m_listHistory.begin();
-       it != m_listHistory.end();
-       it++, uiAccelKey++)
-  {
-    Gtk::Image * poImage = Gtk::manage(new Gtk::Image(Gtk::Stock::OPEN, Gtk::ICON_SIZE_MENU));
-    Glib::ustring sLabel = Glib::path_get_basename(*it);
-    Gtk::ImageMenuItem * poIMI = Gtk::manage(new Gtk::ImageMenuItem(*poImage, sLabel));
-
-    poIMI->set_tooltip_text(*it);
-
-    poIMI->signal_activate().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnRecentFile),
-                                      *it));
-
-    poIMI->add_accelerator("activate", poAccelGroup, uiAccelKey, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
-
-    poIMI->show();
-    m_poRecentMenu->items().push_back(*poIMI);
-  }
+  m_poRecentManager->add_item(sURL);
 }
 
 void Window::vLoadJoypadsFromConfig()
