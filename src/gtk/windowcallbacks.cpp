@@ -426,31 +426,12 @@ void Window::vOnFileScreenCapture()
   oPngFilter.set_name(_("PNG image"));
   oPngFilter.add_pattern("*.[pP][nN][gG]");
 
-  Gtk::FileFilter oBmpFilter;
-  oBmpFilter.set_name(_("BMP image"));
-  oBmpFilter.add_pattern("*.[bB][mM][pP]");
-
   oDialog.add_filter(oPngFilter);
-  oDialog.add_filter(oBmpFilter);
-
-  if (m_poCoreConfig->sGetKey("screenshot_format") == "bmp")
-  {
-    oDialog.set_filter(oBmpFilter);
-  }
 
   while (oDialog.run() == Gtk::RESPONSE_OK)
   {
     Glib::ustring sFile = oDialog.get_filename();
-    Glib::ustring sExt;
-
-    if (oDialog.get_filter() == &oPngFilter)
-    {
-      sExt = ".png";
-    }
-    else
-    {
-      sExt = ".bmp";
-    }
+    Glib::ustring sExt = ".png";
 
     if (! bHasSuffix(sFile, sExt, false))
     {
@@ -470,17 +451,7 @@ void Window::vOnFileScreenCapture()
       }
     }
 
-    bool bResult;
-    if (sExt == ".png")
-    {
-      bResult = m_stEmulator.emuWritePNG(sFile.c_str());
-    }
-    else
-    {
-      bResult = m_stEmulator.emuWriteBMP(sFile.c_str());
-    }
-
-    if (bResult)
+    if (m_stEmulator.emuWritePNG(sFile.c_str()))
     {
       break;
     }
@@ -825,16 +796,6 @@ void Window::vOnFlashSizeToggled(Gtk::CheckMenuItem * _poCMI, int _iFlashSize)
     flashSetSize(0x20000);
   }
   m_poCoreConfig->vSetKey("flash_size", _iFlashSize);
-}
-
-void Window::vOnScreenshotFormatToggled(Gtk::CheckMenuItem * _poCMI, std::string _sFormat)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  m_poCoreConfig->vSetKey("screenshot_format", _sFormat);
 }
 
 void Window::vOnSoundStatusToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundStatus)

@@ -172,7 +172,6 @@ protected:
   virtual void vOnShowSpeedToggled(Gtk::CheckMenuItem * _poCMI, int _iShowSpeed);
   virtual void vOnSaveTypeToggled(Gtk::CheckMenuItem * _poCMI, int _iSaveType);
   virtual void vOnFlashSizeToggled(Gtk::CheckMenuItem * _poCMI, int _iFlashSize);
-  virtual void vOnScreenshotFormatToggled(Gtk::CheckMenuItem * _poCMI, std::string _sFormat);
   virtual void vOnSoundStatusToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundStatus);
   virtual void vOnSoundEchoToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnSoundLowPassToggled(Gtk::CheckMenuItem * _poCMI);

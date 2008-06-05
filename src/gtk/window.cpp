@@ -504,32 +504,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
                                       poCMI, astFlashSize[i].m_iFlashSize));
   }
 
-  // Screenshot format menu
-  //
-  struct
-  {
-    const char * m_csName;
-    const char * m_csScreenshotFormat;
-  }
-  astScreenshotFormat[] =
-  {
-    { "ScreenshotFormatPNG", "png" },
-    { "ScreenshotFormatBMP", "bmp" }
-  };
-  std::string sDefaultScreenshotFormat = m_poCoreConfig->sGetKey("screenshot_format");
-  for (guint i = 0; i < G_N_ELEMENTS(astScreenshotFormat); i++)
-  {
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astScreenshotFormat[i].m_csName));
-    if (astScreenshotFormat[i].m_csScreenshotFormat == sDefaultScreenshotFormat)
-    {
-      poCMI->set_active();
-      vOnScreenshotFormatToggled(poCMI, sDefaultScreenshotFormat);
-    }
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnScreenshotFormatToggled),
-                                      poCMI, std::string(astScreenshotFormat[i].m_csScreenshotFormat)));
-  }
-
   // Sound menu
   //
   std::string sDefaultSoundStatus = m_poSoundConfig->sGetKey("status");
@@ -1034,7 +1008,6 @@ void Window::vInitConfig()
   m_poCoreConfig->vSetKey("gb_border",         true         );
   m_poCoreConfig->vSetKey("gb_printer",        false        );
   m_poCoreConfig->vSetKey("emulator_type",     EmulatorAuto );
-  m_poCoreConfig->vSetKey("screenshot_format", "png"        );
 
   // Display section
   //
@@ -1184,12 +1157,6 @@ void Window::vCheckConfig()
   if (iValue != iAdjusted)
   {
     m_poCoreConfig->vSetKey("emulator_type", iAdjusted);
-  }
-
-  sValue = m_poCoreConfig->sGetKey("screenshot_format");
-  if (sValue != "png" && sValue != "bmp")
-  {
-    sValue = "png";
   }
 
   // Display section
@@ -1702,20 +1669,13 @@ void Window::vCaptureScreen(int _iNum)
   {
     sBaseName = sCaptureDir + "/" + sCutSuffix(Glib::path_get_basename(m_sRomFile));
   }
-  std::string sFormat = m_poCoreConfig->sGetKey("screenshot_format");
 
-  char * csFile = g_strdup_printf("%s_%02d.%s",
+  char * csFile = g_strdup_printf("%s_%02d.png",
                                   sBaseName.c_str(),
-                                  _iNum,
-                                  sFormat.c_str());
-  if (sFormat == "png")
-  {
-    m_stEmulator.emuWritePNG(csFile);
-  }
-  else
-  {
-    m_stEmulator.emuWriteBMP(csFile);
-  }
+                                  _iNum);
+
+  m_stEmulator.emuWritePNG(csFile);
+
   g_free(csFile);
 }
 
