@@ -1661,7 +1661,7 @@
           <widget class="GtkTable" id="table1">
             <property name="visible">True</property>
             <property name="n_rows">5</property>
-            <property name="n_columns">4</property>
+            <property name="n_columns">2</property>
             <child>
               <widget class="GtkLabel" id="label6">
                 <property name="visible">True</property>
@@ -1674,54 +1674,13 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkEntry" id="GBARomsDirEntry">
+              <widget class="GtkFileChooserButton" id="GBARomsDirEntry">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="invisible_char">*</property>
+                <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
               </widget>
               <packing>
                 <property name="left_attach">1</property>
                 <property name="right_attach">2</property>
-                <property name="y_options">GTK_EXPAND</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkButton" id="GBARomsDirResetButton">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
-                <property name="response_id">0</property>
-                <child>
-                  <widget class="GtkImage" id="image83">
-                    <property name="visible">True</property>
-                    <property name="stock">gtk-cancel</property>
-                  </widget>
-                </child>
-              </widget>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="right_attach">3</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_EXPAND</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkButton" id="GBARomsDirSelectButton">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
-                <property name="response_id">0</property>
-                <child>
-                  <widget class="GtkImage" id="image84">
-                    <property name="visible">True</property>
-                    <property name="stock">gtk-open</property>
-                  </widget>
-                </child>
-              </widget>
-              <packing>
-                <property name="left_attach">3</property>
-                <property name="right_attach">4</property>
-                <property name="x_options">GTK_FILL</property>
                 <property name="y_options">GTK_EXPAND</property>
               </packing>
             </child>
@@ -1732,28 +1691,6 @@
                 <property name="label" translatable="yes">GB roms : </property>
               </widget>
               <packing>
-                <property name="top_attach">1</property>
-                <property name="bottom_attach">2</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_EXPAND</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkButton" id="GBRomsDirSelectButton">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
-                <property name="response_id">0</property>
-                <child>
-                  <widget class="GtkImage" id="image94">
-                    <property name="visible">True</property>
-                    <property name="stock">gtk-open</property>
-                  </widget>
-                </child>
-              </widget>
-              <packing>
-                <property name="left_attach">3</property>
-                <property name="right_attach">4</property>
                 <property name="top_attach">1</property>
                 <property name="bottom_attach">2</property>
                 <property name="x_options">GTK_FILL</property>
@@ -1774,60 +1711,15 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkEntry" id="BatteriesDirEntry">
+              <widget class="GtkFileChooserButton" id="BatteriesDirEntry">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="invisible_char">*</property>
+                <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
               </widget>
               <packing>
                 <property name="left_attach">1</property>
                 <property name="right_attach">2</property>
                 <property name="top_attach">2</property>
                 <property name="bottom_attach">3</property>
-                <property name="y_options">GTK_EXPAND</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkButton" id="BatteriesDirSelectButton">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
-                <property name="response_id">0</property>
-                <child>
-                  <widget class="GtkImage" id="image98">
-                    <property name="visible">True</property>
-                    <property name="stock">gtk-open</property>
-                  </widget>
-                </child>
-              </widget>
-              <packing>
-                <property name="left_attach">3</property>
-                <property name="right_attach">4</property>
-                <property name="top_attach">2</property>
-                <property name="bottom_attach">3</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_EXPAND</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkButton" id="BatteriesDirResetButton">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
-                <property name="response_id">0</property>
-                <child>
-                  <widget class="GtkImage" id="image95">
-                    <property name="visible">True</property>
-                    <property name="stock">gtk-cancel</property>
-                  </widget>
-                </child>
-              </widget>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="right_attach">3</property>
-                <property name="top_attach">2</property>
-                <property name="bottom_attach">3</property>
-                <property name="x_options">GTK_FILL</property>
                 <property name="y_options">GTK_EXPAND</property>
               </packing>
             </child>
@@ -1845,60 +1737,15 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkEntry" id="SavesDirEntry">
+              <widget class="GtkFileChooserButton" id="SavesDirEntry">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="invisible_char">*</property>
+                <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
               </widget>
               <packing>
                 <property name="left_attach">1</property>
                 <property name="right_attach">2</property>
                 <property name="top_attach">3</property>
                 <property name="bottom_attach">4</property>
-                <property name="y_options">GTK_EXPAND</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkButton" id="SavesDirResetButton">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
-                <property name="response_id">0</property>
-                <child>
-                  <widget class="GtkImage" id="image96">
-                    <property name="visible">True</property>
-                    <property name="stock">gtk-cancel</property>
-                  </widget>
-                </child>
-              </widget>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="right_attach">3</property>
-                <property name="top_attach">3</property>
-                <property name="bottom_attach">4</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_EXPAND</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkButton" id="SavesDirSelectButton">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
-                <property name="response_id">0</property>
-                <child>
-                  <widget class="GtkImage" id="image99">
-                    <property name="visible">True</property>
-                    <property name="stock">gtk-open</property>
-                  </widget>
-                </child>
-              </widget>
-              <packing>
-                <property name="left_attach">3</property>
-                <property name="right_attach">4</property>
-                <property name="top_attach">3</property>
-                <property name="bottom_attach">4</property>
-                <property name="x_options">GTK_FILL</property>
                 <property name="y_options">GTK_EXPAND</property>
               </packing>
             </child>
@@ -1916,10 +1763,9 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkEntry" id="CapturesDirEntry">
+              <widget class="GtkFileChooserButton" id="CapturesDirEntry">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="invisible_char">*</property>
+                <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
               </widget>
               <packing>
                 <property name="left_attach">1</property>
@@ -1930,82 +1776,15 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkButton" id="CapturesDirResetButton">
+              <widget class="GtkFileChooserButton" id="GBRomsDirEntry">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
-                <property name="response_id">0</property>
-                <child>
-                  <widget class="GtkImage" id="image97">
-                    <property name="visible">True</property>
-                    <property name="stock">gtk-cancel</property>
-                  </widget>
-                </child>
-              </widget>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="right_attach">3</property>
-                <property name="top_attach">4</property>
-                <property name="bottom_attach">5</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_EXPAND</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkButton" id="CapturesDirSelectButton">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
-                <property name="response_id">0</property>
-                <child>
-                  <widget class="GtkImage" id="image100">
-                    <property name="visible">True</property>
-                    <property name="stock">gtk-open</property>
-                  </widget>
-                </child>
-              </widget>
-              <packing>
-                <property name="left_attach">3</property>
-                <property name="right_attach">4</property>
-                <property name="top_attach">4</property>
-                <property name="bottom_attach">5</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_EXPAND</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkEntry" id="GBRomsDirEntry">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="invisible_char">*</property>
+                <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
               </widget>
               <packing>
                 <property name="left_attach">1</property>
                 <property name="right_attach">2</property>
                 <property name="top_attach">1</property>
                 <property name="bottom_attach">2</property>
-                <property name="y_options">GTK_EXPAND</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkButton" id="GBRomsDirResetButton">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
-                <property name="response_id">0</property>
-                <child>
-                  <widget class="GtkImage" id="image101">
-                    <property name="visible">True</property>
-                    <property name="stock">gtk-cancel</property>
-                  </widget>
-                </child>
-              </widget>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="right_attach">3</property>
-                <property name="top_attach">1</property>
-                <property name="bottom_attach">2</property>
-                <property name="x_options">GTK_FILL</property>
                 <property name="y_options">GTK_EXPAND</property>
               </packing>
             </child>
@@ -2019,21 +1798,11 @@
             <property name="visible">True</property>
             <property name="layout_style">GTK_BUTTONBOX_END</property>
             <child>
-              <widget class="GtkButton" id="cancelbutton2">
+              <widget class="GtkButton" id="closebutton2">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
-                <property name="label">gtk-cancel</property>
-                <property name="use_stock">True</property>
-                <property name="response_id">-6</property>
-              </widget>
-            </child>
-            <child>
-              <widget class="GtkButton" id="okbutton2">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="label">gtk-ok</property>
+                <property name="label">gtk-close</property>
                 <property name="use_stock">True</property>
                 <property name="response_id">-5</property>
               </widget>
