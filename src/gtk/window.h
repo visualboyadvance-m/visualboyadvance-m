@@ -148,9 +148,7 @@ protected:
   void vOnSaveGame(int _iSlot);
   virtual void vOnFilePauseToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnFileReset();
-  virtual void vOnRecentReset();
-  virtual void vOnRecentFreezeToggled(Gtk::CheckMenuItem * _poCMI);
-  virtual void vOnRecentFile(std::string _sFile);
+  virtual void vOnRecentFile();
   virtual void vOnImportBatteryFile();
   virtual void vOnExportBatteryFile();
   virtual void vOnFileScreenCapture();
@@ -234,7 +232,6 @@ private:
   std::string       m_sUserDataDir;
   std::string       m_sConfigFile;
   Config::File      m_oConfig;
-  Config::Section * m_poHistoryConfig;
   Config::Section * m_poDirConfig;
   Config::Section * m_poCoreConfig;
   Config::Section * m_poDisplayConfig;
@@ -244,8 +241,6 @@ private:
   Gtk::FileChooserDialog * m_poFileOpenDialog;
 
   ScreenArea *         m_poScreenArea;
-  Gtk::Menu *          m_poRecentMenu;
-  Gtk::MenuItem *      m_poRecentResetItem;
   Gtk::CheckMenuItem * m_poFilePauseItem;
   Gtk::CheckMenuItem * m_poUseBiosItem;
   Gtk::CheckMenuItem * m_poSoundOffItem;
@@ -262,7 +257,9 @@ private:
   Gtk::MenuItem * m_apoSaveGameItem[10];
   SGameSlot       m_astGameSlot[10];
 
-  std::list<std::string> m_listHistory;
+  Glib::RefPtr<Gtk::RecentManager> m_poRecentManager;
+  Gtk::MenuItem *                  m_poRecentMenu;
+  Gtk::RecentChooserMenu *         m_poRecentChooserMenu;
 
   std::list<Gtk::Widget *> m_listSensitiveWhenPlaying;
 
@@ -296,11 +293,7 @@ private:
   void vInitScreenArea(EVideoOutput _eVideoOutput);
   void vLoadConfig(const std::string & _rsFile);
   void vSaveConfig(const std::string & _rsFile);
-  void vLoadHistoryFromConfig();
-  void vSaveHistoryToConfig();
   void vHistoryAdd(const std::string & _rsFile);
-  void vClearHistoryMenu();
-  void vUpdateHistoryMenu();
   void vLoadJoypadsFromConfig();
   void vSaveJoypadsToConfig();
   void vUpdateScreen();

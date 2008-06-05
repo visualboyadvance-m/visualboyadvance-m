@@ -246,21 +246,15 @@ void Window::vOnFileReset()
   }
 }
 
-void Window::vOnRecentReset()
+void Window::vOnRecentFile()
 {
-  m_listHistory.clear();
-  vClearHistoryMenu();
-}
+  Glib::ustring sURI = m_poRecentChooserMenu->get_current_uri();
 
-void Window::vOnRecentFreezeToggled(Gtk::CheckMenuItem * _poCMI)
-{
-  m_poRecentResetItem->set_sensitive(! _poCMI->get_active());
-  m_poHistoryConfig->vSetKey("freeze", _poCMI->get_active());
-}
-
-void Window::vOnRecentFile(std::string _sFile)
-{
-  bLoadROM(_sFile);
+  if (!sURI.empty())
+  {
+    std::string sFileName = Glib::filename_from_uri(sURI);
+    bLoadROM(sFileName);
+  }
 }
 
 void Window::vOnImportBatteryFile()
