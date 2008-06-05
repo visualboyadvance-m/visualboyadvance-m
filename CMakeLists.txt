@@ -1,15 +1,33 @@
 cmake_minimum_required(VERSION 2.4.0)
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts)
+
+# Include the definition of the ASM compiler. It will look for nasm
+# This is probably not needed if CMake 2.6 or above is used
 INCLUDE(CMakeScripts/CMakeDetermineASMCompiler.cmake)
 INCLUDE(CMakeScripts/CMakeASMInformation.cmake)
 
+# The project's name is VBA-M it uses assembly, C and C++ code
 PROJECT(VBA-M ASM C CXX)
 
+# Both the SDL and the GTK+ frontends are built by default
+# To disable building the SDL frontend add -DNO_SDL=1 on the commandline
+# To disable building the GTK+ frontend add -DNO_GTK=1 on the commandline
+# To use ASM scalers, add -DUSE_ASM=1
+# To use the ASM core, add -DUSE_ASM_CORE=1
+# Set the version number with -DVERSION=X.X.X-uber
+
+# Version number
+IF( NOT VERSION )
+    SET( VERSION "1.8.0-SVN" )
+ENDIF( NOT VERSION )
+
+# Look for some dependencies using builtin CMake scripts
 FIND_PACKAGE ( ZLIB REQUIRED )
 FIND_PACKAGE ( PNG REQUIRED )
 FIND_PACKAGE ( OpenGL REQUIRED )
 FIND_PACKAGE ( PkgConfig REQUIRED )
 
+# Those dependencies require pkg-config to be found
 PKG_CHECK_MODULES ( GTKMM gtkmm-2.4 )
 PKG_CHECK_MODULES ( GLIBMM glibmm-2.4 )
 PKG_CHECK_MODULES ( GLADEMM libglademm-2.4 )
@@ -18,36 +36,48 @@ PKG_CHECK_MODULES ( SDL sdl )
 PKG_CHECK_MODULES ( XV xv )
 PKG_CHECK_MODULES ( GTKGLMM gtkglextmm-x11-1.2 )
 
-IF( SDL_FOUND )
-    SET( CAN_BUILD_VBAM 1 )
-ENDIF( SDL_FOUND )
+# Check that the dependencies are met to build the SDL frontend
+IF( NOT NO_SDL )
+    IF( SDL_FOUND )
+        SET( CAN_BUILD_VBAM 1 )
+    ENDIF( SDL_FOUND )
+ENDIF( NOT NO_SDL )
 
-IF( GLIBMM_FOUND AND GTKMM_FOUND AND GLADEMM_FOUND AND PORTAUDIO_FOUND AND XV_FOUND )
-    SET( CAN_BUILD_GVBAM 1 )
-ENDIF( GLIBMM_FOUND AND GTKMM_FOUND AND GLADEMM_FOUND AND PORTAUDIO_FOUND AND XV_FOUND )
+# Check that the dependencies are met to build the GTK frontend
+IF( NOT NO_GTK )
+    IF( GLIBMM_FOUND AND GTKMM_FOUND AND GLADEMM_FOUND AND PORTAUDIO_FOUND AND XV_FOUND )
+        SET( CAN_BUILD_GVBAM 1 )
+    ENDIF( GLIBMM_FOUND AND GTKMM_FOUND AND GLADEMM_FOUND AND PORTAUDIO_FOUND AND XV_FOUND )
+ENDIF( NOT NO_GTK )
 
+# Set the default install dir
 IF( NOT DATA_INSTALL_DIR )
     SET( DATA_INSTALL_DIR "share/vbam" )
 ENDIF( NOT DATA_INSTALL_DIR )
 
 SET( PKGDATADIR ${CMAKE_INSTALL_PREFIX}/${DATA_INSTALL_DIR} )
 
+# Set the configuration file location
 IF( NOT SYSCONFDIR )
     SET( SYSCONFDIR "/etc" )
 ENDIF( NOT SYSCONFDIR )
 
-IF( NOT VERSION )
-    SET( VERSION "1.8.0-SVN" )
-ENDIF( NOT VERSION )
-
+# C defines
 ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DBKPT_SUPPORT -DSDL -DUSE_OPENGL -DC_CORE -DSYSCONFDIR='"${SYSCONFDIR}"')
 
 ADD_DEFINITIONS (-DVERSION='"${VERSION}"' -DPKGDATADIR='"${PKGDATADIR}"' -DPACKAGE='')
 
+# The ASM core is disabled by default because we don't know on which platform we are
+IF( NOT USE_ASM_CORE )
+    ADD_DEFINITIONS (-DC_CORE)
+ENDIF( NOT USE_ASM_CORE )
+
+# Compiler flags
 SET( CMAKE_ASM_FLAGS "-Isrc/hq/asm/ -O1 -DELF")
 SET( CMAKE_C_FLAGS "-O3 -Wall")
 SET( CMAKE_CXX_FLAGS "-O3 -Wall")
 
+# Source files definition
 SET(SRC_MAIN
     src/2xSaI.cpp
     src/admame.cpp
@@ -149,11 +179,11 @@ SET(SRC_GTK
     src/gtk/sndPortAudio.cpp
 )
 
-IF(CMAKE_ASM_COMPILER_LOADED AND USEASM)
+IF(CMAKE_ASM_COMPILER_LOADED AND USE_ASM)
     SET(SRC_HQ ${SRC_HQ_ASM})
-ELSE(CMAKE_ASM_COMPILER_LOADED AND USEASM)
+ELSE(CMAKE_ASM_COMPILER_LOADED AND USE_ASM)
     SET(SRC_HQ ${SRC_HQ_C})
-ENDIF(CMAKE_ASM_COMPILER_LOADED AND USEASM)
+ENDIF(CMAKE_ASM_COMPILER_LOADED AND USE_ASM)
 
 include_directories(
     ${GTKMM_INCLUDE_DIRS}
