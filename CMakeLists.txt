@@ -6,6 +6,20 @@ SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts)
 INCLUDE(CMakeScripts/CMakeDetermineASMCompiler.cmake)
 INCLUDE(CMakeScripts/CMakeASMInformation.cmake)
 
+#Support building Windows builds from UNIX
+IF ( WINCROSS )
+    SET( CMAKE_C_COMPILER i586-mingw32-gcc )
+    SET( CMAKE_CXX_COMPILER i586-mingw32-g++ )
+    SET( CMAKE_RANLIB i586-mingw32-ranlib )
+    SET( CMAKE_AR i586-mingw32-ar )
+    SET( CMAKE_LINKER i586-mingw32-ld )
+    SET( CMAKE_NM i586-mingw32-nm )
+    SET( CMAKE_OBJCOPY i586-mingw32-objcopy )
+    SET( CMAKE_OBJDUMP i586-mingw32-objdump )
+    SET( CMAKE_STRIP i586-mingw32-strip )
+    SET( WIN32 1 )
+ENDIF ( WINCROSS )
+
 # The project's name is VBA-M it uses assembly, C and C++ code
 PROJECT(VBA-M ASM C CXX)
 
@@ -73,7 +87,11 @@ IF( NOT USE_ASM_CORE )
 ENDIF( NOT USE_ASM_CORE )
 
 # Compiler flags
-SET( CMAKE_ASM_FLAGS "-Isrc/hq/asm/ -O1 -DELF")
+IF ( WIN32 )
+    SET( CMAKE_ASM_FLAGS "-Isrc/hq/asm/ -O1")
+ELSE ( WIN32 )
+    SET( CMAKE_ASM_FLAGS "-Isrc/hq/asm/ -O1 -DELF")
+ENDIF ( WIN32 )
 SET( CMAKE_C_FLAGS "-O3 -Wall")
 SET( CMAKE_CXX_FLAGS "-O3 -Wall")
 
@@ -218,12 +236,12 @@ IF( CAN_BUILD_VBAM )
         ${PNG_LIBRARY}
         ${OPENGL_LIBRARY}
     )
-    
+
     INSTALL(PROGRAMS vbam DESTINATION bin)
     INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/VisualBoyAdvance.cfg-example
             DESTINATION ${SYSCONFDIR}
             RENAME VisualBoyAdvance.cfg)
-    
+
 ENDIF( CAN_BUILD_VBAM )
 
 IF( CAN_BUILD_GVBAM )
@@ -244,7 +262,7 @@ IF( CAN_BUILD_GVBAM )
         ${XV_LIBRARIES}
         ${GTKGLMM_LIBRARIES}
     )
-    
+
     INSTALL(PROGRAMS gvbam DESTINATION bin)
     INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/vba.glade DESTINATION ${DATA_INSTALL_DIR})
     INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/gvbam.desktop DESTINATION share/applications)
