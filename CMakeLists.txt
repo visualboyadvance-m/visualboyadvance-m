@@ -1,5 +1,9 @@
-cmake_minimum_required(VERSION 2.4.0)
-SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts)
+cmake_minimum_required( VERSION 2.4.6 )
+if( COMMAND cmake_policy )
+    cmake_policy( SET CMP0003 NEW )
+    cmake_policy( SET CMP0005 NEW )
+endif( COMMAND cmake_policy )
+SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts )
 
 # Include the definition of the ASM compiler. It will look for nasm
 # This is probably not needed if CMake 2.6 or above is used
@@ -12,7 +16,7 @@ PROJECT(VBA-M ASM C CXX)
 # Both the SDL and the GTK+ frontends are built by default
 # To disable building the SDL frontend add -DNO_SDL=1 on the commandline
 # To disable building the GTK+ frontend add -DNO_GTK=1 on the commandline
-# To use ASM scalers, add -DUSE_ASM=1
+# To use ASM scalers, add -DUSE_ASM_SCALERS=1
 # To use the ASM core, add -DUSE_ASM_CORE=1
 # Set the version number with -DVERSION=X.X.X-uber
 
@@ -189,11 +193,11 @@ SET(SRC_GTK
     src/gtk/sndPortAudio.cpp
 )
 
-IF(CMAKE_ASM_COMPILER_LOADED AND USE_ASM)
+IF(CMAKE_ASM_COMPILER_LOADED AND USE_ASM_SCALERS)
     SET(SRC_HQ ${SRC_HQ_ASM})
-ELSE(CMAKE_ASM_COMPILER_LOADED AND USE_ASM)
+ELSE(CMAKE_ASM_COMPILER_LOADED AND USE_ASM_SCALERS)
     SET(SRC_HQ ${SRC_HQ_C})
-ENDIF(CMAKE_ASM_COMPILER_LOADED AND USE_ASM)
+ENDIF(CMAKE_ASM_COMPILER_LOADED AND USE_ASM_SCALERS)
 
 include_directories(
     ${ZLIB_INCLUDE_DIR}
