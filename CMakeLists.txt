@@ -104,7 +104,8 @@ SET(SRC_MAIN
     src/bios.cpp
     src/Cheats.cpp
     src/CheatSearch.cpp
-    src/EEprom.cpp src/elf.cpp
+    src/EEprom.cpp 
+    src/elf.cpp
     src/Flash.cpp
     src/Globals.cpp
     src/interframe.cpp
