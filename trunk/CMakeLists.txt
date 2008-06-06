@@ -6,20 +6,6 @@ SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts)
 INCLUDE(CMakeScripts/CMakeDetermineASMCompiler.cmake)
 INCLUDE(CMakeScripts/CMakeASMInformation.cmake)
 
-#Support building Windows builds from UNIX
-IF ( WINCROSS )
-    SET( CMAKE_SYSTEM_NAME Windows )
-    SET( CMAKE_C_COMPILER i586-mingw32-gcc )
-    SET( CMAKE_CXX_COMPILER i586-mingw32-g++ )
-    SET( CMAKE_RANLIB i586-mingw32-ranlib )
-    SET( CMAKE_AR i586-mingw32-ar )
-    SET( CMAKE_LINKER i586-mingw32-ld )
-    SET( CMAKE_NM i586-mingw32-nm )
-    SET( CMAKE_OBJCOPY i586-mingw32-objcopy )
-    SET( CMAKE_OBJDUMP i586-mingw32-objdump )
-    SET( CMAKE_STRIP i586-mingw32-strip )
-ENDIF ( WINCROSS )
-
 # The project's name is VBA-M it uses assembly, C and C++ code
 PROJECT(VBA-M ASM C CXX)
 
@@ -39,16 +25,21 @@ ENDIF( NOT VERSION )
 FIND_PACKAGE ( ZLIB REQUIRED )
 FIND_PACKAGE ( PNG REQUIRED )
 FIND_PACKAGE ( OpenGL REQUIRED )
-FIND_PACKAGE ( PkgConfig REQUIRED )
+FIND_PACKAGE ( SDL REQUIRED )
 
-# Those dependencies require pkg-config to be found
-PKG_CHECK_MODULES ( GTKMM gtkmm-2.4 )
-PKG_CHECK_MODULES ( GLIBMM glibmm-2.4 )
-PKG_CHECK_MODULES ( GLADEMM libglademm-2.4 )
-PKG_CHECK_MODULES ( PORTAUDIO portaudio-2.0 )
-PKG_CHECK_MODULES ( SDL sdl )
-PKG_CHECK_MODULES ( XV xv )
-PKG_CHECK_MODULES ( GTKGLMM gtkglextmm-x11-1.2 )
+# Disable looking for GTK if not going to build the GTK frontend
+# so that pkg-config is not required
+IF(NOT NO_GTK)
+    FIND_PACKAGE ( PkgConfig REQUIRED )
+
+    # These dependencies require pkg-config to be found
+    PKG_CHECK_MODULES ( GTKMM gtkmm-2.4 )
+    PKG_CHECK_MODULES ( GLIBMM glibmm-2.4 )
+    PKG_CHECK_MODULES ( GLADEMM libglademm-2.4 )
+    PKG_CHECK_MODULES ( PORTAUDIO portaudio-2.0 )
+    PKG_CHECK_MODULES ( XV xv )
+    PKG_CHECK_MODULES ( GTKGLMM gtkglextmm-x11-1.2 )
+ENDIF(NOT NO_GTK)
 
 # Check that the dependencies are met to build the SDL frontend
 IF( NOT NO_SDL )
@@ -205,6 +196,7 @@ ELSE(CMAKE_ASM_COMPILER_LOADED AND USE_ASM)
 ENDIF(CMAKE_ASM_COMPILER_LOADED AND USE_ASM)
 
 include_directories(
+    ${ZLIB_INCLUDE_DIR}
     ${GTKMM_INCLUDE_DIRS}
     ${GLADEMM_INCLUDE_DIRS}
     ${SDL_INCLUDE_DIRS}
@@ -229,13 +221,18 @@ IF( CAN_BUILD_VBAM )
         ${SRC_HQ}
     )
 
+    IF( WIN32 )
+        SET( WIN32_LIBRARIES wsock32 )
+    ENDIF( WIN32 )
+
     TARGET_LINK_LIBRARIES (
         vbam
         vbamcore
-        ${SDL_LIBRARIES}
+        ${SDL_LIBRARY}
         ${ZLIB_LIBRARY}
         ${PNG_LIBRARY}
         ${OPENGL_LIBRARY}
+        ${WIN32_LIBRARIES}
     )
 
     INSTALL(PROGRAMS vbam DESTINATION bin)
