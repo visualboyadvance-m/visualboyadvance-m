@@ -8,6 +8,7 @@ INCLUDE(CMakeScripts/CMakeASMInformation.cmake)
 
 #Support building Windows builds from UNIX
 IF ( WINCROSS )
+    SET( CMAKE_SYSTEM_NAME Windows )
     SET( CMAKE_C_COMPILER i586-mingw32-gcc )
     SET( CMAKE_CXX_COMPILER i586-mingw32-g++ )
     SET( CMAKE_RANLIB i586-mingw32-ranlib )
@@ -17,7 +18,6 @@ IF ( WINCROSS )
     SET( CMAKE_OBJCOPY i586-mingw32-objcopy )
     SET( CMAKE_OBJDUMP i586-mingw32-objdump )
     SET( CMAKE_STRIP i586-mingw32-strip )
-    SET( WIN32 1 )
 ENDIF ( WINCROSS )
 
 # The project's name is VBA-M it uses assembly, C and C++ code
