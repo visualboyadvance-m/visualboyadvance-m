@@ -48,8 +48,9 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
         return paContinue;
     }
 
-    if (soundbufsize - audioFree() < outBufferLength)
-        fprintf(stderr, "** PortAudio : buffer underflow **\n");
+    // Not enough available data to fill the sound buffer
+    //if (soundbufsize - audioFree() < outBufferLength)
+    //    fprintf(stderr, "** PortAudio : buffer underflow **\n");
 
     u8 *soundbuf = (u8 *)stereodata16;
     
