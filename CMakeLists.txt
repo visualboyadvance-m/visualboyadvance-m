@@ -16,6 +16,8 @@ PROJECT(VBA-M ASM C CXX)
 # Both the SDL and the GTK+ frontends are built by default
 # To disable building the SDL frontend add -DNO_SDL=1 on the commandline
 # To disable building the GTK+ frontend add -DNO_GTK=1 on the commandline
+# To disable building the debugger, add -DNO_DEBUGGER=1.
+# The SDL frontend can't be built without debugger support
 # To use ASM scalers, add -DUSE_ASM_SCALERS=1
 # To use the ASM core, add -DUSE_ASM_CORE=1
 # Set the version number with -DVERSION=X.X.X-uber
@@ -72,9 +74,22 @@ IF( NOT SYSCONFDIR )
 ENDIF( NOT SYSCONFDIR )
 
 # C defines
-ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DBKPT_SUPPORT -DSDL -DUSE_OPENGL -DSYSCONFDIR='"${SYSCONFDIR}"')
+ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONFDIR='"${SYSCONFDIR}"')
 
 ADD_DEFINITIONS (-DVERSION='"${VERSION}"' -DPKGDATADIR='"${PKGDATADIR}"' -DPACKAGE='')
+
+# The debugger is enabled by default
+# The SDL port can't be built without debugging support
+IF( NO_DEBUGGER )
+    IF( CAN_BUILD_VBAM )
+        MESSAGE(STATUS "The SDL port can't be built without debugging support")
+        SET( CAN_BUILD_VBAM 0 )
+    ENDIF( CAN_BUILD_VBAM )
+    
+    ADD_DEFINITIONS (-DNO_DEBUGGER)
+ELSE( NO_DEBUGGER )
+    ADD_DEFINITIONS (-DBKPT_SUPPORT)
+ENDIF( NO_DEBUGGER )
 
 # The ASM core is disabled by default because we don't know on which platform we are
 IF( NOT USE_ASM_CORE )
@@ -94,13 +109,11 @@ SET( CMAKE_CXX_FLAGS "-O3 -Wall")
 SET(SRC_MAIN
     src/2xSaI.cpp
     src/admame.cpp
-    src/armdis.cpp
     src/bilinear.cpp
     src/bios.cpp
     src/Cheats.cpp
     src/CheatSearch.cpp
     src/EEprom.cpp 
-    src/elf.cpp
     src/Flash.cpp
     src/Globals.cpp
     src/interframe.cpp
@@ -112,15 +125,11 @@ SET(SRC_MAIN
     src/Mode4.cpp
     src/Mode5.cpp
     src/pixel.cpp
-    src/remote.cpp
     src/RTC.cpp
     src/scanline.cpp
     src/Sound.cpp
     src/Sram.cpp
     src/Util.cpp
-    src/expr.cpp
-    src/exprNode.cpp
-    src/expr-lex.cpp
     src/memgzio.c
 )
 
@@ -193,6 +202,17 @@ SET(SRC_GTK
     src/gtk/sndPortAudio.cpp
 )
 
+IF( NOT NO_DEBUGGER )
+    SET(SRC_DEBUGGER
+        src/armdis.cpp
+        src/elf.cpp
+        src/expr.cpp
+        src/exprNode.cpp
+        src/expr-lex.cpp
+        src/remote.cpp
+    )
+ENDIF( NOT NO_DEBUGGER )
+
 IF(CMAKE_ASM_COMPILER_LOADED AND USE_ASM_SCALERS)
     SET(SRC_HQ ${SRC_HQ_ASM})
 ELSE(CMAKE_ASM_COMPILER_LOADED AND USE_ASM_SCALERS)
@@ -214,6 +234,7 @@ ADD_LIBRARY (
     ${SRC_AGB}
     ${SRC_DMG}
     ${SRC_FEX_MINI}
+    ${SRC_DEBUGGER}
 )
 
 IF( CAN_BUILD_VBAM )

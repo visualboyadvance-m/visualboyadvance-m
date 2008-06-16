@@ -1004,6 +1004,7 @@ void Window::vOnAutofireToggled(Gtk::CheckMenuItem * _poCMI, u32 _uiKeyFlag)
   m_poInputConfig->vSetKey(sKey, _poCMI->get_active());
 }
 
+#ifndef NO_DEBUGGER
 void Window::vOnGDBWait()
 {
   Glib::RefPtr<Xml> poXml;
@@ -1155,6 +1156,7 @@ void Window::vOnGDBDisconnect()
   remoteCleanUp();
   debugger = false;
 }
+#endif //NO_DEBUGGER
 
 void Window::vOnHelpAbout()
 {

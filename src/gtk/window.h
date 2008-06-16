@@ -183,10 +183,12 @@ protected:
   virtual void vOnJoypadConfigure(int _iJoypad);
   virtual void vOnJoypadToggled(Gtk::CheckMenuItem * _poCMI, int _iJoypad);
   virtual void vOnAutofireToggled(Gtk::CheckMenuItem * _poCMI, u32 _uiKeyFlag);
+#ifndef NO_DEBUGGER
   virtual void vOnGDBWait();
   virtual void vOnGDBLoadAndWait();
   virtual void vOnGDBBreak();
   virtual void vOnGDBDisconnect();
+#endif //NO_DEBUGGER
   virtual void vOnHelpAbout();
   virtual bool bOnEmuIdle();
 
