@@ -1272,7 +1272,9 @@ void CPUCleanUp()
     ioMem = NULL;
   }
 
+#ifndef NO_DEBUGGER
   elfCleanUp();
+#endif //NO_DEBUGGER
 
   systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
@@ -1303,6 +1305,7 @@ int CPULoadRom(const char *szFile)
 
   u8 *whereToLoad = cpuIsMultiBoot ? workRAM : rom;
 
+#ifndef NO_DEBUGGER
   if(CPUIsELF(szFile)) {
     FILE *f = fopen(szFile, "rb");
     if(!f) {
@@ -1323,7 +1326,9 @@ int CPULoadRom(const char *szFile)
       elfCleanUp();
       return 0;
     }
-  } else if(!utilLoad(szFile,
+  } else 
+#endif //NO_DEBUGGER
+  if(!utilLoad(szFile,
                       utilIsGBAImage,
                       whereToLoad,
                       romSize)) {

@@ -817,6 +817,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 
   // GDB menu
   //
+#ifndef NO_DEBUGGER
   poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("GdbWait"));
   poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnGDBWait));
 
@@ -828,6 +829,11 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 
   poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("GdbDisconnect"));
   poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnGDBDisconnect));
+#else
+  // Hide the whole Tools menu as it only contains the debugger stuff as of now
+  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("ToolsMenu"));
+  poMI->hide();
+#endif //NO_DEBUGGER
 
   // Help menu
   //
