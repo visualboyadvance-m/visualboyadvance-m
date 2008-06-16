@@ -467,6 +467,7 @@ void remoteWriteWatch(char *p, bool active)
     return;
   }
 
+#ifdef BKPT_SUPPORT
   for(int i = 0; i < count; i++) {
     if((address >> 24) == 2)
       freezeWorkRAM[address & 0x3ffff] = active;
@@ -474,6 +475,7 @@ void remoteWriteWatch(char *p, bool active)
       freezeInternalRAM[address & 0x7fff] = active;
     address++;
   }
+#endif
 
   remotePutPacket("OK");
 }
