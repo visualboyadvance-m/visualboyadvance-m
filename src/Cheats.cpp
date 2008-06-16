@@ -2819,6 +2819,7 @@ extern int cpuNextEvent;
 
 extern void debuggerBreakOnWrite(u32 , u32, u32, int, int);
 
+#ifdef BKPT_SUPPORT
 static u8 cheatsGetType(u32 address)
 {
   switch(address >> 24) {
@@ -2838,6 +2839,7 @@ static u8 cheatsGetType(u32 address)
   }
   return 0;
 }
+#endif
 
 void cheatsWriteMemory(u32 address, u32 value)
 {
