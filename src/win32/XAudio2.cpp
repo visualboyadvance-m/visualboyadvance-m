@@ -63,7 +63,7 @@ public:
 
 
 	// dummies:
-	STDMETHOD_( void, OnVoiceProcessingPassStart ) () {}
+	STDMETHOD_( void, OnVoiceProcessingPassStart ) ( UINT32 BytesRequired ) {}
 	STDMETHOD_( void, OnVoiceProcessingPassEnd ) () {}
 	STDMETHOD_( void, OnStreamEnd ) () {}
 	STDMETHOD_( void, OnBufferStart ) ( void *pBufferContext ) {}
