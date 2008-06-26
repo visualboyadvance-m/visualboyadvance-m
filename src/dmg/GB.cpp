@@ -3313,12 +3313,14 @@ bool gbReadBatteryFile(const char *file)
     case 0x13:
     case 0xfc:
       res = gbReadSaveMBC3(file);
+      break;
     case 0x1b:
     case 0x1e:
       res = gbReadSaveMBC5(file);
       break;
     case 0x22:
       res = gbReadSaveMBC7(file);
+      break;
     case 0xfd:
       if(!gbReadSaveTAMA5(file)) {
         u8 gbDaysinMonth [12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
