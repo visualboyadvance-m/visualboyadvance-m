@@ -991,3 +991,14 @@ void MainWnd::OnUpdateFileLoadgameAutoloadmostrecent(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(theApp.autoLoadMostRecent);
 }
+
+void MainWnd::OnLoadgameDonotchangebatterysave()
+{
+  theApp.winSkipSaveGameBattery = !theApp.winSkipSaveGameBattery;
+  skipSaveGameBattery = theApp.winSkipSaveGameBattery;
+}
+
+void MainWnd::OnUpdateLoadgameDonotchangebatterysave(CCmdUI *pCmdUI)
+{
+  pCmdUI->SetCheck(theApp.winSkipSaveGameBattery);
+}

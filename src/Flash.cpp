@@ -97,6 +97,18 @@ void flashReadGame(gzFile gzFile, int version)
   }
 }
 
+void flashReadGameSkip(gzFile gzFile, int version)
+{
+  // skip the flash data in a save game
+  if(version < SAVE_GAME_VERSION_5)
+    utilReadDataSkip(gzFile, flashSaveData);
+  else if(version < SAVE_GAME_VERSION_7) {
+    utilReadDataSkip(gzFile, flashSaveData2);
+  } else {
+    utilReadDataSkip(gzFile, flashSaveData3);
+  }
+}
+
 void flashSetSize(int size)
 {
   //  log("Setting flash size to %d\n", size);

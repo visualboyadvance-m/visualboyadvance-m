@@ -746,8 +746,15 @@ static bool CPUReadState(gzFile gzFile)
     utilGzRead(gzFile, pix, 4*241*162);
   utilGzRead(gzFile, ioMem, 0x400);
 
-  eepromReadGame(gzFile, version);
-  flashReadGame(gzFile, version);
+  if(skipSaveGameBattery) {
+    // skip eeprom data
+    eepromReadGameSkip(gzFile, version);
+    // skip flash data
+    flashReadGameSkip(gzFile, version);
+  } else {
+    eepromReadGame(gzFile, version);
+    flashReadGame(gzFile, version);
+  }
   soundReadGame(gzFile, version);
 
   if(version > SAVE_GAME_VERSION_1) {
