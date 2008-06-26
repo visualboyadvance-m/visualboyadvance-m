@@ -428,6 +428,8 @@ public:
 	afx_msg void OnPixelfilterMultiThreading();
 	afx_msg void OnUpdatePixelfilterMultiThreading(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateOptionsSelectPlugin(CCmdUI *pCmdUI);
+	afx_msg void OnLoadgameDonotchangebatterysave();
+	afx_msg void OnUpdateLoadgameDonotchangebatterysave(CCmdUI *pCmdUI);
 };
 
 /////////////////////////////////////////////////////////////////////////////

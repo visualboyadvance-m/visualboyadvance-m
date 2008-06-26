@@ -77,6 +77,15 @@ void eepromReadGame(gzFile gzFile, int version)
   }
 }
 
+void eepromReadGameSkip(gzFile gzFile, int version)
+{
+  // skip the eeprom data in a save game
+  utilReadDataSkip(gzFile, eepromSaveData);
+  if(version >= SAVE_GAME_VERSION_3) {
+    utilGzSeek(gzFile, sizeof(int), SEEK_CUR);
+    utilGzSeek(gzFile, 0x2000, SEEK_CUR);
+  }
+}
 
 int eepromRead(u32 /* address */)
 {

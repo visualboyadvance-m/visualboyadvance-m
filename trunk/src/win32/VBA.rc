@@ -13,6 +13,38 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// German (Germany) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.\0"
+END
+
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // German (Germany) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
@@ -1515,6 +1547,7 @@ BEGIN
         BEGIN
             MENUITEM "Most recent",                 ID_FILE_LOADGAME_MOSTRECENT
             MENUITEM "Auto load most recent",       ID_FILE_LOADGAME_AUTOLOADMOSTRECENT
+            MENUITEM "Do not change battery save",  ID_LOADGAME_DONOTCHANGEBATTERYSAVE
             MENUITEM SEPARATOR
             MENUITEM "Slot #1",                     ID_FILE_LOADGAME_SLOT1
             MENUITEM "Slot #2",                     ID_FILE_LOADGAME_SLOT2

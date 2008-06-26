@@ -50,6 +50,7 @@ bool speedHack = false;
 int cpuSaveType = 0;
 bool cheatsEnabled = true;
 bool mirroringEnable = false;
+bool skipSaveGameBattery = false;
 
 u8 *bios = NULL;
 u8 *rom = NULL;
