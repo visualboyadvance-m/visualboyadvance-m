@@ -855,13 +855,15 @@
 #define ID_FILE_OPEN_GBC                40358
 #define ID_OUTPUTAPI_XAUDIO2            40359
 #define ID_PIXELFILTER_MULTI            40360
+#define ID_EMULATOR_LOADSTATESHOULD     40361
+#define ID_LOADGAME_DONOTCHANGEBATTERYSAVE 40362
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        163
-#define _APS_NEXT_COMMAND_VALUE         40361
+#define _APS_NEXT_COMMAND_VALUE         40363
 #define _APS_NEXT_CONTROL_VALUE         1285
 #define _APS_NEXT_SYMED_VALUE           103
 #endif

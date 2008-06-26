@@ -57,6 +57,7 @@ extern u32 systemColorMap32[0x10000];
 static int (ZEXPORT *utilGzWriteFunc)(gzFile, const voidp, unsigned int) = NULL;
 static int (ZEXPORT *utilGzReadFunc)(gzFile, voidp, unsigned int) = NULL;
 static int (ZEXPORT *utilGzCloseFunc)(gzFile) = NULL;
+static z_off_t (ZEXPORT *utilGzSeekFunc)(gzFile, z_off_t, int) = NULL;
 
 bool utilWritePNGFile(const char *fileName, int w, int h, u8 *pix)
 {
@@ -631,6 +632,14 @@ void utilReadData(gzFile gzFile, variable_desc* data)
   }
 }
 
+void utilReadDataSkip(gzFile gzFile, variable_desc* data)
+{
+  while(data->address) {
+    utilGzSeek(gzFile, data->size, SEEK_CUR);
+    data++;
+  }
+}
+
 void utilWriteData(gzFile gzFile, variable_desc *data)
 {
   while(data->address) {
@@ -644,6 +653,7 @@ gzFile utilGzOpen(const char *file, const char *mode)
   utilGzWriteFunc = (int (ZEXPORT *)(void *,void * const, unsigned int))gzwrite;
   utilGzReadFunc = gzread;
   utilGzCloseFunc = gzclose;
+  utilGzSeekFunc = gzseek;
 
   return gzopen(file, mode);
 }
@@ -670,6 +680,11 @@ int utilGzRead(gzFile file, voidp buffer, unsigned int len)
 int utilGzClose(gzFile file)
 {
   return utilGzCloseFunc(file);
+}
+
+z_off_t utilGzSeek(gzFile file, z_off_t offset, int whence)
+{
+	return utilGzSeekFunc(file, offset, whence);
 }
 
 long utilGzMemTell(gzFile file)

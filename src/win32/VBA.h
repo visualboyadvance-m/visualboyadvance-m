@@ -201,6 +201,7 @@ class VBA : public CWinApp
   bool wasPaused;
   int frameskipadjust;
   bool autoLoadMostRecent;
+  bool winSkipSaveGameBattery;
   int fsMaxScale;
   int romSize;
   VIDEO_SIZE lastWindowed;
