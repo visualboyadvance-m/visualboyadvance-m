@@ -215,6 +215,8 @@ bool gbCapture = false;
 bool gbCapturePrevious = false;
 int gbJoymask[4] = { 0, 0, 0, 0 };
 
+u8 gbRamFill = 0xff;
+
 int gbRomSizes[] = { 0x00008000, // 32K
                      0x00010000, // 64K
                      0x00020000, // 128K
@@ -4125,12 +4127,6 @@ bool gbUpdateSizes()
   gbRamSize = gbRamSizes[ramsize];
   gbRamSizeMask = gbRamSizesMasks[ramsize];
 
-  if(gbRamSize) {
-    gbRam = (u8 *)malloc(gbRamSize);
-    memset(gbRam, 0xff, gbRamSize);
-  }
-
-
   gbRomType = gbRom[0x147];
   if (genericflashcardEnable)
   {
@@ -4214,6 +4210,8 @@ bool gbUpdateSizes()
     mapper = mapperMBC7ROM;
     mapperRAM = mapperMBC7RAM;
     mapperReadRAM = mapperMBC7ReadRAM;
+    gbRamSize = 0x200;
+    gbRamSizeMask = 0x1ff;
     break;
     // GG (GameGenie)
   case 0x55:
@@ -4234,8 +4232,7 @@ bool gbUpdateSizes()
     ramsize = 3;
     gbRamSize = gbRamSizes[3];
     gbRamSizeMask = gbRamSizesMasks[3];
-    gbRam = (u8 *)malloc(gbRamSize);
-    memset(gbRam, 0x0, gbRamSize);
+    gbRamFill = 0x0;
 
     gbTAMA5ramSize = 0x100;
 
@@ -4262,6 +4259,11 @@ bool gbUpdateSizes()
     systemMessage(MSG_UNKNOWN_CARTRIDGE_TYPE,
                   N_("Unknown cartridge type %02x"), gbRomType);
     return false;
+  }
+
+  if(gbRamSize) {
+    gbRam = (u8 *)malloc(gbRamSize);
+    memset(gbRam, gbRamFill, gbRamSize);
   }
 
   switch(gbRomType) {
