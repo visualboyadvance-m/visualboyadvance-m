@@ -104,10 +104,21 @@ ScreenAreaXv::ScreenAreaXv(int _iWidth, int _iHeight, int _iScale) :
   }
   */
 
-  Atom oAtom = XInternAtom(m_pDisplay, "XV_AUTOPAINT_COLORKEY", True);
-  if (oAtom != None) 
-    XvSetPortAttribute (m_pDisplay, m_iXvPortId, oAtom, 1);
-  
+  int iNumAttributes;
+  pAttr = XvQueryPortAttributes(m_pDisplay, m_iXvPortId, &iNumAttributes);
+
+  for (int iAttr = 0; iAttr < iNumAttributes; iAttr++)
+  {
+    if (!strcmp(pAttr[iAttr].name, "XV_AUTOPAINT_COLORKEY"))
+    {
+      Atom oAtom = XInternAtom(m_pDisplay, "XV_AUTOPAINT_COLORKEY", True);
+      if (oAtom != None) 
+        XvSetPortAttribute(m_pDisplay, m_iXvPortId, oAtom, 1);
+      
+      break;
+    }
+  }
+
   vUpdateSize();
 }
 
@@ -146,9 +157,9 @@ void ScreenAreaXv::vDrawPixels(u8 * _puiData)
                 m_iHeight);
   }
 
-  if (m_vFilter2x != NULL)
+  if (m_poFilter2x)
   {
-    m_vFilter2x(_puiData + iSrcPitch,
+    m_poFilter2x->apply(_puiData + iSrcPitch,
                 iSrcPitch,
                 m_puiDelta,
                 (u8 *)m_puiPixels,
