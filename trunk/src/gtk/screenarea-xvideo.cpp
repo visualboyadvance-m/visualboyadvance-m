@@ -105,7 +105,7 @@ ScreenAreaXv::ScreenAreaXv(int _iWidth, int _iHeight, int _iScale) :
   */
 
   int iNumAttributes;
-  pAttr = XvQueryPortAttributes(m_pDisplay, m_iXvPortId, &iNumAttributes);
+  XvAttribute *pAttr = XvQueryPortAttributes(m_pDisplay, m_iXvPortId, &iNumAttributes);
 
   for (int iAttr = 0; iAttr < iNumAttributes; iAttr++)
   {
@@ -157,9 +157,9 @@ void ScreenAreaXv::vDrawPixels(u8 * _puiData)
                 m_iHeight);
   }
 
-  if (m_poFilter2x)
+  if (m_vFilter2x)
   {
-    m_poFilter2x->apply(_puiData + iSrcPitch,
+    m_vFilter2x(_puiData + iSrcPitch,
                 iSrcPitch,
                 m_puiDelta,
                 (u8 *)m_puiPixels,
