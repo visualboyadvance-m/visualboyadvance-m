@@ -26,6 +26,7 @@ extern int gbTAMA5ramSize;
 extern bool useBios;
 extern bool skipBios;
 extern u8 *bios;
+extern bool skipSaveGameBattery;
 
 extern u8 *gbRom;
 extern u8 *gbRam;
