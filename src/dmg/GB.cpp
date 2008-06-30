@@ -3697,11 +3697,16 @@ static bool gbReadSaveState(gzFile gzFile)
   utilGzRead(gzFile, &gbDataMBC5, sizeof(gbDataMBC5));
   utilGzRead(gzFile, &gbDataHuC1, sizeof(gbDataHuC1));
   utilGzRead(gzFile, &gbDataHuC3, sizeof(gbDataHuC3));
-  if (version>=11)
+  if(version>=11)
   {
     utilGzRead(gzFile, &gbDataTAMA5, sizeof(gbDataTAMA5));
-    if (gbTAMA5ram != NULL)
-      utilGzRead(gzFile, gbTAMA5ram, gbTAMA5ramSize);
+    if(gbTAMA5ram != NULL) {
+      if(skipSaveGameBattery) {
+        utilGzSeek(gzFile, gbTAMA5ramSize, SEEK_CUR);
+      } else {
+        utilGzRead(gzFile, gbTAMA5ram, gbTAMA5ramSize);
+      }
+    }
     utilGzRead(gzFile, &gbDataMMM01, sizeof(gbDataMMM01));
   }
 
@@ -3728,14 +3733,22 @@ static bool gbReadSaveState(gzFile gzFile)
   utilGzRead(gzFile, &gbMemory[0x8000], 0x8000);
 
   if(gbRamSize && gbRam) {
-    if (version < 11)
-      utilGzRead(gzFile, gbRam, gbRamSize);
+    if(version < 11)
+      if(skipSaveGameBattery) {
+        utilGzSeek(gzFile, gbRamSize, SEEK_CUR); //skip
+      } else {
+        utilGzRead(gzFile, gbRam, gbRamSize); //read
+      }
     else
     {
       int ramSize = utilReadInt(gzFile);
-      utilGzRead(gzFile, gbRam, (gbRamSize>ramSize) ? ramSize : gbRamSize);
-      if (ramSize>gbRamSize)
-        gzseek(gzFile,ramSize-gbRamSize,SEEK_CUR);
+      if(skipSaveGameBattery) {
+        utilGzSeek(gzFile, (gbRamSize>ramSize) ? ramSize : gbRamSize, SEEK_CUR); //skip
+      } else {
+        utilGzRead(gzFile, gbRam, (gbRamSize>ramSize) ? ramSize : gbRamSize); //read
+      }
+      if(ramSize>gbRamSize)
+        utilGzSeek(gzFile,ramSize-gbRamSize,SEEK_CUR);
     }
   }
 
