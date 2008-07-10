@@ -12,37 +12,6 @@
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
-/////////////////////////////////////////////////////////////////////////////
-// German (Germany) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
-#ifdef _WIN32
-LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
-#pragma code_page(1252)
-#endif //_WIN32
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.\0"
-END
-
-
-3 TEXTINCLUDE 
-BEGIN
-    "\r\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-#endif    // German (Germany) resources
-/////////////////////////////////////////////////////////////////////////////
-
 
 /////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
@@ -2233,6 +2202,8 @@ BEGIN
                             "XAudio2: Creating mastering voice failed!"
     IDS_XAUDIO2_CANNOT_CREATE_SOURCEVOICE 
                             "XAudio2: Creating source voice failed!"
+    IDS_CHEATS_DISABLED     "Cheats disabled"
+    IDS_CHEATS_ENABLED      "Cheats enabled"
 END
 
 #endif    // English (U.S.) resources
