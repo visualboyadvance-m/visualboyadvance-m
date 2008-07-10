@@ -152,6 +152,7 @@ void MainWnd::OnUpdateCheatsSavecheatlist(CCmdUI* pCmdUI)
 void MainWnd::OnCheatsDisablecheats()
 {
   cheatsEnabled = !cheatsEnabled;
+  systemScreenMessage(winResLoadString(cheatsEnabled ? IDS_CHEATS_ENABLED : IDS_CHEATS_DISABLED));
 }
 
 void MainWnd::OnUpdateCheatsDisablecheats(CCmdUI* pCmdUI)
