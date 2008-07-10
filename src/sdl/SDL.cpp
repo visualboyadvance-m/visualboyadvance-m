@@ -68,6 +68,11 @@
 # include <getopt.h>
 #endif // ! __GNUC__
 
+#ifdef WITH_LIRC
+#include <sys/poll.h>
+#include <lirc/lirc_client.h>
+#endif
+
 extern bool soundEcho;
 extern bool soundLowPass;
 extern bool soundReverse;
