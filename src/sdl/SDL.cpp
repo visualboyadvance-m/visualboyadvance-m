@@ -166,7 +166,7 @@ char* homeDir = NULL;
 #define DOT_DIR ".vbam"
 
 static char *rewindMemory = NULL;
-static int *rewindSerials = NULL; 
+static int *rewindSerials = NULL;
 static int rewindPos = 0;
 static int rewindSerial = 0;
 static int rewindTopPos = 0;
@@ -362,12 +362,168 @@ struct option sdlOptions[] = {
   { NULL, no_argument, NULL, 0 }
 };
 
+#ifdef WITH_LIRC
+//LIRC code
+bool LIRCEnabled = false;
+int  LIRCfd = 0;
+static struct lirc_config *LIRCConfigInfo;
+
+void StartLirc(void)
+{
+  fprintf(stderr, "Trying to start LIRC: ");
+  //init LIRC and Record output
+  LIRCfd = lirc_init( "vbam",1 );
+  if( LIRCfd == -1 ) {
+    //it failed
+    fprintf(stderr, "Failed\n");
+  } else {
+    fprintf(stderr, "Success\n");
+    //read the config file
+    char LIRCConfigLoc[2048];
+    sprintf(LIRCConfigLoc, "%s/%s/%s", homeDir, DOT_DIR, "lircrc");
+    fprintf(stderr, "LIRC Config file:");
+    if( lirc_readconfig(LIRCConfigLoc,&LIRCConfigInfo,NULL) == 0 ) {
+      //check vbam dir for lircrc
+      fprintf(stderr, "Loaded (%s)\n", LIRCConfigLoc );
+    } else if( lirc_readconfig(NULL,&LIRCConfigInfo,NULL) == 0 ) {
+      //check default lircrc location
+      fprintf(stderr, "Loaded\n");
+    } else {
+      //it all failed
+      fprintf(stderr, "Failed\n");
+      LIRCEnabled = false;
+    }
+    LIRCEnabled = true;
+  }
+}
+
+void StopLirc(void)
+{
+  //did we actually get lirc working at the start
+  if(LIRCEnabled) {
+    //if so free the config and deinit lirc
+    fprintf(stderr, "Shuting down LIRC\n");
+    lirc_freeconfig(LIRCConfigInfo);
+    lirc_deinit();
+    //set lirc enabled to false
+    LIRCEnabled = false;
+  }
+}
+#endif
+
+
 u32 sdlFromHex(char *s)
 {
   u32 value;
   sscanf(s, "%x", &value);
   return value;
 }
+
+#ifdef WITH_LIRC
+void lircCheckInput(void)
+{
+  if(LIRCEnabled) {
+    //setup a poll (poll.h)
+    struct pollfd pollLIRC;
+    //values fd is the pointer gotten from lircinit and events is what way
+    pollLIRC.fd = LIRCfd;
+    pollLIRC.events = POLLIN;
+    //run the poll
+    if( poll( &pollLIRC, 1, 0 ) > 0 ) {
+      //poll retrieved something
+      char *CodeLIRC;
+      char *CmdLIRC;
+      int ret; //dunno???
+      if( lirc_nextcode(&CodeLIRC) == 0 && CodeLIRC != NULL ) {
+        //retrieve the commands
+        while( ( ret = lirc_code2char( LIRCConfigInfo, CodeLIRC, &CmdLIRC ) ) == 0 && CmdLIRC != NULL ) {
+          //change the text to uppercase
+          char *CmdLIRC_Pointer = CmdLIRC;
+          while(*CmdLIRC_Pointer != '\0') {
+            *CmdLIRC_Pointer = toupper(*CmdLIRC_Pointer);
+            CmdLIRC_Pointer++;
+          }
+
+          if( strcmp( CmdLIRC, "QUIT" ) == 0 ) {
+            emulating = 0;
+          } else if( strcmp( CmdLIRC, "PAUSE" ) == 0 ) {
+            paused = !paused;
+            SDL_PauseAudio(paused);
+            if(paused) wasPaused = true;
+            systemConsoleMessage( paused?"Pause on":"Pause off" );
+            systemScreenMessage( paused?"Pause on":"Pause off" );
+          } else if( strcmp( CmdLIRC, "RESET" ) == 0 ) {
+            if(emulating) {
+              emulator.emuReset();
+              systemScreenMessage("Reset");
+            }
+          } else if( strcmp( CmdLIRC, "MUTE" ) == 0 ) {
+            if (sdlSoundToggledOff) { // was off
+              // restore saved state
+              soundEnable(sdlSoundToggledOff);
+              soundDisable(~sdlSoundToggledOff);
+              sdlSoundToggledOff = 0;
+              systemConsoleMessage("Sound toggled on");
+              systemScreenMessage("Sound toggled on");
+            } else { // was on
+              sdlSoundToggledOff= soundGetEnable();
+              soundEnable(0);
+              soundDisable(sdlSoundToggledOff);
+              systemConsoleMessage("Sound toggled off");
+              systemScreenMessage("Sound toggled off");
+              if (!sdlSoundToggledOff) {
+                // if ON actually meant "all channels off" for some reason,
+                // remember that on "toggle to ON" we should unmute everything
+                sdlSoundToggledOff = 0x3ff;
+              }
+            }
+          } else if( strcmp( CmdLIRC, "VOLUP" ) == 0 ) {
+            soundVolume++;
+            if( soundVolume > 3 ) soundVolume = 3;
+            else systemScreenMessage("Sound volume Increased");
+          } else if( strcmp( CmdLIRC, "VOLDOWN" ) == 0 ) {
+            soundVolume--;
+            if( soundVolume < 0 ) soundVolume = 0;
+            else systemScreenMessage("Sound volume Decreased");
+          } else if( strcmp( CmdLIRC, "LOADSTATE" ) == 0 ) {
+            sdlReadState(saveSlotPosition);
+          } else if( strcmp( CmdLIRC, "SAVESTATE" ) == 0 ) {
+            sdlWriteState(saveSlotPosition);
+          } else if( strcmp( CmdLIRC, "1" ) == 0 ) {
+            saveSlotPosition = 0;
+            systemScreenMessage("Selected State 1");
+          } else if( strcmp( CmdLIRC, "2" ) == 0 ) {
+            saveSlotPosition = 1;
+            systemScreenMessage("Selected State 2");
+          } else if( strcmp( CmdLIRC, "3" ) == 0 ) {
+            saveSlotPosition = 2;
+            systemScreenMessage("Selected State 3");
+          } else if( strcmp( CmdLIRC, "4" ) == 0 ) {
+            saveSlotPosition = 3;
+            systemScreenMessage("Selected State 4");
+          } else if( strcmp( CmdLIRC, "5" ) == 0 ) {
+            saveSlotPosition = 4;
+            systemScreenMessage("Selected State 5");
+          } else if( strcmp( CmdLIRC, "6" ) == 0 ) {
+            saveSlotPosition = 5;
+           systemScreenMessage("Selected State 6");
+          } else if( strcmp( CmdLIRC, "7" ) == 0 ) {
+           saveSlotPosition = 6;
+            systemScreenMessage("Selected State 7");
+          } else if( strcmp( CmdLIRC, "8" ) == 0 ) {
+            saveSlotPosition = 7;
+            systemScreenMessage("Selected State 8");
+          } else {
+            //do nothing
+          }
+        }
+        //we dont need this code nomore
+        free(CodeLIRC);
+      }
+    }
+  }
+}
+#endif
 
 #ifdef __MSC__
 #define stat _stat
@@ -1654,7 +1810,7 @@ void sdlPollEvents()
 		systemConsoleMessage(cheatsEnabled?"Cheats on":"Cheats off");
 	}
 	break;
-	
+
       case SDLK_s:
         if(!(event.key.keysym.mod & MOD_NOCTRL) &&
            (event.key.keysym.mod & KMOD_CTRL)
@@ -2313,6 +2469,9 @@ int main(int argc, char **argv)
     systemMessage(0, "Failed to init joystick support: %s", SDL_GetError());
   }
 
+#ifdef WITH_LIRC
+  StartLirc();
+#endif
   sdlCheckKeys();
 
   if(cartridgeType == 0) {
@@ -2416,6 +2575,9 @@ int main(int argc, char **argv)
       SDL_Delay(500);
     }
     sdlPollEvents();
+    #ifdef WITH_LIRC
+   lircCheckInput();
+   #endif
     if(mouseCounter) {
       mouseCounter--;
       if(mouseCounter == 0)
@@ -2442,6 +2604,10 @@ int main(int argc, char **argv)
     free(filterPix);
     filterPix = NULL;
  }
+
+#ifdef WITH_LIRC
+  StopLirc();
+#endif
 
   SDL_Quit();
   return 0;
