@@ -23,6 +23,7 @@
 
 
 #define NBUFFERS 4
+#define STEREO_UPMIXING
 
 // MFC
 #include "stdafx.h"
@@ -215,6 +216,69 @@ bool XAudio2_Output::init()
 		failed = true;
 		return false;
 	}
+
+
+#ifdef STEREO_UPMIXING
+	// set up stereo upmixing
+	XAUDIO2_DEVICE_DETAILS dd;
+	ZeroMemory( &dd, sizeof( dd ) );
+	hr = xaud->GetDeviceDetails( 0, &dd );
+	ASSERT( hr == S_OK );
+	float *matrix = NULL;
+	matrix = (float*)malloc( sizeof( float ) * 2 * dd.OutputFormat.Format.nChannels );
+	switch( dd.OutputFormat.Format.nChannels ) {
+		case 4: // 4.0
+//Speaker \ Left Source           Right Source
+/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
+/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
+/*Back  L*/	matrix[4] = 1.0000f;  matrix[5] = 0.0000f;
+/*Back  R*/	matrix[6] = 0.0000f;  matrix[7] = 1.0000f;
+			break;
+		case 5: // 5.0
+//Speaker \ Left Source           Right Source
+/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
+/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
+/*Front C*/	matrix[4] = 0.7071f;  matrix[5] = 0.7071f;
+/*Side  L*/	matrix[6] = 1.0000f;  matrix[7] = 0.0000f;
+/*Side  R*/	matrix[8] = 0.0000f;  matrix[9] = 1.0000f;
+			break;
+		case 6: // 5.1
+//Speaker \ Left Source           Right Source
+/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
+/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
+/*Front C*/	matrix[4] = 0.7071f;  matrix[5] = 0.7071f;
+/*LFE    */	matrix[6] = 0.0000f;  matrix[7] = 0.0000f;
+/*Side  L*/	matrix[8] = 1.0000f;  matrix[9] = 0.0000f;
+/*Side  R*/	matrix[10] = 0.0000f;  matrix[11] = 1.0000f;
+			break;
+		case 7: // 6.1
+//Speaker \ Left Source           Right Source
+/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
+/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
+/*Front C*/	matrix[4] = 0.7071f;  matrix[5] = 0.7071f;
+/*LFE    */	matrix[6] = 0.0000f;  matrix[7] = 0.0000f;
+/*Side  L*/	matrix[8] = 1.0000f;  matrix[9] = 0.0000f;
+/*Side  R*/	matrix[10] = 0.0000f;  matrix[11] = 1.0000f;
+/*Back  C*/	matrix[12] = 0.7071f;  matrix[13] = 0.7071f;
+			break;
+		case 8: // 7.1
+//Speaker \ Left Source           Right Source
+/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
+/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
+/*Front C*/	matrix[4] = 0.7071f;  matrix[5] = 0.7071f;
+/*LFE    */	matrix[6] = 0.0000f;  matrix[7] = 0.0000f;
+/*Back  L*/	matrix[8] = 1.0000f;  matrix[9] = 0.0000f;
+/*Back  R*/	matrix[10] = 0.0000f;  matrix[11] = 1.0000f;
+/*Side  L*/	matrix[12] = 1.0000f;  matrix[13] = 0.0000f;
+/*Side  R*/	matrix[14] = 0.0000f;  matrix[15] = 1.0000f;
+			break;
+	}
+	hr = sVoice->SetOutputMatrix( NULL, 2, dd.OutputFormat.Format.nChannels, matrix );
+	ASSERT( hr == S_OK );
+	free( matrix );
+	matrix = NULL;
+#endif
+
 
 	hr = sVoice->Start( 0 );
 	ASSERT( hr == S_OK );
