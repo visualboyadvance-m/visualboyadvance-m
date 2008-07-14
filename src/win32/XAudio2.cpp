@@ -136,13 +136,15 @@ XAudio2_Output::~XAudio2_Output()
 
 	if( sVoice ) {
 		if( playing ) {
-			sVoice->Stop( 0 );
+			HRESULT hr = sVoice->Stop( 0 );
+			ASSERT( hr == S_OK );
 		}
 		sVoice->DestroyVoice();
 	}
 
 	if( buffers ) {
 		free( buffers );
+		buffers = NULL;
 	}
 
 	if( mVoice ) {
@@ -151,6 +153,7 @@ XAudio2_Output::~XAudio2_Output()
 
 	if( xaud ) {
 		xaud->Release();
+		xaud = NULL;
 	}
 }
 
@@ -159,34 +162,15 @@ bool XAudio2_Output::init()
 {
 	if( failed || initialized ) return false;
 
-	// Initialize XAudio2 using COM
 	HRESULT hr;
 
-	hr = CoCreateInstance(
+	// Initialize XAudio2
+	UINT32 Flags = 0;
 #ifdef _DEBUG
-		__uuidof( XAudio2_Debug ),
-#else
-		__uuidof( XAudio2 ),
+	Flags = XAUDIO2_DEBUG_ENGINE;
 #endif
-		NULL,
-		CLSCTX_INPROC_SERVER,
-		__uuidof( IXAudio2 ),
-		(LPVOID *)&xaud
-		);
-	if( hr != S_OK ) {
-		systemMessage( IDS_XAUDIO2_FAILURE, NULL );
-		failed = true;
-		return false;
-	}
 
-	hr = xaud->Initialize(
-#ifdef _DEBUG
-		XAUDIO2_DEBUG_ENGINE,
-#else
-		0,
-#endif
-		XAUDIO2_DEFAULT_PROCESSOR
-		);
+	hr = XAudio2Create( &xaud, Flags );
 	if( hr != S_OK ) {
 		systemMessage( IDS_XAUDIO2_FAILURE, NULL );
 		failed = true;
@@ -200,10 +184,10 @@ bool XAudio2_Output::init()
 	// then multiply it with the size of a sample frame (16 bit * stereo)
 	soundBufferLen = ( freq / 60 ) * 4;
 
-	// create own buffers because sound data must not be manipulated
-	// by the audio emulation core while it is still being played back
+	// create own buffers to store sound data because it must not be
+	// manipulated while the voice plays from it
 	buffers = (BYTE *)malloc( ( NBUFFERS + 1 ) * soundBufferLen );
-	// + 1 because we need one temporary buffer when all others are still playing
+	// + 1 because we need one temporary buffer when all others are in use
 
 	WAVEFORMATEX wfx;
 	ZeroMemory( &wfx, sizeof( wfx ) );
@@ -215,26 +199,25 @@ bool XAudio2_Output::init()
 	wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
 
 
-	// Create Sound Receiver
-	hr = xaud->CreateMasteringVoice( &mVoice, 2, freq );
-
-	if( FAILED( hr ) ) {
+	// create sound receiver
+	hr = xaud->CreateMasteringVoice( &mVoice );
+	if( hr != S_OK ) {
 		systemMessage( IDS_XAUDIO2_CANNOT_CREATE_MASTERINGVOICE, NULL );
 		failed = true;
 		return false;
 	}
 
 
-	// Create Sound Emitter
+	// create sound emitter
 	hr = xaud->CreateSourceVoice( &sVoice, &wfx, 0, 4.0f, &notify );
-
-	if( FAILED( hr ) ) {
+	if( hr != S_OK ) {
 		systemMessage( IDS_XAUDIO2_CANNOT_CREATE_SOURCEVOICE, NULL );
 		failed = true;
 		return false;
 	}
 
-	sVoice->Start( 0 );
+	hr = sVoice->Start( 0 );
+	ASSERT( hr == S_OK );
 	playing = true;
 
 
@@ -282,9 +265,10 @@ void XAudio2_Output::write()
 	buf.pAudioData = &buffers[ currentBuffer * soundBufferLen ];
 
 	currentBuffer++;
-	currentBuffer %= ( NBUFFERS + 1 );
+	currentBuffer %= ( NBUFFERS + 1 ); // + 1 because we need one temporary buffer
 
-	sVoice->SubmitSourceBuffer( &buf ); // send buffer to queue
+	HRESULT hr = sVoice->SubmitSourceBuffer( &buf ); // send buffer to queue
+	ASSERT( hr == S_OK );
 }
 
 
@@ -293,7 +277,8 @@ void XAudio2_Output::pause()
 	if( !initialized || failed ) return;
 
 	if( playing ) {
-		sVoice->Stop( 0 );
+		HRESULT hr = sVoice->Stop( 0 );
+		ASSERT( hr == S_OK );
 		playing = false;
 	}
 }
@@ -304,7 +289,8 @@ void XAudio2_Output::resume()
 	if( !initialized || failed ) return;
 
 	if( !playing ) {
-		sVoice->Start( 0 );
+		HRESULT hr = sVoice->Start( 0 );
+		ASSERT( hr == S_OK );
 		playing = true;
 	}
 }
@@ -315,7 +301,8 @@ void XAudio2_Output::reset()
 	if( !initialized || failed ) return;
 
 	if( playing ) {
-		sVoice->Stop( 0 );
+		HRESULT hr = sVoice->Stop( 0 );
+		ASSERT( hr == S_OK );
 	}
 
 	sVoice->FlushSourceBuffers();
@@ -329,7 +316,8 @@ void XAudio2_Output::setThrottle( unsigned short throttle )
 	if( !initialized || failed ) return;
 
 	if( throttle == 0 ) throttle = 100;
-	sVoice->SetFrequencyRatio( (float)throttle / 100.0f );
+	HRESULT hr = sVoice->SetFrequencyRatio( (float)throttle / 100.0f );
+	ASSERT( hr == S_OK );
 }
 
 
