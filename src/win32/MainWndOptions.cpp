@@ -33,6 +33,7 @@
 #include "WinResUtil.h"
 #include "SelectPlugin.h"
 #include "OALConfig.h"
+#include "XAudio2_Config.h"
 #include "BIOSDialog.h"
 
 #include "../System.h"
@@ -1825,6 +1826,36 @@ void MainWnd::OnOutputapiOalconfiguration()
 void MainWnd::OnUpdateOutputapiOalconfiguration(CCmdUI *pCmdUI)
 {
 #ifndef NO_OAL
+	pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
+#else
+	pCmdUI->Enable( FALSE );
+#endif
+}
+
+void MainWnd::OnOutputapiXaudio2config()
+{
+#ifndef NO_XAUDIO2
+	XAudio2_Config dlg;
+
+	dlg.m_selected_device_index = theApp.xa2Device;
+	dlg.m_buffer_count = theApp.xa2BufferCount;
+	dlg.m_enable_upmixing = theApp.xa2Upmixing;
+
+	if( dlg.DoModal() == IDOK ) {
+		systemSoundShutdown();
+
+		theApp.xa2Device = dlg.m_selected_device_index;
+		theApp.xa2BufferCount = dlg.m_buffer_count;
+		theApp.xa2Upmixing = dlg.m_enable_upmixing;
+
+		systemSoundInit();
+	}
+#endif
+}
+
+void MainWnd::OnUpdateOutputapiXaudio2config(CCmdUI *pCmdUI)
+{
+#ifndef NO_XAUDIO2
 	pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
 #else
 	pCmdUI->Enable( FALSE );

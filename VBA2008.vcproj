@@ -744,6 +744,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\win32\OALConfig.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\win32\OamView.cpp"
 					>
 				</File>
@@ -793,6 +797,10 @@
 				</File>
 				<File
 					RelativePath=".\src\win32\WinResUtil.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\win32\XAudio2_Config.cpp"
 					>
 				</File>
 				<File
@@ -897,10 +905,6 @@
 				</File>
 				<File
 					RelativePath=".\src\win32\LoadOAL.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\win32\OALConfig.cpp"
 					>
 				</File>
 				<File
@@ -1270,6 +1274,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\win32\OALConfig.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\win32\OamView.h"
 					>
 				</File>
@@ -1326,6 +1334,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\win32\XAudio2_Config.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\win32\ZoomControl.h"
 					>
 				</File>
@@ -1379,10 +1391,6 @@
 				</File>
 				<File
 					RelativePath=".\src\win32\Input.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\win32\OALConfig.h"
 					>
 				</File>
 				<File

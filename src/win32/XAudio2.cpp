@@ -21,10 +21,6 @@
 
 #ifndef NO_XAUDIO2
 
-
-#define NBUFFERS 4
-#define STEREO_UPMIXING
-
 // MFC
 #include "stdafx.h"
 
@@ -32,7 +28,7 @@
 #include "Sound.h"
 
 // XAudio2
-#include <Xaudio2.h>
+#include <xaudio2.h>
 
 // Internals
 #include "../Sound.h" // for soundBufferLen, soundFinalWave and soundQuality
@@ -101,6 +97,7 @@ private:
 	bool   initialized;
 	bool   playing;
 	UINT32 freq;
+	UINT32 bufferCount;
 	BYTE  *buffers;
 	int    currentBuffer;
 
@@ -120,6 +117,7 @@ XAudio2_Output::XAudio2_Output()
 	initialized = false;
 	playing = false;
 	freq = 0;
+	bufferCount = theApp.xa2BufferCount;
 	buffers = NULL;
 	currentBuffer = 0;
 
@@ -166,12 +164,12 @@ bool XAudio2_Output::init()
 	HRESULT hr;
 
 	// Initialize XAudio2
-	UINT32 Flags = 0;
+	UINT32 flags = 0;
 #ifdef _DEBUG
-	Flags = XAUDIO2_DEBUG_ENGINE;
+	flags = XAUDIO2_DEBUG_ENGINE;
 #endif
 
-	hr = XAudio2Create( &xaud, Flags );
+	hr = XAudio2Create( &xaud, flags );
 	if( hr != S_OK ) {
 		systemMessage( IDS_XAUDIO2_FAILURE, NULL );
 		failed = true;
@@ -187,7 +185,7 @@ bool XAudio2_Output::init()
 
 	// create own buffers to store sound data because it must not be
 	// manipulated while the voice plays from it
-	buffers = (BYTE *)malloc( ( NBUFFERS + 1 ) * soundBufferLen );
+	buffers = (BYTE *)malloc( ( bufferCount + 1 ) * soundBufferLen );
 	// + 1 because we need one temporary buffer when all others are in use
 
 	WAVEFORMATEX wfx;
@@ -201,7 +199,13 @@ bool XAudio2_Output::init()
 
 
 	// create sound receiver
-	hr = xaud->CreateMasteringVoice( &mVoice );
+	hr = xaud->CreateMasteringVoice(
+		&mVoice,
+		XAUDIO2_DEFAULT_CHANNELS,
+		XAUDIO2_DEFAULT_SAMPLERATE,
+		0,
+		theApp.xa2Device,
+		NULL );
 	if( hr != S_OK ) {
 		systemMessage( IDS_XAUDIO2_CANNOT_CREATE_MASTERINGVOICE, NULL );
 		failed = true;
@@ -218,66 +222,66 @@ bool XAudio2_Output::init()
 	}
 
 
-#ifdef STEREO_UPMIXING
-	// set up stereo upmixing
-	XAUDIO2_DEVICE_DETAILS dd;
-	ZeroMemory( &dd, sizeof( dd ) );
-	hr = xaud->GetDeviceDetails( 0, &dd );
-	ASSERT( hr == S_OK );
-	float *matrix = NULL;
-	matrix = (float*)malloc( sizeof( float ) * 2 * dd.OutputFormat.Format.nChannels );
-	switch( dd.OutputFormat.Format.nChannels ) {
-		case 4: // 4.0
-//Speaker \ Left Source           Right Source
-/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
-/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
-/*Back  L*/	matrix[4] = 1.0000f;  matrix[5] = 0.0000f;
-/*Back  R*/	matrix[6] = 0.0000f;  matrix[7] = 1.0000f;
-			break;
-		case 5: // 5.0
-//Speaker \ Left Source           Right Source
-/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
-/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
-/*Front C*/	matrix[4] = 0.7071f;  matrix[5] = 0.7071f;
-/*Side  L*/	matrix[6] = 1.0000f;  matrix[7] = 0.0000f;
-/*Side  R*/	matrix[8] = 0.0000f;  matrix[9] = 1.0000f;
-			break;
-		case 6: // 5.1
-//Speaker \ Left Source           Right Source
-/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
-/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
-/*Front C*/	matrix[4] = 0.7071f;  matrix[5] = 0.7071f;
-/*LFE    */	matrix[6] = 0.0000f;  matrix[7] = 0.0000f;
-/*Side  L*/	matrix[8] = 1.0000f;  matrix[9] = 0.0000f;
-/*Side  R*/	matrix[10] = 0.0000f;  matrix[11] = 1.0000f;
-			break;
-		case 7: // 6.1
-//Speaker \ Left Source           Right Source
-/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
-/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
-/*Front C*/	matrix[4] = 0.7071f;  matrix[5] = 0.7071f;
-/*LFE    */	matrix[6] = 0.0000f;  matrix[7] = 0.0000f;
-/*Side  L*/	matrix[8] = 1.0000f;  matrix[9] = 0.0000f;
-/*Side  R*/	matrix[10] = 0.0000f;  matrix[11] = 1.0000f;
-/*Back  C*/	matrix[12] = 0.7071f;  matrix[13] = 0.7071f;
-			break;
-		case 8: // 7.1
-//Speaker \ Left Source           Right Source
-/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
-/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
-/*Front C*/	matrix[4] = 0.7071f;  matrix[5] = 0.7071f;
-/*LFE    */	matrix[6] = 0.0000f;  matrix[7] = 0.0000f;
-/*Back  L*/	matrix[8] = 1.0000f;  matrix[9] = 0.0000f;
-/*Back  R*/	matrix[10] = 0.0000f;  matrix[11] = 1.0000f;
-/*Side  L*/	matrix[12] = 1.0000f;  matrix[13] = 0.0000f;
-/*Side  R*/	matrix[14] = 0.0000f;  matrix[15] = 1.0000f;
-			break;
+	if( theApp.xa2Upmixing ) {
+		// set up stereo upmixing
+		XAUDIO2_DEVICE_DETAILS dd;
+		ZeroMemory( &dd, sizeof( dd ) );
+		hr = xaud->GetDeviceDetails( 0, &dd );
+		ASSERT( hr == S_OK );
+		float *matrix = NULL;
+		matrix = (float*)malloc( sizeof( float ) * 2 * dd.OutputFormat.Format.nChannels );
+		switch( dd.OutputFormat.Format.nChannels ) {
+			case 4: // 4.0
+	//Speaker \ Left Source           Right Source
+	/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
+	/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
+	/*Back  L*/	matrix[4] = 1.0000f;  matrix[5] = 0.0000f;
+	/*Back  R*/	matrix[6] = 0.0000f;  matrix[7] = 1.0000f;
+				break;
+			case 5: // 5.0
+	//Speaker \ Left Source           Right Source
+	/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
+	/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
+	/*Front C*/	matrix[4] = 0.7071f;  matrix[5] = 0.7071f;
+	/*Side  L*/	matrix[6] = 1.0000f;  matrix[7] = 0.0000f;
+	/*Side  R*/	matrix[8] = 0.0000f;  matrix[9] = 1.0000f;
+				break;
+			case 6: // 5.1
+	//Speaker \ Left Source           Right Source
+	/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
+	/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
+	/*Front C*/	matrix[4] = 0.7071f;  matrix[5] = 0.7071f;
+	/*LFE    */	matrix[6] = 0.0000f;  matrix[7] = 0.0000f;
+	/*Side  L*/	matrix[8] = 1.0000f;  matrix[9] = 0.0000f;
+	/*Side  R*/	matrix[10] = 0.0000f;  matrix[11] = 1.0000f;
+				break;
+			case 7: // 6.1
+	//Speaker \ Left Source           Right Source
+	/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
+	/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
+	/*Front C*/	matrix[4] = 0.7071f;  matrix[5] = 0.7071f;
+	/*LFE    */	matrix[6] = 0.0000f;  matrix[7] = 0.0000f;
+	/*Side  L*/	matrix[8] = 1.0000f;  matrix[9] = 0.0000f;
+	/*Side  R*/	matrix[10] = 0.0000f;  matrix[11] = 1.0000f;
+	/*Back  C*/	matrix[12] = 0.7071f;  matrix[13] = 0.7071f;
+				break;
+			case 8: // 7.1
+	//Speaker \ Left Source           Right Source
+	/*Front L*/	matrix[0] = 1.0000f;  matrix[1] = 0.0000f;
+	/*Front R*/	matrix[2] = 0.0000f;  matrix[3] = 1.0000f;
+	/*Front C*/	matrix[4] = 0.7071f;  matrix[5] = 0.7071f;
+	/*LFE    */	matrix[6] = 0.0000f;  matrix[7] = 0.0000f;
+	/*Back  L*/	matrix[8] = 1.0000f;  matrix[9] = 0.0000f;
+	/*Back  R*/	matrix[10] = 0.0000f;  matrix[11] = 1.0000f;
+	/*Side  L*/	matrix[12] = 1.0000f;  matrix[13] = 0.0000f;
+	/*Side  R*/	matrix[14] = 0.0000f;  matrix[15] = 1.0000f;
+				break;
+		}
+		hr = sVoice->SetOutputMatrix( NULL, 2, dd.OutputFormat.Format.nChannels, matrix );
+		ASSERT( hr == S_OK );
+		free( matrix );
+		matrix = NULL;
 	}
-	hr = sVoice->SetOutputMatrix( NULL, 2, dd.OutputFormat.Format.nChannels, matrix );
-	ASSERT( hr == S_OK );
-	free( matrix );
-	matrix = NULL;
-#endif
 
 
 	hr = sVoice->Start( 0 );
@@ -298,9 +302,9 @@ void XAudio2_Output::write()
 	while( true ) {
 		sVoice->GetState( &vState );
 
-		ASSERT( vState.BuffersQueued <= NBUFFERS );
+		ASSERT( vState.BuffersQueued <= bufferCount );
 
-		if( vState.BuffersQueued < NBUFFERS ) {
+		if( vState.BuffersQueued < bufferCount ) {
 			if( vState.BuffersQueued == 0 ) {
 				// buffers ran dry
 				if( systemVerbose & VERBOSE_SOUNDOUTPUT ) {
@@ -329,7 +333,7 @@ void XAudio2_Output::write()
 	buf.pAudioData = &buffers[ currentBuffer * soundBufferLen ];
 
 	currentBuffer++;
-	currentBuffer %= ( NBUFFERS + 1 ); // + 1 because we need one temporary buffer
+	currentBuffer %= ( bufferCount + 1 ); // + 1 because we need one temporary buffer
 
 	HRESULT hr = sVoice->SubmitSourceBuffer( &buf ); // send buffer to queue
 	ASSERT( hr == S_OK );
