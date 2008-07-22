@@ -294,11 +294,16 @@ VBA::VBA()
   oalDevice = NULL;
   oalBufferCount = 5;
 #endif
-  iconic = false;
+#ifndef NO_XAUDIO2
+  xa2Device = 0;
+  xa2BufferCount = 4;
+  xa2Upmixing = false;
+#endif
 #ifndef NO_D3D
   d3dFilter = 0;
   d3dMotionBlur = false;
 #endif
+  iconic = false;
   glFilter = 0;
   regEnabled = false;
   pauseWhenInactive = true;
@@ -1795,6 +1800,12 @@ void VBA::loadSettings()
   oalBufferCount = regQueryDwordValue( "oalBufferCount", 5 );
 #endif
 
+#ifndef NO_XAUDIO2
+  xa2Device = regQueryDwordValue( "xa2Device", 0 );
+  xa2BufferCount = regQueryDwordValue( "xa2BufferCount", 4 );
+  xa2Upmixing = ( 1 == regQueryDwordValue( "xa2Upmixing", 0 ) );
+#endif
+
   if( ( maxCpuCores == 1 ) && filterMT ) {
 	  // multi-threading use useless for just one core
 	  filterMT = false;
@@ -2688,6 +2699,12 @@ void VBA::saveSettings()
 #ifndef NO_OAL
   regSetStringValue( "oalDevice", oalDevice );
   regSetDwordValue( "oalBufferCount", oalBufferCount );
+#endif
+
+#ifndef NO_XAUDIO2
+  regSetDwordValue( "xa2Device", xa2Device );
+  regSetDwordValue( "xa2BufferCount", xa2BufferCount );
+  regSetDwordValue( "xa2Upmixing", xa2Upmixing ? 1 : 0 );
 #endif
 }
 

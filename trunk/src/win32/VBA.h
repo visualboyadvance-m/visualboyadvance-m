@@ -157,11 +157,16 @@ class VBA : public CWinApp
   TCHAR *oalDevice;
   int oalBufferCount;
 #endif
-  bool iconic;
+#ifndef NO_XAUDIO2
+  UINT32 xa2Device;
+  UINT32 xa2BufferCount;
+  bool xa2Upmixing;
+#endif
 #ifndef NO_D3D
   int d3dFilter;
   bool d3dMotionBlur;
 #endif
+  bool iconic;
   int glFilter;
   bool dinputKeyFocus;
   bool pauseWhenInactive;
