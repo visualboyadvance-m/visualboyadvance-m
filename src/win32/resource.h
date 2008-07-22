@@ -100,6 +100,7 @@
 #define IDD_OAL_CONFIG                  160
 #define IDD_BIOS                        161
 #define IDD_FULLSCREEN                  162
+#define IDD_XAUDIO2_CONFIG              163
 #define IDC_R0                          1000
 #define IDC_EDIT_UP                     1000
 #define IDC_R1                          1001
@@ -534,6 +535,10 @@
 #define IDC_COMBO_DEVICE                1283
 #define IDC_CHECK1                      1284
 #define IDC_ALWAYSLASTROMDIR            1284
+#define IDC_CHECK_UPMIX                 1284
+#define IDC_COMBO_DEV                   1285
+#define IDC_SLIDER_BUFFER               1286
+#define IDC_INFO_BUFFER                 1287
 #define IDS_OAL_NODEVICE                2000
 #define IDS_OAL_NODLL                   2001
 #define IDS_AVI_CANNOT_CREATE_AVI       2002
@@ -546,8 +551,9 @@
 #define IDS_XAUDIO2_FAILURE             2009
 #define IDS_XAUDIO2_CANNOT_CREATE_MASTERINGVOICE 2010
 #define IDS_XAUDIO2_CANNOT_CREATE_SOURCEVOICE 2011
-#define IDS_CHEATS_DISABLED             2012
-#define IDS_CHEATS_ENABLED              2013
+#define IDS_XAUDIO2_CANNOT_ENUMERATE_DEVICES 2012
+#define IDS_CHEATS_DISABLED             2013
+#define IDS_CHEATS_ENABLED              2014
 #define ID_HELP_ABOUT                   40001
 #define ID_FILE_EXIT                    40002
 #define ID_OPTIONS_VIDEO_FRAMESKIP_0    40003
@@ -859,14 +865,16 @@
 #define ID_PIXELFILTER_MULTI            40360
 #define ID_EMULATOR_LOADSTATESHOULD     40361
 #define ID_LOADGAME_DONOTCHANGEBATTERYSAVE 40362
+#define ID_OUTPUTAPI_CONFIGURATION40363 40363
+#define ID_OUTPUTAPI_XAUDIO2CONFIG      40364
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        163
-#define _APS_NEXT_COMMAND_VALUE         40363
-#define _APS_NEXT_CONTROL_VALUE         1285
+#define _APS_NEXT_RESOURCE_VALUE        164
+#define _APS_NEXT_COMMAND_VALUE         40365
+#define _APS_NEXT_CONTROL_VALUE         1288
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
 #endif

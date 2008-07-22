@@ -24,57 +24,23 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,8,0,0
- PRODUCTVERSION 1,8,0,0
- FILEFLAGSMASK 0x17L
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904b0"
-        BEGIN
-            VALUE "Comments", "VBA-M comes with NO WARRANTY. Use it at your own risk."
-            VALUE "CompanyName", "http://vba-m.ngemu.com/"
-            VALUE "FileDescription", "GB & GBA emulator for Windows"
-            VALUE "FileVersion", "1, 8, 0, 0"
-            VALUE "InternalName", "VBA-M"
-            VALUE "LegalCopyright", "Copyright © 2008 VBA-M development team"
-            VALUE "OriginalFilename", "VisualBoyAdvance.exe"
-            VALUE "ProductName", "VBA-M - A VisualBoyAdvance Fork"
-            VALUE "ProductVersion", "1, 8, 0, 0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1200
-    END
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_MAINICON            ICON                    "VBA-M.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Dialog
 //
+
+IDD_XAUDIO2_CONFIG DIALOGEX 0, 0, 160, 144
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "XAudio2"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,42,126,54,14
+    PUSHBUTTON      "Cancel",IDCANCEL,102,126,54,14
+    COMBOBOX        IDC_COMBO_DEV,6,18,150,60,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Enable stereo upmixing",IDC_CHECK_UPMIX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,108,150,8
+    LTEXT           "Select device:",IDC_STATIC,6,6,150,8
+    GROUPBOX        "Number of sound buffers:",IDC_STATIC,6,42,150,54
+    CONTROL         "",IDC_SLIDER_BUFFER,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | WS_TABSTOP,12,54,138,24
+    CTEXT           "bufferInfo",IDC_INFO_BUFFER,12,78,138,12,0,WS_EX_DLGMODALFRAME
+END
 
 IDD_OAL_CONFIG DIALOGEX 0, 0, 167, 114
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
@@ -1161,6 +1127,14 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO 
 BEGIN
+    IDD_XAUDIO2_CONFIG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 153
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 137
+    END
+
     IDD_OAL_CONFIG, DIALOG
     BEGIN
         LEFTMARGIN, 7
@@ -1499,6 +1473,55 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,8,0,0
+ PRODUCTVERSION 1,8,0,0
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "VBA-M comes with NO WARRANTY. Use it at your own risk."
+            VALUE "CompanyName", "http://vba-m.ngemu.com/"
+            VALUE "FileDescription", "GB & GBA emulator for Windows"
+            VALUE "FileVersion", "1, 8, 0, 0"
+            VALUE "InternalName", "VBA-M"
+            VALUE "LegalCopyright", "Copyright © 2008 VBA-M development team"
+            VALUE "OriginalFilename", "VisualBoyAdvance.exe"
+            VALUE "ProductName", "VBA-M - A VisualBoyAdvance Fork"
+            VALUE "ProductVersion", "1, 8, 0, 0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MAINICON            ICON                    "VBA-M.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // Menu
 //
 
@@ -1674,6 +1697,7 @@ BEGIN
                 MENUITEM "DirectSound",                 ID_OUTPUTAPI_DIRECTSOUND
                 MENUITEM SEPARATOR
                 MENUITEM "XAudio2",                     ID_OUTPUTAPI_XAUDIO2
+                MENUITEM "  Configuration...",          ID_OUTPUTAPI_XAUDIO2CONFIG
                 MENUITEM SEPARATOR
                 MENUITEM "OpenAL",                      ID_OUTPUTAPI_OPENAL
                 MENUITEM "  Configuration...",          ID_OUTPUTAPI_OALCONFIGURATION
@@ -2202,6 +2226,8 @@ BEGIN
                             "XAudio2: Creating mastering voice failed!"
     IDS_XAUDIO2_CANNOT_CREATE_SOURCEVOICE 
                             "XAudio2: Creating source voice failed!"
+    IDS_XAUDIO2_CANNOT_ENUMERATE_DEVICES 
+                            "XAudio2: Enumerating devices failed!"
     IDS_CHEATS_DISABLED     "Cheats disabled"
     IDS_CHEATS_ENABLED      "Cheats enabled"
 END
