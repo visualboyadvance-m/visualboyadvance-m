@@ -27,6 +27,11 @@ OpenGL files: http://www.opengl.org/registry/
 zlib:         http://zlib.net/
 libpng:       http://libpng.org/pub/png/libpng.html
 
+You can find pre-built versions of zlib & libpng at:
+http://vba-m.ngemu.com/vbam/vbasources/libs/
+Just extract them somewhere and point Visual C++ 2008 to the include & lib folders.
+They are built with the static C runtime (this is what the releases use).
+
 
 
 #################################
