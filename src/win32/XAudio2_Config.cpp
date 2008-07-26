@@ -137,11 +137,19 @@ BOOL XAudio2_Config::OnInitDialog()
 					}
 				}
 			}
-			if( m_combo_dev.GetCount() > 0 ) {
-				if( m_selected_device_index < (UINT32)(m_combo_dev.GetCount()) ) {
-					m_combo_dev.SetCurSel( m_selected_device_index );
+
+			// select the currently configured device {
+			int count = m_combo_dev.GetCount();
+			if( count > 0 ) {
+				for( int i = 0; i < count; i++ ) {
+					if( m_combo_dev.GetItemData( i ) == m_selected_device_index ) {
+						m_combo_dev.SetCurSel( i );
+						break;
+					}
 				}
 			}
+			// }
+
 		}
 		xa->Release();
 		xa = NULL;
