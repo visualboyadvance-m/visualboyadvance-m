@@ -13,6 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 
+
 /////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
 
@@ -34,7 +35,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,42,126,54,14
     PUSHBUTTON      "Cancel",IDCANCEL,102,126,54,14
-    COMBOBOX        IDC_COMBO_DEV,6,18,150,60,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_DEV,6,18,150,60,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Enable stereo upmixing",IDC_CHECK_UPMIX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,108,150,8
     LTEXT           "Select device:",IDC_STATIC,6,6,150,8
     GROUPBOX        "Number of sound buffers:",IDC_STATIC,6,42,150,54
