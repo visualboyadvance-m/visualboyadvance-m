@@ -55,6 +55,8 @@ IF( NOT NO_SDL )
 ENDIF( NOT NO_SDL )
 IF( WITH_LIRC )
         SET( WITHLIRC 1 )
+ELSE( WITH_LIRC )
+        SET( WITHLIRC 0 )
 ENDIF( WITH_LIRC )
 
 # Check that the dependencies are met to build the GTK frontend
@@ -105,8 +107,8 @@ IF ( WIN32 )
 ELSE ( WIN32 )
     SET( CMAKE_ASM_FLAGS "-Isrc/hq/asm/ -O1 -DELF -w-orphan-labels")
 ENDIF ( WIN32 )
-SET( CMAKE_C_FLAGS "-O3 -Wall")
-SET( CMAKE_CXX_FLAGS "-O3 -Wall")
+SET( CMAKE_C_FLAGS "-O3 -mtune=native -Wall")
+SET( CMAKE_CXX_FLAGS "-O3 -mtune=native -Wall")
 
 # Source files definition
 SET(SRC_MAIN
@@ -222,13 +224,17 @@ ELSE(CMAKE_ASM_COMPILER_LOADED AND USE_ASM_SCALERS)
     SET(SRC_HQ ${SRC_HQ_C})
 ENDIF(CMAKE_ASM_COMPILER_LOADED AND USE_ASM_SCALERS)
 
-include_directories(
+INCLUDE_DIRECTORIES(
     ${ZLIB_INCLUDE_DIR}
-    ${GTKMM_INCLUDE_DIRS}
-    ${GLADEMM_INCLUDE_DIRS}
     ${SDL_INCLUDE_DIRS}
-    ${GTKGLMM_INCLUDE_DIRS}
 )
+
+IF( CAN_BUILD_GVBAM )
+    INCLUDE_DIRECTORIES(
+        ${GTKMM_INCLUDE_DIRS}
+        ${GLADEMM_INCLUDE_DIRS}
+    )
+ENDIF( CAN_BUILD_GVBAM )
 
 ADD_LIBRARY (
     vbamcore
@@ -253,15 +259,19 @@ IF( CAN_BUILD_VBAM )
         SET( WIN32_LIBRARIES wsock32 )
     ENDIF( WIN32 )
 
+    IF( WITH_LIRC )
+        SET( LIRC_CLIENT_LIBRARY lirc_client )
+    ENDIF( WITH_LIRC )
+
     TARGET_LINK_LIBRARIES (
         vbam
         vbamcore
-        lirc_client
         ${SDL_LIBRARY}
         ${ZLIB_LIBRARY}
         ${PNG_LIBRARY}
         ${OPENGL_LIBRARY}
         ${WIN32_LIBRARIES}
+        ${LIRC_CLIENT_LIBRARY}
     )
 
     INSTALL(PROGRAMS vbam DESTINATION bin)
