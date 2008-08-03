@@ -45,6 +45,7 @@
 #include "../Util.h"
 #include "../dmg/gb.h"
 #include "../dmg/gbGlobals.h"
+#include "../dmg/gbCheats.h"
 #include "../Cheats.h"
 
 #include "debugger.h"
@@ -68,7 +69,7 @@
 # include <getopt.h>
 #endif // ! __GNUC__
 
-#ifdef WITH_LIRC
+#if WITH_LIRC
 #include <sys/poll.h>
 #include <lirc/lirc_client.h>
 #endif
@@ -362,7 +363,7 @@ struct option sdlOptions[] = {
   { NULL, no_argument, NULL, 0 }
 };
 
-#ifdef WITH_LIRC
+#if WITH_LIRC
 //LIRC code
 bool LIRCEnabled = false;
 int  LIRCfd = 0;
@@ -419,7 +420,7 @@ u32 sdlFromHex(char *s)
   return value;
 }
 
-#ifdef WITH_LIRC
+#if WITH_LIRC
 void lircCheckInput(void)
 {
   if(LIRCEnabled) {
@@ -2469,7 +2470,7 @@ int main(int argc, char **argv)
     systemMessage(0, "Failed to init joystick support: %s", SDL_GetError());
   }
 
-#ifdef WITH_LIRC
+#if WITH_LIRC
   StartLirc();
 #endif
   sdlCheckKeys();
@@ -2552,6 +2553,9 @@ int main(int argc, char **argv)
 		} else if (l == 13 && p[8] == ' ') {
 			fprintf(stderr,"Adding CBA cheat code %s\n", p);
 			cheatsAddCBACode(p, p);
+		} else if (l == 8) {
+			fprintf(stderr,"Adding GB(GS) cheat code %s\n", p);
+			gbAddGsCheat(p, p);
 		} else {
 			fprintf(stderr,"Unknown format for cheat code %s\n", p);
 		}
@@ -2575,7 +2579,7 @@ int main(int argc, char **argv)
       SDL_Delay(500);
     }
     sdlPollEvents();
-    #ifdef WITH_LIRC
+    #if WITH_LIRC
    lircCheckInput();
    #endif
     if(mouseCounter) {
@@ -2605,7 +2609,7 @@ int main(int argc, char **argv)
     filterPix = NULL;
  }
 
-#ifdef WITH_LIRC
+#if WITH_LIRC
   StopLirc();
 #endif
 
