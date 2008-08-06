@@ -27,6 +27,7 @@ VideoOptionsPage::VideoOptionsPage(QWidget *parent)
         RenderCombo->addItem("OpenGL");
         RenderCombo->addItem("QPainter");
 
+
         QLabel *ResLabel = new QLabel(tr("Resolution:"));
         QComboBox *ResCombo = new QComboBox;
         ResCombo->addItem("320x200");
@@ -236,10 +237,75 @@ SoundOptionsPage::SoundOptionsPage(QWidget *parent)
 DirecOptionsPage::DirecOptionsPage(QWidget *parent)
 : QWidget(parent)
 {
-        QGroupBox *FolderGroup = new QGroupBox(tr("Directory Options"));
+        QGroupBox *DirectoryGroup = new QGroupBox(tr("Directory Options"));
+
+
+	QLabel *GBAROMLabel = new QLabel(tr("GBA ROMs:"));
+        QLineEdit *GBAROMEdit = new QLineEdit;
+        QPushButton *GBAROMButton = new QPushButton(tr("&..."));
+
+	QLabel *GBCROMLabel = new QLabel(tr("GBC ROMs:"));
+        QLineEdit *GBCROMEdit = new QLineEdit;
+	QPushButton *GBCROMButton = new QPushButton(tr("&..."));
+
+	QLabel *GBROMLabel = new QLabel(tr("GB ROMs:"));
+        QLineEdit *GBROMEdit = new QLineEdit;
+	QPushButton *GBROMButton = new QPushButton(tr("&..."));
+
+	QLabel *NativeSaveLabel = new QLabel(tr("Native Saves:"));
+        QLineEdit *NativeSaveEdit = new QLineEdit;
+	QPushButton *NativeSaveButton = new QPushButton(tr("&..."));
+
+	QLabel *SaveStateLabel = new QLabel(tr("Savestates:"));
+        QLineEdit *SaveStateEdit = new QLineEdit;
+	QPushButton *SaveStateButton = new QPushButton(tr("&..."));
+
+	QLabel *ScreenshotLabel = new QLabel(tr("Screenshots:"));
+        QLineEdit *ScreenshotEdit = new QLineEdit;
+	QPushButton *ScreenshotButton = new QPushButton(tr("&..."));
+
+	QLabel *GBMonoBIOSLabel = new QLabel(tr("GB Mono BIOS:"));
+        QLineEdit *GBMonoBIOSEdit = new QLineEdit;
+	QPushButton *GBMonoBIOSButton = new QPushButton(tr("&..."));
+
+	QLabel *GBABIOSLabel = new QLabel(tr("GBA BIOS:"));
+        QLineEdit *GBABIOSEdit = new QLineEdit;
+	QPushButton *GBABIOSButton = new QPushButton(tr("&..."));
+
+
+	QGridLayout *DirectoryLayout = new QGridLayout;
+        DirectoryLayout->addWidget(GBAROMLabel, 0, 0);
+        DirectoryLayout->addWidget(GBAROMEdit, 0, 1);
+        DirectoryLayout->addWidget(GBAROMButton, 0, 2);
+        DirectoryLayout->addWidget(GBCROMLabel, 1, 0);
+        DirectoryLayout->addWidget(GBCROMEdit, 1, 1);
+	DirectoryLayout->addWidget(GBCROMButton, 1, 2);
+        DirectoryLayout->addWidget(GBROMLabel, 2, 0);
+        DirectoryLayout->addWidget(GBROMEdit, 2, 1);
+	DirectoryLayout->addWidget(GBROMButton, 2, 2);
+        DirectoryLayout->addWidget(NativeSaveLabel, 3, 0);
+        DirectoryLayout->addWidget(NativeSaveEdit, 3, 1);
+	DirectoryLayout->addWidget(NativeSaveButton, 3, 2);
+        DirectoryLayout->addWidget(SaveStateLabel, 4, 0);
+        DirectoryLayout->addWidget(SaveStateEdit, 4, 1);
+	DirectoryLayout->addWidget(SaveStateButton, 4, 2);
+        DirectoryLayout->addWidget(ScreenshotLabel, 5, 0);
+        DirectoryLayout->addWidget(ScreenshotEdit, 5, 1);
+	DirectoryLayout->addWidget(ScreenshotButton, 5, 2);
+        DirectoryLayout->addWidget(GBMonoBIOSLabel, 6, 0);
+        DirectoryLayout->addWidget(GBMonoBIOSEdit, 6, 1);
+	DirectoryLayout->addWidget(GBMonoBIOSButton, 6, 2);
+        DirectoryLayout->addWidget(GBABIOSLabel, 7, 0);
+	DirectoryLayout->addWidget(GBABIOSEdit, 7, 1);
+	DirectoryLayout->addWidget(GBABIOSButton, 7, 2);
+
+
+
+	DirectoryGroup->setLayout(DirectoryLayout);
+
 
         QVBoxLayout *mainLayout = new QVBoxLayout;
-        mainLayout->addWidget(FolderGroup);
+        mainLayout->addWidget(DirectoryGroup);
         mainLayout->addStretch(1);
         setLayout(mainLayout);
 }
