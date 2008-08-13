@@ -1,3 +1,5 @@
+#ifndef NO_OGL
+
 //*********************************************************
 //GLFONT.CPP -- glFont routines
 //Copyright (c) 1998 Brad Fish
@@ -151,4 +153,4 @@ void glFontTextOut (char *String, float x, float y,
 //End of file
 
 
-
+#endif // NO_OGL
