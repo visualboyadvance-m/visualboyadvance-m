@@ -26,6 +26,7 @@ OpenAL SDK:   http://connect.creativelabs.com/openal/default.aspx
 OpenGL files: http://www.opengl.org/registry/
 zlib:         http://zlib.net/
 libpng:       http://libpng.org/pub/png/libpng.html
+UPX:          http://upx.sourceforge.net/
 
 You can find pre-built versions of zlib & libpng at:
 http://vba-m.ngemu.com/vbam/vbasources/libs/
@@ -56,6 +57,7 @@ It uses the qmake file in trunk/project/qmake, so you always have to add files t
 IMPORTANT: The Qt-sources have to be compiled with the Microsoft compiler first, in order to use it,
 because the default binary distribution was compiled with mingw and will not work with the MS Compiler.
 Continue by reading "How to compile Qt from source with Visual C++ 2008".
+The release build will automatically be compressed with UPX, make sure to download it and point MSVC++ to it.
 
 
 
