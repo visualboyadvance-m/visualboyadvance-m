@@ -20,7 +20,7 @@
 			OutputDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)_temp"
 			ConfigurationType="4"
-			CharacterSet="2"
+			CharacterSet="0"
 			BuildLogFile="$(IntDir)\$(ProjectName)_BuildLog.htm"
 			>
 			<Tool
@@ -82,7 +82,7 @@
 			OutputDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)_temp"
 			ConfigurationType="4"
-			CharacterSet="2"
+			CharacterSet="0"
 			WholeProgramOptimization="1"
 			BuildLogFile="$(IntDir)\$(ProjectName)_BuildLog.htm"
 			>

@@ -295,6 +295,7 @@ VBA::VBA()
   oalBufferCount = 5;
 #endif
 #ifndef NO_XAUDIO2
+  audioAPI = XAUDIO2;
   xa2Device = 0;
   xa2BufferCount = 4;
   xa2Upmixing = false;
@@ -1546,7 +1547,7 @@ void VBA::loadSettings()
   }
 #endif
 
-  audioAPI = (AUDIO_API)regQueryDwordValue( "audioAPI", DIRECTSOUND );
+  audioAPI = (AUDIO_API)regQueryDwordValue( "audioAPI", XAUDIO2 );
   if( ( audioAPI != DIRECTSOUND )
 #ifndef NO_OAL
 	  && ( audioAPI != OPENAL_SOUND )
@@ -1555,7 +1556,11 @@ void VBA::loadSettings()
 	  && ( audioAPI != XAUDIO2 )
 #endif
 	  ) {
-		  audioAPI = DIRECTSOUND;
+#ifndef NO_XAUDIO2
+        audioAPI = XAUDIO2;
+#else
+        audioAPI = DIRECTSOUND;
+#endif
   }
 
   windowPositionX = regQueryDwordValue("windowX", 0);

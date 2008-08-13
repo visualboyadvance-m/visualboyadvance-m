@@ -1,4 +1,4 @@
-How to create a new translation:
+How to create a new translation for the Qt build:
 
 For Windows:
 

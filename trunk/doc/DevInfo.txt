@@ -15,14 +15,14 @@ Known preprocessor switches:
 - NO_OGL: Exclude OpenGL code
 - NO_D3D: Exclude Direct3D code
 - NO_OAL: Exclude OpenAL code
-- NO_XAUDIO2: Exclude XAudio2 code (supersedes DirectSound)
+- NO_XAUDIO2: Exclude XAudio2 code (the XAudio2 interface is DirectSound's successor)
 
 
 
 Download locations:
-NASM:         http://nasm.sourceforge.net
+NASM:         http://nasm.sourceforge.net/
 DirectX SDK:  http://msdn2.microsoft.com/en-us/xna/aa937788.aspx
-OpenAL SDK:   http://openal.org/downloads.html
+OpenAL SDK:   http://connect.creativelabs.com/openal/default.aspx
 OpenGL files: http://www.opengl.org/registry/
 zlib:         http://zlib.net/
 libpng:       http://libpng.org/pub/png/libpng.html
@@ -41,14 +41,18 @@ They are built with the static C runtime (this is what the releases use).
 There are two solution files for Visual C++ 2008:
 
 ===Win32/MFC===
-The Windows MFC GUI version project files are located in the root of the VBA-M sources (VBA2008.sln).
-In order to compile it, you have to compile zlib and libpng first and set your compiler's INCLUDE and LIB path accordingly.
+The Windows MFC GUI version project files are located in trunk/project/vc2008_mfc (VBA2008.sln).
+In order to compile it, you have to compile or download a precompiled version of zlib and libpng first
+and set your compiler's INCLUDE and LIB path accordingly.
 You also need Microsoft's DirectX SDK (At least for DirectInput).
 If you want to enable OpenAL sound output, install the OpenAL SDK. If you do not want it, #define NO_OAL.
-Some pixel filters come with assembler code compatible with NASM syntax. Extract NASM somewhere and add it to your PATH environment variable. All .asm files should be handled with the "nasm.rules" build rules file, also in the source root.
+Some pixel filters come with assembler code compatible with NASM syntax.
+Extract NASM somewhere and add it to your compiler's PATH environment variable.
+All .asm files should be handled with the "nasm.rules" build rules file.
 
 ===Win32/Qt===
-The MS Visual C++ 2008 Express-compatible project file can be found in /project/vc2008.
+The MS Visual C++ 2008 Express-compatible project file can be found in /project/vc2008_qt.
 It uses the qmake file in /project/qmake.
-IMPORTANT: The Qt-sources have to be compiled with the Microsoft compiler first, in order to use it. The default distribution was compiled with mingw and will not work with the MS Compiler.
+IMPORTANT: The Qt-sources have to be compiled with the Microsoft compiler first, in order to use it.
+The default distribution was compiled with mingw and will not work with the MS Compiler.
 The dependencies folder is not (yet) necessary.
