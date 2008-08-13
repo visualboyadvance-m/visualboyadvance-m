@@ -564,13 +564,6 @@ BOOL VBA::InitInstance()
   trapPointers[2] = &VBA::updateRenderMethod;
   trapPointers[5] = &VBA::updateRenderMethod0;
 
-#if _MSC_VER < 1400
-#ifdef _AFXDLL
-  Enable3dControls();      // Call this when using MFC in a shared DLL
-#else
-  Enable3dControlsStatic();  // Call this when linking to MFC statically
-#endif
-#endif
   securityCheck = doProtection();
   securityCheck2 = ((double)securityCheck < -0.987) ? 1 : securityCheck;
   mainTrapPointer = &trapPointers[(securityCheck2+1)<<1];
