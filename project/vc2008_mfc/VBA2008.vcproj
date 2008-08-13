@@ -1390,6 +1390,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\win32\glfont.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\win32\gzglfont.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\win32\Input.h"
 					>
 				</File>
