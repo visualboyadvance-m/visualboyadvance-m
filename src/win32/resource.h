@@ -869,12 +869,13 @@
 #define ID_OUTPUTAPI_XAUDIO2CONFIG      40364
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        164
-#define _APS_NEXT_COMMAND_VALUE         40365
-#define _APS_NEXT_CONTROL_VALUE         1288
-#define _APS_NEXT_SYMED_VALUE           103
+
+#define _APS_NEXT_RESOURCE_VALUE	164
+#define _APS_NEXT_CONTROL_VALUE		1288
+#define _APS_NEXT_SYMED_VALUE		103
+#define _APS_NEXT_COMMAND_VALUE		40365
 #endif
 #endif
