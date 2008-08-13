@@ -111,7 +111,9 @@ BOOL XAudio2_Config::OnInitDialog()
 					systemMessage( IDS_XAUDIO2_CANNOT_ENUMERATE_DEVICES, NULL );
 					break;
 				} else {
-#ifdef _MBCS
+#ifdef _UNICODE
+					int id = m_combo_dev.AddString( dd.DisplayName );
+#else
 					CHAR temp[256];
 					ZeroMemory( temp, sizeof( temp ) );
 					WideCharToMultiByte(
@@ -125,9 +127,6 @@ BOOL XAudio2_Config::OnInitDialog()
 						NULL );
 					
 					int id = m_combo_dev.AddString( temp );
-#endif
-#ifdef _UNICODE
-					int id = m_combo_dev.AddString( dd.DisplayName );
 #endif
 					if( id < 0 ) {
 						systemMessage( IDS_XAUDIO2_CANNOT_ENUMERATE_DEVICES, NULL );
