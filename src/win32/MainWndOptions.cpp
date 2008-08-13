@@ -589,16 +589,6 @@ void MainWnd::OnUpdateOptionsEmulatorSynchronize(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(synchronize);
 }
 
-void MainWnd::OnOptionsEmulatorPausewheninactive()
-{
-  theApp.pauseWhenInactive = !theApp.pauseWhenInactive;
-}
-
-void MainWnd::OnUpdateOptionsEmulatorPausewheninactive(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(theApp.pauseWhenInactive);
-}
-
 void MainWnd::OnOptionsEmulatorSpeeduptoggle()
 {
   theApp.speedupToggle = !theApp.speedupToggle;
@@ -637,22 +627,6 @@ void MainWnd::OnOptionsEmulatorRealtimeclock()
 void MainWnd::OnUpdateOptionsEmulatorRealtimeclock(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(theApp.winRtcEnable);
-}
-
-void MainWnd::OnOptionsEmulatorGenericflashcard()
-{
-  if(emulating && theApp.cartridgeType == IMAGE_GB)
-  theApp.winGenericflashcardEnable = !theApp.winGenericflashcardEnable;
-}
-
-void MainWnd::OnUpdateOptionsEmulatorGenericflashcard(CCmdUI* pCmdUI)
-{
-  if(emulating && theApp.cartridgeType == IMAGE_GB)
-  pCmdUI->SetCheck(theApp.winGenericflashcardEnable);
-    else
-  pCmdUI->SetCheck(false);
-
-  pCmdUI->Enable(emulating && theApp.cartridgeType == IMAGE_GB);
 }
 
 void MainWnd::OnOptionsEmulatorRewindinterval()

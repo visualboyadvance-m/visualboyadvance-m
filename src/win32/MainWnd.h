@@ -176,8 +176,6 @@ public:
 	afx_msg void OnUpdateOptionsEmulatorDisablestatusmessages(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorSynchronize();
 	afx_msg void OnUpdateOptionsEmulatorSynchronize(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsEmulatorPausewheninactive();
-	afx_msg void OnUpdateOptionsEmulatorPausewheninactive(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorSpeeduptoggle();
 	afx_msg void OnUpdateOptionsEmulatorSpeeduptoggle(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorAutomaticallyipspatch();
@@ -186,8 +184,6 @@ public:
 	afx_msg void OnUpdateOptionsEmulatorAgbprint(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorRealtimeclock();
 	afx_msg void OnUpdateOptionsEmulatorRealtimeclock(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsEmulatorGenericflashcard();
-	afx_msg void OnUpdateOptionsEmulatorGenericflashcard(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorRewindinterval();
 	afx_msg void OnOptionsEmulatorSavetypeAutomatic();
 	afx_msg void OnUpdateOptionsEmulatorSavetypeAutomatic(CCmdUI* pCmdUI);

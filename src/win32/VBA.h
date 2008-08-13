@@ -134,7 +134,6 @@ class VBA : public CWinApp
   int winGbBorderOn;
   int winFlashSize;
   bool winRtcEnable;
-  bool winGenericflashcardEnable;
   int winSaveType;
   char *rewindMemory;
   int rewindPos;
@@ -168,7 +167,6 @@ class VBA : public CWinApp
   bool iconic;
   int glFilter;
   bool dinputKeyFocus;
-  bool pauseWhenInactive;
   bool speedupToggle;
   bool winGbPrinterEnabled;
   int threadPriority;

@@ -140,7 +140,6 @@ struct {
   { "OptionsEmulatorAutoIPSPatch", ID_OPTIONS_EMULATOR_AUTOMATICALLYIPSPATCH },
   { "OptionsEmulatorAGBPrint", ID_OPTIONS_EMULATOR_AGBPRINT },
   { "OptionsEmulatorRTC", ID_OPTIONS_EMULATOR_REALTIMECLOCK },
-  { "OptionsEmulatorGenericflashcard", ID_OPTIONS_EMULATOR_GENERICFLASHCARD },
   { "OptionsEmulatorRewindInterval", ID_OPTIONS_EMULATOR_REWINDINTERVAL },
   { "OptionsSoundOff", ID_OPTIONS_SOUND_OFF },
   { "OptionsSoundMute", ID_OPTIONS_SOUND_MUTE },
