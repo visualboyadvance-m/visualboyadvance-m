@@ -9,11 +9,7 @@
  * Adapted from original gzio.c from zlib library by Forgotten
  */
 
-#if defined(HAVE_ZUTIL_H) || defined(_MSC_VER)
-# include <zutil.h>
-#else
 #include <zlib.h>
-#endif
 
 gzFile ZEXPORT memgzopen(char *memory, int, const char *);
 int ZEXPORT memgzread(gzFile, voidp, unsigned);
