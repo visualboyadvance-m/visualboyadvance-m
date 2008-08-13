@@ -405,4 +405,5 @@ public:
 	afx_msg void OnUpdateLoadgameDonotchangebatterysave(CCmdUI *pCmdUI);
 
 	DECLARE_MESSAGE_MAP()
+    afx_msg void OnEnterSizeMove();
 };

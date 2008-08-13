@@ -440,6 +440,7 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_LOADGAME_DONOTCHANGEBATTERYSAVE, &MainWnd::OnUpdateLoadgameDonotchangebatterysave)
   ON_COMMAND(ID_OUTPUTAPI_XAUDIO2CONFIG, &MainWnd::OnOutputapiXaudio2config)
   ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_XAUDIO2CONFIG, &MainWnd::OnUpdateOutputapiXaudio2config)
+  ON_WM_ENTERSIZEMOVE()
   END_MESSAGE_MAP()
 
 
@@ -1325,4 +1326,17 @@ void MainWnd::OnNcRButtonDown(UINT nHitTest, CPoint point)
 	}
 
 	CWnd::OnNcRButtonDown(nHitTest, point);
+}
+
+void MainWnd::OnEnterSizeMove()
+{
+    // The WM_ENTERSIZEMOVE message is sent one time to a window after it enters the moving or sizing modal loop.
+    // Causes the emulator to stop when moving or resizing the window.
+
+	if( emulating ) {
+        // pause sound before entering DefWindowProc
+		soundPause();
+	}
+
+    CWnd::OnEnterSizeMove();
 }
