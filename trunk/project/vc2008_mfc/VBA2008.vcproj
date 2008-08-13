@@ -1406,6 +1406,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\win32\targetver.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\win32\VBA.h"
 					>
 				</File>
@@ -1469,11 +1473,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\win32\VBA-M.ico"
+				RelativePath="..\..\src\win32\res\VBA.ico"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\win32\VBA.rc"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\win32\res\VBA.rc2"
 				>
 			</File>
 		</Filter>

@@ -28,7 +28,6 @@
 
 #include "stdafx.h"
 #include "resource.h"
-//#include <afxtempl.h>
 
 #include "AcceleratorManager.h"
 #include "Display.h"
