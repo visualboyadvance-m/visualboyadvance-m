@@ -272,7 +272,6 @@ VBA::VBA()
   winGbBorderOn = 0;
   winFlashSize = 0x20000;
   winRtcEnable = false;
-  winGenericflashcardEnable = false;
   winSaveType = 0;
   rewindMemory = NULL;
   rewindPos = 0;
@@ -307,7 +306,6 @@ VBA::VBA()
   iconic = false;
   glFilter = 0;
   regEnabled = false;
-  pauseWhenInactive = true;
   speedupToggle = false;
   winGbPrinterEnabled = false;
   threadPriority = 2;
@@ -1655,9 +1653,6 @@ void VBA::loadSettings()
   else
     gbSerialFunction = NULL;
 
-  pauseWhenInactive = regQueryDwordValue("pauseWhenInactive", 1) ?
-    true : false;
-
   captureFormat = regQueryDwordValue("captureFormat", 0);
 
   removeIntros = regQueryDwordValue("removeIntros", false) ? true : false;
@@ -2640,8 +2635,6 @@ void VBA::saveSettings()
   regSetDwordValue("showSpeedTransparent", showSpeedTransparent);
 
   regSetDwordValue("gbPrinter", winGbPrinterEnabled);
-
-  regSetDwordValue("pauseWhenInactive", pauseWhenInactive);
 
   regSetDwordValue("captureFormat", captureFormat);
 

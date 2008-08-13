@@ -1865,7 +1865,6 @@ BEGIN
             END
             MENUITEM "&Remove intros (GBA)",        ID_OPTIONS_EMULATOR_REMOVEINTROSGBA
             MENUITEM "Automatic IPS patching",      ID_OPTIONS_EMULATOR_AUTOMATICALLYIPSPATCH
-            MENUITEM "Pause when inactive",         ID_OPTIONS_EMULATOR_PAUSEWHENINACTIVE
             MENUITEM "AGB Print",                   ID_OPTIONS_EMULATOR_AGBPRINT
             MENUITEM "Real Time Clock",             ID_OPTIONS_EMULATOR_REALTIMECLOCK
             MENUITEM "&Game Overrides...",          ID_OPTIONS_EMULATOR_GAMEOVERRIDES

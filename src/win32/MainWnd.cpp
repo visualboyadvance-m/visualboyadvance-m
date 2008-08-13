@@ -175,8 +175,6 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_DISABLESTATUSMESSAGES, OnUpdateOptionsEmulatorDisablestatusmessages)
   ON_COMMAND(ID_OPTIONS_EMULATOR_SYNCHRONIZE, OnOptionsEmulatorSynchronize)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_SYNCHRONIZE, OnUpdateOptionsEmulatorSynchronize)
-  ON_COMMAND(ID_OPTIONS_EMULATOR_PAUSEWHENINACTIVE, OnOptionsEmulatorPausewheninactive)
-  ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_PAUSEWHENINACTIVE, OnUpdateOptionsEmulatorPausewheninactive)
   ON_COMMAND(ID_OPTIONS_EMULATOR_SPEEDUPTOGGLE, OnOptionsEmulatorSpeeduptoggle)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_SPEEDUPTOGGLE, OnUpdateOptionsEmulatorSpeeduptoggle)
   ON_COMMAND(ID_OPTIONS_EMULATOR_AUTOMATICALLYIPSPATCH, OnOptionsEmulatorAutomaticallyipspatch)
@@ -185,8 +183,6 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_AGBPRINT, OnUpdateOptionsEmulatorAgbprint)
   ON_COMMAND(ID_OPTIONS_EMULATOR_REALTIMECLOCK, OnOptionsEmulatorRealtimeclock)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_REALTIMECLOCK, OnUpdateOptionsEmulatorRealtimeclock)
-  ON_COMMAND(ID_OPTIONS_EMULATOR_GENERICFLASHCARD, OnOptionsEmulatorGenericflashcard)
-  ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_GENERICFLASHCARD, OnUpdateOptionsEmulatorGenericflashcard)
   ON_COMMAND(ID_OPTIONS_EMULATOR_REWINDINTERVAL, OnOptionsEmulatorRewindinterval)
   ON_COMMAND(ID_OPTIONS_EMULATOR_SAVETYPE_AUTOMATIC, OnOptionsEmulatorSavetypeAutomatic)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_SAVETYPE_AUTOMATIC, OnUpdateOptionsEmulatorSavetypeAutomatic)
@@ -510,9 +506,6 @@ bool MainWnd::FileRun()
   systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
   theApp.cartridgeType = type;
   if(type == IMAGE_GB) {
-    genericflashcardEnable = theApp.winGenericflashcardEnable;
-
-
     if(!gbLoadRom(theApp.szFile))
       return false;
 
@@ -1258,12 +1251,10 @@ void MainWnd::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
     }
   } else {
     theApp.wasPaused = true;
-    if(theApp.pauseWhenInactive) {
-      if(emulating) {
+    if(emulating) {
         soundPause();
-      }
-      theApp.active = a;
     }
+    theApp.active = a;
 
     memset(theApp.delta,255,sizeof(theApp.delta));
   }
