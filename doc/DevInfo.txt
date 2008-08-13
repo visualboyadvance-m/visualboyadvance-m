@@ -51,8 +51,23 @@ Extract NASM somewhere and add it to your compiler's PATH environment variable.
 All .asm files should be handled with the "nasm.rules" build rules file.
 
 ===Win32/Qt===
-The MS Visual C++ 2008 Express-compatible project file can be found in /project/vc2008_qt.
-It uses the qmake file in /project/qmake.
-IMPORTANT: The Qt-sources have to be compiled with the Microsoft compiler first, in order to use it.
-The default distribution was compiled with mingw and will not work with the MS Compiler.
-The dependencies folder is not (yet) necessary.
+The MS Visual C++ 2008 Express-compatible project file can be found in trunk/project/vc2008_qt.
+It uses the qmake file in trunk/project/qmake, so you always have to add files to the VC++ project file AND the qmake file!
+IMPORTANT: The Qt-sources have to be compiled with the Microsoft compiler first, in order to use it,
+because the default binary distribution was compiled with mingw and will not work with the MS Compiler.
+Continue by reading "How to compile Qt from source with Visual C++ 2008".
+
+
+
+######################################################
+# How to compile Qt from source with Visual C++ 2008 #
+######################################################
+- Download the latest Qt source code archive from http://trolltech.com/developer/downloads/qt/windows
+ - You want "qt-win-opensource-src-x.x.x.zip", not "qt-win-opensource-x.x.x-mingw.exe"
+ - This how-to was witten when Qt 4.4.1 was the current version. 
+- Extract the archive somewhere.
+- Start a Visual Studio build command promt and cd to the extracted files.
+ - You can find it in the start menu in "Microsoft Visual Studio 2008\Visual Studio Tools\Visual Studio 2008 Command Prompt".
+- Type & run "configure -release -fast -no-qt3support -platform win32-msvc2008"
+- When configure finished, simply run "nmake" and get yourself a coffee or ten.
+- When nmake finished and you've become a coffee addict, add the created lib files to your Visual Studio paths, do the same for the include paths.
