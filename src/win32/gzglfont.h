@@ -1,3 +1,5 @@
+#ifndef NO_OGL
+
 #define GZGLFONT_SIZE 35096
 
 
@@ -255,3 +257,6 @@ unsigned char gzglfont[]=
 	'\x16', '\x2D', '\x5A', '\xB4', '\xE9', '\xB1', '\xFF', '\x01',
 	'\xF1', '\xAA', '\xBA', '\x4E', '\x18', '\x89', '\x00', '\x00'
 	};
+
+
+#endif // NO_OGL
