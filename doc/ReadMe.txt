@@ -43,13 +43,20 @@ Required Runtimes
 
 Microsoft Visual C++ 2008 SP1 Redistributable Package (x86):
 http://www.microsoft.com/downloads/details.aspx?FamilyID=a5c84275-3b97-4ab7-a40d-3802b2af5fc2&DisplayLang=en
+[MFC & Qt build]
 
 DirectX End-User Runtimes (August 2008):
 http://www.microsoft.com/downloads/details.aspx?FamilyID=c1367bc3-4676-481a-bfaa-5c15d1d7199d&DisplayLang=en
+[MFC build]
 
 zlib 1.2.3 + libpng 1.2.29:
 http://vba-m.ngemu.com/vbam/vbacompiles/msvc2008sp1/mfc/zlib123+libpng1229.7z
 Extract it either to C:\Windows\system32 or to the same folder where the VisualBoyAdvance-M executable resides.
+[MFC build]
+
+Qt 4.4.1 Runtime:
+http://vba-m.ngemu.com/vbam/vbacompiles/msvc2008sp1/qt/qt441.7z
+[Qt build]
 
 
 =================
@@ -58,6 +65,7 @@ Optional Runtimes
 
 OpenAL Installer for Windows:
 http://connect.creativelabs.com/openal/Downloads/Forms/AllItems.aspx
+[MFC build]
 
 
 ==============
