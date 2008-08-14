@@ -39,17 +39,24 @@ They are built with the static C runtime (this is what the releases use).
 # Visual C++ 2008 project files #
 #################################
 
-There are two solution files for Visual C++ 2008:
+Using Microsoft Visual C++ 2008, you can build the Win32/MFC and the Win32/Qt build.
+Refer to the instructions below for further assistance:
 
 ===Win32/MFC===
-The Windows MFC GUI version project files are located in trunk/project/vc2008_mfc (VBA2008.sln).
-In order to compile it, you have to compile or download a precompiled version of zlib and libpng first
-and set your compiler's INCLUDE and LIB path accordingly.
-You also need Microsoft's DirectX SDK (At least for DirectInput).
+This is the full-featured Windows build using the MFC GUI.
+The project files are located in trunk/project/vc2008_mfc (VBA2008.sln).
+Before you can compile it, you have to take care of some prerequisites:
+Download the zlib & libpng sources from the internet and extract them both to the same folder.
+Rename them so you have a folder called libpng and another one called zlib in the same loaction.
+Open libpng/projects/visualc71/libpng.sln. Let the assistant convert them if necessary.
+Build the "DLL Release" & "DLL Debug" configurations.
+Set up your operating system's PATH variable to point to the created zlib & libpng DLLs.
+Set up your compiler's LIB & INCLUDE paths to point to the created lib files and the source files.
+You also have to install Microsoft's DirectX SDK for DirectInput & XAudio2.
 If you want to enable OpenAL sound output, install the OpenAL SDK. If you do not want it, #define NO_OAL.
-Some pixel filters come with assembler code compatible with NASM syntax.
-Extract NASM somewhere and add it to your compiler's PATH environment variable.
-All .asm files should be handled with the "nasm.rules" build rules file.
+Some pixel filters come with assembler code, which compatible to the NASM syntax.
+Extract NASM somewhere and add it to your compiler's executable file paths.
+All .asm files will be handled with the "nasm.rules" build rules file which comes with this project file.
 
 ===Win32/Qt===
 The MS Visual C++ 2008 Express-compatible project file can be found in trunk/project/vc2008_qt.

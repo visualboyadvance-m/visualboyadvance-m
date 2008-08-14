@@ -24,7 +24,7 @@
 			OutputDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)_temp"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="2"
 			CharacterSet="0"
 			BuildLogFile="$(IntDir)\$(ProjectName)_BuildLog.htm"
 			>
@@ -58,7 +58,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				SmallerTypeCheck="false"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				StructMemberAlignment="0"
 				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="false"
@@ -85,14 +85,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib zlibd.lib libpngd.lib"
+				AdditionalDependencies="zlib1d.lib libpng13d.lib"
 				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
 				Version=""
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateManifest="true"
 				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;x86&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
-				IgnoreDefaultLibraryNames="nafxcwd.lib;LIBCMTD.lib"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="1"
@@ -129,7 +129,7 @@
 			OutputDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)_temp"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="2"
 			UseOfATL="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="0"
@@ -166,7 +166,7 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="&quot;..\..\..\dependencies\File_Extractor-0.4.3\fex&quot;;..\..\..\dependencies\msvc"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;GBA_LOGGING;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
 				EnableEnhancedInstructionSet="0"
 				FloatingPointModel="2"
@@ -193,17 +193,15 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib zlib.lib libpng.lib LIBCMT.lib"
-				ShowProgress="0"
+				AdditionalDependencies="zlib1.lib libpng13.lib"
 				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
 				Version=""
 				LinkIncremental="0"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;c:\Program Files\Microsoft DirectX SDK (November 2007)\lib\x86&quot;"
+				AdditionalLibraryDirectories=""
 				GenerateManifest="true"
 				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;x86&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
-				IgnoreAllDefaultLibraries="false"
-				IgnoreDefaultLibraryNames="nafxcw.lib;LIBCMT.lib"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="false"
 				AssemblyDebug="2"
 				GenerateMapFile="false"
@@ -454,14 +452,6 @@
 				<File
 					RelativePath="..\..\src\memgzio.c"
 					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							CompileAs="1"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\win32\protect.c"
