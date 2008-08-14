@@ -46,7 +46,9 @@ http://www.microsoft.com/downloads/details.aspx?FamilyID=a5c84275-3b97-4ab7-a40d
 [MFC & Qt build]
 
 DirectX End-User Runtimes (August 2008):
-http://www.microsoft.com/downloads/details.aspx?FamilyID=c1367bc3-4676-481a-bfaa-5c15d1d7199d&DisplayLang=en
+Web-Updater: http://www.microsoft.com/downloads/details.aspx?FamilyID=2da43d38-db71-4c1b-bc6a-9b6652cd92a3&DisplayLang=en
+Offline Package: http://www.microsoft.com/downloads/details.aspx?FamilyID=c1367bc3-4676-481a-bfaa-5c15d1d7199d&DisplayLang=en
+Only the Web-Updater needs the WGA check
 [MFC build]
 
 zlib 1.2.3 + libpng 1.2.29:
