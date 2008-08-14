@@ -37,15 +37,27 @@ RAM: ~64MB free
 GFX: ~32MB VRAM, DirectX9 drivers
 
 
-===================
-File Dependencies
-===================
+=================
+Required Runtimes
+=================
 
-"D3DX9_37.DLL" requires an update to DirectX.
-You can use the following tool to update it:
-http://vba-m.ngemu.com/vbam/vbacompiles/msvc2008/Directx_9c_webupdater.zip
+Microsoft Visual C++ 2008 SP1 Redistributable Package (x86):
+http://www.microsoft.com/downloads/details.aspx?FamilyID=a5c84275-3b97-4ab7-a40d-3802b2af5fc2&DisplayLang=en
 
-In order to use OpenAL sound, the OpenAL runtime has to be downloaded and installed from http://openal.org/downloads.html
+DirectX End-User Runtimes (August 2008):
+http://www.microsoft.com/downloads/details.aspx?FamilyID=c1367bc3-4676-481a-bfaa-5c15d1d7199d&DisplayLang=en
+
+zlib 1.2.3 + libpng 1.2.29:
+http://vba-m.ngemu.com/vbam/vbacompiles/msvc2008sp1/mfc/zlib123+libpng1229.7z
+Extract it either to C:\Windows\system32 or to the same folder where the VisualBoyAdvance-M executable resides.
+
+
+=================
+Optional Runtimes
+=================
+
+OpenAL Installer for Windows:
+http://connect.creativelabs.com/openal/Downloads/Forms/AllItems.aspx
 
 
 ==============
@@ -96,11 +108,6 @@ Less important:
 - Merge HQ2x/LQ2x C code into code for HQ3x/4x
 
 - Apply pixel filter to sprites and BG seperately for better image quality
-
-- Create Visual Studio project using SDL makefile
-
-- Add device enumeration & buffer count selection for XAudio2
-  - Current buffer count: 4
 
 
 
