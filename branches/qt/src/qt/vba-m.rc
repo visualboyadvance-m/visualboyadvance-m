@@ -1,6 +1,6 @@
 #include "version.h"
 
-IDI_ICON1 ICON DISCARDABLE "../../src/win32/res/VBA.ico"
+IDI_ICON1 ICON DISCARDABLE "../../src/qt/resources/vbam.ico"
 
 
 #include <WinVer.h>

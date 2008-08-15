@@ -1,0 +1,93 @@
+##############################
+# Developer Information File #
+##############################
+
+===========================
+Known preprocessor switches
+===========================
+
+- SDL: Defined for the SDL version
+- GBA_LOGGING: Enables logging for the GBA core
+- FINAL_VERSION: Defined for release versions, disables additional GBA logging and completely disables GB logging. Increases the amount of CPU cycles being emulated in one go.
+- BKPT_SUPPORT
+- MMX: Enable MMX instruction set
+
+
+==================
+Download locations
+==================
+
+Qt:     http://trolltech.com/developer/downloads/qt/windows
+UPX:    http://upx.sourceforge.net/
+zlib:   http://zlib.net/
+libpng: http://libpng.org/pub/png/libpng.html
+
+
+=============================
+Visual C++ 2008 project files
+=============================
+
+There are project files available for Microsoft's Visual C++ IDE/compiler.
+Refer to the instructions below for further assistance:
+
+The MS Visual C++ 2008 Express-compatible project file can be found in project/vc2008_qt.
+It uses the qmake file in project/qmake, so you always have to add files to the VC++ project file AND the qmake file!
+IMPORTANT: The Qt-sources have to be compiled with the Microsoft compiler first, in order to use it,
+because Trolltech only provides MinGW compatible binaries which are incompatible to the MS Compiler.
+Continue by reading "How to compile Qt from source with Visual C++ 2008".
+The release build will automatically be compressed with UPX, make sure to download it and point MSVC++ to it.
+
+
+==================================================
+How to compile Qt from source with Visual C++ 2008
+==================================================
+
+- Download the latest Qt source code archive
+ - You want "qt-win-opensource-src-x.x.x.zip", not "qt-win-opensource-x.x.x-mingw.exe"
+ - This how-to was witten when Qt 4.4.1 was the current version. 
+- Extract the archive somewhere.
+- Start a Visual Studio build command promt and cd to the extracted files.
+ - You can find it in the start menu in "Microsoft Visual Studio 2008\Visual Studio Tools\Visual Studio 2008 Command Prompt".
+- Type & run "configure -release -fast -no-qt3support -platform win32-msvc2008"
+- When configure finished, simply run "nmake" and get yourself a coffee or ten.
+- When nmake finished and you've become a coffee addict, add the created lib files to your Visual Studio paths, do the same for the include paths.
+
+
+==========
+To Do List
+==========
+
+###Important###
+- Many games show emulation warnings in the log window (unaligned read, bad read/write address)
+ - Test: Metroid Fusion, Advance Wars 2
+
+- Gfx.cpp/h optimization
+ - Test: Final Fantasy 4 airship intro
+
+- Improve automatic 64k/128k flash save detection
+
+- Add support for byuu's UPS patching format to replace IPS
+
+- Add selection for compressed archives with more than one ROM in them
+
+- Fix LCD colouring
+
+- Game Bugs:
+* Drymouth - screen flashes black after certain scanline
+* World Reborn - 2 graphics bugs
+
+###Less important###
+- Add documentation for VBA-M (configuration guide)
+
+- Improve AVI recording (produces asynchronous files)
+
+- Enable audio stream compression for AVI files
+
+- Verify BIOS files by checksum instead by file extension
+
+- Apply pixel filter to sprites and BG seperately for better image quality
+
+###Performance###
+- Apply pixel filter only to changed parts of the image
+
+- Make use of multi-core CPUs
