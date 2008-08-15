@@ -20,10 +20,10 @@
 #ifndef VBA_GBAinline_H
 #define VBA_GBAinline_H
 
-#include "../System.h"
-#include "../Port.h"
-#include "../RTC.h"
-#include "../Sound.h"
+#include "../shared/System.h"
+#include "../shared/Port.h"
+#include "../shared/RTC.h"
+#include "../shared/Sound.h"
 #include "agbprint.h"
 
 extern const u32 objTilesAddress[3];

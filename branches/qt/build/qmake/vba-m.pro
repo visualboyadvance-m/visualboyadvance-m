@@ -7,7 +7,7 @@ DEFINES += BKPT_SUPPORT NO_PNG
 # Directory Locations
 M_DIR_QT = ../../src/qt/
 M_DIR_LANG = ../../lang/
-M_DIR_SHARED = ../../src/
+M_DIR_SHARED = ../../src/shared/
 M_DIR_GBAPU = ../../src/dmg/gb_apu/
 M_DIR_AGB = ../../src/agb/
 M_DIR_DMG = ../../src/dmg/

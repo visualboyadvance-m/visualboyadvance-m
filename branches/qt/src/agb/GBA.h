@@ -20,7 +20,7 @@
 #ifndef VBA_GBA_H
 #define VBA_GBA_H
 
-#include "../System.h"
+#include "../shared/System.h"
 
 #define SAVE_GAME_VERSION_1 1
 #define SAVE_GAME_VERSION_2 2
@@ -152,9 +152,9 @@ extern struct EmulatedSystem GBASystem;
 #define R14_FIQ  43
 #define SPSR_FIQ 44
 
-#include "../Cheats.h"
-#include "../Globals.h"
-#include "../EEprom.h"
-#include "../Flash.h"
+#include "../shared/Cheats.h"
+#include "../shared/Globals.h"
+#include "../shared/EEprom.h"
+#include "../shared/Flash.h"
 
 #endif //VBA_GBA_H

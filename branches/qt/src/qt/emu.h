@@ -20,7 +20,7 @@
 #define EMU_H
 
 
-#include "../System.h"
+#include "../shared/System.h"
 
 
 // Global Variables

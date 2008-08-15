@@ -22,9 +22,9 @@
 #define VBA_GFX_H
 
 #include "GBA.h"
-#include "../Globals.h"
+#include "../shared/Globals.h"
 
-#include "../Port.h"
+#include "../shared/Port.h"
 
 //#define SPRITE_DEBUG
 

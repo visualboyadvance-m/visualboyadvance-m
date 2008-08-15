@@ -202,127 +202,127 @@
 				Name="Shared"
 				>
 				<File
-					RelativePath="..\..\src\bios.cpp"
+					RelativePath="..\..\src\shared\bios.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\bios.h"
+					RelativePath="..\..\src\shared\bios.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Cheats.cpp"
+					RelativePath="..\..\src\shared\Cheats.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Cheats.h"
+					RelativePath="..\..\src\shared\Cheats.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\EEprom.cpp"
+					RelativePath="..\..\src\shared\EEprom.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\EEprom.h"
+					RelativePath="..\..\src\shared\EEprom.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\elf.cpp"
+					RelativePath="..\..\src\shared\elf.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\elf.h"
+					RelativePath="..\..\src\shared\elf.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\fex.h"
+					RelativePath="..\..\src\shared\fex.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\fex_mini.cpp"
+					RelativePath="..\..\src\shared\fex_mini.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Flash.cpp"
+					RelativePath="..\..\src\shared\Flash.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Flash.h"
+					RelativePath="..\..\src\shared\Flash.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Globals.cpp"
+					RelativePath="..\..\src\shared\Globals.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Globals.h"
+					RelativePath="..\..\src\shared\Globals.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\memgzio.c"
+					RelativePath="..\..\src\shared\memgzio.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\memgzio.h"
+					RelativePath="..\..\src\shared\memgzio.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Mode0.cpp"
+					RelativePath="..\..\src\shared\Mode0.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Mode1.cpp"
+					RelativePath="..\..\src\shared\Mode1.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Mode2.cpp"
+					RelativePath="..\..\src\shared\Mode2.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Mode3.cpp"
+					RelativePath="..\..\src\shared\Mode3.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Mode4.cpp"
+					RelativePath="..\..\src\shared\Mode4.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Mode5.cpp"
+					RelativePath="..\..\src\shared\Mode5.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\RTC.cpp"
+					RelativePath="..\..\src\shared\RTC.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\RTC.h"
+					RelativePath="..\..\src\shared\RTC.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Sound.cpp"
+					RelativePath="..\..\src\shared\Sound.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Sound.h"
+					RelativePath="..\..\src\shared\Sound.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Sram.cpp"
+					RelativePath="..\..\src\shared\Sram.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Sram.h"
+					RelativePath="..\..\src\shared\Sram.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\System.h"
+					RelativePath="..\..\src\shared\System.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Util.cpp"
+					RelativePath="..\..\src\shared\Util.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Util.h"
+					RelativePath="..\..\src\shared\Util.h"
 					>
 				</File>
 			</Filter>
