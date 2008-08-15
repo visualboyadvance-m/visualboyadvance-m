@@ -1,0 +1,51 @@
+vbam (0.svn500-1) hardy; urgency=low
+
+  * Updated VBA-M to r500
+
+ -- Bastien Bouclet <bgk@users.sourceforge.net>  Sun, 29 Apr 2008 21:16:23 +0200
+
+vbam (0.svn484-1) gutsy; urgency=low
+
+  * Added a GTK+ binary
+  * Updated VBA-M to r484
+
+ -- Bastien Bouclet <bgk@users.sourceforge.net>  Sun, 20 Apr 2008 13:53:48 +0100
+
+vbam (0.svn472-1) gutsy; urgency=low
+
+  * Updated VBA-M to r472
+
+ -- Bastien Bouclet <bgk@users.sourceforge.net>  Sat, 3 Apr 2008 16:59:12 +0100
+
+vbam (0.svn451-1) unstable; urgency=low
+
+  * Updated VBA-M to r451
+
+ -- Bastien Bouclet <bgkweb@gmail.com>  Sat, 8 Mar 2008 22:51:23 +0100
+
+vbam (0.svn347-1) unstable; urgency=low
+
+  * Updated VBA-M to r347
+
+ -- Bastien Bouclet <bgkweb@gmail.com>  Thu, 1 Feb 2008 07:43:45 +0100
+
+vbam (0.svn338-1) unstable; urgency=low
+
+  * Updated VBA-M to r338
+
+ -- Bastien Bouclet <bgkweb@gmail.com>  Thu, 24 Jan 2008 14:06:21 +0100
+
+vbam (0.svn333-1) unstable; urgency=low
+
+  * Added a man page
+  * Added a default configuration file
+  * Updated VBA-M to r333
+
+ -- Bastien Bouclet <bgkweb@gmail.com>  Tue, 22 Jan 2008 22:06:31 +0100
+
+vbam (0.svn307-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Bastien Bouclet <bgkweb@gmail.com>  Tue, 15 Jan 2008 13:31:45 +0100
+

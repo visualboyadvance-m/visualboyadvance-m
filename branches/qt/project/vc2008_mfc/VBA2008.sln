@@ -1,0 +1,28 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VisualBoyAdvance", "VBA2008.vcproj", "{6D4C5EC8-933F-4C05-A1BF-498E658576DF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0} = {7AEC599C-7C82-4F00-AA60-411E0A359CB0}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "File_Extractor", "..\..\..\dependencies\File_Extractor-0.4.3\File_Extractor2008.vcproj", "{7AEC599C-7C82-4F00-AA60-411E0A359CB0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6D4C5EC8-933F-4C05-A1BF-498E658576DF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6D4C5EC8-933F-4C05-A1BF-498E658576DF}.Debug|Win32.Build.0 = Debug|Win32
+		{6D4C5EC8-933F-4C05-A1BF-498E658576DF}.Release|Win32.ActiveCfg = Release|Win32
+		{6D4C5EC8-933F-4C05-A1BF-498E658576DF}.Release|Win32.Build.0 = Release|Win32
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0}.Debug|Win32.Build.0 = Debug|Win32
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0}.Release|Win32.ActiveCfg = Release|Win32
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

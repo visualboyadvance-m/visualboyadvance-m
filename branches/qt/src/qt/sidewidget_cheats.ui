@@ -1,0 +1,47 @@
+<ui version="4.0" >
+ <class>sidewidget_cheats</class>
+ <widget class="QWidget" name="sidewidget_cheats" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>160</width>
+    <height>320</height>
+   </rect>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>160</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle" >
+   <string>Cheats</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QCheckBox" name="enableCheatsCheckbox" >
+       <property name="text" >
+        <string>Enable</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="searchForCheatsButton" >
+       <property name="text" >
+        <string>Search...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QListWidget" name="cheatListWidget" />
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
