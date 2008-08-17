@@ -28,6 +28,8 @@ Visual C++ 2008 project files
 =============================
 
 There are project files available for Microsoft's Visual C++ IDE/compiler.
+If you do not want to buy Visual C++, I recommend downloading the Express Edition for free.
+You can download it from http://www.microsoft.com/express/
 Refer to the instructions below for further assistance:
 
 The MS Visual C++ 2008 Express-compatible project file can be found in project/vc2008_qt.
@@ -41,6 +43,8 @@ The release build will automatically be compressed with UPX, make sure to downlo
 ==================================================
 How to compile Qt from source with Visual C++ 2008
 ==================================================
+
+- An official how-to can be found at http://doc.trolltech.com/main-snapshot/install-win.html
 
 - Download the latest Qt source code archive
  - You want "qt-win-opensource-src-x.x.x.zip", not "qt-win-opensource-x.x.x-mingw.exe"
