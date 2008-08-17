@@ -20,7 +20,6 @@ Download locations
 Qt:     http://trolltech.com/developer/downloads/qt/windows
 UPX:    http://upx.sourceforge.net/
 zlib:   http://zlib.net/
-libpng: http://libpng.org/pub/png/libpng.html
 
 
 =============================
@@ -37,7 +36,6 @@ It uses the qmake file in project/qmake, so you always have to add files to the 
 IMPORTANT: The Qt-sources have to be compiled with the Microsoft compiler first, in order to use it,
 because Trolltech only provides MinGW compatible binaries which are incompatible to the MS Compiler.
 Continue by reading "How to compile Qt from source with Visual C++ 2008".
-The release build will automatically be compressed with UPX, make sure to download it and point MSVC++ to it.
 
 
 ==================================================
@@ -55,6 +53,7 @@ How to compile Qt from source with Visual C++ 2008
 - Type & run "configure -release -fast -no-qt3support -platform win32-msvc2008"
 - When configure finished, simply run "nmake" and get yourself a coffee or ten.
 - When nmake finished and you've become a coffee addict, add the created lib files to your Visual Studio paths, do the same for the include paths.
+- You also have to compile zlib and point MSVC to it.
 
 
 ==========
