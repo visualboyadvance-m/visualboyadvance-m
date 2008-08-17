@@ -19,7 +19,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../System.h"
+#include "../shared/System.h"
+
 #include "gbGlobals.h"
 
 typedef struct {

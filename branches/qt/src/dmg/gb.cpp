@@ -21,15 +21,15 @@
 #include <string.h>
 #include <memory.h>
 
-#include "../System.h"
-#include "../NLS.h"
+#include "../shared/System.h"
+#include "../shared/NLS.h"
+#include "../shared/Util.h"
 #include "gb.h"
 #include "gbCheats.h"
 #include "gbGlobals.h"
 #include "gbMemory.h"
 #include "gbSGB.h"
 #include "gbSound.h"
-#include "../Util.h"
 
 #ifdef __GNUC__
 #define _stricmp strcasecmp
@@ -720,7 +720,7 @@ void  gbWriteMemory(register u16 address, register u8 value)
   if(address < 0x8000) {
 #ifndef FINAL_VERSION
     if(memorydebug && (address>0x3fff || address < 0x2000)) {
-      log("Memory register write %04x=%02x PC=%04x\n",
+      winlog("Memory register write %04x=%02x PC=%04x\n",
           address,
           value,
           PC.W);
@@ -753,7 +753,7 @@ void  gbWriteMemory(register u16 address, register u8 value)
   if(address < 0xc000) {
 #ifndef FINAL_VERSION
     if(memorydebug) {
-      log("Memory register write %04x=%02x PC=%04x\n",
+      winlog("Memory register write %04x=%02x PC=%04x\n",
           address,
           value,
           PC.W);
@@ -1766,7 +1766,7 @@ u8 gbReadMemory(register u16 address)
   if(address < 0xc000) {
 #ifndef FINAL_VERSION
     if(memorydebug) {
-      log("Memory register read %04x PC=%04x\n",
+      winlog("Memory register read %04x PC=%04x\n",
           address,
           PC.W);
     }
@@ -4479,7 +4479,7 @@ void gbEmulate(int ticksToStop)
         } else {
           sprintf(gbBuffer,"PC=%04x I=%02x\n", PC.W, IFF);
         }
-        log(gbBuffer);
+        winlog(gbBuffer);
       }
     }
 #endif

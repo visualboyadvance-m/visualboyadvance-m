@@ -18,8 +18,9 @@
 
 #include <memory.h>
 
-#include "../System.h"
-#include "../Util.h"
+#include "../shared/System.h"
+#include "../shared/Util.h"
+
 #include "gbGlobals.h"
 #include "gbSound.h"
 
@@ -74,7 +75,7 @@ void gbSoundEvent(register u16 address, register int data)
 #ifndef FINAL_VERSION
 	if(soundDebug) {
 		// don't translate. debug only
-		log("Sound event: %08lx %02x\n", address, data);
+		winlog("Sound event: %08lx %02x\n", address, data);
 	}
 #endif
 
@@ -201,7 +202,7 @@ void gbSoundReset()
 	// don't translate
 #ifndef FINAL_VERSION
 	if(soundDebug) {
-		log("*** Sound Init ***\n");
+		winlog("*** Sound Init ***\n");
 	}
 #endif
 	gbSoundEvent(0xff10, 0x80);
@@ -232,7 +233,7 @@ void gbSoundReset()
 	// don't translate
 #ifndef FINAL_VERSION
 	if(soundDebug) {
-		log("*** Sound Init Complete ***\n");
+		winlog("*** Sound Init Complete ***\n");
 	}
 #endif
 	int addr = 0xff30;

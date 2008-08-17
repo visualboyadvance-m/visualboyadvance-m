@@ -17,10 +17,13 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "../agb/GBA.h"
-#include "../Port.h"
+
+#include "../shared/Port.h"
+
 #include "gbGlobals.h"
 #include "gbMemory.h"
 #include "gb.h"
+
 u8 gbDaysinMonth [12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 const u8 gbDisabledRam [8] = {0x80, 0xff, 0xf0, 0x00, 0x30, 0xbf, 0xbf, 0xbf};
 extern int gbHardware;

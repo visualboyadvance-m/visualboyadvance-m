@@ -8,9 +8,9 @@ DEFINES += BKPT_SUPPORT NO_PNG
 M_DIR_QT = ../../src/qt/
 M_DIR_LANG = ../../lang/
 M_DIR_SHARED = ../../src/shared/
-M_DIR_GBAPU = ../../src/dmg/gb_apu/
-M_DIR_AGB = ../../src/agb/
 M_DIR_DMG = ../../src/dmg/
+M_DIR_GBAPU = $${M_DIR_DMG}gb_apu/
+M_DIR_AGB = ../../src/agb/
 M_DIR_DEP = ../../../dependencies/msvc/
 
 
@@ -129,6 +129,36 @@ SOURCES += $${M_DIR_SHARED}Mode5.cpp
 #HEADERS += $${M_DIR_SHARED}Port.h
 
 #SOURCES += $${M_DIR_SHARED}remote.cpp
+
+
+# GB Core Files
+HEADERS += $${M_DIR_DMG}gb.h
+SOURCES += $${M_DIR_DMG}gb.cpp
+
+HEADERS += $${M_DIR_DMG}gbCheats.h
+SOURCES += $${M_DIR_DMG}gbCheats.cpp
+
+HEADERS += $${M_DIR_DMG}gbCodes.h
+HEADERS += $${M_DIR_DMG}gbCodesCB.h
+
+SOURCES += $${M_DIR_DMG}gbDis.cpp
+
+SOURCES += $${M_DIR_DMG}gbGfx.cpp
+
+HEADERS += $${M_DIR_DMG}gbGlobals.h
+SOURCES += $${M_DIR_DMG}gbGlobals.cpp
+
+HEADERS += $${M_DIR_DMG}gbMemory.h
+SOURCES += $${M_DIR_DMG}gbMemory.cpp
+
+HEADERS += $${M_DIR_DMG}gbPrinter.h
+SOURCES += $${M_DIR_DMG}gbPrinter.cpp
+
+HEADERS += $${M_DIR_DMG}gbSGB.h
+SOURCES += $${M_DIR_DMG}gbSGB.cpp
+
+HEADERS += $${M_DIR_DMG}gbSound.h
+SOURCES += $${M_DIR_DMG}gbSound.cpp
 
 
 # GB APU

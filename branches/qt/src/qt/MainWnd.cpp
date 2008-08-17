@@ -154,8 +154,8 @@ void MainWnd::createMenus()
 
 	// File menu
 	fileMenu = menuBar()->addMenu( tr( "File" ) );
-	fileMenu->addAction( QIcon( ":/resources/open.png" ), tr( "Open ROM" ), this, SLOT( showOpenROM() ) );
-	fileMenu->addAction( QIcon(), tr( "Close ROM" ), this, SLOT( closeROM() ) );
+	fileMenu->addAction( QIcon( ":/resources/open.png" ), tr( "Open ROM" ), this, SLOT( showOpenRom() ) );
+	fileMenu->addAction( QIcon(), tr( "Close ROM" ), this, SLOT( closeRom() ) );
 	fileMenu->addAction( QIcon( ":/resources/exit.png" ), tr( "Exit" ), this, SLOT( close() ) );
 
 
@@ -318,7 +318,7 @@ void MainWnd::showAbout()
 }
 
 
-void MainWnd::showOpenROM()
+void MainWnd::showOpenRom()
 {
 	QString file = QFileDialog::getOpenFileName(
 		this,
@@ -328,7 +328,7 @@ void MainWnd::showOpenROM()
 
 	if( file.isNull() ) return;
 
-	if( !emuManager->loadROM( file ) ) {
+	if( !emuManager->loadRom( file ) ) {
 		QMessageBox::critical( this, tr( "Error!" ), tr( "Can not load ROM!" ) );
 		return;
 	}
@@ -337,10 +337,10 @@ void MainWnd::showOpenROM()
 }
 
 
-void MainWnd::closeROM()
+void MainWnd::closeRom()
 {
-	if( emuManager->isROMLoaded() ) {
-		emuManager->unloadROM();
+	if( emuManager->isRomLoaded() ) {
+		emuManager->unloadRom();
 	}
 }
 

@@ -27,6 +27,7 @@ int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 bool systemSoundOn = false;
 u32 systemColorMap32[0x10000];
 u16 systemColorMap16[0x10000];
+u16 systemGbPalette[24];
 int systemRedShift = 0;
 int systemBlueShift = 0;
 int systemGreenShift = 0;
@@ -120,6 +121,12 @@ bool systemPauseOnFrame()
 }
 
 
+void systemGbBorderOn()
+{
+	// TODO: implement
+}
+
+
 void debuggerOutput( const char *s, u32 addr )
 {
 	// TODO: implement
@@ -174,3 +181,15 @@ bool systemCanChangeSoundQuality()
 	// TODO: implement
 	return false;
 }
+
+void systemGbPrint(u8 *data,
+                   int pages,
+                   int feed,
+                   int palette,
+                   int contrast)
+{
+  //GBPrinterDlg printer;
+  //printer.processData(data);
+  //printer.DoModal();
+}
+

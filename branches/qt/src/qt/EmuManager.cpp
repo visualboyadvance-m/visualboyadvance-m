@@ -18,11 +18,14 @@
 
 #include "EmuManager.h"
 
+//#include "../dmg/gb.h"
+
 
 EmuManager::EmuManager()
 : romBuffer( 0 )
 , systemType( SYSTEM_UNKNOWN )
 , romLoaded( false )
+, emulating( false )
 {
 }
 
@@ -36,7 +39,7 @@ EmuManager::~EmuManager()
 }
 
 
-bool EmuManager::loadROM( const QString &filePath )
+bool EmuManager::loadRom( const QString &filePath )
 {
 	if( 0 == filePath.compare( romPath ) ) {
 		// we don't need to reload the ROM into romBuffer
@@ -44,7 +47,7 @@ bool EmuManager::loadROM( const QString &filePath )
 	}
 
 	if( filePath.isEmpty() ) {
-		unloadROM();
+		unloadRom();
 		return false;
 	}
 
@@ -107,24 +110,31 @@ bool EmuManager::loadROM( const QString &filePath )
 		systemType = SYSTEM_GBA;
 	}
 
-	if( systemType == SYSTEM_UNKNOWN ) {
-		return false;
+
+	// tell the core where to find the ROM data
+	switch( systemType ) {
+		case SYSTEM_UNKNOWN:
+			return false;
+			break;
+		case SYSTEM_GB:
+			//gbLoadRom();
+			break;
+		case SYSTEM_GBA:
+			break;
 	}
 
-	romLoaded = true;
 
+	romLoaded = true;
 	return true;
 }
 
 
-QString EmuManager::getROMPath()
+void EmuManager::unloadRom()
 {
-	return romPath;
-}
+	if( emulating ) {
+		stopEmulation();
+	}
 
-
-void EmuManager::unloadROM()
-{
 	romPath.clear();
 	romLoaded = false;
 
@@ -135,13 +145,50 @@ void EmuManager::unloadROM()
 }
 
 
-bool EmuManager::isROMLoaded()
+bool EmuManager::isRomLoaded()
 {
 	return romLoaded;
+}
+
+
+QString EmuManager::getRomPath()
+{
+	return romPath;
 }
 
 
 EmuManager::SYSTEM_TYPE EmuManager::getSystemType()
 {
 	return systemType;
+}
+
+
+bool EmuManager::startEmulation()
+{
+	if( emulating ) return true;
+
+	switch( systemType ) {
+		case SYSTEM_UNKNOWN:
+			return false;
+			break;
+		case SYSTEM_GB:
+			break;
+		case SYSTEM_GBA:
+			break;
+	}
+
+	emulating = true;
+	return true;
+}
+
+
+void EmuManager::stopEmulation()
+{
+	emulating = false;
+}
+
+
+bool EmuManager::isEmulating()
+{
+	return emulating;
 }

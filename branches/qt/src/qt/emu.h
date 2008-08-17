@@ -30,6 +30,7 @@ extern int systemSaveUpdateCounter;
 extern bool systemSoundOn;
 extern u32 systemColorMap32[0x10000];
 extern u16 systemColorMap16[0x10000];
+extern u16 systemGbPalette[24];
 extern int systemRedShift;
 extern int systemBlueShift;
 extern int systemGreenShift;
@@ -53,6 +54,7 @@ void debuggerSignal( int sig,int number );
 void debuggerOutput( const char *s, u32 addr );
 
 bool systemPauseOnFrame();
+void systemGbBorderOn();
 void systemScreenCapture( int captureNumber );
 void systemDrawScreen();
 void systemShowSpeed( int speed );
@@ -66,6 +68,12 @@ void systemSoundResume();
 void systemSoundReset();
 bool systemSoundInit();
 bool systemCanChangeSoundQuality();
+
+void systemGbPrint(u8 *data,
+                   int pages,
+                   int feed,
+                   int palette,
+                   int contrast);
 
 
 #endif // #ifndef EMU_H

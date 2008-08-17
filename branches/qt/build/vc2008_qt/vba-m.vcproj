@@ -132,18 +132,6 @@
 					</File>
 				</Filter>
 			</Filter>
-			<Filter
-				Name="IO"
-				>
-				<File
-					RelativePath="..\..\src\qt\GraphicsOutput.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\qt\GraphicsOutput.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Build"
@@ -151,6 +139,7 @@
 			>
 			<File
 				RelativePath="..\qmake\vba-m.pro"
+				FileType="8"
 				>
 			</File>
 			<File
@@ -174,26 +163,6 @@
 				RelativePath="..\..\src\qt\version.h"
 				>
 			</File>
-			<Filter
-				Name="EmuManager"
-				>
-				<File
-					RelativePath="..\..\src\qt\emu.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\qt\emu.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\qt\EmuManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\qt\EmuManager.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Core"
@@ -371,65 +340,173 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="APU"
+				Name="GB"
 				>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\blargg_common.h"
+					RelativePath="..\..\src\dmg\gb.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\blargg_config.h"
+					RelativePath="..\..\src\dmg\gb.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\blargg_source.h"
+					RelativePath="..\..\src\dmg\gbCheats.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Blip_Buffer.cpp"
+					RelativePath="..\..\src\dmg\gbCheats.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Blip_Buffer.h"
+					RelativePath="..\..\src\dmg\gbCodes.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Effects_Buffer.cpp"
+					RelativePath="..\..\src\dmg\gbCodesCB.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Effects_Buffer.h"
+					RelativePath="..\..\src\dmg\gbDis.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Gb_Apu.cpp"
+					RelativePath="..\..\src\dmg\gbGfx.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Gb_Apu.h"
+					RelativePath="..\..\src\dmg\gbGlobals.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Gb_Apu_State.cpp"
+					RelativePath="..\..\src\dmg\gbGlobals.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Gb_Oscs.cpp"
+					RelativePath="..\..\src\dmg\gbMemory.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Gb_Oscs.h"
+					RelativePath="..\..\src\dmg\gbMemory.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Multi_Buffer.cpp"
+					RelativePath="..\..\src\dmg\gbPrinter.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Multi_Buffer.h"
+					RelativePath="..\..\src\dmg\gbPrinter.h"
 					>
 				</File>
+				<File
+					RelativePath="..\..\src\dmg\gbSGB.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\dmg\gbSGB.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\dmg\gbSound.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\dmg\gbSound.h"
+					>
+				</File>
+				<Filter
+					Name="APU"
+					>
+					<File
+						RelativePath="..\..\src\dmg\gb_apu\blargg_common.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\dmg\gb_apu\blargg_config.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\dmg\gb_apu\blargg_source.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\dmg\gb_apu\Blip_Buffer.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\dmg\gb_apu\Blip_Buffer.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\dmg\gb_apu\Effects_Buffer.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\dmg\gb_apu\Effects_Buffer.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\dmg\gb_apu\Gb_Apu.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\dmg\gb_apu\Gb_Apu.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\dmg\gb_apu\Gb_Apu_State.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\dmg\gb_apu\Gb_Oscs.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\dmg\gb_apu\Gb_Oscs.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\dmg\gb_apu\Multi_Buffer.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\dmg\gb_apu\Multi_Buffer.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="IO"
+			>
+			<File
+				RelativePath="..\..\src\qt\GraphicsOutput.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\qt\GraphicsOutput.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="EmuManager"
+			>
+			<File
+				RelativePath="..\..\src\qt\emu.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\qt\emu.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\qt\EmuManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\qt\EmuManager.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

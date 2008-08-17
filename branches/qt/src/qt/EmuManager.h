@@ -16,16 +16,17 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
+// The EmuManager class is the interface to the core.
+// All communications with the core MUST be handled by this class for cleaner code.
+
+
 #ifndef EMUMANAGER_H
 #define EMUMANAGER_H
 
 
 #include "precompile.h"
 
-#include "emu.h"
 
-
-// class to abstract emulation control
 class EmuManager
 {
 public:
@@ -40,19 +41,24 @@ public:
 	EmuManager();
 	~EmuManager();
 
-	bool loadROM( const QString &filePath );
-	QString getROMPath();
-	void unloadROM();
-	bool isROMLoaded();
+	bool loadRom( const QString &filePath );
+	void unloadRom();
+	bool isRomLoaded();
+	QString getRomPath();
 
 	SYSTEM_TYPE getSystemType();
+
+	bool startEmulation();
+	void stopEmulation();
+	bool isEmulating();
 
 
 private:
 	QString romPath;
 	unsigned char *romBuffer;
-	SYSTEM_TYPE systemType; // set by loadROM()
+	SYSTEM_TYPE systemType; // set by loadRom()
 	bool romLoaded;
+	bool emulating;
 };
 
 

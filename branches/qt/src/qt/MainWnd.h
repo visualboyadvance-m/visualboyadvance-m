@@ -61,8 +61,8 @@ private slots:
 	bool enableTranslation( bool enable );
 	void showAbout();
 	void showAboutOpenGL();
-	void showOpenROM();
-	void closeROM();
+	void showOpenRom();
+	void closeRom();
 	void showMainOptions();
 };
 

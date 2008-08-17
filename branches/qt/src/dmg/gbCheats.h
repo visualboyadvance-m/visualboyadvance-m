@@ -20,7 +20,7 @@
 #ifndef __VBA_GB_GBCHEATS_H
 #define __VBA_GB_GBCHEATS_H
 
-#include "../System.h"
+#include "../shared/System.h"
 
 struct gbXxCheat {
   char cheatDesc[100];
