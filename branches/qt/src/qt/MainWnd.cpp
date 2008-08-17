@@ -155,6 +155,7 @@ void MainWnd::createMenus()
 	// File menu
 	fileMenu = menuBar()->addMenu( tr( "File" ) );
 	fileMenu->addAction( QIcon( ":/resources/open.png" ), tr( "Open ROM" ), this, SLOT( showOpenROM() ) );
+	fileMenu->addAction( QIcon(), tr( "Close ROM" ), this, SLOT( closeROM() ) );
 	fileMenu->addAction( QIcon( ":/resources/exit.png" ), tr( "Exit" ), this, SLOT( close() ) );
 
 
@@ -327,13 +328,20 @@ void MainWnd::showOpenROM()
 
 	if( file.isNull() ) return;
 
-	emuManager->setROM( file );
-	if( !emuManager->loadROM() ) {
+	if( !emuManager->loadROM( file ) ) {
 		QMessageBox::critical( this, tr( "Error!" ), tr( "Can not load ROM!" ) );
 		return;
 	}
 
 	// TODO: start emulation
+}
+
+
+void MainWnd::closeROM()
+{
+	if( emuManager->isROMLoaded() ) {
+		emuManager->unloadROM();
+	}
 }
 
 

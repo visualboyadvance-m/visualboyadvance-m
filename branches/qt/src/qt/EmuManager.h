@@ -29,17 +29,30 @@
 class EmuManager
 {
 public:
+	enum SYSTEM_TYPE {
+		SYSTEM_UNKNOWN,
+		SYSTEM_GB,
+		SYSTEM_GBA
+	};
+
+
+public:
 	EmuManager();
 	~EmuManager();
 
-	void setROM( QString &file );
-	QString &getROM();
+	bool loadROM( const QString &filePath );
+	QString getROMPath();
+	void unloadROM();
+	bool isROMLoaded();
 
-	bool loadROM();
+	SYSTEM_TYPE getSystemType();
+
 
 private:
 	QString romPath;
 	unsigned char *romBuffer;
+	SYSTEM_TYPE systemType; // set by loadROM()
+	bool romLoaded;
 };
 
 

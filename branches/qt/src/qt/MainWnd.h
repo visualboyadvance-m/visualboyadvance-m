@@ -62,6 +62,7 @@ private slots:
 	void showAbout();
 	void showAboutOpenGL();
 	void showOpenROM();
+	void closeROM();
 	void showMainOptions();
 };
 

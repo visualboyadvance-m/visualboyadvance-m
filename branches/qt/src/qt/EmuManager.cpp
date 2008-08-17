@@ -21,6 +21,8 @@
 
 EmuManager::EmuManager()
 : romBuffer( 0 )
+, systemType( SYSTEM_UNKNOWN )
+, romLoaded( false )
 {
 }
 
@@ -34,20 +36,21 @@ EmuManager::~EmuManager()
 }
 
 
-void EmuManager::setROM( QString &file )
+bool EmuManager::loadROM( const QString &filePath )
 {
-	romPath = file;
-}
+	if( 0 == filePath.compare( romPath ) ) {
+		// we don't need to reload the ROM into romBuffer
+		return true;
+	}
 
+	if( filePath.isEmpty() ) {
+		unloadROM();
+		return false;
+	}
 
-QString &EmuManager::getROM()
-{
-	return romPath;
-}
-
-
-bool EmuManager::loadROM()
-{
+	romPath = filePath;
+	romLoaded = false;
+	
 	// validate ROM
 	if( romPath.isEmpty() ) return false;
 
@@ -60,6 +63,7 @@ bool EmuManager::loadROM()
 
 	// TODO: add further validation
 
+
 	// read ROM into memory
 	if( !file.open( QIODevice::ReadOnly ) ) return false;
 
@@ -69,6 +73,7 @@ bool EmuManager::loadROM()
 		temp = (unsigned char *)realloc( romBuffer, size );
 		if( temp == 0 ) {
 			free( romBuffer );
+			romBuffer = 0;
 			return false;
 		} else {
 			romBuffer = temp;
@@ -81,5 +86,62 @@ bool EmuManager::loadROM()
 
 	if( -1 == file.read( (char *)romBuffer, size ) ) return false;
 
+	file.close();
+
+
+	// determine system type
+	QFileInfo fileInfo( romPath );
+	QString suffix = fileInfo.suffix();
+
+	systemType = SYSTEM_UNKNOWN;
+
+	if( 0 == suffix.compare( "gb", Qt::CaseInsensitive ) ) {
+		systemType = SYSTEM_GB;
+	}
+
+	if( 0 == suffix.compare( "gbc", Qt::CaseInsensitive ) ) {
+		systemType = SYSTEM_GB;
+	}
+
+	if( 0 == suffix.compare( "gba", Qt::CaseInsensitive ) ) {
+		systemType = SYSTEM_GBA;
+	}
+
+	if( systemType == SYSTEM_UNKNOWN ) {
+		return false;
+	}
+
+	romLoaded = true;
+
 	return true;
+}
+
+
+QString EmuManager::getROMPath()
+{
+	return romPath;
+}
+
+
+void EmuManager::unloadROM()
+{
+	romPath.clear();
+	romLoaded = false;
+
+	if( romBuffer != 0 ) {
+		free( romBuffer );
+		romBuffer = 0;
+	}
+}
+
+
+bool EmuManager::isROMLoaded()
+{
+	return romLoaded;
+}
+
+
+EmuManager::SYSTEM_TYPE EmuManager::getSystemType()
+{
+	return systemType;
 }
