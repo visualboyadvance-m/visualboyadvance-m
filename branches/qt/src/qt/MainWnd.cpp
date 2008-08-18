@@ -49,7 +49,7 @@ MainWnd::MainWnd( QTranslator **trans, QSettings *settings, QTimer *emuTimer, QW
 
 	emuManager = new EmuManager();
 	
-	connect( emuTimer, SIGNAL( timeout() ), this, SLOT( executeRom ) );
+	connect( emuTimer, SIGNAL( timeout() ), this, SLOT( executeRom() ) );
 }
 
 
@@ -58,11 +58,6 @@ MainWnd::~MainWnd()
 	if( emuManager != 0 ) {
 		delete emuManager;
 		emuManager = 0;
-	}
-
-	if( graphicsOutput != 0 ) {
-		delete graphicsOutput;
-		graphicsOutput = 0;
 	}
 }
 
