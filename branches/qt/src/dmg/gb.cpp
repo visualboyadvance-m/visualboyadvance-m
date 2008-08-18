@@ -4006,9 +4006,11 @@ void gbCleanUp()
     gbRam = NULL;
   }
 
-  if(gbRom != NULL) {
-    free(gbRom);
-    gbRom = NULL;
+  if(!gbRomMemoryIsExternal) {
+    if(gbRom != NULL) {
+      free(gbRom);
+      gbRom = NULL;
+    }
   }
 
   if(gbMemory != NULL) {
@@ -4060,6 +4062,7 @@ bool gbLoadRom(const char *szFile)
                    utilIsGBImage,
                    NULL,
                    size);
+  gbRomMemoryIsExternal = false;
   if(!gbRom)
     return false;
 
@@ -4074,6 +4077,30 @@ bool gbLoadRom(const char *szFile)
   bios = (u8 *)calloc(1,0x100);
 
   return gbUpdateSizes();
+}
+
+bool gbLoadRomFromMemory( unsigned char *memory, const int size )
+{
+	if( gbRom != NULL ) {
+		gbCleanUp();
+	}
+	
+	systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
+
+	gbRom = memory;
+	gbRomMemoryIsExternal = true; // [memory] shall not be freed by the core
+	
+	gbRomSize = size;
+	
+	gbBatteryError = false;
+	
+	if(bios != NULL) {
+		free(bios);
+		bios = NULL;
+	}
+	bios = (u8 *)calloc(1,0x100);
+	
+	return gbUpdateSizes();
 }
 
 bool gbUpdateSizes()

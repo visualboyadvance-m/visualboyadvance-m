@@ -29,6 +29,7 @@ extern u8 *bios;
 extern bool skipSaveGameBattery;
 
 extern u8 *gbRom;
+extern bool gbRomMemoryIsExternal;
 extern u8 *gbRam;
 extern u8 *gbVram;
 extern u8 *gbWram;

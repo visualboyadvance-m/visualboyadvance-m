@@ -39,6 +39,7 @@ typedef union {
 } gbRegister;
 
 bool gbLoadRom(const char *);
+bool gbLoadRomFromMemory( unsigned char *memory, const int size );
 void gbEmulate(int);
 void gbWriteMemory(register u16, register u8);
 void gbDrawLine();

@@ -29,6 +29,7 @@ int gbTAMA5ramSize = 0;
 u8 *gbMemory = NULL;
 u8 *gbVram = NULL;
 u8 *gbRom = NULL;
+bool gbRomMemoryIsExternal = false;
 u8 *gbRam = NULL;
 u8 *gbWram = NULL;
 u16 *gbLineBuffer = NULL;

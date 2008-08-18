@@ -18,11 +18,12 @@
 
 #include "EmuManager.h"
 
-//#include "../dmg/gb.h"
+#include "../dmg/gb.h"
 
 
 EmuManager::EmuManager()
 : romBuffer( 0 )
+, romSize( 0 )
 , systemType( SYSTEM_UNKNOWN )
 , romLoaded( false )
 , emulating( false )
@@ -39,61 +40,78 @@ EmuManager::~EmuManager()
 }
 
 
+// for memory optimization, do NOT call unloadRom() before calling loadRom()
 bool EmuManager::loadRom( const QString &filePath )
 {
+	//### Basic checks
 	if( 0 == filePath.compare( romPath ) ) {
-		// we don't need to reload the ROM into romBuffer
+		// We assume ROM content did not change since last call.
+		// Same file: do not reload ROM data into [romBuffer].
 		return true;
 	}
 
 	if( filePath.isEmpty() ) {
-		unloadRom();
 		return false;
 	}
 
-	romPath = filePath;
-	romLoaded = false;
-	
-	// validate ROM
-	if( romPath.isEmpty() ) return false;
 
-	QFile file( romPath );
+	//### Validate ROM
+	QFile file( filePath );
 
 	if( !file.exists() ) return false;
 
 	qint64 size = file.size();
+
 	if( ( size == 0 ) || ( size > 0x2000000 /* 32MB */ ) ) return false;
 
 	// TODO: add further validation
 
 
-	// read ROM into memory
-	if( !file.open( QIODevice::ReadOnly ) ) return false;
-
-	if( romBuffer != 0 ) {
-		// resize the buffer
-		unsigned char *temp;
-		temp = (unsigned char *)realloc( romBuffer, size );
-		if( temp == 0 ) {
-			free( romBuffer );
-			romBuffer = 0;
+	//### Prepare [romBuffer] size
+	if( romBuffer == 0 ) {
+		// [romBuffer] does not yet exist.
+		// Allocate new memory for romBuffer.
+		romBuffer = (unsigned char *)malloc( size );
+		if( romBuffer == 0 ) {
+			// error occured
 			return false;
-		} else {
-			romBuffer = temp;
 		}
 	} else {
-		// create the buffer
-		romBuffer = (unsigned char *)malloc( size );
-		if( romBuffer == 0 ) return false;
+		// romBuffer already exists
+		if( size == romSize ) {
+			// new and old ROMs have the same size, perfect!
+		} else {
+			// resize the buffer
+			unsigned char *temp;
+			temp = (unsigned char *)realloc( romBuffer, size );
+			if( temp == 0 ) {
+				// error occured, romBuffer is left unchanged
+				return false;
+			} else {
+				// everything is fine
+				romBuffer = temp;
+				romLoaded = true;
+			}
+		}
 	}
 
-	if( -1 == file.read( (char *)romBuffer, size ) ) return false;
 
+	//### Read ROM into memory
+	if( !file.open( QIODevice::ReadOnly ) ) {
+		return false;
+	}
+
+	qint64 bytesRead = file.read( (char *)romBuffer, size );
 	file.close();
 
+	if( bytesRead < size ) {
+		// Not all bytes could be read from the file or error occured.
+		return false;
+	}
 
-	// determine system type
-	QFileInfo fileInfo( romPath );
+
+	//### Determine system type
+	QFileInfo fileInfo( filePath );
 	QString suffix = fileInfo.suffix();
 
 	systemType = SYSTEM_UNKNOWN;
@@ -110,20 +128,27 @@ bool EmuManager::loadRom( const QString &filePath )
 		systemType = SYSTEM_GBA;
 	}
 
+	// TODO: add more extensions & compressed formats
 
-	// tell the core where to find the ROM data
+
+	//### Tell the core where to find the ROM data
 	switch( systemType ) {
 		case SYSTEM_UNKNOWN:
 			return false;
 			break;
 		case SYSTEM_GB:
-			//gbLoadRom();
+			// Show the GB core where to find the ROM data in memory.
+			// Make sure no one else accesses romBuffer from now on!
+			gbLoadRomFromMemory( romBuffer, (int)size );
 			break;
 		case SYSTEM_GBA:
 			break;
 	}
 
 
+	//### Finished successfully
+	romPath = filePath;
+	romSize = size;
 	romLoaded = true;
 	return true;
 }
@@ -136,6 +161,7 @@ void EmuManager::unloadRom()
 	}
 
 	romPath.clear();
+	romSize = 0;
 	romLoaded = false;
 
 	if( romBuffer != 0 ) {

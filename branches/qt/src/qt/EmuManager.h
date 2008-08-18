@@ -56,6 +56,7 @@ public:
 private:
 	QString romPath;
 	unsigned char *romBuffer;
+	int romSize;
 	SYSTEM_TYPE systemType; // set by loadRom()
 	bool romLoaded;
 	bool emulating;
