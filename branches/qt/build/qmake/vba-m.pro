@@ -23,7 +23,6 @@ M_DIR_DEP = ../../../dependencies/msvc/
 # Tweaks
 win32-msvc2008 {
 	DEFINES += _CRT_SECURE_NO_WARNINGS
-	DEFINES += NO_PNG
 	INCLUDEPATH += $${M_DIR_DEP}
 }
 

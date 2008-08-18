@@ -4810,7 +4810,7 @@ void gbEmulate(int ticksToStop)
                     tempgbWindowLine = 146;
                   }
 
-                  int wy = inUseRegister_WY;
+                  //int wy = inUseRegister_WY;
 
                   if(register_LY >= inUseRegister_WY) {
 

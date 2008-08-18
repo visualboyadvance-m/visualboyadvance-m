@@ -177,10 +177,10 @@ bool gbVerifyGsCode(const char *code)
     if(!GBCHEAT_IS_HEX(code[i]))
       return false;
 
-  int address = GBCHEAT_HEX_VALUE(code[6]) << 12 |
-    GBCHEAT_HEX_VALUE(code[7]) << 8 |
-    GBCHEAT_HEX_VALUE(code[4]) << 4 |
-    GBCHEAT_HEX_VALUE(code[5]);
+  //int address = GBCHEAT_HEX_VALUE(code[6]) << 12 |
+  //  GBCHEAT_HEX_VALUE(code[7]) << 8 |
+  //  GBCHEAT_HEX_VALUE(code[4]) << 4 |
+  //  GBCHEAT_HEX_VALUE(code[5]);
 
   return true;
 }

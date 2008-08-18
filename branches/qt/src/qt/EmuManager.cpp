@@ -18,6 +18,8 @@
 
 #include "EmuManager.h"
 
+#include "../shared/Sound.h"
+
 #include "../dmg/gb.h"
 
 
@@ -191,15 +193,27 @@ EmuManager::SYSTEM_TYPE EmuManager::getSystemType()
 
 bool EmuManager::startEmulation()
 {
-	if( emulating ) return true;
+	if( emulating ) {
+		return true;
+	}
+
+	if( !romLoaded ) {
+		return false;
+	}
 
 	switch( systemType ) {
 		case SYSTEM_UNKNOWN:
 			return false;
 			break;
 		case SYSTEM_GB:
+			gbReset();
+			soundInit();
+			emuSys = GBSystem;
+			// TODO: Read battery file
+			// TODO: Set up display size etc.
 			break;
 		case SYSTEM_GBA:
+			// TODO: Add
 			break;
 	}
 
@@ -211,10 +225,28 @@ bool EmuManager::startEmulation()
 void EmuManager::stopEmulation()
 {
 	emulating = false;
+
+	// TODO: Write battery file
+
+	soundPause();
+
+	emuSys.emuCleanUp();
 }
 
 
 bool EmuManager::isEmulating()
 {
 	return emulating;
+}
+
+
+void EmuManager::emulate()
+{
+	if( !emulating ) {
+		return;
+	}
+
+	for( int i = 0 ; i < 2 ; i++ ) {
+		emuSys.emuMain( emuSys.emuCount );
+	}
 }

@@ -26,6 +26,8 @@
 
 #include "precompile.h"
 
+#include "../shared/System.h"
+
 
 class EmuManager
 {
@@ -51,6 +53,7 @@ public:
 	bool startEmulation();
 	void stopEmulation();
 	bool isEmulating();
+	void emulate(); // call to progress
 
 
 private:
@@ -60,6 +63,7 @@ private:
 	SYSTEM_TYPE systemType; // set by loadRom()
 	bool romLoaded;
 	bool emulating;
+	struct EmulatedSystem emuSys;
 };
 
 

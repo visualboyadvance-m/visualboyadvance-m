@@ -29,7 +29,7 @@ class MainWnd : public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWnd( QTranslator **trans, QSettings *settings, QWidget *parent = 0 );
+	MainWnd( QTranslator **trans, QSettings *settings, QTimer *emuTimer, QWidget *parent = 0 );
 	~MainWnd();
 
 public slots:
@@ -53,8 +53,10 @@ private:
 	QMenu *toolsMenu;
 	QMenu *helpMenu;
 	QDockWidget *dockWidget_cheats;
-	EmuManager *emuManager;
 	GraphicsOutput *graphicsOutput;
+
+	EmuManager *emuManager;
+	QTimer *emuTimer;
 
 private slots:
 	bool selectLanguage();
@@ -62,6 +64,9 @@ private slots:
 	void showAbout();
 	void showAboutOpenGL();
 	void showOpenRom();
+	void playRom();
+	void pauseRom();
+	void executeRom();
 	void closeRom();
 	void showMainOptions();
 };

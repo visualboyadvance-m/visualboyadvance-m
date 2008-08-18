@@ -23,18 +23,19 @@
 #include "sidewidget_cheats.h"
 
 
-MainWnd::MainWnd( QTranslator **trans, QSettings *settings, QWidget *parent )
-	: QMainWindow( parent ),
-	translator( trans ),
-	settings( settings ),
-	fileMenu( 0 ),
-	settingsMenu( 0 ),
-	enableTranslationAct( 0 ),
-	toolsMenu( 0 ),
-	helpMenu( 0 ),
-	dockWidget_cheats( 0 ),
-	emuManager( 0 ),
-	graphicsOutput( 0 )
+MainWnd::MainWnd( QTranslator **trans, QSettings *settings, QTimer *emuTimer, QWidget *parent )
+: QMainWindow( parent )
+, translator( trans )
+, settings( settings )
+, emuTimer( emuTimer )
+, fileMenu( 0 )
+, settingsMenu( 0 )
+, enableTranslationAct( 0 )
+, toolsMenu( 0 )
+, helpMenu( 0 )
+, dockWidget_cheats( 0 )
+, emuManager( 0 )
+, graphicsOutput( 0 )
 {
 	createDisplay();
 	setMinimumSize( 320, 240 );
@@ -47,6 +48,8 @@ MainWnd::MainWnd( QTranslator **trans, QSettings *settings, QWidget *parent )
 	loadSettings();
 
 	emuManager = new EmuManager();
+	
+	connect( emuTimer, SIGNAL( timeout() ), this, SLOT( executeRom ) );
 }
 
 
@@ -155,6 +158,8 @@ void MainWnd::createMenus()
 	// File menu
 	fileMenu = menuBar()->addMenu( tr( "File" ) );
 	fileMenu->addAction( QIcon( ":/resources/open.png" ), tr( "Open ROM" ), this, SLOT( showOpenRom() ) );
+	fileMenu->addAction( QIcon(), tr( "Play ROM" ), this, SLOT( playRom() ) );
+	fileMenu->addAction( QIcon(), tr( "Pause ROM" ), this, SLOT( pauseRom() ) );
 	fileMenu->addAction( QIcon(), tr( "Close ROM" ), this, SLOT( closeRom() ) );
 	fileMenu->addAction( QIcon( ":/resources/exit.png" ), tr( "Exit" ), this, SLOT( close() ) );
 
@@ -337,9 +342,35 @@ void MainWnd::showOpenRom()
 }
 
 
+void MainWnd::playRom()
+{
+	// TODO: Using QTimer is just an experiment, as soon as emulation is up and running, we will switch to threads
+	if( emuManager->isRomLoaded() ) {
+		if( emuManager->startEmulation() ) {
+			emuTimer->start(); // idle timer
+		}
+	}
+}
+
+
+void MainWnd::pauseRom()
+{
+	// TODO: More checking
+	emuTimer->stop();
+}
+
+
+void MainWnd::executeRom()
+{
+	emuManager->emulate();
+}
+
+
 void MainWnd::closeRom()
 {
 	if( emuManager->isRomLoaded() ) {
+		// EmuManager will stop emulation for us if necessary.
+		pauseRom();
 		emuManager->unloadRom();
 	}
 }

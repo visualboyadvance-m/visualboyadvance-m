@@ -51,23 +51,23 @@
 #define FIFOB_H 0xa6
 
 extern void (*psoundTickfn)();
-extern void soundShutdown();
-extern bool soundInit();
-extern void soundPause();
-extern void soundResume();
-extern void soundEnable(int);
-extern void soundDisable(int);
-extern int  soundGetEnable();
-extern void soundReset();
-extern void soundSaveGame(gzFile);
-extern void soundReadGame(gzFile, int);
-extern void soundEvent(u32, u8);
-extern void soundEvent(u32, u16);
-extern void soundTimerOverflow(int);
-extern void soundSetQuality(int);
-extern void setsystemSoundOn(bool value);
-extern void setsoundPaused(bool value);
-extern void interp_rate();
+void soundShutdown();
+bool soundInit();
+void soundPause();
+void soundResume();
+void soundEnable(int);
+void soundDisable(int);
+int  soundGetEnable();
+void soundReset();
+void soundSaveGame(gzFile);
+void soundReadGame(gzFile, int);
+void soundEvent(u32, u8);
+void soundEvent(u32, u16);
+void soundTimerOverflow(int);
+void soundSetQuality(int);
+void setsystemSoundOn(bool value);
+void setsoundPaused(bool value);
+void interp_rate();
 
 extern int SOUND_CLOCK_TICKS;   // Number of 16.8 MHz clocks between calls to soundTick()
 extern int soundTicks;          // Number of 16.8 MHz clocks until soundTick() will be called

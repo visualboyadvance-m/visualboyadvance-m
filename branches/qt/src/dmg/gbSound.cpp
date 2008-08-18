@@ -68,7 +68,7 @@ u8 gbSoundRead( u16 address )
 
 void gbSoundEvent(register u16 address, register int data)
 {
-	int freq = 0;
+	//int freq = 0;
 
 	gbMemory[address] = data;
 
