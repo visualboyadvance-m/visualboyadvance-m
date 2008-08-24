@@ -29,7 +29,7 @@ class MainWnd : public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWnd( QTranslator **trans, QSettings *settings, QTimer *emuTimer, QWidget *parent = 0 );
+	MainWnd( QTranslator **translator, QSettings *settings, QTimer *emuTimer, QWidget *parent = 0 );
 	~MainWnd();
 
 public slots:

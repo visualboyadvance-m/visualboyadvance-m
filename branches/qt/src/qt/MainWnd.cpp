@@ -23,9 +23,9 @@
 #include "sidewidget_cheats.h"
 
 
-MainWnd::MainWnd( QTranslator **trans, QSettings *settings, QTimer *emuTimer, QWidget *parent )
+MainWnd::MainWnd( QTranslator **translator, QSettings *settings, QTimer *emuTimer, QWidget *parent )
 : QMainWindow( parent )
-, translator( trans )
+, translator( translator )
 , settings( settings )
 , emuTimer( emuTimer )
 , fileMenu( 0 )
@@ -247,6 +247,7 @@ bool MainWnd::selectLanguage()
 	if( ret == false ) {
 		QMessageBox::critical( this, tr( "Error!" ), tr( "Language file can not be loaded!" ) );
 	}
+
 	return ret;
 }
 

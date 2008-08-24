@@ -38,8 +38,6 @@ public:
 		SYSTEM_GBA
 	};
 
-
-public:
 	EmuManager();
 	~EmuManager();
 
