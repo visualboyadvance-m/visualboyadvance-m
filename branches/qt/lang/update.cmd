@@ -1,2 +1,2 @@
-cd ..\project\qmake
+cd ..\build\qmake
 lupdate vba-m.pro
