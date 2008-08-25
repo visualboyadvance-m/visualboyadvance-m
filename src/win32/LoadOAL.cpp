@@ -22,6 +22,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "stdafx.h"
+
+#ifndef NO_OAL
+
 #include "windows.h"
 #include "LoadOAL.h"
 
@@ -446,3 +450,5 @@ ALvoid UnloadOAL10Library()
 		g_hOpenALDLL = NULL;
 	}
 }
+
+#endif

@@ -1,9 +1,10 @@
 // src/win32/OALConfig.cpp : implementation file
 //
 
+#include "stdafx.h"
+
 #ifndef NO_OAL
 
-#include "stdafx.h"
 #include "OALConfig.h"
 
 // OpenAL

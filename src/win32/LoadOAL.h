@@ -1,3 +1,5 @@
+#ifndef NO_OAL
+
 #include <al.h>
 #include <alc.h>
 
@@ -162,3 +164,5 @@ typedef struct
 
 ALboolean LoadOAL10Library(char *szOALFullPathName, LPOPENALFNTABLE lpOALFnTable);
 ALvoid UnloadOAL10Library();
+
+#endif
