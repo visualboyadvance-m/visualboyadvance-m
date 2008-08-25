@@ -120,6 +120,11 @@ static void apply_effects()
 	}
 }
 
+void gbSoundConfigEffects( gb_effects_config_t const& c )
+{
+	gb_effects_config = c;
+}
+
 void gbSoundTick()
 {
  	if ( systemSoundOn && gb_apu && stereo_buffer )
@@ -140,8 +145,12 @@ void gbSoundTick()
 
 static void reset_apu()
 {
-	// Use DMG or CGB sound differences based on type of game
-	gb_apu->reset( gbHardware & 1 ? gb_apu->mode_dmg : gb_apu->mode_cgb );
+	Gb_Apu::mode_t mode = Gb_Apu::mode_dmg;
+	if ( gbHardware & 1 )
+		mode = Gb_Apu::mode_cgb;
+	if ( gbHardware & 4 )
+		mode = Gb_Apu::mode_agb;
+	gb_apu->reset( mode );
 
 	if ( stereo_buffer )
 		stereo_buffer->clear();
