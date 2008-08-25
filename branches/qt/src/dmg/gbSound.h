@@ -69,6 +69,6 @@ struct gb_effects_config_t
 	bool surround;  // true = put some channels in back
 };
 
-// Can be changed at any time, probably from another thread too.
-// Sound will notice changes during next 1/100 second.
-extern gb_effects_config_t gb_effects_config;
+// Changes effects configuration
+void gbSoundConfigEffects( gb_effects_config_t const& );
+extern gb_effects_config_t gb_effects_config; // current configuration

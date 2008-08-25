@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <memory.h>
+#include <assert.h>
 
 #include "../shared/System.h"
 #include "../shared/NLS.h"
@@ -591,7 +592,8 @@ u8 ZeroTable[256] = {
 #define GBSAVE_GAME_VERSION_9 9
 #define GBSAVE_GAME_VERSION_10 10
 #define GBSAVE_GAME_VERSION_11 11
-#define GBSAVE_GAME_VERSION GBSAVE_GAME_VERSION_11
+#define GBSAVE_GAME_VERSION_12 12
+#define GBSAVE_GAME_VERSION GBSAVE_GAME_VERSION_12
 
 int inline gbGetValue(int min,int max,int v)
 {
@@ -3565,6 +3567,7 @@ static bool gbWriteSaveState(gzFile gzFile)
   utilWriteInt(gzFile, gbWindowLine);
   utilWriteInt(gzFile, inUseRegister_WY);
   utilWriteInt(gzFile, gbScreenOn);
+  utilWriteInt(gzFile, 0x12345678); // end marker
   return true;
 }
 
@@ -3955,6 +3958,9 @@ static bool gbReadSaveState(gzFile gzFile)
     gbLine99Ticks *= 2;
 
   systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
+
+  if ( version >= 12 && utilReadInt( gzFile ) != 0x12345678 )
+    assert( false ); // fails if something read too much/little from file
 
   return true;
 }

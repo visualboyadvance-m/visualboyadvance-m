@@ -44,8 +44,6 @@ extern int soundTicks;
 extern int SOUND_CLOCK_TICKS;
 extern u32 soundNextPosition;
 
-extern int soundDebug;
-
 extern bool soundEcho;
 extern bool soundLowPass;
 extern bool soundReverse;
@@ -71,13 +69,6 @@ void gbSoundEvent(register u16 address, register int data)
 	//int freq = 0;
 
 	gbMemory[address] = data;
-
-#ifndef FINAL_VERSION
-	if(soundDebug) {
-		// don't translate. debug only
-		winlog("Sound event: %08lx %02x\n", address, data);
-	}
-#endif
 
 	if ( gb_apu && address >= NR10 && address <= 0xFF3F )
 		gb_apu->write_register( blip_time(), address, data );
@@ -130,6 +121,11 @@ static void apply_effects()
 	}
 }
 
+void gbSoundConfigEffects( gb_effects_config_t const& c )
+{
+	gb_effects_config = c;
+}
+
 void gbSoundTick()
 {
  	if ( systemSoundOn && gb_apu && stereo_buffer )
@@ -150,8 +146,12 @@ void gbSoundTick()
 
 static void reset_apu()
 {
-	// Use DMG or CGB sound differences based on type of game
-	gb_apu->reset( gbHardware & 1 ? gb_apu->mode_dmg : gb_apu->mode_cgb );
+	Gb_Apu::mode_t mode = Gb_Apu::mode_dmg;
+	if ( gbHardware & 1 )
+		mode = Gb_Apu::mode_cgb;
+	if ( gbHardware & 4 )
+		mode = Gb_Apu::mode_agb;
+	gb_apu->reset( mode );
 
 	if ( stereo_buffer )
 		stereo_buffer->clear();
@@ -199,12 +199,6 @@ void gbSoundReset()
 	soundPaused       = 1;
 	soundNextPosition = 0;
 
-	// don't translate
-#ifndef FINAL_VERSION
-	if(soundDebug) {
-		winlog("*** Sound Init ***\n");
-	}
-#endif
 	gbSoundEvent(0xff10, 0x80);
 	gbSoundEvent(0xff11, 0xbf);
 	gbSoundEvent(0xff12, 0xf3);
@@ -230,12 +224,6 @@ void gbSoundReset()
 	else
 		gbSoundEvent(0xff26, 0xf1);
 
-	// don't translate
-#ifndef FINAL_VERSION
-	if(soundDebug) {
-		winlog("*** Sound Init Complete ***\n");
-	}
-#endif
 	int addr = 0xff30;
 
 	while(addr < 0xff40) {
@@ -272,12 +260,18 @@ void gbSoundSetQuality(int quality)
 	}
 }
 
-static char dummy_buf [735 * 2];
+static struct {
+	int version;
+	gb_apu_state_t apu;
+} state;
 
-#define SKIP( type, name ) { dummy_buf, sizeof (type) }
+static char dummy_state [735 * 2];
 
-// funny expr at end ensures that type matches type of variable
-#define LOAD( type, name ) { &name, sizeof (name) + (&name - (type*) &name) }
+#define SKIP( type, name ) { dummy_state, sizeof (type) }
+
+#define LOAD( type, name ) { &name, sizeof (type) }
+
+// Old save state support
 
 static variable_desc gbsound_format [] =
 {
@@ -363,11 +357,6 @@ static variable_desc gbsound_format3 [] =
 	{ NULL, 0 }
 };
 
-void gbSoundSaveGame(gzFile gzFile)
-{
-	// TODO: implement
-}
-
 enum {
 	nr10 = 0,
 	nr11, nr12, nr13, nr14,
@@ -377,10 +366,18 @@ enum {
 	nr50, nr51, nr52
 };
 
-void gbSoundReadGame(int version,gzFile gzFile)
+static void gbSoundReadGameOld(int version,gzFile gzFile)
 {
-	return; // TODO: apparently GB save states don't work in the main emulator
-
+	if ( version == 11 )
+	{
+		// Version 11 didn't save any state
+		// TODO: same for version 10?
+		state.apu.regs [nr50] = 0x77; // volume at max
+		state.apu.regs [nr51] = 0xFF; // channels enabled
+		state.apu.regs [nr52] = 0x80; // power on
+		return;
+	}
+	
 	// Load state
 	utilReadData( gzFile, gbsound_format );
 
@@ -396,9 +393,7 @@ void gbSoundReadGame(int version,gzFile gzFile)
 	gbSoundSetQuality( quality );
 
 	// Convert to format Gb_Apu uses
-	reset_apu();
-	gb_apu_state_t s;
-	gb_apu->save_state( &s ); // use fresh values for anything not restored
+	gb_apu_state_t& s = state.apu;
 
 	// Only some registers are properly preserved
 	static int const regs_to_copy [] = {
@@ -408,6 +403,64 @@ void gbSoundReadGame(int version,gzFile gzFile)
 		s.regs [regs_to_copy [i]] = gbMemory [0xFF10 + regs_to_copy [i]];
 
 	memcpy( &s.regs [0x20], &gbMemory [0xFF30], 0x10 ); // wave
+}
 
-	gb_apu->load_state( s );
+// New state format
+
+static variable_desc gb_state [] =
+{
+	LOAD( int, state.version ),				// room_for_expansion will be used by later versions
+	
+	// APU
+	LOAD( u8 [0x40], state.apu.regs ),      // last values written to registers and wave RAM (both banks)
+	LOAD( int, state.apu.frame_time ),      // clocks until next frame sequencer action
+	LOAD( int, state.apu.frame_phase ),     // next step frame sequencer will run
+
+	LOAD( int, state.apu.sweep_freq ),      // sweep's internal frequency register
+	LOAD( int, state.apu.sweep_delay ),     // clocks until next sweep action
+	LOAD( int, state.apu.sweep_enabled ),
+	LOAD( int, state.apu.sweep_neg ),       // obscure internal flag
+	LOAD( int, state.apu.noise_divider ),
+	LOAD( int, state.apu.wave_buf ),        // last read byte of wave RAM
+
+	LOAD( int [4], state.apu.delay ),       // clocks until next channel action
+	LOAD( int [4], state.apu.length_ctr ),
+	LOAD( int [4], state.apu.phase ),       // square/wave phase, noise LFSR
+	LOAD( int [4], state.apu.enabled ),     // internal enabled flag
+
+	LOAD( int [3], state.apu.env_delay ),   // clocks until next envelope action
+	LOAD( int [3], state.apu.env_volume ),
+	LOAD( int [3], state.apu.env_enabled ),
+
+	SKIP( int [13], room_for_expansion ),
+
+	// Emulator
+	SKIP( int [16], room_for_expansion ),
+
+	{ NULL, 0 }
+};
+
+void gbSoundSaveGame( gzFile out )
+{
+	gb_apu->save_state( &state.apu );
+
+	// Be sure areas for expansion get written as zero
+	memset( dummy_state, 0, sizeof dummy_state );
+
+	state.version = 1;
+	utilWriteData( out, gb_state );
+}
+
+void gbSoundReadGame( int version, gzFile in )
+{
+	// Prepare APU and default state
+	reset_apu();
+	gb_apu->save_state( &state.apu );
+	
+	if ( version > 11 )
+		utilReadData( in, gb_state );
+	else
+		gbSoundReadGameOld( version, in );
+
+	gb_apu->load_state( state.apu );
 }
