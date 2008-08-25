@@ -15,14 +15,14 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#ifndef NO_OAL
-
 
 // === LOGALL writes very detailed informations to vba-trace.log ===
 //#define LOGALL
 
 
 #include "stdafx.h" // includes VBA.h for 'theApp.throttle'
+
+#ifndef NO_OAL
 
 // Interface
 #include "Sound.h"
