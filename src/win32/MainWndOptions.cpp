@@ -800,19 +800,6 @@ void MainWnd::OnUpdateOptionsEmulatorBmpformat(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(theApp.captureFormat == 1);
 }
 
-void MainWnd::OnOptionsSoundOff()
-{
-  soundOffFlag = true;
-  soundShutdown();
-  theApp.soundInitialized = false;
-}
-
-void MainWnd::OnUpdateOptionsSoundOff(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(soundOffFlag);
-  pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
-}
-
 void MainWnd::OnOptionsSoundMute()
 {
   soundDisable(0x30f);
@@ -822,22 +809,6 @@ void MainWnd::OnUpdateOptionsSoundMute(CCmdUI* pCmdUI)
 {
   int active = soundGetEnable() & 0x30f;
   pCmdUI->SetCheck(active == 0);
-}
-
-void MainWnd::OnOptionsSoundOn()
-{
-  if(soundOffFlag) {
-    soundOffFlag = false;
-    soundInit();
-  }
-  soundEnable(0x30f);
-}
-
-void MainWnd::OnUpdateOptionsSoundOn(CCmdUI* pCmdUI)
-{
-  int active = soundGetEnable() & 0x30f;
-  pCmdUI->SetCheck(active != 0 && !soundOffFlag);
-  pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
 }
 
 void MainWnd::OnOptionsSoundEcho()

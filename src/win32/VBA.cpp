@@ -1589,8 +1589,6 @@ void VBA::loadSettings()
   soundEnable(res);
   soundDisable(~res);
 
-  soundOffFlag = (regQueryDwordValue("soundOff", 0)) ? true : false;
-
   soundQuality = regQueryDwordValue("soundQuality", 1);
 
   soundEcho = regQueryDwordValue("soundEcho", 0) ? true : false;
@@ -2590,8 +2588,6 @@ void VBA::saveSettings()
     regSetStringValue("biosFileGB", biosFileNameGB);
 
   regSetDwordValue("soundEnable", soundGetEnable() & 0x30f);
-
-  regSetDwordValue("soundOff", soundOffFlag);
 
   regSetDwordValue("soundQuality", soundQuality);
 

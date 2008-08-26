@@ -205,12 +205,8 @@ public:
 	afx_msg void OnUpdateOptionsEmulatorPngformat(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorBmpformat();
 	afx_msg void OnUpdateOptionsEmulatorBmpformat(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsSoundOff();
-	afx_msg void OnUpdateOptionsSoundOff(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsSoundMute();
 	afx_msg void OnUpdateOptionsSoundMute(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsSoundOn();
-	afx_msg void OnUpdateOptionsSoundOn(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsSoundEcho();
 	afx_msg void OnUpdateOptionsSoundEcho(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsSoundLowpassfilter();
