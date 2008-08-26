@@ -58,9 +58,6 @@ extern int soundVolume;         // emulator volume code (not linear)
 extern int soundInterpolation;  // 1 if PCM should have low-pass filtering
 extern float soundFiltering;    // 0.0 = none, 1.0 = max (only if soundInterpolation!=0)
 
-// Not used anymore
-extern bool soundReverse;
-
 // Unknown purpose
 extern int soundBufferTotalLen;
 extern u32 soundNextPosition;
