@@ -10,8 +10,7 @@
 #ifndef APSTUDIO_INVOKED
 #include "targetver.h"
 #endif
-#include "afxres.h"
-
+#include "afxres.h"
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -1756,9 +1755,6 @@ BEGIN
                 MENUITEM "&Sync game to audio",         ID_OPTIONS_EMULATOR_SYNCHRONIZE
             END
             MENUITEM SEPARATOR
-            MENUITEM "&On",                         ID_OPTIONS_SOUND_ON
-            MENUITEM "O&ff",                        ID_OPTIONS_SOUND_OFF
-            MENUITEM SEPARATOR
             POPUP "&Volume"
             BEGIN
                 MENUITEM "&Mute",                       ID_OPTIONS_SOUND_MUTE
@@ -2302,8 +2298,7 @@ LANGUAGE 9, 1
 #pragma code_page(1252)
 #include "res\VBA.rc2"  // non-Microsoft Visual C++ edited resources
 #include "afxres.rc"     // Standard components
-#endif
-
+#endif
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 
