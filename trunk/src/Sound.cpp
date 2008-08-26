@@ -70,7 +70,6 @@ u16 soundFinalWave [1470];
 int soundBufferLen = sizeof soundFinalWave;
 
 int soundDebug        = 0;
-u32 soundNextPosition = 0;
 bool soundPaused      = true;
 
 void interp_rate() { /* empty for now */ }
@@ -548,8 +547,6 @@ void soundReset()
 	SOUND_CLOCK_TICKS = SOUND_CLOCK_TICKS_;
 	soundTicks        = SOUND_CLOCK_TICKS_;
 
-	soundNextPosition = 0;
-
 	soundEvent( NR52, (u8) 0x80 );
 }
 
@@ -570,13 +567,11 @@ void soundSetQuality(int quality)
 		{
 			soundShutdown();
 			soundQuality      = quality;
-			soundNextPosition = 0;
 			soundInit();
 		}
 		else
 		{
 			soundQuality      = quality;
-			soundNextPosition = 0;
 		}
 
 		remake_stereo_buffer();
