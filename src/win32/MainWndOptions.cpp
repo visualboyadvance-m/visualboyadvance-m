@@ -17,6 +17,7 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "stdafx.h"
+#include "VBA.h"
 #include "MainWnd.h"
 
 #include "Associate.h"
@@ -35,6 +36,7 @@
 #include "OALConfig.h"
 #include "XAudio2_Config.h"
 #include "BIOSDialog.h"
+#include "AudioEffectsDlg.h"
 
 #include "../System.h"
 #include "../agb/agbprint.h"
@@ -44,12 +46,10 @@
 #include "../dmg/GB.h"
 #include "../dmg/gbGlobals.h"
 #include "../dmg/gbPrinter.h"
+#include "../dmg/gbSound.h"
 #include "../agb/GBALink.h"
+
 #include <tchar.h>
-
-extern int emulating;
-
-extern void CPUUpdateRenderBuffers(bool force);
 
 
 void MainWnd::OnOptionsFrameskipThrottleNothrottle()
@@ -819,6 +819,27 @@ void MainWnd::OnOptionsSoundEcho()
 void MainWnd::OnUpdateOptionsSoundEcho(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(soundEcho);
+}
+
+void MainWnd::OnAudioEffects()
+{
+	AudioEffectsDlg dlg;
+
+	dlg.m_enabled = gb_effects_config.enabled;
+	dlg.m_surround = gb_effects_config.surround;
+	dlg.m_echo = gb_effects_config.echo;
+	dlg.m_stereo = gb_effects_config.stereo;
+
+	if( IDOK == dlg.DoModal() ) {
+		gb_effects_config_t _new;
+
+		_new.enabled = dlg.m_enabled;
+		_new.surround = dlg.m_surround;
+		_new.echo = dlg.m_echo;
+		_new.stereo = dlg.m_stereo;
+
+		gbSoundConfigEffects( _new );
+	}
 }
 
 void MainWnd::OnOptionsSoundLowpassfilter()
