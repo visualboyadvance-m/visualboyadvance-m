@@ -1796,7 +1796,6 @@ BEGIN
                 MENUITEM "Off",                         ID_OPTIONS_SOUND_PCMINTERPOLATION_NONE
             END
             MENUITEM SEPARATOR
-            MENUITEM "&Echo",                       ID_OPTIONS_SOUND_ECHO
             MENUITEM "Effects...",                  ID_AUDIO_EFFECTS
             MENUITEM SEPARATOR
             POPUP "Sound Channels"

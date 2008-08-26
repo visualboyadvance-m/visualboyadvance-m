@@ -43,7 +43,6 @@ extern int soundTicks;
 extern int SOUND_CLOCK_TICKS;
 extern u32 soundNextPosition;
 
-extern bool soundEcho;
 extern bool soundLowPass;
 extern bool soundReverse;
 extern bool soundOffFlag;
@@ -133,8 +132,6 @@ void gbSoundTick()
 		end_frame( SOUND_CLOCK_TICKS * ticks_to_time );
 
 		flush_samples();
-
-		gb_effects_config.enabled = soundEcho;
 
 		// Update effects config if it was changed
 		if ( memcmp( &gb_effects_config_current, &gb_effects_config,
