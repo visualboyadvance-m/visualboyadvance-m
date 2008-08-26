@@ -74,8 +74,6 @@ u32 soundNextPosition = 0;
 bool soundOffFlag     = false;
 bool soundPaused      = true;
 
-bool soundReverse = false;
-
 void interp_rate() { /* empty for now */ }
 
 class Gba_Pcm {
