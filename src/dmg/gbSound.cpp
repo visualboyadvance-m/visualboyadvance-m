@@ -43,7 +43,6 @@ extern int soundTicks;
 extern int SOUND_CLOCK_TICKS;
 extern u32 soundNextPosition;
 
-extern bool soundReverse;
 extern bool soundOffFlag;
 
 int const ticks_to_time = 2 * GB_APU_OVERCLOCK;

@@ -832,16 +832,6 @@ void MainWnd::OnAudioEffects()
 	}
 }
 
-void MainWnd::OnOptionsSoundReversestereo()
-{
-  soundReverse = !soundReverse;
-}
-
-void MainWnd::OnUpdateOptionsSoundReversestereo(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(soundReverse);
-}
-
 void MainWnd::OnOptionsSound11khz()
 {
   if(theApp.cartridgeType == 0)
