@@ -413,20 +413,18 @@ void MainWnd::OnToolsRecordStartavirecording()
 	}
 
 	// add audio stream
-	if( !soundOffFlag ) {
-		ret = theApp.aviRecorder->CreateAudioStream(
-			2,
-			44100 / soundQuality,
-			16,
-			this->GetSafeHwnd()
-			);
-		if( !ret ) {
-			systemMessage( IDS_AVI_CANNOT_CREATE_AUDIO, "Cannot create audio stream in AVI file." );
-			delete theApp.aviRecorder;
-			theApp.aviRecorder = NULL;
-			theApp.aviRecording = false;
-			return;
-		}
+	ret = theApp.aviRecorder->CreateAudioStream(
+		2,
+		44100 / soundQuality,
+		16,
+		this->GetSafeHwnd()
+		);
+	if( !ret ) {
+		systemMessage( IDS_AVI_CANNOT_CREATE_AUDIO, "Cannot create audio stream in AVI file." );
+		delete theApp.aviRecorder;
+		theApp.aviRecorder = NULL;
+		theApp.aviRecording = false;
+		return;
 	}
 }
 

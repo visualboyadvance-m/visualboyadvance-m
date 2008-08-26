@@ -62,6 +62,5 @@ extern float soundFiltering;    // 0.0 = none, 1.0 = max (only if soundInterpola
 extern int soundBufferTotalLen;
 extern u32 soundNextPosition;
 extern bool soundPaused;
-extern bool soundOffFlag;
 
 #endif // VBA_SOUND_H
