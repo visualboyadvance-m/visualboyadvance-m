@@ -1167,6 +1167,26 @@ BEGIN
     RTEXT           "Device:",IDC_STATIC,6,6,48,12
 END
 
+IDD_AUDIO_EFFECTS DIALOGEX 0, 0, 136, 144
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Audio Effects"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,30,126,48,14
+    PUSHBUTTON      "Cancel",IDCANCEL,84,126,48,14
+    GROUPBOX        "Game Boy only",IDC_STATIC,6,6,126,114
+    CONTROL         "Enhance sound",IDC_ENHANCE_SOUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,18,90,12
+    CONTROL         "Surround",IDC_SURROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,24,30,90,12
+    GROUPBOX        "Echo",IDC_STATIC,24,42,102,36
+    CONTROL         "",IDC_ECHO,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,30,54,90,12
+    LTEXT           "None",IDC_STATIC,30,66,36,8,SS_CENTERIMAGE
+    RTEXT           "Lots",IDC_STATIC,84,66,36,8,SS_CENTERIMAGE
+    GROUPBOX        "Stereo",IDC_STATIC,24,78,102,36
+    CONTROL         "",IDC_STEREO,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,30,90,90,12
+    LTEXT           "Center",IDC_STATIC,30,102,36,8,SS_CENTERIMAGE
+    RTEXT           "Left/Right",IDC_STATIC,84,102,36,8,SS_CENTERIMAGE
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1516,6 +1536,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 89
     END
+
+    IDD_AUDIO_EFFECTS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 129
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 137
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -1769,6 +1797,7 @@ BEGIN
             END
             MENUITEM SEPARATOR
             MENUITEM "&Echo",                       ID_OPTIONS_SOUND_ECHO
+            MENUITEM "Effects...",                  ID_AUDIO_EFFECTS
             MENUITEM SEPARATOR
             POPUP "Sound Channels"
             BEGIN
