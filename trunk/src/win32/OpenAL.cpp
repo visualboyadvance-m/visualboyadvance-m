@@ -197,7 +197,6 @@ bool OpenAL::init()
 	soundBufferLen = ( freq / 60 ) * 4;
 
 
-	setsystemSoundOn( true );
 	initialized = true;
 	return true;
 }

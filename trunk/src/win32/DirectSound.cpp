@@ -35,7 +35,6 @@
 #include <dsound.h>
 
 extern bool soundBufferLow;
-extern void setsystemSoundOn(bool value);
 
 class DirectSound : public ISound
 {
@@ -206,7 +205,6 @@ bool DirectSound::init()
 		return false;
 	}
 
-	setsystemSoundOn(true);
 	return true;
 }
 
@@ -279,9 +277,10 @@ void DirectSound::write()
 		          }
 		        }
 			}
-		} else {
+		}/* else {
+		 // TODO: remove?
 			 setsoundPaused(true);
-		}
+		}*/
 	}
 
 

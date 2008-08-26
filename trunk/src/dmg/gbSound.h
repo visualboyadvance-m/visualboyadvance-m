@@ -17,9 +17,6 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#ifndef GBSOUND_H
-#define GBSOUND_H
-
 #define NR10 0xff10
 #define NR11 0xff11
 #define NR12 0xff12
@@ -75,5 +72,3 @@ struct gb_effects_config_t
 // Changes effects configuration
 void gbSoundConfigEffects( gb_effects_config_t const& );
 extern gb_effects_config_t gb_effects_config; // current configuration
-
-#endif

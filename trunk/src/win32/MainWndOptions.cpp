@@ -802,13 +802,16 @@ void MainWnd::OnUpdateOptionsEmulatorBmpformat(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsSoundMute()
 {
-  soundDisable(0x30f);
+	if( 0 == soundGetEnable() ) {
+		soundSetEnable( 0x30f );
+	} else {
+		soundSetEnable( 0x000 );
+	}
 }
 
 void MainWnd::OnUpdateOptionsSoundMute(CCmdUI* pCmdUI)
 {
-  int active = soundGetEnable() & 0x30f;
-  pCmdUI->SetCheck(active == 0);
+  pCmdUI->SetCheck( 0 == soundGetEnable() );
 }
 
 void MainWnd::OnAudioEffects()
@@ -876,34 +879,35 @@ void MainWnd::OnUpdateOptionsSound44khz(CCmdUI* pCmdUI)
 
 BOOL MainWnd::OnOptionsSoundVolume(UINT nID)
 {
-  soundVolume = nID - ID_OPTIONS_SOUND_VOLUME_1X;
-  return TRUE;
+	UINT soundVolume = nID - ID_OPTIONS_SOUND_VOLUME_1X;
+	soundSetVolume( (float)soundVolume );
+	return TRUE;
 }
 
 void MainWnd::OnUpdateOptionsSoundVolume(CCmdUI *pCmdUI)
 {
-  pCmdUI->SetCheck(soundVolume == (int)(pCmdUI->m_nID - ID_OPTIONS_SOUND_VOLUME_1X));
+	pCmdUI->SetCheck( soundGetVolume() == (float)(pCmdUI->m_nID - ID_OPTIONS_SOUND_VOLUME_1X) );
 }
 
 
 void MainWnd::OnOptionsSoundVolume25x()
 {
-  soundVolume = 4;
+	soundSetVolume( 0.25f );
 }
 
 void MainWnd::OnUpdateOptionsSoundVolume25x(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(soundVolume == 4);
+	pCmdUI->SetCheck( 0.25f == soundGetVolume() );
 }
 
 void MainWnd::OnOptionsSoundVolume5x()
 {
-  soundVolume = 5;
+	soundSetVolume( 0.5f );
 }
 
 void MainWnd::OnUpdateOptionsSoundVolume5x(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(soundVolume == 5);
+	pCmdUI->SetCheck( 0.5f == soundGetVolume() );
 }
 
 void MainWnd::updateSoundChannels(UINT id)
@@ -935,8 +939,7 @@ void MainWnd::updateSoundChannels(UINT id)
   else
     active |= flag;
 
-  soundEnable(active);
-  soundDisable((~active)&0x30f);
+  soundSetEnable(active);
 }
 
 void MainWnd::OnOptionsSoundChannel1()
