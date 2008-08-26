@@ -39,22 +39,12 @@ BEGIN
     "#ifndef APSTUDIO_INVOKED\r\n"
     "#include ""targetver.h""\r\n"
     "#endif\r\n"
-    "#include ""afxres.h""\r\0"
+    "#include ""afxres.h""\0"
 END
 
 3 TEXTINCLUDE 
 BEGIN
-    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
-    "#define _AFX_NO_OLE_RESOURCES\r\n"
-    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
-    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
-    "\r\n"
-    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
-    "LANGUAGE 9, 1\r\n"
-    "#pragma code_page(1252)\r\n"
-    "#include ""res\\VBA.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
-    "#include ""afxres.rc""     // Standard components\r\n"
-    "#endif\r\0"
+    "#include ""res\\VBA.rc2""   // non-Microsoft Visual C++ edited resource\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -2288,17 +2278,7 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-#define _AFX_NO_SPLITTER_RESOURCES
-#define _AFX_NO_OLE_RESOURCES
-#define _AFX_NO_TRACKER_RESOURCES
-#define _AFX_NO_PROPERTY_RESOURCES
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE 9, 1
-#pragma code_page(1252)
-#include "res\VBA.rc2"  // non-Microsoft Visual C++ edited resources
-#include "afxres.rc"     // Standard components
-#endif
+#include "res\VBA.rc2"   // non-Microsoft Visual C++ edited resources
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 
