@@ -879,14 +879,14 @@ void MainWnd::OnUpdateOptionsSound44khz(CCmdUI* pCmdUI)
 
 BOOL MainWnd::OnOptionsSoundVolume(UINT nID)
 {
-	UINT soundVolume = nID - ID_OPTIONS_SOUND_VOLUME_1X;
+	UINT soundVolume = nID - ID_OPTIONS_SOUND_VOLUME_1X + 1;
 	soundSetVolume( (float)soundVolume );
 	return TRUE;
 }
 
 void MainWnd::OnUpdateOptionsSoundVolume(CCmdUI *pCmdUI)
 {
-	pCmdUI->SetCheck( soundGetVolume() == (float)(pCmdUI->m_nID - ID_OPTIONS_SOUND_VOLUME_1X) );
+	pCmdUI->SetCheck( soundGetVolume() == (float)(pCmdUI->m_nID - ID_OPTIONS_SOUND_VOLUME_1X + 1) );
 }
 
 
