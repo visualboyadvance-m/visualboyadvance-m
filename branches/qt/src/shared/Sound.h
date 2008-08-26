@@ -89,6 +89,5 @@ extern bool soundReverse;
 extern int soundBufferTotalLen;
 extern u32 soundNextPosition;
 extern bool soundPaused;
-extern bool soundOffFlag;
 
 #endif // VBA_SOUND_H

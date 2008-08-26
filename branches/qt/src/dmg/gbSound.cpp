@@ -47,7 +47,6 @@ extern u32 soundNextPosition;
 extern bool soundEcho;
 extern bool soundLowPass;
 extern bool soundReverse;
-extern bool soundOffFlag;
 
 int const ticks_to_time = 2 * GB_APU_OVERCLOCK;
 
@@ -241,14 +240,10 @@ void gbSoundSetQuality(int quality)
 	{
 		if ( systemCanChangeSoundQuality() )
 		{
-			if ( !soundOffFlag )
-				soundShutdown();
-
+			soundShutdown();
 			soundQuality      = quality;
 			soundNextPosition = 0;
-
-			if ( !soundOffFlag )
-				soundInit();
+			soundInit();
 		}
 		else
 		{

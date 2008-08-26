@@ -5297,33 +5297,6 @@ void gbEmulate(int ticksToStop)
     while (gbInternalTimer<0)
       gbInternalTimer+=0x100;
 
-    /*
-    if(soundOffFlag) {
-      if(synchronize && !speedup) {
-        synchronizeTicks -= clockTicks;
-
-        while(synchronizeTicks < 0) {
-          synchronizeTicks += SYNCHRONIZE_CLOCK_TICKS;
-
-          DWORD now = GetTickCount();
-          gbElapsedTime += (now - timeNow);
-
-          if(gbElapsedTime < 50) {
-            DWORD diff = 50 - gbElapsedTime;
-            Sleep(diff);
-            timeNow = GetTickCount();
-            elapsedTime = timeNow - now - diff;
-            if((int)elapsedTime < 0)
-              elapsedTime = 0;
-          } else {
-            timeNow = GetTickCount();
-            elapsedTime = 0;
-          }
-        }
-      }
-    }
-    */
-
     clockTicks = 0;
 
     if (gbIntBreak == 1)

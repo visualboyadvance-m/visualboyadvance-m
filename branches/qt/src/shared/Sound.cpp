@@ -50,7 +50,6 @@ int soundBufferLen = sizeof soundFinalWave;
 
 int soundDebug        = 0;
 u32 soundNextPosition = 0;
-bool soundOffFlag     = false;
 bool soundPaused      = true;
 
 bool soundLowPass = false;
@@ -551,14 +550,10 @@ void soundSetQuality(int quality)
 	{
 		if ( systemCanChangeSoundQuality() )
 		{
-			if ( !soundOffFlag )
-				soundShutdown();
-
+			soundShutdown();
 			soundQuality      = quality;
 			soundNextPosition = 0;
-
-			if ( !soundOffFlag )
-				soundInit();
+			soundInit();
 		}
 		else
 		{
