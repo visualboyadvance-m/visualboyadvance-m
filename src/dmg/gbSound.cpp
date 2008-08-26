@@ -43,8 +43,6 @@ extern int soundTicks;
 extern int SOUND_CLOCK_TICKS;
 extern u32 soundNextPosition;
 
-extern bool soundOffFlag;
-
 int const ticks_to_time = 2 * GB_APU_OVERCLOCK;
 
 static inline blip_time_t blip_time()
@@ -235,14 +233,10 @@ void gbSoundSetQuality(int quality)
 	{
 		if ( systemCanChangeSoundQuality() )
 		{
-			if ( !soundOffFlag )
-				soundShutdown();
-
+			soundShutdown();
 			soundQuality      = quality;
 			soundNextPosition = 0;
-
-			if ( !soundOffFlag )
-				soundInit();
+			soundInit();
 		}
 		else
 		{
