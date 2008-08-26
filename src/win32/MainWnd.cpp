@@ -600,8 +600,7 @@ bool MainWnd::FileRun()
     else
       soundReset();
   } else {
-    if(!soundOffFlag)
-      soundInit();
+	  soundInit();
     theApp.soundInitialized = true;
   }
 
