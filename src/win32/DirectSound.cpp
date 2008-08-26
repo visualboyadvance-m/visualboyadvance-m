@@ -47,6 +47,7 @@ private:
 	HANDLE               dsbEvent;
 	WAVEFORMATEX         wfx;          // Primary buffer wave format
 	int                  soundBufferTotalLen;
+	unsigned int         soundNextPosition;
 
 public:
 	DirectSound();
@@ -69,6 +70,7 @@ DirectSound::DirectSound()
 	dsbEvent      = NULL;
 
 	soundBufferTotalLen = 14700;
+	soundNextPosition = 0;
 }
 
 
@@ -144,6 +146,7 @@ bool DirectSound::init()
 	// then multiply it with the size of a sample frame (16 bit * stereo)
 	soundBufferLen = ( freq / 60 ) * 4;
 	soundBufferTotalLen = soundBufferLen * 10;
+	soundNextPosition = 0;
 
 	ZeroMemory( &wfx, sizeof(WAVEFORMATEX) );
 	wfx.wFormatTag = WAVE_FORMAT_PCM;
@@ -227,6 +230,8 @@ void DirectSound::reset()
 	dsbSecondary->Stop();
 
 	dsbSecondary->SetCurrentPosition( 0 );
+
+	soundNextPosition = 0;
 }
 
 
