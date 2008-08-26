@@ -43,7 +43,6 @@ extern int soundTicks;
 extern int SOUND_CLOCK_TICKS;
 extern u32 soundNextPosition;
 
-extern bool soundLowPass;
 extern bool soundReverse;
 extern bool soundOffFlag;
 

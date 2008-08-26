@@ -1591,8 +1591,6 @@ void VBA::loadSettings()
 
   soundQuality = regQueryDwordValue("soundQuality", 1);
 
-  soundLowPass = regQueryDwordValue("soundLowPass", 0) ? true : false;
-
   soundReverse = regQueryDwordValue("soundReverse", 0) ? true : false;
 
   soundVolume = regQueryDwordValue("soundVolume", 0);
@@ -2588,8 +2586,6 @@ void VBA::saveSettings()
   regSetDwordValue("soundEnable", soundGetEnable() & 0x30f);
 
   regSetDwordValue("soundQuality", soundQuality);
-
-  regSetDwordValue("soundLowPass", soundLowPass);
 
   regSetDwordValue("soundReverse", soundReverse);
 

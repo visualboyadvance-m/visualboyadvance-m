@@ -832,16 +832,6 @@ void MainWnd::OnAudioEffects()
 	}
 }
 
-void MainWnd::OnOptionsSoundLowpassfilter()
-{
-  soundLowPass = !soundLowPass;
-}
-
-void MainWnd::OnUpdateOptionsSoundLowpassfilter(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(soundLowPass);
-}
-
 void MainWnd::OnOptionsSoundReversestereo()
 {
   soundReverse = !soundReverse;
