@@ -30,6 +30,28 @@
 #include "dmg/gb_apu/Gb_Apu.h"
 #include "dmg/gb_apu/Multi_Buffer.h"
 
+#define NR10 0x60
+#define NR11 0x62
+#define NR12 0x63
+#define NR13 0x64
+#define NR14 0x65
+#define NR21 0x68
+#define NR22 0x69
+#define NR23 0x6c
+#define NR24 0x6d
+#define NR30 0x70
+#define NR31 0x72
+#define NR32 0x73
+#define NR33 0x74
+#define NR34 0x75
+#define NR41 0x78
+#define NR42 0x79
+#define NR43 0x7c
+#define NR44 0x7d
+#define NR50 0x80
+#define NR51 0x81
+#define NR52 0x84
+
 extern bool stopState;      // TODO: silence sound when true
 
 int soundQuality       = 2;
