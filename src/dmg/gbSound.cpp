@@ -41,7 +41,6 @@ extern int soundQuality;
 extern bool soundPaused;
 extern int soundTicks;
 extern int SOUND_CLOCK_TICKS;
-extern u32 soundNextPosition;
 
 int const ticks_to_time = 2 * GB_APU_OVERCLOCK;
 
@@ -189,7 +188,6 @@ void gbSoundReset()
 	reset_apu();
 
 	soundPaused       = 1;
-	soundNextPosition = 0;
 
 	gbSoundEvent(0xff10, 0x80);
 	gbSoundEvent(0xff11, 0xbf);
@@ -235,13 +233,11 @@ void gbSoundSetQuality(int quality)
 		{
 			soundShutdown();
 			soundQuality      = quality;
-			soundNextPosition = 0;
 			soundInit();
 		}
 		else
 		{
 			soundQuality      = quality;
-			soundNextPosition = 0;
 		}
 
 		remake_stereo_buffer();
