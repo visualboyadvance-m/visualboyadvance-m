@@ -811,16 +811,6 @@ void MainWnd::OnUpdateOptionsSoundMute(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(active == 0);
 }
 
-void MainWnd::OnOptionsSoundEcho()
-{
-  soundEcho = !soundEcho;
-}
-
-void MainWnd::OnUpdateOptionsSoundEcho(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(soundEcho);
-}
-
 void MainWnd::OnAudioEffects()
 {
 	AudioEffectsDlg dlg;

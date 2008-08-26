@@ -60,7 +60,6 @@ float soundFiltering   = 1;
 static float soundFiltering_;
 int soundVolume        = 0;
 static int soundVolume_;
-bool soundEcho         = false;
 int soundEnableFlag    = 0x3ff; // emulator channels enabled
 
 int const SOUND_CLOCK_TICKS_ = 167772;
