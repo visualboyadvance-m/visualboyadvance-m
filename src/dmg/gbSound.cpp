@@ -26,11 +26,12 @@
 #include "gb_apu/Gb_Apu.h"
 #include "gb_apu/Effects_Buffer.h"
 
+extern int soundGetEnable();
+
 static Gb_Apu* gb_apu;
 static Simple_Effects_Buffer* stereo_buffer;
 
 extern u16 soundFinalWave[1470];
-extern int soundVolume;
 
 extern int gbHardware;
 
@@ -82,13 +83,10 @@ static void flush_samples()
 	while ( stereo_buffer->samples_avail() >= out_buf_size )
 	{
 		stereo_buffer->read_samples( (blip_sample_t*) soundFinalWave, out_buf_size );
-		if(systemSoundOn)
-		{
-			if(soundPaused)
-				soundResume();
+		if(soundPaused)
+			soundResume();
 
-			systemWriteDataToSoundBuffer();
-		}
+		systemWriteDataToSoundBuffer();
 	}
 }
 
@@ -97,8 +95,11 @@ int const chan_count = 4;
 gb_effects_config_t gb_effects_config;
 static gb_effects_config_t gb_effects_config_current;
 
+static int prevSoundEnable = -1;
+
 static void apply_effects()
 {
+	prevSoundEnable = soundGetEnable();
 	gb_effects_config_current = gb_effects_config;
 
 	stereo_buffer->config().enabled  = gb_effects_config_current.enabled;
@@ -109,7 +110,9 @@ static void apply_effects()
 
 	for ( int i = 0; i < chan_count; i++ )
 	{
-		Multi_Buffer::channel_t ch = stereo_buffer->channel( i );
+		Multi_Buffer::channel_t ch = { 0, 0, 0 };
+		if ( prevSoundEnable >> i & 1 )
+			ch = stereo_buffer->channel( i );
 		gb_apu->set_output( ch.center, ch.left, ch.right, i );
 	}
 }
@@ -121,7 +124,7 @@ void gbSoundConfigEffects( gb_effects_config_t const& c )
 
 void gbSoundTick()
 {
- 	if ( systemSoundOn && gb_apu && stereo_buffer )
+ 	if ( gb_apu && stereo_buffer )
 	{
 		// Run sound hardware to present
 		end_frame( SOUND_CLOCK_TICKS * ticks_to_time );
@@ -130,7 +133,7 @@ void gbSoundTick()
 
 		// Update effects config if it was changed
 		if ( memcmp( &gb_effects_config_current, &gb_effects_config,
-				sizeof gb_effects_config ) )
+				sizeof gb_effects_config ) || soundGetEnable() != prevSoundEnable )
 			apply_effects();
 	}
 }

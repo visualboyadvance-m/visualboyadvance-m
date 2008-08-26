@@ -289,7 +289,6 @@ bool XAudio2_Output::init()
 	playing = true;
 
 
-	setsystemSoundOn( true );
 	initialized = true;
 	return true;
 }
