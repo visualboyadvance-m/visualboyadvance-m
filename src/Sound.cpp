@@ -58,9 +58,11 @@ int soundQuality       = 2;
 int soundInterpolation = 0;
 float soundFiltering   = 1;
 static float soundFiltering_;
-int soundVolume        = 0;
-static int soundVolume_;
-int soundEnableFlag    = 0x3ff; // emulator channels enabled
+float soundVolume      = 1;
+static float soundVolume_ = -1;
+bool soundEcho         = false;
+
+static int soundEnableFlag = 0x3ff; // emulator channels enabled
 
 int const SOUND_CLOCK_TICKS_ = 167772;
 int SOUND_CLOCK_TICKS = SOUND_CLOCK_TICKS_;
@@ -69,7 +71,6 @@ int soundTicks = SOUND_CLOCK_TICKS_;
 u16 soundFinalWave [1470];
 int soundBufferLen = sizeof soundFinalWave;
 
-int soundDebug        = 0;
 bool soundPaused      = true;
 
 void interp_rate() { /* empty for now */ }
@@ -297,20 +298,16 @@ static void apply_volume( bool apu_only = false )
 	if ( !apu_only )
 		soundVolume_ = soundVolume;
 
-	// Emulator volume
-	static float const vols [6] = { 1, 2, 3, 4, 0.25, 0.5 };
-	double const volume = vols [soundVolume_];
-
 	if ( gb_apu )
 	{
 		static float const apu_vols [4] = { 0.25, 0.5, 1, 0.25 };
-		gb_apu->volume( volume * apu_vols [ioMem [SGCNT0_H] & 3] );
+		gb_apu->volume( soundVolume_ * apu_vols [ioMem [SGCNT0_H] & 3] );
 	}
 
 	if ( !apu_only )
 	{
 		for ( int i = 0; i < 3; i++ )
-			pcm_synth [i].volume( 0.66 / 256 * volume );
+			pcm_synth [i].volume( 0.66 / 256 * soundVolume_ );
 	}
 }
 
@@ -381,13 +378,10 @@ static void flush_samples()
 	while ( stereo_buffer->samples_avail() >= out_buf_size )
 	{
 		stereo_buffer->read_samples( (blip_sample_t*) soundFinalWave, out_buf_size );
-		if(systemSoundOn)
-		{
-			if(soundPaused)
-				soundResume();
+		if(soundPaused)
+			soundResume();
 
-			systemWriteDataToSoundBuffer();
-		}
+		systemWriteDataToSoundBuffer();
 	}
 }
 
@@ -407,9 +401,9 @@ static void apply_filtering()
 	}
 }
 
-static void soundTick()
+void psoundTickfn()
 {
- 	if ( systemSoundOn && gb_apu && stereo_buffer )
+ 	if ( gb_apu && stereo_buffer )
 	{
 		// Run sound hardware to present
 		end_frame( SOUND_CLOCK_TICKS );
@@ -423,8 +417,6 @@ static void soundTick()
 			apply_volume();
 	}
 }
-
-void (*psoundTickfn)() = soundTick;
 
 static void apply_muting()
 {
@@ -492,16 +484,6 @@ static void remake_stereo_buffer()
 	apply_volume();
 }
 
-void setsystemSoundOn(bool value)
-{
-	systemSoundOn = value;
-}
-
-void setsoundPaused(bool value)
-{
-	soundPaused = value;
-}
-
 void soundShutdown()
 {
 	systemSoundShutdown();
@@ -509,25 +491,29 @@ void soundShutdown()
 
 void soundPause()
 {
+	soundPaused = true;
 	systemSoundPause();
-	setsoundPaused(true);
 }
 
 void soundResume()
 {
+	soundPaused = false;
 	systemSoundResume();
-	setsoundPaused(false);
 }
 
-void soundEnable(int channels)
+void soundSetVolume( float volume )
+{
+	soundVolume = volume;
+}
+
+float soundGetVolume()
+{
+	return soundVolume;
+}
+
+void soundSetEnable(int channels)
 {
 	soundEnableFlag = channels;
-	apply_muting();
-}
-
-void soundDisable(int channels)
-{
-	soundEnableFlag &= ~channels;
 	apply_muting();
 }
 
@@ -543,7 +529,7 @@ void soundReset()
 	remake_stereo_buffer();
 	reset_apu();
 
-	setsoundPaused(true);
+	soundPaused = true;
 	SOUND_CLOCK_TICKS = SOUND_CLOCK_TICKS_;
 	soundTicks        = SOUND_CLOCK_TICKS_;
 
@@ -789,7 +775,7 @@ static void soundReadGameOld( gzFile in, int version )
 	pcm [0].dac = state.soundDSAValue;
 	pcm [1].dac = state.soundDSBValue;
 
-	int quality = utilReadInt( in ); // ignore this crap
+	(void) utilReadInt( in ); // ignore quality
 }
 
 #include <stdio.h>

@@ -1585,15 +1585,11 @@ void VBA::loadSettings()
   }
 
   int res = regQueryDwordValue("soundEnable", 0x30f);
-
-  soundEnable(res);
-  soundDisable(~res);
+  soundSetEnable(res);
 
   soundQuality = regQueryDwordValue("soundQuality", 1);
 
-  soundVolume = regQueryDwordValue("soundVolume", 0);
-  if(soundVolume < 0 || soundVolume > 5)
-    soundVolume = 0;
+  soundSetVolume( (float)(regQueryDwordValue("soundVolume", 100)) / 100.0f );
 
   soundInterpolation = regQueryDwordValue("soundInterpolation", 0);
   if(soundInterpolation < 0 || soundInterpolation > 1)
@@ -2585,7 +2581,7 @@ void VBA::saveSettings()
 
   regSetDwordValue("soundQuality", soundQuality);
 
-  regSetDwordValue("soundVolume", soundVolume);
+  regSetDwordValue("soundVolume", (DWORD)(soundGetVolume() * 100.0f));
 
   regSetDwordValue("soundInterpolation", soundInterpolation);
   regSetDwordValue("tripleBuffering", tripleBuffering);
