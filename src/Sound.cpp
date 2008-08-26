@@ -74,7 +74,6 @@ u32 soundNextPosition = 0;
 bool soundOffFlag     = false;
 bool soundPaused      = true;
 
-bool soundLowPass = false;
 bool soundReverse = false;
 
 void interp_rate() { /* empty for now */ }

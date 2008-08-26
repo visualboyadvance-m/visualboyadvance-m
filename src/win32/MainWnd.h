@@ -207,8 +207,6 @@ public:
 	afx_msg void OnUpdateOptionsEmulatorBmpformat(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsSoundMute();
 	afx_msg void OnUpdateOptionsSoundMute(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsSoundLowpassfilter();
-	afx_msg void OnUpdateOptionsSoundLowpassfilter(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsSoundReversestereo();
 	afx_msg void OnUpdateOptionsSoundReversestereo(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsSound11khz();
