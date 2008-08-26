@@ -151,7 +151,6 @@ struct {
   { "OptionsSound11Khz", ID_OPTIONS_SOUND_11KHZ },
   { "OptionsSound22Khz", ID_OPTIONS_SOUND_22KHZ },
   { "OptionsSound44Khz", ID_OPTIONS_SOUND_44KHZ },
-  { "OptionsSoundLowPassFilter", ID_OPTIONS_SOUND_LOWPASSFILTER },
   { "OptionsSoundReverseStereo", ID_OPTIONS_SOUND_REVERSESTEREO },
   { "OptionsSoundVolume1x", ID_OPTIONS_SOUND_VOLUME_1X },
   { "OptionsSoundVolume2x", ID_OPTIONS_SOUND_VOLUME_2X },
