@@ -36,7 +36,7 @@
 #include "OALConfig.h"
 #include "XAudio2_Config.h"
 #include "BIOSDialog.h"
-#include "AudioEffectsDlg.h"
+#include "AudioCoreSettingsDlg.h"
 
 #include "../System.h"
 #include "../agb/agbprint.h"
@@ -816,12 +816,13 @@ void MainWnd::OnUpdateOptionsSoundMute(CCmdUI* pCmdUI)
 
 void MainWnd::OnAudioEffects()
 {
-	AudioEffectsDlg dlg;
+	AudioCoreSettingsDlg dlg;
 
 	dlg.m_enabled = gb_effects_config.enabled;
 	dlg.m_surround = gb_effects_config.surround;
 	dlg.m_echo = gb_effects_config.echo;
 	dlg.m_stereo = gb_effects_config.stereo;
+	dlg.m_volume = soundGetVolume();
 
 	if( IDOK == dlg.DoModal() ) {
 		gb_effects_config_t _new;
@@ -832,6 +833,8 @@ void MainWnd::OnAudioEffects()
 		_new.stereo = dlg.m_stereo;
 
 		gbSoundConfigEffects( _new );
+
+		soundSetVolume( dlg.m_volume );
 	}
 }
 
