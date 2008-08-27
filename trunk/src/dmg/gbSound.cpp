@@ -92,7 +92,7 @@ static void flush_samples()
 
 int const chan_count = 4;
 
-gb_effects_config_t gb_effects_config = { false, 0.0f, 0.0f, false };
+gb_effects_config_t gb_effects_config = { false, 0.2f, 0.15f, false };
 static gb_effects_config_t gb_effects_config_current;
 
 static int prevSoundEnable = -1;
