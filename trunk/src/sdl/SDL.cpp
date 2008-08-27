@@ -74,10 +74,6 @@
 #include <lirc/lirc_client.h>
 #endif
 
-extern bool soundEcho;
-extern bool soundLowPass;
-extern bool soundReverse;
-
 extern void remoteInit();
 extern void remoteCleanUp();
 extern void remoteStubMain();
@@ -226,7 +222,6 @@ bool sdlMotionButtons[4] = { false, false, false, false };
 
 int sdlNumDevices = 0;
 SDL_Joystick **sdlDevices = NULL;
-bool soundOffFlag;
 bool wasPaused = false;
 int autoFrameSkip = 0;
 int frameskipadjust = 0;
@@ -362,6 +357,23 @@ struct option sdlOptions[] = {
   { "cheat", required_argument, 0, 1000 },
   { NULL, no_argument, NULL, 0 }
 };
+
+static void sdlChangeVolume(float d)
+{
+	float oldVolume = soundGetVolume();
+	float newVolume = oldVolume + d;
+
+	if (newVolume < 0.0) newVolume = 0.0;
+	if (newVolume > 2.0) newVolume = 2.0;
+
+	if (fabs(newVolume - oldVolume) > 0.001) {
+		char tmp[32];
+		if (newVolume < oldVolume) sprintf(tmp, "Sound volume decreased (%i%%)", (int)(newVolume*100.0+0.5));
+		else sprintf(tmp, "Sound volume increased (%i%%)", (int)(newVolume*100.0+0.5));
+		systemScreenMessage(tmp);
+		soundSetVolume(newVolume);
+	}
+}
 
 #if WITH_LIRC
 //LIRC code
@@ -786,19 +798,17 @@ void sdlReadPreferences(FILE *f)
         soundQuality = 2;
         break;
       }
-    } else if(!strcmp(key, "soundOff")) {
-      soundOffFlag = sdlFromHex(value) ? true : false;
     } else if(!strcmp(key, "soundEnable")) {
       int res = sdlFromHex(value) & 0x30f;
       soundSetEnable(res);
     } else if(!strcmp(key, "soundEcho")) {
-      soundEcho = sdlFromHex(value) ? true : false;
+      /* TODO */
+      /* soundEcho = sdlFromHex(value) ? true : false; */
     } else if(!strcmp(key, "soundVolume")) {
-      float volume;
-      volume = sdlFromHex(value);
-      if( volume > 100.0f ) volume = 100.0f;
-      if( volume < 1.0f ) volume = 1.0f;
-      soundSetVolume( volume );
+      int volume = sdlFromDec(value);
+      if (volume < 0 || volume > 200)
+        volume = 100;
+      soundSetVolume((float)(volume / 100.0f ));
     } else if(!strcmp(key, "saveType")) {
       cpuSaveType = sdlFromHex(value);
       if(cpuSaveType < 0 || cpuSaveType > 5)
@@ -1729,6 +1739,12 @@ void sdlPollEvents()
 		}
 	}
 	break;
+      case SDLK_KP_DIVIDE:
+        sdlChangeVolume(-0.1);
+        break;
+      case SDLK_KP_MULTIPLY:
+        sdlChangeVolume(0.1);
+        break;
 
       case SDLK_p:
         if(!(event.key.keysym.mod & MOD_NOCTRL) &&
@@ -1921,19 +1937,9 @@ void lircCheckInput(void)
               }
             } 
           } else if( strcmp( CmdLIRC, "VOLUP" ) == 0 ) {
-            float tempvolumeup;
-            tempvolumeup = soundGetVolume();
-            tempvolumeup = tempvolumeup + 1.0f;
-            if( tempvolumeup > 100.0f ) tempvolumeup = 100.0f;
-            soundSetVolume( tempvolumeup );
-            systemScreenMessage("Sound volume Increased");
+            sdlChangeVolume(0.1);
           } else if( strcmp( CmdLIRC, "VOLDOWN" ) == 0 ) {
-            float tempvolumedown;
-            tempvolumedown = soundGetVolume();
-            tempvolumedown = tempvolumedown - 1.0f;
-            if( tempvolumedown < 1.0f ) tempvolumedown = 1.0f;
-            soundSetVolume( tempvolumedown );
-            systemScreenMessage("Sound volume Decreased");
+            sdlChangeVolume(-0.1);
           } else if( strcmp( CmdLIRC, "LOADSTATE" ) == 0 ) {
             sdlReadState(saveSlotPosition);
           } else if( strcmp( CmdLIRC, "SAVESTATE" ) == 0 ) {
@@ -2457,9 +2463,6 @@ int main(int argc, char **argv)
   int flags = SDL_INIT_VIDEO|SDL_INIT_AUDIO|
     SDL_INIT_TIMER|SDL_INIT_NOPARACHUTE;
 
-  if(soundOffFlag)
-    flags ^= SDL_INIT_AUDIO;
-
   if(SDL_Init(flags)) {
     systemMessage(0, "Failed to init SDL: %s", SDL_GetError());
     exit(-1);
@@ -2531,7 +2534,6 @@ int main(int argc, char **argv)
   emulating = 1;
   renderedFrames = 0;
 
-  if(!soundOffFlag)
     soundInit();
 
   autoFrameSkipLastTime = throttleLastTime = systemGetClock();
