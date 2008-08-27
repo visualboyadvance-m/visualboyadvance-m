@@ -78,8 +78,8 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_iSaveTypeMax    (SaveNone),
   m_iSoundQualityMin(Sound44K),
   m_iSoundQualityMax(Sound11K),
-  m_iSoundVolumeMin (Sound100),
-  m_iSoundVolumeMax (Sound50),
+  m_fSoundVolumeMin (0.50f),
+  m_fSoundVolumeMax (4.00f),
   m_iEmulatorTypeMin(EmulatorAuto),
   m_iEmulatorTypeMax(EmulatorSGB2),
   m_iFilter2xMin    (FirstFilter),
@@ -509,85 +509,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 
   // Sound menu
   //
-  std::string sDefaultSoundStatus = m_poSoundConfig->sGetKey("status");
-
-  poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("SoundOff"));
-  if (sDefaultSoundStatus == "off")
-  {
-    poCMI->set_active();
-    vOnSoundStatusToggled(poCMI, SoundOff);
-  }
-  poCMI->signal_toggled().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnSoundStatusToggled),
-                                    poCMI, SoundOff));
-  m_poSoundOffItem = poCMI;
-
-  poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("SoundMute"));
-  if (sDefaultSoundStatus == "mute")
-  {
-    poCMI->set_active();
-    vOnSoundStatusToggled(poCMI, SoundMute);
-  }
-  poCMI->signal_toggled().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnSoundStatusToggled),
-                                    poCMI, SoundMute));
-
-  poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("SoundOn"));
-  if (sDefaultSoundStatus == "on")
-  {
-    poCMI->set_active();
-    vOnSoundStatusToggled(poCMI, SoundOn);
-  }
-  poCMI->signal_toggled().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnSoundStatusToggled),
-                                    poCMI, SoundOn));
-
-  poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("SoundEcho"));
-  poCMI->set_active(m_poSoundConfig->oGetKey<bool>("echo"));
-  vOnSoundEchoToggled(poCMI);
-  poCMI->signal_toggled().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnSoundEchoToggled),
-                                    poCMI));
-
-  poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("SoundLowPass"));
-  poCMI->set_active(m_poSoundConfig->oGetKey<bool>("low_pass"));
-  vOnSoundLowPassToggled(poCMI);
-  poCMI->signal_toggled().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnSoundLowPassToggled),
-                                    poCMI));
-
-  poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("SoundReverseStereo"));
-  poCMI->set_active(m_poSoundConfig->oGetKey<bool>("reverse_stereo"));
-  vOnSoundReverseToggled(poCMI);
-  poCMI->signal_toggled().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnSoundReverseToggled),
-                                    poCMI));
-
-  struct
-  {
-    const char * m_csName;
-    const char * m_csKey;
-    const int    m_iSoundChannel;
-  }
-  astSoundChannel[] =
-  {
-    { "SoundChannel1", "channel_1", 0 },
-    { "SoundChannel2", "channel_2", 1 },
-    { "SoundChannel3", "channel_3", 2 },
-    { "SoundChannel4", "channel_4", 3 },
-    { "SoundChannelA", "channel_A", 4 },
-    { "SoundChannelB", "channel_B", 5 }
-  };
-  for (guint i = 0; i < G_N_ELEMENTS(astSoundChannel); i++)
-  {
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astSoundChannel[i].m_csName));
-    poCMI->set_active(m_poSoundConfig->oGetKey<bool>(astSoundChannel[i].m_csKey));
-    vOnSoundChannelToggled(poCMI, astSoundChannel[i].m_iSoundChannel);
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnSoundChannelToggled),
-                                      poCMI, astSoundChannel[i].m_iSoundChannel));
-  }
-
   struct
   {
     const char *        m_csName;
@@ -618,29 +539,29 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   struct
   {
     const char *       m_csName;
-    const ESoundVolume m_eSoundVolume;
+    const float        m_fSoundVolume;
   }
   astSoundVolume[] =
   {
-    { "Volume25",   Sound25  },
-    { "Volume50",   Sound50  },
-    { "Volume100",  Sound100 },
-    { "Volume200",  Sound200 },
-    { "Volume300",  Sound300 },
-    { "Volume400",  Sound400 }
+    { "Volume25",   0.25f    },
+    { "Volume50",   0.50f    },
+    { "Volume100",  1.00f    },
+    { "Volume200",  2.00f    },
+    { "Volume300",  3.00f    },
+    { "Volume400",  4.00f    }
   };
-  ESoundVolume eDefaultSoundVolume = (ESoundVolume)m_poSoundConfig->oGetKey<int>("volume");
+  float fDefaultSoundVolume = m_poSoundConfig->oGetKey<float>("volume");
   for (guint i = 0; i < G_N_ELEMENTS(astSoundVolume); i++)
   {
     poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astSoundVolume[i].m_csName));
-    if (astSoundVolume[i].m_eSoundVolume == eDefaultSoundVolume)
+    if (astSoundVolume[i].m_fSoundVolume == fDefaultSoundVolume)
     {
       poCMI->set_active();
-      vOnSoundVolumeToggled(poCMI, eDefaultSoundVolume);
+      vOnSoundVolumeToggled(poCMI, fDefaultSoundVolume);
     }
     poCMI->signal_toggled().connect(sigc::bind(
                                       sigc::mem_fun(*this, &Window::vOnSoundVolumeToggled),
-                                      poCMI, astSoundVolume[i].m_eSoundVolume));
+                                      poCMI, astSoundVolume[i].m_fSoundVolume));
   }
 
   // Gameboy menu
@@ -934,7 +855,6 @@ void Window::vInitSystem()
   systemVerbose = 0;
   systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
   systemFrameSkip = 2;
-  soundOffFlag = true;
 
   systemRenderedFrames = 0;
   systemFPS = 0;
@@ -1031,7 +951,7 @@ void Window::vInitConfig()
   m_poSoundConfig->vSetKey("channel_A",      true     );
   m_poSoundConfig->vSetKey("channel_B",      true     );
   m_poSoundConfig->vSetKey("quality",        Sound22K );
-  m_poSoundConfig->vSetKey("volume",         Sound100 );
+  m_poSoundConfig->vSetKey("volume",         1.00f    );
 
   // Input section
   //
@@ -1067,6 +987,8 @@ void Window::vCheckConfig()
 {
   int iValue;
   int iAdjusted;
+  float fValue;
+  float fAdjusted;
   std::string sValue;
 
   // Directories section
@@ -1204,11 +1126,11 @@ void Window::vCheckConfig()
     m_poSoundConfig->vSetKey("quality", iAdjusted);
   }
 
-  iValue = m_poSoundConfig->oGetKey<int>("volume");
-  iAdjusted = CLAMP(iValue, m_iSoundVolumeMin, m_iSoundVolumeMax);
-  if (iValue != iAdjusted)
+  fValue = m_poSoundConfig->oGetKey<float>("volume");
+  fAdjusted = CLAMP(fValue, m_fSoundVolumeMin, m_fSoundVolumeMax);
+  if (fValue != fAdjusted)
   {
-    m_poSoundConfig->vSetKey("volume", iAdjusted);
+    m_poSoundConfig->vSetKey("volume", fAdjusted);
   }
 
   // Input section
