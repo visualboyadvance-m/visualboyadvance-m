@@ -420,6 +420,13 @@ u32 sdlFromHex(char *s)
   return value;
 }
 
+u32 sdlFromDec(char *s)
+{
+  u32 value;
+  sscanf(s, "%u", &value);
+  return value;
+}
+
 #ifdef __MSC__
 #define stat _stat
 #define S_IFDIR _S_IFDIR
@@ -740,7 +747,7 @@ void sdlReadPreferences(FILE *f)
     } else if(!strcmp(key, "gbBiosFile")) {
       strcpy(gbBiosFileName, value);
     } else if(!strcmp(key, "filter")) {
-      filter = (Filter)sdlFromHex(value);
+      filter = (Filter)sdlFromDec(value);
       if(filter < kStretch1x || filter >= kInvalidFilter)
         filter = kStretch2x;
     } else if(!strcmp(key, "disableStatus")) {
@@ -1739,7 +1746,6 @@ void sdlPollEvents()
       case SDLK_f:
         if(!(event.key.keysym.mod & MOD_NOCTRL) &&
            (event.key.keysym.mod & KMOD_CTRL)) {
-          int flags = 0;
           fullscreen = !fullscreen;
           sdlInitVideo();
         }
