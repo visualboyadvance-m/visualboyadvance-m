@@ -606,7 +606,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\win32\AudioEffectsDlg.cpp"
+					RelativePath="..\..\src\win32\AudioCoreSettingsDlg.cpp"
 					>
 				</File>
 				<File
@@ -1160,7 +1160,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\win32\AudioEffectsDlg.h"
+					RelativePath="..\..\src\win32\AudioCoreSettingsDlg.h"
 					>
 				</File>
 				<File

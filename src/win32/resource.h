@@ -45,7 +45,10 @@
 #define IDS_CBA_CODE_WARNING            40
 #define IDS_OUT_OF_MEMORY               41
 #define IDS_WRONG_GAMESHARK_CODE        42
+#define IDS_TOOLTIP_DEFAULT_VOLUME      42
 #define IDS_UNSUPPORTED_GAMESHARK_CODE  43
+#define IDS_TOOLTIP_ENHANCE_SOUND       43
+#define IDS_TOOLTIP_SURROUND            44
 #define IDI_MAINICON                    101
 #define IDD_REGISTERS                   102
 #define IDD_DEBUG                       103
@@ -101,7 +104,7 @@
 #define IDD_BIOS                        161
 #define IDD_FULLSCREEN                  162
 #define IDD_XAUDIO2_CONFIG              163
-#define IDD_AUDIO_EFFECTS               164
+#define IDD_AUDIO_CORE_SETTINGS         164
 #define IDC_R0                          1000
 #define IDC_EDIT_UP                     1000
 #define IDC_R1                          1001
@@ -545,6 +548,8 @@
 #define IDC_ECHO                        1289
 #define IDC_STEREO                      1290
 #define IDC_SLIDER2                     1291
+#define IDC_VOLUME                      1291
+#define IDC_DEFAULT_VOLUME              1292
 #define IDS_OAL_NODEVICE                2000
 #define IDS_OAL_NODLL                   2001
 #define IDS_AVI_CANNOT_CREATE_AVI       2002
@@ -861,7 +866,7 @@
 #define ID_LOADGAME_DONOTCHANGEBATTERYSAVE 40362
 #define ID_OUTPUTAPI_CONFIGURATION40363 40363
 #define ID_OUTPUTAPI_XAUDIO2CONFIG      40364
-#define ID_AUDIO_EFFECTS                40365
+#define ID_AUDIO_CORE_SETTINGS          40365
 
 // Next default values for new objects
 // 
@@ -869,7 +874,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        165
 #define _APS_NEXT_COMMAND_VALUE         40366
-#define _APS_NEXT_CONTROL_VALUE         1292
+#define _APS_NEXT_CONTROL_VALUE         1296
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
 #endif
