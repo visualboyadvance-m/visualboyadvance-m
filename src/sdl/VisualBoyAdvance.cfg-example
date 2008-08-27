@@ -141,14 +141,6 @@ soundQuality=2
 # 0=false, anything else for true
 soundEcho=0
 
-# Sound Low pass filter
-# 0=false, anything else for true
-soundLowPass=0
-
-# Sound reverse stereo
-# 0=false, anything else for true
-soundReverse=0
-
 # Save Type
 # 0=automatic, 1=EEPROM, 2=SRAM, 3=Flash, 4=EEPROM+Sensor, 5=NONE
 saveType=0
@@ -158,7 +150,7 @@ saveType=0
 flashSize=0
 
 # Sound volume
-# 0=1x, 1=2x, 2=3x, 3=4x
+# 0-200=0%-200%
 soundVolume=0
 
 # Interframe blending
@@ -192,10 +184,6 @@ agbPrint=0
 # Enables GBA RTC support
 # 0=disable, anything else to enable
 rtcEnabled=0
-
-# Sound OFF flag
-# 0=sound on, anything else turns off sound
-soundOff=0
 
 # Sound Enable
 # Controls which channels are enabled: (add values)

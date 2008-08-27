@@ -12,6 +12,8 @@ CTRL-P: pause
 CTRL-F: toggle fullscreen
 CTRL-G: rotate between filters
 CTRL-S: toggle sound
+NUMPAD /: decrease volume
+NUMPAD *: increase volume
 CTRL-E: toggle cheats
 ESC: quit
 F11: debugger
