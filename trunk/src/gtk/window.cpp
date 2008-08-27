@@ -509,6 +509,13 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 
   // Sound menu
   //
+  poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("SoundMute"));
+  poCMI->set_active(m_poSoundConfig->oGetKey<bool>("mute"));
+  vOnSoundMuteToggled(poCMI);
+  poCMI->signal_toggled().connect(sigc::bind(
+                                    sigc::mem_fun(*this, &Window::vOnSoundMuteToggled),
+                                    poCMI));
+  
   struct
   {
     const char *        m_csName;
@@ -940,10 +947,7 @@ void Window::vInitConfig()
   // Sound section
   //
   m_poSoundConfig = m_oConfig.poAddSection("Sound");
-  m_poSoundConfig->vSetKey("status",         "on"     );
-  m_poSoundConfig->vSetKey("echo",           false    );
-  m_poSoundConfig->vSetKey("low_pass",       false    );
-  m_poSoundConfig->vSetKey("reverse_stereo", false    );
+  m_poSoundConfig->vSetKey("mute",           false    );
   m_poSoundConfig->vSetKey("channel_1",      true     );
   m_poSoundConfig->vSetKey("channel_2",      true     );
   m_poSoundConfig->vSetKey("channel_3",      true     );
@@ -1113,12 +1117,6 @@ void Window::vCheckConfig()
 
   // Sound section
   //
-  sValue = m_poSoundConfig->sGetKey("status");
-  if (sValue != "off" && sValue != "on" && sValue != "mute")
-  {
-    m_poSoundConfig->vSetKey("status", "on");
-  }
-
   iValue = m_poSoundConfig->oGetKey<int>("quality");
   iAdjusted = CLAMP(iValue, m_iSoundQualityMin, m_iSoundQualityMax);
   if (iValue != iAdjusted)
