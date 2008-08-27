@@ -111,17 +111,7 @@ protected:
     Sound11K = 4
   };
 
-  enum ESoundVolume
-  {
-    Sound100,
-    Sound200,
-    Sound300,
-    Sound400,
-    Sound25,
-    Sound50
-  };
-
-  enum EEmulatorType
+ enum EEmulatorType
   {
     EmulatorAuto,
     EmulatorCGB,
@@ -168,13 +158,8 @@ protected:
   virtual void vOnShowSpeedToggled(Gtk::CheckMenuItem * _poCMI, int _iShowSpeed);
   virtual void vOnSaveTypeToggled(Gtk::CheckMenuItem * _poCMI, int _iSaveType);
   virtual void vOnFlashSizeToggled(Gtk::CheckMenuItem * _poCMI, int _iFlashSize);
-  virtual void vOnSoundStatusToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundStatus);
-  virtual void vOnSoundEchoToggled(Gtk::CheckMenuItem * _poCMI);
-  virtual void vOnSoundLowPassToggled(Gtk::CheckMenuItem * _poCMI);
-  virtual void vOnSoundReverseToggled(Gtk::CheckMenuItem * _poCMI);
-  virtual void vOnSoundChannelToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundChannel);
   virtual void vOnSoundQualityToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundQuality);
-  virtual void vOnSoundVolumeToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundVolume);
+  virtual void vOnSoundVolumeToggled(Gtk::CheckMenuItem * _poCMI, float _fSoundVolume);
   virtual void vOnGBBorderToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnGBPrinterToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnEmulatorTypeToggled(Gtk::CheckMenuItem * _poCMI, int _iEmulatorType);
@@ -212,8 +197,8 @@ private:
   const int m_iSaveTypeMax;
   const int m_iSoundQualityMin;
   const int m_iSoundQualityMax;
-  const int m_iSoundVolumeMin;
-  const int m_iSoundVolumeMax;
+  const float m_fSoundVolumeMin;
+  const float m_fSoundVolumeMax;
   const int m_iEmulatorTypeMin;
   const int m_iEmulatorTypeMax;
   const int m_iFilter2xMin;

@@ -752,95 +752,6 @@ void Window::vOnFlashSizeToggled(Gtk::CheckMenuItem * _poCMI, int _iFlashSize)
   m_poCoreConfig->vSetKey("flash_size", _iFlashSize);
 }
 
-void Window::vOnSoundStatusToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundStatus)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  std::string sSoundStatus;
-  switch (_iSoundStatus)
-  {
-  case SoundOff:
-    soundOffFlag = true;
-    if (systemSoundOn)
-    {
-      soundShutdown();
-    }
-    sSoundStatus = "off";
-    break;
-  case SoundMute:
-    soundDisable(0x30f);
-    sSoundStatus = "mute";
-    break;
-  case SoundOn:
-    if (soundOffFlag)
-    {
-      soundOffFlag = false;
-      if (! soundInit())
-      {
-        m_poSoundOffItem->set_active();
-        return;
-      }
-    }
-    soundEnable(0x30f);
-    sSoundStatus = "on";
-    break;
-  }
-  m_poSoundConfig->vSetKey("status", sSoundStatus);
-}
-
-void Window::vOnSoundEchoToggled(Gtk::CheckMenuItem * _poCMI)
-{
-  soundEcho = _poCMI->get_active();
-  m_poSoundConfig->vSetKey("echo", soundEcho);
-}
-
-void Window::vOnSoundLowPassToggled(Gtk::CheckMenuItem * _poCMI)
-{
-  soundLowPass = _poCMI->get_active();
-  m_poSoundConfig->vSetKey("low_pass", soundLowPass);
-}
-
-void Window::vOnSoundReverseToggled(Gtk::CheckMenuItem * _poCMI)
-{
-  soundReverse = _poCMI->get_active();
-  m_poSoundConfig->vSetKey("reverse_stereo", soundReverse);
-}
-
-void Window::vOnSoundChannelToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundChannel)
-{
-  int iShift = _iSoundChannel;
-  if (_iSoundChannel > 3)
-  {
-    iShift += 4;
-  }
-  int iFlag = 1 << iShift;
-  int iActive = soundGetEnable() & 0x30f;
-  if (_poCMI->get_active())
-  {
-    iActive |= iFlag;
-  }
-  else
-  {
-    iActive &= ~iFlag;
-  }
-  soundEnable(iActive);
-  soundDisable(~iActive & 0x30f);
-
-  const char * acsChannels[] =
-  {
-    "channel_1",
-    "channel_2",
-    "channel_3",
-    "channel_4",
-    "channel_A",
-    "channel_B"
-  };
-  m_poSoundConfig->vSetKey(acsChannels[_iSoundChannel], _poCMI->get_active());
-}
-
 void Window::vOnSoundQualityToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundQuality)
 {
   if (! _poCMI->get_active())
@@ -860,14 +771,14 @@ void Window::vOnSoundQualityToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundQual
   m_poSoundConfig->vSetKey("quality", _iSoundQuality);
 }
 
-void Window::vOnSoundVolumeToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundVolume)
+void Window::vOnSoundVolumeToggled(Gtk::CheckMenuItem * _poCMI, float _iSoundVolume)
 {
   if (! _poCMI->get_active())
   {
     return;
   }
 
-  soundVolume = _iSoundVolume;
+  soundSetVolume(_iSoundVolume);
   m_poSoundConfig->vSetKey("volume", _iSoundVolume);
 }
 
