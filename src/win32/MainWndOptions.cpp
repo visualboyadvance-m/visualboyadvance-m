@@ -800,20 +800,6 @@ void MainWnd::OnUpdateOptionsEmulatorBmpformat(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(theApp.captureFormat == 1);
 }
 
-void MainWnd::OnOptionsSoundMute()
-{
-	if( 0 == soundGetEnable() ) {
-		soundSetEnable( 0x30f );
-	} else {
-		soundSetEnable( 0x000 );
-	}
-}
-
-void MainWnd::OnUpdateOptionsSoundMute(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck( 0 == soundGetEnable() );
-}
-
 void MainWnd::OnAudioEffects()
 {
 	AudioCoreSettingsDlg dlg;
@@ -878,39 +864,6 @@ void MainWnd::OnUpdateOptionsSound44khz(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(soundQuality == 1);
   pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
-}
-
-BOOL MainWnd::OnOptionsSoundVolume(UINT nID)
-{
-	UINT soundVolume = nID - ID_OPTIONS_SOUND_VOLUME_1X + 1;
-	soundSetVolume( (float)soundVolume );
-	return TRUE;
-}
-
-void MainWnd::OnUpdateOptionsSoundVolume(CCmdUI *pCmdUI)
-{
-	pCmdUI->SetCheck( soundGetVolume() == (float)(pCmdUI->m_nID - ID_OPTIONS_SOUND_VOLUME_1X + 1) );
-}
-
-
-void MainWnd::OnOptionsSoundVolume25x()
-{
-	soundSetVolume( 0.25f );
-}
-
-void MainWnd::OnUpdateOptionsSoundVolume25x(CCmdUI* pCmdUI)
-{
-	pCmdUI->SetCheck( 0.25f == soundGetVolume() );
-}
-
-void MainWnd::OnOptionsSoundVolume5x()
-{
-	soundSetVolume( 0.5f );
-}
-
-void MainWnd::OnUpdateOptionsSoundVolume5x(CCmdUI* pCmdUI)
-{
-	pCmdUI->SetCheck( 0.5f == soundGetVolume() );
 }
 
 void MainWnd::updateSoundChannels(UINT id)
