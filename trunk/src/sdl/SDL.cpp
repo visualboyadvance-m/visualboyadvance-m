@@ -226,7 +226,7 @@ bool sdlMotionButtons[4] = { false, false, false, false };
 
 int sdlNumDevices = 0;
 SDL_Joystick **sdlDevices = NULL;
-
+bool soundOffFlag;
 bool wasPaused = false;
 int autoFrameSkip = 0;
 int frameskipadjust = 0;
@@ -419,112 +419,6 @@ u32 sdlFromHex(char *s)
   sscanf(s, "%x", &value);
   return value;
 }
-
-#if WITH_LIRC
-void lircCheckInput(void)
-{
-  if(LIRCEnabled) {
-    //setup a poll (poll.h)
-    struct pollfd pollLIRC;
-    //values fd is the pointer gotten from lircinit and events is what way
-    pollLIRC.fd = LIRCfd;
-    pollLIRC.events = POLLIN;
-    //run the poll
-    if( poll( &pollLIRC, 1, 0 ) > 0 ) {
-      //poll retrieved something
-      char *CodeLIRC;
-      char *CmdLIRC;
-      int ret; //dunno???
-      if( lirc_nextcode(&CodeLIRC) == 0 && CodeLIRC != NULL ) {
-        //retrieve the commands
-        while( ( ret = lirc_code2char( LIRCConfigInfo, CodeLIRC, &CmdLIRC ) ) == 0 && CmdLIRC != NULL ) {
-          //change the text to uppercase
-          char *CmdLIRC_Pointer = CmdLIRC;
-          while(*CmdLIRC_Pointer != '\0') {
-            *CmdLIRC_Pointer = toupper(*CmdLIRC_Pointer);
-            CmdLIRC_Pointer++;
-          }
-
-          if( strcmp( CmdLIRC, "QUIT" ) == 0 ) {
-            emulating = 0;
-          } else if( strcmp( CmdLIRC, "PAUSE" ) == 0 ) {
-            paused = !paused;
-            SDL_PauseAudio(paused);
-            if(paused) wasPaused = true;
-            systemConsoleMessage( paused?"Pause on":"Pause off" );
-            systemScreenMessage( paused?"Pause on":"Pause off" );
-          } else if( strcmp( CmdLIRC, "RESET" ) == 0 ) {
-            if(emulating) {
-              emulator.emuReset();
-              systemScreenMessage("Reset");
-            }
-          } else if( strcmp( CmdLIRC, "MUTE" ) == 0 ) {
-            if (sdlSoundToggledOff) { // was off
-              // restore saved state
-              soundEnable(sdlSoundToggledOff);
-              soundDisable(~sdlSoundToggledOff);
-              sdlSoundToggledOff = 0;
-              systemConsoleMessage("Sound toggled on");
-              systemScreenMessage("Sound toggled on");
-            } else { // was on
-              sdlSoundToggledOff= soundGetEnable();
-              soundEnable(0);
-              soundDisable(sdlSoundToggledOff);
-              systemConsoleMessage("Sound toggled off");
-              systemScreenMessage("Sound toggled off");
-              if (!sdlSoundToggledOff) {
-                // if ON actually meant "all channels off" for some reason,
-                // remember that on "toggle to ON" we should unmute everything
-                sdlSoundToggledOff = 0x3ff;
-              }
-            }
-          } else if( strcmp( CmdLIRC, "VOLUP" ) == 0 ) {
-            soundVolume++;
-            if( soundVolume > 3 ) soundVolume = 3;
-            else systemScreenMessage("Sound volume Increased");
-          } else if( strcmp( CmdLIRC, "VOLDOWN" ) == 0 ) {
-            soundVolume--;
-            if( soundVolume < 0 ) soundVolume = 0;
-            else systemScreenMessage("Sound volume Decreased");
-          } else if( strcmp( CmdLIRC, "LOADSTATE" ) == 0 ) {
-            sdlReadState(saveSlotPosition);
-          } else if( strcmp( CmdLIRC, "SAVESTATE" ) == 0 ) {
-            sdlWriteState(saveSlotPosition);
-          } else if( strcmp( CmdLIRC, "1" ) == 0 ) {
-            saveSlotPosition = 0;
-            systemScreenMessage("Selected State 1");
-          } else if( strcmp( CmdLIRC, "2" ) == 0 ) {
-            saveSlotPosition = 1;
-            systemScreenMessage("Selected State 2");
-          } else if( strcmp( CmdLIRC, "3" ) == 0 ) {
-            saveSlotPosition = 2;
-            systemScreenMessage("Selected State 3");
-          } else if( strcmp( CmdLIRC, "4" ) == 0 ) {
-            saveSlotPosition = 3;
-            systemScreenMessage("Selected State 4");
-          } else if( strcmp( CmdLIRC, "5" ) == 0 ) {
-            saveSlotPosition = 4;
-            systemScreenMessage("Selected State 5");
-          } else if( strcmp( CmdLIRC, "6" ) == 0 ) {
-            saveSlotPosition = 5;
-           systemScreenMessage("Selected State 6");
-          } else if( strcmp( CmdLIRC, "7" ) == 0 ) {
-           saveSlotPosition = 6;
-            systemScreenMessage("Selected State 7");
-          } else if( strcmp( CmdLIRC, "8" ) == 0 ) {
-            saveSlotPosition = 7;
-            systemScreenMessage("Selected State 8");
-          } else {
-            //do nothing
-          }
-        }
-        //we dont need this code nomore
-        free(CodeLIRC);
-      }
-    }
-  }
-}
-#endif
 
 #ifdef __MSC__
 #define stat _stat
@@ -889,18 +783,15 @@ void sdlReadPreferences(FILE *f)
       soundOffFlag = sdlFromHex(value) ? true : false;
     } else if(!strcmp(key, "soundEnable")) {
       int res = sdlFromHex(value) & 0x30f;
-      soundEnable(res);
-      soundDisable(~res);
+      soundSetEnable(res);
     } else if(!strcmp(key, "soundEcho")) {
       soundEcho = sdlFromHex(value) ? true : false;
-    } else if(!strcmp(key, "soundLowPass")) {
-      soundLowPass = sdlFromHex(value) ? true : false;
-    } else if(!strcmp(key, "soundReverse")) {
-      soundReverse = sdlFromHex(value) ? true : false;
     } else if(!strcmp(key, "soundVolume")) {
-      soundVolume = sdlFromHex(value);
-      if(soundVolume < 0 || soundVolume > 3)
-        soundVolume = 0;
+      float volume;
+      volume = sdlFromHex(value);
+      if( volume > 100.0f ) volume = 100.0f;
+      if( volume < 1.0f ) volume = 1.0f;
+      soundSetVolume( volume );
     } else if(!strcmp(key, "saveType")) {
       cpuSaveType = sdlFromHex(value);
       if(cpuSaveType < 0 || cpuSaveType > 5)
@@ -1818,19 +1709,15 @@ void sdlPollEvents()
 	) {
 		if (sdlSoundToggledOff) { // was off
 			// restore saved state
-			soundEnable(sdlSoundToggledOff);
-			soundDisable(~sdlSoundToggledOff);
-			sdlSoundToggledOff	= 0;
+			soundSetEnable( sdlSoundToggledOff );
+			sdlSoundToggledOff = 0;
 			systemConsoleMessage("Sound toggled on");
 		} else { // was on
-			sdlSoundToggledOff	= soundGetEnable();
-			soundEnable(0);
-			soundDisable(sdlSoundToggledOff);
+			sdlSoundToggledOff = soundGetEnable();
+			soundSetEnable( 0 );
 			systemConsoleMessage("Sound toggled off");
 			if (!sdlSoundToggledOff) {
-				// if ON actually meant "all channels off" for some reason,
-				// remember that on "toggle to ON" we should unmute everything
-				sdlSoundToggledOff	= 0x3ff;
+				sdlSoundToggledOff = 0x3ff;
 			}
 		}
 	}
@@ -1974,6 +1861,112 @@ void sdlPollEvents()
     }
   }
 }
+
+#if WITH_LIRC
+void lircCheckInput(void)
+{
+  if(LIRCEnabled) {
+    //setup a poll (poll.h)
+    struct pollfd pollLIRC;
+    //values fd is the pointer gotten from lircinit and events is what way
+    pollLIRC.fd = LIRCfd;
+    pollLIRC.events = POLLIN;
+    //run the poll
+    if( poll( &pollLIRC, 1, 0 ) > 0 ) {
+      //poll retrieved something
+      char *CodeLIRC;
+      char *CmdLIRC;
+      int ret; //dunno???
+      if( lirc_nextcode(&CodeLIRC) == 0 && CodeLIRC != NULL ) {
+        //retrieve the commands
+        while( ( ret = lirc_code2char( LIRCConfigInfo, CodeLIRC, &CmdLIRC ) ) == 0 && CmdLIRC != NULL ) {
+          //change the text to uppercase
+          char *CmdLIRC_Pointer = CmdLIRC;
+          while(*CmdLIRC_Pointer != '\0') {
+            *CmdLIRC_Pointer = toupper(*CmdLIRC_Pointer);
+            CmdLIRC_Pointer++;
+          }
+
+          if( strcmp( CmdLIRC, "QUIT" ) == 0 ) {
+            emulating = 0;
+          } else if( strcmp( CmdLIRC, "PAUSE" ) == 0 ) {
+            paused = !paused;
+            SDL_PauseAudio(paused);
+            if(paused) wasPaused = true;
+            systemConsoleMessage( paused?"Pause on":"Pause off" );
+            systemScreenMessage( paused?"Pause on":"Pause off" );
+          } else if( strcmp( CmdLIRC, "RESET" ) == 0 ) {
+            if(emulating) {
+              emulator.emuReset();
+              systemScreenMessage("Reset");
+            }
+         } else if( strcmp( CmdLIRC, "MUTE" ) == 0 ) {
+            if (sdlSoundToggledOff) { // was off
+              // restore saved state
+              soundSetEnable( sdlSoundToggledOff );
+              sdlSoundToggledOff = 0;
+              systemConsoleMessage("Sound toggled on");
+            } else { // was on
+              sdlSoundToggledOff = soundGetEnable();
+              soundSetEnable( 0 );
+              systemConsoleMessage("Sound toggled off");
+              if (!sdlSoundToggledOff) {
+                sdlSoundToggledOff = 0x3ff;
+              }
+            } 
+          } else if( strcmp( CmdLIRC, "VOLUP" ) == 0 ) {
+            float tempvolumeup;
+            tempvolumeup = soundGetVolume();
+            tempvolumeup = tempvolumeup + 1.0f;
+            if( tempvolumeup > 100.0f ) tempvolumeup = 100.0f;
+            soundSetVolume( tempvolumeup );
+            systemScreenMessage("Sound volume Increased");
+          } else if( strcmp( CmdLIRC, "VOLDOWN" ) == 0 ) {
+            float tempvolumedown;
+            tempvolumedown = soundGetVolume();
+            tempvolumedown = tempvolumedown - 1.0f;
+            if( tempvolumedown < 1.0f ) tempvolumedown = 1.0f;
+            soundSetVolume( tempvolumedown );
+            systemScreenMessage("Sound volume Decreased");
+          } else if( strcmp( CmdLIRC, "LOADSTATE" ) == 0 ) {
+            sdlReadState(saveSlotPosition);
+          } else if( strcmp( CmdLIRC, "SAVESTATE" ) == 0 ) {
+            sdlWriteState(saveSlotPosition);
+          } else if( strcmp( CmdLIRC, "1" ) == 0 ) {
+            saveSlotPosition = 0;
+            systemScreenMessage("Selected State 1");
+          } else if( strcmp( CmdLIRC, "2" ) == 0 ) {
+            saveSlotPosition = 1;
+            systemScreenMessage("Selected State 2");
+          } else if( strcmp( CmdLIRC, "3" ) == 0 ) {
+            saveSlotPosition = 2;
+            systemScreenMessage("Selected State 3");
+          } else if( strcmp( CmdLIRC, "4" ) == 0 ) {
+            saveSlotPosition = 3;
+            systemScreenMessage("Selected State 4");
+          } else if( strcmp( CmdLIRC, "5" ) == 0 ) {
+            saveSlotPosition = 4;
+            systemScreenMessage("Selected State 5");
+          } else if( strcmp( CmdLIRC, "6" ) == 0 ) {
+            saveSlotPosition = 5;
+           systemScreenMessage("Selected State 6");
+          } else if( strcmp( CmdLIRC, "7" ) == 0 ) {
+           saveSlotPosition = 6;
+            systemScreenMessage("Selected State 7");
+          } else if( strcmp( CmdLIRC, "8" ) == 0 ) {
+            saveSlotPosition = 7;
+            systemScreenMessage("Selected State 8");
+          } else {
+            //do nothing
+          }
+        }
+        //we dont need this code nomore
+        free(CodeLIRC);
+      }
+    }
+  }
+}
+#endif
 
 void usage(char *cmd)
 {
