@@ -752,6 +752,20 @@ void Window::vOnFlashSizeToggled(Gtk::CheckMenuItem * _poCMI, int _iFlashSize)
   m_poCoreConfig->vSetKey("flash_size", _iFlashSize);
 }
 
+void Window::vOnSoundMuteToggled(Gtk::CheckMenuItem * _poCMI)
+{
+  bool bMute = _poCMI->get_active();
+  if (bMute)
+  {
+    soundSetEnable(0x000);
+  }
+  else
+  {
+    soundSetEnable(0x30f);
+  }
+  m_poSoundConfig->vSetKey("mute", bMute);
+}
+
 void Window::vOnSoundQualityToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundQuality)
 {
   if (! _poCMI->get_active())
