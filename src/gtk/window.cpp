@@ -948,12 +948,6 @@ void Window::vInitConfig()
   //
   m_poSoundConfig = m_oConfig.poAddSection("Sound");
   m_poSoundConfig->vSetKey("mute",           false    );
-  m_poSoundConfig->vSetKey("channel_1",      true     );
-  m_poSoundConfig->vSetKey("channel_2",      true     );
-  m_poSoundConfig->vSetKey("channel_3",      true     );
-  m_poSoundConfig->vSetKey("channel_4",      true     );
-  m_poSoundConfig->vSetKey("channel_A",      true     );
-  m_poSoundConfig->vSetKey("channel_B",      true     );
   m_poSoundConfig->vSetKey("quality",        Sound22K );
   m_poSoundConfig->vSetKey("volume",         1.00f    );
 
