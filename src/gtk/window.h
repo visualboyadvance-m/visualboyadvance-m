@@ -111,7 +111,7 @@ protected:
     Sound11K = 4
   };
 
- enum EEmulatorType
+  enum EEmulatorType
   {
     EmulatorAuto,
     EmulatorCGB,
@@ -158,6 +158,7 @@ protected:
   virtual void vOnShowSpeedToggled(Gtk::CheckMenuItem * _poCMI, int _iShowSpeed);
   virtual void vOnSaveTypeToggled(Gtk::CheckMenuItem * _poCMI, int _iSaveType);
   virtual void vOnFlashSizeToggled(Gtk::CheckMenuItem * _poCMI, int _iFlashSize);
+  virtual void vOnSoundMuteToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnSoundQualityToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundQuality);
   virtual void vOnSoundVolumeToggled(Gtk::CheckMenuItem * _poCMI, float _fSoundVolume);
   virtual void vOnGBBorderToggled(Gtk::CheckMenuItem * _poCMI);

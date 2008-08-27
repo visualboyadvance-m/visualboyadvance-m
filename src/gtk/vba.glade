@@ -906,6 +906,18 @@
                         <child>
                           <widget class="GtkMenu" id="SoundMenu_menu">
                             <child>
+                              <widget class="GtkCheckMenuItem" id="SoundMute">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Mute</property>
+                                <property name="use_underline">True</property>
+                              </widget>
+                            </child>
+                            <child>
+                              <widget class="GtkSeparatorMenuItem" id="separator11">
+                                <property name="visible">True</property>
+                              </widget>
+                            </child>
+                            <child>
                               <widget class="GtkRadioMenuItem" id="Sound11Khz">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes">11 _Khz</property>
