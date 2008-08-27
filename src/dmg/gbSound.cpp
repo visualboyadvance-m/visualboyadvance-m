@@ -92,7 +92,7 @@ static void flush_samples()
 
 int const chan_count = 4;
 
-gb_effects_config_t gb_effects_config;
+gb_effects_config_t gb_effects_config = { false, 0.0f, 0.0f, false };
 static gb_effects_config_t gb_effects_config_current;
 
 static int prevSoundEnable = -1;
@@ -181,10 +181,6 @@ static void remake_stereo_buffer()
 
 void gbSoundReset()
 {
-	gb_effects_config.echo     = 0.20f;
-	gb_effects_config.stereo   = 0.15f;
-	gb_effects_config.surround = false;
-
 	SOUND_CLOCK_TICKS = 20000;
 
 	remake_stereo_buffer();
