@@ -47,6 +47,7 @@
 #include "../Util.h"
 #include "../dmg/gbGlobals.h"
 #include "../dmg/gbPrinter.h"
+#include "../dmg/gbSound.h"
 
 /* Link
 ---------------------*/
@@ -1595,6 +1596,11 @@ void VBA::loadSettings()
   if(soundInterpolation < 0 || soundInterpolation > 1)
     soundInterpolation = 0;
 
+	gb_effects_config.enabled = 1 == regQueryDwordValue( "gbSoundEffectsEnabled", 0 );
+	gb_effects_config.surround = 1 == regQueryDwordValue( "gbSoundEffectsSurround", 0 );
+	gb_effects_config.echo = (float)regQueryDwordValue( "gbSoundEffectsEcho", 0 ) / 100.0f;
+	gb_effects_config.stereo = (float)regQueryDwordValue( "gbSoundEffectsStereo", 0 ) / 100.0f;
+
   tripleBuffering = regQueryDwordValue("tripleBuffering", false) ? true : false;
 
 #ifndef NO_D3D
@@ -2584,6 +2590,12 @@ void VBA::saveSettings()
   regSetDwordValue("soundVolume", (DWORD)(soundGetVolume() * 100.0f));
 
   regSetDwordValue("soundInterpolation", soundInterpolation);
+
+	regSetDwordValue( "gbSoundEffectsEnabled", gb_effects_config.enabled ? 1 : 0 );
+	regSetDwordValue( "gbSoundEffectsSurround", gb_effects_config.surround ? 1 : 0 );
+	regSetDwordValue( "gbSoundEffectsEcho", (DWORD)( gb_effects_config.echo * 100.0f ) );
+	regSetDwordValue( "gbSoundEffectsStereo", (DWORD)( gb_effects_config.stereo * 100.0f ) );
+
   regSetDwordValue("tripleBuffering", tripleBuffering);
 
 #ifndef NO_D3D
