@@ -64,8 +64,6 @@ public:
 	afx_msg BOOL OnOptionsFilter(UINT nID);
 	afx_msg void OnUpdateOptionsPriority(CCmdUI *pCmdUI);
 	afx_msg BOOL OnOptionsPriority(UINT nID);
-	afx_msg void OnUpdateOptionsSoundVolume(CCmdUI *pCmdUI);
-	afx_msg BOOL OnOptionsSoundVolume(UINT nID);
 	afx_msg void OnUpdateOptionsEmulatorShowSpeed(CCmdUI *pCmdUI);
 	afx_msg BOOL OnOptionsEmulatorShowSpeed(UINT nID);
 	afx_msg void OnSystemMinimize();
@@ -205,8 +203,6 @@ public:
 	afx_msg void OnUpdateOptionsEmulatorPngformat(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorBmpformat();
 	afx_msg void OnUpdateOptionsEmulatorBmpformat(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsSoundMute();
-	afx_msg void OnUpdateOptionsSoundMute(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsSound11khz();
 	afx_msg void OnUpdateOptionsSound11khz(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsSound22khz();
@@ -333,10 +329,6 @@ public:
 	afx_msg void OnUpdateFileLoadgameMostrecent(CCmdUI* pCmdUI);
 	afx_msg void OnFileLoadgameAutoloadmostrecent();
 	afx_msg void OnUpdateFileLoadgameAutoloadmostrecent(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsSoundVolume25x();
-	afx_msg void OnUpdateOptionsSoundVolume25x(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsSoundVolume5x();
-	afx_msg void OnUpdateOptionsSoundVolume5x(CCmdUI* pCmdUI);
 	afx_msg void OnCheatsDisablecheats();
 	afx_msg void OnUpdateCheatsDisablecheats(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsVideoFullscreenmaxscale();

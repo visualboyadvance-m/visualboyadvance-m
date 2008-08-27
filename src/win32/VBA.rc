@@ -1779,17 +1779,8 @@ BEGIN
                 MENUITEM "&Sync game to audio",         ID_OPTIONS_EMULATOR_SYNCHRONIZE
             END
             MENUITEM SEPARATOR
-            POPUP "&Volume"
-            BEGIN
-                MENUITEM "&Mute",                       ID_OPTIONS_SOUND_MUTE
-                MENUITEM SEPARATOR
-                MENUITEM "2&5%",                        ID_OPTIONS_SOUND_VOLUME_25X
-                MENUITEM "5&0%",                        ID_OPTIONS_SOUND_VOLUME_5X
-                MENUITEM "&100%",                       ID_OPTIONS_SOUND_VOLUME_1X
-                MENUITEM "&200%",                       ID_OPTIONS_SOUND_VOLUME_2X
-                MENUITEM "&300%",                       ID_OPTIONS_SOUND_VOLUME_3X
-                MENUITEM "&400%",                       ID_OPTIONS_SOUND_VOLUME_4X
-            END
+            MENUITEM "Core Settings...",            ID_AUDIO_CORE_SETTINGS
+            MENUITEM SEPARATOR
             POPUP "Sampling Rate"
             BEGIN
                 MENUITEM "&11025 Hz",                   ID_OPTIONS_SOUND_11KHZ
@@ -1801,8 +1792,6 @@ BEGIN
                 MENUITEM "On",                          ID_OPTIONS_SOUND_PCMINTERPOLATION_LINEAR
                 MENUITEM "Off",                         ID_OPTIONS_SOUND_PCMINTERPOLATION_NONE
             END
-            MENUITEM SEPARATOR
-            MENUITEM "Core Settings...",            ID_AUDIO_CORE_SETTINGS
             MENUITEM SEPARATOR
             POPUP "Sound Channels"
             BEGIN
