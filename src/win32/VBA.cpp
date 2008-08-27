@@ -1598,8 +1598,8 @@ void VBA::loadSettings()
 
 	gb_effects_config.enabled = 1 == regQueryDwordValue( "gbSoundEffectsEnabled", 0 );
 	gb_effects_config.surround = 1 == regQueryDwordValue( "gbSoundEffectsSurround", 0 );
-	gb_effects_config.echo = (float)regQueryDwordValue( "gbSoundEffectsEcho", 0 ) / 100.0f;
-	gb_effects_config.stereo = (float)regQueryDwordValue( "gbSoundEffectsStereo", 0 ) / 100.0f;
+	gb_effects_config.echo = (float)regQueryDwordValue( "gbSoundEffectsEcho", 20 ) / 100.0f;
+	gb_effects_config.stereo = (float)regQueryDwordValue( "gbSoundEffectsStereo", 15 ) / 100.0f;
 
   tripleBuffering = regQueryDwordValue("tripleBuffering", false) ? true : false;
 
