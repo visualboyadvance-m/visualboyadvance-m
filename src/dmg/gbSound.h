@@ -1,22 +1,34 @@
-// -*- C++ -*-
-// VisualBoyAdvance - Nintendo Gameboy/GameboyAdvance (TM) emulator.
-// Copyright (C) 1999-2003 Forgotten
-// Copyright (C) 2004 Forgotten and the VBA development team
+// GB sound emulation
 
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2, or(at your option)
-// any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software Foundation,
-// Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#ifndef VBA_GBSOUND_H
+#define VBA_GBSOUND_H
 
+// See Sound.h for sound setup/options
+
+//// GB sound options
+
+// Sets sample rate to 44100 / quality
+void gbSoundSetQuality( int quality );
+extern int soundQuality; // current sound quality
+
+// Effects configuration
+struct gb_effects_config_t
+{
+	bool enabled;   // false = disable all effects
+
+	float echo;     // 0.0 = none, 1.0 = lots
+	float stereo;   // 0.0 = channels in center, 1.0 = channels on left/right
+	bool surround;  // true = put some channels in back
+};
+
+// Changes effects configuration
+void gbSoundConfigEffects( gb_effects_config_t const& );
+extern gb_effects_config_t gb_effects_config; // current configuration
+
+
+//// GB sound emulation
+
+// GB sound registers
 #define NR10 0xff10
 #define NR11 0xff11
 #define NR12 0xff12
@@ -39,36 +51,23 @@
 #define NR51 0xff25
 #define NR52 0xff26
 
-#define SOUND_EVENT(address,value) \
-    gbSoundEvent(address,value)
+// Resets emulated sound hardware
+void gbSoundReset();
 
-extern void gbSoundTick();
-extern void gbSoundPause();
-extern void gbSoundResume();
-extern void gbSoundEnable(int);
-extern void gbSoundDisable(int);
-extern int gbSoundGetEnable();
-extern void gbSoundReset();
-extern void gbSoundSaveGame(gzFile);
-extern void gbSoundReadGame(int,gzFile);
-extern void gbSoundEvent(register u16, register int);
-extern void gbSoundSetQuality(int);
+// Emulates write to sound hardware
+void gbSoundEvent( u16 address, int data );
+#define SOUND_EVENT gbSoundEvent
 
-extern u8 gbSoundRead(u16 address);
+// Emulates read from sound hardware
+u8   gbSoundRead( u16 address );
 
-extern int soundTicks;
-extern int soundQuality;
-extern int SOUND_CLOCK_TICKS;
+// Notifies emulator that SOUND_CLOCK_TICKS clocks have passed
+void gbSoundTick();
+extern int SOUND_CLOCK_TICKS;   // Number of 16.8 MHz clocks between calls to gbSoundTick()
+extern int soundTicks;          // Number of 16.8 MHz clocks until gbSoundTick() will be called
 
-struct gb_effects_config_t
-{
-	bool enabled;   // false = disable all effects
+// Saves/loads emulator state
+void gbSoundSaveGame( gzFile out );
+void gbSoundReadGame( int version, gzFile in );
 
-	float echo;     // 0.0 = none, 1.0 = lots
-	float stereo;   // 0.0 = channels in center, 1.0 = channels on left/right
-	bool surround;  // true = put some channels in back
-};
-
-// Changes effects configuration
-void gbSoundConfigEffects( gb_effects_config_t const& );
-extern gb_effects_config_t gb_effects_config; // current configuration
+#endif

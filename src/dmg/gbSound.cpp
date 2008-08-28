@@ -2,6 +2,8 @@
 // Copyright (C) 1999-2003 Forgotten
 // Copyright (C) 2005-2006 Forgotten and the VBA development team
 // Copyright (C) 2007-2008 VBA-M development team
+// Copyright (C) 2007-2008 Shay Green (blargg)
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2, or(at your option)
@@ -16,9 +18,9 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#include <memory.h>
+#include <string.h>
 
-#include "../System.h"
+#include "../Sound.h"
 #include "../Util.h"
 #include "gbGlobals.h"
 #include "gbSound.h"
@@ -26,23 +28,18 @@
 #include "gb_apu/Gb_Apu.h"
 #include "gb_apu/Effects_Buffer.h"
 
-extern int soundGetEnable();
-
-static Gb_Apu* gb_apu;
-static Simple_Effects_Buffer* stereo_buffer;
-
-extern u16 soundFinalWave[1470];
-
 extern int gbHardware;
 
-extern void soundResume();
+gb_effects_config_t gb_effects_config = { false, 0.20f, 0.15f, false };
 
-extern int soundBufferLen;
-extern int soundQuality;
-extern bool soundPaused;
-extern int soundTicks;
-extern int SOUND_CLOCK_TICKS;
+static gb_effects_config_t    gb_effects_config_current;
+static Simple_Effects_Buffer* stereo_buffer;
+static Gb_Apu*                gb_apu;
 
+static float soundVolume_  = -1;
+static int prevSoundEnable = -1;
+
+int const chan_count = 4;
 int const ticks_to_time = 2 * GB_APU_OVERCLOCK;
 
 static inline blip_time_t blip_time()
@@ -90,13 +87,6 @@ static void flush_samples()
 	}
 }
 
-int const chan_count = 4;
-
-gb_effects_config_t gb_effects_config = { false, 0.2f, 0.15f, false };
-static gb_effects_config_t gb_effects_config_current;
-
-static int prevSoundEnable = -1;
-
 static void apply_effects()
 {
 	prevSoundEnable = soundGetEnable();
@@ -122,6 +112,14 @@ void gbSoundConfigEffects( gb_effects_config_t const& c )
 	gb_effects_config = c;
 }
 
+static void apply_volume()
+{
+	soundVolume_ = soundGetVolume();
+
+	if ( gb_apu )
+		gb_apu->volume( soundVolume_ );
+}
+
 void gbSoundTick()
 {
  	if ( gb_apu && stereo_buffer )
@@ -135,6 +133,9 @@ void gbSoundTick()
 		if ( memcmp( &gb_effects_config_current, &gb_effects_config,
 				sizeof gb_effects_config ) || soundGetEnable() != prevSoundEnable )
 			apply_effects();
+		
+		if ( soundVolume_ != soundGetVolume() )
+			apply_volume();
 	}
 }
 
@@ -160,7 +161,7 @@ static void remake_stereo_buffer()
 	stereo_buffer = 0;
 
 	stereo_buffer = new Simple_Effects_Buffer; // TODO: handle out of memory
-	stereo_buffer->set_sample_rate( 44100 / soundQuality ); // TODO: handle out of memory
+	if ( stereo_buffer->set_sample_rate( 44100 / soundQuality ) ) { } // TODO: handle out of memory
 	stereo_buffer->clock_rate( gb_apu->clock_rate );
 
 	// APU
@@ -168,20 +169,21 @@ static void remake_stereo_buffer()
 		Multi_Buffer::wave_type+1, Multi_Buffer::wave_type+2,
 		Multi_Buffer::wave_type+3, Multi_Buffer::mixed_type+1
 	};
-	stereo_buffer->set_channel_count( chan_count, chan_types );
+	if ( stereo_buffer->set_channel_count( chan_count, chan_types ) ) { } // TODO: handle errors
 
 	if ( !gb_apu )
 	{
-		gb_apu = new Gb_Apu;
+		gb_apu = new Gb_Apu; // TODO: handle errors
 		reset_apu();
 	}
 
 	apply_effects();
+	apply_volume();
 }
 
 void gbSoundReset()
 {
-	SOUND_CLOCK_TICKS = 20000;
+	SOUND_CLOCK_TICKS = 20000; // 1/100 second
 
 	remake_stereo_buffer();
 	reset_apu();
@@ -220,9 +222,6 @@ void gbSoundReset()
 		gbMemory[addr++] = 0xff;
 	}
 }
-
-extern bool soundInit();
-extern void soundShutdown();
 
 void gbSoundSetQuality(int quality)
 {
@@ -364,7 +363,7 @@ static void gbSoundReadGameOld(int version,gzFile gzFile)
 	// Load state
 	utilReadData( gzFile, gbsound_format );
 
-	if ( version >= 11 )
+	if ( version >= 11 ) // TODO: never executed; remove?
 		utilReadData( gzFile, gbsound_format2 );
 
 	utilReadData( gzFile, gbsound_format3 );
