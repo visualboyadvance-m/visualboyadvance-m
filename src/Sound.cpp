@@ -2,8 +2,9 @@
 // Copyright (C) 1999-2003 Forgotten
 // Copyright (C) 2004 Forgotten and the VBA development team
 // Copyright (C) 2004-2006 VBA development team
-// Copyright (C) 2007 Shay Green (blargg)
-
+// Copyright (C) 2007-2008 VBA-M development team
+// Copyright (C) 2007-2008 Shay Green (blargg)
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2, or(at your option)
@@ -18,7 +19,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#include <memory.h>
+#include <string.h>
 
 #include "Sound.h"
 
@@ -54,24 +55,22 @@
 
 extern bool stopState;      // TODO: silence sound when true
 
-int soundQuality       = 2;
-int soundInterpolation = 0;
-float soundFiltering   = 1;
-static float soundFiltering_;
-float soundVolume      = 1;
-static float soundVolume_ = -1;
-bool soundEcho         = false;
+int const SOUND_CLOCK_TICKS_ = 167772; // 1/100 second
 
-static int soundEnableFlag = 0x3ff; // emulator channels enabled
+u16   soundFinalWave [1470];
+int   soundBufferLen     = sizeof soundFinalWave;
+int   soundQuality       = 2;
+int   soundInterpolation = 0;
+bool  soundPaused        = true;
+float soundFiltering     = 1;
+float soundVolume        = 1;
+bool  soundEcho          = false;
+int   SOUND_CLOCK_TICKS  = SOUND_CLOCK_TICKS_;
+int   soundTicks         = SOUND_CLOCK_TICKS_;
 
-int const SOUND_CLOCK_TICKS_ = 167772;
-int SOUND_CLOCK_TICKS = SOUND_CLOCK_TICKS_;
-int soundTicks = SOUND_CLOCK_TICKS_;
-
-u16 soundFinalWave [1470];
-int soundBufferLen = sizeof soundFinalWave;
-
-bool soundPaused      = true;
+static int soundEnableFlag   = 0x3ff; // emulator channels enabled
+static float soundFiltering_ = -1;
+static float soundVolume_    = -1;
 
 void interp_rate() { /* empty for now */ }
 
