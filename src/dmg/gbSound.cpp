@@ -141,7 +141,7 @@ void gbSoundTick()
 static void reset_apu()
 {
 	Gb_Apu::mode_t mode = Gb_Apu::mode_dmg;
-	if ( gbHardware & 1 )
+	if ( gbHardware & 2 )
 		mode = Gb_Apu::mode_cgb;
 	if ( gbHardware & 8 )
 		mode = Gb_Apu::mode_agb;
