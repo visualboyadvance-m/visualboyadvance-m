@@ -1,19 +1,15 @@
-// GBA sound emulation
+// Sound emulation setup/options and GBA sound emulation
 
 #ifndef VBA_SOUND_H
 #define VBA_SOUND_H
 
 #include "System.h"
 
-//// Setup/options
+//// Setup/options (these affect GBA and GB sound)
 
 // Initializes sound and returns true if successful. Sets sound quality to
 // current value in soundQuality global.
 bool soundInit();
-
-// Sets sample rate to 44100 / quality
-void soundSetQuality( int quality );
-extern int soundQuality; // current sound quality
 
 // Manages sound volume, where 1.0 is normal
 void soundSetVolume( float );
@@ -24,8 +20,8 @@ float soundGetVolume();
 // 0x002 Pulse 2
 // 0x004 Wave
 // 0x008 Noise
-// 0x100 GBA left
-// 0x200 GBA right
+// 0x100 PCM 1
+// 0x200 PCM 2
 void soundSetEnable( int mask );
 int  soundGetEnable();
 
@@ -41,14 +37,21 @@ void soundShutdown();
 extern int soundBufferLen;      // size of sound buffer in BYTES
 extern u16 soundFinalWave[1470];// 16-bit SIGNED stereo sample buffer
 
+
+//// GBA sound options
+
+// Sets sample rate to 44100 / quality
+void soundSetQuality( int quality );
+extern int soundQuality; // current sound quality
+
 // Sound settings
 extern int soundInterpolation;  // 1 if PCM should have low-pass filtering
 extern float soundFiltering;    // 0.0 = none, 1.0 = max (only if soundInterpolation is 1)
 
 
-//// Emulation
+//// GBA sound emulation
 
-// GBA register addresses
+// GBA sound registers
 #define SGCNT0_H 0x82
 #define FIFOA_L 0xa0
 #define FIFOA_H 0xa2
