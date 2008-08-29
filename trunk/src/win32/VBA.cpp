@@ -144,7 +144,6 @@ int RGB_LOW_BITS_MASK = 0;
 bool b16to32Video = false;
 int systemFrameSkip = 0;
 int systemSpeed = 0;
-bool systemSoundOn = false;
 u32 systemColorMap32[0x10000];
 u16 systemColorMap16[0x10000];
 u16 systemGbPalette[24];

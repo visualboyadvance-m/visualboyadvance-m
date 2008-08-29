@@ -14,8 +14,6 @@
 
 extern int emulating;
 
-bool systemSoundOn = false;
-
 static PaStreamParameters outputParameters;
 static PaStream *stream;
 static PaError err;
@@ -149,8 +147,6 @@ bool systemSoundInit()
 
     err = Pa_StartStream( stream );
     if (err != paNoError) goto error;
-    
-    systemSoundOn = true;
     
     return true;
 error:
