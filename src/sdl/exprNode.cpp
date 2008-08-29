@@ -20,9 +20,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "agb/GBA.h"
-#include "Port.h"
-#include "elf.h"
+#include "../agb/GBA.h"
+#include "../Port.h"
+#include "../elf.h"
 #include "exprNode.h"
 
 #ifndef __GNUC__
