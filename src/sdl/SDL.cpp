@@ -35,7 +35,7 @@
 
 #include "../AutoBuild.h"
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include "../agb/GBA.h"
 #include "../agb/agbprint.h"
@@ -2534,7 +2534,7 @@ int main(int argc, char **argv)
   emulating = 1;
   renderedFrames = 0;
 
-    soundInit();
+  soundInit();
 
   autoFrameSkipLastTime = throttleLastTime = systemGetClock();
 

@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <time.h>
 
+#include <SDL.h>
+
 #include "../agb/GBA.h"
 #include "../dmg/gb.h"
 #include "../dmg/gbGlobals.h"
@@ -101,6 +103,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_uiAutofireState  = 0;
   m_poKeymap         = NULL;
 
+  vInitSDL();
   vInitSystem();
 
   vSetDefaultTitle();
@@ -887,11 +890,31 @@ void Window::vInitSystem()
   }
 
   Init_2xSaI(32);
+  
+  soundInit();
 }
 
 void Window::vUnInitSystem()
 {
   systemSoundShutdown();
+}
+
+void Window::vInitSDL()
+{
+  static bool bDone = false;
+
+  if (bDone)
+    return;
+
+  int iFlags = (SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
+
+  if (SDL_Init(iFlags) < 0)
+  {
+    fprintf(stderr, "Failed to init SDL: %s", SDL_GetError());
+    abort();
+  }
+
+  bDone = true;
 }
 
 void Window::vInitConfig()
