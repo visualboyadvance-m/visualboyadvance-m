@@ -81,7 +81,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_iSoundQualityMin(Sound44K),
   m_iSoundQualityMax(Sound11K),
   m_fSoundVolumeMin (0.50f),
-  m_fSoundVolumeMax (4.00f),
+  m_fSoundVolumeMax (2.00f),
   m_iEmulatorTypeMin(EmulatorAuto),
   m_iEmulatorTypeMax(EmulatorSGB2),
   m_iFilter2xMin    (FirstFilter),
@@ -556,9 +556,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
     { "Volume25",   0.25f    },
     { "Volume50",   0.50f    },
     { "Volume100",  1.00f    },
-    { "Volume200",  2.00f    },
-    { "Volume300",  3.00f    },
-    { "Volume400",  4.00f    }
+    { "Volume200",  2.00f    }
   };
   float fDefaultSoundVolume = m_poSoundConfig->oGetKey<float>("volume");
   for (guint i = 0; i < G_N_ELEMENTS(astSoundVolume); i++)
