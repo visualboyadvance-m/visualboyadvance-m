@@ -5,8 +5,6 @@
 
 extern int emulating;
 
-bool systemSoundOn = false;
-
 const  int        sdlSoundSamples  = 4096;
 const  int        sdlSoundAlign    = 4;
 const  int        sdlSoundCapacity = sdlSoundSamples * 2;
@@ -131,7 +129,6 @@ bool systemSoundInit()
   sdlSoundMutex = SDL_CreateMutex();
 
   sdlSoundRPos = sdlSoundWPos = 0;
-  systemSoundOn = true;
   return true;
 
 }
@@ -153,7 +150,6 @@ void systemSoundShutdown()
   SDL_CloseAudio();
 
   emulating = iSave;
-  systemSoundOn = false;
 }
 
 void systemSoundPause()
