@@ -24,7 +24,6 @@
 int emulating = 0;
 int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
-bool systemSoundOn = false;
 u32 systemColorMap32[0x10000];
 u16 systemColorMap16[0x10000];
 int systemRedShift = 0;

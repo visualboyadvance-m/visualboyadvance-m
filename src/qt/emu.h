@@ -27,7 +27,6 @@
 extern int emulating;
 extern int systemFrameSkip;
 extern int systemSaveUpdateCounter;
-extern bool systemSoundOn;
 extern u32 systemColorMap32[0x10000];
 extern u16 systemColorMap16[0x10000];
 extern int systemRedShift;
