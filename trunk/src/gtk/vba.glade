@@ -985,22 +985,6 @@
                                         <property name="group">Volume25</property>
                                       </widget>
                                     </child>
-                                    <child>
-                                      <widget class="GtkRadioMenuItem" id="Volume300">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">300%</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="group">Volume25</property>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkRadioMenuItem" id="Volume400">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">400%</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="group">Volume25</property>
-                                      </widget>
-                                    </child>
                                   </widget>
                                 </child>
                               </widget>

@@ -785,15 +785,15 @@ void Window::vOnSoundQualityToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundQual
   m_poSoundConfig->vSetKey("quality", _iSoundQuality);
 }
 
-void Window::vOnSoundVolumeToggled(Gtk::CheckMenuItem * _poCMI, float _iSoundVolume)
+void Window::vOnSoundVolumeToggled(Gtk::CheckMenuItem * _poCMI, float _fSoundVolume)
 {
   if (! _poCMI->get_active())
   {
     return;
   }
 
-  soundSetVolume(_iSoundVolume);
-  m_poSoundConfig->vSetKey("volume", _iSoundVolume);
+  soundSetVolume(_fSoundVolume);
+  m_poSoundConfig->vSetKey("volume", _fSoundVolume);
 }
 
 void Window::vOnGBBorderToggled(Gtk::CheckMenuItem * _poCMI)
