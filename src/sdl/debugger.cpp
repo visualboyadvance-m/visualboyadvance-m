@@ -27,7 +27,7 @@
 #include "../Port.h"
 #include "../armdis.h"
 #include "../elf.h"
-#include "../exprNode.h"
+#include "exprNode.h"
 
 extern bool debugger;
 extern int emulating;

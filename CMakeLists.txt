@@ -172,6 +172,9 @@ SET(SRC_SDL
     src/sdl/filters.cpp
     src/sdl/text.cpp
     src/sdl/sndSDL.cpp
+    src/sdl/expr.cpp
+    src/sdl/exprNode.cpp
+    src/sdl/expr-lex.cpp
 )
 
 SET(SRC_FEX_MINI
@@ -211,9 +214,6 @@ IF( NOT NO_DEBUGGER )
     SET(SRC_DEBUGGER
         src/armdis.cpp
         src/elf.cpp
-        src/expr.cpp
-        src/exprNode.cpp
-        src/expr-lex.cpp
         src/remote.cpp
     )
 ENDIF( NOT NO_DEBUGGER )
