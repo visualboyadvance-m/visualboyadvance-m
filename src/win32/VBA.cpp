@@ -56,11 +56,6 @@
 
 #include "../agb/gbafilter.h"
 
-#ifdef SDL
-#pragma comment( lib, "SDL" )
-#pragma comment( lib, "SDLmain" )
-#endif
-
 extern void Pixelate(u8*,u32,u8*,u8*,u32,int,int);
 extern void Pixelate32(u8*,u32,u8*,u8*,u32,int,int);
 extern void _2xSaI(u8*,u32,u8*,u8*,u32,int,int);
