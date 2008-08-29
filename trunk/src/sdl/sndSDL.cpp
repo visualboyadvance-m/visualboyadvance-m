@@ -1,4 +1,4 @@
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include "../System.h"
 #include "../Sound.h"
 #include "../Globals.h"
@@ -33,8 +33,8 @@ static inline int soundBufferUsed()
 
 static void soundCallback(void *,u8 *stream,int len)
 {
- if (len <= 0 || !emulating)
-     return;
+  if (len <= 0 || !emulating)
+    return;
 
   SDL_mutexP(sdlSoundMutex);
   const int nAvail = soundBufferUsed();

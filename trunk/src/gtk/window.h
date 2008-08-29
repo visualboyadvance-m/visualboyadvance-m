@@ -274,6 +274,7 @@ private:
 
   void vInitSystem();
   void vUnInitSystem();
+  void vInitSDL();
   void vInitConfig();
   void vCheckConfig();
   void vInitScreenArea(EVideoOutput _eVideoOutput);
