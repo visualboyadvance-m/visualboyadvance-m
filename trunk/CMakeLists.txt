@@ -170,6 +170,7 @@ SET(SRC_SDL
     src/sdl/dummy.cpp
     src/sdl/filters.cpp
     src/sdl/text.cpp
+    src/sdl/inputSDL.cpp
     src/sdl/sndSDL.cpp
     src/sdl/expr.cpp
     src/sdl/exprNode.cpp
