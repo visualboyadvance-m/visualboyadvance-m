@@ -3,9 +3,7 @@
 
 #include "../System.h"
 
-#define SDLBUTTONS_NUM 14
-
-enum {
+enum EKey {
   KEY_LEFT, KEY_RIGHT,
   KEY_UP, KEY_DOWN,
   KEY_BUTTON_A, KEY_BUTTON_B,
@@ -15,9 +13,9 @@ enum {
   KEY_BUTTON_AUTO_A, KEY_BUTTON_AUTO_B
 };
 
-extern u16 joypad[4][SDLBUTTONS_NUM];
-extern u16 motion[4];
-extern int autoFire;
+void inputSetKeymap(int joy, EKey key, u16 code);
+void inputSetMotionKeymap(EKey key, u16 code);
+bool inputToggleAutoFire(EKey key);
 
 void sdlUpdateKey(int key, bool down);
 void sdlUpdateJoyButton(int which, int button, bool pressed);

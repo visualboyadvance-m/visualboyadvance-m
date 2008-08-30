@@ -2,6 +2,8 @@
 
 #include <SDL.h>
 
+#define SDLBUTTONS_NUM 14
+
 bool sdlButtons[4][SDLBUTTONS_NUM] = {
   { false, false, false, false, false, false,
     false, false, false, false, false, false,
@@ -65,6 +67,50 @@ u16 defaultMotion[4] = {
 
 int sensorX = 2047;
 int sensorY = 2047;
+
+void inputSetKeymap(int joy, EKey key, u16 code)
+{
+	joypad[joy][key] = code;
+}
+
+void inputSetMotionKeymap(EKey key, u16 code)
+{
+	motion[key] = code;
+}
+
+bool inputToggleAutoFire(EKey key)
+{
+	int mask = 0;
+	
+	switch (key)
+	{
+		case KEY_BUTTON_A:
+			mask = 1 << 0;
+		break;
+		case KEY_BUTTON_B:
+			mask = 1 << 1;
+		break;
+		case KEY_BUTTON_R:
+			mask = 1 << 8;
+		break;
+		case KEY_BUTTON_L:
+			mask = 1 << 9;
+		break;
+		default:
+		break;
+	}
+
+	if(autoFire & mask)
+	{
+		autoFire &= ~mask;
+		return false;
+	}
+	else
+	{
+		autoFire |= mask;
+		return true;
+	}
+}
 
 void sdlUpdateKey(int key, bool down)
 {
