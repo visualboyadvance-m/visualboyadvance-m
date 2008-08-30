@@ -54,7 +54,7 @@
 
 
 // we only need the 32bit version because our YUV format has 32bits
-#define abs_32( value )  ( value & 0x7FFFFFFF )
+#define abs_32( value )  ( ( value ) & 0x7FFFFFFF )
 
 
 inline bool Diff( unsigned int YUV1, unsigned int YUV2 )
@@ -98,7 +98,7 @@ inline bool Diff( unsigned int YUV1, unsigned int YUV2 )
 #define Interp2_32( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned int *)(pc) ) = \
-	( (c1) == (c2) == (c3) ) ? c1 : \
+	( ( (c1) == (c2) ) == (c3) ) ? c1 : \
 	( \
 		( ( \
 			( ( (c1) & 0x00FF00 ) * 2 ) + \
@@ -140,7 +140,7 @@ inline bool Diff( unsigned int YUV1, unsigned int YUV2 )
 #define Interp4_32( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned int *)(pc) ) = \
-	( (c1) == (c2) == (c3) ) ? c1 : \
+	( ( (c1) == (c2) ) == (c3) ) ? c1 : \
 	( \
 	( ( ( ( (c1) & 0x00FF00 ) * 2 ) + ( ( ( (c2) & 0x00FF00 ) + ( (c3) & 0x00FF00 ) ) * 7 ) ) & 0x000FF000 ) + \
 	( ( ( ( (c1) & 0xFF00FF ) * 2 ) + ( ( ( (c2) & 0xFF00FF ) + ( (c3) & 0xFF00FF ) ) * 7 ) ) & 0x0FF00FF0 ) \
@@ -173,7 +173,7 @@ inline bool Diff( unsigned int YUV1, unsigned int YUV2 )
 #define Interp6_32( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned int *)(pc) ) = \
-	( (c1) == (c2) == (c3) ) ? c1 : \
+	( ( (c1) == (c2) ) == (c3) ) ? c1 : \
 	( \
 		( ( \
 			( ( (c1) & 0x00FF00 ) * 5 ) + \
@@ -195,7 +195,7 @@ inline bool Diff( unsigned int YUV1, unsigned int YUV2 )
 #define Interp7_32( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned int *)(pc) ) = \
-	( (c1) == (c2) == (c3) ) ? c1 : \
+	( ( (c1) == (c2) ) == (c3) ) ? c1 : \
 	( \
 		( ( \
 			( ( (c1) & 0x00FF00 ) * 6 ) + \
@@ -288,7 +288,7 @@ inline unsigned int RGBtoYUV_32( unsigned int c )
 #define Interp2_16( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned short *)(pc) ) = \
-	( (c1) == (c2) == (c3) ) ? c1 : \
+	( ( (c1) == (c2) ) == (c3) ) ? c1 : \
 	( \
 		( ( \
 			( ( (c1) & GMASK ) * 2 ) + \
@@ -330,7 +330,7 @@ inline unsigned int RGBtoYUV_32( unsigned int c )
 #define Interp4_16( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned short *)(pc) ) = \
-	( (c1) == (c2) == (c3) ) ? c1 : \
+	( ( (c1) == (c2) ) == (c3) ) ? c1 : \
 	( \
 	( ( ( ( (c1) & GMASK ) * 2 ) + ( ( ( (c2) & GMASK ) + ( (c3) & GMASK ) ) * 7 ) ) & GSHIFT4MASK ) + \
 	( ( ( ( (c1) & RBMASK ) * 2 ) + ( ( ( (c2) & RBMASK ) + ( (c3) & RBMASK ) ) * 7 ) ) & RBSHIFT4MASK ) \
@@ -363,7 +363,7 @@ inline unsigned int RGBtoYUV_32( unsigned int c )
 #define Interp6_16( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned short *)(pc) ) = \
-	( (c1) == (c2) == (c3) ) ? c1 : \
+	( ( (c1) == (c2) ) == (c3) ) ? c1 : \
 	( \
 		( ( \
 			( ( (c1) & GMASK ) * 5 ) + \
@@ -385,7 +385,7 @@ inline unsigned int RGBtoYUV_32( unsigned int c )
 #define Interp7_16( pc, c1, c2, c3 ) \
 ( \
 	*( (unsigned short *)(pc) ) = \
-	( (c1) == (c2) == (c3) ) ? c1 : \
+	( ( (c1) == (c2) ) == (c3) ) ? c1 : \
 	( \
 		( ( \
 			( ( (c1) & GMASK ) * 6 ) + \
