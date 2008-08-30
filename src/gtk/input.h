@@ -20,7 +20,7 @@
 #ifndef __VBA_INPUT_H__
 #define __VBA_INPUT_H__
 
-#include <glib.h>
+#include <map>
 
 namespace VBA
 {
@@ -68,22 +68,21 @@ class Keymap
   Keymap();
   ~Keymap();
 
-  void vRegister(guint _uiVal, EKey _eKey);
+  void vRegister(int _iVal, EKey _eKey);
   void vClear();
-  inline EKey eGetKey(guint _uiVal);
+  inline EKey eGetKey(int _iVal);
 
  private:
-  GHashTable * m_pstTable;
+  std::map<int, EKey> m_oTable;
 
   // noncopyable
   Keymap(const Keymap &);
   Keymap & operator=(const Keymap &);
 };
 
-inline EKey Keymap::eGetKey(guint _uiVal)
+inline EKey Keymap::eGetKey(int _iVal)
 {
-  return (EKey)GPOINTER_TO_UINT(g_hash_table_lookup(m_pstTable,
-                                                    GUINT_TO_POINTER(_uiVal)));
+  return m_oTable[_iVal];
 }
 
 } // namespace VBA

@@ -18,36 +18,25 @@
 
 #include "input.h"
 
-#include <new>
-
 namespace VBA
 {
 
 Keymap::Keymap()
 {
-  m_pstTable = g_hash_table_new(g_direct_hash, g_direct_equal);
-  if (m_pstTable == NULL)
-  {
-    throw std::bad_alloc();
-  }
 }
 
 Keymap::~Keymap()
 {
-  g_hash_table_destroy(m_pstTable);
 }
 
-void Keymap::vRegister(guint _uiVal, EKey _eKey)
+void Keymap::vRegister(int _iVal, EKey _eKey)
 {
-  g_hash_table_insert(m_pstTable,
-                      GUINT_TO_POINTER(_uiVal),
-                      GUINT_TO_POINTER(_eKey));
+  m_oTable[_iVal] = _eKey;
 }
 
 void Keymap::vClear()
 {
-  g_hash_table_destroy(m_pstTable);
-  m_pstTable = g_hash_table_new(g_direct_hash, g_direct_equal);
+  m_oTable.clear();
 }
 
 } // namespace VBA
