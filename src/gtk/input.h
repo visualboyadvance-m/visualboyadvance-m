@@ -62,28 +62,7 @@ enum EKeyFlag
   KeyFlagCapture = 1 << 11,
 };
 
-class Keymap
-{
- public:
-  Keymap();
-  ~Keymap();
-
-  void vRegister(int _iVal, EKey _eKey);
-  void vClear();
-  inline EKey eGetKey(int _iVal);
-
- private:
-  std::map<int, EKey> m_oTable;
-
-  // noncopyable
-  Keymap(const Keymap &);
-  Keymap & operator=(const Keymap &);
-};
-
-inline EKey Keymap::eGetKey(int _iVal)
-{
-  return m_oTable[_iVal];
-}
+typedef std::map<int, EKey> Keymap;
 
 } // namespace VBA
 

@@ -49,7 +49,7 @@ public:
   guint *  puiAt(int _iIndex);
   int      iFind(guint _uiKeycode);
   void     vSetDefault();
-  Keymap * poCreateKeymap() const;
+  Keymap   oCreateKeymap() const;
 };
 
 class JoypadConfigDialog : public Gtk::Dialog

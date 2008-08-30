@@ -252,7 +252,7 @@ private:
   sigc::connection m_oEmuSig;
 
   std::vector<JoypadConfig> m_oJoypads;
-  Keymap * m_poKeymap;
+  Keymap m_oKeymap;
 
   int m_bFullscreen;
   int m_iScreenWidth;
