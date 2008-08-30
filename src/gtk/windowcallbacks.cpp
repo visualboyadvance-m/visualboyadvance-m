@@ -871,11 +871,7 @@ void Window::vOnJoypadConfigure(int _iJoypad)
     m_oJoypads[_iJoypad - 1] = poDialog->stGetConfig();
     if (_iJoypad == m_poInputConfig->oGetKey<int>("active_joypad"))
     {
-      if (m_poKeymap != NULL)
-      {
-        delete m_poKeymap;
-      }
-      m_poKeymap = m_oJoypads[_iJoypad - 1].poCreateKeymap();
+      m_oKeymap = m_oJoypads[_iJoypad - 1].oCreateKeymap();
     }
   }
 
@@ -889,11 +885,7 @@ void Window::vOnJoypadToggled(Gtk::CheckMenuItem * _poCMI, int _iJoypad)
     return;
   }
 
-  if (m_poKeymap != NULL)
-  {
-    delete m_poKeymap;
-  }
-  m_poKeymap = m_oJoypads[_iJoypad - 1].poCreateKeymap();
+  m_oKeymap = m_oJoypads[_iJoypad - 1].oCreateKeymap();
 
   m_poInputConfig->vSetKey("active_joypad", _iJoypad);
 }
@@ -1181,7 +1173,7 @@ bool Window::on_key_press_event(GdkEventKey * _pstEvent)
   }
 
   if ((_pstEvent->state & Gtk::AccelGroup::get_default_mod_mask())
-      || (eKey = m_poKeymap->eGetKey(_pstEvent->hardware_keycode)) == KeyNone)
+      || (eKey = m_oKeymap[_pstEvent->hardware_keycode]) == KeyNone)
   {
     return Gtk::Window::on_key_press_event(_pstEvent);
   }
@@ -1239,7 +1231,7 @@ bool Window::on_key_release_event(GdkEventKey * _pstEvent)
   EKey eKey;
 
   if ((_pstEvent->state & Gtk::AccelGroup::get_default_mod_mask())
-      || (eKey = m_poKeymap->eGetKey(_pstEvent->hardware_keycode)) == KeyNone)
+      || (eKey = m_oKeymap[_pstEvent->hardware_keycode]) == KeyNone)
   {
     return Gtk::Window::on_key_release_event(_pstEvent);
   }

@@ -101,7 +101,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_eCartridge       = CartridgeNone;
   m_uiJoypadState    = 0;
   m_uiAutofireState  = 0;
-  m_poKeymap         = NULL;
 
   vInitSDL();
   vInitSystem();
@@ -797,11 +796,6 @@ Window::~Window()
   if (m_poFileOpenDialog != NULL)
   {
     delete m_poFileOpenDialog;
-  }
-
-  if (m_poKeymap != NULL)
-  {
-    delete m_poKeymap;
   }
 
   m_poInstance = NULL;

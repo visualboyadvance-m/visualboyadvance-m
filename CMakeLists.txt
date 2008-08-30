@@ -194,7 +194,6 @@ SET(SRC_HQ_ASM
 
 SET(SRC_GTK
     src/gtk/configfile.cpp
-    src/gtk/input.cpp
     src/gtk/main.cpp
     src/gtk/system.cpp
     src/gtk/windowcallbacks.cpp

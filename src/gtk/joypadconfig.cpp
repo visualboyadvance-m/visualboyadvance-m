@@ -117,24 +117,24 @@ void JoypadConfig::vSetDefault()
   }
 }
 
-Keymap * JoypadConfig::poCreateKeymap() const
+Keymap JoypadConfig::oCreateKeymap() const
 {
-  Keymap * poKeymap = new Keymap();
+  Keymap oKeymap;
 
-  poKeymap->vRegister(m_uiUp,      KeyUp      );
-  poKeymap->vRegister(m_uiDown,    KeyDown    );
-  poKeymap->vRegister(m_uiLeft,    KeyLeft    );
-  poKeymap->vRegister(m_uiRight,   KeyRight   );
-  poKeymap->vRegister(m_uiA,       KeyA       );
-  poKeymap->vRegister(m_uiB,       KeyB       );
-  poKeymap->vRegister(m_uiL,       KeyL       );
-  poKeymap->vRegister(m_uiR,       KeyR       );
-  poKeymap->vRegister(m_uiSelect,  KeySelect  );
-  poKeymap->vRegister(m_uiStart,   KeyStart   );
-  poKeymap->vRegister(m_uiSpeed,   KeySpeed   );
-  poKeymap->vRegister(m_uiCapture, KeyCapture );
+  oKeymap[m_uiUp]      = KeyUp;
+  oKeymap[m_uiDown]    = KeyDown;
+  oKeymap[m_uiLeft]    = KeyLeft;
+  oKeymap[m_uiRight]   = KeyRight;
+  oKeymap[m_uiA]       = KeyA;
+  oKeymap[m_uiB]       = KeyB;
+  oKeymap[m_uiL]       = KeyL;
+  oKeymap[m_uiR]       = KeyR;
+  oKeymap[m_uiSelect]  = KeySelect;
+  oKeymap[m_uiStart]   = KeyStart;
+  oKeymap[m_uiSpeed]   = KeySpeed;
+  oKeymap[m_uiCapture] = KeyCapture;
 
-  return poKeymap;
+  return oKeymap;
 }
 
 JoypadConfigDialog::JoypadConfigDialog(GtkDialog * _pstDialog,
