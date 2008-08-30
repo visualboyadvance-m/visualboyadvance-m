@@ -1,5 +1,5 @@
-#ifndef VBAM_INPUTSDL_FILTERS_H
-#define VBAM_INPUTSDL_FILTERS_H
+#ifndef VBAM_SDL_INPUT_H
+#define VBAM_SDL_INPUT_H
 
 #include "../System.h"
 
@@ -23,4 +23,4 @@ void sdlUpdateJoyHat(int which, int hat, int value);
 void sdlUpdateJoyAxis(int which, int axis, int value);
 void sdlCheckKeys();
 
-#endif // VBAM_INPUTSDL_FILTERS_H
+#endif // VBAM_SDL_INPUT_H
