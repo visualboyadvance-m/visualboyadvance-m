@@ -19,7 +19,6 @@
 #include "configfile.h"
 
 #include <string.h>
-#include <glib.h>
 
 #include <glibmm/fileutils.h>
 #include <glibmm/iochannel.h>
