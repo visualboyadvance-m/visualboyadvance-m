@@ -1,8 +1,29 @@
+// VBA-M, A Nintendo Handheld Console Emulator
+// Copyright (C) 2008 VBA-M development team
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2, or(at your option)
+// any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software Foundation,
+// Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
 #include "inputSDL.h"
 
-#include <SDL.h>
-
 #define SDLBUTTONS_NUM 14
+
+static void sdlUpdateKey(int key, bool down);
+static void sdlUpdateJoyButton(int which, int button, bool pressed);
+static void sdlUpdateJoyHat(int which, int hat, int value);
+static void sdlUpdateJoyAxis(int which, int axis, int value);
+static bool sdlCheckJoyKey(int key);
 
 bool sdlButtons[4][SDLBUTTONS_NUM] = {
   { false, false, false, false, false, false,
@@ -33,21 +54,21 @@ int sdlDefaultJoypad = 0;
 int autoFire = 0;
 bool autoFireToggle = false;
 
-u16 joypad[4][SDLBUTTONS_NUM] = {
+uint16_t joypad[4][SDLBUTTONS_NUM] = {
   { SDLK_LEFT,  SDLK_RIGHT,
     SDLK_UP,    SDLK_DOWN,
     SDLK_z,     SDLK_x,
     SDLK_RETURN,SDLK_BACKSPACE,
     SDLK_a,     SDLK_s,
     SDLK_SPACE, SDLK_F12,
-    SDLK_q,	SDLK_w,
+    SDLK_q,     SDLK_w,
   },
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 };
 
-u16 defaultJoypad[SDLBUTTONS_NUM] = {
+uint16_t defaultJoypad[SDLBUTTONS_NUM] = {
   SDLK_LEFT,  SDLK_RIGHT,
   SDLK_UP,    SDLK_DOWN,
   SDLK_z,     SDLK_x,
@@ -57,62 +78,62 @@ u16 defaultJoypad[SDLBUTTONS_NUM] = {
   SDLK_q,     SDLK_w
 };
 
-u16 motion[4] = {
+uint16_t motion[4] = {
   SDLK_KP4, SDLK_KP6, SDLK_KP8, SDLK_KP2
 };
 
-u16 defaultMotion[4] = {
+uint16_t defaultMotion[4] = {
   SDLK_KP4, SDLK_KP6, SDLK_KP8, SDLK_KP2
 };
 
 int sensorX = 2047;
 int sensorY = 2047;
 
-void inputSetKeymap(int joy, EKey key, u16 code)
+void inputSetKeymap(int joy, EKey key, uint16_t code)
 {
-	joypad[joy][key] = code;
+    joypad[joy][key] = code;
 }
 
-void inputSetMotionKeymap(EKey key, u16 code)
+void inputSetMotionKeymap(EKey key, uint16_t code)
 {
-	motion[key] = code;
+    motion[key] = code;
 }
 
 bool inputToggleAutoFire(EKey key)
 {
-	int mask = 0;
-	
-	switch (key)
-	{
-		case KEY_BUTTON_A:
-			mask = 1 << 0;
-		break;
-		case KEY_BUTTON_B:
-			mask = 1 << 1;
-		break;
-		case KEY_BUTTON_R:
-			mask = 1 << 8;
-		break;
-		case KEY_BUTTON_L:
-			mask = 1 << 9;
-		break;
-		default:
-		break;
-	}
+    int mask = 0;
+    
+    switch (key)
+    {
+        case KEY_BUTTON_A:
+            mask = 1 << 0;
+            break;
+        case KEY_BUTTON_B:
+            mask = 1 << 1;
+            break;
+        case KEY_BUTTON_R:
+            mask = 1 << 8;
+            break;
+        case KEY_BUTTON_L:
+            mask = 1 << 9;
+            break;
+        default:
+            break;
+    }
 
-	if(autoFire & mask)
-	{
-		autoFire &= ~mask;
-		return false;
-	}
-	else
-	{
-		autoFire |= mask;
-		return true;
-	}
+    if(autoFire & mask)
+    {
+        autoFire &= ~mask;
+        return false;
+    }
+    else
+    {
+        autoFire |= mask;
+        return true;
+    }
 }
 
-void sdlUpdateKey(int key, bool down)
+static void sdlUpdateKey(int key, bool down)
 {
   int i;
   for(int j = 0; j < 4; j++) {
@@ -131,9 +152,9 @@ void sdlUpdateKey(int key, bool down)
   }
 }
 
-void sdlUpdateJoyButton(int which,
-                        int button,
-                        bool pressed)
+static void sdlUpdateJoyButton(int which,
+                               int button,
+                               bool pressed)
 {
   int i;
   for(int j = 0; j < 4; j++) {
@@ -162,9 +183,9 @@ void sdlUpdateJoyButton(int which,
   }
 }
 
-void sdlUpdateJoyHat(int which,
-                     int hat,
-                     int value)
+static void sdlUpdateJoyHat(int which,
+                            int hat,
+                            int value)
 {
   int i;
   for(int j = 0; j < 4; j++) {
@@ -225,9 +246,9 @@ void sdlUpdateJoyHat(int which,
   }
 }
 
-void sdlUpdateJoyAxis(int which,
-                      int axis,
-                      int value)
+static void sdlUpdateJoyAxis(int which,
+                             int axis,
+                             int value)
 {
   int i;
   for(int j = 0; j < 4; j++) {
@@ -256,7 +277,7 @@ void sdlUpdateJoyAxis(int which,
   }
 }
 
-bool sdlCheckJoyKey(int key)
+static bool sdlCheckJoyKey(int key)
 {
   int dev = (key >> 12) - 1;
   int what = key & 0xfff;
@@ -284,7 +305,7 @@ bool sdlCheckJoyKey(int key)
   return true;
 }
 
-void sdlCheckKeys()
+void inputInitJoysticks()
 {
   sdlNumDevices = SDL_NumJoysticks();
 
@@ -349,19 +370,43 @@ void sdlCheckKeys()
     SDL_JoystickEventState(SDL_ENABLE);
 }
 
-bool systemReadJoypads()
+void inputProcessSDLEvent(const SDL_Event &event)
 {
-  return true;
+    switch(event.type)
+    {
+        case SDL_KEYDOWN:
+            sdlUpdateKey(event.key.keysym.sym, true);
+            break;
+        case SDL_KEYUP:
+            sdlUpdateKey(event.key.keysym.sym, false);
+            break;
+        case SDL_JOYHATMOTION:
+            sdlUpdateJoyHat(event.jhat.which,
+                            event.jhat.hat,
+                            event.jhat.value);
+            break;
+        case SDL_JOYBUTTONDOWN:
+        case SDL_JOYBUTTONUP:
+            sdlUpdateJoyButton(event.jbutton.which,
+                               event.jbutton.button,
+                               event.jbutton.state == SDL_PRESSED);
+            break;
+        case SDL_JOYAXISMOTION:
+            sdlUpdateJoyAxis(event.jaxis.which,
+                             event.jaxis.axis,
+                             event.jaxis.value);
+            break;
+    }
 }
 
-u32 systemReadJoypad(int which)
+uint32_t inputReadJoypad(int which)
 {
-  int realAutoFire	= autoFire;
+  int realAutoFire  = autoFire;
 
   if(which < 0 || which > 3)
     which = sdlDefaultJoypad;
 
-  u32 res = 0;
+  uint32_t res = 0;
 
   if(sdlButtons[which][KEY_BUTTON_A])
     res |= 1;
@@ -409,7 +454,7 @@ u32 systemReadJoypad(int which)
   return res;
 }
 
-void systemUpdateMotionSensor()
+void inputUpdateMotionSensor()
 {
   if(sdlMotionButtons[KEY_LEFT]) {
     sensorX += 3;
@@ -456,12 +501,12 @@ void systemUpdateMotionSensor()
   }
 }
 
-int systemGetSensorX()
+int inputGetSensorX()
 {
   return sensorX;
 }
 
-int systemGetSensorY()
+int inputGetSensorY()
 {
   return sensorY;
 }
