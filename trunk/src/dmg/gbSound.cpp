@@ -38,6 +38,7 @@ static Gb_Apu*                gb_apu;
 
 static float soundVolume_  = -1;
 static int prevSoundEnable = -1;
+static bool declicking     = false;
 
 int const chan_count = 4;
 int const ticks_to_time = 2 * GB_APU_OVERCLOCK;
@@ -142,10 +143,11 @@ static void reset_apu()
 	Gb_Apu::mode_t mode = Gb_Apu::mode_dmg;
 	if ( gbHardware & 2 )
 		mode = Gb_Apu::mode_cgb;
-	if ( gbHardware & 8 )
+	if ( gbHardware & 8 || declicking )
 		mode = Gb_Apu::mode_agb;
 	gb_apu->reset( mode );
-
+	gb_apu->reduce_clicks( declicking );
+	
 	if ( stereo_buffer )
 		stereo_buffer->clear();
 
@@ -177,6 +179,28 @@ static void remake_stereo_buffer()
 
 	apply_effects();
 	apply_volume();
+}
+
+void gbSoundSetDeclicking( bool enable )
+{
+	if ( declicking != enable )
+	{
+		declicking = enable;
+		if ( gb_apu )
+		{
+			// Can't change sound hardware mode without resetting APU, so save/load
+			// state around mode change
+			gb_apu_state_t state;
+			gb_apu->save_state( &state );
+			reset_apu();
+			if ( gb_apu->load_state( state ) ) { } // ignore error
+		}
+	}
+}
+
+bool gbSoundGetDeclicking()
+{
+	return declicking;
 }
 
 void gbSoundReset()
