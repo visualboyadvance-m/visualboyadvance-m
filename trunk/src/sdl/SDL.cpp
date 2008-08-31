@@ -1353,23 +1353,11 @@ void sdlPollEvents()
       }
       break;
     case SDL_JOYHATMOTION:
-      sdlUpdateJoyHat(event.jhat.which,
-                      event.jhat.hat,
-                      event.jhat.value);
-      break;
     case SDL_JOYBUTTONDOWN:
     case SDL_JOYBUTTONUP:
-      sdlUpdateJoyButton(event.jbutton.which,
-                         event.jbutton.button,
-                         event.jbutton.state == SDL_PRESSED);
-      break;
     case SDL_JOYAXISMOTION:
-      sdlUpdateJoyAxis(event.jaxis.which,
-                       event.jaxis.axis,
-                       event.jaxis.value);
-      break;
     case SDL_KEYDOWN:
-      sdlUpdateKey(event.key.keysym.sym, true);
+      inputProcessSDLEvent(event);
       break;
     case SDL_KEYUP:
       switch(event.key.keysym.sym) {
@@ -1575,7 +1563,7 @@ void sdlPollEvents()
       default:
         break;
       }
-      sdlUpdateKey(event.key.keysym.sym, false);
+      inputProcessSDLEvent(event);
       break;
     }
   }
@@ -2172,7 +2160,7 @@ int main(int argc, char **argv)
 #if WITH_LIRC
   StartLirc();
 #endif
-  sdlCheckKeys();
+  inputInitJoysticks();
 
   if(cartridgeType == 0) {
     srcWidth = 240;
@@ -2610,4 +2598,29 @@ void systemGbBorderOn()
   sdlInitVideo();
 
   filterFunction = initFilter(filter, systemColorDepth, srcWidth);
+}
+
+bool systemReadJoypads()
+{
+  return true;
+}
+
+u32 systemReadJoypad(int which)
+{
+  return inputReadJoypad(which);
+}
+
+void systemUpdateMotionSensor()
+{
+  inputUpdateMotionSensor();
+}
+
+int systemGetSensorX()
+{
+  return inputGetSensorX();
+}
+
+int systemGetSensorY()
+{
+  return inputGetSensorY();
 }
