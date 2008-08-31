@@ -1167,30 +1167,30 @@ BEGIN
     RTEXT           "Device:",IDC_STATIC,6,6,48,12
 END
 
-IDD_AUDIO_CORE_SETTINGS DIALOGEX 0, 0, 256, 144
+IDD_AUDIO_CORE_SETTINGS DIALOGEX 0, 0, 168, 211
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Audio Core Settings"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,150,126,48,14
-    PUSHBUTTON      "Cancel",IDCANCEL,204,126,48,14
-    GROUPBOX        "Game Boy only",IDC_STATIC,6,6,126,114
-    CONTROL         "Enhance sound",IDC_ENHANCE_SOUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,18,65,10
-    CONTROL         "Surround",IDC_SURROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,24,30,45,10
-    GROUPBOX        "Echo",IDC_STATIC,24,42,102,36
-    CONTROL         "",IDC_ECHO,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP,30,54,90,12
-    LTEXT           "None",IDC_STATIC,30,66,36,8,SS_CENTERIMAGE
-    RTEXT           "Lots",IDC_STATIC,84,66,36,8,SS_CENTERIMAGE
-    GROUPBOX        "Stereo",IDC_STATIC,24,78,102,36
-    CONTROL         "",IDC_STEREO,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP,30,90,90,12
-    LTEXT           "Center",IDC_STATIC,30,102,36,8,SS_CENTERIMAGE
-    RTEXT           "Left/Right",IDC_STATIC,84,102,36,8,SS_CENTERIMAGE
-    GROUPBOX        "Game Boy Advance only",IDC_STATIC,138,6,114,114
-    GROUPBOX        "Volume",IDC_STATIC,144,18,102,42
-    CONTROL         "",IDC_VOLUME,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP,150,30,90,12
-    LTEXT           "Mute",IDC_STATIC,150,42,18,12,SS_CENTERIMAGE
-    RTEXT           "Max",IDC_STATIC,222,42,18,12,SS_CENTERIMAGE
-    PUSHBUTTON      "Default",IDC_DEFAULT_VOLUME,174,42,42,12,BS_NOTIFY
+    DEFPUSHBUTTON   "OK",IDOK,60,192,48,14
+    PUSHBUTTON      "Cancel",IDCANCEL,114,192,48,14
+    GROUPBOX        "Game Boy only",IDC_STATIC,6,54,156,132
+    CONTROL         "Enhance sound",IDC_ENHANCE_SOUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,66,65,10
+    CONTROL         "Surround",IDC_SURROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,24,78,45,10
+    GROUPBOX        "Echo",IDC_STATIC,24,102,132,36
+    CONTROL         "",IDC_ECHO,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP,30,114,120,12
+    LTEXT           "None",IDC_STATIC,30,126,36,8,SS_CENTERIMAGE
+    RTEXT           "Lots",IDC_STATIC,114,126,36,8,SS_CENTERIMAGE
+    GROUPBOX        "Stereo",IDC_STATIC,24,144,132,36
+    CONTROL         "",IDC_STEREO,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP,30,156,120,12
+    LTEXT           "Center",IDC_STATIC,30,168,36,8,SS_CENTERIMAGE
+    RTEXT           "Left/Right",IDC_STATIC,114,168,36,8,SS_CENTERIMAGE
+    GROUPBOX        "Volume",IDC_STATIC,6,6,156,42
+    CONTROL         "",IDC_VOLUME,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP,12,18,144,12
+    LTEXT           "Mute",IDC_STATIC,12,30,48,12,SS_CENTERIMAGE
+    RTEXT           "Maximum",IDC_STATIC,108,30,48,12,SS_CENTERIMAGE
+    PUSHBUTTON      "Default",IDC_DEFAULT_VOLUME,66,30,36,12,BS_NOTIFY
+    CONTROL         "Declicking",IDC_DECLICKING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,24,90,47,10
 END
 
 
@@ -1546,9 +1546,9 @@ BEGIN
     IDD_AUDIO_CORE_SETTINGS, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 249
+        RIGHTMARGIN, 161
         TOPMARGIN, 7
-        BOTTOMMARGIN, 137
+        BOTTOMMARGIN, 204
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -1835,15 +1835,14 @@ BEGIN
         BEGIN
             POPUP "&Throttle"
             BEGIN
+                MENUITEM "No throttle",                 ID_OPTIONS_FRAMESKIP_THROTTLE_NOTHROTTLE
                 MENUITEM "25%",                         ID_OPTIONS_FRAMESKIP_THROTTLE_25
                 MENUITEM "50%",                         ID_OPTIONS_FRAMESKIP_THROTTLE_50
                 MENUITEM "100%",                        ID_OPTIONS_FRAMESKIP_THROTTLE_100
                 MENUITEM "150%",                        ID_OPTIONS_FRAMESKIP_THROTTLE_150
                 MENUITEM "200%",                        ID_OPTIONS_FRAMESKIP_THROTTLE_200
                 MENUITEM "&Other...",                   ID_OPTIONS_FRAMESKIP_THROTTLE_OTHER
-                MENUITEM "No throttle",                 ID_OPTIONS_FRAMESKIP_THROTTLE_NOTHROTTLE
             END
-            MENUITEM SEPARATOR
             POPUP "&Frame Skip"
             BEGIN
                 MENUITEM "&No frame skip",              ID_OPTIONS_VIDEO_FRAMESKIP_0
@@ -1857,6 +1856,7 @@ BEGIN
                 MENUITEM "&8 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_8
                 MENUITEM "&9 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_9
             END
+            MENUITEM SEPARATOR
             MENUITEM "Turbo mode",                  ID_OPTIONS_EMULATOR_SPEEDUPTOGGLE
         END
         MENUITEM SEPARATOR
@@ -2220,6 +2220,7 @@ BEGIN
     IDS_TOOLTIP_DEFAULT_VOLUME "Reset to default volume (100%)."
     IDS_TOOLTIP_ENHANCE_SOUND "Enable the following sound enhancements."
     IDS_TOOLTIP_SURROUND    "Inverts the phase of some channels, making it sound as if sound is coming from behind."
+    IDS_TOOLTIP_DECLICKING  "When enabled, clicks are reduced by using GBA sound hardware. Note that clicks are normal for GB and GBC sound hardware."
 END
 
 STRINGTABLE 

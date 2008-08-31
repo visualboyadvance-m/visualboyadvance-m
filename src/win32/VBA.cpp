@@ -1595,6 +1595,8 @@ void VBA::loadSettings()
 	gb_effects_config.echo = (float)regQueryDwordValue( "gbSoundEffectsEcho", 20 ) / 100.0f;
 	gb_effects_config.stereo = (float)regQueryDwordValue( "gbSoundEffectsStereo", 15 ) / 100.0f;
 
+	gbSoundSetDeclicking( 1 == regQueryDwordValue( "gbSoundDeclicking", 1 ) );
+
   tripleBuffering = regQueryDwordValue("tripleBuffering", false) ? true : false;
 
 #ifndef NO_D3D
@@ -2589,6 +2591,8 @@ void VBA::saveSettings()
 	regSetDwordValue( "gbSoundEffectsSurround", gb_effects_config.surround ? 1 : 0 );
 	regSetDwordValue( "gbSoundEffectsEcho", (DWORD)( gb_effects_config.echo * 100.0f ) );
 	regSetDwordValue( "gbSoundEffectsStereo", (DWORD)( gb_effects_config.stereo * 100.0f ) );
+
+	regSetDwordValue( "gbSoundDeclicking", gbSoundGetDeclicking() ? 1 : 0 );
 
   regSetDwordValue("tripleBuffering", tripleBuffering);
 

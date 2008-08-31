@@ -49,6 +49,7 @@
 #define IDS_UNSUPPORTED_GAMESHARK_CODE  43
 #define IDS_TOOLTIP_ENHANCE_SOUND       43
 #define IDS_TOOLTIP_SURROUND            44
+#define IDS_TOOLTIP_DECLICKING          45
 #define IDI_MAINICON                    101
 #define IDD_REGISTERS                   102
 #define IDD_DEBUG                       103
@@ -550,6 +551,7 @@
 #define IDC_SLIDER2                     1291
 #define IDC_VOLUME                      1291
 #define IDC_DEFAULT_VOLUME              1292
+#define IDC_DECLICKING                  1293
 #define IDS_OAL_NODEVICE                2000
 #define IDS_OAL_NODLL                   2001
 #define IDS_AVI_CANNOT_CREATE_AVI       2002
