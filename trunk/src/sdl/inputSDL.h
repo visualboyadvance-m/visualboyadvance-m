@@ -66,10 +66,17 @@ void inputSetMotionKeymap(EKey key, uint16_t code);
 bool inputToggleAutoFire(EKey key);
 
 /**
- * Update the emulated pads state with an SDL event
+ * Update the emulated pads state with a SDL event
  * @param SDL_Event An event that has just occured
  */
 void inputProcessSDLEvent(const SDL_Event &event);
+
+/**
+ * Get the keymap code corresponding to a SDL event
+ * @param SDL_Event An event that has just occured
+ * @return Keymap code
+ */
+uint16_t inputGetEventCode(const SDL_Event &event);
 
 /**
  * Read the state of an emulated joypad

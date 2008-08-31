@@ -89,6 +89,64 @@ uint16_t defaultMotion[4] = {
 int sensorX = 2047;
 int sensorY = 2047;
 
+static uint16_t sdlGetHatCode(const SDL_Event &event)
+{
+    return (
+                ((event.jhat.which + 1) << 12) |
+                (event.jhat.hat << 2) |
+                (
+                    event.jhat.value & SDL_HAT_UP ? 0 :
+                    event.jhat.value & SDL_HAT_DOWN ? 1 :
+                    event.jhat.value & SDL_HAT_RIGHT ? 2 :
+                    event.jhat.value & SDL_HAT_LEFT ? 3 : 0
+                )
+           );
+}
+
+static uint16_t sdlGetButtonCode(const SDL_Event &event)
+{
+    return (
+                ((event.jbutton.which + 1) << 12) |
+                (event.jbutton.button + 0x80)
+           );
+}
+
+static uint16_t sdlGetAxisCode(const SDL_Event &event)
+{
+    return (
+                ((event.jaxis.which + 1) << 12) |
+                (event.jaxis.axis << 1) |
+                (
+                    event.jaxis.value > 16384 ? 1 :
+                    event.jaxis.value < -16384 ? 0 : 0
+                )
+           );
+}
+
+uint16_t inputGetEventCode(const SDL_Event &event)
+{
+    switch(event.type)
+    {
+        case SDL_KEYDOWN:
+        case SDL_KEYUP:
+            return event.key.keysym.sym;
+            break;
+        case SDL_JOYHATMOTION:
+            return sdlGetHatCode(event);
+            break;
+        case SDL_JOYBUTTONDOWN:
+        case SDL_JOYBUTTONUP:
+            return sdlGetButtonCode(event);
+            break;
+        case SDL_JOYAXISMOTION:
+            return sdlGetAxisCode(event);
+            break;
+        default:
+            return 0;
+            break;
+    }
+}
+
 void inputSetKeymap(int joy, EKey key, uint16_t code)
 {
     joypad[joy][key] = code;
