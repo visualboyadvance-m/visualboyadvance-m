@@ -59,11 +59,11 @@ int const SOUND_CLOCK_TICKS_ = 167772; // 1/100 second
 
 u16   soundFinalWave [1470];
 int   soundBufferLen     = sizeof soundFinalWave;
-int   soundQuality       = 2;
-int   soundInterpolation = 0;
+int   soundQuality       = 1;
+bool  soundInterpolation = true;
 bool  soundPaused        = true;
-float soundFiltering     = 1;
-float soundVolume        = 1;
+float soundFiltering     = 0.5f;
+float soundVolume        = 1.0f;
 bool  soundEcho          = false;
 int   SOUND_CLOCK_TICKS  = SOUND_CLOCK_TICKS_;
 int   soundTicks         = SOUND_CLOCK_TICKS_;

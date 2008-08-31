@@ -810,6 +810,8 @@ void MainWnd::OnAudioCoreSettings()
 	dlg.m_stereo = gb_effects_config.stereo;
 	dlg.m_volume = soundGetVolume();
 	dlg.m_declicking = gbSoundGetDeclicking();
+	dlg.m_sound_interpolation = soundInterpolation;
+	dlg.m_sound_filtering = soundFiltering;
 
 	if( IDOK == dlg.DoModal() ) {
 		gb_effects_config_t _new;
@@ -824,6 +826,10 @@ void MainWnd::OnAudioCoreSettings()
 		soundSetVolume( dlg.m_volume );
 
 		gbSoundSetDeclicking( dlg.m_declicking );
+
+		soundInterpolation = dlg.m_sound_interpolation;
+
+		soundFiltering = dlg.m_sound_filtering;
 	}
 }
 
@@ -960,41 +966,6 @@ void MainWnd::OnOptionsSoundDirectsoundb()
 void MainWnd::OnUpdateOptionsSoundDirectsoundb(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(soundGetEnable() & 512);
-  pCmdUI->Enable(theApp.cartridgeType == 0);
-}
-
-BOOL MainWnd::OnOptionsSoundPcminterpolation(UINT nID)
-{
-  switch (nID)
-  {
-  case ID_OPTIONS_SOUND_PCMINTERPOLATION_NONE:
-    soundInterpolation = 0;
-    break;
-  case ID_OPTIONS_SOUND_PCMINTERPOLATION_LINEAR:
-    soundInterpolation = 1;
-    break;
-
-  default:
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-void MainWnd::OnUpdateOptionsSoundPcminterpolation(CCmdUI *pCmdUI)
-{
-  switch (pCmdUI->m_nID)
-  {
-  case ID_OPTIONS_SOUND_PCMINTERPOLATION_NONE:
-    pCmdUI->SetCheck(soundInterpolation == 0);
-    break;
-  case ID_OPTIONS_SOUND_PCMINTERPOLATION_LINEAR:
-    pCmdUI->SetCheck(soundInterpolation == 1);
-    break;
-
-  default:
-    return;
-  }
   pCmdUI->Enable(theApp.cartridgeType == 0);
 }
 

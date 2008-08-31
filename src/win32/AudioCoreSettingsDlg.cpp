@@ -13,9 +13,11 @@ AudioCoreSettingsDlg::AudioCoreSettingsDlg(CWnd* pParent /*=NULL*/)
 	, m_enabled( false )
 	, m_surround( false )
 	, m_declicking( false )
+	, m_sound_interpolation( false )
 	, m_echo( 0.0f )
 	, m_stereo( 0.0f )
 	, m_volume( 0.0f )
+	, m_sound_filtering( 0.0f )
 	, toolTip( NULL )
 {
 }
@@ -35,14 +37,18 @@ void AudioCoreSettingsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STEREO, stereo);
 	DDX_Control(pDX, IDC_VOLUME, volume);
 	DDX_Control(pDX, IDC_DECLICKING, declicking);
+	DDX_Control(pDX, IDC_SOUND_INTERPOLATION, sound_interpolation);
+	DDX_Control(pDX, IDC_SOUND_FILTERING, sound_filtering);
 
 	if( pDX->m_bSaveAndValidate == TRUE ) {
 		m_enabled = BST_CHECKED == enhance_sound.GetCheck();
 		m_surround = BST_CHECKED == surround.GetCheck();
 		m_declicking = BST_CHECKED == declicking.GetCheck();
+		m_sound_interpolation = BST_CHECKED == sound_interpolation.GetCheck();
 		m_echo = (float)echo.GetPos() / 100.0f;
 		m_stereo = (float)stereo.GetPos() / 100.0f;
 		m_volume = (float)volume.GetPos() / 100.0f;
+		m_sound_filtering = (float)sound_filtering.GetPos() / 100.0f;
 	}
 }
 
@@ -73,6 +79,9 @@ BOOL AudioCoreSettingsDlg::OnTtnNeedText(UINT id, NMHDR *pNMHDR, LRESULT *pResul
 			break;
 		case IDC_STEREO:
 			_stprintf_s( t3->szText, _countof( t3->szText ), _T( "%i%%" ), stereo.GetPos() );
+			break;
+		case IDC_SOUND_FILTERING:
+			_stprintf_s( t3->szText, _countof( t3->szText ), _T( "%i%%" ), sound_filtering.GetPos() );
 			break;
 		case IDC_DEFAULT_VOLUME:
 			res.LoadString( IDS_TOOLTIP_DEFAULT_VOLUME );
@@ -130,11 +139,16 @@ BOOL AudioCoreSettingsDlg::OnInitDialog()
 
 	declicking.SetCheck( m_declicking ? BST_CHECKED : BST_UNCHECKED );
 
+	sound_interpolation.SetCheck( m_sound_interpolation ? BST_CHECKED : BST_UNCHECKED );
+
 	echo.SetRange( 0, 100 );
 	echo.SetPos( (int)( m_echo * 100.0f ) );
 
 	stereo.SetRange( 0, 100 );
 	stereo.SetPos( (int)( m_stereo * 100.0f ) );
+
+	sound_filtering.SetRange( 0, 100 );
+	sound_filtering.SetPos( (int)( m_sound_filtering * 100.0f ) );
 
 	volume.SetRange( (int)( MIN_VOLUME * 100.0f ), (int)( MAX_VOLUME * 100.0f ) );
 	volume.SetPos( (int)( m_volume * 100.0f ) );

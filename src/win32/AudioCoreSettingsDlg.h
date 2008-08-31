@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "afxwin.h"
+#include "afxcmn.h"
 
 
 // AudioCoreSettingsDlg dialog
@@ -14,9 +15,11 @@ public:
 	bool m_enabled;
 	bool m_surround;
 	bool m_declicking;
+	bool m_sound_interpolation;
 	float m_echo;
 	float m_stereo;
 	float m_volume;
+	float m_sound_filtering;
 
 	AudioCoreSettingsDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~AudioCoreSettingsDlg();
@@ -38,8 +41,10 @@ private:
 	CButton enhance_sound;
 	CButton surround;
 	CButton declicking;
+	CButton sound_interpolation;
 	CSliderCtrl echo;
 	CSliderCtrl stereo;
 	CSliderCtrl volume;
+	CSliderCtrl sound_filtering;
 	CToolTipCtrl *toolTip;
 };
