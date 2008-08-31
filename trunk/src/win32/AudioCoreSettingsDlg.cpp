@@ -12,8 +12,10 @@ AudioCoreSettingsDlg::AudioCoreSettingsDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(AudioCoreSettingsDlg::IDD, pParent)
 	, m_enabled( false )
 	, m_surround( false )
+	, m_declicking( false )
 	, m_echo( 0.0f )
 	, m_stereo( 0.0f )
+	, m_volume( 0.0f )
 	, toolTip( NULL )
 {
 }
@@ -32,10 +34,12 @@ void AudioCoreSettingsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_ECHO, echo);
 	DDX_Control(pDX, IDC_STEREO, stereo);
 	DDX_Control(pDX, IDC_VOLUME, volume);
+	DDX_Control(pDX, IDC_DECLICKING, declicking);
 
 	if( pDX->m_bSaveAndValidate == TRUE ) {
 		m_enabled = BST_CHECKED == enhance_sound.GetCheck();
 		m_surround = BST_CHECKED == surround.GetCheck();
+		m_declicking = BST_CHECKED == declicking.GetCheck();
 		m_echo = (float)echo.GetPos() / 100.0f;
 		m_stereo = (float)stereo.GetPos() / 100.0f;
 		m_volume = (float)volume.GetPos() / 100.0f;
@@ -85,6 +89,11 @@ BOOL AudioCoreSettingsDlg::OnTtnNeedText(UINT id, NMHDR *pNMHDR, LRESULT *pResul
 			_tcscpy_s( buf, _countof( buf ), res.GetString() );
 			t3->lpszText = buf;
 			break;
+		case IDC_DECLICKING:
+			res.LoadString( IDS_TOOLTIP_DECLICKING );
+			_tcscpy_s( buf, _countof( buf ), res.GetString() );
+			t3->lpszText = buf;
+			break;
 		default:
 			i_provided_tooltip_with_text = FALSE;
 			break;
@@ -112,11 +121,14 @@ BOOL AudioCoreSettingsDlg::OnInitDialog()
 	toolTip->AddTool( GetDlgItem( IDC_DEFAULT_VOLUME ) );
 	toolTip->AddTool( GetDlgItem( IDC_ENHANCE_SOUND ) );
 	toolTip->AddTool( GetDlgItem( IDC_SURROUND ) );
+	toolTip->AddTool( GetDlgItem( IDC_DECLICKING ) );
 	toolTip->Activate( TRUE );
 
 	enhance_sound.SetCheck( m_enabled ? BST_CHECKED : BST_UNCHECKED );
 
 	surround.SetCheck( m_surround ? BST_CHECKED : BST_UNCHECKED );
+
+	declicking.SetCheck( m_declicking ? BST_CHECKED : BST_UNCHECKED );
 
 	echo.SetRange( 0, 100 );
 	echo.SetPos( (int)( m_echo * 100.0f ) );

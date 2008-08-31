@@ -388,5 +388,5 @@ public:
 
 	DECLARE_MESSAGE_MAP()
     afx_msg void OnEnterSizeMove();
-	afx_msg void OnAudioEffects();
+	afx_msg void OnAudioCoreSettings();
 };

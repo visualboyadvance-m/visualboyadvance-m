@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stdafx.h"
+#include "afxwin.h"
 
 
 // AudioCoreSettingsDlg dialog
@@ -12,6 +13,7 @@ class AudioCoreSettingsDlg : public CDialog
 public:
 	bool m_enabled;
 	bool m_surround;
+	bool m_declicking;
 	float m_echo;
 	float m_stereo;
 	float m_volume;
@@ -35,6 +37,7 @@ protected:
 private:
 	CButton enhance_sound;
 	CButton surround;
+	CButton declicking;
 	CSliderCtrl echo;
 	CSliderCtrl stereo;
 	CSliderCtrl volume;
