@@ -1586,16 +1586,15 @@ void VBA::loadSettings()
 
   soundSetVolume( (float)(regQueryDwordValue("soundVolume", 100)) / 100.0f );
 
-  soundInterpolation = regQueryDwordValue("soundInterpolation", 0);
-  if(soundInterpolation < 0 || soundInterpolation > 1)
-    soundInterpolation = 0;
-
 	gb_effects_config.enabled = 1 == regQueryDwordValue( "gbSoundEffectsEnabled", 0 );
 	gb_effects_config.surround = 1 == regQueryDwordValue( "gbSoundEffectsSurround", 0 );
 	gb_effects_config.echo = (float)regQueryDwordValue( "gbSoundEffectsEcho", 20 ) / 100.0f;
 	gb_effects_config.stereo = (float)regQueryDwordValue( "gbSoundEffectsStereo", 15 ) / 100.0f;
 
 	gbSoundSetDeclicking( 1 == regQueryDwordValue( "gbSoundDeclicking", 1 ) );
+
+	soundInterpolation = 1 == regQueryDwordValue( "gbaSoundInterpolation", 1 );
+	soundFiltering = (float)regQueryDwordValue( "gbaSoundFiltering", 50 ) / 100.0f;
 
   tripleBuffering = regQueryDwordValue("tripleBuffering", false) ? true : false;
 
@@ -2585,14 +2584,15 @@ void VBA::saveSettings()
 
   regSetDwordValue("soundVolume", (DWORD)(soundGetVolume() * 100.0f));
 
-  regSetDwordValue("soundInterpolation", soundInterpolation);
-
 	regSetDwordValue( "gbSoundEffectsEnabled", gb_effects_config.enabled ? 1 : 0 );
 	regSetDwordValue( "gbSoundEffectsSurround", gb_effects_config.surround ? 1 : 0 );
 	regSetDwordValue( "gbSoundEffectsEcho", (DWORD)( gb_effects_config.echo * 100.0f ) );
 	regSetDwordValue( "gbSoundEffectsStereo", (DWORD)( gb_effects_config.stereo * 100.0f ) );
 
 	regSetDwordValue( "gbSoundDeclicking", gbSoundGetDeclicking() ? 1 : 0 );
+
+	regSetDwordValue( "gbaSoundInterpolation", soundInterpolation ? 1 : 0 );
+	regSetDwordValue( "gbaSoundFiltering", (DWORD)( soundFiltering * 100.0f ) );
 
   regSetDwordValue("tripleBuffering", tripleBuffering);
 
