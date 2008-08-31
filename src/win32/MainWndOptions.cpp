@@ -800,7 +800,7 @@ void MainWnd::OnUpdateOptionsEmulatorBmpformat(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(theApp.captureFormat == 1);
 }
 
-void MainWnd::OnAudioEffects()
+void MainWnd::OnAudioCoreSettings()
 {
 	AudioCoreSettingsDlg dlg;
 
@@ -809,6 +809,7 @@ void MainWnd::OnAudioEffects()
 	dlg.m_echo = gb_effects_config.echo;
 	dlg.m_stereo = gb_effects_config.stereo;
 	dlg.m_volume = soundGetVolume();
+	dlg.m_declicking = gbSoundGetDeclicking();
 
 	if( IDOK == dlg.DoModal() ) {
 		gb_effects_config_t _new;
@@ -821,6 +822,8 @@ void MainWnd::OnAudioEffects()
 		gbSoundConfigEffects( _new );
 
 		soundSetVolume( dlg.m_volume );
+
+		gbSoundSetDeclicking( dlg.m_declicking );
 	}
 }
 
