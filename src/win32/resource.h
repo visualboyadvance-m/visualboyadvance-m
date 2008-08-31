@@ -50,6 +50,7 @@
 #define IDS_TOOLTIP_ENHANCE_SOUND       43
 #define IDS_TOOLTIP_SURROUND            44
 #define IDS_TOOLTIP_DECLICKING          45
+#define IDS_TOOLTIP_SOUND_INTERPOLATION 46
 #define IDI_MAINICON                    101
 #define IDD_REGISTERS                   102
 #define IDD_DEBUG                       103
@@ -543,6 +544,7 @@
 #define IDC_CHECK_UPMIX                 1284
 #define IDC_ENHANCE_SOUND               1284
 #define IDC_COMBO_DEV                   1285
+#define IDC_SOUND_INTERPOLATION         1285
 #define IDC_SLIDER_BUFFER               1286
 #define IDC_INFO_BUFFER                 1287
 #define IDC_SURROUND                    1288
@@ -552,6 +554,7 @@
 #define IDC_VOLUME                      1291
 #define IDC_DEFAULT_VOLUME              1292
 #define IDC_DECLICKING                  1293
+#define IDC_SOUND_FILTERING             1294
 #define IDS_OAL_NODEVICE                2000
 #define IDS_OAL_NODLL                   2001
 #define IDS_AVI_CANNOT_CREATE_AVI       2002

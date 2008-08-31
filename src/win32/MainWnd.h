@@ -341,8 +341,6 @@ public:
 	afx_msg BOOL OnFileSaveSlot(UINT nID);
 	afx_msg void OnOptionsFilterLcdcolors();
 	afx_msg void OnUpdateOptionsFilterLcdcolors(CCmdUI *pCmdUI);
-	afx_msg BOOL OnOptionsSoundPcminterpolation(UINT nID);
-	afx_msg void OnUpdateOptionsSoundPcminterpolation(CCmdUI *pCmdUI);
 	afx_msg void OnOptionsSoundHardwareacceleration();
 	afx_msg void OnUpdateOptionsSoundHardwareacceleration(CCmdUI *pCmdUI);
 	afx_msg void OnOptionsVideoFullscreen1280x1024();

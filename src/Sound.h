@@ -45,8 +45,8 @@ void soundSetQuality( int quality );
 extern int soundQuality; // current sound quality
 
 // Sound settings
-extern int soundInterpolation;  // 1 if PCM should have low-pass filtering
-extern float soundFiltering;    // 0.0 = none, 1.0 = max (only if soundInterpolation is 1)
+extern bool soundInterpolation; // 1 if PCM should have low-pass filtering
+extern float soundFiltering;    // 0.0 = none, 1.0 = max
 
 
 //// GBA sound emulation
