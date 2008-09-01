@@ -23,12 +23,15 @@
 #include <stdio.h>
 #include <time.h>
 
+#include <SDL.h>
+
 #include "../agb/GBA.h"
 #include "../dmg/gb.h"
 #include "../dmg/gbGlobals.h"
 #include "../dmg/gbPrinter.h"
 #include "../Sound.h"
 #include "../Util.h"
+#include "../sdl/inputSDL.h"
 
 #include "tools.h"
 #include "intl.h"
@@ -933,7 +936,7 @@ void Window::vOnGDBWait()
   poDialog->set_transient_for(*this);
 
   int iPort = 55555;
-  poSpin->set_value(iPort);  
+  poSpin->set_value(iPort);
 
   bool bOk = false;
   if (poDialog->run() == Gtk::RESPONSE_OK)
@@ -1027,7 +1030,7 @@ void Window::vOnGDBLoadAndWait()
   poDialog->set_transient_for(*this);
 
   int iPort = 55555;
-  poSpin->set_value(iPort);  
+  poSpin->set_value(iPort);
 
   bool bOk = false;
   if (poDialog->run() == Gtk::RESPONSE_OK)
@@ -1078,7 +1081,7 @@ void Window::vOnGDBDisconnect()
 void Window::vOnHelpAbout()
 {
   Gtk::AboutDialog oAboutDialog;
-  
+
   oAboutDialog.set_transient_for(*this);
 
   oAboutDialog.set_name("VBA-M");
@@ -1099,13 +1102,13 @@ void Window::vOnHelpAbout()
   list_authors.push_back("jbo_85");
   list_authors.push_back("bgK");
   oAboutDialog.set_authors(list_authors);
-  
+
   std::list<Glib::ustring> list_artists;
   list_artists.push_back("Matteo Drera");
   list_artists.push_back("Jakub Steiner");
   list_artists.push_back("Jones Lee");
   oAboutDialog.set_artists(list_artists);
-  
+
   oAboutDialog.run();
 }
 
@@ -1121,7 +1124,7 @@ bool Window::bOnEmuIdle()
   {
     Glib::TimeVal uiTime;
     uiTime.assign_current_time();
-    
+
     if (uiTime - m_uiThrottleLastTime >= m_uiThrottleDelay)
     {
       m_uiThrottleDelay = Glib::TimeVal(0, 0);
@@ -1132,6 +1135,8 @@ bool Window::bOnEmuIdle()
       return true;
     }
   }
+
+  vSDLPollEvents();
 
   m_stEmulator.emuMain(m_stEmulator.emuCount);
   return true;
@@ -1171,6 +1176,12 @@ bool Window::on_key_press_event(GdkEventKey * _pstEvent)
     vToggleFullscreen();
     return true;
   }
+
+  // Forward the keyboard event to the input module by faking a SDL event
+  SDL_Event event;
+  event.type = SDL_KEYDOWN;
+  event.key.keysym.sym = (SDLKey)_pstEvent->keyval;
+  inputProcessSDLEvent(event);
 
   if ((_pstEvent->state & Gtk::AccelGroup::get_default_mod_mask())
       || (eKey = m_oKeymap[_pstEvent->hardware_keycode]) == KeyNone)
@@ -1228,6 +1239,12 @@ bool Window::on_key_press_event(GdkEventKey * _pstEvent)
 
 bool Window::on_key_release_event(GdkEventKey * _pstEvent)
 {
+  // Forward the keyboard event to the input module by faking a SDL event
+  SDL_Event event;
+  event.type = SDL_KEYDOWN;
+  event.key.keysym.sym = (SDLKey)_pstEvent->keyval;
+  inputProcessSDLEvent(event);
+
   EKey eKey;
 
   if ((_pstEvent->state & Gtk::AccelGroup::get_default_mod_mask())
@@ -1286,7 +1303,7 @@ bool Window::on_window_state_event(GdkEventWindowState* _pstEvent)
   {
     m_bFullscreen = _pstEvent->new_window_state & GDK_WINDOW_STATE_FULLSCREEN;
   }
-  
+
   return true;
 }
 
