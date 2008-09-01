@@ -4,38 +4,39 @@
 #
 # Key configuration (all numbers are in hexadecimal!)
 #
-# Keys values are in the format YXXX where Y is the device number. 0 means
-# keyborad and XXX is the SDL define for the desired key (read SDL_keysym.h).
+# Keys values are in the format YYYYXXXX where YYYY is the device number.
+# 0 means keyboard and XXXX is the SDL define for the desired key
+# (read SDL_keysym.h).
 #
-# If Y is greater than 0, it means joystick number Y-1 and it uses the
-# following format for XXX:
+# If YYYY is greater than 0, it means joystick number YYYY-1 and it uses the
+# following format for XXXX:
 #
-# - if XXX < 20, XXX is the axis number multiplied by 2. An even number means
+# - if XXXX < 20, XXXX is the axis number multiplied by 2. An even number means
 #   movement to the negative side (on the X axis, it means left). An odd
 #   number means movement to the positive side (on the X axis, it mean
 #   right). For the Y axis, negative means up and positive means down.
 #   X axis is usally axis number 0 and Y is axis number 1.
-# - if 20 >= XXX > 30, then XXX is the HAT number multiplied by 4 plus the
+# - if 20 >= XXXX > 30, then XXXX is the HAT number multiplied by 4 plus the
 #   direction: 0 for up, 1 for down, 2 for right and 3 for left. Example:
 #   0021 is HAT 0 down, 0026 is HAT 1 right.
-# - if 80 >= XXX > 100, XXX is the joystick button number (XXX-080).
+# - if 80 >= XXXX > 100, XXXX is the joystick button number (XXXX-0080).
 #
 # Default key configuration is (value in parenthesis):
 #
-# Left          Left Arrow  (0114)
-# Right         Right Arrow (0113)
-# Up            Up Arrow    (0111)
-# Down          Down Arrow  (0112)
-# A             Z           (007a)
-# B             X           (0078)
-# L             A           (0061)
-# R             S           (0073)
-# Start         ENTER       (000d)
-# Select        BACKSPACE   (0008)
-# Speed up      SPACE       (0020)
-# Capture       F12         (0125)
-# Auto A        Q           (0071)
-# Auto B        W           (0077)
+# Left          Left Arrow  (00000114)
+# Right         Right Arrow (00000113)
+# Up            Up Arrow    (00000111)
+# Down          Down Arrow  (00000112)
+# A             Z           (0000007a)
+# B             X           (00000078)
+# L             A           (00000061)
+# R             S           (00000073)
+# Start         ENTER       (0000000d)
+# Select        BACKSPACE   (00000008)
+# Speed up      SPACE       (00000020)
+# Capture       F12         (00000125)
+# Auto A        Q           (00000071)
+# Auto B        W           (00000077)
 #
 Joy0_Left=0114
 Joy0_Right=0113

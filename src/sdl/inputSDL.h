@@ -49,19 +49,19 @@ void inputInitJoysticks();
  * @param key Emulated joypad button
  * @param code Code defining an actual joypad / keyboard button
  */
-void inputSetKeymap(int joy, EKey key, uint16_t code);
+void inputSetKeymap(int joy, EKey key, uint32_t code);
 
 /**
  * Define which keys control motion detection emulation
  * @param key Emulated joypad button
  * @param code Code defining an actual joypad / keyboard button
  */
-void inputSetMotionKeymap(EKey key, uint16_t code);
+void inputSetMotionKeymap(EKey key, uint32_t code);
 
 /**
  * Toggle Auto fire for the specified button. Only A, B, R, L are supported.
  * @param key Emulated joypad button
- * @return Auto fire enabled 
+ * @return Auto fire enabled
  */
 bool inputToggleAutoFire(EKey key);
 
@@ -76,7 +76,7 @@ void inputProcessSDLEvent(const SDL_Event &event);
  * @param SDL_Event An event that has just occured
  * @return Keymap code
  */
-uint16_t inputGetEventCode(const SDL_Event &event);
+uint32_t inputGetEventCode(const SDL_Event &event);
 
 /**
  * Read the state of an emulated joypad
