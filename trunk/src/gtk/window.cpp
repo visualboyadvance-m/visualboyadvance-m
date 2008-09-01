@@ -31,6 +31,7 @@
 #include "../dmg/gbPrinter.h"
 #include "../Sound.h"
 #include "../Util.h"
+#include "../sdl/inputSDL.h"
 
 #include "tools.h"
 #include "intl.h"
@@ -517,7 +518,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   poCMI->signal_toggled().connect(sigc::bind(
                                     sigc::mem_fun(*this, &Window::vOnSoundMuteToggled),
                                     poCMI));
-  
+
   struct
   {
     const char *        m_csName;
@@ -808,7 +809,7 @@ void Window::vInitScreenArea(EVideoOutput _eVideoOutput)
   poC = dynamic_cast<Gtk::Alignment *>(m_poXml->get_widget("ScreenContainer"));
   poC->remove();
   poC->set(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER, 1.0, 1.0);
-  
+
   try
   {
     switch (_eVideoOutput)
@@ -882,7 +883,7 @@ void Window::vInitSystem()
   }
 
   Init_2xSaI(32);
-  
+
   soundInit();
 }
 
@@ -898,13 +899,20 @@ void Window::vInitSDL()
   if (bDone)
     return;
 
-  int iFlags = (SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE);
+  int iFlags = (SDL_INIT_EVERYTHING | SDL_INIT_NOPARACHUTE);
 
   if (SDL_Init(iFlags) < 0)
   {
     fprintf(stderr, "Failed to init SDL: %s", SDL_GetError());
     abort();
   }
+
+  // TODO : remove
+  int sdlNumDevices = SDL_NumJoysticks();
+  for (int i = 0; i < sdlNumDevices; i++)
+    SDL_JoystickOpen(i);
+
+  inputInitJoysticks();
 
   bDone = true;
 }
@@ -1785,6 +1793,25 @@ void Window::vToggleFullscreen()
   {
     unfullscreen();
     m_poMenuBar->show();
+  }
+}
+
+void Window::vSDLPollEvents()
+{
+  SDL_Event event;
+  while(SDL_PollEvent(&event))
+  {
+    switch(event.type)
+    {
+      case SDL_JOYHATMOTION:
+      case SDL_JOYBUTTONDOWN:
+      case SDL_JOYBUTTONUP:
+      case SDL_JOYAXISMOTION:
+      case SDL_KEYDOWN:
+      case SDL_KEYUP:
+        inputProcessSDLEvent(event);
+        break;
+    }
   }
 }
 
