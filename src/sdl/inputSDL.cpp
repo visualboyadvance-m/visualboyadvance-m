@@ -19,13 +19,13 @@
 
 #define SDLBUTTONS_NUM 14
 
-static void sdlUpdateKey(int key, bool down);
+static void sdlUpdateKey(uint32_t key, bool down);
 static void sdlUpdateJoyButton(int which, int button, bool pressed);
 static void sdlUpdateJoyHat(int which, int hat, int value);
 static void sdlUpdateJoyAxis(int which, int axis, int value);
 static bool sdlCheckJoyKey(int key);
 
-bool sdlButtons[4][SDLBUTTONS_NUM] = {
+static bool sdlButtons[4][SDLBUTTONS_NUM] = {
   { false, false, false, false, false, false,
     false, false, false, false, false, false,
     false, false
@@ -44,17 +44,17 @@ bool sdlButtons[4][SDLBUTTONS_NUM] = {
   }
 };
 
-bool sdlMotionButtons[4] = { false, false, false, false };
+static bool sdlMotionButtons[4] = { false, false, false, false };
 
-int sdlNumDevices = 0;
-SDL_Joystick **sdlDevices = NULL;
+static int sdlNumDevices = 0;
+static SDL_Joystick **sdlDevices = NULL;
 
-int sdlDefaultJoypad = 0;
+static int sdlDefaultJoypad = 0;
 
-int autoFire = 0;
-bool autoFireToggle = false;
+static int autoFire = 0;
+static bool autoFireToggle = false;
 
-uint16_t joypad[4][SDLBUTTONS_NUM] = {
+static uint32_t joypad[4][SDLBUTTONS_NUM] = {
   { SDLK_LEFT,  SDLK_RIGHT,
     SDLK_UP,    SDLK_DOWN,
     SDLK_z,     SDLK_x,
@@ -68,7 +68,7 @@ uint16_t joypad[4][SDLBUTTONS_NUM] = {
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 };
 
-uint16_t defaultJoypad[SDLBUTTONS_NUM] = {
+static uint32_t defaultJoypad[SDLBUTTONS_NUM] = {
   SDLK_LEFT,  SDLK_RIGHT,
   SDLK_UP,    SDLK_DOWN,
   SDLK_z,     SDLK_x,
@@ -78,21 +78,21 @@ uint16_t defaultJoypad[SDLBUTTONS_NUM] = {
   SDLK_q,     SDLK_w
 };
 
-uint16_t motion[4] = {
+static uint32_t motion[4] = {
   SDLK_KP4, SDLK_KP6, SDLK_KP8, SDLK_KP2
 };
 
-uint16_t defaultMotion[4] = {
+static uint32_t defaultMotion[4] = {
   SDLK_KP4, SDLK_KP6, SDLK_KP8, SDLK_KP2
 };
 
-int sensorX = 2047;
-int sensorY = 2047;
+static int sensorX = 2047;
+static int sensorY = 2047;
 
-static uint16_t sdlGetHatCode(const SDL_Event &event)
+static uint32_t sdlGetHatCode(const SDL_Event &event)
 {
     return (
-                ((event.jhat.which + 1) << 12) |
+                ((event.jhat.which + 1) << 16) |
                 (event.jhat.hat << 2) |
                 (
                     event.jhat.value & SDL_HAT_UP ? 0 :
@@ -103,18 +103,18 @@ static uint16_t sdlGetHatCode(const SDL_Event &event)
            );
 }
 
-static uint16_t sdlGetButtonCode(const SDL_Event &event)
+static uint32_t sdlGetButtonCode(const SDL_Event &event)
 {
     return (
-                ((event.jbutton.which + 1) << 12) |
+                ((event.jbutton.which + 1) << 16) |
                 (event.jbutton.button + 0x80)
            );
 }
 
-static uint16_t sdlGetAxisCode(const SDL_Event &event)
+static uint32_t sdlGetAxisCode(const SDL_Event &event)
 {
     return (
-                ((event.jaxis.which + 1) << 12) |
+                ((event.jaxis.which + 1) << 16) |
                 (event.jaxis.axis << 1) |
                 (
                     event.jaxis.value > 16384 ? 1 :
@@ -123,7 +123,7 @@ static uint16_t sdlGetAxisCode(const SDL_Event &event)
            );
 }
 
-uint16_t inputGetEventCode(const SDL_Event &event)
+uint32_t inputGetEventCode(const SDL_Event &event)
 {
     switch(event.type)
     {
@@ -147,12 +147,12 @@ uint16_t inputGetEventCode(const SDL_Event &event)
     }
 }
 
-void inputSetKeymap(int joy, EKey key, uint16_t code)
+void inputSetKeymap(int joy, EKey key, uint32_t code)
 {
     joypad[joy][key] = code;
 }
 
-void inputSetMotionKeymap(EKey key, uint16_t code)
+void inputSetMotionKeymap(EKey key, uint32_t code)
 {
     motion[key] = code;
 }
@@ -160,7 +160,7 @@ void inputSetMotionKeymap(EKey key, uint16_t code)
 bool inputToggleAutoFire(EKey key)
 {
     int mask = 0;
-    
+
     switch (key)
     {
         case KEY_BUTTON_A:
@@ -191,19 +191,19 @@ bool inputToggleAutoFire(EKey key)
     }
 }
 
-static void sdlUpdateKey(int key, bool down)
+static void sdlUpdateKey(uint32_t key, bool down)
 {
   int i;
   for(int j = 0; j < 4; j++) {
     for(i = 0 ; i < SDLBUTTONS_NUM; i++) {
-      if((joypad[j][i] & 0xf000) == 0) {
+      if((joypad[j][i] & 0xffff0000) == 0) {
         if(key == joypad[j][i])
           sdlButtons[j][i] = down;
       }
     }
   }
   for(i = 0 ; i < 4; i++) {
-    if((motion[i] & 0xf000) == 0) {
+    if((motion[i] & 0xffff0000) == 0) {
       if(key == motion[i])
         sdlMotionButtons[i] = down;
     }
@@ -217,8 +217,8 @@ static void sdlUpdateJoyButton(int which,
   int i;
   for(int j = 0; j < 4; j++) {
     for(i = 0; i < SDLBUTTONS_NUM; i++) {
-      int dev = (joypad[j][i] >> 12);
-      int b = joypad[j][i] & 0xfff;
+      int dev = (joypad[j][i] >> 16);
+      int b = joypad[j][i] & 0xffff;
       if(dev) {
         dev--;
 
@@ -229,8 +229,8 @@ static void sdlUpdateJoyButton(int which,
     }
   }
   for(i = 0; i < 4; i++) {
-    int dev = (motion[i] >> 12);
-    int b = motion[i] & 0xfff;
+    int dev = (motion[i] >> 16);
+    int b = motion[i] & 0xffff;
     if(dev) {
       dev--;
 
@@ -248,8 +248,8 @@ static void sdlUpdateJoyHat(int which,
   int i;
   for(int j = 0; j < 4; j++) {
     for(i = 0; i < SDLBUTTONS_NUM; i++) {
-      int dev = (joypad[j][i] >> 12);
-      int a = joypad[j][i] & 0xfff;
+      int dev = (joypad[j][i] >> 16);
+      int a = joypad[j][i] & 0xffff;
       if(dev) {
         dev--;
 
@@ -276,8 +276,8 @@ static void sdlUpdateJoyHat(int which,
     }
   }
   for(i = 0; i < 4; i++) {
-    int dev = (motion[i] >> 12);
-    int a = motion[i] & 0xfff;
+    int dev = (motion[i] >> 16);
+    int a = motion[i] & 0xffff;
     if(dev) {
       dev--;
 
@@ -311,8 +311,8 @@ static void sdlUpdateJoyAxis(int which,
   int i;
   for(int j = 0; j < 4; j++) {
     for(i = 0; i < SDLBUTTONS_NUM; i++) {
-      int dev = (joypad[j][i] >> 12);
-      int a = joypad[j][i] & 0xfff;
+      int dev = (joypad[j][i] >> 16);
+      int a = joypad[j][i] & 0xffff;
       if(dev) {
         dev--;
 
@@ -323,8 +323,8 @@ static void sdlUpdateJoyAxis(int which,
     }
   }
   for(i = 0; i < 4; i++) {
-    int dev = (motion[i] >> 12);
-    int a = motion[i] & 0xfff;
+    int dev = (motion[i] >> 16);
+    int a = motion[i] & 0xffff;
     if(dev) {
       dev--;
 
@@ -337,8 +337,8 @@ static void sdlUpdateJoyAxis(int which,
 
 static bool sdlCheckJoyKey(int key)
 {
-  int dev = (key >> 12) - 1;
-  int what = key & 0xfff;
+  int dev = (key >> 16) - 1;
+  int what = key & 0xffff;
 
   if(what >= 128) {
     // joystick button
@@ -376,7 +376,7 @@ void inputInitJoysticks()
 
   for(int j = 0; j < 4; j++) {
     for(i = 0; i < SDLBUTTONS_NUM; i++) {
-      int dev = joypad[j][i] >> 12;
+      int dev = joypad[j][i] >> 16;
       if(dev) {
         dev--;
         bool ok = false;
@@ -401,7 +401,7 @@ void inputInitJoysticks()
   }
 
   for(i = 0; i < 4; i++) {
-    int dev = motion[i] >> 12;
+    int dev = motion[i] >> 16;
     if(dev) {
       dev--;
       bool ok = false;
