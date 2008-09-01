@@ -295,6 +295,7 @@ private:
   void vSelectBestThrottleItem();
   void vUpdateGameSlots();
   void vToggleFullscreen();
+  void vSDLPollEvents();
 };
 
 } // namespace VBA
