@@ -31,12 +31,12 @@
 #include <list>
 
 #include "../System.h"
+#include "../sdl/inputSDL.h"
 
 #include "configfile.h"
 #include "screenarea.h"
 #include "filters.h"
-#include "input.h"
-#include "joypadconfig.h"
+//#include "joypadconfig.h"
 
 namespace VBA
 {
@@ -72,7 +72,6 @@ public:
   void vComputeFrameskip(int _iRate);
   void vShowSpeed(int _iSpeed);
   void vCaptureScreen(int _iNum);
-  u32  uiReadJoypad();
 
   inline ECartridge eGetCartridge() const { return m_eCartridge; }
 
@@ -206,8 +205,8 @@ private:
   const int m_iFilter2xMax;
   const int m_iFilterIBMin;
   const int m_iFilterIBMax;
-  const int m_iJoypadMin;
-  const int m_iJoypadMax;
+  const EPad m_iJoypadMin;
+  const EPad m_iJoypadMax;
   const int m_iVideoOutputMin;
   const int m_iVideoOutputMax;
 
@@ -239,6 +238,14 @@ private:
     time_t      m_uiTime;
   };
 
+  struct SJoypadKey
+  {
+  	const char * m_csKey;
+  	const EKey   m_eKeyFlag;
+  };
+
+  static const SJoypadKey m_astJoypad[SDLBUTTONS_NUM];
+
   Gtk::MenuItem * m_apoLoadGameItem[10];
   Gtk::MenuItem * m_apoSaveGameItem[10];
   SGameSlot       m_astGameSlot[10];
@@ -251,9 +258,6 @@ private:
 
   sigc::connection m_oEmuSig;
 
-  std::vector<JoypadConfig> m_oJoypads;
-  Keymap m_oKeymap;
-
   int m_bFullscreen;
   int m_iScreenWidth;
   int m_iScreenHeight;
@@ -261,9 +265,6 @@ private:
   std::string    m_sRomFile;
   ECartridge     m_eCartridge;
   EmulatedSystem m_stEmulator;
-  u32            m_uiJoypadState;
-  u32            m_uiAutofireState;
-  bool           m_bAutofireToggle;
   bool           m_bPaused;
   bool           m_bWasEmulating;
   bool           m_bAutoFrameskip;
