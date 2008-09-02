@@ -31,7 +31,6 @@
 #include "../dmg/gbPrinter.h"
 #include "../Sound.h"
 #include "../Util.h"
-#include "../sdl/inputSDL.h"
 
 #include "tools.h"
 #include "intl.h"
@@ -61,6 +60,24 @@ using Gnome::Glade::Xml;
 
 Window * Window::m_poInstance = NULL;
 
+const Window::SJoypadKey Window::m_astJoypad[SDLBUTTONS_NUM] =
+{
+	{ "left",    KEY_LEFT           },
+	{ "right",   KEY_RIGHT          },
+	{ "up",      KEY_UP             },
+	{ "down",    KEY_DOWN           },
+	{ "A",       KEY_BUTTON_A       },
+	{ "B",       KEY_BUTTON_B       },
+	{ "select",  KEY_BUTTON_SELECT  },
+	{ "start",   KEY_BUTTON_START   },
+	{ "L",       KEY_BUTTON_L       },
+	{ "R",       KEY_BUTTON_R       },
+	{ "speed",   KEY_BUTTON_SPEED   },
+	{ "capture", KEY_BUTTON_CAPTURE },
+	{ "speed",   KEY_BUTTON_SPEED   },
+	{ "capture", KEY_BUTTON_CAPTURE }
+};
+
 Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   Gtk::Window       (_pstWindow),
   m_iGBScreenWidth  (160),
@@ -89,8 +106,8 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_iFilter2xMax    (LastFilter),
   m_iFilterIBMin    (FirstFilterIB),
   m_iFilterIBMax    (LastFilterIB),
-  m_iJoypadMin      (1),
-  m_iJoypadMax      (4),
+  m_iJoypadMin      (PAD_1),
+  m_iJoypadMax      (PAD_4),
   m_iVideoOutputMin (OutputCairo),
   m_iVideoOutputMax (OutputXvideo),
   m_bFullscreen     (false)
@@ -100,8 +117,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_iScreenWidth     = m_iGBAScreenWidth;
   m_iScreenHeight    = m_iGBAScreenHeight;
   m_eCartridge       = CartridgeNone;
-  m_uiJoypadState    = 0;
-  m_uiAutofireState  = 0;
 
   vInitSDL();
   vInitSystem();
@@ -697,7 +712,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   poMI->signal_activate().connect(sigc::bind(
                                     sigc::mem_fun(*this, &Window::vOnJoypadConfigure), 4));
 
-  int iDefaultJoypad = m_poInputConfig->oGetKey<int>("active_joypad");
+  /*int iDefaultJoypad = m_poInputConfig->oGetKey<int>("active_joypad");
   for (int i = m_iJoypadMin; i <= m_iJoypadMax; i++)
   {
     char csName[20];
@@ -712,11 +727,11 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
     poCMI->signal_toggled().connect(sigc::bind(
                                       sigc::mem_fun(*this, &Window::vOnJoypadToggled),
                                       poCMI, i));
-  }
+  }*/
 
   // Autofire menu
   //
-  struct
+  /*struct
   {
     const char *   m_csName;
     const char *   m_csKey;
@@ -737,7 +752,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
     poCMI->signal_toggled().connect(sigc::bind(
                                       sigc::mem_fun(*this, &Window::vOnAutofireToggled),
                                       poCMI, astAutofire[i].m_eKeyFlag));
-  }
+  }*/
 
   // Fullscreen menu
   //
@@ -991,27 +1006,19 @@ void Window::vInitConfig()
 
   // Input section
   //
-  JoypadConfig oJoypadConfig;
-  oJoypadConfig.vSetDefault();
   m_poInputConfig = m_oConfig.poAddSection("Input");
   m_poInputConfig->vSetKey("active_joypad", m_iJoypadMin );
   for (int i = m_iJoypadMin; i <= m_iJoypadMax; i++)
   {
     char csPrefix[20];
-    snprintf(csPrefix, sizeof(csPrefix), "joypad%d_", i);
+    snprintf(csPrefix, sizeof(csPrefix), "joypadSDL%d_", i);
     std::string sPrefix(csPrefix);
-    m_poInputConfig->vSetKey(sPrefix + "up",      oJoypadConfig.m_uiUp      );
-    m_poInputConfig->vSetKey(sPrefix + "down",    oJoypadConfig.m_uiDown    );
-    m_poInputConfig->vSetKey(sPrefix + "left",    oJoypadConfig.m_uiLeft    );
-    m_poInputConfig->vSetKey(sPrefix + "right",   oJoypadConfig.m_uiRight   );
-    m_poInputConfig->vSetKey(sPrefix + "A",       oJoypadConfig.m_uiA       );
-    m_poInputConfig->vSetKey(sPrefix + "B",       oJoypadConfig.m_uiB       );
-    m_poInputConfig->vSetKey(sPrefix + "L",       oJoypadConfig.m_uiL       );
-    m_poInputConfig->vSetKey(sPrefix + "R",       oJoypadConfig.m_uiR       );
-    m_poInputConfig->vSetKey(sPrefix + "select",  oJoypadConfig.m_uiSelect  );
-    m_poInputConfig->vSetKey(sPrefix + "start",   oJoypadConfig.m_uiStart   );
-    m_poInputConfig->vSetKey(sPrefix + "speed",   oJoypadConfig.m_uiSpeed   );
-    m_poInputConfig->vSetKey(sPrefix + "capture", oJoypadConfig.m_uiCapture );
+
+    for (int j = 0; j < SDLBUTTONS_NUM; j++)
+    {
+    	m_poInputConfig->vSetKey(sPrefix + m_astJoypad[j].m_csKey,
+    			inputGetKeymap(PAD_DEFAULT, m_astJoypad[j].m_eKeyFlag));
+    }
   }
   m_poInputConfig->vSetKey("autofire_A", false );
   m_poInputConfig->vSetKey("autofire_B", false );
@@ -1206,29 +1213,17 @@ void Window::vHistoryAdd(const std::string & _rsFile)
 
 void Window::vLoadJoypadsFromConfig()
 {
-  m_oJoypads.clear();
-
   for (int i = m_iJoypadMin; i <= m_iJoypadMax; i++)
   {
     char csPrefix[20];
-    snprintf(csPrefix, sizeof(csPrefix), "joypad%d_", i);
+    snprintf(csPrefix, sizeof(csPrefix), "joypadSDL%d_", i);
     std::string sPrefix(csPrefix);
 
-    JoypadConfig oJoypadConfig;
-    oJoypadConfig.m_uiUp      = m_poInputConfig->oGetKey<guint>(sPrefix + "up");
-    oJoypadConfig.m_uiDown    = m_poInputConfig->oGetKey<guint>(sPrefix + "down");
-    oJoypadConfig.m_uiLeft    = m_poInputConfig->oGetKey<guint>(sPrefix + "left");
-    oJoypadConfig.m_uiRight   = m_poInputConfig->oGetKey<guint>(sPrefix + "right");
-    oJoypadConfig.m_uiA       = m_poInputConfig->oGetKey<guint>(sPrefix + "A");
-    oJoypadConfig.m_uiB       = m_poInputConfig->oGetKey<guint>(sPrefix + "B");
-    oJoypadConfig.m_uiL       = m_poInputConfig->oGetKey<guint>(sPrefix + "L");
-    oJoypadConfig.m_uiR       = m_poInputConfig->oGetKey<guint>(sPrefix + "R");
-    oJoypadConfig.m_uiSelect  = m_poInputConfig->oGetKey<guint>(sPrefix + "select");
-    oJoypadConfig.m_uiStart   = m_poInputConfig->oGetKey<guint>(sPrefix + "start");
-    oJoypadConfig.m_uiSpeed   = m_poInputConfig->oGetKey<guint>(sPrefix + "speed");
-    oJoypadConfig.m_uiCapture = m_poInputConfig->oGetKey<guint>(sPrefix + "capture");
-
-    m_oJoypads.push_back(oJoypadConfig);
+    for (int j = 0; j < SDLBUTTONS_NUM; j++)
+    {
+    	inputSetKeymap((EPad)i, m_astJoypad[j].m_eKeyFlag,
+    			m_poInputConfig->oGetKey<guint>(sPrefix + m_astJoypad[j].m_csKey));
+    }
   }
 }
 
@@ -1236,22 +1231,15 @@ void Window::vSaveJoypadsToConfig()
 {
   for (int i = m_iJoypadMin; i <= m_iJoypadMax; i++)
   {
-    char csPrefix[20];
-    snprintf(csPrefix, sizeof(csPrefix), "joypad%d_", i);
-    std::string sPrefix(csPrefix);
+	char csPrefix[20];
+	snprintf(csPrefix, sizeof(csPrefix), "joypadSDL%d_", i);
+	std::string sPrefix(csPrefix);
 
-    m_poInputConfig->vSetKey(sPrefix + "up",      m_oJoypads[i - 1].m_uiUp      );
-    m_poInputConfig->vSetKey(sPrefix + "down",    m_oJoypads[i - 1].m_uiDown    );
-    m_poInputConfig->vSetKey(sPrefix + "left",    m_oJoypads[i - 1].m_uiLeft    );
-    m_poInputConfig->vSetKey(sPrefix + "right",   m_oJoypads[i - 1].m_uiRight   );
-    m_poInputConfig->vSetKey(sPrefix + "A",       m_oJoypads[i - 1].m_uiA       );
-    m_poInputConfig->vSetKey(sPrefix + "B",       m_oJoypads[i - 1].m_uiB       );
-    m_poInputConfig->vSetKey(sPrefix + "L",       m_oJoypads[i - 1].m_uiL       );
-    m_poInputConfig->vSetKey(sPrefix + "R",       m_oJoypads[i - 1].m_uiR       );
-    m_poInputConfig->vSetKey(sPrefix + "select",  m_oJoypads[i - 1].m_uiSelect  );
-    m_poInputConfig->vSetKey(sPrefix + "start",   m_oJoypads[i - 1].m_uiStart   );
-    m_poInputConfig->vSetKey(sPrefix + "speed",   m_oJoypads[i - 1].m_uiSpeed   );
-    m_poInputConfig->vSetKey(sPrefix + "capture", m_oJoypads[i - 1].m_uiCapture );
+	for (int j = 0; j < SDLBUTTONS_NUM; j++)
+	{
+		m_poInputConfig->vSetKey(sPrefix + m_astJoypad[j].m_csKey,
+				inputGetKeymap((EPad)i, m_astJoypad[j].m_eKeyFlag));
+	}
   }
 }
 
@@ -1549,23 +1537,6 @@ void Window::vCaptureScreen(int _iNum)
   m_stEmulator.emuWritePNG(csFile);
 
   g_free(csFile);
-}
-
-u32 Window::uiReadJoypad()
-{
-  u32 uiJoypad = m_uiJoypadState;
-
-  if (m_uiAutofireState != 0)
-  {
-    uiJoypad &= ~m_uiAutofireState;
-    if (m_bAutofireToggle)
-    {
-      uiJoypad |= m_uiAutofireState;
-    }
-    m_bAutofireToggle = ! m_bAutofireToggle;
-  }
-
-  return uiJoypad;
 }
 
 void Window::vCreateFileOpenDialog()

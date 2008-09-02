@@ -17,8 +17,6 @@
 
 #include "inputSDL.h"
 
-#define SDLBUTTONS_NUM 14
-
 static void sdlUpdateKey(uint32_t key, bool down);
 static void sdlUpdateJoyButton(int which, int button, bool pressed);
 static void sdlUpdateJoyHat(int which, int hat, int value);
@@ -136,6 +134,11 @@ uint32_t inputGetEventCode(const SDL_Event &event)
             return 0;
             break;
     }
+}
+
+uint32_t inputGetKeymap(EPad pad, EKey key)
+{
+	return joypad[pad][key];
 }
 
 void inputSetKeymap(EPad pad, EKey key, uint32_t code)
