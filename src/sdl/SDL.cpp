@@ -436,10 +436,10 @@ FILE *sdlFindFile(const char *name)
 #define EXE_NAME "vbam"
 #endif // ! _WIN32
 
-  fprintf(stderr, "Searching for file %s\n", name);
+  fprintf(stdout, "Searching for file %s\n", name);
 
   if(GETCWD(buffer, 2048)) {
-    fprintf(stderr, "Searching current directory: %s\n", buffer);
+    fprintf(stdout, "Searching current directory: %s\n", buffer);
   }
 
   FILE *f = fopen(name, "r");
@@ -448,7 +448,7 @@ FILE *sdlFindFile(const char *name)
   }
 
   if(homeDir) {
-    fprintf(stderr, "Searching home directory: %s%c%s\n", homeDir, FILE_SEP, DOT_DIR);
+    fprintf(stdout, "Searching home directory: %s%c%s\n", homeDir, FILE_SEP, DOT_DIR);
     sprintf(path, "%s%c%s%c%s", homeDir, FILE_SEP, DOT_DIR, FILE_SEP, name);
     f = fopen(path, "r");
     if(f != NULL)
@@ -458,14 +458,14 @@ FILE *sdlFindFile(const char *name)
 #ifdef _WIN32
   char *home = getenv("USERPROFILE");
   if(home != NULL) {
-    fprintf(stderr, "Searching user profile directory: %s\n", home);
+    fprintf(stdout, "Searching user profile directory: %s\n", home);
     sprintf(path, "%s%c%s", home, FILE_SEP, name);
     f = fopen(path, "r");
     if(f != NULL)
       return f;
   }
 #else // ! _WIN32
-  fprintf(stderr, "Searching system config directory: %s\n", SYSCONFDIR);
+  fprintf(stdout, "Searching system config directory: %s\n", SYSCONFDIR);
   sprintf(path, "%s%c%s", SYSCONFDIR, FILE_SEP, name);
   f = fopen(path, "r");
   if(f != NULL)
@@ -477,7 +477,7 @@ FILE *sdlFindFile(const char *name)
     char *path = getenv("PATH");
 
     if(path != NULL) {
-      fprintf(stderr, "Searching PATH\n");
+      fprintf(stdout, "Searching PATH\n");
       strncpy(buffer, path, 4096);
       buffer[4095] = 0;
       char *tok = strtok(buffer, PATH_SEP);
@@ -491,7 +491,7 @@ FILE *sdlFindFile(const char *name)
           sprintf(path2, "%s%c%s", tok, FILE_SEP, name);
           f = fopen(path2, "r");
           if(f != NULL) {
-            fprintf(stderr, "Found at %s\n", path2);
+            fprintf(stdout, "Found at %s\n", path2);
             return f;
           }
         }
@@ -500,7 +500,7 @@ FILE *sdlFindFile(const char *name)
     }
   } else {
     // executable is relative to some directory
-    fprintf(stderr, "Searching executable directory\n");
+    fprintf(stdout, "Searching executable directory\n");
     strcpy(buffer, arg0);
     char *p = strrchr(buffer, FILE_SEP);
     if(p) {
@@ -541,7 +541,7 @@ void sdlReadPreferences(FILE *f)
     char *value = strtok(NULL, "\t\n\r");
 
     if(value == NULL) {
-      fprintf(stderr, "Empty value for key %s\n", key);
+      fprintf(stdout, "Empty value for key %s\n", key);
       continue;
     }
 
@@ -720,7 +720,7 @@ void sdlReadPreferences(FILE *f)
       case 4:
         break;
       default:
-        fprintf(stderr, "Unknown sound quality %d. Defaulting to 22Khz\n",
+        fprintf(stdout, "Unknown sound quality %d. Defaulting to 22Khz\n",
                 soundQuality);
         soundQuality = 2;
         break;
@@ -841,10 +841,10 @@ void sdlReadPreferences()
   FILE *f = sdlFindFile("vbam.cfg");
 
   if(f == NULL) {
-    fprintf(stderr, "Configuration file NOT FOUND (using defaults)\n");
+    fprintf(stdout, "Configuration file NOT FOUND (using defaults)\n");
     return;
   } else
-    fprintf(stderr, "Reading configuration file.\n");
+    fprintf(stdout, "Reading configuration file.\n");
 
   sdlReadPreferences(f);
 
@@ -855,10 +855,10 @@ static void sdlApplyPerImagePreferences()
 {
   FILE *f = sdlFindFile("vba-over.ini");
   if(!f) {
-    fprintf(stderr, "vba-over.ini NOT FOUND (using emulator settings)\n");
+    fprintf(stdout, "vba-over.ini NOT FOUND (using emulator settings)\n");
     return;
   } else
-    fprintf(stderr, "Reading vba-over.ini\n");
+    fprintf(stdout, "Reading vba-over.ini\n");
 
   char buffer[7];
   buffer[0] = '[';
@@ -1043,19 +1043,19 @@ void sdlWriteBackupStateExchange(int from, int to, int backup)
   /* on POSIX, rename would not do anything anyway for identical names, but let's check it ourselves anyway */
   if (to != backup) {
 	  if (-1 == rename(stateNameDest, stateNameBack)) {
-		fprintf(stderr, "savestate backup: can't backup old state %s to %s", stateNameDest, stateNameBack );
+		fprintf(stdout, "savestate backup: can't backup old state %s to %s", stateNameDest, stateNameBack );
 		perror(": ");
 	  }
   }
   if (to != from) {
 	  if (-1 == rename(stateNameOrig, stateNameDest)) {
-		fprintf(stderr, "savestate backup: can't move new state %s to %s", stateNameOrig, stateNameDest );
+		fprintf(stdout, "savestate backup: can't move new state %s to %s", stateNameOrig, stateNameDest );
 		perror(": ");
 	  }
   }
 
   systemConsoleMessage("Savestate store and backup committed"); // with timestamp and newline
-  fprintf(stderr, "to slot %d, backup in %d, using temporary slot %d\n", to+1, backup+1, from+1);
+  fprintf(stdout, "to slot %d, backup in %d, using temporary slot %d\n", to+1, backup+1, from+1);
 }
 
 void sdlWriteBattery()
@@ -1232,7 +1232,7 @@ static void sdlHandleSavestateKey(int num, int shifted)
 				if (saveSlotPosition > 0)
 				{
 					saveSlotPosition--;
-					fprintf(stderr, "Changed savestate slot to %d.\n", saveSlotPosition + 1);
+					fprintf(stdout, "Changed savestate slot to %d.\n", saveSlotPosition + 1);
 				} else
 					fprintf(stderr, "Can't decrease slotnumber below 1.\n");
 				return; // handled
@@ -1240,7 +1240,7 @@ static void sdlHandleSavestateKey(int num, int shifted)
 				if (saveSlotPosition < 7)
 				{
 					saveSlotPosition++;
-					fprintf(stderr, "Changed savestate slot to %d.\n", saveSlotPosition + 1);
+					fprintf(stdout, "Changed savestate slot to %d.\n", saveSlotPosition + 1);
 				} else
 					fprintf(stderr, "Can't increase slotnumber above 8.\n");
 				return; // handled
@@ -1780,7 +1780,7 @@ void handleRewinds()
 
 int main(int argc, char **argv)
 {
-  fprintf(stderr, "VBA-M version %s [SDL]\n", VERSION);
+  fprintf(stdout, "VBA-M version %s [SDL]\n", VERSION);
 
   arg0 = argv[0];
 
@@ -2080,7 +2080,7 @@ int main(int argc, char **argv)
           int size = gbRomSize, patchnum;
 //          utilApplyIPS(ipsname, &gbRom, &size);
           for (patchnum = 0; patchnum < sdl_ips_num; patchnum++) {
-            fprintf(stderr, "Trying IPS patch %s.\n", sdl_ips_names[patchnum]);
+            fprintf(stdout, "Trying IPS patch %s.\n", sdl_ips_names[patchnum]);
             utilApplyIPS(sdl_ips_names[patchnum], &gbRom, &size);
 	  }
           if(size != gbRomSize) {
@@ -2107,7 +2107,7 @@ int main(int argc, char **argv)
           int size = 0x2000000, patchnum;
 //          utilApplyIPS(ipsname, &rom, &size);
           for (patchnum = 0; patchnum < sdl_ips_num; patchnum++) {
-            fprintf(stderr, "Trying IPS patch %s.\n", sdl_ips_names[patchnum]);
+            fprintf(stdout, "Trying IPS patch %s.\n", sdl_ips_names[patchnum]);
             utilApplyIPS(sdl_ips_names[patchnum], &rom, &size);
 	  }
           if(size != 0x2000000) {
@@ -2205,7 +2205,7 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
-  fprintf(stderr,"Color depth: %d\n", systemColorDepth);
+  fprintf(stdout,"Color depth: %d\n", systemColorDepth);
 
   utilUpdateSystemColorMaps();
 
@@ -2234,13 +2234,13 @@ int main(int argc, char **argv)
 		p	= sdlPreparedCheatCodes[i];
 		l	= strlen(p);
 		if (l == 17 && p[8] == ':') {
-			fprintf(stderr,"Adding cheat code %s\n", p);
+			fprintf(stdout,"Adding cheat code %s\n", p);
 			cheatsAddCheatCode(p, p);
 		} else if (l == 13 && p[8] == ' ') {
-			fprintf(stderr,"Adding CBA cheat code %s\n", p);
+			fprintf(stdout,"Adding CBA cheat code %s\n", p);
 			cheatsAddCBACode(p, p);
 		} else if (l == 8) {
-			fprintf(stderr,"Adding GB(GS) cheat code %s\n", p);
+			fprintf(stdout,"Adding GB(GS) cheat code %s\n", p);
 			gbAddGsCheat(p, p);
 		} else {
 			fprintf(stderr,"Unknown format for cheat code %s\n", p);
@@ -2276,7 +2276,7 @@ int main(int argc, char **argv)
   }
 
   emulating = 0;
-  fprintf(stderr,"Shutting down\n");
+  fprintf(stdout,"Shutting down\n");
   remoteCleanUp();
   soundShutdown();
 
@@ -2323,7 +2323,7 @@ void systemMessage(int num, const char *msg, ...)
   va_start(valist, msg);
   vsprintf(buffer, msg, valist);
 
-  fprintf(stderr, "%s\n", buffer);
+  fprintf(stdout, "%s\n", buffer);
   va_end(valist);
 }
 
@@ -2546,7 +2546,7 @@ void systemConsoleMessage(const char *msg)
   now_time		= time(NULL);
   now_time_broken	= *(localtime( &now_time ));
   fprintf(
-		stderr,
+		stdout,
 		"%02d:%02d:%02d %02d.%02d.%4d: %s\n",
 		now_time_broken.tm_hour,
 		now_time_broken.tm_min,
