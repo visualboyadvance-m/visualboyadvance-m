@@ -310,27 +310,27 @@ static struct lirc_config *LIRCConfigInfo;
 
 void StartLirc(void)
 {
-  fprintf(stderr, "Trying to start LIRC: ");
+  fprintf(stdout, "Trying to start LIRC: ");
   //init LIRC and Record output
   LIRCfd = lirc_init( "vbam",1 );
   if( LIRCfd == -1 ) {
     //it failed
-    fprintf(stderr, "Failed\n");
+    fprintf(stdout, "Failed\n");
   } else {
-    fprintf(stderr, "Success\n");
+    fprintf(stdout, "Success\n");
     //read the config file
     char LIRCConfigLoc[2048];
     sprintf(LIRCConfigLoc, "%s/%s/%s", homeDir, DOT_DIR, "lircrc");
-    fprintf(stderr, "LIRC Config file:");
+    fprintf(stdout, "LIRC Config file:");
     if( lirc_readconfig(LIRCConfigLoc,&LIRCConfigInfo,NULL) == 0 ) {
       //check vbam dir for lircrc
-      fprintf(stderr, "Loaded (%s)\n", LIRCConfigLoc );
+      fprintf(stdout, "Loaded (%s)\n", LIRCConfigLoc );
     } else if( lirc_readconfig(NULL,&LIRCConfigInfo,NULL) == 0 ) {
       //check default lircrc location
-      fprintf(stderr, "Loaded\n");
+      fprintf(stdout, "Loaded\n");
     } else {
       //it all failed
-      fprintf(stderr, "Failed\n");
+      fprintf(stdout, "Failed\n");
       LIRCEnabled = false;
     }
     LIRCEnabled = true;
@@ -342,7 +342,7 @@ void StopLirc(void)
   //did we actually get lirc working at the start
   if(LIRCEnabled) {
     //if so free the config and deinit lirc
-    fprintf(stderr, "Shuting down LIRC\n");
+    fprintf(stdout, "Shuting down LIRC\n");
     lirc_freeconfig(LIRCConfigInfo);
     lirc_deinit();
     //set lirc enabled to false
@@ -2323,7 +2323,7 @@ void systemMessage(int num, const char *msg, ...)
   va_start(valist, msg);
   vsprintf(buffer, msg, valist);
 
-  fprintf(stdout, "%s\n", buffer);
+  fprintf(stderr, "%s\n", buffer);
   va_end(valist);
 }
 
