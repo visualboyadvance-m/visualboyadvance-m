@@ -838,7 +838,7 @@ void sdlOpenGLInit(int w, int h)
 
 void sdlReadPreferences()
 {
-  FILE *f = sdlFindFile("VisualBoyAdvance.cfg");
+  FILE *f = sdlFindFile("vbam.cfg");
 
   if(f == NULL) {
     fprintf(stderr, "Configuration file NOT FOUND (using defaults)\n");
@@ -2223,7 +2223,7 @@ int main(int argc, char **argv)
 
   autoFrameSkipLastTime = throttleLastTime = systemGetClock();
 
-  SDL_WM_SetCaption("VisualBoyAdvance", NULL);
+  SDL_WM_SetCaption("VBA-M", NULL);
 
   // now we can enable cheats?
   {
@@ -2426,9 +2426,9 @@ void systemShowSpeed(int speed)
   if(!fullscreen && showSpeed) {
     char buffer[80];
     if(showSpeed == 1)
-      sprintf(buffer, "VisualBoyAdvance-%3d%%", systemSpeed);
+      sprintf(buffer, "VBA-M - %d%%", systemSpeed);
     else
-      sprintf(buffer, "VisualBoyAdvance-%3d%%(%d, %d fps)", systemSpeed,
+      sprintf(buffer, "VBA-M - %d%%(%d, %d fps)", systemSpeed,
               systemFrameSkip,
               showRenderedFrames);
 
