@@ -20,6 +20,8 @@
 
 #include <SDL.h>
 
+#define SDLBUTTONS_NUM 14
+
 enum EKey {
     KEY_LEFT,
     KEY_RIGHT,
@@ -54,11 +56,19 @@ void inputInitJoysticks();
 
 /**
  * Define which key controls an emulated joypad button
- * @param joy Emulated joypad index (there may be up to 4 joypads for the SGB)
+ * @param pad Emulated joypad index (there may be up to 4 joypads for the SGB)
  * @param key Emulated joypad button
  * @param code Code defining an actual joypad / keyboard button
  */
 void inputSetKeymap(EPad pad, EKey key, uint32_t code);
+
+/**
+ * Get which key is associated to which emulated joypad button
+ * @param pad Emulated joypad index (there may be up to 4 joypads for the SGB)
+ * @param key Emulated joypad button
+ * @retunr Code defining an actual joypad / keyboard button
+ */
+uint32_t inputGetKeymap(EPad pad, EKey key);
 
 /**
  * Define which keys control motion detection emulation

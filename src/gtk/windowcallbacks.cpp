@@ -861,7 +861,7 @@ void Window::vOnFilterIBToggled(Gtk::CheckMenuItem * _poCMI, int _iFilterIB)
 
 void Window::vOnJoypadConfigure(int _iJoypad)
 {
-  Glib::RefPtr<Xml> poXml;
+/*  Glib::RefPtr<Xml> poXml;
   poXml = Xml::create(PKGDATADIR "/vba.glade", "JoypadConfigDialog");
 
   JoypadConfigDialog * poDialog = NULL;
@@ -878,24 +878,24 @@ void Window::vOnJoypadConfigure(int _iJoypad)
     }
   }
 
-  delete poDialog;
+  delete poDialog;*/
 }
 
 void Window::vOnJoypadToggled(Gtk::CheckMenuItem * _poCMI, int _iJoypad)
 {
-  if (! _poCMI->get_active())
+/*  if (! _poCMI->get_active())
   {
     return;
   }
 
   m_oKeymap = m_oJoypads[_iJoypad - 1].oCreateKeymap();
 
-  m_poInputConfig->vSetKey("active_joypad", _iJoypad);
+  m_poInputConfig->vSetKey("active_joypad", _iJoypad);*/
 }
 
 void Window::vOnAutofireToggled(Gtk::CheckMenuItem * _poCMI, u32 _uiKeyFlag)
 {
-  if (_poCMI->get_active())
+/*  if (_poCMI->get_active())
   {
     m_uiAutofireState |= _uiKeyFlag;
   }
@@ -921,7 +921,7 @@ void Window::vOnAutofireToggled(Gtk::CheckMenuItem * _poCMI, u32 _uiKeyFlag)
   {
     sKey = "autofire_R";
   }
-  m_poInputConfig->vSetKey(sKey, _poCMI->get_active());
+  m_poInputConfig->vSetKey(sKey, _poCMI->get_active());*/
 }
 
 #ifndef NO_DEBUGGER
@@ -1168,8 +1168,6 @@ bool Window::on_focus_out_event(GdkEventFocus * _pstEvent)
 
 bool Window::on_key_press_event(GdkEventKey * _pstEvent)
 {
-  EKey eKey;
-
   // The menu accelerators are disabled when it is hidden
   if (_pstEvent->keyval == GDK_F11 && !m_poMenuBar->is_visible())
   {
@@ -1183,58 +1181,7 @@ bool Window::on_key_press_event(GdkEventKey * _pstEvent)
   event.key.keysym.sym = (SDLKey)_pstEvent->keyval;
   inputProcessSDLEvent(event);
 
-  if ((_pstEvent->state & Gtk::AccelGroup::get_default_mod_mask())
-      || (eKey = m_oKeymap[_pstEvent->hardware_keycode]) == KeyNone)
-  {
-    return Gtk::Window::on_key_press_event(_pstEvent);
-  }
-
-  switch (eKey)
-  {
-  case KeyA:
-    m_uiJoypadState |= KeyFlagA;
-    break;
-  case KeyB:
-    m_uiJoypadState |= KeyFlagB;
-    break;
-  case KeySelect:
-    m_uiJoypadState |= KeyFlagSelect;
-    break;
-  case KeyStart:
-    m_uiJoypadState |= KeyFlagStart;
-    break;
-  case KeyRight:
-    m_uiJoypadState |= KeyFlagRight;
-    m_uiJoypadState &= ~KeyFlagLeft;
-    break;
-  case KeyLeft:
-    m_uiJoypadState |= KeyFlagLeft;
-    m_uiJoypadState &= ~KeyFlagRight;
-    break;
-  case KeyUp:
-    m_uiJoypadState |= KeyFlagUp;
-    m_uiJoypadState &= ~KeyFlagDown;
-    break;
-  case KeyDown:
-    m_uiJoypadState |= KeyFlagDown;
-    m_uiJoypadState &= ~KeyFlagUp;
-    break;
-  case KeyR:
-    m_uiJoypadState |= KeyFlagR;
-    break;
-  case KeyL:
-    m_uiJoypadState |= KeyFlagL;
-    break;
-  case KeySpeed:
-    m_uiJoypadState |= KeyFlagSpeed;
-    break;
-  case KeyCapture:
-    m_uiJoypadState |= KeyFlagCapture;
-    break;
-  case KeyNone:
-    break;
-  }
-  return true;
+  return Gtk::Window::on_key_press_event(_pstEvent);
 }
 
 bool Window::on_key_release_event(GdkEventKey * _pstEvent)
@@ -1245,56 +1192,8 @@ bool Window::on_key_release_event(GdkEventKey * _pstEvent)
   event.key.keysym.sym = (SDLKey)_pstEvent->keyval;
   inputProcessSDLEvent(event);
 
-  EKey eKey;
 
-  if ((_pstEvent->state & Gtk::AccelGroup::get_default_mod_mask())
-      || (eKey = m_oKeymap[_pstEvent->hardware_keycode]) == KeyNone)
-  {
-    return Gtk::Window::on_key_release_event(_pstEvent);
-  }
-
-  switch (eKey)
-  {
-  case KeyA:
-    m_uiJoypadState &= ~KeyFlagA;
-    break;
-  case KeyB:
-    m_uiJoypadState &= ~KeyFlagB;
-    break;
-  case KeySelect:
-    m_uiJoypadState &= ~KeyFlagSelect;
-    break;
-  case KeyStart:
-    m_uiJoypadState &= ~KeyFlagStart;
-    break;
-  case KeyRight:
-    m_uiJoypadState &= ~KeyFlagRight;
-    break;
-  case KeyLeft:
-    m_uiJoypadState &= ~KeyFlagLeft;
-    break;
-  case KeyUp:
-    m_uiJoypadState &= ~KeyFlagUp;
-    break;
-  case KeyDown:
-    m_uiJoypadState &= ~KeyFlagDown;
-    break;
-  case KeyR:
-    m_uiJoypadState &= ~KeyFlagR;
-    break;
-  case KeyL:
-    m_uiJoypadState &= ~KeyFlagL;
-    break;
-  case KeySpeed:
-    m_uiJoypadState &= ~KeyFlagSpeed;
-    break;
-  case KeyCapture:
-    m_uiJoypadState &= ~KeyFlagCapture;
-    break;
-  case KeyNone:
-    break;
-  }
-  return true;
+  return Gtk::Window::on_key_release_event(_pstEvent);
 }
 
 bool Window::on_window_state_event(GdkEventWindowState* _pstEvent)

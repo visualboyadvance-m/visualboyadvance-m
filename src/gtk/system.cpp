@@ -82,8 +82,7 @@ bool systemReadJoypads()
 
 u32 systemReadJoypad(int joy)
 {
-  //return inputReadJoypad(joy);
-  return GUI()->uiReadJoypad();
+  return inputReadJoypad(joy);
 }
 
 void systemShowSpeed(int _iSpeed)
