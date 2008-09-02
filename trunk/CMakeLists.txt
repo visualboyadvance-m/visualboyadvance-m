@@ -282,9 +282,9 @@ IF( CAN_BUILD_VBAM )
     )
 
     INSTALL(PROGRAMS vbam DESTINATION bin)
-    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/VisualBoyAdvance.cfg-example
+    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
             DESTINATION ${SYSCONFDIR}
-            RENAME VisualBoyAdvance.cfg)
+            RENAME vbam.cfg)
 
 ENDIF( CAN_BUILD_VBAM )
 
