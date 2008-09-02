@@ -1,7 +1,7 @@
 SDL frontend keymap
 ===================
 These are the keybindings that are hardwired into the source code
-(those that are not defined in VisualBoyAdvance.cfg):
+(those that are not defined in vbam.cfg):
 
 CTRL-R: reset
 CTRL-B: rewind
@@ -117,7 +117,7 @@ of the value of saveKeysSwitch.
 
 REWINDS
 =======
-VBA-M has an 'autosave' feature. Try setting rewindTimer in your VisualBoyAdvance.cfg.
+VBA-M has an 'autosave' feature. Try setting rewindTimer in your vbam.cfg.
 Keep in mind that this (like all other numbers in the cfg file) is a hexadecimal number.
 So rewindTimer=3c means saving every 60 seconds, or one minute.
 The maximum value is 258, which is 10 minutes (258 in hex is 2*256 + 5*16 + 8 =
@@ -148,7 +148,7 @@ for example, when you press ALT-1 on your keyboard, then all A buttons on
 all gamepads will be 'autofiring' (alternating quickly between pressed and not pressed)
 until you press ALT-1 again. This might not be what you want.
 Or you can get a gamepad with more buttons and set some to be 'autofire A'.
-In the VisualBoyAdvance.cfg file, set Joy#_AutoX=$$$$, where # is the number
+In the vbam.cfg file, set Joy#_AutoX=$$$$, where # is the number
 of the emulated gamepad, X is eighter A or B (autofire on A or autofire on B)
 and $$$$ is the code that should trigger this.
 For example, I have
