@@ -1241,7 +1241,7 @@ bool Window::on_key_release_event(GdkEventKey * _pstEvent)
 {
   // Forward the keyboard event to the input module by faking a SDL event
   SDL_Event event;
-  event.type = SDL_KEYDOWN;
+  event.type = SDL_KEYUP;
   event.key.keysym.sym = (SDLKey)_pstEvent->keyval;
   inputProcessSDLEvent(event);
 

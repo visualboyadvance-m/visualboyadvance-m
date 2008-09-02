@@ -907,6 +907,21 @@ void Window::vInitSDL()
     abort();
   }
 
+  inputSetKeymap(PAD_DEFAULT, KEY_LEFT, GDK_Left);
+  inputSetKeymap(PAD_DEFAULT, KEY_RIGHT, GDK_Right);
+  inputSetKeymap(PAD_DEFAULT, KEY_UP, GDK_Up);
+  inputSetKeymap(PAD_DEFAULT, KEY_DOWN, GDK_Down);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_A, GDK_z);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_B, GDK_x);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_START, GDK_Return);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_SELECT, GDK_BackSpace);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_L, GDK_a);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_R, GDK_s);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_SPEED, GDK_space);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_CAPTURE, GDK_F12);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_AUTO_A, GDK_q);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_AUTO_B, GDK_w);
+
   // TODO : remove
   int sdlNumDevices = SDL_NumJoysticks();
   for (int i = 0; i < sdlNumDevices; i++)
