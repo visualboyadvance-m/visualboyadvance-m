@@ -25,6 +25,7 @@
 #include "../dmg/gbGlobals.h"
 #include "../Util.h"
 #include "../Sound.h"
+#include "../sdl/inputSDL.h"
 
 #include "window.h"
 #include "intl.h"
@@ -79,8 +80,9 @@ bool systemReadJoypads()
   return true;
 }
 
-u32 systemReadJoypad(int)
+u32 systemReadJoypad(int joy)
 {
+  //return inputReadJoypad(joy);
   return GUI()->uiReadJoypad();
 }
 

@@ -37,6 +37,15 @@ enum EKey {
     KEY_BUTTON_AUTO_B
 };
 
+enum EPad {
+	PAD_MAIN,
+	PAD_1 = PAD_MAIN,
+	PAD_2,
+	PAD_3,
+	PAD_4,
+	PAD_DEFAULT
+};
+
 /**
  * Init the joysticks needed by the keymap. Verify that the keymap is compatible
  * with the joysticks. If it's not the case, revert to the default keymap.
@@ -49,7 +58,7 @@ void inputInitJoysticks();
  * @param key Emulated joypad button
  * @param code Code defining an actual joypad / keyboard button
  */
-void inputSetKeymap(int joy, EKey key, uint32_t code);
+void inputSetKeymap(EPad pad, EKey key, uint32_t code);
 
 /**
  * Define which keys control motion detection emulation

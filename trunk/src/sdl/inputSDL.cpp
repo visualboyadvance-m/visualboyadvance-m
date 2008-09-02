@@ -54,7 +54,11 @@ static int sdlDefaultJoypad = 0;
 static int autoFire = 0;
 static bool autoFireToggle = false;
 
-static uint32_t joypad[4][SDLBUTTONS_NUM] = {
+static uint32_t joypad[5][SDLBUTTONS_NUM] = {
+  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
   { SDLK_LEFT,  SDLK_RIGHT,
     SDLK_UP,    SDLK_DOWN,
     SDLK_z,     SDLK_x,
@@ -62,20 +66,7 @@ static uint32_t joypad[4][SDLBUTTONS_NUM] = {
     SDLK_a,     SDLK_s,
     SDLK_SPACE, SDLK_F12,
     SDLK_q,     SDLK_w,
-  },
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-};
-
-static uint32_t defaultJoypad[SDLBUTTONS_NUM] = {
-  SDLK_LEFT,  SDLK_RIGHT,
-  SDLK_UP,    SDLK_DOWN,
-  SDLK_z,     SDLK_x,
-  SDLK_RETURN,SDLK_BACKSPACE,
-  SDLK_a,     SDLK_s,
-  SDLK_SPACE, SDLK_F12,
-  SDLK_q,     SDLK_w
+  }
 };
 
 static uint32_t motion[4] = {
@@ -147,9 +138,9 @@ uint32_t inputGetEventCode(const SDL_Event &event)
     }
 }
 
-void inputSetKeymap(int joy, EKey key, uint32_t code)
+void inputSetKeymap(EPad pad, EKey key, uint32_t code)
 {
-    joypad[joy][key] = code;
+   	joypad[pad][key] = code;
 }
 
 void inputSetMotionKeymap(EKey key, uint32_t code)
@@ -365,17 +356,21 @@ static bool sdlCheckJoyKey(int key)
 
 void inputInitJoysticks()
 {
+  // The main joypad has to be entirely defined
+  for(int i = 0; i < SDLBUTTONS_NUM; i++) {
+	if (!joypad[PAD_MAIN][i])
+	  joypad[PAD_MAIN][i] = joypad[PAD_DEFAULT][i];
+  }
+
   sdlNumDevices = SDL_NumJoysticks();
 
   if(sdlNumDevices)
     sdlDevices = (SDL_Joystick **)calloc(1,sdlNumDevices *
                                          sizeof(SDL_Joystick **));
-  int i;
-
   bool usesJoy = false;
 
   for(int j = 0; j < 4; j++) {
-    for(i = 0; i < SDLBUTTONS_NUM; i++) {
+    for(int i = 0; i < SDLBUTTONS_NUM; i++) {
       int dev = joypad[j][i] >> 16;
       if(dev) {
         dev--;
@@ -393,14 +388,14 @@ void inputInitJoysticks()
         }
 
         if(!ok)
-          joypad[j][i] = defaultJoypad[i];
+          joypad[j][i] = joypad[PAD_DEFAULT][i];
         else
           usesJoy = true;
       }
     }
   }
 
-  for(i = 0; i < 4; i++) {
+  for(int i = 0; i < 4; i++) {
     int dev = motion[i] >> 16;
     if(dev) {
       dev--;
@@ -430,6 +425,8 @@ void inputInitJoysticks()
 
 void inputProcessSDLEvent(const SDL_Event &event)
 {
+//	fprintf(stdout, "%x\n", inputGetEventCode(event));
+
     switch(event.type)
     {
         case SDL_KEYDOWN:

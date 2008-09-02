@@ -546,117 +546,117 @@ void sdlReadPreferences(FILE *f)
     }
 
     if(!strcmp(key,"Joy0_Left")) {
-      inputSetKeymap(0, KEY_LEFT, sdlFromHex(value));
+      inputSetKeymap(PAD_1, KEY_LEFT, sdlFromHex(value));
     } else if(!strcmp(key, "Joy0_Right")) {
-      inputSetKeymap(0, KEY_RIGHT, sdlFromHex(value));
+      inputSetKeymap(PAD_1, KEY_RIGHT, sdlFromHex(value));
     } else if(!strcmp(key, "Joy0_Up")) {
-      inputSetKeymap(0, KEY_UP, sdlFromHex(value));
+      inputSetKeymap(PAD_1, KEY_UP, sdlFromHex(value));
     } else if(!strcmp(key, "Joy0_Down")) {
-      inputSetKeymap(0, KEY_DOWN, sdlFromHex(value));
+      inputSetKeymap(PAD_1, KEY_DOWN, sdlFromHex(value));
     } else if(!strcmp(key, "Joy0_A")) {
-      inputSetKeymap(0, KEY_BUTTON_A, sdlFromHex(value));
+      inputSetKeymap(PAD_1, KEY_BUTTON_A, sdlFromHex(value));
     } else if(!strcmp(key, "Joy0_B")) {
-      inputSetKeymap(0, KEY_BUTTON_B, sdlFromHex(value));
+      inputSetKeymap(PAD_1, KEY_BUTTON_B, sdlFromHex(value));
     } else if(!strcmp(key, "Joy0_L")) {
-      inputSetKeymap(0, KEY_BUTTON_L, sdlFromHex(value));
+      inputSetKeymap(PAD_1, KEY_BUTTON_L, sdlFromHex(value));
     } else if(!strcmp(key, "Joy0_R")) {
-      inputSetKeymap(0, KEY_BUTTON_R, sdlFromHex(value));
+      inputSetKeymap(PAD_1, KEY_BUTTON_R, sdlFromHex(value));
     } else if(!strcmp(key, "Joy0_Start")) {
-      inputSetKeymap(0, KEY_BUTTON_START, sdlFromHex(value));
+      inputSetKeymap(PAD_1, KEY_BUTTON_START, sdlFromHex(value));
     } else if(!strcmp(key, "Joy0_Select")) {
-      inputSetKeymap(0, KEY_BUTTON_SELECT, sdlFromHex(value));
+      inputSetKeymap(PAD_1, KEY_BUTTON_SELECT, sdlFromHex(value));
     } else if(!strcmp(key, "Joy0_Speed")) {
-      inputSetKeymap(0, KEY_BUTTON_SPEED, sdlFromHex(value));
+      inputSetKeymap(PAD_1, KEY_BUTTON_SPEED, sdlFromHex(value));
     } else if(!strcmp(key, "Joy0_Capture")) {
-      inputSetKeymap(0, KEY_BUTTON_CAPTURE, sdlFromHex(value));
+      inputSetKeymap(PAD_1, KEY_BUTTON_CAPTURE, sdlFromHex(value));
     } else if(!strcmp(key,"Joy1_Left")) {
-      inputSetKeymap(1, KEY_LEFT, sdlFromHex(value));
+      inputSetKeymap(PAD_2, KEY_LEFT, sdlFromHex(value));
     } else if(!strcmp(key, "Joy1_Right")) {
-      inputSetKeymap(1, KEY_RIGHT, sdlFromHex(value));
+      inputSetKeymap(PAD_2, KEY_RIGHT, sdlFromHex(value));
     } else if(!strcmp(key, "Joy1_Up")) {
-      inputSetKeymap(1, KEY_UP, sdlFromHex(value));
+      inputSetKeymap(PAD_2, KEY_UP, sdlFromHex(value));
     } else if(!strcmp(key, "Joy1_Down")) {
-      inputSetKeymap(1, KEY_DOWN, sdlFromHex(value));
+      inputSetKeymap(PAD_2, KEY_DOWN, sdlFromHex(value));
     } else if(!strcmp(key, "Joy1_A")) {
-      inputSetKeymap(1, KEY_BUTTON_A, sdlFromHex(value));
+      inputSetKeymap(PAD_2, KEY_BUTTON_A, sdlFromHex(value));
     } else if(!strcmp(key, "Joy1_B")) {
-      inputSetKeymap(1, KEY_BUTTON_B, sdlFromHex(value));
+      inputSetKeymap(PAD_2, KEY_BUTTON_B, sdlFromHex(value));
     } else if(!strcmp(key, "Joy1_L")) {
-      inputSetKeymap(1, KEY_BUTTON_L, sdlFromHex(value));
+      inputSetKeymap(PAD_2, KEY_BUTTON_L, sdlFromHex(value));
     } else if(!strcmp(key, "Joy1_R")) {
-      inputSetKeymap(1, KEY_BUTTON_R, sdlFromHex(value));
+      inputSetKeymap(PAD_2, KEY_BUTTON_R, sdlFromHex(value));
     } else if(!strcmp(key, "Joy1_Start")) {
-      inputSetKeymap(1, KEY_BUTTON_START, sdlFromHex(value));
+      inputSetKeymap(PAD_2, KEY_BUTTON_START, sdlFromHex(value));
     } else if(!strcmp(key, "Joy1_Select")) {
-      inputSetKeymap(1, KEY_BUTTON_SELECT, sdlFromHex(value));
+      inputSetKeymap(PAD_2, KEY_BUTTON_SELECT, sdlFromHex(value));
     } else if(!strcmp(key, "Joy1_Speed")) {
-      inputSetKeymap(1, KEY_BUTTON_SPEED, sdlFromHex(value));
+      inputSetKeymap(PAD_2, KEY_BUTTON_SPEED, sdlFromHex(value));
     } else if(!strcmp(key, "Joy1_Capture")) {
-      inputSetKeymap(1, KEY_BUTTON_CAPTURE, sdlFromHex(value));
+      inputSetKeymap(PAD_2, KEY_BUTTON_CAPTURE, sdlFromHex(value));
     } else if(!strcmp(key,"Joy2_Left")) {
-      inputSetKeymap(2, KEY_LEFT, sdlFromHex(value));
+      inputSetKeymap(PAD_3, KEY_LEFT, sdlFromHex(value));
     } else if(!strcmp(key, "Joy2_Right")) {
-      inputSetKeymap(2, KEY_RIGHT, sdlFromHex(value));
+      inputSetKeymap(PAD_3, KEY_RIGHT, sdlFromHex(value));
     } else if(!strcmp(key, "Joy2_Up")) {
-      inputSetKeymap(2, KEY_UP, sdlFromHex(value));
+      inputSetKeymap(PAD_3, KEY_UP, sdlFromHex(value));
     } else if(!strcmp(key, "Joy2_Down")) {
-      inputSetKeymap(2, KEY_DOWN, sdlFromHex(value));
+      inputSetKeymap(PAD_3, KEY_DOWN, sdlFromHex(value));
     } else if(!strcmp(key, "Joy2_A")) {
-      inputSetKeymap(2, KEY_BUTTON_A, sdlFromHex(value));
+      inputSetKeymap(PAD_3, KEY_BUTTON_A, sdlFromHex(value));
     } else if(!strcmp(key, "Joy2_B")) {
-      inputSetKeymap(2, KEY_BUTTON_B, sdlFromHex(value));
+      inputSetKeymap(PAD_3, KEY_BUTTON_B, sdlFromHex(value));
     } else if(!strcmp(key, "Joy2_L")) {
-      inputSetKeymap(2, KEY_BUTTON_L, sdlFromHex(value));
+      inputSetKeymap(PAD_3, KEY_BUTTON_L, sdlFromHex(value));
     } else if(!strcmp(key, "Joy2_R")) {
-      inputSetKeymap(2, KEY_BUTTON_R, sdlFromHex(value));
+      inputSetKeymap(PAD_3, KEY_BUTTON_R, sdlFromHex(value));
     } else if(!strcmp(key, "Joy2_Start")) {
-      inputSetKeymap(2, KEY_BUTTON_START, sdlFromHex(value));
+      inputSetKeymap(PAD_3, KEY_BUTTON_START, sdlFromHex(value));
     } else if(!strcmp(key, "Joy2_Select")) {
-      inputSetKeymap(2, KEY_BUTTON_SELECT, sdlFromHex(value));
+      inputSetKeymap(PAD_3, KEY_BUTTON_SELECT, sdlFromHex(value));
     } else if(!strcmp(key, "Joy2_Speed")) {
-      inputSetKeymap(2, KEY_BUTTON_SPEED, sdlFromHex(value));
+      inputSetKeymap(PAD_3, KEY_BUTTON_SPEED, sdlFromHex(value));
     } else if(!strcmp(key, "Joy2_Capture")) {
-      inputSetKeymap(2, KEY_BUTTON_CAPTURE, sdlFromHex(value));
+      inputSetKeymap(PAD_3, KEY_BUTTON_CAPTURE, sdlFromHex(value));
     } else if(!strcmp(key,"Joy3_Left")) {
-      inputSetKeymap(3, KEY_LEFT, sdlFromHex(value));
+      inputSetKeymap(PAD_4, KEY_LEFT, sdlFromHex(value));
     } else if(!strcmp(key, "Joy3_Right")) {
-      inputSetKeymap(3, KEY_RIGHT, sdlFromHex(value));
+      inputSetKeymap(PAD_4, KEY_RIGHT, sdlFromHex(value));
     } else if(!strcmp(key, "Joy3_Up")) {
-      inputSetKeymap(3, KEY_UP, sdlFromHex(value));
+      inputSetKeymap(PAD_4, KEY_UP, sdlFromHex(value));
     } else if(!strcmp(key, "Joy3_Down")) {
-      inputSetKeymap(3, KEY_DOWN, sdlFromHex(value));
+      inputSetKeymap(PAD_4, KEY_DOWN, sdlFromHex(value));
     } else if(!strcmp(key, "Joy3_A")) {
-      inputSetKeymap(3, KEY_BUTTON_A, sdlFromHex(value));
+      inputSetKeymap(PAD_4, KEY_BUTTON_A, sdlFromHex(value));
     } else if(!strcmp(key, "Joy3_B")) {
-      inputSetKeymap(3, KEY_BUTTON_B, sdlFromHex(value));
+      inputSetKeymap(PAD_4, KEY_BUTTON_B, sdlFromHex(value));
     } else if(!strcmp(key, "Joy3_L")) {
-      inputSetKeymap(3, KEY_BUTTON_L, sdlFromHex(value));
+      inputSetKeymap(PAD_4, KEY_BUTTON_L, sdlFromHex(value));
     } else if(!strcmp(key, "Joy3_R")) {
-      inputSetKeymap(3, KEY_BUTTON_R, sdlFromHex(value));
+      inputSetKeymap(PAD_4, KEY_BUTTON_R, sdlFromHex(value));
     } else if(!strcmp(key, "Joy3_Start")) {
-      inputSetKeymap(3, KEY_BUTTON_START, sdlFromHex(value));
+      inputSetKeymap(PAD_4, KEY_BUTTON_START, sdlFromHex(value));
     } else if(!strcmp(key, "Joy3_Select")) {
-      inputSetKeymap(3, KEY_BUTTON_SELECT, sdlFromHex(value));
+      inputSetKeymap(PAD_4, KEY_BUTTON_SELECT, sdlFromHex(value));
     } else if(!strcmp(key, "Joy3_Speed")) {
-      inputSetKeymap(3, KEY_BUTTON_SPEED, sdlFromHex(value));
+      inputSetKeymap(PAD_4, KEY_BUTTON_SPEED, sdlFromHex(value));
     } else if(!strcmp(key, "Joy3_Capture")) {
-      inputSetKeymap(3, KEY_BUTTON_CAPTURE, sdlFromHex(value));
+      inputSetKeymap(PAD_4, KEY_BUTTON_CAPTURE, sdlFromHex(value));
     } else if(!strcmp(key, "Joy0_AutoA")) {
-      inputSetKeymap(0, KEY_BUTTON_AUTO_A, sdlFromHex(value));
+      inputSetKeymap(PAD_1, KEY_BUTTON_AUTO_A, sdlFromHex(value));
     } else if(!strcmp(key, "Joy0_AutoB")) {
-      inputSetKeymap(0, KEY_BUTTON_AUTO_B, sdlFromHex(value));
+      inputSetKeymap(PAD_1, KEY_BUTTON_AUTO_B, sdlFromHex(value));
     } else if(!strcmp(key, "Joy1_AutoA")) {
-      inputSetKeymap(1, KEY_BUTTON_AUTO_A, sdlFromHex(value));
+      inputSetKeymap(PAD_2, KEY_BUTTON_AUTO_A, sdlFromHex(value));
     } else if(!strcmp(key, "Joy1_AutoB")) {
-      inputSetKeymap(1, KEY_BUTTON_AUTO_B, sdlFromHex(value));
+      inputSetKeymap(PAD_2, KEY_BUTTON_AUTO_B, sdlFromHex(value));
     } else if(!strcmp(key, "Joy2_AutoA")) {
-      inputSetKeymap(2, KEY_BUTTON_AUTO_A, sdlFromHex(value));
+      inputSetKeymap(PAD_3, KEY_BUTTON_AUTO_A, sdlFromHex(value));
     } else if(!strcmp(key, "Joy2_AutoB")) {
-      inputSetKeymap(2, KEY_BUTTON_AUTO_B, sdlFromHex(value));
+      inputSetKeymap(PAD_3, KEY_BUTTON_AUTO_B, sdlFromHex(value));
     } else if(!strcmp(key, "Joy3_AutoA")) {
-      inputSetKeymap(3, KEY_BUTTON_AUTO_A, sdlFromHex(value));
+      inputSetKeymap(PAD_4, KEY_BUTTON_AUTO_A, sdlFromHex(value));
     } else if(!strcmp(key, "Joy3_AutoB")) {
-      inputSetKeymap(3, KEY_BUTTON_AUTO_B, sdlFromHex(value));
+      inputSetKeymap(PAD_4, KEY_BUTTON_AUTO_B, sdlFromHex(value));
     } else if(!strcmp(key, "openGL")) {
      openGL = sdlFromHex(value);
     } else if(!strcmp(key, "Motion_Left")) {
@@ -1620,7 +1620,7 @@ void lircCheckInput(void)
               if (!sdlSoundToggledOff) {
                 sdlSoundToggledOff = 0x3ff;
               }
-            } 
+            }
           } else if( strcmp( CmdLIRC, "VOLUP" ) == 0 ) {
             sdlChangeVolume(0.1);
           } else if( strcmp( CmdLIRC, "VOLDOWN" ) == 0 ) {
