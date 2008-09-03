@@ -71,10 +71,18 @@ JoypadConfigDialog::JoypadConfigDialog(GtkDialog * _pstDialog,
   }
 
   vUpdateEntries();
+
+  vEmptyEventQueue();
+
+  memset(&m_oPreviousEvent, 0, sizeof(m_oPreviousEvent));
+
+  m_oConfigSig = Glib::signal_idle().connect(sigc::mem_fun(*this, &JoypadConfigDialog::bOnConfigIdle),
+          Glib::PRIORITY_DEFAULT_IDLE);
 }
 
 JoypadConfigDialog::~JoypadConfigDialog()
 {
+  m_oConfigSig.disconnect();
 }
 
 void JoypadConfigDialog::vUpdateEntries()
@@ -104,8 +112,9 @@ void JoypadConfigDialog::vUpdateEntries()
       else if (what < 0x20)
       {
         // joystick axis
+        int dir = what & 1;
 		what >>= 1;
-	    os << " Axis " << what;
+	    os << " Axis " << what << (dir?'-':'+');
       }
       else if (what < 0x30)
       {
@@ -132,85 +141,89 @@ void JoypadConfigDialog::vUpdateEntries()
 bool JoypadConfigDialog::bOnEntryFocusIn(GdkEventFocus * _pstEvent,
                                          guint           _uiEntry)
 {
-  m_uiCurrentEntry    = _uiEntry;
+  m_iCurrentEntry = _uiEntry;
 
   return false;
 }
 
 bool JoypadConfigDialog::bOnEntryFocusOut(GdkEventFocus * _pstEvent)
 {
+  m_iCurrentEntry = -1;
 
   return false;
 }
 
 bool JoypadConfigDialog::on_key_press_event(GdkEventKey * _pstEvent)
 {
-  // Forward the keyboard event to the input module by faking a SDL event
+  if (m_iCurrentEntry < 0)
+  {
+    return Gtk::Window::on_key_press_event(_pstEvent);
+  }
+
+  // Forward the keyboard event by faking a SDL event
   SDL_Event event;
   event.type = SDL_KEYDOWN;
   event.key.keysym.sym = (SDLKey)_pstEvent->keyval;
   vOnInputEvent(event);
-/*  if (m_puiCurrentKeyCode == NULL)
-  {
-    return Gtk::Dialog::on_key_press_event(_pstEvent);
-  }
-
-  *m_puiCurrentKeyCode = 0;
-  int iFound = m_oConfig.iFind(_pstEvent->hardware_keycode);
-  if (iFound >= 0)
-  {
-    *m_oConfig.puiAt(iFound) = 0;
-    m_oEntries[iFound]->set_text(_("<Undefined>"));
-  }
-
-  *m_puiCurrentKeyCode = _pstEvent->hardware_keycode;
-
-  guint uiKeyval = 0;
-  gdk_keymap_translate_keyboard_state(gdk_keymap_get_default(),
-                                      _pstEvent->hardware_keycode,
-                                      (GdkModifierType)0,
-                                      0,
-                                      &uiKeyval,
-                                      NULL,
-                                      NULL,
-                                      NULL);
-
-  const char * csName = gdk_keyval_name(uiKeyval);
-  if (csName == NULL)
-  {
-    m_oEntries[m_uiCurrentEntry]->set_text(_("<Undefined>"));
-  }
-  else
-  {
-    m_oEntries[m_uiCurrentEntry]->set_text(csName);
-  }
-
-  if (m_uiCurrentEntry + 1 < m_oEntries.size())
-  {
-    m_oEntries[m_uiCurrentEntry + 1]->grab_focus();
-  }
-  else
-  {
-    m_poOkButton->grab_focus();
-  }*/
 
   return true;
 }
 
 void JoypadConfigDialog::vOnInputEvent(const SDL_Event &event)
 {
+  if (m_iCurrentEntry < 0)
+  {
+	return;
+  }
+
   int code = inputGetEventCode(event);
-  inputSetKeymap(PAD_MAIN, m_aeKeys[m_uiCurrentEntry], code);
+  inputSetKeymap(PAD_MAIN, m_aeKeys[m_iCurrentEntry], code);
   vUpdateEntries();
 
-  if (m_uiCurrentEntry + 1 < m_oEntries.size())
+  if (m_iCurrentEntry + 1 < (gint)m_oEntries.size())
   {
-    m_oEntries[m_uiCurrentEntry + 1]->grab_focus();
+    m_oEntries[m_iCurrentEntry + 1]->grab_focus();
   }
   else
   {
     m_poOkButton->grab_focus();
   }
+}
+
+bool JoypadConfigDialog::bOnConfigIdle()
+{
+  SDL_Event event;
+  while(SDL_PollEvent(&event))
+  {
+	switch(event.type)
+	{
+	  case SDL_JOYAXISMOTION:
+		if (event.jaxis.which != m_oPreviousEvent.jaxis.which ||
+			event.jaxis.axis != m_oPreviousEvent.jaxis.axis	||
+			(event.jaxis.value > 0 && m_oPreviousEvent.jaxis.value < 0) ||
+			(event.jaxis.value < 0 && m_oPreviousEvent.jaxis.value > 0))
+		{
+		  vOnInputEvent(event);
+		  m_oPreviousEvent = event;
+		}
+		vEmptyEventQueue();
+		break;
+	  case SDL_JOYHATMOTION:
+	  case SDL_JOYBUTTONUP:
+        vOnInputEvent(event);
+		vEmptyEventQueue();
+		break;
+	}
+  }
+
+  return true;
+}
+
+void JoypadConfigDialog::vEmptyEventQueue()
+{
+  // Empty the SDL event queue
+  SDL_Event event;
+  while(SDL_PollEvent(&event));
 }
 
 } // namespace VBA
