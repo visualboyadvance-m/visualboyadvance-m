@@ -881,16 +881,16 @@ void Window::vOnJoypadConfigure(int _iJoypad)
   delete poDialog;
 }
 
-void Window::vOnJoypadToggled(Gtk::CheckMenuItem * _poCMI, int _iJoypad)
+void Window::vOnJoypadToggled(Gtk::CheckMenuItem * _poCMI, EPad _eJoypad)
 {
-/*  if (! _poCMI->get_active())
+  if (! _poCMI->get_active())
   {
     return;
   }
 
-  m_oKeymap = m_oJoypads[_iJoypad - 1].oCreateKeymap();
+  inputSetDefaultJoypad(_eJoypad);
 
-  m_poInputConfig->vSetKey("active_joypad", _iJoypad);*/
+  m_poInputConfig->vSetKey("active_joypad", _eJoypad);
 }
 
 void Window::vOnAutofireToggled(Gtk::CheckMenuItem * _poCMI, u32 _uiKeyFlag)
