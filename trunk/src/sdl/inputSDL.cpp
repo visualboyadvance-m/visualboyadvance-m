@@ -47,7 +47,7 @@ static bool sdlMotionButtons[4] = { false, false, false, false };
 static int sdlNumDevices = 0;
 static SDL_Joystick **sdlDevices = NULL;
 
-static int sdlDefaultJoypad = 0;
+static EPad sdlDefaultJoypad = PAD_MAIN;
 
 static int autoFire = 0;
 static bool autoFireToggle = false;
@@ -567,4 +567,9 @@ int inputGetSensorX()
 int inputGetSensorY()
 {
   return sensorY;
+}
+
+void inputSetDefaultJoypad(EPad pad)
+{
+  sdlDefaultJoypad = pad;
 }
