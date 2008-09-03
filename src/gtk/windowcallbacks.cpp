@@ -35,6 +35,7 @@
 
 #include "tools.h"
 #include "intl.h"
+#include "joypadconfig.h"
 
 extern int systemRenderedFrames;
 extern int systemFPS;
@@ -861,24 +862,23 @@ void Window::vOnFilterIBToggled(Gtk::CheckMenuItem * _poCMI, int _iFilterIB)
 
 void Window::vOnJoypadConfigure(int _iJoypad)
 {
-/*  Glib::RefPtr<Xml> poXml;
+  Glib::RefPtr<Xml> poXml;
   poXml = Xml::create(PKGDATADIR "/vba.glade", "JoypadConfigDialog");
 
   JoypadConfigDialog * poDialog = NULL;
   poXml->get_widget_derived<JoypadConfigDialog>("JoypadConfigDialog", poDialog);
   poDialog->set_transient_for(*this);
-  poDialog->vSetConfig(m_oJoypads[_iJoypad - 1]);
 
   if (poDialog->run() == Gtk::RESPONSE_OK)
   {
-    m_oJoypads[_iJoypad - 1] = poDialog->stGetConfig();
+    /*m_oJoypads[_iJoypad - 1] = poDialog->stGetConfig();
     if (_iJoypad == m_poInputConfig->oGetKey<int>("active_joypad"))
     {
       m_oKeymap = m_oJoypads[_iJoypad - 1].oCreateKeymap();
-    }
+    }*/
   }
 
-  delete poDialog;*/
+  delete poDialog;
 }
 
 void Window::vOnJoypadToggled(Gtk::CheckMenuItem * _poCMI, int _iJoypad)
