@@ -37,6 +37,7 @@ public:
                      const Glib::RefPtr<Gnome::Glade::Xml> & _poXml);
   virtual ~JoypadConfigDialog();
 
+  void vInitDialog(EPad _ePad);
 protected:
   bool bOnEntryFocusIn(GdkEventFocus * _pstEvent, guint _uiEntry);
   bool bOnEntryFocusOut(GdkEventFocus * _pstEvent);
@@ -51,6 +52,7 @@ private:
   static const EKey         m_aeKeys[];
   sigc::connection          m_oConfigSig;
   SDL_Event                 m_oPreviousEvent;
+  EPad                      m_ePad;
 
   void vUpdateEntries();
   bool bOnConfigIdle();
