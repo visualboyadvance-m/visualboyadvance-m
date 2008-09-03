@@ -85,6 +85,13 @@ void inputSetMotionKeymap(EKey key, uint32_t code);
 bool inputToggleAutoFire(EKey key);
 
 /**
+ * Get Auto fire status for the specified button. Only A, B, R, L are supported.
+ * @param key Emulated joypad button
+ * @return Auto fire enabled
+ */
+bool inputGetAutoFire(EKey key);
+
+/**
  * Update the emulated pads state with a SDL event
  * @param SDL_Event An event that has just occured
  */

@@ -151,6 +151,31 @@ void inputSetMotionKeymap(EKey key, uint32_t code)
     motion[key] = code;
 }
 
+bool inputGetAutoFire(EKey key)
+{
+    int mask = 0;
+
+    switch (key)
+    {
+        case KEY_BUTTON_A:
+            mask = 1 << 0;
+            break;
+        case KEY_BUTTON_B:
+            mask = 1 << 1;
+            break;
+        case KEY_BUTTON_R:
+            mask = 1 << 8;
+            break;
+        case KEY_BUTTON_L:
+            mask = 1 << 9;
+            break;
+        default:
+            break;
+    }
+
+    return !(autoFire & mask);
+}
+
 bool inputToggleAutoFire(EKey key)
 {
     int mask = 0;

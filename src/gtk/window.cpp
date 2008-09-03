@@ -731,28 +731,28 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 
   // Autofire menu
   //
-  /*struct
+  struct
   {
-    const char *   m_csName;
-    const char *   m_csKey;
-    const EKeyFlag m_eKeyFlag;
+    const char * m_csName;
+    const char * m_csKey;
+    const EKey   m_eKey;
   }
   astAutofire[] =
   {
-    { "AutofireA", "autofire_A", KeyFlagA },
-    { "AutofireB", "autofire_B", KeyFlagB },
-    { "AutofireL", "autofire_L", KeyFlagL },
-    { "AutofireR", "autofire_R", KeyFlagR }
+    { "AutofireA", "autofire_A", KEY_BUTTON_A },
+    { "AutofireB", "autofire_B", KEY_BUTTON_B },
+    { "AutofireL", "autofire_L", KEY_BUTTON_L },
+    { "AutofireR", "autofire_R", KEY_BUTTON_R }
   };
   for (guint i = 0; i < G_N_ELEMENTS(astAutofire); i++)
   {
     poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astAutofire[i].m_csName));
     poCMI->set_active(m_poInputConfig->oGetKey<bool>(astAutofire[i].m_csKey));
-    vOnAutofireToggled(poCMI, astAutofire[i].m_eKeyFlag);
+    vOnAutofireToggled(poCMI, astAutofire[i].m_eKey);
     poCMI->signal_toggled().connect(sigc::bind(
                                       sigc::mem_fun(*this, &Window::vOnAutofireToggled),
-                                      poCMI, astAutofire[i].m_eKeyFlag));
-  }*/
+                                      poCMI, astAutofire[i].m_eKey));
+  }
 
   // Fullscreen menu
   //

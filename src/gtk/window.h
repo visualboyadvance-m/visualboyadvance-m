@@ -166,7 +166,7 @@ protected:
   virtual void vOnFilterIBToggled(Gtk::CheckMenuItem * _poCMI, int _iFilterIB);
   virtual void vOnJoypadConfigure(EPad _eJoypad);
   virtual void vOnJoypadToggled(Gtk::CheckMenuItem * _poCMI, EPad _eJoypad);
-  virtual void vOnAutofireToggled(Gtk::CheckMenuItem * _poCMI, u32 _uiKeyFlag);
+  virtual void vOnAutofireToggled(Gtk::CheckMenuItem * _poCMI, EKey _eKey);
 #ifndef NO_DEBUGGER
   virtual void vOnGDBWait();
   virtual void vOnGDBLoadAndWait();
