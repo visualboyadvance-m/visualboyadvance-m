@@ -25,32 +25,8 @@
 #include <libglademm.h>
 #include <gtkmm.h>
 
-#include "input.h"
-
 namespace VBA
 {
-
-class JoypadConfig
-{
-public:
-  guint m_uiUp;
-  guint m_uiDown;
-  guint m_uiLeft;
-  guint m_uiRight;
-  guint m_uiA;
-  guint m_uiB;
-  guint m_uiL;
-  guint m_uiR;
-  guint m_uiSelect;
-  guint m_uiStart;
-  guint m_uiSpeed;
-  guint m_uiCapture;
-
-  guint *  puiAt(int _iIndex);
-  int      iFind(guint _uiKeycode);
-  void     vSetDefault();
-  Keymap   oCreateKeymap() const;
-};
 
 class JoypadConfigDialog : public Gtk::Dialog
 {
@@ -59,9 +35,6 @@ public:
                      const Glib::RefPtr<Gnome::Glade::Xml> & _poXml);
   virtual ~JoypadConfigDialog();
 
-  void vSetConfig(const JoypadConfig & _roConfig);
-  inline JoypadConfig stGetConfig() const { return m_oConfig; }
-
 protected:
   bool bOnEntryFocusIn(GdkEventFocus * _pstEvent, guint _uiEntry);
   bool bOnEntryFocusOut(GdkEventFocus * _pstEvent);
@@ -69,10 +42,8 @@ protected:
   bool on_key_press_event(GdkEventKey * _pstEvent);
 
 private:
-  JoypadConfig              m_oConfig;
   Gtk::Button *             m_poOkButton;
   std::vector<Gtk::Entry *> m_oEntries;
-  guint *                   m_puiCurrentKeyCode;
   guint                     m_uiCurrentEntry;
 
   void vUpdateEntries();

@@ -36,7 +36,6 @@
 #include "configfile.h"
 #include "screenarea.h"
 #include "filters.h"
-//#include "joypadconfig.h"
 
 namespace VBA
 {
