@@ -10,6 +10,12 @@ SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts )
 INCLUDE(CMakeScripts/CMakeDetermineASMCompiler.cmake)
 INCLUDE(CMakeScripts/CMakeASMInformation.cmake)
 
+# Fill in SDLMAIN_LIBRARY on OS X manually to avoid using SDLMain.m
+# OS X users will have to compile and install SDL form source.
+if( APPLE )
+	SET(SDLMAIN_LIBRARY "-lSDLmain")
+endif( APPLE )
+
 # The project's name is VBA-M it uses assembly, C and C++ code
 PROJECT(VBA-M ASM C CXX)
 
@@ -257,7 +263,6 @@ IF( CAN_BUILD_VBAM )
     ADD_EXECUTABLE (
         vbam
         WIN32
-        MACOSX_BUNDLE
         ${SRC_SDL}
         ${SRC_HQ}
     )
