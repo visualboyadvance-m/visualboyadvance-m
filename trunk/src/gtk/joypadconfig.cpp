@@ -198,6 +198,7 @@ bool JoypadConfigDialog::bOnConfigIdle()
 	switch(event.type)
 	{
 	  case SDL_JOYAXISMOTION:
+		if (abs(event.jaxis.value) < 16384) continue;
 		if (event.jaxis.which != m_oPreviousEvent.jaxis.which ||
 			event.jaxis.axis != m_oPreviousEvent.jaxis.axis	||
 			(event.jaxis.value > 0 && m_oPreviousEvent.jaxis.value < 0) ||
