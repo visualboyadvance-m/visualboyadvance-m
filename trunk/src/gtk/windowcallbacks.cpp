@@ -887,35 +887,31 @@ void Window::vOnJoypadToggled(Gtk::CheckMenuItem * _poCMI, EPad _eJoypad)
   m_poInputConfig->vSetKey("active_joypad", _eJoypad);
 }
 
-void Window::vOnAutofireToggled(Gtk::CheckMenuItem * _poCMI, u32 _uiKeyFlag)
+void Window::vOnAutofireToggled(Gtk::CheckMenuItem * _poCMI, EKey _eKey)
 {
-/*  if (_poCMI->get_active())
+  if (_poCMI->get_active() != inputGetAutoFire(_eKey))
   {
-    m_uiAutofireState |= _uiKeyFlag;
-  }
-  else
-  {
-    m_uiAutofireState &= ~_uiKeyFlag;
+    inputToggleAutoFire(_eKey);
   }
 
   std::string sKey;
-  if (_uiKeyFlag == KeyFlagA)
+  if (_eKey == KEY_BUTTON_A)
   {
     sKey = "autofire_A";
   }
-  else if (_uiKeyFlag == KeyFlagB)
+  else if (_eKey == KEY_BUTTON_B)
   {
     sKey = "autofire_B";
   }
-  else if (_uiKeyFlag == KeyFlagL)
+  else if (_eKey == KEY_BUTTON_L)
   {
     sKey = "autofire_L";
   }
-  else if (_uiKeyFlag == KeyFlagR)
+  else if (_eKey == KEY_BUTTON_R)
   {
     sKey = "autofire_R";
   }
-  m_poInputConfig->vSetKey(sKey, _poCMI->get_active());*/
+  m_poInputConfig->vSetKey(sKey, _poCMI->get_active());
 }
 
 #ifndef NO_DEBUGGER
