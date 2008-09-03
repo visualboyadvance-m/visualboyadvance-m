@@ -47,10 +47,14 @@ protected:
 private:
   Gtk::Button *             m_poOkButton;
   std::vector<Gtk::Entry *> m_oEntries;
-  guint                     m_uiCurrentEntry;
+  gint                      m_iCurrentEntry;
   static const EKey         m_aeKeys[];
+  sigc::connection          m_oConfigSig;
+  SDL_Event                 m_oPreviousEvent;
 
   void vUpdateEntries();
+  bool bOnConfigIdle();
+  void vEmptyEventQueue();
 };
 
 } // namespace VBA
