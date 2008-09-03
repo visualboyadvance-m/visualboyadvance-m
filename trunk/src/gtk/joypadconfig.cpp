@@ -43,7 +43,8 @@ const EKey JoypadConfigDialog::m_aeKeys[] =
 
 JoypadConfigDialog::JoypadConfigDialog(GtkDialog * _pstDialog,
                                        const Glib::RefPtr<Gnome::Glade::Xml> & _poXml) :
-  Gtk::Dialog(_pstDialog)
+  Gtk::Dialog(_pstDialog),
+  m_ePad(PAD_MAIN)
 {
   m_poOkButton = dynamic_cast<Gtk::Button *>(_poXml->get_widget("JoypadOkButton"));
 
@@ -70,14 +71,18 @@ JoypadConfigDialog::JoypadConfigDialog(GtkDialog * _pstDialog,
     poEntry->signal_focus_out_event().connect(sigc::mem_fun(*this, &JoypadConfigDialog::bOnEntryFocusOut));
   }
 
-  vUpdateEntries();
+  memset(&m_oPreviousEvent, 0, sizeof(m_oPreviousEvent));
 
   vEmptyEventQueue();
 
-  memset(&m_oPreviousEvent, 0, sizeof(m_oPreviousEvent));
-
   m_oConfigSig = Glib::signal_idle().connect(sigc::mem_fun(*this, &JoypadConfigDialog::bOnConfigIdle),
           Glib::PRIORITY_DEFAULT_IDLE);
+}
+
+void JoypadConfigDialog::vInitDialog(EPad _ePad)
+{
+  m_ePad = _ePad;
+  vUpdateEntries();
 }
 
 JoypadConfigDialog::~JoypadConfigDialog()
@@ -91,7 +96,7 @@ void JoypadConfigDialog::vUpdateEntries()
   {
 	const char * csName = 0;
 
-    guint uiKeyval = inputGetKeymap(PAD_MAIN, m_aeKeys[i]);
+    guint uiKeyval = inputGetKeymap(m_ePad, m_aeKeys[i]);
     int dev = uiKeyval >> 16;
     if (dev == 0)
     {
@@ -177,7 +182,7 @@ void JoypadConfigDialog::vOnInputEvent(const SDL_Event &event)
   }
 
   int code = inputGetEventCode(event);
-  inputSetKeymap(PAD_MAIN, m_aeKeys[m_iCurrentEntry], code);
+  inputSetKeymap(m_ePad, m_aeKeys[m_iCurrentEntry], code);
   vUpdateEntries();
 
   if (m_iCurrentEntry + 1 < (gint)m_oEntries.size())
