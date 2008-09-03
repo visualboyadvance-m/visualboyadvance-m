@@ -152,7 +152,7 @@ flashSize=0
 
 # Sound volume
 # 0-200=0%-200%
-soundVolume=0
+soundVolume=100
 
 # Interframe blending
 # 0=none, 1=motion blur, 2=smart
