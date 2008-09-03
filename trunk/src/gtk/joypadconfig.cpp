@@ -21,10 +21,25 @@
 #include <string.h>
 
 #include "intl.h"
-#include "../sdl/inputSDL.h"
 
 namespace VBA
 {
+
+const EKey JoypadConfigDialog::m_aeKeys[] =
+  {
+    KEY_UP,
+    KEY_DOWN,
+    KEY_LEFT,
+    KEY_RIGHT,
+    KEY_BUTTON_A,
+    KEY_BUTTON_B,
+    KEY_BUTTON_L,
+    KEY_BUTTON_R,
+    KEY_BUTTON_SELECT,
+    KEY_BUTTON_START,
+    KEY_BUTTON_SPEED,
+    KEY_BUTTON_CAPTURE
+  };
 
 JoypadConfigDialog::JoypadConfigDialog(GtkDialog * _pstDialog,
                                        const Glib::RefPtr<Gnome::Glade::Xml> & _poXml) :
@@ -32,16 +47,16 @@ JoypadConfigDialog::JoypadConfigDialog(GtkDialog * _pstDialog,
 {
   m_poOkButton = dynamic_cast<Gtk::Button *>(_poXml->get_widget("JoypadOkButton"));
 
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadLeftEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadRightEntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadUpEntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadDownEntry")));
+  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadLeftEntry")));
+  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadRightEntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadAEntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadBEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadSelectEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadStartEntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadLEntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadREntry")));
+  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadSelectEntry")));
+  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadStartEntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadSpeedEntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadCaptureEntry")));
 
@@ -68,7 +83,7 @@ void JoypadConfigDialog::vUpdateEntries()
   {
 	const char * csName = 0;
 
-    guint uiKeyval = inputGetKeymap(PAD_MAIN, (EKey)i);
+    guint uiKeyval = inputGetKeymap(PAD_MAIN, m_aeKeys[i]);
     int dev = uiKeyval >> 16;
     if (dev == 0)
     {
@@ -130,6 +145,11 @@ bool JoypadConfigDialog::bOnEntryFocusOut(GdkEventFocus * _pstEvent)
 
 bool JoypadConfigDialog::on_key_press_event(GdkEventKey * _pstEvent)
 {
+  // Forward the keyboard event to the input module by faking a SDL event
+  SDL_Event event;
+  event.type = SDL_KEYDOWN;
+  event.key.keysym.sym = (SDLKey)_pstEvent->keyval;
+  vOnInputEvent(event);
 /*  if (m_puiCurrentKeyCode == NULL)
   {
     return Gtk::Dialog::on_key_press_event(_pstEvent);
@@ -175,6 +195,22 @@ bool JoypadConfigDialog::on_key_press_event(GdkEventKey * _pstEvent)
   }*/
 
   return true;
+}
+
+void JoypadConfigDialog::vOnInputEvent(const SDL_Event &event)
+{
+  int code = inputGetEventCode(event);
+  inputSetKeymap(PAD_MAIN, m_aeKeys[m_uiCurrentEntry], code);
+  vUpdateEntries();
+
+  if (m_uiCurrentEntry + 1 < m_oEntries.size())
+  {
+    m_oEntries[m_uiCurrentEntry + 1]->grab_focus();
+  }
+  else
+  {
+    m_poOkButton->grab_focus();
+  }
 }
 
 } // namespace VBA
