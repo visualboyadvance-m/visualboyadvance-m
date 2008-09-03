@@ -112,8 +112,8 @@ IF ( WIN32 )
 ELSE ( WIN32 )
     SET( CMAKE_ASM_FLAGS "-Isrc/hq/asm/ -O1 -DELF -w-orphan-labels")
 ENDIF ( WIN32 )
-SET( CMAKE_C_FLAGS "-O3 -mtune=native -Wall")
-SET( CMAKE_CXX_FLAGS "-O3 -mtune=native -Wall")
+SET( CMAKE_C_FLAGS "-O3 -Wall")
+SET( CMAKE_CXX_FLAGS "-O3 -Wall")
 
 # Source files definition
 SET(SRC_MAIN
