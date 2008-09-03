@@ -230,6 +230,7 @@ bool XAudio2_Output::init()
 		ASSERT( hr == S_OK );
 		float *matrix = NULL;
 		matrix = (float*)malloc( sizeof( float ) * 2 * dd.OutputFormat.Format.nChannels );
+		bool matrixAvailable = true;
 		switch( dd.OutputFormat.Format.nChannels ) {
 			case 4: // 4.0
 	//Speaker \ Left Source           Right Source
@@ -276,9 +277,14 @@ bool XAudio2_Output::init()
 	/*Side  L*/	matrix[12] = 1.0000f;  matrix[13] = 0.0000f;
 	/*Side  R*/	matrix[14] = 0.0000f;  matrix[15] = 1.0000f;
 				break;
+			default:
+				matrixAvailable = false;
+				break;
 		}
-		hr = sVoice->SetOutputMatrix( NULL, 2, dd.OutputFormat.Format.nChannels, matrix );
-		ASSERT( hr == S_OK );
+		if( matrixAvailable ) {
+			hr = sVoice->SetOutputMatrix( NULL, 2, dd.OutputFormat.Format.nChannels, matrix );
+			ASSERT( hr == S_OK );
+		}
 		free( matrix );
 		matrix = NULL;
 	}
