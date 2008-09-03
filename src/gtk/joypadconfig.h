@@ -25,6 +25,8 @@
 #include <libglademm.h>
 #include <gtkmm.h>
 
+#include "../sdl/inputSDL.h"
+
 namespace VBA
 {
 
@@ -39,12 +41,14 @@ protected:
   bool bOnEntryFocusIn(GdkEventFocus * _pstEvent, guint _uiEntry);
   bool bOnEntryFocusOut(GdkEventFocus * _pstEvent);
 
+  void vOnInputEvent(const SDL_Event &event);
   bool on_key_press_event(GdkEventKey * _pstEvent);
 
 private:
   Gtk::Button *             m_poOkButton;
   std::vector<Gtk::Entry *> m_oEntries;
   guint                     m_uiCurrentEntry;
+  static const EKey         m_aeKeys[];
 
   void vUpdateEntries();
 };
