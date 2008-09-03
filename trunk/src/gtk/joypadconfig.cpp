@@ -21,142 +21,27 @@
 #include <string.h>
 
 #include "intl.h"
+#include "../sdl/inputSDL.h"
 
 namespace VBA
 {
-
-guint * JoypadConfig::puiAt(int _iIndex)
-{
-  guint * puiMember;
-
-  switch (_iIndex)
-  {
-  case 0:
-    puiMember = &m_uiUp;
-    break;
-  case 1:
-    puiMember = &m_uiDown;
-    break;
-  case 2:
-    puiMember = &m_uiLeft;
-    break;
-  case 3:
-    puiMember = &m_uiRight;
-    break;
-  case 4:
-    puiMember = &m_uiA;
-    break;
-  case 5:
-    puiMember = &m_uiB;
-    break;
-  case 6:
-    puiMember = &m_uiL;
-    break;
-  case 7:
-    puiMember = &m_uiR;
-    break;
-  case 8:
-    puiMember = &m_uiSelect;
-    break;
-  case 9:
-    puiMember = &m_uiStart;
-    break;
-  case 10:
-    puiMember = &m_uiSpeed;
-    break;
-  case 11:
-    puiMember = &m_uiCapture;
-    break;
-  default:
-    puiMember = NULL;
-  }
-
-  return puiMember;
-}
-
-int JoypadConfig::iFind(guint _uiKeycode)
-{
-  for (guint i = 0; i < 12; i++)
-  {
-    if (*puiAt(i) == _uiKeycode)
-    {
-      return i;
-    }
-  }
-
-  return -1;
-}
-
-void JoypadConfig::vSetDefault()
-{
-  guint auiKeyval[] =
-  {
-    GDK_Up, GDK_Down, GDK_Left, GDK_Right,
-    GDK_z, GDK_x, GDK_a, GDK_s,
-    GDK_BackSpace, GDK_Return,
-    GDK_space, GDK_F12
-  };
-
-  for (guint i = 0; i < G_N_ELEMENTS(auiKeyval); i++)
-  {
-    GdkKeymapKey * pstKeys;
-    int iKeys;
-
-    if (gdk_keymap_get_entries_for_keyval(gdk_keymap_get_default(),
-                                          auiKeyval[i],
-                                          &pstKeys,
-                                          &iKeys))
-    {
-      *puiAt(i) = pstKeys[0].keycode;
-      g_free(pstKeys);
-    }
-    else
-    {
-      *puiAt(i) = 0;
-    }
-  }
-}
-
-Keymap JoypadConfig::oCreateKeymap() const
-{
-  Keymap oKeymap;
-
-  oKeymap[m_uiUp]      = KeyUp;
-  oKeymap[m_uiDown]    = KeyDown;
-  oKeymap[m_uiLeft]    = KeyLeft;
-  oKeymap[m_uiRight]   = KeyRight;
-  oKeymap[m_uiA]       = KeyA;
-  oKeymap[m_uiB]       = KeyB;
-  oKeymap[m_uiL]       = KeyL;
-  oKeymap[m_uiR]       = KeyR;
-  oKeymap[m_uiSelect]  = KeySelect;
-  oKeymap[m_uiStart]   = KeyStart;
-  oKeymap[m_uiSpeed]   = KeySpeed;
-  oKeymap[m_uiCapture] = KeyCapture;
-
-  return oKeymap;
-}
 
 JoypadConfigDialog::JoypadConfigDialog(GtkDialog * _pstDialog,
                                        const Glib::RefPtr<Gnome::Glade::Xml> & _poXml) :
   Gtk::Dialog(_pstDialog)
 {
-  m_puiCurrentKeyCode = NULL;
-
-  memset(&m_oConfig, 0, sizeof(m_oConfig));
-
   m_poOkButton = dynamic_cast<Gtk::Button *>(_poXml->get_widget("JoypadOkButton"));
 
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadUpEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadDownEntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadLeftEntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadRightEntry")));
+  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadUpEntry")));
+  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadDownEntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadAEntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadBEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadLEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadREntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadSelectEntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadStartEntry")));
+  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadLEntry")));
+  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadREntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadSpeedEntry")));
   m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadCaptureEntry")));
 
@@ -177,27 +62,48 @@ JoypadConfigDialog::~JoypadConfigDialog()
 {
 }
 
-void JoypadConfigDialog::vSetConfig(const JoypadConfig & _roConfig)
-{
-  m_oConfig = _roConfig;
-  vUpdateEntries();
-}
-
 void JoypadConfigDialog::vUpdateEntries()
 {
   for (guint i = 0; i < m_oEntries.size(); i++)
   {
-    guint uiKeyval = 0;
-    gdk_keymap_translate_keyboard_state(gdk_keymap_get_default(),
-                                        *m_oConfig.puiAt(i),
-                                        (GdkModifierType)0,
-                                        0,
-                                        &uiKeyval,
-                                        NULL,
-                                        NULL,
-                                        NULL);
-    const char * csName = gdk_keyval_name(uiKeyval);
-    if (csName == NULL)
+	const char * csName = 0;
+
+    guint uiKeyval = inputGetKeymap(PAD_MAIN, (EKey)i);
+    int dev = uiKeyval >> 16;
+    if (dev == 0)
+    {
+      csName = gdk_keyval_name(uiKeyval);
+    }
+    else
+    {
+      int what = uiKeyval & 0xffff;
+      std::stringstream os;
+      os << "Joy " << dev;
+
+      if(what >= 128)
+      {
+        // joystick button
+        int button = what - 128;
+        os << " Button " << button;
+      }
+      else if (what < 0x20)
+      {
+        // joystick axis
+		what >>= 1;
+	    os << " Axis " << what;
+      }
+      else if (what < 0x30)
+      {
+        // joystick hat
+        what = (what & 15);
+        what >>= 2;
+        os << " Hat " << what;
+      }
+
+      csName = os.str().c_str();
+    }
+
+    if (csName == 0)
     {
       m_oEntries[i]->set_text(_("<Undefined>"));
     }
@@ -212,21 +118,19 @@ bool JoypadConfigDialog::bOnEntryFocusIn(GdkEventFocus * _pstEvent,
                                          guint           _uiEntry)
 {
   m_uiCurrentEntry    = _uiEntry;
-  m_puiCurrentKeyCode = m_oConfig.puiAt(_uiEntry);
 
   return false;
 }
 
 bool JoypadConfigDialog::bOnEntryFocusOut(GdkEventFocus * _pstEvent)
 {
-  m_puiCurrentKeyCode = NULL;
 
   return false;
 }
 
 bool JoypadConfigDialog::on_key_press_event(GdkEventKey * _pstEvent)
 {
-  if (m_puiCurrentKeyCode == NULL)
+/*  if (m_puiCurrentKeyCode == NULL)
   {
     return Gtk::Dialog::on_key_press_event(_pstEvent);
   }
@@ -268,7 +172,7 @@ bool JoypadConfigDialog::on_key_press_event(GdkEventKey * _pstEvent)
   else
   {
     m_poOkButton->grab_focus();
-  }
+  }*/
 
   return true;
 }
