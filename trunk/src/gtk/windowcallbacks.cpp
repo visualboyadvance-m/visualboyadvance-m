@@ -892,7 +892,7 @@ void Window::vOnAutofireToggled(Gtk::CheckMenuItem * _poCMI, EKey _eKey)
 {
   if (_poCMI->get_active() != inputGetAutoFire(_eKey))
   {
-    inputToggleAutoFire(_eKey);
+    //inputToggleAutoFire(_eKey);
   }
 
   std::string sKey;
