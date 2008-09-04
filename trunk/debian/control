@@ -2,7 +2,7 @@ Source: vbam
 Section: games
 Priority: extra
 Maintainer: Bastien Bouclet <bgk@users.sourceforge.net>
-Build-Depends: debhelper (>= 5), zlib1g-dev, libpng12-dev, libsdl1.2-dev, libgl1-mesa-dev, libgtkmm-2.4-dev, libglademm-2.4-dev, cmake, portaudio19-dev, libgtkglextmm-x11-dev, libxv-dev
+Build-Depends: debhelper (>= 5), zlib1g-dev, libpng12-dev, libsdl1.2-dev, libgl1-mesa-dev, libgtkmm-2.4-dev, libglademm-2.4-dev, cmake, libgtkglextmm-x11-dev, libxv-dev
 Standards-Version: 3.7.2
 
 Package: vbam
