@@ -50,7 +50,6 @@
 #define IDS_TOOLTIP_ENHANCE_SOUND       43
 #define IDS_TOOLTIP_SURROUND            44
 #define IDS_TOOLTIP_DECLICKING          45
-#define IDS_TOOLTIP_SOUND_INTERPOLATION 46
 #define IDI_MAINICON                    101
 #define IDD_REGISTERS                   102
 #define IDD_DEBUG                       103
@@ -555,6 +554,8 @@
 #define IDC_DEFAULT_VOLUME              1292
 #define IDC_DECLICKING                  1293
 #define IDC_SOUND_FILTERING             1294
+#define IDC_COMBO1                      1296
+#define IDC_SAMPLE_RATE                 1296
 #define IDS_OAL_NODEVICE                2000
 #define IDS_OAL_NODLL                   2001
 #define IDS_AVI_CANNOT_CREATE_AVI       2002
@@ -872,7 +873,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        165
 #define _APS_NEXT_COMMAND_VALUE         40366
-#define _APS_NEXT_CONTROL_VALUE         1296
+#define _APS_NEXT_CONTROL_VALUE         1297
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
 #endif
