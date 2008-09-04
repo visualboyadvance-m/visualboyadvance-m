@@ -29,6 +29,7 @@
 #include "../dmg/gb.h"
 #include "../dmg/gbGlobals.h"
 #include "../dmg/gbPrinter.h"
+#include "../dmg/gbSound.h"
 #include "../Sound.h"
 #include "../Util.h"
 
