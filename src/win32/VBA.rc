@@ -1185,11 +1185,11 @@ BEGIN
     CONTROL         "",IDC_STEREO,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP,192,109,120,12
     LTEXT           "Center",IDC_STATIC,192,120,36,8,SS_CENTERIMAGE
     RTEXT           "Left/Right",IDC_STATIC,276,120,36,8,SS_CENTERIMAGE
-    GROUPBOX        "Volume",IDC_STATIC,6,6,156,42
-    CONTROL         "",IDC_VOLUME,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP,12,18,144,12
-    LTEXT           "Mute",IDC_STATIC,12,30,48,12,SS_CENTERIMAGE
-    RTEXT           "Maximum",IDC_STATIC,108,30,48,12,SS_CENTERIMAGE
-    PUSHBUTTON      "Default",IDC_DEFAULT_VOLUME,66,30,36,12,BS_NOTIFY
+    GROUPBOX        "Shared",IDC_STATIC,6,6,156,66
+    CONTROL         "",IDC_VOLUME,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP,42,18,114,12
+    LTEXT           "Mute",IDC_STATIC,42,30,36,12,SS_CENTERIMAGE
+    RTEXT           "Maximum",IDC_STATIC,120,30,36,12,SS_CENTERIMAGE
+    PUSHBUTTON      "Default",IDC_DEFAULT_VOLUME,78,30,42,12,BS_NOTIFY
     CONTROL         "Declicking",IDC_DECLICKING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,174,18,47,10
     GROUPBOX        "Game Boy Advance only",IDC_STATIC,6,78,156,66
     CONTROL         "Sound interpolation",IDC_SOUND_INTERPOLATION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,90,78,10
@@ -1197,6 +1197,9 @@ BEGIN
     CONTROL         "",IDC_SOUND_FILTERING,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP,18,115,132,12
     LTEXT           "None",IDC_STATIC,18,126,36,8,SS_CENTERIMAGE
     RTEXT           "Maximum",IDC_STATIC,114,126,36,8,SS_CENTERIMAGE
+    LTEXT           "Volume:",IDC_STATIC,12,18,30,12,SS_CENTERIMAGE
+    LTEXT           "Sample rate:",IDC_STATIC,12,54,48,12,SS_CENTERIMAGE
+    COMBOBOX        IDC_SAMPLE_RATE,66,54,66,12,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 END
 
 
@@ -1774,25 +1777,18 @@ BEGIN
         BEGIN
             POPUP "Output API"
             BEGIN
-                MENUITEM "DirectSound",                 ID_OUTPUTAPI_DIRECTSOUND
-                MENUITEM SEPARATOR
                 MENUITEM "XAudio2",                     ID_OUTPUTAPI_XAUDIO2
                 MENUITEM "  Configuration...",          ID_OUTPUTAPI_XAUDIO2CONFIG
                 MENUITEM SEPARATOR
                 MENUITEM "OpenAL",                      ID_OUTPUTAPI_OPENAL
                 MENUITEM "  Configuration...",          ID_OUTPUTAPI_OALCONFIGURATION
                 MENUITEM SEPARATOR
+                MENUITEM "DirectSound",                 ID_OUTPUTAPI_DIRECTSOUND
+                MENUITEM SEPARATOR
                 MENUITEM "&Sync game to audio",         ID_OPTIONS_EMULATOR_SYNCHRONIZE
             END
             MENUITEM SEPARATOR
             MENUITEM "Core Settings...",            ID_AUDIO_CORE_SETTINGS
-            MENUITEM SEPARATOR
-            POPUP "Sampling Rate"
-            BEGIN
-                MENUITEM "&11025 Hz",                   ID_OPTIONS_SOUND_11KHZ
-                MENUITEM "&22050 Hz",                   ID_OPTIONS_SOUND_22KHZ
-                MENUITEM "&44100 Hz",                   ID_OPTIONS_SOUND_44KHZ
-            END
             MENUITEM SEPARATOR
             POPUP "Sound Channels"
             BEGIN

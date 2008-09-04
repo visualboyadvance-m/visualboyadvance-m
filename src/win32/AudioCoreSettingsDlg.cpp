@@ -18,6 +18,7 @@ AudioCoreSettingsDlg::AudioCoreSettingsDlg(CWnd* pParent /*=NULL*/)
 	, m_stereo( 0.0f )
 	, m_volume( 0.0f )
 	, m_sound_filtering( 0.0f )
+	, m_sample_rate( 0 )
 	, toolTip( NULL )
 {
 }
@@ -39,6 +40,7 @@ void AudioCoreSettingsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_DECLICKING, declicking);
 	DDX_Control(pDX, IDC_SOUND_INTERPOLATION, sound_interpolation);
 	DDX_Control(pDX, IDC_SOUND_FILTERING, sound_filtering);
+	DDX_Control(pDX, IDC_SAMPLE_RATE, sample_rate);
 
 	if( pDX->m_bSaveAndValidate == TRUE ) {
 		m_enabled = BST_CHECKED == enhance_sound.GetCheck();
@@ -49,6 +51,7 @@ void AudioCoreSettingsDlg::DoDataExchange(CDataExchange* pDX)
 		m_stereo = (float)stereo.GetPos() / 100.0f;
 		m_volume = (float)volume.GetPos() / 100.0f;
 		m_sound_filtering = (float)sound_filtering.GetPos() / 100.0f;
+		m_sample_rate = (unsigned int)sample_rate.GetItemData( sample_rate.GetCurSel() );
 	}
 }
 
@@ -152,6 +155,18 @@ BOOL AudioCoreSettingsDlg::OnInitDialog()
 
 	volume.SetRange( (int)( MIN_VOLUME * 100.0f ), (int)( MAX_VOLUME * 100.0f ) );
 	volume.SetPos( (int)( m_volume * 100.0f ) );
+
+	unsigned int rate = 44100;
+	CString temp;
+	for( int i = 0 ; i <= 2 ; i++ ) {
+		temp.Format( _T("%u Hz"), rate );
+		int id = sample_rate.AddString( temp.GetString() );
+		sample_rate.SetItemData( id, rate );
+		if( rate == m_sample_rate ) {
+			sample_rate.SetCurSel( id );
+		}
+		rate /= 2;
+	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE

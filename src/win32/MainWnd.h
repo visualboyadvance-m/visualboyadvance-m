@@ -49,6 +49,10 @@ public:
 	void winSaveCheatList(const char *name);
 	void winSaveCheatListDefault();
 
+
+	DECLARE_MESSAGE_MAP()
+
+protected:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
 	afx_msg LRESULT OnMySysCommand(WPARAM, LPARAM);
@@ -203,12 +207,6 @@ public:
 	afx_msg void OnUpdateOptionsEmulatorPngformat(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorBmpformat();
 	afx_msg void OnUpdateOptionsEmulatorBmpformat(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsSound11khz();
-	afx_msg void OnUpdateOptionsSound11khz(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsSound22khz();
-	afx_msg void OnUpdateOptionsSound22khz(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsSound44khz();
-	afx_msg void OnUpdateOptionsSound44khz(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsSoundChannel1();
 	afx_msg void OnUpdateOptionsSoundChannel1(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsSoundChannel2();
@@ -384,7 +382,8 @@ public:
 	afx_msg void OnLoadgameDonotchangebatterysave();
 	afx_msg void OnUpdateLoadgameDonotchangebatterysave(CCmdUI *pCmdUI);
 
-	DECLARE_MESSAGE_MAP()
     afx_msg void OnEnterSizeMove();
+
 	afx_msg void OnAudioCoreSettings();
+	afx_msg void OnUpdateAudioCoreSettings(CCmdUI *pCmdUI);
 };

@@ -812,6 +812,7 @@ void MainWnd::OnAudioCoreSettings()
 	dlg.m_declicking = gbSoundGetDeclicking();
 	dlg.m_sound_interpolation = soundInterpolation;
 	dlg.m_sound_filtering = soundFiltering;
+	dlg.m_sample_rate = 44100 / soundQuality;
 
 	if( IDOK == dlg.DoModal() ) {
 		gb_effects_config_t _new;
@@ -830,49 +831,18 @@ void MainWnd::OnAudioCoreSettings()
 		soundInterpolation = dlg.m_sound_interpolation;
 
 		soundFiltering = dlg.m_sound_filtering;
+		
+		if( theApp.cartridgeType == IMAGE_GBA ) {
+			soundSetQuality( 44100 / dlg.m_sample_rate );
+		} else if( theApp.cartridgeType == IMAGE_GB ) {
+			gbSoundSetQuality( 44100 / dlg.m_sample_rate );
+		}
 	}
 }
 
-void MainWnd::OnOptionsSound11khz()
+void MainWnd::OnUpdateAudioCoreSettings(CCmdUI *pCmdUI)
 {
-  if(theApp.cartridgeType == 0)
-    soundSetQuality(4);
-  else
-    gbSoundSetQuality(4);
-}
-
-void MainWnd::OnUpdateOptionsSound11khz(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(soundQuality == 4);
-  pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
-}
-
-void MainWnd::OnOptionsSound22khz()
-{
-  if(theApp.cartridgeType == 0)
-    soundSetQuality(2);
-  else
-    gbSoundSetQuality(2);
-}
-
-void MainWnd::OnUpdateOptionsSound22khz(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(soundQuality == 2);
-  pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
-}
-
-void MainWnd::OnOptionsSound44khz()
-{
-  if(theApp.cartridgeType == 0)
-    soundSetQuality(1);
-  else
-    gbSoundSetQuality(1);
-}
-
-void MainWnd::OnUpdateOptionsSound44khz(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(soundQuality == 1);
-  pCmdUI->Enable(!theApp.aviRecording && !theApp.soundRecording);
+	pCmdUI->Enable( ( !theApp.aviRecording && !theApp.soundRecording ) ? TRUE : FALSE );
 }
 
 void MainWnd::updateSoundChannels(UINT id)
