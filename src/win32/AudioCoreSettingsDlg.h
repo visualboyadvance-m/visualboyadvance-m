@@ -20,6 +20,7 @@ public:
 	float m_stereo;
 	float m_volume;
 	float m_sound_filtering;
+	unsigned int m_sample_rate;
 
 	AudioCoreSettingsDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~AudioCoreSettingsDlg();
@@ -47,4 +48,5 @@ private:
 	CSliderCtrl volume;
 	CSliderCtrl sound_filtering;
 	CToolTipCtrl *toolTip;
+	CComboBox sample_rate;
 };

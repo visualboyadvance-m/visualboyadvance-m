@@ -39,6 +39,7 @@
 #include "../Flash.h"
 #include "../Globals.h"
 #include "../dmg/GB.h"
+#include "../dmg/gbSound.h"
 #include "../dmg/gbCheats.h"
 #include "../dmg/gbGlobals.h"
 #include "../RTC.h"
@@ -204,12 +205,6 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_PNGFORMAT, OnUpdateOptionsEmulatorPngformat)
   ON_COMMAND(ID_OPTIONS_EMULATOR_BMPFORMAT, OnOptionsEmulatorBmpformat)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_BMPFORMAT, OnUpdateOptionsEmulatorBmpformat)
-  ON_COMMAND(ID_OPTIONS_SOUND_11KHZ, OnOptionsSound11khz)
-  ON_UPDATE_COMMAND_UI(ID_OPTIONS_SOUND_11KHZ, OnUpdateOptionsSound11khz)
-  ON_COMMAND(ID_OPTIONS_SOUND_22KHZ, OnOptionsSound22khz)
-  ON_UPDATE_COMMAND_UI(ID_OPTIONS_SOUND_22KHZ, OnUpdateOptionsSound22khz)
-  ON_COMMAND(ID_OPTIONS_SOUND_44KHZ, OnOptionsSound44khz)
-  ON_UPDATE_COMMAND_UI(ID_OPTIONS_SOUND_44KHZ, OnUpdateOptionsSound44khz)
   ON_COMMAND(ID_OPTIONS_SOUND_CHANNEL1, OnOptionsSoundChannel1)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_SOUND_CHANNEL1, OnUpdateOptionsSoundChannel1)
   ON_COMMAND(ID_OPTIONS_SOUND_CHANNEL2, OnOptionsSoundChannel2)
@@ -422,6 +417,7 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_XAUDIO2CONFIG, &MainWnd::OnUpdateOutputapiXaudio2config)
   ON_WM_ENTERSIZEMOVE()
   ON_COMMAND(ID_AUDIO_CORE_SETTINGS, &MainWnd::OnAudioCoreSettings)
+  ON_UPDATE_COMMAND_UI(ID_AUDIO_CORE_SETTINGS, &MainWnd::OnUpdateAudioCoreSettings)
   END_MESSAGE_MAP()
 
 

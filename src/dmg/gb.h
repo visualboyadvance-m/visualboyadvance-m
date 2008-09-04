@@ -36,28 +36,26 @@ typedef union {
   u16 W;
 } gbRegister;
 
-extern bool gbLoadRom(const char *);
-extern void gbEmulate(int);
-extern void gbWriteMemory(register u16, register u8);
-extern void gbDrawLine();
-extern bool gbIsGameboyRom(const char *);
-extern void gbSoundReset();
-extern void gbSoundSetQuality(int);
-extern void gbGetHardwareType();
-extern void gbReset();
-extern void gbCleanUp();
-extern void gbCPUInit(const char *,bool);
-extern bool gbWriteBatteryFile(const char *);
-extern bool gbWriteBatteryFile(const char *, bool);
-extern bool gbReadBatteryFile(const char *);
-extern bool gbWriteSaveState(const char *);
-extern bool gbWriteMemSaveState(char *, int);
-extern bool gbReadSaveState(const char *);
-extern bool gbReadMemSaveState(char *, int);
-extern void gbSgbRenderBorder();
-extern bool gbWritePNGFile(const char *);
-extern bool gbWriteBMPFile(const char *);
-extern bool gbReadGSASnapshot(const char *);
+bool gbLoadRom(const char *);
+void gbEmulate(int);
+void gbWriteMemory(register u16, register u8);
+void gbDrawLine();
+bool gbIsGameboyRom(const char *);
+void gbGetHardwareType();
+void gbReset();
+void gbCleanUp();
+void gbCPUInit(const char *,bool);
+bool gbWriteBatteryFile(const char *);
+bool gbWriteBatteryFile(const char *, bool);
+bool gbReadBatteryFile(const char *);
+bool gbWriteSaveState(const char *);
+bool gbWriteMemSaveState(char *, int);
+bool gbReadSaveState(const char *);
+bool gbReadMemSaveState(char *, int);
+void gbSgbRenderBorder();
+bool gbWritePNGFile(const char *);
+bool gbWriteBMPFile(const char *);
+bool gbReadGSASnapshot(const char *);
 
 extern struct EmulatedSystem GBSystem;
 
