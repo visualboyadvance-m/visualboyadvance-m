@@ -108,8 +108,7 @@ BOOL XAudio2_Config::OnInitDialog()
 			for( UINT32 i = 0; i < dev_count; i++ ) {
 				hr = xa->GetDeviceDetails( i, &dd );
 				if( hr != S_OK ) {
-					systemMessage( IDS_XAUDIO2_CANNOT_ENUMERATE_DEVICES, NULL );
-					break;
+					continue;
 				} else {
 #ifdef _UNICODE
 					int id = m_combo_dev.AddString( dd.DisplayName );
