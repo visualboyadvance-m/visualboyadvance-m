@@ -620,7 +620,9 @@ bool sdlStretchInit(int colorDepth, int sizeMultiplier, int srcWidth)
 
 void sdlStretch1x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height) {
     int i;
+#ifndef C_CORE
     u32 *stretcher = (u32 *)sdlStretcher;
+#endif
       for(i = 0; i < height; i++) {
         SDL_CALL_STRETCHER;
         srcPtr += srcPitch;
@@ -629,7 +631,9 @@ void sdlStretch1x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32
 }
 void sdlStretch2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height) {
     int i;
+#ifndef C_CORE
     u32 *stretcher = (u32 *)sdlStretcher;
+#endif
       for(i = 0; i < height; i++) {
         SDL_CALL_STRETCHER;
         dstPtr += dstPitch;
@@ -640,7 +644,9 @@ void sdlStretch2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32
 }
 void sdlStretch3x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height) {
     int i;
+#ifndef C_CORE
     u32 *stretcher = (u32 *)sdlStretcher;
+#endif
       for(i = 0; i < height; i++) {
         SDL_CALL_STRETCHER;
         dstPtr += dstPitch;
@@ -653,7 +659,9 @@ void sdlStretch3x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32
 }
 void sdlStretch4x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height) {
     int i;
+#ifndef C_CORE
     u32 *stretcher = (u32 *)sdlStretcher;
+#endif
       for(i = 0; i < height; i++) {
         SDL_CALL_STRETCHER;
         dstPtr += dstPitch;
