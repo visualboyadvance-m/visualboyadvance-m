@@ -97,7 +97,9 @@ static void debuggerBreakChange(int, char **);
 static void debuggerBreakChangeClear(int, char **);
 static void debuggerBreakWriteClear(int, char **);
 static void debuggerBreakWrite(int, char **);
+#ifndef FINAL_VERSION
 static void debuggerDebug(int, char **);
+#endif
 static void debuggerDisassemble(int, char **);
 static void debuggerDisassembleArm(int, char **);
 static void debuggerDisassembleThumb(int, char **);
@@ -121,7 +123,9 @@ static void debuggerPrint(int, char **);
 static void debuggerQuit(int, char **);
 static void debuggerSetRadix(int, char **);
 static void debuggerSymbols(int, char **);
+#ifdef GBA_LOGGING
 static void debuggerVerbose(int, char **);
+#endif
 static void debuggerWhere(int, char **);
 
 static void debuggerReadState(int, char **);
@@ -750,6 +754,7 @@ static void debuggerHelp(int n, char **args)
   }
 }
 
+#ifndef FINAL_VERSION
 static void debuggerDebug(int n, char **args)
 {
   if(n == 2) {
@@ -760,7 +765,9 @@ static void debuggerDebug(int n, char **args)
   } else
     debuggerUsage("trace");
 }
+#endif
 
+#ifdef GBA_LOGGING
 static void debuggerVerbose(int n, char **args)
 {
   if(n == 2) {
@@ -771,6 +778,7 @@ static void debuggerVerbose(int n, char **args)
   } else
     debuggerUsage("verbose");
 }
+#endif
 
 static void debuggerWhere(int n, char **args)
 {
@@ -1648,7 +1656,7 @@ void debuggerFindResume(int n, char **args)
 
 void debuggerDoSearch()
 {
-  int count = 0;
+  unsigned int count = 0;
 
   while (true)
   {
