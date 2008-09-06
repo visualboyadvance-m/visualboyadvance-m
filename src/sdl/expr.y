@@ -12,7 +12,7 @@ using namespace std;
 #include "../elf.h"
 #include "exprNode.h" 
 
-extern int yyerror(char *);
+extern int yyerror(const char *);
 extern int yylex(); 
 extern char *yytext;
 
@@ -56,7 +56,7 @@ ident:
 
 %%
 
-int yyerror(char *s)
+int yyerror(const char *s)
 {
   return 0;
 }
