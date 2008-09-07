@@ -863,17 +863,11 @@ void Window::vOnFilterIBToggled(Gtk::CheckMenuItem * _poCMI, int _iFilterIB)
 
 void Window::vOnJoypadConfigure(EPad _eJoypad)
 {
-  Glib::RefPtr<Xml> poXml;
-  poXml = Xml::create(PKGDATADIR "/vba.glade", "JoypadConfigDialog");
+  JoypadConfigDialog oDialog;
+  oDialog.set_transient_for(*this);
+  oDialog.vInitDialog(_eJoypad);
 
-  JoypadConfigDialog * poDialog = NULL;
-  poXml->get_widget_derived<JoypadConfigDialog>("JoypadConfigDialog", poDialog);
-  poDialog->set_transient_for(*this);
-  poDialog->vInitDialog(_eJoypad);
-
-  poDialog->run();
-
-  delete poDialog;
+  oDialog.run();
 }
 
 void Window::vOnJoypadToggled(Gtk::CheckMenuItem * _poCMI, EPad _eJoypad)

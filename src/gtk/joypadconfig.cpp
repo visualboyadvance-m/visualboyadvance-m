@@ -25,45 +25,34 @@
 namespace VBA
 {
 
-const EKey JoypadConfigDialog::m_aeKeys[] =
-  {
-    KEY_UP,
-    KEY_DOWN,
-    KEY_LEFT,
-    KEY_RIGHT,
-    KEY_BUTTON_A,
-    KEY_BUTTON_B,
-    KEY_BUTTON_L,
-    KEY_BUTTON_R,
-    KEY_BUTTON_SELECT,
-    KEY_BUTTON_START,
-    KEY_BUTTON_SPEED,
-    KEY_BUTTON_CAPTURE
-  };
+const JoypadConfigDialog::SJoypadKey JoypadConfigDialog::m_astKeys[] =
+{
+    { KEY_UP,             "Up :"       },
+    { KEY_DOWN,           "Down :"     },
+    { KEY_LEFT,           "Left :"     },
+    { KEY_RIGHT,          "Right :"    },
+    { KEY_BUTTON_A,       "Button A :" },
+    { KEY_BUTTON_B,       "Button B :" },
+    { KEY_BUTTON_L,       "Button L :" },
+    { KEY_BUTTON_R,       "Button R :" },
+    { KEY_BUTTON_SELECT,  "Select :"   },
+    { KEY_BUTTON_START,   "Start :"    },
+    { KEY_BUTTON_SPEED,   "Speed :"    },
+    { KEY_BUTTON_CAPTURE, "Capture :"  }
+};
 
-JoypadConfigDialog::JoypadConfigDialog(GtkDialog * _pstDialog,
-                                       const Glib::RefPtr<Gnome::Glade::Xml> & _poXml) :
-  Gtk::Dialog(_pstDialog),
+JoypadConfigDialog::JoypadConfigDialog() :
+  Gtk::Dialog("Joypad config", true, true),
+  m_oTable(G_N_ELEMENTS(m_astKeys), 2, false),
   m_ePad(PAD_MAIN)
 {
-  m_poOkButton = dynamic_cast<Gtk::Button *>(_poXml->get_widget("JoypadOkButton"));
-
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadUpEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadDownEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadLeftEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadRightEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadAEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadBEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadLEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadREntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadSelectEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadStartEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadSpeedEntry")));
-  m_oEntries.push_back(dynamic_cast<Gtk::Entry *>(_poXml->get_widget("JoypadCaptureEntry")));
-
-  for (guint i = 0; i < m_oEntries.size(); i++)
+  for (guint i = 0; i < G_N_ELEMENTS(m_astKeys); i++)
   {
-    Gtk::Entry * poEntry = m_oEntries[i];
+    Gtk::Label * poLabel = Gtk::manage( new Gtk::Label(m_astKeys[i].m_csKeyName, Gtk::ALIGN_RIGHT) );
+    Gtk::Entry * poEntry = Gtk::manage( new Gtk::Entry() );
+    m_oTable.attach(* poLabel, 0, 1, i, i + 1);
+    m_oTable.attach(* poEntry, 1, 2, i, i + 1);
+    m_oEntries.push_back(poEntry);
 
     poEntry->signal_focus_in_event().connect(sigc::bind(
                                                sigc::mem_fun(*this, &JoypadConfigDialog::bOnEntryFocusIn),
@@ -71,9 +60,18 @@ JoypadConfigDialog::JoypadConfigDialog(GtkDialog * _pstDialog,
     poEntry->signal_focus_out_event().connect(sigc::mem_fun(*this, &JoypadConfigDialog::bOnEntryFocusOut));
   }
 
-  memset(&m_oPreviousEvent, 0, sizeof(m_oPreviousEvent));
+  Gtk::VBox* poVBox = get_vbox();
+  poVBox->pack_start(m_oTable);
+
+  m_oTable.set_border_width(5);
+  m_oTable.set_spacings(5);
+
+  m_poOkButton = add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
+
+  show_all();
 
   vEmptyEventQueue();
+  memset(&m_oPreviousEvent, 0, sizeof(m_oPreviousEvent));
 
   m_oConfigSig = Glib::signal_idle().connect(sigc::mem_fun(*this, &JoypadConfigDialog::bOnConfigIdle),
           Glib::PRIORITY_DEFAULT_IDLE);
@@ -96,7 +94,7 @@ void JoypadConfigDialog::vUpdateEntries()
   {
 	const char * csName = 0;
 
-    guint uiKeyval = inputGetKeymap(m_ePad, m_aeKeys[i]);
+    guint uiKeyval = inputGetKeymap(m_ePad, m_astKeys[i].m_eKeyFlag);
     int dev = uiKeyval >> 16;
     if (dev == 0)
     {
@@ -182,7 +180,7 @@ void JoypadConfigDialog::vOnInputEvent(const SDL_Event &event)
   }
 
   int code = inputGetEventCode(event);
-  inputSetKeymap(m_ePad, m_aeKeys[m_iCurrentEntry], code);
+  inputSetKeymap(m_ePad, m_astKeys[m_iCurrentEntry].m_eKeyFlag, code);
   vUpdateEntries();
 
   if (m_iCurrentEntry + 1 < (gint)m_oEntries.size())

@@ -17,6 +17,8 @@
 
 #include "inputSDL.h"
 
+#define SDLBUTTONS_NUM 14
+
 static void sdlUpdateKey(uint32_t key, bool down);
 static void sdlUpdateJoyButton(int which, int button, bool pressed);
 static void sdlUpdateJoyHat(int which, int hat, int value);
