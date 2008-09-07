@@ -61,7 +61,7 @@ using Gnome::Glade::Xml;
 
 Window * Window::m_poInstance = NULL;
 
-const Window::SJoypadKey Window::m_astJoypad[SDLBUTTONS_NUM] =
+const Window::SJoypadKey Window::m_astJoypad[] =
 {
 	{ "left",    KEY_LEFT           },
 	{ "right",   KEY_RIGHT          },
@@ -1015,7 +1015,7 @@ void Window::vInitConfig()
     snprintf(csPrefix, sizeof(csPrefix), "joypadSDL%d_", i);
     std::string sPrefix(csPrefix);
 
-    for (int j = 0; j < SDLBUTTONS_NUM; j++)
+    for (guint j = 0; j < G_N_ELEMENTS(m_astJoypad); j++)
     {
     	m_poInputConfig->vSetKey(sPrefix + m_astJoypad[j].m_csKey,
     			inputGetKeymap(PAD_DEFAULT, m_astJoypad[j].m_eKeyFlag));
@@ -1220,7 +1220,7 @@ void Window::vLoadJoypadsFromConfig()
     snprintf(csPrefix, sizeof(csPrefix), "joypadSDL%d_", i);
     std::string sPrefix(csPrefix);
 
-    for (int j = 0; j < SDLBUTTONS_NUM; j++)
+    for (guint j = 0; j < G_N_ELEMENTS(m_astJoypad); j++)
     {
     	inputSetKeymap((EPad)i, m_astJoypad[j].m_eKeyFlag,
     			m_poInputConfig->oGetKey<guint>(sPrefix + m_astJoypad[j].m_csKey));
@@ -1236,7 +1236,7 @@ void Window::vSaveJoypadsToConfig()
 	snprintf(csPrefix, sizeof(csPrefix), "joypadSDL%d_", i);
 	std::string sPrefix(csPrefix);
 
-	for (int j = 0; j < SDLBUTTONS_NUM; j++)
+	for (guint j = 0; j < G_N_ELEMENTS(m_astJoypad); j++)
 	{
 		m_poInputConfig->vSetKey(sPrefix + m_astJoypad[j].m_csKey,
 				inputGetKeymap((EPad)i, m_astJoypad[j].m_eKeyFlag));

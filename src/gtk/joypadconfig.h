@@ -33,8 +33,7 @@ namespace VBA
 class JoypadConfigDialog : public Gtk::Dialog
 {
 public:
-  JoypadConfigDialog(GtkDialog * _pstDialog,
-                     const Glib::RefPtr<Gnome::Glade::Xml> & _poXml);
+  JoypadConfigDialog();
   virtual ~JoypadConfigDialog();
 
   void vInitDialog(EPad _ePad);
@@ -46,10 +45,17 @@ protected:
   bool on_key_press_event(GdkEventKey * _pstEvent);
 
 private:
+  struct SJoypadKey
+  {
+	const EKey   m_eKeyFlag;
+	const char * m_csKeyName;
+  };
+
+  Gtk::Table                m_oTable;
   Gtk::Button *             m_poOkButton;
   std::vector<Gtk::Entry *> m_oEntries;
   gint                      m_iCurrentEntry;
-  static const EKey         m_aeKeys[];
+  static const SJoypadKey   m_astKeys[];
   sigc::connection          m_oConfigSig;
   SDL_Event                 m_oPreviousEvent;
   EPad                      m_ePad;
