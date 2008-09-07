@@ -20,8 +20,6 @@
 
 #include <SDL.h>
 
-#define SDLBUTTONS_NUM 14
-
 enum EKey {
     KEY_LEFT,
     KEY_RIGHT,

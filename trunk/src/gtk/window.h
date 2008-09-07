@@ -243,7 +243,7 @@ private:
   	const EKey   m_eKeyFlag;
   };
 
-  static const SJoypadKey m_astJoypad[SDLBUTTONS_NUM];
+  static const SJoypadKey m_astJoypad[];
 
   Gtk::MenuItem * m_apoLoadGameItem[10];
   Gtk::MenuItem * m_apoSaveGameItem[10];
