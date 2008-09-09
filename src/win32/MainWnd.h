@@ -78,7 +78,9 @@ protected:
 	afx_msg void OnClose();
 	afx_msg void OnHelpAbout();
 	afx_msg void OnHelpFaq();
-	afx_msg void OnFileOpen();
+	afx_msg void OnFileOpenGBA();
+	afx_msg void OnFileOpenGBC();
+	afx_msg void OnFileOpenGB();
 	afx_msg void OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
 	afx_msg void OnFilePause();
 	afx_msg void OnUpdateFilePause(CCmdUI* pCmdUI);
@@ -90,7 +92,6 @@ protected:
 	afx_msg void OnFileExit();
 	afx_msg void OnFileClose();
 	afx_msg void OnUpdateFileClose(CCmdUI* pCmdUI);
-	afx_msg void OnFileOpengameboy();
 	afx_msg void OnFileLoad();
 	afx_msg void OnUpdateFileLoad(CCmdUI* pCmdUI);
 	afx_msg void OnFileSave();
@@ -375,7 +376,6 @@ protected:
 	afx_msg void OnNcLButtonDown(UINT nHitTest, CPoint point);
 	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
 	afx_msg void OnEmulatorBiosfiles();
-	afx_msg void OnFileOpenGbc();
 	afx_msg void OnNcRButtonDown(UINT nHitTest, CPoint point);
 	afx_msg void OnUpdatePixelfilterMultiThreading(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateOptionsSelectPlugin(CCmdUI *pCmdUI);

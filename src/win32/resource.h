@@ -50,6 +50,7 @@
 #define IDS_TOOLTIP_ENHANCE_SOUND       43
 #define IDS_TOOLTIP_SURROUND            44
 #define IDS_TOOLTIP_DECLICKING          45
+#define IDS_FILTER_COMPRESSED_FILES     46
 #define IDI_MAINICON                    101
 #define IDD_REGISTERS                   102
 #define IDD_DEBUG                       103
@@ -316,7 +317,7 @@
 #define IDC_3X                          1092
 #define IDS_FILTER_BIOS                 1092
 #define IDC_4X                          1093
-#define IDS_FILTER_ROM                  1093
+#define IDS_FILTER_GBAROM               1093
 #define IDC_ROM_MAKER_NAME2             1093
 #define ID_PRINT                        1094
 #define IDS_FILTER_SGM                  1094
@@ -682,7 +683,7 @@
 #define ID_OPTIONS_VIDEO_LAYERS_WIN0    40132
 #define ID_OPTIONS_VIDEO_LAYERS_WIN1    40133
 #define ID_OPTIONS_VIDEO_LAYERS_OBJWIN  40134
-#define ID_FILE_OPENGAMEBOY             40135
+#define ID_FILE_OPEN_GB                 40135
 #define ID_DEBUG_NEXTFRAME              40137
 #define ID_TOOLS_MAPVIEW                40138
 #define ID_TOOLS_PALETTEVIEW            40139
@@ -856,7 +857,6 @@
 #define ID_RENDERAPI_MOTIONBLUR         40354
 #define ID_RENDERAPI_D3DMOTIONBLUR      40355
 #define ID_EMULATOR_BIOSFILES           40356
-#define ID_FILE_OPENGBC                 40357
 #define ID_FILE_OPEN_GBC                40358
 #define ID_OUTPUTAPI_XAUDIO2            40359
 #define ID_PIXELFILTER_MULTI            40360
@@ -865,13 +865,14 @@
 #define ID_OUTPUTAPI_CONFIGURATION40363 40363
 #define ID_OUTPUTAPI_XAUDIO2CONFIG      40364
 #define ID_AUDIO_CORE_SETTINGS          40365
+#define ID_FILE_OPEN_GBA                40366
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        165
-#define _APS_NEXT_COMMAND_VALUE         40366
+#define _APS_NEXT_COMMAND_VALUE         40367
 #define _APS_NEXT_CONTROL_VALUE         1297
 #define _APS_NEXT_SYMED_VALUE           103
 #endif

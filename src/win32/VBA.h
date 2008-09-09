@@ -283,8 +283,8 @@ class VBA : public CWinApp
   int doProtection();
 };
 
-    extern VBA theApp;
-	extern int emulating;
+extern VBA theApp;
+extern int emulating;
 
 #ifdef MMX
     extern "C" bool cpu_mmx;

@@ -75,7 +75,9 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_WM_CLOSE()
   ON_COMMAND(ID_HELP_ABOUT, OnHelpAbout)
   ON_COMMAND(ID_HELP_FAQ, OnHelpFaq)
-  ON_COMMAND(ID_FILE_OPEN, OnFileOpen)
+  ON_COMMAND(ID_FILE_OPEN_GBA, OnFileOpenGBA)
+  ON_COMMAND(ID_FILE_OPEN_GBC, OnFileOpenGBC)
+  ON_COMMAND(ID_FILE_OPEN_GB, OnFileOpenGB)
   ON_WM_INITMENUPOPUP()
   ON_COMMAND(ID_FILE_PAUSE, OnFilePause)
   ON_UPDATE_COMMAND_UI(ID_FILE_PAUSE, OnUpdateFilePause)
@@ -87,7 +89,6 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_COMMAND(ID_FILE_EXIT, OnFileExit)
   ON_COMMAND(ID_FILE_CLOSE, OnFileClose)
   ON_UPDATE_COMMAND_UI(ID_FILE_CLOSE, OnUpdateFileClose)
-  ON_COMMAND(ID_FILE_OPENGAMEBOY, OnFileOpengameboy)
   ON_COMMAND(ID_FILE_LOAD, OnFileLoad)
   ON_UPDATE_COMMAND_UI(ID_FILE_LOAD, OnUpdateFileLoad)
   ON_COMMAND(ID_FILE_SAVE, OnFileSave)
@@ -404,7 +405,6 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_WM_NCLBUTTONDOWN()
   ON_WM_WINDOWPOSCHANGING()
   ON_COMMAND(ID_EMULATOR_BIOSFILES, &MainWnd::OnEmulatorBiosfiles)
-  ON_COMMAND(ID_FILE_OPEN_GBC, &MainWnd::OnFileOpenGbc)
   ON_WM_NCRBUTTONDOWN()
   ON_COMMAND(ID_OUTPUTAPI_XAUDIO2, &MainWnd::OnOutputapiXaudio2)
   ON_UPDATE_COMMAND_UI(ID_OUTPUTAPI_XAUDIO2, &MainWnd::OnUpdateOutputapiXaudio2)
@@ -1041,7 +1041,7 @@ bool MainWnd::fileOpenSelect( int system )
 		if( (selectedFilter < 0) || (selectedFilter > 2) ) {
 			selectedFilter = 0;
 		}
-		filter = winLoadFilter( IDS_FILTER_ROM );
+		filter = winLoadFilter( IDS_FILTER_GBAROM );
 		break;
 	case 1:
 		// GBC
