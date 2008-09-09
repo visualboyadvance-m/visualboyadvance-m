@@ -51,7 +51,4 @@ private:
 
 	CString browseForDir(CString title);
 	bool directoryDoesExist(const char *directory);
-
-public:
-	BOOL m_alwaysLastRomDir;
 };

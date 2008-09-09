@@ -52,7 +52,6 @@ static int CALLBACK browseCallbackProc(HWND hWnd, UINT msg,
 
 Directories::Directories(CWnd* pParent /*=NULL*/)
   : CDialog(Directories::IDD, pParent)
-  , m_alwaysLastRomDir(FALSE)
 {
 }
 
@@ -66,7 +65,6 @@ void Directories::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_GBROM_PATH, m_gbromPath);
 	DDX_Control(pDX, IDC_CAPTURE_PATH, m_capturePath);
 	DDX_Control(pDX, IDC_BATTERY_PATH, m_batteryPath);
-	DDX_Check(pDX, IDC_ALWAYSLASTROMDIR, m_alwaysLastRomDir);
 }
 
 
