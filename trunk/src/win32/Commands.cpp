@@ -33,8 +33,9 @@ struct {
   const char *command;
   WORD id;
 } winAccelCommands[] = {
-  { "FileOpen", ID_FILE_OPEN },
-  { "FileOpenGameboy", ID_FILE_OPENGAMEBOY },
+  { "FileOpenGBA", ID_FILE_OPEN_GBA },
+  { "FileOpenGBC", ID_FILE_OPEN_GBC },
+  { "FileOpenGB", ID_FILE_OPEN_GB },
   { "FileLoad", ID_FILE_LOAD },
   { "FileSave", ID_FILE_SAVE },
   { "FileLoadGame01", ID_FILE_LOADGAME_SLOT1 },

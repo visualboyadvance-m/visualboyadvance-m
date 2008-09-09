@@ -1611,9 +1611,9 @@ IDR_MENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "Open GB...",                  ID_FILE_OPENGAMEBOY
+        MENUITEM "Open GBA...",                 ID_FILE_OPEN_GBA
         MENUITEM "Open GBC...",                 ID_FILE_OPEN_GBC
-        MENUITEM "Open GBA...",                 ID_FILE_OPEN
+        MENUITEM "Open GB...",                  ID_FILE_OPEN_GB
         MENUITEM SEPARATOR
         MENUITEM "Load...",                     ID_FILE_LOAD
         MENUITEM "Save...",                     ID_FILE_SAVE
@@ -2023,7 +2023,6 @@ BEGIN
     VK_F7,          ID_FILE_MRU_FILE7,      VIRTKEY, CONTROL, NOINVERT
     VK_F8,          ID_FILE_MRU_FILE8,      VIRTKEY, CONTROL, NOINVERT
     VK_F9,          ID_FILE_MRU_FILE9,      VIRTKEY, CONTROL, NOINVERT
-    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
     "P",            ID_FILE_PAUSE,          VIRTKEY, CONTROL, NOINVERT
     VK_PAUSE,       ID_FILE_PAUSE,          VIRTKEY, NOINVERT
     "R",            ID_FILE_RESET,          VIRTKEY, CONTROL, NOINVERT
@@ -2187,7 +2186,7 @@ BEGIN
     IDS_FAILED_TO_LOAD_LIBRARY "Failed to load library %s"
     IDS_FAILED_TO_GET_LOCINFO "Failed to get locale information"
     IDS_SELECT_CHEAT_LIST_NAME "Select cheat list name"
-    IDS_FILTER_ROM          "Game Boy Advance ROMs_*.GBA;*.AGB;*.BIN;*.ELF;*.MB;*.ZIP;*.7Z;*.Z;*.GZ__"
+    IDS_FILTER_GBAROM       "Game Boy Advance ROMs (*.GBA;*.AGB;*.BIN;*.ELF;*.MB;*.ZIP;*.7Z;*.Z;*.GZ)_*.GBA;*.AGB;*.BIN;*.ELF;*.MB;*.ZIP;*.7Z;*.Z;*.GZ__"
     IDS_FILTER_SGM          "VisualBoyAdvance Save Game_*.SGM__"
     IDS_FILTER_CHEAT_LIST   "VisualBoyAdvance Cheat List_*.CLT__"
     IDS_FILTER_PNG          "PNG Image_*.PNG_BMP Image_*.BMP__"
@@ -2231,7 +2230,7 @@ BEGIN
     IDS_ADD_CBA_CODE        "Add CodeBreakerAdvance code"
     IDS_FILTER_WAV          "Wave file_*.WAV__"
     IDS_SELECT_WAV_NAME     "Select wave file name"
-    IDS_FILTER_GBROM        "Game Boy ROMs_*.GB;*.SGB;*.ZIP;*.7Z;*.Z;*.GZ__"
+    IDS_FILTER_GBROM        "Game Boy ROMs (*.GB;*.SGB;*.ZIP;*.7Z;*.Z;*.GZ)_*.GB;*.SGB;*.ZIP;*.7Z;*.Z;*.GZ__"
     IDS_FILTER_PAL          "Windows Palette (*.PAL)_*.PAL_PaintShop Palette (*.PAL)_*.PAL_Adobe Color Table (*.ACT)_*.ACT__"
     IDS_SELECT_PALETTE_NAME "Select palette name:"
     IDS_SEARCH_PRODUCED_NO_RESULTS "Search produced no results."
@@ -2278,7 +2277,7 @@ BEGIN
     IDS_AVI_CANNOT_CREATE_AUDIO "Cannot create audio stream in AVI file."
     IDS_AVI_CANNOT_WRITE_VIDEO "Cannot write video frame to AVI file."
     IDS_AVI_CANNOT_WRITE_AUDIO "Cannot write audio frame to AVI file."
-    IDS_FILTER_GBCROM       "Game Boy Color ROMs_*.GBC;*.CGB;*.ZIP;*.7Z;*.Z;*.GZ__"
+    IDS_FILTER_GBCROM       "Game Boy Color ROMs (*.GBC;*.CGB;*.ZIP;*.7Z;*.Z;*.GZ)_*.GBC;*.CGB;*.ZIP;*.7Z;*.Z;*.GZ__"
     IDS_COM_FAILURE         "The COM (Component Object Model) failed to initialize!"
     IDS_XAUDIO2_FAILURE     "The XAudio2 interface failed to initialize!"
     IDS_XAUDIO2_CANNOT_CREATE_MASTERINGVOICE 
