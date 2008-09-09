@@ -1032,17 +1032,11 @@ bool MainWnd::fileOpenSelect( int system )
 	CString filter;
 	CString title;
 
-	if( theApp.alwaysLastDir ) {
-		initialDir = regQueryStringValue( _T("lastDir"), _T(".") );
-	}
-
 	switch( system )
 	{
 	case 0:
 		// GBA
-		if( !theApp.alwaysLastDir ) {
-			initialDir = regQueryStringValue( _T("romdir"), _T(".") );
-		}
+		initialDir = regQueryStringValue( _T("romdir"), _T(".") );
 		selectedFilter = regQueryDwordValue( _T("selectedFilter"), 0);
 		if( (selectedFilter < 0) || (selectedFilter > 2) ) {
 			selectedFilter = 0;
@@ -1051,17 +1045,13 @@ bool MainWnd::fileOpenSelect( int system )
 		break;
 	case 1:
 		// GBC
-		if( !theApp.alwaysLastDir ) {
-			initialDir = regQueryStringValue( _T("gbcromdir"), _T(".") );
-		}
+		initialDir = regQueryStringValue( _T("gbcromdir"), _T(".") );
 		// TODO: memorize selected filter for GBC as well
 		filter = winLoadFilter( IDS_FILTER_GBCROM );
 		break;
 	case 2:
 		// GB
-		if( !theApp.alwaysLastDir ) {
-			initialDir = regQueryStringValue( _T("gbromdir"), _T(".") );
-		}
+		initialDir = regQueryStringValue( _T("gbromdir"), _T(".") );
 		// TODO: memorize selected filter for GB as well
 		filter = winLoadFilter( IDS_FILTER_GBROM );
 		break;
