@@ -37,19 +37,30 @@
 #include "../dmg/gbCheats.h"
 #include "../dmg/gbGlobals.h"
 
-extern int emulating;
-
 extern void remoteCleanUp();
 extern void InterframeCleanup();
 
 
-void MainWnd::OnFileOpen()
+void MainWnd::OnFileOpenGBA()
 {
 	if( fileOpenSelect( 0 ) ) {
 		FileRun();
 	}
 }
 
+void MainWnd::OnFileOpenGBC()
+{
+	if( fileOpenSelect( 1 ) ) {
+		FileRun();
+	}
+}
+
+void MainWnd::OnFileOpenGB()
+{
+	if( fileOpenSelect( 2 ) ) {
+		FileRun();
+	}
+}
 
 void MainWnd::OnFilePause()
 {
@@ -162,23 +173,6 @@ void MainWnd::OnUpdateFileClose(CCmdUI* pCmdUI)
 {
   pCmdUI->Enable(emulating);
 }
-
-
-void MainWnd::OnFileOpengameboy()
-{
-	if( fileOpenSelect( 2 ) ) {
-		FileRun();
-	}
-}
-
-
-void MainWnd::OnFileOpenGbc()
-{
-	if( fileOpenSelect( 1 ) ) {
-		FileRun();
-	}
-}
-
 
 void MainWnd::OnFileLoad()
 {
