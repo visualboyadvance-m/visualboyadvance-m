@@ -50,7 +50,7 @@
 #define IDS_TOOLTIP_ENHANCE_SOUND       43
 #define IDS_TOOLTIP_SURROUND            44
 #define IDS_TOOLTIP_DECLICKING          45
-#define IDS_FILTER_COMPRESSED_FILES     46
+#define IDS_FILTER_ALLROM               46
 #define IDI_MAINICON                    101
 #define IDD_REGISTERS                   102
 #define IDD_DEBUG                       103
@@ -866,13 +866,14 @@
 #define ID_OUTPUTAPI_XAUDIO2CONFIG      40364
 #define ID_AUDIO_CORE_SETTINGS          40365
 #define ID_FILE_OPEN_GBA                40366
+#define ID_FILE_QUICKOPENROM            40367
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        165
-#define _APS_NEXT_COMMAND_VALUE         40367
+#define _APS_NEXT_COMMAND_VALUE         40368
 #define _APS_NEXT_CONTROL_VALUE         1297
 #define _APS_NEXT_SYMED_VALUE           103
 #endif

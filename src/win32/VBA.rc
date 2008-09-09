@@ -1611,9 +1611,19 @@ IDR_MENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
+        MENUITEM "Quick Open ROM...",           ID_FILE_QUICKOPENROM
+        MENUITEM SEPARATOR
         MENUITEM "Open GBA...",                 ID_FILE_OPEN_GBA
         MENUITEM "Open GBC...",                 ID_FILE_OPEN_GBC
         MENUITEM "Open GB...",                  ID_FILE_OPEN_GB
+        MENUITEM "Close",                       ID_FILE_CLOSE
+        MENUITEM SEPARATOR
+        POPUP "Recent"
+        BEGIN
+            MENUITEM "&Reset",                      ID_FILE_RECENT_RESET
+            MENUITEM "&Freeze",                     ID_FILE_RECENT_FREEZE
+            MENUITEM SEPARATOR
+        END
         MENUITEM SEPARATOR
         MENUITEM "Load...",                     ID_FILE_LOAD
         MENUITEM "Save...",                     ID_FILE_SAVE
@@ -1653,13 +1663,6 @@ BEGIN
         MENUITEM "Pause",                       ID_FILE_PAUSE
         MENUITEM "Reset",                       ID_FILE_RESET
         MENUITEM SEPARATOR
-        POPUP "Recent"
-        BEGIN
-            MENUITEM "&Reset",                      ID_FILE_RECENT_RESET
-            MENUITEM "&Freeze",                     ID_FILE_RECENT_FREEZE
-            MENUITEM SEPARATOR
-        END
-        MENUITEM SEPARATOR
         POPUP "Import"
         BEGIN
             MENUITEM "&Battery file...",            ID_FILE_IMPORT_BATTERYFILE
@@ -1675,8 +1678,6 @@ BEGIN
         MENUITEM "Screen Capture...",           ID_FILE_SCREENCAPTURE
         MENUITEM "ROM Information...",          ID_FILE_ROMINFORMATION
         MENUITEM "Toggle Fullscreen",           ID_FILE_TOGGLEMENU
-        MENUITEM SEPARATOR
-        MENUITEM "Close",                       ID_FILE_CLOSE
         MENUITEM SEPARATOR
         MENUITEM "Exit",                        ID_FILE_EXIT
     END
@@ -2216,6 +2217,7 @@ BEGIN
     IDS_TOOLTIP_ENHANCE_SOUND "Enable the following sound enhancements."
     IDS_TOOLTIP_SURROUND    "Inverts the phase of some channels, making it sound as if sound is coming from behind."
     IDS_TOOLTIP_DECLICKING  "When enabled, clicks are reduced by using GBA sound hardware. Note that clicks are normal for GB and GBC sound hardware."
+    IDS_FILTER_ALLROM       "All ROMs (*.GBA;*.AGB;*.BIN;*.ELF;*.MB;*.GBC;*.CGB;*.GB;*.SGB;*.ZIP;*.7Z;*.Z;*.GZ)_*.GBA;*.AGB;*.BIN;*.ELF;*.MB;*.GBC;*.CGB;*.GB;*.SGB;*.ZIP;*.7Z;*.Z;*.GZ_All Files (*.*)_*.*__"
 END
 
 STRINGTABLE 
