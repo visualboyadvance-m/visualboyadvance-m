@@ -539,7 +539,6 @@
 #define IDC_COMBO_REFRESH_RATE          1282
 #define IDC_COMBO_DEVICE                1283
 #define IDC_CHECK1                      1284
-#define IDC_ALWAYSLASTROMDIR            1284
 #define IDC_CHECK_UPMIX                 1284
 #define IDC_ENHANCE_SOUND               1284
 #define IDC_COMBO_DEV                   1285

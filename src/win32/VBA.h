@@ -127,7 +127,6 @@ class VBA : public CWinApp
   CString recentFiles[10];
   bool recentFreeze;
   bool autoSaveLoadCheatList;
-  bool alwaysLastDir;
   FILE *winout;
   bool removeIntros;
   bool autoIPS;
