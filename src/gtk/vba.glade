@@ -1045,48 +1045,6 @@
                               </widget>
                             </child>
                             <child>
-                              <widget class="GtkSeparatorMenuItem" id="separator18">
-                                <property name="visible">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="Joypad1">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_1</property>
-                                <property name="use_underline">True</property>
-                                <property name="active">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="Joypad2">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_2</property>
-                                <property name="use_underline">True</property>
-                                <property name="group">Joypad1</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="Joypad3">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_3</property>
-                                <property name="use_underline">True</property>
-                                <property name="group">Joypad1</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="Joypad4">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_4</property>
-                                <property name="use_underline">True</property>
-                                <property name="group">Joypad1</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkSeparatorMenuItem" id="separator24">
-                                <property name="visible">True</property>
-                              </widget>
-                            </child>
-                            <child>
                               <widget class="GtkMenuItem" id="AutofireMenu">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes">_Autofire</property>

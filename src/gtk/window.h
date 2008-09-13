@@ -160,7 +160,6 @@ protected:
   virtual void vOnFilter2xToggled(Gtk::CheckMenuItem * _poCMI, int _iFilter2x);
   virtual void vOnFilterIBToggled(Gtk::CheckMenuItem * _poCMI, int _iFilterIB);
   virtual void vOnJoypadConfigure();
-  virtual void vOnJoypadToggled(Gtk::CheckMenuItem * _poCMI, EPad _eJoypad);
   virtual void vOnAutofireToggled(Gtk::CheckMenuItem * _poCMI, EKey _eKey);
   virtual void vOnHelpAbout();
   virtual bool bOnEmuIdle();
