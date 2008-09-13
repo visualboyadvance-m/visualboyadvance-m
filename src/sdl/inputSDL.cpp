@@ -600,3 +600,8 @@ void inputSetDefaultJoypad(EPad pad)
 {
   sdlDefaultJoypad = pad;
 }
+
+EPad inputGetDefaultJoypad()
+{
+  return sdlDefaultJoypad;
+}

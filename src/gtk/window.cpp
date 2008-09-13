@@ -614,22 +614,8 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("JoypadConfigure"));
   poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnJoypadConfigure));
 
-  int iDefaultJoypad = m_poInputConfig->oGetKey<int>("active_joypad");
-  for (int i = m_iJoypadMin; i <= m_iJoypadMax; i++)
-  {
-    char csName[20];
-    snprintf(csName, sizeof(csName), "Joypad%d", i + 1);
-
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(csName));
-    if (i == iDefaultJoypad)
-    {
-      poCMI->set_active();
-      vOnJoypadToggled(poCMI, (EPad)iDefaultJoypad);
-    }
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnJoypadToggled),
-                                      poCMI, (EPad)i));
-  }
+  EPad eDefaultJoypad = (EPad)m_poInputConfig->oGetKey<int>("active_joypad");
+  inputSetDefaultJoypad(eDefaultJoypad);
 
   // Autofire menu
   //

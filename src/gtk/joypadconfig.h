@@ -28,6 +28,7 @@
 #include <gtkmm/entry.h>
 #include <gtkmm/comboboxtext.h>
 #include <gtkmm/separator.h>
+#include <gtkmm/checkbutton.h>
 
 #include "../sdl/inputSDL.h"
 
@@ -58,6 +59,7 @@ private:
   Gtk::Label                m_oTitleLabel;
   Gtk::ComboBoxText         m_oTitleCombo;
   Gtk::HSeparator           m_oSeparator;
+  Gtk::CheckButton          m_oDefaultJoypad;
   Gtk::Table                m_oTable;
   Gtk::Button *             m_poOkButton;
   std::vector<Gtk::Entry *> m_oEntries;
@@ -69,6 +71,7 @@ private:
 
   bool bOnConfigIdle();
   void vOnJoypadSelect();
+  void vOnDefaultJoypadSelect();
   void vUpdateEntries();
   void vEmptyEventQueue();
 };

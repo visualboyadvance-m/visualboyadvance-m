@@ -641,18 +641,8 @@ void Window::vOnJoypadConfigure()
   JoypadConfigDialog oDialog;
   oDialog.set_transient_for(*this);
   oDialog.run();
-}
 
-void Window::vOnJoypadToggled(Gtk::CheckMenuItem * _poCMI, EPad _eJoypad)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  inputSetDefaultJoypad(_eJoypad);
-
-  m_poInputConfig->vSetKey("active_joypad", _eJoypad);
+  m_poInputConfig->vSetKey("active_joypad", inputGetDefaultJoypad());
 }
 
 void Window::vOnAutofireToggled(Gtk::CheckMenuItem * _poCMI, EKey _eKey)
