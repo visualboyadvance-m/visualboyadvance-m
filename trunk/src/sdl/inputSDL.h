@@ -128,8 +128,14 @@ int inputGetSensorY();
 
 /**
  * Set which joypad configuration use when the core doesn't ask for a specific
- * pad
+ * @param pad Default pad
  */
 void inputSetDefaultJoypad(EPad pad);
+
+/**
+ * Get the default joypad
+ * pad
+ */
+EPad inputGetDefaultJoypad();
 
 #endif // VBAM_SDL_INPUT_H
