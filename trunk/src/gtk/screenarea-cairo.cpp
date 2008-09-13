@@ -18,8 +18,6 @@
 
 #include "screenarea-cairo.h"
 
-#include <string.h>
-
 namespace VBA
 {
 
@@ -82,7 +80,7 @@ void ScreenAreaCairo::vDrawPixels(u8 * _puiData)
 }
 
 bool ScreenAreaCairo::on_expose_event(GdkEventExpose * _pstEvent)
-{ 
+{
   DrawingArea::on_expose_event(_pstEvent);
   Cairo::RefPtr< Cairo::ImageSurface >   poImage;
   Cairo::RefPtr< Cairo::SurfacePattern > poPattern;
@@ -93,8 +91,8 @@ bool ScreenAreaCairo::on_expose_event(GdkEventExpose * _pstEvent)
   poContext = get_window()->create_cairo_context();
 
   poContext->set_identity_matrix();
-  poContext->scale(m_dScaleFactor, m_dScaleFactor);    
-  
+  poContext->scale(m_dScaleFactor, m_dScaleFactor);
+
   poImage = Cairo::ImageSurface::create((u8 *)m_puiPixels, Cairo::FORMAT_RGB24,
                                     m_iScaledWidth, m_iScaledHeight, iScaledPitch);
 
@@ -104,10 +102,10 @@ bool ScreenAreaCairo::on_expose_event(GdkEventExpose * _pstEvent)
   poPattern->set_matrix (oMatrix);
   poContext->set_source_rgb(0.0, 0.0, 0.0);
   poContext->paint();
-  
+
   poContext->set_source(poPattern);
-  poContext->paint(); 
-    
+  poContext->paint();
+
   return true;
 }
 
@@ -131,10 +129,10 @@ void ScreenAreaCairo::vUpdateSize()
   {
     delete[] m_puiDelta;
   }
-  
+
   m_iScaledWidth = m_iFilterScale * m_iWidth;
   m_iScaledHeight = m_iFilterScale * m_iHeight;
-  
+
   vOnWidgetResize();
 
   m_puiPixels = new u32[(m_iScaledWidth + 1) * m_iScaledHeight];
@@ -157,7 +155,7 @@ void ScreenAreaCairo::vOnWidgetResize()
 bool ScreenAreaCairo::on_configure_event(GdkEventConfigure * event)
 {
   vOnWidgetResize();
-  
+
   return true;
 }
 

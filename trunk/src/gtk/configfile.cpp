@@ -18,8 +18,6 @@
 
 #include "configfile.h"
 
-#include <string.h>
-
 #include <glibmm/fileutils.h>
 #include <glibmm/iochannel.h>
 

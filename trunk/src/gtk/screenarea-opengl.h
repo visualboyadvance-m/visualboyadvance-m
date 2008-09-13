@@ -21,7 +21,7 @@
 #define __VBA_SCREENAREA_OPENGL_H__
 
 #include "screenarea.h"
-#include <gtkglmm.h>
+#include <gtkmm/gl/widget.h>
 
 namespace VBA
 {
