@@ -611,21 +611,8 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 
   // Joypad menu
   //
-  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("JoypadConfigure1"));
-  poMI->signal_activate().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnJoypadConfigure), PAD_1));
-
-  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("JoypadConfigure2"));
-  poMI->signal_activate().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnJoypadConfigure), PAD_2));
-
-  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("JoypadConfigure3"));
-  poMI->signal_activate().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnJoypadConfigure), PAD_3));
-
-  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("JoypadConfigure4"));
-  poMI->signal_activate().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnJoypadConfigure), PAD_4));
+  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("JoypadConfigure"));
+  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnJoypadConfigure));
 
   int iDefaultJoypad = m_poInputConfig->oGetKey<int>("active_joypad");
   for (int i = m_iJoypadMin; i <= m_iJoypadMax; i++)
