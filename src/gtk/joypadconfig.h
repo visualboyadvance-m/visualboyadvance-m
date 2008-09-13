@@ -22,7 +22,12 @@
 
 #include <vector>
 
-#include <gtkmm.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/label.h>
+#include <gtkmm/table.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/comboboxtext.h>
+#include <gtkmm/separator.h>
 
 #include "../sdl/inputSDL.h"
 
@@ -32,7 +37,7 @@ namespace VBA
 class JoypadConfigDialog : public Gtk::Dialog
 {
 public:
-  JoypadConfigDialog(EPad _eJoypad);
+  JoypadConfigDialog();
   virtual ~JoypadConfigDialog();
 
 protected:
@@ -49,6 +54,11 @@ private:
 	const char * m_csKeyName;
   };
 
+  Gtk::HBox                 m_oTitleHBox;
+  Gtk::Label                m_oTitleLabel;
+  Gtk::ComboBoxText         m_oTitleCombo;
+  Gtk::HSeparator           m_oSeparator;
+  Gtk::Table                m_oTable;
   Gtk::Button *             m_poOkButton;
   std::vector<Gtk::Entry *> m_oEntries;
   gint                      m_iCurrentEntry;
@@ -57,8 +67,9 @@ private:
   SDL_Event                 m_oPreviousEvent;
   EPad                      m_ePad;
 
-  void vUpdateEntries();
   bool bOnConfigIdle();
+  void vOnJoypadSelect();
+  void vUpdateEntries();
   void vEmptyEventQueue();
 };
 

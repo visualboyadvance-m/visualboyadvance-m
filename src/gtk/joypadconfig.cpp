@@ -18,7 +18,7 @@
 
 #include "joypadconfig.h"
 
-#include <string.h>
+#include <gtkmm/stock.h>
 
 #include "intl.h"
 
@@ -41,40 +41,56 @@ const JoypadConfigDialog::SJoypadKey JoypadConfigDialog::m_astKeys[] =
     { KEY_BUTTON_CAPTURE, "Capture :"  }
 };
 
-JoypadConfigDialog::JoypadConfigDialog(EPad _eJoypad) :
+JoypadConfigDialog::JoypadConfigDialog() :
   Gtk::Dialog("Joypad config", true, true),
-  m_ePad(_eJoypad)
+  m_oTitleHBox(false, 5),
+  m_oTitleLabel("Joypad :", Gtk::ALIGN_RIGHT),
+  m_oTable(G_N_ELEMENTS(m_astKeys), 2, false),
+  m_ePad(PAD_MAIN)
 {
-  Gtk::Table * poTable = Gtk::manage( new Gtk::Table(G_N_ELEMENTS(m_astKeys), 2, false) );
-  poTable->set_border_width(5);
-  poTable->set_spacings(5);
-  get_vbox()->pack_start(* poTable);
+  // Joypad selection
+  m_oTitleCombo.append_text("1");
+  m_oTitleCombo.append_text("2");
+  m_oTitleCombo.append_text("3");
+  m_oTitleCombo.append_text("4");
 
+  m_oTitleHBox.pack_start(m_oTitleLabel, Gtk::PACK_SHRINK);
+  m_oTitleHBox.pack_start(m_oTitleCombo);
+
+  // Joypad buttons
   for (guint i = 0; i < G_N_ELEMENTS(m_astKeys); i++)
   {
     Gtk::Label * poLabel = Gtk::manage( new Gtk::Label(m_astKeys[i].m_csKeyName, Gtk::ALIGN_RIGHT) );
     Gtk::Entry * poEntry = Gtk::manage( new Gtk::Entry() );
-    poTable->attach(* poLabel, 0, 1, i, i + 1);
-    poTable->attach(* poEntry, 1, 2, i, i + 1);
+    m_oTable.attach(* poLabel, 0, 1, i, i + 1);
+    m_oTable.attach(* poEntry, 1, 2, i, i + 1);
     m_oEntries.push_back(poEntry);
 
     poEntry->signal_focus_in_event().connect(sigc::bind(
-                                               sigc::mem_fun(*this, &JoypadConfigDialog::bOnEntryFocusIn),
-                                               i));
+                                               sigc::mem_fun(*this, &JoypadConfigDialog::bOnEntryFocusIn), i));
     poEntry->signal_focus_out_event().connect(sigc::mem_fun(*this, &JoypadConfigDialog::bOnEntryFocusOut));
   }
 
+  // Dialog validation button
   m_poOkButton = add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
 
-  show_all_children();
+  // Layout
+  m_oTitleHBox.set_border_width(5);
+  m_oTable.set_border_width(5);
+  m_oTable.set_spacings(5);
+  get_vbox()->pack_start(m_oTitleHBox);
+  get_vbox()->pack_start(m_oSeparator);
+  get_vbox()->pack_start(m_oTable);
 
-  vEmptyEventQueue();
-  memset(&m_oPreviousEvent, 0, sizeof(m_oPreviousEvent));
-
+  // Signals and default values
   m_oConfigSig = Glib::signal_idle().connect(sigc::mem_fun(*this, &JoypadConfigDialog::bOnConfigIdle),
           Glib::PRIORITY_DEFAULT_IDLE);
 
-  vUpdateEntries();
+  m_oTitleCombo.signal_changed().connect(sigc::mem_fun(*this,
+              &JoypadConfigDialog::vOnJoypadSelect) );
+  m_oTitleCombo.set_active_text("1");
+
+  show_all_children();
 }
 
 JoypadConfigDialog::~JoypadConfigDialog()
@@ -222,6 +238,33 @@ void JoypadConfigDialog::vEmptyEventQueue()
   // Empty the SDL event queue
   SDL_Event event;
   while(SDL_PollEvent(&event));
+}
+
+void JoypadConfigDialog::vOnJoypadSelect()
+{
+  std::string oText = m_oTitleCombo.get_active_text();
+
+  if (oText == "1")
+  {
+    m_ePad = PAD_1;
+  }
+  else if (oText == "2")
+  {
+    m_ePad = PAD_2;
+  }
+  else if (oText == "3")
+  {
+    m_ePad = PAD_3;
+  }
+  else if (oText == "4")
+  {
+    m_ePad = PAD_4;
+  }
+
+  vEmptyEventQueue();
+  memset(&m_oPreviousEvent, 0, sizeof(m_oPreviousEvent));
+
+  vUpdateEntries();
 }
 
 } // namespace VBA

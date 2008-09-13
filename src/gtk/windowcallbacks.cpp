@@ -636,11 +636,10 @@ void Window::vOnFilterIBToggled(Gtk::CheckMenuItem * _poCMI, int _iFilterIB)
   m_poDisplayConfig->vSetKey("filterIB", _iFilterIB);
 }
 
-void Window::vOnJoypadConfigure(EPad _eJoypad)
+void Window::vOnJoypadConfigure()
 {
-  JoypadConfigDialog oDialog(_eJoypad);
+  JoypadConfigDialog oDialog;
   oDialog.set_transient_for(*this);
-
   oDialog.run();
 }
 
