@@ -805,7 +805,6 @@ void Window::vInitSystem()
 #endif
 
   systemColorDepth = 32;
-  systemDebug = 0;
   systemVerbose = 0;
   systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
   systemFrameSkip = 2;
@@ -1405,9 +1404,9 @@ void Window::vComputeFrameskip(int _iRate)
           iFrameskipAdjust--;
         }
 
-        if (iFrameskipAdjust <= -2)
+        if (iFrameskipAdjust <= -4)
         {
-          iFrameskipAdjust += 2;
+          iFrameskipAdjust = 0;
           if (systemFrameSkip < 9)
           {
             systemFrameSkip++;
@@ -1558,7 +1557,7 @@ void Window::vStartEmu()
   }
 
   m_oEmuSig = Glib::signal_idle().connect(sigc::mem_fun(*this, &Window::bOnEmuIdle),
-                                          Glib::PRIORITY_DEFAULT_IDLE);
+                                          Glib::PRIORITY_HIGH_IDLE + 30);
 }
 
 void Window::vStopEmu()
