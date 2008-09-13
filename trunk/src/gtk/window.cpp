@@ -686,6 +686,56 @@ Window::~Window()
   m_poInstance = NULL;
 }
 
+void Window::vInitColors(EColorFormat _eColorFormat)
+{
+  switch (_eColorFormat)
+  {
+    case ColorFormatBGR:
+#if G_BYTE_ORDER == G_LITTLE_ENDIAN
+      systemRedShift    = 3;
+      systemGreenShift  = 11;
+      systemBlueShift   = 19;
+      RGB_LOW_BITS_MASK = 0x00010101;
+#else
+      systemRedShift    = 27;
+      systemGreenShift  = 19;
+      systemBlueShift   = 11;
+      RGB_LOW_BITS_MASK = 0x01010100;
+#endif
+      break;
+    default:
+#if G_BYTE_ORDER == G_LITTLE_ENDIAN
+      systemRedShift    = 19;
+      systemGreenShift  = 11;
+      systemBlueShift   = 3;
+      RGB_LOW_BITS_MASK = 0x00010101;
+#else
+      systemRedShift    = 11;
+      systemGreenShift  = 19;
+      systemBlueShift   = 27;
+      RGB_LOW_BITS_MASK = 0x01010100;
+#endif
+      break;
+  }
+
+  for (int i = 0; i < 0x10000; i++)
+  {
+    systemColorMap32[i] = (((i & 0x1f) << systemRedShift)
+                           | (((i & 0x3e0) >> 5) << systemGreenShift)
+                           | (((i & 0x7c00) >> 10) << systemBlueShift));
+  }
+
+  for (int i = 0; i < 24; )
+  {
+    systemGbPalette[i++] = (0x1f) | (0x1f << 5) | (0x1f << 10);
+    systemGbPalette[i++] = (0x15) | (0x15 << 5) | (0x15 << 10);
+    systemGbPalette[i++] = (0x0c) | (0x0c << 5) | (0x0c << 10);
+    systemGbPalette[i++] = 0;
+  }
+
+  Init_2xSaI(32);
+}
+
 void Window::vInitScreenArea(EVideoOutput _eVideoOutput)
 {
   Gtk::Alignment * poC;
@@ -700,14 +750,17 @@ void Window::vInitScreenArea(EVideoOutput _eVideoOutput)
     {
 #ifdef USE_OPENGL
       case OutputOpenGL:
+        vInitColors(ColorFormatBGR);
         m_poScreenArea = Gtk::manage(new ScreenAreaGl(m_iScreenWidth, m_iScreenHeight));
         break;
 #endif // USE_OPENGL
       case OutputXvideo:
+        vInitColors(ColorFormatBGR);
         m_poScreenArea = Gtk::manage(new ScreenAreaXv(m_iScreenWidth, m_iScreenHeight));
         break;
       case OutputCairo:
       default:
+        vInitColors(ColorFormatRGB);
         m_poScreenArea = Gtk::manage(new ScreenAreaCairo(m_iScreenWidth, m_iScreenHeight));
         break;
     }
@@ -725,18 +778,6 @@ void Window::vInitScreenArea(EVideoOutput _eVideoOutput)
 
 void Window::vInitSystem()
 {
-#if G_BYTE_ORDER == G_LITTLE_ENDIAN
-  systemRedShift    = 3;
-  systemGreenShift  = 11;
-  systemBlueShift   = 19;
-  RGB_LOW_BITS_MASK = 0x00010101;
-#else
-  systemRedShift    = 27;
-  systemGreenShift  = 19;
-  systemBlueShift   = 11;
-  RGB_LOW_BITS_MASK = 0x01010100;
-#endif
-
   systemColorDepth = 32;
   systemVerbose = 0;
   systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
@@ -747,24 +788,7 @@ void Window::vInitSystem()
 
   emulating = 0;
 
-  for (int i = 0; i < 0x10000; i++)
-  {
-    systemColorMap32[i] = (((i & 0x1f) << systemRedShift)
-                           | (((i & 0x3e0) >> 5) << systemGreenShift)
-                           | (((i & 0x7c00) >> 10) << systemBlueShift));
-  }
-
   gbFrameSkip = 0;
-
-  for (int i = 0; i < 24; )
-  {
-    systemGbPalette[i++] = (0x1f) | (0x1f << 5) | (0x1f << 10);
-    systemGbPalette[i++] = (0x15) | (0x15 << 5) | (0x15 << 10);
-    systemGbPalette[i++] = (0x0c) | (0x0c << 5) | (0x0c << 10);
-    systemGbPalette[i++] = 0;
-  }
-
-  Init_2xSaI(32);
 
   soundInit();
 }
