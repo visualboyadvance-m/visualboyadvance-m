@@ -1,3 +1,9 @@
+vbam (0.svn701-1) hardy; urgency=low
+
+  * Updated VBA-M to r701
+
+ -- Bastien Bouclet <bgk@users.sourceforge.net>  Thu, 04 Sep 2008 23:10:32 +0200
+
 vbam (0.svn696-1) hardy; urgency=low
 
   * Updated VBA-M to r696
