@@ -38,20 +38,6 @@
 #include "intl.h"
 #include "joypadconfig.h"
 
-extern int systemRenderedFrames;
-extern int systemFPS;
-extern bool debugger;
-extern int RGB_LOW_BITS_MASK;
-extern void (*dbgMain)();
-extern void (*dbgSignal)(int, int);
-extern void remoteInit();
-extern void remoteCleanUp();
-extern void remoteStubMain();
-extern void remoteStubSignal(int, int);
-extern void remoteOutput(const char *, u32);
-extern void remoteSetProtocol(int);
-extern void remoteSetPort(int);
-
 namespace VBA
 {
 
@@ -914,160 +900,6 @@ void Window::vOnAutofireToggled(Gtk::CheckMenuItem * _poCMI, EKey _eKey)
   m_poInputConfig->vSetKey(sKey, _poCMI->get_active());
 }
 
-#ifndef NO_DEBUGGER
-void Window::vOnGDBWait()
-{
-  Glib::RefPtr<Xml> poXml;
-  poXml = Xml::create(PKGDATADIR "/vba.glade", "TcpPortDialog");
-
-  Gtk::Dialog * poDialog = dynamic_cast<Gtk::Dialog *>(poXml->get_widget("TcpPortDialog"));
-  Gtk::SpinButton * poSpin = dynamic_cast<Gtk::SpinButton *>(poXml->get_widget("TcpPortSpin"));
-
-  poDialog->set_transient_for(*this);
-
-  int iPort = 55555;
-  poSpin->set_value(iPort);
-
-  bool bOk = false;
-  if (poDialog->run() == Gtk::RESPONSE_OK)
-  {
-    bOk = true;
-    iPort = poSpin->get_value_as_int();
-  }
-  delete poDialog;
-
-  if (! bOk)
-  {
-    return;
-  }
-
-  m_eCartridge = CartridgeGBA;
-  m_sRomFile   = "gnu_stub";
-  m_stEmulator = GBASystem;
-
-  rom         = (u8 *) malloc(0x2000000);
-  workRAM     = (u8 *) calloc(1, 0x40000);
-  bios        = (u8 *) calloc(1, 0x4000);
-  internalRAM = (u8 *) calloc(1, 0x8000);
-  paletteRAM  = (u8 *) calloc(1, 0x400);
-  vram        = (u8 *) calloc(1, 0x20000);
-  oam         = (u8 *) calloc(1, 0x400);
-  pix         = (u8 *) calloc(1, 4 * m_iGBAScreenWidth * m_iGBAScreenHeight);
-  ioMem       = (u8 *) calloc(1, 0x400);
-
-  useBios = m_poCoreConfig->oGetKey<bool>("use_bios_file");
-  CPUInit(m_poCoreConfig->sGetKey("bios_file").c_str(), useBios);
-  CPUReset();
-
-  for (std::list<Gtk::Widget *>::iterator it = m_listSensitiveWhenPlaying.begin();
-       it != m_listSensitiveWhenPlaying.end();
-       it++)
-  {
-    (*it)->set_sensitive();
-  }
-
-  if (m_poCoreConfig->oGetKey<bool>("load_game_auto"))
-  {
-    vOnLoadGameMostRecent();
-  }
-
-  vStartEmu();
-
-  emulating = 1;
-
-  dbgMain   = remoteStubMain;
-  dbgSignal = remoteStubSignal;
-  dbgOutput = remoteOutput;
-  debugger  = true;
-
-  remoteSetProtocol(0);
-  remoteSetPort(iPort);
-  remoteInit();
-}
-
-void Window::vOnGDBLoadAndWait()
-{
-  bool bLoaded = false;
-
-  while (m_poFileOpenDialog->run() == Gtk::RESPONSE_OK)
-  {
-    if (bLoadROM(m_poFileOpenDialog->get_filename()))
-    {
-      bLoaded = true;
-      break;
-    }
-  }
-  m_poFileOpenDialog->hide();
-
-  if (! bLoaded)
-  {
-    return;
-  }
-
-  if (m_eCartridge != CartridgeGBA)
-  {
-    vPopupError(_("Only GBA images are supported."));
-    vOnFileClose();
-    return;
-  }
-
-  Glib::RefPtr<Xml> poXml;
-  poXml = Xml::create(PKGDATADIR "/vba.glade", "TcpPortDialog");
-
-  Gtk::Dialog * poDialog = dynamic_cast<Gtk::Dialog *>(poXml->get_widget("TcpPortDialog"));
-  Gtk::SpinButton * poSpin = dynamic_cast<Gtk::SpinButton *>(poXml->get_widget("TcpPortSpin"));
-
-  poDialog->set_transient_for(*this);
-
-  int iPort = 55555;
-  poSpin->set_value(iPort);
-
-  bool bOk = false;
-  if (poDialog->run() == Gtk::RESPONSE_OK)
-  {
-    bOk = true;
-    iPort = poSpin->get_value_as_int();
-  }
-  delete poDialog;
-
-  if (! bOk)
-  {
-    return;
-  }
-
-  dbgMain   = remoteStubMain;
-  dbgSignal = remoteStubSignal;
-  dbgOutput = remoteOutput;
-  debugger  = true;
-
-  remoteSetProtocol(0);
-  remoteSetPort(iPort);
-  remoteInit();
-}
-
-void Window::vOnGDBBreak()
-{
-  if (armState)
-  {
-    armNextPC -= 4;
-    reg[15].I -= 4;
-  }
-  else
-  {
-    armNextPC -= 2;
-    reg[15].I -= 2;
-  }
-
-  debugger = true;
-}
-
-void Window::vOnGDBDisconnect()
-{
-  remoteCleanUp();
-  debugger = false;
-}
-#endif //NO_DEBUGGER
-
 void Window::vOnHelpAbout()
 {
   Gtk::AboutDialog oAboutDialog;
@@ -1104,12 +936,6 @@ void Window::vOnHelpAbout()
 
 bool Window::bOnEmuIdle()
 {
-  if (debugger && m_stEmulator.emuHasDebugger)
-  {
-    dbgMain();
-    return true;
-  }
-
   if (m_uiThrottleDelay != Glib::TimeVal(0, 0))
   {
     Glib::TimeVal uiTime;
