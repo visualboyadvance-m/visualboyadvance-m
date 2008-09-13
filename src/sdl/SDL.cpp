@@ -1056,6 +1056,10 @@ void sdlWriteBackupStateExchange(int from, int to, int backup)
 
   systemConsoleMessage("Savestate store and backup committed"); // with timestamp and newline
   fprintf(stdout, "to slot %d, backup in %d, using temporary slot %d\n", to+1, backup+1, from+1);
+
+  free(stateNameOrig);
+  free(stateNameDest);
+  free(stateNameBack);
 }
 
 void sdlWriteBattery()
