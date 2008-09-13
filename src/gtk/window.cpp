@@ -18,10 +18,11 @@
 
 #include "window.h"
 
-#include <sys/stat.h>
+#include <gtkmm/stock.h>
+#include <gtkmm/alignment.h>
+#include <gtkmm/messagedialog.h>
 
-#include <stdio.h>
-#include <time.h>
+#include <sys/stat.h>
 
 #include <SDL.h>
 
