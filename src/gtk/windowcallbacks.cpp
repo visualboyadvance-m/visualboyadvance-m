@@ -41,8 +41,6 @@
 namespace VBA
 {
 
-using Gnome::Glade::Xml;
-
 void Window::vOnFileOpen()
 {
   while (m_poFileOpenDialog->run() == Gtk::RESPONSE_OK)
