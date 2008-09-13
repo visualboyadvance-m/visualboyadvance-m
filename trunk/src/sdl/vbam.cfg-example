@@ -138,9 +138,21 @@ captureFormat=0
 # 1=44 Khz, 2=22Khz, 4=11Khz
 soundQuality=2
 
-# Sound Echo
+# GB Sound Stereo
+# 0=false, anything else for true
+soundStereo=0
+
+# GB Sound Echo
 # 0=false, anything else for true
 soundEcho=0
+
+# GB Sound Surround
+# 0=false, anything else for true
+soundSurround=0
+
+# GB Sound Declicking
+# 0=false, anything else for true
+declicking=1
 
 # Save Type
 # 0=automatic, 1=EEPROM, 2=SRAM, 3=Flash, 4=EEPROM+Sensor, 5=NONE

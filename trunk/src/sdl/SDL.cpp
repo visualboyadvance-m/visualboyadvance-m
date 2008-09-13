@@ -46,6 +46,7 @@
 #include "../dmg/gb.h"
 #include "../dmg/gbGlobals.h"
 #include "../dmg/gbCheats.h"
+#include "../dmg/gbSound.h"
 #include "../Cheats.h"
 
 #include "debugger.h"
@@ -239,6 +240,10 @@ int sdlPreparedCheats	= 0;
 #define MAX_CHEATS 100
 const char * sdlPreparedCheatCodes[MAX_CHEATS];
 
+#define SDL_SOUND_MAX_VOLUME 2.0
+#define SDL_SOUND_ECHO       0.2
+#define SDL_SOUND_STEREO     0.15
+
 struct option sdlOptions[] = {
   { "agb-print", no_argument, &sdlAgbPrint, 1 },
   { "auto-frameskip", no_argument, &autoFrameSkip, 1 },
@@ -291,12 +296,11 @@ static void sdlChangeVolume(float d)
 	float newVolume = oldVolume + d;
 
 	if (newVolume < 0.0) newVolume = 0.0;
-	if (newVolume > 2.0) newVolume = 2.0;
+	if (newVolume > SDL_SOUND_MAX_VOLUME) newVolume = SDL_SOUND_MAX_VOLUME;
 
 	if (fabs(newVolume - oldVolume) > 0.001) {
 		char tmp[32];
-		if (newVolume < oldVolume) sprintf(tmp, "Sound volume decreased (%i%%)", (int)(newVolume*100.0+0.5));
-		else sprintf(tmp, "Sound volume increased (%i%%)", (int)(newVolume*100.0+0.5));
+		sprintf(tmp, "Volume: %i%%", (int)(newVolume*100.0+0.5));
 		systemScreenMessage(tmp);
 		soundSetVolume(newVolume);
 	}
@@ -361,7 +365,7 @@ u32 sdlFromHex(char *s)
 
 u32 sdlFromDec(char *s)
 {
-  u32 value;
+  u32 value = 0;
   sscanf(s, "%u", &value);
   return value;
 }
@@ -728,14 +732,28 @@ void sdlReadPreferences(FILE *f)
     } else if(!strcmp(key, "soundEnable")) {
       int res = sdlFromHex(value) & 0x30f;
       soundSetEnable(res);
+    } else if(!strcmp(key, "soundStereo")) {
+      if (sdlFromHex(value)) {
+        gb_effects_config.stereo = SDL_SOUND_STEREO;
+        gb_effects_config.enabled = true;
+      }
     } else if(!strcmp(key, "soundEcho")) {
-      /* TODO */
-      /* soundEcho = sdlFromHex(value) ? true : false; */
+      if (sdlFromHex(value)) {
+        gb_effects_config.echo = SDL_SOUND_ECHO;
+        gb_effects_config.enabled = true;
+      }
+    } else if(!strcmp(key, "soundSurround")) {
+      if (sdlFromHex(value)) {
+        gb_effects_config.surround = true;
+        gb_effects_config.enabled = true;
+      }
+    } else if(!strcmp(key, "declicking")) {
+      gbSoundSetDeclicking(sdlFromHex(value) != 0);
     } else if(!strcmp(key, "soundVolume")) {
-      int volume = sdlFromDec(value);
-      if (volume < 0 || volume > 200)
-        volume = 100;
-      soundSetVolume((float)(volume / 100.0f ));
+      float volume = sdlFromDec(value) / 100.0;
+      if (volume < 0.0 || volume > SDL_SOUND_MAX_VOLUME)
+        volume = 1.0;
+      soundSetVolume(volume);
     } else if(!strcmp(key, "saveType")) {
       cpuSaveType = sdlFromHex(value);
       if(cpuSaveType < 0 || cpuSaveType > 5)
@@ -1428,6 +1446,45 @@ void sdlPollEvents()
       case SDLK_KP_MULTIPLY:
         sdlChangeVolume(0.1);
         break;
+      case SDLK_KP_MINUS:
+        if (gb_effects_config.stereo > 0.0) {
+          gb_effects_config.stereo = 0.0;
+          if (gb_effects_config.echo == 0.0 && !gb_effects_config.surround) {
+            gb_effects_config.enabled = 0;
+          }
+          systemScreenMessage("Stereo off");
+        } else {
+          gb_effects_config.stereo = SDL_SOUND_STEREO;
+          gb_effects_config.enabled = true;
+          systemScreenMessage("Stereo on");
+        }
+        break;
+      case SDLK_KP_PLUS:
+        if (gb_effects_config.echo > 0.0) {
+          gb_effects_config.echo = 0.0;
+          if (gb_effects_config.stereo == 0.0 && !gb_effects_config.surround) {
+            gb_effects_config.enabled = false;
+          }
+          systemScreenMessage("Echo off");
+        } else {
+          gb_effects_config.echo = SDL_SOUND_ECHO;
+          gb_effects_config.enabled = true;
+          systemScreenMessage("Echo on");
+        }
+        break;
+      case SDLK_KP_ENTER:
+        if (gb_effects_config.surround) {
+          gb_effects_config.surround = false;
+          if (gb_effects_config.stereo == 0.0 && gb_effects_config.echo == 0.0) {
+            gb_effects_config.enabled = false;
+          }
+          systemScreenMessage("Surround off");
+        } else {
+          gb_effects_config.surround =true;
+          gb_effects_config.enabled = true;
+          systemScreenMessage("Surround on");
+        }
+        break;
 
       case SDLK_p:
         if(!(event.key.keysym.mod & MOD_NOCTRL) &&
@@ -1799,6 +1856,11 @@ int main(int argc, char **argv)
   gbBorderOn = 0;
 
   parseDebug = true;
+
+  gb_effects_config.stereo = 0.0;
+  gb_effects_config.echo = 0.0;
+  gb_effects_config.surround = false;
+  gb_effects_config.enabled = false;
 
   char buf[1024];
   struct stat s;
