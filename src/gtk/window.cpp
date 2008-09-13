@@ -44,15 +44,8 @@
 
 extern int systemRenderedFrames;
 extern int systemFPS;
-extern bool debugger;
 extern int RGB_LOW_BITS_MASK;
-extern void remoteInit();
-extern void remoteCleanUp();
-extern void remoteStubMain();
-extern void remoteStubSignal(int, int);
-extern void remoteOutput(const char *, u32);
-extern void remoteSetProtocol(int);
-extern void remoteSetPort(int);
+
 
 namespace VBA
 {
@@ -760,26 +753,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("VideoFullscreen"));
   poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnVideoFullscreen));
 
-  // GDB menu
-  //
-#ifndef NO_DEBUGGER
-  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("GdbWait"));
-  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnGDBWait));
-
-  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("GdbLoadAndWait"));
-  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnGDBLoadAndWait));
-
-  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("GdbBreak"));
-  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnGDBBreak));
-
-  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("GdbDisconnect"));
-  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnGDBDisconnect));
-#else
-  // Hide the whole Tools menu as it only contains the debugger stuff as of now
-  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("ToolsMenu"));
-  poMI->hide();
-#endif //NO_DEBUGGER
-
   // Help menu
   //
   poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("HelpAbout"));
@@ -879,7 +852,6 @@ void Window::vInitSystem()
   systemFPS = 0;
 
   emulating = 0;
-  debugger = false;
 
   for (int i = 0; i < 0x10000; i++)
   {
@@ -1344,7 +1316,6 @@ bool Window::bLoadROM(const std::string & _rsFile)
   vLoadBattery();
   vUpdateScreen();
 
-  debugger = false; // May cause conflicts
   emulating = 1;
   m_bWasEmulating = false;
   m_uiThrottleDelay = Glib::TimeVal(0, 0);
