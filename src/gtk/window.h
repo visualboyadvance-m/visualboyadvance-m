@@ -116,6 +116,12 @@ protected:
     EmulatorSGB2
   };
 
+  enum EColorFormat
+  {
+    ColorFormatRGB,
+    ColorFormatBGR
+  };
+
   enum EVideoOutput
   {
     OutputCairo,
@@ -258,6 +264,7 @@ private:
   void vInitSDL();
   void vInitConfig();
   void vCheckConfig();
+  void vInitColors(EColorFormat _eColorFormat);
   void vInitScreenArea(EVideoOutput _eVideoOutput);
   void vLoadConfig(const std::string & _rsFile);
   void vSaveConfig(const std::string & _rsFile);
