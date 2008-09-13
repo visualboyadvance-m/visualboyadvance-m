@@ -47,6 +47,7 @@ JoypadConfigDialog::JoypadConfigDialog() :
   m_oTitleLabel("Joypad :", Gtk::ALIGN_RIGHT),
   m_oDefaultJoypad("Default joypad"),
   m_oTable(G_N_ELEMENTS(m_astKeys), 2, false),
+  m_bUpdating(false),
   m_ePad(PAD_MAIN)
 {
   // Joypad selection
@@ -104,6 +105,7 @@ JoypadConfigDialog::~JoypadConfigDialog()
 
 void JoypadConfigDialog::vUpdateEntries()
 {
+  m_bUpdating = true;
   m_oDefaultJoypad.set_active(inputGetDefaultJoypad() == m_ePad);
 
   for (guint i = 0; i < m_oEntries.size(); i++)
@@ -155,6 +157,8 @@ void JoypadConfigDialog::vUpdateEntries()
       m_oEntries[i]->set_text(csName);
     }
   }
+
+  m_bUpdating = false;
 }
 
 bool JoypadConfigDialog::bOnEntryFocusIn(GdkEventFocus * _pstEvent,
@@ -275,6 +279,8 @@ void JoypadConfigDialog::vOnJoypadSelect()
 
 void JoypadConfigDialog::vOnDefaultJoypadSelect()
 {
+  if (m_bUpdating) return;
+
   if (m_oDefaultJoypad.get_active())
   {
     inputSetDefaultJoypad(m_ePad);

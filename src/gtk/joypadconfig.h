@@ -64,6 +64,7 @@ private:
   Gtk::Button *             m_poOkButton;
   std::vector<Gtk::Entry *> m_oEntries;
   gint                      m_iCurrentEntry;
+  bool                      m_bUpdating;
   static const SJoypadKey   m_astKeys[];
   sigc::connection          m_oConfigSig;
   SDL_Event                 m_oPreviousEvent;
