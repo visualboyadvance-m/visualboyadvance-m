@@ -21,9 +21,7 @@
 #define __VBA_CONFIGFILE_H__
 
 #include <list>
-#include <string>
 #include <sstream>
-#include <ostream>
 
 namespace VBA
 {

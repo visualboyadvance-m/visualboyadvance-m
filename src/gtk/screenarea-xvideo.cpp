@@ -22,7 +22,6 @@
 #include <gdk/gdkx.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <string.h>
 
 #include <X11/extensions/Xvlib.h>
 
@@ -52,17 +51,17 @@ ScreenAreaXv::ScreenAreaXv(int _iWidth, int _iHeight, int _iScale) :
   GdkWindow *pWindow = poWindow->gobj();
 
   m_pDisplay = gdk_x11_drawable_get_xdisplay(GDK_DRAWABLE(pWindow));
-  
+
   Glib::RefPtr<Gdk::Screen> poScreen = get_screen();
   Glib::RefPtr<Gdk::Window> poRoot = poScreen->get_root_window();
   pRoot = poRoot->gobj();
-  
+
   m_iXvPortId = -1;
-  XvQueryAdaptors(m_pDisplay, 
-                    GDK_WINDOW_XWINDOW(pRoot), 
+  XvQueryAdaptors(m_pDisplay,
+                    GDK_WINDOW_XWINDOW(pRoot),
                     &iNumAdaptors,
                     &pAdaptors);
-  
+
   for (unsigned int i = 0; i < iNumAdaptors; i++)
   {
     if (pAdaptors[i].type & XvInputMask &&
@@ -71,9 +70,9 @@ ScreenAreaXv::ScreenAreaXv(int _iWidth, int _iHeight, int _iScale) :
       m_iXvPortId = pAdaptors[i].base_id;
     }
   }
-  
+
   XvFreeAdaptorInfo(pAdaptors);
-  
+
   if (m_iXvPortId < 0)
   {
     fprintf (stderr, "Could not open Xv output port.\n");
@@ -90,7 +89,7 @@ ScreenAreaXv::ScreenAreaXv(int _iWidth, int _iHeight, int _iScale) :
 
   // Try to find an RGB format
   pFormats = XvListImageFormats(m_pDisplay, m_iXvPortId, &iNumFormats);
-  
+
   for (int i = 0; i < iNumFormats; i++)
   {
     if (pFormats[i].id == 0x3 || pFormats[i].type == XvRGB)
@@ -112,9 +111,9 @@ ScreenAreaXv::ScreenAreaXv(int _iWidth, int _iHeight, int _iScale) :
     if (!strcmp(pAttr[iAttr].name, "XV_AUTOPAINT_COLORKEY"))
     {
       Atom oAtom = XInternAtom(m_pDisplay, "XV_AUTOPAINT_COLORKEY", True);
-      if (oAtom != None) 
+      if (oAtom != None)
         XvSetPortAttribute(m_pDisplay, m_iXvPortId, oAtom, 1);
-      
+
       break;
     }
   }
@@ -125,7 +124,7 @@ ScreenAreaXv::ScreenAreaXv(int _iWidth, int _iHeight, int _iScale) :
 ScreenAreaXv::~ScreenAreaXv()
 {
   XShmDetach(m_pDisplay, &m_oShm);
-  
+
   if (m_puiPixels != NULL)
   {
     delete[] m_puiPixels;
@@ -197,7 +196,7 @@ void ScreenAreaXv::vUpdateSize()
 {
   const int iScaledWidth = m_iFilterScale * m_iWidth;
   const int iScaledHeight = m_iFilterScale * m_iHeight;
-  
+
   if (m_puiPixels != NULL)
   {
     delete[] m_puiPixels;
@@ -214,7 +213,7 @@ void ScreenAreaXv::vUpdateSize()
   }
 
   vOnWidgetResize();
-  
+
   m_pXvImage = XvShmCreateImage(m_pDisplay,
                               m_iXvPortId,
                               m_iFormat,
@@ -222,13 +221,13 @@ void ScreenAreaXv::vUpdateSize()
                               iScaledWidth + 4,
                               iScaledHeight + 4,
                               &m_oShm);
-  
+
   m_oShm.shmid = shmget(IPC_PRIVATE, m_pXvImage->data_size, IPC_CREAT | 0777);
   m_oShm.shmaddr = (char *) shmat(m_oShm.shmid, 0, 0);
-  m_oShm.readOnly = FALSE; 
-  
+  m_oShm.readOnly = FALSE;
+
   m_pXvImage->data = m_oShm.shmaddr;
-  
+
   XShmAttach(m_pDisplay, &m_oShm);
 
   m_puiPixels = new u32[iScaledWidth * iScaledHeight];
@@ -300,10 +299,10 @@ void ScreenAreaXv::vRGB32toYUY2 (unsigned char* dest_ptr,
 void ScreenAreaXv::vOnWidgetResize()
 {
   double dAspectRatio = m_iWidth / (double)m_iHeight;
-  
+
   m_iAreaHeight = min<int>(get_height(), get_width() / dAspectRatio);
   m_iAreaWidth = min<int>(get_width(), get_height() * dAspectRatio);
-  
+
   m_iAreaTop = (get_height() - m_iAreaHeight) / 2;
   m_iAreaLeft = (get_width() - m_iAreaWidth) / 2;
 }
@@ -311,7 +310,7 @@ void ScreenAreaXv::vOnWidgetResize()
 bool ScreenAreaXv::on_configure_event(GdkEventConfigure * event)
 {
   vOnWidgetResize();
-  
+
   return true;
 }
 

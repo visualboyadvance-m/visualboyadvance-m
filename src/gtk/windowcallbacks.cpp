@@ -18,10 +18,10 @@
 
 #include "window.h"
 
-#include <sys/stat.h>
-
-#include <stdio.h>
-#include <time.h>
+#include <gtkmm/stock.h>
+#include <gtkmm/messagedialog.h>
+#include <gtkmm/filechooserbutton.h>
+#include <gtkmm/aboutdialog.h>
 
 #include <SDL.h>
 

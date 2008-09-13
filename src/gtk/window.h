@@ -20,15 +20,12 @@
 #ifndef __VBA_WINDOW_H__
 #define __VBA_WINDOW_H__
 
-#include <sys/types.h>
-#include <stdarg.h>
-
-#include <gtkmm.h>
+#include <gtkmm/window.h>
+#include <gtkmm/checkmenuitem.h>
+#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/menubar.h>
+#include <gtkmm/recentchoosermenu.h>
 #include <libglademm.h>
-
-#include <string>
-#include <vector>
-#include <list>
 
 #include "../System.h"
 #include "../sdl/inputSDL.h"

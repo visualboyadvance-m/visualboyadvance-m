@@ -18,8 +18,6 @@
 
 #include "screenarea-opengl.h"
 
-#include <string.h>
-
 namespace VBA
 {
 
@@ -127,10 +125,10 @@ void ScreenAreaGl::vUpdateSize()
   {
     delete[] m_puiDelta;
   }
-  
+
   m_iScaledWidth = m_iFilterScale * m_iWidth;
   m_iScaledHeight = m_iFilterScale * m_iHeight;
-  
+
   vOnWidgetResize();
 
   m_puiPixels = new u32[(m_iScaledWidth + 1) * m_iScaledHeight];
@@ -145,7 +143,7 @@ void ScreenAreaGl::vOnWidgetResize()
 {
   m_dScaleFactor = min<double>(get_height() / (double)m_iScaledHeight, get_width() / (double)m_iScaledWidth);
   glViewport(0, 0, get_width(), get_height());
-  
+
   m_dAreaTop = 1 - m_dScaleFactor * m_iScaledHeight / (double)get_height();
   m_dAreaLeft = 1 - m_dScaleFactor * m_iScaledWidth / (double)get_width();
 }
@@ -153,7 +151,7 @@ void ScreenAreaGl::vOnWidgetResize()
 bool ScreenAreaGl::on_configure_event(GdkEventConfigure * event)
 {
   vOnWidgetResize();
-  
+
   return true;
 }
 
@@ -173,9 +171,9 @@ bool ScreenAreaGl::on_expose_event(GdkEventExpose * _pstEvent)
     glDrawPixels(m_iScaledWidth, m_iScaledHeight, GL_RGBA, GL_UNSIGNED_BYTE, m_puiPixels);
 
     glwindow->swap_buffers();
-    
+
   glwindow->gl_end();
-  
+
   return true;
 }
 
