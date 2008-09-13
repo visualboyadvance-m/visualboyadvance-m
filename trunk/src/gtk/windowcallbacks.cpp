@@ -497,55 +497,6 @@ void Window::vOnFrameskipToggled(Gtk::CheckMenuItem * _poCMI, int _iValue)
   }
 }
 
-void Window::vOnThrottleToggled(Gtk::CheckMenuItem * _poCMI, int _iPercent)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  vSetThrottle(_iPercent);
-
-  // Initialize the frameskip adjustment each time throttle is changed
-  if (m_bAutoFrameskip)
-  {
-    systemFrameSkip = 0;
-  }
-}
-
-void Window::vOnThrottleOther(Gtk::CheckMenuItem * _poCMI)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  Glib::RefPtr<Xml> poXml;
-  poXml = Xml::create(PKGDATADIR "/vba.glade", "ThrottleDialog");
-
-  Gtk::Dialog * poDialog = dynamic_cast<Gtk::Dialog *>(poXml->get_widget("ThrottleDialog"));
-  Gtk::SpinButton * poSpin = dynamic_cast<Gtk::SpinButton *>(poXml->get_widget("ThrottleSpin"));
-
-  poDialog->set_transient_for(*this);
-
-  if (systemThrottle != 0)
-  {
-    poSpin->set_value(systemThrottle);
-  }
-  else
-  {
-    poSpin->set_value(100);
-  }
-
-  if (poDialog->run() == Gtk::RESPONSE_OK)
-  {
-    vSetThrottle(poSpin->get_value_as_int());
-  }
-
-  delete poDialog;
-  vSelectBestThrottleItem();
-}
-
 void Window::vOnVideoFullscreen()
 {
   vToggleFullscreen();
@@ -936,22 +887,6 @@ void Window::vOnHelpAbout()
 
 bool Window::bOnEmuIdle()
 {
-  if (m_uiThrottleDelay != Glib::TimeVal(0, 0))
-  {
-    Glib::TimeVal uiTime;
-    uiTime.assign_current_time();
-
-    if (uiTime - m_uiThrottleLastTime >= m_uiThrottleDelay)
-    {
-      m_uiThrottleDelay = Glib::TimeVal(0, 0);
-      m_uiThrottleLastTime = uiTime;
-    }
-    else
-    {
-      return true;
-    }
-  }
-
   vSDLPollEvents();
 
   m_stEmulator.emuMain(m_stEmulator.emuCount);
