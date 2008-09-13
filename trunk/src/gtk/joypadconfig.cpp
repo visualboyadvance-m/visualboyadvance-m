@@ -41,17 +41,21 @@ const JoypadConfigDialog::SJoypadKey JoypadConfigDialog::m_astKeys[] =
     { KEY_BUTTON_CAPTURE, "Capture :"  }
 };
 
-JoypadConfigDialog::JoypadConfigDialog() :
+JoypadConfigDialog::JoypadConfigDialog(EPad _eJoypad) :
   Gtk::Dialog("Joypad config", true, true),
-  m_oTable(G_N_ELEMENTS(m_astKeys), 2, false),
-  m_ePad(PAD_MAIN)
+  m_ePad(_eJoypad)
 {
+  Gtk::Table * poTable = Gtk::manage( new Gtk::Table(G_N_ELEMENTS(m_astKeys), 2, false) );
+  poTable->set_border_width(5);
+  poTable->set_spacings(5);
+  get_vbox()->pack_start(* poTable);
+
   for (guint i = 0; i < G_N_ELEMENTS(m_astKeys); i++)
   {
     Gtk::Label * poLabel = Gtk::manage( new Gtk::Label(m_astKeys[i].m_csKeyName, Gtk::ALIGN_RIGHT) );
     Gtk::Entry * poEntry = Gtk::manage( new Gtk::Entry() );
-    m_oTable.attach(* poLabel, 0, 1, i, i + 1);
-    m_oTable.attach(* poEntry, 1, 2, i, i + 1);
+    poTable->attach(* poLabel, 0, 1, i, i + 1);
+    poTable->attach(* poEntry, 1, 2, i, i + 1);
     m_oEntries.push_back(poEntry);
 
     poEntry->signal_focus_in_event().connect(sigc::bind(
@@ -60,26 +64,16 @@ JoypadConfigDialog::JoypadConfigDialog() :
     poEntry->signal_focus_out_event().connect(sigc::mem_fun(*this, &JoypadConfigDialog::bOnEntryFocusOut));
   }
 
-  Gtk::VBox* poVBox = get_vbox();
-  poVBox->pack_start(m_oTable);
-
-  m_oTable.set_border_width(5);
-  m_oTable.set_spacings(5);
-
   m_poOkButton = add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
 
-  show_all();
+  show_all_children();
 
   vEmptyEventQueue();
   memset(&m_oPreviousEvent, 0, sizeof(m_oPreviousEvent));
 
   m_oConfigSig = Glib::signal_idle().connect(sigc::mem_fun(*this, &JoypadConfigDialog::bOnConfigIdle),
           Glib::PRIORITY_DEFAULT_IDLE);
-}
 
-void JoypadConfigDialog::vInitDialog(EPad _ePad)
-{
-  m_ePad = _ePad;
   vUpdateEntries();
 }
 

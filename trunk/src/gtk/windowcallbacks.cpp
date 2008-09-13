@@ -617,46 +617,52 @@ void Window::vOnLayerToggled(Gtk::CheckMenuItem * _poCMI, int _iLayer)
 
 void Window::vOnDirectories()
 {
-  Glib::RefPtr<Xml> poXml;
-  poXml = Xml::create(PKGDATADIR "/vba.glade", "DirectoriesDialog");
-
   struct
   {
     const char * m_csKey;
+    const char * m_csLabel;
     const char * m_csFileChooserButton;
+    Gtk::FileChooserButton * m_poFileChooserButton;
   }
   astRow[] =
   {
-    { "gba_roms",  "GBARomsDirEntry"   },
-    { "gb_roms",   "GBRomsDirEntry"    },
-    { "batteries", "BatteriesDirEntry" },
-    { "saves",     "SavesDirEntry"     },
-    { "captures",  "CapturesDirEntry"  }
+    { "gba_roms",  "GBA roms :",  "GBARomsDirEntry",   0 },
+    { "gb_roms",   "GB roms :",   "GBRomsDirEntry",    0 },
+    { "batteries", "Batteries :", "BatteriesDirEntry", 0 },
+    { "saves",     "Saves :",     "SavesDirEntry",     0 },
+    { "captures",  "Captures :",  "CapturesDirEntry",  0 }
   };
 
+  Gtk::Table oTable(G_N_ELEMENTS(astRow), 2, false);
+  oTable.set_border_width(5);
+  oTable.set_spacings(5);
+
   for (guint i = 0; i < G_N_ELEMENTS(astRow); i++)
   {
-    Gtk::FileChooserButton * poFileChooserButton = dynamic_cast<Gtk::FileChooserButton *>(poXml->get_widget(astRow[i].m_csFileChooserButton));
+    Gtk::Label * poLabel = Gtk::manage( new Gtk::Label(astRow[i].m_csLabel, Gtk::ALIGN_RIGHT) );
+    astRow[i].m_poFileChooserButton = Gtk::manage( new Gtk::FileChooserButton(Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER) );
+    astRow[i].m_poFileChooserButton->set_current_folder(m_poDirConfig->sGetKey(astRow[i].m_csKey));
 
-    poFileChooserButton->set_current_folder(m_poDirConfig->sGetKey(astRow[i].m_csKey));
+    oTable.attach(* poLabel, 0, 1, i, i + 1);
+    oTable.attach(* astRow[i].m_poFileChooserButton, 1, 2, i, i + 1);
   }
 
-  Gtk::Dialog * poDialog = dynamic_cast<Gtk::Dialog *>(poXml->get_widget("DirectoriesDialog"));
-  poDialog->set_transient_for(*this);
-  poDialog->run();
+  Gtk::Dialog oDialog("Directories", true, true);
+  oDialog.add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
+  oDialog.get_vbox()->pack_start(oTable);
+  oDialog.set_transient_for(*this);
+  oDialog.show_all_children();
+  oDialog.run();
 
   for (guint i = 0; i < G_N_ELEMENTS(astRow); i++)
   {
-    Gtk::FileChooserButton * poFileChooserButton = dynamic_cast<Gtk::FileChooserButton *>(poXml->get_widget(astRow[i].m_csFileChooserButton));
-    Glib::ustring sDir = poFileChooserButton->get_current_folder();
+    Glib::ustring sDir = astRow[i].m_poFileChooserButton->get_current_folder();
 
     m_poDirConfig->vSetKey(astRow[i].m_csKey, sDir);
   }
 
   // Needed if saves dir changed
   vUpdateGameSlots();
-
-  delete poDialog;
 }
 
 void Window::vOnPauseWhenInactiveToggled(Gtk::CheckMenuItem * _poCMI)
@@ -863,9 +869,8 @@ void Window::vOnFilterIBToggled(Gtk::CheckMenuItem * _poCMI, int _iFilterIB)
 
 void Window::vOnJoypadConfigure(EPad _eJoypad)
 {
-  JoypadConfigDialog oDialog;
+  JoypadConfigDialog oDialog(_eJoypad);
   oDialog.set_transient_for(*this);
-  oDialog.vInitDialog(_eJoypad);
 
   oDialog.run();
 }
