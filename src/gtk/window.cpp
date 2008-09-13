@@ -259,18 +259,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_poRecentMenu = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("RecentMenu"));
   m_poRecentMenu->set_submenu(static_cast<Gtk::Menu &>(*m_poRecentChooserMenu));
 
-  // Import menu
-  //
-  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("ImportBatteryFile"));
-  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnImportBatteryFile));
-  m_listSensitiveWhenPlaying.push_back(poMI);
-
-  // Export menu
-  //
-  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("ExportBatteryFile"));
-  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnExportBatteryFile));
-  m_listSensitiveWhenPlaying.push_back(poMI);
-
   // Frameskip menu
   //
   struct
@@ -342,35 +330,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
     poCMI->signal_toggled().connect(sigc::bind(
                                       sigc::mem_fun(*this, &Window::vOnVideoScaleToggled),
                                       poCMI, astVideoScale[i].m_iScale));
-  }
-
-  // Layers menu
-  //
-  struct
-  {
-    const char * m_csName;
-    const char * m_csKey;
-    const int    m_iLayer;
-  }
-  astLayer[] =
-  {
-    { "LayersBg0",    "layer_bg0",    0 },
-    { "LayersBg1",    "layer_bg1",    1 },
-    { "LayersBg2",    "layer_bg2",    2 },
-    { "LayersBg3",    "layer_bg3",    3 },
-    { "LayersObj",    "layer_obj",    4 },
-    { "LayersWin0",   "layer_win0",   5 },
-    { "LayersWin1",   "layer_win1",   6 },
-    { "LayersObjWin", "layer_objwin", 7 }
-  };
-  for (guint i = 0; i < G_N_ELEMENTS(astLayer); i++)
-  {
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astLayer[i].m_csName));
-    poCMI->set_active(m_poCoreConfig->oGetKey<bool>(astLayer[i].m_csKey));
-    vOnLayerToggled(poCMI, astLayer[i].m_iLayer);
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnLayerToggled),
-                                      poCMI, astLayer[i].m_iLayer));
   }
 
   // Emulator menu
@@ -899,14 +858,6 @@ void Window::vInitConfig()
   m_poCoreConfig = m_oConfig.poAddSection("Core");
   m_poCoreConfig->vSetKey("load_game_auto",    false        );
   m_poCoreConfig->vSetKey("frameskip",         "auto"       );
-  m_poCoreConfig->vSetKey("layer_bg0",         true         );
-  m_poCoreConfig->vSetKey("layer_bg1",         true         );
-  m_poCoreConfig->vSetKey("layer_bg2",         true         );
-  m_poCoreConfig->vSetKey("layer_bg3",         true         );
-  m_poCoreConfig->vSetKey("layer_obj",         true         );
-  m_poCoreConfig->vSetKey("layer_win0",        true         );
-  m_poCoreConfig->vSetKey("layer_win1",        true         );
-  m_poCoreConfig->vSetKey("layer_objwin",      true         );
   m_poCoreConfig->vSetKey("use_bios_file",     false        );
   m_poCoreConfig->vSetKey("bios_file",         ""           );
   m_poCoreConfig->vSetKey("save_type",         SaveAuto     );
@@ -1369,11 +1320,10 @@ void Window::vComputeFrameskip(int _iRate)
 
   if (m_bWasEmulating)
   {
-    int iWantedSpeed = 100;
-
     if (m_bAutoFrameskip)
     {
       Glib::TimeVal uiDiff = uiTime - uiLastTime;
+      const int iWantedSpeed = 100;
       int iSpeed = iWantedSpeed;
 
       if (uiDiff != Glib::TimeVal(0, 0))

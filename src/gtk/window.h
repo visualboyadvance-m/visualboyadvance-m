@@ -137,8 +137,6 @@ protected:
   virtual void vOnFilePauseToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnFileReset();
   virtual void vOnRecentFile();
-  virtual void vOnImportBatteryFile();
-  virtual void vOnExportBatteryFile();
   virtual void vOnFileScreenCapture();
   virtual void vOnFileClose();
   virtual void vOnFileExit();
@@ -146,7 +144,6 @@ protected:
   virtual void vOnVideoFullscreen();
   virtual void vOnVideoOutputToggled(Gtk::CheckMenuItem * _poCMI, int _iOutput);
   virtual void vOnVideoScaleToggled(Gtk::CheckMenuItem * _poCMI, int _iScale);
-  virtual void vOnLayerToggled(Gtk::CheckMenuItem * _poCMI, int _iLayer);
   virtual void vOnDirectories();
   virtual void vOnPauseWhenInactiveToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnSelectBios();

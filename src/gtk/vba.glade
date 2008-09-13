@@ -26,31 +26,83 @@
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkSeparatorMenuItem" id="separator1">
+                      <widget class="GtkMenuItem" id="RecentMenu">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Open rece_nt</property>
+                        <property name="use_underline">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separator4">
                         <property name="visible">True</property>
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="FileLoad">
+                      <widget class="GtkMenuItem" id="FileScreenCapture">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">_Load...</property>
+                        <property name="label" translatable="yes">Screen capt_ure...</property>
                         <property name="use_underline">True</property>
-                        <accelerator key="L" modifiers="GDK_CONTROL_MASK" signal="activate"/>
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="FileSave">
+                      <widget class="GtkSeparatorMenuItem" id="separator6">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">gtk-save-as</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="FileClose">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">gtk-close</property>
+                        <property name="use_stock">True</property>
                         <property name="use_underline">True</property>
-                	<property name="use_stock">True</property>
-                        <accelerator key="S" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="FileExit">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">gtk-quit</property>
+                        <property name="use_stock">True</property>
+                        <property name="use_underline">True</property>
+                        <accelerator key="X" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
+              </widget>
+            </child>
+            <child>
+              <widget class="GtkMenuItem" id="EmulationMenu">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">_Emulation</property>
+                <property name="use_underline">True</property>
+                <child>
+                  <widget class="GtkMenu" id="EmulationMenu_menu">
+                    <child>
+                      <widget class="GtkCheckMenuItem" id="FilePause">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">gtk-media-pause</property>
+                        <property name="use_stock">True</property>
+                        <property name="use_underline">True</property>
+                        <accelerator key="P" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="FileReset">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">_Reset</property>
+                        <property name="use_underline">True</property>
+                        <accelerator key="R" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separator3">
+                        <property name="visible">True</property>
                       </widget>
                     </child>
                     <child>
                       <widget class="GtkMenuItem" id="LoadGameMenu">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">Loa_d game</property>
+                        <property name="label" translatable="yes">Loa_d state</property>
                         <property name="use_underline">True</property>
                         <child>
                           <widget class="GtkMenu" id="LoadGameMenu_menu">
@@ -153,6 +205,14 @@
                                 <accelerator key="F10" modifiers="" signal="activate"/>
                               </widget>
                             </child>
+                            <child>
+                              <widget class="GtkMenuItem" id="FileLoad">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">From _File ...</property>
+                                <property name="use_underline">True</property>
+                                <accelerator key="L" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+                              </widget>
+                            </child>
                           </widget>
                         </child>
                       </widget>
@@ -160,7 +220,7 @@
                     <child>
                       <widget class="GtkMenuItem" id="SaveGameMenu">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">S_ave game</property>
+                        <property name="label" translatable="yes">S_ave state</property>
                         <property name="use_underline">True</property>
                         <child>
                           <widget class="GtkMenu" id="SaveGameMenu_menu">
@@ -256,117 +316,21 @@
                                 <accelerator key="F10" modifiers="GDK_SHIFT_MASK" signal="activate"/>
                               </widget>
                             </child>
-                          </widget>
-                        </child>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkSeparatorMenuItem" id="separator2">
-                        <property name="visible">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkCheckMenuItem" id="FilePause">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">gtk-media-pause</property>
-                        <property name="use_stock">True</property>
-                        <property name="use_underline">True</property>
-                        <accelerator key="P" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkMenuItem" id="FileReset">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">_Reset</property>
-                        <property name="use_underline">True</property>
-                        <accelerator key="R" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkSeparatorMenuItem" id="separator3">
-                        <property name="visible">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkMenuItem" id="RecentMenu">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Rece_nt</property>
-                        <property name="use_underline">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkSeparatorMenuItem" id="separator4">
-                        <property name="visible">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkMenuItem" id="ImportMenu">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">_Import</property>
-                        <property name="use_underline">True</property>
-                        <child>
-                          <widget class="GtkMenu" id="ImportMenu_menu">
                             <child>
-                              <widget class="GtkMenuItem" id="ImportBatteryFile">
+                              <widget class="GtkSeparatorMenuItem" id="separator25">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Battery file...</property>
+                              </widget>
+                            </child>
+                            <child>
+                              <widget class="GtkMenuItem" id="FileSave">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">To _File ...</property>
                                 <property name="use_underline">True</property>
+                                <accelerator key="S" modifiers="GDK_CONTROL_MASK" signal="activate"/>
                               </widget>
                             </child>
                           </widget>
                         </child>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkMenuItem" id="ExportMenu">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">E_xport</property>
-                        <property name="use_underline">True</property>
-                        <child>
-                          <widget class="GtkMenu" id="ExportMenu_menu">
-                            <child>
-                              <widget class="GtkMenuItem" id="ExportBatteryFile">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Battery file...</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                            </child>
-                          </widget>
-                        </child>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkSeparatorMenuItem" id="separator5">
-                        <property name="visible">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkMenuItem" id="FileScreenCapture">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Screen capt_ure...</property>
-                        <property name="use_underline">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkSeparatorMenuItem" id="separator6">
-                        <property name="visible">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkImageMenuItem" id="FileClose">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">gtk-close</property>
-                        <property name="use_stock">True</property>
-                        <property name="use_underline">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkImageMenuItem" id="FileExit">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">gtk-quit</property>
-                        <property name="use_stock">True</property>
-                        <property name="use_underline">True</property>
-                        <accelerator key="X" modifiers="GDK_CONTROL_MASK" signal="activate"/>
                       </widget>
                     </child>
                   </widget>
@@ -581,86 +545,6 @@
                                 <property name="label" translatable="yes">_6x</property>
                                 <property name="use_underline">True</property>
                                 <property name="group">Video1x</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkSeparatorMenuItem" id="separator9">
-                                <property name="visible">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkMenuItem" id="LayersMenu">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Layers</property>
-                                <property name="use_underline">True</property>
-                                <child>
-                                  <widget class="GtkMenu" id="LayersMenu_menu">
-                                    <child>
-                                      <widget class="GtkCheckMenuItem" id="LayersBg0">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">BG0</property>
-                                        <property name="use_underline">True</property>
-                                        <accelerator key="1" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkCheckMenuItem" id="LayersBg1">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">BG1</property>
-                                        <property name="use_underline">True</property>
-                                        <accelerator key="2" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkCheckMenuItem" id="LayersBg2">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">BG2</property>
-                                        <property name="use_underline">True</property>
-                                        <accelerator key="3" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkCheckMenuItem" id="LayersBg3">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">BG3</property>
-                                        <property name="use_underline">True</property>
-                                        <accelerator key="4" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkCheckMenuItem" id="LayersObj">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">OBJ</property>
-                                        <property name="use_underline">True</property>
-                                        <accelerator key="5" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkCheckMenuItem" id="LayersWin0">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">WIN0</property>
-                                        <property name="use_underline">True</property>
-                                        <accelerator key="6" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkCheckMenuItem" id="LayersWin1">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">WIN1</property>
-                                        <property name="use_underline">True</property>
-                                        <accelerator key="7" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkCheckMenuItem" id="LayersObjWin">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">OBJWIN</property>
-                                        <property name="use_underline">True</property>
-                                        <accelerator key="8" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                                      </widget>
-                                    </child>
-                                  </widget>
-                                </child>
                               </widget>
                             </child>
                           </widget>
@@ -1140,11 +1024,6 @@
                                 <property name="label" translatable="yes">_lq2x</property>
                                 <property name="use_underline">True</property>
                                 <property name="group">FilterNone</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkSeparatorMenuItem" id="separator17">
-                                <property name="visible">True</property>
                               </widget>
                             </child>
                           </widget>
