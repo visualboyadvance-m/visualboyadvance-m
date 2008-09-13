@@ -143,8 +143,6 @@ protected:
   virtual void vOnFileClose();
   virtual void vOnFileExit();
   virtual void vOnFrameskipToggled(Gtk::CheckMenuItem * _poCMI, int _iValue);
-  virtual void vOnThrottleToggled(Gtk::CheckMenuItem * _poCMI, int _iPercent);
-  virtual void vOnThrottleOther(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnVideoFullscreen();
   virtual void vOnVideoOutputToggled(Gtk::CheckMenuItem * _poCMI, int _iOutput);
   virtual void vOnVideoScaleToggled(Gtk::CheckMenuItem * _poCMI, int _iScale);
@@ -180,8 +178,6 @@ private:
   // Config limits
   const int m_iFrameskipMin;
   const int m_iFrameskipMax;
-  const int m_iThrottleMin;
-  const int m_iThrottleMax;
   const int m_iScaleMin;
   const int m_iScaleMax;
   const int m_iShowSpeedMin;
@@ -261,8 +257,6 @@ private:
   bool           m_bPaused;
   bool           m_bWasEmulating;
   bool           m_bAutoFrameskip;
-  Glib::TimeVal  m_uiThrottleLastTime;
-  Glib::TimeVal  m_uiThrottleDelay;
   EShowSpeed     m_eShowSpeed;
   ESoundQuality  m_eSoundQuality;
 
@@ -285,8 +279,6 @@ private:
   void vSaveBattery();
   void vStartEmu();
   void vStopEmu();
-  void vSetThrottle(int _iPercent);
-  void vSelectBestThrottleItem();
   void vUpdateGameSlots();
   void vToggleFullscreen();
   void vSDLPollEvents();

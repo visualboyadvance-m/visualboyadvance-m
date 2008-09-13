@@ -82,8 +82,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_iGBAScreenHeight(160),
   m_iFrameskipMin   (0),
   m_iFrameskipMax   (9),
-  m_iThrottleMin    (5),
-  m_iThrottleMax    (1000),
   m_iScaleMin       (1),
   m_iScaleMax       (6),
   m_iShowSpeedMin   (ShowNone),
@@ -315,42 +313,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
                                       sigc::mem_fun(*this, &Window::vOnFrameskipToggled),
                                       poCMI, astFrameskip[i].m_iFrameskip));
   }
-
-  // Throttle menu
-  //
-  struct
-  {
-    const char * m_csName;
-    const int    m_iThrottle;
-  }
-  astThrottle[] =
-  {
-    { "ThrottleNoThrottle",   0 },
-    { "Throttle25",          25 },
-    { "Throttle50",          50 },
-    { "Throttle100",        100 },
-    { "Throttle150",        150 },
-    { "Throttle200",        200 }
-  };
-  poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("ThrottleOther"));
-  poCMI->set_active();
-  poCMI->signal_activate().connect(sigc::bind(
-                                     sigc::mem_fun(*this, &Window::vOnThrottleOther),
-                                     poCMI));
-
-  int iDefaultThrottle = m_poCoreConfig->oGetKey<int>("throttle");
-  for (guint i = 0; i < G_N_ELEMENTS(astThrottle); i++)
-  {
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astThrottle[i].m_csName));
-    if (astThrottle[i].m_iThrottle == iDefaultThrottle)
-    {
-      poCMI->set_active();
-    }
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnThrottleToggled),
-                                      poCMI, astThrottle[i].m_iThrottle));
-  }
-  vSetThrottle(iDefaultThrottle);
 
   // Video menu
   //
@@ -938,7 +900,6 @@ void Window::vInitConfig()
   m_poCoreConfig = m_oConfig.poAddSection("Core");
   m_poCoreConfig->vSetKey("load_game_auto",    false        );
   m_poCoreConfig->vSetKey("frameskip",         "auto"       );
-  m_poCoreConfig->vSetKey("throttle",          0            );
   m_poCoreConfig->vSetKey("layer_bg0",         true         );
   m_poCoreConfig->vSetKey("layer_bg1",         true         );
   m_poCoreConfig->vSetKey("layer_bg2",         true         );
@@ -1044,16 +1005,6 @@ void Window::vCheckConfig()
     if (iValue != iAdjusted)
     {
       m_poCoreConfig->vSetKey("frameskip", iAdjusted);
-    }
-  }
-
-  iValue = m_poCoreConfig->oGetKey<int>("throttle");
-  if (iValue != 0)
-  {
-    iAdjusted = CLAMP(iValue, m_iThrottleMin, m_iThrottleMax);
-    if (iValue != iAdjusted)
-    {
-      m_poCoreConfig->vSetKey("throttle", iAdjusted);
     }
   }
 
@@ -1318,7 +1269,6 @@ bool Window::bLoadROM(const std::string & _rsFile)
 
   emulating = 1;
   m_bWasEmulating = false;
-  m_uiThrottleDelay = Glib::TimeVal(0, 0);
 
   if (m_eCartridge == CartridgeGBA)
   {
@@ -1422,21 +1372,6 @@ void Window::vComputeFrameskip(int _iRate)
   {
     int iWantedSpeed = 100;
 
-    if (systemThrottle > 0)
-    {
-      if (! speedup)
-      {
-        Glib::TimeVal uiDiff  = uiTime - m_uiThrottleLastTime;
-        Glib::TimeVal iTarget = Glib::TimeVal(0, 1000 / (_iRate * systemThrottle));
-        Glib::TimeVal iDelay  = iTarget - uiDiff;
-        if (iDelay > Glib::TimeVal(0, 0))
-        {
-          m_uiThrottleDelay = iDelay;
-        }
-      }
-      iWantedSpeed = systemThrottle;
-    }
-
     if (m_bAutoFrameskip)
     {
       Glib::TimeVal uiDiff = uiTime - uiLastTime;
@@ -1487,7 +1422,6 @@ void Window::vComputeFrameskip(int _iRate)
   }
 
   uiLastTime = uiTime;
-  m_uiThrottleLastTime = uiTime;
 }
 
 void Window::vCaptureScreen(int _iNum)
@@ -1631,39 +1565,6 @@ void Window::vStopEmu()
 {
   m_oEmuSig.disconnect();
   m_bWasEmulating = false;
-}
-
-void Window::vSetThrottle(int _iPercent)
-{
-  systemThrottle = _iPercent;
-  m_poCoreConfig->vSetKey("throttle", _iPercent);
-}
-
-void Window::vSelectBestThrottleItem()
-{
-  struct
-  {
-    const char * m_csName;
-    const int    m_iThrottle;
-  }
-  astThrottle[] =
-  {
-    { "ThrottleNoThrottle",   0 },
-    { "Throttle25",          25 },
-    { "Throttle50",          50 },
-    { "Throttle100",        100 },
-    { "Throttle150",        150 },
-    { "Throttle200",        200 }
-  };
-  for (guint i = 0; i < G_N_ELEMENTS(astThrottle); i++)
-  {
-    Gtk::CheckMenuItem * poCMI;
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(m_poXml->get_widget(astThrottle[i].m_csName));
-    if (astThrottle[i].m_iThrottle == systemThrottle)
-    {
-      poCMI->set_active();
-    }
-  }
 }
 
 void Window::vUpdateGameSlots()
