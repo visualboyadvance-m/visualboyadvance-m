@@ -22,7 +22,6 @@
 
 #include <vector>
 
-#include <libglademm.h>
 #include <gtkmm.h>
 
 #include "../sdl/inputSDL.h"
@@ -33,10 +32,9 @@ namespace VBA
 class JoypadConfigDialog : public Gtk::Dialog
 {
 public:
-  JoypadConfigDialog();
+  JoypadConfigDialog(EPad _eJoypad);
   virtual ~JoypadConfigDialog();
 
-  void vInitDialog(EPad _ePad);
 protected:
   bool bOnEntryFocusIn(GdkEventFocus * _pstEvent, guint _uiEntry);
   bool bOnEntryFocusOut(GdkEventFocus * _pstEvent);
@@ -51,7 +49,6 @@ private:
 	const char * m_csKeyName;
   };
 
-  Gtk::Table                m_oTable;
   Gtk::Button *             m_poOkButton;
   std::vector<Gtk::Entry *> m_oEntries;
   gint                      m_iCurrentEntry;
