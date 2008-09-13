@@ -36,7 +36,6 @@ int  systemRedShift;
 int  systemGreenShift;
 int  systemBlueShift;
 int  systemColorDepth;
-int  systemDebug;
 int  systemVerbose;
 int  systemSaveUpdateCounter;
 int  systemFrameSkip;
@@ -46,7 +45,6 @@ u16  systemGbPalette[24];
 int  systemThrottle = 0;
 
 int  emulating;
-bool debugger;
 int  RGB_LOW_BITS_MASK;
 
 // Extra vars, only used for the GUI
