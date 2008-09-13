@@ -63,17 +63,7 @@ void ScreenAreaCairo::vDrawPixels(u8 * _puiData)
   }
   else
   {
-    // TODO : Find a way to use systemXXXShift cleanly to avoid this loop
-    u32 * puiPixel = m_puiPixels;
-    u8 * puiSrc = _puiData + iSrcPitch;
-    for (int i = 0; i < (m_iWidth + 1) * m_iHeight; i++)
-    {
-      u8 iR = *puiSrc++;
-      u8 iG = *puiSrc++;
-      u8 iB = *puiSrc++;
-      puiSrc++;
-      *puiPixel++ = (iR << 16) + (iG << 8) + iB;
-    }
+    memcpy(m_puiPixels, _puiData + iSrcPitch, m_iHeight * iSrcPitch);
   }
 
   queue_draw();
