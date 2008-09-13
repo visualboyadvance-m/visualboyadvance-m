@@ -1363,56 +1363,6 @@
               </widget>
             </child>
             <child>
-              <widget class="GtkMenuItem" id="ToolsMenu">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">_Tools</property>
-                <property name="use_underline">True</property>
-                <child>
-                  <widget class="GtkMenu" id="ToolsMenu_menu">
-                    <child>
-                      <widget class="GtkMenuItem" id="GdbMenu">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">_GDB</property>
-                        <property name="use_underline">True</property>
-                        <child>
-                          <widget class="GtkMenu" id="GdbMenu_menu">
-                            <child>
-                              <widget class="GtkMenuItem" id="GdbWait">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Wait connection...</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkMenuItem" id="GdbLoadAndWait">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Load and wait...</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkMenuItem" id="GdbBreak">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Break</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkMenuItem" id="GdbDisconnect">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Disconnect</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                            </child>
-                          </widget>
-                        </child>
-                      </widget>
-                    </child>
-                  </widget>
-                </child>
-              </widget>
-            </child>
-            <child>
               <widget class="GtkMenuItem" id="HelpMenu">
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">gtk-help</property>
