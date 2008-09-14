@@ -18,6 +18,8 @@
 
 #include "screenarea-opengl.h"
 
+#include <cstring>
+
 namespace VBA
 {
 

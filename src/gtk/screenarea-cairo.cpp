@@ -18,6 +18,8 @@
 
 #include "screenarea-cairo.h"
 
+#include <cstring>
+
 namespace VBA
 {
 
