@@ -25,6 +25,8 @@
 
 #include <X11/extensions/Xvlib.h>
 
+#include <cstring>
+
 #define FOURCC_YUY2 0x32595559
 
 namespace VBA

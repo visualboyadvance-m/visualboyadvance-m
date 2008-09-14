@@ -18,6 +18,8 @@
 
 #include "screenarea.h"
 
+#include <cstring>
+
 namespace VBA
 {
 
