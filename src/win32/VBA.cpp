@@ -213,11 +213,6 @@ VBA::VBA()
   }
 
   // ! keep in mind that many of the following values will be really initialized in loadSettings()
-  mode320Available = false;
-  mode640Available = false;
-  mode800Available = false;
-  mode1024Available = false;
-  mode1280Available = false;
   maxCpuCores = 1;
   windowPositionX = 0;
   windowPositionY = 0;
@@ -335,7 +330,7 @@ VBA::VBA()
   frameskipadjust = 0;
   autoLoadMostRecent = false;
   winSkipSaveGameBattery = false;
-  fsMaxScale = 0;
+  maxScale = 0;
   romSize = 0;
   lastWindowed = VIDEO_3X;
   lastFullscreen = VIDEO_1024x768;
@@ -1750,7 +1745,7 @@ void VBA::loadSettings()
 
   cheatsEnabled = regQueryDwordValue("cheatsEnabled", false) ? true : false;
 
-  fsMaxScale = regQueryDwordValue("fsMaxScale", 0);
+  maxScale = regQueryDwordValue("maxScale", 0);
 
   updateThrottle( (unsigned short)regQueryDwordValue( "throttle", 0 ) );
 
@@ -1970,8 +1965,8 @@ void VBA::updateWindowSize(int value)
       scaleX = (fsWidth / sizeX);
       scaleY = (fsHeight / sizeY);
       int min = scaleX < scaleY ? scaleX : scaleY;
-      if(fsMaxScale)
-        min = min > fsMaxScale ? fsMaxScale : min;
+      if(maxScale)
+        min = min > maxScale ? maxScale : min;
       surfaceSizeX = min * sizeX;
       surfaceSizeY = min * sizeY;
       if((fullScreenStretch && (display != NULL &&
@@ -2661,7 +2656,7 @@ void VBA::saveSettings()
   regSetDwordValue("autoLoadMostRecent", autoLoadMostRecent);
   regSetDwordValue("winSkipSaveGameBattery", winSkipSaveGameBattery);
   regSetDwordValue("cheatsEnabled", cheatsEnabled);
-  regSetDwordValue("fsMaxScale", fsMaxScale);
+  regSetDwordValue("maxScale", maxScale);
   regSetDwordValue("throttle", throttle);
   regSetStringValue("pluginName", pluginName);
   regSetDwordValue("saveMoreCPU", Sm60FPS::bSaveMoreCPU);

@@ -269,68 +269,11 @@ void MainWnd::OnUpdateOptionsVideoX4(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(theApp.videoOption == VIDEO_4X);
 }
 
-void MainWnd::OnUpdateOptionsVideoFullscreen320x240(CCmdUI* pCmdUI)
-{
-  pCmdUI->Enable(theApp.mode320Available);
-  pCmdUI->SetCheck(theApp.videoOption == VIDEO_320x240);
-}
-
-void MainWnd::OnUpdateOptionsVideoFullscreen640x480(CCmdUI* pCmdUI)
-{
-  pCmdUI->Enable(theApp.mode640Available);
-  pCmdUI->SetCheck(theApp.videoOption == VIDEO_640x480);
-}
-
-void MainWnd::OnUpdateOptionsVideoFullscreen800x600(CCmdUI* pCmdUI)
-{
-  pCmdUI->Enable(theApp.mode800Available);
-  pCmdUI->SetCheck(theApp.videoOption == VIDEO_800x600);
-}
-
-void MainWnd::OnUpdateOptionsVideoFullscreen1024x768(CCmdUI *pCmdUI)
-{
-  pCmdUI->Enable(theApp.mode1024Available);
-  pCmdUI->SetCheck(theApp.videoOption == VIDEO_1024x768);
-}
-
-void MainWnd::OnUpdateOptionsVideoFullscreen1280x1024(CCmdUI *pCmdUI)
-{
-  pCmdUI->Enable(theApp.mode1280Available);
-  pCmdUI->SetCheck(theApp.videoOption == VIDEO_1280x1024);
-}
-
 BOOL MainWnd::OnOptionVideoSize(UINT nID)
 {
 	theApp.updateVideoSize(nID);
 	return TRUE;
 }
-
-
-void MainWnd::OnOptionsVideoFullscreen320x240()
-{
-  OnOptionVideoSize(ID_OPTIONS_VIDEO_FULLSCREEN320X240);
-}
-
-void MainWnd::OnOptionsVideoFullscreen640x480()
-{
-  OnOptionVideoSize(ID_OPTIONS_VIDEO_FULLSCREEN640X480);
-}
-
-void MainWnd::OnOptionsVideoFullscreen800x600()
-{
-  OnOptionVideoSize(ID_OPTIONS_VIDEO_FULLSCREEN800X600);
-}
-
-void MainWnd::OnOptionsVideoFullscreen1024x768()
-{
-	OnOptionVideoSize(ID_OPTIONS_VIDEO_FULLSCREEN1024X768);
-}
-
-void MainWnd::OnOptionsVideoFullscreen1280x1024()
-{
-	OnOptionVideoSize(ID_OPTIONS_VIDEO_FULLSCREEN1280X1024);
-}
-
 
 void MainWnd::OnOptionsVideoFullscreen()
 {
@@ -379,11 +322,7 @@ void MainWnd::OnUpdateOptionsVideoDisablesfx(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsVideoFullscreenstretchtofit()
 {
 	theApp.fullScreenStretch = !theApp.fullScreenStretch;
-	theApp.updateWindowSize( theApp.videoOption );
 	if( theApp.display ) {
-		if( emulating ) {
-			theApp.display->clear( );
-		}
 		theApp.display->setOption( _T("fullScreenStretch"), theApp.fullScreenStretch );
 	}
 }
@@ -1485,7 +1424,7 @@ void MainWnd::OnOptionsVideoFullscreenmaxscale()
   dlg.DoModal();
 
   if( theApp.display ) {
-	  theApp.display->setOption( _T("maxScale"), theApp.fsMaxScale );
+	  theApp.display->setOption( _T("maxScale"), theApp.maxScale );
   }
 }
 

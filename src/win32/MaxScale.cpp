@@ -70,7 +70,7 @@ void MaxScale::OnOk()
 {
   CString tmp;
   m_value.GetWindowText(tmp);
-  theApp.fsMaxScale = atoi(tmp);
+  theApp.maxScale = atoi(tmp);
   EndDialog(TRUE);
 }
 
@@ -80,7 +80,7 @@ BOOL MaxScale::OnInitDialog()
 
 	CString temp;
 
-  temp.Format("%d", theApp.fsMaxScale);
+  temp.Format("%d", theApp.maxScale);
 
   m_value.SetWindowText(temp);
 

@@ -1687,41 +1687,30 @@ BEGIN
         BEGIN
             POPUP "Render API"
             BEGIN
-                MENUITEM "Direct&3D",                   ID_OPTIONS_VIDEO_RENDERMETHOD_DIRECT3D
+                MENUITEM "Direct3D 9",                  ID_OPTIONS_VIDEO_RENDERMETHOD_DIRECT3D
                 MENUITEM "   Filter: Nearest",          ID_OPTIONS_VIDEO_RENDEROPTIONS_D3DNOFILTER
                 MENUITEM "   Filter: Bilinear",         ID_OPTIONS_VIDEO_RENDEROPTIONS_D3DBILINEAR
                 MENUITEM "   Motion Blur",              ID_RENDERAPI_D3DMOTIONBLUR
                 MENUITEM SEPARATOR
-                MENUITEM "&OpenGL",                     ID_OPTIONS_VIDEO_RENDERMETHOD_OPENGL
+                MENUITEM "OpenGL",                      ID_OPTIONS_VIDEO_RENDERMETHOD_OPENGL
                 MENUITEM "   Filter: Nearest",          ID_OPTIONS_VIDEO_RENDEROPTIONS_GLNEAREST
                 MENUITEM "   Filter: Bilinear",         ID_OPTIONS_VIDEO_RENDEROPTIONS_GLBILINEAR
                 MENUITEM SEPARATOR
-                MENUITEM "&VSync",                      ID_OPTIONS_VIDEO_VSYNC
+                MENUITEM "VSync",                       ID_OPTIONS_VIDEO_VSYNC
                 MENUITEM "Triple Buffering",            ID_OPTIONS_VIDEO_TRIPLEBUFFERING
             END
             MENUITEM SEPARATOR
-            POPUP "Windowed"
-            BEGIN
-                MENUITEM "&1x Size",                    ID_OPTIONS_VIDEO_X1
-                MENUITEM "&2x Size",                    ID_OPTIONS_VIDEO_X2
-                MENUITEM "&3x Size",                    ID_OPTIONS_VIDEO_X3
-                MENUITEM "&4x Size",                    ID_OPTIONS_VIDEO_X4
-            END
-            POPUP "Fullscreen"
-            BEGIN
-                MENUITEM "&Custom...",                  ID_OPTIONS_VIDEO_FULLSCREEN
-                MENUITEM SEPARATOR
-                MENUITEM "320x240x16",                  ID_OPTIONS_VIDEO_FULLSCREEN320X240
-                MENUITEM "640x480x16",                  ID_OPTIONS_VIDEO_FULLSCREEN640X480
-                MENUITEM "800x600x16",                  ID_OPTIONS_VIDEO_FULLSCREEN800X600
-                MENUITEM "1024x768x16",                 ID_OPTIONS_VIDEO_FULLSCREEN1024X768
-                MENUITEM "1280x1024x16",                ID_OPTIONS_VIDEO_FULLSCREEN1280X1024
-                MENUITEM SEPARATOR
-                MENUITEM "&Max Scale...",               ID_OPTIONS_VIDEO_FULLSCREENMAXSCALE
-                MENUITEM "Stretch to &fit",             ID_OPTIONS_VIDEO_FULLSCREENSTRETCHTOFIT
-            END
+            MENUITEM "1x window size",              ID_OPTIONS_VIDEO_X1
+            MENUITEM "2x window size",              ID_OPTIONS_VIDEO_X2
+            MENUITEM "3x window size",              ID_OPTIONS_VIDEO_X3
+            MENUITEM "4x window size",              ID_OPTIONS_VIDEO_X4
             MENUITEM SEPARATOR
-            MENUITEM "D&isable status messages",    ID_OPTIONS_EMULATOR_DISABLESTATUSMESSAGES
+            MENUITEM "Select fullscreen mode...",   ID_OPTIONS_VIDEO_FULLSCREEN
+            MENUITEM SEPARATOR
+            MENUITEM "Ignore aspect ratio",         ID_OPTIONS_VIDEO_FULLSCREENSTRETCHTOFIT
+            MENUITEM "Maximum magnification...",    ID_OPTIONS_VIDEO_FULLSCREENMAXSCALE
+            MENUITEM SEPARATOR
+            MENUITEM "Disable status messages",     ID_OPTIONS_EMULATOR_DISABLESTATUSMESSAGES
         END
         POPUP "&Pixel Filter"
         BEGIN
@@ -1783,7 +1772,7 @@ BEGIN
                 MENUITEM "OpenAL",                      ID_OUTPUTAPI_OPENAL
                 MENUITEM "  Configuration...",          ID_OUTPUTAPI_OALCONFIGURATION
                 MENUITEM SEPARATOR
-                MENUITEM "DirectSound",                 ID_OUTPUTAPI_DIRECTSOUND
+                MENUITEM "DirectSound 8",               ID_OUTPUTAPI_DIRECTSOUND
                 MENUITEM SEPARATOR
                 MENUITEM "&Sync game to audio",         ID_OPTIONS_EMULATOR_SYNCHRONIZE
             END
