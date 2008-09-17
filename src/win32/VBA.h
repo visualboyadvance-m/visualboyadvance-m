@@ -76,11 +76,6 @@ class VBA : public CWinApp
   CMenu m_menu;
   HMENU menu;
   HMENU popup;
-  bool mode320Available;
-  bool mode640Available;
-  bool mode800Available;
-  bool mode1024Available;
-  bool mode1280Available;
   unsigned int maxCpuCores; // maximum number of CPU cores VBA should use, 0 means auto-detect
   int windowPositionX;
   int windowPositionY;
@@ -203,7 +198,7 @@ class VBA : public CWinApp
   int frameskipadjust;
   bool autoLoadMostRecent;
   bool winSkipSaveGameBattery;
-  int fsMaxScale;
+  int maxScale;
   int romSize;
   VIDEO_SIZE lastWindowed;
   VIDEO_SIZE lastFullscreen;
