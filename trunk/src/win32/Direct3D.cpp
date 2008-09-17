@@ -263,36 +263,8 @@ bool Direct3DDisplay::initialize()
 		DXTRACE_ERR_MSGBOX( _T("Error creating Direct3D object"), 0 );
 		return false;
 	}
+
 	pD3D->GetAdapterDisplayMode(theApp.fsAdapter, &mode);
-
-	theApp.mode320Available = FALSE;
-	theApp.mode640Available = FALSE;
-	theApp.mode800Available = FALSE;
-	theApp.mode1024Available = FALSE;
-	theApp.mode1280Available = FALSE;
-
-	unsigned int nModes, i;
-	D3DDISPLAYMODE dm;
-
-	nModes = pD3D->GetAdapterModeCount(theApp.fsAdapter, mode.Format);
-	for( i = 0; i<nModes; i++ )
-	{
-		if( D3D_OK == pD3D->EnumAdapterModes(theApp.fsAdapter, mode.Format, i, &dm) )
-		{
-			if( (dm.Width == 320) && (dm.Height == 240) )
-				theApp.mode320Available = true;
-			if( (dm.Width == 640) && (dm.Height == 480) )
-				theApp.mode640Available = true;
-			if( (dm.Width == 800) && (dm.Height == 600) )
-				theApp.mode800Available = true;
-			if( (dm.Width == 1024) && (dm.Height == 768) )
-				theApp.mode1024Available = true;
-			if( (dm.Width == 1280) && (dm.Height == 1024) )
-				theApp.mode1280Available = true;
-		}
-	}
-
-
 	screenFormat = mode.Format;
 
 	switch(mode.Format) {
@@ -827,8 +799,8 @@ void Direct3DDisplay::calculateDestRect()
 		float scaleX = (float)dpp.BackBufferWidth / (float)width;
 		float scaleY = (float)dpp.BackBufferHeight / (float)height;
 		float min = (scaleX < scaleY) ? scaleX : scaleY;
-		if( theApp.fsMaxScale && (min > theApp.fsMaxScale) ) {
-			min = (float)theApp.fsMaxScale;
+		if( theApp.maxScale && (min > theApp.maxScale) ) {
+			min = (float)theApp.maxScale;
 		}
 		destRect.left = 0;
 		destRect.top = 0;

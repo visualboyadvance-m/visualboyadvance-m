@@ -143,12 +143,6 @@ protected:
 	afx_msg void OnUpdateOptionsVideoX2(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateOptionsVideoX3(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateOptionsVideoX4(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateOptionsVideoFullscreen320x240(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateOptionsVideoFullscreen640x480(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateOptionsVideoFullscreen800x600(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsVideoFullscreen320x240();
-	afx_msg void OnOptionsVideoFullscreen640x480();
-	afx_msg void OnOptionsVideoFullscreen800x600();
 	afx_msg void OnOptionsVideoFullscreen();
 	afx_msg void OnUpdateOptionsVideoFullscreen(CCmdUI* pCmdUI);
 	afx_msg void OnMove(int x, int y);
@@ -343,10 +337,6 @@ protected:
 	afx_msg void OnUpdateOptionsFilterLcdcolors(CCmdUI *pCmdUI);
 	afx_msg void OnOptionsSoundHardwareacceleration();
 	afx_msg void OnUpdateOptionsSoundHardwareacceleration(CCmdUI *pCmdUI);
-	afx_msg void OnOptionsVideoFullscreen1280x1024();
-	afx_msg void OnOptionsVideoFullscreen1024x768();
-	afx_msg void OnUpdateOptionsVideoFullscreen1024x768(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateOptionsVideoFullscreen1280x1024(CCmdUI *pCmdUI);
 	afx_msg void OnLinkOptions();
 	afx_msg void OnOptionsLinkLog() ;
 	afx_msg void OnUpdateOptionsLinkLog(CCmdUI* pCmdUI) ;

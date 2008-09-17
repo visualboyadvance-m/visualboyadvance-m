@@ -261,8 +261,8 @@ bool OpenGLDisplay::initialize()
 				float scaleX = (float)theApp.fsWidth / (float)theApp.sizeX;
 				float scaleY = (float)theApp.fsHeight / (float)theApp.sizeY;
 				float min = ( scaleX < scaleY ) ? scaleX : scaleY;
-				if( theApp.fsMaxScale )
-					min = ( min > (float)theApp.fsMaxScale ) ? (float)theApp.fsMaxScale : min;
+				if( theApp.maxScale )
+					min = ( min > (float)theApp.maxScale ) ? (float)theApp.maxScale : min;
 				theApp.surfaceSizeX = (int)((float)theApp.sizeX * min);
 				theApp.surfaceSizeY = (int)((float)theApp.sizeY * min);
 			}
@@ -310,12 +310,6 @@ bool OpenGLDisplay::initialize()
 	theApp.updateMenuBar();
 
 	theApp.adjustDestRect();
-	theApp.mode320Available = FALSE;
-	theApp.mode640Available = FALSE;
-	theApp.mode800Available = FALSE;
-	theApp.mode1024Available = FALSE;
-	theApp.mode1280Available = FALSE;
-
 
 	currentAdapter = theApp.fsAdapter;
 	DISPLAY_DEVICE dev;
@@ -483,8 +477,7 @@ void OpenGLDisplay::render()
 //resize screen
 void OpenGLDisplay::resize( int w, int h )
 {
-	initializeMatrices( w, h );
-	
+	initializeMatrices( w, h );	
 }
 
 //update filtering methods
@@ -627,8 +620,8 @@ void OpenGLDisplay::calculateDestRect( int w, int h )
 	float scaleX = (float)w / (float)width;
 	float scaleY = (float)h / (float)height;
 	float min = (scaleX < scaleY) ? scaleX : scaleY;
-	if( theApp.fsMaxScale && (min > theApp.fsMaxScale) ) {
-		min = (float)theApp.fsMaxScale;
+	if( theApp.maxScale && (min > theApp.maxScale) ) {
+		min = (float)theApp.maxScale;
 	}
 	destRect.left = 0;
 	destRect.top = 0;
@@ -659,11 +652,11 @@ void OpenGLDisplay::setOption( const char *option, int value )
 	}
 
 	if( !_tcscmp( option, _T("maxScale") ) ) {
-		initializeMatrices( theApp.dest.right, theApp.dest.bottom );
+		initializeMatrices( theApp.dest.right-theApp.dest.left, theApp.dest.bottom-theApp.dest.top );
 	}
 
 	if( !_tcscmp( option, _T("fullScreenStretch") ) ) {
-		initializeMatrices( theApp.dest.right, theApp.dest.bottom );
+		initializeMatrices( theApp.dest.right-theApp.dest.left, theApp.dest.bottom-theApp.dest.top );
 	}
 }
 
