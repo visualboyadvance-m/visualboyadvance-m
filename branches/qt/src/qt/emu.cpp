@@ -18,161 +18,161 @@ int systemColorDepth = 32;
 int systemDebug = 0;
 int systemVerbose = 0;
 
-void (*dbgSignal)( int sig, int number ) = debuggerSignal;
-void (*dbgOutput)( const char *s, u32 addr ) = debuggerOutput;
+void ( *dbgSignal )( int sig, int number ) = debuggerSignal;
+void ( *dbgOutput )( const char *s, u32 addr ) = debuggerOutput;
 
 
 bool systemReadJoypads()
 {
-	// TODO: implement
-	return false;
+    // TODO: implement
+    return false;
 }
 
 u32 systemReadJoypad( int which )
 {
-	// TODO: implement
-	return 0;
+    // TODO: implement
+    return 0;
 }
 
 void systemUpdateMotionSensor()
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 
 int systemGetSensorX()
 {
-	// TODO: implement
-	return 0;
+    // TODO: implement
+    return 0;
 }
 
 
 int systemGetSensorY()
 {
-	// TODO: implement
-	return 0;
+    // TODO: implement
+    return 0;
 }
 
 
 u32 systemGetClock()
 {
-	// TODO: implement
-	return 0;
+    // TODO: implement
+    return 0;
 }
 
 
 void systemMessage( int number, const char *defaultMsg, ... )
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 
 void systemScreenCapture( int captureNumber )
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 
 void systemDrawScreen()
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 
 void systemShowSpeed( int speed )
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 
 void system10Frames( int rate )
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 
 void systemFrame()
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 
 bool systemPauseOnFrame()
 {
-	// TODO: implement
-	return false;
+    // TODO: implement
+    return false;
 }
 
 
 void systemGbBorderOn()
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 
 void debuggerOutput( const char *s, u32 addr )
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 
-void debuggerSignal( int sig,int number )
+void debuggerSignal( int sig, int number )
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 
 void winlog( const char *msg, ... )
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 
 void systemWriteDataToSoundBuffer()
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 void systemSoundShutdown()
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 void systemSoundPause()
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 void systemSoundResume()
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 void systemSoundReset()
 {
-	// TODO: implement
+    // TODO: implement
 }
 
 bool systemSoundInit()
 {
-	// TODO: implement
-	return false;
+    // TODO: implement
+    return false;
 }
 
 bool systemCanChangeSoundQuality()
 {
-	// TODO: implement
-	return false;
+    // TODO: implement
+    return false;
 }
 
-void systemGbPrint(u8 *data,
-                   int pages,
-                   int feed,
-                   int palette,
-                   int contrast)
+void systemGbPrint( u8 *data,
+                    int pages,
+                    int feed,
+                    int palette,
+                    int contrast )
 {
-  //GBPrinterDlg printer;
-  //printer.processData(data);
-  //printer.DoModal();
+    //GBPrinterDlg printer;
+    //printer.processData(data);
+    //printer.DoModal();
 }
 

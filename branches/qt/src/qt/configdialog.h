@@ -5,19 +5,19 @@
 
 class ConfigDialog : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	ConfigDialog();
+    ConfigDialog();
 
 public slots:
-	void changePage( QListWidgetItem *current, QListWidgetItem *previous );
+    void changePage( QListWidgetItem *current, QListWidgetItem *previous );
 
 private:
-	void createIcons();
+    void createIcons();
 
-	QListWidget *contentsWidget;
-	QStackedWidget *pagesWidget;
+    QListWidget *contentsWidget;
+    QStackedWidget *pagesWidget;
 };
 
 #endif

@@ -1,11 +1,11 @@
 #ifndef EEPROM_H
 #define EEPROM_H
 
-void eepromSaveGame(gzFile _gzFile);
-void eepromReadGame(gzFile _gzFile, int version);
-void eepromReadGameSkip(gzFile _gzFile, int version);
-int eepromRead(u32 address);
-void eepromWrite(u32 address, u8 value);
+void eepromSaveGame( gzFile _gzFile );
+void eepromReadGame( gzFile _gzFile, int version );
+void eepromReadGameSkip( gzFile _gzFile, int version );
+int eepromRead( u32 address );
+void eepromWrite( u32 address, u8 value );
 void eepromInit();
 void eepromReset();
 

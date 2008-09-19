@@ -6,30 +6,29 @@
 // this class uses a QGLWidget with QPainter, which uses OpenGL acceleration if supported
 class GraphicsOutput : public QGLWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	GraphicsOutput( QWidget *parent );
-	~GraphicsOutput();
+    GraphicsOutput( QWidget *parent );
+    ~GraphicsOutput();
 
-	enum DISPLAY_API
-	{
-		NONE,
-		QPAINTER,
-		OPENGL
-	};
+    enum DISPLAY_API {
+        NONE,
+        QPAINTER,
+        OPENGL
+    };
 
-	bool setAPI( DISPLAY_API api );
-	DISPLAY_API getAPI();
+    bool setAPI( DISPLAY_API api );
+    DISPLAY_API getAPI();
 
 public slots:
-	void render();
+    void render();
 
 protected:
-	void paintEvent( QPaintEvent *event );
+    void paintEvent( QPaintEvent *event );
 
 private:
-	DISPLAY_API m_api;
+    DISPLAY_API m_api;
 };
 
 #endif // #ifndef GRAPHICSOUTPUT_H

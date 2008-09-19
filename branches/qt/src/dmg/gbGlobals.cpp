@@ -37,4 +37,4 @@ int gbBorderRowSkip = 0;
 int gbBorderColumnSkip = 0;
 int gbDmaTicks = 0;
 
-u8 (*gbSerialFunction)(u8) = NULL;
+u8( *gbSerialFunction )( u8 ) = NULL;

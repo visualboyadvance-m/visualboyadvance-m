@@ -5,34 +5,34 @@
 
 class VideoOptionsPage : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	VideoOptionsPage(QWidget *parent = 0);
+    VideoOptionsPage( QWidget *parent = 0 );
 };
 
 class InputOptionsPage : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	InputOptionsPage(QWidget *parent = 0);
+    InputOptionsPage( QWidget *parent = 0 );
 };
 
 class SoundOptionsPage : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	SoundOptionsPage(QWidget *parent = 0);
+    SoundOptionsPage( QWidget *parent = 0 );
 };
 
 class DirecOptionsPage : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	DirecOptionsPage(QWidget *parent = 0);
+    DirecOptionsPage( QWidget *parent = 0 );
 };
 
 #endif

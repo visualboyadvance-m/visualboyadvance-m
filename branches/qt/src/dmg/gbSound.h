@@ -29,28 +29,27 @@
 void gbSoundTick();
 void gbSoundPause();
 void gbSoundResume();
-void gbSoundEnable(int);
-void gbSoundDisable(int);
+void gbSoundEnable( int );
+void gbSoundDisable( int );
 int gbSoundGetEnable();
 void gbSoundReset();
-void gbSoundSaveGame(gzFile);
-void gbSoundReadGame(int,gzFile);
-void gbSoundEvent(register u16, register int);
-void gbSoundSetQuality(int);
+void gbSoundSaveGame( gzFile );
+void gbSoundReadGame( int, gzFile );
+void gbSoundEvent( register u16, register int );
+void gbSoundSetQuality( int );
 
-u8 gbSoundRead(u16 address);
+u8 gbSoundRead( u16 address );
 
 extern int soundTicks;
 extern int soundQuality;
 extern int SOUND_CLOCK_TICKS;
 
-struct gb_effects_config_t
-{
-	bool enabled;   // false = disable all effects
+struct gb_effects_config_t {
+    bool enabled;   // false = disable all effects
 
-	float echo;     // 0.0 = none, 1.0 = lots
-	float stereo;   // 0.0 = channels in center, 1.0 = channels on left/right
-	bool surround;  // true = put some channels in back
+    float echo;     // 0.0 = none, 1.0 = lots
+    float stereo;   // 0.0 = channels in center, 1.0 = channels on left/right
+    bool surround;  // true = put some channels in back
 };
 
 // Changes effects configuration

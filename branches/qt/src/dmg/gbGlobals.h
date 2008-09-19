@@ -70,8 +70,8 @@ extern int gbBorderColumnSkip;
 extern int gbDmaTicks;
 
 extern void gbRenderLine();
-extern void gbDrawSprites(bool);
+extern void gbDrawSprites( bool );
 
-extern u8 (*gbSerialFunction)(u8);
+extern u8( *gbSerialFunction )( u8 );
 
 #endif

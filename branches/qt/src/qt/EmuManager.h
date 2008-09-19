@@ -14,36 +14,36 @@
 class EmuManager
 {
 public:
-	enum SYSTEM_TYPE {
-		SYSTEM_UNKNOWN,
-		SYSTEM_GB,
-		SYSTEM_GBA
-	};
+    enum SYSTEM_TYPE {
+        SYSTEM_UNKNOWN,
+        SYSTEM_GB,
+        SYSTEM_GBA
+    };
 
-	EmuManager();
-	~EmuManager();
+    EmuManager();
+    ~EmuManager();
 
-	bool loadRom( const QString &filePath );
-	void unloadRom();
-	bool isRomLoaded();
-	QString getRomPath();
+    bool loadRom( const QString &filePath );
+    void unloadRom();
+    bool isRomLoaded();
+    QString getRomPath();
 
-	SYSTEM_TYPE getSystemType();
+    SYSTEM_TYPE getSystemType();
 
-	bool startEmulation();
-	void stopEmulation();
-	bool isEmulating();
-	void emulate(); // call to progress
+    bool startEmulation();
+    void stopEmulation();
+    bool isEmulating();
+    void emulate(); // call to progress
 
 
 private:
-	QString romPath;
-	unsigned char *romBuffer;
-	int romSize;
-	SYSTEM_TYPE systemType; // set by loadRom()
-	bool romLoaded;
-	bool emulating;
-	struct EmulatedSystem emuSys;
+    QString romPath;
+    unsigned char *romBuffer;
+    int romSize;
+    SYSTEM_TYPE systemType; // set by loadRom()
+    bool romLoaded;
+    bool emulating;
+    struct EmulatedSystem emuSys;
 };
 
 

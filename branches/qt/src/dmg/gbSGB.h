@@ -6,9 +6,9 @@ void gbSgbShutdown();
 void gbSgbCommand();
 void gbSgbResetPacketState();
 void gbSgbReset();
-void gbSgbDoBitTransfer(u8);
-void gbSgbSaveGame(gzFile);
-void gbSgbReadGame(gzFile, int version);
+void gbSgbDoBitTransfer( u8 );
+void gbSgbSaveGame( gzFile );
+void gbSgbReadGame( gzFile, int version );
 void gbSgbRenderBorder();
 
 extern u8  gbSgbATF[20*18];

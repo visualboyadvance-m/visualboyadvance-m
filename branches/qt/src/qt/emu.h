@@ -32,7 +32,7 @@ u32 systemGetClock();
 void systemMessage( int number, const char *defaultMsg, ... );
 void winlog( const char *msg, ... );
 
-void debuggerSignal( int sig,int number );
+void debuggerSignal( int sig, int number );
 void debuggerOutput( const char *s, u32 addr );
 
 bool systemPauseOnFrame();
@@ -51,11 +51,11 @@ void systemSoundReset();
 bool systemSoundInit();
 bool systemCanChangeSoundQuality();
 
-void systemGbPrint(u8 *data,
-                   int pages,
-                   int feed,
-                   int palette,
-                   int contrast);
+void systemGbPrint( u8 *data,
+                    int pages,
+                    int feed,
+                    int palette,
+                    int contrast );
 
 
 #endif // #ifndef EMU_H

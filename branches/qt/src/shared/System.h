@@ -27,71 +27,71 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 
 struct EmulatedSystem {
-  // main emulation function
-  void (*emuMain)(int);
-  // reset emulator
-  void (*emuReset)();
-  // clean up memory
-  void (*emuCleanUp)();
-  // load battery file
-  bool (*emuReadBattery)(const char *);
-  // write battery file
-  bool (*emuWriteBattery)(const char *);
-  // load state
-  bool (*emuReadState)(const char *);
-  // save state
-  bool (*emuWriteState)(const char *);
-  // load memory state (rewind)
-  bool (*emuReadMemState)(char *, int);
-  // write memory state (rewind)
-  bool (*emuWriteMemState)(char *, int);
-  // write PNG file
-  bool (*emuWritePNG)(const char *);
-  // write BMP file
-  bool (*emuWriteBMP)(const char *);
-  // emulator update CPSR (ARM only)
-  void (*emuUpdateCPSR)();
-  // emulator has debugger
-  bool emuHasDebugger;
-  // clock ticks to emulate
-  int emuCount;
+    // main emulation function
+    void ( *emuMain )( int );
+    // reset emulator
+    void ( *emuReset )();
+    // clean up memory
+    void ( *emuCleanUp )();
+    // load battery file
+    bool ( *emuReadBattery )( const char * );
+    // write battery file
+    bool ( *emuWriteBattery )( const char * );
+    // load state
+    bool ( *emuReadState )( const char * );
+    // save state
+    bool ( *emuWriteState )( const char * );
+    // load memory state (rewind)
+    bool ( *emuReadMemState )( char *, int );
+    // write memory state (rewind)
+    bool ( *emuWriteMemState )( char *, int );
+    // write PNG file
+    bool ( *emuWritePNG )( const char * );
+    // write BMP file
+    bool ( *emuWriteBMP )( const char * );
+    // emulator update CPSR (ARM only)
+    void ( *emuUpdateCPSR )();
+    // emulator has debugger
+    bool emuHasDebugger;
+    // clock ticks to emulate
+    int emuCount;
 };
 
-void log(const char *,...);
+void log( const char *, ... );
 
 bool systemPauseOnFrame();
-void systemGbPrint(u8 *,int,int,int,int);
-void systemScreenCapture(int);
+void systemGbPrint( u8 *, int, int, int, int );
+void systemScreenCapture( int );
 void systemDrawScreen();
 bool systemReadJoypads(); // updates the joystick data
-u32 systemReadJoypad(int); // return information about the given joystick, -1 for default joystick
+u32 systemReadJoypad( int ); // return information about the given joystick, -1 for default joystick
 u32 systemGetClock();
-void systemMessage(int, const char *, ...);
-void systemSetTitle(const char *);
+void systemMessage( int, const char *, ... );
+void systemSetTitle( const char * );
 void systemWriteDataToSoundBuffer();
 void systemSoundShutdown();
 void systemSoundPause();
 void systemSoundResume();
 void systemSoundReset();
 bool systemSoundInit();
-void systemScreenMessage(const char *);
+void systemScreenMessage( const char * );
 void systemUpdateMotionSensor();
 int  systemGetSensorX();
 int  systemGetSensorY();
 bool systemCanChangeSoundQuality();
-void systemShowSpeed(int);
-void system10Frames(int);
+void systemShowSpeed( int );
+void system10Frames( int );
 void systemFrame();
 void systemGbBorderOn();
 
 extern void Sm60FPS_Init();
 extern bool Sm60FPS_CanSkipFrame();
 extern void Sm60FPS_Sleep();
-extern void DbgMsg(const char *msg, ...);
-extern void winlog(const char *,...);
+extern void DbgMsg( const char *msg, ... );
+extern void winlog( const char *, ... );
 
-extern void (*dbgOutput)(const char *s, u32 addr);
-extern void (*dbgSignal)(int sig,int number);
+extern void ( *dbgOutput )( const char *s, u32 addr );
+extern void ( *dbgSignal )( int sig, int number );
 
 extern bool systemSoundOn;
 extern u16 systemColorMap16[0x10000];
