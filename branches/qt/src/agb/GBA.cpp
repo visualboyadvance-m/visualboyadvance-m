@@ -50,7 +50,7 @@
 #endif
 
 
-extern int emulating;
+extern bool emulating;
 #ifdef LINK_EMULATION
 extern int linktime;
 extern void StartLink(u16);
@@ -1288,7 +1288,7 @@ void CPUCleanUp()
 
   systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-  emulating = 0;
+  emulating = false;
 }
 
 int CPULoadRom(const char *szFile)

@@ -77,7 +77,7 @@ extern u8 register_WX;
 extern u8 register_VBK;
 extern u8 oldRegister_WY;
 
-extern int emulating;
+extern bool emulating;
 extern bool genericflashcardEnable;
 
 extern int gbBorderLineSkip;

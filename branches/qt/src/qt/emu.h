@@ -24,7 +24,7 @@
 
 
 // Global Variables
-extern int emulating;
+extern bool emulating;
 extern int systemFrameSkip;
 extern int systemSaveUpdateCounter;
 extern bool systemSoundOn;

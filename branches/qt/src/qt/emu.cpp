@@ -21,7 +21,7 @@
 #include "emu.h"
 
 
-int emulating = 0;
+bool emulating = false;
 int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 bool systemSoundOn = false;
