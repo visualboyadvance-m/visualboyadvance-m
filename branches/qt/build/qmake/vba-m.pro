@@ -192,9 +192,6 @@ SOURCES += $${M_DIR_AGB}GBA.cpp
 HEADERS += $${M_DIR_AGB}GBAGfx.h
 SOURCES += $${M_DIR_AGB}GBAGfx.cpp
 
-#HEADERS += $${M_DIR_AGB}GBALink.h
-#SOURCES += $${M_DIR_AGB}GBALink.cpp
-
 SOURCES += $${M_DIR_AGB}GBA-arm.cpp
 SOURCES += $${M_DIR_AGB}GBA-thumb.cpp
 
