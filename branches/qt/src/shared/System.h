@@ -57,7 +57,7 @@ struct EmulatedSystem {
     int emuCount;
 };
 
-void log( const char *, ... );
+void winlog( const char *, ... );
 
 bool systemPauseOnFrame();
 void systemGbPrint( u8 *, int, int, int, int );

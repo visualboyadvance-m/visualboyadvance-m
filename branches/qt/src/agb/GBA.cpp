@@ -1622,7 +1622,7 @@ void CPUSoftwareInterrupt( int comment )
     if ( useBios ) {
 #ifdef GBA_LOGGING
         if ( systemVerbose & VERBOSE_SWI ) {
-            log( "SWI: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
+            winlog( "SWI: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
                  armState ? armNextPC - 4 : armNextPC - 2,
                  reg[0].I,
                  reg[1].I,
@@ -1649,7 +1649,7 @@ void CPUSoftwareInterrupt( int comment )
     case 0x02:
 #ifdef GBA_LOGGING
         if ( systemVerbose & VERBOSE_SWI ) {
-            log( "Halt: (VCOUNT = %2d)\n",
+            winlog( "Halt: (VCOUNT = %2d)\n",
                  VCOUNT );
         }
 #endif
@@ -1660,7 +1660,7 @@ void CPUSoftwareInterrupt( int comment )
     case 0x03:
 #ifdef GBA_LOGGING
         if ( systemVerbose & VERBOSE_SWI ) {
-            log( "Stop: (VCOUNT = %2d)\n",
+            winlog( "Stop: (VCOUNT = %2d)\n",
                  VCOUNT );
         }
 #endif
@@ -1672,7 +1672,7 @@ void CPUSoftwareInterrupt( int comment )
     case 0x04:
 #ifdef GBA_LOGGING
         if ( systemVerbose & VERBOSE_SWI ) {
-            log( "IntrWait: 0x%08x,0x%08x (VCOUNT = %2d)\n",
+            winlog( "IntrWait: 0x%08x,0x%08x (VCOUNT = %2d)\n",
                  reg[0].I,
                  reg[1].I,
                  VCOUNT );
@@ -1683,7 +1683,7 @@ void CPUSoftwareInterrupt( int comment )
     case 0x05:
 #ifdef GBA_LOGGING
         if ( systemVerbose & VERBOSE_SWI ) {
-            log( "VBlankIntrWait: (VCOUNT = %2d)\n",
+            winlog( "VBlankIntrWait: (VCOUNT = %2d)\n",
                  VCOUNT );
         }
 #endif
@@ -1830,7 +1830,7 @@ void CPUSoftwareInterrupt( int comment )
     case 0x19:
 #ifdef GBA_LOGGING
         if ( systemVerbose & VERBOSE_SWI ) {
-            log( "SoundBiasSet: 0x%08x (VCOUNT = %2d)\n",
+            winlog( "SoundBiasSet: 0x%08x (VCOUNT = %2d)\n",
                  reg[0].I,
                  VCOUNT );
         }
@@ -1849,7 +1849,7 @@ void CPUSoftwareInterrupt( int comment )
     default:
 #ifdef GBA_LOGGING
         if ( systemVerbose & VERBOSE_SWI ) {
-            log( "SWI: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
+            winlog( "SWI: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
                  armState ? armNextPC - 4 : armNextPC - 2,
                  reg[0].I,
                  reg[1].I,
@@ -2000,7 +2000,7 @@ void CPUCheckDMA( int reason, int dmamask )
                 int count = ( DM0CNT_L ? DM0CNT_L : 0x4000 ) << 1;
                 if ( DM0CNT_H & 0x0400 )
                     count <<= 1;
-                log( "DMA0: s=%08x d=%08x c=%04x count=%08x\n", dma0Source, dma0Dest,
+                winlog( "DMA0: s=%08x d=%08x c=%04x count=%08x\n", dma0Source, dma0Dest,
                      DM0CNT_H,
                      count );
             }
@@ -2055,7 +2055,7 @@ void CPUCheckDMA( int reason, int dmamask )
             if ( reason == 3 ) {
 #ifdef GBA_LOGGING
                 if ( systemVerbose & VERBOSE_DMA1 ) {
-                    log( "DMA1: s=%08x d=%08x c=%04x count=%08x\n", dma1Source, dma1Dest,
+                    winlog( "DMA1: s=%08x d=%08x c=%04x count=%08x\n", dma1Source, dma1Dest,
                          DM1CNT_H,
                          16 );
                 }
@@ -2068,7 +2068,7 @@ void CPUCheckDMA( int reason, int dmamask )
                     int count = ( DM1CNT_L ? DM1CNT_L : 0x4000 ) << 1;
                     if ( DM1CNT_H & 0x0400 )
                         count <<= 1;
-                    log( "DMA1: s=%08x d=%08x c=%04x count=%08x\n", dma1Source, dma1Dest,
+                    winlog( "DMA1: s=%08x d=%08x c=%04x count=%08x\n", dma1Source, dma1Dest,
                          DM1CNT_H,
                          count );
                 }
@@ -2125,7 +2125,7 @@ void CPUCheckDMA( int reason, int dmamask )
 #ifdef GBA_LOGGING
                 if ( systemVerbose & VERBOSE_DMA2 ) {
                     int count = ( 4 ) << 2;
-                    log( "DMA2: s=%08x d=%08x c=%04x count=%08x\n", dma2Source, dma2Dest,
+                    winlog( "DMA2: s=%08x d=%08x c=%04x count=%08x\n", dma2Source, dma2Dest,
                          DM2CNT_H,
                          count );
                 }
@@ -2138,7 +2138,7 @@ void CPUCheckDMA( int reason, int dmamask )
                     int count = ( DM2CNT_L ? DM2CNT_L : 0x4000 ) << 1;
                     if ( DM2CNT_H & 0x0400 )
                         count <<= 1;
-                    log( "DMA2: s=%08x d=%08x c=%04x count=%08x\n", dma2Source, dma2Dest,
+                    winlog( "DMA2: s=%08x d=%08x c=%04x count=%08x\n", dma2Source, dma2Dest,
                          DM2CNT_H,
                          count );
                 }
@@ -2196,7 +2196,7 @@ void CPUCheckDMA( int reason, int dmamask )
                 int count = ( DM3CNT_L ? DM3CNT_L : 0x10000 ) << 1;
                 if ( DM3CNT_H & 0x0400 )
                     count <<= 1;
-                log( "DMA3: s=%08x d=%08x c=%04x count=%08x\n", dma3Source, dma3Dest,
+                winlog( "DMA3: s=%08x d=%08x c=%04x count=%08x\n", dma3Source, dma3Dest,
                      DM3CNT_H,
                      count );
             }

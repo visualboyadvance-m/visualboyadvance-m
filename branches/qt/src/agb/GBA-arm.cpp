@@ -28,6 +28,10 @@
 // Visual C's inline assembler treats "offset" as a reserved word, so we
 // tell it otherwise.  If you want to use it, write "OFFSET" in capitals.
 #define offset offset_
+#ifdef CONST
+    // for some reason windef.h gets included
+    #undef CONST
+#endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////
@@ -38,7 +42,7 @@ static INSN_REGPARM void armUnknownInsn( u32 opcode )
 {
 #ifdef GBA_LOGGING
     if ( systemVerbose & VERBOSE_UNDEFINED ) {
-        log( "Undefined ARM instruction %08x at %08x\n", opcode,
+        winlog( "Undefined ARM instruction %08x at %08x\n", opcode,
              armNextPC - 4 );
     }
 #endif

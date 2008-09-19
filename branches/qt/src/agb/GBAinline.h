@@ -47,7 +47,7 @@ static inline u32 CPUReadMemory( u32 address )
 #ifdef GBA_LOGGING
     if ( address & 3 ) {
         if ( systemVerbose & VERBOSE_UNALIGNED_MEMORY ) {
-            log( "Unaligned word read: %08x at %08x\n", address, armMode ?
+            winlog( "Unaligned word read: %08x at %08x\n", address, armMode ?
                  armNextPC - 4 : armNextPC - 2 );
         }
     }
@@ -60,7 +60,7 @@ static inline u32 CPUReadMemory( u32 address )
             if ( address < 0x4000 ) {
 #ifdef GBA_LOGGING
                 if ( systemVerbose & VERBOSE_ILLEGAL_READ ) {
-                    log( "Illegal word read: %08x at %08x\n", address, armMode ?
+                    winlog( "Illegal word read: %08x at %08x\n", address, armMode ?
                          armNextPC - 4 : armNextPC - 2 );
                 }
 #endif
@@ -121,7 +121,7 @@ static inline u32 CPUReadMemory( u32 address )
 unreadable:
 #ifdef GBA_LOGGING
         if ( systemVerbose & VERBOSE_ILLEGAL_READ ) {
-            log( "Illegal word read: %08x at %08x\n", address, armMode ?
+            winlog( "Illegal word read: %08x at %08x\n", address, armMode ?
                  armNextPC - 4 : armNextPC - 2 );
         }
 #endif
@@ -169,7 +169,7 @@ static inline u32 CPUReadHalfWord( u32 address )
 #ifdef GBA_LOGGING
     if ( address & 1 ) {
         if ( systemVerbose & VERBOSE_UNALIGNED_MEMORY ) {
-            log( "Unaligned halfword read: %08x at %08x\n", address, armMode ?
+            winlog( "Unaligned halfword read: %08x at %08x\n", address, armMode ?
                  armNextPC - 4 : armNextPC - 2 );
         }
     }
@@ -183,7 +183,7 @@ static inline u32 CPUReadHalfWord( u32 address )
             if ( address < 0x4000 ) {
 #ifdef GBA_LOGGING
                 if ( systemVerbose & VERBOSE_ILLEGAL_READ ) {
-                    log( "Illegal halfword read: %08x at %08x\n", address, armMode ?
+                    winlog( "Illegal halfword read: %08x at %08x\n", address, armMode ?
                          armNextPC - 4 : armNextPC - 2 );
                 }
 #endif
@@ -256,7 +256,7 @@ static inline u32 CPUReadHalfWord( u32 address )
 unreadable:
 #ifdef GBA_LOGGING
         if ( systemVerbose & VERBOSE_ILLEGAL_READ ) {
-            log( "Illegal halfword read: %08x at %08x\n", address, armMode ?
+            winlog( "Illegal halfword read: %08x at %08x\n", address, armMode ?
                  armNextPC - 4 : armNextPC - 2 );
         }
 #endif
@@ -295,7 +295,7 @@ static inline u8 CPUReadByte( u32 address )
             if ( address < 0x4000 ) {
 #ifdef GBA_LOGGING
                 if ( systemVerbose & VERBOSE_ILLEGAL_READ ) {
-                    log( "Illegal byte read: %08x at %08x\n", address, armMode ?
+                    winlog( "Illegal byte read: %08x at %08x\n", address, armMode ?
                          armNextPC - 4 : armNextPC - 2 );
                 }
 #endif
@@ -352,7 +352,7 @@ static inline u8 CPUReadByte( u32 address )
 unreadable:
 #ifdef GBA_LOGGING
         if ( systemVerbose & VERBOSE_ILLEGAL_READ ) {
-            log( "Illegal byte read: %08x at %08x\n", address, armMode ?
+            winlog( "Illegal byte read: %08x at %08x\n", address, armMode ?
                  armNextPC - 4 : armNextPC - 2 );
         }
 #endif
@@ -375,7 +375,7 @@ static inline void CPUWriteMemory( u32 address, u32 value )
 #ifdef GBA_LOGGING
     if ( address & 3 ) {
         if ( systemVerbose & VERBOSE_UNALIGNED_MEMORY ) {
-            log( "Unaligned word write: %08x to %08x from %08x\n",
+            winlog( "Unaligned word write: %08x to %08x from %08x\n",
                  value,
                  address,
                  armMode ? armNextPC - 4 : armNextPC - 2 );
@@ -427,7 +427,7 @@ static inline void CPUWriteMemory( u32 address, u32 value )
 unwritable:
 #ifdef GBA_LOGGING
         if ( systemVerbose & VERBOSE_ILLEGAL_WRITE ) {
-            log( "Illegal word write: %08x to %08x from %08x\n",
+            winlog( "Illegal word write: %08x to %08x from %08x\n",
                  value,
                  address,
                  armMode ? armNextPC - 4 : armNextPC - 2 );
@@ -442,7 +442,7 @@ static inline void CPUWriteHalfWord( u32 address, u16 value )
 #ifdef GBA_LOGGING
     if ( address & 1 ) {
         if ( systemVerbose & VERBOSE_UNALIGNED_MEMORY ) {
-            log( "Unaligned halfword write: %04x to %08x from %08x\n",
+            winlog( "Unaligned halfword write: %04x to %08x from %08x\n",
                  value,
                  address,
                  armMode ? armNextPC - 4 : armNextPC - 2 );
@@ -499,7 +499,7 @@ static inline void CPUWriteHalfWord( u32 address, u16 value )
 unwritable:
 #ifdef GBA_LOGGING
         if ( systemVerbose & VERBOSE_ILLEGAL_WRITE ) {
-            log( "Illegal halfword write: %04x to %08x from %08x\n",
+            winlog( "Illegal halfword write: %04x to %08x from %08x\n",
                  value,
                  address,
                  armMode ? armNextPC - 4 : armNextPC - 2 );
@@ -624,7 +624,7 @@ static inline void CPUWriteByte( u32 address, u8 b )
 unwritable:
 #ifdef GBA_LOGGING
         if ( systemVerbose & VERBOSE_ILLEGAL_WRITE ) {
-            log( "Illegal byte write: %02x to %08x from %08x\n",
+            winlog( "Illegal byte write: %02x to %08x from %08x\n",
                  b,
                  address,
                  armMode ? armNextPC - 4 : armNextPC - 2 );
