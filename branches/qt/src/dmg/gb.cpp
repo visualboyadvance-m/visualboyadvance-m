@@ -4019,6 +4019,11 @@ void gbCleanUp()
     }
   }
 
+  if(bios != NULL) {
+    free(bios);
+    bios = NULL;
+  }
+
   if(gbMemory != NULL) {
     free(gbMemory);
     gbMemory = NULL;
