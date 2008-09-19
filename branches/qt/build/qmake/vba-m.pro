@@ -186,9 +186,6 @@ SOURCES += $${M_DIR_AGB}agbprint.cpp
 HEADERS += $${M_DIR_AGB}GBA.h
 SOURCES += $${M_DIR_AGB}GBA.cpp
 
-#HEADERS += $${M_DIR_AGB}gbafilter.h
-#SOURCES += $${M_DIR_AGB}gbafilter.cpp
-
 HEADERS += $${M_DIR_AGB}GBAGfx.h
 SOURCES += $${M_DIR_AGB}GBAGfx.cpp
 
