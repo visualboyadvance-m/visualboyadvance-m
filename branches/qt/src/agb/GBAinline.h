@@ -410,21 +410,9 @@ static inline void CPUWriteMemory(u32 address, u32 value)
 
   switch(address >> 24) {
   case 0x02:
-#ifdef BKPT_SUPPORT
-    if(*((u32 *)&freezeWorkRAM[address & 0x3FFFC]))
-      cheatsWriteMemory(address & 0x203FFFC,
-                        value);
-    else
-#endif
       WRITE32LE(((u32 *)&workRAM[address & 0x3FFFC]), value);
     break;
   case 0x03:
-#ifdef BKPT_SUPPORT
-    if(*((u32 *)&freezeInternalRAM[address & 0x7ffc]))
-      cheatsWriteMemory(address & 0x3007FFC,
-                        value);
-    else
-#endif
       WRITE32LE(((u32 *)&internalRAM[address & 0x7ffC]), value);
     break;
   case 0x04:
@@ -434,12 +422,6 @@ static inline void CPUWriteMemory(u32 address, u32 value)
     } else goto unwritable;
     break;
   case 0x05:
-#ifdef BKPT_SUPPORT
-    if(*((u32 *)&freezePRAM[address & 0x3fc]))
-      cheatsWriteMemory(address & 0x70003FC,
-                        value);
-    else
-#endif
     WRITE32LE(((u32 *)&paletteRAM[address & 0x3FC]), value);
     break;
   case 0x06:
@@ -449,21 +431,9 @@ static inline void CPUWriteMemory(u32 address, u32 value)
     if ((address & 0x18000) == 0x18000)
       address &= 0x17fff;
 
-#ifdef BKPT_SUPPORT
-    if(*((u32 *)&freezeVRAM[address]))
-      cheatsWriteMemory(address + 0x06000000, value);
-    else
-#endif
-
     WRITE32LE(((u32 *)&vram[address]), value);
     break;
   case 0x07:
-#ifdef BKPT_SUPPORT
-    if(*((u32 *)&freezeOAM[address & 0x3fc]))
-      cheatsWriteMemory(address & 0x70003FC,
-                        value);
-    else
-#endif
     WRITE32LE(((u32 *)&oam[address & 0x3fc]), value);
     break;
   case 0x0D:
@@ -507,21 +477,9 @@ static inline void CPUWriteHalfWord(u32 address, u16 value)
 
   switch(address >> 24) {
   case 2:
-#ifdef BKPT_SUPPORT
-    if(*((u16 *)&freezeWorkRAM[address & 0x3FFFE]))
-      cheatsWriteHalfWord(address & 0x203FFFE,
-                          value);
-    else
-#endif
       WRITE16LE(((u16 *)&workRAM[address & 0x3FFFE]),value);
     break;
   case 3:
-#ifdef BKPT_SUPPORT
-    if(*((u16 *)&freezeInternalRAM[address & 0x7ffe]))
-      cheatsWriteHalfWord(address & 0x3007ffe,
-                          value);
-    else
-#endif
       WRITE16LE(((u16 *)&internalRAM[address & 0x7ffe]), value);
     break;
   case 4:
@@ -530,12 +488,6 @@ static inline void CPUWriteHalfWord(u32 address, u16 value)
     else goto unwritable;
     break;
   case 5:
-#ifdef BKPT_SUPPORT
-    if(*((u16 *)&freezePRAM[address & 0x03fe]))
-      cheatsWriteHalfWord(address & 0x70003fe,
-                          value);
-    else
-#endif
     WRITE16LE(((u16 *)&paletteRAM[address & 0x3fe]), value);
     break;
   case 6:
@@ -544,21 +496,9 @@ static inline void CPUWriteHalfWord(u32 address, u16 value)
         return;
     if ((address & 0x18000) == 0x18000)
       address &= 0x17fff;
-#ifdef BKPT_SUPPORT
-    if(*((u16 *)&freezeVRAM[address]))
-      cheatsWriteHalfWord(address + 0x06000000,
-                          value);
-    else
-#endif
     WRITE16LE(((u16 *)&vram[address]), value);
     break;
   case 7:
-#ifdef BKPT_SUPPORT
-    if(*((u16 *)&freezeOAM[address & 0x03fe]))
-      cheatsWriteHalfWord(address & 0x70003fe,
-                          value);
-    else
-#endif
     WRITE16LE(((u16 *)&oam[address & 0x3fe]), value);
     break;
   case 8:
@@ -598,19 +538,9 @@ static inline void CPUWriteByte(u32 address, u8 b)
 {
   switch(address >> 24) {
   case 2:
-#ifdef BKPT_SUPPORT
-      if(freezeWorkRAM[address & 0x3FFFF])
-        cheatsWriteByte(address & 0x203FFFF, b);
-      else
-#endif
         workRAM[address & 0x3FFFF] = b;
     break;
   case 3:
-#ifdef BKPT_SUPPORT
-    if(freezeInternalRAM[address & 0x7fff])
-      cheatsWriteByte(address & 0x3007fff, b);
-    else
-#endif
       internalRAM[address & 0x7fff] = b;
     break;
   case 4:
@@ -693,11 +623,6 @@ static inline void CPUWriteByte(u32 address, u8 b)
     // byte writes to OBJ VRAM are ignored
     if ((address) < objTilesAddress[((DISPCNT&7)+1)>>2])
     {
-#ifdef BKPT_SUPPORT
-      if(freezeVRAM[address])
-        cheatsWriteByte(address + 0x06000000, b);
-      else
-#endif
             *((u16 *)&vram[address]) = (b << 8) | b;
     }
     break;

@@ -41,10 +41,6 @@
 #include "../shared/Port.h"
 #include "../shared/System.h"
 
-#ifdef PROFILING
-#include "prof/prof.h"
-#endif
-
 #ifdef _MSC_VER
  // Disable "empty statement" warnings
  #pragma warning(disable: 4390)
@@ -67,16 +63,6 @@ static INSN_REGPARM void armUnknownInsn(u32 opcode)
 #endif
     CPUUndefinedException();
 }
-
-#ifdef BKPT_SUPPORT
-static INSN_REGPARM void armBreakpoint(u32 opcode)
-{
-    reg[15].I -= 4;
-    armNextPC -= 4;
-    dbgSignal(5, (opcode & 0x0f) | ((opcode>>4) & 0xfff0));
-    clockTicks = -1;
-}
-#endif
 
 
 // Subroutine to count instructions (for debugging/optimizing)
@@ -118,15 +104,6 @@ static void count(u32 opcode, int cond_res)
 #endif
 
 // Common macros //////////////////////////////////////////////////////////
-
-#ifdef BKPT_SUPPORT
-#define CONSOLE_OUTPUT(a,b) do { \
-    if ((opcode == 0xe0000000) && (reg[0].I == 0xC0DED00D)) {   \
-        dbgOutput((a), (b));                                    \
-} while (0)
-#else
-#define CONSOLE_OUTPUT(a,b)  /* nothing */
-#endif
 
 #define NEG(i) ((i) >> 31)
 #define POS(i) ((~(i)) >> 31)
@@ -2669,11 +2646,7 @@ typedef INSN_REGPARM void (*insnfunc_t)(u32 opcode);
     REP16(insn),REP16(insn),REP16(insn),REP16(insn),\
     REP16(insn),REP16(insn),REP16(insn),REP16(insn)
 #define arm_UI armUnknownInsn
-#ifdef BKPT_SUPPORT
- #define arm_BP armBreakpoint
-#else
- #define arm_BP armUnknownInsn
-#endif
+#define arm_BP armUnknownInsn // TODO: implement
 static insnfunc_t armInsnTable[4096] = {
     arm000,arm001,arm002,arm003,arm004,arm005,arm006,arm007,  // 000
     arm000,arm009,arm002,arm00B,arm004,arm_UI,arm006,arm_UI,  // 008

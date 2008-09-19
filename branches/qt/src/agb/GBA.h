@@ -85,17 +85,6 @@ extern bool armState;
 extern int armMode;
 extern void (*cpuSaveGameFunc)(u32,u8);
 
-#ifdef BKPT_SUPPORT
-extern u8 freezeWorkRAM[0x40000];
-extern u8 freezeInternalRAM[0x8000];
-extern u8 freezeVRAM[0x18000];
-extern u8 freezeOAM[0x400];
-extern u8 freezePRAM[0x400];
-extern bool debugger_last;
-extern int  oldreg[17];
-extern char oldbuffer[10];
-#endif
-
 extern bool CPUReadGSASnapshot(const char *);
 extern bool CPUWriteGSASnapshot(const char *, const char *, const char *, const char *);
 extern bool CPUWriteBatteryFile(const char *);
@@ -121,11 +110,6 @@ extern void CPULoop(int);
 extern void CPUCheckDMA(int,int);
 extern bool CPUIsGBAImage(const char *);
 extern bool CPUIsZipFile(const char *);
-#ifdef PROFILING
-#include "prof/prof.h"
-extern void cpuProfil(profile_segment *seg);
-extern void cpuEnableProfiling(int hz);
-#endif
 
 extern struct EmulatedSystem GBASystem;
 

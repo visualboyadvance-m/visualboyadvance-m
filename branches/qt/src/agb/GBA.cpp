@@ -41,25 +41,12 @@
 #include "GBAGfx.h"
 #include "agbprint.h"
 
-#ifdef PROFILING
-#include "prof/prof.h"
-#endif
-
 #ifdef __GNUC__
 #define _stricmp strcasecmp
 #endif
 
 
 extern bool emulating;
-#ifdef LINK_EMULATION
-extern int linktime;
-extern void StartLink(u16);
-extern void StartJOYLink(u16);
-extern void StartGPLink(u16);
-extern void LinkSSend(u16);
-extern void LinkUpdate(int);
-extern int linktime2;
-#endif
 int SWITicks = 0;
 int IRQTicks = 0;
 
@@ -90,20 +77,6 @@ bool cpuEEPROMSensorEnabled = false;
 u32 cpuPrefetch[2];
 
 int cpuTotalTicks = 0;
-#ifdef PROFILING
-int profilingTicks = 0;
-int profilingTicksReload = 0;
-static profile_segment *profilSegment = NULL;
-#endif
-
-#ifdef BKPT_SUPPORT
-u8 freezeWorkRAM[0x40000];
-u8 freezeInternalRAM[0x8000];
-u8 freezeVRAM[0x18000];
-u8 freezePRAM[0x400];
-u8 freezeOAM[0x400];
-bool debugger_last;
-#endif
 
 int lcdTicks = (useBios && !skipBios) ? 1008 : 208;
 u8 timerOnOffDelay = 0;
@@ -486,21 +459,6 @@ variable_desc saveGameStruct[] = {
 
 static int romSize = 0x2000000;
 
-#ifdef PROFILING
-void cpuProfil(profile_segment *seg)
-{
-    profilSegment = seg;
-}
-
-void cpuEnableProfiling(int hz)
-{
-  if(hz == 0)
-    hz = 100;
-  profilingTicks = profilingTicksReload = 16777216 / hz;
-  profSetHertz(hz);
-}
-#endif
-
 
 inline int CPUUpdateTicks()
 {
@@ -521,14 +479,6 @@ inline int CPUUpdateTicks()
   if(timer3On && !(TM3CNT & 4) && (timer3Ticks < cpuLoopTicks)) {
     cpuLoopTicks = timer3Ticks;
   }
-#ifdef PROFILING
-  if(profilingTicksReload != 0) {
-    if(profilingTicks < cpuLoopTicks) {
-      cpuLoopTicks = profilingTicks;
-    }
-  }
-#endif
-
   if (SWITicks) {
     if (SWITicks < cpuLoopTicks)
         cpuLoopTicks = SWITicks;
@@ -1231,12 +1181,6 @@ bool CPUIsELF(const char *file)
 
 void CPUCleanUp()
 {
-#ifdef PROFILING
-  if(profilingTicksReload) {
-    profCleanup();
-  }
-#endif
-
   if(rom != NULL) {
     free(rom);
     rom = NULL;
@@ -1699,42 +1643,10 @@ void CPUSoftwareInterrupt(int comment)
 {
   static bool disableMessage = false;
   if(armState) comment >>= 16;
-#ifdef BKPT_SUPPORT
-  if(comment == 0xff) {
-    dbgOutput(NULL, reg[0].I);
-    return;
-  }
-#endif
-#ifdef PROFILING
-  if(comment == 0xfe) {
-    profStartup(reg[0].I, reg[1].I);
-    return;
-  }
-  if(comment == 0xfd) {
-    profControl(reg[0].I);
-    return;
-  }
-  if(comment == 0xfc) {
-    profCleanup();
-    return;
-  }
-  if(comment == 0xfb) {
-    profCount();
-    return;
-  }
-#endif
   if(comment == 0xfa) {
     agbPrintFlush();
     return;
   }
-#ifdef SDL
-  if(comment == 0xf9) {
-    emulating = 0;
-    cpuNextEvent = cpuTotalTicks;
-    cpuBreakLoop = true;
-    return;
-  }
-#endif
   if(useBios) {
 #ifdef GBA_LOGGING
     if(systemVerbose & VERBOSE_SWI) {
@@ -2777,35 +2689,20 @@ void CPUUpdateRegister(u32 address, u16 value)
     cpuNextEvent = cpuTotalTicks;
     break;
   case 0x128:
-   #ifdef LINK_EMULATION
-	if (linkenable)
-	{
-		StartLink(value);
+	if(value & 0x80) {
+	  value &= 0xff7f;
+	  if(value & 1 && (value & 0x4000)) {
+		UPDATE_REG(0x12a, 0xFF);
+		IF |= 0x80;
+		UPDATE_REG(0x202, IF);
+		value &= 0x7f7f;
+	  }
 	}
-	else
-#endif
-	{
-		if(value & 0x80) {
-		  value &= 0xff7f;
-		  if(value & 1 && (value & 0x4000)) {
-			UPDATE_REG(0x12a, 0xFF);
-			IF |= 0x80;
-			UPDATE_REG(0x202, IF);
-			value &= 0x7f7f;
-		  }
-		}
-	    UPDATE_REG(0x128, value);
-	}
+    UPDATE_REG(0x128, value);
     break;
- case 0x12a:
- #ifdef LINK_EMULATION
- if(linkenable && lspeed)
-    LinkSSend(value);
-  #endif
-  {
- UPDATE_REG(0x134, value);
-  }
-  break;
+  case 0x12a:
+	UPDATE_REG(0x134, value);
+	break;
   case 0x130:
     P1 |= (value & 0x3FF);
     UPDATE_REG(0x130, P1);
@@ -2814,22 +2711,10 @@ void CPUUpdateRegister(u32 address, u16 value)
     UPDATE_REG(0x132, value & 0xC3FF);
     break;
   case 0x134:
-#ifdef LINK_EMULATION
-	if (linkenable)
-		StartGPLink(value);
-	else
-#endif
-	    UPDATE_REG(0x134, value);
-
+	UPDATE_REG(0x134, value);
 	break;
   case 0x140:
-#ifdef LINK_EMULATION
-	if (linkenable)
-		StartJOYLink(value);
-	else
-#endif
-	    UPDATE_REG(0x140, value);
-
+    UPDATE_REG(0x140, value);
 	break;
   case 0x200:
     IE = value & 0x3FFF;
@@ -3389,26 +3274,7 @@ void CPUInterrupt()
   biosProtected[3] = 0xe5;
 }
 
-#ifdef SDL
-void log(const char *defaultMsg, ...)
-{
-  char buffer[2048];
-  va_list valist;
-
-  va_start(valist, defaultMsg);
-  vsprintf(buffer, defaultMsg, valist);
-
-  if(out == NULL) {
-    out = fopen("trace.log","w");
-  }
-
-  fputs(buffer, out);
-
-  va_end(valist);
-}
-#else
-extern void winlog(const char *, ...);
-#endif
+void winlog(const char *, ...);
 
 void CPULoop(int ticks)
 {
@@ -3416,10 +3282,6 @@ void CPULoop(int ticks)
   int timerOverflow = 0;
   // variable used by the CPU core
   cpuTotalTicks = 0;
-#ifdef LINK_EMULATION
-  if(linkenable)
-    cpuNextEvent = 1;
-#endif
   cpuBreakLoop = false;
   cpuNextEvent = CPUUpdateTicks();
   if(cpuNextEvent > ticks)
@@ -3431,33 +3293,15 @@ void CPULoop(int ticks)
     if(systemDebug) {
       if(systemDebug >= 10 && !holdState) {
         CPUUpdateCPSR();
-#ifdef BKPT_SUPPORT
-		if (debugger_last)
-		{
-		sprintf(buffer, "R00=%08x R01=%08x R02=%08x R03=%08x R04=%08x R05=%08x R06=%08x R07=%08x R08=%08x R09=%08x R10=%08x R11=%08x R12=%08x R13=%08x R14=%08x R15=%08x R16=%08x R17=%08x\n",
-                 oldreg[0], oldreg[1], oldreg[2], oldreg[3], oldreg[4], oldreg[5],
-                 oldreg[6], oldreg[7], oldreg[8], oldreg[9], oldreg[10], oldreg[11],
-                 oldreg[12], oldreg[13], oldreg[14], oldreg[15], oldreg[16],
-                 oldreg[17]);
-		}
-#endif
         sprintf(buffer, "R00=%08x R01=%08x R02=%08x R03=%08x R04=%08x R05=%08x R06=%08x R07=%08x R08=%08x R09=%08x R10=%08x R11=%08x R12=%08x R13=%08x R14=%08x R15=%08x R16=%08x R17=%08x\n",
                  reg[0].I, reg[1].I, reg[2].I, reg[3].I, reg[4].I, reg[5].I,
                  reg[6].I, reg[7].I, reg[8].I, reg[9].I, reg[10].I, reg[11].I,
                  reg[12].I, reg[13].I, reg[14].I, reg[15].I, reg[16].I,
                  reg[17].I);
-#ifdef SDL
-        log(buffer);
-#else
         winlog(buffer);
-#endif
       } else if(!holdState) {
         sprintf(buffer, "PC=%08x\n", armNextPC);
-#ifdef SDL
-        log(buffer);
-#else
         winlog(buffer);
-#endif
       }
     }
 #endif /* FINAL_VERSION */
@@ -3851,33 +3695,7 @@ void CPULoop(int ticks)
 
       timerOverflow = 0;
 
-
-
-#ifdef PROFILING
-      profilingTicks -= clockTicks;
-      if(profilingTicks <= 0) {
-        profilingTicks += profilingTicksReload;
-        if(profilSegment) {
-	  profile_segment *seg = profilSegment;
-	  do {
-	    u16 *b = (u16 *)seg->sbuf;
-	    int pc = ((reg[15].I - seg->s_lowpc) * seg->s_scale)/0x10000;
-	    if(pc >= 0 && pc < seg->ssiz) {
-            b[pc]++;
-	      break;
-          }
-
-	    seg = seg->next;
-	  } while(seg);
-        }
-      }
-#endif
-
       ticks -= clockTicks;
-#ifdef LINK_EMULATION
-	  if (linkenable)
-		  LinkUpdate(clockTicks);
-#endif
       cpuNextEvent = CPUUpdateTicks();
 
       if(cpuDmaTicksToUpdate > 0) {
@@ -3891,10 +3709,6 @@ void CPULoop(int ticks)
         cpuDmaHack = true;
         goto updateLoop;
       }
-#ifdef LINK_EMULATION
-	  if(linkenable)
-  	       cpuNextEvent = 1;
-#endif
       if(IF && (IME & 1) && armIrqEnable) {
         int res = IF & IE;
         if(stopState)
