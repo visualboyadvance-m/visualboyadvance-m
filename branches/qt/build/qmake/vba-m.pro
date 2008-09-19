@@ -137,9 +137,6 @@ SOURCES += $${M_DIR_DMG}gb.cpp
 HEADERS += $${M_DIR_DMG}gbCheats.h
 SOURCES += $${M_DIR_DMG}gbCheats.cpp
 
-HEADERS += $${M_DIR_DMG}gbCodes.h
-HEADERS += $${M_DIR_DMG}gbCodesCB.h
-
 SOURCES += $${M_DIR_DMG}gbDis.cpp
 
 SOURCES += $${M_DIR_DMG}gbGfx.cpp

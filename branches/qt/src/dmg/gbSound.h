@@ -1,3 +1,6 @@
+#ifndef GBSOUND_H
+#define GBSOUND_H
+
 #define NR10 0xff10
 #define NR11 0xff11
 #define NR12 0xff12
@@ -23,19 +26,19 @@
 #define SOUND_EVENT(address,value) \
     gbSoundEvent(address,value)
 
-extern void gbSoundTick();
-extern void gbSoundPause();
-extern void gbSoundResume();
-extern void gbSoundEnable(int);
-extern void gbSoundDisable(int);
-extern int gbSoundGetEnable();
-extern void gbSoundReset();
-extern void gbSoundSaveGame(gzFile);
-extern void gbSoundReadGame(int,gzFile);
-extern void gbSoundEvent(register u16, register int);
-extern void gbSoundSetQuality(int);
+void gbSoundTick();
+void gbSoundPause();
+void gbSoundResume();
+void gbSoundEnable(int);
+void gbSoundDisable(int);
+int gbSoundGetEnable();
+void gbSoundReset();
+void gbSoundSaveGame(gzFile);
+void gbSoundReadGame(int,gzFile);
+void gbSoundEvent(register u16, register int);
+void gbSoundSetQuality(int);
 
-extern u8 gbSoundRead(u16 address);
+u8 gbSoundRead(u16 address);
 
 extern int soundTicks;
 extern int soundQuality;
@@ -53,3 +56,5 @@ struct gb_effects_config_t
 // Changes effects configuration
 void gbSoundConfigEffects( gb_effects_config_t const& );
 extern gb_effects_config_t gb_effects_config; // current configuration
+
+#endif

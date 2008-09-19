@@ -7,6 +7,7 @@ u8 sramRead(u32 address)
 {
   return flashSaveMemory[address & 0xFFFF];
 }
+
 void sramDelayedWrite(u32 address, u8 byte)
 {
   saveType = 1;

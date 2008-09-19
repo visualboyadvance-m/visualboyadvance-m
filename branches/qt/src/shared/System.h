@@ -1,5 +1,5 @@
-#ifndef VBA_SYSTEM_H
-#define VBA_SYSTEM_H
+#ifndef SYSTEM_H
+#define SYSTEM_H
 
 #include <stdint.h>
 
@@ -57,34 +57,32 @@ struct EmulatedSystem {
   int emuCount;
 };
 
-extern void log(const char *,...);
+void log(const char *,...);
 
-extern bool systemPauseOnFrame();
-extern void systemGbPrint(u8 *,int,int,int,int);
-extern void systemScreenCapture(int);
-extern void systemDrawScreen();
-// updates the joystick data
-extern bool systemReadJoypads();
-// return information about the given joystick, -1 for default joystick
-extern u32 systemReadJoypad(int);
-extern u32 systemGetClock();
-extern void systemMessage(int, const char *, ...);
-extern void systemSetTitle(const char *);
-extern void systemWriteDataToSoundBuffer();
-extern void systemSoundShutdown();
-extern void systemSoundPause();
-extern void systemSoundResume();
-extern void systemSoundReset();
-extern bool systemSoundInit();
-extern void systemScreenMessage(const char *);
-extern void systemUpdateMotionSensor();
-extern int  systemGetSensorX();
-extern int  systemGetSensorY();
-extern bool systemCanChangeSoundQuality();
-extern void systemShowSpeed(int);
-extern void system10Frames(int);
-extern void systemFrame();
-extern void systemGbBorderOn();
+bool systemPauseOnFrame();
+void systemGbPrint(u8 *,int,int,int,int);
+void systemScreenCapture(int);
+void systemDrawScreen();
+bool systemReadJoypads(); // updates the joystick data
+u32 systemReadJoypad(int); // return information about the given joystick, -1 for default joystick
+u32 systemGetClock();
+void systemMessage(int, const char *, ...);
+void systemSetTitle(const char *);
+void systemWriteDataToSoundBuffer();
+void systemSoundShutdown();
+void systemSoundPause();
+void systemSoundResume();
+void systemSoundReset();
+bool systemSoundInit();
+void systemScreenMessage(const char *);
+void systemUpdateMotionSensor();
+int  systemGetSensorX();
+int  systemGetSensorY();
+bool systemCanChangeSoundQuality();
+void systemShowSpeed(int);
+void system10Frames(int);
+void systemFrame();
+void systemGbBorderOn();
 
 extern void Sm60FPS_Init();
 extern bool Sm60FPS_CanSkipFrame();
@@ -113,4 +111,4 @@ extern int systemThrottle;
 #define SYSTEM_SAVE_UPDATED 30
 #define SYSTEM_SAVE_NOT_UPDATED 0
 
-#endif //VBA_SYSTEM_H
+#endif

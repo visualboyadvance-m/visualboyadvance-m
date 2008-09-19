@@ -1,5 +1,5 @@
-#ifndef VBA_GB_GB_H
-#define VBA_GB_GB_H
+#ifndef GB_H
+#define GB_H
 
 #include "../shared/System.h"
 

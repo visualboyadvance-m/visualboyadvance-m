@@ -1,5 +1,5 @@
-#ifndef VBA_GBAinline_H
-#define VBA_GBAinline_H
+#ifndef GBAINLINE_H
+#define GBAINLINE_H
 
 #include "../shared/System.h"
 #include "../shared/Port.h"
@@ -641,4 +641,4 @@ static inline void CPUWriteByte(u32 address, u8 b)
   }
 }
 
-#endif //VBA_GBAinline_H
+#endif

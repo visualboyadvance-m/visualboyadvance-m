@@ -1,3 +1,6 @@
+#ifndef GBGLOBALS_H
+#define GBGLOBALS_H
+
 extern int gbRomSizeMask;
 extern int gbRomSize;
 extern int gbRamSize;
@@ -70,3 +73,5 @@ extern void gbRenderLine();
 extern void gbDrawSprites(bool);
 
 extern u8 (*gbSerialFunction)(u8);
+
+#endif

@@ -1,5 +1,5 @@
-#ifndef __VBA_GB_GBCHEATS_H
-#define __VBA_GB_GBCHEATS_H
+#ifndef GBCHEATS_H
+#define GBCHEATS_H
 
 #include "../shared/System.h"
 

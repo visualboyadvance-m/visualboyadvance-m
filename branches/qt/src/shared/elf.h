@@ -1,5 +1,5 @@
-#ifndef VBA_ELF_H
-#define VBA_ELF_H
+#ifndef ELF_H
+#define ELF_H
 
 enum LocationType {
   LOCATION_register,
@@ -247,18 +247,19 @@ struct Symbol {
   u32 size;
 };
 
-extern u32 elfReadLEB128(u8 *, int *);
-extern s32 elfReadSignedLEB128(u8 *, int *);
-extern bool elfRead(const char *, int &, FILE *f);
-extern bool elfGetSymbolAddress(const char *,u32 *, u32 *, int *);
-extern const char *elfGetAddressSymbol(u32);
-extern const char *elfGetSymbol(int, u32 *, u32 *, int *);
-extern void elfCleanUp();
-extern bool elfGetCurrentFunction(u32, Function **, CompileUnit **c);
-extern bool elfGetObject(const char *, Function *, CompileUnit *, Object **);
-extern bool elfFindLineInUnit(u32 *, CompileUnit *, int);
-extern bool elfFindLineInModule(u32 *, const char *, int);
+u32 elfReadLEB128(u8 *, int *);
+s32 elfReadSignedLEB128(u8 *, int *);
+bool elfRead(const char *, int &, FILE *f);
+bool elfGetSymbolAddress(const char *,u32 *, u32 *, int *);
+const char *elfGetAddressSymbol(u32);
+const char *elfGetSymbol(int, u32 *, u32 *, int *);
+void elfCleanUp();
+bool elfGetCurrentFunction(u32, Function **, CompileUnit **c);
+bool elfGetObject(const char *, Function *, CompileUnit *, Object **);
+bool elfFindLineInUnit(u32 *, CompileUnit *, int);
+bool elfFindLineInModule(u32 *, const char *, int);
 u32 elfDecodeLocation(Function *, ELFBlock *, LocationType *);
 u32 elfDecodeLocation(Function *, ELFBlock *, LocationType *, u32);
 int elfFindLine(CompileUnit *unit, Function *func, u32 addr, const char **);
+
 #endif

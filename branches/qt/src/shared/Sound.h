@@ -1,5 +1,5 @@
-#ifndef VBA_SOUND_H
-#define VBA_SOUND_H
+#ifndef SOUND_H
+#define SOUND_H
 
 #include "System.h"
 
@@ -31,6 +31,7 @@
 #define FIFOB_H 0xa6
 
 extern void (*psoundTickfn)();
+
 void soundShutdown();
 bool soundInit();
 void soundPause();
@@ -70,4 +71,4 @@ extern int soundBufferTotalLen;
 extern u32 soundNextPosition;
 extern bool soundPaused;
 
-#endif // VBA_SOUND_H
+#endif

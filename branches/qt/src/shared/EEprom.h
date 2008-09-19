@@ -1,13 +1,14 @@
-#ifndef VBA_EEPROM_H
-#define VBA_EEPROM_H
+#ifndef EEPROM_H
+#define EEPROM_H
 
-extern void eepromSaveGame(gzFile _gzFile);
-extern void eepromReadGame(gzFile _gzFile, int version);
-extern void eepromReadGameSkip(gzFile _gzFile, int version);
-extern int eepromRead(u32 address);
-extern void eepromWrite(u32 address, u8 value);
-extern void eepromInit();
-extern void eepromReset();
+void eepromSaveGame(gzFile _gzFile);
+void eepromReadGame(gzFile _gzFile, int version);
+void eepromReadGameSkip(gzFile _gzFile, int version);
+int eepromRead(u32 address);
+void eepromWrite(u32 address, u8 value);
+void eepromInit();
+void eepromReset();
+
 extern u8 eepromData[0x2000];
 extern bool eepromInUse;
 extern int eepromSize;
@@ -18,4 +19,4 @@ extern int eepromSize;
 #define EEPROM_READDATA2      3
 #define EEPROM_WRITEDATA      4
 
-#endif // VBA_EEPROM_H
+#endif

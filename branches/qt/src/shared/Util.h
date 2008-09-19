@@ -1,5 +1,5 @@
-#ifndef VBA_UTIL_H
-#define VBA_UTIL_H
+#ifndef UTIL_H
+#define UTIL_H
 
 #include "System.h"
 
@@ -16,33 +16,30 @@ typedef struct {
   int size;
 } variable_desc;
 
-extern bool utilWritePNGFile(const char *, int, int, u8 *);
-extern bool utilWriteBMPFile(const char *, int, int, u8 *);
-extern void utilApplyIPS(const char *ips, u8 **rom, int *size);
-extern bool utilIsGBAImage(const char *);
-extern bool utilIsGBImage(const char *);
-extern bool utilIsGzipFile(const char *);
-extern void utilStripDoubleExtension(const char *, char *);
-extern IMAGE_TYPE utilFindType(const char *);
-extern u8 *utilLoad(const char *,
-                    bool (*)(const char*),
-                    u8 *,
-                    int &);
+bool utilWritePNGFile(const char *, int, int, u8 *);
+bool utilWriteBMPFile(const char *, int, int, u8 *);
+void utilApplyIPS(const char *ips, u8 **rom, int *size);
+bool utilIsGBAImage(const char *);
+bool utilIsGBImage(const char *);
+bool utilIsGzipFile(const char *);
+void utilStripDoubleExtension(const char *, char *);
+IMAGE_TYPE utilFindType(const char *);
+u8 *utilLoad(const char *, bool (*)(const char*), u8 *, int &);
+void utilPutDword(u8 *, u32);
+void utilPutWord(u8 *, u16);
+void utilWriteData(gzFile, variable_desc *);
+void utilReadData(gzFile, variable_desc *);
+void utilReadDataSkip(gzFile, variable_desc *);
+int utilReadInt(gzFile);
+void utilWriteInt(gzFile, int);
+gzFile utilGzOpen(const char *file, const char *mode);
+gzFile utilMemGzOpen(char *memory, int available, const char *mode);
+int utilGzWrite(gzFile file, const voidp buffer, unsigned int len);
+int utilGzRead(gzFile file, voidp buffer, unsigned int len);
+int utilGzClose(gzFile file);
+z_off_t utilGzSeek(gzFile file, z_off_t offset, int whence);
+long utilGzMemTell(gzFile file);
+void utilGBAFindSave(const u8 *, const int);
+void utilUpdateSystemColorMaps();
 
-extern void utilPutDword(u8 *, u32);
-extern void utilPutWord(u8 *, u16);
-extern void utilWriteData(gzFile, variable_desc *);
-extern void utilReadData(gzFile, variable_desc *);
-extern void utilReadDataSkip(gzFile, variable_desc *);
-extern int utilReadInt(gzFile);
-extern void utilWriteInt(gzFile, int);
-extern gzFile utilGzOpen(const char *file, const char *mode);
-extern gzFile utilMemGzOpen(char *memory, int available, const char *mode);
-extern int utilGzWrite(gzFile file, const voidp buffer, unsigned int len);
-extern int utilGzRead(gzFile file, voidp buffer, unsigned int len);
-extern int utilGzClose(gzFile file);
-extern z_off_t utilGzSeek(gzFile file, z_off_t offset, int whence);
-extern long utilGzMemTell(gzFile file);
-extern void utilGBAFindSave(const u8 *, const int);
-extern void utilUpdateSystemColorMaps();
 #endif

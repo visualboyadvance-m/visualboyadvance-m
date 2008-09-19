@@ -1,3 +1,6 @@
+#ifndef MEMGZIO_H
+#define MEMGZIO_H
+
 /* gzio.c -- IO on .gz files
  * Copyright (C) 1995-2002 Jean-loup Gailly.
  * For conditions of distribution and use, see copyright notice in zlib.h
@@ -16,3 +19,5 @@ int ZEXPORT memgzread(gzFile, voidp, unsigned);
 int ZEXPORT memgzwrite(gzFile, const voidp, unsigned);
 int ZEXPORT memgzclose(gzFile);
 long ZEXPORT memtell(gzFile);
+
+#endif

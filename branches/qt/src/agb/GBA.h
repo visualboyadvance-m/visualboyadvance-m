@@ -1,5 +1,5 @@
-#ifndef VBA_GBA_H
-#define VBA_GBA_H
+#ifndef GBA_H
+#define GBA_H
 
 #include "../shared/System.h"
 
@@ -66,31 +66,31 @@ extern bool armState;
 extern int armMode;
 extern void (*cpuSaveGameFunc)(u32,u8);
 
-extern bool CPUReadGSASnapshot(const char *);
-extern bool CPUWriteGSASnapshot(const char *, const char *, const char *, const char *);
-extern bool CPUWriteBatteryFile(const char *);
-extern bool CPUReadBatteryFile(const char *);
-extern bool CPUExportEepromFile(const char *);
-extern bool CPUImportEepromFile(const char *);
-extern bool CPUWritePNGFile(const char *);
-extern bool CPUWriteBMPFile(const char *);
-extern void CPUCleanUp();
-extern void CPUUpdateRender();
-extern void CPUUpdateRenderBuffers(bool);
-extern bool CPUReadMemState(char *, int);
-extern bool CPUReadState(const char *);
-extern bool CPUWriteMemState(char *, int);
-extern bool CPUWriteState(const char *);
-extern int CPULoadRom(const char *);
-extern void doMirroring(bool);
-extern void CPUUpdateRegister(u32, u16);
-extern void applyTimer ();
-extern void CPUInit(const char *,bool);
-extern void CPUReset();
-extern void CPULoop(int);
-extern void CPUCheckDMA(int,int);
-extern bool CPUIsGBAImage(const char *);
-extern bool CPUIsZipFile(const char *);
+bool CPUReadGSASnapshot(const char *);
+bool CPUWriteGSASnapshot(const char *, const char *, const char *, const char *);
+bool CPUWriteBatteryFile(const char *);
+bool CPUReadBatteryFile(const char *);
+bool CPUExportEepromFile(const char *);
+bool CPUImportEepromFile(const char *);
+bool CPUWritePNGFile(const char *);
+bool CPUWriteBMPFile(const char *);
+void CPUCleanUp();
+void CPUUpdateRender();
+void CPUUpdateRenderBuffers(bool);
+bool CPUReadMemState(char *, int);
+bool CPUReadState(const char *);
+bool CPUWriteMemState(char *, int);
+bool CPUWriteState(const char *);
+int CPULoadRom(const char *);
+void doMirroring(bool);
+void CPUUpdateRegister(u32, u16);
+void applyTimer ();
+void CPUInit(const char *,bool);
+void CPUReset();
+void CPULoop(int);
+void CPUCheckDMA(int,int);
+bool CPUIsGBAImage(const char *);
+bool CPUIsZipFile(const char *);
 
 extern struct EmulatedSystem GBASystem;
 
@@ -122,4 +122,4 @@ extern struct EmulatedSystem GBASystem;
 #include "../shared/EEprom.h"
 #include "../shared/Flash.h"
 
-#endif //VBA_GBA_H
+#endif

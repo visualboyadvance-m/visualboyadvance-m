@@ -1,3 +1,6 @@
+#ifndef GBMEMORY_H
+#define GBMEMORY_H
+
 #include <time.h>
 
 struct mapperMBC1 {
@@ -167,9 +170,6 @@ void mapperMMM01ROM(u16,u8);
 void mapperMMM01RAM(u16,u8);
 void mapperGGROM(u16,u8);
 void mapperGS3ROM(u16,u8);
-//extern void (*mapper)(u16,u8);
-//extern void (*mapperRAM)(u16,u8);
-//extern u8 (*mapperReadRAM)(u16);
 
 extern void memoryUpdateMapMBC1();
 extern void memoryUpdateMapMBC2();
@@ -182,6 +182,4 @@ extern void memoryUpdateMapTAMA5();
 extern void memoryUpdateMapMMM01();
 extern void memoryUpdateMapGS3();
 
-
-
-
+#endif

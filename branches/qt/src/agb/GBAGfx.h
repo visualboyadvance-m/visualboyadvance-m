@@ -1,9 +1,8 @@
-#ifndef VBA_GFX_H
-#define VBA_GFX_H
+#ifndef GBAGFX_H
+#define GBAGFX_H
 
 #include "GBA.h"
 #include "../shared/Globals.h"
-
 #include "../shared/Port.h"
 
 //#define SPRITE_DEBUG

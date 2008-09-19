@@ -1,8 +1,8 @@
-#ifndef VBA_GBAcpu_H
-#define VBA_GBAcpu_H
+#ifndef GBACPU_H
+#define GBACPU_H
 
-extern int armExecute();
-extern int thumbExecute();
+int armExecute();
+int thumbExecute();
 
 #ifdef __GNUC__
 # define INSN_REGPARM __attribute__((regparm(1)))
@@ -53,14 +53,15 @@ extern u8 memoryWaitSeq[16];
 extern u8 memoryWaitSeq32[16];
 extern u8 cpuBitsSet[256];
 extern u8 cpuLowestBitSet[256];
-extern void CPUSwitchMode(int mode, bool saveState, bool breakLoop);
-extern void CPUSwitchMode(int mode, bool saveState);
-extern void CPUUpdateCPSR();
-extern void CPUUpdateFlags(bool breakLoop);
-extern void CPUUpdateFlags();
-extern void CPUUndefinedException();
-extern void CPUSoftwareInterrupt();
-extern void CPUSoftwareInterrupt(int comment);
+
+void CPUSwitchMode(int mode, bool saveState, bool breakLoop);
+void CPUSwitchMode(int mode, bool saveState);
+void CPUUpdateCPSR();
+void CPUUpdateFlags(bool breakLoop);
+void CPUUpdateFlags();
+void CPUUndefinedException();
+void CPUSoftwareInterrupt();
+void CPUSoftwareInterrupt(int comment);
 
 
 // Waitstates when accessing data
