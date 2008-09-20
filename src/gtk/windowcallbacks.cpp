@@ -645,33 +645,6 @@ void Window::vOnJoypadConfigure()
   m_poInputConfig->vSetKey("active_joypad", inputGetDefaultJoypad());
 }
 
-void Window::vOnAutofireToggled(Gtk::CheckMenuItem * _poCMI, EKey _eKey)
-{
-  if (_poCMI->get_active() == inputGetAutoFire(_eKey))
-  {
-    inputToggleAutoFire(_eKey);
-  }
-
-  std::string sKey;
-  if (_eKey == KEY_BUTTON_A)
-  {
-    sKey = "autofire_A";
-  }
-  else if (_eKey == KEY_BUTTON_B)
-  {
-    sKey = "autofire_B";
-  }
-  else if (_eKey == KEY_BUTTON_L)
-  {
-    sKey = "autofire_L";
-  }
-  else if (_eKey == KEY_BUTTON_R)
-  {
-    sKey = "autofire_R";
-  }
-  m_poInputConfig->vSetKey(sKey, _poCMI->get_active());
-}
-
 void Window::vOnHelpAbout()
 {
   Gtk::AboutDialog oAboutDialog;
