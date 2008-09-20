@@ -29,25 +29,17 @@ class ScreenAreaCairo : public ScreenArea
 {
 public:
   ScreenAreaCairo(int _iWidth, int _iHeight, int _iScale = 1);
-  virtual ~ScreenAreaCairo();
   void vDrawPixels(u8 * _puiData);
   void vDrawBlackScreen();
 
 protected:
-  bool on_configure_event(GdkEventConfigure * event);
   bool on_expose_event(GdkEventExpose * _pstEvent);
+  void vOnWidgetResize();
 
 private:
   double   m_dScaleFactor;
   int      m_iAreaTop;
   int      m_iAreaLeft;
-  u32 *    m_puiPixels;
-  u8 *     m_puiDelta;
-  int      m_iScaledWidth;
-  int      m_iScaledHeight;
-
-  void vUpdateSize();
-  void vOnWidgetResize();
 };
 
 } // namespace VBA

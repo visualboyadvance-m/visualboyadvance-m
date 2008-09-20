@@ -40,7 +40,7 @@ public:
   void vDrawBlackScreen();
 
 protected:
-  bool on_configure_event(GdkEventConfigure * event);
+  void vOnWidgetResize();
 
 private:
   Display *m_pDisplay;
@@ -49,13 +49,9 @@ private:
   int m_iFormat;
   u16* m_paYUY;
   XShmSegmentInfo m_oShm;
-  u32 *    m_puiPixels;
-  u8 *     m_puiDelta;
   int      m_iAreaTop;
   int      m_iAreaLeft;
 
-  void vUpdateSize();
-  void vOnWidgetResize();
   void vRGB32toYUY2 (unsigned char* dest_ptr,
                      int            dest_width,
                      int            dest_height,

@@ -27,11 +27,7 @@ template<typename T> T min( T x, T y ) { return x < y ? x : y; }
 template<typename T> T max( T x, T y ) { return x > y ? x : y; }
 
 ScreenAreaGl::ScreenAreaGl(int _iWidth, int _iHeight, int _iScale) :
-  ScreenArea(_iWidth, _iHeight, _iScale),
-  m_iScaledWidth(_iWidth),
-  m_iScaledHeight(_iHeight),
-  m_puiPixels(NULL),
-  m_puiDelta(NULL)
+  ScreenArea(_iWidth, _iHeight, _iScale)
 {
   Glib::RefPtr<Gdk::GL::Config> glconfig;
 
@@ -63,46 +59,9 @@ void ScreenAreaGl::on_realize()
   glClearColor(0.0, 0.0, 0.0, 1.0);
 }
 
-ScreenAreaGl::~ScreenAreaGl()
-{
-  if (m_puiPixels)
-  {
-    delete[] m_puiPixels;
-  }
-
-  if (m_puiDelta)
-  {
-    delete[] m_puiDelta;
-  }
-}
-
 void ScreenAreaGl::vDrawPixels(u8 * _puiData)
 {
-  const int iSrcPitch = (m_iWidth + 1) * sizeof(u32);
-  const int iScaledPitch = (m_iScaledWidth + 1) * sizeof(u32);
-
-  if (m_vFilterIB != NULL)
-  {
-    m_vFilterIB(_puiData + iSrcPitch,
-                iSrcPitch,
-                m_iWidth,
-                m_iHeight);
-  }
-
-  if (m_vFilter2x != NULL)
-  {
-    m_vFilter2x(_puiData + iSrcPitch,
-                iSrcPitch,
-                m_puiDelta,
-                (u8 *)m_puiPixels,
-                iScaledPitch,
-                m_iWidth,
-                m_iHeight);
-  }
-  else
-  {
-    memcpy(m_puiPixels, _puiData + iSrcPitch, m_iHeight * iSrcPitch);
-  }
+  ScreenArea::vDrawPixels(_puiData);
 
   queue_draw_area(0, 0, get_width(), get_height());
 }
@@ -116,31 +75,6 @@ void ScreenAreaGl::vDrawBlackScreen()
   }
 }
 
-void ScreenAreaGl::vUpdateSize()
-{
-  if (m_puiPixels)
-  {
-    delete[] m_puiPixels;
-  }
-
-  if (m_puiDelta)
-  {
-    delete[] m_puiDelta;
-  }
-
-  m_iScaledWidth = m_iFilterScale * m_iWidth;
-  m_iScaledHeight = m_iFilterScale * m_iHeight;
-
-  vOnWidgetResize();
-
-  m_puiPixels = new u32[(m_iScaledWidth + 1) * m_iScaledHeight];
-  m_puiDelta = new u8[(m_iWidth + 2) * (m_iHeight + 2) * sizeof(u32)];
-  memset(m_puiPixels, 0, (m_iScaledWidth + 1) * m_iScaledHeight * sizeof(u32));
-  memset(m_puiDelta, 255, (m_iWidth + 2) * (m_iHeight + 2) * sizeof(u32));
-
-  set_size_request(m_iScale * m_iWidth, m_iScale * m_iHeight);
-}
-
 void ScreenAreaGl::vOnWidgetResize()
 {
   m_dScaleFactor = min<double>(get_height() / (double)m_iScaledHeight, get_width() / (double)m_iScaledWidth);
@@ -148,13 +82,6 @@ void ScreenAreaGl::vOnWidgetResize()
 
   m_dAreaTop = 1 - m_dScaleFactor * m_iScaledHeight / (double)get_height();
   m_dAreaLeft = 1 - m_dScaleFactor * m_iScaledWidth / (double)get_width();
-}
-
-bool ScreenAreaGl::on_configure_event(GdkEventConfigure * event)
-{
-  vOnWidgetResize();
-
-  return true;
 }
 
 bool ScreenAreaGl::on_expose_event(GdkEventExpose * _pstEvent)
