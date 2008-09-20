@@ -27,6 +27,10 @@ ScreenArea::ScreenArea(int _iWidth, int _iHeight, int _iScale) :
   m_iFilterScale(1),
   m_vFilter2x(NULL),
   m_vFilterIB(NULL),
+  m_puiPixels(NULL),
+  m_puiDelta(NULL),
+  m_iScaledWidth(_iWidth),
+  m_iScaledHeight(_iHeight),
   m_bShowCursor(true)
 {
   g_assert(_iWidth >= 1 && _iHeight >= 1 && _iScale >= 1);
@@ -54,6 +58,16 @@ ScreenArea::ScreenArea(int _iWidth, int _iHeight, int _iScale) :
 
 ScreenArea::~ScreenArea()
 {
+  if (m_puiPixels)
+  {
+    delete[] m_puiPixels;
+  }
+
+  if (m_puiDelta)
+  {
+    delete[] m_puiDelta;
+  }
+
   if (m_poEmptyCursor != NULL)
   {
     delete m_poEmptyCursor;
@@ -158,6 +172,67 @@ bool ScreenArea::bOnCursorTimeout()
 {
   vHideCursor();
   return false;
+}
+
+void ScreenArea::vDrawPixels(u8 * _puiData)
+{
+  const int iSrcPitch = (m_iWidth + 1) * sizeof(u32);
+  const int iScaledPitch = (m_iScaledWidth + 1) * sizeof(u32);
+
+  if (m_vFilterIB != NULL)
+  {
+    m_vFilterIB(_puiData + iSrcPitch,
+                iSrcPitch,
+                m_iWidth,
+                m_iHeight);
+  }
+
+  if (m_vFilter2x != NULL)
+  {
+    m_vFilter2x(_puiData + iSrcPitch,
+                iSrcPitch,
+                m_puiDelta,
+                (u8 *)m_puiPixels,
+                iScaledPitch,
+                m_iWidth,
+                m_iHeight);
+  }
+  else
+  {
+    memcpy(m_puiPixels, _puiData + iSrcPitch, m_iHeight * iSrcPitch);
+  }
+}
+
+void ScreenArea::vUpdateSize()
+{
+  if (m_puiPixels)
+  {
+    delete[] m_puiPixels;
+  }
+
+  if (m_puiDelta)
+  {
+    delete[] m_puiDelta;
+  }
+
+  m_iScaledWidth = m_iFilterScale * m_iWidth;
+  m_iScaledHeight = m_iFilterScale * m_iHeight;
+
+  vOnWidgetResize();
+
+  m_puiPixels = new u32[(m_iScaledWidth + 1) * m_iScaledHeight];
+  m_puiDelta = new u8[(m_iWidth + 2) * (m_iHeight + 2) * sizeof(u32)];
+  memset(m_puiPixels, 0, (m_iScaledWidth + 1) * m_iScaledHeight * sizeof(u32));
+  memset(m_puiDelta, 255, (m_iWidth + 2) * (m_iHeight + 2) * sizeof(u32));
+
+  set_size_request(m_iScale * m_iWidth, m_iScale * m_iHeight);
+}
+
+bool ScreenArea::on_configure_event(GdkEventConfigure * event)
+{
+  vOnWidgetResize();
+
+  return true;
 }
 
 } // namespace VBA

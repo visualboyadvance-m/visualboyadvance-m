@@ -31,26 +31,18 @@ class ScreenAreaGl : public ScreenArea,
 {
 public:
   ScreenAreaGl(int _iWidth, int _iHeight, int _iScale = 1);
-  virtual ~ScreenAreaGl();
   void vDrawPixels(u8 * _puiData);
   void vDrawBlackScreen();
 
 protected:
   void on_realize();
   bool on_expose_event(GdkEventExpose * _pstEvent);
-  bool on_configure_event(GdkEventConfigure * event);
+  void vOnWidgetResize();
 
 private:
   double   m_dAreaTop;
   double   m_dAreaLeft;
   double   m_dScaleFactor;
-  int      m_iScaledWidth;
-  int      m_iScaledHeight;
-  u32 *    m_puiPixels;
-  u8 *     m_puiDelta;
-
-  void vUpdateSize();
-  void vOnWidgetResize();
 };
 
 } // namespace VBA
