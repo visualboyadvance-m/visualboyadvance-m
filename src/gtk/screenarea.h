@@ -38,13 +38,14 @@ public:
   void vSetScale(int _iScale);
   void vSetFilter2x(EFilter2x _eFilter2x);
   void vSetFilterIB(EFilterIB _eFilterIB);
-  virtual void vDrawPixels(u8 * _puiData) = 0;
+  virtual void vDrawPixels(u8 * _puiData);
   virtual void vDrawBlackScreen() = 0;
 
 protected:
   virtual bool on_motion_notify_event(GdkEventMotion * _pstEvent);
   virtual bool on_enter_notify_event(GdkEventCrossing * _pstEvent);
   virtual bool on_leave_notify_event(GdkEventCrossing * _pstEvent);
+  virtual bool on_configure_event(GdkEventConfigure * event);
   virtual bool bOnCursorTimeout();
 
   int      m_iWidth;
@@ -55,12 +56,17 @@ protected:
   int      m_iAreaHeight;
   Filter2x m_vFilter2x;
   FilterIB m_vFilterIB;
+  u32 *    m_puiPixels;
+  u8 *     m_puiDelta;
+  int      m_iScaledWidth;
+  int      m_iScaledHeight;
 
   bool             m_bShowCursor;
   Gdk::Cursor *    m_poEmptyCursor;
   sigc::connection m_oCursorSig;
 
-  virtual void vUpdateSize() = 0;
+  void vUpdateSize();
+  virtual void vOnWidgetResize() = 0;
   void vStartCursorTimeout();
   void vStopCursorTimeout();
   void vHideCursor();

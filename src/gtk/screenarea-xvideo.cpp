@@ -37,8 +37,6 @@ template<typename T> T max( T x, T y ) { return x > y ? x : y; }
 
 ScreenAreaXv::ScreenAreaXv(int _iWidth, int _iHeight, int _iScale) :
   ScreenArea(_iWidth, _iHeight, _iScale),
-  m_puiPixels(0),
-  m_puiDelta(0),
   m_iAreaTop(0),
   m_iAreaLeft(0)
 {
@@ -126,52 +124,20 @@ ScreenAreaXv::ScreenAreaXv(int _iWidth, int _iHeight, int _iScale) :
 ScreenAreaXv::~ScreenAreaXv()
 {
   XShmDetach(m_pDisplay, &m_oShm);
-
-  if (m_puiPixels != NULL)
-  {
-    delete[] m_puiPixels;
-  }
-
-  if (m_puiDelta != NULL)
-  {
-    delete[] m_puiDelta;
-  }
 }
 
 void ScreenAreaXv::vDrawPixels(u8 * _puiData)
 {
   GtkWidget *pDrawingArea = GTK_WIDGET(this->gobj());
   GdkGC *gc = pDrawingArea->style->bg_gc[GTK_WIDGET_STATE (pDrawingArea)];
-  u32 * puiPixels = (u32 *)_puiData;
 
-  const int iSrcPitch = m_iWidth * sizeof(u32) + 4;
-  const int iScaledWidth = m_iFilterScale * m_iWidth;
-  const int iScaledHeight = m_iFilterScale * m_iHeight;
-  const int iScaledPitch = iScaledWidth * sizeof(u32) + 4;
-  const int iDstPitch = (iScaledWidth + 4) * sizeof(u16);
+  const int iScaledPitch = m_iScaledWidth * sizeof(u32) + 4;
+  const int iDstPitch = (m_iScaledWidth + 4) * sizeof(u16);
 
-  if (m_vFilterIB != NULL)
-  {
-    m_vFilterIB(_puiData + iSrcPitch,
-                iSrcPitch,
-                m_iWidth,
-                m_iHeight);
-  }
+  ScreenArea::vDrawPixels(_puiData);
 
-  if (m_vFilter2x)
-  {
-    m_vFilter2x(_puiData + iSrcPitch,
-                iSrcPitch,
-                m_puiDelta,
-                (u8 *)m_puiPixels,
-                iScaledPitch,
-                m_iWidth,
-                m_iHeight);
-    puiPixels = m_puiPixels;
-  }
-
-  vRGB32toYUY2((unsigned char*)m_pXvImage->data, iScaledWidth, iScaledHeight, iDstPitch,
-               (u8 *)puiPixels + iScaledPitch, iScaledWidth + 4, iScaledHeight + 4, iScaledPitch);
+  vRGB32toYUY2((unsigned char*)m_pXvImage->data, m_iScaledWidth, m_iScaledHeight, iDstPitch,
+               (u8 *)m_puiPixels + iScaledPitch, m_iScaledWidth + 4, m_iScaledHeight + 4, iScaledPitch);
 
   gdk_display_sync(gtk_widget_get_display(pDrawingArea));
 
@@ -181,7 +147,7 @@ void ScreenAreaXv::vDrawPixels(u8 * _puiData)
                 GDK_GC_XGC (gc),
                 m_pXvImage,
                 0, 0,
-                iScaledWidth, iScaledHeight,
+                m_iScaledWidth, m_iScaledHeight,
                 m_iAreaLeft, m_iAreaTop,
                 m_iAreaWidth + 4, m_iAreaHeight + 4,
                 True);
@@ -192,52 +158,6 @@ void ScreenAreaXv::vDrawPixels(u8 * _puiData)
 void ScreenAreaXv::vDrawBlackScreen()
 {
   modify_bg(get_state(), Gdk::Color("black"));
-}
-
-void ScreenAreaXv::vUpdateSize()
-{
-  const int iScaledWidth = m_iFilterScale * m_iWidth;
-  const int iScaledHeight = m_iFilterScale * m_iHeight;
-
-  if (m_puiPixels != NULL)
-  {
-    delete[] m_puiPixels;
-  }
-
-  if (m_puiDelta != NULL)
-  {
-    delete[] m_puiDelta;
-  }
-
-  if (m_oShm.shmid)
-  {
-    XShmDetach(m_pDisplay, &m_oShm);
-  }
-
-  vOnWidgetResize();
-
-  m_pXvImage = XvShmCreateImage(m_pDisplay,
-                              m_iXvPortId,
-                              m_iFormat,
-                              0,
-                              iScaledWidth + 4,
-                              iScaledHeight + 4,
-                              &m_oShm);
-
-  m_oShm.shmid = shmget(IPC_PRIVATE, m_pXvImage->data_size, IPC_CREAT | 0777);
-  m_oShm.shmaddr = (char *) shmat(m_oShm.shmid, 0, 0);
-  m_oShm.readOnly = FALSE;
-
-  m_pXvImage->data = m_oShm.shmaddr;
-
-  XShmAttach(m_pDisplay, &m_oShm);
-
-  m_puiPixels = new u32[iScaledWidth * iScaledHeight];
-  m_puiDelta = new u8[(m_iWidth + 2) * (m_iHeight + 2) * 4];
-  memset(m_puiPixels, 0, iScaledWidth * iScaledHeight * sizeof(u32));
-  memset(m_puiDelta, 255, (m_iWidth + 2) * (m_iHeight + 2) * 4);
-
-  set_size_request(m_iScale * m_iWidth, m_iScale* m_iHeight);
 }
 
 void ScreenAreaXv::vRGB32toYUY2 (unsigned char* dest_ptr,
@@ -302,18 +222,32 @@ void ScreenAreaXv::vOnWidgetResize()
 {
   double dAspectRatio = m_iWidth / (double)m_iHeight;
 
+  if (m_oShm.shmid)
+  {
+    XShmDetach(m_pDisplay, &m_oShm);
+  }
+
   m_iAreaHeight = min<int>(get_height(), get_width() / dAspectRatio);
   m_iAreaWidth = min<int>(get_width(), get_height() * dAspectRatio);
 
   m_iAreaTop = (get_height() - m_iAreaHeight) / 2;
   m_iAreaLeft = (get_width() - m_iAreaWidth) / 2;
-}
 
-bool ScreenAreaXv::on_configure_event(GdkEventConfigure * event)
-{
-  vOnWidgetResize();
+  m_pXvImage = XvShmCreateImage(m_pDisplay,
+                              m_iXvPortId,
+                              m_iFormat,
+                              0,
+                              m_iFilterScale * m_iWidth + 4,
+                              m_iFilterScale * m_iHeight + 4,
+                              &m_oShm);
 
-  return true;
+  m_oShm.shmid = shmget(IPC_PRIVATE, m_pXvImage->data_size, IPC_CREAT | 0777);
+  m_oShm.shmaddr = (char *) shmat(m_oShm.shmid, 0, 0);
+  m_oShm.readOnly = FALSE;
+
+  m_pXvImage->data = m_oShm.shmaddr;
+
+  XShmAttach(m_pDisplay, &m_oShm);
 }
 
 } // namespace VBA
