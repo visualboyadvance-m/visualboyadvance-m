@@ -4935,7 +4935,7 @@ void gbEmulate(int ticksToStop)
 
                 if(newmask)
                 {
-                  gbMemory[0xff0f] |= 16;
+                  gbMemory[0xff0f] = register_IF |= 16;
                 }
 
 
