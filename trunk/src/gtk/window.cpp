@@ -70,7 +70,9 @@ const Window::SJoypadKey Window::m_astJoypad[] =
 	{ "speed",   KEY_BUTTON_SPEED   },
 	{ "capture", KEY_BUTTON_CAPTURE },
 	{ "speed",   KEY_BUTTON_SPEED   },
-	{ "capture", KEY_BUTTON_CAPTURE }
+	{ "capture", KEY_BUTTON_CAPTURE },
+        { "autoA",   KEY_BUTTON_AUTO_A  },
+        { "autoB",   KEY_BUTTON_AUTO_B  }
 };
 
 Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
@@ -618,31 +620,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   EPad eDefaultJoypad = (EPad)m_poInputConfig->oGetKey<int>("active_joypad");
   inputSetDefaultJoypad(eDefaultJoypad);
 
-  // Autofire menu
-  //
-  struct
-  {
-    const char * m_csName;
-    const char * m_csKey;
-    const EKey   m_eKey;
-  }
-  astAutofire[] =
-  {
-    { "AutofireA", "autofire_A", KEY_BUTTON_A },
-    { "AutofireB", "autofire_B", KEY_BUTTON_B },
-    { "AutofireL", "autofire_L", KEY_BUTTON_L },
-    { "AutofireR", "autofire_R", KEY_BUTTON_R }
-  };
-  for (guint i = 0; i < G_N_ELEMENTS(astAutofire); i++)
-  {
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astAutofire[i].m_csName));
-    poCMI->set_active(m_poInputConfig->oGetKey<bool>(astAutofire[i].m_csKey));
-    vOnAutofireToggled(poCMI, astAutofire[i].m_eKey);
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnAutofireToggled),
-                                      poCMI, astAutofire[i].m_eKey));
-  }
-
   // Fullscreen menu
   //
   poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("VideoFullscreen"));
@@ -767,7 +744,7 @@ void Window::vInitScreenArea(EVideoOutput _eVideoOutput)
   }
   catch (std::exception e)
   {
-    fprintf(stderr, "Unable to initialise output, falling back to Cairo\n");
+    fprintf(stderr, "Unable to initialize output, falling back to Cairo\n");
     m_poScreenArea = Gtk::manage(new ScreenAreaCairo(m_iScreenWidth, m_iScreenHeight));
   }
 
