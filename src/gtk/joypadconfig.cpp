@@ -27,18 +27,20 @@ namespace VBA
 
 const JoypadConfigDialog::SJoypadKey JoypadConfigDialog::m_astKeys[] =
 {
-    { KEY_UP,             "Up :"       },
-    { KEY_DOWN,           "Down :"     },
-    { KEY_LEFT,           "Left :"     },
-    { KEY_RIGHT,          "Right :"    },
-    { KEY_BUTTON_A,       "Button A :" },
-    { KEY_BUTTON_B,       "Button B :" },
-    { KEY_BUTTON_L,       "Button L :" },
-    { KEY_BUTTON_R,       "Button R :" },
-    { KEY_BUTTON_SELECT,  "Select :"   },
-    { KEY_BUTTON_START,   "Start :"    },
-    { KEY_BUTTON_SPEED,   "Speed :"    },
-    { KEY_BUTTON_CAPTURE, "Capture :"  }
+    { KEY_UP,             "Up :"         },
+    { KEY_DOWN,           "Down :"       },
+    { KEY_LEFT,           "Left :"       },
+    { KEY_RIGHT,          "Right :"      },
+    { KEY_BUTTON_A,       "Button A :"   },
+    { KEY_BUTTON_B,       "Button B :"   },
+    { KEY_BUTTON_L,       "Button L :"   },
+    { KEY_BUTTON_R,       "Button R :"   },
+    { KEY_BUTTON_SELECT,  "Select :"     },
+    { KEY_BUTTON_START,   "Start :"      },
+    { KEY_BUTTON_SPEED,   "Speed :"      },
+    { KEY_BUTTON_CAPTURE, "Capture :"    },
+    { KEY_BUTTON_AUTO_A,  "Autofire A :" },
+    { KEY_BUTTON_AUTO_B,  "Autofire B :" }
 };
 
 JoypadConfigDialog::JoypadConfigDialog() :
@@ -93,6 +95,7 @@ JoypadConfigDialog::JoypadConfigDialog() :
               &JoypadConfigDialog::vOnDefaultJoypadSelect) );
   m_oTitleCombo.signal_changed().connect(sigc::mem_fun(*this,
               &JoypadConfigDialog::vOnJoypadSelect) );
+
   m_oTitleCombo.set_active_text("1");
 
   show_all_children();
@@ -218,26 +221,26 @@ bool JoypadConfigDialog::bOnConfigIdle()
   SDL_Event event;
   while(SDL_PollEvent(&event))
   {
-	switch(event.type)
-	{
-	  case SDL_JOYAXISMOTION:
-		if (abs(event.jaxis.value) < 16384) continue;
-		if (event.jaxis.which != m_oPreviousEvent.jaxis.which ||
-			event.jaxis.axis != m_oPreviousEvent.jaxis.axis	||
-			(event.jaxis.value > 0 && m_oPreviousEvent.jaxis.value < 0) ||
-			(event.jaxis.value < 0 && m_oPreviousEvent.jaxis.value > 0))
-		{
-		  vOnInputEvent(event);
-		  m_oPreviousEvent = event;
-		}
-		vEmptyEventQueue();
-		break;
-	  case SDL_JOYHATMOTION:
-	  case SDL_JOYBUTTONUP:
+    switch(event.type)
+    {
+    case SDL_JOYAXISMOTION:
+      if (abs(event.jaxis.value) < 16384) continue;
+      if (event.jaxis.which != m_oPreviousEvent.jaxis.which
+              || event.jaxis.axis != m_oPreviousEvent.jaxis.axis
+              || (event.jaxis.value > 0 && m_oPreviousEvent.jaxis.value < 0)
+              || (event.jaxis.value < 0 && m_oPreviousEvent.jaxis.value > 0))
+      {
         vOnInputEvent(event);
-		vEmptyEventQueue();
-		break;
-	}
+        m_oPreviousEvent = event;
+      }
+      vEmptyEventQueue();
+      break;
+    case SDL_JOYHATMOTION:
+    case SDL_JOYBUTTONUP:
+      vOnInputEvent(event);
+      vEmptyEventQueue();
+      break;
+    }
   }
 
   return true;

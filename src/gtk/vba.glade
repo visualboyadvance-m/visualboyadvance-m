@@ -1031,64 +1031,10 @@
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="JoypadMenu">
+                      <widget class="GtkMenuItem" id="JoypadConfigure">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">_Joypad</property>
+                        <property name="label" translatable="yes">_Joypads ...</property>
                         <property name="use_underline">True</property>
-                        <child>
-                          <widget class="GtkMenu" id="JoypadMenu_menu">
-                            <child>
-                              <widget class="GtkMenuItem" id="JoypadConfigure">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Configure ...</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkMenuItem" id="AutofireMenu">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Autofire</property>
-                                <property name="use_underline">True</property>
-                                <child>
-                                  <widget class="GtkMenu" id="AutofireMenu_menu">
-                                    <child>
-                                      <widget class="GtkCheckMenuItem" id="AutofireA">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">_A</property>
-                                        <property name="use_underline">True</property>
-                                        <accelerator key="1" modifiers="GDK_MOD1_MASK" signal="activate"/>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkCheckMenuItem" id="AutofireB">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">_B</property>
-                                        <property name="use_underline">True</property>
-                                        <accelerator key="2" modifiers="GDK_MOD1_MASK" signal="activate"/>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkCheckMenuItem" id="AutofireL">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">_L</property>
-                                        <property name="use_underline">True</property>
-                                        <accelerator key="3" modifiers="GDK_MOD1_MASK" signal="activate"/>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkCheckMenuItem" id="AutofireR">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">_R</property>
-                                        <property name="use_underline">True</property>
-                                        <accelerator key="4" modifiers="GDK_MOD1_MASK" signal="activate"/>
-                                      </widget>
-                                    </child>
-                                  </widget>
-                                </child>
-                              </widget>
-                            </child>
-                          </widget>
-                        </child>
                       </widget>
                     </child>
                   </widget>
