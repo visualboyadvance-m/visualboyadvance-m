@@ -252,9 +252,14 @@ void memoryUpdateMapMBC1()
     gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
   }
 
-  if((gbRamSize) &&  (gbDataMBC1.mapperMemoryModel == 1)){
-    gbMemoryMap[0x0a] = &gbRam[gbDataMBC1.mapperRAMAddress];
-    gbMemoryMap[0x0b] = &gbRam[gbDataMBC1.mapperRAMAddress + 0x1000];
+  if(gbRamSize) {
+    if(gbDataMBC1.mapperMemoryModel == 1) {
+      gbMemoryMap[0x0a] = &gbRam[gbDataMBC1.mapperRAMAddress];
+      gbMemoryMap[0x0b] = &gbRam[gbDataMBC1.mapperRAMAddress + 0x1000];
+    } else {
+      gbMemoryMap[0x0a] = &gbRam[0];
+      gbMemoryMap[0x0b] = &gbRam[0x1000];
+    }
   }
 }
 
