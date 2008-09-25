@@ -237,6 +237,12 @@ void gbSoundReset()
 	else
 		gbSoundEvent(0xff26, 0xf1);
 
+	/* workaround for game Beetlejuice */
+	if (gbHardware & 0x1) {
+		gbSoundEvent(0xff24, 0x77);
+		gbSoundEvent(0xff25, 0xf3);
+	}
+
 	int addr = 0xff30;
 
 	while(addr < 0xff40) {

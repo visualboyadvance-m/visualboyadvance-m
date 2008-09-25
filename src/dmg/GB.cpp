@@ -2218,7 +2218,11 @@ void gbReset()
           gbMemory[temp] = 0xff;
   }
 
-
+  // GB bios set this memory area to 0
+  // Fixes Pitman (J) title screen
+  if (gbHardware & 0x1) {
+    memset(&gbMemory[0x8000], 0x0, 0x2000);
+  }
 
   // clean LineBuffer
   if (gbLineBuffer != NULL)
