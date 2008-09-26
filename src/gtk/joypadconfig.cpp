@@ -43,14 +43,15 @@ const JoypadConfigDialog::SJoypadKey JoypadConfigDialog::m_astKeys[] =
     { KEY_BUTTON_AUTO_B,  "Autofire B :" }
 };
 
-JoypadConfigDialog::JoypadConfigDialog() :
+JoypadConfigDialog::JoypadConfigDialog(Config::Section * _poConfig) :
   Gtk::Dialog("Joypad config", true, true),
   m_oTitleHBox(false, 5),
   m_oTitleLabel("Joypad :", Gtk::ALIGN_RIGHT),
   m_oDefaultJoypad("Default joypad"),
   m_oTable(G_N_ELEMENTS(m_astKeys), 2, false),
   m_bUpdating(false),
-  m_ePad(PAD_MAIN)
+  m_ePad(PAD_MAIN),
+  m_poConfig(_poConfig)
 {
   // Joypad selection
   m_oTitleCombo.append_text("1");
@@ -193,6 +194,11 @@ bool JoypadConfigDialog::on_key_press_event(GdkEventKey * _pstEvent)
   vOnInputEvent(event);
 
   return true;
+}
+
+void JoypadConfigDialog::on_response(int response_id)
+{
+  m_poConfig->vSetKey("active_joypad", inputGetDefaultJoypad());
 }
 
 void JoypadConfigDialog::vOnInputEvent(const SDL_Event &event)
