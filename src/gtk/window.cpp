@@ -120,7 +120,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 
   // Get config
   //
-  m_sUserDataDir = Glib::get_home_dir() + "/.gvba";
+  m_sUserDataDir = Glib::get_user_config_dir() + "/gvbam";
   m_sConfigFile  = m_sUserDataDir + "/config";
 
   vInitConfig();
