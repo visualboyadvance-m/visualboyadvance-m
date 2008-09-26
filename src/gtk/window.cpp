@@ -337,7 +337,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 
   // Emulator menu
   //
-  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("EmulatorDirectories"));
+  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("DirectoriesConfigure"));
   poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnDirectories));
 
   poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("EmulatorPauseWhenInactive"));

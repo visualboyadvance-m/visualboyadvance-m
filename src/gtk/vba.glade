@@ -95,6 +95,15 @@
                       </widget>
                     </child>
                     <child>
+                      <widget class="GtkImageMenuItem" id="VideoFullscreen">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">gtk-fullscreen</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
+                        <accelerator key="F11" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
                       <widget class="GtkSeparatorMenuItem" id="separator3">
                         <property name="visible">True</property>
                       </widget>
@@ -451,20 +460,6 @@
                         <child>
                           <widget class="GtkMenu" id="VideoMenu_menu">
                             <child>
-                              <widget class="GtkImageMenuItem" id="VideoFullscreen">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">gtk-fullscreen</property>
-                                <property name="use_underline">True</property>
-                                <property name="use_stock">True</property>
-                                <accelerator key="F11" signal="activate"/>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkSeparatorMenuItem" id="separatormenuitem1">
-                                <property name="visible">True</property>
-                              </widget>
-                            </child>
-                            <child>
                               <widget class="GtkRadioMenuItem" id="VideoOpenGL">
                                 <property name="visible">True</property>
                                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
@@ -558,13 +553,6 @@
                         <property name="use_underline">True</property>
                         <child>
                           <widget class="GtkMenu" id="EmulatorMenu_menu">
-                            <child>
-                              <widget class="GtkMenuItem" id="EmulatorDirectories">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">Directories...</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                            </child>
                             <child>
                               <widget class="GtkCheckMenuItem" id="EmulatorPauseWhenInactive">
                                 <property name="visible">True</property>
@@ -1028,6 +1016,13 @@
                             </child>
                           </widget>
                         </child>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="DirectoriesConfigure">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">_Directories ...</property>
+                        <property name="use_underline">True</property>
                       </widget>
                     </child>
                     <child>
