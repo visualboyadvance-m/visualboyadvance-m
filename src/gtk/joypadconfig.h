@@ -31,6 +31,7 @@
 #include <gtkmm/checkbutton.h>
 
 #include "../sdl/inputSDL.h"
+#include "configfile.h"
 
 namespace VBA
 {
@@ -38,7 +39,7 @@ namespace VBA
 class JoypadConfigDialog : public Gtk::Dialog
 {
 public:
-  JoypadConfigDialog();
+  JoypadConfigDialog(Config::Section * _poConfig);
   virtual ~JoypadConfigDialog();
 
 protected:
@@ -47,6 +48,7 @@ protected:
 
   void vOnInputEvent(const SDL_Event &event);
   bool on_key_press_event(GdkEventKey * _pstEvent);
+  void on_response(int response_id);
 
 private:
   struct SJoypadKey
@@ -69,6 +71,7 @@ private:
   sigc::connection          m_oConfigSig;
   SDL_Event                 m_oPreviousEvent;
   EPad                      m_ePad;
+  Config::Section *         m_poConfig;
 
   bool bOnConfigIdle();
   void vOnJoypadSelect();
