@@ -95,7 +95,7 @@ IF( NO_DEBUGGER )
         MESSAGE(STATUS "The SDL port can't be built without debugging support")
         SET( CAN_BUILD_VBAM 0 )
     ENDIF( CAN_BUILD_VBAM )
-    
+
     ADD_DEFINITIONS (-DNO_DEBUGGER)
 ELSE( NO_DEBUGGER )
     ADD_DEFINITIONS (-DBKPT_SUPPORT)
@@ -123,7 +123,7 @@ SET(SRC_MAIN
     src/bios.cpp
     src/Cheats.cpp
     src/CheatSearch.cpp
-    src/EEprom.cpp 
+    src/EEprom.cpp
     src/Flash.cpp
     src/Globals.cpp
     src/interframe.cpp
@@ -134,6 +134,7 @@ SET(SRC_MAIN
     src/Mode3.cpp
     src/Mode4.cpp
     src/Mode5.cpp
+    src/Patch.cpp
     src/pixel.cpp
     src/RTC.cpp
     src/scanline.cpp
