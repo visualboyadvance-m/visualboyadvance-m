@@ -40,6 +40,7 @@
 #include "../agb/GBA.h"
 #include "../agb/agbprint.h"
 #include "../Flash.h"
+#include "../Patch.h"
 #include "../RTC.h"
 #include "../Sound.h"
 #include "../Util.h"
@@ -150,7 +151,6 @@ FilterFunc filterFunction = 0;
 IFBFilterFunc ifbFunction = 0;
 IFBFilter ifbType = kIFBNone;
 char filename[2048];
-char ipsname[2048];
 char biosFileName[2048];
 char gbBiosFileName[2048];
 char captureDir[2048];
@@ -185,10 +185,10 @@ static int saveSlotPosition = 0; // default is the slot from normal F1
 static int sdlOpenglScale = 1;
 // will scale window on init by this much
 static int sdlSoundToggledOff = 0;
-// allow up to 100 IPS patches given on commandline
-#define IPS_MAX_NUM 100
-int	sdl_ips_num	= 0;
-char *	(sdl_ips_names[IPS_MAX_NUM])	= { NULL }; // and so on
+// allow up to 100 IPS/UPS/PPF patches given on commandline
+#define PATCH_MAX_NUM 100
+int	sdl_patch_num	= 0;
+char *	(sdl_patch_names[PATCH_MAX_NUM])	= { NULL }; // and so on
 
 #define REWIND_NUM 8
 #define REWIND_SIZE 400000
@@ -214,7 +214,7 @@ bool debugger = false;
 bool debuggerStub = false;
 int fullscreen = 0;
 int sdlFlashSize = 0;
-int sdlAutoIPS = 1;
+int sdlAutoPatch = 1;
 int sdlRtcEnable = 0;
 int sdlAgbPrint = 0;
 int sdlMirroringEnable = 0;
@@ -259,11 +259,11 @@ struct option sdlOptions[] = {
   { "fullscreen", no_argument, &fullscreen, 1 },
   { "gdb", required_argument, 0, 'G' },
   { "help", no_argument, &sdlPrintUsage, 1 },
-  { "ips", required_argument, 0, 'i' },
+  { "patch", required_argument, 0, 'i' },
   { "no-agb-print", no_argument, &sdlAgbPrint, 0 },
   { "no-auto-frameskip", no_argument, &autoFrameSkip, 0 },
   { "no-debug", no_argument, 0, 'N' },
-  { "no-ips", no_argument, &sdlAutoIPS, 0 },
+  { "no-patch", no_argument, &sdlAutoPatch, 0 },
   { "no-opengl", no_argument, &openGL, 0 },
   { "no-pause-when-inactive", no_argument, &pauseWhenInactive, 0 },
   { "no-rtc", no_argument, &sdlRtcEnable, 0 },
@@ -1760,7 +1760,7 @@ Options:\n\
 	  printf("                                %d - %s\n", i, getFilterName((Filter)i));
   printf("\
   -h, --help                   Print this help\n\
-  -i, --ips=PATCH              Apply given IPS patch\n\
+  -i, --patch=PATCH            Apply given patch\n\
   -p, --profile=[HERTZ]        Enable profiling\n\
   -s, --frameskip=FRAMESKIP    Set frame skip (0...9)\n\
   -t, --save-type=TYPE         Set the available save type\n\
@@ -1787,7 +1787,7 @@ Long options only:\n\
       --auto-frameskip         Enable auto frameskipping\n\
       --no-agb-print           Disable AGBPrint support\n\
       --no-auto-frameskip      Disable auto frameskipping\n\
-      --no-ips                 Do not apply IPS patch\n\
+      --no-patch               Do not automatically apply patch\n\
       --no-pause-when-inactive Don't pause when inactive\n\
       --no-rtc                 Disable RTC support\n\
       --no-show-speed          Don't show emulation speed\n\
@@ -1796,7 +1796,7 @@ Long options only:\n\
       --rtc                    Enable RTC support\n\
       --show-speed-normal      Show emulation speed\n\
       --show-speed-detailed    Show detailed speed data\n\
-      --cheat 'CHEAT'          add a cheat\n\
+      --cheat 'CHEAT'          Add a cheat\n\
 ");
 }
 
@@ -1848,7 +1848,6 @@ int main(int argc, char **argv)
   captureDir[0] = 0;
   saveDir[0] = 0;
   batteryDir[0] = 0;
-  ipsname[0] = 0;
 
   int op = -1;
 
@@ -1933,16 +1932,15 @@ int main(int argc, char **argv)
       break;
     case 'i':
       if(optarg == NULL) {
-        fprintf(stderr, "Missing IPS name\n");
+        fprintf(stderr, "Missing patch name\n");
         exit(-1);
       }
-//        strcpy(ipsname, optarg);
-      if (sdl_ips_num >= IPS_MAX_NUM) {
-        fprintf(stderr, "Too many IPS patches given at %s (max is %d). Ignoring.\n", optarg, IPS_MAX_NUM);
+      if (sdl_patch_num >= PATCH_MAX_NUM) {
+        fprintf(stderr, "Too many patches given at %s (max is %d). Ignoring.\n", optarg, PATCH_MAX_NUM);
       } else {
-        sdl_ips_names[sdl_ips_num]	= (char *)malloc(1 + strlen(optarg));
-        strcpy(sdl_ips_names[sdl_ips_num], optarg);
-        sdl_ips_num++;
+        sdl_patch_names[sdl_patch_num]	= (char *)malloc(1 + strlen(optarg));
+        strcpy(sdl_patch_names[sdl_patch_num], optarg);
+        sdl_patch_num++;
       }
       break;
    case 'G':
@@ -2110,14 +2108,26 @@ int main(int argc, char **argv)
     if(p)
       *p = 0;
 
-//    if(ipsname[0] == 0)
-//      sprintf(ipsname, "%s.ips", filename);
-    if (sdl_ips_num == 0)
+    if (sdlAutoPatch && sdl_patch_num == 0)
     {
+      char * tmp;
       // no patch given yet - look for ROMBASENAME.ips
-      sprintf(ipsname, "%s.ips", filename);
-      sdl_ips_names[0]	= ipsname;
-      sdl_ips_num++;
+      tmp = (char *)malloc(strlen(filename) + 4 + 1);
+      sprintf(tmp, "%s.ips", filename);
+      sdl_patch_names[sdl_patch_num] = tmp;
+      sdl_patch_num++;
+
+      // no patch given yet - look for ROMBASENAME.ups
+      tmp = (char *)malloc(strlen(filename) + 4 + 1);
+      sprintf(tmp, "%s.ups", filename);
+      sdl_patch_names[sdl_patch_num] = tmp;
+      sdl_patch_num++;
+
+      // no patch given yet - look for ROMBASENAME.ppf
+      tmp = (char *)malloc(strlen(filename) + 4 + 1);
+      sprintf(tmp, "%s.ppf", filename);
+      sdl_patch_names[sdl_patch_num] = tmp;
+      sdl_patch_num++;
     }
 
     bool failed = false;
@@ -2139,22 +2149,19 @@ int main(int argc, char **argv)
         if (gbHardware & 5)
           gbCPUInit(gbBiosFileName, useBios);
 
-        gbReset();
         cartridgeType = IMAGE_GB;
         emulator = GBSystem;
-        if(sdlAutoIPS) {
-          int size = gbRomSize, patchnum;
-//          utilApplyIPS(ipsname, &gbRom, &size);
-          for (patchnum = 0; patchnum < sdl_ips_num; patchnum++) {
-            fprintf(stdout, "Trying IPS patch %s.\n", sdl_ips_names[patchnum]);
-            utilApplyIPS(sdl_ips_names[patchnum], &gbRom, &size);
-	  }
-          if(size != gbRomSize) {
-            extern bool gbUpdateSizes();
-            gbUpdateSizes();
-            gbReset();
-          }
+        int size = gbRomSize, patchnum;
+        for (patchnum = 0; patchnum < sdl_patch_num; patchnum++) {
+          fprintf(stdout, "Trying patch %s%s\n", sdl_patch_names[patchnum],
+            applyPatch(sdl_patch_names[patchnum], &gbRom, &size) ? " [success]" : "");
         }
+        if(size != gbRomSize) {
+          extern bool gbUpdateSizes();
+          gbUpdateSizes();
+          gbReset();
+        }
+        gbReset();
       }
     } else if(type == IMAGE_GBA) {
       int size = CPULoadRom(szFile);
@@ -2168,18 +2175,12 @@ int main(int argc, char **argv)
         emulator = GBASystem;
 
         CPUInit(biosFileName, useBios);
-        CPUReset();
-        if(sdlAutoIPS) {
-          int size = 0x2000000, patchnum;
-//          utilApplyIPS(ipsname, &rom, &size);
-          for (patchnum = 0; patchnum < sdl_ips_num; patchnum++) {
-            fprintf(stdout, "Trying IPS patch %s.\n", sdl_ips_names[patchnum]);
-            utilApplyIPS(sdl_ips_names[patchnum], &rom, &size);
-	  }
-          if(size != 0x2000000) {
-            CPUReset();
-          }
+        int patchnum;
+        for (patchnum = 0; patchnum < sdl_patch_num; patchnum++) {
+          fprintf(stdout, "Trying patch %s%s\n", sdl_patch_names[patchnum],
+            applyPatch(sdl_patch_names[patchnum], &rom, &size) ? " [success]" : "");
         }
+        CPUReset();
       }
     }
 
@@ -2360,6 +2361,10 @@ int main(int argc, char **argv)
     free(filterPix);
     filterPix = NULL;
  }
+
+  for (int i = 0; i < sdl_patch_num; i++) {
+    free(sdl_patch_names[i]);
+  }
 
 #if WITH_LIRC
   StopLirc();

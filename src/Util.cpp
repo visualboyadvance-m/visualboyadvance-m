@@ -34,6 +34,7 @@ extern "C" {
 #include "agb/GBA.h"
 #include "Globals.h"
 #include "RTC.h"
+#include "Patch.h"
 #include "Port.h"
 
 #include "fex.h"
@@ -330,96 +331,9 @@ bool utilWriteBMPFile(const char *fileName, int w, int h, u8 *pix)
   return true;
 }
 
-static int utilReadInt2(FILE *f)
+void utilApplyIPS(const char *ips, u8 **rom, int *size)
 {
-  int res = 0;
-  int c = fgetc(f);
-  if(c == EOF)
-    return -1;
-  res = c;
-  c = fgetc(f);
-  if(c == EOF)
-    return -1;
-  return c + (res<<8);
-}
-
-static int utilReadInt3(FILE *f)
-{
-  int res = 0;
-  int c = fgetc(f);
-  if(c == EOF)
-    return -1;
-  res = c;
-  c = fgetc(f);
-  if(c == EOF)
-    return -1;
-  res = c + (res<<8);
-  c = fgetc(f);
-  if(c == EOF)
-    return -1;
-  return c + (res<<8);
-}
-
-void utilApplyIPS(const char *ips, u8 **r, int *s)
-{
-  // from the IPS spec at http://zerosoft.zophar.net/ips.htm
-  FILE *f = fopen(ips, "rb");
-  if(!f)
-    return;
-  u8 *rom = *r;
-  int size = *s;
-  if(fgetc(f) == 'P' &&
-     fgetc(f) == 'A' &&
-     fgetc(f) == 'T' &&
-     fgetc(f) == 'C' &&
-     fgetc(f) == 'H') {
-    int b;
-    int offset;
-    int len;
-    for(;;) {
-      // read offset
-      offset = utilReadInt3(f);
-      // if offset == EOF, end of patch
-      if(offset == 0x454f46)
-        break;
-      // read length
-      len = utilReadInt2(f);
-      if(!len) {
-        // len == 0, RLE block
-        len = utilReadInt2(f);
-        // byte to fill
-        int c = fgetc(f);
-        if(c == -1)
-          break;
-        b = (u8)c;
-      } else
-        b= -1;
-      // check if we need to reallocate our ROM
-      if((offset + len) >= size) {
-        size *= 2;
-        rom = (u8 *)realloc(rom, size);
-        *r = rom;
-        *s = size;
-      }
-      if(b == -1) {
-        // normal block, just read the data
-        if(fread(&rom[offset], 1, len, f) != (size_t)len)
-          break;
-      } else {
-        // fill the region with the given byte
-        while(len--) {
-          rom[offset++] = b;
-        }
-      }
-    }
-  }
-  // close the file
-  fclose(f);
-}
-
-//TODO: Modify ZSNES code for this
-void utilApplyUPS(const char *ips, u8 **r, int *s)
-{
+	applyPatch(ips, rom, size);
 }
 
 extern bool cpuIsMultiBoot;
