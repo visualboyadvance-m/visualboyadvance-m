@@ -257,7 +257,7 @@ VBA::VBA()
   autoSaveLoadCheatList = false;
   winout = NULL;
   removeIntros = false;
-  autoIPS = true;
+  autoPatch = true;
   winGbBorderOn = 0;
   winFlashSize = 0x20000;
   winRtcEnable = false;
@@ -1635,7 +1635,7 @@ void VBA::loadSettings()
 
   recentFreeze = regQueryDwordValue("recentFreeze", false) ? true : false;
 
-  autoIPS = regQueryDwordValue("autoIPS", true) ? true : false;
+  autoPatch = regQueryDwordValue("autoPatch", 1) == 1 ? true : false;
 
   cpuDisableSfx = regQueryDwordValue("disableSfx", 0) ? true : false;
 
@@ -2616,7 +2616,7 @@ void VBA::saveSettings()
 
   regSetDwordValue("recentFreeze", recentFreeze);
 
-  regSetDwordValue("autoIPS", autoIPS);
+  regSetDwordValue("autoPatch", autoPatch ? 1 : 0);
 
   regSetDwordValue("disableSfx", cpuDisableSfx);
 
