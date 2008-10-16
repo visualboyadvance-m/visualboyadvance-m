@@ -124,7 +124,7 @@ class VBA : public CWinApp
   bool autoSaveLoadCheatList;
   FILE *winout;
   bool removeIntros;
-  bool autoIPS;
+  bool autoPatch;
   int winGbBorderOn;
   int winFlashSize;
   bool winRtcEnable;

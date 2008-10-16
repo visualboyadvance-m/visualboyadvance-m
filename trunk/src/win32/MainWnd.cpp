@@ -69,6 +69,12 @@ MainWnd::~MainWnd()
 {
 }
 
+bool MainWnd::fileExists( LPCTSTR lpFileName )
+{
+	// check if file exists
+	return GetFileAttributes( lpFileName ) != INVALID_FILE_ATTRIBUTES;
+}
+
 
 BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   //{{AFX_MSG_MAP(MainWnd)
@@ -173,8 +179,8 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_SYNCHRONIZE, OnUpdateOptionsEmulatorSynchronize)
   ON_COMMAND(ID_OPTIONS_EMULATOR_SPEEDUPTOGGLE, OnOptionsEmulatorSpeeduptoggle)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_SPEEDUPTOGGLE, OnUpdateOptionsEmulatorSpeeduptoggle)
-  ON_COMMAND(ID_OPTIONS_EMULATOR_AUTOMATICALLYIPSPATCH, OnOptionsEmulatorAutomaticallyipspatch)
-  ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_AUTOMATICALLYIPSPATCH, OnUpdateOptionsEmulatorAutomaticallyipspatch)
+  ON_COMMAND(ID_OPTIONS_EMULATOR_AUTOMATICALLYAPPLYPATCHFILES, OnOptionsEmulatorAutomaticallyApplyPatchFiles)
+  ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_AUTOMATICALLYAPPLYPATCHFILES, OnUpdateOptionsEmulatorAutomaticallyipspatch)
   ON_COMMAND(ID_OPTIONS_EMULATOR_AGBPRINT, OnOptionsEmulatorAgbprint)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_AGBPRINT, OnUpdateOptionsEmulatorAgbprint)
   ON_COMMAND(ID_OPTIONS_EMULATOR_REALTIMECLOCK, OnOptionsEmulatorRealtimeclock)
@@ -455,8 +461,19 @@ bool MainWnd::FileRun()
 	  gbCheatRemoveAll();
   }
 
-  CString ipsname;
-  ipsname.Format("%s.ips", theApp.filename);
+  CString patchName;
+  patchName.Format("%s.ips", theApp.filename);
+  if( !fileExists( patchName ) ) {
+	  patchName.Format("%s.ups", theApp.filename);
+	  if( !fileExists( patchName ) ) {
+		  patchName.Format("%s.ppf", theApp.filename);
+		  if( !fileExists( patchName ) ) {
+			  // don't use any patches
+			  patchName.Empty();
+		  }
+	  }
+  }
+
 
   if(!theApp.dir.GetLength()) {
     int index = theApp.filename.ReverseFind('\\');
@@ -495,9 +512,9 @@ bool MainWnd::FileRun()
     theApp.romSize = gbRomSize;
 
 
-    if(theApp.autoIPS) {
+    if(theApp.autoPatch && !patchName.IsEmpty()) {
       int size = gbRomSize;
-      utilApplyIPS(ipsname, &gbRom, &size);
+      utilApplyIPS(patchName, &gbRom, &size);
       if(size != gbRomSize) {
         extern bool gbUpdateSizes();
         gbUpdateSizes();
@@ -562,9 +579,9 @@ bool MainWnd::FileRun()
     }
     */
 
-    if(theApp.autoIPS) {
+    if(theApp.autoPatch && !patchName.IsEmpty()) {
       int size = 0x2000000;
-      utilApplyIPS(ipsname, &rom, &size);
+      utilApplyIPS(patchName, &rom, &size);
       if(size != 0x2000000) {
         CPUReset();
       }
@@ -1151,9 +1168,7 @@ void MainWnd::screenCapture(int captureNumber)
                   captureNumber,
                   ext);
 
-  // check if file exists
-  DWORD dwAttr = GetFileAttributes( buffer );
-  if( dwAttr != INVALID_FILE_ATTRIBUTES ) {
+  if( fileExists( buffer ) ) {
 	  // screenshot file already exists
 	  screenCapture(++captureNumber);
 	  // this will recursively use the first non-existent screenshot number
