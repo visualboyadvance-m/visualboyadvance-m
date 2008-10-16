@@ -811,6 +811,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\Patch.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Patch.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\Port.h"
 				>
 			</File>
