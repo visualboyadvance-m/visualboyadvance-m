@@ -39,7 +39,7 @@ They are built with the static C runtime (this is what the releases use).
 # Visual C++ 2008 project files #
 #################################
 
-Using Microsoft Visual C++ 2008, you can build the Win32/MFC and the Win32/Qt build.
+Using Microsoft Visual C++ 2008, you can build the Windows/MFC version.
 Refer to the instructions below for further assistance:
 
 ===Win32/MFC===
@@ -57,26 +57,3 @@ If you want to enable OpenAL sound output, install the OpenAL SDK. If you do not
 Some pixel filters come with assembler code, which compatible to the NASM syntax.
 Extract NASM somewhere and add it to your compiler's executable file paths.
 All .asm files will be handled with the "nasm.rules" build rules file which comes with this project file.
-
-===Win32/Qt===
-The MS Visual C++ 2008 Express-compatible project file can be found in trunk/project/vc2008_qt.
-It uses the qmake file in trunk/project/qmake, so you always have to add files to the VC++ project file AND the qmake file!
-IMPORTANT: The Qt-sources have to be compiled with the Microsoft compiler first, in order to use it,
-because the default binary distribution was compiled with mingw and will not work with the MS Compiler.
-Continue by reading "How to compile Qt from source with Visual C++ 2008".
-The release build will automatically be compressed with UPX, make sure to download it and point MSVC++ to it.
-
-
-
-######################################################
-# How to compile Qt from source with Visual C++ 2008 #
-######################################################
-- Download the latest Qt source code archive from http://trolltech.com/developer/downloads/qt/windows
- - You want "qt-win-opensource-src-x.x.x.zip", not "qt-win-opensource-x.x.x-mingw.exe"
- - This how-to was witten when Qt 4.4.1 was the current version. 
-- Extract the archive somewhere.
-- Start a Visual Studio build command promt and cd to the extracted files.
- - You can find it in the start menu in "Microsoft Visual Studio 2008\Visual Studio Tools\Visual Studio 2008 Command Prompt".
-- Type & run "configure -release -fast -no-qt3support -platform win32-msvc2008"
-- When configure finished, simply run "nmake" and get yourself a coffee or ten.
-- When nmake finished and you've become a coffee addict, add the created lib files to your Visual Studio paths, do the same for the include paths.
