@@ -34,6 +34,12 @@
 #define _stricmp strcasecmp
 #endif // ! _MSC_VER
 
+#ifdef _MSC_VER
+#define fseeko64 _fseeki64
+#define ftello64 _ftelli64
+typedef	__int64 __off64_t;
+#endif
+
 #if defined(__APPLE__) || defined (MACOSX)
 #define	fseeko64 fseeko
 #define	ftello64 ftello
