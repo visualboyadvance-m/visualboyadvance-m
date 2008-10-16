@@ -40,11 +40,6 @@ typedef int32_t s32;
 typedef int64_t s64;
 
 
-
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-
 struct EmulatedSystem {
   // main emulation function
   void (*emuMain)(int);
