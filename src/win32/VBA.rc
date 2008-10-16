@@ -1859,7 +1859,7 @@ BEGIN
                 MENUITEM "&Below Normal",               ID_OPTIONS_PRIORITY_BELOWNORMAL
             END
             MENUITEM "&Remove intros (GBA)",        ID_OPTIONS_EMULATOR_REMOVEINTROSGBA
-            MENUITEM "Automatic IPS patching",      ID_OPTIONS_EMULATOR_AUTOMATICALLYIPSPATCH
+            MENUITEM "Auto-apply IPS/UPS/PPF",      ID_OPTIONS_EMULATOR_AUTOMATICALLYAPPLYPATCHFILES
             MENUITEM "AGB Print",                   ID_OPTIONS_EMULATOR_AGBPRINT
             MENUITEM "Real Time Clock",             ID_OPTIONS_EMULATOR_REALTIMECLOCK
             MENUITEM "&Game Overrides...",          ID_OPTIONS_EMULATOR_GAMEOVERRIDES

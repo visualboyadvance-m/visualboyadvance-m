@@ -536,14 +536,14 @@ void MainWnd::OnUpdateOptionsEmulatorSpeeduptoggle(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(theApp.speedupToggle);
 }
 
-void MainWnd::OnOptionsEmulatorAutomaticallyipspatch()
+void MainWnd::OnOptionsEmulatorAutomaticallyApplyPatchFiles()
 {
-  theApp.autoIPS = !theApp.autoIPS;
+  theApp.autoPatch = !theApp.autoPatch;
 }
 
 void MainWnd::OnUpdateOptionsEmulatorAutomaticallyipspatch(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.autoIPS);
+  pCmdUI->SetCheck(theApp.autoPatch);
 }
 
 void MainWnd::OnOptionsEmulatorAgbprint()

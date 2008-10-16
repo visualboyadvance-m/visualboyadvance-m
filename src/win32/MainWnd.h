@@ -49,6 +49,9 @@ public:
 	void winSaveCheatList(const char *name);
 	void winSaveCheatListDefault();
 
+private:
+	bool fileExists( LPCTSTR lpFileName );
+
 
 	DECLARE_MESSAGE_MAP()
 
@@ -176,7 +179,7 @@ protected:
 	afx_msg void OnUpdateOptionsEmulatorSynchronize(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorSpeeduptoggle();
 	afx_msg void OnUpdateOptionsEmulatorSpeeduptoggle(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsEmulatorAutomaticallyipspatch();
+	afx_msg void OnOptionsEmulatorAutomaticallyApplyPatchFiles();
 	afx_msg void OnUpdateOptionsEmulatorAutomaticallyipspatch(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorAgbprint();
 	afx_msg void OnUpdateOptionsEmulatorAgbprint(CCmdUI* pCmdUI);
