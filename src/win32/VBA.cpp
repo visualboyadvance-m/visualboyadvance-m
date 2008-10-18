@@ -54,8 +54,6 @@
 #include "../agb/GBALink.h"
 /* ---------------- */
 
-#include "../agb/gbafilter.h"
-
 extern void Pixelate(u8*,u32,u8*,u8*,u32,int,int);
 extern void Pixelate32(u8*,u32,u8*,u8*,u32,int,int);
 extern void _2xSaI(u8*,u32,u8*,u8*,u32,int,int);
