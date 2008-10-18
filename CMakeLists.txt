@@ -147,7 +147,6 @@ SET(SRC_MAIN
 SET(SRC_AGB
     src/agb/agbprint.cpp
     src/agb/GBA.cpp
-    src/agb/gbafilter.cpp
     src/agb/GBAGfx.cpp
     src/agb/GBA-thumb.cpp
     src/agb/GBA-arm.cpp
