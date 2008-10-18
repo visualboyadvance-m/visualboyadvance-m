@@ -480,10 +480,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\agb\gbafilter.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\src\agb\gbagfx.cpp"
 					>
 				</File>
@@ -788,10 +784,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\CheatSearch.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\agb\gbafilter.cpp"
 				>
 			</File>
 			<File
