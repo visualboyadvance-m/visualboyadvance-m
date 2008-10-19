@@ -33,7 +33,7 @@
 
 #define __STDC_CONSTANT_MACROS
 
-#include <stdint.h>
+#include "stdint.h"
 
 
 typedef uint16_t interp_uint16;

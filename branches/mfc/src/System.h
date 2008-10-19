@@ -20,7 +20,7 @@
 #ifndef VBA_SYSTEM_H
 #define VBA_SYSTEM_H
 
-#include <stdint.h>
+#include "stdint.h"
 
 #include <zlib.h>
 
