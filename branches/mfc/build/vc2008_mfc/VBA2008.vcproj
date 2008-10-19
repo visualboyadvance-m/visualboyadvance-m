@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="VisualBoyAdvance"
 	ProjectGUID="{6D4C5EC8-933F-4C05-A1BF-498E658576DF}"
 	RootNamespace="VBA"
@@ -21,12 +21,12 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)_temp"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="1"
 			CharacterSet="0"
-			BuildLogFile="$(IntDir)\$(ProjectName)_BuildLog.htm"
+			BuildLogFile="$(IntDir)\BuildLog.htm"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -52,7 +52,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;..\..\..\dependencies\File_Extractor-0.4.3\fex&quot;;..\..\..\dependencies\msvc"
+				AdditionalIncludeDirectories="../../src"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;DEV_VERSION;BKPT_SUPPORT;GBA_LOGGING;MMX;ASM;_CRT_SECURE_NO_WARNINGS;HAS_FILE_EXTRACTOR"
 				StringPooling="false"
 				MinimalRebuild="true"
@@ -65,7 +65,7 @@
 				EnableEnhancedInstructionSet="0"
 				TreatWChar_tAsBuiltInType="false"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="$(IntDir)\$(ProjectName).pdb"
+				ProgramDataBaseFileName="$(IntDir)\vc90.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
@@ -85,14 +85,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nafxcwd.lib libcmtd.lib zlibd.lib libpngd.lib"
+				AdditionalDependencies="nafxcwd.lib libcmtd.lib zlib1.lib libpng13.lib File_Extractor.lib"
 				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
 				Version=""
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateManifest="true"
 				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;x86&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
-				IgnoreDefaultLibraryNames="nafxcwd.lib;libcmtd.lib"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="1"
@@ -126,15 +126,15 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(ProjectDir)$(PlatformName)\$(ConfigurationName)_temp"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="1"
 			UseOfATL="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="0"
 			ManagedExtensions="0"
-			BuildLogFile="$(IntDir)\$(ProjectName)_BuildLog.htm"
+			BuildLogFile="$(IntDir)\BuildLog.htm"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -164,14 +164,14 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;..\..\..\dependencies\File_Extractor-0.4.3\fex&quot;;..\..\..\dependencies\msvc"
+				AdditionalIncludeDirectories="../../src"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;GBA_LOGGING;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
 				EnableEnhancedInstructionSet="0"
 				FloatingPointModel="2"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="$(IntDir)\$(ProjectName).pdb"
+				ProgramDataBaseFileName="$(IntDir)\vc90.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="0"
@@ -193,7 +193,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
-				AdditionalDependencies="nafxcw.lib libcmt.lib zlib.lib libpng.lib"
+				AdditionalDependencies="nafxcw.lib libcmt.lib zlib1.lib libpng13.lib File_Extractor.lib"
 				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
 				Version=""
 				LinkIncremental="0"
@@ -201,7 +201,7 @@
 				AdditionalLibraryDirectories=""
 				GenerateManifest="true"
 				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;x86&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
-				IgnoreDefaultLibraryNames="nafxcw.lib;libcmt.lib"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="false"
 				AssemblyDebug="2"
 				GenerateMapFile="false"
@@ -236,7 +236,7 @@
 				Name="VCPostBuildEventTool"
 				Description="Signing executable..."
 				CommandLine="protect.exe $(TargetPath)"
-				ExcludedFromBuild="false"
+				ExcludedFromBuild="true"
 			/>
 		</Configuration>
 	</Configurations>
@@ -1446,6 +1446,18 @@
 					>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="Misc"
+			>
+			<File
+				RelativePath="..\..\src\gl\glext.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\stdint.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
