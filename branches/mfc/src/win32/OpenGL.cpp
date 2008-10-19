@@ -45,7 +45,7 @@
 #include <gl/GL.h> // main include file
 #include <GL/glu.h>
 #include "glFont.h"
-#include <gl/glext.h>
+#include "gl/glext.h"
 typedef BOOL (APIENTRY *PFNWGLSWAPINTERVALFARPROC)( int );
 extern int Init_2xSaI(u32);
 extern void winlog(const char *,...);
