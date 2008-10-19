@@ -46,6 +46,7 @@ Refer to the instructions below for further assistance:
 This is the full-featured Windows build using the MFC GUI.
 The project files are located in trunk/project/vc2008_mfc (VBA2008.sln).
 Before you can compile it, you have to take care of some prerequisites:
+Checkout the File Extractor dependancy and build the LIB.
 Download the zlib & libpng sources from the internet and extract them both to the same folder.
 Rename them so you have a folder called libpng and another one called zlib in the same loaction.
 Open libpng/projects/visualc71/libpng.sln. Let the assistant convert them if necessary.
@@ -55,5 +56,5 @@ Set up your compiler's LIB & INCLUDE paths to point to the created lib files and
 You also have to install Microsoft's DirectX SDK for DirectInput & XAudio2.
 If you want to enable OpenAL sound output, install the OpenAL SDK. If you do not want it, #define NO_OAL.
 Some pixel filters come with assembler code, which compatible to the NASM syntax.
-Extract NASM somewhere and add it to your compiler's executable file paths.
+Extract NASM somewhere and add it to your compiler's executable file paths (the latest version, "2.05rc4", of NASM  produces a lot of label related warnings - use an earlier release version)
 All .asm files will be handled with the "nasm.rules" build rules file which comes with this project file.
