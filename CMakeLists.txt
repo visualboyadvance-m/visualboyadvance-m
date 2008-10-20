@@ -28,7 +28,7 @@ IF( NOT VERSION )
 ENDIF( NOT VERSION )
 
 # Fill in SDLMAIN_LIBRARY on OS X manually to avoid using SDLMain.m
-# OS X users will have to compile and install SDL form source.
+# OS X users will have to compile and install SDL from source.
 if( APPLE )
 	SET(SDLMAIN_LIBRARY "-lSDLmain")
 endif( APPLE )
