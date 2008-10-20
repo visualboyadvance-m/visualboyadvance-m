@@ -30,6 +30,10 @@
 // #include "RTC.h"
 // #include "Port.h"
 
+#ifdef __GNUC__
+typedef off64_t __off64_t;
+#endif
+
 #ifndef _MSC_VER
 #define _stricmp strcasecmp
 #endif // ! _MSC_VER
