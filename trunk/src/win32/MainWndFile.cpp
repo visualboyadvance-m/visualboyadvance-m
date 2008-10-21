@@ -564,7 +564,7 @@ void MainWnd::OnFileScreencapture()
   else
     name = theApp.filename;
 
-  CString capdir = regQueryStringValue("captureDir", "");
+  CString capdir = regQueryStringValue("captureDir", DEFAULT_SCREENSHOTS_DIR);
   treatRelativePath( capdir );
 
   if(capdir.IsEmpty())
