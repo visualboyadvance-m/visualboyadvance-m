@@ -24,7 +24,6 @@
 #include "MainWnd.h"
 
 #include <winsock.h>
-#include <shlwapi.h>
 
 #include "FileDlg.h"
 #include "Reg.h"
@@ -818,17 +817,8 @@ void MainWnd::winSaveCheatListDefault()
     name = theApp.filename.Right(theApp.filename.GetLength()-index-1);
   else
     name = theApp.filename;
-  CString dir = regQueryStringValue("saveDir", NULL);
-  if( dir[0] == '.' ) {
-	  // handle as relative path
-	  char baseDir[MAX_PATH+1];
-	  GetModuleFileName( NULL, baseDir, MAX_PATH );
-	  baseDir[MAX_PATH] = '\0'; // for security reasons
-	  PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
-	  strcat( baseDir, "\\" );
-	  strcat( baseDir, dir );
-	  dir = baseDir;
-	}
+  CString dir = regQueryStringValue("saveDir", DEFAULT_SAVESTATES_DIR);
+  treatRelativePath( dir );
 
   if(!dir.GetLength())
     dir = getDirFromFile(filename);
@@ -860,17 +850,8 @@ void MainWnd::winLoadCheatListDefault()
     name = theApp.filename.Right(theApp.filename.GetLength()-index-1);
   else
     name = theApp.filename;
-  CString dir = regQueryStringValue("saveDir", NULL);
-  if( dir[0] == '.' ) {
-	  // handle as relative path
-	  char baseDir[MAX_PATH+1];
-	  GetModuleFileName( NULL, baseDir, MAX_PATH );
-	  baseDir[MAX_PATH] = '\0'; // for security reasons
-	  PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
-	  strcat( baseDir, "\\" );
-	  strcat( baseDir, dir );
-	  dir = baseDir;
-	}
+  CString dir = regQueryStringValue("saveDir", DEFAULT_SAVESTATES_DIR);
+  treatRelativePath( dir );
 
   if(!dir.GetLength())
     dir = getDirFromFile(filename);
@@ -932,17 +913,8 @@ void MainWnd::writeBatteryFile()
   else
     buffer = theApp.filename;
 
-  CString saveDir = regQueryStringValue("batteryDir", NULL);
-  if( saveDir[0] == '.' ) {
-	  // handle as relative path
-	  char baseDir[MAX_PATH+1];
-	  GetModuleFileName( NULL, baseDir, MAX_PATH );
-	  baseDir[MAX_PATH] = '\0'; // for security reasons
-	  PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
-	  strcat( baseDir, "\\" );
-	  strcat( baseDir, saveDir );
-	  saveDir = baseDir;
-	}
+  CString saveDir = regQueryStringValue("batteryDir", DEFAULT_BATTERY_DIR);
+  treatRelativePath( saveDir );
 
   if(saveDir.IsEmpty())
     saveDir = getDirFromFile(theApp.filename);
@@ -969,17 +941,8 @@ void MainWnd::readBatteryFile()
   else
     buffer = theApp.filename;
 
-  CString saveDir = regQueryStringValue("batteryDir", NULL);
-  if( saveDir[0] == '.' ) {
-	  // handle as relative path
-	  char baseDir[MAX_PATH+1];
-	  GetModuleFileName( NULL, baseDir, MAX_PATH );
-	  baseDir[MAX_PATH] = '\0'; // for security reasons
-	  PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
-	  strcat( baseDir, "\\" );
-	  strcat( baseDir, saveDir );
-	  saveDir = baseDir;
-	}
+  CString saveDir = regQueryStringValue("batteryDir", DEFAULT_BATTERY_DIR);
+  treatRelativePath( saveDir );
 
   if(saveDir.IsEmpty())
     saveDir = getDirFromFile(theApp.filename);
@@ -1069,16 +1032,7 @@ bool MainWnd::fileOpenSelect( int system )
 		theApp.dir = initialDir;
 	}
 
-	if( initialDir[0] == '.' ) {
-		// handle as relative path
-		char baseDir[MAX_PATH+1];
-		GetModuleFileName( NULL, baseDir, MAX_PATH );
-		baseDir[MAX_PATH] = '\0'; // for security reasons
-		PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
-		strcat( baseDir, "\\" );
-		strcat( baseDir, initialDir );
-		initialDir = baseDir;
-	}
+	treatRelativePath( initialDir );
 
 	theApp.szFile = _T("");
 
@@ -1130,16 +1084,8 @@ void MainWnd::screenCapture(int captureNumber)
   CString buffer;
 
   CString captureDir = regQueryStringValue("captureDir", "");
-  if( captureDir[0] == '.' ) {
-	  // handle as relative path
-	  char baseDir[MAX_PATH+1];
-	  GetModuleFileName( NULL, baseDir, MAX_PATH );
-	  baseDir[MAX_PATH] = '\0'; // for security reasons
-	  PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
-	  strcat( baseDir, "\\" );
-	  strcat( baseDir, captureDir );
-	  captureDir = baseDir;
-	}
+  treatRelativePath( captureDir );
+
   int index = theApp.filename.ReverseFind('\\');
 
   CString name;
