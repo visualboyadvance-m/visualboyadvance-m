@@ -23,9 +23,6 @@
 #include "Reg.h"
 #include "WinResUtil.h"
 
-#include <shlobj.h>
-#include <shlwapi.h>
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -97,11 +94,11 @@ BOOL Directories::OnInitDialog()
 	if(!p.IsEmpty())
 		GetDlgItem(IDC_GBROM_PATH)->SetWindowText(p);
 
-	p = regQueryStringValue("batteryDir", NULL);
+	p = regQueryStringValue("batteryDir", DEFAULT_BATTERY_DIR);
 	if(!p.IsEmpty())
 		GetDlgItem(IDC_BATTERY_PATH)->SetWindowText( p);
 
-	p = regQueryStringValue("saveDir", NULL);
+	p = regQueryStringValue("saveDir", DEFAULT_SAVESTATES_DIR);
 	if(!p.IsEmpty())
 		GetDlgItem(IDC_SAVE_PATH)->SetWindowText(p);
 
@@ -171,86 +168,37 @@ void Directories::OnOK()
 {
 	CDialog::OnOK();
 
-	char baseDir[MAX_PATH+1];
-	char temp[MAX_PATH+1];
-	GetModuleFileName( NULL, baseDir, MAX_PATH );
-	baseDir[MAX_PATH] = '\0'; // for security reasons
-	PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
-
-
 	CString buffer;
 
 	m_romPath.GetWindowText(buffer);
 	if( !buffer.IsEmpty() )
 		regSetStringValue( "romdir", buffer );
-	if( buffer[0] == '.' ) {
-		strcpy( temp, baseDir );
-		strcat( temp, "\\" );
-		strcat( temp, buffer );
-		buffer = temp;
-	}
-	if( !directoryDoesExist( buffer ) )
-		SHCreateDirectoryEx( NULL, buffer, NULL );
+	treatRelativePath( buffer );
 
 	m_gbcromPath.GetWindowText(buffer);
 	if( !buffer.IsEmpty() )
 		regSetStringValue( "gbcromdir", buffer );
-	if( buffer[0] == '.' ) {
-		strcpy( temp, baseDir );
-		strcat( temp, "\\" );
-		strcat( temp, buffer );
-		buffer = temp;
-	}
-	if( !directoryDoesExist( buffer ) )
-		SHCreateDirectoryEx( NULL, buffer, NULL );
+	treatRelativePath( buffer );
 
 	m_gbromPath.GetWindowText(buffer);
 	if( !buffer.IsEmpty() )
 		regSetStringValue( "gbromdir", buffer );
-	if( buffer[0] == '.' ) {
-		strcpy( temp, baseDir );
-		strcat( temp, "\\" );
-		strcat( temp, buffer );
-		buffer = temp;
-	}
-	if( !directoryDoesExist( buffer ) )
-		SHCreateDirectoryEx( NULL, buffer, NULL );
+	treatRelativePath( buffer );
 
 	m_batteryPath.GetWindowText(buffer);
 	if( !buffer.IsEmpty() )
 		regSetStringValue( "batteryDir", buffer );
-	if( buffer[0] == '.' ) {
-		strcpy( temp, baseDir );
-		strcat( temp, "\\" );
-		strcat( temp, buffer );
-		buffer = temp;
-	}
-	if( !directoryDoesExist( buffer ) )
-		SHCreateDirectoryEx( NULL, buffer, NULL );
+	treatRelativePath( buffer );
 
 	m_savePath.GetWindowText(buffer);
 	if( !buffer.IsEmpty() )
 		regSetStringValue( "saveDir", buffer );
-	if( buffer[0] == '.' ) {
-		strcpy( temp, baseDir );
-		strcat( temp, "\\" );
-		strcat( temp, buffer );
-		buffer = temp;
-	}
-	if( !directoryDoesExist( buffer ) )
-		SHCreateDirectoryEx( NULL, buffer, NULL );
+	treatRelativePath( buffer );
 
 	m_capturePath.GetWindowText(buffer);
 	if( !buffer.IsEmpty() )
 		regSetStringValue( "captureDir", buffer );
-	if( buffer[0] == '.' ) {
-		strcpy( temp, baseDir );
-		strcat( temp, "\\" );
-		strcat( temp, buffer );
-		buffer = temp;
-	}
-	if( !directoryDoesExist( buffer ) )
-		SHCreateDirectoryEx( NULL, buffer, NULL );
+	treatRelativePath( buffer );
 
 	EndDialog(TRUE);
 }
@@ -284,21 +232,4 @@ CString Directories::browseForDir(CString title)
     }
   }
   return res;
-}
-
-// returns true if the directory does exist
-bool Directories::directoryDoesExist(const char *directory)
-{
-	HANDLE hDir;
-	hDir = CreateFile(
-		directory,
-		GENERIC_READ,
-		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-		NULL,
-		OPEN_EXISTING,
-		FILE_FLAG_BACKUP_SEMANTICS,
-		NULL );
-	bool retval = (hDir == INVALID_HANDLE_VALUE) ? false : true;
-	CloseHandle( hDir );
-	return retval;
 }

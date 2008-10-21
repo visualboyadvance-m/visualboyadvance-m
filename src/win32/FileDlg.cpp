@@ -189,7 +189,7 @@ int FileDlg::getFilterIndex()
 int FileDlg::DoModal()
 {
   BOOL res = isSave ? GetSaveFileName(&m_ofn) :
-    GetOpenFileName(&m_ofn);
+  GetOpenFileName(&m_ofn);
 
   return res ? IDOK : IDCANCEL;
 }

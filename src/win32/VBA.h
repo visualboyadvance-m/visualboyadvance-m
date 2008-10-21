@@ -64,6 +64,9 @@ enum pixelFilterType
 
 #define REWIND_SIZE 400000
 
+#define DEFAULT_BATTERY_DIR    ".\\battery"
+#define DEFAULT_SAVESTATES_DIR ".\\savestates"
+
 class AVIWrite;
 class WavWriter;
 
@@ -284,3 +287,5 @@ extern int emulating;
 #ifdef MMX
     extern "C" bool cpu_mmx;
 #endif
+
+void treatRelativePath( CString & path );
