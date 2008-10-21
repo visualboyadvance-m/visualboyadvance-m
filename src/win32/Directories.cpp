@@ -102,7 +102,7 @@ BOOL Directories::OnInitDialog()
 	if(!p.IsEmpty())
 		GetDlgItem(IDC_SAVE_PATH)->SetWindowText(p);
 
-	p = regQueryStringValue("captureDir", NULL);
+	p = regQueryStringValue("captureDir", DEFAULT_SCREENSHOTS_DIR);
 	if(!p.IsEmpty())
 		GetDlgItem(IDC_CAPTURE_PATH)->SetWindowText(p);
 

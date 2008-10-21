@@ -1083,7 +1083,7 @@ void MainWnd::screenCapture(int captureNumber)
 {
   CString buffer;
 
-  CString captureDir = regQueryStringValue("captureDir", "");
+  CString captureDir = regQueryStringValue("captureDir", DEFAULT_SCREENSHOTS_DIR);
   treatRelativePath( captureDir );
 
   int index = theApp.filename.ReverseFind('\\');

@@ -66,6 +66,7 @@ enum pixelFilterType
 
 #define DEFAULT_BATTERY_DIR    ".\\battery"
 #define DEFAULT_SAVESTATES_DIR ".\\savestates"
+#define DEFAULT_SCREENSHOTS_DIR ".\\screenshots"
 
 class AVIWrite;
 class WavWriter;
