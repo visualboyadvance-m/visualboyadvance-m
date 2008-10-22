@@ -1815,7 +1815,6 @@ BEGIN
                 MENUITEM "&L",                          ID_OPTIONS_JOYPAD_AUTOFIRE_L
                 MENUITEM "&R",                          ID_OPTIONS_JOYPAD_AUTOFIRE_R
             END
-            MENUITEM "Rewind interval...",          ID_OPTIONS_EMULATOR_REWINDINTERVAL
         END
         POPUP "&Speed"
         BEGIN
@@ -1969,6 +1968,8 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "Rewind",                      ID_TOOLS_REWIND
+        MENUITEM "Rewind interval...",          ID_OPTIONS_EMULATOR_REWINDINTERVAL
+        MENUITEM SEPARATOR
         MENUITEM "Customize...",                ID_TOOLS_CUSTOMIZE
     END
     POPUP "&Help"
