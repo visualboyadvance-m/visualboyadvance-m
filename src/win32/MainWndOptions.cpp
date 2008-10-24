@@ -339,6 +339,53 @@ BOOL MainWnd::OnVideoLayer(UINT nID)
     ((nID & 0xFFFF) - ID_OPTIONS_VIDEO_LAYERS_BG0);
   layerEnable = DISPCNT & layerSettings;
   CPUUpdateRenderBuffers(false);
+
+  // inform the user about the change
+  CString msg;
+  int thisLayer = -1;
+  switch( nID ) {
+	  case ID_OPTIONS_VIDEO_LAYERS_BG0:
+		  msg = "BG0";
+		  thisLayer = 256;
+		  break;
+	  case ID_OPTIONS_VIDEO_LAYERS_BG1:
+		  msg = "BG1";
+		  thisLayer = 512;
+		  break;
+	  case ID_OPTIONS_VIDEO_LAYERS_BG2:
+		  msg = "BG2";
+		  thisLayer = 1024;
+		  break;
+	  case ID_OPTIONS_VIDEO_LAYERS_BG3:
+		  msg = "BG3";
+		  thisLayer = 2048;
+		  break;
+	  case ID_OPTIONS_VIDEO_LAYERS_OBJ:
+		  msg = "OBJ";
+		  thisLayer = 4096;
+		  break;
+	  case ID_OPTIONS_VIDEO_LAYERS_WIN0:
+		  msg = "WIN0";
+		  thisLayer = 8192;
+		  break;
+	  case ID_OPTIONS_VIDEO_LAYERS_WIN1:
+		  msg = "WIN1";
+		  thisLayer = 16384;
+		  break;
+	  case ID_OPTIONS_VIDEO_LAYERS_OBJWIN:
+		  msg = "OBJWIN";
+		  thisLayer = 32768;
+		  break;
+	  default:
+		  ASSERT( false );
+  }
+  if( layerSettings & thisLayer ) {
+	  msg.Append( " enabled" );
+  } else {
+	  msg.Append( " disabled" );
+  }
+  systemScreenMessage( msg );
+
   return TRUE;
 }
 
@@ -351,7 +398,7 @@ void MainWnd::OnUpdateVideoLayer(CCmdUI *pCmdUI)
   case ID_OPTIONS_VIDEO_LAYERS_BG3:
   case ID_OPTIONS_VIDEO_LAYERS_WIN1:
   case ID_OPTIONS_VIDEO_LAYERS_OBJWIN:
-    pCmdUI->Enable(theApp.cartridgeType == 0);
+    pCmdUI->Enable(theApp.cartridgeType == IMAGE_GBA);
     break;
   }
 }
