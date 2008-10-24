@@ -76,6 +76,7 @@ protected:
 	afx_msg void OnSystemMinimize();
 	afx_msg void OnUpdateVideoLayer(CCmdUI* pCmdUI);
 	afx_msg BOOL OnVideoLayer(UINT nID);
+	afx_msg void OnVideoLayerReset();
 	afx_msg BOOL OnOptionVideoSize(UINT nID);
 	afx_msg BOOL OnOptionsFrameskip(UINT nID);
 	afx_msg void OnClose();
