@@ -389,6 +389,14 @@ BOOL MainWnd::OnVideoLayer(UINT nID)
   return TRUE;
 }
 
+void MainWnd::OnVideoLayerReset()
+{
+	layerSettings = 0xFF00;
+	layerEnable = DISPCNT & layerSettings;
+	CPUUpdateRenderBuffers(false);
+	systemScreenMessage( "All layers enabled" );
+}
+
 void MainWnd::OnUpdateVideoLayer(CCmdUI *pCmdUI)
 {
   pCmdUI->SetCheck((layerSettings >> (8 + pCmdUI->m_nID - ID_OPTIONS_VIDEO_LAYERS_BG0)) & 1);
