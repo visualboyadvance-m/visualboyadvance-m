@@ -867,13 +867,14 @@
 #define ID_AUDIO_CORE_SETTINGS          40365
 #define ID_FILE_OPEN_GBA                40366
 #define ID_FILE_QUICKOPENROM            40367
+#define ID_OPTIONS_VIDEO_LAYERS_RESET   40368
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        165
-#define _APS_NEXT_COMMAND_VALUE         40368
+#define _APS_NEXT_COMMAND_VALUE         40370
 #define _APS_NEXT_CONTROL_VALUE         1297
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
