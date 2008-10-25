@@ -392,6 +392,8 @@
 #define IDC_MAP_VIEW_ZOOM               1138
 #define IDS_MOVIE_PLAY                  1138
 #define IDC_VIEWER                      1140
+#define IDC_SAVE_BG2                    1140
+#define IDC_CHANGE_BACKDROP             1140
 #define IDC_ADDRESSES                   1141
 #define IDC_GO                          1143
 #define IDC_8_BIT                       1144

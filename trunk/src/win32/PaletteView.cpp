@@ -80,7 +80,8 @@ BEGIN_MESSAGE_MAP(PaletteView, CDialog)
   ON_BN_CLICKED(IDC_CLOSE, OnClose)
   //}}AFX_MSG_MAP
   ON_MESSAGE(WM_PALINFO, OnPalInfo)
-  END_MESSAGE_MAP()
+  ON_BN_CLICKED(IDC_CHANGE_BACKDROP, &PaletteView::OnBnClickedChangeBackdrop)
+END_MESSAGE_MAP()
 
   /////////////////////////////////////////////////////////////////////////////
 // PaletteView message handlers
@@ -190,6 +191,7 @@ void PaletteView::OnAutoUpdate()
   } else {
     theApp.winRemoveUpdateListener(this);
   }
+  (CButton*)GetDlgItem(IDC_REFRESH2)->EnableWindow(!autoUpdate);
 }
 
 void PaletteView::OnClose()
@@ -242,4 +244,22 @@ LRESULT PaletteView::OnPalInfo(WPARAM wParam, LPARAM lParam)
 void PaletteView::PostNcDestroy()
 {
   delete this;
+}
+
+void PaletteView::OnBnClickedChangeBackdrop()
+{
+  CColorDialog cdlg;
+  COLORREF color;
+  switch( cdlg.DoModal() ) {
+    case IDOK:
+      color = cdlg.GetColor();
+      customBackdropColor =
+        ( ( GetBValue( color ) >> 3 ) << 10 ) |
+        ( ( GetGValue( color ) >> 3 ) << 5 ) |
+          ( GetRValue( color ) >> 3 );
+      break;
+    case IDCANCEL:
+      customBackdropColor = -1; // disable hack
+      break;
+  }  
 }
