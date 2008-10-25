@@ -727,6 +727,7 @@ void MapView::OnAutoUpdate()
   } else {
     theApp.winRemoveUpdateListener(this);
   }
+  (CButton*)GetDlgItem(IDC_REFRESH)->EnableWindow(autoUpdate ? FALSE : TRUE);
 }
 
 void MapView::update()
