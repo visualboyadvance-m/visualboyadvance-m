@@ -47,7 +47,12 @@ void mode5RenderLine()
 
   gfxDrawSprites(lineOBJ);
 
-  u32 background = (READ16LE(&palette[0]) | 0x30000000);
+  u32 background;
+  if(customBackdropColor == -1) {
+    background = (READ16LE(&palette[0]) | 0x30000000);
+  } else {
+    background = ((customBackdropColor & 0x7FFF) | 0x30000000);
+  }
 
   for(int x = 0; x < 240; x++) {
     u32 color = background;
@@ -124,7 +129,12 @@ void mode5RenderLineNoWindow()
 
   gfxDrawSprites(lineOBJ);
 
-  u32 background = ( READ16LE(&palette[0]) | 0x30000000);
+  u32 background;
+  if(customBackdropColor == -1) {
+    background = (READ16LE(&palette[0]) | 0x30000000);
+  } else {
+    background = ((customBackdropColor & 0x7FFF) | 0x30000000);
+  }
 
   for(int x = 0; x < 240; x++) {
     u32 color = background;
@@ -269,7 +279,12 @@ void mode5RenderLineAll()
   u8 inWin1Mask = WININ >> 8;
   u8 outMask = WINOUT & 0xFF;
 
-  u32 background = (READ16LE(&palette[0]) | 0x30000000);
+  u32 background;
+  if(customBackdropColor == -1) {
+    background = (READ16LE(&palette[0]) | 0x30000000);
+  } else {
+    background = ((customBackdropColor & 0x7FFF) | 0x30000000);
+  }
 
   for(int x = 0; x < 240; x++) {
     u32 color = background;
