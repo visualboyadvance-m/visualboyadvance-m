@@ -52,6 +52,11 @@ bool cheatsEnabled = true;
 bool mirroringEnable = false;
 bool skipSaveGameBattery = false;
 
+// this is an optional hack to change the backdrop/background color:
+// -1: disabled
+// 0x0000 to 0x7FFF: set custom 15 bit color
+int customBackdropColor = -1;
+
 u8 *bios = NULL;
 u8 *rom = NULL;
 u8 *internalRAM = NULL;

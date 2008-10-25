@@ -61,6 +61,7 @@ extern int cpuSaveType;
 extern bool cheatsEnabled;
 extern bool mirroringEnable;
 extern bool skipSaveGameBattery;
+extern int customBackdropColor;
 
 extern u8 *bios;
 extern u8 *rom;
