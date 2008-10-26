@@ -2356,25 +2356,28 @@ void CPUCheckDMA(int reason, int dmamask)
 
 void CPUUpdateRegister(u32 address, u16 value)
 {
-  switch(address) {
+  switch(address)
+  {
   case 0x00:
-    {
-      if ((value & 7) >5)
-          DISPCNT = (value &7);
-      bool change = ((DISPCNT ^ value) & 0x80) ? true : false;
-      bool changeBG = ((DISPCNT ^ value) & 0x0F00) ? true : false;
-      u16 changeBGon = (((~DISPCNT) & value) & 0x0F00);
-      DISPCNT = (value & 0xFFF7);
+    { // we need to place the following code in { } because we declare & initialize variables in a case statement
+      if((value & 7) > 5) {
+        // display modes above 0-5 are prohibited
+        DISPCNT = (value & 7);
+      }
+      bool change = (0 != ((DISPCNT ^ value) & 0x80));
+      bool changeBG = (0 != ((DISPCNT ^ value) & 0x0F00));
+      u16 changeBGon = ((~DISPCNT) & value) & 0x0F00; // these layers are being activated
+
+      DISPCNT = (value & 0xFFF7); // bit 3 can only be accessed by the BIOS to enable GBC mode
       UPDATE_REG(0x00, DISPCNT);
 
-      if (changeBGon)
-      {
-         layerEnableDelay=4;
-         layerEnable = layerSettings & value & (~changeBGon);
+      if(changeBGon) {
+        layerEnableDelay = 4;
+        layerEnable = layerSettings & value & (~changeBGon);
+      } else {
+        layerEnable = layerSettings & value;
+        // CPUUpdateTicks();
       }
-       else
-         layerEnable = layerSettings & value;
-      //      CPUUpdateTicks();
 
       windowOn = (layerEnable & 0x6000) ? true : false;
       if(change && !((value & 0x80))) {
@@ -2390,10 +2393,11 @@ void CPUUpdateRegister(u32 address, u16 value)
       }
       CPUUpdateRender();
       // we only care about changes in BG0-BG3
-      if(changeBG)
+      if(changeBG) {
         CPUUpdateRenderBuffers(false);
+      }
+      break;
     }
-    break;
   case 0x04:
     DISPSTAT = (value & 0xFF38) | (DISPSTAT & 7);
     UPDATE_REG(0x04, DISPSTAT);
@@ -2739,9 +2743,9 @@ void CPUUpdateRegister(u32 address, u16 value)
       }
     }
     break;
- case 0x100:
+  case 0x100:
     timer0Reload = value;
-	interp_rate();
+    interp_rate();
     break;
   case 0x102:
     timer0Value = value;
@@ -2750,7 +2754,7 @@ void CPUUpdateRegister(u32 address, u16 value)
     break;
   case 0x104:
     timer1Reload = value;
-	interp_rate();
+    interp_rate();
     break;
   case 0x106:
     timer1Value = value;
@@ -2774,35 +2778,35 @@ void CPUUpdateRegister(u32 address, u16 value)
     cpuNextEvent = cpuTotalTicks;
     break;
   case 0x128:
-   #ifdef LINK_EMULATION
-	if (linkenable)
-	{
-		StartLink(value);
-	}
-	else
+#ifdef LINK_EMULATION
+    if (linkenable)
+    {
+      StartLink(value);
+    }
+    else
 #endif
-	{
-		if(value & 0x80) {
-		  value &= 0xff7f;
-		  if(value & 1 && (value & 0x4000)) {
-			UPDATE_REG(0x12a, 0xFF);
-			IF |= 0x80;
-			UPDATE_REG(0x202, IF);
-			value &= 0x7f7f;
-		  }
-		}
-	    UPDATE_REG(0x128, value);
-	}
+    {
+      if(value & 0x80) {
+        value &= 0xff7f;
+        if(value & 1 && (value & 0x4000)) {
+          UPDATE_REG(0x12a, 0xFF);
+          IF |= 0x80;
+          UPDATE_REG(0x202, IF);
+          value &= 0x7f7f;
+        }
+      }
+      UPDATE_REG(0x128, value);
+    }
     break;
- case 0x12a:
- #ifdef LINK_EMULATION
- if(linkenable && lspeed)
-    LinkSSend(value);
-  #endif
-  {
- UPDATE_REG(0x134, value);
-  }
-  break;
+  case 0x12a:
+#ifdef LINK_EMULATION
+    if(linkenable && lspeed)
+      LinkSSend(value);
+#endif
+    {
+      UPDATE_REG(0x134, value);
+    }
+    break;
   case 0x130:
     P1 |= (value & 0x3FF);
     UPDATE_REG(0x130, P1);
@@ -2812,22 +2816,22 @@ void CPUUpdateRegister(u32 address, u16 value)
     break;
   case 0x134:
 #ifdef LINK_EMULATION
-	if (linkenable)
-		StartGPLink(value);
-	else
+    if (linkenable)
+      StartGPLink(value);
+    else
 #endif
-	    UPDATE_REG(0x134, value);
+      UPDATE_REG(0x134, value);
 
-	break;
+    break;
   case 0x140:
 #ifdef LINK_EMULATION
-	if (linkenable)
-		StartJOYLink(value);
-	else
+    if (linkenable)
+      StartJOYLink(value);
+    else
 #endif
-	    UPDATE_REG(0x140, value);
+      UPDATE_REG(0x140, value);
 
-	break;
+    break;
   case 0x200:
     IE = value & 0x3FFF;
     UPDATE_REG(0x200, IE);
