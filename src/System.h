@@ -1,5 +1,5 @@
-#ifndef VBA_SYSTEM_H
-#define VBA_SYSTEM_H
+#ifndef SYSTEM_H
+#define SYSTEM_H
 
 #include <stdint.h>
 
@@ -107,4 +107,4 @@ extern int systemThrottle;
 #define SYSTEM_SAVE_UPDATED 30
 #define SYSTEM_SAVE_NOT_UPDATED 0
 
-#endif //VBA_SYSTEM_H
+#endif // SYSTEM_H

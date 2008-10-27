@@ -1,5 +1,5 @@
-#ifndef VBA_BIOS_H
-#define VBA_BIOS_H
+#ifndef BIOS_H
+#define BIOS_H
 
 extern void BIOS_ArcTan();
 extern void BIOS_ArcTan2();
@@ -25,4 +25,5 @@ extern void BIOS_SoftReset();
 extern void BIOS_Sqrt();
 extern void BIOS_MidiKey2Freq();
 extern void BIOS_SndDriverJmpTableCopy();
-#endif // VBA_BIOS_H
+
+#endif // BIOS_H

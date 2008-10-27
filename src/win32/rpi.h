@@ -1,3 +1,5 @@
+#pragma once
+
 //---------------------------------------------------------------------------------------------------------------------------
 // hq2x plugin example - Steve Snake 2004.
 // This plugin uses (modified) code by Maxim Stepin - see "hq2x16.asm" for info

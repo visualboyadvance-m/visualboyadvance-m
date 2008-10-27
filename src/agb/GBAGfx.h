@@ -1,5 +1,5 @@
-#ifndef VBA_GFX_H
-#define VBA_GFX_H
+#ifndef GFX_H
+#define GFX_H
 
 #include "GBA.h"
 #include "../Globals.h"
@@ -1578,4 +1578,4 @@ static inline void gfxAlphaBlend(u32 *ta, u32 *tb, int ca, int cb)
   }
 }
 
-#endif // VBA_GFX_H
+#endif // GFX_H

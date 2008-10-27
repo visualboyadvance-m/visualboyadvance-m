@@ -1,5 +1,5 @@
-#ifndef VBA_PORT_H
-#define VBA_PORT_H
+#ifndef PORT_H
+#define PORT_H
 
 // swaps a 16-bit value
 static inline u16 swap16(u16 v)
@@ -53,4 +53,4 @@ static inline u32 swap32(u32 v)
   *((u32 *)x) = (v)
 #endif
 
-#endif
+#endif // PORT_H

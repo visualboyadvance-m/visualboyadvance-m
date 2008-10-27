@@ -1,12 +1,13 @@
-#ifndef VBA_RTC_H
-#define VBA_RTC_H
-extern u16 rtcRead(u32 address);
-extern bool rtcWrite(u32 address, u16 value);
-extern void rtcEnable(bool);
-extern bool rtcIsEnabled();
-extern void rtcReset();
+#ifndef RTC_H
+#define RTC_H
 
-extern void rtcReadGame(gzFile gzFile);
-extern void rtcSaveGame(gzFile gzFile);
+u16 rtcRead(u32 address);
+bool rtcWrite(u32 address, u16 value);
+void rtcEnable(bool);
+bool rtcIsEnabled();
+void rtcReset();
 
-#endif
+void rtcReadGame(gzFile gzFile);
+void rtcSaveGame(gzFile gzFile);
+
+#endif // RTC_H

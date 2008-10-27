@@ -1,5 +1,5 @@
-#ifndef __VBA_GB_GBCHEATS_H
-#define __VBA_GB_GBCHEATS_H
+#ifndef GBCHEATS_H
+#define GBCHEATS_H
 
 #include "../System.h"
 
@@ -39,5 +39,5 @@ bool gbVerifyGgCode(const char *code);
 extern int gbCheatNumber;
 extern gbCheat gbCheatList[100];
 extern bool gbCheatMap[0x10000];
-#endif
 
+#endif // GBCHEATS_H

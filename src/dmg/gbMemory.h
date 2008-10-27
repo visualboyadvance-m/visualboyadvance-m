@@ -1,3 +1,6 @@
+#ifndef GBMEMORY_H
+#define GBMEMORY_H
+
 #include <time.h>
 
 struct mapperMBC1 {
@@ -182,6 +185,4 @@ extern void memoryUpdateMapTAMA5();
 extern void memoryUpdateMapMMM01();
 extern void memoryUpdateMapGS3();
 
-
-
-
+#endif // GBMEMORY_H
