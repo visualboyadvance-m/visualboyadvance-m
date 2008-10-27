@@ -24,41 +24,13 @@
 
 int Init_2xSaI(u32);
 
-void _2xSaI        (u8 *, u32, u8 *, u8 *, u32, int, int);
-void _2xSaI32      (u8 *, u32, u8 *, u8 *, u32, int, int);
-void Super2xSaI    (u8 *, u32, u8 *, u8 *, u32, int, int);
-void Super2xSaI32  (u8 *, u32, u8 *, u8 *, u32, int, int);
-void SuperEagle    (u8 *, u32, u8 *, u8 *, u32, int, int);
-void SuperEagle32  (u8 *, u32, u8 *, u8 *, u32, int, int);
-void Pixelate      (u8 *, u32, u8 *, u8 *, u32, int, int);
-void Pixelate32    (u8 *, u32, u8 *, u8 *, u32, int, int);
-void AdMame2x      (u8 *, u32, u8 *, u8 *, u32, int, int);
-void AdMame2x32    (u8 *, u32, u8 *, u8 *, u32, int, int);
-void Bilinear      (u8 *, u32, u8 *, u8 *, u32, int, int);
-void Bilinear32    (u8 *, u32, u8 *, u8 *, u32, int, int);
-void BilinearPlus  (u8 *, u32, u8 *, u8 *, u32, int, int);
-void BilinearPlus32(u8 *, u32, u8 *, u8 *, u32, int, int);
-void Scanlines     (u8 *, u32, u8 *, u8 *, u32, int, int);
-void Scanlines32   (u8 *, u32, u8 *, u8 *, u32, int, int);
-void ScanlinesTV   (u8 *, u32, u8 *, u8 *, u32, int, int);
-void ScanlinesTV32 (u8 *, u32, u8 *, u8 *, u32, int, int);
-void hq2x          (u8 *, u32, u8 *, u8 *, u32, int, int);
-void hq2x32        (u8 *, u32, u8 *, u8 *, u32, int, int);
-void lq2x          (u8 *, u32, u8 *, u8 *, u32, int, int);
-void lq2x32        (u8 *, u32, u8 *, u8 *, u32, int, int);
-
-void SmartIB       (u8 *, u32, int, int);
-void SmartIB32     (u8 *, u32, int, int);
-void MotionBlurIB  (u8 *, u32, int, int);
-void MotionBlurIB32(u8 *, u32, int, int);
-
 namespace VBA
 {
 
-typedef void (*Filter2x)(u8 *, u32, u8 *, u8 *, u32, int, int);
+typedef void (*Filter)(u8 *, u32, u8 *, u8 *, u32, int, int);
 typedef void (*FilterIB)(u8 *, u32, int, int);
 
-enum EFilter2x
+enum EFilter
 {
   FirstFilter,
   FilterNone = FirstFilter,
@@ -91,8 +63,11 @@ enum EFilterDepth
   FilterDepth32
 };
 
-Filter2x pvGetFilter2x(EFilter2x _eFilter2x, EFilterDepth _eDepth);
+Filter pvGetFilter(EFilter _eFilter, EFilterDepth _eDepth);
+char* pcsGetFilterName(const EFilter _eFilter);
+
 FilterIB pvGetFilterIB(EFilterIB _eFilterIB, EFilterDepth _eDepth);
+char* pcsGetFilterIBName(const EFilterIB _eFilterIB);
 
 } // namespace VBA
 

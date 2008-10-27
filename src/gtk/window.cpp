@@ -971,7 +971,7 @@ void Window::vSaveConfig(const std::string & _rsFile)
 void Window::vApplyConfigFilter()
 {
   int iFilter = m_poDisplayConfig->oGetKey<int>("filter2x");
-  m_poScreenArea->vSetFilter2x((EFilter2x)iFilter);
+  m_poScreenArea->vSetFilter((EFilter)iFilter);
   if (emulating)
   {
     vDrawScreen();
