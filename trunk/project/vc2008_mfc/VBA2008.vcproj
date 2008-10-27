@@ -273,6 +273,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\doc\License.txt"
+				>
+			</File>
+			<File
 				RelativePath="..\..\doc\ReadMe.MFC.txt"
 				>
 			</File>
@@ -787,10 +791,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\getopt.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\memgzio.c"
 				>
 			</File>
@@ -820,14 +820,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\win32\protect.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\Text.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\unzip.h"
 				>
 			</File>
 			<File
@@ -1008,6 +1000,10 @@
 			</File>
 			<File
 				RelativePath="..\..\src\win32\BIOSDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\win32\BIOSDialog.h"
 				>
 			</File>
 			<File
