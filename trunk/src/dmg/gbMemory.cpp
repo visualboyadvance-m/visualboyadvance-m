@@ -1176,22 +1176,24 @@ mapperTAMA5 gbDataTAMA5 = {
   0, // RAM Byte select
   0, // mapper command number
   0, // mapper last command;
-  0, // commands 0x0
-  0, // commands 0x1
-  0, // commands 0x2
-  0, // commands 0x3
-  0, // commands 0x4
-  0, // commands 0x5
-  0, // commands 0x6
-  0, // commands 0x7
-  0, // commands 0x8
-  0, // commands 0x9
-  0, // commands 0xa
-  0, // commands 0xb
-  0, // commands 0xc
-  0, // commands 0xd
-  0, // commands 0xe
-  0, // commands 0xf
+  {
+    0, // commands 0x0
+    0, // commands 0x1
+    0, // commands 0x2
+    0, // commands 0x3
+    0, // commands 0x4
+    0, // commands 0x5
+    0, // commands 0x6
+    0, // commands 0x7
+    0, // commands 0x8
+    0, // commands 0x9
+    0, // commands 0xa
+    0, // commands 0xb
+    0, // commands 0xc
+    0, // commands 0xd
+    0, // commands 0xe
+    0  // commands 0xf
+  },
   0, // register
   0, // timer clock latch
   0, // timer clock register
@@ -1288,8 +1290,8 @@ void mapperTAMA5RAM(u16 address, u8 value)
         gbDataTAMA5.mapperCommands[gbDataTAMA5.mapperCommandNumber] = value;
         gbMemoryMap[0xa][0] = value;
 
-        int test = gbDataTAMA5.mapperCommands[gbDataTAMA5.mapperCommandNumber & 0x0e] |
-                                    (gbDataTAMA5.mapperCommands[(gbDataTAMA5.mapperCommandNumber & 0x0e) +1]<<4);
+/*        int test = gbDataTAMA5.mapperCommands[gbDataTAMA5.mapperCommandNumber & 0x0e] |
+                                    (gbDataTAMA5.mapperCommands[(gbDataTAMA5.mapperCommandNumber & 0x0e) +1]<<4);*/
 
         if ((gbDataTAMA5.mapperCommandNumber & 0xe) == 0) // Read Command !!!
         {
@@ -1643,8 +1645,6 @@ void memoryUpdateMapMMM01()
 // GameGenie ROM write registers
 void mapperGGROM(u16 address, u8 value)
 {
-  int tmpAddress = 0;
-
   switch(address & 0x6000) {
   case 0x0000: // RAM enable register
     break;
