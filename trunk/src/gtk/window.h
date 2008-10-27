@@ -53,6 +53,13 @@ public:
     CartridgeGBA
   };
 
+  enum EVideoOutput
+  {
+    OutputCairo,
+    OutputOpenGL,
+    OutputXvideo
+  };
+
   // GB/GBA screen sizes
   const int m_iGBScreenWidth;
   const int m_iGBScreenHeight;
@@ -68,6 +75,9 @@ public:
   void vComputeFrameskip(int _iRate);
   void vShowSpeed(int _iSpeed);
   void vCaptureScreen(int _iNum);
+  void vApplyConfigFilter();
+  void vApplyConfigFilterIB();
+  void vApplyConfigScreenArea();
 
   inline ECartridge eGetCartridge() const { return m_eCartridge; }
 
@@ -122,13 +132,6 @@ protected:
     ColorFormatBGR
   };
 
-  enum EVideoOutput
-  {
-    OutputCairo,
-    OutputOpenGL,
-    OutputXvideo
-  };
-
   virtual void vOnFileOpen();
   virtual void vOnFileLoad();
   virtual void vOnFileSave();
@@ -145,7 +148,6 @@ protected:
   virtual void vOnFileExit();
   virtual void vOnFrameskipToggled(Gtk::CheckMenuItem * _poCMI, int _iValue);
   virtual void vOnVideoFullscreen();
-  virtual void vOnVideoOutputToggled(Gtk::CheckMenuItem * _poCMI, int _iOutput);
   virtual void vOnVideoScaleToggled(Gtk::CheckMenuItem * _poCMI, int _iScale);
   virtual void vOnDirectories();
   virtual void vOnPauseWhenInactiveToggled(Gtk::CheckMenuItem * _poCMI);
@@ -160,9 +162,8 @@ protected:
   virtual void vOnGBBorderToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnGBPrinterToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnEmulatorTypeToggled(Gtk::CheckMenuItem * _poCMI, int _iEmulatorType);
-  virtual void vOnFilter2xToggled(Gtk::CheckMenuItem * _poCMI, int _iFilter2x);
-  virtual void vOnFilterIBToggled(Gtk::CheckMenuItem * _poCMI, int _iFilterIB);
   virtual void vOnJoypadConfigure();
+  virtual void vOnDisplayConfigure();
   virtual void vOnHelpAbout();
   virtual bool bOnEmuIdle();
 
@@ -264,11 +265,10 @@ private:
   void vInitConfig();
   void vCheckConfig();
   void vInitColors(EColorFormat _eColorFormat);
-  void vInitScreenArea(EVideoOutput _eVideoOutput);
   void vLoadConfig(const std::string & _rsFile);
   void vSaveConfig(const std::string & _rsFile);
   void vHistoryAdd(const std::string & _rsFile);
-  void vLoadJoypadsFromConfig();
+  void vApplyConfigJoypads();
   void vSaveJoypadsToConfig();
   void vUpdateScreen();
   void vDrawDefaultScreen();

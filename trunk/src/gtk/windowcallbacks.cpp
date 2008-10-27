@@ -21,6 +21,7 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/aboutdialog.h>
+#include <gtkmm/builder.h>
 
 #include <SDL.h>
 
@@ -37,6 +38,7 @@
 #include "intl.h"
 #include "joypadconfig.h"
 #include "directoriesconfig.h"
+#include "displayconfig.h"
 
 namespace VBA
 {
@@ -361,18 +363,6 @@ void Window::vOnVideoFullscreen()
   vToggleFullscreen();
 }
 
-void Window::vOnVideoOutputToggled(Gtk::CheckMenuItem * _poCMI, int _iOutput)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  m_poDisplayConfig->vSetKey("output", _iOutput);
-
-  vInitScreenArea((EVideoOutput)_iOutput);
-}
-
 void Window::vOnVideoScaleToggled(Gtk::CheckMenuItem * _poCMI, int _iScale)
 {
   if (! _poCMI->get_active())
@@ -566,41 +556,23 @@ void Window::vOnEmulatorTypeToggled(Gtk::CheckMenuItem * _poCMI, int _iEmulatorT
   m_poCoreConfig->vSetKey("emulator_type", _iEmulatorType);
 }
 
-void Window::vOnFilter2xToggled(Gtk::CheckMenuItem * _poCMI, int _iFilter2x)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  m_poScreenArea->vSetFilter2x((EFilter2x)_iFilter2x);
-  if (emulating)
-  {
-    vDrawScreen();
-  }
-  m_poDisplayConfig->vSetKey("filter2x", _iFilter2x);
-}
-
-void Window::vOnFilterIBToggled(Gtk::CheckMenuItem * _poCMI, int _iFilterIB)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  m_poScreenArea->vSetFilterIB((EFilterIB)_iFilterIB);
-  if (emulating)
-  {
-    vDrawScreen();
-  }
-  m_poDisplayConfig->vSetKey("filterIB", _iFilterIB);
-}
-
 void Window::vOnJoypadConfigure()
 {
   JoypadConfigDialog oDialog(m_poInputConfig);
   oDialog.set_transient_for(*this);
   oDialog.run();
+}
+
+void Window::vOnDisplayConfigure()
+{
+  Glib::RefPtr<Gtk::Builder> poBuilder = Gtk::Builder::create_from_file("src/gtk/ui/display.ui");
+
+  DisplayConfigDialog * poDialog = 0;
+  poBuilder->get_widget_derived("dialog1", poDialog);
+  poDialog->vSetConfig(m_poDisplayConfig, this);
+  poDialog->set_transient_for(*this);
+  poDialog->run();
+  poDialog->hide();
 }
 
 void Window::vOnHelpAbout()

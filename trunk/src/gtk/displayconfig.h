@@ -16,41 +16,42 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#ifndef __VBA_DIRECTORIESCONFIG_H__
-#define __VBA_DIRECTORIESCONFIG_H__
+#ifndef __VBA_DISPLAYCONFIG_H__
+#define __VBA_DISPLAYCONFIG_H__
 
 #include <gtkmm/dialog.h>
-#include <gtkmm/label.h>
-#include <gtkmm/table.h>
-#include <gtkmm/filechooserbutton.h>
+#include <gtkmm/builder.h>
+#include <gtkmm/combobox.h>
 
 #include "configfile.h"
+#include "window.h"
 
 namespace VBA
 {
 
-class DirectoriesConfigDialog : public Gtk::Dialog
+class DisplayConfigDialog : public Gtk::Dialog
 {
 public:
-  DirectoriesConfigDialog(Config::Section * _poConfig);
+  DisplayConfigDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder);
 
-protected:
-  void on_response(int response_id);
+  void vSetConfig(Config::Section * _poConfig, VBA::Window * _poWindow);
 
 private:
-  struct SDirEntry
-  {
-    const char * m_csKey;
-    const char * m_csLabel;
-    const char * m_csFileChooserButton;
-  };
+  void vOnFilterChanged();
+  void vOnFilterIBChanged();
+  void vOnOutputChanged(VBA::Window::EVideoOutput _eOutput);
+
+  VBA::Window *             m_poWindow;
 
   Config::Section *         m_poConfig;
-  static const SDirEntry    m_astDirs[];
-  Gtk::FileChooserButton *  m_poButtons[5];
+  Gtk::ComboBox *           m_poFiltersComboBox;
+  Gtk::ComboBox *           m_poIBFiltersComboBox;
+  Gtk::RadioButton *        m_poOutputOpenGLRadioButton;
+  Gtk::RadioButton *        m_poOutputCairoRadioButton;
+  Gtk::RadioButton *        m_poOutputXvRadioButton;
 };
 
 } // namespace VBA
 
 
-#endif // __VBA_DIRECTORIESCONFIG_H__
+#endif // __VBA_DISPLAYCONFIG_H__

@@ -140,40 +140,16 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   }
 
   vCreateFileOpenDialog();
-  vLoadJoypadsFromConfig();
+  vApplyConfigJoypads();
+  vApplyConfigScreenArea();
+  vApplyConfigFilter();
+  vApplyConfigFilterIB();
 
   Gtk::MenuItem *      poMI;
   Gtk::CheckMenuItem * poCMI;
 
   // Menu bar
   m_poMenuBar = dynamic_cast<Gtk::MenuBar *>(_poXml->get_widget("MenuBar"));
-
-  // Video output menu
-  //
-  struct
-  {
-    const char *       m_csName;
-    const EVideoOutput m_eVideoOutput;
-  }
-  astVideoOutput[] =
-  {
-    { "VideoOpenGL", OutputOpenGL },
-    { "VideoCairo",  OutputCairo  },
-    { "VideoXv",     OutputXvideo }
-  };
-  EVideoOutput eDefaultVideoOutput = (EVideoOutput)m_poDisplayConfig->oGetKey<int>("output");
-  for (guint i = 0; i < G_N_ELEMENTS(astVideoOutput); i++)
-  {
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astVideoOutput[i].m_csName));
-    if (astVideoOutput[i].m_eVideoOutput == eDefaultVideoOutput)
-    {
-      poCMI->set_active();
-      vOnVideoOutputToggled(poCMI, eDefaultVideoOutput);
-    }
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnVideoOutputToggled),
-                                      poCMI, astVideoOutput[i].m_eVideoOutput));
-  }
 
   // File menu
   //
@@ -549,68 +525,9 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
                                       poCMI, astEmulatorType[i].m_eEmulatorType));
   }
 
-  // Filter menu
-  //
-  struct
-  {
-    const char *    m_csName;
-    const EFilter2x m_eFilter2x;
-  }
-  astFilter2x[] =
-  {
-    { "FilterNone",          FilterNone         },
-    { "FilterTVMode",        FilterScanlinesTV  },
-    { "Filter2xSaI",         Filter2xSaI        },
-    { "FilterSuper2xSaI",    FilterSuper2xSaI   },
-    { "FilterSuperEagle",    FilterSuperEagle   },
-    { "FilterPixelate",      FilterPixelate     },
-    { "FilterAdvanceMame2x", FilterAdMame2x     },
-    { "FilterBilinear",      FilterBilinear     },
-    { "FilterBilinearPlus",  FilterBilinearPlus },
-    { "FilterScanlines",     FilterScanlines    },
-    { "FilterHq2x",          FilterHq2x         },
-    { "FilterLq2x",          FilterLq2x         }
-  };
-  EFilter2x eDefaultFilter2x = (EFilter2x)m_poDisplayConfig->oGetKey<int>("filter2x");
-  for (guint i = 0; i < G_N_ELEMENTS(astFilter2x); i++)
-  {
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astFilter2x[i].m_csName));
-    if (astFilter2x[i].m_eFilter2x == eDefaultFilter2x)
-    {
-      poCMI->set_active();
-      vOnFilter2xToggled(poCMI, eDefaultFilter2x);
-    }
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnFilter2xToggled),
-                                      poCMI, astFilter2x[i].m_eFilter2x));
-  }
-
-  // Interframe blending menu
-  //
-  struct
-  {
-    const char *    m_csName;
-    const EFilterIB m_eFilterIB;
-  }
-  astFilterIB[] =
-  {
-    { "IFBNone",       FilterIBNone       },
-    { "IFBSmart",      FilterIBSmart      },
-    { "IFBMotionBlur", FilterIBMotionBlur }
-  };
-  EFilterIB eDefaultFilterIB = (EFilterIB)m_poDisplayConfig->oGetKey<int>("filterIB");
-  for (guint i = 0; i < G_N_ELEMENTS(astFilterIB); i++)
-  {
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astFilterIB[i].m_csName));
-    if (astFilterIB[i].m_eFilterIB == eDefaultFilterIB)
-    {
-      poCMI->set_active();
-      vOnFilterIBToggled(poCMI, eDefaultFilterIB);
-    }
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnFilterIBToggled),
-                                      poCMI, astFilterIB[i].m_eFilterIB));
-  }
+  // Display menu
+  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("DisplayConfigure"));
+  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnDisplayConfigure));
 
   // Joypad menu
   //
@@ -713,8 +630,10 @@ void Window::vInitColors(EColorFormat _eColorFormat)
   Init_2xSaI(32);
 }
 
-void Window::vInitScreenArea(EVideoOutput _eVideoOutput)
+void Window::vApplyConfigScreenArea()
 {
+  EVideoOutput eVideoOutput = (EVideoOutput)m_poDisplayConfig->oGetKey<int>("output");;
+
   Gtk::Alignment * poC;
 
   poC = dynamic_cast<Gtk::Alignment *>(m_poXml->get_widget("ScreenContainer"));
@@ -723,7 +642,7 @@ void Window::vInitScreenArea(EVideoOutput _eVideoOutput)
 
   try
   {
-    switch (_eVideoOutput)
+    switch (eVideoOutput)
     {
 #ifdef USE_OPENGL
       case OutputOpenGL:
@@ -879,10 +798,6 @@ void Window::vInitConfig()
     			inputGetKeymap(PAD_DEFAULT, m_astJoypad[j].m_eKeyFlag));
     }
   }
-  m_poInputConfig->vSetKey("autofire_A", false );
-  m_poInputConfig->vSetKey("autofire_B", false );
-  m_poInputConfig->vSetKey("autofire_L", false );
-  m_poInputConfig->vSetKey("autofire_R", false );
 }
 
 void Window::vCheckConfig()
@@ -1053,6 +968,26 @@ void Window::vSaveConfig(const std::string & _rsFile)
   }
 }
 
+void Window::vApplyConfigFilter()
+{
+  int iFilter = m_poDisplayConfig->oGetKey<int>("filter2x");
+  m_poScreenArea->vSetFilter2x((EFilter2x)iFilter);
+  if (emulating)
+  {
+    vDrawScreen();
+  }
+}
+
+void Window::vApplyConfigFilterIB()
+{
+  int iFilter = m_poDisplayConfig->oGetKey<int>("filterIB");
+  m_poScreenArea->vSetFilterIB((EFilterIB)iFilter);
+  if (emulating)
+  {
+    vDrawScreen();
+  }
+}
+
 void Window::vHistoryAdd(const std::string & _rsFile)
 {
   std::string sURL = "file://" + _rsFile;
@@ -1060,7 +995,7 @@ void Window::vHistoryAdd(const std::string & _rsFile)
   m_poRecentManager->add_item(sURL);
 }
 
-void Window::vLoadJoypadsFromConfig()
+void Window::vApplyConfigJoypads()
 {
   for (int i = m_iJoypadMin; i <= m_iJoypadMax; i++)
   {
