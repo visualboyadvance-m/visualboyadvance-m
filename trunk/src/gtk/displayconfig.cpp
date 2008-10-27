@@ -33,40 +33,6 @@ DisplayConfigDialog::DisplayConfigDialog(GtkDialog* _pstDialog, const Glib::RefP
   Gtk::Dialog(_pstDialog),
   m_poConfig(0)
 {
-  //TODO Move to filters.h
-  struct
-  {
-    const char *    m_csName;
-    const EFilter2x m_eFilter;
-  }
-  astFilter[] =
-  {
-    { "None",                FilterNone         },
-    { "2xSaI",               Filter2xSaI        },
-    { "Super 2xSaI",         FilterSuper2xSaI   },
-    { "Super Eagle",         FilterSuperEagle   },
-    { "Pixelate",            FilterPixelate     },
-    { "AdvanceMAME Scale2x", FilterAdMame2x     },
-    { "Bilinear",            FilterBilinear     },
-    { "Bilinear Plus",       FilterBilinearPlus },
-    { "Scanlines",           FilterScanlines    },
-    { "TV Mode",             FilterScanlinesTV  },
-    { "hq2x",                FilterHq2x         },
-    { "lq2x",                FilterLq2x         }
-  };
-
-  struct
-  {
-    const char *    m_csName;
-    const EFilterIB m_eFilterIB;
-  }
-  astFilterIB[] =
-  {
-    { "None",                      FilterIBNone       },
-    { "Smart interframe blending", FilterIBSmart      },
-    { "Interframe motion blur",    FilterIBMotionBlur }
-  };
-
   refBuilder->get_widget("FiltersComboBox", m_poFiltersComboBox);
   refBuilder->get_widget("IBFiltersComboBox", m_poIBFiltersComboBox);
   refBuilder->get_widget("OutputOpenGL", m_poOutputOpenGLRadioButton);
@@ -84,20 +50,20 @@ DisplayConfigDialog::DisplayConfigDialog(GtkDialog* _pstDialog, const Glib::RefP
   Glib::RefPtr<Gtk::ListStore> poFiltersListStore;
   poFiltersListStore = Glib::RefPtr<Gtk::ListStore>::cast_static(refBuilder->get_object("FiltersListStore"));
 
-  for (guint i = 0; i < G_N_ELEMENTS(astFilter); i++)
+  for (guint i = FirstFilter; i <= LastFilter; i++)
   {
     Gtk::TreeModel::Row row = *(poFiltersListStore->append());
-    row->set_value(0, std::string(astFilter[i].m_csName));
+    row->set_value(0, std::string(pcsGetFilterName((EFilter)i)));
   }
 
   // Populate the interframe blending filters combobox
   Glib::RefPtr<Gtk::ListStore> poIBFiltersListStore;
   poIBFiltersListStore = Glib::RefPtr<Gtk::ListStore>::cast_static(refBuilder->get_object("IBFiltersListStore"));
 
-  for (guint i = 0; i < G_N_ELEMENTS(astFilterIB); i++)
+  for (guint i = FirstFilterIB; i <= LastFilterIB; i++)
   {
     Gtk::TreeModel::Row row = *(poIBFiltersListStore->append());
-    row->set_value(0, std::string(astFilterIB[i].m_csName));
+    row->set_value(0, std::string(pcsGetFilterIBName((EFilterIB)i)));
   }
 }
 

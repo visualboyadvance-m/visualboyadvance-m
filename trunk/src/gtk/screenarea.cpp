@@ -92,16 +92,16 @@ void ScreenArea::vSetScale(int _iScale)
 
   if (_iScale == 1)
   {
-    vSetFilter2x(FilterNone);
+    vSetFilter(FilterNone);
   }
 
   m_iScale = _iScale;
   vUpdateSize();
 }
 
-void ScreenArea::vSetFilter2x(EFilter2x _eFilter2x)
+void ScreenArea::vSetFilter(EFilter _eFilter)
 {
-  m_vFilter2x = pvGetFilter2x(_eFilter2x, FilterDepth32);
+  m_vFilter2x = pvGetFilter(_eFilter, FilterDepth32);
 
   m_iFilterScale = 1;
   if (m_vFilter2x != NULL)
