@@ -1,5 +1,5 @@
-#ifndef VBA_GLOBALS_H
-#define VBA_GLOBALS_H
+#ifndef GLOBALS_H
+#define GLOBALS_H
 
 #include "agb/GBA.h"
 
@@ -132,4 +132,4 @@ extern u16 IE;
 extern u16 IF;
 extern u16 IME;
 
-#endif // VBA_GLOBALS_H
+#endif // GLOBALS_H

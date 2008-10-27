@@ -1,8 +1,10 @@
-#ifndef VBA_AGBPRINT_H
-#define VBA_AGBPRINT_H
-extern void agbPrintEnable(bool);
-extern bool agbPrintIsEnabled();
-extern void agbPrintReset();
-extern bool agbPrintWrite(u32, u16);
-extern void agbPrintFlush();
-#endif
+#ifndef AGBPRINT_H
+#define AGBPRINT_H
+
+void agbPrintEnable(bool enable);
+bool agbPrintIsEnabled();
+void agbPrintReset();
+bool agbPrintWrite(u32 address, u16 value);
+void agbPrintFlush();
+
+#endif // AGBPRINT_H

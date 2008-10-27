@@ -1,5 +1,5 @@
-#ifndef VBA_CHEATSEARCH_H
-#define VBA_CHEATSEARCH_H
+#ifndef CHEATSEARCH_H
+#define CHEATSEARCH_H
 
 #include "System.h"
 
@@ -41,14 +41,14 @@ enum {
   (bits)[(off) >> 3] & (1 << ((off) & 7))
 
 extern CheatSearchData cheatSearchData;
-extern void cheatSearchCleanup(CheatSearchData *cs);
-extern void cheatSearchStart(const CheatSearchData *cs);
-extern void cheatSearch(const CheatSearchData *cs, int compare, int size,
-                        bool isSigned);
-extern void cheatSearchValue(const CheatSearchData *cs, int compare, int size,
-                             bool isSigned, u32 value);
-extern int cheatSearchGetCount(const CheatSearchData *cs, int size);
-extern void cheatSearchUpdateValues(const CheatSearchData *cs);
-extern s32 cheatSearchSignedRead(u8 *data, int off, int size);
-extern u32 cheatSearchRead(u8 *data, int off, int size);
-#endif
+
+void cheatSearchCleanup(CheatSearchData *cs);
+void cheatSearchStart(const CheatSearchData *cs);
+void cheatSearch(const CheatSearchData *cs, int compare, int size, bool isSigned);
+void cheatSearchValue(const CheatSearchData *cs, int compare, int size, bool isSigned, u32 value);
+int cheatSearchGetCount(const CheatSearchData *cs, int size);
+void cheatSearchUpdateValues(const CheatSearchData *cs);
+s32 cheatSearchSignedRead(u8 *data, int off, int size);
+u32 cheatSearchRead(u8 *data, int off, int size);
+
+#endif // CHEATSEARCH_H

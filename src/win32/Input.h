@@ -1,5 +1,5 @@
-#ifndef VBA_WIN32_INPUT_H
-#define VBA_WIN32_INPUT_H
+#pragma once
+
 #include "../System.h"
 
 #define JOYCONFIG_MESSAGE (WM_USER + 1000)
@@ -44,5 +44,3 @@ class Input {
   virtual void loadSettings() = 0;
   virtual void saveSettings() = 0;
 };
-
-#endif

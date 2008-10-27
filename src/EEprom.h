@@ -1,5 +1,5 @@
-#ifndef VBA_EEPROM_H
-#define VBA_EEPROM_H
+#ifndef EEPROM_H
+#define EEPROM_H
 
 extern void eepromSaveGame(gzFile _gzFile);
 extern void eepromReadGame(gzFile _gzFile, int version);
@@ -18,4 +18,4 @@ extern int eepromSize;
 #define EEPROM_READDATA2      3
 #define EEPROM_WRITEDATA      4
 
-#endif // VBA_EEPROM_H
+#endif // EEPROM_H

@@ -1,7 +1,7 @@
-// GB sound emulation
+#ifndef GBSOUND_H
+#define GBSOUND_H
 
-#ifndef VBA_GBSOUND_H
-#define VBA_GBSOUND_H
+// GB sound emulation
 
 // See Sound.h for sound setup/options
 
@@ -64,7 +64,7 @@ void gbSoundEvent( u16 address, int data );
 #define SOUND_EVENT gbSoundEvent
 
 // Emulates read from sound hardware
-u8   gbSoundRead( u16 address );
+u8 gbSoundRead( u16 address );
 
 // Notifies emulator that SOUND_CLOCK_TICKS clocks have passed
 void gbSoundTick();
@@ -75,4 +75,4 @@ extern int soundTicks;          // Number of 16.8 MHz clocks until gbSoundTick()
 void gbSoundSaveGame( gzFile out );
 void gbSoundReadGame( int version, gzFile in );
 
-#endif
+#endif // GBSOUND_H

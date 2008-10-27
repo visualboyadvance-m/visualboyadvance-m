@@ -1,5 +1,5 @@
-#ifndef GBA_CHEATS_H
-#define GBA_CHEATS_H
+#ifndef CHEATS_H
+#define CHEATS_H
 
 struct CheatsData {
   int code;
@@ -35,4 +35,4 @@ int cheatsCheckKeys(u32 keys, u32 extended);
 extern int cheatsNumber;
 extern CheatsData cheatsList[100];
 
-#endif // GBA_CHEATS_H
+#endif // CHEATS_H

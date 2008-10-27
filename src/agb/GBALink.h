@@ -1,7 +1,7 @@
+#pragma once
+
 #include <winsock.h>
 
-#ifndef LINKH
-#define LINKH
 #define LINK_PARENTLOST 0x80
 #define UNSUPPORTED -1
 #define MULTIPLAYER 0
@@ -102,5 +102,3 @@ extern bool linkenable;
 extern int linktimeout;
 extern lclient lc;
 extern int linkid;
-
-#endif

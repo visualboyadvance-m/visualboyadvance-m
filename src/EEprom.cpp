@@ -185,4 +185,3 @@ void eepromWrite(u32 /* address */, u8 value)
     break;
   }
 }
-

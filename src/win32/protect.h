@@ -1,5 +1,4 @@
-#ifndef ___PROTECT_H_
-#define ___PROTECT_H_
+#pragma once
 
 #if defined(__cplusplus)
 extern "C" {
@@ -24,6 +23,4 @@ char *unprotect_buffer(unsigned char *buffer, size_t buffer_len);
 
 #if defined(__cplusplus)
 }
-#endif
-
 #endif

@@ -1,8 +1,8 @@
-#ifndef VBA_PATCH_H
-#define VBA_PATCH_H
+#ifndef PATCH_H
+#define PATCH_H
 
 #include "System.h"
 
 bool applyPatch(const char *patchname, u8 **rom, int *size);
 
-#endif
+#endif // PATCH_H

@@ -714,4 +714,4 @@ unwritable:
   }
 }
 
-#endif //GBAINLINE_H
+#endif // GBAINLINE_H
