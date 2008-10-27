@@ -1,5 +1,5 @@
-#ifndef VBA_GB_GB_H
-#define VBA_GB_GB_H
+#ifndef GB_H
+#define GB_H
 
 #define C_FLAG 0x10
 #define H_FLAG 0x20
@@ -40,4 +40,4 @@ bool gbReadGSASnapshot(const char *);
 
 extern struct EmulatedSystem GBSystem;
 
-#endif
+#endif // GB_H

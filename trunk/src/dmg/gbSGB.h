@@ -1,3 +1,6 @@
+#ifndef GBSGB_H
+#define GBSGB_H
+
 void gbSgbInit();
 void gbSgbShutdown();
 void gbSgbCommand();
@@ -17,4 +20,4 @@ extern int gbSgbPacketTimeout;
 extern u8  gbSgbReadingController;
 extern int gbSgbFourPlayers;
 
-
+#endif // GBSGB_H

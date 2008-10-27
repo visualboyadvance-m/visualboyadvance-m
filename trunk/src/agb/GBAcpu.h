@@ -1,5 +1,5 @@
-#ifndef VBA_GBAcpu_H
-#define VBA_GBAcpu_H
+#ifndef GBACPU_H
+#define GBACPU_H
 
 extern int armExecute();
 extern int thumbExecute();
@@ -280,4 +280,4 @@ inline void cpuMasterCodeCheck()
   }
 }
 
-#endif //VBA_GBAcpu_H
+#endif // GBACPU_H

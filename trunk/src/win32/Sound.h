@@ -1,5 +1,4 @@
-#ifndef VBA_WIN32_SOUND_H
-#define VBA_WIN32_SOUND_H
+#pragma once
 
 enum AUDIO_API {
 	DIRECTSOUND = 0
@@ -24,5 +23,3 @@ class ISound
 
   virtual void setThrottle( unsigned short throttle ) {};
 };
-
-#endif

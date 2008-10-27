@@ -1,5 +1,5 @@
-#ifndef VBA_FLASH_H
-#define VBA_FLASH_H
+#ifndef FLASH_H
+#define FLASH_H
 
 extern void flashSaveGame(gzFile _gzFile);
 extern void flashReadGame(gzFile _gzFile, int version);
@@ -14,4 +14,5 @@ extern void flashSetSize(int size);
 extern void flashInit();
 
 extern int flashSize;
-#endif // VBA_FLASH_H
+
+#endif // FLASH_H

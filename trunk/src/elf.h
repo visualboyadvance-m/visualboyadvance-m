@@ -1,5 +1,5 @@
-#ifndef VBA_ELF_H
-#define VBA_ELF_H
+#ifndef ELF_H
+#define ELF_H
 
 enum LocationType {
   LOCATION_register,
@@ -261,4 +261,5 @@ extern bool elfFindLineInModule(u32 *, const char *, int);
 u32 elfDecodeLocation(Function *, ELFBlock *, LocationType *);
 u32 elfDecodeLocation(Function *, ELFBlock *, LocationType *, u32);
 int elfFindLine(CompileUnit *unit, Function *func, u32 addr, const char **);
-#endif
+
+#endif // ELF_H

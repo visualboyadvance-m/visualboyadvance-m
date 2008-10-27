@@ -1,5 +1,5 @@
-#ifndef VBA_GBA_H
-#define VBA_GBA_H
+#ifndef GBA_H
+#define GBA_H
 
 #include "../System.h"
 
@@ -138,4 +138,4 @@ extern struct EmulatedSystem GBASystem;
 #include "../EEprom.h"
 #include "../Flash.h"
 
-#endif //VBA_GBA_H
+#endif // GBA_H
