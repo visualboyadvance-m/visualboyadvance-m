@@ -36,7 +36,7 @@ public:
 
   void vSetSize(int _iWidth, int _iHeight);
   void vSetScale(int _iScale);
-  void vSetFilter2x(EFilter2x _eFilter2x);
+  void vSetFilter(EFilter _eFilter);
   void vSetFilterIB(EFilterIB _eFilterIB);
   virtual void vDrawPixels(u8 * _puiData);
   virtual void vDrawBlackScreen() = 0;
@@ -54,7 +54,7 @@ protected:
   int      m_iFilterScale;
   int      m_iAreaWidth;
   int      m_iAreaHeight;
-  Filter2x m_vFilter2x;
+  Filter   m_vFilter2x;
   FilterIB m_vFilterIB;
   u32 *    m_puiPixels;
   u8 *     m_puiDelta;
