@@ -1,6 +1,3 @@
-// SelectPlugin.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "vba.h"
 #include "SelectPlugin.h"

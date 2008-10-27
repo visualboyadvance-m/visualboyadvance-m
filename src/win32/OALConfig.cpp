@@ -1,6 +1,3 @@
-// src/win32/OALConfig.cpp : implementation file
-//
-
 #include "stdafx.h"
 
 #ifndef NO_OAL
