@@ -35,12 +35,14 @@ DisplayConfigDialog::DisplayConfigDialog(GtkDialog* _pstDialog, const Glib::RefP
 {
   refBuilder->get_widget("FiltersComboBox", m_poFiltersComboBox);
   refBuilder->get_widget("IBFiltersComboBox", m_poIBFiltersComboBox);
+  refBuilder->get_widget("DefaultScaleComboBox", m_poDefaultScaleComboBox);
   refBuilder->get_widget("OutputOpenGL", m_poOutputOpenGLRadioButton);
   refBuilder->get_widget("OutputCairo", m_poOutputCairoRadioButton);
   refBuilder->get_widget("OutputXv", m_poOutputXvRadioButton);
 
   m_poFiltersComboBox->signal_changed().connect(sigc::mem_fun(*this, &DisplayConfigDialog::vOnFilterChanged));
   m_poIBFiltersComboBox->signal_changed().connect(sigc::mem_fun(*this, &DisplayConfigDialog::vOnFilterIBChanged));
+  m_poDefaultScaleComboBox->signal_changed().connect(sigc::mem_fun(*this, &DisplayConfigDialog::vOnScaleChanged));
   m_poOutputOpenGLRadioButton->signal_toggled().connect(sigc::bind(sigc::mem_fun(*this, &DisplayConfigDialog::vOnOutputChanged), VBA::Window::OutputOpenGL));
   m_poOutputCairoRadioButton->signal_toggled().connect(sigc::bind(sigc::mem_fun(*this, &DisplayConfigDialog::vOnOutputChanged), VBA::Window::OutputCairo));
   m_poOutputXvRadioButton->signal_toggled().connect(sigc::bind(sigc::mem_fun(*this, &DisplayConfigDialog::vOnOutputChanged), VBA::Window::OutputXvideo));
@@ -77,6 +79,9 @@ void DisplayConfigDialog::vSetConfig(Config::Section * _poConfig, VBA::Window * 
 
   int iDefaultFilterIB = m_poConfig->oGetKey<int>("filterIB");
   m_poIBFiltersComboBox->set_active(iDefaultFilterIB);
+
+  int iDefaultScale = m_poConfig->oGetKey<int>("scale");
+  m_poDefaultScaleComboBox->set_active(iDefaultScale - 1);
 
   // Set the default output module
   VBA::Window::EVideoOutput _eOutput = (VBA::Window::EVideoOutput)m_poConfig->oGetKey<int>("output");
@@ -124,6 +129,16 @@ void DisplayConfigDialog::vOnOutputChanged(VBA::Window::EVideoOutput _eOutput)
     m_poConfig->vSetKey("output", VBA::Window::OutputXvideo);
 
   m_poWindow->vApplyConfigScreenArea();
+}
+
+void DisplayConfigDialog::vOnScaleChanged()
+{
+  int iScale = m_poDefaultScaleComboBox->get_active_row_number() + 1;
+  if (iScale > 0)
+  {
+    m_poConfig->vSetKey("scale", iScale);
+    m_poWindow->vUpdateScreen();
+  }
 }
 
 } // namespace VBA

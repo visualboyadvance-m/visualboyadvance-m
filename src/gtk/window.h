@@ -78,6 +78,7 @@ public:
   void vApplyConfigFilter();
   void vApplyConfigFilterIB();
   void vApplyConfigScreenArea();
+  void vUpdateScreen();
 
   inline ECartridge eGetCartridge() const { return m_eCartridge; }
 
@@ -148,7 +149,6 @@ protected:
   virtual void vOnFileExit();
   virtual void vOnFrameskipToggled(Gtk::CheckMenuItem * _poCMI, int _iValue);
   virtual void vOnVideoFullscreen();
-  virtual void vOnVideoScaleToggled(Gtk::CheckMenuItem * _poCMI, int _iScale);
   virtual void vOnDirectories();
   virtual void vOnPauseWhenInactiveToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnSelectBios();
@@ -270,7 +270,6 @@ private:
   void vHistoryAdd(const std::string & _rsFile);
   void vApplyConfigJoypads();
   void vSaveJoypadsToConfig();
-  void vUpdateScreen();
   void vDrawDefaultScreen();
   void vSetDefaultTitle();
   void vCreateFileOpenDialog();
