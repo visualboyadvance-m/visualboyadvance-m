@@ -43,7 +43,7 @@
       </row>
     </data>
   </object>
-  <object class="GtkDialog" id="dialog1">
+  <object class="GtkDialog" id="DisplayConfigDialog">
     <property name="border_width">5</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>

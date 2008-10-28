@@ -554,10 +554,11 @@ void Window::vOnJoypadConfigure()
 
 void Window::vOnDisplayConfigure()
 {
-  Glib::RefPtr<Gtk::Builder> poBuilder = Gtk::Builder::create_from_file("src/gtk/ui/display.ui");
+  std::string sUiFile = sGetUiFilePath("display.ui");
+  Glib::RefPtr<Gtk::Builder> poBuilder = Gtk::Builder::create_from_file(sUiFile);
 
   DisplayConfigDialog * poDialog = 0;
-  poBuilder->get_widget_derived("dialog1", poDialog);
+  poBuilder->get_widget_derived("DisplayConfigDialog", poDialog);
   poDialog->vSetConfig(m_poDisplayConfig, this);
   poDialog->set_transient_for(*this);
   poDialog->run();
