@@ -45,6 +45,7 @@ public:
   virtual ~Window();
 
   inline static Window * poGetInstance() { return m_poInstance; }
+  static std::string sGetUiFilePath(const std::string &_sFileName);
 
   enum ECartridge
   {

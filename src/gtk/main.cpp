@@ -88,13 +88,7 @@ int main(int argc, char * argv[])
 
   Gtk::Window::set_default_icon_name("vbam");
 
-  // Use the glade file from the source folder if it exists
-  // to make gvbam runnable without installation
-  std::string sGladeFile = "src/gtk/vba.glade";
-  if (!Glib::file_test(sGladeFile, Glib::FILE_TEST_EXISTS))
-  {
-    sGladeFile = PKGDATADIR "/vba.glade";
-  }
+  std::string sGladeFile = VBA::Window::sGetUiFilePath("vbam.glade");
 
   Glib::RefPtr<Xml> poXml;
   try
