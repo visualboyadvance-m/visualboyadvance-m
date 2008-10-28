@@ -1503,4 +1503,17 @@ void Window::vSDLPollEvents()
   }
 }
 
+std::string Window::sGetUiFilePath(const std::string &_sFileName)
+{
+  // Use the ui file from the source folder if it exists
+  // to make gvbam runnable without installation
+  std::string sUiFile = "src/gtk/ui/" + _sFileName;
+  if (!Glib::file_test(sUiFile, Glib::FILE_TEST_EXISTS))
+  {
+    sUiFile = PKGDATADIR "/ui/" + _sFileName;
+  }
+
+  return sUiFile;
+}
+
 } // VBA namespace
