@@ -363,17 +363,6 @@ void Window::vOnVideoFullscreen()
   vToggleFullscreen();
 }
 
-void Window::vOnVideoScaleToggled(Gtk::CheckMenuItem * _poCMI, int _iScale)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  m_poDisplayConfig->vSetKey("scale", _iScale);
-  vUpdateScreen();
-}
-
 void Window::vOnDirectories()
 {
   DirectoriesConfigDialog oDialog(m_poDirConfig);

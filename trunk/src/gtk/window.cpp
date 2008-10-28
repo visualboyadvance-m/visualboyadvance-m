@@ -281,36 +281,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
                                       poCMI, astFrameskip[i].m_iFrameskip));
   }
 
-  // Video menu
-  //
-  struct
-  {
-    const char * m_csName;
-    const int    m_iScale;
-  }
-  astVideoScale[] =
-  {
-    { "Video1x", 1 },
-    { "Video2x", 2 },
-    { "Video3x", 3 },
-    { "Video4x", 4 },
-    { "Video5x", 5 },
-    { "Video6x", 6 }
-  };
-  int iDefaultScale = m_poDisplayConfig->oGetKey<int>("scale");
-  for (guint i = 0; i < G_N_ELEMENTS(astVideoScale); i++)
-  {
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astVideoScale[i].m_csName));
-    if (astVideoScale[i].m_iScale == iDefaultScale)
-    {
-      poCMI->set_active();
-      vOnVideoScaleToggled(poCMI, iDefaultScale);
-    }
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnVideoScaleToggled),
-                                      poCMI, astVideoScale[i].m_iScale));
-  }
-
   // Emulator menu
   //
   poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("DirectoriesConfigure"));

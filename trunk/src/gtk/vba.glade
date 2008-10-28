@@ -453,65 +453,6 @@
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="VideoMenu">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">_Video</property>
-                        <property name="use_underline">True</property>
-                        <child>
-                          <widget class="GtkMenu" id="VideoMenu_menu">
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="Video1x">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_1x</property>
-                                <property name="use_underline">True</property>
-                                <property name="active">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="Video2x">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_2x</property>
-                                <property name="use_underline">True</property>
-                                <property name="group">Video1x</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="Video3x">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_3x</property>
-                                <property name="use_underline">True</property>
-                                <property name="group">Video1x</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="Video4x">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_4x</property>
-                                <property name="use_underline">True</property>
-                                <property name="group">Video1x</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="Video5x">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_5x</property>
-                                <property name="use_underline">True</property>
-                                <property name="group">Video1x</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="Video6x">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_6x</property>
-                                <property name="use_underline">True</property>
-                                <property name="group">Video1x</property>
-                              </widget>
-                            </child>
-                          </widget>
-                        </child>
-                      </widget>
-                    </child>
-                    <child>
                       <widget class="GtkMenuItem" id="EmulatorMenu">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">_Emulator</property>

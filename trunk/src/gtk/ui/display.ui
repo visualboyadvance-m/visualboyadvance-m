@@ -18,6 +18,31 @@
       <column type="gchararray"/>
     </columns>
   </object>
+  <object class="GtkListStore" id="ScalingListStore">
+    <columns>
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0">1x</col>
+      </row>
+      <row>
+        <col id="0">2x</col>
+      </row>
+      <row>
+        <col id="0">3x</col>
+      </row>
+      <row>
+        <col id="0">4x</col>
+      </row>
+      <row>
+        <col id="0">5x</col>
+      </row>
+      <row>
+        <col id="0">6x</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkDialog" id="dialog1">
     <property name="border_width">5</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
@@ -89,6 +114,61 @@
           <packing>
             <property name="expand">False</property>
             <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkFrame" id="frame2">
+            <property name="visible">True</property>
+            <property name="label_xalign">0</property>
+            <property name="shadow_type">GTK_SHADOW_NONE</property>
+            <child>
+              <object class="GtkAlignment" id="alignment2">
+                <property name="visible">True</property>
+                <property name="left_padding">12</property>
+                <child>
+                  <object class="GtkHBox" id="hbox1">
+                    <property name="visible">True</property>
+                    <child>
+                      <object class="GtkLabel" id="label6">
+                        <property name="visible">True</property>
+                        <property name="xalign">1</property>
+                        <property name="label" translatable="yes">Default scaling : </property>
+                        <property name="justify">GTK_JUSTIFY_RIGHT</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkComboBox" id="DefaultScaleComboBox">
+                        <property name="visible">True</property>
+                        <property name="model">ScalingListStore</property>
+                        <child>
+                          <object class="GtkCellRendererText" id="renderer3"/>
+                          <attributes>
+                            <attribute name="text">0</attribute>
+                          </attributes>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child type="label">
+              <object class="GtkLabel" id="label2">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">&lt;b&gt;Zoom&lt;/b&gt;</property>
+                <property name="use_markup">True</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">2</property>
           </packing>
         </child>
         <child>
