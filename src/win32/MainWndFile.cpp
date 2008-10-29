@@ -877,11 +877,20 @@ void MainWnd::OnUpdateFileLoadgameAutoloadmostrecent(CCmdUI* pCmdUI)
 
 void MainWnd::OnLoadgameDonotchangebatterysave()
 {
-  theApp.winSkipSaveGameBattery = !theApp.winSkipSaveGameBattery;
-  skipSaveGameBattery = theApp.winSkipSaveGameBattery;
+  skipSaveGameBattery = !skipSaveGameBattery;
 }
 
 void MainWnd::OnUpdateLoadgameDonotchangebatterysave(CCmdUI *pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.winSkipSaveGameBattery);
+  pCmdUI->SetCheck(skipSaveGameBattery);
+}
+
+void MainWnd::OnLoadgameDonotchangecheatlist()
+{
+  skipSaveGameCheats = !skipSaveGameCheats;
+}
+
+void MainWnd::OnUpdateLoadgameDonotchangecheatlist(CCmdUI *pCmdUI)
+{
+  pCmdUI->SetCheck(skipSaveGameCheats);
 }

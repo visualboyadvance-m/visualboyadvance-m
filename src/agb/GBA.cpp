@@ -740,7 +740,12 @@ static bool CPUReadState(gzFile gzFile)
   soundReadGame(gzFile, version);
 
   if(version > SAVE_GAME_VERSION_1) {
-    cheatsReadGame(gzFile, version);
+    if(skipSaveGameCheats) {
+      // skip cheats list data
+      cheatsReadGameSkip(gzFile, version);
+    } else {
+      cheatsReadGame(gzFile, version);
+    }
   }
   if(version > SAVE_GAME_VERSION_6) {
     rtcReadGame(gzFile);

@@ -73,6 +73,35 @@ void gbCheatsReadGame(gzFile gzFile, int version)
   gbCheatUpdateMap();
 }
 
+
+void gbCheatsReadGameSkip(gzFile gzFile, int version)
+{
+  if( version <= 8 ) {
+    int gbGgOn = utilReadInt( gzFile );
+    if( gbGgOn ) {
+      int n = utilReadInt( gzFile );
+      if( n > 0 ) {
+        utilGzSeek( gzFile, n * sizeof(gbXxCheat), SEEK_CUR );
+      }
+    }
+
+    int gbGsOn = utilReadInt( gzFile );
+    if( gbGsOn ) {
+      int n = utilReadInt(gzFile);
+      if( n > 0 ) {
+        utilGzSeek( gzFile, n * sizeof(gbXxCheat), SEEK_CUR );
+      }
+    }
+  } else {
+    int n = utilReadInt( gzFile );
+
+    if( n > 0 ) {
+      utilGzSeek( gzFile, n * sizeof(gbCheat), SEEK_CUR );
+    }
+  }
+}
+
+
 void gbCheatsSaveCheatList(const char *file)
 {
   if(gbCheatNumber == 0)
