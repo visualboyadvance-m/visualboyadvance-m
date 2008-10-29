@@ -1925,13 +1925,14 @@ BEGIN
     END
     POPUP "&Cheats"
     BEGIN
-        MENUITEM "&Search for cheats...",       ID_CHEATS_SEARCHFORCHEATS
-        MENUITEM "&Cheat list...",              ID_CHEATS_CHEATLIST
+        MENUITEM "Create...",                   ID_CHEATS_SEARCHFORCHEATS
+        MENUITEM "List...",                     ID_CHEATS_CHEATLIST
         MENUITEM SEPARATOR
-        MENUITEM "&Automatic save/load cheats", ID_CHEATS_AUTOMATICSAVELOADCHEATS
-        MENUITEM "Disable cheats",              ID_CHEATS_DISABLECHEATS
-        MENUITEM "&Load cheat list...",         ID_CHEATS_LOADCHEATLIST
-        MENUITEM "Sa&ve cheat list...",         ID_CHEATS_SAVECHEATLIST
+        MENUITEM "Save cheat list to...",       ID_CHEATS_SAVECHEATLIST
+        MENUITEM "Load cheat list from...",     ID_CHEATS_LOADCHEATLIST
+        MENUITEM "Save/Load automatically",     ID_CHEATS_AUTOMATICSAVELOADCHEATS
+        MENUITEM SEPARATOR
+        MENUITEM "Disabled",                    ID_CHEATS_DISABLECHEATS
     END
     POPUP "&Tools"
     BEGIN
