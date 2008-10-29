@@ -234,7 +234,7 @@ VBA::VBA()
   active = true;
   paused = false;
   recentFreeze = false;
-  autoSaveLoadCheatList = false;
+  autoSaveLoadCheatList = true;
   winout = NULL;
   removeIntros = false;
   autoPatch = true;
@@ -1683,8 +1683,7 @@ void VBA::loadSettings()
     threadPriority = 2;
   updatePriority();
 
-  autoSaveLoadCheatList = regQueryDwordValue("autoSaveCheatList", 0) ?
-    true : false;
+  autoSaveLoadCheatList = ( 1 == regQueryDwordValue( "autoSaveCheatList", 1 ) ) ? true : false;
 
   gbPaletteOption = regQueryDwordValue("gbPaletteOption", 0);
   if(gbPaletteOption < 0)
