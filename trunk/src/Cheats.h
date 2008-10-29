@@ -25,6 +25,7 @@ void cheatsEnable(int number);
 void cheatsDisable(int number);
 void cheatsSaveGame(gzFile file);
 void cheatsReadGame(gzFile file, int version);
+void cheatsReadGameSkip(gzFile file, int version);
 void cheatsSaveCheatList(const char *file);
 bool cheatsLoadCheatList(const char *file);
 void cheatsWriteMemory(u32 address, u32 value);

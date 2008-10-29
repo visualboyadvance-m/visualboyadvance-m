@@ -309,7 +309,6 @@ VBA::VBA()
   wasPaused = false;
   frameskipadjust = 0;
   autoLoadMostRecent = false;
-  winSkipSaveGameBattery = false;
   maxScale = 0;
   romSize = 0;
   lastWindowed = VIDEO_3X;
@@ -1716,11 +1715,11 @@ void VBA::loadSettings()
   if(joypadDefault < 0 || joypadDefault > 3)
     joypadDefault = 0;
 
-  autoLoadMostRecent = regQueryDwordValue("autoLoadMostRecent", false) ? true :
-    false;
+  autoLoadMostRecent = ( 1 == regQueryDwordValue("autoLoadMostRecent", 0) ) ? true : false;
 
-  winSkipSaveGameBattery = regQueryDwordValue("winSkipSaveGameBattery", false) ? true : false;
-  skipSaveGameBattery = theApp.winSkipSaveGameBattery;
+  skipSaveGameBattery = ( 1 == regQueryDwordValue("skipSaveGameBattery", 0) ) ? true : false;
+
+  skipSaveGameCheats = ( 1 == regQueryDwordValue("skipSaveGameCheats", 0) ) ? true : false;
 
   cheatsEnabled = regQueryDwordValue("cheatsEnabled", false) ? true : false;
 
@@ -2633,7 +2632,8 @@ void VBA::saveSettings()
 
   regSetDwordValue("joypadDefault", joypadDefault);
   regSetDwordValue("autoLoadMostRecent", autoLoadMostRecent);
-  regSetDwordValue("winSkipSaveGameBattery", winSkipSaveGameBattery);
+  regSetDwordValue("skipSaveGameBattery", skipSaveGameBattery);
+  regSetDwordValue("skipSaveGameCheats", skipSaveGameCheats);
   regSetDwordValue("cheatsEnabled", cheatsEnabled);
   regSetDwordValue("maxScale", maxScale);
   regSetDwordValue("throttle", throttle);

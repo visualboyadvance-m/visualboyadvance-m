@@ -2667,6 +2667,27 @@ void cheatsReadGame(gzFile file, int version)
   }
 }
 
+
+// skip the cheat list data
+void cheatsReadGameSkip( gzFile file, int version )
+{
+  int nCheats = 0;
+  nCheats = utilReadInt( file );
+
+  if( version >= 9 ) {
+    utilGzSeek( file, sizeof( cheatsList ), SEEK_CUR );
+  }
+
+  bool firstCodeBreaker = true;
+
+  for( int i = 0; i < nCheats; i++ ) {
+    if( version < 9 ) {
+      utilGzSeek( file, ( 7 * sizeof(int) ) + ( 52 * sizeof(char) ), SEEK_CUR );
+    }
+  }
+}
+
+
 void cheatsSaveCheatList(const char *file)
 {
   if(cheatsNumber == 0)

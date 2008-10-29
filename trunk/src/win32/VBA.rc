@@ -1632,7 +1632,6 @@ BEGIN
         BEGIN
             MENUITEM "Most recent",                 ID_FILE_LOADGAME_MOSTRECENT
             MENUITEM "Auto load most recent",       ID_FILE_LOADGAME_AUTOLOADMOSTRECENT
-            MENUITEM "Do not change battery save",  ID_LOADGAME_DONOTCHANGEBATTERYSAVE
             MENUITEM SEPARATOR
             MENUITEM "Slot #1",                     ID_FILE_LOADGAME_SLOT1
             MENUITEM "Slot #2",                     ID_FILE_LOADGAME_SLOT2
@@ -1644,6 +1643,9 @@ BEGIN
             MENUITEM "Slot #8",                     ID_FILE_LOADGAME_SLOT8
             MENUITEM "Slot #9",                     ID_FILE_LOADGAME_SLOT9
             MENUITEM "Slot #10",                    ID_FILE_LOADGAME_SLOT10
+            MENUITEM SEPARATOR
+            MENUITEM "Do not change battery save",  ID_LOADGAME_DONOTCHANGEBATTERYSAVE
+            MENUITEM "Do not change cheat list",    ID_LOADGAME_DONOTCHANGECHEATLIST
         END
         POPUP "Save Game"
         BEGIN

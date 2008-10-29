@@ -20,6 +20,7 @@ struct gbCheat {
 
 void gbCheatsSaveGame(gzFile);
 void gbCheatsReadGame(gzFile, int);
+void gbCheatsReadGameSkip(gzFile, int);
 void gbCheatsSaveCheatList(const char *);
 bool gbCheatsLoadCheatList(const char *);
 bool gbCheatReadGSCodeFile(const char *);

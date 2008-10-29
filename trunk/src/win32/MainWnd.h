@@ -355,10 +355,13 @@ protected:
 	afx_msg void OnNcRButtonDown(UINT nHitTest, CPoint point);
 	afx_msg void OnUpdatePixelfilterMultiThreading(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateOptionsSelectPlugin(CCmdUI *pCmdUI);
-	afx_msg void OnLoadgameDonotchangebatterysave();
-	afx_msg void OnUpdateLoadgameDonotchangebatterysave(CCmdUI *pCmdUI);
 
-    afx_msg void OnEnterSizeMove();
+  afx_msg void OnLoadgameDonotchangebatterysave();
+	afx_msg void OnUpdateLoadgameDonotchangebatterysave(CCmdUI *pCmdUI);
+  afx_msg void OnLoadgameDonotchangecheatlist();
+  afx_msg void OnUpdateLoadgameDonotchangecheatlist(CCmdUI *pCmdUI);
+
+  afx_msg void OnEnterSizeMove();
 
 	afx_msg void OnAudioCoreSettings();
 	afx_msg void OnUpdateAudioCoreSettings(CCmdUI *pCmdUI);
