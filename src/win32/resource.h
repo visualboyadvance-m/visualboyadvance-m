@@ -392,7 +392,6 @@
 #define IDC_MAP_VIEW_ZOOM               1138
 #define IDS_MOVIE_PLAY                  1138
 #define IDC_VIEWER                      1140
-#define IDC_SAVE_BG2                    1140
 #define IDC_CHANGE_BACKDROP             1140
 #define IDC_ADDRESSES                   1141
 #define IDC_GO                          1143
@@ -870,13 +869,14 @@
 #define ID_FILE_OPEN_GBA                40366
 #define ID_FILE_QUICKOPENROM            40367
 #define ID_OPTIONS_VIDEO_LAYERS_RESET   40368
+#define ID_LOADGAME_DONOTCHANGECHEATLIST 40370
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        165
-#define _APS_NEXT_COMMAND_VALUE         40370
+#define _APS_NEXT_COMMAND_VALUE         40371
 #define _APS_NEXT_CONTROL_VALUE         1297
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
