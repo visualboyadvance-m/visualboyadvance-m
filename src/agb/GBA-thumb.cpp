@@ -156,7 +156,7 @@ static INSN_REGPARM void thumbBreakpoint(u32 opcode)
             {\
                 register int Flags;					\
                 register int Result;				\
-                asm volatile("mtspr xer, %4\n"		\
+                asm volatile("mtspr 1, %4\n"		\ /* reg 1 is xer */
                              "addeo. %0, %2, %3\n"	\
                              "mcrxr cr1\n"			\
                              "mfcr	%1\n"			\
@@ -248,7 +248,7 @@ static INSN_REGPARM void thumbBreakpoint(u32 opcode)
             {\
                 register int Flags;					\
                 register int Result;				\
-                asm volatile("mtspr xer, %4\n"		\
+                asm volatile("mtspr 1, %4\n"		\ /* reg 1 is xer */
                              "subfeo. %0, %3, %2\n"	\
                              "mcrxr cr1\n"			\
                              "mfcr	%1\n"			\
