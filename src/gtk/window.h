@@ -79,6 +79,9 @@ public:
   void vApplyConfigFilter();
   void vApplyConfigFilterIB();
   void vApplyConfigScreenArea();
+  void vApplyConfigMute();
+  void vApplyConfigVolume();
+  void vApplyConfigSoundQuality();
   void vUpdateScreen();
 
   inline ECartridge eGetCartridge() const { return m_eCartridge; }
