@@ -568,13 +568,27 @@ void Window::vOnDisplayConfigure()
 void Window::vOnHelpAbout()
 {
   Gtk::AboutDialog oAboutDialog;
+  const char csGPLHeader[] = "This program is free software: you can redistribute it and/or modify\n"
+    "it under the terms of the GNU General Public License as published by\n"
+    "the Free Software Foundation, either version 2 of the License, or\n"
+    "(at your option) any later version.\n\n"
+    "This program is distributed in the hope that it will be useful,\n"
+    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+    "GNU General Public License for more details.\n\n"
+    "You should have received a copy of the GNU General Public License\n"
+    "along with this program.  If not, see <http://www.gnu.org/licenses/>.";
+  const char csCopyright[] = "Copyright (C) 1999-2003 Forgotten\n"
+                             "Copyright (C) 2004-2006 VBA development team\n"
+                             "Copyright (C) 2007-2008 VBA-M development team";
 
   oAboutDialog.set_transient_for(*this);
 
   oAboutDialog.set_name("VBA-M");
   oAboutDialog.set_version(VERSION);
   oAboutDialog.set_comments(_("Nintendo GameBoy Advance emulator."));
-  oAboutDialog.set_license("GPL");
+  oAboutDialog.set_license(csGPLHeader);
+  oAboutDialog.set_copyright(csCopyright);
   oAboutDialog.set_logo_icon_name("vbam");
 
   oAboutDialog.set_website("http://vba-m.ngemu.com/");
