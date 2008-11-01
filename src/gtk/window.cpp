@@ -958,6 +958,38 @@ void Window::vApplyConfigFilterIB()
   }
 }
 
+void Window::vApplyConfigMute()
+{
+  bool bMute = m_poSoundConfig->oGetKey<bool>("mute");
+  if (bMute)
+  {
+    soundSetEnable(0x000);
+  }
+  else
+  {
+    soundSetEnable(0x30f);
+  }
+}
+
+void Window::vApplyConfigVolume()
+{
+  float fSoundVolume = m_poSoundConfig->oGetKey<float>("volume");
+  soundSetVolume(fSoundVolume);
+}
+
+void Window::vApplyConfigSoundQuality()
+{
+  m_eSoundQuality = (ESoundQuality)m_poSoundConfig->oGetKey<int>("quality");
+  if (m_eCartridge == CartridgeGBA)
+  {
+    soundSetQuality(m_eSoundQuality);
+  }
+  else if (m_eCartridge == CartridgeGB)
+  {
+    gbSoundSetQuality(m_eSoundQuality);
+  }
+}
+
 void Window::vHistoryAdd(const std::string & _rsFile)
 {
   std::string sURL = "file://" + _rsFile;

@@ -474,15 +474,8 @@ void Window::vOnFlashSizeToggled(Gtk::CheckMenuItem * _poCMI, int _iFlashSize)
 void Window::vOnSoundMuteToggled(Gtk::CheckMenuItem * _poCMI)
 {
   bool bMute = _poCMI->get_active();
-  if (bMute)
-  {
-    soundSetEnable(0x000);
-  }
-  else
-  {
-    soundSetEnable(0x30f);
-  }
   m_poSoundConfig->vSetKey("mute", bMute);
+  vApplyConfigMute();
 }
 
 void Window::vOnSoundQualityToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundQuality)
@@ -492,16 +485,8 @@ void Window::vOnSoundQualityToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundQual
     return;
   }
 
-  m_eSoundQuality = (ESoundQuality)_iSoundQuality;
-  if (m_eCartridge == CartridgeGBA)
-  {
-    soundSetQuality(_iSoundQuality);
-  }
-  else if (m_eCartridge == CartridgeGB)
-  {
-    gbSoundSetQuality(_iSoundQuality);
-  }
   m_poSoundConfig->vSetKey("quality", _iSoundQuality);
+  vApplyConfigSoundQuality();
 }
 
 void Window::vOnSoundVolumeToggled(Gtk::CheckMenuItem * _poCMI, float _fSoundVolume)
@@ -511,8 +496,8 @@ void Window::vOnSoundVolumeToggled(Gtk::CheckMenuItem * _poCMI, float _fSoundVol
     return;
   }
 
-  soundSetVolume(_fSoundVolume);
   m_poSoundConfig->vSetKey("volume", _fSoundVolume);
+  vApplyConfigVolume();
 }
 
 void Window::vOnGBBorderToggled(Gtk::CheckMenuItem * _poCMI)
