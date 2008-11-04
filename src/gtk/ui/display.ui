@@ -132,7 +132,7 @@
                       <object class="GtkLabel" id="label6">
                         <property name="visible">True</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">Default scaling : </property>
+                        <property name="label" translatable="yes">Default scale : </property>
                         <property name="justify">GTK_JUSTIFY_RIGHT</property>
                       </object>
                       <packing>
