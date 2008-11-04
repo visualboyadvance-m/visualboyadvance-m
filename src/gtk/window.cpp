@@ -749,7 +749,7 @@ void Window::vInitConfig()
   //
   m_poSoundConfig = m_oConfig.poAddSection("Sound");
   m_poSoundConfig->vSetKey("mute",           false    );
-  m_poSoundConfig->vSetKey("quality",        Sound22K );
+  m_poSoundConfig->vSetKey("quality",        Sound44K );
   m_poSoundConfig->vSetKey("volume",         1.00f    );
 
   // Input section
