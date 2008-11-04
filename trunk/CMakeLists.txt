@@ -47,6 +47,7 @@ IF(NOT NO_GTK)
     # These dependencies require pkg-config to be found
     PKG_CHECK_MODULES ( GTKMM gtkmm-2.4 )
     PKG_CHECK_MODULES ( GLIBMM glibmm-2.4 )
+    PKG_CHECK_MODULES ( GIOMM giomm-2.4 )
     PKG_CHECK_MODULES ( GLADEMM libglademm-2.4 )
     PKG_CHECK_MODULES ( XV xv )
     PKG_CHECK_MODULES ( GTKGLMM gtkglextmm-x11-1.2 )
@@ -240,12 +241,16 @@ INCLUDE_DIRECTORIES(
 
 IF( CAN_BUILD_GVBAM )
     INCLUDE_DIRECTORIES(
+        ${GLIBMM_INCLUDE_DIRS}
+        ${GIOMM_INCLUDE_DIRS}
         ${GTKMM_INCLUDE_DIRS}
         ${GTKGLMM_INCLUDE_DIRS}
         ${GLADEMM_INCLUDE_DIRS}
     )
 
     LINK_DIRECTORIES(
+        ${GLIBMM_LIBRARY_DIRS}
+        ${GIOMM_LIBRARY_DIRS}
         ${GTKMM_LIBRARY_DIRS}
         ${GTKGLMM_LIBRARY_DIRS}
         ${GLADEMM_LIBRARY_DIRS}
