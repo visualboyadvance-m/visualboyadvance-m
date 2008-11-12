@@ -13,8 +13,14 @@
 // #include "Port.h"
 
 #ifdef __GNUC__
+#if defined(__APPLE__) || defined (BSD)
+typedef off_t __off64_t; /* off_t is 64 bits on BSD. */
+#define	fseeko64 fseeko
+#define	ftello64 ftello
+#else
 typedef off64_t __off64_t;
-#endif
+#endif /* __APPLE__ || BSD */
+#endif /* __GNUC__ */
 
 #ifndef _MSC_VER
 #define _stricmp strcasecmp
@@ -25,12 +31,6 @@ typedef off64_t __off64_t;
 #define ftello64 _ftelli64
 typedef	__int64 __off64_t;
 #endif
-
-#if defined(__APPLE__) || defined (MACOSX)
-#define	fseeko64 fseeko
-#define	ftello64 ftello
-typedef	off_t __off64_t;
-#endif /* __APPLE__ || MACOSX */
 
 static int readInt2(FILE *f)
 {
