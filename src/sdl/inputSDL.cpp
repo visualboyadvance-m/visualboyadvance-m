@@ -53,6 +53,8 @@ static EPad sdlDefaultJoypad = PAD_MAIN;
 
 static int autoFire = 0;
 static bool autoFireToggle = false;
+static int autoFireCountdown = 0;
+extern int autoFireMaxCount;
 
 static uint32_t joypad[5][SDLBUTTONS_NUM] = {
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -533,7 +535,12 @@ uint32_t inputReadJoypad(int which)
     res &= (~realAutoFire);
     if(autoFireToggle)
       res |= realAutoFire;
-    autoFireToggle = !autoFireToggle;
+    if (autoFireCountdown <= 0) {
+      autoFireToggle = !autoFireToggle;
+      autoFireCountdown = autoFireMaxCount;
+    } else {
+      autoFireCountdown--;
+    }
   }
 
   return res;
