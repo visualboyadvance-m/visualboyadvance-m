@@ -164,4 +164,14 @@ which means:
 	     circle button)
 So when I press and hold this button on my gamepad, VBA-M rewards me with autofire on A *on that pad only*.
 
+[2008-11-21] new autofire configuration:
+  commandline argument: --autofire NNN
+  configfile attribute: autoFireMaxCount=NNN
+  default value: NNN=1 (does exactly the same thing as without this new feature)
+This controls the "length" of each press (and depress). It is measured in vba-m cycles
+(so --autofire 30 means something like "press once every second" - don't forget that
+the button is not just "virtually pressed" but also "virtually non-pressed" in between).
+This is needed for some games that apparently check whether the button isn't pressed
+faster than a human could do it.
+For example, autofire doesn't work in Mother 3 with --autofire 1 or 2, but it works with 5.
 

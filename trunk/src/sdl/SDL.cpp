@@ -190,6 +190,8 @@ static int sdlSoundToggledOff = 0;
 int	sdl_patch_num	= 0;
 char *	(sdl_patch_names[PATCH_MAX_NUM])	= { NULL }; // and so on
 
+int autoFireMaxCount = 1;
+
 #define REWIND_NUM 8
 #define REWIND_SIZE 400000
 #define SYSMSG_BUFFER_SIZE 1024
@@ -287,6 +289,7 @@ struct option sdlOptions[] = {
   { "throttle", required_argument, 0, 'T' },
   { "verbose", required_argument, 0, 'v' },
   { "cheat", required_argument, 0, 1000 },
+  { "autofire", required_argument, 0, 1001 },
   { NULL, no_argument, NULL, 0 }
 };
 
@@ -793,6 +796,10 @@ void sdlReadPreferences(FILE *f)
       sdlSaveKeysSwitch = sdlFromHex(value);
     } else if(!strcmp(key, "openGLscale")) {
       sdlOpenglScale = sdlFromHex(value);
+    } else if(!strcmp(key, "autoFireMaxCount")) {
+      autoFireMaxCount = sdlFromDec(value);
+      if(autoFireMaxCount < 1)
+        autoFireMaxCount = 1;
     } else {
       fprintf(stderr, "Unknown configuration key %s\n", key);
     }
@@ -1900,6 +1907,12 @@ int main(int argc, char **argv)
 	      strcpy(cpy, optarg);
 	      sdlPreparedCheatCodes[sdlPreparedCheats++]	= cpy;
       }
+      break;
+    case 1001:
+      // --autofire
+      autoFireMaxCount = sdlFromDec(optarg);
+      if (autoFireMaxCount < 1)
+         autoFireMaxCount = 1;
       break;
     case 'b':
       useBios = true;
