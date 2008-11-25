@@ -535,11 +535,13 @@ uint32_t inputReadJoypad(int which)
     res &= (~realAutoFire);
     if(autoFireToggle)
       res |= realAutoFire;
+    autoFireCountdown--; // this needs decrementing even when autoFireToggle is toggled,
+    // so that autoFireMaxCount==1 (the default) will alternate at the maximum possible
+    // frequency (every time this code is reached). Which is what it did before
+    // introducing autoFireCountdown.
     if (autoFireCountdown <= 0) {
       autoFireToggle = !autoFireToggle;
       autoFireCountdown = autoFireMaxCount;
-    } else {
-      autoFireCountdown--;
     }
   }
 
