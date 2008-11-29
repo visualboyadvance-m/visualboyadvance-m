@@ -54,7 +54,7 @@ static EPad sdlDefaultJoypad = PAD_MAIN;
 static int autoFire = 0;
 static bool autoFireToggle = false;
 static int autoFireCountdown = 0;
-extern int autoFireMaxCount;
+int autoFireMaxCount = 1;
 
 static uint32_t joypad[5][SDLBUTTONS_NUM] = {
   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
