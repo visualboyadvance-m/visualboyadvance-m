@@ -190,7 +190,7 @@ static int sdlSoundToggledOff = 0;
 int	sdl_patch_num	= 0;
 char *	(sdl_patch_names[PATCH_MAX_NUM])	= { NULL }; // and so on
 
-int autoFireMaxCount = 1;
+extern int autoFireMaxCount;
 
 #define REWIND_NUM 8
 #define REWIND_SIZE 400000
