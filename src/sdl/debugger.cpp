@@ -525,7 +525,7 @@ static void debuggerPrintEnum(Type *t, u32 value)
   for(i = 0; i < t->enumeration->count; i++) {
     EnumMember *m = (EnumMember *)&t->enumeration->members[i];
     if(value == m->value) {
-      printf(m->name);
+      printf("%s", m->name);
       return;
     }
   }
@@ -2105,7 +2105,8 @@ static void debuggerQuit(int, char **)
 {
   char buffer[10];
   printf("Are you sure you want to quit (y/n)? ");
-  fgets(buffer, 1024, stdin);
+  if (!fgets(buffer, sizeof(buffer), stdin))
+    return;
 
   if(buffer[0] == 'y' || buffer[0] == 'Y') {
     debugger = false;
@@ -2559,7 +2560,7 @@ static bool debuggerCondEvaluate(int num)
 /*extern*/ void debuggerOutput(const char *s, u32 addr)
 {
   if(s)
-    printf(s);
+    printf("%s", s);
   else {
     char c;
 
