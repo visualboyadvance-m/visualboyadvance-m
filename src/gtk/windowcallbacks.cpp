@@ -39,6 +39,7 @@
 #include "joypadconfig.h"
 #include "directoriesconfig.h"
 #include "displayconfig.h"
+#include "soundconfig.h"
 
 namespace VBA
 {
@@ -471,35 +472,6 @@ void Window::vOnFlashSizeToggled(Gtk::CheckMenuItem * _poCMI, int _iFlashSize)
   m_poCoreConfig->vSetKey("flash_size", _iFlashSize);
 }
 
-void Window::vOnSoundMuteToggled(Gtk::CheckMenuItem * _poCMI)
-{
-  bool bMute = _poCMI->get_active();
-  m_poSoundConfig->vSetKey("mute", bMute);
-  vApplyConfigMute();
-}
-
-void Window::vOnSoundQualityToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundQuality)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  m_poSoundConfig->vSetKey("quality", _iSoundQuality);
-  vApplyConfigSoundQuality();
-}
-
-void Window::vOnSoundVolumeToggled(Gtk::CheckMenuItem * _poCMI, float _fSoundVolume)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  m_poSoundConfig->vSetKey("volume", _fSoundVolume);
-  vApplyConfigVolume();
-}
-
 void Window::vOnGBBorderToggled(Gtk::CheckMenuItem * _poCMI)
 {
   gbBorderOn = _poCMI->get_active();
@@ -545,6 +517,19 @@ void Window::vOnDisplayConfigure()
   DisplayConfigDialog * poDialog = 0;
   poBuilder->get_widget_derived("DisplayConfigDialog", poDialog);
   poDialog->vSetConfig(m_poDisplayConfig, this);
+  poDialog->set_transient_for(*this);
+  poDialog->run();
+  poDialog->hide();
+}
+
+void Window::vOnSoundConfigure()
+{
+  std::string sUiFile = sGetUiFilePath("sound.ui");
+  Glib::RefPtr<Gtk::Builder> poBuilder = Gtk::Builder::create_from_file(sUiFile);
+
+  SoundConfigDialog * poDialog = 0;
+  poBuilder->get_widget_derived("SoundConfigDialog", poDialog);
+  poDialog->vSetConfig(m_poSoundConfig, this);
   poDialog->set_transient_for(*this);
   poDialog->run();
   poDialog->hide();
