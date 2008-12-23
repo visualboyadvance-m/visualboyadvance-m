@@ -209,6 +209,7 @@ SET(SRC_GTK
     src/gtk/joypadconfig.cpp
     src/gtk/directoriesconfig.cpp
     src/gtk/displayconfig.cpp
+    src/gtk/soundconfig.cpp
     src/gtk/screenarea.cpp
     src/gtk/screenarea-cairo.cpp
     src/gtk/screenarea-xvideo.cpp

@@ -61,6 +61,13 @@ public:
     OutputXvideo
   };
 
+  enum ESoundQuality
+  {
+    Sound44K = 1,
+    Sound22K = 2,
+    Sound11K = 4
+  };
+
   // GB/GBA screen sizes
   const int m_iGBScreenWidth;
   const int m_iGBScreenHeight;
@@ -114,13 +121,6 @@ protected:
     SoundOn
   };
 
-  enum ESoundQuality
-  {
-    Sound44K = 1,
-    Sound22K = 2,
-    Sound11K = 4
-  };
-
   enum EEmulatorType
   {
     EmulatorAuto,
@@ -160,14 +160,12 @@ protected:
   virtual void vOnShowSpeedToggled(Gtk::CheckMenuItem * _poCMI, int _iShowSpeed);
   virtual void vOnSaveTypeToggled(Gtk::CheckMenuItem * _poCMI, int _iSaveType);
   virtual void vOnFlashSizeToggled(Gtk::CheckMenuItem * _poCMI, int _iFlashSize);
-  virtual void vOnSoundMuteToggled(Gtk::CheckMenuItem * _poCMI);
-  virtual void vOnSoundQualityToggled(Gtk::CheckMenuItem * _poCMI, int _iSoundQuality);
-  virtual void vOnSoundVolumeToggled(Gtk::CheckMenuItem * _poCMI, float _fSoundVolume);
   virtual void vOnGBBorderToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnGBPrinterToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnEmulatorTypeToggled(Gtk::CheckMenuItem * _poCMI, int _iEmulatorType);
   virtual void vOnJoypadConfigure();
   virtual void vOnDisplayConfigure();
+  virtual void vOnSoundConfigure();
   virtual void vOnHelpAbout();
   virtual bool bOnEmuIdle();
 
@@ -261,7 +259,6 @@ private:
   bool           m_bWasEmulating;
   bool           m_bAutoFrameskip;
   EShowSpeed     m_eShowSpeed;
-  ESoundQuality  m_eSoundQuality;
 
   void vInitSystem();
   void vUnInitSystem();
