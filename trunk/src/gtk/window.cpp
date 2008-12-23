@@ -144,6 +144,8 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   vApplyConfigScreenArea();
   vApplyConfigFilter();
   vApplyConfigFilterIB();
+  vApplyConfigMute();
+  vApplyConfigVolume();
 
   Gtk::MenuItem *      poMI;
   Gtk::CheckMenuItem * poCMI;
@@ -389,68 +391,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
                                       poCMI, astFlashSize[i].m_iFlashSize));
   }
 
-  // Sound menu
-  //
-  poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("SoundMute"));
-  poCMI->set_active(m_poSoundConfig->oGetKey<bool>("mute"));
-  vOnSoundMuteToggled(poCMI);
-  poCMI->signal_toggled().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnSoundMuteToggled),
-                                    poCMI));
-
-  struct
-  {
-    const char *        m_csName;
-    const ESoundQuality m_eSoundQuality;
-  }
-  astSoundQuality[] =
-  {
-    { "Sound11Khz", Sound11K },
-    { "Sound22Khz", Sound22K },
-    { "Sound44Khz", Sound44K }
-  };
-  ESoundQuality eDefaultSoundQuality = (ESoundQuality)m_poSoundConfig->oGetKey<int>("quality");
-  for (guint i = 0; i < G_N_ELEMENTS(astSoundQuality); i++)
-  {
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astSoundQuality[i].m_csName));
-    if (astSoundQuality[i].m_eSoundQuality == eDefaultSoundQuality)
-    {
-      poCMI->set_active();
-      vOnSoundQualityToggled(poCMI, eDefaultSoundQuality);
-    }
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnSoundQualityToggled),
-                                      poCMI, astSoundQuality[i].m_eSoundQuality));
-  }
-
-  // Volume menu
-  //
-  struct
-  {
-    const char *       m_csName;
-    const float        m_fSoundVolume;
-  }
-  astSoundVolume[] =
-  {
-    { "Volume25",   0.25f    },
-    { "Volume50",   0.50f    },
-    { "Volume100",  1.00f    },
-    { "Volume200",  2.00f    }
-  };
-  float fDefaultSoundVolume = m_poSoundConfig->oGetKey<float>("volume");
-  for (guint i = 0; i < G_N_ELEMENTS(astSoundVolume); i++)
-  {
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astSoundVolume[i].m_csName));
-    if (astSoundVolume[i].m_fSoundVolume == fDefaultSoundVolume)
-    {
-      poCMI->set_active();
-      vOnSoundVolumeToggled(poCMI, fDefaultSoundVolume);
-    }
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnSoundVolumeToggled),
-                                      poCMI, astSoundVolume[i].m_fSoundVolume));
-  }
-
   // Gameboy menu
   //
   poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("GameboyBorder"));
@@ -498,6 +438,10 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   // Display menu
   poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("DisplayConfigure"));
   poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnDisplayConfigure));
+
+  // Sound menu
+  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("SoundConfigure"));
+  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnSoundConfigure));
 
   // Joypad menu
   //
@@ -979,14 +923,14 @@ void Window::vApplyConfigVolume()
 
 void Window::vApplyConfigSoundQuality()
 {
-  m_eSoundQuality = (ESoundQuality)m_poSoundConfig->oGetKey<int>("quality");
+  ESoundQuality eSoundQuality = (ESoundQuality)m_poSoundConfig->oGetKey<int>("quality");
   if (m_eCartridge == CartridgeGBA)
   {
-    soundSetQuality(m_eSoundQuality);
+    soundSetQuality(eSoundQuality);
   }
   else if (m_eCartridge == CartridgeGB)
   {
-    gbSoundSetQuality(m_eSoundQuality);
+    gbSoundSetQuality(eSoundQuality);
   }
 }
 
@@ -1132,14 +1076,7 @@ bool Window::bLoadROM(const std::string & _rsFile)
   emulating = 1;
   m_bWasEmulating = false;
 
-  if (m_eCartridge == CartridgeGBA)
-  {
-    soundSetQuality(m_eSoundQuality);
-  }
-  else
-  {
-    gbSoundSetQuality(m_eSoundQuality);
-  }
+  vApplyConfigSoundQuality();
 
   vUpdateGameSlots();
   vHistoryAdd(_rsFile);
