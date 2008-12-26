@@ -178,7 +178,7 @@ SET(SRC_SDL
     src/sdl/filters.cpp
     src/sdl/text.cpp
     src/sdl/inputSDL.cpp
-    src/sdl/sndSDL.cpp
+    src/common/SoundSDL.cpp
     src/sdl/expr.cpp
     src/sdl/exprNode.cpp
     src/sdl/expr-lex.cpp
@@ -217,7 +217,7 @@ SET(SRC_GTK
     src/gtk/tools.cpp
     src/gtk/window.cpp
     src/sdl/inputSDL.cpp
-    src/sdl/sndSDL.cpp
+    src/common/SoundSDL.cpp
 )
 
 IF( NOT NO_DEBUGGER )

@@ -20,8 +20,9 @@
 #include "../dmg/gb.h"
 #include "../dmg/gbGlobals.h"
 #include "../Util.h"
-#include "../Sound.h"
 #include "../sdl/inputSDL.h"
+#include "../Sound.h"
+#include "../common/SoundSDL.h"
 
 #include "window.h"
 #include "intl.h"
@@ -47,6 +48,8 @@ int  RGB_LOW_BITS_MASK;
 //
 int systemRenderedFrames;
 int systemFPS;
+
+static SoundDriver * systemSoundDriver = 0;
 
 inline VBA::Window * GUI()
 {
@@ -151,6 +154,41 @@ bool systemPauseOnFrame()
 
 void systemGbBorderOn()
 {
+}
+
+void systemWriteDataToSoundBuffer()
+{
+	systemSoundDriver->write(soundFinalWave, soundBufferLen);
+}
+
+bool systemSoundInit()
+{
+	systemSoundShutdown();
+
+	systemSoundDriver = new SoundSDL();
+	bool ret = systemSoundDriver->init(soundQuality);
+	soundBufferLen = systemSoundDriver->getBufferLength();
+	return ret;
+}
+
+void systemSoundShutdown()
+{
+	delete systemSoundDriver;
+}
+
+void systemSoundPause()
+{
+	systemSoundDriver->pause();
+}
+
+void systemSoundResume()
+{
+	systemSoundDriver->resume();
+}
+
+void systemSoundReset()
+{
+	systemSoundDriver->reset();
 }
 
 void debuggerMain()
