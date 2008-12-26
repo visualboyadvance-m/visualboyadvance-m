@@ -11,7 +11,7 @@
 #include "Display.h"
 #include "Input.h"
 #include "IUpdate.h"
-#include "Sound.h"
+#include "../common/SoundDriver.h"
 #include "../System.h"
 #include "../Util.h"
 
@@ -38,6 +38,16 @@ enum pixelFilterType
 	FILTER_SIMPLE3X, FILTER_HQ3X,
 
 	FILTER_SIMPLE4X, FILTER_HQ4X
+};
+
+enum AUDIO_API {
+	DIRECTSOUND = 0
+#ifndef NO_OAL
+	, OPENAL_SOUND = 1
+#endif
+#ifndef NO_XAUDIO2
+	, XAUDIO2 = 2
+#endif
 };
 
 #define REWIND_SIZE 400000
@@ -160,7 +170,7 @@ class VBA : public CWinApp
   WavWriter *soundRecorder;
   CString soundRecordName;
   bool dsoundDisableHardwareAcceleration;
-  ISound *sound;
+  SoundDriver *sound;
   bool aviRecording;
   AVIWrite *aviRecorder;
   CString aviRecordName;

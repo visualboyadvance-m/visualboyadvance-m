@@ -16,7 +16,7 @@
 
 extern bool soundBufferLow;
 
-class DirectSound : public ISound
+class DirectSound : public SoundDriver
 {
 private:
 	LPDIRECTSOUND8       pDirectSound; // DirectSound interface
@@ -25,6 +25,7 @@ private:
 	LPDIRECTSOUNDNOTIFY8 dsbNotify;
 	HANDLE               dsbEvent;
 	WAVEFORMATEX         wfx;          // Primary buffer wave format
+	int					 soundBufferLen;
 	int                  soundBufferTotalLen;
 	unsigned int         soundNextPosition;
 
@@ -32,11 +33,12 @@ public:
 	DirectSound();
 	virtual ~DirectSound();
 
-	bool init();   // initialize the primary and secondary sound buffer
+	bool init(int quality);   // initialize the primary and secondary sound buffer
 	void pause();  // pause the secondary sound buffer
 	void reset();  // stop and reset the secondary sound buffer
 	void resume(); // resume the secondary sound buffer
-	void write();  // write the emulated sound to the secondary sound buffer
+	void write(const u16 * finalWave, int length);  // write the emulated sound to the secondary sound buffer
+	virtual int getBufferLength();
 };
 
 
@@ -82,7 +84,7 @@ DirectSound::~DirectSound()
 }
 
 
-bool DirectSound::init()
+bool DirectSound::init(int quality)
 {
 	HRESULT hr;
 	DWORD freq;
@@ -120,7 +122,7 @@ bool DirectSound::init()
 		return false;
 	}
 
-	freq = 44100 / soundQuality;
+	freq = 44100 / quality;
 	// calculate the number of samples per frame first
 	// then multiply it with the size of a sample frame (16 bit * stereo)
 	soundBufferLen = ( freq / 60 ) * 4;
@@ -221,7 +223,7 @@ void DirectSound::resume()
 }
 
 
-void DirectSound::write()
+void DirectSound::write(const u16 * finalWave, int length)
 {
 	if(!pDirectSound) return;
 
@@ -291,9 +293,9 @@ void DirectSound::write()
 
 	if( SUCCEEDED( hr ) ) {
 		// Write to pointers.
-		CopyMemory( lpvPtr1, soundFinalWave, dwBytes1 );
+		CopyMemory( lpvPtr1, finalWave, dwBytes1 );
 		if ( lpvPtr2 ) {
-			CopyMemory( lpvPtr2, soundFinalWave + dwBytes1, dwBytes2 );
+			CopyMemory( lpvPtr2, finalWave + dwBytes1, dwBytes2 );
 		}
 
 		// Release the data back to DirectSound.
@@ -304,8 +306,12 @@ void DirectSound::write()
 	}
 }
 
+int DirectSound::getBufferLength()
+{
+	return soundBufferLen;
+}
 
-ISound *newDirectSound()
+SoundDriver *newDirectSound()
 {
 	return new DirectSound();
 }
