@@ -365,6 +365,7 @@ void flush_samples(Multi_Buffer * buffer)
 			soundResume();
 
 		soundDriver->write(soundFinalWave, soundBufferLen);
+		systemOnWriteDataToSoundBuffer(soundFinalWave, soundBufferLen);
 	}
 }
 
@@ -469,19 +470,27 @@ static void remake_stereo_buffer()
 
 void soundShutdown()
 {
-	delete soundDriver;
+	if (soundDriver)
+	{
+		delete soundDriver;
+		soundDriver = 0;
+	}
+
+	systemOnSoundShutdown();
 }
 
 void soundPause()
 {
 	soundPaused = true;
-	soundDriver->pause();
+	if (soundDriver)
+		soundDriver->pause();
 }
 
 void soundResume()
 {
 	soundPaused = false;
-	soundDriver->resume();
+	if (soundDriver)
+		soundDriver->resume();
 }
 
 void soundSetVolume( float volume )
@@ -530,6 +539,11 @@ bool soundInit()
 
 	soundPaused = true;
 	return true;
+}
+
+int soundGetQuality()
+{
+	return soundQuality;
 }
 
 void soundSetQuality(int quality)

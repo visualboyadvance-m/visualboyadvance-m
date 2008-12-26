@@ -10,6 +10,7 @@
 #include "../agb/GBA.h"
 #include "../Globals.h"
 #include "../Sound.h"
+#include "../common/SoundDriver.h"
 
 // DirectSound8
 #include <dsound.h>

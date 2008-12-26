@@ -11,7 +11,6 @@
 #include "Display.h"
 #include "Input.h"
 #include "IUpdate.h"
-#include "../common/SoundDriver.h"
 #include "../System.h"
 #include "../Util.h"
 
@@ -170,7 +169,6 @@ class VBA : public CWinApp
   WavWriter *soundRecorder;
   CString soundRecordName;
   bool dsoundDisableHardwareAcceleration;
-  SoundDriver *sound;
   bool aviRecording;
   AVIWrite *aviRecorder;
   CString aviRecordName;

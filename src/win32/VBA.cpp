@@ -30,6 +30,7 @@
 #include "../dmg/gbGlobals.h"
 #include "../dmg/gbPrinter.h"
 #include "../dmg/gbSound.h"
+#include "../common/SoundDriver.h"
 
 /* Link
 ---------------------*/
@@ -291,7 +292,6 @@ VBA::VBA()
   soundRecording = false;
   soundRecorder = NULL;
   dsoundDisableHardwareAcceleration = true;
-  sound = NULL;
   aviRecording = false;
   aviRecorder = NULL;
   painting = false;
@@ -960,9 +960,8 @@ void VBA::updateThrottle( unsigned short throttle )
 		systemFrameSkip = 0;
 	}
 
-	if( theApp.sound ) {
-		theApp.sound->setThrottle( throttle );
-	}
+	soundShutdown();
+	soundInit();
 }
 
 
@@ -1235,39 +1234,37 @@ int systemGetSensorY()
 }
 
 
-bool systemSoundInit()
+SoundDriver * systemSoundInit()
 {
-	systemSoundShutdown();
+	SoundDriver * drv = 0;
+	soundShutdown();
 
 	switch( theApp.audioAPI )
 	{
 	case DIRECTSOUND:
-		theApp.sound = newDirectSound();
+		drv = newDirectSound();
 		break;
 #ifndef NO_OAL
 	case OPENAL_SOUND:
-		theApp.sound = newOpenAL();
+		drv = newOpenAL();
 		break;
 #endif
 #ifndef NO_XAUDIO2
 	case XAUDIO2:
-		theApp.sound = newXAudio2_Output();
+		drv = newXAudio2_Output();
 		break;
 #endif
 	}
 
-	bool retVal = theApp.sound->init(soundQuality);
-	soundBufferLen = theApp.sound->getBufferLength();
-
-	if( retVal ) {
-		theApp.sound->setThrottle( theApp.throttle );
+	if( drv ) {
+		drv->setThrottle( theApp.throttle );
 	}
 
-	return retVal;
+	return drv;
 }
 
 
-void systemSoundShutdown()
+void systemOnSoundShutdown()
 {
 	if( theApp.aviRecorder ) {
 		delete theApp.aviRecorder;
@@ -1281,38 +1278,13 @@ void systemSoundShutdown()
 		theApp.soundRecorder = NULL;
 	}
 	theApp.soundRecording = false;
-
-
-	if( theApp.sound ) {
-		delete theApp.sound;
-		theApp.sound = NULL;
-	}
 }
 
-
-void systemSoundPause()
-{
-  if(theApp.sound)
-    theApp.sound->pause();
-}
-
-void systemSoundReset()
-{
-  if(theApp.sound)
-    theApp.sound->reset();
-}
-
-void systemSoundResume()
-{
-  if(theApp.sound)
-    theApp.sound->resume();
-}
-
-void systemWriteDataToSoundBuffer()
+void systemOnWriteDataToSoundBuffer(const u16 * finalWave, int length)
 {
 	if( theApp.soundRecording ) {
 		if( theApp.soundRecorder ) {
-			theApp.soundRecorder->AddSound( (const u8 *)soundFinalWave, soundBufferLen );
+			theApp.soundRecorder->AddSound( (const u8 *)finalWave, length );
 		} else {
 			WAVEFORMATEX format;
 			format.cbSize = 0;
@@ -1333,17 +1305,13 @@ void systemWriteDataToSoundBuffer()
 		if( theApp.skipAudioFrames ) {
 			theApp.skipAudioFrames--;
 		} else {
-			if( false == theApp.aviRecorder->AddAudioFrame( soundFinalWave ) ) {
+			if( false == theApp.aviRecorder->AddAudioFrame( ( u8 *)finalWave ) ) {
 				systemMessage( IDS_AVI_CANNOT_WRITE_AUDIO, "Cannot write audio frame to AVI file." );
 				delete theApp.aviRecorder;
 				theApp.aviRecorder = NULL;
 				theApp.aviRecording = false;
 			}
 		}
-	}
-
-	if( theApp.sound ) {
-		theApp.sound->write(soundFinalWave, soundBufferLen);
 	}
 }
 

@@ -36,6 +36,7 @@ void soundShutdown();
 //// GBA sound options
 
 // Sets sample rate to 44100 / quality
+int soundGetQuality();
 void soundSetQuality( int quality );
 
 // Sound settings

@@ -161,6 +161,14 @@ SoundDriver * systemSoundInit()
 	return new SoundSDL();
 }
 
+void systemOnSoundShutdown()
+{
+}
+
+void systemOnWriteDataToSoundBuffer(const u16 * finalWave, int length)
+{
+}
+
 void debuggerMain()
 {
 }
