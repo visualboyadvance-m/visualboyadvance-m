@@ -397,7 +397,7 @@ void MainWnd::OnToolsRecordStartavirecording()
 	// add audio stream
 	ret = theApp.aviRecorder->CreateAudioStream(
 		2,
-		44100 / soundQuality,
+		44100 / soundGetQuality(),
 		16,
 		this->GetSafeHwnd()
 		);
