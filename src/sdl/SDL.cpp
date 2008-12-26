@@ -224,8 +224,6 @@ int sdlMirroringEnable = 0;
 
 static int        ignore_first_resize_event = 0;
 
-static SoundDriver * systemSoundDriver = 0;
-
 /* forward */
 void systemConsoleMessage(const char*);
 
@@ -2712,37 +2710,9 @@ int systemGetSensorY()
   return inputGetSensorY();
 }
 
-void systemWriteDataToSoundBuffer()
+SoundDriver * systemSoundInit()
 {
-	systemSoundDriver->write(soundFinalWave, soundBufferLen);
-}
+	soundShutdown();
 
-bool systemSoundInit()
-{
-	systemSoundShutdown();
-
-	systemSoundDriver = new SoundSDL();
-	bool ret = systemSoundDriver->init(soundQuality);
-	soundBufferLen = systemSoundDriver->getBufferLength();
-	return ret;
-}
-
-void systemSoundShutdown()
-{
-	delete systemSoundDriver;
-}
-
-void systemSoundPause()
-{
-	systemSoundDriver->pause();
-}
-
-void systemSoundResume()
-{
-	systemSoundDriver->resume();
-}
-
-void systemSoundReset()
-{
-	systemSoundDriver->reset();
+	return new SoundSDL();
 }
