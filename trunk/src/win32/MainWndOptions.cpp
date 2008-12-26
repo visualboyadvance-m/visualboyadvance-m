@@ -1531,8 +1531,8 @@ void MainWnd::OnUpdateOptionsEmulatorGameoverrides(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsSoundHardwareacceleration()
 {
   theApp.dsoundDisableHardwareAcceleration = !theApp.dsoundDisableHardwareAcceleration;
-  systemSoundShutdown();
-  systemSoundInit();
+  soundShutdown();
+  soundInit();
 }
 
 void MainWnd::OnUpdateOptionsSoundHardwareacceleration(CCmdUI *pCmdUI)
@@ -1556,8 +1556,8 @@ void MainWnd::OnOutputapiDirectsound()
 {
 	if( theApp.audioAPI != DIRECTSOUND ) {
 		theApp.audioAPI = DIRECTSOUND;
-		systemSoundShutdown();
-		systemSoundInit();
+		soundShutdown();
+		soundInit();
 	}
 }
 
@@ -1572,8 +1572,8 @@ void MainWnd::OnOutputapiXaudio2()
 #ifndef NO_XAUDIO2
 	if( theApp.audioAPI != XAUDIO2 ) {
 		theApp.audioAPI = XAUDIO2;
-		systemSoundShutdown();
-		systemSoundInit();
+		soundShutdown();
+		soundInit();
 	}
 #endif
 }
@@ -1593,8 +1593,8 @@ void MainWnd::OnOutputapiOpenal()
 #ifndef NO_OAL
 	if( theApp.audioAPI != OPENAL_SOUND ) {
 		theApp.audioAPI = OPENAL_SOUND;
-		systemSoundShutdown();
-		systemSoundInit();
+		soundShutdown();
+		soundInit();
 	}
 #endif
 }
@@ -1618,7 +1618,7 @@ void MainWnd::OnOutputapiOalconfiguration()
 	dlg.bufferCount = theApp.oalBufferCount;
 
 	if( dlg.DoModal() == IDOK ) {
-		systemSoundShutdown();
+		soundShutdown();
 		// do this before changing any values OpenAL
 		// might need for successful cleanup
 
@@ -1631,7 +1631,7 @@ void MainWnd::OnOutputapiOalconfiguration()
 		_tcscpy( theApp.oalDevice, dlg.selectedDevice.GetBuffer() );
 		theApp.oalBufferCount = dlg.bufferCount;
 
-		systemSoundInit();
+		soundInit();
 	}
 #endif
 }
@@ -1655,13 +1655,13 @@ void MainWnd::OnOutputapiXaudio2config()
 	dlg.m_enable_upmixing = theApp.xa2Upmixing;
 
 	if( dlg.DoModal() == IDOK ) {
-		systemSoundShutdown();
+		soundShutdown();
 
 		theApp.xa2Device = dlg.m_selected_device_index;
 		theApp.xa2BufferCount = dlg.m_buffer_count;
 		theApp.xa2Upmixing = dlg.m_enable_upmixing;
 
-		systemSoundInit();
+		soundInit();
 	}
 #endif
 }
