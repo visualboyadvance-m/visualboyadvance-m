@@ -7,7 +7,7 @@
 #ifndef NO_OAL
 
 // Interface
-#include "Sound.h"
+#include "../common/SoundDriver.h"
 
 // OpenAL
 #include <al.h>
@@ -31,17 +31,18 @@
 #define debugState() //
 #endif
 
-class OpenAL : public ISound
+class OpenAL : public SoundDriver
 {
 public:
 	OpenAL();
 	virtual ~OpenAL();
 
-	bool init();   // initialize the sound buffer queue
+	bool init(int quality);   // initialize the sound buffer queue
 	void pause();  // pause the secondary sound buffer
 	void reset();  // stop and reset the secondary sound buffer
 	void resume(); // play/resume the secondary sound buffer
-	void write();  // write the emulated sound to a sound buffer
+	void write(const u16 * finalWave, int length);  // write the emulated sound to a sound buffer
+	virtual int getBufferLength();
 
 private:
 	OPENALFNTABLE  ALFunction;
@@ -53,6 +54,7 @@ private:
 	ALuint         tempBuffer;
 	ALuint         source;
 	int            freq;
+	int			   soundBufferLen;
 
 #ifdef LOGALL
 	void           debugState();
@@ -143,7 +145,7 @@ void OpenAL::debugState()
 #endif
 
 
-bool OpenAL::init()
+bool OpenAL::init(int quality)
 {
 	winlog( "OpenAL::init\n" );
 	assert( initialized == false );
@@ -172,7 +174,7 @@ bool OpenAL::init()
 	ALFunction.alGenSources( 1, &source );
 	ASSERT_SUCCESS;
 
-	freq = 44100 / soundQuality;
+	freq = 44100 / quality;
 
 	// calculate the number of samples per frame first
 	// then multiply it with the size of a sample frame (16 bit * stereo)
@@ -240,7 +242,7 @@ void OpenAL::reset()
 }
 
 
-void OpenAL::write()
+void OpenAL::write(const u16 * finalWave, int length)
 {
 	if( !initialized ) return;
 	winlog( "OpenAL::write\n" );
@@ -256,7 +258,7 @@ void OpenAL::write()
 		for( int i = 0 ; i < theApp.oalBufferCount ; i++ ) {
 			// Filling the buffers explicitly with silence would be cleaner,
 			// but the very first sample is usually silence anyway.
-			ALFunction.alBufferData( buffer[i], AL_FORMAT_STEREO16, soundFinalWave, soundBufferLen, freq );
+			ALFunction.alBufferData( buffer[i], AL_FORMAT_STEREO16, finalWave, soundBufferLen, freq );
 			ASSERT_SUCCESS;
 		}
 
@@ -302,7 +304,7 @@ void OpenAL::write()
 		ASSERT_SUCCESS;
 
 		// refill buffer
-		ALFunction.alBufferData( tempBuffer, AL_FORMAT_STEREO16, soundFinalWave, soundBufferLen, freq );
+		ALFunction.alBufferData( tempBuffer, AL_FORMAT_STEREO16, finalWave, soundBufferLen, freq );
 		ASSERT_SUCCESS;
 
 		// requeue buffer
@@ -319,8 +321,12 @@ void OpenAL::write()
 	}
 }
 
+int OpenAL::getBufferLength()
+{
+	return soundBufferLen;
+}
 
-ISound *newOpenAL()
+SoundDriver *newOpenAL()
 {
 	winlog( "newOpenAL\n" );
 	return new OpenAL();

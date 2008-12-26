@@ -4,13 +4,12 @@
 #include "stdafx.h"
 
 // Interface
-#include "Sound.h"
+#include "../common/SoundDriver.h"
 
 // XAudio2
 #include <xaudio2.h>
 
 // Internals
-#include "../Sound.h" // for soundBufferLen, soundFinalWave and soundQuality
 #include "../System.h" // for systemMessage()
 #include "../Globals.h"
 
@@ -50,17 +49,17 @@ public:
 
 // Class Declaration
 class XAudio2_Output
-	: public ISound
+	: public SoundDriver
 {
 public:
 	XAudio2_Output();
 	~XAudio2_Output();
 
 	// Initialization
-	bool init();
+	bool init(int quality);
 
 	// Sound Data Feed
-	void write();
+	void write(const u16 * finalWave, int length);
 
 	// Play Control
 	void pause();
@@ -70,6 +69,7 @@ public:
 	// Configuration Changes
 	void setThrottle( unsigned short throttle );
 
+	virtual int getBufferLength();
 
 private:
 	bool   failed;
@@ -79,6 +79,7 @@ private:
 	UINT32 bufferCount;
 	BYTE  *buffers;
 	int    currentBuffer;
+	int    soundBufferLen;
 
 	IXAudio2               *xaud;
 	IXAudio2MasteringVoice *mVoice; // listener
@@ -136,7 +137,7 @@ XAudio2_Output::~XAudio2_Output()
 }
 
 
-bool XAudio2_Output::init()
+bool XAudio2_Output::init(int quality)
 {
 	if( failed || initialized ) return false;
 
@@ -156,7 +157,7 @@ bool XAudio2_Output::init()
 	}
 
 
-	freq = 44100 / (UINT32)soundQuality;
+	freq = 44100 / (UINT32)quality;
 
 	// calculate the number of samples per frame first
 	// then multiply it with the size of a sample frame (16 bit * stereo)
@@ -279,7 +280,7 @@ bool XAudio2_Output::init()
 }
 
 
-void XAudio2_Output::write()
+void XAudio2_Output::write(const u16 * finalWave, int length)
 {
 	if( !initialized || failed ) return;
 
@@ -311,7 +312,7 @@ void XAudio2_Output::write()
 	}
 
 	// copy & protect the audio data in own memory area while playing it
-	CopyMemory( &buffers[ currentBuffer * soundBufferLen ], soundFinalWave, soundBufferLen );
+	CopyMemory( &buffers[ currentBuffer * soundBufferLen ], finalWave, soundBufferLen );
 
 	buf.AudioBytes = soundBufferLen;
 	buf.pAudioData = &buffers[ currentBuffer * soundBufferLen ];
@@ -372,8 +373,12 @@ void XAudio2_Output::setThrottle( unsigned short throttle )
 	ASSERT( hr == S_OK );
 }
 
+int XAudio2_Output::getBufferLength()
+{
+	return soundBufferLen;
+}
 
-ISound *newXAudio2_Output()
+SoundDriver *newXAudio2_Output()
 {
 	return new XAudio2_Output();
 }
