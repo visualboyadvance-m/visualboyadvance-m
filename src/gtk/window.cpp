@@ -605,7 +605,7 @@ void Window::vInitSystem()
 
 void Window::vUnInitSystem()
 {
-  systemSoundShutdown();
+  soundShutdown();
 }
 
 void Window::vInitSDL()

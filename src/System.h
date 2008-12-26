@@ -20,6 +20,7 @@ typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
 
+class SoundDriver;
 
 struct EmulatedSystem {
   // main emulation function
@@ -65,12 +66,7 @@ extern u32 systemReadJoypad(int);
 extern u32 systemGetClock();
 extern void systemMessage(int, const char *, ...);
 extern void systemSetTitle(const char *);
-extern void systemWriteDataToSoundBuffer();
-extern void systemSoundShutdown();
-extern void systemSoundPause();
-extern void systemSoundResume();
-extern void systemSoundReset();
-extern bool systemSoundInit();
+extern SoundDriver * systemSoundInit();
 extern void systemScreenMessage(const char *);
 extern void systemUpdateMotionSensor();
 extern int  systemGetSensorX();

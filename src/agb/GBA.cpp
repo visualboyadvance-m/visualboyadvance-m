@@ -1320,7 +1320,7 @@ int CPULoadRom(const char *szFile)
       elfCleanUp();
       return 0;
     }
-  } else 
+  } else
 #endif //NO_DEBUGGER
   if(!utilLoad(szFile,
                       utilIsGBAImage,
@@ -1952,9 +1952,9 @@ void CPUSoftwareInterrupt(int comment)
     }
 #endif
     if(reg[0].I)
-      systemSoundPause();
+      soundPause();
     else
-      systemSoundResume();
+      soundResume();
     break;
   case 0x1F:
     BIOS_MidiKey2Freq();

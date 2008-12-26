@@ -25,6 +25,7 @@
 
 #include "../agb/GBA.h"
 #include "../Port.h"
+#include "../Sound.h"
 #include "../armdis.h"
 #include "../elf.h"
 #include "exprNode.h"
@@ -2643,7 +2644,7 @@ char* strqtok (char* string, const char* ctrl)
   debuggerRegisters(0, NULL);
 
   while(debugger) {
-    systemSoundPause();
+    soundPause();
     debuggerDisableBreakpoints();
     printf("debugger> ");
     commandCount = 0;

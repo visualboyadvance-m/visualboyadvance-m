@@ -10,6 +10,8 @@
 #include "dmg/gb_apu/Gb_Apu.h"
 #include "dmg/gb_apu/Multi_Buffer.h"
 
+#include "common/SoundDriver.h"
+
 #define NR10 0x60
 #define NR11 0x62
 #define NR12 0x63
@@ -32,21 +34,21 @@
 #define NR51 0x81
 #define NR52 0x84
 
+SoundDriver * soundDriver = 0;
+
 extern bool stopState;      // TODO: silence sound when true
 
 int const SOUND_CLOCK_TICKS_ = 167772; // 1/100 second
 
-u16   soundFinalWave [1470];
-int   soundBufferLen     = sizeof soundFinalWave;
+static u16   soundFinalWave [1470];
 int   soundQuality       = 1;
 bool  soundInterpolation = true;
 bool  soundPaused        = true;
 float soundFiltering     = 0.5f;
-float soundVolume        = 1.0f;
-bool  soundEcho          = false;
 int   SOUND_CLOCK_TICKS  = SOUND_CLOCK_TICKS_;
 int   soundTicks         = SOUND_CLOCK_TICKS_;
 
+static float soundVolume     = 1.0f;
 static int soundEnableFlag   = 0x3ff; // emulator channels enabled
 static float soundFiltering_ = -1;
 static float soundVolume_    = -1;
@@ -344,8 +346,11 @@ static void end_frame( blip_time_t time )
 	stereo_buffer->end_frame( time );
 }
 
-static void flush_samples()
+void flush_samples(Multi_Buffer * buffer)
 {
+	// get the size in bytes of the sound driver buffer
+	int soundBufferLen = soundDriver->getBufferLength();
+
 	// soundBufferLen should have a whole number of sample pairs
 	assert( soundBufferLen % (2 * sizeof *soundFinalWave) == 0 );
 
@@ -353,13 +358,13 @@ static void flush_samples()
 	int const out_buf_size = soundBufferLen / sizeof *soundFinalWave;
 
 	// Keep filling and writing soundFinalWave until it can't be fully filled
-	while ( stereo_buffer->samples_avail() >= out_buf_size )
+	while ( buffer->samples_avail() >= out_buf_size )
 	{
-		stereo_buffer->read_samples( (blip_sample_t*) soundFinalWave, out_buf_size );
+		buffer->read_samples( (blip_sample_t*) soundFinalWave, out_buf_size );
 		if(soundPaused)
 			soundResume();
 
-		systemWriteDataToSoundBuffer();
+		soundDriver->write(soundFinalWave, soundBufferLen);
 	}
 }
 
@@ -386,7 +391,7 @@ void psoundTickfn()
 		// Run sound hardware to present
 		end_frame( SOUND_CLOCK_TICKS );
 
-		flush_samples();
+		flush_samples(stereo_buffer);
 
 		if ( soundFiltering_ != soundFiltering )
 			apply_filtering();
@@ -464,19 +469,19 @@ static void remake_stereo_buffer()
 
 void soundShutdown()
 {
-	systemSoundShutdown();
+	delete soundDriver;
 }
 
 void soundPause()
 {
 	soundPaused = true;
-	systemSoundPause();
+	soundDriver->pause();
 }
 
 void soundResume()
 {
 	soundPaused = false;
-	systemSoundResume();
+	soundDriver->resume();
 }
 
 void soundSetVolume( float volume )
@@ -502,7 +507,7 @@ int soundGetEnable()
 
 void soundReset()
 {
-	systemSoundReset();
+	soundDriver->reset();
 
 	remake_stereo_buffer();
 	reset_apu();
@@ -516,7 +521,11 @@ void soundReset()
 
 bool soundInit()
 {
-	if ( !systemSoundInit() )
+	soundDriver = systemSoundInit();
+	if ( !soundDriver )
+		return false;
+
+	if (!soundDriver->init(soundQuality))
 		return false;
 
 	soundPaused = true;
