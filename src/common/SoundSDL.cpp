@@ -6,25 +6,25 @@
 
 extern int emulating;
 
-u8          SoundSDL::sdlSoundBuffer[sdlSoundTotalLen];
-int         SoundSDL::sdlSoundRPos;
-int         SoundSDL::sdlSoundWPos;
-SDL_cond  * SoundSDL::sdlSoundCond;
-SDL_mutex * SoundSDL::sdlSoundMutex;
+u8          SoundSDL::_buffer[_bufferTotalLen];
+int         SoundSDL::_readPosition;
+int         SoundSDL::_writePosition;
+SDL_cond  * SoundSDL::_cond;
+SDL_mutex * SoundSDL::_mutex;
 
-inline int SoundSDL::soundBufferFree()
+inline int SoundSDL::getBufferFree()
 {
-  int ret = sdlSoundRPos - sdlSoundWPos - sdlSoundAlign;
+  int ret = _readPosition - _writePosition - _bufferAlign;
   if (ret < 0)
-    ret += sdlSoundTotalLen;
+    ret += _bufferTotalLen;
   return ret;
 }
 
-inline int SoundSDL::soundBufferUsed()
+inline int SoundSDL::getBufferUsed()
 {
-  int ret = sdlSoundWPos - sdlSoundRPos;
+  int ret = _writePosition - _readPosition;
   if (ret < 0)
-    ret += sdlSoundTotalLen;
+    ret += _bufferTotalLen;
   return ret;
 }
 
@@ -33,24 +33,24 @@ void SoundSDL::soundCallback(void *,u8 *stream,int len)
   if (len <= 0 || !emulating)
     return;
 
-  SDL_mutexP(sdlSoundMutex);
-  const int nAvail = soundBufferUsed();
+  SDL_mutexP(_mutex);
+  const int nAvail = getBufferUsed();
   if (len > nAvail)
     len = nAvail;
-  const int nAvail2 = sdlSoundTotalLen - sdlSoundRPos;
+  const int nAvail2 = _bufferTotalLen - _readPosition;
   if (len >= nAvail2) {
-    memcpy(stream, &sdlSoundBuffer[sdlSoundRPos], nAvail2);
-    sdlSoundRPos = 0;
+    memcpy(stream, &_buffer[_readPosition], nAvail2);
+    _readPosition = 0;
     stream += nAvail2;
     len    -= nAvail2;
   }
   if (len > 0) {
-    memcpy(stream, &sdlSoundBuffer[sdlSoundRPos], len);
-    sdlSoundRPos = (sdlSoundRPos + len) % sdlSoundTotalLen;
+    memcpy(stream, &_buffer[_readPosition], len);
+    _readPosition = (_readPosition + len) % _bufferTotalLen;
     stream += len;
   }
-  SDL_CondSignal(sdlSoundCond);
-  SDL_mutexV(sdlSoundMutex);
+  SDL_CondSignal(_cond);
+  SDL_mutexV(_mutex);
 }
 
 void SoundSDL::write(const u16 * finalWave, int length)
@@ -63,35 +63,35 @@ void SoundSDL::write(const u16 * finalWave, int length)
   int remain = length;
   const u8 *wave = reinterpret_cast<const u8 *>(finalWave);
 
-  SDL_mutexP(sdlSoundMutex);
+  SDL_mutexP(_mutex);
 
   int n;
-  while (remain >= (n = soundBufferFree())) {
-  const int nAvail = (sdlSoundTotalLen - sdlSoundWPos) < n ? (sdlSoundTotalLen - sdlSoundWPos) : n;
-   memcpy(&sdlSoundBuffer[sdlSoundWPos], wave, nAvail);
-   sdlSoundWPos = (sdlSoundWPos + nAvail) % sdlSoundTotalLen;
+  while (remain >= (n = getBufferFree())) {
+  const int nAvail = (_bufferTotalLen - _writePosition) < n ? (_bufferTotalLen - _writePosition) : n;
+   memcpy(&_buffer[_writePosition], wave, nAvail);
+   _writePosition = (_writePosition + nAvail) % _bufferTotalLen;
     wave        += nAvail;
     remain      -= nAvail;
 
 	if (!emulating || speedup || systemThrottle) {
-       SDL_mutexV(sdlSoundMutex);
+       SDL_mutexV(_mutex);
       return;
     }
-    SDL_CondWait(sdlSoundCond, sdlSoundMutex);
+    SDL_CondWait(_cond, _mutex);
   }
 
-  const int nAvail = sdlSoundTotalLen - sdlSoundWPos;
+  const int nAvail = _bufferTotalLen - _writePosition;
   if (remain >= nAvail) {
-    memcpy(&sdlSoundBuffer[sdlSoundWPos], wave, nAvail);
-    sdlSoundWPos = 0;
+    memcpy(&_buffer[_writePosition], wave, nAvail);
+    _writePosition = 0;
     wave   += nAvail;
     remain -= nAvail;
   }
   if (remain > 0) {
-    memcpy(&sdlSoundBuffer[sdlSoundWPos], wave, remain);
-    sdlSoundWPos = (sdlSoundWPos + remain) % sdlSoundTotalLen;
+    memcpy(&_buffer[_writePosition], wave, remain);
+    _writePosition = (_writePosition + remain) % _bufferTotalLen;
   }
-  SDL_mutexV(sdlSoundMutex);
+  SDL_mutexV(_mutex);
 }
 
 bool SoundSDL::init(int quality)
@@ -123,27 +123,27 @@ bool SoundSDL::init(int quality)
     return false;
   }
 
-  sdlSoundCond  = SDL_CreateCond();
-  sdlSoundMutex = SDL_CreateMutex();
+  _cond  = SDL_CreateCond();
+  _mutex = SDL_CreateMutex();
 
-  sdlSoundRPos = sdlSoundWPos = 0;
+  _readPosition = _writePosition = 0;
   return true;
 
 }
 
 SoundSDL::~SoundSDL()
 {
-  SDL_mutexP(sdlSoundMutex);
+  SDL_mutexP(_mutex);
   int iSave = emulating;
   emulating = 0;
-  SDL_CondSignal(sdlSoundCond);
-  SDL_mutexV(sdlSoundMutex);
+  SDL_CondSignal(_cond);
+  SDL_mutexV(_mutex);
 
-  SDL_DestroyCond(sdlSoundCond);
-  sdlSoundCond = NULL;
+  SDL_DestroyCond(_cond);
+  _cond = NULL;
 
-  SDL_DestroyMutex(sdlSoundMutex);
-  sdlSoundMutex = NULL;
+  SDL_DestroyMutex(_mutex);
+  _mutex = NULL;
 
   SDL_CloseAudio();
 
