@@ -85,12 +85,12 @@ extern IDisplay *newDirect3DDisplay();
 
 extern Input *newDirectInput();
 
-extern ISound *newDirectSound();
+extern SoundDriver *newDirectSound();
 #ifndef NO_OAL
-extern ISound *newOpenAL();
+extern SoundDriver *newOpenAL();
 #endif
 #ifndef NO_XAUDIO2
-extern ISound *newXAudio2_Output();
+extern SoundDriver *newXAudio2_Output();
 #endif
 
 extern void remoteStubSignal(int, int);
@@ -1256,7 +1256,8 @@ bool systemSoundInit()
 #endif
 	}
 
-	bool retVal = theApp.sound->init();
+	bool retVal = theApp.sound->init(soundQuality);
+	soundBufferLen = theApp.sound->getBufferLength();
 
 	if( retVal ) {
 		theApp.sound->setThrottle( theApp.throttle );
@@ -1342,7 +1343,7 @@ void systemWriteDataToSoundBuffer()
 	}
 
 	if( theApp.sound ) {
-		theApp.sound->write();
+		theApp.sound->write(soundFinalWave, soundBufferLen);
 	}
 }
 

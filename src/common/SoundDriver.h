@@ -61,6 +61,8 @@ public:
 	 * Return the size in bytes of the core sound buffer.
 	 */
 	virtual int getBufferLength() = 0;
+
+	virtual void setThrottle(unsigned short throttle) { };
 };
 
 #endif // __VBA_SOUND_DRIVER_H__
