@@ -49,8 +49,6 @@ int  RGB_LOW_BITS_MASK;
 int systemRenderedFrames;
 int systemFPS;
 
-static SoundDriver * systemSoundDriver = 0;
-
 inline VBA::Window * GUI()
 {
   return VBA::Window::poGetInstance();
@@ -156,39 +154,11 @@ void systemGbBorderOn()
 {
 }
 
-void systemWriteDataToSoundBuffer()
+SoundDriver * systemSoundInit()
 {
-	systemSoundDriver->write(soundFinalWave, soundBufferLen);
-}
+	soundShutdown();
 
-bool systemSoundInit()
-{
-	systemSoundShutdown();
-
-	systemSoundDriver = new SoundSDL();
-	bool ret = systemSoundDriver->init(soundQuality);
-	soundBufferLen = systemSoundDriver->getBufferLength();
-	return ret;
-}
-
-void systemSoundShutdown()
-{
-	delete systemSoundDriver;
-}
-
-void systemSoundPause()
-{
-	systemSoundDriver->pause();
-}
-
-void systemSoundResume()
-{
-	systemSoundDriver->resume();
-}
-
-void systemSoundReset()
-{
-	systemSoundDriver->reset();
+	return new SoundSDL();
 }
 
 void debuggerMain()

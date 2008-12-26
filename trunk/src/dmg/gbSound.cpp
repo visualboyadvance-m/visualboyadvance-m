@@ -50,22 +50,6 @@ static void end_frame( blip_time_t time )
 	stereo_buffer->end_frame( time );
 }
 
-static void flush_samples()
-{
-	// number of samples in output buffer
-	int const out_buf_size = soundBufferLen / sizeof *soundFinalWave;
-
-	// Keep filling and writing soundFinalWave until it can't be fully filled
-	while ( stereo_buffer->samples_avail() >= out_buf_size )
-	{
-		stereo_buffer->read_samples( (blip_sample_t*) soundFinalWave, out_buf_size );
-		if(soundPaused)
-			soundResume();
-
-		systemWriteDataToSoundBuffer();
-	}
-}
-
 static void apply_effects()
 {
 	prevSoundEnable = soundGetEnable();
@@ -106,13 +90,13 @@ void gbSoundTick()
 		// Run sound hardware to present
 		end_frame( SOUND_CLOCK_TICKS * ticks_to_time );
 
-		flush_samples();
+		flush_samples(stereo_buffer);
 
 		// Update effects config if it was changed
 		if ( memcmp( &gb_effects_config_current, &gb_effects_config,
 				sizeof gb_effects_config ) || soundGetEnable() != prevSoundEnable )
 			apply_effects();
-		
+
 		if ( soundVolume_ != soundGetVolume() )
 			apply_volume();
 	}
@@ -127,7 +111,7 @@ static void reset_apu()
 		mode = Gb_Apu::mode_agb;
 	gb_apu->reset( mode );
 	gb_apu->reduce_clicks( declicking );
-	
+
 	if ( stereo_buffer )
 		stereo_buffer->clear();
 
@@ -367,7 +351,7 @@ static void gbSoundReadGameOld(int version,gzFile gzFile)
 		state.apu.regs [nr52] = 0x80; // power on
 		return;
 	}
-	
+
 	// Load state
 	utilReadData( gzFile, gbsound_format );
 
@@ -400,7 +384,7 @@ static void gbSoundReadGameOld(int version,gzFile gzFile)
 static variable_desc gb_state [] =
 {
 	LOAD( int, state.version ),				// room_for_expansion will be used by later versions
-	
+
 	// APU
 	LOAD( u8 [0x40], state.apu.regs ),      // last values written to registers and wave RAM (both banks)
 	LOAD( int, state.apu.frame_time ),      // clocks until next frame sequencer action
@@ -446,7 +430,7 @@ void gbSoundReadGame( int version, gzFile in )
 	// Prepare APU and default state
 	reset_apu();
 	gb_apu->save_state( &state.apu );
-	
+
 	if ( version > 11 )
 		utilReadData( in, gb_state );
 	else

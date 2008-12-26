@@ -33,16 +33,10 @@ extern bool soundPaused; // current paused state
 // Cleans up sound. Afterwards, soundInit() can be called again.
 void soundShutdown();
 
-// Sound buffering
-extern int soundBufferLen;      // size of sound buffer in BYTES
-extern u16 soundFinalWave[1470];// 16-bit SIGNED stereo sample buffer
-
-
 //// GBA sound options
 
 // Sets sample rate to 44100 / quality
 void soundSetQuality( int quality );
-extern int soundQuality; // current sound quality
 
 // Sound settings
 extern bool soundInterpolation; // 1 if PCM should have low-pass filtering
@@ -79,5 +73,9 @@ extern int soundTicks;          // Number of 16.8 MHz clocks until soundTick() w
 // Saves/loads emulator state
 void soundSaveGame( gzFile );
 void soundReadGame( gzFile, int version );
+
+class Multi_Buffer;
+
+void flush_samples(Multi_Buffer * buffer);
 
 #endif // SOUND_H
