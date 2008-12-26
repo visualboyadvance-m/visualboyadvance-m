@@ -18,17 +18,49 @@
 #ifndef __VBA_SOUND_DRIVER_H__
 #define __VBA_SOUND_DRIVER_H__
 
+/**
+ * Sound driver abstract interface for the core to use to output sound.
+ * Subclass this to implement a new sound driver.
+ */
 class SoundDriver
 {
- public:
-  virtual ~SoundDriver() {};
+public:
 
-  virtual bool init(int quality) = 0;
-  virtual void pause() = 0;
-  virtual void reset() = 0;
-  virtual void resume() = 0;
-  virtual void write(const u16 * finalWave, int length) = 0;
-  virtual int getBufferLength() = 0;
+	/**
+	 * Destructor. Free the resources allocated by the sound driver.
+	 */
+	virtual ~SoundDriver() { };
+
+	/**
+	 * Initialize the sound driver.
+	 * @param quality Sound frequency : 1 => 44100 Hz, 2 => 22050 Hz, 4 => 11025 Hz
+	 */
+	virtual bool init(int quality) = 0;
+
+	/**
+	 * Tell the driver that the sound stream has paused
+	 */
+	virtual void pause() = 0;
+
+	/**
+	 * Reset the sound driver
+	 */
+	virtual void reset() = 0;
+
+	/**
+	 * Tell the driver that the sound stream has resumed
+	 */
+	virtual void resume() = 0;
+
+	/**
+	 * Write length bytes of data from the finalWave buffer to the driver output buffer.
+	 */
+	virtual void write(const u16 * finalWave, int length) = 0;
+
+	/**
+	 * Return the size in bytes of the core sound buffer.
+	 */
+	virtual int getBufferLength() = 0;
 };
 
 #endif // __VBA_SOUND_DRIVER_H__
