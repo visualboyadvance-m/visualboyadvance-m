@@ -1,21 +1,18 @@
 #include <SDL.h>
 #include "../System.h"
-#include "../Sound.h"
 #include "../Globals.h"
+
+#include "SoundSDL.h"
 
 extern int emulating;
 
-const  int        sdlSoundSamples  = 4096;
-const  int        sdlSoundAlign    = 4;
-const  int        sdlSoundCapacity = sdlSoundSamples * 2;
-const  int        sdlSoundTotalLen = sdlSoundCapacity + sdlSoundAlign;
-static u8         sdlSoundBuffer[sdlSoundTotalLen];
-static int        sdlSoundRPos;
-static int        sdlSoundWPos;
-static SDL_cond  *sdlSoundCond;
-static SDL_mutex *sdlSoundMutex;
+u8          SoundSDL::sdlSoundBuffer[sdlSoundTotalLen];
+int         SoundSDL::sdlSoundRPos;
+int         SoundSDL::sdlSoundWPos;
+SDL_cond  * SoundSDL::sdlSoundCond;
+SDL_mutex * SoundSDL::sdlSoundMutex;
 
-static inline int soundBufferFree()
+inline int SoundSDL::soundBufferFree()
 {
   int ret = sdlSoundRPos - sdlSoundWPos - sdlSoundAlign;
   if (ret < 0)
@@ -23,7 +20,7 @@ static inline int soundBufferFree()
   return ret;
 }
 
-static inline int soundBufferUsed()
+inline int SoundSDL::soundBufferUsed()
 {
   int ret = sdlSoundWPos - sdlSoundRPos;
   if (ret < 0)
@@ -31,7 +28,7 @@ static inline int soundBufferUsed()
   return ret;
 }
 
-static void soundCallback(void *,u8 *stream,int len)
+void SoundSDL::soundCallback(void *,u8 *stream,int len)
 {
   if (len <= 0 || !emulating)
     return;
@@ -56,15 +53,15 @@ static void soundCallback(void *,u8 *stream,int len)
   SDL_mutexV(sdlSoundMutex);
 }
 
-void systemWriteDataToSoundBuffer()
+void SoundSDL::write(const u16 * finalWave, int length)
 {
   if (SDL_GetAudioStatus() != SDL_AUDIO_PLAYING)
   {
     SDL_PauseAudio(0);
   }
 
-  int remain = soundBufferLen;
-  const u8 *wave = reinterpret_cast<const u8 *>(soundFinalWave);
+  int remain = length;
+  const u8 *wave = reinterpret_cast<const u8 *>(finalWave);
 
   SDL_mutexP(sdlSoundMutex);
 
@@ -97,25 +94,26 @@ void systemWriteDataToSoundBuffer()
   SDL_mutexV(sdlSoundMutex);
 }
 
-bool systemSoundInit()
+bool SoundSDL::init(int quality)
 {
   SDL_AudioSpec audio;
 
-  switch(soundQuality) {
+  switch(quality) {
   case 1:
     audio.freq = 44100;
-    soundBufferLen = 1470*2;
+    _bufferLen = 1470*2;
     break;
   case 2:
     audio.freq = 22050;
-    soundBufferLen = 736*2;
+    _bufferLen = 736*2;
     break;
   case 4:
     audio.freq = 11025;
-    soundBufferLen = 368*2;
+    _bufferLen = 368*2;
     break;
   }
-  audio.format=AUDIO_S16SYS;
+
+  audio.format = AUDIO_S16SYS;
   audio.channels = 2;
   audio.samples = 1024;
   audio.callback = soundCallback;
@@ -133,7 +131,7 @@ bool systemSoundInit()
 
 }
 
-void systemSoundShutdown()
+SoundSDL::~SoundSDL()
 {
   SDL_mutexP(sdlSoundMutex);
   int iSave = emulating;
@@ -152,17 +150,21 @@ void systemSoundShutdown()
   emulating = iSave;
 }
 
-void systemSoundPause()
+void SoundSDL::pause()
 {
   SDL_PauseAudio(1);
 }
 
-void systemSoundResume()
+void SoundSDL::resume()
 {
   SDL_PauseAudio(0);
 }
 
-void systemSoundReset()
+void SoundSDL::reset()
 {
 }
 
+int SoundSDL::getBufferLength()
+{
+	return _bufferLen;
+}

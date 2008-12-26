@@ -54,6 +54,7 @@
 #include "filters.h"
 #include "text.h"
 #include "inputSDL.h"
+#include "../common/SoundSDL.h"
 
 #ifndef _WIN32
 # include <unistd.h>
@@ -222,6 +223,8 @@ int sdlAgbPrint = 0;
 int sdlMirroringEnable = 0;
 
 static int        ignore_first_resize_event = 0;
+
+static SoundDriver * systemSoundDriver = 0;
 
 /* forward */
 void systemConsoleMessage(const char*);
@@ -2143,6 +2146,8 @@ int main(int argc, char **argv)
       sdl_patch_num++;
     }
 
+    soundInit();
+
     bool failed = false;
 
     IMAGE_TYPE type = utilFindType(szFile);
@@ -2298,8 +2303,6 @@ int main(int argc, char **argv)
 
   emulating = 1;
   renderedFrames = 0;
-
-  soundInit();
 
   autoFrameSkipLastTime = throttleLastTime = systemGetClock();
 
@@ -2707,4 +2710,39 @@ int systemGetSensorX()
 int systemGetSensorY()
 {
   return inputGetSensorY();
+}
+
+void systemWriteDataToSoundBuffer()
+{
+	systemSoundDriver->write(soundFinalWave, soundBufferLen);
+}
+
+bool systemSoundInit()
+{
+	systemSoundShutdown();
+
+	systemSoundDriver = new SoundSDL();
+	bool ret = systemSoundDriver->init(soundQuality);
+	soundBufferLen = systemSoundDriver->getBufferLength();
+	return ret;
+}
+
+void systemSoundShutdown()
+{
+	delete systemSoundDriver;
+}
+
+void systemSoundPause()
+{
+	systemSoundDriver->pause();
+}
+
+void systemSoundResume()
+{
+	systemSoundDriver->resume();
+}
+
+void systemSoundReset()
+{
+	systemSoundDriver->reset();
 }
