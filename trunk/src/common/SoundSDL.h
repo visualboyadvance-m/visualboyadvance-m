@@ -33,20 +33,20 @@ public:
 	virtual int getBufferLength();
 
 private:
-	static const  int        sdlSoundSamples  = 4096;
-	static const  int        sdlSoundAlign    = 4;
-	static const  int        sdlSoundCapacity = sdlSoundSamples * 2;
-	static const  int        sdlSoundTotalLen = sdlSoundCapacity + sdlSoundAlign;
+	static const  int  _sampleCount    = 4096;
+	static const  int  _bufferAlign    = 4;
+	static const  int  _bufferCapacity = _sampleCount * 2;
+	static const  int  _bufferTotalLen = _bufferCapacity + _bufferAlign;
 
-	static u8          sdlSoundBuffer[sdlSoundTotalLen];
-	static int         sdlSoundRPos;
-	static int         sdlSoundWPos;
-	static SDL_cond  * sdlSoundCond;
-	static SDL_mutex * sdlSoundMutex;
-	int _bufferLen;
+	static u8          _buffer[_bufferTotalLen];
+	static int         _readPosition;
+	static int         _writePosition;
+	static SDL_cond  * _cond;
+	static SDL_mutex * _mutex;
+	int                _bufferLen;
 
-	static int soundBufferFree();
-	static int soundBufferUsed();
+	static int getBufferFree();
+	static int getBufferUsed();
 	static void soundCallback(void *, u8 *stream, int len);
 };
 
