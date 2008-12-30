@@ -19,35 +19,31 @@
 #define __VBA_SOUND_SDL_H__
 
 #include "SoundDriver.h"
+#include "RingBuffer.h"
 
 class SoundSDL: public SoundDriver
 {
 public:
+	SoundSDL();
 	virtual ~SoundSDL();
 
 	virtual bool init(long sampleRate);
 	virtual void pause();
 	virtual void reset();
 	virtual void resume();
-	virtual void write(const u16 * finalWave, int length);
-	virtual int getBufferLength();
+	virtual void write(u16 * finalWave, int length);
 
 private:
-	static const  int  _sampleCount    = 4096;
-	static const  int  _bufferAlign    = 4;
-	static const  int  _bufferCapacity = _sampleCount * 2;
-	static const  int  _bufferTotalLen = _bufferCapacity + _bufferAlign;
+	RingBuffer<u16> _rbuf;
 
-	static u8          _buffer[_bufferTotalLen];
-	static int         _readPosition;
-	static int         _writePosition;
-	static SDL_cond  * _cond;
-	static SDL_mutex * _mutex;
-	int                _bufferLen;
+	SDL_cond  * _cond;
+	SDL_mutex * _mutex;
 
-	static int getBufferFree();
-	static int getBufferUsed();
-	static void soundCallback(void *, u8 *stream, int len);
+	// Hold up to 100 ms of data in the ring buffer
+	static const float _delay = 0.1f;
+
+	static void soundCallback(void *data, u8 *stream, int length);
+	virtual void read(u16 * stream, int length);
 };
 
 #endif // __VBA_SOUND_SDL_H__

@@ -55,12 +55,7 @@ public:
 	/**
 	 * Write length bytes of data from the finalWave buffer to the driver output buffer.
 	 */
-	virtual void write(const u16 * finalWave, int length) = 0;
-
-	/**
-	 * Return the size in bytes of the core sound buffer.
-	 */
-	virtual int getBufferLength() = 0;
+	virtual void write(u16 * finalWave, int length) = 0;
 
 	virtual void setThrottle(unsigned short throttle) { };
 };
