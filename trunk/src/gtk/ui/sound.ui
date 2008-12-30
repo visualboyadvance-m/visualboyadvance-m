@@ -35,7 +35,10 @@
         <col id="0">22 KHz</col>
       </row>
       <row>
-        <col id="0">44 KHz</col>
+        <col id="0">44.1 KHz</col>
+      </row>
+      <row>
+        <col id="0">48 KHz</col>
       </row>
     </data>
   </object>
