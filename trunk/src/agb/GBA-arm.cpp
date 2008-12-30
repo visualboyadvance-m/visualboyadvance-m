@@ -2833,6 +2833,7 @@ static insnfunc_t armInsnTable[4096] = {
 
 // Wrapper routine (execution loop) ///////////////////////////////////////
 
+#if 0
 #include<time.h>
 static void tester(void) {
   static int ran=0;if(ran)return;ran=1;
@@ -2844,6 +2845,7 @@ static void tester(void) {
     fprintf(f,"arm%03X %6ld\n",op,e-s);fflush(f);
   }fclose(f);
 }
+#endif
 
 int armExecute()
 {
