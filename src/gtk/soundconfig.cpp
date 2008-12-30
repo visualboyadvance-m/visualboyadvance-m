@@ -60,15 +60,18 @@ void SoundConfigDialog::vSetConfig(Config::Section * _poConfig, VBA::Window * _p
   long iSoundSampleRate = m_poConfig->oGetKey<long>("sample_rate");
   switch (iSoundSampleRate)
   {
-    default:
-    case 44100:
-      m_poRateComboBox->set_active(2);
+    case 11025:
+      m_poRateComboBox->set_active(0);
       break;
     case 22050:
       m_poRateComboBox->set_active(1);
       break;
-    case 11025:
-      m_poRateComboBox->set_active(0);
+    default:
+    case 44100:
+      m_poRateComboBox->set_active(2);
+      break;
+    case 48000:
+      m_poRateComboBox->set_active(3);
       break;
   }
 }
@@ -119,6 +122,9 @@ void SoundConfigDialog::vOnRateChanged()
     case 2: // 44 KHz
     default:
       m_poConfig->vSetKey("sample_rate", 44100);
+      break;
+    case 3: // 48 KHz
+      m_poConfig->vSetKey("sample_rate", 48000);
       break;
   }
 

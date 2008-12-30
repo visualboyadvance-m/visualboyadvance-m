@@ -98,7 +98,7 @@ bool SoundSDL::init(long sampleRate)
 {
   SDL_AudioSpec audio;
 
-  _bufferLen = sampleRate / 15;
+  _bufferLen = sampleRate * 4 / 60;
 
   audio.freq = sampleRate;
   audio.format = AUDIO_S16SYS;

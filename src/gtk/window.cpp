@@ -92,7 +92,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_iSaveTypeMin    (SaveAuto),
   m_iSaveTypeMax    (SaveNone),
   m_iSoundSampleRateMin(11025),
-  m_iSoundSampleRateMax(44100),
+  m_iSoundSampleRateMax(48000),
   m_fSoundVolumeMin (0.50f),
   m_fSoundVolumeMax (2.00f),
   m_iEmulatorTypeMin(EmulatorAuto),
