@@ -59,7 +59,7 @@ public:
 	bool init(long sampleRate);
 
 	// Sound Data Feed
-	void write(const u16 * finalWave, int length);
+	void write(u16 * finalWave, int length);
 
 	// Play Control
 	void pause();
@@ -68,8 +68,6 @@ public:
 
 	// Configuration Changes
 	void setThrottle( unsigned short throttle );
-
-	virtual int getBufferLength();
 
 private:
 	bool   failed;
@@ -280,7 +278,7 @@ bool XAudio2_Output::init(long sampleRate)
 }
 
 
-void XAudio2_Output::write(const u16 * finalWave, int length)
+void XAudio2_Output::write(u16 * finalWave, int length)
 {
 	if( !initialized || failed ) return;
 
@@ -371,11 +369,6 @@ void XAudio2_Output::setThrottle( unsigned short throttle )
 	if( throttle == 0 ) throttle = 100;
 	HRESULT hr = sVoice->SetFrequencyRatio( (float)throttle / 100.0f );
 	ASSERT( hr == S_OK );
-}
-
-int XAudio2_Output::getBufferLength()
-{
-	return soundBufferLen;
 }
 
 SoundDriver *newXAudio2_Output()

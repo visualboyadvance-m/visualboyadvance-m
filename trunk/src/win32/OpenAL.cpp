@@ -41,8 +41,7 @@ public:
 	void pause();  // pause the secondary sound buffer
 	void reset();  // stop and reset the secondary sound buffer
 	void resume(); // play/resume the secondary sound buffer
-	void write(const u16 * finalWave, int length);  // write the emulated sound to a sound buffer
-	virtual int getBufferLength();
+	void write(u16 * finalWave, int length);  // write the emulated sound to a sound buffer
 
 private:
 	OPENALFNTABLE  ALFunction;
@@ -242,7 +241,7 @@ void OpenAL::reset()
 }
 
 
-void OpenAL::write(const u16 * finalWave, int length)
+void OpenAL::write(u16 * finalWave, int length)
 {
 	if( !initialized ) return;
 	winlog( "OpenAL::write\n" );
@@ -319,11 +318,6 @@ void OpenAL::write(const u16 * finalWave, int length)
 		ALFunction.alSourcePlay( source );
 		ASSERT_SUCCESS;
 	}
-}
-
-int OpenAL::getBufferLength()
-{
-	return soundBufferLen;
 }
 
 SoundDriver *newOpenAL()
