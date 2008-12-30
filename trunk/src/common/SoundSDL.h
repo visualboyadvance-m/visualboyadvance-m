@@ -25,7 +25,7 @@ class SoundSDL: public SoundDriver
 public:
 	virtual ~SoundSDL();
 
-	virtual bool init(int quality);
+	virtual bool init(long sampleRate);
 	virtual void pause();
 	virtual void reset();
 	virtual void resume();

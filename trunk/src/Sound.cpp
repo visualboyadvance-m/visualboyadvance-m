@@ -41,7 +41,7 @@ extern bool stopState;      // TODO: silence sound when true
 int const SOUND_CLOCK_TICKS_ = 167772; // 1/100 second
 
 static u16   soundFinalWave [1470];
-int   soundQuality       = 1;
+long  soundSampleRate    = 44100;
 bool  soundInterpolation = true;
 bool  soundPaused        = true;
 float soundFiltering     = 0.5f;
@@ -448,8 +448,7 @@ static void remake_stereo_buffer()
 	stereo_buffer = 0;
 
 	stereo_buffer = new Stereo_Buffer; // TODO: handle out of memory
-	long const sample_rate = 44100 / soundQuality;
-	stereo_buffer->set_sample_rate( sample_rate ); // TODO: handle out of memory
+	stereo_buffer->set_sample_rate( soundSampleRate ); // TODO: handle out of memory
 	stereo_buffer->clock_rate( gb_apu->clock_rate );
 
 	// PCM
@@ -534,7 +533,7 @@ bool soundInit()
 	if ( !soundDriver )
 		return false;
 
-	if (!soundDriver->init(soundQuality))
+	if (!soundDriver->init(soundSampleRate))
 		return false;
 
 	soundPaused = true;
@@ -543,22 +542,24 @@ bool soundInit()
 
 int soundGetQuality()
 {
-	return soundQuality;
+	return 44100 / soundSampleRate;
 }
 
 void soundSetQuality(int quality)
 {
-	if ( soundQuality != quality )
+	long newSampleRate = 44100 / quality;
+
+	if ( soundSampleRate != newSampleRate )
 	{
 		if ( systemCanChangeSoundQuality() )
 		{
 			soundShutdown();
-			soundQuality      = quality;
+			soundSampleRate      = newSampleRate;
 			soundInit();
 		}
 		else
 		{
-			soundQuality      = quality;
+			soundSampleRate      = newSampleRate;
 		}
 
 		remake_stereo_buffer();

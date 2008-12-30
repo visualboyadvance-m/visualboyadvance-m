@@ -34,7 +34,7 @@ public:
 	DirectSound();
 	virtual ~DirectSound();
 
-	bool init(int quality);   // initialize the primary and secondary sound buffer
+	bool init(long sampleRate);   // initialize the primary and secondary sound buffer
 	void pause();  // pause the secondary sound buffer
 	void reset();  // stop and reset the secondary sound buffer
 	void resume(); // resume the secondary sound buffer
@@ -85,7 +85,7 @@ DirectSound::~DirectSound()
 }
 
 
-bool DirectSound::init(int quality)
+bool DirectSound::init(long sampleRate)
 {
 	HRESULT hr;
 	DWORD freq;
@@ -123,7 +123,7 @@ bool DirectSound::init(int quality)
 		return false;
 	}
 
-	freq = 44100 / quality;
+	freq = sampleRate;
 	// calculate the number of samples per frame first
 	// then multiply it with the size of a sample frame (16 bit * stereo)
 	soundBufferLen = ( freq / 60 ) * 4;

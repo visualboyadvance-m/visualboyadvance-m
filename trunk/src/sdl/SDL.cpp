@@ -721,7 +721,7 @@ void sdlReadPreferences(FILE *f)
     } else if(!strcmp(key, "captureFormat")) {
       captureFormat = sdlFromHex(value);
     } else if(!strcmp(key, "soundQuality")) {
-      soundQuality = sdlFromHex(value);
+      int soundQuality = sdlFromHex(value);
       switch(soundQuality) {
       case 1:
       case 2:
@@ -733,6 +733,7 @@ void sdlReadPreferences(FILE *f)
         soundQuality = 2;
         break;
       }
+      soundSetQuality(soundQuality);
     } else if(!strcmp(key, "soundEnable")) {
       int res = sdlFromHex(value) & 0x30f;
       soundSetEnable(res);
