@@ -38,8 +38,7 @@ public:
 	void pause();  // pause the secondary sound buffer
 	void reset();  // stop and reset the secondary sound buffer
 	void resume(); // resume the secondary sound buffer
-	void write(const u16 * finalWave, int length);  // write the emulated sound to the secondary sound buffer
-	virtual int getBufferLength();
+	void write(u16 * finalWave, int length);  // write the emulated sound to the secondary sound buffer
 };
 
 
@@ -224,7 +223,7 @@ void DirectSound::resume()
 }
 
 
-void DirectSound::write(const u16 * finalWave, int length)
+void DirectSound::write(u16 * finalWave, int length)
 {
 	if(!pDirectSound) return;
 
@@ -305,11 +304,6 @@ void DirectSound::write(const u16 * finalWave, int length)
 		systemMessage( 0, _T("dsbSecondary->Lock() failed: %08x"), hr );
 		return;
 	}
-}
-
-int DirectSound::getBufferLength()
-{
-	return soundBufferLen;
 }
 
 SoundDriver *newDirectSound()

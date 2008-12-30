@@ -40,7 +40,7 @@ public:
 	// a new time frame at the end of the current frame.
 	void end_frame( blip_time_t time );
 
-	// Reads at most 'max_samples' out of buffer into 'dest', removing them from from
+	// Reads at most 'max_samples' out of buffer into 'dest', removing them from
 	// the buffer. Returns number of samples actually read and removed. If stereo is
 	// true, increments 'dest' one extra time after writing each sample, to allow
 	// easy interleving of two channels into a stereo output buffer.

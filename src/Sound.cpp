@@ -348,8 +348,11 @@ static void end_frame( blip_time_t time )
 
 void flush_samples(Multi_Buffer * buffer)
 {
-	// get the size in bytes of the sound driver buffer
-	int soundBufferLen = soundDriver->getBufferLength();
+	// We want to write the data frame by frame to support legacy audio drivers
+	// that don't use the length parameter of the write method.
+	// TODO: Update the Win32 audio drivers (DS, OAL, XA2), and flush all the
+	// samples at once to help reducing the audio delay on all platforms.
+	int soundBufferLen = ( soundSampleRate / 60 ) * 4;
 
 	// soundBufferLen should have a whole number of sample pairs
 	assert( soundBufferLen % (2 * sizeof *soundFinalWave) == 0 );
