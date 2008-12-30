@@ -733,7 +733,7 @@ void sdlReadPreferences(FILE *f)
         soundQuality = 2;
         break;
       }
-      soundSetQuality(soundQuality);
+      soundSetSampleRate(44100 / soundQuality);
     } else if(!strcmp(key, "soundEnable")) {
       int res = sdlFromHex(value) & 0x30f;
       soundSetEnable(res);

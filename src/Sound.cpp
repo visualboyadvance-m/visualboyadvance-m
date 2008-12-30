@@ -540,26 +540,24 @@ bool soundInit()
 	return true;
 }
 
-int soundGetQuality()
+long soundGetSampleRate()
 {
-	return 44100 / soundSampleRate;
+	return soundSampleRate;
 }
 
-void soundSetQuality(int quality)
+void soundSetSampleRate(long sampleRate)
 {
-	long newSampleRate = 44100 / quality;
-
-	if ( soundSampleRate != newSampleRate )
+	if ( soundSampleRate != sampleRate )
 	{
 		if ( systemCanChangeSoundQuality() )
 		{
 			soundShutdown();
-			soundSampleRate      = newSampleRate;
+			soundSampleRate      = sampleRate;
 			soundInit();
 		}
 		else
 		{
-			soundSampleRate      = newSampleRate;
+			soundSampleRate      = sampleRate;
 		}
 
 		remake_stereo_buffer();
