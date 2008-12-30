@@ -9,6 +9,7 @@
 #include "gb_apu/Effects_Buffer.h"
 
 extern int gbHardware;
+extern long soundSampleRate; // current sound quality
 
 gb_effects_config_t gb_effects_config = { false, 0.20f, 0.15f, false };
 
@@ -125,7 +126,7 @@ static void remake_stereo_buffer()
 	stereo_buffer = 0;
 
 	stereo_buffer = new Simple_Effects_Buffer; // TODO: handle out of memory
-	if ( stereo_buffer->set_sample_rate( 44100 / soundQuality ) ) { } // TODO: handle out of memory
+	if ( stereo_buffer->set_sample_rate( soundSampleRate ) ) { } // TODO: handle out of memory
 	stereo_buffer->clock_rate( gb_apu->clock_rate );
 
 	// APU
@@ -217,17 +218,19 @@ void gbSoundReset()
 
 void gbSoundSetQuality(int quality)
 {
-	if ( soundQuality != quality )
+	long newSampleRate = 44100 / quality;
+
+	if ( soundSampleRate != newSampleRate )
 	{
 		if ( systemCanChangeSoundQuality() )
 		{
 			soundShutdown();
-			soundQuality      = quality;
+			soundSampleRate      = newSampleRate;
 			soundInit();
 		}
 		else
 		{
-			soundQuality      = quality;
+			soundSampleRate      = newSampleRate;
 		}
 
 		remake_stereo_buffer();

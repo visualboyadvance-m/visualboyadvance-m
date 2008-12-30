@@ -33,9 +33,9 @@ public:
 
 	/**
 	 * Initialize the sound driver.
-	 * @param quality Sound frequency : 1 => 44100 Hz, 2 => 22050 Hz, 4 => 11025 Hz
+	 * @param sampleRate In Hertz
 	 */
-	virtual bool init(int quality) = 0;
+	virtual bool init(long sampleRate) = 0;
 
 	/**
 	 * Tell the driver that the sound stream has paused

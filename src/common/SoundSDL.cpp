@@ -94,25 +94,13 @@ void SoundSDL::write(const u16 * finalWave, int length)
   SDL_mutexV(_mutex);
 }
 
-bool SoundSDL::init(int quality)
+bool SoundSDL::init(long sampleRate)
 {
   SDL_AudioSpec audio;
 
-  switch(quality) {
-  case 1:
-    audio.freq = 44100;
-    _bufferLen = 1470*2;
-    break;
-  case 2:
-    audio.freq = 22050;
-    _bufferLen = 736*2;
-    break;
-  case 4:
-    audio.freq = 11025;
-    _bufferLen = 368*2;
-    break;
-  }
+  _bufferLen = sampleRate / 15;
 
+  audio.freq = sampleRate;
   audio.format = AUDIO_S16SYS;
   audio.channels = 2;
   audio.samples = 1024;
