@@ -786,7 +786,7 @@ void MainWnd::OnAudioCoreSettings()
 	dlg.m_declicking = gbSoundGetDeclicking();
 	dlg.m_sound_interpolation = soundInterpolation;
 	dlg.m_sound_filtering = soundFiltering;
-	dlg.m_sample_rate = 44100 / soundQuality;
+	dlg.m_sample_rate = soundGetSampleRate();
 
 	if( IDOK == dlg.DoModal() ) {
 		gb_effects_config_t _new;
@@ -807,9 +807,9 @@ void MainWnd::OnAudioCoreSettings()
 		soundFiltering = dlg.m_sound_filtering;
 		
 		if( theApp.cartridgeType == IMAGE_GBA ) {
-			soundSetQuality( 44100 / dlg.m_sample_rate );
+			soundSetSampleRate( dlg.m_sample_rate );
 		} else if( theApp.cartridgeType == IMAGE_GB ) {
-			gbSoundSetQuality( 44100 / dlg.m_sample_rate );
+			gbSoundSetSampleRate( dlg.m_sample_rate );
 		}
 	}
 }

@@ -1290,7 +1290,7 @@ void systemOnWriteDataToSoundBuffer(const u16 * finalWave, int length)
 			format.cbSize = 0;
 			format.wFormatTag = WAVE_FORMAT_PCM;
 			format.nChannels = 2;
-			format.nSamplesPerSec = 44100 / soundQuality;
+			format.nSamplesPerSec = soundGetSampleRate();
 			format.wBitsPerSample = 16;
 			format.nBlockAlign = format.nChannels * ( format.wBitsPerSample >> 3 );
 			format.nAvgBytesPerSec = format.nSamplesPerSec * format.nBlockAlign;
@@ -1524,7 +1524,8 @@ void VBA::loadSettings()
   int res = regQueryDwordValue("soundEnable", 0x30f);
   soundSetEnable(res);
 
-  soundQuality = regQueryDwordValue("soundQuality", 1);
+  long soundQuality = regQueryDwordValue("soundQuality", 1);
+  soundSetSampleRate(44100 / soundQuality);
 
   soundSetVolume( (float)(regQueryDwordValue("soundVolume", 100)) / 100.0f );
 
@@ -2518,7 +2519,7 @@ void VBA::saveSettings()
 
   regSetDwordValue("soundEnable", soundGetEnable() & 0x30f);
 
-  regSetDwordValue("soundQuality", soundQuality);
+  regSetDwordValue("soundQuality", soundGetSampleRate() / 44100);
 
   regSetDwordValue("soundVolume", (DWORD)(soundGetVolume() * 100.0f));
 
