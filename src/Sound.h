@@ -35,9 +35,8 @@ void soundShutdown();
 
 //// GBA sound options
 
-// Sets sample rate to 44100 / quality
-int soundGetQuality();
-void soundSetQuality( int quality );
+long soundGetSampleRate();
+void soundSetSampleRate(long sampleRate);
 
 // Sound settings
 extern bool soundInterpolation; // 1 if PCM should have low-pass filtering

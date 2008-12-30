@@ -91,8 +91,8 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_iShowSpeedMax   (ShowDetailed),
   m_iSaveTypeMin    (SaveAuto),
   m_iSaveTypeMax    (SaveNone),
-  m_iSoundQualityMin(Sound44K),
-  m_iSoundQualityMax(Sound11K),
+  m_iSoundSampleRateMin(11025),
+  m_iSoundSampleRateMax(44100),
   m_fSoundVolumeMin (0.50f),
   m_fSoundVolumeMax (2.00f),
   m_iEmulatorTypeMin(EmulatorAuto),
@@ -692,9 +692,9 @@ void Window::vInitConfig()
   // Sound section
   //
   m_poSoundConfig = m_oConfig.poAddSection("Sound");
-  m_poSoundConfig->vSetKey("mute",           false    );
-  m_poSoundConfig->vSetKey("quality",        Sound44K );
-  m_poSoundConfig->vSetKey("volume",         1.00f    );
+  m_poSoundConfig->vSetKey("mute",           false );
+  m_poSoundConfig->vSetKey("sample_rate",    44100 );
+  m_poSoundConfig->vSetKey("volume",         1.00f );
 
   // Input section
   //
@@ -834,11 +834,11 @@ void Window::vCheckConfig()
 
   // Sound section
   //
-  iValue = m_poSoundConfig->oGetKey<int>("quality");
-  iAdjusted = CLAMP(iValue, m_iSoundQualityMin, m_iSoundQualityMax);
+  iValue = m_poSoundConfig->oGetKey<int>("sample_rate");
+  iAdjusted = CLAMP(iValue, m_iSoundSampleRateMin, m_iSoundSampleRateMax);
   if (iValue != iAdjusted)
   {
-    m_poSoundConfig->vSetKey("quality", iAdjusted);
+    m_poSoundConfig->vSetKey("sample_rate", iAdjusted);
   }
 
   fValue = m_poSoundConfig->oGetKey<float>("volume");
@@ -921,16 +921,16 @@ void Window::vApplyConfigVolume()
   soundSetVolume(fSoundVolume);
 }
 
-void Window::vApplyConfigSoundQuality()
+void Window::vApplyConfigSoundSampleRate()
 {
-  ESoundQuality eSoundQuality = (ESoundQuality)m_poSoundConfig->oGetKey<int>("quality");
+  long iSoundSampleRate = m_poSoundConfig->oGetKey<int>("sample_rate");
   if (m_eCartridge == CartridgeGBA)
   {
-    soundSetQuality(eSoundQuality);
+    soundSetSampleRate(iSoundSampleRate);
   }
   else if (m_eCartridge == CartridgeGB)
   {
-    gbSoundSetQuality(eSoundQuality);
+    gbSoundSetSampleRate(iSoundSampleRate);
   }
 }
 
@@ -1076,7 +1076,7 @@ bool Window::bLoadROM(const std::string & _rsFile)
   emulating = 1;
   m_bWasEmulating = false;
 
-  vApplyConfigSoundQuality();
+  vApplyConfigSoundSampleRate();
 
   vUpdateGameSlots();
   vHistoryAdd(_rsFile);

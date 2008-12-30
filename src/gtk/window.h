@@ -61,13 +61,6 @@ public:
     OutputXvideo
   };
 
-  enum ESoundQuality
-  {
-    Sound44K = 1,
-    Sound22K = 2,
-    Sound11K = 4
-  };
-
   // GB/GBA screen sizes
   const int m_iGBScreenWidth;
   const int m_iGBScreenHeight;
@@ -88,7 +81,7 @@ public:
   void vApplyConfigScreenArea();
   void vApplyConfigMute();
   void vApplyConfigVolume();
-  void vApplyConfigSoundQuality();
+  void vApplyConfigSoundSampleRate();
   void vUpdateScreen();
 
   inline ECartridge eGetCartridge() const { return m_eCartridge; }
@@ -185,8 +178,8 @@ private:
   const int m_iShowSpeedMax;
   const int m_iSaveTypeMin;
   const int m_iSaveTypeMax;
-  const int m_iSoundQualityMin;
-  const int m_iSoundQualityMax;
+  const int m_iSoundSampleRateMin;
+  const int m_iSoundSampleRateMax;
   const float m_fSoundVolumeMin;
   const float m_fSoundVolumeMax;
   const int m_iEmulatorTypeMin;
