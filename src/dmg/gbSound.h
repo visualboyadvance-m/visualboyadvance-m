@@ -9,7 +9,6 @@
 
 // Sets sample rate to 44100 / quality
 void gbSoundSetQuality( int quality );
-extern int soundQuality; // current sound quality
 
 // Manages declicking mode. When enabled, clicks are reduced. Note that clicks
 // are normal for GB and GBC sound hardware.

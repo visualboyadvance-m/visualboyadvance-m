@@ -56,7 +56,7 @@ public:
 	~XAudio2_Output();
 
 	// Initialization
-	bool init(int quality);
+	bool init(long sampleRate);
 
 	// Sound Data Feed
 	void write(const u16 * finalWave, int length);
@@ -137,7 +137,7 @@ XAudio2_Output::~XAudio2_Output()
 }
 
 
-bool XAudio2_Output::init(int quality)
+bool XAudio2_Output::init(long sampleRate)
 {
 	if( failed || initialized ) return false;
 
@@ -157,7 +157,7 @@ bool XAudio2_Output::init(int quality)
 	}
 
 
-	freq = 44100 / (UINT32)quality;
+	freq = sampleRate;
 
 	// calculate the number of samples per frame first
 	// then multiply it with the size of a sample frame (16 bit * stereo)
@@ -360,7 +360,7 @@ void XAudio2_Output::reset()
 
 	sVoice->FlushSourceBuffers();
 	sVoice->Start( 0 );
-	playing = true;	
+	playing = true;
 }
 
 

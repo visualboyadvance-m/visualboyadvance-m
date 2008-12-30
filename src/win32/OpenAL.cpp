@@ -37,7 +37,7 @@ public:
 	OpenAL();
 	virtual ~OpenAL();
 
-	bool init(int quality);   // initialize the sound buffer queue
+	bool init(long sampleRate);   // initialize the sound buffer queue
 	void pause();  // pause the secondary sound buffer
 	void reset();  // stop and reset the secondary sound buffer
 	void resume(); // play/resume the secondary sound buffer
@@ -145,7 +145,7 @@ void OpenAL::debugState()
 #endif
 
 
-bool OpenAL::init(int quality)
+bool OpenAL::init(long sampleRate)
 {
 	winlog( "OpenAL::init\n" );
 	assert( initialized == false );
@@ -174,7 +174,7 @@ bool OpenAL::init(int quality)
 	ALFunction.alGenSources( 1, &source );
 	ASSERT_SUCCESS;
 
-	freq = 44100 / quality;
+	freq = sampleRate;
 
 	// calculate the number of samples per frame first
 	// then multiply it with the size of a sample frame (16 bit * stereo)
