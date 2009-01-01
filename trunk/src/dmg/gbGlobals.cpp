@@ -1,4 +1,5 @@
-#include "../agb/GBA.h"
+#include <cstdlib>
+#include "../common/Types.h"
 
 u8 *gbMemoryMap[16];
 
