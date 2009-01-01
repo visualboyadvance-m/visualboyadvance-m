@@ -5,8 +5,8 @@
 #include "gbGlobals.h"
 #include "gbSound.h"
 
-#include "gb_apu/Gb_Apu.h"
-#include "gb_apu/Effects_Buffer.h"
+#include "../apu/Gb_Apu.h"
+#include "../apu/Effects_Buffer.h"
 
 extern int gbHardware;
 extern long soundSampleRate; // current sound quality
