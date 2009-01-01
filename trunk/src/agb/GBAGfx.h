@@ -4,7 +4,7 @@
 #include "GBA.h"
 #include "../Globals.h"
 
-#include "../Port.h"
+#include "../common/Port.h"
 
 //#define SPRITE_DEBUG
 

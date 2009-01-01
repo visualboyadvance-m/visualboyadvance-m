@@ -2,7 +2,7 @@
 #include <memory.h>
 
 #include "../System.h"
-#include "../Port.h"
+#include "../common/Port.h"
 #include "../Util.h"
 #include "gb.h"
 #include "gbGlobals.h"

@@ -130,12 +130,12 @@ SET(SRC_MAIN
     src/Mode3.cpp
     src/Mode4.cpp
     src/Mode5.cpp
-    src/Patch.cpp
     src/RTC.cpp
     src/Sound.cpp
     src/Sram.cpp
     src/Util.cpp
-    src/memgzio.c
+    src/common/Patch.cpp
+    src/common/memgzio.c
 )
 
 SET(SRC_AGB
@@ -178,7 +178,7 @@ SET(SRC_SDL
 )
 
 SET(SRC_FEX_MINI
-    src/fex_mini.cpp
+    src/common/fex_mini.cpp
 )
 
 SET(SRC_FILTERS

@@ -17,7 +17,7 @@
 #include "../NLS.h"
 #include "../elf.h"
 #include "../Util.h"
-#include "../Port.h"
+#include "../common/Port.h"
 #include "../System.h"
 #include "agbprint.h"
 #ifdef PROFILING

@@ -16,13 +16,12 @@ extern "C" {
 #include "agb/GBA.h"
 #include "Globals.h"
 #include "RTC.h"
-#include "Patch.h"
-#include "Port.h"
+#include "common/Port.h"
 
-#include "fex.h"
+#include "common/fex.h"
 
 extern "C" {
-#include "memgzio.h"
+#include "common/memgzio.h"
 }
 
 #ifndef _MSC_VER
@@ -311,11 +310,6 @@ bool utilWriteBMPFile(const char *fileName, int w, int h, u8 *pix)
   fclose(fp);
 
   return true;
-}
-
-void utilApplyIPS(const char *ips, u8 **rom, int *size)
-{
-	applyPatch(ips, rom, size);
 }
 
 extern bool cpuIsMultiBoot;
