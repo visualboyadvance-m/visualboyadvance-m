@@ -296,7 +296,7 @@
    break;
  case 0x37:
    // SCF
-   AF.B.B0 = AF.B.B0 & Z_FLAG | C_FLAG;
+   AF.B.B0 = (AF.B.B0 & Z_FLAG) | C_FLAG;
    break;
 case 0x38:
   // JR C,NN
