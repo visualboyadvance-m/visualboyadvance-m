@@ -2,7 +2,7 @@
 #include "vba.h"
 #include "ExportGSASnapshot.h"
 
-#include "../agb/GBA.h"
+#include "../gba/GBA.h"
 #include "../NLS.h"
 
 #ifdef _DEBUG

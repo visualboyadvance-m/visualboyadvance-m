@@ -11,7 +11,7 @@
 
 // Internals
 #include "../System.h" // for systemMessage()
-#include "../Globals.h"
+#include "../gba/Globals.h"
 
 
 // Synchronization Event

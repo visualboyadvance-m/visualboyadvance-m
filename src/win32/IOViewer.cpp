@@ -3,9 +3,9 @@
 #include "IOViewer.h"
 
 #include "../System.h"
-#include "../agb/GBA.h"
-#include "../Globals.h"
-#include "../agb/GBAinline.h"
+#include "../gba/GBA.h"
+#include "../gba/Globals.h"
+#include "../gba/GBAinline.h"
 #include "IOViewerRegs.h"
 
 #ifdef _DEBUG

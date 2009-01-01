@@ -9,13 +9,13 @@
 #include "WinResUtil.h"
 #include "Logging.h"
 
-#include "../agb/GBA.h"
-#include "../Globals.h"
+#include "../gba/GBA.h"
+#include "../gba/Globals.h"
 #include "../NLS.h"
-#include "../Sound.h"
-#include "../dmg/GB.h"
-#include "../dmg/gbCheats.h"
-#include "../dmg/gbGlobals.h"
+#include "../gba/Sound.h"
+#include "../gb/GB.h"
+#include "../gb/gbCheats.h"
+#include "../gb/gbGlobals.h"
 
 extern void remoteCleanUp();
 extern void InterframeCleanup();

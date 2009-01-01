@@ -8,7 +8,7 @@
 #include "../System.h"
 #include "../NLS.h"
 #include "../Util.h"
-#include "../dmg/gbGlobals.h"
+#include "../gb/gbGlobals.h"
 
 extern "C" {
 #include <png.h>

@@ -3,7 +3,7 @@
 #include "GBA.h"
 #include <stdio.h>
 #include "../win32/stdafx.h"
-#include "../port.h"
+#include "../common/port.h"
 #include "GBALink.h"
 #include "../win32/vba.h"
 #include "../win32/MainWnd.h"

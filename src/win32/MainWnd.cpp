@@ -11,19 +11,20 @@
 
 #include "../System.h"
 #include "../AutoBuild.h"
-#include "../cheatSearch.h"
-#include "../agb/GBA.h"
-#include "../Globals.h"
-#include "../Flash.h"
-#include "../Globals.h"
-#include "../dmg/GB.h"
-#include "../dmg/gbSound.h"
-#include "../dmg/gbCheats.h"
-#include "../dmg/gbGlobals.h"
-#include "../RTC.h"
-#include "../Sound.h"
+#include "../gba/cheatSearch.h"
+#include "../gba/GBA.h"
+#include "../gba/Globals.h"
+#include "../gba/Flash.h"
+#include "../gba/Globals.h"
+#include "../gb/GB.h"
+#include "../gb/gbSound.h"
+#include "../gb/gbCheats.h"
+#include "../gb/gbGlobals.h"
+#include "../gba/RTC.h"
+#include "../gba/Sound.h"
 #include "../Util.h"
-#include "../agb/GBALink.h"
+#include "../gba/GBALink.h"
+#include "../common/Patch.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -498,7 +499,7 @@ bool MainWnd::FileRun()
 
     if(theApp.autoPatch && !patchName.IsEmpty()) {
       int size = gbRomSize;
-      utilApplyIPS(patchName, &gbRom, &size);
+      applyPatch(patchName, &gbRom, &size);
       if(size != gbRomSize) {
         extern bool gbUpdateSizes();
         gbUpdateSizes();
@@ -565,7 +566,7 @@ bool MainWnd::FileRun()
 
     if(theApp.autoPatch && !patchName.IsEmpty()) {
       int size = 0x2000000;
-      utilApplyIPS(patchName, &rom, &size);
+      applyPatch(patchName, &rom, &size);
       if(size != 0x2000000) {
         CPUReset();
       }
