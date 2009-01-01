@@ -1,4 +1,4 @@
-#include "System.h"
+#include "../System.h"
 
 void Simple2x16(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
               u8 *dstPtr, u32 dstPitch, int width, int height)

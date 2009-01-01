@@ -118,17 +118,12 @@ SET( CMAKE_CXX_FLAGS "-O3 -Wall")
 
 # Source files definition
 SET(SRC_MAIN
-    src/2xSaI.cpp
-    src/admame.cpp
-    src/bilinear.cpp
     src/bios.cpp
     src/Cheats.cpp
     src/CheatSearch.cpp
     src/EEprom.cpp
     src/Flash.cpp
     src/Globals.cpp
-    src/interframe.cpp
-    src/hq2x.cpp
     src/Mode0.cpp
     src/Mode1.cpp
     src/Mode2.cpp
@@ -136,9 +131,7 @@ SET(SRC_MAIN
     src/Mode4.cpp
     src/Mode5.cpp
     src/Patch.cpp
-    src/pixel.cpp
     src/RTC.cpp
-    src/scanline.cpp
     src/Sound.cpp
     src/Sram.cpp
     src/Util.cpp
@@ -188,16 +181,26 @@ SET(SRC_FEX_MINI
     src/fex_mini.cpp
 )
 
+SET(SRC_FILTERS
+    src/filters/2xSaI.cpp
+    src/filters/admame.cpp
+    src/filters/bilinear.cpp
+    src/filters/hq2x.cpp
+    src/filters/interframe.cpp
+    src/filters/pixel.cpp
+    src/filters/scanline.cpp
+)
+
 SET(SRC_HQ_C
-    src/hq/c/hq_implementation.cpp
+    src/filters/hq/c/hq_implementation.cpp
 )
 
 SET(SRC_HQ_ASM
-    src/hq/asm/hq3x_16.asm
-    src/hq/asm/hq3x_32.asm
-    src/hq/asm/hq4x_16.asm
-    src/hq/asm/hq4x_32.asm
-    src/hq/asm/hq3x32.cpp
+    src/filters/hq/asm/hq3x_16.asm
+    src/filters/hq/asm/hq3x_32.asm
+    src/filters/hq/asm/hq4x_16.asm
+    src/filters/hq/asm/hq4x_32.asm
+    src/filters/hq/asm/hq3x32.cpp
 )
 
 SET(SRC_GTK
@@ -265,6 +268,7 @@ ADD_LIBRARY (
     ${SRC_AGB}
     ${SRC_DMG}
     ${SRC_FEX_MINI}
+    ${SRC_FILTERS}
     ${SRC_DEBUGGER}
 )
 
