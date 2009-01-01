@@ -26,10 +26,9 @@
 #include <SDL.h>
 
 #include "../agb/GBA.h"
-#include "../dmg/gb.h"
-#include "../dmg/gbGlobals.h"
-#include "../dmg/gbPrinter.h"
-#include "../dmg/gbSound.h"
+#include "../gb/gb.h"
+#include "../gb/gbGlobals.h"
+#include "../gb/gbPrinter.h"
 #include "../Sound.h"
 #include "../Util.h"
 #include "../sdl/inputSDL.h"
