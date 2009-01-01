@@ -3,8 +3,8 @@
 
 #include "../System.h"
 #include "../common/Port.h"
-#include "../RTC.h"
-#include "../Sound.h"
+#include "RTC.h"
+#include "Sound.h"
 #include "agbprint.h"
 
 extern const u32 objTilesAddress[3];

@@ -1,9 +1,9 @@
-#include "System.h"
-#include "gba/GBA.h"
+#include "../System.h"
+#include "GBA.h"
 #include "Globals.h"
-#include "common/Port.h"
-#include "Util.h"
-#include "NLS.h"
+#include "../common/Port.h"
+#include "../Util.h"
+#include "../NLS.h"
 
 #include <time.h>
 #include <memory.h>

@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "../Sound.h"
+#include "../gba/Sound.h"
 #include "../Util.h"
 #include "gbGlobals.h"
 #include "gbSound.h"

@@ -1,4 +1,4 @@
-#include "gba/GBA.h"
+#include "GBA.h"
 
 #ifdef BKPT_SUPPORT
 int  oldreg[17];

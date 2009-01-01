@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "GBA.h"
-#include "../Globals.h"
+#include "Globals.h"
 #include "../common/Port.h"
 #include "../System.h"
 

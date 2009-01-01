@@ -37,18 +37,18 @@
 
 #include <SDL.h>
 
+#include "../common/Patch.h"
 #include "../gba/GBA.h"
 #include "../gba/agbprint.h"
-#include "../Flash.h"
-#include "../common/Patch.h"
-#include "../RTC.h"
-#include "../Sound.h"
-#include "../Util.h"
+#include "../gba/Flash.h"
+#include "../gba/Cheats.h"
+#include "../gba/RTC.h"
+#include "../gba/Sound.h"
 #include "../gb/gb.h"
 #include "../gb/gbGlobals.h"
 #include "../gb/gbCheats.h"
 #include "../gb/gbSound.h"
-#include "../Cheats.h"
+#include "../Util.h"
 
 #include "debugger.h"
 #include "filters.h"

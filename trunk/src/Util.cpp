@@ -12,10 +12,10 @@ extern "C" {
 #include "System.h"
 #include "NLS.h"
 #include "Util.h"
-#include "Flash.h"
+#include "gba/Flash.h"
 #include "gba/GBA.h"
-#include "Globals.h"
-#include "RTC.h"
+#include "gba/Globals.h"
+#include "gba/RTC.h"
 #include "common/Port.h"
 
 #include "common/fex.h"
