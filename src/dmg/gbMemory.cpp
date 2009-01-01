@@ -1,4 +1,4 @@
-#include "../agb/GBA.h"
+#include "../System.h"
 #include "../common/Port.h"
 #include "gbGlobals.h"
 #include "gbMemory.h"
@@ -1322,8 +1322,8 @@ void mapperTAMA5RAM(u16 address, u8 value)
           // Write Commands !!!
           if (gbDataTAMA5.mapperCommands[0x0f] && (gbDataTAMA5.mapperCommandNumber == 7))
           {
-            int data = gbDataTAMA5.mapperCommands[0x04] & 0x0f |
-                      (gbDataTAMA5.mapperCommands[0x05] <<4);
+            int data = (gbDataTAMA5.mapperCommands[0x04] & 0x0f) |
+                       (gbDataTAMA5.mapperCommands[0x05] <<4);
 
             // Not sure when the write command should reset...
             // but it doesn't seem to matter.
@@ -1456,7 +1456,7 @@ void mapperTAMA5RAM(u16 address, u8 value)
           for (int i = 0; i<0x10; i++)
             for (int j = 0; j<0x10; j++)
               if (!(j&2))
-                gbTAMA5ram[(i*0x10)+j | 2] = gbTAMA5ram[(i*0x10)+j];
+                gbTAMA5ram[((i*0x10)+j) | 2] = gbTAMA5ram[(i*0x10)+j];
           // Enable this to see the content of the flashrom in 0xe000
           /*for (int k = 0; k<0x100; k++)
             gbMemoryMap[0xe][k] = gbTAMA5ram[k];*/
