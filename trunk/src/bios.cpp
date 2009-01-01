@@ -2,9 +2,9 @@
 #include <memory.h>
 #include <stdlib.h>
 
-#include "agb/GBA.h"
+#include "gba/GBA.h"
 #include "bios.h"
-#include "agb/GBAinline.h"
+#include "gba/GBAinline.h"
 #include "Globals.h"
 
 s16 sineTable[256] = {

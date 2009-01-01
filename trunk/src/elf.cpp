@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "agb/GBA.h"
+#include "gba/GBA.h"
 #include "common/Port.h"
 #include "elf.h"
 #include "NLS.h"

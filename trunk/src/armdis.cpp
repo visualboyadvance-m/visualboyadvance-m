@@ -5,7 +5,7 @@
 
 #include "System.h"
 #include "common/Port.h"
-#include "agb/GBA.h"
+#include "gba/GBA.h"
 #include "armdis.h"
 #include "elf.h"
 

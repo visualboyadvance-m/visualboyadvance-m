@@ -1,6 +1,6 @@
-#include "agb/GBA.h"
+#include "gba/GBA.h"
 #include "Globals.h"
-#include "agb/GBAGfx.h"
+#include "gba/GBAGfx.h"
 
 void mode0RenderLine()
 {

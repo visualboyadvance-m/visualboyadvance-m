@@ -37,8 +37,8 @@
 
 #include <SDL.h>
 
-#include "../agb/GBA.h"
-#include "../agb/agbprint.h"
+#include "../gba/GBA.h"
+#include "../gba/agbprint.h"
 #include "../Flash.h"
 #include "../common/Patch.h"
 #include "../RTC.h"

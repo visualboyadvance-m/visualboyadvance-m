@@ -26,7 +26,7 @@
 
 #include <SDL.h>
 
-#include "../agb/GBA.h"
+#include "../gba/GBA.h"
 #include "../gb/gb.h"
 #include "../gb/gbGlobals.h"
 #include "../gb/gbSound.h"

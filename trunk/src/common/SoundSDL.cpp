@@ -17,9 +17,8 @@
 
 #include "SoundSDL.h"
 
-#include "../Globals.h"
-
 extern int emulating;
+extern bool speedup;
 
 SoundSDL::SoundSDL():
 	_rbuf(0)
@@ -64,7 +63,7 @@ void SoundSDL::write(u16 * finalWave, int length)
 
 		// If emulating and not in speed up mode, synchronize to audio
 		// by waiting till there is enough room in the buffer
-		if (emulating && !speedup && !systemThrottle)
+		if (emulating && !speedup)
 		{
 			SDL_CondWait(_cond, _mutex);
 		}
