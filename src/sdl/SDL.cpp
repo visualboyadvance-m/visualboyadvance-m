@@ -116,7 +116,6 @@ int systemDebug = 0;
 int systemVerbose = 0;
 int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
-int systemThrottle = 0;
 
 int srcPitch = 0;
 int srcWidth = 0;
@@ -271,7 +270,6 @@ struct option sdlOptions[] = {
   { "no-pause-when-inactive", no_argument, &pauseWhenInactive, 0 },
   { "no-rtc", no_argument, &sdlRtcEnable, 0 },
   { "no-show-speed", no_argument, &showSpeed, 0 },
-  { "no-throttle", no_argument, &systemThrottle, 0 },
   { "opengl", required_argument, 0, 'O' },
   { "opengl-nearest", no_argument, &openGL, 1 },
   { "opengl-bilinear", no_argument, &openGL, 2 },
@@ -779,10 +777,6 @@ void sdlReadPreferences(FILE *f)
       showSpeedTransparent = sdlFromHex(value);
     } else if(!strcmp(key, "autoFrameSkip")) {
       autoFrameSkip = sdlFromHex(value);
-    } else if(!strcmp(key, "throttle")) {
-      systemThrottle = sdlFromHex(value);
-      if(systemThrottle != 0 && (systemThrottle < 5 || systemThrottle > 1000))
-        systemThrottle = 0;
     } else if(!strcmp(key, "pauseWhenInactive")) {
       pauseWhenInactive = sdlFromHex(value) ? true : false;
     } else if(!strcmp(key, "agbPrint")) {
@@ -2044,14 +2038,6 @@ int main(int argc, char **argv)
         cpuSaveType = a;
       }
       break;
-    case 'T':
-      if(optarg) {
-        int t = atoi(optarg);
-        if(t < 5 || t > 1000)
-          t = 0;
-        systemThrottle = t;
-      }
-      break;
     case 'v':
       if(optarg) {
         systemVerbose = atoi(optarg);
@@ -2529,7 +2515,7 @@ void systemFrame()
 void system10Frames(int rate)
 {
   u32 time = systemGetClock();
-  if(!wasPaused && autoFrameSkip && !systemThrottle) {
+  if(!wasPaused && autoFrameSkip) {
     u32 diff = time - autoFrameSkipLastTime;
     int speed = 100;
 
@@ -2556,19 +2542,6 @@ void system10Frames(int rate)
           systemFrameSkip++;
       }
     }
-  }
-  if(!wasPaused && systemThrottle) {
-    if(!speedup) {
-      u32 diff = time - throttleLastTime;
-
-      int target = (1000000/(rate*systemThrottle));
-      int d = (target - diff);
-
-      if(d > 0) {
-        SDL_Delay(d);
-      }
-    }
-    throttleLastTime = systemGetClock();
   }
   if(rewindMemory) {
     if(++rewindCounter >= rewindTimer) {
