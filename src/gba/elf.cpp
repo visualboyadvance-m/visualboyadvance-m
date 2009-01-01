@@ -2782,8 +2782,15 @@ bool elfRead(const char *name, int& siz, FILE *f)
   long size = ftell(f);
   elfFileData = (u8 *)malloc(size);
   fseek(f, 0, SEEK_SET);
-  fread(elfFileData, 1, size, f);
+  int res = fread(elfFileData, 1, size, f);
   fclose(f);
+
+  if (res < 0)
+  {
+    free(elfFileData);
+    elfFileData = NULL;
+    return false;
+  }
 
   ELFHeader *header = (ELFHeader *)elfFileData;
 

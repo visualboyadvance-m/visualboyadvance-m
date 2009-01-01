@@ -245,8 +245,7 @@ void Bilinear32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
   u32 *to_odd = (u32 *)(dstPtr + dstPitch);
 
   int from_width = width;
-  if(width+1 < from_width)
-    from_width = width+1;
+
   u32 *from = (u32 *)srcPtr;
   fill_rgb_row_32(from, from_width, rgb_row_cur, width+1);
 
@@ -330,8 +329,7 @@ void BilinearPlus32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
   u32 *to_odd = (u32 *)(dstPtr + dstPitch);
 
   int from_width = width;
-  if(width+1 < from_width)
-    from_width = width+1;
+
   u32 *from = (u32 *)srcPtr;
   fill_rgb_row_32(from, from_width, rgb_row_cur, width+1);
 
