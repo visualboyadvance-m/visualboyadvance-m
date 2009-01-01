@@ -7,8 +7,8 @@
 #include "Util.h"
 #include "common/Port.h"
 
-#include "dmg/gb_apu/Gb_Apu.h"
-#include "dmg/gb_apu/Multi_Buffer.h"
+#include "apu/Gb_Apu.h"
+#include "apu/Multi_Buffer.h"
 
 #include "common/SoundDriver.h"
 
