@@ -2,7 +2,7 @@
 #define GBAINLINE_H
 
 #include "../System.h"
-#include "../Port.h"
+#include "../common/Port.h"
 #include "../RTC.h"
 #include "../Sound.h"
 #include "agbprint.h"

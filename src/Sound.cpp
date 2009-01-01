@@ -5,7 +5,7 @@
 #include "agb/GBA.h"
 #include "Globals.h"
 #include "Util.h"
-#include "Port.h"
+#include "common/Port.h"
 
 #include "dmg/gb_apu/Gb_Apu.h"
 #include "dmg/gb_apu/Multi_Buffer.h"

@@ -3,14 +3,8 @@
 #include <string.h>
 #include <zlib.h>
 
-#include "System.h"
-// #include "NLS.h"
-// #include "Util.h"
-// #include "Flash.h"
-// #include "agb/GBA.h"
-// #include "Globals.h"
-// #include "RTC.h"
-// #include "Port.h"
+#include "Patch.h"
+
 
 #ifdef __GNUC__
 #if defined(__APPLE__) || defined (BSD)
@@ -283,7 +277,7 @@ static int ppfVersion(FILE *f)
   }
 }
 
-int ppfFileIdLen(FILE *f, int version)
+static int ppfFileIdLen(FILE *f, int version)
 {
   if (version == 2) {
     fseeko64(f, -8, SEEK_END);
