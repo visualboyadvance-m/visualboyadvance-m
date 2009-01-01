@@ -1,5 +1,5 @@
 #include "../agb/GBA.h"
-#include "../Port.h"
+#include "../common/Port.h"
 #include "gbGlobals.h"
 #include "gbMemory.h"
 #include "gb.h"

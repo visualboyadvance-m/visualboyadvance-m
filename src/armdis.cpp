@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "System.h"
-#include "Port.h"
+#include "common/Port.h"
 #include "agb/GBA.h"
 #include "armdis.h"
 #include "elf.h"

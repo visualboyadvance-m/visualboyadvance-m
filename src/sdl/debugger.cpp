@@ -24,7 +24,7 @@
 #include <ctype.h>
 
 #include "../agb/GBA.h"
-#include "../Port.h"
+#include "../common/Port.h"
 #include "../Sound.h"
 #include "../armdis.h"
 #include "../elf.h"

@@ -40,7 +40,7 @@
 #include "../agb/GBA.h"
 #include "../agb/agbprint.h"
 #include "../Flash.h"
-#include "../Patch.h"
+#include "../common/Patch.h"
 #include "../RTC.h"
 #include "../Sound.h"
 #include "../Util.h"
