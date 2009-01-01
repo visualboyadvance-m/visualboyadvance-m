@@ -565,7 +565,7 @@
 			Name="Pixel Filter"
 			>
 			<File
-				RelativePath="..\..\src\2xSaI.cpp"
+				RelativePath="..\..\src\filters\2xSaI.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -577,7 +577,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\src\2xSaImmx.asm"
+				RelativePath="..\..\src\filters\2xSaImmx.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -599,19 +599,19 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\src\admame.cpp"
+				RelativePath="..\..\src\filters\admame.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\bilinear.cpp"
+				RelativePath="..\..\src\filters\bilinear.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\interframe.cpp"
+				RelativePath="..\..\src\filters\interframe.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\pixel.cpp"
+				RelativePath="..\..\src\filters\pixel.cpp"
 				>
 			</File>
 			<File
@@ -623,41 +623,41 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\scanline.cpp"
+				RelativePath="..\..\src\filters\scanline.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\simpleFilter.cpp"
+				RelativePath="..\..\src\filters\simpleFilter.cpp"
 				>
 			</File>
 			<Filter
 				Name="HQ"
 				>
 				<File
-					RelativePath="..\..\src\hq2x.cpp"
+					RelativePath="..\..\src\filters\hq2x.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\hq2x.h"
+					RelativePath="..\..\src\filters\hq2x.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\interp.h"
+					RelativePath="..\..\src\filters\interp.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\lq2x.h"
+					RelativePath="..\..\src\filters\lq2x.h"
 					>
 				</File>
 				<Filter
 					Name="3x_4x_asm"
 					>
 					<File
-						RelativePath="..\..\src\hq\asm\hq3x32.cpp"
+						RelativePath="..\..\src\filters\hq\asm\hq3x32.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\src\hq\asm\hq3x_16.asm"
+						RelativePath="..\..\src\filters\hq\asm\hq3x_16.asm"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -665,7 +665,7 @@
 							<Tool
 								Name="NASM"
 								Optimization="1"
-								IncludePath="../../src/hq/asm/"
+								IncludePath="../../src/filters/hq/asm/"
 								DisableOrphanLabelsWarning="true"
 								GenerateDebugInfo="true"
 							/>
@@ -682,7 +682,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\src\hq\asm\hq3x_32.asm"
+						RelativePath="..\..\src\filters\hq\asm\hq3x_32.asm"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -690,7 +690,7 @@
 							<Tool
 								Name="NASM"
 								Optimization="1"
-								IncludePath="../../src/hq/asm/"
+								IncludePath="../../src/filters/hq/asm/"
 								DisableOrphanLabelsWarning="true"
 								GenerateDebugInfo="true"
 							/>
@@ -707,7 +707,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\src\hq\asm\hq4x_16.asm"
+						RelativePath="..\..\src\filters\hq\asm\hq4x_16.asm"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -715,7 +715,7 @@
 							<Tool
 								Name="NASM"
 								Optimization="1"
-								IncludePath="../../src/hq/asm/"
+								IncludePath="../../src/filters/hq/asm/"
 								DisableOrphanLabelsWarning="true"
 								GenerateDebugInfo="true"
 							/>
@@ -732,7 +732,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\src\hq\asm\hq4x_32.asm"
+						RelativePath="..\..\src\filters\hq\asm\hq4x_32.asm"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -740,7 +740,7 @@
 							<Tool
 								Name="NASM"
 								Optimization="1"
-								IncludePath="../../src/hq/asm/"
+								IncludePath="../../src/filters/hq/asm/"
 								DisableOrphanLabelsWarning="true"
 								GenerateDebugInfo="true"
 							/>
@@ -757,7 +757,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\..\src\hq\asm\macros.mac"
+						RelativePath="..\..\src\filters\hq\asm\macros.mac"
 						>
 					</File>
 				</Filter>
