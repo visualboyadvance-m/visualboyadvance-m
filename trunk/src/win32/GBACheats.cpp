@@ -3,10 +3,10 @@
 #include "GBACheats.h"
 
 #include "../System.h"
-#include "../Cheats.h"
-#include "../CheatSearch.h"
-#include "../agb/GBA.h"
-#include "../Globals.h"
+#include "../gba/Cheats.h"
+#include "../gba/CheatSearch.h"
+#include "../gba/GBA.h"
+#include "../gba/Globals.h"
 
 #include "Reg.h"
 #include "StringTokenizer.h"

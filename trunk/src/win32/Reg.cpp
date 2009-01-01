@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "..\agb\GBALink.h"
+#include "..\gba\GBALink.h"
 
 static char buffer[2048];
 static HKEY vbKey = NULL;

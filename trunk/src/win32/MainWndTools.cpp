@@ -23,9 +23,9 @@
 #include "WinResUtil.h"
 #include "Logging.h"
 
-#include "../agb/GBA.h"
-#include "../Globals.h"
-#include "../Sound.h"
+#include "../gba/GBA.h"
+#include "../gba/Globals.h"
+#include "../gba/Sound.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

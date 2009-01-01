@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "vba.h"
 #include "LinkOptions.h"
-#include "../agb/GBALink.h"
+#include "../gba/GBALink.h"
 
 extern int lspeed;
 extern lserver ls;

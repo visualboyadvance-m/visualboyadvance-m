@@ -20,21 +20,21 @@
 #include "protect.h"
 
 #include "../System.h"
-#include "../agb/agbprint.h"
-#include "../cheatSearch.h"
-#include "../agb/GBA.h"
-#include "../Globals.h"
-#include "../RTC.h"
-#include "../Sound.h"
+#include "../gba/agbprint.h"
+#include "../gba/cheatSearch.h"
+#include "../gba/GBA.h"
+#include "../gba/Globals.h"
+#include "../gba/RTC.h"
+#include "../gba/Sound.h"
 #include "../Util.h"
-#include "../dmg/gbGlobals.h"
-#include "../dmg/gbPrinter.h"
-#include "../dmg/gbSound.h"
+#include "../gb/gbGlobals.h"
+#include "../gb/gbPrinter.h"
+#include "../gb/gbSound.h"
 #include "../common/SoundDriver.h"
 
 /* Link
 ---------------------*/
-#include "../agb/GBALink.h"
+#include "../gba/GBALink.h"
 /* ---------------- */
 
 extern void Pixelate(u8*,u32,u8*,u8*,u32,int,int);

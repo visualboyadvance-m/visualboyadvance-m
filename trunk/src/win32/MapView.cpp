@@ -6,8 +6,8 @@
 #include "WinResUtil.h"
 
 #include "../System.h"
-#include "../agb/GBA.h"
-#include "../Globals.h"
+#include "../gba/GBA.h"
+#include "../gba/Globals.h"
 #include "../NLS.h"
 #include "../Util.h"
 

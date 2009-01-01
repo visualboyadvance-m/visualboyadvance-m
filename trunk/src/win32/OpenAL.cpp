@@ -18,8 +18,8 @@
 #include <windows.h> // for 'Sleep' function
 
 // Internals
-#include "../Sound.h"
-#include "../Globals.h" // for 'speedup' and 'synchronize'
+#include "../gba/Sound.h"
+#include "../gba/Globals.h" // for 'speedup' and 'synchronize'
 
 // Debug
 #include <assert.h>

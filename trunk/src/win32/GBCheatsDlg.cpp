@@ -6,9 +6,9 @@
 #include "WinResUtil.h"
 
 #include "../System.h"
-#include "../CheatSearch.h"
-#include "../dmg/gbCheats.h"
-#include "../dmg/gbGlobals.h"
+#include "../gba/CheatSearch.h"
+#include "../gb/gbCheats.h"
+#include "../gb/gbGlobals.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

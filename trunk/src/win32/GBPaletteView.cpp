@@ -5,7 +5,7 @@
 #include "WinResUtil.h"
 
 #include "../System.h"
-#include "../dmg/gbGlobals.h"
+#include "../gb/gbGlobals.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

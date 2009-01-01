@@ -3,9 +3,9 @@
 #include "Disassemble.h"
 
 #include "../System.h"
-#include "../armdis.h"
-#include "../agb/GBA.h"
-#include "../Globals.h"
+#include "../gba/armdis.h"
+#include "../gba/GBA.h"
+#include "../gba/Globals.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
