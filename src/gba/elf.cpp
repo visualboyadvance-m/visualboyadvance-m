@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "gba/GBA.h"
-#include "common/Port.h"
+#include "GBA.h"
+#include "../common/Port.h"
 #include "elf.h"
-#include "NLS.h"
+#include "../NLS.h"
 
 #define elfReadMemory(addr) \
   READ32LE((&map[(addr)>>24].address[(addr) & map[(addr)>>24].mask]))

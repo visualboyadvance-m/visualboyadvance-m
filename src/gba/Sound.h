@@ -3,7 +3,7 @@
 
 // Sound emulation setup/options and GBA sound emulation
 
-#include "System.h"
+#include "../System.h"
 
 //// Setup/options (these affect GBA and GB sound)
 

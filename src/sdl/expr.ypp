@@ -9,7 +9,7 @@ namespace std {
 using namespace std;
  
 #include "../System.h"
-#include "../elf.h"
+#include "../gba/elf.h"
 #include "exprNode.h" 
 
 extern int yyerror(const char *);

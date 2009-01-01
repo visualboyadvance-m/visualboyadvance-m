@@ -2,7 +2,7 @@
 #define GFX_H
 
 #include "GBA.h"
-#include "../Globals.h"
+#include "Globals.h"
 
 #include "../common/Port.h"
 
