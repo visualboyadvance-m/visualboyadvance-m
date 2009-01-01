@@ -17,8 +17,6 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "../agb/GBA.h"
-#include "../dmg/gb.h"
-#include "../dmg/gbGlobals.h"
 #include "../Util.h"
 #include "../sdl/inputSDL.h"
 #include "../Sound.h"

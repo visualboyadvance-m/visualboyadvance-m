@@ -146,16 +146,16 @@ SET(SRC_AGB
     src/agb/GBA-arm.cpp
 )
 
-SET(SRC_DMG
-    src/dmg/GB.cpp
-    src/dmg/gbCheats.cpp
-    src/dmg/gbDis.cpp
-    src/dmg/gbGfx.cpp
-    src/dmg/gbGlobals.cpp
-    src/dmg/gbMemory.cpp
-    src/dmg/gbPrinter.cpp
-    src/dmg/gbSGB.cpp
-    src/dmg/gbSound.cpp
+SET(SRC_GB
+    src/gb/GB.cpp
+    src/gb/gbCheats.cpp
+    src/gb/gbDis.cpp
+    src/gb/gbGfx.cpp
+    src/gb/gbGlobals.cpp
+    src/gb/gbMemory.cpp
+    src/gb/gbPrinter.cpp
+    src/gb/gbSGB.cpp
+    src/gb/gbSound.cpp
 )
 
 SET(SRC_APU
@@ -269,7 +269,7 @@ ADD_LIBRARY (
     ${PROJECT_SRCS}
     ${SRC_MAIN}
     ${SRC_AGB}
-    ${SRC_DMG}
+    ${SRC_GB}
     ${SRC_APU}
     ${SRC_FEX_MINI}
     ${SRC_FILTERS}
