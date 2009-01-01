@@ -24,10 +24,10 @@
 #include <ctype.h>
 
 #include "../gba/GBA.h"
+#include "../gba/Sound.h"
+#include "../gba/armdis.h"
+#include "../gba/elf.h"
 #include "../common/Port.h"
-#include "../Sound.h"
-#include "../armdis.h"
-#include "../elf.h"
 #include "exprNode.h"
 
 extern bool debugger;

@@ -1,7 +1,7 @@
 #include <memory.h>
-#include "gba/GBA.h"
+#include "GBA.h"
 #include "EEprom.h"
-#include "Util.h"
+#include "../Util.h"
 
 extern int cpuDmaCount;
 

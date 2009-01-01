@@ -21,8 +21,8 @@
 #include <stdlib.h>
 
 #include "../gba/GBA.h"
+#include "../gba/elf.h"
 #include "../common/Port.h"
-#include "../elf.h"
 #include "exprNode.h"
 
 #ifndef __GNUC__

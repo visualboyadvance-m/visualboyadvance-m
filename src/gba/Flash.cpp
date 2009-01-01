@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <memory.h>
-#include "gba/GBA.h"
+#include "GBA.h"
 #include "Globals.h"
 #include "Flash.h"
 #include "Sram.h"
-#include "Util.h"
+#include "../Util.h"
 
 #define FLASH_READ_ARRAY         0
 #define FLASH_CMD_1              1

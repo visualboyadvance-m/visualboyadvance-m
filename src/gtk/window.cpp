@@ -27,10 +27,10 @@
 #include <SDL.h>
 
 #include "../gba/GBA.h"
+#include "../gba/Sound.h"
 #include "../gb/gb.h"
 #include "../gb/gbGlobals.h"
 #include "../gb/gbSound.h"
-#include "../Sound.h"
 #include "../Util.h"
 
 #include "tools.h"

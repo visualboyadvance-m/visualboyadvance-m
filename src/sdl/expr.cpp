@@ -88,7 +88,7 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 1 "expr.y"
+#line 1 "expr.ypp"
 
 namespace std {  
 #include <stdio.h>
@@ -100,7 +100,7 @@ namespace std {
 using namespace std;
  
 #include "../System.h"
-#include "../elf.h"
+#include "../gba/elf.h"
 #include "exprNode.h" 
 
 extern int yyerror(const char *);
@@ -145,7 +145,7 @@ typedef int YYSTYPE;
 
 
 /* Line 216 of yacc.c.  */
-#line 149 "expr.tab.c"
+#line 149 "expr.tab.cpp"
 
 #ifdef short
 # undef short
@@ -1345,68 +1345,68 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 32 "expr.y"
+#line 32 "expr.ypp"
     { result = (yyvsp[(1) - (1)]); ;}
     break;
 
   case 3:
-#line 36 "expr.y"
+#line 36 "expr.ypp"
     { (yyval) = (yyvsp[(1) - (1)]); ;}
     break;
 
   case 4:
-#line 37 "expr.y"
+#line 37 "expr.ypp"
     { (yyval) = (yyvsp[(2) - (3)]); ;}
     break;
 
   case 5:
-#line 38 "expr.y"
+#line 38 "expr.ypp"
     { (yyval) = exprNodeDot((yyvsp[(1) - (3)]), (yyvsp[(3) - (3)])); ;}
     break;
 
   case 6:
-#line 39 "expr.y"
+#line 39 "expr.ypp"
     { (yyval) = exprNodeArrow((yyvsp[(1) - (3)]), (yyvsp[(3) - (3)])); ;}
     break;
 
   case 7:
-#line 40 "expr.y"
+#line 40 "expr.ypp"
     { (yyval) = exprNodeArray((yyvsp[(1) - (4)]), (yyvsp[(3) - (4)])); ;}
     break;
 
   case 8:
-#line 43 "expr.y"
+#line 43 "expr.ypp"
     { (yyval) = (yyvsp[(1) - (1)]); ;}
     break;
 
   case 9:
-#line 44 "expr.y"
+#line 44 "expr.ypp"
     { (yyval) = exprNodeStar((yyvsp[(2) - (2)])); ;}
     break;
 
   case 10:
-#line 45 "expr.y"
+#line 45 "expr.ypp"
     { (yyval) = exprNodeAddr((yyvsp[(2) - (2)])); ;}
     break;
 
   case 11:
-#line 46 "expr.y"
+#line 46 "expr.ypp"
     { (yyval) = exprNodeSizeof((yyvsp[(3) - (4)])); ;}
     break;
 
   case 12:
-#line 50 "expr.y"
+#line 50 "expr.ypp"
     { (yyval) = exprNodeNumber(); ;}
     break;
 
   case 13:
-#line 54 "expr.y"
+#line 54 "expr.ypp"
     {(yyval) = exprNodeIdentifier(); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1410 "expr.tab.c"
+#line 1410 "expr.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1620,7 +1620,7 @@ yyreturn:
 }
 
 
-#line 57 "expr.y"
+#line 57 "expr.ypp"
 
 
 int yyerror(const char *s)

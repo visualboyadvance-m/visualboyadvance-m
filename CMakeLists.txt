@@ -118,21 +118,6 @@ SET( CMAKE_CXX_FLAGS "-O3 -Wall")
 
 # Source files definition
 SET(SRC_MAIN
-    src/bios.cpp
-    src/Cheats.cpp
-    src/CheatSearch.cpp
-    src/EEprom.cpp
-    src/Flash.cpp
-    src/Globals.cpp
-    src/Mode0.cpp
-    src/Mode1.cpp
-    src/Mode2.cpp
-    src/Mode3.cpp
-    src/Mode4.cpp
-    src/Mode5.cpp
-    src/RTC.cpp
-    src/Sound.cpp
-    src/Sram.cpp
     src/Util.cpp
     src/common/Patch.cpp
     src/common/memgzio.c
@@ -140,10 +125,24 @@ SET(SRC_MAIN
 
 SET(SRC_GBA
     src/gba/agbprint.cpp
+    src/gba/bios.cpp
+    src/gba/Cheats.cpp
+    src/gba/EEprom.cpp
+    src/gba/Flash.cpp
     src/gba/GBA.cpp
     src/gba/GBAGfx.cpp
     src/gba/GBA-thumb.cpp
     src/gba/GBA-arm.cpp
+    src/gba/Globals.cpp
+    src/gba/Mode0.cpp
+    src/gba/Mode1.cpp
+    src/gba/Mode2.cpp
+    src/gba/Mode3.cpp
+    src/gba/Mode4.cpp
+    src/gba/Mode5.cpp
+    src/gba/RTC.cpp
+    src/gba/Sound.cpp
+    src/gba/Sram.cpp
 )
 
 SET(SRC_GB
@@ -228,9 +227,9 @@ SET(SRC_GTK
 
 IF( NOT NO_DEBUGGER )
     SET(SRC_DEBUGGER
-        src/armdis.cpp
-        src/elf.cpp
-        src/remote.cpp
+        src/gba/armdis.cpp
+        src/gba/elf.cpp
+        src/gba/remote.cpp
     )
 ENDIF( NOT NO_DEBUGGER )
 

@@ -1,7 +1,7 @@
 #ifndef CHEATSEARCH_H
 #define CHEATSEARCH_H
 
-#include "System.h"
+#include "../System.h"
 
 struct CheatSearchBlock {
   int size;
