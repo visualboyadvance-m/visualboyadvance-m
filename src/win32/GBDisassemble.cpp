@@ -3,8 +3,8 @@
 #include "GBDisassemble.h"
 
 #include "../System.h"
-#include "../dmg/GB.h"
-#include "../dmg/gbGlobals.h"
+#include "../gb/GB.h"
+#include "../gb/gbGlobals.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

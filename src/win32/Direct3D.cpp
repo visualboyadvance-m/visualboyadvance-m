@@ -12,10 +12,10 @@
 #include "FullscreenSettings.h"
 
 #include "../System.h"
-#include "../agb/GBA.h"
-#include "../Globals.h"
+#include "../gba/GBA.h"
+#include "../gba/Globals.h"
 #include "../Util.h"
-#include "../dmg/gbGlobals.h"
+#include "../gb/gbGlobals.h"
 
 #include <memory.h>
 #include <cassert>

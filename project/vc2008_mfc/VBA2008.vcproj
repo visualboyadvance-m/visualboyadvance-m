@@ -288,75 +288,75 @@
 				Name="GB"
 				>
 				<File
-					RelativePath="..\..\src\dmg\gb.cpp"
+					RelativePath="..\..\src\gb\gb.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb.h"
+					RelativePath="..\..\src\gb\gb.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbCheats.cpp"
+					RelativePath="..\..\src\gb\gbCheats.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbCheats.h"
+					RelativePath="..\..\src\gb\gbCheats.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbCodes.h"
+					RelativePath="..\..\src\gb\gbCodes.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbCodesCB.h"
+					RelativePath="..\..\src\gb\gbCodesCB.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbDis.cpp"
+					RelativePath="..\..\src\gb\gbDis.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbGfx.cpp"
+					RelativePath="..\..\src\gb\gbGfx.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbGlobals.cpp"
+					RelativePath="..\..\src\gb\gbGlobals.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbGlobals.h"
+					RelativePath="..\..\src\gb\gbGlobals.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbMemory.cpp"
+					RelativePath="..\..\src\gb\gbMemory.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbMemory.h"
+					RelativePath="..\..\src\gb\gbMemory.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbPrinter.cpp"
+					RelativePath="..\..\src\gb\gbPrinter.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbPrinter.h"
+					RelativePath="..\..\src\gb\gbPrinter.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbSGB.cpp"
+					RelativePath="..\..\src\gb\gbSGB.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbSGB.h"
+					RelativePath="..\..\src\gb\gbSGB.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbSound.cpp"
+					RelativePath="..\..\src\gb\gbSound.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gbSound.h"
+					RelativePath="..\..\src\gb\gbSound.h"
 					>
 				</File>
 			</Filter>
@@ -364,59 +364,59 @@
 				Name="GB APU"
 				>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\blargg_common.h"
+					RelativePath="..\..\src\apu\blargg_common.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\blargg_config.h"
+					RelativePath="..\..\src\apu\blargg_config.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\blargg_source.h"
+					RelativePath="..\..\src\apu\blargg_source.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Blip_Buffer.cpp"
+					RelativePath="..\..\src\apu\Blip_Buffer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Blip_Buffer.h"
+					RelativePath="..\..\src\apu\Blip_Buffer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Effects_Buffer.cpp"
+					RelativePath="..\..\src\apu\Effects_Buffer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Effects_Buffer.h"
+					RelativePath="..\..\src\apu\Effects_Buffer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Gb_Apu.cpp"
+					RelativePath="..\..\src\apu\Gb_Apu.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Gb_Apu.h"
+					RelativePath="..\..\src\apu\Gb_Apu.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Gb_Apu_State.cpp"
+					RelativePath="..\..\src\apu\Gb_Apu_State.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Gb_Oscs.cpp"
+					RelativePath="..\..\src\apu\Gb_Oscs.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Gb_Oscs.h"
+					RelativePath="..\..\src\apu\Gb_Oscs.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Multi_Buffer.cpp"
+					RelativePath="..\..\src\apu\Multi_Buffer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\dmg\gb_apu\Multi_Buffer.h"
+					RelativePath="..\..\src\apu\Multi_Buffer.h"
 					>
 				</File>
 			</Filter>
@@ -424,135 +424,135 @@
 				Name="GBA"
 				>
 				<File
-					RelativePath="..\..\src\agb\agbprint.cpp"
+					RelativePath="..\..\src\gba\agbprint.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\agb\agbprint.h"
+					RelativePath="..\..\src\gba\agbprint.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\bios.cpp"
+					RelativePath="..\..\src\gba\bios.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\bios.h"
+					RelativePath="..\..\src\gba\bios.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\EEprom.cpp"
+					RelativePath="..\..\src\gba\EEprom.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\EEprom.h"
+					RelativePath="..\..\src\gba\EEprom.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\elf.cpp"
+					RelativePath="..\..\src\gba\elf.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\elf.h"
+					RelativePath="..\..\src\gba\elf.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Flash.cpp"
+					RelativePath="..\..\src\gba\Flash.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Flash.h"
+					RelativePath="..\..\src\gba\Flash.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\agb\gba-arm.cpp"
+					RelativePath="..\..\src\gba\gba-arm.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\agb\gba-thumb.cpp"
+					RelativePath="..\..\src\gba\gba-thumb.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\agb\gba.cpp"
+					RelativePath="..\..\src\gba\gba.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\agb\gba.h"
+					RelativePath="..\..\src\gba\gba.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\agb\GBAcpu.h"
+					RelativePath="..\..\src\gba\GBAcpu.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\agb\gbagfx.cpp"
+					RelativePath="..\..\src\gba\gbagfx.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\agb\gbagfx.h"
+					RelativePath="..\..\src\gba\gbagfx.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\agb\gbainline.h"
+					RelativePath="..\..\src\gba\gbainline.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Globals.cpp"
+					RelativePath="..\..\src\gba\Globals.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Globals.h"
+					RelativePath="..\..\src\gba\Globals.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Mode0.cpp"
+					RelativePath="..\..\src\gba\Mode0.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Mode1.cpp"
+					RelativePath="..\..\src\gba\Mode1.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Mode2.cpp"
+					RelativePath="..\..\src\gba\Mode2.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Mode3.cpp"
+					RelativePath="..\..\src\gba\Mode3.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Mode4.cpp"
+					RelativePath="..\..\src\gba\Mode4.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Mode5.cpp"
+					RelativePath="..\..\src\gba\Mode5.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\remote.cpp"
+					RelativePath="..\..\src\gba\remote.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\RTC.cpp"
+					RelativePath="..\..\src\gba\RTC.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\RTC.h"
+					RelativePath="..\..\src\gba\RTC.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Sound.cpp"
+					RelativePath="..\..\src\gba\Sound.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Sound.h"
+					RelativePath="..\..\src\gba\Sound.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Sram.cpp"
+					RelativePath="..\..\src\gba\Sram.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\Sram.h"
+					RelativePath="..\..\src\gba\Sram.h"
 					>
 				</File>
 				<File
@@ -767,35 +767,35 @@
 			Name="Functionality"
 			>
 			<File
-				RelativePath="..\..\src\armdis.cpp"
+				RelativePath="..\..\src\gba\armdis.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\armdis.h"
+				RelativePath="..\..\src\gba\armdis.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Cheats.cpp"
+				RelativePath="..\..\src\gba\Cheats.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Cheats.h"
+				RelativePath="..\..\src\gba\Cheats.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\CheatSearch.cpp"
+				RelativePath="..\..\src\gba\CheatSearch.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\CheatSearch.h"
+				RelativePath="..\..\src\gba\CheatSearch.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\memgzio.c"
+				RelativePath="..\..\src\common\memgzio.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\memgzio.h"
+				RelativePath="..\..\src\common\memgzio.h"
 				>
 			</File>
 			<File
@@ -803,15 +803,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Patch.cpp"
+				RelativePath="..\..\src\common\Patch.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Patch.h"
+				RelativePath="..\..\src\common\Patch.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Port.h"
+				RelativePath="..\..\src\common\Port.h"
 				>
 			</File>
 			<File
@@ -907,11 +907,11 @@
 			Name="Linking"
 			>
 			<File
-				RelativePath="..\..\src\agb\gbalink.cpp"
+				RelativePath="..\..\src\gba\gbalink.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\agb\gbalink.h"
+				RelativePath="..\..\src\gba\gbalink.h"
 				>
 			</File>
 			<File

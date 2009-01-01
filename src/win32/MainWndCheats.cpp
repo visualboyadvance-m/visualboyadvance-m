@@ -7,9 +7,9 @@
 #include "Reg.h"
 #include "WinResUtil.h"
 
-#include "../agb/GBA.h"
-#include "../Globals.h"
-#include "../dmg/gbCheats.h"
+#include "../gba/GBA.h"
+#include "../gba/Globals.h"
+#include "../gb/gbCheats.h"
 
 extern int emulating;
 

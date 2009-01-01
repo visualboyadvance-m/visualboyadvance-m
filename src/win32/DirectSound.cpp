@@ -7,9 +7,9 @@
 
 // Internals
 #include "../System.h"
-#include "../agb/GBA.h"
-#include "../Globals.h"
-#include "../Sound.h"
+#include "../gba/GBA.h"
+#include "../gba/Globals.h"
+#include "../gba/Sound.h"
 #include "../common/SoundDriver.h"
 
 // DirectSound8

@@ -21,15 +21,15 @@
 #include "AudioCoreSettingsDlg.h"
 
 #include "../System.h"
-#include "../agb/agbprint.h"
-#include "../agb/GBA.h"
-#include "../Globals.h"
-#include "../Sound.h"
-#include "../dmg/GB.h"
-#include "../dmg/gbGlobals.h"
-#include "../dmg/gbPrinter.h"
-#include "../dmg/gbSound.h"
-#include "../agb/GBALink.h"
+#include "../gba/agbprint.h"
+#include "../gba/GBA.h"
+#include "../gba/Globals.h"
+#include "../gba/Sound.h"
+#include "../gb/GB.h"
+#include "../gb/gbGlobals.h"
+#include "../gb/gbPrinter.h"
+#include "../gb/gbSound.h"
+#include "../gba/GBALink.h"
 
 #include <tchar.h>
 
