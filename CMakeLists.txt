@@ -156,12 +156,15 @@ SET(SRC_DMG
     src/dmg/gbPrinter.cpp
     src/dmg/gbSGB.cpp
     src/dmg/gbSound.cpp
-    src/dmg/gb_apu/Blip_Buffer.cpp
-    src/dmg/gb_apu/Effects_Buffer.cpp
-    src/dmg/gb_apu/Gb_Apu.cpp
-    src/dmg/gb_apu/Gb_Apu_State.cpp
-    src/dmg/gb_apu/Gb_Oscs.cpp
-    src/dmg/gb_apu/Multi_Buffer.cpp
+)
+
+SET(SRC_APU
+    src/apu/Blip_Buffer.cpp
+    src/apu/Effects_Buffer.cpp
+    src/apu/Gb_Apu.cpp
+    src/apu/Gb_Apu_State.cpp
+    src/apu/Gb_Oscs.cpp
+    src/apu/Multi_Buffer.cpp
 )
 
 SET(SRC_SDL
@@ -267,6 +270,7 @@ ADD_LIBRARY (
     ${SRC_MAIN}
     ${SRC_AGB}
     ${SRC_DMG}
+    ${SRC_APU}
     ${SRC_FEX_MINI}
     ${SRC_FILTERS}
     ${SRC_DEBUGGER}
