@@ -23,7 +23,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "../agb/GBA.h"
+#include "../gba/GBA.h"
 #include "../common/Port.h"
 #include "../Sound.h"
 #include "../armdis.h"

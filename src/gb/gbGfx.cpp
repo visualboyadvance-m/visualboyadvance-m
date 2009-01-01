@@ -1,6 +1,7 @@
 #include <memory.h>
 
-#include "../Globals.h"
+#include "../common/Types.h"
+#include "../Util.h"
 #include "gbGlobals.h"
 #include "gbSGB.h"
 
@@ -42,6 +43,7 @@ u8 gbInvertTab[256] = {
 u16 gbLineMix[160];
 u16 gbWindowColor[160];
 extern int inUseRegister_WY;
+extern int layerSettings;
 
 void gbRenderLine()
 {

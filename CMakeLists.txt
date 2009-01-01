@@ -138,12 +138,12 @@ SET(SRC_MAIN
     src/common/memgzio.c
 )
 
-SET(SRC_AGB
-    src/agb/agbprint.cpp
-    src/agb/GBA.cpp
-    src/agb/GBAGfx.cpp
-    src/agb/GBA-thumb.cpp
-    src/agb/GBA-arm.cpp
+SET(SRC_GBA
+    src/gba/agbprint.cpp
+    src/gba/GBA.cpp
+    src/gba/GBAGfx.cpp
+    src/gba/GBA-thumb.cpp
+    src/gba/GBA-arm.cpp
 )
 
 SET(SRC_GB
@@ -268,7 +268,7 @@ ADD_LIBRARY (
     vbamcore
     ${PROJECT_SRCS}
     ${SRC_MAIN}
-    ${SRC_AGB}
+    ${SRC_GBA}
     ${SRC_GB}
     ${SRC_APU}
     ${SRC_FEX_MINI}
