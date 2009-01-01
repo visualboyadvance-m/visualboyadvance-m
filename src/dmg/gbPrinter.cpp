@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <memory.h>
-#include "../agb/GBA.h"
+#include "../System.h"
 
 u8 gbPrinterStatus = 0;
 int gbPrinterState = 0;
