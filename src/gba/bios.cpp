@@ -369,7 +369,7 @@ void BIOS_Diff8bitUnFilterWram()
   source += 4;
 
   if(((source & 0xe000000) == 0) ||
-     ((source + ((header >> 8) & 0x1fffff) & 0xe000000) == 0))
+     (((source + ((header >> 8) & 0x1fffff)) & 0xe000000) == 0))
     return;
 
   int len = header >> 8;

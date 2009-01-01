@@ -168,10 +168,12 @@ int remotePipeRecv(char *data, int len)
 bool remotePipeInit()
 {
   char dummy;
-  read(0, &dummy, 1);
-  if(dummy != '+') {
-    fprintf(stderr, "ACK not received\n");
-    exit(-1);
+  if (read(0, &dummy, 1) == 1)
+  {
+    if(dummy != '+') {
+      fprintf(stderr, "ACK not received\n");
+      exit(-1);
+    }
   }
 
   return true;

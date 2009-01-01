@@ -3852,11 +3852,13 @@ static bool gbReadSaveState(gzFile gzFile)
   systemDrawScreen();
 
   if(version > GBSAVE_GAME_VERSION_1)
+  {
     if( skipSaveGameCheats ) {
       gbCheatsReadGameSkip(gzFile, version);
     } else {
       gbCheatsReadGame(gzFile, version);
     }
+  }
 
   if (version<11)
   {
