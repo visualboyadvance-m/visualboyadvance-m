@@ -13,7 +13,7 @@ extern "C" {
 #include "NLS.h"
 #include "Util.h"
 #include "Flash.h"
-#include "agb/GBA.h"
+#include "gba/GBA.h"
 #include "Globals.h"
 #include "RTC.h"
 #include "common/Port.h"

@@ -2,7 +2,7 @@
 
 #include "Sound.h"
 
-#include "agb/GBA.h"
+#include "gba/GBA.h"
 #include "Globals.h"
 #include "Util.h"
 #include "common/Port.h"

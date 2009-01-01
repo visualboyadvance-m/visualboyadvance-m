@@ -1,5 +1,5 @@
 #include "System.h"
-#include "agb/GBA.h"
+#include "gba/GBA.h"
 #include "Globals.h"
 #include "common/Port.h"
 #include "Util.h"

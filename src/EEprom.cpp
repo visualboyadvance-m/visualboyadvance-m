@@ -1,5 +1,5 @@
 #include <memory.h>
-#include "agb/GBA.h"
+#include "gba/GBA.h"
 #include "EEprom.h"
 #include "Util.h"
 
