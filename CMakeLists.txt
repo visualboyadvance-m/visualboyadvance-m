@@ -109,9 +109,9 @@ ENDIF( NOT USE_ASM_CORE )
 
 # Compiler flags
 IF ( WIN32 )
-    SET( CMAKE_ASM_FLAGS "-Isrc/hq/asm/ -O1 -w-orphan-labels")
+    SET( CMAKE_ASM_FLAGS "-Isrc/filters/hq/asm/ -O1 -w-orphan-labels")
 ELSE ( WIN32 )
-    SET( CMAKE_ASM_FLAGS "-Isrc/hq/asm/ -O1 -DELF -w-orphan-labels")
+    SET( CMAKE_ASM_FLAGS "-Isrc/filters/hq/asm/ -O1 -DELF -w-orphan-labels")
 ENDIF ( WIN32 )
 SET( CMAKE_C_FLAGS "-O3 -Wall")
 SET( CMAKE_CXX_FLAGS "-O3 -Wall")
