@@ -40,11 +40,14 @@ static const char* get_gzip_size( const char* path, long* eof )
 		return "Couldn't open file";
 
 	unsigned char buf [4];
-	int res;
 	if ( fread( buf, 2, 1, file ) > 0 && buf [0] == 0x1F && buf [1] == 0x8B )
 	{
 		fseek( file, -4, SEEK_END );
-		res = fread( buf, 4, 1, file );
+		if ( !fread( buf, 4, 1, file ) )
+		{
+			fclose( file );
+			return "Couldn't get file size";
+		}
 		*eof = buf [3] * 0x1000000 + buf [2] * 0x10000 + buf [1] * 0x100 + buf [0];
 	}
 	else
@@ -52,7 +55,7 @@ static const char* get_gzip_size( const char* path, long* eof )
 		fseek( file, 0, SEEK_END );
 		*eof = ftell( file );
 	}
-	const char* err = ((res != 1) || ferror( file ) || feof( file )) ? "Couldn't get file size" : 0;
+	const char* err = (ferror( file ) || feof( file )) ? "Couldn't get file size" : 0;
 	fclose( file );
 	return err;
 }
