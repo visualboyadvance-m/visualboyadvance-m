@@ -29,7 +29,6 @@
 #include "../gba/Sound.h"
 #include "../gb/gb.h"
 #include "../gb/gbGlobals.h"
-#include "../gb/gbPrinter.h"
 #include "../Util.h"
 #include "../sdl/inputSDL.h"
 
@@ -39,6 +38,7 @@
 #include "directoriesconfig.h"
 #include "displayconfig.h"
 #include "soundconfig.h"
+#include "gameboyconfig.h"
 
 namespace VBA
 {
@@ -471,36 +471,6 @@ void Window::vOnFlashSizeToggled(Gtk::CheckMenuItem * _poCMI, int _iFlashSize)
   m_poCoreConfig->vSetKey("flash_size", _iFlashSize);
 }
 
-void Window::vOnGBBorderToggled(Gtk::CheckMenuItem * _poCMI)
-{
-  gbBorderOn = _poCMI->get_active();
-  if (emulating && m_eCartridge == CartridgeGB && _poCMI->get_active())
-  {
-    gbSgbRenderBorder();
-  }
-  vUpdateScreen();
-  m_poCoreConfig->vSetKey("gb_border", _poCMI->get_active());
-}
-
-void Window::vOnGBPrinterToggled(Gtk::CheckMenuItem * _poCMI)
-{
-  if (_poCMI->get_active())
-  {
-    gbSerialFunction = gbPrinterSend;
-  }
-  else
-  {
-    gbSerialFunction = NULL;
-  }
-  m_poCoreConfig->vSetKey("gb_printer", _poCMI->get_active());
-}
-
-void Window::vOnEmulatorTypeToggled(Gtk::CheckMenuItem * _poCMI, int _iEmulatorType)
-{
-  gbEmulatorType = _iEmulatorType;
-  m_poCoreConfig->vSetKey("emulator_type", _iEmulatorType);
-}
-
 void Window::vOnJoypadConfigure()
 {
   JoypadConfigDialog oDialog(m_poInputConfig);
@@ -529,6 +499,19 @@ void Window::vOnSoundConfigure()
   SoundConfigDialog * poDialog = 0;
   poBuilder->get_widget_derived("SoundConfigDialog", poDialog);
   poDialog->vSetConfig(m_poSoundConfig, this);
+  poDialog->set_transient_for(*this);
+  poDialog->run();
+  poDialog->hide();
+}
+
+void Window::vOnGameBoyConfigure()
+{
+  std::string sUiFile = sGetUiFilePath("gameboy.ui");
+  Glib::RefPtr<Gtk::Builder> poBuilder = Gtk::Builder::create_from_file(sUiFile);
+
+  GameBoyConfigDialog * poDialog = 0;
+  poBuilder->get_widget_derived("GameBoyConfigDialog", poDialog);
+  poDialog->vSetConfig(m_poCoreConfig, this);
   poDialog->set_transient_for(*this);
   poDialog->run();
   poDialog->hide();

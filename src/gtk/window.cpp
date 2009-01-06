@@ -31,6 +31,7 @@
 #include "../gb/gb.h"
 #include "../gb/gbGlobals.h"
 #include "../gb/gbSound.h"
+#include "../gb/gbPrinter.h"
 #include "../Util.h"
 
 #include "tools.h"
@@ -145,6 +146,9 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   vApplyConfigFilterIB();
   vApplyConfigMute();
   vApplyConfigVolume();
+  vApplyConfigGBSystem();
+  vApplyConfigGBBorder();
+  vApplyConfigGBPrinter();
 
   Gtk::MenuItem *      poMI;
   Gtk::CheckMenuItem * poCMI;
@@ -390,49 +394,9 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
                                       poCMI, astFlashSize[i].m_iFlashSize));
   }
 
-  // Gameboy menu
-  //
-  poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("GameboyBorder"));
-  poCMI->set_active(m_poCoreConfig->oGetKey<bool>("gb_border"));
-  vOnGBBorderToggled(poCMI);
-  poCMI->signal_toggled().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnGBBorderToggled),
-                                    poCMI));
-
-  poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("GameboyPrinter"));
-  poCMI->set_active(m_poCoreConfig->oGetKey<bool>("gb_printer"));
-  vOnGBPrinterToggled(poCMI);
-  poCMI->signal_toggled().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnGBPrinterToggled),
-                                    poCMI));
-
-  struct
-  {
-    const char *        m_csName;
-    const EEmulatorType m_eEmulatorType;
-  }
-  astEmulatorType[] =
-  {
-    { "GameboyAutomatic", EmulatorAuto },
-    { "GameboyGba",       EmulatorGBA  },
-    { "GameboyCgb",       EmulatorCGB  },
-    { "GameboySgb",       EmulatorSGB  },
-    { "GameboySgb2",      EmulatorSGB2 },
-    { "GameboyGb",        EmulatorGB   }
-  };
-  EEmulatorType eDefaultEmulatorType = (EEmulatorType)m_poCoreConfig->oGetKey<int>("emulator_type");
-  for (guint i = 0; i < G_N_ELEMENTS(astEmulatorType); i++)
-  {
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astEmulatorType[i].m_csName));
-    if (astEmulatorType[i].m_eEmulatorType == eDefaultEmulatorType)
-    {
-      poCMI->set_active();
-      vOnEmulatorTypeToggled(poCMI, eDefaultEmulatorType);
-    }
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnEmulatorTypeToggled),
-                                      poCMI, astEmulatorType[i].m_eEmulatorType));
-  }
+  // Game Boy menu
+  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("GameBoyConfigure"));
+  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnGameBoyConfigure));
 
   // Display menu
   poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("DisplayConfigure"));
@@ -932,6 +896,35 @@ void Window::vApplyConfigSoundSampleRate()
     gbSoundSetSampleRate(iSoundSampleRate);
   }
 }
+
+void Window::vApplyConfigGBSystem()
+{
+  gbEmulatorType = m_poCoreConfig->oGetKey<int>("emulator_type");
+}
+
+void Window::vApplyConfigGBBorder()
+{
+  gbBorderOn = m_poCoreConfig->oGetKey<bool>("gb_border");
+  if (emulating && m_eCartridge == CartridgeGB && gbBorderOn)
+  {
+    gbSgbRenderBorder();
+  }
+  vUpdateScreen();
+}
+
+void Window::vApplyConfigGBPrinter()
+{
+  bool bPrinter = m_poCoreConfig->oGetKey<bool>("gb_printer");
+  if (bPrinter)
+  {
+    gbSerialFunction = gbPrinterSend;
+  }
+  else
+  {
+    gbSerialFunction = NULL;
+  }
+}
+
 
 void Window::vHistoryAdd(const std::string & _rsFile)
 {

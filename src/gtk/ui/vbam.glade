@@ -605,81 +605,10 @@
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="GameboyMenu">
+                      <widget class="GtkMenuItem" id="GameBoyConfigure">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">_Gameboy</property>
+                        <property name="label" translatable="yes">_Game Boy ...</property>
                         <property name="use_underline">True</property>
-                        <child>
-                          <widget class="GtkMenu" id="GameboyMenu_menu">
-                            <child>
-                              <widget class="GtkCheckMenuItem" id="GameboyBorder">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Border</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkCheckMenuItem" id="GameboyPrinter">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Printer</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkSeparatorMenuItem" id="separator16">
-                                <property name="visible">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="GameboyAutomatic">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Automatic</property>
-                                <property name="use_underline">True</property>
-                                <property name="active">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="GameboyGba">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_GBA</property>
-                                <property name="use_underline">True</property>
-                                <property name="group">GameboyAutomatic</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="GameboyCgb">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_CGB/GBC</property>
-                                <property name="use_underline">True</property>
-                                <property name="group">GameboyAutomatic</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="GameboySgb">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_SGB</property>
-                                <property name="use_underline">True</property>
-                                <property name="group">GameboyAutomatic</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="GameboySgb2">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">SGB_2</property>
-                                <property name="use_underline">True</property>
-                                <property name="group">GameboyAutomatic</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkRadioMenuItem" id="GameboyGb">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">G_B</property>
-                                <property name="use_underline">True</property>
-                                <property name="group">GameboyAutomatic</property>
-                              </widget>
-                            </child>
-                          </widget>
-                        </child>
                       </widget>
                     </child>
                     <child>

@@ -60,6 +60,16 @@ public:
     OutputOpenGL,
     OutputXvideo
   };
+  
+  enum EEmulatorType
+  {
+    EmulatorAuto,
+    EmulatorCGB,
+    EmulatorSGB,
+    EmulatorGB,
+    EmulatorGBA,
+    EmulatorSGB2
+  };
 
   // GB/GBA screen sizes
   const int m_iGBScreenWidth;
@@ -82,6 +92,9 @@ public:
   void vApplyConfigMute();
   void vApplyConfigVolume();
   void vApplyConfigSoundSampleRate();
+  void vApplyConfigGBSystem();
+  void vApplyConfigGBBorder();
+  void vApplyConfigGBPrinter();
   void vUpdateScreen();
 
   inline ECartridge eGetCartridge() const { return m_eCartridge; }
@@ -114,16 +127,6 @@ protected:
     SoundOn
   };
 
-  enum EEmulatorType
-  {
-    EmulatorAuto,
-    EmulatorCGB,
-    EmulatorSGB,
-    EmulatorGB,
-    EmulatorGBA,
-    EmulatorSGB2
-  };
-
   enum EColorFormat
   {
     ColorFormatRGB,
@@ -153,12 +156,10 @@ protected:
   virtual void vOnShowSpeedToggled(Gtk::CheckMenuItem * _poCMI, int _iShowSpeed);
   virtual void vOnSaveTypeToggled(Gtk::CheckMenuItem * _poCMI, int _iSaveType);
   virtual void vOnFlashSizeToggled(Gtk::CheckMenuItem * _poCMI, int _iFlashSize);
-  virtual void vOnGBBorderToggled(Gtk::CheckMenuItem * _poCMI);
-  virtual void vOnGBPrinterToggled(Gtk::CheckMenuItem * _poCMI);
-  virtual void vOnEmulatorTypeToggled(Gtk::CheckMenuItem * _poCMI, int _iEmulatorType);
   virtual void vOnJoypadConfigure();
   virtual void vOnDisplayConfigure();
   virtual void vOnSoundConfigure();
+  virtual void vOnGameBoyConfigure();
   virtual void vOnHelpAbout();
   virtual bool bOnEmuIdle();
 
