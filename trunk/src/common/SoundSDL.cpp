@@ -87,7 +87,7 @@ bool SoundSDL::init(long sampleRate)
 	audio.freq = sampleRate;
 	audio.format = AUDIO_S16SYS;
 	audio.channels = 2;
-	audio.samples = sampleRate / 60;
+	audio.samples = 1024;
 	audio.callback = soundCallback;
 	audio.userdata = this;
 
