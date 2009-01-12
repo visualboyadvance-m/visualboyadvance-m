@@ -56,7 +56,7 @@ struct {
 }
 static const astFilters[] =
 {
-  { "None",                1, { NULL,         NULL           } },
+  { "None",                1, { 0,            0              } },
   { "2xSaI",               2, { _2xSaI,       _2xSaI32       } },
   { "Super 2xSaI",         2, { Super2xSaI,   Super2xSaI32   } },
   { "Super Eagle",         2, { SuperEagle,   SuperEagle32   } },
@@ -76,7 +76,7 @@ struct {
 }
 static const astFiltersIB[] =
 {
-  { "None",                      { NULL,         NULL           } },
+  { "None",                      { 0,            0              } },
   { "Smart interframe blending", { SmartIB,      SmartIB32      } },
   { "Interframe motion blur",    { MotionBlurIB, MotionBlurIB32 } }
 };

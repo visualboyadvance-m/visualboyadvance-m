@@ -452,7 +452,7 @@ void sdlMakeStretcher(int width, int sizeOption)
 
 #else // C_CORE
 
-void (*sdlStretcher)(u8 *, u8*, int) = NULL;
+void (*sdlStretcher)(u8 *, u8*, int) = 0;
 
 #define SDL_CALL_STRETCHER \
        sdlStretcher(srcPtr, dstPtr, width)

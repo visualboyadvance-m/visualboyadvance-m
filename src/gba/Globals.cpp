@@ -40,15 +40,15 @@ bool skipSaveGameCheats = false;
 // 0x0000 to 0x7FFF: set custom 15 bit color
 int customBackdropColor = -1;
 
-u8 *bios = NULL;
-u8 *rom = NULL;
-u8 *internalRAM = NULL;
-u8 *workRAM = NULL;
-u8 *paletteRAM = NULL;
-u8 *vram = NULL;
-u8 *pix = NULL;
-u8 *oam = NULL;
-u8 *ioMem = NULL;
+u8 *bios = 0;
+u8 *rom = 0;
+u8 *internalRAM = 0;
+u8 *workRAM = 0;
+u8 *paletteRAM = 0;
+u8 *vram = 0;
+u8 *pix = 0;
+u8 *oam = 0;
+u8 *ioMem = 0;
 
 u16 DISPCNT  = 0x0080;
 u16 DISPSTAT = 0x0000;
