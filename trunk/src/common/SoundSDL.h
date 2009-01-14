@@ -41,8 +41,8 @@ private:
 	SDL_cond  * _cond;
 	SDL_mutex * _mutex;
 
-	// Hold up to 100 ms of data in the ring buffer
-	static const float _delay = 0.1f;
+	// Defines what delay in seconds we keep in the sound buffer
+	static const float _delay;
 
 	static void soundCallback(void *data, u8 *stream, int length);
 	virtual void read(u16 * stream, int length);

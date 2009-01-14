@@ -20,6 +20,9 @@
 extern int emulating;
 extern bool speedup;
 
+// Hold up to 100 ms of data in the ring buffer
+const float SoundSDL::_delay = 0.1f;
+
 SoundSDL::SoundSDL():
 	_rbuf(0)
 {
