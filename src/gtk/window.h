@@ -245,6 +245,7 @@ private:
   int m_bFullscreen;
   int m_iScreenWidth;
   int m_iScreenHeight;
+  int m_iFrameCount;
 
   std::string    m_sRomFile;
   ECartridge     m_eCartridge;

@@ -43,8 +43,6 @@
 #include "screenarea-opengl.h"
 #endif // USE_OPENGL
 
-extern int systemRenderedFrames;
-extern int systemFPS;
 extern int RGB_LOW_BITS_MASK;
 
 
@@ -556,12 +554,11 @@ void Window::vInitSystem()
   systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
   systemFrameSkip = 2;
 
-  systemRenderedFrames = 0;
-  systemFPS = 0;
-
   emulating = 0;
 
   gbFrameSkip = 0;
+  
+  m_iFrameCount = 0;
 
   soundInit();
 }
@@ -1149,6 +1146,7 @@ void Window::vPopupErrorV(const char * _csFormat, va_list _args)
 void Window::vDrawScreen()
 {
   m_poScreenArea->vDrawPixels(pix);
+  m_iFrameCount++;
 }
 
 void Window::vDrawDefaultScreen()
@@ -1173,9 +1171,11 @@ void Window::vShowSpeed(int _iSpeed)
   else if (m_eShowSpeed == ShowDetailed)
   {
     snprintf(csTitle, 50, "VBA-M - %d%% (%d, %d fps)",
-             _iSpeed, systemFrameSkip, systemFPS);
+             _iSpeed, systemFrameSkip, m_iFrameCount);
     set_title(csTitle);
   }
+  
+  m_iFrameCount = 0;
 }
 
 void Window::vComputeFrameskip(int _iRate)
