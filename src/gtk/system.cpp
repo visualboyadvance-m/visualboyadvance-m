@@ -39,11 +39,6 @@ u16  systemGbPalette[24];
 int  emulating;
 int  RGB_LOW_BITS_MASK;
 
-// Extra vars, only used for the GUI
-//
-int systemRenderedFrames;
-int systemFPS;
-
 inline VBA::Window * GUI()
 {
   return VBA::Window::poGetInstance();
@@ -62,7 +57,6 @@ void systemMessage(int _iId, const char * _csFormat, ...)
 void systemDrawScreen()
 {
   GUI()->vDrawScreen();
-  systemRenderedFrames++;
 }
 
 bool systemReadJoypads()
@@ -77,9 +71,6 @@ u32 systemReadJoypad(int joy)
 
 void systemShowSpeed(int _iSpeed)
 {
-  systemFPS = systemRenderedFrames;
-  systemRenderedFrames = 0;
-
   GUI()->vShowSpeed(_iSpeed);
 }
 
