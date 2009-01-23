@@ -19,9 +19,7 @@
 #ifndef __VBA_GAMEBOYCONFIG_H__
 #define __VBA_GAMEBOYCONFIG_H__
 
-#include <gtkmm/dialog.h>
-#include <gtkmm/builder.h>
-#include <gtkmm/combobox.h>
+#include <gtkmm.h>
 
 #include "configfile.h"
 #include "window.h"
@@ -40,6 +38,8 @@ private:
   void vOnSystemChanged();
   void vOnBorderChanged();
   void vOnPrinterChanged();
+  void vOnUseBootRomChanged();
+  void vOnBootRomSelectionChanged();
 
   VBA::Window *             m_poWindow;
 
@@ -47,6 +47,8 @@ private:
   Gtk::ComboBox *           m_poSystemComboBox;
   Gtk::CheckButton *        m_poBorderCheckButton;
   Gtk::CheckButton *        m_poPrinterCheckButton;
+  Gtk::CheckButton *        m_poBootRomCheckButton;
+  Gtk::FileChooserButton *  m_poBootRomFileChooserButton;
 };
 
 } // namespace VBA

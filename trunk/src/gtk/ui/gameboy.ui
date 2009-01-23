@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!--Generated with glade3 3.4.5 on Tue Jan  6 21:21:29 2009 -->
+<!--Generated with glade3 3.4.5 on Fri Jan 23 14:39:58 2009 -->
 <interface>
   <object class="GtkListStore" id="model1">
     <columns>
@@ -28,7 +28,7 @@
   </object>
   <object class="GtkDialog" id="GameBoyConfigDialog">
     <property name="border_width">5</property>
-    <property name="title" translatable="yes">Game Boy games settings</property>
+    <property name="title" translatable="yes">GameBoy settings</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="has_separator">False</property>
@@ -36,59 +36,140 @@
       <object class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>
         <child>
-          <object class="GtkVBox" id="vbox1">
+          <object class="GtkFrame" id="frame1">
             <property name="visible">True</property>
+            <property name="label_xalign">0</property>
+            <property name="shadow_type">GTK_SHADOW_NONE</property>
             <child>
-              <object class="GtkHBox" id="hbox1">
+              <object class="GtkAlignment" id="alignment1">
                 <property name="visible">True</property>
+                <property name="left_padding">12</property>
                 <child>
-                  <object class="GtkLabel" id="label1">
+                  <object class="GtkVBox" id="vbox1">
                     <property name="visible">True</property>
-                    <property name="label" translatable="yes">Emulated system : </property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkComboBox" id="SystemComboBox">
-                    <property name="visible">True</property>
-                    <property name="model">model1</property>
                     <child>
-                      <object class="GtkCellRendererText" id="renderer1"/>
-                      <attributes>
-                        <attribute name="text">0</attribute>
-                      </attributes>
+                      <object class="GtkHBox" id="hbox1">
+                        <property name="visible">True</property>
+                        <child>
+                          <object class="GtkLabel" id="label1">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">Emulated system : </property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkComboBox" id="SystemComboBox">
+                            <property name="visible">True</property>
+                            <property name="model">model1</property>
+                            <child>
+                              <object class="GtkCellRendererText" id="renderer1"/>
+                              <attributes>
+                                <attribute name="text">0</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="BorderCheckButton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="label" translatable="yes">Display Super Game Boy borders</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="PrinterCheckButton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="label" translatable="yes">Emulate a Game Boy Printer</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing>
+                        <property name="position">2</property>
+                      </packing>
                     </child>
                   </object>
-                  <packing>
-                    <property name="position">1</property>
-                  </packing>
                 </child>
               </object>
             </child>
-            <child>
-              <object class="GtkCheckButton" id="BorderCheckButton">
+            <child type="label">
+              <object class="GtkLabel" id="label2">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="label" translatable="yes">Display Super Game Boy borders</property>
-                <property name="draw_indicator">True</property>
+                <property name="label" translatable="yes">&lt;b&gt;System and peripherals&lt;/b&gt;</property>
+                <property name="use_markup">True</property>
               </object>
-              <packing>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkCheckButton" id="PrinterCheckButton">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="label" translatable="yes">Emulate a Game Boy Printer</property>
-                <property name="draw_indicator">True</property>
-              </object>
-              <packing>
-                <property name="position">2</property>
-              </packing>
             </child>
           </object>
           <packing>
             <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkFrame" id="frame2">
+            <property name="visible">True</property>
+            <property name="label_xalign">0</property>
+            <property name="shadow_type">GTK_SHADOW_NONE</property>
+            <child>
+              <object class="GtkAlignment" id="alignment2">
+                <property name="visible">True</property>
+                <property name="left_padding">12</property>
+                <child>
+                  <object class="GtkVBox" id="vbox2">
+                    <property name="visible">True</property>
+                    <child>
+                      <object class="GtkCheckButton" id="BootRomCheckButton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="label" translatable="yes">Use a Game Boy boot ROM file</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkHBox" id="hbox2">
+                        <property name="visible">True</property>
+                        <child>
+                          <object class="GtkLabel" id="label4">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">Boot ROM file : </property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkFileChooserButton" id="BootRomFileChooserButton">
+                            <property name="visible">True</property>
+                          </object>
+                          <packing>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child type="label">
+              <object class="GtkLabel" id="label3">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">&lt;b&gt;Boot ROM&lt;/b&gt;</property>
+                <property name="use_markup">True</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="position">2</property>
           </packing>
         </child>
         <child internal-child="action_area">
