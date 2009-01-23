@@ -33,7 +33,6 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 extern void remoteCleanUp();
-extern int gbHardware;
 
 /////////////////////////////////////////////////////////////////////////////
 // MainWnd

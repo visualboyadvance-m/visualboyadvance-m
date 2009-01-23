@@ -633,8 +633,10 @@ void Window::vInitConfig()
   m_poCoreConfig->vSetKey("bios_file",         ""           );
   m_poCoreConfig->vSetKey("save_type",         SaveAuto     );
   m_poCoreConfig->vSetKey("flash_size",        64           );
-  m_poCoreConfig->vSetKey("gb_border",         true         );
+  m_poCoreConfig->vSetKey("gb_border",         false        );
   m_poCoreConfig->vSetKey("gb_printer",        false        );
+  m_poCoreConfig->vSetKey("gb_use_bios_file",  false        );
+  m_poCoreConfig->vSetKey("gb_bios_file",      ""           );
   m_poCoreConfig->vSetKey("emulator_type",     EmulatorAuto );
 
   // Display section
@@ -733,6 +735,16 @@ void Window::vCheckConfig()
   if (m_poCoreConfig->sGetKey("bios_file") == "")
   {
     m_poCoreConfig->vSetKey("use_bios_file", false);
+  }
+
+  sValue = m_poCoreConfig->sGetKey("gb_bios_file");
+  if (sValue != "" && ! Glib::file_test(sValue, Glib::FILE_TEST_IS_REGULAR))
+  {
+    m_poCoreConfig->vSetKey("gb_bios_file", "");
+  }
+  if (m_poCoreConfig->sGetKey("gb_bios_file") == "")
+  {
+    m_poCoreConfig->vSetKey("gb_use_bios_file", false);
   }
 
   iValue = m_poCoreConfig->oGetKey<int>("save_type");
@@ -1031,6 +1043,21 @@ bool Window::bLoadROM(const std::string & _rsFile)
     {
       m_eCartridge = CartridgeGB;
       m_stEmulator = GBSystem;
+      
+      useBios = m_poCoreConfig->oGetKey<bool>("gb_use_bios_file");
+      gbGetHardwareType();
+      
+      if (gbHardware & 5)
+      {
+        gbCPUInit(m_poCoreConfig->sGetKey("gb_bios_file").c_str(), useBios);
+      }
+      
+      // If the bios file was rejected by gbCPUInit
+      if (m_poCoreConfig->oGetKey<bool>("gb_use_bios_file") && ! useBios)
+      {
+        m_poCoreConfig->vSetKey("gb_bios_file", "");
+      }
+      
       gbReset();
     }
   }

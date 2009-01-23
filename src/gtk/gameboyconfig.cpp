@@ -34,10 +34,14 @@ GameBoyConfigDialog::GameBoyConfigDialog(GtkDialog* _pstDialog, const Glib::RefP
   refBuilder->get_widget("SystemComboBox", m_poSystemComboBox);
   refBuilder->get_widget("BorderCheckButton", m_poBorderCheckButton);
   refBuilder->get_widget("PrinterCheckButton", m_poPrinterCheckButton);
+  refBuilder->get_widget("BootRomCheckButton", m_poBootRomCheckButton);
+  refBuilder->get_widget("BootRomFileChooserButton", m_poBootRomFileChooserButton);
 
   m_poSystemComboBox->signal_changed().connect(sigc::mem_fun(*this, &GameBoyConfigDialog::vOnSystemChanged));
   m_poBorderCheckButton->signal_toggled().connect(sigc::mem_fun(*this, &GameBoyConfigDialog::vOnBorderChanged));
   m_poPrinterCheckButton->signal_toggled().connect(sigc::mem_fun(*this, &GameBoyConfigDialog::vOnPrinterChanged));
+  m_poBootRomCheckButton->signal_toggled().connect(sigc::mem_fun(*this, &GameBoyConfigDialog::vOnUseBootRomChanged));
+  m_poBootRomFileChooserButton->signal_selection_changed().connect(sigc::mem_fun(*this, &GameBoyConfigDialog::vOnBootRomSelectionChanged));
 }
 
 void GameBoyConfigDialog::vSetConfig(Config::Section * _poConfig, VBA::Window * _poWindow)
@@ -55,6 +59,13 @@ void GameBoyConfigDialog::vSetConfig(Config::Section * _poConfig, VBA::Window * 
 
   bool bPrinter = m_poConfig->oGetKey<bool>("gb_printer");
   m_poPrinterCheckButton->set_active(bPrinter);
+  
+  bool bUseBootRom = m_poConfig->oGetKey<bool>("gb_use_bios_file");
+  m_poBootRomCheckButton->set_active(bUseBootRom);
+  m_poBootRomFileChooserButton->set_sensitive(bUseBootRom);
+  
+  std::string sBootRom = m_poConfig->oGetKey<std::string>("gb_bios_file");
+  m_poBootRomFileChooserButton->set_filename(sBootRom);
 }
 
 void GameBoyConfigDialog::vOnSystemChanged()
@@ -87,6 +98,19 @@ void GameBoyConfigDialog::vOnPrinterChanged()
   bool bPrinter = m_poPrinterCheckButton->get_active();
   m_poConfig->vSetKey("gb_printer", bPrinter);
   m_poWindow->vApplyConfigGBPrinter();
+}
+
+void GameBoyConfigDialog::vOnUseBootRomChanged()
+{
+  bool bUseBootRom = m_poBootRomCheckButton->get_active();
+  m_poConfig->vSetKey("gb_use_bios_file", bUseBootRom);
+  m_poBootRomFileChooserButton->set_sensitive(bUseBootRom);
+}
+
+void GameBoyConfigDialog::vOnBootRomSelectionChanged()
+{
+  std::string sBootRom = m_poBootRomFileChooserButton->get_filename();
+  m_poConfig->vSetKey("gb_bios_file", sBootRom);
 }
 
 } // namespace VBA

@@ -86,8 +86,6 @@ extern void remoteOutput(const char *, u32);
 extern void remoteSetProtocol(int);
 extern void remoteSetPort(int);
 
-extern int gbHardware;
-
 struct EmulatedSystem emulator = {
   NULL,
   NULL,
