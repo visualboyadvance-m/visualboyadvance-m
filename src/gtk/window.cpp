@@ -147,6 +147,8 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   vApplyConfigGBSystem();
   vApplyConfigGBBorder();
   vApplyConfigGBPrinter();
+  vApplyConfigGBASaveType();
+  vApplyConfigGBAFlashSize();
 
   Gtk::MenuItem *      poMI;
   Gtk::CheckMenuItem * poCMI;
@@ -296,19 +298,6 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
                                     sigc::mem_fun(*this, &Window::vOnPauseWhenInactiveToggled),
                                     poCMI));
 
-  m_poUseBiosItem = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget("EmulatorUseBios"));
-  m_poUseBiosItem->set_active(m_poCoreConfig->oGetKey<bool>("use_bios_file"));
-  if (m_poCoreConfig->sGetKey("bios_file") == "")
-  {
-    m_poUseBiosItem->set_sensitive(false);
-  }
-  m_poUseBiosItem->signal_toggled().connect(sigc::bind(
-                                              sigc::mem_fun(*this, &Window::vOnUseBiosToggled),
-                                              m_poUseBiosItem));
-
-  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("EmulatorSelectBios"));
-  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnSelectBios));
-
   // Show speed menu
   //
   struct
@@ -336,65 +325,13 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
                                       poCMI, astShowSpeed[i].m_eShowSpeed));
   }
 
-  // Save type menu
-  //
-  struct
-  {
-    const char *    m_csName;
-    const ESaveType m_eSaveType;
-  }
-  astSaveType[] =
-  {
-    { "SaveTypeAutomatic",    SaveAuto         },
-    { "SaveTypeEeprom",       SaveEEPROM       },
-    { "SaveTypeSram",         SaveSRAM         },
-    { "SaveTypeFlash",        SaveFlash        },
-    { "SaveTypeEepromSensor", SaveEEPROMSensor },
-    { "SaveTypeNone",         SaveNone         }
-  };
-  ESaveType eDefaultSaveType = (ESaveType)m_poCoreConfig->oGetKey<int>("save_type");
-  for (guint i = 0; i < G_N_ELEMENTS(astSaveType); i++)
-  {
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astSaveType[i].m_csName));
-    if (astSaveType[i].m_eSaveType == eDefaultSaveType)
-    {
-      poCMI->set_active();
-      vOnSaveTypeToggled(poCMI, eDefaultSaveType);
-    }
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnSaveTypeToggled),
-                                      poCMI, astSaveType[i].m_eSaveType));
-  }
-
-  // Flash size menu
-  //
-  struct
-  {
-    const char * m_csName;
-    const int    m_iFlashSize;
-  }
-  astFlashSize[] =
-  {
-    { "SaveTypeFlash64K",   64 },
-    { "SaveTypeFlash128K", 128 }
-  };
-  int iDefaultFlashSize = m_poCoreConfig->oGetKey<int>("flash_size");
-  for (guint i = 0; i < G_N_ELEMENTS(astFlashSize); i++)
-  {
-    poCMI = dynamic_cast<Gtk::CheckMenuItem *>(_poXml->get_widget(astFlashSize[i].m_csName));
-    if (astFlashSize[i].m_iFlashSize == iDefaultFlashSize)
-    {
-      poCMI->set_active();
-      vOnFlashSizeToggled(poCMI, iDefaultFlashSize);
-    }
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnFlashSizeToggled),
-                                      poCMI, astFlashSize[i].m_iFlashSize));
-  }
-
   // Game Boy menu
   poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("GameBoyConfigure"));
   poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnGameBoyConfigure));
+
+  // Game Boy Advance menu
+  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("GameBoyAdvanceConfigure"));
+  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnGameBoyAdvanceConfigure));
 
   // Display menu
   poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("DisplayConfigure"));
@@ -934,6 +871,24 @@ void Window::vApplyConfigGBPrinter()
   }
 }
 
+void Window::vApplyConfigGBASaveType()
+{
+  int iSaveType = m_poCoreConfig->oGetKey<int>("save_type");
+  cpuSaveType = iSaveType;
+}
+
+void Window::vApplyConfigGBAFlashSize()
+{
+  int iFlashSize = m_poCoreConfig->oGetKey<int>("flash_size");
+  if (iFlashSize == 64)
+  {
+    flashSetSize(0x10000);
+  }
+  else
+  {
+    flashSetSize(0x20000);
+  }
+}
 
 void Window::vHistoryAdd(const std::string & _rsFile)
 {

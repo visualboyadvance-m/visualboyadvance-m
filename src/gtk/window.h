@@ -71,6 +71,16 @@ public:
     EmulatorSGB2
   };
 
+  enum ESaveType
+  {
+    SaveAuto,
+    SaveEEPROM,
+    SaveSRAM,
+    SaveFlash,
+    SaveEEPROMSensor,
+    SaveNone
+  };
+
   // GB/GBA screen sizes
   const int m_iGBScreenWidth;
   const int m_iGBScreenHeight;
@@ -95,6 +105,8 @@ public:
   void vApplyConfigGBSystem();
   void vApplyConfigGBBorder();
   void vApplyConfigGBPrinter();
+  void vApplyConfigGBASaveType();
+  void vApplyConfigGBAFlashSize();
   void vUpdateScreen();
 
   inline ECartridge eGetCartridge() const { return m_eCartridge; }
@@ -108,16 +120,6 @@ protected:
     ShowNone,
     ShowPercentage,
     ShowDetailed
-  };
-
-  enum ESaveType
-  {
-    SaveAuto,
-    SaveEEPROM,
-    SaveSRAM,
-    SaveFlash,
-    SaveEEPROMSensor,
-    SaveNone
   };
 
   enum ESoundStatus
@@ -151,15 +153,12 @@ protected:
   virtual void vOnVideoFullscreen();
   virtual void vOnDirectories();
   virtual void vOnPauseWhenInactiveToggled(Gtk::CheckMenuItem * _poCMI);
-  virtual void vOnSelectBios();
-  virtual void vOnUseBiosToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnShowSpeedToggled(Gtk::CheckMenuItem * _poCMI, int _iShowSpeed);
-  virtual void vOnSaveTypeToggled(Gtk::CheckMenuItem * _poCMI, int _iSaveType);
-  virtual void vOnFlashSizeToggled(Gtk::CheckMenuItem * _poCMI, int _iFlashSize);
   virtual void vOnJoypadConfigure();
   virtual void vOnDisplayConfigure();
   virtual void vOnSoundConfigure();
   virtual void vOnGameBoyConfigure();
+  virtual void vOnGameBoyAdvanceConfigure();
   virtual void vOnHelpAbout();
   virtual bool bOnEmuIdle();
 
