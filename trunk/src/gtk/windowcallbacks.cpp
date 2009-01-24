@@ -39,6 +39,7 @@
 #include "displayconfig.h"
 #include "soundconfig.h"
 #include "gameboyconfig.h"
+#include "gameboyadvanceconfig.h"
 
 namespace VBA
 {
@@ -378,55 +379,6 @@ void Window::vOnPauseWhenInactiveToggled(Gtk::CheckMenuItem * _poCMI)
   m_poDisplayConfig->vSetKey("pause_when_inactive", _poCMI->get_active());
 }
 
-void Window::vOnSelectBios()
-{
-  Gtk::FileChooserDialog oDialog(*this, _("Select BIOS file"));
-  oDialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-  oDialog.add_button(Gtk::Stock::OPEN,   Gtk::RESPONSE_OK);
-
-  if (m_poCoreConfig->sGetKey("bios_file") != "")
-  {
-    oDialog.set_filename(m_poCoreConfig->sGetKey("bios_file"));
-  }
-
-  const char * acsPattern[] =
-  {
-    "*.[bB][iI][nN]", "*.[aA][gG][bB]", "*.[gG][bB][aA]",
-    "*.[bB][iI][oO][sS]", "*.[zZ][iI][pP]", "*.[zZ]", "*.[gG][zZ]"
-  };
-
-  Gtk::FileFilter oAllFilter;
-  oAllFilter.set_name(_("All files"));
-  oAllFilter.add_pattern("*");
-
-  Gtk::FileFilter oBiosFilter;
-  oBiosFilter.set_name(_("Gameboy Advance BIOS"));
-  for (guint i = 0; i < G_N_ELEMENTS(acsPattern); i++)
-  {
-    oBiosFilter.add_pattern(acsPattern[i]);
-  }
-
-  oDialog.add_filter(oAllFilter);
-  oDialog.add_filter(oBiosFilter);
-
-  oDialog.set_filter(oBiosFilter);
-
-  while (oDialog.run() == Gtk::RESPONSE_OK)
-  {
-    if (Glib::file_test(oDialog.get_filename(), Glib::FILE_TEST_IS_REGULAR))
-    {
-      m_poCoreConfig->vSetKey("bios_file", oDialog.get_filename());
-      m_poUseBiosItem->set_sensitive();
-      break;
-    }
-  }
-}
-
-void Window::vOnUseBiosToggled(Gtk::CheckMenuItem * _poCMI)
-{
-  m_poCoreConfig->vSetKey("use_bios_file", _poCMI->get_active());
-}
-
 void Window::vOnShowSpeedToggled(Gtk::CheckMenuItem * _poCMI, int _iShowSpeed)
 {
   if (! _poCMI->get_active())
@@ -440,35 +392,6 @@ void Window::vOnShowSpeedToggled(Gtk::CheckMenuItem * _poCMI, int _iShowSpeed)
     vSetDefaultTitle();
   }
   m_poDisplayConfig->vSetKey("show_speed", _iShowSpeed);
-}
-
-void Window::vOnSaveTypeToggled(Gtk::CheckMenuItem * _poCMI, int _iSaveType)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  cpuSaveType = _iSaveType;
-  m_poCoreConfig->vSetKey("save_type", _iSaveType);
-}
-
-void Window::vOnFlashSizeToggled(Gtk::CheckMenuItem * _poCMI, int _iFlashSize)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  if (_iFlashSize == 64)
-  {
-    flashSetSize(0x10000);
-  }
-  else
-  {
-    flashSetSize(0x20000);
-  }
-  m_poCoreConfig->vSetKey("flash_size", _iFlashSize);
 }
 
 void Window::vOnJoypadConfigure()
@@ -516,6 +439,20 @@ void Window::vOnGameBoyConfigure()
   poDialog->run();
   poDialog->hide();
 }
+
+void Window::vOnGameBoyAdvanceConfigure()
+{
+  std::string sUiFile = sGetUiFilePath("gameboyadvance.ui");
+  Glib::RefPtr<Gtk::Builder> poBuilder = Gtk::Builder::create_from_file(sUiFile);
+
+  GameBoyAdvanceConfigDialog * poDialog = 0;
+  poBuilder->get_widget_derived("GameBoyAdvanceConfigDialog", poDialog);
+  poDialog->vSetConfig(m_poCoreConfig, this);
+  poDialog->set_transient_for(*this);
+  poDialog->run();
+  poDialog->hide();
+}
+
 
 void Window::vOnHelpAbout()
 {

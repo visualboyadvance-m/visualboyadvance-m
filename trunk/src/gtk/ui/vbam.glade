@@ -501,105 +501,6 @@
                                 </child>
                               </widget>
                             </child>
-                            <child>
-                              <widget class="GtkMenuItem" id="SaveTypeMenu">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">Save type</property>
-                                <property name="use_underline">True</property>
-                                <child>
-                                  <widget class="GtkMenu" id="SaveTypeMenu_menu">
-                                    <child>
-                                      <widget class="GtkRadioMenuItem" id="SaveTypeAutomatic">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">_Automatic</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="active">True</property>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkRadioMenuItem" id="SaveTypeEeprom">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">EEPROM</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="group">SaveTypeAutomatic</property>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkRadioMenuItem" id="SaveTypeSram">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">SRAM</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="group">SaveTypeAutomatic</property>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkRadioMenuItem" id="SaveTypeFlash">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">Flash</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="group">SaveTypeAutomatic</property>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkRadioMenuItem" id="SaveTypeEepromSensor">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">EEPROM+Sensor</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="group">SaveTypeAutomatic</property>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkRadioMenuItem" id="SaveTypeNone">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">None</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="group">SaveTypeAutomatic</property>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkSeparatorMenuItem" id="separator10">
-                                        <property name="visible">True</property>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkRadioMenuItem" id="SaveTypeFlash64K">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">Flash 64K</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="active">True</property>
-                                      </widget>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkRadioMenuItem" id="SaveTypeFlash128K">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes">Flash 128K</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="group">SaveTypeFlash64K</property>
-                                      </widget>
-                                    </child>
-                                  </widget>
-                                </child>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkSeparatorMenuItem" id="separator31">
-                                <property name="visible">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkMenuItem" id="EmulatorSelectBios">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Select BIOS file...</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                            </child>
-                            <child>
-                              <widget class="GtkCheckMenuItem" id="EmulatorUseBios">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">_Use BIOS file</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                            </child>
                           </widget>
                         </child>
                       </widget>
@@ -608,6 +509,13 @@
                       <widget class="GtkMenuItem" id="GameBoyConfigure">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">_Game Boy ...</property>
+                        <property name="use_underline">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="GameBoyAdvanceConfigure">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Game Boy _Advance ...</property>
                         <property name="use_underline">True</property>
                       </widget>
                     </child>
@@ -628,7 +536,7 @@
                     <child>
                       <widget class="GtkMenuItem" id="DirectoriesConfigure">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">_Directories ...</property>
+                        <property name="label" translatable="yes">D_irectories ...</property>
                         <property name="use_underline">True</property>
                       </widget>
                     </child>
