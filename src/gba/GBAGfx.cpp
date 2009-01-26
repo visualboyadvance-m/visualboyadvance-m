@@ -20,10 +20,6 @@ int gfxBG3Changed = 0;
 
 int gfxBG2X = 0;
 int gfxBG2Y = 0;
-int gfxBG2LastX = 0;
-int gfxBG2LastY = 0;
 int gfxBG3X = 0;
 int gfxBG3Y = 0;
-int gfxBG3LastX = 0;
-int gfxBG3LastY = 0;
 int gfxLastVCOUNT = 0;
