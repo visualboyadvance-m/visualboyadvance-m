@@ -87,12 +87,8 @@ extern int gfxBG3Changed;
 
 extern int gfxBG2X;
 extern int gfxBG2Y;
-extern int gfxBG2LastX;
-extern int gfxBG2LastY;
 extern int gfxBG3X;
 extern int gfxBG3Y;
-extern int gfxBG3LastX;
-extern int gfxBG3LastY;
 extern int gfxLastVCOUNT;
 
 static inline void gfxClearArray(u32 *array)
