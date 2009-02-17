@@ -676,7 +676,7 @@
 							<Tool
 								Name="NASM"
 								Optimization="1"
-								IncludePath="../../src/hq/asm/"
+								IncludePath="../../src/filters/hq/asm/"
 								DisableOrphanLabelsWarning="true"
 							/>
 						</FileConfiguration>
@@ -701,7 +701,7 @@
 							<Tool
 								Name="NASM"
 								Optimization="1"
-								IncludePath="../../src/hq/asm/"
+								IncludePath="../../src/filters/hq/asm/"
 								DisableOrphanLabelsWarning="true"
 							/>
 						</FileConfiguration>
@@ -726,7 +726,7 @@
 							<Tool
 								Name="NASM"
 								Optimization="1"
-								IncludePath="../../src/hq/asm/"
+								IncludePath="../../src/filters/hq/asm/"
 								DisableOrphanLabelsWarning="true"
 							/>
 						</FileConfiguration>
@@ -751,7 +751,7 @@
 							<Tool
 								Name="NASM"
 								Optimization="1"
-								IncludePath="../../src/hq/asm/"
+								IncludePath="../../src/filters/hq/asm/"
 								DisableOrphanLabelsWarning="true"
 							/>
 						</FileConfiguration>
