@@ -48,15 +48,23 @@ void ScreenAreaGl::on_realize()
 {
   Gtk::DrawingArea::on_realize();
 
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
+  Glib::RefPtr<Gdk::GL::Window> glwindow = get_gl_window();
+  if (!glwindow->gl_begin(get_gl_context()))
+    return;
 
-  glOrtho(0.0, 1.0, 1.0, 0.0, 0.0, 1.0);
+    glViewport(0, 0, get_width(), get_height());
 
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
 
-  glClearColor(0.0, 0.0, 0.0, 1.0);
+    glOrtho(0.0, 1.0, 1.0, 0.0, 0.0, 1.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+
+  glwindow->gl_end();
 }
 
 void ScreenAreaGl::vDrawPixels(u8 * _puiData)
@@ -77,21 +85,28 @@ void ScreenAreaGl::vDrawBlackScreen()
 
 void ScreenAreaGl::vOnWidgetResize()
 {
-  m_dScaleFactor = min<double>(get_height() / (double)m_iScaledHeight, get_width() / (double)m_iScaledWidth);
-  glViewport(0, 0, get_width(), get_height());
+  Glib::RefPtr<Gdk::GL::Window> glwindow = get_gl_window();
 
-  m_dAreaTop = 1 - m_dScaleFactor * m_iScaledHeight / (double)get_height();
-  m_dAreaLeft = 1 - m_dScaleFactor * m_iScaledWidth / (double)get_width();
+  if (!glwindow->gl_begin(get_gl_context()))
+    return;
+
+    glViewport(0, 0, get_width(), get_height());
+  
+  glwindow->gl_end();
+
+  m_dScaleFactor = min<double>(get_height() / (double)m_iScaledHeight, get_width() / (double)m_iScaledWidth);
+  m_dAreaTop = (1 - m_dScaleFactor * m_iScaledHeight / (double)get_height()) / 2;
+  m_dAreaLeft = (1 - m_dScaleFactor * m_iScaledWidth / (double)get_width()) / 2;
 }
 
 bool ScreenAreaGl::on_expose_event(GdkEventExpose * _pstEvent)
 {
-  Glib::RefPtr<Gdk::GL::Window> glwindow = get_gl_window();
-
-  glRasterPos2f(-1.0f + m_dAreaLeft, 1.0f - m_dAreaTop);
   glPixelZoom(m_dScaleFactor, -m_dScaleFactor);
+  glRasterPos2f(m_dAreaLeft, m_dAreaTop);
+  
   glPixelStorei(GL_UNPACK_ROW_LENGTH, m_iScaledWidth + 1);
 
+  Glib::RefPtr<Gdk::GL::Window> glwindow = get_gl_window();
   if (!glwindow->gl_begin(get_gl_context()))
     return false;
 
