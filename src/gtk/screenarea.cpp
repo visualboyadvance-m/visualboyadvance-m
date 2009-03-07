@@ -218,8 +218,6 @@ void ScreenArea::vUpdateSize()
   m_iScaledWidth = m_iFilterScale * m_iWidth;
   m_iScaledHeight = m_iFilterScale * m_iHeight;
 
-  vOnWidgetResize();
-
   m_puiPixels = new u32[(m_iScaledWidth + 1) * m_iScaledHeight];
   m_puiDelta = new u8[(m_iWidth + 2) * (m_iHeight + 2) * sizeof(u32)];
   memset(m_puiPixels, 0, (m_iScaledWidth + 1) * m_iScaledHeight * sizeof(u32));
