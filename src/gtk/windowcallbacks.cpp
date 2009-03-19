@@ -44,6 +44,26 @@
 namespace VBA
 {
 
+void Window::vOnMenuEnter()
+{
+  if (emulating && ! m_bPaused)
+  {
+    m_poScreenArea->vSetEnableRender(false);
+    vStopEmu();
+    soundPause();
+  }
+}
+
+void Window::vOnMenuExit()
+{
+  if (emulating && ! m_bPaused)
+  {
+    m_poScreenArea->vSetEnableRender(true);
+    vStartEmu();
+    soundResume();
+  }
+}
+
 void Window::vOnFileOpen()
 {
   while (m_poFileOpenDialog->run() == Gtk::RESPONSE_OK)

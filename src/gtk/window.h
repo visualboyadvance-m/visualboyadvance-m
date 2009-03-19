@@ -135,6 +135,8 @@ protected:
     ColorFormatBGR
   };
 
+  virtual void vOnMenuEnter();
+  virtual void vOnMenuExit();
   virtual void vOnFileOpen();
   virtual void vOnFileLoad();
   virtual void vOnFileSave();
