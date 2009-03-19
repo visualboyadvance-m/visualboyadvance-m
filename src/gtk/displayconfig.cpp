@@ -38,14 +38,12 @@ DisplayConfigDialog::DisplayConfigDialog(GtkDialog* _pstDialog, const Glib::RefP
   refBuilder->get_widget("DefaultScaleComboBox", m_poDefaultScaleComboBox);
   refBuilder->get_widget("OutputOpenGL", m_poOutputOpenGLRadioButton);
   refBuilder->get_widget("OutputCairo", m_poOutputCairoRadioButton);
-  refBuilder->get_widget("OutputXv", m_poOutputXvRadioButton);
 
   m_poFiltersComboBox->signal_changed().connect(sigc::mem_fun(*this, &DisplayConfigDialog::vOnFilterChanged));
   m_poIBFiltersComboBox->signal_changed().connect(sigc::mem_fun(*this, &DisplayConfigDialog::vOnFilterIBChanged));
   m_poDefaultScaleComboBox->signal_changed().connect(sigc::mem_fun(*this, &DisplayConfigDialog::vOnScaleChanged));
   m_poOutputOpenGLRadioButton->signal_toggled().connect(sigc::bind(sigc::mem_fun(*this, &DisplayConfigDialog::vOnOutputChanged), VBA::Window::OutputOpenGL));
   m_poOutputCairoRadioButton->signal_toggled().connect(sigc::bind(sigc::mem_fun(*this, &DisplayConfigDialog::vOnOutputChanged), VBA::Window::OutputCairo));
-  m_poOutputXvRadioButton->signal_toggled().connect(sigc::bind(sigc::mem_fun(*this, &DisplayConfigDialog::vOnOutputChanged), VBA::Window::OutputXvideo));
 
 
   // Populate the filters combobox
@@ -90,9 +88,6 @@ void DisplayConfigDialog::vSetConfig(Config::Section * _poConfig, VBA::Window * 
     case VBA::Window::OutputOpenGL:
       m_poOutputOpenGLRadioButton->set_active();
       break;
-    case VBA::Window::OutputXvideo:
-      m_poOutputXvRadioButton->set_active();
-      break;
     default:
       m_poOutputCairoRadioButton->set_active();
       break;
@@ -121,12 +116,17 @@ void DisplayConfigDialog::vOnFilterIBChanged()
 
 void DisplayConfigDialog::vOnOutputChanged(VBA::Window::EVideoOutput _eOutput)
 {
+  VBA::Window::EVideoOutput eOldOutput = (VBA::Window::EVideoOutput)m_poConfig->oGetKey<int>("output");
+
+  if (_eOutput == eOldOutput)
+    return;
+  
   if (_eOutput == VBA::Window::OutputOpenGL && m_poOutputOpenGLRadioButton->get_active())
     m_poConfig->vSetKey("output", VBA::Window::OutputOpenGL);
   else if (_eOutput == VBA::Window::OutputCairo && m_poOutputCairoRadioButton->get_active())
     m_poConfig->vSetKey("output", VBA::Window::OutputCairo);
-  else if (_eOutput == VBA::Window::OutputXvideo && m_poOutputXvRadioButton->get_active())
-    m_poConfig->vSetKey("output", VBA::Window::OutputXvideo);
+
+g_message("caca");
 
   m_poWindow->vApplyConfigScreenArea();
 }

@@ -57,8 +57,7 @@ public:
   enum EVideoOutput
   {
     OutputCairo,
-    OutputOpenGL,
-    OutputXvideo
+    OutputOpenGL
   };
   
   enum EEmulatorType
