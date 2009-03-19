@@ -430,7 +430,9 @@ void Window::vOnDisplayConfigure()
   poBuilder->get_widget_derived("DisplayConfigDialog", poDialog);
   poDialog->vSetConfig(m_poDisplayConfig, this);
   poDialog->set_transient_for(*this);
+  m_poScreenArea->vSetEnableRender(false);
   poDialog->run();
+  m_poScreenArea->vSetEnableRender(true);
   poDialog->hide();
 }
 
