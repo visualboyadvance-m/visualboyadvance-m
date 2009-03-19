@@ -38,6 +38,7 @@ public:
   void vSetScale(int _iScale);
   void vSetFilter(EFilter _eFilter);
   void vSetFilterIB(EFilterIB _eFilterIB);
+  void vSetEnableRender(bool _bEnable);
   virtual void vDrawPixels(u8 * _puiData);
   virtual void vDrawBlackScreen() = 0;
 
@@ -60,6 +61,7 @@ protected:
   u8 *     m_puiDelta;
   int      m_iScaledWidth;
   int      m_iScaledHeight;
+  bool     m_bEnableRender;
 
   bool             m_bShowCursor;
   Gdk::Cursor *    m_poEmptyCursor;

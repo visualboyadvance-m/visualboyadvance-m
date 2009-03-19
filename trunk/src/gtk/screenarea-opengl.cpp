@@ -27,7 +27,9 @@ template<typename T> T min( T x, T y ) { return x < y ? x : y; }
 template<typename T> T max( T x, T y ) { return x > y ? x : y; }
 
 ScreenAreaGl::ScreenAreaGl(int _iWidth, int _iHeight, int _iScale) :
-  ScreenArea(_iWidth, _iHeight, _iScale)
+  ScreenArea(_iWidth, _iHeight, _iScale),
+  m_uiScreenTexture(0),
+  m_iTextureSize(256)
 {
   Glib::RefPtr<Gdk::GL::Config> glconfig;
 
@@ -52,7 +54,13 @@ void ScreenAreaGl::on_realize()
   if (!glwindow->gl_begin(get_gl_context()))
     return;
 
-    glViewport(0, 0, get_width(), get_height());
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_TEXTURE_2D);
+
+    if (glIsTexture(m_uiScreenTexture))
+      glDeleteTextures(1, &m_uiScreenTexture);
+
+
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -62,7 +70,28 @@ void ScreenAreaGl::on_realize()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+    glGenTextures(1, &m_uiScreenTexture);
+    glBindTexture(GL_TEXTURE_2D, m_uiScreenTexture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    // Calculate texture size as a the smallest working power of two
+    float n1 = log10((float)m_iScaledWidth ) / log10( 2.0f);
+    float n2 = log10((float)m_iScaledHeight ) / log10( 2.0f);
+    float n = (n1 > n2)? n1 : n2;
+
+      // round up
+    if (((float)((int)n)) != n)
+      n = ((float)((int)n)) + 1.0f;
+
+    m_iTextureSize = (int)pow(2.0f, n);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_iTextureSize, m_iTextureSize, 0,
+                 GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+
     glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
 
   glwindow->gl_end();
 }
@@ -87,32 +116,53 @@ void ScreenAreaGl::vOnWidgetResize()
 {
   Glib::RefPtr<Gdk::GL::Window> glwindow = get_gl_window();
 
+  int iWidth = get_width();
+  int iHeight = get_height();
+  
+  float fScreenAspect = (float) m_iScaledWidth / m_iScaledHeight,
+        fWindowAspect = (float) iWidth / iHeight;
+
   if (!glwindow->gl_begin(get_gl_context()))
     return;
 
-    glViewport(0, 0, get_width(), get_height());
+    if (fWindowAspect == fScreenAspect)
+      glViewport(0, 0, iWidth, iHeight);
+    else if (fWindowAspect < fScreenAspect) {
+      int iAspectHeight = (int)(iWidth / fScreenAspect);
+      glViewport(0, (iHeight - iAspectHeight) / 2, iWidth, iAspectHeight);
+    } else {
+      int iAspectWidth = (int)(iHeight * fScreenAspect);
+      glViewport((iWidth - iAspectWidth) / 2, 0, iAspectWidth, iHeight);
+    }
   
   glwindow->gl_end();
-
-  m_dScaleFactor = min<double>(get_height() / (double)m_iScaledHeight, get_width() / (double)m_iScaledWidth);
-  m_dAreaTop = (1 - m_dScaleFactor * m_iScaledHeight / (double)get_height()) / 2;
-  m_dAreaLeft = (1 - m_dScaleFactor * m_iScaledWidth / (double)get_width()) / 2;
 }
 
 bool ScreenAreaGl::on_expose_event(GdkEventExpose * _pstEvent)
 {
-  glPixelZoom(m_dScaleFactor, -m_dScaleFactor);
-  glRasterPos2f(m_dAreaLeft, m_dAreaTop);
-  
-  glPixelStorei(GL_UNPACK_ROW_LENGTH, m_iScaledWidth + 1);
+  if (!m_bEnableRender)
+    return true;
 
   Glib::RefPtr<Gdk::GL::Window> glwindow = get_gl_window();
   if (!glwindow->gl_begin(get_gl_context()))
     return false;
 
     glClear( GL_COLOR_BUFFER_BIT );
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, m_iScaledWidth + 1);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_iScaledWidth + 1, m_iScaledHeight,
+                      GL_RGBA, GL_UNSIGNED_BYTE, m_puiPixels);
 
-    glDrawPixels(m_iScaledWidth, m_iScaledHeight, GL_RGBA, GL_UNSIGNED_BYTE, m_puiPixels);
+    glBegin(GL_TRIANGLE_STRIP);
+      glTexCoord2f(0.0f, 0.0f);
+      glVertex3i(0, 0, 0);
+      glTexCoord2f(m_iScaledWidth / (GLfloat) m_iTextureSize, 0.0f);
+      glVertex3i(1, 0, 0);
+      glTexCoord2f(0.0f, m_iScaledHeight / (GLfloat) m_iTextureSize);
+      glVertex3i(0, 1, 0);
+      glTexCoord2f(m_iScaledWidth / (GLfloat) m_iTextureSize,
+                  m_iScaledHeight / (GLfloat) m_iTextureSize);
+      glVertex3i(1, 1, 0);
+    glEnd();
 
     glwindow->swap_buffers();
 
