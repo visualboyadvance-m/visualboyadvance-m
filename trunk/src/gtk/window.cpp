@@ -37,7 +37,6 @@
 #include "tools.h"
 #include "intl.h"
 #include "screenarea-cairo.h"
-#include "screenarea-xvideo.h"
 
 #ifdef USE_OPENGL
 #include "screenarea-opengl.h"
@@ -102,7 +101,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   m_iJoypadMin      (PAD_1),
   m_iJoypadMax      (PAD_4),
   m_iVideoOutputMin (OutputCairo),
-  m_iVideoOutputMax (OutputXvideo),
+  m_iVideoOutputMax (OutputOpenGL),
   m_bFullscreen     (false)
 {
   m_poXml            = _poXml;
@@ -454,7 +453,7 @@ void Window::vInitColors(EColorFormat _eColorFormat)
 
 void Window::vApplyConfigScreenArea()
 {
-  EVideoOutput eVideoOutput = (EVideoOutput)m_poDisplayConfig->oGetKey<int>("output");;
+  EVideoOutput eVideoOutput = (EVideoOutput)m_poDisplayConfig->oGetKey<int>("output");
 
   Gtk::Alignment * poC;
 
@@ -472,10 +471,6 @@ void Window::vApplyConfigScreenArea()
         m_poScreenArea = Gtk::manage(new ScreenAreaGl(m_iScreenWidth, m_iScreenHeight));
         break;
 #endif // USE_OPENGL
-      case OutputXvideo:
-        vInitColors(ColorFormatBGR);
-        m_poScreenArea = Gtk::manage(new ScreenAreaXv(m_iScreenWidth, m_iScreenHeight));
-        break;
       case OutputCairo:
       default:
         vInitColors(ColorFormatRGB);

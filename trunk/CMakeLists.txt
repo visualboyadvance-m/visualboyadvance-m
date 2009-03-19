@@ -49,7 +49,6 @@ IF(NOT NO_GTK)
     PKG_CHECK_MODULES ( GLIBMM glibmm-2.4 )
     PKG_CHECK_MODULES ( GIOMM giomm-2.4 )
     PKG_CHECK_MODULES ( GLADEMM libglademm-2.4 )
-    PKG_CHECK_MODULES ( XV xv )
     PKG_CHECK_MODULES ( GTKGLMM gtkglextmm-x11-1.2 )
 ENDIF(NOT NO_GTK)
 
@@ -67,9 +66,9 @@ ENDIF( WITH_LIRC )
 
 # Check that the dependencies are met to build the GTK frontend
 IF( NOT NO_GTK )
-    IF( GLIBMM_FOUND AND GTKMM_FOUND AND GLADEMM_FOUND AND SDL_FOUND AND XV_FOUND )
+    IF( GLIBMM_FOUND AND GTKMM_FOUND AND GLADEMM_FOUND AND SDL_FOUND )
         SET( CAN_BUILD_GVBAM 1 )
-    ENDIF( GLIBMM_FOUND AND GTKMM_FOUND AND GLADEMM_FOUND AND SDL_FOUND AND XV_FOUND )
+    ENDIF( GLIBMM_FOUND AND GTKMM_FOUND AND GLADEMM_FOUND AND SDL_FOUND )
 ENDIF( NOT NO_GTK )
 
 # Set the default install dir
@@ -219,7 +218,6 @@ SET(SRC_GTK
     src/gtk/soundconfig.cpp
     src/gtk/screenarea.cpp
     src/gtk/screenarea-cairo.cpp
-    src/gtk/screenarea-xvideo.cpp
     src/gtk/screenarea-opengl.cpp
     src/gtk/tools.cpp
     src/gtk/window.cpp
@@ -326,7 +324,6 @@ IF( CAN_BUILD_GVBAM )
         ${PNG_LIBRARY}
         ${GLADEMM_LIBRARIES}
         ${SDL_LIBRARY}
-        ${XV_LIBRARIES}
         ${GTKGLMM_LIBRARIES}
     )
 

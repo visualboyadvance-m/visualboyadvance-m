@@ -50,7 +50,6 @@ private:
   Gtk::ComboBox *           m_poDefaultScaleComboBox;
   Gtk::RadioButton *        m_poOutputOpenGLRadioButton;
   Gtk::RadioButton *        m_poOutputCairoRadioButton;
-  Gtk::RadioButton *        m_poOutputXvRadioButton;
 };
 
 } // namespace VBA
