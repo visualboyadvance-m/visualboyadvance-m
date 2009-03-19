@@ -155,6 +155,16 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
 
   // Menu bar
   m_poMenuBar = dynamic_cast<Gtk::MenuBar *>(_poXml->get_widget("MenuBar"));
+  m_poMenuBar->signal_deactivate().connect(sigc::mem_fun(*this, &Window::vOnMenuExit));
+  
+  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("FileMenu"));
+  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnMenuEnter));
+  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("EmulationMenu"));
+  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnMenuEnter));
+  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("OptionsMenu"));
+  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnMenuEnter));
+  poMI = dynamic_cast<Gtk::MenuItem *>(_poXml->get_widget("HelpMenu"));
+  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnMenuEnter));
 
   // File menu
   //

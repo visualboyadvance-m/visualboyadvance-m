@@ -40,9 +40,11 @@ protected:
   void vOnWidgetResize();
 
 private:
-  double   m_dAreaTop;
+  GLuint m_uiScreenTexture;
+  int m_iTextureSize;
+/*  double   m_dAreaTop;
   double   m_dAreaLeft;
-  double   m_dScaleFactor;
+  double   m_dScaleFactor;*/
 };
 
 } // namespace VBA
