@@ -126,8 +126,6 @@ void DisplayConfigDialog::vOnOutputChanged(VBA::Window::EVideoOutput _eOutput)
   else if (_eOutput == VBA::Window::OutputCairo && m_poOutputCairoRadioButton->get_active())
     m_poConfig->vSetKey("output", VBA::Window::OutputCairo);
 
-g_message("caca");
-
   m_poWindow->vApplyConfigScreenArea();
 }
 
