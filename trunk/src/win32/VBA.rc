@@ -1831,6 +1831,8 @@ BEGIN
             END
             POPUP "&Frame Skip"
             BEGIN
+                MENUITEM "&Automatic",                  ID_OPTIONS_FRAMESKIP_AUTOMATIC
+            MENUITEM SEPARATOR
                 MENUITEM "&No frame skip",              ID_OPTIONS_VIDEO_FRAMESKIP_0
                 MENUITEM "&1 frame",                    ID_OPTIONS_VIDEO_FRAMESKIP_1
                 MENUITEM "&2 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_2
