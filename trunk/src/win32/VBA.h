@@ -264,7 +264,6 @@ class VBA : public CWinApp
 
   private:
   unsigned int detectCpuCores();
-  int doProtection();
 };
 
 extern VBA theApp;
