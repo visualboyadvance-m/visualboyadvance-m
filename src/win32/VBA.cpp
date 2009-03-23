@@ -275,6 +275,7 @@ VBA::VBA()
   iconic = false;
   glFilter = 0;
   regEnabled = false;
+ pauseWhenInactive = true;
   speedupToggle = false;
   winGbPrinterEnabled = false;
   threadPriority = 2;
@@ -2046,7 +2047,7 @@ bool VBA::updateRenderMethod(bool force)
 
 	Sm60FPS_Init();
 
-	if( !(this->*secondaryTrapPointer)( force ) ) {
+	if( !updateRenderMethod0( force ) ) {
 		// fall back to safe configuration
 		renderMethod = DIRECT_3D;
 		fsAdapter = 0;
