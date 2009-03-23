@@ -58,9 +58,6 @@ enum AUDIO_API {
 class AVIWrite;
 class WavWriter;
 
-typedef DWORD (WINAPI* lpGetModuleFileNameA)(HINSTANCE, LPSTR, DWORD);
-typedef VOID (WINAPI* lpExitProcess)(UINT);
-
 class VBA : public CWinApp
 {
  public:
@@ -152,6 +149,7 @@ class VBA : public CWinApp
   bool iconic;
   int glFilter;
   bool dinputKeyFocus;
+  bool pauseWhenInactive;
   bool speedupToggle;
   bool winGbPrinterEnabled;
   int threadPriority;
@@ -209,12 +207,6 @@ class VBA : public CWinApp
 
   CString wndClass;
 
-  lpGetModuleFileNameA pGetModuleFileNameA;
-  lpExitProcess pExitProcess;
-
-  int securityCheck;
-  int securityCheck2;
-
  public:
   VBA();
   ~VBA();
@@ -260,14 +252,12 @@ class VBA : public CWinApp
   void loadSettings();
   void addRecentFile(CString file);
 
-  bool trap(bool);
-
   private:
   unsigned int detectCpuCores();
 };
 
-extern VBA theApp;
-extern int emulating;
+    extern VBA theApp;
+	extern int emulating;
 
 #ifdef MMX
     extern "C" bool cpu_mmx;

@@ -155,6 +155,8 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_DISABLESTATUSMESSAGES, OnUpdateOptionsEmulatorDisablestatusmessages)
   ON_COMMAND(ID_OPTIONS_EMULATOR_SYNCHRONIZE, OnOptionsEmulatorSynchronize)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_SYNCHRONIZE, OnUpdateOptionsEmulatorSynchronize)
+  ON_COMMAND(ID_OPTIONS_EMULATOR_PAUSEWHENINACTIVE, OnOptionsEmulatorPausewheninactive)
+  ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_PAUSEWHENINACTIVE, OnUpdateOptionsEmulatorPausewheninactive)
   ON_COMMAND(ID_OPTIONS_EMULATOR_SPEEDUPTOGGLE, OnOptionsEmulatorSpeeduptoggle)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_SPEEDUPTOGGLE, OnUpdateOptionsEmulatorSpeeduptoggle)
   ON_COMMAND(ID_OPTIONS_EMULATOR_AUTOMATICALLYAPPLYPATCHFILES, OnOptionsEmulatorAutomaticallyApplyPatchFiles)
@@ -1154,8 +1156,11 @@ void MainWnd::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
     }
   } else {
     theApp.wasPaused = true;
-    if(emulating) {
+    if(theApp.pauseWhenInactive) {
+      if(emulating) {
         soundPause();
+      }
+      theApp.active = a;
     }
     theApp.active = a;
 
