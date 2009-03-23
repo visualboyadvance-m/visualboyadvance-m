@@ -398,7 +398,6 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_WM_ENTERSIZEMOVE()
   ON_COMMAND(ID_AUDIO_CORE_SETTINGS, &MainWnd::OnAudioCoreSettings)
   ON_UPDATE_COMMAND_UI(ID_AUDIO_CORE_SETTINGS, &MainWnd::OnUpdateAudioCoreSettings)
-  ON_COMMAND(ID_FILE_QUICKOPENROM, &MainWnd::OnFileQuickopenrom)
   END_MESSAGE_MAP()
 
 
@@ -983,30 +982,32 @@ bool MainWnd::fileOpenSelect( int system )
 {
 	theApp.dir = _T("");
 	CString initialDir;
+	int selectedFilter = 0;
 	LPCTSTR exts[] = { _T(""), _T(""), _T(""), _T("") };
 	CString filter;
 	CString title;
 
 	switch( system )
 	{
-	case 100:
-		// Quick Open File
-		initialDir = regQueryStringValue( _T("QuickOpenFileLastDir"), _T(".") );
-		filter = winLoadFilter( IDS_FILTER_ALLROM );
-		break;
 	case 0:
 		// GBA
 		initialDir = regQueryStringValue( _T("romdir"), _T(".") );
+		selectedFilter = regQueryDwordValue( _T("selectedFilter"), 0);
+		if( (selectedFilter < 0) || (selectedFilter > 2) ) {
+			selectedFilter = 0;
+		}
 		filter = winLoadFilter( IDS_FILTER_GBAROM );
 		break;
 	case 1:
 		// GBC
 		initialDir = regQueryStringValue( _T("gbcromdir"), _T(".") );
+		// TODO: memorize selected filter for GBC as well
 		filter = winLoadFilter( IDS_FILTER_GBCROM );
 		break;
 	case 2:
 		// GB
 		initialDir = regQueryStringValue( _T("gbromdir"), _T(".") );
+		// TODO: memorize selected filter for GB as well
 		filter = winLoadFilter( IDS_FILTER_GBROM );
 		break;
 	}
@@ -1022,18 +1023,19 @@ bool MainWnd::fileOpenSelect( int system )
 	theApp.szFile = _T("");
 
 
-	FileDlg dlg( this, _T(""), filter, 0, _T(""), exts, theApp.dir, title, false);
+	FileDlg dlg( this, _T(""), filter, selectedFilter, _T(""), exts, theApp.dir, title, false);
 
 	if( dlg.DoModal() == IDOK ) {
+		if( system == 0 ) {
+			regSetDwordValue( _T("selectedFilter"), dlg.m_ofn.nFilterIndex );
+		}
 		theApp.szFile = dlg.GetPathName();
 		theApp.dir = theApp.szFile.Left( dlg.m_ofn.nFileOffset );
 		if( (theApp.dir.GetLength() > 3) && (theApp.dir[theApp.dir.GetLength()-1] == _T('\\')) ) {
 			theApp.dir = theApp.dir.Left( theApp.dir.GetLength() - 1 );
 		}
 		SetCurrentDirectory( theApp.dir );
-		if( system == 100 ) {
-			regSetStringValue( _T("QuickOpenFileLastDir"), theApp.dir );
-		}
+		regSetStringValue( _T("lastDir"), theApp.dir );
 		return true;
 	}
 	return false;
