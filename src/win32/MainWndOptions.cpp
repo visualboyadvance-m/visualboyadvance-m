@@ -566,6 +566,8 @@ void MainWnd::OnUpdateOptionsEmulatorSynchronize(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsEmulatorPausewheninactive()
 {
   theApp.pauseWhenInactive = !theApp.pauseWhenInactive;
+}
+
 void MainWnd::OnUpdateOptionsEmulatorPausewheninactive(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(theApp.pauseWhenInactive);
