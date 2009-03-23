@@ -158,6 +158,8 @@ protected:
 	afx_msg void OnUpdateOptionsEmulatorDisablestatusmessages(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorSynchronize();
 	afx_msg void OnUpdateOptionsEmulatorSynchronize(CCmdUI* pCmdUI);
+	afx_msg void OnOptionsEmulatorPausewheninactive();
+	afx_msg void OnUpdateOptionsEmulatorPausewheninactive(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorSpeeduptoggle();
 	afx_msg void OnUpdateOptionsEmulatorSpeeduptoggle(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorAutomaticallyApplyPatchFiles();
