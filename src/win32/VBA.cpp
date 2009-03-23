@@ -17,7 +17,6 @@
 #include "WinResUtil.h"
 #include "Logging.h"
 #include "rpi.h"
-#include "protect.h"
 
 #include "../System.h"
 #include "../gba/agbprint.h"

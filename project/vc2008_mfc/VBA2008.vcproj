@@ -232,12 +232,6 @@
 			<Tool
 				Name="VCAppVerifierTool"
 			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				Description="Signing executable..."
-				CommandLine="protect.exe $(TargetPath)"
-				ExcludedFromBuild="false"
-			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -812,14 +806,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\common\Port.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\win32\protect.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\win32\protect.h"
 				>
 			</File>
 			<File
