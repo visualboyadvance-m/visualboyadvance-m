@@ -21,13 +21,6 @@ extern void remoteCleanUp();
 extern void InterframeCleanup();
 
 
-void MainWnd::OnFileQuickopenrom()
-{
-	if( fileOpenSelect( 100 ) ) {
-		FileRun();
-	}
-}
-
 void MainWnd::OnFileOpenGBA()
 {
 	if( fileOpenSelect( 0 ) ) {
