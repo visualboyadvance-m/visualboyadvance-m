@@ -1115,6 +1115,7 @@ void system10Frames(int rate)
   }
 
   theApp.wasPaused = false;
+  theApp.autoFrameSkipLastTime = time;
 
 #ifdef LOG_PERFORMANCE
   if( systemSpeedCounter >= PERFORMANCE_INTERVAL ) {
@@ -1362,6 +1363,8 @@ void VBA::loadSettings()
   if(gbFrameSkip < 0 || gbFrameSkip > 9)
     gbFrameSkip = 0;
 
+  autoFrameSkip = regQueryDwordValue("autoFrameSkip", FALSE) ? TRUE : FALSE;
+  
   vsync = regQueryDwordValue("vsync", false) ? true : false ;
   synchronize = regQueryDwordValue("synchronize", 1) ? true : false;
   fullScreenStretch = regQueryDwordValue("stretch", 0) ? true : false;
