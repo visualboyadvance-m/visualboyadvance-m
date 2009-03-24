@@ -1087,6 +1087,8 @@ void systemFrame()
 
 void system10Frames(int rate)
 {
+
+//Define autoframeskip method. may no longer be required in current code.
 	if( theApp.autoFrameSkip )
 	{
 		u32 time = systemGetClock();
@@ -1115,7 +1117,9 @@ void system10Frames(int rate)
   }
 
   theApp.wasPaused = false;
-  theApp.autoFrameSkipLastTime = time;
+
+//  Old autoframeskip crap... might be useful later. autoframeskip Ifdef above might be useless as well now
+//  theApp.autoFrameSkipLastTime = time;
 
 #ifdef LOG_PERFORMANCE
   if( systemSpeedCounter >= PERFORMANCE_INTERVAL ) {
