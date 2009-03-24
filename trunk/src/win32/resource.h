@@ -50,7 +50,7 @@
 #define IDS_TOOLTIP_ENHANCE_SOUND       43
 #define IDS_TOOLTIP_SURROUND            44
 #define IDS_TOOLTIP_DECLICKING          45
-#define IDS_FILTER_ALLROM               46
+#define IDS_FILTER_COMPRESSED_FILES     46
 #define IDI_MAINICON                    101
 #define IDD_REGISTERS                   102
 #define IDD_DEBUG                       103

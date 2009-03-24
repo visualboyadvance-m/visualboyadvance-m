@@ -2658,34 +2658,3 @@ void Sm60FPS_Sleep()
 		}
 	}
 }
-
-
-void treatRelativePath( CString & path )
-{
-	if( path.GetLength() > 1 ) {
-		if( path.GetAt( 0 ) == '.' ) {
-			// treat as relative path
-			char baseDir[MAX_PATH + 1];
-			GetModuleFileName( NULL, baseDir, MAX_PATH );
-			baseDir[MAX_PATH] = '\0'; // for security reasons
-			CString temp = baseDir;
-			int pos = temp.ReverseFind( '\\' );
-			temp.Truncate( pos + 1 );
-			path.Insert( 0, temp );
-
-			// create directories if path does not exist
-			SHCreateDirectoryEx( NULL, path, NULL );
-			/* Spacy's implementation:
-			while( ERROR_PATH_NOT_FOUND == CreateDirectory( path, NULL ) ) {
-				temp = path;
-				while( ERROR_PATH_NOT_FOUND == CreateDirectory( temp, NULL ) ) {
-					pos = temp.ReverseFind( '\\' );
-					ASSERT( pos != -1 );
-					if( pos == -1 ) break; // something has gone wrong, abort
-					temp.Truncate( pos );
-				}
-			}
-			*/
-		}
-	}
-}
