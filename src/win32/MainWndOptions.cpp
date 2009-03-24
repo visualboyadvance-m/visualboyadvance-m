@@ -37,8 +37,8 @@
 void MainWnd::OnOptionsFrameskipThrottleNothrottle()
 {
 	theApp.updateThrottle( 0 ); // disable
+  theApp.autoFrameSkip = false;
 }
-
 
 void MainWnd::OnUpdateOptionsFrameskipThrottleNothrottle(CCmdUI* pCmdUI)
 {
@@ -49,8 +49,8 @@ void MainWnd::OnUpdateOptionsFrameskipThrottleNothrottle(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle25()
 {
 	theApp.updateThrottle( 25 );
+  theApp.autoFrameSkip = false;
 }
-
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle25(CCmdUI* pCmdUI)
 {
@@ -61,8 +61,8 @@ void MainWnd::OnUpdateOptionsFrameskipThrottle25(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle50()
 {
 	theApp.updateThrottle( 50 );
+  theApp.autoFrameSkip = false;
 }
-
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle50(CCmdUI* pCmdUI)
 {
@@ -73,8 +73,8 @@ void MainWnd::OnUpdateOptionsFrameskipThrottle50(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle100()
 {
 	theApp.updateThrottle( 100 );
+  theApp.autoFrameSkip = false;
 }
-
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle100(CCmdUI* pCmdUI)
 {
@@ -85,8 +85,8 @@ void MainWnd::OnUpdateOptionsFrameskipThrottle100(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle150()
 {
 	theApp.updateThrottle( 150 );
+theApp.autoFrameSkip = false;
 }
-
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle150(CCmdUI* pCmdUI)
 {
@@ -97,8 +97,8 @@ void MainWnd::OnUpdateOptionsFrameskipThrottle150(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle200()
 {
 	theApp.updateThrottle( 200 );
+  theApp.autoFrameSkip = false;
 }
-
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle200(CCmdUI* pCmdUI)
 {
@@ -113,6 +113,7 @@ void MainWnd::OnOptionsFrameskipThrottleOther()
 
 	if( v ) {
 		theApp.updateThrottle( v );
+		theApp.autoFrameSkip = false;
 	}
 }
 
@@ -128,6 +129,23 @@ void MainWnd::OnUpdateOptionsFrameskipThrottleOther(CCmdUI* pCmdUI)
 		( theApp.throttle != 200 ) );
 }
 
+void MainWnd::OnOptionsFrameskipAutomatic() 
+{
+  theApp.autoFrameSkip = !theApp.autoFrameSkip;
+  if(!theApp.autoFrameSkip && emulating)
+	  theApp.updateFrameSkip();
+  else
+  {
+	  theApp.throttle = false;
+	  frameSkip = 0;
+	  systemFrameSkip = 0;
+  }
+}
+
+void MainWnd::OnUpdateOptionsFrameskipAutomatic(CCmdUI* pCmdUI) 
+{
+  pCmdUI->SetCheck(theApp.autoFrameSkip);  
+}
 
 BOOL MainWnd::OnOptionsFrameskip(UINT nID)
 {
