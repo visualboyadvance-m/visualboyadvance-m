@@ -33,6 +33,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 extern void remoteCleanUp();
+extern int gbHardware;
 
 /////////////////////////////////////////////////////////////////////////////
 // MainWnd
@@ -45,12 +46,6 @@ MainWnd::MainWnd()
 
 MainWnd::~MainWnd()
 {
-}
-
-bool MainWnd::fileExists( LPCTSTR lpFileName )
-{
-	// check if file exists
-	return GetFileAttributes( lpFileName ) != INVALID_FILE_ATTRIBUTES;
 }
 
 
@@ -1022,7 +1017,16 @@ bool MainWnd::fileOpenSelect( int system )
 		theApp.dir = initialDir;
 	}
 
-	treatRelativePath( initialDir );
+	if( initialDir[0] == '.' ) {
+		// handle as relative path
+		char baseDir[MAX_PATH+1];
+		GetModuleFileName( NULL, baseDir, MAX_PATH );
+		baseDir[MAX_PATH] = '\0'; // for security reasons
+		PathRemoveFileSpec( baseDir ); // removes the trailing file name and backslash
+		strcat( baseDir, "\\" );
+		strcat( baseDir, initialDir );
+		initialDir = baseDir;
+	}
 
 	theApp.szFile = _T("");
 
@@ -1105,7 +1109,9 @@ void MainWnd::screenCapture(int captureNumber)
                   captureNumber,
                   ext);
 
-  if( fileExists( buffer ) ) {
+  // check if file exists
+  DWORD dwAttr = GetFileAttributes( buffer );
+  if( dwAttr != INVALID_FILE_ATTRIBUTES ) {
 	  // screenshot file already exists
 	  screenCapture(++captureNumber);
 	  // this will recursively use the first non-existent screenshot number

@@ -262,5 +262,3 @@ class VBA : public CWinApp
 #ifdef MMX
     extern "C" bool cpu_mmx;
 #endif
-
-void treatRelativePath( CString & path );
