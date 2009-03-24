@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "MainWnd.h"
 
+#include <shlwapi.h>
 #include "ExportGSASnapshot.h"
 #include "FileDlg.h"
 #include "GSACodeSelect.h"
@@ -488,7 +489,7 @@ void MainWnd::OnFileExportBatteryfile()
   CString filter = winLoadFilter(IDS_FILTER_SAV);
   CString title = winResLoadString(IDS_SELECT_BATTERY_FILE);
 
-  CString saveDir = regQueryStringValue("batteryDir", DEFAULT_BATTERY_DIR);
+  CString saveDir = regQueryStringValue("batteryDir", NULL);
   if( saveDir[0] == '.' ) {
 	  // handle as relative path
 	  char baseDir[MAX_PATH+1];
