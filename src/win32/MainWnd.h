@@ -30,6 +30,9 @@ public:
 	void winSaveCheatList(const char *name);
 	void winSaveCheatListDefault();
 
+private:
+	bool fileExists( LPCTSTR lpFileName );
+
 
 	DECLARE_MESSAGE_MAP()
 
