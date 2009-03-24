@@ -67,7 +67,7 @@ void MainWnd::OnCheatsLoadcheatlist()
   else
     buffer = theApp.filename;
 
-  CString saveDir = regQueryStringValue("saveDir", DEFAULT_SAVESTATES_DIR);
+  CString saveDir = regQueryStringValue("saveDir", NULL);
 
   if(saveDir.IsEmpty())
     saveDir = getDirFromFile(theApp.filename);
@@ -105,7 +105,7 @@ void MainWnd::OnCheatsSavecheatlist()
   else
     buffer = theApp.filename;
 
-  CString saveDir = regQueryStringValue("saveDir", DEFAULT_SAVESTATES_DIR);
+  CString saveDir = regQueryStringValue("saveDir", NULL);
 
   if(saveDir.IsEmpty())
     saveDir = getDirFromFile(theApp.filename);
