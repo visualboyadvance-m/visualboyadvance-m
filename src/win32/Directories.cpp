@@ -4,6 +4,8 @@
 #include "Reg.h"
 #include "WinResUtil.h"
 
+#include <shlobj.h>
+#include <shlwapi.h>
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
