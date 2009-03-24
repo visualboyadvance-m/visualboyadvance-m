@@ -3,6 +3,7 @@
 #include "MainWnd.h"
 
 #include <winsock.h>
+#include <shlwapi.h>
 
 #include "FileDlg.h"
 #include "Reg.h"
@@ -46,6 +47,12 @@ MainWnd::MainWnd()
 
 MainWnd::~MainWnd()
 {
+}
+
+bool MainWnd::fileExists( LPCTSTR lpFileName )
+{
+	// check if file exists
+	return GetFileAttributes( lpFileName ) != INVALID_FILE_ATTRIBUTES;
 }
 
 
@@ -1154,9 +1161,7 @@ void MainWnd::screenCapture(int captureNumber)
                   captureNumber,
                   ext);
 
-  // check if file exists
-  DWORD dwAttr = GetFileAttributes( buffer );
-  if( dwAttr != INVALID_FILE_ATTRIBUTES ) {
+  if( fileExists( buffer ) ) {
 	  // screenshot file already exists
 	  screenCapture(++captureNumber);
 	  // this will recursively use the first non-existent screenshot number
