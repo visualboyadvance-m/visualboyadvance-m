@@ -6,7 +6,6 @@
 
 #include "stdafx.h"
 #include <intrin.h>
-#include <shlobj.h> // for SHCreateDirectoryEx
 
 #include "AVIWrite.h"
 #include "LangSelect.h"

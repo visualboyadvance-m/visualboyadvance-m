@@ -75,15 +75,15 @@ BOOL Directories::OnInitDialog()
 	if(!p.IsEmpty())
 		GetDlgItem(IDC_GBROM_PATH)->SetWindowText(p);
 
-	p = regQueryStringValue("batteryDir", DEFAULT_BATTERY_DIR);
+	p = regQueryStringValue("batteryDir", NULL);
 	if(!p.IsEmpty())
 		GetDlgItem(IDC_BATTERY_PATH)->SetWindowText( p);
 
-	p = regQueryStringValue("saveDir", DEFAULT_SAVESTATES_DIR);
+	p = regQueryStringValue("saveDir", NULL);
 	if(!p.IsEmpty())
 		GetDlgItem(IDC_SAVE_PATH)->SetWindowText(p);
 
-	p = regQueryStringValue("captureDir", DEFAULT_SCREENSHOTS_DIR);
+	p = regQueryStringValue("captureDir", NULL);
 	if(!p.IsEmpty())
 		GetDlgItem(IDC_CAPTURE_PATH)->SetWindowText(p);
 
