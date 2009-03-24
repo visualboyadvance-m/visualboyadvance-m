@@ -2,6 +2,7 @@
 #include "MainWnd.h"
 
 #include <shlwapi.h>
+
 #include "ExportGSASnapshot.h"
 #include "FileDlg.h"
 #include "GSACodeSelect.h"
