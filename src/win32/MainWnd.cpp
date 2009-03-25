@@ -1220,7 +1220,6 @@ void MainWnd::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
       }
       theApp.active = a;
     }
-    theApp.active = a;
 
     memset(theApp.delta,255,sizeof(theApp.delta));
   }

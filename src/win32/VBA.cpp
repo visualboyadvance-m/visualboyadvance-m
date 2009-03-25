@@ -882,8 +882,7 @@ void VBA::updateThrottle( unsigned short throttle )
 		systemFrameSkip = 0;
 	}
 
-	soundShutdown();
-	soundInit();
+	soundSetThrottle(throttle);
 }
 
 
