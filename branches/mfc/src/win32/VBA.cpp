@@ -473,87 +473,15 @@ static int parseCommandLine(char *cmdline, char **argv)
   return(argc);
 }
 
-static VOID WINAPI srandWrap(UINT n)
-{
-  srand(n);
-}
-
-static unsigned char kernel_encoded[] = { 0x14, 0xef, 0xe1, 0xe3, 0x18, 0x1c, 0xd1, 0x1f, 0xdd, 0x21, 0x25, 0x21, 0x00 };
-static unsigned char getname_encoded[] = { 0xc8, 0x33, 0x3f, 0xdc, 0xdd, 0x21, 0x2a, 0x2e, 0xd5, 0x0f, 0x08, 0x0c, 0xf7, 0x15, 0xea, 0xe9, 0x12, 0xcd, 0x00 };
-static unsigned char exit_encoded[] = { 0xca, 0xd2, 0xd5, 0xd9, 0x29, 0x27, 0x26, 0xdb, 0x20, 0x2d, 0x20, 0x00 };
-
-static lpExitProcess protectHelp[2] = { (lpExitProcess)srandWrap, (lpExitProcess)0 };
-
-typedef HMODULE (WINAPI* lpLoadLibrary)(LPCTSTR);
-typedef FARPROC (WINAPI* lpGetProcAddress)(HMODULE, LPCSTR);
-typedef int (*lpExecutableValid)(const char *);
-typedef char *(*lpUnprotectBuffer)(unsigned char *, size_t);
-
-#pragma optimize("", off)
-SET_FN_PTR(LoadLibrary, 0x01301400);
-SET_FN_PTR(GetProcAddress, 0x01301500);
-SET_FN_PTR(ExecutableValid, 0x01301600);
-SET_FN_PTR(unprotect_buffer, 0x01301700);
-
-int VBA::doProtection()
-{
-  char szEXEFileName[260];
-  *szEXEFileName = 0;
-
-  HMODULE hM_kernel32 = ((lpLoadLibrary)GET_FN_PTR(LoadLibrary))(unprotect_buffer(kernel_encoded, sizeof(kernel_encoded)));
-  if (hM_kernel32)
-  {
-    pGetModuleFileNameA = (lpGetModuleFileNameA)((lpGetProcAddress)GET_FN_PTR(GetProcAddress))(hM_kernel32, ((lpUnprotectBuffer)GET_FN_PTR(unprotect_buffer))(getname_encoded, sizeof(getname_encoded)));
-    if (pGetModuleFileNameA)
-    {
-      pGetModuleFileNameA(GetModuleHandle(0), szEXEFileName, sizeof(szEXEFileName));
-    }
-
-    pExitProcess = (lpExitProcess)((lpGetProcAddress)GET_FN_PTR(GetProcAddress))(hM_kernel32, ((lpUnprotectBuffer)GET_FN_PTR(unprotect_buffer))(exit_encoded, sizeof(exit_encoded)));
-    protectHelp[1] = pExitProcess;
-
-    return(((lpExecutableValid)GET_FN_PTR(ExecutableValid))(szEXEFileName));
-  }
-  return(-3);
-}
-
-static BOOL doStuffGood(VBA *vba, register int num)
-{
-  protectHelp[vba->securityCheck2]((UINT)time(0));
-  num ^= 1;
-  return((BOOL)num);
-}
-
-static BOOL doStuffBad(VBA *vba, register int num)
-{
-  num |= 1;
-  vba->pExitProcess(num);
-  return(doStuffGood(vba, num&1));
-}
-#pragma optimize("", on)
-
-typedef bool (VBA::*trapPointer)(bool);
-static trapPointer trapPointers[6];
-static trapPointer *mainTrapPointer = trapPointers;
-static trapPointer secondaryTrapPointer = &VBA::trap;
-
-bool VBA::trap(bool value)
-{
-  pExitProcess(value);
-  return(false);
-}
-
 BOOL VBA::InitInstance()
 {
-  BOOL (*pointFamily[])(VBA *, int) = { doStuffGood, doStuffBad, doStuffBad, doStuffBad, doStuffBad, doStuffBad, doStuffBad, doStuffBad };
-  trapPointers[0] = trapPointers[1] = trapPointers[3] = trapPointers[4] = secondaryTrapPointer;
-  trapPointers[2] = &VBA::updateRenderMethod;
-  trapPointers[5] = &VBA::updateRenderMethod0;
-
-  securityCheck = doProtection();
-  securityCheck2 = ((double)securityCheck < -0.987) ? 1 : securityCheck;
-  mainTrapPointer = &trapPointers[(securityCheck2+1)<<1];
-  secondaryTrapPointer = trapPointers[(((double)securityCheck > 0.4357) || ((double)securityCheck < -0.9123)) ? 2 : 5];
+#if _MSC_VER < 1400
+#ifdef _AFXDLL
+  Enable3dControls();      // Call this when using MFC in a shared DLL
+#else
+  Enable3dControlsStatic();  // Call this when linking to MFC statically
+#endif
+#endif
 
   SetRegistryKey(_T("VBA"));
 
@@ -584,11 +512,6 @@ BOOL VBA::InitInstance()
   regInit(winBuffer);
 
   loadSettings();
-
-  //Putting some stuff here too
-  if ((double)securityCheck2 > 0.0123) { trapPointers[5] = trapPointers[2]; }
-  if ((double)securityCheck2 > 0.101234) { *pointFamily = doStuffBad; }
-
 
   if(!openLinkLog())
     return FALSE;
@@ -642,7 +565,7 @@ BOOL VBA::InitInstance()
       free(argv);
     }
 
-  return(pointFamily[securityCheck&7](this, securityCheck));
+  return TRUE;
 }
 
 void VBA::adjustDestRect()
@@ -2036,12 +1959,7 @@ void VBA::updateWindowSize(int value)
 
 bool VBA::initDisplay()
 {
-  if (securityCheck != -3)
-  {
-    protectHelp[securityCheck2](0);
-    return (this->**mainTrapPointer)(false);
-  }
-  return(false);
+  return updateRenderMethod(false);
 }
 
 
@@ -2176,7 +2094,7 @@ bool VBA::updateRenderMethod(bool force)
 
 	Sm60FPS_Init();
 
-	if( !(this->*secondaryTrapPointer)( force ) ) {
+	 if( !updateRenderMethod0( force ) ) {
 		// fall back to safe configuration
 		renderMethod = DIRECT_3D;
 		fsAdapter = 0;
