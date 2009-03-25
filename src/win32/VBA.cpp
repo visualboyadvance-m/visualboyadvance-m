@@ -251,6 +251,7 @@ VBA::VBA()
   captureFormat = 0;
   tripleBuffering = true;
   throttle = 0;
+  throttleLastTime = 0;
   autoFrameSkipLastTime = 0;
   autoFrameSkip = false;
   vsync = false;
@@ -1086,7 +1087,6 @@ void systemFrame()
 void system10Frames(int rate)
 {
 
-//Define autoframeskip method. may no longer be required in current code.
 	if( theApp.autoFrameSkip )
 	{
 		u32 time = systemGetClock();
@@ -2410,6 +2410,7 @@ void VBA::saveSettings()
 
   regSetDwordValue("gbFrameSkip", gbFrameSkip);
 
+  regSetDwordValue("autoFrameSkip", autoFrameSkip);
   regSetDwordValue("vsync", vsync);
   regSetDwordValue("synchronize", synchronize);
   regSetDwordValue("stretch", fullScreenStretch);
