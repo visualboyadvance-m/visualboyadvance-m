@@ -251,7 +251,6 @@ VBA::VBA()
   captureFormat = 0;
   tripleBuffering = true;
   throttle = 0;
-  throttleLastTime = 0;
   autoFrameSkipLastTime = 0;
   autoFrameSkip = false;
   vsync = false;
