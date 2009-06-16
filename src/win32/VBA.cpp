@@ -494,18 +494,20 @@ BOOL VBA::InitInstance()
 
   loadSettings();
 
+    if(!initDisplay()) {
+    if(videoOption >= VIDEO_320x240) {
+      regSetDwordValue("video", VIDEO_2X);
+    }
+    return FALSE;
+  }
+
+  
+
   if(!openLinkLog())
     return FALSE;
 
   if(!initInput())
     return FALSE;
-
-  if(!initDisplay()) {
-    if(videoOption >= VIDEO_320x240) {
-      regSetDwordValue("video", VIDEO_1X);
-    }
-    return FALSE;
-  }
 
   hAccel = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCELERATOR));
 
@@ -1182,6 +1184,7 @@ SoundDriver * systemSoundInit()
 	}
 
 	if( drv ) {
+		if (theApp.throttle)
 		drv->setThrottle( theApp.throttle );
 	}
 
@@ -2444,7 +2447,7 @@ void VBA::saveSettings()
 
   regSetDwordValue("soundEnable", soundGetEnable() & 0x30f);
 
-  regSetDwordValue("soundQuality", soundGetSampleRate() / 44100);
+  regSetDwordValue("soundQuality", 44100 / soundGetSampleRate() );
 
   regSetDwordValue("soundVolume", (DWORD)(soundGetVolume() * 100.0f));
 
