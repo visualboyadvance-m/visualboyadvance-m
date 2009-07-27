@@ -873,13 +873,11 @@ void VBA::updateThrottle( unsigned short throttle )
 {
 	this->throttle = throttle;
 
-	if( throttle == 0 ) {
-		autoFrameSkip = false;
-	} else {
+	if( throttle ) {
 		Sm60FPS::K_fCpuSpeed = (float)throttle;
 		Sm60FPS::K_fTargetFps = 60.0f * Sm60FPS::K_fCpuSpeed / 100;
 		Sm60FPS::K_fDT = 1000.0f / Sm60FPS::K_fTargetFps;
-		autoFrameSkip = true;
+		autoFrameSkip = false;
 		frameSkip = 0;
 		systemFrameSkip = 0;
 	}
@@ -2542,6 +2540,7 @@ void VBA::saveSettings()
   regSetDwordValue("RFU", adapter);
   regSetDwordValue("linkEnabled", linkenable);
   regSetDwordValue("lastFullscreen", lastFullscreen);
+  regSetDwordValue("pauseWhenInactive", pauseWhenInactive);
 
 #ifndef NO_OAL
   regSetStringValue( "oalDevice", oalDevice );
