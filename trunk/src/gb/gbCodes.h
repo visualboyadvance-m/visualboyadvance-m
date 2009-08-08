@@ -208,9 +208,7 @@
  case 0x27:
    // DAA
    tempRegister.W=AF.B.B1;
-   if(AF.B.B0&C_FLAG) tempRegister.W|=256;
-   if(AF.B.B0&H_FLAG) tempRegister.W|=512;
-   if(AF.B.B0&N_FLAG) tempRegister.W|=1024;
+   tempRegister.W|=(AF.B.B0&(C_FLAG|H_FLAG|N_FLAG))<<4;
    AF.W=DAATable[tempRegister.W];
    break;
  case 0x28:
@@ -1290,18 +1288,10 @@ case 0x38:
  case 0xe8:
    // ADD SP,NN
    offset = (s8)gbReadOpcode(PC.W++);
-
-   if(offset >= 0) {
-     tempRegister.W = SP.W + offset;
-     AF.B.B0 = (SP.W > tempRegister.W ? C_FLAG : 0) |
-       ((SP.W^offset^tempRegister.W)&0x1000? H_FLAG:0);
-     SP.W = tempRegister.W;
-   } else {
-     tempRegister.W = SP.W + offset;
-     AF.B.B0 = (SP.W < tempRegister.W ? C_FLAG : 0) |
-       ((SP.W^offset^tempRegister.W)&0x1000?H_FLAG:0);
-     SP.W = tempRegister.W;
-   }
+   tempRegister.W = SP.W + offset;
+   AF.B.B0 = ((SP.W^offset^tempRegister.W)&0x100? C_FLAG : 0) |
+             ((SP.W^offset^tempRegister.W)& 0x10? H_FLAG : 0);
+   SP.W = tempRegister.W;
    break;
  case 0xe9:
    // LD PC,HL
@@ -1340,7 +1330,7 @@ case 0x38:
    break;
  case 0xf1:
    // POP AF
-   AF.B.B0=gbReadMemory(SP.W++);
+   AF.B.B0=gbReadMemory(SP.W++)&0xF0;
    AF.B.B1=gbReadMemory(SP.W++);
    break;
  case 0xf2:
@@ -1377,17 +1367,10 @@ case 0x38:
  case 0xf8:
    // LD HL,SP+NN
    offset = (s8)gbReadOpcode(PC.W++);
-   if(offset >= 0) {
-     tempRegister.W = SP.W + offset;
-     AF.B.B0 = (SP.W > tempRegister.W ? C_FLAG : 0) |
-       ((SP.W^offset^tempRegister.W)&0x1000? H_FLAG:0);
-     HL.W = tempRegister.W;
-   } else {
-     tempRegister.W = SP.W + offset;
-     AF.B.B0 = (SP.W < tempRegister.W ? C_FLAG : 0) |
-       ((SP.W^offset^tempRegister.W)&0x1000?H_FLAG:0);
-     HL.W = tempRegister.W;
-   }
+   tempRegister.W = SP.W + offset;
+   AF.B.B0 = ((SP.W^offset^tempRegister.W)&0x100? C_FLAG : 0) |
+             ((SP.W^offset^tempRegister.W)& 0x10? H_FLAG : 0);
+   HL.W = tempRegister.W;
    break;
  case 0xf9:
    // LD SP,HL
