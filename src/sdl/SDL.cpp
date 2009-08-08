@@ -2190,6 +2190,7 @@ int main(int argc, char **argv)
       exit(-1);
     }
   } else {
+    soundInit();
     cartridgeType = 0;
     strcpy(filename, "gnu_stub");
     rom = (u8 *)malloc(0x2000000);

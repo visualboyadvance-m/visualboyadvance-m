@@ -127,12 +127,12 @@ bool remoteTcpInit()
       int error = WSAGetLastError();
 #endif // _WIN32
     }
-    char dummy;
-    recv(s2, &dummy, 1, 0);
-    if(dummy != '+') {
-      fprintf(stderr, "ACK not received\n");
-      exit(-1);
-    }
+    //char dummy;
+    //recv(s2, &dummy, 1, 0);
+    //if(dummy != '+') {
+    //  fprintf(stderr, "ACK not received\n");
+    //  exit(-1);
+    //}
     remoteSocket = s2;
     //    close(s);
   }
@@ -167,14 +167,14 @@ int remotePipeRecv(char *data, int len)
 
 bool remotePipeInit()
 {
-  char dummy;
-  if (read(0, &dummy, 1) == 1)
-  {
-    if(dummy != '+') {
-      fprintf(stderr, "ACK not received\n");
-      exit(-1);
-    }
-  }
+//  char dummy;
+//  if (read(0, &dummy, 1) == 1)
+//  {
+//    if(dummy != '+') {
+//      fprintf(stderr, "ACK not received\n");
+//      exit(-1);
+//    }
+//  }
 
   return true;
 }
@@ -230,16 +230,13 @@ void remotePutPacket(const char *packet)
   *p++ = hex[csum & 15];
   *p++ = 0;
   //  printf("Sending %s\n", buffer);
-  remoteSendFnc(buffer, (int)count + 4);
 
   char c = 0;
-  remoteRecvFnc(&c, 1);
-  /*
-  if(c == '+')
-    printf("ACK\n");
-  else if(c=='-')
-    printf("NACK\n");
-  */
+  while(c != '+'){
+    remoteSendFnc(buffer, (int)count + 4);
+    remoteRecvFnc(&c, 1);
+//    fprintf(stderr,"sent:%s recieved:%c\n",buffer,c);
+  }
 }
 
 #define debuggerReadMemory(addr) \
@@ -560,7 +557,9 @@ void remoteStubMain()
     remoteResumed = false;
   }
 
+  const char *hex = "0123456789abcdef";
   while(1) {
+    char ack;
     char buffer[1024];
     int res = remoteRecvFnc(buffer, 1024);
 
@@ -573,99 +572,135 @@ void remoteStubMain()
       debugger = false;
       break;
     }
-
-    //    fprintf(stderr, "Received %s\n", buffer);
-    char *p = buffer;
-    char c = *p++;
-    char pp = '+';
-    remoteSendFnc(&pp, 1);
-
-    if(c != '$')
-      continue;
-    c= *p++;
-    switch(c) {
-    case '?':
-      remoteSendSignal();
-      break;
-    case 'D':
-      remotePutPacket("OK");
-#ifdef SDL
-      dbgMain = debuggerMain;
-      dbgSignal = debuggerSignal;
-#endif
-      remoteResumed = true;
-      debugger = false;
-      return;
-    case 'e':
-      remoteStepOverRange(p);
-      break;
-    case 'k':
-      remotePutPacket("OK");
-#ifdef SDL
-      dbgMain = debuggerMain;
-      dbgSignal = debuggerSignal;
-#endif
-      debugger = false;
-      emulating = false;
-      return;
-    case 'C':
-      remoteResumed = true;
-      debugger = false;
-      return;
-    case 'c':
-      remoteResumed = true;
-      debugger = false;
-      return;
-    case 's':
-      remoteResumed = true;
-      remoteSignal = 5;
-      CPULoop(1);
-      if(remoteResumed) {
-        remoteResumed = false;
-        remoteSendStatus();
-      }
-      break;
-    case 'g':
-      remoteReadRegisters(p);
-      break;
-    case 'P':
-      remoteWriteRegister(p);
-      break;
-    case 'M':
-      remoteMemoryWrite(p);
-      break;
-    case 'm':
-      remoteMemoryRead(p);
-      break;
-    case 'X':
-      remoteBinaryWrite(p);
-      break;
-    case 'H':
-      remotePutPacket("OK");
-      break;
-    case 'q':
-      remotePutPacket("");
-      break;
-    case 'Z':
-      if(*p++ == '2') {
-        remoteWriteWatch(p, true);
-      } else
-        remotePutPacket("");
-      break;
-    case 'z':
-      if(*p++ == '2') {
-	remoteWriteWatch(p, false);
-      } else
-	remotePutPacket("");
-      break;
-    default:
-      {
-        *(strchr(p, '#') + 3) = 0;
-        fprintf(stderr, "Unknown packet %s\n", --p);
-        remotePutPacket("");
-      }
-      break;
+    if(res < 1024){
+      buffer[res] = 0;
+    }else{
+      fprintf(stderr, "res=%d\n",res);
     }
+
+//    fprintf(stderr, "res=%d Received %s\n",res, buffer);
+    char c = buffer[0];
+    char *p = &buffer[0];
+    int i = 0;
+    unsigned char csum = 0;
+    while(i < res){
+      if(buffer[i] == '$'){
+        i++;
+        csum = 0;
+        c = buffer[i];
+        p = &buffer[i+1];
+        while((i<res) && (buffer[i] !='#')){
+          csum += buffer[i];
+          i++;
+        }
+      }else if(buffer[i] == '#'){
+        buffer[i] = 0;
+        if((i+2)<res){
+          if((buffer[i+1] == hex[csum>>4]) && (buffer[i+2] == hex[csum & 0xf])){
+            ack = '+';
+            remoteSendFnc(&ack, 1);
+            //fprintf(stderr, "SentACK c=%c\n",c);
+            //process message...
+             switch(c) {
+             case '?':
+               remoteSendSignal();
+               break;
+             case 'D':
+               remotePutPacket("OK");
+#ifdef SDL
+               dbgMain = debuggerMain;
+               dbgSignal = debuggerSignal;
+#endif
+               remoteResumed = true;
+               debugger = false;
+               return;
+             case 'e':
+               remoteStepOverRange(p);
+               break;
+             case 'k':
+               remotePutPacket("OK");
+#ifdef SDL
+               dbgMain = debuggerMain;
+               dbgSignal = debuggerSignal;
+#endif
+               debugger = false;
+               emulating = false;
+               return;
+             case 'C':
+               remoteResumed = true;
+               debugger = false;
+               return;
+             case 'c':
+               remoteResumed = true;
+               debugger = false;
+               return;
+             case 's':
+               remoteResumed = true;
+               remoteSignal = 5;
+               CPULoop(1);
+               if(remoteResumed) {
+                 remoteResumed = false;
+                 remoteSendStatus();
+               }
+               break;
+             case 'g':
+               remoteReadRegisters(p);
+               break;
+             case 'P':
+               remoteWriteRegister(p);
+               break;
+             case 'M':
+               remoteMemoryWrite(p);
+               break;
+             case 'm':
+               remoteMemoryRead(p);
+               break;
+             case 'X':
+               remoteBinaryWrite(p);
+               break;
+             case 'H':
+               remotePutPacket("OK");
+               break;
+             case 'q':
+               remotePutPacket("");
+               break;
+             case 'Z':
+               if(*p++ == '2') {
+                 remoteWriteWatch(p, true);
+               } else
+                 remotePutPacket("");
+               break;
+             case 'z':
+               if(*p++ == '2') {
+                 remoteWriteWatch(p, false);
+               } else
+                 remotePutPacket("");
+               break;
+             default:
+               {
+                 fprintf(stderr, "Unknown packet %s\n", --p);
+                 remotePutPacket("");
+               }
+               break;
+             }
+          }else{
+            fprintf(stderr, "bad chksum csum=%x msg=%c%c\n",csum,buffer[i+1],buffer[i+2]);
+            ack = '-';
+            remoteSendFnc(&ack, 1);
+            fprintf(stderr, "SentNACK\n");
+          }//if
+          i+=3;
+        }else{
+          fprintf(stderr, "didn't receive chksum i=%d res=%d\n",i,res);
+          i++;
+        }//if
+      }else{
+        if(buffer[i] != '+'){ //ingnore ACKs
+          fprintf(stderr, "not sure what to do with:%c i=%d res=%d\n",buffer[i],i,res);
+        }
+        i++;
+      }//if
+    }//while
   }
 }
 
