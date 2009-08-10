@@ -14,13 +14,13 @@ void MainWnd::OnHelpAbout()
 
 void MainWnd::OnHelpFaq()
 {
-  ::ShellExecute(0, _T("open"), "http://vba-m.ngemu.com/forum/",
+  ::ShellExecute(0, _T("open"), "http://vba-m.com/forum/",
                  0, 0, SW_SHOWNORMAL);
 }
 
 void MainWnd::OnHelpBugreport()
 {
-  ::ShellExecute(0, _T("open"), "http://sourceforge.net/tracker/?atid=1023154&group_id=212795&func=browse",
+  ::ShellExecute(0, _T("open"), "http://sourceforge.net/tracker/?group_id=212795&atid=1023154",
                  0, 0, SW_SHOWNORMAL);
 }
 
