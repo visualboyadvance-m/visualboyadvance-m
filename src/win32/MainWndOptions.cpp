@@ -31,6 +31,8 @@
 #include "../gb/gbSound.h"
 #include "../gba/GBALink.h"
 
+#include "../version.h"
+
 #include <tchar.h>
 
 
@@ -661,7 +663,7 @@ BOOL MainWnd::OnOptionsEmulatorShowSpeed(UINT nID)
   switch(nID) {
   case ID_OPTIONS_EMULATOR_SHOWSPEED_NONE:
     theApp.showSpeed = 0;
-    systemSetTitle("VisualBoyAdvance");
+    systemSetTitle(VBA_NAME_AND_SUBVERSION);
     break;
   case ID_OPTIONS_EMULATOR_SHOWSPEED_PERCENTAGE:
     theApp.showSpeed = 1;

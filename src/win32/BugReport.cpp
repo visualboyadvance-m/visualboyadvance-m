@@ -140,7 +140,7 @@ CString BugReport::createReport()
   theApp.winCheckFullscreen();
 
   CString report = "";
-  AppendFormat(report, "Emu version  : %s\r\n", VERSION);
+  AppendFormat(report, "Emu version  : %s\r\n", VBA_VERSION_STRING);
   AppendFormat(report, "Emu Type     : %s\r\n",
 #ifdef DEBUG
                "Debug Version"

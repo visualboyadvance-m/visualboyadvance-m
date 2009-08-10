@@ -30,6 +30,8 @@
 #include "../gb/gbSound.h"
 #include "../common/SoundDriver.h"
 
+#include "../version.h"
+
 /* Link
 ---------------------*/
 #include "../gba/GBALink.h"
@@ -1060,9 +1062,9 @@ void systemShowSpeed(int speed)
   if(theApp.videoOption <= VIDEO_4X && theApp.showSpeed) {
     CString buffer;
     if(theApp.showSpeed == 1)
-      buffer.Format("VisualBoyAdvance-%3d%%", systemSpeed);
+      buffer.Format(VBA_NAME_AND_SUBVERSION "-%3d%%", systemSpeed);
     else
-      buffer.Format("VisualBoyAdvance-%3d%%(%d, %d fps)", systemSpeed,
+      buffer.Format(VBA_NAME_AND_SUBVERSION "-%3d%%(%d, %d fps)", systemSpeed,
                     systemFrameSkip,
                     theApp.showRenderedFrames);
 
@@ -2026,7 +2028,7 @@ bool VBA::preInitialize()
 	pWnd->CreateEx(
 		styleEx,
 		wndClass,
-		_T("VisualBoyAdvance"),
+		_T(VBA_NAME_AND_SUBVERSION),
 		style,
 		x, y,
 		winSizeX, winSizeY,

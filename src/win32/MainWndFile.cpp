@@ -19,6 +19,8 @@
 #include "../gb/gbCheats.h"
 #include "../gb/gbGlobals.h"
 
+#include "../version.h"
+
 extern void remoteCleanUp();
 extern void InterframeCleanup();
 
@@ -148,7 +150,7 @@ void MainWnd::OnFileClose()
   }
   emulating = 0;
   RedrawWindow(NULL,NULL,RDW_INVALIDATE|RDW_ERASE|RDW_ALLCHILDREN);
-  systemSetTitle("VisualBoyAdvance");
+  systemSetTitle(VBA_NAME_AND_SUBVERSION);
 }
 
 void MainWnd::OnUpdateFileClose(CCmdUI* pCmdUI)
