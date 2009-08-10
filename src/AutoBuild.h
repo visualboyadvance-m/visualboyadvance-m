@@ -19,9 +19,7 @@
 
 #ifndef __AUTOBUILD_H__
 #define __AUTOBUILD_H__
-#ifndef VERSION
-#define VERSION       "1.8.0-SVN"
-#endif
+#include "version.h"
 //change the FALSE to TRUE for autoincrement of build number
 #define INCREMENT_VERSION FALSE
 #define FILEVER        1,8,0,600

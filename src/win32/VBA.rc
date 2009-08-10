@@ -207,7 +207,7 @@ BEGIN
     ICON            IDI_MAINICON,IDC_STATIC,6,6,20,20
     CTEXT           "VisualBoyAdvance Emulator",IDC_STATIC,36,6,138,8
     CTEXT           "Copyright © 2008 VBA-M development team",IDC_STATIC,6,48,168,8
-    CTEXT           "http://vba-m.ngemu.com",IDC_URL,7,138,168,8
+    CTEXT           "http://vba-m.com",IDC_URL,7,138,168,8
     RTEXT           "Version:",IDC_STATIC,36,18,54,8
     LTEXT           "",IDC_VERSION,96,18,78,8,SS_NOPREFIX
     GROUPBOX        "VBA-M dev team:",IDC_STATIC,7,65,90,66
@@ -1586,7 +1586,7 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "Comments", "VBA-M comes with NO WARRANTY. Use it at your own risk."
-            VALUE "CompanyName", "http://vba-m.ngemu.com/"
+            VALUE "CompanyName", "http://vba-m.com/"
             VALUE "FileDescription", "GB/C/A emulator for Windows"
             VALUE "FileVersion", "1, 8, 0, 0"
             VALUE "InternalName", "VBA-M"
