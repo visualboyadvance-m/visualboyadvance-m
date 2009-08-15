@@ -654,3 +654,15 @@ void utilUpdateSystemColorMaps()
     break;
   }
 }
+
+// Check for existence of file.
+bool utilFileExists( const char *filename )
+{
+	FILE *f = fopen( filename, "r" );
+	if( f == NULL ) {
+		return false;
+	} else {
+		fclose( f );
+		return true;
+	}
+}
