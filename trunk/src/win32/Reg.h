@@ -12,7 +12,7 @@ void regSetBinaryValue(const char *key, char *value, int count);
 void regDeleteValue(char *key);
 void regInit(const char *);
 void regShutdown();
-bool regCreateFileType(const char *ext, const char *type);
-bool regAssociateType(const char *type, const char *desc, const char *application);
+bool regCreateFileType( const char *ext, const char *type );
+bool regAssociateType( const char *type, const char *desc, const char *application, const char *icon = NULL );
 void regExportSettingsToINI();
 #endif // VBA_REG_H
