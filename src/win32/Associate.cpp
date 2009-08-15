@@ -95,7 +95,8 @@ void Associate::OnOk()
     commandPath.Format("\"%s\" \"%%1\"", applicationPath);
     regAssociateType("VisualBoyAdvance.Binary",
                      "Binary",
-                     commandPath);
+                     commandPath,
+					 "%SystemRoot%\\system32\\SHELL32.dll,-13");
 
     for(int i = 0; i < 7; i++) {
       if(mask & (1<<i)) {

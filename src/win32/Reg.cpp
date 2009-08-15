@@ -218,77 +218,111 @@ void regDeleteValue(char *key)
   }
 }
 
-bool regCreateFileType(const char *ext, const char *type)
+bool regCreateFileType( const char *ext, const char *type )
 {
-  DWORD disp = 0;
-  HKEY key;
-  LONG res = RegCreateKeyEx(HKEY_CLASSES_ROOT,
-                            ext,
-                            0,
-                            "",
-                            REG_OPTION_NON_VOLATILE,
-                            KEY_ALL_ACCESS,
-                            NULL,
-                            &key,
-                            &disp);
-  if(res == ERROR_SUCCESS) {
-    res = RegSetValueEx(key,
-                        "",
-                        0,
-                        REG_SZ,
-                        (const UCHAR *)type,
-                        lstrlen(type)+1);
-    RegCloseKey(key);
-    return true;
-  }
-  return false;
+	HKEY key;
+	CString temp;
+	temp.Format( "Software\\Classes\\%s", ext );
+	LONG res = RegCreateKeyEx(
+		HKEY_CURRENT_USER,
+		temp,
+		0,
+		NULL,
+		REG_OPTION_NON_VOLATILE,
+		KEY_ALL_ACCESS,
+		NULL,
+		&key,
+		NULL );
+	if( res == ERROR_SUCCESS ) {
+		RegSetValueEx(
+			key,
+			"",
+			0,
+			REG_SZ,
+			(const BYTE *)type,
+			lstrlen(type) + 1 );
+		RegCloseKey( key );
+		// Notify Windows that extensions have changed
+		SHChangeNotify( SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL );
+		return true;
+	}
+	return false;
 }
 
-bool regAssociateType(const char *type, const char *desc, const char *application)
+bool regAssociateType( const char *type, const char *desc, const char *application, const char *icon )
 {
-  DWORD disp = 0;
-  HKEY key;
-  LONG res = RegCreateKeyEx(HKEY_CLASSES_ROOT,
-                            type,
-                            0,
-                            "",
-                            REG_OPTION_NON_VOLATILE,
-                            KEY_ALL_ACCESS,
-                            NULL,
-                            &key,
-                            &disp);
-  if(res == ERROR_SUCCESS) {
-    res = RegSetValueEx(key,
-                        "",
-                        0,
-                        REG_SZ,
-                        (const UCHAR *)desc,
-                        lstrlen(desc)+1);
-    HKEY key2;
-    res = RegCreateKeyEx(key,
-                         "Shell\\Open\\Command",
-                         0,
-                         "",
-                         REG_OPTION_NON_VOLATILE,
-                         KEY_ALL_ACCESS,
-                         NULL,
-                         &key2,
-                         &disp);
-    if(res == ERROR_SUCCESS) {
-      res = RegSetValueEx(key2,
-                          "",
-                          0,
-                          REG_SZ,
-                          (const UCHAR *)application,
-                          lstrlen(application)+1);
-      RegCloseKey(key2);
-      RegCloseKey(key);
-      return true;
-    }
-
-    RegCloseKey(key);
-  }
-  return false;
+	HKEY key;
+	CString temp;
+	temp.Format( "Software\\Classes\\%s", type );
+	LONG res = RegCreateKeyEx(
+		HKEY_CURRENT_USER,
+		temp,
+		0,
+		NULL,
+		REG_OPTION_NON_VOLATILE,
+		KEY_ALL_ACCESS,
+		NULL,
+		&key,
+		NULL );
+	if( res == ERROR_SUCCESS ) {
+		res = RegSetValueEx(
+			key,
+			"",//"FriendlyTypeName",
+			0,
+			REG_SZ,
+			(const BYTE *)desc,
+			lstrlen(desc) + 1 );
+		HKEY key2;
+		res = RegCreateKeyEx(
+			key,
+			"Shell\\Open\\Command",
+			0,
+			NULL,
+			REG_OPTION_NON_VOLATILE,
+			KEY_ALL_ACCESS,
+			NULL,
+			&key2,
+			NULL );
+		if( res == ERROR_SUCCESS ) {
+			RegSetValueEx(
+				key2,
+				"",
+				0,
+				REG_SZ,
+				(const BYTE *)application,
+				lstrlen(application) + 1 );
+			if( icon != NULL ) {
+				HKEY key3;
+				res = RegCreateKeyEx(
+					key,
+					"DefaultIcon",
+					0,
+					NULL,
+					REG_OPTION_NON_VOLATILE,
+					KEY_ALL_ACCESS,
+					NULL,
+					&key3,
+					NULL );
+				if( res == ERROR_SUCCESS ) {
+					RegSetValueEx(
+						key3,
+						"",
+						0,
+						REG_SZ,
+						(const BYTE *)icon,
+						lstrlen(icon) + 1 );
+				}
+				RegCloseKey(key3);
+			}
+			RegCloseKey(key2);
+			RegCloseKey(key);
+			// Notify Windows that extensions have changed
+			SHChangeNotify( SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL );
+			return true;
+		}
+		RegCloseKey(key);
+	}
+	return false;
 }
 
 static void regExportSettingsToINI(HKEY key, const char *section)
