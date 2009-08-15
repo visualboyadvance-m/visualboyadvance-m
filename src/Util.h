@@ -41,5 +41,6 @@ z_off_t utilGzSeek(gzFile file, z_off_t offset, int whence);
 long utilGzMemTell(gzFile file);
 void utilGBAFindSave(const u8 *, const int);
 void utilUpdateSystemColorMaps();
+bool utilFileExists( const char *filename );
 
 #endif // UTIL_H
