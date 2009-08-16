@@ -87,7 +87,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="nafxcwd.lib libcmtd.lib zlibd.lib libpngd.lib"
-				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
+				OutputFile="$(OutDir)\VisualBoyAdvance-M.exe"
 				Version=""
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -196,7 +196,7 @@
 				RegisterOutput="false"
 				IgnoreImportLibrary="false"
 				AdditionalDependencies="nafxcw.lib libcmt.lib zlib.lib libpng.lib"
-				OutputFile="$(OutDir)\VisualBoyAdvance.exe"
+				OutputFile="$(OutDir)\VisualBoyAdvance-M.exe"
 				Version=""
 				LinkIncremental="0"
 				SuppressStartupBanner="true"
@@ -233,6 +233,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
 	</Configurations>
