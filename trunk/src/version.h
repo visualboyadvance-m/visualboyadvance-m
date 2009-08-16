@@ -17,7 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#define VBA_NAME "VisualBoyAdvance"
+#define VBA_NAME "VisualBoyAdvance-M"
 
 #ifdef WIN32
 #include "svnrev.h"
@@ -36,7 +36,7 @@
 #elif defined(PUBLIC_RELEASE)
 #define VBA_SUBVERSION_STRING ""
 #else
-#define VBA_SUBVERSION_STRING "-SVN" SVN_REV_STR
+#define VBA_SUBVERSION_STRING " (SVN" SVN_REV_STR ")"
 #endif
 
 #if defined(_MSC_VER)
