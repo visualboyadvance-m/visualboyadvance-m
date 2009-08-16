@@ -890,7 +890,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\win32\Sound.h"
+				RelativePath="..\..\src\common\SoundDriver.h"
 				>
 			</File>
 			<File

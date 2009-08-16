@@ -20,18 +20,17 @@ Known preprocessor switches:
 
 
 Download locations:
-NASM:         http://nasm.sourceforge.net/
-DirectX SDK:  http://msdn2.microsoft.com/en-us/xna/aa937788.aspx
+NASM:         http://nasm.us/
+DirectX SDK:  http://msdn.microsoft.com/en-us/xna/aa937788.aspx
 OpenAL SDK:   http://connect.creativelabs.com/openal/default.aspx
 OpenGL files: http://www.opengl.org/registry/
 zlib:         http://zlib.net/
 libpng:       http://libpng.org/pub/png/libpng.html
-UPX:          http://upx.sourceforge.net/
 
 You can find pre-built versions of zlib & libpng at:
-http://vba-m.ngemu.com/vbam/vbasources/libs/
+http://spacy51.sp.funpic.de/VBA-M/libs/
 Just extract them somewhere and point Visual C++ 2008 to the include & lib folders.
-They are built with the static C runtime (this is what the releases use).
+They are built with the static C runtime (this is what the release builds use).
 
 
 
@@ -45,15 +44,8 @@ Refer to the instructions below for further assistance:
 ===Win32/MFC===
 This is the full-featured Windows build using the MFC GUI.
 The project files are located in trunk/project/vc2008_mfc (VBA2008.sln).
-Before you can compile it, you have to take care of some prerequisites:
-Download the zlib & libpng sources from the internet and extract them both to the same folder.
-Rename them so you have a folder called libpng and another one called zlib in the same loaction.
-Open libpng/projects/visualc71/libpng.sln. Let the assistant convert them if necessary.
-Build the "DLL Release" & "DLL Debug" configurations.
-Set up your operating system's PATH variable to point to the created zlib & libpng DLLs.
-Set up your compiler's LIB & INCLUDE paths to point to the created lib files and the source files.
-You also have to install Microsoft's DirectX SDK for DirectInput & XAudio2.
+You also have to install Microsoft's DirectX SDK for Direct3D, DirectInput & XAudio2.
 If you want to enable OpenAL sound output, install the OpenAL SDK. If you do not want it, #define NO_OAL.
-Some pixel filters come with assembler code, which compatible to the NASM syntax.
-Extract NASM somewhere and add it to your compiler's executable file paths.
+Some pixel filters come with assembler code, which is compatible to the NASM syntax.
+Install NASM somewhere and add it to your compiler's executable file paths.
 All .asm files will be handled with the "nasm.rules" build rules file which comes with this project file.
