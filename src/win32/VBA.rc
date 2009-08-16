@@ -205,7 +205,7 @@ CAPTION "About"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     ICON            IDI_MAINICON,IDC_STATIC,6,6,20,20
-    CTEXT           "VisualBoyAdvance Emulator",IDC_STATIC,36,6,138,8
+    CTEXT           "VisualBoyAdvance-M Emulator",IDC_STATIC,36,6,138,8
     CTEXT           "Copyright © 2008 VBA-M development team",IDC_STATIC,6,48,168,8
     CTEXT           "http://vba-m.com",IDC_URL,7,138,168,8
     RTEXT           "Version:",IDC_STATIC,36,18,54,8
@@ -1832,7 +1832,7 @@ BEGIN
             POPUP "&Frame Skip"
             BEGIN
                 MENUITEM "&Automatic",                  ID_OPTIONS_FRAMESKIP_AUTOMATIC
-            MENUITEM SEPARATOR
+                MENUITEM SEPARATOR
                 MENUITEM "&No frame skip",              ID_OPTIONS_VIDEO_FRAMESKIP_0
                 MENUITEM "&1 frame",                    ID_OPTIONS_VIDEO_FRAMESKIP_1
                 MENUITEM "&2 frames",                   ID_OPTIONS_VIDEO_FRAMESKIP_2
