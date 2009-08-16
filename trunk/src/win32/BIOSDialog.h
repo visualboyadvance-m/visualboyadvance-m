@@ -1,5 +1,4 @@
 #pragma once
-#include "afxwin.h"
 
 
 // BIOSDialog dialog

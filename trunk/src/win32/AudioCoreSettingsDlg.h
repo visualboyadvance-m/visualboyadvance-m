@@ -1,10 +1,5 @@
 #pragma once
 
-#include "stdafx.h"
-#include "afxwin.h"
-#include "afxcmn.h"
-
-
 // AudioCoreSettingsDlg dialog
 
 class AudioCoreSettingsDlg : public CDialog

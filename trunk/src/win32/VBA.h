@@ -4,7 +4,6 @@
 #error include 'stdafx.h' before including this file for PCH
 #endif
 
-#include "stdafx.h"
 #include "resource.h"
 
 #include "AcceleratorManager.h"

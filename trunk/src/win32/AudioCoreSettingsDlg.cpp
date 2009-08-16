@@ -1,3 +1,6 @@
+#include "stdafx.h"
+#include "VBA.h"
+
 #include "AudioCoreSettingsDlg.h"
 
 #define MIN_VOLUME 0.0f

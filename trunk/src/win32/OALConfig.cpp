@@ -1,6 +1,6 @@
-#include "stdafx.h"
-
 #ifndef NO_OAL
+#include "stdafx.h"
+#include "VBA.h"
 
 #include "OALConfig.h"
 
