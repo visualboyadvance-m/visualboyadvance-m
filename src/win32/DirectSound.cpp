@@ -1,6 +1,9 @@
 // MFC
 #include "stdafx.h"
 
+// Application
+#include "VBA.h"
+
 // Tools
 #include "AVIWrite.h"
 #include "WavWriter.h"

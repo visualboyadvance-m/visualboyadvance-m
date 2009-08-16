@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "VBA.h"
 #include "rpi.h"
 
 extern void SuperEagle(u8*,u32,u8*,u8*,u32,int,int);

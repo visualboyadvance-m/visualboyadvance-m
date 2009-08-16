@@ -1,11 +1,13 @@
 // This file was written by denopqrihg
 
+#include "../win32/stdafx.h"
+#include "../win32/VBA.h"
+
+#include "GBALink.h"
+
 #include "GBA.h"
 #include <stdio.h>
-#include "../win32/stdafx.h"
 #include "../common/port.h"
-#include "GBALink.h"
-#include "../win32/vba.h"
 #include "../win32/MainWnd.h"
 #include "../win32/LinkOptions.h"
 #include "../win32/Reg.h"
