@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "VBA.h"
 #include "..\gba\GBALink.h"
 
 static char buffer[2048];

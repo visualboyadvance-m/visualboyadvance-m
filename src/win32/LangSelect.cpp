@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "vba.h"
+#include "VBA.h"
 #include "LangSelect.h"
 
 #ifdef _DEBUG

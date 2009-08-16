@@ -1,13 +1,11 @@
 #ifndef NO_OAL
 
 #pragma once
-#include "afxwin.h"
 
 // OpenAL
 #include <al.h>
 #include <alc.h>
 #include "LoadOAL.h"
-#include "afxcmn.h"
 
 
 // OALConfig dialog

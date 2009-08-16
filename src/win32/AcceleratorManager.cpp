@@ -27,8 +27,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-//#include "resource.h"
-#include "../System.h"
+#include "VBA.h"
 
 #include "AcceleratorManager.h"
 #include "Reg.h"

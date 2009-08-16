@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stdafx.h"
+#include "VBA.h"
 
 
 class MainWnd : public CWnd

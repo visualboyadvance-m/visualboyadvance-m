@@ -3,6 +3,9 @@
 // MFC
 #include "stdafx.h"
 
+// Application
+#include "VBA.h"
+
 // Interface
 #include "../common/SoundDriver.h"
 

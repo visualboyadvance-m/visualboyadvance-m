@@ -1,8 +1,8 @@
 // === LOGALL writes very detailed informations to vba-trace.log ===
 //#define LOGALL
 
-
-#include "stdafx.h" // includes VBA.h for 'theApp.throttle'
+#include "stdafx.h"
+#include "VBA.h" // for 'theApp.throttle'
 
 #ifndef NO_OAL
 

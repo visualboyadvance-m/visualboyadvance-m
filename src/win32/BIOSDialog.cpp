@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include "VBA.h"
+
 #include "BIOSDialog.h"
 
 

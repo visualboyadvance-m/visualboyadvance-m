@@ -5,6 +5,8 @@
 #endif
 
 #include "stdafx.h"
+#include "VBA.h"
+
 #include <intrin.h>
 
 #include "AVIWrite.h"

@@ -1,8 +1,6 @@
 #ifndef NO_XAUDIO2
 
 #pragma once
-#include "afxwin.h"
-#include "afxcmn.h"
 
 
 class XAudio2_Config : public CDialog
