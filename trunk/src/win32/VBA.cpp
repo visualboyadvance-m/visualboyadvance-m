@@ -407,57 +407,6 @@ VBA theApp;
 /////////////////////////////////////////////////////////////////////////////
 // VBA initialization
 
-// code from SDL_main.c for Windows
-/* Parse a command line buffer into arguments */
-static int parseCommandLine(char *cmdline, char **argv)
-{
-  char *bufp;
-  int argc;
-
-  argc = 0;
-  for ( bufp = cmdline; *bufp; ) {
-    /* Skip leading whitespace */
-    while ( isspace(*bufp) ) {
-      ++bufp;
-    }
-    /* Skip over argument */
-    if ( *bufp == '"' ) {
-      ++bufp;
-      if ( *bufp ) {
-        if ( argv ) {
-          argv[argc] = bufp;
-        }
-        ++argc;
-      }
-      /* Skip over word */
-      while ( *bufp && (*bufp != '"') ) {
-        ++bufp;
-      }
-    } else {
-      if ( *bufp ) {
-        if ( argv ) {
-          argv[argc] = bufp;
-        }
-        ++argc;
-      }
-      /* Skip over word */
-      while ( *bufp && ! isspace(*bufp) ) {
-        ++bufp;
-      }
-    }
-    if ( *bufp ) {
-      if ( argv ) {
-        *bufp = '\0';
-      }
-      ++bufp;
-    }
-  }
-  if ( argv ) {
-    argv[argc] = NULL;
-  }
-  return(argc);
-}
-
 BOOL VBA::InitInstance()
 {
 #if _MSC_VER < 1400
@@ -533,11 +482,8 @@ BOOL VBA::InitInstance()
 
   if (m_lpCmdLine[0])
     {
-      int argc = parseCommandLine(m_lpCmdLine, NULL);
-      char **argv = (char **)malloc((argc+1)*sizeof(char *));
-      parseCommandLine(m_lpCmdLine, argv);
-      if(argc > 0) {
-        szFile = argv[0];
+      if(__argc > 0) {
+        szFile = __argv[1];
         filename = szFile;
       }
       int index = filename.ReverseFind('.');
@@ -549,7 +495,6 @@ BOOL VBA::InitInstance()
         emulating = true;
       else
         emulating = false;
-      free(argv);
     }
 
   return TRUE;
