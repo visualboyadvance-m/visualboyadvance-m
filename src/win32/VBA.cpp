@@ -443,7 +443,32 @@ BOOL VBA::InitInstance()
   if(!InitLink())
 	return FALSE;;
 
-  regInit(winBuffer);
+  bool force = false;
+
+  if (m_lpCmdLine[0])
+  {
+    if(__argc > 0) {
+      if( 0 == strcmp( __argv[1], "--configpath" ) ) {
+        if( __argc > 2 ) {
+          strcpy( winBuffer, __argv[2] );
+          force = true;
+          if( __argc > 3 ) {
+            szFile = __argv[3]; filename = szFile;
+            int index = filename.ReverseFind('.');
+            if(index != -1)
+              filename = filename.Left(index);
+          }
+        }
+      } else {
+        szFile = __argv[1]; filename = szFile;
+        int index = filename.ReverseFind('.');
+        if(index != -1)
+          filename = filename.Left(index);
+      }
+    }
+  }
+
+  regInit(winBuffer, force);
 
   loadSettings();
 
@@ -480,22 +505,12 @@ BOOL VBA::InitInstance()
 
   winAccelMgr.UpdateMenu(menu);
 
-  if (m_lpCmdLine[0])
-    {
-      if(__argc > 0) {
-        szFile = __argv[1];
-        filename = szFile;
-      }
-      int index = filename.ReverseFind('.');
-
-      if(index != -1)
-        filename = filename.Left(index);
-
-      if(((MainWnd*)m_pMainWnd)->FileRun())
-        emulating = true;
-      else
-        emulating = false;
-    }
+  if( !filename.IsEmpty() ) {
+    if(((MainWnd*)m_pMainWnd)->FileRun())
+      emulating = true;
+    else
+      emulating = false;
+  }
 
   return TRUE;
 }

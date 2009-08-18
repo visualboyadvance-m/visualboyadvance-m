@@ -10,7 +10,7 @@ static CString *regVbaPath = NULL;
 
 bool regEnabled = true;
 
-void regInit(const char *path)
+void regInit(const char *path, bool force)
 {
 	if( regEnabled ) {
   DWORD disp = 0;
@@ -32,7 +32,7 @@ void regInit(const char *path)
   // If vba.ini exists in executable's folder, use it. Else create/use one in %appdata% folder.
   regVbaPath = new CString();
   regVbaPath->Format(MakeInstanceFilename("%s\\vba.ini"), path);
-  if( !utilFileExists( regVbaPath->GetString() ) ) {
+  if( !force && !utilFileExists( regVbaPath->GetString() ) ) {
 	  TCHAR appdata[MAX_PATH+1];
 	  SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, appdata );
 	  regVbaPath->Format( "%s\\VBA-M", appdata );
