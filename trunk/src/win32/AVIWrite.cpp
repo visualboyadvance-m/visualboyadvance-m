@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "AVIWrite.h"
 #pragma comment( lib, "Vfw32" )
 

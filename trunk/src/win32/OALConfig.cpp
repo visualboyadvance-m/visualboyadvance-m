@@ -1,5 +1,5 @@
-#ifndef NO_OAL
 #include "stdafx.h"
+#ifndef NO_OAL
 #include "VBA.h"
 
 #include "OALConfig.h"

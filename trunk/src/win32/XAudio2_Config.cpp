@@ -1,6 +1,5 @@
-#ifndef NO_XAUDIO2
-
 #include "stdafx.h"
+#ifndef NO_XAUDIO2
 #include "VBA.h"
 
 #include "XAudio2_Config.h"
