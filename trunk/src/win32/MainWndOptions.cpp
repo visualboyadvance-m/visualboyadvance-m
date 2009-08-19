@@ -786,28 +786,40 @@ void MainWnd::OnUpdateOptionsEmulatorSavetypeFlash1m(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsEmulatorSavetypeDetectNow()
 {
+    if( theApp.cartridgeType != IMAGE_GBA ) return;
     const int address_max = theApp.romSize - 10;
     char temp[11]; temp[10] = '\0';
     CString answer( _T( "This cartridge has probably no backup media." ) );
 
     for( int address = 0; address < address_max; address += 4 ) {
-        memcpy( temp, &rom[address], 10 );
+        const u8 check = rom[address];
 
-        if( 0 == strncmp( temp, "EEPROM_V", 8 ) ) {
-            answer = _T( "This cartridge uses EEPROM." );
-            break;
+        if( 'E' == check ) {
+            memcpy( temp, &rom[address], 10 );
+            if( 0 == strncmp( temp, "EEPROM_V", 8 ) ) {
+                answer = _T( "This cartridge uses EEPROM." );
+                break;
+            }
         }
-        if( 0 == strncmp( temp, "SRAM_V", 6 ) ) {
-            answer = _T( "This cartridge uses SRAM." );
-            break;
+
+        if( 'S' == check ) {
+            memcpy( temp, &rom[address], 10 );
+            if( 0 == strncmp( temp, "SRAM_V", 6 ) ) {
+                answer = _T( "This cartridge uses SRAM." );
+                break;
+            }
         }
-        if( ( 0 == strncmp( temp, "FLASH_V", 7 ) ) || ( 0 == strncmp( temp, "FLASH512_V", 10 ) ) ) {
-            answer = _T( "This cartridge uses FLASH (64 KiB)." );
-            break;
-        }
-        if( 0 == strncmp( temp, "FLASH1M_V", 9 ) ) {
-            answer = _T( "This cartridge uses FLASH (128 KiB)." );
-            break;
+
+        if( 'F' == check ) {
+            memcpy( temp, &rom[address], 10 );
+            if( ( 0 == strncmp( temp, "FLASH_V", 7 ) ) || ( 0 == strncmp( temp, "FLASH512_V", 10 ) ) ) {
+                answer = _T( "This cartridge uses FLASH (64 KiB)." );
+                break;
+            }
+            if( 0 == strncmp( temp, "FLASH1M_V", 9 ) ) {
+                answer = _T( "This cartridge uses FLASH (128 KiB)." );
+                break;
+            }
         }
     }
 
