@@ -1587,12 +1587,12 @@ BEGIN
         BEGIN
             VALUE "Comments", "VBA-M comes with NO WARRANTY. Use it at your own risk."
             VALUE "CompanyName", "http://vba-m.com/"
-            VALUE "FileDescription", "GB/C/A emulator for Windows"
+            VALUE "FileDescription", "VisualBoyAdvance-M"
             VALUE "FileVersion", "1, 8, 0, 0"
             VALUE "InternalName", "VBA-M"
-            VALUE "LegalCopyright", "Copyright © 2008 VBA-M development team"
-            VALUE "OriginalFilename", "VisualBoyAdvance.exe"
-            VALUE "ProductName", "VBA-M - A VisualBoyAdvance Fork"
+            VALUE "LegalCopyright", "Copyright © 2008-2009 VBA-M development team"
+            VALUE "OriginalFilename", "VisualBoyAdvance-M.exe"
+            VALUE "ProductName", "GB/C/A emulator for Windows"
             VALUE "ProductVersion", "1, 8, 0, 0"
         END
     END
