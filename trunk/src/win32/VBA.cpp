@@ -67,10 +67,12 @@ extern void Simple3x16(u8*,u32,u8*,u8*,u32,int,int);
 extern void Simple3x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void Simple4x16(u8*,u32,u8*,u8*,u32,int,int);
 extern void Simple4x32(u8*,u32,u8*,u8*,u32,int,int);
+#ifndef WIN64
 extern void hq3x16(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq4x16(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq3x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq4x32(u8*,u32,u8*,u8*,u32,int,int);
+#endif
 
 extern void SmartIB(u8*,u32,int,int);
 extern void SmartIB32(u8*,u32,int,int);
@@ -698,6 +700,7 @@ void VBA::updateFilter()
 			filterFunction = Simple4x16;
 			filterMagnification = 4;
 			break;
+#ifndef WIN64
 		case FILTER_HQ3X:
 			filterFunction = hq3x16;
 			filterMagnification = 3;
@@ -706,6 +709,7 @@ void VBA::updateFilter()
 			filterFunction = hq4x16;
 			filterMagnification = 4;
 			break;
+#endif
 		}
 		}
 
@@ -785,6 +789,7 @@ void VBA::updateFilter()
 				filterFunction = Simple4x32;
 				filterMagnification = 4;
 				break;
+#ifndef WIN64
 			case FILTER_HQ3X:
 				filterFunction = hq3x32;
 				filterMagnification = 3;
@@ -799,6 +804,7 @@ void VBA::updateFilter()
 				b16to32Video=true;
 #endif
 				break;
+#endif
 			}
 		}
 	}
