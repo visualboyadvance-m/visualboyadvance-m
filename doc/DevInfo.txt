@@ -16,6 +16,7 @@ Known preprocessor switches:
 - NO_D3D: Exclude Direct3D code
 - NO_OAL: Exclude OpenAL code
 - NO_XAUDIO2: Exclude XAudio2 code (the XAudio2 interface is DirectSound's successor)
+- WIN64: This macro is only defined for 64 bit builds
 
 
 
