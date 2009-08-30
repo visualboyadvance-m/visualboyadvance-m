@@ -15,7 +15,7 @@ class GBPrinterDlg : public CDialog
  private:
   u8 bitmapHeader[sizeof(BITMAPINFO)+4*sizeof(RGBQUAD)];
   BITMAPINFO *bitmap;
-  u8 bitmapData[160*144];
+  u8 *bitmapData;
   int scale;
   // Construction
  public:
@@ -23,6 +23,7 @@ class GBPrinterDlg : public CDialog
   void saveAsPNG(const char *name);
   void saveAsBMP(const char *name);
   GBPrinterDlg(CWnd* pParent = NULL);   // standard constructor
+  ~GBPrinterDlg();
 
   // Dialog Data
   //{{AFX_DATA(GBPrinterDlg)
