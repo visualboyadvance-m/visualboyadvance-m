@@ -454,7 +454,7 @@ static inline void CPUWriteMemory(u32 address, u32 value)
     }
     goto unwritable;
   case 0x0E:
-    if(!eepromInUse | cpuSramEnabled | cpuFlashEnabled) {
+    if((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled) {
       (*cpuSaveGameFunc)(address, (u8)value);
       break;
     }
@@ -556,7 +556,7 @@ static inline void CPUWriteHalfWord(u32 address, u16 value)
     }
     goto unwritable;
   case 14:
-    if(!eepromInUse | cpuSramEnabled | cpuFlashEnabled) {
+    if((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled) {
       (*cpuSaveGameFunc)(address, (u8)value);
       break;
     }
@@ -692,7 +692,7 @@ static inline void CPUWriteByte(u32 address, u8 b)
     }
     goto unwritable;
   case 14:
-    if (!(saveType == 5) && (!eepromInUse | cpuSramEnabled | cpuFlashEnabled)) {
+    if ((saveType != 5) && ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled)) {
 
       //if(!cpuEEPROMEnabled && (cpuSramEnabled | cpuFlashEnabled)) {
 

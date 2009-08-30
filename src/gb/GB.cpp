@@ -2437,7 +2437,7 @@ void gbReset()
   gbTimerOn = false;
 
   if(gbCgbMode) {
-    for (int i = 0; i<0x20; i++)
+    for (i = 0; i<0x20; i++)
       gbPalette[i] = 0x7fff;
 
     // This is just to show that the starting values of the OBJ palettes are different
@@ -2555,11 +2555,11 @@ void gbReset()
     }
   } else {
     if(gbSgbMode) {
-      for(int i = 0; i < 8; i++)
+      for(i = 0; i < 8; i++)
         gbPalette[i] = systemGbPalette[gbPaletteOption*8+i];
 
     }
-    for(int i = 0; i < 8; i++)
+    for(i = 0; i < 8; i++)
       gbPalette[i] = systemGbPalette[gbPaletteOption*8+i];
   }
 
@@ -4079,7 +4079,9 @@ bool gbUpdateSizes()
   }
 
   if(gbRomSize < gbRomSizes[gbRom[0x148]]) {
-    gbRom = (u8 *)realloc(gbRom, gbRomSizes[gbRom[0x148]]);
+    u8 *gbRomNew = (u8 *)realloc(gbRom, gbRomSizes[gbRom[0x148]]);
+    if( !gbRomNew ) { assert( false ); return false; };
+    gbRom = gbRomNew;
     for (int i = gbRomSize; i<gbRomSizes[gbRom[0x148]]; i++)
         gbRom[i] = 0x00; // Not sure if it's 0x00, 0xff or random data...
   }
@@ -4097,7 +4099,9 @@ bool gbUpdateSizes()
       }
       gbRom[0x148]++;
     }
-    gbRom = (u8 *)realloc(gbRom, gbRomSizes[gbRom[0x148]]);
+    u8 *gbRomNew = (u8 *)realloc(gbRom, gbRomSizes[gbRom[0x148]]);
+    if( !gbRomNew ) { assert( false ); return false; };
+    gbRom = gbRomNew;
   }
   gbRomSize = gbRomSizes[gbRom[0x148]];
   gbRomSizeMask = gbRomSizesMasks[gbRom[0x148]];
@@ -4305,36 +4309,36 @@ bool gbUpdateSizes()
   return true;
 }
 
-int gbGetNextEvent (int clockTicks)
+int gbGetNextEvent (int _clockTicks)
 {
   if (register_LCDC & 0x80)
   {
-    if(gbLcdTicks < clockTicks)
-        clockTicks = gbLcdTicks;
+    if(gbLcdTicks < _clockTicks)
+        _clockTicks = gbLcdTicks;
 
-    if(gbLcdTicksDelayed < clockTicks)
-      clockTicks = gbLcdTicksDelayed;
+    if(gbLcdTicksDelayed < _clockTicks)
+      _clockTicks = gbLcdTicksDelayed;
 
-    if(gbLcdLYIncrementTicksDelayed < clockTicks)
-      clockTicks = gbLcdLYIncrementTicksDelayed;
+    if(gbLcdLYIncrementTicksDelayed < _clockTicks)
+      _clockTicks = gbLcdLYIncrementTicksDelayed;
   }
 
-  if(gbLcdLYIncrementTicks < clockTicks)
-    clockTicks = gbLcdLYIncrementTicks;
+  if(gbLcdLYIncrementTicks < _clockTicks)
+    _clockTicks = gbLcdLYIncrementTicks;
 
-  if(gbSerialOn && (gbSerialTicks < clockTicks))
-    clockTicks = gbSerialTicks;
+  if(gbSerialOn && (gbSerialTicks < _clockTicks))
+    _clockTicks = gbSerialTicks;
 
-  if(gbTimerOn && (((gbInternalTimer) & gbTimerMask[gbTimerMode])+1 < clockTicks))
-    clockTicks = ((gbInternalTimer) & gbTimerMask[gbTimerMode])+1;
+  if(gbTimerOn && (((gbInternalTimer) & gbTimerMask[gbTimerMode])+1 < _clockTicks))
+    _clockTicks = ((gbInternalTimer) & gbTimerMask[gbTimerMode])+1;
 
-  //if(soundTicks && (soundTicks < clockTicks))
-  //  clockTicks = soundTicks;
+  //if(soundTicks && (soundTicks < _clockTicks))
+  //  _clockTicks = soundTicks;
 
-  if ((clockTicks<=0) || (gbInterruptWait))
-      clockTicks = 1;
+  if ((_clockTicks<=0) || (gbInterruptWait))
+      _clockTicks = 1;
 
-  return clockTicks;
+  return _clockTicks;
 }
 
 void gbDrawLine()

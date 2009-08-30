@@ -211,6 +211,7 @@ bool XAudio2_Output::init(long sampleRate)
 		ASSERT( hr == S_OK );
 		float *matrix = NULL;
 		matrix = (float*)malloc( sizeof( float ) * 2 * dd.OutputFormat.Format.nChannels );
+        if( matrix == NULL ) return false;
 		bool matrixAvailable = true;
 		switch( dd.OutputFormat.Format.nChannels ) {
 			case 4: // 4.0
