@@ -673,7 +673,7 @@ bool Direct3DDisplay::clearTexture( LPDIRECT3DTEXTURE9 texture, size_t textureHe
 // when either textureWidth or textureHeight is 0, last texture size will be used
 void Direct3DDisplay::createTexture( unsigned int textureWidth, unsigned int textureHeight )
 {
-	if( ( textureWidth != 0 ) && ( textureWidth != 0 ) ) {
+	if( ( textureWidth != 0 ) && ( textureHeight != 0 ) ) {
 		// calculate next possible square texture size
 		textureSize = 1;
 		unsigned int reqSizeMin = ( textureWidth > textureHeight ) ? textureWidth : textureHeight;

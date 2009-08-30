@@ -1,7 +1,7 @@
 #include "GBA.h"
 
 #ifdef BKPT_SUPPORT
-int  oldreg[17];
+int  oldreg[18];
 char oldbuffer[10];
 #endif
 

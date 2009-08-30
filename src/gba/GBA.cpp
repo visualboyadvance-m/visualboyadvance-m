@@ -1026,7 +1026,7 @@ bool CPUWriteGSASnapshot(const char *fileName,
   utilPutDword(buffer, totalSize); // length of remainder of save - CRC
   fwrite(buffer, 1, 4, file);
 
-  char temp[0x2001c];
+  char *temp = new char[0x2001c];
   memset(temp, 0, 28);
   memcpy(temp, &rom[0xa0], 16); // copy internal name
   temp[0x10] = rom[0xbe]; // reserved area (old checksum)
@@ -1046,6 +1046,7 @@ bool CPUWriteGSASnapshot(const char *fileName,
   fwrite(buffer, 1, 4, file); // CRC?
 
   fclose(file);
+  delete [] temp;
   return true;
 }
 

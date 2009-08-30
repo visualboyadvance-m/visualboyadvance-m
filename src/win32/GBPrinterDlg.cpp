@@ -26,6 +26,7 @@ static char THIS_FILE[] = __FILE__;
 GBPrinterDlg::GBPrinterDlg(CWnd* pParent /*=NULL*/)
   : CDialog(GBPrinterDlg::IDD, pParent)
 {
+  bitmapData = new u8[160*144];
   //{{AFX_DATA_INIT(GBPrinterDlg)
   m_scale = -1;
   //}}AFX_DATA_INIT
@@ -62,6 +63,12 @@ GBPrinterDlg::GBPrinterDlg(CWnd* pParent /*=NULL*/)
     bitmap->bmiColors[3].rgbRed =
     0;
   bitmap->bmiColors[3].rgbReserved = 0;
+}
+
+
+GBPrinterDlg::~GBPrinterDlg()
+{
+  delete [] bitmapData;
 }
 
 
@@ -211,7 +218,7 @@ void GBPrinterDlg::saveAsPNG(const char *name)
   int sizeX = 160;
   int sizeY = 144;
 
-  u8 *pixU8 = (u8 *)bitmapData;
+  u8 *pixU8 = bitmapData;
   for(int y = 0; y < sizeY; y++) {
     for(int x = 0; x < sizeX; x++) {
       u8 c = *pixU8++;

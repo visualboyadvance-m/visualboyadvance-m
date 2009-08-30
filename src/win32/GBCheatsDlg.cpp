@@ -1002,7 +1002,7 @@ void GBCheatList::OnNMDblclkCheatList(NMHDR *pNMHDR, LRESULT *pResult)
 	if( FALSE == m_list.GetItem( &item ) ) return;
 
 	// modify code
-	INT_PTR res;
+	INT_PTR res = IDABORT;
 	if( gbVerifyGsCode( gbCheatList[ item.lParam ].cheatCode ) ) {
 		CString temp = winResLoadString(IDS_ADD_GS_CODE);
 		AddGBCode dlg( winGbCheatAddVerifyGs, 8, temp );
