@@ -968,7 +968,7 @@ void systemDrawScreen()
 			  theApp.aviRecorder = NULL;
 			  theApp.aviRecording = false;
 		  }
-		  delete bmp;
+		  delete [] bmp;
 	  }
   }
 
@@ -2141,7 +2141,7 @@ void VBA::updatePriority()
 bool VBA::detectMMX()
 {
   bool support = false;
-  char brand[13];
+  char brand[12]; // not zero terminated
 
   // check for Intel chip
   __try {

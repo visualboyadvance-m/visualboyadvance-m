@@ -245,22 +245,22 @@ void gbSgbDrawBorderTile(int x, int y, int tile, int attr)
         else
           xxx = 7 - xx;
 
-        u16 c;
+        u16 cc;
         if (color) {
-          c = gbPalette[palette + color];
+          cc = gbPalette[palette + color];
         } else {
-          c = gbPalette[0];
+          cc = gbPalette[0];
         }
 
         switch(systemColorDepth) {
         case 16:
-          gbSgbDraw16Bit(dest + yyy*(256+2) + xxx, c);
+          gbSgbDraw16Bit(dest + yyy*(256+2) + xxx, cc);
           break;
         case 24:
-          gbSgbDraw24Bit(dest8 + (yyy*256+xxx)*3, c);
+          gbSgbDraw24Bit(dest8 + (yyy*256+xxx)*3, cc);
           break;
         case 32:
-          gbSgbDraw32Bit(dest32 + yyy*(256+1)+xxx, c);
+          gbSgbDraw32Bit(dest32 + yyy*(256+1)+xxx, cc);
           break;
         }
       }
