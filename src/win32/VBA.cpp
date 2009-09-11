@@ -1662,6 +1662,12 @@ void VBA::updateVideoSize(UINT id)
   case ID_OPTIONS_VIDEO_X4:
     value = VIDEO_4X;
     break;
+  case ID_OPTIONS_VIDEO_X5:
+    value = VIDEO_5X;
+    break;
+  case ID_OPTIONS_VIDEO_X6:
+    value = VIDEO_6X;
+    break;
   case ID_OPTIONS_VIDEO_FULLSCREEN320X240:
     value = VIDEO_320x240;
     fsWidth = 320;
@@ -1801,6 +1807,14 @@ void VBA::updateWindowSize(int value)
     surfaceSizeX = sizeX * 4;
     surfaceSizeY = sizeY * 4;
     break;
+  case VIDEO_5X:
+    surfaceSizeX = sizeX * 5;
+    surfaceSizeY = sizeY * 5;
+    break;
+  case VIDEO_6X:
+    surfaceSizeX = sizeX * 6;
+    surfaceSizeY = sizeY * 6;
+    break;
   case VIDEO_320x240:
   case VIDEO_640x480:
   case VIDEO_800x600:
@@ -1927,6 +1941,14 @@ bool VBA::preInitialize()
 	case VIDEO_4X:
 		surfaceSizeX = sizeX * 4;
 		surfaceSizeY = sizeY * 4;
+		break;
+	case VIDEO_5X:
+		surfaceSizeX = sizeX * 5;
+		surfaceSizeY = sizeY * 5;
+		break;
+	case VIDEO_6X:
+		surfaceSizeX = sizeX * 6;
+		surfaceSizeY = sizeY * 6;
 		break;
 	case VIDEO_320x240:
 	case VIDEO_640x480:
