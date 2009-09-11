@@ -1705,6 +1705,8 @@ BEGIN
             MENUITEM "2x window size",              ID_OPTIONS_VIDEO_X2
             MENUITEM "3x window size",              ID_OPTIONS_VIDEO_X3
             MENUITEM "4x window size",              ID_OPTIONS_VIDEO_X4
+            MENUITEM "5x window size",              ID_OPTIONS_VIDEO_X5
+            MENUITEM "6x window size",              ID_OPTIONS_VIDEO_X6
             MENUITEM SEPARATOR
             MENUITEM "Select fullscreen mode...",   ID_OPTIONS_VIDEO_FULLSCREEN
             MENUITEM SEPARATOR
