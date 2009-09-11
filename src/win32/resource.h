@@ -585,6 +585,8 @@
 #define ID_OPTIONS_VIDEO_X2             40011
 #define ID_OPTIONS_VIDEO_X3             40012
 #define ID_OPTIONS_VIDEO_X4             40013
+#define ID_OPTIONS_VIDEO_X5             40373
+#define ID_OPTIONS_VIDEO_X6             40374
 #define ID_FILE_PAUSE                   40014
 #define ID_OPTIONS_EMULATOR_DIRECTORIES 40015
 #define ID_OPTIONS_JOYPAD               40016
@@ -877,7 +879,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        165
-#define _APS_NEXT_COMMAND_VALUE         40373
+#define _APS_NEXT_COMMAND_VALUE         40375
 #define _APS_NEXT_CONTROL_VALUE         1297
 #define _APS_NEXT_SYMED_VALUE           103
 #endif

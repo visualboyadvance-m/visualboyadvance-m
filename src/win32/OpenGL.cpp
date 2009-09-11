@@ -228,6 +228,14 @@ bool OpenGLDisplay::initialize()
 		theApp.surfaceSizeX = theApp.sizeX * 4;
 		theApp.surfaceSizeY = theApp.sizeY * 4;
 		break;
+	case VIDEO_5X:
+		theApp.surfaceSizeX = theApp.sizeX * 5;
+		theApp.surfaceSizeY = theApp.sizeY * 5;
+		break;
+	case VIDEO_6X:
+		theApp.surfaceSizeX = theApp.sizeX * 6;
+		theApp.surfaceSizeY = theApp.sizeY * 6;
+		break;
 	case VIDEO_320x240:
 	case VIDEO_640x480:
 	case VIDEO_800x600:
