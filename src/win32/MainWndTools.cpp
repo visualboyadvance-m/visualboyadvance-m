@@ -55,7 +55,7 @@ void MainWnd::OnToolsDisassemble()
 
 void MainWnd::OnUpdateToolsDisassemble(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X);
 }
 
 void MainWnd::OnToolsLogging()
@@ -65,7 +65,7 @@ void MainWnd::OnToolsLogging()
 
 void MainWnd::OnUpdateToolsLogging(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X);
 }
 
 void MainWnd::OnToolsIoviewer()
@@ -77,7 +77,7 @@ void MainWnd::OnToolsIoviewer()
 
 void MainWnd::OnUpdateToolsIoviewer(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X && theApp.cartridgeType == 0);
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X && theApp.cartridgeType == 0);
 }
 
 void MainWnd::OnToolsMapview()
@@ -95,7 +95,7 @@ void MainWnd::OnToolsMapview()
 
 void MainWnd::OnUpdateToolsMapview(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X);
 }
 
 void MainWnd::OnToolsMemoryviewer()
@@ -113,7 +113,7 @@ void MainWnd::OnToolsMemoryviewer()
 
 void MainWnd::OnUpdateToolsMemoryviewer(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X);
 }
 
 void MainWnd::OnToolsOamviewer()
@@ -131,7 +131,7 @@ void MainWnd::OnToolsOamviewer()
 
 void MainWnd::OnUpdateToolsOamviewer(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X);
 }
 
 void MainWnd::OnToolsPaletteview()
@@ -149,7 +149,7 @@ void MainWnd::OnToolsPaletteview()
 
 void MainWnd::OnUpdateToolsPaletteview(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X);
 }
 
 void MainWnd::OnToolsTileviewer()
@@ -167,7 +167,7 @@ void MainWnd::OnToolsTileviewer()
 
 void MainWnd::OnUpdateToolsTileviewer(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X);
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X);
 }
 
 void MainWnd::OnDebugNextframe()
@@ -209,7 +209,7 @@ void MainWnd::OnToolsDebugGdb()
 
 void MainWnd::OnUpdateToolsDebugGdb(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X && remoteSocket == -1);
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X && remoteSocket == -1);
 }
 
 void MainWnd::OnToolsDebugLoadandwait()
@@ -237,7 +237,7 @@ void MainWnd::OnToolsDebugLoadandwait()
 
 void MainWnd::OnUpdateToolsDebugLoadandwait(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X && remoteSocket == -1);
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X && remoteSocket == -1);
 }
 
 void MainWnd::OnToolsDebugBreak()
@@ -254,7 +254,7 @@ void MainWnd::OnToolsDebugBreak()
 
 void MainWnd::OnUpdateToolsDebugBreak(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X && remoteSocket != -1);
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X && remoteSocket != -1);
 }
 
 void MainWnd::OnToolsDebugDisconnect()
@@ -265,7 +265,7 @@ void MainWnd::OnToolsDebugDisconnect()
 
 void MainWnd::OnUpdateToolsDebugDisconnect(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_4X && remoteSocket != -1);
+  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X && remoteSocket != -1);
 }
 
 void MainWnd::OnOptionsSoundStartrecording()

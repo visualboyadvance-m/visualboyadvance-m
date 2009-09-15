@@ -775,7 +775,7 @@ void MainWnd::OnSize(UINT nType, int cx, int cy)
             theApp.paused = false;
           }
         }
-        if(theApp.videoOption <= VIDEO_4X) {
+        if(theApp.videoOption <= VIDEO_6X) {
           theApp.surfaceSizeX = cx;
           theApp.surfaceSizeY = cy;
           theApp.adjustDestRect();
@@ -1185,7 +1185,7 @@ void MainWnd::screenCapture(int captureNumber)
 void MainWnd::winMouseOn()
 {
   SetCursor(arrow);
-  if(theApp.videoOption > VIDEO_4X) {
+  if(theApp.videoOption > VIDEO_6X) {
     theApp.mouseCounter = 10;
   } else
     theApp.mouseCounter = 0;
