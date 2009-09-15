@@ -543,7 +543,7 @@ void VBA::adjustDestRect()
     dest.right -= windowPositionX;
   }
 
-  if(videoOption > VIDEO_4X) {
+  if(videoOption > VIDEO_6X) {
 	  if(fullScreenStretch) {
 		  dest.top = 0;
 		  dest.left = 0;
@@ -1027,7 +1027,7 @@ void systemShowSpeed(int speed)
   systemSpeed = speed;
   theApp.showRenderedFrames = theApp.renderedFrames;
   theApp.renderedFrames = 0;
-  if(theApp.videoOption <= VIDEO_4X && theApp.showSpeed) {
+  if(theApp.videoOption <= VIDEO_6X && theApp.showSpeed) {
     CString buffer;
     if(theApp.showSpeed == 1)
       buffer.Format(VBA_NAME_AND_SUBVERSION "-%3d%%", systemSpeed);
@@ -1720,11 +1720,11 @@ void VBA::updateWindowSize(int value)
   if(((value >= VIDEO_320x240) &&
       (videoOption != value)) ||
      (videoOption >= VIDEO_320x240 &&
-      value <= VIDEO_4X) ||
+      value <= VIDEO_6X) ||
      fsForceChange) {
     fsForceChange = false;
     changingVideoSize = true;
-	if( videoOption <= VIDEO_4X ) {
+	if( videoOption <= VIDEO_6X ) {
 		lastWindowed = (VIDEO_SIZE)videoOption; // save for when leaving full screen
 	} else {
 		lastFullscreen = (VIDEO_SIZE)videoOption; // save for when using quick switch to fullscreen
@@ -1847,7 +1847,7 @@ void VBA::updateWindowSize(int value)
   int winSizeX = sizeX;
   int winSizeY = sizeY;
 
-  if(videoOption <= VIDEO_4X) {
+  if(videoOption <= VIDEO_6X) {
     dest.left = 0;
     dest.top = 0;
     dest.right = surfaceSizeX;
@@ -1983,13 +1983,13 @@ bool VBA::preInitialize()
 	DWORD style = WS_POPUP | WS_VISIBLE;
 	DWORD styleEx = 0;
 
-	if( videoOption <= VIDEO_4X ) {
+	if( videoOption <= VIDEO_6X ) {
 		style |= WS_OVERLAPPEDWINDOW;
 	} else {
 		styleEx = 0;
 	}
 
-	if( videoOption <= VIDEO_4X ) {
+	if( videoOption <= VIDEO_6X ) {
 		AdjustWindowRectEx( &dest, style, TRUE, styleEx );
 	} else {
 		AdjustWindowRectEx( &dest, style, FALSE, styleEx );
@@ -1998,14 +1998,14 @@ bool VBA::preInitialize()
 	int winSizeX = dest.right-dest.left;
 	int winSizeY = dest.bottom-dest.top;
 
-	if( videoOption > VIDEO_4X ) {
+	if( videoOption > VIDEO_6X ) {
 		winSizeX = fsWidth;
 		winSizeY = fsHeight;
 	}
 
 	int x = 0, y = 0;
 
-	if( videoOption <= VIDEO_4X ) {
+	if( videoOption <= VIDEO_6X ) {
 		x = windowPositionX;
 		y = windowPositionY;
 	}

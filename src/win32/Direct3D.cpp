@@ -531,7 +531,7 @@ void Direct3DDisplay::render()
 	r.right = dpp.BackBufferWidth - 1;
 	r.bottom = dpp.BackBufferHeight - 1;
 
-	if( theApp.showSpeed && ( theApp.videoOption > VIDEO_4X ) ) {
+	if( theApp.showSpeed && ( theApp.videoOption > VIDEO_6X ) ) {
 		color = theApp.showSpeedTransparent ? D3DCOLOR_ARGB(0x7F, 0x00, 0x00, 0xFF) : D3DCOLOR_ARGB(0xFF, 0x00, 0x00, 0xFF);
 		char buffer[30];
 		if( theApp.showSpeed == 1 ) {
@@ -583,7 +583,7 @@ void Direct3DDisplay::resize( int w, int h )
 
 	if( (w != dpp.BackBufferWidth) ||
 		(h != dpp.BackBufferHeight) ||
-		(theApp.videoOption > VIDEO_4X) ) {
+		(theApp.videoOption > VIDEO_6X) ) {
 		resetDevice();
 		calculateDestRect();
 	}

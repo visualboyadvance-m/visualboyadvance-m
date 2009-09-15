@@ -272,12 +272,12 @@ bool OpenGLDisplay::initialize()
 	DWORD style = WS_POPUP | WS_VISIBLE;
 	DWORD styleEx = 0;
 
-	if( theApp.videoOption <= VIDEO_4X )
+	if( theApp.videoOption <= VIDEO_6X )
 		style |= WS_OVERLAPPEDWINDOW;
 	else
 		styleEx = 0;
 
-	if( theApp.videoOption <= VIDEO_4X )
+	if( theApp.videoOption <= VIDEO_6X )
 		AdjustWindowRectEx( &theApp.dest, style, TRUE, styleEx );
 	else
 		AdjustWindowRectEx( &theApp.dest, style, FALSE, styleEx );
@@ -286,7 +286,7 @@ bool OpenGLDisplay::initialize()
 	int winSizeY = theApp.dest.bottom - theApp.dest.top;
 	int x = 0, y = 0;
 
-	if( theApp.videoOption <= VIDEO_4X ) {
+	if( theApp.videoOption <= VIDEO_6X ) {
 		x = theApp.windowPositionX;
 		y = theApp.windowPositionY;
 	} else {
@@ -420,7 +420,7 @@ void OpenGLDisplay::render()
 	glEnd();
 
 
-	if( theApp.showSpeed ) { // && ( theApp.videoOption > VIDEO_4X ) ) {
+	if( theApp.showSpeed ) { // && ( theApp.videoOption > VIDEO_6X ) ) {
 		char buffer[30];
 		if( theApp.showSpeed == 1 ) {
 			sprintf( buffer, "%3d%%", systemSpeed );
