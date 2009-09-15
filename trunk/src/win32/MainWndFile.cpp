@@ -672,7 +672,7 @@ void MainWnd::OnUpdateFileRominformation(CCmdUI* pCmdUI)
 //OnFileToggleFullscreen
 void MainWnd::OnFileTogglemenu()
 {
-	if( theApp.videoOption <= VIDEO_4X ) {
+	if( theApp.videoOption <= VIDEO_6X ) {
 		// switch to full screen
 		toolsLoggingClose(); // close log dialog
 		theApp.updateWindowSize( theApp.lastFullscreen );
@@ -685,7 +685,7 @@ void MainWnd::OnFileTogglemenu()
 void MainWnd::OnUpdateFileTogglemenu(CCmdUI* pCmdUI)
 {
 	// HACK: when uncommented, Esc key will not be send to MainWnd
-	//pCmdUI->Enable(theApp.videoOption > VIDEO_4X);
+	//pCmdUI->Enable(theApp.videoOption > VIDEO_6X);
 }
 
 bool MainWnd::fileImportGSACodeFile(CString& fileName)
