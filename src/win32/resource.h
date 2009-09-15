@@ -585,10 +585,10 @@
 #define ID_OPTIONS_VIDEO_X2             40011
 #define ID_OPTIONS_VIDEO_X3             40012
 #define ID_OPTIONS_VIDEO_X4             40013
-#define ID_OPTIONS_VIDEO_X5             40373
-#define ID_OPTIONS_VIDEO_X6             40374
-#define ID_FILE_PAUSE                   40014
-#define ID_OPTIONS_EMULATOR_DIRECTORIES 40015
+#define ID_OPTIONS_VIDEO_X5             40014
+#define ID_OPTIONS_VIDEO_X6             40015
+#define ID_FILE_PAUSE                   40373
+#define ID_OPTIONS_EMULATOR_DIRECTORIES 40374
 #define ID_OPTIONS_JOYPAD               40016
 #define ID_OPTIONS_EMULATOR_SYNCHRONIZE 40017
 #define ID_FILE_RESET                   40018
