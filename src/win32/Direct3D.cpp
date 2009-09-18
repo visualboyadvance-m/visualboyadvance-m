@@ -2,7 +2,7 @@
 
 #pragma comment( lib, "d3d9" )
 #pragma comment( lib, "d3dx9" )
-#pragma comment( lib, "DxErr9" )
+#pragma comment( lib, "DxErr" )
 
 #include "stdafx.h"
 
