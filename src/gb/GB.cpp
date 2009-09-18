@@ -2715,9 +2715,9 @@ void gbWriteSaveMBC2(const char * name)
       return;
     }
 
-    fwrite(&gbMemory[0xa000],
+    fwrite(gbMemoryMap[0x0a],
            1,
-           256,
+           512,
            file);
 
     fclose(file);
@@ -2897,12 +2897,12 @@ bool gbReadSaveMBC2(const char * name)
       return false;
     }
 
-    size_t read = fread(&gbMemory[0xa000],
+    size_t read = fread(gbMemoryMap[0x0a],
                      1,
-                     256,
+                     512,
                      file);
 
-    if(read != 256) {
+    if(read != 512) {
       systemMessage(MSG_FAILED_TO_READ_SGM,
                     N_("Battery file's size incompatible with the rom settings %s (%d).\nWarning : save of the battery file is now disabled !"), name, read);
       fclose(file);
