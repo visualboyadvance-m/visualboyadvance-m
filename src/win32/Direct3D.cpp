@@ -248,13 +248,6 @@ bool Direct3DDisplay::initialize()
 	screenFormat = mode.Format;
 
 	switch(mode.Format) {
-  case D3DFMT_A2R10G10B10:
-	  systemColorDepth = 32;
-	  systemRedShift = 25;
-	  systemGreenShift = 15;
-	  systemBlueShift = 5;
-	  Init_2xSaI(32); // TODO: verify
-	  break;
   case D3DFMT_X8R8G8B8:
 	  systemColorDepth = 32;
 	  systemRedShift = 19;
