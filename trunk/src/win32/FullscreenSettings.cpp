@@ -131,27 +131,21 @@ void FullscreenSettings::OnCbnSelchangeComboDevice()
 		D3DDISPLAYMODE mode;
 		combo_color_depth.ResetContent();
 
-		res = pD3D->EnumAdapterModes( adapter, D3DFMT_A2R10G10B10, 0, &mode );
-		if( res == D3D_OK ) {
-			int index = combo_color_depth.AddString( _T("32bit+ (A2R10G10B10)") );
-			combo_color_depth.SetItemData( index, (DWORD_PTR)D3DFMT_A2R10G10B10 );
-		}
-
 		res = pD3D->EnumAdapterModes( adapter, D3DFMT_X8R8G8B8, 0, &mode );
 		if( res == D3D_OK ) {
-			int index = combo_color_depth.AddString( _T("32bit (X8R8G8B8)") );
+			int index = combo_color_depth.AddString( _T("24bit (X8R8G8B8)") );
 			combo_color_depth.SetItemData( index, (DWORD_PTR)D3DFMT_X8R8G8B8 );
 		}
 
 		res = pD3D->EnumAdapterModes( adapter, D3DFMT_R5G6B5, 0, &mode );
 		if( res == D3D_OK ) {
-			int index = combo_color_depth.AddString( _T("16bit+ (R5G6B5)") );
+			int index = combo_color_depth.AddString( _T("16bit (R5G6B5)") );
 			combo_color_depth.SetItemData( index, (DWORD_PTR)D3DFMT_R5G6B5 );
 		}
 
 		res = pD3D->EnumAdapterModes( adapter, D3DFMT_X1R5G5B5, 0, &mode );
 		if( res == D3D_OK ) {
-			int index = combo_color_depth.AddString( _T("16bit (X1R5G5B5)") );
+			int index = combo_color_depth.AddString( _T("15bit (X1R5G5B5)") );
 			combo_color_depth.SetItemData( index, (DWORD_PTR)D3DFMT_X1R5G5B5 );
 		}
 
@@ -470,11 +464,8 @@ void FullscreenSettings::OnOK()
 
 		m_device = (unsigned int)adapter;
 		switch( mode.Format )
-		{ // TODO: use these assignments for VBA as well
-		case D3DFMT_A2R10G10B10:
-			m_colorDepth = 30;
-			break;
-		case D3DFMT_X8R8G8B8:
+		{
+        case D3DFMT_X8R8G8B8:
 			m_colorDepth = 24;
 			break;
 		case D3DFMT_R5G6B5:
