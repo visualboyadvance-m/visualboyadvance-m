@@ -1,13 +1,16 @@
 Source: vbam
-Section: games
-Priority: extra
-Maintainer: Bastien Bouclet <bgk@users.sourceforge.net>
-Build-Depends: debhelper (>= 5), zlib1g-dev, libpng12-dev, libsdl1.2-dev, libgl1-mesa-dev, libgtkmm-2.4-dev, libglademm-2.4-dev, cmake, libgtkglextmm-x11-dev, libxv-dev, nasm
-Standards-Version: 3.7.2
+Section: otherosfs
+Priority: optional
+Maintainer: Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>
+Build-Depends: debhelper (>= 7), cmake, libsdl1.2-dev, libgl-dev, libgtkmm-2.4-dev, libgtkglextmm-x11-1.2-dev
+Standards-Version: 3.8.1
+Homepage: http://www.vbam.com
 
 Package: vbam
-Architecture: any
+Architecture: i386
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Nintendo GameBoy Advance emulator
- VBA-M is a Nintendo GameBoy Advance emulator. It runs homebrew and commercial games.
- This version is based on the SDL library.
+Description: Nintendo Game Boy Advance emulator
+ VisualBoyAdvance-M is a Nintendo Game Boy Emulator with high compatibility
+ with commercial games. It emulates the Nintendo Game Boy Advance handheld
+ console, in addition to the original Game Boy handhelds and its Super and
+ Color variants.
