@@ -12,51 +12,52 @@
 
 
 
-CFLAGS = -Wall -g
 
-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0
-else
-	CFLAGS += -O2
-endif
+builddir/Makefile:
+	dh_testdir
+	# Add here commands to configure the package.
+	mkdir -p builddir
+	cd builddir && cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_LD_FLAGS="-Wl,-z,defs" -DCMAKE_CXX_FLAGS="$(CXXFLAGS)" -DCMAKE_SKIP_RPATH=ON -DCMAKE_VERBOSE_MAKEFILE=ON
+
 
 build: build-stamp
 
-build-stamp: 
+build-stamp:  builddir/Makefile 
 	dh_testdir
 
-	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr .
-	$(MAKE)
+	# Add here commands to compile the package.
+	$(MAKE) -C builddir
 	#docbook-to-man debian/vbam.sgml > vbam.1
 
 	touch $@
 
-clean:
+clean: 
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp
-	rm -f CMakeCache.txt
+	rm -f build-stamp 
 
 	# Add here commands to clean up after the build process.
-	-$(MAKE) clean
+	rm -rf builddir
+
 
 	dh_clean 
 
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k 
+	dh_prep  
 	dh_installdirs
 
 	# Add here commands to install the package into debian/vbam.
-	$(MAKE) DESTDIR=$(CURDIR)/debian/vbam install
+	$(MAKE) -C builddir DESTDIR=$(CURDIR)/debian/vbam install
+
 
 # Build architecture-independent files here.
-binary-indep: build install
+binary-indep: install
 # We have nothing to do by default.
 
 # Build architecture-dependent files here.
-binary-arch: build install
+binary-arch: install
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs 
@@ -64,7 +65,7 @@ binary-arch: build install
 	dh_installexamples
 #	dh_install
 #	dh_installmenu
-#	dh_installdebconf	
+#	dh_installdebconf
 #	dh_installlogrotate
 #	dh_installemacsen
 #	dh_installpam
@@ -87,4 +88,4 @@ binary-arch: build install
 	dh_builddeb
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
+.PHONY: build clean binary-indep binary-arch binary install 
