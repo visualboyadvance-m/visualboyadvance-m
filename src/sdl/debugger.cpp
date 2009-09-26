@@ -945,7 +945,7 @@ static void debuggerBreak(int n, char **args)
     char c = *s;
     if(strchr(s, ':')) {
       const char *name = s;
-      char *l = strchr(s, ':');
+      char *l = (char *)strchr(s, ':');
       *l++ = 0;
       int line = atoi(l);
 
