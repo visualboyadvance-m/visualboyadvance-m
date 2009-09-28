@@ -2,7 +2,7 @@ Source: vbam
 Section: otherosfs
 Priority: optional
 Maintainer: Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>
-Build-Depends: debhelper (>= 7), cmake, libsdl1.2-dev, libgl-dev, libgtkmm-2.4-dev, libgtkglextmm-x11-1.2-dev
+Build-Depends: debhelper (>= 7), cmake, libsdl1.2-dev, libgl-dev, libgtkmm-2.4-dev, libgtkglextmm-x11-1.2-dev, libglademm-2.4-dev
 Standards-Version: 3.8.1
 Homepage: http://www.vbam.com
 
