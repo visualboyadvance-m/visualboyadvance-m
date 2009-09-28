@@ -1,4 +1,10 @@
-vbam (0.0.905-1) unstable; urgency=low
+vbam (1.8.0.912-1) unstable; urgency=low
+
+  * Added libglademm-2.4-dev as a build-time dependency
+
+ -- Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>  Sun, 27 Sep 2009 23:26:23 -0300
+
+vbam (1.8.0.905-1) unstable; urgency=low
 
   * Initial release
 
