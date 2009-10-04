@@ -2,12 +2,12 @@ Source: vbam
 Section: otherosfs
 Priority: optional
 Maintainer: Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>
-Build-Depends: debhelper (>= 7), cmake, libsdl1.2-dev, libgl-dev, libgtkmm-2.4-dev, libgtkglextmm-x11-1.2-dev, libglademm-2.4-dev
+Build-Depends: debhelper (>= 7), cmake, nasm [i386 amd64], libsdl1.2-dev, libgl-dev, libgtkmm-2.4-dev, libgtkglextmm-x11-1.2-dev, libglademm-2.4-dev
 Standards-Version: 3.8.1
 Homepage: http://www.vbam.com
 
 Package: vbam
-Architecture: i386
+Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Nintendo Game Boy Advance emulator
  VisualBoyAdvance-M is a Nintendo Game Boy Emulator with high compatibility
