@@ -1,3 +1,9 @@
+vbam (1.8.0.913-1) unstable; urgency=low
+
+  * Using assembly optmizations for i386 and amd64 platforms
+
+ -- Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>  Sat, 03 Oct 2009 22:41:55 -0300
+
 vbam (1.8.0.912-1) unstable; urgency=low
 
   * Added libglademm-2.4-dev as a build-time dependency
