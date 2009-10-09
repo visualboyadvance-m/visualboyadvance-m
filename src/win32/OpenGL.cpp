@@ -353,7 +353,7 @@ bool OpenGLDisplay::initialize()
 
 	Init_2xSaI(32);
 
-	utilUpdateSystemColorMaps();
+	utilUpdateSystemColorMaps(theApp.cartridgeType == IMAGE_GBA && gbColorOption == 1);
 	theApp.updateFilter();
 	theApp.updateIFB();
 	pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;

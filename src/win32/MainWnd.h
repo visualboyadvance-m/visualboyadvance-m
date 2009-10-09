@@ -325,8 +325,6 @@ protected:
 	afx_msg BOOL OnFileRecentFile(UINT nID);
 	afx_msg BOOL OnFileLoadSlot(UINT nID);
 	afx_msg BOOL OnFileSaveSlot(UINT nID);
-	afx_msg void OnOptionsFilterLcdcolors();
-	afx_msg void OnUpdateOptionsFilterLcdcolors(CCmdUI *pCmdUI);
 	afx_msg void OnOptionsSoundHardwareacceleration();
 	afx_msg void OnUpdateOptionsSoundHardwareacceleration(CCmdUI *pCmdUI);
 	afx_msg void OnLinkOptions();
