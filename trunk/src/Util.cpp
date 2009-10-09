@@ -24,6 +24,9 @@ extern "C" {
 #include "common/memgzio.h"
 }
 
+#include "gba/gbafilter.h"
+#include "gb/gbGlobals.h"
+
 #ifndef _MSC_VER
 #define _stricmp strcasecmp
 #endif // ! _MSC_VER
@@ -630,7 +633,7 @@ void utilGBAFindSave(const u8 *data, const int size)
   flashSetSize(flashSize);
 }
 
-void utilUpdateSystemColorMaps()
+void utilUpdateSystemColorMaps(bool lcd)
 {
   switch(systemColorDepth) {
   case 16:
@@ -640,6 +643,7 @@ void utilUpdateSystemColorMaps()
           (((i & 0x3e0) >> 5) << systemGreenShift) |
           (((i & 0x7c00) >> 10) << systemBlueShift);
       }
+      if (lcd) gbafilter_pal(systemColorMap16, 0x10000);
     }
     break;
   case 24:
@@ -650,6 +654,7 @@ void utilUpdateSystemColorMaps()
           (((i & 0x3e0) >> 5) << systemGreenShift) |
           (((i & 0x7c00) >> 10) << systemBlueShift);
       }
+      if (lcd) gbafilter_pal32(systemColorMap32, 0x10000);
     }
     break;
   }

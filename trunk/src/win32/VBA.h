@@ -70,7 +70,6 @@ class VBA : public CWinApp
   int filterWidth;
   int filterHeight;
   int filterMagnification;
-  int filterLCD;
   bool filterMT; // enable multi-threading for pixel filters
   int fsWidth;
   int fsHeight;

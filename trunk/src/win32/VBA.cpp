@@ -609,7 +609,7 @@ void VBA::updateFilter()
 		systemRedShift = realsystemRedShift;
 		systemGreenShift = realsystemGreenShift;
 		systemBlueShift = realsystemBlueShift;
-		utilUpdateSystemColorMaps();
+		utilUpdateSystemColorMaps(theApp.cartridgeType == IMAGE_GBA && gbColorOption == 1);
 	}
     // END hacky ugly code
 
@@ -829,7 +829,7 @@ void VBA::updateFilter()
 		systemGreenShift = 6;
 		realsystemBlueShift = systemBlueShift;
 		systemBlueShift = 0;
-		utilUpdateSystemColorMaps();
+		utilUpdateSystemColorMaps(theApp.cartridgeType == IMAGE_GBA && gbColorOption == 1);
 	}
 
 #ifdef LOG_PERFORMANCE
@@ -2463,8 +2463,6 @@ void VBA::saveSettings()
   regSetDwordValue("filter", filterType);
 
   regSetDwordValue("filterEnableMultiThreading", filterMT ? 1 : 0);
-
-  regSetDwordValue("LCDFilter", filterLCD);
 
   regSetDwordValue("disableMMX", disableMMX);
 
