@@ -132,6 +132,7 @@ SET(SRC_GBA
     src/gba/GBAGfx.cpp
     src/gba/GBA-thumb.cpp
     src/gba/GBA-arm.cpp
+    src/gba/gbafilter.cpp
     src/gba/Globals.cpp
     src/gba/Mode0.cpp
     src/gba/Mode1.cpp
