@@ -1918,7 +1918,6 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "&Real Colors",                ID_OPTIONS_GAMEBOY_REALCOLORS
             MENUITEM "G&ameboy Colors",             ID_OPTIONS_GAMEBOY_GAMEBOYCOLORS
-            MENUITEM "LCD colors",                  ID_OPTIONS_FILTER_LCDCOLORS
             MENUITEM SEPARATOR
             MENUITEM "&Colors...",                  ID_OPTIONS_GAMEBOY_COLORS
         END

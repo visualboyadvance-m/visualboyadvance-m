@@ -1105,6 +1105,7 @@ void MainWnd::OnUpdateOptionsGameboyGb(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsGameboyRealcolors()
 {
   gbColorOption = 0;
+  utilUpdateSystemColorMaps(theApp.cartridgeType == IMAGE_GBA && gbColorOption == 1);
 }
 
 void MainWnd::OnUpdateOptionsGameboyRealcolors(CCmdUI* pCmdUI)
@@ -1115,6 +1116,7 @@ void MainWnd::OnUpdateOptionsGameboyRealcolors(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsGameboyGameboycolors()
 {
   gbColorOption = 1;
+  utilUpdateSystemColorMaps(theApp.cartridgeType == IMAGE_GBA && gbColorOption == 1);
 }
 
 void MainWnd::OnUpdateOptionsGameboyGameboycolors(CCmdUI* pCmdUI)
@@ -1361,18 +1363,6 @@ void MainWnd::OnOptionsFilterDisablemmx()
 void MainWnd::OnUpdateOptionsFilterDisablemmx(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(theApp.disableMMX);
-}
-
-void MainWnd::OnOptionsFilterLcdcolors()
-{
-// todo: depreciated
-  theApp.filterLCD = !theApp.filterLCD;
-  utilUpdateSystemColorMaps();
-}
-
-void MainWnd::OnUpdateOptionsFilterLcdcolors(CCmdUI *pCmdUI)
-{
-  pCmdUI->SetCheck(theApp.filterLCD);
 }
 
 void MainWnd::OnOptionsLanguageSystem()

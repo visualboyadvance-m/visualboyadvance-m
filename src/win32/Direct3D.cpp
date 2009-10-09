@@ -274,7 +274,7 @@ bool Direct3DDisplay::initialize()
 	  return false;
 	}
 	theApp.fsColorDepth = systemColorDepth;
-	utilUpdateSystemColorMaps();
+	utilUpdateSystemColorMaps(theApp.cartridgeType == IMAGE_GBA && gbColorOption == 1);
 
 
 #ifdef MMX
