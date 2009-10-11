@@ -103,11 +103,13 @@ static inline u32 CPUReadMemory(u32 address)
     value = READ32LE(((u32 *)&oam[address & 0x3FC]));
     break;
   case 8:
+	// Must be cartridge ROM, reading other sensors doesn't allow 32-bit access.
   case 9:
   case 10:
   case 11:
   case 12:
     value = READ32LE(((u32 *)&rom[address&0x1FFFFFC]));
+
     break;
   case 13:
     if(cpuEEPROMEnabled)
@@ -115,6 +117,20 @@ static inline u32 CPUReadMemory(u32 address)
       return eepromRead(address);
     goto unreadable;
   case 14:
+	// Yoshi's Universal Gravitation (Topsy Turvy)
+	// Koro Koro
+    if(cpuEEPROMSensorEnabled) {
+      switch(address & 0x00008f00) {
+      case 0x8200:
+        return systemGetSensorX() & 255;
+      case 0x8300:
+        return (systemGetSensorX() >> 8)|0x80;
+      case 0x8400:
+        return systemGetSensorY() & 255;
+      case 0x8500:
+        return systemGetSensorY() >> 8;
+      }
+    }
     if(cpuFlashEnabled | cpuSramEnabled)
       // no need to swap this
       return flashRead(address);
@@ -239,6 +255,15 @@ static inline u32 CPUReadHalfWord(u32 address)
     value = READ16LE(((u16 *)&oam[address & 0x3fe]));
     break;
   case 8:
+	// Use existing case statement and faster test for potential speed improvement
+	// This is possibly the GPIO port that controls the real time clock,
+	// WarioWare Twisted! tilt sensors, rumble, and solar sensors.
+    if(address >= 0x80000c4 && address <= 0x80000c8) {
+	  // this function still works if there is no real time clock
+	  // and does a normal memory read in that case.
+      value = rtcRead(address & 0xFFFFFFE);
+	  break;
+	}
   case 9:
   case 10:
   case 11:
@@ -247,6 +272,7 @@ static inline u32 CPUReadHalfWord(u32 address)
       value = rtcRead(address);
     else
       value = READ16LE(((u16 *)&rom[address & 0x1FFFFFE]));
+
     break;
   case 13:
     if(cpuEEPROMEnabled)
@@ -254,6 +280,20 @@ static inline u32 CPUReadHalfWord(u32 address)
       return  eepromRead(address);
     goto unreadable;
   case 14:
+	// Yoshi's Universal Gravitation (Topsy Turvy)
+	// Koro Koro
+    if(cpuEEPROMSensorEnabled) {
+      switch(address & 0x00008f00) {
+      case 0x8200:
+        return systemGetSensorX() & 255;
+      case 0x8300:
+        return (systemGetSensorX() >> 8)|0x80;
+      case 0x8400:
+        return systemGetSensorY() & 255;
+      case 0x8500:
+        return systemGetSensorY() >> 8;
+      }
+    }
     if(cpuFlashEnabled | cpuSramEnabled)
       // no need to swap this
       return flashRead(address);
@@ -329,30 +369,34 @@ static inline u8 CPUReadByte(u32 address)
   case 7:
     return oam[address & 0x3ff];
   case 8:
+	// the real time clock doesn't support byte reads, so don't bother checking for it.
   case 9:
   case 10:
   case 11:
   case 12:
     return rom[address & 0x1FFFFFF];
+
   case 13:
     if(cpuEEPROMEnabled)
       return eepromRead(address);
     goto unreadable;
   case 14:
-    if(cpuSramEnabled | cpuFlashEnabled)
-      return flashRead(address);
+	// Yoshi's Universal Gravitation (Topsy Turvy)
+	// Koro Koro
     if(cpuEEPROMSensorEnabled) {
       switch(address & 0x00008f00) {
-  case 0x8200:
-    return systemGetSensorX() & 255;
-  case 0x8300:
-    return (systemGetSensorX() >> 8)|0x80;
-  case 0x8400:
-    return systemGetSensorY() & 255;
-  case 0x8500:
-    return systemGetSensorY() >> 8;
+      case 0x8200:
+        return systemGetSensorX() & 255;
+      case 0x8300:
+        return (systemGetSensorX() >> 8)|0x80;
+      case 0x8400:
+        return systemGetSensorY() & 255;
+      case 0x8500:
+        return systemGetSensorY() >> 8;
       }
     }
+    if(cpuSramEnabled | cpuFlashEnabled)
+      return flashRead(address);
     // default
   default:
 unreadable:
