@@ -3054,6 +3054,7 @@ void CPUInit(const char *biosFileName, bool useBiosFile)
 
 void CPUReset()
 {
+  systemCartridgeRumble(false);
   if(gbaSaveType == 0) {
     if(eepromInUse)
       gbaSaveType = 3;

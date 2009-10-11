@@ -4,6 +4,7 @@
 u16 rtcRead(u32 address);
 bool rtcWrite(u32 address, u16 value);
 void rtcEnable(bool);
+void rtcEnableWarioRumble(bool);
 bool rtcIsEnabled();
 void rtcReset();
 

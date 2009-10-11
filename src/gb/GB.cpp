@@ -1437,6 +1437,8 @@ void  gbWriteMemory(register u16 address, register u8 value)
         int paletteHiLo  = (v & 0x01);
 
         // No access to gbPalette during mode 3 (Color Panel Demo)
+		// CAK - The following check has to be commented out for
+		// colourised roms like Metroid 2 DX
         if (((gbLcdModeDelayed != 3) && (!((gbLcdMode == 0) && (gbLcdTicks>=(GBLCD_MODE_0_CLOCK_TICKS-gbSpritesTicks[299]-1)))) && (!gbSpeed)) ||
            (gbSpeed && ((gbLcdMode == 1) || (gbLcdMode == 2) ||
            ((gbLcdMode == 3) && (gbLcdTicks>(GBLCD_MODE_3_CLOCK_TICKS-2))) ||
@@ -1491,6 +1493,8 @@ void  gbWriteMemory(register u16 address, register u8 value)
         paletteIndex += 32;
 
         // No access to gbPalette during mode 3 (Color Panel Demo)
+		// CAK - The following check has to be commented out for
+		// colourised roms like Metroid 2 DX
         if (((gbLcdModeDelayed != 3) && (!((gbLcdMode == 0) && (gbLcdTicks>=(GBLCD_MODE_0_CLOCK_TICKS-gbSpritesTicks[299]-1)))) && (!gbSpeed)) ||
            (gbSpeed && ((gbLcdMode == 1) || (gbLcdMode == 2) ||
            ((gbLcdMode == 3) && (gbLcdTicks>(GBLCD_MODE_3_CLOCK_TICKS-2))) ||
@@ -2141,6 +2145,7 @@ void gbGetHardwareType()
 
 void gbReset()
 {
+  systemCartridgeRumble(false);
   gbGetHardwareType();
 
   oldRegister_WY = 146;
@@ -2614,6 +2619,8 @@ void gbReset()
 
   memset(&gbDataMBC5, 0, sizeof(gbDataMBC5));
   gbDataMBC5.mapperROMBank = 1;
+  if (gbRomType >= 0x1c && gbRomType<=0x1e)
+    gbDataMBC5.isRumbleCartridge = 1;
 
   memset(&gbDataHuC1, 0, sizeof(gbDataHuC1));
   gbDataHuC1.mapperROMBank = 1;
