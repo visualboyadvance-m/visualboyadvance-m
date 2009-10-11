@@ -48,6 +48,11 @@ extern void systemDrawScreen();
 extern bool systemReadJoypads();
 // return information about the given joystick, -1 for default joystick
 extern u32 systemReadJoypad(int);
+// this function should turn on or off rumble on the gamepad
+extern void systemCartridgeRumble(bool);
+extern void systemPossibleCartridgeRumble(bool);
+// This should be called once per frame
+extern void updateRumbleFrame();
 extern u32 systemGetClock();
 extern void systemMessage(int, const char *, ...);
 extern void systemSetTitle(const char *);
