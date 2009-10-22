@@ -98,6 +98,7 @@ static inline void gfxClearArray(u32 *array)
   }
 }
 
+#ifdef __GNUC__
 union u8h
 {
 	struct
@@ -107,6 +108,18 @@ union u8h
 	} __attribute__ ((packed));
 	u8 val;
 };
+	#else
+
+union u8h
+{
+#pragma pack(1)
+	 struct
+	{
+	unsigned lo:4;
+	unsigned hi:4;};
+	u8 val;
+};
+#endif
 
 union TileEntry
 {
