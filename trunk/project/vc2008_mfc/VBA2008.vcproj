@@ -481,6 +481,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\gba\gbafilter.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\gba\gbagfx.cpp"
 					>
 				</File>
