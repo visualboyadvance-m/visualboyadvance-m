@@ -926,6 +926,13 @@ u32 systemReadJoypad(int which)
   return 0;
 }
 
+// TODO: implement
+void systemCartridgeRumble(bool) { }
+void systemPossibleCartridgeRumble(bool) { }
+void updateRumbleFrame() { }
+int systemGetSensorZ() { return 0; }
+u8 systemGetSensorDarkness() { return 0; }
+
 void systemDrawScreen()
 {
   if(theApp.display == NULL)
