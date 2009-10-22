@@ -2,46 +2,46 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Core">
-      <UniqueIdentifier>{23ce12ea-204d-4bc0-a83f-47315f76a212}</UniqueIdentifier>
+      <UniqueIdentifier>{71ab2045-01c0-482a-9c81-3f39b285a4ee}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\GB">
-      <UniqueIdentifier>{f336c3ae-261f-4873-b062-9e05d7afca09}</UniqueIdentifier>
+      <UniqueIdentifier>{6cb20f6a-afd1-4ccd-a926-3834889bae84}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\GB APU">
-      <UniqueIdentifier>{1b3555ff-9bdf-457d-bc01-6e94a256278a}</UniqueIdentifier>
+      <UniqueIdentifier>{2f992f65-e7e8-48bc-a7f5-774edb9e62f5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\GBA">
-      <UniqueIdentifier>{da309579-ba11-4082-93e3-4d29e387488a}</UniqueIdentifier>
+      <UniqueIdentifier>{9eaca194-71f6-4e10-86d5-b94e05fd3f10}</UniqueIdentifier>
     </Filter>
     <Filter Include="Documentation">
-      <UniqueIdentifier>{c1844500-2572-4250-9be1-f4969fabc48e}</UniqueIdentifier>
+      <UniqueIdentifier>{52d0aca8-f8f2-41d1-a67d-bfa4e4e99d94}</UniqueIdentifier>
     </Filter>
     <Filter Include="Functionality">
-      <UniqueIdentifier>{5419645c-6723-460f-b8e0-5be4b634f584}</UniqueIdentifier>
+      <UniqueIdentifier>{ef1d7bb9-f2d2-496e-9549-25583f04f3c4}</UniqueIdentifier>
     </Filter>
     <Filter Include="IO">
-      <UniqueIdentifier>{2988ee4b-39c4-4fbe-af69-4daec52c6c63}</UniqueIdentifier>
+      <UniqueIdentifier>{6d57ec3d-8b19-4d80-8221-b803b2edb7aa}</UniqueIdentifier>
     </Filter>
     <Filter Include="Linking">
-      <UniqueIdentifier>{a5da88a7-5785-46a5-b2a8-487225ac69c8}</UniqueIdentifier>
+      <UniqueIdentifier>{7e4bd18a-5c40-46e3-b05d-1eee558c4ab2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Main">
-      <UniqueIdentifier>{70f0fedd-e7dc-4911-a89e-d9ebe7a3f670}</UniqueIdentifier>
+      <UniqueIdentifier>{ecb2dede-5ec7-485d-a7a6-b3489d0e504b}</UniqueIdentifier>
     </Filter>
     <Filter Include="MFC">
-      <UniqueIdentifier>{dc5878f6-fc7f-4ab8-a261-4232514170ef}</UniqueIdentifier>
+      <UniqueIdentifier>{09851216-fb4c-4f6a-81ae-5ec46f04e6fa}</UniqueIdentifier>
     </Filter>
     <Filter Include="MFC\GB">
-      <UniqueIdentifier>{18f82a90-19b8-4ee0-bf11-21ae39aaa799}</UniqueIdentifier>
+      <UniqueIdentifier>{265d5ac0-3209-44e4-b09f-8354ea4839c2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Pixel Filter">
-      <UniqueIdentifier>{3c8217d7-3e96-48f3-8039-a4df5b6186e5}</UniqueIdentifier>
+      <UniqueIdentifier>{4d6fc79c-afbf-418c-a41a-163a37de1c07}</UniqueIdentifier>
     </Filter>
     <Filter Include="Pixel Filter\HQ">
-      <UniqueIdentifier>{90711076-20e5-4e32-8fb2-4d7255223277}</UniqueIdentifier>
+      <UniqueIdentifier>{da4006a7-9edf-441d-9b6f-68e10c67c23c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Pixel Filter\HQ\3x_4x_asm">
-      <UniqueIdentifier>{c3dc4558-ae69-42d0-af12-1bd9e4ebbe18}</UniqueIdentifier>
+      <UniqueIdentifier>{8a72efc9-f324-4d65-a877-74026352ae70}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
@@ -122,9 +122,6 @@
       <Filter>Core\GBA</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\gba\GBAcpu.h">
-      <Filter>Core\GBA</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\gba\gbafilter.h">
       <Filter>Core\GBA</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\gba\gbagfx.h">

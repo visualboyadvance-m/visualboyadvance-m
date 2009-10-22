@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -69,15 +69,15 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" />
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;d:\Projects\dependencies\zlib\;c:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Include\;d:\Projects\dependencies\libpng\;c:\Program Files (x86)\OpenAL 1.1 SDK\include\;</IncludePath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(VCInstallDir)bin;$(WindowsSdkDir)bin\NETFX 4.0 Tools;$(WindowsSdkDir)bin;$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(FrameworkSDKDir)\bin;$(MSBuildToolsPath32);$(VSInstallDir);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);d:\Projects\Dev-Cpp\bin\;</ExecutablePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;d:\Projects\dependencies\zlib\;c:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Include\;d:\Projects\dependencies\libpng\;c:\Program Files (x86)\OpenAL 1.1 SDK\include\;</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib;c:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Lib\x86\;c:\Program Files (x86)\OpenAL 1.1 SDK\libs\;d:\Projects\dependencies\libs\;</LibraryPath>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(VCInstallDir)bin;$(WindowsSdkDir)bin\NETFX 4.0 Tools;$(WindowsSdkDir)bin;$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(FrameworkSDKDir)\bin;$(MSBuildToolsPath32);$(VSInstallDir);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);d:\Projects\Dev-Cpp\bin\;</ExecutablePath>
-    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">$(VCInstallDir)bin;$(WindowsSdkDir)bin\NETFX 4.0 Tools;$(WindowsSdkDir)bin;$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(FrameworkSDKDir)\bin;$(MSBuildToolsPath32);$(VSInstallDir);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);d:\Projects\Dev-Cpp\bin\;</ExecutablePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib;c:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Lib\x86\;c:\Program Files (x86)\OpenAL 1.1 SDK\libs\;d:\Projects\dependencies\libs\;</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib;c:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Lib\x86\;c:\Program Files (x86)\OpenAL 1.1 SDK\libs\;d:\Projects\dependencies\libs\;</LibraryPath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;d:\Projects\dependencies\zlib\;c:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Include\;d:\Projects\dependencies\libpng\;c:\Program Files (x86)\OpenAL 1.1 SDK\include\;</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib;c:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Lib\x86\;c:\Program Files (x86)\OpenAL 1.1 SDK\libs\;d:\Projects\dependencies\libs\;</LibraryPath>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">$(VCInstallDir)bin;$(WindowsSdkDir)bin\NETFX 4.0 Tools;$(WindowsSdkDir)bin;$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(FrameworkSDKDir)\bin;$(MSBuildToolsPath32);$(VSInstallDir);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);d:\Projects\Dev-Cpp\bin\;</ExecutablePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;d:\Projects\dependencies\zlib\;c:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Include\;d:\Projects\dependencies\libpng\;c:\Program Files (x86)\OpenAL 1.1 SDK\include\;</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib;c:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Lib\x86\;c:\Program Files (x86)\OpenAL 1.1 SDK\libs\;d:\Projects\dependencies\libs\;</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
@@ -142,7 +142,7 @@
 /D_SECURE_SCL=0
 /Zc:forScope-
 /MP %(AdditionalOptions)</AdditionalOptions>
-      <Optimization>Full</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -150,7 +150,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GBA_LOGGING;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -190,7 +190,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\gba\gbafilter.h" />
     <ClInclude Include="..\..\src\win32\resource.h" />
     <ClInclude Include="..\..\src\gb\gb.h" />
     <ClInclude Include="..\..\src\gb\gbCheats.h" />
@@ -318,7 +317,6 @@
     <ResourceCompile Include="..\..\src\win32\VBA.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\gba\gbafilter.cpp" />
     <ClCompile Include="..\..\src\gb\gb.cpp" />
     <ClCompile Include="..\..\src\gb\gbCheats.cpp" />
     <ClCompile Include="..\..\src\gb\gbDis.cpp" />
@@ -342,6 +340,7 @@
     <ClCompile Include="..\..\src\gba\gba-arm.cpp" />
     <ClCompile Include="..\..\src\gba\gba-thumb.cpp" />
     <ClCompile Include="..\..\src\gba\gba.cpp" />
+    <ClCompile Include="..\..\src\gba\gbafilter.cpp" />
     <ClCompile Include="..\..\src\gba\gbagfx.cpp" />
     <ClCompile Include="..\..\src\gba\Globals.cpp" />
     <ClCompile Include="..\..\src\gba\Mode0.cpp" />
