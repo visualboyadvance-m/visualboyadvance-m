@@ -1,0 +1,823 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{23ce12ea-204d-4bc0-a83f-47315f76a212}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\GB">
+      <UniqueIdentifier>{f336c3ae-261f-4873-b062-9e05d7afca09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\GB APU">
+      <UniqueIdentifier>{1b3555ff-9bdf-457d-bc01-6e94a256278a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\GBA">
+      <UniqueIdentifier>{da309579-ba11-4082-93e3-4d29e387488a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Documentation">
+      <UniqueIdentifier>{c1844500-2572-4250-9be1-f4969fabc48e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Functionality">
+      <UniqueIdentifier>{5419645c-6723-460f-b8e0-5be4b634f584}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IO">
+      <UniqueIdentifier>{2988ee4b-39c4-4fbe-af69-4daec52c6c63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Linking">
+      <UniqueIdentifier>{a5da88a7-5785-46a5-b2a8-487225ac69c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{70f0fedd-e7dc-4911-a89e-d9ebe7a3f670}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MFC">
+      <UniqueIdentifier>{dc5878f6-fc7f-4ab8-a261-4232514170ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MFC\GB">
+      <UniqueIdentifier>{18f82a90-19b8-4ee0-bf11-21ae39aaa799}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pixel Filter">
+      <UniqueIdentifier>{3c8217d7-3e96-48f3-8039-a4df5b6186e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pixel Filter\HQ">
+      <UniqueIdentifier>{90711076-20e5-4e32-8fb2-4d7255223277}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pixel Filter\HQ\3x_4x_asm">
+      <UniqueIdentifier>{c3dc4558-ae69-42d0-af12-1bd9e4ebbe18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\apu\blargg_common.h">
+      <Filter>Core\GB APU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\apu\blargg_config.h">
+      <Filter>Core\GB APU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\apu\blargg_source.h">
+      <Filter>Core\GB APU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\apu\Blip_Buffer.h">
+      <Filter>Core\GB APU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\apu\Effects_Buffer.h">
+      <Filter>Core\GB APU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\apu\Gb_Apu.h">
+      <Filter>Core\GB APU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\apu\Gb_Oscs.h">
+      <Filter>Core\GB APU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\apu\Multi_Buffer.h">
+      <Filter>Core\GB APU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\memgzio.h">
+      <Filter>Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\Patch.h">
+      <Filter>Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\Port.h">
+      <Filter>Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\SoundDriver.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\filters\hq2x.h">
+      <Filter>Pixel Filter\HQ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\filters\interp.h">
+      <Filter>Pixel Filter\HQ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\filters\lq2x.h">
+      <Filter>Pixel Filter\HQ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\agbprint.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\armdis.h">
+      <Filter>Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\bios.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\Cheats.h">
+      <Filter>Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\CheatSearch.h">
+      <Filter>Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\EEprom.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\elf.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\Flash.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\gba.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\GBAcpu.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\gbafilter.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\gbagfx.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\gbainline.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\gbalink.h">
+      <Filter>Linking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\Globals.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\RTC.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\Sound.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\Sram.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gb\gb.h">
+      <Filter>Core\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gb\gbCheats.h">
+      <Filter>Core\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gb\gbCodes.h">
+      <Filter>Core\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gb\gbCodesCB.h">
+      <Filter>Core\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gb\gbGlobals.h">
+      <Filter>Core\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gb\gbMemory.h">
+      <Filter>Core\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gb\gbPrinter.h">
+      <Filter>Core\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gb\gbSGB.h">
+      <Filter>Core\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gb\gbSound.h">
+      <Filter>Core\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\NLS.h">
+      <Filter>Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\System.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Util.h">
+      <Filter>Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\version.h">
+      <Filter>Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\AboutDialog.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\AccelEditor.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\AcceleratorManager.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\Associate.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\AudioCoreSettingsDlg.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\AVIWrite.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\BIOSDialog.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\BitmapControl.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\CmdAccelOb.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\ColorButton.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\ColorControl.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\Directories.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\Disassemble.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\Display.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\ExportGSASnapshot.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\FileDlg.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\FullscreenSettings.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\GBACheats.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\GBCheatsDlg.h">
+      <Filter>MFC\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\GBColorDlg.h">
+      <Filter>MFC\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\GBDisassemble.h">
+      <Filter>MFC\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\GBMapView.h">
+      <Filter>MFC\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\GBMemoryViewerDlg.h">
+      <Filter>MFC\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\GBOamView.h">
+      <Filter>MFC\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\GBPaletteView.h">
+      <Filter>MFC\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\GBPrinterDlg.h">
+      <Filter>MFC\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\GBTileView.h">
+      <Filter>MFC\GB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\GDBConnection.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\glfont.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\GSACodeSelect.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\gzglfont.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\Hyperlink.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\Input.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\IOViewer.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\IOViewerRegs.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\IUpdate.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\Joypad.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\KeyboardEdit.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\LangSelect.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\LinkOptions.h">
+      <Filter>Linking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\Logging.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\MainWnd.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\MapView.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\MaxScale.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\MemoryViewer.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\MemoryViewerAddressSize.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\MemoryViewerDlg.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\OALConfig.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\OamView.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\PaletteView.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\PaletteViewControl.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\Reg.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\ResizeDlg.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\resource.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\RewindInterval.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\RomInfo.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\rpi.h">
+      <Filter>Pixel Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\SelectPlugin.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\stdafx.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\StringTokenizer.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\targetver.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\Throttle.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\TileView.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\VBA.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\WavWriter.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\WinHelper.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\WinResUtil.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\XAudio2_Config.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win32\ZoomControl.h">
+      <Filter>MFC</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\doc\DevInfo.txt">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\..\doc\License.txt">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\..\doc\ReadMe.MFC.txt">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\..\src\filters\hq\asm\macros.mac">
+      <Filter>Pixel Filter\HQ\3x_4x_asm</Filter>
+    </None>
+    <None Include="..\..\src\win32\res\VBA.ico">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="..\..\src\win32\res\VBA.rc2">
+      <Filter>Resource</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\src\win32\VBA.rc">
+      <Filter>Resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\apu\Blip_Buffer.cpp">
+      <Filter>Core\GB APU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\apu\Effects_Buffer.cpp">
+      <Filter>Core\GB APU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\apu\Gb_Apu.cpp">
+      <Filter>Core\GB APU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\apu\Gb_Apu_State.cpp">
+      <Filter>Core\GB APU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\apu\Gb_Oscs.cpp">
+      <Filter>Core\GB APU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\apu\Multi_Buffer.cpp">
+      <Filter>Core\GB APU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\memgzio.c">
+      <Filter>Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\Patch.cpp">
+      <Filter>Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\filters\2xSaI.cpp">
+      <Filter>Pixel Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\filters\admame.cpp">
+      <Filter>Pixel Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\filters\bilinear.cpp">
+      <Filter>Pixel Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\filters\hq2x.cpp">
+      <Filter>Pixel Filter\HQ</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\filters\hq\asm\hq3x32.cpp">
+      <Filter>Pixel Filter\HQ\3x_4x_asm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\filters\interframe.cpp">
+      <Filter>Pixel Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\filters\pixel.cpp">
+      <Filter>Pixel Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\filters\scanline.cpp">
+      <Filter>Pixel Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\filters\simpleFilter.cpp">
+      <Filter>Pixel Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\agbprint.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\armdis.cpp">
+      <Filter>Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\bios.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\Cheats.cpp">
+      <Filter>Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\CheatSearch.cpp">
+      <Filter>Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\EEprom.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\elf.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\Flash.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\gba-arm.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\gba-thumb.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\gba.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\gbafilter.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\gbagfx.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\gbalink.cpp">
+      <Filter>Linking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\Globals.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\Mode0.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\Mode1.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\Mode2.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\Mode3.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\Mode4.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\Mode5.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\remote.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\RTC.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\Sound.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\Sram.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gb\gb.cpp">
+      <Filter>Core\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gb\gbCheats.cpp">
+      <Filter>Core\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gb\gbDis.cpp">
+      <Filter>Core\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gb\gbGfx.cpp">
+      <Filter>Core\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gb\gbGlobals.cpp">
+      <Filter>Core\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gb\gbMemory.cpp">
+      <Filter>Core\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gb\gbPrinter.cpp">
+      <Filter>Core\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gb\gbSGB.cpp">
+      <Filter>Core\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gb\gbSound.cpp">
+      <Filter>Core\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Util.cpp">
+      <Filter>Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\AboutDialog.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\AccelEditor.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\AcceleratorManager.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\Associate.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\AudioCoreSettingsDlg.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\AVIWrite.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\BIOSDialog.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\BitmapControl.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\CmdAccelOb.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\ColorButton.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\ColorControl.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\Commands.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\Direct3D.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\DirectInput.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\Directories.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\DirectSound.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\Disassemble.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\ExportGSASnapshot.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\FileDlg.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\FullscreenSettings.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\GameOverrides.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\GBACheats.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\GBCheatsDlg.cpp">
+      <Filter>MFC\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\GBColorDlg.cpp">
+      <Filter>MFC\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\GBDisassemble.cpp">
+      <Filter>MFC\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\GBMapView.cpp">
+      <Filter>MFC\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\GBMemoryViewerDlg.cpp">
+      <Filter>MFC\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\GBOamView.cpp">
+      <Filter>MFC\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\GBPaletteView.cpp">
+      <Filter>MFC\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\GBPrinterDlg.cpp">
+      <Filter>MFC\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\GBTileView.cpp">
+      <Filter>MFC\GB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\GDBConnection.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\glfont.c">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\GSACodeSelect.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\Hyperlink.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\IOViewer.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\Joypad.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\KeyboardEdit.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\LangSelect.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\LinkOptions.cpp">
+      <Filter>Linking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\LoadOAL.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\Logging.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\MainWnd.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\MainWndCheats.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\MainWndFile.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\MainWndHelp.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\MainWndOptions.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\MainWndTools.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\MapView.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\MaxScale.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\MemoryViewer.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\MemoryViewerAddressSize.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\MemoryViewerDlg.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\OALConfig.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\OamView.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\OpenAL.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\OpenGL.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\PaletteView.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\PaletteViewControl.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\Reg.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\ResizeDlg.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\RewindInterval.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\RomInfo.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\rpi.cpp">
+      <Filter>Pixel Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\SelectPlugin.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\stdafx.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\StringTokenizer.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\Throttle.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\TileView.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\VBA.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\WavWriter.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\WinResUtil.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\XAudio2.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\XAudio2_Config.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\win32\ZoomControl.cpp">
+      <Filter>MFC</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <NASM Include="..\..\src\filters\2xSaImmx.asm">
+      <Filter>Pixel Filter</Filter>
+    </NASM>
+    <NASM Include="..\..\src\filters\hq\asm\hq3x_16.asm">
+      <Filter>Pixel Filter\HQ\3x_4x_asm</Filter>
+    </NASM>
+    <NASM Include="..\..\src\filters\hq\asm\hq3x_32.asm">
+      <Filter>Pixel Filter\HQ\3x_4x_asm</Filter>
+    </NASM>
+    <NASM Include="..\..\src\filters\hq\asm\hq4x_16.asm">
+      <Filter>Pixel Filter\HQ\3x_4x_asm</Filter>
+    </NASM>
+    <NASM Include="..\..\src\filters\hq\asm\hq4x_32.asm">
+      <Filter>Pixel Filter\HQ\3x_4x_asm</Filter>
+    </NASM>
+  </ItemGroup>
+</Project>
