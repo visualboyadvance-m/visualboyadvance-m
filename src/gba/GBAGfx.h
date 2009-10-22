@@ -103,22 +103,24 @@ union u8h
 {
 	struct
 	{
-	/* 0*/	unsigned lo:4;
-	/* 4*/	unsigned hi:4;
+		/* 0*/	unsigned lo:4;
+		/* 4*/	unsigned hi:4;
 	} __attribute__ ((packed));
 	u8 val;
 };
-	#else
+#else
+
 
 union u8h
 {
-#pragma pack(1)
-	 struct
-	{
-	unsigned lo:4;
-	unsigned hi:4;};
+	 __declspec(align(8)) struct
+	 {
+	unsigned lo:2;
+	unsigned hi:2;
+	 };
 	u8 val;
 };
+
 #endif
 
 union TileEntry
