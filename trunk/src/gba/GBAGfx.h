@@ -5,10 +5,10 @@
 #include "Globals.h"
 
 #include "../common/Port.h"
-#include <string.h>
 
 //#define SPRITE_DEBUG
 
+static void gfxDrawTextScreen(u16, u16, u16, u32 *);
 static void gfxDrawRotScreen(u16,
 			     u16, u16,
 			     u16, u16,
@@ -98,261 +98,145 @@ static inline void gfxClearArray(u32 *array)
   }
 }
 
-#ifdef __GNUC__
-union u8h
+static inline void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs,
+				     u32 *line)
 {
-	struct
-	{
-		/* 0*/	unsigned lo:4;
-		/* 4*/	unsigned hi:4;
-	} __attribute__ ((packed));
-	u8 val;
-};
-#else
+  u16 *palette = (u16 *)paletteRAM;
+  u8 *charBase = &vram[((control >> 2) & 0x03) * 0x4000];
+  u16 *screenBase = (u16 *)&vram[((control >> 8) & 0x1f) * 0x800];
+  u32 prio = ((control & 3)<<25) + 0x1000000;
+  int sizeX = 256;
+  int sizeY = 256;
+  switch((control >> 14) & 3) {
+  case 0:
+    break;
+  case 1:
+    sizeX = 512;
+    break;
+  case 2:
+    sizeY = 512;
+    break;
+  case 3:
+    sizeX = 512;
+    sizeY = 512;
+    break;
+  }
 
+  int maskX = sizeX-1;
+  int maskY = sizeY-1;
 
-union u8h
-{
-	 __declspec(align(8)) struct
-	 {
-	unsigned lo:2;
-	unsigned hi:2;
-	 };
-	u8 val;
-};
+  bool mosaicOn = (control & 0x40) ? true : false;
 
-#endif
+  int xxx = hofs & maskX;
+  int yyy = (vofs + VCOUNT) & maskY;
+  int mosaicX = (MOSAIC & 0x000F)+1;
+  int mosaicY = ((MOSAIC & 0x00F0)>>4)+1;
 
-union TileEntry
-{
-	struct
-	{
-	/* 0*/	unsigned tileNum:10;
-	/*12*/	unsigned hFlip:1;
-	/*13*/	unsigned vFlip:1;
-	/*14*/	unsigned palette:4;
-	};
-	u16 val;
-};
+  if(mosaicOn) {
+    if((VCOUNT % mosaicY) != 0) {
+      mosaicY = VCOUNT - (VCOUNT % mosaicY);
+      yyy = (vofs + mosaicY) & maskY;
+    }
+  }
 
-struct TileLine
-{
-	u32 pixels[8];
-};
+  if(yyy > 255 && sizeY > 256) {
+    yyy &= 255;
+    screenBase += 0x400;
+    if(sizeX > 256)
+      screenBase += 0x400;
+  }
 
-typedef const TileLine (*TileReader) (const u16 *, const int, const u8 *, u16 *, const u32);
+  int yshift = ((yyy>>3)<<5);
+  if((control) & 0x80) {
+    u16 *screenSource = screenBase + 0x400 * (xxx>>8) + ((xxx & 255)>>3) + yshift;
+    for(int x = 0; x < 240; x++) {
+      u16 data = READ16LE(screenSource);
 
-static inline void gfxDrawPixel(u32 *dest, const u8 color, const u16 *palette, const u32 prio)
-{
-	*dest = color ? (READ16LE(&palette[color]) | prio): 0x80000000;
-}
+      int tile = data & 0x3FF;
+      int tileX = (xxx & 7);
+      int tileY = yyy & 7;
 
-inline const TileLine gfxReadTile(const u16 *screenSource, const int yyy, const u8 *charBase, u16 *palette, const u32 prio)
-{
-	TileEntry tile;
-	tile.val = READ16LE(screenSource);
+      if(tileX == 7)
+        screenSource++;
 
-	int tileY = yyy & 7;
-	if (tile.vFlip) tileY = 7 - tileY;
-	TileLine tileLine;
+      if(data & 0x0400)
+        tileX = 7 - tileX;
+      if(data & 0x0800)
+        tileY = 7 - tileY;
 
-	const u8 *tileBase = &charBase[tile.tileNum * 64 + tileY * 8];
+      u8 color = charBase[tile * 64 + tileY * 8 + tileX];
 
-	if (!tile.hFlip)
-	{
-		gfxDrawPixel(&tileLine.pixels[0], tileBase[0], palette, prio);
-		gfxDrawPixel(&tileLine.pixels[1], tileBase[1], palette, prio);
-		gfxDrawPixel(&tileLine.pixels[2], tileBase[2], palette, prio);
-		gfxDrawPixel(&tileLine.pixels[3], tileBase[3], palette, prio);
-		gfxDrawPixel(&tileLine.pixels[4], tileBase[4], palette, prio);
-		gfxDrawPixel(&tileLine.pixels[5], tileBase[5], palette, prio);
-		gfxDrawPixel(&tileLine.pixels[6], tileBase[6], palette, prio);
-		gfxDrawPixel(&tileLine.pixels[7], tileBase[7], palette, prio);
-	}
-	else
-	{
-		gfxDrawPixel(&tileLine.pixels[0], tileBase[7], palette, prio);
-		gfxDrawPixel(&tileLine.pixels[1], tileBase[6], palette, prio);
-		gfxDrawPixel(&tileLine.pixels[2], tileBase[5], palette, prio);
-		gfxDrawPixel(&tileLine.pixels[3], tileBase[4], palette, prio);
-		gfxDrawPixel(&tileLine.pixels[4], tileBase[3], palette, prio);
-		gfxDrawPixel(&tileLine.pixels[5], tileBase[2], palette, prio);
-		gfxDrawPixel(&tileLine.pixels[6], tileBase[1], palette, prio);
-		gfxDrawPixel(&tileLine.pixels[7], tileBase[0], palette, prio);
-	}
+      line[x] = color ? (READ16LE(&palette[color]) | prio): 0x80000000;
 
-	return tileLine;
-}
+      xxx++;
+      if(xxx == 256) {
+        if(sizeX > 256)
+          screenSource = screenBase + 0x400 + yshift;
+        else {
+          screenSource = screenBase + yshift;
+          xxx = 0;
+        }
+      } else if(xxx >= sizeX) {
+        xxx = 0;
+        screenSource = screenBase + yshift;
+      }
+    }
+  } else {
+    u16 *screenSource = screenBase + 0x400*(xxx>>8)+((xxx&255)>>3) +
+      yshift;
+    for(int x = 0; x < 240; x++) {
+      u16 data = READ16LE(screenSource);
 
-inline const TileLine gfxReadTilePal(const u16 *screenSource, const int yyy, const u8 *charBase, u16 *palette, const u32 prio)
-{
-	TileEntry tile;
-	tile.val = READ16LE(screenSource);
+      int tile = data & 0x3FF;
+      int tileX = (xxx & 7);
+      int tileY = yyy & 7;
 
-	int tileY = yyy & 7;
-	if (tile.vFlip) tileY = 7 - tileY;
-	palette += tile.palette * 16;
-	TileLine tileLine;
+      if(tileX == 7)
+        screenSource++;
 
-	const u8h *tileBase = (u8h*) &charBase[tile.tileNum * 32 + tileY * 4];
+      if(data & 0x0400)
+        tileX = 7 - tileX;
+      if(data & 0x0800)
+        tileY = 7 - tileY;
 
-	if (!tile.hFlip)
-	{
-		gfxDrawPixel(&tileLine.pixels[0], tileBase[0].lo, palette, prio);
-		gfxDrawPixel(&tileLine.pixels[1], tileBase[0].hi, palette, prio);
-		gfxDrawPixel(&tileLine.pixels[2], tileBase[1].lo, palette, prio);
-		gfxDrawPixel(&tileLine.pixels[3], tileBase[1].hi, palette, prio);
-		gfxDrawPixel(&tileLine.pixels[4], tileBase[2].lo, palette, prio);
-		gfxDrawPixel(&tileLine.pixels[5], tileBase[2].hi, palette, prio);
-		gfxDrawPixel(&tileLine.pixels[6], tileBase[3].lo, palette, prio);
-		gfxDrawPixel(&tileLine.pixels[7], tileBase[3].hi, palette, prio);
-	}
-	else
-	{
-		gfxDrawPixel(&tileLine.pixels[0], tileBase[3].hi, palette, prio);
-		gfxDrawPixel(&tileLine.pixels[1], tileBase[3].lo, palette, prio);
-		gfxDrawPixel(&tileLine.pixels[2], tileBase[2].hi, palette, prio);
-		gfxDrawPixel(&tileLine.pixels[3], tileBase[2].lo, palette, prio);
-		gfxDrawPixel(&tileLine.pixels[4], tileBase[1].hi, palette, prio);
-		gfxDrawPixel(&tileLine.pixels[5], tileBase[1].lo, palette, prio);
-		gfxDrawPixel(&tileLine.pixels[6], tileBase[0].hi, palette, prio);
-		gfxDrawPixel(&tileLine.pixels[7], tileBase[0].lo, palette, prio);
-	}
+      u8 color = charBase[(tile<<5) + (tileY<<2) + (tileX>>1)];
 
-	return tileLine;
-}
+      if(tileX & 1) {
+        color = (color >> 4);
+      } else {
+        color &= 0x0F;
+      }
 
-static inline void gfxDrawTile(const TileLine &tileLine, u32 *line)
-{
-	memcpy(line, tileLine.pixels, sizeof(tileLine.pixels));
-}
+      int pal = (data>>8) & 0xF0;
+      line[x] = color ? (READ16LE(&palette[pal + color])|prio): 0x80000000;
 
-static inline void gfxDrawTileClipped(const TileLine &tileLine, u32 *line, const int start, int w)
-{
-	memcpy(line, tileLine.pixels + start, w * sizeof(u32));
-}
-
-template<TileReader readTile>
-void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs,
-                       u32 *line)
-{
-	u16 *palette = (u16 *)paletteRAM;
-	u8 *charBase = &vram[((control >> 2) & 0x03) * 0x4000];
-	u16 *screenBase = (u16 *)&vram[((control >> 8) & 0x1f) * 0x800];
-	u32 prio = ((control & 3)<<25) + 0x1000000;
-	int sizeX = 256;
-	int sizeY = 256;
-	switch ((control >> 14) & 3)
-	{
-	case 0:
-		break;
-	case 1:
-		sizeX = 512;
-		break;
-	case 2:
-		sizeY = 512;
-		break;
-	case 3:
-		sizeX = 512;
-		sizeY = 512;
-		break;
-	}
-
-	int maskX = sizeX-1;
-	int maskY = sizeY-1;
-
-	bool mosaicOn = (control & 0x40) ? true : false;
-
-	int xxx = hofs & maskX;
-	int yyy = (vofs + VCOUNT) & maskY;
-	int mosaicX = (MOSAIC & 0x000F)+1;
-	int mosaicY = ((MOSAIC & 0x00F0)>>4)+1;
-
-	if (mosaicOn)
-	{
-		if ((VCOUNT % mosaicY) != 0)
-		{
-			mosaicY = VCOUNT - (VCOUNT % mosaicY);
-			yyy = (vofs + mosaicY) & maskY;
-		}
-	}
-
-	if (yyy > 255 && sizeY > 256)
-	{
-		yyy &= 255;
-		screenBase += 0x400;
-		if (sizeX > 256)
-			screenBase += 0x400;
-	}
-
-	int yshift = ((yyy>>3)<<5);
-
-	u16 *screenSource = screenBase + 0x400 * (xxx>>8) + ((xxx & 255)>>3) + yshift;
-	int x = 0;
-	const int firstTileX = xxx & 7;
-
-	// First tile, if clipped
-	if (firstTileX)
-	{
-		gfxDrawTileClipped(readTile(screenSource, yyy, charBase, palette, prio), &line[x], firstTileX, 8 - firstTileX);
-		screenSource++;
-		x += 8 - firstTileX;
-		xxx += 8 - firstTileX;
-	}
-
-	// Middle tiles, full
-	while (x < 240 - firstTileX)
-	{
-		gfxDrawTile(readTile(screenSource, yyy, charBase, palette, prio), &line[x]);
-		screenSource++;
-		xxx += 8;
-		x += 8;
-
-		if (xxx == 256 && sizeX > 256)
-		{
-				screenSource = screenBase + 0x400 + yshift;
-		}
-		else if (xxx >= sizeX)
-		{
-			xxx = 0;
-			screenSource = screenBase + yshift;
-		}
-	}
-
-	// Last tile, if clipped
-	if (firstTileX)
-	{
-		gfxDrawTileClipped(readTile(screenSource, yyy, charBase, palette, prio), &line[x], 0, firstTileX);
-		screenSource++;
-		x += firstTileX;
-		xxx += firstTileX;
-	}
-
-	if (mosaicOn)
-	{
-		if (mosaicX > 1)
-		{
-			int m = 1;
-			for (int i = 0; i < 239; i++)
-			{
-				line[i+1] = line[i];
-				m++;
-				if (m == mosaicX)
-				{
-					m = 1;
-					i++;
-				}
-			}
-		}
-	}
-}
-
-static inline void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs, u32 *line)
-{
-	if (control & 0x80) // 1 pal / 256 col
-		gfxDrawTextScreen<gfxReadTile>(control, hofs, vofs, line);
-	else // 16 pal / 16 col
-		gfxDrawTextScreen<gfxReadTilePal>(control, hofs, vofs, line);
+      xxx++;
+      if(xxx == 256) {
+        if(sizeX > 256)
+          screenSource = screenBase + 0x400 + yshift;
+        else {
+          screenSource = screenBase + yshift;
+          xxx = 0;
+        }
+      } else if(xxx >= sizeX) {
+        xxx = 0;
+        screenSource = screenBase + yshift;
+      }
+    }
+  }
+  if(mosaicOn) {
+    if(mosaicX > 1) {
+      int m = 1;
+      for(int i = 0; i < 239; i++) {
+        line[i+1] = line[i];
+        m++;
+        if(m == mosaicX) {
+          m = 1;
+          i++;
+        }
+      }
+    }
+  }
 }
 
 static inline void gfxDrawRotScreen(u16 control,
