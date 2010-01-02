@@ -95,9 +95,11 @@ class VBA : public CWinApp
   IMAGE_TYPE cartridgeType;
   bool soundInitialized;
   bool useBiosFileGBA;
+  bool useBiosFileGBC;
   bool useBiosFileGB;
   bool skipBiosFile;
   CString biosFileNameGBA;
+  CString biosFileNameGBC;
   CString biosFileNameGB;
   bool active;
   bool paused;
