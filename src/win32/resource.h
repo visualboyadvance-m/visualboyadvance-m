@@ -536,8 +536,12 @@
 #define IDC_SELECT_GB_BIOS_PATH         1277
 #define IDC_SELECT_GBA_BIOS_PATH        1278
 #define IDC_CLEAR_ALL                   1278
+#define IDC_GBC_BIOS_PATH               1279
 #define IDC_COMBO_RESOLUTION            1280
+#define IDC_ENABLE_GBC_BIOS             1280
 #define IDC_COMBO_COLOR_DEPTH           1281
+#define IDC_SELECT_GB_BIOS_PATH2        1281
+#define IDC_SELECT_GBC_BIOS_PATH        1281
 #define IDC_COMBO_REFRESH_RATE          1282
 #define IDC_COMBO_DEVICE                1283
 #define IDC_CHECK1                      1284
@@ -587,8 +591,6 @@
 #define ID_OPTIONS_VIDEO_X4             40013
 #define ID_OPTIONS_VIDEO_X5             40014
 #define ID_OPTIONS_VIDEO_X6             40015
-#define ID_FILE_PAUSE                   40373
-#define ID_OPTIONS_EMULATOR_DIRECTORIES 40374
 #define ID_OPTIONS_JOYPAD               40016
 #define ID_OPTIONS_EMULATOR_SYNCHRONIZE 40017
 #define ID_FILE_RESET                   40018
@@ -872,6 +874,8 @@
 #define ID_OPTIONS_VIDEO_LAYERS_RESET   40367
 #define ID_LOADGAME_DONOTCHANGECHEATLIST 40371
 #define ID_OPTIONS_EMULATOR_SAVETYPE_DETECTNOW 40372
+#define ID_FILE_PAUSE                   40373
+#define ID_OPTIONS_EMULATOR_DIRECTORIES 40374
 
 // Next default values for new objects
 // 
