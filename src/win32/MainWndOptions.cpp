@@ -1774,16 +1774,20 @@ void MainWnd::OnEmulatorBiosfiles()
 {
 	BIOSDialog dlg;
 	dlg.m_enableBIOS_GBA = theApp.useBiosFileGBA ? TRUE : FALSE;
+	dlg.m_enableBIOS_GBC = theApp.useBiosFileGBC ? TRUE : FALSE;
 	dlg.m_enableBIOS_GB = theApp.useBiosFileGB ? TRUE : FALSE;
 	dlg.m_skipLogo = theApp.skipBiosFile ? TRUE : FALSE;
 	dlg.m_pathGBA = theApp.biosFileNameGBA;
+	dlg.m_pathGBC = theApp.biosFileNameGBC;
 	dlg.m_pathGB = theApp.biosFileNameGB;
 
 	if( IDOK == dlg.DoModal() ) {
 		theApp.useBiosFileGBA = dlg.m_enableBIOS_GBA == TRUE;
+		theApp.useBiosFileGBC = dlg.m_enableBIOS_GBC == TRUE;
 		theApp.useBiosFileGB = dlg.m_enableBIOS_GB == TRUE;
 		theApp.skipBiosFile = dlg.m_skipLogo == TRUE;
 		theApp.biosFileNameGBA = dlg.m_pathGBA;
+		theApp.biosFileNameGBC = dlg.m_pathGBC;
 		theApp.biosFileNameGB = dlg.m_pathGB;
 	}
 }

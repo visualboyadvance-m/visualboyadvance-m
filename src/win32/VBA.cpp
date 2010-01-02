@@ -232,9 +232,11 @@ VBA::VBA()
   cartridgeType = IMAGE_GBA;
   soundInitialized = false;
   useBiosFileGBA = false;
+  useBiosFileGBC = false;
   useBiosFileGB = false;
   skipBiosFile = false;
   biosFileNameGBA = _T("");
+  biosFileNameGBC = _T("");
   biosFileNameGB = _T("");
   active = true;
   paused = false;
@@ -1410,6 +1412,8 @@ void VBA::loadSettings()
 
   useBiosFileGBA = ( regQueryDwordValue("useBiosGBA", 0) == 1 ) ? true : false;
 
+  useBiosFileGBC = ( regQueryDwordValue("useBiosGBC", 0) == 1 ) ? true : false;
+
   useBiosFileGB = ( regQueryDwordValue("useBiosGB", 0) == 1 ) ? true : false;
 
   skipBiosFile = regQueryDwordValue("skipBios", 0) ? true : false;
@@ -1418,6 +1422,12 @@ void VBA::loadSettings()
 
   if(!buffer.IsEmpty()) {
     biosFileNameGBA = buffer;
+  }
+
+  buffer = regQueryStringValue("biosFileGBC", "");
+
+  if(!buffer.IsEmpty()) {
+    biosFileNameGBC = buffer;
   }
 
   buffer = regQueryStringValue("biosFileGB", "");
@@ -2432,12 +2442,17 @@ void VBA::saveSettings()
 
   regSetDwordValue("useBiosGBA", useBiosFileGBA);
 
+  regSetDwordValue("useBiosGBC", useBiosFileGBC);
+
   regSetDwordValue("useBiosGB", useBiosFileGB);
 
   regSetDwordValue("skipBios", skipBiosFile);
 
   if(!biosFileNameGBA.IsEmpty())
     regSetStringValue("biosFileGBA", biosFileNameGBA);
+
+  if(!biosFileNameGBC.IsEmpty())
+    regSetStringValue("biosFileGBC", biosFileNameGBC);
 
   if(!biosFileNameGB.IsEmpty())
     regSetStringValue("biosFileGB", biosFileNameGB);
