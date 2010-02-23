@@ -1,0 +1,209 @@
+File_Extractor 0.4.3
+--------------------
+Author  : Shay Green <gblargg@gmail.com>
+Website : http://www.slack.net/~ant/
+License : GNU Lesser General Public License (LGPL) for all except unrar
+Language: C or C++
+
+
+Contents
+--------
+* Overview
+* Limitations
+* C and C++ interfaces
+* Extracting file data
+* Alternate interfaces: unzip.h and unrarlib.h
+* Minimal version: fex_mini.cpp
+* Library compilation
+* Error handling
+* Solving problems
+* Thanks
+
+
+Overview
+--------
+This library contains several modules that support different archive
+formats. They have a common interface allowing an archive to be opened,
+scanned, and extracted from. To use an archive, do the following:
+
+* Open file using appropriate extractor.
+* See if at end of archive.
+* Get info for current file and/or extract data from it.
+* Go to next file and check if at end of archive and repeat above.
+* If desired at any point, rewind and scan the archive again.
+* When done, close archive.
+
+If support for one or more archive types is not needed, many of the
+library sources can be eliminated. Refer to the files list in readme.txt
+to find what can be removed.
+
+
+Details
+-------
+All archives:
+* A file's checksum is verified only if all the file's data is read from
+the archive.
+* Encryption, segmentation, 2GB and larger files, and other extra
+features are not supported.
+
+GZ archives:
+* Only gzip archives of a single file are supported. If it has multiple
+files, the reported size will be wrong. Multi-file gzip files are rare.
+
+ZIP archives:
+* Supports files compressed using deflation or no compression. Other
+compression schemes are not supported.
+* Archive must have a valid directory structure at the end.
+* Optimized file access reduces reads and keeps them aligned
+
+RAR archives:
+* Support for really old 1.x archives might not work. Send me some test
+archives as I couldn't find any.
+
+7-zip:
+* Solid archives currently can use lots of memory.
+* Modification date isn't supported.
+
+
+C and C++ interfaces
+--------------------
+This library includes a C interface in fex.h, which can be used from C
+and C++. If this is being compiled as a shared library (rather than
+linking statically), only the C interface in fex.h should be used since
+it will change less in future versions.
+
+The native C++ interface is in File_Extractor.h and supports more ways
+of reading data and accessing files. Both interfaces can be used
+together in C++ code without problems. The interfaces correspond in a
+consistent way:
+
+	C interface                     C++ interface
+	- - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	File_Extractor* fex;            File_Extractor* fex;
+	
+	fex_open( path, &fex );         fex_open( path, &fex );
+	
+	fex_done( fex );                fex->done();
+	
+	fex_read( fex, out, count );    fex->read( out, count );
+	
+	fex_close( fex );               delete fex;
+
+The archive extractor classes are derived from File_Extractor, which
+allows a File_Extractor* to point to any type of extractor. There is no
+need to use concrete types directly (Zip_Extractor, etc.).
+
+
+Extracting file data
+--------------------
+Data for a file in an archive can be accessed in three ways:
+
+* Make one or more calls to read().
+* Get a pointer to the file's data in memory.
+* Have extractor write data to Data_Writer you provide (C++ only).
+
+Each archive type has an optimal access method that you might use if you
+were using only one archive type and wanted to avoid extra memory
+allocation or copying. Single_File_Extractor and Zip_Extractor favor
+read(), Zip7_Extractor favors getting a pointer to data in memory, and
+Rar_Extractor favors writing the data to a Data_Writer.
+
+You should generally use whatever method is most convenient in your
+program. In most cases you will be keeping a copy of the data in memory
+after closing the archive, so you'll want to use read(). As long as you
+read the ENTIRE file's contents in one call to read(), your code will be
+most efficient and won't involve any extra memory allocation. If you
+only need the first portion of the file and will not be reading the rest
+(for example, if scanning headers only), you can use the optimized
+read_once() function instead of the normal read().
+
+
+Alternate interfaces: unzip.h and unrarlib.h
+--------------------------------------------
+If your code already uses the unzip.h or unrarlib.h library, you can
+begin using fex with minimal/no changes to your code by using the
+included wrappers. Most unrarlib.h functions are supported, and the main
+unzip.h functions are supported. Only basic file information is returned
+by each; things like dates and directories are not supported. These
+header files should NOT be used if you're writing new code, since they
+are inferior to the fex.h interface.
+
+Both of these header files define FEX_WRAPPER to 1, so your code can
+check for that macro and if defined, support additional archive formats
+rather than just .rar or .zip.
+
+
+Minimal version: fex_mini.cpp
+-----------------------------
+You can use fex_mini.cpp and fex.h as an absolute minimum version. If
+you have zlib installed and HAVE_ZLIB_H defined, gzipped files are
+supported, otherwise only uncompressed files are supported. No other
+source files are required for this version. No changes to your source
+are necessary as long as you use only fex.h functionality.
+
+
+Library compilation
+-------------------
+While this library is written in C++, it should easily link in a C
+program WITHOUT needing the standard C++ library. It doesn't use
+exception handling or run-time type information (RTTI), so you can
+disable these in your C++ compiler to increase efficiency.
+
+If you're building a shared library (DLL), I HIGHLY recommend only
+exporting the C interface from fex.h, as the C++ interface exposes
+implementation details that will surely break link compatibility across
+versions. If you aren't familiar with symbol exporting, just be sure you
+only use fex.h to access the shared library.
+
+If you're using C and compiling with GCC, I recommend the following
+command-line options when compiling the library source, otherwise GCC
+will insert calls to the standard C++ library and require that it be
+linked in:
+
+	-fno-rtti -fno-exceptions
+
+
+Error handling
+--------------
+Functions that can fail have a return type of fex_err_t (blargg_err_t in
+the C++ interfaces), which is a pointer to an error string, const char*.
+If a function is successful it returns NULL. Logic errors that can be
+easily avoided are checked with debug-only assertions; error return
+values are only used for genuine run-time errors that can't be easily
+prevented in advance (out of memory, I/O errors, incompatible file
+data). All return values should be checked after calling library
+functions.
+
+To improve usability for C programmers, C++ programmers unfamiliar with
+exceptions, and compatibility with older C++ compilers, the library does
+NOT throw any C++ exceptions, and uses malloc() instead of the standard
+operator new. This means that in C++ you MUST check for NULL when
+creating a library object with the new operator.
+
+
+Solving problems
+----------------
+If you're having problems, try the following:
+
+* Enable debugging support in your environment. This enables assertions
+and other run-time checks. In particular, be sure NDEBUG isn't defined.
+
+* Turn the compiler's optimizer is off. Sometimes an optimizer generates
+bad code.
+
+* If multiple threads are being used, ensure that only one at a time is
+accessing a given set of objects from the library. This library is not
+in general thread-safe, though independent objects can be used in
+separate threads.
+
+* If all else fails, see if the demo works.
+
+
+Thanks
+------
+Thanks to Richard Bannister, Kode54, and DJRobX for testing and giving
+feedback for the library. Thanks to the authors of zlib, unrar, and
+7-zip.
+
+-- 
+Shay Green <gblargg@gmail.com>

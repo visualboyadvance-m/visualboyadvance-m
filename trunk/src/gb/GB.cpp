@@ -21,7 +21,6 @@
 
 extern u8 *pix;
 extern bool speedup;
-
 bool gbUpdateSizes();
 bool inBios = false;
 
@@ -801,7 +800,7 @@ void  gbWriteMemory(register u16 address, register u8 value)
       gbMemory[0xff02] = value;
       if(gbSerialOn) {
         gbSerialTicks = GBSERIAL_CLOCK_TICKS;
-#ifdef LINK_EMULATION
+#ifdef OLD_GB_LINK
         if(linkConnected) {
           if(value & 1) {
             linkSendByte(0x100|gbMemory[0xFF01]);
@@ -5170,7 +5169,7 @@ void gbEmulate(int ticksToStop)
 
     // serial emulation
     if(gbSerialOn) {
-#ifdef LINK_EMULATION
+#ifdef OLD_GB_LINK
       if(linkConnected) {
         gbSerialTicks -= clockTicks;
 
@@ -5216,7 +5215,7 @@ void gbEmulate(int ticksToStop)
               gbSerialTicks += GBSERIAL_CLOCK_TICKS;
           }
         }
-#ifdef LINK_EMULATION
+#ifdef OLD_GB_LINK
       }
 #endif
     }
