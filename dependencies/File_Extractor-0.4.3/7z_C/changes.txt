@@ -1,0 +1,19 @@
+Changes to 7z_C source
+----------------------
+I made several minor changes:
+
+* Enabled _LZMA_IN_CB in LzmaDecoer.h and fixed other files that depend
+on this setting to properly #include this file
+
+* Fixed several memory free functions to not access NULL when cleaning
+up after a failed allocation.
+
+* Made private functions static.
+
+* Fixed SzArchiveOpen to properly report error when header can't be
+read.
+
+* Fixed glaring conflicts between LzmaTypes.h and 7zTypes.h.
+
+-- 
+Shay Green <gblargg@gmail.com>

@@ -20,6 +20,7 @@
 #include "../common/Port.h"
 #include "../System.h"
 #include "agbprint.h"
+
 #ifdef PROFILING
 #include "prof/prof.h"
 #endif
@@ -28,17 +29,17 @@
 #define _stricmp strcasecmp
 #endif
 
-
 extern int emulating;
-#ifdef LINK_EMULATION
+
+#include "GBALink.h"
 extern int linktime;
 extern void StartLink(u16);
-extern void StartJOYLink(u16);
 extern void StartGPLink(u16);
 extern void LinkSSend(u16);
 extern void LinkUpdate(int);
 extern int linktime2;
-#endif
+extern bool linkenable;
+
 int SWITicks = 0;
 int IRQTicks = 0;
 
@@ -1203,6 +1204,9 @@ bool CPUIsGBABios(const char * file)
 
 bool CPUIsELF(const char *file)
 {
+  if(file == NULL)
+	  return false;
+
   if(strlen(file) > 4) {
     const char * p = strrchr(file,'.');
 
@@ -1323,15 +1327,18 @@ int CPULoadRom(const char *szFile)
     }
   } else
 #endif //NO_DEBUGGER
-  if(!utilLoad(szFile,
-                      utilIsGBAImage,
-                      whereToLoad,
-                      romSize)) {
-    free(rom);
-    rom = NULL;
-    free(workRAM);
-    workRAM = NULL;
-    return 0;
+  if(szFile!=NULL)
+  {
+	  if(!utilLoad(szFile,
+						  utilIsGBAImage,
+						  whereToLoad,
+						  romSize)) {
+		free(rom);
+		rom = NULL;
+		free(workRAM);
+		workRAM = NULL;
+		return 0;
+	  }
   }
 
   u16 *temp = (u16 *)(rom+((romSize+1)&~1));
@@ -2765,61 +2772,78 @@ void CPUUpdateRegister(u32 address, u16 value)
     timerOnOffDelay|=8;
     cpuNextEvent = cpuTotalTicks;
     break;
-  case 0x128:
-#ifdef LINK_EMULATION
-    if (linkenable)
-    {
-      StartLink(value);
-    }
-    else
-#endif
-    {
-      if(value & 0x80) {
-        value &= 0xff7f;
-        if(value & 1 && (value & 0x4000)) {
-          UPDATE_REG(0x12a, 0xFF);
-          IF |= 0x80;
-          UPDATE_REG(0x202, IF);
-          value &= 0x7f7f;
-        }
-      }
-      UPDATE_REG(0x128, value);
-    }
-    break;
-  case 0x12a:
-#ifdef LINK_EMULATION
-    if(linkenable && lspeed)
-      LinkSSend(value);
-#endif
-    {
-      UPDATE_REG(0x134, value);
-    }
-    break;
+
+
+  case COMM_SIOCNT:
+	  StartLink(value);
+	  /*
+	  // old code path for no linking...
+	  {
+		  if (value & 0x80) {
+			  value &= 0xff7f;
+			  if ((value & 1) && (value & 0x4000)) {
+				  UPDATE_REG(COMM_SIODATA8, 0xFF);
+				  IF |= 0x80;
+				  UPDATE_REG(0x202, IF);
+				  value &= 0x7f7f;
+			  }
+		  }
+		  UPDATE_REG(COMM_SIOCNT, value);
+	  }
+	  */
+	  break;
+
+  case COMM_SIODATA8:
+	  if (gba_link_enabled && lspeed)
+		  LinkSSend(value);
+	  UPDATE_REG(COMM_RCNT, value);
+	  break;
+
   case 0x130:
-    P1 |= (value & 0x3FF);
-    UPDATE_REG(0x130, P1);
-    break;
+	  P1 |= (value & 0x3FF);
+	  UPDATE_REG(0x130, P1);
+	  break;
+
   case 0x132:
-    UPDATE_REG(0x132, value & 0xC3FF);
-    break;
-  case 0x134:
-#ifdef LINK_EMULATION
-    if (linkenable)
-      StartGPLink(value);
-    else
-#endif
-      UPDATE_REG(0x134, value);
+	  UPDATE_REG(0x132, value & 0xC3FF);
+	  break;
 
-    break;
-  case 0x140:
-#ifdef LINK_EMULATION
-    if (linkenable)
-      StartJOYLink(value);
-    else
-#endif
-      UPDATE_REG(0x140, value);
+  case COMM_RCNT:
+	  StartGPLink(value);
+	  break;
 
-    break;
+  case COMM_JOYCNT:
+	  {
+		  u16 cur = READ16LE(&ioMem[COMM_JOYCNT]);
+
+		  if (value & JOYCNT_RESET)			cur &= ~JOYCNT_RESET;
+		  if (value & JOYCNT_RECV_COMPLETE)	cur &= ~JOYCNT_RECV_COMPLETE;
+		  if (value & JOYCNT_SEND_COMPLETE)	cur &= ~JOYCNT_SEND_COMPLETE;
+		  if (value & JOYCNT_INT_ENABLE)	cur |= JOYCNT_INT_ENABLE;
+
+		  UPDATE_REG(COMM_JOYCNT, cur);
+	  }
+	  break;
+
+  case COMM_JOY_RECV_L:
+	  UPDATE_REG(COMM_JOY_RECV_L, value);
+	  break;
+  case COMM_JOY_RECV_H:
+	  UPDATE_REG(COMM_JOY_RECV_H, value);	  
+	  break;
+
+  case COMM_JOY_TRANS_L:
+	  UPDATE_REG(COMM_JOY_TRANS_L, value);
+	  UPDATE_REG(COMM_JOYSTAT, READ16LE(&ioMem[COMM_JOYSTAT]) | JOYSTAT_SEND);
+	  break;
+  case COMM_JOY_TRANS_H:
+	  UPDATE_REG(COMM_JOY_TRANS_H, value);
+	  break;
+
+  case COMM_JOYSTAT:
+	  UPDATE_REG(COMM_JOYSTAT, (READ16LE(&ioMem[COMM_JOYSTAT]) & 0xf) | (value & 0xf0));
+	  break;
+
   case 0x200:
     IE = value & 0x3FFF;
     UPDATE_REG(0x200, IE);
@@ -3405,10 +3429,11 @@ void CPULoop(int ticks)
   int timerOverflow = 0;
   // variable used by the CPU core
   cpuTotalTicks = 0;
-#ifdef LINK_EMULATION
-  if(linkenable)
+  
+  // shuffle2: what's the purpose?
+  if(gba_link_enabled)
     cpuNextEvent = 1;
-#endif
+
   cpuBreakLoop = false;
   cpuNextEvent = CPUUpdateTicks();
   if(cpuNextEvent > ticks)
@@ -3863,10 +3888,13 @@ void CPULoop(int ticks)
 #endif
 
       ticks -= clockTicks;
-#ifdef LINK_EMULATION
-	  if (linkenable)
+
+	  if (gba_joybus_enabled)
+		  JoyBusUpdate(clockTicks);
+
+	  if (gba_link_enabled)
 		  LinkUpdate(clockTicks);
-#endif
+
       cpuNextEvent = CPUUpdateTicks();
 
       if(cpuDmaTicksToUpdate > 0) {
@@ -3880,10 +3908,11 @@ void CPULoop(int ticks)
         cpuDmaHack = true;
         goto updateLoop;
       }
-#ifdef LINK_EMULATION
-	  if(linkenable)
+
+	  // shuffle2: what's the purpose?
+	  if(gba_link_enabled)
   	       cpuNextEvent = 1;
-#endif
+
       if(IF && (IME & 1) && armIrqEnable) {
         int res = IF & IE;
         if(stopState)
