@@ -107,6 +107,7 @@
 #define IDD_FULLSCREEN                  162
 #define IDD_XAUDIO2_CONFIG              163
 #define IDD_AUDIO_CORE_SETTINGS         164
+#define IDD_JOYBUS_DIALOG               165
 #define IDC_R0                          1000
 #define IDC_EDIT_UP                     1000
 #define IDC_R1                          1001
@@ -561,6 +562,8 @@
 #define IDC_SOUND_FILTERING             1294
 #define IDC_COMBO1                      1296
 #define IDC_SAMPLE_RATE                 1296
+#define IDC_JOYBUS_HOSTNAME             1297
+#define IDC_JOYBUS_ENABLE               1298
 #define IDS_OAL_NODEVICE                2000
 #define IDS_OAL_NODLL                   2001
 #define IDS_AVI_CANNOT_CREATE_AVI       2002
@@ -876,14 +879,16 @@
 #define ID_OPTIONS_EMULATOR_SAVETYPE_DETECTNOW 40372
 #define ID_FILE_PAUSE                   40373
 #define ID_OPTIONS_EMULATOR_DIRECTORIES 40374
+#define ID_Menu40375                    40375
+#define ID_OPTIONS_JOYBUS               40376
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        165
-#define _APS_NEXT_COMMAND_VALUE         40375
-#define _APS_NEXT_CONTROL_VALUE         1297
+#define _APS_NEXT_RESOURCE_VALUE        166
+#define _APS_NEXT_COMMAND_VALUE         40377
+#define _APS_NEXT_CONTROL_VALUE         1299
 #define _APS_NEXT_SYMED_VALUE           103
 #endif
 #endif

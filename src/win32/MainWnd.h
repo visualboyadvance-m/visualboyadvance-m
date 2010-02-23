@@ -14,6 +14,7 @@ public:
 	HACCEL m_hAccelTable;
 
 	bool FileRun();
+	bool BiosRun();
 	void winMouseOn();
 	void screenCapture(int captureNumber);
 	bool fileOpenSelect( int system );
@@ -328,12 +329,11 @@ protected:
 	afx_msg void OnOptionsSoundHardwareacceleration();
 	afx_msg void OnUpdateOptionsSoundHardwareacceleration(CCmdUI *pCmdUI);
 	afx_msg void OnLinkOptions();
-	afx_msg void OnOptionsLinkLog() ;
-	afx_msg void OnUpdateOptionsLinkLog(CCmdUI* pCmdUI) ;
-	afx_msg void OnOptionsLinkRFU() ;
-	afx_msg void OnUpdateOptionsLinkRFU(CCmdUI* pCmdUI) ;
-	afx_msg void OnOptionsLinkEnable() ;
-	afx_msg void OnUpdateOptionsLinkEnable(CCmdUI* pCmdUI) ;
+	afx_msg void OnOptionsLinkRFU();
+	afx_msg void OnUpdateOptionsLinkRFU(CCmdUI* pCmdUI);
+	afx_msg void OnOptionsLinkEnable();
+	afx_msg void OnUpdateOptionsLinkEnable(CCmdUI* pCmdUI);
+	afx_msg void OnOptionsJoybus();
 
 	afx_msg void OnOutputapiDirectsound();
 	afx_msg void OnUpdateOutputapiDirectsound(CCmdUI *pCmdUI);
@@ -361,12 +361,12 @@ protected:
 	afx_msg void OnUpdatePixelfilterMultiThreading(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateOptionsSelectPlugin(CCmdUI *pCmdUI);
 
-  afx_msg void OnLoadgameDonotchangebatterysave();
+	afx_msg void OnLoadgameDonotchangebatterysave();
 	afx_msg void OnUpdateLoadgameDonotchangebatterysave(CCmdUI *pCmdUI);
-  afx_msg void OnLoadgameDonotchangecheatlist();
-  afx_msg void OnUpdateLoadgameDonotchangecheatlist(CCmdUI *pCmdUI);
+	afx_msg void OnLoadgameDonotchangecheatlist();
+	afx_msg void OnUpdateLoadgameDonotchangecheatlist(CCmdUI *pCmdUI);
 
-  afx_msg void OnEnterSizeMove();
+	afx_msg void OnEnterSizeMove();
 
 	afx_msg void OnAudioCoreSettings();
 	afx_msg void OnUpdateAudioCoreSettings(CCmdUI *pCmdUI);

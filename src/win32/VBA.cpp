@@ -115,7 +115,6 @@ extern int InitLink(void);
 extern void CloseLink(void);
 //extern int linkid;
 extern char inifile[];
-extern FILE *linklogfile;
 /* ------------------- */
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -351,6 +350,8 @@ VBA::~VBA()
 
   regInit(winBuffer);
 
+  JoyBusShutdown();
+
   saveSettings();
 
   if(moviePlaying) {
@@ -445,7 +446,7 @@ BOOL VBA::InitInstance()
     *p = 0;
 
   if(!InitLink())
-	return FALSE;;
+	return FALSE;
 
   bool force = false;
 
@@ -482,11 +483,6 @@ BOOL VBA::InitInstance()
     }
     return FALSE;
   }
-
-  
-
-  if(!openLinkLog())
-    return FALSE;
 
   if(!initInput())
     return FALSE;
@@ -1616,12 +1612,14 @@ void VBA::loadSettings()
 
   linktimeout = regQueryDwordValue("LinkTimeout", 1000);
 
-  linklog = regQueryDwordValue("Linklog", false) ? true : false;
-  if(linklog)
-	  openLinkLog();
+  rfu_enabled = regQueryDwordValue("RFU", false) ? true : false;
+  gba_link_enabled = regQueryDwordValue("linkEnabled", false) ? true : false;
+  gba_joybus_enabled = regQueryDwordValue("joybusEnabled", false) ? true : false;
+  buffer = regQueryStringValue("joybusHostAddr", "");
 
-  adapter = regQueryDwordValue("RFU", false) ? true : false;
-  linkenable = regQueryDwordValue("linkEnabled", false) ? true : false;
+  if(!buffer.IsEmpty()) {
+	  joybusHostAddr = std::string(buffer);
+  }
 
   lanlink.active = regQueryDwordValue("LAN", 0) ? true : false;
 
@@ -2548,9 +2546,10 @@ void VBA::saveSettings()
   regSetStringValue("pluginName", pluginName);
   regSetDwordValue("saveMoreCPU", Sm60FPS::bSaveMoreCPU);
   regSetDwordValue("LinkTimeout", linktimeout);
-  regSetDwordValue("Linklog", linklog);
-  regSetDwordValue("RFU", adapter);
-  regSetDwordValue("linkEnabled", linkenable);
+  regSetDwordValue("RFU", rfu_enabled);
+  regSetDwordValue("linkEnabled", gba_link_enabled);
+  regSetDwordValue("joybusEnabled", gba_joybus_enabled);
+  regSetStringValue("joybusHostAddr", joybusHostAddr.ToString().c_str());
   regSetDwordValue("lastFullscreen", lastFullscreen);
   regSetDwordValue("pauseWhenInactive", pauseWhenInactive);
 
