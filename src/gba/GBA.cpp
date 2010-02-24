@@ -1087,8 +1087,10 @@ bool CPUImportEepromFile(const char *fileName)
       i++;
       i += 4;
     }
-  } else
+  } else {
+    fclose(file);
     return false;
+  }
   fclose(file);
   return true;
 }
