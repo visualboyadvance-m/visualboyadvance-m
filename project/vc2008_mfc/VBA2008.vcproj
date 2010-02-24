@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="VisualBoyAdvance"
 	ProjectGUID="{6D4C5EC8-933F-4C05-A1BF-498E658576DF}"
 	RootNamespace="VBA"
@@ -32,7 +32,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				CommandLine="SubWCRev.exe ..\.. svnrev_template.h ..\..\src\svnrev.h"
-				ExcludedFromBuild="false"
+				ExcludedFromBuild="true"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -54,8 +54,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;..\..\..\dependencies\File_Extractor-0.4.3\fex&quot;;..\..\..\dependencies\msvc"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;DEV_VERSION;BKPT_SUPPORT;GBA_LOGGING;MMX;ASM;_CRT_SECURE_NO_WARNINGS;HAS_FILE_EXTRACTOR"
+				AdditionalIncludeDirectories="&quot;..\..\..\dependencies\File_Extractor-0.4.3\fex&quot;;..\..\..\dependencies\lpng140;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\zlib"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;DEV_VERSION;BKPT_SUPPORT;GBA_LOGGING;MMX;ASM;_CRT_SECURE_NO_WARNINGS;HAS_FILE_EXTRACTOR;NO_OAL"
 				StringPooling="false"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -91,7 +91,7 @@
 				OutputFile="$(OutDir)\VisualBoyAdvance-M.exe"
 				Version=""
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="..\..\..\dependencies\lpng140\projects\visualc9\Win32_LIB_Debug;..\..\..\dependencies\zlib"
 				AdditionalManifestDependencies=""
 				IgnoreDefaultLibraryNames="nafxcwd.lib;libcmtd.lib"
 				GenerateDebugInformation="true"
@@ -141,7 +141,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				CommandLine="SubWCRev.exe ..\.. svnrev_template.h ..\..\src\svnrev.h"
-				ExcludedFromBuild="false"
+				ExcludedFromBuild="true"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -167,8 +167,8 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;..\..\..\dependencies\File_Extractor-0.4.3\fex&quot;;..\..\..\dependencies\msvc"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;GBA_LOGGING;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR"
+				AdditionalIncludeDirectories="&quot;..\..\..\dependencies\File_Extractor-0.4.3\fex&quot;;..\..\..\dependencies\lpng140;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\zlib"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;GBA_LOGGING;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR;NO_OAL"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
 				EnableEnhancedInstructionSet="0"
@@ -201,7 +201,7 @@
 				Version=""
 				LinkIncremental="0"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="..\..\..\dependencies\lpng140\projects\visualc9\Win32_LIB_Release;..\..\..\dependencies\zlib"
 				AdditionalManifestDependencies=""
 				IgnoreDefaultLibraryNames="nafxcw.lib;libcmt.lib;libcmtd.lib"
 				GenerateDebugInformation="false"
@@ -911,6 +911,22 @@
 			</File>
 			<File
 				RelativePath="..\..\src\gba\gbalink.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\gba\GBASockClient.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\gba\GBASockClient.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\win32\JoybusOptions.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\win32\JoybusOptions.h"
 				>
 			</File>
 			<File
@@ -2470,7 +2486,7 @@
 	<Globals>
 		<Global
 			Name="RESOURCE_FILE"
-			Value="\Dev\vbam\trunk\src\win32\VBA.rc"
+			Value="\Users\Shawn\Desktop\shuffle2proj\vba-m\src\win32\VBA.rc"
 		/>
 	</Globals>
 </VisualStudioProject>
