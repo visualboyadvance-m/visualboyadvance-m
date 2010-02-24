@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="File_Extractor"
 	ProjectGUID="{7AEC599C-7C82-4F00-AA60-411E0A359CB0}"
 	RootNamespace="File_Extractor"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\zlib&quot;"
 				PreprocessorDefinitions="FEX_ENABLE_RAR;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -103,7 +103,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\zlib&quot;"
 				PreprocessorDefinitions="FEX_ENABLE_RAR;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				ProgramDataBaseFileName="$(IntDir)\$(ProjectName).pdb"
