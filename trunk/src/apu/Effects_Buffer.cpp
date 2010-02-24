@@ -505,7 +505,7 @@ void Effects_Buffer::mix_effects( blip_sample_t* out_, int pair_count )
 			int bufs_remain = bufs_size;
 			do
 			{
-				if ( buf->non_silent() && ( buf->echo == (bool)echo_phase ) )
+				if ( buf->non_silent() && ( buf->echo == !!echo_phase ) )
 				{
 					stereo_fixed_t* BLIP_RESTRICT out = (stereo_fixed_t*) &echo [echo_pos];
 					int const bass = BLIP_READER_BASS( *buf );

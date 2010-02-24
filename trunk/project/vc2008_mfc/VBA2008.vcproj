@@ -916,6 +916,14 @@
 			<File
 				RelativePath="..\..\src\gba\GBASockClient.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_SCL_SECURE_NO_WARNINGS"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\gba\GBASockClient.h"
