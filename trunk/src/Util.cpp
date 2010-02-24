@@ -18,7 +18,7 @@ extern "C" {
 #include "gba/RTC.h"
 #include "common/Port.h"
 
-#include "common/fex.h"
+#include "fex/fex.h"
 
 extern "C" {
 #include "common/memgzio.h"
@@ -387,13 +387,13 @@ void utilStripDoubleExtension(const char *file, char *buffer)
   }
 }
 
-// Opens and scans archive using accept(). Returns File_Extractor if found.
+// Opens and scans archive using accept(). Returns fex_t if found.
 // If error or not found, displays message and returns NULL.
-static File_Extractor* scan_arc(const char *file, bool (*accept)(const char *),
+static fex_t* scan_arc(const char *file, bool (*accept)(const char *),
 		char (&buffer) [2048] )
 {
-	fex_err_t err;
-	File_Extractor* fe = fex_open( file, &err );
+	fex_t* fe;
+	fex_err_t err = fex_open( &fe, file );
 	if(!fe)
 	{
 		systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s: %s"), file, err);
@@ -440,7 +440,7 @@ IMAGE_TYPE utilFindType(const char *file)
 	char buffer [2048];
 	if ( !utilIsImage( file ) ) // TODO: utilIsArchive() instead?
 	{
-		File_Extractor* fe = scan_arc(file,utilIsImage,buffer);
+		fex_t* fe = scan_arc(file,utilIsImage,buffer);
 		if(!fe)
 			return IMAGE_UNKNOWN;
 		fex_close(fe);
@@ -465,11 +465,12 @@ u8 *utilLoad(const char *file,
 {
 	// find image file
 	char buffer [2048];
-	File_Extractor *fe = scan_arc(file,accept,buffer);
+	fex_t *fe = scan_arc(file,accept,buffer);
 	if(!fe)
 		return NULL;
 
 	// Allocate space for image
+	fex_err_t err = fex_stat(fe);
 	int fileSize = fex_size(fe);
 	if(size == 0)
 		size = fileSize;
@@ -490,7 +491,7 @@ u8 *utilLoad(const char *file,
 
 	// Read image
 	int read = fileSize <= size ? fileSize : size; // do not read beyond file
-	fex_err_t err = fex_read_once(fe, image, read);
+	err = fex_read(fe, image, read);
 	fex_close(fe);
 	if(err) {
 		systemMessage(MSG_ERROR_READING_IMAGE,
