@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <VisualStudioToolFile
 	Name="Netwide Assembler"
 	Version="8,00"
@@ -7,7 +7,7 @@
 		<CustomBuildRule
 			Name="NASM"
 			DisplayName="Netwide Assembler"
-			CommandLine="$(SolutionDir)..\..\dependencies\nasm.exe [AllOptions] [AdditionalOptions] -- [inputs]"
+			CommandLine="$(SolutionDir)..\..\..\dependencies\nasm.exe [AllOptions] [AdditionalOptions] -- [inputs]"
 			Outputs="[$ObjectFileName]"
 			FileExtensions="*.asm"
 			ExecutionDescription="Assembling..."

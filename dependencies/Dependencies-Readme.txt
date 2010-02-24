@@ -1,1 +1,0 @@
-The Dependencies that go in this folder can be obtained from https://sourceforge.net/projects/vbam/files/Dependencies/dependencies.7z
