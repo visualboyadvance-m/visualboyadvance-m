@@ -18,7 +18,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 #include "blargg_source.h"
 
 #if GB_APU_CUSTOM_STATE
-	#define REFLECT( x, y ) (save ?       (io->y) = (x) :         (x) = (io->y)          )
+	#define REFLECT( x, y ) (save ?       (io->y) = (x) :         (x) = !!(io->y)        )
 #else
 	#define REFLECT( x, y ) (save ? set_val( io->y, x ) : (void) ((x) = get_val( io->y )))
 
