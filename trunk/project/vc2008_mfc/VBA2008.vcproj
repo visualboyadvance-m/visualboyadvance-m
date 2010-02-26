@@ -31,8 +31,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="SubWCRev.exe ..\.. svnrev_template.h ..\..\src\svnrev.h"
-				ExcludedFromBuild="true"
+				CommandLine="..\..\..\dependencies\SubWCRev.exe ..\.. svnrev_template.h ..\..\src\svnrev.h"
+				ExcludedFromBuild="false"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -140,8 +140,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="SubWCRev.exe ..\.. svnrev_template.h ..\..\src\svnrev.h"
-				ExcludedFromBuild="true"
+				CommandLine="..\..\..\dependencies\SubWCRev.exe ..\.. svnrev_template.h ..\..\src\svnrev.h"
+				ExcludedFromBuild="false"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
