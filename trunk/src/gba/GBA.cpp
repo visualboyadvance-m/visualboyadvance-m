@@ -20,6 +20,7 @@
 #include "../common/Port.h"
 #include "../System.h"
 #include "agbprint.h"
+#include "GBALink.h"
 
 #ifdef PROFILING
 #include "prof/prof.h"
@@ -30,15 +31,6 @@
 #endif
 
 extern int emulating;
-
-#include "GBALink.h"
-extern int linktime;
-extern void StartLink(u16);
-extern void StartGPLink(u16);
-extern void LinkSSend(u16);
-extern void LinkUpdate(int);
-extern int linktime2;
-extern bool linkenable;
 
 int SWITicks = 0;
 int IRQTicks = 0;
@@ -2796,10 +2788,8 @@ void CPUUpdateRegister(u32 address, u16 value)
 	  break;
 
   case COMM_SIODATA8:
-#ifdef _MSC_VER
-	  if (gba_link_enabled && lspeed)
+	  if (gba_link_enabled)
 		  LinkSSend(value);
-#endif
 	  UPDATE_REG(COMM_RCNT, value);
 	  break;
 
@@ -3433,12 +3423,10 @@ void CPULoop(int ticks)
   int timerOverflow = 0;
   // variable used by the CPU core
   cpuTotalTicks = 0;
-  
-#ifdef _MSC_VER
+
   // shuffle2: what's the purpose?
   if(gba_link_enabled)
     cpuNextEvent = 1;
-#endif
 
   cpuBreakLoop = false;
   cpuNextEvent = CPUUpdateTicks();
@@ -3898,10 +3886,8 @@ void CPULoop(int ticks)
 	  if (gba_joybus_enabled)
 		  JoyBusUpdate(clockTicks);
 
-#ifdef _MSC_VER
 	  if (gba_link_enabled)
 		  LinkUpdate(clockTicks);
-#endif
 
       cpuNextEvent = CPUUpdateTicks();
 
@@ -3917,11 +3903,9 @@ void CPULoop(int ticks)
         goto updateLoop;
       }
 
-#ifdef _MSC_VER
 	  // shuffle2: what's the purpose?
 	  if(gba_link_enabled)
   	       cpuNextEvent = 1;
-#endif
 
       if(IF && (IME & 1) && armIrqEnable) {
         int res = IF & IE;

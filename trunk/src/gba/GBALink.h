@@ -121,8 +121,13 @@ extern void JoyBusConnect();
 extern void JoyBusShutdown();
 extern void JoyBusUpdate(int ticks);
 
+extern bool gba_link_enabled;
+
 #ifdef _MSC_VER
-extern void LinkUpdate();
+extern void StartLink(u16);
+extern void StartGPLink(u16);
+extern void LinkSSend(u16);
+extern void LinkUpdate(int);
 extern void LinkChildStop();
 extern void LinkChildSend(u16);
 extern void CloseLanLink();
@@ -130,9 +135,12 @@ extern char *MakeInstanceFilename(const char *Input);
 extern LANLINKDATA lanlink;
 extern int vbaid;
 extern bool rfu_enabled;
-extern bool gba_link_enabled;
 extern int linktimeout;
 extern lclient lc;
 extern int linkid;
-extern int lspeed;
+#else // These are stubbed for now
+inline void StartLink(u16){}
+inline void StartGPLink(u16){}
+inline void LinkSSend(u16){}
+inline void LinkUpdate(int){}
 #endif

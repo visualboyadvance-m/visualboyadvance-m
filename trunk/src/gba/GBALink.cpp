@@ -23,10 +23,10 @@ bool gba_joybus_enabled = false;
 GBASockClient* dol = NULL;
 sf::IPAddress joybusHostAddr = sf::IPAddress::LocalHost;
 
-#ifdef _MSC_VER
 // If disabled, gba core won't call any (non-joybus) link functions
 bool gba_link_enabled = false;
 
+#ifdef _MSC_VER
 // Hodgepodge
 u8 tspeed = 3;
 u8 transfer = 0;
@@ -40,7 +40,6 @@ static int i, j;
 int linktimeout = 1000;
 LANLINKDATA lanlink;
 u16 linkdata[4];
-int lspeed = 0;
 lserver ls;
 lclient lc;
 bool oncewait = false, after = false;
