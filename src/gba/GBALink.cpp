@@ -1,30 +1,33 @@
 // This file was written by denopqrihg
 
+#ifdef _WIN32
 #include "../win32/stdafx.h"
 #include "../win32/VBA.h"
-
-#include "GBALink.h"
-#include "GBASockClient.h"
-
-#include "GBA.h"
-#include <stdio.h>
-#include "../common/port.h"
 #include "../win32/MainWnd.h"
 #include "../win32/LinkOptions.h"
 #include "../win32/Reg.h"
+#endif
+
+#include <stdio.h>
+#include "../common/Port.h"
+#include "GBA.h"
+#include "GBALink.h"
+#include "GBASockClient.h"
 
 #define UPDATE_REG(address, value) WRITE16LE(((u16 *)&ioMem[address]),value)
 
-// If disabled, gba core won't call any (non-joybus) link functions
-bool gba_link_enabled = false;
+int linktime = 0;
 
 // Joybus
 bool gba_joybus_enabled = false;
 GBASockClient* dol = NULL;
 sf::IPAddress joybusHostAddr = sf::IPAddress::LocalHost;
 
+#ifdef _MSC_VER
+// If disabled, gba core won't call any (non-joybus) link functions
+bool gba_link_enabled = false;
+
 // Hodgepodge
-int linktime = 0;
 u8 tspeed = 3;
 u8 transfer = 0;
 LINKDATA *linkmem = NULL;
@@ -191,6 +194,8 @@ void StartGPLink(u16 value)
 	}
 }
 
+#endif // _MSC_VER
+
 void JoyBusConnect()
 {
 	delete dol;
@@ -263,6 +268,8 @@ void JoyBusUpdate(int ticks)
 		}
 	}
 }
+
+#ifdef _MSC_VER
 
 // Windows threading is within!
 void LinkUpdate(int ticks)
@@ -1211,3 +1218,5 @@ void LinkSSend(u16 value){
 		lc.oncesend = true;
 	}
 }
+
+#endif // _MSC_VER

@@ -2796,8 +2796,10 @@ void CPUUpdateRegister(u32 address, u16 value)
 	  break;
 
   case COMM_SIODATA8:
+#ifdef _MSC_VER
 	  if (gba_link_enabled && lspeed)
 		  LinkSSend(value);
+#endif
 	  UPDATE_REG(COMM_RCNT, value);
 	  break;
 
@@ -3432,9 +3434,11 @@ void CPULoop(int ticks)
   // variable used by the CPU core
   cpuTotalTicks = 0;
   
+#ifdef _MSC_VER
   // shuffle2: what's the purpose?
   if(gba_link_enabled)
     cpuNextEvent = 1;
+#endif
 
   cpuBreakLoop = false;
   cpuNextEvent = CPUUpdateTicks();
@@ -3894,8 +3898,10 @@ void CPULoop(int ticks)
 	  if (gba_joybus_enabled)
 		  JoyBusUpdate(clockTicks);
 
+#ifdef _MSC_VER
 	  if (gba_link_enabled)
 		  LinkUpdate(clockTicks);
+#endif
 
       cpuNextEvent = CPUUpdateTicks();
 
@@ -3911,9 +3917,11 @@ void CPULoop(int ticks)
         goto updateLoop;
       }
 
+#ifdef _MSC_VER
 	  // shuffle2: what's the purpose?
 	  if(gba_link_enabled)
   	       cpuNextEvent = 1;
+#endif
 
       if(IF && (IME & 1) && armIrqEnable) {
         int res = IF & IE;
