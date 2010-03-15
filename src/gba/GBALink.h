@@ -43,6 +43,7 @@ enum
 	JOY_CMD_WRITE	= 0x15		
 };
 
+#ifdef _MSC_VER
 typedef struct {
 	u16 linkdata[4];
 	u16 linkcmd[4];
@@ -112,12 +113,15 @@ typedef struct {
 	bool speed;
 	bool active;
 } LANLINKDATA;
+#endif
 
+extern bool gba_joybus_enabled;
 extern sf::IPAddress joybusHostAddr;
 extern void JoyBusConnect();
 extern void JoyBusShutdown();
 extern void JoyBusUpdate(int ticks);
 
+#ifdef _MSC_VER
 extern void LinkUpdate();
 extern void LinkChildStop();
 extern void LinkChildSend(u16);
@@ -127,8 +131,8 @@ extern LANLINKDATA lanlink;
 extern int vbaid;
 extern bool rfu_enabled;
 extern bool gba_link_enabled;
-extern bool gba_joybus_enabled;
 extern int linktimeout;
 extern lclient lc;
 extern int linkid;
 extern int lspeed;
+#endif

@@ -7,7 +7,7 @@
 #include "Sound.h"
 #include "agbprint.h"
 #include "GBAcpu.h"
-#include "gbalink.h"
+#include "GBALink.h"
 
 extern const u32 objTilesAddress[3];
 
