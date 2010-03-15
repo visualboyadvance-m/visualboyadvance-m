@@ -19,7 +19,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "..\..\..\dependen
 		{3E03C179-8251-46E4-81F4-466F114BAC63} = {3E03C179-8251-46E4-81F4-466F114BAC63}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "File_Extractor", "..\..\..\dependencies\File_Extractor-1.0.0\File_Extractor2008.vcproj", "{7AEC599C-7C82-4F00-AA60-411E0A359CB0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "File_Extractor", "..\..\fex\File_Extractor2008.vcproj", "{7AEC599C-7C82-4F00-AA60-411E0A359CB0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3E03C179-8251-46E4-81F4-466F114BAC63} = {3E03C179-8251-46E4-81F4-466F114BAC63}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

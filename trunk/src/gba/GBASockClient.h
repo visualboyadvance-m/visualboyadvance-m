@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SFML/Network.hpp"
+#include <SFML/Network.hpp>
 #include "../common/Types.h"
 
 class GBASockClient : public sf::SocketTCP

@@ -1,3 +1,6 @@
+# The project's name is VBA-M it uses assembly, C and C++ code
+PROJECT(VBA-M ASM C CXX)
+
 cmake_minimum_required( VERSION 2.4.6 )
 if( COMMAND cmake_policy )
     cmake_policy( SET CMP0003 NEW )
@@ -10,8 +13,8 @@ SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts )
 INCLUDE(CMakeScripts/CMakeDetermineASMCompiler.cmake)
 INCLUDE(CMakeScripts/CMakeASMInformation.cmake)
 
-# The project's name is VBA-M it uses assembly, C and C++ code
-PROJECT(VBA-M ASM C CXX)
+# Also need to look for SFML
+INCLUDE(CMakeScripts/FindSFML.cmake)
 
 # Both the SDL and the GTK+ frontends are built by default
 # To disable building the SDL frontend add -DNO_SDL=1 on the commandline
@@ -33,11 +36,12 @@ if( APPLE )
 	SET(SDLMAIN_LIBRARY "-lSDLmain")
 endif( APPLE )
 
-# Look for some dependencies using builtin CMake scripts
+# Look for some dependencies using CMake scripts
 FIND_PACKAGE ( ZLIB REQUIRED )
 FIND_PACKAGE ( PNG REQUIRED )
 FIND_PACKAGE ( OpenGL REQUIRED )
 FIND_PACKAGE ( SDL REQUIRED )
+FIND_PACKAGE ( SFML REQUIRED )
 
 # Disable looking for GTK if not going to build the GTK frontend
 # so that pkg-config is not required
@@ -116,6 +120,33 @@ SET( CMAKE_C_FLAGS "-O3 -Wall")
 SET( CMAKE_CXX_FLAGS "-O3 -Wall")
 
 # Source files definition
+SET(SRC_FEX
+    fex/7z_C/7zAlloc.c
+    fex/7z_C/7zBuf.c
+    fex/7z_C/7zCrc.c
+    fex/7z_C/7zDecode.c
+    fex/7z_C/7zExtract.c
+    fex/7z_C/7zHeader.c
+    fex/7z_C/7zIn.c
+    fex/7z_C/7zItem.c
+    fex/7z_C/7zStream.c
+    fex/7z_C/Bcj2.c
+    fex/7z_C/Bra86.c
+    fex/7z_C/LzmaDec.c
+    fex/fex/Binary_Extractor.cpp
+    fex/fex/blargg_common.cpp
+    fex/fex/blargg_errors.cpp
+    fex/fex/Data_Reader.cpp
+    fex/fex/fex.cpp
+    fex/fex/File_Extractor.cpp
+    fex/fex/Gzip_Extractor.cpp
+    fex/fex/Gzip_Reader.cpp
+    fex/fex/Rar_Extractor.cpp
+    fex/fex/Zip7_Extractor.cpp
+    fex/fex/Zip_Extractor.cpp
+    fex/fex/Zlib_Inflater.cpp
+)
+
 SET(SRC_MAIN
     src/Util.cpp
     src/common/Patch.cpp
@@ -130,6 +161,8 @@ SET(SRC_GBA
     src/gba/Flash.cpp
     src/gba/GBA.cpp
     src/gba/GBAGfx.cpp
+    src/gba/GBALink.cpp
+    src/gba/GBASockClient.cpp
     src/gba/GBA-thumb.cpp
     src/gba/GBA-arm.cpp
     src/gba/gbafilter.cpp
@@ -177,10 +210,6 @@ SET(SRC_SDL
     src/sdl/expr.cpp
     src/sdl/exprNode.cpp
     src/sdl/expr-lex.cpp
-)
-
-SET(SRC_FEX_MINI
-    src/common/fex_mini.cpp
 )
 
 SET(SRC_FILTERS
@@ -242,6 +271,7 @@ ENDIF(CMAKE_ASM_COMPILER_LOADED AND USE_ASM_SCALERS)
 
 INCLUDE_DIRECTORIES(
     ${ZLIB_INCLUDE_DIR}
+    fex
     ${PNG_INCLUDE_DIR}
     ${SDL_INCLUDE_DIR}
 )
@@ -264,6 +294,11 @@ IF( CAN_BUILD_GVBAM )
     )
 ENDIF( CAN_BUILD_GVBAM )
 
+ADD_LIBRARY(
+    fex
+    ${SRC_FEX}
+)
+
 ADD_LIBRARY (
     vbamcore
     ${PROJECT_SRCS}
@@ -271,7 +306,6 @@ ADD_LIBRARY (
     ${SRC_GBA}
     ${SRC_GB}
     ${SRC_APU}
-    ${SRC_FEX_MINI}
     ${SRC_FILTERS}
     ${SRC_DEBUGGER}
 )
@@ -301,6 +335,8 @@ IF( CAN_BUILD_VBAM )
         ${OPENGL_LIBRARY}
         ${WIN32_LIBRARIES}
         ${LIRC_CLIENT_LIBRARY}
+        ${SFML_LIBRARY}
+        fex
     )
 
     INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam DESTINATION bin)
@@ -326,6 +362,8 @@ IF( CAN_BUILD_GVBAM )
         ${GLADEMM_LIBRARIES}
         ${SDL_LIBRARY}
         ${GTKGLMM_LIBRARIES}
+        ${SFML_LIBRARY}
+        fex
     )
 
     INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/gvbam DESTINATION bin)
