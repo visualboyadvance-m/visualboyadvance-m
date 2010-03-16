@@ -308,7 +308,7 @@ unsigned char *,
 unsigned char *pOut, unsigned int dstPitch,
 int Xres, int Yres )
 {
-	unsigned int yuv[10]; // yuv[0] not used
+	unsigned int yuv[10] = {0}; // yuv[0] not used
 	// yuv[1-9] allows reusage of calculated YUV values
 	int x, y;
 	unsigned int linePlus, lineMinus;
