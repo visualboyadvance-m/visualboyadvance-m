@@ -3,7 +3,6 @@
 #include "LinkOptions.h"
 #include "../gba/GBALink.h"
 
-extern int lspeed;
 extern lserver ls;
 
 #ifdef _DEBUG
@@ -502,7 +501,6 @@ void LinkServer::OnServerStart()
 	lanlink.type = m_prottype;
 	lanlink.server = 1;
 	lanlink.speed = m_speed==1 ? true : false;
-	lspeed = lanlink.speed;
 
 	if((errorcode=ls.Init(&dlg))!=0){
 		char message[50];
@@ -539,7 +537,6 @@ void LinkClient::OnLinkConnect()
 	lanlink.type = m_prottype;
 	lanlink.server = 0;
 	lanlink.speed = m_hacks==1 ? true : false;
-	lspeed = lanlink.speed;
 
 	m_serverip.GetWindowText(ipaddress, 30);
 
@@ -564,7 +561,6 @@ void LinkOptions::GetAllData(LinkGeneral *src)
 
 	if(src->m_type==0){
 		lanlink.speed = 0;
-		lspeed = 0;
 	}
 
 	return;
