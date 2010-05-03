@@ -1,0 +1,224 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<!-- base href="http://zerosoft.zophar.net.way_back_stub/ips.htm" -->
+
+<title>:: ZeroSoft ::</title>
+<link rel="stylesheet" type="text/css" href="ips-Dateien/common.css">
+</head><body topmargin="0" leftmargin="0" bgcolor="#ffffff">
+
+<!--#include virtual="panels/top.htm"-->
+
+<div align="center">
+ 	<table border="0">
+    <tbody><tr>
+      <td align="left" valign="top">
+        <!--#include virtual="panels/menu.htm"-->
+      </td>
+      <td valign="top">
+		<!-- Main Body Table -->
+		<table border="0" cellpadding="0">
+          <tbody><tr>
+            <td class="title" align="center">
+              <p class="title">IPS File Format</p>
+            </td>
+          </tr>
+          <tr>
+		  		<td>
+					<p><b>IPS specifications.</b><br>
+					IPS format was created a lot of time ago and so the specs for many people are too restrictive for the modern needs.
+					Well, let see these specs.</p>
+					<ul>
+						<li>IPS files can patch every file not larger than 2^24-1 bits (2047 Mb)</li>
+					   <li>Every patch should not be larger than 2^16-1 bits (7.99 Mb)</li>
+					   <li>An
+IPS file can hold as many patches he can, assumed that the specified
+offset and the size of every single patch doesn't overflow the
+specified bounds.</li>
+					</ul>
+					<p>As you should realize it isn't so restrictive... 8 )</p>
+					<p><b>IPS file format</b><br>
+					The IPS file structure is made just like that:</p>
+
+					<table bgcolor="#000080" border="0" width="100%">
+					<tbody><tr>
+						<td bgcolor="#800080" width="32%"><font color="#ffffff" size="2" face="Arial"><b>Section</b></font></td>
+					   <td bgcolor="#800080" width="33%"><font color="#ffffff" size="2" face="Arial"><b>Size (Bytes)</b></font></td>
+					   <td bgcolor="#800080" width="85%"><font color="#ffffff" size="2" face="Arial"><b>Description</b></font></td>
+					</tr>
+					<tr>
+					   <td bgcolor="#ffffff" width="32%"><font color="#800080" size="2" face="Courier New">Header</font></td>
+					   <td bgcolor="#ffffff" width="33%"><font size="2" face="Arial">5</font></td>
+					   <td bgcolor="#ffffff" width="85%"><font size="2" face="Arial">The header show ever the same string: </font><font color="#800080" size="2" face="Courier New"> PATCH</font><font size="2" face="Arial"> note that the string is not NULL terminated.</font></td>
+					</tr>
+					<tr>
+					   <td bgcolor="#ffffff" width="32%"><font color="#800080" size="2" face="Courier New">Record</font></td>
+					   <td bgcolor="#ffffff" width="33%"><font size="2" face="Arial">3+2+Variable</font></td>
+					   <td bgcolor="#ffffff" width="85%"><font size="2" face="Arial">It's the record of a single patch, see below</font></td>
+					</tr>
+					<tr>
+					   <td bgcolor="#ffffff" width="32%"><font color="#800080" size="2" face="Courier New">....</font></td>
+					   <td bgcolor="#ffffff" width="33%">&nbsp;</td>
+					   <td bgcolor="#ffffff" width="85%"><font size="2" face="Arial">The numbers of record may vary</font></td>
+					</tr>
+					<tr>
+					   <td bgcolor="#ffffff" width="32%"><font color="#800080" size="2" face="Courier New">End Of file marker</font></td>
+					   <td bgcolor="#ffffff" width="33%"><font size="2" face="Arial">3</font></td>
+					   <td bgcolor="#ffffff" width="85%"><font size="2" face="Arial">A string (not NULL terminated) saying </font><font color="#800080" size="2" face="Courier New"> EOF</font></td>
+					</tr>
+					</tbody></table>
+					<p><b>IPS Record structure:</b></p>
+					<table bgcolor="#000080" border="0" width="100%">
+					<tbody><tr>
+						<td bgcolor="#800080" width="22%"><font color="#ffffff" size="2" face="Arial"><b>Section</b></font></td>
+					   <td bgcolor="#800080" width="25%"><font color="#ffffff" size="2" face="Arial"><b>Size (Bytes)</b></font></td>
+					   <td bgcolor="#800080" width="53%"><font color="#ffffff" size="2" face="Arial"><b>Description</b></font></td>
+					</tr>
+					<tr>
+					   <td bgcolor="#ffffff" width="22%"><font color="#800080" size="2" face="Courier New">Offset</font></td>
+					   <td bgcolor="#ffffff" width="25%"><font size="2" face="Arial">3</font></td>
+					   <td bgcolor="#ffffff" width="53%"><font size="2" face="Arial">The offset where the patch will be placed in the file to patch</font></td>
+					</tr>
+					<tr>
+					   <td bgcolor="#ffffff" width="22%"><font color="#800080" size="2" face="Courier New">Size</font></td>
+					   <td bgcolor="#ffffff" width="25%"><font size="2" face="Arial">2</font></td>
+					   <td bgcolor="#ffffff" width="53%"><font size="2" face="Arial">The size of the data to put from the specified offset in the patching file</font></td>
+					</tr>
+					<tr>
+					   <td bgcolor="#ffffff" width="22%"><font color="#800080" size="2" face="Courier New">Data</font></td>
+					   <td bgcolor="#ffffff" width="25%"><font color="#800080" size="2" face="Courier New">Size</font></td>
+					   <td bgcolor="#ffffff" width="53%"><font size="2" face="Arial">Contains a number of Size bytes of data to be copied in the file to patch </font></td>
+					</tr>
+					</tbody></table>
+					<p>And that's the info you can find around. Now the technical stuff and RLE infos.</p>
+					<p><b>IPS RLE encoding</b><br>
+					The next big step in the comprehension of the IPS format is that some patches can be RLE encoded to save space. The
+					encoding is very simple but can easily be overlooked if someone is not aware of that. If when you read the size value
+					of a record this field contains 0 you have a RLE encoded patch. You should read again a 16 bit value to obtain the size
+					of the RLE patch and then you should read a single byte. This byte must be repeated as many times as the value of the
+					second 16 bit read. An IPS RLE Record should look like that:</p>
+					<p><font color="#000080" size="2" face="Arial">IPS RLE Record structure:</font></p>
+					<table bgcolor="#000080" border="0" width="100%">
+					<tbody><tr>
+						<td bgcolor="#800080" width="28%"><font color="#ffffff" size="2" face="Arial"><b>Section</b></font></td>
+					   <td bgcolor="#800080" width="26%"><font color="#ffffff" size="2" face="Arial"><b>Size(Bytes)</b></font></td>
+					   <td bgcolor="#800080" width="100%"><font color="#ffffff" size="2" face="Arial"><b>Description</b></font></td>
+					</tr>
+					<tr>
+					   <td bgcolor="#ffffff" width="28%"><p><font color="#800080" size="2" face="Courier New">Offset</font></p></td>
+					   <td bgcolor="#ffffff" width="26%"><font size="2" face="Arial">3</font></td>
+					   <td bgcolor="#ffffff" width="100%"><font size="2" face="Arial">Any Value</font></td>
+					</tr>
+					<tr>
+					   <td bgcolor="#ffffff" width="28%"><font color="#800080" size="2" face="Courier New">Size</font></td>
+					   <td bgcolor="#ffffff" width="26%"><font size="2" face="Arial">2</font></td>
+					   <td bgcolor="#ffffff" width="100%"><font size="2" face="Arial">0</font></td>
+					</tr>
+					<tr>
+					   <td bgcolor="#ffffff" width="28%"><font color="#800080" size="2" face="Courier New">RLE_Size</font></td>
+					   <td bgcolor="#ffffff" width="26%"><font size="2" face="Arial">2</font></td>
+					   <td bgcolor="#ffffff" width="100%"><font size="2" face="Arial">Any nonzero value</font></td>
+					</tr>
+					<tr>
+					   <td bgcolor="#ffffff" width="28%"><font color="#800080" size="2" face="Courier New">Value</font></td>
+				      <td bgcolor="#ffffff" width="26%"><font size="2" face="Arial">1</font></td>
+					   <td bgcolor="#ffffff" width="100%"><font size="2" face="Arial">This is the value to write </font><font color="#800080" size="2" face="Courier New">RLE_Size</font><font size="2" face="Arial"> times starting from Offset</font></td>
+					</tr>
+					</tbody></table>
+					<p>&nbsp;</p>
+					<p><b>Encoding Of Offset and Size</b><br>
+					For peoples using low level languages a little bytes-swapping is needed to make read right the values of Offset and Size.
+					These values are written linearly, just like Pascal and Basic does when handling numerical variables. The problem is that
+					low level languages like ASM and C/C++ use the same endianess format of the machine, so every couple of two bytes are
+					swapped. A 16 bit value is written like this in the IPS: 0x6712, a 24 bit value in this way: 0x671234. If read with a low
+					level language they'll throw up: 0x1267 and 0x341267 respectively. Here two C macros that does
+					the conversion after you read them. bp should be a char array:</p>
+					<p><font size="2" face="Courier"><font color="#800080">#define BYTE3_TO_UINT(bp)   \<br>
+					&nbsp;&nbsp;&nbsp;&nbsp; (((unsigned int)(bp)[0] &lt;&lt; 16) &amp; 0x00FF0000) | \<br>
+					&nbsp;&nbsp;&nbsp;&nbsp; (((unsigned int)(bp)[1] &lt;&lt;  8) &amp; 0x0000FF00) | \<br>
+					&nbsp;&nbsp;&nbsp;&nbsp; ((unsigned int)(bp)[2] &amp; 0x000000FF)<br><br>
+					#define BYTE2_TO_UINT(bp)   \<br>
+					&nbsp;&nbsp;&nbsp; (((unsigned int)(bp)[0] &lt;&lt; 8) &amp; 0xFF00) | \<br>
+					&nbsp;&nbsp;&nbsp; ((unsigned int) (bp)[1] &amp; 0x00FF)</font></font></p>
+					<p>16 bit compiler users may find useful to substitute <font size="2" face="Courier">unsigned int</font>
+					<font size="2" face="Arial"> to </font><font size="2" face="Courier New">unsigned</font><font size="2" face="Arial">
+					</font><font size="2" face="Courier New">long in&nbsp;</font><font size="2" face="Arial">
+					the </font><font size="2" face="Courier New">BYTE3_TO_UINT</font><font size="2" face="Arial"> macro...</font></p>
+					<p><font size="2" face="Arial">Real simple once someone has hacked the format for you, isn't it?</font></p>
+      			<p align="right"><b><a href="mailto:z.e.r.o@softhome.net"><font color="#800080" size="3" face="Arial">Z.e.r.o</font></a></b></p>
+		  		</td>
+          </tr>
+        </tbody></table>
+      </td>
+    </tr>
+  </tbody></table>
+</div>
+<!--#include virtual="panels/bottom.htm"-->
+<!-- SOME LINK HREF'S ON THIS PAGE HAVE BEEN REWRITTEN BY THE WAYBACK MACHINE
+OF THE INTERNET ARCHIVE IN ORDER TO PRESERVE THE TEMPORAL INTEGRITY OF THE SESSION. -->
+
+
+<script language="Javascript">
+<!--
+
+// FILE ARCHIVED ON 20080130070707 AND RETRIEVED FROM THE
+// INTERNET ARCHIVE ON 20081022200411.
+// JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+// ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+// SECTION 108(a)(3)).
+
+   var sWayBackCGI = "http://web.archive.org/web/20080130070707/";
+
+   function xResolveUrl(url) {
+      var image = new Image();
+      image.src = url;
+      return image.src;
+   }
+   function xLateUrl(aCollection, sProp) {
+      var i = 0;
+      for(i = 0; i < aCollection.length; i++) {
+         var url = aCollection[i][sProp];         if (typeof(url) == "string") { 
+          if (url.indexOf("mailto:") == -1 &&
+             url.indexOf("javascript:") == -1
+             && url.length > 0) {
+            if(url.indexOf("http") != 0) {
+                url = xResolveUrl(url);
+            }
+            url = url.replace('.way_back_stub','');
+            aCollection[i][sProp] = sWayBackCGI + url;
+         }
+         }
+      }
+   }
+
+   xLateUrl(document.getElementsByTagName("IMG"),"src");
+   xLateUrl(document.getElementsByTagName("A"),"href");
+   xLateUrl(document.getElementsByTagName("AREA"),"href");
+   xLateUrl(document.getElementsByTagName("OBJECT"),"codebase");
+   xLateUrl(document.getElementsByTagName("OBJECT"),"data");
+   xLateUrl(document.getElementsByTagName("APPLET"),"codebase");
+   xLateUrl(document.getElementsByTagName("APPLET"),"archive");
+   xLateUrl(document.getElementsByTagName("EMBED"),"src");
+   xLateUrl(document.getElementsByTagName("BODY"),"background");
+   xLateUrl(document.getElementsByTagName("TD"),"background");
+   xLateUrl(document.getElementsByTagName("INPUT"),"src");
+   var forms = document.getElementsByTagName("FORM");
+   if (forms) {
+       var j = 0;
+       for (j = 0; j < forms.length; j++) {
+              f = forms[j];
+              if (typeof(f.action)  == "string") {
+                 if(typeof(f.method)  == "string") {
+                     if(typeof(f.method) != "post") {
+                        f.action = sWayBackCGI + f.action;
+                     }
+                  }
+              }
+        }
+    }
+
+
+//-->
+</script>
+
+</body></html>
