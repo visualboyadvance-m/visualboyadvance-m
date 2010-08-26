@@ -782,7 +782,7 @@ CString DirectInput::getKeyName(LONG_PTR key)
         winBuffer = di.tszName;
 	} else if (d < numDevices) {
         if (k < 16) {
-            if (k < 4) {
+            /*if (k < 4) {
                 switch (k) {
                 case 0:
                     winBuffer.Format(winResLoadString(IDS_JOY_LEFT), d);
@@ -797,7 +797,7 @@ CString DirectInput::getKeyName(LONG_PTR key)
                     winBuffer.Format(winResLoadString(IDS_JOY_DOWN), d);
                     break;
                 }
-            } else {
+            } else */{
                 pDevices[d].device->GetObjectInfo(&di,
                                                   pDevices[d].axis[k>>1].offset,
                                                   DIPH_BYOFFSET);
