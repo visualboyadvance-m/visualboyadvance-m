@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="VisualBoyAdvance"
+	Name="VisualBoyAdvance-M"
 	ProjectGUID="{6D4C5EC8-933F-4C05-A1BF-498E658576DF}"
 	RootNamespace="VBA"
 	Keyword="MFCProj"
