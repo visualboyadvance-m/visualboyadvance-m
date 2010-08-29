@@ -1,0 +1,250 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ProjectSchemaDefinitions xmlns="clr-namespace:Microsoft.Build.Framework.XamlTypes;assembly=Microsoft.Build.Framework" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib" xmlns:transformCallback="Microsoft.Cpp.Dev10.ConvertPropertyCallback">
+  <Rule
+    Name="NASM"
+    PageTemplate="tool"
+    DisplayName="Netwide Assembler"
+    Order="200">
+    <Rule.DataSource>
+      <DataSource
+        Persistence="ProjectFile"
+        ItemType="NASM" />
+    </Rule.DataSource>
+    <Rule.Categories>
+      <Category
+        Name="General">
+        <Category.DisplayName>
+          <sys:String>General</sys:String>
+        </Category.DisplayName>
+      </Category>
+      <Category
+        Name="Command Line"
+        Subtype="CommandLine">
+        <Category.DisplayName>
+          <sys:String>Command Line</sys:String>
+        </Category.DisplayName>
+      </Category>
+    </Rule.Categories>
+    <StringListProperty
+      Name="Inputs"
+      Category="Command Line"
+      IsRequired="true"
+      Switch=" ">
+      <StringListProperty.DataSource>
+        <DataSource
+          Persistence="ProjectFile"
+          ItemType="NASM"
+          SourceType="Item" />
+      </StringListProperty.DataSource>
+    </StringListProperty>
+    <BoolProperty
+      Name="TreatWarningsAsErrors"
+      HelpContext="0"
+      DisplayName="Treat Warnings As Errors"
+      Description="Returns an error code if warnings are generated.     (-w+error)"
+      Switch="-w+error" />
+    <BoolProperty
+      Name="DisableOrphanLabelsWarning"
+      HelpContext="0"
+      DisplayName="Disable Orphan Labels Warning"
+      Description="Disable warning when labels alone on lines without trailing ':' are found.     (-w-orphan-labels)"
+      Switch="-w-orphan-labels" />
+    <BoolProperty
+      Name="GenerateDebugInfo"
+      HelpContext="0"
+      DisplayName="Generate Debug Info"
+      Description="Generate debug information in selected format. (-g)"
+      Switch="-g" />
+    <StringProperty
+      Name="ObjectFileName"
+      HelpContext="0"
+      DisplayName="Object File Name"
+      Description="Specifies the name of the output object file.     (-o [file])"
+      Switch="-o &quot;[value]&quot;" />
+    <StringListProperty
+      Name="IncludePath"
+      HelpContext="0"
+      DisplayName="Include Path"
+      Description="Adds a pathname to the include file path.     (-I[path])"
+      Separator=";"
+      Switch="-I&quot;[value]&quot;" />
+    <StringProperty
+      Name="PreprocessorDefinitions"
+      HelpContext="0"
+      DisplayName="Preprocessor Definitions"
+      Description="Defines a text macro with the given name.     (-D[symbol][=value])"
+      Switch="-D[value]" />
+    <EnumProperty
+      Name="Optimization"
+      HelpContext="0"
+      DisplayName="Branch Offset Optimization"
+      Description="Optimize branch offsets.     (-O[digit])">
+      <EnumValue
+        Name="0"
+        DisplayName="Do not optimize (-O0)"
+        Switch="-O0" />
+      <EnumValue
+        Name="1"
+        DisplayName="Optimize (-O1)"
+        Switch="-O1" />
+    </EnumProperty>
+    <EnumProperty
+      Name="ObjectFileFormat"
+      HelpContext="0"
+      DisplayName="Object File Format"
+      Description="Set the object file format.     (-f [format])">
+      <EnumValue
+        Name="0"
+        DisplayName="Flat-form binary files (e.g. DOS .COM, .SYS)"
+        Switch="-f bin" />
+      <EnumValue
+        Name="1"
+        DisplayName="Linux a.out object files"
+        Switch="-f aout" />
+      <EnumValue
+        Name="2"
+        DisplayName="NetBSD/FreeBSD a.out object files"
+        Switch="-f aoutb" />
+      <EnumValue
+        Name="3"
+        DisplayName="COFF (i386) object files (e.g. DJGPP for DOS)"
+        Switch="-f coff" />
+      <EnumValue
+        Name="4"
+        DisplayName="ELF32 (i386) object files (e.g. Linux)"
+        Switch="-f elf32" />
+      <EnumValue
+        Name="5"
+        DisplayName="ELF64 (x86_64) object files (e.g. Linux)"
+        Switch="-f elf64" />
+      <EnumValue
+        Name="6"
+        DisplayName="Linux as86 (bin86 version 0.3) object files"
+        Switch="-f as86" />
+      <EnumValue
+        Name="7"
+        DisplayName="MS-DOS 16-bit/32-bit OMF object files"
+        Switch="-f obj" />
+      <EnumValue
+        Name="8"
+        DisplayName="Microsoft Win32 (i386) object files"
+        Switch="-f win32" />
+      <EnumValue
+        Name="9"
+        DisplayName="Microsoft Win64 (x86-64) object files"
+        Switch="-f win64" />
+      <EnumValue
+        Name="10"
+        DisplayName="Relocatable Dynamic Object File Format v2.0"
+        Switch="-f rdf" />
+      <EnumValue
+        Name="11"
+        DisplayName="IEEE-695 (LADsoft variant) object file format"
+        Switch="-f ieee" />
+      <EnumValue
+        Name="12"
+        DisplayName="NeXTstep/OpenStep/Rhapsody/Darwin/MacOS X object files"
+        Switch="-f macho" />
+    </EnumProperty>
+    <EnumProperty
+      Name="ErrorReportingFormat"
+      HelpContext="0"
+      DisplayName="Error Reporting Format"
+      Description="Specifies error reporting format.     (-X[format])">
+      <EnumValue
+        Name="0"
+        DisplayName="GNU"
+        Switch="-Xgnu" />
+      <EnumValue
+        Name="1"
+        DisplayName="Microsoft Visual C++"
+        Switch="-Xvc" />
+    </EnumProperty>
+    <StringProperty
+      Name="CommandLineTemplate"
+      DisplayName="Command Line"
+      Visible="False"
+      IncludeInCommandLine="False" />
+    <DynamicEnumProperty
+      Name="NASMBeforeTargets"
+      Category="General"
+      EnumProvider="Targets"
+      IncludeInCommandLine="False">
+      <DynamicEnumProperty.DisplayName>
+        <sys:String>Execute Before</sys:String>
+      </DynamicEnumProperty.DisplayName>
+      <DynamicEnumProperty.Description>
+        <sys:String>Specifies the targets for the build customization to run before.</sys:String>
+      </DynamicEnumProperty.Description>
+      <DynamicEnumProperty.ProviderSettings>
+        <NameValuePair
+          Name="Exclude"
+          Value="^NASMBeforeTargets|^Compute" />
+      </DynamicEnumProperty.ProviderSettings>
+      <DynamicEnumProperty.DataSource>
+        <DataSource
+          Persistence="ProjectFile"
+          HasConfigurationCondition="true" />
+      </DynamicEnumProperty.DataSource>
+    </DynamicEnumProperty>
+    <DynamicEnumProperty
+      Name="NASMAfterTargets"
+      Category="General"
+      EnumProvider="Targets"
+      IncludeInCommandLine="False">
+      <DynamicEnumProperty.DisplayName>
+        <sys:String>Execute After</sys:String>
+      </DynamicEnumProperty.DisplayName>
+      <DynamicEnumProperty.Description>
+        <sys:String>Specifies the targets for the build customization to run after.</sys:String>
+      </DynamicEnumProperty.Description>
+      <DynamicEnumProperty.ProviderSettings>
+        <NameValuePair
+          Name="Exclude"
+          Value="^NASMAfterTargets|^Compute" />
+      </DynamicEnumProperty.ProviderSettings>
+      <DynamicEnumProperty.DataSource>
+        <DataSource
+          Persistence="ProjectFile"
+          ItemType=""
+          HasConfigurationCondition="true" />
+      </DynamicEnumProperty.DataSource>
+    </DynamicEnumProperty>
+    <StringListProperty
+      Name="Outputs"
+      DisplayName="Outputs"
+      Visible="False"
+      IncludeInCommandLine="False" />
+    <StringProperty
+      Name="ExecutionDescription"
+      DisplayName="Execution Description"
+      Visible="False"
+      IncludeInCommandLine="False" />
+    <StringListProperty
+      Name="AdditionalDependencies"
+      DisplayName="Additional Dependencies"
+      IncludeInCommandLine="False"
+      Visible="false" />
+    <StringProperty
+      Subtype="AdditionalOptions"
+      Name="AdditionalOptions"
+      Category="Command Line">
+      <StringProperty.DisplayName>
+        <sys:String>Additional Options</sys:String>
+      </StringProperty.DisplayName>
+      <StringProperty.Description>
+        <sys:String>Additional Options</sys:String>
+      </StringProperty.Description>
+    </StringProperty>
+  </Rule>
+  <ItemType
+    Name="NASM"
+    DisplayName="Netwide Assembler" />
+  <FileExtension
+    Name="*.asm"
+    ContentType="NASM" />
+  <ContentType
+    Name="NASM"
+    DisplayName="Netwide Assembler"
+    ItemType="NASM" />
+</ProjectSchemaDefinitions>
