@@ -185,51 +185,6 @@ void winSaveKeys()
                    theApp.input->joypaddata[MOTION(KEY_DOWN)]);
 }
 
-static BOOL CALLBACK EnumAxesCallback( const DIDEVICEOBJECTINSTANCE* pdidoi,
-                                       VOID* pContext )
-{
-    DIPROPRANGE diprg;
-    diprg.diph.dwSize       = sizeof(DIPROPRANGE);
-    diprg.diph.dwHeaderSize = sizeof(DIPROPHEADER);
-    diprg.diph.dwHow        = DIPH_BYOFFSET;
-    diprg.diph.dwObj        = pdidoi->dwOfs; // Specify the enumerated axis
-
-    diprg.lMin = -32768;
-    diprg.lMax = 32767;
-    // try to set the range
-    if (FAILED(currentDevice->device->SetProperty(DIPROP_RANGE, &diprg.diph))) {
-        // Get the range for the axis
-        if ( FAILED(currentDevice->device->
-                    GetProperty( DIPROP_RANGE, &diprg.diph ) ) ) {
-            return DIENUM_STOP;
-        }
-    }
-
-    DIPROPDWORD didz;
-
-    didz.diph.dwSize = sizeof(didz);
-    didz.diph.dwHeaderSize = sizeof(DIPROPHEADER);
-    didz.diph.dwHow = DIPH_BYOFFSET;
-    didz.diph.dwObj = pdidoi->dwOfs;
-
-    didz.dwData = 5000;
-
-    currentDevice->device->SetProperty(DIPROP_DEADZONE, &didz.diph);
-
-    LONG center = (diprg.lMin + diprg.lMax)/2;
-    LONG threshold = (diprg.lMax - center)/2;
-
-    // only 8 axis supported
-    if (axisNumber < 8) {
-        currentDevice->axis[axisNumber].center = center;
-        currentDevice->axis[axisNumber].negative = center - threshold;
-        currentDevice->axis[axisNumber].positive = center + threshold;
-        currentDevice->axis[axisNumber].offset = pdidoi->dwOfs;
-    }
-    axisNumber++;
-    return DIENUM_CONTINUE;
-}
-
 static BOOL CALLBACK EnumPovsCallback( const DIDEVICEOBJECTINSTANCE* pdidoi,
                                        VOID* pContext )
 {
@@ -442,40 +397,11 @@ static void checkJoypads()
         for (j = 0; j < pDevices[i].nAxes && j < 8; j++) {
             LONG value = pDevices[i].axis[j].center;
             LONG old = 0;
-            switch (pDevices[i].axis[j].offset) {
-            case DIJOFS_X:
-                value = joystick.lX;
-                old = pDevices[i].state.lX;
-                break;
-            case DIJOFS_Y:
-                value = joystick.lY;
-                old = pDevices[i].state.lY;
-                break;
-            case DIJOFS_Z:
-                value = joystick.lZ;
-                old = pDevices[i].state.lZ;
-                break;
-            case DIJOFS_RX:
-                value = joystick.lRx;
-                old = pDevices[i].state.lRx;
-                break;
-            case DIJOFS_RY:
-                value = joystick.lRy;
-                old = pDevices[i].state.lRy;
-                break;
-            case DIJOFS_RZ:
-                value = joystick.lRz;
-                old = pDevices[i].state.lRz;
-                break;
-            case DIJOFS_SLIDER(0):
-                            value = joystick.rglSlider[0];
-                old = pDevices[i].state.rglSlider[0];
-                break;
-            case DIJOFS_SLIDER(1):
-                            value = joystick.rglSlider[1];
-                old = pDevices[i].state.rglSlider[1];
-                break;
-            }
+
+			const DWORD offset = pDevices[i].axis[j].offset;
+			value = *(LONG*)(((char*)&joystick.lX) + offset);
+			old = *(LONG*)(((char*)&pDevices[i].state.lX) + offset);
+
             if (value != old) {
                 if (value < pDevices[i].axis[j].negative)
                     SendMessage(GetFocus(), JOYCONFIG_MESSAGE, i, (j<<1));
@@ -517,32 +443,8 @@ BOOL checkKey(LONG_PTR key)
         if (k < 16) {
             LONG_PTR axis = k >> 1;
             LONG value = pDevices[dev].axis[axis].center;
-            switch (pDevices[dev].axis[axis].offset) {
-            case DIJOFS_X:
-                value = pDevices[dev].state.lX;
-                break;
-            case DIJOFS_Y:
-                value = pDevices[dev].state.lY;
-                break;
-            case DIJOFS_Z:
-                value = pDevices[dev].state.lZ;
-                break;
-            case DIJOFS_RX:
-                value = pDevices[dev].state.lRx;
-                break;
-            case DIJOFS_RY:
-                value = pDevices[dev].state.lRy;
-                break;
-            case DIJOFS_RZ:
-                value = pDevices[dev].state.lRz;
-                break;
-            case DIJOFS_SLIDER(0):
-                            value = pDevices[dev].state.rglSlider[0];
-                break;
-            case DIJOFS_SLIDER(1):
-                            value = pDevices[dev].state.rglSlider[1];
-                break;
-            }
+
+			value = *(LONG*)(((char*)&pDevices[dev].state.lX) + pDevices[dev].axis[axis].offset);
 
             if (k & 1)
                 return value > pDevices[dev].axis[axis].positive;
@@ -551,20 +453,9 @@ BOOL checkKey(LONG_PTR key)
             LONG_PTR hat = (k >> 2) & 3;
             int state = getPovState(pDevices[dev].state.rgdwPOV[hat]);
             BOOL res = FALSE;
-            switch (k & 3) {
-            case 0:
-                res = state & POV_UP;
-                break;
-            case 1:
-                res = state & POV_DOWN;
-                break;
-            case 2:
-                res = state & POV_RIGHT;
-                break;
-            case 3:
-                res = state & POV_LEFT;
-                break;
-            }
+
+			res = state & (1 << (k & 3));
+
             return res;
         } else if (k  >= 128) {
             return pDevices[dev].state.rgbButtons[k-128] & 0x80;
@@ -668,7 +559,39 @@ bool DirectInput::initialize()
         pDevices[i].first  = true;
         currentDevice = &pDevices[i];
         axisNumber = 0;
-        currentDevice->device->EnumObjects(EnumAxesCallback, NULL, DIDFT_AXIS);
+
+		// get up to 6 axes and 2 sliders
+		DIPROPRANGE range;
+		range.diph.dwSize = sizeof(range);
+		range.diph.dwHeaderSize = sizeof(range.diph);
+		range.diph.dwHow = DIPH_BYOFFSET;
+        // screw EnumObjects, just go through all the axis offsets and try to GetProperty
+        // this should be more foolproof, less code, and probably faster
+        for (unsigned int offset = 0; offset < DIJOFS_BUTTON(0); offset += sizeof(LONG))
+		{
+			range.diph.dwObj = offset;
+			// try to set some nice power of 2 values (8192)
+			range.lMin = -(1 << 13);
+			range.lMax = (1 << 13);
+			pDevices[i].device->SetProperty(DIPROP_RANGE, &range.diph);
+			// but i guess not all devices support setting range
+			// so i getproperty right afterward incase it didn't set :P
+			// this also checks that the axis is present
+			if (SUCCEEDED(pDevices[i].device->GetProperty(DIPROP_RANGE, &range.diph)))
+			{
+				const LONG center = (range.lMin + range.lMax)/2;
+				const LONG threshold = (range.lMax - center)/2;
+
+				currentDevice->axis[axisNumber].center = center;
+				currentDevice->axis[axisNumber].negative = center - threshold;
+				currentDevice->axis[axisNumber].positive = center + threshold;
+				currentDevice->axis[axisNumber].offset = offset;
+
+				++axisNumber;
+			}
+
+		}
+
         currentDevice->device->EnumObjects(EnumPovsCallback, NULL, DIDFT_POV);
 
 
@@ -781,31 +704,15 @@ CString DirectInput::getKeyName(LONG_PTR key)
         pDevices[0].device->GetObjectInfo( &di, (DWORD)key, DIPH_BYOFFSET );
         winBuffer = di.tszName;
 	} else if (d < numDevices) {
-        if (k < 16) {
-            /*if (k < 4) {
-                switch (k) {
-                case 0:
-                    winBuffer.Format(winResLoadString(IDS_JOY_LEFT), d);
-                    break;
-                case 1:
-                    winBuffer.Format(winResLoadString(IDS_JOY_RIGHT), d);
-                    break;
-                case 2:
-                    winBuffer.Format(winResLoadString(IDS_JOY_UP), d);
-                    break;
-                case 3:
-                    winBuffer.Format(winResLoadString(IDS_JOY_DOWN), d);
-                    break;
-                }
-            } else */{
-                pDevices[d].device->GetObjectInfo(&di,
-                                                  pDevices[d].axis[k>>1].offset,
-                                                  DIPH_BYOFFSET);
-                if (k & 1)
-                    winBuffer.Format("Joy %d %s +", d, di.tszName);
-                else
-                    winBuffer.Format("Joy %d %s -", d, di.tszName);
-            }
+        if (k < 16)
+		{
+			pDevices[d].device->GetObjectInfo(&di,
+				pDevices[d].axis[k>>1].offset,
+				DIPH_BYOFFSET);
+			if (k & 1)
+				winBuffer.Format("Joy %d %s +", d, di.tszName);
+			else
+				winBuffer.Format("Joy %d %s -", d, di.tszName);
         } else if (k < 48) {
             LONG_PTR hat = (k >> 2) & 3;
             pDevices[d].device->GetObjectInfo(&di,
