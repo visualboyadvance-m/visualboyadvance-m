@@ -18,10 +18,8 @@
 // German (Germany) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
-#ifdef _WIN32
 LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -54,13 +52,11 @@ END
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -136,7 +132,7 @@ BEGIN
     CONTROL         "Network",IDC_LINK_LAN,"Button",BS_AUTORADIOBUTTON,17,43,70,16
 END
 
-IDD_LINKTAB2 DIALOG  0, 0, 210, 113
+IDD_LINKTAB2 DIALOG 0, 0, 210, 113
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Sans Serif"
 BEGIN
@@ -166,7 +162,7 @@ BEGIN
     CONTROL         "On (fast)",IDC_SPEEDON,"Button",BS_AUTORADIOBUTTON,128,63,48,12
 END
 
-IDD_SERVERWAIT DIALOG  0, 0, 186, 90
+IDD_SERVERWAIT DIALOG 0, 0, 186, 90
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Waiting for players"
 FONT 8, "MS Sans Serif"
@@ -179,7 +175,7 @@ BEGIN
     LTEXT           "",IDC_STATIC4,7,33,105,8
 END
 
-IDD_OPENDLG DIALOG  36, 24, 202, 117
+IDD_OPENDLG DIALOG 36, 24, 202, 117
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_CONTEXTHELP | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Open"
 FONT 8, "MS Shell Dlg"
@@ -285,7 +281,7 @@ BEGIN
     PUSHBUTTON      "Clear all",IDC_CLEAR_ALL,306,60,36,12
 END
 
-IDD_CHEATS DIALOG  0, 0, 276, 253
+IDD_CHEATS DIALOG 0, 0, 276, 253
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Search for cheats"
 FONT 8, "MS Sans Serif"
@@ -318,7 +314,7 @@ BEGIN
     LTEXT           "Enter &value:",IDC_STATIC,3,214,69,8
 END
 
-IDD_ADD_CHEAT DIALOG  0, 0, 186, 137
+IDD_ADD_CHEAT DIALOG 0, 0, 186, 137
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Add cheat"
 FONT 8, "MS Sans Serif"
@@ -341,7 +337,7 @@ BEGIN
     LTEXT           "&Description:",IDC_STATIC,3,45,55,8
 END
 
-IDD_CHEAT_LIST DIALOG  0, 0, 280, 250
+IDD_CHEAT_LIST DIALOG 0, 0, 280, 250
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Cheat list"
 FONT 8, "MS Sans Serif"
@@ -362,7 +358,7 @@ BEGIN
     GROUPBOX        "Add",IDC_STATIC,5,199,268,27
 END
 
-IDD_ASSOCIATIONS DIALOG  0, 0, 116, 95
+IDD_ASSOCIATIONS DIALOG 0, 0, 116, 95
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Associations"
 FONT 8, "MS Sans Serif"
@@ -438,7 +434,7 @@ BEGIN
     LTEXT           "Maker name:",IDC_STATIC,7,52,60,8
 END
 
-IDD_GB_CHEAT_LIST DIALOG  0, 0, 286, 221
+IDD_GB_CHEAT_LIST DIALOG 0, 0, 286, 221
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Gameboy Cheat List"
 FONT 8, "MS Sans Serif"
@@ -455,7 +451,7 @@ BEGIN
     LTEXT           "D: Disabled",IDC_STATIC,241,9,38,8
 END
 
-IDD_ADD_CHEAT_DLG DIALOG  0, 0, 182, 107
+IDD_ADD_CHEAT_DLG DIALOG 0, 0, 182, 107
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Title"
 FONT 8, "MS Sans Serif"
@@ -468,7 +464,7 @@ BEGIN
     LTEXT           "&Code:",IDC_STATIC,3,29,54,8
 END
 
-IDD_GB_PRINTER DIALOG  0, 0, 178, 209
+IDD_GB_PRINTER DIALOG 0, 0, 178, 209
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "GB Printer"
 FONT 8, "MS Sans Serif"
@@ -503,7 +499,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,46,66,135,10
 END
 
-IDD_LANG_SELECT DIALOG  0, 0, 186, 68
+IDD_LANG_SELECT DIALOG 0, 0, 186, 68
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Language selection"
 FONT 8, "MS Sans Serif"
@@ -516,7 +512,7 @@ BEGIN
     LTEXT           "",IDC_LANG_NAME,140,9,40,8,SS_NOPREFIX
 END
 
-IDD_CODE_SELECT DIALOG  0, 0, 316, 235
+IDD_CODE_SELECT DIALOG 0, 0, 316, 235
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Select codes to import"
 FONT 8, "MS Sans Serif"
@@ -526,7 +522,7 @@ BEGIN
     LISTBOX         IDC_GAME_LIST,7,7,302,205,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
 END
 
-IDD_MAP_VIEW DIALOG  0, 0, 322, 238
+IDD_MAP_VIEW DIALOG 0, 0, 322, 238
 STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Map view"
 FONT 8, "MS Sans Serif"
@@ -607,7 +603,7 @@ BEGIN
     PUSHBUTTON      "Change backdrop color...",IDC_CHANGE_BACKDROP,102,228,108,14
 END
 
-IDD_MEM_VIEWER DIALOG  0, 0, 380, 178
+IDD_MEM_VIEWER DIALOG 0, 0, 380, 178
 STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Memory viewer"
 FONT 8, "MS Sans Serif"
@@ -687,7 +683,7 @@ BEGIN
     LTEXT           "Currently assigned to :",IDC_STATIC2,7,87,73,10
 END
 
-IDD_TILE_VIEWER DIALOG  0, 0, 326, 266
+IDD_TILE_VIEWER DIALOG 0, 0, 326, 266
 STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Tile Viewer"
 FONT 8, "MS Sans Serif"
@@ -720,7 +716,7 @@ BEGIN
     LTEXT           "",IDC_ADDRESS,135,26,50,8,SS_NOPREFIX
 END
 
-IDD_GB_COLORS DIALOG  0, 0, 169, 121
+IDD_GB_COLORS DIALOG 0, 0, 169, 121
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Gameboy Mono Colors"
 FONT 8, "MS Sans Serif"
@@ -744,7 +740,7 @@ BEGIN
     GROUPBOX        "Sprite",IDC_STATIC,8,67,154,30
 END
 
-IDD_DISASSEMBLE DIALOG  0, 0, 402, 225
+IDD_DISASSEMBLE DIALOG 0, 0, 402, 225
 STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Disassemble"
 FONT 8, "MS Sans Serif"
@@ -806,7 +802,7 @@ BEGIN
     PUSHBUTTON      "Goto R15",IDC_GOPC,7,204,50,14
 END
 
-IDD_GDB_PORT DIALOG  0, 0, 186, 51
+IDD_GDB_PORT DIALOG 0, 0, 186, 51
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "GDB connection"
 FONT 8, "MS Sans Serif"
@@ -817,7 +813,7 @@ BEGIN
     EDITTEXT        IDC_PORT,125,7,54,14,ES_RIGHT | ES_AUTOHSCROLL
 END
 
-IDD_GDB_WAITING DIALOG  0, 0, 186, 44
+IDD_GDB_WAITING DIALOG 0, 0, 186, 44
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Waiting..."
 FONT 8, "MS Sans Serif"
@@ -866,7 +862,7 @@ BEGIN
     LTEXT           "Notes:",IDC_STATIC,7,48,60,8
 END
 
-IDD_ADDR_SIZE DIALOG  0, 0, 186, 67
+IDD_ADDR_SIZE DIALOG 0, 0, 186, 67
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Enter address and size"
 FONT 8, "MS Sans Serif"
@@ -890,7 +886,7 @@ BEGIN
     CTEXT           "Enter desired throttle (5%...1000%):",IDC_STATIC,6,6,114,8
 END
 
-IDD_GB_DISASSEMBLE DIALOG  0, 0, 344, 225
+IDD_GB_DISASSEMBLE DIALOG 0, 0, 344, 225
 STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "GB Disassemble"
 FONT 8, "MS Sans Serif"
@@ -926,7 +922,7 @@ BEGIN
     LTEXT           "",IDC_R5,285,75,52,8,SS_NOPREFIX
 END
 
-IDD_GB_OAM_VIEW DIALOG  0, 0, 234, 185
+IDD_GB_OAM_VIEW DIALOG 0, 0, 234, 185
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "GB Oam Viewer"
 FONT 8, "MS Sans Serif"
@@ -961,7 +957,7 @@ BEGIN
     LTEXT           "Bank:",IDC_STATIC,7,107,24,8
 END
 
-IDD_GB_TILE_VIEWER DIALOG  0, 0, 326, 238
+IDD_GB_TILE_VIEWER DIALOG 0, 0, 326, 238
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "GB Tile Viewer"
 FONT 8, "MS Sans Serif"
@@ -991,7 +987,7 @@ BEGIN
     CONTROL         "Slider1",IDC_PALETTE_SLIDER,"msctls_trackbar32",TBS_AUTOTICKS | WS_GROUP | WS_TABSTOP,1,98,76,22
 END
 
-IDD_GB_MAP_VIEW DIALOG  0, 0, 322, 238
+IDD_GB_MAP_VIEW DIALOG 0, 0, 322, 238
 STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "GB Map Viewer"
 FONT 8, "MS Sans Serif"
@@ -1026,7 +1022,7 @@ BEGIN
     LTEXT           "",IDC_PALETTE_NUM,130,58,53,8,SS_NOPREFIX
 END
 
-IDD_GB_PALETTE_VIEW DIALOG  0, 0, 196, 234
+IDD_GB_PALETTE_VIEW DIALOG 0, 0, 196, 234
 STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "GB Palette Viewer"
 FONT 8, "MS Sans Serif"
@@ -1055,7 +1051,7 @@ BEGIN
     CONTROL         "Automatic update",IDC_AUTO_UPDATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,178,71,10
 END
 
-IDD_REWIND_INTERVAL DIALOG  0, 0, 186, 68
+IDD_REWIND_INTERVAL DIALOG 0, 0, 186, 68
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Select rewind interval"
 FONT 8, "MS Sans Serif"
@@ -1067,7 +1063,7 @@ BEGIN
     LTEXT           "Enter 0 to disable rewind.",IDC_STATIC,7,17,172,8
 END
 
-IDD_IO_VIEWER DIALOG  0, 0, 269, 238
+IDD_IO_VIEWER DIALOG 0, 0, 269, 238
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "I/O Viewer"
 FONT 8, "MS Sans Serif"
@@ -1097,7 +1093,7 @@ BEGIN
     LTEXT           "Value:",IDC_STATIC,7,23,72,8
 END
 
-IDD_MAX_SCALE DIALOG  0, 0, 186, 68
+IDD_MAX_SCALE DIALOG 0, 0, 186, 68
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Fullscreen scale"
 FONT 8, "MS Sans Serif"
@@ -1224,7 +1220,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_XAUDIO2_CONFIG, DIALOG
     BEGIN
@@ -1631,7 +1627,7 @@ END
 // Menu
 //
 
-IDR_MENU MENU 
+IDR_MENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -1735,6 +1731,18 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "Ignore aspect ratio",         ID_OPTIONS_VIDEO_FULLSCREENSTRETCHTOFIT
             MENUITEM "Maximum magnification...",    ID_OPTIONS_VIDEO_FULLSCREENMAXSCALE
+            MENUITEM SEPARATOR
+            POPUP "&Layers"
+            BEGIN
+                MENUITEM "BG 0",                        ID_OPTIONS_VIDEO_LAYERS_BG0
+                MENUITEM "BG 1",                        ID_OPTIONS_VIDEO_LAYERS_BG1
+                MENUITEM "BG 2",                        ID_OPTIONS_VIDEO_LAYERS_BG2
+                MENUITEM "BG 3",                        ID_OPTIONS_VIDEO_LAYERS_BG3
+                MENUITEM "OBJ",                         ID_OPTIONS_VIDEO_LAYERS_OBJ
+                MENUITEM "WIN 0",                       ID_OPTIONS_VIDEO_LAYERS_WIN0
+                MENUITEM "WIN 1",                       ID_OPTIONS_VIDEO_LAYERS_WIN1
+                MENUITEM "OBJ WIN",                     ID_OPTIONS_VIDEO_LAYERS_OBJWIN
+            END
             MENUITEM SEPARATOR
             MENUITEM "Disable status messages",     ID_OPTIONS_EMULATOR_DISABLESTATUSMESSAGES
         END
@@ -2020,7 +2028,7 @@ END
 // Accelerator
 //
 
-IDR_ACCELERATOR ACCELERATORS 
+IDR_ACCELERATOR ACCELERATORS
 BEGIN
     "C",            ID_CHEATS_SEARCHFORCHEATS, VIRTKEY, CONTROL, NOINVERT
     "N",            ID_DEBUG_NEXTFRAME,     VIRTKEY, CONTROL, NOINVERT
@@ -2083,7 +2091,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_UNSUPPORTED_VBA_SGM "Unsupported VisualBoyAdvance save game version %d"
     IDS_CANNOT_LOAD_SGM     "Cannot load save game for %s"
@@ -2103,7 +2111,7 @@ BEGIN
     IDS_UNKNOWN_THUMB_OPCODE "Unknown opcode %04x from %08x"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ERROR_CREATING_FILE "Error creating file %s"
     IDS_FAILED_TO_READ_SGM  "Battery file's size incompatible with the ROM settings %s (%d).\nWarning : save of the battery file is now disabled !"
@@ -2123,7 +2131,7 @@ BEGIN
     IDS_UNSUPPORTED_CHEAT_LIST_VERSION "Unsupported cheat list version %d"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_DIRECTX_7_REQUIRED  "DirectX 7.0 or greater is required to run.\nDownload at http://www.microsoft.com/directx.\n\nError found at: %s"
     IDS_DISABLING_VIDEO_MEMORY "Disabling Use Video Memory setting"
@@ -2145,7 +2153,7 @@ BEGIN
     IDS_INVALID_ADDRESS     "Invalid address: %08x"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_MISALIGNED_HALFWORD "Misaligned half-word address: %08x"
     IDS_MISALIGNED_WORD     "Misaligned word address: %08x"
@@ -2165,7 +2173,7 @@ BEGIN
     IDS_SELECT_BATTERY_DIR  "Select Battery directory:"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_SELECT_SAVE_DIR     "Select Save Directory:"
     IDS_SELECT_CAPTURE_DIR  "Select Capture directory:"
@@ -2184,7 +2192,7 @@ BEGIN
     IDS_LOADED_STATE_N      "Loaded state %d"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_WROTE_STATE         "Wrote state"
     IDS_WROTE_STATE_N       "Wrote state %d"
@@ -2204,7 +2212,7 @@ BEGIN
     IDS_UNKNOWN             "Unknown"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_NONE                "None"
     IDS_FAILED_TO_LOAD_LIBRARY "Failed to load library %s"
@@ -2223,7 +2231,7 @@ BEGIN
     IDS_SELECT_BATTERY_FILE "Select battery file"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_UNSUPPORTED_CHEAT_LIST_TYPE "Unsupported cheat list type %d"
     IDS_INVALID_GSA_CODE    "Invalid GSA code. Format is XXXXXXXXYYYYYYYY."
@@ -2242,7 +2250,7 @@ BEGIN
     IDS_TOOLTIP_DECLICKING  "When enabled, clicks are reduced by using GBA sound hardware. Note that clicks are normal for GB and GBC sound hardware."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_FILTER_GBS          "Gameboy Snapshot_*.GBS__"
     IDS_FILTER_GCF          "Gameshark Code File_*.GCF__"
@@ -2262,7 +2270,7 @@ BEGIN
     IDS_ERROR_LISTENING     "Error listening on socket."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ERROR_CREATING_SOCKET "Error creating socket."
     IDS_ACK_NOT_RECEIVED    "ACK not received from GDB."
@@ -2283,7 +2291,7 @@ BEGIN
     IDS_END_OF_MOVIE        "end of movie"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_INVALID_INTERVAL_VALUE 
                             "Invalid rewind interval value. Please enter a number between 0 and 600 seconds."
@@ -2291,7 +2299,7 @@ BEGIN
     IDS_MOVIE_PLAY          "Playing a movie will load a save state which may erase your previous battery saves. Please be sure to have a saved state if you don't want to loose any previous data."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_OAL_NODEVICE        "There are no sound devices present on this system."
     IDS_OAL_NODLL           "OpenAL32.dll could not be found on your system. Please install the runtime from http://openal.org"
@@ -2314,7 +2322,7 @@ BEGIN
     IDS_CHEATS_ENABLED      "Cheats enabled"
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
