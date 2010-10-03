@@ -9,7 +9,7 @@
 
 VisualBoyAdvance-M
 Nintendo Game Boy & Game Boy Advance Emulator
-Project Homepage: vba-m.ngemu.com
+Project Homepage: http://vba-m.com
 
 This program is distributed under the GNU General Public License
 http://www.gnu.org/licenses/gpl.html
@@ -24,7 +24,7 @@ Original Project Homepage: vba.ngemu.com
 System Requirements
 ===================
 
-OS:  Windows 2000 - Vista (x86 or x64)
+OS: Windows 2000 - Vista (x86 or x64)
 CPU: min. 700 MHz for GBA emulation, CPU requirements increase if filters or other improvements are enabled
 RAM: ~64MB free
 GFX: ~32MB VRAM, latest drivers supporting DirectX9
@@ -36,45 +36,54 @@ Required Runtimes
 =================
 
 DirectX Runtime Web-Updater:
-http://www.microsoft.com/downloads/details.aspx?FamilyID=2da43d38-db71-4c1b-bc6a-9b6652cd92a3&DisplayLang=en
+http://www.microsoft.com/downloads/details.aspx?FamilyID=2da43d38-db71-4c1b-bc6a- 9b6652cd92a3&DisplayLang=en
 
+MSVC 2008SP1 Runtime
+(x86) http://www.microsoft.com/downloads/details.aspx?familyid=A5C84275-3B97-4AB7-A40D- 3802B2AF5FC2&displaylang=en
+
+(x64) http://www.microsoft.com/downloads/details.aspx?familyid=BA9257CA-337F-4B40-8C14- 157CFDFFEE4E&displaylang=en
+
+zLib
+http://www.zlib.net/zlib123-dll.zip
 
 =================
-Optional Runtimes
+Optional Runtimes (Not required if you have a Creative Sound Card)
 =================
 
 OpenAL Installer for Windows:
-http://connect.creativelabs.com/openal/Downloads/Forms/DispForm.aspx?ID=1&Source=http%3A%2F%2Fconnect.creativelabs.com%2Fopenal%2FDownloads%2FForms%2FAllItems.aspx&RootFolder=%2Fopenal%2FDownloads
+http://connect.creativelabs.com/openal/Downloads/Forms/DispForm.aspx?ID=1& Source=http%3A%2F%2Fconnect.creativelabs.com%2Fopenal%2FDownloads%2FForms%2FAllItems. aspx&RootFolder=%2Fopenal%2FDownloads
 
+=================
+Optional Filters
+=================
+check the sourceforge project page.
 
 ==============
 To Do List
 ==============
 Important:
 - Many games show emulation warnings in the log window (unaligned read, bad read/write address)
- - Test: Metroid Fusion, Advance Wars 2
+- Test: Metroid Fusion, Advance Wars 2
 
 - Gfx.cpp/h optimization
- - Test: Final Fantasy 4 airship intro
+- Test: Final Fantasy 4 airship intro / Pokemon Fire Red
 
 - Improve automatic 64k/128k flash save detection
- - Pokémon Emerald hangs with white screen when no save state exists and wrong flash size is selected
+- Pokémon Emerald hangs with white screen when no save state exists and wrong flash size is selected (Flash 128)
 
 - Remove 16 bit hack for filters
- - Not compatible to software motion blur (display corruption)
+- Not compatible to software motion blur (display corruption)
 
 - Add selection for compressed archives with more than one ROM in them
 
-- Fix LCD colouring
-
 - Game Bugs:
- - Drymouth - screen flashes black after certain scanline
- - World Reborn - 2 graphics bugs
-
+- Drymouth - screen flashes black after certain scanline
+- World Reborn - 2 graphics bugs
+- V-Rally 3, Pseudo 3D flickering
 
 Less important:
 - Add GBA cheat editing support (GB already has)
- - Look at Cheats.cpp (Core) and GBACheats.cpp (GUI)
+- Look at Cheats.cpp (Core) and GBACheats.cpp (GUI)
 
 - Add documentation for VBA-M (configuration guide)
 
@@ -90,8 +99,6 @@ Less important:
 
 - Apply pixel filter to sprites and BG seperately for better image quality
 
-- Add support for byuu's UPS patching format to replace IPS
-
 
 Performance:
 - Apply HQ3x/4x optimizations from C version to ASM version
@@ -103,7 +110,7 @@ Performance:
 - Make use of 64 bit CPUs
 
 - Have a look at the liboil optimization library
- - http://liboil.freedesktop.org/wiki/
+- http://liboil.freedesktop.org/wiki/
 
 
 ==========
@@ -112,13 +119,14 @@ Known Bugs
 - Linking: Doesnt work quite right yet.
 
 - Audio core: assertation error occurs when disabling sound in GB mode
- - I think its best we mute sound instead, since some games rely on audio for timing.
-   Plus, blargg's GB_Snd_Emu is extremely optimized stuff. (Mudlord)
- - blargg's core implementation broke Dwedit's GBC emu.
+- I think its best we mute sound instead, since some games rely on audio for timing.
+Plus, blargg's GB_Snd_Emu is extremely optimized stuff. (Mudlord)
+- blargg's core implementation broke Dwedit's GBC emu.
+- Audio Sync + Auto frame skip break frames, causing emulation to drop to as low as 40fps even though enough performance is available to maintain full speed. Use one, or the other, not both. Vsync is not effected, and can be used with either setting.
 
 - Wrong bit depth image is displayed for 2 frames when switching from/to HQ3x/4x ASM
- - This is caused by the 16bit hack which does not re-process the emulated image.
-   It results in the display devices treating the image at pix with the wrong bit depth.
+- This is caused by the 16bit hack which does not re-process the emulated image.
+It results in the display devices treating the image at pix with the wrong bit depth.
 
 
 =======
@@ -144,10 +152,14 @@ Forgotten & the VBA development team:
 chrono:
 - Fixed a bug in the HQ3x/4x filters
 - Made HQ3x/4x and Bilinear filters (ASM versions) thread-safe
+- Many other fixes....
 
 bgKu:
 - GTK GUI port
 - Various assistance with Linux issues
+
+xKiv
+- Assistance with Linux SDL port
 
 blargg:
 - Assistance with the implementation of his highly accurate GB audio core
