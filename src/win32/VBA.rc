@@ -1919,7 +1919,7 @@ BEGIN
                 MENUITEM "Flash 64 KB",                 ID_OPTIONS_EMULATOR_SAVETYPE_FLASH512K
                 MENUITEM "Flash 128 KB",                ID_OPTIONS_EMULATOR_SAVETYPE_FLASH1M
                 MENUITEM SEPARATOR
-                MENUITEM "Detect now...",               40372
+                MENUITEM "Detect now...",               ID_OPTIONS_EMULATOR_SAVETYPE_DETECTNOW
             END
             POPUP "Screenshot &Format"
             BEGIN

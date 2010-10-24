@@ -192,6 +192,7 @@ protected:
 	afx_msg void OnOptionsEmulatorSavetypeFlash1m();
 	afx_msg void OnUpdateOptionsEmulatorSavetypeFlash1m(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorSavetypeDetectNow();
+	afx_msg void OnUpdateOptionsEmulatorSavetypeDetectNow(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorPngformat();
 	afx_msg void OnUpdateOptionsEmulatorPngformat(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorBmpformat();
