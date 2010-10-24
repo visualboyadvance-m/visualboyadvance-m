@@ -1687,7 +1687,7 @@ BEGIN
         BEGIN
             MENUITEM "&Battery file...",            ID_FILE_IMPORT_BATTERYFILE
             MENUITEM "Gameshark &code file...",     ID_FILE_IMPORT_GAMESHARKCODEFILE
-            MENUITEM "&Gameshark Snapshot...",      ID_FILE_IMPORT_GAMESHARKSNAPSHOT
+            MENUITEM "&Gameshark/Pro Action Replay Snapshot...",      ID_FILE_IMPORT_GAMESHARKSNAPSHOT
         END
         POPUP "Export"
         BEGIN
@@ -2225,7 +2225,7 @@ BEGIN
     IDS_LOADED_CHEATS       "Loaded cheats"
     IDS_ERROR_DISP_COLOR    "Unsupported display setting for color depth: %d bits. \nWindows desktop must be in either 16-bit, 24-bit or 32-bit mode for this program to work in window mode."
     IDS_ADD_GSA_CODE        "Add GameSharkAdvance code"
-    IDS_FILTER_SPS          "Gameshark Snapshot_*.SPS__"
+    IDS_FILTER_SPS          "GS & PAC Snapshots (*.SPS;*.XPS)_*.SPS;*.XPS__"
     IDS_SELECT_SNAPSHOT_FILE "Select snapshot file"
     IDS_FILTER_SAV          "Battery file_*.SAV_Flash save_*.DAT__"
     IDS_SELECT_BATTERY_FILE "Select battery file"
