@@ -160,6 +160,8 @@ BEGIN_MESSAGE_MAP(GDBWaitingDlg, CDialog)
   ON_BN_CLICKED(ID_CANCEL, OnCancel)
   ON_WM_CLOSE()
   //}}AFX_MSG_MAP
+  ON_MESSAGE(SOCKET_MESSAGE, OnSocketAccept)
+  ON_MESSAGE(SOCKET_MESSAGE, OnSocketAccept)
   END_MESSAGE_MAP()
 
   /////////////////////////////////////////////////////////////////////////////
