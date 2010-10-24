@@ -92,6 +92,8 @@ FileDlg::FileDlg(CWnd *parent, LPCTSTR file, LPCTSTR filter,
   m_ofn.lpfnHook = HookFunc;
   m_ofn.Flags = OFN_PATHMUSTEXIST | OFN_ENABLESIZING | OFN_ENABLEHOOK;
   m_ofn.Flags |= OFN_EXPLORER;
+  if (!save)
+	m_ofn.Flags |= OFN_READONLY;
   m_filter = filter;
 
   char *p = m_filter.GetBuffer(0);

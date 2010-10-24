@@ -59,7 +59,7 @@ struct {
   { "FileReset", ID_FILE_RESET },
   { "FileImportBatteryFile", ID_FILE_IMPORT_BATTERYFILE },
   { "FileImportGamesharkCodeFile", ID_FILE_IMPORT_GAMESHARKCODEFILE },
-  { "FileImportGamesharkSnapshot", ID_FILE_IMPORT_GAMESHARKSNAPSHOT },
+  { "FileImportGamesharkActionReplaySnapshot", ID_FILE_IMPORT_GAMESHARKSNAPSHOT },
   { "FileExportBatteryFile", ID_FILE_EXPORT_BATTERYFILE },
   { "FileExportGamesharkSnapshot", ID_FILE_EXPORT_GAMESHARKSNAPSHOT },
   { "FileScreenCapture", ID_FILE_SCREENCAPTURE },

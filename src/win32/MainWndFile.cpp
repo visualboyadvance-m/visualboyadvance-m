@@ -448,8 +448,8 @@ void MainWnd::OnUpdateFileImportGamesharkcodefile(CCmdUI* pCmdUI)
 
 void MainWnd::OnFileImportGamesharksnapshot()
 {
-  LPCTSTR exts[] = { ".gbs" };
-  CString filter = theApp.cartridgeType == 1 ? winLoadFilter(IDS_FILTER_GBS) : winLoadFilter(IDS_FILTER_SPS);
+  LPCTSTR exts[] = { ".?ps", ".gsv" };
+  CString filter = theApp.cartridgeType == 1 ? winLoadFilter(IDS_FILTER_GBS) : winLoadFilter(IDS_FILTER_GSVSPS);
   CString title = winResLoadString(IDS_SELECT_SNAPSHOT_FILE);
 
   FileDlg dlg(this, "", filter, 0, "", exts, "", title, false);
@@ -465,8 +465,12 @@ void MainWnd::OnFileImportGamesharksnapshot()
                 MB_OKCANCEL) == IDCANCEL)
     return;
 
-  if(theApp.cartridgeType == 1)
+  if(theApp.cartridgeType == IMAGE_GB && dlg.getFilterIndex() == 1)
     gbReadGSASnapshot(dlg.GetPathName());
+  else if(theApp.cartridgeType == IMAGE_GB && dlg.getFilterIndex() == 2) {
+	/* gameboy .gsv saves? */ }
+  else if(theApp.cartridgeType == IMAGE_GBA && dlg.getFilterIndex() == 2)
+	CPUReadGSASPSnapshot(dlg.GetPathName());
   else
     CPUReadGSASnapshot(dlg.GetPathName());
 }
