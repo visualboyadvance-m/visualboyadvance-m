@@ -841,6 +841,11 @@ void MainWnd::OnOptionsEmulatorSavetypeDetectNow()
     MessageBox( answer );
 }
 
+void MainWnd::OnUpdateOptionsEmulatorSavetypeDetectNow(CCmdUI* pCmdUI)
+{
+  pCmdUI->Enable(emulating);
+}
+
 void MainWnd::OnOptionsEmulatorPngformat()
 {
   theApp.captureFormat = 0;
