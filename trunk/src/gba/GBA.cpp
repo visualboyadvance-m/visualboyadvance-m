@@ -983,6 +983,62 @@ bool CPUReadGSASnapshot(const char *fileName)
   return true;
 }
 
+bool CPUReadGSASPSnapshot(const char *fileName)
+{
+  const char gsvfooter[] = "xV4\x12";
+  const size_t namepos=0x0c, namesz=12;
+  const size_t footerpos=0x42c, footersz=4;
+
+  char footer[footersz+1], romname[namesz+1], savename[namesz+1];;
+  FILE *file = fopen(fileName, "rb");
+
+  if(!file) {
+    systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s"), fileName);
+    return false;
+  }
+
+  // read save name
+  fseek(file, namepos, SEEK_SET);
+  fread(savename, 1, namesz, file);
+  savename[namesz] = 0;
+
+  memcpy(romname, &rom[0xa0], namesz);
+  romname[namesz] = 0;
+
+  if(memcmp(romname, savename, namesz)) {
+    systemMessage(MSG_CANNOT_IMPORT_SNAPSHOT_FOR,
+                  N_("Cannot import snapshot for %s. Current game is %s"),
+                  savename,
+                  romname);
+    fclose(file);
+    return false;
+  }
+
+  // read footer tag
+  fseek(file, footerpos, SEEK_SET);
+  fread(footer, 1, footersz, file);
+  footer[footersz] = 0;
+
+  if(memcmp(footer, gsvfooter, footersz)) {
+    systemMessage(0,
+                  N_("Unsupported snapshot file %s. Footer '%s' at %u should be '%s'"),
+                  fileName,
+				  footer,
+                  footerpos,
+				  gsvfooter);
+    fclose(file);
+    return false;
+  }
+
+  // Read up to 128k save
+  fread(flashSaveMemory, 1, FLASH_128K_SZ, file);
+
+  fclose(file);
+  CPUReset();
+  return true;
+}
+
+
 bool CPUWriteGSASnapshot(const char *fileName,
                          const char *title,
                          const char *desc,

@@ -78,6 +78,7 @@ extern char oldbuffer[10];
 #endif
 
 extern bool CPUReadGSASnapshot(const char *);
+extern bool CPUReadGSASPSnapshot(const char *);
 extern bool CPUWriteGSASnapshot(const char *, const char *, const char *, const char *);
 extern bool CPUWriteBatteryFile(const char *);
 extern bool CPUReadBatteryFile(const char *);
