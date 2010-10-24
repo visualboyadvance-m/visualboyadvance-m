@@ -17,7 +17,7 @@
 #define FLASH_PROGRAM            8
 #define FLASH_SETBANK            9
 
-u8 flashSaveMemory[0x20000];
+u8 flashSaveMemory[FLASH_128K_SZ];
 int flashState = FLASH_READ_ARRAY;
 int flashReadState = FLASH_READ_ARRAY;
 int flashSize = 0x10000;
