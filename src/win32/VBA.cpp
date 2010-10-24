@@ -1015,7 +1015,12 @@ void systemMessage(int number, const char *defaultMsg, ...)
   va_start(valist, defaultMsg);
   buffer.FormatV(msg, valist);
 
-  AfxGetApp()->m_pMainWnd->MessageBox(buffer, winResLoadString(IDS_ERROR), MB_OK|MB_ICONERROR);
+  CWnd *win = AfxGetApp()->GetMainWnd();
+  if (win)
+    win = win->GetLastActivePopup(); // possible modal dialog
+  if (!win)
+    win = AfxGetApp()->m_pMainWnd;
+  win->MessageBox(buffer, winResLoadString(IDS_ERROR), MB_OK|MB_ICONERROR);
 
   va_end(valist);
 }
@@ -1377,8 +1382,11 @@ void VBA::loadSettings()
 	  renderMethod = OPENGL;
   }
 #endif
-
+#ifndef NO_XAUDIO2
   audioAPI = (AUDIO_API)regQueryDwordValue( "audioAPI", XAUDIO2 );
+#else
+  audioAPI = (AUDIO_API)regQueryDwordValue( "audioAPI", DIRECTSOUND );
+#endif
   if( ( audioAPI != DIRECTSOUND )
 #ifndef NO_OAL
 	  && ( audioAPI != OPENAL_SOUND )
