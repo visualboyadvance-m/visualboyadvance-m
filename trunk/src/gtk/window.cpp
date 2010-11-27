@@ -27,6 +27,7 @@
 #include <SDL.h>
 
 #include "../gba/GBA.h"
+#include "../gba/RTC.h"
 #include "../gba/Sound.h"
 #include "../gb/gb.h"
 #include "../gb/gbGlobals.h"
@@ -148,6 +149,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Xml> & _poXml) :
   vApplyConfigGBPrinter();
   vApplyConfigGBASaveType();
   vApplyConfigGBAFlashSize();
+  vApplyConfigGBARTC();
 
   Gtk::MenuItem *      poMI;
   Gtk::CheckMenuItem * poCMI;
@@ -570,6 +572,7 @@ void Window::vInitConfig()
   m_poCoreConfig->vSetKey("frameskip",         "auto"       );
   m_poCoreConfig->vSetKey("use_bios_file",     false        );
   m_poCoreConfig->vSetKey("bios_file",         ""           );
+  m_poCoreConfig->vSetKey("enable_rtc",        false        );
   m_poCoreConfig->vSetKey("save_type",         SaveAuto     );
   m_poCoreConfig->vSetKey("flash_size",        64           );
   m_poCoreConfig->vSetKey("gb_border",         false        );
@@ -674,6 +677,10 @@ void Window::vCheckConfig()
   if (m_poCoreConfig->sGetKey("bios_file") == "")
   {
     m_poCoreConfig->vSetKey("use_bios_file", false);
+  }
+  if (m_poCoreConfig->sGetKey("enable_rtc") == "")
+  {
+    m_poCoreConfig->vSetKey("enable_rtc", false);
   }
 
   sValue = m_poCoreConfig->sGetKey("gb_bios_file");
@@ -895,6 +902,12 @@ void Window::vApplyConfigGBAFlashSize()
   }
 }
 
+void Window::vApplyConfigGBARTC()
+{
+  bool iRTC = m_poCoreConfig->oGetKey<bool>("enable_rtc");
+  rtcEnable(iRTC);
+}
+
 void Window::vHistoryAdd(const std::string & _rsFile)
 {
   std::string sURL = "file://" + _rsFile;
@@ -1038,6 +1051,8 @@ bool Window::bLoadROM(const std::string & _rsFile)
         m_poUseBiosItem->set_sensitive(false);
         m_poCoreConfig->vSetKey("bios_file", "");
       }
+
+      rtcEnable(m_poCoreConfig->oGetKey<bool>("enable_rtc"));
     }
   }
 
