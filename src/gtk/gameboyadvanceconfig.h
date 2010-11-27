@@ -39,6 +39,7 @@ private:
   void vOnFlashSizeChanged();
   void vOnUseBiosChanged();
   void vOnBiosSelectionChanged();
+  void vOnEnableRTCChanged();
 
   VBA::Window *             m_poWindow;
 
@@ -47,6 +48,7 @@ private:
   Gtk::ComboBox *           m_poFlashSizeComboBox; 
   Gtk::CheckButton *        m_poBiosCheckButton;
   Gtk::FileChooserButton *  m_poBiosFileChooserButton;
+  Gtk::CheckButton *        m_poRTCCheckButton;
 };
 
 } // namespace VBA

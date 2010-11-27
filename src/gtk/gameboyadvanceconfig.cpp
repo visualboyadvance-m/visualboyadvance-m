@@ -31,11 +31,13 @@ GameBoyAdvanceConfigDialog::GameBoyAdvanceConfigDialog(GtkDialog* _pstDialog, co
   refBuilder->get_widget("FlashSizeComboBox", m_poFlashSizeComboBox);
   refBuilder->get_widget("BiosCheckButton", m_poBiosCheckButton);
   refBuilder->get_widget("BiosFileChooserButton", m_poBiosFileChooserButton);
+  refBuilder->get_widget("RTCCheckButton", m_poRTCCheckButton);
 
   m_poSaveTypeComboBox->signal_changed().connect(sigc::mem_fun(*this, &GameBoyAdvanceConfigDialog::vOnSaveTypeChanged));
   m_poFlashSizeComboBox->signal_changed().connect(sigc::mem_fun(*this, &GameBoyAdvanceConfigDialog::vOnFlashSizeChanged));
   m_poBiosCheckButton->signal_toggled().connect(sigc::mem_fun(*this, &GameBoyAdvanceConfigDialog::vOnUseBiosChanged));
   m_poBiosFileChooserButton->signal_selection_changed().connect(sigc::mem_fun(*this, &GameBoyAdvanceConfigDialog::vOnBiosSelectionChanged));
+  m_poRTCCheckButton->signal_toggled().connect(sigc::mem_fun(*this, &GameBoyAdvanceConfigDialog::vOnEnableRTCChanged));
 }
 
 void GameBoyAdvanceConfigDialog::vSetConfig(Config::Section * _poConfig, VBA::Window * _poWindow)
@@ -83,6 +85,9 @@ void GameBoyAdvanceConfigDialog::vSetConfig(Config::Section * _poConfig, VBA::Wi
   m_poBiosFileChooserButton->add_filter(oAllFilter);
   m_poBiosFileChooserButton->add_filter(oBiosFilter);
   m_poBiosFileChooserButton->set_filter(oBiosFilter);
+
+  bool bEnableRTC = m_poConfig->oGetKey<bool>("enable_rtc");
+  m_poRTCCheckButton->set_active(bEnableRTC);
 }
 
 void GameBoyAdvanceConfigDialog::vOnSaveTypeChanged()
@@ -118,6 +123,12 @@ void GameBoyAdvanceConfigDialog::vOnBiosSelectionChanged()
 {
   std::string sBios = m_poBiosFileChooserButton->get_filename();
   m_poConfig->vSetKey("bios_file", sBios);
+}
+
+void GameBoyAdvanceConfigDialog::vOnEnableRTCChanged()
+{
+  bool bEnableRTC = m_poRTCCheckButton->get_active();
+  m_poConfig->vSetKey("enable_rtc", bEnableRTC);
 }
 
 } // namespace VBA
