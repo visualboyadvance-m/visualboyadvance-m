@@ -106,6 +106,7 @@ public:
   void vApplyConfigGBPrinter();
   void vApplyConfigGBASaveType();
   void vApplyConfigGBAFlashSize();
+  void vApplyConfigGBARTC();
   void vUpdateScreen();
 
   inline ECartridge eGetCartridge() const { return m_eCartridge; }
