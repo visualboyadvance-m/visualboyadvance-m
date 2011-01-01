@@ -192,11 +192,6 @@ struct blargg_callback
 	void operator () ( T callback, void* user_data = NULL ) { f = callback; data = user_data; }
 };
 
-#ifndef _WIN32
-	// Not supported on any other platforms
-	#undef BLARGG_UTF8_PATHS
-#endif
-
 BLARGG_DEPRECATED( typedef signed   int blargg_long; )
 BLARGG_DEPRECATED( typedef unsigned int blargg_ulong; )
 #if BLARGG_LEGACY

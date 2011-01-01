@@ -40,14 +40,12 @@ returns "", since it can open any file. */
 const char* fex_type_extension( fex_type_t );
 
 
-/**** Wide-character file paths (Windows only) ****/
+/**** Wide-character file paths ****/
 
-/** Converts wide-character path to form suitable for use with fex functions.
-Only supported when BLARGG_UTF8_PATHS is defined and building on Windows. */
+/** Converts wide-character path to form suitable for use with fex functions. */
 char* fex_wide_to_path( const wchar_t* wide );
 
-/** Frees converted path. OK to pass NULL. Only supported when BLARGG_UTF8_PATHS
-is defined and building on Windows */
+/** Frees converted path. OK to pass NULL. */
 void fex_free_path( char* );
 
 

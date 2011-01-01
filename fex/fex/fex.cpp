@@ -235,7 +235,6 @@ BLARGG_EXPORT fex_err_t fex_open( fex_t** fe_out, const char path [] )
 
 //// Wide paths
 
-#if BLARGG_UTF8_PATHS
 char* fex_wide_to_path( const wchar_t* wide )
 {
 	return blargg_to_utf8( wide );
@@ -245,7 +244,6 @@ void fex_free_path( char* path )
 {
 	free( path );
 }
-#endif
 
 
 //// Errors
