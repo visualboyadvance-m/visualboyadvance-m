@@ -1,14 +1,26 @@
 /* Types.h -- Basic types
-2008-11-23 : Igor Pavlov : Public domain */
+2010-10-09 : Igor Pavlov : Public domain */
 
 #ifndef __7Z_TYPES_H
 #define __7Z_TYPES_H
 
 #include <stddef.h>
 
-#ifdef __cplusplus
-	extern "C" {
+#ifdef _WIN32
+#include <windows.h>
 #endif
+
+#ifndef EXTERN_C_BEGIN
+#ifdef __cplusplus
+#define EXTERN_C_BEGIN extern "C" {
+#define EXTERN_C_END }
+#else
+#define EXTERN_C_BEGIN
+#define EXTERN_C_END
+#endif
+#endif
+
+EXTERN_C_BEGIN
 
 #define SZ_OK 0
 
@@ -29,6 +41,12 @@
 #define SZ_ERROR_NO_ARCHIVE 17
 
 typedef int SRes;
+
+#ifdef _WIN32
+typedef DWORD WRes;
+#else
+typedef int WRes;
+#endif
 
 #ifndef RINOK
 #define RINOK(x) { int __result__ = (x); if (__result__ != 0) return __result__; }
@@ -59,9 +77,11 @@ typedef unsigned long UInt64;
 #if defined(_MSC_VER) || defined(__BORLANDC__)
 typedef __int64 Int64;
 typedef unsigned __int64 UInt64;
+#define UINT64_CONST(n) n
 #else
 typedef long long int Int64;
 typedef unsigned long long int UInt64;
+#define UINT64_CONST(n) n ## ULL
 #endif
 
 #endif
@@ -77,6 +97,12 @@ typedef int Bool;
 #define False 0
 
 
+#ifdef _WIN32
+#define MY_STD_CALL __stdcall
+#else
+#define MY_STD_CALL
+#endif
+
 #ifdef _MSC_VER
 
 #if _MSC_VER >= 1300
@@ -86,19 +112,27 @@ typedef int Bool;
 #endif
 
 #define MY_CDECL __cdecl
-#define MY_STD_CALL __stdcall
-#define MY_FAST_CALL MY_NO_INLINE __fastcall
+#define MY_FAST_CALL __fastcall
 
 #else
 
 #define MY_CDECL
-#define MY_STD_CALL
 #define MY_FAST_CALL
 
 #endif
 
 
 /* The following interfaces use first parameter as pointer to structure */
+
+typedef struct
+{
+  Byte (*Read)(void *p); /* reads one byte, returns 0 in case of EOF or error */
+} IByteIn;
+
+typedef struct
+{
+  void (*Write)(void *p, Byte b);
+} IByteOut;
 
 typedef struct
 {
@@ -134,7 +168,7 @@ typedef struct
 
 typedef struct
 {
-  SRes (*Look)(void *p, void **buf, size_t *size);
+  SRes (*Look)(void *p, const void **buf, size_t *size);
     /* if (input(*size) != 0 && output(*size) == 0) means end_of_stream.
        (output(*size) > input(*size)) is not allowed
        (output(*size) < input(*size)) is allowed */
@@ -199,8 +233,22 @@ typedef struct
 #define IAlloc_Alloc(p, size) (p)->Alloc((p), size)
 #define IAlloc_Free(p, a) (p)->Free((p), a)
 
-#ifdef __cplusplus
-	}
+#ifdef _WIN32
+
+#define CHAR_PATH_SEPARATOR '\\'
+#define WCHAR_PATH_SEPARATOR L'\\'
+#define STRING_PATH_SEPARATOR "\\"
+#define WSTRING_PATH_SEPARATOR L"\\"
+
+#else
+
+#define CHAR_PATH_SEPARATOR '/'
+#define WCHAR_PATH_SEPARATOR L'/'
+#define STRING_PATH_SEPARATOR "/"
+#define WSTRING_PATH_SEPARATOR L"/"
+
 #endif
+
+EXTERN_C_END
 
 #endif

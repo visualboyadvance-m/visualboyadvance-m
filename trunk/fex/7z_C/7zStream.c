@@ -1,11 +1,10 @@
 /* 7zStream.c -- 7z Stream functions
-2008-11-23 : Igor Pavlov : Public domain */
+2010-03-11 : Igor Pavlov : Public domain */
 
 #include <string.h>
 
 #include "Types.h"
 
-#if NEVER_CALLED
 SRes SeqInStream_Read2(ISeqInStream *stream, void *buf, size_t size, SRes errorType)
 {
   while (size != 0)
@@ -31,7 +30,6 @@ SRes SeqInStream_ReadByte(ISeqInStream *stream, Byte *buf)
   RINOK(stream->Read(stream, buf, &processed));
   return (processed == 1) ? SZ_OK : SZ_ERROR_INPUT_EOF;
 }
-#endif
 
 SRes LookInStream_SeekTo(ILookInStream *stream, UInt64 offset)
 {
@@ -39,17 +37,15 @@ SRes LookInStream_SeekTo(ILookInStream *stream, UInt64 offset)
   return stream->Seek(stream, &t, SZ_SEEK_SET);
 }
 
-#if NEVER_CALLED
 SRes LookInStream_LookRead(ILookInStream *stream, void *buf, size_t *size)
 {
-  void *lookBuf;
+  const void *lookBuf;
   if (*size == 0)
     return SZ_OK;
   RINOK(stream->Look(stream, &lookBuf, size));
   memcpy(buf, lookBuf, *size);
   return stream->Skip(stream, *size);
 }
-#endif
 
 SRes LookInStream_Read2(ILookInStream *stream, void *buf, size_t size, SRes errorType)
 {
@@ -70,14 +66,9 @@ SRes LookInStream_Read(ILookInStream *stream, void *buf, size_t size)
   return LookInStream_Read2(stream, buf, size, SZ_ERROR_INPUT_EOF);
 }
 
-static SRes LookToRead_Look_Lookahead(void *pp, void **buf, size_t *size)
+static SRes LookToRead_Look_Lookahead(void *pp, const void **buf, size_t *size)
 {
   SRes res = SZ_OK;
-#if !NEVER_CALLED
-  (void)pp;
-  (void)buf;
-  (void)size;
-#else
   CLookToRead *p = (CLookToRead *)pp;
   size_t size2 = p->size - p->pos;
   if (size2 == 0 && *size > 0)
@@ -90,11 +81,10 @@ static SRes LookToRead_Look_Lookahead(void *pp, void **buf, size_t *size)
   if (size2 < *size)
     *size = size2;
   *buf = p->buf + p->pos;
-#endif
   return res;
 }
 
-static SRes LookToRead_Look_Exact(void *pp, void **buf, size_t *size)
+static SRes LookToRead_Look_Exact(void *pp, const void **buf, size_t *size)
 {
   SRes res = SZ_OK;
   CLookToRead *p = (CLookToRead *)pp;
@@ -143,9 +133,6 @@ static SRes LookToRead_Seek(void *pp, Int64 *pos, ESzSeek origin)
 
 void LookToRead_CreateVTable(CLookToRead *p, int lookahead)
 {
-#if !NEVER_CALLED
-  lookahead = 0;
-#endif
   p->s.Look = lookahead ?
       LookToRead_Look_Lookahead :
       LookToRead_Look_Exact;
@@ -159,7 +146,6 @@ void LookToRead_Init(CLookToRead *p)
   p->pos = p->size = 0;
 }
 
-#if NEVER_CALLED
 static SRes SecToLook_Read(void *pp, void *buf, size_t *size)
 {
   CSecToLook *p = (CSecToLook *)pp;
@@ -181,4 +167,3 @@ void SecToRead_CreateVTable(CSecToRead *p)
 {
   p->s.Read = SecToRead_Read;
 }
-#endif

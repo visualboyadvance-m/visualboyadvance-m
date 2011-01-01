@@ -79,6 +79,7 @@
     <ClCompile Include="7z_C\7zAlloc.c" />
     <ClCompile Include="7z_C\7zBuf.c" />
     <ClCompile Include="7z_C\7zCrc.c" />
+    <ClCompile Include="7z_C\7zCrcOpt.c" />
     <ClCompile Include="7z_C\7zDecode.c" />
     <ClCompile Include="7z_C\7zExtract.c" />
     <ClCompile Include="7z_C\7zHeader.c" />
@@ -86,7 +87,10 @@
     <ClCompile Include="7z_C\7zItem.c" />
     <ClCompile Include="7z_C\7zStream.c" />
     <ClCompile Include="7z_C\Bcj2.c" />
+    <ClCompile Include="7z_C\Bra.c" />
     <ClCompile Include="7z_C\Bra86.c" />
+    <ClCompile Include="7z_C\CpuArch.c" />
+    <ClCompile Include="7z_C\Lzma2Dec.c" />
     <ClCompile Include="7z_C\LzmaDec.c" />
     <ClCompile Include="fex\Binary_Extractor.cpp" />
     <ClCompile Include="fex\blargg_common.cpp" />
@@ -105,7 +109,6 @@
     <ClInclude Include="7z_C\7zAlloc.h" />
     <ClInclude Include="7z_C\7zBuf.h" />
     <ClInclude Include="7z_C\7zCrc.h" />
-    <ClInclude Include="7z_C\7zDecode.h" />
     <ClInclude Include="7z_C\7zExtract.h" />
     <ClInclude Include="7z_C\7zHeader.h" />
     <ClInclude Include="7z_C\7zIn.h" />
@@ -113,6 +116,7 @@
     <ClInclude Include="7z_C\Bcj2.h" />
     <ClInclude Include="7z_C\Bra.h" />
     <ClInclude Include="7z_C\CpuArch.h" />
+    <ClInclude Include="7z_C\Lzma2Dec.h" />
     <ClInclude Include="7z_C\LzmaDec.h" />
     <ClInclude Include="7z_C\Types.h" />
     <ClInclude Include="fex\Binary_Extractor.h" />
@@ -134,7 +138,6 @@
   <ItemGroup>
     <None Include="7z_C\7zC.txt" />
     <None Include="7z_C\lzma.txt" />
-    <None Include="7z_C\readme.txt" />
     <None Include="changes.txt" />
     <None Include="fex.txt" />
     <None Include="internals.txt" />
