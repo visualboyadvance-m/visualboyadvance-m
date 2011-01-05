@@ -124,6 +124,7 @@ SET(SRC_FEX
     fex/7z_C/7zAlloc.c
     fex/7z_C/7zBuf.c
     fex/7z_C/7zCrc.c
+    fex/7z_C/7zCrcOpt.c
     fex/7z_C/7zDecode.c
     fex/7z_C/7zExtract.c
     fex/7z_C/7zHeader.c
@@ -131,8 +132,11 @@ SET(SRC_FEX
     fex/7z_C/7zItem.c
     fex/7z_C/7zStream.c
     fex/7z_C/Bcj2.c
+    fex/7z_C/Bra.c
     fex/7z_C/Bra86.c
+    fex/7z_C/CpuArch.c
     fex/7z_C/LzmaDec.c
+    fex/7z_C/Lzma2Dec.c
     fex/fex/Binary_Extractor.cpp
     fex/fex/blargg_common.cpp
     fex/fex/blargg_errors.cpp
