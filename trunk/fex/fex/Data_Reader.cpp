@@ -5,6 +5,7 @@
 #include "blargg_endian.h"
 #include <stdio.h>
 #include <errno.h>
+#include <wchar.h>
 
 #if BLARGG_UTF8_PATHS
 	#include <windows.h>
