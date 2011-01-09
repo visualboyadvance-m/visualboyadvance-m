@@ -84,8 +84,11 @@ static int sensorY = 2047;
 
 static uint32_t sdlGetHatCode(const SDL_Event &event)
 {
+    if (!event.jhat.value) return 0;
+    
     return (
                 ((event.jhat.which + 1) << 16) |
+                32 |
                 (event.jhat.hat << 2) |
                 (
                     event.jhat.value & SDL_HAT_UP ? 0 :
@@ -106,6 +109,8 @@ static uint32_t sdlGetButtonCode(const SDL_Event &event)
 
 static uint32_t sdlGetAxisCode(const SDL_Event &event)
 {
+    if (event.jaxis.value >= -16384 && event.jaxis.value <= 16384) return 0;
+
     return (
                 ((event.jaxis.which + 1) << 16) |
                 (event.jaxis.axis << 1) |
