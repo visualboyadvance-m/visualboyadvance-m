@@ -144,10 +144,18 @@ void JoypadConfigDialog::vUpdateEntries()
       else if (what < 0x30)
       {
         // joystick hat
+        int dir = (what & 3);
         what = (what & 15);
         what >>= 2;
-        os << " Hat " << what;
-      }
+        os << " Hat " << what << " ";
+    switch (dir)
+    {
+      case 0: os << "Up"; break;
+      case 1: os << "Down"; break;
+      case 2: os << "Right"; break;
+      case 3: os << "Left"; break;
+    }
+       }
 
       csName = os.str().c_str();
     }
@@ -209,6 +217,7 @@ void JoypadConfigDialog::vOnInputEvent(const SDL_Event &event)
   }
 
   int code = inputGetEventCode(event);
+  if (!code) return;
   inputSetKeymap(m_ePad, m_astKeys[m_iCurrentEntry].m_eKeyFlag, code);
   vUpdateEntries();
 
@@ -241,11 +250,17 @@ bool JoypadConfigDialog::bOnConfigIdle()
       }
       vEmptyEventQueue();
       break;
-    case SDL_JOYHATMOTION:
     case SDL_JOYBUTTONUP:
       vOnInputEvent(event);
       vEmptyEventQueue();
       break;
+    case SDL_JOYHATMOTION:
+      if (event.jhat.value)
+      {
+    vOnInputEvent(event);
+    vEmptyEventQueue();
+      }
+      break
     }
   }
 
