@@ -260,7 +260,7 @@ bool JoypadConfigDialog::bOnConfigIdle()
     vOnInputEvent(event);
     vEmptyEventQueue();
       }
-      break
+      break;
     }
   }
 
