@@ -90,8 +90,8 @@ JoypadConfigDialog::JoypadConfigDialog(Config::Section * _poConfig) :
   get_vbox()->pack_start(m_oTable);
 
   // Signals and default values
-  m_oConfigSig = Glib::signal_idle().connect(sigc::mem_fun(*this, &JoypadConfigDialog::bOnConfigIdle),
-          Glib::PRIORITY_DEFAULT_IDLE);
+  m_oConfigSig = Glib::signal_timeout().connect(sigc::mem_fun(*this, &JoypadConfigDialog::bOnConfigIdle),
+          50);
   m_oDefaultJoypad.signal_toggled().connect(sigc::mem_fun(*this,
               &JoypadConfigDialog::vOnDefaultJoypadSelect) );
   m_oTitleCombo.signal_changed().connect(sigc::mem_fun(*this,
