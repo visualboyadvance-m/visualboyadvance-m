@@ -9,7 +9,7 @@
  * Adapted from original gzio.c from zlib library by Forgotten
  */
 
-/* @(#) $Id: memgzio.c,v 1.5 2006/06/06 21:04:20 spacy51 Exp $ */
+/* @(#) $Id$ */
 
 #include <stdio.h>
 #include <stdarg.h>
