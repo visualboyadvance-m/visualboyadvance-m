@@ -1,17 +1,15 @@
-# The project's name is VBA-M it uses assembly, C and C++ code
-PROJECT(VBA-M ASM C CXX)
+# The project's name is VBA-M it uses C and C++ code
+PROJECT(VBA-M C CXX)
 
-cmake_minimum_required( VERSION 2.4.6 )
+cmake_minimum_required( VERSION 2.6.0 )
 if( COMMAND cmake_policy )
     cmake_policy( SET CMP0003 NEW )
     cmake_policy( SET CMP0005 OLD )
 endif( COMMAND cmake_policy )
 SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts )
 
-# Include the definition of the ASM compiler. It will look for nasm
-# This is probably not needed if CMake 2.6 or above is used
-INCLUDE(CMakeScripts/CMakeDetermineASMCompiler.cmake)
-INCLUDE(CMakeScripts/CMakeASMInformation.cmake)
+# Check for nasm
+ENABLE_LANGUAGE( ASM_NASM )
 
 # Also need to look for SFML
 INCLUDE(CMakeScripts/FindSFML.cmake)
@@ -118,9 +116,9 @@ ENDIF( NOT USE_ASM_CORE )
 
 # Compiler flags
 IF ( WIN32 )
-    SET( CMAKE_ASM_FLAGS "-I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -w-orphan-labels")
+    SET( CMAKE_ASM_NASM_FLAGS "-I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -w-orphan-labels")
 ELSE ( WIN32 )
-    SET( CMAKE_ASM_FLAGS "-I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -DELF -w-orphan-labels")
+    SET( CMAKE_ASM_NASM_FLAGS "-I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -DELF -w-orphan-labels")
 ENDIF ( WIN32 )
 SET( CMAKE_C_FLAGS "-O3 -Wall")
 SET( CMAKE_CXX_FLAGS "-O3 -Wall")
@@ -273,11 +271,11 @@ IF( NOT NO_DEBUGGER )
     )
 ENDIF( NOT NO_DEBUGGER )
 
-IF(CMAKE_ASM_COMPILER_LOADED AND USE_ASM_SCALERS)
+IF(CMAKE_ASM_NASM_COMPILER_LOADED AND USE_ASM_SCALERS)
     SET(SRC_HQ ${SRC_HQ_ASM})
-ELSE(CMAKE_ASM_COMPILER_LOADED AND USE_ASM_SCALERS)
+ELSE(CMAKE_ASM_NASM_COMPILER_LOADED AND USE_ASM_SCALERS)
     SET(SRC_HQ ${SRC_HQ_C})
-ENDIF(CMAKE_ASM_COMPILER_LOADED AND USE_ASM_SCALERS)
+ENDIF(CMAKE_ASM_NASM_COMPILER_LOADED AND USE_ASM_SCALERS)
 
 INCLUDE_DIRECTORIES(
     ${ZLIB_INCLUDE_DIR}
