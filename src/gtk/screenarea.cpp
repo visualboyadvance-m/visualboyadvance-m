@@ -224,6 +224,8 @@ void ScreenArea::vUpdateSize()
   memset(m_puiPixels, 0, (m_iScaledWidth + 1) * m_iScaledHeight * sizeof(u32));
   memset(m_puiDelta, 255, (m_iWidth + 2) * (m_iHeight + 2) * sizeof(u32));
 
+  vOnSizeUpdated();
+
   set_size_request(m_iScale * m_iWidth, m_iScale * m_iHeight);
 }
 

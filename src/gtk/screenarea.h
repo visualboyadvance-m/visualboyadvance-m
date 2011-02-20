@@ -48,6 +48,7 @@ protected:
   virtual bool on_leave_notify_event(GdkEventCrossing * _pstEvent);
   virtual bool on_configure_event(GdkEventConfigure * event);
   virtual bool bOnCursorTimeout();
+  virtual void vOnSizeUpdated() {}
 
   int      m_iWidth;
   int      m_iHeight;
