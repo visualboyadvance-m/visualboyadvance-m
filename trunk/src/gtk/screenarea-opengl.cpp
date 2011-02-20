@@ -29,7 +29,7 @@ template<typename T> T max( T x, T y ) { return x > y ? x : y; }
 ScreenAreaGl::ScreenAreaGl(int _iWidth, int _iHeight, int _iScale) :
   ScreenArea(_iWidth, _iHeight, _iScale),
   m_uiScreenTexture(0),
-  m_iTextureSize(256)
+  m_iTextureSize(0)
 {
   Glib::RefPtr<Gdk::GL::Config> glconfig;
 
@@ -46,6 +46,23 @@ ScreenAreaGl::ScreenAreaGl(int _iWidth, int _iHeight, int _iScale) :
   vUpdateSize();
 }
 
+void ScreenAreaGl::vUpdateTexture()
+{
+  // Calculate the new texture size as a the smallest working power of two
+  // TODO: Support the ARB_texture_rectangle extension
+  int iExpX = 0, iExpY = 0;
+  for (int i = m_iScaledWidth; i; i >>= 1, ++iExpX);
+  for (int i = m_iScaledHeight; i; i >>= 1, ++iExpY);
+  int iNewTextureSize = 1 << max(iExpX, iExpY);
+
+  // Notify the system if the texture size changed
+  if (iNewTextureSize != m_iTextureSize) {
+    m_iTextureSize = iNewTextureSize;
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, iNewTextureSize, iNewTextureSize,
+        0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+  }
+}
+
 void ScreenAreaGl::on_realize()
 {
   Gtk::DrawingArea::on_realize();
@@ -59,8 +76,6 @@ void ScreenAreaGl::on_realize()
 
     if (glIsTexture(m_uiScreenTexture))
       glDeleteTextures(1, &m_uiScreenTexture);
-
-
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -76,19 +91,7 @@ void ScreenAreaGl::on_realize()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-    // Calculate texture size as a the smallest working power of two
-    float n1 = log10((float)m_iScaledWidth ) / log10( 2.0f);
-    float n2 = log10((float)m_iScaledHeight ) / log10( 2.0f);
-    float n = (n1 > n2)? n1 : n2;
-
-      // round up
-    if (((float)((int)n)) != n)
-      n = ((float)((int)n)) + 1.0f;
-
-    m_iTextureSize = (int)pow(2.0f, n);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_iTextureSize, m_iTextureSize, 0,
-                 GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+    vUpdateTexture();
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -169,6 +172,20 @@ bool ScreenAreaGl::on_expose_event(GdkEventExpose * _pstEvent)
   glwindow->gl_end();
 
   return true;
+}
+
+void ScreenAreaGl::vOnSizeUpdated()
+{
+  if (!is_realized())
+    return;
+
+  Glib::RefPtr<Gdk::GL::Window> glwindow = get_gl_window();
+  if (!glwindow->gl_begin(get_gl_context()))
+    return;
+
+  vUpdateTexture();
+
+  glwindow->gl_end();
 }
 
 } // namespace VBA
