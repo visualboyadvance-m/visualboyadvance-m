@@ -19,7 +19,6 @@
 #include <gtkmm/main.h>
 #include <gtkmm/window.h>
 #include <gtkmm/messagedialog.h>
-#include <libglademm.h>
 
 #ifdef USE_OPENGL
 #include <gtkmm/gl/init.h>
@@ -27,8 +26,6 @@
 
 #include "window.h"
 #include "intl.h"
-
-using Gnome::Glade::Xml;
 
 int main(int argc, char * argv[])
 {
@@ -90,12 +87,14 @@ int main(int argc, char * argv[])
 
   std::string sGladeFile = VBA::Window::sGetUiFilePath("vbam.glade");
 
-  Glib::RefPtr<Xml> poXml;
+  Glib::RefPtr<Gtk::Builder> poXml;
   try
   {
-    poXml = Xml::create(sGladeFile, "MainWindow");
+    poXml = Gtk::Builder::create();
+    poXml->add_from_file(sGladeFile, "accelgroup1");
+    poXml->add_from_file(sGladeFile, "MainWindow");
   }
-  catch (const Xml::Error & e)
+  catch (const Gtk::BuilderError & e)
   {
     Gtk::MessageDialog oDialog(e.what(),
                                false,
