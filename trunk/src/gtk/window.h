@@ -161,6 +161,8 @@ protected:
   virtual void vOnSoundConfigure();
   virtual void vOnGameBoyConfigure();
   virtual void vOnGameBoyAdvanceConfigure();
+  virtual void vOnCheatList();
+  virtual void vOnCheatDisableToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnHelpAbout();
   virtual bool bOnEmuIdle();
 
