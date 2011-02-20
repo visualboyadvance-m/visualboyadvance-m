@@ -40,6 +40,7 @@
 #include "soundconfig.h"
 #include "gameboyconfig.h"
 #include "gameboyadvanceconfig.h"
+#include "cheatlist.h"
 
 namespace VBA
 {
@@ -471,6 +472,36 @@ void Window::vOnGameBoyAdvanceConfigure()
   poDialog->hide();
 }
 
+void Window::vOnCheatList()
+{
+  if (m_eCartridge == CartridgeGBA)
+  {
+    std::string sUiFile = sGetUiFilePath("cheatlist.ui");
+    Glib::RefPtr<Gtk::Builder> poBuilder = Gtk::Builder::create_from_file(sUiFile);
+
+    CheatListDialog * poDialog = 0;
+    poBuilder->get_widget_derived("CheatListDialog", poDialog);
+    poDialog->set_transient_for(*this);
+    poDialog->run();
+    poDialog->hide();
+  }
+  else
+  {
+    vPopupError(_("Only Gameboy Advance cheats are supported"));
+  }
+}
+
+void Window::vOnCheatDisableToggled(Gtk::CheckMenuItem * _poCMI)
+{
+  if (m_eCartridge == CartridgeGB) {
+    // TODO: implement
+  }
+  else if (m_eCartridge == CartridgeGBA) {
+    cheatsEnabled = !cheatsEnabled;
+  }
+
+  _poCMI->set_active(!cheatsEnabled);
+}
 
 void Window::vOnHelpAbout()
 {

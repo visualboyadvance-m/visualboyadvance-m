@@ -435,6 +435,31 @@
                         </child>
                       </object>
                     </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="separator34">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+		    <child>
+		      <object class="GtkMenuItem" id="CheatList">
+			<property name="visible">True</property>
+			<property name="can_focus">False</property>
+			<property name="use_action_appearance">False</property>
+			<property name="label" translatable="yes">_List cheats ...</property>
+			<property name="use_underline">True</property>
+			<accelerator key="C" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+		      </object>
+		    </child>
+		    <child>
+		      <object class="GtkCheckMenuItem" id="CheatDisable">
+			<property name="visible">True</property>
+			<property name="can_focus">False</property>
+			<property name="use_action_appearance">False</property>
+			<property name="label" translatable="yes">_Disable cheats</property>
+			<property name="use_underline">True</property>
+		      </object>
+		    </child>
                   </object>
                 </child>
               </object>
