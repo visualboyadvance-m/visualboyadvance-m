@@ -1,595 +1,753 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--*- mode: xml -*-->
-<glade-interface>
-  <widget class="GtkWindow" id="MainWindow">
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="2.16"/>
+  <!-- interface-naming-policy project-wide -->
+  <object class="GtkWindow" id="MainWindow">
+    <property name="can_focus">False</property>
     <property name="title" translatable="yes">VBA</property>
+    <accel-groups>
+      <group name="accelgroup1"/>
+    </accel-groups>
     <child>
-      <widget class="GtkVBox" id="vbox1">
+      <object class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
+        <property name="can_focus">False</property>
         <child>
-          <widget class="GtkMenuBar" id="MenuBar">
+          <object class="GtkMenuBar" id="MenuBar">
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <child>
-              <widget class="GtkMenuItem" id="FileMenu">
+              <object class="GtkMenuItem" id="FileMenu">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">_File</property>
                 <property name="use_underline">True</property>
-                <child>
-                  <widget class="GtkMenu" id="FileMenu_menu">
+                <child type="submenu">
+                  <object class="GtkMenu" id="FileMenu_menu">
+                    <property name="can_focus">False</property>
                     <child>
-                      <widget class="GtkImageMenuItem" id="FileOpen">
+                      <object class="GtkImageMenuItem" id="FileOpen">
+                        <property name="label">gtk-open</property>
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">gtk-open</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="use_underline">True</property>
-                	<property name="use_stock">True</property>
-                      </widget>
+                        <property name="use_stock">True</property>
+                        <property name="accel_group">accelgroup1</property>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="RecentMenu">
+                      <object class="GtkMenuItem" id="RecentMenu">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Open rece_nt</property>
                         <property name="use_underline">True</property>
-                      </widget>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkSeparatorMenuItem" id="separator4">
+                      <object class="GtkSeparatorMenuItem" id="separator4">
                         <property name="visible">True</property>
-                      </widget>
+                        <property name="can_focus">False</property>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="FileScreenCapture">
+                      <object class="GtkMenuItem" id="FileScreenCapture">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Screen capt_ure...</property>
                         <property name="use_underline">True</property>
-                      </widget>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkSeparatorMenuItem" id="separator6">
+                      <object class="GtkSeparatorMenuItem" id="separator6">
                         <property name="visible">True</property>
-                      </widget>
+                        <property name="can_focus">False</property>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkImageMenuItem" id="FileClose">
+                      <object class="GtkImageMenuItem" id="FileClose">
+                        <property name="label">gtk-close</property>
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">gtk-close</property>
-                        <property name="use_stock">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="use_underline">True</property>
-                      </widget>
+                        <property name="use_stock">True</property>
+                        <property name="accel_group">accelgroup1</property>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkImageMenuItem" id="FileExit">
+                      <object class="GtkImageMenuItem" id="FileExit">
+                        <property name="label">gtk-quit</property>
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">gtk-quit</property>
-                        <property name="use_stock">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="use_underline">True</property>
-                        <accelerator key="X" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                      </widget>
+                        <property name="use_stock">True</property>
+                        <property name="accel_group">accelgroup1</property>
+                        <accelerator key="X" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </object>
                     </child>
-                  </widget>
+                  </object>
                 </child>
-              </widget>
+              </object>
             </child>
             <child>
-              <widget class="GtkMenuItem" id="EmulationMenu">
+              <object class="GtkMenuItem" id="EmulationMenu">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">_Emulation</property>
                 <property name="use_underline">True</property>
-                <child>
-                  <widget class="GtkMenu" id="EmulationMenu_menu">
+                <child type="submenu">
+                  <object class="GtkMenu" id="EmulationMenu_menu">
+                    <property name="can_focus">False</property>
                     <child>
-                      <widget class="GtkCheckMenuItem" id="FilePause">
+                      <object class="GtkCheckMenuItem" id="FilePause">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">gtk-media-pause</property>
-                        <property name="use_stock">True</property>
                         <property name="use_underline">True</property>
-                        <accelerator key="P" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                      </widget>
+                        <accelerator key="P" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="FileReset">
+                      <object class="GtkMenuItem" id="FileReset">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">_Reset</property>
                         <property name="use_underline">True</property>
-                        <accelerator key="R" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                      </widget>
+                        <accelerator key="R" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkImageMenuItem" id="VideoFullscreen">
+                      <object class="GtkImageMenuItem" id="VideoFullscreen">
+                        <property name="label">gtk-fullscreen</property>
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">gtk-fullscreen</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
+                        <property name="accel_group">accelgroup1</property>
                         <accelerator key="F11" signal="activate"/>
-                      </widget>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkSeparatorMenuItem" id="separator3">
+                      <object class="GtkSeparatorMenuItem" id="separator3">
                         <property name="visible">True</property>
-                      </widget>
+                        <property name="can_focus">False</property>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="LoadGameMenu">
+                      <object class="GtkMenuItem" id="LoadGameMenu">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Loa_d state</property>
                         <property name="use_underline">True</property>
-                        <child>
-                          <widget class="GtkMenu" id="LoadGameMenu_menu">
+                        <child type="submenu">
+                          <object class="GtkMenu" id="LoadGameMenu_menu">
+                            <property name="can_focus">False</property>
                             <child>
-                              <widget class="GtkMenuItem" id="LoadGameMostRecent">
+                              <object class="GtkMenuItem" id="LoadGameMostRecent">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Most recent</property>
                                 <property name="use_underline">True</property>
-                              </widget>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkCheckMenuItem" id="LoadGameAuto">
+                              <object class="GtkCheckMenuItem" id="LoadGameAuto">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Auto load most recent</property>
                                 <property name="use_underline">True</property>
-                              </widget>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkSeparatorMenuItem" id="separator28">
+                              <object class="GtkSeparatorMenuItem" id="separator28">
                                 <property name="visible">True</property>
-                              </widget>
+                                <property name="can_focus">False</property>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="LoadGameSlot1">
+                              <object class="GtkMenuItem" id="LoadGameSlot1">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot1</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F1" modifiers="" signal="activate"/>
-                              </widget>
+                                <accelerator key="F1" signal="activate"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="LoadGameSlot2">
+                              <object class="GtkMenuItem" id="LoadGameSlot2">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot2</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F2" modifiers="" signal="activate"/>
-                              </widget>
+                                <accelerator key="F2" signal="activate"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="LoadGameSlot3">
+                              <object class="GtkMenuItem" id="LoadGameSlot3">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot3</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F3" modifiers="" signal="activate"/>
-                              </widget>
+                                <accelerator key="F3" signal="activate"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="LoadGameSlot4">
+                              <object class="GtkMenuItem" id="LoadGameSlot4">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot4</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F4" modifiers="" signal="activate"/>
-                              </widget>
+                                <accelerator key="F4" signal="activate"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="LoadGameSlot5">
+                              <object class="GtkMenuItem" id="LoadGameSlot5">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot5</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F5" modifiers="" signal="activate"/>
-                              </widget>
+                                <accelerator key="F5" signal="activate"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="LoadGameSlot6">
+                              <object class="GtkMenuItem" id="LoadGameSlot6">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot6</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F6" modifiers="" signal="activate"/>
-                              </widget>
+                                <accelerator key="F6" signal="activate"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="LoadGameSlot7">
+                              <object class="GtkMenuItem" id="LoadGameSlot7">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot7</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F7" modifiers="" signal="activate"/>
-                              </widget>
+                                <accelerator key="F7" signal="activate"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="LoadGameSlot8">
+                              <object class="GtkMenuItem" id="LoadGameSlot8">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot8</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F8" modifiers="" signal="activate"/>
-                              </widget>
+                                <accelerator key="F8" signal="activate"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="LoadGameSlot9">
+                              <object class="GtkMenuItem" id="LoadGameSlot9">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot9</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F9" modifiers="" signal="activate"/>
-                              </widget>
+                                <accelerator key="F9" signal="activate"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="LoadGameSlot10">
+                              <object class="GtkMenuItem" id="LoadGameSlot10">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot10</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F10" modifiers="" signal="activate"/>
-                              </widget>
+                                <accelerator key="F10" signal="activate"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="FileLoad">
+                              <object class="GtkMenuItem" id="FileLoad">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">From _File ...</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="L" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                              </widget>
+                                <accelerator key="L" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                              </object>
                             </child>
-                          </widget>
+                          </object>
                         </child>
-                      </widget>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="SaveGameMenu">
+                      <object class="GtkMenuItem" id="SaveGameMenu">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">S_ave state</property>
                         <property name="use_underline">True</property>
-                        <child>
-                          <widget class="GtkMenu" id="SaveGameMenu_menu">
+                        <child type="submenu">
+                          <object class="GtkMenu" id="SaveGameMenu_menu">
+                            <property name="can_focus">False</property>
                             <child>
-                              <widget class="GtkMenuItem" id="SaveGameOldest">
+                              <object class="GtkMenuItem" id="SaveGameOldest">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Oldest slot</property>
                                 <property name="use_underline">True</property>
-                              </widget>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkSeparatorMenuItem" id="separator27">
+                              <object class="GtkSeparatorMenuItem" id="separator27">
                                 <property name="visible">True</property>
-                              </widget>
+                                <property name="can_focus">False</property>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="SaveGameSlot1">
+                              <object class="GtkMenuItem" id="SaveGameSlot1">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot1</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F1" modifiers="GDK_SHIFT_MASK" signal="activate"/>
-                              </widget>
+                                <accelerator key="F1" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="SaveGameSlot2">
+                              <object class="GtkMenuItem" id="SaveGameSlot2">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot2</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F2" modifiers="GDK_SHIFT_MASK" signal="activate"/>
-                              </widget>
+                                <accelerator key="F2" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="SaveGameSlot3">
+                              <object class="GtkMenuItem" id="SaveGameSlot3">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot3</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F3" modifiers="GDK_SHIFT_MASK" signal="activate"/>
-                              </widget>
+                                <accelerator key="F3" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="SaveGameSlot4">
+                              <object class="GtkMenuItem" id="SaveGameSlot4">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot4</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F4" modifiers="GDK_SHIFT_MASK" signal="activate"/>
-                              </widget>
+                                <accelerator key="F4" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="SaveGameSlot5">
+                              <object class="GtkMenuItem" id="SaveGameSlot5">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot5</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F5" modifiers="GDK_SHIFT_MASK" signal="activate"/>
-                              </widget>
+                                <accelerator key="F5" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="SaveGameSlot6">
+                              <object class="GtkMenuItem" id="SaveGameSlot6">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot6</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F6" modifiers="GDK_SHIFT_MASK" signal="activate"/>
-                              </widget>
+                                <accelerator key="F6" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="SaveGameSlot7">
+                              <object class="GtkMenuItem" id="SaveGameSlot7">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot7</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F7" modifiers="GDK_SHIFT_MASK" signal="activate"/>
-                              </widget>
+                                <accelerator key="F7" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="SaveGameSlot8">
+                              <object class="GtkMenuItem" id="SaveGameSlot8">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot8</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F8" modifiers="GDK_SHIFT_MASK" signal="activate"/>
-                              </widget>
+                                <accelerator key="F8" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="SaveGameSlot9">
+                              <object class="GtkMenuItem" id="SaveGameSlot9">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot9</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F9" modifiers="GDK_SHIFT_MASK" signal="activate"/>
-                              </widget>
+                                <accelerator key="F9" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="SaveGameSlot10">
+                              <object class="GtkMenuItem" id="SaveGameSlot10">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Slot10</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="F10" modifiers="GDK_SHIFT_MASK" signal="activate"/>
-                              </widget>
+                                <accelerator key="F10" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkSeparatorMenuItem" id="separator25">
+                              <object class="GtkSeparatorMenuItem" id="separator25">
                                 <property name="visible">True</property>
-                              </widget>
+                                <property name="can_focus">False</property>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="FileSave">
+                              <object class="GtkMenuItem" id="FileSave">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">To _File ...</property>
                                 <property name="use_underline">True</property>
-                                <accelerator key="S" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                              </widget>
+                                <accelerator key="S" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                              </object>
                             </child>
-                          </widget>
+                          </object>
                         </child>
-                      </widget>
+                      </object>
                     </child>
-                  </widget>
+                  </object>
                 </child>
-              </widget>
+              </object>
             </child>
             <child>
-              <widget class="GtkMenuItem" id="OptionsMenu">
+              <object class="GtkMenuItem" id="OptionsMenu">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">_Options</property>
                 <property name="use_underline">True</property>
-                <child>
-                  <widget class="GtkMenu" id="OptionsMenu_menu">
+                <child type="submenu">
+                  <object class="GtkMenu" id="OptionsMenu_menu">
+                    <property name="can_focus">False</property>
                     <child>
-                      <widget class="GtkMenuItem" id="FrameskipMenu">
+                      <object class="GtkMenuItem" id="FrameskipMenu">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">_Frameskip</property>
                         <property name="use_underline">True</property>
-                        <child>
-                          <widget class="GtkMenu" id="FrameskipMenu_menu">
+                        <child type="submenu">
+                          <object class="GtkMenu" id="FrameskipMenu_menu">
+                            <property name="can_focus">False</property>
                             <child>
-                              <widget class="GtkRadioMenuItem" id="FrameskipAutomatic">
+                              <object class="GtkRadioMenuItem" id="FrameskipAutomatic">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">_Automatic</property>
                                 <property name="use_underline">True</property>
                                 <property name="active">True</property>
-                              </widget>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkRadioMenuItem" id="Frameskip0">
+                              <object class="GtkRadioMenuItem" id="Frameskip0">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">_0</property>
                                 <property name="use_underline">True</property>
                                 <property name="group">FrameskipAutomatic</property>
-                              </widget>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkRadioMenuItem" id="Frameskip1">
+                              <object class="GtkRadioMenuItem" id="Frameskip1">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">_1</property>
                                 <property name="use_underline">True</property>
                                 <property name="group">FrameskipAutomatic</property>
-                              </widget>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkRadioMenuItem" id="Frameskip2">
+                              <object class="GtkRadioMenuItem" id="Frameskip2">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">_2</property>
                                 <property name="use_underline">True</property>
                                 <property name="group">FrameskipAutomatic</property>
-                              </widget>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkRadioMenuItem" id="Frameskip3">
+                              <object class="GtkRadioMenuItem" id="Frameskip3">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">_3</property>
                                 <property name="use_underline">True</property>
                                 <property name="group">FrameskipAutomatic</property>
-                              </widget>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkRadioMenuItem" id="Frameskip4">
+                              <object class="GtkRadioMenuItem" id="Frameskip4">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">_4</property>
                                 <property name="use_underline">True</property>
                                 <property name="group">FrameskipAutomatic</property>
-                              </widget>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkRadioMenuItem" id="Frameskip5">
+                              <object class="GtkRadioMenuItem" id="Frameskip5">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">_5</property>
                                 <property name="use_underline">True</property>
                                 <property name="group">FrameskipAutomatic</property>
-                              </widget>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkRadioMenuItem" id="Frameskip6">
+                              <object class="GtkRadioMenuItem" id="Frameskip6">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">_6</property>
                                 <property name="use_underline">True</property>
                                 <property name="group">FrameskipAutomatic</property>
-                              </widget>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkRadioMenuItem" id="Frameskip7">
+                              <object class="GtkRadioMenuItem" id="Frameskip7">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">_7</property>
                                 <property name="use_underline">True</property>
                                 <property name="group">FrameskipAutomatic</property>
-                              </widget>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkRadioMenuItem" id="Frameskip8">
+                              <object class="GtkRadioMenuItem" id="Frameskip8">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">_8</property>
                                 <property name="use_underline">True</property>
                                 <property name="group">FrameskipAutomatic</property>
-                              </widget>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkRadioMenuItem" id="Frameskip9">
+                              <object class="GtkRadioMenuItem" id="Frameskip9">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">_9</property>
                                 <property name="use_underline">True</property>
                                 <property name="group">FrameskipAutomatic</property>
-                              </widget>
+                              </object>
                             </child>
-                          </widget>
+                          </object>
                         </child>
-                      </widget>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="EmulatorMenu">
+                      <object class="GtkMenuItem" id="EmulatorMenu">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">_Emulator</property>
                         <property name="use_underline">True</property>
-                        <child>
-                          <widget class="GtkMenu" id="EmulatorMenu_menu">
+                        <child type="submenu">
+                          <object class="GtkMenu" id="EmulatorMenu_menu">
+                            <property name="can_focus">False</property>
                             <child>
-                              <widget class="GtkCheckMenuItem" id="EmulatorPauseWhenInactive">
+                              <object class="GtkCheckMenuItem" id="EmulatorPauseWhenInactive">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Pause when inactive window</property>
                                 <property name="use_underline">True</property>
-                              </widget>
+                              </object>
                             </child>
                             <child>
-                              <widget class="GtkMenuItem" id="ShowSpeedMenu">
+                              <object class="GtkMenuItem" id="ShowSpeedMenu">
                                 <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Show speed</property>
                                 <property name="use_underline">True</property>
-                                <child>
-                                  <widget class="GtkMenu" id="ShowSpeedMenu_menu">
+                                <child type="submenu">
+                                  <object class="GtkMenu" id="ShowSpeedMenu_menu">
+                                    <property name="can_focus">False</property>
                                     <child>
-                                      <widget class="GtkRadioMenuItem" id="ShowSpeedNone">
+                                      <object class="GtkRadioMenuItem" id="ShowSpeedNone">
                                         <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="use_action_appearance">False</property>
                                         <property name="label" translatable="yes">None</property>
                                         <property name="use_underline">True</property>
                                         <property name="active">True</property>
-                                      </widget>
+                                      </object>
                                     </child>
                                     <child>
-                                      <widget class="GtkRadioMenuItem" id="ShowSpeedPercentage">
+                                      <object class="GtkRadioMenuItem" id="ShowSpeedPercentage">
                                         <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="use_action_appearance">False</property>
                                         <property name="label" translatable="yes">Percentage</property>
                                         <property name="use_underline">True</property>
                                         <property name="group">ShowSpeedNone</property>
-                                      </widget>
+                                      </object>
                                     </child>
                                     <child>
-                                      <widget class="GtkRadioMenuItem" id="ShowSpeedDetailed">
+                                      <object class="GtkRadioMenuItem" id="ShowSpeedDetailed">
                                         <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="use_action_appearance">False</property>
                                         <property name="label" translatable="yes">Detailed</property>
                                         <property name="use_underline">True</property>
                                         <property name="group">ShowSpeedNone</property>
-                                      </widget>
+                                      </object>
                                     </child>
-                                  </widget>
+                                  </object>
                                 </child>
-                              </widget>
+                              </object>
                             </child>
-                          </widget>
+                          </object>
                         </child>
-                      </widget>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="GameBoyConfigure">
+                      <object class="GtkMenuItem" id="GameBoyConfigure">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">_Game Boy ...</property>
                         <property name="use_underline">True</property>
-                      </widget>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="GameBoyAdvanceConfigure">
+                      <object class="GtkMenuItem" id="GameBoyAdvanceConfigure">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Game Boy _Advance ...</property>
                         <property name="use_underline">True</property>
-                      </widget>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="DisplayConfigure">
+                      <object class="GtkMenuItem" id="DisplayConfigure">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">_Display ...</property>
                         <property name="use_underline">True</property>
-                      </widget>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="SoundConfigure">
+                      <object class="GtkMenuItem" id="SoundConfigure">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">_Sound ...</property>
                         <property name="use_underline">True</property>
-                      </widget>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="DirectoriesConfigure">
+                      <object class="GtkMenuItem" id="DirectoriesConfigure">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">D_irectories ...</property>
                         <property name="use_underline">True</property>
-                      </widget>
+                      </object>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="JoypadConfigure">
+                      <object class="GtkMenuItem" id="JoypadConfigure">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">_Joypads ...</property>
                         <property name="use_underline">True</property>
-                      </widget>
+                      </object>
                     </child>
-                  </widget>
+                  </object>
                 </child>
-              </widget>
+              </object>
             </child>
             <child>
-              <widget class="GtkMenuItem" id="HelpMenu">
+              <object class="GtkMenuItem" id="HelpMenu">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">gtk-help</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="label" translatable="yes" context="gtk20">_Help</property>
                 <property name="use_underline">True</property>
-                <property name="use_stock">True</property>
-                <child>
-                  <widget class="GtkMenu" id="HelpMenu_menu">
+                <child type="submenu">
+                  <object class="GtkMenu" id="HelpMenu_menu">
+                    <property name="can_focus">False</property>
                     <child>
-                      <widget class="GtkImageMenuItem" id="HelpAbout">
+                      <object class="GtkImageMenuItem" id="HelpAbout">
+                        <property name="label">gtk-about</property>
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">gtk-about</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                      </widget>
+                        <property name="accel_group">accelgroup1</property>
+                      </object>
                     </child>
-                  </widget>
+                  </object>
                 </child>
-              </widget>
+              </object>
             </child>
-          </widget>
+          </object>
           <packing>
             <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
           </packing>
         </child>
         <child>
-          <widget class="GtkAlignment" id="ScreenContainer">
+          <object class="GtkAlignment" id="ScreenContainer">
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <property name="xscale">0</property>
             <property name="yscale">0</property>
             <child>
               <placeholder/>
             </child>
-          </widget>
+          </object>
           <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
             <property name="position">1</property>
           </packing>
         </child>
-      </widget>
+      </object>
     </child>
-  </widget>
-</glade-interface>
+  </object>
+  <object class="GtkAccelGroup" id="accelgroup1"/>
+</interface>
