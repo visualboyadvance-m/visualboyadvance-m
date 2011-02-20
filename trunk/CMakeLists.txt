@@ -41,7 +41,7 @@ FIND_PACKAGE ( ZLIB REQUIRED )
 FIND_PACKAGE ( PNG REQUIRED )
 FIND_PACKAGE ( OpenGL REQUIRED )
 FIND_PACKAGE ( SDL REQUIRED )
-FIND_PACKAGE ( SFML REQUIRED )
+FIND_PACKAGE ( SFML )
 
 # Disable looking for GTK if not going to build the GTK frontend
 # so that pkg-config is not required
@@ -50,6 +50,7 @@ IF(NOT NO_GTK)
 
     # These dependencies require pkg-config to be found
     PKG_CHECK_MODULES ( GTKMM gtkmm-2.4 )
+    PKG_CHECK_MODULES ( GDKMM gdkmm-2.4 )
     PKG_CHECK_MODULES ( GLIBMM glibmm-2.4 )
     PKG_CHECK_MODULES ( GIOMM giomm-2.4 )
     PKG_CHECK_MODULES ( GTKGLMM gtkglextmm-x11-1.2 )
@@ -90,6 +91,12 @@ ENDIF( NOT SYSCONFDIR )
 ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONFDIR='"${SYSCONFDIR}"' -DWITH_LIRC='${WITHLIRC}')
 
 ADD_DEFINITIONS (-DVERSION='"${VERSION}"' -DPKGDATADIR='"${PKGDATADIR}"' -DPACKAGE='')
+
+# Linking is disabled if SFML has not been found
+IF( NOT SFML_FOUND )
+	ADD_DEFINITIONS (-DNO_LINK)
+        MESSAGE(STATUS "SFML was not found, link support is disabled")
+ENDIF( NOT SFML_FOUND )
 
 # The debugger is enabled by default
 # The SDL port can't be built without debugging support
@@ -284,6 +291,7 @@ IF( CAN_BUILD_GVBAM )
         ${GLIBMM_INCLUDE_DIRS}
         ${GIOMM_INCLUDE_DIRS}
         ${GTKMM_INCLUDE_DIRS}
+        ${GDKMM_INCLUDE_DIRS}
         ${GTKGLMM_INCLUDE_DIRS}
     )
 
