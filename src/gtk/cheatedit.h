@@ -19,7 +19,11 @@
 #ifndef __VBA_CHEATEDIT_H__
 #define __VBA_CHEATEDIT_H__
 
-#include <gtkmm.h>
+#include <gtkmm/combobox.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/liststore.h>
+#include <gtkmm/textview.h>
+#include <gtkmm/treemodel.h>
 
 #include "window.h"
 
@@ -31,6 +35,21 @@ enum ECheatType
   CheatGeneric,
   CheatGSA,
   CheatCBA
+};
+
+class EditCheatCodeColumns : public Gtk::TreeModel::ColumnRecord
+{
+  public:
+    EditCheatCodeColumns()
+    {
+      add(uText);
+      add(iType);
+    }
+
+    ~EditCheatCodeColumns() {}
+
+    Gtk::TreeModelColumn<Glib::ustring> uText;
+    Gtk::TreeModelColumn<ECheatType> iType;
 };
 
 class CheatEditDialog : public Gtk::Dialog
@@ -54,6 +73,7 @@ private:
   Gtk::Button *                 m_poCheatCancelButton;
   Glib::RefPtr<Gtk::TextBuffer> m_poCheatInputBuffer;
   Glib::RefPtr<Gtk::ListStore>  m_poCheatTypeStore;
+  EditCheatCodeColumns          m_oTypeModel;
 };
 
 } // namespace VBA

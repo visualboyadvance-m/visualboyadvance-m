@@ -18,31 +18,14 @@
 
 #include "cheatlist.h"
 
+#include <gtkmm/stock.h>
+
 #include "intl.h"
 #include "stringtokenizer.h"
 #include <vector>
 
 namespace VBA
 {
-
-class CheatCodeColumns : public Gtk::TreeModel::ColumnRecord
-{
-  public:
-    CheatCodeColumns()
-    {
-      add(iIndex);
-      add(bEnabled);
-      add(uDesc);
-    }
-
-    ~CheatCodeColumns() {}
-
-    Gtk::TreeModelColumn<int> iIndex;
-    Gtk::TreeModelColumn<bool> bEnabled;
-    Gtk::TreeModelColumn<Glib::ustring> uDesc;
-};
-
-CheatCodeColumns cRecordModel;
 
 CheatListDialog::CheatListDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder) :
   Gtk::Dialog(_pstDialog)
@@ -56,7 +39,7 @@ CheatListDialog::CheatListDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::
   refBuilder->get_widget("CheatTreeView", m_poCheatTreeView);
 
   // Tree View model
-  m_poCheatListStore = Gtk::ListStore::create(cRecordModel);
+  m_poCheatListStore = Gtk::ListStore::create(m_oRecordModel);
 
   m_poCheatTreeView->set_model(m_poCheatListStore);
 
@@ -69,9 +52,9 @@ CheatListDialog::CheatListDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::
   Gtk::TreeViewColumn* pColumn = m_poCheatTreeView->get_column(cols_count - 1);
 
   if (pColumn)
-    pColumn->add_attribute(pRenderer->property_active(), cRecordModel.bEnabled);
+    pColumn->add_attribute(pRenderer->property_active(), m_oRecordModel.bEnabled);
 
-  m_poCheatTreeView->append_column("Description", cRecordModel.uDesc);
+  m_poCheatTreeView->append_column("Description", m_oRecordModel.uDesc);
 
   m_poCheatOpenButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatListDialog::vOnCheatOpen));
   m_poCheatSaveButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatListDialog::vOnCheatSave));
@@ -230,7 +213,7 @@ void CheatListDialog::vOnCheatRemove()
   {
     Gtk::TreeModel::Row row = *iter;
 
-    cheatsDelete(row[cRecordModel.iIndex], false);
+    cheatsDelete(row[m_oRecordModel.iIndex], false);
 
     m_poCheatListStore->erase(iter);
   }
@@ -251,9 +234,9 @@ void CheatListDialog::vOnCheatMarkAll()
   {
     Gtk::TreeModel::Row row = *iter;
 
-    row[cRecordModel.bEnabled] = bMark;
+    row[m_oRecordModel.bEnabled] = bMark;
 
-    vToggleCheat(row[cRecordModel.iIndex], row[cRecordModel.bEnabled]);
+    vToggleCheat(row[m_oRecordModel.iIndex], row[m_oRecordModel.bEnabled]);
   }
 
   bMark = !bMark;
@@ -265,9 +248,9 @@ void CheatListDialog::vOnCheatToggled(Glib::ustring const& string_path)
 
   Gtk::TreeModel::Row row = *iter;
 
-  row[cRecordModel.bEnabled] = !row[cRecordModel.bEnabled];
+  row[m_oRecordModel.bEnabled] = !row[m_oRecordModel.bEnabled];
 
-  vToggleCheat(row[cRecordModel.iIndex], row[cRecordModel.bEnabled]);
+  vToggleCheat(row[m_oRecordModel.iIndex], row[m_oRecordModel.bEnabled]);
 }
 
 void CheatListDialog::vToggleCheat(int index, bool enable) {
@@ -284,9 +267,9 @@ void CheatListDialog::vUpdateList(int previous)
     // Add row for each newly added cheat
     Gtk::TreeModel::Row row = *(m_poCheatListStore->append());
 
-    row[cRecordModel.iIndex] = i;
-    row[cRecordModel.bEnabled] = cheatsList[i].enabled;
-    row[cRecordModel.uDesc] = cheatsList[i].desc;
+    row[m_oRecordModel.iIndex] = i;
+    row[m_oRecordModel.bEnabled] = cheatsList[i].enabled;
+    row[m_oRecordModel.uDesc] = cheatsList[i].desc;
   }
 }
 

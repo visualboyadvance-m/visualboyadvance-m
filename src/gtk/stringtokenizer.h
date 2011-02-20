@@ -20,8 +20,7 @@
 #ifndef __VBA_STRINGTOKENIZER_H__
 #define __VBA_STRINGTOKENIZER_H__
 
-#include <gtkmm.h>
-#include <string>
+#include <glibmm/ustring.h>
 #include <vector>
 
 namespace VBA
@@ -32,8 +31,6 @@ class StringTokenizer
 public:
   static void tokenize(Glib::ustring source, std::vector<Glib::ustring>& tokens);
 };
-
-static const Glib::ustring delimiters = " \t\n\r";
 
 } // VBA namespace
 
