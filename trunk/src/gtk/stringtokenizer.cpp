@@ -23,6 +23,8 @@ namespace VBA
 
 void StringTokenizer::tokenize(Glib::ustring source, std::vector<Glib::ustring>& tokens)
 {
+  Glib::ustring delimiters = " \t\n\r";
+
   // Skip delimiters at beginning.
   Glib::ustring::size_type lastPos = source.find_first_not_of(delimiters, 0);
   // Find first "non-delimiter".

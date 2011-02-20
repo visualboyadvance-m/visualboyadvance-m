@@ -23,23 +23,6 @@
 namespace VBA
 {
 
-class CheatCodeColumns : public Gtk::TreeModel::ColumnRecord
-{
-  public:
-    CheatCodeColumns()
-    {
-      add(uText);
-      add(iType);
-    }
-
-    ~CheatCodeColumns() {}
-
-    Gtk::TreeModelColumn<Glib::ustring> uText;
-    Gtk::TreeModelColumn<ECheatType> iType;
-};
-
-CheatCodeColumns cTypeModel;
-
 /**
  * GameBoyAdvanceCheatEditDialog
  *
@@ -55,24 +38,24 @@ CheatEditDialog::CheatEditDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::
   refBuilder->get_widget("CheatCancelButton", m_poCheatCancelButton);
 
   // Tree View model
-  m_poCheatTypeStore = Gtk::ListStore::create(cTypeModel);
+  m_poCheatTypeStore = Gtk::ListStore::create(m_oTypeModel);
 
   m_poCheatTypeComboBox->set_model(m_poCheatTypeStore);
 
   Gtk::TreeModel::Row row = *(m_poCheatTypeStore->append());
 
-  row[cTypeModel.iType] = CheatGeneric;
-  row[cTypeModel.uText] = "Generic Code";
+  row[m_oTypeModel.iType] = CheatGeneric;
+  row[m_oTypeModel.uText] = "Generic Code";
 
   row = *(m_poCheatTypeStore->append());
 
-  row[cTypeModel.iType] = CheatGSA;
-  row[cTypeModel.uText] = "Gameshark Advance";
+  row[m_oTypeModel.iType] = CheatGSA;
+  row[m_oTypeModel.uText] = "Gameshark Advance";
 
   row = *(m_poCheatTypeStore->append());
 
-  row[cTypeModel.iType] = CheatCBA;
-  row[cTypeModel.uText] = "CodeBreaker Advance";
+  row[m_oTypeModel.iType] = CheatCBA;
+  row[m_oTypeModel.uText] = "CodeBreaker Advance";
 
   m_poCheatTypeComboBox->set_active(CheatGeneric);
 
@@ -98,7 +81,7 @@ ECheatType CheatEditDialog::vGetType()
   {
     Gtk::TreeModel::Row row = *iter;
 
-    return row[cTypeModel.iType];
+    return row[m_oTypeModel.iType];
   }
 
   return CheatGeneric;
