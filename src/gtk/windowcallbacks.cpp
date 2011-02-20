@@ -40,6 +40,7 @@
 #include "soundconfig.h"
 #include "gameboyconfig.h"
 #include "gameboyadvanceconfig.h"
+#include "generalconfig.h"
 #include "cheatlist.h"
 
 namespace VBA
@@ -355,29 +356,6 @@ void Window::vOnFileExit()
   hide();
 }
 
-void Window::vOnFrameskipToggled(Gtk::CheckMenuItem * _poCMI, int _iValue)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  if (_iValue >= 0 && _iValue <= 9)
-  {
-    m_poCoreConfig->vSetKey("frameskip", _iValue);
-    gbFrameSkip      = _iValue;
-    systemFrameSkip  = _iValue;
-    m_bAutoFrameskip = false;
-  }
-  else
-  {
-    m_poCoreConfig->vSetKey("frameskip", "auto");
-    gbFrameSkip      = 0;
-    systemFrameSkip  = 0;
-    m_bAutoFrameskip = true;
-  }
-}
-
 void Window::vOnVideoFullscreen()
 {
   vToggleFullscreen();
@@ -391,26 +369,6 @@ void Window::vOnDirectories()
 
   // Needed if saves dir changed
   vUpdateGameSlots();
-}
-
-void Window::vOnPauseWhenInactiveToggled(Gtk::CheckMenuItem * _poCMI)
-{
-  m_poDisplayConfig->vSetKey("pause_when_inactive", _poCMI->get_active());
-}
-
-void Window::vOnShowSpeedToggled(Gtk::CheckMenuItem * _poCMI, int _iShowSpeed)
-{
-  if (! _poCMI->get_active())
-  {
-    return;
-  }
-
-  m_eShowSpeed = (EShowSpeed)_iShowSpeed;
-  if (m_eShowSpeed == ShowNone)
-  {
-    vSetDefaultTitle();
-  }
-  m_poDisplayConfig->vSetKey("show_speed", _iShowSpeed);
 }
 
 void Window::vOnJoypadConfigure()
@@ -472,6 +430,19 @@ void Window::vOnGameBoyAdvanceConfigure()
   poDialog->hide();
 }
 
+void Window::vOnGeneralConfigure()
+{
+  std::string sUiFile = sGetUiFilePath("preferences.ui");
+  Glib::RefPtr<Gtk::Builder> poBuilder = Gtk::Builder::create_from_file(sUiFile);
+
+  PreferencesDialog * poDialog = 0;
+  poBuilder->get_widget_derived("PreferencesDialog", poDialog);
+  poDialog->vSetConfig(m_poCoreConfig, this);
+  poDialog->set_transient_for(*this);
+  poDialog->run();
+  poDialog->hide();
+}
+
 void Window::vOnCheatList()
 {
   if (m_eCartridge == CartridgeGBA)
@@ -518,7 +489,7 @@ void Window::vOnHelpAbout()
     "along with this program.  If not, see <http://www.gnu.org/licenses/>.";
   const char csCopyright[] = "Copyright (C) 1999-2003 Forgotten\n"
                              "Copyright (C) 2004-2006 VBA development team\n"
-                             "Copyright (C) 2007-2008 VBA-M development team";
+                             "Copyright (C) 2007-2011 VBA-M development team";
 
   oAboutDialog.set_transient_for(*this);
 
@@ -563,7 +534,7 @@ bool Window::on_focus_in_event(GdkEventFocus * _pstEvent)
 {
   if (emulating
       && ! m_bPaused
-      && m_poDisplayConfig->oGetKey<bool>("pause_when_inactive"))
+      && m_poCoreConfig->oGetKey<bool>("pause_when_inactive"))
   {
     vStartEmu();
     soundResume();
@@ -575,7 +546,7 @@ bool Window::on_focus_out_event(GdkEventFocus * _pstEvent)
 {
   if (emulating
       && ! m_bPaused
-      && m_poDisplayConfig->oGetKey<bool>("pause_when_inactive"))
+      && m_poCoreConfig->oGetKey<bool>("pause_when_inactive"))
   {
     vStopEmu();
     soundPause();

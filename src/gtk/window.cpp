@@ -68,8 +68,8 @@ const Window::SJoypadKey Window::m_astJoypad[] =
 	{ "capture", KEY_BUTTON_CAPTURE },
 	{ "speed",   KEY_BUTTON_SPEED   },
 	{ "capture", KEY_BUTTON_CAPTURE },
-        { "autoA",   KEY_BUTTON_AUTO_A  },
-        { "autoB",   KEY_BUTTON_AUTO_B  }
+	{ "autoA",   KEY_BUTTON_AUTO_A  },
+	{ "autoB",   KEY_BUTTON_AUTO_B  }
 };
 
 Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Gtk::Builder> & _poXml) :
@@ -149,6 +149,8 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Gtk::Builder> & _poXml
   vApplyConfigGBASaveType();
   vApplyConfigGBAFlashSize();
   vApplyConfigGBARTC();
+  vApplyConfigFrameskip();
+  vApplyConfigShowSpeed();
 
   Gtk::MenuItem *      poMI;
   Gtk::CheckMenuItem * poCMI;
@@ -253,87 +255,14 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Gtk::Builder> & _poXml
   _poXml->get_widget("RecentMenu", m_poRecentMenu);
   m_poRecentMenu->set_submenu(static_cast<Gtk::Menu &>(*m_poRecentChooserMenu));
 
-  // Frameskip menu
-  //
-  struct
-  {
-    const char * m_csName;
-    const int    m_iFrameskip;
-  }
-  astFrameskip[] =
-  {
-    { "FrameskipAutomatic", -1 },
-    { "Frameskip0",          0 },
-    { "Frameskip1",          1 },
-    { "Frameskip2",          2 },
-    { "Frameskip3",          3 },
-    { "Frameskip4",          4 },
-    { "Frameskip5",          5 },
-    { "Frameskip6",          6 },
-    { "Frameskip7",          7 },
-    { "Frameskip8",          8 },
-    { "Frameskip9",          9 }
-  };
-  int iDefaultFrameskip;
-  if (m_poCoreConfig->sGetKey("frameskip") == "auto")
-  {
-    iDefaultFrameskip = -1;
-  }
-  else
-  {
-    iDefaultFrameskip = m_poCoreConfig->oGetKey<int>("frameskip");
-  }
-  for (guint i = 0; i < G_N_ELEMENTS(astFrameskip); i++)
-  {
-    _poXml->get_widget(astFrameskip[i].m_csName, poCMI);
-    if (astFrameskip[i].m_iFrameskip == iDefaultFrameskip)
-    {
-      poCMI->set_active();
-      vOnFrameskipToggled(poCMI, iDefaultFrameskip);
-    }
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnFrameskipToggled),
-                                      poCMI, astFrameskip[i].m_iFrameskip));
-  }
-
   // Emulator menu
   //
   _poXml->get_widget("DirectoriesConfigure", poMI);
   poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnDirectories));
 
-  _poXml->get_widget("EmulatorPauseWhenInactive", poCMI);
-  poCMI->set_active(m_poDisplayConfig->oGetKey<bool>("pause_when_inactive"));
-  vOnPauseWhenInactiveToggled(poCMI);
-  poCMI->signal_toggled().connect(sigc::bind(
-                                    sigc::mem_fun(*this, &Window::vOnPauseWhenInactiveToggled),
-                                    poCMI));
-
-  // Show speed menu
-  //
-  struct
-  {
-    const char *     m_csName;
-    const EShowSpeed m_eShowSpeed;
-  }
-  astShowSpeed[] =
-  {
-    { "ShowSpeedNone",       ShowNone       },
-    { "ShowSpeedPercentage", ShowPercentage },
-    { "ShowSpeedDetailed",   ShowDetailed   }
-  };
-  EShowSpeed eDefaultShowSpeed = (EShowSpeed)m_poDisplayConfig->oGetKey<int>("show_speed");
-  for (guint i = 0; i < G_N_ELEMENTS(astShowSpeed); i++)
-  {
-    _poXml->get_widget(astShowSpeed[i].m_csName, poCMI);
-    if (astShowSpeed[i].m_eShowSpeed == eDefaultShowSpeed)
-    {
-      poCMI->set_active();
-      vOnShowSpeedToggled(poCMI, eDefaultShowSpeed);
-    }
-    poCMI->signal_toggled().connect(sigc::bind(
-                                      sigc::mem_fun(*this, &Window::vOnShowSpeedToggled),
-                                      poCMI, astShowSpeed[i].m_eShowSpeed));
-  }
+  // Preferences
+  _poXml->get_widget("GeneralConfigure", poMI);
+  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnGeneralConfigure));
 
   // Game Boy menu
   _poXml->get_widget("GameBoyConfigure", poMI);
@@ -592,13 +521,13 @@ void Window::vInitConfig()
   m_poCoreConfig->vSetKey("gb_use_bios_file",  false        );
   m_poCoreConfig->vSetKey("gb_bios_file",      ""           );
   m_poCoreConfig->vSetKey("emulator_type",     EmulatorAuto );
-
+  m_poCoreConfig->vSetKey("pause_when_inactive", true       );
+  m_poCoreConfig->vSetKey("show_speed",        ShowPercentage );
+  
   // Display section
   //
   m_poDisplayConfig = m_oConfig.poAddSection("Display");
   m_poDisplayConfig->vSetKey("scale",               1              );
-  m_poDisplayConfig->vSetKey("show_speed",          ShowPercentage );
-  m_poDisplayConfig->vSetKey("pause_when_inactive", true           );
   m_poDisplayConfig->vSetKey("filter2x",            FilterNone     );
   m_poDisplayConfig->vSetKey("filterIB",            FilterIBNone   );
 #ifdef USE_OPENGL
@@ -737,11 +666,11 @@ void Window::vCheckConfig()
     m_poDisplayConfig->vSetKey("scale", iAdjusted);
   }
 
-  iValue = m_poDisplayConfig->oGetKey<int>("show_speed");
+  iValue = m_poCoreConfig->oGetKey<int>("show_speed");
   iAdjusted = CLAMP(iValue, m_iShowSpeedMin, m_iShowSpeedMax);
   if (iValue != iAdjusted)
   {
-    m_poDisplayConfig->vSetKey("show_speed", iAdjusted);
+    m_poCoreConfig->vSetKey("show_speed", iAdjusted);
   }
 
   iValue = m_poDisplayConfig->oGetKey<int>("filter2x");
@@ -941,6 +870,32 @@ void Window::vApplyConfigJoypads()
     			m_poInputConfig->oGetKey<guint>(sPrefix + m_astJoypad[j].m_csKey));
     }
   }
+}
+
+void Window::vApplyConfigFrameskip()
+{
+  std::string sFrameskip = m_poCoreConfig->oGetKey<std::string>("frameskip");
+  
+  if (sFrameskip == "auto")
+  {
+    m_bAutoFrameskip = true;
+    gbFrameSkip      = 0;
+    systemFrameSkip  = 0;
+  }
+  else
+  {
+    m_bAutoFrameskip = false;
+    int iFrameskip = m_poCoreConfig->oGetKey<int>("frameskip");
+    gbFrameSkip      = iFrameskip;
+    systemFrameSkip  = iFrameskip;
+  }
+}
+
+void Window::vApplyConfigShowSpeed()
+{
+  m_eShowSpeed = (EShowSpeed)m_poCoreConfig->oGetKey<int>("show_speed");
+  if (m_eShowSpeed == ShowNone)
+    vSetDefaultTitle();
 }
 
 void Window::vSaveJoypadsToConfig()

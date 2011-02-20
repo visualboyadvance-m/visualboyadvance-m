@@ -107,6 +107,8 @@ public:
   void vApplyConfigGBASaveType();
   void vApplyConfigGBAFlashSize();
   void vApplyConfigGBARTC();
+  void vApplyConfigFrameskip();
+  void vApplyConfigShowSpeed();
   void vUpdateScreen();
 
   inline ECartridge eGetCartridge() const { return m_eCartridge; }
@@ -151,11 +153,9 @@ protected:
   virtual void vOnFileScreenCapture();
   virtual void vOnFileClose();
   virtual void vOnFileExit();
-  virtual void vOnFrameskipToggled(Gtk::CheckMenuItem * _poCMI, int _iValue);
   virtual void vOnVideoFullscreen();
   virtual void vOnDirectories();
-  virtual void vOnPauseWhenInactiveToggled(Gtk::CheckMenuItem * _poCMI);
-  virtual void vOnShowSpeedToggled(Gtk::CheckMenuItem * _poCMI, int _iShowSpeed);
+  virtual void vOnGeneralConfigure();
   virtual void vOnJoypadConfigure();
   virtual void vOnDisplayConfigure();
   virtual void vOnSoundConfigure();
