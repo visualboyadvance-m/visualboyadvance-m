@@ -85,14 +85,14 @@ int main(int argc, char * argv[])
 
   Gtk::Window::set_default_icon_name("vbam");
 
-  std::string sGladeFile = VBA::Window::sGetUiFilePath("vbam.glade");
+  std::string sGtkBuilderFile = VBA::Window::sGetUiFilePath("vbam.ui");
 
   Glib::RefPtr<Gtk::Builder> poXml;
   try
   {
     poXml = Gtk::Builder::create();
-    poXml->add_from_file(sGladeFile, "accelgroup1");
-    poXml->add_from_file(sGladeFile, "MainWindow");
+    poXml->add_from_file(sGtkBuilderFile, "accelgroup1");
+    poXml->add_from_file(sGtkBuilderFile, "MainWindow");
   }
   catch (const Gtk::BuilderError & e)
   {
