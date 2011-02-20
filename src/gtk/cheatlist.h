@@ -19,7 +19,7 @@
 #ifndef __VBA_CHEATLIST_H__
 #define __VBA_CHEATLIST_H__
 
-#include <gtkmm.h>
+#include <gtkmm/toolbutton.h>
 
 #include "../System.h"
 #include "../gba/Cheats.h"
@@ -31,6 +31,23 @@
 
 namespace VBA
 {
+
+class ListCheatCodeColumns : public Gtk::TreeModel::ColumnRecord
+{
+  public:
+    ListCheatCodeColumns()
+    {
+      add(iIndex);
+      add(bEnabled);
+      add(uDesc);
+    }
+
+    ~ListCheatCodeColumns() {}
+
+    Gtk::TreeModelColumn<int> iIndex;
+    Gtk::TreeModelColumn<bool> bEnabled;
+    Gtk::TreeModelColumn<Glib::ustring> uDesc;
+};
 
 class CheatListDialog : public Gtk::Dialog
 {
@@ -59,6 +76,7 @@ private:
   Gtk::ToolButton *             m_poCheatMarkAllButton;
   Gtk::TreeView *               m_poCheatTreeView;
   Glib::RefPtr<Gtk::ListStore>  m_poCheatListStore;
+  ListCheatCodeColumns          m_oRecordModel;
   
   bool bMark;
 };
