@@ -250,6 +250,8 @@ SET(SRC_GTK
     src/gtk/filters.cpp
     src/gtk/gameboyconfig.cpp
     src/gtk/gameboyadvanceconfig.cpp
+    src/gtk/cheatlist.cpp
+    src/gtk/cheatedit.cpp
     src/gtk/joypadconfig.cpp
     src/gtk/directoriesconfig.cpp
     src/gtk/displayconfig.cpp
@@ -257,6 +259,7 @@ SET(SRC_GTK
     src/gtk/screenarea.cpp
     src/gtk/screenarea-cairo.cpp
     src/gtk/screenarea-opengl.cpp
+    src/gtk/stringtokenizer.cpp
     src/gtk/tools.cpp
     src/gtk/window.cpp
     src/sdl/inputSDL.cpp

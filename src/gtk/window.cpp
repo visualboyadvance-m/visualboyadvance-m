@@ -31,6 +31,7 @@
 #include "../gba/Sound.h"
 #include "../gb/gb.h"
 #include "../gb/gbGlobals.h"
+#include "../gb/gbCheats.h"
 #include "../gb/gbSound.h"
 #include "../gb/gbPrinter.h"
 #include "../Util.h"
@@ -341,6 +342,19 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Gtk::Builder> & _poXml
   // Game Boy Advance menu
   _poXml->get_widget("GameBoyAdvanceConfigure", poMI);
   poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnGameBoyAdvanceConfigure));
+
+  // Cheat list menu
+  _poXml->get_widget("CheatList", poMI);
+  poMI->signal_activate().connect(sigc::mem_fun(*this, &Window::vOnCheatList));
+  m_listSensitiveWhenPlaying.push_back(poMI);
+
+  // Cheat disable item
+  _poXml->get_widget("CheatDisable", poCMI);
+  poCMI->set_active(!cheatsEnabled);
+  poCMI->signal_toggled().connect(sigc::bind(
+                                    sigc::mem_fun(*this, &Window::vOnCheatDisableToggled),
+                                    poCMI));
+  m_listSensitiveWhenPlaying.push_back(poCMI);
 
   // Display menu
   _poXml->get_widget("DisplayConfigure", poMI);
@@ -992,6 +1006,10 @@ void Window::vUpdateScreen()
 bool Window::bLoadROM(const std::string & _rsFile)
 {
   vOnFileClose();
+
+  // clear cheat list
+  cheatsDeleteAll(false);
+  gbCheatRemoveAll();
 
   m_sRomFile = _rsFile;
   const char * csFile = _rsFile.c_str();
