@@ -24,7 +24,8 @@ extern bool speedup;
 const float SoundSDL::_delay = 0.1f;
 
 SoundSDL::SoundSDL():
-	_rbuf(0)
+	_rbuf(0),
+	_initialized(false)
 {
 
 }
@@ -36,7 +37,7 @@ void SoundSDL::soundCallback(void *data, u8 *stream, int len)
 
 void SoundSDL::read(u16 * stream, int length)
 {
-	if (length <= 0 || !emulating)
+	if (!_initialized || length <= 0 || !emulating)
 		return;
 
 	SDL_mutexP(_mutex);
@@ -49,6 +50,9 @@ void SoundSDL::read(u16 * stream, int length)
 
 void SoundSDL::write(u16 * finalWave, int length)
 {
+	if (!_initialized)
+		return;
+
 	if (SDL_GetAudioStatus() != SDL_AUDIO_PLAYING)
 		SDL_PauseAudio(0);
 
@@ -104,12 +108,16 @@ bool SoundSDL::init(long sampleRate)
 
 	_cond  = SDL_CreateCond();
 	_mutex = SDL_CreateMutex();
+	_initialized = true;
 
 	return true;
 }
 
 SoundSDL::~SoundSDL()
 {
+	if (!_initialized)
+		return;
+
 	SDL_mutexP(_mutex);
 	int iSave = emulating;
 	emulating = 0;
@@ -129,11 +137,17 @@ SoundSDL::~SoundSDL()
 
 void SoundSDL::pause()
 {
+	if (!_initialized)
+		return;
+
 	SDL_PauseAudio(1);
 }
 
 void SoundSDL::resume()
 {
+	if (!_initialized)
+		return;
+
 	SDL_PauseAudio(0);
 }
 
