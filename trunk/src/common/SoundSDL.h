@@ -41,6 +41,8 @@ private:
 	SDL_cond  * _cond;
 	SDL_mutex * _mutex;
 
+	bool _initialized;
+
 	// Defines what delay in seconds we keep in the sound buffer
 	static const float _delay;
 
