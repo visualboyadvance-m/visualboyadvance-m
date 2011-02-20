@@ -1,2 +1,0 @@
-?package(vbam):needs="X11" section="Applications/Emulators"\
-  title="VisualBoyAdvance-M" command="/usr/bin/gvbam"

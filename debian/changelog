@@ -1,3 +1,9 @@
+vbam (1.8.0.914-1) unstable; urgency=low
+
+  * Cleanup, packages split into SDL and GTK+ versions
+
+ -- Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>  Sun, 04 Oct 2009 19:58:09 -0300
+
 vbam (1.8.0.913-1) unstable; urgency=low
 
   * Using assembly optmizations for i386 and amd64 platforms
