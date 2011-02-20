@@ -92,8 +92,8 @@ ADD_DEFINITIONS (-DVERSION='"${VERSION}"' -DPKGDATADIR='"${PKGDATADIR}"' -DPACKA
 
 # Linking is disabled if SFML has not been found
 IF( NOT SFML_FOUND )
-	ADD_DEFINITIONS (-DNO_LINK)
-        MESSAGE(STATUS "SFML was not found, link support is disabled")
+    ADD_DEFINITIONS (-DNO_LINK)
+    MESSAGE(STATUS "SFML was not found, link support is disabled")
 ENDIF( NOT SFML_FOUND )
 
 # The debugger is enabled by default
@@ -248,6 +248,7 @@ SET(SRC_GTK
     src/gtk/system.cpp
     src/gtk/windowcallbacks.cpp
     src/gtk/filters.cpp
+    src/gtk/generalconfig.cpp
     src/gtk/gameboyconfig.cpp
     src/gtk/gameboyadvanceconfig.cpp
     src/gtk/cheatlist.cpp
