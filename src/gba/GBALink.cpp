@@ -1,5 +1,12 @@
 // This file was written by denopqrihg
 
+// Joybus
+bool gba_joybus_enabled = false;
+
+// If disabled, gba core won't call any (non-joybus) link functions
+bool gba_link_enabled = false;
+
+#ifndef NO_LINK
 #ifdef _WIN32
 #include "../win32/stdafx.h"
 #include "../win32/VBA.h"
@@ -18,13 +25,8 @@
 
 int linktime = 0;
 
-// Joybus
-bool gba_joybus_enabled = false;
 GBASockClient* dol = NULL;
 sf::IPAddress joybusHostAddr = sf::IPAddress::LocalHost;
-
-// If disabled, gba core won't call any (non-joybus) link functions
-bool gba_link_enabled = false;
 
 #ifdef _MSC_VER
 // Hodgepodge
@@ -1219,3 +1221,7 @@ void LinkSSend(u16 value){
 }
 
 #endif // _MSC_VER
+
+#else // NO_LINK
+void JoyBusUpdate(int ticks) {}
+#endif // NO_LINK

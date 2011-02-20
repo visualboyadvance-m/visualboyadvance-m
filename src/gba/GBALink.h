@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef NO_LINK
 #include <SFML/Network.hpp>
+#endif
 
 #define LINK_PARENTLOST 0x80
 #define UNSUPPORTED -1
@@ -116,7 +118,9 @@ typedef struct {
 #endif
 
 extern bool gba_joybus_enabled;
+#ifndef NO_LINK
 extern sf::IPAddress joybusHostAddr;
+#endif
 extern void JoyBusConnect();
 extern void JoyBusShutdown();
 extern void JoyBusUpdate(int ticks);

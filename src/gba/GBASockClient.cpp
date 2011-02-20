@@ -1,3 +1,5 @@
+#ifndef NO_LINK
+
 #include "GBASockClient.h"
 
 // Currently only for Joybus communications
@@ -36,3 +38,5 @@ char GBASockClient::ReceiveCmd(char* data_in)
 
 	return data_in[0];
 }
+
+#endif // NO_LINK
