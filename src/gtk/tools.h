@@ -21,6 +21,7 @@
 #define __VBA_TOOLS_H__
 
 #include <string>
+#include <vector>
 #include <glibmm/ustring.h>
 
 namespace VBA
@@ -35,6 +36,8 @@ Glib::ustring sCutSuffix(const Glib::ustring & _rsString,
 bool bHasSuffix(const Glib::ustring & _rsString,
                 const Glib::ustring & _rsSuffix,
                 bool _bCaseSensitive = true);
+                
+void vTokenize(Glib::ustring source, std::vector<Glib::ustring>& tokens);
 
 }
 
