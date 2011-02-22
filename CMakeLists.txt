@@ -260,7 +260,6 @@ SET(SRC_GTK
     src/gtk/screenarea.cpp
     src/gtk/screenarea-cairo.cpp
     src/gtk/screenarea-opengl.cpp
-    src/gtk/stringtokenizer.cpp
     src/gtk/tools.cpp
     src/gtk/window.cpp
     src/sdl/inputSDL.cpp

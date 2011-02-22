@@ -17,11 +17,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cheatlist.h"
+#include "tools.h"
 
 #include <gtkmm/stock.h>
 
 #include "intl.h"
-#include "stringtokenizer.h"
 #include <vector>
 
 namespace VBA
@@ -128,7 +128,7 @@ void CheatListDialog::vOnCheatAdd()
       std::vector<Glib::ustring> tokens;
       Glib::RefPtr<Gtk::TextBuffer> code_buffer = poDialog->vGetCode();
 
-      StringTokenizer::tokenize(code_buffer->get_text(), tokens);
+      vTokenize(code_buffer->get_text(), tokens);
 
       for (std::vector<Glib::ustring>::iterator it = tokens.begin();
           it != tokens.end();
@@ -152,7 +152,7 @@ void CheatListDialog::vOnCheatAdd()
       Glib::ustring sCode;
       Glib::ustring sPart = "";
 
-      StringTokenizer::tokenize(code_buffer->get_text(), tokens);
+      vTokenize(code_buffer->get_text(), tokens);
 
       for (std::vector<Glib::ustring>::iterator it = tokens.begin();
           it != tokens.end();

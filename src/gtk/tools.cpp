@@ -62,4 +62,24 @@ bool bHasSuffix(const Glib::ustring & _rsString,
   return false;
 }
 
+void vTokenize(Glib::ustring source, std::vector<Glib::ustring>& tokens)
+{
+  Glib::ustring delimiters = " \t\n\r";
+
+  // Skip delimiters at beginning.
+  Glib::ustring::size_type lastPos = source.find_first_not_of(delimiters, 0);
+  // Find first "non-delimiter".
+  Glib::ustring::size_type pos = source.find_first_of(delimiters, lastPos);
+
+  while (Glib::ustring::npos != pos || std:: string::npos != lastPos)
+  {
+    // Found a token, add it to the vector.
+    tokens.push_back(source.substr(lastPos, pos - lastPos));
+    // Skip delimiters.  Note the "not_of"
+    lastPos = source.find_first_not_of(delimiters, pos);
+    // Find next "non-delimiter"
+    pos = source.find_first_of(delimiters, lastPos);
+  }
+}
+
 } // namespace VBA
