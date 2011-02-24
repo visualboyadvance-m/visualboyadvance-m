@@ -116,11 +116,6 @@ ENDIF ( WIN32 )
 SET( CMAKE_C_FLAGS "-O3 -Wall")
 SET( CMAKE_CXX_FLAGS "-O3 -Wall")
 
-# Native Language Support
-if( ENABLE_NLS )
-    add_subdirectory(po)
-endif( ENABLE_NLS )
-
 # Source files definition
 SET(SRC_FEX
     fex/7z_C/7zAlloc.c
@@ -351,7 +346,6 @@ IF( ENABLE_SDL )
     INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
             DESTINATION ${SYSCONFDIR}
             RENAME vbam.cfg)
-
 ENDIF( ENABLE_SDL )
 
 IF( ENABLE_GTK )
@@ -379,4 +373,8 @@ IF( ENABLE_GTK )
     INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/icons/ DESTINATION share/icons/hicolor PATTERN ".svn" EXCLUDE)
     INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/ui DESTINATION ${DATA_INSTALL_DIR} PATTERN ".svn" EXCLUDE)
 
+    # Native Language Support
+    if( ENABLE_NLS )
+        add_subdirectory(po)
+    endif( ENABLE_NLS )
 ENDIF( ENABLE_GTK )
