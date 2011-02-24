@@ -109,6 +109,7 @@ public:
   void vApplyConfigGBARTC();
   void vApplyConfigFrameskip();
   void vApplyConfigShowSpeed();
+  void vApplyPerGameConfig();
   void vUpdateScreen();
 
   inline ECartridge eGetCartridge() const { return m_eCartridge; }

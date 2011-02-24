@@ -21,6 +21,7 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/alignment.h>
 #include <gtkmm/messagedialog.h>
+#include <glibmm/keyfile.h>
 
 #include <sys/stat.h>
 
@@ -898,6 +899,51 @@ void Window::vApplyConfigShowSpeed()
     vSetDefaultTitle();
 }
 
+void Window::vApplyPerGameConfig()
+{
+  std::string sRDBFile = PKGDATADIR "/vba-over.ini";
+  if (!Glib::file_test(sRDBFile, Glib::FILE_TEST_EXISTS))
+    return;
+
+  char csGameID[5];
+  csGameID[0] = rom[0xac];
+  csGameID[1] = rom[0xad];
+  csGameID[2] = rom[0xae];
+  csGameID[3] = rom[0xaf];
+  csGameID[4] = '\0';
+
+  Glib::KeyFile oKeyFile;
+  oKeyFile.load_from_file(sRDBFile);
+
+  if (!oKeyFile.has_group(csGameID))
+    return;   
+
+  if (oKeyFile.has_key(csGameID, "rtcEnabled"))
+  {
+    bool bRTCEnabled = oKeyFile.get_boolean(csGameID, "rtcEnabled");
+    rtcEnable(bRTCEnabled);
+  }
+
+  if (oKeyFile.has_key(csGameID, "flashSize"))
+  {
+    int iFlashSize = oKeyFile.get_integer(csGameID, "flashSize");
+    if (iFlashSize == 0x10000 || iFlashSize == 0x20000)
+      flashSetSize(iFlashSize);
+  }
+
+  if (oKeyFile.has_key(csGameID, "saveType"))
+  {
+    int iSaveType = oKeyFile.get_integer(csGameID, "saveType");
+    if(iSaveType >= 0 && iSaveType <= 5)
+      cpuSaveType = iSaveType;
+  }
+
+  if (oKeyFile.has_key(csGameID, "mirroringEnabled"))
+  {
+    mirroringEnable = oKeyFile.get_boolean(csGameID, "mirroringEnabled");
+  }
+}
+
 void Window::vSaveJoypadsToConfig()
 {
   for (int i = m_iJoypadMin; i <= m_iJoypadMax; i++)
@@ -1011,6 +1057,8 @@ bool Window::bLoadROM(const std::string & _rsFile)
       m_eCartridge = CartridgeGBA;
       m_stEmulator = GBASystem;
 
+      vApplyPerGameConfig();
+
       useBios = m_poCoreConfig->oGetKey<bool>("use_bios_file");
       CPUInit(m_poCoreConfig->sGetKey("bios_file").c_str(), useBios);
       CPUReset();
@@ -1020,8 +1068,6 @@ bool Window::bLoadROM(const std::string & _rsFile)
       {
         m_poCoreConfig->vSetKey("bios_file", "");
       }
-
-      rtcEnable(m_poCoreConfig->oGetKey<bool>("enable_rtc"));
     }
   }
 
