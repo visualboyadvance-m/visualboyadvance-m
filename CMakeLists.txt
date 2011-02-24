@@ -52,6 +52,7 @@ endif( ENABLE_LINK )
 # so that pkg-config is not required
 IF( ENABLE_GTK )
     FIND_PACKAGE ( PkgConfig REQUIRED )
+    FIND_PACKAGE ( Gettext REQUIRED )
 
     # These dependencies require pkg-config to be found
     PKG_CHECK_MODULES ( GTKMM REQUIRED gtkmm-2.4 )
@@ -101,7 +102,9 @@ ENDIF( NOT ENABLE_ASM_CORE )
 
 # Enable internationalization
 if( ENABLE_NLS )
-    ADD_DEFINITIONS (-DENABLE_NLS)
+    SET( LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale )
+    ADD_DEFINITIONS ( -DENABLE_NLS )
+    ADD_DEFINITIONS ( -DLOCALEDIR=\\\"${LOCALEDIR}\\\" )
 endif( ENABLE_NLS )
 
 # Compiler flags
@@ -112,6 +115,11 @@ ELSE ( WIN32 )
 ENDIF ( WIN32 )
 SET( CMAKE_C_FLAGS "-O3 -Wall")
 SET( CMAKE_CXX_FLAGS "-O3 -Wall")
+
+# Native Language Support
+if( ENABLE_NLS )
+    add_subdirectory(po)
+endif( ENABLE_NLS )
 
 # Source files definition
 SET(SRC_FEX

@@ -34,6 +34,7 @@ int main(int argc, char * argv[])
 
 #ifdef ENABLE_NLS
   setlocale(LC_ALL, "");
+  bindtextdomain("gvbam", LOCALEDIR);
   textdomain("gvbam");
 #endif // ENABLE_NLS
 
