@@ -19,7 +19,7 @@
               <object class="GtkToolButton" id="CheatOpenButton">
                 <property name="visible">True</property>
                 <property name="tooltip_text" translatable="yes">Open cheat list</property>
-                <property name="label" translatable="yes">gtk-open</property>
+                <property name="label">gtk-open</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">document-open</property>
               </object>
@@ -32,7 +32,7 @@
               <object class="GtkToolButton" id="CheatSaveButton">
                 <property name="visible">True</property>
                 <property name="tooltip_text" translatable="yes">Save cheat list</property>
-                <property name="label" translatable="yes">gtk-save</property>
+                <property name="label">gtk-save</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">document-save</property>
               </object>
@@ -54,7 +54,7 @@
               <object class="GtkToolButton" id="CheatAddButton">
                 <property name="visible">True</property>
                 <property name="tooltip_text" translatable="yes">Add new cheat</property>
-                <property name="label" translatable="yes">gtk-add</property>
+                <property name="label">gtk-add</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">list-add</property>
               </object>
@@ -67,7 +67,7 @@
               <object class="GtkToolButton" id="CheatRemoveButton">
                 <property name="visible">True</property>
                 <property name="tooltip_text" translatable="yes">Delete selected cheat</property>
-                <property name="label" translatable="yes">gtk-delete</property>
+                <property name="label">gtk-delete</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">list-remove</property>
               </object>
@@ -101,7 +101,7 @@
               <object class="GtkToolButton" id="CheatMarkAllButton">
                 <property name="visible">True</property>
                 <property name="tooltip_text" translatable="yes">Toggle all Cheats</property>
-                <property name="label" translatable="yes">gtk-markall</property>
+                <property name="label">gtk-markall</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">edit-select-all</property>
               </object>

@@ -7,22 +7,22 @@
     </columns>
     <data>
       <row>
-        <col id="0">Automatic</col>
+        <col id="0" translatable="yes">Automatic</col>
       </row>
       <row>
-        <col id="0">Game Boy Advance</col>
+        <col id="0" translatable="yes">Game Boy Advance</col>
       </row>
       <row>
-        <col id="0">Game Boy Color</col>
+        <col id="0" translatable="yes">Game Boy Color</col>
       </row>
       <row>
-        <col id="0">Super Game Boy</col>
+        <col id="0" translatable="yes">Super Game Boy</col>
       </row>
       <row>
-        <col id="0">Super Game Boy 2</col>
+        <col id="0" translatable="yes">Super Game Boy 2</col>
       </row>
       <row>
-        <col id="0">Game Boy</col>
+        <col id="0" translatable="yes">Game Boy</col>
       </row>
     </data>
   </object>
@@ -184,7 +184,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="label" translatable="yes">gtk-close</property>
+                <property name="label">gtk-close</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>

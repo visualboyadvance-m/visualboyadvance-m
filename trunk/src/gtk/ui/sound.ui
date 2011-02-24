@@ -7,19 +7,19 @@
     </columns>
     <data>
       <row>
-        <col id="0">Mute</col>
+        <col id="0" translatable="yes">Mute</col>
       </row>
       <row>
-        <col id="0">25 %</col>
+        <col id="0" translatable="yes">25 %</col>
       </row>
       <row>
-        <col id="0">50 %</col>
+        <col id="0" translatable="yes">50 %</col>
       </row>
       <row>
-        <col id="0">100 %</col>
+        <col id="0" translatable="yes">100 %</col>
       </row>
       <row>
-        <col id="0">200 %</col>
+        <col id="0" translatable="yes">200 %</col>
       </row>
     </data>
   </object>
@@ -132,7 +132,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="label" translatable="yes">gtk-close</property>
+                <property name="label">gtk-close</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>
