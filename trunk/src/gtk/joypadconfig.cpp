@@ -27,27 +27,27 @@ namespace VBA
 
 const JoypadConfigDialog::SJoypadKey JoypadConfigDialog::m_astKeys[] =
 {
-    { KEY_UP,             "Up :"         },
-    { KEY_DOWN,           "Down :"       },
-    { KEY_LEFT,           "Left :"       },
-    { KEY_RIGHT,          "Right :"      },
-    { KEY_BUTTON_A,       "Button A :"   },
-    { KEY_BUTTON_B,       "Button B :"   },
-    { KEY_BUTTON_L,       "Button L :"   },
-    { KEY_BUTTON_R,       "Button R :"   },
-    { KEY_BUTTON_SELECT,  "Select :"     },
-    { KEY_BUTTON_START,   "Start :"      },
-    { KEY_BUTTON_SPEED,   "Speed :"      },
-    { KEY_BUTTON_CAPTURE, "Capture :"    },
-    { KEY_BUTTON_AUTO_A,  "Autofire A :" },
-    { KEY_BUTTON_AUTO_B,  "Autofire B :" }
+    { KEY_UP,             _("Up :")         },
+    { KEY_DOWN,           _("Down :")       },
+    { KEY_LEFT,           _("Left :")       },
+    { KEY_RIGHT,          _("Right :")      },
+    { KEY_BUTTON_A,       _("Button A :")   },
+    { KEY_BUTTON_B,       _("Button B :")   },
+    { KEY_BUTTON_L,       _("Button L :")   },
+    { KEY_BUTTON_R,       _("Button R :")   },
+    { KEY_BUTTON_SELECT,  _("Select :")     },
+    { KEY_BUTTON_START,   _("Start :")      },
+    { KEY_BUTTON_SPEED,   _("Speed :")      },
+    { KEY_BUTTON_CAPTURE, _("Capture :")    },
+    { KEY_BUTTON_AUTO_A,  _("Autofire A :") },
+    { KEY_BUTTON_AUTO_B,  _("Autofire B :") }
 };
 
 JoypadConfigDialog::JoypadConfigDialog(Config::Section * _poConfig) :
-  Gtk::Dialog("Joypad config", true, true),
+  Gtk::Dialog(_("Joypad config"), true, true),
   m_oTitleHBox(false, 5),
-  m_oTitleLabel("Joypad :", Gtk::ALIGN_RIGHT),
-  m_oDefaultJoypad("Default joypad"),
+  m_oTitleLabel(_("Joypad :"), Gtk::ALIGN_RIGHT),
+  m_oDefaultJoypad(_("Default joypad")),
   m_oTable(G_N_ELEMENTS(m_astKeys), 2, false),
   m_bUpdating(false),
   m_ePad(PAD_MAIN),
@@ -126,20 +126,20 @@ void JoypadConfigDialog::vUpdateEntries()
     {
       int what = uiKeyval & 0xffff;
       std::stringstream os;
-      os << "Joy " << dev;
+      os << _("Joy ") << dev;
 
       if(what >= 128)
       {
         // joystick button
         int button = what - 128;
-        os << " Button " << button;
+        os << _(" Button ") << button;
       }
       else if (what < 0x20)
       {
         // joystick axis
         int dir = what & 1;
 		what >>= 1;
-	    os << " Axis " << what << (dir?'-':'+');
+	    os << _(" Axis ") << what << (dir?'-':'+');
       }
       else if (what < 0x30)
       {
@@ -147,13 +147,13 @@ void JoypadConfigDialog::vUpdateEntries()
         int dir = (what & 3);
         what = (what & 15);
         what >>= 2;
-        os << " Hat " << what << " ";
+        os << _(" Hat ") << what << " ";
     switch (dir)
     {
-      case 0: os << "Up"; break;
-      case 1: os << "Down"; break;
-      case 2: os << "Right"; break;
-      case 3: os << "Left"; break;
+      case 0: os << _("Up"); break;
+      case 1: os << _("Down"); break;
+      case 2: os << _("Right"); break;
+      case 3: os << _("Left"); break;
     }
        }
 

@@ -45,17 +45,17 @@ CheatEditDialog::CheatEditDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::
   Gtk::TreeModel::Row row = *(m_poCheatTypeStore->append());
 
   row[m_oTypeModel.iType] = CheatGeneric;
-  row[m_oTypeModel.uText] = "Generic Code";
+  row[m_oTypeModel.uText] = _("Generic Code");
 
   row = *(m_poCheatTypeStore->append());
 
   row[m_oTypeModel.iType] = CheatGSA;
-  row[m_oTypeModel.uText] = "Gameshark Advance";
+  row[m_oTypeModel.uText] = _("Gameshark Advance");
 
   row = *(m_poCheatTypeStore->append());
 
   row[m_oTypeModel.iType] = CheatCBA;
-  row[m_oTypeModel.uText] = "CodeBreaker Advance";
+  row[m_oTypeModel.uText] = _("CodeBreaker Advance");
 
   m_poCheatTypeComboBox->set_active(CheatGeneric);
 

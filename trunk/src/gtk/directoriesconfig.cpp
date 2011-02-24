@@ -27,15 +27,15 @@ namespace VBA
 
 const DirectoriesConfigDialog::SDirEntry DirectoriesConfigDialog::m_astDirs[] =
 {
-    { "gba_roms",  "GBA roms :",  "GBARomsDirEntry"   },
-    { "gb_roms",   "GB roms :",   "GBRomsDirEntry"    },
-    { "batteries", "Batteries :", "BatteriesDirEntry" },
-    { "saves",     "Saves :",     "SavesDirEntry"     },
-    { "captures",  "Captures :",  "CapturesDirEntry"  }
+    { "gba_roms",  _("GBA roms :"),  "GBARomsDirEntry"   },
+    { "gb_roms",   _("GB roms :"),   "GBRomsDirEntry"    },
+    { "batteries", _("Batteries :"), "BatteriesDirEntry" },
+    { "saves",     _("Saves :"),     "SavesDirEntry"     },
+    { "captures",  _("Captures :"),  "CapturesDirEntry"  }
 };
 
 DirectoriesConfigDialog::DirectoriesConfigDialog(Config::Section * _poConfig) :
-  Gtk::Dialog("Directories config", true, true),
+  Gtk::Dialog(_("Directories config"), true, true),
   m_poConfig(_poConfig)
 {
   Gtk::Table * poTable = Gtk::manage( new Gtk::Table(G_N_ELEMENTS(m_astDirs), 2, false));

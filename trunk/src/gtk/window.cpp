@@ -423,7 +423,7 @@ void Window::vApplyConfigScreenArea()
   }
   catch (std::exception e)
   {
-    fprintf(stderr, "Unable to initialize output, falling back to Cairo\n");
+    fprintf(stderr, _("Unable to initialize output, falling back to Cairo\n"));
     m_poScreenArea = Gtk::manage(new ScreenAreaCairo(m_iScreenWidth, m_iScreenHeight));
   }
 
@@ -464,7 +464,7 @@ void Window::vInitSDL()
 
   if (SDL_Init(iFlags) < 0)
   {
-    fprintf(stderr, "Failed to init SDL: %s", SDL_GetError());
+    fprintf(stderr, _("Failed to init SDL: %s"), SDL_GetError());
     abort();
   }
 
@@ -1111,12 +1111,12 @@ void Window::vShowSpeed(int _iSpeed)
 
   if (m_eShowSpeed == ShowPercentage)
   {
-    snprintf(csTitle, 50, "VBA-M - %d%%", _iSpeed);
+    snprintf(csTitle, 50, _("VBA-M - %d%%"), _iSpeed);
     set_title(csTitle);
   }
   else if (m_eShowSpeed == ShowDetailed)
   {
-    snprintf(csTitle, 50, "VBA-M - %d%% (%d, %d fps)",
+    snprintf(csTitle, 50, _("VBA-M - %d%% (%d, %d fps)"),
              _iSpeed, systemFrameSkip, m_iFrameCount);
     set_title(csTitle);
   }
@@ -1446,7 +1446,7 @@ std::string Window::sGetUiFilePath(const std::string &_sFileName)
   {
     sUiFile = PKGDATADIR "/ui/" + _sFileName;
   }
-
+   
   return sUiFile;
 }
 
