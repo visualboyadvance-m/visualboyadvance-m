@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-24 14:05+0100\n"
+"POT-Creation-Date: 2011-02-24 17:56+0100\n"
 "PO-Revision-Date: 2011-02-24 13:15+0000\n"
 "Last-Translator: bgK <bastien.bouclet@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,71 +39,91 @@ msgstr "*** OpenGL : Cannot open display.\n"
 msgid "----/--/-- --:--:--"
 msgstr "----/--/-- --:--:--"
 
+#: tmp/sound.ui.h:2
+#, no-c-format
+msgid "100 %"
+msgstr ""
+
+#: tmp/sound.ui.h:4
+#, no-c-format
+msgid "200 %"
+msgstr ""
+
+#: tmp/sound.ui.h:6
+#, no-c-format
+msgid "25 %"
+msgstr ""
+
 #: ../src/gtk/filters.cpp:61
 msgid "2xSaI"
 msgstr "2xSaI"
+
+#: tmp/sound.ui.h:8
+#, no-c-format
+msgid "50 %"
+msgstr ""
 
 #: ../src/gtk/joypadconfig.cpp:165
 msgid "<Undefined>"
 msgstr "<Undefined>"
 
-#: ../src/gtk/ui/preferences.ui:163
+#: tmp/preferences.ui.h:1
 msgid "<b>Appearance</b>"
 msgstr "<b>Appearance</b>"
 
-#: ../src/gtk/ui/gameboyadvance.ui:189
+#: tmp/gameboyadvance.ui.h:1
 msgid "<b>Bios</b>"
 msgstr "<b>Bios</b>"
 
-#: ../src/gtk/ui/gameboy.ui:166
+#: tmp/gameboy.ui.h:1
 msgid "<b>Boot ROM</b>"
 msgstr "<b>Boot ROM</b>"
 
-#: ../src/gtk/ui/gameboyadvance.ui:128
+#: tmp/gameboyadvance.ui.h:2
 msgid "<b>Cartridge</b>"
 msgstr "<b>Cartridge</b>"
 
-#: ../src/gtk/ui/cheatedit.ui:118
+#: tmp/cheatedit.ui.h:1
 msgid "<b>Codes</b>"
 msgstr "<b>Codes</b>"
 
-#: ../src/gtk/ui/cheatedit.ui:44
+#: tmp/cheatedit.ui.h:2
 msgid "<b>Description</b>"
 msgstr "<b>Description</b>"
 
-#: ../src/gtk/ui/display.ui:238
+#: tmp/display.ui.h:1
 msgid "<b>Filters</b>"
 msgstr "<b>Filters</b>"
 
-#: ../src/gtk/ui/preferences.ui:109
+#: tmp/preferences.ui.h:2
 msgid "<b>Frameskip</b>"
 msgstr "<b>Frameskip</b>"
 
-#: ../src/gtk/ui/preferences.ui:37
+#: tmp/preferences.ui.h:3
 msgid "<b>General</b>"
 msgstr "<b>General</b>"
 
-#: ../src/gtk/ui/display.ui:96
+#: tmp/display.ui.h:2
 msgid "<b>Output module</b>"
 msgstr "<b>Output module</b>"
 
-#: ../src/gtk/ui/gameboyadvance.ui:225
+#: tmp/gameboyadvance.ui.h:3
 msgid "<b>Real-Time Clock</b>"
 msgstr "<b>Real-Time Clock</b>"
 
-#: ../src/gtk/ui/gameboy.ui:105
+#: tmp/gameboy.ui.h:2
 msgid "<b>System and peripherals</b>"
 msgstr "<b>System and peripherals</b>"
 
-#: ../src/gtk/ui/cheatedit.ui:80
+#: tmp/cheatedit.ui.h:3
 msgid "<b>Type</b>"
 msgstr "<b>Type</b>"
 
-#: ../src/gtk/ui/display.ui:151
+#: tmp/display.ui.h:3
 msgid "<b>Zoom</b>"
 msgstr "<b>Zoom</b>"
 
-#: ../src/gtk/ui/cheatlist.ui:56
+#: tmp/cheatlist.ui.h:1
 msgid "Add new cheat"
 msgstr "Add new cheat"
 
@@ -119,7 +139,7 @@ msgstr "All Gameboy Advance files"
 msgid "All files"
 msgstr "All files"
 
-#: ../src/gtk/ui/vbam.ui:169
+#: tmp/vbam.ui.h:1
 msgid "Auto load most recent"
 msgstr "Auto load most recent"
 
@@ -130,6 +150,10 @@ msgstr "Autofire A :"
 #: ../src/gtk/joypadconfig.cpp:43
 msgid "Autofire B :"
 msgstr "Autofire B :"
+
+#: tmp/gameboy.ui.h:3 tmp/gameboyadvance.ui.h:4
+msgid "Automatic"
+msgstr ""
 
 #: ../src/gtk/directoriesconfig.cpp:32
 msgid "Batteries :"
@@ -143,11 +167,11 @@ msgstr "Bilinear"
 msgid "Bilinear Plus"
 msgstr "Bilinear Plus"
 
-#: ../src/gtk/ui/gameboyadvance.ui:163
+#: tmp/gameboyadvance.ui.h:5
 msgid "Bios file : "
 msgstr "Bios file : "
 
-#: ../src/gtk/ui/gameboy.ui:140
+#: tmp/gameboy.ui.h:4
 msgid "Boot ROM file : "
 msgstr "Boot ROM file : "
 
@@ -167,7 +191,7 @@ msgstr "Button L :"
 msgid "Button R :"
 msgstr "Button R :"
 
-#: ../src/gtk/ui/display.ui:80
+#: tmp/display.ui.h:4
 msgid "Cairo"
 msgstr "Cairo"
 
@@ -179,7 +203,7 @@ msgstr "Capture :"
 msgid "Captures :"
 msgstr "Captures :"
 
-#: ../src/gtk/ui/cheatlist.ui:9
+#: tmp/cheatlist.ui.h:2
 msgid "Cheat list"
 msgstr "Cheat list"
 
@@ -187,7 +211,7 @@ msgstr "Cheat list"
 msgid "CodeBreaker Advance"
 msgstr "CodeBreaker Advance"
 
-#: ../src/gtk/ui/vbam.ui:527
+#: tmp/vbam.ui.h:2
 msgid "D_irectories ..."
 msgstr "D_irectories ..."
 
@@ -195,23 +219,27 @@ msgstr "D_irectories ..."
 msgid "Default joypad"
 msgstr "Default joypad"
 
-#: ../src/gtk/ui/display.ui:122
+#: tmp/display.ui.h:5
 msgid "Default scale : "
 msgstr "Default scale : "
 
-#: ../src/gtk/ui/cheatlist.ui:82
+#: tmp/cheatlist.ui.h:3
 msgid "Delete all cheats"
 msgstr "Delete all cheats"
 
-#: ../src/gtk/ui/cheatlist.ui:69
+#: tmp/cheatlist.ui.h:4
 msgid "Delete selected cheat"
 msgstr "Delete selected cheat"
+
+#: tmp/preferences.ui.h:4
+msgid "Detailed"
+msgstr ""
 
 #: ../src/gtk/directoriesconfig.cpp:38
 msgid "Directories config"
 msgstr "Directories config"
 
-#: ../src/gtk/ui/gameboy.ui:80
+#: tmp/gameboy.ui.h:5
 msgid "Display Super Game Boy borders"
 msgstr "Display Super Game Boy borders"
 
@@ -223,23 +251,31 @@ msgstr "Down"
 msgid "Down :"
 msgstr "Down :"
 
-#: ../src/gtk/ui/cheatedit.ui:13
+#: tmp/gameboyadvance.ui.h:6
+msgid "EEPROM"
+msgstr ""
+
+#: tmp/gameboyadvance.ui.h:7
+msgid "EEPROM + Sensor"
+msgstr ""
+
+#: tmp/cheatedit.ui.h:4
 msgid "Edit cheat"
 msgstr "Edit cheat"
 
-#: ../src/gtk/ui/gameboy.ui:91
+#: tmp/gameboy.ui.h:6
 msgid "Emulate a Game Boy Printer"
 msgstr "Emulate a Game Boy Printer"
 
-#: ../src/gtk/ui/gameboy.ui:56
+#: tmp/gameboy.ui.h:7
 msgid "Emulated system : "
 msgstr "Emulated system : "
 
-#: ../src/gtk/ui/preferences.ui:62
+#: tmp/preferences.ui.h:5
 msgid "Enable automatic frame skipping"
 msgstr "Enable automatic frame skipping"
 
-#: ../src/gtk/ui/gameboyadvance.ui:214
+#: tmp/gameboyadvance.ui.h:8
 msgid "Enable real-time clock"
 msgstr "Enable real-time clock"
 
@@ -252,19 +288,23 @@ msgstr "Failed to init SDL: %s"
 msgid "File already exists. Overwrite it?"
 msgstr "File already exists. Overwrite it?"
 
-#: ../src/gtk/ui/gameboyadvance.ui:102
+#: tmp/gameboyadvance.ui.h:9
+msgid "Flash"
+msgstr ""
+
+#: tmp/gameboyadvance.ui.h:10
 msgid "Flash size : "
 msgstr "Flash size : "
 
-#: ../src/gtk/ui/preferences.ui:79
+#: tmp/preferences.ui.h:6
 msgid "Frameskip level : "
 msgstr "Frameskip level : "
 
-#: ../src/gtk/ui/vbam.ui:284
+#: tmp/vbam.ui.h:3
 msgid "From _File ..."
 msgstr "From _File ..."
 
-#: ../src/gtk/ui/display.ui:191
+#: tmp/display.ui.h:6
 msgid "Fullscreen filter : "
 msgstr "Fullscreen filter : "
 
@@ -276,15 +316,30 @@ msgstr "GB roms :"
 msgid "GBA roms :"
 msgstr "GBA roms :"
 
-#: ../src/gtk/ui/gameboyadvance.ui:44
+#: tmp/gameboy.ui.h:8
+#, fuzzy
+msgid "Game Boy"
+msgstr "_Game Boy ..."
+
+#: tmp/gameboy.ui.h:9
+#, fuzzy
+msgid "Game Boy Advance"
+msgstr "Game Boy _Advance ..."
+
+#: tmp/gameboyadvance.ui.h:11
 msgid "Game Boy Advance settings"
 msgstr "Game Boy Advance settings"
 
-#: ../src/gtk/ui/vbam.ui:500
+#: tmp/gameboy.ui.h:10
+#, fuzzy
+msgid "Game Boy Color"
+msgstr "_Game Boy ..."
+
+#: tmp/vbam.ui.h:4
 msgid "Game Boy _Advance ..."
 msgstr "Game Boy _Advance ..."
 
-#: ../src/gtk/ui/gameboy.ui:31
+#: tmp/gameboy.ui.h:11
 msgid "GameBoy settings"
 msgstr "GameBoy settings"
 
@@ -308,7 +363,7 @@ msgstr "Gameshark Advance"
 msgid "Generic Code"
 msgstr "Generic Code"
 
-#: ../src/gtk/ui/display.ui:179
+#: tmp/display.ui.h:7
 msgid "Interframe blending : "
 msgstr "Interframe blending : "
 
@@ -336,7 +391,7 @@ msgstr "Left"
 msgid "Left :"
 msgstr "Left :"
 
-#: ../src/gtk/ui/vbam.ui:150
+#: tmp/vbam.ui.h:5
 msgid "Loa_d state"
 msgstr "Loa_d state"
 
@@ -348,23 +403,28 @@ msgstr "Load game"
 msgid "Loaded battery"
 msgstr "Loaded battery"
 
-#: ../src/gtk/main.cpp:49
+#: ../src/gtk/main.cpp:51
 msgid "Main VBA-M options"
 msgstr "Main VBA-M options"
 
-#: ../src/gtk/ui/vbam.ui:160
+#: tmp/vbam.ui.h:6
 msgid "Most recent"
 msgstr "Most recent"
+
+#: tmp/sound.ui.h:9
+msgid "Mute"
+msgstr ""
 
 #: ../src/gtk/windowcallbacks.cpp:498
 msgid "Nintendo GameBoy Advance emulator."
 msgstr "Nintendo GameBoy Advance emulator."
 
 #: ../src/gtk/filters.cpp:60 ../src/gtk/filters.cpp:80
+#: tmp/gameboyadvance.ui.h:12 tmp/preferences.ui.h:7
 msgid "None"
 msgstr "None"
 
-#: ../src/gtk/ui/vbam.ui:308
+#: tmp/vbam.ui.h:7
 msgid "Oldest slot"
 msgstr "Oldest slot"
 
@@ -376,19 +436,19 @@ msgstr "Only Gameboy Advance cheats are supported"
 msgid "Open"
 msgstr "Open"
 
-#: ../src/gtk/cheatlist.cpp:73 ../src/gtk/ui/cheatlist.ui:21
+#: ../src/gtk/cheatlist.cpp:73 tmp/cheatlist.ui.h:5
 msgid "Open cheat list"
 msgstr "Open cheat list"
 
-#: ../src/gtk/ui/vbam.ui:45
+#: tmp/vbam.ui.h:8
 msgid "Open rece_nt"
 msgstr "Open rece_nt"
 
-#: ../src/gtk/ui/display.ui:71
+#: tmp/display.ui.h:8
 msgid "OpenGL"
 msgstr "OpenGL"
 
-#: ../src/gtk/main.cpp:54
+#: ../src/gtk/main.cpp:56
 msgid "Output version information."
 msgstr "Output version information."
 
@@ -396,19 +456,23 @@ msgstr "Output version information."
 msgid "PNG image"
 msgstr "PNG image"
 
-#: ../src/gtk/ui/vbam.ui:112
+#: tmp/vbam.ui.h:9
 msgid "Pause"
 msgstr "Pause"
 
-#: ../src/gtk/ui/preferences.ui:25
+#: tmp/preferences.ui.h:8
 msgid "Pause when inactive"
 msgstr "Pause when inactive"
+
+#: tmp/preferences.ui.h:9
+msgid "Percentage"
+msgstr ""
 
 #: ../src/gtk/filters.cpp:64
 msgid "Pixelate"
 msgstr "Pixelate"
 
-#: ../src/gtk/ui/preferences.ui:7
+#: tmp/preferences.ui.h:10
 msgid "Preferences"
 msgstr "Preferences"
 
@@ -420,15 +484,19 @@ msgstr "Right"
 msgid "Right :"
 msgstr "Right :"
 
-#: ../src/gtk/ui/vbam.ui:298
+#: tmp/gameboyadvance.ui.h:13
+msgid "SRAM"
+msgstr ""
+
+#: tmp/vbam.ui.h:10
 msgid "S_ave state"
 msgstr "S_ave state"
 
-#: ../src/gtk/ui/sound.ui:92
+#: tmp/sound.ui.h:10
 msgid "Sample rate : "
 msgstr "Sample rate : "
 
-#: ../src/gtk/cheatlist.cpp:96 ../src/gtk/ui/cheatlist.ui:34
+#: ../src/gtk/cheatlist.cpp:96 tmp/cheatlist.ui.h:6
 msgid "Save cheat list"
 msgstr "Save cheat list"
 
@@ -440,7 +508,7 @@ msgstr "Save game"
 msgid "Save screenshot"
 msgstr "Save screenshot"
 
-#: ../src/gtk/ui/gameboyadvance.ui:114
+#: tmp/gameboyadvance.ui.h:14
 msgid "Save type : "
 msgstr "Save type : "
 
@@ -456,7 +524,7 @@ msgstr "Saves :"
 msgid "Scanlines"
 msgstr "Scanlines"
 
-#: ../src/gtk/ui/vbam.ui:60
+#: tmp/vbam.ui.h:11
 msgid "Screen capt_ure..."
 msgstr "Screen capt_ure..."
 
@@ -464,43 +532,43 @@ msgstr "Screen capt_ure..."
 msgid "Select :"
 msgstr "Select :"
 
-#: ../src/gtk/ui/vbam.ui:184 ../src/gtk/ui/vbam.ui:323
+#: tmp/vbam.ui.h:12
 msgid "Slot1"
 msgstr "Slot1"
 
-#: ../src/gtk/ui/vbam.ui:274 ../src/gtk/ui/vbam.ui:413
+#: tmp/vbam.ui.h:13
 msgid "Slot10"
 msgstr "Slot10"
 
-#: ../src/gtk/ui/vbam.ui:194 ../src/gtk/ui/vbam.ui:333
+#: tmp/vbam.ui.h:14
 msgid "Slot2"
 msgstr "Slot2"
 
-#: ../src/gtk/ui/vbam.ui:204 ../src/gtk/ui/vbam.ui:343
+#: tmp/vbam.ui.h:15
 msgid "Slot3"
 msgstr "Slot3"
 
-#: ../src/gtk/ui/vbam.ui:214 ../src/gtk/ui/vbam.ui:353
+#: tmp/vbam.ui.h:16
 msgid "Slot4"
 msgstr "Slot4"
 
-#: ../src/gtk/ui/vbam.ui:224 ../src/gtk/ui/vbam.ui:363
+#: tmp/vbam.ui.h:17
 msgid "Slot5"
 msgstr "Slot5"
 
-#: ../src/gtk/ui/vbam.ui:234 ../src/gtk/ui/vbam.ui:373
+#: tmp/vbam.ui.h:18
 msgid "Slot6"
 msgstr "Slot6"
 
-#: ../src/gtk/ui/vbam.ui:244 ../src/gtk/ui/vbam.ui:383
+#: tmp/vbam.ui.h:19
 msgid "Slot7"
 msgstr "Slot7"
 
-#: ../src/gtk/ui/vbam.ui:254 ../src/gtk/ui/vbam.ui:393
+#: tmp/vbam.ui.h:20
 msgid "Slot8"
 msgstr "Slot8"
 
-#: ../src/gtk/ui/vbam.ui:264 ../src/gtk/ui/vbam.ui:403
+#: tmp/vbam.ui.h:21
 msgid "Slot9"
 msgstr "Slot9"
 
@@ -512,7 +580,7 @@ msgstr "Smart interframe blending"
 msgid "Speed :"
 msgstr "Speed :"
 
-#: ../src/gtk/ui/preferences.ui:134
+#: tmp/preferences.ui.h:11
 msgid "Speed indicator : "
 msgstr "Speed indicator : "
 
@@ -528,15 +596,25 @@ msgstr "Super 2xSaI"
 msgid "Super Eagle"
 msgstr "Super Eagle"
 
+#: tmp/gameboy.ui.h:12
+#, fuzzy
+msgid "Super Game Boy"
+msgstr "Super Eagle"
+
+#: tmp/gameboy.ui.h:13
+#, fuzzy
+msgid "Super Game Boy 2"
+msgstr "Display Super Game Boy borders"
+
 #: ../src/gtk/filters.cpp:69
 msgid "TV Mode"
 msgstr "TV Mode"
 
-#: ../src/gtk/ui/vbam.ui:429
+#: tmp/vbam.ui.h:22
 msgid "To _File ..."
 msgstr "To _File ..."
 
-#: ../src/gtk/ui/cheatlist.ui:103
+#: tmp/cheatlist.ui.h:7
 msgid "Toggle all Cheats"
 msgstr "Toggle all Cheats"
 
@@ -558,19 +636,19 @@ msgstr "Up"
 msgid "Up :"
 msgstr "Up :"
 
-#: ../src/gtk/ui/gameboy.ui:130
+#: tmp/gameboy.ui.h:14
 msgid "Use a Game Boy boot ROM file"
 msgstr "Use a Game Boy boot ROM file"
 
-#: ../src/gtk/ui/gameboyadvance.ui:153
+#: tmp/gameboyadvance.ui.h:15
 msgid "Use a bios file"
 msgstr "Use a bios file"
 
-#: ../src/gtk/ui/vbam.ui:7
+#: tmp/vbam.ui.h:23
 msgid "VBA"
 msgstr "VBA"
 
-#: ../src/gtk/main.cpp:40 ../src/gtk/windowcallbacks.cpp:496
+#: ../src/gtk/main.cpp:42 ../src/gtk/windowcallbacks.cpp:496
 msgid "VBA-M"
 msgstr "VBA-M"
 
@@ -588,88 +666,62 @@ msgstr "VBA-M - %d%% (%d, %d fps)"
 msgid "VisualBoyAdvance save game"
 msgstr "VisualBoyAdvance save game"
 
-#: ../src/gtk/main.cpp:80
+#: ../src/gtk/main.cpp:82
 #, c-format
 msgid "VisualBoyAdvance version %s [GTK+]\n"
 msgstr "VisualBoyAdvance version %s [GTK+]\n"
 
-#: ../src/gtk/ui/sound.ui:82
+#: tmp/sound.ui.h:11
 msgid "Volume : "
 msgstr "Volume : "
 
-#: ../src/gtk/ui/vbam.ui:459
+#: tmp/vbam.ui.h:24
 msgid "_Disable cheats"
 msgstr "_Disable cheats"
 
-#: ../src/gtk/ui/vbam.ui:509
+#: tmp/vbam.ui.h:25
 msgid "_Display ..."
 msgstr "_Display ..."
 
-#: ../src/gtk/ui/vbam.ui:102
+#: tmp/vbam.ui.h:26
 msgid "_Emulation"
 msgstr "_Emulation"
 
-#: ../src/gtk/ui/vbam.ui:24
+#: tmp/vbam.ui.h:27
 msgid "_File"
 msgstr "_File"
 
-#: ../src/gtk/ui/vbam.ui:491
+#: tmp/vbam.ui.h:28
 msgid "_Game Boy ..."
 msgstr "_Game Boy ..."
 
-#: ../src/gtk/ui/vbam.ui:549
+#: tmp/vbam.ui.h:29
 msgid "_Help"
 msgstr "_Help"
 
-#: ../src/gtk/ui/vbam.ui:536
+#: tmp/vbam.ui.h:30
 msgid "_Joypads ..."
 msgstr "_Joypads ..."
 
-#: ../src/gtk/ui/vbam.ui:449
+#: tmp/vbam.ui.h:31
 msgid "_List cheats ..."
 msgstr "_List cheats ..."
 
-#: ../src/gtk/ui/vbam.ui:472
+#: tmp/vbam.ui.h:32
 msgid "_Options"
 msgstr "_Options"
 
-#: ../src/gtk/ui/vbam.ui:482
+#: tmp/vbam.ui.h:33
 msgid "_Preferences ..."
 msgstr "_Preferences ..."
 
-#: ../src/gtk/ui/vbam.ui:122
+#: tmp/vbam.ui.h:34
 msgid "_Reset"
 msgstr "_Reset"
 
-#: ../src/gtk/ui/vbam.ui:518
+#: tmp/vbam.ui.h:35
 msgid "_Sound ..."
 msgstr "_Sound ..."
-
-#: ../src/gtk/ui/cheatlist.ui:57
-msgid "gtk-add"
-msgstr "gtk-add"
-
-#: ../src/gtk/ui/display.ui:259 ../src/gtk/ui/gameboy.ui:187
-#: ../src/gtk/ui/gameboyadvance.ui:246 ../src/gtk/ui/preferences.ui:179
-#: ../src/gtk/ui/sound.ui:135
-msgid "gtk-close"
-msgstr "gtk-close"
-
-#: ../src/gtk/ui/cheatlist.ui:70
-msgid "gtk-delete"
-msgstr "gtk-delete"
-
-#: ../src/gtk/ui/cheatlist.ui:104
-msgid "gtk-markall"
-msgstr "gtk-markall"
-
-#: ../src/gtk/ui/cheatlist.ui:22
-msgid "gtk-open"
-msgstr "gtk-open"
-
-#: ../src/gtk/ui/cheatlist.ui:35
-msgid "gtk-save"
-msgstr "gtk-save"
 
 #: ../src/gtk/filters.cpp:70
 msgid "hq2x"
@@ -678,3 +730,21 @@ msgstr "hq2x"
 #: ../src/gtk/filters.cpp:71
 msgid "lq2x"
 msgstr "lq2x"
+
+#~ msgid "gtk-add"
+#~ msgstr "gtk-add"
+
+#~ msgid "gtk-close"
+#~ msgstr "gtk-close"
+
+#~ msgid "gtk-delete"
+#~ msgstr "gtk-delete"
+
+#~ msgid "gtk-markall"
+#~ msgstr "gtk-markall"
+
+#~ msgid "gtk-open"
+#~ msgstr "gtk-open"
+
+#~ msgid "gtk-save"
+#~ msgstr "gtk-save"
