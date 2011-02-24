@@ -11,6 +11,7 @@ SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts )
 option( ENABLE_SDL "Build the SDL port" ON )
 option( ENABLE_GTK "Build the GTK+ GUI" ON )
 option( ENABLE_DEBUGGER "Enable the debugger" ON )
+option( ENABLE_NLS "Enable translations" ON )
 option( ENABLE_ASM_CORE "Enable x86 ASM CPU cores" OFF )
 option( ENABLE_ASM_SCALERS "Enable x86 ASM graphic filters" OFF )
 option( ENABLE_LINK "Enable GBA linking functionality" OFF )
@@ -97,6 +98,11 @@ endif( NOT ENABLE_DEBUGGER )
 IF( NOT ENABLE_ASM_CORE )
     ADD_DEFINITIONS (-DC_CORE)
 ENDIF( NOT ENABLE_ASM_CORE )
+
+# Enable internationalization
+if( ENABLE_NLS )
+    ADD_DEFINITIONS (-DENABLE_NLS)
+endif( ENABLE_NLS )
 
 # Compiler flags
 IF ( WIN32 )
