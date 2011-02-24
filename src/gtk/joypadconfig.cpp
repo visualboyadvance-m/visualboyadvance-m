@@ -27,20 +27,20 @@ namespace VBA
 
 const JoypadConfigDialog::SJoypadKey JoypadConfigDialog::m_astKeys[] =
 {
-    { KEY_UP,             _("Up :")         },
-    { KEY_DOWN,           _("Down :")       },
-    { KEY_LEFT,           _("Left :")       },
-    { KEY_RIGHT,          _("Right :")      },
-    { KEY_BUTTON_A,       _("Button A :")   },
-    { KEY_BUTTON_B,       _("Button B :")   },
-    { KEY_BUTTON_L,       _("Button L :")   },
-    { KEY_BUTTON_R,       _("Button R :")   },
-    { KEY_BUTTON_SELECT,  _("Select :")     },
-    { KEY_BUTTON_START,   _("Start :")      },
-    { KEY_BUTTON_SPEED,   _("Speed :")      },
-    { KEY_BUTTON_CAPTURE, _("Capture :")    },
-    { KEY_BUTTON_AUTO_A,  _("Autofire A :") },
-    { KEY_BUTTON_AUTO_B,  _("Autofire B :") }
+    { KEY_UP,             N_("Up :")         },
+    { KEY_DOWN,           N_("Down :")       },
+    { KEY_LEFT,           N_("Left :")       },
+    { KEY_RIGHT,          N_("Right :")      },
+    { KEY_BUTTON_A,       N_("Button A :")   },
+    { KEY_BUTTON_B,       N_("Button B :")   },
+    { KEY_BUTTON_L,       N_("Button L :")   },
+    { KEY_BUTTON_R,       N_("Button R :")   },
+    { KEY_BUTTON_SELECT,  N_("Select :")     },
+    { KEY_BUTTON_START,   N_("Start :")      },
+    { KEY_BUTTON_SPEED,   N_("Speed :")      },
+    { KEY_BUTTON_CAPTURE, N_("Capture :")    },
+    { KEY_BUTTON_AUTO_A,  N_("Autofire A :") },
+    { KEY_BUTTON_AUTO_B,  N_("Autofire B :") }
 };
 
 JoypadConfigDialog::JoypadConfigDialog(Config::Section * _poConfig) :
@@ -65,7 +65,7 @@ JoypadConfigDialog::JoypadConfigDialog(Config::Section * _poConfig) :
   // Joypad buttons
   for (guint i = 0; i < G_N_ELEMENTS(m_astKeys); i++)
   {
-    Gtk::Label * poLabel = Gtk::manage( new Gtk::Label(m_astKeys[i].m_csKeyName, Gtk::ALIGN_RIGHT) );
+    Gtk::Label * poLabel = Gtk::manage( new Gtk::Label(gettext(m_astKeys[i].m_csKeyName), Gtk::ALIGN_RIGHT) );
     Gtk::Entry * poEntry = Gtk::manage( new Gtk::Entry() );
     m_oTable.attach(* poLabel, 0, 1, i, i + 1);
     m_oTable.attach(* poEntry, 1, 2, i, i + 1);
