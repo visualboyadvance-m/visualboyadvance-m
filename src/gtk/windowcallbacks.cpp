@@ -500,7 +500,7 @@ void Window::vOnHelpAbout()
   oAboutDialog.set_copyright(csCopyright);
   oAboutDialog.set_logo_icon_name("vbam");
 
-  oAboutDialog.set_website("http://http://www.vba-m.com/");
+  oAboutDialog.set_website("http://www.vba-m.com/");
 
   std::list<Glib::ustring> list_authors;
   list_authors.push_back("Forgotten");

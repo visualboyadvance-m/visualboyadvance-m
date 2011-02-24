@@ -27,11 +27,11 @@ namespace VBA
 
 const DirectoriesConfigDialog::SDirEntry DirectoriesConfigDialog::m_astDirs[] =
 {
-    { "gba_roms",  _("GBA roms :"),  "GBARomsDirEntry"   },
-    { "gb_roms",   _("GB roms :"),   "GBRomsDirEntry"    },
-    { "batteries", _("Batteries :"), "BatteriesDirEntry" },
-    { "saves",     _("Saves :"),     "SavesDirEntry"     },
-    { "captures",  _("Captures :"),  "CapturesDirEntry"  }
+    { "gba_roms",  N_("GBA roms :"),  "GBARomsDirEntry"   },
+    { "gb_roms",   N_("GB roms :"),   "GBRomsDirEntry"    },
+    { "batteries", N_("Batteries :"), "BatteriesDirEntry" },
+    { "saves",     N_("Saves :"),     "SavesDirEntry"     },
+    { "captures",  N_("Captures :"),  "CapturesDirEntry"  }
 };
 
 DirectoriesConfigDialog::DirectoriesConfigDialog(Config::Section * _poConfig) :
@@ -44,7 +44,7 @@ DirectoriesConfigDialog::DirectoriesConfigDialog(Config::Section * _poConfig) :
 
   for (guint i = 0; i < G_N_ELEMENTS(m_astDirs); i++)
   {
-    Gtk::Label * poLabel = Gtk::manage( new Gtk::Label(m_astDirs[i].m_csLabel, Gtk::ALIGN_RIGHT) );
+    Gtk::Label * poLabel = Gtk::manage( new Gtk::Label(gettext(m_astDirs[i].m_csLabel), Gtk::ALIGN_RIGHT) );
     m_poButtons[i] = Gtk::manage( new Gtk::FileChooserButton(Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER) );
     m_poButtons[i]->set_current_folder(m_poConfig->sGetKey(m_astDirs[i].m_csKey));
 
