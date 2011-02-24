@@ -10,3 +10,5 @@ intltool-extract --local --type=gettext/glade ../src/gtk/ui/sound.ui
 intltool-extract --local --type=gettext/glade ../src/gtk/ui/vbam.ui
 
 xgettext -k_ -kN_ -o gvbam.pot ../src/gtk/*.cpp tmp/*.h
+
+rm -r tmp/
