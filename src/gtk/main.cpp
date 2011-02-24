@@ -34,9 +34,7 @@ int main(int argc, char * argv[])
 
 #ifdef ENABLE_NLS
   setlocale(LC_ALL, "");
-  bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
-  textdomain(GETTEXT_PACKAGE);
-  bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+  textdomain("gvbam");
 #endif // ENABLE_NLS
 
   Glib::set_application_name(_("VBA-M"));

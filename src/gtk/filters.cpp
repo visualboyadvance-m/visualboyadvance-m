@@ -57,18 +57,18 @@ struct {
 }
 static const astFilters[] =
 {
-  { _("None"),                1, { 0,            0              } },
-  { _("2xSaI"),               2, { _2xSaI,       _2xSaI32       } },
-  { _("Super 2xSaI"),         2, { Super2xSaI,   Super2xSaI32   } },
-  { _("Super Eagle"),         2, { SuperEagle,   SuperEagle32   } },
-  { _("Pixelate"),            2, { Pixelate,     Pixelate32     } },
-  { _("AdvanceMAME Scale2x"), 2, { AdMame2x,     AdMame2x32     } },
-  { _("Bilinear"),            2, { Bilinear,     Bilinear32     } },
-  { _("Bilinear Plus"),       2, { BilinearPlus, BilinearPlus32 } },
-  { _("Scanlines"),           2, { Scanlines,    Scanlines32    } },
-  { _("TV Mode"),             2, { ScanlinesTV,  ScanlinesTV32  } },
-  { _("hq2x"),                2, { hq2x,         hq2x32         } },
-  { _("lq2x"),                2, { lq2x,         lq2x32         } }
+  { N_("None"),                1, { 0,            0              } },
+  { N_("2xSaI"),               2, { _2xSaI,       _2xSaI32       } },
+  { N_("Super 2xSaI"),         2, { Super2xSaI,   Super2xSaI32   } },
+  { N_("Super Eagle"),         2, { SuperEagle,   SuperEagle32   } },
+  { N_("Pixelate"),            2, { Pixelate,     Pixelate32     } },
+  { N_("AdvanceMAME Scale2x"), 2, { AdMame2x,     AdMame2x32     } },
+  { N_("Bilinear"),            2, { Bilinear,     Bilinear32     } },
+  { N_("Bilinear Plus"),       2, { BilinearPlus, BilinearPlus32 } },
+  { N_("Scanlines"),           2, { Scanlines,    Scanlines32    } },
+  { N_("TV Mode"),             2, { ScanlinesTV,  ScanlinesTV32  } },
+  { N_("hq2x"),                2, { hq2x,         hq2x32         } },
+  { N_("lq2x"),                2, { lq2x,         lq2x32         } }
 };
 
 struct {
@@ -77,9 +77,9 @@ struct {
 }
 static const astFiltersIB[] =
 {
-  { _("None"),                      { 0,            0              } },
-  { _("Smart interframe blending"), { SmartIB,      SmartIB32      } },
-  { _("Interframe motion blur"),    { MotionBlurIB, MotionBlurIB32 } }
+  { N_("None"),                      { 0,            0              } },
+  { N_("Smart interframe blending"), { SmartIB,      SmartIB32      } },
+  { N_("Interframe motion blur"),    { MotionBlurIB, MotionBlurIB32 } }
 };
 
 Filter pvGetFilter(EFilter _eFilter, EFilterDepth _eDepth)
@@ -89,7 +89,7 @@ Filter pvGetFilter(EFilter _eFilter, EFilterDepth _eDepth)
 
 char* pcsGetFilterName(const EFilter _eFilter)
 {
-        return (char*)astFilters[_eFilter].m_csName;
+        return gettext(astFilters[_eFilter].m_csName);
 }
 
 FilterIB pvGetFilterIB(EFilterIB _eFilterIB, EFilterDepth _eDepth)
@@ -99,7 +99,7 @@ FilterIB pvGetFilterIB(EFilterIB _eFilterIB, EFilterDepth _eDepth)
 
 char* pcsGetFilterIBName(const EFilterIB _eFilterIB)
 {
-        return (char*)astFiltersIB[_eFilterIB].m_csName;
+        return gettext(astFiltersIB[_eFilterIB].m_csName);
 }
 
 } // namespace VBA
