@@ -214,8 +214,6 @@ private:
 
   ScreenArea *         m_poScreenArea;
   Gtk::CheckMenuItem * m_poFilePauseItem;
-  Gtk::CheckMenuItem * m_poUseBiosItem;
-  Gtk::CheckMenuItem * m_poSoundOffItem;
   Gtk::MenuBar *       m_poMenuBar;
 
   struct SGameSlot
