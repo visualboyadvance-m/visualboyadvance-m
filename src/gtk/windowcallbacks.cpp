@@ -493,14 +493,14 @@ void Window::vOnHelpAbout()
 
   oAboutDialog.set_transient_for(*this);
 
-  oAboutDialog.set_name("VBA-M");
+  oAboutDialog.set_name(_("VBA-M"));
   oAboutDialog.set_version(VERSION);
   oAboutDialog.set_comments(_("Nintendo GameBoy Advance emulator."));
   oAboutDialog.set_license(csGPLHeader);
   oAboutDialog.set_copyright(csCopyright);
   oAboutDialog.set_logo_icon_name("vbam");
 
-  oAboutDialog.set_website("http://vba-m.ngemu.com/");
+  oAboutDialog.set_website("http://http://www.vba-m.com/");
 
   std::list<Glib::ustring> list_authors;
   list_authors.push_back("Forgotten");

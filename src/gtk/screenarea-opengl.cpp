@@ -17,6 +17,7 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "screenarea-opengl.h"
+#include "intl.h"
 
 #include <cstring>
 
@@ -37,7 +38,7 @@ ScreenAreaGl::ScreenAreaGl(int _iWidth, int _iHeight, int _iScale) :
                                      Gdk::GL::MODE_DOUBLE);
   if (!glconfig)
     {
-      fprintf(stderr, "*** OpenGL : Cannot open display.\n");
+      fprintf(stderr, _("*** OpenGL : Cannot open display.\n"));
       throw std::exception();
     }
 

@@ -17,6 +17,7 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "filters.h"
+#include "intl.h"
 
 void _2xSaI        (u8 *, u32, u8 *, u8 *, u32, int, int);
 void _2xSaI32      (u8 *, u32, u8 *, u8 *, u32, int, int);
@@ -56,18 +57,18 @@ struct {
 }
 static const astFilters[] =
 {
-  { "None",                1, { 0,            0              } },
-  { "2xSaI",               2, { _2xSaI,       _2xSaI32       } },
-  { "Super 2xSaI",         2, { Super2xSaI,   Super2xSaI32   } },
-  { "Super Eagle",         2, { SuperEagle,   SuperEagle32   } },
-  { "Pixelate",            2, { Pixelate,     Pixelate32     } },
-  { "AdvanceMAME Scale2x", 2, { AdMame2x,     AdMame2x32     } },
-  { "Bilinear",            2, { Bilinear,     Bilinear32     } },
-  { "Bilinear Plus",       2, { BilinearPlus, BilinearPlus32 } },
-  { "Scanlines",           2, { Scanlines,    Scanlines32    } },
-  { "TV Mode",             2, { ScanlinesTV,  ScanlinesTV32  } },
-  { "hq2x",                2, { hq2x,         hq2x32         } },
-  { "lq2x",                2, { lq2x,         lq2x32         } }
+  { _("None"),                1, { 0,            0              } },
+  { _("2xSaI"),               2, { _2xSaI,       _2xSaI32       } },
+  { _("Super 2xSaI"),         2, { Super2xSaI,   Super2xSaI32   } },
+  { _("Super Eagle"),         2, { SuperEagle,   SuperEagle32   } },
+  { _("Pixelate"),            2, { Pixelate,     Pixelate32     } },
+  { _("AdvanceMAME Scale2x"), 2, { AdMame2x,     AdMame2x32     } },
+  { _("Bilinear"),            2, { Bilinear,     Bilinear32     } },
+  { _("Bilinear Plus"),       2, { BilinearPlus, BilinearPlus32 } },
+  { _("Scanlines"),           2, { Scanlines,    Scanlines32    } },
+  { _("TV Mode"),             2, { ScanlinesTV,  ScanlinesTV32  } },
+  { _("hq2x"),                2, { hq2x,         hq2x32         } },
+  { _("lq2x"),                2, { lq2x,         lq2x32         } }
 };
 
 struct {
@@ -76,9 +77,9 @@ struct {
 }
 static const astFiltersIB[] =
 {
-  { "None",                      { 0,            0              } },
-  { "Smart interframe blending", { SmartIB,      SmartIB32      } },
-  { "Interframe motion blur",    { MotionBlurIB, MotionBlurIB32 } }
+  { _("None"),                      { 0,            0              } },
+  { _("Smart interframe blending"), { SmartIB,      SmartIB32      } },
+  { _("Interframe motion blur"),    { MotionBlurIB, MotionBlurIB32 } }
 };
 
 Filter pvGetFilter(EFilter _eFilter, EFilterDepth _eDepth)
