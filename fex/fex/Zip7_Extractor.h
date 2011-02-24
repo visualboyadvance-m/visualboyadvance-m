@@ -24,6 +24,8 @@ protected:
 
 	virtual blargg_err_t data_v( void const** out );
 	
+	bool utf16ToUtf8( unsigned char* dest, size_t* destLen, const short* src, size_t srcLen );
+	
 private:
 	Zip7_Extractor_Impl* impl;
 	int index;
