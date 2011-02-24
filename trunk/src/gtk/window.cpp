@@ -1248,7 +1248,8 @@ void Window::vCreateFileOpenDialog()
     // GB
     "*.[gG][bB]", "*.[sS][gG][bB]", "*.[cC][gG][bB]", "*.[gG][bB][cC]",
     // Both
-    "*.[mM][bB]", "*.[eE][lL][fF]", "*.[zZ][iI][pP]", "*.[zZ]", "*.[gG][zZ]"
+    "*.[mM][bB]", "*.[eE][lL][fF]", "*.[zZ][iI][pP]", "*.[zZ]", "*.[gG][zZ]",
+    "*.7[zZ]",
   };
 
   Gtk::FileFilter oAllGBAFilter;
