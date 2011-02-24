@@ -201,6 +201,74 @@ void Zip7_Extractor::close_v()
 	}
 }
 
+// This method was taken from ogre-7z (thanks), and is thus LGPL
+bool Zip7_Extractor::utf16ToUtf8( unsigned char* dest, size_t* destLen, const short* src, size_t srcLen )
+{
+	static const unsigned char sUtf8Limits[5] = { 0xC0, 0xE0, 0xF0, 0xF8, 0xFC };
+
+	size_t destPos = 0, srcPos = 0;
+	for(;;)
+	{
+		unsigned int numAdds;
+		unsigned long value;
+		if( srcPos == srcLen )
+		{
+			*destLen = destPos;
+			return true;
+		}
+
+		value = src[srcPos++];
+		if( value < 0x80 )
+		{
+			if( dest )
+			{
+				dest[destPos] = (char)value;
+			}
+			destPos++;
+			continue;
+		}
+
+		if( value >= 0xD800 && value < 0xE000 )
+		{
+			unsigned long c2;
+			if( value >= 0xDC00 || srcPos == srcLen )
+				break;
+
+			c2 = src[srcPos++];
+			if( c2 < 0xDC00 || c2 >= 0xE000 )
+				break;
+
+			value = (((value - 0xD800) << 10) | (c2 - 0xDC00)) + 0x10000;
+		}
+
+		for( numAdds = 1; numAdds < 5; numAdds++ )
+		{
+			if( value < (((UInt32)1) << (numAdds * 5 + 6)) )
+				break;
+		}
+
+		if( dest )
+		{
+			dest[destPos] = (char)(sUtf8Limits[numAdds - 1] + (value >> (6 * numAdds)));
+		}
+
+		destPos++;
+		do
+		{
+			numAdds--;
+			if( dest )
+			{
+				dest[destPos] = (char)(0x80 + ((value >> (6 * numAdds)) & 0x3F));
+			}
+			destPos++;
+		}
+		while( numAdds != 0 );
+	}
+
+	*destLen = destPos;
+	return false;
+}
+
 blargg_err_t Zip7_Extractor::next_v()
 {
 	while ( ++index < (int) impl->db.db.NumFiles )
@@ -226,7 +294,7 @@ blargg_err_t Zip7_Extractor::next_v()
 				localtime_r( &_time, &tm );
 			#endif
 
-				date = ( tm.tm_sec >> 1 ) & 0x1F |
+				date = (( tm.tm_sec >> 1 ) & 0x1F) |
 					(( tm.tm_min & 0x3F ) << 5 ) |
 					(( tm.tm_hour & 0x1F ) << 11 ) |
 					(( tm.tm_mday & 0x1F ) << 16 ) |
@@ -235,14 +303,15 @@ blargg_err_t Zip7_Extractor::next_v()
 			}
 
 			size_t name_length = SzArEx_GetFileNameUtf16( &impl->db, index, 0 );
+			size_t utf8_length = 0;
 			name16.resize( name_length );
 			SzArEx_GetFileNameUtf16( &impl->db, index, ( UInt16 * ) name16.begin() );
-			char * temp = blargg_to_utf8( name16.begin() );
-			if ( !temp ) temp = "";
-			size_t utf8_length = strlen( temp );
+			unsigned char temp[1024];
+			utf16ToUtf8( temp, &utf8_length, (const short*)name16.begin(), name_length - 1 );
+			temp[utf8_length] = '\0';
+
 			name8.resize( utf8_length + 1 );
 			memcpy( name8.begin(), temp, utf8_length + 1 );
-			free( temp );
 			set_name( name8.begin(), name16.begin() );
 			set_info( item.Size, 0, (item.CrcDefined ? item.Crc : 0) );
 			break;
