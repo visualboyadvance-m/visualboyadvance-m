@@ -8,22 +8,20 @@ if( COMMAND cmake_policy )
 endif( COMMAND cmake_policy )
 SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts )
 
-# Check for nasm
-ENABLE_LANGUAGE( ASM_NASM )
+option( ENABLE_SDL "Build the SDL port" ON )
+option( ENABLE_GTK "Build the GTK+ GUI" ON )
+option( ENABLE_DEBUGGER "Enable the debugger" ON )
+option( ENABLE_ASM_CORE "Enable x86 ASM CPU cores" OFF )
+option( ENABLE_ASM_SCALERS "Enable x86 ASM graphic filters" OFF )
+option( ENABLE_LINK "Enable GBA linking functionality" OFF )
+option( ENABLE_LIRC "Enable LIRC support" OFF )
 
-# Also need to look for SFML
-INCLUDE(CMakeScripts/FindSFML.cmake)
+# The SDL port can't be built without debugging support
+if( NOT ENABLE_DEBUGGER AND ENABLE_SDL )
+        message( SEND_ERROR "The SDL port can't be built without debugging support" )
+endif( NOT ENABLE_DEBUGGER AND ENABLE_SDL )
 
-# Both the SDL and the GTK+ frontends are built by default
-# To disable building the SDL frontend add -DNO_SDL=1 on the commandline
-# To disable building the GTK+ frontend add -DNO_GTK=1 on the commandline
-# To disable building the debugger, add -DNO_DEBUGGER=1.
-# The SDL frontend can't be built without debugger support
-# To use ASM scalers, add -DUSE_ASM_SCALERS=1
-# To use the ASM core, add -DUSE_ASM_CORE=1
 # Set the version number with -DVERSION=X.X.X-uber
-
-# Version number
 IF( NOT VERSION )
     SET( VERSION "1.8.0-SVN" )
 ENDIF( NOT VERSION )
@@ -31,47 +29,42 @@ ENDIF( NOT VERSION )
 # Fill in SDLMAIN_LIBRARY on OS X manually to avoid using SDLMain.m
 # OS X users will have to compile and install SDL from source.
 if( APPLE )
-	SET(SDLMAIN_LIBRARY "-lSDLmain")
+    SET(SDLMAIN_LIBRARY "-lSDLmain")
 endif( APPLE )
+
+# Check for nasm
+if( ENABLE_ASM_SCALERS )
+    ENABLE_LANGUAGE( ASM_NASM )
+endif( ENABLE_ASM_SCALERS )
 
 # Look for some dependencies using CMake scripts
 FIND_PACKAGE ( ZLIB REQUIRED )
 FIND_PACKAGE ( PNG REQUIRED )
 FIND_PACKAGE ( OpenGL REQUIRED )
 FIND_PACKAGE ( SDL REQUIRED )
-FIND_PACKAGE ( SFML )
+
+if( ENABLE_LINK )
+    FIND_PACKAGE ( SFML REQUIRED )
+endif( ENABLE_LINK )
 
 # Disable looking for GTK if not going to build the GTK frontend
 # so that pkg-config is not required
-IF(NOT NO_GTK)
+IF( ENABLE_GTK )
     FIND_PACKAGE ( PkgConfig REQUIRED )
 
     # These dependencies require pkg-config to be found
-    PKG_CHECK_MODULES ( GTKMM gtkmm-2.4 )
-    PKG_CHECK_MODULES ( GDKMM gdkmm-2.4 )
-    PKG_CHECK_MODULES ( GLIBMM glibmm-2.4 )
-    PKG_CHECK_MODULES ( GIOMM giomm-2.4 )
-    PKG_CHECK_MODULES ( GTKGLMM gtkglextmm-x11-1.2 )
-ENDIF(NOT NO_GTK)
+    PKG_CHECK_MODULES ( GTKMM REQUIRED gtkmm-2.4 )
+    PKG_CHECK_MODULES ( GDKMM REQUIRED gdkmm-2.4 )
+    PKG_CHECK_MODULES ( GLIBMM REQUIRED glibmm-2.4 )
+    PKG_CHECK_MODULES ( GIOMM REQUIRED giomm-2.4 )
+    PKG_CHECK_MODULES ( GTKGLMM REQUIRED gtkglextmm-x11-1.2 )
+ENDIF( ENABLE_GTK )
 
-# Check that the dependencies are met to build the SDL frontend
-IF( NOT NO_SDL )
-    IF( SDL_FOUND )
-        SET( CAN_BUILD_VBAM 1 )
-    ENDIF( SDL_FOUND )
-ENDIF( NOT NO_SDL )
-IF( WITH_LIRC )
+IF( ENABLE_LIRC )
         SET( WITHLIRC 1 )
-ELSE( WITH_LIRC )
+ELSE( ENABLE_LIRC )
         SET( WITHLIRC 0 )
-ENDIF( WITH_LIRC )
-
-# Check that the dependencies are met to build the GTK frontend
-IF( NOT NO_GTK )
-    IF( GLIBMM_FOUND AND GTKMM_FOUND AND SDL_FOUND )
-        SET( CAN_BUILD_GVBAM 1 )
-    ENDIF( GLIBMM_FOUND AND GTKMM_FOUND AND SDL_FOUND )
-ENDIF( NOT NO_GTK )
+ENDIF( ENABLE_LIRC )
 
 # Set the default install dir
 IF( NOT DATA_INSTALL_DIR )
@@ -87,32 +80,23 @@ ENDIF( NOT SYSCONFDIR )
 
 # C defines
 ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONFDIR='"${SYSCONFDIR}"' -DWITH_LIRC='${WITHLIRC}')
-
 ADD_DEFINITIONS (-DVERSION='"${VERSION}"' -DPKGDATADIR='"${PKGDATADIR}"' -DPACKAGE='')
 
-# Linking is disabled if SFML has not been found
-IF( NOT SFML_FOUND )
+if( NOT ENABLE_LINK )
     ADD_DEFINITIONS (-DNO_LINK)
-    MESSAGE(STATUS "SFML was not found, link support is disabled")
-ENDIF( NOT SFML_FOUND )
+endif( NOT ENABLE_LINK )
 
 # The debugger is enabled by default
-# The SDL port can't be built without debugging support
-IF( NO_DEBUGGER )
-    IF( CAN_BUILD_VBAM )
-        MESSAGE(STATUS "The SDL port can't be built without debugging support")
-        SET( CAN_BUILD_VBAM 0 )
-    ENDIF( CAN_BUILD_VBAM )
-
+if( NOT ENABLE_DEBUGGER )
     ADD_DEFINITIONS (-DNO_DEBUGGER)
-ELSE( NO_DEBUGGER )
+else( NOT ENABLE_DEBUGGER )
     ADD_DEFINITIONS (-DBKPT_SUPPORT)
-ENDIF( NO_DEBUGGER )
+endif( NOT ENABLE_DEBUGGER )
 
 # The ASM core is disabled by default because we don't know on which platform we are
-IF( NOT USE_ASM_CORE )
+IF( NOT ENABLE_ASM_CORE )
     ADD_DEFINITIONS (-DC_CORE)
-ENDIF( NOT USE_ASM_CORE )
+ENDIF( NOT ENABLE_ASM_CORE )
 
 # Compiler flags
 IF ( WIN32 )
@@ -266,19 +250,19 @@ SET(SRC_GTK
     src/common/SoundSDL.cpp
 )
 
-IF( NOT NO_DEBUGGER )
+if( ENABLE_DEBUGGER )
     SET(SRC_DEBUGGER
         src/gba/armdis.cpp
         src/gba/elf.cpp
         src/gba/remote.cpp
     )
-ENDIF( NOT NO_DEBUGGER )
+endif( ENABLE_DEBUGGER )
 
-IF(CMAKE_ASM_NASM_COMPILER_LOADED AND USE_ASM_SCALERS)
+if( ENABLE_ASM_SCALERS )
     SET(SRC_HQ ${SRC_HQ_ASM})
-ELSE(CMAKE_ASM_NASM_COMPILER_LOADED AND USE_ASM_SCALERS)
+else( ENABLE_ASM_SCALERS )
     SET(SRC_HQ ${SRC_HQ_C})
-ENDIF(CMAKE_ASM_NASM_COMPILER_LOADED AND USE_ASM_SCALERS)
+endif( ENABLE_ASM_SCALERS )
 
 INCLUDE_DIRECTORIES(
     ${ZLIB_INCLUDE_DIR}
@@ -287,7 +271,7 @@ INCLUDE_DIRECTORIES(
     ${SDL_INCLUDE_DIR}
 )
 
-IF( CAN_BUILD_GVBAM )
+IF( ENABLE_GTK )
     INCLUDE_DIRECTORIES(
         ${GLIBMM_INCLUDE_DIRS}
         ${GIOMM_INCLUDE_DIRS}
@@ -302,7 +286,7 @@ IF( CAN_BUILD_GVBAM )
         ${GTKMM_LIBRARY_DIRS}
         ${GTKGLMM_LIBRARY_DIRS}
     )
-ENDIF( CAN_BUILD_GVBAM )
+ENDIF( ENABLE_GTK )
 
 ADD_LIBRARY(
     fex
@@ -320,7 +304,7 @@ ADD_LIBRARY (
     ${SRC_DEBUGGER}
 )
 
-IF( CAN_BUILD_VBAM )
+IF( ENABLE_SDL )
     ADD_EXECUTABLE (
         vbam
         WIN32
@@ -332,9 +316,9 @@ IF( CAN_BUILD_VBAM )
         SET( WIN32_LIBRARIES wsock32 )
     ENDIF( WIN32 )
 
-    IF( WITH_LIRC )
+    IF( ENABLE_LIRC )
         SET( LIRC_CLIENT_LIBRARY lirc_client )
-    ENDIF( WITH_LIRC )
+    ENDIF( ENABLE_LIRC )
 
     TARGET_LINK_LIBRARIES (
         vbam
@@ -354,9 +338,9 @@ IF( CAN_BUILD_VBAM )
             DESTINATION ${SYSCONFDIR}
             RENAME vbam.cfg)
 
-ENDIF( CAN_BUILD_VBAM )
+ENDIF( ENABLE_SDL )
 
-IF( CAN_BUILD_GVBAM )
+IF( ENABLE_GTK )
     ADD_EXECUTABLE (
         gvbam
         WIN32
@@ -370,6 +354,7 @@ IF( CAN_BUILD_GVBAM )
         ${ZLIB_LIBRARY}
         ${PNG_LIBRARY}
         ${SDL_LIBRARY}
+        ${GTKMM_LIBRARIES}
         ${GTKGLMM_LIBRARIES}
         ${SFML_LIBRARY}
         fex
@@ -380,4 +365,4 @@ IF( CAN_BUILD_GVBAM )
     INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/icons/ DESTINATION share/icons/hicolor PATTERN ".svn" EXCLUDE)
     INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/ui DESTINATION ${DATA_INSTALL_DIR} PATTERN ".svn" EXCLUDE)
 
-ENDIF( CAN_BUILD_GVBAM )
+ENDIF( ENABLE_GTK )
