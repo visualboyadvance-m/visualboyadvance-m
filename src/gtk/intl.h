@@ -21,9 +21,7 @@
 #define __VBA_INTL_H__
 
 #ifdef ENABLE_NLS
-# include <libintl.h>
-# define _(String) gettext(String)
-# define N_(String) (String)
+# include <glibmm/i18n.h>
 #else
 # define _(String) (String)
 # define N_(String) (String)
