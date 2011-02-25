@@ -1,3 +1,9 @@
+vbam (1.8.0.1001-1) unstable; urgency=low
+
+  * Use new version from upstream
+
+ -- Bastien Bouclet <bbouclet@lapin>  Fri, 25 Feb 2011 12:25:25 +0100
+
 vbam (1.8.0.914-1) unstable; urgency=low
 
   * Cleanup, packages split into SDL and GTK+ versions
