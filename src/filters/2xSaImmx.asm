@@ -1,15 +1,22 @@
-;/*---------------------------------------------------------------------*
-; * The following (piece of) code, (part of) the 2xSaI engine,          *
-; * copyright (c) 1999 - 2001 by Derek Liauw Kie Fa.                    *
-; * Non-Commercial use of this software is allowed and is encouraged,   *
-; * provided that appropriate credit be given.                          *
-; * You may freely modify this code, but I request                      *
-; * that any improvements to the engine be submitted to me, so          *
-; * that I can implement these improvements in newer versions of        *
-; * the software.                                                       *
-; * If you need more information, have any comments or suggestions,     *
-; * you can e-mail me. My e-mail: derek-liauw@usa.net.                  *
-; *---------------------------------------------------------------------*/
+; 2xSaI engine
+; Copyright (C) 1999 - 2001 by Derek Liauw Kie Fa
+
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 2, or(at your option)
+; any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program; if not, write to the Free Software Foundation,
+; Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+; The author released that file under GPLv2+ on the Fedora legal list :
+; http://lists.fedoraproject.org/pipermail/legal/2009-October/000947.html
 
 ;----------------------
 ; 2xSaI version 0.59 WIP, soon to become version 0.60
