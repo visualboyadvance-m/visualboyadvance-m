@@ -53,6 +53,7 @@ class CheatListDialog : public Gtk::Dialog
 {
 public:
   CheatListDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder);
+  void vSetWindow(VBA::Window * _poWindow);
 
 private:
   void vAddCheat(int index, Glib::ustring desc, bool enabled = true);

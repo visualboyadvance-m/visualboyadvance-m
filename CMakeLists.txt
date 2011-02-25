@@ -246,6 +246,7 @@ SET(SRC_GTK
     src/gtk/gameboyadvanceconfig.cpp
     src/gtk/cheatlist.cpp
     src/gtk/cheatedit.cpp
+    src/gtk/gameboycheatlist.cpp
     src/gtk/joypadconfig.cpp
     src/gtk/directoriesconfig.cpp
     src/gtk/displayconfig.cpp

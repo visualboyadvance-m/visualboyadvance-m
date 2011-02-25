@@ -34,7 +34,9 @@ enum ECheatType
 {
   CheatGeneric,
   CheatGSA,
-  CheatCBA
+  CheatCBA,
+  CheatGS,
+  CheatGG
 };
 
 class EditCheatCodeColumns : public Gtk::TreeModel::ColumnRecord
@@ -59,6 +61,7 @@ public:
   Glib::RefPtr<Gtk::TextBuffer> vGetCode();
   Glib::ustring vGetDesc();
   ECheatType vGetType();
+  void vSetWindow(VBA::Window * _poWindow);
 
 private:
   void vOnApply();
