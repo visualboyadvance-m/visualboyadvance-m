@@ -74,7 +74,7 @@ void CheatListDialog::vOnCheatOpen()
   oDialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
   oDialog.add_button(Gtk::Stock::OPEN,   Gtk::RESPONSE_OK);
 
-  oDialog.set_current_folder(Glib::get_home_dir()); // TODO: remember dir?
+  oDialog.set_current_folder(Glib::get_home_dir());
 
   while (oDialog.run() == Gtk::RESPONSE_OK)
   {
@@ -111,6 +111,7 @@ void CheatListDialog::vOnCheatAdd()
   CheatEditDialog * poDialog = 0;
   poBuilder->get_widget_derived("CheatEditDialog", poDialog);
   poDialog->set_transient_for(*this);
+  poDialog->vSetWindow(m_poWindow);
   int response = poDialog->run();
   poDialog->hide();
 
@@ -198,6 +199,7 @@ void CheatListDialog::vOnCheatAdd()
       } // end of loop
 
     } // end of case
+    default:; // silence warnings
     } // end of switch
 
     vUpdateList(previous);
@@ -251,6 +253,11 @@ void CheatListDialog::vOnCheatToggled(Glib::ustring const& string_path)
   row[m_oRecordModel.bEnabled] = !row[m_oRecordModel.bEnabled];
 
   vToggleCheat(row[m_oRecordModel.iIndex], row[m_oRecordModel.bEnabled]);
+}
+
+void CheatListDialog::vSetWindow(VBA::Window * _poWindow)
+{
+  m_poWindow = _poWindow;
 }
 
 void CheatListDialog::vToggleCheat(int index, bool enable) {

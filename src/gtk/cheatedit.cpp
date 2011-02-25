@@ -42,23 +42,6 @@ CheatEditDialog::CheatEditDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::
 
   m_poCheatTypeComboBox->set_model(m_poCheatTypeStore);
 
-  Gtk::TreeModel::Row row = *(m_poCheatTypeStore->append());
-
-  row[m_oTypeModel.iType] = CheatGeneric;
-  row[m_oTypeModel.uText] = _("Generic Code");
-
-  row = *(m_poCheatTypeStore->append());
-
-  row[m_oTypeModel.iType] = CheatGSA;
-  row[m_oTypeModel.uText] = _("Gameshark Advance");
-
-  row = *(m_poCheatTypeStore->append());
-
-  row[m_oTypeModel.iType] = CheatCBA;
-  row[m_oTypeModel.uText] = _("CodeBreaker Advance");
-
-  m_poCheatTypeComboBox->set_active(CheatGeneric);
-
   m_poCheatApplyButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatEditDialog::vOnApply));
   m_poCheatCancelButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatEditDialog::vOnCancel));
 }
@@ -85,6 +68,47 @@ ECheatType CheatEditDialog::vGetType()
   }
 
   return CheatGeneric;
+}
+
+void CheatEditDialog::vSetWindow(VBA::Window * _poWindow)
+{
+  m_poWindow = _poWindow;
+
+  // GameBoy Advance
+  if (m_poWindow->eGetCartridge() == VBA::Window::CartridgeGBA)
+  {
+    Gtk::TreeModel::Row row = *(m_poCheatTypeStore->append());
+
+    row[m_oTypeModel.iType] = CheatGeneric;
+    row[m_oTypeModel.uText] = _("Generic Code");
+
+    row = *(m_poCheatTypeStore->append());
+
+    row[m_oTypeModel.iType] = CheatGSA;
+    row[m_oTypeModel.uText] = _("Gameshark Advance");
+
+    row = *(m_poCheatTypeStore->append());
+
+    row[m_oTypeModel.iType] = CheatCBA;
+    row[m_oTypeModel.uText] = _("CodeBreaker Advance");
+
+    m_poCheatTypeComboBox->set_active(CheatGeneric);
+  }
+  // GameBoy
+  else if (m_poWindow->eGetCartridge() == VBA::Window::CartridgeGB)
+  {
+    Gtk::TreeModel::Row row = *(m_poCheatTypeStore->append());
+
+    row[m_oTypeModel.iType] = CheatGS;
+    row[m_oTypeModel.uText] = _("GameShark");
+
+    row = *(m_poCheatTypeStore->append());
+
+    row[m_oTypeModel.iType] = CheatGG;
+    row[m_oTypeModel.uText] = _("GameGenie");
+
+    m_poCheatTypeComboBox->set_active(0);
+  }
 }
 
 void CheatEditDialog::vOnApply()
