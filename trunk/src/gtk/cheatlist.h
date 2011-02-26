@@ -21,10 +21,6 @@
 
 #include <gtkmm/toolbutton.h>
 
-#include "../System.h"
-#include "../gba/Cheats.h"
-#include "../gba/GBA.h"
-#include "../gba/Globals.h"
 #include "cheatedit.h"
 
 #include "window.h"
@@ -55,17 +51,26 @@ public:
   CheatListDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder);
   void vSetWindow(VBA::Window * _poWindow);
 
+protected:
+  virtual void vAddCheat(Glib::ustring sDesc, ECheatType type, Glib::RefPtr<Gtk::TextBuffer> buffer) = 0;
+  virtual bool vCheatListOpen(const char *file) = 0;
+  virtual void vCheatListSave(const char *file) = 0;
+  virtual void vRemoveCheat(int index) = 0;
+  virtual void vRemoveAllCheats() = 0;
+  virtual void vToggleCheat(int index, bool enable) = 0;
+  virtual void vUpdateList(int previous = 0) = 0;
+
+  Glib::RefPtr<Gtk::ListStore>  m_poCheatListStore;
+  ListCheatCodeColumns          m_oRecordModel;
+
 private:
-  void vAddCheat(int index, Glib::ustring desc, bool enabled = true);
-  void vOnCheatOpen();
-  void vOnCheatSave();
+  void vOnCheatListOpen();
+  void vOnCheatListSave();
   void vOnCheatAdd();
   void vOnCheatRemove();
   void vOnCheatRemoveAll();
   void vOnCheatMarkAll();
   void vOnCheatToggled(Glib::ustring const& string_path);
-  void vToggleCheat(int index, bool enable);
-  void vUpdateList(int previous = 0);
 
   VBA::Window *                 m_poWindow;
 
@@ -76,8 +81,6 @@ private:
   Gtk::ToolButton *             m_poCheatRemoveAllButton;
   Gtk::ToolButton *             m_poCheatMarkAllButton;
   Gtk::TreeView *               m_poCheatTreeView;
-  Glib::RefPtr<Gtk::ListStore>  m_poCheatListStore;
-  ListCheatCodeColumns          m_oRecordModel;
   
   bool bMark;
 };

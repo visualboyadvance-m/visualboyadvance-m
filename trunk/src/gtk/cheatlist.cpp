@@ -17,7 +17,6 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cheatlist.h"
-#include "tools.h"
 
 #include <gtkmm/stock.h>
 
@@ -56,19 +55,17 @@ CheatListDialog::CheatListDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::
 
   m_poCheatTreeView->append_column("Description", m_oRecordModel.uDesc);
 
-  m_poCheatOpenButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatListDialog::vOnCheatOpen));
-  m_poCheatSaveButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatListDialog::vOnCheatSave));
+  m_poCheatOpenButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatListDialog::vOnCheatListOpen));
+  m_poCheatSaveButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatListDialog::vOnCheatListSave));
   m_poCheatAddButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatListDialog::vOnCheatAdd));
   m_poCheatRemoveButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatListDialog::vOnCheatRemove));
   m_poCheatRemoveAllButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatListDialog::vOnCheatRemoveAll));
   m_poCheatMarkAllButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatListDialog::vOnCheatMarkAll));
 
   bMark = false;
-
-  vUpdateList();
 }
 
-void CheatListDialog::vOnCheatOpen()
+void CheatListDialog::vOnCheatListOpen()
 {
   Gtk::FileChooserDialog oDialog(*this, _("Open cheat list"));
   oDialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -79,11 +76,11 @@ void CheatListDialog::vOnCheatOpen()
   while (oDialog.run() == Gtk::RESPONSE_OK)
   {
     // delete existing cheats before loading the list
-    cheatsDeleteAll(false);
+    vRemoveAllCheats();
 
     m_poCheatListStore->clear();
 
-    if (cheatsLoadCheatList(oDialog.get_filename().c_str()))
+    if (vCheatListOpen(oDialog.get_filename().c_str()))
     {
       vUpdateList();
       break;
@@ -91,7 +88,7 @@ void CheatListDialog::vOnCheatOpen()
   }
 }
 
-void CheatListDialog::vOnCheatSave()
+void CheatListDialog::vOnCheatListSave()
 {
   Gtk::FileChooserDialog sDialog(*this, _("Save cheat list"));
   sDialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -100,7 +97,7 @@ void CheatListDialog::vOnCheatSave()
   sDialog.set_current_folder(Glib::get_home_dir());
 
   if (sDialog.run() == Gtk::RESPONSE_OK)
-    cheatsSaveCheatList(sDialog.get_filename().c_str());
+    vCheatListSave(sDialog.get_filename().c_str());
 }
 
 void CheatListDialog::vOnCheatAdd()
@@ -116,95 +113,7 @@ void CheatListDialog::vOnCheatAdd()
   poDialog->hide();
 
   if (response == Gtk::RESPONSE_APPLY)
-  {
-    Glib::ustring sDesc = poDialog->vGetDesc();
-
-    int previous = cheatsNumber;
-
-    switch (poDialog->vGetType())
-    {
-    // Generic Code
-    case CheatGeneric:
-    {
-      std::vector<Glib::ustring> tokens;
-      Glib::RefPtr<Gtk::TextBuffer> code_buffer = poDialog->vGetCode();
-
-      vTokenize(code_buffer->get_text(), tokens);
-
-      for (std::vector<Glib::ustring>::iterator it = tokens.begin();
-          it != tokens.end();
-          it++)
-      {
-        Glib::ustring sToken = it->uppercase();
-
-        cheatsAddCheatCode(sToken.c_str(), sDesc.c_str());
-      }
-
-      break;
-    }
-    // Gameshark Advance & CodeBreaker Advance
-    case CheatGSA:
-    case CheatCBA:
-    {
-      std::vector<Glib::ustring> tokens;
-      Glib::RefPtr<Gtk::TextBuffer> code_buffer = poDialog->vGetCode();
-
-      Glib::ustring sToken;
-      Glib::ustring sCode;
-      Glib::ustring sPart = "";
-
-      vTokenize(code_buffer->get_text(), tokens);
-
-      for (std::vector<Glib::ustring>::iterator it = tokens.begin();
-          it != tokens.end();
-          it++)
-      {
-
-        sToken = it->uppercase();
-        const char *cToken = sToken.c_str();
-
-        if (sToken.size() == 16)
-        {
-          cheatsAddGSACode(cToken, sDesc.c_str(), false);
-        }
-        else if (sToken.size() == 12)
-        {
-          sCode = sToken.substr(0,8);
-          sCode += " ";
-          sCode += sToken.substr(9,4); // TODO: is this safe?
-          cheatsAddCBACode(sCode.c_str(), sDesc.c_str());
-        }
-        else
-          if (sPart.empty())
-          {
-            sPart = sToken;
-          }
-          else
-          {
-            if (sToken.size() == 4)
-            {
-              sCode = sPart;
-              sCode += " ";
-              sCode += cToken;
-              cheatsAddCBACode(sCode.c_str(), sDesc.c_str());
-            }
-            else
-            {
-              sCode = sPart + sToken;
-              cheatsAddGSACode(sCode.c_str(), sDesc.c_str(), true);
-            }
-
-            sPart = "";
-          }
-      } // end of loop
-
-    } // end of case
-    default:; // silence warnings
-    } // end of switch
-
-    vUpdateList(previous);
-
-  } // end of condition
+    vAddCheat(poDialog->vGetDesc(), poDialog->vGetType(), poDialog->vGetCode());
 }
 
 void CheatListDialog::vOnCheatRemove()
@@ -215,7 +124,7 @@ void CheatListDialog::vOnCheatRemove()
   {
     Gtk::TreeModel::Row row = *iter;
 
-    cheatsDelete(row[m_oRecordModel.iIndex], false);
+    vRemoveCheat(row[m_oRecordModel.iIndex]);
 
     m_poCheatListStore->erase(iter);
   }
@@ -223,7 +132,7 @@ void CheatListDialog::vOnCheatRemove()
 
 void CheatListDialog::vOnCheatRemoveAll()
 {
-  cheatsDeleteAll(false);
+  vRemoveAllCheats();
 
   m_poCheatListStore->clear();
 }
@@ -258,26 +167,6 @@ void CheatListDialog::vOnCheatToggled(Glib::ustring const& string_path)
 void CheatListDialog::vSetWindow(VBA::Window * _poWindow)
 {
   m_poWindow = _poWindow;
-}
-
-void CheatListDialog::vToggleCheat(int index, bool enable) {
-  if (enable)
-    cheatsEnable(index);
-  else
-    cheatsDisable(index);
-}
-
-void CheatListDialog::vUpdateList(int previous)
-{
-  for (int i = previous; i < cheatsNumber;  i++)
-  {
-    // Add row for each newly added cheat
-    Gtk::TreeModel::Row row = *(m_poCheatListStore->append());
-
-    row[m_oRecordModel.iIndex] = i;
-    row[m_oRecordModel.bEnabled] = cheatsList[i].enabled;
-    row[m_oRecordModel.uDesc] = cheatsList[i].desc;
-  }
 }
 
 } // namespace VBA

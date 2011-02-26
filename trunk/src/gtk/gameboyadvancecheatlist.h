@@ -16,19 +16,22 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#ifndef __VBA_GAMEBOYCHEATLIST_H__
-#define __VBA_GAMEBOYCHEATLIST_H__
+#ifndef __VBA_GAMEBOYADVANCECHEATLIST_H__
+#define __VBA_GAMEBOYADVANCECHEATLIST_H__
 
-#include "../gb/gbCheats.h"
+#include "../System.h"
+#include "../gba/Cheats.h"
+#include "../gba/GBA.h"
+#include "../gba/Globals.h"
 #include "cheatlist.h"
 
 namespace VBA
 {
 
-class GameBoyCheatListDialog : public CheatListDialog
+class GameBoyAdvanceCheatListDialog : public CheatListDialog
 {
 public:
-  GameBoyCheatListDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder);
+  GameBoyAdvanceCheatListDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder);
 
 protected:
   void vAddCheat(Glib::ustring sDesc, ECheatType type, Glib::RefPtr<Gtk::TextBuffer> buffer);
