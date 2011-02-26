@@ -41,7 +41,7 @@
 #include "gameboyconfig.h"
 #include "gameboyadvanceconfig.h"
 #include "generalconfig.h"
-#include "cheatlist.h"
+#include "gameboyadvancecheatlist.h"
 #include "gameboycheatlist.h"
 
 namespace VBA
@@ -451,7 +451,7 @@ void Window::vOnCheatList()
     std::string sUiFile = sGetUiFilePath("cheatlist.ui");
     Glib::RefPtr<Gtk::Builder> poBuilder = Gtk::Builder::create_from_file(sUiFile);
 
-    CheatListDialog * poDialog = 0;
+    GameBoyAdvanceCheatListDialog * poDialog = 0;
     poBuilder->get_widget_derived("CheatListDialog", poDialog);
     poDialog->set_transient_for(*this);
     poDialog->vSetWindow(this);
