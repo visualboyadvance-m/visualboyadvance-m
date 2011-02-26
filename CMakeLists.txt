@@ -113,8 +113,11 @@ IF ( WIN32 )
 ELSE ( WIN32 )
     SET( CMAKE_ASM_NASM_FLAGS "-I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -DELF -w-orphan-labels")
 ENDIF ( WIN32 )
-SET( CMAKE_C_FLAGS "-O3 -Wall")
-SET( CMAKE_CXX_FLAGS "-O3 -Wall")
+
+SET( CMAKE_C_FLAGS_RELEASE "-O3")
+SET( CMAKE_CXX_FLAGS_RELEASE "-O3")
+SET( CMAKE_C_FLAGS_DEBUG "-g -Wall")
+SET( CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
 
 # Source files definition
 SET(SRC_FEX
