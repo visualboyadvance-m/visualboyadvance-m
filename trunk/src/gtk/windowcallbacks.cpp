@@ -542,9 +542,7 @@ bool Window::bOnEmuIdle()
 
 bool Window::on_focus_in_event(GdkEventFocus * _pstEvent)
 {
-  if (emulating
-      && ! m_bPaused
-      && m_poCoreConfig->oGetKey<bool>("pause_when_inactive"))
+  if (emulating && !m_bPaused)
   {
     vStartEmu();
     soundResume();
@@ -555,7 +553,7 @@ bool Window::on_focus_in_event(GdkEventFocus * _pstEvent)
 bool Window::on_focus_out_event(GdkEventFocus * _pstEvent)
 {
   if (emulating
-      && ! m_bPaused
+      && !m_bPaused
       && m_poCoreConfig->oGetKey<bool>("pause_when_inactive"))
   {
     vStopEmu();
