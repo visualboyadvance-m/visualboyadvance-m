@@ -1,2 +1,2 @@
-GETTEXT_CREATE_TRANSLATIONS(gvbam.pot gvbam/en.po gvbam/fr.po gvbam/de.po)
+GETTEXT_CREATE_TRANSLATIONS(gvbam.pot gvbam/de.po gvbam/en.po gvbam/es_ES.po gvbam/fr.po gvbam/zh_CN.po)
 ADD_DEPENDENCIES(gvbam translations)
