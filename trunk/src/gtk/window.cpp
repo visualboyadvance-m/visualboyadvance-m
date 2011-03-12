@@ -926,7 +926,8 @@ void Window::vApplyPerGameConfig()
 
   if (oKeyFile.has_key(csGameID, "flashSize"))
   {
-    int iFlashSize = oKeyFile.get_integer(csGameID, "flashSize");
+    Glib::ustring sFlashSize = oKeyFile.get_string(csGameID, "flashSize");
+    int iFlashSize = atoi(sFlashSize.c_str());
     if (iFlashSize == 0x10000 || iFlashSize == 0x20000)
       flashSetSize(iFlashSize);
   }
