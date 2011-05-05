@@ -2016,6 +2016,7 @@ void gbVblank_interrupt()
 
 void gbLcd_interrupt()
 {
+  gbCheatWrite(false); // Emulates GS codes.
   gbMemory[0xff0f] = register_IF &= 0xfd;
   gbWriteMemory(--SP.W, PC.B.B1);
   gbWriteMemory(--SP.W, PC.B.B0);
