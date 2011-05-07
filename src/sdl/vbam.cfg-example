@@ -69,7 +69,7 @@ Motion_Down=0102
 
 # OpenGL mode:
 # 0 = don't use OpenGL, 1 = no texture filtering, 2 = bilinear filtering
-openGL=0
+openGL=1
 # when using OpenGL scaling and 'no filter' (called the 1x filter, number 0),
 # make the window this many times taller and wider:
 openGLscale=1
