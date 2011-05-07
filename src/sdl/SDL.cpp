@@ -133,7 +133,7 @@ int sdlPrintUsage = 0;
 int cartridgeType = 3;
 int captureFormat = 0;
 
-int openGL = 0;
+int openGL = 1;
 int textureSize = 256;
 GLuint screenTexture = 0;
 u8 *filterPix = 0;
