@@ -697,3 +697,21 @@ long ZEXPORT memtell(file)
 
     return memTell(s->file);
 }
+
+long ZEXPORT memgzseek(gzFile file, long off, int whence)
+{
+    if(whence != SEEK_CUR) {
+	fputs("FIXME: memgzio does not support seeking\n", stderr);
+	exit(1);
+    }
+    // this is inefficient, but the best I can do without actually reading
+    // the above code
+    char buf[80];
+    while(off > 0) {
+	int r = memgzread(file, buf, off > 80 ? 80 : off);
+	if(r <= 0)
+	    return -1;
+	off -= r;
+    }
+    return memtell(file);
+}

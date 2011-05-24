@@ -16,6 +16,16 @@ option( ENABLE_ASM_CORE "Enable x86 ASM CPU cores" OFF )
 option( ENABLE_ASM_SCALERS "Enable x86 ASM graphic filters" OFF )
 option( ENABLE_LINK "Enable GBA linking functionality" OFF )
 option( ENABLE_LIRC "Enable LIRC support" OFF )
+if(ENABLE_ASM_SCALERS)
+    option( ENABLE_MMX "Enable MMX" OFF )
+endif(ENABLE_ASM_SCALERS)
+option( ENABLE_GBA_LOGGING "Enable extended GBA logging" ON )
+if( ENABLE_GBA_LOGGING )
+   ADD_DEFINITIONS (-DGBA_LOGGING )
+endif( ENABLE_GBA_LOGGING )
+if(ENABLE_MMX)
+  ADD_DEFINITIONS (-DMMX)
+endif(ENABLE_MMX)
 
 # The SDL port can't be built without debugging support
 if( NOT ENABLE_DEBUGGER AND ENABLE_SDL )
@@ -24,7 +34,13 @@ endif( NOT ENABLE_DEBUGGER AND ENABLE_SDL )
 
 # Set the version number with -DVERSION=X.X.X-uber
 IF( NOT VERSION )
-    SET( VERSION "1.8.0-SVN" )
+    FIND_PACKAGE(Subversion)
+    IF(SUBVERSION_FOUND)
+       Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} SVN_INFO)
+        SET( VERSION "1.8.0-SVN${SVN_INFO_WC_REVISION}" )
+    ELSE(SUBVERSION_FOUND)
+        SET( VERSION "1.8.0-SVN" )
+    ENDIF(SUBVERSION_FOUND)
 ENDIF( NOT VERSION )
 
 # Fill in SDLMAIN_LIBRARY on OS X manually to avoid using SDLMain.m
@@ -61,6 +77,17 @@ IF( ENABLE_GTK )
     PKG_CHECK_MODULES ( GIOMM REQUIRED giomm-2.4 )
     PKG_CHECK_MODULES ( GTKGLMM REQUIRED gtkglextmm-x11-1.2 )
 ENDIF( ENABLE_GTK )
+
+option( ENABLE_FFMPEG "Enable ffmpeg A/V recording" ON )
+if(ENABLE_FFMPEG)
+    FIND_PACKAGE ( PkgConfig REQUIRED )
+
+    PKG_CHECK_MODULES(FFMPEG REQUIRED libavcodec libavformat libswscale libavutil)
+endif(ENABLE_FFMPEG)
+
+if(NOT ENABLE_FFMPEG)
+  ADD_DEFINITIONS(-DNO_FFMPEG)
+endif(NOT ENABLE_FFMPEG)
 
 IF( ENABLE_LIRC )
         SET( WITHLIRC 1 )
@@ -156,6 +183,10 @@ SET(SRC_MAIN
     src/common/Patch.cpp
     src/common/memgzio.c
 )
+
+if(ENABLE_FFMPEG)
+    SET(SRC_MAIN ${SRC_MAIN} src/common/ffmpeg.cpp)
+endif(ENABLE_FFMPEG)
 
 SET(SRC_GBA
     src/gba/agbprint.cpp
