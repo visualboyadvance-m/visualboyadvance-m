@@ -302,26 +302,26 @@ static void debuggerPrintBaseType(Type *t, u32 value, u32 location,
     case DW_ATE_signed:
       switch(debuggerRadix) {
       case 0:
-        printf("%lld", value);
+        printf("%lld", (long long)value);
         break;
       case 1:
-        printf("0x%llx", value);
+        printf("0x%llx", (long long)value);
         break;
       case 2:
-        printf("0%llo", value);
+        printf("0%llo", (long long)value);
         break;
       }
       break;
     case DW_ATE_unsigned:
       switch(debuggerRadix) {
       case 0:
-        printf("%llu", value);
+        printf("%llu", (unsigned long long)value);
         break;
       case 1:
-        printf("0x%llx", value);
+        printf("0x%llx", (unsigned long long)value);
         break;
       case 2:
-        printf("0%llo", value);
+        printf("0%llo", (unsigned long long)value);
         break;
       }
       break;

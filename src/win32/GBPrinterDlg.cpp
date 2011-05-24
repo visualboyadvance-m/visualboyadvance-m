@@ -467,12 +467,14 @@ void GBPrinterDlg::OnPaint()
 }
 
 void systemGbPrint(u8 *data,
+		   int datalen,
                    int pages,
                    int feed,
                    int palette,
                    int contrast)
 {
   GBPrinterDlg printer;
+  memset(data + datalen, 0, 160*144/4 - datalen);
   printer.processData(data);
   printer.DoModal();
 }
