@@ -40,7 +40,7 @@ u8  gbSgbScreenBuffer[4160];
 
 inline void gbSgbDraw24Bit(u8 *p, u16 v)
 {
-  *((u32*) p) = systemColorMap32[v];
+  memcpy(p, &systemColorMap32[v], 3);
 }
 
 inline void gbSgbDraw32Bit(u32 *p, u16 v)

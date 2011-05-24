@@ -4976,6 +4976,8 @@ void gbEmulate(int ticksToStop)
                 gbSgbRenderBorder();
               //if (gbScreenOn)
                 systemDrawScreen();
+		if(systemPauseOnFrame())
+		    ticksToStop = 0;
             }
             gbFrameSkipCount = 0;
           } else
@@ -5160,6 +5162,8 @@ void gbEmulate(int ticksToStop)
                 gbSgbRenderBorder();
                   //if (gbScreenOn)
                 systemDrawScreen();
+		if(systemPauseOnFrame())
+		    ticksToStop = 0;
             }
             }
             if(systemReadJoypads()) {

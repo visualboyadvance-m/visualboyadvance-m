@@ -50,6 +50,7 @@ public:
 
 class Gb_Env : public Gb_Osc {
 public:
+	Gb_Env() : env_enabled(false), env_delay(0) {}
 	int  env_delay;
 	int  volume;
 	bool env_enabled;

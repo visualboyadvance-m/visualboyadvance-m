@@ -115,6 +115,7 @@ int systemGetSensorY()
 }
 
 void systemGbPrint(u8 * _puiData,
+		   int  _iLen,
                    int  _iPages,
                    int  _iFeed,
                    int  _iPalette,

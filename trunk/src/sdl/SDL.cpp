@@ -2591,7 +2591,7 @@ u32 systemGetClock()
   return SDL_GetTicks();
 }
 
-void systemGbPrint(u8 *data,int pages,int feed,int palette, int contrast)
+void systemGbPrint(u8 *data,int len,int pages,int feed,int palette, int contrast)
 {
 }
 

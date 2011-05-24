@@ -598,6 +598,7 @@ gzFile utilMemGzOpen(char *memory, int available, const char *mode)
   utilGzWriteFunc = memgzwrite;
   utilGzReadFunc = memgzread;
   utilGzCloseFunc = memgzclose;
+  utilGzSeekFunc = memgzseek;
 
   return memgzopen(memory, available, mode);
 }
