@@ -182,6 +182,7 @@ SET(SRC_MAIN
     src/Util.cpp
     src/common/Patch.cpp
     src/common/memgzio.c
+    src/common/SoundSDL.cpp
 )
 
 if(ENABLE_FFMPEG)
@@ -192,6 +193,7 @@ SET(SRC_GBA
     src/gba/agbprint.cpp
     src/gba/bios.cpp
     src/gba/Cheats.cpp
+    src/gba/CheatSearch.cpp
     src/gba/EEprom.cpp
     src/gba/Flash.cpp
     src/gba/GBA.cpp
@@ -237,11 +239,10 @@ SET(SRC_APU
 SET(SRC_SDL
     src/sdl/debugger.cpp
     src/sdl/SDL.cpp
-    src/sdl/dummy.cpp
+#    src/sdl/dummy.cpp
     src/sdl/filters.cpp
     src/sdl/text.cpp
     src/sdl/inputSDL.cpp
-    src/common/SoundSDL.cpp
     src/sdl/expr.cpp
     src/sdl/exprNode.cpp
     src/sdl/expr-lex.cpp
@@ -292,7 +293,6 @@ SET(SRC_GTK
     src/gtk/tools.cpp
     src/gtk/window.cpp
     src/sdl/inputSDL.cpp
-    src/common/SoundSDL.cpp
 )
 
 if( ENABLE_DEBUGGER )
