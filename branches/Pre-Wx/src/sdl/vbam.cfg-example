@@ -1,0 +1,222 @@
+# All numeric values are in hexadecimal
+# Use TAB or EQUAL sign to separate name from value
+
+#
+# Key configuration (all numbers are in hexadecimal!)
+#
+# Keys values are in the format YYYYXXXX where YYYY is the device number.
+# 0 means keyboard and XXXX is the SDL define for the desired key
+# (read SDL_keysym.h).
+#
+# If YYYY is greater than 0, it means joystick number YYYY-1 and it uses the
+# following format for XXXX:
+#
+# - if XXXX < 20, XXXX is the axis number multiplied by 2. An even number means
+#   movement to the negative side (on the X axis, it means left). An odd
+#   number means movement to the positive side (on the X axis, it mean
+#   right). For the Y axis, negative means up and positive means down.
+#   X axis is usally axis number 0 and Y is axis number 1.
+# - if 20 >= XXXX > 30, then XXXX is the HAT number multiplied by 4 plus the
+#   direction: 0 for up, 1 for down, 2 for right and 3 for left. Example:
+#   0021 is HAT 0 down, 0026 is HAT 1 right.
+# - if 80 >= XXXX > 100, XXXX is the joystick button number (XXXX-0080).
+#
+# Default key configuration is (value in parenthesis):
+#
+# Left          Left Arrow  (00000114)
+# Right         Right Arrow (00000113)
+# Up            Up Arrow    (00000111)
+# Down          Down Arrow  (00000112)
+# A             Z           (0000007a)
+# B             X           (00000078)
+# L             A           (00000061)
+# R             S           (00000073)
+# Start         ENTER       (0000000d)
+# Select        BACKSPACE   (00000008)
+# Speed up      SPACE       (00000020)
+# Capture       F12         (00000125)
+# Auto A        Q           (00000071)
+# Auto B        W           (00000077)
+#
+Joy0_Left=0114
+Joy0_Right=0113
+Joy0_Up=0111
+Joy0_Down=0112
+Joy0_A=007a
+Joy0_B=0078
+Joy0_L=0061
+Joy0_R=0073
+Joy0_Start=000d
+Joy0_Select=0008
+Joy0_Speed=0020
+Joy0_Capture=0125
+Joy0_AutoA=0071
+Joy0_AutoB=0077
+
+# Motion support keys. Same format as above
+#
+# Default keys are (value in parenthesis):
+#
+# Left          Numeric Pad 4 (0104)
+# Right         Numeric Pad 6 (0106)
+# Up            Numeric Pad 8 (0108)
+# Down          Numeric Pad 2 (0102)
+#
+Motion_Left=0104
+Motion_Right=0106
+Motion_Up=0108
+Motion_Down=0102
+
+# OpenGL mode:
+# 0 = don't use OpenGL, 1 = no texture filtering, 2 = bilinear filtering
+openGL=1
+# when using OpenGL scaling and 'no filter' (called the 1x filter, number 0),
+# make the window this many times taller and wider:
+openGLscale=1
+
+# Frame skip setting. Allowed values are from 0 to 5 only.
+frameSkip=0
+
+# Gameboy Frame skip setting. Allowed values are from 0 to 5 only.
+gbFrameSkip=0
+
+# Use fullscreen mode. 0=false, any other value means true
+fullScreen=0
+
+# Use bios file. 0=false, any other value means true
+useBios=0
+
+# GBA bios file full path and name (ZIP not supported)
+biosFile=none
+
+# GB bios file full path and name (ZIP not supported)
+gbBiosFile=none
+
+# Skip bios code
+# 0=disable, anything else skips BIOS code
+skipBios=0
+
+# Filter to use:
+# 0 = Stretch 1x (no filter), 1 = Stretch 2x, 2 = 2xSaI, 3 = Super 2xSaI,
+# 4 = Super Eagle, 5 = Pixelate, 6 = Motion Blur, 7 = AdvanceMAME Scale2x,
+# 8 = Bilinear, 9 = Bilinear Plus, 10 = Scanlines, 11 = TV Mode, 12 = lq2x,
+# 13 = hq2x, 14 = Stretch 3x, 15 = hq3x, 16 = Stretch 4x, 17 = hq4x
+filter=1
+
+# Disable status messages. 0=false, any other value means true
+disableStatus=0
+
+# Enable Gameboy border. 0=false, any other value means true
+borderOn=0
+
+# Controls automatic SGB border
+# 0=disable, anything else enables automatic SGB border display
+borderAutomatic=0
+
+# Gameboy emulator type. 0=automatic, 1=CGB/GBC, 2=SGB, 3=GB, 4=GBA, 5=SGB2
+emulatorType=0
+
+# Enable washed colors. 0=false, any other value means true
+colorOption=1
+
+# Directories. Not setting one them makes the file go the rom directory.
+
+# Save state directory
+#saveDir=
+
+# Screen shot Capture directory
+#captureDir=
+
+# Battery directory
+#batteryDir=
+
+# Screen capture format
+# 0=PNG, anything else for BMP
+captureFormat=0
+
+# Sound quality
+# 1=44 Khz, 2=22Khz, 4=11Khz
+soundQuality=2
+
+# GB Sound Stereo
+# 0=false, anything else for true
+soundStereo=0
+
+# GB Sound Echo
+# 0=false, anything else for true
+soundEcho=0
+
+# GB Sound Surround
+# 0=false, anything else for true
+soundSurround=0
+
+# GB Sound Declicking
+# 0=false, anything else for true
+declicking=1
+
+# Save Type
+# 0=automatic, 1=EEPROM, 2=SRAM, 3=Flash, 4=EEPROM+Sensor, 5=NONE
+saveType=0
+
+# Flash size
+# 0=64K Flash, 1=128K Flash
+flashSize=0
+
+# Sound volume
+# 0-200=0%-200%
+soundVolume=100
+
+# Interframe blending
+# 0=none, 1=motion blur, 2=smart
+ifbType=0
+
+# Show emulation speed
+# 0=none, 1=percentage, 2=detailed
+showSpeed=1
+
+# Show speed in transparent mode
+# 0=normal, anything else for transparent
+showSpeedTransparent=1
+
+# Enable/Disable auto frameskip
+# 0=disable, anything else to enable
+autoFrameSkip=0
+
+# Sets the desired throttle
+# 0=disable, 5...1000 valid throttle speeds
+throttle=0
+
+# Pauses the emulator when the window is inactive
+# 0=disable, anything else to enable
+pauseWhenInactive=0
+
+# Enables AGBPrint support
+# 0=disable, anything else to enable
+agbPrint=0
+
+# Enables GBA RTC support
+# 0=disable, anything else to enable
+rtcEnabled=0
+
+# Sound Enable
+# Controls which channels are enabled: (add values)
+#   1 - Channel 1
+#   2 - Channel 2
+#   4 - Channel 3
+#   8 - Channel 4
+# 100 - DirectSound A
+# 200 - DirectSound B
+# 30f=all enabled, 0=mute all
+soundEnable=30f
+
+# The interval between the rewind saves
+# Minimum of 0 seconds to disable rewind support, 
+# Maximum of 10 minutes (258). Value in seconds (hexadecimal numbers)
+rewindTimer=0
+
+# type of save/load keyboard control
+# if 0, then SHIFT+F# saves, F# loads (old VBA, ...)
+# if 1, then SHIFT+F# loads, F# saves (linux snes9x, ...)
+# if 2, then F5 decreases slot number, F6 increases, F7 saves, F8 loads // not implemented
+saveKeysSwitch=2
+

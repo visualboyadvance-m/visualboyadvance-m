@@ -1,0 +1,63 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VisualBoyAdvance-M", "VBA2008.vcproj", "{6D4C5EC8-933F-4C05-A1BF-498E658576DF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0008960E-E0DD-41A6-8265-00B31DDB4C21} = {0008960E-E0DD-41A6-8265-00B31DDB4C21}
+		{3E03C179-8251-46E4-81F4-466F114BAC63} = {3E03C179-8251-46E4-81F4-466F114BAC63}
+		{823DDC98-42D5-4A38-88CF-9DC06C788AE4} = {823DDC98-42D5-4A38-88CF-9DC06C788AE4}
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0} = {7AEC599C-7C82-4F00-AA60-411E0A359CB0}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dependencies", "dependencies", "{8B814174-883E-43D0-969E-3A17D8EDE080}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\..\..\dependencies\zlib\zlib.vcproj", "{3E03C179-8251-46E4-81F4-466F114BAC63}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SFML_Network", "..\..\..\dependencies\SFML\build\vc2008\sfml-network.vcproj", "{823DDC98-42D5-4A38-88CF-9DC06C788AE4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "..\..\..\dependencies\lpng140\projects\visualc9\libpng.vcproj", "{0008960E-E0DD-41A6-8265-00B31DDB4C21}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3E03C179-8251-46E4-81F4-466F114BAC63} = {3E03C179-8251-46E4-81F4-466F114BAC63}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "File_Extractor", "..\..\fex\File_Extractor2008.vcproj", "{7AEC599C-7C82-4F00-AA60-411E0A359CB0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3E03C179-8251-46E4-81F4-466F114BAC63} = {3E03C179-8251-46E4-81F4-466F114BAC63}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6D4C5EC8-933F-4C05-A1BF-498E658576DF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6D4C5EC8-933F-4C05-A1BF-498E658576DF}.Debug|Win32.Build.0 = Debug|Win32
+		{6D4C5EC8-933F-4C05-A1BF-498E658576DF}.Release|Win32.ActiveCfg = Release|Win32
+		{6D4C5EC8-933F-4C05-A1BF-498E658576DF}.Release|Win32.Build.0 = Release|Win32
+		{3E03C179-8251-46E4-81F4-466F114BAC63}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3E03C179-8251-46E4-81F4-466F114BAC63}.Debug|Win32.Build.0 = Debug|Win32
+		{3E03C179-8251-46E4-81F4-466F114BAC63}.Release|Win32.ActiveCfg = Release|Win32
+		{3E03C179-8251-46E4-81F4-466F114BAC63}.Release|Win32.Build.0 = Release|Win32
+		{823DDC98-42D5-4A38-88CF-9DC06C788AE4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{823DDC98-42D5-4A38-88CF-9DC06C788AE4}.Debug|Win32.Build.0 = Debug|Win32
+		{823DDC98-42D5-4A38-88CF-9DC06C788AE4}.Release|Win32.ActiveCfg = Release|Win32
+		{823DDC98-42D5-4A38-88CF-9DC06C788AE4}.Release|Win32.Build.0 = Release|Win32
+		{0008960E-E0DD-41A6-8265-00B31DDB4C21}.Debug|Win32.ActiveCfg = LIB Debug|Win32
+		{0008960E-E0DD-41A6-8265-00B31DDB4C21}.Debug|Win32.Build.0 = LIB Debug|Win32
+		{0008960E-E0DD-41A6-8265-00B31DDB4C21}.Release|Win32.ActiveCfg = LIB Release|Win32
+		{0008960E-E0DD-41A6-8265-00B31DDB4C21}.Release|Win32.Build.0 = LIB Release|Win32
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0}.Debug|Win32.Build.0 = Debug|Win32
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0}.Release|Win32.ActiveCfg = Release|Win32
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3E03C179-8251-46E4-81F4-466F114BAC63} = {8B814174-883E-43D0-969E-3A17D8EDE080}
+		{823DDC98-42D5-4A38-88CF-9DC06C788AE4} = {8B814174-883E-43D0-969E-3A17D8EDE080}
+		{0008960E-E0DD-41A6-8265-00B31DDB4C21} = {8B814174-883E-43D0-969E-3A17D8EDE080}
+		{7AEC599C-7C82-4F00-AA60-411E0A359CB0} = {8B814174-883E-43D0-969E-3A17D8EDE080}
+	EndGlobalSection
+EndGlobal
