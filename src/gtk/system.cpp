@@ -175,3 +175,18 @@ void debuggerBreakOnWrite(u32 address, u32 oldvalue, u32 value, int size, int t)
 void (*dbgMain)() = debuggerMain;
 void (*dbgSignal)(int, int) = debuggerSignal;
 void (*dbgOutput)(const char *, u32) = debuggerOutput;
+
+void log(const char *defaultMsg, ...)
+{
+  static FILE *out = NULL;
+
+  if(out == NULL) {
+    out = fopen("trace.log","w");
+  }
+
+  va_list valist;
+
+  va_start(valist, defaultMsg);
+  vfprintf(out, defaultMsg, valist);
+  va_end(valist);
+}
