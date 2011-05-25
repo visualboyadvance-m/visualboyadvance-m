@@ -17,7 +17,12 @@ typedef union {
   u16 W;
 } gbRegister;
 
+extern gbRegister AF, BC, DE, HL, SP, PC;
+extern u16 IFF;
+int gbDis(char *, u16);
+
 bool gbLoadRom(const char *);
+bool gbUpdateSizes();
 void gbEmulate(int);
 void gbWriteMemory(register u16, register u8);
 void gbDrawLine();

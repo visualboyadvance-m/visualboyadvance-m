@@ -234,7 +234,8 @@ void remotePutPacket(const char *packet)
   char c = 0;
   while(c != '+'){
     remoteSendFnc(buffer, (int)count + 4);
-    remoteRecvFnc(&c, 1);
+    if(remoteRecvFnc(&c, 1) < 0)
+	  return;
 //    fprintf(stderr,"sent:%s recieved:%c\n",buffer,c);
   }
 }
@@ -571,7 +572,8 @@ void remoteStubMain()
 #endif
       debugger = false;
       break;
-    }
+    } else if(res == -2)
+      break;
     if(res < 1024){
       buffer[res] = 0;
     }else{

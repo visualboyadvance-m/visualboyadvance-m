@@ -7,7 +7,11 @@
 // http://www.hiend3d.com/hq2x.html
 // Modified by suanyuan
 //---------------------------------------------------------------------------------------------------------------------------
+#ifdef __MSW__
 #include	<windows.h>
+#else
+#define HMODULE void *
+#endif
 
 //---------------------------------------------------------------------------------------------------------------------------
 typedef struct
@@ -54,9 +58,15 @@ typedef	RENDER_PLUGIN_INFO	*(*RENDPLUG_GetInfo)(void);
 #define	RPI_565_SUPP	0x000000800
 #define	RPI_888_SUPP	0x000001000
 
+#define RPI_DST_WIDE	0x000008000
+
+#define RPI_OUT_SCL1	0x000010000
 #define	RPI_OUT_SCL2	0x000020000
 #define	RPI_OUT_SCL3	0x000030000
 #define	RPI_OUT_SCL4	0x000040000
+
+#define RPI_OUT_SCLMSK	0x0000f0000
+#define RPI_OUT_SCLSH	16
 
 //---------------------------------------------------------------------------------------------------------------------------
 

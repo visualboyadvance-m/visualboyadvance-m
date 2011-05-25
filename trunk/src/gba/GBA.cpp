@@ -113,7 +113,6 @@ bool fxOn = false;
 bool windowOn = false;
 int frameCount = 0;
 char buffer[1024];
-FILE *out = NULL;
 u32 lastTime = 0;
 int count = 0;
 
@@ -2826,27 +2825,12 @@ void CPUUpdateRegister(u32 address, u16 value)
 
   case COMM_SIOCNT:
 	  StartLink(value);
-	  /*
-	  // old code path for no linking...
-	  {
-		  if (value & 0x80) {
-			  value &= 0xff7f;
-			  if ((value & 1) && (value & 0x4000)) {
-				  UPDATE_REG(COMM_SIODATA8, 0xFF);
-				  IF |= 0x80;
-				  UPDATE_REG(0x202, IF);
-				  value &= 0x7f7f;
-			  }
-		  }
-		  UPDATE_REG(COMM_SIOCNT, value);
-	  }
-	  */
 	  break;
 
   case COMM_SIODATA8:
 	  if (gba_link_enabled)
 		  LinkSSend(value);
-	  UPDATE_REG(COMM_RCNT, value);
+	  UPDATE_REG(COMM_SIODATA8, value);
 	  break;
 
   case 0x130:
@@ -3452,27 +3436,6 @@ void CPUInterrupt()
   biosProtected[3] = 0xe5;
 }
 
-#ifdef SDL
-void log(const char *defaultMsg, ...)
-{
-  char buffer[2048];
-  va_list valist;
-
-  va_start(valist, defaultMsg);
-  vsprintf(buffer, defaultMsg, valist);
-
-  if(out == NULL) {
-    out = fopen("trace.log","w");
-  }
-
-  fputs(buffer, out);
-
-  va_end(valist);
-}
-#else
-extern void winlog(const char *, ...);
-#endif
-
 void CPULoop(int ticks)
 {
   int clockTicks;
@@ -3498,30 +3461,20 @@ void CPULoop(int ticks)
 #ifdef BKPT_SUPPORT
 		if (debugger_last)
 		{
-		sprintf(buffer, "R00=%08x R01=%08x R02=%08x R03=%08x R04=%08x R05=%08x R06=%08x R07=%08x R08=%08x R09=%08x R10=%08x R11=%08x R12=%08x R13=%08x R14=%08x R15=%08x R16=%08x R17=%08x\n",
+		winlog("R00=%08x R01=%08x R02=%08x R03=%08x R04=%08x R05=%08x R06=%08x R07=%08x R08=%08x R09=%08x R10=%08x R11=%08x R12=%08x R13=%08x R14=%08x R15=%08x R16=%08x R17=%08x\n",
                  oldreg[0], oldreg[1], oldreg[2], oldreg[3], oldreg[4], oldreg[5],
                  oldreg[6], oldreg[7], oldreg[8], oldreg[9], oldreg[10], oldreg[11],
                  oldreg[12], oldreg[13], oldreg[14], oldreg[15], oldreg[16],
                  oldreg[17]);
 		}
 #endif
-        sprintf(buffer, "R00=%08x R01=%08x R02=%08x R03=%08x R04=%08x R05=%08x R06=%08x R07=%08x R08=%08x R09=%08x R10=%08x R11=%08x R12=%08x R13=%08x R14=%08x R15=%08x R16=%08x R17=%08x\n",
+        winlog("R00=%08x R01=%08x R02=%08x R03=%08x R04=%08x R05=%08x R06=%08x R07=%08x R08=%08x R09=%08x R10=%08x R11=%08x R12=%08x R13=%08x R14=%08x R15=%08x R16=%08x R17=%08x\n",
                  reg[0].I, reg[1].I, reg[2].I, reg[3].I, reg[4].I, reg[5].I,
                  reg[6].I, reg[7].I, reg[8].I, reg[9].I, reg[10].I, reg[11].I,
                  reg[12].I, reg[13].I, reg[14].I, reg[15].I, reg[16].I,
                  reg[17].I);
-#ifdef SDL
-        log(buffer);
-#else
-        winlog(buffer);
-#endif
       } else if(!holdState) {
-        sprintf(buffer, "PC=%08x\n", armNextPC);
-#ifdef SDL
-        log(buffer);
-#else
-        winlog(buffer);
-#endif
+        winlog("PC=%08x\n", armNextPC);
       }
     }
 #endif /* FINAL_VERSION */

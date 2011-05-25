@@ -27,11 +27,11 @@ bool genericflashcardEnable = false;
 int gbCgbMode = 0;
 
 u16 gbColorFilter[32768];
-int gbColorOption = 0;
+bool gbColorOption = false;
 int gbPaletteOption = 0;
 int gbEmulatorType = 0;
-int gbBorderOn = 1;
-int gbBorderAutomatic = 0;
+bool gbBorderOn = true;
+bool gbBorderAutomatic = false;
 int gbBorderLineSkip = 160;
 int gbBorderRowSkip = 0;
 int gbBorderColumnSkip = 0;

@@ -436,12 +436,17 @@ static bool utilIsImage(const char *file)
 }
 
 #ifdef WIN32
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 IMAGE_TYPE utilFindType(const char *file)
 {
 	char buffer [2048];
+	utilFindType(file, buffer);
+}
+
+IMAGE_TYPE utilFindType(const char *file, char (&buffer)[2048])
+{
 #ifdef WIN32
 	DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, file, -1, NULL, 0);
 	wchar_t *pwText;
@@ -453,24 +458,24 @@ IMAGE_TYPE utilFindType(const char *file)
 	MultiByteToWideChar (CP_ACP, 0, file, -1, pwText, dwNum );
 	char* file_conv = fex_wide_to_path( pwText);
 	delete []pwText;
-	if ( !utilIsImage( file_conv ) ) // TODO: utilIsArchive() instead?
-	{
+//	if ( !utilIsImage( file_conv ) ) // TODO: utilIsArchive() instead?
+//	{
 		fex_t* fe = scan_arc(file_conv,utilIsImage,buffer);
 		if(!fe)
 			return IMAGE_UNKNOWN;
 		fex_close(fe);
 		file = buffer;
-	}
+//	}
 	free(file_conv);
 #else
-	if ( !utilIsImage( file ) ) // TODO: utilIsArchive() instead?
-	{
+//	if ( !utilIsImage( file ) ) // TODO: utilIsArchive() instead?
+//	{
 		fex_t* fe = scan_arc(file,utilIsImage,buffer);
 		if(!fe)
 			return IMAGE_UNKNOWN;
 		fex_close(fe);
 		file = buffer;
-	}
+//	}
 #endif
 	return utilIsGBAImage(file) ? IMAGE_GBA : IMAGE_GB;
 }

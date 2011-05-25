@@ -195,7 +195,7 @@ BOOL LinkServer::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	m_numplayers = lanlink.numgbas;
+	m_numplayers = lanlink.numslaves;
 	m_prottype = lanlink.type;
 	m_speed = lanlink.speed;
 
@@ -490,6 +490,25 @@ void LinkOptions::OnCancel()
 	return;
 }
 
+class Win32ServerInfoDisplay : public ServerInfoDisplay
+{
+    Win32ServerInfoDisplay(ServerWait _dlg) : dlg(_dlg) {}
+    void ShowServerIP(sf::IPAddress addr) {
+	    dlg->m_serveraddress.Format("Server IP address is: %s", addr.ToString);
+    }
+    void ShowConnect(int player) {
+	    dlg->m_plconn[i].Format("Player %d connected", player);
+	    dlg->UpdateData(false);
+    }
+    void Ping() { dlg->m_prgctrl.StepIt(); }
+    void Connected() {
+	MessageBox(NULL, "All players connected", "Link", MB_OK);
+	dlg->SendMessage(WM_CLOSE, 0, 0);
+    }
+private:
+    ServerWait dlg;
+}
+
 void LinkServer::OnServerStart()
 {
 	int errorcode;
@@ -497,15 +516,15 @@ void LinkServer::OnServerStart()
 
 	UpdateData(TRUE);
 
-	lanlink.numgbas = m_numplayers+1;
+	lanlink.numslaves = m_numplayers+1;
 	lanlink.type = m_prottype;
-	lanlink.server = 1;
+	lanlink.server = true;
 	lanlink.speed = m_speed==1 ? true : false;
+	sf::IPAddress addr;
 
-	if((errorcode=ls.Init(&dlg))!=0){
-		char message[50];
-		sprintf(message, "Error %d occured.\nPlease try again.", errorcode);
-		MessageBox(message, "Error", MB_OK);
+	Win32ServerInfoDisplay dlginfo(dlg);
+	if(!ls.Init(&dlginfo)){
+		MessageBox("Error occured.\nPlease try again.", "Error", MB_OK);
 		return;
 	}
 
@@ -526,6 +545,26 @@ BOOL LinkClient::OnInitDialog()
 	return TRUE;
 }
 
+class Win32ClientInfoDisplay : public ClientInfoDisplay
+{
+    Win32ClientInfoDisplay(ServerWait _dlg) : dlg(_dlg) {}
+    void ConnectStart(sf::IPAddress addr) {
+	    dlg->SetWindowText("Connecting...");
+    }
+    void ShowConnect(int player, int togo) {
+	    dlg->m_serveraddress.Format("Connected as #%d", player);
+	    if(togo)	dlg->m_plconn[0].Format("Waiting for %d players to join", togo);
+	    else dlg->m_plconn[0].Format("All players joined.");
+    }
+    void Ping() { dlg->m_prgctrl.StepIt(); }
+    void Connected() {
+	    MessageBox(NULL, "Connected.", "Link", MB_OK);
+	    dlg->SendMessage(WM_CLOSE, 0, 0);
+    }
+private:
+    ServerWait dlg;
+}
+
 void LinkClient::OnLinkConnect()
 {
 	char ipaddress[31];
@@ -535,12 +574,13 @@ void LinkClient::OnLinkConnect()
 	UpdateData(TRUE);
 
 	lanlink.type = m_prottype;
-	lanlink.server = 0;
+	lanlink.server = false;
 	lanlink.speed = m_hacks==1 ? true : false;
 
 	m_serverip.GetWindowText(ipaddress, 30);
 
-	if((errorcode=lc.Init(gethostbyname(ipaddress), &dlg))!=0){
+	Win32ClientInfoDisplay dlginfo(dlg);
+	if((errorcode=lc.Init(sf::IPAddress(std::string(ipaddress)), &dlginfo))!=0){
 		char message[50];
 		sprintf(message, "Error %d occured.\nPlease try again.", errorcode);
 		MessageBox(message, "Error", MB_OK);
