@@ -706,8 +706,8 @@ long ZEXPORT memgzseek(gzFile file, long off, int whence)
     }
     // this is inefficient, but the best I can do without actually reading
     // the above code
-    char buf[80];
     while(off > 0) {
+	char buf[80];
 	int r = memgzread(file, buf, off > 80 ? 80 : off);
 	if(r <= 0)
 	    return -1;
