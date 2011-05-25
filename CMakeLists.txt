@@ -8,6 +8,7 @@ if( COMMAND cmake_policy )
 endif( COMMAND cmake_policy )
 SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts )
 
+option( ENABLE_WX "Build the wxWidgets port" ON )
 option( ENABLE_SDL "Build the SDL port" ON )
 option( ENABLE_GTK "Build the GTK+ GUI" ON )
 option( ENABLE_DEBUGGER "Enable the debugger" ON )
@@ -63,6 +64,17 @@ FIND_PACKAGE ( SDL REQUIRED )
 if( ENABLE_LINK )
     FIND_PACKAGE ( SFML REQUIRED )
 endif( ENABLE_LINK )
+# set the standard libraries all ports use
+SET(VBAMCORE_LIBS
+    vbamcore
+    fex
+    ${SDL_LIBRARY}
+    ${SFML_LIBRARY}
+    ${OPENGL_LIBRARIES}
+    ${ZLIB_LIBRARY}
+    ${PNG_LIBRARY})
+
+
 
 # Disable looking for GTK if not going to build the GTK frontend
 # so that pkg-config is not required
@@ -111,9 +123,20 @@ ENDIF( NOT SYSCONFDIR )
 ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONFDIR='"${SYSCONFDIR}"' -DWITH_LIRC='${WITHLIRC}')
 ADD_DEFINITIONS (-DVERSION='"${VERSION}"' -DPKGDATADIR='"${PKGDATADIR}"' -DPACKAGE='')
 
-if( NOT ENABLE_LINK )
+if( ENABLE_LINK )
+    FIND_LIBRARY(RT_LIB rt)
+    IF(RT_LIB)
+       SET(CMAKE_REQUIRED_LIBRARIES ${RT_LIB})
+       SET(VBAMCORE_LIBS ${VBAMCORE_LIBS} ${RT_LIB})
+    ENDIF(RT_LIB)
+    INCLUDE(CheckFunctionExists)
+    CHECK_FUNCTION_EXISTS(sem_timedwait SEM_TIMEDWAIT)
+    IF( SEM_TIMEDWAIT)
+        ADD_DEFINITIONS (-DHAVE_SEM_TIMEDWAIT)
+    ENDIF( SEM_TIMEDWAIT)
+else( ENABLE_LINK )
     ADD_DEFINITIONS (-DNO_LINK)
-endif( NOT ENABLE_LINK )
+endif( ENABLE_LINK )
 
 # The debugger is enabled by default
 if( NOT ENABLE_DEBUGGER )
@@ -132,6 +155,21 @@ if( ENABLE_NLS )
     SET( LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale )
     ADD_DEFINITIONS ( -DENABLE_NLS )
     ADD_DEFINITIONS ( -DLOCALEDIR=\\\"${LOCALEDIR}\\\" )
+    # for now, only GBALink.cpp uses gettext() directly
+    IF(ENABLE_LINK)
+        FIND_PATH(LIBINTL_INC libintl.h )
+        FIND_LIBRARY(LIBINTL_LIB intl )
+	IF(LIBINTL_LIB)
+            SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${LIBINTL_LIB})
+            SET(VBAMCORE_LIBS ${VBAMCORE_LIBS} ${LIBINTL_LIB})
+	ENDIF(LIBINTL_LIB)
+        INCLUDE(CheckFunctionExists)
+        CHECK_FUNCTION_EXISTS(gettext GETTEXT_FN)
+        IF(NOT LIBINTL_INC OR NOT GETTEXT_FN)
+            message( SEND_ERROR "NLS requires libintl" )
+        ENDIF(NOT LIBINTL_INC OR NOT GETTEXT_FN)
+        INCLUDE_DIRECTORIES(${LIBINTL_INC})
+    ENDIF(ENABLE_LINK)
 endif( ENABLE_NLS )
 
 # Compiler flags
@@ -256,6 +294,7 @@ SET(SRC_FILTERS
     src/filters/interframe.cpp
     src/filters/pixel.cpp
     src/filters/scanline.cpp
+    src/filters/simpleFilter.cpp
 )
 
 SET(SRC_HQ_C
@@ -269,6 +308,13 @@ SET(SRC_HQ_ASM
     src/filters/hq/asm/hq4x_32.asm
     src/filters/hq/asm/hq3x32.cpp
 )
+
+if( ENABLE_ASM_SCALERS )
+    SET(SRC_FILTERS ${SRC_FILTERS} ${SRC_HQ_ASM})
+else( ENABLE_ASM_SCALERS )
+    SET(SRC_FILTERS ${SRC_FILTERS} ${SRC_HQ_C})
+    ADD_DEFINITIONS ( -DNO_ASM )
+endif( ENABLE_ASM_SCALERS )
 
 SET(SRC_GTK
     src/gtk/configfile.cpp
@@ -302,12 +348,6 @@ if( ENABLE_DEBUGGER )
         src/gba/remote.cpp
     )
 endif( ENABLE_DEBUGGER )
-
-if( ENABLE_ASM_SCALERS )
-    SET(SRC_HQ ${SRC_HQ_ASM})
-else( ENABLE_ASM_SCALERS )
-    SET(SRC_HQ ${SRC_HQ_C})
-endif( ENABLE_ASM_SCALERS )
 
 INCLUDE_DIRECTORIES(
     ${ZLIB_INCLUDE_DIR}
@@ -354,7 +394,6 @@ IF( ENABLE_SDL )
         vbam
         WIN32
         ${SRC_SDL}
-        ${SRC_HQ}
     )
 
     IF( WIN32 )
@@ -367,15 +406,9 @@ IF( ENABLE_SDL )
 
     TARGET_LINK_LIBRARIES (
         vbam
-        vbamcore
-        ${SDL_LIBRARY}
-        ${ZLIB_LIBRARY}
-        ${PNG_LIBRARY}
-        ${OPENGL_LIBRARY}
+        ${VBAMCORE_LIBS}
         ${WIN32_LIBRARIES}
         ${LIRC_CLIENT_LIBRARY}
-        ${SFML_LIBRARY}
-        fex
     )
 
     INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam DESTINATION bin)
@@ -394,14 +427,9 @@ IF( ENABLE_GTK )
 
     TARGET_LINK_LIBRARIES (
         gvbam
-        vbamcore
-        ${ZLIB_LIBRARY}
-        ${PNG_LIBRARY}
-        ${SDL_LIBRARY}
+	${VBAMCORE_LIBS}
         ${GTKMM_LIBRARIES}
         ${GTKGLMM_LIBRARIES}
-        ${SFML_LIBRARY}
-        fex
     )
 
     INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/gvbam DESTINATION bin)
@@ -410,8 +438,20 @@ IF( ENABLE_GTK )
     INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/ui DESTINATION ${DATA_INSTALL_DIR} PATTERN ".svn" EXCLUDE)
     INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini DESTINATION ${DATA_INSTALL_DIR})
 
+ENDIF( ENABLE_GTK )
+
+IF( ENABLE_WX )
+    # since this has generated source files, it's easier to just
+    # make from the subdir
+    # otherwise out-of-tree builds have trouble
+
+    add_subdirectory(src/wx)
+
+ENDIF( ENABLE_WX )
+
+if( ENABLE_GTK OR ENABLE_WX )
     # Native Language Support
     if( ENABLE_NLS )
         add_subdirectory(po)
     endif( ENABLE_NLS )
-ENDIF( ENABLE_GTK )
+endif( ENABLE_GTK OR ENABLE_WX )

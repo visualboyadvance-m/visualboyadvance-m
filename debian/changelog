@@ -1,3 +1,9 @@
+vbam (1.8.0.1016-1) unstable; urgency=low
+
+  * Use new version from upstream, with wxwidgets patches
+
+ -- Thomas J. Moore <darktjm@gmail.com>  Sun, 22 May 2011 14:08:05 -0500
+
 vbam (1.8.0.1001-1) unstable; urgency=low
 
   * Use new version from upstream

@@ -1,10 +1,10 @@
+#ifndef GBA_GBALINK_H
+#define GBA_GBALINK_H
+
 #pragma once
 
-#ifndef NO_LINK
-#include <SFML/Network.hpp>
-#endif
+// register definitions; these are always present
 
-#define LINK_PARENTLOST 0x80
 #define UNSUPPORTED -1
 #define MULTIPLAYER 0
 #define NORMAL8 1
@@ -12,6 +12,7 @@
 #define UART 3
 #define JOYBUS 4
 #define GP 5
+
 #define RFU_INIT 0
 #define RFU_COMM 1
 #define RFU_SEND 2
@@ -21,6 +22,11 @@
 #define COMM_SIODATA32_H	0x122
 #define COMM_SIOCNT			0x128
 #define COMM_SIODATA8		0x12a
+#define COMM_SIOMLT_SEND 0x12a
+#define COMM_SIOMULTI0 0x120
+#define COMM_SIOMULTI1 0x122
+#define COMM_SIOMULTI2 0x124
+#define COMM_SIOMULTI3 0x126
 #define COMM_RCNT			0x134
 #define COMM_JOYCNT			0x140
 #define COMM_JOY_RECV_L		0x150
@@ -45,13 +51,27 @@ enum
 	JOY_CMD_WRITE	= 0x15		
 };
 
-#ifdef _MSC_VER
+// Link implementation; only present if enabled
+#ifndef NO_LINK
+#include <SFML/System.hpp>
+#include <SFML/Network.hpp>
+
+class ServerInfoDisplay
+{
+public:
+    virtual void ShowServerIP(sf::IPAddress addr) = 0;
+    virtual void ShowConnect(int player) = 0;
+    virtual void Ping() = 0;
+    virtual void Connected() = 0;
+};
+
 typedef struct {
-	u16 linkdata[4];
-	u16 linkcmd[4];
+	u16 linkdata[5];
+	u16 linkcmd;
 	u16 numtransfers;
 	int lastlinktime;
 	u8 numgbas;
+	u8 trgbas;
 	u8 linkflags;
 	int rfu_q[4];
 	u8 rfu_request[4];
@@ -62,72 +82,77 @@ typedef struct {
 
 class lserver{
 	int numbytes;
-	fd_set fdset;
-	timeval wsocktimeout;
+	sf::Selector<sf::SocketTCP> fdset;
 	//timeval udptimeout;
 	char inbuffer[256], outbuffer[256];
-	int *intinbuffer;
+	s32 *intinbuffer;
 	u16 *u16inbuffer;
-	int *intoutbuffer;
+	s32 *intoutbuffer;
 	u16 *u16outbuffer;
 	int counter;
 	int done;
 public:
 	int howmanytimes;
-	SOCKET tcpsocket[4];
-	SOCKADDR_IN udpaddr[4];
+	sf::SocketTCP tcpsocket[4];
+	sf::IPAddress udpaddr[4];
 	lserver(void);
-	int Init(void*);
+	bool Init(ServerInfoDisplay *);
 	void Send(void);
 	void Recv(void);
 };
 
+class ClientInfoDisplay {
+public:
+    virtual void ConnectStart(sf::IPAddress addr) = 0;
+    virtual void Ping() = 0;
+    virtual void ShowConnect(int player, int togo) = 0;
+    virtual void Connected() = 0;
+};
+
 class lclient{
-	fd_set fdset;
-	timeval wsocktimeout;
+	sf::Selector<sf::SocketTCP> fdset;
 	char inbuffer[256], outbuffer[256];
-	int *intinbuffer;
+	s32 *intinbuffer;
 	u16 *u16inbuffer;
-	int *intoutbuffer;
+	s32 *intoutbuffer;
 	u16 *u16outbuffer;
 	int numbytes;
 public:
 	bool oncesend;
-	SOCKADDR_IN serverinfo;
-	SOCKET noblock;
+	sf::IPAddress serveraddr;
+	unsigned short serverport;
+	sf::SocketTCP noblock;
 	int numtransfers;
 	lclient(void);
-	int Init(LPHOSTENT, void*);
+	bool Init(sf::IPAddress, ClientInfoDisplay *);
 	void Send(void);
 	void Recv(void);
 	void CheckConn(void);
 };
 
 typedef struct {
-	SOCKET tcpsocket;
-	//SOCKET udpsocket;
-	int numgbas;
-	HANDLE thread;
-	u8 type;
-	u8 server;
+	sf::SocketTCP tcpsocket;
+	//sf::SocketUDP udpsocket;
+	int numslaves;
+	sf::Thread *thread;
+	int type;
+	bool server;
 	bool terminate;
 	bool connected;
 	bool speed;
 	bool active;
 } LANLINKDATA;
-#endif
 
 extern bool gba_joybus_enabled;
-#ifndef NO_LINK
 extern sf::IPAddress joybusHostAddr;
-#endif
 extern void JoyBusConnect();
 extern void JoyBusShutdown();
 extern void JoyBusUpdate(int ticks);
 
 extern bool gba_link_enabled;
 
-#ifdef _MSC_VER
+extern bool InitLink();
+extern void CloseLink();
 extern void StartLink(u16);
 extern void StartGPLink(u16);
 extern void LinkSSend(u16);
@@ -135,16 +160,28 @@ extern void LinkUpdate(int);
 extern void LinkChildStop();
 extern void LinkChildSend(u16);
 extern void CloseLanLink();
-extern char *MakeInstanceFilename(const char *Input);
+extern void CleanLocalLink();
+extern const char *MakeInstanceFilename(const char *Input);
 extern LANLINKDATA lanlink;
 extern int vbaid;
 extern bool rfu_enabled;
 extern int linktimeout;
 extern lclient lc;
+extern lserver ls;
 extern int linkid;
-#else // These are stubbed for now
-inline void StartLink(u16){}
-inline void StartGPLink(u16){}
-inline void LinkSSend(u16){}
-inline void LinkUpdate(int){}
+
+#else
+
+// stubs to keep #ifdef's out of mainline
+#define StartLink(x)
+#define StartGPLink(x)
+#define LinkSSend(x)
+#define LinkUpdate(x)
+#define JoyBusUpdate(x)
+#define InitLink() false
+#define CloseLink()
+#define gba_link_enabled false
+#define gba_joybus_enabled false
 #endif
+
+#endif /* GBA_GBALINK_H */

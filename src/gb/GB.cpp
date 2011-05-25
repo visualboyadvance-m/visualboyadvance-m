@@ -21,7 +21,6 @@
 
 extern u8 *pix;
 extern bool speedup;
-bool gbUpdateSizes();
 bool inBios = false;
 
 // debugging
