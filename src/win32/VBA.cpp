@@ -429,12 +429,12 @@ BOOL VBA::InitInstance()
   systemVerbose = GetPrivateProfileInt("config",
                                        "verbose",
                                        0,
-                                       MakeInstanceFilename("VBA.ini"));
+                                       MakeInstanceFilename("vbam.ini"));
 
   systemDebug = GetPrivateProfileInt("config",
                                      "debug",
                                      0,
-                                     MakeInstanceFilename("VBA.ini"));
+                                     MakeInstanceFilename("vbam.ini"));
 
   wndClass = AfxRegisterWndClass(0, LoadCursor(IDC_ARROW), (HBRUSH)GetStockObject(BLACK_BRUSH), LoadIcon(IDI_MAINICON));
 

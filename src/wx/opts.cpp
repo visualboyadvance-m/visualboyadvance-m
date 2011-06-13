@@ -286,7 +286,7 @@ bool opt_lt(const opt_desc &opt1, const opt_desc &opt2)
     return wxStrcmp(opt1.opt, opt2.opt) < 0;
 }
 
-// FIXME: simulate MakeInstanceFilename(VBA.ini) using subkeys (Slave%d/*)
+// FIXME: simulate MakeInstanceFilename(vbam.ini) using subkeys (Slave%d/*)
 
 void load_opts()
 {
