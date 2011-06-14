@@ -25,10 +25,10 @@ endif(ENABLE_OPENAL)
 
 
 # adv is for wxAboutBox
-SET( wxWidgets_USE_LIBS core base xrc gl adv net )
+# xml, html is for xrc
+SET( wxWidgets_USE_LIBS xrc xml html adv gl net core base )
 FIND_PACKAGE ( wxWidgets REQUIRED )
 EXECUTE_PROCESS(COMMAND sh "${wxWidgets_CONFIG_EXECUTABLE}" --cxxflags
-OUTPUT_VARIABLE CXF)
 INCLUDE( ${wxWidgets_USE_FILE} )
 FIND_PACKAGE ( Gettext REQUIRED )
 FIND_PROGRAM(XGETTEXT xgettext)
