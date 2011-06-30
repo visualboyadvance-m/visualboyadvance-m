@@ -28,7 +28,7 @@ endif(ENABLE_OPENAL)
 # xml, html is for xrc
 SET( wxWidgets_USE_LIBS xrc xml html adv gl net core base )
 FIND_PACKAGE ( wxWidgets REQUIRED )
-EXECUTE_PROCESS(COMMAND sh "${wxWidgets_CONFIG_EXECUTABLE}" --cxxflags
+EXECUTE_PROCESS(COMMAND sh "${wxWidgets_CONFIG_EXECUTABLE}" --cxxflags)
 INCLUDE( ${wxWidgets_USE_FILE} )
 FIND_PACKAGE ( Gettext REQUIRED )
 FIND_PROGRAM(XGETTEXT xgettext)
