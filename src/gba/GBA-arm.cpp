@@ -657,7 +657,7 @@ static void count(u32 opcode, int cond_res)
 #define OP_MVN \
     EMIT1(not, eax)                     \
     EMIT2(mov, eax, REGREF1(esi))
-#define OP_MVNS   CHECK_PC(OP_MVN, SETCOND_LOGICAL)
+#define OP_MVNS   CHECK_PC(OP_MVN EMIT2(test,eax,eax), SETCOND_LOGICAL)
 
 // ALU cleanup macro
 #define ALU_FINISH  ALU_TRAILER
