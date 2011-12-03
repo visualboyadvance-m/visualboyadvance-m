@@ -1,5 +1,9 @@
 # This file is distributed under the same license as the VBA-M package.
 #
+# Translators:
+# bgK <bastien.bouclet@gmail.com>, 2011.
+# filmor <filmor@gmail.com>, 2011.
+# King_Bud <andreschwarz@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
