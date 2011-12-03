@@ -35,7 +35,6 @@ void InitLUTs(void)
 }
 
 int hq3xinited=0;
-extern int realsystemRedShift, realsystemBlueShift;
 
 //16 bit input, see below for 32 bit input
 void hq3x32(unsigned char * pIn,  unsigned int srcPitch,
@@ -49,23 +48,6 @@ void hq3x32(unsigned char * pIn,  unsigned int srcPitch,
 		hq3xinited=1;
 	}
 	hq3x_32( pIn, pOut, Xres, Yres, dstPitch, srcPitch - (Xres *2) );
-	if (realsystemRedShift == 3)
-	{   // damn you opengl...
-		int offset = (dstPitch - (Xres *12)) / 4;
-		unsigned int *p = (unsigned int *)pOut;
-		Yres *= 3;
-		while(Yres--)
-		{
-			for(int i=0;i<Xres*3;i++)
-			{
-				*p = (*p & 0xFF0000) >> 16 |
-				     (*p & 0x0000FF) << 16 |
-					 (*p & 0x00FF00);
-				 p++;
-			}
-			p += offset;
-		}
-	}
 }
 
 void hq3x16(unsigned char * pIn,  unsigned int srcPitch,
@@ -107,23 +89,6 @@ void hq4x32(unsigned char * pIn,  unsigned int srcPitch,
 		hq3xinited=1;
 	}
 	hq4x_32( pIn, pOut, Xres, Yres, dstPitch, srcPitch - (Xres *2));
-	if (realsystemRedShift == 3)
-	{   // damn you opengl...
-		int offset = (dstPitch - (Xres *16)) / 4;
-		unsigned int *p = (unsigned int *)pOut;
-		Yres *= 4;
-		while(Yres--)
-		{
-			for(int i=0;i<Xres*4;i++)
-			{
-				*p = (*p & 0xFF0000) >> 16 |
-				     (*p & 0x0000FF) << 16 |
-					 (*p & 0x00FF00);
-				 p++;
-			}
-			p += offset;
-		}
-	}
 }
 
 static inline void convert32bpp_16bpp(unsigned char *pIn, unsigned int width)
