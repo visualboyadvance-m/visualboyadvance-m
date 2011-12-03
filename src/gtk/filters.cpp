@@ -87,7 +87,7 @@ Filter pvGetFilter(EFilter _eFilter, EFilterDepth _eDepth)
   return astFilters[_eFilter].m_apvFunc[_eDepth];
 }
 
-char* pcsGetFilterName(const EFilter _eFilter)
+const char* pcsGetFilterName(const EFilter _eFilter)
 {
         return gettext(astFilters[_eFilter].m_csName);
 }
@@ -97,7 +97,7 @@ FilterIB pvGetFilterIB(EFilterIB _eFilterIB, EFilterDepth _eDepth)
   return astFiltersIB[_eFilterIB].m_apvFunc[_eDepth];
 }
 
-char* pcsGetFilterIBName(const EFilterIB _eFilterIB)
+const char* pcsGetFilterIBName(const EFilterIB _eFilterIB)
 {
         return gettext(astFiltersIB[_eFilterIB].m_csName);
 }

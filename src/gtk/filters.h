@@ -64,10 +64,10 @@ enum EFilterDepth
 };
 
 Filter pvGetFilter(EFilter _eFilter, EFilterDepth _eDepth);
-char* pcsGetFilterName(const EFilter _eFilter);
+const char* pcsGetFilterName(const EFilter _eFilter);
 
 FilterIB pvGetFilterIB(EFilterIB _eFilterIB, EFilterDepth _eDepth);
-char* pcsGetFilterIBName(const EFilterIB _eFilterIB);
+const char* pcsGetFilterIBName(const EFilterIB _eFilterIB);
 
 } // namespace VBA
 
