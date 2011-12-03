@@ -277,7 +277,6 @@ SET(SRC_APU
 SET(SRC_SDL
     src/sdl/debugger.cpp
     src/sdl/SDL.cpp
-#    src/sdl/dummy.cpp
     src/sdl/filters.cpp
     src/sdl/text.cpp
     src/sdl/inputSDL.cpp
