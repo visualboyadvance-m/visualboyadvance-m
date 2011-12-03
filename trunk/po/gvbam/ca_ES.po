@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-25 18:50+0100\n"
+"POT-Creation-Date: 2011-12-03 20:50+0100\n"
 "PO-Revision-Date: 2011-08-17 19:49+0000\n"
 "Last-Translator: aldomann <aldomann.designs@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,7 +28,7 @@ msgstr " Botó "
 msgid " Hat "
 msgstr " Hat "
 
-#: ../src/gtk/window.cpp:1412
+#: ../src/gtk/window.cpp:1413
 msgid "%Y/%m/%d %H:%M:%S"
 msgstr "%Y/%m/%d %H:%M:%S"
 
@@ -37,7 +37,7 @@ msgstr "%Y/%m/%d %H:%M:%S"
 msgid "*** OpenGL : Cannot open display.\n"
 msgstr "*** OpenGL: no es pot obrir la pantalla.\n"
 
-#: ../src/gtk/window.cpp:1382 ../src/gtk/window.cpp:1427
+#: ../src/gtk/window.cpp:1383 ../src/gtk/window.cpp:1428
 msgid "----/--/-- --:--:--"
 msgstr "----/--/-- --:--:--"
 
@@ -133,7 +133,7 @@ msgstr "Afegeix una nova trampa"
 msgid "AdvanceMAME Scale2x"
 msgstr "AdvanceMAME Scale2x"
 
-#: ../src/gtk/window.cpp:1300
+#: ../src/gtk/window.cpp:1301
 msgid "All Gameboy Advance files"
 msgstr "Tots els fitxers de Game Boy Advance"
 
@@ -354,11 +354,11 @@ msgstr "GameShark"
 msgid "Gameboy Advance BIOS"
 msgstr "BIOS de Game Boy Advance"
 
-#: ../src/gtk/window.cpp:1307
+#: ../src/gtk/window.cpp:1308
 msgid "Gameboy Advance files"
 msgstr "Fitxers de Game Boy Advance"
 
-#: ../src/gtk/window.cpp:1314
+#: ../src/gtk/window.cpp:1315
 msgid "Gameboy files"
 msgstr "Fitxers de Game Boy"
 
@@ -406,7 +406,7 @@ msgstr "_Carrega estat"
 msgid "Load game"
 msgstr "Carrega un joc"
 
-#: ../src/gtk/window.cpp:1340
+#: ../src/gtk/window.cpp:1341
 msgid "Loaded battery"
 msgstr "Bateria carregada"
 
@@ -435,12 +435,11 @@ msgstr "Cap"
 msgid "Oldest slot"
 msgstr "Ranura més antiga"
 
-#: ../src/gtk/window.cpp:1265
+#: ../src/gtk/window.cpp:1266
 msgid "Open"
 msgstr "Obre"
 
-#: ../src/gtk/cheatlist.cpp:73 ../src/gtk/gameboycheatlist.cpp:73
-#: tmp/cheatlist.ui.h:5
+#: ../src/gtk/cheatlist.cpp:70 tmp/cheatlist.ui.h:5
 msgid "Open cheat list"
 msgstr "Obre llista de trampes"
 
@@ -500,8 +499,7 @@ msgstr "_Desa estat"
 msgid "Sample rate : "
 msgstr "Freqüència de mostreig: "
 
-#: ../src/gtk/cheatlist.cpp:96 ../src/gtk/gameboycheatlist.cpp:96
-#: tmp/cheatlist.ui.h:6
+#: ../src/gtk/cheatlist.cpp:93 tmp/cheatlist.ui.h:6
 msgid "Save cheat list"
 msgstr "Desa llista de trampes"
 
@@ -517,7 +515,7 @@ msgstr "Desa la captura de pantalla"
 msgid "Save type : "
 msgstr "Tipus de desament: "
 
-#: ../src/gtk/window.cpp:1357
+#: ../src/gtk/window.cpp:1358
 msgid "Saved battery"
 msgstr "Bateria desada"
 
@@ -626,7 +624,7 @@ msgstr "Activa totes les trampes"
 msgid "Unable to initialize output, falling back to Cairo\n"
 msgstr "No s'ha pogut iniciar la sortida, es recorrerà al Cairo.\n"
 
-#: ../src/gtk/window.cpp:1021
+#: ../src/gtk/window.cpp:1022
 #, c-format
 msgid "Unknown file type %s"
 msgstr "Tipus de fitxer desconegut %s"
@@ -655,12 +653,12 @@ msgstr "VBA"
 msgid "VBA-M"
 msgstr "VBA-M"
 
-#: ../src/gtk/window.cpp:1158
+#: ../src/gtk/window.cpp:1159
 #, c-format
 msgid "VBA-M - %d%%"
 msgstr "VBA-M - %d%%"
 
-#: ../src/gtk/window.cpp:1163
+#: ../src/gtk/window.cpp:1164
 #, c-format
 msgid "VBA-M - %d%% (%d, %d fps)"
 msgstr "VBA-M - %d%% (%d, %d fps)"

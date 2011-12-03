@@ -1,11 +1,14 @@
-# This file is distributed under the same license as the VBA-M package.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-25 18:50+0100\n"
+"POT-Creation-Date: 2011-12-03 21:22+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,13 +36,11 @@ msgstr ""
 msgid "GameGenie"
 msgstr ""
 
-#: ../src/gtk/cheatlist.cpp:73 ../src/gtk/gameboycheatlist.cpp:73
-#: tmp/cheatlist.ui.h:5
+#: ../src/gtk/cheatlist.cpp:70 tmp/cheatlist.ui.h:5
 msgid "Open cheat list"
 msgstr ""
 
-#: ../src/gtk/cheatlist.cpp:96 ../src/gtk/gameboycheatlist.cpp:96
-#: tmp/cheatlist.ui.h:6
+#: ../src/gtk/cheatlist.cpp:93 tmp/cheatlist.ui.h:6
 msgid "Save cheat list"
 msgstr ""
 
@@ -268,50 +269,50 @@ msgstr ""
 msgid "Failed to init SDL: %s"
 msgstr ""
 
-#: ../src/gtk/window.cpp:1021
+#: ../src/gtk/window.cpp:1022
 #, c-format
 msgid "Unknown file type %s"
 msgstr ""
 
-#: ../src/gtk/window.cpp:1158
+#: ../src/gtk/window.cpp:1159
 #, c-format
 msgid "VBA-M - %d%%"
 msgstr ""
 
-#: ../src/gtk/window.cpp:1163
+#: ../src/gtk/window.cpp:1164
 #, c-format
 msgid "VBA-M - %d%% (%d, %d fps)"
 msgstr ""
 
-#: ../src/gtk/window.cpp:1265
+#: ../src/gtk/window.cpp:1266
 msgid "Open"
 msgstr ""
 
-#: ../src/gtk/window.cpp:1300
+#: ../src/gtk/window.cpp:1301
 msgid "All Gameboy Advance files"
 msgstr ""
 
-#: ../src/gtk/window.cpp:1307
+#: ../src/gtk/window.cpp:1308
 msgid "Gameboy Advance files"
 msgstr ""
 
-#: ../src/gtk/window.cpp:1314
+#: ../src/gtk/window.cpp:1315
 msgid "Gameboy files"
 msgstr ""
 
-#: ../src/gtk/window.cpp:1340
+#: ../src/gtk/window.cpp:1341
 msgid "Loaded battery"
 msgstr ""
 
-#: ../src/gtk/window.cpp:1357
+#: ../src/gtk/window.cpp:1358
 msgid "Saved battery"
 msgstr ""
 
-#: ../src/gtk/window.cpp:1382 ../src/gtk/window.cpp:1427
+#: ../src/gtk/window.cpp:1383 ../src/gtk/window.cpp:1428
 msgid "----/--/-- --:--:--"
 msgstr ""
 
-#: ../src/gtk/window.cpp:1412
+#: ../src/gtk/window.cpp:1413
 msgid "%Y/%m/%d %H:%M:%S"
 msgstr ""
 
