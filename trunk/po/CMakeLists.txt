@@ -1,5 +1,20 @@
 IF(ENABLE_GTK)
-  GETTEXT_CREATE_TRANSLATIONS(gvbam.pot gvbam/cs.po gvbam/de.po gvbam/en.po gvbam/es_ES.po gvbam/fr.po gvbam/pt_BR.po gvbam/zh_CN.po)
+  GETTEXT_CREATE_TRANSLATIONS(
+	gvbam.pot
+	gvbam/ca_ES.po
+	gvbam/cs.po
+	gvbam/de.po
+	gvbam/en.po
+	gvbam/es_ES.po
+	gvbam/fr.po
+	gvbam/it_IT.po
+	gvbam/nb.po
+	gvbam/nl.po
+	gvbam/pl.po
+	gvbam/pt_BR.po
+	gvbam/sv.po
+	gvbam/zh_CN.po
+  )
   ADD_DEPENDENCIES(gvbam translations)
 ENDIF(ENABLE_GTK)
 IF(ENABLE_WX)

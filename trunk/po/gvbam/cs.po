@@ -1,11 +1,14 @@
 # This file is distributed under the same license as the VBA-M package.
 #
+# Translators:
+#   <gsanky+transifex@gmail.com>, 2011.
+# Sanky <gsanky+transifex@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-02-25 18:50+0100\n"
-"PO-Revision-Date: 2011-04-20 06:47+0000\n"
+"PO-Revision-Date: 2011-07-14 14:31+0000\n"
 "Last-Translator: Sanky <gsanky+transifex@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +31,7 @@ msgstr "  Úhel  "
 
 #: ../src/gtk/window.cpp:1412
 msgid "%Y/%m/%d %H:%M:%S"
-msgstr "%Y/%m/%d %H:%M:%S"
+msgstr "%d. %m. %Y %H:%M:%S"
 
 #: ../src/gtk/screenarea-opengl.cpp:41
 #, c-format
@@ -37,7 +40,7 @@ msgstr "*** OpenGL : Nemohu otevřít display.\n"
 
 #: ../src/gtk/window.cpp:1382 ../src/gtk/window.cpp:1427
 msgid "----/--/-- --:--:--"
-msgstr "----/--/-- --:--:--"
+msgstr "--. --. ---- --:--:--"
 
 #: tmp/sound.ui.h:2
 #, no-c-format
@@ -101,7 +104,7 @@ msgstr "<b>Frameskip</b>"
 
 #: tmp/preferences.ui.h:3
 msgid "<b>General</b>"
-msgstr "<b>Obacné</b>"
+msgstr "<b>Obecné</b>"
 
 #: tmp/display.ui.h:2
 msgid "<b>Output module</b>"
@@ -225,7 +228,7 @@ msgstr "Výchozí velikost :  "
 
 #: tmp/cheatlist.ui.h:3
 msgid "Delete all cheats"
-msgstr "Smazat všechny cehaty"
+msgstr "Smazat všechny cheaty"
 
 #: tmp/cheatlist.ui.h:4
 msgid "Delete selected cheat"
@@ -370,11 +373,11 @@ msgstr "Generický kód"
 
 #: tmp/display.ui.h:7
 msgid "Interframe blending : "
-msgstr "Míšení interframů :  "
+msgstr "Míšení mezisnímků :  "
 
 #: ../src/gtk/filters.cpp:82
 msgid "Interframe motion blur"
-msgstr "Meziframový motion blur"
+msgstr "Mezisnímkový motion blur"
 
 #: ../src/gtk/joypadconfig.cpp:129
 msgid "Joy "
@@ -472,7 +475,7 @@ msgstr "Percentuálně"
 
 #: ../src/gtk/filters.cpp:64
 msgid "Pixelate"
-msgstr "Pixelate"
+msgstr "Zpixelovat"
 
 #: tmp/preferences.ui.h:10
 msgid "Preferences"
@@ -577,7 +580,7 @@ msgstr "Slot9"
 
 #: ../src/gtk/filters.cpp:81
 msgid "Smart interframe blending"
-msgstr "Chytré míšení meziframů"
+msgstr "Chytré míšení mezisnímků"
 
 #: ../src/gtk/joypadconfig.cpp:40
 msgid "Speed :"
@@ -627,7 +630,7 @@ msgstr "Nelze inicializovat výstup, zkouším Cairo\n"
 #: ../src/gtk/window.cpp:1021
 #, c-format
 msgid "Unknown file type %s"
-msgstr "Neznámýtyp souboru %s"
+msgstr "Neznámý typ souboru %s"
 
 #: ../src/gtk/joypadconfig.cpp:153
 msgid "Up"
@@ -635,7 +638,7 @@ msgstr "Nahoru"
 
 #: ../src/gtk/joypadconfig.cpp:30
 msgid "Up :"
-msgstr "Nahou :"
+msgstr "Nahoru :"
 
 #: tmp/gameboy.ui.h:14
 msgid "Use a Game Boy boot ROM file"
