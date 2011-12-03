@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-25 18:50+0100\n"
+"POT-Creation-Date: 2011-12-03 20:50+0100\n"
 "PO-Revision-Date: 2011-05-19 01:33+0000\n"
 "Last-Translator: jpage89 <sabinoliguori@yahoo.it>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr " Pulsante "
 msgid " Hat "
 msgstr " Hat "
 
-#: ../src/gtk/window.cpp:1412
+#: ../src/gtk/window.cpp:1413
 msgid "%Y/%m/%d %H:%M:%S"
 msgstr "%d/%m/%Y %H:%M:%S"
 
@@ -40,7 +40,7 @@ msgstr ""
 "*** OpenGL : Impossibile aprire display.\n"
 "\n"
 
-#: ../src/gtk/window.cpp:1382 ../src/gtk/window.cpp:1427
+#: ../src/gtk/window.cpp:1383 ../src/gtk/window.cpp:1428
 msgid "----/--/-- --:--:--"
 msgstr "--/--/---- --:--:--"
 
@@ -136,7 +136,7 @@ msgstr "Aggiungi nuovo cheat"
 msgid "AdvanceMAME Scale2x"
 msgstr "AdvanceMAME Scale 2x"
 
-#: ../src/gtk/window.cpp:1300
+#: ../src/gtk/window.cpp:1301
 msgid "All Gameboy Advance files"
 msgstr "Tutti i files Gameboy Advance"
 
@@ -357,11 +357,11 @@ msgstr "GameShark"
 msgid "Gameboy Advance BIOS"
 msgstr "BIOS Gameboy Advance"
 
-#: ../src/gtk/window.cpp:1307
+#: ../src/gtk/window.cpp:1308
 msgid "Gameboy Advance files"
 msgstr "Files Gameboy Advance"
 
-#: ../src/gtk/window.cpp:1314
+#: ../src/gtk/window.cpp:1315
 msgid "Gameboy files"
 msgstr "Files Gameboy"
 
@@ -409,7 +409,7 @@ msgstr "Cari_ca stato"
 msgid "Load game"
 msgstr "Carica"
 
-#: ../src/gtk/window.cpp:1340
+#: ../src/gtk/window.cpp:1341
 msgid "Loaded battery"
 msgstr "Batteria caricata"
 
@@ -438,12 +438,11 @@ msgstr "Vuoto"
 msgid "Oldest slot"
 msgstr "Slot più vecchio"
 
-#: ../src/gtk/window.cpp:1265
+#: ../src/gtk/window.cpp:1266
 msgid "Open"
 msgstr "Apri"
 
-#: ../src/gtk/cheatlist.cpp:73 ../src/gtk/gameboycheatlist.cpp:73
-#: tmp/cheatlist.ui.h:5
+#: ../src/gtk/cheatlist.cpp:70 tmp/cheatlist.ui.h:5
 msgid "Open cheat list"
 msgstr "Apri lista cheat"
 
@@ -503,8 +502,7 @@ msgstr "S_alva stato"
 msgid "Sample rate : "
 msgstr "Sample rate : "
 
-#: ../src/gtk/cheatlist.cpp:96 ../src/gtk/gameboycheatlist.cpp:96
-#: tmp/cheatlist.ui.h:6
+#: ../src/gtk/cheatlist.cpp:93 tmp/cheatlist.ui.h:6
 msgid "Save cheat list"
 msgstr "Salva lista cheat"
 
@@ -520,7 +518,7 @@ msgstr "Salva screenshot"
 msgid "Save type : "
 msgstr "TIpo di salvataggio : "
 
-#: ../src/gtk/window.cpp:1357
+#: ../src/gtk/window.cpp:1358
 msgid "Saved battery"
 msgstr "Batteria salvata"
 
@@ -629,7 +627,7 @@ msgstr "Abilita/Disabilita i Cheats"
 msgid "Unable to initialize output, falling back to Cairo\n"
 msgstr "Impossibile inizializzare l'output, ritorno su Cairo\n"
 
-#: ../src/gtk/window.cpp:1021
+#: ../src/gtk/window.cpp:1022
 #, c-format
 msgid "Unknown file type %s"
 msgstr "Tipo di file sconosciuto %s"
@@ -658,12 +656,12 @@ msgstr "VBA"
 msgid "VBA-M"
 msgstr "VBA-M"
 
-#: ../src/gtk/window.cpp:1158
+#: ../src/gtk/window.cpp:1159
 #, c-format
 msgid "VBA-M - %d%%"
 msgstr "VBA-M - %d%%"
 
-#: ../src/gtk/window.cpp:1163
+#: ../src/gtk/window.cpp:1164
 #, c-format
 msgid "VBA-M - %d%% (%d, %d fps)"
 msgstr "VBA-M - %d%% (%d, %d fps)"
