@@ -2,7 +2,7 @@ Source: vbam
 Section: otherosfs
 Priority: optional
 Maintainer: Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>
-Build-Depends: debhelper (>= 7), cmake, nasm [i386 amd64], libsdl1.2-dev, libgl-dev, libgtkmm-2.4-dev, libgtkglextmm-x11-1.2-dev, libavcodec-dev, libavformat-dev, libswscale-dev, libavutil-dev, wx-common, libcairo2-dev, liblircclient-dev, libopenal-dev, libwxgtk2.8-dev
+Build-Depends: debhelper (>= 7), cmake, nasm [i386 amd64], libsdl1.2-dev, libgl-dev, libgtkmm-2.4-dev, libgtkglextmm-x11-1.2-dev, libavcodec-dev, libavformat-dev, libswscale-dev, libavutil-dev, wx-common, libcairo2-dev, liblircclient-dev, libopenal-dev, libwxgtk2.8-dev, libsfml-dev, imagemagick, zip
 Standards-Version: 3.8.1
 Homepage: http://www.vbam.com
 
