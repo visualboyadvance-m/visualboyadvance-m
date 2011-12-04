@@ -1,3 +1,9 @@
+vbam (1.8.0.1042-1) lucid; urgency=low
+
+  * Use new version from upstream
+
+ -- Bastien Bouclet <bgk@users.sourceforge.net>  Sun, 04 Dec 2011 08:48:11 +0100
+
 vbam (1.8.0.1016-1) unstable; urgency=low
 
   * Use new version from upstream, with wxwidgets patches
