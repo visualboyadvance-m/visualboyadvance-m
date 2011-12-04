@@ -30,14 +30,14 @@
 ////////////////////////////////////////////////////////////
 
 #include <SFML/Config.hpp>
-// #include <SFML/System/Clock.hpp>
-// #include <SFML/System/Lock.hpp>
-// #include <SFML/System/Mutex.hpp>
-// #include <SFML/System/Randomizer.hpp>
-// #include <SFML/System/Sleep.hpp>
-// #include <SFML/System/Thread.hpp>
-// #include <SFML/System/Unicode.hpp>
-// #include <SFML/System/Vector2.hpp>
-// #include <SFML/System/Vector3.hpp>
+#include <SFML/System/Clock.hpp>
+#include <SFML/System/Lock.hpp>
+#include <SFML/System/Mutex.hpp>
+#include <SFML/System/Randomizer.hpp>
+#include <SFML/System/Sleep.hpp>
+#include <SFML/System/Thread.hpp>
+#include <SFML/System/Unicode.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/System/Vector3.hpp>
 
 #endif // SFML_SYSTEM_HPP
