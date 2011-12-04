@@ -54,7 +54,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\fex;..\..\..\dependencies\lpng140;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\zlib"
+				AdditionalIncludeDirectories="..\..\..\dependencies\fex;..\..\..\dependencies\lpng140;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\zlib"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;DEV_VERSION;BKPT_SUPPORT;GBA_LOGGING;MMX;ASM;_CRT_SECURE_NO_WARNINGS;HAS_FILE_EXTRACTOR"
 				StringPooling="false"
 				MinimalRebuild="true"
@@ -167,7 +167,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\fex;..\..\..\dependencies\lpng140;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\zlib"
+				AdditionalIncludeDirectories="..\..\..\dependencies\fex;..\..\..\dependencies\lpng140;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\zlib"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;GBA_LOGGING;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
