@@ -23,12 +23,12 @@
 
 VERMAJ = 1
 VERMIN = 4
-VERMIC = 0
+VERMIC = 8
 VER = $(VERMAJ).$(VERMIN).$(VERMIC)
 NAME = libpng
 PACKAGE = $(NAME)-$(VER)
 
-BIN = libpng14-0.dll libpng-14.dll
+BIN = libpng14-0.dll
 LIB = libpng14.a libpng14.dll.a libpng.a libpng.dll.a scripts/png32ce.def
 INCLUDE = png.h pngconf.h pngpriv.h
 PC = libpng14.pc libpng.pc
@@ -64,7 +64,7 @@ copy-src:
 
 compilation:
 	@echo " * Compilation of $(PACKAGE)"
-	cd $(PACKAGE) && CPPFLAGS="$(CPPFLAGS) -DPNG_BUILD_DLL -DPNG_CONSOLE_IO_SUPPORTED -DPNG_NO_MMX_CODE -D_WIN32_WCE=0x0420" CFLAGS="$(CFLAGS) -mms-bitfields -O3 -pipe -fomit-frame-pointer" LDFLAGS="$(LDFLAGS) -Wl,--enable-auto-import -Wl,-s" ./configure --prefix=/opt/wince --host=arm-mingw32ce && make
+	cd $(PACKAGE) && CPPFLAGS="$(CPPFLAGS) -DPNG_BUILD_DLL -DPNG_CONSOLE_IO_SUPPORTED -D_WIN32_WCE=0x0420" CFLAGS="$(CFLAGS) -mms-bitfields -O3 -pipe -fomit-frame-pointer" LDFLAGS="$(LDFLAGS) -Wl,--enable-auto-import -Wl,-s" ./configure --prefix=/opt/wince --host=arm-mingw32ce && make
 
 copy:
 	@echo " * Copy of binary and development files"

@@ -1,5 +1,5 @@
 # makefile for libpng on DEC Alpha Unix
-# Copyright (C) 2000-2002, 2006 Glenn Randers-Pehrson
+# Copyright (C) 2000-2002, 2006, 2010 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 #
 # This code is released under the libpng license.
@@ -8,17 +8,13 @@
 
 # Library name:
 PNGMAJ = 14
-PNGMIN = 1.4.0
-PNGVER = $(PNGMAJ).$(PNGMIN)
 LIBNAME = libpng14
 
 # Shared library names:
 LIBSO=$(LIBNAME).so
 LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
-LIBSOVER=$(LIBNAME).so.$(PNGVER)
+LIBSOREL=$(LIBSOMAJ).$(RELEASE)
 OLDSO=libpng.so
-OLDSOMAJ=libpng.so.14
-OLDSOVER=libpng.so.14.$(PNGMIN)
 
 # Utilities:
 AR_RC=ar rc
@@ -90,16 +86,9 @@ libpng-config:
 $(LIBSO): $(LIBSOMAJ)
 	$(LN_SF) $(LIBSOMAJ) $(LIBSO)
 
-$(LIBSOMAJ): $(LIBSOVER)
-	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ)
-
-$(LIBSOVER): $(OBJS)
+$(LIBSOMAJ): $(OBJS)
 	$(CC) -shared -o $@ $(OBJS) -L$(ZLIBLIB) \
 	-soname $(LIBSOMAJ)
-
-$(OLDSOVER): $(OBJS)
-	$(CC) -shared -o $@ $(OBJS) -L$(ZLIBLIB) \
-	-soname $(OLDSOMAJ)
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -123,29 +112,22 @@ install-static: install-headers libpng.a
 	-@/bin/rm -f $(DL)/libpng.a
 	(cd $(DL); $(LN_SF)(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBSOVER) libpng.pc \
-	$(OLDSOVER)
+install-shared: install-headers $(LIBSOMAJ) libpng.pc
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
-	-@/bin/rm -f $(DL)/$(LIBSOVER)* $(DL)/$(LIBSO)
-	-@/bin/rm -f $(DL)/$(LIBSOMAJ)
-	-@/bin/rm -f $(DL)/$(OLDSO)
-	-@/bin/rm -f $(DL)/$(OLDSOMAJ)
-	-@/bin/rm -f $(DL)/$(OLDSOVER)*
-	cp $(LIBSOVER) $(DL)
-	cp $(OLDSOVER) $(DL)
-	chmod 755 $(DL)/$(LIBSOVER)
-	chmod 755 $(DL)/$(OLDSOVER)
+	-@$(RM_F) $(DL)/$(LIBSO)
+	-@$(RM_F) $(DL)/$(LIBSOREL)
+	-@$(RM_F) $(DL)/$(OLDSO)
+	cp $(LIBSOMAJ) $(DL)/$(LIBSOREL)
+	chmod 755 $(DL)/$(LIBSOREL)
 	(cd $(DL); \
-	$(LN_SF) $(OLDSOVER) $(OLDSOMAJ); \
-	$(LN_SF) $(OLDSOMAJ) $(OLDSO); \
-	$(LN_SF)(LIBSOVER) $(LIBSOMAJ); \
-	$(LN_SF)(LIBSOMAJ) $(LIBSO))
+	$(LN_SF) $(LIBSOREL) $(LIBSO); \
+	$(LN_SF) $(LIBSO) $(OLDSO))
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
-	-@/bin/rm -f $(DL)/pkgconfig/$(LIBNAME).pc
-	-@/bin/rm -f $(DL)/pkgconfig/libpng.pc
+	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
+	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
 	cp libpng.pc $(DL)/pkgconfig/$(LIBNAME).pc
 	chmod 644 $(DL)/pkgconfig/$(LIBNAME).pc
-	(cd $(DL)/pkgconfig; $(LN_SF)(LIBNAME).pc libpng.pc)
+	(cd $(DL)/pkgconfig; $(LN_SF) $(LIBNAME).pc libpng.pc)
 
 install-man: libpng.3 libpngpf.3 png.5
 	-@if [ ! -d $(DM) ]; then $(MKDIR_P) $(DM); fi
@@ -193,7 +175,6 @@ test-installed:
 clean:
 	/bin/rm -f *.o libpng.a pngtest pngtesti pngout.png \
 	libpng-config $(LIBSO) $(LIBSOMAJ)* \
-	$(OLDSOVER) \
 	libpng.pc
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.

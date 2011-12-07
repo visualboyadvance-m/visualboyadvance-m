@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.4.0 [January 3, 2010]
+ * Last changed in libpng 1.4.2 [May 6, 2010]
  * This file has been placed in the public domain by the authors.
  * Maintained 1998-2010 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
@@ -160,7 +160,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
     * If you have enough memory to read in the entire image at once,
     * and you need to specify only transforms that can be controlled
     * with one of the PNG_TRANSFORM_* bits (this presently excludes
-    * dithering, filling, setting background, and doing gamma
+    * quantizing, filling, setting background, and doing gamma
     * adjustment), then you can read the entire image (including
     * pixels) into the info structure with this call:
     */
@@ -271,7 +271,8 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
          png_set_gamma(png_ptr, screen_gamma, 0.45455);
    }
 
-   /* Dither RGB files down to 8 bit palette or reduce palettes
+#ifdef PNG_READ_QUANTIZE_SUPPORTED
+   /* Quantize RGB files down to 8 bit palette or reduce palettes
     * to the number of colors available on your screen.
     */
    if (color_type & PNG_COLOR_MASK_COLOR)
@@ -282,10 +283,11 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
       /* This reduces the image to the application supplied palette */
       if (/* We have our own palette */)
       {
-         /* An array of colors to which the image should be dithered */
+         /* An array of colors to which the image should be quantized */
          png_color std_color_cube[MAX_SCREEN_COLORS];
 
-         png_set_dither(png_ptr, std_color_cube, MAX_SCREEN_COLORS,
+         /* Prior to libpng-1.4.2, this was png_set_dither(). */
+         png_set_quantize(png_ptr, std_color_cube, MAX_SCREEN_COLORS,
             MAX_SCREEN_COLORS, NULL, 0);
       }
       /* This reduces the image to the palette supplied in the file */
@@ -295,10 +297,11 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
 
          png_get_hIST(png_ptr, info_ptr, &histogram);
 
-         png_set_dither(png_ptr, palette, num_palette,
+         png_set_quantize(png_ptr, palette, num_palette,
                         max_screen_colors, histogram, 0);
       }
    }
+#endif /* PNG_READ_QUANTIZE_SUPPORTED */
 
    /* Invert monochrome files to have 0 as white and 1 as black */
    png_set_invert_mono(png_ptr);
@@ -509,20 +512,17 @@ row_callback(png_structp png_ptr, png_bytep new_row,
     * shown below:
     */
 
-   /* Check if row_num is in bounds. */
-   if ((row_num >= 0) && (row_num < height))
-   {
-     /* Get pointer to corresponding row in our
-      * PNG read buffer.
-      */
-     png_bytep old_row = ((png_bytep *)our_data)[row_num];
+   /* Get pointer to corresponding row in our
+    * PNG read buffer.
+    */
+   png_bytep old_row = ((png_bytep *)our_data)[row_num];
 
-     /* If both rows are allocated then copy the new row
-      * data to the corresponding row data.
-      */
-     if ((old_row != NULL) && (new_row != NULL))
-     png_progressive_combine_row(png_ptr, old_row, new_row);
-   }
+   /* If both rows are allocated then copy the new row
+    * data to the corresponding row data.
+    */
+   if ((old_row != NULL) && (new_row != NULL))
+   png_progressive_combine_row(png_ptr, old_row, new_row);
+
    /*
     * The rows and passes are called in order, so you don't really
     * need the row_num and pass, but I'm supplying them because it
@@ -684,8 +684,11 @@ void write_png(char *file_name /* , ... other image information ... */)
    text_ptr[2].compression = PNG_TEXT_COMPRESSION_zTXt;
 #ifdef PNG_iTXt_SUPPORTED
    text_ptr[0].lang = NULL;
+   text_ptr[0].lang_key = NULL;
    text_ptr[1].lang = NULL;
+   text_ptr[1].lang_key = NULL;
    text_ptr[2].lang = NULL;
+   text_ptr[2].lang_key = NULL;
 #endif
    png_set_text(png_ptr, info_ptr, text_ptr, 3);
 

@@ -1,6 +1,6 @@
-.TH LIBPNGPF 3 "January 3, 2010"
+.TH LIBPNGPF 3 "July 7, 2011"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0
+libpng \- Portable Network Graphics (PNG) Reference Library 1.4.8
 (private functions)
 .SH SYNOPSIS
 \fB#include <png.h>\fP
@@ -145,14 +145,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0
 
 \fI\fB
 
-\fI\fB
-
-\fBvoid png_do_dither (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_bytep \fP\fIpalette_lookup\fP\fB, png_bytep \fIdither_lookup\fP\fB);\fP
-
-\fI\fB
-
-\fI\fB
-
 \fBvoid png_do_expand (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_color_16p \fItrans_value\fP\fB);\fP
 
 \fI\fB
@@ -190,6 +182,12 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0
 \fI\fB
 
 \fBvoid png_do_packswap (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fIrow\fP\fB);\fP
+
+\fI\fB
+
+\fI\fB
+
+\fBvoid png_do_quantize (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_bytep \fP\fIpalette_lookup\fP\fB, png_bytep \fIquantize_lookup\fP\fB);\fP
 
 \fI\fB
 
@@ -583,11 +581,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0
 
 \fI\fB
 
-\fI\fB
-
 \fBvoid png_read_push_finish_row (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
+
+\fBvoid png_read_sig (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -595,17 +593,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.4.0
 
 \fI\fB
 
-\fI\fB
-
 \fBvoid png_read_transform_info (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fI\fB
-
 \fBvoid png_reset_crc (png_structp \fIpng_ptr\fP\fB);\fP
-
-\fI\fB
 
 \fI\fB
 
@@ -805,6 +797,6 @@ are listed alphabetically here as an aid to libpng maintainers.
 See png.h for more information on these functions.
 
 .SH SEE ALSO
-libpng(3), png(5)
+.BR "png"(5), " libpng"(3), " zlib"(3), " deflate"(5), " " and " zlib"(5)
 .SH AUTHOR
 Glenn Randers-Pehrson

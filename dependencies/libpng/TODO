@@ -9,7 +9,7 @@ Fix problem with C++ and EXTERN "C".
 cHRM transformation.
 Improve setjmp/longjmp usage or remove it in favor of returning error codes.
 Add "grayscale->palette" transformation and "palette->grayscale" detection.
-Improved dithering.
+Improved quantizing and dithering.
 Multi-lingual error and warning message support.
 Complete sRGB transformation (presently it simply uses gamma=0.45455).
 Man pages for function calls.

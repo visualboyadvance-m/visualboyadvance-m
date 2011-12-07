@@ -1,5 +1,5 @@
 # makefile for libpng.a and libpng14.so, SGI IRIX with 'cc'
-# Copyright (C) 2001-2002, 2006 Glenn Randers-Pehrson
+# Copyright (C) 2001-2002, 2006, 2010 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 #
 # This code is released under the libpng license.
@@ -9,16 +9,12 @@
 # Library name:
 LIBNAME=libpng14
 PNGMAJ = 14
-PNGMIN = 1.4.0
-PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
 LIBSO=$(LIBNAME).so
 LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
-LIBSOVER=$(LIBNAME).so.$(PNGVER)
+LIBSOREL=$(LIBSOMAJ).$(RELEASE)
 OLDSO=libpng.so
-OLDSOMAJ=libpng.so.14
-OLDSOVER=libpng.so.14.$(PNGMIN)
 
 # Utilities:
 AR_RC=ar rc
@@ -51,8 +47,6 @@ CFLAGS=$(ABI) -I$(ZLIBINC) -O $(WARNMORE) -fPIC -mabi=n32
 LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm
 LDSHARED=cc $(ABI) -shared -soname $(LIBSOMAJ) \
   -set_version sgi$(PNGMAJ).0
-LDLEGACY=cc $(ABI) -shared -soname $(OLDSOMAJ) \
-  -set_version sgi$3.0
 # See "man dso" for info about shared objects
 
 INCPATH=$(prefix)/include
@@ -86,7 +80,7 @@ libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)
 	$(RANLIB) $@
 
-shared: $(LIBSOVER)
+shared: $(LIBSOMAJ)
 
 libpng.pc:
 	cat scripts/libpng.pc.in | sed -e s!@prefix@!$(prefix)! \
@@ -111,15 +105,9 @@ libpng-config:
 $(LIBSO): $(LIBSOMAJ)
 	$(LN_SF) $(LIBSOMAJ) $(LIBSO)
 
-$(LIBSOMAJ): $(LIBSOVER)
-	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ)
-
-$(LIBSOVER): $(OBJS)
+$(LIBSOMAJ): $(OBJS)
 	$(LDSHARED) -o $@ $(OBJS)
 	$(RM_F) $(LIBSO) $(LIBSOMAJ)
-
-$(OLDSOVER): $(OBJS)
-	$(LDLEGACY) -o $@ $(OBJS)
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -145,23 +133,16 @@ install-static: install-headers libpng.a
 	-@$(RM_F) $(DL)/libpng.a
 	(cd $(DL); $(LN_SF) $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBSOVER) libpng.pc \
-	$(OLDSOVER)
+install-shared: install-headers $(LIBSOMAJ) libpng.pc
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
-	-@$(RM_F) $(DL)/$(LIBSOVER)* $(DL)/$(LIBSO)
-	-@$(RM_F) $(DL)/$(LIBSOMAJ)
+	-@$(RM_F) $(DL)/$(LIBSO)
+	-@$(RM_F) $(DL)/$(LIBSOREL)
 	-@$(RM_F) $(DL)/$(OLDSO)
-	-@$(RM_F) $(DL)/$(OLDSOMAJ)
-	-@$(RM_F) $(DL)/$(OLDSOVER)*
-	cp $(LIBSOVER) $(DL)
-	cp $(OLDSOVER) $(DL)
-	chmod 755 $(DL)/$(LIBSOVER)
-	chmod 755 $(DL)/$(OLDSOVER)
+	cp $(LIBSOMAJ) $(DL)/$(LIBSOREL)
+	chmod 755 $(DL)/$(LIBSOREL)
 	(cd $(DL); \
-	$(LN_SF) $(OLDSOVER) $(OLDSOMAJ); \
-	$(LN_SF) $(OLDSOMAJ) $(OLDSO); \
-	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ); \
-	$(LN_SF) $(LIBSOMAJ) $(LIBSO))
+	$(LN_SF) $(LIBSOREL) $(LIBSO); \
+	$(LN_SF) $(LIBSO) $(OLDSO))
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
 	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
 	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
@@ -216,7 +197,7 @@ test-installed:
 
 clean:
 	$(RM_F) libpng.a pngtest pngtesti pngout.png libpng.pc \
-        so_locations libpng-config $(LIBSO) $(LIBSOMAJ)* $(OLDSOVER)
+        so_locations libpng-config $(LIBSO) $(LIBSOMAJ)*
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

@@ -1,5 +1,5 @@
 # makefile for libpng on Darwin / Mac OS X
-# Copyright (C) 2002, 2004, 2006, 2008 Glenn Randers-Pehrson
+# Copyright (C) 2002, 2004, 2006, 2008, 2010 Glenn Randers-Pehrson
 # Copyright (C) 2001 Christoph Pfisterer
 # derived from makefile.linux:
 #  Copyright (C) 1998, 1999 Greg Roelofs
@@ -22,16 +22,12 @@ ZLIBINC=../zlib
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 14
-PNGMIN = 1.4.0
-PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
 LIBSO=$(LIBNAME).dylib
 LIBSOMAJ=$(LIBNAME).$(PNGMAJ).dylib
-LIBSOVER=$(LIBNAME).$(PNGVER).dylib
+LIBSOREL=$(LIBNAME).$(PNGMAJ).$(RELEASE).dylib
 OLDSO=libpng.dylib
-OLDSOMAJ=libpng.14.dylib
-OLDSOVER=libpng.14.$(PNGMIN).dylib
 
 # Utilities:
 CC=cc
@@ -101,21 +97,11 @@ libpng-config:
 $(LIBSO): $(LIBSOMAJ)
 	$(LN_SF) $(LIBSOMAJ) $(LIBSO)
 
-$(LIBSOMAJ): $(LIBSOVER)
-	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ)
-
-$(LIBSOVER): $(OBJSDLL)
+$(LIBSOMAJ): $(OBJSDLL)
 	$(CC) -dynamiclib \
 	 -install_name $(LIBPATH)/$(LIBSOMAJ) \
 	 -current_version 14 -compatibility_version 14 \
-	 -o $(LIBSOVER) \
-	 $(OBJSDLL) -L$(ZLIBLIB) -lz
-
-$(OLDSOVER): $(OBJSDLL)
-	$(CC) -dynamiclib \
-	 -install_name $(LIBPATH)/$(OLDSOMAJ) \
-	 -current_version 14 -compatibility_version 14 \
-	 -o $(OLDSOVER) \
+	 -o $(LIBSOMAJ) \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
 pngtest: pngtest.o $(LIBSO)
@@ -141,24 +127,16 @@ install-static: install-headers libpng.a
 	-@$(RM_F) $(DL)/libpng.a
 	(cd $(DL); $(LN_SF) $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBSO) libpng.pc \
-	$(OLDSOVER)
+install-shared: install-headers $(LIBSOMAJ) libpng.pc
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
-	-@$(RM_F) $(DL)/$(LIBNAME).$(PNGVER)*.dylib
-	-@$(RM_F) $(DL)/$(LIBNAME).$(PNGMAJ)*.dylib
 	-@$(RM_F) $(DL)/$(LIBSO)
+	-@$(RM_F) $(DL)/$(LIBSOREL)
 	-@$(RM_F) $(DL)/$(OLDSO)
-	-@$(RM_F) $(DL)/$(OLDSOMAJ)
-	-@$(RM_F) $(DL)/libpng.3.$(PNGMIN)*.dylib
-	cp $(LIBSOVER) $(DL)
-	cp $(OLDSOVER) $(DL)
-	chmod 755 $(DL)/$(LIBSOVER)
-	chmod 755 $(DL)/$(OLDSOVER)
+	cp $(LIBSOMAJ) $(DL)/$(LIBSOREL)
+	chmod 755 $(DL)/$(LIBSOREL)
 	(cd $(DL); \
-	$(LN_SF) $(OLDSOVER) $(OLDSOMAJ); \
-	$(LN_SF) $(OLDSOMAJ) $(OLDSO); \
-	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ); \
-	$(LN_SF) $(LIBSOMAJ) $(LIBSO))
+	$(LN_SF) $(LIBSOREL) $(LIBSO); \
+	$(LN_SF) $(LIBSO) $(OLDSO))
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
 	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
 	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
@@ -209,7 +187,6 @@ test-installed:
 
 clean:
 	$(RM_F) *.o libpng.a pngtest pngout.png libpng-config \
-	$(OLDSOVER) \
 	libpng.pc $(LIBNAME).*dylib pngtesti
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO

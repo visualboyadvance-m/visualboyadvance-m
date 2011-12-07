@@ -14,6 +14,10 @@
 
 # Built from makefile.cygwin
 
+# This makefile expects to be run under the MSYS shell (part of
+# the MINGW project) and not under CMD.EXE which does not provide
+# "cat" or "sed".
+
 # This makefile intends to support building outside the src directory
 # if desired. When invoking it, specify an argument to SRCDIR on the
 # command line that points to the top of the directory where your source
@@ -68,8 +72,6 @@ CFLAGS= $(strip $(MINGW_CCFLAGS) $(addprefix -I,$(ZLIBINC)) \
 LIBNAME = libpng14
 PNGMAJ = 14
 MINGDLL = 14
-PNGMIN = 1.4.0
-PNGVER = $(PNGMAJ).$(PNGMIN)
 
 SHAREDLIB=libpng$(MINGDLL).dll
 STATLIB=libpng.a

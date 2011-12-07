@@ -6,7 +6,7 @@ LIBRARY lpngce
 
  png_memcpy_check
  png_memset_check
- png_set_dither
+ png_set_quantize
  png_read_init_3
  png_write_init_3
  png_set_strip_error_numbers
@@ -15,7 +15,7 @@ LIBRARY lpngce
  png_get_int_32
 
 EXPORTS
-;Version 1.4.0
+;Version 1.4.8
   png_build_grayscale_palette  @1
 ;  png_check_sig        @2
   png_chunk_error      @3
@@ -113,7 +113,7 @@ EXPORTS
   png_set_compression_strategy  @94
   png_set_compression_window_bits  @95
   png_set_crc_action  @96
-;  png_set_dither    @97
+  png_set_quantize    @97
   png_set_error_fn    @98
   png_set_expand    @99
   png_set_filler    @100
@@ -198,9 +198,11 @@ EXPORTS
 ;  png_read_init_3    @175
 ;  png_write_init_3    @176
   png_info_init_3 @177
-  png_destroy_struct  @178
+;  Moved to pngpriv.h
+;  png_destroy_struct  @178
 ; Added at version 1.2.0
 ; For use with PNG_USER_MEM_SUPPORTED
+;  Moved to pngpriv.h
 ; png_destroy_struct_2  @179
 ; png_create_read_struct_2 @180
 ; png_create_write_struct_2 @181
@@ -245,13 +247,16 @@ EXPORTS
 ; Added at version 1.2.41
   png_write_sig @208
   png_benign_error @209
-  png_benign_chunk_error @210
+  png_chunk_benign_error @210
   png_set_benign_error @211
   png_get_io_chunk_name @212
   png_get_io_state @213
-  png_set_premultiply_alpha @214
   png_get_chunk_cache_max @215
   png_set_chunk_cache_max @216
-  png_check_cHRM_fixed @217
+; Moved to pngpriv.h
+; png_check_cHRM_fixed @217
   png_calloc @218
   png_set_longjmp_fn @219
+; Added at version 1.4.1
+  png_get_chunk_malloc_max @220
+  png_set_chunk_malloc_max @221

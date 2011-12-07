@@ -23,8 +23,6 @@ LN_SF = ln -f -s
 
 LIBNAME=libpng14
 PNGMAJ = 14
-PNGMIN = 1.4.0
-PNGVER = $(PNGMAJ).$(PNGMIN)
 
 prefix=/usr/local
 INCPATH=$(prefix)/include
@@ -48,7 +46,7 @@ LDDEBUG =
 CRELEASE = -O2
 LDRELEASE = -s
 WARNMORE=-W -Wall
-CFLAGS = -I$(ZLIBINC) $(WARNMORE) $(CRELEASE)
+CFLAGS = -D_ALL_SOURCE -I$(ZLIBINC) $(WARNMORE) $(CRELEASE)
 LDFLAGS = -L. -L$(ZLIBLIB) -lpng14 -lz -lm $(LDRELEASE)
 
 # File extensions

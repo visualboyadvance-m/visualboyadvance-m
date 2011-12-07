@@ -2,7 +2,7 @@
 ; PNG.LIB module definition file for OS/2
 ;----------------------------------------
 
-; Version 1.4.0
+; Version 1.4.8
 
 LIBRARY		PNG
 DESCRIPTION	"PNG image compression library for OS/2"
@@ -205,16 +205,21 @@ EXPORTS
 ; Added at version 1.2.41
   png_write_sig
 ; png_benign_error
-; png_benign_chunk_error
+; png_chunk_benign_error
 ; png_set_benign_error
   png_get_io_chunk_name
   png_get_io_state
-  png_set_premultiply_alpha
   png_get_chunk_cache_max
   png_set_chunk_cache_max
-  png_check_cHRM_fixed
+; Moved to pngpriv.h
+; png_check_cHRM_fixed @217
   png_calloc
   png_set_longjmp_fn
+; Added at version 1.4.1
+  png_get_chunk_malloc_max
+  png_set_chunk_malloc_max
+; Added at version 1.4.2
+  png_set_quantize
 
 ; These are not present when libpng is compiled with PNG_NO_GLOBAL_ARRAYS
   png_libpng_ver

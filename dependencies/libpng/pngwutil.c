@@ -1,8 +1,8 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.4.0 [January 3, 2010]
- * Copyright (c) 1998-2010 Glenn Randers-Pehrson
+ * Last changed in libpng 1.4.8 [July 7, 2011]
+ * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -246,10 +246,12 @@ png_text_compress(png_structp png_ptr,
     */
 
    /* Set up the compression buffers */
+   /* TODO: the following cast hides a potential overflow problem. */
    png_ptr->zstream.avail_in = (uInt)text_len;
+   /* NOTE: assume zlib doesn't overwrite the input */
    png_ptr->zstream.next_in = (Bytef *)text;
-   png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
-   png_ptr->zstream.next_out = (Bytef *)png_ptr->zbuf;
+   png_ptr->zstream.avail_out = png_ptr->zbuf_size;
+   png_ptr->zstream.next_out = png_ptr->zbuf;
 
    /* This is the same compression loop as in png_write_row() */
    do
@@ -436,7 +438,8 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
             case 4:
             case 8:
             case 16: png_ptr->channels = 1; break;
-            default: png_error(png_ptr, "Invalid bit depth for grayscale image");
+            default: png_error(png_ptr,
+                         "Invalid bit depth for grayscale image");
          }
          break;
       case PNG_COLOR_TYPE_RGB:
@@ -639,7 +642,9 @@ png_write_PLTE(png_structp png_ptr, png_colorp palette, png_uint_32 num_pal)
       png_write_chunk_data(png_ptr, buf, (png_size_t)3);
    }
 #else
-   /* This is a little slower but some buggy compilers need to do this instead */
+   /* This is a little slower but some buggy compilers need to do this
+    * instead
+    */
    pal_ptr=palette;
    for (i = 0; i < num_pal; i++)
    {
@@ -677,11 +682,29 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
          if (length >= 2 &&
              png_ptr->height < 16384 && png_ptr->width < 16384)
          {
+            unsigned int z_cinfo;
+            unsigned int half_z_window_size;
+
+            /* Compute the maximum possible length of the datastream */
+
+            /* Number of pixels, plus for each row a filter byte
+             * and possibly a padding byte, so increase the maximum
+             * size to account for these.
+             */
             png_uint_32 uncompressed_idat_size = png_ptr->height *
                ((png_ptr->width *
                png_ptr->channels * png_ptr->bit_depth + 15) >> 3);
-            unsigned int z_cinfo = z_cmf >> 4;
-            unsigned int half_z_window_size = 1 << (z_cinfo + 7);
+
+            /* If it's interlaced, each block of 8 rows is sent as up to
+             * 14 rows, i.e., 6 additional rows, each with a filter byte
+             * and possibly a padding byte
+             */
+            if (png_ptr->interlaced)
+               uncompressed_idat_size += ((png_ptr->height + 7)/8) *
+                   (png_ptr->bit_depth < 8 ? 12 : 6);
+
+            z_cinfo = z_cmf >> 4;
+            half_z_window_size = 1 << (z_cinfo + 7);
             while (uncompressed_idat_size <= half_z_window_size &&
                    half_z_window_size >= 256)
             {
@@ -2103,7 +2126,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
    png_uint_32 row_bytes = row_info->rowbytes;
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
    int num_p_filters = (int)png_ptr->num_prev_filters;
-#endif 
+#endif
 
    png_debug(1, "in png_write_find_filter");
 
@@ -2113,7 +2136,7 @@ png_write_find_filter(png_structp png_ptr, png_row_infop row_info)
       /* These will never be selected so we need not test them. */
       filter_to_do &= ~(PNG_FILTER_UP | PNG_FILTER_PAETH);
   }
-#endif 
+#endif
 
    /* Find out how many bytes offset each pixel is */
    bpp = (row_info->pixel_depth + 7) >> 3;

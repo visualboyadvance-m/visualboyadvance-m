@@ -1,7 +1,7 @@
 # makefile for SCO OSr5  ELF and Unixware 7 with Native cc
 # Contributed by Mike Hopkirk (hops@sco.com) modified from Makefile.lnx
 #   force ELF build dynamic linking, SONAME setting in lib and RPATH in app
-# Copyright (C) 2002, 2006 Glenn Randers-Pehrson
+# Copyright (C) 2002, 2006, 2010 Glenn Randers-Pehrson
 # Copyright (C) 1998 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
 #
@@ -12,16 +12,12 @@
 # Library name:
 LIBNAME = libpng14
 PNGMAJ = 14
-PNGMIN = 1.4.0
-PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
 LIBSO=$(LIBNAME).so
 LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
-LIBSOVER=$(LIBNAME).so.$(PNGVER)
+LIBSOREL=$(LIBSOMAJ).$(RELEASE)
 OLDSO=libpng.so
-OLDSOMAJ=libpng.so.14
-OLDSOVER=libpng.so.14.$(PNGMIN)
 
 # Utilities:
 CC=cc
@@ -101,16 +97,9 @@ libpng-config:
 $(LIBSO): $(LIBSOMAJ)
 	$(LN_SF) $(LIBSOMAJ) $(LIBSO)
 
-$(LIBSOMAJ): $(LIBSOVER)
-	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ)
-
-$(LIBSOVER): $(OBJSDLL)
-	$(CC) -G  -Wl,-h,$(LIBSOMAJ) -o $(LIBSOVER) \
+$(LIBSOMAJ): $(OBJSDLL)
+	$(CC) -G  -Wl,-h,$(LIBSOMAJ) -o $(LIBSOMAJ) \
 	 $(OBJSDLL)
-
-$(OLDSOVER): $(OBJSDLL)
-	$(CC) -G  -Wl,-h,$(OLDSOMAJ) -o $(OLDSOVER) \
-	$(OBJSDLL)
 
 pngtest: pngtest.o $(LIBSO)
 	LD_RUN_PATH=.:$(ZLIBLIB) $(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)
@@ -136,23 +125,16 @@ install-static: install-headers libpng.a
 	-@$(RM_F) $(DL)/libpng.a
 	(cd $(DL); $(LN_SF) $(LIBNAME).a libpng.a)
 
-install-shared: install-headers $(LIBSOVER) libpng.pc \
-	$(OLDSOVER)
+install-shared: install-headers $(LIBSOMAJ) libpng.pc
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
-	-@$(RM_F) $(DL)/$(LIBSOVER)* $(DL)/$(LIBSO)
-	-@$(RM_F) $(DL)/$(LIBSOMAJ)
+	-@$(RM_F) $(DL)/$(LIBSO)
+	-@$(RM_F) $(DL)/$(LIBSOREL)
 	-@$(RM_F) $(DL)/$(OLDSO)
-	-@$(RM_F) $(DL)/$(OLDSOMAJ)
-	-@$(RM_F) $(DL)/$(OLDSOVER)*
-	cp $(LIBSOVER) $(DL)
-	cp $(OLDSOVER) $(DL)
-	chmod 755 $(DL)/$(LIBSOVER)
-	chmod 755 $(DL)/$(OLDSOVER)
+	cp $(LIBSOMAJ) $(DL)/$(LIBSOREL)
+	chmod 755 $(DL)/$(LIBSOREL)
 	(cd $(DL); \
-	$(LN_SF) $(OLDSOVER) $(OLDSOMAJ); \
-	$(LN_SF) $(OLDSOMAJ) $(OLDSO); \
-	$(LN_SF) $(LIBSOVER) $(LIBSOMAJ); \
-	$(LN_SF) $(LIBSOMAJ) $(LIBSO))
+	$(LN_SF) $(LIBSOREL) $(LIBSO); \
+	$(LN_SF) $(LIBSO) $(OLDSO))
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
 	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
 	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
@@ -204,7 +186,6 @@ test-installed:
 clean:
 	$(RM_F) *.o libpng.a pngtest pngout.png libpng-config \
 	$(LIBSO) $(LIBSOMAJ)* pngtest-static pngtesti \
-	$(OLDSOVER) \
 	libpng.pc
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
