@@ -33,7 +33,7 @@ Description: Nintendo Game Boy Advance emulator (GTK+ frontend)
 Package: vbam-wx
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Nintendo Game Boy Advance emulator (GTK+ frontend)
+Description: Nintendo Game Boy Advance emulator (wxWidgets frontend)
  VisualBoyAdvance-M is a Nintendo Game Boy Emulator with high
  compatibility with commercial games. It emulates the Nintendo Game
  Boy Advance handheld console, in addition to the original Game Boy
