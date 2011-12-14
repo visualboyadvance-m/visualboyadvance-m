@@ -23,23 +23,16 @@ endif
 
 builddir/Makefile:
 	dh_testdir
-	mkdir -p builddir builddir-wx
+	mkdir -p builddir
 	cd builddir && \
 		cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_C_FLAGS="$(CFLAGS)" \
 			-DCMAKE_LD_FLAGS="-Wl,-z,defs" -DCMAKE_CXX_FLAGS="$(CXXFLAGS)" \
-			-DENABLE_LIRC=ON -DENABLE_WX=OFF \
-			-DCMAKE_SKIP_RPATH=ON $(EXTRA_CMAKE_FLAGS)
-	cd builddir-wx && \
-		cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_C_FLAGS="$(CFLAGS)" \
-			-DCMAKE_LD_FLAGS="-Wl,-z,defs" -DCMAKE_CXX_FLAGS="$(CXXFLAGS)" \
-			-DENABLE_LINK=ON -DENABLE_WX=ON -DENABLE_SDL=OFF -DENABLE_GTK=OFF\
-			-DCMAKE_SKIP_RPATH=ON $(EXTRA_CMAKE_FLAGS)
+			-DENABLE_LIRC=ON -DCMAKE_SKIP_RPATH=ON $(EXTRA_CMAKE_FLAGS)
 
 build: build-stamp
 
 build-stamp: builddir/Makefile
 	dh_testdir
-	$(MAKE) -C builddir-wx
 	$(MAKE) -C builddir
 	touch $@
 
@@ -47,7 +40,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp
-	rm -rf builddir builddir-wx
+	rm -rf builddir
 	dh_clean
 
 install: build
@@ -56,7 +49,6 @@ install: build
 	dh_prep
 	dh_installdirs
 	$(MAKE) -C builddir DESTDIR=$(CURDIR)/debian/tmp install
-	$(MAKE) -C builddir-wx DESTDIR=$(CURDIR)/debian/tmp install
 
 binary-indep: install
 
