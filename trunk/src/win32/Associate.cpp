@@ -20,6 +20,7 @@ Associate::Associate(CWnd* pParent /*=NULL*/)
   m_agb = FALSE;
   m_bin = FALSE;
   m_cgb = FALSE;
+  m_dmg = FALSE;
   m_gb = FALSE;
   m_gba = FALSE;
   m_gbc = FALSE;
@@ -35,6 +36,7 @@ void Associate::DoDataExchange(CDataExchange* pDX)
   DDX_Check(pDX, IDC_AGB, m_agb);
   DDX_Check(pDX, IDC_BIN, m_bin);
   DDX_Check(pDX, IDC_CGB, m_cgb);
+  DDX_Check(pDX, IDC_GB, m_dmg);
   DDX_Check(pDX, IDC_GB, m_gb);
   DDX_Check(pDX, IDC_GBA, m_gba);
   DDX_Check(pDX, IDC_GBC, m_gbc);
@@ -73,24 +75,26 @@ void Associate::OnOk()
   UpdateData();
 
   int mask = 0;
-  if(m_gb)
+  if(m_dmg)
     mask |= 1;
-  if(m_sgb)
+  if(m_gb)
     mask |= 2;
-  if(m_cgb)
+  if(m_sgb)
     mask |= 4;
-  if(m_gbc)
+  if(m_cgb)
     mask |= 8;
-  if(m_gba)
+  if(m_gbc)
     mask |= 16;
-  if(m_agb)
+  if(m_gba)
     mask |= 32;
-  if(m_bin)
+  if(m_agb)
     mask |= 64;
+  if(m_bin)
+    mask |= 128;
   if(mask) {
     char applicationPath[2048];
     CString commandPath;
-    LPCTSTR types[] = { ".gb", ".sgb", ".cgb", ".gbc", ".gba", ".agb", ".bin" };
+    LPCTSTR types[] = { "*.dmg", ".gb", ".sgb", ".cgb", ".gbc", ".gba", ".agb", ".bin" };
     GetModuleFileName(NULL, applicationPath, 2048);
     commandPath.Format("\"%s\" \"%%1\"", applicationPath);
     regAssociateType("VisualBoyAdvance.Binary",
@@ -98,7 +102,7 @@ void Associate::OnOk()
                      commandPath,
 					 "%SystemRoot%\\system32\\SHELL32.dll,-13");
 
-    for(int i = 0; i < 7; i++) {
+    for(int i = 0; i < 8; i++) {
       if(mask & (1<<i)) {
         regCreateFileType(types[i],"VisualBoyAdvance.Binary");
       }

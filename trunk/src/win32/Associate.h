@@ -22,6 +22,7 @@ class Associate : public CDialog
   BOOL  m_agb;
   BOOL  m_bin;
   BOOL  m_cgb;
+  BOOL  m_dmg;
   BOOL  m_gb;
   BOOL  m_gba;
   BOOL  m_gbc;
