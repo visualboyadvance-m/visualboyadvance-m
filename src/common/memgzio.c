@@ -698,7 +698,7 @@ long ZEXPORT memtell(file)
     return memTell(s->file);
 }
 
-long ZEXPORT memgzseek(gzFile file, long off, int whence)
+z_off_t ZEXPORT memgzseek(gzFile file, z_off_t off, int whence)
 {
     if(whence != SEEK_CUR) {
 	fputs("FIXME: memgzio does not support seeking\n", stderr);
