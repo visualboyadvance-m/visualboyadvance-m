@@ -202,7 +202,7 @@ FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     ICON            IDI_MAINICON,IDC_STATIC,6,6,20,20
     CTEXT           "VisualBoyAdvance-M Emulator",IDC_STATIC,36,6,138,8
-    CTEXT           "Copyright © 2008 VBA-M development team",IDC_STATIC,6,48,168,8
+    CTEXT           "Copyright ï¿½ 2008 VBA-M development team",IDC_STATIC,6,48,168,8
     CTEXT           "http://vba-m.com",IDC_URL,7,138,168,8
     RTEXT           "Version:",IDC_STATIC,36,18,54,8
     LTEXT           "",IDC_VERSION,96,18,78,8,SS_NOPREFIX
@@ -1609,7 +1609,7 @@ BEGIN
             VALUE "FileDescription", "VisualBoyAdvance-M"
             VALUE "FileVersion", "1, 8, 0, 0"
             VALUE "InternalName", "VBA-M"
-            VALUE "LegalCopyright", "Copyright © 2008-2009 VBA-M development team"
+            VALUE "LegalCopyright", "Copyright ï¿½ 2008-2009 VBA-M development team"
             VALUE "OriginalFilename", "VisualBoyAdvance-M.exe"
             VALUE "ProductName", "GB/C/A emulator for Windows"
             VALUE "ProductVersion", "1, 8, 0, 0"
@@ -2263,7 +2263,7 @@ BEGIN
     IDS_ADD_CBA_CODE        "Add CodeBreakerAdvance code"
     IDS_FILTER_WAV          "Wave file_*.WAV__"
     IDS_SELECT_WAV_NAME     "Select wave file name"
-    IDS_FILTER_GBROM        "Game Boy ROMs (*.GB;*.SGB;*.ZIP;*.7Z;*.Z;*.GZ)_*.GB;*.SGB;*.ZIP;*.7Z;*.Z;*.GZ__"
+    IDS_FILTER_GBROM        "Game Boy ROMs (*.DMG;*.GB;*.SGB;*.ZIP;*.7Z;*.Z;*.GZ)_*.DMG;*.GB;*.SGB;*.ZIP;*.7Z;*.Z;*.GZ__"
     IDS_FILTER_PAL          "Windows Palette (*.PAL)_*.PAL_PaintShop Palette (*.PAL)_*.PAL_Adobe Color Table (*.ACT)_*.ACT__"
     IDS_SELECT_PALETTE_NAME "Select palette name:"
     IDS_SEARCH_PRODUCED_NO_RESULTS "Search produced no results."
