@@ -35,13 +35,15 @@ endif( NOT ENABLE_DEBUGGER AND ENABLE_SDL )
 
 # Set the version number with -DVERSION=X.X.X-uber
 IF( NOT VERSION )
-    FIND_PACKAGE(Subversion)
-    IF(SUBVERSION_FOUND)
-       Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} SVN_INFO)
-        SET( VERSION "1.8.0-SVN${SVN_INFO_WC_REVISION}" )
-    ELSE(SUBVERSION_FOUND)
-        SET( VERSION "1.8.0-SVN" )
-    ENDIF(SUBVERSION_FOUND)
+    SET( VERSION "1.8.0-SVN" )
+   
+    IF(EXISTS "${CMAKE_SOURCE_DIR}/.svn")
+        FIND_PACKAGE(Subversion)
+        IF(SUBVERSION_FOUND)
+            Subversion_WC_INFO(${CMAKE_SOURCE_DIR} SVN_INFO)
+            SET( VERSION "1.8.0-SVN${SVN_INFO_WC_REVISION}" )
+        ENDIF(SUBVERSION_FOUND)
+    ENDIF(EXISTS "${CMAKE_SOURCE_DIR}/.svn")
 ENDIF( NOT VERSION )
 
 # Fill in SDLMAIN_LIBRARY on OS X manually to avoid using SDLMain.m
