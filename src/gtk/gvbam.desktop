@@ -8,3 +8,4 @@ Comment=Nindendo GameBoy Advance Emulator
 Exec=gvbam
 Icon=vbam
 Categories=Application;Game;Emulator;GTK
+MimeType=application/x-gameboy-rom;application/x-gba-rom
