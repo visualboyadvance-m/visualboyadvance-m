@@ -358,22 +358,23 @@ BEGIN
     GROUPBOX        "Add",IDC_STATIC,5,199,268,27
 END
 
-IDD_ASSOCIATIONS DIALOG 0, 0, 116, 95
+IDD_ASSOCIATIONS DIALOGEX 0, 0, 116, 110
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Associations"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         ".gb",IDC_GB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,15,26,10
-    CONTROL         ".sgb",IDC_SGB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,29,29,10
-    CONTROL         ".cgb",IDC_CGB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,43,30,10
-    CONTROL         ".gbc",IDC_GBC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,57,30,10
+    CONTROL         ".gb",IDC_GB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,13,26,10
+    CONTROL         ".dmg",IDC_DMG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,27,30,10
+    CONTROL         ".sgb",IDC_SGB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,41,29,10
+    CONTROL         ".cgb",IDC_CGB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,55,30,10
+    CONTROL         ".gbc",IDC_GBC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,69,30,10
     CONTROL         ".gba",IDC_GBA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,13,30,10
     CONTROL         ".agb",IDC_AGB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,27,30,10
     CONTROL         ".bin",IDC_BIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,41,27,10
-    DEFPUSHBUTTON   "OK",ID_OK,3,78,50,14
-    PUSHBUTTON      "Cancel",ID_CANCEL,63,78,50,14
+    DEFPUSHBUTTON   "OK",ID_OK,3,89,50,14
+    PUSHBUTTON      "Cancel",ID_CANCEL,63,89,50,14
     GROUPBOX        "GBA Types",IDC_STATIC,63,3,50,51
-    GROUPBOX        "GB Types",IDC_STATIC,3,3,50,69
+    GROUPBOX        "GB Types",IDC_STATIC,3,3,50,79
 END
 
 IDD_GBA_ROM_INFO DIALOGEX 0, 0, 220, 142
@@ -1296,7 +1297,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 109
         TOPMARGIN, 7
-        BOTTOMMARGIN, 88
+        BOTTOMMARGIN, 103
     END
 
     IDD_GBA_ROM_INFO, DIALOG
@@ -1687,7 +1688,7 @@ BEGIN
         BEGIN
             MENUITEM "&Battery file...",            ID_FILE_IMPORT_BATTERYFILE
             MENUITEM "Gameshark &code file...",     ID_FILE_IMPORT_GAMESHARKCODEFILE
-            MENUITEM "&Gameshark/Pro Action Replay Snapshot...",      ID_FILE_IMPORT_GAMESHARKSNAPSHOT
+            MENUITEM "&Gameshark/Pro Action Replay Snapshot...", ID_FILE_IMPORT_GAMESHARKSNAPSHOT
         END
         POPUP "Export"
         BEGIN
@@ -2263,7 +2264,7 @@ BEGIN
     IDS_ADD_CBA_CODE        "Add CodeBreakerAdvance code"
     IDS_FILTER_WAV          "Wave file_*.WAV__"
     IDS_SELECT_WAV_NAME     "Select wave file name"
-    IDS_FILTER_GBROM        "Game Boy ROMs (*.GB;*.SGB;*.ZIP;*.7Z;*.Z;*.GZ)_*.GB;*.SGB;*.ZIP;*.7Z;*.Z;*.GZ__"
+    IDS_FILTER_GBROM        "Game Boy ROMs (*.GB;*.DMG;*.SGB;*.ZIP;*.7Z;*.Z;*.GZ)_*.GB;*.DMG;*.SGB;*.ZIP;*.7Z;*.Z;*.GZ__"
     IDS_FILTER_PAL          "Windows Palette (*.PAL)_*.PAL_PaintShop Palette (*.PAL)_*.PAL_Adobe Color Table (*.ACT)_*.ACT__"
     IDS_SELECT_PALETTE_NAME "Select palette name:"
     IDS_SEARCH_PRODUCED_NO_RESULTS "Search produced no results."

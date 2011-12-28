@@ -22,6 +22,7 @@ class Associate : public CDialog
   BOOL  m_agb;
   BOOL  m_bin;
   BOOL  m_cgb;
+  BOOL  m_dmg;
   BOOL  m_gb;
   BOOL  m_gba;
   BOOL  m_gbc;
@@ -46,7 +47,7 @@ class Associate : public CDialog
   afx_msg void OnOk();
   //}}AFX_MSG
   DECLARE_MESSAGE_MAP()
-    };
+};
 
     //{{AFX_INSERT_LOCATION}}
     // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

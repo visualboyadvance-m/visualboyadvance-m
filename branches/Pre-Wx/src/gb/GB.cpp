@@ -611,6 +611,8 @@ bool gbIsGameboyRom(char * file)
     if(p != NULL) {
       if(_stricmp(p, ".gb") == 0)
         return true;
+      if(_stricmp(p, ".dmg") == 0)
+        return true;
       if(_stricmp(p, ".gbc") == 0)
         return true;
       if(_stricmp(p, ".cgb") == 0)
