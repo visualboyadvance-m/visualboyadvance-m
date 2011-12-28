@@ -468,14 +468,7 @@ FILE *sdlFindFile(const char *name)
     if(f != NULL)
       return f;
   }
-#else // ! _WIN32
-  fprintf(stdout, "Searching system config directory: %s\n", SYSCONFDIR);
-  sprintf(path, "%s%c%s", SYSCONFDIR, FILE_SEP, name);
-  f = fopen(path, "r");
-  if(f != NULL)
-    return f;
-#endif // ! _WIN32
-
+  
   if(!strchr(arg0, '/') &&
      !strchr(arg0, '\\')) {
     char *path = getenv("PATH");
@@ -515,6 +508,20 @@ FILE *sdlFindFile(const char *name)
         return f;
     }
   }
+#else // ! _WIN32
+  fprintf(stdout, "Searching data directory: %s\n", PKGDATADIR);
+  sprintf(path, "%s%c%s", PKGDATADIR, FILE_SEP, name);
+  f = fopen(path, "r");
+  if(f != NULL)
+    return f;
+
+  fprintf(stdout, "Searching system config directory: %s\n", SYSCONFDIR);
+  sprintf(path, "%s%c%s", SYSCONFDIR, FILE_SEP, name);
+  f = fopen(path, "r");
+  if(f != NULL)
+    return f;
+#endif // ! _WIN32
+
   return NULL;
 }
 
