@@ -36,7 +36,7 @@ void Associate::DoDataExchange(CDataExchange* pDX)
   DDX_Check(pDX, IDC_AGB, m_agb);
   DDX_Check(pDX, IDC_BIN, m_bin);
   DDX_Check(pDX, IDC_CGB, m_cgb);
-  DDX_Check(pDX, IDC_GB, m_dmg);
+  DDX_Check(pDX, IDC_DMG, m_dmg);
   DDX_Check(pDX, IDC_GB, m_gb);
   DDX_Check(pDX, IDC_GBA, m_gba);
   DDX_Check(pDX, IDC_GBC, m_gbc);
@@ -50,7 +50,7 @@ BEGIN_MESSAGE_MAP(Associate, CDialog)
   ON_BN_CLICKED(ID_CANCEL, OnCancel)
   ON_BN_CLICKED(ID_OK, OnOk)
   //}}AFX_MSG_MAP
-  END_MESSAGE_MAP()
+END_MESSAGE_MAP()
 
   /////////////////////////////////////////////////////////////////////////////
 // Associate message handlers
@@ -75,9 +75,9 @@ void Associate::OnOk()
   UpdateData();
 
   int mask = 0;
-  if(m_dmg)
-    mask |= 1;
   if(m_gb)
+    mask |= 1;
+  if(m_dmg)
     mask |= 2;
   if(m_sgb)
     mask |= 4;

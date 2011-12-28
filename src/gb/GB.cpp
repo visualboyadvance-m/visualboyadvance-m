@@ -21,6 +21,7 @@
 
 extern u8 *pix;
 extern bool speedup;
+bool gbUpdateSizes();
 bool inBios = false;
 
 // debugging
@@ -608,9 +609,9 @@ bool gbIsGameboyRom(char * file)
     char * p = strrchr(file,'.');
 
     if(p != NULL) {
-      if(_stricmp(p, ".dmg") == 0)
-        return true;
       if(_stricmp(p, ".gb") == 0)
+        return true;
+      if(_stricmp(p, ".dmg") == 0)
         return true;
       if(_stricmp(p, ".gbc") == 0)
         return true;
