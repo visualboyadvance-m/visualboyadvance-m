@@ -288,6 +288,7 @@
 #define IDC_GBC                         1081
 #define IDC_ROM_MAKER_CODE              1081
 #define IDS_CODE                        1081
+#define IDC_DMG                         1082
 #define IDC_ROM_UNIT_CODE               1082
 #define IDS_DESCRIPTION                 1082
 #define IDC_ROM_DEVICE_TYPE             1083
