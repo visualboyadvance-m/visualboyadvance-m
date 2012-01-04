@@ -24,7 +24,7 @@ bool gba_link_enabled = false;
 #define _(x) x
 #endif
 #define N_(x) x
-#ifdef __WIN32__
+#if (defined __WIN32__ || defined _WIN32)
 #include <windows.h>
 #else
 #include <sys/mman.h>
@@ -145,19 +145,19 @@ u8 tspeed = 3;
 u8 transfer = 0;
 LINKDATA *linkmem = NULL;
 int linkid = 0, vbaid = 0;
-#ifdef __WIN32__
+#if (defined __WIN32__ || defined _WIN32)
 HANDLE linksync[4];
 #else
 sem_t *linksync[4];
 #endif
 int savedlinktime = 0;
-#ifdef __WIN32__
+#if (defined __WIN32__ || defined _WIN32)
 HANDLE mmf = NULL;
 #else
 int mmf = -1;
 #endif
 char linkevent[] =
-#ifndef __WIN32__
+#if !(defined __WIN32__ || defined _WIN32)
 	"/"
 #endif
 	"VBA link event  ";
@@ -964,7 +964,7 @@ bool InitLink()
 {
 	linkid = 0;
 
-#ifdef __WIN32__
+#if (defined __WIN32__ || defined _WIN32)
 	if((mmf=CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(LINKDATA), LOCAL_LINK_NAME))==NULL){
 		systemMessage(0, N_("Error creating file mapping"));
 		return false;
@@ -1019,7 +1019,7 @@ bool InitLink()
 				break;
 			}
 		if(vbaid == 4){
-#ifdef __WIN32__
+#if (defined __WIN32__ || defined _WIN32)
 			UnmapViewOfFile(linkmem);
 			CloseHandle(mmf);
 #else
@@ -1039,7 +1039,7 @@ bool InitLink()
 
 	for(i=0;i<4;i++){
 		linkevent[sizeof(linkevent)-2]=(char)i+'1';
-#ifdef __WIN32__
+#if (defined __WIN32__ || defined _WIN32)
 		linksync[i] = firstone ?
 			CreateSemaphore(NULL, 0, 4, linkevent) :
 			OpenSemaphore(SEMAPHORE_ALL_ACCESS, false, linkevent);
@@ -1126,7 +1126,7 @@ void CloseLink(void){
 
 	for(i=0;i<4;i++){
 		if(linksync[i]!=NULL){
-#ifdef __WIN32__
+#if (defined __WIN32__ || defined _WIN32)
 			ReleaseSemaphore(linksync[i], 1, NULL);
 			CloseHandle(linksync[i]);
 #else
@@ -1138,7 +1138,7 @@ void CloseLink(void){
 #endif
 		}
 	}
-#ifdef __WIN32__
+#if (defined __WIN32__ || defined _WIN32)
 	CloseHandle(mmf);
 	UnmapViewOfFile(linkmem);
 
@@ -1159,7 +1159,7 @@ void CloseLink(void){
 // this may be necessary under MSW as well, but I wouldn't know how
 void CleanLocalLink()
 {
-#ifndef __WIN32__
+#if !(defined __WIN32__ || defined _WIN32)
 	shm_unlink("/" LOCAL_LINK_NAME);
 	for(int i = 0; i < 4; i++) {
 		linkevent[sizeof(linkevent) - 2] = '1' + i;
@@ -1383,7 +1383,11 @@ void LinkClientThread(void *_cid){
 		// even connected yet
 		// corrected sleep on socket worked, but this is more sane
 		// and probably less portable... works with mingw32 at least
-		usleep(100000);
+#if (defined __WIN32__ || defined _WIN32)
+		Sleep(100); // in milliseconds
+#else
+		usleep(100000); // in microseconds
+#endif
 	}
 
 	numbytes = 0;
