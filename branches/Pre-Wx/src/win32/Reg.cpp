@@ -28,17 +28,8 @@ void regInit(const char *path, bool force)
 	  delete regVbaPath;
 	  regVbaPath = NULL;
   }
-
-  // If vbam.ini exists in executable's folder, use it. Else create/use one in %appdata% folder.
   regVbaPath = new CString();
-  regVbaPath->Format(MakeInstanceFilename("%s\\vbam.ini"), path);
-  if( !force && !utilFileExists( regVbaPath->GetString() ) ) {
-	  TCHAR appdata[MAX_PATH+1];
-	  SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, appdata );
-	  regVbaPath->Format( "%s\\VBA-M", appdata );
-	  SHCreateDirectoryEx( NULL, regVbaPath->GetString(), NULL );
-	  regVbaPath->Append( "\\vbam.ini" );
-  }
+  regVbaPath->Format("%s\\vbam.ini", path);
 }
 
 void regShutdown()
