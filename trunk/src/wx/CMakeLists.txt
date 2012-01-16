@@ -5,12 +5,17 @@ option( ENABLE_CAIRO "Enable Cairo rendering for the wxWidgets port" ON )
 if( WIN32 )
   # not yet implemented
   option( ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" ON )
+  option( ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" OFF )
 endif( WIN32 )
 option( ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" ON )
 
 if( NOT ENABLE_CAIRO )
     ADD_DEFINITIONS (-DNO_CAIRO)
 endif( NOT ENABLE_CAIRO )
+
+if( NOT ENABLE_XAUDIO2 )
+    ADD_DEFINITIONS (-DNO_XAUDIO2)
+endif( NOT ENABLE_XAUDIO2 )
 
 if(NOT ENABLE_DIRECT3D)
    ADD_DEFINITIONS(-DNO_D3D)
@@ -157,8 +162,12 @@ IF(ENABLE_OPENAL)
     SET( SRC_WX ${SRC_WX} openal.cpp )
 ENDIF(ENABLE_OPENAL)
 
+IF(ENABLE_XAUDIO2)
+	SET( SRC_WX ${SRC_WX} xaudio2.cpp )
+ENDIF(ENABLE_XAUDIO2)
+
 IF( WIN32 )
-    SET( SRC_WX ${SRC_WX} wxvbam.rc dsound.cpp xaudio2.cpp )
+    SET( SRC_WX ${SRC_WX} wxvbam.rc dsound.cpp )
     SET(DIRECTX_LIBRARIES -ldxguid -ldsound)
     # not strictly directx, but win32-related
     IF(ENABLE_DEBUGGER)
@@ -201,6 +210,7 @@ TARGET_LINK_LIBRARIES (
     ${FFMPEG_LIBRARIES}
     ${DIRECTX_LIBRARIES}
     ${CAIRO_LIBRARIES}
+    gdiplus
 )
 
 INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/wxvbam DESTINATION bin)
