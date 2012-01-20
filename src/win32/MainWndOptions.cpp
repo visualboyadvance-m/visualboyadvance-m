@@ -1547,7 +1547,7 @@ void MainWnd::OnOptionsVideoFullscreenmaxscale()
   }
 }
 
-
+#ifndef NO_LINK
 void MainWnd::OnLinkOptions()
 {
 	LinkOptions dlg;
@@ -1584,7 +1584,14 @@ void MainWnd::OnOptionsJoybus()
 	JoybusOptions dlg;
 	dlg.DoModal();
 }
-
+#else
+void MainWnd::OnLinkOptions() { }
+void MainWnd::OnOptionsLinkRFU() { }
+void MainWnd::OnUpdateOptionsLinkEnable(CCmdUI*) { }
+void MainWnd::OnOptionsLinkEnable() { }
+void MainWnd::OnUpdateOptionsLinkRFU(CCmdUI*) { }
+void MainWnd::OnOptionsJoybus() { }
+#endif
 
 void MainWnd::OnOptionsEmulatorGameoverrides()
 {

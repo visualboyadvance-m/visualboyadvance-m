@@ -18,12 +18,10 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -37,10 +35,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Platform)\$(Configuration)_temp\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Platform)\$(Configuration)_temp\</IntDir>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
@@ -49,24 +43,19 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <BuildLog>
-      <Path>$(IntDir)$(ProjectName)_BuildLog.htm</Path>
-    </BuildLog>
+    <BuildLog />
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\zlib;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\zlib;$(ProjectDir);$(ProjectDir)7z_C;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <BuildLog>
-      <Path>$(IntDir)$(ProjectName)_BuildLog.htm</Path>
-    </BuildLog>
+    <BuildLog />
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\dependencies\zlib;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -80,7 +69,7 @@
       <StringPooling>true</StringPooling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -88,11 +77,8 @@
     <ClCompile Include="7z_C\7zBuf.c" />
     <ClCompile Include="7z_C\7zCrc.c" />
     <ClCompile Include="7z_C\7zCrcOpt.c" />
-    <ClCompile Include="7z_C\7zDecode.c" />
-    <ClCompile Include="7z_C\7zExtract.c" />
-    <ClCompile Include="7z_C\7zHeader.c" />
+    <ClCompile Include="7z_C\7zDec.c" />
     <ClCompile Include="7z_C\7zIn.c" />
-    <ClCompile Include="7z_C\7zItem.c" />
     <ClCompile Include="7z_C\7zStream.c" />
     <ClCompile Include="7z_C\Bcj2.c" />
     <ClCompile Include="7z_C\Bra.c" />
@@ -100,6 +86,8 @@
     <ClCompile Include="7z_C\CpuArch.c" />
     <ClCompile Include="7z_C\Lzma2Dec.c" />
     <ClCompile Include="7z_C\LzmaDec.c" />
+    <ClCompile Include="7z_C\Ppmd7.c" />
+    <ClCompile Include="7z_C\Ppmd7Dec.c" />
     <ClCompile Include="fex\Binary_Extractor.cpp" />
     <ClCompile Include="fex\blargg_common.cpp" />
     <ClCompile Include="fex\blargg_errors.cpp" />
@@ -114,18 +102,17 @@
     <ClCompile Include="fex\Zlib_Inflater.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="7z_C\7z.h" />
     <ClInclude Include="7z_C\7zAlloc.h" />
     <ClInclude Include="7z_C\7zBuf.h" />
     <ClInclude Include="7z_C\7zCrc.h" />
-    <ClInclude Include="7z_C\7zExtract.h" />
-    <ClInclude Include="7z_C\7zHeader.h" />
-    <ClInclude Include="7z_C\7zIn.h" />
-    <ClInclude Include="7z_C\7zItem.h" />
     <ClInclude Include="7z_C\Bcj2.h" />
     <ClInclude Include="7z_C\Bra.h" />
     <ClInclude Include="7z_C\CpuArch.h" />
     <ClInclude Include="7z_C\Lzma2Dec.h" />
     <ClInclude Include="7z_C\LzmaDec.h" />
+    <ClInclude Include="7z_C\Ppmd.h" />
+    <ClInclude Include="7z_C\Ppmd7.h" />
     <ClInclude Include="7z_C\Types.h" />
     <ClInclude Include="fex\Binary_Extractor.h" />
     <ClInclude Include="fex\blargg_common.h" />
@@ -153,7 +140,7 @@
     <None Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\zlib\project\vs2010\zlib.vcxproj">
+    <ProjectReference Include="..\..\dependencies\zlib\project\vs2010\zlib.vcxproj">
       <Project>{3e03c179-8251-46e4-81f4-466f114bac63}</Project>
     </ProjectReference>
   </ItemGroup>

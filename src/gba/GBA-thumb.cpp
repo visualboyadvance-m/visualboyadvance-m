@@ -301,7 +301,7 @@ static INSN_REGPARM void thumbBreakpoint(u32 opcode)
 #else
   #define EMIT1(op,arg)        #op" "arg"; "
   #define EMIT2(op,src,dest)   #op" "src", "dest"; "
-  #define CONST(val)           "$"#val
+  #define KONST(val)           "$"#val
   #define ASMVAR(cvar)         ASMVAR2 (__USER_LABEL_PREFIX__, cvar)
   #define ASMVAR2(prefix,cvar) STRING (prefix) cvar
   #define STRING(x)            #x
@@ -328,7 +328,7 @@ static INSN_REGPARM void thumbBreakpoint(u32 opcode)
           : \
           : "r" (value), "r" (reg[dest].I):"1");
   #define ADC_RD_RS \
-     asm (EMIT2(bt,CONST(0),VAR(C_FLAG)) \
+     asm (EMIT2(bt,KONST(0),VAR(C_FLAG)) \
           "adc %1, %%ebx;"\
           EMIT1(setsb, VAR(N_FLAG)) \
           EMIT1(setzb, VAR(Z_FLAG)) \
@@ -346,7 +346,7 @@ static INSN_REGPARM void thumbBreakpoint(u32 opcode)
           : "=m" (reg[(d)].I));
   #define MOV_RN_O8(d) \
      asm ("andl $0xFF, %%eax;"\
-          EMIT2(movb,CONST(0),VAR(N_FLAG)) \
+          EMIT2(movb,KONST(0),VAR(N_FLAG)) \
           "movl %%eax, %0;"\
           EMIT1(setzb, VAR(Z_FLAG)) \
           : "=m" (reg[(d)].I));
@@ -360,7 +360,7 @@ static INSN_REGPARM void thumbBreakpoint(u32 opcode)
           : \
           : "m" (reg[(d)].I));
   #define SBC_RD_RS \
-     asm volatile (EMIT2(bt,CONST(0),VAR(C_FLAG)) \
+     asm volatile (EMIT2(bt,KONST(0),VAR(C_FLAG)) \
                    "cmc;"\
                    "sbb %1, %%ebx;"\
                    EMIT1(setsb, VAR(N_FLAG)) \
@@ -465,9 +465,9 @@ static INSN_REGPARM void thumbBreakpoint(u32 opcode)
          EMIT1(setcb, VAR(C_FLAG)) \
          EMIT1(setob, VAR(V_FLAG))
   #define ADD_RD_RS_O3_0(N)        \
-         EMIT2(movb,CONST(0),VAR(C_FLAG)) \
+         EMIT2(movb,KONST(0),VAR(C_FLAG)) \
          "add $0,%%ecx;"           \
-         EMIT2(movb,CONST(0),VAR(V_FLAG))
+         EMIT2(movb,KONST(0),VAR(V_FLAG))
   #define SUB_RD_RS_RN(N) \
          EMIT2(sub,VAR(reg)"+"#N"*4",ecx) \
          EMIT1(setncb, VAR(C_FLAG)) \
@@ -477,9 +477,9 @@ static INSN_REGPARM void thumbBreakpoint(u32 opcode)
          EMIT1(setncb, VAR(C_FLAG)) \
          EMIT1(setob, VAR(V_FLAG))
   #define SUB_RD_RS_O3_0(N)        \
-         EMIT2(movb,CONST(1),VAR(C_FLAG)) \
+         EMIT2(movb,KONST(1),VAR(C_FLAG)) \
          "sub $0,%%ecx;"           \
-         EMIT2(movb,CONST(0),VAR(V_FLAG))
+         EMIT2(movb,KONST(0),VAR(V_FLAG))
 #endif
 #else // !__GNUC__
   #define ADD_RD_RS_RN(N) \
