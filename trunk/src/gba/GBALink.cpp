@@ -1,7 +1,27 @@
 // This file was written by denopqrihg
 // with major changes by tjm
+#include <string.h>
+#include <malloc.h>
+#include <stdio.h>
+
+int vbaid = 0;
+const char *MakeInstanceFilename(const char *Input)
+{
+	if (vbaid == 0)
+		return Input;
+
+	static char *result=NULL;
+	if (result!=NULL)
+		free(result);
+
+	result = (char *)malloc(strlen(Input)+3);
+	char *p = strrchr((char *)Input, '.');
+	sprintf(result, "%.*s-%d.%s", (int)(p-Input), Input, vbaid+1, p+1);
+	return result;
+}
 
 #ifndef NO_LINK
+
 // Joybus
 bool gba_joybus_enabled = false;
 
@@ -11,8 +31,6 @@ bool gba_link_enabled = false;
 #define LOCAL_LINK_NAME "VBA link memory"
 #define IP_LINK_PORT 5738
 
-#include <string.h>
-#include <stdio.h>
 #include "../common/Port.h"
 #include "GBA.h"
 #include "GBALink.h"
@@ -144,7 +162,7 @@ sf::IPAddress joybusHostAddr = sf::IPAddress::LocalHost;
 u8 tspeed = 3;
 u8 transfer = 0;
 LINKDATA *linkmem = NULL;
-int linkid = 0, vbaid = 0;
+int linkid = 0;
 #if (defined __WIN32__ || defined _WIN32)
 HANDLE linksync[4];
 #else
@@ -213,21 +231,6 @@ void LinkServerThread(void *);
 int StartServer(void);
 
 u16 StartRFU(u16);
-
-const char *MakeInstanceFilename(const char *Input)
-{
-	if (vbaid == 0)
-		return Input;
-
-	static char *result=NULL;
-	if (result!=NULL)
-		free(result);
-
-	result = (char *)malloc(strlen(Input)+3);
-	char *p = strrchr((char *)Input, '.');
-	sprintf(result, "%.*s-%d.%s", (int)(p-Input), Input, vbaid+1, p+1);
-	return result;
-}
 
 void StartLink(u16 value)
 {
@@ -1218,7 +1221,7 @@ void LinkServerThread(void *_sid){
 		fdset.Add(lanlink.tcpsocket);
 		if(lanlink.terminate){
 			ReleaseSemaphore(linksync[vbaid], 1, NULL);
-			return;
+			goto CloseInfoDisplay;
 		}
 		if(fdset.Wait(0.1)==1){
 			sf::Socket::Status st =
@@ -1247,6 +1250,8 @@ void LinkServerThread(void *_sid){
 		ls.tcpsocket[i].Send(outbuffer, 4);
 	}
 
+CloseInfoDisplay:
+	delete sid;
 	return;
 }
 
@@ -1300,7 +1305,8 @@ void lserver::Recv(void){
 		fdset.Clear();
 		for(i=0;i<lanlink.numslaves;i++) fdset.Add(tcpsocket[i+1]);
 		// was linktimeout/1000 (i.e., drop ms part), but that's wrong
-		if(fdset.Wait((float)linktimeout / 1000.0)==0){
+		if (fdset.Wait((float)(linktimeout / 1000.)) == 0)
+		{
 			return;
 		}
 		howmanytimes++;
@@ -1363,7 +1369,7 @@ bool lclient::Init(sf::IPAddress addr, ClientInfoDisplay *cid){
 	lanlink.terminate = false;
 	lanlink.thread = new sf::Thread(LinkClientThread, cid);
 	lanlink.thread->Launch();
-	return 0;
+	return true;
 }
 
 void LinkClientThread(void *_cid){
@@ -1378,7 +1384,8 @@ void LinkClientThread(void *_cid){
 		// stupid SFML has no way of giving what sort of error occurred
 		// so we'll just have to do a retry loop, I guess.
 		cid->Ping();
-		if(lanlink.terminate) return;
+		if(lanlink.terminate)
+			goto CloseInfoDisplay;
 		// old code had broken sleep on socket, which isn't
 		// even connected yet
 		// corrected sleep on socket worked, but this is more sane
@@ -1401,7 +1408,7 @@ void LinkClientThread(void *_cid){
 		cid->Ping();
 		if(lanlink.terminate) {
 			lanlink.tcpsocket.Close();
-			return;
+			goto CloseInfoDisplay;
 		}
 	}
 	linkid = (int)READ16LE(&u16inbuffer[0]);
@@ -1420,7 +1427,7 @@ void LinkClientThread(void *_cid){
 		cid->Ping();
 		if(lanlink.terminate) {
 			lanlink.tcpsocket.Close();
-			return;
+			goto CloseInfoDisplay;
 		}
 	}
 
@@ -1428,6 +1435,8 @@ void LinkClientThread(void *_cid){
 
 	cid->Connected();
 
+CloseInfoDisplay:
+	delete cid;
 	return;
 }
 
@@ -1468,7 +1477,8 @@ void lclient::Recv(void){
 	// old code used socket # instead of mask again
 	fdset.Add(lanlink.tcpsocket);
 	// old code stripped off ms again
-	if(fdset.Wait((float)linktimeout / 1000.0)==0){
+	if (fdset.Wait((float)(linktimeout / 1000.)) == 0)
+	{
 		numtransfers = 0;
 		return;
 	}

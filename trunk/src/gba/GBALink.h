@@ -51,16 +51,18 @@ enum
 	JOY_CMD_WRITE	= 0x15		
 };
 
-// Link implementation; only present if enabled
+extern const char *MakeInstanceFilename(const char *Input);
+
 #ifndef NO_LINK
+// Link implementation
 #include <SFML/System.hpp>
 #include <SFML/Network.hpp>
 
 class ServerInfoDisplay
 {
 public:
-    virtual void ShowServerIP(sf::IPAddress addr) = 0;
-    virtual void ShowConnect(int player) = 0;
+    virtual void ShowServerIP(const sf::IPAddress& addr) = 0;
+    virtual void ShowConnect(const int player) = 0;
     virtual void Ping() = 0;
     virtual void Connected() = 0;
 };
@@ -103,9 +105,9 @@ public:
 
 class ClientInfoDisplay {
 public:
-    virtual void ConnectStart(sf::IPAddress addr) = 0;
+    virtual void ConnectStart(const sf::IPAddress& addr) = 0;
     virtual void Ping() = 0;
-    virtual void ShowConnect(int player, int togo) = 0;
+    virtual void ShowConnect(const int player, const int togo) = 0;
     virtual void Connected() = 0;
 };
 
@@ -144,12 +146,12 @@ typedef struct {
 } LANLINKDATA;
 
 extern bool gba_joybus_enabled;
+extern bool gba_link_enabled;
+
 extern sf::IPAddress joybusHostAddr;
 extern void JoyBusConnect();
 extern void JoyBusShutdown();
 extern void JoyBusUpdate(int ticks);
-
-extern bool gba_link_enabled;
 
 extern bool InitLink();
 extern void CloseLink();
@@ -161,7 +163,6 @@ extern void LinkChildStop();
 extern void LinkChildSend(u16);
 extern void CloseLanLink();
 extern void CleanLocalLink();
-extern const char *MakeInstanceFilename(const char *Input);
 extern LANLINKDATA lanlink;
 extern int vbaid;
 extern bool rfu_enabled;
@@ -173,15 +174,23 @@ extern int linkid;
 #else
 
 // stubs to keep #ifdef's out of mainline
-#define StartLink(x)
-#define StartGPLink(x)
-#define LinkSSend(x)
-#define LinkUpdate(x)
-#define JoyBusUpdate(x)
-#define InitLink() false
-#define CloseLink()
-#define gba_link_enabled false
-#define gba_joybus_enabled false
+const bool gba_joybus_enabled = false;
+const bool gba_link_enabled = false;
+
+inline void JoyBusConnect() { }
+inline void JoyBusShutdown() { }
+inline void JoyBusUpdate(int) { }
+
+inline bool InitLink() { return true; }
+inline void CloseLink() { }
+inline void StartLink(u16) { }
+inline void StartGPLink(u16) { }
+inline void LinkSSend(u16) { }
+inline void LinkUpdate(int) { }
+inline void LinkChildStop() { }
+inline void LinkChildSend(u16) { }
+inline void CloseLanLink() { }
+inline void CleanLocalLink() { }
 #endif
 
 #endif /* GBA_GBALINK_H */

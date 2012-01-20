@@ -298,7 +298,7 @@ static void count(u32 opcode, int cond_res)
  #define EMIT0(op)            #op"; "
  #define EMIT1(op,arg)        #op" "arg"; "
  #define EMIT2(op,src,dest)   #op" "src", "dest"; "
- #define CONST(val)           "$"#val
+ #define KONST(val)           "$"#val
  #define ASMVAR(cvar)         ASMVAR2 (__USER_LABEL_PREFIX__, cvar)
  #define ASMVAR2(prefix,cvar) STRING (prefix) cvar
  #define STRING(x)            #x
@@ -331,7 +331,7 @@ static void count(u32 opcode, int cond_res)
  #define EMIT0(op)            __asm op
  #define EMIT1(op,arg)        __asm op arg
  #define EMIT2(op,src,dest)   __asm op dest, src
- #define CONST(val)           val
+ #define KONST(val)           val
  #define VAR(var)             var
  #define VARL(var)            dword ptr var
  #define REGREF1(index)       reg[index]
@@ -350,15 +350,15 @@ static void count(u32 opcode, int cond_res)
 
 // Helper macros for loading value / shift count
 #define VALUE_LOAD_IMM \
-        EMIT2(and, CONST(0x0F), eax)            \
+        EMIT2(and, KONST(0x0F), eax)            \
         EMIT2(mov, REGREF2(eax,4), eax)         \
-        EMIT2(shr, CONST(7), ecx)               \
-        EMIT2(and, CONST(0x1F), ecx)
+        EMIT2(shr, KONST(7), ecx)               \
+        EMIT2(and, KONST(0x1F), ecx)
 #define VALUE_LOAD_REG \
-        EMIT2(and, CONST(0x0F), eax)            \
+        EMIT2(and, KONST(0x0F), eax)            \
         EMIT2(mov, REGREF2(eax,4), eax)         \
         EMIT2(movzx, ch, ecx)                   \
-        EMIT2(and, CONST(0x0F), ecx)            \
+        EMIT2(and, KONST(0x0F), ecx)            \
         EMIT2(mov, REGREF2(ecx,4), ecx)
 
 // Helper macros for setting flags
@@ -382,13 +382,13 @@ static void count(u32 opcode, int cond_res)
     ALU_HEADER                          \
     LOAD_C_FLAG                         \
     EMIT2(mov, ecx, edx)                \
-    EMIT2(shr, CONST(14), edx)          \
+    EMIT2(shr, KONST(14), edx)          \
     EMIT2(mov, ecx, eax)                \
     EMIT2(mov, ecx, esi)                \
-    EMIT2(shr, CONST(10), esi)          \
-    EMIT2(and, CONST(0x3C), edx)        \
+    EMIT2(shr, KONST(10), esi)          \
+    EMIT2(and, KONST(0x3C), edx)        \
     EMIT2(mov, REGREF1(edx), edx)       \
-    EMIT2(and, CONST(0x3C), esi)
+    EMIT2(and, KONST(0x3C), esi)
 
 #define LOAD_C_FLAG_YES EMIT2(mov, VAR(C_FLAG), bl)
 #define LOAD_C_FLAG_NO  /*nothing*/
@@ -416,14 +416,14 @@ static void count(u32 opcode, int cond_res)
     VALUE_LOAD_REG                      \
     EMIT2(test, cl, cl)                 \
     EMIT1(jz, LABELREF(0,f))            \
-    EMIT2(cmp, CONST(0x20), cl)         \
+    EMIT2(cmp, KONST(0x20), cl)         \
     EMIT1(je, LABELREF(1,f))            \
     EMIT1(ja, LABELREF(2,f))            \
     EMIT2(shl, cl, eax)                 \
     EMIT1(setc, bl)                     \
     EMIT1(jmp, LABELREF(0,f))           \
     LABEL(1)                            \
-    EMIT2(test, CONST(1), al)           \
+    EMIT2(test, KONST(1), al)           \
     EMIT1(setnz, bl)                    \
     EMIT2(xor, eax, eax)                \
     EMIT1(jmp, LABELREF(0,f))           \
@@ -433,7 +433,7 @@ static void count(u32 opcode, int cond_res)
     LABEL(0)
 #define VALUE_LSL_REG_NC \
     VALUE_LOAD_REG                      \
-    EMIT2(cmp, CONST(0x20), cl)         \
+    EMIT2(cmp, KONST(0x20), cl)         \
     EMIT1(jae, LABELREF(1,f))           \
     EMIT2(shl, cl, eax)                 \
     EMIT1(jmp, LABELREF(0,f))           \
@@ -467,7 +467,7 @@ static void count(u32 opcode, int cond_res)
     VALUE_LOAD_REG                      \
     EMIT2(test, cl, cl)                 \
     EMIT1(jz, LABELREF(0,f))            \
-    EMIT2(cmp, CONST(0x20), cl)         \
+    EMIT2(cmp, KONST(0x20), cl)         \
     EMIT1(je, LABELREF(1,f))            \
     EMIT1(ja, LABELREF(2,f))            \
     EMIT2(shr, cl, eax)                 \
@@ -484,7 +484,7 @@ static void count(u32 opcode, int cond_res)
     LABEL(0)
 #define VALUE_LSR_REG_NC \
     VALUE_LOAD_REG                      \
-    EMIT2(cmp, CONST(0x20), cl)         \
+    EMIT2(cmp, KONST(0x20), cl)         \
     EMIT1(jae, LABELREF(1,f))           \
     EMIT2(shr, cl, eax)                 \
     EMIT1(jmp, LABELREF(0,f))           \
@@ -500,7 +500,7 @@ static void count(u32 opcode, int cond_res)
     EMIT1(setc, bl)                     \
     EMIT1(jmp, LABELREF(0,f))           \
     LABEL(1)                            \
-    EMIT2(sar, CONST(31), eax)          \
+    EMIT2(sar, KONST(31), eax)          \
     EMIT1(sets, bl)                     \
     LABEL(0)
 #define VALUE_ASR_IMM_NC \
@@ -509,7 +509,7 @@ static void count(u32 opcode, int cond_res)
     EMIT2(sar, cl, eax)                 \
     EMIT1(jmp, LABELREF(0,f))           \
     LABEL(1)                            \
-    EMIT2(sar, CONST(31), eax)          \
+    EMIT2(sar, KONST(31), eax)          \
     LABEL(0)
 
 // OP Rd,Rb,Rm ASR Rs
@@ -517,23 +517,23 @@ static void count(u32 opcode, int cond_res)
     VALUE_LOAD_REG                      \
     EMIT2(test, cl, cl)                 \
     EMIT1(jz, LABELREF(0,f))            \
-    EMIT2(cmp, CONST(0x20), cl)         \
+    EMIT2(cmp, KONST(0x20), cl)         \
     EMIT1(jae, LABELREF(1,f))           \
     EMIT2(sar, cl, eax)                 \
     EMIT1(setc, bl)                     \
     EMIT1(jmp, LABELREF(0,f))           \
     LABEL(1)                            \
-    EMIT2(sar, CONST(31), eax)          \
+    EMIT2(sar, KONST(31), eax)          \
     EMIT1(sets, bl)                     \
     LABEL(0)
 #define VALUE_ASR_REG_NC \
     VALUE_LOAD_REG                      \
-    EMIT2(cmp, CONST(0x20), cl)         \
+    EMIT2(cmp, KONST(0x20), cl)         \
     EMIT1(jae, LABELREF(1,f))           \
     EMIT2(sar, cl, eax)                 \
     EMIT1(jmp, LABELREF(0,f))           \
     LABEL(1)                            \
-    EMIT2(sar, CONST(31), eax)          \
+    EMIT2(sar, KONST(31), eax)          \
     LABEL(0)
 
 // OP Rd,Rb,Rm ROR #
@@ -543,8 +543,8 @@ static void count(u32 opcode, int cond_res)
     EMIT2(ror, cl, eax)                 \
     EMIT1(jmp, LABELREF(0,f))           \
     LABEL(1)                            \
-    EMIT2(bt, CONST(0), ebx)            \
-    EMIT2(rcr, CONST(1), eax)           \
+    EMIT2(bt, KONST(0), ebx)            \
+    EMIT2(rcr, KONST(1), eax)           \
     LABEL(0)                            \
     EMIT1(setc, bl)
 #define VALUE_ROR_IMM_NC \
@@ -553,14 +553,14 @@ static void count(u32 opcode, int cond_res)
     EMIT2(ror, cl, eax)                 \
     EMIT1(jmp, LABELREF(0,f))           \
     LABEL(1)                            \
-    EMIT2(bt, CONST(0), VARL(C_FLAG))   \
-    EMIT2(rcr, CONST(1), eax)           \
+    EMIT2(bt, KONST(0), VARL(C_FLAG))   \
+    EMIT2(rcr, KONST(1), eax)           \
     LABEL(0)
 
 // OP Rd,Rb,Rm ROR Rs
 #define VALUE_ROR_REG_C \
     VALUE_LOAD_REG                      \
-    EMIT2(bt, CONST(0), ebx)            \
+    EMIT2(bt, KONST(0), ebx)            \
     EMIT2(ror, cl, eax)                 \
     EMIT1(setc, bl)
 #define VALUE_ROR_REG_NC \
@@ -572,7 +572,7 @@ static void count(u32 opcode, int cond_res)
     EMIT2(movzx, ch, ecx)               \
     EMIT2(add, ecx, ecx)                \
     EMIT2(movzx, al, eax)               \
-    EMIT2(bt, CONST(0), ebx)            \
+    EMIT2(bt, KONST(0), ebx)            \
     EMIT2(ror, cl, eax)                 \
     EMIT1(setc, bl)
 #define VALUE_IMM_NC \
@@ -585,7 +585,7 @@ static void count(u32 opcode, int cond_res)
 
 // Set condition codes iff the destination register is not R15 (PC)
 #define CHECK_PC(OP, SETCOND) \
-    EMIT2(cmp, CONST(0x3C), esi)        \
+    EMIT2(cmp, KONST(0x3C), esi)        \
     EMIT1(je, LABELREF(8,f))            \
     OP SETCOND                          \
     EMIT1(jmp, LABELREF(9,f))           \
@@ -614,18 +614,18 @@ static void count(u32 opcode, int cond_res)
     EMIT2(mov, edx, REGREF1(esi))
 #define OP_ADDS   CHECK_PC(OP_ADD, SETCOND_ADD)
 #define OP_ADC \
-    EMIT2(bt, CONST(0), VARL(C_FLAG))   \
+    EMIT2(bt, KONST(0), VARL(C_FLAG))   \
     EMIT2(adc, eax, edx)                \
     EMIT2(mov, edx, REGREF1(esi))
 #define OP_ADCS   CHECK_PC(OP_ADC, SETCOND_ADD)
 #define OP_SBC \
-    EMIT2(bt, CONST(0), VARL(C_FLAG))   \
+    EMIT2(bt, KONST(0), VARL(C_FLAG))   \
     EMIT0(cmc)                          \
     EMIT2(sbb, eax, edx)                \
     EMIT2(mov, edx, REGREF1(esi))
 #define OP_SBCS   CHECK_PC(OP_SBC, SETCOND_SUB)
 #define OP_RSC \
-    EMIT2(bt, CONST(0), VARL(C_FLAG))   \
+    EMIT2(bt, KONST(0), VARL(C_FLAG))   \
     EMIT0(cmc)                          \
     EMIT2(sbb, edx, eax)                \
     EMIT2(mov, eax, REGREF1(esi))
@@ -678,7 +678,7 @@ static void count(u32 opcode, int cond_res)
         : "0" (offset), "c" (shift));
 
 #define RRX_OFFSET \
-    asm(EMIT2(btl,CONST(0),VAR(C_FLAG)) \
+    asm(EMIT2(btl,KONST(0),VAR(C_FLAG)) \
         "rcr $1, %0"                    \
         : "=r" (offset)                 \
         : "0" (offset));

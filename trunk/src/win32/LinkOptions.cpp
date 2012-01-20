@@ -1,3 +1,5 @@
+#ifndef NO_LINK
+
 #include "stdafx.h"
 #include "vba.h"
 #include "LinkOptions.h"
@@ -492,28 +494,55 @@ void LinkOptions::OnCancel()
 
 class Win32ServerInfoDisplay : public ServerInfoDisplay
 {
-    Win32ServerInfoDisplay(ServerWait _dlg) : dlg(_dlg) {}
-    void ShowServerIP(sf::IPAddress addr) {
-	    dlg->m_serveraddress.Format("Server IP address is: %s", addr.ToString);
+public:
+    Win32ServerInfoDisplay(ServerWait *_dlg)
+	{
+		dlg = _dlg;
+	}
+
+	~Win32ServerInfoDisplay()
+	{
+		if (dlg)
+		{
+			// not connected
+			MessageBox(NULL, "Failed to connect.", "Link", MB_OK);
+			dlg->SendMessage(WM_CLOSE, 0, 0);
+		}
+
+		delete dlg;
+		dlg = NULL;
+	}
+
+    void ShowServerIP(const sf::IPAddress& addr)
+	{
+		dlg->m_serveraddress.Format("Server IP address is: %s", addr.ToString());
+	}
+
+	void ShowConnect(const int player)
+	{
+		dlg->m_plconn[0].Format("Player %d connected", player);
+		dlg->UpdateData(false);
+	}
+
+	void Ping()
+	{
+		dlg->m_prgctrl.StepIt();
+	}
+
+	void Connected()
+	{
+		MessageBox(NULL, "All players connected", "Link", MB_OK);
+		dlg->SendMessage(WM_CLOSE, 0, 0);
+		delete dlg;
+		dlg = NULL;
     }
-    void ShowConnect(int player) {
-	    dlg->m_plconn[i].Format("Player %d connected", player);
-	    dlg->UpdateData(false);
-    }
-    void Ping() { dlg->m_prgctrl.StepIt(); }
-    void Connected() {
-	MessageBox(NULL, "All players connected", "Link", MB_OK);
-	dlg->SendMessage(WM_CLOSE, 0, 0);
-    }
+
 private:
-    ServerWait dlg;
-}
+    ServerWait *dlg;
+};
 
 void LinkServer::OnServerStart()
 {
-	int errorcode;
-	ServerWait dlg;
-
 	UpdateData(TRUE);
 
 	lanlink.numslaves = m_numplayers+1;
@@ -522,13 +551,18 @@ void LinkServer::OnServerStart()
 	lanlink.speed = m_speed==1 ? true : false;
 	sf::IPAddress addr;
 
-	Win32ServerInfoDisplay dlginfo(dlg);
-	if(!ls.Init(&dlginfo)){
-		MessageBox("Error occured.\nPlease try again.", "Error", MB_OK);
-		return;
-	}
+	// These must be created on the heap - referenced from the connection thread
+	ServerWait *dlg = new ServerWait;
+	// Owns the ServerWait*
+	Win32ServerInfoDisplay *dlginfo = new Win32ServerInfoDisplay(dlg);
 
-	dlg.DoModal();
+	// ls thread will own the dlginfo
+	if (!ls.Init(dlginfo))
+	{
+		// Thread didn't get created
+		delete dlginfo;
+		MessageBox("Error occurred.\nPlease try again.", "Error", MB_OK);
+	}
 
 	return;
 }
@@ -547,29 +581,59 @@ BOOL LinkClient::OnInitDialog()
 
 class Win32ClientInfoDisplay : public ClientInfoDisplay
 {
-    Win32ClientInfoDisplay(ServerWait _dlg) : dlg(_dlg) {}
-    void ConnectStart(sf::IPAddress addr) {
+public:
+    Win32ClientInfoDisplay(ServerWait *_dlg)
+	{
+		dlg = _dlg;
+	}
+
+	~Win32ClientInfoDisplay()
+	{
+		if (dlg)
+		{
+			// not connected
+			MessageBox(NULL, "Failed to connect.", "Link", MB_OK);
+			dlg->SendMessage(WM_CLOSE, 0, 0);
+		}
+
+		delete dlg;
+		dlg = NULL;
+	}
+
+    void ConnectStart(const sf::IPAddress& addr)
+	{
 	    dlg->SetWindowText("Connecting...");
     }
-    void ShowConnect(int player, int togo) {
+
+    void ShowConnect(const int player, const int togo)
+	{
 	    dlg->m_serveraddress.Format("Connected as #%d", player);
-	    if(togo)	dlg->m_plconn[0].Format("Waiting for %d players to join", togo);
-	    else dlg->m_plconn[0].Format("All players joined.");
+	    if (togo)
+			dlg->m_plconn[0].Format("Waiting for %d players to join", togo);
+	    else
+			dlg->m_plconn[0].Format("All players joined.");
     }
-    void Ping() { dlg->m_prgctrl.StepIt(); }
-    void Connected() {
-	    MessageBox(NULL, "Connected.", "Link", MB_OK);
-	    dlg->SendMessage(WM_CLOSE, 0, 0);
+
+    void Ping()
+	{
+		dlg->m_prgctrl.StepIt();
+	}
+
+    void Connected()
+	{
+		MessageBox(NULL, "Connected.", "Link", MB_OK);
+		dlg->SendMessage(WM_CLOSE, 0, 0);
+		delete dlg;
+		dlg = NULL;
     }
+
 private:
-    ServerWait dlg;
-}
+    ServerWait *dlg;
+};
 
 void LinkClient::OnLinkConnect()
 {
 	char ipaddress[31];
-	int errorcode;
-	ServerWait dlg;
 
 	UpdateData(TRUE);
 
@@ -579,14 +643,23 @@ void LinkClient::OnLinkConnect()
 
 	m_serverip.GetWindowText(ipaddress, 30);
 
-	Win32ClientInfoDisplay dlginfo(dlg);
-	if((errorcode=lc.Init(sf::IPAddress(std::string(ipaddress)), &dlginfo))!=0){
-		char message[50];
-		sprintf(message, "Error %d occured.\nPlease try again.", errorcode);
-		MessageBox(message, "Error", MB_OK);
-		return;
+	// These must be created on the heap - referenced from the connection thread
+	ServerWait *dlg = new ServerWait;
+	// Owns the ServerWait*
+	Win32ClientInfoDisplay *dlginfo = new Win32ClientInfoDisplay(dlg);
+
+	// lc thread will own the dlginfo
+	if (!lc.Init(sf::IPAddress(std::string(ipaddress)), dlginfo))
+	{
+		// Thread didn't get created
+		delete dlginfo;
+		MessageBox("Error occurred.\nPlease try again.", "Error", MB_OK);
 	}
-	dlg.DoModal();
+	else
+	{
+		dlg->DoModal();
+	}
+
 	return;
 }
 
@@ -674,3 +747,5 @@ BOOL LinkServer::PreTranslateMessage(MSG* pMsg)
 
 	return CDialog::PreTranslateMessage(pMsg);
 }
+
+#endif // NO_LINK

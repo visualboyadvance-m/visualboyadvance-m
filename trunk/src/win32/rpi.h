@@ -7,7 +7,7 @@
 // http://www.hiend3d.com/hq2x.html
 // Modified by suanyuan
 //---------------------------------------------------------------------------------------------------------------------------
-#ifdef __MSW__
+#if defined(_WIN32)
 #include	<windows.h>
 #else
 #define HMODULE void *

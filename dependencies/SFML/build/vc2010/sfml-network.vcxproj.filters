@@ -16,6 +16,7 @@
     <ClCompile Include="..\..\src\SFML\Network\SelectorBase.cpp" />
     <ClCompile Include="..\..\src\SFML\Network\SocketTCP.cpp" />
     <ClCompile Include="..\..\src\SFML\Network\SocketUDP.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\Win32\Thread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\SFML\Network\Win32\SocketHelper.hpp">
@@ -30,6 +31,8 @@
     <ClInclude Include="..\..\include\SFML\Network\SocketHelper.hpp" />
     <ClInclude Include="..\..\include\SFML\Network\SocketTCP.hpp" />
     <ClInclude Include="..\..\include\SFML\Network\SocketUDP.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\NonCopyable.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\Thread.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\include\SFML\Network\Selector.inl" />

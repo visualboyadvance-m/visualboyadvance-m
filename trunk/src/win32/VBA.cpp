@@ -111,7 +111,7 @@ void winlog(const char *msg, ...);
 
 /* Link
 ---------------------*/
-extern int InitLink(void);
+extern bool InitLink(void);
 extern void CloseLink(void);
 //extern int linkid;
 extern char inifile[];
@@ -1254,7 +1254,11 @@ BOOL VBA::OnIdle(LONG lCount)
   } else if(emulating && active && !paused) {
     for(int i = 0; i < 2; i++) {
       emulator.emuMain(emulator.emuCount);
-      if(lanlink.connected&&linkid&&lc.numtransfers==0) lc.CheckConn();
+
+#ifndef NO_LINK
+      if (lanlink.connected && linkid && lc.numtransfers == 0)
+		  lc.CheckConn();
+#endif
 
       if(rewindSaveNeeded && rewindMemory && emulator.emuWriteMemState) {
         rewindCount++;
@@ -1618,6 +1622,7 @@ void VBA::loadSettings()
 
   updateThrottle( (unsigned short)regQueryDwordValue( "throttle", 0 ) );
 
+#ifndef NO_LINK
   linktimeout = regQueryDwordValue("LinkTimeout", 1000);
 
   rfu_enabled = regQueryDwordValue("RFU", false) ? true : false;
@@ -1630,6 +1635,7 @@ void VBA::loadSettings()
   }
 
   lanlink.active = regQueryDwordValue("LAN", 0) ? true : false;
+#endif
 
   Sm60FPS::bSaveMoreCPU = regQueryDwordValue("saveMoreCPU", 0);
 
@@ -2553,11 +2559,15 @@ void VBA::saveSettings()
   regSetDwordValue("throttle", throttle);
   regSetStringValue("pluginName", pluginName);
   regSetDwordValue("saveMoreCPU", Sm60FPS::bSaveMoreCPU);
+
+#ifndef NO_LINK
   regSetDwordValue("LinkTimeout", linktimeout);
   regSetDwordValue("RFU", rfu_enabled);
   regSetDwordValue("linkEnabled", gba_link_enabled);
   regSetDwordValue("joybusEnabled", gba_joybus_enabled);
   regSetStringValue("joybusHostAddr", joybusHostAddr.ToString().c_str());
+#endif
+
   regSetDwordValue("lastFullscreen", lastFullscreen);
   regSetDwordValue("pauseWhenInactive", pauseWhenInactive);
 
