@@ -165,22 +165,7 @@ static void LzmaDec_UpdateWithUncompressed(CLzmaDec *p, const Byte *src, SizeT s
   p->processedPos += (UInt32)size;
 }
 
-static
-void LzmaDec_InitDicAndState(CLzmaDec *p, Bool initDic, Bool initState)
-{
-  p->needFlush = 1;
-  p->remainLen = 0;
-  p->tempBufSize = 0;
-
-  if (initDic)
-  {
-    p->processedPos = 0;
-    p->checkDicSize = 0;
-    p->needInitState = 1;
-  }
-  if (initState)
-    p->needInitState = 1;
-}
+void LzmaDec_InitDicAndState(CLzmaDec *p, Bool initDic, Bool initState);
 
 SRes Lzma2Dec_DecodeToDic(CLzma2Dec *p, SizeT dicLimit,
     const Byte *src, SizeT *srcLen, ELzmaFinishMode finishMode, ELzmaStatus *status)

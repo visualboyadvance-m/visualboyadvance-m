@@ -1,3 +1,5 @@
+#ifndef NO_LINK
+
 #include "stdafx.h"
 #include "vba.h"
 #include "JoybusOptions.h"
@@ -74,3 +76,5 @@ void JoybusOptions::OnBnClickedOk()
 
 	OnOK();
 }
+
+#endif // NO_LINK

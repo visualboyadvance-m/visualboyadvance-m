@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="7z">
-      <UniqueIdentifier>{4f3646e4-ddc5-4030-9ba1-7629a947e5db}</UniqueIdentifier>
-    </Filter>
     <Filter Include="fex">
       <UniqueIdentifier>{40ba751f-4ce2-4162-85a2-0c2ae2f33ae2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="7z_C">
+      <UniqueIdentifier>{4f3646e4-ddc5-4030-9ba1-7629a947e5db}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -46,52 +46,49 @@
       <Filter>fex</Filter>
     </ClCompile>
     <ClCompile Include="7z_C\7zAlloc.c">
-      <Filter>7z</Filter>
+      <Filter>7z_C</Filter>
     </ClCompile>
     <ClCompile Include="7z_C\7zBuf.c">
-      <Filter>7z</Filter>
+      <Filter>7z_C</Filter>
     </ClCompile>
     <ClCompile Include="7z_C\7zCrc.c">
-      <Filter>7z</Filter>
-    </ClCompile>
-    <ClCompile Include="7z_C\7zExtract.c">
-      <Filter>7z</Filter>
-    </ClCompile>
-    <ClCompile Include="7z_C\7zHeader.c">
-      <Filter>7z</Filter>
-    </ClCompile>
-    <ClCompile Include="7z_C\7zIn.c">
-      <Filter>7z</Filter>
-    </ClCompile>
-    <ClCompile Include="7z_C\7zItem.c">
-      <Filter>7z</Filter>
-    </ClCompile>
-    <ClCompile Include="7z_C\7zStream.c">
-      <Filter>7z</Filter>
-    </ClCompile>
-    <ClCompile Include="7z_C\Bcj2.c">
-      <Filter>7z</Filter>
-    </ClCompile>
-    <ClCompile Include="7z_C\Bra86.c">
-      <Filter>7z</Filter>
-    </ClCompile>
-    <ClCompile Include="7z_C\LzmaDec.c">
-      <Filter>7z</Filter>
-    </ClCompile>
-    <ClCompile Include="7z_C\CpuArch.c">
-      <Filter>7z</Filter>
+      <Filter>7z_C</Filter>
     </ClCompile>
     <ClCompile Include="7z_C\7zCrcOpt.c">
-      <Filter>7z</Filter>
+      <Filter>7z_C</Filter>
     </ClCompile>
-    <ClCompile Include="7z_C\Lzma2Dec.c">
-      <Filter>7z</Filter>
+    <ClCompile Include="7z_C\7zDec.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\7zIn.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\7zStream.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\Bcj2.c">
+      <Filter>7z_C</Filter>
     </ClCompile>
     <ClCompile Include="7z_C\Bra.c">
-      <Filter>7z</Filter>
+      <Filter>7z_C</Filter>
     </ClCompile>
-    <ClCompile Include="7z_C\7zDecode.c">
-      <Filter>7z</Filter>
+    <ClCompile Include="7z_C\Bra86.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\CpuArch.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\Lzma2Dec.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\LzmaDec.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\Ppmd7.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\Ppmd7Dec.c">
+      <Filter>7z_C</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -140,44 +137,41 @@
     <ClInclude Include="fex\Zlib_Inflater.h">
       <Filter>fex</Filter>
     </ClInclude>
+    <ClInclude Include="7z_C\7z.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
     <ClInclude Include="7z_C\7zAlloc.h">
-      <Filter>7z</Filter>
+      <Filter>7z_C</Filter>
     </ClInclude>
     <ClInclude Include="7z_C\7zBuf.h">
-      <Filter>7z</Filter>
+      <Filter>7z_C</Filter>
     </ClInclude>
     <ClInclude Include="7z_C\7zCrc.h">
-      <Filter>7z</Filter>
-    </ClInclude>
-    <ClInclude Include="7z_C\7zExtract.h">
-      <Filter>7z</Filter>
-    </ClInclude>
-    <ClInclude Include="7z_C\7zHeader.h">
-      <Filter>7z</Filter>
-    </ClInclude>
-    <ClInclude Include="7z_C\7zIn.h">
-      <Filter>7z</Filter>
-    </ClInclude>
-    <ClInclude Include="7z_C\7zItem.h">
-      <Filter>7z</Filter>
+      <Filter>7z_C</Filter>
     </ClInclude>
     <ClInclude Include="7z_C\Bcj2.h">
-      <Filter>7z</Filter>
+      <Filter>7z_C</Filter>
     </ClInclude>
     <ClInclude Include="7z_C\Bra.h">
-      <Filter>7z</Filter>
+      <Filter>7z_C</Filter>
     </ClInclude>
     <ClInclude Include="7z_C\CpuArch.h">
-      <Filter>7z</Filter>
-    </ClInclude>
-    <ClInclude Include="7z_C\LzmaDec.h">
-      <Filter>7z</Filter>
-    </ClInclude>
-    <ClInclude Include="7z_C\Types.h">
-      <Filter>7z</Filter>
+      <Filter>7z_C</Filter>
     </ClInclude>
     <ClInclude Include="7z_C\Lzma2Dec.h">
-      <Filter>7z</Filter>
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\LzmaDec.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\Ppmd7.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\Ppmd.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\Types.h">
+      <Filter>7z_C</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -187,10 +181,10 @@
     <None Include="license.txt" />
     <None Include="readme.txt" />
     <None Include="7z_C\7zC.txt">
-      <Filter>7z</Filter>
+      <Filter>7z_C</Filter>
     </None>
     <None Include="7z_C\lzma.txt">
-      <Filter>7z</Filter>
+      <Filter>7z_C</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -23,7 +23,6 @@ bool utilIsGBImage(const char *);
 bool utilIsGzipFile(const char *);
 void utilStripDoubleExtension(const char *, char *);
 IMAGE_TYPE utilFindType(const char *);
-IMAGE_TYPE utilFindType(const char *, char (&)[2048]);
 u8 *utilLoad(const char *, bool (*)(const char*), u8 *, int &);
 
 void utilPutDword(u8 *, u32);
