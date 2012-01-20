@@ -1,0 +1,49 @@
+
+Libpng 1.4.8 - July 7, 2011
+
+This is a public release of libpng, intended for use in production codes.
+
+Files available for download:
+
+Source files with LF line endings (for Unix/Linux) and with a
+"configure" script
+
+   libpng-1.4.8.tar.xz (LZMA-compressed, recommended)
+   libpng-1.4.8.tar.gz
+   libpng-1.4.8.tar.bz2
+
+Source files with CRLF line endings (for Windows), without the
+"configure" script
+
+   lpng148.7z (LZMA-compressed, recommended)
+   lpng148.zip
+
+Other information:
+
+   libpng-1.4.8-README.txt
+   libpng-1.4.8-LICENSE.txt
+
+Changes since the last public release (1.4.7):
+
+  Undef "_ALL_SOURCE" for AIX, to prevent "jmpbuf" from being redefined.
+  Copied png_debug macros from pngpriv.h into pngtest.c and removed
+    "#include pngpriv.h" from pngtest.c, to avoid setting a bad example.
+  Pass "" instead of '\0' to png_default_error() in png_err().  This mistake
+    was introduced in libpng-1.2.20beta01.
+  Check for up->location !PNG_AFTER_IDAT when writing unknown chunks
+    before IDAT.
+  Ported bugfix in pngrtran.c from 1.5.3: when expanding a paletted image,
+    always expand to RGBA if transparency is present.
+  Ported bugfix in pngrtran.c from 1.5.3: Ensure coefficients are OK for
+    png_rgb_to_gray_fixed(); check for integer overflow in
+    png_set_rgb_to_gray().
+  Fixed uninitialized memory read in png_format_buffer() (Bug report by
+    Frank Busse, related to CVE-2004-0421).
+  Fixed error in "ACCURATE" 16-to-8 scaling (John Bowler).
+  Check for sCAL chunk too short.
+
+Send comments/corrections/commendations to glennrp at users.sourceforge.net
+or to png-mng-implement at lists.sf.net (subscription required; visit
+https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
+
+Glenn R-P

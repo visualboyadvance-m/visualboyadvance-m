@@ -1,0 +1,91 @@
+File_Extractor library internals
+--------------------------------
+This describes the implementation and design.
+
+Contents
+--------
+* Framework
+* Archive abstraction
+* 7-ZIP
+* ZIP
+* RAR
+* GZIP
+* Binary
+
+
+Framework
+---------
+This library is essentially:
+
+* Several archive readers
+* Wrappers to provide common interface
+* File type detection
+
+The File_Extractor base class implements the common aspects of the
+interface and filters out invalid calls. It also provides default
+implementations for some operations. Each derived *_Extractor class then
+wraps the particular library.
+
+Then fex.h provides a stable, C-compatible wrapper over File_Extractor,
+and does file type identification.
+
+
+Archive abstraction
+-------------------
+An extractor is abstracted to these fundamental operations:
+
+* Open (either from path or custom reader)
+* Iterate over each file
+* Extract file's data (either gradually, or all at once into memory)
+* Seek to particular file in archive
+* Close
+
+The extractor can choose whether to open a file path immediately, or
+defer until the first stat() call. When extracting data, it can
+implement one or both of normal read and "give me a pointer to the data
+already in memory". If it only implements one, File_Extractor will
+implement the other in terms of it.
+
+
+7-ZIP
+-----
+A fairly simple wrapper over a slightly-modified LZMA library.
+Unfortunately you probably won't be able to drop a later version of the
+LZMA library sources in and recompile, as the interface and file
+arrangement tends to change with every release. The main change I've
+made is to declare functions extern "C" in headers, so C++ code can call
+them.
+
+
+ZIP
+---
+A complete implementation I wrote. Has nifty optimization that makes all
+disk reads begin and end on a multiple of 4K. Also minimizes number of
+accesses when initially reading catalog, and extracting file data.
+Correctly handles empty zip archives, unlike the popular unzip library
+which reports it as a bad archive.
+
+
+RAR
+---
+Wrapper over heavily-modified UnRAR extraction library based on the
+official UnRAR sources. The library is available separately with
+documentation and demos, in case you want to use it without the
+File_Extractor front-end (see unrar/changes.txt for more).
+
+
+GZIP
+----
+Uses zlib's built-in parsing. Also works with non-gzipped files, based
+on absence of two-byte Gzip header. Defers opening of file until
+fex_stat(), speeding mere scanning of filenames. Gzip_Reader and
+Zlib_Reader further divide the implementation into more manageable and
+reusable components.
+
+
+Binary
+------
+Just a minimal wrapper over C-style FILE.
+
+-- 
+Shay Green <gblargg@gmail.com>
