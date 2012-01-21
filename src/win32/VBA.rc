@@ -132,16 +132,16 @@ BEGIN
     CONTROL         "Network",IDC_LINK_LAN,"Button",BS_AUTORADIOBUTTON,17,43,70,16
 END
 
-IDD_LINKTAB2 DIALOG 0, 0, 210, 113
+IDD_LINKTAB2 DIALOGEX 0, 0, 210, 113
 STYLE DS_SETFONT | WS_CHILD
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     CONTROL         "2",IDC_LINK2P,"Button",BS_AUTORADIOBUTTON | WS_GROUP,46,16,21,13
     CONTROL         "3",IDC_LINK3P,"Button",BS_AUTORADIOBUTTON,94,16,21,13
     CONTROL         "4",IDC_LINK4P,"Button",BS_AUTORADIOBUTTON,142,16,21,13
     CONTROL         "TCP/IP",IDC_LINKTCP,"Button",BS_AUTORADIOBUTTON | WS_GROUP,54,47,42,14
     CONTROL         "UDP",IDC_LINKUDP,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,121,47,33,14
-    PUSHBUTTON      "Start!",IDC_SERVERSTART,79,89,50,17
+    PUSHBUTTON      "Start!",IDC_SERVERSTART,79,89,50,17,WS_DISABLED
     LTEXT           "Select number of players:",IDC_STATIC,60,7,89,10
     LTEXT           "Select protocol:",IDC_STATIC,78,33,53,11
     CONTROL         "Speed hacks",IDC_SSPEED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,76,70,57,12
@@ -154,7 +154,7 @@ BEGIN
     CONTROL         "TCP/IP",IDC_CLINKTCP,"Button",BS_AUTORADIOBUTTON | WS_GROUP,58,20,39,12
     CONTROL         "UDP",IDC_CLINKUDP,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,118,20,32,12
     EDITTEXT        IDC_SERVERIP,84,39,79,12,ES_AUTOHSCROLL | WS_GROUP
-    PUSHBUTTON      "Connect",IDC_LINKCONNECT,75,81,59,16
+    PUSHBUTTON      "Connect",IDC_LINKCONNECT,75,81,59,16,WS_DISABLED
     LTEXT           "Select protocol:",IDC_STATIC,78,7,53,9
     LTEXT           "Server IP address or hostname:",IDC_STATIC,7,37,62,18
     LTEXT           "Speed hacks:",IDC_STATIC,7,64,47,10
@@ -1239,6 +1239,22 @@ BEGIN
         BOTTOMMARGIN, 107
     END
 
+    IDD_LINKTAB, DIALOG
+    BEGIN
+    END
+
+    IDD_LINKTAB1, DIALOG
+    BEGIN
+    END
+
+    IDD_LINKTAB2, DIALOG
+    BEGIN
+    END
+
+    IDD_LINKTAB3, DIALOG
+    BEGIN
+    END
+
     IDD_OPENDLG, DIALOG
     BEGIN
         RIGHTMARGIN, 165
@@ -1955,9 +1971,9 @@ BEGIN
         END
         POPUP "&Link"
         BEGIN
-            MENUITEM "Enable GBA Linking",          ID_OPTIONS_LINK_ENABLE, INACTIVE
-            MENUITEM "&Wireless Adapter",           ID_OPTIONS_LINK_WIRELESSADAPTER, INACTIVE
-            MENUITEM "&Options...",                 ID_OPTIONS_LINK_OPTIONS, INACTIVE
+            MENUITEM "Enable GBA Linking",          ID_OPTIONS_LINK_ENABLE
+            MENUITEM "&Wireless Adapter",           ID_OPTIONS_LINK_WIRELESSADAPTER
+            MENUITEM "&Options...",                 ID_OPTIONS_LINK_OPTIONS
             MENUITEM SEPARATOR
             MENUITEM "&Joybus Options...",          ID_OPTIONS_JOYBUS
         END
@@ -2226,11 +2242,19 @@ BEGIN
     IDS_LOADED_CHEATS       "Loaded cheats"
     IDS_ERROR_DISP_COLOR    "Unsupported display setting for color depth: %d bits. \nWindows desktop must be in either 16-bit, 24-bit or 32-bit mode for this program to work in window mode."
     IDS_ADD_GSA_CODE        "Add GameSharkAdvance code"
-    IDS_FILTER_GSVSPS       "GS & PAC Snapshots (*.SPS;*.XPS)_*.SPS;*.XPS_GameShark SP Snapshots (*.GSV)_*.gsv__"
     IDS_FILTER_SPS          "Gameshark Snapshot_*.SPS__"
     IDS_SELECT_SNAPSHOT_FILE "Select snapshot file"
     IDS_FILTER_SAV          "Battery file_*.SAV_Flash save_*.DAT__"
     IDS_SELECT_BATTERY_FILE "Select battery file"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_INVALID_INTERVAL_VALUE 
+                            "Invalid rewind interval value. Please enter a number between 0 and 600 seconds."
+    IDS_REGISTRY            "VisualBoyAdvance no longer uses the registry to store its settings. Your previous settings have been exported into the file: %s"
+    IDS_MOVIE_PLAY          "Playing a movie will load a save state which may erase your previous battery saves. Please be sure to have a saved state if you don't want to loose any previous data."
+    IDS_FILTER_GSVSPS       "GS & PAC Snapshots (*.SPS;*.XPS)_*.SPS;*.XPS_GameShark SP Snapshots (*.GSV)_*.gsv__"
 END
 
 STRINGTABLE
@@ -2291,14 +2315,6 @@ BEGIN
     IDS_BUG_REPORT          "The bug report information is now available on the Windows Clipboard. Please paste it into any bug report made by email or on forums to help solve problems more easily."
     IDS_UNSUPPORTED_MOVIE_VERSION "Unsupported movie version %d."
     IDS_END_OF_MOVIE        "end of movie"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_INVALID_INTERVAL_VALUE 
-                            "Invalid rewind interval value. Please enter a number between 0 and 600 seconds."
-    IDS_REGISTRY            "VisualBoyAdvance no longer uses the registry to store its settings. Your previous settings have been exported into the file: %s"
-    IDS_MOVIE_PLAY          "Playing a movie will load a save state which may erase your previous battery saves. Please be sure to have a saved state if you don't want to loose any previous data."
 END
 
 STRINGTABLE
