@@ -442,6 +442,11 @@ static bool utilIsImage(const char *file)
 IMAGE_TYPE utilFindType(const char *file)
 {
 	char buffer [2048];
+	return utilFindType(file, buffer);
+}
+
+IMAGE_TYPE utilFindType(const char *file, char (&buffer)[2048])
+{
 #ifdef WIN32
 	DWORD dwNum = MultiByteToWideChar (CP_ACP, 0, file, -1, NULL, 0);
 	wchar_t *pwText;
