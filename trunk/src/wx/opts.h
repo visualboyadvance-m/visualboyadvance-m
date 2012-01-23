@@ -12,7 +12,7 @@ extern struct opts_t {
 
     /// Display
     bool bilinear;
-    // bool cpu_mmx;
+    bool cpu_mmx;
     bool no_osd_status;
     int filter;
     wxString filter_plugin;
@@ -29,16 +29,16 @@ extern struct opts_t {
     bool vsync;
 
     /// GB
-    // bool gbBorderAutomatic;
+    bool gbBorderAutomatic;
     wxString gb_bios;
-    // bool gbBorderOn;
-    // int gbEmulatorType;
+    bool gbBorderOn;
+    int gbEmulatorType;
     bool gbprint; // gbSerialFunction
     int gb_frameskip; // systemFrameSkip
     wxString gbc_bios;
     bool gbc_use_bios;
-    // bool gbcColorOption;
-    // bool gbPaletteOption;
+    bool gbcColorOption;
+    int gbPaletteOption;
     // u16 systemGbPalette[8*3];
     bool print_auto_page, print_screen_cap;
     wxString gb_rom_dir;
@@ -50,14 +50,14 @@ extern struct opts_t {
     bool rtc; // rtcEnable  // has per-game override
     int flash_size; // flashSetSize  // has per-game override
     int gba_frameskip; // systemFrameSkip
-    // bool gba_joybus_enabled;
+    bool gba_joybus_enabled;
     wxString joybus_host;
-    // bool gba_link_enabled;
-    // bool lanlink.speed;
+    bool gba_link_enabled;
+    bool lanlink_speed;
     wxString link_host;
     int link_proto;
-    // bool rfu_enabled;
-    // int linktimeout;
+    bool rfu_enabled;
+    int linktimeout;
     wxString gba_rom_dir;
     bool skip_intro;
     int save_type; // cpuSaveType
@@ -68,15 +68,15 @@ extern struct opts_t {
     bool autoload_state, autoload_cheats;
     wxString battery_dir;
     int cap_format;
-    // bool cheatsEnabled;
+    bool cheatsEnabled;
     bool recent_freeze;
     bool defocus_pause;
     wxString recording_dir;
     int rewind_interval;
     wxString scrshot_dir;
-    // bool skipBios;
+    bool skipBios;
     wxString state_dir;
-    // bool skipSaveGameBattery, skipSaveGameCheats;
+    bool skipSaveGameBattery, skipSaveGameCheats;
     int throttle; // updateThrottle()
 
     /// Joypad
@@ -93,15 +93,15 @@ extern struct opts_t {
     wxString audio_dev;
     int sound_en; // soundSetEnable()
     int gba_sound_filter;
-    // int soundInterpolation;
+    bool soundInterpolation;
     bool gb_declick;
     int gb_echo;
-    // bool gb_effects_config.enabled;
+    bool gb_effects_config_enabled;
     bool dsound_hw_accel;
     int gb_stereo;
-    // int gb_effects_config.surround;
+    bool gb_effects_config_surround;
     int sound_qual; // soundSetSampleRate() / gbSoundSetSampleRate()
-    // bool synchronize;
+    bool synchronize;
     int sound_vol; // soundSetVolume()
     bool upmix; // xa2 only
 
