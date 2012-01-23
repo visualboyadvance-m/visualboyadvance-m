@@ -676,7 +676,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties RESOURCE_FILE="\Users\Shawn\Desktop\shuffle2proj\vba-m\src\win32\VBA.rc" />
+      <UserProperties RESOURCE_FILE="" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
