@@ -732,11 +732,11 @@ static blargg_err_t convert_gz_error( gzFile file )
 
 blargg_err_t Gzip_File_Reader::read_v( void* p, int s )
 {
-	int result = gzread( file_, p, s );
+	int result = gzread( (gzFile)file_, p, s );
 	if ( result != s )
 	{
 		if ( result < 0 )
-			return convert_gz_error( file_ );
+			return convert_gz_error( (gzFile)file_ );
 		
 		return blargg_err_file_corrupt;
 	}
@@ -746,8 +746,8 @@ blargg_err_t Gzip_File_Reader::read_v( void* p, int s )
 
 blargg_err_t Gzip_File_Reader::seek_v( int n )
 {
-	if ( gzseek( file_, n, SEEK_SET ) < 0 )
-		return convert_gz_error( file_ );
+	if ( gzseek( (gzFile)file_, n, SEEK_SET ) < 0 )
+		return convert_gz_error( (gzFile)file_ );
 
 	return blargg_ok;
 }
@@ -756,7 +756,7 @@ void Gzip_File_Reader::close()
 {
 	if ( file_ )
 	{
-		if ( gzclose( file_ ) )
+		if ( gzclose( (gzFile)file_ ) )
 			check( false );
 		file_ = NULL;
 	}
