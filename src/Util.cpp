@@ -590,7 +590,7 @@ void utilWriteData(gzFile gzFile, variable_desc *data)
 
 gzFile utilGzOpen(const char *file, const char *mode)
 {
-  utilGzWriteFunc = (int (ZEXPORT *)(void *,void * const, unsigned int))gzwrite;
+  utilGzWriteFunc = (int (ZEXPORT *)(gzFile, void * const, unsigned int))gzwrite;
   utilGzReadFunc = gzread;
   utilGzCloseFunc = gzclose;
   utilGzSeekFunc = gzseek;
