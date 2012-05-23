@@ -78,8 +78,6 @@ Important:
 
 - Game Bugs:
 - Drymouth - screen flashes black after certain scanline
-- World Reborn - 2 graphics bugs
-- V-Rally 3, Pseudo 3D flickering
 
 Less important:
 - Add GBA cheat editing support (GB already has)
@@ -99,6 +97,7 @@ Less important:
 
 - Apply pixel filter to sprites and BG seperately for better image quality
 
+- Add CGB Bios support
 
 Performance:
 - Apply HQ3x/4x optimizations from C version to ASM version
@@ -118,9 +117,6 @@ Known Bugs
 ==========
 - Linking: Doesnt work quite right yet.
 
-- Audio core: assertation error occurs when disabling sound in GB mode
-- I think its best we mute sound instead, since some games rely on audio for timing.
-Plus, blargg's GB_Snd_Emu is extremely optimized stuff. (Mudlord)
 - blargg's core implementation broke Dwedit's GBC emu.
 - Audio Sync + Auto frame skip break frames, causing emulation to drop to as low as 40fps even though enough performance is available to maintain full speed. Use one, or the other, not both. Vsync is not effected, and can be used with either setting.
 
@@ -139,7 +135,7 @@ Squall Leonhart
 Spacy
 DJRobX
 Jonas Quinn
-
+kode54
 
 ==============
 Special Thanks
@@ -165,3 +161,12 @@ blargg:
 - Assistance with the implementation of his highly accurate GB audio core
 - Implemented his unreleased File_Extractor library
 - Cleanup of the audio core interface
+
+kode64:
+- Implemented LZMA2 in FEX
+- GB_APU tweaks and fixes
+- cmake corrections
+
+shuffle2:
+- SFML library
+- various build fixes
