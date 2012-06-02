@@ -31,11 +31,13 @@ GFX: ~32MB VRAM, latest drivers supporting DirectX9
 SND: Anything with working Windows drivers
 
 
-=================
-Required Runtimes
-=================
+===========================
+Required Runtimes and components
+===========================
+This is a list of runtimes that are NOT included with any release version of windows to date (Windows 8 may contain newer D3DX components released since Windows 7's release).
 
-DirectX Runtime Web-Updater:
+
+D3DX Components require the DirectX End-User Runtime Installer.
 http://www.microsoft.com/downloads/details.aspx?FamilyID=2da43d38-db71-4c1b-bc6a- 9b6652cd92a3&DisplayLang=en
 
 MSVC 2008SP1 Runtime
