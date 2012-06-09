@@ -38,12 +38,12 @@ This is a list of runtimes that are NOT included with any release version of win
 
 
 D3DX Components require the DirectX End-User Runtime Installer.
-http://www.microsoft.com/downloads/details.aspx?FamilyID=2da43d38-db71-4c1b-bc6a-9b6652cd92a3&DisplayLang=en
+http://www.microsoft.com/en-us/download/details.aspx?id=35
 
-MSVC 2008SP1 Runtime
-(x86) http://www.microsoft.com/downloads/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en
+MSVC 2010 SP1 Runtime
+(x86) http://www.microsoft.com/en-us/download/details.aspx?id=8328
 
-(x64) http://www.microsoft.com/downloads/details.aspx?familyid=BA9257CA-337F-4B40-8C14-157CFDFFEE4E&displaylang=en
+(x64) http://www.microsoft.com/en-us/download/details.aspx?id=13523  (x64 versions aren't really a requirement since there are no supported 64bit versions of the emulator)
 
 zLib
 http://www.zlib.net/zlib123-dll.zip
