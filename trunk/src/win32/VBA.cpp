@@ -1,3 +1,7 @@
+#if (_MSC_VER == 1600 && _M_IX86_FP >= 0 && (_MSC_FULL_VER < 160040219))
+#error You must compile this software without SSE!
+#endif
+
 #ifdef NO_D3D
 #ifdef NO_OGL
 #error NO_D3D and NO_OGL must not be defined at the same time.
