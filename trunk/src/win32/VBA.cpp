@@ -1,5 +1,5 @@
 #if (_MSC_VER == 1600 && _M_IX86_FP >= 0 && (_MSC_FULL_VER < 160040219))
-#error You must compile this software without SSE!
+#error The version of Visual Studio 2010 you are using generates SSE2 instructions  when /arch:SSE is specified. Please update to Service Pack 1.
 #endif
 
 #ifdef NO_D3D
