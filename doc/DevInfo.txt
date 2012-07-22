@@ -46,7 +46,7 @@ The project files are located in /project/vc2008_mfc (VBA2008.sln) and /project/
 Anyone distributing builds should be using MSVC 2010 SP1, the unpatched release has a bug where it applies SSE2 updates to mov and other instructions resulting in illegal instruction errors on cpu's only supporting SSE.
 You also have to install Microsoft's DirectX SDK for Direct3D, DirectInput & XAudio2.
 If you want to enable OpenAL sound output, install the OpenAL SDK. If you do not want it, add NO_OAL to the VBA-M project's preprocessor definitions.
-SubWCRev.exe is used to append the svn versioning to the output executable, this should already be present if you pulled from the svn, but will require installing if you downloaded the project as a tarball.
+SubWCRev.exe is used to append the svn versioning to the output executable, this as of TortoiseSVN 1.7, is only available by installing TortoiseSVN.
 All other dependencies for MSVC builds may be found in the ../dependencies directory (above /trunk).
 Normally, Windows users will want to checkout the root of the repository instead of just the trunk directory. Afterwards, simply opening the .sln of choice, setting preprocessor definitions, and hitting build is all that's required.
 
