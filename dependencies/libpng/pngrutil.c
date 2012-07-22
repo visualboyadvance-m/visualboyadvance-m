@@ -1,8 +1,8 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.8 [July 7, 2011]
- * Copyright (c) 1998-2011 Glenn Randers-Pehrson
+ * Last changed in libpng 1.4.10 [March 8, 2012]
+ * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -282,8 +282,8 @@ png_inflate(png_structp png_ptr, const png_byte *data, png_size_t size,
       {
          if (output != 0 && output_size > count)
          {
-            int copy = output_size - count;
-            if (avail < copy) copy = avail;
+            png_size_t copy = output_size - count;
+            if ((png_size_t) avail < copy) copy = (png_size_t) avail;
             png_memcpy(output + count, png_ptr->zbuf, copy);
          }
 
@@ -377,15 +377,16 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       /* Now check the limits on this chunk - if the limit fails the
        * compressed data will be removed, the prefix will remain.
        */
-#ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
-      if (png_ptr->user_chunk_malloc_max &&
+      if (prefix_size >= (~(png_size_t)0) - 1 ||
+         expanded_size >= (~(png_size_t)0) - 1 - prefix_size
+#ifdef PNG_USER_LIMITS_SUPPORTED
+         || (png_ptr->user_chunk_malloc_max &&
           (prefix_size + expanded_size >= png_ptr->user_chunk_malloc_max - 1))
 #else
-#  ifdef PNG_USER_CHUNK_MALLOC_MAX
-      if ((PNG_USER_CHUNK_MALLOC_MAX > 0) &&
+         || ((PNG_USER_CHUNK_MALLOC_MAX > 0) &&
           prefix_size + expanded_size >= PNG_USER_CHUNK_MALLOC_MAX - 1)
-#  endif
 #endif
+         )
          png_warning(png_ptr, "Exceeded size limit while expanding chunk");
 
       /* If the size is zero either there was an error and a message
@@ -393,11 +394,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
        * and we have nothing to do - the code will exit through the
        * error case below.
        */
-#if defined(PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED) || \
-    defined(PNG_USER_CHUNK_MALLOC_MAX)
-      else
-#endif
-      if (expanded_size > 0)
+      else if (expanded_size > 0)
       {
          /* Success (maybe) - really uncompress the chunk. */
          png_size_t new_size = 0;
@@ -1261,7 +1258,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_free(png_ptr, png_ptr->chunkdata);
    png_ptr->chunkdata = (png_charp)png_malloc(png_ptr, length + 1);
-   slength = (png_size_t)length;
+   slength = length;
    png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
 
    if (png_crc_finish(png_ptr, skip))
@@ -1584,14 +1581,15 @@ png_handle_hIST(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   num = length / 2 ;
-   if (num != (unsigned int) png_ptr->num_palette || num >
-      (unsigned int) PNG_MAX_PALETTE_LENGTH)
+   if (length > 2*PNG_MAX_PALETTE_LENGTH ||
+       length != (unsigned int) (2*png_ptr->num_palette))
    {
       png_warning(png_ptr, "Incorrect hIST chunk length");
       png_crc_finish(png_ptr, length);
       return;
    }
+
+   num = length / 2 ;
 
    for (i = 0; i < num; i++)
    {
@@ -1911,11 +1909,11 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_ptr->chunkdata = NULL;
       return;
    }
-   png_memcpy(swidth, ep, png_strlen(ep));
+   png_memcpy(swidth, ep, png_strlen(ep)+1);
 #endif
 #endif
 
-   for (ep = png_ptr->chunkdata; *ep; ep++)
+   for (ep = png_ptr->chunkdata+1; *ep; ep++)
       /* Empty loop */ ;
    ep++;
 
@@ -1950,7 +1948,7 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_free(png_ptr, swidth);
       return;
    }
-   png_memcpy(sheight, ep, png_strlen(ep));
+   png_memcpy(sheight, ep, png_strlen(ep)+1);
 #endif
 #endif
 

@@ -1,5 +1,4 @@
 #if 0
-libpng_changes(){ /*
 CHANGES - changes for libpng
 
 version 0.2
@@ -2826,10 +2825,58 @@ version 1.4.8rc01 [June 30, 2011]
 version 1.4.8 [July 7, 2011]
   No changes.
 
+version 1.4.9beta01 [February 16, 2012]
+  Added vstudio/* and CMakeLists to EXTRA_DIST in Makefile.in and Makefile.am
+  Updated contrib/pngminus/makefile.std (Samuli Souminen)
+  Added SunOS support to configure.ac and Makefile.am (but configure and
+    Makefile.in were not updated)
+
+version 1.4.9rc01 [February 17, 2012]
+  Fixed CVE-2011-3026 buffer overrun bug.  This bug was introduced when
+    iCCP chunk support was added at libpng-1.0.6. Deal more correctly with the
+    test on iCCP chunk length. Also removed spurious casts that may hide
+    problems on 16-bit systems.
+
+version 1.4.9 [February 18, 2012]
+  No changes.
+
+version 1.4.10beta01 [February 27, 2011]
+  Removed two useless #ifdef directives from pngread.c and one from pngrutil.c
+  Eliminated redundant png_push_read_tEXt|zTXt|iTXt|unknown code from
+    pngpread.c and use the sequential png_handle_tEXt, etc., in pngrutil.c;
+    now that png_ptr->buffer is inaccessible to applications, the special
+    handling is no longer useful.
+  Fixed bug with png_handle_hIST with odd chunk length (Frank Busse).
+  Fixed incorrect type (int copy should be png_size_t copy) in png_inflate()
+    (fixes CVE-2011-3045).
+  Fixed off-by-one bug in png_handle_sCAL() when using fixed point arithmetic,
+    causing out-of-bounds read in png_set_sCAL() because of failure to copy
+    the string terminators.  This bug was introduced in libpng-1.0.6 (Frank
+    Busse).
+
+version 1.4.10rc01 [March 2, 2012]
+  Removed the png_free() of unused png_ptr->current_text from pngread.c.
+
+version 1.4.10rc02 [March 6, 2012]
+  Fixed PNG_LIBPNG_BUILD_BASE_TYPE definition in png.h
+
+version 1.4.10 [March 15, 2012]
+  No changes.
+
+version 1.4.11 [March 29, 2012]
+  Revised png_set_text_2() to avoid potential memory corruption (fixes
+    CVE-2011-3048).
+  Prevent PNG_EXPAND+PNG_SHIFT doing the shift twice.
+
+version 1.4.12 [July 10, 2012]
+  Added two images to contrib/pngsuite (1-bit and 2-bit transparent grayscale),
+    and renamed three whose names were inconsistent with those in
+    pngsuite/README.txt.
+  Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
 
 Glenn R-P
-*/ }
 #endif

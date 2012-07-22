@@ -24,7 +24,10 @@ MAN=		libpng.3 libpngpf.3 png.5
 MANDIR=		/man/man
 SYMLINKS=       libpng/png.h ${INCSDIR}/../png.h \
 		libpng/pngconf.h ${INCSDIR}/../pngconf.h
+
 LDADD+=         -lm -lz
+# LDADD+=         -lm -lz -lssp_nonshared   # for OSVERSION >= 800000 ?
+
 DPADD+=         ${LIBM} ${LIBZ}
 
 CFLAGS+= -I.

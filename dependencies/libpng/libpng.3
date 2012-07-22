@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "July 7, 2011"
+.TH LIBPNG 3 "July 10, 2012"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.4.8
+libpng \- Portable Network Graphics (PNG) Reference Library 1.4.12
 .SH SYNOPSIS
 \fI\fB
 
@@ -895,7 +895,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.4.8 - July 7, 2011
+ libpng version 1.4.12 - July 10, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
@@ -906,7 +906,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.4.8 - July 7, 2011
+ libpng versions 0.97, January 1998, through 1.4.12 - July 10, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2010 Glenn Randers-Pehrson
 
@@ -1591,7 +1591,8 @@ pointer into the info_ptr is returned for any complex types.
                     (PNG_VALID_tIME)
 
     png_get_bKGD(png_ptr, info_ptr, &background);
-    background     - background color (PNG_VALID_bKGD)
+    background     - background color (of type
+                     png_color_16p) (PNG_VALID_bKGD)
                      valid 16-bit red, green and blue
                      values, regardless of color_type
 
@@ -1800,7 +1801,7 @@ things.
 As of libpng version 1.2.9, png_set_expand_gray_1_2_4_to_8() was
 added.  It expands the sample depth without changing tRNS to alpha.
 
-As of libpng version 1.4.8, not all possible expansions are supported.
+As of libpng version 1.4.12, not all possible expansions are supported.
 
 In the following table, the 01 means grayscale with depth<8, 31 means
 indexed with depth<8, other numerals represent the color type, "T" means
@@ -2077,7 +2078,6 @@ histogram, it may not do as good a job.
          PNG_INFO_PLTE))
       {
          png_uint_16p histogram = NULL;
-
          png_get_hIST(png_ptr, info_ptr,
             &histogram);
          png_set_quantize(png_ptr, palette, num_palette,
@@ -2866,7 +2866,8 @@ width, height, bit_depth, and color_type must be the same in each call.
                      (PNG_VALID_tIME)
 
     png_set_bKGD(png_ptr, info_ptr, background);
-    background     - background color (PNG_VALID_bKGD)
+    background     - background color (of type
+                     png_color_16p) (PNG_VALID_bKGD)
 
     png_set_text(png_ptr, info_ptr, text_ptr, num_text);
     text_ptr       - array of png_text holding image
@@ -3528,7 +3529,8 @@ However, there are some uncertainties about the status of local variables
 after a longjmp, so the user may want to be careful about doing anything
 after setjmp returns non-zero besides returning itself.  Consult your
 compiler documentation for more details.  For an alternative approach, you
-may wish to use the "cexcept" facility (see http://cexcept.sourceforge.net).
+may wish to use the "cexcept" facility (see http://cexcept.sourceforge.net),
+which is illustrated in pngvalid.c and in contrib/visupng.
 
 .SS Custom chunks
 
@@ -3546,8 +3548,11 @@ and look at how other chunks were designed, so you can do things
 similarly.  Second, check out the sections of libpng that read and
 write chunks.  Try to find a chunk that is similar to yours and use
 it as a template.  More details can be found in the comments inside
-the code.  It is best to handle unknown chunks in a generic method,
-via callback functions, instead of by modifying libpng functions.
+the code.  It is best to handle private or unknown chunks in a generic method,
+via callback functions, instead of by modifying libpng functions. This
+is illustrated in pngtest.c, which uses a callback function to handle a
+private "vpAg" chunk and the new "sTER" chunk, which are both unknown to
+libpng.
 
 If you wish to write your own transformation for the data, look through
 the part of the code that does the transformations, and check out some of
@@ -3736,8 +3741,8 @@ capability, which you'll still have).
 All the reading and writing specific code are in separate files, so the
 linker should only grab the files it needs.  However, if you want to
 make sure, or if you are building a stand alone library, all the
-reading files start with pngr and all the writing files start with
-pngw.  The files that don't match either (like png.c, pngtrans.c, etc.)
+reading files start with "pngr" and all the writing files start with "pngw".
+The files that don't match either (like png.c, pngtrans.c, etc.)
 are used for both reading and writing, and always need to be included.
 The progressive reader is in pngpread.c
 
@@ -4177,8 +4182,8 @@ above the comment that says
   /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
 
 To avoid polluting the global namespace, the names of all exported
-functions and variables begin with  "png_", and all publicly visible C
-preprocessor macros begin with "PNG_".  We request that applications that
+functions and variables begin with "png_", and all publicly visible C
+preprocessor macros begin with "PNG".  We request that applications that
 use libpng *not* begin any of their own symbols with either of these strings.
 
 We put a space after each comma and after each semicolon
@@ -4202,13 +4207,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XIII. Y2K Compliance in libpng
 
-July 7, 2011
+July 10, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.4.8 are Y2K compliant.  It is my belief that earlier
+upward through 1.4.12 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
@@ -4408,6 +4413,15 @@ the first widely used release:
  1.4.8beta01-05      14    10408  14.so.14.8[.0]
  1.4.8rc01           14    10408  14.so.14.8[.0]
  1.4.8               14    10408  14.so.14.8[.0]
+ 1.4.9beta01         14    10409  14.so.14.9[.0]
+ 1.4.9rc01           14    10409  14.so.14.9[.0]
+ 1.4.9               14    10409  14.so.14.9[.0]
+ 1.4.10beta01        14    10410  14.so.14.10[.0]
+ 1.4.10rc01-02       14    10410  14.so.14.10[.0]
+ 1.4.10              14    10410  14.so.14.10[.0]
+ 1.4.11rc01          14    10411  14.so.14.11[.0]
+ 1.4.11              14    10411  14.so.14.11[.0]
+ 1.4.12              14    10412  14.so.14.12[.0]
 
 Henceforth the source version will match the shared-library minor
 and patch numbers; the shared-library major version number will be
@@ -4417,7 +4431,7 @@ for applications, is an unsigned integer of the form xyyzz corresponding
 to the source version x.y.z (leading zeros in y and z).  Beta versions
 were given the previous public release number plus a letter, until
 version 1.0.6j; from then on they were given the upcoming public
-release number plus "betaNN" or "rcN".
+release number plus "betaNN" or "rcNN".
 
 .SH "SEE ALSO"
 .BR "png"(5), " libpngpf"(3), " zlib"(3), " deflate"(5), " " and " zlib"(5)
@@ -4463,7 +4477,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.4.8 - July 7, 2011:
+Libpng version 1.4.12 - July 10, 2012:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -4486,7 +4500,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.4.8, July 7, 2011, are
+libpng versions 1.2.6, August 15, 2004, through 1.4.12, July 10, 2012, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -4585,7 +4599,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-July 7, 2011
+July 10, 2012
 
 .\" end of man page
 

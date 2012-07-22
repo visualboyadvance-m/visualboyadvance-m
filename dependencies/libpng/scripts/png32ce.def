@@ -15,7 +15,7 @@ LIBRARY lpngce
  png_get_int_32
 
 EXPORTS
-;Version 1.4.8
+;Version 1.4.12
   png_build_grayscale_palette  @1
 ;  png_check_sig        @2
   png_chunk_error      @3

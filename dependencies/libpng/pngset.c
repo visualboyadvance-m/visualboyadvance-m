@@ -1,8 +1,8 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.4.6 [January 14, 2011]
- * Copyright (c) 1998-2011 Glenn Randers-Pehrson
+ * Last changed in libpng 1.4.11 [March 29, 2012]
+ * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -649,22 +649,26 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
     */
    if (info_ptr->num_text + num_text > info_ptr->max_text)
    {
+      int old_max_text = info_ptr->max_text;
+      int old_num_text = info_ptr->num_text;
+
       if (info_ptr->text != NULL)
       {
          png_textp old_text;
-         int old_max;
 
-         old_max = info_ptr->max_text;
          info_ptr->max_text = info_ptr->num_text + num_text + 8;
          old_text = info_ptr->text;
+
          info_ptr->text = (png_textp)png_malloc_warn(png_ptr,
             (png_size_t)(info_ptr->max_text * png_sizeof(png_text)));
          if (info_ptr->text == NULL)
          {
-            png_free(png_ptr, old_text);
+            /* Restore to previous condition */
+            info_ptr->max_text = old_max_text;
+            info_ptr->text = old_text;
             return(1);
          }
-         png_memcpy(info_ptr->text, old_text, (png_size_t)(old_max *
+         png_memcpy(info_ptr->text, old_text, (png_size_t)(old_max_text *
             png_sizeof(png_text)));
          png_free(png_ptr, old_text);
       }
@@ -675,7 +679,12 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr, png_textp text_ptr,
          info_ptr->text = (png_textp)png_malloc_warn(png_ptr,
             (png_size_t)(info_ptr->max_text * png_sizeof(png_text)));
          if (info_ptr->text == NULL)
+         {
+            /* Restore to previous condition */
+            info_ptr->num_text = old_num_text;
+            info_ptr->max_text = old_max_text;
             return(1);
+         }
          info_ptr->free_me |= PNG_FREE_TEXT;
       }
       png_debug1(3, "allocated %d entries for info_ptr->text",

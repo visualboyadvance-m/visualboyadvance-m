@@ -1,5 +1,5 @@
 
-Installing libpng version 1.4.8 - July 7, 2011
+Installing libpng version 1.4.12 - July 10, 2012
 
 On Unix/Linux and similar systems, you can simply type
 
@@ -46,7 +46,7 @@ to have access to the zlib.h and zconf.h include files that
 correspond to the version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
-might be called "libpng-1.4.8" or "libpng14" and "zlib-1.2.3"
+might be called "libpng-1.4.12" or "libpng14" and "zlib-1.2.3"
 or "zlib123") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
@@ -60,8 +60,8 @@ Your directory structure should look like this:
           CMakeLists.txt    =>  "cmake" script
           configuration files:
              configure.ac, configure, Makefile.am, Makefile.in,
-             autogen.sh, config.guess, ltmain.sh, missing, libpng.pc.in,
-             libpng-config.in, aclocal.m4, config.h.in, config.sub,
+             autogen.sh, config.guess, ltmain.sh, missing,
+             aclocal.m4, config.h.in, config.sub,
              depcomp, install-sh, test-pngtest.sh
           contrib
              gregbook
