@@ -10,10 +10,129 @@
 // XAudio2
 #include <XAudio2.h>
 
+// MMDevice API
+#include <mmdeviceapi.h>
+#include <vector>
+#include <string>
+
 // Internals
 #include "../System.h" // for systemMessage()
 #include "../gba/Globals.h"
 
+
+class XAudio2_Output;
+
+static void xaudio2_device_changed( XAudio2_Output * );
+
+class XAudio2_Device_Notifier : public IMMNotificationClient
+{
+	volatile LONG registered;
+	IMMDeviceEnumerator *pEnumerator;
+
+	std::wstring last_device;
+
+	CRITICAL_SECTION lock;
+	std::vector<XAudio2_Output*> instances;
+
+public:
+	XAudio2_Device_Notifier() : registered( 0 )
+	{
+		InitializeCriticalSection( &lock );
+	}
+	~XAudio2_Device_Notifier()
+	{
+		DeleteCriticalSection( &lock );
+	}
+
+	ULONG STDMETHODCALLTYPE AddRef()
+	{
+		return 1;
+	}
+
+	ULONG STDMETHODCALLTYPE Release()
+	{
+		return 1;
+	}
+
+	HRESULT STDMETHODCALLTYPE QueryInterface( REFIID riid, VOID **ppvInterface )
+	{
+		if (IID_IUnknown == riid)
+		{
+			*ppvInterface = (IUnknown*)this;
+		}
+		else if (__uuidof(IMMNotificationClient) == riid)
+		{
+			*ppvInterface = (IMMNotificationClient*)this;
+		}
+		else
+		{
+			*ppvInterface = NULL;
+			return E_NOINTERFACE;
+		}
+		return S_OK;
+	}
+
+	HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged( EDataFlow flow, ERole role, LPCWSTR pwstrDeviceId )
+	{
+		if ( flow == eRender && last_device.compare( pwstrDeviceId ) != 0 )
+		{
+			last_device = pwstrDeviceId;
+
+			EnterCriticalSection( &lock );
+			for ( auto it = instances.begin(); it < instances.end(); ++it )
+			{
+				xaudio2_device_changed( *it );
+			}
+			LeaveCriticalSection( &lock );
+		}
+
+		return S_OK;
+	}
+
+	HRESULT STDMETHODCALLTYPE OnDeviceAdded( LPCWSTR pwstrDeviceId ) { return S_OK; }
+	HRESULT STDMETHODCALLTYPE OnDeviceRemoved( LPCWSTR pwstrDeviceId ) { return S_OK; }
+	HRESULT STDMETHODCALLTYPE OnDeviceStateChanged( LPCWSTR pwstrDeviceId, DWORD dwNewState ) { return S_OK; }
+	HRESULT STDMETHODCALLTYPE OnPropertyValueChanged( LPCWSTR pwstrDeviceId, const PROPERTYKEY key ) { return S_OK; }
+
+	void do_register(sound_out_i_xaudio2 * p_instance)
+	{
+		if ( InterlockedIncrement( &registered ) == 1 )
+		{
+			pEnumerator = NULL;
+			HRESULT hr = CoCreateInstance( __uuidof( MMDeviceEnumerator ), NULL, CLSCTX_INPROC_SERVER, __uuidof( IMMDeviceEnumerator ), ( void** ) &pEnumerator );
+			if ( SUCCEEDED( hr ) )
+			{
+				pEnumerator->RegisterEndpointNotificationCallback( this );
+				registered = true;
+			}
+		}
+
+		EnterCriticalSection( &lock );
+		instances.push_back( p_instance );
+		LeaveCriticalSection( &lock );
+	}
+
+	void do_unregister( sound_out_i_xaudio2 * p_instance )
+	{
+		if ( InterlockedDecrement( &registered ) == 0 )
+		{
+			pEnumerator->UnregisterEndpointNotificationCallback( this );
+			pEnumerator->Release();
+			registered = false;
+		}
+
+		EnterCriticalSection( &lock );
+		for ( auto it = instances.begin(); it < instances.end(); ++it )
+		{
+			if ( *it == p_instance )
+			{
+				instances.erase( it );
+				break;
+			}
+		}
+		LeaveCriticalSection( &lock );
+	}
+} g_notifier;
 
 // Synchronization Event
 class XAudio2_BufferNotify : public IXAudio2VoiceCallback
@@ -66,6 +185,8 @@ public:
 	void pause();
 	void resume();
 	void reset();
+	void close();
+	void device_change();
 
 	// Configuration Changes
 	void setThrottle( unsigned short throttle );
@@ -79,6 +200,8 @@ private:
 	BYTE  *buffers;
 	int    currentBuffer;
 	int    soundBufferLen;
+
+	volatile bool device_changed;
 
 	IXAudio2               *xaud;
 	IXAudio2MasteringVoice *mVoice; // listener
@@ -99,16 +222,25 @@ XAudio2_Output::XAudio2_Output()
 	bufferCount = gopts.audio_buffers;
 	buffers = NULL;
 	currentBuffer = 0;
+	device_changed = false;
 
 	xaud = NULL;
 	mVoice = NULL;
 	sVoice = NULL;
 	ZeroMemory( &buf, sizeof( buf ) );
 	ZeroMemory( &vState, sizeof( vState ) );
+
+	g_notifier.do_register( this );
 }
 
 
 XAudio2_Output::~XAudio2_Output()
+{
+	g_notifier.do_unregister( this );
+	close();
+}
+
+void XAudio2_Output::close()
 {
 	initialized = false;
 
@@ -118,6 +250,7 @@ XAudio2_Output::~XAudio2_Output()
 			assert( hr == S_OK );
 		}
 		sVoice->DestroyVoice();
+		sVoice = NULL;
 	}
 
 	if( buffers ) {
@@ -127,12 +260,18 @@ XAudio2_Output::~XAudio2_Output()
 
 	if( mVoice ) {
 		mVoice->DestroyVoice();
+		mVoice = NULL;
 	}
 
 	if( xaud ) {
 		xaud->Release();
 		xaud = NULL;
 	}
+}
+
+void XAudio2_Output::device_change()
+{
+	device_changed = true;
 }
 
 
@@ -277,6 +416,8 @@ bool XAudio2_Output::init(long sampleRate)
 	assert( hr == S_OK );
 	playing = true;
 
+	currentBuffer = 0;
+	device_changed = false;
 
 	initialized = true;
 	return true;
@@ -288,6 +429,11 @@ void XAudio2_Output::write(u16 * finalWave, int length)
 	if( !initialized || failed ) return;
 
 	while( true ) {
+		if ( device_changed ) {
+			close();
+			if (!init(freq)) return;
+		}
+
 		sVoice->GetState( &vState );
 
 		assert( vState.BuffersQueued <= bufferCount );
@@ -306,7 +452,9 @@ void XAudio2_Output::write(u16 * finalWave, int length)
 			// the maximum number of buffers is currently queued
 			if( synchronize && !speedup && !gopts.throttle ) {
 				// wait for one buffer to finish playing
-				WaitForSingleObject( notify.hBufferEndEvent, INFINITE );
+				if (WaitForSingleObject( notify.hBufferEndEvent, 10000 ) == WAIT_TIMEOUT) {
+					device_changed = true;
+				}
 			} else {
 				// drop current audio frame
 				return;
@@ -374,6 +522,11 @@ void XAudio2_Output::setThrottle( unsigned short throttle )
 	if( throttle == 0 ) throttle = 100;
 	HRESULT hr = sVoice->SetFrequencyRatio( (float)throttle / 100.0f );
 	assert( hr == S_OK );
+}
+
+void xaudio2_device_changed( XAudio2_Output * instance )
+{
+	instance->device_change();
 }
 
 SoundDriver *newXAudio2_Output()
