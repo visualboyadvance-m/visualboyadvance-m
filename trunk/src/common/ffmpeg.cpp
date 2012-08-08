@@ -11,7 +11,8 @@
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
-#include <libavcodec/opt.h>
+#include <libavutil/opt.h>
+#include <libavutil/samplefmt.h>
 #include <libavutil/mathematics.h>
 #ifndef AV_PKT_FLAG_KEY
 #define AV_PKT_FLAG_KEY PKT_FLAG_KEY
@@ -47,7 +48,7 @@ static void avformat_free_context(AVFormatContext *ctx)
 // this will almost definitely fail on big-endian systems
 #define PIX_FMT_RGB565LE PIX_FMT_RGB565
 #endif
-#if LIBAVUTIL_VERSION_INT < AV_VERSION_INT(52,38,0)
+#if LIBAVUTIL_VERSION_INT < AV_VERSION_INT(50,38,0)
 #define AV_SAMPLE_FMT_S16 SAMPLE_FMT_S16
 #endif
 }
@@ -190,13 +191,13 @@ MediaRet MediaRecorder::setup_video_stream(const char *fname, int w, int h, int 
 #else
 	    converter = sws_alloc_context();
 	    // what a convoluted, inefficient way to set options
-	    av_set_int(converter, "sws_flags", SWS_BICUBIC);
-	    av_set_int(converter, "srcw", w);
-	    av_set_int(converter, "srch", h);
-	    av_set_int(converter, "dstw", w);
-	    av_set_int(converter, "dsth", h);
-	    av_set_int(converter, "src_format", pixfmt);
-	    av_set_int(converter, "dst_format", dp);
+	    av_opt_set_int(converter, "sws_flags", SWS_BICUBIC, 0);
+	    av_opt_set_int(converter, "srcw", w, 0);
+	    av_opt_set_int(converter, "srch", h, 0);
+	    av_opt_set_int(converter, "dstw", w, 0);
+	    av_opt_set_int(converter, "dsth", h, 0);
+	    av_opt_set_int(converter, "src_format", pixfmt, 0);
+	    av_opt_set_int(converter, "dst_format", dp, 0);
 	    sws_init_context(converter, NULL, NULL);
 #endif
 	    ctx->pix_fmt = dp;
@@ -213,11 +214,6 @@ MediaRet MediaRecorder::setup_video_stream(const char *fname, int w, int h, int 
 
 MediaRet MediaRecorder::finish_setup(const char *fname)
 {
-    if(av_set_parameters(oc, NULL) < 0) {
-	avformat_free_context(oc);
-	oc = NULL;
-	return MRET_ERR_NOCODEC;
-    }
     if(audio_buf)
 	free(audio_buf);
     if(audio_buf2)
@@ -263,13 +259,13 @@ MediaRet MediaRecorder::finish_setup(const char *fname)
 	video_buf = NULL;
     }
     if(!(oc->oformat->flags & AVFMT_NOFILE)) {
-	if(avio_open(&oc->pb, fname, URL_WRONLY) < 0) {
+	if(avio_open(&oc->pb, fname, AVIO_FLAG_WRITE) < 0) {
 	    avformat_free_context(oc);
 	    oc = NULL;
 	    return MRET_ERR_FERR;
 	}
     }
-    av_write_header(oc);
+    avformat_write_header(oc, NULL);    
     return MRET_OK;
 }
 
