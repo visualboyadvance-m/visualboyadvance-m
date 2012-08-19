@@ -168,13 +168,8 @@ void GBOamView::render()
   u8 * bank0;
   u8 * bank1;
   if(gbCgbMode) {
-    if(register_VBK & 1) {
-      bank0 = &gbVram[0x0000];
-      bank1 = &gbVram[0x2000];
-    } else {
-      bank0 = &gbVram[0x0000];
-      bank1 = &gbVram[0x2000];
-    }
+    bank0 = &gbVram[0x0000];
+    bank1 = &gbVram[0x2000];
   } else {
     bank0 = &gbMemory[0x8000];
     bank1 = NULL;
