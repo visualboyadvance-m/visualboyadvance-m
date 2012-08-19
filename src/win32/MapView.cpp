@@ -279,7 +279,6 @@ void MapView::renderRotScreen(u16 control)
   w = sizeX;
   h = sizeY;
 
-  if(control & 0x80) {
     for(int y = 0; y < sizeY; y++) {
       for(int x = 0; x < sizeX; x++) {
         int tile = screenBase[(x>>3) + (y>>3)*(w>>3)];
@@ -293,23 +292,6 @@ void MapView::renderRotScreen(u16 control)
         *bmp++ = ((color2 >> 10) & 0x1f) << 3;
         *bmp++ = ((color2 >> 5) & 0x1f) << 3;
         *bmp++ = (color2 & 0x1f) << 3;
-      }
-    }
-  } else {
-    for(int y = 0; y < sizeY; y++) {
-      for(int x = 0; x < sizeX; x++) {
-        int tile = screenBase[(x>>3) + (y>>3)*(w>>3)];
-
-        int tileX = (x & 7);
-        int tileY = y & 7;
-
-        u8 color = charBase[tile * 64 + tileY * 8 + tileX];
-        u16 color2 = palette[color];
-
-        *bmp++ = ((color2 >> 10) & 0x1f) << 3;
-        *bmp++ = ((color2 >> 5) & 0x1f) << 3;
-        *bmp++ = (color2 & 0x1f) << 3;
-      }
     }
   }
 
