@@ -103,7 +103,6 @@ public:
 			if ( SUCCEEDED( hr ) )
 			{
 				pEnumerator->RegisterEndpointNotificationCallback( this );
-				registered = true;
 			}
 		}
 
@@ -116,9 +115,12 @@ public:
 	{
 		if ( InterlockedDecrement( &registered ) == 0 )
 		{
-			pEnumerator->UnregisterEndpointNotificationCallback( this );
-			pEnumerator->Release();
-			registered = false;
+			if (pEnumerator)
+			{
+				pEnumerator->UnregisterEndpointNotificationCallback( this );
+				pEnumerator->Release();
+				pEnumerator = NULL;
+			}
 		}
 
 		EnterCriticalSection( &lock );
