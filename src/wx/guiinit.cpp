@@ -88,7 +88,7 @@ public:
 		sid_t(wxMutex *m, wxCondition *c, wxString *cm, wxString *pm,
 		      bool *d) :
 		    lock(m), sig(c), connmsg(cm), pmsg(pm), done(d) {}
-		void ShowServerIP(sf::IPAddress addr) {
+		void ShowServerIP(const sf::IPAddress &addr) {
 		    wxString addr_s(addr.ToString().c_str(), wxConvLibc);
 		    wxString msg;
 		    msg.Printf(_("Server IP address is: %s\n"), addr_s.c_str());
@@ -146,7 +146,7 @@ public:
 		cid_t(wxMutex *m, wxCondition *c, wxString *cm, wxString *pm,
 		      bool *d) :
 		    lock(m), sig(c), connmsg(cm), pmsg(pm), done(d) {}
-		void ConnectStart(sf::IPAddress addr) {
+		void ConnectStart(const sf::IPAddress &addr) {
 		    wxString addr_s(addr.ToString().c_str(), wxConvLibc);
 		    connmsg->Printf(_("Connecting to %s\n"), addr_s.c_str());
 		}
