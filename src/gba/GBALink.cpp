@@ -484,10 +484,8 @@ void LinkUpdate(int ticks)
 			{
 				linkdata[linkid] = READ16LE(&ioMem[COMM_SIODATA8]);
 
-				if (!lc.oncesend)
-					lc.Send();
+				lc.Send();
 
-				lc.oncesend = false;
 				UPDATE_REG(COMM_SIODATA32_L, linkdata[0]);
 				UPDATE_REG(COMM_SIOCNT, READ16LE(&ioMem[COMM_SIOCNT]) | 0x80);
 				transfer = 1;
@@ -1350,7 +1348,6 @@ lclient::lclient(void){
 	intoutbuffer = (s32*)outbuffer;
 	u16outbuffer = (u16*)outbuffer;
 	numtransfers = 0;
-	oncesend = false;
 	return;
 }
 
@@ -1467,7 +1464,6 @@ void lclient::CheckConn(void){
 			}
 		after = false;
 		oncewait = true;
-		oncesend = true;
 	}
 	return;
 }
@@ -1515,32 +1511,5 @@ void lclient::Send(){
 	WRITE16LE(&u16outbuffer[1], linkdata[linkid]);
 	lanlink.tcpsocket.Send(outbuffer, 4);
 	return;
-}
-
-
-// Uncalled
-void LinkSStop(void){
-	if(!oncewait){
-		if(linkid){
-			if(lanlink.numslaves==1) return;
-			lc.Recv();
-		}
-		else ls.Recv();
-
-		oncewait = true;
-		UPDATE_REG(COMM_SIOMULTI1, linkdata[1]);
-		UPDATE_REG(COMM_SIOMULTI2, linkdata[2]);
-		UPDATE_REG(COMM_SIOMULTI3, linkdata[3]);
-	}
-	return;
-}
-
-// ??? Called when COMM_SIODATA8 written
-void LinkSSend(u16 value){
-	if(linkid&&!lc.oncesend){
-		linkdata[linkid] = value;
-		lc.Send();
-		lc.oncesend = true;
-	}
 }
 #endif
