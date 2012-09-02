@@ -120,7 +120,6 @@ class lclient{
 	u16 *u16outbuffer;
 	int numbytes;
 public:
-	bool oncesend;
 	sf::IPAddress serveraddr;
 	unsigned short serverport;
 	sf::SocketTCP noblock;
@@ -157,11 +156,7 @@ extern bool InitLink();
 extern void CloseLink();
 extern void StartLink(u16);
 extern void StartGPLink(u16);
-extern void LinkSSend(u16);
 extern void LinkUpdate(int);
-extern void LinkChildStop();
-extern void LinkChildSend(u16);
-extern void CloseLanLink();
 extern void CleanLocalLink();
 extern LANLINKDATA lanlink;
 extern int vbaid;
@@ -185,11 +180,7 @@ inline bool InitLink() { return true; }
 inline void CloseLink() { }
 inline void StartLink(u16) { }
 inline void StartGPLink(u16) { }
-inline void LinkSSend(u16) { }
 inline void LinkUpdate(int) { }
-inline void LinkChildStop() { }
-inline void LinkChildSend(u16) { }
-inline void CloseLanLink() { }
 inline void CleanLocalLink() { }
 #endif
 

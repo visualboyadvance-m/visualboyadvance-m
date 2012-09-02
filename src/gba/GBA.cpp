@@ -2828,8 +2828,6 @@ void CPUUpdateRegister(u32 address, u16 value)
 	  break;
 
   case COMM_SIODATA8:
-	  if (gba_link_enabled)
-		  LinkSSend(value);
 	  UPDATE_REG(COMM_SIODATA8, value);
 	  break;
 
