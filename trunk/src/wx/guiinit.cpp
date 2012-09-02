@@ -121,19 +121,25 @@ public:
 		    sig->Signal();
 		    lock->Unlock();
 		}
-	    } sid(&lock, &sig, &connmsg, &pmsg, &done);
-	    if(!ls.Init(&sid)) {
-		wxLogError(_("Error occurred.\nPlease try again."));
-		lock.Unlock();
-		return;
+	    };
+	    
+	    sid_t* sid = new sid_t(&lock, &sig, &connmsg, &pmsg, &done);
+	    
+	    if (!ls.Init(sid)) {
+			wxLogError(_("Error occurred.\nPlease try again."));
+			lock.Unlock();
+			delete sid;
+			return;
 	    }
+	    
 	    wxProgressDialog
 		pdlg(_("Waiting for clients..."), connmsg,
 		     100, dlg, wxPD_APP_MODAL|wxPD_CAN_ABORT|wxPD_ELAPSED_TIME);
+		     
 	    while(!done) {
-		if(!pdlg.Pulse(connmsg + pmsg))
-		    done = true;
-		sig.Wait();
+			if(!pdlg.Pulse(connmsg + pmsg))
+				done = true;
+			sig.Wait();
 	    }
 	} else {
 	    class cid_t : public ClientInfoDisplay
@@ -175,21 +181,25 @@ public:
 		    sig->Signal();
 		    lock->Unlock();
 		}
-	    } cid(&lock, &sig, &connmsg, &pmsg, &done);
-	    int err;
-	    if((err = lc.Init(sf::IPAddress(std::string(gopts.link_host.mb_str())),
-			      &cid))) {
-		wxLogError(_("Error %d occurred.\nPlease try again."), err);
-		lock.Unlock();
-		return;
+	    };
+	    
+	    cid_t* cid = new cid_t(&lock, &sig, &connmsg, &pmsg, &done);
+	    
+	    if (!lc.Init(sf::IPAddress(std::string(gopts.link_host.mb_str())), cid)) {
+			wxLogError(_("Error occurred.\nPlease try again."));
+			lock.Unlock();
+			delete cid;
+			return;
 	    }
+	    
 	    wxProgressDialog
 		pdlg(_("Waiting for connection..."), connmsg,
 		     100, dlg, wxPD_APP_MODAL|wxPD_CAN_ABORT|wxPD_ELAPSED_TIME);
+		     
 	    while(!done) {
-		if(!pdlg.Pulse(connmsg + pmsg))
-		    done = true;
-		sig.Wait();
+			if(!pdlg.Pulse(connmsg + pmsg))
+				done = true;
+			sig.Wait();
 	    }
 	}
 	lock.Unlock();
