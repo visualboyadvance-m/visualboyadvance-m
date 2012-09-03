@@ -552,7 +552,10 @@ void LinkServer::OnServerStart()
 	sf::IPAddress addr;
 
 	// These must be created on the heap - referenced from the connection thread
-	ServerWait *dlg = new ServerWait;
+	ServerWait *dlg = new ServerWait();
+	dlg->Create(IDD_SERVERWAIT, this);
+	dlg->ShowWindow(SW_SHOW);
+
 	// Owns the ServerWait*
 	Win32ServerInfoDisplay *dlginfo = new Win32ServerInfoDisplay(dlg);
 
@@ -644,7 +647,10 @@ void LinkClient::OnLinkConnect()
 	m_serverip.GetWindowText(ipaddress, 30);
 
 	// These must be created on the heap - referenced from the connection thread
-	ServerWait *dlg = new ServerWait;
+	ServerWait *dlg = new ServerWait();
+	dlg->Create(IDD_SERVERWAIT, this);
+	dlg->ShowWindow(SW_SHOW);
+
 	// Owns the ServerWait*
 	Win32ClientInfoDisplay *dlginfo = new Win32ClientInfoDisplay(dlg);
 
