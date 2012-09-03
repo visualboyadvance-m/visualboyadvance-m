@@ -661,10 +661,6 @@ void LinkClient::OnLinkConnect()
 		delete dlginfo;
 		MessageBox("Error occurred.\nPlease try again.", "Error", MB_OK);
 	}
-	else
-	{
-		dlg->DoModal();
-	}
 
 	return;
 }
