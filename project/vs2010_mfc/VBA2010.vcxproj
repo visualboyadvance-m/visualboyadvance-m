@@ -88,10 +88,10 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <MinimumRequiredVersion>5.0</MinimumRequiredVersion>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>nafxcwd.lib;libcmtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>nafxcwd.lib;libcmtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <BuildLog>
       <Path>$(IntDir)$(ProjectName)_BuildLog.htm</Path>
@@ -108,8 +108,7 @@
     </Midl>
     <ClCompile>
       <AdditionalOptions>/D_ST_MODEL
-/D_SECURE_SCL=0
-/MP %(AdditionalOptions)</AdditionalOptions>
+/D_SECURE_SCL=0 %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>..\..\fex;..\..\..\dependencies\libpng;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -125,8 +124,6 @@
       <StringPooling>true</StringPooling>
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <MultiProcessorCompilation>
-      </MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile />
     <Link>
@@ -138,7 +135,6 @@
       <MinimumRequiredVersion>5.0</MinimumRequiredVersion>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AssemblyDebug>
       </AssemblyDebug>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
