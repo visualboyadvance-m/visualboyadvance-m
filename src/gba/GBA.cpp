@@ -3442,7 +3442,7 @@ void CPULoop(int ticks)
   cpuTotalTicks = 0;
 
   // shuffle2: what's the purpose?
-  if(gba_link_enabled)
+  if(GetLinkMode() != LINK_DISCONNECTED)
     cpuNextEvent = 1;
 
   cpuBreakLoop = false;
@@ -3890,10 +3890,10 @@ void CPULoop(int ticks)
 
       ticks -= clockTicks;
 
-	  if (gba_joybus_enabled)
+	  if(GetLinkMode() == LINK_GAMECUBE_DOLPHIN)
 		  JoyBusUpdate(clockTicks);
 
-	  if (gba_link_enabled)
+	  if(GetLinkMode() != LINK_DISCONNECTED)
 		  LinkUpdate(clockTicks);
 
       cpuNextEvent = CPUUpdateTicks();
@@ -3911,7 +3911,7 @@ void CPULoop(int ticks)
       }
 
 	  // shuffle2: what's the purpose?
-	  if(gba_link_enabled)
+	  if(GetLinkMode() != LINK_DISCONNECTED)
   	       cpuNextEvent = 1;
 
       if(IF && (IME & 1) && armIrqEnable) {

@@ -67,6 +67,9 @@ public:
 	    return;
 	update_opts(); // save fast flag and client host
 
+    // Close any previous link
+	CloseLink();
+
 	wxString connmsg, pmsg;
 
 	wxMutex lock;
@@ -206,7 +209,10 @@ public:
 	if(lanlink.connected) {
 	    pmsg.Replace(wxT("\n"), wxT(" "));
 	    systemScreenMessage(pmsg);
-	    lanlink.active = true;
+	    
+	    // Init link
+	    InitLink(LINK_CABLE_SOCKET);
+	    
 	    ev.Skip(); // all OK
 	}
     }
@@ -2227,7 +2233,7 @@ bool MainFrame::InitMore(void)
     // so just set individual flags here
     cmd_enable = CMDEN_NGDB_ANY | CMDEN_NREC_ANY;
     update_state_ts(true);
-    enable_menus();
+
     // set pointers for checkable menu items
     // and set initial checked status
     if(checkable_mi.size()) {
@@ -3072,14 +3078,14 @@ bool MainFrame::InitMore(void)
 #ifndef NO_LINK
     LoadXRCDialog("LinkConfig");
     {
-	getcbbe("Joybus", gba_joybus_enabled);
+	getcbbe("Joybus", gopts.gba_joybus_enabled);
 	getlab("JoybusHostLab");
 	addbe(lab);
 	gettc("JoybusHost", gopts.joybus_host);
 	tc->SetValidator(IPHostValidator(&gopts.joybus_host));
 	addbe(tc);
-	getcbbe("Link", gba_link_enabled);
-	getcbb("RFU", rfu_enabled);
+	getcbbe("Link", gopts.gba_link_enabled);
+	getcbb("RFU", gopts.rfu_enabled);
 	addbe(cb);
 	getlab("LinkTimeoutLab");
 	addbe(lab);
@@ -3205,23 +3211,31 @@ bool MainFrame::InitMore(void)
 	panel->ShowFullScreen(true);
 
 #ifndef NO_LINK
-    if(gba_joybus_enabled) {
-	bool isv = !gopts.joybus_host.empty();
-	if(isv) {
-	    joybusHostAddr = std::string(gopts.joybus_host.mb_str());
-	    isv = joybusHostAddr.IsValid();
-	}
-	if(!isv) {
-	    wxLogError(_("JoyBus host invalid; disabling"));
-	    gba_joybus_enabled = false;
-	} else
-	    JoyBusConnect();
-    }
-    if(gba_link_enabled)
-	if((did_link_init = InitLink()))
-	    cmd_enable |= CMDEN_LINK_ANY;
+    LinkMode linkMode = getOptionsLinkMode();
 
+	if (linkMode == LINK_GAMECUBE_DOLPHIN) {
+		bool isv = !gopts.joybus_host.empty();
+		if(isv) {
+			joybusHostAddr = std::string(gopts.joybus_host.mb_str());
+			isv = joybusHostAddr.IsValid();
+		}
+		
+		if(!isv) {
+			wxLogError(_("JoyBus host invalid; disabling"));
+			gopts.gba_joybus_enabled = false;
+		} else {
+		    linkMode = LINK_DISCONNECTED;
+		}
+	}
+	
+	InitLink(linkMode);
+	
+	if (GetLinkMode() != LINK_DISCONNECTED)
+		cmd_enable |= CMDEN_LINK_ANY;
 #endif
+
+    enable_menus();
+
     panel->SetFrameTitle();
 
     // All OK; activate idle loop
