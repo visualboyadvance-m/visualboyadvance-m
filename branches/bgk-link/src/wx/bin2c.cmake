@@ -1,0 +1,24 @@
+# portably convert binary file to header
+FUNCTION(FILE2C INFILE VARNAME OUTFILE)
+  FILE(READ ${INFILE} HEXFILE HEX)
+  STRING(LENGTH ${HEXFILE} XRSLEN)
+  SET(HEXPOS 0)
+  FILE(WRITE ${OUTFILE}
+          "/* generated from ${INFILE}; do not edit */\n"
+          "const unsigned char ${VARNAME}[] = {")
+  WHILE(${HEXPOS} LESS ${XRSLEN})
+    MATH(EXPR LPOS "${HEXPOS} % 32")
+    IF(NOT ${LPOS})
+      FILE(APPEND ${OUTFILE} "\n")
+    ENDIF(NOT ${LPOS})
+    STRING(SUBSTRING ${HEXFILE} ${HEXPOS} 2 HEXBYTE)
+    FILE(APPEND ${OUTFILE} "0x${HEXBYTE}")
+    MATH(EXPR HEXPOS "${HEXPOS} + 2")
+    IF(${HEXPOS} LESS ${XRSLEN})
+      FILE(APPEND ${OUTFILE} ",")
+    ENDIF(${HEXPOS} LESS ${XRSLEN})
+  ENDWHILE(${HEXPOS} LESS ${XRSLEN})
+  FILE(APPEND ${OUTFILE} "};\n")
+ENDFUNCTION(FILE2C)
+
+FILE2C(${INFILE} ${VARNAME} ${OUTFILE})

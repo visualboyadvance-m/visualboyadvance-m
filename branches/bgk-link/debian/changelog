@@ -1,0 +1,41 @@
+vbam (1.8.0.1042-1) lucid; urgency=low
+
+  * Use new version from upstream
+
+ -- Bastien Bouclet <bgk@users.sourceforge.net>  Sun, 04 Dec 2011 08:48:11 +0100
+
+vbam (1.8.0.1016-1) unstable; urgency=low
+
+  * Use new version from upstream, with wxwidgets patches
+
+ -- Thomas J. Moore <darktjm@gmail.com>  Sun, 22 May 2011 14:08:05 -0500
+
+vbam (1.8.0.1001-1) unstable; urgency=low
+
+  * Use new version from upstream
+
+ -- Bastien Bouclet <bbouclet@lapin>  Fri, 25 Feb 2011 12:25:25 +0100
+
+vbam (1.8.0.914-1) unstable; urgency=low
+
+  * Cleanup, packages split into SDL and GTK+ versions
+
+ -- Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>  Sun, 04 Oct 2009 19:58:09 -0300
+
+vbam (1.8.0.913-1) unstable; urgency=low
+
+  * Using assembly optmizations for i386 and amd64 platforms
+
+ -- Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>  Sat, 03 Oct 2009 22:41:55 -0300
+
+vbam (1.8.0.912-1) unstable; urgency=low
+
+  * Added libglademm-2.4-dev as a build-time dependency
+
+ -- Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>  Sun, 27 Sep 2009 23:26:23 -0300
+
+vbam (1.8.0.905-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>  Sat, 12 Sep 2009 19:39:52 -0300

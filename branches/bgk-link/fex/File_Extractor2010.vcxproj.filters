@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="fex">
+      <UniqueIdentifier>{40ba751f-4ce2-4162-85a2-0c2ae2f33ae2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="7z_C">
+      <UniqueIdentifier>{4f3646e4-ddc5-4030-9ba1-7629a947e5db}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="fex\Binary_Extractor.cpp">
+      <Filter>fex</Filter>
+    </ClCompile>
+    <ClCompile Include="fex\blargg_common.cpp">
+      <Filter>fex</Filter>
+    </ClCompile>
+    <ClCompile Include="fex\blargg_errors.cpp">
+      <Filter>fex</Filter>
+    </ClCompile>
+    <ClCompile Include="fex\Data_Reader.cpp">
+      <Filter>fex</Filter>
+    </ClCompile>
+    <ClCompile Include="fex\fex.cpp">
+      <Filter>fex</Filter>
+    </ClCompile>
+    <ClCompile Include="fex\File_Extractor.cpp">
+      <Filter>fex</Filter>
+    </ClCompile>
+    <ClCompile Include="fex\Gzip_Extractor.cpp">
+      <Filter>fex</Filter>
+    </ClCompile>
+    <ClCompile Include="fex\Gzip_Reader.cpp">
+      <Filter>fex</Filter>
+    </ClCompile>
+    <ClCompile Include="fex\Rar_Extractor.cpp">
+      <Filter>fex</Filter>
+    </ClCompile>
+    <ClCompile Include="fex\Zip_Extractor.cpp">
+      <Filter>fex</Filter>
+    </ClCompile>
+    <ClCompile Include="fex\Zip7_Extractor.cpp">
+      <Filter>fex</Filter>
+    </ClCompile>
+    <ClCompile Include="fex\Zlib_Inflater.cpp">
+      <Filter>fex</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\7zAlloc.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\7zBuf.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\7zCrc.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\7zCrcOpt.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\7zDec.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\7zIn.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\7zStream.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\Bcj2.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\Bra.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\Bra86.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\CpuArch.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\Lzma2Dec.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\LzmaDec.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\Ppmd7.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+    <ClCompile Include="7z_C\Ppmd7Dec.c">
+      <Filter>7z_C</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="fex\Binary_Extractor.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="fex\blargg_common.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="fex\blargg_config.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="fex\blargg_endian.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="fex\blargg_errors.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="fex\blargg_source.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="fex\Data_Reader.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="fex\fex.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="fex\File_Extractor.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="fex\Gzip_Extractor.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="fex\Gzip_Reader.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="fex\Rar_Extractor.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="fex\Zip_Extractor.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="fex\Zip7_Extractor.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="fex\Zlib_Inflater.h">
+      <Filter>fex</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\7z.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\7zAlloc.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\7zBuf.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\7zCrc.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\Bcj2.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\Bra.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\CpuArch.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\Lzma2Dec.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\LzmaDec.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\Ppmd7.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\Ppmd.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+    <ClInclude Include="7z_C\Types.h">
+      <Filter>7z_C</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="changes.txt" />
+    <None Include="fex.txt" />
+    <None Include="internals.txt" />
+    <None Include="license.txt" />
+    <None Include="readme.txt" />
+    <None Include="7z_C\7zC.txt">
+      <Filter>7z_C</Filter>
+    </None>
+    <None Include="7z_C\lzma.txt">
+      <Filter>7z_C</Filter>
+    </None>
+  </ItemGroup>
+</Project>
