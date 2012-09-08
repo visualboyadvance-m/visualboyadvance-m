@@ -205,7 +205,6 @@ public:
     // required for event handling
     DECLARE_EVENT_TABLE();
 private:
-    bool did_link_init;
     GameArea *panel;
 
     // the various reasons the game might be paused
@@ -244,6 +243,8 @@ private:
     void OnDropFile(wxDropFilesEvent&);
     // pop up menu in fullscreen mode
     void OnMenu(wxContextMenuEvent &);
+    // Returns the link mode to set according to the options
+    LinkMode getOptionsLinkMode();
 #include "cmdhandlers.h"
 };
 

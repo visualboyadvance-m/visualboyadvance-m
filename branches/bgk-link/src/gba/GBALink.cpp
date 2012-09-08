@@ -22,12 +22,6 @@ const char *MakeInstanceFilename(const char *Input)
 
 #ifndef NO_LINK
 
-// Joybus
-bool gba_joybus_enabled = false;
-
-// If disabled, gba core won't call any (non-joybus) link functions
-bool gba_link_enabled = false;
-
 #define LOCAL_LINK_NAME "VBA link memory"
 #define IP_LINK_PORT 5738
 
@@ -153,6 +147,12 @@ int WaitForSingleObject(sem_t *s, int t)
 
 #define UPDATE_REG(address, value) WRITE16LE(((u16 *)&ioMem[address]),value)
 
+static LinkMode gba_link_mode = LINK_DISCONNECTED;
+
+LinkMode GetLinkMode() {
+	return gba_link_mode;
+}
+
 int linktime = 0;
 
 GBASockClient* dol = NULL;
@@ -188,7 +188,6 @@ lclient lc;
 bool oncewait = false, after = false;
 
 // RFU crap (except for numtransfers note...should probably check that out)
-bool rfu_enabled = false;
 u8 rfu_cmd, rfu_qsend, rfu_qrecv;
 int rfu_state, rfu_polarity, rfu_counter, rfu_masterq;
 // numtransfers seems to be used interchangeably with linkmem->numtransfers
@@ -237,14 +236,14 @@ void StartLink(u16 value)
 	if (ioMem == NULL)
 		return;
 
-	if (rfu_enabled) {
+	if (GetLinkMode() == LINK_RFU_IPC) {
 		UPDATE_REG(COMM_SIOCNT, StartRFU(value));
 		return;
 	}
 
 	switch (GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]))) {
 	case MULTIPLAYER: {
-		bool start = (value & 0x80) && !linkid && !transfer && gba_link_enabled;
+		bool start = (value & 0x80) && !linkid && !transfer && GetLinkMode() != LINK_DISCONNECTED;
 		u16 si = value & 4;
 		// clear start, seqno, si (RO on slave, start = pulse on master)
 		value &= 0xff4b;
@@ -256,7 +255,7 @@ void StartLink(u16 value)
 				value |= READ16LE(&ioMem[COMM_SIOCNT]) & 4;
 		}
 		if (start) {
-			if (lanlink.active)
+			if (GetLinkMode() == LINK_CABLE_SOCKET)
 			{
 				if (lanlink.connected)
 				{
@@ -362,13 +361,13 @@ void StartGPLink(u16 value)
 		break;
 
 	case GP:
-		if (rfu_enabled)
+		if (GetLinkMode() == LINK_RFU_IPC)
 			rfu_state = RFU_INIT;
 		break;
 	}
 }
 
-void JoyBusConnect()
+static void JoyBusConnect()
 {
 	delete dol;
 	dol = NULL;
@@ -376,7 +375,7 @@ void JoyBusConnect()
 	dol = new GBASockClient(joybusHostAddr);
 }
 
-void JoyBusShutdown()
+static void JoyBusShutdown()
 {
 	delete dol;
 	dol = NULL;
@@ -450,7 +449,7 @@ void LinkUpdate(int ticks)
 
 	linktime += ticks;
 
-	if (rfu_enabled)
+	if (GetLinkMode() == LINK_RFU_IPC)
 	{
 		rfu_transfer_end -= ticks;
 		if (transfer && rfu_transfer_end <= 0) 
@@ -466,7 +465,7 @@ void LinkUpdate(int ticks)
 		return;
 	}
 
-	if (lanlink.active)
+	if (GetLinkMode() == LINK_CABLE_SOCKET)
 	{
 		if (lanlink.connected)
 		{
@@ -961,8 +960,18 @@ u16 StartRFU(u16 value)
 // Probably from here down needs to be replaced with SFML goodness :)
 // tjm: what SFML goodness?  SFML for network, yes, but not for IPC
 
-bool InitLink()
+bool InitLink(LinkMode mode)
 {
+	// Do nothing if we are already connected
+	if (GetLinkMode() != LINK_DISCONNECTED) {
+		systemMessage(0, N_("Error, link already connected"));
+		return false;
+	}
+
+    if (mode == LINK_GAMECUBE_DOLPHIN) {
+        JoyBusConnect();
+    }
+
 	linkid = 0;
 
 #if (defined __WIN32__ || defined _WIN32)
@@ -1075,6 +1084,10 @@ bool InitLink()
 	}
 	for(i=0;i<4;i++)
 		linkdata[i] = 0xffff;
+		
+	// No errors, save the link mode
+	gba_link_mode = mode;
+		
 	return true;
 }
 
@@ -1094,6 +1107,14 @@ static void ReInitLink()
 }
 
 void CloseLink(void){
+    if (GetLinkMode() == LINK_DISCONNECTED) {
+        return; // Nothing to do
+    }
+
+    if (GetLinkMode() == LINK_GAMECUBE_DOLPHIN) {
+        JoyBusShutdown();
+    }
+
 	if(lanlink.connected){
 		if(linkid){
 			char outbuffer[4];
@@ -1152,6 +1173,9 @@ void CloseLink(void){
 	munmap(linkmem, sizeof(LINKDATA));
 	close(mmf);
 #endif
+
+    gba_link_mode = LINK_DISCONNECTED;
+
 	return;
 }
 

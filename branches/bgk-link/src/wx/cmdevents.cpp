@@ -1159,16 +1159,18 @@ EVT_HANDLER(JoypadAutofireR, "Autofire R (toggle)")
 EVT_HANDLER_MASK(LanLink, "Start LAN link", CMDEN_LINK_ANY)
 {
 #ifndef NO_LINK
-    if(lanlink.connected) {
-	// while we could deactivate the command when connected, it is more
-	// user-friendly to display a message indidcating why
-	wxLogError(_("LAN link is already active.  Disable link mode to disconnect."));
-	return;
+    LinkMode mode = GetLinkMode();
+
+    if (mode == LINK_CABLE_SOCKET) {
+        // while we could deactivate the command when connected, it is more
+        // user-friendly to display a message indidcating why
+        wxLogError(_("LAN link is already active.  Disable link mode to disconnect."));
+        return;
     }
-    if(rfu_enabled) {
-	// see above comment
-	wxLogError(_("RFU is currently only supported in local mode."));
-	return;
+    if (mode == LINK_RFU_IPC || mode == LINK_GAMECUBE_DOLPHIN) {
+        // see above comment
+        wxLogError(_("RFU and Joybus are only supported in local mode."));
+        return;
     }
     wxDialog *dlg = GetXRCDialog("NetLink");
     ShowModal(dlg);
@@ -2118,33 +2120,29 @@ EVT_HANDLER(JoypadConfigure, "Joypad options...")
 EVT_HANDLER(LinkConfigure, "Link options...")
 {
 #ifndef NO_LINK
-    bool jb = gba_joybus_enabled;
     wxString jh = gopts.joybus_host;
     wxDialog *dlg = GetXRCDialog("LinkConfig");
-    if(ShowModal(dlg) != wxID_OK)
-	return;
+    if (ShowModal(dlg) != wxID_OK)
+        return;
     update_opts();
-    if(jb != gba_joybus_enabled) {
-	if(gba_joybus_enabled)
-	    JoyBusConnect();
-	else
-	    JoyBusShutdown();
-    } else if(jh != gopts.joybus_host) {
-	joybusHostAddr = std::string(gopts.joybus_host.mb_str());
-	JoyBusConnect();
+    
+    LinkMode oldLinkMode = GetLinkMode();
+    LinkMode newLinkMode = getOptionsLinkMode();
+    bool dolphinHostChanged = jh != gopts.joybus_host;
+    
+    if (newLinkMode != oldLinkMode || dolphinHostChanged) {
+        joybusHostAddr = std::string(gopts.joybus_host.mb_str());
+        CloseLink();
+        InitLink(newLinkMode);
     }
-    if(gba_link_enabled != did_link_init) {
-	if(gba_link_enabled) {
-	    if((did_link_init = InitLink()))
-		cmd_enable |= CMDEN_LINK_ANY;
-	} else {
-	    did_link_init = false;
-	    CloseLink();
-	    lanlink.active = false;
-	    cmd_enable &= ~CMDEN_LINK_ANY;
-	}
-	enable_menus();
+
+    cmd_enable &= ~CMDEN_LINK_ANY;
+
+    if (GetLinkMode() != LINK_DISCONNECTED) {
+        cmd_enable |= CMDEN_LINK_ANY;
     }
+    
+    enable_menus();
 #endif
 }
 

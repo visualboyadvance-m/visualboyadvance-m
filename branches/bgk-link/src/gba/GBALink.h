@@ -3,6 +3,38 @@
 
 #pragma once
 
+/**
+ * Link modes to be passed to InitLink
+ */
+enum LinkMode
+{
+	LINK_DISCONNECTED,
+	LINK_CABLE_IPC,
+	LINK_CABLE_SOCKET,
+	LINK_RFU_IPC,
+	LINK_GAMECUBE_DOLPHIN
+};
+
+/**
+ * Initialize GBA linking
+ *
+ * @param mode Device to emulate, plugged to the GBA link port.
+ * @return success
+ */
+extern bool InitLink(LinkMode mode);
+
+/**
+ * Get the currently enabled link mode
+ *
+ * @return link mode
+ */
+extern LinkMode GetLinkMode();
+
+/**
+ * Set the current link mode to LINK_DISCONNECTED
+ */
+extern void CloseLink();
+
 // register definitions; these are always present
 
 #define UNSUPPORTED -1
@@ -141,26 +173,17 @@ typedef struct {
 	bool terminate;
 	bool connected;
 	bool speed;
-	bool active;
 } LANLINKDATA;
 
-extern bool gba_joybus_enabled;
-extern bool gba_link_enabled;
-
 extern sf::IPAddress joybusHostAddr;
-extern void JoyBusConnect();
-extern void JoyBusShutdown();
 extern void JoyBusUpdate(int ticks);
 
-extern bool InitLink();
-extern void CloseLink();
 extern void StartLink(u16);
 extern void StartGPLink(u16);
 extern void LinkUpdate(int);
 extern void CleanLocalLink();
 extern LANLINKDATA lanlink;
 extern int vbaid;
-extern bool rfu_enabled;
 extern int linktimeout;
 extern lclient lc;
 extern lserver ls;
@@ -169,9 +192,6 @@ extern int linkid;
 #else
 
 // stubs to keep #ifdef's out of mainline
-const bool gba_joybus_enabled = false;
-const bool gba_link_enabled = false;
-
 inline void JoyBusConnect() { }
 inline void JoyBusShutdown() { }
 inline void JoyBusUpdate(int) { }
