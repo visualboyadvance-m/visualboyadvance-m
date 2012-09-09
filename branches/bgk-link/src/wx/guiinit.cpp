@@ -122,7 +122,7 @@ public:
 		wxLogError(_("Error occurred.\nPlease try again."));
 	}
 
-	if(lanlink.connected) {
+	if(GetLinkMode() != LINK_DISCONNECTED) {
 		connmsg.Replace(wxT("\n"), wxT(" "));
 		systemScreenMessage(connmsg);
 

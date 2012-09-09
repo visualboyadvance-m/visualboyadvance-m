@@ -836,8 +836,8 @@ void GameArea::OnIdle(wxIdleEvent &event)
 	}
 	emusys->emuMain(emusys->emuCount);
 #ifndef NO_LINK
-	if(loaded == IMAGE_GBA && lanlink.connected && linkid && lc.numtransfers == 0)
-	    lc.CheckConn();
+	if (loaded == IMAGE_GBA && GetLinkMode() != LINK_DISCONNECTED)
+		CheckLinkConnection();
 #endif
     } else {
 	was_paused = true;
