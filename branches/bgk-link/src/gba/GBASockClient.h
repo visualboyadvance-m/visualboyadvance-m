@@ -3,7 +3,7 @@
 #include <SFML/Network.hpp>
 #include "../common/Types.h"
 
-class GBASockClient : public sf::SocketTCP
+class GBASockClient
 {
 public:
 	GBASockClient(sf::IPAddress server_addr);
