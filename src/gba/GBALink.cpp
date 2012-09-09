@@ -213,7 +213,7 @@ LinkMode GetLinkMode() {
 int linktime = 0;
 
 GBASockClient* dol = NULL;
-sf::IPAddress joybusHostAddr = sf::IPAddress::LocalHost;
+static sf::IPAddress joybusHostAddr = sf::IPAddress::LocalHost;
 
 // Hodgepodge
 u8 tspeed = 3;
@@ -430,9 +430,8 @@ static void JoyBusShutdown()
 	dol = NULL;
 }
 
-void JoyBusUpdate(int ticks)
+static void JoyBusUpdate()
 {
-	linktime += ticks;
 	static int lastjoybusupdate = 0;
 
 	// Kinda ugly hack to update joybus stuff intermittently
@@ -511,6 +510,12 @@ void LinkUpdate(int ticks)
 			}
 			UPDATE_REG(COMM_SIOCNT, READ16LE(&ioMem[COMM_SIOCNT]) & 0xff7f);
 		}
+		return;
+	}
+
+	if (GetLinkMode() == LINK_GAMECUBE_DOLPHIN)
+	{
+		JoyBusUpdate();
 		return;
 	}
 
@@ -1270,9 +1275,13 @@ ConnectionState ConnectLinkUpdate(char * const message, size_t size)
 	return gba_connection_state;
 }
 
-void SetLinkServerHost(const char *host) {
-	lc.serveraddr = sf::IPAddress(host);
-	joybusHostAddr = sf::IPAddress(host);
+bool SetLinkServerHost(const char *host) {
+	sf::IPAddress addr = sf::IPAddress(host);
+
+	lc.serveraddr = addr;
+	joybusHostAddr = addr;
+
+	return addr.IsValid();
 }
 
 void GetLinkServerHost(char * const host, size_t size) {

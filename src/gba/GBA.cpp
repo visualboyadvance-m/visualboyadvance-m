@@ -3890,9 +3890,6 @@ void CPULoop(int ticks)
 
       ticks -= clockTicks;
 
-	  if(GetLinkMode() == LINK_GAMECUBE_DOLPHIN)
-		  JoyBusUpdate(clockTicks);
-
 	  if(GetLinkMode() != LINK_DISCONNECTED)
 		  LinkUpdate(clockTicks);
 

@@ -2131,7 +2131,7 @@ EVT_HANDLER(LinkConfigure, "Link options...")
     bool dolphinHostChanged = jh != gopts.joybus_host;
     
     if (newLinkMode != oldLinkMode || dolphinHostChanged) {
-        joybusHostAddr = std::string(gopts.joybus_host.mb_str());
+    	SetLinkServerHost(gopts.joybus_host.mb_str());
         CloseLink();
         InitLink(newLinkMode);
     }

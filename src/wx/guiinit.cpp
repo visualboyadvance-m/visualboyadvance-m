@@ -2766,8 +2766,8 @@ bool MainFrame::InitMore(void)
 	addbier(lab, true);
 
 	/// Boot ROM
-	getcbbe("BootRomEn", gopts.gb_use_bios);
-	getfp("BootRom", gopts.gb_bios);
+	getcbbe("BootRomEn", gopts.gba_use_bios);
+	getfp("BootRom", gopts.gba_bios);
 	addbe(fp);
 	getlab("BootRomLab");
 	addbe(lab);
@@ -3129,8 +3129,7 @@ bool MainFrame::InitMore(void)
 	if (linkMode == LINK_GAMECUBE_DOLPHIN) {
 		bool isv = !gopts.joybus_host.empty();
 		if(isv) {
-			joybusHostAddr = std::string(gopts.joybus_host.mb_str());
-			isv = joybusHostAddr.IsValid();
+			isv = SetLinkServerHost(gopts.joybus_host.mb_str());
 		}
 		
 		if(!isv) {
