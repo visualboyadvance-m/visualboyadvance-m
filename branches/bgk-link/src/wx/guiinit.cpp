@@ -63,6 +63,7 @@ public:
     // attached to OK, so skip when OK
     void NetConnect(wxCommandEvent &ev)
     {
+	static const int length = 256;
 	if(!dlg->Validate() || !dlg->TransferDataFromWindow())
 	    return;
 	update_opts(); // save fast flag and client host
@@ -70,150 +71,62 @@ public:
     // Close any previous link
 	CloseLink();
 
-	wxString connmsg, pmsg;
-
-	wxMutex lock;
-	wxCondition sig(lock);
-	lock.Lock();
-
-	bool done = false;
+	wxString connmsg;
+	wxString title;
 
 	if(lanlink.server) {
-	    lanlink.numslaves = n_players - 1;
-	    class sid_t : public ServerInfoDisplay
-	    {
-		wxMutex *lock;
-		wxCondition *sig;
-		wxString *connmsg, *pmsg;
-		bool *done;
-		bool conn[3];
-	    public:
-		sid_t(wxMutex *m, wxCondition *c, wxString *cm, wxString *pm,
-		      bool *d) :
-		    lock(m), sig(c), connmsg(cm), pmsg(pm), done(d) {}
-		void ShowServerIP(const sf::IPAddress &addr) {
-		    wxString addr_s(addr.ToString().c_str(), wxConvLibc);
-		    wxString msg;
-		    msg.Printf(_("Server IP address is: %s\n"), addr_s.c_str());
-		    connmsg->append(msg);
-		    conn[0] = conn[1] = conn[2] = false;
-		}
-		void ShowConnect(int player) {
-		    wxString msg;
-		    conn[player - 1] = true;
-		    lock->Lock();
-		    pmsg->clear();
-		    for(int i = 0; i < 3; i++)
-			if(conn[i]) {
-			    msg.Printf(_("Player %d connected\n"), i + 2);
-			    pmsg->append(msg);
-			}
-		    sig->Signal();
-		    lock->Unlock();
-		}
-		void Ping() {
-		    lock->Lock();
-		    sig->Signal();
-		    if(*done)
-			lanlink.terminate = true;
-		    lock->Unlock();
-		}
-		void Connected() {
-		    lock->Lock();
-		    *done = true;
-		    sig->Signal();
-		    lock->Unlock();
-		}
-	    };
-	    
-	    sid_t* sid = new sid_t(&lock, &sig, &connmsg, &pmsg, &done);
-	    
-	    if (!ls.Init(sid)) {
-			wxLogError(_("Error occurred.\nPlease try again."));
-			lock.Unlock();
-			delete sid;
-			return;
-	    }
-	    
-	    wxProgressDialog
-		pdlg(_("Waiting for clients..."), connmsg,
-		     100, dlg, wxPD_APP_MODAL|wxPD_CAN_ABORT|wxPD_ELAPSED_TIME);
-		     
-	    while(!done) {
-			if(!pdlg.Pulse(connmsg + pmsg))
-				done = true;
-			sig.Wait();
-	    }
+		char host[length];
+		GetLinkServerHost(host, length);
+
+		lanlink.numslaves = n_players - 1;
+
+		title.Printf(_("Waiting for clients..."));
+		connmsg.Printf(_("Server IP address is: %s\n"), wxString(host, wxConvLibc).c_str());
 	} else {
-	    class cid_t : public ClientInfoDisplay
-	    {
-		wxMutex *lock;
-		wxCondition *sig;
-		wxString *connmsg, *pmsg;
-		bool *done;
-	    public:
-		cid_t(wxMutex *m, wxCondition *c, wxString *cm, wxString *pm,
-		      bool *d) :
-		    lock(m), sig(c), connmsg(cm), pmsg(pm), done(d) {}
-		void ConnectStart(const sf::IPAddress &addr) {
-		    wxString addr_s(addr.ToString().c_str(), wxConvLibc);
-		    connmsg->Printf(_("Connecting to %s\n"), addr_s.c_str());
-		}
-		void ShowConnect(int player, int togo) {
-		    wxString msg;
-		    lock->Lock();
-		    pmsg->Printf(_("Connected as #%d\n"), player);
-		    if(togo)
-			msg.Printf(_("Waiting for %d players to join"), togo);
-		    else
-			msg = _("All players joined.");
-		    pmsg->append(msg);
-		    sig->Signal();
-		    lock->Unlock();
-		}
-		void Ping() {
-		    lock->Lock();
-		    sig->Signal();
-		    if(*done)
-			lanlink.terminate = true;
-		    lock->Unlock();
-		}
-		void Connected() {
-		    lock->Lock();
-		    *done = true;
-		    sig->Signal();
-		    lock->Unlock();
-		}
-	    };
-	    
-	    cid_t* cid = new cid_t(&lock, &sig, &connmsg, &pmsg, &done);
-	    
-	    if (!lc.Init(sf::IPAddress(std::string(gopts.link_host.mb_str())), cid)) {
-			wxLogError(_("Error occurred.\nPlease try again."));
-			lock.Unlock();
-			delete cid;
-			return;
-	    }
-	    
-	    wxProgressDialog
-		pdlg(_("Waiting for connection..."), connmsg,
-		     100, dlg, wxPD_APP_MODAL|wxPD_CAN_ABORT|wxPD_ELAPSED_TIME);
-		     
-	    while(!done) {
-			if(!pdlg.Pulse(connmsg + pmsg))
-				done = true;
-			sig.Wait();
-	    }
+		SetLinkServerHost(gopts.link_host.mb_str());
+
+		title.Printf(_("Waiting for connection..."));
+		connmsg.Printf(_("Connecting to %s\n"), gopts.link_host.c_str());
 	}
-	lock.Unlock();
+
+	// Init link
+	ConnectionState state = InitLink(LINK_CABLE_SOCKET);
+
+	// Display a progress dialog while the connection is establishing
+	if (state == LINK_NEEDS_UPDATE) {
+		wxProgressDialog pdlg(title, connmsg,
+			100, dlg, wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME);
+
+		while (state == LINK_NEEDS_UPDATE) {
+			// Ask the core for updates
+			char message[length];
+			state = ConnectLinkUpdate(message, length);
+
+			connmsg = wxString(message, wxConvLibc);
+
+			// Does the user want to abort?
+			if (!pdlg.Pulse(connmsg)) {
+				state = LINK_ABORT;
+			}
+		}
+	}
+
+	// The user canceled the connection attempt
+	if (state == LINK_ABORT) {
+		CloseLink();
+	}
+
+	// Something failed during init
+	if (state == LINK_ERROR) {
+		CloseLink();
+		wxLogError(_("Error occurred.\nPlease try again."));
+	}
+
 	if(lanlink.connected) {
-	    pmsg.Replace(wxT("\n"), wxT(" "));
-	    systemScreenMessage(pmsg);
-	    
-	    // Init link
-	    InitLink(LINK_CABLE_SOCKET);
-	    
-	    ev.Skip(); // all OK
+		connmsg.Replace(wxT("\n"), wxT(" "));
+		systemScreenMessage(connmsg);
+
+		ev.Skip(); // all OK
 	}
     }
 } net_link_handler;
@@ -3228,7 +3141,10 @@ bool MainFrame::InitMore(void)
 		}
 	}
 	
-	InitLink(linkMode);
+	ConnectionState linkState = InitLink(linkMode);
+	if (linkState != LINK_OK) {
+		CloseLink();
+	}
 	
 	if (GetLinkMode() != LINK_DISCONNECTED)
 		cmd_enable |= CMDEN_LINK_ANY;

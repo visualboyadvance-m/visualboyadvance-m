@@ -689,7 +689,10 @@ void LinkOptions::GetAllData(LinkGeneral *src)
 
 	if (newMode != oldMode) {
 		CloseLink();
-		InitLink(newMode);
+		ConnectionState state = InitLink(newMode);
+		if (state != LINK_OK) {
+			CloseLink();
+		}
 	}
 
 	return;
