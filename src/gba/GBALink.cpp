@@ -147,6 +147,59 @@ int WaitForSingleObject(sem_t *s, int t)
 
 #define UPDATE_REG(address, value) WRITE16LE(((u16 *)&ioMem[address]),value)
 
+typedef struct {
+	u16 linkdata[5];
+	u16 linkcmd;
+	u16 numtransfers;
+	int lastlinktime;
+	u8 numgbas;
+	u8 trgbas;
+	u8 linkflags;
+	int rfu_q[4];
+	u8 rfu_request[4];
+	int rfu_linktime[4];
+	u32 rfu_bdata[4][7];
+	u32 rfu_data[4][32];
+} LINKDATA;
+
+class lserver{
+	int numbytes;
+	sf::Selector<sf::SocketTCP> fdset;
+	//timeval udptimeout;
+	char inbuffer[256], outbuffer[256];
+	s32 *intinbuffer;
+	u16 *u16inbuffer;
+	s32 *intoutbuffer;
+	u16 *u16outbuffer;
+	int counter;
+	int done;
+public:
+	int howmanytimes;
+	sf::SocketTCP tcpsocket[4];
+	sf::IPAddress udpaddr[4];
+	lserver(void);
+	void Send(void);
+	void Recv(void);
+};
+
+class lclient{
+	sf::Selector<sf::SocketTCP> fdset;
+	char inbuffer[256], outbuffer[256];
+	s32 *intinbuffer;
+	u16 *u16inbuffer;
+	s32 *intoutbuffer;
+	u16 *u16outbuffer;
+	int numbytes;
+public:
+	sf::IPAddress serveraddr;
+	unsigned short serverport;
+	int numtransfers;
+	lclient(void);
+	void Send(void);
+	void Recv(void);
+	void CheckConn(void);
+};
+
 static LinkMode gba_link_mode = LINK_DISCONNECTED;
 static ConnectionState gba_connection_state = LINK_OK;
 
@@ -165,7 +218,7 @@ sf::IPAddress joybusHostAddr = sf::IPAddress::LocalHost;
 // Hodgepodge
 u8 tspeed = 3;
 u8 transfer = 0;
-LINKDATA *linkmem = NULL;
+static LINKDATA *linkmem = NULL;
 int linkid = 0;
 #if (defined __WIN32__ || defined _WIN32)
 HANDLE linksync[4];
@@ -187,8 +240,8 @@ static int i, j;
 int linktimeout = 1000;
 LANLINKDATA lanlink;
 u16 linkdata[4];
-lserver ls;
-lclient lc;
+static lserver ls;
+static lclient lc;
 bool oncewait = false, after = false;
 
 // RFU crap (except for numtransfers note...should probably check that out)
@@ -255,23 +308,19 @@ void StartLink(u16 value)
 		if (start) {
 			if (GetLinkMode() == LINK_CABLE_SOCKET)
 			{
-				if (lanlink.connected)
-				{
-					linkdata[0] = READ16LE(&ioMem[COMM_SIODATA8]);
-					savedlinktime = linktime;
-					tspeed = value & 3;
-					ls.Send();
-					transfer = 1;
-					linktime = 0;
-					UPDATE_REG(COMM_SIOMULTI0, linkdata[0]);
-					UPDATE_REG(COMM_SIOMULTI1, 0xffff);
-					WRITE32LE(&ioMem[COMM_SIOMULTI2], 0xffffffff);
-					if (lanlink.speed&&oncewait == false)
-						ls.howmanytimes++;
-					after = false;
-					value &= ~0x40;
-				} else
-					value |= 0x40; // comm error
+				linkdata[0] = READ16LE(&ioMem[COMM_SIODATA8]);
+				savedlinktime = linktime;
+				tspeed = value & 3;
+				ls.Send();
+				transfer = 1;
+				linktime = 0;
+				UPDATE_REG(COMM_SIOMULTI0, linkdata[0]);
+				UPDATE_REG(COMM_SIOMULTI1, 0xffff);
+				WRITE32LE(&ioMem[COMM_SIOMULTI2], 0xffffffff);
+				if (lanlink.speed && oncewait == false)
+					ls.howmanytimes++;
+				after = false;
+				value &= ~0x40;
 			}
 			else if (linkmem->numgbas > 1)
 			{
@@ -316,6 +365,8 @@ void StartLink(u16 value)
 				WRITE32LE(&ioMem[COMM_SIOMULTI0], 0xffffffff);
 				WRITE32LE(&ioMem[COMM_SIOMULTI2], 0xffffffff);
 				value &= ~0x40;
+			} else {
+				value |= 0x40; // comm error
 			}
 		}
 		value |= (transfer != 0) << 7;
@@ -465,67 +516,64 @@ void LinkUpdate(int ticks)
 
 	if (GetLinkMode() == LINK_CABLE_SOCKET)
 	{
-		if (lanlink.connected)
+		if (after)
 		{
-			if (after)
+			if (linkid && linktime > 6044) {
+				lc.Recv();
+				oncewait = true;
+			}
+			else
+				return;
+		}
+
+		if (linkid && !transfer && lc.numtransfers > 0 && linktime >= savedlinktime)
+		{
+			linkdata[linkid] = READ16LE(&ioMem[COMM_SIODATA8]);
+
+			lc.Send();
+
+			UPDATE_REG(COMM_SIODATA32_L, linkdata[0]);
+			UPDATE_REG(COMM_SIOCNT, READ16LE(&ioMem[COMM_SIOCNT]) | 0x80);
+			transfer = 1;
+			if (lc.numtransfers==1)
+				linktime = 0;
+			else
+				linktime -= savedlinktime;
+		}
+
+		if (transfer && linktime >= trtimeend[lanlink.numslaves-1][tspeed])
+		{
+			if (READ16LE(&ioMem[COMM_SIOCNT]) & 0x4000)
 			{
-				if (linkid && linktime > 6044) {
+				IF |= 0x80;
+				UPDATE_REG(0x202, IF);
+			}
+
+			UPDATE_REG(COMM_SIOCNT, (READ16LE(&ioMem[COMM_SIOCNT]) & 0xff0f) | (linkid << 4));
+			transfer = 0;
+			linktime -= trtimeend[lanlink.numslaves-1][tspeed];
+			oncewait = false;
+
+			if (!lanlink.speed)
+			{
+				if (linkid)
 					lc.Recv();
-					oncewait = true;
-				}
 				else
-					return;
-			}
+					ls.Recv(); // WTF is the point of this?
 
-			if (linkid && !transfer && lc.numtransfers > 0 && linktime >= savedlinktime)
-			{
-				linkdata[linkid] = READ16LE(&ioMem[COMM_SIODATA8]);
+				UPDATE_REG(COMM_SIOMULTI1, linkdata[1]);
+				UPDATE_REG(COMM_SIOMULTI2, linkdata[2]);
+				UPDATE_REG(COMM_SIOMULTI3, linkdata[3]);
+				oncewait = true;
 
-				lc.Send();
+			} else {
 
-				UPDATE_REG(COMM_SIODATA32_L, linkdata[0]);
-				UPDATE_REG(COMM_SIOCNT, READ16LE(&ioMem[COMM_SIOCNT]) | 0x80);
-				transfer = 1;
-				if (lc.numtransfers==1)
-					linktime = 0;
-				else
-					linktime -= savedlinktime;
-			}
-
-			if (transfer && linktime >= trtimeend[lanlink.numslaves-1][tspeed])
-			{
-				if (READ16LE(&ioMem[COMM_SIOCNT]) & 0x4000)
+				after = true;
+				if (lanlink.numslaves == 1)
 				{
-					IF |= 0x80;
-					UPDATE_REG(0x202, IF);
-				}
-
-				UPDATE_REG(COMM_SIOCNT, (READ16LE(&ioMem[COMM_SIOCNT]) & 0xff0f) | (linkid << 4));
-				transfer = 0;
-				linktime -= trtimeend[lanlink.numslaves-1][tspeed];
-				oncewait = false;
-
-				if (!lanlink.speed)
-				{
-					if (linkid)
-						lc.Recv();
-					else
-						ls.Recv(); // WTF is the point of this?
-
 					UPDATE_REG(COMM_SIOMULTI1, linkdata[1]);
 					UPDATE_REG(COMM_SIOMULTI2, linkdata[2]);
 					UPDATE_REG(COMM_SIOMULTI3, linkdata[3]);
-					oncewait = true;
-
-				} else {
-
-					after = true;
-					if (lanlink.numslaves == 1)
-					{
-						UPDATE_REG(COMM_SIOMULTI1, linkdata[1]);
-						UPDATE_REG(COMM_SIOMULTI2, linkdata[2]);
-						UPDATE_REG(COMM_SIOMULTI3, linkdata[3]);
-					}
 				}
 			}
 		}
@@ -1172,8 +1220,6 @@ ConnectionState ConnectLinkUpdate(char * const message, size_t size)
 		}
 
 		if (lanlink.numslaves == lanlink.connectedSlaves) {
-			lanlink.connected = true;
-
 			for (int i = 1; i <= lanlink.numslaves; i++) {
 				sf::Packet packet;
 				packet 	<< true;
@@ -1210,7 +1256,6 @@ ConnectionState ConnectLinkUpdate(char * const message, size_t size)
 				packet >> gameReady;
 
 				if (packet && gameReady) {
-					lanlink.connected = true;
 					gba_connection_state = LINK_OK;
 					snprintf(message, size, N_("All players joined."));
 				}
@@ -1268,7 +1313,7 @@ void CloseLink(void){
         JoyBusShutdown();
     }
 
-	if(lanlink.connected){
+	if (gba_link_mode == LINK_CABLE_SOCKET) {
 		if(linkid){
 			char outbuffer[4];
 			outbuffer[0] = 4;
@@ -1424,7 +1469,6 @@ void lserver::Recv(void){
 			if(howmanytimes>1) memmove(inbuffer, inbuffer+inbuffer[0]*(howmanytimes-1), inbuffer[0]);
 			if(inbuffer[1]==-32){
 				char message[30];
-				lanlink.connected = false;
 				sprintf(message, _("Player %d disconnected."), i+2);
 				systemScreenMessage(message);
 				outbuffer[0] = 4;
@@ -1435,6 +1479,7 @@ void lserver::Recv(void){
 					tcpsocket[i].Receive(inbuffer, 256, nr);
 					tcpsocket[i].Close();
 				}
+				CloseLink();
 				return;
 			}
 			linkdata[i+1] = READ16LE(&u16inbuffer[1]);
@@ -1445,6 +1490,13 @@ void lserver::Recv(void){
 	return;
 }
 
+void CheckLinkConnection() {
+	if (GetLinkMode() == LINK_CABLE_SOCKET) {
+		if (linkid && lc.numtransfers == 0) {
+			lc.CheckConn();
+		}
+	}
+}
 
 // Client
 lclient::lclient(void){
@@ -1468,8 +1520,8 @@ void lclient::CheckConn(void){
 		if(inbuffer[1]==-32){
 			outbuffer[0] = 4;
 			lanlink.tcpsocket.Send(outbuffer, 4);
-			lanlink.connected = false;
 			systemScreenMessage(_("Server disconnected."));
+			CloseLink();
 			return;
 		}
 		numtransfers = 1;
@@ -1507,8 +1559,8 @@ void lclient::Recv(void){
 	if(inbuffer[1]==-32){
 		outbuffer[0] = 4;
 		lanlink.tcpsocket.Send(outbuffer, 4);
-		lanlink.connected = false;
 		systemScreenMessage(_("Server disconnected."));
+		CloseLink();
 		return;
 	}
 	tspeed = inbuffer[1] & 3;

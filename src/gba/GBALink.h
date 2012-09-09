@@ -63,6 +63,11 @@ extern void SetLinkServerHost(const char *host);
 extern void GetLinkServerHost(char * const host, size_t size);
 
 /**
+ * Verify that the link between the emulators is still active
+ */
+extern void CheckLinkConnection();
+
+/**
  * Set the current link mode to LINK_DISCONNECTED
  */
 extern void CloseLink();
@@ -122,66 +127,11 @@ extern const char *MakeInstanceFilename(const char *Input);
 #include <SFML/Network.hpp>
 
 typedef struct {
-	u16 linkdata[5];
-	u16 linkcmd;
-	u16 numtransfers;
-	int lastlinktime;
-	u8 numgbas;
-	u8 trgbas;
-	u8 linkflags;
-	int rfu_q[4];
-	u8 rfu_request[4];
-	int rfu_linktime[4];
-	u32 rfu_bdata[4][7];
-	u32 rfu_data[4][32];
-} LINKDATA;
-
-class lserver{
-	int numbytes;
-	sf::Selector<sf::SocketTCP> fdset;
-	//timeval udptimeout;
-	char inbuffer[256], outbuffer[256];
-	s32 *intinbuffer;
-	u16 *u16inbuffer;
-	s32 *intoutbuffer;
-	u16 *u16outbuffer;
-	int counter;
-	int done;
-public:
-	int howmanytimes;
-	sf::SocketTCP tcpsocket[4];
-	sf::IPAddress udpaddr[4];
-	lserver(void);
-	void Send(void);
-	void Recv(void);
-};
-
-class lclient{
-	sf::Selector<sf::SocketTCP> fdset;
-	char inbuffer[256], outbuffer[256];
-	s32 *intinbuffer;
-	u16 *u16inbuffer;
-	s32 *intoutbuffer;
-	u16 *u16outbuffer;
-	int numbytes;
-public:
-	sf::IPAddress serveraddr;
-	unsigned short serverport;
-	sf::SocketTCP noblock;
-	int numtransfers;
-	lclient(void);
-	void Send(void);
-	void Recv(void);
-	void CheckConn(void);
-};
-
-typedef struct {
 	sf::SocketTCP tcpsocket;
 	int numslaves;
 	int connectedSlaves;
 	int type;
 	bool server;
-	bool connected;
 	bool speed;
 } LANLINKDATA;
 
@@ -195,8 +145,6 @@ extern void CleanLocalLink();
 extern LANLINKDATA lanlink;
 extern int vbaid;
 extern int linktimeout;
-extern lclient lc;
-extern lserver ls;
 extern int linkid;
 
 #else
