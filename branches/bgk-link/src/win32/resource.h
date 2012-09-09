@@ -823,9 +823,12 @@
 #define IDC_TAB1                        40305
 #define IDC_LINK_SINGLE                 40306
 #define IDC_LINK_TIMEOUT                40307
+#define IDC_LINK_DISCONNECTED           40307
 #define IDC_LINK_LAN                    40308
 #define IDC_LINK2P                      40309
+#define IDC_LINK_RFU                    40309
 #define IDC_LINKTCP                     40310
+#define IDC_LINK_GAMECUBE               40310
 #define IDC_SSPEED                      40311
 #define IDC_SERVERSTART                 40312
 #define IDC_SERVERIP                    40313

@@ -115,9 +115,6 @@ void winlog(const char *msg, ...);
 
 /* Link
 ---------------------*/
-extern bool InitLink(void);
-extern void CloseLink(void);
-//extern int linkid;
 extern char inifile[];
 /* ------------------- */
 #ifdef _DEBUG
@@ -354,7 +351,7 @@ VBA::~VBA()
 
   regInit(winBuffer);
 
-  JoyBusShutdown();
+  CloseLink();
 
   saveSettings();
 
@@ -449,9 +446,6 @@ BOOL VBA::InitInstance()
   if(p)
     *p = 0;
 
-  if(!InitLink())
-	return FALSE;
-
   bool force = false;
 
   if (m_lpCmdLine[0])
@@ -481,7 +475,10 @@ BOOL VBA::InitInstance()
 
   loadSettings();
 
-    if(!initDisplay()) {
+  if(!InitLink((LinkMode) linkMode))
+	return FALSE;
+
+  if(!initDisplay()) {
     if(videoOption >= VIDEO_320x240) {
       regSetDwordValue("video", VIDEO_2X);
     }
@@ -1629,16 +1626,14 @@ void VBA::loadSettings()
 #ifndef NO_LINK
   linktimeout = regQueryDwordValue("LinkTimeout", 1000);
 
-  rfu_enabled = regQueryDwordValue("RFU", false) ? true : false;
-  gba_link_enabled = regQueryDwordValue("linkEnabled", false) ? true : false;
-  gba_joybus_enabled = regQueryDwordValue("joybusEnabled", false) ? true : false;
+  linkMode = regQueryDwordValue("LinkMode", LINK_DISCONNECTED);
+
   buffer = regQueryStringValue("joybusHostAddr", "");
 
   if(!buffer.IsEmpty()) {
 	  joybusHostAddr = std::string(buffer);
   }
 
-  lanlink.active = regQueryDwordValue("LAN", 0) ? true : false;
 #endif
 
   Sm60FPS::bSaveMoreCPU = regQueryDwordValue("saveMoreCPU", 0);
@@ -2566,9 +2561,7 @@ void VBA::saveSettings()
 
 #ifndef NO_LINK
   regSetDwordValue("LinkTimeout", linktimeout);
-  regSetDwordValue("RFU", rfu_enabled);
-  regSetDwordValue("linkEnabled", gba_link_enabled);
-  regSetDwordValue("joybusEnabled", gba_joybus_enabled);
+  regSetDwordValue("LinkMode", GetLinkMode());
   regSetStringValue("joybusHostAddr", joybusHostAddr.ToString().c_str());
 #endif
 

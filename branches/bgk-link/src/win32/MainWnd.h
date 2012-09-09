@@ -330,10 +330,6 @@ protected:
 	afx_msg void OnOptionsSoundHardwareacceleration();
 	afx_msg void OnUpdateOptionsSoundHardwareacceleration(CCmdUI *pCmdUI);
 	afx_msg void OnLinkOptions();
-	afx_msg void OnOptionsLinkRFU();
-	afx_msg void OnUpdateOptionsLinkRFU(CCmdUI* pCmdUI);
-	afx_msg void OnOptionsLinkEnable();
-	afx_msg void OnUpdateOptionsLinkEnable(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsJoybus();
 
 	afx_msg void OnOutputapiDirectsound();
