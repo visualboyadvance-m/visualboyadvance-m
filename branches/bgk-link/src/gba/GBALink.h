@@ -49,8 +49,10 @@ extern LinkMode GetLinkMode();
 
 /**
  * Set the host to connect to when in socket mode
+ *
+ * @return false if the address is invalid
  */
-extern void SetLinkServerHost(const char *host);
+extern bool SetLinkServerHost(const char *host);
 
 /**
  * Get the host relevant to context
@@ -135,9 +137,6 @@ typedef struct {
 	bool speed;
 } LANLINKDATA;
 
-extern sf::IPAddress joybusHostAddr;
-extern void JoyBusUpdate(int ticks);
-
 extern void StartLink(u16);
 extern void StartGPLink(u16);
 extern void LinkUpdate(int);
@@ -150,8 +149,6 @@ extern int linkid;
 #else
 
 // stubs to keep #ifdef's out of mainline
-inline void JoyBusUpdate(int) { }
-
 inline bool InitLink() { return true; }
 inline void CloseLink() { }
 inline void StartLink(u16) { }
