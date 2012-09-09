@@ -148,9 +148,13 @@ int WaitForSingleObject(sem_t *s, int t)
 #define UPDATE_REG(address, value) WRITE16LE(((u16 *)&ioMem[address]),value)
 
 static LinkMode gba_link_mode = LINK_DISCONNECTED;
+static ConnectionState gba_connection_state = LINK_OK;
 
 LinkMode GetLinkMode() {
-	return gba_link_mode;
+	if (gba_connection_state == LINK_OK)
+		return gba_link_mode;
+	else
+		return LINK_DISCONNECTED;
 }
 
 int linktime = 0;
@@ -224,11 +228,6 @@ int gbtime = 1024;
 
 int GetSIOMode(u16, u16);
 
-void LinkClientThread(void *);
-void LinkServerThread(void *);
-
-int StartServer(void);
-
 u16 StartRFU(u16);
 
 void StartLink(u16 value)
@@ -244,7 +243,6 @@ void StartLink(u16 value)
 	switch (GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]))) {
 	case MULTIPLAYER: {
 		bool start = (value & 0x80) && !linkid && !transfer && GetLinkMode() != LINK_DISCONNECTED;
-		u16 si = value & 4;
 		// clear start, seqno, si (RO on slave, start = pulse on master)
 		value &= 0xff4b;
 		// get current si.  This way, on slaves, it is low during xfer
@@ -956,13 +954,13 @@ u16 StartRFU(u16 value)
 	}
 }
 
-static bool InitIPC() {
+static ConnectionState InitIPC() {
 	linkid = 0;
 
 #if (defined __WIN32__ || defined _WIN32)
 	if((mmf=CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(LINKDATA), LOCAL_LINK_NAME))==NULL){
 		systemMessage(0, N_("Error creating file mapping"));
-		return false;
+		return LINK_ERROR;
 	}
 
 	if(GetLastError() == ERROR_ALREADY_EXISTS)
@@ -974,7 +972,7 @@ static bool InitIPC() {
 	if((linkmem=(LINKDATA *)MapViewOfFile(mmf, FILE_MAP_WRITE, 0, 0, sizeof(LINKDATA)))==NULL){
 		CloseHandle(mmf);
 		systemMessage(0, N_("Error mapping file"));
-		return false;
+		return LINK_ERROR;
 	}
 #else
 	if((mmf = shm_open("/" LOCAL_LINK_NAME, O_RDWR|O_CREAT|O_EXCL, 0777)) < 0) {
@@ -1024,7 +1022,7 @@ static bool InitIPC() {
 			close(mmf);
 #endif
 			systemMessage(0, N_("5 or more GBAs not supported."));
-			return false;
+			return LINK_ERROR;
 		}
 		if(vbaid == n)
 			linkmem->numgbas = n + 1;
@@ -1045,7 +1043,7 @@ static bool InitIPC() {
 				CloseHandle(linksync[j]);
 			}
 			systemMessage(0, N_("Error opening event"));
-			return false;
+			return LINK_ERROR;
 		}
 #else
 		if((linksync[i] = sem_open(linkevent,
@@ -1063,45 +1061,187 @@ static bool InitIPC() {
 				}
 			}
 			systemMessage(0, N_("Error opening event"));
-			return false;
+			return LINK_ERROR;
 		}
 #endif
 	}
 
-	return true;
+	return LINK_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Probably from here down needs to be replaced with SFML goodness :)
 // tjm: what SFML goodness?  SFML for network, yes, but not for IPC
 
-bool InitLink(LinkMode mode)
+ConnectionState InitLink(LinkMode mode)
 {
 	// Do nothing if we are already connected
 	if (GetLinkMode() != LINK_DISCONNECTED) {
 		systemMessage(0, N_("Error, link already connected"));
-		return false;
+		return LINK_ERROR;
 	}
 
-	bool initOk = true;
+	gba_connection_state = LINK_OK;
 
     if (mode == LINK_GAMECUBE_DOLPHIN) {
         JoyBusConnect();
     } else if (mode == LINK_CABLE_IPC || mode == LINK_RFU_IPC) {
-		initOk = InitIPC();
+    	gba_connection_state = InitIPC();
 	} else if (mode == LINK_CABLE_SOCKET) {
-		for(i=0;i<4;i++)
+		linkid = 0;
+
+		for(int i = 0; i < 4; i++)
 			linkdata[i] = 0xffff;
+
+		if (lanlink.server) {
+			lanlink.connectedSlaves = 0;
+			// should probably use GetPublicAddress()
+			//sid->ShowServerIP(sf::IPAddress::GetLocalAddress());
+
+			// too bad Listen() doesn't take an address as well
+			// then again, old code used INADDR_ANY anyway
+			if (!lanlink.tcpsocket.Listen(IP_LINK_PORT))
+				// Note: old code closed socket & retried once on bind failure
+				gba_connection_state = LINK_ERROR; // FIXME: error code?
+			else
+				gba_connection_state = LINK_NEEDS_UPDATE;
+		} else {
+			lc.serverport = IP_LINK_PORT;
+
+			if (!lc.serveraddr.IsValid()) {
+				gba_connection_state = LINK_ERROR;
+			} else {
+				lanlink.tcpsocket.SetBlocking(false);
+				sf::Socket::Status status = lanlink.tcpsocket.Connect(lc.serverport, lc.serveraddr);
+
+				if (status == sf::Socket::Error || status == sf::Socket::Disconnected)
+					gba_connection_state = LINK_ERROR;
+				else
+					gba_connection_state = LINK_NEEDS_UPDATE;
+			}
+		}
 	}
 
 	// No errors, save the link mode
-	if (initOk) {
+	if (gba_connection_state != LINK_ERROR) {
 		gba_link_mode = mode;
 	} else {
 		gba_link_mode = LINK_DISCONNECTED;
 	}
 		
-	return initOk;
+	return gba_connection_state;
+}
+
+ConnectionState ConnectLinkUpdate(char * const message, size_t size)
+{
+	message[0] = '\0';
+
+	if (gba_connection_state != LINK_NEEDS_UPDATE) {
+		gba_connection_state = LINK_ERROR;
+		snprintf(message, size, N_("Link connection does not need updates."));
+
+		return LINK_ERROR;
+	}
+
+	if (gba_link_mode == LINK_CABLE_SOCKET && lanlink.server) {
+		sf::Selector<sf::SocketTCP> fdset;
+		fdset.Add(lanlink.tcpsocket);
+
+		if (fdset.Wait(0.1) == 1) {
+			int nextSlave = lanlink.connectedSlaves + 1;
+
+			sf::Socket::Status st = lanlink.tcpsocket.Accept(ls.tcpsocket[nextSlave]);
+
+			if (st == sf::Socket::Error) {
+				for (int j = 1; j < nextSlave; j++)
+					ls.tcpsocket[j].Close();
+
+				snprintf(message, size, N_("Network error."));
+				gba_connection_state = LINK_ERROR;
+			} else {
+				sf::Packet packet;
+				packet 	<< static_cast<sf::Uint16>(nextSlave)
+						<< static_cast<sf::Uint16>(lanlink.numslaves);
+
+				ls.tcpsocket[nextSlave].Send(packet);
+
+				snprintf(message, size, N_("Player %d connected"), nextSlave);
+
+				lanlink.connectedSlaves++;
+			}
+		}
+
+		if (lanlink.numslaves == lanlink.connectedSlaves) {
+			lanlink.connected = true;
+
+			for (int i = 1; i <= lanlink.numslaves; i++) {
+				sf::Packet packet;
+				packet 	<< true;
+
+				ls.tcpsocket[i].Send(packet);
+			}
+
+			snprintf(message, size, N_("All players connected"));
+			gba_connection_state = LINK_OK;
+		}
+	} else if (gba_link_mode == LINK_CABLE_SOCKET && !lanlink.server) {
+
+		sf::Packet packet;
+		sf::Socket::Status status = lanlink.tcpsocket.Receive(packet);
+
+		if (status == sf::Socket::Error || status == sf::Socket::Disconnected) {
+			snprintf(message, size, N_("Network error."));
+			gba_connection_state = LINK_ERROR;
+		} else if (status == sf::Socket::Done) {
+
+			if (linkid == 0) {
+				sf::Uint16 receivedId, receivedSlaves;
+				packet >> receivedId >> receivedSlaves;
+
+				if (packet) {
+					linkid = receivedId;
+					lanlink.numslaves = receivedSlaves;
+
+					snprintf(message, size, N_("Connected as #%d, Waiting for %d players to join"),
+							linkid + 1, lanlink.numslaves - linkid);
+				}
+			} else {
+				bool gameReady;
+				packet >> gameReady;
+
+				if (packet && gameReady) {
+					lanlink.connected = true;
+					gba_connection_state = LINK_OK;
+					snprintf(message, size, N_("All players joined."));
+				}
+			}
+
+			sf::Selector<sf::SocketTCP> fdset;
+			fdset.Add(lanlink.tcpsocket);
+			fdset.Wait(0.1);
+		}
+	}
+
+	return gba_connection_state;
+}
+
+void SetLinkServerHost(const char *host) {
+	lc.serveraddr = sf::IPAddress(host);
+	joybusHostAddr = sf::IPAddress(host);
+}
+
+void GetLinkServerHost(char * const host, size_t size) {
+	if (host == NULL || size == 0)
+		return;
+
+	host[0] = '\0';
+
+	if (gba_link_mode == LINK_GAMECUBE_DOLPHIN)
+		strncpy(host, joybusHostAddr.ToString().c_str(), size);
+	else if (lanlink.server)
+		strncpy(host, sf::IPAddress::GetLocalAddress().ToString().c_str(), size);
+	else
+		strncpy(host, lc.serveraddr.ToString().c_str(), size);
 }
 
 static void ReInitLink()
@@ -1120,11 +1260,11 @@ static void ReInitLink()
 }
 
 void CloseLink(void){
-    if (GetLinkMode() == LINK_DISCONNECTED) {
+    if (gba_link_mode == LINK_DISCONNECTED) {
         return; // Nothing to do
     }
 
-    if (GetLinkMode() == LINK_GAMECUBE_DOLPHIN) {
+    if (gba_link_mode == LINK_GAMECUBE_DOLPHIN) {
         JoyBusShutdown();
     }
 
@@ -1147,45 +1287,48 @@ void CloseLink(void){
 			}
 		}
 	}
-	int f = linkmem->linkflags;
-	f &= ~(1 << linkid);
-	if(f & 0xf) {
-		linkmem->linkflags = f;
-		int n = linkmem->numgbas;
-		for(int i = 0; i < n; i--)
-			if(f <= (1 << (i + 1)) - 1) {
-				linkmem->numgbas = i + 1;
-				break;
-			}
-	}
 
-	for(i=0;i<4;i++){
-		if(linksync[i]!=NULL){
-#if (defined __WIN32__ || defined _WIN32)
-			ReleaseSemaphore(linksync[i], 1, NULL);
-			CloseHandle(linksync[i]);
-#else
-			sem_close(linksync[i]);
-			if(!(f & 0xf)) {
-				linkevent[sizeof(linkevent)-2]=(char)i+'1';
-				sem_unlink(linkevent);
-			}
-#endif
+	if (gba_link_mode == LINK_CABLE_IPC || gba_link_mode == LINK_RFU_IPC) {
+		int f = linkmem->linkflags;
+		f &= ~(1 << linkid);
+		if(f & 0xf) {
+			linkmem->linkflags = f;
+			int n = linkmem->numgbas;
+			for(int i = 0; i < n; i--)
+				if(f <= (1 << (i + 1)) - 1) {
+					linkmem->numgbas = i + 1;
+					break;
+				}
 		}
-	}
-#if (defined __WIN32__ || defined _WIN32)
-	CloseHandle(mmf);
-	UnmapViewOfFile(linkmem);
 
-	// FIXME: move to caller
-	// (but there are no callers, so why bother?)
-	//regSetDwordValue("LAN", lanlink.active);
+		for(i=0;i<4;i++){
+			if(linksync[i]!=NULL){
+#if (defined __WIN32__ || defined _WIN32)
+				ReleaseSemaphore(linksync[i], 1, NULL);
+				CloseHandle(linksync[i]);
 #else
-	if(!(f & 0xf))
-		shm_unlink("/" LOCAL_LINK_NAME);
-	munmap(linkmem, sizeof(LINKDATA));
-	close(mmf);
+				sem_close(linksync[i]);
+				if(!(f & 0xf)) {
+					linkevent[sizeof(linkevent)-2]=(char)i+'1';
+					sem_unlink(linkevent);
+				}
 #endif
+			}
+		}
+#if (defined __WIN32__ || defined _WIN32)
+		CloseHandle(mmf);
+		UnmapViewOfFile(linkmem);
+
+		// FIXME: move to caller
+		// (but there are no callers, so why bother?)
+		//regSetDwordValue("LAN", lanlink.active);
+#else
+		if(!(f & 0xf))
+			shm_unlink("/" LOCAL_LINK_NAME);
+		munmap(linkmem, sizeof(LINKDATA));
+		close(mmf);
+#endif
+	}
 
     gba_link_mode = LINK_DISCONNECTED;
 
@@ -1213,81 +1356,6 @@ lserver::lserver(void){
 	intoutbuffer = (s32*)outbuffer;
 	u16outbuffer = (u16*)outbuffer;
 	oncewait = false;
-}
-
-bool lserver::Init(ServerInfoDisplay *sid){
-	// too bad Listen() doesn't take an address as well
-	// then again, old code used INADDR_ANY anyway
-	if(!lanlink.tcpsocket.Listen(IP_LINK_PORT))
-		// Note: old code closed socket & retried once on bind failure
-		return false; // FIXME: error code?
-
-	if(lanlink.thread!=NULL){
-		lanlink.terminate = true;
-		WaitForSingleObject(linksync[vbaid], 500);
-		lanlink.thread = NULL;
-	}
-	lanlink.terminate = false;
-	linkid = 0;
-
-	// should probably use GetPublicAddress()
-	sid->ShowServerIP(sf::IPAddress::GetLocalAddress());
-
-	lanlink.thread = new sf::Thread(LinkServerThread, sid);
-	lanlink.thread->Launch();
-
-	return true;
-
-}
-
-void LinkServerThread(void *_sid){
-	ServerInfoDisplay *sid = (ServerInfoDisplay *)_sid;
-	sf::Selector<sf::SocketTCP> fdset;
-	char inbuffer[256], outbuffer[256];
-	s32 *intinbuffer = (s32*)inbuffer;
-	u16 *u16inbuffer = (u16*)inbuffer;
-	s32 *intoutbuffer = (s32*)outbuffer;
-	u16 *u16outbuffer = (u16*)outbuffer;
-
-	i = 0;
-
-	while(i<lanlink.numslaves){
-		fdset.Clear();
-		fdset.Add(lanlink.tcpsocket);
-		if(lanlink.terminate){
-			ReleaseSemaphore(linksync[vbaid], 1, NULL);
-			goto CloseInfoDisplay;
-		}
-		if(fdset.Wait(0.1)==1){
-			sf::Socket::Status st =
-				lanlink.tcpsocket.Accept(ls.tcpsocket[i+1]);
-			if(st == sf::Socket::Error) {
-				for(int j=1;j<i;j++) ls.tcpsocket[j].Close();
-				systemMessage(0, N_("Network error."));
-				lanlink.terminate = true;
-			} else {
-				i++;
-				WRITE16LE(&u16outbuffer[0], i);
-				WRITE16LE(&u16outbuffer[1], lanlink.numslaves);
-				ls.tcpsocket[i].Send(outbuffer, 4);
-				sid->ShowConnect(i);
-			}
-		}
-		sid->Ping();
-	}
-
-	lanlink.connected = true;
-
-	sid->Connected();
-
-	for(i=1;i<=lanlink.numslaves;i++){
-		outbuffer[0] = 4;
-		ls.tcpsocket[i].Send(outbuffer, 4);
-	}
-
-CloseInfoDisplay:
-	delete sid;
-	return;
 }
 
 void lserver::Send(void){
@@ -1385,92 +1453,6 @@ lclient::lclient(void){
 	intoutbuffer = (s32*)outbuffer;
 	u16outbuffer = (u16*)outbuffer;
 	numtransfers = 0;
-	return;
-}
-
-bool lclient::Init(sf::IPAddress addr, ClientInfoDisplay *cid){
-	serveraddr = addr;
-	serverport = IP_LINK_PORT;
-	lanlink.tcpsocket.SetBlocking(false);
-
-	if(lanlink.thread!=NULL){
-		lanlink.terminate = true;
-		WaitForSingleObject(linksync[vbaid], 500);
-		lanlink.thread = NULL;
-	}
-
-	cid->ConnectStart(addr);
-	lanlink.terminate = false;
-	lanlink.thread = new sf::Thread(LinkClientThread, cid);
-	lanlink.thread->Launch();
-	return true;
-}
-
-void LinkClientThread(void *_cid){
-	ClientInfoDisplay *cid = (ClientInfoDisplay *)_cid;
-	sf::Selector<sf::SocketTCP> fdset;
-	int numbytes;
-	char inbuffer[16];
-	u16 *u16inbuffer = (u16*)inbuffer;
-	unsigned long block = 0;
-
-	while(lanlink.tcpsocket.Connect(lc.serverport, lc.serveraddr) != sf::Socket::Done) {
-		// stupid SFML has no way of giving what sort of error occurred
-		// so we'll just have to do a retry loop, I guess.
-		cid->Ping();
-		if(lanlink.terminate)
-			goto CloseInfoDisplay;
-		// old code had broken sleep on socket, which isn't
-		// even connected yet
-		// corrected sleep on socket worked, but this is more sane
-		// and probably less portable... works with mingw32 at least
-#if (defined __WIN32__ || defined _WIN32)
-		Sleep(100); // in milliseconds
-#else
-		usleep(100000); // in microseconds
-#endif
-	}
-
-	numbytes = 0;
-	size_t got;
-	while(numbytes<4) {
-		lanlink.tcpsocket.Receive(inbuffer+numbytes, 4 - numbytes, got);
-		numbytes += got;
-		fdset.Clear();
-		fdset.Add(lanlink.tcpsocket);
-		fdset.Wait(0.1);
-		cid->Ping();
-		if(lanlink.terminate) {
-			lanlink.tcpsocket.Close();
-			goto CloseInfoDisplay;
-		}
-	}
-	linkid = (int)READ16LE(&u16inbuffer[0]);
-	lanlink.numslaves = (int)READ16LE(&u16inbuffer[1]);
-
-	cid->ShowConnect(linkid + 1, lanlink.numslaves - linkid);
-
-	numbytes = 0;
-	inbuffer[0] = 1;
-	while(numbytes<inbuffer[0]) {
-		lanlink.tcpsocket.Receive(inbuffer+numbytes, inbuffer[0] - got, got);
-		numbytes += got;
-		fdset.Clear();
-		fdset.Add(lanlink.tcpsocket);
-		fdset.Wait(0.1);
-		cid->Ping();
-		if(lanlink.terminate) {
-			lanlink.tcpsocket.Close();
-			goto CloseInfoDisplay;
-		}
-	}
-
-	lanlink.connected = true;
-
-	cid->Connected();
-
-CloseInfoDisplay:
-	delete cid;
 	return;
 }
 

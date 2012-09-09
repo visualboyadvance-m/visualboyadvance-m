@@ -1,8 +1,6 @@
 #ifndef GBA_GBALINK_H
 #define GBA_GBALINK_H
 
-#pragma once
-
 /**
  * Link modes to be passed to InitLink
  */
@@ -16,12 +14,31 @@ enum LinkMode
 };
 
 /**
+ * State of the connection attempt
+ */
+enum ConnectionState
+{
+	LINK_OK,
+	LINK_ERROR,
+	LINK_NEEDS_UPDATE,
+	LINK_ABORT
+};
+
+/**
  * Initialize GBA linking
  *
  * @param mode Device to emulate, plugged to the GBA link port.
  * @return success
  */
-extern bool InitLink(LinkMode mode);
+extern ConnectionState InitLink(LinkMode mode);
+
+/**
+ * Update a link connection request
+ *
+ * @param message Information message
+ * @param size Maximum message size
+ */
+extern ConnectionState ConnectLinkUpdate(char * const message, size_t size);
 
 /**
  * Get the currently enabled link mode
@@ -29,6 +46,21 @@ extern bool InitLink(LinkMode mode);
  * @return link mode
  */
 extern LinkMode GetLinkMode();
+
+/**
+ * Set the host to connect to when in socket mode
+ */
+extern void SetLinkServerHost(const char *host);
+
+/**
+ * Get the host relevant to context
+ *
+ * If in lan server mode, returns the external IP adress
+ * If in lan client mode, returns the IP adress of the host to connect to
+ * If in gamecube mode, returns the IP adress of the dolphin host
+ *
+ */
+extern void GetLinkServerHost(char * const host, size_t size);
 
 /**
  * Set the current link mode to LINK_DISCONNECTED
@@ -87,17 +119,7 @@ extern const char *MakeInstanceFilename(const char *Input);
 
 #ifndef NO_LINK
 // Link implementation
-#include <SFML/System.hpp>
 #include <SFML/Network.hpp>
-
-class ServerInfoDisplay
-{
-public:
-    virtual void ShowServerIP(const sf::IPAddress& addr) = 0;
-    virtual void ShowConnect(const int player) = 0;
-    virtual void Ping() = 0;
-    virtual void Connected() = 0;
-};
 
 typedef struct {
 	u16 linkdata[5];
@@ -130,17 +152,8 @@ public:
 	sf::SocketTCP tcpsocket[4];
 	sf::IPAddress udpaddr[4];
 	lserver(void);
-	bool Init(ServerInfoDisplay *);
 	void Send(void);
 	void Recv(void);
-};
-
-class ClientInfoDisplay {
-public:
-    virtual void ConnectStart(const sf::IPAddress& addr) = 0;
-    virtual void Ping() = 0;
-    virtual void ShowConnect(const int player, const int togo) = 0;
-    virtual void Connected() = 0;
 };
 
 class lclient{
@@ -157,7 +170,6 @@ public:
 	sf::SocketTCP noblock;
 	int numtransfers;
 	lclient(void);
-	bool Init(sf::IPAddress, ClientInfoDisplay *);
 	void Send(void);
 	void Recv(void);
 	void CheckConn(void);
@@ -165,12 +177,10 @@ public:
 
 typedef struct {
 	sf::SocketTCP tcpsocket;
-	//sf::SocketUDP udpsocket;
 	int numslaves;
-	sf::Thread *thread;
+	int connectedSlaves;
 	int type;
 	bool server;
-	bool terminate;
 	bool connected;
 	bool speed;
 } LANLINKDATA;
@@ -192,8 +202,6 @@ extern int linkid;
 #else
 
 // stubs to keep #ifdef's out of mainline
-inline void JoyBusConnect() { }
-inline void JoyBusShutdown() { }
 inline void JoyBusUpdate(int) { }
 
 inline bool InitLink() { return true; }
