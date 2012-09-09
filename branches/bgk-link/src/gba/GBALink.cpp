@@ -956,22 +956,7 @@ u16 StartRFU(u16 value)
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Probably from here down needs to be replaced with SFML goodness :)
-// tjm: what SFML goodness?  SFML for network, yes, but not for IPC
-
-bool InitLink(LinkMode mode)
-{
-	// Do nothing if we are already connected
-	if (GetLinkMode() != LINK_DISCONNECTED) {
-		systemMessage(0, N_("Error, link already connected"));
-		return false;
-	}
-
-    if (mode == LINK_GAMECUBE_DOLPHIN) {
-        JoyBusConnect();
-    }
-
+static bool InitIPC() {
 	linkid = 0;
 
 #if (defined __WIN32__ || defined _WIN32)
@@ -1082,13 +1067,41 @@ bool InitLink(LinkMode mode)
 		}
 #endif
 	}
-	for(i=0;i<4;i++)
-		linkdata[i] = 0xffff;
-		
-	// No errors, save the link mode
-	gba_link_mode = mode;
-		
+
 	return true;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Probably from here down needs to be replaced with SFML goodness :)
+// tjm: what SFML goodness?  SFML for network, yes, but not for IPC
+
+bool InitLink(LinkMode mode)
+{
+	// Do nothing if we are already connected
+	if (GetLinkMode() != LINK_DISCONNECTED) {
+		systemMessage(0, N_("Error, link already connected"));
+		return false;
+	}
+
+	bool initOk = true;
+
+    if (mode == LINK_GAMECUBE_DOLPHIN) {
+        JoyBusConnect();
+    } else if (mode == LINK_CABLE_IPC || mode == LINK_RFU_IPC) {
+		initOk = InitIPC();
+	} else if (mode == LINK_CABLE_SOCKET) {
+		for(i=0;i<4;i++)
+			linkdata[i] = 0xffff;
+	}
+
+	// No errors, save the link mode
+	if (initOk) {
+		gba_link_mode = mode;
+	} else {
+		gba_link_mode = LINK_DISCONNECTED;
+	}
+		
+	return initOk;
 }
 
 static void ReInitLink()
