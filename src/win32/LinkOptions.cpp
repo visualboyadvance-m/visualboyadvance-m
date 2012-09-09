@@ -113,7 +113,7 @@ void LinkGeneral::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(LinkGeneral)
-	DDX_Radio(pDX, IDC_LINK_SINGLE, m_type);
+	DDX_Radio(pDX, IDC_LINK_DISCONNECTED, m_type);
 	DDX_Control(pDX, IDC_LINKTIMEOUT, m_timeout);
 	//}}AFX_DATA_MAP
 }
@@ -124,6 +124,9 @@ BEGIN_MESSAGE_MAP(LinkGeneral, CDialog)
 	ON_BN_CLICKED(IDC_LINK_SINGLE, OnRadio1)
 	ON_BN_CLICKED(IDC_LINK_LAN, OnRadio2)
 	//}}AFX_MSG_MAP
+	ON_BN_CLICKED(IDC_LINK_DISCONNECTED, &LinkGeneral::OnBnClickedLinkDisconnected)
+	ON_BN_CLICKED(IDC_LINK_RFU, &LinkGeneral::OnBnClickedLinkRfu)
+	ON_BN_CLICKED(IDC_LINK_GAMECUBE, &LinkGeneral::OnBnClickedLinkGamecube)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -234,7 +237,9 @@ BOOL CMyTabCtrl::SubclassDlgItem(UINT nID, CWnd* pParent)
 
 BOOL CMyTabCtrl::IsTabEnabled(int iTab)
 {
-	if (!lanlink.active && iTab > 0)
+	LinkGeneral *general = (LinkGeneral*)m_tabdialog[0];
+
+	if (general->m_type != LINK_CABLE_SOCKET && iTab > 0)
 		return false;
 	return true;
 }
@@ -426,6 +431,7 @@ void CMyTabCtrl::OnSwitchTabs(void)
 {
 	CRect clientRect, wndRect;
 	int i;
+	LinkGeneral *general = (LinkGeneral*)m_tabdialog[0];
 
 	GetClientRect(clientRect);
 	AdjustRect(FALSE, clientRect);
@@ -433,7 +439,9 @@ void CMyTabCtrl::OnSwitchTabs(void)
 	GetParent()->ScreenToClient(wndRect);
 	clientRect.OffsetRect(wndRect.left, wndRect.top);
 
-	if(lanlink.active==0)
+
+
+	if (general->m_type != LINK_CABLE_SOCKET)
 		SetCurSel(0);
 
 	for(i=0;i<3;i++){
@@ -456,15 +464,13 @@ void LinkOptions::OnOk()
 
 void LinkGeneral::OnRadio1()
 {
-	m_type = 0;
-	lanlink.active = 0;
+	m_type = LINK_CABLE_IPC;
 	GetParent()->Invalidate();
 }
 
 void LinkGeneral::OnRadio2()
 {
-	m_type = 1;
-	lanlink.active = 1;
+	m_type = LINK_CABLE_SOCKET;
 	GetParent()->Invalidate();
 }
 
@@ -474,11 +480,11 @@ BOOL LinkGeneral::OnInitDialog(){
 
 	CDialog::OnInitDialog();
 
+	m_type = GetLinkMode();
+
 	m_timeout.LimitText(5);
 	sprintf(timeout, "%d", linktimeout);
 	m_timeout.SetWindowText(timeout);
-
-	m_type = lanlink.active;
 
 	UpdateData(FALSE);
 
@@ -674,8 +680,16 @@ void LinkOptions::GetAllData(LinkGeneral *src)
 	src->m_timeout.GetWindowText(timeout, 5);
 	sscanf(timeout, "%d", &linktimeout);
 
-	if(src->m_type==0){
+	if(src->m_type == LINK_CABLE_SOCKET){
 		lanlink.speed = 0;
+	}
+
+	LinkMode oldMode = GetLinkMode();
+	LinkMode newMode = (LinkMode) src->m_type;
+
+	if (newMode != oldMode) {
+		CloseLink();
+		InitLink(newMode);
 	}
 
 	return;
@@ -751,3 +765,24 @@ BOOL LinkServer::PreTranslateMessage(MSG* pMsg)
 }
 
 #endif // NO_LINK
+
+
+void LinkGeneral::OnBnClickedLinkDisconnected()
+{
+	m_type = LINK_DISCONNECTED;
+	GetParent()->Invalidate();
+}
+
+
+void LinkGeneral::OnBnClickedLinkRfu()
+{
+	m_type = LINK_RFU_IPC;
+	GetParent()->Invalidate();
+}
+
+
+void LinkGeneral::OnBnClickedLinkGamecube()
+{
+	m_type = LINK_GAMECUBE_DOLPHIN;
+	GetParent()->Invalidate();
+}

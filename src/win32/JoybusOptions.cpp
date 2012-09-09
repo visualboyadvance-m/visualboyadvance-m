@@ -34,7 +34,7 @@ BOOL JoybusOptions::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	enable_check.SetCheck(gba_joybus_enabled ? BST_CHECKED : BST_UNCHECKED);
+	enable_check.SetCheck(GetLinkMode() == LINK_GAMECUBE_DOLPHIN ? BST_CHECKED : BST_UNCHECKED);
 
 	hostname.EnableWindow(enable_check.GetCheck() == BST_CHECKED);
 
@@ -57,8 +57,6 @@ void JoybusOptions::OnBnClickedOk()
 		return;
 	}
 
-	gba_joybus_enabled = enable_check.GetCheck() == BST_CHECKED;
-
 	CString address;
 	hostname.GetWindowText(address);
 
@@ -72,7 +70,12 @@ void JoybusOptions::OnBnClickedOk()
 	}
 
 	joybusHostAddr = new_server;
-	JoyBusConnect();
+
+	if (enable_check.GetCheck() == BST_CHECKED)
+	{
+		CloseLink();
+		InitLink(LINK_GAMECUBE_DOLPHIN);
+	}
 
 	OnOK();
 }

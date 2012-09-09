@@ -203,6 +203,8 @@ class VBA : public CWinApp
 
   CString wndClass;
 
+  int linkMode;
+
  public:
   VBA();
   ~VBA();
