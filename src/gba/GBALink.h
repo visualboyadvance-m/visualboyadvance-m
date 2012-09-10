@@ -48,6 +48,21 @@ extern ConnectionState ConnectLinkUpdate(char * const message, size_t size);
 extern LinkMode GetLinkMode();
 
 /**
+ * Is this instance going to host a LAN link server?
+ *
+ * @param enabled Server mode
+ * @param numSlaves Number of expected clients
+ */
+extern void EnableLinkServer(bool enable, int numSlaves);
+
+/**
+ * Should speed hacks be used?
+ *
+ * @param enabled Speed hacks
+ */
+extern void EnableSpeedHacks(bool enable);
+
+/**
  * Set the host to connect to when in socket mode
  *
  * @return false if the address is invalid
@@ -74,30 +89,16 @@ extern void CheckLinkConnection();
  */
 extern void CloseLink();
 
-// register definitions; these are always present
-
-#define UNSUPPORTED -1
-#define MULTIPLAYER 0
-#define NORMAL8 1
-#define NORMAL32 2
-#define UART 3
-#define JOYBUS 4
-#define GP 5
-
-#define RFU_INIT 0
-#define RFU_COMM 1
-#define RFU_SEND 2
-#define RFU_RECV 3
-
+// register definitions
 #define COMM_SIODATA32_L	0x120
 #define COMM_SIODATA32_H	0x122
 #define COMM_SIOCNT			0x128
 #define COMM_SIODATA8		0x12a
-#define COMM_SIOMLT_SEND 0x12a
-#define COMM_SIOMULTI0 0x120
-#define COMM_SIOMULTI1 0x122
-#define COMM_SIOMULTI2 0x124
-#define COMM_SIOMULTI3 0x126
+#define COMM_SIOMLT_SEND	0x12a
+#define COMM_SIOMULTI0		0x120
+#define COMM_SIOMULTI1		0x122
+#define COMM_SIOMULTI2		0x124
+#define COMM_SIOMULTI3		0x126
 #define COMM_RCNT			0x134
 #define COMM_JOYCNT			0x140
 #define COMM_JOY_RECV_L		0x150
@@ -114,34 +115,17 @@ extern void CloseLink();
 #define JOYCNT_SEND_COMPLETE	4
 #define JOYCNT_INT_ENABLE		0x40
 
-enum
-{
-	JOY_CMD_RESET	= 0xff,
-	JOY_CMD_STATUS	= 0x00,
-	JOY_CMD_READ	= 0x14,
-	JOY_CMD_WRITE	= 0x15		
-};
+
 
 extern const char *MakeInstanceFilename(const char *Input);
 
 #ifndef NO_LINK
 // Link implementation
-#include <SFML/Network.hpp>
-
-typedef struct {
-	sf::SocketTCP tcpsocket;
-	int numslaves;
-	int connectedSlaves;
-	int type;
-	bool server;
-	bool speed;
-} LANLINKDATA;
 
 extern void StartLink(u16);
 extern void StartGPLink(u16);
 extern void LinkUpdate(int);
 extern void CleanLocalLink();
-extern LANLINKDATA lanlink;
 extern int vbaid;
 extern int linktimeout;
 extern int linkid;
