@@ -29,6 +29,9 @@ const char *MakeInstanceFilename(const char *Input)
 #include "GBA.h"
 #include "GBALink.h"
 #include "GBASockClient.h"
+
+#include <SFML/Network.hpp>
+
 #ifdef ENABLE_NLS
 #include <libintl.h>
 #define _(x) gettext(x)
@@ -145,6 +148,27 @@ int WaitForSingleObject(sem_t *s, int t)
 #endif
 #endif
 
+#define UNSUPPORTED -1
+#define MULTIPLAYER 0
+#define NORMAL8 1
+#define NORMAL32 2
+#define UART 3
+#define JOYBUS 4
+#define GP 5
+
+#define RFU_INIT 0
+#define RFU_COMM 1
+#define RFU_SEND 2
+#define RFU_RECV 3
+
+enum
+{
+	JOY_CMD_RESET	= 0xff,
+	JOY_CMD_STATUS	= 0x00,
+	JOY_CMD_READ	= 0x14,
+	JOY_CMD_WRITE	= 0x15
+};
+
 #define UPDATE_REG(address, value) WRITE16LE(((u16 *)&ioMem[address]),value)
 
 typedef struct {
@@ -161,6 +185,15 @@ typedef struct {
 	u32 rfu_bdata[4][7];
 	u32 rfu_data[4][32];
 } LINKDATA;
+
+typedef struct {
+	sf::SocketTCP tcpsocket;
+	int numslaves;
+	int connectedSlaves;
+	int type;
+	bool server;
+	bool speed;
+} LANLINKDATA;
 
 class lserver{
 	int numbytes;
@@ -238,7 +271,7 @@ char linkevent[] =
 	"VBA link event  ";
 static int i, j;
 int linktimeout = 1000;
-LANLINKDATA lanlink;
+static LANLINKDATA lanlink;
 u16 linkdata[4];
 static lserver ls;
 static lclient lc;
@@ -295,7 +328,7 @@ void StartLink(u16 value)
 
 	switch (GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]))) {
 	case MULTIPLAYER: {
-		bool start = (value & 0x80) && !linkid && !transfer && GetLinkMode() != LINK_DISCONNECTED;
+		bool start = (value & 0x80) && !linkid && !transfer;
 		// clear start, seqno, si (RO on slave, start = pulse on master)
 		value &= 0xff4b;
 		// get current si.  This way, on slaves, it is low during xfer
@@ -322,7 +355,7 @@ void StartLink(u16 value)
 				after = false;
 				value &= ~0x40;
 			}
-			else if (linkmem->numgbas > 1)
+			else if (GetLinkMode() == LINK_CABLE_IPC && linkmem->numgbas > 1)
 			{
 				// find first active attached GBA
 				// doing this first reduces the potential
@@ -1273,6 +1306,15 @@ ConnectionState ConnectLinkUpdate(char * const message, size_t size)
 	}
 
 	return gba_connection_state;
+}
+
+void EnableLinkServer(bool enable, int numSlaves) {
+	lanlink.server = enable;
+	lanlink.numslaves = numSlaves;
+}
+
+void EnableSpeedHacks(bool enable) {
+	lanlink.speed = enable;
 }
 
 bool SetLinkServerHost(const char *host) {

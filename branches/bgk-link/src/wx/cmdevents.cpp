@@ -2124,6 +2124,14 @@ EVT_HANDLER(LinkConfigure, "Link options...")
     wxDialog *dlg = GetXRCDialog("LinkConfig");
     if (ShowModal(dlg) != wxID_OK)
         return;
+
+	bool valid = SetLinkServerHost(gopts.joybus_host.mb_str());
+	if (!valid) {
+		wxMessageBox(_("You must enter a valid host name"),
+			 _("Host name invalid"), wxICON_ERROR | wxOK);
+		return;
+	}
+
     update_opts();
     
     LinkMode oldLinkMode = GetLinkMode();
@@ -2131,7 +2139,6 @@ EVT_HANDLER(LinkConfigure, "Link options...")
     bool dolphinHostChanged = jh != gopts.joybus_host;
     
     if (newLinkMode != oldLinkMode || dolphinHostChanged) {
-    	SetLinkServerHost(gopts.joybus_host.mb_str());
         CloseLink();
         InitLink(newLinkMode);
     }

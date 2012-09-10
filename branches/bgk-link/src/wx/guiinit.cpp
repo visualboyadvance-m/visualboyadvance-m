@@ -50,7 +50,8 @@ static class NetLink_t : public wxEvtHandler
 public:
     wxDialog *dlg;
     int n_players;
-    NetLink_t() : n_players(2) {}
+    bool server;
+    NetLink_t() : n_players(2), server(false) {}
     wxButton *okb;
     void ServerOKButton(wxCommandEvent &ev)
     {
@@ -66,25 +67,34 @@ public:
 	static const int length = 256;
 	if(!dlg->Validate() || !dlg->TransferDataFromWindow())
 	    return;
+
+	if (!server) {
+		bool valid = SetLinkServerHost(gopts.link_host.mb_str());
+		if (!valid) {
+			wxMessageBox(_("You must enter a valid host name"),
+				 _("Host name invalid"), wxICON_ERROR | wxOK);
+			return;
+		}
+	}
+
 	update_opts(); // save fast flag and client host
 
-    // Close any previous link
+	// Close any previous link
 	CloseLink();
 
 	wxString connmsg;
 	wxString title;
 
-	if(lanlink.server) {
+	EnableSpeedHacks(gopts.lanlink_speed);
+	EnableLinkServer(server, n_players - 1);
+
+	if (server) {
 		char host[length];
 		GetLinkServerHost(host, length);
-
-		lanlink.numslaves = n_players - 1;
 
 		title.Printf(_("Waiting for clients..."));
 		connmsg.Printf(_("Server IP address is: %s\n"), wxString(host, wxConvLibc).c_str());
 	} else {
-		SetLinkServerHost(gopts.link_host.mb_str());
-
 		title.Printf(_("Waiting for connection..."));
 		connmsg.Printf(_("Connecting to %s\n"), gopts.link_host.c_str());
 	}
@@ -1357,45 +1367,6 @@ public:
     }
 } JoyPadConfigHandler[4];
 
-#ifndef NO_LINK
-// tc validator for IP addresses using SFML for validation instead of wx
-class IPHostValidator : public wxValidator
-{
-    wxString *valp;
-public:
-    IPHostValidator(wxString *v) : wxValidator(), valp(v) {}
-    IPHostValidator(const IPHostValidator &e) : wxValidator(), valp(e.valp) {}
-    wxObject *Clone() const { return new IPHostValidator(*this); }
-    bool Validate(wxWindow *p) {
-	wxTextCtrl *tc = wxStaticCast(GetWindow(), wxTextCtrl);
-	if(!tc->IsEnabled())
-	    return true;
-	wxString val = tc->GetValue();
-	bool isv = true;
-	if(val.empty())
-	    isv = false;
-	else {
-	    sf::IPAddress srv = std::string(val.mb_str());
-	    isv = srv.IsValid();
-	}
-	if(!isv)
-	    wxMessageBox(_("You must enter a valid host name"),
-			 _("Host name invalid"), wxICON_ERROR|wxOK);
-	return isv;
-    }
-    bool TransferToWindow() {
-	wxTextCtrl *tc = wxStaticCast(GetWindow(), wxTextCtrl);
-	tc->SetValue(*valp);
-	return true;
-    }
-    bool TransferFromWindow() {
-	wxTextCtrl *tc = wxStaticCast(GetWindow(), wxTextCtrl);
-	*valp = tc->GetValue();
-	return true;
-    }
-};
-#endif
-
 // manage fullscreen mode widget
 // technically, it's more than a validator: it modifies the widget as well
 class ScreenModeList : public wxValidator
@@ -2383,8 +2354,8 @@ bool MainFrame::InitMore(void)
 #ifndef NO_LINK
     {
 	net_link_handler.dlg = d;
-	getrbbe("Server", lanlink.server);
-	getrbbd("Client", lanlink.server);
+	getrbbe("Server", net_link_handler.server);
+	getrbbd("Client", net_link_handler.server);
 	getlab("PlayersLab");
 	addrber(lab, false);
 	getrbi("Link2P", net_link_handler.n_players, 2);
@@ -2397,9 +2368,8 @@ bool MainFrame::InitMore(void)
 	addrber(lab, true);
 	gettc("ServerIP", gopts.link_host);
 	addrber(tc, true);
-	tc->SetValidator(IPHostValidator(&gopts.link_host));
-	getrbbr("SpeedOff", lanlink.speed);
-	getrbb("SpeedOn", lanlink.speed);
+	getrbbr("SpeedOff", gopts.lanlink_speed);
+	getrbb("SpeedOn", gopts.lanlink_speed);
 	wxWindow *okb = d->FindWindow(wxID_OK);
 	if(okb) { // may be gone if style guidlines removed it
 	    net_link_handler.okb = wxStaticCast(okb, wxButton);
@@ -2995,7 +2965,6 @@ bool MainFrame::InitMore(void)
 	getlab("JoybusHostLab");
 	addbe(lab);
 	gettc("JoybusHost", gopts.joybus_host);
-	tc->SetValidator(IPHostValidator(&gopts.joybus_host));
 	addbe(tc);
 	getcbbe("Link", gopts.gba_link_enabled);
 	getcbb("RFU", gopts.rfu_enabled);
