@@ -95,7 +95,7 @@ void BIOSDialog::OnBnClickedSelectGbcBiosPath()
 		NULL,
 		current,
 		OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST,
-		_T("BIOS Files (*.bin;*.cgb;*.gbc)|*.bin;*.cgb;*.gbc|All Files (*.*)|*.*||"),
+		_T("BIOS Files (*.bin;*.rom)|*.bin;*.rom|All Files (*.*)|*.*||"),
 		this,
 		0 );
 
