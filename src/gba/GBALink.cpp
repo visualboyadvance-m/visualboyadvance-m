@@ -4,6 +4,10 @@
 #include <malloc.h>
 #include <stdio.h>
 
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif
+
 int vbaid = 0;
 const char *MakeInstanceFilename(const char *Input)
 {
@@ -1208,11 +1212,10 @@ ConnectionState InitLink(LinkMode mode)
 		}
 	}
 
-	// No errors, save the link mode
-	if (gba_connection_state != LINK_ERROR) {
-		gba_link_mode = mode;
-	} else {
-		gba_link_mode = LINK_DISCONNECTED;
+	// Save the link mode
+	gba_link_mode = mode;
+	if (gba_connection_state == LINK_ERROR) {
+		CloseLink();
 	}
 		
 	return gba_connection_state;
@@ -1382,6 +1385,7 @@ void CloseLink(void){
 				ls.tcpsocket[i].Close();
 			}
 		}
+		lanlink.tcpsocket.Close();
 	}
 
 	if (gba_link_mode == LINK_CABLE_IPC || gba_link_mode == LINK_RFU_IPC) {

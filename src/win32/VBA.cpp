@@ -475,9 +475,6 @@ BOOL VBA::InitInstance()
 
   loadSettings();
 
-  if(!InitLink((LinkMode) linkMode))
-	return FALSE;
-
   if(!initDisplay()) {
     if(videoOption >= VIDEO_320x240) {
       regSetDwordValue("video", VIDEO_2X);
@@ -1257,8 +1254,8 @@ BOOL VBA::OnIdle(LONG lCount)
       emulator.emuMain(emulator.emuCount);
 
 #ifndef NO_LINK
-      if (lanlink.connected && linkid && lc.numtransfers == 0)
-		  lc.CheckConn();
+	if (GetLinkMode() != LINK_DISCONNECTED)
+		CheckLinkConnection();
 #endif
 
       if(rewindSaveNeeded && rewindMemory && emulator.emuWriteMemState) {
@@ -1628,11 +1625,7 @@ void VBA::loadSettings()
 
   linkMode = regQueryDwordValue("LinkMode", LINK_DISCONNECTED);
 
-  buffer = regQueryStringValue("joybusHostAddr", "");
-
-  if(!buffer.IsEmpty()) {
-	  joybusHostAddr = std::string(buffer);
-  }
+  linkHost = regQueryStringValue("LinkHostAddr", "localhost");
 
 #endif
 
@@ -2561,8 +2554,8 @@ void VBA::saveSettings()
 
 #ifndef NO_LINK
   regSetDwordValue("LinkTimeout", linktimeout);
-  regSetDwordValue("LinkMode", GetLinkMode());
-  regSetStringValue("joybusHostAddr", joybusHostAddr.ToString().c_str());
+  regSetDwordValue("LinkMode", linkMode);
+  regSetStringValue("LinkHostAddr", linkHost);
 #endif
 
   regSetDwordValue("lastFullscreen", lastFullscreen);
