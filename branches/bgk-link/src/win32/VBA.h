@@ -204,6 +204,7 @@ class VBA : public CWinApp
   CString wndClass;
 
   int linkMode;
+  CString linkHost;
 
  public:
   VBA();

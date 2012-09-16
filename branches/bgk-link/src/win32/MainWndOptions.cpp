@@ -7,7 +7,6 @@
 #include "FileDlg.h"
 #include "GameOverrides.h"
 #include "LinkOptions.h"
-#include "JoybusOptions.h"
 #include "GBColorDlg.h"
 #include "Joypad.h"
 #include "MaxScale.h"
@@ -1555,14 +1554,8 @@ void MainWnd::OnLinkOptions()
 	dlg.DoModal();
 }
 
-void MainWnd::OnOptionsJoybus()
-{
-	JoybusOptions dlg;
-	dlg.DoModal();
-}
 #else
 void MainWnd::OnLinkOptions() { }
-void MainWnd::OnOptionsJoybus() { }
 #endif
 
 void MainWnd::OnOptionsEmulatorGameoverrides()
