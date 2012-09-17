@@ -100,9 +100,41 @@ extern void CloseLink();
 /**
  * Get the id of the player of this VBA instance
  *
- * @return id. -1 means disconnected, 0 means master, > 0 means slave
+ * @return id -1 means disconnected, 0 means master, > 0 means slave
  */
 extern int GetLinkPlayerId();
+
+/**
+ * Start a link transfer
+ *
+ * @param siocnt the value of SIOCNT to be written
+ */
+extern void StartLink(u16 siocnt);
+
+/**
+ * Start a general purpose link transfer
+ *
+ * @param rcnt the value of RCNT to be written
+ */
+extern void StartGPLink(u16 rcnt);
+
+/**
+ * Emulate the linked device
+ */
+extern void LinkUpdate(int);
+
+/**
+ * Clean up IPC shared memory
+ */
+extern void CleanLocalLink();
+
+/**
+ * Append the current VBA ID to a filemane
+ *
+ * @param Input filename to complete
+ * @return completed filename
+ */
+extern const char *MakeInstanceFilename(const char *Input);
 
 // register definitions
 #define COMM_SIODATA32_L	0x120
@@ -129,28 +161,5 @@ extern int GetLinkPlayerId();
 #define JOYCNT_RECV_COMPLETE	2
 #define JOYCNT_SEND_COMPLETE	4
 #define JOYCNT_INT_ENABLE		0x40
-
-
-
-extern const char *MakeInstanceFilename(const char *Input);
-
-#ifndef NO_LINK
-// Link implementation
-
-extern void StartLink(u16);
-extern void StartGPLink(u16);
-extern void LinkUpdate(int);
-extern void CleanLocalLink();
-
-#else
-
-// stubs to keep #ifdef's out of mainline
-inline bool InitLink() { return true; }
-inline void CloseLink() { }
-inline void StartLink(u16) { }
-inline void StartGPLink(u16) { }
-inline void LinkUpdate(int) { }
-inline void CleanLocalLink() { }
-#endif
 
 #endif /* GBA_GBALINK_H */
