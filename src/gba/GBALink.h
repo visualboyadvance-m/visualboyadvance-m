@@ -80,6 +80,14 @@ extern bool SetLinkServerHost(const char *host);
 extern void GetLinkServerHost(char * const host, size_t size);
 
 /**
+ * Set the value in milliseconds of the timeout after which a connection is
+ * deemed lost.
+ *
+ * @param value timeout
+ */
+extern void SetLinkTimeout(int value);
+
+/**
  * Verify that the link between the emulators is still active
  */
 extern void CheckLinkConnection();
@@ -88,6 +96,13 @@ extern void CheckLinkConnection();
  * Set the current link mode to LINK_DISCONNECTED
  */
 extern void CloseLink();
+
+/**
+ * Get the id of the player of this VBA instance
+ *
+ * @return id. -1 means disconnected, 0 means master, > 0 means slave
+ */
+extern int GetLinkPlayerId();
 
 // register definitions
 #define COMM_SIODATA32_L	0x120
@@ -126,9 +141,6 @@ extern void StartLink(u16);
 extern void StartGPLink(u16);
 extern void LinkUpdate(int);
 extern void CleanLocalLink();
-extern int vbaid;
-extern int linktimeout;
-extern int linkid;
 
 #else
 

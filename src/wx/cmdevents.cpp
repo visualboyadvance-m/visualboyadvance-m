@@ -2134,6 +2134,8 @@ EVT_HANDLER(LinkConfigure, "Link options...")
 
     update_opts();
     
+    SetLinkTimeout(gopts.linktimeout);
+
     LinkMode oldLinkMode = GetLinkMode();
     LinkMode newLinkMode = getOptionsLinkMode();
     bool dolphinHostChanged = jh != gopts.joybus_host;
