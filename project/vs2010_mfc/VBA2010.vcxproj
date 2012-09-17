@@ -201,7 +201,6 @@
     <ClInclude Include="..\..\src\common\SoundDriver.h" />
     <ClInclude Include="..\..\src\gba\gbalink.h" />
     <ClInclude Include="..\..\src\gba\GBASockClient.h" />
-    <ClInclude Include="..\..\src\win32\JoybusOptions.h" />
     <ClInclude Include="..\..\src\win32\LinkOptions.h" />
     <ClInclude Include="..\..\src\win32\stdafx.h" />
     <ClInclude Include="..\..\src\win32\targetver.h" />
@@ -347,7 +346,6 @@
     <ClCompile Include="..\..\src\gba\GBASockClient.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\..\src\win32\JoybusOptions.cpp" />
     <ClCompile Include="..\..\src\win32\LinkOptions.cpp" />
     <ClCompile Include="..\..\src\win32\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
