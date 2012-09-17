@@ -8,7 +8,7 @@
 #define snprintf _snprintf
 #endif
 
-int vbaid = 0;
+static int vbaid = 0;
 const char *MakeInstanceFilename(const char *Input)
 {
 	if (vbaid == 0)
@@ -256,7 +256,7 @@ static sf::IPAddress joybusHostAddr = sf::IPAddress::LocalHost;
 u8 tspeed = 3;
 u8 transfer = 0;
 static LINKDATA *linkmem = NULL;
-int linkid = 0;
+static int linkid = 0;
 #if (defined __WIN32__ || defined _WIN32)
 HANDLE linksync[4];
 #else
@@ -274,7 +274,7 @@ char linkevent[] =
 #endif
 	"VBA link event  ";
 static int i, j;
-int linktimeout = 1000;
+static int linktimeout = 1000;
 static LANLINKDATA lanlink;
 u16 linkdata[4];
 static lserver ls;
@@ -1341,6 +1341,20 @@ void GetLinkServerHost(char * const host, size_t size) {
 		strncpy(host, sf::IPAddress::GetLocalAddress().ToString().c_str(), size);
 	else
 		strncpy(host, lc.serveraddr.ToString().c_str(), size);
+}
+
+void SetLinkTimeout(int value) {
+	linktimeout = value;
+}
+
+int GetLinkPlayerId() {
+	if (GetLinkMode() == LINK_DISCONNECTED) {
+		return -1;
+	} else if (linkid > 0) {
+		return linkid;
+	} else {
+		return vbaid;
+	}
 }
 
 static void ReInitLink()

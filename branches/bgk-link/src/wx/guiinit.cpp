@@ -85,6 +85,7 @@ public:
 	wxString connmsg;
 	wxString title;
 
+	SetLinkTimeout(gopts.linktimeout);
 	EnableSpeedHacks(gopts.lanlink_speed);
 	EnableLinkServer(server, n_players - 1);
 
@@ -2971,7 +2972,7 @@ bool MainFrame::InitMore(void)
 	addbe(cb);
 	getlab("LinkTimeoutLab");
 	addbe(lab);
-	getsc("LinkTimeout", linktimeout);
+	getsc("LinkTimeout", gopts.linktimeout);
 	addbe(sc);
     }
 #endif
