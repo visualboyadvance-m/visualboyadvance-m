@@ -1621,7 +1621,7 @@ void VBA::loadSettings()
   updateThrottle( (unsigned short)regQueryDwordValue( "throttle", 0 ) );
 
 #ifndef NO_LINK
-  linktimeout = regQueryDwordValue("LinkTimeout", 1000);
+  linkTimeout = regQueryDwordValue("LinkTimeout", 1000);
 
   linkMode = regQueryDwordValue("LinkMode", LINK_DISCONNECTED);
 
@@ -2553,7 +2553,7 @@ void VBA::saveSettings()
   regSetDwordValue("saveMoreCPU", Sm60FPS::bSaveMoreCPU);
 
 #ifndef NO_LINK
-  regSetDwordValue("LinkTimeout", linktimeout);
+  regSetDwordValue("LinkTimeout", linkTimeout);
   regSetDwordValue("LinkMode", linkMode);
   regSetStringValue("LinkHostAddr", linkHost);
 #endif

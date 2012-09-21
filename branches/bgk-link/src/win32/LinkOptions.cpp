@@ -74,7 +74,7 @@ BOOL LinkOptions::OnInitDialog(){
 	AddMode("GameCube - Dolphin", LINK_GAMECUBE_DOLPHIN);
 	AddMode("Wireless adapter - Single Computer", LINK_RFU_IPC);
 
-	sprintf(timeout, "%d", linktimeout);
+	sprintf(timeout, "%d", theApp.linkTimeout);
 
 	m_timeout.LimitText(5);
 	m_timeout.SetWindowText(timeout);
@@ -115,7 +115,8 @@ void LinkOptions::AddMode(LPCTSTR name, int value) {
 void LinkOptions::OnOk()
 {
 	static const int length = 256; 
-	CString timeout;
+	int timeout;
+	CString timeoutStr;
 	CString host;
 	CString title;
 	CString addressMessage;
@@ -126,8 +127,9 @@ void LinkOptions::OnOk()
 	CloseLink();
 
 	m_serverip.GetWindowText(host);
-	m_timeout.GetWindowText(timeout);
-	sscanf(timeout, "%d", &linktimeout);
+	m_timeout.GetWindowText(timeoutStr);
+	sscanf(timeoutStr, "%d", &timeout);
+	SetLinkTimeout(timeout);
 
 	LinkMode newMode = (LinkMode) m_type;
 	bool needsServerHost = newMode == LINK_GAMECUBE_DOLPHIN || (newMode == LINK_CABLE_SOCKET && !m_server);
@@ -206,6 +208,7 @@ void LinkOptions::OnOk()
 		return;
 	}
 
+	theApp.linkTimeout = timeout;
 	theApp.linkMode = GetLinkMode();
 	theApp.linkHost = host;
 
