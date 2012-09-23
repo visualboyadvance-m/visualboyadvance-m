@@ -6,9 +6,10 @@
 class GBASockClient
 {
 public:
-	GBASockClient(sf::IPAddress server_addr);
+	GBASockClient();
 	~GBASockClient();
 
+	bool Connect(sf::IPAddress server_addr);
 	void Send(std::vector<char> data);
 	char ReceiveCmd(char* data_in);
 

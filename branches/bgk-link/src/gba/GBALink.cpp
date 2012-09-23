@@ -451,12 +451,20 @@ void StartGPLink(u16 value)
 	}
 }
 
-static void JoyBusConnect()
+static ConnectionState JoyBusConnect()
 {
 	delete dol;
 	dol = NULL;
 
-	dol = new GBASockClient(joybusHostAddr);
+	dol = new GBASockClient();
+	bool connected = dol->Connect(joybusHostAddr);
+
+	if (connected) {
+		return LINK_OK;
+	} else {
+		systemMessage(0, N_("Error, could not connect to Dolphin"));
+		return LINK_ERROR;
+	}
 }
 
 static void JoyBusShutdown()
@@ -1171,10 +1179,10 @@ ConnectionState InitLink(LinkMode mode)
 
 	gba_connection_state = LINK_OK;
 
-    if (mode == LINK_GAMECUBE_DOLPHIN) {
-        JoyBusConnect();
-    } else if (mode == LINK_CABLE_IPC || mode == LINK_RFU_IPC) {
-    	gba_connection_state = InitIPC();
+	if (mode == LINK_GAMECUBE_DOLPHIN) {
+		gba_connection_state = JoyBusConnect();
+	} else if (mode == LINK_CABLE_IPC || mode == LINK_RFU_IPC) {
+		gba_connection_state = InitIPC();
 	} else if (mode == LINK_CABLE_SOCKET) {
 		linkid = 0;
 
