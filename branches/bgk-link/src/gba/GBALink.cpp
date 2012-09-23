@@ -247,28 +247,28 @@ LinkMode GetLinkMode() {
 		return LINK_DISCONNECTED;
 }
 
-int linktime = 0;
+static int linktime = 0;
 
-GBASockClient* dol = NULL;
+static GBASockClient* dol = NULL;
 static sf::IPAddress joybusHostAddr = sf::IPAddress::LocalHost;
 
 // Hodgepodge
-u8 tspeed = 3;
-u8 transfer = 0;
+static u8 tspeed = 3;
+static u8 transfer = 0;
 static LINKDATA *linkmem = NULL;
 static int linkid = 0;
 #if (defined __WIN32__ || defined _WIN32)
-HANDLE linksync[4];
+static HANDLE linksync[4];
 #else
-sem_t *linksync[4];
+static sem_t *linksync[4];
 #endif
-int savedlinktime = 0;
+static int savedlinktime = 0;
 #if (defined __WIN32__ || defined _WIN32)
-HANDLE mmf = NULL;
+static HANDLE mmf = NULL;
 #else
-int mmf = -1;
+static int mmf = -1;
 #endif
-char linkevent[] =
+static char linkevent[] =
 #if !(defined __WIN32__ || defined _WIN32)
 	"/"
 #endif
@@ -276,25 +276,25 @@ char linkevent[] =
 static int i, j;
 static int linktimeout = 1000;
 static LANLINKDATA lanlink;
-u16 linkdata[4];
+static u16 linkdata[4];
 static lserver ls;
 static lclient lc;
-bool oncewait = false, after = false;
+static bool oncewait = false, after = false;
 
 // RFU crap (except for numtransfers note...should probably check that out)
-u8 rfu_cmd, rfu_qsend, rfu_qrecv;
-int rfu_state, rfu_polarity, rfu_counter, rfu_masterq;
+static u8 rfu_cmd, rfu_qsend, rfu_qrecv;
+static int rfu_state, rfu_polarity, rfu_counter, rfu_masterq;
 // numtransfers seems to be used interchangeably with linkmem->numtransfers
 // in rfu code; probably a bug?
-int rfu_transfer_end;
+static int rfu_transfer_end;
 // in local comm, setting this keeps slaves from trying to communicate even
 // when master isn't
-u16 numtransfers = 0;
-u32 rfu_masterdata[32];
+static u16 numtransfers = 0;
+static u32 rfu_masterdata[32];
 
 // time to end of single GBA's transfer, in 16.78 MHz clock ticks
 // first index is GBA #
-int trtimedata[4][4] = {
+static const int trtimedata[4][4] = {
       // 9600 38400 57600 115200
 	{34080, 8520, 5680, 2840},
 	{65536, 16384, 10923, 5461},
@@ -307,18 +307,16 @@ int trtimedata[4][4] = {
 // for < 3 slaves, this is time to transfer last machine + time to detect lack
 // of start bit from next slave
 // first index is (# of slaves) - 1
-int trtimeend[3][4] = {
+static const int trtimeend[3][4] = {
       // 9600 38400 57600 115200
 	{72527, 18132, 12088, 6044},
 	{106608, 26652, 17768, 8884},
 	{133692, 33423, 22282, 11141}
 };
 
-int gbtime = 1024;
+static int GetSIOMode(u16, u16);
 
-int GetSIOMode(u16, u16);
-
-u16 StartRFU(u16);
+static u16 StartRFU(u16);
 
 void StartLink(u16 value)
 {
@@ -764,7 +762,7 @@ void LinkUpdate(int ticks)
 	return;
 }
 
-inline int GetSIOMode(u16 siocnt, u16 rcnt)
+inline static int GetSIOMode(u16 siocnt, u16 rcnt)
 {
 	if (!(rcnt & 0x8000))
 	{
@@ -784,7 +782,7 @@ inline int GetSIOMode(u16 siocnt, u16 rcnt)
 
 // The GBA wireless RFU (see adapter3.txt)
 // Just try to avert your eyes for now ^^ (note, it currently can be called, tho)
-u16 StartRFU(u16 value)
+static u16 StartRFU(u16 value)
 {
 	switch (GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]))) {
 	case NORMAL8:
