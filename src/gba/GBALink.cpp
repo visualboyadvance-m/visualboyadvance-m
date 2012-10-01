@@ -1297,7 +1297,7 @@ ConnectionState InitLink(LinkMode mode)
 
 	// Find the link driver
 	linkDriver = NULL;
-	for (uint i = 0; i < sizeof(linkDrivers) / sizeof(linkDrivers[0]); i++) {
+	for (u8 i = 0; i < sizeof(linkDrivers) / sizeof(linkDrivers[0]); i++) {
 		if (linkDrivers[i].mode == mode) {
 			linkDriver = &linkDrivers[i];
 			break;
