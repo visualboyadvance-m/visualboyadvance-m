@@ -14,6 +14,8 @@
 #include "gbSGB.h"
 #include "gbSound.h"
 #include "../Util.h"
+#include "../gba/GBALink.h"
+//#include "../gba/Globals.h"
 
 #ifdef __GNUC__
 #define _stricmp strcasecmp
@@ -790,16 +792,81 @@ void  gbWriteMemory(register u16 address, register u8 value)
     }
 
     case 0x01: {
+	  #ifdef GBA_LOGGING
+		if(gbMemory[0xff01]!=value)
+		if(systemVerbose & VERBOSE_SIO) {
+			log("SioSB(%04X) : %02X  %02X->%02X  %d\n", PC.W-2, gbMemory[0xff02], gbMemory[0xff01], value, GetTickCount() ); //register_LY
+		}
+	  #endif
       gbMemory[0xff01] = value;
+	  //if(value==0xff/*0x00*/) LinkFirstTime = true;
       return;
     }
 
     // serial control
     case 0x02: {
+	  #ifdef GBA_LOGGING
+		if(gbMemory[0xff02]!=value)
+		if(systemVerbose & VERBOSE_SIO) {
+			log("SioSC(%04X) : %02X->%02X  %02X  %d\n", PC.W-2, gbMemory[0xff02], value, gbMemory[0xff01], GetTickCount() ); //register_LY
+		}
+	  #endif
       gbSerialOn = (value & 0x80);
+	  //if(gba_link_enabled && lanlink.connected)
+	  if( EmuReseted ||(gbMemory[0xff02] & 0x7c)||(value & 0x7c)||(!(value & 0x81)) ) { //trying to detect whether the game has exited multiplay mode, pokemon blue start w/ 0x7e while pocket racing start w/ 0x7c 
+		  LinkFirstTime = true;
+		  if( EmuReseted ||(gbMemory[0xff02] & 0x7c)||(value & 0x7c) )
+		  if(lanlink.connected)
+		  if(linkid) lc.DiscardData();
+		  else ls.DiscardData(1);
+	  }
+	  EmuReseted = false;
       gbMemory[0xff02] = value;
       if(gbSerialOn) {
         gbSerialTicks = GBSERIAL_CLOCK_TICKS;
+
+		LinkIsWaiting = true;
+
+		//Do data exchange, master initiate the transfer
+		//may cause visual artifact if not processed immediately, is it due to IRQ stuff or invalid data being exchanged?
+	    if( (value & 1) /*|| (!LinkFirstTime)*/ ) { //&& !linkid //internal clock
+			if(gbSerialFunction) {
+				gbSIO_SC = value;
+				LogStrPush("gbWrite");
+				//if(linkid /*&& (value & 1)*/) {gbMemory[0xff01] = 0xff; LinkFirstTime = true;} else
+				gbMemory[0xff01] = gbSerialFunction(gbMemory[0xff01]); //gbSerialFunction/gbStartLink/gbPrinter
+				LogStrPop(7);
+			} else gbMemory[0xff01]=0xff;
+			//gbSerialTicks = GBSERIAL_CLOCK_TICKS; //1; //0; //wrong value in gbSerialTicks could cause visual artifact
+			gbMemory[0xff02] &= 0x7f;
+			gbSerialOn = 0;
+			//if(register_IE & 8)
+			gbMemory[0xff0f] = register_IF |= 8;
+			//gbSerialBits  = 0;
+			//LinkFirstTime = false;
+			//if(!(value & 1)) LinkFirstTime = true;
+	    } /*else //external clock
+		{
+			u16 dat = 0;
+			//if(gbSerialFunction) 
+			{
+				gbSIO_SC = value;
+				LogStrPush("gbWrite");
+				dat = gbLinkUpdate(gbMemory[0xff01]);
+				gbMemory[0xff01] = (dat >> 8); //gbSerialFunction/gbStartLink/gbPrinter
+				LogStrPop(7);
+			}
+			if(dat & 1) {
+			//gbSerialTicks = GBSERIAL_CLOCK_TICKS; //1; //0; //wrong value in gbSerialTicks could cause visual artifact
+			gbMemory[0xff02] &= 0x7f;
+			gbSerialOn = 0;
+			//if(register_IE & 8)
+			gbMemory[0xff0f] = register_IF |= 8;
+			//gbSerialBits  = 0;
+			//LinkFirstTime = false;
+			//if(!(value & 1)) LinkFirstTime = true;
+			}
+		}*/
 #ifdef OLD_GB_LINK
         if(linkConnected) {
           if(value & 1) {
@@ -2174,6 +2241,8 @@ void gbGetHardwareType()
 
 void gbReset()
 {
+  EmuReseted = true;
+  LinkFirstTime = true;
   gbGetHardwareType();
 
   oldRegister_WY = 146;
@@ -4487,6 +4556,8 @@ void gbDrawLine()
 
 void gbEmulate(int ticksToStop)
 {
+  if(EmuCtr>0) {log("Emu inside Emu:%d\n",EmuCtr);return;}
+
   gbRegister tempRegister;
   u8 tempValue;
   s8 offset;
@@ -4916,8 +4987,9 @@ void gbEmulate(int ticksToStop)
                 gbFrameCount++;
                 systemFrame();
 
-                if((gbFrameCount % 10) == 0)
-                  system10Frames(60);
+                /*if((gbFrameCount % 10) == 0)
+                  system10Frames(60);*/
+				system1Frames(60, gbFrameCount);
 
                 if(gbFrameCount >= 60) {
                   u32 currentTime = systemGetClock();
@@ -5186,8 +5258,9 @@ void gbEmulate(int ticksToStop)
 
             systemFrame();
 
-            if((gbFrameCount % 10) == 0)
-              system10Frames(60);
+            /*if((gbFrameCount % 10) == 0)
+              system10Frames(60);*/
+			system1Frames(60, gbFrameCount);
 
             if(gbFrameCount >= 60) {
               u32 currentTime = systemGetClock();
@@ -5206,7 +5279,33 @@ void gbEmulate(int ticksToStop)
     gbMemory[0xff41] = register_STAT;
 
     // serial emulation
-    if(gbSerialOn) {
+	gbSerialOn = (gbMemory[0xff02] & 0x80);
+	/*if(gba_link_enabled && lanlink.connected && (register_LY>=144)) {
+		//if(gbSerialOn) 
+		{
+		u16 dat = 0;
+		if(gbSerialFunction) { // external device
+			gbSIO_SC = gbMemory[0xff02];
+			LogStrPush("gbEmu");
+			if(!LinkFirstTime) dat = (gbSerialFunction(gbMemory[0xff01]) << 8) | 1; else
+			dat = gbLinkUpdate(gbMemory[0xff01]);
+            gbMemory[0xff01] = (dat >> 8);
+			LogStrPop(5);
+			if(gbSerialOn && (dat & 1)) {
+				gbMemory[0xff02] &= 0x7f;
+				gbSerialOn = 0;
+				//if(register_IE & 8)
+				gbMemory[0xff0f] = register_IF |= 8;
+			}
+		} //else gbMemory[0xff01] = 0xff;
+		}
+		gbSerialTicks = 1; //GBSERIAL_CLOCK_TICKS; //0; //seems to cause varies visual artifact if gbSerialTicks value isn't right
+        gbSerialBits  = 0;
+	}*/
+	static int SIOctr = 0;
+	SIOctr++;
+	if(!lanlink.speed || (SIOctr % 5))
+    if(gbSerialOn) { //Transfer Started
 #ifdef OLD_GB_LINK
       if(linkConnected) {
         gbSerialTicks -= clockTicks;
@@ -5229,7 +5328,7 @@ void gbEmulate(int ticksToStop)
         }
       } else {
 #endif
-        if(gbMemory[0xff02] & 1) {
+        if(gbMemory[0xff02] & 1) { //internal clocks (master)
           gbSerialTicks -= clockTicks;
 
           // overflow
@@ -5238,21 +5337,66 @@ void gbEmulate(int ticksToStop)
             //      gbMemory[0xff01] = 0x80 | (gbMemory[0xff01]>>1);
             // increment number of shifted bits
             gbSerialBits++;
-            if(gbSerialBits == 8) {
+            if(gbSerialBits >= 8) {
               // end of transmission
-              if(gbSerialFunction) // external device
-                gbMemory[0xff01] = gbSerialFunction(gbMemory[0xff01]);
-              else
-                gbMemory[0xff01] = 0xff;
-              gbSerialTicks = 0;
+              /*if(gbSerialFunction) { // external device
+				gbSIO_SC = gbMemory[0xff02];
+				LogStrPush("gbEmu");
+                gbMemory[0xff01] = gbSerialFunction(gbMemory[0xff01]); //gbStartLik/gbPrinter
+				LogStrPop(5);
+				LinkFirstTime = false;
+			  } else
+                gbMemory[0xff01] = 0xff;*/
+			  gbSerialTicks = 0;
+			  //if(!linkid) 
+			  /*{
               gbMemory[0xff02] &= 0x7f;
               gbSerialOn = 0;
               gbMemory[0xff0f] = register_IF |= 8;
+			  }*/
               gbSerialBits  = 0;
             } else
               gbSerialTicks += GBSERIAL_CLOCK_TICKS;
           }
-        }
+        } else //external clocks (slave)
+		{
+			gbSerialTicks -= clockTicks;
+
+          // overflow
+          while(gbSerialTicks <= 0) {
+            // shift serial byte to right and put a 1 bit in its place
+            //      gbMemory[0xff01] = 0x80 | (gbMemory[0xff01]>>1);
+            // increment number of shifted bits
+            gbSerialBits++;
+            if(gbSerialBits >= 8) {
+              // end of transmission
+			  u16 dat = 0;
+			  if(!LinkIsWaiting) {
+				if(lanlink.connected)
+				if(linkid) lc.DiscardData();
+				else ls.DiscardData(1);
+			  } else
+              if(gbSerialFunction) { // external device
+				gbSIO_SC = gbMemory[0xff02];
+				LogStrPush("gbEmu");
+				if(!LinkFirstTime) dat = (gbSerialFunction(gbMemory[0xff01]) << 8) | 1; else //external clock not suppose to start a transfer, but there are time where both side using external clock and couldn't communicate properly
+				dat = gbLinkUpdate(gbMemory[0xff01]);
+                gbMemory[0xff01] = (dat >> 8);
+				LogStrPop(5);
+			  } //else 
+                //gbMemory[0xff01] = 0xff;
+			  gbSerialTicks = 0;
+			  if(dat & 1) //if(linkid) 
+			  {
+				gbMemory[0xff02] &= 0x7f;
+				gbSerialOn = 0;
+				gbMemory[0xff0f] = register_IF |= 8;
+			  }
+              gbSerialBits  = 0;
+            } else
+              gbSerialTicks += GBSERIAL_CLOCK_TICKS;
+		  }
+		}
 #ifdef OLD_GB_LINK
       }
 #endif

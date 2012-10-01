@@ -22,13 +22,17 @@ class Disassemble : public ResizeDlg, IUpdateListener
   void refresh();
   int count;
   bool autoUpdate;
+  //bool breakpt;
+  bool autostep;
   u32 address;
+  //u32 breakaddr;
   Disassemble(CWnd* pParent = NULL);   // standard constructor
 
   // Dialog Data
   //{{AFX_DATA(Disassemble)
   enum { IDD = IDD_DISASSEMBLE };
   CEdit  m_address;
+  CEdit  m_address2;
   CListBox  m_list;
   BOOL  m_c;
   BOOL  m_f;
@@ -37,6 +41,8 @@ class Disassemble : public ResizeDlg, IUpdateListener
   BOOL  m_t;
   BOOL  m_v;
   BOOL  m_z;
+  BOOL  m_breakpt;
+  BOOL  m_autostep;
   int    mode;
   //}}AFX_DATA
 
@@ -67,7 +73,10 @@ class Disassemble : public ResizeDlg, IUpdateListener
   afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
   //}}AFX_MSG
   DECLARE_MESSAGE_MAP()
-    };
+public:
+	afx_msg void OnBnClickedBreakAt();
+	afx_msg void OnBnClickedStepinto();
+};
 
     //{{AFX_INSERT_LOCATION}}
     // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

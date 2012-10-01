@@ -149,6 +149,9 @@ void winOutput(const char *, u32);
 void (*dbgSignal)(int,int) = winSignal;
 void (*dbgOutput)(const char *, u32) = winOutput;
 
+int lastSA = 0;
+int lastSR = 0;
+
 #ifdef MMX
 extern "C" bool cpu_mmx;
 #endif
@@ -156,7 +159,7 @@ extern "C" bool cpu_mmx;
 namespace Sm60FPS
 {
   float					K_fCpuSpeed = 100.0f; // was 98.0f before, but why?
-  float					K_fTargetFps = 60.0f * K_fCpuSpeed / 100;
+  float					K_fTargetFps = 60.0f * K_fCpuSpeed / 100.0f;
   float					K_fDT = 1000.0f / K_fTargetFps;
 
   u32					dwTimeElapse;
@@ -167,6 +170,7 @@ namespace Sm60FPS
   float					fCurFPS;
   bool					bLastSkip;
   int					nCurSpeed;
+  float					nPrvSpeed;
   int					bSaveMoreCPU;
 };
 
@@ -336,8 +340,21 @@ VBA::VBA()
   }
 }
 
+CString DataHex(const char *buf, int len) {
+	CString dat = _T("");
+	if(buf!=NULL && len>0) {
+		for(int i=0; i<len; i++) {
+			dat.AppendFormat(_T("%02X "), (byte)buf[i]);
+		}
+	}
+	return dat;
+}
+
 VBA::~VBA()
 {
+  c_s.Lock();
+  AppTerminated = true;
+  c_s.Unlock();
   rpiCleanup();
   InterframeCleanup();
 
@@ -351,6 +368,8 @@ VBA::~VBA()
   regInit(winBuffer);
 
   JoyBusShutdown();
+
+  CloseLink(); //AdamN: closing connections gracefully
 
   saveSettings();
 
@@ -422,6 +441,8 @@ BOOL VBA::InitInstance()
 #endif
 #endif
 
+  //SetProcessAffinityMask(GetCurrentProcess(), 1); //AdamN: using only 1 CPU for all threads in this process for testing if there were bug caused by deadlock
+
   SetRegistryKey(_T("VBA"));
 
   remoteSetProtocol(0);
@@ -447,6 +468,7 @@ BOOL VBA::InitInstance()
 
   if(!InitLink())
 	return FALSE;
+  lanlink.mode = NORMAL8;
 
   bool force = false;
 
@@ -839,18 +861,21 @@ void VBA::updateFilter()
 
 void VBA::updateThrottle( unsigned short throttle )
 {
+	//if(throttle>100 && synchronize) throttle = 100; //max speed when audio sync enabled is 100%
+
 	this->throttle = throttle;
 
 	if( throttle ) {
 		Sm60FPS::K_fCpuSpeed = (float)throttle;
 		Sm60FPS::K_fTargetFps = 60.0f * Sm60FPS::K_fCpuSpeed / 100;
 		Sm60FPS::K_fDT = 1000.0f / Sm60FPS::K_fTargetFps;
-		autoFrameSkip = false;
+		/*autoFrameSkip = true;
 		frameSkip = 0;
-		systemFrameSkip = 0;
+		gbFrameSkip = 0;
+		systemFrameSkip = 0;*/
 	}
 
-	soundSetThrottle(throttle);
+	soundSetThrottle(throttle); //AdamN: only XAudio2 that have this feature? (added for OpenAL)
 }
 
 
@@ -1065,20 +1090,109 @@ void systemFrame()
 
 void system10Frames(int rate)
 {
-
 	if( theApp.autoFrameSkip )
 	{
 		u32 time = systemGetClock();
 		u32 diff = time - theApp.autoFrameSkipLastTime;
-		theApp.autoFrameSkipLastTime = time;
 		if( diff ) {
 			// countermeasure against div/0 when debugging
+			theApp.autoFrameSkipLastTime = time;
 			Sm60FPS::nCurSpeed = (1000000/rate)/diff;
 		} else {
 			Sm60FPS::nCurSpeed = 100;
 		}
 	}
 
+
+  if(theApp.rewindMemory) {
+    if(++theApp.rewindCounter >= (theApp.rewindTimer)) {
+      theApp.rewindSaveNeeded = true;
+      theApp.rewindCounter = 0;
+    }
+  }
+  if(systemSaveUpdateCounter) {
+    if(--systemSaveUpdateCounter <= SYSTEM_SAVE_NOT_UPDATED) {
+      ((MainWnd *)theApp.m_pMainWnd)->writeBatteryFile();
+      systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
+    }
+  }
+
+  theApp.wasPaused = false;
+
+//  Old autoframeskip crap... might be useful later. autoframeskip Ifdef above might be useless as well now
+//  theApp.autoFrameSkipLastTime = time;
+
+#ifdef LOG_PERFORMANCE
+  if( systemSpeedCounter >= PERFORMANCE_INTERVAL ) {
+	  // log performance every PERFORMANCE_INTERVAL frames
+	  float a = 0.0f;
+	  for( unsigned short i = 0 ; i < PERFORMANCE_INTERVAL ; i++ ) {
+		  a += (float)systemSpeedTable[i];
+	  }
+	  a /= (float)PERFORMANCE_INTERVAL;
+	  log( _T("Speed: %f\n"), a );
+	  systemSpeedCounter = 0;
+  }
+#endif
+}
+
+void system1Frames(int rate, int count) //AdamN: update skippedframes faster to make sure it didn't cause too many frames or too little frames being skipped
+{
+
+	if( theApp.autoFrameSkip ) //AdamN: CurSpeed might need to be updated regardless of autoframeskip for throttle to works properly w/o autoframeskip
+	{
+		theApp.autoFrameSkipCount++;
+		u32 time = systemGetClock();
+		u32 diff = time - theApp.autoFrameSkipLastTime;
+		if( diff) {
+			// countermeasure against div/0 when debugging
+			int tm = (diff/theApp.autoFrameSkipCount);
+			float cspd = (100000.0f/rate/*60.0f*/)/tm; //calc current speed smoothly (frame 1-10,2-11,3-12,so on)
+			Sm60FPS::nCurSpeed = (int)cspd; //(500000/rate)/diff;
+			if(theApp.autoFrameSkipCount >= 10) { //60
+				theApp.autoFrameSkipCount--; //= 0; //to maintain 10 frames per update
+				theApp.autoFrameSkipLastTime += tm ; //theApp.autoFrameSkipLastTime2;
+				//theApp.autoFrameSkipLastTime2 += tm; //rough prediction of nextframe's time
+			}/* else if(theApp.autoFrameSkipCount == 2)
+				theApp.autoFrameSkipLastTime2 = time;*/
+			//if(theApp.autoFrameSkip)
+			{
+			float tgtspd = Sm60FPS::K_fCpuSpeed;
+			int maxfs = gbFrameSkip;
+			if(theApp.cartridgeType == IMAGE_GBA) maxfs = frameSkip;
+			//if(speedup && (count % 10)==0) theApp.updateThrottle(Sm60FPS::nCurSpeed); //update throttle on turbo, may slows down things
+			//if(synchronize && tgtspd>100.0f) float tgtspd = 100.0f; //max speed when audio sync enabled is 100%, this is to prevent skippedframe piling up since CurSpeed never goes beyond 100
+			if((systemFrameSkip < maxfs) && (Sm60FPS::nCurSpeed < tgtspd*0.94f/**0.89f *0.845f*/)) { //*0.7f
+				/*if(maxfs==9) //special feature for auto-frameskip-cap=9
+					if(Sm60FPS::nCurSpeed <= 1.01f*Sm60FPS::nPrvSpeed && systemFrameSkip>3) { //if frameskipping no longer effective, don't skip more
+						systemFrameSkip--;
+						//Sm60FPS::nPrvSpeed = 0.0f; //0.99f*Sm60FPS::nPrvSpeed;
+					} else
+				Sm60FPS::nPrvSpeed = (float)Sm60FPS::nCurSpeed;*/
+				//frameSkip += 1;
+				//gbFrameSkip += 1;
+				systemFrameSkip += 1; //frames to skip for the next n frames
+			} else
+			if((systemFrameSkip > 0) && (Sm60FPS::nCurSpeed > tgtspd/**1.02f*//**1.1f *1.4f*/)) { //*1.07f
+				//frameSkip -= 1;
+				//gbFrameSkip -= 1;
+				systemFrameSkip -= 1; //frames to skip for the next n frames
+			}
+			//Sm60FPS::nPrvSpeed = Sm60FPS::nCurSpeed;
+			}
+			//theApp.autoFrameSkipCount = 0;
+		} else {
+			/*if(theApp.autoFrameSkipCount == 2)
+				theApp.autoFrameSkipLastTime2 = time;*/
+			if(!Sm60FPS::nCurSpeed)
+			Sm60FPS::nCurSpeed = (int)Sm60FPS::K_fCpuSpeed; //100;
+			//frameSkip = 0;
+			//gbFrameSkip = 0;
+			//systemFrameSkip = 0;
+		}
+	}
+
+  if((count % 10)!=0) return;
 
   if(theApp.rewindMemory) {
     if(++theApp.rewindCounter >= (theApp.rewindTimer)) {
@@ -1163,7 +1277,7 @@ SoundDriver * systemSoundInit()
 
 	if( drv ) {
 		if (theApp.throttle)
-		drv->setThrottle( theApp.throttle );
+		drv->setThrottle( theApp.throttle ); //AdamN: XAudio2 seems the only one who has this feature?
 	}
 
 	return drv;
@@ -1251,10 +1365,13 @@ BOOL VBA::OnIdle(LONG lCount)
     if(debugger)
       return TRUE; // continue loop
     return !::PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE);
-  } else if(emulating && active && !paused) {
+  } else if(emulating && (gba_link_enabled || active) && !paused) {
     for(int i = 0; i < 2; i++) {
-      emulator.emuMain(emulator.emuCount);
-      if(lanlink.connected&&linkid&&lc.numtransfers==0) lc.CheckConn();
+      emulator.emuMain(emulator.emuCount); //emuMain=CPULoop,emuCount=250000
+      if(/*gba_link_enabled &&*/ lanlink.connected && linkid && lc.numtransfers==0 && (theApp.cartridgeType == IMAGE_GBA) && !rfu_enabled) {
+		  if(/*(i & 1) &&*/ !LinkHandlerActive)
+			lc.CheckConn(); //AdamN: This is Needed for Client/Slave to works properly, but does it need to be called twice in the FOR loop?
+	  }
 
       if(rewindSaveNeeded && rewindMemory && emulator.emuWriteMemState) {
         rewindCount++;
@@ -1622,6 +1739,8 @@ void VBA::loadSettings()
 
   rfu_enabled = regQueryDwordValue("RFU", false) ? true : false;
   gba_link_enabled = regQueryDwordValue("linkEnabled", false) ? true : false;
+  if(gba_link_enabled)
+    gbSerialFunction = gbStartLink;
   gba_joybus_enabled = regQueryDwordValue("joybusEnabled", false) ? true : false;
   buffer = regQueryStringValue("joybusHostAddr", "");
 
@@ -2620,11 +2739,11 @@ void Sm60FPS_Init()
 }
 
 
-bool Sm60FPS_CanSkipFrame()
+bool Sm60FPS_CanSkipFrame() //AdamN: autoframeskipping here doesn't seems to give much effect, more like only giving up to 1 frame skipped(per 10 frames) instead of up to 9 frames
 {
-  if( theApp.autoFrameSkip ) {
+  /*if( theApp.autoFrameSkip )*/ { //AdamN: this is the reason why throttle doesn't works properly w/o autoframeskip
 	  if( Sm60FPS::nFrameCnt == 0 ) {
-		  Sm60FPS::nFrameCnt = 0;
+		  //Sm60FPS::nFrameCnt = 0; //AdamN: is this really necessary?
 		  Sm60FPS::dwTimeElapse = 0;
 		  Sm60FPS::dwTime0 = GetTickCount();
 	  } else {
@@ -2634,14 +2753,18 @@ bool Sm60FPS_CanSkipFrame()
 
 			  if( Sm60FPS::nCurSpeed > Sm60FPS::K_fCpuSpeed ) {
 				  Sm60FPS::fWantFPS += 1;
-				  if( Sm60FPS::fWantFPS > Sm60FPS::K_fTargetFps ){
-					  Sm60FPS::fWantFPS = Sm60FPS::K_fTargetFps;
+				  //frameSkip = 0;
+				  //systemFrameSkip = 0;
+				  if( Sm60FPS::fWantFPS > Sm60FPS::K_fTargetFps/**(systemFrameSkip+1)*/ ){
+					  Sm60FPS::fWantFPS = Sm60FPS::K_fTargetFps/**(systemFrameSkip+1)*/;
 				  }
 			  } else {
-				  if( Sm60FPS::nCurSpeed < (Sm60FPS::K_fCpuSpeed - 5) ) {
+				  if( Sm60FPS::nCurSpeed < (Sm60FPS::K_fCpuSpeed/**0.94f*/ /*- 5*/) ) {
 					  Sm60FPS::fWantFPS -= 1;
-					  if( Sm60FPS::fWantFPS < 30.f ) {
-						  Sm60FPS::fWantFPS = 30.f;
+					  //frameSkip += 1;
+					  //systemFrameSkip += 1;
+					  if( Sm60FPS::fWantFPS < 6.f/*30.f*/ ) {
+						  Sm60FPS::fWantFPS = 6.f/*30.f*/;
 					  }
 				  }
 			  }
@@ -2649,12 +2772,15 @@ bool Sm60FPS_CanSkipFrame()
 			  Sm60FPS::dwTime1 = GetTickCount();
 			  Sm60FPS::dwTimeElapse += (Sm60FPS::dwTime1 - Sm60FPS::dwTime0);
 			  Sm60FPS::dwTime0 = Sm60FPS::dwTime1;
+			  
 			  if( !Sm60FPS::bLastSkip &&
-				  ( (Sm60FPS::fWantFPS < Sm60FPS::K_fTargetFps) || Sm60FPS::bSaveMoreCPU) ) {
+				  ( (Sm60FPS::fWantFPS < Sm60FPS::K_fTargetFps/**(systemFrameSkip+1)*/) || Sm60FPS::bSaveMoreCPU) ) {
 					  Sm60FPS::fCurFPS = (float)Sm60FPS::nFrameCnt * 1000 / Sm60FPS::dwTimeElapse;
-					  if( (Sm60FPS::fCurFPS < Sm60FPS::K_fTargetFps) || Sm60FPS::bSaveMoreCPU ) {
+					  if( (Sm60FPS::fCurFPS < Sm60FPS::K_fTargetFps/**(systemFrameSkip+1)*/) || Sm60FPS::bSaveMoreCPU ) {
 						  Sm60FPS::bLastSkip = true;
 						  Sm60FPS::nFrameCnt++;
+						  //frameSkip += 1;
+						  //systemFrameSkip += 1;
 						  return true;
 					  }
 			  }
@@ -2662,16 +2788,20 @@ bool Sm60FPS_CanSkipFrame()
 	  }
 	  Sm60FPS::bLastSkip = false;
 	  Sm60FPS::nFrameCnt++;
-  }
+	  //frameSkip = 0;
+	  //systemFrameSkip = 0;
+  } 
   return false;
 }
 
 
 void Sm60FPS_Sleep()
 {
-	if( theApp.autoFrameSkip ) {
+	if(!speedup) /*if( theApp.autoFrameSkip )*/ { //AdamN: this is the reason why throttle doesn't works properly w/o autoframeskip
 		u32 dwTimePass = Sm60FPS::dwTimeElapse + (GetTickCount() - Sm60FPS::dwTime0);
-		u32 dwTimeShould = (u32)(Sm60FPS::nFrameCnt * Sm60FPS::K_fDT);
+		float kfdt = Sm60FPS::K_fDT;
+		if(!theApp.autoFrameSkip) kfdt*=(systemFrameSkip+1);
+		u32 dwTimeShould = (u32)(Sm60FPS::nFrameCnt * kfdt);
 		if( dwTimeShould > dwTimePass ) {
 			Sleep(dwTimeShould - dwTimePass);
 		}

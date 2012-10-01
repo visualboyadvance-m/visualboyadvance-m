@@ -42,6 +42,7 @@ public:
 	void reset();  // stop and reset the secondary sound buffer
 	void resume(); // play/resume the secondary sound buffer
 	void write(u16 * finalWave, int length);  // write the emulated sound to a sound buffer
+	void setThrottle( unsigned short throttle ); //pitch
 
 private:
 	OPENALFNTABLE  ALFunction;
@@ -181,6 +182,8 @@ bool OpenAL::init(long sampleRate)
 
 
 	initialized = true;
+
+	setThrottle(theApp.throttle); //setting pitch to current throttle
 	return true;
 }
 
@@ -281,7 +284,7 @@ void OpenAL::write(u16 * finalWave, int length)
 			}
 		}
 
-		if( !speedup && synchronize && !theApp.throttle ) {
+		if( !speedup && synchronize /*&& !theApp.throttle*/ ) {
 			// wait until at least one buffer has finished
 			while( nBuffersProcessed == 0 ) {
 				winlog( " waiting...\n" );
@@ -318,6 +321,20 @@ void OpenAL::write(u16 * finalWave, int length)
 		ALFunction.alSourcePlay( source );
 		ASSERT_SUCCESS;
 	}
+}
+
+void OpenAL::setThrottle( unsigned short throttle )
+{
+	if( !initialized ) return;
+	winlog( "OpenAL::setThrottle\n" );
+
+	debugState();
+
+	if( throttle == 0 ) throttle = 100;
+	ALFunction.alSourcef(source, AL_PITCH, (float)throttle / 100.0f );
+	ASSERT_SUCCESS;
+
+	debugState(); //AdamN: is this needed?
 }
 
 SoundDriver *newOpenAL()

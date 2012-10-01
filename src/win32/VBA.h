@@ -124,6 +124,8 @@ class VBA : public CWinApp
   bool tripleBuffering;
   unsigned short throttle;
   u32 autoFrameSkipLastTime;
+  u32 autoFrameSkipLastTime2;
+  int autoFrameSkipCount;
   bool autoFrameSkip;
   bool vsync;
   bool changingVideoSize;
@@ -254,6 +256,27 @@ class VBA : public CWinApp
 
     extern VBA theApp;
 	extern int emulating;
+
+	extern bool AppTerminated; //AdamN: to mark Application is exiting for other threads to check
+	extern CString DataHex(const char *buf, int len); //AdamN: buffer to hex string
+
+namespace Sm60FPS
+{
+  extern float					K_fCpuSpeed; // was 98.0f before, but why?
+  extern float					K_fTargetFps;
+  extern float					K_fDT;
+
+  extern u32					dwTimeElapse;
+  extern u32					dwTime0;
+  extern u32					dwTime1;
+  extern u32					nFrameCnt;
+  extern float					fWantFPS;
+  extern float					fCurFPS;
+  extern bool					bLastSkip;
+  extern int					nCurSpeed;
+  extern float					nPrvSpeed;
+  extern int					bSaveMoreCPU;
+};
 
 #ifdef MMX
     extern "C" bool cpu_mmx;

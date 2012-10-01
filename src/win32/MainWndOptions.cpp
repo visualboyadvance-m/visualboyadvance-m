@@ -40,7 +40,12 @@
 void MainWnd::OnOptionsFrameskipThrottleNothrottle()
 {
 	theApp.updateThrottle( 0 ); // disable
-  theApp.autoFrameSkip = false;
+  /*if(theApp.autoFrameSkip) {
+	frameSkip = 0;
+	gbFrameSkip = 0;
+	systemFrameSkip = 0;
+  }
+  theApp.autoFrameSkip = false;*/
 }
 
 void MainWnd::OnUpdateOptionsFrameskipThrottleNothrottle(CCmdUI* pCmdUI)
@@ -52,7 +57,7 @@ void MainWnd::OnUpdateOptionsFrameskipThrottleNothrottle(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle25()
 {
 	theApp.updateThrottle( 25 );
-  theApp.autoFrameSkip = false;
+  //theApp.autoFrameSkip = false;
 }
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle25(CCmdUI* pCmdUI)
@@ -64,7 +69,7 @@ void MainWnd::OnUpdateOptionsFrameskipThrottle25(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle50()
 {
 	theApp.updateThrottle( 50 );
-  theApp.autoFrameSkip = false;
+  //theApp.autoFrameSkip = false;
 }
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle50(CCmdUI* pCmdUI)
@@ -76,7 +81,7 @@ void MainWnd::OnUpdateOptionsFrameskipThrottle50(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle100()
 {
 	theApp.updateThrottle( 100 );
-  theApp.autoFrameSkip = false;
+  //theApp.autoFrameSkip = false;
 }
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle100(CCmdUI* pCmdUI)
@@ -88,7 +93,7 @@ void MainWnd::OnUpdateOptionsFrameskipThrottle100(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle150()
 {
 	theApp.updateThrottle( 150 );
-theApp.autoFrameSkip = false;
+//theApp.autoFrameSkip = false;
 }
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle150(CCmdUI* pCmdUI)
@@ -100,7 +105,7 @@ void MainWnd::OnUpdateOptionsFrameskipThrottle150(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsFrameskipThrottle200()
 {
 	theApp.updateThrottle( 200 );
-  theApp.autoFrameSkip = false;
+  //theApp.autoFrameSkip = false;
 }
 
 void MainWnd::OnUpdateOptionsFrameskipThrottle200(CCmdUI* pCmdUI)
@@ -116,7 +121,7 @@ void MainWnd::OnOptionsFrameskipThrottleOther()
 
 	if( v ) {
 		theApp.updateThrottle( v );
-		theApp.autoFrameSkip = false;
+		//theApp.autoFrameSkip = false;
 	}
 }
 
@@ -137,12 +142,16 @@ void MainWnd::OnOptionsFrameskipAutomatic()
   theApp.autoFrameSkip = !theApp.autoFrameSkip;
   if(!theApp.autoFrameSkip && emulating)
 	  theApp.updateFrameSkip();
-  else
+  else if(theApp.autoFrameSkip)
   {
-	  theApp.throttle = false;
-	  frameSkip = 0;
+	  //theApp.throttle = false;
+	  frameSkip = 9;
+	  gbFrameSkip = 9;
 	  systemFrameSkip = 0;
   }
+  //frameSkip = 0;
+  //gbFrameSkip = 0;
+  //systemFrameSkip = 0;
 }
 
 void MainWnd::OnUpdateOptionsFrameskipAutomatic(CCmdUI* pCmdUI) 
@@ -152,6 +161,7 @@ void MainWnd::OnUpdateOptionsFrameskipAutomatic(CCmdUI* pCmdUI)
 
 BOOL MainWnd::OnOptionsFrameskip(UINT nID)
 {
+  //theApp.autoFrameSkip = false;
   switch(nID) {
   case ID_OPTIONS_VIDEO_FRAMESKIP_0:
   case ID_OPTIONS_VIDEO_FRAMESKIP_1:
@@ -166,7 +176,7 @@ BOOL MainWnd::OnOptionsFrameskip(UINT nID)
     }
     if(emulating)
       theApp.updateFrameSkip();
-	theApp.updateThrottle( 0 );
+	//theApp.updateThrottle( 0 );
     return TRUE;
     break;
   case ID_OPTIONS_VIDEO_FRAMESKIP_6:
@@ -180,7 +190,7 @@ BOOL MainWnd::OnOptionsFrameskip(UINT nID)
     }
     if(emulating)
       theApp.updateFrameSkip();
-	theApp.updateThrottle( 0 );
+	//theApp.updateThrottle( 0 );
     return TRUE;
     break;
   }
@@ -585,8 +595,13 @@ void MainWnd::OnUpdateOptionsEmulatorDisablestatusmessages(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsEmulatorSynchronize()
 {
   synchronize = !synchronize;
-  if (synchronize)
-	  theApp.throttle = false;
+  if (synchronize) {
+	  //theApp.throttle = false;
+	  //theApp.autoFrameSkip = false;
+	  frameSkip = 0;
+	  gbFrameSkip = 0;
+	  systemFrameSkip = 0;
+  }
 }
 
 void MainWnd::OnUpdateOptionsEmulatorSynchronize(CCmdUI* pCmdUI)
@@ -1023,6 +1038,8 @@ void MainWnd::OnUpdateOptionsGameboyBorder(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsGameboyPrinter()
 {
   theApp.winGbPrinterEnabled = !theApp.winGbPrinterEnabled;
+  if(gba_link_enabled)
+    gbSerialFunction = gbStartLink; else
   if(theApp.winGbPrinterEnabled)
     gbSerialFunction = gbPrinterSend;
   else
@@ -1560,7 +1577,7 @@ void MainWnd::OnOptionsLinkRFU()
 	if(rfu_enabled) rfu_enabled = false;
 	else {
 		rfu_enabled = true;
-		MessageBox("Please note this is the first version\nof RFU emulation code and it's not 100% bug free.\nAlso only 2 players single computer are supported at this time.", "Warning", MB_OK);
+		//MessageBox("Please note this is the first version\nof RFU emulation code and it's not 100% bug free.\nAlso only 2 players single computer are supported at this time.", "Warning", MB_OK);
 	}
 }
 
@@ -1572,6 +1589,12 @@ void MainWnd::OnUpdateOptionsLinkEnable(CCmdUI* pCmdUI)
 void MainWnd::OnOptionsLinkEnable()
 {
 	gba_link_enabled = !gba_link_enabled;
+	if(gba_link_enabled)
+		gbSerialFunction = gbStartLink; else
+    if(theApp.winGbPrinterEnabled)
+		gbSerialFunction = gbPrinterSend;
+	else
+		gbSerialFunction = NULL;
 }
 
 void MainWnd::OnUpdateOptionsLinkRFU(CCmdUI* pCmdUI)

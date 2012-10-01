@@ -22,6 +22,10 @@
 #include "agbprint.h"
 #include "GBALink.h"
 
+#ifdef _MSC_VER //#ifdef _WIN32
+#include "../Win32/WinHelper.h"			// AdamN: for CCriticalSection
+#endif
+
 #ifdef PROFILING
 #include "prof/prof.h"
 #endif
@@ -31,6 +35,8 @@
 #endif
 
 extern int emulating;
+
+extern bool AppTerminated = false;
 
 int SWITicks = 0;
 int IRQTicks = 0;
@@ -58,6 +64,9 @@ bool cpuSramEnabled = true;
 bool cpuFlashEnabled = true;
 bool cpuEEPROMEnabled = true;
 bool cpuEEPROMSensorEnabled = false;
+
+bool breakpt = false;
+u32 breakaddr = 0xffffffff;
 
 u32 cpuPrefetch[2];
 
@@ -815,7 +824,7 @@ static bool CPUReadState(gzFile gzFile)
     THUMB_PREFETCH;
   }
 
-  CPUUpdateRegister(0x204, CPUReadHalfWordQuick(0x4000204));
+  CPUUpdateRegister(0x204, CPUReadHalfWordQuick(0x4000204)); //WAITCNT
 
   return true;
 }
@@ -1779,7 +1788,8 @@ void CPUSoftwareInterrupt(int comment)
 #endif
   if(useBios) {
 #ifdef GBA_LOGGING
-    if(systemVerbose & VERBOSE_SWI) {
+	//if(comment>0x2A) //AdamN: what is the idea of flooding the log with all interrupts?? having a stats showing how many times each interrupt being called might be more usefull than flooding
+    if(systemVerbose & VERBOSE_SWI) { //AdamN: trying to capture only the impossible (should be logged even when logging not enabled tho)
       log("SWI: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
           armState ? armNextPC - 4: armNextPC -2,
           reg[0].I,
@@ -1827,31 +1837,31 @@ void CPUSoftwareInterrupt(int comment)
     stopState = true;
     cpuNextEvent = cpuTotalTicks;
     break;
-  case 0x04:
+  case 0x04: //AdamN: IntrWait
 #ifdef GBA_LOGGING
     if(systemVerbose & VERBOSE_SWI) {
       log("IntrWait: 0x%08x,0x%08x (VCOUNT = %2d)\n",
           reg[0].I,
-          reg[1].I,
+          reg[1].I, //AdamN: Interrupt flag(s) to wait for (same format as IE/IF registers)
           VCOUNT);
     }
 #endif
-    CPUSoftwareInterrupt();
+    CPUSoftwareInterrupt(); //AdamN: Forcefully sets IME=1 and wait in Halt state until one (or more) of the specified interrupt(s) occurs.
     break;
-  case 0x05:
+  case 0x05: //AdamN: this VBlankIntrWait oftenly called (every 1/60 sec) so it should be handled properly
 #ifdef GBA_LOGGING
     if(systemVerbose & VERBOSE_SWI) {
       log("VBlankIntrWait: (VCOUNT = %2d)\n",
           VCOUNT);
     }
 #endif
-    CPUSoftwareInterrupt();
+    CPUSoftwareInterrupt(); //AdamN: set r0=1,r1=1 then execute IntrWait
     break;
-  case 0x06:
-    CPUSoftwareInterrupt();
+  case 0x06: //AdamN: Div oftenly called so it should be handled properly
+    BIOS_Div(); //CPUSoftwareInterrupt();
     break;
-  case 0x07:
-    CPUSoftwareInterrupt();
+  case 0x07: //AdamN: DivArm
+    BIOS_DivARM(); //CPUSoftwareInterrupt();
     break;
   case 0x08:
     BIOS_Sqrt();
@@ -1862,7 +1872,7 @@ void CPUSoftwareInterrupt(int comment)
   case 0x0A:
     BIOS_ArcTan2();
     break;
-  case 0x0B:
+  case 0x0B: //AdamN: CpuSet oftenly called so it should be handled properly
     {
       int len = (reg[2].I & 0x1FFFFF) >>1;
       if (!(((reg[0].I & 0xe000000) == 0) ||
@@ -1888,7 +1898,7 @@ void CPUSoftwareInterrupt(int comment)
     }
     BIOS_CpuSet();
     break;
-  case 0x0C:
+  case 0x0C: //AdamN: CpuFastSet oftenly called so it should be handled properly
     {
       int len = (reg[2].I & 0x1FFFFF) >>5;
       if (!(((reg[0].I & 0xe000000) == 0) ||
@@ -2005,7 +2015,7 @@ void CPUSoftwareInterrupt(int comment)
 #ifdef GBA_LOGGING
     if(systemVerbose & VERBOSE_SWI) {
       log("SoundBiasSet: 0x%08x (VCOUNT = %2d)\n",
-          reg[0].I,
+          reg[0].I, //AdamN: r0=BIAS Level (0=Level 000h, any other value=Level 200h), r1=Delay Count on NDS (GBA uses a fixed delay count of 8) 
           VCOUNT);
     }
 #endif
@@ -2014,15 +2024,152 @@ void CPUSoftwareInterrupt(int comment)
     else
       soundResume();
     break;
+  /*case 0x1A: //AdamN: SoundDriverInit, calling sequences after SoundDriverInit then SoundChannelClear then SoundDriverMode, then repeated SoundDriverVSync+SoundDriverMain
+#ifdef GBA_LOGGING
+    if(systemVerbose & VERBOSE_SWI) {
+      log("SoundDriverInit: 0x%08x (VCOUNT = %2d)\n",
+          reg[0].I, //AdamN: Pointer to SoundArea structure 
+          VCOUNT);
+    }
+#endif
+    CPUSoftwareInterrupt();
+    break;*/  
+  case 0x1B: //AdamN: SoundDriverMode
+#ifdef GBA_LOGGING
+    if(systemVerbose & VERBOSE_SWI) {
+      log("SoundDriverMode: 0x%08x (VCOUNT = %2d)\n",
+          reg[0].I, //AdamN: Sound driver operation mode 
+          VCOUNT);
+    }
+#endif
+    //CPUSoftwareInterrupt();
+    break;
+  case 0x1C: //AdamN: SoundDriverMain (no param)
+    //CPUSoftwareInterrupt(); //AdamN: Call (using/after SoundDriverVSync) every 1/60 of a second, immediately after the V-Blank interrupt. After that, this routine is called after BG and OBJ processing is executed.
+    break;
+  case 0x1D: //AdamN: SoundDriverVSync
+    //CPUSoftwareInterrupt(); //AdamN: Resets the sound DMA (no param) to sync the BIOS sound driver
+    break;
+  case 0x1E: //AdamN: SoundChannelClear
+    //CPUSoftwareInterrupt(); //AdamN: Clears all direct sound channels and stops the sound (no param)
+    break;
   case 0x1F:
     BIOS_MidiKey2Freq();
     break;
-  case 0x2A:
+  case 0x20: //AdamN: SoundWhatever0/MusicPlayerOpen
+#ifdef GBA_LOGGING
+    if(systemVerbose & VERBOSE_SWI) { 
+      log("MusicPlayerOpen: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
+          armState ? armNextPC - 4: armNextPC -2,
+          reg[0].I,
+          reg[1].I,
+          reg[2].I,
+          VCOUNT);
+    }
+#endif
+    //CPUSoftwareInterrupt();
+    break;
+  case 0x21: //AdamN: SoundWhatever1/MusicPlayerStart
+#ifdef GBA_LOGGING
+    if(systemVerbose & VERBOSE_SWI) { 
+      log("MusicPlayerStart: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
+          armState ? armNextPC - 4: armNextPC -2,
+          reg[0].I,
+          reg[1].I,
+          reg[2].I,
+          VCOUNT);
+    }
+#endif
+    //CPUSoftwareInterrupt();
+    break;
+  case 0x22: //AdamN: SoundWhatever2/MusicPlayerStop
+#ifdef GBA_LOGGING
+    if(systemVerbose & VERBOSE_SWI) { 
+      log("MusicPlayerStop: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
+          armState ? armNextPC - 4: armNextPC -2,
+          reg[0].I,
+          reg[1].I,
+          reg[2].I,
+          VCOUNT);
+    }
+#endif
+    //CPUSoftwareInterrupt();
+    break;
+  case 0x23: //AdamN: SoundWhatever3/MusicPlayerContinue
+#ifdef GBA_LOGGING
+    if(systemVerbose & VERBOSE_SWI) { 
+      log("MusicPlayerContinue: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
+          armState ? armNextPC - 4: armNextPC -2,
+          reg[0].I,
+          reg[1].I,
+          reg[2].I,
+          VCOUNT);
+    }
+#endif
+    //CPUSoftwareInterrupt();
+    break;
+  case 0x24: //AdamN: SoundWhatever4/MusicPlayerFadeOut
+#ifdef GBA_LOGGING
+    if(systemVerbose & VERBOSE_SWI) { 
+      log("MusicPlayerFadeOut: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
+          armState ? armNextPC - 4: armNextPC -2,
+          reg[0].I,
+          reg[1].I,
+          reg[2].I,
+          VCOUNT);
+    }
+#endif
+    //CPUSoftwareInterrupt();
+    break;
+  case 0x25: //AdamN: MultiBoot
+#ifdef GBA_LOGGING
+    if(systemVerbose & VERBOSE_SWI) {
+      log("MultiBoot: 0x%08x,0x%08x (VCOUNT = %2d)\n",
+          reg[0].I, //AdamN: Pointer to MultiBootParam structure
+          reg[1].I, //AdamN: Transfer Mode
+          VCOUNT);
+    }
+#endif
+    //CPUSoftwareInterrupt();
+    break;
+  case 0x26: //AdamN: HardReset
+#ifdef GBA_LOGGING
+    if(systemVerbose & VERBOSE_SWI) {
+      log("HardReset: (VCOUNT = %2d)\n",
+		  VCOUNT);
+    }
+#endif
+    CPUSoftwareInterrupt(); //Fully reset to Nintendo intro (no param)
+    break;
+  case 0x27: //AdamN: CustomHalt
+#ifdef GBA_LOGGING
+    if(systemVerbose & VERBOSE_SWI) {
+      log("CustomHalt: 0x%08x (VCOUNT = %2d)\n",
+		  reg[2].I, //AdamN: 8bit param (00h=Halt, 80h=Stop)
+          VCOUNT);
+    }
+#endif
+    CPUSoftwareInterrupt();
+    break;
+  case 0x28: //AdamN: SoundDriverVSyncOff
+    //CPUSoftwareInterrupt(); //AdamN: Stop sound DMA (no param) to prevent sound DMA from overflowing and playing noise when the game loading (as SoundDriverVSync might missed the 1/60sec interval)
+    break;
+  case 0x29: //AdamN: SoundDriverVSyncOn
+    //CPUSoftwareInterrupt(); //AdamN: Restarts the sound DMA stopped with SoundDriverVSyncOff (no param) to restore sound driver operation
+    break;
+  case 0x2A: //AdamN: SoundGetJumpList
+#ifdef GBA_LOGGING
+    if(systemVerbose & VERBOSE_SWI) {
+      log("SoundGetJumpList: 0x%08x (VCOUNT = %2d)\n",
+          reg[0].I, //AdamN: Destination address (must be aligned by 4) (120h bytes buffer) 
+          VCOUNT);
+    }
+#endif
     BIOS_SndDriverJmpTableCopy();
     // let it go, because we don't really emulate this function
   default:
 #ifdef GBA_LOGGING
-    if(systemVerbose & VERBOSE_SWI) {
+    if(systemVerbose & VERBOSE_SWI) { 
       log("SWI: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
           armState ? armNextPC - 4: armNextPC -2,
           reg[0].I,
@@ -2034,11 +2181,12 @@ void CPUSoftwareInterrupt(int comment)
 
     if(!disableMessage) {
       systemMessage(MSG_UNSUPPORTED_BIOS_FUNCTION,
-                    N_("Unsupported BIOS function %02x called from %08x. A BIOS file is needed in order to get correct behaviour."),
+                    N_("Unsupported BIOS Function %02X called from %08x. A BIOS file is needed in order to get correct behaviour."),
                     comment,
                     armMode ? armNextPC - 4: armNextPC - 2);
       disableMessage = true;
     }
+	//CPUSoftwareInterrupt(); //AdamN: not needed as it could cause the game to stop when there are no bios file
     break;
   }
 }
@@ -2405,7 +2553,10 @@ void CPUUpdateRegister(u32 address, u16 value)
   {
   case 0x00:
     { // we need to place the following code in { } because we declare & initialize variables in a case statement
-      if((value & 7) > 5) {
+      /*if((value & 4)&&((DISPCNT & 0x0010)!=(value & 0x0010))) {
+		  log("DISPCNT(%08x) : %04X->%04X %04X R0=%08X R1=%08X R2=%08X R14=%08X Z=%d (VCOUNT = %d)\n", armState ? armNextPC - 4: armNextPC -2, DISPCNT, value, DISPSTAT, reg[0].I, reg[1].I, reg[2].I, reg[14].I, Z_FLAG, VCOUNT);
+	  }*/
+	  if((value & 7) > 5) {
         // display modes above 0-5 are prohibited
         DISPCNT = (value & 7);
       }
@@ -2626,7 +2777,11 @@ void CPUUpdateRegister(u32 address, u16 value)
   case 0x7c:
   case 0x80:
   case 0x84:
+	lastSR = value & 0xFF;
+	lastSA = address&0xFF;
     soundEvent(address&0xFF, (u8)(value & 0xFF));
+	lastSR = value >> 8;
+	lastSA = (address&0xFF)+1;
     soundEvent((address&0xFF)+1, (u8)(value>>8));
     break;
   case 0x82:
@@ -2643,6 +2798,8 @@ void CPUUpdateRegister(u32 address, u16 value)
   case 0x9a:
   case 0x9c:
   case 0x9e:
+	lastSR = value;
+	lastSA = address&0xFF;
     soundEvent(address&0xFF, value);
     break;
   case 0xB0:
@@ -2822,16 +2979,79 @@ void CPUUpdateRegister(u32 address, u16 value)
     timerOnOffDelay|=8;
     cpuNextEvent = cpuTotalTicks;
     break;
-
-
+  case COMM_SIODATA32_L:
+	if(READ16LE(&ioMem[COMM_SIODATA32_L]) != value) {
+	#ifdef GBA_LOGGING
+		if(systemVerbose & VERBOSE_SIO) {
+			log("SIODATAL(%d) : %04X %04X  %04X->%04X %04X %04X %04X  %04X  (VCOUNT = %d)\n", GetTickCount(), READ16LE(&ioMem[COMM_RCNT]), READ16LE(&ioMem[COMM_SIOCNT]), READ16LE(&ioMem[COMM_SIOMULTI0]), value, READ16LE(&ioMem[COMM_SIOMULTI1]), READ16LE(&ioMem[COMM_SIOMULTI2]), READ16LE(&ioMem[COMM_SIOMULTI3]), READ16LE(&ioMem[COMM_SIOMLT_SEND]), VCOUNT );
+		}
+	#endif
+	}
+	  UPDATE_REG(COMM_SIODATA32_L, value);
+	  break;
+  case COMM_SIODATA32_H:
+	if(READ16LE(&ioMem[COMM_SIODATA32_H]) != value) {
+	#ifdef GBA_LOGGING
+		if(systemVerbose & VERBOSE_SIO) {
+			log("SIODATAH(%d) : %04X %04X  %04X %04X->%04X %04X %04X  %04X  (VCOUNT = %d)\n", GetTickCount(), READ16LE(&ioMem[COMM_RCNT]), READ16LE(&ioMem[COMM_SIOCNT]), READ16LE(&ioMem[COMM_SIOMULTI0]), READ16LE(&ioMem[COMM_SIOMULTI1]), value, READ16LE(&ioMem[COMM_SIOMULTI2]), READ16LE(&ioMem[COMM_SIOMULTI3]), READ16LE(&ioMem[COMM_SIOMLT_SEND]), VCOUNT );
+		}
+	#endif
+	}
+	  UPDATE_REG(COMM_SIODATA32_H, value);
+	  break;
   case COMM_SIOCNT:
+	if(READ16LE(&ioMem[COMM_SIOCNT]) != (/*READ16LE(&ioMem[COMM_SIOCNT]) &*/ value)) {
+	#ifdef GBA_LOGGING
+		if(systemVerbose & VERBOSE_SIO) {
+			if(value & 0x4000)
+			log("SIOCNT(%08x) : %04X %04X->%04X  %04X %04X %04X %04X  %04X  (VCOUNT = %d)\n", armState ? armNextPC - 4: armNextPC -2, READ16LE(&ioMem[COMM_RCNT]), READ16LE(&ioMem[COMM_SIOCNT]), value, READ16LE(&ioMem[COMM_SIOMULTI0]), READ16LE(&ioMem[COMM_SIOMULTI1]), READ16LE(&ioMem[COMM_SIOMULTI2]), READ16LE(&ioMem[COMM_SIOMULTI3]), READ16LE(&ioMem[COMM_SIOMLT_SEND]), VCOUNT );
+		}
+	#endif
+	}
+		if( EmuReseted ) { //trying to detect whether the game has exited multiplay mode (ie. game restarted)
+		  EmuReseted = false; 
+		  LinkFirstTime = true;
+		  if(lanlink.connected)
+		  if(linkid) lc.DiscardData();
+		  else ls.DiscardData(1);
+		}
+	  //UPDATE_REG(COMM_SIOCNT, value);
+	  lanlink.mode = GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]));
+	  if(lanlink.mode!=GetSIOMode(READ16LE(&ioMem[COMM_SIOCNT]), READ16LE(&ioMem[COMM_RCNT]))) LinkFirstTime = true;
 	  StartLink(value);
+	  /*switch (GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]))) {
+	  case MULTIPLAYER:
+		if(LinkHandlerActive) {
+			if (value & 0x80) { //AdamN: Start/Busy Bit.7=1 (Active/Transfering)
+				LinkCmdQueue(1,value);
+				c_s.Lock(); //AdamN: Locking resource to prevent deadlock
+				//UPDATE_REG(COMM_SIOCNT, value); //AdamN: when using socket handler SIOCNT need to be updated as soon as possible because program might be reading it and ORing it for the next update
+				LinkParam1=value;
+				LinkCommand|=1; //AdamN: StartLink command
+				c_s.Unlock(); //AdamN: Locking resource to prevent deadlock
+			} else UPDATE_REG(COMM_SIOCNT, value);
+		} else {
+			LogStrPush("CPUUpdReg");
+			//UPDATE_REG(COMM_SIOCNT, value); //just for testing the effect
+			if (value & 0x80) { //AdamN: Start/Busy Bit.7=1 (Active/Transfering)
+				StartLink(value); //AdamN: using blocking sockets here can cause noticibly delays
+			} else UPDATE_REG(COMM_SIOCNT, value);
+			LogStrPop(9);
+	    }
+		break;
+	  case NORMAL8:
+	  case NORMAL32:
+	  case UART:
+	  default:
+		  UPDATE_REG(COMM_SIOCNT, value);
+		break;
+	  } */
 	  /*
 	  // old code path for no linking...
 	  {
-		  if (value & 0x80) {
+		  if (value & 0x80) { //Start bit.7
 			  value &= 0xff7f;
-			  if ((value & 1) && (value & 0x4000)) {
+			  if ((value & 1) && (value & 0x4000)) { //IRQ Enable bit.14
 				  UPDATE_REG(COMM_SIODATA8, 0xFF);
 				  IF |= 0x80;
 				  UPDATE_REG(0x202, IF);
@@ -2843,24 +3063,65 @@ void CPUUpdateRegister(u32 address, u16 value)
 	  */
 	  break;
 
-  case COMM_SIODATA8:
-	  if (gba_link_enabled)
-		  LinkSSend(value);
-	  UPDATE_REG(COMM_RCNT, value);
+  case COMM_SIODATA8: //AdamN: 8bit(SIODATA8) on Normal/UART(up to 4x8bit with FIFO), 16bit(SIOMLT_SEND) on Multiplayer mode
+	if(READ16LE(&ioMem[COMM_SIOMLT_SEND]) != (/*READ16LE(&ioMem[COMM_SIOMLT_SEND]) &*/ value)) {
+	#ifdef GBA_LOGGING
+		if(systemVerbose & VERBOSE_SIO) {
+			log("SIODATA(%d) : %04X %04X  %04X %04X %04X %04X  %04X->%04X  (VCOUNT = %d)\n", GetTickCount(), READ16LE(&ioMem[COMM_RCNT]), READ16LE(&ioMem[COMM_SIOCNT]), READ16LE(&ioMem[COMM_SIOMULTI0]), READ16LE(&ioMem[COMM_SIOMULTI1]), READ16LE(&ioMem[COMM_SIOMULTI2]), READ16LE(&ioMem[COMM_SIOMULTI3]), READ16LE(&ioMem[COMM_SIOMLT_SEND]), value, VCOUNT );
+		}
+	#endif
+	}
+	  UPDATE_REG(COMM_SIODATA8, value); //COMM_SIOMLT_SEND
+	  /*if (gba_link_enabled && lanlink.connected) //AdamN: added active connection checking, don't send any packet if there are no connection
+		  LinkSSend(value); //AdamN: Does sending packet really needed in this part?(as transfers are initiated by SIOCNT)
+		  UPDATE_REG(COMM_RCNT, value); //AdamN: is this really necessary?? seems to break connection
+	  */
+	  /*if(linkid && (READ16LE(&ioMem[COMM_SIOMLT_SEND]) & 0x3f)==0x0f) {
+		  lc.WaitForData(-1);
+		  LinkUpdate2(0);
+	  }*/
 	  break;
 
-  case 0x130:
+  case 0x130: //AdamN: KEYINPUT
 	  P1 |= (value & 0x3FF);
 	  UPDATE_REG(0x130, P1);
 	  break;
 
-  case 0x132:
+  case 0x132: //AdamN: KEYCNT
 	  UPDATE_REG(0x132, value & 0xC3FF);
 	  break;
 
-  case COMM_RCNT:
-	  StartGPLink(value);
+  case COMM_RCNT: //AdamN: often reach here even when no connection yet
+	/*if(lanlink.connected)
+	if(linkid) {
+		  lc.DiscardData(); //AdamN: discarding may cause server to wait for infinity
+	} else {
+		  //ls.DiscardData();
+	}*/
+	lanlink.mode = GetSIOMode(READ16LE(&ioMem[COMM_SIOCNT]), value);
+	if(READ16LE(&ioMem[COMM_RCNT]) != (/*READ16LE(&ioMem[COMM_RCNT]) &*/ value)) {
+	#ifdef GBA_LOGGING
+		if(systemVerbose & VERBOSE_SIO) {
+			log("RCNT(%d) : %04X->%04X %04X  %04X %04X %04X %04X  (VCOUNT = %d)\n", GetTickCount(), READ16LE(&ioMem[COMM_RCNT]), value, READ16LE(&ioMem[COMM_SIOCNT]), READ16LE(&ioMem[COMM_SIOMULTI0]), READ16LE(&ioMem[COMM_SIOMULTI1]), READ16LE(&ioMem[COMM_SIOMULTI2]), READ16LE(&ioMem[COMM_SIOMULTI3]), VCOUNT );
+		}
+	#endif
+	}
+	  /*if(LinkHandlerActive) {
+	  LinkCmdQueue(2,value);
+	  c_s.Lock(); //AdamN: Locking resource to prevent deadlock
+	  LinkParam2=value;
+	  LinkCommand|=2; //AdamN: StartGPLink command
+	  c_s.Unlock(); //AdamN: Locking resource to prevent deadlock
+	  } else {
+	  LogStrPush("CPUUpdReg");*/
+	  StartGPLink(value); //AdamN: doesn't need to be put in different thread as it doesn't send/recv data
+	  /*LogStrPop(9);
+	  }*/
 	  break;
+ 
+  /*case COMM_IR:
+	  StartIRLink(value); //AdamN: not made yet tho, probably not useful
+	  break;*/
 
   case COMM_JOYCNT:
 	  {
@@ -3128,6 +3389,8 @@ void CPUInit(const char *biosFileName, bool useBiosFile)
 
 void CPUReset()
 {
+  EmuReseted = true;
+  LinkFirstTime = true;
   if(gbaSaveType == 0) {
     if(eepromInUse)
       gbaSaveType = 3;
@@ -3475,20 +3738,26 @@ extern void winlog(const char *, ...);
 
 void CPULoop(int ticks)
 {
+  if(EmuCtr>0) {log("Emu inside Emu:%d\n",EmuCtr);return;}
+
   int clockTicks;
   int timerOverflow = 0;
   // variable used by the CPU core
   cpuTotalTicks = 0;
 
+  cpuBreakLoop = false; //
   // shuffle2: what's the purpose?
-  if(gba_link_enabled)
-    cpuNextEvent = 1;
+  /*if(gba_link_enabled && lanlink.connected && lanlink.mode==MULTIPLAYER && frameCount < systemFrameSkip)
+	  //if(linkid)
+		cpuNextEvent = 159; //224; //else; //AdamN: this is to prevent CPU from executing too many opcodes when frame being skipped which cause Linking instability (ie. in-game timeout reached on client)
+  else */
+	  cpuNextEvent = CPUUpdateTicks(); //cpuNextEvent = 1; //224 //AdamN: this will cause slowdown?*/
+	bool NewFrame = false;
 
-  cpuBreakLoop = false;
-  cpuNextEvent = CPUUpdateTicks();
+  //cpuBreakLoop = false;
+  //cpuNextEvent = CPUUpdateTicks(); //
   if(cpuNextEvent > ticks)
     cpuNextEvent = ticks;
-
 
   for(;;) {
 #ifndef FINAL_VERSION
@@ -3526,6 +3795,7 @@ void CPULoop(int ticks)
     }
 #endif /* FINAL_VERSION */
 
+	if(breakpt && armNextPC==breakaddr) holdState=true; //AdamN: checking for breakpoint
     if(!holdState && !SWITicks) {
       if(armState) {
         if (!armExecute())
@@ -3555,7 +3825,7 @@ void CPULoop(int ticks)
       cpuTotalTicks = 0;
       cpuDmaHack = false;
 
-    updateLoop:
+updateLoop:
 
       if (IRQTicks)
       {
@@ -3581,7 +3851,7 @@ void CPULoop(int ticks)
             lcdTicks += 224;
             DISPSTAT |= 2;
             UPDATE_REG(0x04, DISPSTAT);
-            if(DISPSTAT & 16) {
+            if(DISPSTAT & 16) { // entering H-Blank
               IF |= 2;
               UPDATE_REG(0x202, IF);
             }
@@ -3608,12 +3878,15 @@ void CPULoop(int ticks)
             DISPSTAT &= 0xFFFD;
             if(VCOUNT == 160) {
               count++;
+			  NewFrame = true;
               systemFrame();
 
-              if((count % 10) == 0) {
+              /*if((count % 10) == 0) {
                 system10Frames(60);
-              }
-              if(count == 60) {
+              }*/
+			  system1Frames(60, count);
+
+              if(count >= 60) {
                 u32 time = systemGetClock();
                 if(time != lastTime) {
                   u32 t = 100000/(time - lastTime);
@@ -3623,6 +3896,7 @@ void CPULoop(int ticks)
                 lastTime = time;
                 count = 0;
               }
+
               u32 joy = 0;
               // update joystick information
               if(systemReadJoypads())
@@ -3667,11 +3941,12 @@ void CPULoop(int ticks)
               DISPSTAT |= 1;
               DISPSTAT &= 0xFFFD;
               UPDATE_REG(0x04, DISPSTAT);
-              if(DISPSTAT & 0x0008) {
+              if(DISPSTAT & 0x0008) { //entering V-Blank
                 IF |= 1;
                 UPDATE_REG(0x202, IF);
               }
               CPUCheckDMA(1, 0x0f);
+
               if(frameCount >= framesToSkip) {
                 systemDrawScreen();
                 frameCount = 0;
@@ -3786,7 +4061,10 @@ void CPULoop(int ticks)
                 }
                 break;
               }
-            }
+            } //else //AdamN: this seems to fix the instability of linking when frame being skipped, but it causes artifact at the top lines when connection established in game, does cpu executes more opcodes when frameskipped?
+                //frameCount++; //AdamN: shouldn't increase frameCount here, instead do something useless just to delay before calling LinkUpdate to maintain stability
+				//if(lanlink.connected) if(linkid) cpuNextEvent = cpuTotalTicks;/*lc.WaitForData(0); else ls.WaitForData(0);*/
+			
             // entering H-Blank
             DISPSTAT |= 2;
             UPDATE_REG(0x04, DISPSTAT);
@@ -3796,6 +4074,7 @@ void CPULoop(int ticks)
               IF |= 2;
               UPDATE_REG(0x202, IF);
             }
+			//
           }
         }
       }
@@ -3942,8 +4221,21 @@ void CPULoop(int ticks)
 	  if (gba_joybus_enabled)
 		  JoyBusUpdate(clockTicks);
 
-	  if (gba_link_enabled)
-		  LinkUpdate(clockTicks);
+	  if (gba_link_enabled && (lanlink.connected || !lanlink.active)) { //AdamN: don't update if there are no connection
+		  LinkUpdate(clockTicks); //AdamN: when frame being skipped LinkUpdate might not be called(?) thus causing instability
+		  NewFrame = false;
+		  //if(LinkHandlerActive) {
+			//LinkCmdQueue(8,clockTicks);
+			//c_s.Lock(); //AdamN: Locking resource to prevent deadlock
+			//LinkParam8=clockTicks;
+			//LinkCommand|=8; //AdamN: LinkUpdate command
+			//c_s.Unlock(); //AdamN: Locking resource to prevent deadlock
+		  //} else if(/*(clockTicks & 1)&&*/(lanlink.connected)) { //AdamN: it seems LinkUpdate need to be called every cycle, occasionally doesn't works
+			//LogStrPush("CPULoop");
+			//LinkUpdate2(clockTicks); //AdamN: using blocking sockets here can cause noticibly delays
+			//LogStrPop(7);
+		  //}
+	  }
 
       cpuNextEvent = CPUUpdateTicks();
 
@@ -3960,8 +4252,11 @@ void CPULoop(int ticks)
       }
 
 	  // shuffle2: what's the purpose?
-	  if(gba_link_enabled)
-  	       cpuNextEvent = 1;
+	  /*if(gba_link_enabled && lanlink.connected) 
+  	       cpuNextEvent = 1; //AdamN: this will cause great slowdown*/
+	  /*if(gba_link_enabled && lanlink.connected && lanlink.mode==MULTIPLAYER && frameCount < systemFrameSkip) 
+		//if(linkid) 
+			  cpuNextEvent = 159; //224;*/ //cpuTotalTicks+224; //AdamN: this is to prevent CPU from executing too many opcodes when frame being skipped which cause Linking instability (ie. in-game timeout reached on client)
 
       if(IF && (IME & 1) && armIrqEnable) {
         int res = IF & IE;

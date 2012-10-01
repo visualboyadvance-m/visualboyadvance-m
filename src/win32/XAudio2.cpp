@@ -278,6 +278,8 @@ bool XAudio2_Output::init(long sampleRate)
 
 
 	initialized = true;
+
+	setThrottle(theApp.throttle); //AdamN: setting sound pitch to current throttle
 	return true;
 }
 
@@ -303,7 +305,7 @@ void XAudio2_Output::write(u16 * finalWave, int length)
 			break;
 		} else {
 			// the maximum number of buffers is currently queued
-			if( synchronize && !speedup && !theApp.throttle ) {
+			if( synchronize && !speedup /*&& !theApp.throttle*/ ) {
 				// wait for one buffer to finish playing
 				WaitForSingleObject( notify.hBufferEndEvent, INFINITE );
 			} else {

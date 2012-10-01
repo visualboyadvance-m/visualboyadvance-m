@@ -38,6 +38,7 @@ inline void Gb_Osc::update_amp( blip_time_t time, int new_amp )
 	{
 		last_amp = new_amp;
 		med_synth->offset( time, delta, output );
+		//good_synth->offset( time, delta, output );
 	}
 }
 
@@ -280,12 +281,12 @@ inline void Gb_Wave::write_register( int frame_phase, int reg, int old_data, int
 
 	switch ( reg )
 	{
-	case 0:
+	case 0: //NR30
 		if ( !dac_enabled() )
 			enabled = false;
 		break;
 
-	case 1:
+	case 1: //NR31
 		length_ctr = max_len - data;
 		break;
 
@@ -571,9 +572,9 @@ void Gb_Noise::run( blip_time_t time, blip_time_t end_time )
 void Gb_Wave::run( blip_time_t time, blip_time_t end_time )
 {
 	// Calc volume
-	static byte const volumes [8] = { 0, 4, 2, 1, 3, 3, 3, 3 };
+	static byte const volumes [8] = { 0, 4, 2, 1, 3, 3, 3, 3 }; //4 = 100%
 	int const volume_shift = 2;
-	int const volume_idx = regs [2] >> 5 & (agb_mask | 3); // 2 bits on DMG/CGB, 3 on AGB
+	int const volume_idx = regs [2] >> 5 & (agb_mask | 3); // 2 bits on DMG/CGB, 3 on AGB //AdamN: osc.regs[2]=apu.regs[12] (NR32)
 	int const volume_mul = volumes [volume_idx];
 
 	// Determine what will be generated
@@ -585,10 +586,10 @@ void Gb_Wave::run( blip_time_t time, blip_time_t end_time )
 		if ( dac_enabled() )
 		{
 			// Play inaudible frequencies as constant amplitude
-			amp = 8 << 4; // really depends on average of all samples in wave
+			amp = 8 << 4; // really depends on average of all samples in wave //AdamN: can we use this->last_amp instead?
 
 			// if delay is larger, constant amplitude won't start yet
-			if ( frequency() <= 0x7FB || delay > 15 * clk_mul )
+			if ( frequency() <= 0x7FB || delay > 15 * clk_mul ) //2043
 			{
 				if ( volume_mul )
 					playing = (int) enabled;
@@ -609,13 +610,14 @@ void Gb_Wave::run( blip_time_t time, blip_time_t end_time )
 
 		// wave size and bank
 		int const size20_mask = 0x20;
-		int const flags = regs [0] & agb_mask;
-		int const wave_mask = (flags & size20_mask) | 0x1F;
+		int const flags = regs [0] & agb_mask; //AdamN: osc.regs[0]=apu.regs[10] (NR30)
+		int const wave_mask = (flags & size20_mask) | 0x1F; //AdamN: Bank Dimension
 		int swap_banks = 0;
-		if ( flags & bank40_mask )
+		if ( flags & bank40_mask ) //AdamN: Bank 1
 		{
-			swap_banks = flags & size20_mask;
+			swap_banks = flags & size20_mask; //AdamN: Bank Dimension, swap_banks = Use 2 Banks (64 digits)
 			wave += bank_size/2 - (swap_banks >> 1);
+			//wave = &this->wave_ram[bank_size/2 - (swap_banks >> 1)];
 		}
 
 		int ph = this->phase ^ swap_banks;
@@ -640,13 +642,14 @@ void Gb_Wave::run( blip_time_t time, blip_time_t end_time )
 				ph = (ph + 1) & wave_mask;
 
 				// Scale by volume
-				int amp = (nybble * volume_mul) >> (volume_shift + 4);
+				int amp = (nybble * volume_mul) >> (volume_shift + 4); //AdamN: should we use +dac_bias in here?
 
 				int delta = amp - lamp;
 				if ( delta )
 				{
 					lamp = amp;
 					med_synth->offset_inline( time, delta, out );
+					//good_synth->offset_inline( time, delta, out );
 				}
 				time += per;
 			}

@@ -150,6 +150,7 @@
 #define IDC_C_FLAG                      1020
 #define IDC_CONTINUE                    1020
 #define IDC_SAVE_DIR                    1020
+#define IDC_STEPINTO                    1020
 #define IDC_V_FLAG                      1021
 #define IDC_CAPTURE_DIR                 1021
 #define IDC_CHEAT_LIST                  1021
@@ -215,6 +216,7 @@
 #define IDS_VALUE_CANNOT_BE_EMPTY       1042
 #define IDS_ERROR_ON_STARTDOC           1043
 #define IDC_R                           1043
+#define IDC_ADDRESS2                    1043
 #define IDS_ERROR_ON_STARTPAGE          1044
 #define IDC_G                           1044
 #define IDS_ERROR_PRINTING_ON_STRETCH   1045
@@ -459,6 +461,8 @@
 #define IDC_ARM                         1200
 #define IDC_THUMB                       1201
 #define IDC_AUTO_UPDATE                 1204
+#define IDC_BREAK_AT                    1205
+#define IDC_AUTO_STEP                   1206
 #define IDC_N                           1210
 #define IDC_Z                           1211
 #define IDC_C                           1212
@@ -491,6 +495,8 @@
 #define IDC_VERBOSE_SOUNDOUTPUT         1235
 #define IDC_NOTES                       1236
 #define IDC_CURRENT_ADDRESS_LABEL       1236
+#define IDC_VERBOSE_SIO                 1236
+#define IDC_VERBOSE_LINK                1237
 #define IDC_LOAD                        1238
 #define IDC_SIZE_CONTROL                1240
 #define IDC_MODES                       1240
@@ -841,6 +847,7 @@
 #define IDC_LINK3P                      40325
 #define IDC_LINK4P                      40326
 #define IDC_CLINKUDP                    40327
+#define IDC_LINK5P                      40327
 #define IDC_SPEEDON                     40328
 #define ID_OPTIONS_EMULATOR_REMOVEINTROSGBA 40331
 #define ID_Menu                         40332
