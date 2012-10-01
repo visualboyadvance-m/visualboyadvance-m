@@ -33,10 +33,15 @@ Disassemble::Disassemble(CWnd* pParent /*=NULL*/)
   m_t = FALSE;
   m_v = FALSE;
   m_z = FALSE;
+  m_breakpt = FALSE;
+  m_autostep = FALSE;
   mode = -1;
   //}}AFX_DATA_INIT
   mode = 0;
   address = 0;
+  //breakaddr = 0xffffffff;
+  //breakpt = false;
+  autostep = false;
   autoUpdate = false;
   count = 1;
 }
@@ -56,6 +61,9 @@ void Disassemble::DoDataExchange(CDataExchange* pDX)
   DDX_Check(pDX, IDC_V, m_v);
   DDX_Check(pDX, IDC_Z, m_z);
   DDX_Radio(pDX, IDC_AUTOMATIC, mode);
+  DDX_Check(pDX, IDC_BREAK_AT, m_breakpt);
+  DDX_Control(pDX, IDC_ADDRESS2, m_address2);
+  DDX_Check(pDX, IDC_AUTO_STEP, m_autostep);
   //}}AFX_DATA_MAP
 }
 
@@ -73,7 +81,9 @@ BEGIN_MESSAGE_MAP(Disassemble, CDialog)
   ON_BN_CLICKED(IDC_THUMB, OnThumb)
   ON_WM_VSCROLL()
   //}}AFX_MSG_MAP
-  END_MESSAGE_MAP()
+  ON_BN_CLICKED(IDC_BREAK_AT, &Disassemble::OnBnClickedBreakAt)
+  ON_BN_CLICKED(IDC_STEPINTO, &Disassemble::OnBnClickedStepinto)
+END_MESSAGE_MAP()
 
   /////////////////////////////////////////////////////////////////////////////
 // Disassemble message handlers
@@ -337,4 +347,39 @@ void Disassemble::update()
 void Disassemble::PostNcDestroy()
 {
   delete this;
+}
+
+
+void Disassemble::OnBnClickedBreakAt()
+{
+	// TODO: Add your control notification handler code here
+  CString buffer;
+  m_address2.GetWindowText(buffer);
+  sscanf(buffer, "%x", &breakaddr);
+  //if (mode==1)
+      breakaddr&=0xfffffffc;
+  //else if (mode==2)
+  //    breakaddr&=0xfffffffe;
+  m_breakpt = !m_breakpt;
+  breakpt = (bool)m_breakpt;
+  refresh();
+}
+
+
+void Disassemble::OnBnClickedStepinto()
+{
+	// TODO: Add your control notification handler code here
+  if(rom != NULL)
+  {
+  if(armState)
+    breakaddr = breakaddr + 4;
+  else
+    breakaddr = breakaddr + 2;
+  char buffer[20];
+  sprintf(buffer, _T("%08x"), breakaddr);
+  m_address2.SetWindowText(buffer);
+  cpuNextEvent = 1; //cpuTotalTicks;
+  holdState = false;
+  refresh();
+  }
 }

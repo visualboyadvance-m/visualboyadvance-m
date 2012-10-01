@@ -66,6 +66,12 @@ extern bool armState;
 extern int armMode;
 extern void (*cpuSaveGameFunc)(u32,u8);
 
+extern int cpuNextEvent;
+extern int cpuTotalTicks;
+extern bool holdState;
+extern bool breakpt;
+extern u32 breakaddr;
+
 #ifdef BKPT_SUPPORT
 extern u8 freezeWorkRAM[0x40000];
 extern u8 freezeInternalRAM[0x8000];

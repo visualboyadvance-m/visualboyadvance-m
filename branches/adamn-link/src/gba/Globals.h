@@ -15,6 +15,8 @@
 #define VERBOSE_UNDEFINED          256
 #define VERBOSE_AGBPRINT           512
 #define VERBOSE_SOUNDOUTPUT       1024
+#define VERBOSE_SIO               2048
+#define VERBOSE_LINK              4096
 
 extern reg_pair reg[45];
 extern bool ioReadable[0x400];

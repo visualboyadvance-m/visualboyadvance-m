@@ -33,6 +33,7 @@ Logging::Logging(CWnd* pParent /*=NULL*/)
   m_dma3 = FALSE;
   m_agbprint = FALSE;
   m_undefined = FALSE;
+  m_sio = FALSE;
   //}}AFX_DATA_INIT
 }
 
@@ -52,6 +53,8 @@ void Logging::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_VERBOSE_AGBPRINT, m_agbprint);
 	DDX_Check(pDX, IDC_VERBOSE_UNDEFINED, m_undefined);
 	DDX_Check(pDX, IDC_VERBOSE_SOUNDOUTPUT, m_sound_output);
+	DDX_Check(pDX, IDC_VERBOSE_SIO, m_sio);
+	DDX_Check(pDX, IDC_VERBOSE_LINK, m_link);
 }
 
 
@@ -69,10 +72,13 @@ BEGIN_MESSAGE_MAP(Logging, CDialog)
   ON_BN_CLICKED(IDC_VERBOSE_UNALIGNED_ACCESS, OnVerboseUnalignedAccess)
   ON_BN_CLICKED(IDC_VERBOSE_UNDEFINED, OnVerboseUndefined)
   ON_BN_CLICKED(IDC_VERBOSE_SOUNDOUTPUT, OnVerboseSoundoutput)
+  ON_BN_CLICKED(IDC_VERBOSE_SIO, OnVerboseSIO)
   ON_BN_CLICKED(IDC_SAVE, OnSave)
   ON_EN_ERRSPACE(IDC_LOG, OnErrspaceLog)
   ON_EN_MAXTEXT(IDC_LOG, OnMaxtextLog)
   ON_WM_CLOSE()
+//  ON_BN_CLICKED(IDC_VERBOSE_LINK, &Logging::OnBnClickedVerboseLink)
+ON_BN_CLICKED(IDC_VERBOSE_LINK, &Logging::OnVerboseLink)
 END_MESSAGE_MAP()
 
 
@@ -147,6 +153,16 @@ void Logging::OnVerboseSoundoutput()
 	systemVerbose ^= VERBOSE_SOUNDOUTPUT;
 }
 
+void Logging::OnVerboseSIO()
+{
+	systemVerbose ^= VERBOSE_SIO;
+}
+
+void Logging::OnVerboseLink()
+{
+	systemVerbose ^= VERBOSE_LINK;
+}
+
 void Logging::OnSave()
 {
   int len = m_log.GetWindowTextLength();
@@ -213,6 +229,8 @@ BOOL Logging::OnInitDialog()
   m_undefined =        (systemVerbose & VERBOSE_UNDEFINED) != 0;
   m_agbprint =         (systemVerbose & VERBOSE_AGBPRINT) != 0;
   m_sound_output =     (systemVerbose & VERBOSE_SOUNDOUTPUT) != 0;
+  m_sio =              (systemVerbose & VERBOSE_SIO) != 0;
+  m_link =             (systemVerbose & VERBOSE_LINK) != 0;
   UpdateData(FALSE);
 
   m_log.LimitText(-1);
@@ -293,3 +311,7 @@ void toolsClearLog()
 		Logging::instance->clearLog();
 	}
 }
+
+
+
+

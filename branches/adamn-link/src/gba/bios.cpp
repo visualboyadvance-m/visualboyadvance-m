@@ -856,7 +856,7 @@ void BIOS_RegisterRamReset(u32 flags)
   // no need to trace here. this is only called directly from GBA.cpp
   // to emulate bios initialization
 
-  CPUUpdateRegister(0x0, 0x80);
+  CPUUpdateRegister(0x0, 0x80); //DISPCNT
 
   if(flags) {
     if(flags & 0x01) {
@@ -894,35 +894,35 @@ void BIOS_RegisterRamReset(u32 flags)
       for(i = 0; i < 0x18; i++)
         CPUUpdateRegister(0xb0+i*2, 0);
 
-      CPUUpdateRegister(0x130, 0);
-      CPUUpdateRegister(0x20, 0x100);
-      CPUUpdateRegister(0x30, 0x100);
-      CPUUpdateRegister(0x26, 0x100);
-      CPUUpdateRegister(0x36, 0x100);
+      CPUUpdateRegister(0x130, 0); //KEYINPUT
+      CPUUpdateRegister(0x20, 0x100); //BG2PA
+      CPUUpdateRegister(0x30, 0x100); //BG3PA
+      CPUUpdateRegister(0x26, 0x100); //BG2PD
+      CPUUpdateRegister(0x36, 0x100); //BG3PD
     }
 
     if(flags & 0x20) {
       int i;
       for(i = 0; i < 8; i++)
-        CPUUpdateRegister(0x110+i*2, 0);
-      CPUUpdateRegister(0x134, 0x8000);
+        CPUUpdateRegister(0x110+i*2, 0); //Unused Registers after Timer Register?
+      CPUUpdateRegister(0x134, 0x8000); //COMM_RCNT for GP/JOYBUS?
       for(i = 0; i < 7; i++)
-        CPUUpdateRegister(0x140+i*2, 0);
+        CPUUpdateRegister(0x140+i*2, 0); //Unused Registers after COMM_JOYCNT?
     }
 
     if(flags & 0x40) {
       int i;
-      CPUWriteByte(0x4000084, 0);
-      CPUWriteByte(0x4000084, 0x80);
-      CPUWriteMemory(0x4000080, 0x880e0000);
-      CPUUpdateRegister(0x88, CPUReadHalfWord(0x4000088)&0x3ff);
-      CPUWriteByte(0x4000070, 0x70);
+      CPUWriteByte(0x4000084, 0); //SOUNDCNT_X, Is this realy needed as below it's rewritten right?
+      CPUWriteByte(0x4000084, 0x80); //SOUNDCNT_X, Rewritten above?
+      CPUWriteMemory(0x4000080, 0x880e0000); //SOUNDCNT_L
+      CPUUpdateRegister(0x88, CPUReadHalfWord(0x4000088)&0x3ff); //SOUNDBIAS
+      CPUWriteByte(0x4000070, 0x70); //SOUND3CNT_L
       for(i = 0; i < 8; i++)
         CPUUpdateRegister(0x90+i*2, 0);
-      CPUWriteByte(0x4000070, 0);
+      CPUWriteByte(0x4000070, 0); //SOUND3CNT_L, Rewritten again?
       for(i = 0; i < 8; i++)
         CPUUpdateRegister(0x90+i*2, 0);
-      CPUWriteByte(0x4000084, 0);
+      CPUWriteByte(0x4000084, 0); //SOUNDCNT_X, Another Rewriten??
     }
   }
 }

@@ -14,6 +14,7 @@ License along with this module; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 #include "blargg_source.h"
+#include "../system.h"
 
 unsigned const vol_reg    = 0xFF24;
 unsigned const stereo_reg = 0xFF25;
@@ -317,6 +318,9 @@ void Gb_Apu::write_register( blip_time_t time, unsigned addr, int data )
 	{
 		int old_data = regs [reg];
 		regs [reg] = data;
+		
+		//if(lastSA>=0x70 && lastSA<=0x75)
+		//log("CH3 Addr:%04X = %04X  Regs[%d]:%02X->%02X\n",lastSA,lastSR,reg,old_data,data);
 
 		if ( addr < vol_reg )
 		{

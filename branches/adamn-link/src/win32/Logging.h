@@ -27,6 +27,8 @@ public:
 	BOOL   m_agbprint;
 	BOOL   m_undefined;
 	BOOL   m_sound_output;
+	BOOL   m_sio;
+	BOOL   m_link;
 
 // Overrides
 protected:
@@ -47,6 +49,8 @@ protected:
 	afx_msg void OnVerboseUnalignedAccess();
 	afx_msg void OnVerboseUndefined();
 	afx_msg void OnVerboseSoundoutput();
+	afx_msg void OnVerboseSIO();
+	afx_msg void OnVerboseLink();
 	afx_msg void OnSave();
 	afx_msg void OnClose();
 	afx_msg void OnErrspaceLog();

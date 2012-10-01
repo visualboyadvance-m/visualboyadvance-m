@@ -303,7 +303,7 @@ void soundEvent(u32 address, u16 data)
 {
 	switch ( address )
 	{
-	case SGCNT0_H:
+	case SGCNT0_H: //SOUNDCNT_H
 		write_SGCNT0_H( data );
 		break;
 
@@ -319,7 +319,7 @@ void soundEvent(u32 address, u16 data)
 		WRITE16LE( &ioMem[address], data );
 		break;
 
-	case 0x88:
+	case 0x88: //SOUNDBIAS
 		data &= 0xC3FF;
 		WRITE16LE( &ioMem[address], data );
 		break;

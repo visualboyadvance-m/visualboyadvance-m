@@ -43,6 +43,8 @@ public:
 	void reset();  // stop and reset the secondary sound buffer
 	void resume(); // resume the secondary sound buffer
 	void write(u16 * finalWave, int length);  // write the emulated sound to the secondary sound buffer
+	// Configuration Changes
+	void setThrottle( unsigned short throttle );
 };
 
 
@@ -191,6 +193,8 @@ bool DirectSound::init(long sampleRate)
 		return false;
 	}
 
+	setThrottle(theApp.throttle); //AdamN: setting sound pitch to current throttle
+
 	return true;
 }
 
@@ -240,7 +244,7 @@ void DirectSound::write(u16 * finalWave, int length)
 	LPVOID       lpvPtr2;
 	DWORD        dwBytes2 = 0;
 
-	if( !speedup && synchronize && !theApp.throttle ) {
+	if( !speedup && synchronize /*&& !theApp.throttle*/ ) {
 		hr = dsbSecondary->GetStatus(&status);
 		if( status & DSBSTATUS_PLAYING ) {
 			if( !soundPaused ) {
@@ -308,6 +312,18 @@ void DirectSound::write(u16 * finalWave, int length)
 		systemMessage( 0, _T("dsbSecondary->Lock() failed: %08x"), hr );
 		return;
 	}
+}
+
+void DirectSound::setThrottle( unsigned short throttle ) //AdamN: doesn't works quite right yet
+{
+	if(!pDirectSound) return;
+	if( dsbSecondary == NULL ) return;
+
+	if( throttle == 0 ) throttle = 100;
+	//HRESULT hr = dsbPrimary->SetFrequency( (DWORD)(soundGetSampleRate() * throttle / 100.0f) ); //AdamN: may not be valid for primary buffer, also need to check CAPS whether frequency is supported or not
+	//ASSERT( hr == S_OK );
+	HRESULT hr = dsbSecondary->SetFrequency( (DWORD)(soundGetSampleRate() * throttle / 100.0f) ); //AdamN: may need to use IDirectMusicSegment8::SetLength to adjust the inverval for looping to prevent silence when pitch is higher than normal pitch or restarted/relooped when pitch is lower than normal before it finished the whole stream
+	ASSERT( hr == S_OK );
 }
 
 SoundDriver *newDirectSound()

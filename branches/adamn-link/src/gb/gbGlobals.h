@@ -1,6 +1,8 @@
 #ifndef GBGLOBALS_H
 #define GBGLOBALS_H
 
+#define VERBOSE_SIO               2048
+
 extern int gbRomSizeMask;
 extern int gbRomSize;
 extern int gbRamSize;

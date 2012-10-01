@@ -132,13 +132,14 @@ BEGIN
     CONTROL         "Network",IDC_LINK_LAN,"Button",BS_AUTORADIOBUTTON,17,43,70,16
 END
 
-IDD_LINKTAB2 DIALOG 0, 0, 210, 113
+IDD_LINKTAB2 DIALOGEX 0, 0, 210, 113
 STYLE DS_SETFONT | WS_CHILD
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "2",IDC_LINK2P,"Button",BS_AUTORADIOBUTTON | WS_GROUP,46,16,21,13
-    CONTROL         "3",IDC_LINK3P,"Button",BS_AUTORADIOBUTTON,94,16,21,13
-    CONTROL         "4",IDC_LINK4P,"Button",BS_AUTORADIOBUTTON,142,16,21,13
+    CONTROL         "2",IDC_LINK2P,"Button",BS_AUTORADIOBUTTON | WS_GROUP,33,17,21,13
+    CONTROL         "3",IDC_LINK3P,"Button",BS_AUTORADIOBUTTON,73,17,21,13
+    CONTROL         "4",IDC_LINK4P,"Button",BS_AUTORADIOBUTTON,115,17,21,13
+    CONTROL         "5",IDC_LINK5P,"Button",BS_AUTORADIOBUTTON,156,17,21,13
     CONTROL         "TCP/IP",IDC_LINKTCP,"Button",BS_AUTORADIOBUTTON | WS_GROUP,54,47,42,14
     CONTROL         "UDP",IDC_LINKUDP,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,121,47,33,14
     PUSHBUTTON      "Start!",IDC_SERVERSTART,79,89,50,17
@@ -162,17 +163,17 @@ BEGIN
     CONTROL         "On (fast)",IDC_SPEEDON,"Button",BS_AUTORADIOBUTTON,128,63,48,12
 END
 
-IDD_SERVERWAIT DIALOG 0, 0, 186, 90
+IDD_SERVERWAIT DIALOGEX 0, 0, 186, 90
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Waiting for players"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,63,69,50,14
     CONTROL         "Progress1",IDC_SERVERWAIT,"msctls_progress32",WS_BORDER,33,50,120,13
-    LTEXT           "",IDC_STATIC1,7,7,154,8
-    LTEXT           "",IDC_STATIC2,7,17,105,8
-    LTEXT           "",IDC_STATIC3,7,25,105,8
-    LTEXT           "",IDC_STATIC4,7,33,105,8
+    LTEXT           "",IDC_STATIC1,7,7,178,8,SS_ENDELLIPSIS
+    LTEXT           "",IDC_STATIC2,7,17,175,8
+    LTEXT           "",IDC_STATIC3,7,25,175,8
+    LTEXT           "",IDC_STATIC4,7,33,175,8
 END
 
 IDD_OPENDLG DIALOG 36, 24, 202, 117
@@ -740,10 +741,10 @@ BEGIN
     GROUPBOX        "Sprite",IDC_STATIC,8,67,154,30
 END
 
-IDD_DISASSEMBLE DIALOG 0, 0, 402, 225
+IDD_DISASSEMBLE DIALOGEX 0, 0, 402, 250
 STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Disassemble"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     CONTROL         "Automatic",IDC_AUTOMATIC,"Button",BS_AUTORADIOBUTTON | WS_GROUP,7,9,47,10
     CONTROL         "ARM",IDC_ARM,"Button",BS_AUTORADIOBUTTON,62,9,32,10
@@ -800,6 +801,10 @@ BEGIN
     LTEXT           "",IDC_MODE,376,176,20,8,SS_NOPREFIX
     SCROLLBAR       IDC_VSCROLL,283,25,10,161,SBS_VERT
     PUSHBUTTON      "Goto R15",IDC_GOPC,7,204,50,14
+    CONTROL         "Break at",IDC_BREAK_AT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,225,41,10
+    EDITTEXT        IDC_ADDRESS2,53,222,65,14,ES_UPPERCASE | ES_AUTOHSCROLL | WS_GROUP
+    PUSHBUTTON      "Step Into",IDC_STEPINTO,124,222,50,14
+    CONTROL         "Auto Step",IDC_AUTO_STEP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,179,225,47,10
 END
 
 IDD_GDB_PORT DIALOG 0, 0, 186, 51
@@ -823,13 +828,12 @@ BEGIN
     LTEXT           "",IDC_PORT,143,7,36,8,SS_NOPREFIX
 END
 
-IDD_LOGGING DIALOGEX 0, 0, 382, 220
+IDD_LOGGING DIALOGEX 0, 0, 382, 257
 STYLE DS_SETFONT | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "Logging"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "SWI",IDC_VERBOSE_SWI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,18,90,12
     CONTROL         "Unaligned memory",IDC_VERBOSE_UNALIGNED_ACCESS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,36,90,12
     CONTROL         "Illegal write",IDC_VERBOSE_ILLEGAL_WRITE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,54,90,12
     CONTROL         "Illegal read",IDC_VERBOSE_ILLEGAL_READ,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,72,90,12
@@ -839,12 +843,15 @@ BEGIN
     CONTROL         "DMA 3",IDC_VERBOSE_DMA3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,144,90,12
     CONTROL         "Undefined instruction",IDC_VERBOSE_UNDEFINED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,162,90,12
     CONTROL         "AGBPrint",IDC_VERBOSE_AGBPRINT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,180,90,12
-    EDITTEXT        IDC_LOG,114,6,258,192,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
-    PUSHBUTTON      "Save...",IDC_SAVE,114,204,48,12
-    PUSHBUTTON      "Clear",IDC_CLEAR,168,204,48,12
-    DEFPUSHBUTTON   "OK",ID_OK,324,204,48,12
-    GROUPBOX        "Verbose",IDC_STATIC,6,6,102,210
+    EDITTEXT        IDC_LOG,114,6,258,226,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
+    PUSHBUTTON      "Save...",IDC_SAVE,113,238,48,12
+    PUSHBUTTON      "Clear",IDC_CLEAR,171,238,48,12
+    DEFPUSHBUTTON   "OK",ID_OK,327,238,48,12
+    GROUPBOX        "Verbose",IDC_STATIC,6,7,102,243
     CONTROL         "Sound output",IDC_VERBOSE_SOUNDOUTPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,198,90,12
+    CONTROL         "SIO",IDC_VERBOSE_SIO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,216,90,12
+    CONTROL         "Link",IDC_VERBOSE_LINK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,233,90,12
+    CONTROL         "SWI",IDC_VERBOSE_SWI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,19,90,12
 END
 
 IDD_EXPORT_SPS DIALOGEX 0, 0, 248, 148
@@ -1238,6 +1245,14 @@ BEGIN
         BOTTOMMARGIN, 107
     END
 
+    IDD_LINKTAB2, DIALOG
+    BEGIN
+    END
+
+    IDD_SERVERWAIT, DIALOG
+    BEGIN
+    END
+
     IDD_OPENDLG, DIALOG
     BEGIN
         RIGHTMARGIN, 165
@@ -1424,7 +1439,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 396
         TOPMARGIN, 7
-        BOTTOMMARGIN, 218
+        BOTTOMMARGIN, 243
     END
 
     IDD_GDB_PORT, DIALOG
@@ -1448,7 +1463,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 375
         TOPMARGIN, 7
-        BOTTOMMARGIN, 213
+        BOTTOMMARGIN, 250
     END
 
     IDD_EXPORT_SPS, DIALOG
@@ -1687,7 +1702,7 @@ BEGIN
         BEGIN
             MENUITEM "&Battery file...",            ID_FILE_IMPORT_BATTERYFILE
             MENUITEM "Gameshark &code file...",     ID_FILE_IMPORT_GAMESHARKCODEFILE
-            MENUITEM "&Gameshark/Pro Action Replay Snapshot...",      ID_FILE_IMPORT_GAMESHARKSNAPSHOT
+            MENUITEM "&Gameshark/Pro Action Replay Snapshot...", ID_FILE_IMPORT_GAMESHARKSNAPSHOT
         END
         POPUP "Export"
         BEGIN
@@ -2225,11 +2240,19 @@ BEGIN
     IDS_LOADED_CHEATS       "Loaded cheats"
     IDS_ERROR_DISP_COLOR    "Unsupported display setting for color depth: %d bits. \nWindows desktop must be in either 16-bit, 24-bit or 32-bit mode for this program to work in window mode."
     IDS_ADD_GSA_CODE        "Add GameSharkAdvance code"
-    IDS_FILTER_GSVSPS       "GS & PAC Snapshots (*.SPS;*.XPS)_*.SPS;*.XPS_GameShark SP Snapshots (*.GSV)_*.gsv__"
     IDS_FILTER_SPS          "Gameshark Snapshot_*.SPS__"
     IDS_SELECT_SNAPSHOT_FILE "Select snapshot file"
     IDS_FILTER_SAV          "Battery file_*.SAV_Flash save_*.DAT__"
     IDS_SELECT_BATTERY_FILE "Select battery file"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_INVALID_INTERVAL_VALUE 
+                            "Invalid rewind interval value. Please enter a number between 0 and 600 seconds."
+    IDS_REGISTRY            "VisualBoyAdvance no longer uses the registry to store its settings. Your previous settings have been exported into the file: %s"
+    IDS_MOVIE_PLAY          "Playing a movie will load a save state which may erase your previous battery saves. Please be sure to have a saved state if you don't want to loose any previous data."
+    IDS_FILTER_GSVSPS       "GS & PAC Snapshots (*.SPS;*.XPS)_*.SPS;*.XPS_GameShark SP Snapshots (*.GSV)_*.gsv__"
 END
 
 STRINGTABLE
@@ -2290,14 +2313,6 @@ BEGIN
     IDS_BUG_REPORT          "The bug report information is now available on the Windows Clipboard. Please paste it into any bug report made by email or on forums to help solve problems more easily."
     IDS_UNSUPPORTED_MOVIE_VERSION "Unsupported movie version %d."
     IDS_END_OF_MOVIE        "end of movie"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_INVALID_INTERVAL_VALUE 
-                            "Invalid rewind interval value. Please enter a number between 0 and 600 seconds."
-    IDS_REGISTRY            "VisualBoyAdvance no longer uses the registry to store its settings. Your previous settings have been exported into the file: %s"
-    IDS_MOVIE_PLAY          "Playing a movie will load a save state which may erase your previous battery saves. Please be sure to have a saved state if you don't want to loose any previous data."
 END
 
 STRINGTABLE

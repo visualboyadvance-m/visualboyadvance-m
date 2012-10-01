@@ -1,7 +1,12 @@
 #include "stdafx.h"
+//#include "afxctl.h"
 #include "vba.h"
 #include "LinkOptions.h"
 #include "../gba/GBALink.h"
+
+/*#ifdef _MSC_VER //#ifdef _WIN32
+#include "WinHelper.h"			// AdamN: MFC MultiThreading
+#endif*/
 
 extern lserver ls;
 
@@ -49,7 +54,7 @@ void LinkOptions::DoDataExchange(CDataExchange* pDX)
 
 BOOL LinkOptions::OnInitDialog(){
 	TCITEM tabitem;
-	char tabtext[3][8] = {"General", "Server", "Client"};
+	char tabtext[3][8] = {_T("General"), _T("Server"), _T("Client")};
 	int i;
 
 	CDialog::OnInitDialog();
@@ -145,6 +150,11 @@ void LinkServer::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(LinkServer)
+	BOOL ok = (theApp.cartridgeType != IMAGE_GB);
+	GetDlgItem(IDC_LINK3P)->EnableWindow(ok);
+	GetDlgItem(IDC_LINK4P)->EnableWindow(ok);
+	GetDlgItem(IDC_LINK5P)->EnableWindow(rfu_enabled && ok);
+	
 	DDX_Radio(pDX, IDC_LINK2P, m_numplayers);
 	DDX_Radio(pDX, IDC_LINKTCP, m_prottype);
 	DDX_Check(pDX, IDC_SSPEED, m_speed);
@@ -195,7 +205,7 @@ BOOL LinkServer::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	m_numplayers = lanlink.numgbas;
+	m_numplayers = max(lanlink.numgbas-1,0);
 	m_prottype = lanlink.type;
 	m_speed = lanlink.speed;
 
@@ -455,14 +465,14 @@ void LinkOptions::OnOk()
 void LinkGeneral::OnRadio1()
 {
 	m_type = 0;
-	lanlink.active = 0;
+	lanlink.active = 0; //Single Computer
 	GetParent()->Invalidate();
 }
 
 void LinkGeneral::OnRadio2()
 {
 	m_type = 1;
-	lanlink.active = 1;
+	lanlink.active = 1; //Networks
 	GetParent()->Invalidate();
 }
 
@@ -473,7 +483,7 @@ BOOL LinkGeneral::OnInitDialog(){
 	CDialog::OnInitDialog();
 
 	m_timeout.LimitText(5);
-	sprintf(timeout, "%d", linktimeout);
+	sprintf(timeout, _T("%d"), linktimeout);
 	m_timeout.SetWindowText(timeout);
 
 	m_type = lanlink.active;
@@ -504,8 +514,8 @@ void LinkServer::OnServerStart()
 
 	if((errorcode=ls.Init(&dlg))!=0){
 		char message[50];
-		sprintf(message, "Error %d occured.\nPlease try again.", errorcode);
-		MessageBox(message, "Error", MB_OK);
+		sprintf(message, _T("Error %d occured.\nPlease try again."), errorcode);
+		MessageBox(message, _T("Error"), MB_OK);
 		return;
 	}
 
@@ -520,6 +530,7 @@ BOOL LinkClient::OnInitDialog()
 
 	m_prottype = lanlink.type;
 	m_hacks = lanlink.speed;
+	m_serverip.SetWindowText(_T("localhost"));
 
 	UpdateData(FALSE);
 
@@ -539,11 +550,12 @@ void LinkClient::OnLinkConnect()
 	lanlink.speed = m_hacks==1 ? true : false;
 
 	m_serverip.GetWindowText(ipaddress, 30);
-
+	
 	if((errorcode=lc.Init(gethostbyname(ipaddress), &dlg))!=0){
+		
 		char message[50];
-		sprintf(message, "Error %d occured.\nPlease try again.", errorcode);
-		MessageBox(message, "Error", MB_OK);
+		sprintf(message, _T("Error %d occured.\nPlease try again."), errorcode);
+		MessageBox(message, _T("Error"), MB_OK);
 		return;
 	}
 	dlg.DoModal();
@@ -557,7 +569,7 @@ void LinkOptions::GetAllData(LinkGeneral *src)
 	src->UpdateData(true);
 
 	src->m_timeout.GetWindowText(timeout, 5);
-	sscanf(timeout, "%d", &linktimeout);
+	sscanf(timeout, _T("%d"), &linktimeout);
 
 	if(src->m_type==0){
 		lanlink.speed = 0;
@@ -593,6 +605,7 @@ void ServerWait::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
+
 BEGIN_MESSAGE_MAP(ServerWait, CDialog)
 	//{{AFX_MSG_MAP(ServerWait)
 		ON_BN_CLICKED(ID_CANCEL, OnCancel)
@@ -604,7 +617,9 @@ END_MESSAGE_MAP()
 
 void ServerWait::OnCancel()
 {
-	lanlink.terminate = true;
+	c_s.Lock(); //AdamN: Locking resource to prevent deadlock
+	lanlink.terminate = true; //AdamN: accessing this might not be thread-safe w/o locking
+	c_s.Unlock(); //AdamN: Unlock it after use
 	CDialog::OnCancel();
 }
 

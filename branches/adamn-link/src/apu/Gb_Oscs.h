@@ -165,11 +165,11 @@ private:
 	int period() const { return (2048 - frequency()) * (2 * clk_mul); }
 
 	// Non-zero if DAC is enabled
-	int dac_enabled() const { return regs [0] & 0x80; }
+	int dac_enabled() const { return regs [0] & 0x80; } //AdamN: osc.regs[0]=apu.regs[10]
 
 	void corrupt_wave();
 
-	BOOST::uint8_t* wave_bank() const { return &wave_ram [(~regs [0] & bank40_mask) >> 2 & agb_mask]; }
+	BOOST::uint8_t* wave_bank() const { return &wave_ram [(~regs [0] & bank40_mask) >> 2 & agb_mask]; } //AdamN: osc.regs[0]=apu.regs[10]
 
 	// Wave index that would be accessed, or -1 if no access would occur
 	int access( unsigned addr ) const;
