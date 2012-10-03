@@ -49,10 +49,10 @@ JoypadConfigDialog::JoypadConfigDialog(Config::Section * _poConfig) :
   m_oTitleLabel(_("Joypad :"), Gtk::ALIGN_RIGHT),
   m_oDefaultJoypad(_("Default joypad")),
   m_oTable(G_N_ELEMENTS(m_astKeys), 2, false),
+  m_iCurrentEntry(-1),
   m_bUpdating(false),
   m_ePad(PAD_MAIN),
-  m_poConfig(_poConfig),
-  m_iCurrentEntry(-1)
+  m_poConfig(_poConfig)
 {
   // Joypad selection
   m_oTitleCombo.append_text("1");
