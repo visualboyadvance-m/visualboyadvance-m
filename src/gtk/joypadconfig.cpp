@@ -115,7 +115,7 @@ void JoypadConfigDialog::vUpdateEntries()
 
   for (guint i = 0; i < m_oEntries.size(); i++)
   {
-    const char * csName = 0;
+    std::string csName;
 
     guint uiKeyval = inputGetKeymap(m_ePad, m_astKeys[i].m_eKeyFlag);
     int dev = uiKeyval >> 16;
@@ -158,10 +158,10 @@ void JoypadConfigDialog::vUpdateEntries()
     }
        }
 
-      csName = os.str().c_str();
+      csName = os.str();
     }
 
-    if (csName == 0)
+    if (csName.empty())
     {
       m_oEntries[i]->set_text(_("<Undefined>"));
     }
