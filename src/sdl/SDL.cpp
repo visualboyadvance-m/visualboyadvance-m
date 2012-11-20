@@ -1162,9 +1162,34 @@ void sdlInitVideo() {
     exit(-1);
   }
 
-  systemRedShift = sdlCalculateShift(surface->format->Rmask);
-  systemGreenShift = sdlCalculateShift(surface->format->Gmask);
-  systemBlueShift = sdlCalculateShift(surface->format->Bmask);
+  u32 rmask, gmask, bmask;
+  
+  if(openGL) {
+    #if SDL_BYTEORDER == SDL_LIL_ENDIAN /* OpenGL RGBA masks */
+      rmask = 0x000000FF;
+      gmask = 0x0000FF00;
+      bmask = 0x00FF0000;
+    #else
+      rmask = 0xFF000000;
+      gmask = 0x00FF0000; 
+      bmask = 0x0000FF00; 
+    #endif
+  } else {
+      rmask = surface->format->Rmask;
+      gmask = surface->format->Gmask;
+      bmask = surface->format->Bmask;
+  }
+  
+  systemRedShift = sdlCalculateShift(rmask);
+  systemGreenShift = sdlCalculateShift(gmask);
+  systemBlueShift = sdlCalculateShift(bmask);
+  
+  if(openGL) {
+      // Align to BGRA instead of ABGR
+      systemRedShift += 8;
+      systemGreenShift += 8;
+      systemBlueShift += 8;
+  }
 
   systemColorDepth = surface->format->BitsPerPixel;
 
@@ -2467,7 +2492,7 @@ void systemDrawScreen()
                       GL_RGB, GL_UNSIGNED_SHORT_5_6_5, screen);
     else
       glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
-                      GL_BGRA, GL_UNSIGNED_BYTE, screen);
+                      GL_BGRA, GL_UNSIGNED_INT_8_8_8_8, screen);
 
     glBegin(GL_TRIANGLE_STRIP);
       glTexCoord2f(0.0f, 0.0f);
