@@ -1,5 +1,7 @@
-# This file is distributed under the same license as the VBA-M package.
-# 
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
 # Translators:
 # Admc <Admc@ufurmix.org>, 2011.
 #   <Admc@ufurmix.org>, 2011.
@@ -8,7 +10,7 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-12-03 21:22+0100\n"
-"PO-Revision-Date: 2011-05-21 15:53+0000\n"
+"PO-Revision-Date: 2012-02-14 08:48+0000\n"
 "Last-Translator: Admc <Admc@ufurmix.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: pl\n"
@@ -16,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2)\n"
+"|| n%100>=20) ? 1 : 2);\n"
 
 #: ../src/gtk/joypadconfig.cpp:142
 msgid " Axis "
