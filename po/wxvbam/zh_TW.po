@@ -1,0 +1,3436 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# 
+# Translators:
+#   <hiunnhue108@ymail.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: VBA-M\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-12-03 21:22+0100\n"
+"PO-Revision-Date: 2012-12-20 16:09+0000\n"
+"Last-Translator: Hiunn_Hue <hiunnhue108@ymail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../src/wx/cmdevents.cpp:77
+msgid ""
+"GameBoy Advance Files "
+"(*.agb;*.gba;*.bin;*.elf;*.mb)|*.agb;*.gba;*.bin;*.elf;*.mb*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z|GameBoy"
+" Files "
+"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z|Archives"
+" (*.zip;*.7z;*.rar)|*.zip;*.7z;*.rar|"
+msgstr "GameBoy Advance 檔案 (*.agb;*.gba;*.bin;*.elf;*.mb)|*.agb;*.gba;*.bin;*.elf;*.mb*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z|GameBoy 檔案 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z|封存檔 (*.zip;*.7z;*.rar)|*.zip;*.7z;*.rar|"
+
+#: ../src/wx/cmdevents.cpp:88
+msgid "Open ROM file"
+msgstr "開啟 ROM 檔案"
+
+#: ../src/wx/cmdevents.cpp:436 ../src/wx/cmdevents.cpp:523
+#: ../src/wx/cmdevents.cpp:552 ../src/wx/cmdevents.cpp:606
+msgid "Unknown"
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:442
+msgid "ROM"
+msgstr "ROM"
+
+#: ../src/wx/cmdevents.cpp:445
+msgid "ROM+MBC1"
+msgstr "ROM+MBC1"
+
+#: ../src/wx/cmdevents.cpp:448
+msgid "ROM+MBC1+RAM"
+msgstr "ROM+MBC1+RAM"
+
+#: ../src/wx/cmdevents.cpp:451
+msgid "ROM+MBC1+RAM+BATT"
+msgstr "ROM+MBC1+RAM+BATT"
+
+#: ../src/wx/cmdevents.cpp:454
+msgid "ROM+MBC2"
+msgstr "ROM+MBC2"
+
+#: ../src/wx/cmdevents.cpp:457
+msgid "ROM+MBC2+BATT"
+msgstr "ROM+MBC2+BATT"
+
+#: ../src/wx/cmdevents.cpp:460
+msgid "ROM+MMM01"
+msgstr "ROM+MMM01"
+
+#: ../src/wx/cmdevents.cpp:463
+msgid "ROM+MMM01+RAM"
+msgstr "ROM+MMM01+RAM"
+
+#: ../src/wx/cmdevents.cpp:466
+msgid "ROM+MMM01+RAM+BATT"
+msgstr "ROM+MMM01+RAM+BATT"
+
+#: ../src/wx/cmdevents.cpp:469
+msgid "ROM+MBC3+TIMER+BATT"
+msgstr "ROM+MBC3+TIMER+BATT"
+
+#: ../src/wx/cmdevents.cpp:472
+msgid "ROM+MBC3+TIMER+RAM+BATT"
+msgstr "ROM+MBC3+TIMER+RAM+BATT"
+
+#: ../src/wx/cmdevents.cpp:475
+msgid "ROM+MBC3"
+msgstr "ROM+MBC3"
+
+#: ../src/wx/cmdevents.cpp:478
+msgid "ROM+MBC3+RAM"
+msgstr "ROM+MBC3+RAM"
+
+#: ../src/wx/cmdevents.cpp:481
+msgid "ROM+MBC3+RAM+BATT"
+msgstr "ROM+MBC3+RAM+BATT"
+
+#: ../src/wx/cmdevents.cpp:484
+msgid "ROM+MBC5"
+msgstr "ROM+MBC5"
+
+#: ../src/wx/cmdevents.cpp:487
+msgid "ROM+MBC5+RAM"
+msgstr "ROM+MBC5+RAM"
+
+#: ../src/wx/cmdevents.cpp:490
+msgid "ROM+MBC5+RAM+BATT"
+msgstr "ROM+MBC5+RAM+BATT"
+
+#: ../src/wx/cmdevents.cpp:493
+msgid "ROM+MBC5+RUMBLE"
+msgstr "ROM+MBC5+RUMBLE"
+
+#: ../src/wx/cmdevents.cpp:496
+msgid "ROM+MBC5+RUMBLE+RAM"
+msgstr "ROM+MBC5+RUMBLE+RAM"
+
+#: ../src/wx/cmdevents.cpp:499
+msgid "ROM+MBC5+RUMBLE+RAM+BATT"
+msgstr "ROM+MBC5+RUMBLE+RAM+BATT"
+
+#: ../src/wx/cmdevents.cpp:502
+msgid "ROM+MBC7+BATT"
+msgstr "ROM+MBC7+BATT"
+
+#: ../src/wx/cmdevents.cpp:505 ../src/wx/guiinit.cpp:642
+msgid "GameGenie"
+msgstr "GameGenie"
+
+#: ../src/wx/cmdevents.cpp:508
+msgid "GameShark V3.0"
+msgstr "GameShark V3.0"
+
+#: ../src/wx/cmdevents.cpp:511
+msgid "ROM+POCKET CAMERA"
+msgstr "ROM+POCKET CAMERA"
+
+#: ../src/wx/cmdevents.cpp:514
+msgid "ROM+BANDAI TAMA5"
+msgstr "ROM+BANDAI TAMA5"
+
+#: ../src/wx/cmdevents.cpp:517
+msgid "ROM+HuC-3"
+msgstr "ROM+HuC-3"
+
+#: ../src/wx/cmdevents.cpp:520
+msgid "ROM+HuC-1"
+msgstr "ROM+HuC-1"
+
+#: ../src/wx/cmdevents.cpp:557 ../src/wx/guiinit.cpp:1582 wx-xrc-strings.h:273
+#: wx-xrc-strings.h:304 wx-xrc-strings.h:316 wx-xrc-strings.h:342
+#: wx-xrc-strings.h:362 wx-xrc-strings.h:391 wx-xrc-strings.h:400
+msgid "None"
+msgstr "無"
+
+#: ../src/wx/cmdevents.cpp:633 ../src/wx/cmdevents.cpp:795
+msgid "Select battery file"
+msgstr "選擇電池記憶檔"
+
+#: ../src/wx/cmdevents.cpp:634 ../src/wx/cmdevents.cpp:796
+msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
+msgstr "電池記憶檔 (*.sav)|*.sav|Flash save (*.dat)|*.dat"
+
+#: ../src/wx/cmdevents.cpp:640
+msgid ""
+"Importing a battery file will erase any saved games (permanently after the "
+"next write).  Do you want to continue?"
+msgstr "匯入電池記憶檔將會抹除現有的存檔（下次存檔後就永遠無法復原）。你要繼續嗎？"
+
+#: ../src/wx/cmdevents.cpp:641 ../src/wx/cmdevents.cpp:666
+#: ../src/wx/cmdevents.cpp:763
+msgid "Confirm import"
+msgstr "匯入確認"
+
+#: ../src/wx/cmdevents.cpp:645 ../src/wx/panel.cpp:292
+#, c-format
+msgid "Loaded battery %s"
+msgstr "已讀取電池記憶檔 %s"
+
+#: ../src/wx/cmdevents.cpp:647
+#, c-format
+msgid "Error loading battery %s"
+msgstr "讀取電池記憶檔時發生錯誤 %s"
+
+#: ../src/wx/cmdevents.cpp:655
+msgid "Select code file"
+msgstr "選擇代碼檔"
+
+#: ../src/wx/cmdevents.cpp:657
+msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
+msgstr "Gameshark 代碼檔 (*.spc;*.xpc)|*.spc;*.xpc"
+
+#: ../src/wx/cmdevents.cpp:658
+msgid "Gameshark Code File (*.gcf)|*.gcf"
+msgstr "Gameshark 代碼檔 (*.gcf)|*.gcf"
+
+#: ../src/wx/cmdevents.cpp:665
+msgid ""
+"Importing a code file will replace any loaded cheats.  Do you want to "
+"continue?"
+msgstr "匯入的代碼檔將會取代已經載入的代碼。  你要繼續嗎？"
+
+#: ../src/wx/cmdevents.cpp:679
+#, c-format
+msgid "Cannot open file %s"
+msgstr "無法開啟檔案 %s"
+
+#: ../src/wx/cmdevents.cpp:689
+#, c-format
+msgid "Unsupported code file %s"
+msgstr "不支援的代碼檔 %s"
+
+#: ../src/wx/cmdevents.cpp:740
+#, c-format
+msgid "Loaded code file %s"
+msgstr "已讀取代碼檔 %s"
+
+#: ../src/wx/cmdevents.cpp:742
+#, c-format
+msgid "Error loading code file %s"
+msgstr "讀取代碼檔時發生錯誤 %s"
+
+#: ../src/wx/cmdevents.cpp:752 ../src/wx/cmdevents.cpp:818
+msgid "Select snapshot file"
+msgstr "選擇快照檔"
+
+#: ../src/wx/cmdevents.cpp:754
+msgid ""
+"GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots "
+"(*.gsv)|*.gsv"
+msgstr "GS & PAC 快照檔 (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots (*.gsv)|*.gsv"
+
+#: ../src/wx/cmdevents.cpp:755
+msgid "Gameboy Snapshot (*.gbs)|*.gbs"
+msgstr "Gameboy 快照檔 (*.gbs)|*.gbs"
+
+#: ../src/wx/cmdevents.cpp:762
+msgid ""
+"Importing a snapshot file will erase any saved games (permanently after the "
+"next write).  Do you want to continue?"
+msgstr "匯入快照檔將會抹除現有存檔（下次存檔後就永遠無法復原）。你要繼續嗎？"
+
+#: ../src/wx/cmdevents.cpp:784
+#, c-format
+msgid "Loaded snapshot file %s"
+msgstr "已讀取快照檔 %s"
+
+#: ../src/wx/cmdevents.cpp:786
+#, c-format
+msgid "Error loading snapshot file %s"
+msgstr "讀取快照檔時發生錯誤 %s"
+
+#: ../src/wx/cmdevents.cpp:804 ../src/wx/panel.cpp:536
+#, c-format
+msgid "Wrote battery %s"
+msgstr "寫入電池記憶檔 %s"
+
+#: ../src/wx/cmdevents.cpp:806 ../src/wx/panel.cpp:538
+#, c-format
+msgid "Error writing battery %s"
+msgstr "寫入電池記憶檔時發生錯誤 %s"
+
+#: ../src/wx/cmdevents.cpp:813
+msgid "EEPROM saves cannot be exported"
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:819
+msgid "Gameshark Snapshot (*.sps)|*.sps"
+msgstr "Gameshark 快照檔 (*.sps)|*.sps"
+
+#: ../src/wx/cmdevents.cpp:831
+msgid "Exported from VisualBoyAdvance-M"
+msgstr "從 VisualBoyAdvance-M 匯出"
+
+#: ../src/wx/cmdevents.cpp:841
+#, c-format
+msgid "Saved snapshot file %s"
+msgstr "已儲存快照檔 %s"
+
+#: ../src/wx/cmdevents.cpp:843
+#, c-format
+msgid "Error saving snapshot file %s"
+msgstr "儲存快照檔時發生錯誤 %s"
+
+#: ../src/wx/cmdevents.cpp:864 ../src/wx/cmdevents.cpp:941
+#: ../src/wx/cmdevents.cpp:1013 ../src/wx/cmdevents.cpp:1049
+#: ../src/wx/viewers.cpp:495 ../src/wx/viewers.cpp:664
+#: ../src/wx/viewsupt.cpp:1023
+msgid "Select output file"
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:865 ../src/wx/viewsupt.cpp:1024
+msgid "PNG images|*.png|BMP images|*.bmp"
+msgstr "PNG 圖片|*.png|BMP images|*.bmp"
+
+#: ../src/wx/cmdevents.cpp:884 ../src/wx/sys.cpp:400
+#, c-format
+msgid "Wrote snapshot %s"
+msgstr "寫入快照檔 %s"
+
+#: ../src/wx/cmdevents.cpp:905 ../src/wx/cmdevents.cpp:977
+msgid " files ("
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:1050 ../src/wx/cmdevents.cpp:1081
+msgid "VBA Movie files|*.vmv"
+msgstr "VBA 影像檔|*.vmv"
+
+#: ../src/wx/cmdevents.cpp:1080
+msgid "Select file"
+msgstr "選擇檔案"
+
+#: ../src/wx/cmdevents.cpp:1165
+msgid "LAN link is already active.  Disable link mode to disconnect."
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:1170
+msgid "RFU is currently only supported in local mode."
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:1246 ../src/wx/cmdevents.cpp:1328
+msgid "Select state file"
+msgstr "選擇即時紀錄檔"
+
+#: ../src/wx/cmdevents.cpp:1247 ../src/wx/cmdevents.cpp:1329
+msgid "VisualBoyAdvance saved game files|*.sgm"
+msgstr "VisualBoyAdvance saved game files|*.sgm"
+
+#: ../src/wx/cmdevents.cpp:1558
+msgid "Sound enabled"
+msgstr "音效已啟動"
+
+#: ../src/wx/cmdevents.cpp:1558
+msgid "Sound disabled"
+msgstr "音效已關閉"
+
+#: ../src/wx/cmdevents.cpp:1569 ../src/wx/cmdevents.cpp:1581
+#, c-format
+msgid "Volume: %d%%"
+msgstr "音量：%d%%"
+
+#: ../src/wx/cmdevents.cpp:1648
+msgid "Set to 0 for pseudo tty"
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:1650
+msgid "Port to wait for connection:"
+msgstr "等待連接的連接埠"
+
+#: ../src/wx/cmdevents.cpp:1651
+msgid "GDB Connection"
+msgstr "GDB 連接"
+
+#: ../src/wx/cmdevents.cpp:1666
+#, c-format
+msgid "Waiting for connection at %s"
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:1672
+#, c-format
+msgid "Waiting for connection on port %d"
+msgstr "在連接埠 %d 等候連接"
+
+#: ../src/wx/cmdevents.cpp:1674
+msgid "Waiting for GDB..."
+msgstr "正在等候 GDB ……"
+
+#: ../src/wx/cmdevents.cpp:2178
+msgid "Nintendo GameBoy (+Color+Advance) emulator."
+msgstr "Nintendo GameBoy (+Color+Advance) emulator."
+
+#: ../src/wx/cmdevents.cpp:2179
+msgid ""
+"Copyright (C) 1999-2003 Forgotten\n"
+"Copyright (C) 2004-2006 VBA development team\n"
+"Copyright (C) 2007-2011 VBA-M development team"
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2011 VBA-M development team"
+
+#: ../src/wx/cmdevents.cpp:2180
+msgid ""
+"This program is free software: you can redistribute it and/or modify\n"
+"it under the terms of the GNU General Public License as published by\n"
+"the Free Software Foundation, either version 2 of the License, or\n"
+"(at your option) any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+"\n"
+"You should have received a copy of the GNU General Public License\n"
+"along with this program.  If not, see http://www.gnu.org/licenses ."
+msgstr "This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses ."
+
+#: ../src/wx/dsound.cpp:93 ../src/wx/dsound.cpp:104
+#, c-format
+msgid "Cannot create DirectSound %08x"
+msgstr ""
+
+#: ../src/wx/dsound.cpp:109
+#, c-format
+msgid "Cannot SetCooperativeLevel %08x"
+msgstr ""
+
+#: ../src/wx/dsound.cpp:123
+#, c-format
+msgid "Cannot CreateSoundBuffer %08x"
+msgstr ""
+
+#: ../src/wx/dsound.cpp:143
+#, c-format
+msgid "CreateSoundBuffer(primary) failed %08x"
+msgstr ""
+
+#: ../src/wx/dsound.cpp:159
+#, c-format
+msgid "CreateSoundBuffer(secondary) failed %08x"
+msgstr ""
+
+#: ../src/wx/dsound.cpp:164
+#, c-format
+msgid "dsbSecondary->SetCurrentPosition failed %08x"
+msgstr ""
+
+#: ../src/wx/dsound.cpp:188
+#, c-format
+msgid "Cannot Play primary %08x"
+msgstr ""
+
+#: ../src/wx/dsound.cpp:306
+#, c-format
+msgid "dsbSecondary->Lock() failed: %08x"
+msgstr ""
+
+#: ../src/wx/gfxviewers.cpp:1041
+msgid "Select output file and type"
+msgstr ""
+
+#: ../src/wx/gfxviewers.cpp:1042
+msgid ""
+"Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
+"Table (*.act)|*.act"
+msgstr "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color Table (*.act)|*.act"
+
+#: ../src/wx/guiinit.cpp:57
+msgid "Start!"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:61 wx-xrc-strings.h:164
+msgid "Connect"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:94
+#, c-format
+msgid "Server IP address is: %s\n"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:105
+#, c-format
+msgid "Player %d connected\n"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:126
+msgid ""
+"Error occurred.\n"
+"Please try again."
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:131
+msgid "Waiting for clients..."
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:151
+#, c-format
+msgid "Connecting to %s\n"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:156
+#, c-format
+msgid "Connected as #%d\n"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:158
+#, c-format
+msgid "Waiting for %d players to join"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:160
+msgid "All players joined."
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:182
+#, c-format
+msgid ""
+"Error %d occurred.\n"
+"Please try again."
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:187
+msgid "Waiting for connection..."
+msgstr "等候連接……"
+
+#: ../src/wx/guiinit.cpp:262 ../src/wx/guiinit.cpp:285
+msgid "Select cheat file"
+msgstr "選擇金手指代碼表"
+
+#: ../src/wx/guiinit.cpp:263 ../src/wx/guiinit.cpp:286
+msgid "VBA cheat lists (*.clt)|*.clt"
+msgstr "VBA 金手指代碼表 (*.clt)|*.clt"
+
+#: ../src/wx/guiinit.cpp:277 ../src/wx/panel.cpp:318
+msgid "Loaded cheats"
+msgstr "已讀取金手指"
+
+#: ../src/wx/guiinit.cpp:300
+msgid "Saved cheats"
+msgstr "已儲存金手指"
+
+#: ../src/wx/guiinit.cpp:324 ../src/wx/guiinit.cpp:341
+msgid "Restore old values?"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:325 ../src/wx/guiinit.cpp:342
+msgid "Removing cheats"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:641 wx-xrc-strings.h:434
+msgid "GameShark"
+msgstr "GameShark"
+
+#: ../src/wx/guiinit.cpp:644
+msgid "Generic Code"
+msgstr "通用代碼"
+
+#: ../src/wx/guiinit.cpp:645
+msgid "GameShark Advance"
+msgstr "GameShark Advance"
+
+#: ../src/wx/guiinit.cpp:646
+msgid "CodeBreaker Advance"
+msgstr "CodeBreaker Advance"
+
+#: ../src/wx/guiinit.cpp:705 ../src/wx/guiinit.cpp:911
+msgid "Number cannot be empty"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:733
+#, c-format
+msgid "Search produced %d results.  Please refine better"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:743
+msgid "Search produced no results"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:883
+msgid "8-bit "
+msgstr "8-bit "
+
+#: ../src/wx/guiinit.cpp:886
+msgid "16-bit "
+msgstr "16-bit "
+
+#: ../src/wx/guiinit.cpp:889
+msgid "32-bit "
+msgstr "32-bit "
+
+#: ../src/wx/guiinit.cpp:894
+msgid "signed decimal"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:897
+msgid "unsigned decimal"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:900
+msgid "unsigned hexadecimal"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:1323
+#, c-format
+msgid "%d frames = %.2f ms"
+msgstr "%d frames = %.2f ms"
+
+#: ../src/wx/guiinit.cpp:1334
+msgid "Default device"
+msgstr "預設裝置"
+
+#: ../src/wx/guiinit.cpp:1453
+msgid "You must enter a valid host name"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:1454
+msgid "Host name invalid"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:1486
+msgid "Desktop mode"
+msgstr "桌面模式"
+
+#: ../src/wx/guiinit.cpp:1492
+#, c-format
+msgid "%d x %d - %dbpp @ %dHz"
+msgstr "%d x %d - %dbpp @ %dHz"
+
+#: ../src/wx/guiinit.cpp:1619
+#, c-format
+msgid "No usable rpi plugins found in %s"
+msgstr "找不到可用的 rpi 外掛元件：%s"
+
+#: ../src/wx/guiinit.cpp:1636 wx-xrc-strings.h:359
+msgid "Plugin"
+msgstr "外掛"
+
+#: ../src/wx/guiinit.cpp:1659
+msgid "Please select a plugin or a different filter"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:1660
+msgid "Plugin selection error"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:1834
+msgid "This will clear all user-defined accelerators.  Are you sure?"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:1835
+msgid "Confirm"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:2048
+msgid "Main display panel not found"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:2062
+msgid "Main icon not found"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:2068
+msgid "Welcome to wxVBAM!"
+msgstr "歡迎使用 wxVBAM！"
+
+#: ../src/wx/guiinit.cpp:2159
+#, c-format
+msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:2171
+#, c-format
+msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:2277
+#, c-format
+msgid "Invalid menu item %s; removing"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:2298 ../src/wx/viewsupt.h:38
+#, c-format
+msgid "Unable to load dialog %s from resources"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:2302
+#, c-format
+msgid "Unable to load dialog %s (control %s) from resources"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:2501
+msgid "Code"
+msgstr "代碼"
+
+#: ../src/wx/guiinit.cpp:2510
+msgid "Description"
+msgstr "描述"
+
+#: ../src/wx/guiinit.cpp:2589 wx-xrc-strings.h:201
+msgid "Address"
+msgstr "位址"
+
+#: ../src/wx/guiinit.cpp:2590
+msgid "Old Value"
+msgstr "舊數值"
+
+#: ../src/wx/guiinit.cpp:2591
+msgid "New Value"
+msgstr "新數值"
+
+#: ../src/wx/guiinit.cpp:3098
+msgid "Menu commands"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:3119
+msgid "Other commands"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:3205
+msgid "JoyBus host invalid; disabling"
+msgstr ""
+
+#: ../src/wx/openal.cpp:161
+msgid ""
+"OpenAL library could not be found on your system.  Please install the "
+"runtime from http://openal.org"
+msgstr "你的系統中找不到 OpenAL 函式庫。  請至 http://openal.org 下載並安裝。"
+
+#: ../src/wx/opts.cpp:318 ../src/wx/opts.cpp:358 ../src/wx/opts.cpp:382
+#: ../src/wx/opts.cpp:391
+#, c-format
+msgid "Invalid option %s present; removing if possible"
+msgstr ""
+
+#: ../src/wx/opts.cpp:346 ../src/wx/opts.cpp:369
+#, c-format
+msgid "Invalid option group %s present; removing if possible"
+msgstr ""
+
+#: ../src/wx/opts.cpp:432 ../src/wx/opts.cpp:676
+#, c-format
+msgid "Invalid value %s for option %s; valid values are %s%s%s"
+msgstr ""
+
+#: ../src/wx/opts.cpp:454 ../src/wx/opts.cpp:691
+#, c-format
+msgid "Invalid value %d for option %s; valid values are %d - %d"
+msgstr ""
+
+#: ../src/wx/opts.cpp:503 ../src/wx/opts.cpp:520 ../src/wx/opts.cpp:745
+#: ../src/wx/opts.cpp:765
+#, c-format
+msgid "Invalid key binding %s for %s"
+msgstr ""
+
+#: ../src/wx/opts.cpp:657
+#, c-format
+msgid "Invalid flag option %s - %s ignored"
+msgstr ""
+
+#: ../src/wx/panel.cpp:55
+#, c-format
+msgid "%s is not a valid ROM file"
+msgstr "%s 不是有效的 ROM 檔案"
+
+#: ../src/wx/panel.cpp:56 ../src/wx/panel.cpp:110 ../src/wx/panel.cpp:173
+msgid "Problem loading file"
+msgstr "讀取檔案時發生問題"
+
+#: ../src/wx/panel.cpp:109
+#, c-format
+msgid "Unable to load Game Boy ROM %s"
+msgstr "無法讀取 Game Boy ROM %s"
+
+#: ../src/wx/panel.cpp:153 ../src/wx/panel.cpp:234
+#, c-format
+msgid "Could not load BIOS %s"
+msgstr "無法讀取 BIOS %s"
+
+#: ../src/wx/panel.cpp:172
+#, c-format
+msgid "Unable to load Game Boy Advance ROM %s"
+msgstr "無法讀取 Game Boy Advance ROM %s"
+
+#: ../src/wx/panel.cpp:335
+msgid " player "
+msgstr ""
+
+#: ../src/wx/panel.cpp:484
+#, c-format
+msgid "Loaded state %s"
+msgstr "已讀取即時紀錄檔 %s"
+
+#: ../src/wx/panel.cpp:484
+#, c-format
+msgid "Error loading state %s"
+msgstr "讀取即時紀錄檔時發生錯誤 %s"
+
+#: ../src/wx/panel.cpp:508
+#, c-format
+msgid "Saved state %s"
+msgstr "已完成即時紀錄 %s"
+
+#: ../src/wx/panel.cpp:508
+#, c-format
+msgid "Error saving state %s"
+msgstr "即時記錄時發生錯誤 %s"
+
+#: ../src/wx/panel.cpp:678
+#, c-format
+msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
+msgstr "不支援全螢幕模式 %dx%d-%d@%d， 尋找其他模式。"
+
+#: ../src/wx/panel.cpp:708
+#, c-format
+msgid "Fullscreen mode %dx%d-%d@%d not supported"
+msgstr "不支援全螢幕模式 %dx%d-%d@%d"
+
+#: ../src/wx/panel.cpp:712
+#, c-format
+msgid "Valid mode: %dx%d-%d@%d"
+msgstr "有效模式：%dx%d-%d@%d"
+
+#: ../src/wx/panel.cpp:719
+#, c-format
+msgid "Chose mode %dx%d-%d@%d"
+msgstr "選擇模式：%dx%d-%d@%d"
+
+#: ../src/wx/panel.cpp:722
+#, c-format
+msgid "Failed to change mode to %dx%d-%d@%d"
+msgstr "無法切換到 %dx%d-%d@%d 模式"
+
+#: ../src/wx/panel.cpp:774
+msgid "Not a valid GBA cartridge"
+msgstr "不是有效的 GBA 卡匣"
+
+#: ../src/wx/panel.cpp:853
+msgid "No memory for rewinding"
+msgstr ""
+
+#: ../src/wx/panel.cpp:860
+msgid "Error writing rewind state"
+msgstr ""
+
+#: ../src/wx/panel.cpp:1831
+msgid "Cannot create conversion buffer"
+msgstr ""
+
+#: ../src/wx/panel.cpp:1899
+msgid "memory allocation error"
+msgstr ""
+
+#: ../src/wx/panel.cpp:1901
+msgid "error initializing codec"
+msgstr ""
+
+#: ../src/wx/panel.cpp:1903
+msgid "error writing to output file"
+msgstr ""
+
+#: ../src/wx/panel.cpp:1905
+msgid "can't guess output format from file name"
+msgstr ""
+
+#: ../src/wx/panel.cpp:1909
+msgid "programming error; aborting!"
+msgstr ""
+
+#: ../src/wx/panel.cpp:1921 ../src/wx/panel.cpp:1949
+#, c-format
+msgid "Unable to begin recording to %s (%s)"
+msgstr ""
+
+#: ../src/wx/panel.cpp:1974
+#, c-format
+msgid "Error in audio/video recording (%s); aborting"
+msgstr ""
+
+#: ../src/wx/panel.cpp:1979
+#, c-format
+msgid "Error in audio recording (%s); aborting"
+msgstr ""
+
+#: ../src/wx/panel.cpp:1988
+#, c-format
+msgid "Error in video recording (%s); aborting"
+msgstr ""
+
+#: ../src/wx/sys.cpp:108 ../src/wx/sys.cpp:158
+msgid "No game in progress to record"
+msgstr ""
+
+#: ../src/wx/sys.cpp:118
+#, c-format
+msgid "Cannot open output file %s"
+msgstr ""
+
+#: ../src/wx/sys.cpp:123 ../src/wx/sys.cpp:143 ../src/wx/sys.cpp:269
+msgid "Error writing game recording"
+msgstr ""
+
+#: ../src/wx/sys.cpp:162
+msgid "Cannot play game recording while recording"
+msgstr ""
+
+#: ../src/wx/sys.cpp:173
+#, c-format
+msgid "Cannot open recording file %s"
+msgstr ""
+
+#: ../src/wx/sys.cpp:179 ../src/wx/sys.cpp:187
+msgid "Error reading game recording"
+msgstr ""
+
+#: ../src/wx/sys.cpp:280
+msgid "Playback ended"
+msgstr ""
+
+#: ../src/wx/sys.cpp:297
+#, c-format
+msgid "%d%%(%d, %d fps)"
+msgstr "%d%%(%d, %d fps)"
+
+#: ../src/wx/sys.cpp:303
+#, c-format
+msgid "%d%%"
+msgstr "%d%%"
+
+#: ../src/wx/sys.cpp:556 wx-xrc-strings.h:121
+msgid "&Discard"
+msgstr ""
+
+#: ../src/wx/sys.cpp:591
+msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
+msgstr "圖片檔 (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
+
+#: ../src/wx/sys.cpp:598
+msgid "Save printer image to"
+msgstr ""
+
+#: ../src/wx/sys.cpp:609 ../src/wx/sys.cpp:778
+#, c-format
+msgid "Wrote printer output to %s"
+msgstr ""
+
+#: ../src/wx/sys.cpp:613 ../src/wx/sys.cpp:680
+msgid "&Close"
+msgstr ""
+
+#: ../src/wx/sys.cpp:676
+msgid "Printed"
+msgstr ""
+
+#: ../src/wx/sys.cpp:933
+#, c-format
+msgid "Error opening pseudo tty: %s"
+msgstr ""
+
+#: ../src/wx/sys.cpp:1019
+#, c-format
+msgid "Error setting up server socket (%d)"
+msgstr ""
+
+#: ../src/wx/viewers.cpp:493
+msgid "Text files (*.txt;*.log)|*.txt;*.log|"
+msgstr "純文字檔 (*.txt;*.log)|*.txt;*.log|"
+
+#: ../src/wx/viewers.cpp:615 ../src/wx/viewers.cpp:662
+msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
+msgstr "記憶體傾印檔 (*.dmp;*.bin)|*.dmp;*.bin|"
+
+#: ../src/wx/viewers.cpp:617
+msgid "Select memory dump file"
+msgstr "選擇記憶體傾印檔"
+
+#: ../src/wx/viewers.cpp:703
+msgid "0x00000000 - BIOS"
+msgstr "0x00000000 - BIOS"
+
+#: ../src/wx/viewers.cpp:704
+msgid "0x02000000 - WRAM"
+msgstr "0x02000000 - WRAM"
+
+#: ../src/wx/viewers.cpp:705
+msgid "0x03000000 - IRAM"
+msgstr "0x03000000 - IRAM"
+
+#: ../src/wx/viewers.cpp:706
+msgid "0x04000000 - I/O"
+msgstr "0x04000000 - I/O"
+
+#: ../src/wx/viewers.cpp:707
+msgid "0x05000000 - PALETTE"
+msgstr "0x05000000 - PALETTE"
+
+#: ../src/wx/viewers.cpp:708
+msgid "0x06000000 - VRAM"
+msgstr "0x06000000 - VRAM"
+
+#: ../src/wx/viewers.cpp:709
+msgid "0x07000000 - OAM"
+msgstr "0x07000000 - OAM"
+
+#: ../src/wx/viewers.cpp:710
+msgid "0x08000000 - ROM"
+msgstr "0x08000000 - ROM"
+
+#: ../src/wx/viewers.cpp:798
+msgid "0x0000 - ROM"
+msgstr "0x0000 - ROM"
+
+#: ../src/wx/viewers.cpp:799
+msgid "0x4000 - ROM"
+msgstr "0x4000 - ROM"
+
+#: ../src/wx/viewers.cpp:800
+msgid "0x8000 - VRAM"
+msgstr "0x8000 - VRAM"
+
+#: ../src/wx/viewers.cpp:801
+msgid "0xA000 - SRAM"
+msgstr "0xA000 - SRAM"
+
+#: ../src/wx/viewers.cpp:802
+msgid "0xC000 - RAM"
+msgstr "0xC000 - RAM"
+
+#: ../src/wx/viewers.cpp:803
+msgid "0xD000 - WRAM"
+msgstr "0xD000 - WRAM"
+
+#: ../src/wx/viewers.cpp:804
+msgid "0xFF00 - I/O"
+msgstr "0xFF00 - I/O"
+
+#: ../src/wx/viewers.cpp:805
+msgid "0xFF80 - RAM"
+msgstr "0xFF80 - RAM"
+
+#: ../src/wx/viewsupt.cpp:675
+msgid "R:"
+msgstr "R:"
+
+#: ../src/wx/viewsupt.cpp:680
+msgid "G:"
+msgstr "G:"
+
+#: ../src/wx/viewsupt.cpp:685
+msgid "B:"
+msgstr "B:"
+
+#: ../src/wx/wxvbam.cpp:208
+msgid "Could not create main window"
+msgstr "無法開啟主視窗"
+
+#: ../src/wx/wxvbam.cpp:240
+msgid "Save built-in XRC file and exit"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:242
+msgid "Save built-in vba-over.ini and exit"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:244
+msgid "Print configuration path and exit"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:246
+msgid "Start in full-screen mode"
+msgstr "以全螢幕模式開始"
+
+#: ../src/wx/wxvbam.cpp:249
+msgid "Delete shared link state first, if it exists"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:255
+msgid "List all settable options and exit"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:257
+msgid "ROM file"
+msgstr "ROM 檔案"
+
+#: ../src/wx/wxvbam.cpp:259
+msgid "<config>=<value>"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:279
+msgid "save-xrc"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:287
+msgid "Configuration/build error: can't find built-in xrc"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:294
+#, c-format
+msgid ""
+"Wrote built-in configuration to %s.\n"
+"To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:303
+msgid "print-cfg-path"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:308
+msgid "Configuration is read from, in order:"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:313
+msgid "save-over"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:321
+#, c-format
+msgid ""
+"Wrote built-in override file to %s\n"
+"To override, delete all but changed section.  First found section is used from search path:"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:326
+msgid ""
+"\n"
+"\tbuilt-in"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:334
+msgid ""
+"Options set from the command line are saved if any configuration changes are made in the user interface.\n"
+"\n"
+"For flag options, true and false are specified as 1 and 0, respectively.\n"
+"\n"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:339
+msgid "flag"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:340 ../src/wx/wxvbam.cpp:343
+msgid "string"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:342
+msgid "int"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:353
+msgid ""
+"The commands available for the Keyboard/* option are:\n"
+"\n"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:383
+msgid "Bad configuration option or multiple ROM files given:\n"
+msgstr ""
+
+#: ../src/wx/xaudio2.cpp:156 ../src/wx/xaudio2.cpp:422
+msgid "The XAudio2 interface failed to initialize!"
+msgstr ""
+
+#: ../src/wx/xaudio2.cpp:192
+msgid "XAudio2: Creating mastering voice failed!"
+msgstr ""
+
+#: ../src/wx/xaudio2.cpp:201
+msgid "XAudio2: Creating source voice failed!"
+msgstr ""
+
+#: ../src/wx/xaudio2.cpp:391
+msgid "XAudio2: Enumerating devices failed!"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:78
+#, c-format
+msgid "Joy%d-"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:82
+#, c-format
+msgid "Axis%d+"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:85
+#, c-format
+msgid "Axis%d-"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:88
+#, c-format
+msgid "Button%d"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:91
+#, c-format
+msgid "Hat%dN"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:94
+#, c-format
+msgid "Hat%dS"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:97
+#, c-format
+msgid "Hat%dW"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:100
+#, c-format
+msgid "Hat%dE"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:103
+#, c-format
+msgid "Hat%dNW"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:106
+#, c-format
+msgid "Hat%dNE"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:109
+#, c-format
+msgid "Hat%dSW"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:112
+#, c-format
+msgid "Hat%dSE"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:139
+msgid "^Joy([0-9]+)[-+]"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:141
+msgid "Axis([0-9]+)([+-])"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:143
+msgid "Button([0-9]+)"
+msgstr ""
+
+#: ../src/wx/widgets/joyedit.cpp:146
+msgid ""
+"Hat([0-9]+)((N|North|U|Up)|(S|South|D|Down)|(E|East|R|Right)|(W|West|L|Left)|(NE|NorthEast|UR|UpRight)|(SE|SouthEast|DR|DownRight)|(SW|SouthWest|DL|DownLeft)|(NW|NorthWest|UL|UpLeft))"
+msgstr ""
+
+#: ../src/wx/widgets/keyedit.cpp:78 ../src/wx/widgets/keyedit.cpp:166
+msgid "SHIFT"
+msgstr "SHIFT"
+
+#: ../src/wx/widgets/keyedit.cpp:81 ../src/wx/widgets/keyedit.cpp:165
+msgid "ALT"
+msgstr "ALT"
+
+#: ../src/wx/widgets/keyedit.cpp:84 ../src/wx/widgets/keyedit.cpp:167
+msgid "CTRL"
+msgstr "CTRL"
+
+#: ../src/wx/widgets/keyedit.cpp:95 ../src/wx/widgets/keyedit.cpp:139
+msgid "Meta-"
+msgstr ""
+
+#: ../src/wx/widgets/keyedit.cpp:140
+msgid "Meta+"
+msgstr ""
+
+#: ../src/wx/widgets/keyedit.cpp:168
+msgid "CONTROL"
+msgstr ""
+
+#: wx-xrc-strings.h:1
+msgid "VBAM"
+msgstr ""
+
+#: wx-xrc-strings.h:2
+msgid "&File"
+msgstr "檔案(&F)"
+
+#: wx-xrc-strings.h:3
+msgid "Open rece&nt"
+msgstr "歷史清單(&N)"
+
+#: wx-xrc-strings.h:4
+msgid "&Reset recent list"
+msgstr "清空歷史清單(&R)"
+
+#: wx-xrc-strings.h:5
+msgid "&Freeze recent list"
+msgstr "停用歷史清單(&F)"
+
+#: wx-xrc-strings.h:6
+msgid "ROM in&formation..."
+msgstr "ROM 資訊(&F)"
+
+#: wx-xrc-strings.h:7 wx-xrc-strings.h:11
+msgid "&Battery file..."
+msgstr "電池記憶檔(&B)"
+
+#: wx-xrc-strings.h:8
+msgid "Gameshark &code file..."
+msgstr "Gameshark 代碼檔(&C)"
+
+#: wx-xrc-strings.h:9 wx-xrc-strings.h:12
+msgid "&Gameshark snapshot..."
+msgstr "Gameshark 快照(&G)"
+
+#: wx-xrc-strings.h:10
+msgid "&Import"
+msgstr "匯入(&I)"
+
+#: wx-xrc-strings.h:13
+msgid "&Export"
+msgstr "匯出(&E)"
+
+#: wx-xrc-strings.h:14
+msgid "Screen capt&ure..."
+msgstr "擷取螢幕畫面(&U)"
+
+#: wx-xrc-strings.h:15
+msgid "Start &sound recording..."
+msgstr "開始錄音(&S)"
+
+#: wx-xrc-strings.h:16
+msgid "Stop s&ound recording"
+msgstr "停止錄音(&O)"
+
+#: wx-xrc-strings.h:17
+msgid "Start &video recording..."
+msgstr "開始錄影(&V)"
+
+#: wx-xrc-strings.h:18
+msgid "Stop v&ideo recording"
+msgstr "停止錄影(&I)"
+
+#: wx-xrc-strings.h:19
+msgid "Start &game recording..."
+msgstr "開始錄製遊戲(&G)"
+
+#: wx-xrc-strings.h:20
+msgid "Stop g&ame recording"
+msgstr "停止錄製遊戲(&A)"
+
+#: wx-xrc-strings.h:21
+msgid "&Record"
+msgstr "錄影(%R)"
+
+#: wx-xrc-strings.h:22
+msgid "Start playing &movie..."
+msgstr "開始播放影片(&M)"
+
+#: wx-xrc-strings.h:23
+msgid "Stop playing m&ovie"
+msgstr "停止播放影片(&O)"
+
+#: wx-xrc-strings.h:24
+msgid "&Play"
+msgstr "播放(&P)"
+
+#: wx-xrc-strings.h:25
+msgid "&Emulation"
+msgstr "模擬(&E)"
+
+#: wx-xrc-strings.h:26
+msgid "&Pause"
+msgstr "暫停(&P)"
+
+#: wx-xrc-strings.h:27
+msgid "&Turbo mode"
+msgstr "Turbo 模式(&T)"
+
+#: wx-xrc-strings.h:28
+msgid "&Reset"
+msgstr "重置(&R)"
+
+#: wx-xrc-strings.h:29
+msgid "&Fullscreen"
+msgstr "全螢幕"
+
+#: wx-xrc-strings.h:30
+msgid "&Autofire"
+msgstr "自動連擊"
+
+#: wx-xrc-strings.h:31
+msgid "&A"
+msgstr "&A"
+
+#: wx-xrc-strings.h:32
+msgid "&B"
+msgstr "&B"
+
+#: wx-xrc-strings.h:33
+msgid "&L"
+msgstr "&L"
+
+#: wx-xrc-strings.h:34
+msgid "&R"
+msgstr "&R"
+
+#: wx-xrc-strings.h:35
+msgid "Start &Network Link..."
+msgstr ""
+
+#: wx-xrc-strings.h:36
+msgid "Most &recent"
+msgstr ""
+
+#: wx-xrc-strings.h:37
+msgid "&Auto load most recent"
+msgstr ""
+
+#: wx-xrc-strings.h:38 wx-xrc-strings.h:53 wx-xrc-strings.h:692
+msgid "&1"
+msgstr "&1"
+
+#: wx-xrc-strings.h:39 wx-xrc-strings.h:54
+msgid "&2"
+msgstr "&2"
+
+#: wx-xrc-strings.h:40 wx-xrc-strings.h:55
+msgid "&3"
+msgstr "&3"
+
+#: wx-xrc-strings.h:41 wx-xrc-strings.h:56
+msgid "&4"
+msgstr "&4"
+
+#: wx-xrc-strings.h:42 wx-xrc-strings.h:57
+msgid "&5"
+msgstr "&5"
+
+#: wx-xrc-strings.h:43 wx-xrc-strings.h:58
+msgid "&6"
+msgstr "&6"
+
+#: wx-xrc-strings.h:44 wx-xrc-strings.h:59
+msgid "&7"
+msgstr "&7"
+
+#: wx-xrc-strings.h:45 wx-xrc-strings.h:60
+msgid "&8"
+msgstr "&8"
+
+#: wx-xrc-strings.h:46 wx-xrc-strings.h:61
+msgid "&9"
+msgstr "&9"
+
+#: wx-xrc-strings.h:47 wx-xrc-strings.h:62
+msgid "1&0"
+msgstr "1&0"
+
+#: wx-xrc-strings.h:48
+msgid "From &File ..."
+msgstr ""
+
+#: wx-xrc-strings.h:49
+msgid "Do not change &battery save"
+msgstr ""
+
+#: wx-xrc-strings.h:50
+msgid "Do not change &cheat list"
+msgstr ""
+
+#: wx-xrc-strings.h:51
+msgid "&Load state"
+msgstr "讀取即時記錄(&L)"
+
+#: wx-xrc-strings.h:52
+msgid "&Oldest slot"
+msgstr ""
+
+#: wx-xrc-strings.h:63
+msgid "To &File ..."
+msgstr ""
+
+#: wx-xrc-strings.h:64
+msgid "&Save state"
+msgstr "即時記錄(&S)"
+
+#: wx-xrc-strings.h:65
+msgid "Re&wind"
+msgstr ""
+
+#: wx-xrc-strings.h:66
+msgid "List &cheats ..."
+msgstr "列出金手指代碼(&C)"
+
+#: wx-xrc-strings.h:67
+msgid "Find c&heat ..."
+msgstr "尋找金手指代碼(&H)"
+
+#: wx-xrc-strings.h:68
+msgid "A&utomatically save/load cheats"
+msgstr "自動儲存/讀取金手指代碼(&U)"
+
+#: wx-xrc-strings.h:69
+msgid "&Enable cheats"
+msgstr "啟動金手指(&E)"
+
+#: wx-xrc-strings.h:70
+msgid "BG &0"
+msgstr "BG &0"
+
+#: wx-xrc-strings.h:71
+msgid "BG &1"
+msgstr "BG &1"
+
+#: wx-xrc-strings.h:72
+msgid "BG &2"
+msgstr "BG &2"
+
+#: wx-xrc-strings.h:73
+msgid "BG &3"
+msgstr "BG &3"
+
+#: wx-xrc-strings.h:74
+msgid "&OBJ"
+msgstr "&OBJ"
+
+#: wx-xrc-strings.h:75
+msgid "&WIN 0"
+msgstr "&WIN 0"
+
+#: wx-xrc-strings.h:76
+msgid "W&IN 1"
+msgstr "W&IN 1"
+
+#: wx-xrc-strings.h:77
+msgid "O&BJ WIN"
+msgstr "O&BJ WIN"
+
+#: wx-xrc-strings.h:78
+msgid "&View Layers"
+msgstr "檢視圖層(&V)"
+
+#: wx-xrc-strings.h:79
+msgid "Channel &1"
+msgstr "聲道 &1"
+
+#: wx-xrc-strings.h:80
+msgid "Channel &2"
+msgstr "聲道 &2"
+
+#: wx-xrc-strings.h:81
+msgid "Channel &3"
+msgstr "聲道 &3"
+
+#: wx-xrc-strings.h:82
+msgid "Channel &4"
+msgstr "聲道 &4"
+
+#: wx-xrc-strings.h:83
+msgid "Direct Sound &A"
+msgstr "Direct 音效 &A"
+
+#: wx-xrc-strings.h:84
+msgid "Direct Sound &B"
+msgstr "Direct 音效 &B"
+
+#: wx-xrc-strings.h:85
+msgid "&Sound Channels"
+msgstr "聲道"
+
+#: wx-xrc-strings.h:86
+msgid "&Next frame"
+msgstr "下一個畫格"
+
+#: wx-xrc-strings.h:87
+msgid "&Disassemble..."
+msgstr "反編譯(&D)"
+
+#: wx-xrc-strings.h:88
+msgid "&Logging..."
+msgstr "日誌(&L)"
+
+#: wx-xrc-strings.h:89
+msgid "&IO Viewer..."
+msgstr "IO 檢視器(&I)"
+
+#: wx-xrc-strings.h:90
+msgid "&Map Viewer..."
+msgstr "Map 檢視器(&M)"
+
+#: wx-xrc-strings.h:91
+msgid "M&emory viewer..."
+msgstr "記憶體檢視器(&E)"
+
+#: wx-xrc-strings.h:92
+msgid "&OAM Viewer..."
+msgstr "OAM 檢視器(&O)"
+
+#: wx-xrc-strings.h:93
+msgid "&Palette Viewer..."
+msgstr "調色板檢視器(&P)"
+
+#: wx-xrc-strings.h:94
+msgid "&Tile Viewer..."
+msgstr "圖塊檢視器(&T)"
+
+#: wx-xrc-strings.h:95
+msgid "&Debug"
+msgstr "除錯(&D)"
+
+#: wx-xrc-strings.h:96
+msgid "&Wait for connection..."
+msgstr "等待連接(&W)"
+
+#: wx-xrc-strings.h:97
+msgid "&Load and wait..."
+msgstr "讀取並等候(&L)"
+
+#: wx-xrc-strings.h:98
+msgid "&Break into GDB"
+msgstr "中斷執行 GDB(&B)"
+
+#: wx-xrc-strings.h:99
+msgid "&Disconnect"
+msgstr "中斷連接(&D)"
+
+#: wx-xrc-strings.h:100
+msgid "&GDB"
+msgstr "&GDB"
+
+#: wx-xrc-strings.h:101
+msgid "&General ..."
+msgstr "一般設定(&G)"
+
+#: wx-xrc-strings.h:102
+msgid "Game &Boy ..."
+msgstr "Game &Boy"
+
+#: wx-xrc-strings.h:103
+msgid "Game Boy &Advance ..."
+msgstr "Game Boy &Advance"
+
+#: wx-xrc-strings.h:104
+msgid "&Display ..."
+msgstr "顯示(&D)"
+
+#: wx-xrc-strings.h:105
+msgid "&Sound ..."
+msgstr "音效(&S)"
+
+#: wx-xrc-strings.h:106
+msgid "D&irectories ..."
+msgstr "資料夾設定(&D)"
+
+#: wx-xrc-strings.h:107
+msgid "&Joypads ..."
+msgstr "搖桿(&J)"
+
+#: wx-xrc-strings.h:108
+msgid "&Link ..."
+msgstr "連接(&L)"
+
+#: wx-xrc-strings.h:109
+msgid "&Key Shortcuts ..."
+msgstr "快捷鍵(&K)"
+
+#: wx-xrc-strings.h:110
+msgid "&Options"
+msgstr "選項(&O)"
+
+#: wx-xrc-strings.h:111
+msgid "&Help"
+msgstr "說明(&H)"
+
+#: wx-xrc-strings.h:112
+msgid "Report &Bugs"
+msgstr "回報程式瑕疵"
+
+#: wx-xrc-strings.h:113
+msgid "VBA-M Support &Forum"
+msgstr "VBA-M 線上支援及論壇"
+
+#: wx-xrc-strings.h:114
+msgid "GB Printer"
+msgstr "GB 印表機"
+
+#: wx-xrc-strings.h:115
+msgid "Print Si&ze"
+msgstr "列印尺寸(&Z)"
+
+#: wx-xrc-strings.h:116
+msgid "1x"
+msgstr "1x"
+
+#: wx-xrc-strings.h:117
+msgid "2x"
+msgstr "2x"
+
+#: wx-xrc-strings.h:118
+msgid "3x"
+msgstr "3x"
+
+#: wx-xrc-strings.h:119
+msgid "4x"
+msgstr "4x"
+
+#: wx-xrc-strings.h:120
+msgid "C&ontinue"
+msgstr "繼續(&O)"
+
+#: wx-xrc-strings.h:122 wx-xrc-strings.h:131 wx-xrc-strings.h:145
+msgid "ROM Information"
+msgstr "ROM 資訊"
+
+#: wx-xrc-strings.h:123 wx-xrc-strings.h:132
+msgid "Game title:"
+msgstr "遊戲名稱："
+
+#: wx-xrc-strings.h:124
+msgid "Game code:"
+msgstr "遊戲代碼："
+
+#: wx-xrc-strings.h:125 wx-xrc-strings.h:133
+msgid "Maker code:"
+msgstr "製造商代碼："
+
+#: wx-xrc-strings.h:126 wx-xrc-strings.h:134
+msgid "Maker name:"
+msgstr "製造商名稱："
+
+#: wx-xrc-strings.h:127
+msgid "Main unit code:"
+msgstr "主要單位代碼："
+
+#: wx-xrc-strings.h:128
+msgid "Device type:"
+msgstr "裝置類型："
+
+#: wx-xrc-strings.h:129 wx-xrc-strings.h:137
+msgid "ROM version:"
+msgstr "ROM 版本："
+
+#: wx-xrc-strings.h:130 wx-xrc-strings.h:138
+msgid "CRC:"
+msgstr "CRC："
+
+#: wx-xrc-strings.h:135
+msgid "Unit code:"
+msgstr ""
+
+#: wx-xrc-strings.h:136
+msgid "Cartridge type:"
+msgstr "卡匣類型："
+
+#: wx-xrc-strings.h:139
+msgid "Color:"
+msgstr "色彩："
+
+#: wx-xrc-strings.h:140
+msgid "ROM size:"
+msgstr "ROM 大小："
+
+#: wx-xrc-strings.h:141
+msgid "RAM size:"
+msgstr "記憶體大小："
+
+#: wx-xrc-strings.h:142
+msgid "Dest. code:"
+msgstr ""
+
+#: wx-xrc-strings.h:143
+msgid "License code:"
+msgstr ""
+
+#: wx-xrc-strings.h:144
+msgid "Checksum:"
+msgstr ""
+
+#: wx-xrc-strings.h:146
+msgid "Selct codes to import"
+msgstr ""
+
+#: wx-xrc-strings.h:147
+msgid "Title:"
+msgstr ""
+
+#: wx-xrc-strings.h:148
+msgid "Description:"
+msgstr ""
+
+#: wx-xrc-strings.h:149
+msgid "Notes:"
+msgstr ""
+
+#: wx-xrc-strings.h:150
+msgid "Export GameShark Snapshot"
+msgstr ""
+
+#: wx-xrc-strings.h:151
+msgid "Server"
+msgstr ""
+
+#: wx-xrc-strings.h:152
+msgid "Client"
+msgstr ""
+
+#: wx-xrc-strings.h:153
+msgid "Players:"
+msgstr "玩家："
+
+#: wx-xrc-strings.h:154
+msgid "2"
+msgstr "2"
+
+#: wx-xrc-strings.h:155
+msgid "3"
+msgstr "3"
+
+#: wx-xrc-strings.h:156
+msgid "4"
+msgstr "4"
+
+#: wx-xrc-strings.h:157
+msgid "Server:"
+msgstr ""
+
+#: wx-xrc-strings.h:158
+msgid "Protocol:"
+msgstr ""
+
+#: wx-xrc-strings.h:159
+msgid "TCP"
+msgstr "TCP"
+
+#: wx-xrc-strings.h:160
+msgid "UDP"
+msgstr "UDP"
+
+#: wx-xrc-strings.h:161
+msgid "Speed hacks:"
+msgstr ""
+
+#: wx-xrc-strings.h:162
+msgid "Off (accurate)"
+msgstr ""
+
+#: wx-xrc-strings.h:163
+msgid "On (fast)"
+msgstr ""
+
+#: wx-xrc-strings.h:165
+msgid "Network Link"
+msgstr ""
+
+#: wx-xrc-strings.h:166
+msgid "Open cheat list"
+msgstr "開啟金手指代碼表"
+
+#: wx-xrc-strings.h:167
+msgid "Save cheat list"
+msgstr "儲存"
+
+#: wx-xrc-strings.h:168
+msgid "Add new cheat"
+msgstr "新增代碼"
+
+#: wx-xrc-strings.h:169
+msgid "Delete selected cheat"
+msgstr "刪除選擇的代碼"
+
+#: wx-xrc-strings.h:170
+msgid "Delete all cheats"
+msgstr "刪除所有代碼"
+
+#: wx-xrc-strings.h:171
+msgid "Toggle all Cheats"
+msgstr ""
+
+#: wx-xrc-strings.h:172
+msgid "Cheat list"
+msgstr "代碼表"
+
+#: wx-xrc-strings.h:173 wx-xrc-strings.h:200
+msgid "&Description"
+msgstr "描述(&D)"
+
+#: wx-xrc-strings.h:174
+msgid "&Type"
+msgstr "類型(&T)"
+
+#: wx-xrc-strings.h:175
+msgid "C&odes"
+msgstr "代碼(&O)"
+
+#: wx-xrc-strings.h:176
+msgid "Edit cheat"
+msgstr "編輯代碼"
+
+#: wx-xrc-strings.h:177
+msgid "E&qual"
+msgstr "相等(&Q)"
+
+#: wx-xrc-strings.h:178
+msgid "&Not equal"
+msgstr "不相等(&N)"
+
+#: wx-xrc-strings.h:179
+msgid "&Less than"
+msgstr "小於(&L)"
+
+#: wx-xrc-strings.h:180
+msgid "L&ess or equal"
+msgstr "小於或等於(&E)"
+
+#: wx-xrc-strings.h:181
+msgid "&Greater than"
+msgstr "大於(&G)"
+
+#: wx-xrc-strings.h:182
+msgid "G&reater or equal"
+msgstr "大於或等於(%R)"
+
+#: wx-xrc-strings.h:183
+msgid "Compare type"
+msgstr "比對類型"
+
+#: wx-xrc-strings.h:184
+msgid "S&igned"
+msgstr "正負整數(&I)"
+
+#: wx-xrc-strings.h:185
+msgid "&Unsigned"
+msgstr "無正負整數(&U)"
+
+#: wx-xrc-strings.h:186
+msgid "&Hexadecimal"
+msgstr "十六進制(&H)"
+
+#: wx-xrc-strings.h:187
+msgid "Signed/Unsigned"
+msgstr "正負數/無正負數"
+
+#: wx-xrc-strings.h:188
+msgid "&8 bits"
+msgstr "8位元(&8)"
+
+#: wx-xrc-strings.h:189
+msgid "&16 bits"
+msgstr "16位元(&1)"
+
+#: wx-xrc-strings.h:190
+msgid "&32 bits"
+msgstr "32位元(&3)"
+
+#: wx-xrc-strings.h:191
+msgid "Data size"
+msgstr "數據大小"
+
+#: wx-xrc-strings.h:192
+msgid "Ol&d value"
+msgstr "舊的數值(%D)"
+
+#: wx-xrc-strings.h:193
+msgid "Specific &value"
+msgstr "指定的數值(&V)"
+
+#: wx-xrc-strings.h:194
+msgid "Search value"
+msgstr "搜尋數值"
+
+#: wx-xrc-strings.h:195
+msgid "&Search"
+msgstr "搜尋(&S)"
+
+#: wx-xrc-strings.h:196
+msgid "U&pdate Old"
+msgstr "更新數值(&P)"
+
+#: wx-xrc-strings.h:197 wx-xrc-strings.h:547
+msgid "&Clear"
+msgstr "清除(&C)"
+
+#: wx-xrc-strings.h:198
+msgid "&Add cheat"
+msgstr "新增代碼(&A)"
+
+#: wx-xrc-strings.h:199
+msgid "Search for cheats"
+msgstr "搜尋金手指代碼"
+
+#: wx-xrc-strings.h:202
+msgid "&Value"
+msgstr "輸入數值(&V)"
+
+#: wx-xrc-strings.h:203
+msgid "Format"
+msgstr "格式："
+
+#: wx-xrc-strings.h:204
+msgid "Add cheat"
+msgstr "新增代碼"
+
+#: wx-xrc-strings.h:205
+msgid "General"
+msgstr "一般設定"
+
+#: wx-xrc-strings.h:206
+msgid "Pause when &inactive"
+msgstr "非作用中的時候暫停"
+
+#: wx-xrc-strings.h:207
+msgid "&Auto-apply IPS/UPS/PPF patches"
+msgstr "自動套用 IPS/UPS/PPF 補丁(&A)"
+
+#: wx-xrc-strings.h:208
+msgid "Screenshot Format:"
+msgstr "擷圖格式："
+
+#: wx-xrc-strings.h:209
+msgid "&PNG"
+msgstr "&PNG"
+
+#: wx-xrc-strings.h:210
+msgid "&BMP"
+msgstr "&BMP"
+
+#: wx-xrc-strings.h:211
+msgid "&Rewind interval :"
+msgstr ""
+
+#: wx-xrc-strings.h:212
+msgid "If not empty or 0, enable rewind (seconds)"
+msgstr ""
+
+#: wx-xrc-strings.h:213
+msgid "seconds (0-600); 0 = disable"
+msgstr ""
+
+#: wx-xrc-strings.h:214
+msgid "&Throttle"
+msgstr ""
+
+#: wx-xrc-strings.h:215
+#, c-format
+msgid "% of normal:"
+msgstr ""
+
+#: wx-xrc-strings.h:216
+msgid "0 = no throttle"
+msgstr ""
+
+#: wx-xrc-strings.h:217
+msgid "No throttle"
+msgstr ""
+
+#: wx-xrc-strings.h:218
+msgid "25%"
+msgstr "25%"
+
+#: wx-xrc-strings.h:219
+msgid "50%"
+msgstr "50%"
+
+#: wx-xrc-strings.h:220 wx-xrc-strings.h:369
+msgid "100%"
+msgstr "100%"
+
+#: wx-xrc-strings.h:221
+msgid "150%"
+msgstr "150%"
+
+#: wx-xrc-strings.h:222
+msgid "200%"
+msgstr "200%"
+
+#: wx-xrc-strings.h:223
+msgid "Preferences"
+msgstr "偏好設定"
+
+#: wx-xrc-strings.h:224
+msgid "GameBoy settings"
+msgstr "Game Boy 設定"
+
+#: wx-xrc-strings.h:225
+msgid "Emulated &system :"
+msgstr "模擬的系統(&S)："
+
+#: wx-xrc-strings.h:226 wx-xrc-strings.h:235 wx-xrc-strings.h:268
+#: wx-xrc-strings.h:299
+msgid "Automatic"
+msgstr "自動"
+
+#: wx-xrc-strings.h:227 wx-xrc-strings.h:402
+msgid "Game Boy Advance"
+msgstr "Game Boy Advance"
+
+#: wx-xrc-strings.h:228
+msgid "Game Boy Color"
+msgstr "Game Boy Color"
+
+#: wx-xrc-strings.h:229
+msgid "Super Game Boy"
+msgstr "Super Game Boy"
+
+#: wx-xrc-strings.h:230
+msgid "Super Game Boy 2"
+msgstr "Super Game Boy 2"
+
+#: wx-xrc-strings.h:231 wx-xrc-strings.h:397
+msgid "Game Boy"
+msgstr "Game Boy"
+
+#: wx-xrc-strings.h:232
+msgid "Display &borders :"
+msgstr "顯示邊框："
+
+#: wx-xrc-strings.h:233
+msgid "Never"
+msgstr "永不"
+
+#: wx-xrc-strings.h:234
+msgid "Always"
+msgstr "總是"
+
+#: wx-xrc-strings.h:236
+msgid "Emulate a Game Boy &Printer"
+msgstr "模擬 Game Boy &Printer"
+
+#: wx-xrc-strings.h:237
+msgid "Automatically &gather entire printed page"
+msgstr ""
+
+#: wx-xrc-strings.h:238
+msgid "Automatically &save printouts as snapshots"
+msgstr ""
+
+#: wx-xrc-strings.h:239
+msgid "Emulate gameboy washed colors"
+msgstr ""
+
+#: wx-xrc-strings.h:240
+msgid "System and Peripherals"
+msgstr ""
+
+#: wx-xrc-strings.h:241 wx-xrc-strings.h:282
+msgid "Frame Skip"
+msgstr "省略畫格"
+
+#: wx-xrc-strings.h:242 wx-xrc-strings.h:283
+msgid "Enable &automatic frame skipping"
+msgstr "自動省略畫格"
+
+#: wx-xrc-strings.h:243 wx-xrc-strings.h:284
+msgid "&Number of frames to skip :"
+msgstr "省略的畫格數："
+
+#: wx-xrc-strings.h:244 wx-xrc-strings.h:285
+msgid "Speed"
+msgstr "速度"
+
+#: wx-xrc-strings.h:245
+msgid "Use a &Game Boy boot ROM file"
+msgstr ""
+
+#: wx-xrc-strings.h:246
+msgid "Boot &ROM file :"
+msgstr ""
+
+#: wx-xrc-strings.h:247
+msgid "Use a &Color Game Boy boot ROM file"
+msgstr ""
+
+#: wx-xrc-strings.h:248
+msgid "Boot ROM &file :"
+msgstr ""
+
+#: wx-xrc-strings.h:249 wx-xrc-strings.h:289
+msgid "Boot ROM"
+msgstr ""
+
+#: wx-xrc-strings.h:250 wx-xrc-strings.h:294 wx-xrc-strings.h:298
+#: wx-xrc-strings.h:306 wx-xrc-strings.h:310
+msgid "Default"
+msgstr "預設"
+
+#: wx-xrc-strings.h:251
+msgid "User 1"
+msgstr "使用者 1"
+
+#: wx-xrc-strings.h:252
+msgid "User 2"
+msgstr "使用者 2"
+
+#: wx-xrc-strings.h:253
+msgid "Custom Colors"
+msgstr ""
+
+#: wx-xrc-strings.h:254 wx-xrc-strings.h:427
+msgid "Standard"
+msgstr "標準"
+
+#: wx-xrc-strings.h:255
+msgid "Blue Sea"
+msgstr "Blue Sea"
+
+#: wx-xrc-strings.h:256
+msgid "Dark Night"
+msgstr "Dark Night"
+
+#: wx-xrc-strings.h:257
+msgid "Green Forest"
+msgstr "Green Forest"
+
+#: wx-xrc-strings.h:258
+msgid "Hot Desert"
+msgstr "Hot Desert"
+
+#: wx-xrc-strings.h:259
+msgid "Pink Dreams"
+msgstr "Pink Dreams"
+
+#: wx-xrc-strings.h:260
+msgid "Weird Colors"
+msgstr "Weird Colors"
+
+#: wx-xrc-strings.h:261
+msgid "Real GB Colors"
+msgstr "Real GB Colors"
+
+#: wx-xrc-strings.h:262
+msgid "Real 'GB on GBASP' Colors"
+msgstr "Real 'GB on GBASP' Colors"
+
+#: wx-xrc-strings.h:263 wx-xrc-strings.h:579 wx-xrc-strings.h:655
+#: wx-xrc-strings.h:665
+msgid "Background"
+msgstr "背景"
+
+#: wx-xrc-strings.h:264
+msgid "Sprites"
+msgstr "色塊"
+
+#: wx-xrc-strings.h:265
+msgid "Use this palette"
+msgstr "使用此調色板"
+
+#: wx-xrc-strings.h:266
+msgid "Restore"
+msgstr "重置"
+
+#: wx-xrc-strings.h:267
+msgid "Save type :"
+msgstr "存檔類型："
+
+#: wx-xrc-strings.h:269 wx-xrc-strings.h:300
+msgid "EEPROM"
+msgstr "EEPROM"
+
+#: wx-xrc-strings.h:270 wx-xrc-strings.h:301
+msgid "SRAM"
+msgstr "SRAM"
+
+#: wx-xrc-strings.h:271 wx-xrc-strings.h:302
+msgid "Flash"
+msgstr "Flash"
+
+#: wx-xrc-strings.h:272
+msgid "EEPROM + Sensor"
+msgstr "EEPROM + Sensor"
+
+#: wx-xrc-strings.h:274
+msgid "Flash size :"
+msgstr "Flash 大小："
+
+#: wx-xrc-strings.h:275 wx-xrc-strings.h:307
+msgid "64K"
+msgstr "64K"
+
+#: wx-xrc-strings.h:276 wx-xrc-strings.h:308
+msgid "128K"
+msgstr "128K"
+
+#: wx-xrc-strings.h:277
+msgid "Detect Now"
+msgstr "立刻偵測"
+
+#: wx-xrc-strings.h:278
+msgid "Cartridge"
+msgstr "卡匣"
+
+#: wx-xrc-strings.h:279
+msgid "Enable real-time clock"
+msgstr "啟動真實時鐘"
+
+#: wx-xrc-strings.h:280
+msgid "Enable AGB Printer"
+msgstr "啟動 AGB 印表機"
+
+#: wx-xrc-strings.h:281
+msgid "System and peripherals"
+msgstr ""
+
+#: wx-xrc-strings.h:286
+msgid "Use a bios file"
+msgstr ""
+
+#: wx-xrc-strings.h:287
+msgid "Bios file :"
+msgstr ""
+
+#: wx-xrc-strings.h:288
+msgid "Skip BIOS intro"
+msgstr ""
+
+#: wx-xrc-strings.h:290
+msgid "Game Boy Advance settings"
+msgstr "Game Boy Advance 設定"
+
+#: wx-xrc-strings.h:291
+msgid "Game Code"
+msgstr ""
+
+#: wx-xrc-strings.h:292
+msgid "Comment"
+msgstr ""
+
+#: wx-xrc-strings.h:293
+msgid "Real Time Clock:"
+msgstr "真實時鐘："
+
+#: wx-xrc-strings.h:295 wx-xrc-strings.h:311
+msgid "Disabled"
+msgstr ""
+
+#: wx-xrc-strings.h:296 wx-xrc-strings.h:312
+msgid "Enabled"
+msgstr ""
+
+#: wx-xrc-strings.h:297
+msgid "Save Type:"
+msgstr "存檔類型："
+
+#: wx-xrc-strings.h:303
+msgid "EEPROM+Sensor"
+msgstr "EEPROM+Sensor"
+
+#: wx-xrc-strings.h:305
+msgid "Flash Size:"
+msgstr "Flash 大小："
+
+#: wx-xrc-strings.h:309
+msgid "Mirroring:"
+msgstr ""
+
+#: wx-xrc-strings.h:313
+msgid "&Defaults"
+msgstr "預設(&D)"
+
+#: wx-xrc-strings.h:314
+msgid "Game Overrides"
+msgstr ""
+
+#: wx-xrc-strings.h:315
+msgid "Speed indicator :"
+msgstr "速度指標："
+
+#: wx-xrc-strings.h:317
+msgid "Percentage"
+msgstr "百分比"
+
+#: wx-xrc-strings.h:318
+msgid "Detailed"
+msgstr "詳細"
+
+#: wx-xrc-strings.h:319
+msgid "Disable status messages"
+msgstr "關閉狀態訊息"
+
+#: wx-xrc-strings.h:320
+msgid "Transparent status and speed"
+msgstr "透明顯示狀態及速度"
+
+#: wx-xrc-strings.h:321
+msgid "On-Screen Display"
+msgstr "螢幕顯示"
+
+#: wx-xrc-strings.h:322
+msgid "Default magnification :"
+msgstr ""
+
+#: wx-xrc-strings.h:323
+msgid "Retain aspect ratio"
+msgstr ""
+
+#: wx-xrc-strings.h:324
+msgid "Maximum magnification factor :"
+msgstr ""
+
+#: wx-xrc-strings.h:325
+msgid "0 = no maximum"
+msgstr ""
+
+#: wx-xrc-strings.h:326
+msgid "0 = no limit"
+msgstr ""
+
+#: wx-xrc-strings.h:327
+msgid "Full screen"
+msgstr "全螢幕"
+
+#: wx-xrc-strings.h:328
+msgid "Video Mode :"
+msgstr ""
+
+#: wx-xrc-strings.h:329
+msgid "Full screen at startup"
+msgstr "以全螢幕模式開始"
+
+#: wx-xrc-strings.h:330
+msgid "Zoom"
+msgstr "縮放"
+
+#: wx-xrc-strings.h:331
+msgid "Output module"
+msgstr "輸出模組"
+
+#: wx-xrc-strings.h:332
+msgid "Simple"
+msgstr "簡易"
+
+#: wx-xrc-strings.h:333
+msgid "OpenGL"
+msgstr "OpenGL"
+
+#: wx-xrc-strings.h:334
+msgid "Direct3D 9"
+msgstr "Direct3D 9"
+
+#: wx-xrc-strings.h:335
+msgid "Cairo"
+msgstr "Cairo"
+
+#: wx-xrc-strings.h:336
+msgid "Bilinear scaling filter"
+msgstr "雙線性縮放濾鏡"
+
+#: wx-xrc-strings.h:337
+msgid "Wait for VSync"
+msgstr "等候垂直同步"
+
+#: wx-xrc-strings.h:338
+msgid "Filters"
+msgstr "濾鏡"
+
+#: wx-xrc-strings.h:339
+msgid "Enable MMX"
+msgstr "啟用 MMX"
+
+#: wx-xrc-strings.h:340
+msgid "Enable multithreading"
+msgstr "啟用多線程"
+
+#: wx-xrc-strings.h:341
+msgid "Fullscreen filter :"
+msgstr "全螢幕濾鏡："
+
+#: wx-xrc-strings.h:343
+msgid "2xSaI"
+msgstr "2xSaI"
+
+#: wx-xrc-strings.h:344
+msgid "Super 2xSaI"
+msgstr "Super 2xSaI"
+
+#: wx-xrc-strings.h:345
+msgid "Super Eagle"
+msgstr "Super Eagle"
+
+#: wx-xrc-strings.h:346
+msgid "Pixelate"
+msgstr "Pixelate"
+
+#: wx-xrc-strings.h:347
+msgid "Advance MAME Scale2x"
+msgstr "Advance MAME Scale2x"
+
+#: wx-xrc-strings.h:348
+msgid "Bilinear"
+msgstr "雙線性"
+
+#: wx-xrc-strings.h:349
+msgid "Bilinear Plus"
+msgstr "雙線性加強"
+
+#: wx-xrc-strings.h:350
+msgid "Scanlines"
+msgstr "掃描線"
+
+#: wx-xrc-strings.h:351
+msgid "TV Mode"
+msgstr "電視模式"
+
+#: wx-xrc-strings.h:352
+msgid "HQ2x"
+msgstr "高畫質 2x"
+
+#: wx-xrc-strings.h:353
+msgid "LQ2x"
+msgstr "低畫質 2x"
+
+#: wx-xrc-strings.h:354
+msgid "Simple 2X"
+msgstr "簡易 2x"
+
+#: wx-xrc-strings.h:355
+msgid "Simple 3x"
+msgstr "簡易 3x"
+
+#: wx-xrc-strings.h:356
+msgid "HQ 3x"
+msgstr "高畫質 3x"
+
+#: wx-xrc-strings.h:357
+msgid "Simple 4x"
+msgstr "簡易 4x"
+
+#: wx-xrc-strings.h:358
+msgid "HQ 4x"
+msgstr "高畫質 4x"
+
+#: wx-xrc-strings.h:360
+msgid "Plugin :"
+msgstr "外掛："
+
+#: wx-xrc-strings.h:361
+msgid "Interframe blending :"
+msgstr "插補混合："
+
+#: wx-xrc-strings.h:363
+msgid "Smart interframe blending"
+msgstr "智能"
+
+#: wx-xrc-strings.h:364
+msgid "Interframe motion blur"
+msgstr "動態"
+
+#: wx-xrc-strings.h:365 wx-xrc-strings.h:386
+msgid "Advanced"
+msgstr "進階"
+
+#: wx-xrc-strings.h:366
+msgid "Display settings"
+msgstr "顯示設定"
+
+#: wx-xrc-strings.h:367
+msgid "Volume :"
+msgstr "音量："
+
+#: wx-xrc-strings.h:368
+msgid "Mute"
+msgstr "靜音"
+
+#: wx-xrc-strings.h:370 wx-xrc-strings.h:401
+msgid "Maximum"
+msgstr "最大"
+
+#: wx-xrc-strings.h:371
+msgid "Sample rate :"
+msgstr "取樣率："
+
+#: wx-xrc-strings.h:372
+msgid "48 KHz"
+msgstr "48 KHz"
+
+#: wx-xrc-strings.h:373
+msgid "44.1 KHz"
+msgstr "44.1 KHz"
+
+#: wx-xrc-strings.h:374
+msgid "22 KHz"
+msgstr "22 KHz"
+
+#: wx-xrc-strings.h:375
+msgid "11 KHz"
+msgstr "11 KHz"
+
+#: wx-xrc-strings.h:376
+msgid "Basic"
+msgstr "基本"
+
+#: wx-xrc-strings.h:377
+msgid "SDL"
+msgstr "SDL"
+
+#: wx-xrc-strings.h:378
+msgid "OpenAL"
+msgstr "OpenAL"
+
+#: wx-xrc-strings.h:379
+msgid "XAudio2"
+msgstr "XAudio2"
+
+#: wx-xrc-strings.h:380
+msgid "DirectSound"
+msgstr "DirectSound"
+
+#: wx-xrc-strings.h:381
+msgid "Device"
+msgstr "裝置"
+
+#: wx-xrc-strings.h:382
+msgid "Enable stereo upmixing"
+msgstr ""
+
+#: wx-xrc-strings.h:383
+msgid "Enable hardware acceleration"
+msgstr "啟動硬體加速"
+
+#: wx-xrc-strings.h:384
+msgid "&Sync game to audio"
+msgstr ""
+
+#: wx-xrc-strings.h:385
+msgid "Number of sound buffers:"
+msgstr ""
+
+#: wx-xrc-strings.h:387
+msgid "Declicking"
+msgstr "降噪"
+
+#: wx-xrc-strings.h:388 wx-xrc-strings.h:389
+msgid "Enhance sound"
+msgstr "增強音效"
+
+#: wx-xrc-strings.h:390
+msgid "Surround"
+msgstr "環繞音效"
+
+#: wx-xrc-strings.h:392
+msgid "Lots"
+msgstr "最大"
+
+#: wx-xrc-strings.h:393
+msgid "Echo"
+msgstr "回聲"
+
+#: wx-xrc-strings.h:394
+msgid "Stereo"
+msgstr "立體聲"
+
+#: wx-xrc-strings.h:395
+msgid "Center"
+msgstr "中央"
+
+#: wx-xrc-strings.h:396
+msgid "Left/Right"
+msgstr "左右"
+
+#: wx-xrc-strings.h:398
+msgid "Sound interpolation"
+msgstr "音訊平滑補償"
+
+#: wx-xrc-strings.h:399
+msgid "Sound filtering"
+msgstr "音訊濾鏡"
+
+#: wx-xrc-strings.h:403
+msgid "Sound Settings"
+msgstr "音效設定"
+
+#: wx-xrc-strings.h:404
+msgid "Game Boy Advance ROMs"
+msgstr "Game Boy Advance ROMs"
+
+#: wx-xrc-strings.h:405
+msgid "Game Boy ROMs"
+msgstr "Game Boy ROMs"
+
+#: wx-xrc-strings.h:406
+msgid "Native Saves"
+msgstr "原生存檔"
+
+#: wx-xrc-strings.h:407
+msgid "Emulator Saves"
+msgstr "模擬器存檔"
+
+#: wx-xrc-strings.h:408
+msgid "Screenshots"
+msgstr "螢幕擷圖"
+
+#: wx-xrc-strings.h:409
+msgid "Recordings"
+msgstr "錄影"
+
+#: wx-xrc-strings.h:410
+msgid "Directories config"
+msgstr "資料夾設定"
+
+#: wx-xrc-strings.h:411
+msgid "Player 1"
+msgstr "玩家 1"
+
+#: wx-xrc-strings.h:412
+msgid "Player 2"
+msgstr "玩家 2"
+
+#: wx-xrc-strings.h:413
+msgid "Player 3"
+msgstr "玩家 3"
+
+#: wx-xrc-strings.h:414
+msgid "Player 4"
+msgstr "玩家 4"
+
+#: wx-xrc-strings.h:415
+msgid "Joypad Configuration"
+msgstr "搖桿設定"
+
+#: wx-xrc-strings.h:416
+msgid ""
+"Click a field and press a key or move joystick to add.  Press backspace to "
+"delete last added key.  Resize window or click inside and move pointer to "
+"see entire contents if too small."
+msgstr ""
+
+#: wx-xrc-strings.h:417
+msgid "Up"
+msgstr "上"
+
+#: wx-xrc-strings.h:418
+msgid "A"
+msgstr "A"
+
+#: wx-xrc-strings.h:419
+msgid "Down"
+msgstr "下"
+
+#: wx-xrc-strings.h:420
+msgid "B"
+msgstr "B"
+
+#: wx-xrc-strings.h:421
+msgid "Left"
+msgstr "左"
+
+#: wx-xrc-strings.h:422
+msgid "L"
+msgstr "L"
+
+#: wx-xrc-strings.h:423
+msgid "Right"
+msgstr "右"
+
+#: wx-xrc-strings.h:424
+msgid "R"
+msgstr "R"
+
+#: wx-xrc-strings.h:425
+msgid "Select"
+msgstr "選擇"
+
+#: wx-xrc-strings.h:426
+msgid "Start"
+msgstr "開始"
+
+#: wx-xrc-strings.h:428
+msgid "Motion Up"
+msgstr ""
+
+#: wx-xrc-strings.h:429
+msgid "Autofire A"
+msgstr "A 鍵自動連擊"
+
+#: wx-xrc-strings.h:430
+msgid "Motion Down"
+msgstr ""
+
+#: wx-xrc-strings.h:431
+msgid "Autofire B"
+msgstr "B 鍵自動連擊"
+
+#: wx-xrc-strings.h:432
+msgid "Motion Left"
+msgstr ""
+
+#: wx-xrc-strings.h:433
+msgid "Motion Right"
+msgstr ""
+
+#: wx-xrc-strings.h:435
+msgid "Speed Up"
+msgstr "加速"
+
+#: wx-xrc-strings.h:436
+msgid "Screenshot"
+msgstr "擷取螢幕畫面"
+
+#: wx-xrc-strings.h:437
+msgid "Special"
+msgstr "特殊"
+
+#: wx-xrc-strings.h:438
+msgid "Use as default"
+msgstr "作為預設值"
+
+#: wx-xrc-strings.h:439
+msgid "Defaults"
+msgstr "使用預設值"
+
+#: wx-xrc-strings.h:440
+msgid "Clear"
+msgstr "清除"
+
+#: wx-xrc-strings.h:441
+msgid "Link Options"
+msgstr ""
+
+#: wx-xrc-strings.h:442
+msgid "Enable joybus"
+msgstr ""
+
+#: wx-xrc-strings.h:443
+msgid "Joybus host"
+msgstr ""
+
+#: wx-xrc-strings.h:444
+msgid "Enable link"
+msgstr ""
+
+#: wx-xrc-strings.h:445
+msgid "Enable wireless"
+msgstr ""
+
+#: wx-xrc-strings.h:446
+msgid ""
+"Please note that this is the first version of RFU emulation code and it's "
+"probably got more bugs than the link code.  Also, it is only supported with "
+"2 players in local mode."
+msgstr ""
+
+#: wx-xrc-strings.h:447
+msgid "Link timeout (in milliseconds)"
+msgstr ""
+
+#: wx-xrc-strings.h:448
+msgid "Co&mmands:"
+msgstr "動作指令(&M)："
+
+#: wx-xrc-strings.h:449
+msgid "Current Keys:"
+msgstr "目前的按鍵："
+
+#: wx-xrc-strings.h:450
+msgid "&Assign"
+msgstr "指派(&A)"
+
+#: wx-xrc-strings.h:451
+msgid "&Remove"
+msgstr "移除(&R)"
+
+#: wx-xrc-strings.h:452
+msgid "Re&set All"
+msgstr "全部重設(&S)"
+
+#: wx-xrc-strings.h:453
+msgid "Currently assigned to:"
+msgstr "目前指派給："
+
+#: wx-xrc-strings.h:454
+msgid "Shortcut Key:"
+msgstr "快捷鍵："
+
+#: wx-xrc-strings.h:455
+msgid "Accelerator Editor"
+msgstr "快捷鍵編輯工具"
+
+#: wx-xrc-strings.h:456
+msgid "&Automatic"
+msgstr "自動(&A)"
+
+#: wx-xrc-strings.h:457
+msgid "A&RM"
+msgstr "A&RM"
+
+#: wx-xrc-strings.h:458
+msgid "&THUMB"
+msgstr "&THUMB"
+
+#: wx-xrc-strings.h:459 wx-xrc-strings.h:508 wx-xrc-strings.h:615
+msgid "&Go"
+msgstr "&Go"
+
+#: wx-xrc-strings.h:460
+msgid "R0:"
+msgstr "R0:"
+
+#: wx-xrc-strings.h:461 wx-xrc-strings.h:463 wx-xrc-strings.h:465
+#: wx-xrc-strings.h:467 wx-xrc-strings.h:469 wx-xrc-strings.h:471
+#: wx-xrc-strings.h:473 wx-xrc-strings.h:475 wx-xrc-strings.h:477
+#: wx-xrc-strings.h:479 wx-xrc-strings.h:481 wx-xrc-strings.h:483
+#: wx-xrc-strings.h:485 wx-xrc-strings.h:487 wx-xrc-strings.h:489
+#: wx-xrc-strings.h:491 wx-xrc-strings.h:493
+msgid "00000000"
+msgstr "00000000"
+
+#: wx-xrc-strings.h:462
+msgid "R1:"
+msgstr "R1:"
+
+#: wx-xrc-strings.h:464
+msgid "R2:"
+msgstr "R2:"
+
+#: wx-xrc-strings.h:466
+msgid "R3:"
+msgstr "R3:"
+
+#: wx-xrc-strings.h:468
+msgid "R4:"
+msgstr "R4:"
+
+#: wx-xrc-strings.h:470
+msgid "R5:"
+msgstr "R5:"
+
+#: wx-xrc-strings.h:472
+msgid "R6:"
+msgstr "R6:"
+
+#: wx-xrc-strings.h:474
+msgid "R7:"
+msgstr "R7:"
+
+#: wx-xrc-strings.h:476
+msgid "R8:"
+msgstr "R8:"
+
+#: wx-xrc-strings.h:478
+msgid "R9:"
+msgstr "R9:"
+
+#: wx-xrc-strings.h:480
+msgid "R10:"
+msgstr "R10:"
+
+#: wx-xrc-strings.h:482
+msgid "R11:"
+msgstr "R11:"
+
+#: wx-xrc-strings.h:484
+msgid "R12:"
+msgstr "R12:"
+
+#: wx-xrc-strings.h:486 wx-xrc-strings.h:517
+msgid "SP:"
+msgstr "SP:"
+
+#: wx-xrc-strings.h:488
+msgid "LR:"
+msgstr "LR:"
+
+#: wx-xrc-strings.h:490 wx-xrc-strings.h:519
+msgid "PC:"
+msgstr "PC:"
+
+#: wx-xrc-strings.h:492
+msgid "CPSR:"
+msgstr "CPSR:"
+
+#: wx-xrc-strings.h:494 wx-xrc-strings.h:526
+msgid "N"
+msgstr "N"
+
+#: wx-xrc-strings.h:495
+msgid "I"
+msgstr "I"
+
+#: wx-xrc-strings.h:496 wx-xrc-strings.h:525
+msgid "Z"
+msgstr "Z"
+
+#: wx-xrc-strings.h:497
+msgid "F"
+msgstr "F"
+
+#: wx-xrc-strings.h:498 wx-xrc-strings.h:528
+msgid "C"
+msgstr "C"
+
+#: wx-xrc-strings.h:499
+msgid "T"
+msgstr "T"
+
+#: wx-xrc-strings.h:500
+msgid "V"
+msgstr "V"
+
+#: wx-xrc-strings.h:501 wx-xrc-strings.h:582 wx-xrc-strings.h:628
+msgid "Mode:"
+msgstr "模式："
+
+#: wx-xrc-strings.h:502 wx-xrc-strings.h:524
+msgid "00"
+msgstr "00"
+
+#: wx-xrc-strings.h:503 wx-xrc-strings.h:529 wx-xrc-strings.h:569
+#: wx-xrc-strings.h:616 wx-xrc-strings.h:637 wx-xrc-strings.h:649
+#: wx-xrc-strings.h:659 wx-xrc-strings.h:671 wx-xrc-strings.h:686
+#: wx-xrc-strings.h:699
+msgid "Automatic &update"
+msgstr "自動更新"
+
+#: wx-xrc-strings.h:504 wx-xrc-strings.h:530
+msgid "G&oto PC"
+msgstr ""
+
+#: wx-xrc-strings.h:505 wx-xrc-strings.h:531
+msgid "Re&fresh"
+msgstr "重新整理(&F)"
+
+#: wx-xrc-strings.h:506 wx-xrc-strings.h:532
+msgid "&Next"
+msgstr ""
+
+#: wx-xrc-strings.h:507 wx-xrc-strings.h:533
+msgid "Disassemble"
+msgstr "反編譯"
+
+#: wx-xrc-strings.h:509
+msgid "AF:"
+msgstr ""
+
+#: wx-xrc-strings.h:510 wx-xrc-strings.h:512 wx-xrc-strings.h:514
+#: wx-xrc-strings.h:516 wx-xrc-strings.h:518 wx-xrc-strings.h:520
+#: wx-xrc-strings.h:522
+msgid "0000"
+msgstr "0000"
+
+#: wx-xrc-strings.h:511
+msgid "BC:"
+msgstr ""
+
+#: wx-xrc-strings.h:513
+msgid "DE:"
+msgstr ""
+
+#: wx-xrc-strings.h:515
+msgid "HL:"
+msgstr ""
+
+#: wx-xrc-strings.h:521
+msgid "IFF:"
+msgstr ""
+
+#: wx-xrc-strings.h:523
+msgid "LY:"
+msgstr ""
+
+#: wx-xrc-strings.h:527
+msgid "H"
+msgstr ""
+
+#: wx-xrc-strings.h:534
+msgid "SW&I"
+msgstr "SW&I"
+
+#: wx-xrc-strings.h:535
+msgid "Unaligned &memory"
+msgstr "不連續的記憶體(&M)"
+
+#: wx-xrc-strings.h:536
+msgid "Illegal &write"
+msgstr "非法寫入(&W)"
+
+#: wx-xrc-strings.h:537
+msgid "Illegal &read"
+msgstr "非法讀取(&R)"
+
+#: wx-xrc-strings.h:538
+msgid "DMA &0"
+msgstr "DMA &0"
+
+#: wx-xrc-strings.h:539
+msgid "DMA &1"
+msgstr "DMA &1"
+
+#: wx-xrc-strings.h:540
+msgid "DMA &2"
+msgstr "DMA &2"
+
+#: wx-xrc-strings.h:541
+msgid "DMA &3"
+msgstr "DMA &3"
+
+#: wx-xrc-strings.h:542
+msgid "&Undefined instruction"
+msgstr "非定義的指令集(&U)"
+
+#: wx-xrc-strings.h:543
+msgid "&AGBPrint"
+msgstr "AGB 列印(&A)"
+
+#: wx-xrc-strings.h:544
+msgid "Soun&d output"
+msgstr "聲音輸出(&D)"
+
+#: wx-xrc-strings.h:545
+msgid "Verbose"
+msgstr "詳細資訊"
+
+#: wx-xrc-strings.h:546 wx-xrc-strings.h:595 wx-xrc-strings.h:610
+msgid "&Save"
+msgstr "儲存(&S)"
+
+#: wx-xrc-strings.h:548
+msgid "Logging"
+msgstr "日誌"
+
+#: wx-xrc-strings.h:549
+msgid "I/O Viewer"
+msgstr "I/O 檢視器"
+
+#: wx-xrc-strings.h:550
+msgid "a"
+msgstr ""
+
+#: wx-xrc-strings.h:551
+msgid "b"
+msgstr ""
+
+#: wx-xrc-strings.h:552 wx-xrc-strings.h:658 wx-xrc-strings.h:670
+msgid "Value:"
+msgstr "數值："
+
+#: wx-xrc-strings.h:553
+msgid "15 "
+msgstr "15 "
+
+#: wx-xrc-strings.h:554
+msgid "14 "
+msgstr "14 "
+
+#: wx-xrc-strings.h:555
+msgid "13 "
+msgstr "13 "
+
+#: wx-xrc-strings.h:556
+msgid "12 "
+msgstr "12 "
+
+#: wx-xrc-strings.h:557
+msgid "11 "
+msgstr "11 "
+
+#: wx-xrc-strings.h:558
+msgid "10 "
+msgstr "10 "
+
+#: wx-xrc-strings.h:559
+msgid "9 "
+msgstr "9 "
+
+#: wx-xrc-strings.h:560
+msgid "8 "
+msgstr "8 "
+
+#: wx-xrc-strings.h:561
+msgid "7 "
+msgstr "7 "
+
+#: wx-xrc-strings.h:562
+msgid "6 "
+msgstr "6 "
+
+#: wx-xrc-strings.h:563
+msgid "5 "
+msgstr "5 "
+
+#: wx-xrc-strings.h:564
+msgid "4 "
+msgstr "4 "
+
+#: wx-xrc-strings.h:565
+msgid "3 "
+msgstr "3 "
+
+#: wx-xrc-strings.h:566
+msgid "2 "
+msgstr "2 "
+
+#: wx-xrc-strings.h:567
+msgid "1 "
+msgstr "1 "
+
+#: wx-xrc-strings.h:568
+msgid "0 "
+msgstr "0 "
+
+#: wx-xrc-strings.h:570 wx-xrc-strings.h:594 wx-xrc-strings.h:609
+#: wx-xrc-strings.h:618 wx-xrc-strings.h:638 wx-xrc-strings.h:650
+#: wx-xrc-strings.h:661 wx-xrc-strings.h:672 wx-xrc-strings.h:689
+#: wx-xrc-strings.h:702
+msgid "&Refresh"
+msgstr "重新整理(&R)"
+
+#: wx-xrc-strings.h:571 wx-xrc-strings.h:611
+msgid "Map view"
+msgstr "Map 檢視"
+
+#: wx-xrc-strings.h:572
+msgid "Frame 0"
+msgstr "畫格 0"
+
+#: wx-xrc-strings.h:573
+msgid "Frame 1"
+msgstr "畫格 1"
+
+#: wx-xrc-strings.h:574
+msgid "Frame"
+msgstr "畫格"
+
+#: wx-xrc-strings.h:575
+msgid "BG0"
+msgstr "背景 0"
+
+#: wx-xrc-strings.h:576
+msgid "BG1"
+msgstr "背景 1"
+
+#: wx-xrc-strings.h:577
+msgid "BG2"
+msgstr "背景 2"
+
+#: wx-xrc-strings.h:578
+msgid "BG3"
+msgstr "背景 3"
+
+#: wx-xrc-strings.h:580 wx-xrc-strings.h:602 wx-xrc-strings.h:636
+#: wx-xrc-strings.h:648 wx-xrc-strings.h:685 wx-xrc-strings.h:698
+msgid "Stretch to &fit"
+msgstr "延展並符合邊界(&F)"
+
+#: wx-xrc-strings.h:581 wx-xrc-strings.h:603
+msgid "Auto &update"
+msgstr "自動更新(&U)"
+
+#: wx-xrc-strings.h:583
+msgid "Map Base:"
+msgstr "Map 基準："
+
+#: wx-xrc-strings.h:584
+msgid "Char Base:"
+msgstr "字型符基準："
+
+#: wx-xrc-strings.h:585 wx-xrc-strings.h:623 wx-xrc-strings.h:633
+msgid "Size:"
+msgstr "大小："
+
+#: wx-xrc-strings.h:586 wx-xrc-strings.h:629
+msgid "Colors:"
+msgstr "顏色："
+
+#: wx-xrc-strings.h:587 wx-xrc-strings.h:608
+msgid "Priority:"
+msgstr "優先權："
+
+#: wx-xrc-strings.h:588
+msgid "Mosaic:"
+msgstr "馬賽克："
+
+#: wx-xrc-strings.h:589
+msgid "Overflow:"
+msgstr "溢值："
+
+#: wx-xrc-strings.h:590 wx-xrc-strings.h:604 wx-xrc-strings.h:622
+#: wx-xrc-strings.h:657 wx-xrc-strings.h:688 wx-xrc-strings.h:701
+msgid "Address:"
+msgstr "位址："
+
+#: wx-xrc-strings.h:591 wx-xrc-strings.h:605 wx-xrc-strings.h:631
+#: wx-xrc-strings.h:642 wx-xrc-strings.h:687 wx-xrc-strings.h:700
+msgid "Tile:"
+msgstr "方格："
+
+#: wx-xrc-strings.h:592 wx-xrc-strings.h:606
+msgid "Flip:"
+msgstr "翻轉："
+
+#: wx-xrc-strings.h:593 wx-xrc-strings.h:607 wx-xrc-strings.h:684
+#: wx-xrc-strings.h:697
+msgid "Palette:"
+msgstr "調色板："
+
+#: wx-xrc-strings.h:596
+msgid "0x8000"
+msgstr "0x8000"
+
+#: wx-xrc-strings.h:597
+msgid "0x8800"
+msgstr "0x8800"
+
+#: wx-xrc-strings.h:598 wx-xrc-strings.h:683 wx-xrc-strings.h:696
+msgid "Char Base"
+msgstr "字型符基準"
+
+#: wx-xrc-strings.h:599
+msgid "0x9800"
+msgstr "0x9800"
+
+#: wx-xrc-strings.h:600
+msgid "0x9C00"
+msgstr "0x9C00"
+
+#: wx-xrc-strings.h:601
+msgid "Map Base"
+msgstr "Map 基準"
+
+#: wx-xrc-strings.h:612
+msgid "&8-bit"
+msgstr "&8 位元"
+
+#: wx-xrc-strings.h:613
+msgid "&16-bit"
+msgstr "&16 位元"
+
+#: wx-xrc-strings.h:614
+msgid "&32-bit"
+msgstr "&32 位元"
+
+#: wx-xrc-strings.h:617
+msgid "Current address:"
+msgstr "目前位址"
+
+#: wx-xrc-strings.h:619
+msgid "&Load..."
+msgstr "讀取(&L)"
+
+#: wx-xrc-strings.h:620 wx-xrc-strings.h:639 wx-xrc-strings.h:651
+#: wx-xrc-strings.h:690 wx-xrc-strings.h:703
+msgid "&Save..."
+msgstr "儲存(&S)"
+
+#: wx-xrc-strings.h:621
+msgid "Memory viewer"
+msgstr "記憶體檢視器"
+
+#: wx-xrc-strings.h:624
+msgid "Enter address and size"
+msgstr "輸入位址及大小"
+
+#: wx-xrc-strings.h:625 wx-xrc-strings.h:652
+msgid "OAM Viewer"
+msgstr "OAM 檢視器"
+
+#: wx-xrc-strings.h:626 wx-xrc-strings.h:640
+msgid "Sprite:"
+msgstr "色塊："
+
+#: wx-xrc-strings.h:627 wx-xrc-strings.h:641
+msgid "Pos:"
+msgstr "位置："
+
+#: wx-xrc-strings.h:630 wx-xrc-strings.h:645
+msgid "Pal:"
+msgstr "色板："
+
+#: wx-xrc-strings.h:632 wx-xrc-strings.h:643
+msgid "Prio:"
+msgstr "順序："
+
+#: wx-xrc-strings.h:634
+msgid "Rot.:"
+msgstr "旋轉："
+
+#: wx-xrc-strings.h:635 wx-xrc-strings.h:646
+msgid "Flags:"
+msgstr "旗標："
+
+#: wx-xrc-strings.h:644
+msgid "OAP:"
+msgstr ""
+
+#: wx-xrc-strings.h:647
+msgid "Bank:"
+msgstr ""
+
+#: wx-xrc-strings.h:653 wx-xrc-strings.h:673
+msgid "Palette View"
+msgstr "調色板檢視"
+
+#: wx-xrc-strings.h:654 wx-xrc-strings.h:664
+msgid "Click on a color for more information"
+msgstr "點選任一個顏色以獲得更多資訊"
+
+#: wx-xrc-strings.h:656 wx-xrc-strings.h:667
+msgid "Sprite"
+msgstr "色塊"
+
+#: wx-xrc-strings.h:660
+msgid "C&hange backdrop color..."
+msgstr "更改背景顏色(&H)"
+
+#: wx-xrc-strings.h:662 wx-xrc-strings.h:666
+msgid "Save &BG..."
+msgstr "儲存背景(&B)"
+
+#: wx-xrc-strings.h:663 wx-xrc-strings.h:668
+msgid "Save &Sprite..."
+msgstr "儲存色塊(&S)"
+
+#: wx-xrc-strings.h:669
+msgid "Index:"
+msgstr ""
+
+#: wx-xrc-strings.h:674 wx-xrc-strings.h:704
+msgid "Tile Viewer"
+msgstr "方格檢視器"
+
+#: wx-xrc-strings.h:675
+msgid "1&6"
+msgstr "1&6"
+
+#: wx-xrc-strings.h:676
+msgid "&256"
+msgstr "&256"
+
+#: wx-xrc-strings.h:677
+msgid "Colors"
+msgstr "色彩"
+
+#: wx-xrc-strings.h:678
+msgid "0x600&0000"
+msgstr "0x600&0000"
+
+#: wx-xrc-strings.h:679
+msgid "0x600&4000"
+msgstr "0x600&4000"
+
+#: wx-xrc-strings.h:680
+msgid "0x600&8000"
+msgstr "0x600&8000"
+
+#: wx-xrc-strings.h:681
+msgid "0x600&C000"
+msgstr "0x600&C000"
+
+#: wx-xrc-strings.h:682
+msgid "0x60&10000"
+msgstr "0x60&10000"
+
+#: wx-xrc-strings.h:691
+msgid "&0"
+msgstr "&0"
+
+#: wx-xrc-strings.h:693
+msgid "VRAM Bank"
+msgstr ""
+
+#: wx-xrc-strings.h:694
+msgid "0x&8000"
+msgstr "0x&8000"
+
+#: wx-xrc-strings.h:695
+msgid "0x&8800"
+msgstr "0x&8800"

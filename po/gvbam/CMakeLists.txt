@@ -13,5 +13,6 @@ GETTEXT_CREATE_TRANSLATIONS(
 	pt_BR.po
 	sv.po
 	zh_CN.po
+	zh_TW.po
 )
 ADD_DEPENDENCIES(gvbam gvbam_translations)
