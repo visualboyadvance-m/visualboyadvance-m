@@ -30,6 +30,7 @@ const DirectoriesConfigDialog::SDirEntry DirectoriesConfigDialog::m_astDirs[] =
     { "gba_roms",  N_("GBA roms :"),  "GBARomsDirEntry"   },
     { "gb_roms",   N_("GB roms :"),   "GBRomsDirEntry"    },
     { "batteries", N_("Batteries :"), "BatteriesDirEntry" },
+    { "cheats",    N_("Cheats :"),    "CheatsDirEntry"    },
     { "saves",     N_("Saves :"),     "SavesDirEntry"     },
     { "captures",  N_("Captures :"),  "CapturesDirEntry"  }
 };
