@@ -991,9 +991,9 @@ static void count(u32 opcode, int cond_res)
 #endif
 #ifndef OP_RSC
  #define OP_RSC \
-    u32 lhs = reg[(opcode>>16)&15].I;                   \
-    u32 rhs = value;                                    \
-    u32 res = rhs - lhs - !((u32)C_FLAG);               \
+    u32 lhs = value;                                    \
+    u32 rhs = reg[(opcode>>16)&15].I;                   \
+    u32 res = lhs - rhs - !((u32)C_FLAG);               \
     reg[dest].I = res;
 #endif
 #ifndef OP_RSCS
