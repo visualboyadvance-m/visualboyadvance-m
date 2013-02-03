@@ -504,6 +504,7 @@ void Window::vInitConfig()
   m_poDirConfig->vSetKey("gb_roms",   Glib::get_home_dir());
   m_poDirConfig->vSetKey("gba_roms",  Glib::get_home_dir());
   m_poDirConfig->vSetKey("batteries", m_sUserDataDir);
+  m_poDirConfig->vSetKey("cheats",    m_sUserDataDir);
   m_poDirConfig->vSetKey("saves",     m_sUserDataDir);
   m_poDirConfig->vSetKey("captures",  m_sUserDataDir);
 
@@ -587,6 +588,11 @@ void Window::vCheckConfig()
   if (sValue != "" && ! Glib::file_test(sValue, Glib::FILE_TEST_IS_DIR))
   {
     m_poDirConfig->vSetKey("batteries", m_sUserDataDir);
+  }
+  sValue = m_poDirConfig->sGetKey("cheats");
+  if (sValue != "" && ! Glib::file_test(sValue, Glib::FILE_TEST_IS_DIR))
+  {
+    m_poDirConfig->vSetKey("cheats", m_sUserDataDir);
   }
   sValue = m_poDirConfig->sGetKey("saves");
   if (sValue != "" && ! Glib::file_test(sValue, Glib::FILE_TEST_IS_DIR))
@@ -1078,6 +1084,7 @@ bool Window::bLoadROM(const std::string & _rsFile)
   }
 
   vLoadBattery();
+  vLoadCheats();
   vUpdateScreen();
 
   emulating = 1;
@@ -1342,6 +1349,30 @@ void Window::vLoadBattery()
   }
 }
 
+void Window::vLoadCheats()
+{
+  std::string sCheats;
+  std::string sDir = m_poDirConfig->sGetKey("cheats");
+  if (sDir == "")
+  {
+    sDir = m_sUserDataDir;
+  }
+
+  sCheats = sDir + "/" + sCutSuffix(Glib::path_get_basename(m_sRomFile)) + ".clt";
+
+  if (Glib::file_test(sCheats, Glib::FILE_TEST_EXISTS))
+  {
+    if (m_eCartridge == CartridgeGB)
+    {
+      gbCheatsLoadCheatList(sCheats.c_str());
+    }
+    else if (m_eCartridge == CartridgeGBA)
+    {
+      cheatsLoadCheatList(sCheats.c_str());
+    }
+  }
+}
+
 void Window::vSaveBattery()
 {
   std::string sBattery;
@@ -1356,6 +1387,27 @@ void Window::vSaveBattery()
   if (m_stEmulator.emuWriteBattery(sBattery.c_str()))
   {
     systemScreenMessage(_("Saved battery"));
+  }
+}
+
+void Window::vSaveCheats()
+{
+  std::string sCheats;
+  std::string sDir = m_poDirConfig->sGetKey("cheats");
+  if (sDir == "")
+  {
+    sDir = m_sUserDataDir;
+  }
+
+  sCheats = sDir + "/" + sCutSuffix(Glib::path_get_basename(m_sRomFile)) + ".clt";
+
+  if (m_eCartridge == CartridgeGB)
+  {
+    gbCheatsSaveCheatList(sCheats.c_str());
+  }
+  else if (m_eCartridge == CartridgeGBA)
+  {
+    cheatsSaveCheatList(sCheats.c_str());
   }
 }
 

@@ -335,6 +335,7 @@ void Window::vOnFileClose()
     vSetDefaultTitle();
     vDrawDefaultScreen();
     vSaveBattery();
+    vSaveCheats();
     m_stEmulator.emuCleanUp();
     m_eCartridge = CartridgeNone;
     emulating = 0;
