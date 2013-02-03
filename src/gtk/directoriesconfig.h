@@ -47,7 +47,7 @@ private:
 
   Config::Section *         m_poConfig;
   static const SDirEntry    m_astDirs[];
-  Gtk::FileChooserButton *  m_poButtons[5];
+  Gtk::FileChooserButton *  m_poButtons[6];
 };
 
 } // namespace VBA

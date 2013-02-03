@@ -272,7 +272,9 @@ private:
   void vSetDefaultTitle();
   void vCreateFileOpenDialog();
   void vLoadBattery();
+  void vLoadCheats();
   void vSaveBattery();
+  void vSaveCheats();
   void vStartEmu();
   void vStopEmu();
   void vUpdateGameSlots();
