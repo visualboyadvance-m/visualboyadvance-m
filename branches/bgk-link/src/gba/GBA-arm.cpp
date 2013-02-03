@@ -754,16 +754,12 @@ static void count(u32 opcode, int cond_res)
 #ifndef VALUE_LSL_REG_C
  #define VALUE_LSL_REG_C \
     unsigned int shift = reg[(opcode >> 8)&15].B.B0;    \
-	unsigned int rm = reg[opcode & 0x0F].I;             \
-	if(opcode & 0x0F == 15) {                           \
-		rm += 4;                                        \
-	}                                                   \
     if (LIKELY(shift)) {                                \
         if (shift == 32) {                              \
             value = 0;                                  \
-            C_OUT = (rm & 1 ? true : false);\
+            C_OUT = (reg[opcode & 0x0F].I & 1 ? true : false);\
         } else if (LIKELY(shift < 32)) {                \
-            u32 v = rm;               \
+            u32 v = reg[opcode & 0x0F].I;               \
             C_OUT = (v >> (32 - shift)) & 1 ? true : false;\
             value = v << shift;                         \
         } else {                                        \
@@ -771,7 +767,7 @@ static void count(u32 opcode, int cond_res)
             C_OUT = false;                              \
         }                                               \
     } else {                                            \
-        value = rm;                   \
+        value = reg[opcode & 0x0F].I;                   \
     }
 #endif
 // OP Rd,Rb,Rm LSR #
@@ -791,23 +787,20 @@ static void count(u32 opcode, int cond_res)
 #ifndef VALUE_LSR_REG_C
  #define VALUE_LSR_REG_C \
     unsigned int shift = reg[(opcode >> 8)&15].B.B0;    \
-	unsigned int rm = reg[opcode & 0x0F].I;             \
-	if(opcode & 0x0F == 15) {                           \
-		rm += 4;                                        \
-	}                                                   \
     if (LIKELY(shift)) {                                \
         if (shift == 32) {                              \
             value = 0;                                  \
-            C_OUT = (rm & 0x80000000 ? true : false);   \
+            C_OUT = (reg[opcode & 0x0F].I & 0x80000000 ? true : false);\
         } else if (LIKELY(shift < 32)) {                \
-            C_OUT = (rm >> (shift - 1)) & 1 ? true : false;\
-            value = rm >> shift;                        \
+            u32 v = reg[opcode & 0x0F].I;               \
+            C_OUT = (v >> (shift - 1)) & 1 ? true : false;\
+            value = v >> shift;                         \
         } else {                                        \
             value = 0;                                  \
             C_OUT = false;                              \
         }                                               \
     } else {                                            \
-        value = rm;                   \
+        value = reg[opcode & 0x0F].I;                   \
     }
 #endif
 // OP Rd,Rb,Rm ASR #
@@ -833,19 +826,16 @@ static void count(u32 opcode, int cond_res)
 #ifndef VALUE_ASR_REG_C
  #define VALUE_ASR_REG_C \
     unsigned int shift = reg[(opcode >> 8)&15].B.B0;    \
-	unsigned int rm = reg[opcode & 0x0F].I;             \
-	if(opcode & 0x0F == 15) {                           \
-		rm += 4;                                        \
-	}                                                   \
     if (LIKELY(shift < 32)) {                           \
         if (LIKELY(shift)) {                            \
-            C_OUT = (rm >> (int)(shift - 1)) & 1 ? true : false;\
-            value = rm >> (int)shift;                   \
+            s32 v = reg[opcode & 0x0F].I;               \
+            C_OUT = (v >> (int)(shift - 1)) & 1 ? true : false;\
+            value = v >> (int)shift;                    \
         } else {                                        \
-            value = rm;                                 \
+            value = reg[opcode & 0x0F].I;               \
         }                                               \
     } else {                                            \
-        if (rm & 0x80000000) {                          \
+        if (reg[opcode & 0x0F].I & 0x80000000) {        \
             value = 0xFFFFFFFF;                         \
             C_OUT = true;                               \
         } else {                                        \
@@ -874,16 +864,13 @@ static void count(u32 opcode, int cond_res)
 #ifndef VALUE_ROR_REG_C
  #define VALUE_ROR_REG_C \
     unsigned int shift = reg[(opcode >> 8)&15].B.B0;    \
-	unsigned int rm = reg[opcode & 0x0F].I;             \
-	if(opcode & 0x0F == 15) {                           \
-		rm += 4;                                        \
-	}                                                   \
     if (LIKELY(shift & 0x1F)) {                         \
-        C_OUT = (rm >> (shift - 1)) & 1 ? true : false; \
-        value = ((rm << (32 - shift)) |                 \
-                 (rm >> shift));                        \
+        u32 v = reg[opcode & 0x0F].I;                   \
+        C_OUT = (v >> (shift - 1)) & 1 ? true : false;  \
+        value = ((v << (32 - shift)) |                  \
+                 (v >> shift));                         \
     } else {                                            \
-        value = rm;                                     \
+        value = reg[opcode & 0x0F].I;                   \
         if (shift)                                      \
             C_OUT = (value & 0x80000000 ? true : false);\
     }
@@ -966,6 +953,7 @@ static void count(u32 opcode, int cond_res)
  #define OP_RSB \
     u32 lhs = value;                                    \
     u32 rhs = reg[(opcode>>16)&15].I;                   \
+    u32 res = lhs - rhs;                                \
     reg[dest].I = res;
 #endif
 #ifndef OP_RSBS
@@ -1003,9 +991,9 @@ static void count(u32 opcode, int cond_res)
 #endif
 #ifndef OP_RSC
  #define OP_RSC \
-    u32 lhs = reg[(opcode>>16)&15].I;                   \
-    u32 rhs = value;                                    \
-    u32 res = rhs - lhs - !((u32)C_FLAG);               \
+    u32 lhs = value;                                    \
+    u32 rhs = reg[(opcode>>16)&15].I;                   \
+    u32 res = lhs - rhs - !((u32)C_FLAG);               \
     reg[dest].I = res;
 #endif
 #ifndef OP_RSCS
