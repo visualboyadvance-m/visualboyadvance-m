@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the VBA-M package.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-03 20:50+0100\n"
+"POT-Creation-Date: 2011-12-03 21:22+0100\n"
 "PO-Revision-Date: 2011-02-24 20:51+0000\n"
 "Last-Translator: bgK <bastien.bouclet@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: ../src/gtk/joypadconfig.cpp:142
