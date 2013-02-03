@@ -966,6 +966,7 @@ static void count(u32 opcode, int cond_res)
  #define OP_RSB \
     u32 lhs = value;                                    \
     u32 rhs = reg[(opcode>>16)&15].I;                   \
+    u32 res = lhs - rhs;                                \
     reg[dest].I = res;
 #endif
 #ifndef OP_RSBS
