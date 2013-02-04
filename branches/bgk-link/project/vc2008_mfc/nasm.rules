@@ -7,11 +7,10 @@
 		<CustomBuildRule
 			Name="NASM"
 			DisplayName="Netwide Assembler"
-			CommandLine="$(SolutionDir)..\..\..\dependencies\nasm.exe [AllOptions] [AdditionalOptions] -- [inputs]"
+			CommandLine=""$(SolutionDir)..\..\..\dependencies\nasm.exe" [AllOptions] [AdditionalOptions] -- [inputs]"
 			Outputs="[$ObjectFileName]"
 			FileExtensions="*.asm"
-			ExecutionDescription="Assembling..."
-			>
+			ExecutionDescription="Assembling..."			>
 			<Properties>
 				<StringProperty
 					Name="ObjectFileName"
