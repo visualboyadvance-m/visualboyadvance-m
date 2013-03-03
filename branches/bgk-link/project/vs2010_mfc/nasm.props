@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup
     Condition="'$(NASMBeforeTargets)' == '' and '$(NASMAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
@@ -18,7 +18,7 @@
       <Optimization>0</Optimization>
       <ObjectFileFormat>8</ObjectFileFormat>
       <ErrorReportingFormat>1</ErrorReportingFormat>
-      <CommandLineTemplate>$(SolutionDir)..\..\..\dependencies\nasm.exe [AllOptions] [AdditionalOptions] -- [inputs]</CommandLineTemplate>
+      <CommandLineTemplate>"$(SolutionDir)..\..\..\dependencies\nasm.exe" [AllOptions] [AdditionalOptions] -- [inputs]</CommandLineTemplate>
       <Outputs>%(ObjectFileName)</Outputs>
       <ExecutionDescription>Assembling...</ExecutionDescription>
     </NASM>
