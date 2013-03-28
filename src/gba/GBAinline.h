@@ -294,7 +294,7 @@ unreadable:
     break;
   }
 
-  if(address & 1) {
+  if(oldAddress & 1) {
     value = (value >> 8) | (value << 24);
   }
 
