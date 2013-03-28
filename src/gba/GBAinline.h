@@ -149,9 +149,8 @@ unreadable:
 	break;
   }
 
-  if(address & 3) {
+  if(oldAddress & 3) {
 #ifdef C_CORE
-    int shift = (address & 3) << 3;
     value = (value >> shift) | (value << (32 - shift));
 #else
 #ifdef __GNUC__
