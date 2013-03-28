@@ -144,7 +144,7 @@ unreadable:
           CPUReadHalfWordQuick(reg[15].I) << 16;
       }
     }
-	break;
+	return value;
   }
 
   if(oldAddress & 3) {
