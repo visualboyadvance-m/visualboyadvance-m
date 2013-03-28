@@ -46,23 +46,24 @@ extern int cpuTotalTicks;
 
 static inline u32 CPUReadMemory(u32 address)
 {
-#ifdef GBA_LOGGING
+  int shift;
+  u32 value;
+  u32 oldAddress = address;
+
+#ifdef C_CORE
   if(address & 3) {
-    if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
-      log("Unaligned word read: %08x at %08x\n", address, armMode ?
-        armNextPC - 4 : armNextPC - 2);
-    }
+	  shift = (address & 3) << 3;
+	  address &= ~0x03;
   }
 #endif
 
-  u32 value;
   switch(address >> 24) {
   case 0:
     if(reg[15].I >> 24) {
       if(address < 0x4000) {
 #ifdef GBA_LOGGING
         if(systemVerbose & VERBOSE_ILLEGAL_READ) {
-          log("Illegal word read: %08x at %08x\n", address, armMode ?
+          log("Illegal word read from bios: %08x at %08x\n", address, armMode ?
             armNextPC - 4 : armNextPC - 2);
         }
 #endif
@@ -145,6 +146,7 @@ unreadable:
           CPUReadHalfWordQuick(reg[15].I) << 16;
       }
     }
+	break;
   }
 
   if(address & 3) {
@@ -168,6 +170,15 @@ unreadable:
 #endif
 #endif
   }
+
+#ifdef GBA_LOGGING
+  if(oldAddress & 3) {
+	  if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
+		  log("Unaligned word read from: %08x at %08x (%08x)\n", oldAddress, armMode ?
+			  armNextPC - 4 : armNextPC - 2, value);
+	  }
+  }
+#endif
   return value;
 }
 
@@ -175,16 +186,14 @@ extern u32 myROM[];
 
 static inline u32 CPUReadHalfWord(u32 address)
 {
-#ifdef GBA_LOGGING
-  if(address & 1) {
-    if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
-      log("Unaligned halfword read: %08x at %08x\n", address, armMode ?
-        armNextPC - 4 : armNextPC - 2);
-    }
-  }
-#endif
-
   u32 value;
+  u32 oldAddress = address;
+
+//#ifdef C_CORE
+  if(address & 1) {
+	  address &= ~0x01;
+  }
+//#endif
 
   switch(address >> 24) {
   case 0:
@@ -192,7 +201,7 @@ static inline u32 CPUReadHalfWord(u32 address)
       if(address < 0x4000) {
 #ifdef GBA_LOGGING
         if(systemVerbose & VERBOSE_ILLEGAL_READ) {
-          log("Illegal halfword read: %08x at %08x\n", address, armMode ?
+          log("Illegal halfword read from bios: %08x at %08x\n", address, armMode ?
             armNextPC - 4 : armNextPC - 2);
         }
 #endif
@@ -289,6 +298,15 @@ unreadable:
     value = (value >> 8) | (value << 24);
   }
 
+#ifdef GBA_LOGGING
+  if(oldAddress & 1) {
+	  if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
+		  log("Unaligned halfword read from: %08x at %08x (%08x)\n", oldAddress, armMode ?
+			  armNextPC - 4 : armNextPC - 2, value);
+	  }
+  }
+#endif
+
   return value;
 }
 
@@ -308,7 +326,7 @@ static inline u8 CPUReadByte(u32 address)
       if(address < 0x4000) {
 #ifdef GBA_LOGGING
         if(systemVerbose & VERBOSE_ILLEGAL_READ) {
-          log("Illegal byte read: %08x at %08x\n", address, armMode ?
+          log("Illegal byte read from bios: %08x at %08x\n", address, armMode ?
             armNextPC - 4 : armNextPC - 2);
         }
 #endif
