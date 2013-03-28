@@ -46,13 +46,11 @@ extern int cpuTotalTicks;
 
 static inline u32 CPUReadMemory(u32 address)
 {
-  int shift;
   u32 value;
   u32 oldAddress = address;
 
 #ifdef C_CORE
   if(address & 3) {
-	  shift = (address & 3) << 3;
 	  address &= ~0x03;
   }
 #endif
@@ -151,6 +149,7 @@ unreadable:
 
   if(oldAddress & 3) {
 #ifdef C_CORE
+	int shift = (oldAddress & 3) << 3;
     value = (value >> shift) | (value << (32 - shift));
 #else
 #ifdef __GNUC__
@@ -158,10 +157,10 @@ unreadable:
       "shl $3 ,%%ecx;"
       "ror %%cl, %0"
       : "=r" (value)
-      : "r" (value), "c" (address));
+      : "r" (value), "c" (oldAddress));
 #else
     __asm {
-      mov ecx, address;
+      mov ecx, oldAddress;
       and ecx, 3;
       shl ecx, 3;
       ror [dword ptr value], cl;
@@ -200,7 +199,7 @@ static inline u32 CPUReadHalfWord(u32 address)
       if(address < 0x4000) {
 #ifdef GBA_LOGGING
         if(systemVerbose & VERBOSE_ILLEGAL_READ) {
-          log("Illegal halfword read from bios: %08x at %08x\n", address, armMode ?
+          log("Illegal halfword read from bios: %08x at %08x\n", oldAddress, armMode ?
             armNextPC - 4 : armNextPC - 2);
         }
 #endif
@@ -277,7 +276,7 @@ static inline u32 CPUReadHalfWord(u32 address)
 unreadable:
 #ifdef GBA_LOGGING
     if(systemVerbose & VERBOSE_ILLEGAL_READ) {
-      log("Illegal halfword read: %08x at %08x\n", address, armMode ?
+      log("Illegal halfword read: %08x at %08x\n", oldAddress, armMode ?
         armNextPC - 4 : armNextPC - 2);
     }
 #endif
@@ -290,21 +289,18 @@ unreadable:
         value = CPUReadHalfWordQuick(reg[15].I);
       }
     }
-    break;
+    return value;
   }
 
   if(oldAddress & 1) {
-    value = (value >> 8) | (value << 24);
-  }
-
-#ifdef GBA_LOGGING
-  if(oldAddress & 1) {
+	value = (value >> 8) | (value << 24);
+	#ifdef GBA_LOGGING
 	  if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
 		  log("Unaligned halfword read from: %08x at %08x (%08x)\n", oldAddress, armMode ?
 			  armNextPC - 4 : armNextPC - 2, value);
 	  }
+	#endif
   }
-#endif
 
   return value;
 }
