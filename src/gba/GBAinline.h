@@ -283,11 +283,12 @@ unreadable:
     if(cpuDmaHack) {
       value = cpuDmaLast & 0xFFFF;
     } else {
-      if(armState) {
-        value = CPUReadHalfWordQuick(reg[15].I + (address & 2));
-      } else {
-        value = CPUReadHalfWordQuick(reg[15].I);
-      }
+		if(armState) {
+			value = CPUReadMemoryQuick(reg[15].I);
+		} else {
+			value = CPUReadHalfWordQuick(reg[15].I) |
+				CPUReadHalfWordQuick(reg[15].I) << 16;
+		}
     }
     return value;
   }
@@ -307,9 +308,21 @@ unreadable:
 
 static inline u16 CPUReadHalfWordSigned(u32 address)
 {
+  u32 oldAddress = address;
+  if(address & 1) {
+    address &= ~0x01;
+  }
   u16 value = CPUReadHalfWord(address);
-  if((address & 1))
+  if((oldAddress & 1))
+  {
     value = (s8)value;
+#ifdef GBA_LOGGING
+	if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
+		log("Unaligned signed halfword read from: %08x at %08x (%08x)\n", oldAddress, armMode ?
+			armNextPC - 4 : armNextPC - 2, value);
+	}
+#endif
+  }
   return value;
 }
 
@@ -385,11 +398,12 @@ unreadable:
     if(cpuDmaHack) {
       return cpuDmaLast & 0xFF;
     } else {
-      if(armState) {
-        return CPUReadByteQuick(reg[15].I+(address & 3));
-      } else {
-        return CPUReadByteQuick(reg[15].I+(address & 1));
-      }
+		if(armState) {
+			return CPUReadMemoryQuick(reg[15].I);
+		} else {
+			return CPUReadHalfWordQuick(reg[15].I) |
+				CPUReadHalfWordQuick(reg[15].I) << 16;
+		}
     }
     break;
   }
