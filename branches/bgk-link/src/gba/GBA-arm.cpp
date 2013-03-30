@@ -2698,7 +2698,7 @@ static insnfunc_t armInsnTable[4096] = {
     arm0D0,arm0D1,arm0D2,arm0D3,arm0D4,arm0D5,arm0D6,arm0D7,  // 0D0
     arm0D0,arm0D9,arm0D2,arm0DB,arm0D4,arm0DD,arm0D6,arm0DF,  // 0D8
     arm0E0,arm0E1,arm0E2,arm0E3,arm0E4,arm0E5,arm0E6,arm0E7,  // 0E0
-    arm0E0,arm0E9,arm0E2,arm_UI,arm0E4,arm_UI,arm0E6,arm_UI,  // 0E8
+    arm0E0,arm0E9,arm0E2,arm0CB,arm0E4,arm_UI,arm0E6,arm_UI,  // 0E8
     arm0F0,arm0F1,arm0F2,arm0F3,arm0F4,arm0F5,arm0F6,arm0F7,  // 0F0
     arm0F0,arm0F9,arm0F2,arm_UI,arm0F4,arm0DD,arm0F6,arm0DF,  // 0F8
 
