@@ -206,12 +206,12 @@ BEGIN
     CTEXT           "http://vba-m.com",IDC_URL,7,138,168,8
     RTEXT           "Version:",IDC_STATIC,36,18,54,8
     LTEXT           "",IDC_VERSION,96,18,78,8,SS_NOPREFIX
-    GROUPBOX        "VBA-M dev team:",IDC_STATIC,7,65,90,66
-    CTEXT           "mudlord\nNach\nJonas Quinn\nDJRobX\nSpacy\nSquall Leonhart",IDC_STATIC,15,76,76,50
+    GROUPBOX        "VBA-M dev team:",IDC_STATIC,7,65,90,69
+    CTEXT           "mudlord\nNach\nJonas Quinn\nDJRobX\nSpacy\nSquall Leonhart\nNormmatt",IDC_STATIC,15,73,76,56
     RTEXT           "Date compiled:",IDC_STATIC,36,30,54,8
     LTEXT           "",IDC_DATE,96,30,78,8,SS_NOPREFIX
-    GROUPBOX        "Thanks go to:",IDC_STATIC,100,65,72,66
-    CTEXT           "blargg\nCostis\nchrono\nxKiv\nbgK\nOrig. VBA team",IDC_STATIC,103,77,60,49
+    GROUPBOX        "Thanks go to:",IDC_STATIC,100,65,72,69
+    CTEXT           "blargg\nCostis\nchrono\nxKiv\nbgK\nOrig. VBA team",IDC_STATIC,108,77,55,49
 END
 
 IDD_DIRECTORIES DIALOGEX 0, 0, 222, 270
