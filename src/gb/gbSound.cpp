@@ -121,6 +121,13 @@ static void reset_apu()
 
 static void remake_stereo_buffer()
 {
+	// APU
+	if ( !gb_apu )
+	{
+		gb_apu = new Gb_Apu; // TODO: handle errors
+		reset_apu();
+	}
+
 	// Stereo_Buffer
 	delete stereo_buffer;
 	stereo_buffer = 0;
@@ -128,20 +135,15 @@ static void remake_stereo_buffer()
 	stereo_buffer = new Simple_Effects_Buffer; // TODO: handle out of memory
 	if ( stereo_buffer->set_sample_rate( soundSampleRate ) ) { } // TODO: handle out of memory
 	stereo_buffer->clock_rate( gb_apu->clock_rate );
-
-	// APU
+	
+	// Multi_Buffer
 	static int const chan_types [chan_count] = {
 		Multi_Buffer::wave_type+1, Multi_Buffer::wave_type+2,
 		Multi_Buffer::wave_type+3, Multi_Buffer::mixed_type+1
 	};
 	if ( stereo_buffer->set_channel_count( chan_count, chan_types ) ) { } // TODO: handle errors
 
-	if ( !gb_apu )
-	{
-		gb_apu = new Gb_Apu; // TODO: handle errors
-		reset_apu();
-	}
-
+	 // Volume Level
 	apply_effects();
 	apply_volume();
 }
