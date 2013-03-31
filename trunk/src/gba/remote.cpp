@@ -75,7 +75,7 @@ bool remoteTcpInit()
 
     remoteListenSocket = s;
 
-    if(s < 0) {
+    if(s == INVALID_SOCKET) {
       fprintf(stderr,"Error opening socket\n");
       exit(-1);
     }
