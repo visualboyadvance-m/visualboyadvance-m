@@ -276,7 +276,7 @@ static bool patchApplyUPS(const char *patchname, u8 **rom, int *size)
 static int ppfVersion(FILE *f)
 {
   fseeko64(f, 0, SEEK_SET);
-  if (fgetc(f) != 'P' || fgetc(f) != 'P' || fgetc(f) != 'F')
+  if (fgetc(f) != 'P' || fgetc(f) != 'P' || fgetc(f) != 'F') //-V501
     return 0;
   switch(fgetc(f)){
     case '1': return 1;
