@@ -138,7 +138,7 @@ void rpiFilter(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch,
 					*(pOCur++) = ((*pICur & 0xF800) << rshiftDiff) |
 						      ((*pICur & 0x07E0) << gshiftDiff) |
 						      ((*pICur & 0x001F) << bshiftDiff);
-					*pICur++;
+					*(pICur++);
 				}
 				pI = pICur = (u16 *)((char *)pI + dstPitch);
 				pO = pOCur = (u32 *)((char *)pO + dstPitch);
@@ -157,7 +157,7 @@ void rpiFilter(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch,
 					*(pOCur++) = ((*pICur & 0xF800) >> rshiftDiff) |
 						      ((*pICur & 0x07E0) << gshiftDiff) |
 						      ((*pICur & 0x001F) << bshiftDiff);
-					*pICur++;
+					*(pICur++);
 				}
 				pI = pICur = (u16 *)((char *)pI + dstPitch);
 				pO = pOCur = (u32 *)((char *)pO + dstPitch);

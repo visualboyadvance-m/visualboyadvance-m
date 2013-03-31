@@ -542,7 +542,7 @@ static void UpdateModel(CPpmd7 *p)
         s->Freq <<= 1;
       else
         s->Freq = MAX_FREQ - 4;
-      c->SummFreq = (UInt16)(s->Freq + p->InitEsc + (ns > 3));
+      c->SummFreq = (UInt16)(s->Freq + p->InitEsc + (ns >> 3));
     }
     cf = 2 * (UInt32)p->FoundState->Freq * (c->SummFreq + 6);
     sf = (UInt32)s0 + c->SummFreq;
