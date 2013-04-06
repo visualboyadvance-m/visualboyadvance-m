@@ -356,7 +356,11 @@ static void count(u32 opcode, int cond_res)
         EMIT2(and, KONST(0x1F), ecx)
 #define VALUE_LOAD_REG \
         EMIT2(and, KONST(0x0F), eax)            \
-        EMIT2(mov, REGREF2(eax,4), eax)         \
+		EMIT2(cmp, KONST(0x0F), eax)			\
+		EMIT2(mov, REGREF2(eax,4), eax)         \
+		EMIT1(jne, LABELREF(3,f))				\
+		EMIT2(add, KONST(4), ax)				\
+		LABEL(3)								\
         EMIT2(movzx, ch, ecx)                   \
         EMIT2(and, KONST(0x0F), ecx)            \
         EMIT2(mov, REGREF2(ecx,4), ecx)
