@@ -19,7 +19,6 @@ extern bool cpuSramEnabled;
 extern bool cpuFlashEnabled;
 extern bool cpuEEPROMEnabled;
 extern bool cpuEEPROMSensorEnabled;
-extern bool cpuDmaHack;
 extern u32 cpuDmaLast;
 extern bool timer0On;
 extern int timer0Ticks;
@@ -49,11 +48,9 @@ static inline u32 CPUReadMemory(u32 address)
   u32 value;
   u32 oldAddress = address;
 
-#ifdef C_CORE
   if(address & 3) {
 	  address &= ~0x03;
   }
-#endif
 
   switch(address >> 24) {
   case 0:
@@ -133,18 +130,12 @@ unreadable:
         armNextPC - 4 : armNextPC - 2);
     }
 #endif
-
-    if(cpuDmaHack) {
-      value = cpuDmaLast;
+    if(armState) {
+		return CPUReadMemoryQuick(reg[15].I);
     } else {
-      if(armState) {
-        value = CPUReadMemoryQuick(reg[15].I);
-      } else {
-        value = CPUReadHalfWordQuick(reg[15].I) |
-          CPUReadHalfWordQuick(reg[15].I) << 16;
-      }
+		return CPUReadHalfWordQuick(reg[15].I) |
+			   CPUReadHalfWordQuick(reg[15].I) << 16;
     }
-	return value;
   }
 
   if(oldAddress & 3) {
@@ -187,11 +178,9 @@ static inline u32 CPUReadHalfWord(u32 address)
   u32 value;
   u32 oldAddress = address;
 
-//#ifdef C_CORE
   if(address & 1) {
 	  address &= ~0x01;
   }
-//#endif
 
   switch(address >> 24) {
   case 0:
@@ -280,17 +269,12 @@ unreadable:
         armNextPC - 4 : armNextPC - 2);
     }
 #endif
-    if(cpuDmaHack) {
-      value = cpuDmaLast & 0xFFFF;
-    } else {
-		if(armState) {
-			value = CPUReadMemoryQuick(reg[15].I);
-		} else {
-			value = CPUReadHalfWordQuick(reg[15].I) |
-				CPUReadHalfWordQuick(reg[15].I) << 16;
-		}
-    }
-    return value;
+	if(armState) {
+		return CPUReadMemoryQuick(reg[15].I);
+	} else {
+		return CPUReadHalfWordQuick(reg[15].I) |
+			   CPUReadHalfWordQuick(reg[15].I) << 16;
+	}
   }
 
   if(oldAddress & 1) {
@@ -306,13 +290,13 @@ unreadable:
   return value;
 }
 
-static inline u16 CPUReadHalfWordSigned(u32 address)
+static inline s16 CPUReadHalfWordSigned(u32 address)
 {
   u32 oldAddress = address;
   if(address & 1) {
     address &= ~0x01;
   }
-  u16 value = CPUReadHalfWord(address);
+  s16 value = (s16)CPUReadHalfWord(address);
   if((oldAddress & 1))
   {
     value = (s8)value;
@@ -395,17 +379,12 @@ unreadable:
         armNextPC - 4 : armNextPC - 2);
     }
 #endif
-    if(cpuDmaHack) {
-      return cpuDmaLast & 0xFF;
-    } else {
-		if(armState) {
-			return CPUReadMemoryQuick(reg[15].I);
-		} else {
-			return CPUReadHalfWordQuick(reg[15].I) |
-				CPUReadHalfWordQuick(reg[15].I) << 16;
-		}
-    }
-    break;
+	if(armState) {
+		return CPUReadMemoryQuick(reg[15].I);
+	} else {
+		return CPUReadHalfWordQuick(reg[15].I) |
+			   CPUReadHalfWordQuick(reg[15].I) << 16;
+	}
   }
 }
 
@@ -422,6 +401,8 @@ static inline void CPUWriteMemory(u32 address, u32 value)
     }
   }
 #endif
+
+  address &= 0xFFFFFFFC;
 
   switch(address >> 24) {
   case 0x02:
@@ -519,6 +500,8 @@ static inline void CPUWriteHalfWord(u32 address, u16 value)
     }
   }
 #endif
+
+  address &= 0xFFFFFFFE;
 
   switch(address >> 24) {
   case 2:
