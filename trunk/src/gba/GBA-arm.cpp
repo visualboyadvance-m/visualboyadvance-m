@@ -359,7 +359,7 @@ static void count(u32 opcode, int cond_res)
 		EMIT2(cmp, KONST(0x0F), eax)			\
 		EMIT2(mov, REGREF2(eax,4), eax)         \
 		EMIT1(jne, LABELREF(3,f))				\
-		EMIT2(add, KONST(4), ax)				\
+		EMIT2(add, KONST(4), eax)				\
 		LABEL(3)								\
         EMIT2(movzx, ch, ecx)                   \
         EMIT2(and, KONST(0x0F), ecx)            \
