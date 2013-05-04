@@ -4827,11 +4827,13 @@ void gbEmulate(int ticksToStop)
                         wx = 0;
 
                     if((wx <= 159) && (tempgbWindowLine <= 143))
+                    {
                       for (int i = wx; i<300; i++)
                         if (gbSpeed)
                           gbSpritesTicks[i]+=3;
                         else
                           gbSpritesTicks[i]+=1;
+                    }
                   }
                 }
               }
