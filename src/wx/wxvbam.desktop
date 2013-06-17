@@ -1,10 +1,9 @@
 [Desktop Entry]
 Version=1.0
-Encoding=UTF-8
 Type=Application
 Name=VBA-M
 GenericName=GameBoy Advance Emulator
 Comment=Nindendo GameBoy Advance Emulator
 Exec=wxvbam
 Icon=vbam
-Categories=Application;Game;Emulator
+Categories=Game;Emulator;
