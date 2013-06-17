@@ -93,7 +93,11 @@ MediaRet MediaRecorder::setup_sound_stream(const char *fname, AVOutputFormat *fm
 	return MRET_OK;
 
     AVCodecContext *ctx;
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(53,10,0)
     aud_st = av_new_stream(oc, 1);
+#else
+    aud_st = avformat_new_stream(oc, NULL);
+#endif
     if(!aud_st) {
 	avformat_free_context(oc);
 	oc = NULL;
@@ -112,7 +116,11 @@ MediaRet MediaRecorder::setup_sound_stream(const char *fname, AVOutputFormat *fm
 	ctx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
     AVCodec *codec = avcodec_find_encoder(fmt->audio_codec);
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(53,6,0)
     if(!codec || avcodec_open(ctx, codec)) {
+#else
+    if(!codec || avcodec_open2(ctx, codec, NULL)) {
+#endif
 	avformat_free_context(oc);
 	oc = NULL;
 	return MRET_ERR_NOCODEC;
@@ -124,7 +132,11 @@ MediaRet MediaRecorder::setup_sound_stream(const char *fname, AVOutputFormat *fm
 MediaRet MediaRecorder::setup_video_stream(const char *fname, int w, int h, int d)
 {
     AVCodecContext *ctx;
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(53,10,0)
     vid_st = av_new_stream(oc, 0);
+#else
+    vid_st = avformat_new_stream(oc, NULL);
+#endif
     if(!vid_st) {
 	avformat_free_context(oc);
 	oc = NULL;
@@ -203,7 +215,11 @@ MediaRet MediaRecorder::setup_video_stream(const char *fname, int w, int h, int 
 	    ctx->pix_fmt = dp;
 	}
     }
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(53,6,0)
     if(!codec || avcodec_open(ctx, codec)) {
+#else
+    if(!codec || avcodec_open2(ctx, codec, NULL)) {
+#endif
 	avformat_free_context(oc);
 	oc = NULL;
 	return MRET_ERR_NOCODEC;
