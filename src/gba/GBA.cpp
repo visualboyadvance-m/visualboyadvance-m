@@ -42,6 +42,7 @@ bool busPrefetchEnable = false;
 u32 busPrefetchCount = 0;
 int cpuDmaTicksToUpdate = 0;
 int cpuDmaCount = 0;
+bool cpuDmaHack = false;
 u32 cpuDmaLast = 0;
 int dummyAddress = 0;
 
@@ -118,6 +119,9 @@ int count = 0;
 int capture = 0;
 int capturePrevious = 0;
 int captureNumber = 0;
+
+int armOpcodeCount = 0;
+int thumbOpcodeCount = 0;
 
 const int TIMER_TICKS[4] = {
   0,
@@ -2183,6 +2187,7 @@ void CPUCheckDMA(int reason, int dmamask)
       doDMA(dma0Source, dma0Dest, sourceIncrement, destIncrement,
             DM0CNT_L ? DM0CNT_L : 0x4000,
             DM0CNT_H & 0x0400);
+	  cpuDmaHack = true;
 
       if(DM0CNT_H & 0x4000) {
         IF |= 0x0100;
@@ -2251,6 +2256,7 @@ void CPUCheckDMA(int reason, int dmamask)
               DM1CNT_L ? DM1CNT_L : 0x4000,
               DM1CNT_H & 0x0400);
       }
+	  cpuDmaHack = true;
 
       if(DM1CNT_H & 0x4000) {
         IF |= 0x0200;
@@ -2320,6 +2326,7 @@ void CPUCheckDMA(int reason, int dmamask)
               DM2CNT_L ? DM2CNT_L : 0x4000,
               DM2CNT_H & 0x0400);
       }
+	  cpuDmaHack = true;
 
       if(DM2CNT_H & 0x4000) {
         IF |= 0x0400;
@@ -2376,6 +2383,8 @@ void CPUCheckDMA(int reason, int dmamask)
       doDMA(dma3Source, dma3Dest, sourceIncrement, destIncrement,
             DM3CNT_L ? DM3CNT_L : 0x10000,
             DM3CNT_H & 0x0400);
+	  cpuDmaHack = true;
+
       if(DM3CNT_H & 0x4000) {
         IF |= 0x0800;
         UPDATE_REG(0x202, IF);
@@ -2422,7 +2431,7 @@ void CPUUpdateRegister(u32 address, u16 value)
       windowOn = (layerEnable & 0x6000) ? true : false;
       if(change && !((value & 0x80))) {
         if(!(DISPSTAT & 1)) {
-          lcdTicks = 1008;
+          //lcdTicks = 1008;
           //      VCOUNT = 0;
           //      UPDATE_REG(0x06, VCOUNT);
           DISPSTAT &= 0xFFFC;
@@ -3071,13 +3080,13 @@ void CPUInit(const char *biosFileName, bool useBiosFile)
     ioReadable[i] = false;
   for(i = 0x8c; i < 0x90; i++)
     ioReadable[i] = false;
-  for(i = 0xa0; i < 0xb8; i++)
+  for(i = 0xa0; i < 0xba; i++)
     ioReadable[i] = false;
-  for(i = 0xbc; i < 0xc4; i++)
+  for(i = 0xbc; i < 0xc6; i++)
     ioReadable[i] = false;
   for(i = 0xc8; i < 0xd0; i++)
     ioReadable[i] = false;
-  for(i = 0xd4; i < 0xdc; i++)
+  for(i = 0xd4; i < 0xde; i++)
     ioReadable[i] = false;
   for(i = 0xe0; i < 0x100; i++)
     ioReadable[i] = false;
@@ -3400,6 +3409,8 @@ void CPUReset()
 
   systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
+  cpuDmaHack = false;
+
   lastTime = systemGetClock();
 
   SWITicks = 0;
@@ -3473,9 +3484,11 @@ void CPULoop(int ticks)
 
     if(!holdState && !SWITicks) {
       if(armState) {
+		  armOpcodeCount++;
         if (!armExecute())
           return;
       } else {
+		  thumbOpcodeCount++;
         if (!thumbExecute())
           return;
       }
@@ -3498,6 +3511,7 @@ void CPULoop(int ticks)
 
       clockTicks = cpuNextEvent;
       cpuTotalTicks = 0;
+	  cpuDmaHack = false;
 
     updateLoop:
 
@@ -3531,7 +3545,7 @@ void CPULoop(int ticks)
             }
           }
 
-          if(VCOUNT >= 228) { //Reaching last line
+          if(VCOUNT > 227) { //Reaching last line
             DISPSTAT &= 0xFFFC;
             UPDATE_REG(0x04, DISPSTAT);
             VCOUNT = 0;
@@ -3899,6 +3913,7 @@ void CPULoop(int ticks)
         cpuDmaTicksToUpdate -= clockTicks;
         if(cpuDmaTicksToUpdate < 0)
           cpuDmaTicksToUpdate = 0;
+		cpuDmaHack = true;
         goto updateLoop;
       }
 
