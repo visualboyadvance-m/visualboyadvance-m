@@ -19,6 +19,7 @@ extern bool cpuSramEnabled;
 extern bool cpuFlashEnabled;
 extern bool cpuEEPROMEnabled;
 extern bool cpuEEPROMSensorEnabled;
+extern bool cpuDmaHack;
 extern u32 cpuDmaLast;
 extern bool timer0On;
 extern int timer0Ticks;
@@ -130,12 +131,16 @@ unreadable:
         armNextPC - 4 : armNextPC - 2);
     }
 #endif
-    if(armState) {
+	if(cpuDmaHack) {
+		value = cpuDmaLast;
+	} else {
+      if(armState) {
 		return CPUReadMemoryQuick(reg[15].I);
-    } else {
+      } else {
 		return CPUReadHalfWordQuick(reg[15].I) |
 			   CPUReadHalfWordQuick(reg[15].I) << 16;
-    }
+      }
+	}
   }
 
   if(oldAddress & 3) {
@@ -222,6 +227,10 @@ static inline u32 CPUReadHalfWord(u32 address)
                 value = 0xFFFF - ((timer3Ticks-cpuTotalTicks) >> timer3ClockReload);
       }
     }
+	else if((address < 0x4000400) && ioReadable[address & 0x3fc])
+	{
+		value = 0;
+	}
     else goto unreadable;
     break;
   case 5:
@@ -263,18 +272,22 @@ static inline u32 CPUReadHalfWord(u32 address)
     // default
   default:
 unreadable:
-#ifdef GBA_LOGGING
-    if(systemVerbose & VERBOSE_ILLEGAL_READ) {
-      log("Illegal halfword read: %08x at %08x\n", oldAddress, armMode ?
-        armNextPC - 4 : armNextPC - 2);
-    }
-#endif
-	if(armState) {
-		return CPUReadMemoryQuick(reg[15].I);
+	if(cpuDmaHack) {
+		value = cpuDmaLast & 0xFFFF;
 	} else {
-		return CPUReadHalfWordQuick(reg[15].I) |
-			   CPUReadHalfWordQuick(reg[15].I) << 16;
+		if(armState) {
+			value = CPUReadMemoryQuick(reg[15].I);
+		} else {
+			value = CPUReadHalfWordQuick(reg[15].I) |
+				CPUReadHalfWordQuick(reg[15].I) << 16;
+		}
 	}
+#ifdef GBA_LOGGING
+	if(systemVerbose & VERBOSE_ILLEGAL_READ) {
+		log("Illegal halfword read: %08x at %08x (%08x)\n", oldAddress, reg[15].I, value);
+	}
+#endif
+	return value;
   }
 
   if(oldAddress & 1) {
@@ -379,11 +392,15 @@ unreadable:
         armNextPC - 4 : armNextPC - 2);
     }
 #endif
-	if(armState) {
-		return CPUReadMemoryQuick(reg[15].I);
+	if(cpuDmaHack) {
+		return cpuDmaLast & 0xFF;
 	} else {
-		return CPUReadHalfWordQuick(reg[15].I) |
-			   CPUReadHalfWordQuick(reg[15].I) << 16;
+		if(armState) {
+			return CPUReadMemoryQuick(reg[15].I);
+		} else {
+			return CPUReadHalfWordQuick(reg[15].I) |
+				CPUReadHalfWordQuick(reg[15].I) << 16;
+		}
 	}
   }
 }
