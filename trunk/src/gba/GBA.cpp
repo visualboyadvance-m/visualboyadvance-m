@@ -2076,6 +2076,7 @@ void doDMA(u32 &s, u32 &d, u32 si, u32 di, u32 c, int transfer32)
   int dw = 0;
   int sc = c;
 
+  cpuDmaHack = true;
   cpuDmaCount = c;
   // This is done to get the correct waitstates.
   if (sm>15)
@@ -2144,7 +2145,7 @@ void doDMA(u32 &s, u32 &d, u32 si, u32 di, u32 c, int transfer32)
   }
 
   cpuDmaTicksToUpdate += totalTicks;
-
+  cpuDmaHack = false;
 }
 
 void CPUCheckDMA(int reason, int dmamask)
@@ -2187,7 +2188,6 @@ void CPUCheckDMA(int reason, int dmamask)
       doDMA(dma0Source, dma0Dest, sourceIncrement, destIncrement,
             DM0CNT_L ? DM0CNT_L : 0x4000,
             DM0CNT_H & 0x0400);
-	  cpuDmaHack = true;
 
       if(DM0CNT_H & 0x4000) {
         IF |= 0x0100;
@@ -2256,7 +2256,6 @@ void CPUCheckDMA(int reason, int dmamask)
               DM1CNT_L ? DM1CNT_L : 0x4000,
               DM1CNT_H & 0x0400);
       }
-	  cpuDmaHack = true;
 
       if(DM1CNT_H & 0x4000) {
         IF |= 0x0200;
@@ -2326,7 +2325,6 @@ void CPUCheckDMA(int reason, int dmamask)
               DM2CNT_L ? DM2CNT_L : 0x4000,
               DM2CNT_H & 0x0400);
       }
-	  cpuDmaHack = true;
 
       if(DM2CNT_H & 0x4000) {
         IF |= 0x0400;
@@ -2383,7 +2381,6 @@ void CPUCheckDMA(int reason, int dmamask)
       doDMA(dma3Source, dma3Dest, sourceIncrement, destIncrement,
             DM3CNT_L ? DM3CNT_L : 0x10000,
             DM3CNT_H & 0x0400);
-	  cpuDmaHack = true;
 
       if(DM3CNT_H & 0x4000) {
         IF |= 0x0800;
@@ -3511,7 +3508,6 @@ void CPULoop(int ticks)
 
       clockTicks = cpuNextEvent;
       cpuTotalTicks = 0;
-	  cpuDmaHack = false;
 
     updateLoop:
 
@@ -3913,7 +3909,6 @@ void CPULoop(int ticks)
         cpuDmaTicksToUpdate -= clockTicks;
         if(cpuDmaTicksToUpdate < 0)
           cpuDmaTicksToUpdate = 0;
-		cpuDmaHack = true;
         goto updateLoop;
       }
 
