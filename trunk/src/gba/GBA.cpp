@@ -3077,13 +3077,13 @@ void CPUInit(const char *biosFileName, bool useBiosFile)
     ioReadable[i] = false;
   for(i = 0x8c; i < 0x90; i++)
     ioReadable[i] = false;
-  for(i = 0xa0; i < 0xba; i++)
+  for(i = 0xa0; i < 0xb8; i++)
     ioReadable[i] = false;
-  for(i = 0xbc; i < 0xc6; i++)
+  for(i = 0xbc; i < 0xc4; i++)
     ioReadable[i] = false;
   for(i = 0xc8; i < 0xd0; i++)
     ioReadable[i] = false;
-  for(i = 0xd4; i < 0xde; i++)
+  for(i = 0xd4; i < 0xdc; i++)
     ioReadable[i] = false;
   for(i = 0xe0; i < 0x100; i++)
     ioReadable[i] = false;
