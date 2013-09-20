@@ -1,3 +1,4 @@
+#ifndef __LIBRETRO__
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -723,3 +724,4 @@ void remoteCleanUp()
   if(remoteCleanUpFnc)
     remoteCleanUpFnc();
 }
+#endif

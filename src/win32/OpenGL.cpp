@@ -345,9 +345,9 @@ bool OpenGLDisplay::initialize()
 		cpu_mmx = 0;
 #endif
 
-	systemRedShift = 19;
+	systemRedShift = 3;
 	systemGreenShift = 11;
-	systemBlueShift = 3;
+	systemBlueShift = 19;
 	systemColorDepth = 32;
 	theApp.fsColorDepth = 32;
 
@@ -401,7 +401,7 @@ void OpenGLDisplay::render()
 	} else {
 		glPixelStorei( GL_UNPACK_ROW_LENGTH, theApp.sizeX + 1 );
 	}
-    glTexSubImage2D(GL_TEXTURE_2D,0,0,0,width,height,GL_BGRA,GL_UNSIGNED_BYTE,data );
+    glTexSubImage2D(GL_TEXTURE_2D,0,0,0,width,height,GL_RGBA,GL_UNSIGNED_BYTE,data );
 
 
 	glBegin( GL_QUADS );

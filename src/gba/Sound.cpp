@@ -348,6 +348,11 @@ static void end_frame( blip_time_t time )
 
 void flush_samples(Multi_Buffer * buffer)
 {
+#ifdef __LIBRETRO__
+   int numSamples = buffer->read_samples( (blip_sample_t*) soundFinalWave, buffer->samples_avail() );
+   soundDriver->write(soundFinalWave, numSamples);
+   systemOnWriteDataToSoundBuffer(soundFinalWave, numSamples);
+#else
 	// We want to write the data frame by frame to support legacy audio drivers
 	// that don't use the length parameter of the write method.
 	// TODO: Update the Win32 audio drivers (DS, OAL, XA2), and flush all the
@@ -370,6 +375,7 @@ void flush_samples(Multi_Buffer * buffer)
 		soundDriver->write(soundFinalWave, soundBufferLen);
 		systemOnWriteDataToSoundBuffer(soundFinalWave, soundBufferLen);
 	}
+#endif
 }
 
 static void apply_filtering()
@@ -744,16 +750,25 @@ static void skip_read( gzFile in, int count )
 	}
 }
 
+#ifdef __LIBRETRO__
+void soundSaveGame( u8 *&out )
+#else
 void soundSaveGame( gzFile out )
+#endif
 {
 	gb_apu->save_state( &state.apu );
 
 	// Be sure areas for expansion get written as zero
 	memset( dummy_state, 0, sizeof dummy_state );
 
-	utilWriteData( out, gba_state );
+#ifdef __LIBRETRO__
+	utilWriteDataMem( out, gba_state );
+#else
+	utilWriteData( data, gba_state );
+#endif
 }
 
+#ifndef __LIBRETRO__
 static void soundReadGameOld( gzFile in, int version )
 {
 	// Read main data
@@ -788,19 +803,28 @@ static void soundReadGameOld( gzFile in, int version )
 
 	(void) utilReadInt( in ); // ignore quality
 }
+#endif
 
 #include <stdio.h>
 
+#ifdef __LIBRETRO__
+void soundReadGame(const u8*& in, int version )
+#else
 void soundReadGame( gzFile in, int version )
+#endif
 {
 	// Prepare APU and default state
 	reset_apu();
 	gb_apu->save_state( &state.apu );
 
 	if ( version > SAVE_GAME_VERSION_9 )
+#ifdef __LIBRETRO__
+		utilReadDataMem( in, gba_state );
+#else
 		utilReadData( in, gba_state );
 	else
 		soundReadGameOld( in, version );
+#endif
 
 	gb_apu->load_state( state.apu );
 	write_SGCNT0_H( READ16LE( &ioMem [SGCNT0_H] ) & 0x770F );
