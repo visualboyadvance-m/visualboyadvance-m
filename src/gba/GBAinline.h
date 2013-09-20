@@ -119,13 +119,9 @@ static inline u32 CPUReadMemory(u32 address)
       return eepromRead(address);
     goto unreadable;
   case 14:
-  case 15:
     if(cpuFlashEnabled | cpuSramEnabled)
-	{
       // no need to swap this
-      value = flashRead(address) * 0x01010101;
-	  break;
-	}
+      return flashRead(address);
     // default
   default:
 unreadable:
@@ -270,13 +266,9 @@ static inline u32 CPUReadHalfWord(u32 address)
       return  eepromRead(address);
     goto unreadable;
   case 14:
-  case 15:
     if(cpuFlashEnabled | cpuSramEnabled)
-	{
       // no need to swap this
-      value = flashRead(address) * 0x0101;
-	  break;
-	}
+      return flashRead(address);
     // default
   default:
 unreadable:
@@ -313,17 +305,22 @@ unreadable:
 
 static inline s16 CPUReadHalfWordSigned(u32 address)
 {
-  s32 value = (s32)CPUReadHalfWord(address);
-  if((address & 1))
+  u32 oldAddress = address;
+  if(address & 1) {
+    address &= ~0x01;
+  }
+  s16 value = (s16)CPUReadHalfWord(address);
+  if((oldAddress & 1))
   {
+    value = (s8)value;
 #ifdef GBA_LOGGING
 	if(systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
-		log("Unaligned signed halfword read from: %08x at %08x (%08x)\n", address, armMode ?
+		log("Unaligned signed halfword read from: %08x at %08x (%08x)\n", oldAddress, armMode ?
 			armNextPC - 4 : armNextPC - 2, value);
 	}
 #endif
   }
-  return (s16)value;
+  return value;
 }
 
 static inline u8 CPUReadByte(u32 address)
@@ -372,7 +369,6 @@ static inline u8 CPUReadByte(u32 address)
       return eepromRead(address);
     goto unreadable;
   case 14:
-  case 15:
     if(cpuSramEnabled | cpuFlashEnabled)
       return flashRead(address);
     if(cpuEEPROMSensorEnabled) {
@@ -490,7 +486,6 @@ static inline void CPUWriteMemory(u32 address, u32 value)
     }
     goto unwritable;
   case 0x0E:
-  case 0x0F:
     if((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled) {
       (*cpuSaveGameFunc)(address, (u8)value);
       break;
@@ -595,7 +590,6 @@ static inline void CPUWriteHalfWord(u32 address, u16 value)
     }
     goto unwritable;
   case 14:
-  case 15:
     if((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled) {
       (*cpuSaveGameFunc)(address, (u8)value);
       break;
@@ -732,7 +726,6 @@ static inline void CPUWriteByte(u32 address, u8 b)
     }
     goto unwritable;
   case 14:
-  case 15:
     if ((saveType != 5) && ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled)) {
 
       //if(!cpuEEPROMEnabled && (cpuSramEnabled | cpuFlashEnabled)) {
