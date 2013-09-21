@@ -11,23 +11,22 @@ enum IMAGE_TYPE {
 
 // save game
 typedef struct {
-  void *address;
-  int size;
+	void *address;
+	int size;
 } variable_desc;
-
 bool utilWritePNGFile(const char *, int, int, u8 *);
 bool utilWriteBMPFile(const char *, int, int, u8 *);
-void utilApplyIPS(const char *ips, u8 **rom, int *size);
+void utilApplyIPS(const char *ips, uint8_t **rom, int *size);
 bool utilIsGBAImage(const char *);
 bool utilIsGBImage(const char *);
 bool utilIsGzipFile(const char *);
+bool utilIsZipFile(const char *);
 void utilStripDoubleExtension(const char *, char *);
 IMAGE_TYPE utilFindType(const char *);
-IMAGE_TYPE utilFindType(const char *, char (&)[2048]);
-u8 *utilLoad(const char *, bool (*)(const char*), u8 *, int &);
+uint8_t *utilLoad(const char *, bool (*)(const char*), uint8_t *, int &);
 
-void utilPutDword(u8 *, u32);
-void utilPutWord(u8 *, u16);
+void utilPutDword(uint8_t *, uint32_t);
+void utilPutWord(uint8_t *, uint16_t);
 void utilWriteData(gzFile, variable_desc *);
 void utilReadData(gzFile, variable_desc *);
 void utilReadDataSkip(gzFile, variable_desc *);
@@ -43,5 +42,16 @@ long utilGzMemTell(gzFile file);
 void utilGBAFindSave(const u8 *, const int);
 void utilUpdateSystemColorMaps(bool lcd = false);
 bool utilFileExists( const char *filename );
+
+
+#ifdef __LIBRETRO__
+void utilWriteIntMem(uint8_t *& data, int);
+void utilWriteMem(uint8_t *& data, const void *in_data, unsigned size);
+void utilWriteDataMem(uint8_t *& data, variable_desc *);
+
+int utilReadIntMem(const uint8_t *& data);
+void utilReadMem(void *buf, const uint8_t *& data, unsigned size);
+void utilReadDataMem(const uint8_t *& data, variable_desc *);
+#endif
 
 #endif // UTIL_H
