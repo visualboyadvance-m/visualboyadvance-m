@@ -1,6 +1,16 @@
 #ifndef PORT_H
 #define PORT_H
 
+#ifdef __CELLOS_LV2__
+/* PlayStation3 */
+#include <ppu_intrinsics.h>
+#endif
+
+#ifdef _XBOX360
+/* XBox 360 */
+#include <ppcintrinsics.h>
+#endif
+
 #include "Types.h"
 
 // swaps a 16-bit value
