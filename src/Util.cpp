@@ -439,6 +439,8 @@ static bool utilIsImage(const char *file)
 #include <Windows.h>
 #endif
 
+IMAGE_TYPE utilFindType(const char *file, char (&buffer)[2048]);
+
 IMAGE_TYPE utilFindType(const char *file)
 {
 	char buffer [2048];

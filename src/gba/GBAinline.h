@@ -77,18 +77,18 @@ static inline u32 CPUReadMemory(u32 address)
     value = READ32LE(((u32 *)&internalRAM[address & 0x7ffC]));
     break;
   case 4:
-	  if((address < 0x4000400) && ioReadable[address & 0x3fc]) {
-		  if(ioReadable[(address & 0x3fc) + 2]) {
-			  value = READ32LE(((u32 *)&ioMem[address & 0x3fC]));
-			  if ((address & 0x3fc) == COMM_JOY_RECV_L)
-				  UPDATE_REG(COMM_JOYSTAT, READ16LE(&ioMem[COMM_JOYSTAT]) & ~JOYSTAT_RECV);
-		  } else {
-			  value = READ16LE(((u16 *)&ioMem[address & 0x3fc]));
-		  }
-	  }
-	  else
-		  goto unreadable;
-	  break;
+	if((address < 0x4000400) && ioReadable[address & 0x3fc]) {
+      if(ioReadable[(address & 0x3fc) + 2]) {
+        value = READ32LE(((u32 *)&ioMem[address & 0x3fC]));
+        if ((address & 0x3fc) == COMM_JOY_RECV_L)
+          UPDATE_REG(COMM_JOYSTAT, READ16LE(&ioMem[COMM_JOYSTAT]) & ~JOYSTAT_RECV);
+      } else {
+        value = READ16LE(((u16 *)&ioMem[address & 0x3fc]));
+      }
+    }
+    else
+      goto unreadable;
+	break;
   case 5:
     value = READ32LE(((u32 *)&paletteRAM[address & 0x3fC]));
     break;
@@ -121,11 +121,14 @@ static inline u32 CPUReadMemory(u32 address)
   case 14:
   case 15:
     if(cpuFlashEnabled | cpuSramEnabled)
-	{
-      // no need to swap this
-      value = flashRead(address) * 0x01010101;
-	  break;
+    {  // no need to swap this
+	  #ifdef __libretro__
+      return flashRead(address);
+	  #else
+	  value = flashRead(address) * 0x01010101;
+	  #endif
 	}
+	break;
     // default
   default:
 unreadable:
@@ -145,6 +148,7 @@ unreadable:
 			   CPUReadHalfWordQuick(reg[15].I) << 16;
       }
 	}
+	break;
   }
 
   if(oldAddress & 3) {
@@ -272,10 +276,13 @@ static inline u32 CPUReadHalfWord(u32 address)
   case 14:
   case 15:
     if(cpuFlashEnabled | cpuSramEnabled)
-	{
       // no need to swap this
-      value = flashRead(address) * 0x0101;
-	  break;
+    {  
+	#ifdef __libretro__
+      return flashRead(address);
+	#else
+	  value = flashRead(address) * 0x0101;
+	#endif
 	}
     // default
   default:
