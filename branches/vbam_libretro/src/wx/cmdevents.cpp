@@ -1,0 +1,2316 @@
+#ifndef NO_FFMPEG
+#define __STDC_LIMIT_MACROS // required for ffmpeg
+#define __STDC_CONSTANT_MACROS // required for ffmpeg
+#endif
+#include "wxvbam.h"
+#include <algorithm>
+#include <wx/aboutdlg.h>
+#include <wx/ffile.h>
+#include <wx/wfstream.h>
+#include <wx/sstream.h>
+#include <wx/regex.h>
+#include <wx/numdlg.h>
+#include <wx/progdlg.h>
+#ifndef NO_FFMPEG
+extern "C" {
+#include <libavformat/avformat.h>
+}
+#endif
+#include "../gb/gbPrinter.h"
+#include "../gba/agbprint.h"
+
+#define GetXRCDialog(n) \
+    wxStaticCast(FindWindow(XRCID(n)), wxDialog)
+
+bool cmditem_lt(const struct cmditem &cmd1, const struct cmditem &cmd2)
+{
+    return wxStrcmp(cmd1.cmd, cmd2.cmd) < 0;
+}
+
+#define update_bcheck(s, f) do { \
+    f = !f; \
+    int id = XRCID(s); \
+    for(int i = 0; i < checkable_mi.size(); i++) { \
+	if(checkable_mi[i].cmd != id) \
+	    continue; \
+	f = checkable_mi[i].mi->IsChecked(); \
+	break; \
+    } \
+} while(0)
+
+#define update_icheck(s, f, m, v) do { \
+    bool is_checked = ((f) & (m)) != (v); \
+    int id = XRCID(s); \
+    for(int i = 0; i < checkable_mi.size(); i++) { \
+	if(checkable_mi[i].cmd != id) \
+	    continue; \
+	is_checked = checkable_mi[i].mi->IsChecked(); \
+	break; \
+    } \
+    f = ((f) & ~(m)) | (is_checked ? (v) : 0); \
+} while(0)
+#define update_icheck1(s, f, m) update_icheck(s, f, m, m)
+
+#define update_check(s, v) do { \
+    int id = XRCID(s); \
+    for(int i = 0; i < checkable_mi.size(); i++) { \
+	if(checkable_mi[i].cmd != id) \
+	    continue; \
+	checkable_mi[i].mi->Check(v); \
+	break; \
+    } \
+} while(0)
+
+//// File menu
+
+// formerly OpenGBA, OpenGBC, OpenGB
+// having just one means separate ROM dirs only make sense on the cmd line
+
+static int open_ft = 0;
+static wxString open_dir;
+
+EVT_HANDLER(wxID_OPEN, "Open ROM...")
+{
+    if(!open_dir.size())
+	open_dir = gopts.gba_rom_dir;
+	// FIXME: ignore if non-existent or not a dir
+    wxString pats = _("GameBoy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb)|"
+		      "*.agb;*.gba;*.bin;*.elf;*.mb"
+		      "*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz"
+		       "*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z"
+		      "|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb)|"
+		      "*.dmg;*.gb;*.gbc;*.cgb;*.sgb"
+		      "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz"
+		      "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z"
+		      "|Archives (*.zip;*.7z;*.rar)"
+		      "|*.zip;*.7z;*.rar|");
+    pats.append(wxALL_FILES);
+    wxFileDialog dlg(this, _("Open ROM file"), open_dir, wxT(""),
+		     pats,
+		     wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+    dlg.SetFilterIndex(open_ft);
+    if(ShowModal(&dlg) == wxID_OK)
+	wxGetApp().pending_load = dlg.GetPath();
+    open_ft = dlg.GetFilterIndex();
+    open_dir = dlg.GetDirectory();
+}
+
+EVT_HANDLER(RecentReset, "Reset recent ROM list")
+{
+    // only save config if there were items to remove
+    if(gopts.recent->GetCount()) {
+	while(gopts.recent->GetCount())
+	    gopts.recent->RemoveFileFromHistory(0);
+	wxConfig *cfg = wxGetApp().cfg;
+	cfg->SetPath(wxT("/Recent"));
+	gopts.recent->Save(*cfg);
+	cfg->SetPath(wxT("/"));
+	cfg->Flush();
+    }
+}
+
+EVT_HANDLER(RecentFreeze, "Freeze recent ROM list (toggle)")
+{
+    update_bcheck("RecentFreeze", gopts.recent_freeze);
+    update_opts();
+}
+
+// following 10 should really be a single ranged handler
+// former names: Recent01 .. Recent10
+EVT_HANDLER(wxID_FILE1, "Load recent ROM 1")
+{
+    panel->LoadGame(gopts.recent->GetHistoryFile(0));
+}
+
+EVT_HANDLER(wxID_FILE2, "Load recent ROM 2")
+{
+    panel->LoadGame(gopts.recent->GetHistoryFile(1));
+}
+
+EVT_HANDLER(wxID_FILE3, "Load recent ROM 3")
+{
+    panel->LoadGame(gopts.recent->GetHistoryFile(2));
+}
+
+EVT_HANDLER(wxID_FILE4, "Load recent ROM 4")
+{
+    panel->LoadGame(gopts.recent->GetHistoryFile(3));
+}
+
+EVT_HANDLER(wxID_FILE5, "Load recent ROM 5")
+{
+    panel->LoadGame(gopts.recent->GetHistoryFile(4));
+}
+
+EVT_HANDLER(wxID_FILE6, "Load recent ROM 6")
+{
+    panel->LoadGame(gopts.recent->GetHistoryFile(5));
+}
+
+EVT_HANDLER(wxID_FILE7, "Load recent ROM 7")
+{
+    panel->LoadGame(gopts.recent->GetHistoryFile(6));
+}
+
+EVT_HANDLER(wxID_FILE8, "Load recent ROM 8")
+{
+    panel->LoadGame(gopts.recent->GetHistoryFile(7));
+}
+
+EVT_HANDLER(wxID_FILE9, "Load recent ROM 9")
+{
+    panel->LoadGame(gopts.recent->GetHistoryFile(8));
+}
+
+EVT_HANDLER(wxID_FILE10, "Load recent ROM 10")
+{
+    panel->LoadGame(gopts.recent->GetHistoryFile(9));
+}
+
+static const struct rom_maker {
+    const wxChar *code, *name;
+} makers[] = {
+  { wxT("01"), wxT("Nintendo") },
+  { wxT("02"), wxT("Rocket Games") },
+  { wxT("08"), wxT("Capcom") },
+  { wxT("09"), wxT("Hot B Co.") },
+  { wxT("0A"), wxT("Jaleco") },
+  { wxT("0B"), wxT("Coconuts Japan") },
+  { wxT("0C"), wxT("Coconuts Japan/G.X.Media") },
+  { wxT("0H"), wxT("Starfish") },
+  { wxT("0L"), wxT("Warashi Inc.") },
+  { wxT("0N"), wxT("Nowpro") },
+  { wxT("0P"), wxT("Game Village") },
+  { wxT("13"), wxT("Electronic Arts Japan") },
+  { wxT("18"), wxT("Hudson Soft Japan") },
+  { wxT("19"), wxT("S.C.P.") },
+  { wxT("1A"), wxT("Yonoman") },
+  { wxT("1G"), wxT("SMDE") },
+  { wxT("1P"), wxT("Creatures Inc.") },
+  { wxT("1Q"), wxT("TDK Deep Impresion") },
+  { wxT("20"), wxT("Destination Software") },
+  { wxT("22"), wxT("VR 1 Japan") },
+  { wxT("25"), wxT("San-X") },
+  { wxT("28"), wxT("Kemco Japan") },
+  { wxT("29"), wxT("Seta") },
+  { wxT("2H"), wxT("Ubisoft Japan") },
+  { wxT("2K"), wxT("NEC InterChannel") },
+  { wxT("2L"), wxT("Tam") },
+  { wxT("2M"), wxT("Jordan") },
+  { wxT("2N"), wxT("Smilesoft") },
+  { wxT("2Q"), wxT("Mediakite") },
+  { wxT("36"), wxT("Codemasters") },
+  { wxT("37"), wxT("GAGA Communications") },
+  { wxT("38"), wxT("Laguna") },
+  { wxT("39"), wxT("Telstar Fun and Games") },
+  { wxT("41"), wxT("Ubi Soft Entertainment") },
+  { wxT("42"), wxT("Sunsoft") },
+  { wxT("47"), wxT("Spectrum Holobyte") },
+  { wxT("49"), wxT("IREM") },
+  { wxT("4D"), wxT("Malibu Games") },
+  { wxT("4F"), wxT("Eidos/U.S. Gold") },
+  { wxT("4J"), wxT("Fox Interactive") },
+  { wxT("4K"), wxT("Time Warner Interactive") },
+  { wxT("4Q"), wxT("Disney") },
+  { wxT("4S"), wxT("Black Pearl") },
+  { wxT("4X"), wxT("GT Interactive") },
+  { wxT("4Y"), wxT("RARE") },
+  { wxT("4Z"), wxT("Crave Entertainment") },
+  { wxT("50"), wxT("Absolute Entertainment") },
+  { wxT("51"), wxT("Acclaim") },
+  { wxT("52"), wxT("Activision") },
+  { wxT("53"), wxT("American Sammy Corp.") },
+  { wxT("54"), wxT("Take 2 Interactive") },
+  { wxT("55"), wxT("Hi Tech") },
+  { wxT("56"), wxT("LJN LTD.") },
+  { wxT("58"), wxT("Mattel") },
+  { wxT("5A"), wxT("Mindscape/Red Orb Ent.") },
+  { wxT("5C"), wxT("Taxan") },
+  { wxT("5D"), wxT("Midway") },
+  { wxT("5F"), wxT("American Softworks") },
+  { wxT("5G"), wxT("Majesco Sales Inc") },
+  { wxT("5H"), wxT("3DO") },
+  { wxT("5K"), wxT("Hasbro") },
+  { wxT("5L"), wxT("NewKidCo") },
+  { wxT("5M"), wxT("Telegames") },
+  { wxT("5N"), wxT("Metro3D") },
+  { wxT("5P"), wxT("Vatical Entertainment") },
+  { wxT("5Q"), wxT("LEGO Media") },
+  { wxT("5S"), wxT("Xicat Interactive") },
+  { wxT("5T"), wxT("Cryo Interactive") },
+  { wxT("5W"), wxT("Red Storm Ent./BKN Ent.") },
+  { wxT("5X"), wxT("Microids") },
+  { wxT("5Z"), wxT("Conspiracy Entertainment Corp.") },
+  { wxT("60"), wxT("Titus Interactive Studios") },
+  { wxT("61"), wxT("Virgin Interactive") },
+  { wxT("62"), wxT("Maxis") },
+  { wxT("64"), wxT("LucasArts Entertainment") },
+  { wxT("67"), wxT("Ocean") },
+  { wxT("69"), wxT("Electronic Arts") },
+  { wxT("6E"), wxT("Elite Systems Ltd.") },
+  { wxT("6F"), wxT("Electro Brain") },
+  { wxT("6G"), wxT("The Learning Company") },
+  { wxT("6H"), wxT("BBC") },
+  { wxT("6J"), wxT("Software 2000") },
+  { wxT("6L"), wxT("BAM! Entertainment") },
+  { wxT("6M"), wxT("Studio 3") },
+  { wxT("6Q"), wxT("Classified Games") },
+  { wxT("6S"), wxT("TDK Mediactive") },
+  { wxT("6U"), wxT("DreamCatcher") },
+  { wxT("6V"), wxT("JoWood Productions") },
+  { wxT("6W"), wxT("SEGA") },
+  { wxT("6X"), wxT("Wannado Edition") },
+  { wxT("6Y"), wxT("LSP") },
+  { wxT("6Z"), wxT("ITE Media") },
+  { wxT("70"), wxT("Infogrames") },
+  { wxT("71"), wxT("Interplay") },
+  { wxT("72"), wxT("JVC Musical Industries Inc") },
+  { wxT("73"), wxT("Parker Brothers") },
+  { wxT("75"), wxT("SCI") },
+  { wxT("78"), wxT("THQ") },
+  { wxT("79"), wxT("Accolade") },
+  { wxT("7A"), wxT("Triffix Ent. Inc.") },
+  { wxT("7C"), wxT("Microprose Software") },
+  { wxT("7D"), wxT("Universal Interactive Studios") },
+  { wxT("7F"), wxT("Kemco") },
+  { wxT("7G"), wxT("Rage Software") },
+  { wxT("7H"), wxT("Encore") },
+  { wxT("7J"), wxT("Zoo") },
+  { wxT("7K"), wxT("BVM") },
+  { wxT("7L"), wxT("Simon & Schuster Interactive") },
+  { wxT("7M"), wxT("Asmik Ace Entertainment Inc./AIA") },
+  { wxT("7N"), wxT("Empire Interactive") },
+  { wxT("7Q"), wxT("Jester Interactive") },
+  { wxT("7T"), wxT("Scholastic") },
+  { wxT("7U"), wxT("Ignition Entertainment") },
+  { wxT("7W"), wxT("Stadlbauer") },
+  { wxT("80"), wxT("Misawa") },
+  { wxT("83"), wxT("LOZC") },
+  { wxT("8B"), wxT("Bulletproof Software") },
+  { wxT("8C"), wxT("Vic Tokai Inc.") },
+  { wxT("8J"), wxT("General Entertainment") },
+  { wxT("8N"), wxT("Success") },
+  { wxT("8P"), wxT("SEGA Japan") },
+  { wxT("91"), wxT("Chun Soft") },
+  { wxT("92"), wxT("Video System") },
+  { wxT("93"), wxT("BEC") },
+  { wxT("96"), wxT("Yonezawa/S'pal") },
+  { wxT("97"), wxT("Kaneko") },
+  { wxT("99"), wxT("Victor Interactive Software") },
+  { wxT("9A"), wxT("Nichibutsu/Nihon Bussan") },
+  { wxT("9B"), wxT("Tecmo") },
+  { wxT("9C"), wxT("Imagineer") },
+  { wxT("9F"), wxT("Nova") },
+  { wxT("9H"), wxT("Bottom Up") },
+  { wxT("9L"), wxT("Hasbro Japan") },
+  { wxT("9N"), wxT("Marvelous Entertainment") },
+  { wxT("9P"), wxT("Keynet Inc.") },
+  { wxT("9Q"), wxT("Hands-On Entertainment") },
+  { wxT("A0"), wxT("Telenet") },
+  { wxT("A1"), wxT("Hori") },
+  { wxT("A4"), wxT("Konami") },
+  { wxT("A6"), wxT("Kawada") },
+  { wxT("A7"), wxT("Takara") },
+  { wxT("A9"), wxT("Technos Japan Corp.") },
+  { wxT("AA"), wxT("JVC") },
+  { wxT("AC"), wxT("Toei Animation") },
+  { wxT("AD"), wxT("Toho") },
+  { wxT("AF"), wxT("Namco") },
+  { wxT("AG"), wxT("Media Rings Corporation") },
+  { wxT("AH"), wxT("J-Wing") },
+  { wxT("AK"), wxT("KID") },
+  { wxT("AL"), wxT("MediaFactory") },
+  { wxT("AP"), wxT("Infogrames Hudson") },
+  { wxT("AQ"), wxT("Kiratto. Ludic Inc") },
+  { wxT("B0"), wxT("Acclaim Japan") },
+  { wxT("B1"), wxT("ASCII") },
+  { wxT("B2"), wxT("Bandai") },
+  { wxT("B4"), wxT("Enix") },
+  { wxT("B6"), wxT("HAL Laboratory") },
+  { wxT("B7"), wxT("SNK") },
+  { wxT("B9"), wxT("Pony Canyon Hanbai") },
+  { wxT("BA"), wxT("Culture Brain") },
+  { wxT("BB"), wxT("Sunsoft") },
+  { wxT("BD"), wxT("Sony Imagesoft") },
+  { wxT("BF"), wxT("Sammy") },
+  { wxT("BG"), wxT("Magical") },
+  { wxT("BJ"), wxT("Compile") },
+  { wxT("BL"), wxT("MTO Inc.") },
+  { wxT("BN"), wxT("Sunrise Interactive") },
+  { wxT("BP"), wxT("Global A Entertainment") },
+  { wxT("BQ"), wxT("Fuuki") },
+  { wxT("C0"), wxT("Taito") },
+  { wxT("C2"), wxT("Kemco") },
+  { wxT("C3"), wxT("Square Soft") },
+  { wxT("C5"), wxT("Data East") },
+  { wxT("C6"), wxT("Tonkin House") },
+  { wxT("C8"), wxT("Koei") },
+  { wxT("CA"), wxT("Konami/Palcom/Ultra") },
+  { wxT("CB"), wxT("Vapinc/NTVIC") },
+  { wxT("CC"), wxT("Use Co.,Ltd.") },
+  { wxT("CD"), wxT("Meldac") },
+  { wxT("CE"), wxT("FCI/Pony Canyon") },
+  { wxT("CF"), wxT("Angel") },
+  { wxT("CM"), wxT("Konami Computer Entertainment Osaka") },
+  { wxT("CP"), wxT("Enterbrain") },
+  { wxT("D1"), wxT("Sofel") },
+  { wxT("D2"), wxT("Quest") },
+  { wxT("D3"), wxT("Sigma Enterprises") },
+  { wxT("D4"), wxT("Ask Kodansa") },
+  { wxT("D6"), wxT("Naxat") },
+  { wxT("D7"), wxT("Copya System") },
+  { wxT("D9"), wxT("Banpresto") },
+  { wxT("DA"), wxT("TOMY") },
+  { wxT("DB"), wxT("LJN Japan") },
+  { wxT("DD"), wxT("NCS") },
+  { wxT("DF"), wxT("Altron Corporation") },
+  { wxT("DH"), wxT("Gaps Inc.") },
+  { wxT("DN"), wxT("ELF") },
+  { wxT("E2"), wxT("Yutaka") },
+  { wxT("E3"), wxT("Varie") },
+  { wxT("E5"), wxT("Epoch") },
+  { wxT("E7"), wxT("Athena") },
+  { wxT("E8"), wxT("Asmik Ace Entertainment Inc.") },
+  { wxT("E9"), wxT("Natsume") },
+  { wxT("EA"), wxT("King Records") },
+  { wxT("EB"), wxT("Atlus") },
+  { wxT("EC"), wxT("Epic/Sony Records") },
+  { wxT("EE"), wxT("IGS") },
+  { wxT("EL"), wxT("Spike") },
+  { wxT("EM"), wxT("Konami Computer Entertainment Tokyo") },
+  { wxT("EN"), wxT("Alphadream Corporation") },
+  { wxT("F0"), wxT("A Wave") },
+  { wxT("G1"), wxT("PCCW") },
+  { wxT("G4"), wxT("KiKi Co Ltd") },
+  { wxT("G5"), wxT("Open Sesame Inc.") },
+  { wxT("G6"), wxT("Sims") },
+  { wxT("G7"), wxT("Broccoli") },
+  { wxT("G8"), wxT("Avex") },
+  { wxT("G9"), wxT("D3 Publisher") },
+  { wxT("GB"), wxT("Konami Computer Entertainment Japan") },
+  { wxT("GD"), wxT("Square-Enix") },
+  { wxT("HY"), wxT("Sachen") }
+};
+#define num_makers (sizeof(makers)/sizeof(makers[0]))
+static bool maker_lt(const rom_maker &r1, const rom_maker &r2)
+{
+    return wxStrcmp(r1.code, r2.code) < 0;
+}
+
+EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB|CMDEN_GBA)
+{
+    wxString s;
+#define setlab(id) do { \
+    /* SetLabelText is not in 2.8 */ \
+    s.Replace(wxT("&"), wxT("&&"), true); \
+    XRCCTRL(*dlg, id, wxControl)->SetLabel(s); \
+} while(0)
+#define setblab(id, b) do { \
+    s.Printf(wxT("%02x"), (unsigned int)b); \
+    setlab(id); \
+} while(0)
+#define setblabs(id, b, ts) do { \
+    s.Printf(wxT("%02x (%s)"), (unsigned int)b, ts); \
+    setlab(id); \
+} while(0)
+#define setlabs(id, ts, l) do { \
+    s = wxString((const char *)&(ts), wxConvLibc, l); \
+    setlab(id); \
+} while(0)
+    switch(panel->game_type()) {
+    case IMAGE_GB:
+	{
+	    wxDialog *dlg = GetXRCDialog("GBROMInfo");
+	    setlabs("Title", gbRom[0x134], 15);
+	    setblab("Color", gbRom[0x143]);
+	    if(gbRom[0x14b] == 0x33)
+		s = wxString((const char *)&gbRom[0x144], wxConvUTF8, 2);
+	    else
+		s.Printf(wxT("%02x"), gbRom[0x14b]);
+	    setlab("MakerCode");
+	    const rom_maker m = { s.c_str() }, *rm;
+	    rm = std::lower_bound(&makers[0], &makers[num_makers], m, maker_lt);
+	    if(rm < &makers[num_makers] && !wxStrcmp(m.code, rm->code))
+		s = rm->name;
+	    else
+		s = _("Unknown");
+	    setlab("MakerName");
+	    setblab("UnitCode", gbRom[0x146]);
+	    const wxChar *type;
+	    switch(gbRom[0x147]) {
+	    case 0x00:
+		type = _("ROM");
+		break;
+	    case 0x01:
+		type = _("ROM+MBC1");
+		break;
+	    case 0x02:
+		type = _("ROM+MBC1+RAM");
+		break;
+	    case 0x03:
+		type = _("ROM+MBC1+RAM+BATT");
+		break;
+	    case 0x05:
+		type = _("ROM+MBC2");
+		break;
+	    case 0x06:
+		type = _("ROM+MBC2+BATT");
+		break;
+	    case 0x0b:
+		type = _("ROM+MMM01");
+		break;
+	    case 0x0c:
+		type = _("ROM+MMM01+RAM");
+		break;
+	    case 0x0d:
+		type = _("ROM+MMM01+RAM+BATT");
+		break;
+	    case 0x0f:
+		type = _("ROM+MBC3+TIMER+BATT");
+		break;
+	    case 0x10:
+		type = _("ROM+MBC3+TIMER+RAM+BATT");
+		break;
+	    case 0x11:
+		type = _("ROM+MBC3");
+		break;
+	    case 0x12:
+		type = _("ROM+MBC3+RAM");
+		break;
+	    case 0x13:
+		type = _("ROM+MBC3+RAM+BATT");
+		break;
+	    case 0x19:
+		type = _("ROM+MBC5");
+		break;
+	    case 0x1a:
+		type = _("ROM+MBC5+RAM");
+		break;
+	    case 0x1b:
+		type = _("ROM+MBC5+RAM+BATT");
+		break;
+	    case 0x1c:
+		type = _("ROM+MBC5+RUMBLE");
+		break;
+	    case 0x1d:
+		type = _("ROM+MBC5+RUMBLE+RAM");
+		break;
+	    case 0x1e:
+		type = _("ROM+MBC5+RUMBLE+RAM+BATT");
+		break;
+	    case 0x22:
+		type = _("ROM+MBC7+BATT");
+		break;
+	    case 0x55:
+		type = _("GameGenie");
+		break;
+	    case 0x56:
+		type = _("GameShark V3.0");
+		break;
+	    case 0xfc:
+		type = _("ROM+POCKET CAMERA");
+		break;
+	    case 0xfd:
+		type = _("ROM+BANDAI TAMA5");
+		break;
+	    case 0xfe:
+		type = _("ROM+HuC-3");
+		break;
+	    case 0xff:
+		type = _("ROM+HuC-1");
+		break;
+	    default:
+		type = _("Unknown");
+	    }
+	    setblabs("DeviceType", gbRom[0x147], type);
+	    switch(gbRom[0x148]) {
+	    case 0:
+		type = wxT("32K");
+		break;
+	    case 1:
+		type = wxT("64K");
+		break;
+	    case 2:
+		type = wxT("128K");
+		break;
+	    case 3:
+		type = wxT("256K");
+		break;
+	    case 4:
+		type = wxT("512K");
+		break;
+	    case 5:
+		type = wxT("1M");
+		break;
+	    case 6:
+		type = wxT("2M");
+		break;
+	    case 7:
+		type = wxT("4M");
+		break;
+	    default:
+		type = _("Unknown");
+	    }
+	    setblabs("ROMSize", gbRom[0x148], type);
+	    switch(gbRom[0x149]) {
+	    case 0:
+		type = _("None");
+		break;
+	    case 1:
+		type = wxT("2K");
+		break;
+	    case 2:
+		type = wxT("8K");
+		break;
+	    case 3:
+		type = wxT("32K");
+		break;
+	    case 4:
+		type = wxT("128K");
+		break;
+	    case 5:
+		type = wxT("64K");
+		break;
+	    }
+	    setblabs("RAMSize", gbRom[0x149], type);
+	    setblab("DestCode", gbRom[0x14a]);
+	    setblab("LicCode", gbRom[0x14b]);
+	    setblab("Version", gbRom[0x14c]);
+	    u8 crc = 25;
+	    for(int i = 0x134; i < 0x14d; i++)
+		crc += gbRom[i];
+	    crc = 256 - crc;
+	    s.Printf(wxT("%02x (%02x)"), crc, gbRom[0x14d]);
+	    setlab("CRC");
+	    u16 crc16 = 0;
+	    for(int i = 0; i < gbRomSize; i++)
+		crc16 += gbRom[i];
+	    crc16 -= gbRom[0x14e] + gbRom[0x14f];
+	    s.Printf(wxT("%04x (%04x)"), crc16, gbRom[0x14e]*256+gbRom[0x14f]);
+	    setlab("Checksum");
+	    dlg->Fit();
+	    ShowModal(dlg);
+	}
+	break;
+    case IMAGE_GBA:
+	{
+	    wxDialog *dlg = GetXRCDialog("GBAROMInfo");
+	    setlabs("Title", rom[0xa0], 12);
+	    setlabs("GameCode", rom[0xac], 4);
+	    setlabs("MakerCode", rom[0xb0], 2);
+	    const rom_maker m = { s.c_str() }, *rm;
+	    rm = std::lower_bound(&makers[0], &makers[num_makers], m, maker_lt);
+	    if(rm < &makers[num_makers] && !wxStrcmp(m.code, rm->code))
+		s = rm->name;
+	    else
+		s = _("Unknown");
+	    setlab("MakerName");
+	    setblab("UnitCode", rom[0xb3]);
+	    s.Printf(wxT("%02x"), (unsigned int)rom[0xb4]);
+	    if(rom[0xb4] & 0x80)
+		s.append(wxT(" (DACS)"));
+	    setlab("DeviceType");
+	    setblab("Version", rom[0xbc]);
+	    u8 crc = 0x19;
+	    for(int i = 0xa0; i < 0xbd; i++)
+		crc += rom[i];
+	    crc = -crc;
+	    s.Printf(wxT("%02x (%02x)"), crc, rom[0xbd]);
+	    setlab("CRC");
+	    dlg->Fit();
+	    ShowModal(dlg);
+	}
+	break;
+    }
+}
+
+static wxString batimp_path;
+
+EVT_HANDLER_MASK(ImportBatteryFile, "Import battery file...", CMDEN_GB|CMDEN_GBA)
+{
+    if(!batimp_path.size())
+	batimp_path = panel->bat_dir();
+    wxFileDialog dlg(this, _("Select battery file"), batimp_path, wxEmptyString,
+		     _("Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+    int ret = ShowModal(&dlg);
+    batimp_path = dlg.GetDirectory();
+    if(ret != wxID_OK)
+	return;
+    wxString fn = dlg.GetPath();
+    ret = wxMessageBox(_("Importing a battery file will erase any saved games (permanently after the next write).  Do you want to continue?"),
+		       _("Confirm import"), wxYES_NO|wxICON_EXCLAMATION);
+    if(ret == wxYES) {
+	wxString msg;
+	if(panel->emusys->emuReadBattery(fn.mb_fn_str()))
+	    msg.Printf(_("Loaded battery %s"), fn.c_str());
+	else
+	    msg.Printf(_("Error loading battery %s"), fn.c_str());
+	systemScreenMessage(msg);
+    }
+}
+
+EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN_GB|CMDEN_GBA)
+{
+    static wxString path;
+    wxFileDialog dlg(this, _("Select code file"), path, wxEmptyString,
+		     panel->game_type() == IMAGE_GBA ?
+		         _("Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"):
+		         _("Gameshark Code File (*.gcf)|*.gcf"),
+		     wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+    int ret = ShowModal(&dlg);
+    path = dlg.GetDirectory();
+    if(ret != wxID_OK)
+	return;
+    wxString fn = dlg.GetPath();
+    ret = wxMessageBox(_("Importing a code file will replace any loaded cheats.  Do you want to continue?"),
+		       _("Confirm import"), wxYES_NO|wxICON_EXCLAMATION);
+    if(ret == wxYES) {
+	wxString msg;
+	bool res;
+	if(panel->game_type() == IMAGE_GB)
+	    // FIXME: this routine will not work on big-endian systems
+	    // if the underlying file format is little-endian
+	    // (fix in gb/gbCheats.cpp)
+	    res = gbCheatReadGSCodeFile(fn.mb_fn_str());
+	else {
+	    // need to select game first
+	    wxFFile f(fn, wxT("rb"));
+	    if(!f.IsOpened()) {
+		wxLogError(_("Cannot open file %s"), fn.c_str());
+		return;
+	    }
+	    // FIXME: in my code, I assume file format is little-endian
+	    // however, in core code, it is assumed to be native-endian
+	    u32 len;
+	    char buf[14];
+	    if(f.Read(&len, sizeof(len)) != sizeof(len) ||
+	       wxUINT32_SWAP_ON_BE(len) != 14 ||
+	       f.Read(buf, 14) != 14 || memcmp(buf, "SharkPortCODES", 14)) {
+		wxLogError(_("Unsupported code file %s"), fn.c_str());
+		return;
+	    }
+	    f.Seek(0x1e);
+	    if(f.Read(&len, sizeof(len)) != sizeof(len))
+		len = 0;
+	    u32 game = 0;
+	    if(len > 1) {
+		wxDialog *seldlg = GetXRCDialog("CodeSelect");
+		wxControlWithItems *lst = XRCCTRL(*seldlg, "CodeList", wxControlWithItems);
+		lst->Clear();
+		while(len-- > 0) {
+		    u32 slen;
+		    if(f.Read(&slen, sizeof(slen)) != sizeof(slen) ||
+		      slen > 1024) // arbitrary upper bound
+			break;
+		    char buf[slen];
+		    if(f.Read(buf, slen) != slen)
+			break;
+		    lst->Append(wxString(buf, wxConvLibc, slen));
+		    u32 ncodes;
+		    if(f.Read(&ncodes, sizeof(ncodes)) != sizeof(ncodes))
+			break;
+		    for(; ncodes > 0; ncodes--) {
+			if(f.Read(&slen, sizeof(slen)) != sizeof(slen))
+			    break;
+			f.Seek(slen, wxFromCurrent);
+			if(f.Read(&slen, sizeof(slen)) != sizeof(slen))
+			    break;
+			f.Seek(slen + 4, wxFromCurrent);
+			if(f.Read(&slen, sizeof(slen)) != sizeof(slen))
+			    break;
+			f.Seek(slen * 12, wxFromCurrent);
+		    }
+		}
+		int sel = ShowModal(seldlg);
+		if(sel != wxID_OK)
+		    return;
+		game = lst->GetSelection();
+		if(game == wxNOT_FOUND)
+		    game = 0;
+	    }
+	    bool v3 = fn.size() >= 4 &&
+		wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".xpc"), false);
+
+	    // FIXME: this routine will not work on big-endian systems
+	    // if the underlying file format is little-endian
+	    // (fix in gba/Cheats.cpp)
+	    res = cheatsImportGSACodeFile(fn.mb_fn_str(), game, v3);
+	}
+	if(res)
+	    msg.Printf(_("Loaded code file %s"), fn.c_str());
+	else
+	    msg.Printf(_("Error loading code file %s"), fn.c_str());
+	systemScreenMessage(msg);
+    }
+}
+
+static wxString gss_path;
+
+EVT_HANDLER_MASK(ImportGamesharkActionReplaySnapshot,
+	    "Import GameShark Action Replay snapshot...", CMDEN_GB|CMDEN_GBA)
+{
+    wxFileDialog dlg(this, _("Select snapshot file"), gss_path, wxEmptyString,
+		     panel->game_type() == IMAGE_GBA ?
+		         _("GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots (*.gsv)|*.gsv"):
+		         _("Gameboy Snapshot (*.gbs)|*.gbs"),
+		     wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+    int ret = ShowModal(&dlg);
+    gss_path = dlg.GetDirectory();
+    if(ret != wxID_OK)
+	return;
+    wxString fn = dlg.GetPath();
+    ret = wxMessageBox(_("Importing a snapshot file will erase any saved games (permanently after the next write).  Do you want to continue?"),
+		       _("Confirm import"), wxYES_NO|wxICON_EXCLAMATION);
+    if(ret == wxYES) {
+	wxString msg;
+	bool res;
+	if(panel->game_type() == IMAGE_GB)
+	    res = gbReadGSASnapshot(fn.mb_fn_str());
+	else {
+	    bool gsv = fn.size() >= 4 &&
+		wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".gsv"), false);
+	    if(gsv)
+		// FIXME: this will fail on big-endian machines if
+		// file format is little-endian
+		// fix in GBA.cpp
+		res = CPUReadGSASPSnapshot(fn.mb_fn_str());
+	    else
+		// FIXME: this will fail on big-endian machines if
+		// file format is little-endian
+		// fix in GBA.cpp
+		res = CPUReadGSASnapshot(fn.mb_fn_str());
+	}
+	if(res)
+	    msg.Printf(_("Loaded snapshot file %s"), fn.c_str());
+	else
+	    msg.Printf(_("Error loading snapshot file %s"), fn.c_str());
+	systemScreenMessage(msg);
+    }
+}
+
+EVT_HANDLER_MASK(ExportBatteryFile, "Export battery file...", CMDEN_GB|CMDEN_GBA)
+{
+    if(!batimp_path.size())
+	batimp_path = panel->bat_dir();
+    wxFileDialog dlg(this, _("Select battery file"), batimp_path, wxEmptyString,
+		     _("Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+    int ret = ShowModal(&dlg);
+    batimp_path = dlg.GetDirectory();
+    if(ret != wxID_OK)
+	return;
+    wxString fn = dlg.GetPath();
+    wxString msg;
+    if(panel->emusys->emuWriteBattery(fn.mb_fn_str()))
+	msg.Printf(_("Wrote battery %s"), fn.c_str());
+    else
+	msg.Printf(_("Error writing battery %s"), fn.c_str());
+    systemScreenMessage(msg);
+}
+
+EVT_HANDLER_MASK(ExportGamesharkSnapshot, "Export GameShark snapshot...", CMDEN_GBA)
+{
+    if(eepromInUse) {
+	wxLogError(_("EEPROM saves cannot be exported"));
+	return;
+    }
+    wxString def_name = panel->game_name();
+    def_name.append(wxT(".sps"));
+    wxFileDialog dlg(this, _("Select snapshot file"), gss_path, def_name,
+		         _("Gameshark Snapshot (*.sps)|*.sps"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+    int ret = ShowModal(&dlg);
+    gss_path = dlg.GetDirectory();
+    if(ret != wxID_OK)
+	return;
+    wxString fn = dlg.GetPath();
+    wxDialog *infodlg = GetXRCDialog("ExportSPS");
+    wxTextCtrl *tit = XRCCTRL(*infodlg, "Title", wxTextCtrl),
+	       *dsc = XRCCTRL(*infodlg, "Description", wxTextCtrl),
+	       *n   = XRCCTRL(*infodlg, "Notes", wxTextCtrl);
+    tit->SetValue(wxString((const char *)&rom[0xa0], wxConvLibc, 12));
+    dsc->SetValue(wxDateTime::Now().Format(wxT("%c")));
+    n->SetValue(_("Exported from VisualBoyAdvance-M"));
+    if(ShowModal(infodlg) != wxID_OK)
+	return;
+    wxString msg;
+
+    // FIXME: this will fail on big-endian machines if file format is
+    // little-endian
+    // fix in GBA.cpp
+    if(CPUWriteGSASnapshot(fn.mb_fn_str(), tit->GetValue().utf8_str(),
+			   dsc->GetValue().utf8_str(), n->GetValue().utf8_str()))
+	msg.Printf(_("Saved snapshot file %s"), fn.c_str());
+    else
+	msg.Printf(_("Error saving snapshot file %s"), fn.c_str());
+    systemScreenMessage(msg);
+}
+
+EVT_HANDLER_MASK(ScreenCapture, "Screen capture...", CMDEN_GB|CMDEN_GBA)
+{
+    static wxString scap_path;
+    if(!scap_path.size()) {
+	scap_path = gopts.scrshot_dir;
+	if(scap_path.size()) {
+	    wxFileName sp(scap_path, wxEmptyString);
+	    if(!sp.IsAbsolute())
+		scap_path = panel->game_dir() + wxT('/') + gopts.scrshot_dir;
+	    wxFileName::Mkdir(scap_path, 0777, wxPATH_MKDIR_FULL);
+	}
+    }
+    wxString def_name = panel->game_name();
+    if(gopts.cap_format == 0)
+	def_name.append(wxT(".png"));
+    else
+	def_name.append(wxT(".bmp"));
+    wxFileDialog dlg(this, _("Select output file"), scap_path, def_name,
+		     _("PNG images|*.png|BMP images|*.bmp"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+    dlg.SetFilterIndex(gopts.cap_format);
+    int ret = ShowModal(&dlg);
+    scap_path = dlg.GetDirectory();
+    if(ret != wxID_OK)
+	return;
+    wxString fn = dlg.GetPath();
+    int fmt = dlg.GetFilterIndex();
+    if(fn.size() >= 4) {
+	if(wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".bmp"), false))
+	    fmt = 1;
+	else if(wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".png"), false))
+	    fmt = 0;
+    }
+    if(fmt == 0)
+	panel->emusys->emuWritePNG(fn.mb_fn_str());
+    else
+	panel->emusys->emuWriteBMP(fn.mb_fn_str());
+    wxString msg;
+    msg.Printf(_("Wrote snapshot %s"), fn.c_str());
+    systemScreenMessage(msg);
+}
+
+EVT_HANDLER_MASK(RecordSoundStartRecording, "Start sound recording...", CMDEN_NSREC)
+{
+#ifndef NO_FFMPEG
+    static wxString sound_exts;
+    static int sound_extno;
+    static wxString sound_path;
+
+    if(!sound_exts.size()) {
+	sound_extno = -1;
+	int extno;
+	AVOutputFormat *fmt;
+	for(fmt = NULL, extno = 0; (fmt = av_oformat_next(fmt)); ) {
+	    if(!fmt->extensions)
+		continue;
+	    if(fmt->audio_codec == CODEC_ID_NONE)
+		continue;
+	    sound_exts.append(wxString(fmt->long_name ? fmt->long_name : fmt->name, wxConvLibc));
+	    sound_exts.append(_(" files ("));
+	    wxString ext(fmt->extensions, wxConvLibc);
+	    ext.Replace(wxT(","), wxT(";*."));
+	    ext.insert(0, wxT("*."));
+	    if(sound_extno < 0 && ext.find(wxT("*.wav")) != wxString::npos)
+		sound_extno = extno;
+	    sound_exts.append(ext);
+	    sound_exts.append(wxT(")|"));
+	    sound_exts.append(ext);
+	    sound_exts.append(wxT('|'));
+	    extno++;
+	}
+	sound_exts.append(wxALL_FILES);
+	if(sound_extno < 0)
+	    sound_extno = extno;
+    }
+    if(!sound_path.size()) {
+	if(!gopts.recording_dir.size())
+	    sound_path = panel->game_dir();
+	else {
+	    wxFileName sp(gopts.recording_dir, wxEmptyString);
+	    if(sp.IsAbsolute())
+		sound_path = gopts.recording_dir;
+	    else
+		sound_path = panel->game_dir() + wxT('/') + gopts.recording_dir;
+	}
+	wxFileName::Mkdir(sound_path, 0777, wxPATH_MKDIR_FULL);
+    }
+    wxString def_name = panel->game_name();
+    const wxChar *extoff = sound_exts.c_str();
+    for(int i = 0; i < sound_extno; i++) {
+	extoff = wxStrchr(extoff, wxT('|')) + 1;
+	extoff = wxStrchr(extoff, wxT('|')) + 1;
+    }
+    extoff = wxStrchr(extoff, wxT('|')) + 2; // skip *
+    def_name += wxString(extoff, wxStrcspn(extoff, wxT(";|")));
+    wxFileDialog dlg(this, _("Select output file"), sound_path, def_name,
+		     sound_exts, wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+    dlg.SetFilterIndex(sound_extno);
+    int ret = ShowModal(&dlg);
+    sound_extno = dlg.GetFilterIndex();
+    sound_path = dlg.GetDirectory();
+    if(ret != wxID_OK)
+	return;
+    panel->StartSoundRecording(dlg.GetPath());
+#endif
+}
+
+EVT_HANDLER_MASK(RecordSoundStopRecording, "Stop sound recording", CMDEN_SREC)
+{
+#ifndef NO_FFMPEG
+    panel->StopSoundRecording();
+#endif
+}
+
+EVT_HANDLER_MASK(RecordAVIStartRecording, "Start video recording...", CMDEN_NVREC)
+{
+#ifndef NO_FFMPEG
+    static wxString vid_exts;
+    static int vid_extno;
+    static wxString vid_path;
+
+    if(!vid_exts.size()) {
+	vid_extno = -1;
+	int extno;
+	AVOutputFormat *fmt;
+	for(fmt = NULL, extno = 0; (fmt = av_oformat_next(fmt)); ) {
+	    if(!fmt->extensions)
+		continue;
+	    if(fmt->video_codec == CODEC_ID_NONE)
+		continue;
+	    vid_exts.append(wxString(fmt->long_name ? fmt->long_name : fmt->name, wxConvLibc));
+	    vid_exts.append(_(" files ("));
+	    wxString ext(fmt->extensions, wxConvLibc);
+	    ext.Replace(wxT(","), wxT(";*."));
+	    ext.insert(0, wxT("*."));
+	    if(vid_extno < 0 && ext.find(wxT("*.avi")) != wxString::npos)
+		vid_extno = extno;
+	    vid_exts.append(ext);
+	    vid_exts.append(wxT(")|"));
+	    vid_exts.append(ext);
+	    vid_exts.append(wxT('|'));
+	    extno++;
+	}
+	vid_exts.append(wxALL_FILES);
+	if(vid_extno < 0)
+	    vid_extno = extno;
+    }
+    if(!vid_path.size()) {
+	if(!gopts.recording_dir.size())
+	    vid_path = panel->game_dir();
+	else {
+	    wxFileName sp(gopts.recording_dir, wxEmptyString);
+	    if(sp.IsAbsolute())
+		vid_path = gopts.recording_dir;
+	    else
+		vid_path = panel->game_dir() + wxT('/') + gopts.recording_dir;
+	}
+	wxFileName::Mkdir(vid_path, 0777, wxPATH_MKDIR_FULL);
+    }
+    wxString def_name = panel->game_name();
+    const wxChar *extoff = vid_exts.c_str();
+    for(int i = 0; i < vid_extno; i++) {
+	extoff = wxStrchr(extoff, wxT('|')) + 1;
+	extoff = wxStrchr(extoff, wxT('|')) + 1;
+    }
+    extoff = wxStrchr(extoff, wxT('|')) + 2; // skip *
+    def_name += wxString(extoff, wxStrcspn(extoff, wxT(";|")));
+    wxFileDialog dlg(this, _("Select output file"), vid_path, def_name,
+		     vid_exts, wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+    dlg.SetFilterIndex(vid_extno);
+    int ret = ShowModal(&dlg);
+    vid_extno = dlg.GetFilterIndex();
+    vid_path = dlg.GetDirectory();
+    if(ret != wxID_OK)
+	return;
+    panel->StartVidRecording(dlg.GetPath());
+#endif
+}
+
+EVT_HANDLER_MASK(RecordAVIStopRecording, "Stop video recording", CMDEN_VREC)
+{
+#ifndef NO_FFMPEG
+    panel->StopVidRecording();
+#endif
+}
+
+static wxString mov_path;
+
+EVT_HANDLER_MASK(RecordMovieStartRecording, "Start game recording...", CMDEN_NGREC)
+{
+    if(!mov_path.size()) {
+	if(!gopts.recording_dir.size())
+	    mov_path = panel->game_dir();
+	else {
+	    wxFileName sp(gopts.recording_dir, wxEmptyString);
+	    if(sp.IsAbsolute())
+		mov_path = gopts.recording_dir;
+	    else
+		mov_path = panel->game_dir() + wxT('/') + gopts.recording_dir;
+	}
+	wxFileName::Mkdir(mov_path, 0777, wxPATH_MKDIR_FULL);
+    }
+    wxString def_name = panel->game_name() + wxT(".vmv");
+    wxFileDialog dlg(this, _("Select output file"), mov_path, def_name,
+		     _("VBA Movie files|*.vmv"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+    int ret = ShowModal(&dlg);
+    mov_path = dlg.GetDirectory();
+    if(ret != wxID_OK)
+	return;
+    systemStartGameRecording(dlg.GetPath());
+}
+
+EVT_HANDLER_MASK(RecordMovieStopRecording, "Stop game recording", CMDEN_GREC)
+{
+    systemStopGameRecording();
+}
+
+EVT_HANDLER_MASK(PlayMovieStartPlaying, "Start playing movie...", CMDEN_NGREC|CMDEN_NGPLAY)
+{
+    if(!mov_path.size()) {
+	if(!gopts.recording_dir.size())
+	    mov_path = panel->game_dir();
+	else {
+	    wxFileName sp(gopts.recording_dir, wxEmptyString);
+	    if(sp.IsAbsolute())
+		mov_path = gopts.recording_dir;
+	    else
+		mov_path = panel->game_dir() + wxT('/') + gopts.recording_dir;
+	}
+	if(!wxFileName::DirExists(mov_path))
+	    mov_path = wxFileName::GetCwd();
+    }
+    systemStopGamePlayback();
+    wxString def_name = panel->game_name() + wxT(".vmv");
+    wxFileDialog dlg(this, _("Select file"), mov_path, def_name,
+		     _("VBA Movie files|*.vmv"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+    int ret = ShowModal(&dlg);
+    mov_path = dlg.GetDirectory();
+    if(ret != wxID_OK)
+	return;
+    systemStartGamePlayback(dlg.GetPath());
+}
+
+EVT_HANDLER_MASK(PlayMovieStopPlaying, "Stop playing movie", CMDEN_GPLAY)
+{
+    systemStopGamePlayback();
+}
+
+// formerly Close
+EVT_HANDLER_MASK(wxID_CLOSE, "Close", CMDEN_GB|CMDEN_GBA)
+{
+    panel->UnloadGame();
+}
+
+// formerly Exit
+EVT_HANDLER(wxID_EXIT, "Exit")
+{
+    Close(false);
+}
+
+
+// Emulation menu
+EVT_HANDLER(Pause, "Pause (toggle)")
+{
+    update_bcheck("Pause", paused);
+    if(paused)
+	panel->Pause();
+    else if(!IsPaused())
+	panel->Resume();
+    // undo next-frame's zeroing of frameskip
+    int fs = panel->game_type() == IMAGE_GB ? gopts.gb_frameskip : gopts.gba_frameskip;
+    if(fs > 0)
+	systemFrameSkip = fs;
+}
+
+// new
+EVT_HANDLER_MASK(EmulatorSpeedupToggle, "Turbo mode (toggle)", CMDEN_GB|CMDEN_GBA)
+{
+    update_bcheck("EmulatorSpeedupToggle", turbo);
+}
+
+EVT_HANDLER_MASK(Reset, "Reset", CMDEN_GB|CMDEN_GBA)
+{
+    panel->emusys->emuReset();
+    // systemScreenMessage("Reset");
+}
+
+EVT_HANDLER(ToggleFullscreen, "Full screen (toggle)")
+{
+    panel->ShowFullScreen(!IsFullScreen());
+}
+
+EVT_HANDLER(JoypadAutofireA, "Autofire A (toggle)")
+{
+    update_icheck1("JoypadAutofireA", autofire, KEYM_A);
+}
+
+EVT_HANDLER(JoypadAutofireB, "Autofire B (toggle)")
+{
+    update_icheck1("JoypadAutofireB", autofire, KEYM_B);
+}
+
+EVT_HANDLER(JoypadAutofireL, "Autofire L (toggle)")
+{
+    update_icheck1("JoypadAutofireL", autofire, KEYM_LEFT);
+}
+
+EVT_HANDLER(JoypadAutofireR, "Autofire R (toggle)")
+{
+    update_icheck1("JoypadAutofireR", autofire, KEYM_RIGHT);
+}
+
+// new
+EVT_HANDLER_MASK(LanLink, "Start LAN link", CMDEN_LINK_ANY)
+{
+#ifndef NO_LINK
+    if(lanlink.connected) {
+	// while we could deactivate the command when connected, it is more
+	// user-friendly to display a message indidcating why
+	wxLogError(_("LAN link is already active.  Disable link mode to disconnect."));
+	return;
+    }
+    if(rfu_enabled) {
+	// see above comment
+	wxLogError(_("RFU is currently only supported in local mode."));
+	return;
+    }
+    wxDialog *dlg = GetXRCDialog("NetLink");
+    ShowModal(dlg);
+    panel->SetFrameTitle();
+#endif
+}
+
+EVT_HANDLER_MASK(LoadGameRecent, "Load most recent save", CMDEN_SAVST)
+{
+    panel->LoadState();
+}
+
+EVT_HANDLER(LoadGameAutoLoad, "Auto load most recent save (toggle)")
+{
+    update_bcheck("LoadGameAutoLoad", gopts.autoload_state);
+    update_opts();
+}
+
+EVT_HANDLER_MASK(LoadGame01, "Load saved state 1", CMDEN_SAVST)
+{
+    panel->LoadState(1);
+}
+
+EVT_HANDLER_MASK(LoadGame02, "Load saved state 2", CMDEN_SAVST)
+{
+    panel->LoadState(2);
+}
+
+EVT_HANDLER_MASK(LoadGame03, "Load saved state 3", CMDEN_SAVST)
+{
+    panel->LoadState(3);
+}
+
+EVT_HANDLER_MASK(LoadGame04, "Load saved state 4", CMDEN_SAVST)
+{
+    panel->LoadState(4);
+}
+
+EVT_HANDLER_MASK(LoadGame05, "Load saved state 5", CMDEN_SAVST)
+{
+    panel->LoadState(5);
+}
+
+EVT_HANDLER_MASK(LoadGame06, "Load saved state 6", CMDEN_SAVST)
+{
+    panel->LoadState(6);
+}
+
+EVT_HANDLER_MASK(LoadGame07, "Load saved state 7", CMDEN_SAVST)
+{
+    panel->LoadState(7);
+}
+
+EVT_HANDLER_MASK(LoadGame08, "Load saved state 8", CMDEN_SAVST)
+{
+    panel->LoadState(8);
+}
+
+EVT_HANDLER_MASK(LoadGame09, "Load saved state 9", CMDEN_SAVST)
+{
+    panel->LoadState(9);
+}
+
+EVT_HANDLER_MASK(LoadGame10, "Load saved state 10", CMDEN_SAVST)
+{
+    panel->LoadState(10);
+}
+
+static wxString st_dir;
+
+EVT_HANDLER_MASK(Load, "Load state...", CMDEN_GB|CMDEN_GBA)
+{
+    if(st_dir.empty())
+	st_dir = panel->state_dir();
+    wxFileDialog dlg(this, _("Select state file"), st_dir, wxEmptyString,
+		     _("VisualBoyAdvance saved game files|*.sgm"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+    int ret = ShowModal(&dlg);
+    st_dir = dlg.GetDirectory();
+    if(ret != wxID_OK)
+	return;
+    panel->LoadState(dlg.GetPath());
+}
+
+// new
+EVT_HANDLER(KeepSaves, "Do not load battery saves (toggle)")
+{
+    update_bcheck("KeepSaves", skipSaveGameBattery);
+    update_opts();
+}
+
+// new
+EVT_HANDLER(KeepCheats, "Do not change cheat list (toggle)")
+{
+    update_bcheck("KeepCheats", skipSaveGameCheats);
+    update_opts();
+}
+
+EVT_HANDLER_MASK(SaveGameOldest, "Save state to oldest slot", CMDEN_GB|CMDEN_GBA)
+{
+    panel->SaveState();
+}
+
+EVT_HANDLER_MASK(SaveGame01, "Save state 1", CMDEN_GB|CMDEN_GBA)
+{
+    panel->SaveState(1);
+}
+
+EVT_HANDLER_MASK(SaveGame02, "Save state 2", CMDEN_GB|CMDEN_GBA)
+{
+    panel->SaveState(2);
+}
+
+EVT_HANDLER_MASK(SaveGame03, "Save state 3", CMDEN_GB|CMDEN_GBA)
+{
+    panel->SaveState(3);
+}
+
+EVT_HANDLER_MASK(SaveGame04, "Save state 4", CMDEN_GB|CMDEN_GBA)
+{
+    panel->SaveState(4);
+}
+
+EVT_HANDLER_MASK(SaveGame05, "Save state 5", CMDEN_GB|CMDEN_GBA)
+{
+    panel->SaveState(5);
+}
+
+EVT_HANDLER_MASK(SaveGame06, "Save state 6", CMDEN_GB|CMDEN_GBA)
+{
+    panel->SaveState(6);
+}
+
+EVT_HANDLER_MASK(SaveGame07, "Save state 7", CMDEN_GB|CMDEN_GBA)
+{
+    panel->SaveState(7);
+}
+
+EVT_HANDLER_MASK(SaveGame08, "Save state 8", CMDEN_GB|CMDEN_GBA)
+{
+    panel->SaveState(8);
+}
+
+EVT_HANDLER_MASK(SaveGame09, "Save state 9", CMDEN_GB|CMDEN_GBA)
+{
+    panel->SaveState(9);
+}
+
+EVT_HANDLER_MASK(SaveGame10, "Save state 10", CMDEN_GB|CMDEN_GBA)
+{
+    panel->SaveState(10);
+}
+
+EVT_HANDLER_MASK(Save, "Save state as...", CMDEN_GB|CMDEN_GBA)
+{
+    if(st_dir.empty())
+	st_dir = panel->state_dir();
+    wxFileDialog dlg(this, _("Select state file"), st_dir, wxEmptyString,
+		     _("VisualBoyAdvance saved game files|*.sgm"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+    int ret = ShowModal(&dlg);
+    st_dir = dlg.GetDirectory();
+    if(ret != wxID_OK)
+	return;
+    panel->SaveState(dlg.GetPath());
+}
+
+static int state_slot = 0;
+
+// new
+EVT_HANDLER_MASK(LoadGameSlot, "Load current state slot", CMDEN_GB|CMDEN_GBA)
+{
+    panel->LoadState(state_slot + 1);
+}
+
+// new
+EVT_HANDLER_MASK(SaveGameSlot, "Save current state slot", CMDEN_GB|CMDEN_GBA)
+{
+    panel->SaveState(state_slot + 1);
+}
+
+// new
+EVT_HANDLER_MASK(IncrGameSlot, "Increase state slot number", CMDEN_GB|CMDEN_GBA)
+{
+    state_slot = (state_slot + 1) % 10;
+}
+
+// new
+EVT_HANDLER_MASK(DecrGameSlot, "Decrease state slot number", CMDEN_GB|CMDEN_GBA)
+{
+    state_slot = (state_slot + 9) % 10;
+}
+
+// new
+EVT_HANDLER_MASK(IncrGameSlotSave, "Increase state slot number and save", CMDEN_GB|CMDEN_GBA)
+{
+    state_slot = (state_slot + 1) % 10;
+    panel->SaveState(state_slot + 1);
+}
+
+EVT_HANDLER_MASK(Rewind, "Rewind", CMDEN_REWIND)
+{
+    MainFrame *mf = wxGetApp().frame;
+    GameArea *panel = mf->GetPanel();
+    int rew_st = (panel->next_rewind_state + NUM_REWINDS - 1) % NUM_REWINDS;
+    // if within 5 seconds of last one, and > 1 state, delete last state & move back
+    // FIXME: 5 should actually be user-configurable
+    // maybe instead of 5, 10% of rewind_interval
+    if(panel->num_rewind_states > 1 &&
+       (gopts.rewind_interval <= 5 ||
+	   panel->rewind_time / 6 > gopts.rewind_interval - 5)) {
+	--panel->num_rewind_states;
+	panel->next_rewind_state = rew_st;
+	if(gopts.rewind_interval > 5)
+	    rew_st = (rew_st + NUM_REWINDS - 1) % NUM_REWINDS;
+    }
+    panel->emusys->emuReadMemState(&panel->rewind_mem[rew_st * REWIND_SIZE],
+				   REWIND_SIZE);
+    InterframeCleanup();
+    // FIXME: if(paused) blank screen
+    panel->do_rewind = false;
+    panel->rewind_time = gopts.rewind_interval * 6;
+//    systemScreenMessage(_("Rewinded"));
+}
+
+EVT_HANDLER_MASK(CheatsList, "List cheats...", CMDEN_GB|CMDEN_GBA)
+{
+    wxDialog *dlg = GetXRCDialog("CheatList");
+    ShowModal(dlg);
+}
+
+EVT_HANDLER_MASK(CheatsSearch, "Create cheat...", CMDEN_GB|CMDEN_GBA)
+{
+    wxDialog *dlg = GetXRCDialog("CheatCreate");
+    ShowModal(dlg);
+}
+
+// new
+EVT_HANDLER(CheatsAutoSaveLoad, "Auto save/load cheats (toggle)")
+{
+    update_bcheck("CheatsAutoSaveLoad", gopts.autoload_cheats);
+    update_opts();
+}
+
+// was CheatsDisable
+// changed for convenience to match internal variable functionality
+EVT_HANDLER(CheatsEnable, "Enable cheats (toggle)")
+{
+    update_bcheck("CheatsEnable", cheatsEnabled);
+    update_opts();
+}
+
+
+// Debug menu
+EVT_HANDLER_MASK(VideoLayersBG0, "Video layer BG0 (toggle)", CMDEN_GB|CMDEN_GBA)
+{
+    update_icheck1("VideoLayersBG0", layerSettings, (1<<8));
+    layerEnable = DISPCNT & layerSettings;
+    CPUUpdateRenderBuffers(false);
+}
+
+EVT_HANDLER_MASK(VideoLayersBG1, "Video layer BG1 (toggle)", CMDEN_GB|CMDEN_GBA)
+{
+    update_icheck1("VideoLayersBG1", layerSettings, (1<<9));
+    layerEnable = DISPCNT & layerSettings;
+    CPUUpdateRenderBuffers(false);
+}
+
+EVT_HANDLER_MASK(VideoLayersBG2, "Video layer BG2 (toggle)", CMDEN_GB|CMDEN_GBA)
+{
+    update_icheck1("VideoLayersBG2", layerSettings, (1<<10));
+    layerEnable = DISPCNT & layerSettings;
+    CPUUpdateRenderBuffers(false);
+}
+
+EVT_HANDLER_MASK(VideoLayersBG3, "Video layer BG3 (toggle)", CMDEN_GB|CMDEN_GBA)
+{
+    update_icheck1("VideoLayersBG3", layerSettings, (1<<11));
+    layerEnable = DISPCNT & layerSettings;
+    CPUUpdateRenderBuffers(false);
+}
+
+EVT_HANDLER_MASK(VideoLayersOBJ, "Video layer OBJ (toggle)", CMDEN_GB|CMDEN_GBA)
+{
+    update_icheck1("VideoLayersOBJ", layerSettings, (1<<12));
+    layerEnable = DISPCNT & layerSettings;
+    CPUUpdateRenderBuffers(false);
+}
+
+EVT_HANDLER_MASK(VideoLayersWIN0, "Video layer WIN0 (toggle)", CMDEN_GB|CMDEN_GBA)
+{
+    update_icheck1("VideoLayersWIN0", layerSettings, (1<<13));
+    layerEnable = DISPCNT & layerSettings;
+    CPUUpdateRenderBuffers(false);
+}
+
+EVT_HANDLER_MASK(VideoLayersWIN1, "Video layer WIN1 (toggle)", CMDEN_GB|CMDEN_GBA)
+{
+    update_icheck1("VideoLayersWIN1", layerSettings, (1<<14));
+    layerEnable = DISPCNT & layerSettings;
+    CPUUpdateRenderBuffers(false);
+}
+
+EVT_HANDLER_MASK(VideoLayersOBJWIN, "Video layer OBJWIN (toggle)", CMDEN_GB|CMDEN_GBA)
+{
+    update_icheck1("VideoLayersOBJWIN", layerSettings, (1<<15));
+    layerEnable = DISPCNT & layerSettings;
+    CPUUpdateRenderBuffers(false);
+}
+
+// not in menu
+EVT_HANDLER_MASK(VideoLayersReset, "Show all video layers", CMDEN_GB|CMDEN_GBA)
+{
+#define set_vl(s) do { \
+    int id = XRCID(s); \
+    for(int i = 0; i < checkable_mi.size(); i++) \
+	if(checkable_mi[i].cmd == id) { \
+	    checkable_mi[i].mi->Check(true); \
+	    break; \
+	} \
+} while(0)
+    layerSettings = 0x7f00;
+    layerEnable = DISPCNT & layerSettings;
+    set_vl("VideoLayersBG0");
+    set_vl("VideoLayersBG1");
+    set_vl("VideoLayersBG2");
+    set_vl("VideoLayersBG3");
+    set_vl("VideoLayersOBJ");
+    set_vl("VideoLayersWIN0");
+    set_vl("VideoLayersWIN1");
+    set_vl("VideoLayersOBJWIN");
+    CPUUpdateRenderBuffers(false);
+}
+
+EVT_HANDLER_MASK(SoundChannel1, "Sound Channel 1 (toggle)", CMDEN_GB|CMDEN_GBA)
+{
+    update_icheck1("SoundChannel1", gopts.sound_en, (1<<0));
+    soundSetEnable(gopts.sound_en);
+    update_opts();
+}
+
+EVT_HANDLER_MASK(SoundChannel2, "Sound Channel 2 (toggle)", CMDEN_GB|CMDEN_GBA)
+{
+    update_icheck1("SoundChannel2", gopts.sound_en, (1<<1));
+    soundSetEnable(gopts.sound_en);
+    update_opts();
+}
+
+EVT_HANDLER_MASK(SoundChannel3, "Sound Channel 3 (toggle)", CMDEN_GB|CMDEN_GBA)
+{
+    update_icheck1("SoundChannel3", gopts.sound_en, (1<<2));
+    soundSetEnable(gopts.sound_en);
+    update_opts();
+}
+
+EVT_HANDLER_MASK(SoundChannel4, "Sound Channel 4 (toggle)", CMDEN_GB|CMDEN_GBA)
+{
+    update_icheck1("SoundChannel4", gopts.sound_en, (1<<3));
+    soundSetEnable(gopts.sound_en);
+    update_opts();
+}
+
+EVT_HANDLER_MASK(DirectSoundA, "Direct Sound A (toggle)", CMDEN_GBA)
+{
+    update_icheck1("DirectSoundA", gopts.sound_en, (1<<8));
+    soundSetEnable(gopts.sound_en);
+    update_opts();
+}
+
+EVT_HANDLER_MASK(DirectSoundB, "Direct Sound B (toggle)", CMDEN_GBA)
+{
+    update_icheck1("DirectSoundB", gopts.sound_en, (1<<9));
+    soundSetEnable(gopts.sound_en);
+    update_opts();
+}
+
+EVT_HANDLER(ToggleSound, "Enable/disable all sound channels")
+{
+    bool en = gopts.sound_en == 0;
+    gopts.sound_en = en ? 0x30f : 0;
+    update_check("SoundChannel1", en);
+    update_check("SoundChannel2", en);
+    update_check("SoundChannel3", en);
+    update_check("SoundChannel4", en);
+    update_check("DirectSoundA", en);
+    update_check("DirectSoundB", en);
+    soundSetEnable(gopts.sound_en);
+    update_opts();
+    systemScreenMessage(en ? _("Sound enabled") : _("Sound disabled"));
+}
+
+EVT_HANDLER(IncreaseVolume, "Increase volume")
+{
+    gopts.sound_vol += 5;
+    if(gopts.sound_vol > 200)
+	gopts.sound_vol = 200;
+    update_opts();
+    soundSetVolume((float)gopts.sound_vol / 100.0);
+    wxString msg;
+    msg.Printf(_("Volume: %d%%"), gopts.sound_vol);
+    systemScreenMessage(msg);
+}
+
+EVT_HANDLER(DecreaseVolume, "Decrease volume")
+{
+    gopts.sound_vol -= 5;
+    if(gopts.sound_vol < 0)
+	gopts.sound_vol = 0;
+    update_opts();
+    soundSetVolume((float)gopts.sound_vol / 100.0);
+    wxString msg;
+    msg.Printf(_("Volume: %d%%"), gopts.sound_vol);
+    systemScreenMessage(msg);
+}
+
+EVT_HANDLER_MASK(NextFrame, "Next Frame", CMDEN_GB|CMDEN_GBA)
+{
+    update_check("Pause", true);
+    paused = true;
+    pause_next = true;
+    if(!IsPaused())
+	panel->Resume();
+    systemFrameSkip = 0;
+}
+
+EVT_HANDLER_MASK(Disassemble, "Disassemble...", CMDEN_GB|CMDEN_GBA)
+{
+    Disassemble();
+}
+
+// only GBA generates the log messages this handles
+// you could view them even w/o a gba cart, but why?
+EVT_HANDLER_MASK(Logging, "Logging...", CMDEN_GBA)
+{
+    wxDialog *dlg = wxGetApp().frame->logdlg;
+    dlg->Show();
+    dlg->Raise();
+}
+
+EVT_HANDLER_MASK(IOViewer, "I/O Viewer...", CMDEN_GBA)
+{
+    IOViewer();
+}
+
+EVT_HANDLER_MASK(MapViewer, "Map Viewer...", CMDEN_GB|CMDEN_GBA)
+{
+    MapViewer();
+}
+
+EVT_HANDLER_MASK(MemoryViewer, "Memory Viewer...", CMDEN_GB|CMDEN_GBA)
+{
+    MemViewer();
+}
+
+EVT_HANDLER_MASK(OAMViewer, "OAM Viewer...", CMDEN_GB|CMDEN_GBA)
+{
+    OAMViewer();
+}
+
+EVT_HANDLER_MASK(PaletteViewer, "Palette Viewer...", CMDEN_GB|CMDEN_GBA)
+{
+    PaletteViewer();
+}
+
+EVT_HANDLER_MASK(TileViewer, "Tile Viewer...", CMDEN_GB|CMDEN_GBA)
+{
+    TileViewer();
+}
+
+extern int remotePort;
+
+EVT_HANDLER_MASK(DebugGDB, "Wait for GDB connection...", CMDEN_NGDB_GBA)
+{
+    ModalPause mp;
+    int port = wxGetNumberFromUser(
+#ifdef __WXMSW__
+				   wxEmptyString,
+#else
+				   _("Set to 0 for pseudo tty"),
+#endif
+				   _("Port to wait for connection:"),
+				   _("GDB Connection"), remotePort,
+#ifdef __WXMSW__
+				   1025,
+#else
+				   0,
+#endif
+				   65535, this);
+    if(port < 0)
+	return;
+    remotePort = port;
+    wxString msg;
+#ifndef __WXMSW__
+    if(!port) {
+	if(!debugOpenPty())
+	    return;
+	msg.Printf(_("Waiting for connection at %s"), debugGetSlavePty().c_str());
+    } else
+#endif
+    {
+	if(!debugStartListen(port))
+	    return;
+	msg.Printf(_("Waiting for connection on port %d"), port);
+    }
+    wxProgressDialog dlg(_("Waiting for GDB..."), msg, 100, this,
+			 wxPD_APP_MODAL|wxPD_CAN_ABORT|wxPD_ELAPSED_TIME);
+    bool connected = false;
+    while(dlg.Pulse()) {
+#ifndef __WXMSW__
+	if(!port)
+	    connected = debugWaitPty();
+	else
+#endif
+	    connected = debugWaitSocket();
+	if(connected)
+	    break;
+	// sleep a bit more in case of infinite loop
+	wxMilliSleep(10);
+    }
+    if(!connected)
+	remoteCleanUp();
+    else {
+	debugger = true;
+	dbgMain = remoteStubMain;
+	dbgSignal = remoteStubSignal;
+	dbgOutput = remoteOutput;
+	cmd_enable &= ~(CMDEN_NGDB_ANY|CMDEN_NGDB_GBA);
+	cmd_enable |= CMDEN_GDB;
+	enable_menus();
+    }
+}
+
+EVT_HANDLER_MASK(DebugGDBLoad, "Load and wait for GDB...", CMDEN_NGDB_ANY)
+{
+    wxCommandEvent ev;
+    ModalPause mp;
+    OnwxID_OPEN(ev);
+    if(wxGetApp().pending_load.empty())
+	return;
+    panel->UnloadGame();
+    DoDebugGDB();
+}
+
+EVT_HANDLER_MASK(DebugGDBBreak, "Break into GDB", CMDEN_GDB)
+{
+    if(armState) {
+	armNextPC -= 4;
+	reg[15].I -= 4;
+    } else {
+	armNextPC -= 2;
+	reg[15].I -= 2;
+    }
+    debugger = true;
+}
+
+EVT_HANDLER_MASK(DebugGDBDisconnect, "Disconnect GDB", CMDEN_GDB)
+{
+    debugger = false;
+    dbgMain = NULL;
+    dbgSignal = NULL;
+    dbgOutput = NULL;
+    remoteCleanUp();
+    cmd_enable &= ~CMDEN_GDB;
+    cmd_enable |= CMDEN_NGDB_GBA|CMDEN_NGDB_ANY;
+    enable_menus();
+}
+
+
+// Options menu
+EVT_HANDLER(GeneralConfigure, "General options...")
+{
+    int rew = gopts.rewind_interval;
+    wxDialog *dlg = GetXRCDialog("GeneralConfig");
+    if(ShowModal(dlg) == wxID_OK)
+	update_opts();
+    if(panel->game_type() != IMAGE_UNKNOWN)
+	soundSetThrottle(gopts.throttle);
+    if(rew != gopts.rewind_interval) {
+	if(!gopts.rewind_interval) {
+	    if(panel->num_rewind_states) {
+		cmd_enable &= ~CMDEN_REWIND;
+		enable_menus();
+	    }
+	    panel->num_rewind_states = 0;
+	    panel->do_rewind = false;
+	} else {
+	    if(!panel->num_rewind_states)
+		panel->do_rewind = true;
+	    panel->rewind_time = gopts.rewind_interval * 6;
+	}
+    }
+}
+
+EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
+{
+    wxDialog *dlg = GetXRCDialog("GameBoyConfig");
+    wxChoice *c = XRCCTRL(*dlg, "Borders", wxChoice);
+    bool borderon = gbBorderOn;
+    bool printeron = gopts.gbprint;
+    if(!gbBorderOn && !gbBorderAutomatic)
+	c->SetSelection(0);
+    else if(gbBorderOn)
+	c->SetSelection(1);
+    else
+	c->SetSelection(2);
+    if(ShowModal(dlg) != wxID_OK)
+	return;
+    switch(c->GetSelection()) {
+    case 0:
+	gbBorderOn = gbBorderAutomatic = false;
+	break;
+    case 1:
+	gbBorderOn = true;
+	break;
+    case 2:
+	gbBorderOn = false;
+	gbBorderAutomatic = true;
+	break;
+    }
+    // this value might have been overwritten by FrameSkip
+    if(XRCCTRL(*dlg, "FrameSkipAuto", wxCheckBox)->GetValue())
+	gopts.gb_frameskip = -1;
+    update_opts();
+    if(panel->game_type() == IMAGE_GB) {
+	if(borderon != gbBorderOn) {
+	    if(gbBorderOn) {
+		panel->AddBorder();
+		gbSgbRenderBorder();
+	    } else
+		panel->DelBorder();
+	}
+	// autoskip will self-adjust
+	if(gopts.gb_frameskip >= 0)
+	    systemFrameSkip = gopts.gb_frameskip;
+	// don't want to have to reset to change colors
+	memcpy(gbPalette, &systemGbPalette[gbPaletteOption * 8], 8 * sizeof(systemGbPalette[0]));
+    }
+    if(printeron != gopts.gbprint) {
+	if(gopts.gbprint)
+	    gbSerialFunction = gbPrinterSend;
+	else
+	    gbSerialFunction = NULL;
+    }
+}
+
+EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
+{
+    wxDialog *dlg = GetXRCDialog("GameBoyAdvanceConfig");
+    wxTextCtrl *ovcmt = XRCCTRL(*dlg, "Comment", wxTextCtrl);
+    wxString cmt;
+    wxChoice *ovrtc = XRCCTRL(*dlg, "OvRTC", wxChoice),
+	     *ovst = XRCCTRL(*dlg, "OvSaveType", wxChoice),
+	     *ovfs = XRCCTRL(*dlg, "OvFlashSize", wxChoice),
+	     *ovmir = XRCCTRL(*dlg, "OvMirroring", wxChoice);
+    if(panel->game_type() == IMAGE_GBA) {
+	wxString s = wxString((const char *)&rom[0xac], wxConvLibc, 4);
+	XRCCTRL(*dlg, "GameCode", wxControl)->SetLabel(s);
+	cmt = wxString((const char *)&rom[0xa0], wxConvLibc, 12);
+	wxFileConfig *cfg = wxGetApp().overrides;
+	if(cfg->HasGroup(s)) {
+	    cfg->SetPath(s);
+	    cmt = cfg->Read(wxT("comment"), cmt);
+	    ovcmt->SetValue(cmt);
+	    ovrtc->SetSelection(cfg->Read(wxT("rtcEnabled"), -1) + 1);
+	    ovst->SetSelection(cfg->Read(wxT("saveType"), -1) + 1);
+	    ovfs->SetSelection((cfg->Read(wxT("flashSize"), -1) >> 17) + 1);
+	    ovmir->SetSelection(cfg->Read(wxT("mirroringEnabled"), -1) + 1);
+	    cfg->SetPath(wxT("/"));
+	} else {
+	    ovcmt->SetValue(cmt);
+	    ovrtc->SetSelection(0);
+	    ovst->SetSelection(0);
+	    ovfs->SetSelection(0);
+	    ovmir->SetSelection(0);
+	}
+    } else {
+	XRCCTRL(*dlg, "GameCode", wxControl)->SetLabel(wxEmptyString);
+	ovcmt->SetValue(wxEmptyString);
+	ovrtc->SetSelection(0);
+	ovst->SetSelection(0);
+	ovfs->SetSelection(0);
+	ovmir->SetSelection(0);
+    }
+    if(ShowModal(dlg) != wxID_OK)
+	return;
+    // this value might have been overwritten by FrameSkip
+    if(XRCCTRL(*dlg, "FrameSkipAuto", wxCheckBox)->GetValue())
+	gopts.gba_frameskip = -1;
+    update_opts();
+    if(panel->game_type() == IMAGE_GBA) {
+	// autoskip will self-adjust
+	if(gopts.gba_frameskip >= 0)
+	    systemFrameSkip = gopts.gba_frameskip;
+	agbPrintEnable(gopts.agbprint);
+#if 0 // disabled in win32 version for undocumented "problems"
+	if(gopts.skip_intro)
+	    *((u32 *)rom) = 0xea00002e;
+	else
+	    *((u32 *)rom) = /* original value */;
+#endif
+	wxString s = wxString((const char *)&rom[0xac], wxConvLibc, 4);
+	wxFileConfig *cfg = wxGetApp().overrides;
+	bool chg;
+	if(cfg->HasGroup(s)) {
+	    cfg->SetPath(s);
+	    chg =
+		ovcmt->GetValue() != cmt ||
+		ovrtc->GetSelection() != cfg->Read(wxT("rtcEnabled"), -1) + 1 ||
+		ovst->GetSelection() != cfg->Read(wxT("saveType"), -1) + 1 ||
+		ovfs->GetSelection() != (cfg->Read(wxT("flashSize"), -1) >> 17) + 1 ||
+		ovmir->GetSelection() != cfg->Read(wxT("mirroringEnabled"), -1) + 1;
+	    cfg->SetPath(wxT("/"));
+	} else
+	    chg = ovrtc->GetSelection() != 0 || ovst->GetSelection() != 0 ||
+		  ovfs->GetSelection() != 0 || ovmir->GetSelection() != 0;
+	if(chg) {
+	    wxString vba_over;
+	    wxFileName fn(wxStandardPaths::Get().GetUserDataDir(), wxT("vba-over.ini"));
+	    if(fn.FileExists()) {
+		wxFileInputStream fis(fn.GetFullPath());
+		wxStringOutputStream sos(&vba_over);
+		fis.Read(sos);
+	    }
+	    if(cfg->HasGroup(s)) {
+		cfg->SetPath(s);
+		if(cfg->Read(wxT("path"), wxEmptyString) == fn.GetPath()) {
+		    // EOL can be either \n (unix), \r\n (dos), or \r (old mac)
+		    wxString res(wxT("(^|[\n\r])" // a new line
+				     "(" // capture group as \2
+				       "(#[^\n\r]*(\r?\n|\r))?" // an optional comment line
+				       "\\[")); // the group header
+		    res += s;
+		    res += wxT( "\\]"
+			        "([^[#]" // non-comment non-group-start chars
+				 "|[^\r\n \t][ \t]*[[#]" // or comment/grp start chars in middle of line
+				 "|#[^\n\r]*(\r?\n|\r)[^[]" // or comments not followed by grp start
+				")*"
+			       ")" // end of group
+				// no need to try to describe what's next
+				// as the regex should maximize match size
+			      );
+		    wxRegEx re(res);
+		    // there may be more than one group if it was hand-edited
+		    // so remove them all
+		    // could use re.Replace(), but this is more reliable
+		    while(re.Matches(vba_over)) {
+			size_t beg, end;
+			re.GetMatch(&beg, &end, 2);
+			vba_over.erase(beg, end - beg);
+		    }
+		}
+		cfg->SetPath(wxT("/"));
+		cfg->DeleteGroup(s);
+	    }
+	    cfg->SetPath(s);
+	    cfg->Write(wxT("path"), fn.GetPath());
+	    cfg->Write(wxT("comment"), ovcmt->GetValue());
+	    vba_over.append(wxT("# "));
+	    vba_over.append(ovcmt->GetValue());
+	    vba_over.append(wxTextFile::GetEOL());
+	    vba_over.append(wxT('['));
+	    vba_over.append(s);
+	    vba_over.append(wxT(']'));
+	    vba_over.append(wxTextFile::GetEOL());
+	    int sel;
+#define appendval(n) do { \
+    vba_over.append(wxT(n)); \
+    vba_over.append(wxT('=')); \
+    vba_over.append((wxChar)(wxT('0') + sel - 1)); \
+    vba_over.append(wxTextFile::GetEOL()); \
+    cfg->Write(wxT(n), sel - 1); \
+} while(0)
+	    if((sel = ovrtc->GetSelection()) > 0)
+		appendval("rtcEnabled");
+	    if((sel = ovst->GetSelection()) > 0)
+		appendval("saveType");
+	    if((sel = ovfs->GetSelection()) > 0) {
+		vba_over.append(wxT("flashSize="));
+		vba_over.append(sel == 1 ? wxT("65536") : wxT("131072"));
+		vba_over.append(wxTextFile::GetEOL());
+		cfg->Write(wxT("flashSize"), 0x10000 << (sel - 1));
+	    }
+	    if((sel = ovmir->GetSelection()) > 0)
+		appendval("mirroringEnabled");
+	    cfg->SetPath(wxT("/"));
+	    vba_over.append(wxTextFile::GetEOL());
+	    fn.Mkdir(0777, wxPATH_MKDIR_FULL);
+	    wxTempFileOutputStream fos(fn.GetFullPath());
+	    fos.Write(vba_over.mb_str(), vba_over.size());
+	    fos.Commit();
+	}
+    }
+}
+
+EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
+{
+    bool fs = gopts.fullscreen;
+    int max_scale = gopts.max_scale;
+    int renderer = gopts.render_method;
+    bool bilinear = gopts.bilinear;
+    int filt = gopts.filter;
+    wxString fp = gopts.filter_plugin;
+    wxVideoMode dm = gopts.fs_mode;
+    bool vsync = gopts.vsync;
+
+    if(gopts.max_threads == 1)
+	gopts.max_threads = 0;
+    else {
+	gopts.max_threads = wxThread::GetCPUCount();
+	if(gopts.max_threads > 8)
+	    gopts.max_threads = 8;
+    }
+    wxDialog *dlg = GetXRCDialog("DisplayConfig");
+    if(ShowModal(dlg) != wxID_OK)
+	return;
+    if(!gopts.max_threads)
+	gopts.max_threads = 1;
+    update_opts();
+    if(max_scale != gopts.max_scale && panel->panel) {
+	if(gopts.max_scale) {
+	    panel->panel->GetWindow()->SetMaxSize(wxDefaultSize);
+	    if(fs == gopts.fullscreen && (!panel->IsFullScreen() ||
+					  dm == gopts.fs_mode))
+		panel->Layout();
+	    // else the window will be resized anyway
+	    else if(fs == gopts.fullscreen && (!panel->IsFullScreen() ||
+					       dm == gopts.fs_mode)) {
+		// can't compute max size here, so just destroy & rebuild
+		// drawing panel
+		panel->panel->Delete();
+		panel->panel = NULL;
+	    }
+	}
+    }
+    if(fs != gopts.fullscreen)
+	panel->ShowFullScreen(gopts.fullscreen);
+    else if(panel->IsFullScreen() && dm != gopts.fs_mode) {
+	// maybe not the best way to do this..
+	panel->ShowFullScreen(false);
+	panel->ShowFullScreen(true);
+    }
+    if(panel->panel &&
+        // change in renderer obviously requires restart
+       (renderer != gopts.render_method ||
+	// change in bilinear filter requires restart only for 3d renderers
+        // but restart for all anyway
+	bilinear != gopts.bilinear ||
+	// change in scale requires buffer resizing
+	builtin_ff_scale(filt) != builtin_ff_scale(gopts.filter) ||
+	// plugin is only loaded on init
+	(filt == FF_PLUGIN && fp != gopts.filter_plugin) ||
+	// ifb doesn't support 24-bit
+	(gopts.ifb != IFB_NONE && systemColorDepth == 24) ||
+	// standard prefers 24-bit
+	(gopts.ifb == IFB_NONE && gopts.filter == FF_NONE &&
+	    systemColorDepth == 32 && gopts.render_method == 0) ||
+	// vsync is only set in init
+	vsync != gopts.vsync)) {
+	panel->panel->Delete();
+	panel->panel = NULL;
+    }
+}
+
+EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
+{
+    int filt = gopts.filter;
+    if(filt == FF_PLUGIN ||
+       ++gopts.filter == FF_PLUGIN && gopts.filter_plugin.empty())
+	gopts.filter = 0;
+    update_opts();
+    if(panel->panel &&
+       builtin_ff_scale(filt) != builtin_ff_scale(gopts.filter)) {
+	panel->panel->Delete();
+	panel->panel = NULL;
+    }
+}
+
+EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
+{
+    gopts.ifb = (gopts.ifb + 1) % 3;
+    update_opts();
+    if(panel->panel &&
+	// ifb doesn't support 24-bit
+	(gopts.ifb != IFB_NONE && systemColorDepth == 24) ||
+	// standard prefers 24-bit
+	(gopts.ifb == IFB_NONE && gopts.filter == FF_NONE &&
+	    systemColorDepth == 32 && gopts.render_method == 0)) {
+	panel->panel->Delete();
+	panel->panel = NULL;
+    }
+}
+
+EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
+{
+    int oqual = gopts.sound_qual, oapi = gopts.audio_api;
+    bool oupmix = gopts.upmix, ohw = gopts.dsound_hw_accel;
+    wxString odev = gopts.audio_dev;
+    wxDialog *dlg = GetXRCDialog("SoundConfig");
+    if(ShowModal(dlg) != wxID_OK)
+	return;
+    update_opts();
+    switch(panel->game_type()) {
+    case IMAGE_UNKNOWN:
+	return;
+    case IMAGE_GB:
+	gb_effects_config.echo = (float)gopts.gb_echo / 100.0;
+	gb_effects_config.stereo = (float)gopts.gb_stereo / 100.0;
+	// note that setting declick may reset gb sound engine
+	gbSoundSetDeclicking(gopts.gb_declick);
+	gbSoundSetSampleRate(!gopts.sound_qual ? 48000 :
+			     44100 / (1 << (gopts.sound_qual - 1)));
+	break;
+    case IMAGE_GBA:
+	soundSetSampleRate(!gopts.sound_qual ? 48000 :
+			   44100 / (1 << (gopts.sound_qual - 1)));
+	break;
+    }
+    // changing sample rate causes driver reload, so no explicit reload needed
+    if(oqual == gopts.sound_qual &&
+       // otherwise reload if API changes
+       (oapi != gopts.audio_api || odev != gopts.audio_dev ||
+        // or init-only options
+        (oapi == AUD_XAUDIO2 && oupmix != gopts.upmix) ||
+        (oapi == AUD_DIRECTSOUND && ohw != gopts.dsound_hw_accel))) {
+	soundShutdown();
+	soundInit();
+    }
+    soundSetVolume((float)gopts.sound_vol / 100.0);
+}
+
+EVT_HANDLER(EmulatorDirectories, "Directories...")
+{
+    wxDialog *dlg = GetXRCDialog("DirectoriesConfig");
+    if(ShowModal(dlg) == wxID_OK)
+	update_opts();
+}
+
+EVT_HANDLER(JoypadConfigure, "Joypad options...")
+{
+    wxDialog *dlg = GetXRCDialog("JoypadConfig");
+    joy.Attach(NULL);
+    joy.Add();
+    if(ShowModal(dlg) == wxID_OK)
+	update_opts();
+    SetJoystick();
+}
+
+// new
+EVT_HANDLER(LinkConfigure, "Link options...")
+{
+#ifndef NO_LINK
+    bool jb = gba_joybus_enabled;
+    wxString jh = gopts.joybus_host;
+    wxDialog *dlg = GetXRCDialog("LinkConfig");
+    if(ShowModal(dlg) != wxID_OK)
+	return;
+    update_opts();
+    if(jb != gba_joybus_enabled) {
+	if(gba_joybus_enabled)
+	    JoyBusConnect();
+	else
+	    JoyBusShutdown();
+    } else if(jh != gopts.joybus_host) {
+	joybusHostAddr = std::string(gopts.joybus_host.mb_str());
+	JoyBusConnect();
+    }
+    if(gba_link_enabled != did_link_init) {
+	if(gba_link_enabled) {
+	    if((did_link_init = InitLink()))
+		cmd_enable |= CMDEN_LINK_ANY;
+	} else {
+	    did_link_init = false;
+	    CloseLink();
+	    lanlink.active = false;
+	    cmd_enable &= ~CMDEN_LINK_ANY;
+	}
+	enable_menus();
+    }
+#endif
+}
+
+EVT_HANDLER(Customize, "Customize UI...")
+{
+    wxDialog *dlg = GetXRCDialog("AccelConfig");
+    if(ShowModal(dlg) == wxID_OK)
+	update_opts();
+}
+
+EVT_HANDLER(BugReport, "Report bugs...")
+{
+    wxLaunchDefaultBrowser(wxT("http://sourceforge.net/tracker/?group_id=212795&atid=1023154"));
+}
+
+EVT_HANDLER(FAQ, "VBA-M support forum")
+{
+    wxLaunchDefaultBrowser(wxT("http://vba-m.com/forum/"));
+}
+
+// was About
+EVT_HANDLER(wxID_ABOUT, "About...")
+{
+    wxAboutDialogInfo ai;
+    ai.SetName(wxT("VisualBoyAdvance-M"));
+    ai.SetVersion(wxT(VERSION));
+    // setting website, icon, license uses custom aboutbox on win32 & macosx
+    // but at least win32 standard about is nothing special
+    ai.SetWebSite(wxT("http://www.vba-m.com/"));
+    ai.SetIcon(GetIcon());
+    ai.SetDescription(_("Nintendo GameBoy (+Color+Advance) emulator."));
+    ai.SetCopyright(_("Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2011 VBA-M development team"));
+    ai.SetLicense(_("This program is free software: you can redistribute it and/or modify\n"
+		    "it under the terms of the GNU General Public License as published by\n"
+		    "the Free Software Foundation, either version 2 of the License, or\n"
+		    "(at your option) any later version.\n\n"
+		    "This program is distributed in the hope that it will be useful,\n"
+		    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+		    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+		    "GNU General Public License for more details.\n\n"
+		    "You should have received a copy of the GNU General Public License\n"
+		    "along with this program.  If not, see http://www.gnu.org/licenses ."));
+    // from gtk
+    ai.AddDeveloper(wxT("Forgotten"));
+    ai.AddDeveloper(wxT("kxu"));
+    ai.AddDeveloper(wxT("Pokemonhacker"));
+    ai.AddDeveloper(wxT("Spacy51"));
+    ai.AddDeveloper(wxT("mudlord"));
+    ai.AddDeveloper(wxT("Nach"));
+    ai.AddDeveloper(wxT("jbo_85"));
+    ai.AddDeveloper(wxT("bgK"));
+    ai.AddArtist(wxT("Matteo Drera"));
+    ai.AddArtist(wxT("Jakub Steiner"));
+    ai.AddArtist(wxT("Jones Lee"));
+    // from win32
+    ai.AddDeveloper(wxT("Jonas Quinn"));
+    ai.AddDeveloper(wxT("DJRobX"));
+    ai.AddDeveloper(wxT("Spacy"));
+    ai.AddDeveloper(wxT("Squall Leonhart"));
+    // wx
+    ai.AddDeveloper(wxT("Thomas J. Moore"));
+    // from win32 "thanks"
+    ai.AddDeveloper(wxT("blargg"));
+    ai.AddDeveloper(wxT("Costis"));
+    ai.AddDeveloper(wxT("chrono"));
+    ai.AddDeveloper(wxT("xKiv"));
+    ai.AddDeveloper(wxT("Orig. VBA team"));
+
+    wxAboutBox(ai);
+}
+
+// Dummy for disabling system key bindings
+EVT_HANDLER_MASK(NOOP, "Do nothing", CMDEN_NEVER)
+{
+}
+
+// The following have been moved to dialogs
+// I will not implement as command unless there is great demand
+// CheatsList
+//EVT_HANDLER(CheatsLoad, "Load Cheats...")
+//EVT_HANDLER(CheatsSave, "Save Cheats...")
+//GeneralConfigure
+//EVT_HANDLER(EmulatorRewindInterval, "EmulatorRewindInterval")
+//EVT_HANDLER(EmulatorAutoApplyPatchFiles, "EmulatorAutoApplyPatchFiles")
+//EVT_HANDLER(ThrottleNone, "ThrottleNone")
+//EVT_HANDLER(Throttle025%, "Throttle025%")
+//EVT_HANDLER(Throttle050%, "Throttle050%")
+//EVT_HANDLER(Throttle100%, "Throttle100%")
+//EVT_HANDLER(Throttle150%, "Throttle150%")
+//EVT_HANDLER(Throttle200%, "Throttle200%")
+//EVT_HANDLER(ThrottleOther, "ThrottleOther")
+//GameBoyConfigure/GameBoyAdvanceConfigure
+//EVT_HANDLER(FrameSkip0, "FrameSkip0")
+//EVT_HANDLER(FrameSkip1, "FrameSkip1")
+//EVT_HANDLER(FrameSkip2, "FrameSkip2")
+//EVT_HANDLER(FrameSkip3, "FrameSkip3")
+//EVT_HANDLER(FrameSkip4, "FrameSkip4")
+//EVT_HANDLER(FrameSkip5, "FrameSkip5")
+//EVT_HANDLER(FrameSkip6, "FrameSkip6")
+//EVT_HANDLER(FrameSkip7, "FrameSkip7")
+//EVT_HANDLER(FrameSkip8, "FrameSkip8")
+//EVT_HANDLER(FrameSkip9, "FrameSkip9")
+// GameBoyConfigure
+//EVT_HANDLER(GameboyBorder, "GameboyBorder")
+//EVT_HANDLER(GameboyBorderAutomatic, "GameboyBorderAutomatic")
+//EVT_HANDLER(GameboyColors, "GameboyColors")
+//GameBoyAdvanceConfigure
+//EVT_HANDLER(EmulatorAGBPrint, "EmulatorAGBPrint")
+//EVT_HANDLER(EmulatorSaveAuto, "EmulatorSaveAuto")
+//EVT_HANDLER(EmulatorSaveEEPROM, "EmulatorSaveEEPROM")
+//EVT_HANDLER(EmulatorSaveSRAM, "EmulatorSaveSRAM")
+//EVT_HANDLER(EmulatorSaveFLASH, "EmulatorSaveFLASH")
+//EVT_HANDLER(EmulatorSaveEEPROMSensor, "EmulatorSaveEEPROMSensor")
+//EVT_HANDLER(EmulatorSaveFlash64K, "EmulatorSaveFlash64K")
+//EVT_HANDLER(EmulatorSaveFlash128K, "EmulatorSaveFlash128K")
+//EVT_HANDLER(EmulatorSaveDetectNow, "EmulatorSaveDetectNow")
+//EVT_HANDLER(EmulatorRTC, "EmulatorRTC")
+//DisplayConfigure
+//EVT_HANDLER(EmulatorShowSpeedNone, "EmulatorShowSpeedNone")
+//EVT_HANDLER(EmulatorShowSpeedPercentage, "EmulatorShowSpeedPercentage")
+//EVT_HANDLER(EmulatorShowSpeedDetailed, "EmulatorShowSpeedDetailed")
+//EVT_HANDLER(EmulatorShowSpeedTransparent, "EmulatorShowSpeedTransparent")
+//EVT_HANDLER(VideoX1, "VideoX1")
+//EVT_HANDLER(VideoX2, "VideoX2")
+//EVT_HANDLER(VideoX3, "VideoX3")
+//EVT_HANDLER(VideoX4, "VideoX4")
+//EVT_HANDLER(VideoX5, "VideoX5")
+//EVT_HANDLER(VideoX6, "VideoX6")
+//EVT_HANDLER(Video320x240, "Video320x240")
+//EVT_HANDLER(Video640x480, "Video640x480")
+//EVT_HANDLER(Video800x600, "Video800x600")
+//EVT_HANDLER(VideoFullscreen, "VideoFullscreen")
+//EVT_HANDLER(VideoFullscreenMaxScale, "VideoFullscreenMaxScale")
+//EVT_HANDLER(VideoRenderDDRAW, "VideoRenderDDRAW")
+//EVT_HANDLER(VideoRenderD3D, "VideoRenderD3D")
+//EVT_HANDLER(VideoRenderOGL, "VideoRenderOGL")
+//EVT_HANDLER(VideoVsync, "VideoVsync")
+//EVT_HANDLER(FilterNormal, "FilterNormal")
+//EVT_HANDLER(FilterTVMode, "FilterTVMode")
+//EVT_HANDLER(Filter2xSaI, "Filter2xSaI")
+//EVT_HANDLER(FilterSuper2xSaI, "FilterSuper2xSaI")
+//EVT_HANDLER(FilterSuperEagle, "FilterSuperEagle")
+//EVT_HANDLER(FilterPixelate, "FilterPixelate")
+//EVT_HANDLER(FilterMotionBlur, "FilterMotionBlur")
+//EVT_HANDLER(FilterAdMameScale2x, "FilterAdMameScale2x")
+//EVT_HANDLER(FilterSimple2x, "FilterSimple2x")
+//EVT_HANDLER(FilterBilinear, "FilterBilinear")
+//EVT_HANDLER(FilterBilinearPlus, "FilterBilinearPlus")
+//EVT_HANDLER(FilterScanlines, "FilterScanlines")
+//EVT_HANDLER(FilterHq2x, "FilterHq2x")
+//EVT_HANDLER(FilterLq2x, "FilterLq2x")
+//EVT_HANDLER(FilterIFBNone, "FilterIFBNone")
+//EVT_HANDLER(FilterIFBMotionBlur, "FilterIFBMotionBlur")
+//EVT_HANDLER(FilterIFBSmart, "FilterIFBSmart")
+//EVT_HANDLER(FilterDisableMMX, "FilterDisableMMX")
+//JoypadConfigure
+//EVT_HANDLER(JoypadConfigure1, "JoypadConfigure1")
+//EVT_HANDLER(JoypadConfigure2, "JoypadConfigure2")
+//EVT_HANDLER(JoypadConfigure3, "JoypadConfigure3")
+//EVT_HANDLER(JoypadConfigure4, "JoypadConfigure4")
+//EVT_HANDLER(JoypadMotionConfigure, "JoypadMotionConfigure")
+
+// The following functionality has been removed
+// It should be done in OS, rather than in vbam
+//EVT_HANDLER(EmulatorAssociate, "EmulatorAssociate")
+
+// The following functionality has been removed
+// It should be done at OS level (e.g. window manager)
+//EVT_HANDLER(SystemMinimize, "SystemMinimize")

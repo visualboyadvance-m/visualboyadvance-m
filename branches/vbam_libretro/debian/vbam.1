@@ -1,0 +1,164 @@
+.TH "VBAM" "1" "January 2008" "VBA-M development team" "User Commands"
+.SH "NAME"
+vbam \- manual page for VisualBoy Advance\-M
+.SH "DESCRIPTION"
+vbam [option ...] file
+.SH "OPTIONS"
+.TP 
+\fB\-O\fR, \fB\-\-opengl\fR=\fIMODE\fR
+Set OpenGL texture filter
+.TP 
+\fB\-\-no\-opengl\fR
+0 \- Disable OpenGL
+.TP 
+\fB\-\-opengl\-nearest\fR
+1 \- No filtering
+.TP 
+\fB\-\-opengl\-bilinear\fR
+2 \- Bilinear filtering
+.TP 
+\fB\-F\fR, \fB\-\-fullscreen\fR
+Full screen
+.TP 
+\fB\-G\fR, \fB\-\-gdb\fR=\fIPROTOCOL\fR
+GNU Remote Stub mode:
+\fBtcp\fR \- use TCP at port 55555,
+\fBtcp:PORT\fR \- use TCP at port PORT,
+\fBpipe\fR \- use pipe transport
+.TP 
+\fB\-I\fR, \fB\-\-ifb\-filter\fR=\fIFILTER\fR
+Select interframe blending filter:
+\fB0\fR \- No interframe blending,
+\fB1\fR \- Interframe motion blur,
+\fB2\fR \- Smart interframe blending
+.TP 
+\fB\-N\fR, \fB\-\-no\-debug\fR
+Don't parse debug information
+.TP 
+\fB\-S\fR, \fB\-\-flash\-size\fR=\fISIZE\fR
+Set the Flash size
+.TP 
+\fB\-\-flash\-64k\fR
+0 \-  64K Flash
+.TP 
+\fB\-\-flash\-128k\fR
+1 \- 128K Flash
+.TP 
+\fB\-T\fR, \fB\-\-throttle\fR=\fITHROTTLE\fR
+Set the desired throttle (5...1000)
+.TP 
+\fB\-b\fR, \fB\-\-bios\fR=\fIBIOS\fR
+Use given bios file
+.TP 
+\fB\-c\fR, \fB\-\-config\fR=\fIFILE\fR
+Read the given configuration file
+.TP 
+\fB\-d\fR, \fB\-\-debug\fR
+Enter debugger
+.TP 
+\fB\-f\fR, \fB\-\-filter\fR=\fIFILTER\fR
+Select filter:
+\fB0\fR \- Stretch 1x,
+\fB1\fR \- Stretch 2x,
+\fB2\fR \- 2xSaI,
+\fB3\fR \- Super 2xSaI,
+\fB4\fR \- Super Eagle,
+\fB5\fR \- Pixelate,
+\fB6\fR \- Motion Blur,
+\fB7\fR \- AdvanceMAME Scale2x,
+\fB8\fR \- Bilinear,
+\fB9\fR \- Bilinear Plus,
+\fB10\fR \- Scanlines,
+\fB11\fR \- TV Mode,
+\fB12\fR \- lq2x,
+\fB13\fR \- hq2x,
+\fB14\fR \- Stretch 3x,
+\fB15\fR \- hq3x,
+\fB16\fR \- Stretch 4x,
+\fB17\fR \- hq4x
+.TP 
+\fB\-h\fR, \fB\-\-help\fR
+Print an help screen
+.TP 
+\fB\-i\fR, \fB\-\-ips\fR=\fIPATCH\fR
+Apply given IPS patch
+.TP 
+\fB\-p\fR, \fB\-\-profile\fR=\fI[HERTZ]\fR
+Enable profiling
+.TP 
+\fB\-s\fR, \fB\-\-frameskip\fR=\fIFRAMESKIP\fR
+Set frame skip (0...9)
+.TP 
+\fB\-t\fR, \fB\-\-save\-type\fR=\fITYPE\fR
+Set the available save type
+.TP 
+\fB\-\-save\-auto\fR
+0 \- Automatic (EEPROM, SRAM, FLASH)
+.TP 
+\fB\-\-save\-eeprom\fR
+1 \- EEPROM
+.TP 
+\fB\-\-save\-sram\fR
+2 \- SRAM
+.TP 
+\fB\-\-save\-flash\fR
+3 \- FLASH
+.TP 
+\fB\-\-save\-sensor\fR
+4 \- EEPROM+Sensor
+.TP 
+\fB\-\-save\-none\fR
+5 \- NONE
+.TP 
+\fB\-v\fR, \fB\-\-verbose\fR=\fIVERBOSE\fR
+Set verbose logging (trace.log):
+\fB1\fR \- SWI,
+\fB2\fR \- Unaligned memory access,
+\fB4\fR \- Illegal memory write,
+\fB8\fR \- Illegal memory read,
+\fB16\fR \- DMA 0,
+\fB32\fR \- DMA 1,
+\fB64\fR \- DMA 2,
+\fB128\fR \- DMA 3,
+\fB256\fR \- Undefined instruction,
+\fB512\fR \- AGBPrint messages
+.SS "Long options only:"
+.TP 
+\fB\-\-agb\-print\fR
+Enable AGBPrint support
+.TP 
+\fB\-\-auto\-frameskip\fR
+Enable auto frameskipping
+.TP 
+\fB\-\-no\-agb\-print\fR
+Disable AGBPrint support
+.TP 
+\fB\-\-no\-auto\-frameskip\fR
+Disable auto frameskipping
+.TP 
+\fB\-\-no\-ips\fR
+Do not apply IPS patch
+.TP 
+\fB\-\-no\-pause\-when\-inactive\fR
+Don't pause when inactive
+.TP 
+\fB\-\-no\-rtc\fR
+Disable RTC support
+.TP 
+\fB\-\-no\-show\-speed\fR
+Don't show emulation speed
+.TP 
+\fB\-\-no\-throttle\fR
+Disable throttle
+.TP 
+\fB\-\-pause\-when\-inactive\fR
+Pause when inactive
+.TP 
+\fB\-\-rtc\fR
+Enable RTC support
+.TP 
+\fB\-\-show\-speed\-normal\fR
+Show emulation speed
+.TP 
+\fB\-\-show\-speed\-detailed\fR
+Show detailed speed data

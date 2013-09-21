@@ -1,0 +1,3502 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: VBA-M\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-12-03 20:50+0100\n"
+"PO-Revision-Date: 2011-12-03 19:43+0000\n"
+"Last-Translator: bgK <bastien.bouclet@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: ../src/wx/wxvbam.cpp:326
+msgid ""
+"\n"
+"\tbuilt-in"
+msgstr ""
+"\n"
+"\tbuilt-in"
+
+#: ../src/wx/cmdevents.cpp:905 ../src/wx/cmdevents.cpp:977
+msgid " files ("
+msgstr " files ("
+
+#: ../src/wx/panel.cpp:335
+msgid " player "
+msgstr " player "
+
+#: wx-xrc-strings.h:215
+#, c-format
+msgid "% of normal:"
+msgstr "% of normal:"
+
+#: ../src/wx/guiinit.cpp:1323
+#, c-format
+msgid "%d frames = %.2f ms"
+msgstr "%d frames = %.2f ms"
+
+#: ../src/wx/guiinit.cpp:1492
+#, c-format
+msgid "%d x %d - %dbpp @ %dHz"
+msgstr "%d x %d - %dbpp @ %dHz"
+
+#: ../src/wx/sys.cpp:303
+#, c-format
+msgid "%d%%"
+msgstr "%d%%"
+
+#: ../src/wx/sys.cpp:297
+#, c-format
+msgid "%d%%(%d, %d fps)"
+msgstr "%d%%(%d, %d fps)"
+
+#: ../src/wx/panel.cpp:55
+#, c-format
+msgid "%s is not a valid ROM file"
+msgstr "%s is not a valid ROM file"
+
+#: wx-xrc-strings.h:691
+msgid "&0"
+msgstr "&0"
+
+#: wx-xrc-strings.h:38 wx-xrc-strings.h:53 wx-xrc-strings.h:692
+msgid "&1"
+msgstr "&1"
+
+#: wx-xrc-strings.h:189
+msgid "&16 bits"
+msgstr "&16 bits"
+
+#: wx-xrc-strings.h:613
+msgid "&16-bit"
+msgstr "&16-bit"
+
+#: wx-xrc-strings.h:39 wx-xrc-strings.h:54
+msgid "&2"
+msgstr "&2"
+
+#: wx-xrc-strings.h:676
+msgid "&256"
+msgstr "&256"
+
+#: wx-xrc-strings.h:40 wx-xrc-strings.h:55
+msgid "&3"
+msgstr "&3"
+
+#: wx-xrc-strings.h:190
+msgid "&32 bits"
+msgstr "&32 bits"
+
+#: wx-xrc-strings.h:614
+msgid "&32-bit"
+msgstr "&32-bit"
+
+#: wx-xrc-strings.h:41 wx-xrc-strings.h:56
+msgid "&4"
+msgstr "&4"
+
+#: wx-xrc-strings.h:42 wx-xrc-strings.h:57
+msgid "&5"
+msgstr "&5"
+
+#: wx-xrc-strings.h:43 wx-xrc-strings.h:58
+msgid "&6"
+msgstr "&6"
+
+#: wx-xrc-strings.h:44 wx-xrc-strings.h:59
+msgid "&7"
+msgstr "&7"
+
+#: wx-xrc-strings.h:45 wx-xrc-strings.h:60
+msgid "&8"
+msgstr "&8"
+
+#: wx-xrc-strings.h:188
+msgid "&8 bits"
+msgstr "&8 bits"
+
+#: wx-xrc-strings.h:612
+msgid "&8-bit"
+msgstr "&8-bit"
+
+#: wx-xrc-strings.h:46 wx-xrc-strings.h:61
+msgid "&9"
+msgstr "&9"
+
+#: wx-xrc-strings.h:31
+msgid "&A"
+msgstr "&A"
+
+#: wx-xrc-strings.h:543
+msgid "&AGBPrint"
+msgstr "&AGBPrint"
+
+#: wx-xrc-strings.h:198
+msgid "&Add cheat"
+msgstr "&Add cheat"
+
+#: wx-xrc-strings.h:450
+msgid "&Assign"
+msgstr "&Assign"
+
+#: wx-xrc-strings.h:37
+msgid "&Auto load most recent"
+msgstr "&Auto load most recent"
+
+#: wx-xrc-strings.h:207
+msgid "&Auto-apply IPS/UPS/PPF patches"
+msgstr "&Auto-apply IPS/UPS/PPF patches"
+
+#: wx-xrc-strings.h:30
+msgid "&Autofire"
+msgstr "&Autofire"
+
+#: wx-xrc-strings.h:456
+msgid "&Automatic"
+msgstr "&Automatic"
+
+#: wx-xrc-strings.h:32
+msgid "&B"
+msgstr "&B"
+
+#: wx-xrc-strings.h:210
+msgid "&BMP"
+msgstr "&BMP"
+
+#: wx-xrc-strings.h:7 wx-xrc-strings.h:11
+msgid "&Battery file..."
+msgstr "&Battery file..."
+
+#: wx-xrc-strings.h:98
+msgid "&Break into GDB"
+msgstr "&Break into GDB"
+
+#: wx-xrc-strings.h:197 wx-xrc-strings.h:547
+msgid "&Clear"
+msgstr "&Clear"
+
+#: ../src/wx/sys.cpp:613 ../src/wx/sys.cpp:680
+msgid "&Close"
+msgstr "&Close"
+
+#: wx-xrc-strings.h:95
+msgid "&Debug"
+msgstr "&Debug"
+
+#: wx-xrc-strings.h:313
+msgid "&Defaults"
+msgstr "&Defaults"
+
+#: wx-xrc-strings.h:173 wx-xrc-strings.h:200
+msgid "&Description"
+msgstr "&Description"
+
+#: wx-xrc-strings.h:87
+msgid "&Disassemble..."
+msgstr "&Disassemble..."
+
+#: ../src/wx/sys.cpp:556 wx-xrc-strings.h:121
+msgid "&Discard"
+msgstr "&Discard"
+
+#: wx-xrc-strings.h:99
+msgid "&Disconnect"
+msgstr "&Disconnect"
+
+#: wx-xrc-strings.h:104
+msgid "&Display ..."
+msgstr "&Display ..."
+
+#: wx-xrc-strings.h:25
+msgid "&Emulation"
+msgstr "&Emulation"
+
+#: wx-xrc-strings.h:69
+msgid "&Enable cheats"
+msgstr "&Enable cheats"
+
+#: wx-xrc-strings.h:13
+msgid "&Export"
+msgstr "&Export"
+
+#: wx-xrc-strings.h:2
+msgid "&File"
+msgstr "&File"
+
+#: wx-xrc-strings.h:5
+msgid "&Freeze recent list"
+msgstr "&Freeze recent list"
+
+#: wx-xrc-strings.h:29
+msgid "&Fullscreen"
+msgstr "&Fullscreen"
+
+#: wx-xrc-strings.h:100
+msgid "&GDB"
+msgstr "&GDB"
+
+#: wx-xrc-strings.h:9 wx-xrc-strings.h:12
+msgid "&Gameshark snapshot..."
+msgstr "&Gameshark snapshot..."
+
+#: wx-xrc-strings.h:101
+msgid "&General ..."
+msgstr "&General ..."
+
+#: wx-xrc-strings.h:459 wx-xrc-strings.h:508 wx-xrc-strings.h:615
+msgid "&Go"
+msgstr "&Go"
+
+#: wx-xrc-strings.h:181
+msgid "&Greater than"
+msgstr "&Greater than"
+
+#: wx-xrc-strings.h:111
+msgid "&Help"
+msgstr "&Help"
+
+#: wx-xrc-strings.h:186
+msgid "&Hexadecimal"
+msgstr "&Hexadecimal"
+
+#: wx-xrc-strings.h:89
+msgid "&IO Viewer..."
+msgstr "&IO Viewer..."
+
+#: wx-xrc-strings.h:10
+msgid "&Import"
+msgstr "&Import"
+
+#: wx-xrc-strings.h:107
+msgid "&Joypads ..."
+msgstr "&Joypads ..."
+
+#: wx-xrc-strings.h:109
+msgid "&Key Shortcuts ..."
+msgstr "&Key Shortcuts ..."
+
+#: wx-xrc-strings.h:33
+msgid "&L"
+msgstr "&L"
+
+#: wx-xrc-strings.h:179
+msgid "&Less than"
+msgstr "&Less than"
+
+#: wx-xrc-strings.h:108
+msgid "&Link ..."
+msgstr "&Link ..."
+
+#: wx-xrc-strings.h:97
+msgid "&Load and wait..."
+msgstr "&Load and wait..."
+
+#: wx-xrc-strings.h:51
+msgid "&Load state"
+msgstr "&Load state"
+
+#: wx-xrc-strings.h:619
+msgid "&Load..."
+msgstr "&Load..."
+
+#: wx-xrc-strings.h:88
+msgid "&Logging..."
+msgstr "&Logging..."
+
+#: wx-xrc-strings.h:90
+msgid "&Map Viewer..."
+msgstr "&Map Viewer..."
+
+#: wx-xrc-strings.h:506 wx-xrc-strings.h:532
+msgid "&Next"
+msgstr "&Next"
+
+#: wx-xrc-strings.h:86
+msgid "&Next frame"
+msgstr "&Next frame"
+
+#: wx-xrc-strings.h:178
+msgid "&Not equal"
+msgstr "&Not equal"
+
+#: wx-xrc-strings.h:243 wx-xrc-strings.h:284
+msgid "&Number of frames to skip :"
+msgstr "&Number of frames to skip :"
+
+#: wx-xrc-strings.h:92
+msgid "&OAM Viewer..."
+msgstr "&OAM Viewer..."
+
+#: wx-xrc-strings.h:74
+msgid "&OBJ"
+msgstr "&OBJ"
+
+#: wx-xrc-strings.h:52
+msgid "&Oldest slot"
+msgstr "&Oldest slot"
+
+#: wx-xrc-strings.h:110
+msgid "&Options"
+msgstr "&Options"
+
+#: wx-xrc-strings.h:209
+msgid "&PNG"
+msgstr "&PNG"
+
+#: wx-xrc-strings.h:93
+msgid "&Palette Viewer..."
+msgstr "&Palette Viewer..."
+
+#: wx-xrc-strings.h:26
+msgid "&Pause"
+msgstr "&Pause"
+
+#: wx-xrc-strings.h:24
+msgid "&Play"
+msgstr "&Play"
+
+#: wx-xrc-strings.h:34
+msgid "&R"
+msgstr "&R"
+
+#: wx-xrc-strings.h:21
+msgid "&Record"
+msgstr "&Record"
+
+#: wx-xrc-strings.h:570 wx-xrc-strings.h:594 wx-xrc-strings.h:609
+#: wx-xrc-strings.h:618 wx-xrc-strings.h:638 wx-xrc-strings.h:650
+#: wx-xrc-strings.h:661 wx-xrc-strings.h:672 wx-xrc-strings.h:689
+#: wx-xrc-strings.h:702
+msgid "&Refresh"
+msgstr "&Refresh"
+
+#: wx-xrc-strings.h:451
+msgid "&Remove"
+msgstr "&Remove"
+
+#: wx-xrc-strings.h:28
+msgid "&Reset"
+msgstr "&Reset"
+
+#: wx-xrc-strings.h:4
+msgid "&Reset recent list"
+msgstr "&Reset recent list"
+
+#: wx-xrc-strings.h:211
+msgid "&Rewind interval :"
+msgstr "&Rewind interval :"
+
+#: wx-xrc-strings.h:546 wx-xrc-strings.h:595 wx-xrc-strings.h:610
+msgid "&Save"
+msgstr "&Save"
+
+#: wx-xrc-strings.h:64
+msgid "&Save state"
+msgstr "&Save state"
+
+#: wx-xrc-strings.h:620 wx-xrc-strings.h:639 wx-xrc-strings.h:651
+#: wx-xrc-strings.h:690 wx-xrc-strings.h:703
+msgid "&Save..."
+msgstr "&Save..."
+
+#: wx-xrc-strings.h:195
+msgid "&Search"
+msgstr "&Search"
+
+#: wx-xrc-strings.h:105
+msgid "&Sound ..."
+msgstr "&Sound ..."
+
+#: wx-xrc-strings.h:85
+msgid "&Sound Channels"
+msgstr "&Sound Channels"
+
+#: wx-xrc-strings.h:384
+msgid "&Sync game to audio"
+msgstr "&Sync game to audio"
+
+#: wx-xrc-strings.h:458
+msgid "&THUMB"
+msgstr "&THUMB"
+
+#: wx-xrc-strings.h:214
+msgid "&Throttle"
+msgstr "&Throttle"
+
+#: wx-xrc-strings.h:94
+msgid "&Tile Viewer..."
+msgstr "&Tile Viewer..."
+
+#: wx-xrc-strings.h:27
+msgid "&Turbo mode"
+msgstr "&Turbo mode"
+
+#: wx-xrc-strings.h:174
+msgid "&Type"
+msgstr "&Type"
+
+#: wx-xrc-strings.h:542
+msgid "&Undefined instruction"
+msgstr "&Undefined instruction"
+
+#: wx-xrc-strings.h:185
+msgid "&Unsigned"
+msgstr "&Unsigned"
+
+#: wx-xrc-strings.h:202
+msgid "&Value"
+msgstr "&Value"
+
+#: wx-xrc-strings.h:78
+msgid "&View Layers"
+msgstr "&View Layers"
+
+#: wx-xrc-strings.h:75
+msgid "&WIN 0"
+msgstr "&WIN 0"
+
+#: wx-xrc-strings.h:96
+msgid "&Wait for connection..."
+msgstr "&Wait for connection..."
+
+#: wx-xrc-strings.h:568
+msgid "0 "
+msgstr "0 "
+
+#: wx-xrc-strings.h:326
+msgid "0 = no limit"
+msgstr "0 = no limit"
+
+#: wx-xrc-strings.h:325
+msgid "0 = no maximum"
+msgstr "0 = no maximum"
+
+#: wx-xrc-strings.h:216
+msgid "0 = no throttle"
+msgstr "0 = no throttle"
+
+#: wx-xrc-strings.h:502 wx-xrc-strings.h:524
+msgid "00"
+msgstr "00"
+
+#: wx-xrc-strings.h:510 wx-xrc-strings.h:512 wx-xrc-strings.h:514
+#: wx-xrc-strings.h:516 wx-xrc-strings.h:518 wx-xrc-strings.h:520
+#: wx-xrc-strings.h:522
+msgid "0000"
+msgstr "0000"
+
+#: wx-xrc-strings.h:461 wx-xrc-strings.h:463 wx-xrc-strings.h:465
+#: wx-xrc-strings.h:467 wx-xrc-strings.h:469 wx-xrc-strings.h:471
+#: wx-xrc-strings.h:473 wx-xrc-strings.h:475 wx-xrc-strings.h:477
+#: wx-xrc-strings.h:479 wx-xrc-strings.h:481 wx-xrc-strings.h:483
+#: wx-xrc-strings.h:485 wx-xrc-strings.h:487 wx-xrc-strings.h:489
+#: wx-xrc-strings.h:491 wx-xrc-strings.h:493
+msgid "00000000"
+msgstr "00000000"
+
+#: wx-xrc-strings.h:694
+msgid "0x&8000"
+msgstr "0x&8000"
+
+#: wx-xrc-strings.h:695
+msgid "0x&8800"
+msgstr "0x&8800"
+
+#: ../src/wx/viewers.cpp:798
+msgid "0x0000 - ROM"
+msgstr "0x0000 - ROM"
+
+#: ../src/wx/viewers.cpp:703
+msgid "0x00000000 - BIOS"
+msgstr "0x00000000 - BIOS"
+
+#: ../src/wx/viewers.cpp:704
+msgid "0x02000000 - WRAM"
+msgstr "0x02000000 - WRAM"
+
+#: ../src/wx/viewers.cpp:705
+msgid "0x03000000 - IRAM"
+msgstr "0x03000000 - IRAM"
+
+#: ../src/wx/viewers.cpp:706
+msgid "0x04000000 - I/O"
+msgstr "0x04000000 - I/O"
+
+#: ../src/wx/viewers.cpp:707
+msgid "0x05000000 - PALETTE"
+msgstr "0x05000000 - PALETTE"
+
+#: ../src/wx/viewers.cpp:708
+msgid "0x06000000 - VRAM"
+msgstr "0x06000000 - VRAM"
+
+#: ../src/wx/viewers.cpp:709
+msgid "0x07000000 - OAM"
+msgstr "0x07000000 - OAM"
+
+#: ../src/wx/viewers.cpp:710
+msgid "0x08000000 - ROM"
+msgstr "0x08000000 - ROM"
+
+#: ../src/wx/viewers.cpp:799
+msgid "0x4000 - ROM"
+msgstr "0x4000 - ROM"
+
+#: wx-xrc-strings.h:682
+msgid "0x60&10000"
+msgstr "0x60&10000"
+
+#: wx-xrc-strings.h:678
+msgid "0x600&0000"
+msgstr "0x600&0000"
+
+#: wx-xrc-strings.h:679
+msgid "0x600&4000"
+msgstr "0x600&4000"
+
+#: wx-xrc-strings.h:680
+msgid "0x600&8000"
+msgstr "0x600&8000"
+
+#: wx-xrc-strings.h:681
+msgid "0x600&C000"
+msgstr "0x600&C000"
+
+#: wx-xrc-strings.h:596
+msgid "0x8000"
+msgstr "0x8000"
+
+#: ../src/wx/viewers.cpp:800
+msgid "0x8000 - VRAM"
+msgstr "0x8000 - VRAM"
+
+#: wx-xrc-strings.h:597
+msgid "0x8800"
+msgstr "0x8800"
+
+#: wx-xrc-strings.h:599
+msgid "0x9800"
+msgstr "0x9800"
+
+#: wx-xrc-strings.h:600
+msgid "0x9C00"
+msgstr "0x9C00"
+
+#: ../src/wx/viewers.cpp:801
+msgid "0xA000 - SRAM"
+msgstr "0xA000 - SRAM"
+
+#: ../src/wx/viewers.cpp:802
+msgid "0xC000 - RAM"
+msgstr "0xC000 - RAM"
+
+#: ../src/wx/viewers.cpp:803
+msgid "0xD000 - WRAM"
+msgstr "0xD000 - WRAM"
+
+#: ../src/wx/viewers.cpp:804
+msgid "0xFF00 - I/O"
+msgstr "0xFF00 - I/O"
+
+#: ../src/wx/viewers.cpp:805
+msgid "0xFF80 - RAM"
+msgstr "0xFF80 - RAM"
+
+#: wx-xrc-strings.h:567
+msgid "1 "
+msgstr "1 "
+
+#: wx-xrc-strings.h:47 wx-xrc-strings.h:62
+msgid "1&0"
+msgstr "1&0"
+
+#: wx-xrc-strings.h:675
+msgid "1&6"
+msgstr "1&6"
+
+#: wx-xrc-strings.h:558
+msgid "10 "
+msgstr "10 "
+
+#: wx-xrc-strings.h:220 wx-xrc-strings.h:369
+msgid "100%"
+msgstr "100%"
+
+#: wx-xrc-strings.h:557
+msgid "11 "
+msgstr "11 "
+
+#: wx-xrc-strings.h:375
+msgid "11 KHz"
+msgstr "11 KHz"
+
+#: wx-xrc-strings.h:556
+msgid "12 "
+msgstr "12 "
+
+#: wx-xrc-strings.h:276 wx-xrc-strings.h:308
+msgid "128K"
+msgstr "128K"
+
+#: wx-xrc-strings.h:555
+msgid "13 "
+msgstr "13 "
+
+#: wx-xrc-strings.h:554
+msgid "14 "
+msgstr "14 "
+
+#: wx-xrc-strings.h:553
+msgid "15 "
+msgstr "15 "
+
+#: wx-xrc-strings.h:221
+msgid "150%"
+msgstr "150%"
+
+#: ../src/wx/guiinit.cpp:886
+msgid "16-bit "
+msgstr "16-bit "
+
+#: wx-xrc-strings.h:116
+msgid "1x"
+msgstr "1x"
+
+#: wx-xrc-strings.h:154
+msgid "2"
+msgstr "2"
+
+#: wx-xrc-strings.h:566
+msgid "2 "
+msgstr "2 "
+
+#: wx-xrc-strings.h:222
+msgid "200%"
+msgstr "200%"
+
+#: wx-xrc-strings.h:374
+msgid "22 KHz"
+msgstr "22 KHz"
+
+#: wx-xrc-strings.h:218
+msgid "25%"
+msgstr "25%"
+
+#: wx-xrc-strings.h:117
+msgid "2x"
+msgstr "2x"
+
+#: wx-xrc-strings.h:343
+msgid "2xSaI"
+msgstr "2xSaI"
+
+#: wx-xrc-strings.h:155
+msgid "3"
+msgstr "3"
+
+#: wx-xrc-strings.h:565
+msgid "3 "
+msgstr "3 "
+
+#: ../src/wx/guiinit.cpp:889
+msgid "32-bit "
+msgstr "32-bit "
+
+#: wx-xrc-strings.h:118
+msgid "3x"
+msgstr "3x"
+
+#: wx-xrc-strings.h:156
+msgid "4"
+msgstr "4"
+
+#: wx-xrc-strings.h:564
+msgid "4 "
+msgstr "4 "
+
+#: wx-xrc-strings.h:373
+msgid "44.1 KHz"
+msgstr "44.1 KHz"
+
+#: wx-xrc-strings.h:372
+msgid "48 KHz"
+msgstr "48 KHz"
+
+#: wx-xrc-strings.h:119
+msgid "4x"
+msgstr "4x"
+
+#: wx-xrc-strings.h:563
+msgid "5 "
+msgstr "5 "
+
+#: wx-xrc-strings.h:219
+msgid "50%"
+msgstr "50%"
+
+#: wx-xrc-strings.h:562
+msgid "6 "
+msgstr "6 "
+
+#: wx-xrc-strings.h:275 wx-xrc-strings.h:307
+msgid "64K"
+msgstr "64K"
+
+#: wx-xrc-strings.h:561
+msgid "7 "
+msgstr "7 "
+
+#: wx-xrc-strings.h:560
+msgid "8 "
+msgstr "8 "
+
+#: ../src/wx/guiinit.cpp:883
+msgid "8-bit "
+msgstr "8-bit "
+
+#: wx-xrc-strings.h:559
+msgid "9 "
+msgstr "9 "
+
+#: ../src/wx/wxvbam.cpp:259
+msgid "<config>=<value>"
+msgstr "<config>=<value>"
+
+#: wx-xrc-strings.h:418
+msgid "A"
+msgstr "A"
+
+#: wx-xrc-strings.h:457
+msgid "A&RM"
+msgstr "A&RM"
+
+#: wx-xrc-strings.h:68
+msgid "A&utomatically save/load cheats"
+msgstr "A&utomatically save/load cheats"
+
+#: wx-xrc-strings.h:509
+msgid "AF:"
+msgstr "AF:"
+
+#: ../src/wx/widgets/keyedit.cpp:81 ../src/wx/widgets/keyedit.cpp:165
+msgid "ALT"
+msgstr "ALT"
+
+#: wx-xrc-strings.h:455
+msgid "Accelerator Editor"
+msgstr "Accelerator Editor"
+
+#: wx-xrc-strings.h:204
+msgid "Add cheat"
+msgstr "Add cheat"
+
+#: wx-xrc-strings.h:168
+msgid "Add new cheat"
+msgstr "Add new cheat"
+
+#: ../src/wx/guiinit.cpp:2589 wx-xrc-strings.h:201
+msgid "Address"
+msgstr "Address"
+
+#: wx-xrc-strings.h:590 wx-xrc-strings.h:604 wx-xrc-strings.h:622
+#: wx-xrc-strings.h:657 wx-xrc-strings.h:688 wx-xrc-strings.h:701
+msgid "Address:"
+msgstr "Address:"
+
+#: wx-xrc-strings.h:347
+msgid "Advance MAME Scale2x"
+msgstr "Advance MAME Scale2x"
+
+#: wx-xrc-strings.h:365 wx-xrc-strings.h:386
+msgid "Advanced"
+msgstr "Advanced"
+
+#: ../src/wx/guiinit.cpp:160
+msgid "All players joined."
+msgstr "All players joined."
+
+#: wx-xrc-strings.h:234
+msgid "Always"
+msgstr "Always"
+
+#: wx-xrc-strings.h:581 wx-xrc-strings.h:603
+msgid "Auto &update"
+msgstr "Auto &update"
+
+#: wx-xrc-strings.h:429
+msgid "Autofire A"
+msgstr "Autofire A"
+
+#: wx-xrc-strings.h:431
+msgid "Autofire B"
+msgstr "Autofire B"
+
+#: wx-xrc-strings.h:226 wx-xrc-strings.h:235 wx-xrc-strings.h:268
+#: wx-xrc-strings.h:299
+msgid "Automatic"
+msgstr "Automatic"
+
+#: wx-xrc-strings.h:503 wx-xrc-strings.h:529 wx-xrc-strings.h:569
+#: wx-xrc-strings.h:616 wx-xrc-strings.h:637 wx-xrc-strings.h:649
+#: wx-xrc-strings.h:659 wx-xrc-strings.h:671 wx-xrc-strings.h:686
+#: wx-xrc-strings.h:699
+msgid "Automatic &update"
+msgstr "Automatic &update"
+
+#: wx-xrc-strings.h:237
+msgid "Automatically &gather entire printed page"
+msgstr "Automatically &gather entire printed page"
+
+#: wx-xrc-strings.h:238
+msgid "Automatically &save printouts as snapshots"
+msgstr "Automatically &save printouts as snapshots"
+
+#: ../src/wx/widgets/joyedit.cpp:82
+#, c-format
+msgid "Axis%d+"
+msgstr "Axis%d+"
+
+#: ../src/wx/widgets/joyedit.cpp:85
+#, c-format
+msgid "Axis%d-"
+msgstr "Axis%d-"
+
+#: ../src/wx/widgets/joyedit.cpp:141
+msgid "Axis([0-9]+)([+-])"
+msgstr "Axis([0-9]+)([+-])"
+
+#: wx-xrc-strings.h:420
+msgid "B"
+msgstr "B"
+
+#: ../src/wx/viewsupt.cpp:685
+msgid "B:"
+msgstr "B:"
+
+#: wx-xrc-strings.h:511
+msgid "BC:"
+msgstr "BC:"
+
+#: wx-xrc-strings.h:70
+msgid "BG &0"
+msgstr "BG &0"
+
+#: wx-xrc-strings.h:71
+msgid "BG &1"
+msgstr "BG &1"
+
+#: wx-xrc-strings.h:72
+msgid "BG &2"
+msgstr "BG &2"
+
+#: wx-xrc-strings.h:73
+msgid "BG &3"
+msgstr "BG &3"
+
+#: wx-xrc-strings.h:575
+msgid "BG0"
+msgstr "BG0"
+
+#: wx-xrc-strings.h:576
+msgid "BG1"
+msgstr "BG1"
+
+#: wx-xrc-strings.h:577
+msgid "BG2"
+msgstr "BG2"
+
+#: wx-xrc-strings.h:578
+msgid "BG3"
+msgstr "BG3"
+
+#: wx-xrc-strings.h:263 wx-xrc-strings.h:579 wx-xrc-strings.h:655
+#: wx-xrc-strings.h:665
+msgid "Background"
+msgstr "Background"
+
+#: ../src/wx/wxvbam.cpp:383
+msgid "Bad configuration option or multiple ROM files given:\n"
+msgstr "Bad configuration option or multiple ROM files given:\n"
+
+#: wx-xrc-strings.h:647
+msgid "Bank:"
+msgstr "Bank:"
+
+#: wx-xrc-strings.h:376
+msgid "Basic"
+msgstr "Basic"
+
+#: ../src/wx/cmdevents.cpp:634 ../src/wx/cmdevents.cpp:796
+msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
+msgstr "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
+
+#: wx-xrc-strings.h:348
+msgid "Bilinear"
+msgstr "Bilinear"
+
+#: wx-xrc-strings.h:349
+msgid "Bilinear Plus"
+msgstr "Bilinear Plus"
+
+#: wx-xrc-strings.h:336
+msgid "Bilinear scaling filter"
+msgstr "Bilinear scaling filter"
+
+#: wx-xrc-strings.h:287
+msgid "Bios file :"
+msgstr "Bios file :"
+
+#: wx-xrc-strings.h:255
+msgid "Blue Sea"
+msgstr "Blue Sea"
+
+#: wx-xrc-strings.h:246
+msgid "Boot &ROM file :"
+msgstr "Boot &ROM file :"
+
+#: wx-xrc-strings.h:249 wx-xrc-strings.h:289
+msgid "Boot ROM"
+msgstr "Boot ROM"
+
+#: wx-xrc-strings.h:248
+msgid "Boot ROM &file :"
+msgstr "Boot ROM &file :"
+
+#: ../src/wx/widgets/joyedit.cpp:88
+#, c-format
+msgid "Button%d"
+msgstr "Button%d"
+
+#: ../src/wx/widgets/joyedit.cpp:143
+msgid "Button([0-9]+)"
+msgstr "Button([0-9]+)"
+
+#: wx-xrc-strings.h:498 wx-xrc-strings.h:528
+msgid "C"
+msgstr "C"
+
+#: wx-xrc-strings.h:660
+msgid "C&hange backdrop color..."
+msgstr "C&hange backdrop color..."
+
+#: wx-xrc-strings.h:175
+msgid "C&odes"
+msgstr "C&odes"
+
+#: wx-xrc-strings.h:120
+msgid "C&ontinue"
+msgstr "C&ontinue"
+
+#: ../src/wx/widgets/keyedit.cpp:168
+msgid "CONTROL"
+msgstr "CONTROL"
+
+#: wx-xrc-strings.h:492
+msgid "CPSR:"
+msgstr "CPSR:"
+
+#: wx-xrc-strings.h:130 wx-xrc-strings.h:138
+msgid "CRC:"
+msgstr "CRC:"
+
+#: ../src/wx/widgets/keyedit.cpp:84 ../src/wx/widgets/keyedit.cpp:167
+msgid "CTRL"
+msgstr "CTRL"
+
+#: wx-xrc-strings.h:335
+msgid "Cairo"
+msgstr "Cairo"
+
+#: ../src/wx/dsound.cpp:123
+#, c-format
+msgid "Cannot CreateSoundBuffer %08x"
+msgstr "Cannot CreateSoundBuffer %08x"
+
+#: ../src/wx/dsound.cpp:188
+#, c-format
+msgid "Cannot Play primary %08x"
+msgstr "Cannot Play primary %08x"
+
+#: ../src/wx/dsound.cpp:109
+#, c-format
+msgid "Cannot SetCooperativeLevel %08x"
+msgstr "Cannot SetCooperativeLevel %08x"
+
+#: ../src/wx/dsound.cpp:93 ../src/wx/dsound.cpp:104
+#, c-format
+msgid "Cannot create DirectSound %08x"
+msgstr "Cannot create DirectSound %08x"
+
+#: ../src/wx/panel.cpp:1831
+msgid "Cannot create conversion buffer"
+msgstr "Cannot create conversion buffer"
+
+#: ../src/wx/cmdevents.cpp:679
+#, c-format
+msgid "Cannot open file %s"
+msgstr "Cannot open file %s"
+
+#: ../src/wx/sys.cpp:118
+#, c-format
+msgid "Cannot open output file %s"
+msgstr "Cannot open output file %s"
+
+#: ../src/wx/sys.cpp:173
+#, c-format
+msgid "Cannot open recording file %s"
+msgstr "Cannot open recording file %s"
+
+#: ../src/wx/sys.cpp:162
+msgid "Cannot play game recording while recording"
+msgstr "Cannot play game recording while recording"
+
+#: wx-xrc-strings.h:278
+msgid "Cartridge"
+msgstr "Cartridge"
+
+#: wx-xrc-strings.h:136
+msgid "Cartridge type:"
+msgstr "Cartridge type:"
+
+#: wx-xrc-strings.h:395
+msgid "Center"
+msgstr "Center"
+
+#: wx-xrc-strings.h:79
+msgid "Channel &1"
+msgstr "Channel &1"
+
+#: wx-xrc-strings.h:80
+msgid "Channel &2"
+msgstr "Channel &2"
+
+#: wx-xrc-strings.h:81
+msgid "Channel &3"
+msgstr "Channel &3"
+
+#: wx-xrc-strings.h:82
+msgid "Channel &4"
+msgstr "Channel &4"
+
+#: wx-xrc-strings.h:598 wx-xrc-strings.h:683 wx-xrc-strings.h:696
+msgid "Char Base"
+msgstr "Char Base"
+
+#: wx-xrc-strings.h:584
+msgid "Char Base:"
+msgstr "Char Base:"
+
+#: wx-xrc-strings.h:172
+msgid "Cheat list"
+msgstr "Cheat list"
+
+#: wx-xrc-strings.h:144
+msgid "Checksum:"
+msgstr "Checksum:"
+
+#: ../src/wx/panel.cpp:719
+#, c-format
+msgid "Chose mode %dx%d-%d@%d"
+msgstr "Chose mode %dx%d-%d@%d"
+
+#: wx-xrc-strings.h:440
+msgid "Clear"
+msgstr "Clear"
+
+#: wx-xrc-strings.h:416
+msgid ""
+"Click a field and press a key or move joystick to add.  Press backspace to "
+"delete last added key.  Resize window or click inside and move pointer to "
+"see entire contents if too small."
+msgstr ""
+"Click a field and press a key or move joystick to add.  Press backspace to "
+"delete last added key.  Resize window or click inside and move pointer to "
+"see entire contents if too small."
+
+#: wx-xrc-strings.h:654 wx-xrc-strings.h:664
+msgid "Click on a color for more information"
+msgstr "Click on a color for more information"
+
+#: wx-xrc-strings.h:152
+msgid "Client"
+msgstr "Client"
+
+#: wx-xrc-strings.h:448
+msgid "Co&mmands:"
+msgstr "Co&mmands:"
+
+#: ../src/wx/guiinit.cpp:2501
+msgid "Code"
+msgstr "Code"
+
+#: ../src/wx/guiinit.cpp:646
+msgid "CodeBreaker Advance"
+msgstr "CodeBreaker Advance"
+
+#: wx-xrc-strings.h:139
+msgid "Color:"
+msgstr "Color:"
+
+#: wx-xrc-strings.h:677
+msgid "Colors"
+msgstr "Colors"
+
+#: wx-xrc-strings.h:586 wx-xrc-strings.h:629
+msgid "Colors:"
+msgstr "Colors:"
+
+#: wx-xrc-strings.h:292
+msgid "Comment"
+msgstr "Comment"
+
+#: wx-xrc-strings.h:183
+msgid "Compare type"
+msgstr "Compare type"
+
+#: ../src/wx/wxvbam.cpp:308
+msgid "Configuration is read from, in order:"
+msgstr "Configuration is read from, in order:"
+
+#: ../src/wx/wxvbam.cpp:287
+msgid "Configuration/build error: can't find built-in xrc"
+msgstr "Configuration/build error: can't find built-in xrc"
+
+#: ../src/wx/guiinit.cpp:1835
+msgid "Confirm"
+msgstr "Confirm"
+
+#: ../src/wx/cmdevents.cpp:641 ../src/wx/cmdevents.cpp:666
+#: ../src/wx/cmdevents.cpp:763
+msgid "Confirm import"
+msgstr "Confirm import"
+
+#: ../src/wx/guiinit.cpp:61 wx-xrc-strings.h:164
+msgid "Connect"
+msgstr "Connect"
+
+#: ../src/wx/guiinit.cpp:156
+#, c-format
+msgid "Connected as #%d\n"
+msgstr "Connected as #%d\n"
+
+#: ../src/wx/guiinit.cpp:151
+#, c-format
+msgid "Connecting to %s\n"
+msgstr "Connecting to %s\n"
+
+#: ../src/wx/cmdevents.cpp:2179
+msgid ""
+"Copyright (C) 1999-2003 Forgotten\n"
+"Copyright (C) 2004-2006 VBA development team\n"
+"Copyright (C) 2007-2011 VBA-M development team"
+msgstr ""
+"Copyright (C) 1999-2003 Forgotten\n"
+"Copyright (C) 2004-2006 VBA development team\n"
+"Copyright (C) 2007-2011 VBA-M development team"
+
+#: ../src/wx/wxvbam.cpp:208
+msgid "Could not create main window"
+msgstr "Could not create main window"
+
+#: ../src/wx/panel.cpp:153 ../src/wx/panel.cpp:234
+#, c-format
+msgid "Could not load BIOS %s"
+msgstr "Could not load BIOS %s"
+
+#: ../src/wx/dsound.cpp:143
+#, c-format
+msgid "CreateSoundBuffer(primary) failed %08x"
+msgstr "CreateSoundBuffer(primary) failed %08x"
+
+#: ../src/wx/dsound.cpp:159
+#, c-format
+msgid "CreateSoundBuffer(secondary) failed %08x"
+msgstr "CreateSoundBuffer(secondary) failed %08x"
+
+#: wx-xrc-strings.h:449
+msgid "Current Keys:"
+msgstr "Current Keys:"
+
+#: wx-xrc-strings.h:617
+msgid "Current address:"
+msgstr "Current address:"
+
+#: wx-xrc-strings.h:453
+msgid "Currently assigned to:"
+msgstr "Currently assigned to:"
+
+#: wx-xrc-strings.h:253
+msgid "Custom Colors"
+msgstr "Custom Colors"
+
+#: wx-xrc-strings.h:106
+msgid "D&irectories ..."
+msgstr "D&irectories ..."
+
+#: wx-xrc-strings.h:513
+msgid "DE:"
+msgstr "DE:"
+
+#: wx-xrc-strings.h:538
+msgid "DMA &0"
+msgstr "DMA &0"
+
+#: wx-xrc-strings.h:539
+msgid "DMA &1"
+msgstr "DMA &1"
+
+#: wx-xrc-strings.h:540
+msgid "DMA &2"
+msgstr "DMA &2"
+
+#: wx-xrc-strings.h:541
+msgid "DMA &3"
+msgstr "DMA &3"
+
+#: wx-xrc-strings.h:256
+msgid "Dark Night"
+msgstr "Dark Night"
+
+#: wx-xrc-strings.h:191
+msgid "Data size"
+msgstr "Data size"
+
+#: wx-xrc-strings.h:387
+msgid "Declicking"
+msgstr "Declicking"
+
+#: wx-xrc-strings.h:250 wx-xrc-strings.h:294 wx-xrc-strings.h:298
+#: wx-xrc-strings.h:306 wx-xrc-strings.h:310
+msgid "Default"
+msgstr "Default"
+
+#: ../src/wx/guiinit.cpp:1334
+msgid "Default device"
+msgstr "Default device"
+
+#: wx-xrc-strings.h:322
+msgid "Default magnification :"
+msgstr "Default magnification :"
+
+#: wx-xrc-strings.h:439
+msgid "Defaults"
+msgstr "Defaults"
+
+#: wx-xrc-strings.h:170
+msgid "Delete all cheats"
+msgstr "Delete all cheats"
+
+#: wx-xrc-strings.h:169
+msgid "Delete selected cheat"
+msgstr "Delete selected cheat"
+
+#: ../src/wx/wxvbam.cpp:249
+msgid "Delete shared link state first, if it exists"
+msgstr "Delete shared link state first, if it exists"
+
+#: ../src/wx/guiinit.cpp:2510
+msgid "Description"
+msgstr "Description"
+
+#: wx-xrc-strings.h:148
+msgid "Description:"
+msgstr "Description:"
+
+#: ../src/wx/guiinit.cpp:1486
+msgid "Desktop mode"
+msgstr "Desktop mode"
+
+#: wx-xrc-strings.h:142
+msgid "Dest. code:"
+msgstr "Dest. code:"
+
+#: wx-xrc-strings.h:318
+msgid "Detailed"
+msgstr "Detailed"
+
+#: wx-xrc-strings.h:277
+msgid "Detect Now"
+msgstr "Detect Now"
+
+#: wx-xrc-strings.h:381
+msgid "Device"
+msgstr "Device"
+
+#: wx-xrc-strings.h:128
+msgid "Device type:"
+msgstr "Device type:"
+
+#: wx-xrc-strings.h:83
+msgid "Direct Sound &A"
+msgstr "Direct Sound &A"
+
+#: wx-xrc-strings.h:84
+msgid "Direct Sound &B"
+msgstr "Direct Sound &B"
+
+#: wx-xrc-strings.h:334
+msgid "Direct3D 9"
+msgstr "Direct3D 9"
+
+#: wx-xrc-strings.h:380
+msgid "DirectSound"
+msgstr "DirectSound"
+
+#: wx-xrc-strings.h:410
+msgid "Directories config"
+msgstr "Directories config"
+
+#: wx-xrc-strings.h:319
+msgid "Disable status messages"
+msgstr "Disable status messages"
+
+#: wx-xrc-strings.h:295 wx-xrc-strings.h:311
+msgid "Disabled"
+msgstr "Disabled"
+
+#: wx-xrc-strings.h:507 wx-xrc-strings.h:533
+msgid "Disassemble"
+msgstr "Disassemble"
+
+#: wx-xrc-strings.h:232
+msgid "Display &borders :"
+msgstr "Display &borders :"
+
+#: wx-xrc-strings.h:366
+msgid "Display settings"
+msgstr "Display settings"
+
+#: wx-xrc-strings.h:49
+msgid "Do not change &battery save"
+msgstr "Do not change &battery save"
+
+#: wx-xrc-strings.h:50
+msgid "Do not change &cheat list"
+msgstr "Do not change &cheat list"
+
+#: wx-xrc-strings.h:419
+msgid "Down"
+msgstr "Down"
+
+#: ../src/wx/guiinit.cpp:2159
+#, c-format
+msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
+msgstr "Duplicate menu accelerator: %s for %s and %s; keeping first"
+
+#: wx-xrc-strings.h:177
+msgid "E&qual"
+msgstr "E&qual"
+
+#: wx-xrc-strings.h:269 wx-xrc-strings.h:300
+msgid "EEPROM"
+msgstr "EEPROM"
+
+#: wx-xrc-strings.h:272
+msgid "EEPROM + Sensor"
+msgstr "EEPROM + Sensor"
+
+#: ../src/wx/cmdevents.cpp:813
+msgid "EEPROM saves cannot be exported"
+msgstr "EEPROM saves cannot be exported"
+
+#: wx-xrc-strings.h:303
+msgid "EEPROM+Sensor"
+msgstr "EEPROM+Sensor"
+
+#: wx-xrc-strings.h:393
+msgid "Echo"
+msgstr "Echo"
+
+#: wx-xrc-strings.h:176
+msgid "Edit cheat"
+msgstr "Edit cheat"
+
+#: wx-xrc-strings.h:236
+msgid "Emulate a Game Boy &Printer"
+msgstr "Emulate a Game Boy &Printer"
+
+#: wx-xrc-strings.h:239
+msgid "Emulate gameboy washed colors"
+msgstr "Emulate gameboy washed colors"
+
+#: wx-xrc-strings.h:225
+msgid "Emulated &system :"
+msgstr "Emulated &system :"
+
+#: wx-xrc-strings.h:407
+msgid "Emulator Saves"
+msgstr "Emulator Saves"
+
+#: wx-xrc-strings.h:242 wx-xrc-strings.h:283
+msgid "Enable &automatic frame skipping"
+msgstr "Enable &automatic frame skipping"
+
+#: wx-xrc-strings.h:280
+msgid "Enable AGB Printer"
+msgstr "Enable AGB Printer"
+
+#: wx-xrc-strings.h:339
+msgid "Enable MMX"
+msgstr "Enable MMX"
+
+#: wx-xrc-strings.h:383
+msgid "Enable hardware acceleration"
+msgstr "Enable hardware acceleration"
+
+#: wx-xrc-strings.h:442
+msgid "Enable joybus"
+msgstr "Enable joybus"
+
+#: wx-xrc-strings.h:444
+msgid "Enable link"
+msgstr "Enable link"
+
+#: wx-xrc-strings.h:340
+msgid "Enable multithreading"
+msgstr "Enable multithreading"
+
+#: wx-xrc-strings.h:279
+msgid "Enable real-time clock"
+msgstr "Enable real-time clock"
+
+#: wx-xrc-strings.h:382
+msgid "Enable stereo upmixing"
+msgstr "Enable stereo upmixing"
+
+#: wx-xrc-strings.h:445
+msgid "Enable wireless"
+msgstr "Enable wireless"
+
+#: wx-xrc-strings.h:296 wx-xrc-strings.h:312
+msgid "Enabled"
+msgstr "Enabled"
+
+#: wx-xrc-strings.h:388 wx-xrc-strings.h:389
+msgid "Enhance sound"
+msgstr "Enhance sound"
+
+#: wx-xrc-strings.h:624
+msgid "Enter address and size"
+msgstr "Enter address and size"
+
+#: ../src/wx/guiinit.cpp:182
+#, c-format
+msgid ""
+"Error %d occurred.\n"
+"Please try again."
+msgstr ""
+"Error %d occurred.\n"
+"Please try again."
+
+#: ../src/wx/panel.cpp:1979
+#, c-format
+msgid "Error in audio recording (%s); aborting"
+msgstr "Error in audio recording (%s); aborting"
+
+#: ../src/wx/panel.cpp:1974
+#, c-format
+msgid "Error in audio/video recording (%s); aborting"
+msgstr "Error in audio/video recording (%s); aborting"
+
+#: ../src/wx/panel.cpp:1988
+#, c-format
+msgid "Error in video recording (%s); aborting"
+msgstr "Error in video recording (%s); aborting"
+
+#: ../src/wx/cmdevents.cpp:647
+#, c-format
+msgid "Error loading battery %s"
+msgstr "Error loading battery %s"
+
+#: ../src/wx/cmdevents.cpp:742
+#, c-format
+msgid "Error loading code file %s"
+msgstr "Error loading code file %s"
+
+#: ../src/wx/cmdevents.cpp:786
+#, c-format
+msgid "Error loading snapshot file %s"
+msgstr "Error loading snapshot file %s"
+
+#: ../src/wx/panel.cpp:484
+#, c-format
+msgid "Error loading state %s"
+msgstr "Error loading state %s"
+
+#: ../src/wx/guiinit.cpp:126
+msgid ""
+"Error occurred.\n"
+"Please try again."
+msgstr ""
+"Error occurred.\n"
+"Please try again."
+
+#: ../src/wx/sys.cpp:933
+#, c-format
+msgid "Error opening pseudo tty: %s"
+msgstr "Error opening pseudo tty: %s"
+
+#: ../src/wx/sys.cpp:179 ../src/wx/sys.cpp:187
+msgid "Error reading game recording"
+msgstr "Error reading game recording"
+
+#: ../src/wx/cmdevents.cpp:843
+#, c-format
+msgid "Error saving snapshot file %s"
+msgstr "Error saving snapshot file %s"
+
+#: ../src/wx/panel.cpp:508
+#, c-format
+msgid "Error saving state %s"
+msgstr "Error saving state %s"
+
+#: ../src/wx/sys.cpp:1019
+#, c-format
+msgid "Error setting up server socket (%d)"
+msgstr "Error setting up server socket (%d)"
+
+#: ../src/wx/cmdevents.cpp:806 ../src/wx/panel.cpp:538
+#, c-format
+msgid "Error writing battery %s"
+msgstr "Error writing battery %s"
+
+#: ../src/wx/sys.cpp:123 ../src/wx/sys.cpp:143 ../src/wx/sys.cpp:269
+msgid "Error writing game recording"
+msgstr "Error writing game recording"
+
+#: ../src/wx/panel.cpp:860
+msgid "Error writing rewind state"
+msgstr "Error writing rewind state"
+
+#: wx-xrc-strings.h:150
+msgid "Export GameShark Snapshot"
+msgstr "Export GameShark Snapshot"
+
+#: ../src/wx/cmdevents.cpp:831
+msgid "Exported from VisualBoyAdvance-M"
+msgstr "Exported from VisualBoyAdvance-M"
+
+#: wx-xrc-strings.h:497
+msgid "F"
+msgstr "F"
+
+#: ../src/wx/panel.cpp:722
+#, c-format
+msgid "Failed to change mode to %dx%d-%d@%d"
+msgstr "Failed to change mode to %dx%d-%d@%d"
+
+#: wx-xrc-strings.h:338
+msgid "Filters"
+msgstr "Filters"
+
+#: wx-xrc-strings.h:67
+msgid "Find c&heat ..."
+msgstr "Find c&heat ..."
+
+#: wx-xrc-strings.h:635 wx-xrc-strings.h:646
+msgid "Flags:"
+msgstr "Flags:"
+
+#: wx-xrc-strings.h:271 wx-xrc-strings.h:302
+msgid "Flash"
+msgstr "Flash"
+
+#: wx-xrc-strings.h:305
+msgid "Flash Size:"
+msgstr "Flash Size:"
+
+#: wx-xrc-strings.h:274
+msgid "Flash size :"
+msgstr "Flash size :"
+
+#: wx-xrc-strings.h:592 wx-xrc-strings.h:606
+msgid "Flip:"
+msgstr "Flip:"
+
+#: wx-xrc-strings.h:203
+msgid "Format"
+msgstr "Format"
+
+#: wx-xrc-strings.h:574
+msgid "Frame"
+msgstr "Frame"
+
+#: wx-xrc-strings.h:572
+msgid "Frame 0"
+msgstr "Frame 0"
+
+#: wx-xrc-strings.h:573
+msgid "Frame 1"
+msgstr "Frame 1"
+
+#: wx-xrc-strings.h:241 wx-xrc-strings.h:282
+msgid "Frame Skip"
+msgstr "Frame Skip"
+
+#: wx-xrc-strings.h:48
+msgid "From &File ..."
+msgstr "From &File ..."
+
+#: wx-xrc-strings.h:327
+msgid "Full screen"
+msgstr "Full screen"
+
+#: wx-xrc-strings.h:329
+msgid "Full screen at startup"
+msgstr "Full screen at startup"
+
+#: wx-xrc-strings.h:341
+msgid "Fullscreen filter :"
+msgstr "Fullscreen filter :"
+
+#: ../src/wx/panel.cpp:708
+#, c-format
+msgid "Fullscreen mode %dx%d-%d@%d not supported"
+msgstr "Fullscreen mode %dx%d-%d@%d not supported"
+
+#: ../src/wx/panel.cpp:678
+#, c-format
+msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
+msgstr "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
+
+#: wx-xrc-strings.h:504 wx-xrc-strings.h:530
+msgid "G&oto PC"
+msgstr "G&oto PC"
+
+#: wx-xrc-strings.h:182
+msgid "G&reater or equal"
+msgstr "G&reater or equal"
+
+#: ../src/wx/viewsupt.cpp:680
+msgid "G:"
+msgstr "G:"
+
+#: wx-xrc-strings.h:114
+msgid "GB Printer"
+msgstr "GB Printer"
+
+#: ../src/wx/cmdevents.cpp:1651
+msgid "GDB Connection"
+msgstr "GDB Connection"
+
+#: ../src/wx/cmdevents.cpp:754
+msgid ""
+"GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots (*.gsv)|"
+"*.gsv"
+msgstr ""
+"GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots (*.gsv)|"
+"*.gsv"
+
+#: wx-xrc-strings.h:102
+msgid "Game &Boy ..."
+msgstr "Game &Boy ..."
+
+#: wx-xrc-strings.h:231 wx-xrc-strings.h:397
+msgid "Game Boy"
+msgstr "Game Boy"
+
+#: wx-xrc-strings.h:103
+msgid "Game Boy &Advance ..."
+msgstr "Game Boy &Advance ..."
+
+#: wx-xrc-strings.h:227 wx-xrc-strings.h:402
+msgid "Game Boy Advance"
+msgstr "Game Boy Advance"
+
+#: wx-xrc-strings.h:404
+msgid "Game Boy Advance ROMs"
+msgstr "Game Boy Advance ROMs"
+
+#: wx-xrc-strings.h:290
+msgid "Game Boy Advance settings"
+msgstr "Game Boy Advance settings"
+
+#: wx-xrc-strings.h:228
+msgid "Game Boy Color"
+msgstr "Game Boy Color"
+
+#: wx-xrc-strings.h:405
+msgid "Game Boy ROMs"
+msgstr "Game Boy ROMs"
+
+#: wx-xrc-strings.h:291
+msgid "Game Code"
+msgstr "Game Code"
+
+#: wx-xrc-strings.h:314
+msgid "Game Overrides"
+msgstr "Game Overrides"
+
+#: wx-xrc-strings.h:124
+msgid "Game code:"
+msgstr "Game code:"
+
+#: wx-xrc-strings.h:123 wx-xrc-strings.h:132
+msgid "Game title:"
+msgstr "Game title:"
+
+#: ../src/wx/cmdevents.cpp:77
+msgid ""
+"GameBoy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb)|*.agb;*.gba;*.bin;*.elf;"
+"*.mb*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz*.agb.z;*.gba.z;*.bin.z;*.elf."
+"z;*.mb.z|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb)|*.dmg;*.gb;*.gbc;*.cgb;"
+"*.sgb*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz*.dmg.z;*.gb.z;*.gbc.z;*.cgb."
+"z;*.sgb.z|Archives (*.zip;*.7z;*.rar)|*.zip;*.7z;*.rar|"
+msgstr ""
+"GameBoy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb)|*.agb;*.gba;*.bin;*.elf;"
+"*.mb*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz*.agb.z;*.gba.z;*.bin.z;*.elf."
+"z;*.mb.z|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb)|*.dmg;*.gb;*.gbc;*.cgb;"
+"*.sgb*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz*.dmg.z;*.gb.z;*.gbc.z;*.cgb."
+"z;*.sgb.z|Archives (*.zip;*.7z;*.rar)|*.zip;*.7z;*.rar|"
+
+#: wx-xrc-strings.h:224
+msgid "GameBoy settings"
+msgstr "GameBoy settings"
+
+#: ../src/wx/cmdevents.cpp:505 ../src/wx/guiinit.cpp:642
+msgid "GameGenie"
+msgstr "GameGenie"
+
+#: ../src/wx/guiinit.cpp:641 wx-xrc-strings.h:434
+msgid "GameShark"
+msgstr "GameShark"
+
+#: ../src/wx/guiinit.cpp:645
+msgid "GameShark Advance"
+msgstr "GameShark Advance"
+
+#: ../src/wx/cmdevents.cpp:508
+msgid "GameShark V3.0"
+msgstr "GameShark V3.0"
+
+#: ../src/wx/cmdevents.cpp:755
+msgid "Gameboy Snapshot (*.gbs)|*.gbs"
+msgstr "Gameboy Snapshot (*.gbs)|*.gbs"
+
+#: wx-xrc-strings.h:8
+msgid "Gameshark &code file..."
+msgstr "Gameshark &code file..."
+
+#: ../src/wx/cmdevents.cpp:658
+msgid "Gameshark Code File (*.gcf)|*.gcf"
+msgstr "Gameshark Code File (*.gcf)|*.gcf"
+
+#: ../src/wx/cmdevents.cpp:657
+msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
+msgstr "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
+
+#: ../src/wx/cmdevents.cpp:819
+msgid "Gameshark Snapshot (*.sps)|*.sps"
+msgstr "Gameshark Snapshot (*.sps)|*.sps"
+
+#: wx-xrc-strings.h:205
+msgid "General"
+msgstr "General"
+
+#: ../src/wx/guiinit.cpp:644
+msgid "Generic Code"
+msgstr "Generic Code"
+
+#: wx-xrc-strings.h:257
+msgid "Green Forest"
+msgstr "Green Forest"
+
+#: wx-xrc-strings.h:527
+msgid "H"
+msgstr "H"
+
+#: wx-xrc-strings.h:515
+msgid "HL:"
+msgstr "HL:"
+
+#: wx-xrc-strings.h:356
+msgid "HQ 3x"
+msgstr "HQ 3x"
+
+#: wx-xrc-strings.h:358
+msgid "HQ 4x"
+msgstr "HQ 4x"
+
+#: wx-xrc-strings.h:352
+msgid "HQ2x"
+msgstr "HQ2x"
+
+#: ../src/wx/widgets/joyedit.cpp:100
+#, c-format
+msgid "Hat%dE"
+msgstr "Hat%dE"
+
+#: ../src/wx/widgets/joyedit.cpp:91
+#, c-format
+msgid "Hat%dN"
+msgstr "Hat%dN"
+
+#: ../src/wx/widgets/joyedit.cpp:106
+#, c-format
+msgid "Hat%dNE"
+msgstr "Hat%dNE"
+
+#: ../src/wx/widgets/joyedit.cpp:103
+#, c-format
+msgid "Hat%dNW"
+msgstr "Hat%dNW"
+
+#: ../src/wx/widgets/joyedit.cpp:94
+#, c-format
+msgid "Hat%dS"
+msgstr "Hat%dS"
+
+#: ../src/wx/widgets/joyedit.cpp:112
+#, c-format
+msgid "Hat%dSE"
+msgstr "Hat%dSE"
+
+#: ../src/wx/widgets/joyedit.cpp:109
+#, c-format
+msgid "Hat%dSW"
+msgstr "Hat%dSW"
+
+#: ../src/wx/widgets/joyedit.cpp:97
+#, c-format
+msgid "Hat%dW"
+msgstr "Hat%dW"
+
+#: ../src/wx/widgets/joyedit.cpp:146
+msgid ""
+"Hat([0-9]+)((N|North|U|Up)|(S|South|D|Down)|(E|East|R|Right)|(W|West|L|Left)|"
+"(NE|NorthEast|UR|UpRight)|(SE|SouthEast|DR|DownRight)|(SW|SouthWest|DL|"
+"DownLeft)|(NW|NorthWest|UL|UpLeft))"
+msgstr ""
+"Hat([0-9]+)((N|North|U|Up)|(S|South|D|Down)|(E|East|R|Right)|(W|West|L|Left)|"
+"(NE|NorthEast|UR|UpRight)|(SE|SouthEast|DR|DownRight)|(SW|SouthWest|DL|"
+"DownLeft)|(NW|NorthWest|UL|UpLeft))"
+
+#: ../src/wx/guiinit.cpp:1454
+msgid "Host name invalid"
+msgstr "Host name invalid"
+
+#: wx-xrc-strings.h:258
+msgid "Hot Desert"
+msgstr "Hot Desert"
+
+#: wx-xrc-strings.h:495
+msgid "I"
+msgstr "I"
+
+#: wx-xrc-strings.h:549
+msgid "I/O Viewer"
+msgstr "I/O Viewer"
+
+#: wx-xrc-strings.h:521
+msgid "IFF:"
+msgstr "IFF:"
+
+#: wx-xrc-strings.h:212
+msgid "If not empty or 0, enable rewind (seconds)"
+msgstr "If not empty or 0, enable rewind (seconds)"
+
+#: wx-xrc-strings.h:537
+msgid "Illegal &read"
+msgstr "Illegal &read"
+
+#: wx-xrc-strings.h:536
+msgid "Illegal &write"
+msgstr "Illegal &write"
+
+#: ../src/wx/sys.cpp:591
+msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
+msgstr "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
+
+#: ../src/wx/cmdevents.cpp:640
+msgid ""
+"Importing a battery file will erase any saved games (permanently after the "
+"next write).  Do you want to continue?"
+msgstr ""
+"Importing a battery file will erase any saved games (permanently after the "
+"next write).  Do you want to continue?"
+
+#: ../src/wx/cmdevents.cpp:665
+msgid ""
+"Importing a code file will replace any loaded cheats.  Do you want to "
+"continue?"
+msgstr ""
+"Importing a code file will replace any loaded cheats.  Do you want to "
+"continue?"
+
+#: ../src/wx/cmdevents.cpp:762
+msgid ""
+"Importing a snapshot file will erase any saved games (permanently after the "
+"next write).  Do you want to continue?"
+msgstr ""
+"Importing a snapshot file will erase any saved games (permanently after the "
+"next write).  Do you want to continue?"
+
+#: wx-xrc-strings.h:669
+msgid "Index:"
+msgstr "Index:"
+
+#: wx-xrc-strings.h:361
+msgid "Interframe blending :"
+msgstr "Interframe blending :"
+
+#: wx-xrc-strings.h:364
+msgid "Interframe motion blur"
+msgstr "Interframe motion blur"
+
+#: ../src/wx/opts.cpp:657
+#, c-format
+msgid "Invalid flag option %s - %s ignored"
+msgstr "Invalid flag option %s - %s ignored"
+
+#: ../src/wx/opts.cpp:503 ../src/wx/opts.cpp:520 ../src/wx/opts.cpp:745
+#: ../src/wx/opts.cpp:765
+#, c-format
+msgid "Invalid key binding %s for %s"
+msgstr "Invalid key binding %s for %s"
+
+#: ../src/wx/guiinit.cpp:2277
+#, c-format
+msgid "Invalid menu item %s; removing"
+msgstr "Invalid menu item %s; removing"
+
+#: ../src/wx/opts.cpp:318 ../src/wx/opts.cpp:358 ../src/wx/opts.cpp:382
+#: ../src/wx/opts.cpp:391
+#, c-format
+msgid "Invalid option %s present; removing if possible"
+msgstr "Invalid option %s present; removing if possible"
+
+#: ../src/wx/opts.cpp:346 ../src/wx/opts.cpp:369
+#, c-format
+msgid "Invalid option group %s present; removing if possible"
+msgstr "Invalid option group %s present; removing if possible"
+
+#: ../src/wx/opts.cpp:454 ../src/wx/opts.cpp:691
+#, c-format
+msgid "Invalid value %d for option %s; valid values are %d - %d"
+msgstr "Invalid value %d for option %s; valid values are %d - %d"
+
+#: ../src/wx/opts.cpp:432 ../src/wx/opts.cpp:676
+#, c-format
+msgid "Invalid value %s for option %s; valid values are %s%s%s"
+msgstr "Invalid value %s for option %s; valid values are %s%s%s"
+
+#: ../src/wx/widgets/joyedit.cpp:78
+#, c-format
+msgid "Joy%d-"
+msgstr "Joy%d-"
+
+#: ../src/wx/guiinit.cpp:3205
+msgid "JoyBus host invalid; disabling"
+msgstr "JoyBus host invalid; disabling"
+
+#: wx-xrc-strings.h:443
+msgid "Joybus host"
+msgstr "Joybus host"
+
+#: wx-xrc-strings.h:415
+msgid "Joypad Configuration"
+msgstr "Joypad Configuration"
+
+#: wx-xrc-strings.h:422
+msgid "L"
+msgstr "L"
+
+#: wx-xrc-strings.h:180
+msgid "L&ess or equal"
+msgstr "L&ess or equal"
+
+#: ../src/wx/cmdevents.cpp:1165
+msgid "LAN link is already active.  Disable link mode to disconnect."
+msgstr "LAN link is already active.  Disable link mode to disconnect."
+
+#: wx-xrc-strings.h:353
+msgid "LQ2x"
+msgstr "LQ2x"
+
+#: wx-xrc-strings.h:488
+msgid "LR:"
+msgstr "LR:"
+
+#: wx-xrc-strings.h:523
+msgid "LY:"
+msgstr "LY:"
+
+#: wx-xrc-strings.h:421
+msgid "Left"
+msgstr "Left"
+
+#: wx-xrc-strings.h:396
+msgid "Left/Right"
+msgstr "Left/Right"
+
+#: wx-xrc-strings.h:143
+msgid "License code:"
+msgstr "License code:"
+
+#: wx-xrc-strings.h:441
+msgid "Link Options"
+msgstr "Link Options"
+
+#: wx-xrc-strings.h:447
+msgid "Link timeout (in milliseconds)"
+msgstr "Link timeout (in milliseconds)"
+
+#: wx-xrc-strings.h:66
+msgid "List &cheats ..."
+msgstr "List &cheats ..."
+
+#: ../src/wx/wxvbam.cpp:255
+msgid "List all settable options and exit"
+msgstr "List all settable options and exit"
+
+#: ../src/wx/cmdevents.cpp:645 ../src/wx/panel.cpp:292
+#, c-format
+msgid "Loaded battery %s"
+msgstr "Loaded battery %s"
+
+#: ../src/wx/guiinit.cpp:277 ../src/wx/panel.cpp:318
+msgid "Loaded cheats"
+msgstr "Loaded cheats"
+
+#: ../src/wx/cmdevents.cpp:740
+#, c-format
+msgid "Loaded code file %s"
+msgstr "Loaded code file %s"
+
+#: ../src/wx/cmdevents.cpp:784
+#, c-format
+msgid "Loaded snapshot file %s"
+msgstr "Loaded snapshot file %s"
+
+#: ../src/wx/panel.cpp:484
+#, c-format
+msgid "Loaded state %s"
+msgstr "Loaded state %s"
+
+#: wx-xrc-strings.h:548
+msgid "Logging"
+msgstr "Logging"
+
+#: wx-xrc-strings.h:392
+msgid "Lots"
+msgstr "Lots"
+
+#: wx-xrc-strings.h:91
+msgid "M&emory viewer..."
+msgstr "M&emory viewer..."
+
+#: ../src/wx/guiinit.cpp:2048
+msgid "Main display panel not found"
+msgstr "Main display panel not found"
+
+#: ../src/wx/guiinit.cpp:2062
+msgid "Main icon not found"
+msgstr "Main icon not found"
+
+#: wx-xrc-strings.h:127
+msgid "Main unit code:"
+msgstr "Main unit code:"
+
+#: wx-xrc-strings.h:125 wx-xrc-strings.h:133
+msgid "Maker code:"
+msgstr "Maker code:"
+
+#: wx-xrc-strings.h:126 wx-xrc-strings.h:134
+msgid "Maker name:"
+msgstr "Maker name:"
+
+#: wx-xrc-strings.h:601
+msgid "Map Base"
+msgstr "Map Base"
+
+#: wx-xrc-strings.h:583
+msgid "Map Base:"
+msgstr "Map Base:"
+
+#: wx-xrc-strings.h:571 wx-xrc-strings.h:611
+msgid "Map view"
+msgstr "Map view"
+
+#: wx-xrc-strings.h:370 wx-xrc-strings.h:401
+msgid "Maximum"
+msgstr "Maximum"
+
+#: wx-xrc-strings.h:324
+msgid "Maximum magnification factor :"
+msgstr "Maximum magnification factor :"
+
+#: ../src/wx/viewers.cpp:615 ../src/wx/viewers.cpp:662
+msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
+msgstr "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
+
+#: wx-xrc-strings.h:621
+msgid "Memory viewer"
+msgstr "Memory viewer"
+
+#: ../src/wx/guiinit.cpp:2171
+#, c-format
+msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
+msgstr "Menu accelerator %s for %s overrides default for %s ; keeping menu"
+
+#: ../src/wx/guiinit.cpp:3098
+msgid "Menu commands"
+msgstr "Menu commands"
+
+#: ../src/wx/widgets/keyedit.cpp:140
+msgid "Meta+"
+msgstr "Meta+"
+
+#: ../src/wx/widgets/keyedit.cpp:95 ../src/wx/widgets/keyedit.cpp:139
+msgid "Meta-"
+msgstr "Meta-"
+
+#: wx-xrc-strings.h:309
+msgid "Mirroring:"
+msgstr "Mirroring:"
+
+#: wx-xrc-strings.h:501 wx-xrc-strings.h:582 wx-xrc-strings.h:628
+msgid "Mode:"
+msgstr "Mode:"
+
+#: wx-xrc-strings.h:588
+msgid "Mosaic:"
+msgstr "Mosaic:"
+
+#: wx-xrc-strings.h:36
+msgid "Most &recent"
+msgstr "Most &recent"
+
+#: wx-xrc-strings.h:430
+msgid "Motion Down"
+msgstr "Motion Down"
+
+#: wx-xrc-strings.h:432
+msgid "Motion Left"
+msgstr "Motion Left"
+
+#: wx-xrc-strings.h:433
+msgid "Motion Right"
+msgstr "Motion Right"
+
+#: wx-xrc-strings.h:428
+msgid "Motion Up"
+msgstr "Motion Up"
+
+#: wx-xrc-strings.h:368
+msgid "Mute"
+msgstr "Mute"
+
+#: wx-xrc-strings.h:494 wx-xrc-strings.h:526
+msgid "N"
+msgstr "N"
+
+#: wx-xrc-strings.h:406
+msgid "Native Saves"
+msgstr "Native Saves"
+
+#: wx-xrc-strings.h:165
+msgid "Network Link"
+msgstr "Network Link"
+
+#: wx-xrc-strings.h:233
+msgid "Never"
+msgstr "Never"
+
+#: ../src/wx/guiinit.cpp:2591
+msgid "New Value"
+msgstr "New Value"
+
+#: ../src/wx/cmdevents.cpp:2178
+msgid "Nintendo GameBoy (+Color+Advance) emulator."
+msgstr "Nintendo GameBoy (+Color+Advance) emulator."
+
+#: ../src/wx/sys.cpp:108 ../src/wx/sys.cpp:158
+msgid "No game in progress to record"
+msgstr "No game in progress to record"
+
+#: ../src/wx/panel.cpp:853
+msgid "No memory for rewinding"
+msgstr "No memory for rewinding"
+
+#: wx-xrc-strings.h:217
+msgid "No throttle"
+msgstr "No throttle"
+
+#: ../src/wx/guiinit.cpp:1619
+#, c-format
+msgid "No usable rpi plugins found in %s"
+msgstr "No usable rpi plugins found in %s"
+
+#: ../src/wx/cmdevents.cpp:557 ../src/wx/guiinit.cpp:1582 wx-xrc-strings.h:273
+#: wx-xrc-strings.h:304 wx-xrc-strings.h:316 wx-xrc-strings.h:342
+#: wx-xrc-strings.h:362 wx-xrc-strings.h:391 wx-xrc-strings.h:400
+msgid "None"
+msgstr "None"
+
+#: ../src/wx/panel.cpp:774
+msgid "Not a valid GBA cartridge"
+msgstr "Not a valid GBA cartridge"
+
+#: wx-xrc-strings.h:149
+msgid "Notes:"
+msgstr "Notes:"
+
+#: ../src/wx/guiinit.cpp:705 ../src/wx/guiinit.cpp:911
+msgid "Number cannot be empty"
+msgstr "Number cannot be empty"
+
+#: wx-xrc-strings.h:385
+msgid "Number of sound buffers:"
+msgstr "Number of sound buffers:"
+
+#: wx-xrc-strings.h:77
+msgid "O&BJ WIN"
+msgstr "O&BJ WIN"
+
+#: wx-xrc-strings.h:625 wx-xrc-strings.h:652
+msgid "OAM Viewer"
+msgstr "OAM Viewer"
+
+#: wx-xrc-strings.h:644
+msgid "OAP:"
+msgstr "OAP:"
+
+#: wx-xrc-strings.h:162
+msgid "Off (accurate)"
+msgstr "Off (accurate)"
+
+#: wx-xrc-strings.h:192
+msgid "Ol&d value"
+msgstr "Ol&d value"
+
+#: ../src/wx/guiinit.cpp:2590
+msgid "Old Value"
+msgstr "Old Value"
+
+#: wx-xrc-strings.h:163
+msgid "On (fast)"
+msgstr "On (fast)"
+
+#: wx-xrc-strings.h:321
+msgid "On-Screen Display"
+msgstr "On-Screen Display"
+
+#: ../src/wx/cmdevents.cpp:88
+msgid "Open ROM file"
+msgstr "Open ROM file"
+
+#: wx-xrc-strings.h:166
+msgid "Open cheat list"
+msgstr "Open cheat list"
+
+#: wx-xrc-strings.h:3
+msgid "Open rece&nt"
+msgstr "Open rece&nt"
+
+#: wx-xrc-strings.h:378
+msgid "OpenAL"
+msgstr "OpenAL"
+
+#: ../src/wx/openal.cpp:161
+msgid ""
+"OpenAL library could not be found on your system.  Please install the "
+"runtime from http://openal.org"
+msgstr ""
+"OpenAL library could not be found on your system.  Please install the "
+"runtime from http://openal.org"
+
+#: wx-xrc-strings.h:333
+msgid "OpenGL"
+msgstr "OpenGL"
+
+#: ../src/wx/wxvbam.cpp:334
+msgid ""
+"Options set from the command line are saved if any configuration changes are "
+"made in the user interface.\n"
+"\n"
+"For flag options, true and false are specified as 1 and 0, respectively.\n"
+"\n"
+msgstr ""
+"Options set from the command line are saved if any configuration changes are "
+"made in the user interface.\n"
+"\n"
+"For flag options, true and false are specified as 1 and 0, respectively.\n"
+"\n"
+
+#: ../src/wx/guiinit.cpp:3119
+msgid "Other commands"
+msgstr "Other commands"
+
+#: wx-xrc-strings.h:331
+msgid "Output module"
+msgstr "Output module"
+
+#: wx-xrc-strings.h:589
+msgid "Overflow:"
+msgstr "Overflow:"
+
+#: wx-xrc-strings.h:490 wx-xrc-strings.h:519
+msgid "PC:"
+msgstr "PC:"
+
+#: ../src/wx/cmdevents.cpp:865 ../src/wx/viewsupt.cpp:1024
+msgid "PNG images|*.png|BMP images|*.bmp"
+msgstr "PNG images|*.png|BMP images|*.bmp"
+
+#: wx-xrc-strings.h:630 wx-xrc-strings.h:645
+msgid "Pal:"
+msgstr "Pal:"
+
+#: wx-xrc-strings.h:653 wx-xrc-strings.h:673
+msgid "Palette View"
+msgstr "Palette View"
+
+#: wx-xrc-strings.h:593 wx-xrc-strings.h:607 wx-xrc-strings.h:684
+#: wx-xrc-strings.h:697
+msgid "Palette:"
+msgstr "Palette:"
+
+#: wx-xrc-strings.h:206
+msgid "Pause when &inactive"
+msgstr "Pause when &inactive"
+
+#: wx-xrc-strings.h:317
+msgid "Percentage"
+msgstr "Percentage"
+
+#: wx-xrc-strings.h:259
+msgid "Pink Dreams"
+msgstr "Pink Dreams"
+
+#: wx-xrc-strings.h:346
+msgid "Pixelate"
+msgstr "Pixelate"
+
+#: ../src/wx/sys.cpp:280
+msgid "Playback ended"
+msgstr "Playback ended"
+
+#: ../src/wx/guiinit.cpp:105
+#, c-format
+msgid "Player %d connected\n"
+msgstr "Player %d connected\n"
+
+#: wx-xrc-strings.h:411
+msgid "Player 1"
+msgstr "Player 1"
+
+#: wx-xrc-strings.h:412
+msgid "Player 2"
+msgstr "Player 2"
+
+#: wx-xrc-strings.h:413
+msgid "Player 3"
+msgstr "Player 3"
+
+#: wx-xrc-strings.h:414
+msgid "Player 4"
+msgstr "Player 4"
+
+#: wx-xrc-strings.h:153
+msgid "Players:"
+msgstr "Players:"
+
+#: wx-xrc-strings.h:446
+msgid ""
+"Please note that this is the first version of RFU emulation code and it's "
+"probably got more bugs than the link code.  Also, it is only supported with "
+"2 players in local mode."
+msgstr ""
+"Please note that this is the first version of RFU emulation code and it's "
+"probably got more bugs than the link code.  Also, it is only supported with "
+"2 players in local mode."
+
+#: ../src/wx/guiinit.cpp:1659
+msgid "Please select a plugin or a different filter"
+msgstr "Please select a plugin or a different filter"
+
+#: ../src/wx/guiinit.cpp:1636 wx-xrc-strings.h:359
+msgid "Plugin"
+msgstr "Plugin"
+
+#: wx-xrc-strings.h:360
+msgid "Plugin :"
+msgstr "Plugin :"
+
+#: ../src/wx/guiinit.cpp:1660
+msgid "Plugin selection error"
+msgstr "Plugin selection error"
+
+#: ../src/wx/cmdevents.cpp:1650
+msgid "Port to wait for connection:"
+msgstr "Port to wait for connection:"
+
+#: wx-xrc-strings.h:627 wx-xrc-strings.h:641
+msgid "Pos:"
+msgstr "Pos:"
+
+#: wx-xrc-strings.h:223
+msgid "Preferences"
+msgstr "Preferences"
+
+#: wx-xrc-strings.h:115
+msgid "Print Si&ze"
+msgstr "Print Si&ze"
+
+#: ../src/wx/wxvbam.cpp:244
+msgid "Print configuration path and exit"
+msgstr "Print configuration path and exit"
+
+#: ../src/wx/sys.cpp:676
+msgid "Printed"
+msgstr "Printed"
+
+#: wx-xrc-strings.h:632 wx-xrc-strings.h:643
+msgid "Prio:"
+msgstr "Prio:"
+
+#: wx-xrc-strings.h:587 wx-xrc-strings.h:608
+msgid "Priority:"
+msgstr "Priority:"
+
+#: ../src/wx/panel.cpp:56 ../src/wx/panel.cpp:110 ../src/wx/panel.cpp:173
+msgid "Problem loading file"
+msgstr "Problem loading file"
+
+#: wx-xrc-strings.h:158
+msgid "Protocol:"
+msgstr "Protocol:"
+
+#: wx-xrc-strings.h:424
+msgid "R"
+msgstr "R"
+
+#: wx-xrc-strings.h:460
+msgid "R0:"
+msgstr "R0:"
+
+#: wx-xrc-strings.h:480
+msgid "R10:"
+msgstr "R10:"
+
+#: wx-xrc-strings.h:482
+msgid "R11:"
+msgstr "R11:"
+
+#: wx-xrc-strings.h:484
+msgid "R12:"
+msgstr "R12:"
+
+#: wx-xrc-strings.h:462
+msgid "R1:"
+msgstr "R1:"
+
+#: wx-xrc-strings.h:464
+msgid "R2:"
+msgstr "R2:"
+
+#: wx-xrc-strings.h:466
+msgid "R3:"
+msgstr "R3:"
+
+#: wx-xrc-strings.h:468
+msgid "R4:"
+msgstr "R4:"
+
+#: wx-xrc-strings.h:470
+msgid "R5:"
+msgstr "R5:"
+
+#: wx-xrc-strings.h:472
+msgid "R6:"
+msgstr "R6:"
+
+#: wx-xrc-strings.h:474
+msgid "R7:"
+msgstr "R7:"
+
+#: wx-xrc-strings.h:476
+msgid "R8:"
+msgstr "R8:"
+
+#: wx-xrc-strings.h:478
+msgid "R9:"
+msgstr "R9:"
+
+#: ../src/wx/viewsupt.cpp:675
+msgid "R:"
+msgstr "R:"
+
+#: wx-xrc-strings.h:141
+msgid "RAM size:"
+msgstr "RAM size:"
+
+#: ../src/wx/cmdevents.cpp:1170
+msgid "RFU is currently only supported in local mode."
+msgstr "RFU is currently only supported in local mode."
+
+#: ../src/wx/cmdevents.cpp:442
+msgid "ROM"
+msgstr "ROM"
+
+#: wx-xrc-strings.h:122 wx-xrc-strings.h:131 wx-xrc-strings.h:145
+msgid "ROM Information"
+msgstr "ROM Information"
+
+#: ../src/wx/wxvbam.cpp:257
+msgid "ROM file"
+msgstr "ROM file"
+
+#: wx-xrc-strings.h:6
+msgid "ROM in&formation..."
+msgstr "ROM in&formation..."
+
+#: wx-xrc-strings.h:140
+msgid "ROM size:"
+msgstr "ROM size:"
+
+#: wx-xrc-strings.h:129 wx-xrc-strings.h:137
+msgid "ROM version:"
+msgstr "ROM version:"
+
+#: ../src/wx/cmdevents.cpp:514
+msgid "ROM+BANDAI TAMA5"
+msgstr "ROM+BANDAI TAMA5"
+
+#: ../src/wx/cmdevents.cpp:520
+msgid "ROM+HuC-1"
+msgstr "ROM+HuC-1"
+
+#: ../src/wx/cmdevents.cpp:517
+msgid "ROM+HuC-3"
+msgstr "ROM+HuC-3"
+
+#: ../src/wx/cmdevents.cpp:445
+msgid "ROM+MBC1"
+msgstr "ROM+MBC1"
+
+#: ../src/wx/cmdevents.cpp:448
+msgid "ROM+MBC1+RAM"
+msgstr "ROM+MBC1+RAM"
+
+#: ../src/wx/cmdevents.cpp:451
+msgid "ROM+MBC1+RAM+BATT"
+msgstr "ROM+MBC1+RAM+BATT"
+
+#: ../src/wx/cmdevents.cpp:454
+msgid "ROM+MBC2"
+msgstr "ROM+MBC2"
+
+#: ../src/wx/cmdevents.cpp:457
+msgid "ROM+MBC2+BATT"
+msgstr "ROM+MBC2+BATT"
+
+#: ../src/wx/cmdevents.cpp:475
+msgid "ROM+MBC3"
+msgstr "ROM+MBC3"
+
+#: ../src/wx/cmdevents.cpp:478
+msgid "ROM+MBC3+RAM"
+msgstr "ROM+MBC3+RAM"
+
+#: ../src/wx/cmdevents.cpp:481
+msgid "ROM+MBC3+RAM+BATT"
+msgstr "ROM+MBC3+RAM+BATT"
+
+#: ../src/wx/cmdevents.cpp:469
+msgid "ROM+MBC3+TIMER+BATT"
+msgstr "ROM+MBC3+TIMER+BATT"
+
+#: ../src/wx/cmdevents.cpp:472
+msgid "ROM+MBC3+TIMER+RAM+BATT"
+msgstr "ROM+MBC3+TIMER+RAM+BATT"
+
+#: ../src/wx/cmdevents.cpp:484
+msgid "ROM+MBC5"
+msgstr "ROM+MBC5"
+
+#: ../src/wx/cmdevents.cpp:487
+msgid "ROM+MBC5+RAM"
+msgstr "ROM+MBC5+RAM"
+
+#: ../src/wx/cmdevents.cpp:490
+msgid "ROM+MBC5+RAM+BATT"
+msgstr "ROM+MBC5+RAM+BATT"
+
+#: ../src/wx/cmdevents.cpp:493
+msgid "ROM+MBC5+RUMBLE"
+msgstr "ROM+MBC5+RUMBLE"
+
+#: ../src/wx/cmdevents.cpp:496
+msgid "ROM+MBC5+RUMBLE+RAM"
+msgstr "ROM+MBC5+RUMBLE+RAM"
+
+#: ../src/wx/cmdevents.cpp:499
+msgid "ROM+MBC5+RUMBLE+RAM+BATT"
+msgstr "ROM+MBC5+RUMBLE+RAM+BATT"
+
+#: ../src/wx/cmdevents.cpp:502
+msgid "ROM+MBC7+BATT"
+msgstr "ROM+MBC7+BATT"
+
+#: ../src/wx/cmdevents.cpp:460
+msgid "ROM+MMM01"
+msgstr "ROM+MMM01"
+
+#: ../src/wx/cmdevents.cpp:463
+msgid "ROM+MMM01+RAM"
+msgstr "ROM+MMM01+RAM"
+
+#: ../src/wx/cmdevents.cpp:466
+msgid "ROM+MMM01+RAM+BATT"
+msgstr "ROM+MMM01+RAM+BATT"
+
+#: ../src/wx/cmdevents.cpp:511
+msgid "ROM+POCKET CAMERA"
+msgstr "ROM+POCKET CAMERA"
+
+#: wx-xrc-strings.h:505 wx-xrc-strings.h:531
+msgid "Re&fresh"
+msgstr "Re&fresh"
+
+#: wx-xrc-strings.h:452
+msgid "Re&set All"
+msgstr "Re&set All"
+
+#: wx-xrc-strings.h:65
+msgid "Re&wind"
+msgstr "Re&wind"
+
+#: wx-xrc-strings.h:262
+msgid "Real 'GB on GBASP' Colors"
+msgstr "Real 'GB on GBASP' Colors"
+
+#: wx-xrc-strings.h:261
+msgid "Real GB Colors"
+msgstr "Real GB Colors"
+
+#: wx-xrc-strings.h:293
+msgid "Real Time Clock:"
+msgstr "Real Time Clock:"
+
+#: wx-xrc-strings.h:409
+msgid "Recordings"
+msgstr "Recordings"
+
+#: ../src/wx/guiinit.cpp:325 ../src/wx/guiinit.cpp:342
+msgid "Removing cheats"
+msgstr "Removing cheats"
+
+#: wx-xrc-strings.h:112
+msgid "Report &Bugs"
+msgstr "Report &Bugs"
+
+#: wx-xrc-strings.h:266
+msgid "Restore"
+msgstr "Restore"
+
+#: ../src/wx/guiinit.cpp:324 ../src/wx/guiinit.cpp:341
+msgid "Restore old values?"
+msgstr "Restore old values?"
+
+#: wx-xrc-strings.h:323
+msgid "Retain aspect ratio"
+msgstr "Retain aspect ratio"
+
+#: wx-xrc-strings.h:423
+msgid "Right"
+msgstr "Right"
+
+#: wx-xrc-strings.h:634
+msgid "Rot.:"
+msgstr "Rot.:"
+
+#: wx-xrc-strings.h:184
+msgid "S&igned"
+msgstr "S&igned"
+
+#: wx-xrc-strings.h:377
+msgid "SDL"
+msgstr "SDL"
+
+#: ../src/wx/widgets/keyedit.cpp:78 ../src/wx/widgets/keyedit.cpp:166
+msgid "SHIFT"
+msgstr "SHIFT"
+
+#: wx-xrc-strings.h:486 wx-xrc-strings.h:517
+msgid "SP:"
+msgstr "SP:"
+
+#: wx-xrc-strings.h:270 wx-xrc-strings.h:301
+msgid "SRAM"
+msgstr "SRAM"
+
+#: wx-xrc-strings.h:534
+msgid "SW&I"
+msgstr "SW&I"
+
+#: wx-xrc-strings.h:371
+msgid "Sample rate :"
+msgstr "Sample rate :"
+
+#: wx-xrc-strings.h:662 wx-xrc-strings.h:666
+msgid "Save &BG..."
+msgstr "Save &BG..."
+
+#: wx-xrc-strings.h:663 wx-xrc-strings.h:668
+msgid "Save &Sprite..."
+msgstr "Save &Sprite..."
+
+#: wx-xrc-strings.h:297
+msgid "Save Type:"
+msgstr "Save Type:"
+
+#: ../src/wx/wxvbam.cpp:240
+msgid "Save built-in XRC file and exit"
+msgstr "Save built-in XRC file and exit"
+
+#: ../src/wx/wxvbam.cpp:242
+msgid "Save built-in vba-over.ini and exit"
+msgstr "Save built-in vba-over.ini and exit"
+
+#: wx-xrc-strings.h:167
+msgid "Save cheat list"
+msgstr "Save cheat list"
+
+#: ../src/wx/sys.cpp:598
+msgid "Save printer image to"
+msgstr "Save printer image to"
+
+#: wx-xrc-strings.h:267
+msgid "Save type :"
+msgstr "Save type :"
+
+#: ../src/wx/guiinit.cpp:300
+msgid "Saved cheats"
+msgstr "Saved cheats"
+
+#: ../src/wx/cmdevents.cpp:841
+#, c-format
+msgid "Saved snapshot file %s"
+msgstr "Saved snapshot file %s"
+
+#: ../src/wx/panel.cpp:508
+#, c-format
+msgid "Saved state %s"
+msgstr "Saved state %s"
+
+#: wx-xrc-strings.h:350
+msgid "Scanlines"
+msgstr "Scanlines"
+
+#: wx-xrc-strings.h:14
+msgid "Screen capt&ure..."
+msgstr "Screen capt&ure..."
+
+#: wx-xrc-strings.h:436
+msgid "Screenshot"
+msgstr "Screenshot"
+
+#: wx-xrc-strings.h:208
+msgid "Screenshot Format:"
+msgstr "Screenshot Format:"
+
+#: wx-xrc-strings.h:408
+msgid "Screenshots"
+msgstr "Screenshots"
+
+#: wx-xrc-strings.h:199
+msgid "Search for cheats"
+msgstr "Search for cheats"
+
+#: ../src/wx/guiinit.cpp:733
+#, c-format
+msgid "Search produced %d results.  Please refine better"
+msgstr "Search produced %d results.  Please refine better"
+
+#: ../src/wx/guiinit.cpp:743
+msgid "Search produced no results"
+msgstr "Search produced no results"
+
+#: wx-xrc-strings.h:194
+msgid "Search value"
+msgstr "Search value"
+
+#: wx-xrc-strings.h:146
+msgid "Selct codes to import"
+msgstr "Selct codes to import"
+
+#: wx-xrc-strings.h:425
+msgid "Select"
+msgstr "Select"
+
+#: ../src/wx/cmdevents.cpp:633 ../src/wx/cmdevents.cpp:795
+msgid "Select battery file"
+msgstr "Select battery file"
+
+#: ../src/wx/guiinit.cpp:262 ../src/wx/guiinit.cpp:285
+msgid "Select cheat file"
+msgstr "Select cheat file"
+
+#: ../src/wx/cmdevents.cpp:655
+msgid "Select code file"
+msgstr "Select code file"
+
+#: ../src/wx/cmdevents.cpp:1080
+msgid "Select file"
+msgstr "Select file"
+
+#: ../src/wx/viewers.cpp:617
+msgid "Select memory dump file"
+msgstr "Select memory dump file"
+
+#: ../src/wx/cmdevents.cpp:864 ../src/wx/cmdevents.cpp:941
+#: ../src/wx/cmdevents.cpp:1013 ../src/wx/cmdevents.cpp:1049
+#: ../src/wx/viewers.cpp:495 ../src/wx/viewers.cpp:664
+#: ../src/wx/viewsupt.cpp:1023
+msgid "Select output file"
+msgstr "Select output file"
+
+#: ../src/wx/gfxviewers.cpp:1041
+msgid "Select output file and type"
+msgstr "Select output file and type"
+
+#: ../src/wx/cmdevents.cpp:752 ../src/wx/cmdevents.cpp:818
+msgid "Select snapshot file"
+msgstr "Select snapshot file"
+
+#: ../src/wx/cmdevents.cpp:1246 ../src/wx/cmdevents.cpp:1328
+msgid "Select state file"
+msgstr "Select state file"
+
+#: wx-xrc-strings.h:151
+msgid "Server"
+msgstr "Server"
+
+#: ../src/wx/guiinit.cpp:94
+#, c-format
+msgid "Server IP address is: %s\n"
+msgstr "Server IP address is: %s\n"
+
+#: wx-xrc-strings.h:157
+msgid "Server:"
+msgstr "Server:"
+
+#: ../src/wx/cmdevents.cpp:1648
+msgid "Set to 0 for pseudo tty"
+msgstr "Set to 0 for pseudo tty"
+
+#: wx-xrc-strings.h:454
+msgid "Shortcut Key:"
+msgstr "Shortcut Key:"
+
+#: wx-xrc-strings.h:187
+msgid "Signed/Unsigned"
+msgstr "Signed/Unsigned"
+
+#: wx-xrc-strings.h:332
+msgid "Simple"
+msgstr "Simple"
+
+#: wx-xrc-strings.h:354
+msgid "Simple 2X"
+msgstr "Simple 2X"
+
+#: wx-xrc-strings.h:355
+msgid "Simple 3x"
+msgstr "Simple 3x"
+
+#: wx-xrc-strings.h:357
+msgid "Simple 4x"
+msgstr "Simple 4x"
+
+#: wx-xrc-strings.h:585 wx-xrc-strings.h:623 wx-xrc-strings.h:633
+msgid "Size:"
+msgstr "Size:"
+
+#: wx-xrc-strings.h:288
+msgid "Skip BIOS intro"
+msgstr "Skip BIOS intro"
+
+#: wx-xrc-strings.h:363
+msgid "Smart interframe blending"
+msgstr "Smart interframe blending"
+
+#: wx-xrc-strings.h:544
+msgid "Soun&d output"
+msgstr "Soun&d output"
+
+#: wx-xrc-strings.h:403
+msgid "Sound Settings"
+msgstr "Sound Settings"
+
+#: ../src/wx/cmdevents.cpp:1558
+msgid "Sound disabled"
+msgstr "Sound disabled"
+
+#: ../src/wx/cmdevents.cpp:1558
+msgid "Sound enabled"
+msgstr "Sound enabled"
+
+#: wx-xrc-strings.h:399
+msgid "Sound filtering"
+msgstr "Sound filtering"
+
+#: wx-xrc-strings.h:398
+msgid "Sound interpolation"
+msgstr "Sound interpolation"
+
+#: wx-xrc-strings.h:437
+msgid "Special"
+msgstr "Special"
+
+#: wx-xrc-strings.h:193
+msgid "Specific &value"
+msgstr "Specific &value"
+
+#: wx-xrc-strings.h:244 wx-xrc-strings.h:285
+msgid "Speed"
+msgstr "Speed"
+
+#: wx-xrc-strings.h:435
+msgid "Speed Up"
+msgstr "Speed Up"
+
+#: wx-xrc-strings.h:161
+msgid "Speed hacks:"
+msgstr "Speed hacks:"
+
+#: wx-xrc-strings.h:315
+msgid "Speed indicator :"
+msgstr "Speed indicator :"
+
+#: wx-xrc-strings.h:656 wx-xrc-strings.h:667
+msgid "Sprite"
+msgstr "Sprite"
+
+#: wx-xrc-strings.h:626 wx-xrc-strings.h:640
+msgid "Sprite:"
+msgstr "Sprite:"
+
+#: wx-xrc-strings.h:264
+msgid "Sprites"
+msgstr "Sprites"
+
+#: wx-xrc-strings.h:254 wx-xrc-strings.h:427
+msgid "Standard"
+msgstr "Standard"
+
+#: wx-xrc-strings.h:426
+msgid "Start"
+msgstr "Start"
+
+#: wx-xrc-strings.h:35
+msgid "Start &Network Link..."
+msgstr "Start &Network Link..."
+
+#: wx-xrc-strings.h:19
+msgid "Start &game recording..."
+msgstr "Start &game recording..."
+
+#: wx-xrc-strings.h:15
+msgid "Start &sound recording..."
+msgstr "Start &sound recording..."
+
+#: wx-xrc-strings.h:17
+msgid "Start &video recording..."
+msgstr "Start &video recording..."
+
+#: ../src/wx/wxvbam.cpp:246
+msgid "Start in full-screen mode"
+msgstr "Start in full-screen mode"
+
+#: wx-xrc-strings.h:22
+msgid "Start playing &movie..."
+msgstr "Start playing &movie..."
+
+#: ../src/wx/guiinit.cpp:57
+msgid "Start!"
+msgstr "Start!"
+
+#: wx-xrc-strings.h:394
+msgid "Stereo"
+msgstr "Stereo"
+
+#: wx-xrc-strings.h:20
+msgid "Stop g&ame recording"
+msgstr "Stop g&ame recording"
+
+#: wx-xrc-strings.h:23
+msgid "Stop playing m&ovie"
+msgstr "Stop playing m&ovie"
+
+#: wx-xrc-strings.h:16
+msgid "Stop s&ound recording"
+msgstr "Stop s&ound recording"
+
+#: wx-xrc-strings.h:18
+msgid "Stop v&ideo recording"
+msgstr "Stop v&ideo recording"
+
+#: wx-xrc-strings.h:580 wx-xrc-strings.h:602 wx-xrc-strings.h:636
+#: wx-xrc-strings.h:648 wx-xrc-strings.h:685 wx-xrc-strings.h:698
+msgid "Stretch to &fit"
+msgstr "Stretch to &fit"
+
+#: wx-xrc-strings.h:344
+msgid "Super 2xSaI"
+msgstr "Super 2xSaI"
+
+#: wx-xrc-strings.h:345
+msgid "Super Eagle"
+msgstr "Super Eagle"
+
+#: wx-xrc-strings.h:229
+msgid "Super Game Boy"
+msgstr "Super Game Boy"
+
+#: wx-xrc-strings.h:230
+msgid "Super Game Boy 2"
+msgstr "Super Game Boy 2"
+
+#: wx-xrc-strings.h:390
+msgid "Surround"
+msgstr "Surround"
+
+#: wx-xrc-strings.h:240
+msgid "System and Peripherals"
+msgstr "System and Peripherals"
+
+#: wx-xrc-strings.h:281
+msgid "System and peripherals"
+msgstr "System and peripherals"
+
+#: wx-xrc-strings.h:499
+msgid "T"
+msgstr "T"
+
+#: wx-xrc-strings.h:159
+msgid "TCP"
+msgstr "TCP"
+
+#: wx-xrc-strings.h:351
+msgid "TV Mode"
+msgstr "TV Mode"
+
+#: ../src/wx/viewers.cpp:493
+msgid "Text files (*.txt;*.log)|*.txt;*.log|"
+msgstr "Text files (*.txt;*.log)|*.txt;*.log|"
+
+#: ../src/wx/xaudio2.cpp:156 ../src/wx/xaudio2.cpp:422
+msgid "The XAudio2 interface failed to initialize!"
+msgstr "The XAudio2 interface failed to initialize!"
+
+#: ../src/wx/wxvbam.cpp:353
+msgid ""
+"The commands available for the Keyboard/* option are:\n"
+"\n"
+msgstr ""
+"The commands available for the Keyboard/* option are:\n"
+"\n"
+
+#: ../src/wx/cmdevents.cpp:2180
+msgid ""
+"This program is free software: you can redistribute it and/or modify\n"
+"it under the terms of the GNU General Public License as published by\n"
+"the Free Software Foundation, either version 2 of the License, or\n"
+"(at your option) any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+"\n"
+"You should have received a copy of the GNU General Public License\n"
+"along with this program.  If not, see http://www.gnu.org/licenses ."
+msgstr ""
+"This program is free software: you can redistribute it and/or modify\n"
+"it under the terms of the GNU General Public License as published by\n"
+"the Free Software Foundation, either version 2 of the License, or\n"
+"(at your option) any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+"\n"
+"You should have received a copy of the GNU General Public License\n"
+"along with this program.  If not, see http://www.gnu.org/licenses ."
+
+#: ../src/wx/guiinit.cpp:1834
+msgid "This will clear all user-defined accelerators.  Are you sure?"
+msgstr "This will clear all user-defined accelerators.  Are you sure?"
+
+#: wx-xrc-strings.h:674 wx-xrc-strings.h:704
+msgid "Tile Viewer"
+msgstr "Tile Viewer"
+
+#: wx-xrc-strings.h:591 wx-xrc-strings.h:605 wx-xrc-strings.h:631
+#: wx-xrc-strings.h:642 wx-xrc-strings.h:687 wx-xrc-strings.h:700
+msgid "Tile:"
+msgstr "Tile:"
+
+#: wx-xrc-strings.h:147
+msgid "Title:"
+msgstr "Title:"
+
+#: wx-xrc-strings.h:63
+msgid "To &File ..."
+msgstr "To &File ..."
+
+#: wx-xrc-strings.h:171
+msgid "Toggle all Cheats"
+msgstr "Toggle all Cheats"
+
+#: wx-xrc-strings.h:320
+msgid "Transparent status and speed"
+msgstr "Transparent status and speed"
+
+#: wx-xrc-strings.h:196
+msgid "U&pdate Old"
+msgstr "U&pdate Old"
+
+#: wx-xrc-strings.h:160
+msgid "UDP"
+msgstr "UDP"
+
+#: ../src/wx/panel.cpp:1921 ../src/wx/panel.cpp:1949
+#, c-format
+msgid "Unable to begin recording to %s (%s)"
+msgstr "Unable to begin recording to %s (%s)"
+
+#: ../src/wx/panel.cpp:172
+#, c-format
+msgid "Unable to load Game Boy Advance ROM %s"
+msgstr "Unable to load Game Boy Advance ROM %s"
+
+#: ../src/wx/panel.cpp:109
+#, c-format
+msgid "Unable to load Game Boy ROM %s"
+msgstr "Unable to load Game Boy ROM %s"
+
+#: ../src/wx/guiinit.cpp:2302
+#, c-format
+msgid "Unable to load dialog %s (control %s) from resources"
+msgstr "Unable to load dialog %s (control %s) from resources"
+
+#: ../src/wx/guiinit.cpp:2298 ../src/wx/viewsupt.h:38
+#, c-format
+msgid "Unable to load dialog %s from resources"
+msgstr "Unable to load dialog %s from resources"
+
+#: wx-xrc-strings.h:535
+msgid "Unaligned &memory"
+msgstr "Unaligned &memory"
+
+#: wx-xrc-strings.h:135
+msgid "Unit code:"
+msgstr "Unit code:"
+
+#: ../src/wx/cmdevents.cpp:436 ../src/wx/cmdevents.cpp:523
+#: ../src/wx/cmdevents.cpp:552 ../src/wx/cmdevents.cpp:606
+msgid "Unknown"
+msgstr "Unknown"
+
+#: ../src/wx/cmdevents.cpp:689
+#, c-format
+msgid "Unsupported code file %s"
+msgstr "Unsupported code file %s"
+
+#: wx-xrc-strings.h:417
+msgid "Up"
+msgstr "Up"
+
+#: wx-xrc-strings.h:247
+msgid "Use a &Color Game Boy boot ROM file"
+msgstr "Use a &Color Game Boy boot ROM file"
+
+#: wx-xrc-strings.h:245
+msgid "Use a &Game Boy boot ROM file"
+msgstr "Use a &Game Boy boot ROM file"
+
+#: wx-xrc-strings.h:286
+msgid "Use a bios file"
+msgstr "Use a bios file"
+
+#: wx-xrc-strings.h:438
+msgid "Use as default"
+msgstr "Use as default"
+
+#: wx-xrc-strings.h:265
+msgid "Use this palette"
+msgstr "Use this palette"
+
+#: wx-xrc-strings.h:251
+msgid "User 1"
+msgstr "User 1"
+
+#: wx-xrc-strings.h:252
+msgid "User 2"
+msgstr "User 2"
+
+#: wx-xrc-strings.h:500
+msgid "V"
+msgstr "V"
+
+#: ../src/wx/cmdevents.cpp:1050 ../src/wx/cmdevents.cpp:1081
+msgid "VBA Movie files|*.vmv"
+msgstr "VBA Movie files|*.vmv"
+
+#: ../src/wx/guiinit.cpp:263 ../src/wx/guiinit.cpp:286
+msgid "VBA cheat lists (*.clt)|*.clt"
+msgstr "VBA cheat lists (*.clt)|*.clt"
+
+#: wx-xrc-strings.h:113
+msgid "VBA-M Support &Forum"
+msgstr "VBA-M Support &Forum"
+
+#: wx-xrc-strings.h:1
+msgid "VBAM"
+msgstr "VBAM"
+
+#: wx-xrc-strings.h:693
+msgid "VRAM Bank"
+msgstr "VRAM Bank"
+
+#: ../src/wx/panel.cpp:712
+#, c-format
+msgid "Valid mode: %dx%d-%d@%d"
+msgstr "Valid mode: %dx%d-%d@%d"
+
+#: wx-xrc-strings.h:552 wx-xrc-strings.h:658 wx-xrc-strings.h:670
+msgid "Value:"
+msgstr "Value:"
+
+#: wx-xrc-strings.h:545
+msgid "Verbose"
+msgstr "Verbose"
+
+#: wx-xrc-strings.h:328
+msgid "Video Mode :"
+msgstr "Video Mode :"
+
+#: ../src/wx/cmdevents.cpp:1247 ../src/wx/cmdevents.cpp:1329
+msgid "VisualBoyAdvance saved game files|*.sgm"
+msgstr "VisualBoyAdvance saved game files|*.sgm"
+
+#: wx-xrc-strings.h:367
+msgid "Volume :"
+msgstr "Volume :"
+
+#: ../src/wx/cmdevents.cpp:1569 ../src/wx/cmdevents.cpp:1581
+#, c-format
+msgid "Volume: %d%%"
+msgstr "Volume: %d%%"
+
+#: wx-xrc-strings.h:76
+msgid "W&IN 1"
+msgstr "W&IN 1"
+
+#: wx-xrc-strings.h:337
+msgid "Wait for VSync"
+msgstr "Wait for VSync"
+
+#: ../src/wx/guiinit.cpp:158
+#, c-format
+msgid "Waiting for %d players to join"
+msgstr "Waiting for %d players to join"
+
+#: ../src/wx/cmdevents.cpp:1674
+msgid "Waiting for GDB..."
+msgstr "Waiting for GDB..."
+
+#: ../src/wx/guiinit.cpp:131
+msgid "Waiting for clients..."
+msgstr "Waiting for clients..."
+
+#: ../src/wx/cmdevents.cpp:1666
+#, c-format
+msgid "Waiting for connection at %s"
+msgstr "Waiting for connection at %s"
+
+#: ../src/wx/cmdevents.cpp:1672
+#, c-format
+msgid "Waiting for connection on port %d"
+msgstr "Waiting for connection on port %d"
+
+#: ../src/wx/guiinit.cpp:187
+msgid "Waiting for connection..."
+msgstr "Waiting for connection..."
+
+#: wx-xrc-strings.h:260
+msgid "Weird Colors"
+msgstr "Weird Colors"
+
+#: ../src/wx/guiinit.cpp:2068
+msgid "Welcome to wxVBAM!"
+msgstr "Welcome to wxVBAM!"
+
+#: ../src/wx/gfxviewers.cpp:1042
+msgid ""
+"Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
+"Table (*.act)|*.act"
+msgstr ""
+"Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
+"Table (*.act)|*.act"
+
+#: ../src/wx/cmdevents.cpp:804 ../src/wx/panel.cpp:536
+#, c-format
+msgid "Wrote battery %s"
+msgstr "Wrote battery %s"
+
+#: ../src/wx/wxvbam.cpp:294
+#, c-format
+msgid ""
+"Wrote built-in configuration to %s.\n"
+"To override, remove all but changed root node(s).  First found root node of "
+"correct name in any .xrc or .xrs files in following search path overrides "
+"built-in:"
+msgstr ""
+"Wrote built-in configuration to %s.\n"
+"To override, remove all but changed root node(s).  First found root node of "
+"correct name in any .xrc or .xrs files in following search path overrides "
+"built-in:"
+
+#: ../src/wx/wxvbam.cpp:321
+#, c-format
+msgid ""
+"Wrote built-in override file to %s\n"
+"To override, delete all but changed section.  First found section is used "
+"from search path:"
+msgstr ""
+"Wrote built-in override file to %s\n"
+"To override, delete all but changed section.  First found section is used "
+"from search path:"
+
+#: ../src/wx/sys.cpp:609 ../src/wx/sys.cpp:778
+#, c-format
+msgid "Wrote printer output to %s"
+msgstr "Wrote printer output to %s"
+
+#: ../src/wx/cmdevents.cpp:884 ../src/wx/sys.cpp:400
+#, c-format
+msgid "Wrote snapshot %s"
+msgstr "Wrote snapshot %s"
+
+#: wx-xrc-strings.h:379
+msgid "XAudio2"
+msgstr "XAudio2"
+
+#: ../src/wx/xaudio2.cpp:192
+msgid "XAudio2: Creating mastering voice failed!"
+msgstr "XAudio2: Creating mastering voice failed!"
+
+#: ../src/wx/xaudio2.cpp:201
+msgid "XAudio2: Creating source voice failed!"
+msgstr "XAudio2: Creating source voice failed!"
+
+#: ../src/wx/xaudio2.cpp:391
+msgid "XAudio2: Enumerating devices failed!"
+msgstr "XAudio2: Enumerating devices failed!"
+
+#: ../src/wx/guiinit.cpp:1453
+msgid "You must enter a valid host name"
+msgstr "You must enter a valid host name"
+
+#: wx-xrc-strings.h:496 wx-xrc-strings.h:525
+msgid "Z"
+msgstr "Z"
+
+#: wx-xrc-strings.h:330
+msgid "Zoom"
+msgstr "Zoom"
+
+#: ../src/wx/widgets/joyedit.cpp:139
+msgid "^Joy([0-9]+)[-+]"
+msgstr "^Joy([0-9]+)[-+]"
+
+#: wx-xrc-strings.h:550
+msgid "a"
+msgstr "a"
+
+#: wx-xrc-strings.h:551
+msgid "b"
+msgstr "b"
+
+#: ../src/wx/panel.cpp:1905
+msgid "can't guess output format from file name"
+msgstr "can't guess output format from file name"
+
+#: ../src/wx/dsound.cpp:306
+#, c-format
+msgid "dsbSecondary->Lock() failed: %08x"
+msgstr "dsbSecondary->Lock() failed: %08x"
+
+#: ../src/wx/dsound.cpp:164
+#, c-format
+msgid "dsbSecondary->SetCurrentPosition failed %08x"
+msgstr "dsbSecondary->SetCurrentPosition failed %08x"
+
+#: ../src/wx/panel.cpp:1901
+msgid "error initializing codec"
+msgstr "error initializing codec"
+
+#: ../src/wx/panel.cpp:1903
+msgid "error writing to output file"
+msgstr "error writing to output file"
+
+#: ../src/wx/wxvbam.cpp:339
+msgid "flag"
+msgstr "flag"
+
+#: ../src/wx/wxvbam.cpp:342
+msgid "int"
+msgstr "int"
+
+#: ../src/wx/panel.cpp:1899
+msgid "memory allocation error"
+msgstr "memory allocation error"
+
+#: ../src/wx/wxvbam.cpp:303
+msgid "print-cfg-path"
+msgstr "print-cfg-path"
+
+#: ../src/wx/panel.cpp:1909
+msgid "programming error; aborting!"
+msgstr "programming error; aborting!"
+
+#: ../src/wx/wxvbam.cpp:313
+msgid "save-over"
+msgstr "save-over"
+
+#: ../src/wx/wxvbam.cpp:279
+msgid "save-xrc"
+msgstr "save-xrc"
+
+#: wx-xrc-strings.h:213
+msgid "seconds (0-600); 0 = disable"
+msgstr "seconds (0-600); 0 = disable"
+
+#: ../src/wx/guiinit.cpp:894
+msgid "signed decimal"
+msgstr "signed decimal"
+
+#: ../src/wx/wxvbam.cpp:340 ../src/wx/wxvbam.cpp:343
+msgid "string"
+msgstr "string"
+
+#: ../src/wx/guiinit.cpp:897
+msgid "unsigned decimal"
+msgstr "unsigned decimal"
+
+#: ../src/wx/guiinit.cpp:900
+msgid "unsigned hexadecimal"
+msgstr "unsigned hexadecimal"
