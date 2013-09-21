@@ -8,13 +8,7 @@
 #include <time.h>
 #include <memory.h>
 
-enum RTCSTATE
-{
-   IDLE = 0,
-   COMMAND,
-   DATA,
-   READDATA
-};
+enum RTCSTATE { IDLE, COMMAND, DATA, READDATA };
 
 typedef struct {
   u8 byte0;
@@ -203,17 +197,6 @@ void rtcReset()
   rtcClockData.state = IDLE;
 }
 
-#ifdef __LIBRETRO__
-void rtcSaveGame(u8 *&data)
-{
-  utilWriteMem(data, &rtcClockData, sizeof(rtcClockData));
-}
-
-void rtcReadGame(const u8 *&data)
-{
-  utilReadMem(&rtcClockData, data, sizeof(rtcClockData));
-}
-#else
 void rtcSaveGame(gzFile gzFile)
 {
   utilGzWrite(gzFile, &rtcClockData, sizeof(rtcClockData));
@@ -223,4 +206,3 @@ void rtcReadGame(gzFile gzFile)
 {
   utilGzRead(gzFile, &rtcClockData, sizeof(rtcClockData));
 }
-#endif
