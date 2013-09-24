@@ -173,3 +173,6 @@ kode64:
 shuffle2:
 - SFML library
 - various build fixes
+
+Squarepusher
+- Libretro merge
