@@ -1,4 +1,5 @@
 #include <memory.h>
+#include <string.h>
 #include "GBA.h"
 #include "EEprom.h"
 #include "../Util.h"
