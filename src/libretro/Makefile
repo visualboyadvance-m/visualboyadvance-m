@@ -11,16 +11,18 @@ else ifneq ($(findstring Darwin,$(shell uname -a)),)
 endif
 endif
 
+TARGET_NAME = vbam
+
 ifeq ($(platform), unix)
-   TARGET := libvbam-retro.so
+   TARGET := $(TARGET_NAME)_libretro.so
    fpic := -fPIC
    SHARED := -shared
 else ifeq ($(platform), osx)
-   TARGET := libvbam-retro.dylib
+   TARGET := $(TARGET_NAME)_libretro.dylib
    fpic := -fPIC
    SHARED := -dynamiclib
 else
-   TARGET := vbam-retro.dll
+   TARGET := $(TARGET_NAME)_libretro.dll
    LDFLAGS += -Wl,-no-undefined -Wl,--version-script=link.T
    CC = gcc
    CXX = g++
