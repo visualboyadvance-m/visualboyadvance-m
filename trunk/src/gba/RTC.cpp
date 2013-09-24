@@ -7,6 +7,7 @@
 
 #include <time.h>
 #include <memory.h>
+#include <string.h>
 
 enum RTCSTATE
 {
