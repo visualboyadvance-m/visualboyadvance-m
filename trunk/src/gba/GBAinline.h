@@ -114,20 +114,11 @@ static inline u32 CPUReadMemory(u32 address)
     value = READ32LE(((u32 *)&rom[address&0x1FFFFFC]));
     break;
   case 13:
-    if(cpuEEPROMEnabled)
-      // no need to swap this
-      return eepromRead(address);
-    goto unreadable;
+	value = eepromRead(address);
+	break;
   case 14:
   case 15:
-    if(cpuFlashEnabled | cpuSramEnabled)
-    {  // no need to swap this
-	  #ifdef __libretro__
-      return flashRead(address);
-	  #else
-	  value = flashRead(address) * 0x01010101;
-	  #endif
-	}
+	value = flashRead(address) * 0x01010101;
 	break;
     // default
   default:
@@ -269,21 +260,12 @@ static inline u32 CPUReadHalfWord(u32 address)
       value = READ16LE(((u16 *)&rom[address & 0x1FFFFFE]));
     break;
   case 13:
-    if(cpuEEPROMEnabled)
-      // no need to swap this
-      return  eepromRead(address);
-    goto unreadable;
+	value = eepromRead(address);
+	break;
   case 14:
   case 15:
-    if(cpuFlashEnabled | cpuSramEnabled)
-      // no need to swap this
-    {  
-	#ifdef __libretro__
-      return flashRead(address);
-	#else
-	  value = flashRead(address) * 0x0101;
-	#endif
-	}
+	value = flashRead(address) * 0x0101;
+	break;
     // default
   default:
 unreadable:
@@ -291,10 +273,9 @@ unreadable:
 		value = cpuDmaLast & 0xFFFF;
 	} else {
 		if(armState) {
-			value = CPUReadMemoryQuick(reg[15].I);
+			value = CPUReadHalfWordQuick(reg[15].I + (address & 2));
 		} else {
-			value = CPUReadHalfWordQuick(reg[15].I) |
-				CPUReadHalfWordQuick(reg[15].I) << 16;
+			value = CPUReadHalfWordQuick(reg[15].I);
 		}
 	}
 #ifdef GBA_LOGGING
@@ -375,25 +356,24 @@ static inline u8 CPUReadByte(u32 address)
   case 12:
     return rom[address & 0x1FFFFFF];
   case 13:
-    if(cpuEEPROMEnabled)
-      return eepromRead(address);
-    goto unreadable;
+	return eepromRead(address);
   case 14:
   case 15:
-    if(cpuSramEnabled | cpuFlashEnabled)
-      return flashRead(address);
-    if(cpuEEPROMSensorEnabled) {
-      switch(address & 0x00008f00) {
-  case 0x8200:
-    return systemGetSensorX() & 255;
-  case 0x8300:
-    return (systemGetSensorX() >> 8)|0x80;
-  case 0x8400:
-    return systemGetSensorY() & 255;
-  case 0x8500:
-    return systemGetSensorY() >> 8;
-      }
-    }
+  {
+	if (cpuEEPROMSensorEnabled) {
+		switch (address & 0x00008f00) {
+		case 0x8200:
+			return systemGetSensorX() & 255;
+		case 0x8300:
+			return (systemGetSensorX() >> 8) | 0x80;
+		case 0x8400:
+			return systemGetSensorY() & 255;
+		case 0x8500:
+			return systemGetSensorY() >> 8;
+		}
+	}
+	return flashRead(address);
+  }
     // default
   default:
 unreadable:
@@ -407,10 +387,9 @@ unreadable:
 		return cpuDmaLast & 0xFF;
 	} else {
 		if(armState) {
-			return CPUReadMemoryQuick(reg[15].I);
+			return CPUReadByteQuick(reg[15].I + (address & 3));
 		} else {
-			return CPUReadHalfWordQuick(reg[15].I) |
-				CPUReadHalfWordQuick(reg[15].I) << 16;
+			return CPUReadByteQuick(reg[15].I + (address & 1));
 		}
 	}
   }
