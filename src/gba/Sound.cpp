@@ -183,11 +183,15 @@ void Gba_Pcm_Fifo::timer_overflowed( int which_timer )
 {
 	if ( which_timer == timer && enabled )
 	{
-		if ( count <= 16 )
+		/* Mother 3 fix, refined to not break Metroid Fusion */
+		if ( count == 16 || count == 0 )
 		{
 			// Need to fill FIFO
+			int saved_count = count;
 			CPUCheckDMA( 3, which ? 4 : 2 );
-			if ( count == 0 ) // Fixes Mother 3
+			if ( saved_count == 0 && count == 16 )
+				CPUCheckDMA( 3, which ? 4 : 2 );
+			if ( count == 0 )
 			{
 				// Not filled by DMA, so fill with 16 bytes of silence
 				int reg = which ? FIFOB_L : FIFOA_L;
