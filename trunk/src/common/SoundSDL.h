@@ -38,8 +38,9 @@ public:
 private:
 	RingBuffer<u16> _rbuf;
 
-	SDL_cond  * _cond;
 	SDL_mutex * _mutex;
+	SDL_sem *_semBufferFull;
+	SDL_sem *_semBufferEmpty;
 
 	bool _initialized;
 
