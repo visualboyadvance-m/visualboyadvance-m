@@ -55,8 +55,7 @@ void SoundSDL::read(u16 * stream, int length)
 
 	SDL_mutexV(_mutex);
 
-	if (lock)
-		SDL_SemPost (_semBufferEmpty);
+	SDL_SemPost (_semBufferEmpty);
 }
 
 void SoundSDL::write(u16 * finalWave, int length)
@@ -82,9 +81,9 @@ void SoundSDL::write(u16 * finalWave, int length)
 		samples -= avail;
 
 		SDL_mutexV(_mutex);
+		SDL_SemPost(_semBufferFull);
 		if (lock)
 		{
-			SDL_SemPost(_semBufferFull);
 			SDL_SemWait(_semBufferEmpty);
 		}
 		else
