@@ -455,11 +455,10 @@ IMAGE_TYPE utilFindType(const char *file, char (&buffer)[2048])
 	pwText = new wchar_t[dwNum];
 	if(!pwText)
 	{
-		delete []pwText;
+		return IMAGE_UNKNOWN;
 	}
 	MultiByteToWideChar (CP_ACP, 0, file, -1, pwText, dwNum );
 	char* file_conv = fex_wide_to_path( pwText);
-	delete []pwText;
 //	if ( !utilIsImage( file_conv ) ) // TODO: utilIsArchive() instead?
 //	{
 		fex_t* fe = scan_arc(file_conv,utilIsImage,buffer);
@@ -503,7 +502,7 @@ u8 *utilLoad(const char *file,
 	pwText = new wchar_t[dwNum];
 	if(!pwText)
 	{
-		delete []pwText;
+		return NULL;
 	}
 	MultiByteToWideChar (CP_ACP, 0, file, -1, pwText, dwNum );
 	char* file_conv = fex_wide_to_path( pwText);
