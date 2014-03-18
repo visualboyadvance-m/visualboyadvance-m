@@ -1,3 +1,4 @@
+#ifndef __LIBRETRO__
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -75,7 +76,11 @@ bool remoteTcpInit()
 
     remoteListenSocket = s;
 
+#ifdef _WIN32
+    if(s == INVALID_SOCKET) {
+#else
     if(s < 0) {
+#endif
       fprintf(stderr,"Error opening socket\n");
       exit(-1);
     }
@@ -719,3 +724,4 @@ void remoteCleanUp()
   if(remoteCleanUpFnc)
     remoteCleanUpFnc();
 }
+#endif

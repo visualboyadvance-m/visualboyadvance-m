@@ -1,3 +1,4 @@
+#ifndef __LIBRETRO__
 #include <memory.h>
 #include <string.h>
 #include <stdio.h>
@@ -2896,3 +2897,4 @@ void cheatsWriteByte(u32, u8)
 #endif
 #endif
 }
+#endif

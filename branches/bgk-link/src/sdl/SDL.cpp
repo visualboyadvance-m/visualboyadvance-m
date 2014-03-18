@@ -125,6 +125,7 @@ int desktopHeight = 0;
 
 Filter filter = kStretch2x;
 u8 *delta = NULL;
+static const int delta_size = 322*242*4;
 
 int filter_enlarge = 2;
 
@@ -1395,7 +1396,7 @@ void sdlPollEvents()
               soundPause();
           }
 
-          memset(delta,255,sizeof(delta));
+          memset(delta,255,delta_size);
         }
       }
       break;
@@ -2311,8 +2312,8 @@ int main(int argc, char **argv)
   utilUpdateSystemColorMaps();
 
   if(delta == NULL) {
-    delta = (u8*)malloc(322*242*4);
-    memset(delta, 255, 322*242*4);
+    delta = (u8*)malloc(delta_size);
+    memset(delta, 255, delta_size);
   }
 
   ifbFunction = initIFBFilter(ifbType, systemColorDepth);

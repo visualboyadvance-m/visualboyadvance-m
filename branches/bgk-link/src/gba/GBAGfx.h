@@ -8,7 +8,11 @@
 
 //#define SPRITE_DEBUG
 
+#ifdef TILED_RENDERING
+extern void gfxDrawTextScreen(u16, u16, u16, u32 *);
+#else
 static void gfxDrawTextScreen(u16, u16, u16, u32 *);
+#endif
 static void gfxDrawRotScreen(u16,
 			     u16, u16,
 			     u16, u16,
@@ -98,6 +102,7 @@ static inline void gfxClearArray(u32 *array)
   }
 }
 
+#ifndef TILED_RENDERING
 static inline void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs,
 				     u32 *line)
 {
@@ -238,6 +243,7 @@ static inline void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs,
     }
   }
 }
+#endif
 
 static inline void gfxDrawRotScreen(u16 control,
 				    u16 x_l, u16 x_h,

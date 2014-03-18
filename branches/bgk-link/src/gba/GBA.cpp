@@ -120,6 +120,9 @@ int capture = 0;
 int capturePrevious = 0;
 int captureNumber = 0;
 
+int armOpcodeCount = 0;
+int thumbOpcodeCount = 0;
+
 const int TIMER_TICKS[4] = {
   0,
   6,
@@ -574,6 +577,44 @@ void CPUUpdateRenderBuffers(bool force)
   }
 }
 
+#ifdef __LIBRETRO__
+#include <cstddef>
+
+unsigned int CPUWriteState(u8* data, unsigned size)
+{
+   uint8_t *orig = data;
+
+   utilWriteIntMem(data, SAVE_GAME_VERSION);
+   utilWriteMem(data, &rom[0xa0], 16);
+   utilWriteIntMem(data, useBios);
+   utilWriteMem(data, &reg[0], sizeof(reg));
+
+   utilWriteDataMem(data, saveGameStruct);
+
+   utilWriteIntMem(data, stopState);
+   utilWriteIntMem(data, IRQTicks);
+
+   utilWriteMem(data, internalRAM, 0x8000);
+   utilWriteMem(data, paletteRAM, 0x400);
+   utilWriteMem(data, workRAM, 0x40000);
+   utilWriteMem(data, vram, 0x20000);
+   utilWriteMem(data, oam, 0x400);
+   utilWriteMem(data, pix, 4 * 241 * 162);
+   utilWriteMem(data, ioMem, 0x400);
+
+   eepromSaveGame(data);
+   flashSaveGame(data);
+   soundSaveGame(data);
+   rtcSaveGame(data);
+
+   return (ptrdiff_t)data - (ptrdiff_t)orig;
+}
+
+bool CPUWriteMemState(char *memory, int available)
+{
+   return false;
+}
+#else
 static bool CPUWriteState(gzFile gzFile)
 {
   utilWriteInt(gzFile, SAVE_GAME_VERSION);
@@ -627,6 +668,7 @@ bool CPUWriteState(const char *file)
   return res;
 }
 
+
 bool CPUWriteMemState(char *memory, int available)
 {
   gzFile gzFile = utilMemGzOpen(memory, available, "w");
@@ -646,7 +688,108 @@ bool CPUWriteMemState(char *memory, int available)
 
   return res;
 }
+#endif
 
+
+#ifdef __LIBRETRO__
+bool CPUReadState(const u8* data, unsigned size)
+{
+   // Don't really care about version.
+   int version = utilReadIntMem(data);
+   if (version != SAVE_GAME_VERSION)
+      return false;
+
+   char romname[16];
+   utilReadMem(romname, data, 16);
+   if (memcmp(&rom[0xa0], romname, 16) != 0)
+      return false;
+
+   // Don't care about use bios ...
+   utilReadIntMem(data);
+
+   utilReadMem(&reg[0], data, sizeof(reg));
+
+   utilReadDataMem(data, saveGameStruct);
+
+   stopState = utilReadIntMem(data) ? true : false;
+
+   IRQTicks = utilReadIntMem(data);
+   if (IRQTicks > 0)
+      intState = true;
+   else
+   {
+      intState = false;
+      IRQTicks = 0;
+   }
+
+   utilReadMem(internalRAM, data, 0x8000);
+   utilReadMem(paletteRAM, data, 0x400);
+   utilReadMem(workRAM, data, 0x40000);
+   utilReadMem(vram, data, 0x20000);
+   utilReadMem(oam, data, 0x400);
+   utilReadMem(pix, data, 4*241*162);
+   utilReadMem(ioMem, data, 0x400);
+
+   eepromReadGame(data, version);
+   flashReadGame(data, version);
+   soundReadGame(data, version);
+   rtcReadGame(data);
+
+   //// Copypasta stuff ...
+   // set pointers!
+   layerEnable = layerSettings & DISPCNT;
+
+   CPUUpdateRender();
+
+   // CPU Update Render Buffers set to true
+   CLEAR_ARRAY(line0);
+   CLEAR_ARRAY(line1);
+   CLEAR_ARRAY(line2);
+   CLEAR_ARRAY(line3);
+   // End of CPU Update Render Buffers set to true
+
+   CPUUpdateWindow0();
+   CPUUpdateWindow1();
+   gbaSaveType = 0;
+   switch(saveType) {
+      case 0:
+         cpuSaveGameFunc = flashSaveDecide;
+         break;
+      case 1:
+         cpuSaveGameFunc = sramWrite;
+         gbaSaveType = 1;
+         break;
+      case 2:
+         cpuSaveGameFunc = flashWrite;
+         gbaSaveType = 2;
+         break;
+      case 3:
+         break;
+      case 5:
+         gbaSaveType = 5;
+         break;
+      default:
+#ifdef CELL_VBA_DEBUG
+         systemMessage(MSG_UNSUPPORTED_SAVE_TYPE,
+               N_("Unsupported save type %d"), saveType);
+#endif
+         break;
+   }
+   if(eepromInUse)
+      gbaSaveType = 3;
+
+   systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
+   if(armState) {
+      ARM_PREFETCH;
+   } else {
+      THUMB_PREFETCH;
+   }
+
+   CPUUpdateRegister(0x204, CPUReadHalfWordQuick(0x4000204));
+
+   return true;
+}
+#else
 static bool CPUReadState(gzFile gzFile)
 {
   int version = utilReadInt(gzFile);
@@ -843,6 +986,7 @@ bool CPUReadState(const char * file)
 
   return res;
 }
+#endif
 
 bool CPUExportEepromFile(const char *fileName)
 {
@@ -934,7 +1078,7 @@ bool CPUReadGSASnapshot(const char *fileName)
   fseek(file, 0x0, SEEK_SET);
   fread(&i, 1, 4, file);
   fseek(file, i, SEEK_CUR); // Skip SharkPortSave
-  fseek(file, 4, SEEK_CUR); // skip some sort of flag
+//  fseek(file, 4, SEEK_CUR); // skip some sort of flag
   fread(&i, 1, 4, file); // name length
   fseek(file, i, SEEK_CUR); // skip name
   fread(&i, 1, 4, file); // desc length
@@ -1806,8 +1950,8 @@ void CPUSoftwareInterrupt(int comment)
   case 0x02:
 #ifdef GBA_LOGGING
     if(systemVerbose & VERBOSE_SWI) {
-      log("Halt: (VCOUNT = %2d)\n",
-          VCOUNT);
+      /*log("Halt: (VCOUNT = %2d)\n",
+          VCOUNT);*/
     }
 #endif
     holdState = true;
@@ -1817,8 +1961,8 @@ void CPUSoftwareInterrupt(int comment)
   case 0x03:
 #ifdef GBA_LOGGING
     if(systemVerbose & VERBOSE_SWI) {
-      log("Stop: (VCOUNT = %2d)\n",
-          VCOUNT);
+      /*log("Stop: (VCOUNT = %2d)\n",
+          VCOUNT);*/
     }
 #endif
     holdState = true;
@@ -2073,6 +2217,7 @@ void doDMA(u32 &s, u32 &d, u32 si, u32 di, u32 c, int transfer32)
   int dw = 0;
   int sc = c;
 
+  cpuDmaHack = true;
   cpuDmaCount = c;
   // This is done to get the correct waitstates.
   if (sm>15)
@@ -2141,7 +2286,7 @@ void doDMA(u32 &s, u32 &d, u32 si, u32 di, u32 c, int transfer32)
   }
 
   cpuDmaTicksToUpdate += totalTicks;
-
+  cpuDmaHack = false;
 }
 
 void CPUCheckDMA(int reason, int dmamask)
@@ -2184,7 +2329,6 @@ void CPUCheckDMA(int reason, int dmamask)
       doDMA(dma0Source, dma0Dest, sourceIncrement, destIncrement,
             DM0CNT_L ? DM0CNT_L : 0x4000,
             DM0CNT_H & 0x0400);
-      cpuDmaHack = true;
 
       if(DM0CNT_H & 0x4000) {
         IF |= 0x0100;
@@ -2253,7 +2397,6 @@ void CPUCheckDMA(int reason, int dmamask)
               DM1CNT_L ? DM1CNT_L : 0x4000,
               DM1CNT_H & 0x0400);
       }
-      cpuDmaHack = true;
 
       if(DM1CNT_H & 0x4000) {
         IF |= 0x0200;
@@ -2323,7 +2466,6 @@ void CPUCheckDMA(int reason, int dmamask)
               DM2CNT_L ? DM2CNT_L : 0x4000,
               DM2CNT_H & 0x0400);
       }
-      cpuDmaHack = true;
 
       if(DM2CNT_H & 0x4000) {
         IF |= 0x0400;
@@ -2380,6 +2522,7 @@ void CPUCheckDMA(int reason, int dmamask)
       doDMA(dma3Source, dma3Dest, sourceIncrement, destIncrement,
             DM3CNT_L ? DM3CNT_L : 0x10000,
             DM3CNT_H & 0x0400);
+
       if(DM3CNT_H & 0x4000) {
         IF |= 0x0800;
         UPDATE_REG(0x202, IF);
@@ -2426,7 +2569,7 @@ void CPUUpdateRegister(u32 address, u16 value)
       windowOn = (layerEnable & 0x6000) ? true : false;
       if(change && !((value & 0x80))) {
         if(!(DISPSTAT & 1)) {
-          lcdTicks = 1008;
+          //lcdTicks = 1008;
           //      VCOUNT = 0;
           //      UPDATE_REG(0x06, VCOUNT);
           DISPSTAT &= 0xFFFC;
@@ -3479,9 +3622,11 @@ void CPULoop(int ticks)
 
     if(!holdState && !SWITicks) {
       if(armState) {
+		  armOpcodeCount++;
         if (!armExecute())
           return;
       } else {
+		  thumbOpcodeCount++;
         if (!thumbExecute())
           return;
       }
@@ -3504,7 +3649,6 @@ void CPULoop(int ticks)
 
       clockTicks = cpuNextEvent;
       cpuTotalTicks = 0;
-      cpuDmaHack = false;
 
     updateLoop:
 
@@ -3538,7 +3682,7 @@ void CPULoop(int ticks)
             }
           }
 
-          if(VCOUNT >= 228) { //Reaching last line
+          if(VCOUNT > 227) { //Reaching last line
             DISPSTAT &= 0xFFFC;
             UPDATE_REG(0x04, DISPSTAT);
             VCOUNT = 0;
@@ -3903,7 +4047,6 @@ void CPULoop(int ticks)
         cpuDmaTicksToUpdate -= clockTicks;
         if(cpuDmaTicksToUpdate < 0)
           cpuDmaTicksToUpdate = 0;
-        cpuDmaHack = true;
         goto updateLoop;
       }
 
@@ -3976,6 +4119,256 @@ void CPULoop(int ticks)
   }
 }
 
+#ifdef TILED_RENDERING
+union u8h
+{
+   struct
+   {
+      /* 0*/	unsigned lo:4;
+      /* 4*/	unsigned hi:4;
+   } __attribute__ ((packed));
+   u8 val;
+};
+
+union TileEntry
+{
+   struct
+   {
+      /* 0*/	unsigned tileNum:10;
+      /*12*/	unsigned hFlip:1;
+      /*13*/	unsigned vFlip:1;
+      /*14*/	unsigned palette:4;
+   };
+   u16 val;
+};
+
+struct TileLine
+{
+   u32 pixels[8];
+};
+
+typedef const TileLine (*TileReader) (const u16 *, const int, const u8 *, u16 *, const u32);
+
+static inline void gfxDrawPixel(u32 *dest, const u8 color, const u16 *palette, const u32 prio)
+{
+   *dest = color ? (READ16LE(&palette[color]) | prio): 0x80000000;
+}
+
+inline const TileLine gfxReadTile(const u16 *screenSource, const int yyy, const u8 *charBase, u16 *palette, const u32 prio)
+{
+   TileEntry tile;
+   tile.val = READ16LE(screenSource);
+
+   int tileY = yyy & 7;
+   if (tile.vFlip) tileY = 7 - tileY;
+   TileLine tileLine;
+
+   const u8 *tileBase = &charBase[tile.tileNum * 64 + tileY * 8];
+
+   if (!tile.hFlip)
+   {
+      gfxDrawPixel(&tileLine.pixels[0], tileBase[0], palette, prio);
+      gfxDrawPixel(&tileLine.pixels[1], tileBase[1], palette, prio);
+      gfxDrawPixel(&tileLine.pixels[2], tileBase[2], palette, prio);
+      gfxDrawPixel(&tileLine.pixels[3], tileBase[3], palette, prio);
+      gfxDrawPixel(&tileLine.pixels[4], tileBase[4], palette, prio);
+      gfxDrawPixel(&tileLine.pixels[5], tileBase[5], palette, prio);
+      gfxDrawPixel(&tileLine.pixels[6], tileBase[6], palette, prio);
+      gfxDrawPixel(&tileLine.pixels[7], tileBase[7], palette, prio);
+   }
+   else
+   {
+      gfxDrawPixel(&tileLine.pixels[0], tileBase[7], palette, prio);
+      gfxDrawPixel(&tileLine.pixels[1], tileBase[6], palette, prio);
+      gfxDrawPixel(&tileLine.pixels[2], tileBase[5], palette, prio);
+      gfxDrawPixel(&tileLine.pixels[3], tileBase[4], palette, prio);
+      gfxDrawPixel(&tileLine.pixels[4], tileBase[3], palette, prio);
+      gfxDrawPixel(&tileLine.pixels[5], tileBase[2], palette, prio);
+      gfxDrawPixel(&tileLine.pixels[6], tileBase[1], palette, prio);
+      gfxDrawPixel(&tileLine.pixels[7], tileBase[0], palette, prio);
+   }
+
+   return tileLine;
+}
+
+inline const TileLine gfxReadTilePal(const u16 *screenSource, const int yyy, const u8 *charBase, u16 *palette, const u32 prio)
+{
+   TileEntry tile;
+   tile.val = READ16LE(screenSource);
+
+   int tileY = yyy & 7;
+   if (tile.vFlip) tileY = 7 - tileY;
+   palette += tile.palette * 16;
+   TileLine tileLine;
+
+   const u8h *tileBase = (u8h*) &charBase[tile.tileNum * 32 + tileY * 4];
+
+   if (!tile.hFlip)
+   {
+      gfxDrawPixel(&tileLine.pixels[0], tileBase[0].lo, palette, prio);
+      gfxDrawPixel(&tileLine.pixels[1], tileBase[0].hi, palette, prio);
+      gfxDrawPixel(&tileLine.pixels[2], tileBase[1].lo, palette, prio);
+      gfxDrawPixel(&tileLine.pixels[3], tileBase[1].hi, palette, prio);
+      gfxDrawPixel(&tileLine.pixels[4], tileBase[2].lo, palette, prio);
+      gfxDrawPixel(&tileLine.pixels[5], tileBase[2].hi, palette, prio);
+      gfxDrawPixel(&tileLine.pixels[6], tileBase[3].lo, palette, prio);
+      gfxDrawPixel(&tileLine.pixels[7], tileBase[3].hi, palette, prio);
+   }
+   else
+   {
+      gfxDrawPixel(&tileLine.pixels[0], tileBase[3].hi, palette, prio);
+      gfxDrawPixel(&tileLine.pixels[1], tileBase[3].lo, palette, prio);
+      gfxDrawPixel(&tileLine.pixels[2], tileBase[2].hi, palette, prio);
+      gfxDrawPixel(&tileLine.pixels[3], tileBase[2].lo, palette, prio);
+      gfxDrawPixel(&tileLine.pixels[4], tileBase[1].hi, palette, prio);
+      gfxDrawPixel(&tileLine.pixels[5], tileBase[1].lo, palette, prio);
+      gfxDrawPixel(&tileLine.pixels[6], tileBase[0].hi, palette, prio);
+      gfxDrawPixel(&tileLine.pixels[7], tileBase[0].lo, palette, prio);
+   }
+
+   return tileLine;
+}
+
+static inline void gfxDrawTile(const TileLine &tileLine, u32 *line)
+{
+   memcpy(line, tileLine.pixels, sizeof(tileLine.pixels));
+}
+
+static inline void gfxDrawTileClipped(const TileLine &tileLine, u32 *line, const int start, int w)
+{
+   memcpy(line, tileLine.pixels + start, w * sizeof(u32));
+}
+
+template<TileReader readTile>
+static void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs,
+                       u32 *line)
+{
+   u16 *palette = (u16 *)paletteRAM;
+   u8 *charBase = &vram[((control >> 2) & 0x03) * 0x4000];
+   u16 *screenBase = (u16 *)&vram[((control >> 8) & 0x1f) * 0x800];
+   u32 prio = ((control & 3)<<25) + 0x1000000;
+   int sizeX = 256;
+   int sizeY = 256;
+   switch ((control >> 14) & 3)
+   {
+      case 0:
+         break;
+      case 1:
+         sizeX = 512;
+         break;
+      case 2:
+         sizeY = 512;
+         break;
+      case 3:
+         sizeX = 512;
+         sizeY = 512;
+         break;
+   }
+
+   int maskX = sizeX-1;
+   int maskY = sizeY-1;
+
+   bool mosaicOn = (control & 0x40) ? true : false;
+
+   int xxx = hofs & maskX;
+   int yyy = (vofs + VCOUNT) & maskY;
+   int mosaicX = (MOSAIC & 0x000F)+1;
+   int mosaicY = ((MOSAIC & 0x00F0)>>4)+1;
+
+   if (mosaicOn)
+   {
+      if ((VCOUNT % mosaicY) != 0)
+      {
+         mosaicY = VCOUNT - (VCOUNT % mosaicY);
+         yyy = (vofs + mosaicY) & maskY;
+      }
+   }
+
+   if (yyy > 255 && sizeY > 256)
+   {
+      yyy &= 255;
+      screenBase += 0x400;
+      if (sizeX > 256)
+         screenBase += 0x400;
+   }
+
+   int yshift = ((yyy>>3)<<5);
+
+   u16 *screenSource = screenBase + 0x400 * (xxx>>8) + ((xxx & 255)>>3) + yshift;
+   int x = 0;
+   const int firstTileX = xxx & 7;
+
+   // First tile, if clipped
+   if (firstTileX)
+   {
+      gfxDrawTileClipped(readTile(screenSource, yyy, charBase, palette, prio), &line[x], firstTileX, 8 - firstTileX);
+      screenSource++;
+      x += 8 - firstTileX;
+      xxx += 8 - firstTileX;
+
+      if (xxx == 256 && sizeX > 256)
+      {
+         screenSource = screenBase + 0x400 + yshift;
+      }
+      else if (xxx >= sizeX)
+      {
+         xxx = 0;
+         screenSource = screenBase + yshift;
+      }
+   }
+
+   // Middle tiles, full
+   while (x < 240 - firstTileX)
+   {
+      gfxDrawTile(readTile(screenSource, yyy, charBase, palette, prio), &line[x]);
+      screenSource++;
+      xxx += 8;
+      x += 8;
+
+      if (xxx == 256 && sizeX > 256)
+      {
+         screenSource = screenBase + 0x400 + yshift;
+      }
+      else if (xxx >= sizeX)
+      {
+         xxx = 0;
+         screenSource = screenBase + yshift;
+      }
+   }
+
+   // Last tile, if clipped
+   if (firstTileX)
+   {
+      gfxDrawTileClipped(readTile(screenSource, yyy, charBase, palette, prio), &line[x], 0, firstTileX);
+   }
+
+   if (mosaicOn)
+   {
+      if (mosaicX > 1)
+      {
+         int m = 1;
+         for (int i = 0; i < 239; i++)
+         {
+            line[i+1] = line[i];
+            m++;
+            if (m == mosaicX)
+            {
+               m = 1;
+               i++;
+            }
+         }
+      }
+   }
+}
+
+void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs, u32 *line)
+{
+   if (control & 0x80) // 1 pal / 256 col
+      gfxDrawTextScreen<gfxReadTile>(control, hofs, vofs, line);
+   else // 16 pal / 16 col
+      gfxDrawTextScreen<gfxReadTilePal>(control, hofs, vofs, line);
+}
+#endif
 
 
 struct EmulatedSystem GBASystem = {
@@ -3994,7 +4387,11 @@ struct EmulatedSystem GBASystem = {
   // emuWriteState
   CPUWriteState,
   // emuReadMemState
+#ifdef __LIBRETRO__
+  NULL,
+#else
   CPUReadMemState,
+#endif
   // emuWriteMemState
   CPUWriteMemState,
   // emuWritePNG

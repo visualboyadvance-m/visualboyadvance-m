@@ -90,9 +90,14 @@ extern void CPUCleanUp();
 extern void CPUUpdateRender();
 extern void CPUUpdateRenderBuffers(bool);
 extern bool CPUReadMemState(char *, int);
-extern bool CPUReadState(const char *);
 extern bool CPUWriteMemState(char *, int);
+#ifdef __LIBRETRO__
+extern bool CPUReadState(const u8*, unsigned);
+extern unsigned int CPUWriteState(u8 *data, unsigned int size);
+#else
+extern bool CPUReadState(const char *);
 extern bool CPUWriteState(const char *);
+#endif
 extern int CPULoadRom(const char *);
 extern void doMirroring(bool);
 extern void CPUUpdateRegister(u32, u16);
