@@ -138,6 +138,7 @@ Spacy
 DJRobX
 Jonas Quinn
 kode54
+Normmatt
 
 ==============
 Special Thanks
@@ -172,3 +173,6 @@ kode64:
 shuffle2:
 - SFML library
 - various build fixes
+
+Squarepusher
+- Libretro merge

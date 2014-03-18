@@ -234,7 +234,7 @@ void gbRenderLine()
 
       if(y >= inUseRegister_WY) {
 
-        if (gbWindowLine>143)
+        if ((gbWindowLine == -1) || (gbWindowLine>144))
           gbWindowLine = 0;
 
         int wx = register_WX;
@@ -266,7 +266,7 @@ void gbRenderLine()
 
             //bx >>= ((gbSCXLine[0]+(((swx>1) && (swx != 7)) ? 1 : 0)) & 7);
 
-            if ((swx == 7))
+            if (swx == 7)
             {
               //wx = 0;
               if ((gbWindowLine>0) || (wy == 0))

@@ -40,12 +40,22 @@ void SoundSDL::read(u16 * stream, int length)
 	if (!_initialized || length <= 0 || !emulating)
 		return;
 
+
+	/* since this is running in a different thread, speedup and
+	 * throttle can change at any time; save the value so locks
+	 * stay in sync */
+	bool lock = (emulating && !speedup) ? true : false;
+
+	if (lock)
+		SDL_SemWait (_semBufferFull);
+
 	SDL_mutexP(_mutex);
 
 	_rbuf.read(stream, std::min(static_cast<std::size_t>(length) / 2, _rbuf.used()));
 
-	SDL_CondSignal(_cond);
 	SDL_mutexV(_mutex);
+
+	SDL_SemPost (_semBufferEmpty);
 }
 
 void SoundSDL::write(u16 * finalWave, int length)
@@ -63,23 +73,25 @@ void SoundSDL::write(u16 * finalWave, int length)
 	std::size_t avail;
 	while ((avail = _rbuf.avail() / 2) < samples)
 	{
+		bool lock = (emulating && !speedup) ? true : false;
+
 		_rbuf.write(finalWave, avail * 2);
 
 		finalWave += avail * 2;
 		samples -= avail;
 
-		// If emulating and not in speed up mode, synchronize to audio
-		// by waiting till there is enough room in the buffer
-		if (emulating && !speedup)
+		SDL_mutexV(_mutex);
+		SDL_SemPost(_semBufferFull);
+		if (lock)
 		{
-			SDL_CondWait(_cond, _mutex);
+			SDL_SemWait(_semBufferEmpty);
 		}
 		else
 		{
 			// Drop the remaining of the audio data
-			SDL_mutexV(_mutex);
 			return;
 		}
+		SDL_mutexP(_mutex);
 	}
 
 	_rbuf.write(finalWave, samples * 2);
@@ -106,9 +118,10 @@ bool SoundSDL::init(long sampleRate)
 
 	_rbuf.reset(_delay * sampleRate * 2);
 
-	_cond  = SDL_CreateCond();
-	_mutex = SDL_CreateMutex();
-	_initialized = true;
+	_mutex          = SDL_CreateMutex();
+	_semBufferFull  = SDL_CreateSemaphore (0);
+	_semBufferEmpty = SDL_CreateSemaphore (1);
+	_initialized    = true;
 
 	return true;
 }
@@ -121,11 +134,14 @@ SoundSDL::~SoundSDL()
 	SDL_mutexP(_mutex);
 	int iSave = emulating;
 	emulating = 0;
-	SDL_CondSignal(_cond);
+	SDL_SemPost(_semBufferFull);
+	SDL_SemPost(_semBufferEmpty);
 	SDL_mutexV(_mutex);
 
-	SDL_DestroyCond(_cond);
-	_cond = NULL;
+	SDL_DestroySemaphore(_semBufferFull);
+	SDL_DestroySemaphore(_semBufferEmpty);
+	_semBufferFull  = NULL;
+	_semBufferEmpty = NULL;
 
 	SDL_DestroyMutex(_mutex);
 	_mutex = NULL;

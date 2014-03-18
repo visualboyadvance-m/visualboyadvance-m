@@ -27,6 +27,16 @@
 namespace VBA
 {
 
+static const VBA::Window::EEmulatorType aEmulatorType[] =
+{
+  VBA::Window::EmulatorAuto,
+  VBA::Window::EmulatorCGB,
+  VBA::Window::EmulatorSGB,
+  VBA::Window::EmulatorGB,
+  VBA::Window::EmulatorGBA,
+  VBA::Window::EmulatorSGB2
+};
+
 GameBoyConfigDialog::GameBoyConfigDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder) :
   Gtk::Dialog(_pstDialog),
   m_poConfig(0)
@@ -49,8 +59,6 @@ void GameBoyConfigDialog::vSetConfig(Config::Section * _poConfig, VBA::Window * 
   m_poConfig = _poConfig;
   m_poWindow = _poWindow;
 
-  const int aEmulatorType[] = { 0, 2, 3, 5, 1, 4 };
-
   VBA::Window::EEmulatorType eDefaultEmulatorType = (VBA::Window::EEmulatorType)m_poConfig->oGetKey<int>("emulator_type");
   m_poSystemComboBox->set_active(aEmulatorType[eDefaultEmulatorType]);
 
@@ -70,17 +78,7 @@ void GameBoyConfigDialog::vSetConfig(Config::Section * _poConfig, VBA::Window * 
 
 void GameBoyConfigDialog::vOnSystemChanged()
 {
-  const VBA::Window::EEmulatorType aEmulatorType[] = 
-  {
-    VBA::Window::EmulatorAuto,
-    VBA::Window::EmulatorCGB,
-    VBA::Window::EmulatorSGB,
-    VBA::Window::EmulatorGB,
-    VBA::Window::EmulatorGBA,
-    VBA::Window::EmulatorSGB2
-  };
-
-  int iSystem = m_poSystemComboBox->get_active_row_number();  
+  int iSystem = m_poSystemComboBox->get_active_row_number();
   m_poConfig->vSetKey("emulator_type", aEmulatorType[iSystem]);
   
   m_poWindow->vApplyConfigGBSystem();

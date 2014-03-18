@@ -356,7 +356,11 @@ static void count(u32 opcode, int cond_res)
         EMIT2(and, KONST(0x1F), ecx)
 #define VALUE_LOAD_REG \
         EMIT2(and, KONST(0x0F), eax)            \
-        EMIT2(mov, REGREF2(eax,4), eax)         \
+		EMIT2(cmp, KONST(0x0F), eax)			\
+		EMIT2(mov, REGREF2(eax,4), eax)         \
+		EMIT1(jne, LABELREF(3,f))				\
+		EMIT2(add, KONST(4), eax)				\
+		LABEL(3)								\
         EMIT2(movzx, ch, ecx)                   \
         EMIT2(and, KONST(0x0F), ecx)            \
         EMIT2(mov, REGREF2(ecx,4), ecx)
@@ -1533,7 +1537,7 @@ static INSN_REGPARM void arm121(u32 opcode)
 #define OP_LDR    reg[dest].I = CPUReadMemory(address)
 #define OP_LDRH   reg[dest].I = CPUReadHalfWord(address)
 #define OP_LDRB   reg[dest].I = CPUReadByte(address)
-#define OP_LDRSH  reg[dest].I = (s16)CPUReadHalfWordSigned(address)
+#define OP_LDRSH  reg[dest].I = (u32)CPUReadHalfWordSigned(address)
 #define OP_LDRSB  reg[dest].I = (s8)CPUReadByte(address)
 
 #define WRITEBACK_NONE     /*nothing*/
@@ -2608,8 +2612,7 @@ static INSN_REGPARM void armA00(u32 opcode)
     reg[15].I += 4;
     ARM_PREFETCH;
     clockTicks = codeTicksAccessSeq32(armNextPC) + 1;
-    clockTicks += 2 + codeTicksAccess32(armNextPC)
-                    + codeTicksAccessSeq32(armNextPC);
+    clockTicks = (clockTicks * 2) + codeTicksAccess32(armNextPC) + 1;
     busPrefetchCount = 0;
 }
 
@@ -2625,8 +2628,7 @@ static INSN_REGPARM void armB00(u32 opcode)
     reg[15].I += 4;
     ARM_PREFETCH;
     clockTicks = codeTicksAccessSeq32(armNextPC) + 1;
-    clockTicks += 2 + codeTicksAccess32(armNextPC)
-                    + codeTicksAccessSeq32(armNextPC);
+    clockTicks = (clockTicks * 2) + codeTicksAccess32(armNextPC) + 1;
     busPrefetchCount = 0;
 }
 
@@ -2644,9 +2646,8 @@ static INSN_REGPARM void armE01(u32 opcode)
 // SWI <comment>
 static INSN_REGPARM void armF00(u32 opcode)
 {
-    clockTicks = codeTicksAccessSeq32(armNextPC) + 1;
-    clockTicks += 2 + codeTicksAccess32(armNextPC)
-                    + codeTicksAccessSeq32(armNextPC);
+	clockTicks = codeTicksAccessSeq32(armNextPC) + 1;
+	clockTicks = (clockTicks * 2) + codeTicksAccess32(armNextPC) + 1;
     busPrefetchCount = 0;
     CPUSoftwareInterrupt(opcode & 0x00FFFFFF);
 }
@@ -2700,7 +2701,7 @@ static insnfunc_t armInsnTable[4096] = {
     arm0E0,arm0E1,arm0E2,arm0E3,arm0E4,arm0E5,arm0E6,arm0E7,  // 0E0
     arm0E0,arm0E9,arm0E2,arm0CB,arm0E4,arm_UI,arm0E6,arm_UI,  // 0E8
     arm0F0,arm0F1,arm0F2,arm0F3,arm0F4,arm0F5,arm0F6,arm0F7,  // 0F0
-    arm0F0,arm0F9,arm0F2,arm_UI,arm0F4,arm0DD,arm0F6,arm0DF,  // 0F8
+    arm0F0,arm0F9,arm0F2,arm0DB,arm0F4,arm0DD,arm0F6,arm0DF,  // 0F8
 
     arm100,arm_UI,arm_UI,arm_UI,arm_UI,arm_UI,arm_UI,arm_UI,  // 100
     arm_UI,arm109,arm_UI,arm10B,arm_UI,arm_UI,arm_UI,arm_UI,  // 108

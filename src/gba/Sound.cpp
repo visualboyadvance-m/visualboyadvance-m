@@ -183,15 +183,19 @@ void Gba_Pcm_Fifo::timer_overflowed( int which_timer )
 {
 	if ( which_timer == timer && enabled )
 	{
-		if ( count <= 16 )
+		/* Mother 3 fix, refined to not break Metroid Fusion */
+		if ( count == 16 || count == 0 )
 		{
 			// Need to fill FIFO
+			int saved_count = count;
 			CPUCheckDMA( 3, which ? 4 : 2 );
-			if ( count <= 16 )
+			if ( saved_count == 0 && count == 16 )
+				CPUCheckDMA( 3, which ? 4 : 2 );
+			if ( count == 0 )
 			{
 				// Not filled by DMA, so fill with 16 bytes of silence
 				int reg = which ? FIFOB_L : FIFOA_L;
-				for ( int n = 4; n--; )
+				for ( int n = 8; n--; )
 				{
 					soundEvent(reg  , (u16)0);
 					soundEvent(reg+2, (u16)0);
@@ -348,6 +352,11 @@ static void end_frame( blip_time_t time )
 
 void flush_samples(Multi_Buffer * buffer)
 {
+#ifdef __LIBRETRO__
+   int numSamples = buffer->read_samples( (blip_sample_t*) soundFinalWave, buffer->samples_avail() );
+   soundDriver->write(soundFinalWave, numSamples);
+   systemOnWriteDataToSoundBuffer(soundFinalWave, numSamples);
+#else
 	// We want to write the data frame by frame to support legacy audio drivers
 	// that don't use the length parameter of the write method.
 	// TODO: Update the Win32 audio drivers (DS, OAL, XA2), and flush all the
@@ -370,6 +379,7 @@ void flush_samples(Multi_Buffer * buffer)
 		soundDriver->write(soundFinalWave, soundBufferLen);
 		systemOnWriteDataToSoundBuffer(soundFinalWave, soundBufferLen);
 	}
+#endif
 }
 
 static void apply_filtering()
@@ -446,6 +456,13 @@ static void remake_stereo_buffer()
 	pcm [0].pcm.init();
 	pcm [1].pcm.init();
 
+	// APU
+	if ( !gb_apu )
+	{
+		gb_apu = new Gb_Apu; // TODO: handle out of memory
+		reset_apu();
+	}
+
 	// Stereo_Buffer
 	delete stereo_buffer;
 	stereo_buffer = 0;
@@ -459,13 +476,7 @@ static void remake_stereo_buffer()
 	pcm [1].which = 1;
 	apply_filtering();
 
-	// APU
-	if ( !gb_apu )
-	{
-		gb_apu = new Gb_Apu; // TODO: handle out of memory
-		reset_apu();
-	}
-
+	// Volume Level
 	apply_muting();
 	apply_volume();
 }
@@ -743,16 +754,25 @@ static void skip_read( gzFile in, int count )
 	}
 }
 
+#ifdef __LIBRETRO__
+void soundSaveGame( u8 *&out )
+#else
 void soundSaveGame( gzFile out )
+#endif
 {
 	gb_apu->save_state( &state.apu );
 
 	// Be sure areas for expansion get written as zero
 	memset( dummy_state, 0, sizeof dummy_state );
 
+#ifdef __LIBRETRO__
+	utilWriteDataMem( out, gba_state );
+#else
 	utilWriteData( out, gba_state );
+#endif
 }
 
+#ifndef __LIBRETRO__
 static void soundReadGameOld( gzFile in, int version )
 {
 	// Read main data
@@ -787,19 +807,28 @@ static void soundReadGameOld( gzFile in, int version )
 
 	(void) utilReadInt( in ); // ignore quality
 }
+#endif
 
 #include <stdio.h>
 
+#ifdef __LIBRETRO__
+void soundReadGame(const u8*& in, int version )
+#else
 void soundReadGame( gzFile in, int version )
+#endif
 {
 	// Prepare APU and default state
 	reset_apu();
 	gb_apu->save_state( &state.apu );
 
 	if ( version > SAVE_GAME_VERSION_9 )
+#ifdef __LIBRETRO__
+		utilReadDataMem( in, gba_state );
+#else
 		utilReadData( in, gba_state );
 	else
 		soundReadGameOld( in, version );
+#endif
 
 	gb_apu->load_state( state.apu );
 	write_SGCNT0_H( READ16LE( &ioMem [SGCNT0_H] ) & 0x770F );
