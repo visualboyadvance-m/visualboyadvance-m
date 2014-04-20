@@ -1761,6 +1761,7 @@ BEGIN
                 MENUITEM "OBJ WIN",                     ID_OPTIONS_VIDEO_LAYERS_OBJWIN
             END
             MENUITEM SEPARATOR
+            MENUITEM "Disable SFX",                 ID_OPTIONS_VIDEO_DISABLESFX
             MENUITEM "Disable status messages",     ID_OPTIONS_EMULATOR_DISABLESTATUSMESSAGES
         END
         POPUP "&Pixel Filter"
