@@ -162,7 +162,7 @@ int WaitForSingleObject(sem_t *s, int t)
 int linktime = 0;
 
 GBASockClient* dol = NULL;
-sf::IPAddress joybusHostAddr = sf::IPAddress::LocalHost;
+sf::IpAddress joybusHostAddr = sf::IpAddress::LocalHost;
 
 // Hodgepodge
 u8 tspeed = 3;
@@ -1105,7 +1105,7 @@ void CloseLink(void){
 			char outbuffer[4];
 			outbuffer[0] = 4;
 			outbuffer[1] = -32;
-			if(lanlink.type==0) lanlink.tcpsocket.Send(outbuffer, 4);
+			if(lanlink.type==0) lanlink.tcpsocket.send(outbuffer, 4);
 		} else {
 			char outbuffer[12];
 			int i;
@@ -1113,9 +1113,9 @@ void CloseLink(void){
 			outbuffer[1] = -32;
 			for(i=1;i<=lanlink.numslaves;i++){
 				if(lanlink.type==0){
-					ls.tcpsocket[i].Send(outbuffer, 12);
+					ls.tcpsocket[i].send(outbuffer, 12);
 				}
-				ls.tcpsocket[i].Close();
+				ls.tcpsocket[i].disconnect();
 			}
 		}
 	}
@@ -1187,7 +1187,7 @@ lserver::lserver(void){
 bool lserver::Init(ServerInfoDisplay *sid){
 	// too bad Listen() doesn't take an address as well
 	// then again, old code used INADDR_ANY anyway
-	if(!lanlink.tcpsocket.Listen(IP_LINK_PORT))
+	if(!lanlink.listener.listen(IP_LINK_PORT))
 		// Note: old code closed socket & retried once on bind failure
 		return false; // FIXME: error code?
 
@@ -1200,10 +1200,10 @@ bool lserver::Init(ServerInfoDisplay *sid){
 	linkid = 0;
 
 	// should probably use GetPublicAddress()
-	sid->ShowServerIP(sf::IPAddress::GetLocalAddress());
+	sid->ShowServerIP(sf::IpAddress::getLocalAddress());
 
 	lanlink.thread = new sf::Thread(LinkServerThread, sid);
-	lanlink.thread->Launch();
+	lanlink.thread->launch();
 
 	return true;
 
@@ -1211,7 +1211,7 @@ bool lserver::Init(ServerInfoDisplay *sid){
 
 void LinkServerThread(void *_sid){
 	ServerInfoDisplay *sid = (ServerInfoDisplay *)_sid;
-	sf::Selector<sf::SocketTCP> fdset;
+	sf::SocketSelector fdset;
 	char inbuffer[256], outbuffer[256];
 	s32 *intinbuffer = (s32*)inbuffer;
 	u16 *u16inbuffer = (u16*)inbuffer;
@@ -1221,24 +1221,24 @@ void LinkServerThread(void *_sid){
 	i = 0;
 
 	while(i<lanlink.numslaves){
-		fdset.Clear();
-		fdset.Add(lanlink.tcpsocket);
+		fdset.clear();
+		fdset.add(lanlink.tcpsocket);
 		if(lanlink.terminate){
 			ReleaseSemaphore(linksync[vbaid], 1, NULL);
 			goto CloseInfoDisplay;
 		}
-		if(fdset.Wait(0.1)==1){
+		if(fdset.wait(sf::seconds(0.1))==1){
 			sf::Socket::Status st =
-				lanlink.tcpsocket.Accept(ls.tcpsocket[i+1]);
+				lanlink.listener.accept(ls.tcpsocket[i+1]);
 			if(st == sf::Socket::Error) {
-				for(int j=1;j<i;j++) ls.tcpsocket[j].Close();
+				for(int j=1;j<i;j++) ls.tcpsocket[j].disconnect();
 				systemMessage(0, N_("Network error."));
 				lanlink.terminate = true;
 			} else {
 				i++;
 				WRITE16LE(&u16outbuffer[0], i);
 				WRITE16LE(&u16outbuffer[1], lanlink.numslaves);
-				ls.tcpsocket[i].Send(outbuffer, 4);
+				ls.tcpsocket[i].send(outbuffer, 4);
 				sid->ShowConnect(i);
 			}
 		}
@@ -1251,7 +1251,7 @@ void LinkServerThread(void *_sid){
 
 	for(i=1;i<=lanlink.numslaves;i++){
 		outbuffer[0] = 4;
-		ls.tcpsocket[i].Send(outbuffer, 4);
+		ls.tcpsocket[i].send(outbuffer, 4);
 	}
 
 CloseInfoDisplay:
@@ -1265,9 +1265,9 @@ void lserver::Send(void){
 			outbuffer[0] = 4;
 			outbuffer[1] = -32;	//0xe0
 			for(i=1;i<=lanlink.numslaves;i++){
-				tcpsocket[i].Send(outbuffer, 4);
+				tcpsocket[i].send(outbuffer, 4);
 				size_t nr;
-				tcpsocket[i].Receive(inbuffer, 4, nr);
+				tcpsocket[i].receive(inbuffer, 4, nr);
 			}
 		}
 		outbuffer[1] = tspeed;
@@ -1276,27 +1276,27 @@ void lserver::Send(void){
 		if(lanlink.numslaves==1){
 			if(lanlink.type==0){
 				outbuffer[0] = 8;
-				tcpsocket[1].Send(outbuffer, 8);
+				tcpsocket[1].send(outbuffer, 8);
 			}
 		}
 		else if(lanlink.numslaves==2){
 			WRITE16LE(&u16outbuffer[4], linkdata[2]);
 			if(lanlink.type==0){
 				outbuffer[0] = 10;
-				tcpsocket[1].Send(outbuffer, 10);
+				tcpsocket[1].send(outbuffer, 10);
 				WRITE16LE(&u16outbuffer[4], linkdata[1]);
-				tcpsocket[2].Send(outbuffer, 10);
+				tcpsocket[2].send(outbuffer, 10);
 			}
 		} else {
 			if(lanlink.type==0){
 				outbuffer[0] = 12;
 				WRITE16LE(&u16outbuffer[4], linkdata[2]);
 				WRITE16LE(&u16outbuffer[5], linkdata[3]);
-				tcpsocket[1].Send(outbuffer, 12);
+				tcpsocket[1].send(outbuffer, 12);
 				WRITE16LE(&u16outbuffer[4], linkdata[1]);
-				tcpsocket[2].Send(outbuffer, 12);
+				tcpsocket[2].send(outbuffer, 12);
 				WRITE16LE(&u16outbuffer[5], linkdata[2]);
-				tcpsocket[3].Send(outbuffer, 12);
+				tcpsocket[3].send(outbuffer, 12);
 			}
 		}
 	}
@@ -1306,10 +1306,10 @@ void lserver::Send(void){
 void lserver::Recv(void){
 	int numbytes;
 	if(lanlink.type==0){	// TCP
-		fdset.Clear();
-		for(i=0;i<lanlink.numslaves;i++) fdset.Add(tcpsocket[i+1]);
+		fdset.clear();
+		for(i=0;i<lanlink.numslaves;i++) fdset.add(tcpsocket[i+1]);
 		// was linktimeout/1000 (i.e., drop ms part), but that's wrong
-		if (fdset.Wait((float)(linktimeout / 1000.)) == 0)
+		if (fdset.wait(sf::seconds((float)(linktimeout / 1000.))) == 0)
 		{
 			return;
 		}
@@ -1319,7 +1319,7 @@ void lserver::Recv(void){
 			inbuffer[0] = 1;
 			while(numbytes<howmanytimes*inbuffer[0]) {
 				size_t nr;
-				tcpsocket[i+1].Receive(inbuffer+numbytes, howmanytimes*inbuffer[0]-numbytes, nr);
+				tcpsocket[i+1].receive(inbuffer+numbytes, howmanytimes*inbuffer[0]-numbytes, nr);
 				numbytes += nr;
 			}
 			if(howmanytimes>1) memmove(inbuffer, inbuffer+inbuffer[0]*(howmanytimes-1), inbuffer[0]);
@@ -1331,10 +1331,10 @@ void lserver::Recv(void){
 				outbuffer[0] = 4;
 				outbuffer[1] = -32;
 				for(i=1;i<lanlink.numslaves;i++){
-					tcpsocket[i].Send(outbuffer, 12);
+					tcpsocket[i].send(outbuffer, 12);
 					size_t nr;
-					tcpsocket[i].Receive(inbuffer, 256, nr);
-					tcpsocket[i].Close();
+					tcpsocket[i].receive(inbuffer, 256, nr);
+					tcpsocket[i].disconnect();
 				}
 				return;
 			}
@@ -1357,10 +1357,10 @@ lclient::lclient(void){
 	return;
 }
 
-bool lclient::Init(sf::IPAddress addr, ClientInfoDisplay *cid){
+bool lclient::Init(sf::IpAddress addr, ClientInfoDisplay *cid){
 	serveraddr = addr;
 	serverport = IP_LINK_PORT;
-	lanlink.tcpsocket.SetBlocking(false);
+	lanlink.tcpsocket.setBlocking(false);
 
 	if(lanlink.thread!=NULL){
 		lanlink.terminate = true;
@@ -1371,19 +1371,19 @@ bool lclient::Init(sf::IPAddress addr, ClientInfoDisplay *cid){
 	cid->ConnectStart(addr);
 	lanlink.terminate = false;
 	lanlink.thread = new sf::Thread(LinkClientThread, cid);
-	lanlink.thread->Launch();
+	lanlink.thread->launch();
 	return true;
 }
 
 void LinkClientThread(void *_cid){
 	ClientInfoDisplay *cid = (ClientInfoDisplay *)_cid;
-	sf::Selector<sf::SocketTCP> fdset;
+	sf::SocketSelector fdset;
 	int numbytes;
 	char inbuffer[16];
 	u16 *u16inbuffer = (u16*)inbuffer;
 	unsigned long block = 0;
 
-	while(lanlink.tcpsocket.Connect(lc.serverport, lc.serveraddr) != sf::Socket::Done) {
+	while(lanlink.tcpsocket.connect(lc.serveraddr, lc.serverport) != sf::Socket::Done) {
 		// stupid SFML has no way of giving what sort of error occurred
 		// so we'll just have to do a retry loop, I guess.
 		cid->Ping();
@@ -1403,14 +1403,14 @@ void LinkClientThread(void *_cid){
 	numbytes = 0;
 	size_t got;
 	while(numbytes<4) {
-		lanlink.tcpsocket.Receive(inbuffer+numbytes, 4 - numbytes, got);
+		lanlink.tcpsocket.receive(inbuffer+numbytes, 4 - numbytes, got);
 		numbytes += got;
-		fdset.Clear();
-		fdset.Add(lanlink.tcpsocket);
-		fdset.Wait(0.1);
+		fdset.clear();
+		fdset.add(lanlink.tcpsocket);
+		fdset.wait(sf::seconds(0.1));
 		cid->Ping();
 		if(lanlink.terminate) {
-			lanlink.tcpsocket.Close();
+			lanlink.tcpsocket.disconnect();
 			goto CloseInfoDisplay;
 		}
 	}
@@ -1422,14 +1422,14 @@ void LinkClientThread(void *_cid){
 	numbytes = 0;
 	inbuffer[0] = 1;
 	while(numbytes<inbuffer[0]) {
-		lanlink.tcpsocket.Receive(inbuffer+numbytes, inbuffer[0] - got, got);
+		lanlink.tcpsocket.receive(inbuffer+numbytes, inbuffer[0] - got, got);
 		numbytes += got;
-		fdset.Clear();
-		fdset.Add(lanlink.tcpsocket);
-		fdset.Wait(0.1);
+		fdset.clear();
+		fdset.add(lanlink.tcpsocket);
+		fdset.wait(sf::seconds(0.1));
 		cid->Ping();
 		if(lanlink.terminate) {
-			lanlink.tcpsocket.Close();
+			lanlink.tcpsocket.disconnect();
 			goto CloseInfoDisplay;
 		}
 	}
@@ -1445,16 +1445,16 @@ CloseInfoDisplay:
 
 void lclient::CheckConn(void){
 	size_t nr;
-	lanlink.tcpsocket.Receive(inbuffer, 1, nr);
+	lanlink.tcpsocket.receive(inbuffer, 1, nr);
 	numbytes = nr;
 	if(numbytes>0){
 		while(numbytes<inbuffer[0]) {
-			lanlink.tcpsocket.Receive(inbuffer+numbytes, inbuffer[0] - numbytes, nr);
+			lanlink.tcpsocket.receive(inbuffer+numbytes, inbuffer[0] - numbytes, nr);
 			numbytes += nr;
 		}
 		if(inbuffer[1]==-32){
 			outbuffer[0] = 4;
-			lanlink.tcpsocket.Send(outbuffer, 4);
+			lanlink.tcpsocket.send(outbuffer, 4);
 			lanlink.connected = false;
 			systemScreenMessage(_("Server disconnected."));
 			return;
@@ -1475,11 +1475,11 @@ void lclient::CheckConn(void){
 }
 
 void lclient::Recv(void){
-	fdset.Clear();
+	fdset.clear();
 	// old code used socket # instead of mask again
-	fdset.Add(lanlink.tcpsocket);
+	fdset.add(lanlink.tcpsocket);
 	// old code stripped off ms again
-	if (fdset.Wait((float)(linktimeout / 1000.)) == 0)
+	if (fdset.wait(sf::seconds((float)(linktimeout / 1000.))) == 0)
 	{
 		numtransfers = 0;
 		return;
@@ -1488,12 +1488,12 @@ void lclient::Recv(void){
 	inbuffer[0] = 1;
 	size_t nr;
 	while(numbytes<inbuffer[0]) {
-		lanlink.tcpsocket.Receive(inbuffer+numbytes, inbuffer[0] - numbytes, nr);
+		lanlink.tcpsocket.receive(inbuffer+numbytes, inbuffer[0] - numbytes, nr);
 		numbytes += nr;
 	}
 	if(inbuffer[1]==-32){
 		outbuffer[0] = 4;
-		lanlink.tcpsocket.Send(outbuffer, 4);
+		lanlink.tcpsocket.send(outbuffer, 4);
 		lanlink.connected = false;
 		systemScreenMessage(_("Server disconnected."));
 		return;
@@ -1515,7 +1515,7 @@ void lclient::Send(){
 	outbuffer[0] = 4;
 	outbuffer[1] = linkid<<2;
 	WRITE16LE(&u16outbuffer[1], linkdata[linkid]);
-	lanlink.tcpsocket.Send(outbuffer, 4);
+	lanlink.tcpsocket.send(outbuffer, 4);
 	return;
 }
 #endif

@@ -88,8 +88,8 @@ public:
 		sid_t(wxMutex *m, wxCondition *c, wxString *cm, wxString *pm,
 		      bool *d) :
 		    lock(m), sig(c), connmsg(cm), pmsg(pm), done(d) {}
-		void ShowServerIP(const sf::IPAddress &addr) {
-		    wxString addr_s(addr.ToString().c_str(), wxConvLibc);
+		void ShowServerIP(const sf::IpAddress &addr) {
+		    wxString addr_s(addr.toString().c_str(), wxConvLibc);
 		    wxString msg;
 		    msg.Printf(_("Server IP address is: %s\n"), addr_s.c_str());
 		    connmsg->append(msg);
@@ -152,8 +152,8 @@ public:
 		cid_t(wxMutex *m, wxCondition *c, wxString *cm, wxString *pm,
 		      bool *d) :
 		    lock(m), sig(c), connmsg(cm), pmsg(pm), done(d) {}
-		void ConnectStart(const sf::IPAddress &addr) {
-		    wxString addr_s(addr.ToString().c_str(), wxConvLibc);
+		void ConnectStart(const sf::IpAddress &addr) {
+		    wxString addr_s(addr.toString().c_str(), wxConvLibc);
 		    connmsg->Printf(_("Connecting to %s\n"), addr_s.c_str());
 		}
 		void ShowConnect(int player, int togo) {
@@ -185,7 +185,7 @@ public:
 	    
 	    cid_t* cid = new cid_t(&lock, &sig, &connmsg, &pmsg, &done);
 	    
-	    if (!lc.Init(sf::IPAddress(std::string(gopts.link_host.mb_str())), cid)) {
+	    if (!lc.Init(sf::IpAddress(std::string(gopts.link_host.mb_str())), cid)) {
 			wxLogError(_("Error occurred.\nPlease try again."));
 			lock.Unlock();
 			delete cid;
@@ -1456,8 +1456,8 @@ public:
 	if(val.empty())
 	    isv = false;
 	else {
-	    sf::IPAddress srv = std::string(val.mb_str());
-	    isv = srv.IsValid();
+	    sf::IpAddress srv = std::string(val.mb_str());
+	    isv = (joybusHostAddr == sf::IpAddress::None);
 	}
 	if(!isv)
 	    wxMessageBox(_("You must enter a valid host name"),
@@ -3209,7 +3209,7 @@ bool MainFrame::InitMore(void)
 	bool isv = !gopts.joybus_host.empty();
 	if(isv) {
 	    joybusHostAddr = std::string(gopts.joybus_host.mb_str());
-	    isv = joybusHostAddr.IsValid();
+	    isv = (joybusHostAddr == sf::IpAddress::None);
 	}
 	if(!isv) {
 	    wxLogError(_("JoyBus host invalid; disabling"));
