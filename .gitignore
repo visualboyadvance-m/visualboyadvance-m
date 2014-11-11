@@ -1,0 +1,12 @@
+/*.patch
+/.cproject
+/.project
+/CMakeCache.txt
+/CMakeFiles
+/Makefile
+/cmake_install.cmake
+/gvbam
+/install_manifest.txt
+/libvbamcore.a
+/vbam
+/wxvbam
