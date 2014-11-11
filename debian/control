@@ -1,10 +1,12 @@
 Source: vbam
 Section: otherosfs
 Priority: optional
-Maintainer: Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>
-Build-Depends: debhelper (>= 7), cmake, nasm [i386 amd64], libsdl1.2-dev, libgl-dev, libgtkmm-2.4-dev, libgtkglextmm-x11-1.2-dev, libavcodec-dev, libavformat-dev, libswscale-dev, libavutil-dev, wx-common, libcairo2-dev, liblircclient-dev, libopenal-dev, libwxgtk2.8-dev, libsfml-dev, imagemagick, zip
-Standards-Version: 3.8.1
-Homepage: http://www.vbam.com
+Maintainer: Sérgio Benjamim <sergio_br2@yahoo.com.br>
+Build-Depends: debhelper (>= 9), cmake, zlib1g-dev, libpng12-dev, imagemagick, libopenal-dev, libsdl1.2-dev, libgtkmm-2.4-dev, libgtkglextmm-x11-1.2-dev, libwxgtk2.8-dev, wx-common, libcairo2-dev, libsfml-dev, nasm [i386 amd64], liblircclient-dev, libavcodec-dev, libavformat-dev, libswscale-dev, libavutil-dev
+Standards-Version: 3.9.4
+Homepage: http://vba-m.com
+Vcs-Svn: svn://svn.code.sf.net/p/vbam/code/trunk
+Vcs-Browser: http://svn.code.sf.net/p/vbam/code/trunk
 
 Package: vbam-sdl
 Architecture: any

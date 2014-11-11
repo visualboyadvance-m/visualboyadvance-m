@@ -1,3 +1,9 @@
+vbam (1.8.0.1229-1) UNRELEASED; urgency=low
+
+  * Use new version from upstream
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Sat, 26 Apr 2014 02:10:00 +0100
+
 vbam (1.8.0.1042-1) lucid; urgency=low
 
   * Use new version from upstream
@@ -14,7 +20,7 @@ vbam (1.8.0.1001-1) unstable; urgency=low
 
   * Use new version from upstream
 
- -- Bastien Bouclet <bbouclet@lapin>  Fri, 25 Feb 2011 12:25:25 +0100
+ -- Bastien Bouclet <bgk@users.sourceforge.net>  Fri, 25 Feb 2011 12:25:25 +0100
 
 vbam (1.8.0.914-1) unstable; urgency=low
 
