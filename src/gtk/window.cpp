@@ -55,22 +55,22 @@ Window * Window::m_poInstance = NULL;
 
 const Window::SJoypadKey Window::m_astJoypad[] =
 {
-	{ "left",    KEY_LEFT           },
-	{ "right",   KEY_RIGHT          },
-	{ "up",      KEY_UP             },
-	{ "down",    KEY_DOWN           },
-	{ "A",       KEY_BUTTON_A       },
-	{ "B",       KEY_BUTTON_B       },
-	{ "select",  KEY_BUTTON_SELECT  },
-	{ "start",   KEY_BUTTON_START   },
-	{ "L",       KEY_BUTTON_L       },
-	{ "R",       KEY_BUTTON_R       },
-	{ "speed",   KEY_BUTTON_SPEED   },
-	{ "capture", KEY_BUTTON_CAPTURE },
-	{ "speed",   KEY_BUTTON_SPEED   },
-	{ "capture", KEY_BUTTON_CAPTURE },
-	{ "autoA",   KEY_BUTTON_AUTO_A  },
-	{ "autoB",   KEY_BUTTON_AUTO_B  }
+	{ "left",    KEY_LEFT                 },
+	{ "right",   KEY_RIGHT                },
+	{ "up",      KEY_UP                   },
+	{ "down",    KEY_DOWN                 },
+	{ "A",       KEY_BUTTON_A             },
+	{ "B",       KEY_BUTTON_B             },
+	{ "select",  KEY_BUTTON_SELECT        },
+	{ "start",   KEY_BUTTON_START         },
+	{ "L",       KEY_BUTTON_L             },
+	{ "R",       KEY_BUTTON_R             },
+	{ "speed",   KEY_BUTTON_SPEED         },
+	{ "save",    KEY_BUTTON_SAVE_OLDEST   },
+	{ "load",    KEY_BUTTON_LOAD_RECENT   },
+	{ "capture", KEY_BUTTON_CAPTURE       },
+	{ "autoA",   KEY_BUTTON_AUTO_A        },
+	{ "autoB",   KEY_BUTTON_AUTO_B        }
 };
 
 Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Gtk::Builder> & _poXml) :
@@ -480,6 +480,8 @@ void Window::vInitSDL()
   inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_L, GDK_a);
   inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_R, GDK_s);
   inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_SPEED, GDK_space);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_SAVE_OLDEST, GDK_k);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_LOAD_RECENT, GDK_l);
   inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_CAPTURE, GDK_F12);
   inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_AUTO_A, GDK_q);
   inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_AUTO_B, GDK_w);

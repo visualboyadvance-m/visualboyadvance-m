@@ -207,8 +207,11 @@ void Window::vOnSaveGameOldest()
 
   for (int i = 0; i < 10; i++)
   {
-    if (! m_astGameSlot[i].m_bEmpty
-        && (iOldest < 0 || m_astGameSlot[i].m_uiTime < uiTimeMin))
+    if (m_astGameSlot[i].m_bEmpty) {
+      iOldest = i;
+      break;
+    }
+    else if ( iOldest < 0 || m_astGameSlot[i].m_uiTime < uiTimeMin)
     {
       iOldest = i;
       uiTimeMin = m_astGameSlot[i].m_uiTime;

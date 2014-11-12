@@ -123,6 +123,8 @@ int captureNumber = 0;
 int armOpcodeCount = 0;
 int thumbOpcodeCount = 0;
 
+extern bool saveold, loadrcn, savePrevious, loadPrevious;
+
 const int TIMER_TICKS[4] = {
   0,
   6,
@@ -3765,6 +3767,20 @@ void CPULoop(int ticks)
               }
               capturePrevious = capture;
 
+#ifdef ENABLE_GTK // todo: enable for wx also
+              // todo: generally this is very inefficient way to do this: cmp on every loop
+              saveold = (ext & 4) ? true : false;
+              loadrcn = (ext & 8) ? true : false;
+
+              if(saveold && !savePrevious) {
+                systemSaveOldest();
+              }
+              savePrevious = saveold;
+              if(loadrcn && !loadPrevious) {
+                systemLoadRecent();
+              }
+              loadPrevious = loadrcn;
+#endif
               DISPSTAT |= 1;
               DISPSTAT &= 0xFFFD;
               UPDATE_REG(0x04, DISPSTAT);

@@ -535,6 +535,10 @@ uint32_t inputReadJoypad(int which)
     res |= 1024;
   if(sdlButtons[which][KEY_BUTTON_CAPTURE])
     res |= 2048;
+  if(sdlButtons[which][KEY_BUTTON_SAVE_OLDEST])
+    res |= 4096;
+  if(sdlButtons[which][KEY_BUTTON_LOAD_RECENT])
+    res |= 8192;
 
   if(realAutoFire) {
     res &= (~realAutoFire);

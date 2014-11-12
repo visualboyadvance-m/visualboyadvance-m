@@ -2619,6 +2619,16 @@ void systemScreenCapture(int a)
   systemScreenMessage("Screen capture");
 }
 
+void systemSaveOldest()
+{
+	// I need to be implemented
+}
+
+void systemLoadRecent()
+{
+	// I need to be implemented
+}
+
 u32 systemGetClock()
 {
   return SDL_GetTicks();

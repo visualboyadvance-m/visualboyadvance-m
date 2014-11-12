@@ -93,6 +93,16 @@ void systemScreenCapture(int _iNum)
   GUI()->vCaptureScreen(_iNum);
 }
 
+void systemSaveOldest()
+{
+  GUI()->vOnSaveGameOldest();
+}
+
+void systemLoadRecent()
+{
+  GUI()->vOnLoadGameMostRecent();
+}
+
 u32 systemGetClock()
 {
     Glib::TimeVal time;

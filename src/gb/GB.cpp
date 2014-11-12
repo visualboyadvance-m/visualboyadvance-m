@@ -198,6 +198,8 @@ bool gbCapture = false;
 bool gbCapturePrevious = false;
 int gbJoymask[4] = { 0, 0, 0, 0 };
 
+bool saveold=false, loadrcn=false, savePrevious=false, loadPrevious=false;
+
 u8 gbRamFill = 0xff;
 
 int gbRomSizes[] = { 0x00008000, // 32K
@@ -4971,6 +4973,21 @@ void gbEmulate(int ticksToStop)
                   systemScreenCapture(gbCaptureNumber);
                 }
                 gbCapturePrevious = gbCapture;
+
+#ifdef ENABLE_GTK // todo: enable for wx also
+                // todo: generally this is very inefficient way to do this: cmp on every loop
+                saveold = (newmask & 4) ? true : false;
+                loadrcn = (newmask & 8) ? true : false;
+
+                if(saveold && !savePrevious) {
+                  systemSaveOldest();
+                }
+                savePrevious = saveold;
+                if(loadrcn && !loadPrevious) {
+                  systemLoadRecent();
+                }
+                loadPrevious = loadrcn;
+#endif
 
           if(gbFrameSkipCount >= framesToSkip) {
 

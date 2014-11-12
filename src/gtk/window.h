@@ -112,6 +112,9 @@ public:
   void vApplyPerGameConfig();
   void vUpdateScreen();
 
+  virtual void vOnSaveGameOldest();
+  virtual void vOnLoadGameMostRecent();
+
   inline ECartridge eGetCartridge() const { return m_eCartridge; }
 
 protected:
@@ -143,10 +146,8 @@ protected:
   virtual void vOnFileOpen();
   virtual void vOnFileLoad();
   virtual void vOnFileSave();
-  virtual void vOnLoadGameMostRecent();
   virtual void vOnLoadGameAutoToggled(Gtk::CheckMenuItem * _poCMI);
   void vOnLoadGame(int _iSlot);
-  virtual void vOnSaveGameOldest();
   void vOnSaveGame(int _iSlot);
   virtual void vOnFilePauseToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnFileReset();

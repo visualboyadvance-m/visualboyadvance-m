@@ -27,20 +27,22 @@ namespace VBA
 
 const JoypadConfigDialog::SJoypadKey JoypadConfigDialog::m_astKeys[] =
 {
-    { KEY_UP,             N_("Up :")         },
-    { KEY_DOWN,           N_("Down :")       },
-    { KEY_LEFT,           N_("Left :")       },
-    { KEY_RIGHT,          N_("Right :")      },
-    { KEY_BUTTON_A,       N_("Button A :")   },
-    { KEY_BUTTON_B,       N_("Button B :")   },
-    { KEY_BUTTON_L,       N_("Button L :")   },
-    { KEY_BUTTON_R,       N_("Button R :")   },
-    { KEY_BUTTON_SELECT,  N_("Select :")     },
-    { KEY_BUTTON_START,   N_("Start :")      },
-    { KEY_BUTTON_SPEED,   N_("Speed :")      },
-    { KEY_BUTTON_CAPTURE, N_("Capture :")    },
-    { KEY_BUTTON_AUTO_A,  N_("Autofire A :") },
-    { KEY_BUTTON_AUTO_B,  N_("Autofire B :") }
+    { KEY_UP,                   N_("Up :")         },
+    { KEY_DOWN,                 N_("Down :")       },
+    { KEY_LEFT,                 N_("Left :")       },
+    { KEY_RIGHT,                N_("Right :")      },
+    { KEY_BUTTON_A,             N_("Button A :")   },
+    { KEY_BUTTON_B,             N_("Button B :")   },
+    { KEY_BUTTON_L,             N_("Button L :")   },
+    { KEY_BUTTON_R,             N_("Button R :")   },
+    { KEY_BUTTON_SELECT,        N_("Select :")     },
+    { KEY_BUTTON_START,         N_("Start :")      },
+    { KEY_BUTTON_SPEED,         N_("Speed :")      },
+    { KEY_BUTTON_SAVE_OLDEST,   N_("SaveOldest :") },
+    { KEY_BUTTON_LOAD_RECENT,   N_("LoadRecent :") },
+    { KEY_BUTTON_CAPTURE,       N_("Capture :")    },
+    { KEY_BUTTON_AUTO_A,        N_("Autofire A :") },
+    { KEY_BUTTON_AUTO_B,        N_("Autofire B :") }
 };
 
 JoypadConfigDialog::JoypadConfigDialog(Config::Section * _poConfig) :
