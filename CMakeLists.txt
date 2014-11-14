@@ -10,7 +10,7 @@ SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts )
 
 option( ENABLE_SDL "Build the SDL port" ON )
 option( ENABLE_GTK "Build the GTK+ GUI" ON )
-option( ENABLE_WX "Build the wxWidgets port" OFF )
+option( ENABLE_WX "Build the wxWidgets port" ON )
 option( ENABLE_DEBUGGER "Enable the debugger" ON )
 option( ENABLE_NLS "Enable translations" ON )
 option( ENABLE_ASM_CORE "Enable x86 ASM CPU cores" OFF )
