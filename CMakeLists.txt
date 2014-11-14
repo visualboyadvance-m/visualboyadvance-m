@@ -324,31 +324,6 @@ else( ENABLE_ASM_SCALERS )
     ADD_DEFINITIONS ( -DNO_ASM )
 endif( ENABLE_ASM_SCALERS )
 
-SET(SRC_GTK
-    src/gtk/configfile.cpp
-    src/gtk/main.cpp
-    src/gtk/system.cpp
-    src/gtk/windowcallbacks.cpp
-    src/gtk/filters.cpp
-    src/gtk/generalconfig.cpp
-    src/gtk/gameboyconfig.cpp
-    src/gtk/gameboyadvanceconfig.cpp
-    src/gtk/cheatlist.cpp
-    src/gtk/cheatedit.cpp
-    src/gtk/gameboyadvancecheatlist.cpp
-    src/gtk/gameboycheatlist.cpp
-    src/gtk/joypadconfig.cpp
-    src/gtk/directoriesconfig.cpp
-    src/gtk/displayconfig.cpp
-    src/gtk/soundconfig.cpp
-    src/gtk/screenarea.cpp
-    src/gtk/screenarea-cairo.cpp
-    src/gtk/screenarea-opengl.cpp
-    src/gtk/tools.cpp
-    src/gtk/window.cpp
-    src/sdl/inputSDL.cpp
-)
-
 if( ENABLE_DEBUGGER )
     SET(SRC_DEBUGGER
         src/gba/armdis.cpp
@@ -363,23 +338,6 @@ INCLUDE_DIRECTORIES(
     ${PNG_INCLUDE_DIR}
     ${SDL_INCLUDE_DIR}
 )
-
-IF( ENABLE_GTK )
-    INCLUDE_DIRECTORIES(
-        ${GLIBMM_INCLUDE_DIRS}
-        ${GIOMM_INCLUDE_DIRS}
-        ${GTKMM_INCLUDE_DIRS}
-        ${GDKMM_INCLUDE_DIRS}
-        ${GTKGLMM_INCLUDE_DIRS}
-    )
-
-    LINK_DIRECTORIES(
-        ${GLIBMM_LIBRARY_DIRS}
-        ${GIOMM_LIBRARY_DIRS}
-        ${GTKMM_LIBRARY_DIRS}
-        ${GTKGLMM_LIBRARY_DIRS}
-    )
-ENDIF( ENABLE_GTK )
 
 IF( ENABLE_FFMPEG )
     INCLUDE_DIRECTORIES(
@@ -433,25 +391,7 @@ IF( ENABLE_SDL )
 ENDIF( ENABLE_SDL )
 
 IF( ENABLE_GTK )
-    ADD_EXECUTABLE (
-        gvbam
-        WIN32
-        MACOSX_BUNDLE
-        ${SRC_GTK}
-    )
-
-    TARGET_LINK_LIBRARIES (
-        gvbam
-        ${VBAMCORE_LIBS}
-        ${GTKMM_LIBRARIES}
-        ${GTKGLMM_LIBRARIES}
-    )
-
-    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/gvbam DESTINATION bin)
-    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/gvbam.desktop DESTINATION share/applications)
-    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/icons/ DESTINATION share/icons/hicolor PATTERN ".svn" EXCLUDE)
-    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/ui DESTINATION ${DATA_INSTALL_DIR} PATTERN ".svn" EXCLUDE)
-    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini DESTINATION ${DATA_INSTALL_DIR})
+    add_subdirectory (src/gtk)
 
 ENDIF( ENABLE_GTK )
 
