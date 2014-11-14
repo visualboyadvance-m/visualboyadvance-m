@@ -1,4 +1,3 @@
 /*.cmake
-/Makefile
-/CMakeFiles
+*.gmo
 /wx-xrc-strings.h
