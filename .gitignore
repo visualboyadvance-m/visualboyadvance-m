@@ -18,3 +18,4 @@ libfex.a
 /*.patch
 /.cproject
 /.project
+*.[Gg][Bb][Aa]
