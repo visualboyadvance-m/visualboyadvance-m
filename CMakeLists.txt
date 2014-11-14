@@ -36,15 +36,25 @@ endif( NOT ENABLE_DEBUGGER AND ENABLE_SDL )
 
 # Set the version number with -DVERSION=X.X.X-uber
 IF( NOT VERSION )
-    SET( VERSION "1.8.0-SVN" )
-   
-    IF(EXISTS "${CMAKE_SOURCE_DIR}/.svn")
-        FIND_PACKAGE(Subversion)
-        IF(SUBVERSION_FOUND)
-            Subversion_WC_INFO(${CMAKE_SOURCE_DIR} SVN_INFO)
-            SET( VERSION "1.8.0-SVN${SVN_INFO_WC_REVISION}" )
-        ENDIF(SUBVERSION_FOUND)
-    ENDIF(EXISTS "${CMAKE_SOURCE_DIR}/.svn")
+    SET( VERSION "https://github.com/EmperorArthur/VBA-M" )
+
+    #openmw does this
+    if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
+        if(NOT EXISTS ${PROJECT_SOURCE_DIR}/.git/shallow)
+            find_package(Git)
+            if(GIT_FOUND)
+                include(GetGitRevisionDescription)
+                get_git_head_revision(REFSPEC COMMITHASH)
+                 SET( VERSION "GIT Commit: " ${COMMITHASH} )
+
+            else(GIT_FOUND)
+                message(WARNING "Git executable not found")
+            endif(GIT_FOUND)
+        else(NOT EXISTS ${PROJECT_SOURCE_DIR}/.git/shallow)
+            message(STATUS "Shallow Git clone detected, not attempting to retrieve version info")
+        endif(NOT EXISTS ${PROJECT_SOURCE_DIR}/.git/shallow)
+    endif(EXISTS ${PROJECT_SOURCE_DIR}/.git)
+
 ENDIF( NOT VERSION )
 
 # Fill in SDLMAIN_LIBRARY on OS X manually to avoid using SDLMain.m
