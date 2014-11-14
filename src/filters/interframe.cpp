@@ -31,11 +31,13 @@ static void Init()
 
 void InterframeCleanup()
 {
+  //\HACK to prevent double freeing.  (It looks like this is not being called in a thread safe manner!!!)
+
   if(frm1)
     free(frm1);
-  if(frm2)
+  if( frm2 && (frm1 != frm2) )
     free(frm2);
-  if(frm3)
+  if( frm3 && (frm1 != frm3) && (frm2 != frm3) )
     free(frm3);
   frm1 = frm2 = frm3 = NULL;
 }
