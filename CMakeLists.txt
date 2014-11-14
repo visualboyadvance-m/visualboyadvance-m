@@ -387,7 +387,6 @@ IF( ENABLE_SDL )
     INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
             DESTINATION ${SYSCONFDIR}
             RENAME vbam.cfg)
-    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini DESTINATION ${DATA_INSTALL_DIR})
 ENDIF( ENABLE_SDL )
 
 IF( ENABLE_GTK )
@@ -410,3 +409,5 @@ if( ENABLE_GTK OR ENABLE_WX )
         add_subdirectory(po)
     endif( ENABLE_NLS )
 endif( ENABLE_GTK OR ENABLE_WX )
+
+INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini DESTINATION ${DATA_INSTALL_DIR})
