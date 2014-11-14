@@ -143,8 +143,6 @@ SET( SRC_WX
    widgets/joyedit.cpp
    widgets/sdljoy.cpp
    widgets/wxmisc.cpp
-   # common, but not in lib, apparently
-   ../common/SoundSDL.cpp
    # probably ought to be in common
    ../sdl/text.cpp
    # from external source with minor modifications
