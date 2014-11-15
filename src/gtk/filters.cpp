@@ -18,6 +18,7 @@
 
 #include "filters.h"
 #include "intl.h"
+#include "../filters/interframe.hpp"
 
 void _2xSaI        (u8 *, u32, u8 *, u8 *, u32, int, int);
 void _2xSaI32      (u8 *, u32, u8 *, u8 *, u32, int, int);
@@ -41,11 +42,6 @@ void hq2x          (u8 *, u32, u8 *, u8 *, u32, int, int);
 void hq2x32        (u8 *, u32, u8 *, u8 *, u32, int, int);
 void lq2x          (u8 *, u32, u8 *, u8 *, u32, int, int);
 void lq2x32        (u8 *, u32, u8 *, u8 *, u32, int, int);
-
-void SmartIB       (u8 *, u32, int, int);
-void SmartIB32     (u8 *, u32, int, int);
-void MotionBlurIB  (u8 *, u32, int, int);
-void MotionBlurIB32(u8 *, u32, int, int);
 
 namespace VBA
 {

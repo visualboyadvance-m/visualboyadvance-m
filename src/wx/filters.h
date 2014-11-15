@@ -6,6 +6,10 @@
 // most 16-bit filters require space in src rounded up to u32
 // those that take delta take 1 src line of pixels, rounded up to u32 size
 // initial value appears to be all-0xff
+
+#include "../filters/interframe.hpp"
+
+
 void Pixelate32(u8 *src, u32 spitch, u8 *, u8 *dst, u32 dstp, int w, int h);
 void Pixelate(u8 *src, u32 spitch, u8 *delta, u8 *dst, u32 dstp, int w, int h);
 // next 3*2 use Init_2xSaI(555|565) and do not take into account
@@ -61,17 +65,5 @@ void hq4x32(u8 *src, u32 spitch, u8 *, u8 *dst, u32 dstp, int w, int h);
 // (by converting to 16-bit first in asm version)
 void hq4x32_32(u8 *src, u32 spitch, u8 *, u8 *dst, u32 dstp, int w, int h);
 void hq4x16(u8 *src, u32 spitch, u8 *, u8 *dst, u32 dstp, int w, int h);
-
-// call ifc to ignore previous frame / when starting new
-void InterframeCleanup();
-// all 4 are MMX-accelerated if enabled
-void SmartIB(u8 *src, u32 spitch, int width, int height);
-void SmartIB32(u8 *src, u32 spitch, int width, int height);
-void MotionBlurIB(u8 *src, u32 spitch, int width, int height);
-void MotionBlurIB32(u8 *src, u32 spitch, int width, int height);
-void SmartIB(u8 *src, u32 spitch, int width, int starty, int height);
-void SmartIB32(u8 *src, u32 spitch, int width, int starty, int height);
-void MotionBlurIB(u8 *src, u32 spitch, int width, int starty, int height);
-void MotionBlurIB32(u8 *src, u32 spitch, int width, int starty, int height);
 
 #endif /* FILTERS_H */

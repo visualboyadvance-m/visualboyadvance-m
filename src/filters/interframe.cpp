@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <memory.h>
 
+#include "interframe.hpp"
+
 #ifdef MMX
 extern "C" bool cpu_mmx;
 #endif
@@ -16,7 +18,6 @@ static u8 *frm1 = NULL;
 static u8 *frm2 = NULL;
 static u8 *frm3 = NULL;
 
-extern int RGB_LOW_BITS_MASK;
 extern u32 qRGB_COLOR_MASK[2];
 
 static void Init()
