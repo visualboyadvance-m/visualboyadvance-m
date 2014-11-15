@@ -18,7 +18,7 @@
 
 #include "filters.h"
 
-#include "../filters/interframe.hpp"
+#include "../filters/filters.hpp"
 
       //
       // Screen filters
@@ -38,22 +38,8 @@ extern void Super2xSaI(u8*,u32,u8*,u8*,u32,int,int);
 extern void Super2xSaI32(u8*,u32,u8*,u8*,u32,int,int);
 extern void SuperEagle(u8*,u32,u8*,u8*,u32,int,int);
 extern void SuperEagle32(u8*,u32,u8*,u8*,u32,int,int);
-extern void Pixelate(u8*,u32,u8*,u8*,u32,int,int);
-extern void Pixelate32(u8*,u32,u8*,u8*,u32,int,int);
 extern void AdMame2x(u8*,u32,u8*,u8*,u32,int,int);
 extern void AdMame2x32(u8*,u32,u8*,u8*,u32,int,int);
-extern void Bilinear(u8*,u32,u8*,u8*,u32,int,int);
-extern void Bilinear32(u8*,u32,u8*,u8*,u32,int,int);
-extern void BilinearPlus(u8*,u32,u8*,u8*,u32,int,int);
-extern void BilinearPlus32(u8*,u32,u8*,u8*,u32,int,int);
-extern void Scanlines(u8*,u32,u8*,u8*,u32,int,int);
-extern void Scanlines32(u8*,u32,u8*,u8*,u32,int,int);
-extern void ScanlinesTV(u8*,u32,u8*,u8*,u32,int,int);
-extern void ScanlinesTV32(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq2x(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq2x32(u8*,u32,u8*,u8*,u32,int,int);
-extern void lq2x(u8*,u32,u8*,u8*,u32,int,int);
-extern void lq2x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq3x16(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq4x16(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq3x32_32(u8*,u32,u8*,u8*,u32,int,int);
