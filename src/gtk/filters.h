@@ -42,9 +42,11 @@ enum EFilter
   FilterBilinearPlus,
   FilterScanlines,
   FilterScanlinesTV,
-  FilterHq2x,
   FilterLq2x,
-  LastFilter = FilterLq2x
+  FilterHq2x,
+  FilterHq3x,
+  FilterHq4x,
+  LastFilter = FilterHq4x
 };
 
 enum EFilterIB

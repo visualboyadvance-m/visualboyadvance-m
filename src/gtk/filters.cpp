@@ -39,8 +39,10 @@ static const astFilters[] =
   { N_("Bilinear Plus"),       2, { BilinearPlus, BilinearPlus32 } },
   { N_("Scanlines"),           2, { Scanlines,    Scanlines32    } },
   { N_("TV Mode"),             2, { ScanlinesTV,  ScanlinesTV32  } },
+  { N_("lq2x"),                2, { lq2x,         lq2x32         } },
   { N_("hq2x"),                2, { hq2x,         hq2x32         } },
-  { N_("lq2x"),                2, { lq2x,         lq2x32         } }
+  { N_("hq3x"),                2, { hq3x16,         hq3x32         } },
+  { N_("hq4x"),                2, { hq4x16,         hq4x32         } }
 };
 
 struct {
