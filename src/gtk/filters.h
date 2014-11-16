@@ -21,8 +21,7 @@
 #define __VBA_FILTERS_H__
 
 #include "../System.h"
-
-int Init_2xSaI(u32);
+#include "../filters/filters.hpp"
 
 namespace VBA
 {

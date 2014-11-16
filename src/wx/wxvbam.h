@@ -561,6 +561,6 @@ extern int joypress[4], autofire;
 #define KEYM_MOTION_LEFT  (1<<17)
 #define KEYM_MOTION_RIGHT (1<<18)
 
-#include "filters.h"
+#include "../filters/filters.hpp"
 
 #endif /* WX_WXVBAM_H */

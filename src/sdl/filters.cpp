@@ -24,26 +24,12 @@
       // Screen filters
       //
 
-extern int Init_2xSaI(u32);
-extern void hq2x_init(unsigned);
 extern bool sdlStretchInit(int colorDepth, int sizeMultiplier, int srcWidth);
 
 extern void sdlStretch1x(u8*,u32,u8*,u8*,u32,int,int);
 extern void sdlStretch2x(u8*,u32,u8*,u8*,u32,int,int);
 extern void sdlStretch3x(u8*,u32,u8*,u8*,u32,int,int);
 extern void sdlStretch4x(u8*,u32,u8*,u8*,u32,int,int);
-extern void _2xSaI(u8*,u32,u8*,u8*,u32,int,int);
-extern void _2xSaI32(u8*,u32,u8*,u8*,u32,int,int);
-extern void Super2xSaI(u8*,u32,u8*,u8*,u32,int,int);
-extern void Super2xSaI32(u8*,u32,u8*,u8*,u32,int,int);
-extern void SuperEagle(u8*,u32,u8*,u8*,u32,int,int);
-extern void SuperEagle32(u8*,u32,u8*,u8*,u32,int,int);
-extern void AdMame2x(u8*,u32,u8*,u8*,u32,int,int);
-extern void AdMame2x32(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq3x16(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq4x16(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq3x32_32(u8*,u32,u8*,u8*,u32,int,int);
-extern void hq4x32_32(u8*,u32,u8*,u8*,u32,int,int);
 
 struct FilterDesc {
 	char name[30];
