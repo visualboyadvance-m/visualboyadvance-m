@@ -14,8 +14,12 @@ install_manifest.txt
 libvbamcore.a
 libfex.a
 
+#Project Files
+build
+.cproject
+.project
+.kdev4
+
 #Others
 /*.patch
-/.cproject
-/.project
 *.[Gg][Bb][Aa]
