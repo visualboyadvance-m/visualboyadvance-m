@@ -318,10 +318,6 @@ SET(SRC_SDL
     src/sdl/expr-lex.cpp
 )
 
-SET(SRC_PNACL
-    src/pnacl/nacl_glue.cpp
-)
-
 SET(SRC_FILTERS
     src/filters/2xSaI.cpp
     src/filters/admame.cpp
@@ -344,6 +340,10 @@ SET(SRC_HQ_ASM
     src/filters/hq/asm/hq4x_32.asm
     src/filters/hq/asm/hq3x32.cpp
 )
+
+IF ( PNACL )
+    SET( SRC_PNACL src/pnacl/nacl_glue.cpp )
+ENDIF ( PNACL )
 
 if( ENABLE_ASM_SCALERS )
     SET(SRC_FILTERS ${SRC_FILTERS} ${SRC_HQ_ASM})
