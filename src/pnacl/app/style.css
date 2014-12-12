@@ -1,0 +1,89 @@
+/* Structure */
+
+html {
+  height: 100%;
+}
+
+body {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  margin: 0;
+}
+
+.lightsOn {
+  background-color: rgb(251, 251, 251);
+}
+
+.lightsOff {
+  background-color: black;
+}
+
+.centered {
+  left: 0;
+  position: absolute;
+  text-align: center;
+  top: 40%;
+  width: 100%;
+  z-index: -1;
+}
+
+.helptext {
+  display: none;
+}
+
+.errorMessage {
+  display: none;
+  color: red;
+}
+
+#loadingBar {
+  background-color: black;
+  border-radius: 13px;
+  margin: 0 auto;
+  padding: 3px;
+  width: 200px;
+}
+
+#loadingBar > div {
+  background-color: blue;
+  border-radius: 10px;
+  height: 10px;
+  width: 0;
+}
+
+#naclModule {
+  -webkit-transform-origin: 50% 50%;
+}
+
+#leftHelptext {
+  bottom: 5px;
+  left: 5px;
+  position: fixed;
+}
+
+#rightHelptext {
+  bottom: 5px;
+  position: fixed;
+  right: 5px;
+  text-align: right;
+}
+
+#topLeftHelptext {
+  left: 5px;
+  position: fixed;
+  text-align: left;
+  top: 5px;
+}
+
+#topRightHelptext {
+  top: 5px;
+  position: fixed;
+  right: 5px;
+  text-align: right;
+}
+
+.advancedSetting {
+  display: none;
+}

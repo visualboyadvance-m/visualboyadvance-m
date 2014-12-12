@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div id="listener">
+      <embed name="nacl_module"
+             id="naclModule"
+             width=480 height=320
+             src="game.nmf"
+             type="application/x-pnacl" />
+    </div>
+    <div id="loadingMessage" class="centered">
+      <div>Translating PNaCl to Native Architecture</div>
+      <div id="loadingBar">
+        <div id="progress"></div>
+      </div>
+    </div>
+    <div id="openMessage" class="centered helptext">
+      <div>Press Ctrl+O to open a rom</div>
+      <div id="filenameErrorMessage" class="errorMessage">
+        The filename cannot have spaces. Please rename the file and try again.
+      </div>
+    </div>
+    <div id="topLeftHelptext" class="helptext">
+    </div>
+    <div id="topRightHelptext" class="helptext">
+      <div><a href='#' id="advancedButton">Advanced</a></div>
+      <div class="advancedSetting">
+        <div><a href="#" id="importSaveButton">Import save</a></div>
+        <div>
+          <label>
+            <input type="checkbox" id="gamepadCheckbox">
+            Use gamepad
+          </label>
+        </div>
+      </div>
+    </div>
+    <div id="leftHelptext" class="helptext">
+      <div>A: Z</div>
+      <div>B: X</div>
+      <div>L: A</div>
+      <div>R: S</div>
+      <div>D-pad: Arrow keys</div>
+    </div>
+    <div id="rightHelptext" class="helptext">
+      <div>Start: Enter</div>
+      <div>Select: Backspace</div>
+      <div id="normalSaveStateKeys">
+        <div>Save state: Shift + F1-9</div>
+        <div>Load state: F1-9</div>
+      </div>
+      <div id="crosSaveStateKeys">
+        <div>Save state: Shift + Search(&#128269) + 1-9</div>
+        <div>Load state: Search(&#128269) + 1-9</div>
+      </div>
+      <div>Vol down/up: -/=</div>
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>
+

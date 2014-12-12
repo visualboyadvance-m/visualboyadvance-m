@@ -34,6 +34,13 @@ if( NOT ENABLE_DEBUGGER AND ENABLE_SDL )
         message( SEND_ERROR "The SDL port can't be built without debugging support" )
 endif( NOT ENABLE_DEBUGGER AND ENABLE_SDL )
 
+if ( PNACL )
+  set ( ENABLE_SDL ON )
+  set ( ENABLE_GTK OFF )
+  set ( ENABLE_LINK OFF )
+  set ( ENABLE_WX OFF )
+endif ( PNACL )
+
 # Set the version number with -DVERSION=X.X.X-uber
 IF( NOT VERSION )
     SET( VERSION "https://github.com/EmperorArthur/VBA-M" )
@@ -71,7 +78,7 @@ endif( ENABLE_ASM_SCALERS )
 # Look for some dependencies using CMake scripts
 FIND_PACKAGE ( ZLIB REQUIRED )
 FIND_PACKAGE ( PNG REQUIRED )
-FIND_PACKAGE ( OpenGL REQUIRED )
+FIND_PACKAGE ( OpenGL )
 FIND_PACKAGE ( SDL REQUIRED )
 
 if( ENABLE_LINK )
@@ -87,7 +94,10 @@ SET(VBAMCORE_LIBS
     ${ZLIB_LIBRARY}
     ${PNG_LIBRARY})
 
-
+if ( PNACL )
+   # Add core NaCl libraries.
+   SET(VBAMCORE_LIBS ${VBAMCORE_LIBS} ppapi ppapi_cpp nacl_io)
+endif ( PNACL )
 
 # Disable looking for GTK if not going to build the GTK frontend
 # so that pkg-config is not required
@@ -131,8 +141,12 @@ IF( NOT SYSCONFDIR )
     SET( SYSCONFDIR "/etc" )
 ENDIF( NOT SYSCONFDIR )
 
+if ( OpenGL_FOUND )
+  set( USE_OPENGL_FLAG "-DUSE_OPENGL " )
+endif ( OpenGL_FOUND )
+
 # C defines
-ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONFDIR='"${SYSCONFDIR}"' -DWITH_LIRC='${WITHLIRC}')
+ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL ${USE_OPENGL_FLAG} -DSYSCONFDIR='"${SYSCONFDIR}"' -DWITH_LIRC='${WITHLIRC}')
 ADD_DEFINITIONS (-DVERSION='"${VERSION}"' -DPKGDATADIR='"${PKGDATADIR}"' -DPACKAGE='')
 
 if( ENABLE_LINK )
@@ -142,13 +156,13 @@ if( ENABLE_LINK )
        SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${RT_LIB})
        SET(VBAMCORE_LIBS ${VBAMCORE_LIBS} ${RT_LIB})
     ENDIF(RT_LIB)
-    
+
     FIND_LIBRARY(PTHREAD_LIB pthread)
     IF(PTHREAD_LIB)
        SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${PTHREAD_LIB})
        SET(VBAMCORE_LIBS ${VBAMCORE_LIBS} ${PTHREAD_LIB})
     ENDIF(PTHREAD_LIB)
-    
+
     INCLUDE(CheckFunctionExists)
     CHECK_FUNCTION_EXISTS(sem_timedwait SEM_TIMEDWAIT)
     IF( SEM_TIMEDWAIT)
@@ -304,6 +318,10 @@ SET(SRC_SDL
     src/sdl/expr-lex.cpp
 )
 
+SET(SRC_PNACL
+    src/pnacl/nacl_glue.cpp
+)
+
 SET(SRC_FILTERS
     src/filters/2xSaI.cpp
     src/filters/admame.cpp
@@ -376,8 +394,8 @@ IF( ENABLE_SDL )
         vbam
         WIN32
         ${SRC_SDL}
+        ${SRC_PNACL}
     )
-
     IF( WIN32 )
         SET( WIN32_LIBRARIES wsock32 )
     ENDIF( WIN32 )
@@ -392,11 +410,14 @@ IF( ENABLE_SDL )
         ${WIN32_LIBRARIES}
         ${LIRC_CLIENT_LIBRARY}
     )
-
-    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam DESTINATION bin)
-    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
-            DESTINATION ${SYSCONFDIR}
-            RENAME vbam.cfg)
+    IF ( PNACL )
+        build_to_app( vbam )
+    ELSE ( PNACL )
+        INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam DESTINATION bin)
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
+                DESTINATION ${SYSCONFDIR}
+                RENAME vbam.cfg)
+    ENDIF ( PNACL )
 ENDIF( ENABLE_SDL )
 
 IF( ENABLE_GTK )

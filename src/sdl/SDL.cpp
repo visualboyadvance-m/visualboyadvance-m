@@ -23,12 +23,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <cmath>
+#ifdef USE_OPENGL
 #ifdef __APPLE__
     #include <OpenGL/glu.h>
     #include <OpenGL/glext.h>
 #else
     #include <GL/glu.h>
     #include <GL/glext.h>
+#endif
 #endif
 
 #include <time.h>
@@ -134,9 +136,13 @@ int sdlPrintUsage = 0;
 int cartridgeType = 3;
 int captureFormat = 0;
 
-int openGL = 1;
 int textureSize = 256;
+#ifdef USE_OPENGL
+int openGL = 1;
 GLuint screenTexture = 0;
+#else
+int openGL = 0;
+#endif
 u8 *filterPix = 0;
 
 int pauseWhenInactive = 0;
@@ -810,6 +816,7 @@ void sdlReadPreferences(FILE *f)
 
 void sdlOpenGLInit(int w, int h)
 {
+#ifdef USE_OPENGL
   float screenAspect = (float) srcWidth / srcHeight,
         windowAspect = (float) w / h;
 
@@ -861,6 +868,7 @@ void sdlOpenGLInit(int w, int h)
 
   glClearColor(0.0,0.0,0.0,1.0);
   glClear( GL_COLOR_BUFFER_BIT );
+#endif
 }
 
 void sdlReadPreferences()
@@ -1277,6 +1285,9 @@ static void sdlHandleSavestateKey(int num, int shifted)
 	// 0: load
 	// 1: save
 	int backuping	= 1; // controls whether we are doing savestate backups
+#ifdef __native_client__
+        backuping = 0;
+#endif
 
 	if ( sdlSaveKeysSwitch == 2 )
 	{
@@ -1475,9 +1486,11 @@ void sdlPollEvents()
 	}
 	break;
       case SDLK_KP_DIVIDE:
+      case SDLK_MINUS:
         sdlChangeVolume(-0.1);
         break;
       case SDLK_KP_MULTIPLY:
+      case SDLK_EQUALS:
         sdlChangeVolume(0.1);
         break;
       case SDLK_KP_MINUS:
@@ -1543,15 +1556,19 @@ void sdlPollEvents()
       case SDLK_g:
         if(!(event.key.keysym.mod & MOD_NOCTRL) &&
            (event.key.keysym.mod & KMOD_CTRL)) {
-		      filterFunction = 0;
-		      while (!filterFunction)
-		      {
-			      filter = (Filter)((filter + 1) % kInvalidFilter);
-		        filterFunction = initFilter(filter, systemColorDepth, srcWidth);
-		      }
-		      if (getFilterEnlargeFactor(filter) != filter_enlarge)
-		        sdlInitVideo();
-		      systemScreenMessage(getFilterName(filter));
+          filterFunction = 0;
+          while (!filterFunction) {
+            filter = (Filter)((filter + 1) % kInvalidFilter);
+#ifdef __native_client__
+            if (getFilterEnlargeFactor(filter) != filter_enlarge)
+              continue;
+#endif
+            filterFunction = initFilter(filter, systemColorDepth, srcWidth);
+          }
+          if (getFilterEnlargeFactor(filter) != filter_enlarge) {
+            sdlInitVideo();
+          }
+          systemScreenMessage(getFilterName(filter));
         }
         break;
       case SDLK_F11:
@@ -2486,6 +2503,7 @@ void systemDrawScreen()
     drawSpeed(screen, destPitch, 10, 20);
 
   if (openGL) {
+#ifdef USE_OPENGL
     glClear( GL_COLOR_BUFFER_BIT );
     glPixelStorei(GL_UNPACK_ROW_LENGTH, destWidth);
     if (systemColorDepth == 16)
@@ -2508,6 +2526,7 @@ void systemDrawScreen()
     glEnd();
 
     SDL_GL_SwapBuffers();
+#endif
   } else {
     SDL_UnlockSurface(surface);
     SDL_Flip(surface);

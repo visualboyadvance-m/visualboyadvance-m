@@ -5,7 +5,7 @@ extern int armExecute();
 extern int thumbExecute();
 
 #ifdef __GNUC__
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__native_client__)
 # define INSN_REGPARM __attribute__((regparm(1)))
 #else
 # define INSN_REGPARM /*nothing*/

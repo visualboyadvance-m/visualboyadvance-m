@@ -1,0 +1,10 @@
+{
+  "program": {
+    "portable" : {
+      "pnacl-translate" : {
+        "url" : "vbam.pexe",
+        "optlevel": 2
+      }
+    }
+  }
+}

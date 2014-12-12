@@ -7,13 +7,13 @@
 
 
 #ifdef __GNUC__
-#if defined(__APPLE__) || defined (BSD) || defined (__NetBSD__)
+#if defined(__APPLE__) || defined (BSD) || defined (__NetBSD__) || defined (__native_client__)
 typedef off_t __off64_t; /* off_t is 64 bits on BSD. */
 #define	fseeko64 fseeko
 #define	ftello64 ftello
 #else
 typedef off64_t __off64_t;
-#endif /* __APPLE__ || BSD */
+#endif /* __APPLE__ || BSD || __native_client__ */
 #endif /* __GNUC__ */
 
 #ifndef _MSC_VER

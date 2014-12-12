@@ -85,7 +85,7 @@ static int sensorY = 2047;
 static uint32_t sdlGetHatCode(const SDL_Event &event)
 {
     if (!event.jhat.value) return 0;
-    
+
     return (
                 ((event.jhat.which + 1) << 16) |
                 32 |
@@ -249,7 +249,6 @@ static void sdlUpdateJoyButton(int which,
       int b = joypad[j][i] & 0xffff;
       if(dev) {
         dev--;
-
         if((dev == which) && (b >= 128) && (b == (button+128))) {
           sdlButtons[j][i] = pressed;
         }
@@ -399,7 +398,11 @@ void inputInitJoysticks()
 	  joypad[PAD_MAIN][i] = joypad[PAD_DEFAULT][i];
   }
 
+#if defined (__native_client__)
+  sdlNumDevices = 1;
+#else
   sdlNumDevices = SDL_NumJoysticks();
+#endif
 
   if(sdlNumDevices)
     sdlDevices = (SDL_Joystick **)calloc(1,sdlNumDevices *
@@ -418,8 +421,11 @@ void inputInitJoysticks()
             if(sdlDevices[dev] == NULL) {
               sdlDevices[dev] = SDL_JoystickOpen(dev);
             }
-
+#if defined (__native_client__)
+            ok = true;  // Force gamepad to be useable.
+#else
             ok = sdlCheckJoyKey(joypad[j][i]);
+#endif
           } else
             ok = false;
         }
