@@ -69,19 +69,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # external deps
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../art/vbam.png DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../art/wxvbam.xpm DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 SET(WX_APP_ICON ${CMAKE_CURRENT_BINARY_DIR}/vbam.png)
-
-# Convert to xpm using ImageMagick (http://www.imagemagick.org)
-# not executed on win32
-IF( NOT WIN32 )
-    FIND_PACKAGE(ImageMagick REQUIRED convert)
-    ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xpm
-		       COMMAND ${ImageMagick_convert_EXECUTABLE} ${WX_APP_ICON} wxvbam.xpm
-		       # following is done using #define in wxvbam.cpp
-		       # so there is no dependency on sed
-#		       COMMAND sed -i 's/wxvbam\\[/wxvbam_xpm[/;s/char \\*/const char */' wxvbam.xpm
-		       )
-ENDIF( NOT WIN32 )
 
 # wxrc does not support xrs files in -c output (> 10x compression)
 # so do it manually using slow but portable bin2c.cmake script
