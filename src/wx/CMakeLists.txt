@@ -68,20 +68,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # external deps
-SET(ICO_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../win32/res/VBA.ico)
-SET(ICO_PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../gtk)
-SET(WX_APP_ICON ${ICO_PARENT_DIR}/icons/32x32/apps/vbam.png)
-#SET(WX_APP_ICON VBA_4_32x32x24.png)
-SET(ICOX_FILES VBA_4_32x32x24.png)
-#wxvbam.xrc now uses gvbam icon as well
-#SET(ICOX_FILES ${ICOX_FILES} VBA_9_48x48x32.png)
-
-# Extract icons using icoutils (http://www.nongnu.org/icoutils/)
-# Used for main prog. icon and about dialog (in xrc file)
-# or, just use the icons already extracted for gtk
-ADD_CUSTOM_COMMAND(OUTPUT ${ICOX_FILES}
-                   COMMAND icotool -x ${ICO_FILE}
-		   DEPENDS ${ICO_FILE})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../art/vbam.png DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+SET(WX_APP_ICON ${CMAKE_CURRENT_BINARY_DIR}/vbam.png)
 
 # Convert to xpm using ImageMagick (http://www.imagemagick.org)
 # not executed on win32
@@ -92,19 +80,17 @@ IF( NOT WIN32 )
 		       # following is done using #define in wxvbam.cpp
 		       # so there is no dependency on sed
 #		       COMMAND sed -i 's/wxvbam\\[/wxvbam_xpm[/;s/char \\*/const char */' wxvbam.xpm
-		       DEPENDS ${WX_APP_ICON})
+		       )
 ENDIF( NOT WIN32 )
 
 # wxrc does not support xrs files in -c output (> 10x compression)
 # so do it manually using slow but portable bin2c.cmake script
-SET(WX_XRC_ICON icons/32x32/apps/vbam.png)
 ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xrs
                    # doing this in its own dir prevents name prefixes
 		   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/wxvbam.xrc wxvbam.xrc
-		   COMMAND ${CMAKE_COMMAND} -E copy ${ICO_PARENT_DIR}/${WX_XRC_ICON} ${WX_XRC_ICON}
                    COMMAND wxrc wxvbam.xrc -o wxvbam.xrs
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-	           DEPENDS ${ICO_PARENT_DIR}/${XRC_ITEM}
+	           DEPENDS ${XRC_ITEM}
 		   DEPENDS wxvbam.xrc)
 ADD_CUSTOM_COMMAND(OUTPUT builtin-xrc.h
                    COMMAND ${CMAKE_COMMAND} -DINFILE=wxvbam.xrs -DOUTFILE=builtin-xrc.h -DVARNAME=builtin_xrs -P ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.cmake
@@ -215,7 +201,6 @@ TARGET_LINK_LIBRARIES (
 INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/wxvbam DESTINATION bin)
 IF(NOT WIN32 AND NOT APPLE)
     INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/wxvbam.desktop DESTINATION share/applications)
-    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../gtk/icons/ DESTINATION share/icons/hicolor)
 ENDIF(NOT WIN32 AND NOT APPLE)
 
 if(WIN32)
