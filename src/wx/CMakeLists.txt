@@ -67,10 +67,9 @@ include_directories(widgets)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-# external deps
+# Copy over needed icons
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../art/vbam.png DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../art/wxvbam.xpm DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-SET(WX_APP_ICON ${CMAKE_CURRENT_BINARY_DIR}/vbam.png)
 
 # wxrc does not support xrs files in -c output (> 10x compression)
 # so do it manually using slow but portable bin2c.cmake script
@@ -131,6 +130,8 @@ SET( SRC_WX
    builtin-over.h
    cmdhandlers.h
    cmd-evtable.h
+   #Icon file
+   wxvbam.xpm
 )
 
 IF(ENABLE_OPENAL)
@@ -150,15 +151,7 @@ IF( WIN32 )
     ENDIF(ENABLE_DEBUGGER)
 ELSE( WIN32 )
     SET(DIRECTX_LIBRARIES )
-    # generated file must be explicitly listed
-    SET( SRC_WX ${SRC_WX} wxvbam.xpm )
 ENDIF( WIN32 )
-
-IF(APPLE)
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../art/wxvbam.icns DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    SET(MACOSX_BUNDLE_ICON_FILE wxvbam.icns)
-    SET_SOURCE_FILES_PROPERTIES(wxvbam.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-ENDIF(APPLE)
 
 link_directories( ${CMAKE_BINARY_DIR} )
 
@@ -190,6 +183,10 @@ if(APPLE)
     SET(WX_EXE_NAME wxvbam.app)
     # this should set ROM file types correctly
     SET_PROPERTY(TARGET wxvbam APPEND PROPERTY MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/wxplist.in)
+    #Handle the program icon
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../art/wxvbam.icns DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    SET(MACOSX_BUNDLE_ICON_FILE wxvbam.icns)
+    SET_SOURCE_FILES_PROPERTIES(wxvbam.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 else(APPLE)
     SET(WX_EXE_NAME wxvbam${CMAKE_EXECUTABLE_SUFFIX})
 endif(APPLE)
