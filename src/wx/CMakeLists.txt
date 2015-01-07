@@ -155,16 +155,7 @@ ELSE( WIN32 )
 ENDIF( WIN32 )
 
 IF(APPLE)
-    # icon must be generated manually
-    SET( SRC_WX ${SRC_WX} wxvbam.icns )
-    # png2icns is provided with libicns (http://icns.sourceforge.net/)
-    FIND_PROGRAM(PNG2ICNS png2icns)
-    # note: could add more icons, if available and proper size
-    SET(WX_APP_ICONS
-          ${WX_APP_ICON}
-          ${ICO_PARENT_DIR}/icons/16x16/apps/vbam.png)
-    ADD_CUSTOM_COMMAND(OUTPUT wxvbam.icns
-                       COMMAND ${PNG2ICNS} wxvbam.icns ${WX_APP_ICONS})
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../art/wxvbam.icns DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     SET(MACOSX_BUNDLE_ICON_FILE wxvbam.icns)
     SET_SOURCE_FILES_PROPERTIES(wxvbam.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 ENDIF(APPLE)
