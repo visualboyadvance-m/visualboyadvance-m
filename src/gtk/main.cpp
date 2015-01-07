@@ -16,6 +16,8 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include <exception>
+
 #include <gtkmm/main.h>
 #include <gtkmm/window.h>
 #include <gtkmm/messagedialog.h>
@@ -26,6 +28,13 @@
 
 #include "window.h"
 #include "intl.h"
+
+template<typename T>
+void showErrorDialoge(T& e)
+{
+  Gtk::MessageDialog oDialog(e.what(),false,Gtk::MESSAGE_ERROR,Gtk::BUTTONS_OK);
+  oDialog.run();
+}
 
 int main(int argc, char * argv[])
 {
@@ -68,11 +77,7 @@ int main(int argc, char * argv[])
   }
   catch (const Glib::Error& e)
   {
-    Gtk::MessageDialog oDialog(e.what(),
-                               false,
-                               Gtk::MESSAGE_ERROR,
-                               Gtk::BUTTONS_OK);
-    oDialog.run();
+    showErrorDialoge(e);
     return 1;
   }
 
@@ -95,11 +100,12 @@ int main(int argc, char * argv[])
   }
   catch (const Gtk::BuilderError & e)
   {
-    Gtk::MessageDialog oDialog(e.what(),
-                               false,
-                               Gtk::MESSAGE_ERROR,
-                               Gtk::BUTTONS_OK);
-    oDialog.run();
+    showErrorDialoge(e);
+    return 1;
+  }
+  catch (const Glib::FileError & e)
+  {
+    showErrorDialoge(e);
     return 1;
   }
 
