@@ -425,5 +425,5 @@ endif( ENABLE_GTK OR ENABLE_WX )
 
 INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini DESTINATION ${DATA_INSTALL_DIR})
 IF(NOT WIN32 AND NOT APPLE)
-    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/art/vbam256.svg DESTINATION share/icons/hicolor/scalable/apps/vbam.svg)
+    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/art/vbam.svg DESTINATION share/icons/hicolor/scalable/apps/vbam.svg)
 ENDIF(NOT WIN32 AND NOT APPLE)
