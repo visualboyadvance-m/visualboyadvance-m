@@ -1,3 +1,9 @@
+#Do not use this file directly.  Always use the top level CMakeLists.txt file
+
+#Make sure the gtk ui elements are available for out of tree builds
+#See window.cpp:1544 (the sGetUiFilePath function) for more details
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ui/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/ui/)
+
 SET(SRC_GTK
     configfile.cpp
     main.cpp
@@ -55,15 +61,12 @@ TARGET_LINK_LIBRARIES (
 INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/gvbam DESTINATION bin)
 IF(NOT WIN32 AND NOT APPLE)
     INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gvbam.desktop DESTINATION share/applications)
-    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/icons/ DESTINATION share/icons/hicolor PATTERN ".svn" EXCLUDE)
-    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ui DESTINATION ${DATA_INSTALL_DIR} PATTERN ".svn" EXCLUDE)
+    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/icons/ DESTINATION share/icons/hicolor)
+    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ui DESTINATION ${DATA_INSTALL_DIR})
 ENDIF(NOT WIN32 AND NOT APPLE)
 
-# for consistency with others, copy exe to top-level dir
 if(WIN32)
     SET(GTK_EXE_NAME gvbam${CMAKE_EXECUTABLE_SUFFIX})
-    ADD_CUSTOM_COMMAND(TARGET gvbam POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E copy ${GTK_EXE_NAME} ../../${GTK_EXE_NAME})
 else(WIN32)
 if(APPLE)
     SET(GTK_EXE_NAME gvbam.app)
@@ -72,8 +75,4 @@ if(APPLE)
 else(APPLE)
     SET(GTK_EXE_NAME gvbam${CMAKE_EXECUTABLE_SUFFIX})
 endif(APPLE)
-    ADD_CUSTOM_COMMAND(TARGET gvbam POST_BUILD
-               # I'd rather make this link relative, but it's too hard
-                       COMMAND rm -rf ../../${GTK_EXE_NAME}
-                       COMMAND ln -s ${CMAKE_CURRENT_BINARY_DIR}/${GTK_EXE_NAME} ../../${GTK_EXE_NAME})
 endif(WIN32)

@@ -1,3 +1,5 @@
+#Do not use this file directly.  Always use the top level CMakeLists.txt file
+
 # This build is much easier if we just do it here.
 
 # not yet implemented
@@ -213,14 +215,11 @@ TARGET_LINK_LIBRARIES (
 INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/wxvbam DESTINATION bin)
 IF(NOT WIN32 AND NOT APPLE)
     INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/wxvbam.desktop DESTINATION share/applications)
-    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../gtk/icons/ DESTINATION share/icons/hicolor PATTERN ".svn" EXCLUDE)
+    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../gtk/icons/ DESTINATION share/icons/hicolor)
 ENDIF(NOT WIN32 AND NOT APPLE)
 
-# for consistency with others, copy exe to top-level dir
 if(WIN32)
     SET(WX_EXE_NAME wxvbam${CMAKE_EXECUTABLE_SUFFIX})
-    ADD_CUSTOM_COMMAND(TARGET wxvbam POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E copy ${WX_EXE_NAME} ../../${WX_EXE_NAME})
 else(WIN32)
 if(APPLE)
     SET(WX_EXE_NAME wxvbam.app)
@@ -229,8 +228,4 @@ if(APPLE)
 else(APPLE)
     SET(WX_EXE_NAME wxvbam${CMAKE_EXECUTABLE_SUFFIX})
 endif(APPLE)
-    ADD_CUSTOM_COMMAND(TARGET wxvbam POST_BUILD
-		       # I'd rather make this link relative, but it's too hard
-                       COMMAND rm -rf ../../${WX_EXE_NAME}
-                       COMMAND ln -s ${CMAKE_CURRENT_BINARY_DIR}/${WX_EXE_NAME} ../../${WX_EXE_NAME})
 endif(WIN32)

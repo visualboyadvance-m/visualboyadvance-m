@@ -7,6 +7,8 @@ if( COMMAND cmake_policy )
     cmake_policy( SET CMP0005 OLD )
 endif( COMMAND cmake_policy )
 SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts )
+#Output all binaries at top level
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
 option( ENABLE_SDL "Build the SDL port" ON )
 option( ENABLE_GTK "Build the GTK+ GUI" ON )
@@ -85,7 +87,8 @@ SET(VBAMCORE_LIBS
     ${SFML_LIBRARY}
     ${OPENGL_LIBRARIES}
     ${ZLIB_LIBRARY}
-    ${PNG_LIBRARY})
+    ${PNG_LIBRARY}
+)
 
 
 
