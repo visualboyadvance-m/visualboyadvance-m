@@ -3,6 +3,8 @@
 #ifndef INTERFRAME_HPP
 #define INTERFRAME_HPP
 
+#include "../System.h"
+
 extern int RGB_LOW_BITS_MASK;
 
 static void Init();

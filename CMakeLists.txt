@@ -202,6 +202,10 @@ ELSE ( WIN32 )
     SET( CMAKE_ASM_NASM_FLAGS "-I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -DELF -w-orphan-labels")
 ENDIF ( WIN32 )
 
+#Make sure that we can use c++11 initializer lists
+#Doesn't work with fex :/
+# SET( CMAKE_CXX_FLAGS -std=c++11 )
+
 SET( CMAKE_C_FLAGS_RELEASE "-O3")
 SET( CMAKE_CXX_FLAGS_RELEASE "-O3")
 SET( CMAKE_C_FLAGS_DEBUG "-g -Wall")
@@ -308,6 +312,7 @@ SET(SRC_SDL
 )
 
 SET(SRC_FILTERS
+    src/filters/filters.cpp
     src/filters/2xSaI.cpp
     src/filters/admame.cpp
     src/filters/bilinear.cpp
@@ -316,6 +321,7 @@ SET(SRC_FILTERS
     src/filters/pixel.cpp
     src/filters/scanline.cpp
     src/filters/simpleFilter.cpp
+    src/filters/sdl.cpp
 )
 
 SET(SRC_HQ_C

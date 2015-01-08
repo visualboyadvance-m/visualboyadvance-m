@@ -20,6 +20,7 @@
 #define VBA_SDL_FILTERS_H
 
 #include "../System.h"
+#include "../filters/filters.hpp"
 
       //
       // Screen filters
@@ -29,9 +30,6 @@
 enum Filter { kStretch1x, kStretch2x, k2xSaI, kSuper2xSaI, kSuperEagle, kPixelate,
 				kAdMame2x, kBilinear, kBilinearPlus, kScanlines, kScanlinesTV,
 				klq2x, khq2x, kStretch3x, khq3x, kStretch4x, khq4x, kInvalidFilter };
-
-// Function pointer type for a filter function
-typedef void(*FilterFunc)(u8*, u32, u8*, u8*, u32, int, int);
 
 // Initialize a filter and get the corresponding filter function pointer
 FilterFunc initFilter(const Filter f, const int colorDepth, const int srcWidth);

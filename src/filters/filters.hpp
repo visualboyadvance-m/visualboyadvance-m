@@ -2,7 +2,34 @@
 #ifndef FILTERS_FILTERS_HPP
 #define FILTERS_FILTERS_HPP
 
+#include <map>
+#include <string>
+
 #include "interframe.hpp"
+#include "../System.h"
+
+//sdl
+// Function pointer type for a filter function
+typedef void(*FilterFunc)(u8*, u32, u8*, u8*, u32, int, int);
+
+typedef std::pair<FilterFunc,FilterFunc> filterpair;
+typedef std::pair<std::string,filterpair> namedfilter;
+
+//Function to make the filterMap
+std::map<std::string,filterpair> makeFilterMap();
+
+//A named map of all the filters
+static const std::map<std::string,filterpair> filterMap = makeFilterMap();
+
+//These are the available filters
+
+//wx
+// src/wx/wxvbam.h:263-278
+// src/wxpanel.cpp:1100-1256
+
+//gtk
+// src/gtk/filters.h
+// src/gtk/filters.cpp
 
 // most 16-bit filters require space in src rounded up to u32
 // those that take delta take 1 src line of pixels, rounded up to u32 size
@@ -121,5 +148,14 @@ void hq4x16(unsigned char * pIn,  unsigned int srcPitch,
 // (by converting to 16-bit first in asm version
 void hq3x32_32(unsigned char *pIn,  unsigned int srcPitch, unsigned char *, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres);
 void hq4x32_32(unsigned char *pIn,  unsigned int srcPitch, unsigned char *, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres);
+
+//sdl.cpp
+//Don't even know if these work or not
+extern bool sdlStretchInit(int colorDepth, int sizeMultiplier, int srcWidth);
+
+extern void sdlStretch1x(u8*,u32,u8*,u8*,u32,int,int);
+extern void sdlStretch2x(u8*,u32,u8*,u8*,u32,int,int);
+extern void sdlStretch3x(u8*,u32,u8*,u8*,u32,int,int);
+extern void sdlStretch4x(u8*,u32,u8*,u8*,u32,int,int);
 
 #endif //FILTERS_FILTERS_HPP
