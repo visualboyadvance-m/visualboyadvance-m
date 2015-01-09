@@ -2049,6 +2049,32 @@ public:
 } throttle_ctrl;
 
 /////////////////////////////
+#define LoadXRCDialog(name) LoadXRCDialog1(d,name,this)
+void LoadXRCDialog1(wxDialog* & dialog,const char * name,MainFrame * theframe)
+{
+    /* why do I have to manually Fit()? */
+    /* since I do, always do it for last item so other init happens first */
+    /* don't forget to Fit() the last dialog! */
+    if(dialog != NULL)
+    {
+        dialog->Fit();
+    }
+    wxString dname = wxString::FromUTF8(name);
+    /* using this instead of LoadDialog() allows non-wxDialog classes that */
+    /* are derived from wxDialog (like wxPropertyDialog) to work */
+    dialog = wxDynamicCast(wxXmlResource::Get()->LoadObject(theframe, dname, wxEmptyString), wxDialog);
+    if(!dialog)
+    {
+        wxLogError(_("Unable to load dialog %s from resources"), name);
+        exit(1);
+    }
+    /* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */
+    /* this will generate a gtk warning but it is necessary for later */
+    /* retrieval using FindWindow() */
+    if(!dialog->GetParent())
+        dialog->Reparent(theframe);
+    mark_recursive(dialog);
+}
 
 bool MainFrame::InitMore(void)
 {
@@ -2302,38 +2328,12 @@ bool MainFrame::InitMore(void)
     // user's responsibility to ensure that the GUI works as intended after
     // modifications
 
-    wxDialog *d = 0;
-    const wxChar *dname;
-#define baddialog() do { \
-    wxLogError(_("Unable to load dialog %s from resources"), dname); \
-    return false; \
-} while(0)
+    wxDialog *d = NULL;
 #define baddialogcv(n) do { \
-    wxLogError(_("Unable to load dialog %s (control %s) from resources"), dname, n); \
+    wxLogError(_("Unable to load dialog (control %s) from resources"), n); \
     return false; \
 } while(0)
 #define baddialogc(n) baddialogcv(wxT(n))
-#define LoadXRCDialog(n) do { \
-    /* why do I have to manually Fit()? */ \
-    /* since I do, always do it for last item so other init happens first */ \
-    /* don't forget to Fit() the last dialog! */ \
-    if(d != 0) \
-	d->Fit(); \
-    dname = wxT(n); \
-    /* using this instead of LoadDialog() allows non-wxDialog classes that */ \
-    /* are derived from wxDialog (like wxPropertyDialog) to work */ \
-    d = wxDynamicCast(wxXmlResource::Get()->LoadObject(this, dname, wxEmptyString), \
-		      wxDialog); \
-    if(!d) \
-	baddialog(); \
-    /* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */ \
-    /* this will generate a gtk warning but it is necessary for later */ \
-    /* retrieval using FindWindow() */ \
-    if(!d->GetParent()) \
-	d->Reparent(this); \
- \
-    mark_recursive(d); \
-} while(0)
 
 #define vfld(f, t) do { \
     if(!XRCCTRL(*d, f, t)) \
