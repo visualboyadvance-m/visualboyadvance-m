@@ -6,7 +6,7 @@
 #include <string>
 
 #include "interframe.hpp"
-#include "../System.h"
+#include "../common/Types.h"
 
 //sdl
 // Function pointer type for a filter function
@@ -16,10 +16,10 @@ typedef std::pair<FilterFunc,FilterFunc> filterpair;
 typedef std::pair<std::string,filterpair> namedfilter;
 
 //Function to make the filterMap
-std::map<std::string,filterpair> makeFilterMap();
+const std::map<std::string,filterpair> makeFilterMap();
 
 //A named map of all the filters
-static const std::map<std::string,filterpair> filterMap = makeFilterMap();
+// static const std::map<std::string,filterpair> filterMap = makeFilterMap();
 
 //These are the available filters
 

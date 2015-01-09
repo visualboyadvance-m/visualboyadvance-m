@@ -3,7 +3,7 @@
 #ifndef INTERFRAME_HPP
 #define INTERFRAME_HPP
 
-#include "../System.h"
+#include "../common/Types.h"
 
 extern int RGB_LOW_BITS_MASK;
 

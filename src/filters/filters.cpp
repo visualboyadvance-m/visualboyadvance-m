@@ -8,7 +8,7 @@ namedfilter InsertFilter(std::string filterName, FilterFunc thirtyTwoBitFilter, 
 }
 
 //Actually make the fitlermap (since C++11 doesn't work right now)
-std::map<std::string,filterpair> makeFilterMap()
+const std::map<std::string,filterpair> makeFilterMap()
 {
     InsertFilter("Pixelate",Pixelate32,Pixelate);
     InsertFilter("Scanlines",Scanlines32,Scanlines);
