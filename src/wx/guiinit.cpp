@@ -2049,20 +2049,13 @@ public:
 } throttle_ctrl;
 
 /////////////////////////////
-#define LoadXRCDialog(name) LoadXRCDialog1(d,name,this)
-void LoadXRCDialog1(wxDialog* & dialog,const char * name,MainFrame * theframe)
+#define LoadXRCDialog(name) d=LoadXRCDialog1(name,this)
+wxDialog * LoadXRCDialog1(const char * name,MainFrame * theframe)
 {
-    /* why do I have to manually Fit()? */
-    /* since I do, always do it for last item so other init happens first */
-    /* don't forget to Fit() the last dialog! */
-    if(dialog != NULL)
-    {
-        dialog->Fit();
-    }
     wxString dname = wxString::FromUTF8(name);
     /* using this instead of LoadDialog() allows non-wxDialog classes that */
     /* are derived from wxDialog (like wxPropertyDialog) to work */
-    dialog = wxDynamicCast(wxXmlResource::Get()->LoadObject(theframe, dname, wxEmptyString), wxDialog);
+    wxDialog * dialog = wxDynamicCast(wxXmlResource::Get()->LoadObject(theframe, dname, wxEmptyString), wxDialog);
     if(!dialog)
     {
         wxLogError(_("Unable to load dialog %s from resources"), name);
@@ -2074,6 +2067,7 @@ void LoadXRCDialog1(wxDialog* & dialog,const char * name,MainFrame * theframe)
     if(!dialog->GetParent())
         dialog->Reparent(theframe);
     mark_recursive(dialog);
+    return dialog;
 }
 
 bool MainFrame::InitMore(void)
@@ -3183,8 +3177,6 @@ bool MainFrame::InitMore(void)
 		   wxCommandEventHandler(AccelConfig_t::CheckKey),
 		   NULL, &accel_config_handler);
     }
-
-    d->Fit();
 
     //// Debug menu
     // actually, the viewers can be instantiated multiple times.
