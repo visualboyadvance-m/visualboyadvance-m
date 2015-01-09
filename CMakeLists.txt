@@ -90,22 +90,6 @@ SET(VBAMCORE_LIBS
     ${PNG_LIBRARY}
 )
 
-
-
-# Disable looking for GTK if not going to build the GTK frontend
-# so that pkg-config is not required
-IF( ENABLE_GTK )
-    FIND_PACKAGE ( PkgConfig REQUIRED )
-    FIND_PACKAGE ( Gettext REQUIRED )
-
-    # These dependencies require pkg-config to be found
-    PKG_CHECK_MODULES ( GTKMM REQUIRED gtkmm-2.4 )
-    PKG_CHECK_MODULES ( GDKMM REQUIRED gdkmm-2.4 )
-    PKG_CHECK_MODULES ( GLIBMM REQUIRED glibmm-2.4 )
-    PKG_CHECK_MODULES ( GIOMM REQUIRED giomm-2.4 )
-    PKG_CHECK_MODULES ( GTKGLMM REQUIRED gtkglextmm-x11-1.2 )
-ENDIF( ENABLE_GTK )
-
 if(ENABLE_FFMPEG)
     FIND_PACKAGE ( PkgConfig REQUIRED )
 
@@ -410,7 +394,6 @@ ENDIF( ENABLE_SDL )
 
 IF( ENABLE_GTK )
     add_subdirectory (src/gtk)
-
 ENDIF( ENABLE_GTK )
 
 IF( ENABLE_WX )

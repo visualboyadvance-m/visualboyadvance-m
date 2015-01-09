@@ -1,5 +1,17 @@
 #Do not use this file directly.  Always use the top level CMakeLists.txt file
 
+
+#GTK dependencies
+FIND_PACKAGE ( PkgConfig REQUIRED )
+FIND_PACKAGE ( Gettext REQUIRED )
+
+# These dependencies require pkg-config to be found
+PKG_CHECK_MODULES ( GTKMM REQUIRED gtkmm-2.4 )
+PKG_CHECK_MODULES ( GDKMM REQUIRED gdkmm-2.4 )
+PKG_CHECK_MODULES ( GLIBMM REQUIRED glibmm-2.4 )
+PKG_CHECK_MODULES ( GIOMM REQUIRED giomm-2.4 )
+PKG_CHECK_MODULES ( GTKGLMM REQUIRED gtkglextmm-x11-1.2 )
+
 #Make sure the gtk ui elements are available for out of tree builds
 #See window.cpp:1544 (the sGetUiFilePath function) for more details
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ui/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/ui/)
