@@ -2071,7 +2071,8 @@ wxDialog * MainFrame::LoadXRCDialog(const char * name)
     wxString dname = wxString::FromUTF8(name);
     /* using this instead of LoadDialog() allows non-wxDialog classes that */
     /* are derived from wxDialog (like wxPropertySheetDialog) to work */
-    wxDialog * dialog = wxDynamicCast(wxXmlResource::Get()->LoadObject(this, dname, wxEmptyString), wxDialog);
+    wxObject * anObject = wxXmlResource::Get()->LoadObject(this, dname, wxEmptyString);
+    wxDialog * dialog = wxDynamicCast(anObject, wxDialog);
     CheckThrowXRCError(dialog,name);
 
     /* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */
