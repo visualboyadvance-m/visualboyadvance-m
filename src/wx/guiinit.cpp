@@ -2080,10 +2080,16 @@ void CheckThrowXRCError(T pointer,std::string name)
 wxDialog * MainFrame::LoadXRCDialog(const char * name)
 {
     wxString dname = wxString::FromUTF8(name);
-    /* using this instead of LoadDialog() allows non-wxDialog classes that */
-    /* are derived from wxDialog (like wxPropertySheetDialog) to work */
+    wxDialog * dialog = wxXmlResource::Get()->LoadDialog(this, dname);
+    CheckThrowXRCError(dialog,name);
+    return dialog;
+}
+wxPropertySheetDialog * MainFrame::LoadXRCropertySheetDialog(const char * name)
+{
+    wxString dname = wxString::FromUTF8(name);
+    //Seems like the only way to do this
     wxObject * anObject = wxXmlResource::Get()->LoadObject(this, dname, wxEmptyString);
-    wxDialog * dialog = wxDynamicCast(anObject, wxDialog);
+    wxPropertySheetDialog * dialog = wxDynamicCast(anObject, wxPropertySheetDialog);
     CheckThrowXRCError(dialog,name);
 
     /* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */
@@ -2745,7 +2751,7 @@ bool MainFrame::InitMore(void)
     getfld(fp, n, wxFilePickerCtrl); \
     fp->SetValidator(wxFileDirPickerValidator(&o)); \
 } while(0)
-    d=LoadXRCDialog("GameBoyConfig");
+    d=LoadXRCropertySheetDialog("GameBoyConfig");
     {
 	/// System and Peripherals
 	getch("System", gbEmulatorType);
@@ -2824,7 +2830,7 @@ bool MainFrame::InitMore(void)
 	}
     }
 
-    d=LoadXRCDialog("GameBoyAdvanceConfig");
+    d=LoadXRCropertySheetDialog("GameBoyAdvanceConfig");
     {
 	/// System and peripherals
 	getch("SaveType", gopts.save_type);
@@ -2876,7 +2882,7 @@ bool MainFrame::InitMore(void)
 	vfld("OvMirroring", wxChoice);
     }
 
-    d=LoadXRCDialog("DisplayConfig");
+    d=LoadXRCropertySheetDialog("DisplayConfig");
     {
 	/// On-Screen Display
 	getch("SpeedIndicator", gopts.osd_speed);
@@ -2945,7 +2951,7 @@ bool MainFrame::InitMore(void)
 	getch("IFB", gopts.ifb);
     }
 
-    d=LoadXRCDialog("SoundConfig");
+    d=LoadXRCropertySheetDialog("SoundConfig");
     wxSlider *sl;
 #define getsl(n, o) do { \
     getfld(sl, n, wxSlider); \
@@ -3035,7 +3041,7 @@ bool MainFrame::InitMore(void)
 	getdp("Recordings", gopts.recording_dir);
     }
 
-    d=LoadXRCDialog("JoypadConfig");
+    d=LoadXRCropertySheetDialog("JoypadConfig");
     wxFarRadio *r = 0;
     for(int i = 0; i < 4; i++) {
 	wxString pn;
