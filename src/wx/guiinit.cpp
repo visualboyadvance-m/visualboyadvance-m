@@ -3041,7 +3041,7 @@ bool MainFrame::InitMore(void)
 	getdp("Recordings", gopts.recording_dir);
     }
 
-    d=LoadXRCropertySheetDialog("JoypadConfig");
+    wxPropertySheetDialog * joyDialog = LoadXRCropertySheetDialog("JoypadConfig");
     wxFarRadio *r = 0;
     for(int i = 0; i < 4; i++) {
 	wxString pn;
@@ -3052,11 +3052,9 @@ bool MainFrame::InitMore(void)
 	// "Unable to load dialog JoypadConfig from resources", this is
 	// probably the reason.
 	pn.Printf(wxT("joy%d"), i + 1);
-	wxWindow *w;
-    w=vfld(d, ToString(pn).c_str(), wxWindow);
-#define d w
+	wxWindow *w = vfld(joyDialog, ToString(pn).c_str(), wxWindow);
 	wxFarRadio *cb;
-    cb=vfld(d,  "DefaultConfig", wxFarRadio);
+    cb=vfld(w,  "DefaultConfig", wxFarRadio);
 	if(r)
 	    cb->SetGroup(r);
 	else
@@ -3080,7 +3078,7 @@ bool MainFrame::InitMore(void)
 	w->Connect(XRCID("Clear"), wxEVT_COMMAND_BUTTON_CLICKED,
 		   wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
 		   NULL, &JoyPadConfigHandler[i]);
-#undef d
+    joyDialog->Fit();
     }
 
 #ifndef NO_LINK
