@@ -617,6 +617,7 @@ void MainFrame::MenuPopped(wxMenuEvent &evt)
 // uses dialog_opened as a nesting counter
 int MainFrame::ShowModal(wxDialog *dlg)
 {
+    CheckPointer(dlg);
     StartModal();
     int ret = dlg->ShowModal();
     StopModal();
