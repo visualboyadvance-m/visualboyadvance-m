@@ -74,6 +74,16 @@ public:
     wxString log;
     // there's no way to retrieve "current" locale, so this is public
     wxLocale locale;
+
+    //Handle most exceptions
+     virtual bool OnExceptionInMainLoop()
+    {
+        try {throw;}
+        catch(const std::exception& e){
+            std::cerr << "AN ERROR HAS OCCURRED:  " << e.what() << std::endl;
+            return false;
+        }
+    }
 private:
     wxPathList config_path;
 };
