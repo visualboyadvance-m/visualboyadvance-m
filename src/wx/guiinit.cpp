@@ -2385,6 +2385,7 @@ bool MainFrame::InitMore(void)
 	if(!wxDynamicCast(prev->GetParent(), wxScrolledWindow))
 	    throw std::runtime_error("Unable to load a dialog control from the builtin xrc file: Preview");
 	SafeXRCCTRL<wxControlWithItems>(d, "Magnification");
+    d->Fit();
     }
 
     //// File menu
@@ -2400,6 +2401,7 @@ bool MainFrame::InitMore(void)
     getlab("DeviceType");
     getlab("Version");
     getlab("CRC");
+    d->Fit();
 
     d=LoadXRCDialog("GBROMInfo");
     // just verify fields present
@@ -2416,16 +2418,19 @@ bool MainFrame::InitMore(void)
     getlab("DestCode");
     getlab("LicCode");
     getlab("Checksum");
+    d->Fit();
 
     d=LoadXRCDialog("CodeSelect");
     // just verify list present
     vfld(d, "CodeList", wxControlWithItems);
+    d->Fit();
 
     d=LoadXRCDialog("ExportSPS");
     // just verify text fields present
     vfld(d, "Title", wxTextCtrl);
     vfld(d, "Description", wxTextCtrl);
     vfld(d, "Notes", wxTextCtrl);
+    d->Fit();
 
     //// Emulation menu
 #ifndef NO_LINK
@@ -2523,6 +2528,7 @@ bool MainFrame::InitMore(void)
 	d->Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED,
 		   wxCommandEventHandler(NetLink_t::NetConnect),
 		   NULL, &net_link_handler);
+    d->Fit();
     }
 #endif
 
@@ -2599,6 +2605,7 @@ bool MainFrame::InitMore(void)
 		   wxListEventHandler(CheatList_t::Edit),
 		   NULL, &cheat_list_handler);
     }
+    d->Fit();
 
     d=LoadXRCDialog("CheatEdit");
     wxChoice *ch;
@@ -2613,6 +2620,7 @@ bool MainFrame::InitMore(void)
 	tc->SetMaxLength(sizeof(cheatsList[0].desc) - 1);
 	gettc("Codes", cheat_list_handler.ce_codes);
 	cheat_list_handler.ce_codes_tc = tc;
+    d->Fit();
     }
 
     d=LoadXRCDialog("CheatCreate");
@@ -2683,6 +2691,7 @@ bool MainFrame::InitMore(void)
 	d->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED,
 		   wxListEventHandler(CheatFind_t::Select),
 		   NULL, &cheat_find_handler);
+    d->Fit();
     }
 
     d=LoadXRCDialog("CheatAdd");
@@ -2701,6 +2710,7 @@ bool MainFrame::InitMore(void)
 	cheat_find_handler.ca_fmt = lab;
 	getlab("Address");
 	cheat_find_handler.ca_addr = lab;
+    d->Fit();
     }
 
     //// config menu
@@ -2734,6 +2744,7 @@ bool MainFrame::InitMore(void)
 		    NULL, &throttle_ctrl);
 	d->Connect(wxEVT_SHOW, wxShowEventHandler(ThrottleCtrl_t::Init),
 		   NULL, &throttle_ctrl);
+    d->Fit();
     }
 
 #define getcbbe(n, o) getbe(n, o, cb, wxCheckBox, CB)
@@ -2834,6 +2845,7 @@ bool MainFrame::InitMore(void)
 		       wxCommandEventHandler(GBColorConfig_t::ColorButton),
 		       NULL, &GBColorConfigHandler[i]);
 	}
+	d->Fit();
     }
 
     d=LoadXRCropertySheetDialog("GameBoyAdvanceConfig");
@@ -2886,6 +2898,7 @@ bool MainFrame::InitMore(void)
 	vfld(d, "OvSaveType", wxChoice);
 	vfld(d, "OvFlashSize", wxChoice);
 	vfld(d, "OvMirroring", wxChoice);
+    d->Fit();
     }
 
     d=LoadXRCropertySheetDialog("DisplayConfig");
@@ -2955,6 +2968,7 @@ bool MainFrame::InitMore(void)
 		    wxCommandEventHandler(PluginEnable_t::ToggleChoice),
 		    NULL, &PluginEnableHandler);
 	getch(d, "IFB", gopts.ifb);
+    d->Fit();
     }
 
     d=LoadXRCropertySheetDialog("SoundConfig");
@@ -3030,6 +3044,7 @@ bool MainFrame::InitMore(void)
 	/// Game Boy Advance
 	getcbb("GBASoundInterpolation", soundInterpolation);
 	getsl("GBASoundFiltering", gopts.gba_sound_filter);
+    d->Fit();
     }
 
     wxDirPickerCtrl *dp;
@@ -3045,6 +3060,7 @@ bool MainFrame::InitMore(void)
 	getdp("StateSaves", gopts.state_dir);
 	getdp("Screenshots", gopts.scrshot_dir);
 	getdp("Recordings", gopts.recording_dir);
+    d->Fit();
     }
 
     wxPropertySheetDialog * joyDialog = LoadXRCropertySheetDialog("JoypadConfig");
@@ -3103,6 +3119,7 @@ bool MainFrame::InitMore(void)
 	addbe(lab);
 	getsc("LinkTimeout", linktimeout);
 	addbe(sc);
+    d->Fit();
     }
 #endif
 
@@ -3200,6 +3217,7 @@ bool MainFrame::InitMore(void)
 	d->Connect(XRCID("Shortcut"), wxEVT_COMMAND_TEXT_UPDATED,
 		   wxCommandEventHandler(AccelConfig_t::CheckKey),
 		   NULL, &accel_config_handler);
+    d->Fit();
     }
     }
     catch (std::exception& e)
