@@ -2109,14 +2109,23 @@ wxPropertySheetDialog * MainFrame::LoadXRCropertySheetDialog(const char * name)
 }
 ///This just adds some error checking to the wx XRCCTRL macro
 template <typename T>
-T * SafeXRCCTRL( wxWindow *window,const char * name)
+T * SafeXRCCTRL( wxWindow *parent,const char * name)
 {
     wxString dname = wxString::FromUTF8(name);
     //This is needed to work around a bug in XRCCTRL
     wxString Ldname=dname;
-    T * output = XRCCTRL(*window, dname, T);
+    T * output = XRCCTRL(*parent, dname, T);
     CheckThrowXRCError(output,name);
     return output;
+}
+///Get an object, and set the appropriate validator
+//T is the object type, and V is the validator type
+template <typename T,typename V>
+T * GetValidatedChild(wxWindow *parent,const char * name, V validator)
+{
+    T * child = SafeXRCCTRL<T>(parent, name);
+    child->SetValidator(validator);
+    return child;
 }
 
 bool MainFrame::InitMore(void)
@@ -2607,12 +2616,9 @@ bool MainFrame::InitMore(void)
 
     d=LoadXRCDialog("CheatEdit");
     wxChoice *ch;
-#define getch(pointer, name, validator)\
-    ch=SafeXRCCTRL<wxChoice>(pointer,  name); \
-    ch->SetValidator(wxGenericValidator(&validator));
     {
 	// d->Reparent(cheat_list_handler.dlg); // broken
-	getch(d, "Type", cheat_list_handler.ce_type);
+	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "Type",wxGenericValidator(& cheat_list_handler.ce_type));
 	cheat_list_handler.ce_type_ch = ch;
 	gettc("Desc", cheat_list_handler.ce_desc);
 	tc->SetMaxLength(sizeof(cheatsList[0].desc) - 1);
@@ -2774,7 +2780,7 @@ bool MainFrame::InitMore(void)
     d=LoadXRCropertySheetDialog("GameBoyConfig");
     {
 	/// System and Peripherals
-	getch(d, "System", gbEmulatorType);
+	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "System",wxGenericValidator(& gbEmulatorType));
 	// "Display borders" corresponds to 2 variables, so it is handled
 	// in command handler.  Plus making changes might require resizing
 	// game area.  Validation only here.
@@ -2849,9 +2855,9 @@ bool MainFrame::InitMore(void)
     d=LoadXRCropertySheetDialog("GameBoyAdvanceConfig");
     {
 	/// System and peripherals
-	getch(d, "SaveType", gopts.save_type);
+	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "SaveType",wxGenericValidator(& gopts.save_type));
 	BatConfigHandler.type = ch;
-	getch(d, "FlashSize", gopts.flash_size);
+	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "FlashSize",wxGenericValidator(& gopts.flash_size));
 	BatConfigHandler.size = ch;
 	d->Connect(XRCID("SaveType"), wxEVT_COMMAND_CHOICE_SELECTED,
 		   wxCommandEventHandler(BatConfig_t::ChangeType),
@@ -2902,7 +2908,7 @@ bool MainFrame::InitMore(void)
     d=LoadXRCropertySheetDialog("DisplayConfig");
     {
 	/// On-Screen Display
-	getch(d, "SpeedIndicator", gopts.osd_speed);
+	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "SpeedIndicator",wxGenericValidator(& gopts.osd_speed));
 	getcbb("NoStatusMsg", gopts.no_osd_status);
 	getcbb("Transparent", gopts.osd_transparent);
 
@@ -2952,7 +2958,7 @@ bool MainFrame::InitMore(void)
     cb=SafeXRCCTRL<wxCheckBox>(d,  "MMX");
 	cb->Hide();
 #endif
-	getch(d, "Filter", gopts.filter);
+	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "Filter",wxGenericValidator(& gopts.filter));
 	// these two are filled and/or hidden at dialog load time
 	wxControl *pll;
 	wxChoice *pl;
@@ -2965,7 +2971,7 @@ bool MainFrame::InitMore(void)
 	ch->Connect(wxEVT_COMMAND_CHOICE_SELECTED,
 		    wxCommandEventHandler(PluginEnable_t::ToggleChoice),
 		    NULL, &PluginEnableHandler);
-	getch(d, "IFB", gopts.ifb);
+	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "IFB",wxGenericValidator(& gopts.ifb));
     d->Fit();
     }
 
@@ -2982,7 +2988,7 @@ bool MainFrame::InitMore(void)
 	d->Connect(XRCID("Volume100"), wxEVT_COMMAND_BUTTON_CLICKED,
 		   wxCommandEventHandler(SoundConfig_t::FullVol),
 		   NULL, &sound_config_handler);
-	getch(d, "Rate", gopts.sound_qual);
+	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "Rate",wxGenericValidator(& gopts.sound_qual));
 
 	/// Advanced
 #define audapi_rb(n, v) do {\
