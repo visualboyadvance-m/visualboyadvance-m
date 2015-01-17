@@ -41,3 +41,5 @@ const std::map<std::string,filterpair> makeFilterMap()
     InsertFilter("sdlStretch3x",sdlStretch3x,sdlStretch3x);
     InsertFilter("sdlStretch4x",sdlStretch4x,sdlStretch4x);
 }
+
+const std::map<std::string,filterpair> filters::filterMap = makeFilterMap();

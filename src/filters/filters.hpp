@@ -4,6 +4,7 @@
 
 #include <map>
 #include <string>
+#include <stdexcept>
 
 #include "interframe.hpp"
 #include "../common/Types.h"
@@ -15,11 +16,33 @@ typedef void(*FilterFunc)(u8*, u32, u8*, u8*, u32, int, int);
 typedef std::pair<FilterFunc,FilterFunc> filterpair;
 typedef std::pair<std::string,filterpair> namedfilter;
 
-//Function to make the filterMap
-const std::map<std::string,filterpair> makeFilterMap();
-
-//A named map of all the filters
-// static const std::map<std::string,filterpair> filterMap = makeFilterMap();
+///A class allowing for easy access to all the filters
+class filters {
+private:
+    //A named map of all the filters
+    static const std::map<std::string,filterpair> filterMap;
+public:
+    ///Returns a function pointer to a 32 bit filter
+    FilterFunc GetFilter(std::string filterName)
+    {
+        std::map<std::string,filterpair>::const_iterator found = filterMap.find(filterName);
+        if(found == filterMap.end()){
+            throw std::runtime_error("ERROR:  Filter not found!");
+            return NULL;
+        }
+        return found->second.first;
+    };
+    ///Returns a function pointer to a 16 bit filter
+    FilterFunc GetFilter16(std::string filterName)
+    {
+        std::map<std::string,filterpair>::const_iterator found = filterMap.find(filterName);
+        if(found == filterMap.end()){
+            throw std::runtime_error("ERROR:  Filter not found!");
+            return NULL;
+        }
+        return found->second.second;
+    };
+};
 
 //These are the available filters
 
