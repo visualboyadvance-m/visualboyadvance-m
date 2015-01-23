@@ -1,8 +1,47 @@
-vbam (1.8.0.1229-1) UNRELEASED; urgency=low
+vbam (1.8.0.1231-0ubuntu3) unstable; urgency=low
+
+  * Revert SDL sound changes to upstream svn 1226, until they fix it (bug #147)
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Sun, 11 Mai 2014 11:08:00 +0100
+
+vbam (1.8.0.1231-0ubuntu2) unstable; urgency=low
+
+  * Manual merge from upstream
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Sun, 11 Mai 2014 11:08:00 +0100
+
+vbam (1.8.0.1231) unstable; urgency=low
+
+  * Re-added rWindows/other stuff (easy recipe to merge upstream changes to fixes)
+  * New icons
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Sun, 11 Mai 2014 09:20:00 +0100
+
+vbam (1.8.0.1230-0ubuntu2) unstable; urgency=low
+
+  * Added missing Build-Depends
+  * Package for vbam-sdl
+  * Fixed some lintian warnings/errors
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Sun, 27 Apr 2014 15:48:00 +0100
+
+vbam (1.8.0.1230-0ubuntu1) unstable; urgency=low
+
+  * Fixing launchpad orig.tar.gz error
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Sat, 22 Mar 2014 16:23:00 +0100
+
+vbam (1.8.0.1229-0ubuntu2) trusty; urgency=low
+
+  * Updated copyright year and fixed homepage link
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Sat, 22 Mar 2014 15:59:00 +0100
+
+vbam (1.8.0.1229-0ubuntu1) trusty; urgency=low
 
   * Use new version from upstream
 
- -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Sat, 26 Apr 2014 02:10:00 +0100
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Thu, 20 Mar 2014 19:30:00 +0100
 
 vbam (1.8.0.1042-1) lucid; urgency=low
 

@@ -1,0 +1,131 @@
+Description: <short summary of the patch>
+ TODO: Put a short summary on the line above and replace this paragraph
+ with a longer explanation of this change. Complete the meta-information
+ with other relevant fields (see below for details). To make it easier, the
+ information below has been extracted from the changelog. Adjust it or drop
+ it.
+ .
+ vbam (1.8.0.1230-0ubuntu1) trusty; urgency=low
+ .
+   * Fixing launchpad orig.tar.gz error
+Author: Sérgio Benjamim <sergio_br2@yahoo.com.br>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: http://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: <YYYY-MM-DD>
+
+--- vbam-1.8.0.1230.orig/CMakeLists.txt
++++ vbam-1.8.0.1230/CMakeLists.txt
+@@ -8,7 +8,7 @@ if( COMMAND cmake_policy )
+ endif( COMMAND cmake_policy )
+ SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts )
+ 
+-option( ENABLE_SDL "Build the SDL port" ON )
++option( ENABLE_SDL "Build the SDL port" OFF )
+ option( ENABLE_GTK "Build the GTK+ GUI" ON )
+ option( ENABLE_WX "Build the wxWidgets port" OFF )
+ option( ENABLE_DEBUGGER "Enable the debugger" ON )
+@@ -36,7 +36,7 @@ endif( NOT ENABLE_DEBUGGER AND ENABLE_SD
+ 
+ # Set the version number with -DVERSION=X.X.X-uber
+ IF( NOT VERSION )
+-    SET( VERSION "1.8.0-SVN" )
++    SET( VERSION "1.8.0-SVN1229" )
+    
+     IF(EXISTS "${CMAKE_SOURCE_DIR}/.svn")
+         FIND_PACKAGE(Subversion)
+--- vbam-1.8.0.1230.orig/po/wxvbam/en.po
++++ vbam-1.8.0.1230/po/wxvbam/en.po
+@@ -1196,11 +1196,11 @@ msgstr "Connecting to %s\n"
+ msgid ""
+ "Copyright (C) 1999-2003 Forgotten\n"
+ "Copyright (C) 2004-2006 VBA development team\n"
+-"Copyright (C) 2007-2011 VBA-M development team"
++"Copyright (C) 2007-2014 VBA-M development team"
+ msgstr ""
+ "Copyright (C) 1999-2003 Forgotten\n"
+ "Copyright (C) 2004-2006 VBA development team\n"
+-"Copyright (C) 2007-2011 VBA-M development team"
++"Copyright (C) 2007-2014 VBA-M development team"
+ 
+ #: ../src/wx/wxvbam.cpp:208
+ msgid "Could not create main window"
+--- vbam-1.8.0.1230.orig/po/wxvbam/cs.po
++++ vbam-1.8.0.1230/po/wxvbam/cs.po
+@@ -371,8 +371,8 @@ msgstr "Nintendo GameBoy (+Color+Advance
+ msgid ""
+ "Copyright (C) 1999-2003 Forgotten\n"
+ "Copyright (C) 2004-2006 VBA development team\n"
+-"Copyright (C) 2007-2011 VBA-M development team"
+-msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2011 VBA-M development team"
++"Copyright (C) 2007-2014 VBA-M development team"
++msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2014 VBA-M development team"
+ 
+ #: ../src/wx/cmdevents.cpp:2180
+ msgid ""
+--- vbam-1.8.0.1230.orig/po/wxvbam/wxvbam.pot
++++ vbam-1.8.0.1230/po/wxvbam/wxvbam.pot
+@@ -368,7 +368,7 @@ msgstr ""
+ msgid ""
+ "Copyright (C) 1999-2003 Forgotten\n"
+ "Copyright (C) 2004-2006 VBA development team\n"
+-"Copyright (C) 2007-2011 VBA-M development team"
++"Copyright (C) 2007-2014 VBA-M development team"
+ msgstr ""
+ 
+ #: ../src/wx/cmdevents.cpp:2180
+--- vbam-1.8.0.1230.orig/po/wxvbam/nl.po
++++ vbam-1.8.0.1230/po/wxvbam/nl.po
+@@ -370,7 +370,7 @@ msgstr ""
+ msgid ""
+ "Copyright (C) 1999-2003 Forgotten\n"
+ "Copyright (C) 2004-2006 VBA development team\n"
+-"Copyright (C) 2007-2011 VBA-M development team"
++"Copyright (C) 2007-2014 VBA-M development team"
+ msgstr ""
+ 
+ #: ../src/wx/cmdevents.cpp:2180
+--- vbam-1.8.0.1230.orig/po/wxvbam/zh_TW.po
++++ vbam-1.8.0.1230/po/wxvbam/zh_TW.po
+@@ -370,8 +370,8 @@ msgstr "Nintendo GameBoy (+Color+Advance
+ msgid ""
+ "Copyright (C) 1999-2003 Forgotten\n"
+ "Copyright (C) 2004-2006 VBA development team\n"
+-"Copyright (C) 2007-2011 VBA-M development team"
+-msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2011 VBA-M development team"
++"Copyright (C) 2007-2014 VBA-M development team"
++msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2014 VBA-M development team"
+ 
+ #: ../src/wx/cmdevents.cpp:2180
+ msgid ""
+--- vbam-1.8.0.1230.orig/src/wx/cmdevents.cpp
++++ vbam-1.8.0.1230/src/wx/cmdevents.cpp
+@@ -2176,7 +2176,7 @@ EVT_HANDLER(wxID_ABOUT, "About...")
+     ai.SetWebSite(wxT("http://www.vba-m.com/"));
+     ai.SetIcon(GetIcon());
+     ai.SetDescription(_("Nintendo GameBoy (+Color+Advance) emulator."));
+-    ai.SetCopyright(_("Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2011 VBA-M development team"));
++    ai.SetCopyright(_("Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2014 VBA-M development team"));
+     ai.SetLicense(_("This program is free software: you can redistribute it and/or modify\n"
+ 		    "it under the terms of the GNU General Public License as published by\n"
+ 		    "the Free Software Foundation, either version 2 of the License, or\n"
+--- vbam-1.8.0.1230.orig/src/gtk/windowcallbacks.cpp
++++ vbam-1.8.0.1230/src/gtk/windowcallbacks.cpp
+@@ -500,7 +500,7 @@ void Window::vOnHelpAbout()
+     "along with this program.  If not, see <http://www.gnu.org/licenses/>.";
+   const char csCopyright[] = "Copyright (C) 1999-2003 Forgotten\n"
+                              "Copyright (C) 2004-2006 VBA development team\n"
+-                             "Copyright (C) 2007-2011 VBA-M development team";
++                             "Copyright (C) 2007-2014 VBA-M development team";
+ 
+   oAboutDialog.set_transient_for(*this);
+ 
