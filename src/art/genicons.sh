@@ -12,7 +12,7 @@ do
 
     SIZENAME="$asize"x"$asize"
     OUTDIR="./hicolor/$SIZENAME/apps/"
-    OUTFILE="$OUTDIR$SIZENAME.png"
+    OUTFILE="$OUTDIR$vbam.png"
 
     #Handle really tiny images
     if (( $asize < 32 ))
