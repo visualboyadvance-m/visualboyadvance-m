@@ -479,7 +479,6 @@ protected:
     FilterThread *threads;
     int nthreads;
     wxSemaphore filt_done;
-    wxDynamicLibrary filt_plugin;
     const RENDER_PLUGIN_INFO *rpi; // also flag indicating plugin loaded
     // largest buffer required is 32-bit * (max width + 1) * (max height + 2)
     u8 delta[257 * 4 * 226];
