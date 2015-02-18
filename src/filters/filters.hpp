@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <stdexcept>
+// #include <iostream>
 
 #include "interframe.hpp"
 #include "../common/Types.h"
@@ -14,17 +15,7 @@
 typedef void(*FilterFunc)(u8*, u32, u8*, u8*, u32, int, int);
 
 //WX
-enum wx_filtfunc {
-    // this order must match order of option enum and selector widget
-    FF_NONE, FF_2XSAI, FF_SUPER2XSAI, FF_SUPEREAGLE, FF_PIXELATE,
-    FF_ADVMAME, FF_BILINEAR, FF_BILINEARPLUS, FF_SCANLINES, FF_TV,
-    FF_HQ2X, FF_LQ2X, FF_SIMPLE2X, FF_SIMPLE3X, FF_HQ3X, FF_SIMPLE4X,
-    FF_HQ4X
-};
-#define builtin_ff_scale(x) \
-    ((x == FF_HQ4X || x == FF_SIMPLE4X) ? 4 : \
-    (x == FF_HQ3X || x == FF_SIMPLE3X) ? 3 : \
-     x == FF_NONE ? 1 : 2)
+
 enum ifbfunc {
     // this order must match order of option enum and selector widget
     IFB_NONE, IFB_SMART, IFB_MOTION_BLUR
@@ -40,25 +31,89 @@ private:
     static const std::map<std::string,filterpair> filterMap;
 public:
     ///Returns a function pointer to a 32 bit filter
-    FilterFunc GetFilter(std::string filterName)
+    static FilterFunc GetFilter(std::string filterName)
     {
         std::map<std::string,filterpair>::const_iterator found = filterMap.find(filterName);
         if(found == filterMap.end()){
-            throw std::runtime_error("ERROR:  Filter not found!");
+            //Not doing the error checking here
+//             throw std::runtime_error("ERROR:  Filter not found!");
             return NULL;
         }
         return found->second.first;
     };
     ///Returns a function pointer to a 16 bit filter
-    FilterFunc GetFilter16(std::string filterName)
+    static FilterFunc GetFilter16(std::string filterName)
     {
         std::map<std::string,filterpair>::const_iterator found = filterMap.find(filterName);
         if(found == filterMap.end()){
-            throw std::runtime_error("ERROR:  Filter not found!");
+//             throw std::runtime_error("ERROR:  Filter not found!");
             return NULL;
         }
         return found->second.second;
     };
+    ///Returns the filter's scaling factor
+    ///TODO:  De hardcode this
+    static int GetFilterScale(std::string filterName)
+    {
+        if(filterName == "HQ 4x" || filterName == "Simple 4x")
+            return 4;
+        if(filterName == "HQ 3x" || filterName == "Simple 3x")
+            return 3;
+        if(filterName == "None")
+            return 1;
+        return 2;
+    }
+};
+
+///This is the parent class of all the filters
+///TODO:  Actually subclass these instead of cheating
+class filter {
+private:
+    //No default constructor for this class
+    filter();
+    ///The filter's name
+    std::string name;
+    ///The internal filter used
+    FilterFunc myFilter;
+    ///The internal scale
+    int myScale;
+    ///If the filter even exists
+    bool isGood;
+public:
+    filter(std::string myName): name(myName)
+    {
+        myFilter=filters::GetFilter(myName);
+        myScale=filters::GetFilterScale(myName);
+        if (myFilter==NULL)
+            isGood = false;
+        else
+            isGood = true;
+
+//         std::cerr << myName << std::endl;
+    }
+    std::string getName()
+    {
+        return name;
+    }
+    int getScale()
+    {
+        return myScale;
+    }
+    void run(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int width, int height)
+    {
+        if(isGood)
+        {
+            myFilter(srcPtr,srcPitch,deltaPtr,dstPtr,dstPitch,width,height);
+        }
+        else
+        {
+            throw std::runtime_error("ERROR:  Filter does not exist!");
+        }
+    }
+    bool exists()
+    {
+        return isGood;
+    }
 };
 
 //These are the available filters

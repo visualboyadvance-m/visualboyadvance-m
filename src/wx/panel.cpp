@@ -986,7 +986,15 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
 {
     memset(delta, 0xff, sizeof(delta));
 
-    scale = builtin_ff_scale(gopts.filter);
+    //Make sure filter is current
+    if(myFilter != NULL)
+    {
+        delete myFilter;
+        myFilter = NULL;
+    }
+    myFilter = new filter(std::string(gopts.filter.mb_str(wxConvUTF8)));
+
+    scale = myFilter->getScale();
 #define out_16 (systemColorDepth == 16)
     systemColorDepth = 32;
 
@@ -1056,6 +1064,7 @@ public:
     int width, height, scale;
     const RENDER_PLUGIN_INFO *rpi;
     u8 *dst, *delta;
+    filter * mainFilter;
 
     // set this param every round
     // if NULL, end thread
@@ -1108,74 +1117,30 @@ public:
 		}
 	    }
 
-	    if(gopts.filter == FF_NONE) {
-		if(nthreads == 1)
-		    return 0;
-		done->Post();
-		continue;
+	    if(mainFilter == NULL)
+        {
+            std::runtime_error("ERROR:  Filter not initialized!");
+            return (wxThread::ExitCode) -1;
+        }
+	    if(!mainFilter->exists()) {
+            if(nthreads == 1)
+                return 0;
+            done->Post();
+            continue;
 	    }
 
 	    src += instride * procy;
 
 	    // naturally, any of these with accumulation buffers like those of
 	    // the IFB filters will screw up royally as well
-	    switch(gopts.filter) {
-	    case FF_2XSAI:
-		_2xSaI32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_SUPER2XSAI:
-		Super2xSaI32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_SUPEREAGLE:
-		SuperEagle32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_PIXELATE:
-		Pixelate32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_ADVMAME:
-		AdMame2x32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_BILINEAR:
-		Bilinear32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_BILINEARPLUS:
-		BilinearPlus32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_SCANLINES:
-		Scanlines32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_TV:
-		ScanlinesTV32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_HQ2X:
-		hq2x32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_LQ2X:
-		lq2x32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_SIMPLE2X:
-		Simple2x32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_SIMPLE3X:
-		Simple3x32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_HQ3X:
-		hq3x32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_SIMPLE4X:
-		Simple4x32(src, instride, delta, dst, outstride, width, height);
-		break;
-	    case FF_HQ4X:
-		hq4x32(src, instride, delta, dst, outstride, width, height);
-		break;
-        default:
-            break;
-        }
+        mainFilter->run(src, instride, delta, dst, outstride, width, height);
+
         if(nthreads == 1)
             return 0;
         done->Post();
         continue;
 	}
+	return (wxThread::ExitCode) 0;
     }
 };
 
@@ -1198,17 +1163,20 @@ void DrawingPanel::DrawArea(u8 **data)
 	}
 	pixbuf2 = (u8 *)calloc(allocstride, (alloch + 2) * scale);
     }
-    if(gopts.filter == FF_NONE) {
-	todraw = *data;
-	// *data is assigned below, after old buf has been processed
-	pixbuf1 = pixbuf2;
-	pixbuf2 = todraw;
-    } else
-	todraw = pixbuf2;
+    if(!myFilter->exists()) {
+        todraw = *data;
+        // *data is assigned below, after old buf has been processed
+        pixbuf1 = pixbuf2;
+        pixbuf2 = todraw;
+    }
+    else
+    {
+        todraw = pixbuf2;
+    }
 
     // First, apply filters, if applicable, in parallel, if enabled
-    if(gopts.filter != FF_NONE ||
-       gopts.ifb != FF_NONE /* FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur) */ ) {
+    if(myFilter->exists() ||
+       gopts.ifb != IFB_NONE /* FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur) */ ) {
 	if(nthreads != gopts.max_threads) {
 	    if(nthreads) {
 		if(nthreads > 1)
@@ -1234,6 +1202,7 @@ void DrawingPanel::DrawArea(u8 **data)
 	    threads[0].dst = todraw;
 	    threads[0].delta = delta;
 	    threads[0].rpi = rpi;
+        threads[0].mainFilter=myFilter;
 	    threads[0].Entry();
 	    // go ahead and start the threads up, though
 	    if(nthreads > 1) {
@@ -1246,6 +1215,7 @@ void DrawingPanel::DrawArea(u8 **data)
 		    threads[i].dst = todraw;
 		    threads[i].delta = delta;
 		    threads[i].rpi = rpi;
+            threads[i].mainFilter=myFilter;
 		    threads[i].done = &filt_done;
 		    threads[i].lock.Lock();
 		    threads[i].Create();
@@ -1268,8 +1238,8 @@ void DrawingPanel::DrawArea(u8 **data)
     }
 
     // swap buffers now that src has been processed
-    if(gopts.filter == FF_NONE)
-	*data = pixbuf1;
+    if(!myFilter->exists())
+        *data = pixbuf1;
 
     // draw OSD text old-style (directly into output buffer), if needed
     // new style flickers too much, so we'll stick to this for now
@@ -1427,7 +1397,7 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow *parent, int _width, int _height)
 {
     // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
     // 16 or 32, though
-    if(gopts.filter == FF_NONE && gopts.ifb == IFB_NONE)
+    if(!myFilter->exists() && gopts.ifb == IFB_NONE)
 	// changing from 32 to 24 does not require regenerating color tables
 	systemColorDepth = 24;
 }
