@@ -13,6 +13,23 @@
 // Function pointer type for a filter function
 typedef void(*FilterFunc)(u8*, u32, u8*, u8*, u32, int, int);
 
+//WX
+enum wx_filtfunc {
+    // this order must match order of option enum and selector widget
+    FF_NONE, FF_2XSAI, FF_SUPER2XSAI, FF_SUPEREAGLE, FF_PIXELATE,
+    FF_ADVMAME, FF_BILINEAR, FF_BILINEARPLUS, FF_SCANLINES, FF_TV,
+    FF_HQ2X, FF_LQ2X, FF_SIMPLE2X, FF_SIMPLE3X, FF_HQ3X, FF_SIMPLE4X,
+    FF_HQ4X, FF_PLUGIN  // plugin must always be last
+};
+#define builtin_ff_scale(x) \
+    ((x == FF_HQ4X || x == FF_SIMPLE4X) ? 4 : \
+    (x == FF_HQ3X || x == FF_SIMPLE3X) ? 3 : \
+     x == FF_PLUGIN ? 0 : x == FF_NONE ? 1 : 2)
+enum ifbfunc {
+    // this order must match order of option enum and selector widget
+    IFB_NONE, IFB_SMART, IFB_MOTION_BLUR
+};
+
 typedef std::pair<FilterFunc,FilterFunc> filterpair;
 typedef std::pair<std::string,filterpair> namedfilter;
 
