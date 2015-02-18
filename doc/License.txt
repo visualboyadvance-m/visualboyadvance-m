@@ -6,8 +6,8 @@ or when stated otherwise in the source file:
 
 Copyright for the modifications to the files mentioned above:
   VisualBoyAdvance-M GB/GBA emulator
-  Copyright (C) 2007-2013 VBA-M development team
-
+  Copyright (C) 2007-2014 VBA-M development team
+  Copyright (C) 2014-2015 Arthur Moore
 
 All files excluding gb_apu, modified files from zlib
 or when stated otherwise in the source file

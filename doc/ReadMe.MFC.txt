@@ -10,6 +10,7 @@
 VisualBoyAdvance-M
 Nintendo Game Boy & Game Boy Advance Emulator
 Project Homepage: http://vba-m.com
+Report bugs to:  https://github.com/EmperorArthur/VBA-M/issues
 
 This program is distributed under the GNU General Public License
 http://www.gnu.org/licenses/gpl.html

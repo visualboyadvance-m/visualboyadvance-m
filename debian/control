@@ -5,8 +5,8 @@ Maintainer: Sérgio Benjamim <sergio_br2@yahoo.com.br>
 Build-Depends: debhelper (>= 9), cmake, zlib1g-dev, libpng12-dev, imagemagick, libopenal-dev, libsdl1.2-dev, libgtkmm-2.4-dev, libgtkglextmm-x11-1.2-dev, libwxgtk2.8-dev, wx-common, libcairo2-dev, libsfml-dev, nasm [i386 amd64], liblircclient-dev, libavcodec-dev, libavformat-dev, libswscale-dev, libavutil-dev
 Standards-Version: 3.9.4
 Homepage: http://vba-m.com
-Vcs-Svn: svn://svn.code.sf.net/p/vbam/code/trunk
-Vcs-Browser: http://svn.code.sf.net/p/vbam/code/trunk
+Vcs-git: https://github.com/EmperorArthur/VBA-M.git
+Vcs-Browser: https://github.com/EmperorArthur/VBA-M
 
 Package: vbam-sdl
 Architecture: any

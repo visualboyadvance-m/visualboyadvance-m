@@ -1,17 +1,19 @@
 This package was debianized by Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com> on
 Sat, 12 Sep 2009 19:39:52 -0300.
 
-It was downloaded from <svn://vbam.svn.sourceforge.net/svnroot/vbam>
+It was downloaded from <https://github.com/EmperorArthur/VBA-M>
 
 Upstream Author:
 
     VisualBoyAdvance-M team
+    Arthur Moore
 
 Copyright:
 
     Copyright (C) 1999-2006 Forgotten
     Copyright (C) 2004-2006 VisualBoyAdvance team
-    Copyright (C) 2007-2009 VisualBoyAdvance-M team
+    Copyright (C) 2007-2014 VisualBoyAdvance-M team
+    Copyright (C) 2014-2015 Arthur Moore
 
 License:
 
