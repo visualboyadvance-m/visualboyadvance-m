@@ -1072,47 +1072,51 @@ public:
 
     ExitCode Entry()
     {
-	// This is the band this thread will process
+    //The filter is run with each thread handling bands of data
+    //This is how tall each of those bands are
+    unsigned int band_height = height/nthreads;
+	// This is the lower height value of the band this thread will process
 	// threadno == -1 means just do a dummy round on the border line
-	int procy = height * threadno / nthreads;
-	height = height * (threadno + 1) / nthreads - procy;
+	int band_lower = band_height * threadno;
 
-	int inbpp = systemColorDepth >> 3;
+    //The number of bytes per pixel, as determined by the systemColorDepth
+    int bytes_per_pixel = systemColorDepth/8;
+
 	int inrb = systemColorDepth == 16 ? 2 : systemColorDepth == 24 ? 0 : 1;
-	int instride = (width + inrb) * inbpp;
+	int instride = (width + inrb) * bytes_per_pixel;
 
 	int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
 	int outrb = systemColorDepth == 24 ? 0 : 4;
 	int outstride = width * outbpp * scale + outrb;
 
-	delta += instride * procy;
+	delta += instride * band_lower;
 	// + 1 for stupid top border
-	dst += outstride * (procy + 1) * scale;
+	dst += outstride * (band_lower + 1) * scale;
 
 	while(nthreads == 1 || sig.Wait() == wxCOND_NO_ERROR) {
 	    if(!src /* && nthreads > 1 */ ) {
-		lock.Unlock();
-		return 0;
+            lock.Unlock();
+            return 0;
 	    }
 	    // + 1 for stupid top border
 	    src += instride;
 	    // interframe blending filter
 	    // definitely not thread safe by default
-	    // added procy param to provide offset into accum buffers
+	    // added band_lower param to provide offset into accum buffers
 	    if(gopts.ifb != IFB_NONE) {
 		switch(gopts.ifb) {
 		case IFB_SMART:
 		    if(systemColorDepth == 16)
-			SmartIB(src, instride, width, procy, height);
+			SmartIB(src, instride, width, band_lower, band_height);
 		    else
-			SmartIB32(src, instride, width, procy, height);
+			SmartIB32(src, instride, width, band_lower, band_height);
 		    break;
 		case IFB_MOTION_BLUR:
 		    // FIXME: if(renderer == d3d/gl && filter == NONE) break;
 		    if(systemColorDepth == 16)
-			MotionBlurIB(src, instride, width, procy, height);
+			MotionBlurIB(src, instride, width, band_lower, band_height);
 		    else
-			MotionBlurIB32(src, instride, width, procy, height);
+			MotionBlurIB32(src, instride, width, band_lower, band_height);
 		    break;
 		}
 	    }
@@ -1129,11 +1133,11 @@ public:
             continue;
 	    }
 
-	    src += instride * procy;
+	    src += instride * band_lower;
 
 	    // naturally, any of these with accumulation buffers like those of
 	    // the IFB filters will screw up royally as well
-        mainFilter->run(src, instride, delta, dst, outstride, width, height);
+        mainFilter->run(src, instride, delta, dst, outstride, width, band_height);
 
         if(nthreads == 1)
             return 0;
