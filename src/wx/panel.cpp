@@ -986,12 +986,6 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
 {
     memset(delta, 0xff, sizeof(delta));
 
-    //Make sure filter is current
-    if(myFilter != NULL)
-    {
-        delete myFilter;
-        myFilter = NULL;
-    }
     myFilter = new filter(std::string(gopts.filter.mb_str(wxConvUTF8)));
 
     scale = myFilter->getScale();
@@ -1085,9 +1079,8 @@ public:
 	int inrb = systemColorDepth == 16 ? 2 : systemColorDepth == 24 ? 0 : 1;
 	int instride = (width + inrb) * bytes_per_pixel;
 
-	int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
 	int outrb = systemColorDepth == 24 ? 0 : 4;
-	int outstride = width * outbpp * scale + outrb;
+	int outstride = width * bytes_per_pixel * scale + outrb;
 
 	delta += instride * band_lower;
 	// + 1 for stupid top border
@@ -1154,15 +1147,17 @@ void DrawingPanel::DrawArea(u8 **data)
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
 
-    int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
+    //The number of bytes per pixel, as determined by the systemColorDepth
+    int bytes_per_pixel = systemColorDepth/8;
+
     int outrb = systemColorDepth == 24 ? 0 : 4;
-    int outstride = width * outbpp * scale + outrb;
+    int outstride = width * bytes_per_pixel * scale + outrb;
 
     if(!pixbuf2) {
 	int allocstride = outstride, alloch = height;
 	// gb may write borders, so allocate enough for them
 	if(width == GameArea::GBWidth && height == GameArea::GBHeight) {
-	    allocstride = GameArea::SGBWidth * outbpp * scale + outrb;
+	    allocstride = GameArea::SGBWidth * bytes_per_pixel * scale + outrb;
 	    alloch = GameArea::SGBHeight;
 	}
 	pixbuf2 = (u8 *)calloc(allocstride, (alloch + 2) * scale);
