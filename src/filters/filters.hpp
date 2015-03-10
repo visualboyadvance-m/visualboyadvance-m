@@ -5,7 +5,7 @@
 #include <map>
 #include <string>
 #include <stdexcept>
-// #include <iostream>
+#include <iostream>
 
 #include "interframe.hpp"
 #include "../common/Types.h"
@@ -77,9 +77,15 @@ private:
     FilterFunc myFilter;
     ///The internal scale
     int myScale;
+    ///The filter's width
+    unsigned int width;
+    ///Don't need to calculate these every time (based off width)
+    unsigned int horiz_bytes;
+    unsigned int horiz_bytes_out;
 public:
     filter(std::string myName):
-        name(myName), myFilter(filters::GetFilter(myName)), myScale(filters::GetFilterScale(myName))
+        name(myName), myFilter(filters::GetFilter(myName)), myScale(filters::GetFilterScale(myName)),
+        width(0), horiz_bytes(0), horiz_bytes_out(0)
     {
 //         std::cerr << name << std::endl;
     }
@@ -87,21 +93,69 @@ public:
     {
         return name;
     }
+    ///Set the number of pixels per horizontal row
+    ///
+    ///Always use this after initialization if using the new run function.
+    void setWidth(unsigned int _width)
+    {
+        width = _width;
+
+        //32 bit filter, so 8 bytes per pixel
+        //  The +1 is for a 1 pixel border that the emulator spits out
+        horiz_bytes = (width+1) * 4;
+        //Unfortunately, the filter keeps the border on the scaled output, but DOES NOT scale it
+        horiz_bytes_out = width * 4 * myScale + 4;
+
+    }
+    unsigned int getWidth()
+    {
+        return width;
+    }
     int getScale()
     {
         return myScale;
     }
-    void run(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int width, int height)
+    /**
+     * New Version:  Run the filter
+     *
+     * This one is smart.
+     * It knows it's a 32 bit filter, and the input width will not change from when it is initialized.
+     *
+     * \param[in] srcPtr        A pointer to a 16/32 bit RGB Pixel Array
+     */
+    void run(u8 *srcPtr, u8 *deltaPtr, u8 *dstPtr, int height)
     {
-//         std::cerr << name <<":  srcPitch:  "<<srcPitch<<" dstPitch:  "<<dstPitch<<" width: "<<width<<" height: "<<height<< std::endl;
+        if(!width)
+        {
+             throw std::runtime_error("ERROR:  Filter width not set");
+        }
+
+        std::cerr << name <<": width: "<<width<<" height: "<<height<< std::endl;
+
         if(myFilter!=NULL)
         {
-            myFilter(srcPtr,srcPitch,deltaPtr,dstPtr,dstPitch,width,height);
+            myFilter(srcPtr,horiz_bytes,deltaPtr,dstPtr,horiz_bytes_out,width,height);
         }
         else
         {
             throw std::runtime_error("ERROR:  Filter does not exist!");
         }
+    }
+    /**
+     * DEPRECATED  Run the filter
+     *
+     * \param[in] srcPtr        A pointer to a 16/32 bit RGB Pixel Array
+     * \param[in] srcPitch     The number of bytes per single horizontal line
+     */
+    void run(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int width, int height)
+    {
+        setWidth(width);
+        //Make sure the math was correct
+        if( (srcPitch != horiz_bytes) || dstPitch != horiz_bytes_out )
+        {
+            throw std::runtime_error("ERROR:  Filter programmer is an idiot, and messed up an important calculation!");
+        }
+        run(srcPtr, deltaPtr, dstPtr, height);
     }
     bool exists()
     {
