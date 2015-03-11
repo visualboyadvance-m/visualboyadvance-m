@@ -1004,6 +1004,7 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
     scale = myFilter->getScale();
     myFilter->setWidth(width);
     iFilter->setWidth(width);
+    iFilter->setHeight(height);
 
     std::cerr << "width: " << width << " Height:  " << height << std::endl;
 #define out_16 (systemColorDepth == 16)
