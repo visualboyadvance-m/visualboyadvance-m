@@ -1164,8 +1164,7 @@ void DrawingPanel::DrawArea(u8 **data)
     }
 
     // First, apply filters, if applicable, in parallel, if enabled
-    if(myFilter->exists() ||
-       gopts.ifb != IFB_NONE /* FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur) */ ) {
+    if(myFilter->exists() || iFilter->exists() ) {
 	if(nthreads != gopts.max_threads) {
 	    if(nthreads) {
 		if(nthreads > 1)
@@ -1399,9 +1398,11 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow *parent, int _width, int _height)
 {
     // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
     // 16 or 32, though
-    if(!myFilter->exists() && gopts.ifb == IFB_NONE)
-	// changing from 32 to 24 does not require regenerating color tables
-	systemColorDepth = 24;
+    if(!myFilter->exists() && !iFilter->exists())
+    {
+        // changing from 32 to 24 does not require regenerating color tables
+        systemColorDepth = 24;
+    }
 }
 
 void BasicDrawingPanel::DrawArea(wxWindowDC &dc)
