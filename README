@@ -34,6 +34,7 @@ DJRobX
 Jonas Quinn
 kode54
 Normmatt
+Arthur Moore
 
 ==============
 Special Thanks
@@ -71,3 +72,18 @@ shuffle2:
 
 Squarepusher
 - Libretro merge
+
+==============
+Changes from Official SVN
+(This list is non inclusive)
+==============
+wxvbam now compiles on modern Linux systems
+-Now compiles on wxwidgets 2.8
+-Now properly Selects wxwidgets 2.8 if 3.0 is also installed
+Cmake Build System has been cleaned up, and is now more modular
+
+Art Assets have been updated
+wxvbam code cleanup
+-Still in the process of removing C macros
+Filter system is currently being rewritten
+-At the least I've changed the variable names so it's obvious what's going on now
