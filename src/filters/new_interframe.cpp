@@ -23,11 +23,11 @@ void interframe_filter::setWidth(unsigned int _width)
 
 SmartIB::SmartIB()
 {
-  frm1 = (u8 *)calloc(322*242,4);
+  frm1 = (u32 *)calloc(322*242,4);
   // 1 frame ago
-  frm2 = (u8 *)calloc(322*242,4);
+  frm2 = (u32 *)calloc(322*242,4);
   // 2 frames ago
-  frm3 = (u8 *)calloc(322*242,4);
+  frm3 = (u32 *)calloc(322*242,4);
   // 3 frames ago
 }
 
@@ -54,9 +54,9 @@ void SmartIB::run(u8 *srcPtr, unsigned int num_threads,unsigned int thread_numbe
     u32 offset = band_height * thread_number * width;
 
     u32 *src0 = reinterpret_cast<u32 *>(srcPtr) + offset;
-    u32 *src1 = reinterpret_cast<u32 *>(frm1) + offset;
-    u32 *src2 = reinterpret_cast<u32 *>(frm2) + offset;
-    u32 *src3 = reinterpret_cast<u32 *>(frm3) + offset;
+    u32 *src1 = frm1 + offset;
+    u32 *src2 = frm2 + offset;
+    u32 *src3 = frm3 + offset;
 
     u32 colorMask = 0xfefefe;
 
@@ -73,7 +73,7 @@ void SmartIB::run(u8 *srcPtr, unsigned int num_threads,unsigned int thread_numbe
     }
 
     /* Swap buffers around */
-    u8 *temp = frm1;
+    u32 *temp = frm1;
     frm1 = frm3;
     frm3 = frm2;
     frm2 = temp;
@@ -82,11 +82,11 @@ void SmartIB::run(u8 *srcPtr, unsigned int num_threads,unsigned int thread_numbe
 
 MotionBlurIB::MotionBlurIB()
 {
-  frm1 = (u8 *)calloc(322*242,4);
+  frm1 = (u32 *)calloc(322*242,4);
   // 1 frame ago
-  frm2 = (u8 *)calloc(322*242,4);
+  frm2 = (u32 *)calloc(322*242,4);
   // 2 frames ago
-  frm3 = (u8 *)calloc(322*242,4);
+  frm3 = (u32 *)calloc(322*242,4);
   // 3 frames ago
 }
 
@@ -113,7 +113,7 @@ void MotionBlurIB::run(u8 *srcPtr, unsigned int num_threads,unsigned int thread_
     u32 offset = band_height * thread_number * width;
 
     u32 *src0 = reinterpret_cast<u32 *>(srcPtr) + offset;
-    u32 *src1 = reinterpret_cast<u32 *>(frm1) + offset;
+    u32 *src1 = frm1 + offset;
 
     u32 colorMask = 0xfefefe;
 
