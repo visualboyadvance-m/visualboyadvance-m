@@ -298,6 +298,7 @@ SET(SRC_SDL
 
 SET(SRC_FILTERS
     src/filters/filters.cpp
+    src/filters/new_interframe.cpp
     src/filters/2xSaI.cpp
     src/filters/admame.cpp
     src/filters/bilinear.cpp

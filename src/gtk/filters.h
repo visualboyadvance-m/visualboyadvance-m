@@ -22,6 +22,7 @@
 
 #include "../System.h"
 #include "../filters/filters.hpp"
+#include "../filters/interframe.hpp"
 
 namespace VBA
 {

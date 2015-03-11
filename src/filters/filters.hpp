@@ -7,7 +7,6 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "interframe.hpp"
 #include "../common/Types.h"
 
 //sdl
@@ -121,7 +120,9 @@ public:
      * This one is smart.
      * It knows it's a 32 bit filter, and the input width will not change from when it is initialized.
      *
-     * \param[in] srcPtr        A pointer to a 16/32 bit RGB Pixel Array
+     * \param[in] srcPtr        A pointer to the input 32 bit RGB Pixel Array
+     * \param[in] deltaPtr      A pointer to a 32 bit RGB Pixel Array (used to store the difference between frames)
+     * \param[in] dstPtr        A pointer to the output 32 bit RGB Pixel Array
      */
     void run(u8 *srcPtr, u8 *deltaPtr, u8 *dstPtr, int height)
     {
@@ -187,8 +188,6 @@ void Scanlines (u8 *srcPtr, u32 srcPitch, u8 *, u8 *dstPtr, u32 dstPitch, int wi
 void Scanlines32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height);
 // "TV" here means each pixel is faded horizontally & vertically rather than
 // inserting black scanlines
-// this depends on RGB_LOW_BITS_MASK (included from interframe.hpp
-//extern int RGB_LOW_BITS_MASK;
 void ScanlinesTV(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height);
 void ScanlinesTV32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height);
 
