@@ -33,7 +33,7 @@ public:
     void setHeight(unsigned int _height){height=_height;}
     unsigned int getHeight() {return height;}
     ///New smarter Interframe function
-    virtual void run(u8 *srcPtr, int starty, int height) {}
+    virtual void run(u8 *srcPtr, unsigned int num_threads=1,unsigned int thread_number=0) {}
 };
 
 
@@ -51,7 +51,7 @@ public:
     SmartIB();
     ~SmartIB();
     std::string getName() {return "SmartIB";}
-    void run(u8 *srcPtr, int starty, int height);
+    void run(u8 *srcPtr, unsigned int num_threads=1,unsigned int thread_number=0);
 };
 
 class MotionBlurIB : public interframe_filter
@@ -64,7 +64,7 @@ public:
     MotionBlurIB();
     ~MotionBlurIB();
     std::string getName() {return "MotionBlurIB";}
-    void run(u8 *srcPtr, int starty, int height);
+    void run(u8 *srcPtr, unsigned int num_threads=1,unsigned int thread_number=0);
 };
 
 
