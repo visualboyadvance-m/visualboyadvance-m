@@ -130,8 +130,6 @@ public:
              throw std::runtime_error("ERROR:  Filter width not set");
         }
 
-        std::cerr << name <<": width: "<<width<<" height: "<<height<< std::endl;
-
         if(myFilter!=NULL)
         {
             myFilter(srcPtr,horiz_bytes,deltaPtr,dstPtr,horiz_bytes_out,width,height);
