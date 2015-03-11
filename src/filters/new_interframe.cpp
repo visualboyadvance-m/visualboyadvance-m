@@ -21,6 +21,15 @@ void interframe_filter::setWidth(unsigned int _width)
 
 }
 
+void interframe_filter::run(u8 *srcPtr, int starty, int height)
+{
+    if(!getWidth())
+    {
+            throw std::runtime_error("ERROR:  Filter width not set");
+    }
+    this->run(srcPtr, get_horiz_bytes(), getWidth(), starty, height);
+}
+
 SmartIB::SmartIB()
 {
   frm1 = (u8 *)calloc(322*242,4);
@@ -42,15 +51,6 @@ SmartIB::~SmartIB()
   if( frm3 && (frm1 != frm3) && (frm2 != frm3) )
     free(frm3);
   frm1 = frm2 = frm3 = NULL;
-}
-
-void SmartIB::run(u8 *srcPtr, int starty, int height)
-{
-    if(!getWidth())
-    {
-            throw std::runtime_error("ERROR:  Filter width not set");
-    }
-    run(srcPtr, get_horiz_bytes(), getWidth(), starty, height);
 }
 
 void SmartIB::run(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
@@ -114,15 +114,6 @@ MotionBlurIB::~MotionBlurIB()
   if( frm3 && (frm1 != frm3) && (frm2 != frm3) )
     free(frm3);
   frm1 = frm2 = frm3 = NULL;
-}
-
-void MotionBlurIB::run(u8 *srcPtr, int starty, int height)
-{
-    if(!getWidth())
-    {
-            throw std::runtime_error("ERROR:  Filter width not set");
-    }
-    run(srcPtr, get_horiz_bytes(), getWidth(), starty, height);
 }
 
 void MotionBlurIB::run(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)

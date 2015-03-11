@@ -1119,7 +1119,7 @@ public:
         }
 
         //Run the interframe blending filter
-        iFilter->run(src, horiz_bytes, width, band_lower, band_height);
+        iFilter->run(src, band_lower, band_height);
 
 	    if(!mainFilter->exists()) {
             if(nthreads == 1)

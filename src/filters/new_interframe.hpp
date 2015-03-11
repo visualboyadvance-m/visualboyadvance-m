@@ -29,7 +29,7 @@ public:
     ///DEPRECATED Original Interframe function
     virtual void run(u8 *srcPtr, u32 srcPitch, int width, int starty, int height) {}
     ///New smarter Interframe function
-    virtual void run(u8 *srcPtr, int starty, int height) {}
+    virtual void run(u8 *srcPtr, int starty, int height);
 };
 
 
@@ -48,7 +48,6 @@ public:
     ~SmartIB();
     std::string getName() {return "SmartIB";}
     void run(u8 *srcPtr, u32 srcPitch, int width, int starty, int height);
-    void run(u8 *srcPtr, int starty, int height);
 };
 
 class MotionBlurIB : public interframe_filter
@@ -62,7 +61,6 @@ public:
     ~MotionBlurIB();
     std::string getName() {return "MotionBlurIB";}
     void run(u8 *srcPtr, u32 srcPitch, int width, int starty, int height);
-    void run(u8 *srcPtr, int starty, int height);
 };
 
 
