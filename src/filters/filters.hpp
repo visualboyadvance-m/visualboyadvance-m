@@ -99,7 +99,7 @@ public:
     {
         width = _width;
 
-        //32 bit filter, so 8 bytes per pixel
+        //32 bit filter, so 4 bytes per pixel
         //  The +1 is for a 1 pixel border that the emulator spits out
         horiz_bytes = (width+1) * 4;
         //Unfortunately, the filter keeps the border on the scaled output, but DOES NOT scale it
