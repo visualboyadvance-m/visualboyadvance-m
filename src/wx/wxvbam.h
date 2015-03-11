@@ -28,7 +28,7 @@
 #include "../gba/Cheats.h"
 
 #include "../filters/filters.hpp"
-#include "../filters/interframe.hpp"
+#include "../filters/new_interframe.hpp"
 
 template <typename T>
 void CheckPointer(T pointer)
@@ -477,6 +477,7 @@ protected:
     virtual void DrawArea(wxWindowDC&) = 0;
     virtual void DrawOSD(wxWindowDC&);
     filter * myFilter = NULL;
+    interframe_filter * iFilter = NULL;
     int width, height, scale;
     u8 *todraw;
     u8 *pixbuf1, *pixbuf2;

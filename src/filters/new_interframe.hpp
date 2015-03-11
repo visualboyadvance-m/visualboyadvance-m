@@ -34,7 +34,10 @@ public:
 
 
 // Interframe blending filters (These are the 32 bit versions)
-class SmartIB : interframe_filter
+// definitely not thread safe by default
+// added band_lower param to provide offset into accum buffers
+
+class SmartIB : public interframe_filter
 {
 private:
     u8 *frm1 = NULL;
@@ -48,7 +51,7 @@ public:
     void run(u8 *srcPtr, int starty, int height);
 };
 
-class MotionBlurIB : interframe_filter
+class MotionBlurIB : public interframe_filter
 {
 private:
     u8 *frm1 = NULL;

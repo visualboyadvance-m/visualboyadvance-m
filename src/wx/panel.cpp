@@ -470,8 +470,6 @@ bool GameArea::LoadState(const wxFileName &fname)
     if(ret) {
 	// forget old save writes
 	systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
-	// no point in blending after abrupt change
-	InterframeCleanup();
 	// frame rate calc should probably reset as well
 	was_paused = true;
 	// save state had a screen frame, so draw it
@@ -988,8 +986,24 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
 
     myFilter = new filter(std::string(gopts.filter.mb_str(wxConvUTF8)));
 
+    if(gopts.ifb != IFB_NONE) {
+        switch(gopts.ifb) {
+            case IFB_SMART:
+                iFilter = new SmartIB();
+                break;
+            case IFB_MOTION_BLUR:
+                iFilter = new MotionBlurIB();
+                break;
+        }
+    }
+    else
+    {
+        iFilter = new interframe_filter();
+    }
+
     scale = myFilter->getScale();
     myFilter->setWidth(width);
+    iFilter->setWidth(width);
 
     std::cerr << "width: " << width << " Height:  " << height << std::endl;
 #define out_16 (systemColorDepth == 16)
@@ -1000,12 +1014,12 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
 	systemRedShift    = 3;
 	systemGreenShift  = 11;
 	systemBlueShift   = 19;
-	RGB_LOW_BITS_MASK = 0x00010101;
+	int RGB_LOW_BITS_MASK = 0x00010101;
 #else
 	systemRedShift    = 27;
 	systemGreenShift  = 19;
 	systemBlueShift   = 11;
-	RGB_LOW_BITS_MASK = 0x01010100;
+	int RGB_LOW_BITS_MASK = 0x01010100;
 #endif
     // FIXME: should be "true" for GBA carts if lcd mode selected
     // which means this needs to be re-run at pref change time
@@ -1062,6 +1076,7 @@ public:
     const RENDER_PLUGIN_INFO *rpi;
     u8 *dst, *delta;
     filter * mainFilter;
+    interframe_filter * iFilter;
 
     // set this param every round
     // if NULL, end thread
@@ -1096,32 +1111,16 @@ public:
 	    }
 	    // + 1 for stupid top border
 	    src += horiz_bytes;
-	    // interframe blending filter
-	    // definitely not thread safe by default
-	    // added band_lower param to provide offset into accum buffers
-	    if(gopts.ifb != IFB_NONE) {
-		switch(gopts.ifb) {
-		case IFB_SMART:
-		    if(systemColorDepth == 16)
-			SmartIB(src, horiz_bytes, width, band_lower, band_height);
-		    else
-			SmartIB32(src, horiz_bytes, width, band_lower, band_height);
-		    break;
-		case IFB_MOTION_BLUR:
-		    // FIXME: if(renderer == d3d/gl && filter == NONE) break;
-		    if(systemColorDepth == 16)
-			MotionBlurIB(src, horiz_bytes, width, band_lower, band_height);
-		    else
-			MotionBlurIB32(src, horiz_bytes, width, band_lower, band_height);
-		    break;
-		}
-	    }
 
-	    if(mainFilter == NULL)
+	    if(!mainFilter || !iFilter)
         {
             std::runtime_error("ERROR:  Filter not initialized!");
             return (wxThread::ExitCode) -1;
         }
+
+        //Run the interframe blending filter
+        iFilter->run(src, horiz_bytes, width, band_lower, band_height);
+
 	    if(!mainFilter->exists()) {
             if(nthreads == 1)
                 return 0;
@@ -1205,6 +1204,7 @@ void DrawingPanel::DrawArea(u8 **data)
 	    threads[0].delta = delta;
 	    threads[0].rpi = rpi;
         threads[0].mainFilter=myFilter;
+        threads[0].iFilter=iFilter;
 	    threads[0].Entry();
 	    // go ahead and start the threads up, though
 	    if(nthreads > 1) {
@@ -1218,6 +1218,7 @@ void DrawingPanel::DrawArea(u8 **data)
 		    threads[i].delta = delta;
 		    threads[i].rpi = rpi;
             threads[i].mainFilter=myFilter;
+            threads[i].iFilter=iFilter;
 		    threads[i].done = &filt_done;
 		    threads[i].lock.Lock();
 		    threads[i].Create();
@@ -1373,7 +1374,6 @@ DrawingPanel::~DrawingPanel()
     // pixbuf1 freed by emulator
     if(pixbuf2)
 	free(pixbuf2);
-    InterframeCleanup();
     if(nthreads) {
 	if(nthreads > 1)
 	    for(int i = 0; i < nthreads; i++) {
@@ -1384,6 +1384,18 @@ DrawingPanel::~DrawingPanel()
 		threads[i].Wait();
 	    }
 	delete[] threads;
+    }
+    //Filter cleanup
+    if(myFilter)
+    {
+        delete myFilter;
+        myFilter = NULL;
+    }
+    //Interframe Filter cleanup
+    if(iFilter)
+    {
+        delete iFilter;
+        iFilter = NULL;
     }
 }
 
