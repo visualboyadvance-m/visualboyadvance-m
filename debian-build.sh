@@ -19,5 +19,7 @@ fi
 mkdir "$BUILD_DIRECTORY"
 cd build
 # cmake -DCMAKE_BUILD_TYPE=Debug ..
+#scan-build cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang ..
 cmake ..
 make
+#scan-build make
