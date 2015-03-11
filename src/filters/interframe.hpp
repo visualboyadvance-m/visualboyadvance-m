@@ -7,8 +7,6 @@
 
 extern int RGB_LOW_BITS_MASK;
 
-static void Init();
-
 // call ifc to ignore previous frame / when starting new
 void InterframeCleanup();
 
@@ -18,12 +16,6 @@ void SmartIB32(u8 *srcPtr, u32 srcPitch, int width, int starty, int height);
 void MotionBlurIB(u8 *srcPtr, u32 srcPitch, int width, int starty, int height);
 void MotionBlurIB32(u8 *srcPtr, u32 srcPitch, int width, int starty, int height);
 
-#ifdef MMX
-static void SmartIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, int height);
-static void SmartIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, int height);
-static void MotionBlurIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, int height);
-static void MotionBlurIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, int height);
-#endif
 
 //Options for if starty is 0
 void SmartIB(u8 *srcPtr, u32 srcPitch, int width, int height);

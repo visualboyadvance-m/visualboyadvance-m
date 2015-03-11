@@ -6,6 +6,10 @@
 
 #ifdef MMX
 extern "C" bool cpu_mmx;
+static void SmartIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, int height);
+static void SmartIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, int height);
+static void MotionBlurIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, int height);
+static void MotionBlurIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, int height);
 #endif
 
 /*
@@ -20,7 +24,7 @@ static u8 *frm3 = NULL;
 
 extern u32 qRGB_COLOR_MASK[2];
 
-static void Init()
+void Init()
 {
   frm1 = (u8 *)calloc(322*242,4);
   // 1 frame ago
