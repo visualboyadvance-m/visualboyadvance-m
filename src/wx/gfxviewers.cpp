@@ -1182,10 +1182,11 @@ namespace Viewers {
 		    cd = new wxColourData();
 		*cd = dlg.GetColourData();
 		wxColour c = cd->GetColour();
+        //Binary or the upper 5 bits of each color choice
 		customBackdropColor =
-		    (c.Red() >> 3) +
-		    (c.Green() >> 3) << 5 +
-		    (c.Blue() >> 3) << 10;
+		    (c.Red() >> 3) ||
+		    ((c.Green() >> 3) << 5) ||
+		    ((c.Blue() >> 3) << 10);
 	    } else
 		// kind of an unintuitive way to turn it off...
 		customBackdropColor = -1;
