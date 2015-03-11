@@ -67,7 +67,31 @@ public:
     void run(u8 *srcPtr, unsigned int num_threads=1,unsigned int thread_number=0);
 };
 
+//WX
+enum ifbfunc {
+    // this order must match order of option enum and selector widget
+    IFB_NONE, IFB_SMART, IFB_MOTION_BLUR
+};
 
+///Use this to select/create the filter to use
+class interframe_factory
+{
+public:
+    static interframe_filter * createIFB(ifbfunc filter_select)
+    {
+        switch(filter_select) {
+            case IFB_SMART:
+                return new SmartIB();
+                break;
+            case IFB_MOTION_BLUR:
+                return new MotionBlurIB();
+                break;
+            default:
+                return new interframe_filter();
+                break;
+        }
+    }
+};
 
 #endif  //NEW_INTERFRAME_HPP
 

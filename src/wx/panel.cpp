@@ -986,20 +986,7 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
 
     myFilter = new filter(std::string(gopts.filter.mb_str(wxConvUTF8)));
 
-    if(gopts.ifb != IFB_NONE) {
-        switch(gopts.ifb) {
-            case IFB_SMART:
-                iFilter = new SmartIB();
-                break;
-            case IFB_MOTION_BLUR:
-                iFilter = new MotionBlurIB();
-                break;
-        }
-    }
-    else
-    {
-        iFilter = new interframe_filter();
-    }
+    iFilter = interframe_factory::createIFB((ifbfunc)gopts.ifb);
 
     scale = myFilter->getScale();
     myFilter->setWidth(width);
