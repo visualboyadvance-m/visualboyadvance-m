@@ -238,4 +238,17 @@ extern void sdlStretch2x(u8*,u32,u8*,u32,int,int);
 extern void sdlStretch3x(u8*,u32,u8*,u32,int,int);
 extern void sdlStretch4x(u8*,u32,u8*,u32,int,int);
 
+/**
+    * Convert a 32 bit image to a 24 bit one
+    *
+    * This centralizes a decent bit of code.
+    * NOTE:  This takes width and height, and ASSUMES their accurate!!!!!
+    *
+    * \param[in] src    A pointer to the input 32 bit RGB Pixel Array
+    * \param[in] dst    A pointer to the output 24 bit RGB Pixel Array
+    * \param[in] width  The image width (in pixels)
+    * \param[in] height The height width (in pixels)
+    */
+void convert32To24(u32* src,u8* dst,unsigned int width, unsigned int height);
+
 #endif //FILTERS_FILTERS_HPP

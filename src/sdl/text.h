@@ -18,3 +18,14 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 extern void drawText(u8 *, int, int, int, const char *, bool);
+
+//Each char is 8 * 8 pixels in size
+
+/*
+ * Draw Text directly to a buffer
+ *
+ * Now auto wraps if there is too much text.
+ * WARNING:  There are no limits to keep you from going out of bounds.  Passing too much text is dangerous.
+ */
+void drawText(u8 *screen, int width,int bytes_per_pixel, int x, int y,
+                             const char *string, bool trans);

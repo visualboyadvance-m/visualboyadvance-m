@@ -484,7 +484,6 @@ public:
 
 protected:
     virtual void DrawArea(wxWindowDC&) = 0;
-    virtual void DrawOSD(wxWindowDC&);
     filter * myFilter;
     interframe_filter * iFilter;
     int width, height, scale;

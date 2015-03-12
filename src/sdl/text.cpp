@@ -35,114 +35,121 @@ static const u8 fontdata2[2048] = {
   0x00,0x00,0x6e,0x3b,0x13,0x3b,0x6e,0x00,0x00,0x1e,0x33,0x1f,0x33,0x1f,0x03,0x03,0x00,0x3f,0x33,0x03,0x03,0x03,0x03,0x00,0x00,0x7f,0x36,0x36,0x36,0x36,0x36,0x00,0x3f,0x33,0x06,0x0c,0x06,0x33,0x3f,0x00,0x00,0x00,0x7e,0x1b,0x1b,0x1b,0x0e,0x00,0x00,0x66,0x66,0x66,0x66,0x3e,0x06,0x03,0x00,0x6e,0x3b,0x18,0x18,0x18,0x18,0x00,0x3f,0x0c,0x1e,0x33,0x33,0x1e,0x0c,0x3f,0x1c,0x36,0x63,0x7f,0x63,0x36,0x1c,0x00,0x1c,0x36,0x63,0x63,0x36,0x36,0x77,0x00,0x38,0x0c,0x18,0x3e,0x33,0x33,0x1e,0x00,0x00,0x00,0x7e,0xdb,0xdb,0x7e,0x00,0x00,0x60,0x30,0x7e,0xdb,0xdb,0x7e,0x06,0x03,0x1c,0x06,0x03,0x1f,0x03,0x06,0x1c,0x00,0x1e,0x33,0x33,0x33,0x33,0x33,0x33,0x00,0x00,0x3f,0x00,0x3f,0x00,0x3f,0x00,0x00,0x0c,0x0c,0x3f,0x0c,0x0c,0x00,0x3f,0x00,0x06,0x0c,0x18,0x0c,0x06,0x00,0x3f,0x00,0x18,0x0c,0x06,0x0c,0x18,0x00,0x3f,0x00,0x70,0xd8,0xd8,0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x1b,0x1b,0x0e,0x0c,0x0c,0x00,0x3f,0x00,0x0c,0x0c,0x00,0x00,0x6e,0x3b,0x00,0x6e,0x3b,0x00,0x00,0x1c,0x36,0x36,0x1c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x18,0x18,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x18,0x00,0x00,0x00,0xf0,0x30,0x30,0x30,0x37,0x36,0x3c,0x38,0x1e,0x36,0x36,0x36,0x36,0x00,0x00,0x00,0x0e,0x18,0x0c,0x06,0x1e,0x00,0x00,0x00,0x00,0x00,0x3c,0x3c,0x3c,0x3c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 };
 
-void drawText(u8 *screen, int pitch, int x, int y,
-                             const char *string, bool trans)
+void drawChar16(u8 *screen,int pitch, char c, bool trans)
 {
-  screen += y*pitch;
-  int inc = 2;
-  switch(systemColorDepth) {
-  case 24:
-    inc = 3;
-    break;
-  case 32:
-    inc = 4;
-    break;
-  }
-  screen += x*inc;
+    u8 *scr = screen;
 
-  switch(systemColorDepth) {
-  case 16:
-    {
-      while(*string) {
-        char c = *string++;
-        u8 *scr = screen;
+    u16 mask = ~RGB_LOW_BITS_MASK;
+    int h, w;
+    u16 *s = (u16 *)scr;
+    for (h = 0; h < 8; h++) {
+        for (w = 0; w < 8; w++, s++) {
+        int on = (fontdata2[(c<<3)+h]>>w)&1;
 
-        u16 mask = ~RGB_LOW_BITS_MASK;
-        int h, w;
-        u16 *s = (u16 *)scr;
-        for (h = 0; h < 8; h++) {
-          for (w = 0; w < 8; w++, s++) {
-            int on = (fontdata2[(c<<3)+h]>>w)&1;
-
-            if(trans) {
-              if(on)
-                *s = ((0xf) << systemRedShift) +
-                  ((*s & mask) >>1);
-            } else {
-              if(on)
-                *s = (0x1f) << systemRedShift;
-            }
-          }
-          scr += pitch;
-          s = (u16 *)scr;
+        if(trans) {
+            if(on)
+            *s = ((0xf) << systemRedShift) +
+                ((*s & mask) >>1);
+        } else {
+            if(on)
+            *s = (0x1f) << systemRedShift;
         }
-        screen += inc*8;
-      }
+        }
+        scr += pitch;
+        s = (u16 *)scr;
     }
-    break;
-  case 24:
-    {
-      while(*string) {
-        char c = *string++;
-        u8 *scr = screen;
+}
 
-        int h, w;
-        u8 *s = (u8 *)scr;
-        for (h = 0; h < 8; h++) {
-          for (w = 0; w < 8; w++, s+=3) {
-            int on = (fontdata2[(c<<3)+h]>>w)&1;
+void drawChar24(u8 *screen,int pitch, char c, bool trans)
+{
+    u8 *scr = screen;
 
-            if(trans) {
-              if(on) {
+    int h, w;
+    u8 *s = (u8 *)scr;
+    for (h = 0; h < 8; h++) {
+        for (w = 0; w < 8; w++, s+=3) {
+        int on = (fontdata2[(c<<3)+h]>>w)&1;
+
+        if(trans) {
+            if(on) {
                 u32 color = (0x1f) << systemRedShift;
                 *s = ((color & 255)>>1)+(*s>>1);
                 *(s+1) = (((color >> 8) & 255)>>1)+(*(s+1)>>1);
                 *(s+2) = (((color >> 16) & 255)>>1)+(*(s+2)>>1);
-              }
-            } else {
-              if(on) {
+            }
+        } else {
+            if(on) {
                 u32 color = (0x1f) << systemRedShift;
                 *s = (color & 255);
                 *(s+1) = (color >> 8) & 255;
                 *(s+2) = (color >> 16) & 255;
-              }
             }
-          }
-          scr += pitch;
-          s = (u8 *)scr;
         }
-        screen += inc*8;
-      }
+        }
+        scr += pitch;
+        s = (u8 *)scr;
     }
+}
+void drawChar32(u8 *screen,int pitch, char c, bool trans)
+{
+    u8 *scr = screen;
+
+    int h, w;
+    u32 mask = 0xfefefe;
+    u32 *s = (u32 *)scr;
+    for (h = 0; h < 8; h++) {
+        for (w = 0; w < 8; w++, s++) {
+        int on = (fontdata2[(c<<3)+h]>>w)&1;
+
+        if(trans) {
+            if(on)
+            *s = ((0xf) << systemRedShift) + ((*s & mask)>>1);
+        } else {
+            if(on)
+            *s = (0x1f) << systemRedShift;
+        }
+        }
+        scr += pitch;
+        s = (u32 *)scr;
+    }
+}
+
+void drawText(u8 *screen, int width,int bytes_per_pixel, int x, int y,
+                             const char *string, bool trans)
+{
+    int pitch=width*bytes_per_pixel;
+    screen += y*pitch;
+    screen += x*bytes_per_pixel;
+    int chars_per_line=width/8;
+    int chars_processed = 0;
+
+    while(*string)
+    {
+        char c = *string++;
+        if(bytes_per_pixel == 2)
+            drawChar16(screen,pitch,c,trans);
+        else if(bytes_per_pixel == 3)
+            drawChar24(screen,pitch,c,trans);
+        else
+            drawChar32(screen,pitch,c,trans);
+        screen += bytes_per_pixel*8;
+        if(++chars_processed >=chars_per_line)
+        {
+            chars_processed=0;
+            screen += pitch*8;
+        }
+    }
+}
+
+void drawText(u8 *screen, int pitch, int x, int y,
+                             const char *string, bool trans)
+{
+  switch(systemColorDepth) {
+  case 24:
+    drawText(screen,pitch/3,3,x,y,string,trans);
     break;
   case 32:
-    {
-      while(*string) {
-        char c = *string++;
-        u8 *scr = screen;
-
-        int h, w;
-        u32 mask = 0xfefefe;
-        u32 *s = (u32 *)scr;
-        for (h = 0; h < 8; h++) {
-          for (w = 0; w < 8; w++, s++) {
-            int on = (fontdata2[(c<<3)+h]>>w)&1;
-
-            if(trans) {
-              if(on)
-                *s = ((0xf) << systemRedShift) + ((*s & mask)>>1);
-            } else {
-              if(on)
-                *s = (0x1f) << systemRedShift;
-            }
-          }
-          scr += pitch;
-          s = (u32 *)scr;
-        }
-        screen += inc*8;
-      }
-    }
+    drawText(screen,pitch/4,4,x,y,string,trans);
     break;
   }
 }
-

@@ -1025,7 +1025,6 @@ void DrawingPanel::PaintEv(wxPaintEvent &ev)
 	return;
     }
     DrawArea(dc);
-    DrawOSD(dc);
 }
 
 // In order to run filters in parallel, they have to run from the method of
@@ -1132,8 +1131,8 @@ void DrawingPanel::DrawArea(u8 **data)
 
     //The number of bytes per pixel, as determined by the systemColorDepth
     int bytes_per_pixel = systemColorDepth/8;
-    //Unfortunately, the filter keeps the border on the scaled output, but DOES NOT scale it
-    int horiz_bytes_out = (width)* bytes_per_pixel * scale+bytes_per_pixel;
+    //Used for determining size of the buffer to allocate
+    int horiz_bytes_out = (width+2)* bytes_per_pixel * scale;
 
     if(!pixbuf2) {
         pixbuf2 = (u8 *)calloc(horiz_bytes_out, (height + 2) * scale);
@@ -1215,125 +1214,25 @@ void DrawingPanel::DrawArea(u8 **data)
     if(!myFilter->exists())
         *data = pixbuf1;
 
-    // draw OSD text old-style (directly into output buffer), if needed
-    // new style flickers too much, so we'll stick to this for now
-    if(1) {
+    // draw OSD text old-style (directly into output buffer)
 	GameArea *panel = wxGetApp().frame->GetPanel();
 	if(panel->osdstat.size())
-	    drawText(todraw+bytes_per_pixel* (systemColorDepth != 24)
-            , horiz_bytes_out,
-		     10, 20, panel->osdstat.utf8_str(), gopts.osd_transparent);
+	    drawText(todraw,width*scale+(systemColorDepth != 24),bytes_per_pixel,
+		     0, 2, panel->osdstat.utf8_str(), gopts.osd_transparent);
 	if(!gopts.no_osd_status && !panel->osdtext.empty()) {
 	    if(systemGetClock() - panel->osdtime < OSD_TIME) {
-        std::string message = ToString(panel->osdtext);
-		int linelen = (width * scale - 20) / 8;
-		int nlines = (message.length() + linelen - 1) / linelen;
-		int cury = height - 14 - nlines * 10;
-        char *ptr = const_cast<char *>(message.c_str());
-		while(nlines > 1) {
-		    char lchar = ptr[linelen];
-		    ptr[linelen] = 0;
-		    drawText(todraw+bytes_per_pixel* (systemColorDepth != 24),
-			     horiz_bytes_out, 10, cury, ptr,
-			     gopts.osd_transparent);
-		    cury += 10;
-		    nlines--;
-		    ptr += linelen;
-		    *ptr = lchar;
-		}
-		drawText(todraw+bytes_per_pixel* (systemColorDepth != 24),
-			 horiz_bytes_out, 10, cury, ptr,
-			 gopts.osd_transparent);
+            std::string message = ToString(panel->osdtext);
+            drawText(todraw,width*scale+(systemColorDepth != 24),bytes_per_pixel,
+            20,height/2,
+            message.c_str(),gopts.osd_transparent);
 	    } else
 		panel->osdtext.clear();
 	}
-    }
 
     // next, draw the game
     wxClientDC dc(GetWindow());
     DrawArea(dc);
 
-    // finally, draw on-screen text using wx method, if possible
-    // this method flickers too much right now
-    if(0)
-	DrawOSD(dc);
-}
-
-void DrawingPanel::DrawOSD(wxWindowDC &dc)
-{
-    // draw OSD message, if available
-    // doing this here rather than using drawText() directly into the screen
-    // image gives us 2 advantages:
-    //   - non-ASCII text in messages
-    //   - message is always default font size, regardless of screen stretch
-    // and one known disadvantage:
-    //   - 3d renderers may overwrite text asynchronously
-    // Until I go through the trouble of making this render to a bitmap, and
-    // then using the bitmap as a texture for the 3d renderers or rendering
-    // directly into the output like DrawText, this is only enabled for
-    // non-3d renderers.
-    GameArea *panel = wxGetApp().frame->GetPanel();
-    dc.SetTextForeground(wxColour(255, 0, 0, gopts.osd_transparent ? 128 : 255));
-    dc.SetTextBackground(wxColour(0, 0, 0, 0));
-    dc.SetUserScale(1.0, 1.0);
-    if(panel->osdstat.size())
-	dc.DrawText(panel->osdstat, 10, 20);
-    if(!panel->osdtext.empty()) {
-	if(systemGetClock() - panel->osdtime >= OSD_TIME) {
-	    panel->osdtext.clear();
-	    wxGetApp().frame->PopStatusText();
-	}
-    }	    
-    if(!gopts.no_osd_status && !panel->osdtext.empty()) {
-	wxSize asz = dc.GetSize();
-	wxString msg = panel->osdtext;
-	int lw, lh;
-	int mlw = asz.GetWidth() - 20;
-	dc.GetTextExtent(msg, &lw, &lh);
-	if(lw <= mlw)
-	    dc.DrawText(msg, 10, asz.GetHeight() - 16 - lh);
-	else {
-	    // Since font is likely proportional, the only way to
-	    // find amt of text that will fit on a line is to search
-	    wxArrayInt llen; // length of each line, in chars
-	    for(int off = 0; off < msg.size(); ) {
-		// One way would be to bsearch on GetTextExtent() looking for
-		// best fit.
-		// Another would be to use GetPartialTextExtents and search
-		// the resulting array.
-		// GetPartialTextExtents may be inaccurate, but calling it
-		// once per line may be more efficient than calling
-		// GetTextExtent log2(remaining_len) times per line.
-#if 1
-		wxArrayInt clen;
-		dc.GetPartialTextExtents(msg.substr(off), clen);
-#endif
-		int lenl = 0, lenh = msg.size() - off - 1, len;
-		do {
-		    len = (lenl + lenh) / 2;
-#if 1
-		    lw = clen[len];
-#else
-		    dc.GetTextExtent(msg.substr(off, len), &lw, NULL);
-#endif
-		    if(lw > mlw)
-			lenh = len - 1;
-		    else if(lw < mlw)
-			lenl = len + 1;
-		    else
-			break;
-		} while(lenh >= lenl);
-		if(lw <= mlw)
-		    len++;
-		off += len;
-		llen.push_back(len);
-	    }
-	    int nlines = llen.size();
-	    int cury = asz.GetHeight() - 14 - nlines * (lh + 2);
-	    for(int off = 0, line = 0; line < nlines; off += llen[line], line++, cury += lh + 2)
-		dc.DrawText(msg.substr(off, llen[line]), 10, cury);
-	}
-    }
 }
 
 DrawingPanel::~DrawingPanel()
@@ -1395,18 +1294,8 @@ void BasicDrawingPanel::DrawArea(wxWindowDC &dc)
     else
     { // 32-bit
 	// scaled by filters, top/right borders, transform to 24-bit
-	wxImage im(width * scale, height * scale, false);
-	u32 *src = (u32 *)todraw + (width + 1) * scale; // skip top border
-	u8 *dst = im.GetData();
-
-	for(int y = 0; y < height * scale; y++) {
-	    for(int x = 0; x < width * scale; x++, src++) {
-		*dst++ = *src >> (systemRedShift - 3);
-		*dst++ = *src >> (systemGreenShift - 3);
-		*dst++ = *src >> (systemBlueShift - 3);
-	    }
-	    ++src; // skip rhs border
-	}
+	wxImage im(width * scale+1, height * scale+1, false);
+    convert32To24((u32 *)todraw,(u8 *)im.GetData(),width * scale+1,height * scale+1);
     bm = new wxBitmap(im);
     }
     double sx, sy;
@@ -1573,7 +1462,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC &dc)
 	int rowlen = width * scale + 1;
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
 	glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, width * scale, height * scale,
-		     0, tex_fmt, todraw + rowlen * 4 * scale);
+		     0, tex_fmt, todraw);
 	glCallList(vlist);
     } else
 	glClear(GL_COLOR_BUFFER_BIT);
