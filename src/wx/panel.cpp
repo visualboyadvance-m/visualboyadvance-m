@@ -1059,16 +1059,16 @@ public:
     wxSemaphore *done;
 
     // Set these params before running
-    int nthreads, threadno;
-    int width, height, scale;
+    unsigned int nthreads, threadno;
+    unsigned int width, height, scale;
     const RENDER_PLUGIN_INFO *rpi;
-    u8 *dst, *delta;
+    u32 *dst, *delta;
     filter * mainFilter;
     interframe_filter * iFilter;
 
     // set this param every round
     // if NULL, end thread
-    u8 *src;
+    u32 *src;
 
     ExitCode Entry()
     {
@@ -1076,21 +1076,18 @@ public:
     //This is how tall each of those bands are
     unsigned int band_height = height/nthreads;
 	// This is the lower height value of the band this thread will process
-	// threadno == -1 means just do a dummy round on the border line
 	int band_lower = band_height * threadno;
 
-    //The number of bytes for each 32 bit pixel
-    int bytes_per_pixel = 4;
 
-    //This is the number of bytes per single horizontal line
-    //      The +1 is for a 1 pixel border
-	int horiz_bytes = (width + 1) * bytes_per_pixel;
     //Unfortunately, the filter keeps the border on the scaled output, but DOES NOT scale it
-    int horiz_bytes_out = width * bytes_per_pixel * scale + bytes_per_pixel;
+    unsigned int scaled_width = width * scale + 1;
+    // + 1 for stupid top border
+    dst += scaled_width * (band_lower + 1) * scale;
 
-	delta += horiz_bytes * band_lower;
-	// + 1 for stupid top border
-	dst += horiz_bytes_out * (band_lower + 1) * scale;
+    //There is a 1 pixel border not included in the official width
+	width += 1;
+
+	delta += width * band_lower;
 
 	while(nthreads == 1 || sig.Wait() == wxCOND_NO_ERROR) {
 	    if(!src /* && nthreads > 1 */ ) {
@@ -1098,7 +1095,7 @@ public:
             return 0;
 	    }
 	    // + 1 for stupid top border
-	    src += horiz_bytes;
+	    src += width;
 
 	    if(!mainFilter || !iFilter)
         {
@@ -1107,7 +1104,7 @@ public:
         }
 
         //Run the interframe blending filter
-        iFilter->run(src, nthreads, threadno);
+        iFilter->run(reinterpret_cast<u8 *>(src), nthreads, threadno);
 
 	    if(!mainFilter->exists()) {
             if(nthreads == 1)
@@ -1116,11 +1113,12 @@ public:
             continue;
 	    }
 
-	    src += horiz_bytes * band_lower;
+	    //Set the start of the source pointer to the first pixel of the appropriate height
+	    src += width * band_lower;
 
 	    // naturally, any of these with accumulation buffers like those of
 	    // the IFB filters will screw up royally as well
-        mainFilter->run(src, delta, dst, band_height);
+        mainFilter->run(reinterpret_cast<u8 *>(src), reinterpret_cast<u8 *>(delta), reinterpret_cast<u8 *>(dst), band_height);
 
         if(nthreads == 1)
             return 0;
@@ -1186,9 +1184,9 @@ void DrawingPanel::DrawArea(u8 **data)
 	    threads[0].width = width;
 	    threads[0].height = height;
 	    threads[0].scale = scale;
-	    threads[0].src = *data;
-	    threads[0].dst = todraw;
-	    threads[0].delta = delta;
+	    threads[0].src = reinterpret_cast<u32 *>(*data);
+	    threads[0].dst = reinterpret_cast<u32 *>(todraw);
+	    threads[0].delta = reinterpret_cast<u32 *>(delta);
 	    threads[0].rpi = rpi;
         threads[0].mainFilter=myFilter;
         threads[0].iFilter=iFilter;
@@ -1201,8 +1199,8 @@ void DrawingPanel::DrawArea(u8 **data)
 		    threads[i].width = width;
 		    threads[i].height = height;
 		    threads[i].scale = scale;
-		    threads[i].dst = todraw;
-		    threads[i].delta = delta;
+		    threads[i].dst = reinterpret_cast<u32 *>(todraw);
+		    threads[i].delta = reinterpret_cast<u32 *>(delta);
 		    threads[i].rpi = rpi;
             threads[i].mainFilter=myFilter;
             threads[i].iFilter=iFilter;
@@ -1217,7 +1215,7 @@ void DrawingPanel::DrawArea(u8 **data)
 	else {
 	    for(int i = 0; i < nthreads; i++) {
 		threads[i].lock.Lock();
-		threads[i].src = *data;
+		threads[i].src = reinterpret_cast<u32 *>(*data);
 		threads[i].sig.Signal();
 		threads[i].lock.Unlock();
 	    }
