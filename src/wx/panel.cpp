@@ -1100,7 +1100,7 @@ public:
         }
 
         //Run the interframe blending filter
-        iFilter->run(reinterpret_cast<u8 *>(src), nthreads, threadno);
+        iFilter->run(src, nthreads, threadno);
 
 	    if(!mainFilter->exists()) {
             if(nthreads == 1)
@@ -1114,7 +1114,7 @@ public:
 
 	    // naturally, any of these with accumulation buffers like those of
 	    // the IFB filters will screw up royally as well
-        mainFilter->run(reinterpret_cast<u8 *>(src), reinterpret_cast<u8 *>(dst), band_height);
+        mainFilter->run(src, dst, band_height);
 
         if(nthreads == 1)
             return 0;

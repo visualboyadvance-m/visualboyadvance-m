@@ -105,7 +105,7 @@ public:
      * \param[in] srcPtr        A pointer to the input 32 bit RGB Pixel Array
      * \param[in] dstPtr        A pointer to the output 32 bit RGB Pixel Array
      */
-    void run(u8 *srcPtr, u8 *dstPtr, int height)
+    void run(u32 *srcPtr, u32 *dstPtr, int height)
     {
         if(!width)
         {
@@ -114,7 +114,7 @@ public:
 
         if(myFilter!=NULL)
         {
-            myFilter(srcPtr,horiz_bytes,dstPtr,horiz_bytes_out,width,height);
+            myFilter(reinterpret_cast<u8 *>(srcPtr),horiz_bytes,reinterpret_cast<u8 *>(dstPtr),horiz_bytes_out,width,height);
         }
         else
         {
@@ -135,7 +135,7 @@ public:
         {
             throw std::runtime_error("ERROR:  Filter programmer is an idiot, and messed up an important calculation!");
         }
-        run(srcPtr, dstPtr, height);
+        run(reinterpret_cast<u32 *>(srcPtr), reinterpret_cast<u32 *>(dstPtr), height);
     }
     bool exists()
     {

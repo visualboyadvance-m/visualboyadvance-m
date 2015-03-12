@@ -44,7 +44,7 @@ SmartIB::~SmartIB()
   frm1 = frm2 = frm3 = NULL;
 }
 
-void SmartIB::run(u8 *srcPtr, unsigned int num_threads,unsigned int thread_number)
+void SmartIB::run(u32 *srcPtr, unsigned int num_threads,unsigned int thread_number)
 {
     //Actual width needs to take into account the +1 border
     unsigned int width = getWidth() +1;
@@ -53,7 +53,7 @@ void SmartIB::run(u8 *srcPtr, unsigned int num_threads,unsigned int thread_numbe
     //First pixel to operate on (for multithreading)
     u32 offset = band_height * thread_number * width;
 
-    u32 *src0 = reinterpret_cast<u32 *>(srcPtr) + offset;
+    u32 *src0 = srcPtr + offset;
     u32 *src1 = frm1 + offset;
     u32 *src2 = frm2 + offset;
     u32 *src3 = frm3 + offset;
@@ -84,26 +84,16 @@ MotionBlurIB::MotionBlurIB()
 {
   frm1 = (u32 *)calloc(322*242,4);
   // 1 frame ago
-  frm2 = (u32 *)calloc(322*242,4);
-  // 2 frames ago
-  frm3 = (u32 *)calloc(322*242,4);
-  // 3 frames ago
 }
 
 MotionBlurIB::~MotionBlurIB()
 {
-  //\HACK to prevent double freeing.  (It looks like this is not being called in a thread safe manner!!!)
-
   if(frm1)
     free(frm1);
-  if( frm2 && (frm1 != frm2) )
-    free(frm2);
-  if( frm3 && (frm1 != frm3) && (frm2 != frm3) )
-    free(frm3);
-  frm1 = frm2 = frm3 = NULL;
+  frm1=NULL;
 }
 
-void MotionBlurIB::run(u8 *srcPtr, unsigned int num_threads,unsigned int thread_number)
+void MotionBlurIB::run(u32 *srcPtr, unsigned int num_threads,unsigned int thread_number)
 {
     //Actual width needs to take into account the +1 border
     unsigned int width = getWidth() +1;
@@ -112,7 +102,7 @@ void MotionBlurIB::run(u8 *srcPtr, unsigned int num_threads,unsigned int thread_
     //First pixel to operate on (for multithreading)
     u32 offset = band_height * thread_number * width;
 
-    u32 *src0 = reinterpret_cast<u32 *>(srcPtr) + offset;
+    u32 *src0 = srcPtr + offset;
     u32 *src1 = frm1 + offset;
 
     u32 colorMask = 0xfefefe;
