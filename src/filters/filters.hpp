@@ -231,7 +231,7 @@ void hq4x32_32(unsigned char *pIn,  unsigned int srcPitch, unsigned char *pOut, 
 
 //sdl.cpp
 //Don't even know if these work or not
-extern bool sdlStretchInit(int colorDepth, int sizeMultiplier, int srcWidth);
+extern bool sdlStretchInit(int sizeMultiplier, int srcWidth);
 
 extern void sdlStretch1x(u8*,u32,u8*,u32,int,int);
 extern void sdlStretch2x(u8*,u32,u8*,u32,int,int);

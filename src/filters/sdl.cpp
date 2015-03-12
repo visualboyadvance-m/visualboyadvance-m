@@ -404,24 +404,12 @@ void (*sdlStretcher24[4])(u8 *, u8 *, int) = {
 #endif // C_CORE
 
 
-bool sdlStretchInit(int colorDepth, int sizeMultiplier, int srcWidth)
+bool sdlStretchInit(int sizeMultiplier, int srcWidth)
 {
 #ifndef C_CORE
   sdlMakeStretcher(srcWidth, sizeMultiplier);
 #else
-  switch(colorDepth) {
-  case 16:
-    sdlStretcher = sdlStretcher16[sizeMultiplier];
-    break;
-  case 24:
-    sdlStretcher = sdlStretcher24[sizeMultiplier];
-    break;
-  case 32:
-    sdlStretcher = sdlStretcher32[sizeMultiplier];
-    break;
-  default:
-    return false;
-  }
+  sdlStretcher = sdlStretcher32[sizeMultiplier];
 #endif
   return true;
 }

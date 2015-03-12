@@ -33,7 +33,7 @@ enum Filter { kStretch1x, kStretch2x, k2xSaI, kSuper2xSaI, kSuperEagle, kPixelat
 				klq2x, khq2x, kStretch3x, khq3x, kStretch4x, khq4x, kInvalidFilter };
 
 // Initialize a filter and get the corresponding filter function pointer
-FilterFunc initFilter(const Filter f, const int colorDepth, const int srcWidth);
+FilterFunc initFilter(const Filter f, const int srcWidth);
 
 // Get the enlarge factor of a filter
 int getFilterEnlargeFactor(const Filter f);
@@ -52,7 +52,7 @@ enum IFBFilter { kIFBNone, kIBMotionBlur, kIBSmart, kInvalidIFBFilter };
 typedef void(*IFBFilterFunc)(u8*, u32, int, int);
 
 // Initialize an IFB filter and get the corresponding filter function pointer
-IFBFilterFunc initIFBFilter(const IFBFilter f, const int colorDepth);
+IFBFilterFunc initIFBFilter(const IFBFilter f);
 
 // Get the display name for an IFB filter
 char* getIFBFilterName(const IFBFilter f);

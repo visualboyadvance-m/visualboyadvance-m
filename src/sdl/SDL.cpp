@@ -1547,7 +1547,7 @@ void sdlPollEvents()
 		      while (!filterFunction)
 		      {
 			      filter = (Filter)((filter + 1) % kInvalidFilter);
-		        filterFunction = initFilter(filter, systemColorDepth, srcWidth);
+		        filterFunction = initFilter(filter, srcWidth);
 		      }
 		      if (getFilterEnlargeFactor(filter) != filter_enlarge)
 		        sdlInitVideo();
@@ -2292,7 +2292,7 @@ int main(int argc, char **argv)
 
   sdlInitVideo();
 
-  filterFunction = initFilter(filter, systemColorDepth, srcWidth);
+  filterFunction = initFilter(filter, srcWidth);
   if (!filterFunction) {
     fprintf(stderr,"Unable to init filter '%s'\n", getFilterName(filter));
     exit(-1);
@@ -2316,7 +2316,7 @@ int main(int argc, char **argv)
     memset(delta, 255, delta_size);
   }
 
-  ifbFunction = initIFBFilter(ifbType, systemColorDepth);
+  ifbFunction = initIFBFilter(ifbType);
 
   emulating = 1;
   renderedFrames = 0;
@@ -2477,7 +2477,7 @@ void systemDrawScreen()
   if (ifbFunction)
     ifbFunction(pix + srcPitch, srcPitch, srcWidth, srcHeight);
 
-  filterFunction(pix + srcPitch, srcPitch, delta, screen,
+  filterFunction(pix + srcPitch, srcPitch, screen,
                  destPitch, srcWidth, srcHeight);
 
   drawScreenMessage(screen, destPitch, 10, destHeight - 20, 3000);
@@ -2698,7 +2698,7 @@ void systemGbBorderOn()
 
   sdlInitVideo();
 
-  filterFunction = initFilter(filter, systemColorDepth, srcWidth);
+  filterFunction = initFilter(filter, srcWidth);
 }
 
 bool systemReadJoypads()

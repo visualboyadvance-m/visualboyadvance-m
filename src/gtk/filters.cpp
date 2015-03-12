@@ -25,40 +25,40 @@ namespace VBA
 struct {
   char m_csName[30];
   int m_iEnlargeFactor;
-  Filter m_apvFunc[2];
+  Filter m_apvFunc;
 }
 static const astFilters[] =
 {
-  { N_("None"),                1, { 0,            0              } },
-  { N_("2xSaI"),               2, { _2xSaI,       _2xSaI32       } },
-  { N_("Super 2xSaI"),         2, { Super2xSaI,   Super2xSaI32   } },
-  { N_("Super Eagle"),         2, { SuperEagle,   SuperEagle32   } },
-  { N_("Pixelate"),            2, { Pixelate,     Pixelate32     } },
-  { N_("AdvanceMAME Scale2x"), 2, { AdMame2x,     AdMame2x32     } },
-  { N_("Bilinear"),            2, { Bilinear,     Bilinear32     } },
-  { N_("Bilinear Plus"),       2, { BilinearPlus, BilinearPlus32 } },
-  { N_("Scanlines"),           2, { Scanlines,    Scanlines32    } },
-  { N_("TV Mode"),             2, { ScanlinesTV,  ScanlinesTV32  } },
-  { N_("lq2x"),                2, { lq2x,         lq2x32         } },
-  { N_("hq2x"),                2, { hq2x,         hq2x32         } },
-  { N_("hq3x"),                2, { hq3x16,         hq3x32         } },
-  { N_("hq4x"),                2, { hq4x16,         hq4x32         } }
+  { N_("None"),                1, 0 },
+  { N_("2xSaI"),               2, _2xSaI32 },
+  { N_("Super 2xSaI"),         2, Super2xSaI32 },
+  { N_("Super Eagle"),         2, SuperEagle32 },
+  { N_("Pixelate"),            2, Pixelate32 },
+  { N_("AdvanceMAME Scale2x"), 2, AdMame2x32 },
+  { N_("Bilinear"),            2, Bilinear32 },
+  { N_("Bilinear Plus"),       2, BilinearPlus32 },
+  { N_("Scanlines"),           2, Scanlines32 },
+  { N_("TV Mode"),             2, ScanlinesTV32 },
+  { N_("lq2x"),                2, lq2x32 },
+  { N_("hq2x"),                2, hq2x32 },
+  { N_("hq3x"),                2, hq3x32 },
+  { N_("hq4x"),                2, hq4x32 }
 };
 
 struct {
   char m_csName[30];
-  FilterIB m_apvFunc[2];
+  FilterIB m_apvFunc;
 }
 static const astFiltersIB[] =
 {
-  { N_("None"),                      { 0,            0              } },
-  { N_("Smart interframe blending"), { SmartIB,      SmartIB32      } },
-  { N_("Interframe motion blur"),    { MotionBlurIB, MotionBlurIB32 } }
+  { N_("None"),                      0 },
+  { N_("Smart interframe blending"), SmartIB32 },
+  { N_("Interframe motion blur"),    MotionBlurIB32 }
 };
 
-Filter pvGetFilter(EFilter _eFilter, EFilterDepth _eDepth)
+Filter pvGetFilter(EFilter _eFilter)
 {
-  return astFilters[_eFilter].m_apvFunc[_eDepth];
+  return astFilters[_eFilter].m_apvFunc;
 }
 
 const char* pcsGetFilterName(const EFilter _eFilter)
@@ -66,9 +66,9 @@ const char* pcsGetFilterName(const EFilter _eFilter)
         return gettext(astFilters[_eFilter].m_csName);
 }
 
-FilterIB pvGetFilterIB(EFilterIB _eFilterIB, EFilterDepth _eDepth)
+FilterIB pvGetFilterIB(EFilterIB _eFilterIB)
 {
-  return astFiltersIB[_eFilterIB].m_apvFunc[_eDepth];
+  return astFiltersIB[_eFilterIB].m_apvFunc;
 }
 
 const char* pcsGetFilterIBName(const EFilterIB _eFilterIB)

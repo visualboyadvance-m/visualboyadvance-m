@@ -59,7 +59,6 @@ protected:
   Filter   m_vFilter2x;
   FilterIB m_vFilterIB;
   u32 *    m_puiPixels;
-  u8 *     m_puiDelta;
   int      m_iScaledWidth;
   int      m_iScaledHeight;
   bool     m_bEnableRender;

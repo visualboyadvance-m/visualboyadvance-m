@@ -27,7 +27,7 @@
 namespace VBA
 {
 
-typedef void (*Filter)(u8 *, u32, u8 *, u8 *, u32, int, int);
+typedef void (*Filter)(u8 *, u32, u8 *, u32, int, int);
 typedef void (*FilterIB)(u8 *, u32, int, int);
 
 enum EFilter
@@ -65,10 +65,10 @@ enum EFilterDepth
   FilterDepth32
 };
 
-Filter pvGetFilter(EFilter _eFilter, EFilterDepth _eDepth);
+Filter pvGetFilter(EFilter _eFilter);
 const char* pcsGetFilterName(const EFilter _eFilter);
 
-FilterIB pvGetFilterIB(EFilterIB _eFilterIB, EFilterDepth _eDepth);
+FilterIB pvGetFilterIB(EFilterIB _eFilterIB);
 const char* pcsGetFilterIBName(const EFilterIB _eFilterIB);
 
 } // namespace VBA

@@ -28,7 +28,6 @@ ScreenArea::ScreenArea(int _iWidth, int _iHeight, int _iScale) :
   m_vFilter2x(NULL),
   m_vFilterIB(NULL),
   m_puiPixels(NULL),
-  m_puiDelta(NULL),
   m_iScaledWidth(_iWidth),
   m_iScaledHeight(_iHeight),
   m_bEnableRender(true),
@@ -64,11 +63,6 @@ ScreenArea::~ScreenArea()
     delete[] m_puiPixels;
   }
 
-  if (m_puiDelta)
-  {
-    delete[] m_puiDelta;
-  }
-
   if (m_poEmptyCursor != NULL)
   {
     delete m_poEmptyCursor;
@@ -102,7 +96,7 @@ void ScreenArea::vSetScale(int _iScale)
 
 void ScreenArea::vSetFilter(EFilter _eFilter)
 {
-  m_vFilter2x = pvGetFilter(_eFilter, FilterDepth32);
+  m_vFilter2x = pvGetFilter(_eFilter);
 
   m_iFilterScale = 1;
   if (m_vFilter2x != NULL)
@@ -115,7 +109,7 @@ void ScreenArea::vSetFilter(EFilter _eFilter)
 
 void ScreenArea::vSetFilterIB(EFilterIB _eFilterIB)
 {
-  m_vFilterIB = pvGetFilterIB(_eFilterIB, FilterDepth32);
+  m_vFilterIB = pvGetFilterIB(_eFilterIB);
 }
 
 void ScreenArea::vStartCursorTimeout()
@@ -192,7 +186,6 @@ void ScreenArea::vDrawPixels(u8 * _puiData)
   {
     m_vFilter2x(_puiData + iSrcPitch,
                 iSrcPitch,
-                m_puiDelta,
                 (u8 *)m_puiPixels,
                 iScaledPitch,
                 m_iWidth,
@@ -211,18 +204,11 @@ void ScreenArea::vUpdateSize()
     delete[] m_puiPixels;
   }
 
-  if (m_puiDelta)
-  {
-    delete[] m_puiDelta;
-  }
-
   m_iScaledWidth = m_iFilterScale * m_iWidth;
   m_iScaledHeight = m_iFilterScale * m_iHeight;
 
   m_puiPixels = new u32[(m_iScaledWidth + 1) * m_iScaledHeight];
-  m_puiDelta = new u8[(m_iWidth + 2) * (m_iHeight + 2) * sizeof(u32)];
   memset(m_puiPixels, 0, (m_iScaledWidth + 1) * m_iScaledHeight * sizeof(u32));
-  memset(m_puiDelta, 255, (m_iWidth + 2) * (m_iHeight + 2) * sizeof(u32));
 
   vOnSizeUpdated();
 
