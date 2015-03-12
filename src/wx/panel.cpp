@@ -992,7 +992,6 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
     iFilter->setHeight(height);
 
     std::cerr << "width: " << width << " Height:  " << height << std::endl;
-#define out_16 (systemColorDepth == 16)
     systemColorDepth = 32;
 
     // Intialize color tables
@@ -1133,18 +1132,11 @@ void DrawingPanel::DrawArea(u8 **data)
 
     //The number of bytes per pixel, as determined by the systemColorDepth
     int bytes_per_pixel = systemColorDepth/8;
-
-    int outrb = systemColorDepth == 24 ? 0 : 4;
-    int outstride = width * bytes_per_pixel * scale + outrb;
+    //Unfortunately, the filter keeps the border on the scaled output, but DOES NOT scale it
+    int horiz_bytes_out = (width)* bytes_per_pixel * scale+bytes_per_pixel;
 
     if(!pixbuf2) {
-	int allocstride = outstride, alloch = height;
-	// gb may write borders, so allocate enough for them
-	if(width == GameArea::GBWidth && height == GameArea::GBHeight) {
-	    allocstride = GameArea::SGBWidth * bytes_per_pixel * scale + outrb;
-	    alloch = GameArea::SGBHeight;
-	}
-	pixbuf2 = (u8 *)calloc(allocstride, (alloch + 2) * scale);
+        pixbuf2 = (u8 *)calloc(horiz_bytes_out, (height + 2) * scale);
     }
     if(!myFilter->exists()) {
         todraw = *data;
@@ -1228,7 +1220,8 @@ void DrawingPanel::DrawArea(u8 **data)
     if(1) {
 	GameArea *panel = wxGetApp().frame->GetPanel();
 	if(panel->osdstat.size())
-	    drawText(todraw + outstride * (systemColorDepth != 24), outstride,
+	    drawText(todraw+bytes_per_pixel* (systemColorDepth != 24)
+            , horiz_bytes_out,
 		     10, 20, panel->osdstat.utf8_str(), gopts.osd_transparent);
 	if(!gopts.no_osd_status && !panel->osdtext.empty()) {
 	    if(systemGetClock() - panel->osdtime < OSD_TIME) {
@@ -1240,16 +1233,16 @@ void DrawingPanel::DrawArea(u8 **data)
 		while(nlines > 1) {
 		    char lchar = ptr[linelen];
 		    ptr[linelen] = 0;
-		    drawText(todraw + outstride * (systemColorDepth != 24),
-			     outstride, 10, cury, ptr,
+		    drawText(todraw+bytes_per_pixel* (systemColorDepth != 24),
+			     horiz_bytes_out, 10, cury, ptr,
 			     gopts.osd_transparent);
 		    cury += 10;
 		    nlines--;
 		    ptr += linelen;
 		    *ptr = lchar;
 		}
-		drawText(todraw + outstride * (systemColorDepth != 24),
-			 outstride, 10, cury, ptr,
+		drawText(todraw+bytes_per_pixel* (systemColorDepth != 24),
+			 horiz_bytes_out, 10, cury, ptr,
 			 gopts.osd_transparent);
 	    } else
 		panel->osdtext.clear();
@@ -1383,8 +1376,7 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow *parent, int _width, int _height)
      : wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetSize(),
 	      wxFULL_REPAINT_ON_RESIZE), DrawingPanel(_width, _height)
 {
-    // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
-    // 16 or 32, though
+    // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require 32, though
     if(!myFilter->exists() && !iFilter->exists())
     {
         // changing from 32 to 24 does not require regenerating color tables
@@ -1399,22 +1391,9 @@ void BasicDrawingPanel::DrawArea(wxWindowDC &dc)
 	// never scaled, no borders, no transformations needed
 	wxImage im(width, height, todraw, true);
 	bm = new wxBitmap(im);
-    } else if(out_16) {
-	// scaled by filters, top/right borders, transform to 24-bit
-	wxImage im(width * scale, height * scale, false);
-	u16 *src = (u16 *)todraw + (width + 2) * scale; // skip top border
-	u8 *dst = im.GetData();
-
-	for(int y = 0; y < height * scale; y++) {
-	    for(int x = 0; x < width * scale; x++, src++) {
-		*dst++ = ((*src >> systemRedShift) & 0x1f) << 3;
-		*dst++ = ((*src >> systemGreenShift) & 0x1f) << 3;
-		*dst++ = ((*src >> systemBlueShift) & 0x1f) << 3;
-	    }
-	    src += 2; // skip rhs border
-	}
-	bm = new wxBitmap(im);
-    } else { // 32-bit
+    }
+    else
+    { // 32-bit
 	// scaled by filters, top/right borders, transform to 24-bit
 	wxImage im(width * scale, height * scale, false);
 	u32 *src = (u32 *)todraw + (width + 1) * scale; // skip top border
@@ -1428,7 +1407,7 @@ void BasicDrawingPanel::DrawArea(wxWindowDC &dc)
 	    }
 	    ++src; // skip rhs border
 	}
-	bm = new wxBitmap(im);
+    bm = new wxBitmap(im);
     }
     double sx, sy;
     int w, h;
@@ -1533,9 +1512,8 @@ void GLDrawingPanel::Init()
 		    gopts.bilinear ? GL_LINEAR : GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 		    gopts.bilinear ? GL_LINEAR : GL_NEAREST);
-#define int_fmt out_16 ? GL_RGB5 : GL_RGB
-#define tex_fmt out_16 ? GL_BGRA : GL_RGBA, \
-                out_16 ? GL_UNSIGNED_SHORT_1_5_5_5_REV : GL_UNSIGNED_BYTE
+#define int_fmt GL_RGB
+#define tex_fmt GL_RGBA, GL_UNSIGNED_BYTE
 #if 0
     texsize = width > height ? width : height;
     texsize *= scale;
@@ -1592,15 +1570,10 @@ void GLDrawingPanel::DrawArea(wxWindowDC &dc)
 	Init();
 
     if(todraw) {
-	int rowlen = width * scale + (out_16 ? 2 : 1);
+	int rowlen = width * scale + 1;
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
-#if wxBYTE_ORDER == wxBIG_ENDIAN
-	// FIXME: is this necessary?
-	if(out_16)
-	    glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
-#endif
 	glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, width * scale, height * scale,
-		     0, tex_fmt, todraw + rowlen * (out_16 ? 2 : 4) * scale);
+		     0, tex_fmt, todraw + rowlen * 4 * scale);
 	glCallList(vlist);
     } else
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -1698,33 +1671,11 @@ void CairoDrawingPanel::DrawArea(wxWindowDC &dc)
 #endif
 #endif
     cairo_surface_t *surf;
-    if(!out_16)
 	surf = cairo_image_surface_create_for_data(todraw + 4 * width,
 						   CAIRO_FORMAT_RGB24,
 						   width, height,
 						   4 * (width + 1));
-    else {
-	if(!conv_surf)
-	    conv_surf = cairo_image_surface_create(CAIRO_FORMAT_RGB24,
-						   width * scale,
-						   height * scale);
-	if(!conv_surf) {
-	    wxLogError(_("Cannot create conversion buffer"));
-	    wxGetApp().frame->Close(true);
-	}
-	surf = cairo_surface_reference(conv_surf);
-	u16 *src = (u16 *)todraw + (width + 2) * scale; // skip top border
-	u32 *dst = (u32 *)cairo_image_surface_get_data(surf);
 
-	for(int y = 0; y < height * scale; y++) {
-	    for(int x = 0; x < width * scale; x++, src++) {
-		*dst++ = (((*src >> systemRedShift) & 0x1f) << 19) |
-		         (((*src >> systemGreenShift) & 0x1f) << 11) |
-		         (((*src >> systemBlueShift) & 0x1f) << 3);
-	    }
-	    src += 2; // skip rhs border
-	}
-    }
     cairo_pattern_t *pat = cairo_pattern_create_for_surface(surf);
     // GOOD is "similar to" bilinear, and FAST is "similar to" nearest
     // could also just use BILINEAR and NEAREST directly, I suppose
