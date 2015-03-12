@@ -13,35 +13,24 @@
 // Function pointer type for a filter function
 typedef void(*FilterFunc)(u8*, u32, u8*, u8*, u32, int, int);
 
-typedef std::pair<FilterFunc,FilterFunc> filterpair;
-typedef std::pair<std::string,filterpair> namedfilter;
+typedef std::pair<std::string,FilterFunc> namedfilter;
 
 ///A class allowing for easy access to all the filters
 class filters {
 private:
     //A named map of all the filters
-    static const std::map<std::string,filterpair> filterMap;
+    static const std::map<std::string,FilterFunc> filterMap;
 public:
     ///Returns a function pointer to a 32 bit filter
     static FilterFunc GetFilter(std::string filterName)
     {
-        std::map<std::string,filterpair>::const_iterator found = filterMap.find(filterName);
+        std::map<std::string,FilterFunc>::const_iterator found = filterMap.find(filterName);
         if(found == filterMap.end()){
             //Not doing the error checking here
 //             throw std::runtime_error("ERROR:  Filter not found!");
             return NULL;
         }
-        return found->second.first;
-    };
-    ///Returns a function pointer to a 16 bit filter
-    static FilterFunc GetFilter16(std::string filterName)
-    {
-        std::map<std::string,filterpair>::const_iterator found = filterMap.find(filterName);
-        if(found == filterMap.end()){
-//             throw std::runtime_error("ERROR:  Filter not found!");
-            return NULL;
-        }
-        return found->second.second;
+        return found->second;
     };
     ///Returns the filter's scaling factor
     ///TODO:  De hardcode this
@@ -173,15 +162,12 @@ public:
 // initial value appears to be all-0xff
 
 //pixel.cpp
-void Pixelate(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int width, int height);
 void Pixelate32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height);
 
 //scanline.cpp
-void Scanlines (u8 *srcPtr, u32 srcPitch, u8 *, u8 *dstPtr, u32 dstPitch, int width, int height);
 void Scanlines32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height);
 // "TV" here means each pixel is faded horizontally & vertically rather than
 // inserting black scanlines
-void ScanlinesTV(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height);
 void ScanlinesTV32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height);
 
 //simpleFilter.cpp
@@ -189,16 +175,10 @@ void ScanlinesTV32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u3
 // in any case, they are worthless, since all renderers do "simple" or
 // better by default
 int Init_2xSaI(u32 BitFormat);
-void Simple2x16(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-              u8 *dstPtr, u32 dstPitch, int width, int height);
 void Simple2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
                 u8 *dstPtr, u32 dstPitch, int width, int height);
-void Simple3x16(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-              u8 *dstPtr, u32 dstPitch, int width, int height);
 void Simple3x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
                 u8 *dstPtr, u32 dstPitch, int width, int height);
-void Simple4x16(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-              u8 *dstPtr, u32 dstPitch, int width, int height);
 void Simple4x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
                 u8 *dstPtr, u32 dstPitch, int width, int height);
 
@@ -206,18 +186,12 @@ void Simple4x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 //These convert to rgb24 in internal buffers first, and then back again
 /*static void fill_rgb_row_16(u16 *from, int src_width, u8 *row, int width);
 static void fill_rgb_row_32(u32 *from, int src_width, u8 *row, int width);*/
-void Bilinear(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-              u8 *dstPtr, u32 dstPitch, int width, int height);
 void Bilinear32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
                 u8 *dstPtr, u32 dstPitch, int width, int height);
-void BilinearPlus(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-                  u8 *dstPtr, u32 dstPitch, int width, int height);
 void BilinearPlus32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
                     u8 *dstPtr, u32 dstPitch, int width, int height);
 
 //admame.cpp
-void AdMame2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-              u8 *dstPtr, u32 dstPitch, int width, int height);
 void AdMame2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
                 u8 *dstPtr, u32 dstPitch, int width, int height);
 
@@ -226,22 +200,12 @@ void AdMame2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 int Init_2xSaI(u32 BitFormat);
 // endianness or bit shift variables in init.
 // next 4*2 may be MMX-accelerated
-void _2xSaI (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
-             u8 *dstPtr, u32 dstPitch, int width, int height);
 void _2xSaI32 (u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
                u8 *dstPtr, u32 dstPitch, int width, int height);
 //This one was commented out in other source files
-void Scale_2xSaI (u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-                  u8 *dstPtr, u32 dstPitch,
-                  u32 dstWidth, u32 dstHeight, int width, int height);
-void Super2xSaI (u8 *srcPtr, u32 srcPitch,
-                 u8 *deltaPtr, u8 *dstPtr, u32 dstPitch,
-                 int width, int height);
 void Super2xSaI32 (u8 *srcPtr, u32 srcPitch,
                    u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch,
                    int width, int height);
-void SuperEagle (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
-                 u8 *dstPtr, u32 dstPitch, int width, int height);
 void SuperEagle32 (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
                    u8 *dstPtr, u32 dstPitch, int width, int height);
 //hq2x.cpp
@@ -251,12 +215,8 @@ static void hq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, 
 static void lq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, const u16* src2, unsigned count);
 static void lq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, const u32* src2, unsigned count);*/
 void hq2x_init(unsigned bits_per_pixel);
-void hq2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-          u8 *dstPtr, u32 dstPitch, int width, int height);
 void hq2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
             u8 *dstPtr, u32 dstPitch, int width, int height);
-void lq2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-          u8 *dstPtr, u32 dstPitch, int width, int height);
 void lq2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
             u8 *dstPtr, u32 dstPitch, int width, int height);
 
@@ -268,14 +228,6 @@ void hq3x32(unsigned char * pIn,  unsigned int srcPitch,
             unsigned char * pOut, unsigned int dstPitch,
             int Xres, int Yres);
 void hq4x32(unsigned char * pIn,  unsigned int srcPitch,
-            unsigned char *,
-            unsigned char * pOut, unsigned int dstPitch,
-            int Xres, int Yres);
-void hq3x16(unsigned char * pIn,  unsigned int srcPitch,
-            unsigned char *,
-            unsigned char * pOut, unsigned int dstPitch,
-            int Xres, int Yres);
-void hq4x16(unsigned char * pIn,  unsigned int srcPitch,
             unsigned char *,
             unsigned char * pOut, unsigned int dstPitch,
             int Xres, int Yres);
