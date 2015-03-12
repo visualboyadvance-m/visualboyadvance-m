@@ -2804,10 +2804,8 @@ bool MainFrame::InitMore(void)
 	getcbb("VSync", gopts.vsync);
 	// FIXME: make cb disabled when not GL or d3d
 	int mthr = wxThread::GetCPUCount();
-	if(mthr > 8)
-	    mthr = 8;
-	if(mthr < 0)
-	    mthr = 2;
+	if(mthr < 1 )
+	    mthr = 1;
     cb=SafeXRCCTRL<wxCheckBox>(d, "Multithread");
     cb->SetValidator(wxBoolIntValidator(&gopts.max_threads, mthr));
 	if(mthr <= 1)

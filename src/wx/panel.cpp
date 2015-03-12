@@ -1083,7 +1083,7 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
 
     // Create and start up new threads
     nthreads = gopts.max_threads;
-    if(nthreads > 1) {
+    if(nthreads) {
         threads = new FilterThread[nthreads];
         for(int i = 0; i < nthreads; i++) {
             threads[i].threadno = i;
@@ -1133,7 +1133,7 @@ void DrawingPanel::DrawArea(u8 **data)
     int horiz_bytes_out = width * bytes_per_pixel * scale;
 
     // First, apply filters, if applicable, in parallel, if enabled
-    if(myFilter->exists() || iFilter->exists() )
+    if(nthreads)
     {
         for(int i = 0; i < nthreads; i++) {
             threads[i].lock.Lock();
