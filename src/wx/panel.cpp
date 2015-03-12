@@ -979,7 +979,7 @@ END_EVENT_TABLE()
 IMPLEMENT_ABSTRACT_CLASS(DrawingPanel, wxEvtHandler)
 
 DrawingPanel::DrawingPanel(int _width, int _height) :
-    wxObject(), width(_width), height(_height), scale(1), todraw(0),
+    wxObject(), width(_width+1), height(_height), scale(1), todraw(0),
     pixbuf1(0), pixbuf2(0), rpi(0), nthreads(0)
 {
     myFilter = new filter(std::string(gopts.filter.mb_str(wxConvUTF8)));
@@ -1074,22 +1074,14 @@ public:
 	// This is the lower height value of the band this thread will process
 	int band_lower = band_height * threadno;
 
-
-    //Unfortunately, the filter keeps the border on the scaled output, but DOES NOT scale it
-    unsigned int scaled_width = width * scale + 1;
-    // + 1 for stupid top border
-    dst += scaled_width * (band_lower + 1) * scale;
-
-    //There is a 1 pixel border not included in the official width
-	width += 1;
+    //Set the starting location for the destination buffer
+    dst += width * scale * band_lower * scale;
 
 	while(nthreads == 1 || sig.Wait() == wxCOND_NO_ERROR) {
 	    if(!src /* && nthreads > 1 */ ) {
             lock.Unlock();
             return 0;
 	    }
-	    // + 1 for stupid top border
-	    src += width;
 
 	    if(!mainFilter || !iFilter)
         {
@@ -1132,7 +1124,7 @@ void DrawingPanel::DrawArea(u8 **data)
     //The number of bytes per pixel, as determined by the systemColorDepth
     int bytes_per_pixel = systemColorDepth/8;
     //Used for determining size of the buffer to allocate
-    int horiz_bytes_out = (width+2)* bytes_per_pixel * scale;
+    int horiz_bytes_out = width * bytes_per_pixel * scale;
 
     if(!pixbuf2) {
         pixbuf2 = (u8 *)calloc(horiz_bytes_out, (height + 2) * scale);
@@ -1217,12 +1209,12 @@ void DrawingPanel::DrawArea(u8 **data)
     // draw OSD text old-style (directly into output buffer)
 	GameArea *panel = wxGetApp().frame->GetPanel();
 	if(panel->osdstat.size())
-	    drawText(todraw,width*scale+(systemColorDepth != 24),bytes_per_pixel,
-		     0, 2, panel->osdstat.utf8_str(), gopts.osd_transparent);
+	    drawText(todraw,width*scale-(systemColorDepth == 24),bytes_per_pixel,
+		     0, 2, tmp, gopts.osd_transparent);
 	if(!gopts.no_osd_status && !panel->osdtext.empty()) {
 	    if(systemGetClock() - panel->osdtime < OSD_TIME) {
             std::string message = ToString(panel->osdtext);
-            drawText(todraw,width*scale+(systemColorDepth != 24),bytes_per_pixel,
+            drawText(todraw,width*scale-(systemColorDepth == 24),bytes_per_pixel,
             20,height/2,
             message.c_str(),gopts.osd_transparent);
 	    } else
@@ -1288,14 +1280,14 @@ void BasicDrawingPanel::DrawArea(wxWindowDC &dc)
     wxBitmap *bm;
     if(systemColorDepth == 24) {
 	// never scaled, no borders, no transformations needed
-	wxImage im(width, height, todraw, true);
+	wxImage im(width-1, height, todraw, true);
 	bm = new wxBitmap(im);
     }
     else
     { // 32-bit
 	// scaled by filters, top/right borders, transform to 24-bit
-	wxImage im(width * scale+1, height * scale+1, false);
-    convert32To24((u32 *)todraw,(u8 *)im.GetData(),width * scale+1,height * scale+1);
+	wxImage im(width * scale, height * scale, false);
+    convert32To24((u32 *)todraw,(u8 *)im.GetData(),width * scale,height * scale);
     bm = new wxBitmap(im);
     }
     double sx, sy;
@@ -1459,7 +1451,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC &dc)
 	Init();
 
     if(todraw) {
-	int rowlen = width * scale + 1;
+	int rowlen = width * scale;
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
 	glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, width * scale, height * scale,
 		     0, tex_fmt, todraw);
@@ -1560,10 +1552,10 @@ void CairoDrawingPanel::DrawArea(wxWindowDC &dc)
 #endif
 #endif
     cairo_surface_t *surf;
-	surf = cairo_image_surface_create_for_data(todraw + 4 * width,
+	surf = cairo_image_surface_create_for_data(todraw,
 						   CAIRO_FORMAT_RGB24,
 						   width, height,
-						   4 * (width + 1));
+						   4 * width);
 
     cairo_pattern_t *pat = cairo_pattern_create_for_surface(surf);
     // GOOD is "similar to" bilinear, and FAST is "similar to" nearest
