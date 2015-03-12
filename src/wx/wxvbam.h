@@ -487,8 +487,8 @@ protected:
     filter * myFilter;
     interframe_filter * iFilter;
     int width, height, scale;
-    u8 *todraw;
-    u8 *pixbuf1, *pixbuf2;
+    // largest buffer required is 32-bit * (max width + 1) * (max height + 2) * (4x4) scaling factor
+    u8 todraw[257 * 226 * 4 * 16];
     FilterThread *threads;
     int nthreads;
     wxSemaphore filt_done;

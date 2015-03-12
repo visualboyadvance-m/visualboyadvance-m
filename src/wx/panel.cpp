@@ -979,9 +979,12 @@ END_EVENT_TABLE()
 IMPLEMENT_ABSTRACT_CLASS(DrawingPanel, wxEvtHandler)
 
 DrawingPanel::DrawingPanel(int _width, int _height) :
-    wxObject(), width(_width+1), height(_height), scale(1), todraw(0),
-    pixbuf1(0), pixbuf2(0), rpi(0), nthreads(0)
+    wxObject(), width(_width+1), height(_height), scale(1),
+    rpi(0), nthreads(0)
 {
+    //Clear the output buffer
+    memset (todraw,0x00,257 * 4 * 16 * 226);
+
     myFilter = new filter(std::string(gopts.filter.mb_str(wxConvUTF8)));
 
     iFilter = interframe_factory::createIFB((ifbfunc)gopts.ifb);
@@ -1014,16 +1017,6 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
 void DrawingPanel::PaintEv(wxPaintEvent &ev)
 {
     wxPaintDC dc(GetWindow());
-    if(!todraw) {
-	// since this is set for custom background, not drawing anything
-	// will cause garbage to be displayed, so draw a black area
-	wxCoord w, h;
-	dc.GetSize(&w, &h);
-	dc.SetPen(*wxBLACK_PEN);
-	dc.SetBrush(*wxBLACK_BRUSH);
-	dc.DrawRectangle(0, 0, w, h);
-	return;
-    }
     DrawArea(dc);
 }
 
@@ -1126,20 +1119,6 @@ void DrawingPanel::DrawArea(u8 **data)
     //Used for determining size of the buffer to allocate
     int horiz_bytes_out = width * bytes_per_pixel * scale;
 
-    if(!pixbuf2) {
-        pixbuf2 = (u8 *)calloc(horiz_bytes_out, (height + 2) * scale);
-    }
-    if(!myFilter->exists()) {
-        todraw = *data;
-        // *data is assigned below, after old buf has been processed
-        pixbuf1 = pixbuf2;
-        pixbuf2 = todraw;
-    }
-    else
-    {
-        todraw = pixbuf2;
-    }
-
     // First, apply filters, if applicable, in parallel, if enabled
     if(myFilter->exists() || iFilter->exists() ) {
 	if(nthreads != gopts.max_threads) {
@@ -1164,7 +1143,7 @@ void DrawingPanel::DrawArea(u8 **data)
 	    threads[0].height = height;
 	    threads[0].scale = scale;
 	    threads[0].src = reinterpret_cast<u32 *>(*data);
-	    threads[0].dst = reinterpret_cast<u32 *>(todraw);
+	    threads[0].dst = reinterpret_cast<u32 *>(&todraw);
 	    threads[0].rpi = rpi;
         threads[0].mainFilter=myFilter;
         threads[0].iFilter=iFilter;
@@ -1177,7 +1156,7 @@ void DrawingPanel::DrawArea(u8 **data)
 		    threads[i].width = width;
 		    threads[i].height = height;
 		    threads[i].scale = scale;
-		    threads[i].dst = reinterpret_cast<u32 *>(todraw);
+		    threads[i].dst = reinterpret_cast<u32 *>(&todraw);
 		    threads[i].rpi = rpi;
             threads[i].mainFilter=myFilter;
             threads[i].iFilter=iFilter;
@@ -1201,16 +1180,15 @@ void DrawingPanel::DrawArea(u8 **data)
 	}
 
     }
-
-    // swap buffers now that src has been processed
+    //If no filter to copy data to output buffer, do it ourselves
     if(!myFilter->exists())
-        *data = pixbuf1;
+        memcpy(todraw,*data, horiz_bytes_out*height*scale);
 
     // draw OSD text old-style (directly into output buffer)
 	GameArea *panel = wxGetApp().frame->GetPanel();
 	if(panel->osdstat.size())
 	    drawText(todraw,width*scale-(systemColorDepth == 24),bytes_per_pixel,
-		     0, 2, tmp, gopts.osd_transparent);
+		     0, 2, panel->osdstat.utf8_str(), gopts.osd_transparent);
 	if(!gopts.no_osd_status && !panel->osdtext.empty()) {
 	    if(systemGetClock() - panel->osdtime < OSD_TIME) {
             std::string message = ToString(panel->osdtext);
@@ -1229,9 +1207,6 @@ void DrawingPanel::DrawArea(u8 **data)
 
 DrawingPanel::~DrawingPanel()
 {
-    // pixbuf1 freed by emulator
-    if(pixbuf2)
-	free(pixbuf2);
     if(nthreads) {
 	if(nthreads > 1)
 	    for(int i = 0; i < nthreads; i++) {
