@@ -1077,7 +1077,7 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
     iFilter->setWidth(width);
     iFilter->setHeight(height);
 
-    //Do a quick run to initalize the filter
+    //Do a quick run to initialize the filter
     //\TODO:  Fix the filters so this is no longer needed
     myFilter->run(reinterpret_cast<u32 *>(&todraw), reinterpret_cast<u32 *>(&todraw), height);
 
