@@ -978,42 +978,6 @@ END_EVENT_TABLE()
 
 IMPLEMENT_ABSTRACT_CLASS(DrawingPanel, wxEvtHandler)
 
-DrawingPanel::DrawingPanel(int _width, int _height) :
-    wxObject(), width(_width+1), height(_height), scale(1),
-    rpi(0), nthreads(0)
-{
-    //Clear the output buffer
-    memset (todraw,0x00,257 * 4 * 16 * 226);
-
-    myFilter = new filter(std::string(gopts.filter.mb_str(wxConvUTF8)));
-
-    iFilter = interframe_factory::createIFB((ifbfunc)gopts.ifb);
-
-    scale = myFilter->getScale();
-    myFilter->setWidth(width);
-    iFilter->setWidth(width);
-    iFilter->setHeight(height);
-
-    std::cerr << "width: " << width << " Height:  " << height << std::endl;
-    systemColorDepth = 32;
-
-    // Intialize color tables
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
-	systemRedShift    = 3;
-	systemGreenShift  = 11;
-	systemBlueShift   = 19;
-	int RGB_LOW_BITS_MASK = 0x00010101;
-#else
-	systemRedShift    = 27;
-	systemGreenShift  = 19;
-	systemBlueShift   = 11;
-	int RGB_LOW_BITS_MASK = 0x01010100;
-#endif
-    // FIXME: should be "true" for GBA carts if lcd mode selected
-    // which means this needs to be re-run at pref change time
-    utilUpdateSystemColorMaps(false);
-}
-
 void DrawingPanel::PaintEv(wxPaintEvent &ev)
 {
     wxPaintDC dc(GetWindow());
@@ -1050,7 +1014,6 @@ public:
     // Set these params before running
     unsigned int nthreads, threadno;
     unsigned int width, height, scale;
-    const RENDER_PLUGIN_INFO *rpi;
     u32 *dst;
     filter * mainFilter;
     interframe_filter * iFilter;
@@ -1070,10 +1033,10 @@ public:
     //Set the starting location for the destination buffer
     dst += width * scale * band_lower * scale;
 
-	while(nthreads == 1 || sig.Wait() == wxCOND_NO_ERROR) {
-	    if(!src /* && nthreads > 1 */ ) {
+	while(sig.Wait() == wxCOND_NO_ERROR) {
+	    if(!src ) {
             lock.Unlock();
-            return 0;
+            return (wxThread::ExitCode) 0;
 	    }
 
 	    if(!mainFilter || !iFilter)
@@ -1085,13 +1048,6 @@ public:
         //Run the interframe blending filter
         iFilter->run(src, nthreads, threadno);
 
-	    if(!mainFilter->exists()) {
-            if(nthreads == 1)
-                return 0;
-            done->Post();
-            continue;
-	    }
-
 	    //Set the start of the source pointer to the first pixel of the appropriate height
 	    src += width * band_lower;
 
@@ -1099,14 +1055,71 @@ public:
 	    // the IFB filters will screw up royally as well
         mainFilter->run(src, dst, band_height);
 
-        if(nthreads == 1)
-            return 0;
         done->Post();
-        continue;
 	}
 	return (wxThread::ExitCode) 0;
     }
 };
+
+DrawingPanel::DrawingPanel(int _width, int _height) :
+    wxObject(), width(_width+1), height(_height), scale(1),
+    rpi(0), nthreads(0)
+{
+    //Clear the output buffer
+    memset (todraw,0x00,257 * 4 * 16 * 226);
+
+    myFilter = new filter(std::string(gopts.filter.mb_str(wxConvUTF8)));
+
+    iFilter = interframe_factory::createIFB((ifbfunc)gopts.ifb);
+
+    scale = myFilter->getScale();
+    myFilter->setWidth(width);
+    iFilter->setWidth(width);
+    iFilter->setHeight(height);
+
+    //Do a quick run to initalize the filter
+    //\TODO:  Fix the filters so this is no longer needed
+    myFilter->run(reinterpret_cast<u32 *>(&todraw), reinterpret_cast<u32 *>(&todraw), height);
+
+    // Create and start up new threads
+    nthreads = gopts.max_threads;
+    if(nthreads > 1) {
+        threads = new FilterThread[nthreads];
+        for(int i = 0; i < nthreads; i++) {
+            threads[i].threadno = i;
+            threads[i].nthreads = nthreads;
+            threads[i].width = width;
+            threads[i].height = height;
+            threads[i].scale = scale;
+            threads[i].dst = reinterpret_cast<u32 *>(&todraw);
+            threads[i].mainFilter=myFilter;
+            threads[i].iFilter=iFilter;
+            threads[i].done = &filt_done;
+            threads[i].lock.Lock();
+            threads[i].Create();
+            threads[i].Run();
+        }
+    }
+
+    std::cerr << "width: " << width << " Height:  " << height << std::endl;
+    systemColorDepth = 32;
+
+    // Intialize color tables
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+    systemRedShift    = 3;
+    systemGreenShift  = 11;
+    systemBlueShift   = 19;
+    int RGB_LOW_BITS_MASK = 0x00010101;
+#else
+    systemRedShift    = 27;
+    systemGreenShift  = 19;
+    systemBlueShift   = 11;
+    int RGB_LOW_BITS_MASK = 0x01010100;
+#endif
+    // FIXME: should be "true" for GBA carts if lcd mode selected
+    // which means this needs to be re-run at pref change time
+    utilUpdateSystemColorMaps(false);
+}
 
 void DrawingPanel::DrawArea(u8 **data)
 {
@@ -1120,63 +1133,22 @@ void DrawingPanel::DrawArea(u8 **data)
     int horiz_bytes_out = width * bytes_per_pixel * scale;
 
     // First, apply filters, if applicable, in parallel, if enabled
-    if(myFilter->exists() || iFilter->exists() ) {
-	if(nthreads != gopts.max_threads) {
-
-        // first time around, no threading in order to avoid
-        // static initializer conflicts
-        iFilter->run(reinterpret_cast<u32 *>(*data));
-        myFilter->run(reinterpret_cast<u32 *>(*data), reinterpret_cast<u32 *>(&todraw), height);
-
-        //Kill and delete all threads
-	    if(nthreads) {
-            if(nthreads > 1)
-                for(int i = 0; i < nthreads; i++) {
-                threads[i].lock.Lock();
-                threads[i].src = NULL;
-                threads[i].sig.Signal();
-                threads[i].lock.Unlock();
-                threads[i].Wait();
-                }
-            delete[] threads;
-	    }
-        // Create and start up new threads
-	    nthreads = gopts.max_threads;
-	    threads = new FilterThread[nthreads];
-	    if(nthreads > 1) {
-		for(int i = 0; i < nthreads; i++) {
-		    threads[i].threadno = i;
-		    threads[i].nthreads = nthreads;
-		    threads[i].width = width;
-		    threads[i].height = height;
-		    threads[i].scale = scale;
-		    threads[i].dst = reinterpret_cast<u32 *>(&todraw);
-		    threads[i].rpi = rpi;
-            threads[i].mainFilter=myFilter;
-            threads[i].iFilter=iFilter;
-		    threads[i].done = &filt_done;
-		    threads[i].lock.Lock();
-		    threads[i].Create();
-		    threads[i].Run();
-		}
-	    }
-	} else if(nthreads == 1)
-	    threads[0].Entry();
-	else {
-	    for(int i = 0; i < nthreads; i++) {
-		threads[i].lock.Lock();
-		threads[i].src = reinterpret_cast<u32 *>(*data);
-		threads[i].sig.Signal();
-		threads[i].lock.Unlock();
-	    }
-	    for(int i = 0; i < nthreads; i++)
-		filt_done.Wait();
-	}
-
+    if(myFilter->exists() || iFilter->exists() )
+    {
+        for(int i = 0; i < nthreads; i++) {
+            threads[i].lock.Lock();
+            threads[i].src = reinterpret_cast<u32 *>(*data);
+            threads[i].sig.Signal();
+            threads[i].lock.Unlock();
+        }
+        for(int i = 0; i < nthreads; i++)
+            filt_done.Wait();
     }
-    //If no filter to copy data to output buffer, do it ourselves
-    if(!myFilter->exists())
+    else
+    {
+        //If no filter to copy data to output buffer, do it ourselves
         memcpy(todraw,*data, horiz_bytes_out*height*scale);
+    }
 
     // draw OSD text old-style (directly into output buffer)
 	GameArea *panel = wxGetApp().frame->GetPanel();
@@ -1201,16 +1173,16 @@ void DrawingPanel::DrawArea(u8 **data)
 
 DrawingPanel::~DrawingPanel()
 {
+    //Kill and delete all threads
     if(nthreads) {
-	if(nthreads > 1)
-	    for(int i = 0; i < nthreads; i++) {
-		threads[i].lock.Lock();
-		threads[i].src = NULL;
-		threads[i].sig.Signal();
-		threads[i].lock.Unlock();
-		threads[i].Wait();
-	    }
-	delete[] threads;
+        for(int i = 0; i < nthreads; i++) {
+            threads[i].lock.Lock();
+            threads[i].src = NULL;
+            threads[i].sig.Signal();
+            threads[i].lock.Unlock();
+            threads[i].Wait();
+        }
+        delete[] threads;
     }
     //Filter cleanup
     if(myFilter)
