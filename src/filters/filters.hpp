@@ -11,7 +11,7 @@
 
 //sdl
 // Function pointer type for a filter function
-typedef void(*FilterFunc)(u8*, u32, u8*, u8*, u32, int, int);
+typedef void(*FilterFunc)(u8*, u32, u8*, u32, int, int);
 
 typedef std::pair<std::string,FilterFunc> namedfilter;
 
@@ -103,10 +103,9 @@ public:
      * It knows it's a 32 bit filter, and the input width will not change from when it is initialized.
      *
      * \param[in] srcPtr        A pointer to the input 32 bit RGB Pixel Array
-     * \param[in] deltaPtr      A pointer to a 32 bit RGB Pixel Array (used to store the difference between frames)
      * \param[in] dstPtr        A pointer to the output 32 bit RGB Pixel Array
      */
-    void run(u8 *srcPtr, u8 *deltaPtr, u8 *dstPtr, int height)
+    void run(u8 *srcPtr, u8 *dstPtr, int height)
     {
         if(!width)
         {
@@ -115,7 +114,7 @@ public:
 
         if(myFilter!=NULL)
         {
-            myFilter(srcPtr,horiz_bytes,deltaPtr,dstPtr,horiz_bytes_out,width,height);
+            myFilter(srcPtr,horiz_bytes,dstPtr,horiz_bytes_out,width,height);
         }
         else
         {
@@ -128,7 +127,7 @@ public:
      * \param[in] srcPtr        A pointer to a 16/32 bit RGB Pixel Array
      * \param[in] srcPitch     The number of bytes per single horizontal line
      */
-    void run(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int width, int height)
+    void run(u8 *srcPtr, u32 srcPitch, u8 *dstPtr, u32 dstPitch, int width, int height)
     {
         setWidth(width);
         //Make sure the math was correct
@@ -136,7 +135,7 @@ public:
         {
             throw std::runtime_error("ERROR:  Filter programmer is an idiot, and messed up an important calculation!");
         }
-        run(srcPtr, deltaPtr, dstPtr, height);
+        run(srcPtr, dstPtr, height);
     }
     bool exists()
     {
@@ -162,37 +161,37 @@ public:
 // initial value appears to be all-0xff
 
 //pixel.cpp
-void Pixelate32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height);
+void Pixelate32(u8 *srcPtr, u32 srcPitch, u8 *dstPtr, u32 dstPitch, int width, int height);
 
 //scanline.cpp
-void Scanlines32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height);
+void Scanlines32(u8 *srcPtr, u32 srcPitch, u8 *dstPtr, u32 dstPitch, int width, int height);
 // "TV" here means each pixel is faded horizontally & vertically rather than
 // inserting black scanlines
-void ScanlinesTV32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height);
+void ScanlinesTV32(u8 *srcPtr, u32 srcPitch, u8 *dstPtr, u32 dstPitch, int width, int height);
 
 //simpleFilter.cpp
 // the simple ones could greatly benefit from correct usage of preprocessor..
 // in any case, they are worthless, since all renderers do "simple" or
 // better by default
 int Init_2xSaI(u32 BitFormat);
-void Simple2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void Simple2x32(u8 *srcPtr, u32 srcPitch,
                 u8 *dstPtr, u32 dstPitch, int width, int height);
-void Simple3x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void Simple3x32(u8 *srcPtr, u32 srcPitch,
                 u8 *dstPtr, u32 dstPitch, int width, int height);
-void Simple4x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void Simple4x32(u8 *srcPtr, u32 srcPitch,
                 u8 *dstPtr, u32 dstPitch, int width, int height);
 
 //bilinear.cpp
 //These convert to rgb24 in internal buffers first, and then back again
 /*static void fill_rgb_row_16(u16 *from, int src_width, u8 *row, int width);
 static void fill_rgb_row_32(u32 *from, int src_width, u8 *row, int width);*/
-void Bilinear32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void Bilinear32(u8 *srcPtr, u32 srcPitch,
                 u8 *dstPtr, u32 dstPitch, int width, int height);
-void BilinearPlus32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void BilinearPlus32(u8 *srcPtr, u32 srcPitch,
                     u8 *dstPtr, u32 dstPitch, int width, int height);
 
 //admame.cpp
-void AdMame2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void AdMame2x32(u8 *srcPtr, u32 srcPitch,
                 u8 *dstPtr, u32 dstPitch, int width, int height);
 
 //2xSal.cpp
@@ -200,49 +199,43 @@ void AdMame2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 int Init_2xSaI(u32 BitFormat);
 // endianness or bit shift variables in init.
 // next 4*2 may be MMX-accelerated
-void _2xSaI32 (u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void _2xSaI32 (u8 *srcPtr, u32 srcPitch,
                u8 *dstPtr, u32 dstPitch, int width, int height);
 //This one was commented out in other source files
 void Super2xSaI32 (u8 *srcPtr, u32 srcPitch,
-                   u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch,
+                   u8 *dstPtr, u32 dstPitch,
                    int width, int height);
-void SuperEagle32 (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
+void SuperEagle32 (u8 *srcPtr, u32 srcPitch,
                    u8 *dstPtr, u32 dstPitch, int width, int height);
 //hq2x.cpp
 //These require calling hq2x_init first and whenever bpp changes
-/*static void hq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, const u16* src2, unsigned count);
-static void hq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, const u32* src2, unsigned count);
-static void lq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, const u16* src2, unsigned count);
-static void lq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, const u32* src2, unsigned count);*/
 void hq2x_init(unsigned bits_per_pixel);
-void hq2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void hq2x32(u8 *srcPtr, u32 srcPitch,
             u8 *dstPtr, u32 dstPitch, int width, int height);
-void lq2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void lq2x32(u8 *srcPtr, u32 srcPitch,
             u8 *dstPtr, u32 dstPitch, int width, int height);
 
 //hq/asm/hq3x32.cpp
 //16 bit input, see below for 32 bit input
 // note: 16-bit input for asm version only!
 void hq3x32(unsigned char * pIn,  unsigned int srcPitch,
-            unsigned char *,
             unsigned char * pOut, unsigned int dstPitch,
             int Xres, int Yres);
 void hq4x32(unsigned char * pIn,  unsigned int srcPitch,
-            unsigned char *,
             unsigned char * pOut, unsigned int dstPitch,
             int Xres, int Yres);
 // this takes 32-bit input
 // (by converting to 16-bit first in asm version
-void hq3x32_32(unsigned char *pIn,  unsigned int srcPitch, unsigned char *, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres);
-void hq4x32_32(unsigned char *pIn,  unsigned int srcPitch, unsigned char *, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres);
+void hq3x32_32(unsigned char *pIn,  unsigned int srcPitch, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres);
+void hq4x32_32(unsigned char *pIn,  unsigned int srcPitch, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres);
 
 //sdl.cpp
 //Don't even know if these work or not
 extern bool sdlStretchInit(int colorDepth, int sizeMultiplier, int srcWidth);
 
-extern void sdlStretch1x(u8*,u32,u8*,u8*,u32,int,int);
-extern void sdlStretch2x(u8*,u32,u8*,u8*,u32,int,int);
-extern void sdlStretch3x(u8*,u32,u8*,u8*,u32,int,int);
-extern void sdlStretch4x(u8*,u32,u8*,u8*,u32,int,int);
+extern void sdlStretch1x(u8*,u32,u8*,u32,int,int);
+extern void sdlStretch2x(u8*,u32,u8*,u32,int,int);
+extern void sdlStretch3x(u8*,u32,u8*,u32,int,int);
+extern void sdlStretch4x(u8*,u32,u8*,u32,int,int);
 
 #endif //FILTERS_FILTERS_HPP

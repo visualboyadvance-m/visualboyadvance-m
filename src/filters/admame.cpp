@@ -472,7 +472,7 @@ static void internal_scale2x_32_def(u32* dst,
   dst[1] = src1[0];
 }
 
-void AdMame2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void AdMame2x32(u8 *srcPtr, u32 srcPitch,
                 u8 *dstPtr, u32 dstPitch, int width, int height)
 {
   u32 *dst0 = (u32 *)dstPtr;

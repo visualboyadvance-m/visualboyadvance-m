@@ -264,7 +264,7 @@ static void lq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, 
   }
 }
 
-void hq2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void hq2x32(u8 *srcPtr, u32 srcPitch,
             u8 *dstPtr, u32 dstPitch, int width, int height)
 {
   u32 *dst0 = (u32 *)dstPtr;
@@ -292,7 +292,7 @@ void hq2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
   hq2x_32_def(dst0, dst1, src0, src1, src1, width);
 }
 
-void lq2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void lq2x32(u8 *srcPtr, u32 srcPitch,
             u8 *dstPtr, u32 dstPitch, int width, int height)
 {
   u32 *dst0 = (u32 *)dstPtr;

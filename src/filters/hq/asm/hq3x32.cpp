@@ -38,7 +38,6 @@ int hq3xinited=0;
 
 //16 bit input, see below for 32 bit input
 void hq3x32(unsigned char * pIn,  unsigned int srcPitch,
-			unsigned char *,
 			unsigned char * pOut, unsigned int dstPitch,
 			int Xres, int Yres)
 {
@@ -79,7 +78,6 @@ void hq4x16(unsigned char * pIn,  unsigned int srcPitch,
 
 //16 bit input, see below for 32 bit input
 void hq4x32(unsigned char * pIn,  unsigned int srcPitch,
-			unsigned char *,
 			unsigned char * pOut, unsigned int dstPitch,
 			int Xres, int Yres)
 {

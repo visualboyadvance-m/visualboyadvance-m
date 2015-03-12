@@ -34,7 +34,7 @@ static void fill_rgb_row_32(u32 *from, int src_width, u8 *row, int width)
 }
 
 
-void Bilinear32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void Bilinear32(u8 *srcPtr, u32 srcPitch,
                 u8 *dstPtr, u32 dstPitch, int width, int height)
 {
   u8 row_cur[3*322];
@@ -118,7 +118,7 @@ void Bilinear32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
   }
 }
 
-void BilinearPlus32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void BilinearPlus32(u8 *srcPtr, u32 srcPitch,
                     u8 *dstPtr, u32 dstPitch, int width, int height)
 {
   u8 row_cur[3*322];

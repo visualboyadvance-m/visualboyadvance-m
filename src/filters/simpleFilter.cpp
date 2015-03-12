@@ -1,6 +1,6 @@
 #include "../System.h"
 
-void Simple2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void Simple2x32(u8 *srcPtr, u32 srcPitch,
                 u8 *dstPtr, u32 dstPitch, int width, int height)
 {
   u8 *nextLine, *finish;
@@ -37,7 +37,7 @@ void Simple2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
   while (--height);
 }
 
-void Simple3x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void Simple3x32(u8 *srcPtr, u32 srcPitch,
                 u8 *dstPtr, u32 dstPitch, int width, int height)
 {
 #define magnification	3
@@ -85,7 +85,7 @@ void Simple3x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 #undef colorBytes
 }
 
-void Simple4x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void Simple4x32(u8 *srcPtr, u32 srcPitch,
                 u8 *dstPtr, u32 dstPitch, int width, int height)
 {
 #define magnification	4

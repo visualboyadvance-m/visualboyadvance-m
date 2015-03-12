@@ -485,8 +485,6 @@ protected:
     int nthreads;
     wxSemaphore filt_done;
     const RENDER_PLUGIN_INFO *rpi; // also flag indicating plugin loaded
-    // largest buffer required is 32-bit * (max width + 1) * (max height + 2)
-    u8 delta[257 * 4 * 226];
 
     // following can't work in 2.8 as intended
     // inheriting from wxEvtHandler is required, but also breaks subclasses

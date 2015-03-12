@@ -304,7 +304,6 @@
 #endif
 
 unsigned char *pIn, unsigned int srcPitch,
-unsigned char *,
 unsigned char *pOut, unsigned int dstPitch,
 int Xres, int Yres )
 {
@@ -419,21 +418,6 @@ int Xres, int Yres )
 		pOut += ( _MAGNIFICATION - 1 ) * dstPitch;
 	}
 }
-
-#ifdef _32BIT
-	#ifdef _HQ3X
-void hq3x32_32(unsigned char *pIn,  unsigned int srcPitch, unsigned char *, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres)
-{
-  hq3x32(pIn, srcPitch, 0, pOut, dstPitch, Xres, Yres);
-}
-	#endif
-	#ifdef _HQ4X
-void hq4x32_32(unsigned char *pIn,  unsigned int srcPitch, unsigned char *, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres)
-{
-  hq4x32(pIn, srcPitch, 0, pOut, dstPitch, Xres, Yres);
-}
-	#endif
-#endif
 
 #undef SIZE_PIXEL
 #undef COLORTYPE

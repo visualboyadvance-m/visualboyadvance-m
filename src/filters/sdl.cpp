@@ -426,7 +426,7 @@ bool sdlStretchInit(int colorDepth, int sizeMultiplier, int srcWidth)
   return true;
 }
 
-void sdlStretch1x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height) {
+void sdlStretch1x(u8 *srcPtr, u32 srcPitch, u8 *dstPtr, u32 dstPitch, int width, int height) {
     int i;
 #ifndef C_CORE
     u32 *stretcher = (u32 *)sdlStretcher;
@@ -437,7 +437,7 @@ void sdlStretch1x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32
         dstPtr += dstPitch;
       }
 }
-void sdlStretch2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height) {
+void sdlStretch2x(u8 *srcPtr, u32 srcPitch, u8 *dstPtr, u32 dstPitch, int width, int height) {
     int i;
 #ifndef C_CORE
     u32 *stretcher = (u32 *)sdlStretcher;
@@ -450,7 +450,7 @@ void sdlStretch2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32
         dstPtr += dstPitch;
       }
 }
-void sdlStretch3x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height) {
+void sdlStretch3x(u8 *srcPtr, u32 srcPitch, u8 *dstPtr, u32 dstPitch, int width, int height) {
     int i;
 #ifndef C_CORE
     u32 *stretcher = (u32 *)sdlStretcher;
@@ -465,7 +465,7 @@ void sdlStretch3x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32
         dstPtr += dstPitch;
       }
 }
-void sdlStretch4x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height) {
+void sdlStretch4x(u8 *srcPtr, u32 srcPitch, u8 *dstPtr, u32 dstPitch, int width, int height) {
     int i;
 #ifndef C_CORE
     u32 *stretcher = (u32 *)sdlStretcher;

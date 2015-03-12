@@ -6,12 +6,12 @@ extern "C"
 {
 
 #ifdef MMX
-  void _2xSaILine (u8 *srcPtr, u8 *deltaPtr, u32 srcPitch,
+  void _2xSaILine (u8 *srcPtr, u32 srcPitch,
                    u32 width, u8 *dstPtr, u32 dstPitch);
-  void _2xSaISuperEagleLine (u8 *srcPtr, u8 *deltaPtr,
+  void _2xSaISuperEagleLine (u8 *srcPtr,
                              u32 srcPitch, u32 width,
                              u8 *dstPtr, u32 dstPitch);
-  void _2xSaISuper2xSaILine (u8 *srcPtr, u8 *deltaPtr,
+  void _2xSaISuper2xSaILine (u8 *srcPtr,
                              u32 srcPitch, u32 width,
                              u8 *dstPtr, u32 dstPitch);
     void Init_2xSaIMMX (u32 BitFormat);
@@ -220,7 +220,7 @@ static inline int GetResult2_32 (u32 A, u32 B, u32 C, u32 D,
 #define GREEN_MASK555 0x03E003E0
 
 void Super2xSaI32 (u8 *srcPtr, u32 srcPitch,
-                   u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch,
+                   u8 *dstPtr, u32 dstPitch,
                    int width, int height)
 {
   u32 *bP;
@@ -339,16 +339,14 @@ void Super2xSaI32 (u8 *srcPtr, u32 srcPitch,
 
     srcPtr   += srcPitch;
     dstPtr   += dstPitch << 1;
-    //        deltaPtr += srcPitch;
   }                 // endof: for (; height; height--)
 }
 
-void SuperEagle32 (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
+void SuperEagle32 (u8 *srcPtr, u32 srcPitch,
                    u8 *dstPtr, u32 dstPitch, int width, int height)
 {
   u32  *dP;
   u32 *bP;
-  u32 *xP;
   u32 inc_bP;
 
   inc_bP = 1;
@@ -357,7 +355,6 @@ void SuperEagle32 (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
 
   for (; height; height--) {
     bP = (u32 *) srcPtr;
-    xP = (u32 *) deltaPtr;
     dP = (u32 *)dstPtr;
     for (u32 finish = width; finish; finish -= inc_bP) {
       u32 color4, color5, color6;
@@ -458,20 +455,17 @@ void SuperEagle32 (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
       *(dP+1) = product1b;
       *(dP + (dstPitch >> 2)) = product2a;
       *(dP + (dstPitch >> 2) +1) = product2b;
-      *xP = color5;
 
       bP += inc_bP;
-      xP += inc_bP;
       dP += 2;
     }                 // end of for ( finish= width etc..)
 
     srcPtr += srcPitch;
     dstPtr += dstPitch << 1;
-    deltaPtr += srcPitch;
   }                   // endof: for (height; height; height--)
 }
 
-void _2xSaI32 (u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
+void _2xSaI32 (u8 *srcPtr, u32 srcPitch,
                u8 *dstPtr, u32 dstPitch, int width, int height)
 {
   u32  *dP;
@@ -620,7 +614,6 @@ void _2xSaI32 (u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 
     srcPtr += srcPitch;
     dstPtr += dstPitch << 1;
-    //    deltaPtr += srcPitch;
   }                   // endof: for (height; height; height--)
 }
 

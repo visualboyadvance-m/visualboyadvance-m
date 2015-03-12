@@ -982,8 +982,6 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
     wxObject(), width(_width), height(_height), scale(1), todraw(0),
     pixbuf1(0), pixbuf2(0), rpi(0), nthreads(0)
 {
-    memset(delta, 0xff, sizeof(delta));
-
     myFilter = new filter(std::string(gopts.filter.mb_str(wxConvUTF8)));
 
     iFilter = interframe_factory::createIFB((ifbfunc)gopts.ifb);
@@ -1062,7 +1060,7 @@ public:
     unsigned int nthreads, threadno;
     unsigned int width, height, scale;
     const RENDER_PLUGIN_INFO *rpi;
-    u32 *dst, *delta;
+    u32 *dst;
     filter * mainFilter;
     interframe_filter * iFilter;
 
@@ -1086,8 +1084,6 @@ public:
 
     //There is a 1 pixel border not included in the official width
 	width += 1;
-
-	delta += width * band_lower;
 
 	while(nthreads == 1 || sig.Wait() == wxCOND_NO_ERROR) {
 	    if(!src /* && nthreads > 1 */ ) {
@@ -1118,7 +1114,7 @@ public:
 
 	    // naturally, any of these with accumulation buffers like those of
 	    // the IFB filters will screw up royally as well
-        mainFilter->run(reinterpret_cast<u8 *>(src), reinterpret_cast<u8 *>(delta), reinterpret_cast<u8 *>(dst), band_height);
+        mainFilter->run(reinterpret_cast<u8 *>(src), reinterpret_cast<u8 *>(dst), band_height);
 
         if(nthreads == 1)
             return 0;
@@ -1186,7 +1182,6 @@ void DrawingPanel::DrawArea(u8 **data)
 	    threads[0].scale = scale;
 	    threads[0].src = reinterpret_cast<u32 *>(*data);
 	    threads[0].dst = reinterpret_cast<u32 *>(todraw);
-	    threads[0].delta = reinterpret_cast<u32 *>(delta);
 	    threads[0].rpi = rpi;
         threads[0].mainFilter=myFilter;
         threads[0].iFilter=iFilter;
@@ -1200,7 +1195,6 @@ void DrawingPanel::DrawArea(u8 **data)
 		    threads[i].height = height;
 		    threads[i].scale = scale;
 		    threads[i].dst = reinterpret_cast<u32 *>(todraw);
-		    threads[i].delta = reinterpret_cast<u32 *>(delta);
 		    threads[i].rpi = rpi;
             threads[i].mainFilter=myFilter;
             threads[i].iFilter=iFilter;
