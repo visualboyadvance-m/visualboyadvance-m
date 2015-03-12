@@ -24,8 +24,8 @@ const std::map<std::string,FilterFunc> makeFilterMap()
     tempMap.insert(namedfilter("Super Eagle",SuperEagle32));
 
     //These require calling hq2x_init first and whenever bpp changes
-    tempMap.insert(namedfilter("hq2x",hq2x32));
-    tempMap.insert(namedfilter("lq2x",lq2x32));
+    tempMap.insert(namedfilter("HQ 2x",hq2x32));
+    tempMap.insert(namedfilter("LQ 2x",lq2x32));
 
     tempMap.insert(namedfilter("HQ 3x",hq3x32));
     tempMap.insert(namedfilter("HQ 4x",hq4x32));
