@@ -41,7 +41,16 @@ void CheckPointer(T pointer)
         throw std::runtime_error(errormessage);
     }
 }
+///Helper functions to convert WX's crazy string types to std::string
 
+inline std::string ToString(wxCharBuffer aString)
+{
+    return std::string(aString);
+}
+inline std::string ToString(const wxChar* aString)
+{
+    return std::string(wxString(aString).mb_str(wxConvUTF8));
+}
 
 class MainFrame;
 

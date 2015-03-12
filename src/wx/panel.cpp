@@ -1232,16 +1232,11 @@ void DrawingPanel::DrawArea(u8 **data)
 		     10, 20, panel->osdstat.utf8_str(), gopts.osd_transparent);
 	if(!gopts.no_osd_status && !panel->osdtext.empty()) {
 	    if(systemGetClock() - panel->osdtime < OSD_TIME) {
+        std::string message = ToString(panel->osdtext);
 		int linelen = (width * scale - 20) / 8;
-		// auto-conversion of wxCharBuffer to const char * seems broken
-		// so save underlying wxCharBuffer (or create one of none is used)
-		wxCharBuffer msg_mb = panel->osdtext.mb_str();
-		int msglen = strlen(msg_mb.data());
-		char msg[msglen + 1];
-		memcpy(msg, msg_mb.data(), msglen + 1);
-		int nlines = (msglen + linelen - 1) / linelen;
+		int nlines = (message.length() + linelen - 1) / linelen;
 		int cury = height - 14 - nlines * 10;
-		char *ptr = msg;
+        char *ptr = const_cast<char *>(message.c_str());
 		while(nlines > 1) {
 		    char lchar = ptr[linelen];
 		    ptr[linelen] = 0;

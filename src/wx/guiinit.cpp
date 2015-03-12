@@ -1925,16 +1925,6 @@ public:
 } throttle_ctrl;
 
 /////////////////////////////
-///Helper functions to convert WX's crazy string types to std::string
-
-std::string ToString(wxCharBuffer aString)
-{
-    return std::string(aString);
-}
-std::string ToString(const wxChar* aString)
-{
-    return std::string(wxString(aString).mb_str(wxConvUTF8));
-}
 
 ///Check if a pointer from the XRC file is valid.  If it's not, throw an error telling the user.
 template <typename T>
