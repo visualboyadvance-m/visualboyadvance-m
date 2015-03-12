@@ -6,6 +6,7 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
+#include <cstring>  //For memcpy
 
 #include "../common/Types.h"
 
@@ -118,7 +119,8 @@ public:
         }
         else
         {
-            throw std::runtime_error("ERROR:  Filter does not exist!");
+            //If the filter doesn't exist, then we still need to get the data to the output buffer
+            std::memcpy(dstPtr,srcPtr, horiz_bytes_out*height*myScale);
         }
     }
     /**

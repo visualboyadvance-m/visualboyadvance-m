@@ -50,8 +50,8 @@ void convert32To24(u32* src,u8* dst,unsigned int width, unsigned int height)
 //         dst[i*3]=((src[i])&0xFF) | ((src[i]>>8)&0xFF) | ((src[i]>>16)&0xFF);
 //     }
 
-    for(int y = 0; y < height ; y++) {
-        for(int x = 0; x < width; x++, src++) {
+    for(unsigned int y = 0; y < height ; y++) {
+        for(unsigned int x = 0; x < width; x++, src++) {
             *dst++ = *src;
             *dst++ = *src >> 8;
             *dst++ = *src >> 16;

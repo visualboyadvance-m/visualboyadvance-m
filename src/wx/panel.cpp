@@ -1122,33 +1122,27 @@ void DrawingPanel::DrawArea(u8 **data)
     // First, apply filters, if applicable, in parallel, if enabled
     if(myFilter->exists() || iFilter->exists() ) {
 	if(nthreads != gopts.max_threads) {
+
+        // first time around, no threading in order to avoid
+        // static initializer conflicts
+        iFilter->run(reinterpret_cast<u32 *>(*data));
+        myFilter->run(reinterpret_cast<u32 *>(*data), reinterpret_cast<u32 *>(&todraw), height);
+
+        //Kill and delete all threads
 	    if(nthreads) {
-		if(nthreads > 1)
-		    for(int i = 0; i < nthreads; i++) {
-			threads[i].lock.Lock();
-			threads[i].src = NULL;
-			threads[i].sig.Signal();
-			threads[i].lock.Unlock();
-			threads[i].Wait();
-		    }
-		delete[] threads;
+            if(nthreads > 1)
+                for(int i = 0; i < nthreads; i++) {
+                threads[i].lock.Lock();
+                threads[i].src = NULL;
+                threads[i].sig.Signal();
+                threads[i].lock.Unlock();
+                threads[i].Wait();
+                }
+            delete[] threads;
 	    }
+        // Create and start up new threads
 	    nthreads = gopts.max_threads;
 	    threads = new FilterThread[nthreads];
-	    // first time around, no threading in order to avoid
-	    // static initializer conflicts
-	    threads[0].threadno = 0;
-	    threads[0].nthreads = 1;
-	    threads[0].width = width;
-	    threads[0].height = height;
-	    threads[0].scale = scale;
-	    threads[0].src = reinterpret_cast<u32 *>(*data);
-	    threads[0].dst = reinterpret_cast<u32 *>(&todraw);
-	    threads[0].rpi = rpi;
-        threads[0].mainFilter=myFilter;
-        threads[0].iFilter=iFilter;
-	    threads[0].Entry();
-	    // go ahead and start the threads up, though
 	    if(nthreads > 1) {
 		for(int i = 0; i < nthreads; i++) {
 		    threads[i].threadno = i;
