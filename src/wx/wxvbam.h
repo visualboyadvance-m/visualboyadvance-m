@@ -484,7 +484,6 @@ public:
 
 protected:
     virtual void DrawArea(wxWindowDC&) = 0;
-    filter * myFilter;
     int width, height, scale;
     // largest buffer required is 32-bit * (max width + 1) * (max height + 2) * (4x4) scaling factor
     u8 todraw[257 * 226 * 4 * 16];

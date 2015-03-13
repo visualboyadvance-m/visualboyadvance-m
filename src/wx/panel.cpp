@@ -1023,6 +1023,11 @@ public:
             delete iFilter;
             iFilter = NULL;
         }
+        if(mainFilter)
+        {
+            delete mainFilter;
+            mainFilter = NULL;
+        }
     }
 
     wxMutex lock;
@@ -1042,6 +1047,8 @@ public:
 
     ExitCode Entry()
     {
+    scale = mainFilter->getScale();
+
 	// This is the lower height value of the band this thread will process
 	int band_lower = height * threadno;
 
@@ -1079,26 +1086,10 @@ public:
 
 DrawingPanel::DrawingPanel(int _width, int _height) :
     wxObject(), width(_width+1), height(_height), scale(1),
-    nthreads(gopts.max_threads)
+    nthreads(gopts.max_threads),isFiltered(false)
 {
     //Clear the output buffer
     memset (todraw,0x00,257 * 4 * 16 * 226);
-
-    if(nthreads){
-        myFilter = new filter(ToString(gopts.filter),width,height/nthreads);
-    }
-    else
-    {
-        myFilter = new filter(ToString(gopts.filter),width,height);
-    }
-
-    scale = myFilter->getScale();
-
-    isFiltered = interframe_factory::exists((ifbfunc)gopts.ifb) || myFilter->exists();
-
-    //Do a quick run to initialize the filter
-    //\TODO:  Fix the filters so this is no longer needed
-//     myFilter->run(reinterpret_cast<u32 *>(&todraw), reinterpret_cast<u32 *>(&todraw), height);
 
     // Create and start up new threads
     if(nthreads) {
@@ -1112,15 +1103,17 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
             threads[i].nthreads = nthreads;
             threads[i].width = width;
             threads[i].height = band_height;
-            threads[i].scale = scale;
             threads[i].dst = reinterpret_cast<u32 *>(&todraw);
-            threads[i].mainFilter=myFilter;
+            threads[i].mainFilter=new filter(ToString(gopts.filter),width,band_height);
             threads[i].iFilter=interframe_factory::createIFB((ifbfunc)gopts.ifb,width,band_height);
             threads[i].done = &filt_done;
             threads[i].lock.Lock();
             threads[i].Create();
             threads[i].Run();
         }
+        //Set some important variables
+        scale=threads[0].scale;
+        isFiltered = threads[0].mainFilter->exists() || interframe_factory::exists((ifbfunc)gopts.ifb);
     }
 
     std::cerr << "width: " << width << " Height:  " << height << std::endl;
@@ -1193,12 +1186,6 @@ DrawingPanel::~DrawingPanel()
             threads[i].Wait();
         }
         delete[] threads;
-    }
-    //Filter cleanup
-    if(myFilter)
-    {
-        delete myFilter;
-        myFilter = NULL;
     }
 }
 
