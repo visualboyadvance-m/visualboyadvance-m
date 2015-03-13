@@ -1006,8 +1006,14 @@ void DrawingPanel::PaintEv(wxPaintEvent &ev)
 //   interface, I will allow them to be threaded at user's discretion.
 class FilterThread : public wxThread
 {
+private:
+    // largest buffer required is 32-bit * (max width + 1) * (max height + 2) * (4x4) scaling factor
+    u32 buffer[257 * 226 * 16];
 public:
-    FilterThread() : wxThread(wxTHREAD_JOINABLE), lock(), sig(lock) {}
+    FilterThread() : wxThread(wxTHREAD_JOINABLE), lock(), sig(lock) {
+        //Clear the buffer
+        memset (buffer,0x00,257 * 4 * 16 * 226);
+    }
 
     //Cleanup on exit
     ~FilterThread()
@@ -1028,7 +1034,7 @@ public:
     unsigned int width, height, scale;
     u32 *dst;
     filter * mainFilter;
-    interframe_filter * iFilter;
+    filter_base * iFilter;
 
     // set this param every round
     // if NULL, end thread
@@ -1059,11 +1065,11 @@ public:
         src += width * band_lower;
 
         //Run the interframe blending filter
-        iFilter->run(src);
+        iFilter->run(src,buffer);
 
 	    // naturally, any of these with accumulation buffers like those of
 	    // the IFB filters will screw up royally as well
-        mainFilter->run(src, dst, height);
+        mainFilter->run(buffer, dst, height);
 
         done->Post();
 	}
