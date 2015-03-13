@@ -10,9 +10,6 @@
 int systemVerbose;
 int systemFrameSkip;
 
-int systemRedShift;
-int systemGreenShift;
-int systemBlueShift;
 int systemColorDepth;
 u16 systemColorMap16[0x10000];
 u32 systemColorMap32[0x10000];
@@ -25,7 +22,6 @@ u16 systemGbPalette[24] = {
     gs555(0x1f), gs555(0x15), gs555(0x0c), 0,
     gs555(0x1f), gs555(0x15), gs555(0x0c), 0
 };
-int RGB_LOW_BITS_MASK;
 
 // these are local, though.
 int joypress[4], autofire;

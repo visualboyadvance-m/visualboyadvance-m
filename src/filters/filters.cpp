@@ -61,3 +61,16 @@ void convert32To24(u32* src,u8* dst,unsigned int width, unsigned int height)
         }
     }
 }
+
+// Intialize color tables
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+    extern int systemRedShift    = 3;
+    extern int systemGreenShift  = 11;
+    extern int systemBlueShift   = 19;
+    extern int RGB_LOW_BITS_MASK = 0x00010101;
+#else
+    extern int systemRedShift    = 27;
+    extern int systemGreenShift  = 19;
+    extern int systemBlueShift   = 11;
+    extern int RGB_LOW_BITS_MASK = 0x01010100;
+#endif

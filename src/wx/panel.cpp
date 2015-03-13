@@ -1116,18 +1116,6 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
     std::cerr << "width: " << width << " Height:  " << height << std::endl;
     systemColorDepth = 32;
 
-    // Intialize color tables
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
-    systemRedShift    = 3;
-    systemGreenShift  = 11;
-    systemBlueShift   = 19;
-    int RGB_LOW_BITS_MASK = 0x00010101;
-#else
-    systemRedShift    = 27;
-    systemGreenShift  = 19;
-    systemBlueShift   = 11;
-    int RGB_LOW_BITS_MASK = 0x01010100;
-#endif
     // FIXME: should be "true" for GBA carts if lcd mode selected
     // which means this needs to be re-run at pref change time
     utilUpdateSystemColorMaps(false);
