@@ -9,6 +9,7 @@
 #include <cstring>  //For memcpy
 
 #include "../common/Types.h"
+#include "filter_base.hpp"
 
 //sdl
 // Function pointer type for a filter function
@@ -49,7 +50,8 @@ public:
 
 ///This is the parent class of all the filters
 ///TODO:  Actually subclass these instead of cheating
-class filter {
+class filter : public filter_base
+{
 private:
     //No default constructor for this class
     filter();
@@ -59,39 +61,23 @@ private:
     FilterFunc myFilter;
     ///The internal scale
     int myScale;
-    ///The filter's width
-    unsigned int width;
-    ///Don't need to calculate these every time (based off width)
+    //Don't need to calculate these every time (based off width)
+    ///The number of pixels per horizontal row
     unsigned int horiz_bytes;
+    ///The number of pixels per output horizontal row
     unsigned int horiz_bytes_out;
 public:
-    filter(std::string myName):
-        name(myName), myFilter(filters::GetFilter(myName)), myScale(filters::GetFilterScale(myName)),
-        width(0), horiz_bytes(0), horiz_bytes_out(0)
+    filter(std::string myName,unsigned int _width,unsigned int _height):
+        filter_base(_width,_height),
+        name(myName), myFilter(filters::GetFilter(myName)),
+        myScale(filters::GetFilterScale(myName)),
+        horiz_bytes(_width * 4), horiz_bytes_out(_width * 4 * filters::GetFilterScale(myName))
     {
 //         std::cerr << name << std::endl;
     }
     std::string getName()
     {
         return name;
-    }
-    ///Set the number of pixels per horizontal row
-    ///
-    ///Always use this after initialization if using the new run function.
-    void setWidth(unsigned int _width)
-    {
-        width = _width;
-
-        //32 bit filter, so 4 bytes per pixel
-        //  The +1 is for a 1 pixel border that the emulator spits out
-        horiz_bytes = width * 4;
-        //Unfortunately, the filter keeps the border on the scaled output, but DOES NOT scale it
-        horiz_bytes_out = horiz_bytes * myScale;
-
-    }
-    unsigned int getWidth()
-    {
-        return width;
     }
     int getScale()
     {
@@ -106,38 +92,17 @@ public:
      * \param[in] srcPtr        A pointer to the input 32 bit RGB Pixel Array
      * \param[in] dstPtr        A pointer to the output 32 bit RGB Pixel Array
      */
-    void run(u32 *srcPtr, u32 *dstPtr, int height)
+    void run(u32 *srcPtr, u32 *dstPtr)
     {
-        if(!width)
-        {
-             throw std::runtime_error("ERROR:  Filter width not set");
-        }
-
         if(myFilter!=NULL)
         {
-            myFilter(reinterpret_cast<u8 *>(srcPtr),horiz_bytes,reinterpret_cast<u8 *>(dstPtr),horiz_bytes_out,width,height);
+            myFilter(reinterpret_cast<u8 *>(srcPtr),horiz_bytes,reinterpret_cast<u8 *>(dstPtr),horiz_bytes_out,getWidth(),getHeight());
         }
         else
         {
             //If the filter doesn't exist, then we still need to get the data to the output buffer
-            std::memcpy(dstPtr,srcPtr, horiz_bytes_out*height*myScale);
+            std::memcpy(dstPtr,srcPtr, horiz_bytes_out*getHeight()*myScale);
         }
-    }
-    /**
-     * DEPRECATED  Run the filter
-     *
-     * \param[in] srcPtr        A pointer to a 16/32 bit RGB Pixel Array
-     * \param[in] srcPitch     The number of bytes per single horizontal line
-     */
-    void run(u8 *srcPtr, u32 srcPitch, u8 *dstPtr, u32 dstPitch, int width, int height)
-    {
-        setWidth(width);
-        //Make sure the math was correct
-        if( (srcPitch != horiz_bytes) || dstPitch != horiz_bytes_out )
-        {
-            throw std::runtime_error("ERROR:  Filter programmer is an idiot, and messed up an important calculation!");
-        }
-        run(reinterpret_cast<u32 *>(srcPtr), reinterpret_cast<u32 *>(dstPtr), height);
     }
     bool exists()
     {

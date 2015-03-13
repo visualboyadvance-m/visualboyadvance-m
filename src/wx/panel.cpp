@@ -1069,7 +1069,7 @@ public:
 
 	    // naturally, any of these with accumulation buffers like those of
 	    // the IFB filters will screw up royally as well
-        mainFilter->run(buffer, dst, height);
+        mainFilter->run(buffer, dst);
 
         done->Post();
 	}
@@ -1079,24 +1079,28 @@ public:
 
 DrawingPanel::DrawingPanel(int _width, int _height) :
     wxObject(), width(_width+1), height(_height), scale(1),
-    nthreads(0)
+    nthreads(gopts.max_threads)
 {
     //Clear the output buffer
     memset (todraw,0x00,257 * 4 * 16 * 226);
 
-    myFilter = new filter(std::string(gopts.filter.mb_str(wxConvUTF8)));
+    if(nthreads){
+        myFilter = new filter(ToString(gopts.filter),width,height/nthreads);
+    }
+    else
+    {
+        myFilter = new filter(ToString(gopts.filter),width,height);
+    }
 
     scale = myFilter->getScale();
-    myFilter->setWidth(width);
 
     isFiltered = interframe_factory::exists((ifbfunc)gopts.ifb) || myFilter->exists();
 
     //Do a quick run to initialize the filter
     //\TODO:  Fix the filters so this is no longer needed
-    myFilter->run(reinterpret_cast<u32 *>(&todraw), reinterpret_cast<u32 *>(&todraw), height);
+//     myFilter->run(reinterpret_cast<u32 *>(&todraw), reinterpret_cast<u32 *>(&todraw), height);
 
     // Create and start up new threads
-    nthreads = gopts.max_threads;
     if(nthreads) {
         //The filter is run with each thread handling bands of data
         //This is how tall each of those bands are
