@@ -212,4 +212,3 @@ void BilinearPlus32(u8 *srcPtr, u32 srcPitch,
     to_odd = (u32 *)((u8 *)to + dstPitch);
   }
 }
-
