@@ -32,23 +32,16 @@ SmartIB::~SmartIB()
   frm1 = frm2 = frm3 = NULL;
 }
 
-void SmartIB::run(u32 *srcPtr, unsigned int num_threads,unsigned int thread_number)
+void SmartIB::run(u32 *srcPtr)
 {
-    //Actual width needs to take into account the +1 border
-    unsigned int width = getWidth() +1;
-    //Height to process (for multithreading)
-    unsigned int band_height = getHeight() / num_threads;
-    //First pixel to operate on (for multithreading)
-    u32 offset = band_height * thread_number * width;
-
-    u32 *src0 = srcPtr + offset;
-    u32 *src1 = frm1 + offset;
-    u32 *src2 = frm2 + offset;
-    u32 *src3 = frm3 + offset;
+    u32 *src0 = srcPtr;
+    u32 *src1 = frm1;
+    u32 *src2 = frm2;
+    u32 *src3 = frm3;
 
     u32 colorMask = 0xfefefe;
 
-    for (unsigned int i = 0; i < width*band_height;  i++)
+    for (unsigned int i = 0; i < getWidth()*getHeight();  i++)
     {
         u32 color = src0[i];
         src0[i] =
@@ -81,21 +74,14 @@ MotionBlurIB::~MotionBlurIB()
   frm1=NULL;
 }
 
-void MotionBlurIB::run(u32 *srcPtr, unsigned int num_threads,unsigned int thread_number)
+void MotionBlurIB::run(u32 *srcPtr)
 {
-    //Actual width needs to take into account the +1 border
-    unsigned int width = getWidth() +1;
-    //Height to process (for multithreading)
-    unsigned int band_height = getHeight() / num_threads;
-    //First pixel to operate on (for multithreading)
-    u32 offset = band_height * thread_number * width;
-
-    u32 *src0 = srcPtr + offset;
-    u32 *src1 = frm1 + offset;
+    u32 *src0 = srcPtr;
+    u32 *src1 = frm1;
 
     u32 colorMask = 0xfefefe;
 
-    for (unsigned int i = 0; i < width*band_height;  i++)
+    for (unsigned int i = 0; i < getWidth()*getHeight();  i++)
     {
         u32 color = src0[i];
         src0[i] = (((color & colorMask) >> 1) +

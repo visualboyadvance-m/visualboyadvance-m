@@ -29,7 +29,7 @@ public:
     unsigned int getWidth() {return width;}
     unsigned int getHeight() {return height;}
     ///New smarter Interframe function
-    virtual void run(u32 *srcPtr, unsigned int num_threads=1,unsigned int thread_number=0) {}
+    virtual void run(u32 *srcPtr) {}
     virtual bool exists() {return false;}
 };
 
@@ -49,7 +49,7 @@ public:
     SmartIB(unsigned int _width,unsigned int _height);
     ~SmartIB();
     std::string getName() {return "SmartIB";}
-    void run(u32 *srcPtr, unsigned int num_threads=1,unsigned int thread_number=0);
+    void run(u32 *srcPtr);
     bool exists() {return true;}
 };
 
@@ -63,7 +63,7 @@ public:
     MotionBlurIB(unsigned int _width,unsigned int _height);
     ~MotionBlurIB();
     std::string getName() {return "MotionBlurIB";}
-    void run(u32 *srcPtr, unsigned int num_threads=1,unsigned int thread_number=0);
+    void run(u32 *srcPtr);
     bool exists() {return true;}
 };
 
@@ -79,7 +79,8 @@ class interframe_factory
 public:
     static interframe_filter * createIFB(ifbfunc filter_select,unsigned int width,unsigned int height)
     {
-        switch(filter_select) {
+        switch(filter_select)
+        {
             case IFB_SMART:
                 return new SmartIB(width,height);
                 break;
@@ -90,6 +91,19 @@ public:
                 return new interframe_filter();
                 break;
         }
+    }
+    static bool exists(ifbfunc filter_select)
+    {
+       switch(filter_select)
+       {
+            case IFB_SMART:
+            case IFB_MOTION_BLUR:
+                return true;
+                break;
+            default:
+                return false;
+                break;
+       }
     }
 };
 

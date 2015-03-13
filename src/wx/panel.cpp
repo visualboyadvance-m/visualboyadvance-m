@@ -1007,6 +1007,16 @@ class FilterThread : public wxThread
 public:
     FilterThread() : wxThread(wxTHREAD_JOINABLE), lock(), sig(lock) {}
 
+    //Cleanup on exit
+    ~FilterThread()
+    {
+        if(iFilter)
+        {
+            delete iFilter;
+            iFilter = NULL;
+        }
+    }
+
     wxMutex lock;
     wxCondition sig;
     wxSemaphore *done;
@@ -1024,16 +1034,14 @@ public:
 
     ExitCode Entry()
     {
-    //The filter is run with each thread handling bands of data
-    //This is how tall each of those bands are
-    unsigned int band_height = height/nthreads;
 	// This is the lower height value of the band this thread will process
-	int band_lower = band_height * threadno;
+	int band_lower = height * threadno;
 
     //Set the starting location for the destination buffer
     dst += width * scale * band_lower * scale;
 
 	while(sig.Wait() == wxCOND_NO_ERROR) {
+        //If no source, do thread cleanup before exiting
 	    if(!src ) {
             lock.Unlock();
             return (wxThread::ExitCode) 0;
@@ -1045,15 +1053,15 @@ public:
             return (wxThread::ExitCode) -1;
         }
 
-        //Run the interframe blending filter
-        iFilter->run(src, nthreads, threadno);
+        //Set the start of the source pointer to the first pixel of the appropriate height
+        src += width * band_lower;
 
-	    //Set the start of the source pointer to the first pixel of the appropriate height
-	    src += width * band_lower;
+        //Run the interframe blending filter
+        iFilter->run(src);
 
 	    // naturally, any of these with accumulation buffers like those of
 	    // the IFB filters will screw up royally as well
-        mainFilter->run(src, dst, band_height);
+        mainFilter->run(src, dst, height);
 
         done->Post();
 	}
@@ -1070,10 +1078,10 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
 
     myFilter = new filter(std::string(gopts.filter.mb_str(wxConvUTF8)));
 
-    iFilter = interframe_factory::createIFB((ifbfunc)gopts.ifb,width,height);
-
     scale = myFilter->getScale();
     myFilter->setWidth(width);
+
+    isFiltered = interframe_factory::exists((ifbfunc)gopts.ifb) || myFilter->exists();
 
     //Do a quick run to initialize the filter
     //\TODO:  Fix the filters so this is no longer needed
@@ -1082,16 +1090,20 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
     // Create and start up new threads
     nthreads = gopts.max_threads;
     if(nthreads) {
+        //The filter is run with each thread handling bands of data
+        //This is how tall each of those bands are
+        unsigned int band_height = height/nthreads;
+        //Create and initialize the threads
         threads = new FilterThread[nthreads];
         for(int i = 0; i < nthreads; i++) {
             threads[i].threadno = i;
             threads[i].nthreads = nthreads;
             threads[i].width = width;
-            threads[i].height = height;
+            threads[i].height = band_height;
             threads[i].scale = scale;
             threads[i].dst = reinterpret_cast<u32 *>(&todraw);
             threads[i].mainFilter=myFilter;
-            threads[i].iFilter=iFilter;
+            threads[i].iFilter=interframe_factory::createIFB((ifbfunc)gopts.ifb,width,band_height);
             threads[i].done = &filt_done;
             threads[i].lock.Lock();
             threads[i].Create();
@@ -1188,12 +1200,6 @@ DrawingPanel::~DrawingPanel()
         delete myFilter;
         myFilter = NULL;
     }
-    //Interframe Filter cleanup
-    if(iFilter)
-    {
-        delete iFilter;
-        iFilter = NULL;
-    }
 }
 
 IMPLEMENT_CLASS2(BasicDrawingPanel, DrawingPanel, wxPanel)
@@ -1207,7 +1213,7 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow *parent, int _width, int _height)
 	      wxFULL_REPAINT_ON_RESIZE), DrawingPanel(_width, _height)
 {
     // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require 32, though
-    if(!myFilter->exists() && !iFilter->exists())
+    if(!isFiltered)
     {
         // changing from 32 to 24 does not require regenerating color tables
         systemColorDepth = 24;
