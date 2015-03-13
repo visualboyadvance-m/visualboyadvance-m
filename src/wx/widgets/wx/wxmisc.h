@@ -28,6 +28,9 @@ protected:
 // may be attached to radio button or checkbox
 class wxBoolIntValidator : public wxValidator
 {
+protected:
+    int* vptr;
+    int val, mask;
 public:
     wxBoolIntValidator(int *_vptr, int _val, int _mask = ~0) : wxValidator(),
 	vptr(_vptr), val(_val), mask(_mask) {}
@@ -37,8 +40,6 @@ public:
     bool TransferToWindow();
     bool TransferFromWindow();
     bool Validate(wxWindow *p) { return true; }
-protected:
-    int val, mask, *vptr;
 };
 
 // boolean copy-only validator with reversed value
@@ -82,7 +83,7 @@ class wxColorValidator : public wxValidator
 {
 public:
     wxColorValidator(uint32_t *vptr) : wxValidator(), ptr32(vptr), ptr16(0) {}
-    wxColorValidator(uint16_t *vptr) : wxValidator(), ptr16(vptr), ptr32(0) {}
+    wxColorValidator(uint16_t *vptr) : wxValidator(), ptr32(0), ptr16(vptr) {}
     wxColorValidator(const wxColorValidator &v) : wxValidator(),
 	ptr32(v.ptr32), ptr16(v.ptr16) {}
     wxObject *Clone() const { return new wxColorValidator(*this); }

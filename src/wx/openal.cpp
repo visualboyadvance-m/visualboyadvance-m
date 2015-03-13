@@ -26,7 +26,7 @@
 #ifdef winlog
 #undef winlog
 #endif
-#define winlog //
+#define winlog(...) {}
 #define debugState() //
 #endif
 
@@ -481,10 +481,9 @@ bool OpenAL::GetDevices(wxArrayString &names, wxArrayString &ids)
 		ids.push_back(names[names.size() - 1]);
 		devs += strlen(devs) + 1;
 	}
-#else
+#endif
 	// should work anyway, but must always use default driver
 	return true;
-#endif
 }
 
 #endif
