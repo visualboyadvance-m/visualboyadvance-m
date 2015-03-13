@@ -3197,7 +3197,7 @@ void MainFrame::set_global_accels()
         // set the table on the panel, where focus usually is
         // otherwise accelerators are lost sometimes
         panel->SetAcceleratorTable(atab);
-        delete tab;
+        delete[] tab;
     }
     else
     {

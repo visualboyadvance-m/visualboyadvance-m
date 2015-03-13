@@ -57,7 +57,7 @@ class MainFrame;
 class wxvbamApp : public wxApp
 {
 public:
-    wxvbamApp() : wxApp(), pending_fullscreen(false) {}
+    wxvbamApp() : wxApp(), pending_fullscreen(false),cfg(NULL),overrides(NULL),frame(NULL) {}
     virtual bool OnInit();
     virtual void OnInitCmdLine(wxCmdLineParser &);
     virtual bool OnCmdLineParsed(wxCmdLineParser &);
