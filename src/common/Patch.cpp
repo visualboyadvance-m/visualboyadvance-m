@@ -120,7 +120,7 @@ static uLong computePatchCRC(FILE *f, unsigned int size)
   return crc;
 }
 
-static bool patchApplyIPS(const char *patchname, u8 **r, int *s)
+static bool patchApplyIPS(const char *patchname, u8 **r, unsigned int *s)
 {
   // from the IPS spec at http://zerosoft.zophar.net/ips.htm
   FILE *f = fopen(patchname, "rb");
@@ -130,7 +130,7 @@ static bool patchApplyIPS(const char *patchname, u8 **r, int *s)
   bool result = false;
 
   u8 *rom = *r;
-  int size = *s;
+  unsigned int size = *s;
   if(fgetc(f) == 'P' &&
      fgetc(f) == 'A' &&
      fgetc(f) == 'T' &&
@@ -185,7 +185,7 @@ static bool patchApplyIPS(const char *patchname, u8 **r, int *s)
   return result;
 }
 
-static bool patchApplyUPS(const char *patchname, u8 **rom, int *size)
+static bool patchApplyUPS(const char *patchname, u8 **rom, unsigned int *size)
 {
   s64 srcCRC, dstCRC, patchCRC;
 
@@ -300,7 +300,7 @@ static int ppfFileIdLen(FILE *f, int version)
   return (version == 2) ? readInt4(f) : readInt2(f);
 }
 
-static bool patchApplyPPF1(FILE *f, u8 **rom, int *size)
+static bool patchApplyPPF1(FILE *f, u8 **rom, unsigned int *size)
 {
   fseek(f, 0, SEEK_END);
   int count = ftell(f);
@@ -329,7 +329,7 @@ static bool patchApplyPPF1(FILE *f, u8 **rom, int *size)
   return (count == 0);
 }
 
-static bool patchApplyPPF2(FILE *f, u8 **rom, int *size)
+static bool patchApplyPPF2(FILE *f, u8 **rom, unsigned int *size)
 {
   fseek(f, 0, SEEK_END);
   int count = ftell(f);
@@ -373,7 +373,7 @@ static bool patchApplyPPF2(FILE *f, u8 **rom, int *size)
   return (count == 0);
 }
 
-static bool patchApplyPPF3(FILE *f, u8 **rom, int *size)
+static bool patchApplyPPF3(FILE *f, u8 **rom, unsigned int *size)
 {
   fseek(f, 0, SEEK_END);
   int count = ftell(f);
@@ -423,7 +423,7 @@ static bool patchApplyPPF3(FILE *f, u8 **rom, int *size)
   return (count == 0);
 }
 
-static bool patchApplyPPF(const char *patchname, u8 **rom, int *size)
+static bool patchApplyPPF(const char *patchname, u8 **rom, unsigned int *size)
 {
   FILE *f = fopen(patchname, "rb");
   if (!f)
@@ -442,7 +442,7 @@ static bool patchApplyPPF(const char *patchname, u8 **rom, int *size)
   return res;
 }
 
-bool applyPatch(const char *patchname, u8 **rom, int *size)
+bool applyPatch(const char *patchname, u8 **rom,unsigned int *size)
 {
   if (strlen(patchname) < 5)
     return false;

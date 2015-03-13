@@ -2,7 +2,7 @@
 #define GBGLOBALS_H
 
 extern int gbRomSizeMask;
-extern int gbRomSize;
+extern unsigned int gbRomSize;
 extern int gbRamSize;
 extern int gbRamSizeMask;
 extern int gbTAMA5ramSize;

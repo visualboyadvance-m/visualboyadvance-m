@@ -2185,7 +2185,8 @@ int main(int argc, char **argv)
 
         cartridgeType = IMAGE_GB;
         emulator = GBSystem;
-        int size = gbRomSize, patchnum;
+        unsigned int size = gbRomSize;
+        int patchnum;
         for (patchnum = 0; patchnum < sdl_patch_num; patchnum++) {
           fprintf(stdout, "Trying patch %s%s\n", sdl_patch_names[patchnum],
             applyPatch(sdl_patch_names[patchnum], &gbRom, &size) ? " [success]" : "");
@@ -2198,7 +2199,7 @@ int main(int argc, char **argv)
         gbReset();
       }
     } else if(type == IMAGE_GBA) {
-      int size = CPULoadRom(szFile);
+      unsigned int size = CPULoadRom(szFile);
       failed = (size == 0);
       if(!failed) {
         sdlApplyPerImagePreferences();

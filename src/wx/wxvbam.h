@@ -427,8 +427,8 @@ protected:
 
     int basic_width, basic_height;
     bool fullscreen;
-
     bool paused;
+
     void OnIdle(wxIdleEvent &);
     void OnKeyDown(wxKeyEvent &ev);
     void OnKeyUp(wxKeyEvent &ev);
@@ -493,7 +493,6 @@ protected:
     bool isFiltered;
     int nthreads;
     wxSemaphore filt_done;
-    const RENDER_PLUGIN_INFO *rpi; // also flag indicating plugin loaded
 
     // following can't work in 2.8 as intended
     // inheriting from wxEvtHandler is required, but also breaks subclasses

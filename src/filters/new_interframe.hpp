@@ -24,6 +24,7 @@ private:
 //     unsigned int get_horiz_bytes_out() {return horiz_bytes_out;}
 public:
     interframe_filter(unsigned int _width=0,unsigned int _height=0): width(_width),height(_height) {}
+    virtual ~interframe_filter() {}
     virtual std::string getName() {return "Dummy Filter";}
     virtual int getScale() {return 0;}
     unsigned int getWidth() {return width;}

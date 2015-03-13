@@ -12,10 +12,12 @@ int emulating;
 IMPLEMENT_DYNAMIC_CLASS(GameArea, wxPanel)
 
 GameArea::GameArea()
-    : wxPanel(), loaded(IMAGE_UNKNOWN), panel(NULL), emusys(NULL),
-      basic_width(GBWidth), basic_height(GBHeight), fullscreen(false),
-      paused(false), was_paused(false), rewind_time(0), do_rewind(false),
-      rewind_mem(0), pointer_blanked(false), mouse_active_time(0)
+    : wxPanel(), panel(NULL), emusys(NULL),
+      was_paused(false),
+      rewind_time(0),do_rewind(false),rewind_mem(0),
+      loaded(IMAGE_UNKNOWN), basic_width(GBWidth), basic_height(GBHeight),
+      fullscreen(false), paused(false),
+      pointer_blanked(false), mouse_active_time(0)
 {
     SetSizer(new wxBoxSizer(wxVERTICAL));
     // all renderers prefer 32-bit
@@ -110,7 +112,7 @@ void GameArea::LoadGame(const wxString &name)
 	}
 	rom_size = gbRomSize;
 	if(loadpatch) {
-	    int size = rom_size;
+	    unsigned int size = rom_size;
 	    // auto-conversion of wxCharBuffer to const char * seems broken
 	    // so save underlying wxCharBuffer (or create one of none is used)
 	    wxCharBuffer pfnb(pfn.GetFullPath().mb_fn_str());
@@ -174,7 +176,7 @@ void GameArea::LoadGame(const wxString &name)
 	if(loadpatch) {
 	    // don't use real rom size or it might try to resize rom[]
 	    // instead, use known size of rom[]
-	    int size = 0x2000000;
+	    unsigned int size = 0x2000000;
 	    // auto-conversion of wxCharBuffer to const char * seems broken
 	    // so save underlying wxCharBuffer (or create one of none is used)
 	    wxCharBuffer pfnb(pfn.GetFullPath().mb_fn_str());
@@ -676,8 +678,8 @@ void GameArea::ShowFullScreen(bool full)
 		// in particular, unix does Matches() in wrong direction
 		wxArrayVideoModes vm = d.GetModes();
 		int best_mode = -1;
-		int i;
-		for(i = 0; i < vm.size(); i++) {
+		unsigned int i = 0;
+		for(; i < vm.size(); i++) {
 		    if(vm[i].w != gopts.fs_mode.w || vm[i].h != gopts.fs_mode.h)
 			continue;
 		    int bpp = vm[i].bpp;
@@ -883,7 +885,7 @@ static wxJoyKeyBinding_v keys_pressed;
 static void process_key_press(bool down, int key, int mod, int joy = 0)
 {
     // check if key is already pressed
-    int kpno;
+    unsigned int kpno;
     for(kpno = 0; kpno < keys_pressed.size(); kpno++)
 	if(keys_pressed[kpno].key == key && keys_pressed[kpno].mod == mod &&
 	   keys_pressed[kpno].joy == joy)
@@ -908,13 +910,13 @@ static void process_key_press(bool down, int key, int mod, int joy = 0)
     for(int i = 0; i < 4; i++)
 	for(int j = 0; j < NUM_KEYS; j++) {
 	    wxJoyKeyBinding_v &b = gopts.joykey_bindings[i][j];
-	    for(int k = 0; k < b.size(); k++)
+	    for(unsigned int k = 0; k < b.size(); k++)
 		if(b[k].key == key && b[k].mod == mod && b[k].joy == joy) {
 		    if(down)
 			joypress[i] |= bmask[j];
 		    else {
 			// only release if no others pressed
-			int k2;
+			unsigned int k2;
 			for(k2 = 0; k2 < b.size(); k2++) {
 			    if(k == k2 || (b[k2].key == key && b[k2].mod == mod &&
 					   b[k2].joy == joy))
@@ -1071,7 +1073,7 @@ public:
 
 DrawingPanel::DrawingPanel(int _width, int _height) :
     wxObject(), width(_width+1), height(_height), scale(1),
-    rpi(0), nthreads(0)
+    nthreads(0)
 {
     //Clear the output buffer
     memset (todraw,0x00,257 * 4 * 16 * 226);
@@ -1209,8 +1211,8 @@ BEGIN_EVENT_TABLE(BasicDrawingPanel, wxPanel)
 END_EVENT_TABLE()
 
 BasicDrawingPanel::BasicDrawingPanel(wxWindow *parent, int _width, int _height)
-     : wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetSize(),
-	      wxFULL_REPAINT_ON_RESIZE), DrawingPanel(_width, _height)
+     : DrawingPanel(_width, _height),
+        wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetSize(), wxFULL_REPAINT_ON_RESIZE)
 {
     // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require 32, though
     if(!isFiltered)
@@ -1281,12 +1283,13 @@ static int glopts[] = {
 #endif
 
 GLDrawingPanel::GLDrawingPanel(wxWindow *parent, int _width, int _height) :
-    glc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetSize(),
-	wxFULL_REPAINT_ON_RESIZE), DrawingPanel(_width, _height),
-        did_init(false)
+    DrawingPanel(_width, _height),
+    glc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetSize(), wxFULL_REPAINT_ON_RESIZE),
 #if wxCHECK_VERSION(2,9,0) || !defined(__WXMAC__)
-	, ctx(this)
+	ctx(this),
 #endif
+    did_init(false)
+
 {
 }
 
@@ -1434,8 +1437,8 @@ BEGIN_EVENT_TABLE(CairoDrawingPanel, wxPanel)
 END_EVENT_TABLE()
 
 CairoDrawingPanel::CairoDrawingPanel(wxWindow *parent, int _width, int _height)
-     : wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetSize(),
-	      wxFULL_REPAINT_ON_RESIZE), DrawingPanel(_width, _height)
+     :  DrawingPanel(_width, _height),
+        wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetSize(), wxFULL_REPAINT_ON_RESIZE)
 {
     conv_surf = NULL;
 
