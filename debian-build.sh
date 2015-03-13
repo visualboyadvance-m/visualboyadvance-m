@@ -23,3 +23,6 @@ cd build
 cmake ..
 make
 #scan-build make
+
+#For profiling:
+#valgrind --tool=callgrind ./wxvbam

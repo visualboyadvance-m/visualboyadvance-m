@@ -44,18 +44,20 @@ const std::map<std::string,FilterFunc> filters::filterMap = makeFilterMap();
 //Convert a 32 bit image to a 24 bit one
 void convert32To24(u32* src,u8* dst,unsigned int width, unsigned int height)
 {
-//     //Each pixel is 3 bytes, which is NOT a common unit, so have to use u8 and manually multiply
-//     for(unsigned int i=0;i<width*height;i++)
-//     {
-//         dst[i*3]=((src[i])&0xFF) | ((src[i]>>8)&0xFF) | ((src[i]>>16)&0xFF);
-//     }
+    //Need src as a single byte pointer for this to work
+    u8 * u8src = (u8*)src;
 
-    for(unsigned int y = 0; y < height ; y++) {
-        for(unsigned int x = 0; x < width; x++, src++) {
-            *dst++ = *src;
-            *dst++ = *src >> 8;
-            *dst++ = *src >> 16;
+    for(unsigned int y = 0; y < height ; y++)
+    {
+        for(unsigned int x = 0; x < width; x++)
+        {
+            //For each pixel copy r,g,b one byte at a time
+            for(unsigned int i = 0; i<3; i++)
+            {
+                *dst++ = *u8src++;
+            }
+            //Skip the alpha channel
+            u8src++;
         }
-//         ++src; // skip rhs border
     }
 }
