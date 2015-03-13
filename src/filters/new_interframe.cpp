@@ -9,25 +9,13 @@
 
 #include "new_interframe.hpp"
 
-void interframe_filter::setWidth(unsigned int _width)
+SmartIB::SmartIB(unsigned int _width,unsigned int _height): interframe_filter(_width,_height)
 {
-    width = _width;
-
-    //32 bit filter, so 4 bytes per pixel
-    //  The +1 is for a 1 pixel border that the emulator spits out
-    horiz_bytes = (width+1) * 4;
-    //Unfortunately, the filter keeps the border on the scaled output, but DOES NOT scale it
-//     horiz_bytes_out = width * 4 * myScale + 4;
-
-}
-
-SmartIB::SmartIB()
-{
-  frm1 = (u32 *)calloc(322*242,4);
+  frm1 = (u32 *)calloc(_width*_height,4);
   // 1 frame ago
-  frm2 = (u32 *)calloc(322*242,4);
+  frm2 = (u32 *)calloc(_width*_height,4);
   // 2 frames ago
-  frm3 = (u32 *)calloc(322*242,4);
+  frm3 = (u32 *)calloc(_width*_height,4);
   // 3 frames ago
 }
 
@@ -80,10 +68,10 @@ void SmartIB::run(u32 *srcPtr, unsigned int num_threads,unsigned int thread_numb
 }
 
 
-MotionBlurIB::MotionBlurIB()
+MotionBlurIB::MotionBlurIB(unsigned int _width,unsigned int _height): interframe_filter(_width,_height)
 {
-  frm1 = (u32 *)calloc(322*242,4);
-  // 1 frame ago
+    //Buffer to hold last frame
+    frm1 = (u32 *)calloc(_width*_height,4);
 }
 
 MotionBlurIB::~MotionBlurIB()

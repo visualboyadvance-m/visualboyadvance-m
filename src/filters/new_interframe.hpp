@@ -13,24 +13,20 @@ private:
     unsigned int width;
     ///The filter's height
     unsigned int height;
+    ///The internal scale
+//     int myScale;
     ///Don't need to calculate these every time (based off width)
-    unsigned int horiz_bytes;
+//     unsigned int horiz_bytes;
 //     unsigned int horiz_bytes_out;
 //Children need this pre-calculated data, but it's NOT public
-protected:
-    unsigned int get_horiz_bytes() {return horiz_bytes;}
+// protected:
+//     unsigned int get_horiz_bytes() {return horiz_bytes;}
 //     unsigned int get_horiz_bytes_out() {return horiz_bytes_out;}
 public:
-    interframe_filter(): width(0) {}
+    interframe_filter(unsigned int _width=0,unsigned int _height=0): width(_width),height(_height) {}
     virtual std::string getName() {return "Dummy Filter";}
     virtual int getScale() {return 0;}
-    ///Set the number of pixels per horizontal row
-    ///Always use this after initialization if using the new run function.
-    void setWidth(unsigned int _width);
     unsigned int getWidth() {return width;}
-    ///Set the number of horizontal rows in the image
-    ///Always use this after initialization if using the new run function.
-    void setHeight(unsigned int _height){height=_height;}
     unsigned int getHeight() {return height;}
     ///New smarter Interframe function
     virtual void run(u32 *srcPtr, unsigned int num_threads=1,unsigned int thread_number=0) {}
@@ -48,8 +44,9 @@ private:
     u32 *frm1;
     u32 *frm2;
     u32 *frm3;
-public:
     SmartIB();
+public:
+    SmartIB(unsigned int _width,unsigned int _height);
     ~SmartIB();
     std::string getName() {return "SmartIB";}
     void run(u32 *srcPtr, unsigned int num_threads=1,unsigned int thread_number=0);
@@ -60,8 +57,10 @@ class MotionBlurIB : public interframe_filter
 {
 private:
     u32 *frm1;
-public:
+    //Must enter width and height at filter initialization
     MotionBlurIB();
+public:
+    MotionBlurIB(unsigned int _width,unsigned int _height);
     ~MotionBlurIB();
     std::string getName() {return "MotionBlurIB";}
     void run(u32 *srcPtr, unsigned int num_threads=1,unsigned int thread_number=0);
@@ -78,14 +77,14 @@ enum ifbfunc {
 class interframe_factory
 {
 public:
-    static interframe_filter * createIFB(ifbfunc filter_select)
+    static interframe_filter * createIFB(ifbfunc filter_select,unsigned int width,unsigned int height)
     {
         switch(filter_select) {
             case IFB_SMART:
-                return new SmartIB();
+                return new SmartIB(width,height);
                 break;
             case IFB_MOTION_BLUR:
-                return new MotionBlurIB();
+                return new MotionBlurIB(width,height);
                 break;
             default:
                 return new interframe_filter();

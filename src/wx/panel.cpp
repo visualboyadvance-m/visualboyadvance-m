@@ -1070,12 +1070,10 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
 
     myFilter = new filter(std::string(gopts.filter.mb_str(wxConvUTF8)));
 
-    iFilter = interframe_factory::createIFB((ifbfunc)gopts.ifb);
+    iFilter = interframe_factory::createIFB((ifbfunc)gopts.ifb,width,height);
 
     scale = myFilter->getScale();
     myFilter->setWidth(width);
-    iFilter->setWidth(width);
-    iFilter->setHeight(height);
 
     //Do a quick run to initialize the filter
     //\TODO:  Fix the filters so this is no longer needed
