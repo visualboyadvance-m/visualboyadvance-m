@@ -1085,8 +1085,8 @@ public:
 };
 
 DrawingPanel::DrawingPanel(int _width, int _height) :
-    wxObject(), width(_width+1), height(_height), scale(1),
-    nthreads(gopts.max_threads),isFiltered(false)
+    wxObject(), width(_width+(systemColorDepth != 24)), height(_height), scale(1),
+    isFiltered(false),nthreads(gopts.max_threads)
 {
     //Clear the output buffer
     memset (todraw,0x00,257 * 4 * 16 * 226);
@@ -1156,13 +1156,13 @@ void DrawingPanel::DrawArea(u8 **data)
     // draw OSD text old-style (directly into output buffer)
 	GameArea *panel = wxGetApp().frame->GetPanel();
 	if(panel->osdstat.size())
-	    drawText(todraw,width*scale-(systemColorDepth == 24),bytes_per_pixel,
+	    drawText(todraw,width*scale,bytes_per_pixel,
 		     0, 2, panel->osdstat.utf8_str(), gopts.osd_transparent);
 	if(!gopts.no_osd_status && !panel->osdtext.empty()) {
 	    if(systemGetClock() - panel->osdtime < OSD_TIME) {
             std::string message = ToString(panel->osdtext);
-            drawText(todraw,width*scale-(systemColorDepth == 24),bytes_per_pixel,
-            20,height/2,
+            drawText(todraw,width*scale,bytes_per_pixel,
+            0,height/2,
             message.c_str(),gopts.osd_transparent);
 	    } else
 		panel->osdtext.clear();
@@ -1212,7 +1212,7 @@ void BasicDrawingPanel::DrawArea(wxWindowDC &dc)
     wxBitmap *bm;
     if(systemColorDepth == 24) {
 	// never scaled, no borders, no transformations needed
-	wxImage im(width-1, height, todraw, true);
+	wxImage im(width, height, todraw, true);
 	bm = new wxBitmap(im);
     }
     else
