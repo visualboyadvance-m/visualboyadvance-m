@@ -65,19 +65,6 @@ public:
                 break;
         }
     }
-    static bool exists(ifbfunc filter_select)
-    {
-       switch(filter_select)
-       {
-            case IFB_SMART:
-            case IFB_MOTION_BLUR:
-                return true;
-                break;
-            default:
-                return false;
-                break;
-       }
-    }
 };
 
 #endif  //NEW_INTERFRAME_HPP

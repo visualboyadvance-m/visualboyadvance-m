@@ -27,7 +27,6 @@
 #include "../gb/gbCheats.h"
 #include "../gba/Cheats.h"
 
-#include "../filters/filters.hpp"
 #include "../filters/new_interframe.hpp"
 
 template <typename T>

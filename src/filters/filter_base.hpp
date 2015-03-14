@@ -22,9 +22,17 @@ public:
     unsigned int getWidth() {return width;}
     unsigned int getHeight() {return height;}
     virtual std::string getName() {return "Dummy Filter";}
-    virtual int getScale() {return 1;}
+    virtual unsigned int getScale() {return 1;}
     virtual bool exists() {return false;}
-    ///Take data from srcPtr, and return the new data via dstPtr
+    /**
+     * Run the filter.
+     *
+     * All of the filters currently in use are designed to work with 32 bits (4 bytes) per pixel.
+     * Of important note is that the output of the filter is scaled.  This means the output array must be scale * scale larger than the input array
+     *
+     * \param[in] srcPtr        A pointer to the input 32 bit RGBA Pixel Array
+     * \param[in] dstPtr        A pointer to the output 32 bit RGBA Pixel Array
+     */
     virtual void run(u32 *srcPtr,u32 *dstPtr)
     {
         //If the filter doesn't exist, then we still need to get the data to the output buffer

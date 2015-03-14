@@ -6,6 +6,7 @@
 #include "../common/Patch.h"
 #include <wx/dcbuffer.h>
 #include "../sdl/text.h"
+#include "../filters/filters.hpp"
 
 int emulating;
 
@@ -1038,7 +1039,7 @@ public:
     unsigned int nthreads, threadno;
     unsigned int width, height, scale;
     u32 *dst;
-    filter * mainFilter;
+    filter_base * mainFilter;
     filter_base * iFilter;
 
     // set this param every round
@@ -1104,7 +1105,7 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
             threads[i].width = width;
             threads[i].height = band_height;
             threads[i].dst = reinterpret_cast<u32 *>(&todraw);
-            threads[i].mainFilter=new filter(ToString(gopts.filter),width,band_height);
+            threads[i].mainFilter=filter_factory::createFilter(ToString(gopts.filter),width,band_height);
             threads[i].iFilter=interframe_factory::createIFB((ifbfunc)gopts.ifb,width,band_height);
             threads[i].done = &filt_done;
             threads[i].lock.Lock();
@@ -1113,7 +1114,7 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
         }
         //Set some important variables
         scale=threads[0].scale;
-        isFiltered = threads[0].mainFilter->exists() || interframe_factory::exists((ifbfunc)gopts.ifb);
+        isFiltered = threads[0].mainFilter->exists() || threads[0].iFilter->exists();
     }
 
     std::cerr << "width: " << width << " Height:  " << height << std::endl;

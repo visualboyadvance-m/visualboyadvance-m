@@ -15,25 +15,64 @@
 // Function pointer type for a filter function
 typedef void(*FilterFunc)(u8*, u32, u8*, u32, int, int);
 
+///This is the parent class of all the filters
+///TODO:  Actually subclass these instead of cheating
+class raw_filter : public filter_base
+{
+private:
+    //No default constructor for this class
+    raw_filter();
+    ///The filter's name
+    std::string name;
+    ///The internal filter used
+    FilterFunc myFilter;
+    ///The internal scale
+    unsigned int myScale;
+    //Don't need to calculate these every time (based off width)
+    ///The number of pixels per horizontal row
+    unsigned int horiz_bytes;
+    ///The number of pixels per output horizontal row
+    unsigned int horiz_bytes_out;
+public:
+    raw_filter(std::string _name,FilterFunc _myFilter,unsigned int _scale,unsigned int _width,unsigned int _height):
+        filter_base(_width,_height),
+        name(_name), myFilter(_myFilter), myScale(_scale),
+        horiz_bytes(_width * 4), horiz_bytes_out(_width * 4 * _scale)
+    {
+//         std::cerr << name << std::endl;
+    }
+    std::string getName() {return name;}
+    unsigned int getScale() {return myScale;}
+    bool exists() {return true;}
+    ///Run the filter pointed to by the internal FilterFunc
+    void run(u32 *srcPtr, u32 *dstPtr)
+    {
+        if(myFilter==NULL)
+        {
+            throw std::runtime_error("ERROR:  Filter not properly initialized!!!");
+        }
+        myFilter(reinterpret_cast<u8 *>(srcPtr),horiz_bytes,reinterpret_cast<u8 *>(dstPtr),horiz_bytes_out,getWidth(),getHeight());
+    }
+};
+
 typedef std::pair<std::string,FilterFunc> namedfilter;
 
-///A class allowing for easy access to all the filters
-class filters {
+class filter_factory
+{
 private:
-    //A named map of all the filters
+    //A named map of all the (original) filters
     static const std::map<std::string,FilterFunc> filterMap;
 public:
-    ///Returns a function pointer to a 32 bit filter
-    static FilterFunc GetFilter(std::string filterName)
+    static filter_base * createFilter(std::string filterName,unsigned int width,unsigned int height)
     {
         std::map<std::string,FilterFunc>::const_iterator found = filterMap.find(filterName);
-        if(found == filterMap.end()){
-            //Not doing the error checking here
-//             throw std::runtime_error("ERROR:  Filter not found!");
-            return NULL;
+        //If we found the filter:
+        if(found != filterMap.end()){
+            return new raw_filter(filterName,found->second,GetFilterScale(filterName),width,height);
         }
-        return found->second;
-    };
+        //If nothing found, just return a default filter
+        return new filter_base(width,height);
+    }
     ///Returns the filter's scaling factor
     ///TODO:  De hardcode this
     static int GetFilterScale(std::string filterName)
@@ -48,76 +87,10 @@ public:
     }
 };
 
-///This is the parent class of all the filters
-///TODO:  Actually subclass these instead of cheating
-class filter : public filter_base
-{
-private:
-    //No default constructor for this class
-    filter();
-    ///The filter's name
-    std::string name;
-    ///The internal filter used
-    FilterFunc myFilter;
-    ///The internal scale
-    int myScale;
-    //Don't need to calculate these every time (based off width)
-    ///The number of pixels per horizontal row
-    unsigned int horiz_bytes;
-    ///The number of pixels per output horizontal row
-    unsigned int horiz_bytes_out;
-public:
-    filter(std::string myName,unsigned int _width,unsigned int _height):
-        filter_base(_width,_height),
-        name(myName), myFilter(filters::GetFilter(myName)),
-        myScale(filters::GetFilterScale(myName)),
-        horiz_bytes(_width * 4), horiz_bytes_out(_width * 4 * filters::GetFilterScale(myName))
-    {
-//         std::cerr << name << std::endl;
-    }
-    std::string getName()
-    {
-        return name;
-    }
-    int getScale()
-    {
-        return myScale;
-    }
-    /**
-     * New Version:  Run the filter
-     *
-     * This one is smart.
-     * It knows it's a 32 bit filter, and the input width will not change from when it is initialized.
-     *
-     * \param[in] srcPtr        A pointer to the input 32 bit RGB Pixel Array
-     * \param[in] dstPtr        A pointer to the output 32 bit RGB Pixel Array
-     */
-    void run(u32 *srcPtr, u32 *dstPtr)
-    {
-        if(myFilter!=NULL)
-        {
-            myFilter(reinterpret_cast<u8 *>(srcPtr),horiz_bytes,reinterpret_cast<u8 *>(dstPtr),horiz_bytes_out,getWidth(),getHeight());
-        }
-        else
-        {
-            //If the filter doesn't exist, then we still need to get the data to the output buffer
-            std::memcpy(dstPtr,srcPtr, horiz_bytes_out*getHeight()*myScale);
-        }
-    }
-    bool exists()
-    {
-        if (myFilter==NULL)
-            return false;
-        else
-            return true;
-    }
-};
-
 //These are the available filters
 
 //wx
-// src/wx/wxvbam.h:263-278
-// src/wxpanel.cpp:1100-1256
+// src/wxpanel.cpp
 
 //gtk
 // src/gtk/filters.h

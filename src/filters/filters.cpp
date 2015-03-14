@@ -39,7 +39,7 @@ const std::map<std::string,FilterFunc> makeFilterMap()
     return tempMap;
 }
 
-const std::map<std::string,FilterFunc> filters::filterMap = makeFilterMap();
+const std::map<std::string,FilterFunc> filter_factory::filterMap = makeFilterMap();
 
 //Convert a 32 bit image to a 24 bit one
 void convert32To24(u32* src,u8* dst,unsigned int width, unsigned int height)
