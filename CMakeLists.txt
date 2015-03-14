@@ -196,36 +196,7 @@ SET( CMAKE_CXX_FLAGS_RELEASE "-O3")
 SET( CMAKE_C_FLAGS_DEBUG "-g -Wall")
 SET( CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
 
-# Source files definition
-SET(SRC_FEX
-    fex/7z_C/7zAlloc.c
-    fex/7z_C/7zBuf.c
-    fex/7z_C/7zCrc.c
-    fex/7z_C/7zCrcOpt.c
-    fex/7z_C/7zDec.c
-    fex/7z_C/7zIn.c
-    fex/7z_C/7zStream.c
-    fex/7z_C/Bcj2.c
-    fex/7z_C/Bra86.c
-    fex/7z_C/Bra.c
-    fex/7z_C/CpuArch.c
-    fex/7z_C/Lzma2Dec.c
-    fex/7z_C/LzmaDec.c
-    fex/7z_C/Ppmd7.c
-    fex/7z_C/Ppmd7Dec.c
-    fex/fex/Binary_Extractor.cpp
-    fex/fex/blargg_common.cpp
-    fex/fex/blargg_errors.cpp
-    fex/fex/Data_Reader.cpp
-    fex/fex/fex.cpp
-    fex/fex/File_Extractor.cpp
-    fex/fex/Gzip_Extractor.cpp
-    fex/fex/Gzip_Reader.cpp
-    fex/fex/Rar_Extractor.cpp
-    fex/fex/Zip7_Extractor.cpp
-    fex/fex/Zip_Extractor.cpp
-    fex/fex/Zlib_Inflater.cpp
-)
+add_subdirectory (fex)
 
 SET(SRC_MAIN
     src/Util.cpp
@@ -339,7 +310,6 @@ endif( ENABLE_DEBUGGER )
 
 INCLUDE_DIRECTORIES(
     ${ZLIB_INCLUDE_DIR}
-    fex
     ${PNG_INCLUDE_DIR}
     ${SDL_INCLUDE_DIR}
 )
@@ -349,11 +319,6 @@ IF( ENABLE_FFMPEG )
         ${FFMPEG_INCLUDE_DIRS}
     )
 ENDIF( ENABLE_FFMPEG )
-
-ADD_LIBRARY(
-    fex
-    ${SRC_FEX}
-)
 
 ADD_LIBRARY (
     vbamcore
@@ -399,12 +364,7 @@ IF( ENABLE_GTK )
 ENDIF( ENABLE_GTK )
 
 IF( ENABLE_WX )
-    # since this has generated source files, it's easier to just
-    # make from the subdir
-    # otherwise out-of-tree builds have trouble
-
     add_subdirectory(src/wx)
-
 ENDIF( ENABLE_WX )
 
 if( ENABLE_GTK OR ENABLE_WX )
