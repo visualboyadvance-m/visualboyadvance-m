@@ -10,6 +10,7 @@
 
 #include "../common/Types.h"
 #include "filter_base.hpp"
+#include "xBRZ/xbrz.h"
 
 //sdl
 // Function pointer type for a filter function
@@ -55,6 +56,28 @@ public:
     }
 };
 
+//Custom filter classes
+///XBR filter
+///Supports 2-5 X scaling
+class xbr : public filter_base
+{
+private:
+    //Must enter width and height at filter initialization
+    xbr();
+    unsigned int myscale;
+public:
+    xbr(unsigned int _width,unsigned int _height,unsigned int _myscale): filter_base(_width,_height), myscale(_myscale) {}
+    std::string getName() {return "XBR "+std::to_string(myscale)+"x";}
+    unsigned int getScale() {return myscale;}
+    bool exists() {return true;}
+    void run(u32 *srcPtr,u32 *dstPtr)
+    {
+        xbrz::scale(myscale, //valid range:
+           srcPtr, dstPtr, getWidth(), getHeight(),
+           xbrz::ColorFormat::ARGB);
+    }
+};
+
 typedef std::pair<std::string,FilterFunc> namedfilter;
 
 class filter_factory
@@ -63,6 +86,8 @@ private:
     //A named map of all the (original) filters
     static const std::map<std::string,FilterFunc> filterMap;
 public:
+    ///Returns an instance of a filter of filterName
+    ///If the filter doesn't exist, it returns a dummy filter instead
     static filter_base * createFilter(std::string filterName,unsigned int width,unsigned int height)
     {
         std::map<std::string,FilterFunc>::const_iterator found = filterMap.find(filterName);
@@ -70,9 +95,28 @@ public:
         if(found != filterMap.end()){
             return new raw_filter(filterName,found->second,GetFilterScale(filterName),width,height);
         }
+
+        if("XBR 2x" == filterName)
+        {
+            return new xbr(width,height,2);
+        }
+        if("XBR 3x" == filterName)
+        {
+            return new xbr(width,height,3);
+        }
+        if("XBR 4x" == filterName)
+        {
+            return new xbr(width,height,4);
+        }
+        if("XBR 5x" == filterName)
+        {
+            return new xbr(width,height,5);
+        }
+
         //If nothing found, just return a default filter
         return new filter_base(width,height);
     }
+
     ///Returns the filter's scaling factor
     ///TODO:  De hardcode this
     static int GetFilterScale(std::string filterName)

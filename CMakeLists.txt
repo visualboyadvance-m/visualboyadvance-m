@@ -187,9 +187,6 @@ ELSE ( WIN32 )
     SET( CMAKE_ASM_NASM_FLAGS "-I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -DELF -w-orphan-labels")
 ENDIF ( WIN32 )
 
-#Make sure that we can use c++11 initializer lists
-#Doesn't work with fex :/
-# SET( CMAKE_CXX_FLAGS -std=c++11 )
 
 SET( CMAKE_C_FLAGS_RELEASE "-O3")
 SET( CMAKE_CXX_FLAGS_RELEASE "-O3")
@@ -197,6 +194,11 @@ SET( CMAKE_C_FLAGS_DEBUG "-g -Wall")
 SET( CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
 
 add_subdirectory (fex)
+
+#Doesn't work with fex
+#Needed by the xBRZ filter
+#initializing after and hoping nothing breaks
+SET( CMAKE_CXX_FLAGS -std=c++11 )
 
 SET(SRC_MAIN
     src/Util.cpp
@@ -279,6 +281,7 @@ SET(SRC_FILTERS
     src/filters/scanline.cpp
     src/filters/simpleFilter.cpp
     src/filters/sdl.cpp
+    src/filters/xBRZ/xbrz.cpp
 )
 
 SET(SRC_HQ_C

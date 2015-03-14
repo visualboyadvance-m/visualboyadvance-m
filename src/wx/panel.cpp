@@ -1008,12 +1008,11 @@ void DrawingPanel::PaintEv(wxPaintEvent &ev)
 class FilterThread : public wxThread
 {
 private:
-    // largest buffer required is 32-bit * (max width + 1) * (max height + 2) * (4x4) scaling factor
-    u32 buffer[257 * 226 * 16];
+    // largest buffer required is 32-bit * (max width + 1) * (max height + 2)
+    // No scaling factor is needed, since it is taking output from the ifb filter
+    u32 buffer[257 * 226 ];
 public:
     FilterThread() : wxThread(wxTHREAD_JOINABLE), lock(), sig(lock) {
-        //Clear the buffer
-        memset (buffer,0x00,257 * 4 * 16 * 226);
     }
 
     //Cleanup on exit
@@ -1089,8 +1088,6 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
     wxObject(), width(_width+(systemColorDepth != 24)), height(_height), scale(1),
     isFiltered(false),nthreads(gopts.max_threads)
 {
-    //Clear the output buffer
-    memset (todraw,0x00,257 * 4 * 16 * 226);
 
     // Create and start up new threads
     if(nthreads) {
@@ -1118,6 +1115,7 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
     }
 
     std::cerr << "width: " << width << " Height:  " << height << std::endl;
+
     systemColorDepth = 32;
 
     // FIXME: should be "true" for GBA carts if lcd mode selected

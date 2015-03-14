@@ -1,0 +1,34 @@
+===========
+|Changelog|
+===========
+
+xBRZ 1.2 [2014-11-21]
+---------------------
+Further improved performance by over 30%
+
+
+xBRZ 1.1 [2014-11-02]
+---------------------
+Support images with alpha channel
+Improved color analysis
+
+
+xBRZ 1.0 [2013-02-11]
+---------------------
+Fixed xBRZ scaler compiler issues for GCC
+
+ 
+xBRZ 0.2 [2012-12-11]
+---------------------
+Added 5xBRZ scaler
+Optimized xBRZ scaler performance by factor 3
+Further improved image quality of xBRZ scaler
+
+
+xBRZ 0.1 [2012-09-26]
+---------------------
+Initial release:
+- scale while preserving small image features
+- support multithreading
+- support 64-bit architectures
+- support processing image slices
