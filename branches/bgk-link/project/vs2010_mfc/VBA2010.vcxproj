@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -183,6 +183,8 @@
     <ClInclude Include="..\..\src\filters\hq2x.h" />
     <ClInclude Include="..\..\src\filters\interp.h" />
     <ClInclude Include="..\..\src\filters\lq2x.h" />
+    <ClInclude Include="..\..\src\filters\xBRZ\config.h" />
+    <ClInclude Include="..\..\src\filters\xBRZ\xbrz.h" />
     <ClInclude Include="..\..\src\gba\armdis.h" />
     <ClInclude Include="..\..\src\gba\Cheats.h" />
     <ClInclude Include="..\..\src\gba\CheatSearch.h" />
@@ -321,6 +323,8 @@
     <ClCompile Include="..\..\src\win32\rpi.cpp" />
     <ClCompile Include="..\..\src\filters\scanline.cpp" />
     <ClCompile Include="..\..\src\filters\simpleFilter.cpp" />
+    <ClCompile Include="..\..\src\filters\xbrzfilter.cpp" />
+    <ClCompile Include="..\..\src\filters\xBRZ\xbrz.cpp" />
     <ClCompile Include="..\..\src\filters\hq2x.cpp" />
     <ClCompile Include="..\..\src\filters\hq\asm\hq3x32.cpp" />
     <ClCompile Include="..\..\src\gba\armdis.cpp" />

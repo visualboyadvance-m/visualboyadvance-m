@@ -1734,18 +1734,25 @@ BEGIN
                     MENUITEM "Super &Eagle",                ID_OPTIONS_FILTER_SUPEREAGLE
                     MENUITEM "&LQ2x",                       ID_OPTIONS_FILTER_LQ2X
                     MENUITEM "&HQ2x",                       ID_OPTIONS_FILTER_HQ2X
+                    MENUITEM "&xBRZ2x",                     ID_OPTIONS_FILTER_XBRZ2X
                 END
                 POPUP "&3X"
                 BEGIN
                     MENUITEM "&Simple 3x",                  ID_OPTIONS_FILTER_SIMPLE3X
                     MENUITEM SEPARATOR
                     MENUITEM "&HQ3x",                       ID_OPTIONS_FILTER_HQ3X
+                    MENUITEM "&xBRZ3x",                     ID_OPTIONS_FILTER_XBRZ3X
                 END
                 POPUP "&4X"
                 BEGIN
                     MENUITEM "&Simple 4x",                  ID_OPTIONS_FILTER_SIMPLE4X
                     MENUITEM SEPARATOR
                     MENUITEM "&HQ4x",                       ID_OPTIONS_FILTER_HQ4X
+                    MENUITEM "&xBRZ4x",                     ID_OPTIONS_FILTER_XBRZ4X
+                END
+                POPUP "&5X"
+                BEGIN
+                    MENUITEM "&xBRZ5x",                     ID_OPTIONS_FILTER_XBRZ5X
                 END
             END
             MENUITEM SEPARATOR

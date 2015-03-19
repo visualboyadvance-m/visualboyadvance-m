@@ -77,6 +77,10 @@ extern void hq4x16(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq3x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq4x32(u8*,u32,u8*,u8*,u32,int,int);
 #endif
+extern void xbrz2x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void xbrz3x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void xbrz4x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void xbrz5x32(u8*,u32,u8*,u8*,u32,int,int);
 
 extern void SmartIB(u8*,u32,int,int);
 extern void SmartIB32(u8*,u32,int,int);
@@ -801,6 +805,22 @@ void VBA::updateFilter()
 #endif
 				break;
 #endif
+			case FILTER_XBRZ2X:
+				filterFunction = xbrz2x32;
+				filterMagnification = 2;
+				break;
+			case FILTER_XBRZ3X:
+				filterFunction = xbrz3x32;
+				filterMagnification = 3;
+				break;
+			case FILTER_XBRZ4X:
+				filterFunction = xbrz4x32;
+				filterMagnification = 4;
+				break;
+			case FILTER_XBRZ5X:
+				filterFunction = xbrz5x32;
+				filterMagnification = 5;
+				break;
 			}
 		}
 	}
@@ -1476,8 +1496,8 @@ void VBA::loadSettings()
 
 
   filterType = regQueryDwordValue("filter", 0);
-  if(filterType < 0 || filterType > 17)
-    filterType = 0;
+  if(filterType < FILTER_NONE || filterType > FILTER_LAST)
+    filterType = FILTER_NONE;
 
   filterMT = ( 1 == regQueryDwordValue("filterEnableMultiThreading", 0) );
 

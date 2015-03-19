@@ -303,6 +303,8 @@ SET(SRC_FILTERS
     src/filters/pixel.cpp
     src/filters/scanline.cpp
     src/filters/simpleFilter.cpp
+    src/filters/xbrzfilter.cpp
+    src/filters/xBRZ/xbrz.cpp
 )
 
 SET(SRC_HQ_C
