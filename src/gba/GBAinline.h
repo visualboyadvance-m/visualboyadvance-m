@@ -114,11 +114,20 @@ static inline u32 CPUReadMemory(u32 address)
     value = READ32LE(((u32 *)&rom[address&0x1FFFFFC]));
     break;
   case 13:
-	value = eepromRead(address);
-	break;
+    if(cpuEEPROMEnabled)
+      // no need to swap this
+      return eepromRead(address);
+    goto unreadable;
   case 14:
   case 15:
-	value = flashRead(address) * 0x01010101;
+    if(cpuFlashEnabled | cpuSramEnabled)
+    {  // no need to swap this
+	  #ifdef __libretro__
+      return flashRead(address);
+	  #else
+	  value = flashRead(address) * 0x01010101;
+	  #endif
+	}
 	break;
     // default
   default:
@@ -260,12 +269,21 @@ static inline u32 CPUReadHalfWord(u32 address)
       value = READ16LE(((u16 *)&rom[address & 0x1FFFFFE]));
     break;
   case 13:
-	value = eepromRead(address);
-	break;
+    if(cpuEEPROMEnabled)
+      // no need to swap this
+      return  eepromRead(address);
+    goto unreadable;
   case 14:
   case 15:
-	value = flashRead(address) * 0x0101;
-	break;
+    if(cpuFlashEnabled | cpuSramEnabled)
+      // no need to swap this
+    {  
+	#ifdef __libretro__
+      return flashRead(address);
+	#else
+	  value = flashRead(address) * 0x0101;
+	#endif
+	}
     // default
   default:
 unreadable:
@@ -356,24 +374,25 @@ static inline u8 CPUReadByte(u32 address)
   case 12:
     return rom[address & 0x1FFFFFF];
   case 13:
-	return eepromRead(address);
+    if(cpuEEPROMEnabled)
+      return eepromRead(address);
+    goto unreadable;
   case 14:
   case 15:
-  {
-	if (cpuEEPROMSensorEnabled) {
-		switch (address & 0x00008f00) {
-		case 0x8200:
-			return systemGetSensorX() & 255;
-		case 0x8300:
-			return (systemGetSensorX() >> 8) | 0x80;
-		case 0x8400:
-			return systemGetSensorY() & 255;
-		case 0x8500:
-			return systemGetSensorY() >> 8;
-		}
-	}
-	return flashRead(address);
-  }
+    if(cpuSramEnabled | cpuFlashEnabled)
+      return flashRead(address);
+    if(cpuEEPROMSensorEnabled) {
+      switch(address & 0x00008f00) {
+  case 0x8200:
+    return systemGetSensorX() & 255;
+  case 0x8300:
+    return (systemGetSensorX() >> 8)|0x80;
+  case 0x8400:
+    return systemGetSensorY() & 255;
+  case 0x8500:
+    return systemGetSensorY() >> 8;
+      }
+    }
     // default
   default:
 unreadable:
