@@ -765,6 +765,26 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="xBRZ"
+				>
+				<File
+					RelativePath="..\..\src\filters\xbrz.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\filters\xBRZ\config.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\filters\xBRZ\xbrz.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\filters\xBRZ\xbrz.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Functionality"

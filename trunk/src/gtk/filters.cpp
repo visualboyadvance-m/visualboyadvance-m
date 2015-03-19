@@ -41,6 +41,7 @@ void hq2x          (u8 *, u32, u8 *, u8 *, u32, int, int);
 void hq2x32        (u8 *, u32, u8 *, u8 *, u32, int, int);
 void lq2x          (u8 *, u32, u8 *, u8 *, u32, int, int);
 void lq2x32        (u8 *, u32, u8 *, u8 *, u32, int, int);
+void xbrz2x32      (u8 *, u32, u8 *, u8 *, u32, int, int);
 
 void SmartIB       (u8 *, u32, int, int);
 void SmartIB32     (u8 *, u32, int, int);
@@ -68,7 +69,8 @@ static const astFilters[] =
   { N_("Scanlines"),           2, { Scanlines,    Scanlines32    } },
   { N_("TV Mode"),             2, { ScanlinesTV,  ScanlinesTV32  } },
   { N_("hq2x"),                2, { hq2x,         hq2x32         } },
-  { N_("lq2x"),                2, { lq2x,         lq2x32         } }
+  { N_("lq2x"),                2, { lq2x,         lq2x32         } },
+  { N_("xbrz2x"),              2, { 0,            xbrz2x32       } }
 };
 
 struct {
