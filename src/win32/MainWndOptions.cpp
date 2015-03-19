@@ -1246,6 +1246,18 @@ BOOL MainWnd::OnOptionsFilter(UINT nID)
 	case ID_OPTIONS_FILTER_HQ4X:
 		theApp.filterType = FILTER_HQ4X;
 		break;
+	case ID_OPTIONS_FILTER_XBRZ2X:
+		theApp.filterType = FILTER_XBRZ2X;
+		break;
+	case ID_OPTIONS_FILTER_XBRZ3X:
+		theApp.filterType = FILTER_XBRZ3X;
+		break;
+	case ID_OPTIONS_FILTER_XBRZ4X:
+		theApp.filterType = FILTER_XBRZ4X;
+		break;
+	case ID_OPTIONS_FILTER_XBRZ5X:
+		theApp.filterType = FILTER_XBRZ5X;
+		break;
 	default:
 		return FALSE;
 	}
@@ -1312,6 +1324,18 @@ void MainWnd::OnUpdateOptionsFilter(CCmdUI *pCmdUI)
     break;
   case ID_OPTIONS_FILTER_HQ4X:
     pCmdUI->SetCheck(theApp.filterType == FILTER_HQ4X);
+    break;
+  case ID_OPTIONS_FILTER_XBRZ2X:
+    pCmdUI->SetCheck(theApp.filterType == FILTER_XBRZ2X);
+    break;
+  case ID_OPTIONS_FILTER_XBRZ3X:
+    pCmdUI->SetCheck(theApp.filterType == FILTER_XBRZ3X);
+    break;
+  case ID_OPTIONS_FILTER_XBRZ4X:
+    pCmdUI->SetCheck(theApp.filterType == FILTER_XBRZ4X);
+    break;
+  case ID_OPTIONS_FILTER_XBRZ5X:
+    pCmdUI->SetCheck(theApp.filterType == FILTER_XBRZ5X);
     break;
   }
 }

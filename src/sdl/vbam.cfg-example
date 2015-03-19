@@ -98,9 +98,10 @@ skipBios=0
 
 # Filter to use:
 # 0 = Stretch 1x (no filter), 1 = Stretch 2x, 2 = 2xSaI, 3 = Super 2xSaI,
-# 4 = Super Eagle, 5 = Pixelate, 6 = Motion Blur, 7 = AdvanceMAME Scale2x,
-# 8 = Bilinear, 9 = Bilinear Plus, 10 = Scanlines, 11 = TV Mode, 12 = lq2x,
-# 13 = hq2x, 14 = Stretch 3x, 15 = hq3x, 16 = Stretch 4x, 17 = hq4x
+# 4 = Super Eagle, 5 = Pixelate, 6 = AdvanceMAME Scale2x, 7 = Bilinear,
+# 8 = Bilinear Plus, 9 = Scanlines, 10 = TV Mode, 11 = lq2x, 12 = hq2x,
+# 13 = xbrz2x, 14 = Stretch 3x, 15 = hq3x, 16 = xbrz3x, 17 = Stretch 4x,
+# 18 = hq4x, 19 = xbrz4x, 20 = xbrz5x
 filter=1
 
 # Disable status messages. 0=false, any other value means true
