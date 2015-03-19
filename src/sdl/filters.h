@@ -28,7 +28,7 @@
 // List of available filters
 enum Filter { kStretch1x, kStretch2x, k2xSaI, kSuper2xSaI, kSuperEagle, kPixelate,
 				kAdMame2x, kBilinear, kBilinearPlus, kScanlines, kScanlinesTV,
-				klq2x, khq2x, kStretch3x, khq3x, kStretch4x, khq4x, kInvalidFilter };
+				klq2x, khq2x, xbrz2x, kStretch3x, khq3x, xbrz3x, kStretch4x, khq4x, xbrz4x, xbrz5x, kInvalidFilter };
 
 // Function pointer type for a filter function
 typedef void(*FilterFunc)(u8*, u32, u8*, u8*, u32, int, int);

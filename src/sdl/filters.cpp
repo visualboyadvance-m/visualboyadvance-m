@@ -56,6 +56,10 @@ extern void hq3x16(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq4x16(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq3x32_32(u8*,u32,u8*,u8*,u32,int,int);
 extern void hq4x32_32(u8*,u32,u8*,u8*,u32,int,int);
+extern void xbrz2x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void xbrz3x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void xbrz4x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void xbrz5x32(u8*,u32,u8*,u8*,u32,int,int);
 
 struct FilterDesc {
 	char name[30];
@@ -79,10 +83,14 @@ const FilterDesc Filters[] = {
   { "TV Mode", 2, ScanlinesTV, 0, ScanlinesTV32 },
   { "lq2x", 2, lq2x, 0, lq2x32 },
   { "hq2x", 2, hq2x, 0, hq2x32 },
+  { "xbrz2x", 2, 0, 0, xbrz2x32 },
   { "Stretch 3x", 3, sdlStretch3x, sdlStretch3x, sdlStretch3x },
   { "hq3x", 3, hq3x16, 0, hq3x32_32 },
+  { "xbrz3x", 3, 0, 0, xbrz3x32 },
   { "Stretch 4x", 4, sdlStretch4x, sdlStretch4x, sdlStretch4x },
-  { "hq4x", 4, hq4x16, 0, hq4x32_32 }
+  { "hq4x", 4, hq4x16, 0, hq4x32_32 },
+  { "xbrz4x", 4, 0, 0, xbrz4x32 },
+  { "xbrz5x", 5, 0, 0, xbrz5x32 }
 };
 
 int getFilterEnlargeFactor(const Filter f)
