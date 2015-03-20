@@ -391,12 +391,11 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser &cl)
     return true;
 }
 
-MainFrame::MainFrame() : wxFrame(), did_link_init(false), focused(false),
+MainFrame::MainFrame() : wxFrame(), focused(false),
     paused(false), menus_opened(0), dialog_opened(0) {}
 
 MainFrame::~MainFrame()
 {
-    if(did_link_init)
 	CloseLink();
 }
 
@@ -640,6 +639,18 @@ void MainFrame::StopModal()
     --dialog_opened;
     if(!IsPaused())
 	panel->Resume();
+}
+
+LinkMode MainFrame::getOptionsLinkMode() {
+	if (gopts.gba_joybus_enabled) {
+		return LINK_GAMECUBE_DOLPHIN;
+	} else if (gopts.rfu_enabled) {
+		return LINK_RFU_IPC;
+	} else if (gopts.gba_link_enabled) {
+		return LINK_CABLE_IPC;
+	}
+	
+	return LINK_DISCONNECTED;
 }
 
 // global event filter

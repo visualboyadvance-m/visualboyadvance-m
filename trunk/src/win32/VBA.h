@@ -207,6 +207,10 @@ class VBA : public CWinApp
 
   CString wndClass;
 
+  int linkTimeout;
+  int linkMode;
+  CString linkHost;
+
  public:
   VBA();
   ~VBA();

@@ -208,9 +208,6 @@
     <ClInclude Include="..\..\src\gba\GBASockClient.h">
       <Filter>Linking</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\win32\JoybusOptions.h">
-      <Filter>Linking</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\win32\LinkOptions.h">
       <Filter>Linking</Filter>
     </ClInclude>
@@ -623,9 +620,6 @@
       <Filter>Linking</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\gba\GBASockClient.cpp">
-      <Filter>Linking</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\JoybusOptions.cpp">
       <Filter>Linking</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\win32\LinkOptions.cpp">
