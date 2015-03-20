@@ -33,6 +33,8 @@ extern bool skipBios;
 extern int frameSkip;
 extern bool speedup;
 extern bool synchronize;
+extern bool gba_joybus_enabled;
+extern bool gba_joybus_active;
 extern bool cpuDisableSfx;
 extern bool cpuIsMultiBoot;
 extern bool parseDebug;

@@ -3055,7 +3055,7 @@ void CPUUpdateRegister(u32 address, u16 value)
 	  UPDATE_REG(COMM_JOY_RECV_L, value);
 	  break;
   case COMM_JOY_RECV_H:
-	  UPDATE_REG(COMM_JOY_RECV_H, value);	  
+	  UPDATE_REG(COMM_JOY_RECV_H, value);
 	  break;
 
   case COMM_JOY_TRANS_L:
@@ -3064,10 +3064,11 @@ void CPUUpdateRegister(u32 address, u16 value)
 	  break;
   case COMM_JOY_TRANS_H:
 	  UPDATE_REG(COMM_JOY_TRANS_H, value);
+	  UPDATE_REG(COMM_JOYSTAT, READ16LE(&ioMem[COMM_JOYSTAT]) | JOYSTAT_SEND);
 	  break;
 
   case COMM_JOYSTAT:
-	  UPDATE_REG(COMM_JOYSTAT, (READ16LE(&ioMem[COMM_JOYSTAT]) & 0xf) | (value & 0xf0));
+	  UPDATE_REG(COMM_JOYSTAT, (READ16LE(&ioMem[COMM_JOYSTAT]) & 0x0a) | (value & ~0x0a));
 	  break;
 #endif
 
@@ -3650,8 +3651,8 @@ void CPULoop(int ticks)
 
 #ifndef NO_LINK
   // shuffle2: what's the purpose?
-  if(gba_link_enabled)
-    cpuNextEvent = 1;
+  //if(gba_link_enabled)
+    //cpuNextEvent = 1;
 #endif
 
   cpuBreakLoop = false;
@@ -4114,12 +4115,12 @@ void CPULoop(int ticks)
 
       ticks -= clockTicks;
 
-	  if (gba_joybus_enabled)
-		  JoyBusUpdate(clockTicks);
-
 #ifndef NO_LINK
 	  if (gba_link_enabled)
 		  LinkUpdate(clockTicks);
+		  
+  	  if (gba_joybus_enabled)
+		  JoyBusUpdate(clockTicks);
 #endif
 
       cpuNextEvent = CPUUpdateTicks();
@@ -4137,7 +4138,7 @@ void CPULoop(int ticks)
 
 #ifndef NO_LINK
 	  // shuffle2: what's the purpose?
-	  if(gba_link_enabled)
+	  if(gba_link_enabled || gba_joybus_active)
   	       cpuNextEvent = 1;
 #endif
 

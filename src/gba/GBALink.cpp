@@ -30,6 +30,7 @@ const char *MakeInstanceFilename(const char *Input)
 
 // Joybus
 bool gba_joybus_enabled = false;
+bool gba_joybus_active = false;
 
 // If disabled, gba core won't call any (non-joybus) link functions
 bool gba_link_enabled = false;
@@ -388,39 +389,95 @@ void JoyBusShutdown()
 	dol = NULL;
 }
 
+const u64 TICKS_PER_FRAME = 16777216 / 60;
+const u64 TICKS_PER_SECOND = 16777216;
+const u64 BITS_PER_SECOND = 115200;
+const u64 BYTES_PER_SECOND = BITS_PER_SECOND / 8;
+
+static u32 lastjoybusupdate = 0;
+static u32 nextjoybusupdate = 0;
+static u32 lastcommand = 0;
+static bool booted = false;
+
 void JoyBusUpdate(int ticks)
 {
-	linktime += ticks;
-	static int lastjoybusupdate = 0;
+	lastjoybusupdate += ticks;
+	lastcommand += ticks;
 
-	// Kinda ugly hack to update joybus stuff intermittently
-	if (linktime > lastjoybusupdate + 0x3000)
+	bool joybus_activated = ((READ16LE(&ioMem[COMM_RCNT])) >> 14) == 3;
+	gba_joybus_active = dol && gba_joybus_enabled && joybus_activated;
+
+	if ((lastjoybusupdate > nextjoybusupdate))
 	{
-		lastjoybusupdate = linktime;
+		if (!joybus_activated)
+		{
+			if (dol && booted)
+			{
+				JoyBusShutdown();
+			}
 
-		char data[5] = {0x10, 0, 0, 0, 0}; // init with invalid cmd
-		std::vector<char> resp;
+			lastjoybusupdate = 0;
+			nextjoybusupdate = 0;
+			lastcommand = 0;
+			return;
+		}
 
 		if (!dol)
+		{
+			booted = false;
 			JoyBusConnect();
+		}
 
-		u8 cmd = dol->ReceiveCmd(data);
+		dol->ReceiveClock(false);
+
+		if (dol->IsDisconnected())
+		{
+			JoyBusShutdown();
+			nextjoybusupdate = TICKS_PER_SECOND * 2; // try to connect after 2 seconds
+			lastjoybusupdate = 0;
+			lastcommand = 0;
+			return;
+		}
+
+		dol->ClockSync(lastjoybusupdate);
+
+		char data[5] = { 0x10, 0, 0, 0, 0 }; // init with invalid cmd
+		std::vector<char> resp;
+		u8 cmd = 0x10;
+
+		if (lastcommand > (TICKS_PER_FRAME * 4))
+		{
+			cmd = dol->ReceiveCmd(data, true);
+		}
+		else
+		{
+			cmd = dol->ReceiveCmd(data, false);
+		}
+
 		switch (cmd) {
 		case JOY_CMD_RESET:
 			UPDATE_REG(COMM_JOYCNT, READ16LE(&ioMem[COMM_JOYCNT]) | JOYCNT_RESET);
+			resp.push_back(0x00); // GBA device ID
+			resp.push_back(0x04);
+			nextjoybusupdate = TICKS_PER_SECOND / BYTES_PER_SECOND;
+			break;
 
 		case JOY_CMD_STATUS:
 			resp.push_back(0x00); // GBA device ID
 			resp.push_back(0x04);
+
+			nextjoybusupdate = TICKS_PER_SECOND / BYTES_PER_SECOND;
 			break;
-		
+
 		case JOY_CMD_READ:
 			resp.push_back((u8)(READ16LE(&ioMem[COMM_JOY_TRANS_L]) & 0xff));
 			resp.push_back((u8)(READ16LE(&ioMem[COMM_JOY_TRANS_L]) >> 8));
 			resp.push_back((u8)(READ16LE(&ioMem[COMM_JOY_TRANS_H]) & 0xff));
 			resp.push_back((u8)(READ16LE(&ioMem[COMM_JOY_TRANS_H]) >> 8));
-			UPDATE_REG(COMM_JOYSTAT, READ16LE(&ioMem[COMM_JOYSTAT]) & ~JOYSTAT_SEND);
+
 			UPDATE_REG(COMM_JOYCNT, READ16LE(&ioMem[COMM_JOYCNT]) | JOYCNT_SEND_COMPLETE);
+			nextjoybusupdate = TICKS_PER_SECOND / BYTES_PER_SECOND;
+			booted = true;
 			break;
 
 		case JOY_CMD_WRITE:
@@ -428,22 +485,35 @@ void JoyBusUpdate(int ticks)
 			UPDATE_REG(COMM_JOY_RECV_H, (u16)((u16)data[4] << 8) | (u8)data[3]);
 			UPDATE_REG(COMM_JOYSTAT, READ16LE(&ioMem[COMM_JOYSTAT]) | JOYSTAT_RECV);
 			UPDATE_REG(COMM_JOYCNT, READ16LE(&ioMem[COMM_JOYCNT]) | JOYCNT_RECV_COMPLETE);
+			nextjoybusupdate = TICKS_PER_SECOND / BYTES_PER_SECOND;
+			booted = true;
 			break;
 
 		default:
+			nextjoybusupdate = TICKS_PER_SECOND / 40000;
+			lastjoybusupdate = 0;
 			return; // ignore
 		}
 
+		lastjoybusupdate = 0;
 		resp.push_back((u8)READ16LE(&ioMem[COMM_JOYSTAT]));
+
+		if (cmd == JOY_CMD_READ)
+		{
+			UPDATE_REG(COMM_JOYSTAT, READ16LE(&ioMem[COMM_JOYSTAT]) & ~JOYSTAT_SEND);
+		}
+
 		dol->Send(resp);
 
 		// Generate SIO interrupt if we can
-		if ( ((cmd == JOY_CMD_RESET) || (cmd == JOY_CMD_READ) || (cmd == JOY_CMD_WRITE))
+		if (((cmd == JOY_CMD_RESET) || (cmd == JOY_CMD_READ) || (cmd == JOY_CMD_WRITE))
 			&& (READ16LE(&ioMem[COMM_JOYCNT]) & JOYCNT_INT_ENABLE) )
 		{
 			IF |= 0x80;
 			UPDATE_REG(0x202, IF);
 		}
+
+		lastcommand = 0;
 	}
 }
 
@@ -451,6 +521,9 @@ static void ReInitLink();
 
 void LinkUpdate(int ticks)
 {
+	if (((READ16LE(&ioMem[COMM_RCNT])) >> 14) == 3)
+		return;
+
 	// this actually gets called every single instruction, so keep default
 	// path as short as possible
 

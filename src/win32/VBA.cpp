@@ -2758,7 +2758,7 @@ void Sm60FPS_Sleep()
 	if( theApp.autoFrameSkip ) {
 		u32 dwTimePass = Sm60FPS::dwTimeElapse + (GetTickCount() - Sm60FPS::dwTime0);
 		u32 dwTimeShould = (u32)(Sm60FPS::nFrameCnt * Sm60FPS::K_fDT);
-		if( dwTimeShould > dwTimePass ) {
+		if (dwTimeShould > dwTimePass && !gba_joybus_active) {
 			Sleep(dwTimeShould - dwTimePass);
 		}
 	}
