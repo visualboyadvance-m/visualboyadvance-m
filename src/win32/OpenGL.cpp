@@ -336,7 +336,7 @@ bool OpenGLDisplay::initialize()
 
 	initializeMatrices( theApp.surfaceSizeX, theApp.surfaceSizeY );
 
-	setVSync( theApp.vsync );
+	setVSync( theApp.vsync && !gba_joybus_active );
 
 #ifdef MMX
 	if(!theApp.disableMMX)
