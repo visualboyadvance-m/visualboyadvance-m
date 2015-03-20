@@ -1218,7 +1218,7 @@ void MainWnd::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
     }
   } else {
     theApp.wasPaused = true;
-    if(theApp.pauseWhenInactive) {
+    if(theApp.pauseWhenInactive && !gba_joybus_active) {
       if(emulating) {
         soundPause();
       }
