@@ -1,32 +1,152 @@
 #ifndef GBA_GBALINK_H
 #define GBA_GBALINK_H
 
-#pragma once
+/**
+ * Link modes to be passed to InitLink
+ */
+enum LinkMode
+{
+	LINK_DISCONNECTED,
+	LINK_CABLE_IPC,
+	LINK_CABLE_SOCKET,
+	LINK_RFU_IPC,
+	LINK_GAMECUBE_DOLPHIN
+};
 
-// register definitions; these are always present
+/**
+ * State of the connection attempt
+ */
+enum ConnectionState
+{
+	LINK_OK,
+	LINK_ERROR,
+	LINK_NEEDS_UPDATE,
+	LINK_ABORT
+};
 
-#define UNSUPPORTED -1
-#define MULTIPLAYER 0
-#define NORMAL8 1
-#define NORMAL32 2
-#define UART 3
-#define JOYBUS 4
-#define GP 5
+/**
+ * Initialize GBA linking
+ *
+ * @param mode Device to emulate, plugged to the GBA link port.
+ * @return success
+ */
+extern ConnectionState InitLink(LinkMode mode);
 
-#define RFU_INIT 0
-#define RFU_COMM 1
-#define RFU_SEND 2
-#define RFU_RECV 3
+/**
+ * Update a link connection request
+ *
+ * @param message Information message
+ * @param size Maximum message size
+ */
+extern ConnectionState ConnectLinkUpdate(char * const message, size_t size);
 
+/**
+ * Get the currently enabled link mode
+ *
+ * @return link mode
+ */
+extern LinkMode GetLinkMode();
+
+/**
+ * Is this instance going to host a LAN link server?
+ *
+ * @param enabled Server mode
+ * @param numSlaves Number of expected clients
+ */
+extern void EnableLinkServer(bool enable, int numSlaves);
+
+/**
+ * Should speed hacks be used?
+ *
+ * @param enabled Speed hacks
+ */
+extern void EnableSpeedHacks(bool enable);
+
+/**
+ * Set the host to connect to when in socket mode
+ *
+ * @return false if the address is invalid
+ */
+extern bool SetLinkServerHost(const char *host);
+
+/**
+ * Get the host relevant to context
+ *
+ * If in lan server mode, returns the external IP adress
+ * If in lan client mode, returns the IP adress of the host to connect to
+ * If in gamecube mode, returns the IP adress of the dolphin host
+ *
+ */
+extern void GetLinkServerHost(char * const host, size_t size);
+
+/**
+ * Set the value in milliseconds of the timeout after which a connection is
+ * deemed lost.
+ *
+ * @param value timeout
+ */
+extern void SetLinkTimeout(int value);
+
+/**
+ * Verify that the link between the emulators is still active
+ */
+extern void CheckLinkConnection();
+
+/**
+ * Set the current link mode to LINK_DISCONNECTED
+ */
+extern void CloseLink();
+
+/**
+ * Get the id of the player of this VBA instance
+ *
+ * @return id -1 means disconnected, 0 means master, > 0 means slave
+ */
+extern int GetLinkPlayerId();
+
+/**
+ * Start a link transfer
+ *
+ * @param siocnt the value of SIOCNT to be written
+ */
+extern void StartLink(u16 siocnt);
+
+/**
+ * Start a general purpose link transfer
+ *
+ * @param rcnt the value of RCNT to be written
+ */
+extern void StartGPLink(u16 rcnt);
+
+/**
+ * Emulate the linked device
+ */
+extern void LinkUpdate(int);
+
+/**
+ * Clean up IPC shared memory
+ */
+extern void CleanLocalLink();
+
+/**
+ * Append the current VBA ID to a filemane
+ *
+ * @param Input filename to complete
+ * @return completed filename
+ */
+
+extern const char *MakeInstanceFilename(const char *Input);
+
+// register definitions
 #define COMM_SIODATA32_L	0x120
 #define COMM_SIODATA32_H	0x122
 #define COMM_SIOCNT			0x128
 #define COMM_SIODATA8		0x12a
-#define COMM_SIOMLT_SEND 0x12a
-#define COMM_SIOMULTI0 0x120
-#define COMM_SIOMULTI1 0x122
-#define COMM_SIOMULTI2 0x124
-#define COMM_SIOMULTI3 0x126
+#define COMM_SIOMLT_SEND	0x12a
+#define COMM_SIOMULTI0		0x120
+#define COMM_SIOMULTI1		0x122
+#define COMM_SIOMULTI2		0x124
+#define COMM_SIOMULTI3		0x126
 #define COMM_RCNT			0x134
 #define COMM_JOYCNT			0x140
 #define COMM_JOY_RECV_L		0x150
@@ -42,147 +162,5 @@
 #define JOYCNT_RECV_COMPLETE	2
 #define JOYCNT_SEND_COMPLETE	4
 #define JOYCNT_INT_ENABLE		0x40
-
-enum
-{
-	JOY_CMD_RESET	= 0xff,
-	JOY_CMD_STATUS	= 0x00,
-	JOY_CMD_READ	= 0x14,
-	JOY_CMD_WRITE	= 0x15		
-};
-
-extern const char *MakeInstanceFilename(const char *Input);
-
-#ifndef NO_LINK
-// Link implementation
-#include <SFML/System.hpp>
-#include <SFML/Network.hpp>
-
-class ServerInfoDisplay
-{
-public:
-    virtual void ShowServerIP(const sf::IPAddress& addr) = 0;
-    virtual void ShowConnect(const int player) = 0;
-    virtual void Ping() = 0;
-    virtual void Connected() = 0;
-};
-
-typedef struct {
-	u16 linkdata[5];
-	u16 linkcmd;
-	u16 numtransfers;
-	int lastlinktime;
-	u8 numgbas;
-	u8 trgbas;
-	u8 linkflags;
-	int rfu_q[4];
-	u8 rfu_request[4];
-	int rfu_linktime[4];
-	u32 rfu_bdata[4][7];
-	u32 rfu_data[4][32];
-} LINKDATA;
-
-class lserver{
-	int numbytes;
-	sf::Selector<sf::SocketTCP> fdset;
-	//timeval udptimeout;
-	char inbuffer[256], outbuffer[256];
-	s32 *intinbuffer;
-	u16 *u16inbuffer;
-	s32 *intoutbuffer;
-	u16 *u16outbuffer;
-	int counter;
-	int done;
-public:
-	int howmanytimes;
-	sf::SocketTCP tcpsocket[4];
-	sf::IPAddress udpaddr[4];
-	lserver(void);
-	bool Init(ServerInfoDisplay *);
-	void Send(void);
-	void Recv(void);
-};
-
-class ClientInfoDisplay {
-public:
-    virtual void ConnectStart(const sf::IPAddress& addr) = 0;
-    virtual void Ping() = 0;
-    virtual void ShowConnect(const int player, const int togo) = 0;
-    virtual void Connected() = 0;
-};
-
-class lclient{
-	sf::Selector<sf::SocketTCP> fdset;
-	char inbuffer[256], outbuffer[256];
-	s32 *intinbuffer;
-	u16 *u16inbuffer;
-	s32 *intoutbuffer;
-	u16 *u16outbuffer;
-	int numbytes;
-public:
-	sf::IPAddress serveraddr;
-	unsigned short serverport;
-	sf::SocketTCP noblock;
-	int numtransfers;
-	lclient(void);
-	bool Init(sf::IPAddress, ClientInfoDisplay *);
-	void Send(void);
-	void Recv(void);
-	void CheckConn(void);
-};
-
-typedef struct {
-	sf::SocketTCP tcpsocket;
-	//sf::SocketUDP udpsocket;
-	int numslaves;
-	sf::Thread *thread;
-	int type;
-	bool server;
-	bool terminate;
-	bool connected;
-	bool speed;
-	bool active;
-} LANLINKDATA;
-
-extern bool gba_joybus_enabled;
-extern bool gba_joybus_active;
-extern bool gba_link_enabled;
-
-extern sf::IPAddress joybusHostAddr;
-extern void JoyBusConnect();
-extern void JoyBusShutdown();
-extern void JoyBusUpdate(int ticks);
-
-extern bool InitLink();
-extern void CloseLink();
-extern void StartLink(u16);
-extern void StartGPLink(u16);
-extern void LinkUpdate(int);
-extern void CleanLocalLink();
-extern LANLINKDATA lanlink;
-extern int vbaid;
-extern bool rfu_enabled;
-extern int linktimeout;
-extern lclient lc;
-extern lserver ls;
-extern int linkid;
-
-#else
-
-// stubs to keep #ifdef's out of mainline
-const bool gba_joybus_enabled = false;
-const bool gba_link_enabled = false;
-
-inline void JoyBusConnect() { }
-inline void JoyBusShutdown() { }
-inline void JoyBusUpdate(int) { }
-
-inline bool InitLink() { return true; }
-inline void CloseLink() { }
-inline void StartLink(u16) { }
-inline void StartGPLink(u16) { }
-inline void LinkUpdate(int) { }
-inline void CleanLocalLink() { }
-#endif
 
 #endif /* GBA_GBALINK_H */
