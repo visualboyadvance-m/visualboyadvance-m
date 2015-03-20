@@ -279,9 +279,10 @@ void GameArea::LoadGame(const wxString &name)
 	wxString bname = loaded_game.GetFullName();
 #ifndef NO_LINK
 	// MakeInstanceFilename doesn't do wxString, so just add slave ID here
-	if(vbaid) {
+	int playerId = GetLinkPlayerId();
+	if(playerId >= 0) {
 	    bname.append(wxT('-'));
-	    bname.append(wxChar(wxT('1') + vbaid));
+	    bname.append(wxChar(wxT('1') + playerId));
 	}
 #endif
 	bname.append(wxT(".sav"));
@@ -331,10 +332,11 @@ void GameArea::SetFrameTitle()
     } else
 	tit = wxT("VisualBoyAdvance-M " VERSION);
 #ifndef NO_LINK
-    if(vbaid > 0 || linkid > 0) {
-	tit.append(_(" player "));
-	tit.append(wxChar(wxT('1') + (linkid > 0 ? linkid : vbaid)));
-    }
+	int playerId = GetLinkPlayerId();
+	if (playerId >= 0) {
+		tit.append(_(" player "));
+		tit.append(wxChar(wxT('1') + playerId));
+	}
 #endif
     wxGetApp().frame->SetTitle(tit);
 }
@@ -516,10 +518,11 @@ void GameArea::SaveBattery(bool quiet)
     // MakeInstanceFilename doesn't do wxString, so just add slave ID here
     wxString bname = game_name();
 #ifndef NO_LINK
-    if(vbaid) {
-	bname.append(wxT('-'));
-	bname.append(wxChar(wxT('1') + vbaid));
-    }
+	int playerId = GetLinkPlayerId();
+	if (playerId >= 0) {
+		bname.append(wxT('-'));
+		bname.append(wxChar(wxT('1') + playerId));
+	}
 #endif
     bname.append(wxT(".sav"));
     wxFileName bat(batdir, bname);
@@ -836,8 +839,8 @@ void GameArea::OnIdle(wxIdleEvent &event)
 	}
 	emusys->emuMain(emusys->emuCount);
 #ifndef NO_LINK
-	if(loaded == IMAGE_GBA && lanlink.connected && linkid && lc.numtransfers == 0)
-	    lc.CheckConn();
+	if (loaded == IMAGE_GBA && GetLinkMode() != LINK_DISCONNECTED)
+		CheckLinkConnection();
 #endif
     } else {
 	was_paused = true;
