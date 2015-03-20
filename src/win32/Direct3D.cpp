@@ -180,7 +180,7 @@ void Direct3DDisplay::prepareDisplayMode()
 	dpp.hDeviceWindow = theApp.m_pMainWnd->GetSafeHwnd();
 	dpp.FullScreen_RefreshRateInHz = ( dpp.Windowed == TRUE ) ? 0 : theApp.fsFrequency;
 	dpp.Flags = 0;
-	dpp.PresentationInterval = theApp.vsync ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
+	dpp.PresentationInterval = (theApp.vsync && !gba_joybus_active) ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 	// D3DPRESENT_INTERVAL_ONE means VSync ON
 
 

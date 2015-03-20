@@ -145,6 +145,7 @@ typedef struct {
 } LANLINKDATA;
 
 extern bool gba_joybus_enabled;
+extern bool gba_joybus_active;
 extern bool gba_link_enabled;
 
 extern sf::IPAddress joybusHostAddr;
