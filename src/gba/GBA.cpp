@@ -1078,7 +1078,7 @@ bool CPUReadGSASnapshot(const char *fileName)
   fseek(file, 0x0, SEEK_SET);
   fread(&i, 1, 4, file);
   fseek(file, i, SEEK_CUR); // Skip SharkPortSave
-//  fseek(file, 4, SEEK_CUR); // skip some sort of flag
+  fseek(file, 4, SEEK_CUR); // skip some sort of flag
   fread(&i, 1, 4, file); // name length
   fseek(file, i, SEEK_CUR); // skip name
   fread(&i, 1, 4, file); // desc length
