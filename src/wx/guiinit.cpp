@@ -1156,7 +1156,7 @@ wxString CheatListCtrl::OnGetItemText(long item, long column) const
 	off = (item & ((1 << (cap_size - size)) - 1)) << size;
 	item >>= cap_size - size;
     } else if(cap_size < size) {
-	for(int i = 0; i < addrs.size(); i++) {
+	for(unsigned int i = 0; i < addrs.size(); i++) {
 	    if(!(addrs[i] & ((1 << size) - 1)) && !item--) {
 		item = i;
 		break;
@@ -1381,7 +1381,7 @@ public:
 #endif
 	}
 	dev->SetSelection(0);
-	for(int i = 0; i < names.size(); i++) {
+	for(unsigned int i = 0; i < names.size(); i++) {
 	    dev->Append(names[i]);
 	    if(api == gopts.audio_api && gopts.audio_dev == dev_ids[i])
 		dev->SetSelection(i + 1);
@@ -1512,7 +1512,7 @@ public:
 	// wxDisplay is so broken.
 	vm = d.GetModes();
 	wxString s;
-	for(int i = 0; i < vm.size(); i++) {
+	for(unsigned int i = 0; i < vm.size(); i++) {
 	    s.Printf(_("%d x %d - %dbpp @ %dHz"), vm[i].w, vm[i].h, vm[i].bpp, vm[i].refresh);
 	    c->Append(s);
 	    if(!modeno && gopts.fs_mode.w == vm[i].w && gopts.fs_mode.h == vm[i].h) {
@@ -1662,7 +1662,7 @@ public:
 	asb->Enable(!key->GetValue().empty());
 	int cmd = id->val;
 
-	for(int i = 0; i < accels.size(); i++)
+	for(unsigned int i = 0; i < accels.size(); i++)
 	    if(accels[i].GetCommand() == cmdtab[cmd].cmd_id)
 		lb->Append(wxKeyTextCtrl::ToString(accels[i].GetFlags(),
 						   accels[i].GetKeyCode()));
@@ -1698,7 +1698,7 @@ public:
 	    }
 	// if it's a system accel, disable by assigning to NOOP
 	wxAcceleratorEntry_v &sys_accels = wxGetApp().frame->sys_accels;
-	for(int i = 0; i < sys_accels.size(); i++)
+	for(unsigned int i = 0; i < sys_accels.size(); i++)
 	    if(sys_accels[i].GetFlags() == selmod &&
 	       sys_accels[i].GetKeyCode() == selkey) {
 		wxAcceleratorEntry ne(selmod, selkey, XRCID("NOOP"));
@@ -1739,7 +1739,7 @@ public:
 	int acmod, ackey;
 	if(!wxKeyTextCtrl::FromString(accel, acmod, ackey))
 	    return; // this should never happen
-	for(int i = 0; i < lb->GetCount(); i++)
+	for(unsigned int i = 0; i < lb->GetCount(); i++)
 	    if(lb->GetString(i) == accel)
 		return; // ignore attempts to add twice
 	lb->Append(accel);
@@ -1783,7 +1783,7 @@ public:
 	}
 	asb->Enable(tc->GetSelection().IsOk());
 	int cmd = -1;
-	for(int i = 0; i < accels.size(); i++)
+	for(unsigned int i = 0; i < accels.size(); i++)
 	    if(accels[i].GetFlags() == acmod && accels[i].GetKeyCode() == ackey) {
 		int cmdid = accels[i].GetCommand();
 		for(cmd = 0; cmd < ncmds; cmd++)
@@ -2174,7 +2174,7 @@ bool MainFrame::InitMore(void)
     if(checkable_mi.size()) {
 #define add_bcheck(s, f) do { \
     int id = XRCID(s); \
-    for(int i = 0; i < checkable_mi.size(); i++) { \
+    for(unsigned int i = 0; i < checkable_mi.size(); i++) { \
 	if(checkable_mi[i].cmd != id) \
 	    continue; \
 	checkable_mi[i].boolopt = &f; \
@@ -2185,7 +2185,7 @@ bool MainFrame::InitMore(void)
 
 #define add_icheck(s, f, m, v) do { \
     int id = XRCID(s); \
-    for(int i = 0; i < checkable_mi.size(); i++) { \
+    for(unsigned int i = 0; i < checkable_mi.size(); i++) { \
 	if(checkable_mi[i].cmd != id) \
 	    continue; \
 	checkable_mi[i].intopt = &f; \
@@ -2223,7 +2223,7 @@ bool MainFrame::InitMore(void)
 	add_icheck1("JoypadAutofireR", autofire, KEYM_RIGHT);
 	add_bcheck("EmulatorSpeedupToggle", turbo);
     }
-    for(int i = 0; i < checkable_mi.size(); i++)
+    for(unsigned int i = 0; i < checkable_mi.size(); i++)
 	if(!checkable_mi[i].boolopt && !checkable_mi[i].intopt) {
 	    wxLogError(_("Invalid menu item %s; removing"),
 		       checkable_mi[i].mi->GetItemLabelText().c_str());
@@ -2991,7 +2991,7 @@ bool MainFrame::InitMore(void)
 	wxTreeItemId rid = tc->AddRoot(wxT("root"));
 	if(menubar) {
 	    wxTreeItemId mid = tc->AppendItem(rid, _("Menu commands"));
-	    for(int i = 0; i < menubar->GetMenuCount(); i++) {
+	    for(unsigned int i = 0; i < menubar->GetMenuCount(); i++) {
 #if wxCHECK_VERSION(2,8,8)
 		wxTreeItemId id = tc->AppendItem(mid, menubar->GetMenuLabelText(i));
 #else
@@ -3129,7 +3129,7 @@ wxAcceleratorEntry_v MainFrame::get_accels(wxAcceleratorEntry_v user_accels)
     // then user overrides
     // silently keep only last defined binding
     // same horribly inefficent O(n*m) search for duplicates as above..
-    for(int i = 0; i < user_accels.size(); i++) {
+    for(unsigned int i = 0; i < user_accels.size(); i++) {
 	const wxAcceleratorEntry &ae = user_accels[i];
 	for(wxAcceleratorEntry_v::iterator e = accels.begin(); e < accels.end(); e++)
 	    if(ae.GetFlags() == e->GetFlags() &&
@@ -3154,7 +3154,7 @@ void MainFrame::set_global_accels()
     // the menus will be added now
 
     // first, zero out menu item on all accels
-    for(int i = 0; i < accels.size(); i++)
+    for(unsigned int i = 0; i < accels.size(); i++)
 	accels[i].Set(accels[i].GetFlags(), accels[i].GetKeyCode(),
 		      accels[i].GetCommand());
 
@@ -3169,7 +3169,7 @@ void MainFrame::set_global_accels()
 	// system
 	int cmd = cmdtab[i].cmd_id;
 	int last_accel = -1;
-	for(int j = 0; j < accels.size(); j++)
+	for(unsigned int j = 0; j < accels.size(); j++)
 	    if(cmd == accels[j].GetCommand())
 		last_accel = j;
 	if(last_accel >= 0) {
@@ -3183,12 +3183,12 @@ void MainFrame::set_global_accels()
     }
     // Finally, install a global accelerator table for any non-menu accels
     int len = 0;
-    for(int i = 0; i < accels.size(); i++)
+    for(unsigned int i = 0; i < accels.size(); i++)
 	if(!accels[i].GetMenuItem())
 	    len++;
     if(len) {
         wxAcceleratorEntry * tab = new wxAcceleratorEntry[len];
-        for(int i = 0, j = 0; i < accels.size(); i++)
+        for(unsigned int i = 0, j = 0; i < accels.size(); i++)
         {
             if(!accels[i].GetMenuItem())
                 tab[j++] = accels[i];
@@ -3207,7 +3207,7 @@ void MainFrame::set_global_accels()
     // save recent accels
     for(int i = 0; i < 10; i++)
 	recent_accel[i] = wxAcceleratorEntry();
-    for(int i = 0; i < accels.size(); i++)
+    for(unsigned int i = 0; i < accels.size(); i++)
 	if(accels[i].GetCommand() >= wxID_FILE1 &&
 	   accels[i].GetCommand() <= wxID_FILE10)
 	    recent_accel[accels[i].GetCommand() - wxID_FILE1] = accels[i];
