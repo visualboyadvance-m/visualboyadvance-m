@@ -1,10 +1,11 @@
 #include <cstdlib>
 #include "../common/Types.h"
+#include "gbGlobals.h"
 
 u8 *gbMemoryMap[16];
 
 int gbRomSizeMask = 0;
-int gbRomSize = 0;
+unsigned int gbRomSize = 0;
 int gbRamSizeMask = 0;
 int gbRamSize = 0;
 int gbTAMA5ramSize = 0;
@@ -27,7 +28,7 @@ bool genericflashcardEnable = false;
 int gbCgbMode = 0;
 
 u16 gbColorFilter[32768];
-int gbColorOption = 0;
+bool gbColorOption = 0;
 int gbPaletteOption = 0;
 int gbEmulatorType = 0;
 int gbBorderOn = 0;

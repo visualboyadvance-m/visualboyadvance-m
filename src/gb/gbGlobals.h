@@ -25,7 +25,7 @@ extern u8 *gbMemoryMap[16];
 
 extern int gbFrameSkip;
 extern u16 gbColorFilter[32768];
-extern int gbColorOption;
+extern bool gbColorOption;
 extern int gbPaletteOption;
 extern int gbEmulatorType;
 extern int gbBorderOn;
