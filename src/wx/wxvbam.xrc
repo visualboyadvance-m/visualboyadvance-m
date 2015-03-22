@@ -456,7 +456,7 @@
       <object class="wxMenuItem" name="wxID_ABOUT"/>
     </object>
   </object>
-  <object class="wxIcon" name="MainIcon">vbam.png</object>
+  <object class="wxIcon" name="MainIcon">../art/vbam.png</object>
   <object class="wxDialog" name="GBPrinter">
     <title>GB Printer</title>
     <object class="wxBoxSizer">

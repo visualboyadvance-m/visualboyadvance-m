@@ -69,19 +69,13 @@ include_directories(widgets)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-# Copy over needed icons
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../art/vbam.png DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../art/wxvbam.xpm DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-# wxrc does not support xrs files in -c output (> 10x compression)
-# so do it manually using slow but portable bin2c.cmake script
+#Compress the xrc file (and png image) to an xrs file (> 10x compression)
 ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xrs
-                   # doing this in its own dir prevents name prefixes
-		   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/wxvbam.xrc wxvbam.xrc
-                   COMMAND wxrc wxvbam.xrc -o wxvbam.xrs
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-	           DEPENDS ${XRC_ITEM}
+        COMMAND wxrc ${CMAKE_CURRENT_SOURCE_DIR}/wxvbam.xrc -o ${CMAKE_CURRENT_BINARY_DIR}/wxvbam.xrs
 		   DEPENDS wxvbam.xrc)
+
+# wxrc does not support xrs files in -c output
+# so do it manually using slow but portable bin2c.cmake script
 ADD_CUSTOM_COMMAND(OUTPUT builtin-xrc.h
                    COMMAND ${CMAKE_COMMAND} -DINFILE=wxvbam.xrs -DOUTFILE=builtin-xrc.h -DVARNAME=builtin_xrs -P ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.cmake
 		   DEPENDS wxvbam.xrs)
@@ -133,7 +127,7 @@ SET( SRC_WX
    cmdhandlers.h
    cmd-evtable.h
    #Icon file
-   wxvbam.xpm
+   ../art/wxvbam.xpm
 )
 
 IF(ENABLE_OPENAL)
