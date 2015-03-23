@@ -293,9 +293,6 @@ void LinkOptions::UpdateAvailability()
 	GetDlgItem(IDC_LINK4P)->EnableWindow(isNetwork && m_server);
 }
 
-#endif // NO_LINK
-
-
 void LinkOptions::OnBnClickedLinkServer()
 {
 	UpdateData(TRUE);
@@ -308,3 +305,5 @@ void LinkOptions::OnBnClickedLinkClient()
 	UpdateData(TRUE);
 	UpdateAvailability();
 }
+
+#endif // NO_LINK
