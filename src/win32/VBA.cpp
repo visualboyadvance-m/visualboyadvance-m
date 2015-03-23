@@ -1567,7 +1567,11 @@ void VBA::loadSettings()
   if(winGbPrinterEnabled)
     gbSerialFunction = gbPrinterSend;
   else
-    gbSerialFunction = NULL;
+#ifndef NO_LINK
+    gbSerialFunction = gbStartLink;
+#else
+	gbSerialFunction = NULL;
+#endif
 
   pauseWhenInactive = regQueryDwordValue("pauseWhenInactive", 1) ?
     true : false;

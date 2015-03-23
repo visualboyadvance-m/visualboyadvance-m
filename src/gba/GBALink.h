@@ -10,7 +10,8 @@ enum LinkMode
 	LINK_CABLE_IPC,
 	LINK_CABLE_SOCKET,
 	LINK_RFU_IPC,
-	LINK_GAMECUBE_DOLPHIN
+	LINK_GAMECUBE_DOLPHIN,
+	LINK_GAMEBOY
 };
 
 /**
@@ -192,5 +193,13 @@ typedef struct {
 	u32 time; //linktime
 	u32 data[255];
 } rfu_datarec;
+
+extern u8 gbSIO_SC;
+extern bool LinkIsWaiting;
+extern bool LinkFirstTime;
+extern bool EmuReseted;
+extern void gbLinkReset();
+extern u8   gbStartLink(u8 b);
+extern u16 gbLinkUpdate(u8 b, int gbSerialOn);
 
 #endif /* GBA_GBALINK_H */

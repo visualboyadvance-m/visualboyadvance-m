@@ -73,6 +73,7 @@ BOOL LinkOptions::OnInitDialog(){
 	AddMode("Cable - Network", LINK_CABLE_SOCKET);
 	AddMode("GameCube - Dolphin", LINK_GAMECUBE_DOLPHIN);
 	AddMode("Wireless adapter - Single Computer", LINK_RFU_IPC);
+	AddMode("Game Link (Game Boy) - Single Computer", LINK_GAMEBOY);
 
 	sprintf(timeout, "%d", theApp.linkTimeout);
 
