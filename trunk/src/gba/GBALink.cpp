@@ -14,8 +14,6 @@
 #define snprintf _snprintf
 #endif
 
-#ifndef NO_LINK
-
 static int vbaid = 0;
 const char *MakeInstanceFilename(const char *Input)
 {
@@ -31,6 +29,8 @@ const char *MakeInstanceFilename(const char *Input)
 	sprintf(result, "%.*s-%d.%s", (int)(p - Input), Input, vbaid + 1, p + 1);
 	return result;
 }
+
+#ifndef NO_LINK
 
 // The usual min/max functions for built-in types.
 //
@@ -2691,5 +2691,6 @@ void lclient::Send() {
 	lanlink.tcpsocket.Send(outbuffer, 4);
 	return;
 }
-
+#else
+bool gba_joybus_active = false;
 #endif
