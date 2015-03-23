@@ -349,9 +349,9 @@ VBA::~VBA()
     *p = 0;
 
   regInit(winBuffer);
-
+#ifndef NO_LINK
   CloseLink();
-
+#endif
   saveSettings();
 
   if(moviePlaying) {
