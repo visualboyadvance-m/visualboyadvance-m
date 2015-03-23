@@ -808,7 +808,7 @@ void  gbWriteMemory(register u16 address, register u8 value)
 		}
 		EmuReseted = false;
 		gbMemory[0xff02] = value;
-		if (gbSerialOn) {
+		if (gbSerialOn && GetLinkMode() == LINK_GAMEBOY) {
 			gbSerialTicks = GBSERIAL_CLOCK_TICKS;
 
 			LinkIsWaiting = true;
@@ -2201,8 +2201,10 @@ void gbGetHardwareType()
 void gbReset()
 {
 #ifndef NO_LINK
-  EmuReseted = true;
-  gbLinkReset();
+	if (GetLinkMode() == LINK_GAMEBOY) {
+		EmuReseted = true;
+		gbLinkReset();
+	}
 #endif
 
   gbGetHardwareType();
@@ -5254,7 +5256,8 @@ void gbEmulate(int ticksToStop)
 	static int SIOctr = 0;
 	SIOctr++;
 	if (SIOctr % 5)
-		if (gbSerialOn) { //Transfer Started
+		//Transfer Started
+		if (gbSerialOn && GetLinkMode() == LINK_GAMEBOY) {
 #ifdef OLD_GB_LINK
 			if (linkConnected) {
 				gbSerialTicks -= clockTicks;
