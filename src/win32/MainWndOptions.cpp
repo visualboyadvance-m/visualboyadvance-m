@@ -1025,7 +1025,11 @@ void MainWnd::OnOptionsGameboyPrinter()
   if(theApp.winGbPrinterEnabled)
     gbSerialFunction = gbPrinterSend;
   else
-    gbSerialFunction = NULL;
+#ifndef NO_LINK
+	gbSerialFunction = gbStartLink;
+#else
+	gbSerialFunction = NULL;
+#endif
 }
 
 void MainWnd::OnUpdateOptionsGameboyPrinter(CCmdUI* pCmdUI)
