@@ -300,7 +300,6 @@ typedef struct {
 	int type;
 	bool server;
 	bool speed; //speedhack
-	bool active; //network/single computer
 } LANLINKDATA;
 
 class lserver{
@@ -1882,7 +1881,7 @@ bool LinkRFUUpdate()
 {
 	//if (IsLinkConnected()) {
 	//}
-	if (!lanlink.active || rfu_enabled) {
+	if (rfu_enabled) {
 		if (transfer&&rfu_transfer_end <= 0)
 		{
 			if (rfu_waiting) {
@@ -2231,6 +2230,9 @@ static ConnectionState InitSocket() {
 
 ConnectionState InitLink(LinkMode mode)
 {
+	if (mode == LINK_DISCONNECTED)
+		return LINK_ABORT;
+
 	// Do nothing if we are already connected
 	if (GetLinkMode() != LINK_DISCONNECTED) {
 		systemMessage(0, N_("Error, link already connected"));
@@ -2720,7 +2722,7 @@ u8 gbStartLink(u8 b) //used on internal clock
 	if (!gba_link_enabled) return 0xff;
 
 	//Single Computer
-	if (!lanlink.active)
+	if (GetLinkMode() == LINK_GAMEBOY)
 	{
 		u32 tm = GetTickCount();
 		do {
@@ -2764,7 +2766,7 @@ u16 gbLinkUpdate(u8 b, int gbSerialOn) //used on external clock
 	if (gbSerialOn) {
 		if (gba_link_enabled)
 			//Single Computer
-			if (!lanlink.active)
+			if (GetLinkMode() == LINK_GAMEBOY)
 			{
 				u32 tm;// = GetTickCount();
 				//do {

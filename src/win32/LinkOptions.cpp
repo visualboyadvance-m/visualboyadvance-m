@@ -133,6 +133,15 @@ void LinkOptions::OnOk()
 	SetLinkTimeout(timeout);
 
 	LinkMode newMode = (LinkMode) m_type;
+
+	if (newMode == LINK_DISCONNECTED) {
+		theApp.linkTimeout = timeout;
+		theApp.linkMode = LINK_DISCONNECTED;
+		theApp.linkHost = host;
+		CDialog::OnOK();
+		return;
+	}
+
 	bool needsServerHost = newMode == LINK_GAMECUBE_DOLPHIN || (newMode == LINK_CABLE_SOCKET && !m_server);
 
 	if (needsServerHost) {
