@@ -244,7 +244,8 @@ static const LinkDriver linkDrivers[] =
 	{ LINK_CABLE_IPC,			InitIPC,		NULL,					StartCableIPC,		UpdateCableIPC,	CloseIPC },
 	{ LINK_CABLE_SOCKET,		InitSocket,		ConnectUpdateSocket,	StartCableSocket,	UpdateSocket,	CloseSocket },
 	{ LINK_RFU_IPC,				InitIPC,		NULL,					StartRFU,			UpdateRFUIPC,	CloseIPC },
-	{ LINK_GAMECUBE_DOLPHIN,	JoyBusConnect,	NULL,					NULL,				JoyBusUpdate,	JoyBusShutdown }
+	{ LINK_GAMECUBE_DOLPHIN,	JoyBusConnect,	NULL,					NULL,				JoyBusUpdate,	JoyBusShutdown },
+	{ LINK_GAMEBOY,				InitIPC,		NULL,					NULL,				NULL,			CloseIPC }
 };
 
 
@@ -434,6 +435,11 @@ static const int trtimeend[3][4] = {
 };
 
 static int GetSIOMode(u16, u16);
+
+u8 gbSIO_SC = 0;
+bool LinkIsWaiting = false;
+bool LinkFirstTime = true;
+bool EmuReseted = true;
 
 // The GBA wireless RFU (see adapter3.txt)
 static void StartRFU(u16 value)
@@ -1906,7 +1912,7 @@ bool LinkRFUUpdate()
 
 						if (((rfu_cmd == 0x11 || rfu_cmd == 0x1a || rfu_cmd == 0x26) && (GetTickCount() - rfu_lasttime) < 16) ||
 							((rfu_cmd == 0xa5 || rfu_cmd == 0xb5) && (GetTickCount() - rfu_lasttime) < 16) ||
-							((rfu_cmd == 0xa7 || rfu_cmd == 0xb7) && (GetTickCount() - rfu_lasttime) < linktimeout))
+							((rfu_cmd == 0xa7 || rfu_cmd == 0xb7) && (GetTickCount() - rfu_lasttime) < (DWORD)linktimeout))
 						{
 							//c_s.Lock();
 							ok = (linkmem->rfu_listfront[vbaid] != linkmem->rfu_listback[vbaid]);
@@ -2691,6 +2697,110 @@ void lclient::Send() {
 	lanlink.tcpsocket.Send(outbuffer, 4);
 	return;
 }
+
+
+void gbLinkReset()
+{
+	LinkIsWaiting = false;
+	LinkFirstTime = true;
+	linkmem->linkcmd[linkid] = 0;
+	linkmem->linkdata[linkid] = 0xff;
+	return;
+}
+
+u8 gbStartLink(u8 b) //used on internal clock
+{
+	u8 dat = 0xff; //master (w/ internal clock) will gets 0xff if slave is turned off (or not ready yet also?)
+	//if(linkid) return 0xff; //b; //Slave shouldn't be sending from here
+	BOOL sent = false;
+	//int gbSerialOn = (gbMemory[0xff02] & 0x80); //not needed?
+	gba_link_enabled = true; //(gbMemory[0xff02]!=0); //not needed?
+	rfu_enabled = false;
+
+	if (!gba_link_enabled) return 0xff;
+
+	//Single Computer
+	if (!lanlink.active)
+	{
+		u32 tm = GetTickCount();
+		do {
+			WaitForSingleObject(linksync[linkid], 1);
+			ResetEvent(linksync[linkid]);
+		} while (linkmem->linkcmd[linkid] && (GetTickCount() - tm)<(u32)linktimeout);
+		linkmem->linkdata[linkid] = b;
+		linkmem->linkcmd[linkid] = 1;
+		SetEvent(linksync[linkid]);
+
+		LinkIsWaiting = false;
+		tm = GetTickCount();
+		do {
+			WaitForSingleObject(linksync[1 - linkid], 1);
+			ResetEvent(linksync[1 - linkid]);
+		} while (!linkmem->linkcmd[1 - linkid] && (GetTickCount() - tm)<(u32)linktimeout);
+		if (linkmem->linkcmd[1 - linkid]) {
+			dat = (u8)linkmem->linkdata[1 - linkid];
+			linkmem->linkcmd[1 - linkid] = 0;
+		} //else LinkIsWaiting = true;
+		SetEvent(linksync[1 - linkid]);
+
+		LinkFirstTime = true;
+		if (dat != 0xff/*||b==0x00||dat==0x00*/)
+			LinkFirstTime = false;
+
+		return dat;
+	}
+	return dat;
+}
+
+u16 gbLinkUpdate(u8 b, int gbSerialOn) //used on external clock
+{
+	u8 dat = b; //0xff; //slave (w/ external clocks) won't be getting 0xff if master turned off
+	BOOL recvd = false;
+	int idx = 0;
+
+	gba_link_enabled = true; //(gbMemory[0xff02]!=0);
+	rfu_enabled = false;
+
+	if (gbSerialOn) {
+		if (gba_link_enabled)
+			//Single Computer
+			if (!lanlink.active)
+			{
+				u32 tm;// = GetTickCount();
+				//do {
+				WaitForSingleObject(linksync[1 - linkid], linktimeout);
+				ResetEvent(linksync[1 - linkid]);
+				//} while (!linkmem->linkcmd[1-linkid] && (GetTickCount()-tm)<(u32)linktimeout);
+				if (linkmem->linkcmd[1 - linkid]) {
+					dat = (u8)linkmem->linkdata[1 - linkid];
+					linkmem->linkcmd[1 - linkid] = 0;
+					recvd = true;
+					LinkIsWaiting = false;
+				}
+				else LinkIsWaiting = true;
+				SetEvent(linksync[1 - linkid]);
+
+				if (!LinkIsWaiting) {
+					tm = GetTickCount();
+					do {
+						WaitForSingleObject(linksync[linkid], 1);
+						ResetEvent(linksync[linkid]);
+					} while (linkmem->linkcmd[1 - linkid] && (GetTickCount() - tm)<(u32)linktimeout);
+					if (!linkmem->linkcmd[linkid]) {
+						linkmem->linkdata[linkid] = b;
+						linkmem->linkcmd[linkid] = 1;
+					}
+					SetEvent(linksync[linkid]);
+				}
+
+			}
+
+		if (dat == 0xff/*||dat==0x00||b==0x00*/) //dat==0xff||dat==0x00
+			LinkFirstTime = true;
+	}
+	return ((dat << 8) | (recvd & (u8)0xff));
+}
+
 #else
 bool gba_joybus_active = false;
 #endif
