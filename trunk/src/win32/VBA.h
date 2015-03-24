@@ -209,7 +209,10 @@ class VBA : public CWinApp
 
   int linkTimeout;
   int linkMode;
-  CString linkHost;
+  CString linkHostAddr;
+  BOOL linkAuto;
+  BOOL linkHacks;
+  int linkNumPlayers;
 
  public:
   VBA();
