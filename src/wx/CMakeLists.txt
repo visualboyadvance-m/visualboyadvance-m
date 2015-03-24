@@ -34,8 +34,11 @@ endif(ENABLE_OPENAL)
 # adv is for wxAboutBox
 # xml, html is for xrc
 SET( wxWidgets_USE_LIBS xrc xml html adv gl net core base )
+#The Following below causes issues on Windows
+IF(NOT WIN32)
 #Make sure we use the libwxgtk2.8 toolkit
 list(APPEND wxWidgets_CONFIG_OPTIONS --version=2.8 --toolkit=gtk2)
+ENDIF (NOT WIN32)
 FIND_PACKAGE ( wxWidgets REQUIRED )
 EXECUTE_PROCESS(COMMAND sh "${wxWidgets_CONFIG_EXECUTABLE}" --cxxflags)
 INCLUDE( ${wxWidgets_USE_FILE} )
