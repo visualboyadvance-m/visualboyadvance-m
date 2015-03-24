@@ -2408,18 +2408,6 @@ int main(int argc, char **argv)
   return 0;
 }
 
-
-
-
-#ifdef __WIN32__
-extern "C" {
-  int WinMain()
-  {
-    return(main(__argc, __argv));
-  }
-}
-#endif
-
 void systemMessage(int num, const char *msg, ...)
 {
   char buffer[SYSMSG_BUFFER_SIZE*2];
