@@ -202,4 +202,6 @@ extern void gbLinkReset();
 extern u8   gbStartLink(u8 b);
 extern u16 gbLinkUpdate(u8 b, int gbSerialOn);
 
+extern void BootLink(int m_type, const char *host, int timeout, bool m_hacks, int m_numplayers);
+
 #endif /* GBA_GBALINK_H */

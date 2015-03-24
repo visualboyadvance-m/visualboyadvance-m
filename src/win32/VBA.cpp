@@ -1699,8 +1699,13 @@ void VBA::loadSettings()
 
   linkMode = regQueryDwordValue("LinkMode", LINK_DISCONNECTED);
 
-  linkHost = regQueryStringValue("LinkHostAddr", "localhost");
+  linkHostAddr = regQueryStringValue("LinkHostAddr", "localhost");
 
+  linkAuto = regQueryDwordValue("LinkAuto", true);
+
+  linkHacks = regQueryDwordValue("LinkHacks", false);
+
+  linkNumPlayers = regQueryDwordValue("LinkNumPlayers", 2);
 #endif
 
   Sm60FPS::bSaveMoreCPU = regQueryDwordValue("saveMoreCPU", 0);
@@ -2631,7 +2636,10 @@ void VBA::saveSettings()
 #ifndef NO_LINK
   regSetDwordValue("LinkTimeout", linkTimeout);
   regSetDwordValue("LinkMode", linkMode);
-  regSetStringValue("LinkHostAddr", linkHost);
+  regSetStringValue("LinkHostAddr", linkHostAddr);
+  regSetDwordValue("LinkAuto", linkAuto);
+  regSetDwordValue("LinkHacks", linkHacks);
+  regSetDwordValue("LinkNumPlayers", linkNumPlayers);
 #endif
 
   regSetDwordValue("lastFullscreen", lastFullscreen);

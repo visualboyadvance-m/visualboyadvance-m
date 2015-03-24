@@ -238,14 +238,15 @@ struct LinkDriver {
 	StartFunc *start;
 	UpdateFunc *update;
 	CloseFunc *close;
+	bool uses_socket;
 };
 static const LinkDriver linkDrivers[] =
 {
-	{ LINK_CABLE_IPC,			InitIPC,		NULL,					StartCableIPC,		UpdateCableIPC,	CloseIPC },
-	{ LINK_CABLE_SOCKET,		InitSocket,		ConnectUpdateSocket,	StartCableSocket,	UpdateSocket,	CloseSocket },
-	{ LINK_RFU_IPC,				InitIPC,		NULL,					StartRFU,			UpdateRFUIPC,	CloseIPC },
-	{ LINK_GAMECUBE_DOLPHIN,	JoyBusConnect,	NULL,					NULL,				JoyBusUpdate,	JoyBusShutdown },
-	{ LINK_GAMEBOY,				InitIPC,		NULL,					NULL,				NULL,			CloseIPC }
+	{ LINK_CABLE_IPC,			InitIPC,		NULL,					StartCableIPC,		UpdateCableIPC,	CloseIPC,		false },
+	{ LINK_CABLE_SOCKET,		InitSocket,		ConnectUpdateSocket,	StartCableSocket,	UpdateSocket,	CloseSocket,	true },
+	{ LINK_RFU_IPC,				InitIPC,		NULL,					StartRFU,			UpdateRFUIPC,	CloseIPC,		false },
+	{ LINK_GAMECUBE_DOLPHIN,	JoyBusConnect,	NULL,					NULL,				JoyBusUpdate,	JoyBusShutdown,	false },
+	{ LINK_GAMEBOY,				InitIPC,		NULL,					NULL,				NULL,			CloseIPC,		false }
 };
 
 
@@ -2044,7 +2045,7 @@ static void UpdateSocket(int ticks)
 
 void LinkUpdate(int ticks)
 {
-	if (!linkDriver) {
+	if (!linkDriver || !linkDriver->update) {
 		return;
 	}
 
@@ -2248,7 +2249,7 @@ ConnectionState InitLink(LinkMode mode)
 		}
 	}
 
-	if (linkDriver == NULL) {
+	if (!linkDriver || !linkDriver->connect) {
 		systemMessage(0, N_("Unable to find link driver"));
 		return LINK_ERROR;
 	}
@@ -2349,7 +2350,7 @@ ConnectionState ConnectLinkUpdate(char * const message, size_t size)
 {
 	message[0] = '\0';
 
-	if (!linkDriver || gba_connection_state != LINK_NEEDS_UPDATE) {
+	if (!linkDriver || !linkDriver->connectUpdate || gba_connection_state != LINK_NEEDS_UPDATE) {
 		gba_connection_state = LINK_ERROR;
 		snprintf(message, size, N_("Link connection does not need updates."));
 
@@ -2486,7 +2487,7 @@ static void CloseSocket() {
 }
 
 void CloseLink(void) {
-	if (!linkDriver) {
+	if (!linkDriver || !linkDriver->close) {
 		return; // Nothing to do
 	}
 
@@ -2802,6 +2803,58 @@ u16 gbLinkUpdate(u8 b, int gbSerialOn) //used on external clock
 	}
 	return ((dat << 8) | (recvd & (u8)0xff));
 }
+
+void BootLink(int m_type, const char *hostAddr, int timeout, bool m_hacks, int m_numplayers)
+{
+	if (linkDriver) {
+		// Connection has already been established
+		return;
+	}
+
+	LinkMode mode = (LinkMode)m_type;
+
+	if (mode == LINK_DISCONNECTED || mode == LINK_CABLE_SOCKET) {
+		return;
+	}
+
+	// Close any previous link
+	CloseLink();
+
+	bool needsServerHost = (mode == LINK_GAMECUBE_DOLPHIN);
+
+	if (needsServerHost) {
+		bool valid = SetLinkServerHost(hostAddr);
+		if (!valid) {
+			return;
+		}
+	}
+
+	SetLinkTimeout(timeout);
+	EnableSpeedHacks(m_hacks);
+
+	// Init link
+	ConnectionState state = InitLink(mode);
+
+	if (!linkDriver->uses_socket)
+	{
+		// The user canceled the connection attempt
+		if (state == LINK_ABORT) {
+			CloseLink();
+			return;
+		}
+
+		// Something failed during init
+		if (state == LINK_ERROR) {
+			return;
+		}
+	}
+	else
+	{
+		CloseLink();
+		return;
+	}
+}
+
 
 #else
 bool gba_joybus_active = false;

@@ -803,7 +803,8 @@ void  gbWriteMemory(register u16 address, register u8 value)
 	case 0x02: {
 		gbSerialOn = (value & 0x80);
 #ifndef NO_LINK
-		if (EmuReseted || (gbMemory[0xff02] & 0x7c) || (value & 0x7c) || (!(value & 0x81))) { //trying to detect whether the game has exited multiplay mode, pokemon blue start w/ 0x7e while pocket racing start w/ 0x7c 
+		//trying to detect whether the game has exited multiplay mode, pokemon blue start w/ 0x7e while pocket racing start w/ 0x7c 
+		if (EmuReseted || (gbMemory[0xff02] & 0x7c) || (value & 0x7c) || (!(value & 0x81))) {
 			LinkFirstTime = true;
 		}
 		EmuReseted = false;

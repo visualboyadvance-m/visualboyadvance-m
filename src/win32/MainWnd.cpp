@@ -626,7 +626,10 @@ bool MainWnd::FileRun()
   theApp.rewindSaveNeeded = false;
 
   toolsClearLog();
-
+#ifndef NO_LINK
+  if (theApp.linkAuto)
+	BootLink(theApp.linkMode, theApp.linkHostAddr, theApp.linkTimeout, theApp.linkHacks, theApp.linkNumPlayers);
+#endif
   return true;
 }
 
