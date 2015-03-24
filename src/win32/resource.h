@@ -836,6 +836,7 @@
 #define ID_OPTIONS_LINK_LOG             40319
 #define ID_OPTIONS_LINK_WIRELESSADAPTER 40320
 #define IDC_LINKTIMEOUT                 40321
+#define IDC_AUTOLINK					40322
 #define IDC_SERVERWAIT                  40323
 #define IDC_LINK3P                      40325
 #define IDC_LINK4P                      40326

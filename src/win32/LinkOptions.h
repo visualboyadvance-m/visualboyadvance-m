@@ -16,8 +16,6 @@ public:
 	CComboBox  m_mode;
 	CEdit m_serverip;
 	BOOL m_server;
-	int		m_numplayers;
-	BOOL	m_hacks;
 	//}}AFX_DATA
 
 

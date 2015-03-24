@@ -42,7 +42,6 @@ LinkOptions::LinkOptions(CWnd* pParent /*=NULL*/)
 	: CDialog(LinkOptions::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(LinkOptions)
-	m_numplayers = 0;
 	m_type = theApp.linkMode;
 	m_server = FALSE;
 	//}}AFX_DATA_INIT
@@ -55,10 +54,11 @@ void LinkOptions::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(LinkOptions)
 	DDX_CBData(pDX, IDC_LINK_MODE, m_type);
 	DDX_Control(pDX, IDC_LINKTIMEOUT, m_timeout);
+	DDX_Check(pDX, IDC_AUTOLINK, theApp.linkAuto);
+	DDX_Check(pDX, IDC_SSPEED, theApp.linkHacks);
 	DDX_Control(pDX, IDC_LINK_MODE, m_mode);
 	DDX_Control(pDX, IDC_SERVERIP, m_serverip);
-	DDX_Check(pDX, IDC_SSPEED, m_hacks);
-	DDX_Radio(pDX, IDC_LINK2P, m_numplayers);
+	DDX_Radio(pDX, IDC_LINK2P, theApp.linkNumPlayers);
 	DDX_Radio(pDX, IDC_LINK_CLIENT, m_server);
 	//}}AFX_DATA_MAP
 }
@@ -80,7 +80,27 @@ BOOL LinkOptions::OnInitDialog(){
 	m_timeout.LimitText(5);
 	m_timeout.SetWindowText(timeout);
 
-	m_serverip.SetWindowText(theApp.linkHost);
+	m_serverip.SetWindowText(theApp.linkHostAddr);
+
+	CheckDlgButton(IDC_AUTOLINK, theApp.linkAuto);
+
+	CheckDlgButton(IDC_SSPEED, theApp.linkHacks);
+
+	int player_radio = 0;
+	switch (theApp.linkNumPlayers)
+	{
+		case 2:
+			player_radio = IDC_LINK2P;
+		case 3:
+			player_radio = IDC_LINK3P;
+		case 4:
+			player_radio = IDC_LINK4P;
+		default:
+			player_radio = IDC_LINK2P;
+	}
+
+	CButton* pButton = (CButton*)GetDlgItem(player_radio);
+	pButton->SetCheck(true);
 
 	UpdateAvailability();
 
@@ -137,7 +157,7 @@ void LinkOptions::OnOk()
 	if (newMode == LINK_DISCONNECTED) {
 		theApp.linkTimeout = timeout;
 		theApp.linkMode = LINK_DISCONNECTED;
-		theApp.linkHost = host;
+		theApp.linkHostAddr = host;
 		CDialog::OnOK();
 		return;
 	}
@@ -152,8 +172,8 @@ void LinkOptions::OnOk()
 		}
 	}
 
-	EnableSpeedHacks(m_hacks);
-	EnableLinkServer(m_server,  m_numplayers + 1);
+	EnableSpeedHacks(theApp.linkHacks);
+	EnableLinkServer(m_server, theApp.linkNumPlayers + 1);
 
 	if (m_server) {
 		char localhost[length];
@@ -220,7 +240,7 @@ void LinkOptions::OnOk()
 
 	theApp.linkTimeout = timeout;
 	theApp.linkMode = GetLinkMode();
-	theApp.linkHost = host;
+	theApp.linkHostAddr = host;
 
 	CDialog::OnOK();
 	return;
