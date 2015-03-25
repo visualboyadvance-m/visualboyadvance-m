@@ -634,10 +634,10 @@ long utilGzMemTell(gzFile file)
   return memtell(file);
 }
 
-void utilGBAFindSave(const u8 *data, const int size)
+void utilGBAFindSave(const int size)
 {
-  u32 *p = (u32 *)data;
-  u32 *end = (u32 *)(data + size);
+  u32 *p = (u32 *)&rom[0];
+  u32 *end = (u32 *)(&rom[0] + size);
   int saveType = 0;
   int flashSize = 0x10000;
   bool rtcFound = false;
@@ -648,22 +648,22 @@ void utilGBAFindSave(const u8 *data, const int size)
     if(d == 0x52504545) {
       if(memcmp(p, "EEPROM_", 7) == 0) {
         if(saveType == 0)
-          saveType = 3;
+          saveType = 1;
       }
     } else if (d == 0x4D415253) {
       if(memcmp(p, "SRAM_", 5) == 0) {
         if(saveType == 0)
-          saveType = 1;
+          saveType = 2;
       }
     } else if (d == 0x53414C46) {
       if(memcmp(p, "FLASH1M_", 8) == 0) {
         if(saveType == 0) {
-          saveType = 2;
+          saveType = 3;
           flashSize = 0x20000;
         }
       } else if(memcmp(p, "FLASH", 5) == 0) {
         if(saveType == 0) {
-          saveType = 2;
+          saveType = 3;
           flashSize = 0x10000;
         }
       }
