@@ -751,12 +751,20 @@ void DirectInput::checkKeys()
 void DirectInput::checkMotionKeys()
 {
   if(checkKey(theApp.input->joypaddata[MOTION(KEY_LEFT)])) {
+	  theApp.sunBars--;
+	  if (theApp.sunBars < 1)
+		  theApp.sunBars = 1;
+
     theApp.sensorX += 3;
     if(theApp.sensorX > 2197)
       theApp.sensorX = 2197;
     if(theApp.sensorX < 2047)
       theApp.sensorX = 2057;
   } else if(checkKey(theApp.input->joypaddata[MOTION(KEY_RIGHT)])) {
+	  theApp.sunBars++;
+	  if (theApp.sunBars > 100)
+		  theApp.sunBars = 100;
+
     theApp.sensorX -= 3;
     if(theApp.sensorX < 1897)
       theApp.sensorX = 1897;
