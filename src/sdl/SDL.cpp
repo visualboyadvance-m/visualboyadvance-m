@@ -2660,50 +2660,70 @@ bool systemCanChangeSoundQuality()
 
 bool systemPauseOnFrame()
 {
-  if(pauseNextFrame) {
-    paused = true;
-    pauseNextFrame = false;
-    return true;
-  }
-  return false;
+	if(pauseNextFrame) {
+		paused = true;
+		pauseNextFrame = false;
+		return true;
+	}
+	return false;
 }
 
 void systemGbBorderOn()
 {
-  srcWidth = 256;
-  srcHeight = 224;
-  gbBorderLineSkip = 256;
-  gbBorderColumnSkip = 48;
-  gbBorderRowSkip = 40;
+	srcWidth = 256;
+	srcHeight = 224;
+	gbBorderLineSkip = 256;
+	gbBorderColumnSkip = 48;
+	gbBorderRowSkip = 40;
 
-  sdlInitVideo();
+	sdlInitVideo();
 
   filterFunction = initFilter(filter, srcWidth);
 }
 
 bool systemReadJoypads()
 {
-  return true;
+	return true;
 }
 
 u32 systemReadJoypad(int which)
 {
-  return inputReadJoypad(which);
+	return inputReadJoypad(which);
+}
+//static u8 sensorDarkness = 0xE8; // total darkness (including daylight on rainy days)
+
+void systemUpdateSolarSensor()
+{
+}
+
+void systemCartridgeRumble(bool)
+{
 }
 
 void systemUpdateMotionSensor()
 {
-  inputUpdateMotionSensor();
+	inputUpdateMotionSensor();
+	systemUpdateSolarSensor();
 }
 
 int systemGetSensorX()
 {
-  return inputGetSensorX();
+	return inputGetSensorX();
 }
 
 int systemGetSensorY()
 {
-  return inputGetSensorY();
+	return inputGetSensorY();
+}
+
+int systemGetSensorZ()
+{
+	return 0;
+}
+
+u8 systemGetSensorDarkness()
+{
+	//return sensorDarkness;
 }
 
 SoundDriver * systemSoundInit()

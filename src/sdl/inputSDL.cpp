@@ -623,3 +623,4 @@ EPad inputGetDefaultJoypad()
 {
   return sdlDefaultJoypad;
 }
+

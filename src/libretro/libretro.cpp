@@ -580,6 +580,11 @@ int systemGetSensorY(void)
    return 0;
 }
 
+int systemGetSensorZ(void)
+{
+  return 0;
+}
+
 u32 systemReadJoypad(int which)
 {
    if (which == -1)
@@ -596,6 +601,11 @@ u32 systemReadJoypad(int which)
 bool systemReadJoypads() { return true; }
 
 void systemUpdateMotionSensor() {}
+u8 systemGetSensorDarkness() {}
+
+void systemCartridgeRumble(bool)
+{
+}
 
 bool systemPauseOnFrame() { return false; }
 void systemGbPrint(u8 *data,int pages, int feed, int palette, int contrast) {}

@@ -95,6 +95,7 @@ wxFFile game_file;
 bool game_recording, game_playback;
 u32 game_frame;
 u32 game_joypad;
+int sunBars = 500;
 
 void systemStartGameRecording(const wxString &fname)
 {
@@ -402,57 +403,132 @@ u32 systemGetClock()
     return wxGetApp().timer.Time();
 }
 
+void systemCartridgeRumble(bool) {}
+
+static u8 sensorDarkness = 0xE8; // total darkness (including daylight on rainy days)
+
+u8 systemGetSensorDarkness()
+{
+	return sensorDarkness;
+}
+
+void systemUpdateSolarSensor()
+{
+	u8 sun = 0x0; //sun = 0xE8 - 0xE8 (case 0 and default)
+	int level = sunBars / 10;
+	switch (level)
+	{
+	case 1:
+		sun = 0xE8 - 0xE0;
+		break;
+	case 2:
+		sun = 0xE8 - 0xDA;
+		break;
+	case 3:
+		sun = 0xE8 - 0xD0;
+		break;
+	case 4:
+		sun = 0xE8 - 0xC8;
+		break;
+	case 5:
+		sun = 0xE8 - 0xC0;
+		break;
+	case 6:
+		sun = 0xE8 - 0xB0;
+		break;
+	case 7:
+		sun = 0xE8 - 0xA0;
+		break;
+	case 8:
+		sun = 0xE8 - 0x88;
+		break;
+	case 9:
+		sun = 0xE8 - 0x70;
+		break;
+	case 10:
+		sun = 0xE8 - 0x50;
+		break;
+	default:
+		break;
+	}
+	struct tm *newtime;
+	time_t long_time;
+	// regardless of the weather, there should be no sun at night time!
+	time(&long_time); // Get time as long integer.
+	newtime = localtime(&long_time); // Convert to local time.
+	if (newtime->tm_hour > 21 || newtime->tm_hour < 5)
+	{
+		sun = 0; // total darkness, 9pm - 5am
+	}
+	else if (newtime->tm_hour > 20 || newtime->tm_hour < 6)
+	{
+		sun /= 9; // almost total darkness 8pm-9pm, 5am-6am
+	}
+	else if (newtime->tm_hour > 18 || newtime->tm_hour < 7)
+	{
+		sun >>= 1;
+	}
+	sensorDarkness = 0xE8 - sun;
+}
+
 void systemUpdateMotionSensor()
 {
     for(int i = 0; i < 4; i++) {
-	if(!sensorx[i])
-	    sensorx[i] = 2047;
-	if(!sensory[i])
-	    sensory[i] = 2047;
-	if(joypress[i] & KEYM_MOTION_LEFT) {
-	    sensorx[i] += 3;
-	    if(sensorx[i] > 2197)
-		sensorx[i] = 2197;
-	    if(sensorx[i] < 2047)
-		sensorx[i] = 2057;
-	} else if(joypress[i] & KEYM_MOTION_RIGHT) {
-	    sensorx[i] -= 3;
-	    if(sensorx[i] < 1897)
-		sensorx[i] = 1897;
-	    if(sensorx[i] > 2047)
-		sensorx[i] = 2037;
-	} else if(sensorx[i] > 2047) {
-	    sensorx[i] -= 2;
-	    if(sensorx[i] < 2047)
-		sensorx[i] = 2047;
-	} else {
-	    sensorx[i] += 2;
-	    if(sensorx[i] > 2047)
-		sensorx[i] = 2047;
+		if(!sensorx[i])
+		    sensorx[i] = 2047;
+		if(!sensory[i])
+		    sensory[i] = 2047;
+		if(joypress[i] & KEYM_MOTION_LEFT) {
+		    sunBars--;
+		    if (sunBars < 1)
+			    sunBars = 1;
+		    sensorx[i] += 3;
+		    if(sensorx[i] > 2197)
+			sensorx[i] = 2197;
+		    if(sensorx[i] < 2047)
+			sensorx[i] = 2057;
+		} else if(joypress[i] & KEYM_MOTION_RIGHT) {
+		    sunBars++;
+		    if (sunBars > 100)
+		        sunBars = 100;
+		    sensorx[i] -= 3;
+		    if(sensorx[i] < 1897)
+			sensorx[i] = 1897;
+		    if(sensorx[i] > 2047)
+			sensorx[i] = 2037;
+		} else if(sensorx[i] > 2047) {
+		    sensorx[i] -= 2;
+		    if(sensorx[i] < 2047)
+			sensorx[i] = 2047;
+		} else {
+		    sensorx[i] += 2;
+		    if(sensorx[i] > 2047)
+			sensorx[i] = 2047;
+		}
+	
+		if(joypress[i] & KEYM_MOTION_UP) {
+		    sensory[i] += 3;
+		    if(sensory[i] > 2197)
+			sensory[i] = 2197;
+		    if(sensory[i] < 2047)
+			sensory[i] = 2057;
+		} else if(joypress[i] & KEYM_MOTION_DOWN) {
+		    sensory[i] -= 3;
+		    if(sensory[i] < 1897)
+			sensory[i] = 1897;
+		    if(sensory[i] > 2047)
+			sensory[i] = 2037;
+		} else if(sensory[i] > 2047) {
+		    sensory[i] -= 2;
+		    if(sensory[i] < 2047)
+			sensory[i] = 2047;
+		} else {
+		    sensory[i] += 2;
+		    if(sensory[i] > 2047)
+			sensory[i] = 2047;
+		}
 	}
-
-	if(joypress[i] & KEYM_MOTION_UP) {
-	    sensory[i] += 3;
-	    if(sensory[i] > 2197)
-		sensory[i] = 2197;
-	    if(sensory[i] < 2047)
-		sensory[i] = 2057;
-	} else if(joypress[i] & KEYM_MOTION_DOWN) {
-	    sensory[i] -= 3;
-	    if(sensory[i] < 1897)
-		sensory[i] = 1897;
-	    if(sensory[i] > 2047)
-		sensory[i] = 2037;
-	} else if(sensory[i] > 2047) {
-	    sensory[i] -= 2;
-	    if(sensory[i] < 2047)
-		sensory[i] = 2047;
-	} else {
-	    sensory[i] += 2;
-	    if(sensory[i] > 2047)
-		sensory[i] = 2047;
-	}
-    }
+	systemUpdateSolarSensor();
 }
 
 int  systemGetSensorX()
@@ -461,6 +537,11 @@ int  systemGetSensorX()
 }
 
 int  systemGetSensorY()
+{
+    return sensory[gopts.default_stick - 1];
+}
+
+int  systemGetSensorZ()
 {
     return sensory[gopts.default_stick - 1];
 }

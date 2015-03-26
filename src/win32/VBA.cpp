@@ -312,6 +312,7 @@ VBA::VBA()
   movieNextJoypad = 0;
   sensorX = 2047;
   sensorY = 2047;
+  sunBars = 500;
   mouseCounter = 0;
   wasPaused = false;
   frameskipadjust = 0;
@@ -925,12 +926,18 @@ u32 systemReadJoypad(int which)
   return 0;
 }
 
+static u8 sensorDarkness = 0xE8; // total darkness (including daylight on rainy days)
+
 // TODO: implement
 void systemCartridgeRumble(bool) { }
 void systemPossibleCartridgeRumble(bool) { }
 void updateRumbleFrame() { }
 int systemGetSensorZ() { return 0; }
-u8 systemGetSensorDarkness() { return 0; }
+
+u8 systemGetSensorDarkness()
+{
+	return sensorDarkness;
+}
 
 void systemDrawScreen()
 {
@@ -1123,10 +1130,71 @@ void systemScreenMessage(const char *msg)
     theApp.screenMessageBuffer = theApp.screenMessageBuffer.Left(40);
 }
 
+void systemUpdateSolarSensor()
+{
+	u8 sun = 0x0; //sun = 0xE8 - 0xE8 (case 0 and default)
+	int level = theApp.sunBars / 10;
+	switch (level)
+	{
+	case 1:
+		sun = 0xE8 - 0xE0;
+		break;
+	case 2:
+		sun = 0xE8 - 0xDA;
+		break;
+	case 3:
+		sun = 0xE8 - 0xD0;
+		break;
+	case 4:
+		sun = 0xE8 - 0xC8;
+		break;
+	case 5:
+		sun = 0xE8 - 0xC0;
+		break;
+	case 6:
+		sun = 0xE8 - 0xB0;
+		break;
+	case 7:
+		sun = 0xE8 - 0xA0;
+		break;
+	case 8:
+		sun = 0xE8 - 0x88;
+		break;
+	case 9:
+		sun = 0xE8 - 0x70;
+		break;
+	case 10:
+		sun = 0xE8 - 0x50;
+		break;
+	default:
+		break;
+	}
+	struct tm *newtime;
+	time_t long_time;
+	// regardless of the weather, there should be no sun at night time!
+	time(&long_time); // Get time as long integer.
+	newtime = localtime(&long_time); // Convert to local time.
+	if (newtime->tm_hour > 21 || newtime->tm_hour < 5)
+	{
+		sun = 0; // total darkness, 9pm - 5am
+	}
+	else if (newtime->tm_hour > 20 || newtime->tm_hour < 6)
+	{
+		sun /= 9; // almost total darkness 8pm-9pm, 5am-6am
+	}
+	else if (newtime->tm_hour > 18 || newtime->tm_hour < 7)
+	{
+		sun >>= 1;
+	}
+	sensorDarkness = 0xE8 - sun;
+}
+
 void systemUpdateMotionSensor()
 {
   if(theApp.input)
     theApp.input->checkMotionKeys();
+
+  systemUpdateSolarSensor();
 }
 
 int systemGetSensorX()

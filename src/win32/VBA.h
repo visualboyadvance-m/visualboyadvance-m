@@ -177,6 +177,7 @@ class VBA : public CWinApp
   u32 movieNextJoypad;
   int sensorX;
   int sensorY;
+  int sunBars;
   int mouseCounter;
   bool wasPaused;
   int frameskipadjust;
