@@ -6,7 +6,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VisualBoyAdvance-M", "VBA20
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\..\..\dependencies\zlib\project\vs2010\zlib.vcxproj", "{3E03C179-8251-46E4-81F4-466F114BAC63}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SFML_Network", "..\..\..\dependencies\SFML\build\vc2010\sfml-network.vcxproj", "{823DDC98-42D5-4A38-88CF-9DC06C788AE4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SFML", "..\..\..\dependencies\SFML\build\vc2010\sfml-network.vcxproj", "{823DDC98-42D5-4A38-88CF-9DC06C788AE4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "..\..\..\dependencies\libpng\project\vs2010\libpng.vcxproj", "{0008960E-E0DD-41A6-8265-00B31DDB4C21}"
 EndProject

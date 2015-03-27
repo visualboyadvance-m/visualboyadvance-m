@@ -110,7 +110,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>..\..\src;..\..\fex;..\..\..\dependencies\libpng;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\SubWCRev;..\..\..\dependencies\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GBA_LOGGING;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NO_OAL;NDEBUG;GBA_LOGGING;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -166,6 +166,7 @@
     <ClInclude Include="..\..\src\apu\Gb_Oscs.h" />
     <ClInclude Include="..\..\src\apu\Multi_Buffer.h" />
     <ClInclude Include="..\..\src\gba\agbprint.h" />
+    <ClInclude Include="..\..\src\gba\ereader.h" />
     <ClInclude Include="..\..\src\gba\bios.h" />
     <ClInclude Include="..\..\src\gba\EEprom.h" />
     <ClInclude Include="..\..\src\gba\elf.h" />
@@ -296,6 +297,7 @@
     <ClCompile Include="..\..\src\gba\bios.cpp" />
     <ClCompile Include="..\..\src\gba\EEprom.cpp" />
     <ClCompile Include="..\..\src\gba\elf.cpp" />
+    <ClCompile Include="..\..\src\gba\ereader.cpp" />
     <ClCompile Include="..\..\src\gba\Flash.cpp" />
     <ClCompile Include="..\..\src\gba\gba-arm.cpp" />
     <ClCompile Include="..\..\src\gba\gba-thumb.cpp" />

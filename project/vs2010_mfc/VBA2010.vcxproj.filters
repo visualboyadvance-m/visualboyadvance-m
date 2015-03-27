@@ -109,6 +109,9 @@
     <ClInclude Include="..\..\src\gba\agbprint.h">
       <Filter>Core\GBA</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\gba\ereader.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\gba\bios.h">
       <Filter>Core\GBA</Filter>
     </ClInclude>
@@ -485,6 +488,9 @@
       <Filter>Core\GBA</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\gba\elf.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\ereader.cpp">
       <Filter>Core\GBA</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\gba\Flash.cpp">
