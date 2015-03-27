@@ -1970,14 +1970,13 @@ wxPropertySheetDialog * MainFrame::LoadXRCropertySheetDialog(const char * name)
     mark_recursive(dialog);
     return dialog;
 }
-///This just adds some error checking to the wx XRCCTRL macro
+///This replaces the wx XRCCTRL macro with one that does error checking
+///See http://docs.wxwidgets.org/trunk/overview_xrc.html
 template <typename T>
 T * SafeXRCCTRL( wxWindow *parent,const char * name)
 {
     wxString dname = wxString::FromUTF8(name);
-    //This is needed to work around a bug in XRCCTRL
-    wxString Ldname=dname;
-    T * output = XRCCTRL(*parent, dname, T);
+    T * output = dynamic_cast<T*>(parent->FindWindow(dname));
     CheckThrowXRCError(output,name);
     return output;
 }

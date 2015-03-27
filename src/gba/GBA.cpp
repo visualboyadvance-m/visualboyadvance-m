@@ -3585,7 +3585,7 @@ void CPUInterrupt()
 
 void CPULoop(int ticks)
 {
-  int clockTicks;
+  int clockTicks = 0;
   int timerOverflow = 0;
   // variable used by the CPU core
   cpuTotalTicks = 0;
