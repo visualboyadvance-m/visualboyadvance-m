@@ -1,3 +1,4 @@
+#Do not use this file directly.  Always use the top level CMakeLists.txt file
 # This build is much easier if we just do it here.
 
 # not yet implemented
@@ -32,6 +33,7 @@ endif(ENABLE_OPENAL)
 # adv is for wxAboutBox
 # xml, html is for xrc
 SET( wxWidgets_USE_LIBS xrc xml html adv gl net core base )
+list(APPEND wxWidgets_CONFIG_OPTIONS --version=2.8)
 FIND_PACKAGE ( wxWidgets REQUIRED )
 EXECUTE_PROCESS(COMMAND sh "${wxWidgets_CONFIG_EXECUTABLE}" --cxxflags)
 INCLUDE( ${wxWidgets_USE_FILE} )
@@ -65,44 +67,17 @@ include_directories(widgets)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-# external deps
-SET(ICO_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../win32/res/VBA.ico)
-SET(ICO_PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../gtk)
-SET(WX_APP_ICON ${ICO_PARENT_DIR}/icons/32x32/apps/vbam.png)
-#SET(WX_APP_ICON VBA_4_32x32x24.png)
-SET(ICOX_FILES VBA_4_32x32x24.png)
-#wxvbam.xrc now uses gvbam icon as well
-#SET(ICOX_FILES ${ICOX_FILES} VBA_9_48x48x32.png)
-
-# Extract icons using icoutils (http://www.nongnu.org/icoutils/)
-# Used for main prog. icon and about dialog (in xrc file)
-# or, just use the icons already extracted for gtk
-ADD_CUSTOM_COMMAND(OUTPUT ${ICOX_FILES}
-                   COMMAND icotool -x ${ICO_FILE}
-		   DEPENDS ${ICO_FILE})
-
-# Convert to xpm using ImageMagick (http://www.imagemagick.org)
-# not executed on win32
-IF( NOT WIN32 )
-    FIND_PACKAGE(ImageMagick REQUIRED convert)
-    ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xpm
-		       COMMAND ${ImageMagick_convert_EXECUTABLE} ${WX_APP_ICON} wxvbam.xpm
-		       # following is done using #define in wxvbam.cpp
-		       # so there is no dependency on sed
-#		       COMMAND sed -i 's/wxvbam\\[/wxvbam_xpm[/;s/char \\*/const char */' wxvbam.xpm
-		       DEPENDS ${WX_APP_ICON})
-ENDIF( NOT WIN32 )
+# Copy over needed icons
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/icons/vbam.png DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/icons/wxvbam.xpm DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # wxrc does not support xrs files in -c output (> 10x compression)
 # so do it manually using slow but portable bin2c.cmake script
-SET(WX_XRC_ICON icons/32x32/apps/vbam.png)
 ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xrs
                    # doing this in its own dir prevents name prefixes
 		   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/wxvbam.xrc wxvbam.xrc
-		   COMMAND ${CMAKE_COMMAND} -E copy ${ICO_PARENT_DIR}/${WX_XRC_ICON} ${WX_XRC_ICON}
                    COMMAND wxrc wxvbam.xrc -o wxvbam.xrs
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-	           DEPENDS ${ICO_PARENT_DIR}/${XRC_ITEM}
 		   DEPENDS wxvbam.xrc)
 ADD_CUSTOM_COMMAND(OUTPUT builtin-xrc.h
                    COMMAND ${CMAKE_COMMAND} -DINFILE=wxvbam.xrs -DOUTFILE=builtin-xrc.h -DVARNAME=builtin_xrs -P ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.cmake
@@ -143,8 +118,6 @@ SET( SRC_WX
    widgets/joyedit.cpp
    widgets/sdljoy.cpp
    widgets/wxmisc.cpp
-   # common, but not in lib, apparently
-   ../common/SoundSDL.cpp
    # probably ought to be in common
    ../sdl/text.cpp
    # from external source with minor modifications
@@ -156,6 +129,8 @@ SET( SRC_WX
    builtin-over.h
    cmdhandlers.h
    cmd-evtable.h
+   #Icon File
+   wxvbam.xpm
 )
 
 IF(ENABLE_OPENAL)
@@ -175,24 +150,7 @@ IF( WIN32 )
     ENDIF(ENABLE_DEBUGGER)
 ELSE( WIN32 )
     SET(DIRECTX_LIBRARIES )
-    # generated file must be explicitly listed
-    SET( SRC_WX ${SRC_WX} wxvbam.xpm )
 ENDIF( WIN32 )
-
-IF(APPLE)
-    # icon must be generated manually
-    SET( SRC_WX ${SRC_WX} wxvbam.icns )
-    # png2icns is provided with libicns (http://icns.sourceforge.net/)
-    FIND_PROGRAM(PNG2ICNS png2icns)
-    # note: could add more icons, if available and proper size
-    SET(WX_APP_ICONS
-          ${WX_APP_ICON}
-          ${ICO_PARENT_DIR}/icons/16x16/apps/vbam.png)
-    ADD_CUSTOM_COMMAND(OUTPUT wxvbam.icns
-                       COMMAND ${PNG2ICNS} wxvbam.icns ${WX_APP_ICONS})
-    SET(MACOSX_BUNDLE_ICON_FILE wxvbam.icns)
-    SET_SOURCE_FILES_PROPERTIES(wxvbam.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-ENDIF(APPLE)
 
 link_directories( ${CMAKE_BINARY_DIR} )
 
@@ -212,10 +170,9 @@ TARGET_LINK_LIBRARIES (
     ${CAIRO_LIBRARIES}
 )
 
-INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/wxvbam DESTINATION bin)
+INSTALL(PROGRAMS ${PROJECT_BINARY_DIR}/wxvbam${CMAKE_EXECUTABLE_SUFFIX} DESTINATION bin)
 IF(NOT WIN32 AND NOT APPLE)
     INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/wxvbam.desktop DESTINATION share/applications)
-    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../gtk/icons/ DESTINATION share/icons/hicolor PATTERN ".svn" EXCLUDE)
 ENDIF(NOT WIN32 AND NOT APPLE)
 
 # for consistency with others, copy exe to top-level dir
@@ -225,14 +182,12 @@ if(WIN32)
                        COMMAND ${CMAKE_COMMAND} -E copy ${WX_EXE_NAME} ../../${WX_EXE_NAME})
 else(WIN32)
 if(APPLE)
-    SET(WX_EXE_NAME wxvbam.app)
+    SET(CMAKE_EXECUTABLE_SUFFIX .app)
     # this should set ROM file types correctly
     SET_PROPERTY(TARGET wxvbam APPEND PROPERTY MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/wxplist.in)
-else(APPLE)
-    SET(WX_EXE_NAME wxvbam${CMAKE_EXECUTABLE_SUFFIX})
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/icons/wxvbam.icns)
+    SET(MACOSX_BUNDLE_ICON_FILE wxvbam.icns)
+    SET_SOURCE_FILES_PROPERTIES(wxvbam.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 endif(APPLE)
-    ADD_CUSTOM_COMMAND(TARGET wxvbam POST_BUILD
-		       # I'd rather make this link relative, but it's too hard
-                       COMMAND rm -rf ../../${WX_EXE_NAME}
-                       COMMAND ln -s ${CMAKE_CURRENT_BINARY_DIR}/${WX_EXE_NAME} ../../${WX_EXE_NAME})
-endif(WIN32)
+    
+SET(WX_EXE_NAME wxvbam${CMAKE_EXECUTABLE_SUFFIX})
