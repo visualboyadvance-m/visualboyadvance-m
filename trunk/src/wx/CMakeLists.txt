@@ -175,12 +175,6 @@ IF(NOT WIN32 AND NOT APPLE)
     INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/wxvbam.desktop DESTINATION share/applications)
 ENDIF(NOT WIN32 AND NOT APPLE)
 
-# for consistency with others, copy exe to top-level dir
-if(WIN32)
-    SET(WX_EXE_NAME wxvbam${CMAKE_EXECUTABLE_SUFFIX})
-    ADD_CUSTOM_COMMAND(TARGET wxvbam POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E copy ${WX_EXE_NAME} ../../${WX_EXE_NAME})
-else(WIN32)
 if(APPLE)
     SET(CMAKE_EXECUTABLE_SUFFIX .app)
     # this should set ROM file types correctly
