@@ -20,7 +20,7 @@ private:
 	LPDIRECTSOUND8       pDirectSound; // DirectSound interface
 	LPDIRECTSOUNDBUFFER  dsbPrimary;   // Primary DirectSound buffer
 	LPDIRECTSOUNDBUFFER  dsbSecondary; // Secondary DirectSound buffer
-	LPDIRECTSOUNDNOTIFY8 dsbNotify;
+	LPDIRECTSOUNDNOTIFY dsbNotify;
 	HANDLE               dsbEvent;
 	WAVEFORMATEX         wfx;          // Primary buffer wave format
 	int					 soundBufferLen;
