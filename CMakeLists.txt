@@ -356,7 +356,9 @@ IF( ENABLE_SDL )
         ${LIRC_CLIENT_LIBRARY}
     )
 
-    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam DESTINATION bin)
+    #Install the executable
+    INSTALL(PROGRAMS ${PROJECT_BINARY_DIR}/vbam${CMAKE_EXECUTABLE_SUFFIX} DESTINATION bin)
+    #Install the default config file
     INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
             DESTINATION ${SYSCONFDIR}
             RENAME vbam.cfg)
