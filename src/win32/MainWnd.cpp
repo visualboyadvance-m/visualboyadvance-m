@@ -63,6 +63,8 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_COMMAND(ID_FILE_OPEN_GBA, OnFileOpenGBA)
   ON_COMMAND(ID_FILE_OPEN_GBC, OnFileOpenGBC)
   ON_COMMAND(ID_FILE_OPEN_GB, OnFileOpenGB)
+  ON_COMMAND(ID_FILE_LOAD_DOTCODE, OnFileLoadDotCode)
+  ON_COMMAND(ID_FILE_SAVE_DOTCODE, OnFileSaveDotCode)
   ON_WM_INITMENUPOPUP()
   ON_COMMAND(ID_FILE_PAUSE, OnFilePause)
   ON_UPDATE_COMMAND_UI(ID_FILE_PAUSE, OnUpdateFilePause)
@@ -168,6 +170,8 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_AUTOMATICALLYAPPLYPATCHFILES, OnUpdateOptionsEmulatorAutomaticallyipspatch)
   ON_COMMAND(ID_OPTIONS_EMULATOR_AGBPRINT, OnOptionsEmulatorAgbprint)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_AGBPRINT, OnUpdateOptionsEmulatorAgbprint)
+  ON_COMMAND(ID_OPTIONS_EMULATOR_EREADER, OnOptionsEmulatorEreader)
+  ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_EREADER, OnUpdateOptionsEmulatorEreader)
   ON_COMMAND(ID_OPTIONS_EMULATOR_REALTIMECLOCK, OnOptionsEmulatorRealtimeclock)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_REALTIMECLOCK, OnUpdateOptionsEmulatorRealtimeclock)
   ON_COMMAND(ID_OPTIONS_EMULATOR_REWINDINTERVAL, OnOptionsEmulatorRewindinterval)
@@ -1024,7 +1028,6 @@ void MainWnd::OnSystemMinimize()
   ShowWindow(SW_SHOWMINIMIZED);
 }
 
-
 bool MainWnd::fileOpenSelect( int system )
 {
 	theApp.dir = _T("");
@@ -1097,6 +1100,50 @@ bool MainWnd::fileOpenSelect( int system )
 	return false;
 }
 
+// EReader
+void MainWnd::OnFileLoadDotCode()
+{
+	//	ereaderDotCode();
+	char *exts[] = { ".raw;*.bin", ".*" };
+
+	//getHandle()
+	FileDlg file(0,  //Get the proper handle somehow, and put it here.
+		"",
+		"E-Reader dot code (*.bin, *.raw)|*.bin;*.raw|All Files (*.*)|*.*||",
+		0,
+		"RAW",
+		(LPCTSTR *)exts,
+		NULL,
+		"Load Nintendo E-Reader Dotcode",
+		FALSE);
+	if (file.DoModal() == IDOK)
+	{
+		theApp.loadDotCodeFile = file.GetPathName();
+		SetLoadDotCodeFile(theApp.loadDotCodeFile);
+	}
+}
+
+void MainWnd::OnFileSaveDotCode()
+{
+
+	char *exts[] = { ".raw", ".*" };
+
+	//getHandle()
+	FileDlg file(0,  //Get the proper handle somehow, and put it here.
+		"",
+		"E-Reader dot code (*.raw)|*.raw|All Files (*.*)|*.*||",
+		0,
+		"RAW",
+		(LPCTSTR *)exts,
+		NULL,
+		"Save Nintendo E-Reader Dotcode",
+		TRUE);
+	if (file.DoModal() == IDOK)
+	{
+		theApp.saveDotCodeFile = file.GetPathName();
+		SetLoadDotCodeFile(theApp.saveDotCodeFile);
+	}
+}
 
 void MainWnd::OnPaint()
 {

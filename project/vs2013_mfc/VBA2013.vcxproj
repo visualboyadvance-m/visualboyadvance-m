@@ -176,6 +176,7 @@
     <ClInclude Include="..\..\src\gba\bios.h" />
     <ClInclude Include="..\..\src\gba\EEprom.h" />
     <ClInclude Include="..\..\src\gba\elf.h" />
+    <ClInclude Include="..\..\src\gba\ereader.h" />
     <ClInclude Include="..\..\src\gba\Flash.h" />
     <ClInclude Include="..\..\src\gba\gba.h" />
     <ClInclude Include="..\..\src\gba\GBAcpu.h" />
@@ -303,6 +304,7 @@
     <ClCompile Include="..\..\src\gba\bios.cpp" />
     <ClCompile Include="..\..\src\gba\EEprom.cpp" />
     <ClCompile Include="..\..\src\gba\elf.cpp" />
+    <ClCompile Include="..\..\src\gba\ereader.cpp" />
     <ClCompile Include="..\..\src\gba\Flash.cpp" />
     <ClCompile Include="..\..\src\gba\gba-arm.cpp" />
     <ClCompile Include="..\..\src\gba\gba-thumb.cpp" />

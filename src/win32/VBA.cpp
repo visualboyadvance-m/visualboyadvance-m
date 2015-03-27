@@ -25,6 +25,7 @@
 
 #include "../System.h"
 #include "../gba/agbprint.h"
+#include "../gba/ereader.h"
 #include "../gba/cheatSearch.h"
 #include "../gba/GBA.h"
 #include "../gba/Globals.h"
@@ -1413,6 +1414,10 @@ void VBA::loadSettings()
 {
   CString buffer;
 
+  eReaderSaveRAW = regQueryDwordValue("eReaderSaveRAW", 1);
+  if (eReaderSaveRAW < 0 || eReaderSaveRAW > 1)
+	  eReaderSaveRAW = 1;
+
   lastFullscreen = (VIDEO_SIZE)regQueryDwordValue("lastFullscreen", VIDEO_1024x768);
 
   languageOption = regQueryDwordValue("language", 1);
@@ -2512,6 +2517,8 @@ void VBA::movieReadNext()
 
 void VBA::saveSettings()
 {
+  regSetDwordValue("eReaderSaveRAW", eReaderSaveRAW);
+
   regSetDwordValue("language", languageOption);
 
   regSetStringValue("languageName", languageName);

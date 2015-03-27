@@ -200,6 +200,7 @@ SET(SRC_GBA
     src/gba/Cheats.cpp
     src/gba/CheatSearch.cpp
     src/gba/EEprom.cpp
+    src/gba/ereader.cpp
     src/gba/Flash.cpp
     src/gba/GBA.cpp
     src/gba/GBAGfx.cpp
