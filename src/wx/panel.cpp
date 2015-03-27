@@ -48,8 +48,7 @@ void GameArea::LoadGame(const wxString &name)
     // so save underlying wxCharBuffer (or create one of none is used)
     wxCharBuffer fnb(fnfn.GetFullPath().mb_fn_str());
     const char *fn = fnb.data();
-    char fnbuf[2048];
-    IMAGE_TYPE t = badfile ? IMAGE_UNKNOWN : utilFindType(fn, fnbuf);
+    IMAGE_TYPE t = badfile ? IMAGE_UNKNOWN : utilFindType(fn);
     if(t == IMAGE_UNKNOWN) {
 	wxString s;
 	s.Printf(_("%s is not a valid ROM file"), name.c_str());
@@ -75,10 +74,8 @@ void GameArea::LoadGame(const wxString &name)
     // be loaded from archive
     // FIXME: if archive name does not match game name, prepend archive
     // name to uniquify game name
-    wxString actname(fnbuf, wxConvFile);
-    loaded_game = wxFileName(actname);
+    loaded_game = fnfn;
     loaded_game.ClearExt();
-    loaded_game.SetPath(fnfn.GetPath());
     loaded_game.MakeAbsolute();
 
     // load patch, if enabled

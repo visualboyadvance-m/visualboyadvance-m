@@ -10,6 +10,7 @@
       <orient>wxHORIZONTAL</orient>
       <object class="sizeritem">
         <object class="wxPanel" name="DisplayArea" subclass="GameArea">
+			<bg>#000000</bg>
           <style>wxCLIP_CHILDREN|wxWANTS_CHARS</style>
         </object>
         <option>1</option>
@@ -455,7 +456,7 @@
       <object class="wxMenuItem" name="wxID_ABOUT"/>
     </object>
   </object>
-  <object class="wxIcon" name="MainIcon">icons/32x32/apps/vbam.png</object>
+  <object class="wxIcon" name="MainIcon">vbam.png</object>
   <object class="wxDialog" name="GBPrinter">
     <title>GB Printer</title>
     <object class="wxBoxSizer">
