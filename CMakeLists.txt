@@ -7,6 +7,8 @@ if( COMMAND cmake_policy )
     cmake_policy( SET CMP0005 OLD )
 endif( COMMAND cmake_policy )
 SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts )
+#Output all binaries at top level
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
 option( ENABLE_SDL "Build the SDL port" ON )
 option( ENABLE_GTK "Build the GTK+ GUI" ON )
@@ -75,23 +77,8 @@ SET(VBAMCORE_LIBS
     ${SFML_LIBRARY}
     ${OPENGL_LIBRARIES}
     ${ZLIB_LIBRARY}
-    ${PNG_LIBRARY})
-
-
-
-# Disable looking for GTK if not going to build the GTK frontend
-# so that pkg-config is not required
-IF( ENABLE_GTK )
-    FIND_PACKAGE ( PkgConfig REQUIRED )
-    FIND_PACKAGE ( Gettext REQUIRED )
-
-    # These dependencies require pkg-config to be found
-    PKG_CHECK_MODULES ( GTKMM REQUIRED gtkmm-2.4 )
-    PKG_CHECK_MODULES ( GDKMM REQUIRED gdkmm-2.4 )
-    PKG_CHECK_MODULES ( GLIBMM REQUIRED glibmm-2.4 )
-    PKG_CHECK_MODULES ( GIOMM REQUIRED giomm-2.4 )
-    PKG_CHECK_MODULES ( GTKGLMM REQUIRED gtkglextmm-x11-1.2 )
-ENDIF( ENABLE_GTK )
+    ${PNG_LIBRARY}
+)
 
 if(ENABLE_FFMPEG)
     FIND_PACKAGE ( PkgConfig REQUIRED )
@@ -194,36 +181,7 @@ SET( CMAKE_CXX_FLAGS_RELEASE "-O3")
 SET( CMAKE_C_FLAGS_DEBUG "-g -Wall")
 SET( CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
 
-# Source files definition
-SET(SRC_FEX
-    fex/7z_C/7zAlloc.c
-    fex/7z_C/7zBuf.c
-    fex/7z_C/7zCrc.c
-    fex/7z_C/7zCrcOpt.c
-    fex/7z_C/7zDec.c
-    fex/7z_C/7zIn.c
-    fex/7z_C/7zStream.c
-    fex/7z_C/Bcj2.c
-    fex/7z_C/Bra86.c
-    fex/7z_C/Bra.c
-    fex/7z_C/CpuArch.c
-    fex/7z_C/Lzma2Dec.c
-    fex/7z_C/LzmaDec.c
-    fex/7z_C/Ppmd7.c
-    fex/7z_C/Ppmd7Dec.c
-    fex/fex/Binary_Extractor.cpp
-    fex/fex/blargg_common.cpp
-    fex/fex/blargg_errors.cpp
-    fex/fex/Data_Reader.cpp
-    fex/fex/fex.cpp
-    fex/fex/File_Extractor.cpp
-    fex/fex/Gzip_Extractor.cpp
-    fex/fex/Gzip_Reader.cpp
-    fex/fex/Rar_Extractor.cpp
-    fex/fex/Zip7_Extractor.cpp
-    fex/fex/Zip_Extractor.cpp
-    fex/fex/Zlib_Inflater.cpp
-)
+add_subdirectory (fex)
 
 SET(SRC_MAIN
     src/Util.cpp
@@ -326,31 +284,6 @@ else( ENABLE_ASM_SCALERS )
     ADD_DEFINITIONS ( -DNO_ASM )
 endif( ENABLE_ASM_SCALERS )
 
-SET(SRC_GTK
-    src/gtk/configfile.cpp
-    src/gtk/main.cpp
-    src/gtk/system.cpp
-    src/gtk/windowcallbacks.cpp
-    src/gtk/filters.cpp
-    src/gtk/generalconfig.cpp
-    src/gtk/gameboyconfig.cpp
-    src/gtk/gameboyadvanceconfig.cpp
-    src/gtk/cheatlist.cpp
-    src/gtk/cheatedit.cpp
-    src/gtk/gameboyadvancecheatlist.cpp
-    src/gtk/gameboycheatlist.cpp
-    src/gtk/joypadconfig.cpp
-    src/gtk/directoriesconfig.cpp
-    src/gtk/displayconfig.cpp
-    src/gtk/soundconfig.cpp
-    src/gtk/screenarea.cpp
-    src/gtk/screenarea-cairo.cpp
-    src/gtk/screenarea-opengl.cpp
-    src/gtk/tools.cpp
-    src/gtk/window.cpp
-    src/sdl/inputSDL.cpp
-)
-
 if( ENABLE_DEBUGGER )
     SET(SRC_DEBUGGER
         src/gba/armdis.cpp
@@ -366,33 +299,11 @@ INCLUDE_DIRECTORIES(
     ${SDL_INCLUDE_DIR}
 )
 
-IF( ENABLE_GTK )
-    INCLUDE_DIRECTORIES(
-        ${GLIBMM_INCLUDE_DIRS}
-        ${GIOMM_INCLUDE_DIRS}
-        ${GTKMM_INCLUDE_DIRS}
-        ${GDKMM_INCLUDE_DIRS}
-        ${GTKGLMM_INCLUDE_DIRS}
-    )
-
-    LINK_DIRECTORIES(
-        ${GLIBMM_LIBRARY_DIRS}
-        ${GIOMM_LIBRARY_DIRS}
-        ${GTKMM_LIBRARY_DIRS}
-        ${GTKGLMM_LIBRARY_DIRS}
-    )
-ENDIF( ENABLE_GTK )
-
 IF( ENABLE_FFMPEG )
     INCLUDE_DIRECTORIES(
         ${FFMPEG_INCLUDE_DIRS}
     )
 ENDIF( ENABLE_FFMPEG )
-
-ADD_LIBRARY(
-    fex
-    ${SRC_FEX}
-)
 
 ADD_LIBRARY (
     vbamcore
@@ -426,44 +337,22 @@ IF( ENABLE_SDL )
         ${WIN32_LIBRARIES}
         ${LIRC_CLIENT_LIBRARY}
     )
-
-    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam DESTINATION bin)
-    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
-            DESTINATION ${SYSCONFDIR}
-            RENAME vbam.cfg)
-    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini DESTINATION ${DATA_INSTALL_DIR})
+	IF( WIN32 )
+		INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam${CMAKE_EXECUTABLE_SUFFIX} DESTINATION bin)
+	ELSE( WIN32 )
+		INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam DESTINATION bin)
+	ENDIF( WIN32 )
+		INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
+				DESTINATION ${SYSCONFDIR}
+				RENAME vbam.cfg)
 ENDIF( ENABLE_SDL )
 
 IF( ENABLE_GTK )
-    ADD_EXECUTABLE (
-        gvbam
-        WIN32
-        MACOSX_BUNDLE
-        ${SRC_GTK}
-    )
-
-    TARGET_LINK_LIBRARIES (
-        gvbam
-        ${VBAMCORE_LIBS}
-        ${GTKMM_LIBRARIES}
-        ${GTKGLMM_LIBRARIES}
-    )
-
-    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/gvbam DESTINATION bin)
-    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/gvbam.desktop DESTINATION share/applications)
-    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/icons/ DESTINATION share/icons/hicolor PATTERN ".svn" EXCLUDE)
-    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/ui DESTINATION ${DATA_INSTALL_DIR} PATTERN ".svn" EXCLUDE)
-    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini DESTINATION ${DATA_INSTALL_DIR})
-
+	add_subdirectory (src/gtk)
 ENDIF( ENABLE_GTK )
 
 IF( ENABLE_WX )
-    # since this has generated source files, it's easier to just
-    # make from the subdir
-    # otherwise out-of-tree builds have trouble
-
     add_subdirectory(src/wx)
-
 ENDIF( ENABLE_WX )
 
 if( ENABLE_GTK OR ENABLE_WX )
@@ -472,3 +361,7 @@ if( ENABLE_GTK OR ENABLE_WX )
         add_subdirectory(po)
     endif( ENABLE_NLS )
 endif( ENABLE_GTK OR ENABLE_WX )
+INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini DESTINATION ${DATA_INSTALL_DIR})
+IF(NOT APPLE)
+    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/icons/ DESTINATION share/icons/hicolor PATTERN ".svn" EXCLUDE)
+ENDIF(NOT APPLE)
