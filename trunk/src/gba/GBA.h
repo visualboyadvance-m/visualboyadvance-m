@@ -114,6 +114,11 @@ extern void cpuProfil(profile_segment *seg);
 extern void cpuEnableProfiling(int hz);
 #endif
 
+const char* GetLoadDotCodeFile();
+const char* GetSaveDotCodeFile();
+void SetLoadDotCodeFile(const char *szFile);
+void SetSaveDotCodeFile(const char *szFile);
+
 extern struct EmulatedSystem GBASystem;
 
 #define R13_IRQ  18

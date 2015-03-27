@@ -18,6 +18,8 @@ struct {
   { "FileOpenGBA", ID_FILE_OPEN_GBA },
   { "FileOpenGBC", ID_FILE_OPEN_GBC },
   { "FileOpenGB", ID_FILE_OPEN_GB },
+  { "FileLoadDotCode", ID_FILE_LOAD_DOTCODE },
+  { "FileSaveDotCode", ID_FILE_SAVE_DOTCODE },
   { "FileLoad", ID_FILE_LOAD },
   { "FileSave", ID_FILE_SAVE },
   { "FileLoadGame01", ID_FILE_LOADGAME_SLOT1 },

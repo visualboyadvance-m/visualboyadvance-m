@@ -1600,7 +1600,10 @@ BEGIN
         MENUITEM "Open GBC...",                 ID_FILE_OPEN_GBC
         MENUITEM "Open GB...",                  ID_FILE_OPEN_GB
         MENUITEM "Close",                       ID_FILE_CLOSE
-        MENUITEM SEPARATOR
+		MENUITEM SEPARATOR
+		MENUITEM "Load E-Reader DotCode...", ID_FILE_LOAD_DOTCODE
+		MENUITEM "Save E-Reader DotCode...", ID_FILE_SAVE_DOTCODE
+		MENUITEM SEPARATOR
         MENUITEM "&Link with...",               ID_OPTIONS_LINK_OPTIONS
         MENUITEM SEPARATOR
         POPUP "Recent"
@@ -1872,6 +1875,7 @@ BEGIN
             MENUITEM "Auto-apply IPS/UPS/PPF",      ID_OPTIONS_EMULATOR_AUTOMATICALLYAPPLYPATCHFILES
             MENUITEM "Pause when inactive",         ID_OPTIONS_EMULATOR_PAUSEWHENINACTIVE
             MENUITEM "AGB Print",                   ID_OPTIONS_EMULATOR_AGBPRINT
+			MENUITEM "E-Reader",					ID_OPTIONS_EMULATOR_EREADER
             MENUITEM "Real Time Clock",             ID_OPTIONS_EMULATOR_REALTIMECLOCK
             MENUITEM "&Game Overrides...",          ID_OPTIONS_EMULATOR_GAMEOVERRIDES
             POPUP "Show speed"

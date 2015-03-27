@@ -25,6 +25,7 @@ LOCAL_SRC_FILES    = $(VBADIR)/gba/agbprint.cpp \
                      $(VBADIR)/gba/CheatSearch.cpp \
                      $(VBADIR)/gba/EEprom.cpp \
                      $(VBADIR)/gba/elf.cpp \
+                     $(VBADIR)/gba/ereader.cpp \
                      $(VBADIR)/gba/Flash.cpp \
                      $(VBADIR)/gba/GBA-arm.cpp \
                      $(VBADIR)/gba/GBA.cpp \
