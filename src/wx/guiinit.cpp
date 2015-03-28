@@ -2246,30 +2246,30 @@ bool MainFrame::InitMore(void)
     try {
 
     wxDialog *d = NULL;
-#define vfld(f, t) CheckThrowXRCError(XRCCTRL(*d, f, t),f)
-#define getfld(v, f, t) \
-	v = XRCCTRL(*d, f, t); \
-	CheckThrowXRCError(v,f)
-#define getfldv(v, f, t) \
-	v = XRCCTRL_D(*d, f, t); \
-	CheckThrowXRCError(v,ToString(f))
+#define vfld(dialog_pointer, name, type) CheckThrowXRCError(XRCCTRL(*dialog_pointer, name, type),name)
+#define getfld(return_value, dialog_pointer, name, type) \
+	return_value = XRCCTRL(*dialog_pointer, name, type); \
+	CheckThrowXRCError(return_value,name)
+#define getfldv(return_value, dialog_pointer, name, t) \
+	return_value = XRCCTRL_D(*dialog_pointer, name, t); \
+	CheckThrowXRCError(return_value,ToString(name))
 
     //// displayed during run
     d=LoadXRCDialog("GBPrinter");
     // just verify preview window & mag sel present
     {
 	wxPanel *prev;
-	getfld(prev, "Preview", wxPanel);
+	getfld(prev, d, "Preview", wxPanel);
 	if(!wxDynamicCast(prev->GetParent(), wxScrolledWindow))
 	    throw std::runtime_error("Unable to load a dialog control from the builtin xrc file: Preview");
-	vfld("Magnification", wxControlWithItems);
+	vfld(d, "Magnification", wxControlWithItems);
     }
 
     //// File menu
     LoadXRCDialog("GBAROMInfo");
     // just verify fields present
     wxControl *lab;
-#define getlab(n) getfld(lab, n, wxControl)
+#define getlab(n) getfld(lab, d, n, wxControl)
     getlab("Title");
     getlab("GameCode");
     getlab("MakerCode");
@@ -2297,13 +2297,13 @@ bool MainFrame::InitMore(void)
 
     d=LoadXRCDialog("CodeSelect");
     // just verify list present
-    vfld("CodeList", wxControlWithItems);
+    vfld(d, "CodeList", wxControlWithItems);
 
     d=LoadXRCDialog("ExportSPS");
     // just verify text fields present
-    vfld("Title", wxTextCtrl);
-    vfld("Description", wxTextCtrl);
-    vfld("Notes", wxTextCtrl);
+    vfld(d, "Title", wxTextCtrl);
+    vfld(d, "Description", wxTextCtrl);
+    vfld(d, "Notes", wxTextCtrl);
 
     //// Emulation menu
 #ifndef NO_LINK
@@ -2311,21 +2311,21 @@ bool MainFrame::InitMore(void)
 #endif
     wxRadioButton *rb;
 #define getrbi(n, o, v) do { \
-    getfld(rb, n, wxRadioButton); \
+    getfld(rb, d, n, wxRadioButton); \
     rb->SetValidator(wxBoolIntValidator(&o, v)); \
 } while(0)
 #define getrbb(n, o) do { \
-    getfld(rb, n, wxRadioButton); \
+    getfld(rb, d, n, wxRadioButton); \
     rb->SetValidator(wxGenericValidator(&o)); \
 } while(0)
 #define getrbbr(n, o) do { \
-    getfld(rb, n, wxRadioButton); \
+    getfld(rb, d, n, wxRadioButton); \
     rb->SetValidator(wxBoolRevValidator(&o)); \
 } while(0)
     wxBoolEnValidator *benval;
     wxBoolEnHandler *ben;
 #define getbe(n, o, cv, t, wt) do { \
-    getfld(cv, n, t); \
+    getfld(cv, d, n, t); \
     cv->SetValidator(wxBoolEnValidator(&o)); \
     benval = wxStaticCast(cv->GetValidator(), wxBoolEnValidator); \
     static wxBoolEnHandler _ben; \
@@ -2336,7 +2336,7 @@ bool MainFrame::InitMore(void)
     // of checkboxes.  A lot of work for little benefit.
     wxBoolRevEnValidator *brenval;
 #define getbre(n, o, cv, t, wt) do { \
-    getfld(cv, n, t); \
+    getfld(cv, d, n, t); \
     cv->SetValidator(wxBoolRevEnValidator(&o)); \
     brenval = wxStaticCast(cv->GetValidator(), wxBoolRevEnValidator); \
     wx##wt##BoolEnHandlerConnect(rb, wxID_ANY, *ben); \
@@ -2364,7 +2364,7 @@ bool MainFrame::InitMore(void)
 #define getrbbd(n, o) getbre(n, o, rb, wxRadioButton, RBD)
     wxTextCtrl *tc;
 #define gettc(n, o) do { \
-    getfld(tc, n, wxTextCtrl); \
+    getfld(tc, d, n, wxTextCtrl); \
     tc->SetValidator(wxTextValidator(wxFILTER_NONE, &o)); \
 } while(0)
 #ifndef NO_LINK
@@ -2408,7 +2408,7 @@ bool MainFrame::InitMore(void)
 	cheat_list_handler.dlg = d;
 	d->SetEscapeId(wxID_OK);
 	wxCheckedListCtrl *cl;
-	getfld(cl, "Cheats", wxCheckedListCtrl);
+	getfld(cl, d, "Cheats", wxCheckedListCtrl);
 	if(!cl->Init())
 	    throw std::runtime_error("Unable to load a dialog control from the builtin xrc file: Cheats");
 	cheat_list_handler.list = cl;
@@ -2480,7 +2480,7 @@ bool MainFrame::InitMore(void)
     d=LoadXRCDialog("CheatEdit");
     wxChoice *ch;
 #define getch(n, o) do { \
-    getfld(ch, n, wxChoice); \
+    getfld(ch, d, n, wxChoice); \
     ch->SetValidator(wxGenericValidator(&o)); \
 } while(0)
     {
@@ -2498,7 +2498,7 @@ bool MainFrame::InitMore(void)
 	cheat_find_handler.dlg = d;
 	d->SetEscapeId(wxID_OK);
 	CheatListCtrl *list;
-	getfld(list, "CheatList", CheatListCtrl);
+	getfld(list, d, "CheatList", CheatListCtrl);
 	cheat_find_handler.list = list;
 	list->SetValidator(CheatFindFill());
 	list->InsertColumn(0, _("Address"));
@@ -2545,7 +2545,7 @@ bool MainFrame::InitMore(void)
 	       wxCommandEventHandler(CheatFind_t::f), \
 	       NULL, &cheat_find_handler);
 #define cf_enbutton(n, v) do { \
-    getfld(cheat_find_handler.v, n, wxButton); \
+    getfld(cheat_find_handler.v, d, n, wxButton); \
     cheat_find_handler.v->Disable(); \
 } while(0)
 	cf_button("Search", Search);
@@ -2585,12 +2585,12 @@ bool MainFrame::InitMore(void)
     d=LoadXRCDialog("GeneralConfig");
     wxCheckBox *cb;
 #define getcbb(n, o) do { \
-    getfld(cb, n, wxCheckBox); \
+    getfld(cb, d, n, wxCheckBox); \
     cb->SetValidator(wxGenericValidator(&o)); \
 } while(0)
     wxSpinCtrl *sc;
 #define getsc(n, o) do { \
-    getfld(sc, n, wxSpinCtrl); \
+    getfld(sc, d, n, wxSpinCtrl); \
     sc->SetValidator(wxGenericValidator(&o)); \
 } while(0)
     {
@@ -2601,7 +2601,7 @@ bool MainFrame::InitMore(void)
 	getsc("RewindInterval", gopts.rewind_interval);
 	getsc("Throttle", gopts.throttle);
 	throttle_ctrl.thr = sc;
-	getfld(throttle_ctrl.thrsel, "ThrottleSel", wxChoice);
+	getfld(throttle_ctrl.thrsel, d, "ThrottleSel", wxChoice);
 	throttle_ctrl.thr->
 	    Connect(wxEVT_COMMAND_SPINCTRL_UPDATED,
 		    wxSpinEventHandler(ThrottleCtrl_t::SetThrottleSel),
@@ -2617,7 +2617,7 @@ bool MainFrame::InitMore(void)
 #define getcbbe(n, o) getbe(n, o, cb, wxCheckBox, CB)
     wxBoolIntEnValidator *bienval;
 #define getbie(n, o, v, cv, t, wt) do { \
-    getfld(cv, n, t); \
+    getfld(cv, d, n, t); \
     cv->SetValidator(wxBoolIntEnValidator(&o, v, v)); \
     bienval = wxStaticCast(cv->GetValidator(), wxBoolIntEnValidator); \
     static wxBoolEnHandler _ben; \
@@ -2637,7 +2637,7 @@ bool MainFrame::InitMore(void)
 #define getcbie(n, o, v) getbie(n, o, v, cb, wxCheckBox, CB)
     wxFilePickerCtrl *fp;
 #define getfp(n, o) do { \
-    getfld(fp, n, wxFilePickerCtrl); \
+    getfld(fp, d, n, wxFilePickerCtrl); \
     fp->SetValidator(wxFileDirPickerValidator(&o)); \
 } while(0)
     d=LoadXRCropertySheetDialog("GameBoyConfig");
@@ -2647,7 +2647,7 @@ bool MainFrame::InitMore(void)
 	// "Display borders" corresponds to 2 variables, so it is handled
 	// in command handler.  Plus making changes might require resizing
 	// game area.  Validation only here.
-	vfld("Borders", wxChoice);
+	vfld(d, "Borders", wxChoice);
 	getcbbe("Printer", gopts.gbprint);
 	getcbb("PrintGather", gopts.print_auto_page);
 	addbe(cb);
@@ -2685,24 +2685,24 @@ bool MainFrame::InitMore(void)
 	    // probably the reason.
 	    pn.Printf(wxT("cp%d"), i + 1);
 	    wxWindow *w;
-	    getfldv(w, pn, wxWindow);
+	    getfldv(w, d, pn, wxWindow);
 	    GBColorConfigHandler[i].p = w;
 	    GBColorConfigHandler[i].pno = i;
 	    wxFarRadio *cb;
 #define d w
-	    getfld(cb, "UsePalette", wxFarRadio);
+	    getfld(cb, d, "UsePalette", wxFarRadio);
 	    if(r)
 		cb->SetGroup(r);
 	    else
 		r = cb;
 	    cb->SetValidator(wxBoolIntValidator(&gbPaletteOption, i));
-	    getfld(ch, "ColorSet", wxChoice);
+	    getfld(ch, d, "ColorSet", wxChoice);
 	    GBColorConfigHandler[i].c = ch;
 	    for(int j = 0; j < 8; j++) {
 		wxString s;
 		s.Printf(wxT("Color%d"), j);
 		wxColourPickerCtrl *cp;
-		getfldv(cp, s, wxColourPickerCtrl);
+		getfldv(cp, d, s, wxColourPickerCtrl);
 		GBColorConfigHandler[i].cp[j] = cp;
 		cp->SetValidator(wxColorValidator(&systemGbPalette[i * 8 + j]));
 	    }
@@ -2764,11 +2764,11 @@ bool MainFrame::InitMore(void)
 	/// Game Overrides
 	getgbaw("GameSettings");
 	// the rest must be filled in by command handler; just validate
-	vfld("Comment", wxTextCtrl);
-	vfld("OvRTC", wxChoice);
-	vfld("OvSaveType", wxChoice);
-	vfld("OvFlashSize", wxChoice);
-	vfld("OvMirroring", wxChoice);
+	vfld(d, "Comment", wxTextCtrl);
+	vfld(d, "OvRTC", wxChoice);
+	vfld(d, "OvSaveType", wxChoice);
+	vfld(d, "OvFlashSize", wxChoice);
+	vfld(d, "OvMirroring", wxChoice);
     }
 
     d=LoadXRCropertySheetDialog("DisplayConfig");
@@ -2807,7 +2807,7 @@ bool MainFrame::InitMore(void)
 	getcbb("VSync", gopts.vsync);
 	// FIXME: make cb disabled when not GL or d3d
 #define getcbi(n, o, v) do { \
-    getfld(cb, n, wxCheckBox); \
+    getfld(cb, d, n, wxCheckBox); \
     cb->SetValidator(wxBoolIntValidator(&o, v)); \
 } while(0)
 	int mthr = wxThread::GetCPUCount();
@@ -2821,15 +2821,15 @@ bool MainFrame::InitMore(void)
 #ifdef MMX
 	getcbb("MMX", cpu_mmx);
 #else
-	getfld(cb, "MMX", wxCheckBox);
+	getfld(cb, d, "MMX", wxCheckBox);
 	cb->Hide();
 #endif
 	getch("Filter", gopts.filter);
 	// these two are filled and/or hidden at dialog load time
 	wxControl *pll;
 	wxChoice *pl;
-	getfld(pll, "PluginLab", wxControl);
-	getfld(pl, "Plugin", wxChoice);
+	getfld(pll, d, "PluginLab", wxControl);
+	getfld(pl, d, "Plugin", wxChoice);
 	pll->SetValidator(PluginEnabler());
 	pl->SetValidator(PluginListFiller(d, pll, ch));
 	PluginEnableHandler.lab = pll;
@@ -2843,7 +2843,7 @@ bool MainFrame::InitMore(void)
     d=LoadXRCropertySheetDialog("SoundConfig");
     wxSlider *sl;
 #define getsl(n, o) do { \
-    getfld(sl, n, wxSlider); \
+    getfld(sl, d, n, wxSlider); \
     sl->SetValidator(wxGenericValidator(&o)); \
 } while(0)
     {
@@ -2875,7 +2875,7 @@ bool MainFrame::InitMore(void)
 #if !defined(__WXMSW__) || defined(NO_XAUDIO2)
 	rb->Hide();
 #endif
-	getfld(sound_config_handler.dev, "Device", wxChoice);
+	getfld(sound_config_handler.dev, d, "Device", wxChoice);
 	sound_config_handler.dev->SetValidator(SoundConfigLoad());
 	getcbb("Upmix", gopts.upmix);
 	sound_config_handler.umix = cb;
@@ -2904,7 +2904,7 @@ bool MainFrame::InitMore(void)
 	getcbb("GBDeclicking", gopts.gb_declick);
 	getcbbe("GBEnhanceSound", gb_effects_config.enabled);
 	wxPanel *p;
-	getfld(p, "GBEnhanceSoundDep", wxPanel);
+	getfld(p, d, "GBEnhanceSoundDep", wxPanel);
 	addbe(p);
 	getcbb("GBSurround", gb_effects_config.surround);
 	getsl("GBEcho", gopts.gb_echo);
@@ -2917,7 +2917,7 @@ bool MainFrame::InitMore(void)
 
     wxDirPickerCtrl *dp;
 #define getdp(n, o) do { \
-    getfld(dp, n, wxDirPickerCtrl); \
+    getfld(dp, d, n, wxDirPickerCtrl); \
     dp->SetValidator(wxFileDirPickerValidator(&o)); \
 } while(0)
     d=LoadXRCDialog("DirectoriesConfig");
@@ -2942,10 +2942,10 @@ bool MainFrame::InitMore(void)
 	// probably the reason.
 	pn.Printf(wxT("joy%d"), i + 1);
 	wxWindow *w;
-	getfldv(w, pn, wxWindow);
+	getfldv(w, d, pn, wxWindow);
 #define d w
 	wxFarRadio *cb;
-	getfld(cb, "DefaultConfig", wxFarRadio);
+	getfld(cb, d, "DefaultConfig", wxFarRadio);
 	if(r)
 	    cb->SetGroup(r);
 	else
@@ -2993,15 +2993,15 @@ bool MainFrame::InitMore(void)
     d=LoadXRCDialog("AccelConfig");
     {
 	wxTreeCtrl *tc;
-	getfld(tc, "Commands", wxTreeCtrl);
+	getfld(tc, d, "Commands", wxTreeCtrl);
 	accel_config_handler.tc = tc;
 	wxControlWithItems *lb;
-	getfld(lb, "Current", wxControlWithItems);
+	getfld(lb, d, "Current", wxControlWithItems);
 	accel_config_handler.lb = lb;
-	getfld(accel_config_handler.asb, "Assign", wxButton);
-	getfld(accel_config_handler.remb, "Remove", wxButton);
-	getfld(accel_config_handler.key, "Shortcut", wxKeyTextCtrl);
-	getfld(accel_config_handler.curas, "AlreadyThere", wxControl);
+	getfld(accel_config_handler.asb, d, "Assign", wxButton);
+	getfld(accel_config_handler.remb, d, "Remove", wxButton);
+	getfld(accel_config_handler.key, d, "Shortcut", wxKeyTextCtrl);
+	getfld(accel_config_handler.curas, d, "AlreadyThere", wxControl);
 	accel_config_handler.key->MoveBeforeInTabOrder(accel_config_handler.asb);
 	accel_config_handler.key->SetMultikey(0);
 	accel_config_handler.key->SetClearable(false);
