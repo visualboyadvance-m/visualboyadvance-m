@@ -2831,16 +2831,13 @@ bool MainFrame::InitMore(void)
 	getcbb("Bilinear", gopts.bilinear);
 	getcbb("VSync", gopts.vsync);
 	// FIXME: make cb disabled when not GL or d3d
-#define getcbi(n, o, v) do { \
-    cb=SafeXRCCTRL<wxCheckBox>(d, n); \
-    cb->SetValidator(wxBoolIntValidator(&o, v)); \
-} while(0)
 	int mthr = wxThread::GetCPUCount();
 	if(mthr > 8)
 	    mthr = 8;
 	if(mthr < 0)
 	    mthr = 2;
-	getcbi("Multithread", gopts.max_threads, mthr);
+	cb=SafeXRCCTRL<wxCheckBox>(d, "Multithread");
+	cb->SetValidator(wxBoolIntValidator(&gopts.max_threads, mthr));
 	if(mthr <= 1)
 	    cb->Hide();
 #ifdef MMX
