@@ -2,6 +2,8 @@
 #define WX_WXVBAM_H
 
 #include <list>
+#include <typeinfo>
+#include <stdexcept>
 #include <wx/propdlg.h>
 
 #include "wxhead.h"
@@ -24,6 +26,18 @@
 #include "../gba/GBALink.h"
 #include "../gb/gbCheats.h"
 #include "../gba/Cheats.h"
+
+template <typename T>
+void CheckPointer(T pointer)
+{
+	if(pointer == NULL)
+	{
+		std::string errormessage = "Pointer of type \"";
+		errormessage+=typeid(pointer).name();
+		errormessage+="\" was not correctly created.";
+		throw std::runtime_error(errormessage);
+	}
+}
 
 class MainFrame;
 

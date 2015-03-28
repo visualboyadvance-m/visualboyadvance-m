@@ -474,7 +474,7 @@ class PrintDialog : public wxEvtHandler, public wxPrintout
 public:
     PrintDialog(const u16 *data, int lines, bool cont);
     ~PrintDialog();
-    int ShowModal() { return wxGetApp().frame->ShowModal(dlg); }
+    int ShowModal() {CheckPointer(wxGetApp().frame); return wxGetApp().frame->ShowModal(dlg); }
 private:
     void DoSave(wxCommandEvent&);
     void DoPrint(wxCommandEvent&);
