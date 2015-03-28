@@ -1025,22 +1025,11 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
 	} while(0);
     } else {
 	scale = builtin_ff_scale(gopts.filter);
-#ifndef NO_ASM
-	// while there is a 32->16 frontend for these, it's probably more
-	// efficient to just use 16 to start with
-	// unfortunately, this also means that the 32-bit output needs to
-	// be sensed in lower code
-#define out_16 (systemColorDepth == 16 && gopts.filter == FF_PLUGIN)
-	if(gopts.filter == FF_HQ3X || gopts.filter == FF_HQ4X)
-	    systemColorDepth = 16;
-	else
-#else
 #define out_16 (systemColorDepth == 16)
 #endif
 	    systemColorDepth = 32;
     }
     // Intialize color tables
-    if(systemColorDepth == 32) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
 	systemRedShift    = 3;
 	systemGreenShift  = 11;
@@ -1052,14 +1041,6 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
 	systemBlueShift   = 11;
 	RGB_LOW_BITS_MASK = 0x01010100;
 #endif
-    } else {
-	// plugins expect RGB in native byte order
-	systemRedShift    = 10;
-	systemGreenShift  = 5;
-	systemBlueShift   = 0;
-	RGB_LOW_BITS_MASK = 0x0421;
-    }
-
     // FIXME: should be "true" for GBA carts if lcd mode selected
     // which means this needs to be re-run at pref change time
     utilUpdateSystemColorMaps(false);
