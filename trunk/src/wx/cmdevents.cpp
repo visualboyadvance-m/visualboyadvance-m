@@ -1966,69 +1966,35 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
 EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
 {
     bool fs = gopts.fullscreen;
-    int max_scale = gopts.max_scale;
-    int renderer = gopts.render_method;
-    bool bilinear = gopts.bilinear;
-    int filt = gopts.filter;
-    wxString fp = gopts.filter_plugin;
     wxVideoMode dm = gopts.fs_mode;
-    bool vsync = gopts.vsync;
-
-    if(gopts.max_threads == 1)
-	gopts.max_threads = 0;
-    else {
-	gopts.max_threads = wxThread::GetCPUCount();
-	if(gopts.max_threads > 8)
-	    gopts.max_threads = 8;
+    
+    if(gopts.max_threads != 1)
+    {
+		gopts.max_threads = wxThread::GetCPUCount();
     }
+    //Just in case GetCPUCount() returns 0
+    if(!gopts.max_threads)
+		gopts.max_threads = 1;
+		
     wxDialog *dlg = GetXRCDialog("DisplayConfig");
     if(ShowModal(dlg) != wxID_OK)
-	return;
-    if(!gopts.max_threads)
-	gopts.max_threads = 1;
+		return;
     update_opts();
-    if(max_scale != gopts.max_scale && panel->panel) {
-	if(gopts.max_scale) {
-	    panel->panel->GetWindow()->SetMaxSize(wxDefaultSize);
-	    if(fs == gopts.fullscreen && (!panel->IsFullScreen() ||
-					  dm == gopts.fs_mode))
-		panel->Layout();
-	    // else the window will be resized anyway
-	    else if(fs == gopts.fullscreen && (!panel->IsFullScreen() ||
-					       dm == gopts.fs_mode)) {
-		// can't compute max size here, so just destroy & rebuild
-		// drawing panel
+    
+    if(fs != gopts.fullscreen)
+	{
+		panel->ShowFullScreen(gopts.fullscreen);
+    }
+    else if(panel->IsFullScreen() && dm != gopts.fs_mode)
+    {
+		// maybe not the best way to do this..
+		panel->ShowFullScreen(false);
+		panel->ShowFullScreen(true);
+	}
+	if(panel->panel)
+	{
 		panel->panel->Delete();
 		panel->panel = NULL;
-	    }
-	}
-    }
-    if(fs != gopts.fullscreen)
-	panel->ShowFullScreen(gopts.fullscreen);
-    else if(panel->IsFullScreen() && dm != gopts.fs_mode) {
-	// maybe not the best way to do this..
-	panel->ShowFullScreen(false);
-	panel->ShowFullScreen(true);
-    }
-    if(panel->panel &&
-        // change in renderer obviously requires restart
-       (renderer != gopts.render_method ||
-	// change in bilinear filter requires restart only for 3d renderers
-        // but restart for all anyway
-	bilinear != gopts.bilinear ||
-	// change in scale requires buffer resizing
-	builtin_ff_scale(filt) != builtin_ff_scale(gopts.filter) ||
-	// plugin is only loaded on init
-	(filt == FF_PLUGIN && fp != gopts.filter_plugin) ||
-	// ifb doesn't support 24-bit
-	(gopts.ifb != IFB_NONE && systemColorDepth == 24) ||
-	// standard prefers 24-bit
-	(gopts.ifb == IFB_NONE && gopts.filter == FF_NONE &&
-	    systemColorDepth == 32 && gopts.render_method == 0) ||
-	// vsync is only set in init
-	vsync != gopts.vsync)) {
-	panel->panel->Delete();
-	panel->panel = NULL;
     }
 }
 
