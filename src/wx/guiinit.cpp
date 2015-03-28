@@ -2788,7 +2788,7 @@ bool MainFrame::InitMore(void)
 	getsc("MaxScale", gopts.max_scale);
 	// fs modes should be filled in at popup time
 	// since they may change based on what screen is current
-	vfld("FullscreenMode", wxChoice);
+	vfld(d, "FullscreenMode", wxChoice);
 	getcbb("Fullscreen", gopts.fullscreen);
 
 	/// Advanced
