@@ -243,6 +243,8 @@ private:
     void OnDropFile(wxDropFilesEvent&);
     // pop up menu in fullscreen mode
     void OnMenu(wxContextMenuEvent &);
+    // Load a named wxDialog from the XRC file (also loads wxPropertySheetDialog)
+    wxDialog * LoadXRCDialog(const char * name);
     // Returns the link mode to set according to the options
     LinkMode getOptionsLinkMode();
 #include "cmdhandlers.h"
