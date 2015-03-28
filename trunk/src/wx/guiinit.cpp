@@ -7,6 +7,8 @@
 
 #include "wxvbam.h"
 
+#include <stdexcept>
+
 #include <wx/stockitem.h>
 #include <wx/spinctrl.h>
 #include <wx/clrpicker.h>
@@ -1940,6 +1942,27 @@ public:
 } throttle_ctrl;
 
 /////////////////////////////
+wxDialog * MainFrame::LoadXRCDialog(const char * name)
+{
+	wxString dname = wxString::FromUTF8(name);
+	/* using this instead of LoadDialog() allows non-wxDialog classes that */
+	/* are derived from wxDialog (like wxPropertySheetDialog) to work */
+	wxDialog * dialog = wxDynamicCast(wxXmlResource::Get()->LoadObject(this, dname, wxEmptyString), wxDialog);
+	if(!dialog)
+	{
+		std::string errormessage = "Unable to load a dialog from the builtin xrc file: ";
+		errormessage+=name;
+		throw std::runtime_error(errormessage);
+		return NULL;
+	}
+	/* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */
+	/* this will generate a gtk warning but it is necessary for later */
+	/* retrieval using FindWindow() */
+	if(!dialog->GetParent())
+		dialog->Reparent(this);
+	mark_recursive(dialog);
+	return dialog;
+}
 
 bool MainFrame::InitMore(void)
 {
@@ -2192,61 +2215,35 @@ bool MainFrame::InitMore(void)
     // note that the only verification done is to ensure no crashes.  It's the
     // user's responsibility to ensure that the GUI works as intended after
     // modifications
+    try {
 
-    wxDialog *d = 0;
-    const wxChar *dname;
-#define baddialog() do { \
-    wxLogError(_("Unable to load dialog %s from resources"), dname); \
-    return false; \
-} while(0)
-#define baddialogcv(n) do { \
-    wxLogError(_("Unable to load dialog %s (control %s) from resources"), dname, n); \
-    return false; \
-} while(0)
-#define baddialogc(n) baddialogcv(wxT(n))
-#define LoadXRCDialog(n) do { \
-    /* why do I have to manually Fit()? */ \
-    /* since I do, always do it for last item so other init happens first */ \
-    /* don't forget to Fit() the last dialog! */ \
-    if(d != 0) \
-	d->Fit(); \
-    dname = wxT(n); \
-    /* using this instead of LoadDialog() allows non-wxDialog classes that */ \
-    /* are derived from wxDialog (like wxPropertyDialog) to work */ \
-    d = wxDynamicCast(wxXmlResource::Get()->LoadObject(this, dname, wxEmptyString), \
-		      wxDialog); \
-    if(!d) \
-	baddialog(); \
-    /* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */ \
-    /* this will generate a gtk warning but it is necessary for later */ \
-    /* retrieval using FindWindow() */ \
-    if(!d->GetParent()) \
-	d->Reparent(this); \
- \
-    mark_recursive(d); \
-} while(0)
+    wxDialog *d = NULL;
+#define baddialogc(name) { \
+	std::string errormessage = "Unable to load a dialog control from the builtin xrc file: "; \
+	errormessage+=name; \
+	throw std::runtime_error(errormessage); \
+}
 
-#define vfld(f, t) do { \
+#define vfld(f, t) \
     if(!XRCCTRL(*d, f, t)) \
-	baddialogc(f); \
-} while(0)
-#define getfld(v, f, t) do { \
-    if(!(v = XRCCTRL(*d, f, t))) \
-	baddialogc(f); \
-} while(0)
-#define getfldv(v, f, t) do { \
-    if(!(v = XRCCTRL_D(*d, f, t))) \
-	baddialogcv(f.c_str()); \
-} while(0)
+	baddialogc(f);
+#define getfld(v, f, t) \
+	v = XRCCTRL(*d, f, t); \
+	if(!v) \
+		baddialogc(f);
+#define getfldv(v, f, t) \
+	v = XRCCTRL_D(*d, f, t); \
+	if(!v) \
+		baddialogc(f.mb_str());
 
     //// displayed during run
-    LoadXRCDialog("GBPrinter");
+    d=LoadXRCDialog("GBPrinter");
     // just verify preview window & mag sel present
     {
 	wxPanel *prev;
 	getfld(prev, "Preview", wxPanel);
 	if(!wxDynamicCast(prev->GetParent(), wxScrolledWindow))
-	    baddialogc("Preview");
+	    throw std::runtime_error("Unable to load a dialog control from the builtin xrc file: Preview");
 	vfld("Magnification", wxControlWithItems);
     }
 
@@ -2264,7 +2261,7 @@ bool MainFrame::InitMore(void)
     getlab("Version");
     getlab("CRC");
 
-    LoadXRCDialog("GBROMInfo");
+    d=LoadXRCDialog("GBROMInfo");
     // just verify fields present
     getlab("Title");
     getlab("MakerCode");
@@ -2280,11 +2277,11 @@ bool MainFrame::InitMore(void)
     getlab("LicCode");
     getlab("Checksum");
 
-    LoadXRCDialog("CodeSelect");
+    d=LoadXRCDialog("CodeSelect");
     // just verify list present
     vfld("CodeList", wxControlWithItems);
 
-    LoadXRCDialog("ExportSPS");
+    d=LoadXRCDialog("ExportSPS");
     // just verify text fields present
     vfld("Title", wxTextCtrl);
     vfld("Description", wxTextCtrl);
@@ -2292,7 +2289,7 @@ bool MainFrame::InitMore(void)
 
     //// Emulation menu
 #ifndef NO_LINK
-    LoadXRCDialog("NetLink");
+    d=LoadXRCDialog("NetLink");
 #endif
     wxRadioButton *rb;
 #define getrbi(n, o, v) do { \
@@ -2388,14 +2385,14 @@ bool MainFrame::InitMore(void)
     }
 #endif
 
-    LoadXRCDialog("CheatList");
+    d=LoadXRCDialog("CheatList");
     {
 	cheat_list_handler.dlg = d;
 	d->SetEscapeId(wxID_OK);
 	wxCheckedListCtrl *cl;
 	getfld(cl, "Cheats", wxCheckedListCtrl);
 	if(!cl->Init())
-	    baddialogc("Cheats");
+	    throw std::runtime_error("Unable to load a dialog control from the builtin xrc file: Cheats");
 	cheat_list_handler.list = cl;
 	cl->SetValidator(CheatListFill());
 	cl->InsertColumn(0, _("Code"));
@@ -2462,7 +2459,7 @@ bool MainFrame::InitMore(void)
 		   NULL, &cheat_list_handler);
     }
 
-    LoadXRCDialog("CheatEdit");
+    d=LoadXRCDialog("CheatEdit");
     wxChoice *ch;
 #define getch(n, o) do { \
     getfld(ch, n, wxChoice); \
@@ -2478,7 +2475,7 @@ bool MainFrame::InitMore(void)
 	cheat_list_handler.ce_codes_tc = tc;
     }
 
-    LoadXRCDialog("CheatCreate");
+    d=LoadXRCDialog("CheatCreate");
     {
 	cheat_find_handler.dlg = d;
 	d->SetEscapeId(wxID_OK);
@@ -2548,7 +2545,7 @@ bool MainFrame::InitMore(void)
 		   NULL, &cheat_find_handler);
     }
 
-    LoadXRCDialog("CheatAdd");
+    d=LoadXRCDialog("CheatAdd");
     {
 	// d->Reparent(cheat_find_handler.dlg); // broken
 	gettc("Desc", cheat_find_handler.ca_desc);
@@ -2567,7 +2564,7 @@ bool MainFrame::InitMore(void)
     }
 
     //// config menu
-    LoadXRCDialog("GeneralConfig");
+    d=LoadXRCDialog("GeneralConfig");
     wxCheckBox *cb;
 #define getcbb(n, o) do { \
     getfld(cb, n, wxCheckBox); \
@@ -2625,7 +2622,7 @@ bool MainFrame::InitMore(void)
     getfld(fp, n, wxFilePickerCtrl); \
     fp->SetValidator(wxFileDirPickerValidator(&o)); \
 } while(0)
-    LoadXRCDialog("GameBoyConfig");
+    d=LoadXRCDialog("GameBoyConfig");
     {
 	/// System and Peripherals
 	getch("System", gbEmulatorType);
@@ -2704,7 +2701,7 @@ bool MainFrame::InitMore(void)
 	}
     }
 
-    LoadXRCDialog("GameBoyAdvanceConfig");
+    d=LoadXRCDialog("GameBoyAdvanceConfig");
     {
 	/// System and peripherals
 	getch("SaveType", gopts.save_type);
@@ -2717,7 +2714,7 @@ bool MainFrame::InitMore(void)
 #define getgbaw(n) do { \
     wxWindow *w = d->FindWindow(XRCID(n)); \
     if(!w) \
-	baddialogc(n); \
+		baddialogc(n); \
     w->SetValidator(GBACtrlEnabler()); \
 } while(0)
 	getgbaw("Detect");
@@ -2757,7 +2754,7 @@ bool MainFrame::InitMore(void)
 	vfld("OvMirroring", wxChoice);
     }
 
-    LoadXRCDialog("DisplayConfig");
+    d=LoadXRCDialog("DisplayConfig");
     {
 	/// On-Screen Display
 	getch("SpeedIndicator", gopts.osd_speed);
@@ -2826,7 +2823,7 @@ bool MainFrame::InitMore(void)
 	getch("IFB", gopts.ifb);
     }
 
-    LoadXRCDialog("SoundConfig");
+    d=LoadXRCDialog("SoundConfig");
     wxSlider *sl;
 #define getsl(n, o) do { \
     getfld(sl, n, wxSlider); \
@@ -2906,7 +2903,7 @@ bool MainFrame::InitMore(void)
     getfld(dp, n, wxDirPickerCtrl); \
     dp->SetValidator(wxFileDirPickerValidator(&o)); \
 } while(0)
-    LoadXRCDialog("DirectoriesConfig");
+    d=LoadXRCDialog("DirectoriesConfig");
     {
 	getdp("GBARoms", gopts.gba_rom_dir);
 	getdp("GBRoms", gopts.gb_rom_dir);
@@ -2916,7 +2913,7 @@ bool MainFrame::InitMore(void)
 	getdp("Recordings", gopts.recording_dir);
     }
 
-    LoadXRCDialog("JoypadConfig");
+    d=LoadXRCDialog("JoypadConfig");
     wxFarRadio *r = 0;
     for(int i = 0; i < 4; i++) {
 	wxString pn;
@@ -2941,7 +2938,7 @@ bool MainFrame::InitMore(void)
 	for(int j = 0; j < NUM_KEYS; j++) {
 	    wxJoyKeyTextCtrl *tc = XRCCTRL_D(*w, joynames[j], wxJoyKeyTextCtrl);
 	    if(!tc)
-		baddialogcv(joynames[j]);
+			baddialogc(wxString(joynames[j]).mb_str());
 	    wxWindow *p = tc->GetParent();
 	    if(p == prevp)
 		tc->MoveAfterInTabOrder(prev);
@@ -2960,7 +2957,7 @@ bool MainFrame::InitMore(void)
     }
 
 #ifndef NO_LINK
-    LoadXRCDialog("LinkConfig");
+    d=LoadXRCDialog("LinkConfig");
     {
 	getcbbe("Joybus", gopts.gba_joybus_enabled);
 	getlab("JoybusHostLab");
@@ -2977,7 +2974,7 @@ bool MainFrame::InitMore(void)
     }
 #endif
 
-    LoadXRCDialog("AccelConfig");
+    d=LoadXRCDialog("AccelConfig");
     {
 	wxTreeCtrl *tc;
 	getfld(tc, "Commands", wxTreeCtrl);
@@ -3072,8 +3069,12 @@ bool MainFrame::InitMore(void)
 		   wxCommandEventHandler(AccelConfig_t::CheckKey),
 		   NULL, &accel_config_handler);
     }
-
-    d->Fit();
+    }
+    catch (std::exception& e)
+    {
+		wxLogError(wxString::FromUTF8(e.what()));
+		return false;
+	}
 
     //// Debug menu
     // actually, the viewers can be instantiated multiple times.
