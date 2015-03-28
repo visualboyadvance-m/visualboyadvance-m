@@ -9,6 +9,7 @@
 
 #include <typeinfo>
 #include <stdexcept>
+#include <algorithm>
 
 #include <wx/stockitem.h>
 #include <wx/spinctrl.h>
@@ -18,7 +19,6 @@
 #include <wx/tokenzr.h>
 #include "wx/checkedlistctrl.h"
 #include <wx/progdlg.h>
-#include <algorithm>
 #include "../gba/CheatSearch.h"
 
 // The program icon, in case it's missing from .xrc (MSW gets it from .rc file)
@@ -1992,6 +1992,18 @@ wxPropertySheetDialog * MainFrame::LoadXRCropertySheetDialog(const char * name)
 	return dialog;
 }
 
+//This just adds some error checking to the wx XRCCTRL macro
+template <typename T>
+T * SafeXRCCTRL( wxWindow *window,const char * name)
+{
+	wxString dname = wxString::FromUTF8(name);
+	//This is needed to work around a bug in XRCCTRL
+	wxString Ldname=dname;
+	T * output = XRCCTRL(*window, dname, T);
+	CheckThrowXRCError(output,name);
+	return output;
+}
+
 bool MainFrame::InitMore(void)
 {
     // Make sure display panel present and correct type
@@ -2246,13 +2258,11 @@ bool MainFrame::InitMore(void)
     try {
 
     wxDialog *d = NULL;
-#define vfld(dialog_pointer, name, type) CheckThrowXRCError(XRCCTRL(*dialog_pointer, name, type),name)
-#define getfld(return_value, dialog_pointer, name, type) \
-	return_value = XRCCTRL(*dialog_pointer, name, type); \
-	CheckThrowXRCError(return_value,name)
-#define getfldv(return_value, dialog_pointer, name, t) \
-	return_value = XRCCTRL_D(*dialog_pointer, name, t); \
-	CheckThrowXRCError(return_value,ToString(name))
+
+#define vfld(dialog_pointer, name, type) SafeXRCCTRL<type>(dialog_pointer,name)
+#define getfld(return_value, dialog_pointer, name, type) return_value=SafeXRCCTRL<type>(dialog_pointer,name)
+#define getfldv(return_value, dialog_pointer, name, type) \
+	return_value=SafeXRCCTRL<type>(dialog_pointer,ToString(name).c_str())
 
     //// displayed during run
     d=LoadXRCDialog("GBPrinter");
@@ -2262,7 +2272,7 @@ bool MainFrame::InitMore(void)
 	getfld(prev, d, "Preview", wxPanel);
 	if(!wxDynamicCast(prev->GetParent(), wxScrolledWindow))
 	    throw std::runtime_error("Unable to load a dialog control from the builtin xrc file: Preview");
-	vfld(d, "Magnification", wxControlWithItems);
+	SafeXRCCTRL<wxControlWithItems>(d, "Magnification");
     }
 
     //// File menu
