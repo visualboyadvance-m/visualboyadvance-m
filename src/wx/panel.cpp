@@ -991,8 +991,7 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
     
     scale = builtin_ff_scale(gopts.filter);
 #define out_16 (systemColorDepth == 16)
-    systemColorDepth = 32;
-
+	    systemColorDepth = 32;
     // Intialize color tables
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
 	systemRedShift    = 3;
