@@ -1972,6 +1972,13 @@ wxDialog * MainFrame::LoadXRCDialog(const char * name)
 	wxString dname = wxString::FromUTF8(name);
 	wxDialog * dialog = wxXmlResource::Get()->LoadDialog(this, dname);
 	CheckThrowXRCError(dialog,name);
+	
+	/* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */
+	/* this will generate a gtk warning but it is necessary for later */
+	/* retrieval using FindWindow() */
+	if(!dialog->GetParent())
+		dialog->Reparent(this);
+	mark_recursive(dialog);
 	return dialog;
 }
 
