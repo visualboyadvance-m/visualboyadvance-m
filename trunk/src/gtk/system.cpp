@@ -104,6 +104,10 @@ void systemUpdateMotionSensor()
 {
 }
 
+u8 systemGetSensorDarkness()
+{
+}
+
 int systemGetSensorX()
 {
   return 0;
@@ -112,6 +116,15 @@ int systemGetSensorX()
 int systemGetSensorY()
 {
   return 0;
+}
+
+int systemGetSensorZ()
+{
+  return 0;
+}
+
+void systemCartridgeRumble(bool)
+{
 }
 
 void systemGbPrint(u8 * _puiData,

@@ -469,6 +469,11 @@ int  systemGetSensorY()
     return sensory[gopts.default_stick - 1];
 }
 
+int  systemGetSensorZ()
+{
+    return sensory[gopts.default_stick - 1];
+}
+
 class PrintDialog : public wxEvtHandler, public wxPrintout
 {
 public:
