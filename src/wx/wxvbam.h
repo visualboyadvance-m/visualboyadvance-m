@@ -39,6 +39,18 @@ void CheckPointer(T pointer)
 	}
 }
 
+///Helper functions to convert WX's crazy string types to std::string
+
+inline std::string ToString(wxCharBuffer aString)
+{
+	return std::string(aString);
+}
+
+inline std::string ToString(const wxChar* aString)
+{
+	return std::string(wxString(aString).mb_str(wxConvUTF8));
+}
+
 class MainFrame;
 
 class wxvbamApp : public wxApp
@@ -496,7 +508,6 @@ protected:
     FilterThread *threads;
     int nthreads;
     wxSemaphore filt_done;
-    wxDynamicLibrary filt_plugin;
     const RENDER_PLUGIN_INFO *rpi; // also flag indicating plugin loaded
     // largest buffer required is 32-bit * (max width + 1) * (max height + 2)
     u8 delta[257 * 4 * 226];
