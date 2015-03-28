@@ -68,8 +68,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # Copy over needed icons
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/icons/vbam.png DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/icons/wxvbam.xpm DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/icons/vbam.png DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/icons/wxvbam.xpm DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})
 
 # wxrc does not support xrs files in -c output (> 10x compression)
 # so do it manually using slow but portable bin2c.cmake script
