@@ -1943,15 +1943,26 @@ public:
 } throttle_ctrl;
 
 /////////////////////////////
+//Helper functions to convert WX's crazy string types to std::string
+
+std::string ToString(wxCharBuffer aString)
+{
+	return std::string(aString);
+}
+
+std::string ToString(const wxChar* aString)
+{
+	return std::string(wxString(aString).mb_str(wxConvUTF8));
+}
 //Check if a pointer from the XRC file is valid. If it's not, throw an error telling the user.
 template <typename T>
 void CheckThrowXRCError(T pointer,std::string name)
 {
 	if(pointer == NULL)
 	{
-		std::string errormessage = "Unable to load a ";
+		std::string errormessage = "Unable to load a \"";
 		errormessage+=typeid(pointer).name();
-		errormessage+=" from the builtin xrc file: ";
+		errormessage+="\" from the builtin xrc file: ";
 		errormessage+=name;
 		throw std::runtime_error(errormessage);
 	}
@@ -1961,7 +1972,8 @@ wxDialog * MainFrame::LoadXRCDialog(const char * name)
 	wxString dname = wxString::FromUTF8(name);
 	/* using this instead of LoadDialog() allows non-wxDialog classes that */
 	/* are derived from wxDialog (like wxPropertySheetDialog) to work */
-	wxDialog * dialog = wxDynamicCast(wxXmlResource::Get()->LoadObject(this, dname, wxEmptyString), wxDialog);
+	wxObject * anObject = wxXmlResource::Get()->LoadObject(this, dname, wxEmptyString);
+	wxDialog * dialog = wxDynamicCast(anObject, wxDialog);
 	CheckThrowXRCError(dialog,name);
 	
 	/* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */
@@ -2227,23 +2239,13 @@ bool MainFrame::InitMore(void)
     try {
 
     wxDialog *d = NULL;
-#define baddialogc(name) { \
-	std::string errormessage = "Unable to load a dialog control from the builtin xrc file: "; \
-	errormessage+=name; \
-	throw std::runtime_error(errormessage); \
-}
-
-#define vfld(f, t) \
-    if(!XRCCTRL(*d, f, t)) \
-	baddialogc(f);
+#define vfld(f, t) CheckThrowXRCError(XRCCTRL(*d, f, t),f)
 #define getfld(v, f, t) \
 	v = XRCCTRL(*d, f, t); \
-	if(!v) \
-		baddialogc(f);
+	CheckThrowXRCError(v,f)
 #define getfldv(v, f, t) \
 	v = XRCCTRL_D(*d, f, t); \
-	if(!v) \
-		baddialogc(f.mb_str());
+	CheckThrowXRCError(v,ToString(f))
 
     //// displayed during run
     d=LoadXRCDialog("GBPrinter");
@@ -2722,8 +2724,7 @@ bool MainFrame::InitMore(void)
 		   NULL, &BatConfigHandler);
 #define getgbaw(n) do { \
     wxWindow *w = d->FindWindow(XRCID(n)); \
-    if(!w) \
-		baddialogc(n); \
+    CheckThrowXRCError(w,n); \
     w->SetValidator(GBACtrlEnabler()); \
 } while(0)
 	getgbaw("Detect");
@@ -2946,8 +2947,7 @@ bool MainFrame::InitMore(void)
 	wxWindow *prev = NULL, *prevp = NULL;
 	for(int j = 0; j < NUM_KEYS; j++) {
 	    wxJoyKeyTextCtrl *tc = XRCCTRL_D(*w, joynames[j], wxJoyKeyTextCtrl);
-	    if(!tc)
-			baddialogc(wxString(joynames[j]).mb_str());
+	    CheckThrowXRCError(tc,ToString(joynames[j]));
 	    wxWindow *p = tc->GetParent();
 	    if(p == prevp)
 		tc->MoveAfterInTabOrder(prev);
