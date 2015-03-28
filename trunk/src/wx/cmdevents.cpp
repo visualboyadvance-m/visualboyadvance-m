@@ -2003,12 +2003,13 @@ EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
     int filt = gopts.filter;
     if(filt == FF_PLUGIN ||
        ++gopts.filter == FF_PLUGIN && gopts.filter_plugin.empty())
-	gopts.filter = 0;
+	{
+		gopts.filter = 0;
+	}
     update_opts();
-    if(panel->panel &&
-       builtin_ff_scale(filt) != builtin_ff_scale(gopts.filter)) {
-	panel->panel->Delete();
-	panel->panel = NULL;
+    if(panel->panel) {
+		panel->panel->Delete();
+		panel->panel = NULL;
     }
 }
 
@@ -2016,14 +2017,10 @@ EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
 {
     gopts.ifb = (gopts.ifb + 1) % 3;
     update_opts();
-    if(panel->panel &&
-	// ifb doesn't support 24-bit
-	(gopts.ifb != IFB_NONE && systemColorDepth == 24) ||
-	// standard prefers 24-bit
-	(gopts.ifb == IFB_NONE && gopts.filter == FF_NONE &&
-	    systemColorDepth == 32 && gopts.render_method == 0)) {
-	panel->panel->Delete();
-	panel->panel = NULL;
+    if(panel->panel)
+    {
+		panel->panel->Delete();
+		panel->panel = NULL;
     }
 }
 
