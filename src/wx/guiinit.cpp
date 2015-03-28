@@ -58,21 +58,21 @@ public:
     wxButton *okb;
     void ServerOKButton(wxCommandEvent &ev)
     {
-	okb->SetLabel(_("Start!"));
+		okb->SetLabel(_("Start!"));
     }
     void ClientOKButton(wxCommandEvent &ev)
     {
-	okb->SetLabel(_("Connect"));
+		okb->SetLabel(_("Connect"));
     }
     // attached to OK, so skip when OK
     void NetConnect(wxCommandEvent &ev)
     {
-	static const int length = 256;
-	if(!dlg->Validate() || !dlg->TransferDataFromWindow())
-	    return;
+		static const int length = 256;
+		if(!dlg->Validate() || !dlg->TransferDataFromWindow())
+			return;
 
-	if (!server) {
-		bool valid = SetLinkServerHost(gopts.link_host.mb_str());
+		if (!server) {
+			bool valid = SetLinkServerHost(gopts.link_host.mb_str());
 		if (!valid) {
 			wxMessageBox(_("You must enter a valid host name"),
 				 _("Host name invalid"), wxICON_ERROR | wxOK);
@@ -167,31 +167,31 @@ public:
 
     void Reload()
     {
-	list->DeleteAllItems();
-	Reload(0);
+		list->DeleteAllItems();
+		Reload(0);
     }
 
     void Reload(int start)
     {
 	if(isgb) {
 	    for(int i = start; i < gbCheatNumber; i++) {
-		item0.SetId(i);
-		item0.SetText(wxString(gbCheatList[i].cheatCode, wxConvLibc));
-		list->InsertItem(item0);
-		item1.SetId(i);
-		item1.SetText(wxString(gbCheatList[i].cheatDesc, wxConvUTF8));
-		list->SetItem(item1);
-		list->Check(i, gbCheatList[i].enabled);
+			item0.SetId(i);
+			item0.SetText(wxString(gbCheatList[i].cheatCode, wxConvLibc));
+			list->InsertItem(item0);
+			item1.SetId(i);
+			item1.SetText(wxString(gbCheatList[i].cheatDesc, wxConvUTF8));
+			list->SetItem(item1);
+			list->Check(i, gbCheatList[i].enabled);
 	    }
 	} else {
 	    for(int i = start; i < cheatsNumber; i++) {
-		item0.SetId(i);
-		item0.SetText(wxString(cheatsList[i].codestring, wxConvLibc));
-		list->InsertItem(item0);
-		item1.SetId(i);
-		item1.SetText(wxString(cheatsList[i].desc, wxConvUTF8));
-		list->SetItem(item1);
-		list->Check(i, cheatsList[i].enabled);
+			item0.SetId(i);
+			item0.SetText(wxString(cheatsList[i].codestring, wxConvLibc));
+			list->InsertItem(item0);
+			item1.SetId(i);
+			item1.SetText(wxString(cheatsList[i].desc, wxConvUTF8));
+			list->SetItem(item1);
+			list->Check(i, cheatsList[i].enabled);
 	    }
 	}
 	AdjustDescWidth();
@@ -202,91 +202,91 @@ public:
 	switch(ev.GetId()) {
 	case wxID_OPEN:
 	    {
-		wxFileDialog subdlg(dlg, _("Select cheat file"), cheatdir,
+			wxFileDialog subdlg(dlg, _("Select cheat file"), cheatdir,
 				    cheatfn, _("VBA cheat lists (*.clt)|*.clt"),
 				    wxFD_OPEN|wxFD_FILE_MUST_EXIST);
-		int ret = subdlg.ShowModal();
-		cheatdir = subdlg.GetDirectory();
-		cheatfn = subdlg.GetPath();
-		if(ret != wxID_OK)
-		    break;
-		bool cld;
-		if(isgb)
-		    cld = gbCheatsLoadCheatList(cheatfn.mb_fn_str());
-		else
-		    cld = cheatsLoadCheatList(cheatfn.mb_fn_str());
-		if(cld) {
-		    *dirty = cheatfn != deffn;
-		    systemScreenMessage(_("Loaded cheats"));
-		} else
-		    *dirty = true; // attempted load always clears
-		Reload();
-	    }
-	    break;
+			int ret = subdlg.ShowModal();
+			cheatdir = subdlg.GetDirectory();
+			cheatfn = subdlg.GetPath();
+			if(ret != wxID_OK)
+				break;
+			bool cld;
+			if(isgb)
+				cld = gbCheatsLoadCheatList(cheatfn.mb_fn_str());
+			else
+				cld = cheatsLoadCheatList(cheatfn.mb_fn_str());
+			if(cld) {
+				*dirty = cheatfn != deffn;
+				systemScreenMessage(_("Loaded cheats"));
+			} else
+				*dirty = true; // attempted load always clears
+			Reload();
+		}
+		break;
 	case wxID_SAVE:
 	    {
-		wxFileDialog subdlg(dlg, _("Select cheat file"), cheatdir,
+			wxFileDialog subdlg(dlg, _("Select cheat file"), cheatdir,
 				    cheatfn, _("VBA cheat lists (*.clt)|*.clt"),
 				    wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
-		int ret = subdlg.ShowModal();
-		cheatdir = subdlg.GetDirectory();
-		cheatfn = subdlg.GetPath();
-		if(ret != wxID_OK)
-		    break;
-		// note that there is no way to test for succes of save
-		if(isgb)
-		    gbCheatsSaveCheatList(cheatfn.mb_fn_str());
-		else
-		    cheatsSaveCheatList(cheatfn.mb_fn_str());
-		if(cheatfn == deffn)
-		    *dirty = false;
-		systemScreenMessage(_("Saved cheats"));
+			int ret = subdlg.ShowModal();
+			cheatdir = subdlg.GetDirectory();
+			cheatfn = subdlg.GetPath();
+			if(ret != wxID_OK)
+				break;
+			// note that there is no way to test for succes of save
+			if(isgb)
+				gbCheatsSaveCheatList(cheatfn.mb_fn_str());
+			else
+				cheatsSaveCheatList(cheatfn.mb_fn_str());
+			if(cheatfn == deffn)
+				*dirty = false;
+			systemScreenMessage(_("Saved cheats"));
 	    }
 	    break;
 	case wxID_ADD:
 	    {
-		int ncheats = isgb ? gbCheatNumber : cheatsNumber;
-		ce_codes = wxEmptyString;
-		wxDialog *subdlg = GetXRCDialog("CheatEdit");
-		subdlg->ShowModal();
-		AddCheat();
-		Reload(ncheats);
+			int ncheats = isgb ? gbCheatNumber : cheatsNumber;
+			ce_codes = wxEmptyString;
+			wxDialog *subdlg = GetXRCDialog("CheatEdit");
+			subdlg->ShowModal();
+			AddCheat();
+			Reload(ncheats);
 	    }
 	    break;
 	case wxID_REMOVE:
 	    {
-		bool asked = false, restore;
-		for(int i = list->GetItemCount() - 1; i >= 0; i--)
+			bool asked = false, restore;
+			for(int i = list->GetItemCount() - 1; i >= 0; i--)
 		    if(list->GetItemState(i, wxLIST_STATE_SELECTED)) {
-			list->DeleteItem(i);
-			if(isgb)
-			    gbCheatRemove(i);
-			else {
-			    if(!asked) {
-				asked = true;
-				restore = wxMessageBox(_("Restore old values?"),
+				list->DeleteItem(i);
+				if(isgb)
+					gbCheatRemove(i);
+				else {
+					if(!asked) {
+					asked = true;
+					restore = wxMessageBox(_("Restore old values?"),
 						       _("Removing cheats"),
 						       wxYES_NO|wxICON_QUESTION) == wxYES;
-			    }
+					}
 			    cheatsDelete(i, restore);
-			}
+				}
 		    }
 	    }
 	    break;
 	case wxID_CLEAR:
 	    if(isgb) {
-		if(gbCheatNumber) {
-		    *dirty = true;
-		    gbCheatRemoveAll();
-		}
-	    } else {
-		if(cheatsNumber) {
-		    bool restore = wxMessageBox(_("Restore old values?"),
+			if(gbCheatNumber) {
+				*dirty = true;
+				gbCheatRemoveAll();
+			}
+		} else {
+			if(cheatsNumber) {
+				bool restore = wxMessageBox(_("Restore old values?"),
 						_("Removing cheats"),
 						wxYES_NO|wxICON_QUESTION) == wxYES;
-		    *dirty = true;
-		    cheatsDeleteAll(restore);
-		}
+				*dirty = true;
+				cheatsDeleteAll(restore);
+			}
 	    }
 	    Reload();
 	    break;
@@ -295,34 +295,34 @@ public:
 	    // are selected
 	    *dirty = true;
 	    if(isgb) {
-		int i;
-		for(i = 0; i < gbCheatNumber; i++)
-		    if(!gbCheatList[i].enabled)
-			break;
-		if(i < gbCheatNumber)
-		    for(; i < gbCheatNumber; i++) {
-			gbCheatEnable(i);
-			list->Check(i, true);
-		    }
-		else
-		    for(i = 0; i < gbCheatNumber; i++) {
-			gbCheatDisable(i);
-			list->Check(i, false);
-		    }
+			int i;
+			for(i = 0; i < gbCheatNumber; i++)
+				if(!gbCheatList[i].enabled)
+					break;
+			if(i < gbCheatNumber)
+				for(; i < gbCheatNumber; i++) {
+				gbCheatEnable(i);
+				list->Check(i, true);
+				}
+			else
+				for(i = 0; i < gbCheatNumber; i++) {
+				gbCheatDisable(i);
+				list->Check(i, false);
+				}
 	    } else {
-		int i;
-		for(i = 0; i < cheatsNumber; i++)
-		    if(!cheatsList[i].enabled)
-			break;
-		if(i < cheatsNumber)
+			int i;
+			for(i = 0; i < cheatsNumber; i++)
+				if(!cheatsList[i].enabled)
+					break;
+			if(i < cheatsNumber)
 		    for(; i < cheatsNumber; i++) {
-			cheatsEnable(i);
-			list->Check(i, true);
+				cheatsEnable(i);
+				list->Check(i, true);
 		    }
 		else
 		    for(i = 0; i < cheatsNumber; i++) {
-			cheatsDisable(i);
-			list->Check(i, false);
+				cheatsDisable(i);
+				list->Check(i, false);
 		    }
 	    }
 	    break;
@@ -793,44 +793,44 @@ public:
 
     void Deselect()
     {
-	int idx = list->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if(idx >= 0)
-	    list->SetItemState(idx, 0, wxLIST_STATE_SELECTED);
-	add_b->Disable();
+		int idx = list->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+		if(idx >= 0)
+			list->SetItemState(idx, 0, wxLIST_STATE_SELECTED);
+		add_b->Disable();
     }
 
     void Select(wxListEvent &ev)
     {
-	add_b->Enable(list->GetItemState(ev.GetIndex(), wxLIST_STATE_SELECTED) != 0);
+		add_b->Enable(list->GetItemState(ev.GetIndex(), wxLIST_STATE_SELECTED) != 0);
     }
 
     void AddCheatB(wxCommandEvent &ev)
     {
-	int idx = list->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if(idx >= 0)
-	    AddCheat(idx);
+		int idx = list->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+		if(idx >= 0)
+			AddCheat(idx);
     }
 
     void AddCheatL(wxListEvent &ev)
     {
-	AddCheat(ev.GetIndex());
+		AddCheat(ev.GetIndex());
     }
 
     void AddCheat(int idx)
     {
-	wxString addr_s = list->OnGetItemText(idx, 0);
-	ca_addr->SetLabel(addr_s);
-	wxString s;
-	switch(size) {
-	  case BITS_8:
-	    s = _("8-bit ");
-	    break;
-	  case BITS_16:
-	    s = _("16-bit ");
-	    break;
-	  case BITS_32:
-	    s = _("32-bit ");
-	    break;
+		wxString addr_s = list->OnGetItemText(idx, 0);
+		ca_addr->SetLabel(addr_s);
+		wxString s;
+		switch(size) {
+			case BITS_8:
+				s = _("8-bit ");
+			break;
+			case BITS_16:
+				s = _("16-bit ");
+			break;
+			case BITS_32:
+				s = _("32-bit ");
+			break;
 	}
 	switch(fmt) {
 	  case CFVFMT_SD:
