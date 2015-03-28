@@ -2281,7 +2281,7 @@ bool MainFrame::InitMore(void)
     // just verify preview window & mag sel present
     {
 	wxPanel *prev;
-	prev=SafeXRCCTRL<wxPanel>(d, "Preview");
+	prev=SafeXRCCTRL<wxPanel>(d,  "Preview");
 	if(!wxDynamicCast(prev->GetParent(), wxScrolledWindow))
 	    throw std::runtime_error("Unable to load a dialog control from the builtin xrc file: Preview");
 	SafeXRCCTRL<wxControlWithItems>(d, "Magnification");
@@ -2289,10 +2289,10 @@ bool MainFrame::InitMore(void)
     }
 
     //// File menu
-    LoadXRCDialog("GBAROMInfo");
+    d=LoadXRCDialog("GBAROMInfo");
     // just verify fields present
     wxControl *lab;
-#define getlab(n) lab=SafeXRCCTRL<wxControl>(d, n)
+#define getlab(n) lab=SafeXRCCTRL<wxControl>(d,  n)
     getlab("Title");
     getlab("GameCode");
     getlab("MakerCode");
@@ -2338,21 +2338,21 @@ bool MainFrame::InitMore(void)
 #endif
     wxRadioButton *rb;
 #define getrbi(n, o, v) do { \
-    rb=SafeXRCCTRL<wxRadioButton>(d, n); \
+    rb=SafeXRCCTRL<wxRadioButton>(d,  n); \
     rb->SetValidator(wxBoolIntValidator(&o, v)); \
 } while(0)
 #define getrbb(n, o) do { \
-    rb=SafeXRCCTRL<wxRadioButton>(d, n); \
+    rb=SafeXRCCTRL<wxRadioButton>(d,  n); \
     rb->SetValidator(wxGenericValidator(&o)); \
 } while(0)
 #define getrbbr(n, o) do { \
-    rb=SafeXRCCTRL<wxRadioButton>(d, n); \
+    rb=SafeXRCCTRL<wxRadioButton>(d,  n); \
     rb->SetValidator(wxBoolRevValidator(&o)); \
 } while(0)
     wxBoolEnValidator *benval;
     wxBoolEnHandler *ben;
 #define getbe(n, o, cv, t, wt) do { \
-    cv=SafeXRCCTRL<t>(d, n); \
+    cv=SafeXRCCTRL<t>(d,  n); \
     cv->SetValidator(wxBoolEnValidator(&o)); \
     benval = wxStaticCast(cv->GetValidator(), wxBoolEnValidator); \
     static wxBoolEnHandler _ben; \
@@ -2363,7 +2363,7 @@ bool MainFrame::InitMore(void)
     // of checkboxes.  A lot of work for little benefit.
     wxBoolRevEnValidator *brenval;
 #define getbre(n, o, cv, t, wt) do { \
-    cv=SafeXRCCTRL<t>(d, n); \
+    cv=SafeXRCCTRL<t>(d,  n); \
     cv->SetValidator(wxBoolRevEnValidator(&o)); \
     brenval = wxStaticCast(cv->GetValidator(), wxBoolRevEnValidator); \
     wx##wt##BoolEnHandlerConnect(rb, wxID_ANY, *ben); \
@@ -2391,7 +2391,7 @@ bool MainFrame::InitMore(void)
 #define getrbbd(n, o) getbre(n, o, rb, wxRadioButton, RBD)
     wxTextCtrl *tc;
 #define gettc(n, o) do { \
-    tc=SafeXRCCTRL<wxTextCtrl>(d, n); \
+    tc=SafeXRCCTRL<wxTextCtrl>(d,  n); \
     tc->SetValidator(wxTextValidator(wxFILTER_NONE, &o)); \
 } while(0)
 #ifndef NO_LINK
@@ -2436,7 +2436,7 @@ bool MainFrame::InitMore(void)
 	cheat_list_handler.dlg = d;
 	d->SetEscapeId(wxID_OK);
 	wxCheckedListCtrl *cl;
-	cl=SafeXRCCTRL<wxCheckedListCtrl>(d, "Cheats");
+    cl=SafeXRCCTRL<wxCheckedListCtrl>(d,  "Cheats");
 	if(!cl->Init())
 	    throw std::runtime_error("Unable to initialize the Cheats dialog control from the builtin xrc file!");
 	cheat_list_handler.list = cl;
@@ -2571,7 +2571,7 @@ bool MainFrame::InitMore(void)
 	       wxCommandEventHandler(CheatFind_t::f), \
 	       NULL, &cheat_find_handler);
 #define cf_enbutton(n, v) do { \
-    cheat_find_handler.v=SafeXRCCTRL<wxButton>(d, n); \
+    cheat_find_handler.v=SafeXRCCTRL<wxButton>(d,  n); \
     cheat_find_handler.v->Disable(); \
 } while(0)
 	cf_button("Search", Search);
@@ -2587,6 +2587,7 @@ bool MainFrame::InitMore(void)
 	d->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED,
 		   wxListEventHandler(CheatFind_t::Select),
 		   NULL, &cheat_find_handler);
+    d->Fit();
     }
 
     d=LoadXRCDialog("CheatAdd");
