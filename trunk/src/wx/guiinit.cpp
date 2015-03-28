@@ -2486,13 +2486,12 @@ bool MainFrame::InitMore(void)
 
     d=LoadXRCDialog("CheatEdit");
     wxChoice *ch;
-#define getch(n, o) do { \
-    ch=vfld(d, n, wxChoice); \
-    ch->SetValidator(wxGenericValidator(&o)); \
-} while(0)
+#define getch(pointer, name, validator)\
+	ch=vfld(pointer, name, wxChoice); \
+	ch->SetValidator(wxGenericValidator(&validator));
     {
 	// d->Reparent(cheat_list_handler.dlg); // broken
-	getch("Type", cheat_list_handler.ce_type);
+	getch(d, "Type", cheat_list_handler.ce_type);
 	cheat_list_handler.ce_type_ch = ch;
 	gettc("Desc", cheat_list_handler.ce_desc);
 	tc->SetMaxLength(sizeof(cheatsList[0].desc) - 1);
@@ -2650,7 +2649,7 @@ bool MainFrame::InitMore(void)
     d=LoadXRCropertySheetDialog("GameBoyConfig");
     {
 	/// System and Peripherals
-	getch("System", gbEmulatorType);
+	getch(d, "System", gbEmulatorType);
 	// "Display borders" corresponds to 2 variables, so it is handled
 	// in command handler.  Plus making changes might require resizing
 	// game area.  Validation only here.
@@ -2724,9 +2723,9 @@ bool MainFrame::InitMore(void)
     d=LoadXRCropertySheetDialog("GameBoyAdvanceConfig");
     {
 	/// System and peripherals
-	getch("SaveType", gopts.save_type);
+	getch(d, "SaveType", gopts.save_type);
 	BatConfigHandler.type = ch;
-	getch("FlashSize", gopts.flash_size);
+	getch(d, "FlashSize", gopts.flash_size);
 	BatConfigHandler.size = ch;
 	d->Connect(XRCID("SaveType"), wxEVT_COMMAND_CHOICE_SELECTED,
 		   wxCommandEventHandler(BatConfig_t::ChangeType),
@@ -2776,7 +2775,7 @@ bool MainFrame::InitMore(void)
     d=LoadXRCropertySheetDialog("DisplayConfig");
     {
 	/// On-Screen Display
-	getch("SpeedIndicator", gopts.osd_speed);
+	getch(d, "SpeedIndicator", gopts.osd_speed);
 	getcbb("NoStatusMsg", gopts.no_osd_status);
 	getcbb("Transparent", gopts.osd_transparent);
 
@@ -2826,7 +2825,7 @@ bool MainFrame::InitMore(void)
 	cb=vfld(d, "MMX", wxCheckBox);
 	cb->Hide();
 #endif
-	getch("Filter", gopts.filter);
+	getch(d, "Filter", gopts.filter);
 	// these two are filled and/or hidden at dialog load time
 	wxControl *pll;
 	wxChoice *pl;
@@ -2839,7 +2838,7 @@ bool MainFrame::InitMore(void)
 	ch->Connect(wxEVT_COMMAND_CHOICE_SELECTED,
 		    wxCommandEventHandler(PluginEnable_t::ToggleChoice),
 		    NULL, &PluginEnableHandler);
-	getch("IFB", gopts.ifb);
+	getch(d, "IFB", gopts.ifb);
     }
 
     d=LoadXRCropertySheetDialog("SoundConfig");
@@ -2855,7 +2854,7 @@ bool MainFrame::InitMore(void)
 	d->Connect(XRCID("Volume100"), wxEVT_COMMAND_BUTTON_CLICKED,
 		   wxCommandEventHandler(SoundConfig_t::FullVol),
 		   NULL, &sound_config_handler);
-	getch("Rate", gopts.sound_qual);
+	getch(d, "Rate", gopts.sound_qual);
 
 	/// Advanced
 #define audapi_rb(n, v) do {\
