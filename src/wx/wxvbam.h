@@ -1,6 +1,9 @@
 #ifndef WX_WXVBAM_H
 #define WX_WXVBAM_H
 
+#include <list>
+#include <wx/propdlg.h>
+
 #include "wxhead.h"
 #include "wx/sdljoy.h"
 #include "wx/joyedit.h"
@@ -9,7 +12,6 @@
 #ifndef NO_FFMPEG
 #include "../common/ffmpeg.h"
 #endif
-#include <list>
 
 /* yeah, they aren't needed globally, but I'm too lazy to limit where needed */
 #include "../System.h"
@@ -243,8 +245,10 @@ private:
     void OnDropFile(wxDropFilesEvent&);
     // pop up menu in fullscreen mode
     void OnMenu(wxContextMenuEvent &);
-    // Load a named wxDialog from the XRC file (also loads wxPropertySheetDialog)
+    // Load a named wxDialog from the XRC file
     wxDialog * LoadXRCDialog(const char * name);
+    // Load a named wxPropertySheetDialog from the XRC file
+    wxPropertySheetDialog * LoadXRCropertySheetDialog(const char * name);
     // Returns the link mode to set according to the options
     LinkMode getOptionsLinkMode();
 #include "cmdhandlers.h"
