@@ -1980,7 +1980,7 @@ wxPropertySheetDialog * MainFrame::LoadXRCropertySheetDialog(const char * name)
 	wxString dname = wxString::FromUTF8(name);
 	//Seems like the only way to do this
 	wxObject * anObject = wxXmlResource::Get()->LoadObject(this, dname, wxEmptyString);
-	wxPropertySheetDialog * dialog = wxDynamicCast(anObject, wxPropertySheetDialog);
+	wxPropertySheetDialog * dialog = dynamic_cast<wxPropertySheetDialog*>(anObject);
 	CheckThrowXRCError(dialog,name);
 	
 	/* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */
