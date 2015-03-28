@@ -7,6 +7,7 @@
 
 #include "wxvbam.h"
 
+#include <typeinfo>
 #include <stdexcept>
 
 #include <wx/stockitem.h>
@@ -1942,19 +1943,27 @@ public:
 } throttle_ctrl;
 
 /////////////////////////////
+//Check if a pointer from the XRC file is valid. If it's not, throw an error telling the user.
+template <typename T>
+void CheckThrowXRCError(T pointer,std::string name)
+{
+	if(pointer == NULL)
+	{
+		std::string errormessage = "Unable to load a ";
+		errormessage+=typeid(pointer).name();
+		errormessage+=" from the builtin xrc file: ";
+		errormessage+=name;
+		throw std::runtime_error(errormessage);
+	}
+}
 wxDialog * MainFrame::LoadXRCDialog(const char * name)
 {
 	wxString dname = wxString::FromUTF8(name);
 	/* using this instead of LoadDialog() allows non-wxDialog classes that */
 	/* are derived from wxDialog (like wxPropertySheetDialog) to work */
 	wxDialog * dialog = wxDynamicCast(wxXmlResource::Get()->LoadObject(this, dname, wxEmptyString), wxDialog);
-	if(!dialog)
-	{
-		std::string errormessage = "Unable to load a dialog from the builtin xrc file: ";
-		errormessage+=name;
-		throw std::runtime_error(errormessage);
-		return NULL;
-	}
+	CheckThrowXRCError(dialog,name);
+	
 	/* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */
 	/* this will generate a gtk warning but it is necessary for later */
 	/* retrieval using FindWindow() */
