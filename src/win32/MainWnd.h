@@ -68,6 +68,8 @@ protected:
 	afx_msg void OnFileOpenGBA();
 	afx_msg void OnFileOpenGBC();
 	afx_msg void OnFileOpenGB();
+	afx_msg void OnFileLoadDotCode();
+	afx_msg void OnFileSaveDotCode();
 	afx_msg void OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
 	afx_msg void OnFilePause();
 	afx_msg void OnUpdateFilePause(CCmdUI* pCmdUI);
@@ -172,6 +174,8 @@ protected:
 	afx_msg void OnUpdateOptionsEmulatorAutomaticallyipspatch(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorAgbprint();
 	afx_msg void OnUpdateOptionsEmulatorAgbprint(CCmdUI* pCmdUI);
+	afx_msg void OnOptionsEmulatorEreader();
+	afx_msg void OnUpdateOptionsEmulatorEreader(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorRealtimeclock();
 	afx_msg void OnUpdateOptionsEmulatorRealtimeclock(CCmdUI* pCmdUI);
 	afx_msg void OnOptionsEmulatorRewindinterval();

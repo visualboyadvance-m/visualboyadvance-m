@@ -202,6 +202,9 @@ class VBA : public CWinApp
   CString filename;
   CString dir;
 
+  CString loadDotCodeFile;
+  CString saveDotCodeFile;
+
   CString wndClass;
 
  public:

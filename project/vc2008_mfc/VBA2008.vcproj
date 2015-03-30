@@ -431,6 +431,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\gba\ereader.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gba\ereader.h"
+					>
+				</File>				
+				<File
 					RelativePath="..\..\src\gba\bios.cpp"
 					>
 				</File>

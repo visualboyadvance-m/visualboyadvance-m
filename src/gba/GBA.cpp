@@ -20,6 +20,7 @@
 #include "../common/Port.h"
 #include "../System.h"
 #include "agbprint.h"
+#include "ereader.h"
 #include "GBALink.h"
 
 #ifdef PROFILING
@@ -160,6 +161,9 @@ u8 memoryWaitSeq32[16] =
 
 
 u8 biosProtected[4];
+
+const char *loadDotCodeFile;
+const char *saveDotCodeFile;
 
 #ifdef WORDS_BIGENDIAN
 bool cpuBiosSwapped = false;
@@ -1618,6 +1622,26 @@ void doMirroring (bool b)
   }
 }
 
+const char* GetLoadDotCodeFile()
+{
+	return loadDotCodeFile;
+}
+
+const char* GetSaveDotCodeFile()
+{
+	return saveDotCodeFile;
+}
+
+void SetLoadDotCodeFile(const char *szFile)
+{
+	loadDotCodeFile = szFile;
+}
+
+void SetSaveDotCodeFile(const char *szFile)
+{
+	saveDotCodeFile = szFile;
+}
+
 void CPUUpdateRender()
 {
   switch(DISPCNT & 7) {
@@ -1933,8 +1957,19 @@ void CPUSoftwareInterrupt(int comment)
           VCOUNT);
     }
 #endif
-    CPUSoftwareInterrupt();
-    return;
+	if ((comment & 0xF8) != 0xE0)
+	{
+		CPUSoftwareInterrupt();
+		return;
+	}
+	else
+	{
+		if (CheckEReaderRegion())
+			BIOS_EReader_ScanCard(comment);
+		else
+			CPUSoftwareInterrupt();
+		return;
+	}
   }
   // This would be correct, but it causes problems if uncommented
   //  else {
@@ -2162,6 +2197,17 @@ void CPUSoftwareInterrupt(int comment)
   case 0x1F:
     BIOS_MidiKey2Freq();
     break;
+  case 0xE0:
+  case 0xE1:
+  case 0xE2:
+  case 0xE3:
+  case 0xE4:
+  case 0xE5:
+  case 0xE6:
+  case 0xE7:
+	  if (CheckEReaderRegion())
+		  BIOS_EReader_ScanCard(comment);
+	  break;
   case 0x2A:
     BIOS_SndDriverJmpTableCopy();
     // let it go, because we don't really emulate this function
@@ -3271,6 +3317,18 @@ void CPUReset()
         gbaSaveType = 2;
         break;
       }
+  }
+  switch (CheckEReaderRegion())
+  {
+  case 1: //US
+	  EReaderWriteMemory(0x8009134, 0x46C0DFE0);
+	  break;
+  case 2:
+	  EReaderWriteMemory(0x8008A8C, 0x46C0DFE0);
+	  break;
+  case 3:
+	  EReaderWriteMemory(0x80091A8, 0x46C0DFE0);
+	  break;
   }
   rtcReset();
   // clean registers

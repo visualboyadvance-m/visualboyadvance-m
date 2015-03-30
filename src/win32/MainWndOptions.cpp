@@ -23,6 +23,7 @@
 
 #include "../System.h"
 #include "../gba/agbprint.h"
+#include "../gba/ereader.h"
 #include "../gba/GBA.h"
 #include "../gba/Globals.h"
 #include "../gba/Sound.h"
@@ -632,6 +633,16 @@ void MainWnd::OnOptionsEmulatorAgbprint()
 void MainWnd::OnUpdateOptionsEmulatorAgbprint(CCmdUI* pCmdUI)
 {
   pCmdUI->SetCheck(agbPrintIsEnabled());
+}
+
+void MainWnd::OnOptionsEmulatorEreader()
+{
+	eReaderSaveRAW = !eReaderSaveRAW;
+}
+
+void MainWnd::OnUpdateOptionsEmulatorEreader(CCmdUI* pCmdUI)
+{
+	pCmdUI->SetCheck(eReaderSaveRAW == 1);
 }
 
 void MainWnd::OnOptionsEmulatorRealtimeclock()
