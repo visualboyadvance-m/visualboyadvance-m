@@ -62,7 +62,7 @@ class GDBWaitingDlg : public CDialog
   SOCKET getSocket();
   SOCKET getListenSocket();
   afx_msg LRESULT OnSocketAccept(WPARAM wParam, LPARAM lParam);
-  GDBWaitingDlg(SOCKET s,int p, CWnd* pParent = NULL);   // standard constructor
+  GDBWaitingDlg(int p, CWnd* pParent = NULL);   // standard constructor
 
   // Dialog Data
   //{{AFX_DATA(GDBWaitingDlg)

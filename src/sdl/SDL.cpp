@@ -50,7 +50,6 @@
 #include "../gb/gbSound.h"
 #include "../Util.h"
 
-#include "debugger.h"
 #include "filters.h"
 #include "text.h"
 #include "inputSDL.h"
@@ -211,7 +210,6 @@ int showSpeedTransparent = 1;
 bool disableStatusMessages = false;
 bool paused = false;
 bool pauseNextFrame = false;
-bool debugger = false;
 bool debuggerStub = false;
 int fullscreen = 0;
 int sdlFlashSize = 0;
@@ -225,9 +223,9 @@ static int        ignore_first_resize_event = 0;
 /* forward */
 void systemConsoleMessage(const char*);
 
-void (*dbgMain)() = debuggerMain;
-void (*dbgSignal)(int,int) = debuggerSignal;
-void (*dbgOutput)(const char *, u32) = debuggerOutput;
+void (*dbgMain)();
+void (*dbgSignal)(int,int);
+void (*dbgOutput)(const char *, u32);
 
 int  mouseCounter = 0;
 
@@ -1555,7 +1553,7 @@ void sdlPollEvents()
         }
         break;
       case SDLK_F11:
-        if(dbgMain != debuggerMain) {
+        if(dbgMain == remoteStubMain) {
           if(armState) {
             armNextPC -= 4;
             reg[15].I -= 4;
