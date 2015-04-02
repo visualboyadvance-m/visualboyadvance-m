@@ -124,6 +124,7 @@ class VBA : public CWinApp
   int rewindCount;
   bool rewindSaveNeeded;
   int rewindTimer;
+  bool gdbBreakOnLoad;
   int captureFormat;
   bool tripleBuffering;
   unsigned short throttle;
@@ -217,6 +218,8 @@ class VBA : public CWinApp
   BOOL linkAuto;
   BOOL linkHacks;
   int linkNumPlayers;
+
+  int gdbPort;
 
  public:
   VBA();

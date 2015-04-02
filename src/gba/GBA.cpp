@@ -32,6 +32,7 @@
 #endif
 
 extern int emulating;
+bool debugger;
 
 int SWITicks = 0;
 int IRQTicks = 0;
@@ -1599,6 +1600,40 @@ int CPULoadRom(const char *szFile)
   eepromInit();
 
   CPUUpdateRenderBuffers(true);
+
+#ifdef BKPT_SUPPORT
+  map[0].size = 0x4000;
+  map[1].size = 0x0;
+  map[2].size = 0x40000;
+  map[3].size = 0x8000;
+  map[4].size = 0x400;
+  map[5].size = 0x400;
+  map[6].size = 0x18000;
+  map[7].size = 0x400;
+  map[8].size = 0x01000000;
+  map[9].size = 0x01000000;
+  map[14].size = 0x10000;
+
+  for (int i = 0; i < 16; i++) {
+	  if (map[i].size > 0) {
+		  map[i].trace = (u8 *)calloc(map[i].size >> 3, sizeof(u8));
+
+		  map[i].breakPoints = (u8 *)calloc(map[i].size >> 1, sizeof(u8)); //\\
+
+		  if (map[i].trace == NULL || map[i].breakPoints == NULL) {
+			  systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+				  "TRACE");
+		  }
+	  }
+	  else {
+		  map[i].trace = NULL;
+		  map[i].breakPoints = NULL; //\\
+
+	  }
+  }
+  clearBreakRegList();
+
+#endif
 
   return romSize;
 }
@@ -3644,6 +3679,7 @@ void CPULoop(int ticks)
 {
   int clockTicks;
   int timerOverflow = 0;
+  u32 memAddr = 0;
   // variable used by the CPU core
   cpuTotalTicks = 0;
 
@@ -3690,10 +3726,14 @@ void CPULoop(int ticks)
 		  armOpcodeCount++;
         if (!armExecute())
           return;
+		if (debugger)
+			return;
       } else {
 		  thumbOpcodeCount++;
         if (!thumbExecute())
           return;
+		if (debugger)
+			return;
       }
       clockTicks = 0;
     } else

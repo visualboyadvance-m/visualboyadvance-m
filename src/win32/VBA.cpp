@@ -129,7 +129,6 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 int emulating = 0;
-bool debugger = false;
 int RGB_LOW_BITS_MASK = 0;
 bool b16to32Video = false;
 int systemFrameSkip = 0;
@@ -290,6 +289,7 @@ VBA::VBA()
  pauseWhenInactive = true;
   speedupToggle = false;
   winGbPrinterEnabled = false;
+  gdbBreakOnLoad = false;
   threadPriority = 2;
   disableMMX = false;
   languageOption = 0;
@@ -1339,7 +1339,8 @@ BOOL VBA::OnIdle(LONG lCount)
       return TRUE; // continue loop
     return !::PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE);
   } else if(emulating && active && !paused) {
-    for(int i = 0; i < 2; i++) {
+    for(int i = 0; i < 2; i++) { // Why is this loop here?
+	if (!debugger)
       emulator.emuMain(emulator.emuCount);
 
 #ifndef NO_LINK
@@ -1730,6 +1731,9 @@ void VBA::loadSettings()
 
   linkNumPlayers = regQueryDwordValue("LinkNumPlayers", 2);
 #endif
+
+  gdbPort = regQueryDwordValue("gdbPort", 55555);
+  gdbBreakOnLoad = regQueryDwordValue("gdbBreakOnLoad", false) ? true : false;
 
   Sm60FPS::bSaveMoreCPU = regQueryDwordValue("saveMoreCPU", 0);
 
@@ -2664,6 +2668,9 @@ void VBA::saveSettings()
   regSetDwordValue("LinkHacks", linkHacks);
   regSetDwordValue("LinkNumPlayers", linkNumPlayers);
 #endif
+
+  regSetDwordValue("gdbPort", gdbPort);
+  regSetDwordValue("gdbBreakOnLoad", gdbBreakOnLoad);
 
   regSetDwordValue("lastFullscreen", lastFullscreen);
   regSetDwordValue("pauseWhenInactive", pauseWhenInactive);

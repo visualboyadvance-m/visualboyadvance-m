@@ -18,6 +18,12 @@
 typedef struct {
   u8 *address;
   u32 mask;
+#ifdef BKPT_SUPPORT
+  u8 *breakPoints;
+  u8 *searchMatch;
+  u8* trace;
+  u32 size;
+#endif
 } memoryMap;
 
 typedef union {
@@ -54,16 +60,8 @@ typedef union {
 extern memoryMap map[256];
 #endif
 
-extern reg_pair reg[45];
 extern u8 biosProtected[4];
 
-extern bool N_FLAG;
-extern bool Z_FLAG;
-extern bool C_FLAG;
-extern bool V_FLAG;
-extern bool armIrqEnable;
-extern bool armState;
-extern int armMode;
 extern void (*cpuSaveGameFunc)(u32,u8);
 
 #ifdef BKPT_SUPPORT
@@ -75,6 +73,7 @@ extern u8 freezePRAM[0x400];
 extern bool debugger_last;
 extern int  oldreg[18];
 extern char oldbuffer[10];
+extern bool debugger;
 #endif
 
 extern bool CPUReadGSASnapshot(const char *);

@@ -24,7 +24,10 @@ GDBPortDlg::GDBPortDlg(CWnd* pParent /*=NULL*/)
   //{{AFX_DATA_INIT(GDBPortDlg)
   // NOTE: the ClassWizard will add member initialization here
   //}}AFX_DATA_INIT
-  port = 55555;
+	if (theApp.gdbPort == 0)
+		port = 55555;
+	else
+		port = theApp.gdbPort;
   sock = INVALID_SOCKET;
 
   if(!initialized) {
@@ -97,30 +100,8 @@ void GDBPortDlg::OnOk()
   address.sin_port = htons(atoi(buffer));
   port = ntohs(address.sin_port);
 
-  SOCKET s = socket(AF_INET, SOCK_STREAM, 0);
-
-  if(s != INVALID_SOCKET) {
-    int error = bind(s, (sockaddr *)&address, sizeof(address));
-
-    if(error) {
-      systemMessage(IDS_ERROR_BINDING, "Error binding socket. Port probably in use.");
-      error = closesocket(s);
-      EndDialog(FALSE);
-    } else {
-      error = listen(s, 1);
-      if(!error) {
-        sock = s;
-        EndDialog(TRUE);
-      } else {
-        systemMessage(IDS_ERROR_LISTENING, "Error listening on socket.");
-        closesocket(s);
-        EndDialog(FALSE);
-      }
-    }
-  } else {
-    systemMessage(IDS_ERROR_CREATING_SOCKET, "Error creating socket.");
-    EndDialog(FALSE);
-  }
+  theApp.gdbPort = port;
+  EndDialog(TRUE);
 }
 
 void GDBPortDlg::OnCancel()
@@ -136,11 +117,45 @@ void GDBPortDlg::OnClose()
 // GDBWaitingDlg dialog
 
 
-GDBWaitingDlg::GDBWaitingDlg(SOCKET s, int p, CWnd* pParent /*=NULL*/)
+GDBWaitingDlg::GDBWaitingDlg(int p, CWnd* pParent /*=NULL*/)
   : CDialog(GDBWaitingDlg::IDD, pParent)
 {
   //{{AFX_DATA_INIT(GDBWaitingDlg)
   //}}AFX_DATA_INIT
+	sockaddr_in address;
+	address.sin_family = AF_INET;
+	address.sin_addr.s_addr = inet_addr("0.0.0.0");
+	address.sin_port = htons(p);
+	port = ntohs(address.sin_port);
+
+	SOCKET s = socket(AF_INET, SOCK_STREAM, 0);
+
+	if (s != INVALID_SOCKET) {
+		int error = bind(s, (sockaddr *)&address, sizeof(address));
+
+		if (error) {
+			systemMessage(IDS_ERROR_BINDING, "Error binding socket. Port probably in use.");
+			error = closesocket(s);
+			//EndDialog(FALSE);
+		}
+		else {
+			error = listen(s, 1);
+			if (!error) {
+				sock = s;
+				//EndDialog(TRUE);
+			}
+			else {
+				systemMessage(IDS_ERROR_LISTENING, "Error listening on socket.");
+				closesocket(s);
+				//EndDialog(FALSE);
+			}
+		}
+	}
+	else {
+		systemMessage(IDS_ERROR_CREATING_SOCKET, "Error creating socket.");
+		//EndDialog(FALSE);
+	}
+
   port = p & 65535;
   listenSocket = s;
 }
@@ -199,13 +214,13 @@ LRESULT GDBWaitingDlg::OnSocketAccept(WPARAM wParam, LPARAM lParam)
     if(s != INVALID_SOCKET) {
       char dummy;
       recv(s, &dummy, 1, 0);
-      if(dummy != '+') {
-        systemMessage(IDS_ACK_NOT_RECEIVED, "ACK not received from GDB.");
-        OnClose(); // calls EndDialog
-      } else {
+      //if(dummy != '+') {
+      //  systemMessage(IDS_ACK_NOT_RECEIVED, "ACK not received from GDB.");
+      //  OnClose(); // calls EndDialog
+      //} else {
         sock = s;
         EndDialog(TRUE);
-      }
+      //}
     }
   }
 

@@ -177,84 +177,68 @@ void MainWnd::OnDebugNextframe()
   theApp.winPauseNextFrame = true;
 }
 
-void MainWnd::OnToolsDebugGdb()
+void MainWnd::OnToolsDebugConfigurePort()
 {
-  GDBPortDlg dlg;
+    GDBPortDlg dlg;
 
-  if(dlg.DoModal()) {
-    GDBWaitingDlg wait(dlg.getSocket(), dlg.getPort());
-    if(wait.DoModal()) {
-      remoteSetSockets(wait.getListenSocket(), wait.getSocket());
-      debugger = true;
-      emulating = 1;
-      theApp.cartridgeType = IMAGE_GBA;
-      theApp.filename = "\\gnu_stub";
-      rom = (u8 *)malloc(0x2000000);
-      workRAM = (u8 *)calloc(1, 0x40000);
-      bios = (u8 *)calloc(1,0x4000);
-      internalRAM = (u8 *)calloc(1,0x8000);
-      paletteRAM = (u8 *)calloc(1,0x400);
-      vram = (u8 *)calloc(1, 0x20000);
-      oam = (u8 *)calloc(1, 0x400);
-      pix = (u8 *)calloc(1, 4 * 241 * 162);
-      ioMem = (u8 *)calloc(1, 0x400);
-
-      theApp.emulator = GBASystem;
-
-      CPUInit(theApp.biosFileNameGBA, theApp.useBiosFileGBA);
-      CPUReset();
+    if(dlg.DoModal()) {
     }
-  }
 }
 
-void MainWnd::OnUpdateToolsDebugGdb(CCmdUI* pCmdUI)
+void MainWnd::OnUpdateToolsDebugConfigurePort(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X && remoteSocket == -1);
 }
 
-void MainWnd::OnToolsDebugLoadandwait()
+void MainWnd::OnToolsDebugBreakOnLoad()
 {
-  if(fileOpenSelect(0)) {
-    if(FileRun()) {
-      if(theApp.cartridgeType != 0) {
-        systemMessage(IDS_ERROR_NOT_GBA_IMAGE, "Error: not a GBA image");
-        OnFileClose();
-        return;
-      }
-      GDBPortDlg dlg;
-
-      if(dlg.DoModal()) {
-        GDBWaitingDlg wait(dlg.getSocket(), dlg.getPort());
-        if(wait.DoModal()) {
-          remoteSetSockets(wait.getListenSocket(), wait.getSocket());
-          debugger = true;
-          emulating = 1;
-        }
-      }
-    }
-  }
+	theApp.gdbBreakOnLoad = !theApp.gdbBreakOnLoad;
 }
 
-void MainWnd::OnUpdateToolsDebugLoadandwait(CCmdUI* pCmdUI)
+void MainWnd::OnUpdateToolsDebugBreakOnLoad(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X && remoteSocket == -1);
+	pCmdUI->SetCheck(theApp.gdbBreakOnLoad);
 }
 
 void MainWnd::OnToolsDebugBreak()
 {
-  if(armState) {
-    armNextPC -= 4;
-    reg[15].I -= 4;
-  } else {
-    armNextPC -= 2;
-    reg[15].I -= 2;
-  }
-  debugger = true;
+	GDBPortDlg dlg;
+
+	int port = theApp.gdbPort;
+	if (port == 0)
+	{
+		if (dlg.DoModal()) {
+			port = dlg.getPort();
+		}
+	}
+
+	if (port != 0) {
+		if (remoteSocket == -1)
+		{
+			GDBWaitingDlg wait(port);
+			if (wait.DoModal()) {
+				remoteSetSockets(wait.getListenSocket(), wait.getSocket());
+				debugger = true;
+				emulating = 1;
+			}
+		}
+		else
+		{
+			if (armState) {
+				armNextPC -= 4;
+				reg[15].I -= 4;
+			}
+			else {
+				armNextPC -= 2;
+				reg[15].I -= 2;
+			}
+			debugger = true;
+		}
+	}
 }
 
 void MainWnd::OnUpdateToolsDebugBreak(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X && remoteSocket != -1);
+	pCmdUI->Enable(theApp.videoOption <= VIDEO_6X && emulating != 0);
 }
 
 void MainWnd::OnToolsDebugDisconnect()

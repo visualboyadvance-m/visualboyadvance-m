@@ -1058,25 +1058,6 @@ static void debuggerBreakArm(int n, char **args)
     debuggerUsage("ba");
 }
 
-/*extern*/ void debuggerBreakOnWrite(u32 address, u32 oldvalue, u32 value,
-                                     int size, int t)
-{
-  const char *type = "write";
-  if(t == 2)
-    type = "change";
-
-  if(size == 2)
-    printf("Breakpoint (on %s) address %08x old:%08x new:%08x\n",
-           type, address, oldvalue, value);
-  else if(size == 1)
-    printf("Breakpoint (on %s) address %08x old:%04x new:%04x\n",
-           type, address, (u16)oldvalue,(u16)value);
-  else
-    printf("Breakpoint (on %s) address %08x old:%02x new:%02x\n",
-           type, address, (u8)oldvalue, (u8)value);
-  debugger = true;
-}
-
 static void debuggerBreakWriteClear(int n, char **args)
 {
   if(n == 3) {

@@ -2846,7 +2846,6 @@ static u8 cheatsGetType(u32 address)
 void cheatsWriteMemory(u32 address, u32 value)
 {
 #ifdef BKPT_SUPPORT
-#ifdef SDL
   if(cheatsNumber == 0) {
     int type = cheatsGetType(address);
     u32 oldValue = debuggerReadMemory(address);
@@ -2857,13 +2856,11 @@ void cheatsWriteMemory(u32 address, u32 value)
     debuggerWriteMemory(address, value);
   }
 #endif
-#endif
 }
 
 void cheatsWriteHalfWord(u32 address, u16 value)
 {
 #ifdef BKPT_SUPPORT
-#ifdef SDL
   if(cheatsNumber == 0) {
     int type = cheatsGetType(address);
     u16 oldValue = debuggerReadHalfWord(address);
@@ -2874,17 +2871,11 @@ void cheatsWriteHalfWord(u32 address, u16 value)
     debuggerWriteHalfWord(address, value);
   }
 #endif
-#endif
 }
 
-#if defined BKPT_SUPPORT && defined SDL
 void cheatsWriteByte(u32 address, u8 value)
-#else
-void cheatsWriteByte(u32, u8)
-#endif
 {
 #ifdef BKPT_SUPPORT
-#ifdef SDL
   if(cheatsNumber == 0) {
     int type = cheatsGetType(address);
     u8 oldValue = debuggerReadByte(address);
@@ -2894,7 +2885,6 @@ void cheatsWriteByte(u32, u8)
     }
     debuggerWriteByte(address, value);
   }
-#endif
 #endif
 }
 #endif
