@@ -447,6 +447,26 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\gba\BreakpointStructures.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gba\BreakpointStructures.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gba\debugger-expr-lex.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gba\debugger-expr-yacc.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gba\debugger-expr-yacc.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\gba\EEprom.cpp"
 					>
 				</File>

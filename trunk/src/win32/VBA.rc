@@ -795,7 +795,7 @@ CAPTION "Waiting..."
 FONT 8, "MS Sans Serif"
 BEGIN
     PUSHBUTTON      "Cancel",ID_CANCEL,67,23,50,14
-    LTEXT           "Waiting for connection on port:",IDC_STATIC,7,7,117,8
+    LTEXT           "Waiting for GDB on port:",IDC_STATIC,7,7,117,8
     LTEXT           "",IDC_PORT,143,7,36,8,SS_NOPREFIX
 END
 
@@ -1957,10 +1957,10 @@ BEGIN
         MENUITEM "&Next frame",                 ID_DEBUG_NEXTFRAME
         POPUP "GDB"
         BEGIN
-            MENUITEM "Wait for connection...",      ID_TOOLS_DEBUG_GDB
-            MENUITEM "Load and wait...",            ID_TOOLS_DEBUG_LOADANDWAIT
             MENUITEM "Break into GDB",              ID_TOOLS_DEBUG_BREAK
             MENUITEM "Disconnect",                  ID_TOOLS_DEBUG_DISCONNECT
+			MENUITEM "Break on load",				ID_TOOLS_DEBUG_BREAKONLOAD
+			MENUITEM "Configure port...",			ID_TOOLS_DEBUG_CONFIGUREPORT
         END
         MENUITEM SEPARATOR
         POPUP "Record"

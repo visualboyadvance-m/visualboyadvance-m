@@ -281,10 +281,10 @@ protected:
 	afx_msg void OnUpdateToolsTileviewer(CCmdUI* pCmdUI);
 	afx_msg void OnDebugNextframe();
 	afx_msg void OnUpdateCheatsAutomaticsaveloadcheats(CCmdUI* pCmdUI);
-	afx_msg void OnToolsDebugGdb();
-	afx_msg void OnUpdateToolsDebugGdb(CCmdUI* pCmdUI);
-	afx_msg void OnToolsDebugLoadandwait();
-	afx_msg void OnUpdateToolsDebugLoadandwait(CCmdUI* pCmdUI);
+	afx_msg void OnToolsDebugConfigurePort();
+	afx_msg void OnUpdateToolsDebugConfigurePort(CCmdUI* pCmdUI);
+	afx_msg void OnToolsDebugBreakOnLoad();
+	afx_msg void OnUpdateToolsDebugBreakOnLoad(CCmdUI* pCmdUI);
 	afx_msg void OnToolsDebugBreak();
 	afx_msg void OnUpdateToolsDebugBreak(CCmdUI* pCmdUI);
 	afx_msg void OnToolsDebugDisconnect();

@@ -19,6 +19,8 @@
 #include "../Util.h"
 #include "../System.h"
 #include "agbprint.h"
+#include "remote.h"
+
 #ifdef PROFILING
 #include "prof/prof.h"
 #endif
@@ -2317,7 +2319,57 @@ int thumbExecute()
     reg[15].I += 2;
     THUMB_PREFETCH_NEXT;
 
+#ifdef BKPT_SUPPORT
+	u32 memAddr = armNextPC;
+	memoryMap *m = &map[memAddr >> 24];
+	if (m->breakPoints && BreakThumbCheck(m->breakPoints, memAddr & m->mask)) {
+		if (debuggerBreakOnExecution(memAddr, armState)){
+			// Revert tickcount?
+			debugger = true;
+			return 0 ;
+		}
+	}
+#endif
+
     (*thumbInsnTable[opcode>>6])(opcode);
+
+
+#ifdef BKPT_SUPPORT
+	if (enableRegBreak){
+			if (lowRegBreakCounter[0])
+				breakReg_check(0);
+			if (lowRegBreakCounter[1])
+				breakReg_check(1);
+			if (lowRegBreakCounter[2])
+				breakReg_check(2);
+			if (lowRegBreakCounter[3])
+				breakReg_check(3);
+			if (medRegBreakCounter[0])
+				breakReg_check(4);
+			if (medRegBreakCounter[1])
+				breakReg_check(5);
+			if (medRegBreakCounter[2])
+				breakReg_check(6);
+			if (medRegBreakCounter[3])
+				breakReg_check(7);
+			if (highRegBreakCounter[0])
+				breakReg_check(8);
+			if (highRegBreakCounter[1])
+				breakReg_check(9);
+			if (highRegBreakCounter[2])
+				breakReg_check(10);
+			if (highRegBreakCounter[3])
+				breakReg_check(11);
+			if (statusRegBreakCounter[0])
+				breakReg_check(12);
+			if (statusRegBreakCounter[1])
+				breakReg_check(13);
+			if (statusRegBreakCounter[2])
+				breakReg_check(14);
+			if (statusRegBreakCounter[3])
+				breakReg_check(15);
+	}
+#endif
 
     if (clockTicks < 0)
       return 0;
@@ -2325,6 +2377,6 @@ int thumbExecute()
       clockTicks = codeTicksAccessSeq16(oldArmNextPC) + 1;
     cpuTotalTicks += clockTicks;
 
-  } while (cpuTotalTicks < cpuNextEvent && !armState && !holdState && !SWITicks);
+  } while (cpuTotalTicks < cpuNextEvent && !armState && !holdState && !SWITicks && !debugger);
   return 1;
 }

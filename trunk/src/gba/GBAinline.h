@@ -8,6 +8,7 @@
 #include "agbprint.h"
 #include "GBAcpu.h"
 #include "GBALink.h"
+#include "remote.h"
 
 extern const u32 objTilesAddress[3];
 
@@ -44,8 +45,18 @@ extern int cpuTotalTicks;
 #define CPUReadMemoryQuick(addr) \
   READ32LE(((u32*)&map[(addr)>>24].address[(addr) & map[(addr)>>24].mask]))
 
+extern u32 myROM[];
+
 static inline u32 CPUReadMemory(u32 address)
 {
+#ifdef BKPT_SUPPORT
+	memoryMap *m = &map[address >> 24];
+	if (m->breakPoints && BreakReadCheck(m->breakPoints, address & m->mask)) {
+		if (debuggerBreakOnRead(address, 2)){
+			//CPU_BREAK_LOOP_2;
+		}
+	}
+#endif
   u32 value;
   u32 oldAddress = address;
 
@@ -184,10 +195,17 @@ unreadable:
   return value;
 }
 
-extern u32 myROM[];
-
 static inline u32 CPUReadHalfWord(u32 address)
 {
+#ifdef BKPT_SUPPORT
+	memoryMap *m = &map[address >> 24];
+	if (m->breakPoints && BreakReadCheck(m->breakPoints, address & m->mask)) {
+		if (debuggerBreakOnRead(address, 1)){
+			//CPU_BREAK_LOOP_2;
+		}
+	}
+#endif
+
   u32 value;
   u32 oldAddress = address;
 
@@ -334,6 +352,15 @@ static inline s16 CPUReadHalfWordSigned(u32 address)
 
 static inline u8 CPUReadByte(u32 address)
 {
+#ifdef BKPT_SUPPORT
+	memoryMap *m = &map[address >> 24];
+	if (m->breakPoints && BreakReadCheck(m->breakPoints, address & m->mask)) {
+		if (debuggerBreakOnRead(address, 0)){
+			//CPU_BREAK_LOOP_2;
+		}
+	}
+#endif
+
   switch(address >> 24) {
   case 0:
     if (reg[15].I >> 24) {
@@ -425,6 +452,15 @@ static inline void CPUWriteMemory(u32 address, u32 value)
         address,
         armMode ? armNextPC - 4 : armNextPC - 2);
     }
+  }
+#endif
+
+#ifdef BKPT_SUPPORT
+  memoryMap *m = &map[address >> 24];
+  if (m->breakPoints && BreakWriteCheck(m->breakPoints, address & m->mask)) {
+	  if (debuggerBreakOnWrite(address, value, 1)){
+		  //CPU_BREAK_LOOP_2;
+	  }
   }
 #endif
 
@@ -528,6 +564,15 @@ static inline void CPUWriteHalfWord(u32 address, u16 value)
   }
 #endif
 
+#ifdef BKPT_SUPPORT
+  memoryMap *m = &map[address >> 24];
+  if (m->breakPoints && BreakWriteCheck(m->breakPoints, address & m->mask)) {
+	  if (debuggerBreakOnWrite(address, value, 1)){
+		  //CPU_BREAK_LOOP_2;
+	  }
+  }
+#endif
+
   address &= 0xFFFFFFFE;
 
   switch(address >> 24) {
@@ -622,6 +667,15 @@ unwritable:
 
 static inline void CPUWriteByte(u32 address, u8 b)
 {
+#ifdef BKPT_SUPPORT
+	memoryMap *m = &map[address >> 24];
+	if (m->breakPoints && BreakWriteCheck(m->breakPoints, address & m->mask)) {
+		if (debuggerBreakOnWrite(address, b, 1)){
+			//CPU_BREAK_LOOP_2;
+		}
+	}
+#endif
+
   switch(address >> 24) {
   case 2:
 #ifdef BKPT_SUPPORT

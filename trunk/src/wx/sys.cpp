@@ -1125,14 +1125,10 @@ void debuggerMain()
 {
 }
 
-bool debugger;
+//bool debugger;
 
 void (*dbgOutput)(const char *s, u32 addr) = debuggerOutput;
 void (*dbgSignal)(int sig,int number) = debuggerSignal;
-
-void debuggerBreakOnWrite(u32 address, u32 oldvalue, u32 value, int size, int t)
-{
-}
 
 void log(const char *defaultMsg, ...)
 {

@@ -279,10 +279,10 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_TOOLS_TILEVIEWER, OnUpdateToolsTileviewer)
   ON_COMMAND(ID_DEBUG_NEXTFRAME, OnDebugNextframe)
   ON_UPDATE_COMMAND_UI(ID_CHEATS_AUTOMATICSAVELOADCHEATS, OnUpdateCheatsAutomaticsaveloadcheats)
-  ON_COMMAND(ID_TOOLS_DEBUG_GDB, OnToolsDebugGdb)
-  ON_UPDATE_COMMAND_UI(ID_TOOLS_DEBUG_GDB, OnUpdateToolsDebugGdb)
-  ON_COMMAND(ID_TOOLS_DEBUG_LOADANDWAIT, OnToolsDebugLoadandwait)
-  ON_UPDATE_COMMAND_UI(ID_TOOLS_DEBUG_LOADANDWAIT, OnUpdateToolsDebugLoadandwait)
+  ON_COMMAND(ID_TOOLS_DEBUG_CONFIGUREPORT, OnToolsDebugConfigurePort)
+  ON_UPDATE_COMMAND_UI(ID_TOOLS_DEBUG_CONFIGUREPORT, OnUpdateToolsDebugConfigurePort)
+  ON_COMMAND(ID_TOOLS_DEBUG_BREAKONLOAD, OnToolsDebugBreakOnLoad)
+  ON_UPDATE_COMMAND_UI(ID_TOOLS_DEBUG_BREAKONLOAD, OnUpdateToolsDebugBreakOnLoad)
   ON_COMMAND(ID_TOOLS_DEBUG_BREAK, OnToolsDebugBreak)
   ON_UPDATE_COMMAND_UI(ID_TOOLS_DEBUG_BREAK, OnUpdateToolsDebugBreak)
   ON_COMMAND(ID_TOOLS_DEBUG_DISCONNECT, OnToolsDebugDisconnect)
@@ -632,6 +632,10 @@ bool MainWnd::FileRun()
   if (theApp.linkAuto)
 	BootLink(theApp.linkMode, theApp.linkHostAddr, theApp.linkTimeout, theApp.linkHacks, theApp.linkNumPlayers);
 #endif
+
+  if (theApp.gdbBreakOnLoad)
+	  OnToolsDebugBreak();
+
   return true;
 }
 

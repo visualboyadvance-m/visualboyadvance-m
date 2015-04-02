@@ -197,8 +197,11 @@ endif(ENABLE_FFMPEG)
 SET(SRC_GBA
     src/gba/agbprint.cpp
     src/gba/bios.cpp
+    src/gba/BreakpointStructures.cpp
     src/gba/Cheats.cpp
     src/gba/CheatSearch.cpp
+    src/gba/debugger-expr-lex.cpp
+    src/gba/debugger-expr-yacc.cpp
     src/gba/EEprom.cpp
     src/gba/ereader.cpp
     src/gba/Flash.cpp
@@ -243,7 +246,6 @@ SET(SRC_APU
 )
 
 SET(SRC_SDL
-    src/sdl/debugger.cpp
     src/sdl/SDL.cpp
     src/sdl/filters.cpp
     src/sdl/text.cpp
