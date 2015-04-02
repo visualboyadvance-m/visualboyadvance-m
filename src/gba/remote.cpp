@@ -3317,7 +3317,7 @@ void remoteWriteRegister(char *p)
 
   int i = 0;
 
-  while(c != '#') {
+  while(i < 4) {
     u8 b = 0;
     if(c <= '9')
       b = (c - '0') << 4;
