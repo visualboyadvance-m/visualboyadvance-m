@@ -1478,6 +1478,22 @@ void CPUCleanUp()
   emulating = 0;
 }
 
+void SetMapMasks()
+{
+	map[0].mask = 0x3FFF;
+	map[2].mask = 0x3FFFF;
+	map[3].mask = 0x7FFF;
+	map[4].mask = 0x3FF;
+	map[5].mask = 0x3FF;
+	map[6].mask = 0x1FFFF;
+	map[7].mask = 0x3FF;
+	map[8].mask = 0x1FFFFFF;
+	map[9].mask = 0x1FFFFFF;
+	map[10].mask = 0x1FFFFFF;
+	map[12].mask = 0x1FFFFFF;
+	map[14].mask = 0xFFFF;
+}
+
 int CPULoadRom(const char *szFile)
 {
   romSize = 0x2000000;
@@ -1602,19 +1618,10 @@ int CPULoadRom(const char *szFile)
   CPUUpdateRenderBuffers(true);
 
 #ifdef BKPT_SUPPORT
-  map[0].size = 0x4000;
-  map[1].size = 0x0;
-  map[2].size = 0x40000;
-  map[3].size = 0x8000;
-  map[4].size = 0x400;
-  map[5].size = 0x400;
-  map[6].size = 0x18000;
-  map[7].size = 0x400;
-  map[8].size = 0x01000000;
-  map[9].size = 0x01000000;
-  map[14].size = 0x10000;
+  SetMapMasks();
 
   for (int i = 0; i < 16; i++) {
+	  map[i].size = map[i].mask + 1;
 	  if (map[i].size > 0) {
 		  map[i].trace = (u8 *)calloc(map[i].size >> 3, sizeof(u8));
 
@@ -3548,29 +3555,19 @@ void CPUReset()
   }
 
   map[0].address = bios;
-  map[0].mask = 0x3FFF;
   map[2].address = workRAM;
-  map[2].mask = 0x3FFFF;
   map[3].address = internalRAM;
-  map[3].mask = 0x7FFF;
   map[4].address = ioMem;
-  map[4].mask = 0x3FF;
   map[5].address = paletteRAM;
-  map[5].mask = 0x3FF;
   map[6].address = vram;
-  map[6].mask = 0x1FFFF;
   map[7].address = oam;
-  map[7].mask = 0x3FF;
   map[8].address = rom;
-  map[8].mask = 0x1FFFFFF;
   map[9].address = rom;
-  map[9].mask = 0x1FFFFFF;
   map[10].address = rom;
-  map[10].mask = 0x1FFFFFF;
   map[12].address = rom;
-  map[12].mask = 0x1FFFFFF;
   map[14].address = flashSaveMemory;
-  map[14].mask = 0xFFFF;
+
+  SetMapMasks();
 
   eepromReset();
   flashReset();
