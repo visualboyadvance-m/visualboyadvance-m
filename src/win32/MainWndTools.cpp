@@ -476,7 +476,7 @@ void MainWnd::OnToolsRecordStartmovierecording()
 
 void MainWnd::OnUpdateToolsRecordStartmovierecording(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(!theApp.movieRecording);
+	pCmdUI->Enable(!theApp.movieRecording && emulating);
 }
 
 void MainWnd::OnToolsRecordStopmovierecording()
@@ -567,7 +567,7 @@ void MainWnd::OnToolsPlayStartmovieplaying()
 
 void MainWnd::OnUpdateToolsPlayStartmovieplaying(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(!theApp.moviePlaying);
+	pCmdUI->Enable(!theApp.moviePlaying && emulating);
 }
 
 void MainWnd::OnToolsPlayStopmovieplaying()
