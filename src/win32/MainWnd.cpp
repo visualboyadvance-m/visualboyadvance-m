@@ -490,13 +490,15 @@ bool MainWnd::FileRun()
     gbGetHardwareType();
 
     // used for the handling of the gb Boot Rom
+    skipBios = theApp.skipBiosFile;
     if (gbHardware & 5)
     {
-      skipBios = theApp.skipBiosFile;
-	  gbCPUInit(theApp.biosFileNameGB, theApp.useBiosFileGB);
+      gbCPUInit(theApp.biosFileNameGB, theApp.useBiosFileGB);
     }
-
-
+    else if (gbHardware & 2)
+    {
+      gbCPUInit(theApp.biosFileNameGBC, theApp.useBiosFileGBC);
+    }
 
     gbReset();
     theApp.emulator = GBSystem;
