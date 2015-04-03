@@ -2178,7 +2178,7 @@ int main(int argc, char **argv)
         gbGetHardwareType();
 
         // used for the handling of the gb Boot Rom
-        if (gbHardware & 5)
+        if (gbHardware & 7)
           gbCPUInit(gbBiosFileName, useBios);
 
         cartridgeType = IMAGE_GB;

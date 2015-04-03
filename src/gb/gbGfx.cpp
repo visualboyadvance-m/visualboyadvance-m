@@ -140,7 +140,12 @@ void gbRenderLine()
             gbLineBuffer[x] |= 0x300;
 
           if(gbCgbMode) {
-            c = c + (attrs & 7)*4;
+            // Use the DMG palette if we are in compat mode.
+            if (gbMemory[0xff6c] & 1) {
+              c = gbBgp[c];
+            } else {
+              c = c + (attrs & 7) * 4;
+            }
           } else {
             c = (gbBgpLine[x+(gbSpeed ? 5 : 11)+SpritesTicks]>>(c<<1)) &3;
             if(gbSgbMode && !gbCgbMode) {
@@ -335,7 +340,12 @@ void gbRenderLine()
                 gbLineBuffer[x] = 0x100 + c;
 
               if(gbCgbMode) {
-                c = c + (attrs & 7) * 4;
+                // Use the DMG palette if we are in compat mode.
+                if (gbMemory[0xff6c] & 1) {
+                  c = gbBgp[c];
+                } else {
+                  c = c + (attrs & 7) * 4;
+                }
               } else {
                 c = (gbBgpLine[x+(gbSpeed ? 5 : 11)+gbSpritesTicks[x]*(gbSpeed ? 2 : 4)]>>(c<<1)) &3;
                 if(gbSgbMode && !gbCgbMode) {
@@ -497,7 +507,12 @@ void gbDrawSpriteTile(int tile, int x,int y,int t, int flags,
 
     // make sure that sprites will work even in CGB mode
     if(gbCgbMode) {
-      c = c + (flags & 0x07)*4 + 32;
+      // Use the DMG palette if we are in compat mode.
+      if (gbMemory[0xff6c] & 1) {
+        c = pal[c] + ((flags & 0x10) >> 4)*4 + 32;
+      } else {
+        c = c + (flags & 0x07)*4 + 32;
+      }
     } else {
       c = pal[c];
 
