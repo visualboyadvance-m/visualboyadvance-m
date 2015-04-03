@@ -2495,7 +2495,7 @@ void gbReset()
 #ifndef NO_LINK
 	if (GetLinkMode() == LINK_GAMEBOY) {
 		EmuReseted = true;
-		gbLinkReset();
+		gbInitLink();
 	}
 #endif
 
