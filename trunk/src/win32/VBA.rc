@@ -1601,9 +1601,6 @@ BEGIN
         MENUITEM "Open GB...",                  ID_FILE_OPEN_GB
         MENUITEM "Close",                       ID_FILE_CLOSE
 		MENUITEM SEPARATOR
-		MENUITEM "Load E-Reader DotCode...", ID_FILE_LOAD_DOTCODE
-		MENUITEM "Save E-Reader DotCode...", ID_FILE_SAVE_DOTCODE
-		MENUITEM SEPARATOR
         MENUITEM "&Link with...",               ID_OPTIONS_LINK_OPTIONS
         MENUITEM SEPARATOR
         POPUP "Recent"
@@ -1652,7 +1649,10 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Pause",                       ID_FILE_PAUSE
         MENUITEM "Reset",                       ID_FILE_RESET
-        MENUITEM SEPARATOR
+		MENUITEM SEPARATOR
+		MENUITEM "Load e-Reader Dot Code...", ID_FILE_LOAD_DOTCODE
+		MENUITEM "Save e-Reader Dot Code...", ID_FILE_SAVE_DOTCODE
+		MENUITEM SEPARATOR
         POPUP "Import"
         BEGIN
             MENUITEM "&Battery file...",            ID_FILE_IMPORT_BATTERYFILE
