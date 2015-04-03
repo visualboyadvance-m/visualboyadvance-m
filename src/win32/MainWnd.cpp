@@ -1113,12 +1113,12 @@ void MainWnd::OnFileLoadDotCode()
 	//getHandle()
 	FileDlg file(0,  //Get the proper handle somehow, and put it here.
 		"",
-		"E-Reader dot code (*.bin, *.raw)|*.bin;*.raw|All Files (*.*)|*.*||",
+		"e-Reader dot code (*.bin, *.raw)|*.bin;*.raw|All Files (*.*)|*.*||",
 		0,
 		"RAW",
 		(LPCTSTR *)exts,
 		NULL,
-		"Load Nintendo E-Reader Dotcode",
+		"Load e-Reader Dot Code",
 		FALSE);
 	if (file.DoModal() == IDOK)
 	{
@@ -1135,12 +1135,12 @@ void MainWnd::OnFileSaveDotCode()
 	//getHandle()
 	FileDlg file(0,  //Get the proper handle somehow, and put it here.
 		"",
-		"E-Reader dot code (*.raw)|*.raw|All Files (*.*)|*.*||",
+		"e-Reader Dot Code (*.raw)|*.raw|All Files (*.*)|*.*||",
 		0,
 		"RAW",
 		(LPCTSTR *)exts,
 		NULL,
-		"Save Nintendo E-Reader Dotcode",
+		"Save e-Reader Dot Code",
 		TRUE);
 	if (file.DoModal() == IDOK)
 	{

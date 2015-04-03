@@ -383,8 +383,13 @@ void BIOS_EReader_ScanCard(int swi_num)
 			GFpow = 0x3000A6C;
 			break;
 		}
+
 		armNextPC -= 2;
 		reg[15].I -= 2;
+		if (armState)
+			ARM_PREFETCH
+		else
+			THUMB_PREFETCH
 
 		for(i=0,j=0;i<12;i++)
 			j ^= DotCodeData[i];
@@ -511,6 +516,10 @@ void BIOS_EReader_ScanCard(int swi_num)
 		}
 		armNextPC -= 2;
 		reg[15].I -= 2;
+		if (armState)
+			ARM_PREFETCH
+		else
+			THUMB_PREFETCH
 	}
 	else if ((swi_num == 0xE3) || (swi_num == 0xE5)) //Dotcode data
 	{
@@ -609,10 +618,12 @@ void BIOS_EReader_ScanCard(int swi_num)
 			reg[15].I = reg[base].I & 0xFFFFFFFC;
 			armNextPC = reg[15].I;
 			reg[15].I += 4;
+			ARM_PREFETCH
 		} else {
 			reg[15].I = reg[base].I & 0xFFFFFFFE;
 			armNextPC = reg[15].I;
 			reg[15].I += 2;
+			THUMB_PREFETCH
 		}
 	}
 	else if (swi_num == 0xE4)
