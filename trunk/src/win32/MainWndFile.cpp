@@ -66,7 +66,17 @@ void MainWnd::OnUpdateFilePause(CCmdUI* pCmdUI)
 
 void MainWnd::OnFileReset()
 {
+  skipBios = theApp.skipBiosFile;
+
   if(emulating) {
+    if(theApp.cartridgeType == IMAGE_GB) {
+      gbGetHardwareType();
+      if (gbHardware & 5) {
+        gbCPUInit(theApp.biosFileNameGB, theApp.useBiosFileGB);
+      } else if (gbHardware & 2) {
+        gbCPUInit(theApp.biosFileNameGBC, theApp.useBiosFileGBC);
+      }
+    }
     theApp.emulator.emuReset();
     systemScreenMessage(winResLoadString(IDS_RESET));
   }

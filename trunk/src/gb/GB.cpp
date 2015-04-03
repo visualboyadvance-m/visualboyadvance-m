@@ -564,6 +564,205 @@ u8 ZeroTable[256] = {
   0,0,0,0,0,0,0,0
 };
 
+// Title checksums that are treated specially by the CGB boot ROM
+static const u8 gbColorizationChecksums[79] = {
+  0x00, 0x88, 0x16, 0x36, 0xD1, 0xDB, 0xF2, 0x3C, 0x8C, 0x92, 0x3D, 0x5C,
+  0x58, 0xC9, 0x3E, 0x70, 0x1D, 0x59, 0x69, 0x19, 0x35, 0xA8, 0x14, 0xAA,
+  0x75, 0x95, 0x99, 0x34, 0x6F, 0x15, 0xFF, 0x97, 0x4B, 0x90, 0x17, 0x10,
+  0x39, 0xF7, 0xF6, 0xA2, 0x49, 0x4E, 0x43, 0x68, 0xE0, 0x8B, 0xF0, 0xCE,
+  0x0C, 0x29, 0xE8, 0xB7, 0x86, 0x9A, 0x52, 0x01, 0x9D, 0x71, 0x9C, 0xBD,
+  0x5D, 0x6D, 0x67, 0x3F, 0x6B, 0xB3, 0x46, 0x28, 0xA5, 0xC6, 0xD3, 0x27,
+  0x61, 0x18, 0x66, 0x6A, 0xBF, 0x0D, 0xF4
+};
+
+// For titles with colliding checksums, the fourth character of the game title
+// for disambiguation.
+static const u8 gbColorizationDisambigChars[29] = {
+  'B', 'E', 'F', 'A', 'A', 'R', 'B', 'E',
+  'K', 'E', 'K', ' ', 'R', '-', 'U', 'R',
+  'A', 'R', ' ', 'I', 'N', 'A', 'I', 'L',
+  'I', 'C', 'E', ' ', 'R'
+};
+
+// Palette ID | (Flags << 5)
+static const u8 gbColorizationPaletteInfo[94] = {
+  0x7C, 0x08, 0x12, 0xA3, 0xA2, 0x07, 0x87, 0x4B, 0x20, 0x12, 0x65, 0xA8,
+  0x16, 0xA9, 0x86, 0xB1, 0x68, 0xA0, 0x87, 0x66, 0x12, 0xA1, 0x30, 0x3C,
+  0x12, 0x85, 0x12, 0x64, 0x1B, 0x07, 0x06, 0x6F, 0x6E, 0x6E, 0xAE, 0xAF,
+  0x6F, 0xB2, 0xAF, 0xB2, 0xA8, 0xAB, 0x6F, 0xAF, 0x86, 0xAE, 0xA2, 0xA2,
+  0x12, 0xAF, 0x13, 0x12, 0xA1, 0x6E, 0xAF, 0xAF, 0xAD, 0x06, 0x4C, 0x6E,
+  0xAF, 0xAF, 0x12, 0x7C, 0xAC, 0xA8, 0x6A, 0x6E, 0x13, 0xA0, 0x2D, 0xA8,
+  0x2B, 0xAC, 0x64, 0xAC, 0x6D, 0x87, 0xBC, 0x60, 0xB4, 0x13, 0x72, 0x7C,
+  0xB5, 0xAE, 0xAE, 0x7C, 0x7C, 0x65, 0xA2, 0x6C, 0x64, 0x85
+};
+
+
+// Uncompressed palette data from the CGB boot ROM
+static const u16 gbColorizationPaletteData[32][3][4] = {
+  {
+    { 0x7FFF, 0x01DF, 0x0112, 0x0000 },
+    { 0x7FFF, 0x7EEB, 0x001F, 0x7C00 },
+    { 0x7FFF, 0x42B5, 0x3DC8, 0x0000 },
+  },
+  {
+    { 0x231F, 0x035F, 0x00F2, 0x0009 },
+    { 0x7FFF, 0x421F, 0x1CF2, 0x0000 },
+    { 0x4FFF, 0x7ED2, 0x3A4C, 0x1CE0 },
+  },
+  {
+    { 0x7FFF, 0x7FFF, 0x7E8C, 0x7C00 },
+    { 0x7FFF, 0x32BF, 0x00D0, 0x0000 },
+    { 0x03ED, 0x7FFF, 0x255F, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x7FFF, 0x7E8C, 0x7C00 },
+    { 0x7FFF, 0x421F, 0x1CF2, 0x0000 },
+    { 0x036A, 0x021F, 0x03FF, 0x7FFF },
+  },
+  {
+    { 0x7FFF, 0x421F, 0x1CF2, 0x0000 },
+    { 0x7FFF, 0x421F, 0x1CF2, 0x0000 },
+    { 0x7FFF, 0x03EF, 0x01D6, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x421F, 0x1CF2, 0x0000 },
+    { 0x7FFF, 0x7EEB, 0x001F, 0x7C00 },
+    { 0x7FFF, 0x03EA, 0x011F, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x421F, 0x1CF2, 0x0000 },
+    { 0x7FFF, 0x7EEB, 0x001F, 0x7C00 },
+    { 0x7FFF, 0x027F, 0x001F, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x7E8C, 0x7C00, 0x0000 },
+    { 0x7FFF, 0x7EEB, 0x001F, 0x7C00 },
+    { 0x7FFF, 0x03FF, 0x001F, 0x0000 },
+  },
+  {
+    { 0x299F, 0x001A, 0x000C, 0x0000 },
+    { 0x7C00, 0x7FFF, 0x3FFF, 0x7E00 },
+    { 0x7E74, 0x03FF, 0x0180, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x01DF, 0x0112, 0x0000 },
+    { 0x7FFF, 0x7E8C, 0x7C00, 0x0000 },
+    { 0x67FF, 0x77AC, 0x1A13, 0x2D6B },
+  },
+  {
+    { 0x0000, 0x7FFF, 0x421F, 0x1CF2 },
+    { 0x0000, 0x7FFF, 0x421F, 0x1CF2 },
+    { 0x7ED6, 0x4BFF, 0x2175, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x421F, 0x1CF2, 0x0000 },
+    { 0x7FFF, 0x3FFF, 0x7E00, 0x001F },
+    { 0x7FFF, 0x7E8C, 0x7C00, 0x0000 },
+  },
+  {
+    { 0x231F, 0x035F, 0x00F2, 0x0009 },
+    { 0x7FFF, 0x7EEB, 0x001F, 0x7C00 },
+    { 0x7FFF, 0x6E31, 0x454A, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x421F, 0x1CF2, 0x0000 },
+    { 0x7FFF, 0x32BF, 0x00D0, 0x0000 },
+    { 0x7FFF, 0x6E31, 0x454A, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x421F, 0x1CF2, 0x0000 },
+    { 0x7FFF, 0x7E8C, 0x7C00, 0x0000 },
+    { 0x7FFF, 0x1BEF, 0x0200, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x7E8C, 0x7C00, 0x0000 },
+    { 0x7FFF, 0x1BEF, 0x0200, 0x0000 },
+    { 0x7FFF, 0x32BF, 0x00D0, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x1BEF, 0x0200, 0x0000 },
+    { 0x7FFF, 0x7E8C, 0x7C00, 0x0000 },
+    { 0x7FFF, 0x421F, 0x1CF2, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x03E0, 0x0206, 0x0120 },
+    { 0x7FFF, 0x7E8C, 0x7C00, 0x0000 },
+    { 0x7FFF, 0x421F, 0x1CF2, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x1BEF, 0x0200, 0x0000 },
+    { 0x7FFF, 0x7E8C, 0x7C00, 0x0000 },
+    { 0x7FFF, 0x32BF, 0x00D0, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x421F, 0x1CF2, 0x0000 },
+    { 0x7FFF, 0x1BEF, 0x0200, 0x0000 },
+    { 0x0000, 0x4200, 0x037F, 0x7FFF },
+  },
+  {
+    { 0x03FF, 0x001F, 0x000C, 0x0000 },
+    { 0x7FFF, 0x1BEF, 0x0200, 0x0000 },
+    { 0x7FFF, 0x7E8C, 0x7C00, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x32BF, 0x00D0, 0x0000 },
+    { 0x7FFF, 0x7E8C, 0x7C00, 0x0000 },
+    { 0x7FFF, 0x42B5, 0x3DC8, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x5294, 0x294A, 0x0000 },
+    { 0x7FFF, 0x5294, 0x294A, 0x0000 },
+    { 0x7FFF, 0x5294, 0x294A, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x1BEF, 0x0200, 0x0000 },
+    { 0x7FFF, 0x7E8C, 0x7C00, 0x0000 },
+    { 0x53FF, 0x4A5F, 0x7E52, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x421F, 0x1CF2, 0x0000 },
+    { 0x7FFF, 0x1BEF, 0x0200, 0x0000 },
+    { 0x7FFF, 0x7E8C, 0x7C00, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x32BF, 0x00D0, 0x0000 },
+    { 0x7FFF, 0x32BF, 0x00D0, 0x0000 },
+    { 0x639F, 0x4279, 0x15B0, 0x04CB },
+  },
+  {
+    { 0x7FFF, 0x7E8C, 0x7C00, 0x0000 },
+    { 0x7FFF, 0x1BEF, 0x0200, 0x0000 },
+    { 0x7FFF, 0x03FF, 0x012F, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x033F, 0x0193, 0x0000 },
+    { 0x7FFF, 0x033F, 0x0193, 0x0000 },
+    { 0x7FFF, 0x033F, 0x0193, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x421F, 0x1CF2, 0x0000 },
+    { 0x7FFF, 0x7E8C, 0x7C00, 0x0000 },
+    { 0x7FFF, 0x1BEF, 0x6180, 0x0000 },
+  },
+  {
+    { 0x2120, 0x8022, 0x8281, 0x1110 },
+    { 0xFF7F, 0xDF7F, 0x1201, 0x0001 },
+    { 0xFF00, 0xFF7F, 0x1F03, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x32BF, 0x00D0, 0x0000 },
+    { 0x7FFF, 0x32BF, 0x00D0, 0x0000 },
+    { 0x7FFF, 0x32BF, 0x00D0, 0x0000 },
+  },
+  {
+    { 0x7FFF, 0x32BF, 0x00D0, 0x0000 },
+    { 0x7FFF, 0x32BF, 0x00D0, 0x0000 },
+    { 0x7FFF, 0x32BF, 0x00D0, 0x0000 },
+  }
+};
+
+
+
 #define GBSAVE_GAME_VERSION_1 1
 #define GBSAVE_GAME_VERSION_2 2
 #define GBSAVE_GAME_VERSION_3 3
@@ -1332,10 +1531,12 @@ void  gbWriteMemory(register u16 address, register u8 value)
     // BOOTROM disable register (also gbCgbMode enabler if value & 0x10 ?)
     case 0x50 :
     {
-      if (useBios && inBios && !skipBios && (value & 1))
+      if (inBios && (value & 1))
       {
         gbMemoryMap[0x00] = &gbRom[0x0000];
-        memcpy ((u8 *)(gbRom+0x100), (u8 *)(gbMemory + 0x100), 0xF00);
+        if (gbHardware & 5) {
+          memcpy ((u8 *)(gbRom+0x100), (u8 *)(gbMemory + 0x100), 0xF00);
+        }
         inBios = false;
       }
     }
@@ -2149,15 +2350,20 @@ bool CPUIsGBBios(const char * file)
 
 void gbCPUInit(const char *biosFileName, bool useBiosFile)
 {
+  // GB/GBC/SGB only at the moment
+  if (!(gbHardware & 7))
+    return;
+
   useBios = false;
   if (useBiosFile)
   {
-    int size = 0x100;
+    int expectedSize = (gbHardware & 2) ? 0x900 : 0x100;
+    int size = expectedSize;
     if(utilLoad(biosFileName,
                 CPUIsGBBios,
                 bios,
                 size)) {
-      if(size == 0x100)
+      if(size == expectedSize)
         useBios = true;
       else
         systemMessage(MSG_INVALID_BIOS_FILE_SIZE, N_("Invalid BOOTROM file size"));
@@ -2169,12 +2375,10 @@ void gbGetHardwareType()
 {
   gbCgbMode = 0;
   gbSgbMode = 0;
-  if(gbRom[0x143] & 0x80) {
-    if((gbEmulatorType == 0) ||
-       gbEmulatorType == 1 ||
-       gbEmulatorType == 4) {
-      gbCgbMode = 1;
-    }
+  if((gbEmulatorType == 0 && (gbRom[0x143] & 0x80)) ||
+     gbEmulatorType == 1 ||
+     gbEmulatorType == 4) {
+    gbCgbMode = 1;
   }
 
   if((gbCgbMode == 0 ) && (gbRom[0x146] == 0x03)) {
@@ -2195,6 +2399,95 @@ void gbGetHardwareType()
   gbGBCColorType = 0;
   if (gbHardware & 8) // If GBA is selected, choose the GBA default settings.
     gbGBCColorType = 2;    // (0 = GBC, 1 = GBA, 2 = GBASP)
+}
+
+static void gbSelectColorizationPalette()
+{
+  int infoIdx = 0;
+
+  // Check if licensee is Nintendo. If not, use default palette.
+  if (gbRom[0x014B] == 0x01 ||
+	  (gbRom[0x014B] == 0x33 && gbRom[0x0144] == 0x30 && gbRom[0x0145] == 0x31))
+  {
+    // Calculate the checksum over 16 title bytes.
+    u8 checksum = 0;
+    for (int i = 0; i < 16; i++)
+    {
+      checksum += gbRom[0x0134 + i];
+    }
+
+    // Check if the checksum is in the list.
+    int idx;
+    for (idx = 0; idx < sizeof(gbColorizationChecksums); idx++)
+    {
+      if (gbColorizationChecksums[idx] == checksum)
+      {
+        break;
+      }
+    }
+
+    // Was the checksum found in the list?
+    if (idx < sizeof(gbColorizationChecksums))
+    {
+      // Indexes above 0x40 have to be disambiguated.
+      if (idx > 0x40)
+      {
+        // No idea how that works. But it works.
+        for (int i = idx - 0x41, j = 0; i < sizeof(gbColorizationDisambigChars); i += 14, j += 14)
+        {
+          if (gbRom[0x0137] == gbColorizationDisambigChars[i])
+          {
+            infoIdx = idx + j;
+            break;
+          }
+        }
+      }
+      else
+      {
+        // Lower indexes just use the index from the checksum list.
+        infoIdx = idx;
+      }
+    }
+  }
+  u8 palette = gbColorizationPaletteInfo[infoIdx] & 0x1F;
+  u8 flags = (gbColorizationPaletteInfo[infoIdx] & 0xE0) >> 5;
+
+
+  // Normally the first palette is used as OBP0.
+  // If bit 0 is zero, the third palette is used instead.
+  const u16* obp0 = 0;
+  if (flags & 1)
+  {
+    obp0 = gbColorizationPaletteData[palette][0];
+  }
+  else
+  {
+    obp0 = gbColorizationPaletteData[palette][2];
+  }
+
+  memcpy(gbPalette + 32, obp0, sizeof(gbColorizationPaletteData[palette][0]));
+
+  // Normally the second palette is used as OBP1.
+  // If bit 1 is set, the first palette is used instead.
+  // If bit 2 is zero, the third palette is used instead.
+  const u16* obp1 = 0;
+  if (!(flags & 4))
+  {
+    obp1 = gbColorizationPaletteData[palette][2];
+  }
+  else if (flags & 2)
+  {
+    obp1 = gbColorizationPaletteData[palette][0];
+  }
+  else
+  {
+    obp1 = gbColorizationPaletteData[palette][1];
+  }
+
+  memcpy(gbPalette + 36, obp1, sizeof(gbColorizationPaletteData[palette][0]));
+
+  // Third palette is always used for BGP.
+  memcpy(gbPalette, gbColorizationPaletteData[palette][2], sizeof(gbColorizationPaletteData[palette][0]));
 }
 
 void gbReset()
@@ -2466,27 +2759,45 @@ void gbReset()
     gbLcdLYIncrementTicks = 114+gbLcdTicks;
     gbLcdMode = 1;
 
-    // used for the handling of the gb Boot Rom
-    if ((gbHardware & 5) && (bios != NULL) && useBios && !skipBios)
+  }
+
+  // used for the handling of the gb Boot Rom
+  if ((gbHardware & 7) && (bios != NULL) && useBios && !skipBios)
+  {
+    if (gbHardware & 5)
     {
       memcpy ((u8 *)(gbMemory), (u8 *)(gbRom), 0x1000);
       memcpy ((u8 *)(gbMemory), (u8 *)(bios), 0x100);
-      gbWhiteScreen = 0;
-
-      gbInternalTimer = 0x3e;
-      gbDivTicks = 0x3f;
-      gbMemory[0xff04] = register_DIV = 0x00;
-      PC.W = 0x0000;
-      register_LCDC = 0x11;
-      gbScreenOn = false;
-      gbLcdTicks = 0;
-      gbLcdMode = 0;
-      gbLcdModeDelayed = 0;
-      gbMemory[0xff41] = register_STAT &= 0xfc;
-      gbInt48Signal = 0;
-      gbLcdLYIncrementTicks = GBLY_INCREMENT_CLOCK_TICKS;
     }
+    else
+    {
+      memcpy ((u8 *)(gbMemory), (u8 *)(bios), 0x900);
+      memcpy ((u8 *)(gbMemory + 0x100), (u8 *)(gbRom + 0x100), 0x100);
+    }
+    gbWhiteScreen = 0;
+
+    gbInternalTimer = 0x3e;
+    gbDivTicks = 0x3f;
+    gbMemory[0xff04] = register_DIV = 0x00;
+    PC.W = 0x0000;
+    register_LCDC = 0x11;
+    gbScreenOn = false;
+    gbLcdTicks = 0;
+    gbLcdMode = 0;
+    gbLcdModeDelayed = 0;
+    gbMemory[0xff41] = register_STAT &= 0xfc;
+    gbInt48Signal = 0;
+    gbLcdLYIncrementTicks = GBLY_INCREMENT_CLOCK_TICKS;
+    gbMemory[0xff6c] = 0xfe;
+
+    inBios = true;
   }
+  else if (gbHardware & 0xa)
+  {
+    // Set compatibility mode if it is a DMG ROM. 
+    gbMemory[0xff6c] = 0xfe | (u8)!(gbRom[0x143] & 0x80);
+  }
+
 
   gbLine99Ticks = 1;
   if (gbHardware & 8)
@@ -2618,6 +2929,12 @@ void gbReset()
     gbPalette[0x3e] = 0x468e;
     gbPalette[0x3f] = 0xa540;
     }
+
+    // The CGB BIOS palette selection has to be done by VBA if BIOS is skipped.
+    if (!(gbRom[0x143] & 0x80) && !inBios) {
+      gbSelectColorizationPalette();
+    }
+
   } else {
     if(gbSgbMode) {
       for(i = 0; i < 8; i++)
@@ -2692,15 +3009,13 @@ void gbReset()
   memset(&gbDataMMM01,0, sizeof(gbDataMMM01));
   gbDataMMM01.mapperROMBank = 1;
 
-  if (useBios && !skipBios && (gbHardware & 5))
+  if (inBios)
   {
     gbMemoryMap[0x00] = &gbMemory[0x0000];
-    inBios = true;
   }
   else
   {
     gbMemoryMap[0x00] = &gbRom[0x0000];
-    inBios = false;
   }
 
   gbMemoryMap[0x01] = &gbRom[0x1000];
@@ -3810,8 +4125,14 @@ static bool gbReadSaveState(gzFile gzFile)
   if (inBios)
   {
     gbMemoryMap[0x00] = &gbMemory[0x0000];
-    memcpy ((u8 *)(gbMemory), (u8 *)(gbRom), 0x1000);
-    memcpy ((u8 *)(gbMemory), (u8 *)(bios), 0x100);
+    if (gbHardware & 5) {
+      memcpy ((u8 *)(gbMemory), (u8 *)(gbRom), 0x1000);
+      memcpy ((u8 *)(gbMemory), (u8 *)(bios), 0x100);
+    } else if (gbHardware & 2) {
+      memcpy ((u8 *)(gbMemory), (u8 *)(bios), 0x900);
+      memcpy ((u8 *)(gbMemory + 0x100), (u8 *)(gbRom + 0x100), 0x100);
+    }
+
   }
   else
     gbMemoryMap[0x00] = &gbRom[0x0000];
@@ -4130,7 +4451,7 @@ bool gbLoadRom(const char *szFile)
     free(bios);
     bios = NULL;
   }
-  bios = (u8 *)calloc(1,0x100);
+  bios = (u8 *)calloc(1,0x900);
 
   return gbUpdateSizes();
 }
