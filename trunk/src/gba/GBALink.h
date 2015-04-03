@@ -198,7 +198,7 @@ extern u8 gbSIO_SC;
 extern bool LinkIsWaiting;
 extern bool LinkFirstTime;
 extern bool EmuReseted;
-extern void gbLinkReset();
+extern void gbInitLink();
 extern u8   gbStartLink(u8 b);
 extern u16 gbLinkUpdate(u8 b, int gbSerialOn);
 
