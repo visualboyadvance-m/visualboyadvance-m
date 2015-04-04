@@ -3359,17 +3359,19 @@ void CPUReset()
         break;
       }
   }
-  switch (CheckEReaderRegion())
-  {
-  case 1: //US
-	  EReaderWriteMemory(0x8009134, 0x46C0DFE0);
-	  break;
-  case 2:
-	  EReaderWriteMemory(0x8008A8C, 0x46C0DFE0);
-	  break;
-  case 3:
-	  EReaderWriteMemory(0x80091A8, 0x46C0DFE0);
-	  break;
+  if (eReaderEnabled) {
+	  switch (CheckEReaderRegion())
+	  {
+	  case 1: //US
+		  EReaderWriteMemory(0x8009134, 0x46C0DFE0);
+		  break;
+	  case 2:
+		  EReaderWriteMemory(0x8008A8C, 0x46C0DFE0);
+		  break;
+	  case 3:
+		  EReaderWriteMemory(0x80091A8, 0x46C0DFE0);
+		  break;
+	  }
   }
   rtcReset();
   // clean registers
