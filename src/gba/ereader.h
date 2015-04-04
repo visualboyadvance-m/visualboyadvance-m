@@ -1,6 +1,6 @@
 extern unsigned char *DotCodeData;
 extern char filebuffer[];
-extern int eReaderSaveRAW;
+extern int eReaderEnabled;
 
 int OpenDotCodeFile(void);
 int CheckEReaderRegion(void);
