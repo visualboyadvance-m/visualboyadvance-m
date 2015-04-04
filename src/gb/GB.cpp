@@ -1000,6 +1000,7 @@ void  gbWriteMemory(register u16 address, register u8 value)
 	case 0x02: {
 		gbSerialOn = (value & 0x80);
 #ifndef NO_LINK
+#if (defined __WIN32__ || defined _WIN32)
 		//trying to detect whether the game has exited multiplay mode, pokemon blue start w/ 0x7e while pocket racing start w/ 0x7c 
 		if (EmuReseted || (gbMemory[0xff02] & 0x7c) || (value & 0x7c) || (!(value & 0x81))) {
 			LinkFirstTime = true;
@@ -1035,6 +1036,7 @@ void  gbWriteMemory(register u16 address, register u8 value)
 
 		gbSerialBits = 0;
 		return;
+#endif
 #endif
 	}
 
@@ -2493,10 +2495,12 @@ static void gbSelectColorizationPalette()
 void gbReset()
 {
 #ifndef NO_LINK
+#if (defined __WIN32__ || defined _WIN32)
 	if (GetLinkMode() == LINK_GAMEBOY) {
 		EmuReseted = true;
 		gbInitLink();
 	}
+#endif
 #endif
 
   gbGetHardwareType();
@@ -5556,6 +5560,7 @@ void gbEmulate(int ticksToStop)
     gbMemory[0xff41] = register_STAT;
 
 #ifndef NO_LINK
+#if (defined __WIN32__ || defined _WIN32)
 	// serial emulation
 	gbSerialOn = (gbMemory[0xff02] & 0x80);
 	static int SIOctr = 0;
@@ -5649,6 +5654,7 @@ void gbEmulate(int ticksToStop)
 			}
 #endif
 		}
+#endif
 #endif
 
     soundTicks -= clockTicks;
