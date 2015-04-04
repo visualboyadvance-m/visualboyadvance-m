@@ -1415,9 +1415,9 @@ void VBA::loadSettings()
 {
   CString buffer;
 
-  eReaderSaveRAW = regQueryDwordValue("eReaderSaveRAW", 1);
-  if (eReaderSaveRAW < 0 || eReaderSaveRAW > 1)
-	  eReaderSaveRAW = 1;
+  eReaderEnabled = regQueryDwordValue("eReaderEnabled", 1);
+  if (eReaderEnabled < 0 || eReaderEnabled > 1)
+	  eReaderEnabled = 1;
 
   lastFullscreen = (VIDEO_SIZE)regQueryDwordValue("lastFullscreen", VIDEO_1024x768);
 
@@ -2521,7 +2521,7 @@ void VBA::movieReadNext()
 
 void VBA::saveSettings()
 {
-  regSetDwordValue("eReaderSaveRAW", eReaderSaveRAW);
+  regSetDwordValue("eReaderEnabled", eReaderEnabled);
 
   regSetDwordValue("language", languageOption);
 

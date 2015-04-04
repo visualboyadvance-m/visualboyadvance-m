@@ -636,12 +636,12 @@ void MainWnd::OnUpdateOptionsEmulatorAgbprint(CCmdUI* pCmdUI)
 
 void MainWnd::OnOptionsEmulatorEreader()
 {
-	eReaderSaveRAW = !eReaderSaveRAW;
+	eReaderEnabled = !eReaderEnabled;
 }
 
 void MainWnd::OnUpdateOptionsEmulatorEreader(CCmdUI* pCmdUI)
 {
-	pCmdUI->SetCheck(eReaderSaveRAW == 1);
+	pCmdUI->SetCheck(eReaderEnabled == 1);
 }
 
 void MainWnd::OnOptionsEmulatorRealtimeclock()

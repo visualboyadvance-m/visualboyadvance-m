@@ -17,7 +17,7 @@
 //#include "win32/MainWnd.h"
 
 
-int eReaderSaveRAW = 1;
+int eReaderEnabled = 1;
 
 char US_Ereader[19] = "CARDE READERPSAE01";
 char JAP_Ereader[19] = "CARDE READERPEAJ01";
