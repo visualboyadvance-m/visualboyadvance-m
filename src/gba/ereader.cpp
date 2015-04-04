@@ -8,15 +8,6 @@
 #include "Globals.h"
 #include "ereader.h"
 
-
-//#include "win32/stdafx.h"
-//#include "win32/vba.h"
-//#include "win32/MainWnd.h"
-//#include "win32/FileDlg.h"
-//#include "win32/WinResUtil.h"
-//#include "win32/MainWnd.h"
-
-
 int eReaderEnabled = 1;
 
 char US_Ereader[19] = "CARDE READERPSAE01";
@@ -100,6 +91,10 @@ char filebuffer[2048];
 
 int dotcodesize;
 
+#if (defined __WIN32__ || defined _WIN32)
+#define strcasecmp _stricmp
+#endif
+
 int CheckEReaderRegion(void) //US = 1, JAP = 2, JAP+ = 3
 {
 	int i;
@@ -107,11 +102,11 @@ int CheckEReaderRegion(void) //US = 1, JAP = 2, JAP+ = 3
 		rom_info[i] = rom[0xA0+i];
 	rom_info[i] = 0;
 
-	if (std::tolower(*rom_info, std::locale()) == std::tolower(*US_Ereader, std::locale()))
+	if (!strcasecmp(rom_info, US_Ereader))
 		return 1;
-	if (std::tolower(*rom_info, std::locale()) == std::tolower(*JAP_Ereader, std::locale()))
+	if (!strcasecmp(rom_info, JAP_Ereader))
 		return 2;
-	if (std::tolower(*rom_info, std::locale()) == std::tolower(*JAP_Ereader_plus, std::locale()))
+	if (!strcasecmp(rom_info, JAP_Ereader_plus))
 		return 3;
 	
 	return 0;
