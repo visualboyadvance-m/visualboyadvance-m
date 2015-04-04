@@ -6,10 +6,10 @@
 class GBASockClient
 {
 public:
-	GBASockClient(sf::IPAddress _server_addr);
+	GBASockClient(sf::IpAddress _server_addr);
 	~GBASockClient();
 
-	bool Connect(sf::IPAddress server_addr);
+	bool Connect(sf::IpAddress server_addr);
 	void Send(std::vector<char> data);
 	char ReceiveCmd(char* data_in, bool block);
 	void ReceiveClock(bool block);
@@ -19,9 +19,9 @@ public:
 	bool IsDisconnected();
 
 private:
-	sf::IPAddress server_addr;
-	sf::SocketTCP client;
-	sf::SocketTCP clock_client;
+	sf::IpAddress server_addr;
+	sf::TcpSocket client;
+	sf::TcpSocket clock_client;
 
 	s32 clock_sync;
 	bool is_disconnected;

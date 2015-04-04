@@ -118,7 +118,7 @@
     <ClInclude Include="..\..\src\gba\BreakpointStructures.h">
       <Filter>Core\GBA</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\gba\debugger-expr-yacc.h">
+    <ClInclude Include="..\..\src\gba\debugger-expr-yacc.hpp">
       <Filter>Core\GBA</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\gba\EEprom.h">
