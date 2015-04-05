@@ -10,7 +10,9 @@
 #ifndef WM_MAPINFO
 #define WM_MAPINFO WM_APP+101
 #endif
-
+#ifndef WM_BITMAPCLICK
+#define WM_BITMAPCLICK WM_APP+102
+#endif
 /////////////////////////////////////////////////////////////////////////////
 // BitmapControl view
 
@@ -29,6 +31,7 @@ class BitmapControl : public CScrollView
   void setStretch(bool b);
   void refresh();
   void setSize(int w1, int h1);
+  void setSelectedRectangle(int x, int y, int width, int height);
   void setData(u8 *d);
   void setBmpInfo(BITMAPINFO *info);
   static bool isRegistered;
@@ -67,6 +70,7 @@ class BitmapControl : public CScrollView
   u8 * data;
   int h;
   int w;
+  RECT boxreigon;
 };
 
 /////////////////////////////////////////////////////////////////////////////
