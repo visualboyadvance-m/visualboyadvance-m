@@ -1343,11 +1343,6 @@ BOOL VBA::OnIdle(LONG lCount)
 	if (!debugger)
       emulator.emuMain(emulator.emuCount);
 
-#ifndef NO_LINK
-	if (GetLinkMode() != LINK_DISCONNECTED)
-		CheckLinkConnection();
-#endif
-
       if(rewindSaveNeeded && rewindMemory && emulator.emuWriteMemState) {
         rewindCount++;
         if(rewindCount > 8)
