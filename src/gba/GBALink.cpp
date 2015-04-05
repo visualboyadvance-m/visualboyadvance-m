@@ -2264,7 +2264,7 @@ static void StartRFU(u16 value)
 												if (rfu_ishost)
 													rfu_curclient = (u8)linkmem->rfu_clientidx[gbaid];
 												if (rfu_qrecv != 0) { //data size > 0
-													memcpy(rfu_masterdata, linkmem->rfu_datalist[vbaid][linkmem->rfu_listfront[vbaid]].data, min(rfu_masterq << 2, (int)sizeof(rfu_masterdata)));
+													memcpy(rfu_masterdata, linkmem->rfu_datalist[vbaid][linkmem->rfu_listfront[vbaid]].data, std::min(rfu_masterq << 2, (int)sizeof(rfu_masterdata)));
 												}
 											}
 										} //else log("%08X  CMD26 Skip: %d %d %d\n",GetTickCount(),rfu_qrecv,linkmem->rfu_q[gbaid],tmpq);
