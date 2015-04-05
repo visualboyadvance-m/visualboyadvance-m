@@ -19,6 +19,62 @@
 #include "../System.h" // for systemMessage()
 #include "../gba/Globals.h"
 
+int GetXA2Devices(IXAudio2 *xa, wxArrayString *names, wxArrayString *ids,
+		  const wxString *match)
+{
+	HRESULT hr;
+	UINT32 dev_count = 0;
+	hr = xa->GetDeviceCount( &dev_count );
+	if( hr != S_OK ) {
+		wxLogError(_("XAudio2: Enumerating devices failed!"));
+		return true;
+	} else {
+		XAUDIO2_DEVICE_DETAILS dd;
+		for( UINT32 i = 0; i < dev_count; i++ ) {
+			hr = xa->GetDeviceDetails( i, &dd );
+			if( hr != S_OK ) {
+				continue;
+			} else {
+				if(ids) {
+					ids->push_back(dd.DeviceID);
+					names->push_back( dd.DisplayName );
+				} else if(*match == dd.DeviceID)
+					return i;
+			}
+		}
+	}
+	return -1;
+}
+
+bool GetXA2Devices(wxArrayString &names, wxArrayString &ids)
+{
+	HRESULT hr;
+	IXAudio2 *xa = NULL;
+	UINT32 flags = 0;
+#ifdef _DEBUG
+	flags = XAUDIO2_DEBUG_ENGINE;
+#endif
+
+	hr = XAudio2Create( &xa, flags );
+	if( hr != S_OK ) {
+		wxLogError( _("The XAudio2 interface failed to initialize!") );
+		return false;
+	}
+	GetXA2Devices(xa, &names, &ids, NULL);
+	xa->Release();
+	return true;
+}
+
+static int XA2GetDev(IXAudio2 *xa)
+{
+	if(gopts.audio_dev.empty())
+		return 0;
+	else {
+		int ret = GetXA2Devices(xa, NULL, NULL, &gopts.audio_dev);
+		return ret < 0 ? 0 : ret;
+	}
+}
+
 
 class XAudio2_Output;
 
@@ -94,7 +150,7 @@ public:
 	HRESULT STDMETHODCALLTYPE OnDeviceStateChanged( LPCWSTR pwstrDeviceId, DWORD dwNewState ) { return S_OK; }
 	HRESULT STDMETHODCALLTYPE OnPropertyValueChanged( LPCWSTR pwstrDeviceId, const PROPERTYKEY key ) { return S_OK; }
 
-	void do_register(sound_out_i_xaudio2 * p_instance)
+	void do_register(XAudio2_Output * p_instance)
 	{
 		if ( InterlockedIncrement( &registered ) == 1 )
 		{
@@ -111,7 +167,7 @@ public:
 		LeaveCriticalSection( &lock );
 	}
 
-	void do_unregister( sound_out_i_xaudio2 * p_instance )
+	void do_unregister( XAudio2_Output * p_instance )
 	{
 		if ( InterlockedDecrement( &registered ) == 0 )
 		{
@@ -277,9 +333,6 @@ void XAudio2_Output::device_change()
 }
 
 
-static int XA2GetDev(IXAudio2 *);
-
-
 bool XAudio2_Output::init(long sampleRate)
 {
 	if( failed || initialized ) return false;
@@ -288,9 +341,9 @@ bool XAudio2_Output::init(long sampleRate)
 
 	// Initialize XAudio2
 	UINT32 flags = 0;
-#ifdef _DEBUG
-	flags = XAUDIO2_DEBUG_ENGINE;
-#endif
+//#ifdef _DEBUG
+//	flags = XAUDIO2_DEBUG_ENGINE;
+//#endif
 
 	hr = XAudio2Create( &xaud, flags );
 	if( hr != S_OK ) {
@@ -452,7 +505,7 @@ void XAudio2_Output::write(u16 * finalWave, int length)
 			break;
 		} else {
 			// the maximum number of buffers is currently queued
-			if( synchronize && !speedup && !gopts.throttle ) {
+			if( synchronize && !speedup && !gopts.throttle && !gba_joybus_active ) {
 				// wait for one buffer to finish playing
 				if (WaitForSingleObject( notify.hBufferEndEvent, 10000 ) == WAIT_TIMEOUT) {
 					device_changed = true;
@@ -536,59 +589,6 @@ SoundDriver *newXAudio2_Output()
 	return new XAudio2_Output();
 }
 
-int GetXA2Devices(IXAudio2 *xa, wxArrayString *names, wxArrayString *ids,
-		  const wxString *match)
-{
-	HRESULT hr;
-	UINT32 dev_count = 0;
-	hr = xa->GetDeviceCount( &dev_count );
-	if( hr != S_OK ) {
-		wxLogError(_("XAudio2: Enumerating devices failed!"));
-		return true;
-	} else {
-		XAUDIO2_DEVICE_DETAILS dd;
-		for( UINT32 i = 0; i < dev_count; i++ ) {
-			hr = xa->GetDeviceDetails( i, &dd );
-			if( hr != S_OK ) {
-				continue;
-			} else {
-				if(ids) {
-					ids->push_back(dd.DeviceID);
-					names->push_back( dd.DisplayName );
-				} else if(*match == dd.DeviceID)
-					return i;
-			}
-		}
-	}
-	return -1;
-}
 
-bool GetXA2Devices(wxArrayString &names, wxArrayString &ids)
-{
-	HRESULT hr;
-	IXAudio2 *xa = NULL;
-	UINT32 flags = 0;
-#ifdef _DEBUG
-	flags = XAUDIO2_DEBUG_ENGINE;
-#endif
 
-	hr = XAudio2Create( &xa, flags );
-	if( hr != S_OK ) {
-		wxLogError( _("The XAudio2 interface failed to initialize!") );
-		return false;
-	}
-	GetXA2Devices(xa, &names, &ids, NULL);
-	xa->Release();
-	return true;
-}
-
-static int XA2GetDev(IXAudio2 *xa)
-{
-	if(gopts.audio_dev.empty())
-		return 0;
-	else {
-		int ret = GetXA2Devices(xa, NULL, NULL, &gopts.audio_dev);
-		return ret < 0 ? 0 : ret;
-	}
-}
 #endif // #ifndef NO_XAUDIO2
