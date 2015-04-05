@@ -4202,6 +4202,10 @@ void CPULoop(int ticks)
 
     }
   }
+#ifndef NO_LINK
+  if (GetLinkMode() != LINK_DISCONNECTED)
+	  CheckLinkConnection();
+#endif
 }
 
 #ifdef TILED_RENDERING

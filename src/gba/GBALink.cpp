@@ -34,6 +34,12 @@ const char *MakeInstanceFilename(const char *Input)
 
 #ifndef NO_LINK
 
+enum
+{
+	SENDING = false,
+	RECEIVING = true
+};
+
 // The usual min/max functions for built-in types.
 //
 // template<typename T> T min( T x, T y ) { return x < y ? x : y; }
@@ -205,7 +211,7 @@ static int GetSIOMode(u16, u16);
 static ConnectionState InitSocket();
 static void StartCableSocket(u16 siocnt);
 static ConnectionState ConnectUpdateSocket(char * const message, size_t size);
-static void UpdateSocket(int ticks);
+static void UpdateCableSocket(int ticks);
 static void CloseSocket();
 
 const u64 TICKS_PER_FRAME = 16777216 / 60;
@@ -328,12 +334,12 @@ static sf::IpAddress joybusHostAddr = sf::IpAddress::LocalHost;
 static const LinkDriver linkDrivers[] =
 {
 #if (defined __WIN32__ || defined _WIN32)
-	{ LINK_CABLE_IPC,           InitIPC,       NULL,                StartCableIPC,    UpdateCableIPC, CloseIPC,       false },
-	{ LINK_RFU_IPC,				InitIPC,       NULL,                StartRFU,         UpdateRFUIPC,   CloseIPC,       false },
-	{ LINK_GAMEBOY,				InitIPC,       NULL,                NULL,             NULL,           CloseIPC,       false },
+	{ LINK_CABLE_IPC,           InitIPC,       NULL,                StartCableIPC,    UpdateCableIPC,    CloseIPC,       false },
+	{ LINK_RFU_IPC,				InitIPC,       NULL,                StartRFU,         UpdateRFUIPC,      CloseIPC,       false },
+	{ LINK_GAMEBOY,				InitIPC,       NULL,                NULL,             NULL,              CloseIPC,       false },
 #endif
-	{ LINK_CABLE_SOCKET,        InitSocket,    ConnectUpdateSocket, StartCableSocket, UpdateSocket,   CloseSocket,    true  },
-	{ LINK_GAMECUBE_DOLPHIN,    JoyBusConnect, NULL,                NULL,             JoyBusUpdate,   JoyBusShutdown, false }
+	{ LINK_CABLE_SOCKET,        InitSocket,    ConnectUpdateSocket, StartCableSocket, UpdateCableSocket, CloseSocket,    true  },
+	{ LINK_GAMECUBE_DOLPHIN,    JoyBusConnect, NULL,                NULL,             JoyBusUpdate,      JoyBusShutdown, false }
 };
 
 enum
@@ -366,7 +372,6 @@ class lserver{
 	int counter;
 	int done;
 public:
-	int howmanytimes;
 	sf::TcpSocket tcpsocket[4];
 	sf::IpAddress udpaddr[4];
 	lserver(void);
@@ -385,7 +390,7 @@ class lclient{
 public:
 	sf::IpAddress serveraddr;
 	unsigned short serverport;
-	int numtransfers;
+	bool transferring;
 	lclient(void);
 	void Send(void);
 	void Recv(void);
@@ -398,7 +403,6 @@ static LANLINKDATA lanlink;
 static u16 linkdata[4];
 static lserver ls;
 static lclient lc;
-static bool oncewait = false, after = false;
 
 // time to end of single GBA's transfer, in 16.78 MHz clock ticks
 // first index is GBA #
@@ -424,14 +428,14 @@ static const int trtimeend[3][4] = {
 
 // Hodgepodge
 static u8 tspeed = 3;
-static u8 transfer = 0;
+static bool transfer_direction = false;
 static int linkid = 0;
 #if (defined __WIN32__ || defined _WIN32)
 static HANDLE linksync[4];
 #else
 static sem_t *linksync[4];
 #endif
-static int savedlinktime = 0;
+static int transfer_start_time_from_master = 0;
 #if (defined __WIN32__ || defined _WIN32)
 static HANDLE mmf = NULL;
 #else
@@ -671,7 +675,7 @@ void LinkUpdate(int ticks)
 
 void CheckLinkConnection() {
 	if (GetLinkMode() == LINK_CABLE_SOCKET) {
-		if (linkid && lc.numtransfers == 0) {
+		if (linkid && !lc.transferring) {
 			lc.CheckConn();
 		}
 	}
@@ -694,23 +698,13 @@ lserver::lserver(void) {
 	u16inbuffer = (u16*)inbuffer;
 	intoutbuffer = (s32*)outbuffer;
 	u16outbuffer = (u16*)outbuffer;
-	oncewait = false;
 }
 
 void lserver::Send(void) {
 	if(lanlink.type==0) {	// TCP
-		if(savedlinktime==-1) {
-			outbuffer[0] = 4;
-			outbuffer[1] = -32;	//0xe0
-			for(i=1;i<=lanlink.numslaves;i++) {
-				tcpsocket[i].send(outbuffer, 4);
-				size_t nr;
-				tcpsocket[i].receive(inbuffer, 4, nr);
-			}
-		}
 		outbuffer[1] = tspeed;
 		WRITE16LE(&u16outbuffer[1], linkdata[0]);
-		WRITE32LE(&intoutbuffer[1], savedlinktime);
+		WRITE32LE(&intoutbuffer[1], transfer_start_time_from_master);
 		if(lanlink.numslaves==1) {
 			if(lanlink.type==0) {
 				outbuffer[0] = 8;
@@ -741,26 +735,28 @@ void lserver::Send(void) {
 	return;
 }
 
+// Receive data from all slaves to master
 void lserver::Recv(void) {
 	int numbytes;
 	if(lanlink.type==0) {	// TCP
 		fdset.clear();
-		for(i=0;i<lanlink.numslaves;i++) fdset.add(tcpsocket[i+1]);
-		// was linktimeout/1000 (i.e., drop ms part), but that's wrong
-		if (fdset.wait(sf::seconds((float)(linktimeout / 1000.))) == 0)
+
+		for(i=0;i<lanlink.numslaves;i++)
+			fdset.add(tcpsocket[i+1]);
+
+		if (fdset.wait(sf::milliseconds(50)) == 0)
 		{
 			return;
 		}
-		howmanytimes++;
+
 		for(i=0;i<lanlink.numslaves;i++) {
 			numbytes = 0;
 			inbuffer[0] = 1;
-			while(numbytes<howmanytimes*inbuffer[0]) {
+			while(numbytes<inbuffer[0]) {
 				size_t nr;
-				tcpsocket[i+1].receive(inbuffer+numbytes, howmanytimes*inbuffer[0]-numbytes, nr);
+				tcpsocket[i+1].receive(inbuffer+numbytes, inbuffer[0]-numbytes, nr);
 				numbytes += nr;
 			}
-			if(howmanytimes>1) memmove(inbuffer, inbuffer+inbuffer[0]*(howmanytimes-1), inbuffer[0]);
 			if(inbuffer[1]==-32) {
 				char message[30];
 				sprintf(message, _("Player %d disconnected."), i+2);
@@ -778,9 +774,7 @@ void lserver::Recv(void) {
 			}
 			linkdata[i+1] = READ16LE(&u16inbuffer[1]);
 		}
-		howmanytimes = 0;
 	}
-	after = false;
 	return;
 }
 
@@ -790,7 +784,7 @@ lclient::lclient(void) {
 	u16inbuffer = (u16*)inbuffer;
 	intoutbuffer = (s32*)outbuffer;
 	u16outbuffer = (u16*)outbuffer;
-	numtransfers = 0;
+	transferring = false;
 	return;
 }
 
@@ -810,8 +804,8 @@ void lclient::CheckConn(void) {
 			CloseLink();
 			return;
 		}
-		numtransfers = 1;
-		savedlinktime = 0;
+		transferring = true;
+		transfer_start_time_from_master = 0;
 		linkdata[0] = READ16LE(&u16inbuffer[1]);
 		tspeed = inbuffer[1] & 3;
 		for(i=1, numbytes=4;i<=lanlink.numslaves;i++)
@@ -819,8 +813,6 @@ void lclient::CheckConn(void) {
 				linkdata[i] = READ16LE(&u16inbuffer[numbytes]);
 				numbytes++;
 			}
-		after = false;
-		oncewait = true;
 	}
 	return;
 }
@@ -830,9 +822,9 @@ void lclient::Recv(void) {
 	// old code used socket # instead of mask again
 	fdset.add(lanlink.tcpsocket);
 	// old code stripped off ms again
-	if (fdset.wait(sf::seconds((float)(linktimeout / 1000.))) == 0)
+	if (fdset.wait(sf::milliseconds(50)) == 0)
 	{
-		numtransfers = 0;
+		transferring = false;
 		return;
 	}
 	numbytes = 0;
@@ -851,15 +843,13 @@ void lclient::Recv(void) {
 	}
 	tspeed = inbuffer[1] & 3;
 	linkdata[0] = READ16LE(&u16inbuffer[1]);
-	savedlinktime = (s32)READ32LE(&intinbuffer[1]);
-	for(i=1, numbytes=4;i<lanlink.numslaves+1;i++)
+	transfer_start_time_from_master = (s32)READ32LE(&intinbuffer[1]);
+	for (i = 1, numbytes = 4; i<lanlink.numslaves + 1; i++) {
 		if(i!=linkid) {
 			linkdata[i] = READ16LE(&u16inbuffer[numbytes]);
 			numbytes++;
 		}
-	numtransfers++;
-	if(numtransfers==0) numtransfers = 2;
-	after = false;
+	}
 }
 
 void lclient::Send() {
@@ -899,9 +889,9 @@ static ConnectionState InitSocket() {
 			sf::Socket::Status status = lanlink.tcpsocket.connect(lc.serveraddr, lc.serverport);
 
 			if (status == sf::Socket::Error || status == sf::Socket::Disconnected)
-				return  LINK_ERROR;
+				return LINK_ERROR;
 			else
-				return  LINK_NEEDS_UPDATE;
+				return LINK_NEEDS_UPDATE;
 		}
 	}
 }
@@ -913,7 +903,7 @@ static ConnectionState ConnectUpdateSocket(char * const message, size_t size) {
 		sf::SocketSelector fdset;
 		fdset.add(lanlink.tcplistener);
 
-		if (fdset.wait(sf::seconds(0.1f))) {
+		if (fdset.wait(sf::milliseconds(150))) {
 			int nextSlave = lanlink.connectedSlaves + 1;
 
 			sf::Socket::Status st = lanlink.tcplistener.accept(ls.tcpsocket[nextSlave]);
@@ -981,121 +971,52 @@ static ConnectionState ConnectUpdateSocket(char * const message, size_t size) {
 
 			sf::SocketSelector fdset;
 			fdset.add(lanlink.tcpsocket);
-			fdset.wait(sf::seconds(0.1f));
+			fdset.wait(sf::milliseconds(150));
 		}
 	}
 
 	return newState;
 }
 
-static void UpdateSocket(int ticks)
-{
-	if (after)
-	{
-		if (linkid && linktime > 6044) {
-			lc.Recv();
-			oncewait = true;
-		}
-		else
-			return;
-	}
-
-	if (linkid && !transfer && lc.numtransfers > 0 && linktime >= savedlinktime)
-	{
-		linkdata[linkid] = READ16LE(&ioMem[COMM_SIODATA8]);
-
-		lc.Send();
-
-		UPDATE_REG(COMM_SIODATA32_L, linkdata[0]);
-		UPDATE_REG(COMM_SIOCNT, READ16LE(&ioMem[COMM_SIOCNT]) | 0x80);
-		transfer = 1;
-		if (lc.numtransfers==1)
-			linktime = 0;
-		else
-			linktime -= savedlinktime;
-	}
-
-	if (transfer && linktime >= trtimeend[lanlink.numslaves-1][tspeed])
-	{
-		if (READ16LE(&ioMem[COMM_SIOCNT]) & 0x4000)
-		{
-			IF |= 0x80;
-			UPDATE_REG(0x202, IF);
-		}
-
-		UPDATE_REG(COMM_SIOCNT, (READ16LE(&ioMem[COMM_SIOCNT]) & 0xff0f) | (linkid << 4));
-		transfer = 0;
-		linktime -= trtimeend[lanlink.numslaves-1][tspeed];
-		oncewait = false;
-
-		if (!lanlink.speed)
-		{
-			if (linkid)
-				lc.Recv();
-			else
-				ls.Recv(); // WTF is the point of this?
-
-			UPDATE_REG(COMM_SIOMULTI1, linkdata[1]);
-			UPDATE_REG(COMM_SIOMULTI2, linkdata[2]);
-			UPDATE_REG(COMM_SIOMULTI3, linkdata[3]);
-			oncewait = true;
-
-		} else {
-
-			after = true;
-			if (lanlink.numslaves == 1)
-			{
-				UPDATE_REG(COMM_SIOMULTI1, linkdata[1]);
-				UPDATE_REG(COMM_SIOMULTI2, linkdata[2]);
-				UPDATE_REG(COMM_SIOMULTI3, linkdata[3]);
-			}
-		}
-	}
-}
-
-
 void StartCableSocket(u16 value)
 {
 	switch (GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]))) {
 	case MULTIPLAYER: {
-		bool start = (value & 0x80) && !linkid && !transfer;
+		bool start = (value & 0x80) && !linkid && !transfer_direction;
 		// clear start, seqno, si (RO on slave, start = pulse on master)
 		value &= 0xff4b;
 		// get current si.  This way, on slaves, it is low during xfer
 		if(linkid) {
-			if(!transfer)
+			if(!transfer_direction)
 				value |= 4;
 			else
 				value |= READ16LE(&ioMem[COMM_SIOCNT]) & 4;
 		}
 		if (start) {
 			linkdata[0] = READ16LE(&ioMem[COMM_SIODATA8]);
-			savedlinktime = linktime;
+			transfer_start_time_from_master = linktime;
 			tspeed = value & 3;
 			ls.Send();
-			transfer = 1;
+			transfer_direction = RECEIVING;
 			linktime = 0;
 			UPDATE_REG(COMM_SIOMULTI0, linkdata[0]);
 			UPDATE_REG(COMM_SIOMULTI1, 0xffff);
 			WRITE32LE(&ioMem[COMM_SIOMULTI2], 0xffffffff);
-			if (lanlink.speed && oncewait == false)
-				ls.howmanytimes++;
-			after = false;
 			value &= ~0x40;
 		}
-		value |= (transfer != 0) << 7;
-		value |= (linkid && !transfer ? 0xc : 8); // set SD (high), SI (low on master)
+		value |= (transfer_direction ? 1 : 0) << 7;
+		value |= (linkid && !transfer_direction) ? 0x0c : 0x08; // set SD (high), SI (low on master)
 		value |= linkid << 4; // set seq
 		UPDATE_REG(COMM_SIOCNT, value);
 		if (linkid)
 			// SC low -> transfer in progress
 			// not sure why SO is low
-			UPDATE_REG(COMM_RCNT, transfer ? 6 : 7);
+			UPDATE_REG(COMM_RCNT, transfer_direction ? 6 : 7);
 		else
 			// SI is always low on master
 			// SO, SC always low during transfer
 			// not sure why SO low otherwise
-			UPDATE_REG(COMM_RCNT, transfer ? 2 : 3);
+			UPDATE_REG(COMM_RCNT, transfer_direction ? 2 : 3);
 		break;
 	}
 	case NORMAL8:
@@ -1106,6 +1027,49 @@ void StartCableSocket(u16 value)
 		break;
 	}
 }
+
+static void UpdateCableSocket(int ticks)
+{
+	if (linkid && transfer_direction == SENDING && lc.transferring && linktime >= transfer_start_time_from_master)
+	{
+		linkdata[linkid] = READ16LE(&ioMem[COMM_SIODATA8]);
+
+		lc.Send();
+
+		UPDATE_REG(COMM_SIODATA32_L, linkdata[0]);
+		UPDATE_REG(COMM_SIOCNT, READ16LE(&ioMem[COMM_SIOCNT]) | 0x80);
+		transfer_direction = RECEIVING;
+		linktime = 0;
+	}
+
+	if (transfer_direction == RECEIVING && linktime >= trtimeend[lanlink.numslaves-1][tspeed])
+	{
+		if (READ16LE(&ioMem[COMM_SIOCNT]) & 0x4000)
+		{
+			IF |= 0x80;
+			UPDATE_REG(0x202, IF);
+		}
+
+		UPDATE_REG(COMM_SIOCNT, (READ16LE(&ioMem[COMM_SIOCNT]) & 0xff0f) | (linkid << 4));
+		transfer_direction = SENDING;
+		linktime -= trtimeend[lanlink.numslaves-1][tspeed];
+
+		if (linkid)
+		{
+			lc.transferring = true;
+			lc.Recv();
+		}
+		else
+		{
+			ls.Recv(); // Receive data from all of the slaves
+		}
+
+		UPDATE_REG(COMM_SIOMULTI1, linkdata[1]);
+		UPDATE_REG(COMM_SIOMULTI2, linkdata[2]);
+		UPDATE_REG(COMM_SIOMULTI3, linkdata[3]);
+	}
+}
+
 
 static void CloseSocket() {
 	if(linkid) {
@@ -1401,12 +1365,12 @@ static void StartCableIPC(u16 value)
 {
 	switch (GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]))) {
 	case MULTIPLAYER: {
-		bool start = (value & 0x80) && !linkid && !transfer;
+		bool start = (value & 0x80) && !linkid && !transfer_direction;
 		// clear start, seqno, si (RO on slave, start = pulse on master)
 		value &= 0xff4b;
 		// get current si.  This way, on slaves, it is low during xfer
 		if(linkid) {
-			if(!transfer)
+			if(!transfer_direction)
 				value |= 4;
 			else
 				value |= READ16LE(&ioMem[COMM_SIOCNT]) & 4;
@@ -1449,7 +1413,7 @@ static void StartCableIPC(u16 value)
 				else
 					linkmem->numtransfers = numtransfers;
 
-				transfer = 1;
+				transfer_direction = 1;
 				linktime = 0;
 				tspeed = value & 3;
 				WRITE32LE(&ioMem[COMM_SIOMULTI0], 0xffffffff);
@@ -1459,19 +1423,19 @@ static void StartCableIPC(u16 value)
 				value |= 0x40; // comm error
 			}
 		}
-		value |= (transfer != 0) << 7;
-		value |= (linkid && !transfer ? 0xc : 8); // set SD (high), SI (low on master)
+		value |= (transfer_direction != 0) << 7;
+		value |= (linkid && !transfer_direction ? 0xc : 8); // set SD (high), SI (low on master)
 		value |= linkid << 4; // set seq
 		UPDATE_REG(COMM_SIOCNT, value);
 		if (linkid)
 			// SC low -> transfer in progress
 			// not sure why SO is low
-			UPDATE_REG(COMM_RCNT, transfer ? 6 : 7);
+			UPDATE_REG(COMM_RCNT, transfer_direction ? 6 : 7);
 		else
 			// SI is always low on master
 			// SO, SC always low during transfer
 			// not sure why SO low otherwise
-			UPDATE_REG(COMM_RCNT, transfer ? 2 : 3);
+			UPDATE_REG(COMM_RCNT, transfer_direction ? 2 : 3);
 		break;
 	}
 	case NORMAL8:
@@ -1507,13 +1471,13 @@ static void UpdateCableIPC(int ticks)
 	// and syncing clock with master (after first transfer)
 	// this will fail if > ~2 minutes have passed since last transfer due
 	// to integer overflow
-	if(!transfer && numtransfers && linktime < 0) {
+	if(!transfer_direction && numtransfers && linktime < 0) {
 		linktime = 0;
 		// there is a very, very, small chance that this will abort
 		// a transfer that was just started
 		linkmem->numtransfers = numtransfers = 0;
 	}
-	if (linkid && !transfer && linktime >= linkmem->lastlinktime &&
+	if (linkid && !transfer_direction && linktime >= linkmem->lastlinktime &&
 	    linkmem->numtransfers != numtransfers)
 	{
 		numtransfers = linkmem->numtransfers;
@@ -1523,7 +1487,7 @@ static void UpdateCableIPC(int ticks)
 		// if this or any previous machine was dropped, no transfer
 		// can take place
 		if(linkmem->trgbas <= linkid) {
-			transfer = 0;
+			transfer_direction = 0;
 			numtransfers = 0;
 			// if this is the one that was dropped, reconnect
 			if(!(linkmem->linkflags & (1 << linkid)))
@@ -1545,7 +1509,7 @@ static void UpdateCableIPC(int ticks)
 		case 'M':
 #endif
 			tspeed = linkmem->linkcmd[0] & 3;
-			transfer = 1;
+			transfer_direction = 1;
 			WRITE32LE(&ioMem[COMM_SIOMULTI0], 0xffffffff);
 			WRITE32LE(&ioMem[COMM_SIOMULTI2], 0xffffffff);
 			UPDATE_REG(COMM_SIOCNT, READ16LE(&ioMem[COMM_SIOCNT]) & ~0x40 | 0x80);
@@ -1555,39 +1519,39 @@ static void UpdateCableIPC(int ticks)
 #endif
 	}
 
-	if (!transfer)
+	if (!transfer_direction)
 		return;
 
-	if (transfer <= linkmem->trgbas && linktime >= trtimedata[transfer-1][tspeed])
+	if (transfer_direction <= linkmem->trgbas && linktime >= trtimedata[transfer_direction-1][tspeed])
 	{
 		// transfer #n -> wait for value n - 1
-		if(transfer > 1 && linkid != transfer - 1) {
-			if(WaitForSingleObject(linksync[transfer - 1], linktimeout) == WAIT_TIMEOUT) {
+		if(transfer_direction > 1 && linkid != transfer_direction - 1) {
+			if(WaitForSingleObject(linksync[transfer_direction - 1], linktimeout) == WAIT_TIMEOUT) {
 				// assume slave has dropped off if timed out
 				if(!linkid) {
-					linkmem->trgbas = transfer - 1;
+					linkmem->trgbas = transfer_direction - 1;
 					int f = linkmem->linkflags;
-					f &= ~(1 << (transfer - 1));
+					f &= ~(1 << (transfer_direction - 1));
 					linkmem->linkflags = f;
-					if(f < (1 << transfer) - 1)
-						linkmem->numgbas = transfer - 1;
+					if(f < (1 << transfer_direction) - 1)
+						linkmem->numgbas = transfer_direction - 1;
 					char message[30];
-					sprintf(message, _("Player %d disconnected."), transfer - 1);
+					sprintf(message, _("Player %d disconnected."), transfer_direction - 1);
 					systemScreenMessage(message);
 				}
-				transfer = linkmem->trgbas + 1;
+				transfer_direction = linkmem->trgbas + 1;
 				// next cycle, transfer will finish up
 				return;
 			}
 		}
 		// now that value is available, store it
-		UPDATE_REG((COMM_SIOMULTI0 - 2) + (transfer<<1), linkmem->linkdata[transfer-1]);
+		UPDATE_REG((COMM_SIOMULTI0 - 2) + (transfer_direction<<1), linkmem->linkdata[transfer_direction-1]);
 
 		// transfer machine's value at start of its transfer cycle
-		if(linkid == transfer) {
+		if(linkid == transfer_direction) {
 			// skip if dropped
 			if(linkmem->trgbas <= linkid) {
-				transfer = 0;
+				transfer_direction = 0;
 				numtransfers = 0;
 				// if this is the one that was dropped, reconnect
 				if(!(linkmem->linkflags & (1 << linkid)))
@@ -1600,23 +1564,23 @@ static void UpdateCableIPC(int ticks)
 			linkmem->linkdata[linkid] = READ16LE(&ioMem[COMM_SIODATA8]);
 			ReleaseSemaphore(linksync[linkid], linkmem->numgbas-1, NULL);
 		}
-		if(linkid == transfer - 1) {
+		if(linkid == transfer_direction - 1) {
 			// SO becomes low to begin next trasnfer
 			// may need to set DDR as well
 			UPDATE_REG(COMM_RCNT, 0x22);
 		}
 
 		// next cycle
-		transfer++;
+		transfer_direction++;
 	}
 
-	if (transfer > linkmem->trgbas && linktime >= trtimeend[transfer-3][tspeed])
+	if (transfer_direction > linkmem->trgbas && linktime >= trtimeend[transfer_direction-3][tspeed])
 	{
 		// wait for slaves to finish
 		// this keeps unfinished slaves from screwing up last xfer
 		// not strictly necessary; may just slow things down
 		if(!linkid) {
-			for(int i = 2; i < transfer; i++)
+			for(int i = 2; i < transfer_direction; i++)
 				if(WaitForSingleObject(linksync[0], linktimeout) == WAIT_TIMEOUT) {
 					// impossible to determine which slave died
 					// so leave them alone for now
@@ -1627,8 +1591,8 @@ static void UpdateCableIPC(int ticks)
 		} else if(linkmem->trgbas > linkid)
 			// signal master that this slave is finished
 			ReleaseSemaphore(linksync[0], 1, NULL);
-		linktime -= trtimeend[transfer - 3][tspeed];
-		transfer = 0;
+		linktime -= trtimeend[transfer_direction - 3][tspeed];
+		transfer_direction = 0;
 		u16 value = READ16LE(&ioMem[COMM_SIOCNT]);
 		if(!linkid)
 			value |= 4; // SI becomes high on slaves after xfer
@@ -1671,15 +1635,11 @@ static void StartRFU(u16 value)
 			}
 			value &= 0xff7f; //Start bit.7 reset //may cause the game to retry sending again
 			//value |= 0x0008; //SO bit.3 set automatically upon transfer completion
-			transfer = 0;
+			transfer_direction = 0;
 		}
 		return;
 	}
 
-	if (!linkid && ls.howmanytimes>0) { //may not be needed? //Server, if previous data exchange not done yet don't initiate anymore data exchange
-		UPDATE_REG(COMM_SIOCNT, value);
-		return;
-	}
 
 	linktimeout = 1;
 
@@ -1695,7 +1655,7 @@ static void StartRFU(u16 value)
 		break;
 	case NORMAL32:
 		//don't do anything if previous cmd aren't sent yet, may fix Boktai2 Not Detecting wireless adapter
-		if (transfer)
+		if (transfer_direction)
 		{
 			UPDATE_REG(COMM_SIOCNT, value);
 			return;
@@ -2587,7 +2547,7 @@ static void StartRFU(u16 value)
 				}
 				break;
 			}
-			transfer = 1;
+			transfer_direction = 1;
 
 			PrevVAL = value;
 			PrevDAT = CurDAT;
@@ -2619,7 +2579,7 @@ bool LinkRFUUpdate()
 	//if (IsLinkConnected()) {
 	//}
 	if (rfu_enabled) {
-		if (transfer&&rfu_transfer_end <= 0)
+		if (transfer_direction&&rfu_transfer_end <= 0)
 		{
 			if (rfu_waiting) {
 				bool ok = false;
@@ -2690,9 +2650,9 @@ static void UpdateRFUIPC(int ticks)
 
 		if (LinkRFUUpdate())
 		{
-			if (transfer && rfu_transfer_end <= 0)
+			if (transfer_direction && rfu_transfer_end <= 0)
 			{
-				transfer = 0;
+				transfer_direction = 0;
 				u16 value = READ16LE(&ioMem[COMM_SIOCNT]);
 				if (value & 0x4000)
 				{
