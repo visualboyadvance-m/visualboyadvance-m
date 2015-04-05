@@ -1,81 +1,59 @@
-#if !defined(AFX_OAMVIEW_H__E5369352_80F8_49C4_9F23_05EB6FC1345B__INCLUDED_)
-#define AFX_OAMVIEW_H__E5369352_80F8_49C4_9F23_05EB6FC1345B__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-// OamView.h : header file
-//
-#include "BitmapControl.h"
-#include "ZoomControl.h"
-#include "ColorControl.h"
-
 #include "IUpdate.h"
 #include "ResizeDlg.h"
+#include "resource.h"
+#include "BitmapControl.h"
+#include "gba/Globals.h"
 
-/////////////////////////////////////////////////////////////////////////////
 // OamView dialog
+class OamViewable
+{
+public:
+	BITMAPINFO bmpInfo;
+	BitmapControl oamView;
+	u8* data;
+	OamViewable(int index, CDialog* parent);
+	int w;
+	int h;
+	~OamViewable();
+};
 
 class OamView : public ResizeDlg, IUpdateListener
 {
- private:
-  BITMAPINFO bmpInfo;
-  u8 *data;
-  int w;
-  int h;
-  int number;
-  bool autoUpdate;
-  BitmapControl oamView;
-  ZoomControl oamZoom;
-  ColorControl color;
+	DECLARE_DYNAMIC(OamView)
+public:
+	void savePNG(const char *name);
+	void saveBMP(const char *name);
+	void render();
+	void setAttributes(u16 a0, u16 a1, u16 a2);
+	void paint();
 
-  // Construction
- public:
-  void updateScrollInfo();
-  afx_msg LRESULT OnColInfo(WPARAM wParam, LPARAM lParam);
-  afx_msg LRESULT OnMapInfo(WPARAM wParam, LPARAM lParam);
-  void savePNG(const char *name);
-  void saveBMP(const char *name);
-  void render();
-  void setAttributes(u16 a0, u16 a1, u16 a2);
-  void paint();
-  ~OamView();
-  OamView(CWnd* pParent = NULL);   // standard constructor
+	virtual ~OamView();
+	OamView(CWnd* pParent = NULL);   // standard constructor
 
-  virtual void update();
-  // Dialog Data
-  //{{AFX_DATA(OamView)
-  enum { IDD = IDD_OAM_VIEW };
-  CEdit  m_sprite;
-  BOOL  m_stretch;
-  //}}AFX_DATA
+	virtual void update();
+	// Dialog Data
+	enum { IDD = IDD_OAM_VIEW };
+private:
+	OamViewable* oamViews[128];
+	BITMAPINFO bmpInfo;
+	u8* data_screen;
+	BitmapControl oamScreen;
+	BitmapControl oamPreview;
+	void UpdateOAM(int index);
+	int selectednumber;
+	bool autoUpdate;
 
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-  // Overrides
-  // ClassWizard generated virtual function overrides
-  //{{AFX_VIRTUAL(OamView)
- protected:
-  virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-  virtual void PostNcDestroy();
-  //}}AFX_VIRTUAL
+	virtual BOOL OnInitDialog();
+	afx_msg void OnAutoUpdate();
+	afx_msg void OnClose();
+	afx_msg void OnSave();
+	afx_msg LRESULT OnOAMClick(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnListDoubleClick();
 
-  // Implementation
- protected:
-
-  // Generated message map functions
-  //{{AFX_MSG(OamView)
-  afx_msg void OnSave();
-  virtual BOOL OnInitDialog();
-  afx_msg void OnStretch();
-  afx_msg void OnAutoUpdate();
-  afx_msg void OnChangeSprite();
-  afx_msg void OnClose();
-  afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-  //}}AFX_MSG
-  DECLARE_MESSAGE_MAP()
-    };
-
-    //{{AFX_INSERT_LOCATION}}
-    // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_OAMVIEW_H__E5369352_80F8_49C4_9F23_05EB6FC1345B__INCLUDED_)
+	DECLARE_MESSAGE_MAP()
+public:
+};

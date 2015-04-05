@@ -14,6 +14,7 @@ typedef struct {
 	void *address;
 	int size;
 } variable_desc;
+void utilReadScreenPixels(u8* dest, int w, int h);
 bool utilWritePNGFile(const char *, int, int, u8 *);
 bool utilWriteBMPFile(const char *, int, int, u8 *);
 void utilApplyIPS(const char *ips, uint8_t **rom, int *size);
