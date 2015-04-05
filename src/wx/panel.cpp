@@ -988,9 +988,47 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
     pixbuf1(0), pixbuf2(0), rpi(0), nthreads(0)
 {
     memset(delta, 0xff, sizeof(delta));
-    
-    scale = builtin_ff_scale(gopts.filter);
+    if(gopts.filter == FF_PLUGIN) {
+        do { // do { } while(0) so break; exits entire block
+            // could've also just used goto & a label, I guess
+            gopts.filter = FF_NONE; // preemptive in case of errors
+            systemColorDepth = 32;
+            if(gopts.filter_plugin.empty())
+                break;
+            wxFileName fpn(gopts.filter_plugin);
+            fpn.MakeAbsolute(wxStandardPaths::Get().GetPluginsDir());
+            if(!filt_plugin.Load(fpn.GetFullPath(), wxDL_VERBATIM|wxDL_NOW))
+                break;
+            RENDPLUG_GetInfo gi = (RENDPLUG_GetInfo)filt_plugin.GetSymbol(wxT("RenderPluginGetInfo"));
+            if(!gi)
+                break;
+            // need to be able to write to _rpi to set Output() and Flags
+            RENDER_PLUGIN_INFO *_rpi = gi();
+            // FIXME: maybe < RPI_VERSION, assuming future vers. back compat?
+            if(!_rpi || (_rpi->Flags & 0xff) != RPI_VERSION ||
+                !(_rpi->Flags & (RPI_555_SUPP|RPI_888_SUPP)))
+                break;
+            _rpi->Flags &= ~RPI_565_SUPP;
+            if(_rpi->Flags & RPI_888_SUPP) {
+                _rpi->Flags &= ~RPI_555_SUPP;
+                // FIXME: should this be 32 or 24?  No docs or sample source
+                systemColorDepth = 32;
+            } else
+                systemColorDepth = 16;
+            if(!_rpi->Output)
+                // note that in actual kega fusion plugins, rpi->Output is
+                // unused (as is rpi->Handle)
+                _rpi->Output = (RENDPLUG_Output)filt_plugin.GetSymbol(wxT("RenderPluginOutput"));
+            scale = (_rpi->Flags & RPI_OUT_SCLMSK) >> RPI_OUT_SCLSH;
+            rpi = _rpi;
+            gopts.filter = FF_PLUGIN; // now that there is a valid plugin
+        } while(0);
+        else {
+            scale = builtin_ff_scale(gopts.filter);
 #define out_16 (systemColorDepth == 16)
+#endif
+            systemColorDepth = 32;
+        }
 	    systemColorDepth = 32;
     // Intialize color tables
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
@@ -1149,9 +1187,6 @@ public:
 			case FF_TV:
 				ScanlinesTV32(src, instride, delta, dst, outstride, width, height);
 				break;
-			case FF_HQ2X:
-				hq2x32(src, instride, delta, dst, outstride, width, height);
-				break;
 			case FF_LQ2X:
 				lq2x32(src, instride, delta, dst, outstride, width, height);
 				break;
@@ -1161,15 +1196,52 @@ public:
 			case FF_SIMPLE3X:
 				Simple3x32(src, instride, delta, dst, outstride, width, height);
 				break;
-			case FF_HQ3X:
-				hq3x32(src, instride, delta, dst, outstride, width, height);
-				break;
 			case FF_SIMPLE4X:
 				Simple4x32(src, instride, delta, dst, outstride, width, height);
+				break;
+			case FF_HQ2X:
+				hq2x32(src, instride, delta, dst, outstride, width, height);
+				break;
+			case FF_HQ3X:
+				hq3x32(src, instride, delta, dst, outstride, width, height);
 				break;
 			case FF_HQ4X:
 				hq4x32(src, instride, delta, dst, outstride, width, height);
 				break;
+/* Placeholder for xbrz support
+			case FF_XBRZ2X:
+                break;
+            case FF_XBRZ3X:
+                break;
+            case FF_XBRZ4X:
+                break;
+            case FF_XBRZ5X:
+                break; 
+*/
+			case FF_PLUGIN:
+                // MFC interface did not do plugins in parallel
+                // Probably because it's almost certain they carry state or do
+                // other non-thread-safe things
+                // But the user can always turn mt off of it's not working..
+                RENDER_PLUGIN_OUTP outdesc;
+                outdesc.Size = sizeof(outdesc);
+                outdesc.Flags = rpi->Flags;
+                outdesc.SrcPtr = src;
+                outdesc.SrcPitch = instride;
+                outdesc.SrcW = width;
+                // FIXME: win32 code adds to H, saying that frame isn't fully
+                // rendered otherwise
+                // I need to verify that statement before I go adding stuff that
+                // may make it crash.
+                outdesc.SrcH = height; // + scale / 2
+                outdesc.DstPtr = dst;
+                outdesc.DstPitch = outstride;
+                outdesc.DstW = width * scale;
+                // on the other hand, there is at least 1 line below, so I'll add
+                // that to dest in case safety checks in plugin use < instead of <=
+                outdesc.DstH = height * scale + 1; // + scale * (scale / 2)
+                rpi->Output(&outdesc);
+                break;
 			default:
 				break;
 			}
