@@ -44,6 +44,68 @@ static int (ZEXPORT *utilGzReadFunc)(gzFile, voidp, unsigned int) = NULL;
 static int (ZEXPORT *utilGzCloseFunc)(gzFile) = NULL;
 static z_off_t (ZEXPORT *utilGzSeekFunc)(gzFile, z_off_t, int) = NULL;
 
+void utilReadScreenPixels(u8* dest, int w, int h)
+{
+	u8* b = dest;
+	int sizeX = w;
+	int sizeY = h;
+	switch (systemColorDepth) {
+	case 16:
+	{
+		u16 *p = (u16 *) (pix + (w + 2) * 2); // skip first black line
+		for (int y = 0; y < sizeY; y++) {
+			for (int x = 0; x < sizeX; x++) {
+				u16 v = *p++;
+
+				*b++ = ((v >> systemRedShift) & 0x001f) << 3; // R
+				*b++ = ((v >> systemGreenShift) & 0x001f) << 3; // G
+				*b++ = ((v >> systemBlueShift) & 0x01f) << 3; // B
+			}
+			p++; // skip black pixel for filters
+			p++; // skip black pixel for filters
+		}
+	}
+		break;
+	case 24:
+	{
+		u8 *pixU8 = (u8 *) pix;
+		for (int y = 0; y < sizeY; y++) {
+			for (int x = 0; x < sizeX; x++) {
+				if (systemRedShift < systemBlueShift) {
+					*b++ = *pixU8++; // R
+					*b++ = *pixU8++; // G
+					*b++ = *pixU8++; // B
+				}
+				else {
+					int blue = *pixU8++;
+					int green = *pixU8++;
+					int red = *pixU8++;
+
+					*b++ = red;
+					*b++ = green;
+					*b++ = blue;
+				}
+			}
+		}
+	}
+		break;
+	case 32:
+	{
+		u32 *pixU32 = (u32 *) (pix + 4 * (w + 1));
+		for (int y = 0; y < sizeY; y++) {
+			for (int x = 0; x < sizeX; x++) {
+				u32 v = *pixU32++;
+				*b++ = ((v >> systemBlueShift) & 0x001f) << 3; // B
+				*b++ = ((v >> systemGreenShift) & 0x001f) << 3; // G
+				*b++ = ((v >> systemRedShift) & 0x001f) << 3; // R
+			}
+			pixU32++;
+		}
+	}
+		break;
+	}
+}
+
 bool utilWritePNGFile(const char *fileName, int w, int h, u8 *pix)
 {
 #ifndef NO_PNG

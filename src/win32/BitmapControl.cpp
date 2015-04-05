@@ -109,6 +109,12 @@ void BitmapControl::OnDraw(CDC* dc)
 
   dc->BitBlt(0,0,w1,h1,
              &memDC,0,0,SRCCOPY);
+  
+  if (boxreigon.right != 0 && boxreigon.bottom != 0)
+  {
+	  CBrush br = CBrush(RGB(255, 0, 0));
+	  dc->FrameRect(&boxreigon, &br);
+  }
   memDC.SelectObject(pOldBitmap);
 
   bitmap.DeleteObject();
@@ -146,6 +152,10 @@ void BitmapControl::OnSize(UINT nType, int cx, int cy)
 
 void BitmapControl::OnLButtonDown(UINT nFlags, CPoint pt)
 {
+	GetParent()->SendMessage(WM_BITMAPCLICK,
+		GetDlgCtrlID(),
+		0);
+
   if(!data)
     return;
   int x = pt.x;
@@ -200,6 +210,7 @@ void BitmapControl::OnLButtonDown(UINT nFlags, CPoint pt)
   GetParent()->SendMessage(WM_MAPINFO,
                            point,
                            (LPARAM)colors);
+
 }
 
 void BitmapControl::setBmpInfo(BITMAPINFO *info)
@@ -223,7 +234,13 @@ void BitmapControl::setSize(int w1, int h1)
     SetScrollSizes(MM_TEXT, s);
   }
 }
-
+void BitmapControl::setSelectedRectangle(int x, int y, int width, int height)
+{
+	boxreigon.left = x;
+	boxreigon.right = x + width;
+	boxreigon.top = y;
+	boxreigon.bottom = y + height;
+}
 void BitmapControl::refresh()
 {
   Invalidate();
