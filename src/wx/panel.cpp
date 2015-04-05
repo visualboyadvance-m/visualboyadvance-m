@@ -1023,13 +1023,11 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
             rpi = _rpi;
             gopts.filter = FF_PLUGIN; // now that there is a valid plugin
         } while(0);
-        else {
+    } else {
             scale = builtin_ff_scale(gopts.filter);
 #define out_16 (systemColorDepth == 16)
-#endif
             systemColorDepth = 32;
-        }
-	    systemColorDepth = 32;
+    }
     // Intialize color tables
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
 	systemRedShift    = 3;
