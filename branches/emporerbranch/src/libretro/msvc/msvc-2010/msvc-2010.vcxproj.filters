@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\libretro">
+      <UniqueIdentifier>{3ed03eb4-3d22-42ca-b2ab-1058e771db27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libretro">
+      <UniqueIdentifier>{01290b17-a062-4772-8a90-1fb347398419}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gba">
+      <UniqueIdentifier>{9553246f-4fb1-41ce-807d-bd3c3dc6f564}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common">
+      <UniqueIdentifier>{d5a23baf-0d6e-4d49-a81e-f1320c3186cc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\NLS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\System.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gba\memory.h">
+      <Filter>Header Files\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gba\GBA.h">
+      <Filter>Header Files\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gba\Globals.h">
+      <Filter>Header Files\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gba\Sound.h">
+      <Filter>Header Files\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libretro\libretro.hpp">
+      <Filter>Header Files\libretro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gba\sound_blargg.h">
+      <Filter>Header Files\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\common\Types.h">
+      <Filter>Header Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\common\Port.h">
+      <Filter>Header Files\common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\libretro.cpp">
+      <Filter>Source Files\libretro</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\sound.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gba.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

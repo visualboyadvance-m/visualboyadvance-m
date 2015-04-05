@@ -1,0 +1,25 @@
+This package was debianized by Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com> on
+Sat, 12 Sep 2009 19:39:52 -0300.
+
+It was downloaded from <svn://vbam.svn.sourceforge.net/svnroot/vbam>
+
+Upstream Author(s):
+
+    VisualBoyAdvance-M team
+
+Copyright:
+
+    Copyright (C) 1999-2006 Forgotten
+    Copyright (C) 2004-2006 VisualBoyAdvance team
+    Copyright (C) 2007-2009 VisualBoyAdvance-M team
+
+License:
+
+    GNU General Public License v2
+
+The Debian packaging is:
+
+    Copyright (C) 2009 Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>
+
+and is licensed under the GPL version 3, 
+see `/usr/share/common-licenses/GPL-3'.
