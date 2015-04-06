@@ -77,19 +77,11 @@ private:
     FilterFunc myFilter;
     //The internal scale
     int myScale;
-    //If the filter even exists
-    bool isGood;
 public:
-    filter(std::string myName): name(myName)
+    filter(std::string myName):
+        name(myName), myFilter(filters::GetFilter(myName)), myScale(filters::GetFilterScale(myName))
     {
-        myFilter=filters::GetFilter(myName);
-        myScale=filters::GetFilterScale(myName);
-        if (myFilter==NULL)
-            isGood = false;
-        else
-            isGood = true;
-            
-            //std::cerr << myName << std::endl;
+        //std::cerr << Name << std::endl;
     }
     
     std::string getName()
@@ -104,7 +96,8 @@ public:
     
     void run(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int width, int height)
     {
-        if(isGood)
+        //std::cerr << name <<":  srcPitch:  "<<srcPitch<<" dstPitch:  "<<dstPitch<<" width: "<<width<<" height: "<<height<< std::endl;
+        if(myFilter!=NULL)
         {
             myFilter(srcPtr,srcPitch,deltaPtr,dstPtr,dstPitch,width,height);
         }
@@ -116,7 +109,10 @@ public:
     
     bool exists()
     {
-        return isGood;
+        if (myFilter==NULL)
+            return false;
+        else
+            return true;
     }
 };
 
