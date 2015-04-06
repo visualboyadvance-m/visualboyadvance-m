@@ -123,8 +123,9 @@ BEGIN
     COMBOBOX        IDC_LINK_MODE,50,8,194,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Link timeout (in milliseconds)",IDC_STATIC_TIMEOUT,11,153,92,12
     EDITTEXT        IDC_LINKTIMEOUT,111,150,53,14,ES_AUTOHSCROLL | ES_NUMBER
-	CONTROL         "Auto-start link (single computer only)", IDC_AUTOLINK, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 11, 165, 138, 12
-	LTEXT           "Server IP address or hostname:", IDC_STATIC, 25, 70, 75, 18
+    CONTROL         "Auto-start link (single computer only)",IDC_AUTOLINK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,165,138,12
+    LTEXT           "Server IP address or hostname:",IDC_STATIC,25,70,75,18
     EDITTEXT        IDC_SERVERIP,114,73,105,12,ES_AUTOHSCROLL | WS_GROUP
     LTEXT           "Expected number of players:",IDC_STATIC,25,94,89,10
     CONTROL         "2",IDC_LINK2P,"Button",BS_AUTORADIOBUTTON | WS_GROUP,53,106,21,13
@@ -169,7 +170,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,90,102,50,14,WS_GROUP
 END
 
-IDD_ABOUT DIALOGEX 0, 0, 179, 153
+IDD_ABOUT DIALOGEX 0, 0, 179, 164
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "About"
@@ -178,14 +179,14 @@ BEGIN
     ICON            IDI_MAINICON,IDC_STATIC,6,6,20,20
     CTEXT           "VisualBoyAdvance-M Emulator",IDC_STATIC,36,6,138,8
     CTEXT           "Copyright © 2008 VBA-M development team",IDC_STATIC,6,48,168,8
-    CTEXT           "http://vba-m.com",IDC_URL,7,138,168,8
+    CTEXT           "http://vba-m.com",IDC_URL,7,149,168,8
     RTEXT           "Version:",IDC_STATIC,36,18,54,8
     LTEXT           "",IDC_VERSION,96,18,78,8,SS_NOPREFIX
-    GROUPBOX        "VBA-M dev team:",IDC_STATIC,7,65,90,69
-    CTEXT           "mudlord\nNach\nJonas Quinn\nDJRobX\nSpacy\nSquall Leonhart\nNormmatt",IDC_STATIC,15,73,76,56
+    GROUPBOX        "VBA-M dev team:",IDC_STATIC,7,65,90,84
+    CTEXT           "mudlord\nNach\nJonas Quinn\nDJRobX\nSpacy\nSquall Leonhart\nNormmatt\nTheCanadianBacon\nSkidau",IDC_STATIC,15,73,76,72
     RTEXT           "Date compiled:",IDC_STATIC,36,30,54,8
     LTEXT           "",IDC_DATE,96,30,78,8,SS_NOPREFIX
-    GROUPBOX        "Thanks go to:",IDC_STATIC,100,65,72,69
+    GROUPBOX        "Thanks go to:",IDC_STATIC,100,65,72,84
     CTEXT           "blargg\nCostis\nchrono\nxKiv\nbgK\nOrig. VBA team",IDC_STATIC,108,77,55,49
 END
 
@@ -1194,8 +1195,8 @@ BEGIN
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 172
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 146
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 157
     END
 
     IDD_DIRECTORIES, DIALOG
@@ -1332,14 +1333,6 @@ BEGIN
         RIGHTMARGIN, 373
         TOPMARGIN, 7
         BOTTOMMARGIN, 171
-    END
-
-    IDD_OAM_VIEW, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 227
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 178
     END
 
     IDD_ACCEL_EDITOR, DIALOG
@@ -1521,8 +1514,9 @@ BEGIN
     IDD_OAM_VIEW, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 347
+        RIGHTMARGIN, 227
         TOPMARGIN, 7
+        BOTTOMMARGIN, 178
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -1581,7 +1575,7 @@ BEGIN
         MENUITEM "Open GBC...",                 ID_FILE_OPEN_GBC
         MENUITEM "Open GB...",                  ID_FILE_OPEN_GB
         MENUITEM "Close",                       ID_FILE_CLOSE
-		MENUITEM SEPARATOR
+        MENUITEM SEPARATOR
         MENUITEM "&Link with...",               ID_OPTIONS_LINK_OPTIONS
         MENUITEM SEPARATOR
         POPUP "Recent"
@@ -1630,10 +1624,10 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Pause",                       ID_FILE_PAUSE
         MENUITEM "Reset",                       ID_FILE_RESET
-		MENUITEM SEPARATOR
-		MENUITEM "Load e-Reader Dot Code...", ID_FILE_LOAD_DOTCODE
-		MENUITEM "Save e-Reader Dot Code...", ID_FILE_SAVE_DOTCODE
-		MENUITEM SEPARATOR
+        MENUITEM SEPARATOR
+        MENUITEM "Load e-Reader Dot Code...",   ID_FILE_LOAD_DOTCODE
+        MENUITEM "Save e-Reader Dot Code...",   ID_FILE_SAVE_DOTCODE
+        MENUITEM SEPARATOR
         POPUP "Import"
         BEGIN
             MENUITEM "&Battery file...",            ID_FILE_IMPORT_BATTERYFILE
@@ -1856,7 +1850,7 @@ BEGIN
             MENUITEM "Auto-apply IPS/UPS/PPF",      ID_OPTIONS_EMULATOR_AUTOMATICALLYAPPLYPATCHFILES
             MENUITEM "Pause when inactive",         ID_OPTIONS_EMULATOR_PAUSEWHENINACTIVE
             MENUITEM "AGB Print",                   ID_OPTIONS_EMULATOR_AGBPRINT
-			MENUITEM "E-Reader",					ID_OPTIONS_EMULATOR_EREADER
+            MENUITEM "E-Reader",                    ID_OPTIONS_EMULATOR_EREADER
             MENUITEM "Real Time Clock",             ID_OPTIONS_EMULATOR_REALTIMECLOCK
             MENUITEM "&Game Overrides...",          ID_OPTIONS_EMULATOR_GAMEOVERRIDES
             POPUP "Show speed"
@@ -1940,8 +1934,8 @@ BEGIN
         BEGIN
             MENUITEM "Break into GDB",              ID_TOOLS_DEBUG_BREAK
             MENUITEM "Disconnect",                  ID_TOOLS_DEBUG_DISCONNECT
-			MENUITEM "Break on load",				ID_TOOLS_DEBUG_BREAKONLOAD
-			MENUITEM "Configure port...",			ID_TOOLS_DEBUG_CONFIGUREPORT
+            MENUITEM "Break on load",               ID_TOOLS_DEBUG_BREAKONLOAD
+            MENUITEM "Configure port...",           ID_TOOLS_DEBUG_CONFIGUREPORT
         END
         MENUITEM SEPARATOR
         POPUP "Record"
