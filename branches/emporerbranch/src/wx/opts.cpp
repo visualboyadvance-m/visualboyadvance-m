@@ -133,10 +133,7 @@ opt_desc opts[] = {
 #ifdef MMX
     BOOLOPT("Display/EnableMMX", wxTRANSLATE("Enable MMX"), gopts.cpu_mmx),
 #endif
-    ENUMOPT("Display/Filter", wxTRANSLATE("Full-screen filter to apply"), gopts.filter,
-	    wxTRANSLATE("none|2xsai|super2xsai|supereagle|pixelate|advmame|"
-			"bilinear|bilinearplus|scanlines|tvmode|hq2x|lq2x|"
-			"simple2x|simple3x|hq3x|simple4x|hq4x")),
+    STROPT("Display/Filter", wxTRANSLATE("Full-screen filter to apply"), gopts.filter),
 	STROPT ("Display/FilterPlugin", wxTRANSLATE("Filter plugin library"), gopts.filter_plugin),
     BOOLOPT("Display/Fullscreen", wxTRANSLATE("Enter fullscreen mode at startup"), gopts.fullscreen),
     INTOPT ("Display/FullscreenDepth", wxTRANSLATE("Fullscreen mode color depth (0 = any)"), gopts.fs_mode.bpp, 0, 999),

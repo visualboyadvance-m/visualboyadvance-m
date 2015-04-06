@@ -14,7 +14,7 @@ extern struct opts_t {
     bool bilinear;
     bool cpu_mmx;
     bool no_osd_status;
-    int filter;
+    wxString filter;
     int ifb;
     bool fullscreen;
     wxVideoMode fs_mode;
