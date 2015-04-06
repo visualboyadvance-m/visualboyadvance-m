@@ -54,29 +54,26 @@ void SmartIB::run(u8 *srcPtr, int starty, int height)
     u32 *src1 = (u32 *)frm1 + starty * width;
     u32 *src2 = (u32 *)frm2 + starty * width;
     u32 *src3 = (u32 *)frm3 + starty * width;
-
-  u32 colorMask = 0xfefefe;
-
-  int pos = 0;
-
-  for (int j = 0; j < height;  j++)
-    for (int i = 0; i < width; i++) {
-      u32 color = src0[pos];
-      src0[pos] =
-        (src1[pos] != src2[pos]) &&
-        (src3[pos] != color) &&
-        ((color == src2[pos]) || (src1[pos] == src3[pos]))
-        ? (((color & colorMask) >> 1) + ((src1[pos] & colorMask) >> 1)) :
-        color;
-      src3[pos] = color; /* oldest buffer now holds newest frame */
-      pos++;
+    
+    u32 colorMask = 0xfefefe;
+    
+    for (int i = 0; i < width*height;  i++)
+    {
+        u32 color = src0[i];
+        src0[i] =
+            (src1[i] != src2[i]) &&
+            (src3[i] != color) &&
+            ((color == src2[i]) || (src1[i] == src3[i]))
+                ? (((color & colorMask) >> 1) + ((src1[i] & colorMask) >> 1)) :
+                color;
+        src3[i] = color; /* oldest buffer now holds newest frame */
     }
 
-  /* Swap buffers around */
-  u8 *temp = frm1;
-  frm1 = frm3;
-  frm3 = frm2;
-  frm2 = temp;
+    /* Swap buffers around */
+    u8 *temp = frm1;
+    frm1 = frm3;
+    frm3 = frm2;
+    frm2 = temp;
 }
 
 
@@ -113,14 +110,11 @@ void MotionBlurIB::run(u8 *srcPtr, int starty, int height)
 
     u32 colorMask = 0xfefefe;
 
-    int pos = 0;
-
-    for (int j = 0; j < height;  j++)
-        for (int i = 0; i < width; i++) {
-            u32 color = src0[pos];
-            src0[pos] = (((color & colorMask) >> 1) +
-                   ((src1[pos] & colorMask) >> 1));
-            src1[pos] = color;
-            pos++;
-        }
+    for (int i = 0; i < width*height;  i++)
+    {
+        u32 color = src0[i];
+        src0[i] = (((color & colorMask) >> 1) +
+                  ((src1[i] & colorMask) >> 1));
+        src1[i] = color;
+    }
 }
