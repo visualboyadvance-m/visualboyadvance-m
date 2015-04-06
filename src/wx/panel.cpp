@@ -303,20 +303,20 @@ void GameArea::LoadGame(const wxString &name)
     cheats_dirty = (did_autoload && !skipSaveGameCheats) ||
 	(loaded == IMAGE_GB ? gbCheatNumber > 0 : cheatsNumber > 0);
     if(gopts.autoload_cheats && (!did_autoload || skipSaveGameCheats)) {
-	wxFileName cfn = loaded_game;
-	// SetExt may strip something off by accident, so append to text instead
-	cfn.SetFullName(cfn.GetFullName() + wxT(".clt"));
-	if(cfn.IsFileReadable()) {
-	    bool cld;
-	    if(loaded == IMAGE_GB)
-		cld = gbCheatsLoadCheatList(cfn.GetFullPath().mb_fn_str());
-	    else
-		cld = cheatsLoadCheatList(cfn.GetFullPath().mb_fn_str());
-	    if(cld) {
-		systemScreenMessage(_("Loaded cheats"));
-		cheats_dirty = false;
-	    }
-	}
+        wxFileName cfn = loaded_game;
+        // SetExt may strip something off by accident, so append to text instead
+        cfn.SetFullName(cfn.GetFullName() + wxT(".clt"));
+            if(cfn.IsFileReadable()) {
+                bool cld;
+                if(loaded == IMAGE_GB)
+                    cld = gbCheatsLoadCheatList(cfn.GetFullPath().mb_fn_str());
+                else
+                    cld = cheatsLoadCheatList(cfn.GetFullPath().mb_fn_str());
+                if(cld) {
+                    systemScreenMessage(_("Loaded cheats"));
+                    cheats_dirty = false;
+                }
+            }
     }
 }
 
