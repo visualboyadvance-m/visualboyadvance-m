@@ -28,6 +28,7 @@
 #include "../gba/Cheats.h"
 
 #include "../filters/filters.hpp"
+#include "../filters/interframe.hpp"
 
 template <typename T>
 void CheckPointer(T pointer)
