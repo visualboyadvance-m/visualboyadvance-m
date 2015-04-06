@@ -1387,7 +1387,6 @@ EVT_HANDLER_MASK(Rewind, "Rewind", CMDEN_REWIND)
     }
     panel->emusys->emuReadMemState(&panel->rewind_mem[rew_st * REWIND_SIZE],
 				   REWIND_SIZE);
-    InterframeCleanup();
     // FIXME: if(paused) blank screen
     panel->do_rewind = false;
     panel->rewind_time = gopts.rewind_interval * 6;
