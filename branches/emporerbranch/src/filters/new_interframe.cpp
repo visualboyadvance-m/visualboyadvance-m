@@ -45,19 +45,24 @@ SmartIB::~SmartIB()
   frm1 = frm2 = frm3 = NULL;
 }
 
-void SmartIB::run(u8 *srcPtr, int starty, int height)
+void SmartIB::run(u8 *srcPtr, unsigned int num_threads,unsigned int thread_number)
 {
     //Actual width needs to take into account the +1 border
     unsigned int width = getWidth() +1;
+    
+    //Height to process (for multithreading)
+    unsigned int band_height = getHeight() / num_threads;
+    //First pixel to operate on (for multithreading)
+    u32 offset = band_height * thread_number * width;
 
-    u32 *src0 = (u32 *)srcPtr + starty * width;
-    u32 *src1 = (u32 *)frm1 + starty * width;
-    u32 *src2 = (u32 *)frm2 + starty * width;
-    u32 *src3 = (u32 *)frm3 + starty * width;
+    u32 *src0 = reinterpret_cast<u32 *>(srcPtr) + offset;
+    u32 *src1 = reinterpret_cast<u32 *>(frm1) + offset;
+    u32 *src2 = reinterpret_cast<u32 *>(frm2) + offset;
+    u32 *src3 = reinterpret_cast<u32 *>(frm3) + offset;
     
     u32 colorMask = 0xfefefe;
     
-    for (int i = 0; i < width*height;  i++)
+    for (int i = 0; i < width*band_height;  i++)
     {
         u32 color = src0[i];
         src0[i] =
@@ -100,17 +105,23 @@ MotionBlurIB::~MotionBlurIB()
   frm1 = frm2 = frm3 = NULL;
 }
 
-void MotionBlurIB::run(u8 *srcPtr, int starty, int height)
+void MotionBlurIB::run(u8 *srcPtr, unsigned int num_threads,unsigned int thread_number)
 {
     //Actual width needs to take into account the +1 border
     unsigned int width = getWidth() +1;
+    
+    //Height to process (for multithreading)
+    unsigned int band_height = getHeight() / num_threads;
+    
+    //First pixel to operate on (for multithreading)
+    u32 offset = band_height * thread_number * width;
 
-    u32 *src0 = (u32 *)srcPtr + starty * width;
-    u32 *src1 = (u32 *)frm1 + starty * width;
+    u32 *src0 = reinterpret_cast<u32 *>(srcPtr) + offset;
+    u32 *src1 = reinterpret_cast<u32 *>(frm1) + offset;
 
     u32 colorMask = 0xfefefe;
 
-    for (int i = 0; i < width*height;  i++)
+    for (int i = 0; i < width*band_height;  i++)
     {
         u32 color = src0[i];
         src0[i] = (((color & colorMask) >> 1) +
