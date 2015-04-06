@@ -21,6 +21,7 @@ void interframe_filter::setWidth(unsigned int _width)
 
 }
 
+
 SmartIB::SmartIB()
 {
   frm1 = (u8 *)calloc(322*242,4);
@@ -46,34 +47,20 @@ SmartIB::~SmartIB()
 
 void SmartIB::run(u8 *srcPtr, int starty, int height)
 {
-    if(!getWidth())
-    {
-            throw std::runtime_error("ERROR:  Filter width not set");
-    }
-    run(srcPtr, get_horiz_bytes(), getWidth(), starty, height);
-}
+    //Actual width needs to take into account the +1 border
+    unsigned int width = getWidth() +1;
 
-void SmartIB::run(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
-{
-    setWidth(width);
-    //Make sure the math was correct
-    if( (srcPitch != get_horiz_bytes()) )
-    {
-        throw std::runtime_error("ERROR:  Filter programmer is an idiot, and messed up an important calculation!");
-    }
-
-  u32 *src0 = (u32 *)srcPtr + starty * srcPitch / 4;
-  u32 *src1 = (u32 *)frm1 + starty * srcPitch / 4;
-  u32 *src2 = (u32 *)frm2 + starty * srcPitch / 4;
-  u32 *src3 = (u32 *)frm3 + starty * srcPitch / 4;
+    u32 *src0 = (u32 *)srcPtr + starty * width;
+    u32 *src1 = (u32 *)frm1 + starty * width;
+    u32 *src2 = (u32 *)frm2 + starty * width;
+    u32 *src3 = (u32 *)frm3 + starty * width;
 
   u32 colorMask = 0xfefefe;
 
-  int sPitch = srcPitch >> 2;
   int pos = 0;
 
   for (int j = 0; j < height;  j++)
-    for (int i = 0; i < sPitch; i++) {
+    for (int i = 0; i < width; i++) {
       u32 color = src0[pos];
       src0[pos] =
         (src1[pos] != src2[pos]) &&
@@ -118,36 +105,22 @@ MotionBlurIB::~MotionBlurIB()
 
 void MotionBlurIB::run(u8 *srcPtr, int starty, int height)
 {
-    if(!getWidth())
-    {
-            throw std::runtime_error("ERROR:  Filter width not set");
-    }
-    run(srcPtr, get_horiz_bytes(), getWidth(), starty, height);
-}
+    //Actual width needs to take into account the +1 border
+    unsigned int width = getWidth() +1;
 
-void MotionBlurIB::run(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
-{
-    setWidth(width);
-    //Make sure the math was correct
-    if( (srcPitch != get_horiz_bytes()) )
-    {
-        throw std::runtime_error("ERROR:  Filter programmer is an idiot, and messed up an important calculation!");
-    }
+    u32 *src0 = (u32 *)srcPtr + starty * width;
+    u32 *src1 = (u32 *)frm1 + starty * width;
 
-  u32 *src0 = (u32 *)srcPtr + starty * srcPitch / 4;
-  u32 *src1 = (u32 *)frm1 + starty * srcPitch / 4;
+    u32 colorMask = 0xfefefe;
 
-  u32 colorMask = 0xfefefe;
+    int pos = 0;
 
-  int sPitch = srcPitch >> 2;
-  int pos = 0;
-
-  for (int j = 0; j < height;  j++)
-    for (int i = 0; i < sPitch; i++) {
-      u32 color = src0[pos];
-      src0[pos] = (((color & colorMask) >> 1) +
+    for (int j = 0; j < height;  j++)
+        for (int i = 0; i < width; i++) {
+            u32 color = src0[pos];
+            src0[pos] = (((color & colorMask) >> 1) +
                    ((src1[pos] & colorMask) >> 1));
-      src1[pos] = color;
-      pos++;
-    }
+            src1[pos] = color;
+            pos++;
+        }
 }

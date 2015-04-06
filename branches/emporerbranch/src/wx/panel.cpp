@@ -1007,6 +1007,7 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
     scale = myFilter->getScale();
     myFilter->setWidth(width);
     iFilter->setWidth(width);
+    iFilter->setHeight(height);
     
     std::cerr << "width: " << width << " Height:  " << height << std::endl;
 #define out_16 (systemColorDepth == 16)
@@ -1123,7 +1124,7 @@ public:
             }
             
             //Run the interframe blending filter
-            iFilter->run(src, horiz_bytes, width, band_lower, band_height);
+            iFilter->run(src, band_lower, band_height);
             
             if(!mainFilter->exists()) {
                 if(nthreads == 1)
