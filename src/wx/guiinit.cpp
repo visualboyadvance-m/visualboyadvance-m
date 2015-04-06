@@ -450,77 +450,88 @@ public:
 	    // It might be safest to only support desc edits, and force the
 	    // user to re-enter codes to change them
 	    int ncodes = isgb ? gbCheatNumber : cheatsNumber;
-	    if(ncodes > id + 1) {
-		wxString codes[ncodes - id - 1];
-		wxString descs[ncodes - id - 1];
-		bool checked[ncodes - id - 1];
-		bool v3[ncodes - id - 1];
-		for(int i = id + 1; i < ncodes; i++) {
-		    codes[i - id - 1] = wxString(isgb ?
-						 gbCheatList[i].cheatCode :
-						 cheatsList[i].codestring,
-						 wxConvLibc);
-		    descs[i - id - 1] = wxString(isgb ?
-						 gbCheatList[i].cheatDesc :
-						 cheatsList[i].desc,
-						 wxConvUTF8);
-		    checked[i - id - 1] = isgb ? gbCheatList[i].enabled :
-			                         cheatsList[i].enabled;
-		    v3[i - id - 1] = isgb ? false : cheatsList[i].code == 257;
-		}
-		for(int i = ncodes - 1; i >= id; i--) {
-		    list->DeleteItem(i);
-		    if(isgb)
-			gbCheatRemove(i);
-		    else
-			cheatsDelete(i, cheatsList[i].enabled);
-		}
-		AddCheat();
-		if(!ochecked) {
-		    if(isgb)
-			gbCheatDisable(id);
-		    else
-			cheatsDisable(id);
-		}
-		for(int i = id + 1; i < ncodes; i++) {
-		    ce_codes = codes[i - id - 1];
-		    ce_desc = descs[i - id - 1];
-		    if(isgb) {
-			if(ce_codes.find(wxT('-')) == wxString::npos)
-			    ce_type = 0;
-			else
-			    ce_type = 1;
-		    } else {
-			if(ce_codes.find(wxT(':')) != wxString::npos)
-			    ce_type = 0;
-			else if(ce_codes.find(wxT(' ')) == wxString::npos) {
-			    ce_type = 1;
-			    if(v3[i - id - 1])
-				ce_codes.insert(8, 1, wxT(' '));
-			} else
-			    ce_type = 2;
-		    }
-		    AddCheat();
-		    if(!checked[i - id - 1]) {
-			if(isgb)
-			    gbCheatDisable(i);
-			else
-			    cheatsDisable(i);
-		    }
-		}
-	    } else {
-		list->DeleteItem(id);
-		if(isgb)
-		    gbCheatRemove(id);
-		else
-		    cheatsDelete(id, cheatsList[id].enabled);
-		AddCheat();
-		if(!ochecked) {
-		    if(isgb)
-			gbCheatDisable(id);
-		    else
-			cheatsDisable(id);
-		}
+	    if(ncodes > id + 1)
+	    {
+            std::vector<wxString> codes;
+            std::vector<wxString> descs;
+            bool checked[ncodes - id - 1];
+            bool v3[ncodes - id - 1];
+            for(int i = id + 1; i < ncodes; i++) {
+                codes[i - id - 1] = wxString(isgb ?
+                            gbCheatList[i].cheatCode :
+                            cheatsList[i].codestring,
+                            wxConvLibc);
+                descs[i - id - 1] = wxString(isgb ?
+                            gbCheatList[i].cheatDesc :
+                            cheatsList[i].desc,
+                            wxConvUTF8);
+                checked[i - id - 1] = isgb ? gbCheatList[i].enabled :
+                                        cheatsList[i].enabled;
+                v3[i - id - 1] = isgb ? false : cheatsList[i].code == 257;
+            }
+            for(int i = ncodes - 1; i >= id; i--) {
+                list->DeleteItem(i);
+                if(isgb)
+                    gbCheatRemove(i);
+                else
+                    cheatsDelete(i, cheatsList[i].enabled);
+            }
+            AddCheat();
+            if(!ochecked) {
+                if(isgb)
+                    gbCheatDisable(id);
+                else
+                    cheatsDisable(id);
+            }
+            for(int i = id + 1; i < ncodes; i++) {
+                ce_codes = codes[i - id - 1];
+                ce_desc = descs[i - id - 1];
+                if(isgb)
+                {
+                    if(ce_codes.find(wxT('-')) == wxString::npos)
+                        ce_type = 0;
+                    else
+                        ce_type = 1;
+                }
+                else
+                {
+                    if(ce_codes.find(wxT(':')) != wxString::npos)
+                        ce_type = 0;
+                    else if(ce_codes.find(wxT(' ')) == wxString::npos)
+                    {
+                        ce_type = 1;
+                        if(v3[i - id - 1])
+                        ce_codes.insert(8, 1, wxT(' '));
+                    }
+                    else
+                    {
+                        ce_type = 2;
+                    }
+                }
+                AddCheat();
+                if(!checked[i - id - 1])
+                {
+                    if(isgb)
+                        gbCheatDisable(i);
+                    else
+                        cheatsDisable(i);
+                }
+            }
+        }
+        else
+        {
+            list->DeleteItem(id);
+            if(isgb)
+                gbCheatRemove(id);
+            else
+                cheatsDelete(id, cheatsList[id].enabled);
+            AddCheat();
+            if(!ochecked) {
+                if(isgb)
+                    gbCheatDisable(id);
+                else
+                    cheatsDisable(id);
+            }
 	    }
 	    Reload(id);
 	} else if(ce_desc != odesc) {
@@ -3229,16 +3240,22 @@ void MainFrame::set_global_accels()
 	if(!accels[i].GetMenuItem())
 	    len++;
     if(len) {
-	wxAcceleratorEntry tab[len];
-	for(int i = 0, j = 0; i < accels.size(); i++)
-	    if(!accels[i].GetMenuItem())
-		tab[j++] = accels[i];
-	wxAcceleratorTable atab(len, tab);
-	// set the table on the panel, where focus usually is
-	// otherwise accelerators are lost sometimes
-	panel->SetAcceleratorTable(atab);
-    } else
-	panel->SetAcceleratorTable(wxNullAcceleratorTable);
+        wxAcceleratorEntry * tab = new wxAcceleratorEntry[len];
+        for(int i = 0, j = 0; i < accels.size(); i++)
+        {
+            if(!accels[i].GetMenuItem())
+                tab[j++] = accels[i];
+        }
+        wxAcceleratorTable atab(len, tab);
+        // set the table on the panel, where focus usually is
+        // otherwise accelerators are lost sometimes
+        panel->SetAcceleratorTable(atab);
+        delete tab;
+    }
+    else
+    {
+        panel->SetAcceleratorTable(wxNullAcceleratorTable);
+    }
 
     // save recent accels
     for(int i = 0; i < 10; i++)
