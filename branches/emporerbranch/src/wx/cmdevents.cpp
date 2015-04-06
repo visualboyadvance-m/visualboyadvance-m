@@ -2000,14 +2000,7 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
 
 EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
 {
-	int filt = gopts.filter;
-	if(filt == FF_PLUGIN ||
-		++gopts.filter == FF_PLUGIN && gopts.filter_plugin.empty())
-		{
-			gopts.filter = 0;
-		}
-	update_opts();
-    if(panel->panel) {
+	if(panel->panel) {
 		panel->panel->Delete();
 		panel->panel = NULL;
     }
