@@ -62,7 +62,7 @@ void SmartIB::run(u8 *srcPtr, unsigned int num_threads,unsigned int thread_numbe
     
     u32 colorMask = 0xfefefe;
     
-    for (int i = 0; i < width*band_height;  i++)
+    for (unsigned int i = 0; i < width*band_height;  i++)
     {
         u32 color = src0[i];
         src0[i] =
@@ -121,7 +121,7 @@ void MotionBlurIB::run(u8 *srcPtr, unsigned int num_threads,unsigned int thread_
 
     u32 colorMask = 0xfefefe;
 
-    for (int i = 0; i < width*band_height;  i++)
+    for (unsigned int i = 0; i < width*band_height;  i++)
     {
         u32 color = src0[i];
         src0[i] = (((color & colorMask) >> 1) +

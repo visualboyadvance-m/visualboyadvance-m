@@ -13,13 +13,6 @@
 // Function pointer type for a filter function
 typedef void(*FilterFunc)(u8*, u32, u8*, u8*, u32, int, int);
 
-//WX
-
-enum ifbfunc {
-    // this order must match order of option enum and selector widget
-    IFB_NONE, IFB_SMART, IFB_MOTION_BLUR
-};
-
 typedef std::pair<FilterFunc,FilterFunc> filterpair;
 typedef std::pair<std::string,filterpair> namedfilter;
 
