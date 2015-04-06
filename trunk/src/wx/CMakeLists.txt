@@ -33,7 +33,7 @@ endif(ENABLE_OPENAL)
 # adv is for wxAboutBox
 # xml, html is for xrc
 SET( wxWidgets_USE_LIBS xrc xml html adv gl net core base )
-list(APPEND wxWidgets_CONFIG_OPTIONS --version=2.8)
+#list(APPEND wxWidgets_CONFIG_OPTIONS --version=2.8)
 FIND_PACKAGE ( wxWidgets REQUIRED )
 #EXECUTE_PROCESS(COMMAND sh "${wxWidgets_CONFIG_EXECUTABLE}" --cxxflags)
 INCLUDE( ${wxWidgets_USE_FILE} )
