@@ -49,9 +49,9 @@ public:
 class SmartIB : public interframe_filter
 {
 private:
-    u8 *frm1 = NULL;
-    u8 *frm2 = NULL;
-    u8 *frm3 = NULL;
+    u32 *frm1 = NULL;
+    u32 *frm2 = NULL;
+    u32 *frm3 = NULL;
 public:
     SmartIB();
     ~SmartIB();
@@ -62,9 +62,9 @@ public:
 class MotionBlurIB : public interframe_filter
 {
 private:
-    u8 *frm1 = NULL;
-    u8 *frm2 = NULL;
-    u8 *frm3 = NULL;
+    u32 *frm1 = NULL;
+    u32 *frm2 = NULL;
+    u32 *frm3 = NULL;
 public:
     MotionBlurIB();
     ~MotionBlurIB();
