@@ -27,6 +27,8 @@
 #include "../gb/gbCheats.h"
 #include "../gba/Cheats.h"
 
+#include "../filters/filters.hpp"
+
 template <typename T>
 void CheckPointer(T pointer)
 {
@@ -485,6 +487,7 @@ public:
 protected:
     virtual void DrawArea(wxWindowDC&) = 0;
     virtual void DrawOSD(wxWindowDC&);
+    filter * myFilter = NULL;
     int width, height, scale;
     u8 *todraw;
     u8 *pixbuf1, *pixbuf2;
@@ -585,7 +588,5 @@ extern int joypress[4], autofire;
 #define KEYM_MOTION_DOWN  (1<<16)
 #define KEYM_MOTION_LEFT  (1<<17)
 #define KEYM_MOTION_RIGHT (1<<18)
-
-#include "../filters/filters.hpp"
 
 #endif /* WX_WXVBAM_H */
