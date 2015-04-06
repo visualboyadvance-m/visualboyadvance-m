@@ -18,8 +18,6 @@
 
 #include "filters.h"
 
-#include "../filters/filters.hpp"
-
       //
       // Screen filters
       //

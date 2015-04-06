@@ -21,8 +21,8 @@
 #define __VBA_FILTERS_H__
 
 #include "../System.h"
-
 #include "../filters/filters.hpp"
+#include "../filters/interframe.hpp"
 
 namespace VBA
 {
