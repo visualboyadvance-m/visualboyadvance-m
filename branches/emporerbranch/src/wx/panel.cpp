@@ -992,6 +992,9 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
     myFilter = new filter(std::string(gopts.filter.mb_str(wxConvUTF8)));
     
     scale = myFilter->getScale();
+    myFilter->setWidth(width);
+    
+    std::cerr << "width: " << width << " Height:  " << height << std::endl;
 #define out_16 (systemColorDepth == 16)
     systemColorDepth = 32;
     
@@ -1076,18 +1079,19 @@ public:
         // threadno == -1 means just do a dummy round on the border line
         int band_lower = band_height * threadno;
         
-        //The number of bytes per pixel, as determined by the systemColorDepth
-        int bytes_per_pixel = systemColorDepth/8;
+        //The number of bytes for each 32 bit pixel
+        int bytes_per_pixel = 4;
 
-        int inrb = systemColorDepth == 16 ? 2 : systemColorDepth == 24 ? 0 : 1;
-        int instride = (width + inrb) * bytes_per_pixel;
+        //This is the number of bytes per single horizontal line
+        //The +1 is for a 1 pixel border
+        int horiz_bytes = (width + 1) * bytes_per_pixel;
+        
+        //Unfortunately, the filter keeps the border on the scaled output, but DOES NOT scale it
+        int horiz_bytes_out = width * bytes_per_pixel * scale + bytes_per_pixel;
 
-        int outrb = systemColorDepth == 24 ? 0 : 4;
-        int outstride = width * bytes_per_pixel * scale + outrb;
-
-        delta += instride * band_lower;
+        delta += horiz_bytes * band_lower;
         // + 1 for stupid top border
-        dst += outstride * (band_lower + 1) * scale;
+        dst += horiz_bytes_out * (band_lower + 1) * scale;
 
         while(nthreads == 1 || sig.Wait() == wxCOND_NO_ERROR) {
             if(!src /* && nthreads > 1 */ ) {
@@ -1095,7 +1099,7 @@ public:
                 return 0;
             }
             // + 1 for stupid top border
-            src += instride;
+            src += horiz_bytes;
             // interframe blending filter
             // definitely not thread safe by default
             // added band_lower param to provide offset into accum buffers
@@ -1103,16 +1107,16 @@ public:
                 switch(gopts.ifb) {
                     case IFB_SMART:
                         if(systemColorDepth == 16)
-                            SmartIB(src, instride, width, band_lower, band_height);
+                            SmartIB(src, horiz_bytes, width, band_lower, band_height);
                         else
-                            SmartIB32(src, instride, width, band_lower, band_height);
+                            SmartIB32(src, horiz_bytes, width, band_lower, band_height);
                         break;
                     case IFB_MOTION_BLUR:
-		    // FIXME: if(renderer == d3d/gl && filter == NONE) break;
+                        // FIXME: if(renderer == d3d/gl && filter == NONE) break;
                         if(systemColorDepth == 16)
-                            MotionBlurIB(src, instride, width, band_lower, band_height);
+                            MotionBlurIB(src, horiz_bytes, width, band_lower, band_height);
                         else
-                            MotionBlurIB32(src, instride, width, band_lower, band_height);
+                            MotionBlurIB32(src, horiz_bytes, width, band_lower, band_height);
                         break;
                 }
             }
@@ -1129,11 +1133,11 @@ public:
                 continue;
             }
 
-            src += instride * band_lower;
+            src += horiz_bytes * band_lower;
 
             // naturally, any of these with accumulation buffers like those of
             // the IFB filters will screw up royally as well
-            mainFilter->run(src, instride, delta, dst, outstride, width, band_height);
+            mainFilter->run(src, delta, dst, band_height);
             
 			if(nthreads == 1)
 				return 0;
