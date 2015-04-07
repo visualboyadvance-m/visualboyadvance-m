@@ -39,6 +39,7 @@ public:
     
     //New smarter Interframe function
     virtual void run(u8 *srcPtr, unsigned int num_threads=1,unsigned int thread_number=0) {}
+    virtual bool exists() {return false;}
 };
 
 
@@ -49,27 +50,29 @@ public:
 class SmartIB : public interframe_filter
 {
 private:
-    u32 *frm1 = NULL;
-    u32 *frm2 = NULL;
-    u32 *frm3 = NULL;
+    u32 *frm1;
+    u32 *frm2;
+    u32 *frm3;
 public:
     SmartIB();
     ~SmartIB();
     std::string getName() {return "SmartIB";}
     void run(u8 *srcPtr, unsigned int num_threads=1,unsigned int thread_number=0);
+    bool exists() {return true;}
 };
 
 class MotionBlurIB : public interframe_filter
 {
 private:
-    u32 *frm1 = NULL;
-    u32 *frm2 = NULL;
-    u32 *frm3 = NULL;
+    u32 *frm1;
+    u32 *frm2;
+    u32 *frm3;
 public:
     MotionBlurIB();
     ~MotionBlurIB();
     std::string getName() {return "MotionBlurIB";}
     void run(u8 *srcPtr, unsigned int num_threads=1,unsigned int thread_number=0);
+    bool exists() {return true;}
 };
 
 //WX
