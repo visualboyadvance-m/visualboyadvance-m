@@ -126,7 +126,7 @@
   
 #include "../System.h"
 #include "GBA.h"
-#include "../Common/Port.h"
+#include "../common/Port.h"
 
 #include <string>
 #include <map>
