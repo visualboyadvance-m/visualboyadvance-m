@@ -2656,17 +2656,13 @@
                     <item>Bilinear Plus</item>
                     <item>Scanlines</item>
                     <item>TV Mode</item>
-                    <item>HQ2x</item>
-                    <item>LQ2x</item>
-                    <item>Simple 2X</item>
+                    <item>HQ 2x</item>
+                    <item>LQ 2x</item>
+                    <item>Simple 2x</item>
                     <item>Simple 3x</item>
                     <item>HQ 3x</item>
                     <item>Simple 4x</item>
                     <item>HQ 4x</item>
-					<item>XBR 2x (note: Not available yet)</item>
-					<item>XBR 3x (note: Not available yet)</item>
-					<item>XBR 4x (note: Not available yet)</item>
-					<item>XBR 5x (note: Not available yet)</item>
                   </content>
                 </object>
 				<flag>wxALL|wxEXPAND</flag>
