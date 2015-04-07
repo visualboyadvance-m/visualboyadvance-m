@@ -31,6 +31,9 @@ if(ENABLE_MMX)
   ADD_DEFINITIONS (-DMMX)
 endif(ENABLE_MMX)
 
+if ( WIN32 )
+set(CMAKE_EXE_LINKER_FLAGS "-static")
+endif ( WIN32 )
 # The SDL port can't be built without debugging support
 if( NOT ENABLE_DEBUGGER AND ENABLE_SDL )
         message( SEND_ERROR "The SDL port can't be built without debugging support" )
@@ -182,7 +185,7 @@ SET( CMAKE_C_FLAGS_DEBUG "-g -Wall")
 SET( CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
 
 add_subdirectory (fex)
-
+SET( CMAKE_CXX_FLAGS -std=c++11 )
 SET(SRC_MAIN
     src/Util.cpp
     src/common/Patch.cpp
@@ -254,6 +257,11 @@ SET(SRC_SDL
     src/sdl/exprNode.cpp
     src/sdl/expr-lex.cpp
 )
+
+#Do not use this file directly.  Always use the top level CMakeLists.txt file
+#File extractors so the user doesn't have to extract the rom before playing it
+
+# Source files definition
 
 SET(SRC_FILTERS
     src/filters/filters.cpp
