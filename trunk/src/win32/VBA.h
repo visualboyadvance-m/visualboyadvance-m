@@ -111,7 +111,6 @@ class VBA : public CWinApp
   bool recentFreeze;
   bool autoSaveLoadCheatList;
   FILE *winout;
-  bool removeIntros;
   bool autoPatch;
   int winGbBorderOn;
   int winFlashSize;

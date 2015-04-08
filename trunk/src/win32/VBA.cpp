@@ -25,7 +25,6 @@
 
 #include "../System.h"
 #include "../gba/agbprint.h"
-#include "../gba/ereader.h"
 #include "../gba/cheatSearch.h"
 #include "../gba/GBA.h"
 #include "../gba/Globals.h"
@@ -247,7 +246,6 @@ VBA::VBA()
   recentFreeze = false;
   autoSaveLoadCheatList = true;
   winout = NULL;
-  removeIntros = false;
   autoPatch = true;
   winGbBorderOn = 0;
   winFlashSize = 0x20000;
@@ -1339,8 +1337,6 @@ BOOL VBA::OnIdle(LONG lCount)
       return TRUE; // continue loop
     return !::PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE);
   } else if(emulating && active && !paused) {
-    for(int i = 0; i < 2; i++) { // Why is this loop here?
-	if (!debugger)
       emulator.emuMain(emulator.emuCount);
 
       if(rewindSaveNeeded && rewindMemory && emulator.emuWriteMemState) {
@@ -1356,7 +1352,6 @@ BOOL VBA::OnIdle(LONG lCount)
       }
 
       rewindSaveNeeded = false;
-    }
 
     if(mouseCounter) {
       if(--mouseCounter == 0) {
@@ -1409,10 +1404,6 @@ void VBA::addRecentFile(CString file)
 void VBA::loadSettings()
 {
   CString buffer;
-
-  eReaderEnabled = regQueryDwordValue("eReaderEnabled", 1);
-  if (eReaderEnabled < 0 || eReaderEnabled > 1)
-	  eReaderEnabled = 1;
 
   lastFullscreen = (VIDEO_SIZE)regQueryDwordValue("lastFullscreen", VIDEO_1024x768);
 
@@ -1595,8 +1586,6 @@ void VBA::loadSettings()
   pauseWhenInactive = regQueryDwordValue("pauseWhenInactive", 1) ?
     true : false;
   captureFormat = regQueryDwordValue("captureFormat", 0);
-
-  removeIntros = regQueryDwordValue("removeIntros", false) ? true : false;
 
   recentFreeze = regQueryDwordValue("recentFreeze", false) ? true : false;
 
@@ -2516,8 +2505,6 @@ void VBA::movieReadNext()
 
 void VBA::saveSettings()
 {
-  regSetDwordValue("eReaderEnabled", eReaderEnabled);
-
   regSetDwordValue("language", languageOption);
 
   regSetStringValue("languageName", languageName);
@@ -2604,8 +2591,6 @@ void VBA::saveSettings()
   regSetDwordValue("gbPrinter", winGbPrinterEnabled);
 
   regSetDwordValue("captureFormat", captureFormat);
-
-  regSetDwordValue("removeIntros", removeIntros);
 
   regSetDwordValue("recentFreeze", recentFreeze);
 

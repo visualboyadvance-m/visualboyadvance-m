@@ -8,8 +8,6 @@
 #include "Globals.h"
 #include "ereader.h"
 
-int eReaderEnabled = 1;
-
 char US_Ereader[19] = "CARDE READERPSAE01";
 char JAP_Ereader[19] = "CARDE READERPEAJ01";
 char JAP_Ereader_plus[19] = "CARDEREADER+PSAJ01";
