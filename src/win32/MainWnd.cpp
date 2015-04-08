@@ -170,8 +170,6 @@ BEGIN_MESSAGE_MAP(MainWnd, CWnd)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_AUTOMATICALLYAPPLYPATCHFILES, OnUpdateOptionsEmulatorAutomaticallyipspatch)
   ON_COMMAND(ID_OPTIONS_EMULATOR_AGBPRINT, OnOptionsEmulatorAgbprint)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_AGBPRINT, OnUpdateOptionsEmulatorAgbprint)
-  ON_COMMAND(ID_OPTIONS_EMULATOR_EREADER, OnOptionsEmulatorEreader)
-  ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_EREADER, OnUpdateOptionsEmulatorEreader)
   ON_COMMAND(ID_OPTIONS_EMULATOR_REALTIMECLOCK, OnOptionsEmulatorRealtimeclock)
   ON_UPDATE_COMMAND_UI(ID_OPTIONS_EMULATOR_REALTIMECLOCK, OnUpdateOptionsEmulatorRealtimeclock)
   ON_COMMAND(ID_OPTIONS_EMULATOR_REWINDINTERVAL, OnOptionsEmulatorRewindinterval)
@@ -570,11 +568,6 @@ bool MainWnd::FileRun()
       doMirroring (i == 0 ? false : true);
 
     theApp.emulator = GBASystem;
-    /* disabled due to problems
-    if(theApp.removeIntros && rom != NULL) {
-      *((u32 *)rom)= 0xea00002e;
-    }
-    */
 
     if(theApp.autoPatch && !patchName.IsEmpty()) {
       int size = 0x2000000;
