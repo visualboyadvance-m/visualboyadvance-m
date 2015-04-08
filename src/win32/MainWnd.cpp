@@ -544,8 +544,8 @@ bool MainWnd::FileRun()
 					                "rtcEnabled",
                                   -1,
                                   tempName);
-    if(i != (UINT)-1)
-      rtcEnable(i == 0 ? false : true);
+
+    rtcEnable(i == 0 ? false : true);
 
     i = GetPrivateProfileInt(buffer,
                              "flashSize",
@@ -564,8 +564,8 @@ bool MainWnd::FileRun()
                              "mirroringEnabled",
                              -1,
                              tempName);
-    if(i != (UINT)-1)
-      doMirroring (i == 0 ? false : true);
+
+    doMirroring(i == 0 ? false : true);
 
     theApp.emulator = GBASystem;
 

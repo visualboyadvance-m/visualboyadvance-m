@@ -31,7 +31,7 @@ int layerEnable = 0xff00;
 bool speedHack = false;
 int cpuSaveType = 0;
 bool cheatsEnabled = true;
-bool mirroringEnable = false;
+bool mirroringEnable = true;
 bool skipSaveGameBattery = false;
 bool skipSaveGameCheats = false;
 
