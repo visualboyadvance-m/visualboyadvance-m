@@ -1035,8 +1035,9 @@ public:
     wxSemaphore *done;
 
     // Set these params before running
-    unsigned int nthreads, threadno;
-    unsigned int width, height, scale;
+    unsigned int width;
+    // This is the lower height value of the band this thread will process
+    unsigned int band_lower;
     u32 *dst;
     filter_base * mainFilter;
     filter_base * iFilter;
@@ -1047,13 +1048,8 @@ public:
 
     ExitCode Entry()
     {
-    scale = mainFilter->getScale();
-
-	// This is the lower height value of the band this thread will process
-	int band_lower = height * threadno;
-
     //Set the starting location for the destination buffer
-    dst += width * scale * band_lower * scale;
+    dst = GetVerticalOffset(dst,width,band_lower,mainFilter->getScale());
 
 	while(sig.Wait() == wxCOND_NO_ERROR) {
         //If no source, do thread cleanup before exiting
@@ -1069,7 +1065,7 @@ public:
         }
 
         //Set the start of the source pointer to the first pixel of the appropriate height
-        src += width * band_lower;
+        src = GetVerticalOffset(src,width,band_lower);
 
         //Run the interframe blending filter
         iFilter->run(src,buffer);
@@ -1097,10 +1093,8 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
         //Create and initialize the threads
         threads = new FilterThread[nthreads];
         for(int i = 0; i < nthreads; i++) {
-            threads[i].threadno = i;
-            threads[i].nthreads = nthreads;
             threads[i].width = width;
-            threads[i].height = band_height;
+            threads[i].band_lower = band_height * i;
             threads[i].dst = reinterpret_cast<u32 *>(&todraw);
             threads[i].mainFilter=filter_factory::createFilter(ToString(gopts.filter),width,band_height);
             threads[i].iFilter=interframe_factory::createIFB((ifbfunc)gopts.ifb,width,band_height);
@@ -1110,7 +1104,7 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
             threads[i].Run();
         }
         //Set some important variables
-        scale=threads[0].scale;
+        scale=threads[0].mainFilter->getScale();
         isFiltered = threads[0].mainFilter->exists() || threads[0].iFilter->exists();
     }
 
@@ -1131,9 +1125,6 @@ void DrawingPanel::DrawArea(u8 **data)
 
     //The number of bytes per pixel, as determined by the systemColorDepth
     int bytes_per_pixel = systemColorDepth/8;
-    //Used for determining size of the buffer to allocate
-    int horiz_bytes_out = width * bytes_per_pixel * scale;
-
     // First, apply filters, if applicable, in parallel, if enabled
     if(nthreads)
     {
@@ -1149,7 +1140,9 @@ void DrawingPanel::DrawArea(u8 **data)
     else
     {
         //If no filter to copy data to output buffer, do it ourselves
-        memcpy(todraw,*data, horiz_bytes_out*height*scale);
+        memcpy(todraw,*data, bytes_per_pixel*width*height);
+        //If there is no filtering, then we know there is no scaling, but this makes sure
+        scale=1;
     }
 
     // draw OSD text old-style (directly into output buffer)
