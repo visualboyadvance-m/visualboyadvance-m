@@ -1048,34 +1048,33 @@ public:
 
     ExitCode Entry()
     {
+    //Make sure everything is properly initialized
+    if(!mainFilter || !iFilter || !dst || !width)
+    {
+        std::runtime_error("ERROR:  Filter not initialized!");
+        lock.Unlock();
+        return (wxThread::ExitCode) -1;
+    }
     //Set the starting location for the destination buffer
     dst = GetVerticalOffset(dst,width,band_lower,mainFilter->getScale());
 
 	while(sig.Wait() == wxCOND_NO_ERROR) {
         //If no source, do thread cleanup before exiting
 	    if(!src ) {
-            lock.Unlock();
-            return (wxThread::ExitCode) 0;
+            break;
 	    }
-
-	    if(!mainFilter || !iFilter)
-        {
-            std::runtime_error("ERROR:  Filter not initialized!");
-            return (wxThread::ExitCode) -1;
-        }
 
         //Set the start of the source pointer to the first pixel of the appropriate height
         src = GetVerticalOffset(src,width,band_lower);
 
-        //Run the interframe blending filter
+        //Run the filters
         iFilter->run(src,buffer);
-
-	    // naturally, any of these with accumulation buffers like those of
-	    // the IFB filters will screw up royally as well
         mainFilter->run(buffer, dst);
 
         done->Post();
 	}
+
+    lock.Unlock();
 	return (wxThread::ExitCode) 0;
     }
 };
