@@ -243,7 +243,6 @@ public:
     // required for event handling
     DECLARE_EVENT_TABLE();
 private:
-    bool did_link_init;
     GameArea *panel;
 
     // the various reasons the game might be paused
@@ -286,6 +285,8 @@ private:
     wxDialog * LoadXRCDialog(const char * name);
     /// Load a named wxPropertySheetDialog from the XRC file
     wxPropertySheetDialog * LoadXRCropertySheetDialog(const char * name);
+    // Returns the link mode to set according to the options
+    LinkMode getOptionsLinkMode();
 #include "cmdhandlers.h"
 };
 

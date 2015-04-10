@@ -53,7 +53,8 @@ static class NetLink_t : public wxEvtHandler
 public:
     wxDialog *dlg;
     int n_players;
-    NetLink_t() : n_players(2) {}
+    bool server;
+    NetLink_t() : n_players(2), server(false) {}
     wxButton *okb;
     void ServerOKButton(wxCommandEvent &ev)
     {
@@ -66,151 +67,80 @@ public:
     // attached to OK, so skip when OK
     void NetConnect(wxCommandEvent &ev)
     {
+	static const int length = 256;
 	if(!dlg->Validate() || !dlg->TransferDataFromWindow())
 	    return;
+
+	if (!server) {
+		bool valid = SetLinkServerHost(gopts.link_host.mb_str());
+		if (!valid) {
+			wxMessageBox(_("You must enter a valid host name"),
+				 _("Host name invalid"), wxICON_ERROR | wxOK);
+			return;
+		}
+	}
+
 	update_opts(); // save fast flag and client host
 
-	wxString connmsg, pmsg;
+	// Close any previous link
+	CloseLink();
 
-	wxMutex lock;
-	wxCondition sig(lock);
-	lock.Lock();
+	wxString connmsg;
+	wxString title;
 
-	bool done = false;
+	SetLinkTimeout(gopts.linktimeout);
+	EnableSpeedHacks(gopts.lanlink_speed);
+	EnableLinkServer(server, n_players - 1);
 
-	if(lanlink.server) {
-	    lanlink.numslaves = n_players - 1;
-	    class sid_t : public ServerInfoDisplay
-	    {
-		wxMutex *lock;
-		wxCondition *sig;
-		wxString *connmsg, *pmsg;
-		bool *done;
-		bool conn[3];
-	    public:
-		sid_t(wxMutex *m, wxCondition *c, wxString *cm, wxString *pm,
-		      bool *d) :
-		    lock(m), sig(c), connmsg(cm), pmsg(pm), done(d) {}
-		void ShowServerIP(const sf::IPAddress &addr) {
-		    wxString addr_s(addr.ToString().c_str(), wxConvLibc);
-		    wxString msg;
-		    msg.Printf(_("Server IP address is: %s\n"), addr_s.c_str());
-		    connmsg->append(msg);
-		    conn[0] = conn[1] = conn[2] = false;
-		}
-		void ShowConnect(int player) {
-		    wxString msg;
-		    conn[player - 1] = true;
-		    lock->Lock();
-		    pmsg->clear();
-		    for(int i = 0; i < 3; i++)
-			if(conn[i]) {
-			    msg.Printf(_("Player %d connected\n"), i + 2);
-			    pmsg->append(msg);
-			}
-		    sig->Signal();
-		    lock->Unlock();
-		}
-		void Ping() {
-		    lock->Lock();
-		    sig->Signal();
-		    if(*done)
-			lanlink.terminate = true;
-		    lock->Unlock();
-		}
-		void Connected() {
-		    lock->Lock();
-		    *done = true;
-		    sig->Signal();
-		    lock->Unlock();
-		}
-	    };
-	    
-	    sid_t* sid = new sid_t(&lock, &sig, &connmsg, &pmsg, &done);
-	    
-	    if (!ls.Init(sid)) {
-			wxLogError(_("Error occurred.\nPlease try again."));
-			lock.Unlock();
-			delete sid;
-			return;
-	    }
-	    
-	    wxProgressDialog
-		pdlg(_("Waiting for clients..."), connmsg,
-		     100, dlg, wxPD_APP_MODAL|wxPD_CAN_ABORT|wxPD_ELAPSED_TIME);
-		     
-	    while(!done) {
-			if(!pdlg.Pulse(connmsg + pmsg))
-				done = true;
-			sig.Wait();
-	    }
+	if (server) {
+		char host[length];
+		GetLinkServerHost(host, length);
+
+		title.Printf(_("Waiting for clients..."));
+		connmsg.Printf(_("Server IP address is: %s\n"), wxString(host, wxConvLibc).c_str());
 	} else {
-	    class cid_t : public ClientInfoDisplay
-	    {
-		wxMutex *lock;
-		wxCondition *sig;
-		wxString *connmsg, *pmsg;
-		bool *done;
-	    public:
-		cid_t(wxMutex *m, wxCondition *c, wxString *cm, wxString *pm,
-		      bool *d) :
-		    lock(m), sig(c), connmsg(cm), pmsg(pm), done(d) {}
-		void ConnectStart(const sf::IPAddress &addr) {
-		    wxString addr_s(addr.ToString().c_str(), wxConvLibc);
-		    connmsg->Printf(_("Connecting to %s\n"), addr_s.c_str());
-		}
-		void ShowConnect(int player, int togo) {
-		    wxString msg;
-		    lock->Lock();
-		    pmsg->Printf(_("Connected as #%d\n"), player);
-		    if(togo)
-			msg.Printf(_("Waiting for %d players to join"), togo);
-		    else
-			msg = _("All players joined.");
-		    pmsg->append(msg);
-		    sig->Signal();
-		    lock->Unlock();
-		}
-		void Ping() {
-		    lock->Lock();
-		    sig->Signal();
-		    if(*done)
-			lanlink.terminate = true;
-		    lock->Unlock();
-		}
-		void Connected() {
-		    lock->Lock();
-		    *done = true;
-		    sig->Signal();
-		    lock->Unlock();
-		}
-	    };
-	    
-	    cid_t* cid = new cid_t(&lock, &sig, &connmsg, &pmsg, &done);
-	    
-	    if (!lc.Init(sf::IPAddress(std::string(gopts.link_host.mb_str())), cid)) {
-			wxLogError(_("Error occurred.\nPlease try again."));
-			lock.Unlock();
-			delete cid;
-			return;
-	    }
-	    
-	    wxProgressDialog
-		pdlg(_("Waiting for connection..."), connmsg,
-		     100, dlg, wxPD_APP_MODAL|wxPD_CAN_ABORT|wxPD_ELAPSED_TIME);
-		     
-	    while(!done) {
-			if(!pdlg.Pulse(connmsg + pmsg))
-				done = true;
-			sig.Wait();
-	    }
+		title.Printf(_("Waiting for connection..."));
+		connmsg.Printf(_("Connecting to %s\n"), gopts.link_host.c_str());
 	}
-	lock.Unlock();
-	if(lanlink.connected) {
-	    pmsg.Replace(wxT("\n"), wxT(" "));
-	    systemScreenMessage(pmsg);
-	    lanlink.active = true;
-	    ev.Skip(); // all OK
+
+	// Init link
+	ConnectionState state = InitLink(LINK_CABLE_SOCKET);
+
+	// Display a progress dialog while the connection is establishing
+	if (state == LINK_NEEDS_UPDATE) {
+		wxProgressDialog pdlg(title, connmsg,
+			100, dlg, wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME);
+
+		while (state == LINK_NEEDS_UPDATE) {
+			// Ask the core for updates
+			char message[length];
+			state = ConnectLinkUpdate(message, length);
+
+			connmsg = wxString(message, wxConvLibc);
+
+			// Does the user want to abort?
+			if (!pdlg.Pulse(connmsg)) {
+				state = LINK_ABORT;
+			}
+		}
+	}
+
+	// The user canceled the connection attempt
+	if (state == LINK_ABORT) {
+		CloseLink();
+	}
+
+	// Something failed during init
+	if (state == LINK_ERROR) {
+		CloseLink();
+		wxLogError(_("Error occurred.\nPlease try again."));
+	}
+
+	if(GetLinkMode() != LINK_DISCONNECTED) {
+		connmsg.Replace(wxT("\n"), wxT(" "));
+		systemScreenMessage(connmsg);
+
+		ev.Skip(); // all OK
 	}
     }
 } net_link_handler;
@@ -1452,45 +1382,6 @@ public:
     }
 } JoyPadConfigHandler[4];
 
-#ifndef NO_LINK
-// tc validator for IP addresses using SFML for validation instead of wx
-class IPHostValidator : public wxValidator
-{
-    wxString *valp;
-public:
-    IPHostValidator(wxString *v) : wxValidator(), valp(v) {}
-    IPHostValidator(const IPHostValidator &e) : wxValidator(), valp(e.valp) {}
-    wxObject *Clone() const { return new IPHostValidator(*this); }
-    bool Validate(wxWindow *p) {
-	wxTextCtrl *tc = wxStaticCast(GetWindow(), wxTextCtrl);
-	if(!tc->IsEnabled())
-	    return true;
-	wxString val = tc->GetValue();
-	bool isv = true;
-	if(val.empty())
-	    isv = false;
-	else {
-	    sf::IPAddress srv = std::string(val.mb_str());
-	    isv = srv.IsValid();
-	}
-	if(!isv)
-	    wxMessageBox(_("You must enter a valid host name"),
-			 _("Host name invalid"), wxICON_ERROR|wxOK);
-	return isv;
-    }
-    bool TransferToWindow() {
-	wxTextCtrl *tc = wxStaticCast(GetWindow(), wxTextCtrl);
-	tc->SetValue(*valp);
-	return true;
-    }
-    bool TransferFromWindow() {
-	wxTextCtrl *tc = wxStaticCast(GetWindow(), wxTextCtrl);
-	*valp = tc->GetValue();
-	return true;
-    }
-};
-#endif
-
 // manage fullscreen mode widget
 // technically, it's more than a validator: it modifies the widget as well
 class ScreenModeList : public wxValidator
@@ -2167,7 +2058,7 @@ bool MainFrame::InitMore(void)
     // so just set individual flags here
     cmd_enable = CMDEN_NGDB_ANY | CMDEN_NREC_ANY;
     update_state_ts(true);
-    enable_menus();
+
     // set pointers for checkable menu items
     // and set initial checked status
     if(checkable_mi.size()) {
@@ -2366,8 +2257,8 @@ bool MainFrame::InitMore(void)
 #ifndef NO_LINK
     {
 	net_link_handler.dlg = d;
-	getrbbe("Server", lanlink.server);
-	getrbbd("Client", lanlink.server);
+	getrbbe("Server", net_link_handler.server);
+	getrbbd("Client", net_link_handler.server);
 	getlab("PlayersLab");
 	addrber(lab, false);
 	getrbi("Link2P", net_link_handler.n_players, 2);
@@ -2380,9 +2271,8 @@ bool MainFrame::InitMore(void)
 	addrber(lab, true);
 	gettc("ServerIP", gopts.link_host);
 	addrber(tc, true);
-	tc->SetValidator(IPHostValidator(&gopts.link_host));
-	getrbbr("SpeedOff", lanlink.speed);
-	getrbb("SpeedOn", lanlink.speed);
+	getrbbr("SpeedOff", gopts.lanlink_speed);
+	getrbb("SpeedOn", gopts.lanlink_speed);
 	wxWindow *okb = d->FindWindow(wxID_OK);
 	if(okb) { // may be gone if style guidlines removed it
 	    net_link_handler.okb = wxStaticCast(okb, wxButton);
@@ -2746,8 +2636,8 @@ bool MainFrame::InitMore(void)
 	addbier(lab, true);
 
 	/// Boot ROM
-	getcbbe("BootRomEn", gopts.gb_use_bios);
-	getfp("BootRom", gopts.gb_bios);
+	getcbbe("BootRomEn", gopts.gba_use_bios);
+	getfp("BootRom", gopts.gba_bios);
 	addbe(fp);
 	getlab("BootRomLab");
 	addbe(lab);
@@ -2955,18 +2845,17 @@ bool MainFrame::InitMore(void)
 #ifndef NO_LINK
     d=LoadXRCDialog("LinkConfig");
     {
-	getcbbe("Joybus", gba_joybus_enabled);
+	getcbbe("Joybus", gopts.gba_joybus_enabled);
 	getlab("JoybusHostLab");
 	addbe(lab);
 	gettc("JoybusHost", gopts.joybus_host);
-	tc->SetValidator(IPHostValidator(&gopts.joybus_host));
 	addbe(tc);
-	getcbbe("Link", gba_link_enabled);
-	getcbb("RFU", rfu_enabled);
+	getcbbe("Link", gopts.gba_link_enabled);
+	getcbb("RFU", gopts.rfu_enabled);
 	addbe(cb);
 	getlab("LinkTimeoutLab");
 	addbe(lab);
-	getsc("LinkTimeout", linktimeout);
+	getsc("LinkTimeout", gopts.linktimeout);
 	addbe(sc);
     d->Fit();
     }
@@ -3094,23 +2983,33 @@ bool MainFrame::InitMore(void)
 	panel->ShowFullScreen(true);
 
 #ifndef NO_LINK
-    if(gba_joybus_enabled) {
-	bool isv = !gopts.joybus_host.empty();
-	if(isv) {
-	    joybusHostAddr = std::string(gopts.joybus_host.mb_str());
-	    isv = joybusHostAddr.IsValid();
-	}
-	if(!isv) {
-	    wxLogError(_("JoyBus host invalid; disabling"));
-	    gba_joybus_enabled = false;
-	} else
-	    JoyBusConnect();
-    }
-    if(gba_link_enabled)
-	if((did_link_init = InitLink()))
-	    cmd_enable |= CMDEN_LINK_ANY;
+    LinkMode linkMode = getOptionsLinkMode();
 
+	if (linkMode == LINK_GAMECUBE_DOLPHIN) {
+		bool isv = !gopts.joybus_host.empty();
+		if(isv) {
+			isv = SetLinkServerHost(gopts.joybus_host.mb_str());
+		}
+		
+		if(!isv) {
+			wxLogError(_("JoyBus host invalid; disabling"));
+			gopts.gba_joybus_enabled = false;
+		} else {
+		    linkMode = LINK_DISCONNECTED;
+		}
+	}
+	
+	ConnectionState linkState = InitLink(linkMode);
+	if (linkState != LINK_OK) {
+		CloseLink();
+	}
+	
+	if (GetLinkMode() != LINK_DISCONNECTED)
+		cmd_enable |= CMDEN_LINK_ANY;
 #endif
+
+    enable_menus();
+
     panel->SetFrameTitle();
 
     // All OK; activate idle loop

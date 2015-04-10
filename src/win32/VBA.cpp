@@ -113,9 +113,6 @@ void winlog(const char *msg, ...);
 
 /* Link
 ---------------------*/
-extern bool InitLink(void);
-extern void CloseLink(void);
-//extern int linkid;
 extern char inifile[];
 /* ------------------- */
 #ifdef _DEBUG
@@ -353,7 +350,7 @@ VBA::~VBA()
 
   regInit(winBuffer);
 
-  JoyBusShutdown();
+  CloseLink();
 
   saveSettings();
 
@@ -448,9 +445,6 @@ BOOL VBA::InitInstance()
   if(p)
     *p = 0;
 
-  if(!InitLink())
-	return FALSE;
-
   bool force = false;
 
   if (m_lpCmdLine[0])
@@ -480,7 +474,7 @@ BOOL VBA::InitInstance()
 
   loadSettings();
 
-    if(!initDisplay()) {
+  if(!initDisplay()) {
     if(videoOption >= VIDEO_320x240) {
       regSetDwordValue("video", VIDEO_2X);
     }
@@ -1326,8 +1320,8 @@ BOOL VBA::OnIdle(LONG lCount)
       emulator.emuMain(emulator.emuCount);
 
 #ifndef NO_LINK
-      if (lanlink.connected && linkid && lc.numtransfers == 0)
-		  lc.CheckConn();
+	if (GetLinkMode() != LINK_DISCONNECTED)
+		CheckLinkConnection();
 #endif
 
       if(rewindSaveNeeded && rewindMemory && emulator.emuWriteMemState) {
@@ -1697,18 +1691,12 @@ void VBA::loadSettings()
   updateThrottle( (unsigned short)regQueryDwordValue( "throttle", 0 ) );
 
 #ifndef NO_LINK
-  linktimeout = regQueryDwordValue("LinkTimeout", 1000);
+  linkTimeout = regQueryDwordValue("LinkTimeout", 1000);
 
-  rfu_enabled = regQueryDwordValue("RFU", false) ? true : false;
-  gba_link_enabled = regQueryDwordValue("linkEnabled", false) ? true : false;
-  gba_joybus_enabled = regQueryDwordValue("joybusEnabled", false) ? true : false;
-  buffer = regQueryStringValue("joybusHostAddr", "");
+  linkMode = regQueryDwordValue("LinkMode", LINK_DISCONNECTED);
 
-  if(!buffer.IsEmpty()) {
-	  joybusHostAddr = std::string(buffer);
-  }
+  linkHost = regQueryStringValue("LinkHostAddr", "localhost");
 
-  lanlink.active = regQueryDwordValue("LAN", 0) ? true : false;
 #endif
 
   Sm60FPS::bSaveMoreCPU = regQueryDwordValue("saveMoreCPU", 0);
@@ -2637,11 +2625,9 @@ void VBA::saveSettings()
   regSetDwordValue("saveMoreCPU", Sm60FPS::bSaveMoreCPU);
 
 #ifndef NO_LINK
-  regSetDwordValue("LinkTimeout", linktimeout);
-  regSetDwordValue("RFU", rfu_enabled);
-  regSetDwordValue("linkEnabled", gba_link_enabled);
-  regSetDwordValue("joybusEnabled", gba_joybus_enabled);
-  regSetStringValue("joybusHostAddr", joybusHostAddr.ToString().c_str());
+  regSetDwordValue("LinkTimeout", linkTimeout);
+  regSetDwordValue("LinkMode", linkMode);
+  regSetStringValue("LinkHostAddr", linkHost);
 #endif
 
   regSetDwordValue("lastFullscreen", lastFullscreen);
