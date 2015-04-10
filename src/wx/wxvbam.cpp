@@ -396,7 +396,9 @@ MainFrame::MainFrame() : wxFrame(), focused(false),
 
 MainFrame::~MainFrame()
 {
+    #ifndef NO_LINK
 	CloseLink();
+    #endif
 }
 
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
