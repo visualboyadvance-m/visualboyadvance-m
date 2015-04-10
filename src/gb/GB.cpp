@@ -3614,6 +3614,7 @@ bool gbWriteBatteryFile(const char *file, bool extendedSave)
     case 0x13:
     case 0xfc:
       gbWriteSaveMBC3(file, false);
+	  break;
     case 0x1b:
     case 0x1e:
       gbWriteSaveMBC5(file);
