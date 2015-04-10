@@ -29,6 +29,9 @@
     <Filter Include="Pixel Filter\HQ\3x_4x_asm">
       <UniqueIdentifier>{443f5282-9e21-46cb-b187-746986699f99}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Pixel Filter\xBRZ">
+      <UniqueIdentifier>{5ab58341-15e1-499c-9fee-7695e1a98161}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Functionality">
       <UniqueIdentifier>{b9123fa0-e9e8-444a-a69c-82a2d3bee747}</UniqueIdentifier>
     </Filter>
@@ -110,6 +113,12 @@
       <Filter>Core\GBA</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\gba\bios.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\BreakpointStructures.h">
+      <Filter>Core\GBA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gba\debugger-expr-yacc.hpp">
       <Filter>Core\GBA</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\gba\EEprom.h">
@@ -397,6 +406,12 @@
     <ClInclude Include="..\..\src\win32\GBTileView.h">
       <Filter>MFC\GB</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\filters\xBRZ\xbrz.h">
+      <Filter>Pixel Filter\xBRZ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\filters\xBRZ\config.h">
+      <Filter>Pixel Filter\xBRZ</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\win32\res\VBA.ico">
@@ -473,6 +488,15 @@
       <Filter>Core\GBA</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\gba\bios.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\BreakpointStructures.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\debugger-expr-lex.cpp">
+      <Filter>Core\GBA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gba\debugger-expr-yacc.cpp">
       <Filter>Core\GBA</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\gba\EEprom.cpp">
@@ -564,6 +588,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\filters\hq\asm\hq3x32.cpp">
       <Filter>Pixel Filter\HQ\3x_4x_asm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\filters\xBRZ\xbrz.cpp">
+      <Filter>Pixel Filter\xBRZ</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\filters\xbrzfilter.cpp">
+      <Filter>Pixel Filter\xBRZ</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\gba\armdis.cpp">
       <Filter>Functionality</Filter>

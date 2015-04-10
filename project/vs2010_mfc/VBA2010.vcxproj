@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -64,7 +64,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\src;..\..\fex;..\..\..\dependencies\libpng;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\SubWCRev;..\..\..\dependencies\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;DEV_VERSION;BKPT_SUPPORT;GBA_LOGGING;MMX;ASM;_CRT_SECURE_NO_WARNINGS;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;SFML_SYSTEM_EXPORTS;SFML_NETWORK_EXPORTS;DEV_VERSION;BKPT_SUPPORT;GBA_LOGGING;MMX;ASM;_CRT_SECURE_NO_WARNINGS;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -110,7 +110,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>..\..\src;..\..\fex;..\..\..\dependencies\libpng;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\SubWCRev;..\..\..\dependencies\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NO_OAL;NDEBUG;GBA_LOGGING;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_SYSTEM_EXPORTS;SFML_NETWORK_EXPORTS;GBA_LOGGING;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -167,7 +167,9 @@
     <ClInclude Include="..\..\src\apu\Multi_Buffer.h" />
     <ClInclude Include="..\..\src\gba\agbprint.h" />
     <ClInclude Include="..\..\src\gba\ereader.h" />
+    <ClInclude Include="..\..\src\gba\BreakpointStructures.h" />
     <ClInclude Include="..\..\src\gba\bios.h" />
+    <ClInclude Include="..\..\src\gba\debugger-expr-yacc.hpp" />
     <ClInclude Include="..\..\src\gba\EEprom.h" />
     <ClInclude Include="..\..\src\gba\elf.h" />
     <ClInclude Include="..\..\src\gba\Flash.h" />
@@ -184,6 +186,8 @@
     <ClInclude Include="..\..\src\filters\hq2x.h" />
     <ClInclude Include="..\..\src\filters\interp.h" />
     <ClInclude Include="..\..\src\filters\lq2x.h" />
+    <ClInclude Include="..\..\src\filters\xBRZ\config.h" />
+    <ClInclude Include="..\..\src\filters\xBRZ\xbrz.h" />
     <ClInclude Include="..\..\src\gba\armdis.h" />
     <ClInclude Include="..\..\src\gba\Cheats.h" />
     <ClInclude Include="..\..\src\gba\CheatSearch.h" />
@@ -293,6 +297,9 @@
     <ClCompile Include="..\..\src\apu\Multi_Buffer.cpp" />
     <ClCompile Include="..\..\src\gba\agbprint.cpp" />
     <ClCompile Include="..\..\src\gba\bios.cpp" />
+    <ClCompile Include="..\..\src\gba\BreakpointStructures.cpp" />
+    <ClCompile Include="..\..\src\gba\debugger-expr-lex.cpp" />
+    <ClCompile Include="..\..\src\gba\debugger-expr-yacc.cpp" />
     <ClCompile Include="..\..\src\gba\EEprom.cpp" />
     <ClCompile Include="..\..\src\gba\elf.cpp" />
     <ClCompile Include="..\..\src\gba\ereader.cpp" />
@@ -323,6 +330,8 @@
     <ClCompile Include="..\..\src\win32\rpi.cpp" />
     <ClCompile Include="..\..\src\filters\scanline.cpp" />
     <ClCompile Include="..\..\src\filters\simpleFilter.cpp" />
+    <ClCompile Include="..\..\src\filters\xbrzfilter.cpp" />
+    <ClCompile Include="..\..\src\filters\xBRZ\xbrz.cpp" />
     <ClCompile Include="..\..\src\filters\hq2x.cpp" />
     <ClCompile Include="..\..\src\filters\hq\asm\hq3x32.cpp" />
     <ClCompile Include="..\..\src\gba\armdis.cpp" />
