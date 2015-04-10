@@ -1,7 +1,6 @@
 #ifndef GBA_GBALINK_H
 #define GBA_GBALINK_H
 
-
 #pragma once
 
 // register definitions; these are always present
@@ -55,9 +54,6 @@ enum
 extern const char *MakeInstanceFilename(const char *Input);
 
 #ifndef NO_LINK
-//Fix for X.h breaking things
-#undef None
-
 // Link implementation
 #include <SFML/System.hpp>
 #include <SFML/Network.hpp>
@@ -65,7 +61,7 @@ extern const char *MakeInstanceFilename(const char *Input);
 class ServerInfoDisplay
 {
 public:
-    virtual void ShowServerIP(const sf::IpAddress& addr) = 0;
+    virtual void ShowServerIP(const sf::IPAddress& addr) = 0;
     virtual void ShowConnect(const int player) = 0;
     virtual void Ping() = 0;
     virtual void Connected() = 0;
@@ -88,7 +84,7 @@ typedef struct {
 
 class lserver{
 	int numbytes;
-	sf::SocketSelector fdset;
+	sf::Selector<sf::SocketTCP> fdset;
 	//timeval udptimeout;
 	char inbuffer[256], outbuffer[256];
 	s32 *intinbuffer;
@@ -99,8 +95,8 @@ class lserver{
 	int done;
 public:
 	int howmanytimes;
-	sf::TcpSocket tcpsocket[4];
-	sf::IpAddress udpaddr[4];
+	sf::SocketTCP tcpsocket[4];
+	sf::IPAddress udpaddr[4];
 	lserver(void);
 	bool Init(ServerInfoDisplay *);
 	void Send(void);
@@ -109,14 +105,14 @@ public:
 
 class ClientInfoDisplay {
 public:
-    virtual void ConnectStart(const sf::IpAddress& addr) = 0;
+    virtual void ConnectStart(const sf::IPAddress& addr) = 0;
     virtual void Ping() = 0;
     virtual void ShowConnect(const int player, const int togo) = 0;
     virtual void Connected() = 0;
 };
 
 class lclient{
-	sf::SocketSelector fdset;
+	sf::Selector<sf::SocketTCP> fdset;
 	char inbuffer[256], outbuffer[256];
 	s32 *intinbuffer;
 	u16 *u16inbuffer;
@@ -124,20 +120,19 @@ class lclient{
 	u16 *u16outbuffer;
 	int numbytes;
 public:
-	sf::IpAddress serveraddr;
+	sf::IPAddress serveraddr;
 	unsigned short serverport;
-	sf::TcpSocket noblock;
+	sf::SocketTCP noblock;
 	int numtransfers;
 	lclient(void);
-	bool Init(sf::IpAddress, ClientInfoDisplay *);
+	bool Init(sf::IPAddress, ClientInfoDisplay *);
 	void Send(void);
 	void Recv(void);
 	void CheckConn(void);
 };
 
 typedef struct {
-    sf::TcpListener listener;
-	sf::TcpSocket tcpsocket;
+	sf::SocketTCP tcpsocket;
 	//sf::SocketUDP udpsocket;
 	int numslaves;
 	sf::Thread *thread;
@@ -152,7 +147,7 @@ typedef struct {
 extern bool gba_joybus_enabled;
 extern bool gba_link_enabled;
 
-extern sf::IpAddress joybusHostAddr;
+extern sf::IPAddress joybusHostAddr;
 extern void JoyBusConnect();
 extern void JoyBusShutdown();
 extern void JoyBusUpdate(int ticks);
