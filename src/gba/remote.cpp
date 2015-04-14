@@ -2077,7 +2077,7 @@ void executeBreakCommands(int n, char** cmd){
 		command = breakSymbolCombo(command, &len);
 		changed = (len == 5);
 	}if (!changed){
-		command = strdup(replaceAlias(cmd[0], breakAliasTable));
+		command = _strdup(replaceAlias(cmd[0], breakAliasTable));
 		changed = (strcmp(cmd[0], command));
 	}
 	if (!changed){
