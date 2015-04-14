@@ -3,6 +3,9 @@
 #include <memory.h>
 #include <stdarg.h>
 #include <string.h>
+#ifndef _MSC_VER
+#include <strings.h>
+#endif
 
 #include "GBA.h"
 #include "GBAcpu.h"

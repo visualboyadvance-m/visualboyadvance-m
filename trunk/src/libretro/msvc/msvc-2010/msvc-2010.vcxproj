@@ -53,7 +53,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MSVC2010_EXPORTS;_CRT_SECURE_NO_WARNINGS;LSB_FIRST;SPEEDHAX=1;__LIBRETRO__;INLINE=_inline;%(PreprocessorDefinitions);FRONTEND_SUPPORTS_RGB565</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;$(SolutionDir)\..\src\;$(SolutionDir)\..\libretro;$(SolutionDir)\..\utils\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;$(SolutionDir)\..\src\;$(SolutionDir)\..\libretro;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -70,7 +70,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MSVC2010_EXPORTS;_CRT_SECURE_NO_WARNINGS;LSB_FIRST;SPEEDHAX=1;__LIBRETRO__;INLINE=_inline;%(PreprocessorDefinitions);FRONTEND_SUPPORTS_RGB565</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;$(SolutionDir)\..\src\;$(SolutionDir)\..\libretro;$(SolutionDir)\..\utils\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;$(SolutionDir)\..\src\;$(SolutionDir)\..\libretro;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

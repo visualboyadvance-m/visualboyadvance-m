@@ -10,6 +10,10 @@ else ifneq ($(findstring win,$(shell uname -a)),)
    platform = win
 else ifneq ($(findstring Darwin,$(shell uname -a)),)
    platform = osx
+   arch = intel
+ifeq ($(shell uname -a),)
+   arch = ppc
+endif
 endif
 endif
 
@@ -24,6 +28,58 @@ else ifeq ($(platform), osx)
    TARGET := $(TARGET_NAME)_libretro.dylib
    fpic := -fPIC
    SHARED := -dynamiclib
+   arch = intel
+ifeq ($(shell uname -a),)
+   arch = ppc
+endif
+
+ifneq ($(arch),ppc)
+   SHARED += -DLSB_FIRST
+endif
+   OSXVER = `sw_vers -productVersion | cut -d. -f 2`
+   OSX_LT_MAVERICKS = `(( $(OSXVER) <= 9)) && echo "YES"`
+ifeq ($(OSX_LT_MAVERICKS),"YES")
+   fpic += -mmacosx-version-min=10.5
+endif
+else ifeq ($(platform), ios)
+   TARGET := $(TARGET_NAME)_libretro_ios.dylib
+   fpic := -fPIC
+   SHARED := -dynamiclib -DLSB_FIRST
+
+ifeq ($(IOSSDK),)
+   IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
+endif
+
+   CC = clang -arch armv7 -isysroot $(IOSSDK)
+   CXX = clang++ -arch armv7 -isysroot $(IOSSDK)
+   OSXVER = `sw_vers -productVersion | cut -d. -f 2`
+   OSX_LT_MAVERICKS = `(( $(OSXVER) <= 9)) && echo "YES"`
+ifeq ($(OSX_LT_MAVERICKS),"YES")
+   CC += -miphoneos-version-min=5.0
+   CXX += -miphoneos-version-min=5.0
+   SHARED += -miphoneos-version-min=5.0
+endif
+	TILED_RENDERING = 1
+else ifeq ($(platform), theos_ios)
+DEPLOYMENT_IOSVERSION = 5.0
+TARGET = iphone:latest:$(DEPLOYMENT_IOSVERSION)
+ARCHS = armv7 armv7s
+TARGET_IPHONEOS_DEPLOYMENT_VERSION=$(DEPLOYMENT_IOSVERSION)
+THEOS_BUILD_DIR := objs
+include $(THEOS)/makefiles/common.mk
+
+LIBRARY_NAME = $(TARGET_NAME)_libretro_ios
+
+   ENDIANNESS_DEFINES = -DLSB_FIRST
+	TILED_RENDERING=1
+else ifeq ($(platform), qnx)
+   TARGET := $(TARGET_NAME)_libretro_qnx.so
+   fpic := -fPIC
+   SHARED := -shared
+	TILED_RENDERING = 1
+	CC = qcc -Vgcc_ntoarmv7le
+	CXX = QCC -Vgcc_ntoarmv7le_cpp
+	AR = QCC -Vgcc_ntoarmv7le
 else
    TARGET := $(TARGET_NAME)_libretro.dll
    LDFLAGS += -Wl,-no-undefined -Wl,--version-script=link.T
@@ -36,42 +92,49 @@ ifeq ($(TILED_RENDERING), 1)
 VBA_DEFINES += -DTILED_RENDERING
 endif
 
-VBA_DIR := ../
+CORE_DIR := ..
 
-VBA_SRC_DIRS := $(VBA_DIR)/gba $(VBA_DIR)/apu 
+include Makefile.common
 
-VBA_CXXSRCS := $(foreach dir,$(VBA_SRC_DIRS),$(wildcard $(dir)/*.cpp))
-VBA_CXXOBJ := $(VBA_CXXSRCS:.cpp=.o) ../common/Patch.o
-VBA_CSRCS := $(foreach dir,$(VBA_SRC_DIRS),$(wildcard $(dir)/*.c))
-VBA_COBJ := $(VBA_CSRCS:.c=.o)
-UTIL_SOURCES := $(wildcard ../common/utils/zlib/*.c)
-UTIL_OBJS := $(UTIL_SOURCES:.c=.o)
-
-OBJS := $(VBA_COBJ) $(VBA_CXXOBJ) $(UTIL_OBJS) libretro.o UtilRetro.o SoundRetro.o scrc32.o
+OBJS := $(SOURCES_CXX:.cpp=.o)
 
 VBA_DEFINES += -D__LIBRETRO__ -DFINAL_VERSION -DC_CORE -DUSE_GBA_ONLY -DNO_LINK
 VBA_DEFINES += -DFRONTEND_SUPPORTS_RGB565
 
-CFLAGS += -O3 -std=gnu99 $(fpic) $(VBA_DEFINES) -I../common/utils/zlib
-CXXFLAGS += -O3 $(fpic) $(VBA_DEFINES) -I../common/utils/zlib
+ifeq ($(DEBUG), 1)
+   CFLAGS += -g
+   CXXFLAGS += -g
+else
+   CFLAGS += -O3 -DNDEBUG
+   CXXFLAGS += -O3 -DNDEBUG
+endif
 
+CFLAGS += $(fpic) $(VBA_DEFINES)
+CXXFLAGS += $(fpic) $(VBA_DEFINES)
 
-INCDIRS := -I$(VBA_DIR)
 LIBS :=
+
+%.o: %.cpp
+	$(CXX) -c -o $@ $< $(CXXFLAGS) $(INCFLAGS)
+
+%.o: %.c
+	$(CC) -c -o $@ $< $(CFLAGS) $(INCFLAGS)
+
+ifeq ($(platform), theos_ios)
+COMMON_FLAGS := -DIOS $(COMMON_DEFINES) $(INCFLAGS) -I$(THEOS_INCLUDE_PATH) -Wno-error
+$(LIBRARY_NAME)_CFLAGS += $(CFLAGS) $(COMMON_FLAGS)
+$(LIBRARY_NAME)_CXXFLAGS += $(CXXFLAGS) $(COMMON_FLAGS)
+${LIBRARY_NAME}_FILES = $(SOURCES_CXX) $(SOURCES_C)
+include $(THEOS_MAKE_PATH)/library.mk
+else
+all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CXX) -o $@ $(SHARED) $(OBJS) $(LDFLAGS) $(LIBS)
-
-%.o: %.cpp
-	$(CXX) -c -o $@ $< $(CXXFLAGS) $(INCDIRS)
-
-%.o: %.c
-	$(CC) -c -o $@ $< $(CFLAGS) $(INCDIRS)
 
 clean:
 	rm -f $(OBJS)
 	rm -f $(TARGET)
 
 .PHONY: clean
-
-
+endif

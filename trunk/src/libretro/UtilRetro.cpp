@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <zlib.h>
 
 #include "System.h"
 #include "NLS.h"
@@ -16,6 +15,7 @@
 #include "gb/gbGlobals.h"
 
 #ifndef _MSC_VER
+#include <strings.h>
 #define _stricmp strcasecmp
 #endif // ! _MSC_VER
 
@@ -93,34 +93,11 @@ bool utilIsGBImage(const char * file)
   return false;
 }
 
-bool utilIsGzipFile(const char *file)
-{
-  if(strlen(file) > 3) {
-    const char * p = strrchr(file,'.');
-
-    if(p != NULL) {
-      if(_stricmp(p, ".gz") == 0)
-        return true;
-      if(_stricmp(p, ".z") == 0)
-        return true;
-    }
-  }
-
-  return false;
-}
-
 // strip .gz or .z off end
 void utilStripDoubleExtension(const char *file, char *buffer)
 {
   if(buffer != file) // allows conversion in place
     strcpy(buffer, file);
-
-  if(utilIsGzipFile(file)) {
-    char *p = strrchr(buffer, '.');
-
-    if(p)
-      *p = 0;
-  }
 }
 
 static bool utilIsImage(const char *file)

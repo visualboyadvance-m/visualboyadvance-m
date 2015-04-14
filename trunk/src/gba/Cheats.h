@@ -23,11 +23,13 @@ void cheatsDelete(int number, bool restore);
 void cheatsDeleteAll(bool restore);
 void cheatsEnable(int number);
 void cheatsDisable(int number);
+#ifndef __LIBRETRO__
 void cheatsSaveGame(gzFile file);
 void cheatsReadGame(gzFile file, int version);
 void cheatsReadGameSkip(gzFile file, int version);
 void cheatsSaveCheatList(const char *file);
 bool cheatsLoadCheatList(const char *file);
+#endif
 void cheatsWriteMemory(u32 address, u32 value);
 void cheatsWriteHalfWord(u32 address, u16 value);
 void cheatsWriteByte(u32 address, u8 value);
