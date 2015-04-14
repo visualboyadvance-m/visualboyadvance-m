@@ -1,8 +1,12 @@
 #include <stdio.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <memory.h>
 #include <stdarg.h>
 #include <string.h>
+#ifndef _MSC_VER
+#include <strings.h>
+#endif
 #include "GBA.h"
 #include "GBAcpu.h"
 #include "GBAinline.h"
@@ -604,7 +608,11 @@ unsigned int CPUWriteState(u8* data, unsigned size)
    utilWriteMem(data, workRAM, 0x40000);
    utilWriteMem(data, vram, 0x20000);
    utilWriteMem(data, oam, 0x400);
+#ifdef __LIBRETRO__
+   utilWriteMem(data, pix, 4 * 240 * 160);
+#else
    utilWriteMem(data, pix, 4 * 241 * 162);
+#endif
    utilWriteMem(data, ioMem, 0x400);
 
    eepromSaveGame(data);
@@ -642,7 +650,11 @@ static bool CPUWriteState(gzFile gzFile)
   utilGzWrite(gzFile, workRAM, 0x40000);
   utilGzWrite(gzFile, vram, 0x20000);
   utilGzWrite(gzFile, oam, 0x400);
+#ifdef __LIBRETRO__
+  utilGzWrite(gzFile, pix, 4*240*160);
+#else
   utilGzWrite(gzFile, pix, 4*241*162);
+#endif
   utilGzWrite(gzFile, ioMem, 0x400);
 
   eepromSaveGame(gzFile);
@@ -732,7 +744,11 @@ bool CPUReadState(const u8* data, unsigned size)
    utilReadMem(workRAM, data, 0x40000);
    utilReadMem(vram, data, 0x20000);
    utilReadMem(oam, data, 0x400);
+#ifdef __LIBRETRO__
+   utilReadMem(pix, data, 4*240*160);
+#else
    utilReadMem(pix, data, 4*241*162);
+#endif
    utilReadMem(ioMem, data, 0x400);
 
    eepromReadGame(data, version);
@@ -862,10 +878,14 @@ static bool CPUReadState(gzFile gzFile)
   utilGzRead(gzFile, workRAM, 0x40000);
   utilGzRead(gzFile, vram, 0x20000);
   utilGzRead(gzFile, oam, 0x400);
+#ifdef __LIBRETRO__
+    utilGzRead(gzFile, pix, 4*240*160);
+#else
   if(version < SAVE_GAME_VERSION_6)
     utilGzRead(gzFile, pix, 4*240*160);
   else
     utilGzRead(gzFile, pix, 4*241*162);
+#endif
   utilGzRead(gzFile, ioMem, 0x400);
 
   if(skipSaveGameBattery) {
@@ -1597,7 +1617,107 @@ int CPULoadRom(const char *szFile)
     CPUCleanUp();
     return 0;
   }
+#ifdef __LIBRETRO__
+  pix = (u8 *)calloc(1, 4 * 240 * 160);
+#else
   pix = (u8 *)calloc(1, 4 * 241 * 162);
+#endif
+  if(pix == NULL) {
+    systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+                  "PIX");
+    CPUCleanUp();
+    return 0;
+  }
+  ioMem = (u8 *)calloc(1, 0x400);
+  if(ioMem == NULL) {
+    systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+                  "IO");
+    CPUCleanUp();
+    return 0;
+  }
+
+  flashInit();
+  eepromInit();
+
+  CPUUpdateRenderBuffers(true);
+
+  return romSize;
+}
+
+int CPULoadRomData(const char *data, int size)
+{
+  romSize = 0x2000000;
+  if(rom != NULL) {
+    CPUCleanUp();
+  }
+
+  systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
+
+  rom = (u8 *)malloc(0x2000000);
+  if(rom == NULL) {
+    systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+                  "ROM");
+    return 0;
+  }
+  workRAM = (u8 *)calloc(1, 0x40000);
+  if(workRAM == NULL) {
+    systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+                  "WRAM");
+    return 0;
+  }
+
+  u8 *whereToLoad = cpuIsMultiBoot ? workRAM : rom;
+
+  romSize = size % 2 == 0 ? size : size + 1;
+  memcpy(whereToLoad, data, size);
+
+  u16 *temp = (u16 *)(rom+((romSize+1)&~1));
+  int i;
+  for(i = (romSize+1)&~1; i < 0x2000000; i+=2) {
+    WRITE16LE(temp, (i >> 1) & 0xFFFF);
+    temp++;
+  }
+
+  bios = (u8 *)calloc(1,0x4000);
+  if(bios == NULL) {
+    systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+                  "BIOS");
+    CPUCleanUp();
+    return 0;
+  }
+  internalRAM = (u8 *)calloc(1,0x8000);
+  if(internalRAM == NULL) {
+    systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+                  "IRAM");
+    CPUCleanUp();
+    return 0;
+  }
+  paletteRAM = (u8 *)calloc(1,0x400);
+  if(paletteRAM == NULL) {
+    systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+                  "PRAM");
+    CPUCleanUp();
+    return 0;
+  }
+  vram = (u8 *)calloc(1, 0x20000);
+  if(vram == NULL) {
+    systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+                  "VRAM");
+    CPUCleanUp();
+    return 0;
+  }
+  oam = (u8 *)calloc(1, 0x400);
+  if(oam == NULL) {
+    systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+                  "OAM");
+    CPUCleanUp();
+    return 0;
+  }
+#ifdef __LIBRETRO__
+  pix = (u8 *)calloc(1, 4 * 240 * 160);
+#else
+  pix = (u8 *)calloc(1, 4 * 241 * 162);
+#endif
   if(pix == NULL) {
     systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
                   "PIX");
@@ -3888,7 +4008,11 @@ void CPULoop(int ticks)
               switch(systemColorDepth) {
                 case 16:
                 {
+#ifdef __LIBRETRO__
+                  u16 *dest = (u16 *)pix + 240 * VCOUNT;
+#else
                   u16 *dest = (u16 *)pix + 242 * (VCOUNT+1);
+#endif
                   for(int x = 0; x < 240;) {
                     *dest++ = systemColorMap16[lineMix[x++]&0xFFFF];
                     *dest++ = systemColorMap16[lineMix[x++]&0xFFFF];
@@ -3911,7 +4035,9 @@ void CPULoop(int ticks)
                     *dest++ = systemColorMap16[lineMix[x++]&0xFFFF];
                   }
                   // for filters that read past the screen
+#ifndef __LIBRETRO__
                   *dest++ = 0;
+#endif
                 }
                 break;
                 case 24:
@@ -3958,7 +4084,11 @@ void CPULoop(int ticks)
                 break;
                 case 32:
                 {
+#ifdef __LIBRETRO__
+                  u32 *dest = (u32 *)pix + 240 * VCOUNT;
+#else
                   u32 *dest = (u32 *)pix + 241 * (VCOUNT+1);
+#endif
                   for(int x = 0; x < 240; ) {
                     *dest++ = systemColorMap32[lineMix[x++] & 0xFFFF];
                     *dest++ = systemColorMap32[lineMix[x++] & 0xFFFF];

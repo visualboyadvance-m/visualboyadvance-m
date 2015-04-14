@@ -1,7 +1,9 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 #include "common/Types.h"
+#ifndef __LIBRETRO__
 #include <zlib.h>
+#endif
 
 class SoundDriver;
 
