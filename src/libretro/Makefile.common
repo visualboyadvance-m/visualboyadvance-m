@@ -14,6 +14,7 @@ SOURCES_CXX := $(CORE_DIR)/gba/GBA-thumb.cpp \
 	$(CORE_DIR)/gba/Mode2.cpp \
 	$(CORE_DIR)/gba/GBASockClient.cpp \
 	$(CORE_DIR)/gba/elf.cpp \
+	$(CORE_DIR)/gba/ereader.cpp \
 	$(CORE_DIR)/gba/GBA-arm.cpp \
 	$(CORE_DIR)/gba/bios.cpp \
 	$(CORE_DIR)/gba/gbafilter.cpp \
