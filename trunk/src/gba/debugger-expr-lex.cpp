@@ -41,6 +41,10 @@
 #include <errno.h>
 #include <stdlib.h>
 
+#if (defined __WIN32__ || defined _WIN32)
+#define fileno _fileno
+#endif
+
 /* end standard C headers. */
 
 /* flex integer type definitions */
@@ -1538,7 +1542,7 @@ extern int isatty (int );
         b->yy_bs_column = 0;
     }
 
-        b->yy_is_interactive = file ? (isatty( _fileno(file) ) > 0) : 0;
+        b->yy_is_interactive = file ? (isatty( fileno(file) ) > 0) : 0;
     
 	errno = oerrno;
 }
