@@ -624,7 +624,7 @@ void parseAndCreateConditionalBreaks(u32 address, u8 flags, char** exp, int n){
 		}else{
 			now->exp_type_flags |= 6;	//assume signed word
 		}
-		now->address = strdup(exp[i]);
+		now->address = _strdup(exp[i]);
 		i++;
 		if(i >= n) goto fail;
 		char* operandName = exp[i];
@@ -639,7 +639,7 @@ void parseAndCreateConditionalBreaks(u32 address, u8 flags, char** exp, int n){
 		}else{
 			now->exp_type_flags |= 0x60;	//assume signed word
 		}
-		now->value = strdup(exp[i]);
+		now->value = _strdup(exp[i]);
 		i++;
 		u32 val;
 		if(!dexp_eval(now->value, &val) || !dexp_eval(now->address, &val)){
@@ -677,7 +677,7 @@ void parseAndCreateConditionalBreaks(u32 address, u8 flags, char** exp, int n){
 u8 parseExpressionType(char* given_type){
 	u8 flags = 0;
 	//for such a small string, pays off to convert first
-	char* type = strdup(given_type);
+	char* type = _strdup(given_type);
 	for(int i = 0; type[i] != '\0'; i++){
 		type[i] = toupper(type[i]);
 	}
