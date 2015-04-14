@@ -490,6 +490,12 @@ void soundShutdown()
 	}
 
 	systemOnSoundShutdown();
+
+	delete stereo_buffer;
+	stereo_buffer = 0;
+	
+	delete gb_apu;
+	gb_apu = 0;
 }
 
 void soundPause()
@@ -738,21 +744,6 @@ static variable_desc gba_state [] =
 	{ NULL, 0 }
 };
 
-// Reads and discards count bytes from in
-static void skip_read( gzFile in, int count )
-{
-	char buf [512];
-
-	while ( count )
-	{
-		int n = sizeof buf;
-		if ( n > count )
-			n = count;
-
-		count -= n;
-		utilGzRead( in, buf, n );
-	}
-}
 
 #ifdef __LIBRETRO__
 void soundSaveGame( u8 *&out )
@@ -773,6 +764,22 @@ void soundSaveGame( gzFile out )
 }
 
 #ifndef __LIBRETRO__
+// Reads and discards count bytes from in
+static void skip_read( gzFile in, int count )
+{
+	char buf [512];
+
+	while ( count )
+	{
+		int n = sizeof buf;
+		if ( n > count )
+			n = count;
+
+		count -= n;
+		utilGzRead( in, buf, n );
+	}
+}
+
 static void soundReadGameOld( gzFile in, int version )
 {
 	// Read main data

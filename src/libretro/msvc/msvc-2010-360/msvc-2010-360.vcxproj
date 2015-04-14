@@ -128,7 +128,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PreprocessorDefinitions>_DEBUG;_XBOX;_LIB;;__LIBRETRO__;SPEEDHAX;__POWERPC__;__ppc__;WORDS_BIGENDIAN;BLARGG_BIG_ENDIAN;INLINE=_inline;%(PreprocessorDefinitions);_XBOX360;FRONTEND_SUPPORTS_RGB565</PreprocessorDefinitions>
       <CallAttributedProfiling>Callcap</CallAttributedProfiling>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\libretro;$(SolutionDir)\..\src;$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;$(SolutionDir)\..\utils\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\libretro;$(SolutionDir)\..\src;$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -148,7 +148,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PreprocessorDefinitions>_DEBUG;_XBOX;_LIB;%(PreprocessorDefinitions);_XBOX360;FRONTEND_SUPPORTS_RGB565</PreprocessorDefinitions>
       <CallAttributedProfiling>Callcap</CallAttributedProfiling>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\libretro;$(SolutionDir)\..\src;$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;$(SolutionDir)\..\utils\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\libretro;$(SolutionDir)\..\src;$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -169,7 +169,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>NDEBUG;_XBOX;PROFILE;_LIB;%(PreprocessorDefinitions);_XBOX360;FRONTEND_SUPPORTS_RGB565</PreprocessorDefinitions>
       <CallAttributedProfiling>Callcap</CallAttributedProfiling>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\libretro;$(SolutionDir)\..\src;$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;$(SolutionDir)\..\utils\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\libretro;$(SolutionDir)\..\src;$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -193,7 +193,7 @@
       <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>NDEBUG;_XBOX;PROFILE;FASTCAP;_LIB;%(PreprocessorDefinitions);_XBOX360;FRONTEND_SUPPORTS_RGB565</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\libretro;$(SolutionDir)\..\src;$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;$(SolutionDir)\..\utils\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\libretro;$(SolutionDir)\..\src;$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -215,7 +215,7 @@
       <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>NDEBUG;_XBOX;_LIB;__LIBRETRO__;SPEEDHAX;__POWERPC__;__ppc__;WORDS_BIGENDIAN;BLARGG_BIG_ENDIAN;INLINE=_inline;USE_CACHE_PREFETCH;BRANCHLESS_GBA_GFX;%(PreprocessorDefinitions);_XBOX360;FRONTEND_SUPPORTS_RGB565</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\libretro;$(SolutionDir)\..\src;$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;$(SolutionDir)\..\utils\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\libretro;$(SolutionDir)\..\src;$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreschedulingOptimization>true</PreschedulingOptimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
@@ -239,7 +239,7 @@
       <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>NDEBUG;_XBOX;LTCG;_LIB;__LIBRETRO__;USE_CACHE_PREFETCH;BRANCHLESS_GBA_GFX;SPEEDHAX;__POWERPC__;__ppc__;WORDS_BIGENDIAN;BLARGG_BIG_ENDIAN;INLINE=_inline;%(PreprocessorDefinitions);_XBOX360;FRONTEND_SUPPORTS_RGB565</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\libretro;$(SolutionDir)\..\src;$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;$(SolutionDir)\..\utils\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\libretro;$(SolutionDir)\..\src;$(SolutionDir)\..\src\common;$(SolutionDir)\..\src\gb;$(SolutionDir)\..\src\gba;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreschedulingOptimization>true</PreschedulingOptimization>
     </ClCompile>
     <Link>
