@@ -10,6 +10,7 @@ enum LinkMode
 	LINK_CABLE_IPC,
 	LINK_CABLE_SOCKET,
 	LINK_RFU_IPC,
+	LINK_RFU_SOCKET,
 	LINK_GAMECUBE_DOLPHIN,
 	LINK_GAMEBOY
 };
@@ -186,10 +187,7 @@ extern const char *MakeInstanceFilename(const char *Input);
 
 typedef struct {
 	u8 len; //data len in 32bit words
-	u8 idx; //client idx
 	u8 gbaid; //source id
-	u8 qid; //target ids
-	u32 sign; //signal
 	u32 time; //linktime
 	u32 data[255];
 } rfu_datarec;

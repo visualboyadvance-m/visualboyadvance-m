@@ -73,6 +73,7 @@ BOOL LinkOptions::OnInitDialog(){
 	AddMode("Cable - Network", LINK_CABLE_SOCKET);
 	AddMode("GameCube - Dolphin", LINK_GAMECUBE_DOLPHIN);
 	AddMode("Wireless adapter - Single Computer", LINK_RFU_IPC);
+	AddMode("Wireless adapter - Network", LINK_RFU_SOCKET);
 	AddMode("Game Link (Game Boy) - Single Computer", LINK_GAMEBOY);
 
 	sprintf(timeout, "%d", theApp.linkTimeout);
@@ -162,7 +163,7 @@ void LinkOptions::OnOk()
 		return;
 	}
 
-	bool needsServerHost = newMode == LINK_GAMECUBE_DOLPHIN || (newMode == LINK_CABLE_SOCKET && !m_server);
+	bool needsServerHost = newMode == LINK_GAMECUBE_DOLPHIN || (newMode == LINK_CABLE_SOCKET && !m_server) || (newMode == LINK_RFU_SOCKET && !m_server);
 
 	if (needsServerHost) {
 		bool valid = SetLinkServerHost(host);
@@ -307,8 +308,8 @@ void LinkOptions::OnCbnSelchangeLinkMode()
 void LinkOptions::UpdateAvailability()
 {
 	bool isDisconnected = m_type == LINK_DISCONNECTED;
-	bool isNetwork = m_type == LINK_CABLE_SOCKET;
-	bool canHaveServer = (m_type == LINK_CABLE_SOCKET && !m_server) || m_type == LINK_GAMECUBE_DOLPHIN;
+	bool isNetwork = (m_type == LINK_CABLE_SOCKET) || (m_type == LINK_RFU_SOCKET);
+	bool canHaveServer = (m_type == LINK_CABLE_SOCKET && !m_server) || (m_type == LINK_RFU_SOCKET && !m_server) || m_type == LINK_GAMECUBE_DOLPHIN;
 	bool hasHacks = m_type == LINK_CABLE_SOCKET;
 
 	GetDlgItem(IDC_LINK_CLIENT)->EnableWindow(isNetwork);
