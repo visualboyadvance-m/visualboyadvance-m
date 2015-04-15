@@ -45,7 +45,7 @@ void utilReadDataMem(const uint8_t *& data, variable_desc *);
 gzFile utilGzOpen(const char *file, const char *mode);
 gzFile utilMemGzOpen(char *memory, int available, const char *mode);
 int utilGzWrite(gzFile file, const voidp buffer, unsigned int len);
-int utilGzRead(gzFile file, void buffer, unsigned int len);
+int utilGzRead(gzFile file, voidp buffer, unsigned int len);
 int utilGzClose(gzFile file);
 z_off_t utilGzSeek(gzFile file, z_off_t offset, int whence);
 long utilGzMemTell(gzFile file);

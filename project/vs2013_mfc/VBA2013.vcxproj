@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>VisualBoyAdvance-M</ProjectName>
+    <ProjectName>VBA-M</ProjectName>
     <ProjectGuid>{6D4C5EC8-933F-4C05-A1BF-498E658576DF}</ProjectGuid>
     <RootNamespace>VBA</RootNamespace>
     <Keyword>MFCProj</Keyword>
@@ -20,13 +20,15 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v120</PlatformToolset>
-    <UseOfMfc>Static</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <PlatformToolset>v120</PlatformToolset>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -54,10 +56,10 @@
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%programfiles%\OpenAL 1.1 SDK\include;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%programfiles%\OpenAL 1.1 SDK\include;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%programfiles%\OpenAL 1.1 SDK\libs\Win32;$(DXSDK_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Platform)\$(Configuration)_temp\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Platform)\$(Configuration)_temp\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Platform)\$(Configuration)\Build\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Platform)\$(Configuration)\Build\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Platform)\$(Configuration)\Build\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Platform)\$(Configuration)\Build\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <BuildLog />
@@ -154,7 +156,6 @@
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\win32\resource.h" />
     <ClInclude Include="..\..\src\gb\gb.h" />
     <ClInclude Include="..\..\src\gb\gbCheats.h" />
     <ClInclude Include="..\..\src\gb\gbCodes.h" />
@@ -188,13 +189,6 @@
     <ClInclude Include="..\..\src\gba\RTC.h" />
     <ClInclude Include="..\..\src\gba\Sound.h" />
     <ClInclude Include="..\..\src\gba\Sram.h" />
-    <ClInclude Include="..\..\src\System.h" />
-    <ClInclude Include="..\..\src\win32\rpi.h" />
-    <ClInclude Include="..\..\src\filters\hq2x.h" />
-    <ClInclude Include="..\..\src\filters\interp.h" />
-    <ClInclude Include="..\..\src\filters\lq2x.h" />
-    <ClInclude Include="..\..\src\filters\xBRZ\config.h" />
-    <ClInclude Include="..\..\src\filters\xBRZ\xbrz.h" />
     <ClInclude Include="..\..\src\gba\armdis.h" />
     <ClInclude Include="..\..\src\gba\Cheats.h" />
     <ClInclude Include="..\..\src\gba\CheatSearch.h" />
@@ -204,87 +198,13 @@
     <ClInclude Include="..\..\src\common\Port.h" />
     <ClInclude Include="..\..\src\Util.h" />
     <ClInclude Include="..\..\src\version.h" />
-    <ClInclude Include="..\..\src\win32\Display.h" />
-    <ClInclude Include="..\..\src\win32\glfont.h" />
-    <ClInclude Include="..\..\src\win32\gzglfont.h" />
-    <ClInclude Include="..\..\src\win32\Input.h" />
-    <ClInclude Include="..\..\src\common\SoundDriver.h" />
     <ClInclude Include="..\..\src\gba\gbalink.h" />
     <ClInclude Include="..\..\src\gba\GBASockClient.h" />
-    <ClInclude Include="..\..\src\win32\LinkOptions.h" />
-    <ClInclude Include="..\..\src\win32\stdafx.h" />
-    <ClInclude Include="..\..\src\win32\targetver.h" />
-    <ClInclude Include="..\..\src\win32\VBA.h" />
-    <ClInclude Include="..\..\src\win32\AboutDialog.h" />
-    <ClInclude Include="..\..\src\win32\AccelEditor.h" />
-    <ClInclude Include="..\..\src\win32\AcceleratorManager.h" />
-    <ClInclude Include="..\..\src\win32\Associate.h" />
-    <ClInclude Include="..\..\src\win32\AudioCoreSettingsDlg.h" />
-    <ClInclude Include="..\..\src\win32\AVIWrite.h" />
-    <ClInclude Include="..\..\src\win32\BIOSDialog.h" />
-    <ClInclude Include="..\..\src\win32\BitmapControl.h" />
-    <ClInclude Include="..\..\src\win32\CmdAccelOb.h" />
-    <ClInclude Include="..\..\src\win32\ColorButton.h" />
-    <ClInclude Include="..\..\src\win32\ColorControl.h" />
-    <ClInclude Include="..\..\src\win32\Directories.h" />
-    <ClInclude Include="..\..\src\win32\Disassemble.h" />
-    <ClInclude Include="..\..\src\win32\ExportGSASnapshot.h" />
-    <ClInclude Include="..\..\src\win32\FileDlg.h" />
-    <ClInclude Include="..\..\src\win32\FullscreenSettings.h" />
-    <ClInclude Include="..\..\src\win32\GBACheats.h" />
-    <ClInclude Include="..\..\src\win32\GDBConnection.h" />
-    <ClInclude Include="..\..\src\win32\GSACodeSelect.h" />
-    <ClInclude Include="..\..\src\win32\Hyperlink.h" />
-    <ClInclude Include="..\..\src\win32\IOViewer.h" />
-    <ClInclude Include="..\..\src\win32\IOViewerRegs.h" />
-    <ClInclude Include="..\..\src\win32\IUpdate.h" />
-    <ClInclude Include="..\..\src\win32\Joypad.h" />
-    <ClInclude Include="..\..\src\win32\KeyboardEdit.h" />
-    <ClInclude Include="..\..\src\win32\LangSelect.h" />
-    <ClInclude Include="..\..\src\win32\Logging.h" />
-    <ClInclude Include="..\..\src\win32\MainWnd.h" />
-    <ClInclude Include="..\..\src\win32\MapView.h" />
-    <ClInclude Include="..\..\src\win32\MaxScale.h" />
-    <ClInclude Include="..\..\src\win32\MemoryViewer.h" />
-    <ClInclude Include="..\..\src\win32\MemoryViewerAddressSize.h" />
-    <ClInclude Include="..\..\src\win32\MemoryViewerDlg.h" />
-    <ClInclude Include="..\..\src\win32\OALConfig.h" />
-    <ClInclude Include="..\..\src\win32\OamView.h" />
-    <ClInclude Include="..\..\src\win32\PaletteView.h" />
-    <ClInclude Include="..\..\src\win32\PaletteViewControl.h" />
-    <ClInclude Include="..\..\src\win32\Reg.h" />
-    <ClInclude Include="..\..\src\win32\ResizeDlg.h" />
-    <ClInclude Include="..\..\src\win32\RewindInterval.h" />
-    <ClInclude Include="..\..\src\win32\RomInfo.h" />
-    <ClInclude Include="..\..\src\win32\SelectPlugin.h" />
-    <ClInclude Include="..\..\src\win32\StringTokenizer.h" />
-    <ClInclude Include="..\..\src\win32\Throttle.h" />
-    <ClInclude Include="..\..\src\win32\TileView.h" />
-    <ClInclude Include="..\..\src\win32\WavWriter.h" />
-    <ClInclude Include="..\..\src\win32\WinHelper.h" />
-    <ClInclude Include="..\..\src\win32\WinResUtil.h" />
-    <ClInclude Include="..\..\src\win32\XAudio2_Config.h" />
-    <ClInclude Include="..\..\src\win32\ZoomControl.h" />
-    <ClInclude Include="..\..\src\win32\GBCheatsDlg.h" />
-    <ClInclude Include="..\..\src\win32\GBColorDlg.h" />
-    <ClInclude Include="..\..\src\win32\GBDisassemble.h" />
-    <ClInclude Include="..\..\src\win32\GBMapView.h" />
-    <ClInclude Include="..\..\src\win32\GBMemoryViewerDlg.h" />
-    <ClInclude Include="..\..\src\win32\GBOamView.h" />
-    <ClInclude Include="..\..\src\win32\GBPaletteView.h" />
-    <ClInclude Include="..\..\src\win32\GBPrinterDlg.h" />
-    <ClInclude Include="..\..\src\win32\GBTileView.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src\win32\res\VBA.ico" />
-    <None Include="..\..\src\win32\res\VBA.rc2" />
     <None Include="..\..\doc\DevInfo.txt" />
     <None Include="..\..\doc\License.txt" />
     <None Include="..\..\doc\ReadMe.MFC.txt" />
-    <None Include="..\..\src\filters\hq\asm\macros.mac" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="..\..\src\win32\VBA.rc" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\gb\gb.cpp" />
@@ -327,343 +247,16 @@
     <ClCompile Include="..\..\src\gba\RTC.cpp" />
     <ClCompile Include="..\..\src\gba\Sound.cpp" />
     <ClCompile Include="..\..\src\gba\Sram.cpp" />
-    <ClCompile Include="..\..\src\filters\2xSaI.cpp">
-      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</WholeProgramOptimization>
-    </ClCompile>
-    <ClCompile Include="..\..\src\filters\admame.cpp" />
-    <ClCompile Include="..\..\src\filters\bilinear.cpp" />
-    <ClCompile Include="..\..\src\filters\interframe.cpp" />
-    <ClCompile Include="..\..\src\filters\pixel.cpp" />
-    <ClCompile Include="..\..\src\win32\rpi.cpp" />
-    <ClCompile Include="..\..\src\filters\scanline.cpp" />
-    <ClCompile Include="..\..\src\filters\simpleFilter.cpp" />
-    <ClCompile Include="..\..\src\filters\xbrzfilter.cpp" />
-    <ClCompile Include="..\..\src\filters\xBRZ\xbrz.cpp" />
-    <ClCompile Include="..\..\src\filters\hq2x.cpp" />
-    <ClCompile Include="..\..\src\filters\hq\asm\hq3x32.cpp" />
     <ClCompile Include="..\..\src\gba\armdis.cpp" />
     <ClCompile Include="..\..\src\gba\Cheats.cpp" />
     <ClCompile Include="..\..\src\gba\CheatSearch.cpp" />
     <ClCompile Include="..\..\src\common\memgzio.c" />
     <ClCompile Include="..\..\src\common\Patch.cpp" />
     <ClCompile Include="..\..\src\Util.cpp" />
-    <ClCompile Include="..\..\src\win32\Direct3D.cpp" />
-    <ClCompile Include="..\..\src\win32\DirectInput.cpp" />
-    <ClCompile Include="..\..\src\win32\DirectSound.cpp" />
-    <ClCompile Include="..\..\src\win32\glfont.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\LoadOAL.cpp" />
-    <ClCompile Include="..\..\src\win32\OpenAL.cpp" />
-    <ClCompile Include="..\..\src\win32\OpenGL.cpp" />
-    <ClCompile Include="..\..\src\win32\XAudio2.cpp" />
     <ClCompile Include="..\..\src\gba\gbalink.cpp" />
     <ClCompile Include="..\..\src\gba\GBASockClient.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\..\src\win32\LinkOptions.cpp" />
-    <ClCompile Include="..\..\src\win32\stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\VBA.cpp" />
-    <ClCompile Include="..\..\src\win32\AboutDialog.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\AccelEditor.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\AcceleratorManager.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\Associate.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\AudioCoreSettingsDlg.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\AVIWrite.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\BIOSDialog.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\BitmapControl.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\CmdAccelOb.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\ColorButton.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\ColorControl.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\Commands.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\Directories.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\Disassemble.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\ExportGSASnapshot.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\FileDlg.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\FullscreenSettings.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\GameOverrides.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\GBACheats.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\GDBConnection.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\GSACodeSelect.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\Hyperlink.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\IOViewer.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\Joypad.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\KeyboardEdit.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\LangSelect.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\Logging.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\MainWnd.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\MainWndCheats.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\MainWndFile.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\MainWndHelp.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\MainWndOptions.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\MainWndTools.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\MapView.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\MaxScale.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\MemoryViewer.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\MemoryViewerAddressSize.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\MemoryViewerDlg.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\OALConfig.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\OamView.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\PaletteView.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\PaletteViewControl.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\Reg.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\ResizeDlg.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\RewindInterval.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\RomInfo.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\SelectPlugin.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\StringTokenizer.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\Throttle.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\TileView.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\WavWriter.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\WinResUtil.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\XAudio2_Config.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\ZoomControl.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\GBCheatsDlg.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\GBColorDlg.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\GBDisassemble.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\GBMapView.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\GBMemoryViewerDlg.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\GBOamView.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\GBPaletteView.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\GBPrinterDlg.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win32\GBTileView.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <NASM Include="..\..\src\filters\2xSaImmx.asm">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">__DJGPP__</PreprocessorDefinitions>
-      <GenerateDebugInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateDebugInfo>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">1</Optimization>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">__DJGPP__</PreprocessorDefinitions>
-    </NASM>
-    <NASM Include="..\..\src\filters\hq\asm\hq3x_16.asm">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">1</Optimization>
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../src/filters/hq/asm/</IncludePath>
-      <DisableOrphanLabelsWarning Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DisableOrphanLabelsWarning>
-      <GenerateDebugInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateDebugInfo>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">1</Optimization>
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../src/filters/hq/asm/</IncludePath>
-      <DisableOrphanLabelsWarning Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DisableOrphanLabelsWarning>
-    </NASM>
-    <NASM Include="..\..\src\filters\hq\asm\hq3x_32.asm">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">1</Optimization>
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../src/filters/hq/asm/</IncludePath>
-      <DisableOrphanLabelsWarning Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DisableOrphanLabelsWarning>
-      <GenerateDebugInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateDebugInfo>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">1</Optimization>
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../src/filters/hq/asm/</IncludePath>
-      <DisableOrphanLabelsWarning Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DisableOrphanLabelsWarning>
-    </NASM>
-    <NASM Include="..\..\src\filters\hq\asm\hq4x_16.asm">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">1</Optimization>
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../src/filters/hq/asm/</IncludePath>
-      <DisableOrphanLabelsWarning Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DisableOrphanLabelsWarning>
-      <GenerateDebugInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateDebugInfo>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">1</Optimization>
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../src/filters/hq/asm/</IncludePath>
-      <DisableOrphanLabelsWarning Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DisableOrphanLabelsWarning>
-    </NASM>
-    <NASM Include="..\..\src\filters\hq\asm\hq4x_32.asm">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">1</Optimization>
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../src/filters/hq/asm/</IncludePath>
-      <DisableOrphanLabelsWarning Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DisableOrphanLabelsWarning>
-      <GenerateDebugInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateDebugInfo>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">1</Optimization>
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../src/filters/hq/asm/</IncludePath>
-      <DisableOrphanLabelsWarning Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DisableOrphanLabelsWarning>
-    </NASM>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\dependencies\libpng\project\vs2013\libpng.vcxproj">
