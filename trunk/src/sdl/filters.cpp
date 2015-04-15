@@ -16,6 +16,10 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#if (defined _MSC_VER)
+#define C_CORE
+#endif
+
 #include "filters.h"
 
       //

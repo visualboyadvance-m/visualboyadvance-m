@@ -16,6 +16,12 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+//OpenGL library
+#if (defined _MSC_VER)
+#pragma comment( lib, "OpenGL32" )
+#include <windows.h>
+#endif
+
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -34,6 +40,7 @@
 #include <time.h>
 
 #include "../AutoBuild.h"
+#include "../svnrev.h"
 
 #include <SDL.h>
 
@@ -61,6 +68,7 @@
 #else // _WIN32
 # include <direct.h>
 # define GETCWD _getcwd
+# define snprintf sprintf
 #endif // _WIN32
 
 #ifndef __GNUC__
@@ -1250,7 +1258,7 @@ void change_rewind(int howmuch)
 		rewindCounter = 0;
 		{
 			char rewindMsgBuffer[50];
-			snprintf(rewindMsgBuffer, 50, "Rewind to %1d [%d]", rewindPos+1, rewindSerials[rewindPos]);
+			sprintf(rewindMsgBuffer, "Rewind to %1d [%d]", rewindPos+1, rewindSerials[rewindPos]);
 			rewindMsgBuffer[49]	= 0;
 			systemConsoleMessage(rewindMsgBuffer);
 		}
@@ -1854,7 +1862,7 @@ void handleRewinds()
 			)
 	) {
 		char rewMsgBuf[100];
-		snprintf(rewMsgBuf, 100, "Remembered rewind %1d (of %1d), serial %d.", curSavePos+1, rewindCount, rewindSerial);
+		sprintf(rewMsgBuf, "Remembered rewind %1d (of %1d), serial %d.", curSavePos+1, rewindCount, rewindSerial);
 		rewMsgBuf[99]	= 0;
 		systemConsoleMessage(rewMsgBuf);
 		rewindSerials[curSavePos]	= rewindSerial;
@@ -1873,7 +1881,7 @@ void handleRewinds()
 
 int main(int argc, char **argv)
 {
-  fprintf(stdout, "VBA-M version %s [SDL]\n", VERSION);
+  fprintf(stdout, "VBA-M version %s [SDL]\n", SVN_REV_STR);
 
   arg0 = argv[0];
 
@@ -2719,7 +2727,7 @@ int systemGetSensorZ()
 
 u8 systemGetSensorDarkness()
 {
-	//return sensorDarkness;
+	return 0;
 }
 
 SoundDriver * systemSoundInit()
