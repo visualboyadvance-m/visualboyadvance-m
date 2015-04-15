@@ -5,6 +5,8 @@
 #include <zlib.h>
 #endif
 
+#define winlog log
+
 class SoundDriver;
 
 struct EmulatedSystem {
@@ -78,11 +80,6 @@ extern void Sm60FPS_Init();
 extern bool Sm60FPS_CanSkipFrame();
 extern void Sm60FPS_Sleep();
 extern void DbgMsg(const char *msg, ...);
-#ifdef SDL
-#define winlog log
-#else
-extern void winlog(const char *,...);
-#endif
 extern void (*dbgOutput)(const char *s, u32 addr);
 extern void (*dbgSignal)(int sig,int number);
 extern u16 systemColorMap16[0x10000];

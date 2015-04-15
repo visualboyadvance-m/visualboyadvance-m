@@ -898,23 +898,6 @@ void VBA::updateMenuBar()
       m_pMainWnd->SetMenu(&m_menu);
 }
 
-void winlog(const char *msg, ...)
-{
-  CString buffer;
-  va_list valist;
-
-  va_start(valist, msg);
-  buffer.FormatV(msg, valist);
-
-  if(theApp.winout == NULL) {
-    theApp.winout = fopen("vba-trace.log","w");
-  }
-
-  fputs(buffer, theApp.winout);
-
-  va_end(valist);
-}
-
 void log(const char *msg, ...)
 {
   CString buffer;
