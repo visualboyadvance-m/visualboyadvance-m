@@ -803,7 +803,7 @@ void MainWnd::OnOptionsEmulatorSavetypeDetectNow()
     CString answer( _T( "This cartridge has probably no backup media." ) );
 
 	utilGBAFindSave(theApp.romSize);
-	switch (cpuSaveType)
+	switch (saveType)
 	{
 	case 0:
 		answer = _T("This cartridge has probably no backup media.");

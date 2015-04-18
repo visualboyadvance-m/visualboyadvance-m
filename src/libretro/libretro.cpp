@@ -439,6 +439,11 @@ static void gba_init(void)
 
 
    utilUpdateSystemColorMaps(false);
+   
+   if (cpuSaveType == 0)
+      utilGBAFindSave(size);
+   else
+      saveType = cpuSaveType;
 
    load_image_preferences();
 
