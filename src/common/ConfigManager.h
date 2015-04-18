@@ -24,6 +24,8 @@ extern char* aviRecordDir;
 extern char* biosFileNameGB;
 extern char* biosFileNameGBA;
 extern char* biosFileNameGBC;
+extern char* loadDotCodeFile;
+extern char* saveDotCodeFile;
 extern char* linkHostAddr;
 extern char* movieRecordDir;
 extern char* romDirGB;
