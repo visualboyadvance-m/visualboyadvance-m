@@ -202,6 +202,12 @@ void GameArea::LoadGame(const wxString &name)
 	    cpuSaveType = cfg->Read(wxT("saveType"), gopts.save_type);
 	    if(cpuSaveType < 0 || cpuSaveType > 5)
 		cpuSaveType = gopts.save_type;
+		
+		if (cpuSaveType == 0)
+		  utilGBAFindSave(size);
+		else
+		  saveType = cpuSaveType;
+		
 	    mirroringEnable = cfg->Read(wxT("mirroringEnabled"), (long)0);
 
 	    cfg->SetPath(wxT("/"));
@@ -209,13 +215,17 @@ void GameArea::LoadGame(const wxString &name)
 	    rtcEnable(gopts.rtc);
 	    flashSetSize(0x10000 << gopts.flash_size);
 	    cpuSaveType = gopts.save_type;
+		if (cpuSaveType == 0)
+		  utilGBAFindSave(size);
+		else
+		  saveType = cpuSaveType;	    
 	    // mirroring short ROMs is such an uncommon thing that any
 	    // carts needing it should be added to vba-over.ini.
 	    // on the other hand, I would see nothing wrong with enabling
 	    // by default on carts that are small enough (i.e., always
 	    // set this to true and ignore vba-over.ini).  It's just a one-time
 	    // init.
-	    mirroringEnable = false;
+	    mirroringEnable = true;
 	}
 	doMirroring(mirroringEnable);
 
