@@ -27,6 +27,8 @@
 #include "window.h"
 #include "intl.h"
 
+int systemDebug = 0;
+
 int main(int argc, char * argv[])
 {
   bool bShowVersion = false;

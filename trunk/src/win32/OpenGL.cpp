@@ -192,49 +192,49 @@ bool OpenGLDisplay::initialize()
 	switch( theApp.cartridgeType )
 	{
 	case IMAGE_GBA:
-		theApp.sizeX = 240;
-		theApp.sizeY = 160;
+		sizeX = 240;
+		sizeY = 160;
 		break;
 	case IMAGE_GB:
 		if ( gbBorderOn )
 		{
-			theApp.sizeX = 256;
-			theApp.sizeY = 224;
+			sizeX = 256;
+			sizeY = 224;
 		}
 		else
 		{
-			theApp.sizeX = 160;
-			theApp.sizeY = 144;
+			sizeX = 160;
+			sizeY = 144;
 		}
 		break;
 	}
 
 
-	switch(theApp.videoOption)
+	switch(videoOption)
 	{
 	case VIDEO_1X:
-		theApp.surfaceSizeX = theApp.sizeX;
-		theApp.surfaceSizeY = theApp.sizeY;
+		surfaceSizeX = sizeX;
+		surfaceSizeY = sizeY;
 		break;
 	case VIDEO_2X:
-		theApp.surfaceSizeX = theApp.sizeX * 2;
-		theApp.surfaceSizeY = theApp.sizeY * 2;
+		surfaceSizeX = sizeX * 2;
+		surfaceSizeY = sizeY * 2;
 		break;
 	case VIDEO_3X:
-		theApp.surfaceSizeX = theApp.sizeX * 3;
-		theApp.surfaceSizeY = theApp.sizeY * 3;
+		surfaceSizeX = sizeX * 3;
+		surfaceSizeY = sizeY * 3;
 		break;
 	case VIDEO_4X:
-		theApp.surfaceSizeX = theApp.sizeX * 4;
-		theApp.surfaceSizeY = theApp.sizeY * 4;
+		surfaceSizeX = sizeX * 4;
+		surfaceSizeY = sizeY * 4;
 		break;
 	case VIDEO_5X:
-		theApp.surfaceSizeX = theApp.sizeX * 5;
-		theApp.surfaceSizeY = theApp.sizeY * 5;
+		surfaceSizeX = sizeX * 5;
+		surfaceSizeY = sizeY * 5;
 		break;
 	case VIDEO_6X:
-		theApp.surfaceSizeX = theApp.sizeX * 6;
-		theApp.surfaceSizeY = theApp.sizeY * 6;
+		surfaceSizeX = sizeX * 6;
+		surfaceSizeY = sizeY * 6;
 		break;
 	case VIDEO_320x240:
 	case VIDEO_640x480:
@@ -243,17 +243,17 @@ bool OpenGLDisplay::initialize()
 	case VIDEO_1280x1024:
 	case VIDEO_OTHER:
 		{
-			if( theApp.fullScreenStretch ) {
-				theApp.surfaceSizeX = theApp.fsWidth;
-				theApp.surfaceSizeY = theApp.fsHeight;
+			if( fullScreenStretch ) {
+				surfaceSizeX = fsWidth;
+				surfaceSizeY = fsHeight;
 			} else {
-				float scaleX = (float)theApp.fsWidth / (float)theApp.sizeX;
-				float scaleY = (float)theApp.fsHeight / (float)theApp.sizeY;
+				float scaleX = (float)fsWidth / (float)sizeX;
+				float scaleY = (float)fsHeight / (float)sizeY;
 				float min = ( scaleX < scaleY ) ? scaleX : scaleY;
-				if( theApp.maxScale )
-					min = ( min > (float)theApp.maxScale ) ? (float)theApp.maxScale : min;
-				theApp.surfaceSizeX = (int)((float)theApp.sizeX * min);
-				theApp.surfaceSizeY = (int)((float)theApp.sizeY * min);
+				if( maxScale )
+					min = ( min > (float)maxScale ) ? (float)maxScale : min;
+				surfaceSizeX = (int)((float)sizeX * min);
+				surfaceSizeY = (int)((float)sizeY * min);
 			}
 		}
 		break;
@@ -261,23 +261,23 @@ bool OpenGLDisplay::initialize()
 
 	theApp.rect.left = 0;
 	theApp.rect.top = 0;
-	theApp.rect.right = theApp.sizeX;
-	theApp.rect.bottom = theApp.sizeY;
+	theApp.rect.right = sizeX;
+	theApp.rect.bottom = sizeY;
 
 	theApp.dest.left = 0;
 	theApp.dest.top = 0;
-	theApp.dest.right = theApp.surfaceSizeX;
-	theApp.dest.bottom = theApp.surfaceSizeY;
+	theApp.dest.right = surfaceSizeX;
+	theApp.dest.bottom = surfaceSizeY;
 
 	DWORD style = WS_POPUP | WS_VISIBLE;
 	DWORD styleEx = 0;
 
-	if( theApp.videoOption <= VIDEO_6X )
+	if( videoOption <= VIDEO_6X )
 		style |= WS_OVERLAPPEDWINDOW;
 	else
 		styleEx = 0;
 
-	if( theApp.videoOption <= VIDEO_6X )
+	if( videoOption <= VIDEO_6X )
 		AdjustWindowRectEx( &theApp.dest, style, TRUE, styleEx );
 	else
 		AdjustWindowRectEx( &theApp.dest, style, FALSE, styleEx );
@@ -286,12 +286,12 @@ bool OpenGLDisplay::initialize()
 	int winSizeY = theApp.dest.bottom - theApp.dest.top;
 	int x = 0, y = 0;
 
-	if( theApp.videoOption <= VIDEO_6X ) {
-		x = theApp.windowPositionX;
-		y = theApp.windowPositionY;
+	if( videoOption <= VIDEO_6X ) {
+		x = windowPositionX;
+		y = windowPositionY;
 	} else {
-		winSizeX = theApp.fsWidth;
-		winSizeY = theApp.fsHeight;
+		winSizeX = fsWidth;
+		winSizeY = fsHeight;
 	}
 
 	
@@ -300,20 +300,20 @@ bool OpenGLDisplay::initialize()
 
 	theApp.adjustDestRect();
 
-	currentAdapter = theApp.fsAdapter;
+	currentAdapter = fsAdapter;
 	DISPLAY_DEVICE dev;
 	ZeroMemory( &dev, sizeof(dev) );
 	dev.cb = sizeof(dev);
 	EnumDisplayDevices( NULL, currentAdapter, &dev, 0 );
-	if( theApp.videoOption >= VIDEO_320x240 ) {
+	if( videoOption >= VIDEO_320x240 ) {
 		// enter full screen mode
 		DEVMODE mode;
 		ZeroMemory( &mode, sizeof(mode) );
 		mode.dmSize = sizeof(mode);
-		mode.dmBitsPerPel = theApp.fsColorDepth;
-		mode.dmPelsWidth = theApp.fsWidth;
-		mode.dmPelsHeight = theApp.fsHeight;
-		mode.dmDisplayFrequency = theApp.fsFrequency;
+		mode.dmBitsPerPel = fsColorDepth;
+		mode.dmPelsWidth = fsWidth;
+		mode.dmPelsHeight = fsHeight;
+		mode.dmDisplayFrequency = fsFrequency;
 		mode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
 		LONG ret = ChangeDisplaySettingsEx( dev.DeviceName, &mode, NULL, CDS_FULLSCREEN, NULL );
 		if( ret != DISP_CHANGE_SUCCESSFUL ) {
@@ -334,12 +334,12 @@ bool OpenGLDisplay::initialize()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-	initializeMatrices( theApp.surfaceSizeX, theApp.surfaceSizeY );
+	initializeMatrices( surfaceSizeX, surfaceSizeY );
 
-	setVSync( theApp.vsync && !gba_joybus_active );
+	setVSync( vsync && !gba_joybus_active );
 
 #ifdef MMX
-	if(!theApp.disableMMX)
+	if(!disableMMX)
 		cpu_mmx = theApp.detectMMX();
 	else
 		cpu_mmx = 0;
@@ -349,15 +349,15 @@ bool OpenGLDisplay::initialize()
 	systemGreenShift = 11;
 	systemBlueShift = 3;
 	systemColorDepth = 32;
-	theApp.fsColorDepth = 32;
+	fsColorDepth = 32;
 
 	Init_2xSaI(32);
 
 	utilUpdateSystemColorMaps(theApp.cartridgeType == IMAGE_GBA && gbColorOption == 1);
 	theApp.updateFilter();
 	theApp.updateIFB();
-	pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
-	data = pix + ( theApp.sizeX + 1 ) * 4;
+	pitch = filterWidth * (systemColorDepth>>3) + 4;
+	data = pix + ( sizeX + 1 ) * 4;
 
 	if(failed)
 		return false;
@@ -377,8 +377,8 @@ void OpenGLDisplay::render()
 {
 	clear();
 
-	pitch = theApp.filterWidth * (systemColorDepth>>3) + 4;
-	data = pix + ( theApp.sizeX + 1 ) * 4;
+	pitch = filterWidth * (systemColorDepth>>3) + 4;
+	data = pix + ( sizeX + 1 ) * 4;
 
 	// apply pixel filter
 	if(theApp.filterFunction) {
@@ -389,8 +389,8 @@ void OpenGLDisplay::render()
 			(u8*)theApp.delta,
 			(u8*)filterData,
 			width * 4 ,
-			theApp.filterWidth,
-			theApp.filterHeight);
+			filterWidth,
+			filterHeight);
 	}
 
 	// Texturemap complete texture to surface
@@ -399,7 +399,7 @@ void OpenGLDisplay::render()
 	if( theApp.filterFunction ) {
 		glPixelStorei( GL_UNPACK_ROW_LENGTH, width);
 	} else {
-		glPixelStorei( GL_UNPACK_ROW_LENGTH, theApp.sizeX + 1 );
+		glPixelStorei( GL_UNPACK_ROW_LENGTH, sizeX + 1 );
 	}
     glTexSubImage2D(GL_TEXTURE_2D,0,0,0,width,height,GL_BGRA,GL_UNSIGNED_BYTE,data );
 
@@ -410,49 +410,49 @@ void OpenGLDisplay::render()
 	glVertex3i( 0, 0, 0 );
 
 	glTexCoord2f( (float)(width) / size, 0.0f );
-	glVertex3i( theApp.surfaceSizeX, 0, 0 );
+	glVertex3i( surfaceSizeX, 0, 0 );
 
 	glTexCoord2f( (float)(width) / size, (float)(height) / size );
-	glVertex3i( theApp.surfaceSizeX, theApp.surfaceSizeY, 0 );
+	glVertex3i( surfaceSizeX, surfaceSizeY, 0 );
 
 	glTexCoord2f( 0.0f, (float)(height) / size );
-	glVertex3i( 0, theApp.surfaceSizeY, 0 );
+	glVertex3i( 0, surfaceSizeY, 0 );
 	glEnd();
 
 
-	if( theApp.showSpeed ) { // && ( theApp.videoOption > VIDEO_6X ) ) {
+	if( showSpeed ) { // && ( videoOption > VIDEO_6X ) ) {
 		char buffer[30];
-		if( theApp.showSpeed == 1 ) {
+		if( showSpeed == 1 ) {
 			sprintf( buffer, "%3d%%", systemSpeed );
 		} else {
-			sprintf( buffer, "%3d%%(%d, %d fps)", systemSpeed, systemFrameSkip, theApp.showRenderedFrames );
+			sprintf( buffer, "%3d%%(%d, %d fps)", systemSpeed, systemFrameSkip, showRenderedFrames );
 		}
 		glFontBegin(&font);
 		glPushMatrix();
-		float fontscale = (float)theApp.surfaceSizeX / 100.0f;
+		float fontscale = (float)surfaceSizeX / 100.0f;
 		glScalef(fontscale, fontscale, fontscale);
 		glColor4f(1.0f, 0.25f, 0.25f, 1.0f);
-		glFontTextOut(buffer, (theApp.surfaceSizeX-(strlen(buffer)*11))/(fontscale*2), (theApp.surfaceSizeY-20)/fontscale, 0);
+		glFontTextOut(buffer, (surfaceSizeX-(strlen(buffer)*11))/(fontscale*2), (surfaceSizeY-20)/fontscale, 0);
 		glPopMatrix();
 		glFontEnd();
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		glBindTexture( GL_TEXTURE_2D, texture );
 	}
-	if( theApp.screenMessage ) {
-		if( ( ( GetTickCount() - theApp.screenMessageTime ) < 3000 ) && !theApp.disableStatusMessage ) {
+	if( screenMessage ) {
+		if( ( ( GetTickCount() - theApp.screenMessageTime ) < 3000 ) && !disableStatusMessages ) {
 			glFontBegin(&font);
 			glPushMatrix();
 
-			float fontscale = (float)theApp.surfaceSizeX / 100.0f;
+			float fontscale = (float)surfaceSizeX / 100.0f;
 			glScalef(fontscale, fontscale, fontscale);
 			glColor4f(1.0f, 0.25f, 0.25f, 1.0f);
-			glFontTextOut((char *)((const char *)theApp.screenMessageBuffer), (theApp.surfaceSizeX-(theApp.screenMessageBuffer.GetLength()*11))/(fontscale*2), (theApp.surfaceSizeY-40)/fontscale, 0);
+			glFontTextOut((char *)((const char *)theApp.screenMessageBuffer), (surfaceSizeX-(theApp.screenMessageBuffer.GetLength()*11))/(fontscale*2), (surfaceSizeY-40)/fontscale, 0);
 			glPopMatrix();
 			glFontEnd();
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			glBindTexture( GL_TEXTURE_2D, texture );
 		} else {
-			theApp.screenMessage = false;
+			screenMessage = false;
 		}
 	}
 
@@ -491,7 +491,7 @@ void OpenGLDisplay::updateFiltering( int value )
 //init projection matrixes and viewports
 void OpenGLDisplay::initializeMatrices( int w, int h )
 {
-	if( theApp.fullScreenStretch ) {
+	if( fullScreenStretch ) {
 		glViewport( 0, 0, w, h );
 	} else {
 		calculateDestRect( w, h );
@@ -542,7 +542,7 @@ bool OpenGLDisplay::initializeTexture( int w, int h )
 
 	glGenTextures( 1, &texture );
 	glBindTexture( GL_TEXTURE_2D, texture );
-	updateFiltering( theApp.glFilter );
+	updateFiltering( glFilter );
 
 	glTexImage2D(
 		GL_TEXTURE_2D,
@@ -609,8 +609,8 @@ void OpenGLDisplay::calculateDestRect( int w, int h )
 	float scaleX = (float)w / (float)width;
 	float scaleY = (float)h / (float)height;
 	float min = (scaleX < scaleY) ? scaleX : scaleY;
-	if( theApp.maxScale && (min > theApp.maxScale) ) {
-		min = (float)theApp.maxScale;
+	if( maxScale && (min > maxScale) ) {
+		min = (float)maxScale;
 	}
 	destRect.left = 0;
 	destRect.top = 0;

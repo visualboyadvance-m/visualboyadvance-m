@@ -16,9 +16,10 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "SoundSDL.h"
+#include "ConfigManager.h"
+#include "../gba/Globals.h"
 
 extern int emulating;
-extern bool speedup;
 
 // Hold up to 100 ms of data in the ring buffer
 const float SoundSDL::_delay = 0.1f;
@@ -44,7 +45,7 @@ void SoundSDL::read(u16 * stream, int length)
 	/* since this is running in a different thread, speedup and
 	 * throttle can change at any time; save the value so locks
 	 * stay in sync */
-	bool lock = (emulating && !speedup) ? true : false;
+	bool lock = (emulating && !speedup && synchronize && !gba_joybus_active) ? true : false;
 
 	if (lock)
 		SDL_SemWait (_semBufferFull);
@@ -73,7 +74,7 @@ void SoundSDL::write(u16 * finalWave, int length)
 	std::size_t avail;
 	while ((avail = _rbuf.avail() / 2) < samples)
 	{
-		bool lock = (emulating && !speedup) ? true : false;
+		bool lock = (emulating && !speedup && synchronize && !gba_joybus_active) ? true : false;
 
 		_rbuf.write(finalWave, avail * 2);
 

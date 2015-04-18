@@ -16,6 +16,7 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 #endif
+#include "../common/ConfigManager.h"
 #include "../gb/gbPrinter.h"
 #include "../gba/agbprint.h"
 

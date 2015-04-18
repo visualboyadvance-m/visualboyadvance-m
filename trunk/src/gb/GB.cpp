@@ -15,13 +15,13 @@
 #include "gbSound.h"
 #include "../Util.h"
 #include "../gba/GBALink.h"
+#include "../common/ConfigManager.h"
 
 #ifdef __GNUC__
 #define _stricmp strcasecmp
 #endif
 
 extern u8 *pix;
-extern bool speedup;
 bool gbUpdateSizes();
 bool inBios = false;
 

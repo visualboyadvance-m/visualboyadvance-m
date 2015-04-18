@@ -243,7 +243,7 @@ void GBPrinterDlg::OnSave()
 {
   CString captureBuffer;
 
-  if(theApp.captureFormat == 0)
+  if(captureFormat == 0)
     captureBuffer = "printer.png";
   else
     captureBuffer = "printer.bmp";
@@ -256,8 +256,8 @@ void GBPrinterDlg::OnSave()
   FileDlg dlg(this,
               captureBuffer,
               filter,
-              theApp.captureFormat ? 2 : 1,
-              theApp.captureFormat ? "BMP" : "PNG",
+              captureFormat ? 2 : 1,
+              captureFormat ? "BMP" : "PNG",
               exts,
               "",
               title,
