@@ -102,7 +102,7 @@ FileDlg::FileDlg(CWnd *parent, LPCTSTR file, LPCTSTR filter,
     *p++ = 0;
   m_ofn.lpstrFilter = m_filter;
 
-  if(theApp.videoOption == VIDEO_320x240) {
+  if(videoOption == VIDEO_320x240) {
     m_ofn.lpTemplateName = MAKEINTRESOURCE(IDD_OPENDLG);
     m_ofn.lpfnHook = HookFuncOldStyle;
     m_ofn.Flags |= OFN_ENABLETEMPLATE;

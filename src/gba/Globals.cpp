@@ -17,23 +17,6 @@ bool armIrqEnable = true;
 u32 armNextPC = 0x00000000;
 int armMode = 0x1f;
 u32 stop = 0x08000568;
-int saveType = 0;
-bool useBios = false;
-bool skipBios = false;
-int frameSkip = 1;
-bool speedup = false;
-bool synchronize = true;
-bool cpuDisableSfx = false;
-bool cpuIsMultiBoot = false;
-bool parseDebug = true;
-int layerSettings = 0xff00;
-int layerEnable = 0xff00;
-bool speedHack = false;
-int cpuSaveType = 0;
-bool cheatsEnabled = true;
-bool mirroringEnable = true;
-bool skipSaveGameBattery = false;
-bool skipSaveGameCheats = false;
 
 // this is an optional hack to change the backdrop/background color:
 // -1: disabled

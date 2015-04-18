@@ -156,6 +156,9 @@
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\common\ConfigManager.h" />
+    <ClInclude Include="..\..\src\common\dictionary.h" />
+    <ClInclude Include="..\..\src\common\iniparser.h" />
     <ClInclude Include="..\..\src\gb\gb.h" />
     <ClInclude Include="..\..\src\gb\gbCheats.h" />
     <ClInclude Include="..\..\src\gb\gbCodes.h" />
@@ -207,6 +210,9 @@
     <None Include="..\..\doc\ReadMe.MFC.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\common\ConfigManager.cpp" />
+    <ClCompile Include="..\..\src\common\dictionary.c" />
+    <ClCompile Include="..\..\src\common\iniparser.c" />
     <ClCompile Include="..\..\src\gb\gb.cpp" />
     <ClCompile Include="..\..\src\gb\gbCheats.cpp" />
     <ClCompile Include="..\..\src\gb\gbDis.cpp" />

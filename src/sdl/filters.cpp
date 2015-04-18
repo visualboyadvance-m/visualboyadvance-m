@@ -180,7 +180,7 @@ const IFBFilterDesc IFBFilters[] = {
   { "Smart interframe blending", SmartIB, SmartIB32 }
 };
 
-IFBFilterFunc initIFBFilter(const IFBFilter f, const int colorDepth)
+IFBFilterFunc initIFBFilter(const int f, const int colorDepth)
 {
   IFBFilterFunc func;
 

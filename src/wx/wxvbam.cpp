@@ -21,6 +21,8 @@
 // The built-in vba-over.ini
 #include "builtin-over.h"
 
+int systemDebug = 0;
+
 IMPLEMENT_APP(wxvbamApp)
 IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
 

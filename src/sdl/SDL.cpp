@@ -45,6 +45,7 @@
 #include <SDL.h>
 
 #include "../common/Patch.h"
+#include "../common/ConfigManager.h"
 #include "../gba/GBA.h"
 #include "../gba/agbprint.h"
 #include "../gba/Flash.h"
@@ -123,59 +124,31 @@ int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
 int srcPitch = 0;
-int srcWidth = 0;
-int srcHeight = 0;
 int destWidth = 0;
 int destHeight = 0;
 int desktopWidth = 0;
 int desktopHeight = 0;
 
-Filter filter = kStretch2x;
 u8 *delta = NULL;
 static const int delta_size = 322*242*4;
 
 int filter_enlarge = 2;
 
-int sdlPrintUsage = 0;
-
 int cartridgeType = 3;
-int captureFormat = 0;
 
-int openGL = 1;
 int textureSize = 256;
 GLuint screenTexture = 0;
 u8 *filterPix = 0;
 
-int pauseWhenInactive = 0;
-int active = 1;
 int emulating = 0;
 int RGB_LOW_BITS_MASK=0x821;
 u32 systemColorMap32[0x10000];
 u16 systemColorMap16[0x10000];
 u16 systemGbPalette[24];
-FilterFunc filterFunction = 0;
-IFBFilterFunc ifbFunction = 0;
-IFBFilter ifbType = kIFBNone;
+
 char filename[2048];
-char biosFileName[2048];
-char gbBiosFileName[2048];
-char captureDir[2048];
-char saveDir[2048];
-char batteryDir[2048];
-char* homeDir = NULL;
 
-// Directory within homedir to use for default save location.
-#define DOT_DIR ".vbam"
-
-static char *rewindMemory = NULL;
-static int *rewindSerials = NULL;
-static int rewindPos = 0;
 static int rewindSerial = 0;
-static int rewindTopPos = 0;
-static int rewindCounter = 0;
-static int rewindCount = 0;
-static bool rewindSaveNeeded = false;
-static int rewindTimer = 0;
 
 static int sdlSaveKeysSwitch = 0;
 // if 0, then SHIFT+F# saves, F# loads (old VBA, ...)
@@ -191,10 +164,6 @@ static int saveSlotPosition = 0; // default is the slot from normal F1
 static int sdlOpenglScale = 1;
 // will scale window on init by this much
 static int sdlSoundToggledOff = 0;
-// allow up to 100 IPS/UPS/PPF patches given on commandline
-#define PATCH_MAX_NUM 100
-int	sdl_patch_num	= 0;
-char *	(sdl_patch_names[PATCH_MAX_NUM])	= { NULL }; // and so on
 
 extern int autoFireMaxCount;
 
@@ -202,100 +171,37 @@ extern int autoFireMaxCount;
 #define REWIND_SIZE 400000
 #define SYSMSG_BUFFER_SIZE 1024
 
+enum VIDEO_SIZE{
+	VIDEO_1X, VIDEO_2X, VIDEO_3X, VIDEO_4X, VIDEO_5X, VIDEO_6X,
+	VIDEO_320x240, VIDEO_640x480, VIDEO_800x600, VIDEO_1024x768, VIDEO_1280x1024,
+	VIDEO_OTHER
+};
+
 #define _stricmp strcasecmp
 
-bool wasPaused = false;
-int autoFrameSkip = 0;
-int frameskipadjust = 0;
-int showRenderedFrames = 0;
-int renderedFrames = 0;
-
 u32 throttleLastTime = 0;
-u32 autoFrameSkipLastTime = 0;
 
-int showSpeed = 1;
-int showSpeedTransparent = 1;
-bool disableStatusMessages = false;
-bool paused = false;
 bool pauseNextFrame = false;
 bool debuggerStub = false;
-int fullscreen = 0;
-int sdlFlashSize = 0;
-int sdlAutoPatch = 1;
-int sdlRtcEnable = 0;
-int sdlAgbPrint = 0;
 int sdlMirroringEnable = 0;
 
-static int        ignore_first_resize_event = 0;
+static int ignore_first_resize_event = 0;
 
+void (*dbgMain)();
 /* forward */
 void systemConsoleMessage(const char*);
 
-void (*dbgMain)();
 void (*dbgSignal)(int,int);
 void (*dbgOutput)(const char *, u32);
 
-int  mouseCounter = 0;
+char* home;
 
-bool screenMessage = false;
 char screenMessageBuffer[21];
 u32  screenMessageTime = 0;
 
-char *arg0;
-
-int sdlPreparedCheats	= 0;
-#define MAX_CHEATS 100
-const char * sdlPreparedCheatCodes[MAX_CHEATS];
-
-#define SDL_SOUND_MAX_VOLUME 2.0
-#define SDL_SOUND_ECHO       0.2
-#define SDL_SOUND_STEREO     0.15
-
-struct option sdlOptions[] = {
-  { "agb-print", no_argument, &sdlAgbPrint, 1 },
-  { "auto-frameskip", no_argument, &autoFrameSkip, 1 },
-  { "bios", required_argument, 0, 'b' },
-  { "config", required_argument, 0, 'c' },
-  { "debug", no_argument, 0, 'd' },
-  { "filter", required_argument, 0, 'f' },
-  { "ifb-filter", required_argument, 0, 'I' },
-  { "flash-size", required_argument, 0, 'S' },
-  { "flash-64k", no_argument, &sdlFlashSize, 0 },
-  { "flash-128k", no_argument, &sdlFlashSize, 1 },
-  { "frameskip", required_argument, 0, 's' },
-  { "fullscreen", no_argument, &fullscreen, 1 },
-  { "gdb", required_argument, 0, 'G' },
-  { "help", no_argument, &sdlPrintUsage, 1 },
-  { "patch", required_argument, 0, 'i' },
-  { "no-agb-print", no_argument, &sdlAgbPrint, 0 },
-  { "no-auto-frameskip", no_argument, &autoFrameSkip, 0 },
-  { "no-debug", no_argument, 0, 'N' },
-  { "no-patch", no_argument, &sdlAutoPatch, 0 },
-  { "no-opengl", no_argument, &openGL, 0 },
-  { "no-pause-when-inactive", no_argument, &pauseWhenInactive, 0 },
-  { "no-rtc", no_argument, &sdlRtcEnable, 0 },
-  { "no-show-speed", no_argument, &showSpeed, 0 },
-  { "opengl", required_argument, 0, 'O' },
-  { "opengl-nearest", no_argument, &openGL, 1 },
-  { "opengl-bilinear", no_argument, &openGL, 2 },
-  { "pause-when-inactive", no_argument, &pauseWhenInactive, 1 },
-  { "profile", optional_argument, 0, 'p' },
-  { "rtc", no_argument, &sdlRtcEnable, 1 },
-  { "save-type", required_argument, 0, 't' },
-  { "save-auto", no_argument, &cpuSaveType, 0 },
-  { "save-eeprom", no_argument, &cpuSaveType, 1 },
-  { "save-sram", no_argument, &cpuSaveType, 2 },
-  { "save-flash", no_argument, &cpuSaveType, 3 },
-  { "save-sensor", no_argument, &cpuSaveType, 4 },
-  { "save-none", no_argument, &cpuSaveType, 5 },
-  { "show-speed-normal", no_argument, &showSpeed, 1 },
-  { "show-speed-detailed", no_argument, &showSpeed, 2 },
-  { "throttle", required_argument, 0, 'T' },
-  { "verbose", required_argument, 0, 'v' },
-  { "cheat", required_argument, 0, 1000 },
-  { "autofire", required_argument, 0, 1001 },
-  { NULL, no_argument, NULL, 0 }
-};
+#define SOUND_MAX_VOLUME 2.0
+#define SOUND_ECHO       0.2
+#define SOUND_STEREO     0.15
 
 static void sdlChangeVolume(float d)
 {
@@ -303,7 +209,7 @@ static void sdlChangeVolume(float d)
 	float newVolume = oldVolume + d;
 
 	if (newVolume < 0.0) newVolume = 0.0;
-	if (newVolume > SDL_SOUND_MAX_VOLUME) newVolume = SDL_SOUND_MAX_VOLUME;
+	if (newVolume > SOUND_MAX_VOLUME) newVolume = SOUND_MAX_VOLUME;
 
 	if (fabs(newVolume - oldVolume) > 0.001) {
 		char tmp[32];
@@ -363,20 +269,6 @@ void StopLirc(void)
 #endif
 
 
-u32 sdlFromHex(char *s)
-{
-  u32 value;
-  sscanf(s, "%x", &value);
-  return value;
-}
-
-u32 sdlFromDec(char *s)
-{
-  u32 value = 0;
-  sscanf(s, "%u", &value);
-  return value;
-}
-
 #ifdef __MSC__
 #define stat _stat
 #define S_IFDIR _S_IFDIR
@@ -384,6 +276,11 @@ u32 sdlFromDec(char *s)
 
 void sdlCheckDirectory(char *dir)
 {
+	if (!dir)
+	{
+		return;
+	}
+
   struct stat buf;
 
   int len = strlen(dir);
@@ -397,11 +294,9 @@ void sdlCheckDirectory(char *dir)
   if(stat(dir, &buf) == 0) {
     if(!(buf.st_mode & S_IFDIR)) {
       fprintf(stderr, "Error: %s is not a directory\n", dir);
-      dir[0] = 0;
     }
   } else {
     fprintf(stderr, "Error: %s does not exist\n", dir);
-    dir[0] = 0;
   }
 }
 
@@ -476,8 +371,8 @@ FILE *sdlFindFile(const char *name)
       return f;
   }
   
-  if(!strchr(arg0, '/') &&
-     !strchr(arg0, '\\')) {
+  if (!strchr(home, '/') &&
+	  !strchr(home, '\\')) {
     char *path = getenv("PATH");
 
     if(path != NULL) {
@@ -505,7 +400,7 @@ FILE *sdlFindFile(const char *name)
   } else {
     // executable is relative to some directory
     fprintf(stdout, "Searching executable directory\n");
-    strcpy(buffer, arg0);
+	strcpy(buffer, home);
     char *p = strrchr(buffer, FILE_SEP);
     if(p) {
       *p = 0;
@@ -530,293 +425,9 @@ FILE *sdlFindFile(const char *name)
 #endif // ! _WIN32
 
   return NULL;
-}
-
-void sdlReadPreferences(FILE *f)
+}void sdlOpenGLInit(int w, int h)
 {
-  char buffer[2048];
-
-  while(1) {
-    char *s = fgets(buffer, 2048, f);
-
-    if(s == NULL)
-      break;
-
-    char *p  = strchr(s, '#');
-
-    if(p)
-      *p = 0;
-
-    char *token = strtok(s, " \t\n\r=");
-
-    if(!token)
-      continue;
-
-    if(strlen(token) == 0)
-      continue;
-
-    char *key = token;
-    char *value = strtok(NULL, "\t\n\r");
-
-    if(value == NULL) {
-      fprintf(stdout, "Empty value for key %s\n", key);
-      continue;
-    }
-
-    if(!strcmp(key,"Joy0_Left")) {
-      inputSetKeymap(PAD_1, KEY_LEFT, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy0_Right")) {
-      inputSetKeymap(PAD_1, KEY_RIGHT, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy0_Up")) {
-      inputSetKeymap(PAD_1, KEY_UP, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy0_Down")) {
-      inputSetKeymap(PAD_1, KEY_DOWN, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy0_A")) {
-      inputSetKeymap(PAD_1, KEY_BUTTON_A, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy0_B")) {
-      inputSetKeymap(PAD_1, KEY_BUTTON_B, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy0_L")) {
-      inputSetKeymap(PAD_1, KEY_BUTTON_L, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy0_R")) {
-      inputSetKeymap(PAD_1, KEY_BUTTON_R, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy0_Start")) {
-      inputSetKeymap(PAD_1, KEY_BUTTON_START, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy0_Select")) {
-      inputSetKeymap(PAD_1, KEY_BUTTON_SELECT, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy0_Speed")) {
-      inputSetKeymap(PAD_1, KEY_BUTTON_SPEED, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy0_Capture")) {
-      inputSetKeymap(PAD_1, KEY_BUTTON_CAPTURE, sdlFromHex(value));
-    } else if(!strcmp(key,"Joy1_Left")) {
-      inputSetKeymap(PAD_2, KEY_LEFT, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy1_Right")) {
-      inputSetKeymap(PAD_2, KEY_RIGHT, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy1_Up")) {
-      inputSetKeymap(PAD_2, KEY_UP, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy1_Down")) {
-      inputSetKeymap(PAD_2, KEY_DOWN, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy1_A")) {
-      inputSetKeymap(PAD_2, KEY_BUTTON_A, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy1_B")) {
-      inputSetKeymap(PAD_2, KEY_BUTTON_B, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy1_L")) {
-      inputSetKeymap(PAD_2, KEY_BUTTON_L, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy1_R")) {
-      inputSetKeymap(PAD_2, KEY_BUTTON_R, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy1_Start")) {
-      inputSetKeymap(PAD_2, KEY_BUTTON_START, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy1_Select")) {
-      inputSetKeymap(PAD_2, KEY_BUTTON_SELECT, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy1_Speed")) {
-      inputSetKeymap(PAD_2, KEY_BUTTON_SPEED, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy1_Capture")) {
-      inputSetKeymap(PAD_2, KEY_BUTTON_CAPTURE, sdlFromHex(value));
-    } else if(!strcmp(key,"Joy2_Left")) {
-      inputSetKeymap(PAD_3, KEY_LEFT, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy2_Right")) {
-      inputSetKeymap(PAD_3, KEY_RIGHT, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy2_Up")) {
-      inputSetKeymap(PAD_3, KEY_UP, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy2_Down")) {
-      inputSetKeymap(PAD_3, KEY_DOWN, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy2_A")) {
-      inputSetKeymap(PAD_3, KEY_BUTTON_A, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy2_B")) {
-      inputSetKeymap(PAD_3, KEY_BUTTON_B, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy2_L")) {
-      inputSetKeymap(PAD_3, KEY_BUTTON_L, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy2_R")) {
-      inputSetKeymap(PAD_3, KEY_BUTTON_R, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy2_Start")) {
-      inputSetKeymap(PAD_3, KEY_BUTTON_START, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy2_Select")) {
-      inputSetKeymap(PAD_3, KEY_BUTTON_SELECT, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy2_Speed")) {
-      inputSetKeymap(PAD_3, KEY_BUTTON_SPEED, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy2_Capture")) {
-      inputSetKeymap(PAD_3, KEY_BUTTON_CAPTURE, sdlFromHex(value));
-    } else if(!strcmp(key,"Joy3_Left")) {
-      inputSetKeymap(PAD_4, KEY_LEFT, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy3_Right")) {
-      inputSetKeymap(PAD_4, KEY_RIGHT, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy3_Up")) {
-      inputSetKeymap(PAD_4, KEY_UP, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy3_Down")) {
-      inputSetKeymap(PAD_4, KEY_DOWN, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy3_A")) {
-      inputSetKeymap(PAD_4, KEY_BUTTON_A, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy3_B")) {
-      inputSetKeymap(PAD_4, KEY_BUTTON_B, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy3_L")) {
-      inputSetKeymap(PAD_4, KEY_BUTTON_L, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy3_R")) {
-      inputSetKeymap(PAD_4, KEY_BUTTON_R, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy3_Start")) {
-      inputSetKeymap(PAD_4, KEY_BUTTON_START, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy3_Select")) {
-      inputSetKeymap(PAD_4, KEY_BUTTON_SELECT, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy3_Speed")) {
-      inputSetKeymap(PAD_4, KEY_BUTTON_SPEED, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy3_Capture")) {
-      inputSetKeymap(PAD_4, KEY_BUTTON_CAPTURE, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy0_AutoA")) {
-      inputSetKeymap(PAD_1, KEY_BUTTON_AUTO_A, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy0_AutoB")) {
-      inputSetKeymap(PAD_1, KEY_BUTTON_AUTO_B, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy1_AutoA")) {
-      inputSetKeymap(PAD_2, KEY_BUTTON_AUTO_A, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy1_AutoB")) {
-      inputSetKeymap(PAD_2, KEY_BUTTON_AUTO_B, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy2_AutoA")) {
-      inputSetKeymap(PAD_3, KEY_BUTTON_AUTO_A, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy2_AutoB")) {
-      inputSetKeymap(PAD_3, KEY_BUTTON_AUTO_B, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy3_AutoA")) {
-      inputSetKeymap(PAD_4, KEY_BUTTON_AUTO_A, sdlFromHex(value));
-    } else if(!strcmp(key, "Joy3_AutoB")) {
-      inputSetKeymap(PAD_4, KEY_BUTTON_AUTO_B, sdlFromHex(value));
-    } else if(!strcmp(key, "openGL")) {
-     openGL = sdlFromHex(value);
-    } else if(!strcmp(key, "Motion_Left")) {
-      inputSetMotionKeymap(KEY_LEFT, sdlFromHex(value));
-    } else if(!strcmp(key, "Motion_Right")) {
-      inputSetMotionKeymap(KEY_RIGHT, sdlFromHex(value));
-    } else if(!strcmp(key, "Motion_Up")) {
-      inputSetMotionKeymap(KEY_UP, sdlFromHex(value));
-    } else if(!strcmp(key, "Motion_Down")) {
-      inputSetMotionKeymap(KEY_DOWN, sdlFromHex(value));
-    } else if(!strcmp(key, "frameSkip")) {
-      frameSkip = sdlFromHex(value);
-      if(frameSkip < 0 || frameSkip > 9)
-        frameSkip = 2;
-    } else if(!strcmp(key, "gbFrameSkip")) {
-      gbFrameSkip = sdlFromHex(value);
-      if(gbFrameSkip < 0 || gbFrameSkip > 9)
-        gbFrameSkip = 0;
-    } else if(!strcmp(key, "fullScreen")) {
-      fullscreen = sdlFromHex(value) ? 1 : 0;
-    } else if(!strcmp(key, "useBios")) {
-      useBios = sdlFromHex(value) ? true : false;
-    } else if(!strcmp(key, "skipBios")) {
-      skipBios = sdlFromHex(value) ? true : false;
-    } else if(!strcmp(key, "biosFile")) {
-      strcpy(biosFileName, value);
-    } else if(!strcmp(key, "gbBiosFile")) {
-      strcpy(gbBiosFileName, value);
-    } else if(!strcmp(key, "filter")) {
-      filter = (Filter)sdlFromDec(value);
-      if(filter < kStretch1x || filter >= kInvalidFilter)
-        filter = kStretch2x;
-    } else if(!strcmp(key, "disableStatus")) {
-      disableStatusMessages = sdlFromHex(value) ? true : false;
-    } else if(!strcmp(key, "borderOn")) {
-      gbBorderOn = sdlFromHex(value) ? true : false;
-    } else if(!strcmp(key, "borderAutomatic")) {
-      gbBorderAutomatic = sdlFromHex(value) ? true : false;
-    } else if(!strcmp(key, "emulatorType")) {
-      gbEmulatorType = sdlFromHex(value);
-      if(gbEmulatorType < 0 || gbEmulatorType > 5)
-        gbEmulatorType = 1;
-    } else if(!strcmp(key, "colorOption")) {
-      gbColorOption = sdlFromHex(value) ? true : false;
-    } else if(!strcmp(key, "captureDir")) {
-      sdlCheckDirectory(value);
-      strcpy(captureDir, value);
-    } else if(!strcmp(key, "saveDir")) {
-      sdlCheckDirectory(value);
-      strcpy(saveDir, value);
-    } else if(!strcmp(key, "batteryDir")) {
-      sdlCheckDirectory(value);
-      strcpy(batteryDir, value);
-    } else if(!strcmp(key, "captureFormat")) {
-      captureFormat = sdlFromHex(value);
-    } else if(!strcmp(key, "soundQuality")) {
-      int soundQuality = sdlFromHex(value);
-      switch(soundQuality) {
-      case 1:
-      case 2:
-      case 4:
-        break;
-      default:
-        fprintf(stdout, "Unknown sound quality %d. Defaulting to 22Khz\n",
-                soundQuality);
-        soundQuality = 2;
-        break;
-      }
-      soundSetSampleRate(44100 / soundQuality);
-    } else if(!strcmp(key, "soundEnable")) {
-      int res = sdlFromHex(value) & 0x30f;
-      soundSetEnable(res);
-    } else if(!strcmp(key, "soundStereo")) {
-      if (sdlFromHex(value)) {
-        gb_effects_config.stereo = SDL_SOUND_STEREO;
-        gb_effects_config.enabled = true;
-      }
-    } else if(!strcmp(key, "soundEcho")) {
-      if (sdlFromHex(value)) {
-        gb_effects_config.echo = SDL_SOUND_ECHO;
-        gb_effects_config.enabled = true;
-      }
-    } else if(!strcmp(key, "soundSurround")) {
-      if (sdlFromHex(value)) {
-        gb_effects_config.surround = true;
-        gb_effects_config.enabled = true;
-      }
-    } else if(!strcmp(key, "declicking")) {
-      gbSoundSetDeclicking(sdlFromHex(value) != 0);
-    } else if(!strcmp(key, "soundVolume")) {
-      float volume = sdlFromDec(value) / 100.0;
-      if (volume < 0.0 || volume > SDL_SOUND_MAX_VOLUME)
-        volume = 1.0;
-      soundSetVolume(volume);
-    } else if(!strcmp(key, "saveType")) {
-      cpuSaveType = sdlFromHex(value);
-      if(cpuSaveType < 0 || cpuSaveType > 5)
-        cpuSaveType = 0;
-    } else if(!strcmp(key, "flashSize")) {
-      sdlFlashSize = sdlFromHex(value);
-      if(sdlFlashSize != 0 && sdlFlashSize != 1)
-        sdlFlashSize = 0;
-    } else if(!strcmp(key, "ifbType")) {
-      ifbType = (IFBFilter)sdlFromHex(value);
-     if(ifbType < kIFBNone || ifbType >= kInvalidIFBFilter)
-        ifbType = kIFBNone;
-    } else if(!strcmp(key, "showSpeed")) {
-      showSpeed = sdlFromHex(value);
-      if(showSpeed < 0 || showSpeed > 2)
-        showSpeed = 1;
-    } else if(!strcmp(key, "showSpeedTransparent")) {
-      showSpeedTransparent = sdlFromHex(value);
-    } else if(!strcmp(key, "autoFrameSkip")) {
-      autoFrameSkip = sdlFromHex(value);
-    } else if(!strcmp(key, "pauseWhenInactive")) {
-      pauseWhenInactive = sdlFromHex(value) ? true : false;
-    } else if(!strcmp(key, "agbPrint")) {
-      sdlAgbPrint = sdlFromHex(value);
-    } else if(!strcmp(key, "rtcEnabled")) {
-      sdlRtcEnable = sdlFromHex(value);
-    } else if(!strcmp(key, "rewindTimer")) {
-      rewindTimer = sdlFromHex(value);
-      if(rewindTimer < 0 || rewindTimer > 600)
-        rewindTimer = 0;
-      rewindTimer *= 6;  // convert value to 10 frames multiple
-    } else if(!strcmp(key, "saveKeysSwitch")) {
-      sdlSaveKeysSwitch = sdlFromHex(value);
-    } else if(!strcmp(key, "openGLscale")) {
-      sdlOpenglScale = sdlFromHex(value);
-    } else if(!strcmp(key, "autoFireMaxCount")) {
-      autoFireMaxCount = sdlFromDec(value);
-      if(autoFireMaxCount < 1)
-        autoFireMaxCount = 1;
-    } else {
-      fprintf(stderr, "Unknown configuration key %s\n", key);
-    }
-  }
-}
-
-void sdlOpenGLInit(int w, int h)
-{
-  float screenAspect = (float) srcWidth / srcHeight,
+  float screenAspect = (float) sizeX / sizeY,
         windowAspect = (float) w / h;
 
   if(glIsTexture(screenTexture))
@@ -867,21 +478,6 @@ void sdlOpenGLInit(int w, int h)
 
   glClearColor(0.0,0.0,0.0,1.0);
   glClear( GL_COLOR_BUFFER_BIT );
-}
-
-void sdlReadPreferences()
-{
-  FILE *f = sdlFindFile("vbam.cfg");
-
-  if(f == NULL) {
-    fprintf(stdout, "Configuration file NOT FOUND (using defaults)\n");
-    return;
-  } else
-    fprintf(stdout, "Reading configuration file.\n");
-
-  sdlReadPreferences(f);
-
-  fclose(f);
 }
 
 static void sdlApplyPerImagePreferences()
@@ -991,7 +587,7 @@ static char * sdlStateName(int num)
 {
   static char stateName[2048];
 
-  if(saveDir[0])
+  if(saveDir)
     sprintf(stateName, "%s/%s%d.sgm", saveDir, sdlGetFilename(filename),
             num+1);
   else if (homeDir)
@@ -1099,7 +695,7 @@ void sdlWriteBattery()
 {
   char buffer[1048];
 
-  if(batteryDir[0])
+  if(batteryDir)
     sprintf(buffer, "%s/%s.sav", batteryDir, sdlGetFilename(filename));
   else if (homeDir)
     sprintf(buffer, "%s/%s/%s.sav", homeDir, DOT_DIR, sdlGetFilename(filename));
@@ -1115,7 +711,7 @@ void sdlReadBattery()
 {
   char buffer[1048];
 
-  if(batteryDir[0])
+  if(batteryDir)
     sprintf(buffer, "%s/%s.sav", batteryDir, sdlGetFilename(filename));
   else if (homeDir)
     sprintf(buffer, "%s/%s/%s.sav", homeDir, DOT_DIR, sdlGetFilename(filename));
@@ -1143,17 +739,17 @@ void sdlInitVideo() {
 
   filter_enlarge = getFilterEnlargeFactor(filter);
 
-  destWidth = filter_enlarge * srcWidth;
-  destHeight = filter_enlarge * srcHeight;
+  destWidth = filter_enlarge * sizeX;
+  destHeight = filter_enlarge * sizeY;
 
-  flags = SDL_ANYFORMAT | (fullscreen ? SDL_FULLSCREEN : 0);
+  flags = SDL_ANYFORMAT | (fullScreen ? SDL_FULLSCREEN : 0);
   if(openGL) {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     flags |= SDL_OPENGL | SDL_RESIZABLE;
   } else
     flags |= SDL_HWSURFACE | SDL_DOUBLEBUF;
 
-  if (fullscreen && openGL) {
+  if (fullScreen && openGL) {
     screenWidth = desktopWidth;
     screenHeight = desktopHeight;
   } else {
@@ -1201,12 +797,12 @@ void sdlInitVideo() {
   systemColorDepth = surface->format->BitsPerPixel;
 
   if(systemColorDepth == 16) {
-    srcPitch = srcWidth*2 + 4;
+    srcPitch = sizeX*2 + 4;
   } else {
     if(systemColorDepth == 32)
-      srcPitch = srcWidth*4 + 4;
+      srcPitch = sizeX*4 + 4;
     else
-      srcPitch = srcWidth*3;
+      srcPitch = sizeX*3;
   }
 
   if(openGL) {
@@ -1217,14 +813,14 @@ void sdlInitVideo() {
     filterPix = (u8 *)calloc(1, (systemColorDepth >> 3) * destWidth * destHeight);
     sdlOpenGLInit(screenWidth, screenHeight);
 
-    if (	(!fullscreen)
+    if (	(!fullScreen)
 	&&	sdlOpenglScale	> 1
 	&&	scaledWidth	< desktopWidth
 	&&	scaledHeight	< desktopHeight
     ) {
         SDL_SetVideoMode(scaledWidth, scaledHeight, 0,
                        SDL_OPENGL | SDL_RESIZABLE |
-                       (fullscreen ? SDL_FULLSCREEN : 0));
+                       (fullScreen ? SDL_FULLSCREEN : 0));
         sdlOpenGLInit(scaledWidth, scaledHeight);
 	/* xKiv: it would seem that SDL_RESIZABLE causes the *previous* dimensions to be immediately
 	 * reported back via the SDL_VIDEORESIZE event
@@ -1383,7 +979,7 @@ void sdlPollEvents()
       {
         SDL_SetVideoMode(event.resize.w, event.resize.h, 0,
                        SDL_OPENGL | SDL_RESIZABLE |
-                       (fullscreen ? SDL_FULLSCREEN : 0));
+					   (fullScreen ? SDL_FULLSCREEN : 0));
         sdlOpenGLInit(event.resize.w, event.resize.h);
       }
       break;
@@ -1409,7 +1005,7 @@ void sdlPollEvents()
     case SDL_MOUSEMOTION:
     case SDL_MOUSEBUTTONUP:
     case SDL_MOUSEBUTTONDOWN:
-      if(fullscreen) {
+      if(fullScreen) {
         SDL_ShowCursor(SDL_ENABLE);
         mouseCounter = 120;
       }
@@ -1494,7 +1090,7 @@ void sdlPollEvents()
           }
           systemScreenMessage("Stereo off");
         } else {
-          gb_effects_config.stereo = SDL_SOUND_STEREO;
+          gb_effects_config.stereo = SOUND_STEREO;
           gb_effects_config.enabled = true;
           systemScreenMessage("Stereo on");
         }
@@ -1507,7 +1103,7 @@ void sdlPollEvents()
           }
           systemScreenMessage("Echo off");
         } else {
-          gb_effects_config.echo = SDL_SOUND_ECHO;
+          gb_effects_config.echo = SOUND_ECHO;
           gb_effects_config.enabled = true;
           systemScreenMessage("Echo on");
         }
@@ -1542,7 +1138,7 @@ void sdlPollEvents()
       case SDLK_f:
         if(!(event.key.keysym.mod & MOD_NOCTRL) &&
            (event.key.keysym.mod & KMOD_CTRL)) {
-          fullscreen = !fullscreen;
+          fullScreen = !fullScreen;
           sdlInitVideo();
         }
         break;
@@ -1553,7 +1149,7 @@ void sdlPollEvents()
 		      while (!filterFunction)
 		      {
 			      filter = (Filter)((filter + 1) % kInvalidFilter);
-		        filterFunction = initFilter(filter, systemColorDepth, srcWidth);
+		        filterFunction = initFilter(filter, systemColorDepth, sizeX);
 		      }
 		      if (getFilterEnlargeFactor(filter) != filter_enlarge)
 		        sdlInitVideo();
@@ -1883,13 +1479,8 @@ int main(int argc, char **argv)
 {
   fprintf(stdout, "VBA-M version %s [SDL]\n", SVN_REV_STR);
 
-  arg0 = argv[0];
-
-  captureDir[0] = 0;
-  saveDir[0] = 0;
-  batteryDir[0] = 0;
-
-  int op = -1;
+  home = argv[0];
+  SetHome(home);
 
   frameSkip = 2;
   gbBorderOn = 0;
@@ -1901,235 +1492,90 @@ int main(int argc, char **argv)
   gb_effects_config.surround = false;
   gb_effects_config.enabled = false;
 
-  char buf[1024];
-  struct stat s;
+  inputSetKeymap(PAD_1, KEY_LEFT, ReadPrefHex("Joy0_Left"));
+  inputSetKeymap(PAD_1, KEY_RIGHT, ReadPrefHex("Joy0_Right"));
+  inputSetKeymap(PAD_1, KEY_UP, ReadPrefHex("Joy0_Up"));
+  inputSetKeymap(PAD_1, KEY_DOWN, ReadPrefHex("Joy0_Down"));
+  inputSetKeymap(PAD_1, KEY_BUTTON_A, ReadPrefHex("Joy0_A"));
+  inputSetKeymap(PAD_1, KEY_BUTTON_B, ReadPrefHex("Joy0_B"));
+  inputSetKeymap(PAD_1, KEY_BUTTON_L, ReadPrefHex("Joy0_L"));
+  inputSetKeymap(PAD_1, KEY_BUTTON_R, ReadPrefHex("Joy0_R"));
+  inputSetKeymap(PAD_1, KEY_BUTTON_START, ReadPrefHex("Joy0_Start"));
+  inputSetKeymap(PAD_1, KEY_BUTTON_SELECT, ReadPrefHex("Joy0_Select"));
+  inputSetKeymap(PAD_1, KEY_BUTTON_SPEED, ReadPrefHex("Joy0_Speed"));
+  inputSetKeymap(PAD_1, KEY_BUTTON_CAPTURE, ReadPrefHex("Joy0_Capture"));
+  inputSetKeymap(PAD_2, KEY_LEFT, ReadPrefHex("Joy1_Left"));
+  inputSetKeymap(PAD_2, KEY_RIGHT, ReadPrefHex("Joy1_Right"));
+  inputSetKeymap(PAD_2, KEY_UP, ReadPrefHex("Joy1_Up"));
+  inputSetKeymap(PAD_2, KEY_DOWN, ReadPrefHex("Joy1_Down"));
+  inputSetKeymap(PAD_2, KEY_BUTTON_A, ReadPrefHex("Joy1_A"));
+  inputSetKeymap(PAD_2, KEY_BUTTON_B, ReadPrefHex("Joy1_B"));
+  inputSetKeymap(PAD_2, KEY_BUTTON_L, ReadPrefHex("Joy1_L"));
+  inputSetKeymap(PAD_2, KEY_BUTTON_R, ReadPrefHex("Joy1_R"));
+  inputSetKeymap(PAD_2, KEY_BUTTON_START, ReadPrefHex("Joy1_Start"));
+  inputSetKeymap(PAD_2, KEY_BUTTON_SELECT, ReadPrefHex("Joy1_Select"));
+  inputSetKeymap(PAD_2, KEY_BUTTON_SPEED, ReadPrefHex("Joy1_Speed"));
+  inputSetKeymap(PAD_2, KEY_BUTTON_CAPTURE, ReadPrefHex("Joy1_Capture"));
+  inputSetKeymap(PAD_3, KEY_LEFT, ReadPrefHex("Joy2_Left"));
+  inputSetKeymap(PAD_3, KEY_RIGHT, ReadPrefHex("Joy2_Right"));
+  inputSetKeymap(PAD_3, KEY_UP, ReadPrefHex("Joy2_Up"));
+  inputSetKeymap(PAD_3, KEY_DOWN, ReadPrefHex("Joy2_Down"));
+  inputSetKeymap(PAD_3, KEY_BUTTON_A, ReadPrefHex("Joy2_A"));
+  inputSetKeymap(PAD_3, KEY_BUTTON_B, ReadPrefHex("Joy2_B"));
+  inputSetKeymap(PAD_3, KEY_BUTTON_L, ReadPrefHex("Joy2_L"));
+  inputSetKeymap(PAD_3, KEY_BUTTON_R, ReadPrefHex("Joy2_R"));
+  inputSetKeymap(PAD_3, KEY_BUTTON_START, ReadPrefHex("Joy2_Start"));
+  inputSetKeymap(PAD_3, KEY_BUTTON_SELECT, ReadPrefHex("Joy2_Select"));
+  inputSetKeymap(PAD_3, KEY_BUTTON_SPEED, ReadPrefHex("Joy2_Speed"));
+  inputSetKeymap(PAD_3, KEY_BUTTON_CAPTURE, ReadPrefHex("Joy2_Capture"));
+  inputSetKeymap(PAD_4, KEY_LEFT, ReadPrefHex("Joy3_Left"));
+  inputSetKeymap(PAD_4, KEY_RIGHT, ReadPrefHex("Joy3_Right"));
+  inputSetKeymap(PAD_4, KEY_UP, ReadPrefHex("Joy3_Up"));
+  inputSetKeymap(PAD_4, KEY_DOWN, ReadPrefHex("Joy3_Down"));
+  inputSetKeymap(PAD_4, KEY_BUTTON_A, ReadPrefHex("Joy3_A"));
+  inputSetKeymap(PAD_4, KEY_BUTTON_B, ReadPrefHex("Joy3_B"));
+  inputSetKeymap(PAD_4, KEY_BUTTON_L, ReadPrefHex("Joy3_L"));
+  inputSetKeymap(PAD_4, KEY_BUTTON_R, ReadPrefHex("Joy3_R"));
+  inputSetKeymap(PAD_4, KEY_BUTTON_START, ReadPrefHex("Joy3_Start"));
+  inputSetKeymap(PAD_4, KEY_BUTTON_SELECT, ReadPrefHex("Joy3_Select"));
+  inputSetKeymap(PAD_4, KEY_BUTTON_SPEED, ReadPrefHex("Joy3_Speed"));
+  inputSetKeymap(PAD_4, KEY_BUTTON_CAPTURE, ReadPrefHex("Joy3_Capture"));
+  inputSetKeymap(PAD_1, KEY_BUTTON_AUTO_A, ReadPrefHex("Joy0_AutoA"));
+  inputSetKeymap(PAD_1, KEY_BUTTON_AUTO_B, ReadPrefHex("Joy0_AutoB"));
+  inputSetKeymap(PAD_2, KEY_BUTTON_AUTO_A, ReadPrefHex("Joy1_AutoA"));
+  inputSetKeymap(PAD_2, KEY_BUTTON_AUTO_B, ReadPrefHex("Joy1_AutoB"));
+  inputSetKeymap(PAD_3, KEY_BUTTON_AUTO_A, ReadPrefHex("Joy2_AutoA"));
+  inputSetKeymap(PAD_3, KEY_BUTTON_AUTO_B, ReadPrefHex("Joy2_AutoB"));
+  inputSetKeymap(PAD_4, KEY_BUTTON_AUTO_A, ReadPrefHex("Joy3_AutoA"));
+  inputSetKeymap(PAD_4, KEY_BUTTON_AUTO_B, ReadPrefHex("Joy3_AutoB"));
+  inputSetMotionKeymap(KEY_LEFT, ReadPrefHex("Motion_Left"));
+  inputSetMotionKeymap(KEY_RIGHT, ReadPrefHex("Motion_Right"));
+  inputSetMotionKeymap(KEY_UP, ReadPrefHex("Motion_Up"));
+  inputSetMotionKeymap(KEY_DOWN, ReadPrefHex("Motion_Down"));
 
-#ifndef _WIN32
-  // Get home dir
-  homeDir = getenv("HOME");
-  snprintf(buf, 1024, "%s/%s", homeDir, DOT_DIR);
-  // Make dot dir if not existent
-  if (stat(buf, &s) == -1 || !S_ISDIR(s.st_mode))
-    mkdir(buf, 0755);
-#else
-  homeDir = 0;
-#endif
+  LoadConfig(); // Parse command line arguments (overrides ini)
+  ReadOpts(argc, argv);
 
-  sdlReadPreferences();
+  sdlCheckDirectory(screenShotDir);
+  sdlCheckDirectory(saveDir);
+  sdlCheckDirectory(batteryDir);
 
-  sdlPrintUsage = 0;
+  sdlSaveKeysSwitch = (ReadPrefHex("saveKeysSwitch"));
+  sdlOpenglScale = (ReadPrefHex("openGLscale"));
 
-  while((op = getopt_long(argc,
-                          argv,
-                           "FNO:T:Y:G:I:D:b:c:df:hi:p::s:t:v:",
-                          sdlOptions,
-                          NULL)) != -1) {
-    switch(op) {
-    case 0:
-      // long option already processed by getopt_long
-      break;
-    case 1000:
-      // --cheat
-      if (sdlPreparedCheats >= MAX_CHEATS) {
-	      fprintf(stderr, "Warning: cannot add more than %d cheats.\n", MAX_CHEATS);
-	      break;
-      }
-      {
-	      char * cpy;
-	      cpy	= (char *)malloc(1 + strlen(optarg));
-	      strcpy(cpy, optarg);
-	      sdlPreparedCheatCodes[sdlPreparedCheats++]	= cpy;
-      }
-      break;
-    case 1001:
-      // --autofire
-      autoFireMaxCount = sdlFromDec(optarg);
-      if (autoFireMaxCount < 1)
-         autoFireMaxCount = 1;
-      break;
-    case 'b':
-      useBios = true;
-      if(optarg == NULL) {
-        fprintf(stderr, "Missing BIOS file name\n");
-        exit(-1);
-      }
-      strcpy(biosFileName, optarg);
-      break;
-    case 'c':
-      {
-        if(optarg == NULL) {
-          fprintf(stderr, "Missing config file name\n");
-          exit(-1);
-        }
-        FILE *f = fopen(optarg, "r");
-        if(f == NULL) {
-          fprintf(stderr, "File not found %s\n", optarg);
-          exit(-1);
-        }
-        sdlReadPreferences(f);
-        fclose(f);
-      }
-      break;
-    case 'd':
-      debugger = true;
-      break;
-    case 'h':
-      sdlPrintUsage = 1;
-      break;
-    case 'i':
-      if(optarg == NULL) {
-        fprintf(stderr, "Missing patch name\n");
-        exit(-1);
-      }
-      if (sdl_patch_num >= PATCH_MAX_NUM) {
-        fprintf(stderr, "Too many patches given at %s (max is %d). Ignoring.\n", optarg, PATCH_MAX_NUM);
-      } else {
-        sdl_patch_names[sdl_patch_num]	= (char *)malloc(1 + strlen(optarg));
-        strcpy(sdl_patch_names[sdl_patch_num], optarg);
-        sdl_patch_num++;
-      }
-      break;
-   case 'G':
-      dbgMain = remoteStubMain;
-      dbgSignal = remoteStubSignal;
-      dbgOutput = remoteOutput;
-      debugger = true;
-      debuggerStub = true;
-      if(optarg) {
-        char *s = optarg;
-        if(strncmp(s,"tcp:", 4) == 0) {
-          s+=4;
-          int port = atoi(s);
-          remoteSetProtocol(0);
-          remoteSetPort(port);
-        } else if(strcmp(s,"tcp") == 0) {
-          remoteSetProtocol(0);
-        } else if(strcmp(s, "pipe") == 0) {
-          remoteSetProtocol(1);
-        } else {
-          fprintf(stderr, "Unknown protocol %s\n", s);
-          exit(-1);
-        }
-      } else {
-        remoteSetProtocol(0);
-      }
-      break;
-    case 'N':
-      parseDebug = false;
-      break;
-    case 'D':
-      if(optarg) {
-        systemDebug = atoi(optarg);
-      } else {
-        systemDebug = 1;
-      }
-      break;
-    case 'F':
-      fullscreen = 1;
-      mouseCounter = 120;
-      break;
-    case 'f':
-      if(optarg) {
-        filter = (Filter)atoi(optarg);
-      } else {
-        filter = kStretch2x;
-      }
-      break;
-    case 'I':
-      if(optarg) {
-        ifbType = (IFBFilter)atoi(optarg);
-      } else {
-        ifbType = kIFBNone;
-      }
-      break;
-    case 'p':
-#ifdef PROFILING
-      if(optarg) {
-        cpuEnableProfiling(atoi(optarg));
-      } else
-        cpuEnableProfiling(100);
-#endif
-      break;
-    case 'S':
-      sdlFlashSize = atoi(optarg);
-      if(sdlFlashSize < 0 || sdlFlashSize > 1)
-        sdlFlashSize = 0;
-      break;
-    case 's':
-      if(optarg) {
-        int a = atoi(optarg);
-        if(a >= 0 && a <= 9) {
-          gbFrameSkip = a;
-          frameSkip = a;
-        }
-      } else {
-        frameSkip = 2;
-        gbFrameSkip = 0;
-      }
-      break;
-    case 't':
-      if(optarg) {
-        int a = atoi(optarg);
-        if(a < 0 || a > 5)
-          a = 0;
-        cpuSaveType = a;
-      }
-      break;
-    case 'v':
-      if(optarg) {
-        systemVerbose = atoi(optarg);
-      } else
-        systemVerbose = 0;
-      break;
-    case '?':
-      sdlPrintUsage = 1;
-      break;
-    case 'O':
-      if(optarg) {
-       openGL = atoi(optarg);
-        if (openGL < 0 || openGL > 2)
-         openGL = 1;
-     } else
-        openGL = 0;
-    break;
 
-    }
-  }
-
-  if(sdlPrintUsage) {
+  if(optPrintUsage) {
     usage(argv[0]);
     exit(-1);
   }
 
-  if(rewindTimer) {
-    rewindMemory = (char *)malloc(REWIND_NUM*REWIND_SIZE);
-    rewindSerials = (int *)calloc(REWIND_NUM, sizeof(int)); // init to zeroes
+  if (!debuggerStub) {
+	  if (optind >= argc) {
+		  systemMessage(0, "Missing image name");
+		  usage(argv[0]);
+		  exit(-1);
+	  }
   }
-
-  if(sdlFlashSize == 0)
-    flashSetSize(0x10000);
-  else
-    flashSetSize(0x20000);
-
-  rtcEnable(sdlRtcEnable ? true : false);
-  agbPrintEnable(sdlAgbPrint ? true : false);
-
-  if(!debuggerStub) {
-    if(optind >= argc) {
-      systemMessage(0,"Missing image name");
-      usage(argv[0]);
-      exit(-1);
-    }
-  }
-
-  for(int i = 0; i < 24;) {
-    systemGbPalette[i++] = (0x1f) | (0x1f << 5) | (0x1f << 10);
-    systemGbPalette[i++] = (0x15) | (0x15 << 5) | (0x15 << 10);
-    systemGbPalette[i++] = (0x0c) | (0x0c << 5) | (0x0c << 10);
-    systemGbPalette[i++] = 0;
-  }
-
-  systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
   if(optind < argc) {
     char *szFile = argv[optind];
@@ -2146,26 +1592,26 @@ int main(int argc, char **argv)
     if(p)
       *p = 0;
 
-    if (sdlAutoPatch && sdl_patch_num == 0)
+    if (autoPatch && patchNum == 0)
     {
       char * tmp;
       // no patch given yet - look for ROMBASENAME.ips
       tmp = (char *)malloc(strlen(filename) + 4 + 1);
       sprintf(tmp, "%s.ips", filename);
-      sdl_patch_names[sdl_patch_num] = tmp;
-      sdl_patch_num++;
+      patchNames[patchNum] = tmp;
+      patchNum++;
 
       // no patch given yet - look for ROMBASENAME.ups
       tmp = (char *)malloc(strlen(filename) + 4 + 1);
       sprintf(tmp, "%s.ups", filename);
-      sdl_patch_names[sdl_patch_num] = tmp;
-      sdl_patch_num++;
+      patchNames[patchNum] = tmp;
+      patchNum++;
 
       // no patch given yet - look for ROMBASENAME.ppf
       tmp = (char *)malloc(strlen(filename) + 4 + 1);
       sprintf(tmp, "%s.ppf", filename);
-      sdl_patch_names[sdl_patch_num] = tmp;
-      sdl_patch_num++;
+      patchNames[patchNum] = tmp;
+      patchNum++;
     }
 
     soundInit();
@@ -2187,14 +1633,14 @@ int main(int argc, char **argv)
 
         // used for the handling of the gb Boot Rom
         if (gbHardware & 7)
-          gbCPUInit(gbBiosFileName, useBios);
+          gbCPUInit(biosFileNameGB, useBios);
 
         cartridgeType = IMAGE_GB;
         emulator = GBSystem;
         int size = gbRomSize, patchnum;
-        for (patchnum = 0; patchnum < sdl_patch_num; patchnum++) {
-          fprintf(stdout, "Trying patch %s%s\n", sdl_patch_names[patchnum],
-            applyPatch(sdl_patch_names[patchnum], &gbRom, &size) ? " [success]" : "");
+        for (patchnum = 0; patchnum < patchNum; patchnum++) {
+          fprintf(stdout, "Trying patch %s%s\n", patchNames[patchnum],
+            applyPatch(patchNames[patchnum], &gbRom, &size) ? " [success]" : "");
         }
         if(size != gbRomSize) {
           extern bool gbUpdateSizes();
@@ -2214,11 +1660,11 @@ int main(int argc, char **argv)
         cartridgeType = 0;
         emulator = GBASystem;
 
-        CPUInit(biosFileName, useBios);
+        CPUInit(biosFileNameGBA, useBios);
         int patchnum;
-        for (patchnum = 0; patchnum < sdl_patch_num; patchnum++) {
-          fprintf(stdout, "Trying patch %s%s\n", sdl_patch_names[patchnum],
-            applyPatch(sdl_patch_names[patchnum], &rom, &size) ? " [success]" : "");
+        for (patchnum = 0; patchnum < patchNum; patchnum++) {
+          fprintf(stdout, "Trying patch %s%s\n", patchNames[patchnum],
+            applyPatch(patchNames[patchnum], &rom, &size) ? " [success]" : "");
         }
         CPUReset();
       }
@@ -2244,7 +1690,7 @@ int main(int argc, char **argv)
 
     emulator = GBASystem;
 
-    CPUInit(biosFileName, useBios);
+    CPUInit(biosFileNameGBA, useBios);
     CPUReset();
   }
 
@@ -2270,35 +1716,36 @@ int main(int argc, char **argv)
 #endif
   inputInitJoysticks();
 
-  if(cartridgeType == 0) {
-    srcWidth = 240;
-    srcHeight = 160;
+  if (cartridgeType == IMAGE_GBA) {
+    sizeX = 240;
+    sizeY = 160;
     systemFrameSkip = frameSkip;
-  } else if (cartridgeType == 1) {
+  }
+  else if (cartridgeType == IMAGE_GB) {
     if(gbBorderOn) {
-      srcWidth = 256;
-      srcHeight = 224;
+      sizeX = 256;
+      sizeY = 224;
       gbBorderLineSkip = 256;
       gbBorderColumnSkip = 48;
       gbBorderRowSkip = 40;
     } else {
-      srcWidth = 160;
-      srcHeight = 144;
+      sizeX = 160;
+      sizeY = 144;
       gbBorderLineSkip = 160;
       gbBorderColumnSkip = 0;
       gbBorderRowSkip = 0;
     }
     systemFrameSkip = gbFrameSkip;
   } else {
-    srcWidth = 320;
-    srcHeight = 240;
+    sizeX = 320;
+    sizeY = 240;
   }
 
   sdlReadDesktopVideoMode();
 
   sdlInitVideo();
 
-  filterFunction = initFilter(filter, systemColorDepth, srcWidth);
+  filterFunction = initFilter(filter, systemColorDepth, sizeX);
   if (!filterFunction) {
     fprintf(stderr,"Unable to init filter '%s'\n", getFilterName(filter));
     exit(-1);
@@ -2334,10 +1781,10 @@ int main(int argc, char **argv)
   // now we can enable cheats?
   {
 	int i;
-	for (i=0; i<sdlPreparedCheats; i++) {
-		const char *	p;
+	for (i=0; i<preparedCheats; i++) {
+		const char *p;
 		int	l;
-		p	= sdlPreparedCheatCodes[i];
+		p	= preparedCheatCodes[i];
 		l	= strlen(p);
 		if (l == 17 && p[8] == ':') {
 			fprintf(stdout,"Adding cheat code %s\n", p);
@@ -2401,14 +1848,16 @@ int main(int argc, char **argv)
     filterPix = NULL;
  }
 
-  for (int i = 0; i < sdl_patch_num; i++) {
-    free(sdl_patch_names[i]);
+  for (int i = 0; i < patchNum; i++) {
+    free(patchNames[i]);
   }
 
 #if WITH_LIRC
   StopLirc();
 #endif
 
+  SaveConfigFile();
+  CloseConfig();
   SDL_Quit();
   return 0;
 }
@@ -2469,14 +1918,14 @@ void systemDrawScreen()
   }
 
   if (ifbFunction)
-    ifbFunction(pix + srcPitch, srcPitch, srcWidth, srcHeight);
+    ifbFunction(pix + srcPitch, srcPitch, sizeX, sizeY);
 
   filterFunction(pix + srcPitch, srcPitch, delta, screen,
-                 destPitch, srcWidth, srcHeight);
+                 destPitch, sizeX, sizeY);
 
   drawScreenMessage(screen, destPitch, 10, destHeight - 20, 3000);
 
-  if (showSpeed && fullscreen)
+  if (showSpeed && fullScreen)
     drawSpeed(screen, destPitch, 10, 20);
 
   if (openGL) {
@@ -2493,14 +1942,13 @@ void systemDrawScreen()
       glTexCoord2f(0.0f, 0.0f);
       glVertex3i(0, 0, 0);
       glTexCoord2f(destWidth / (GLfloat) textureSize, 0.0f);
-      glVertex3i(1, 0, 0);
+	  glVertex3i(1, 0, 0);
       glTexCoord2f(0.0f, destHeight / (GLfloat) textureSize);
-      glVertex3i(0, 1, 0);
+	  glVertex3i(0, 1, 0);
       glTexCoord2f(destWidth / (GLfloat) textureSize,
                   destHeight / (GLfloat) textureSize);
-      glVertex3i(1, 1, 0);
+	  glVertex3i(1, 1, 0);
     glEnd();
-
     SDL_GL_SwapBuffers();
   } else {
     SDL_UnlockSurface(surface);
@@ -2521,7 +1969,7 @@ void systemShowSpeed(int speed)
   showRenderedFrames = renderedFrames;
   renderedFrames = 0;
 
-  if(!fullscreen && showSpeed) {
+  if(!fullScreen && showSpeed) {
     char buffer[80];
     if(showSpeed == 1)
       sprintf(buffer, "VBA-M - %d%%", systemSpeed);
@@ -2592,8 +2040,8 @@ void systemScreenCapture(int a)
   char buffer[2048];
 
   if(captureFormat) {
-    if(captureDir[0])
-      sprintf(buffer, "%s/%s%02d.bmp", captureDir, sdlGetFilename(filename), a);
+    if(screenShotDir)
+      sprintf(buffer, "%s/%s%02d.bmp", screenShotDir, sdlGetFilename(filename), a);
     else if (homeDir)
       sprintf(buffer, "%s/%s/%s%02d.bmp", homeDir, DOT_DIR, sdlGetFilename(filename), a);
     else
@@ -2601,8 +2049,8 @@ void systemScreenCapture(int a)
 
     emulator.emuWriteBMP(buffer);
   } else {
-    if(captureDir[0])
-      sprintf(buffer, "%s/%s%02d.png", captureDir, sdlGetFilename(filename), a);
+    if(screenShotDir)
+      sprintf(buffer, "%s/%s%02d.png", screenShotDir, sdlGetFilename(filename), a);
     else if (homeDir)
       sprintf(buffer, "%s/%s/%s%02d.png", homeDir, DOT_DIR, sdlGetFilename(filename), a);
     else
@@ -2674,15 +2122,15 @@ bool systemPauseOnFrame()
 
 void systemGbBorderOn()
 {
-	srcWidth = 256;
-	srcHeight = 224;
+	sizeX = 256;
+	sizeY = 224;
 	gbBorderLineSkip = 256;
 	gbBorderColumnSkip = 48;
 	gbBorderRowSkip = 40;
 
 	sdlInitVideo();
 
-	filterFunction = initFilter(filter, systemColorDepth, srcWidth);
+	filterFunction = initFilter(filter, systemColorDepth, sizeX);
 }
 
 bool systemReadJoypads()

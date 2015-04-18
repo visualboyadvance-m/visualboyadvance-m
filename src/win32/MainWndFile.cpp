@@ -48,10 +48,10 @@ void MainWnd::OnFileOpenGB()
 
 void MainWnd::OnFilePause()
 {
-  theApp.paused = !theApp.paused;
+  paused = !paused;
   if(emulating) {
-    if(theApp.paused) {
-      theApp.wasPaused = true;
+    if(paused) {
+      wasPaused = true;
       soundPause();
     } else {
       soundResume();
@@ -61,20 +61,19 @@ void MainWnd::OnFilePause()
 
 void MainWnd::OnUpdateFilePause(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.paused);
+  pCmdUI->SetCheck(paused);
 }
 
 void MainWnd::OnFileReset()
 {
-  skipBios = theApp.skipBiosFile;
 
   if(emulating) {
     if(theApp.cartridgeType == IMAGE_GB) {
       gbGetHardwareType();
       if (gbHardware & 5) {
-        gbCPUInit(theApp.biosFileNameGB, theApp.useBiosFileGB);
+        gbCPUInit(theApp.biosFileNameGB, useBiosFileGB);
       } else if (gbHardware & 2) {
-        gbCPUInit(theApp.biosFileNameGBC, theApp.useBiosFileGBC);
+        gbCPUInit(theApp.biosFileNameGBC, useBiosFileGBC);
       }
     }
     theApp.emulator.emuReset();
@@ -89,7 +88,7 @@ void MainWnd::OnUpdateFileReset(CCmdUI* pCmdUI)
 
 void MainWnd::OnUpdateFileRecentFreeze(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.recentFreeze);
+  pCmdUI->SetCheck(recentFreeze);
 
   if(pCmdUI->m_pMenu == NULL)
     return;
@@ -139,7 +138,7 @@ void MainWnd::OnFileRecentReset()
 
 void MainWnd::OnFileRecentFreeze()
 {
-  theApp.recentFreeze = !theApp.recentFreeze;
+  recentFreeze = !recentFreeze;
 }
 
 void MainWnd::OnFileExit()
@@ -151,7 +150,7 @@ void MainWnd::OnFileClose()
 {
   // save battery file before we change the filename...
   if(rom != NULL || gbRom != NULL) {
-    if(theApp.autoSaveLoadCheatList)
+    if(autoSaveLoadCheatList)
       winSaveCheatListDefault();
     writeBatteryFile();
     soundPause();
@@ -209,9 +208,9 @@ void MainWnd::OnFileLoad()
   if(dlg.DoModal() == IDOK) {
     bool res = loadSaveGame(dlg.GetPathName());
 
-    theApp.rewindCount = 0;
-    theApp.rewindCounter = 0;
-    theApp.rewindSaveNeeded = false;
+    rewindCount = 0;
+    rewindCounter = 0;
+    rewindSaveNeeded = false;
 
     if(res)
       systemScreenMessage(winResLoadString(IDS_LOADED_STATE));
@@ -262,16 +261,13 @@ BOOL MainWnd::OnFileLoadSlot(UINT nID)
 
   bool res = loadSaveGame(filename);
 
-  if (theApp.paused)
+  if (paused)
     InterframeCleanup();
 
   systemScreenMessage(buffer);
 
   systemDrawScreen();
 
-  //theApp.rewindCount = 0;
-  //theApp.rewindCounter = 0;
-  //theApp.rewindSaveNeeded = false;
 
   return res;
 }
@@ -628,7 +624,7 @@ void MainWnd::OnFileScreencapture()
 
   CString ext = "png";
 
-  if(theApp.captureFormat != 0)
+  if(captureFormat != 0)
     ext = "bmp";
 
   if(isDriveRoot(capdir))
@@ -644,8 +640,8 @@ void MainWnd::OnFileScreencapture()
   FileDlg dlg(this,
               filename,
               filter,
-              theApp.captureFormat ? 2 : 1,
-              theApp.captureFormat ? "BMP" : "PNG",
+              captureFormat ? 2 : 1,
+              captureFormat ? "BMP" : "PNG",
               exts,
               capdir,
               title,
@@ -686,7 +682,7 @@ void MainWnd::OnUpdateFileRominformation(CCmdUI* pCmdUI)
 //OnFileToggleFullscreen
 void MainWnd::OnFileTogglemenu()
 {
-	if( theApp.videoOption <= VIDEO_6X ) {
+	if( videoOption <= VIDEO_6X ) {
 		// switch to full screen
 		toolsLoggingClose(); // close log dialog
 		theApp.updateWindowSize( theApp.lastFullscreen );
@@ -699,7 +695,7 @@ void MainWnd::OnFileTogglemenu()
 void MainWnd::OnUpdateFileTogglemenu(CCmdUI* pCmdUI)
 {
 	// HACK: when uncommented, Esc key will not be send to MainWnd
-	//pCmdUI->Enable(theApp.videoOption > VIDEO_6X);
+	//pCmdUI->Enable(videoOption > VIDEO_6X);
 }
 
 bool MainWnd::fileImportGSACodeFile(CString& fileName)
@@ -977,12 +973,12 @@ void MainWnd::OnUpdateFileSaveGameSlot(CCmdUI *pCmdUI)
 
 void MainWnd::OnFileLoadgameAutoloadmostrecent()
 {
-  theApp.autoLoadMostRecent = !theApp.autoLoadMostRecent;
+  autoLoadMostRecent = !autoLoadMostRecent;
 }
 
 void MainWnd::OnUpdateFileLoadgameAutoloadmostrecent(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.autoLoadMostRecent);
+  pCmdUI->SetCheck(autoLoadMostRecent);
 }
 
 void MainWnd::OnLoadgameDonotchangebatterysave()

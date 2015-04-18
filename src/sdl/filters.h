@@ -53,7 +53,7 @@ enum IFBFilter { kIFBNone, kIBMotionBlur, kIBSmart, kInvalidIFBFilter };
 typedef void(*IFBFilterFunc)(u8*, u32, int, int);
 
 // Initialize an IFB filter and get the corresponding filter function pointer
-IFBFilterFunc initIFBFilter(const IFBFilter f, const int colorDepth);
+IFBFilterFunc initIFBFilter(const int f, const int colorDepth);
 
 // Get the display name for an IFB filter
 char* getIFBFilterName(const IFBFilter f);

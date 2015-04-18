@@ -7,11 +7,7 @@ extern int gbRamSize;
 extern int gbRamSizeMask;
 extern int gbTAMA5ramSize;
 
-extern bool useBios;
-extern bool skipBios;
 extern u8 *bios;
-extern bool skipSaveGameBattery;
-extern bool skipSaveGameCheats;
 
 extern u8 *gbRom;
 extern u8 *gbRam;

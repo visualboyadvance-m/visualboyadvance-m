@@ -185,6 +185,9 @@ add_subdirectory (fex)
 
 SET(SRC_MAIN
     src/Util.cpp
+    src/common/ConfigManager.cpp
+    src/common/dictionary.c
+    src/common/iniparser.c
     src/common/Patch.cpp
     src/common/memgzio.c
     src/common/SoundSDL.cpp

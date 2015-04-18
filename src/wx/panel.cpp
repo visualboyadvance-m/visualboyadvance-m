@@ -1,5 +1,6 @@
 #include "wxvbam.h"
 #include "drawing.h"
+#include "../common/ConfigManager.h"
 #include "../gba/RTC.h"
 #include "../gba/agbprint.h"
 #include "../gb/gbPrinter.h"

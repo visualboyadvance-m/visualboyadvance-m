@@ -19,6 +19,8 @@
 #include <wx/tokenzr.h>
 #include "wx/checkedlistctrl.h"
 #include <wx/progdlg.h>
+
+#include "../common/ConfigManager.h"
 #include "../gba/CheatSearch.h"
 
 // The program icon, in case it's missing from .xrc (MSW gets it from .rc file)
@@ -2208,7 +2210,7 @@ bool MainFrame::InitMore(void)
     for(int i = 0; i < checkable_mi.size(); i++) { \
 	if(checkable_mi[i].cmd != id) \
 	    continue; \
-	checkable_mi[i].boolopt = &f; \
+	checkable_mi[i].boolopt = (bool*)&f; \
 	checkable_mi[i].mi->Check(f); \
 	break; \
     } \

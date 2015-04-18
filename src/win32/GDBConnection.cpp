@@ -24,10 +24,10 @@ GDBPortDlg::GDBPortDlg(CWnd* pParent /*=NULL*/)
   //{{AFX_DATA_INIT(GDBPortDlg)
   // NOTE: the ClassWizard will add member initialization here
   //}}AFX_DATA_INIT
-	if (theApp.gdbPort == 0)
+	if (gdbPort == 0)
 		port = 55555;
 	else
-		port = theApp.gdbPort;
+		port = gdbPort;
   sock = INVALID_SOCKET;
 
   if(!initialized) {
@@ -100,7 +100,7 @@ void GDBPortDlg::OnOk()
   address.sin_port = htons(atoi(buffer));
   port = ntohs(address.sin_port);
 
-  theApp.gdbPort = port;
+  gdbPort = port;
   EndDialog(TRUE);
 }
 

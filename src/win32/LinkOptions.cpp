@@ -42,7 +42,7 @@ LinkOptions::LinkOptions(CWnd* pParent /*=NULL*/)
 	: CDialog(LinkOptions::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(LinkOptions)
-	m_type = theApp.linkMode;
+	m_type = linkMode;
 	m_server = FALSE;
 	//}}AFX_DATA_INIT
 }
@@ -54,11 +54,11 @@ void LinkOptions::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(LinkOptions)
 	DDX_CBData(pDX, IDC_LINK_MODE, m_type);
 	DDX_Control(pDX, IDC_LINKTIMEOUT, m_timeout);
-	DDX_Check(pDX, IDC_AUTOLINK, theApp.linkAuto);
-	DDX_Check(pDX, IDC_SSPEED, theApp.linkHacks);
+	DDX_Check(pDX, IDC_AUTOLINK, linkAuto);
+	DDX_Check(pDX, IDC_SSPEED, linkHacks);
 	DDX_Control(pDX, IDC_LINK_MODE, m_mode);
 	DDX_Control(pDX, IDC_SERVERIP, m_serverip);
-	DDX_Radio(pDX, IDC_LINK2P, theApp.linkNumPlayers);
+	DDX_Radio(pDX, IDC_LINK2P, linkNumPlayers);
 	DDX_Radio(pDX, IDC_LINK_CLIENT, m_server);
 	//}}AFX_DATA_MAP
 }
@@ -76,19 +76,19 @@ BOOL LinkOptions::OnInitDialog(){
 	AddMode("Wireless adapter - Network", LINK_RFU_SOCKET);
 	AddMode("Game Link (Game Boy) - Single Computer", LINK_GAMEBOY);
 
-	sprintf(timeout, "%d", theApp.linkTimeout);
+	sprintf(timeout, "%d", linkTimeout);
 
 	m_timeout.LimitText(5);
 	m_timeout.SetWindowText(timeout);
 
 	m_serverip.SetWindowText(theApp.linkHostAddr);
 
-	CheckDlgButton(IDC_AUTOLINK, theApp.linkAuto);
+	CheckDlgButton(IDC_AUTOLINK, linkAuto);
 
-	CheckDlgButton(IDC_SSPEED, theApp.linkHacks);
+	CheckDlgButton(IDC_SSPEED, linkHacks);
 
 	int player_radio = 0;
-	switch (theApp.linkNumPlayers)
+	switch (linkNumPlayers)
 	{
 		case 2:
 			player_radio = IDC_LINK2P;
@@ -156,8 +156,8 @@ void LinkOptions::OnOk()
 	LinkMode newMode = (LinkMode) m_type;
 
 	if (newMode == LINK_DISCONNECTED) {
-		theApp.linkTimeout = timeout;
-		theApp.linkMode = LINK_DISCONNECTED;
+		linkTimeout = timeout;
+		linkMode = LINK_DISCONNECTED;
 		theApp.linkHostAddr = host;
 		CDialog::OnOK();
 		return;
@@ -173,8 +173,8 @@ void LinkOptions::OnOk()
 		}
 	}
 
-	EnableSpeedHacks(theApp.linkHacks);
-	EnableLinkServer(m_server, theApp.linkNumPlayers + 1);
+	EnableSpeedHacks(linkHacks);
+	EnableLinkServer(m_server, linkNumPlayers + 1);
 
 	if (m_server) {
 		char localhost[length];
@@ -239,8 +239,8 @@ void LinkOptions::OnOk()
 		return;
 	}
 
-	theApp.linkTimeout = timeout;
-	theApp.linkMode = GetLinkMode();
+	linkTimeout = timeout;
+	linkMode = GetLinkMode();
 	theApp.linkHostAddr = host;
 
 	CDialog::OnOK();
