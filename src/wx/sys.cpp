@@ -1,5 +1,6 @@
 #include <SDL.h>
 #include "wxvbam.h"
+#include "../common/ConfigManager.h"
 #include "../common/SoundSDL.h"
 #include <wx/ffile.h>
 #include <wx/print.h>
@@ -99,7 +100,6 @@ wxFFile game_file;
 bool game_recording, game_playback;
 u32 game_frame;
 u32 game_joypad;
-int sunBars = 500;
 
 void systemStartGameRecording(const wxString &fname)
 {

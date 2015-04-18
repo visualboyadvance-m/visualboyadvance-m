@@ -156,6 +156,15 @@
     <ClInclude Include="..\..\src\gba\GBASockClient.h">
       <Filter>Linking</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\common\dictionary.h">
+      <Filter>Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\iniparser.h">
+      <Filter>Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\ConfigManager.h">
+      <Filter>Functionality</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\doc\DevInfo.txt">
@@ -312,6 +321,15 @@
     </ClCompile>
     <ClCompile Include="..\..\src\gba\GBASockClient.cpp">
       <Filter>Linking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\dictionary.c">
+      <Filter>Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\iniparser.c">
+      <Filter>Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\ConfigManager.cpp">
+      <Filter>Functionality</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

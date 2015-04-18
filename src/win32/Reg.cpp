@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "VBA.h"
 #include "..\gba\GBALink.h"
+#include "..\common\ConfigManager.h"
 
 static char buffer[2048];
 static HKEY vbKey = NULL;

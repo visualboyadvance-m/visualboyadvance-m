@@ -166,21 +166,21 @@ void Direct3DDisplay::prepareDisplayMode()
 {
 	// Change display mode
 	memset(&dpp, 0, sizeof(dpp));
-	dpp.Windowed = !( theApp.videoOption >= VIDEO_320x240 );
+	dpp.Windowed = !( videoOption >= VIDEO_320x240 );
 	if( !dpp.Windowed ) {
-		dpp.BackBufferFormat = (theApp.fsColorDepth == 32) ? D3DFMT_X8R8G8B8 : D3DFMT_R5G6B5;
+		dpp.BackBufferFormat = (fsColorDepth == 32) ? D3DFMT_X8R8G8B8 : D3DFMT_R5G6B5;
 	} else {
 		dpp.BackBufferFormat = mode.Format;
 	}
-	dpp.BackBufferCount = theApp.tripleBuffering ? 2 : 1;
+	dpp.BackBufferCount = tripleBuffering ? 2 : 1;
 	dpp.MultiSampleType = D3DMULTISAMPLE_NONE;
 	dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	dpp.BackBufferWidth = !dpp.Windowed ? theApp.fsWidth : theApp.surfaceSizeX;
-	dpp.BackBufferHeight = !dpp.Windowed ? theApp.fsHeight : theApp.surfaceSizeY;
+	dpp.BackBufferWidth = !dpp.Windowed ? fsWidth : surfaceSizeX;
+	dpp.BackBufferHeight = !dpp.Windowed ? fsHeight : surfaceSizeY;
 	dpp.hDeviceWindow = theApp.m_pMainWnd->GetSafeHwnd();
-	dpp.FullScreen_RefreshRateInHz = ( dpp.Windowed == TRUE ) ? 0 : theApp.fsFrequency;
+	dpp.FullScreen_RefreshRateInHz = ( dpp.Windowed == TRUE ) ? 0 : fsFrequency;
 	dpp.Flags = 0;
-	dpp.PresentationInterval = (theApp.vsync && !gba_joybus_active) ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
+	dpp.PresentationInterval = (vsync && !gba_joybus_active) ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 	// D3DPRESENT_INTERVAL_ONE means VSync ON
 
 
@@ -244,7 +244,7 @@ bool Direct3DDisplay::initialize()
 		return false;
 	}
 
-	pD3D->GetAdapterDisplayMode(theApp.fsAdapter, &mode);
+	pD3D->GetAdapterDisplayMode(fsAdapter, &mode);
 	screenFormat = mode.Format;
 
 	switch(mode.Format) {
@@ -273,12 +273,12 @@ bool Direct3DDisplay::initialize()
 	  DXTRACE_ERR_MSGBOX( _T("Unsupport D3D format"), 0 );
 	  return false;
 	}
-	theApp.fsColorDepth = systemColorDepth;
+	fsColorDepth = systemColorDepth;
 	utilUpdateSystemColorMaps(theApp.cartridgeType == IMAGE_GBA && gbColorOption == 1);
 
 
 #ifdef MMX
-	if(!theApp.disableMMX) {
+	if(!disableMMX) {
 		cpu_mmx = theApp.detectMMX();
 	} else {
 		cpu_mmx = 0;
@@ -295,7 +295,7 @@ bool Direct3DDisplay::initialize()
 	prepareDisplayMode();
 
 	HRESULT hret = pD3D->CreateDevice(
-		theApp.fsAdapter,
+		fsAdapter,
 		D3DDEVTYPE_HAL,
 		theApp.m_pMainWnd->GetSafeHwnd(),
 		D3DCREATE_FPU_PRESERVE |
@@ -388,16 +388,16 @@ void Direct3DDisplay::render()
 		DXTRACE_ERR_MSGBOX( _T("Can not lock texture"), hr );
 		return;
 	} else {
-		u32 pitch = theApp.sizeX * ( systemColorDepth >> 3 ) + 4;
+		u32 pitch = sizeX * ( systemColorDepth >> 3 ) + 4;
 
 		if( theApp.filterFunction ) {
-			if( theApp.filterMT ) {
+			if( filterMT ) {
 				u8 *start = pix + pitch;
-				int src_height_per_thread = theApp.sizeY / nThreads;
-				int src_height_remaining = theApp.sizeY - ( ( theApp.sizeY / nThreads ) * nThreads );
+				int src_height_per_thread = sizeY / nThreads;
+				int src_height_remaining = sizeY - ( ( sizeY / nThreads ) * nThreads );
 				u32 src_bytes_per_thread = pitch * src_height_per_thread;
 
-				int dst_height_per_thread = src_height_per_thread * theApp.filterMagnification;
+				int dst_height_per_thread = src_height_per_thread * filterMagnification;
 				u32 dst_bytes_per_thread = lr.Pitch * dst_height_per_thread;
 
 				unsigned int i = nThreads - 1;
@@ -414,7 +414,7 @@ void Direct3DDisplay::render()
 					pfthread_data[i].deltaPointer = (u8*)theApp.delta; // TODO: check if thread-safe
 					pfthread_data[i].destPointer = ( (u8*)lr.pBits ) + ( i * dst_bytes_per_thread );
 					pfthread_data[i].destPitch = lr.Pitch;
-					pfthread_data[i].width = theApp.sizeX;
+					pfthread_data[i].width = sizeX;
 					
 					if( i == ( nThreads - 1 ) ) {
 						// last thread
@@ -454,8 +454,8 @@ void Direct3DDisplay::render()
 					(u8*)theApp.delta,
 					(u8*)lr.pBits,
 					lr.Pitch,
-					theApp.sizeX,
-					theApp.sizeY
+					sizeX,
+					sizeY
 					);
 			}
 		} else {
@@ -468,8 +468,8 @@ void Direct3DDisplay::render()
 					lr.Pitch,
 					pix + pitch,
 					pitch,
-					theApp.sizeX,
-					theApp.sizeY
+					sizeX,
+					sizeY
 					);
 				break;
 			case 16:
@@ -478,8 +478,8 @@ void Direct3DDisplay::render()
 					lr.Pitch,
 					pix + pitch,
 					pitch,
-					theApp.sizeX,
-					theApp.sizeY
+					sizeX,
+					sizeY
 					);
 				break;
 			}
@@ -524,24 +524,24 @@ void Direct3DDisplay::render()
 	r.right = dpp.BackBufferWidth - 1;
 	r.bottom = dpp.BackBufferHeight - 1;
 
-	if( theApp.showSpeed && ( theApp.videoOption > VIDEO_6X ) ) {
-		color = theApp.showSpeedTransparent ? D3DCOLOR_ARGB(0x7F, 0x00, 0x00, 0xFF) : D3DCOLOR_ARGB(0xFF, 0x00, 0x00, 0xFF);
+	if( showSpeed && ( videoOption > VIDEO_6X ) ) {
+		color = showSpeedTransparent ? D3DCOLOR_ARGB(0x7F, 0x00, 0x00, 0xFF) : D3DCOLOR_ARGB(0xFF, 0x00, 0x00, 0xFF);
 		char buffer[30];
-		if( theApp.showSpeed == 1 ) {
+		if( showSpeed == 1 ) {
 			sprintf( buffer, "%3d%%", systemSpeed );
 		} else {
-			sprintf( buffer, "%3d%%(%d, %d fps)", systemSpeed, systemFrameSkip, theApp.showRenderedFrames );
+			sprintf( buffer, "%3d%%(%d, %d fps)", systemSpeed, systemFrameSkip, showRenderedFrames );
 		}
 
 		pFont->DrawText( NULL, buffer, -1, &r, DT_CENTER | DT_TOP, color );
 	}
 
-	if( theApp.screenMessage ) {
-		color = theApp.showSpeedTransparent ? D3DCOLOR_ARGB(0x7F, 0xFF, 0x00, 0x00) : D3DCOLOR_ARGB(0xFF, 0xFF, 0x00, 0x00);
-		if( ( ( GetTickCount() - theApp.screenMessageTime ) < 3000 ) && !theApp.disableStatusMessage && pFont ) {
+	if( screenMessage ) {
+		color = showSpeedTransparent ? D3DCOLOR_ARGB(0x7F, 0xFF, 0x00, 0x00) : D3DCOLOR_ARGB(0xFF, 0xFF, 0x00, 0x00);
+		if( ( ( GetTickCount() - theApp.screenMessageTime ) < 3000 ) && !disableStatusMessages && pFont ) {
 			pFont->DrawText( NULL, theApp.screenMessageBuffer, -1, &r, DT_CENTER | DT_BOTTOM, color );
 		} else {
-			theApp.screenMessage = false;
+			screenMessage = false;
 		}
 	}
 
@@ -576,7 +576,7 @@ void Direct3DDisplay::resize( int w, int h )
 
 	if( (w != dpp.BackBufferWidth) ||
 		(h != dpp.BackBufferHeight) ||
-		(theApp.videoOption > VIDEO_6X) ) {
+		(videoOption > VIDEO_6X) ) {
 		resetDevice();
 		calculateDestRect();
 	}
@@ -761,7 +761,7 @@ void Direct3DDisplay::destroyTexture()
 
 void Direct3DDisplay::calculateDestRect()
 {
-	if( theApp.fullScreenStretch ) {
+	if( fullScreenStretch ) {
 		rectangleFillsScreen = true; // no clear() necessary
 		destRect.left = 0;
 		destRect.top = 0;
@@ -772,8 +772,8 @@ void Direct3DDisplay::calculateDestRect()
 		float scaleX = (float)dpp.BackBufferWidth / (float)width;
 		float scaleY = (float)dpp.BackBufferHeight / (float)height;
 		float min = (scaleX < scaleY) ? scaleX : scaleY;
-		if( theApp.maxScale && (min > theApp.maxScale) ) {
-			min = (float)theApp.maxScale;
+		if( maxScale && (min > maxScale) ) {
+			min = (float)maxScale;
 		}
 		destRect.left = 0;
 		destRect.top = 0;

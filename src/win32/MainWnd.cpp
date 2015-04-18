@@ -421,7 +421,7 @@ bool MainWnd::FileRun()
 {
   // save battery file before we change the filename...
   if(rom != NULL || gbRom != NULL) {
-    if(theApp.autoSaveLoadCheatList)
+    if(autoSaveLoadCheatList)
       winSaveCheatListDefault();
     writeBatteryFile();
     cheatSearchCleanup(&cheatSearchData);
@@ -488,30 +488,29 @@ bool MainWnd::FileRun()
     gbGetHardwareType();
 
     // used for the handling of the gb Boot Rom
-    skipBios = theApp.skipBiosFile;
     if (gbHardware & 5)
     {
-      gbCPUInit(theApp.biosFileNameGB, theApp.useBiosFileGB);
+      gbCPUInit(theApp.biosFileNameGB, useBiosFileGB);
     }
     else if (gbHardware & 2)
     {
-      gbCPUInit(theApp.biosFileNameGBC, theApp.useBiosFileGBC);
+      gbCPUInit(theApp.biosFileNameGBC, useBiosFileGBC);
     }
 
     gbReset();
     theApp.emulator = GBSystem;
-    gbBorderOn = theApp.winGbBorderOn;
-    theApp.romSize = gbRomSize;
+    gbBorderOn = winGbBorderOn;
+	theApp.romSize = gbRomSize;
 
 
-    if(theApp.autoPatch && !patchName.IsEmpty()) {
+    if(autoPatch && !patchName.IsEmpty()) {
       int size = gbRomSize;
       applyPatch(patchName, &gbRom, &size);
       if(size != gbRomSize) {
         extern bool gbUpdateSizes();
         gbUpdateSizes();
         gbReset();
-        theApp.romSize = size;
+		theApp.romSize = size;
       }
     }
   } else {
@@ -519,11 +518,11 @@ bool MainWnd::FileRun()
     if(!size)
       return false;
 
-    theApp.romSize = size;
+	theApp.romSize = size;
 
-    flashSetSize(theApp.winFlashSize);
-    rtcEnable(theApp.winRtcEnable);
-    cpuSaveType = theApp.winSaveType;
+    flashSetSize(winFlashSize);
+    rtcEnable(rtcEnabled);
+    cpuSaveType = saveType;
 
 	if (cpuSaveType == 0)
 		utilGBAFindSave(theApp.romSize);
@@ -569,7 +568,7 @@ bool MainWnd::FileRun()
 
     theApp.emulator = GBASystem;
 
-    if(theApp.autoPatch && !patchName.IsEmpty()) {
+    if(autoPatch && !patchName.IsEmpty()) {
       int size = 0x2000000;
       applyPatch(patchName, &rom, &size);
       if(size != 0x2000000) {
@@ -585,7 +584,7 @@ bool MainWnd::FileRun()
       soundReset();
   } else {
 	  soundInit();
-    theApp.soundInitialized = true;
+	  theApp.soundInitialized = true;
   }
 
 #ifdef APU_LOGGER_H
@@ -593,42 +592,41 @@ bool MainWnd::FileRun()
 #endif
 
   if(type == IMAGE_GBA) {
-    skipBios = theApp.skipBiosFile;
-    CPUInit(theApp.biosFileNameGBA.GetString(), theApp.useBiosFileGBA);
+    CPUInit(theApp.biosFileNameGBA.GetString(), useBiosFileGBA);
     CPUReset();
   }
 
   readBatteryFile();
 
-  if(theApp.autoSaveLoadCheatList)
+  if(autoSaveLoadCheatList)
     winLoadCheatListDefault();
 
   theApp.addRecentFile(theApp.szFile);
 
-  theApp.updateWindowSize(theApp.videoOption);
+  theApp.updateWindowSize(videoOption);
 
   theApp.updateFrameSkip();
 
   emulating = true;
 
-  if(theApp.autoLoadMostRecent)
+  if(autoLoadMostRecent)
     OnFileLoadgameMostrecent();
 
-  theApp.frameskipadjust = 0;
-  theApp.renderedFrames = 0;
-  theApp.autoFrameSkipLastTime = systemGetClock();
+  frameskipadjust = 0;
+  renderedFrames = 0;
+  autoFrameSkipLastTime = systemGetClock();
 
-  theApp.rewindCount = 0;
-  theApp.rewindCounter = 0;
-  theApp.rewindSaveNeeded = false;
+  rewindCount = 0;
+  rewindCounter = 0;
+  rewindSaveNeeded = false;
 
   toolsClearLog();
 #ifndef NO_LINK
-  if (theApp.linkAuto)
-	BootLink(theApp.linkMode, theApp.linkHostAddr, theApp.linkTimeout, theApp.linkHacks, theApp.linkNumPlayers);
+  if (linkAuto)
+	BootLink(linkMode, theApp.linkHostAddr, linkTimeout, linkHacks, linkNumPlayers);
 #endif
 
-  if (theApp.gdbBreakOnLoad)
+  if (gdbBreakOnLoad)
 	  OnToolsDebugBreak();
 
   return true;
@@ -722,11 +720,11 @@ void MainWnd::OnMove(int x, int y)
         RECT r;
 
         GetWindowRect(&r);
-        theApp.windowPositionX = r.left;
-        theApp.windowPositionY = r.top;
+        windowPositionX = r.left;
+        windowPositionY = r.top;
         theApp.adjustDestRect();
-        regSetDwordValue("windowX", theApp.windowPositionX);
-        regSetDwordValue("windowY", theApp.windowPositionY);
+        regSetDwordValue("windowX", windowPositionX);
+        regSetDwordValue("windowY", windowPositionY);
       }
     }
   }
@@ -742,7 +740,7 @@ void MainWnd::OnSizing(UINT fwSide, LPRECT pRect)
 	}
 
 	// maintain minimal window size
-	RECT size = { 0, 0, theApp.sizeX, theApp.sizeY };
+	RECT size = { 0, 0, sizeX, sizeY };
 	AdjustWindowRectEx(
 		&size,
 		WS_POPUP | WS_VISIBLE | WS_OVERLAPPEDWINDOW,
@@ -767,7 +765,7 @@ void MainWnd::OnSize(UINT nType, int cx, int cy)
 {
   CWnd::OnSize(nType, cx, cy);
 
-  bool redraw = ( ( cx < theApp.surfaceSizeX ) || ( cy < theApp.surfaceSizeY ) );
+  bool redraw = ( ( cx < surfaceSizeX ) || ( cy < surfaceSizeY ) );
 
   if(!theApp.changingVideoSize) {
     if(this) {
@@ -775,12 +773,12 @@ void MainWnd::OnSize(UINT nType, int cx, int cy)
         if(theApp.iconic) {
           if(emulating) {
             soundResume();
-            theApp.paused = false;
+            paused = false;
           }
         }
-        if(theApp.videoOption <= VIDEO_6X) {
-          theApp.surfaceSizeX = cx;
-          theApp.surfaceSizeY = cy;
+        if(videoOption <= VIDEO_6X) {
+          surfaceSizeX = cx;
+          surfaceSizeY = cy;
           theApp.adjustDestRect();
           if(theApp.display)
             theApp.display->resize(theApp.dest.right-theApp.dest.left, theApp.dest.bottom-theApp.dest.top);
@@ -788,17 +786,17 @@ void MainWnd::OnSize(UINT nType, int cx, int cy)
 			  theApp.painting = true;
 			  systemDrawScreen();
 			  theApp.painting = false;
-			  theApp.renderedFrames--;
+			  renderedFrames--;
 		  }
         }
       } else {
         if(emulating) {
-          if(!theApp.paused) {
-            theApp.paused = true;
+          if(!paused) {
+            paused = true;
             soundPause();
           }
         }
-        theApp.iconic = true;
+		theApp.iconic = true;
       }
     }
   }
@@ -1151,8 +1149,8 @@ void MainWnd::OnPaint()
   if(emulating) {
     theApp.painting = true;
     systemDrawScreen();
-    theApp.painting = false;
-    theApp.renderedFrames--;
+	theApp.painting = false;
+    renderedFrames--;
   }
 }
 
@@ -1196,7 +1194,7 @@ void MainWnd::screenCapture(int captureNumber)
     captureDir = getDirFromFile(theApp.filename);
 
   LPCTSTR ext = "png";
-  if(theApp.captureFormat != 0)
+  if(captureFormat != 0)
     ext = "bmp";
 
   if(isDriveRoot(captureDir))
@@ -1219,7 +1217,7 @@ void MainWnd::screenCapture(int captureNumber)
 	  return;
   }
 
-  if(theApp.captureFormat == 0)
+  if(captureFormat == 0)
     theApp.emulator.emuWritePNG(buffer);
   else
     theApp.emulator.emuWriteBMP(buffer);
@@ -1231,10 +1229,10 @@ void MainWnd::screenCapture(int captureNumber)
 void MainWnd::winMouseOn()
 {
   SetCursor(arrow);
-  if(theApp.videoOption > VIDEO_6X) {
-    theApp.mouseCounter = 10;
+  if(videoOption > VIDEO_6X) {
+    mouseCounter = 10;
   } else
-    theApp.mouseCounter = 0;
+    mouseCounter = 0;
 }
 
 void MainWnd::OnMouseMove(UINT nFlags, CPoint point)
@@ -1258,29 +1256,29 @@ void MainWnd::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
   bool a = (nState == WA_ACTIVE) || (nState == WA_CLICKACTIVE);
 
   if(a && theApp.input) {
-    theApp.active = a;
+    active = a;
     theApp.input->activate();
-    if(!theApp.paused && emulating) {
+    if(!paused && emulating) {
       soundResume();
     }
   } else {
-    theApp.wasPaused = true;
-    if(theApp.pauseWhenInactive && !gba_joybus_active) {
+    wasPaused = true;
+    if(pauseWhenInactive && !gba_joybus_active) {
       if(emulating) {
         soundPause();
       }
-      theApp.active = a;
+      active = a;
     }
 
     memset(theApp.delta,255,sizeof(theApp.delta));
   }
 
-  if(theApp.paused && emulating)
+  if(paused && emulating)
   {
     theApp.painting = true;
     systemDrawScreen();
     theApp.painting = false;
-    theApp.renderedFrames--;
+    renderedFrames--;
   }
 }
 
@@ -1306,7 +1304,7 @@ void MainWnd::OnDropFiles(HDROP hDropInfo)
 
 LRESULT MainWnd::OnMySysCommand(WPARAM wParam, LPARAM lParam)
 {
-  if(emulating && !theApp.paused) {
+  if(emulating && !paused) {
     if((wParam&0xFFF0) == SC_SCREENSAVE || (wParam&0xFFF0) == SC_MONITORPOWER)
       return 0;
   }

@@ -117,7 +117,7 @@ bool DirectSound::init(long sampleRate)
 	ZeroMemory( &dsbdesc, sizeof(DSBUFFERDESC) );
 	dsbdesc.dwSize = sizeof(DSBUFFERDESC);
 	dsbdesc.dwFlags = DSBCAPS_PRIMARYBUFFER;
-	if( theApp.dsoundDisableHardwareAcceleration ) {
+	if( dsoundDisableHardwareAcceleration ) {
 		dsbdesc.dwFlags |= DSBCAPS_LOCSOFTWARE;
 	}
 
@@ -151,7 +151,7 @@ bool DirectSound::init(long sampleRate)
 	ZeroMemory( &dsbdesc, sizeof(DSBUFFERDESC) );
 	dsbdesc.dwSize = sizeof(DSBUFFERDESC);
 	dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLPOSITIONNOTIFY | DSBCAPS_GLOBALFOCUS;
-	if( theApp.dsoundDisableHardwareAcceleration ) {
+	if( dsoundDisableHardwareAcceleration ) {
 		dsbdesc.dwFlags |= DSBCAPS_LOCSOFTWARE;
 	}
 	dsbdesc.dwBufferBytes = soundBufferTotalLen;
@@ -240,7 +240,7 @@ void DirectSound::write(u16 * finalWave, int length)
 	LPVOID       lpvPtr2;
 	DWORD        dwBytes2 = 0;
 
-	if( !speedup && synchronize && !theApp.throttle && !gba_joybus_active) {
+	if( !speedup && synchronize && !throttle && !gba_joybus_active) {
 		hr = dsbSecondary->GetStatus(&status);
 		if( status & DSBSTATUS_PLAYING ) {
 			if( !soundPaused ) {

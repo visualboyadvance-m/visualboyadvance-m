@@ -2,7 +2,7 @@
 //#define LOGALL
 
 #include "stdafx.h"
-#include "VBA.h" // for 'theApp.throttle'
+#include "VBA.h" // for 'throttle'
 
 #ifndef NO_OAL
 
@@ -273,7 +273,7 @@ void OpenAL::write(u16 * finalWave, int length)
 
 		if( nBuffersProcessed == theApp.oalBufferCount ) {
 			// we only want to know about it when we are emulating at full speed or faster:
-			if( ( theApp.throttle >= 100 ) || ( theApp.throttle == 0 ) ) {
+			if( ( throttle >= 100 ) || ( throttle == 0 ) ) {
 				if( systemVerbose & VERBOSE_SOUNDOUTPUT ) {
 					static unsigned int i = 0;
 					log( "OpenAL: Buffers were not refilled fast enough (i=%i)\n", i++ );
@@ -281,7 +281,7 @@ void OpenAL::write(u16 * finalWave, int length)
 			}
 		}
 
-		if( !speedup && synchronize && !theApp.throttle  && !gba_joybus_active) {
+		if( !speedup && synchronize && !throttle  && !gba_joybus_active) {
 			// wait until at least one buffer has finished
 			while( nBuffersProcessed == 0 ) {
 				winlog( " waiting...\n" );

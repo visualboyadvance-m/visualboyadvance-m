@@ -47,12 +47,12 @@ void MainWnd::OnUpdateCheatsCheatlist(CCmdUI* pCmdUI)
 
 void MainWnd::OnCheatsAutomaticsaveloadcheats()
 {
-  theApp.autoSaveLoadCheatList = !theApp.autoSaveLoadCheatList;
+  autoSaveLoadCheatList = !autoSaveLoadCheatList;
 }
 
 void MainWnd::OnUpdateCheatsAutomaticsaveloadcheats(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(theApp.autoSaveLoadCheatList);
+  pCmdUI->SetCheck(autoSaveLoadCheatList);
 }
 
 void MainWnd::OnCheatsLoadcheatlist()

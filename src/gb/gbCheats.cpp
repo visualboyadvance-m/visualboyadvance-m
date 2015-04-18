@@ -10,13 +10,12 @@
 #include "gbCheats.h"
 #include "gbGlobals.h"
 #include "gb.h"
+#include "../common/ConfigManager.h"
 
 gbCheat gbCheatList[100];
 int gbCheatNumber = 0;
 int gbNextCheat = 0;
 bool gbCheatMap[0x10000];
-
-extern bool cheatsEnabled;
 
 #define GBCHEAT_IS_HEX(a) ( ((a)>='A' && (a) <='F') || ((a) >='0' && (a) <= '9'))
 #define GBCHEAT_HEX_VALUE(a) ( (a) >= 'A' ? (a) - 'A' + 10 : (a) - '0')

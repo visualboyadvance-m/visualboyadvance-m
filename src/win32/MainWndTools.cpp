@@ -55,7 +55,7 @@ void MainWnd::OnToolsDisassemble()
 
 void MainWnd::OnUpdateToolsDisassemble(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X);
+  pCmdUI->Enable(videoOption <= VIDEO_6X);
 }
 
 void MainWnd::OnToolsLogging()
@@ -65,7 +65,7 @@ void MainWnd::OnToolsLogging()
 
 void MainWnd::OnUpdateToolsLogging(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X);
+  pCmdUI->Enable(videoOption <= VIDEO_6X);
 }
 
 void MainWnd::OnToolsIoviewer()
@@ -77,7 +77,7 @@ void MainWnd::OnToolsIoviewer()
 
 void MainWnd::OnUpdateToolsIoviewer(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X && theApp.cartridgeType == 0);
+  pCmdUI->Enable(videoOption <= VIDEO_6X && theApp.cartridgeType == 0);
 }
 
 void MainWnd::OnToolsMapview()
@@ -95,7 +95,7 @@ void MainWnd::OnToolsMapview()
 
 void MainWnd::OnUpdateToolsMapview(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X);
+  pCmdUI->Enable(videoOption <= VIDEO_6X);
 }
 
 void MainWnd::OnToolsMemoryviewer()
@@ -113,7 +113,7 @@ void MainWnd::OnToolsMemoryviewer()
 
 void MainWnd::OnUpdateToolsMemoryviewer(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X);
+  pCmdUI->Enable(videoOption <= VIDEO_6X);
 }
 
 void MainWnd::OnToolsOamviewer()
@@ -131,7 +131,7 @@ void MainWnd::OnToolsOamviewer()
 
 void MainWnd::OnUpdateToolsOamviewer(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X);
+  pCmdUI->Enable(videoOption <= VIDEO_6X);
 }
 
 void MainWnd::OnToolsPaletteview()
@@ -149,7 +149,7 @@ void MainWnd::OnToolsPaletteview()
 
 void MainWnd::OnUpdateToolsPaletteview(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X);
+  pCmdUI->Enable(videoOption <= VIDEO_6X);
 }
 
 void MainWnd::OnToolsTileviewer()
@@ -167,14 +167,14 @@ void MainWnd::OnToolsTileviewer()
 
 void MainWnd::OnUpdateToolsTileviewer(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X);
+  pCmdUI->Enable(videoOption <= VIDEO_6X);
 }
 
 void MainWnd::OnDebugNextframe()
 {
-  if(theApp.paused)
-    theApp.paused = false;
-  theApp.winPauseNextFrame = true;
+  if(paused)
+    paused = false;
+  winPauseNextFrame = true;
 }
 
 void MainWnd::OnToolsDebugConfigurePort()
@@ -191,19 +191,19 @@ void MainWnd::OnUpdateToolsDebugConfigurePort(CCmdUI* pCmdUI)
 
 void MainWnd::OnToolsDebugBreakOnLoad()
 {
-	theApp.gdbBreakOnLoad = !theApp.gdbBreakOnLoad;
+	gdbBreakOnLoad = !gdbBreakOnLoad;
 }
 
 void MainWnd::OnUpdateToolsDebugBreakOnLoad(CCmdUI* pCmdUI)
 {
-	pCmdUI->SetCheck(theApp.gdbBreakOnLoad);
+	pCmdUI->SetCheck(gdbBreakOnLoad);
 }
 
 void MainWnd::OnToolsDebugBreak()
 {
 	GDBPortDlg dlg;
 
-	int port = theApp.gdbPort;
+	int port = gdbPort;
 	if (port == 0)
 	{
 		if (dlg.DoModal()) {
@@ -238,7 +238,7 @@ void MainWnd::OnToolsDebugBreak()
 
 void MainWnd::OnUpdateToolsDebugBreak(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(theApp.videoOption <= VIDEO_6X && emulating != 0);
+	pCmdUI->Enable(videoOption <= VIDEO_6X && emulating != 0);
 }
 
 void MainWnd::OnToolsDebugDisconnect()
@@ -249,7 +249,7 @@ void MainWnd::OnToolsDebugDisconnect()
 
 void MainWnd::OnUpdateToolsDebugDisconnect(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption <= VIDEO_6X && remoteSocket != -1);
+  pCmdUI->Enable(videoOption <= VIDEO_6X && remoteSocket != -1);
 }
 
 void MainWnd::OnOptionsSoundStartrecording()
@@ -273,7 +273,7 @@ void MainWnd::OnOptionsSoundStartrecording()
   }
 
   captureBuffer = theApp.soundRecordName =  dlg.GetPathName();
-  theApp.soundRecording = true;
+  soundRecording = true;
 
   if(dlg.m_ofn.nFileOffset > 0) {
     captureBuffer = captureBuffer.Left(dlg.m_ofn.nFileOffset);
@@ -288,7 +288,7 @@ void MainWnd::OnOptionsSoundStartrecording()
 
 void MainWnd::OnUpdateOptionsSoundStartrecording(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(!theApp.soundRecording);
+  pCmdUI->Enable(!soundRecording);
 }
 
 void MainWnd::OnOptionsSoundStoprecording()
@@ -297,12 +297,12 @@ void MainWnd::OnOptionsSoundStoprecording()
     delete theApp.soundRecorder;
     theApp.soundRecorder = NULL;
   }
-  theApp.soundRecording = false;
+  soundRecording = false;
 }
 
 void MainWnd::OnUpdateOptionsSoundStoprecording(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.soundRecording);
+  pCmdUI->Enable(soundRecording);
 }
 
 
@@ -328,7 +328,7 @@ void MainWnd::OnToolsRecordStartavirecording()
 
 	captureBuffer = theApp.soundRecordName =  dlg.GetPathName();
 	theApp.aviRecordName = captureBuffer;
-	theApp.aviRecording = true;
+	aviRecording = true;
 
 	if( dlg.m_ofn.nFileOffset > 0 ) {
 		captureBuffer = captureBuffer.Left( dlg.m_ofn.nFileOffset );
@@ -358,14 +358,14 @@ void MainWnd::OnToolsRecordStartavirecording()
 		systemMessage( IDS_AVI_CANNOT_CREATE_AVI, "Cannot create AVI file." );
 		delete theApp.aviRecorder;
 		theApp.aviRecorder = NULL;
-		theApp.aviRecording = false;
+		aviRecording = false;
 		return;
 	}
 
 	// add video stream
 	ret = theApp.aviRecorder->CreateVideoStream(
-		theApp.sizeX,
-		theApp.sizeY,
+		sizeX,
+		sizeY,
 		( systemColorDepth == 32 ) ? 24 : 16,
 		60,
 		this->GetSafeHwnd()
@@ -374,7 +374,7 @@ void MainWnd::OnToolsRecordStartavirecording()
 		systemMessage( IDS_AVI_CANNOT_CREATE_VIDEO, "Cannot create video stream in AVI file. Make sure the selected codec supports input in RGB24 color space!" );
 		delete theApp.aviRecorder;
 		theApp.aviRecorder = NULL;
-		theApp.aviRecording = false;
+		aviRecording = false;
 		return;
 	}
 
@@ -389,7 +389,7 @@ void MainWnd::OnToolsRecordStartavirecording()
 		systemMessage( IDS_AVI_CANNOT_CREATE_AUDIO, "Cannot create audio stream in AVI file." );
 		delete theApp.aviRecorder;
 		theApp.aviRecorder = NULL;
-		theApp.aviRecording = false;
+		aviRecording = false;
 		return;
 	}
 }
@@ -397,7 +397,7 @@ void MainWnd::OnToolsRecordStartavirecording()
 
 void MainWnd::OnUpdateToolsRecordStartavirecording(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable( !theApp.aviRecording && emulating );
+	pCmdUI->Enable( !aviRecording && emulating );
 }
 
 
@@ -407,13 +407,13 @@ void MainWnd::OnToolsRecordStopavirecording()
 		delete theApp.aviRecorder;
 		theApp.aviRecorder = NULL;
 	}
-	theApp.aviRecording = false;
+	aviRecording = false;
 }
 
 
 void MainWnd::OnUpdateToolsRecordStopavirecording(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable( theApp.aviRecording );
+  pCmdUI->Enable( aviRecording );
 }
 
 void MainWnd::OnToolsRecordStartmovierecording()
@@ -464,10 +464,10 @@ void MainWnd::OnToolsRecordStartmovierecording()
   movieName = movieName.Left(movieName.GetLength()-3) + "VM0";
 
   if(writeSaveGame(movieName)) {
-    theApp.movieFrame = 0;
-    theApp.movieLastJoypad = 0;
-    theApp.movieRecording = true;
-    theApp.moviePlaying = false;
+    movieFrame = 0;
+    movieLastJoypad = 0;
+    movieRecording = true;
+    moviePlaying = false;
   } else {
     systemMessage(IDS_CANNOT_OPEN_FILE, "Cannot open file %s",
                   (const char *)movieName);
@@ -476,29 +476,29 @@ void MainWnd::OnToolsRecordStartmovierecording()
 
 void MainWnd::OnUpdateToolsRecordStartmovierecording(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(!theApp.movieRecording && emulating);
+	pCmdUI->Enable(!movieRecording && emulating);
 }
 
 void MainWnd::OnToolsRecordStopmovierecording()
 {
-  if(theApp.movieRecording) {
+  if(movieRecording) {
     if(theApp.movieFile != NULL) {
       // record the last joypad change so that the correct time can be
       // recorded
-      fwrite(&theApp.movieFrame, 1, sizeof(int), theApp.movieFile);
-      fwrite(&theApp.movieLastJoypad, 1, sizeof(u32), theApp.movieFile);
+      fwrite(&movieFrame, 1, sizeof(int), theApp.movieFile);
+      fwrite(&movieLastJoypad, 1, sizeof(u32), theApp.movieFile);
       fclose(theApp.movieFile);
       theApp.movieFile = NULL;
     }
-    theApp.movieRecording = false;
-    theApp.moviePlaying = false;
-    theApp.movieLastJoypad = 0;
+    movieRecording = false;
+    moviePlaying = false;
+    movieLastJoypad = 0;
   }
 }
 
 void MainWnd::OnUpdateToolsRecordStopmovierecording(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.movieRecording);
+  pCmdUI->Enable(movieRecording);
 }
 
 void MainWnd::OnToolsPlayStartmovieplaying()
@@ -554,10 +554,10 @@ void MainWnd::OnToolsPlayStartmovieplaying()
   }
   movieName = movieName.Left(movieName.GetLength()-3)+"VM0";
   if(loadSaveGame(movieName)) {
-    theApp.moviePlaying = true;
-    theApp.movieFrame = 0;
-    theApp.moviePlayFrame = 0;
-    theApp.movieLastJoypad = 0;
+    moviePlaying = true;
+    movieFrame = 0;
+    moviePlayFrame = 0;
+    movieLastJoypad = 0;
     theApp.movieReadNext();
   } else {
     systemMessage(IDS_CANNOT_OPEN_FILE, "Cannot open file %s",
@@ -567,39 +567,39 @@ void MainWnd::OnToolsPlayStartmovieplaying()
 
 void MainWnd::OnUpdateToolsPlayStartmovieplaying(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(!theApp.moviePlaying && emulating);
+	pCmdUI->Enable(!moviePlaying && emulating);
 }
 
 void MainWnd::OnToolsPlayStopmovieplaying()
 {
-  if(theApp.moviePlaying) {
+  if(moviePlaying) {
     if(theApp.movieFile != NULL) {
       fclose(theApp.movieFile);
       theApp.movieFile = NULL;
     }
-    theApp.moviePlaying = false;
-    theApp.movieLastJoypad = 0;
+    moviePlaying = false;
+    movieLastJoypad = 0;
   }
 }
 
 void MainWnd::OnUpdateToolsPlayStopmovieplaying(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.moviePlaying);
+  pCmdUI->Enable(moviePlaying);
 }
 
 void MainWnd::OnToolsRewind()
 {
-  if(emulating && theApp.emulator.emuReadMemState && theApp.rewindMemory && theApp.rewindCount) {
-    theApp.rewindPos = --theApp.rewindPos & 7;
-    theApp.emulator.emuReadMemState(&theApp.rewindMemory[REWIND_SIZE*theApp.rewindPos], REWIND_SIZE);
-    theApp.rewindCount--;
-    theApp.rewindCounter = 0;
+  if(emulating && theApp.emulator.emuReadMemState && theApp.rewindMemory && rewindCount) {
+    rewindPos = --rewindPos & 7;
+    theApp.emulator.emuReadMemState(&theApp.rewindMemory[REWIND_SIZE*rewindPos], REWIND_SIZE);
+    rewindCount--;
+    rewindCounter = 0;
   }
 }
 
 void MainWnd::OnUpdateToolsRewind(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.rewindMemory != NULL && emulating && theApp.rewindCount);
+  pCmdUI->Enable(theApp.rewindMemory != NULL && emulating && rewindCount);
 }
 
 void MainWnd::OnToolsCustomize()
@@ -616,5 +616,5 @@ void MainWnd::OnToolsCustomize()
 
 void MainWnd::OnUpdateToolsCustomize(CCmdUI* pCmdUI)
 {
-  pCmdUI->Enable(theApp.videoOption != VIDEO_320x240);
+  pCmdUI->Enable(videoOption != VIDEO_320x240);
 }

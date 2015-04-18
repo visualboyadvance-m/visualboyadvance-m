@@ -11,6 +11,7 @@
 #include "Input.h"
 #include "IUpdate.h"
 #include "../System.h"
+#include "common/ConfigManager.h"
 #include "../Util.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -63,75 +64,40 @@ class VBA : public CWinApp
   CMenu m_menu;
   HMENU menu;
   HMENU popup;
-  unsigned int maxCpuCores; // maximum number of CPU cores VBA should use, 0 means auto-detect
-  int windowPositionX;
-  int windowPositionY;
-  void (*filterFunction)(u8*,u32,u8*,u8*,u32,int,int);
-  void (*ifbFunction)(u8*,u32,int,int);
-  int ifbType;
-  int filterType;
+
+  AVIWrite *aviRecorder;
+
+  char *rewindMemory;
   char pluginName[MAX_PATH];
-  int filterWidth;
-  int filterHeight;
-  int filterMagnification;
-  bool filterMT; // enable multi-threading for pixel filters
-  int fsWidth;
-  int fsHeight;
-  int fsColorDepth;
-  int fsFrequency;
-  int fsAdapter;
-  bool fsForceChange;
-  int sizeX;
-  int sizeY;
-  int surfaceSizeX;
-  int surfaceSizeY;
-  int videoOption;
-  bool fullScreenStretch;
-  bool disableStatusMessage;
-  int showSpeed;
-  BOOL showSpeedTransparent;
-  int showRenderedFrames;
-  bool screenMessage;
-  CString screenMessageBuffer;
-  DWORD screenMessageTime;
-  u8 *delta[257*244*4];
-  IDisplay *display;
-  IMAGE_TYPE cartridgeType;
-  bool soundInitialized;
-  bool useBiosFileGBA;
-  bool useBiosFileGBC;
-  bool useBiosFileGB;
-  bool skipBiosFile;
+  CString aviRecordName;
+  CString biosFileNameGB;
   CString biosFileNameGBA;
   CString biosFileNameGBC;
-  CString biosFileNameGB;
-  bool active;
-  bool paused;
+  CString languageName;
+  CString linkHostAddr;
   CString recentFiles[10];
-  bool recentFreeze;
-  bool autoSaveLoadCheatList;
-  FILE *winout;
-  bool autoPatch;
-  int winGbBorderOn;
-  int winFlashSize;
-  bool winRtcEnable;
-  int winSaveType;
-  char *rewindMemory;
-  int rewindPos;
-  int rewindTopPos;
-  int rewindCounter;
-  int rewindCount;
-  bool rewindSaveNeeded;
-  int rewindTimer;
-  bool gdbBreakOnLoad;
-  int captureFormat;
-  bool tripleBuffering;
-  unsigned short throttle;
-  u32 autoFrameSkipLastTime;
-  bool autoFrameSkip;
-  bool vsync;
-  bool changingVideoSize;
+  CString screenMessageBuffer;
+  CString soundRecordName;
   DISPLAY_TYPE renderMethod;
+  DWORD screenMessageTime;
+  FILE *movieFile;
+  FILE *winout;
+  HMODULE languageModule;
+  IDisplay *display;
+  IMAGE_TYPE cartridgeType;
+
+  bool soundInitialized;
+
+  Input *input;
+
+  u8 *delta[257 * 244 * 4];
+  unsigned int maxCpuCores; // maximum number of CPU cores VBA should use, 0 means auto-detect
+  unsigned int skipAudioFrames;
+  void(*filterFunction)(u8*, u32, u8*, u8*, u32, int, int);
+  void(*ifbFunction)(u8*, u32, int, int);
+  WavWriter *soundRecorder;
+
+  bool changingVideoSize;
   AUDIO_API audioAPI;
 #ifndef NO_OAL
   TCHAR *oalDevice;
@@ -147,46 +113,7 @@ class VBA : public CWinApp
   bool d3dMotionBlur;
 #endif
   bool iconic;
-  int glFilter;
-  bool dinputKeyFocus;
-  bool pauseWhenInactive;
-  bool speedupToggle;
-  bool winGbPrinterEnabled;
-  int threadPriority;
-  bool disableMMX;
-  int languageOption;
-  CString languageName;
-  HMODULE languageModule;
-  int renderedFrames;
-  Input *input;
-  int joypadDefault;
-  int autoFire;
-  bool autoFireToggle;
-  bool winPauseNextFrame;
-  bool soundRecording;
-  WavWriter *soundRecorder;
-  CString soundRecordName;
-  bool dsoundDisableHardwareAcceleration;
-  bool aviRecording;
-  AVIWrite *aviRecorder;
-  CString aviRecordName;
   bool painting;
-  unsigned int skipAudioFrames;
-  bool movieRecording;
-  bool moviePlaying;
-  int movieFrame;
-  int moviePlayFrame;
-  FILE *movieFile;
-  u32 movieLastJoypad;
-  u32 movieNextJoypad;
-  int sensorX;
-  int sensorY;
-  int sunBars;
-  int mouseCounter;
-  bool wasPaused;
-  int frameskipadjust;
-  bool autoLoadMostRecent;
-  int maxScale;
   int romSize;
   VIDEO_SIZE lastWindowed;
   VIDEO_SIZE lastFullscreen;
@@ -210,15 +137,6 @@ class VBA : public CWinApp
   CString saveDotCodeFile;
 
   CString wndClass;
-
-  int linkTimeout;
-  int linkMode;
-  CString linkHostAddr;
-  BOOL linkAuto;
-  BOOL linkHacks;
-  int linkNumPlayers;
-
-  int gdbPort;
 
  public:
   VBA();

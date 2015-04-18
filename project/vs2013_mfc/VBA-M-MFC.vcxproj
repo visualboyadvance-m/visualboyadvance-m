@@ -249,6 +249,7 @@
     <ResourceCompile Include="..\..\src\win32\VBA.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\dependencies\msvc\getopt.c" />
     <ClCompile Include="..\..\src\filters\2xSaI.cpp">
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</WholeProgramOptimization>
     </ClCompile>

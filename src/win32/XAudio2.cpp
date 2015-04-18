@@ -451,7 +451,7 @@ void XAudio2_Output::write(u16 * finalWave, int length)
 			break;
 		} else {
 			// the maximum number of buffers is currently queued
-			if( synchronize && !speedup && !theApp.throttle && !gba_joybus_active ) {
+			if( synchronize && !speedup && !throttle && !gba_joybus_active ) {
 				// wait for one buffer to finish playing
 				if (WaitForSingleObject( notify.hBufferEndEvent, 10000 ) == WAIT_TIMEOUT) {
 					device_changed = true;

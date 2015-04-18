@@ -21,6 +21,7 @@
 #include "elf.h"
 #include "../Util.h"
 #include "../System.h"
+#include "../common/ConfigManager.h"
 #include "agbprint.h"
 #include "remote.h"
 

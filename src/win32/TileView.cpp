@@ -248,7 +248,7 @@ void TileView::OnSave()
   {
     CString captureBuffer;
 
-    if(theApp.captureFormat == 0)
+    if(captureFormat == 0)
       captureBuffer = "tiles.png";
     else
       captureBuffer = "tiles.bmp";
@@ -261,8 +261,8 @@ void TileView::OnSave()
     FileDlg dlg(this,
                 captureBuffer,
                 filter,
-                theApp.captureFormat ? 2 : 1,
-                theApp.captureFormat ? "BMP" : "PNG",
+                captureFormat ? 2 : 1,
+                captureFormat ? "BMP" : "PNG",
                 exts,
                 "",
                 title,

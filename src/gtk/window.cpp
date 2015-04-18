@@ -27,6 +27,7 @@
 
 #include <SDL.h>
 
+#include "../common/ConfigManager.h"
 #include "../gba/GBA.h"
 #include "../gba/RTC.h"
 #include "../gba/Sound.h"

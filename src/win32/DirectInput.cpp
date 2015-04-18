@@ -621,7 +621,7 @@ bool DirectInput::readDevices()
 u32 DirectInput::readDevice(int which)
 {
   u32 res = 0;
-  int i = theApp.joypadDefault;
+  int i = joypadDefault;
   if(which >= 0 && which <= 3)
     i = which;
 
@@ -649,11 +649,11 @@ u32 DirectInput::readDevice(int which)
   if(checkKey(theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_GS)]))
     res |= 4096;
 
-  if(theApp.autoFire) {
-    res &= (~theApp.autoFire);
-    if(theApp.autoFireToggle)
-      res |= theApp.autoFire;
-    theApp.autoFireToggle = !theApp.autoFireToggle;
+  if(autoFire) {
+    res &= (~autoFire);
+    if(autoFireToggle)
+      res |= autoFire;
+    autoFireToggle = !autoFireToggle;
   }
 
   // disallow L+R or U+D of being pressed at the same time
@@ -662,24 +662,24 @@ u32 DirectInput::readDevice(int which)
   if((res & 192) == 192)
     res &= ~128;
 
-  if(theApp.movieRecording) {
-    if(i == theApp.joypadDefault) {
-      if(res != theApp.movieLastJoypad) {
-        fwrite(&theApp.movieFrame, 1, sizeof(theApp.movieFrame), theApp.movieFile);
+  if(movieRecording) {
+    if(i == joypadDefault) {
+      if(res != movieLastJoypad) {
+        fwrite(&movieFrame, 1, sizeof(movieFrame), theApp.movieFile);
         fwrite(&res, 1, sizeof(res), theApp.movieFile);
-        theApp.movieLastJoypad = res;
+        movieLastJoypad = res;
       }
     }
   }
-  if(theApp.moviePlaying) {
-    if(theApp.movieFrame == theApp.moviePlayFrame) {
-      theApp.movieLastJoypad = theApp.movieNextJoypad;
+  if(moviePlaying) {
+    if(movieFrame == moviePlayFrame) {
+      movieLastJoypad = movieNextJoypad;
       theApp.movieReadNext();
     }
-    res = theApp.movieLastJoypad;
+    res = movieLastJoypad;
   }
   // we don't record speed up or screen capture buttons
-  if(checkKey(theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_SPEED)]) || theApp.speedupToggle)
+  if(checkKey(theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_SPEED)]) || speedupToggle)
     res |= 1024;
   if(checkKey(theApp.input->joypaddata[JOYPAD(i,KEY_BUTTON_CAPTURE)]))
     res |= 2048;
@@ -751,55 +751,55 @@ void DirectInput::checkKeys()
 void DirectInput::checkMotionKeys()
 {
   if(checkKey(theApp.input->joypaddata[MOTION(KEY_LEFT)])) {
-	  theApp.sunBars--;
-	  if (theApp.sunBars < 1)
-		  theApp.sunBars = 1;
+	  sunBars--;
+	  if (sunBars < 1)
+		  sunBars = 1;
 
-    theApp.sensorX += 3;
-    if(theApp.sensorX > 2197)
-      theApp.sensorX = 2197;
-    if(theApp.sensorX < 2047)
-      theApp.sensorX = 2057;
+    sensorX += 3;
+    if(sensorX > 2197)
+      sensorX = 2197;
+    if(sensorX < 2047)
+      sensorX = 2057;
   } else if(checkKey(theApp.input->joypaddata[MOTION(KEY_RIGHT)])) {
-	  theApp.sunBars++;
-	  if (theApp.sunBars > 100)
-		  theApp.sunBars = 100;
+	  sunBars++;
+	  if (sunBars > 100)
+		  sunBars = 100;
 
-    theApp.sensorX -= 3;
-    if(theApp.sensorX < 1897)
-      theApp.sensorX = 1897;
-    if(theApp.sensorX > 2047)
-      theApp.sensorX = 2037;
-  } else if(theApp.sensorX > 2047) {
-    theApp.sensorX -= 2;
-    if(theApp.sensorX < 2047)
-      theApp.sensorX = 2047;
+    sensorX -= 3;
+    if(sensorX < 1897)
+      sensorX = 1897;
+    if(sensorX > 2047)
+      sensorX = 2037;
+  } else if(sensorX > 2047) {
+    sensorX -= 2;
+    if(sensorX < 2047)
+      sensorX = 2047;
   } else {
-    theApp.sensorX += 2;
-    if(theApp.sensorX > 2047)
-      theApp.sensorX = 2047;
+    sensorX += 2;
+    if(sensorX > 2047)
+      sensorX = 2047;
   }
 
   if(checkKey(theApp.input->joypaddata[MOTION(KEY_UP)])) {
-    theApp.sensorY += 3;
-    if(theApp.sensorY > 2197)
-      theApp.sensorY = 2197;
-    if(theApp.sensorY < 2047)
-      theApp.sensorY = 2057;
+    sensorY += 3;
+    if(sensorY > 2197)
+      sensorY = 2197;
+    if(sensorY < 2047)
+      sensorY = 2057;
   } else if(checkKey(theApp.input->joypaddata[MOTION(KEY_DOWN)])) {
-    theApp.sensorY -= 3;
-    if(theApp.sensorY < 1897)
-      theApp.sensorY = 1897;
-    if(theApp.sensorY > 2047)
-      theApp.sensorY = 2037;
-  } else if(theApp.sensorY > 2047) {
-    theApp.sensorY -= 2;
-    if(theApp.sensorY < 2047)
-      theApp.sensorY = 2047;
+    sensorY -= 3;
+    if(sensorY < 1897)
+      sensorY = 1897;
+    if(sensorY > 2047)
+      sensorY = 2037;
+  } else if(sensorY > 2047) {
+    sensorY -= 2;
+    if(sensorY < 2047)
+      sensorY = 2047;
   } else {
-    theApp.sensorY += 2;
-    if(theApp.sensorY > 2047)
-      theApp.sensorY = 2047;
+    sensorY += 2;
+    if(sensorY > 2047)
+      sensorY = 2047;
   }
 }
 

@@ -35,6 +35,7 @@
 #include "../gb/gbPrinter.h"
 #include "../gb/gbSound.h"
 #include "../common/SoundDriver.h"
+#include "../common/ConfigManager.h"
 
 #include "../version.h"
 
@@ -206,7 +207,7 @@ VBA::VBA()
   windowPositionY = 0;
   filterFunction = NULL;
   ifbFunction = NULL;
-  ifbType = 0;
+  ifbType = kIFBNone;
   filterType = FILTER_NONE;
   filterWidth = 0;
   filterHeight = 0;
@@ -223,7 +224,6 @@ VBA::VBA()
   sizeY = 0;
   videoOption = 0;
   fullScreenStretch = false;
-  disableStatusMessage = false;
   showSpeed = 0;
   showSpeedTransparent = true;
   showRenderedFrames = 0;
@@ -237,7 +237,7 @@ VBA::VBA()
   useBiosFileGBA = false;
   useBiosFileGBC = false;
   useBiosFileGB = false;
-  skipBiosFile = false;
+  skipBios = false;
   biosFileNameGBA = _T("");
   biosFileNameGBC = _T("");
   biosFileNameGB = _T("");
@@ -249,8 +249,8 @@ VBA::VBA()
   autoPatch = true;
   winGbBorderOn = 0;
   winFlashSize = 0x20000;
-  winRtcEnable = false;
-  winSaveType = 0;
+  rtcEnabled = false;
+  saveType = 0;
   rewindMemory = NULL;
   rewindPos = 0;
   rewindTopPos = 0;
@@ -857,8 +857,6 @@ void VBA::updateFilter()
 
 void VBA::updateThrottle( unsigned short throttle )
 {
-	this->throttle = throttle;
-
 	if( throttle ) {
 		Sm60FPS::K_fCpuSpeed = (float)throttle;
 		Sm60FPS::K_fTargetFps = 60.0f * Sm60FPS::K_fCpuSpeed / 100;
@@ -943,7 +941,7 @@ void systemDrawScreen()
   if(theApp.display == NULL)
     return;
 
-  theApp.renderedFrames++;
+  renderedFrames++;
 
   if(theApp.updateCount) {
     POSITION pos = theApp.updateList.GetHeadPosition();
@@ -956,38 +954,38 @@ void systemDrawScreen()
   if (Sm60FPS_CanSkipFrame())
 	  return;
 
-  if( theApp.aviRecording ) {
-	  if( theApp.painting ) {
+  if( aviRecording ) {
+	  if (theApp.painting) {
 		  theApp.skipAudioFrames++;
 	  } else {
 		  unsigned char *bmp;
-		  unsigned short srcPitch = theApp.sizeX * ( systemColorDepth >> 3 ) + 4;
+		  unsigned short srcPitch = sizeX * ( systemColorDepth >> 3 ) + 4;
 		  switch( systemColorDepth )
 		  {
 		  case 16:
-			  bmp = new unsigned char[ theApp.sizeX * theApp.sizeY * 2 ];
-			  cpyImg16bmp( bmp, pix + srcPitch, srcPitch, theApp.sizeX, theApp.sizeY );
+			  bmp = new unsigned char[ sizeX * sizeY * 2 ];
+			  cpyImg16bmp( bmp, pix + srcPitch, srcPitch, sizeX, sizeY );
 			  break;
 		  case 32:
 			  // use 24 bit colors to reduce video size
-			  bmp = new unsigned char[ theApp.sizeX * theApp.sizeY * 3 ];
-			  cpyImg32bmp( bmp, pix + srcPitch, srcPitch, theApp.sizeX, theApp.sizeY );
+			  bmp = new unsigned char[ sizeX * sizeY * 3 ];
+			  cpyImg32bmp( bmp, pix + srcPitch, srcPitch, sizeX, sizeY );
 			  break;
 		  }
 		  if( false == theApp.aviRecorder->AddVideoFrame( bmp ) ) {
 			  systemMessage( IDS_AVI_CANNOT_WRITE_VIDEO, "Cannot write video frame to AVI file." );
 			  delete theApp.aviRecorder;
 			  theApp.aviRecorder = NULL;
-			  theApp.aviRecording = false;
+			  aviRecording = false;
 		  }
 		  delete [] bmp;
 	  }
   }
 
   if( theApp.ifbFunction ) {
-	  theApp.ifbFunction( pix + (theApp.filterWidth * (systemColorDepth>>3)) + 4,
-		  (theApp.filterWidth * (systemColorDepth>>3)) + 4,
-		  theApp.filterWidth, theApp.filterHeight );
+	  theApp.ifbFunction( pix + (filterWidth * (systemColorDepth>>3)) + 4,
+		  (filterWidth * (systemColorDepth>>3)) + 4,
+		  filterWidth, filterHeight );
   }
 
   if(!soundBufferLow)
@@ -1042,16 +1040,16 @@ void systemSetTitle(const char *title)
 void systemShowSpeed(int speed)
 {
   systemSpeed = speed;
-  theApp.showRenderedFrames = theApp.renderedFrames;
-  theApp.renderedFrames = 0;
-  if(theApp.videoOption <= VIDEO_6X && theApp.showSpeed) {
+  showRenderedFrames = renderedFrames;
+  renderedFrames = 0;
+  if(videoOption <= VIDEO_6X && showSpeed) {
     CString buffer;
-    if(theApp.showSpeed == 1)
+    if(showSpeed == 1)
       buffer.Format(VBA_NAME_AND_SUBVERSION "-%3d%%", systemSpeed);
     else
       buffer.Format(VBA_NAME_AND_SUBVERSION "-%3d%%(%d, %d fps)", systemSpeed,
                     systemFrameSkip,
-                    theApp.showRenderedFrames);
+                    showRenderedFrames);
 
     systemSetTitle(buffer);
   }
@@ -1060,8 +1058,8 @@ void systemShowSpeed(int speed)
 
 void systemFrame()
 {
-	if( theApp.movieRecording || theApp.moviePlaying ) {
-		theApp.movieFrame++;
+	if( movieRecording || moviePlaying ) {
+		movieFrame++;
 	}
 
 #ifdef LOG_PERFORMANCE
@@ -1073,11 +1071,11 @@ void systemFrame()
 void system10Frames(int rate)
 {
 
-	if( theApp.autoFrameSkip )
+	if( autoFrameSkip )
 	{
 		u32 time = systemGetClock();
-		u32 diff = time - theApp.autoFrameSkipLastTime;
-		theApp.autoFrameSkipLastTime = time;
+		u32 diff = time - autoFrameSkipLastTime;
+		autoFrameSkipLastTime = time;
 		if( diff ) {
 			// countermeasure against div/0 when debugging
 			Sm60FPS::nCurSpeed = (1000000/rate)/diff;
@@ -1088,9 +1086,9 @@ void system10Frames(int rate)
 
 
   if(theApp.rewindMemory) {
-    if(++theApp.rewindCounter >= (theApp.rewindTimer)) {
-      theApp.rewindSaveNeeded = true;
-      theApp.rewindCounter = 0;
+    if(++rewindCounter >= (rewindTimer)) {
+      rewindSaveNeeded = true;
+      rewindCounter = 0;
     }
   }
   if(systemSaveUpdateCounter) {
@@ -1100,10 +1098,10 @@ void system10Frames(int rate)
     }
   }
 
-  theApp.wasPaused = false;
+  wasPaused = false;
 
 //  Old autoframeskip crap... might be useful later. autoframeskip Ifdef above might be useless as well now
-//  theApp.autoFrameSkipLastTime = time;
+//  autoFrameSkipLastTime = time;
 
 #ifdef LOG_PERFORMANCE
   if( systemSpeedCounter >= PERFORMANCE_INTERVAL ) {
@@ -1121,7 +1119,7 @@ void system10Frames(int rate)
 
 void systemScreenMessage(const char *msg)
 {
-  theApp.screenMessage = true;
+  screenMessage = true;
   theApp.screenMessageTime = GetTickCount();
   theApp.screenMessageBuffer = msg;
 
@@ -1132,7 +1130,7 @@ void systemScreenMessage(const char *msg)
 void systemUpdateSolarSensor()
 {
 	u8 sun = 0x0; //sun = 0xE8 - 0xE8 (case 0 and default)
-	int level = theApp.sunBars / 10;
+	int level = sunBars / 10;
 	switch (level)
 	{
 	case 1:
@@ -1198,12 +1196,12 @@ void systemUpdateMotionSensor()
 
 int systemGetSensorX()
 {
-  return theApp.sensorX;
+  return sensorX;
 }
 
 int systemGetSensorY()
 {
-  return theApp.sensorY;
+  return sensorY;
 }
 
 
@@ -1230,8 +1228,8 @@ SoundDriver * systemSoundInit()
 	}
 
 	if( drv ) {
-		if (theApp.throttle)
-		drv->setThrottle( theApp.throttle );
+		if (throttle)
+		drv->setThrottle( throttle );
 	}
 
 	return drv;
@@ -1244,19 +1242,19 @@ void systemOnSoundShutdown()
 		delete theApp.aviRecorder;
 		theApp.aviRecorder = NULL;
 	}
-	theApp.aviRecording = false;
+	aviRecording = false;
 
 
 	if( theApp.soundRecorder ) {
 		delete theApp.soundRecorder;
 		theApp.soundRecorder = NULL;
 	}
-	theApp.soundRecording = false;
+	soundRecording = false;
 }
 
 void systemOnWriteDataToSoundBuffer(const u16 * finalWave, int length)
 {
-	if( theApp.soundRecording ) {
+	if( soundRecording ) {
 		if( theApp.soundRecorder ) {
 			theApp.soundRecorder->AddSound( (const u8 *)finalWave, length );
 		} else {
@@ -1275,7 +1273,7 @@ void systemOnWriteDataToSoundBuffer(const u16 * finalWave, int length)
 		}
 	}
 
-	if( theApp.aviRecording && theApp.aviRecorder ) {
+	if( aviRecording && theApp.aviRecorder ) {
 		if( theApp.skipAudioFrames ) {
 			theApp.skipAudioFrames--;
 		} else {
@@ -1283,7 +1281,7 @@ void systemOnWriteDataToSoundBuffer(const u16 * finalWave, int length)
 				systemMessage( IDS_AVI_CANNOT_WRITE_AUDIO, "Cannot write audio frame to AVI file." );
 				delete theApp.aviRecorder;
 				theApp.aviRecorder = NULL;
-				theApp.aviRecording = false;
+				aviRecording = false;
 			}
 		}
 	}
@@ -1296,9 +1294,9 @@ bool systemCanChangeSoundQuality()
 
 bool systemPauseOnFrame()
 {
-  if(theApp.winPauseNextFrame) {
-    theApp.paused = true;
-    theApp.winPauseNextFrame = false;
+  if(winPauseNextFrame) {
+    paused = true;
+    winPauseNextFrame = false;
     return true;
   }
   return false;
@@ -1307,7 +1305,7 @@ bool systemPauseOnFrame()
 void systemGbBorderOn()
 {
   if(emulating && theApp.cartridgeType == IMAGE_GB && gbBorderOn) {
-    theApp.updateWindowSize(theApp.videoOption);
+    theApp.updateWindowSize(videoOption);
   }
 }
 
@@ -1485,7 +1483,7 @@ void VBA::loadSettings()
 
   useBiosFileGB = ( regQueryDwordValue("useBiosGB", 0) == 1 ) ? true : false;
 
-  skipBiosFile = regQueryDwordValue("skipBios", 0) ? true : false;
+  skipBios = regQueryDwordValue("skipBios", 0) ? true : false;
 
   buffer = regQueryStringValue("biosFileGBA", "");
 
@@ -1546,7 +1544,7 @@ void VBA::loadSettings()
 
   disableMMX = regQueryDwordValue("disableMMX", false) ? true: false;
 
-  disableStatusMessage = regQueryDwordValue("disableStatus", 0) ? true : false;
+  disableStatusMessages = regQueryDwordValue("disableStatus", 0) ? true : false;
 
   showSpeed = regQueryDwordValue("showSpeed", 0);
   if(showSpeed < 0 || showSpeed > 2)
@@ -1576,23 +1574,22 @@ void VBA::loadSettings()
 
   cpuDisableSfx = regQueryDwordValue("disableSfx", 0) ? true : false;
 
-  winSaveType = regQueryDwordValue("saveType", 0);
-  if(winSaveType < 0 || winSaveType > 5)
-    winSaveType = 0;
+  saveType = regQueryDwordValue("saveType", 0);
+  if(saveType < 0 || saveType > 5)
+    saveType = 0;
 
-  ifbType = regQueryDwordValue("ifbType", 0);
+  ifbType = (IFBFilter)regQueryDwordValue("ifbType", 0);
   if(ifbType < 0 || ifbType > 2)
-    ifbType = 0;
+    ifbType = kIFBNone;
 
   winFlashSize = regQueryDwordValue("flashSize", 0x10000);
   if(winFlashSize != 0x10000 && winFlashSize != 0x20000)
     winFlashSize = 0x10000;
-  flashSize = winFlashSize;
 
   agbPrintEnable(regQueryDwordValue("agbPrint", 0) ? true : false);
 
-  winRtcEnable = regQueryDwordValue("rtcEnabled", 0) ? true : false;
-  rtcEnable(winRtcEnable);
+  rtcEnabled = regQueryDwordValue("rtcEnabled", 0) ? true : false;
+  rtcEnable(rtcEnabled);
 
   switch(videoOption) {
   case VIDEO_320x240:
@@ -1973,8 +1970,8 @@ void VBA::updateWindowSize(int value)
         winSizeY += (info.rcBar.bottom - info.rcBar.top) - menuHeight + 1;
         m_pMainWnd->SetWindowPos(
                                         0, //HWND_TOPMOST,
-                                        theApp.windowPositionX,
-                                        theApp.windowPositionY,
+                                        windowPositionX,
+                                        windowPositionY,
                                         winSizeX,
                                         winSizeY,
                                         SWP_NOMOVE | SWP_SHOWWINDOW);
@@ -2523,7 +2520,7 @@ void VBA::saveSettings()
 
   regSetDwordValue("useBiosGB", useBiosFileGB);
 
-  regSetDwordValue("skipBios", skipBiosFile);
+  regSetDwordValue("skipBios", skipBios);
 
   if(!biosFileNameGBA.IsEmpty())
     regSetStringValue("biosFileGBA", biosFileNameGBA);
@@ -2565,7 +2562,7 @@ void VBA::saveSettings()
 
   regSetDwordValue("disableMMX", disableMMX);
 
-  regSetDwordValue("disableStatus", disableStatusMessage);
+  regSetDwordValue("disableStatus", disableStatusMessages);
 
   regSetDwordValue("showSpeed", showSpeed);
 
@@ -2581,7 +2578,7 @@ void VBA::saveSettings()
 
   regSetDwordValue("disableSfx", cpuDisableSfx);
 
-  regSetDwordValue("saveType", winSaveType);
+  regSetDwordValue("saveType", saveType);
 
   regSetDwordValue("ifbType", ifbType);
 
@@ -2589,7 +2586,7 @@ void VBA::saveSettings()
 
   regSetDwordValue("agbPrint", agbPrintIsEnabled());
 
-  regSetDwordValue("rtcEnabled", winRtcEnable);
+  regSetDwordValue("rtcEnabled", rtcEnabled);
 
   regSetDwordValue("borderOn", winGbBorderOn);
   regSetDwordValue("borderAutomatic", gbBorderAutomatic);
@@ -2699,7 +2696,7 @@ void Sm60FPS_Init()
 
 bool Sm60FPS_CanSkipFrame()
 {
-  if( theApp.autoFrameSkip ) {
+  if( autoFrameSkip ) {
 	  if( Sm60FPS::nFrameCnt == 0 ) {
 		  Sm60FPS::nFrameCnt = 0;
 		  Sm60FPS::dwTimeElapse = 0;
@@ -2746,7 +2743,7 @@ bool Sm60FPS_CanSkipFrame()
 
 void Sm60FPS_Sleep()
 {
-	if( theApp.autoFrameSkip ) {
+	if( autoFrameSkip ) {
 		u32 dwTimePass = Sm60FPS::dwTimeElapse + (GetTickCount() - Sm60FPS::dwTime0);
 		u32 dwTimeShould = (u32)(Sm60FPS::nFrameCnt * Sm60FPS::K_fDT);
 		if (dwTimeShould > dwTimePass && !gba_joybus_active) {
