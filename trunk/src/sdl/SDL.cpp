@@ -1653,6 +1653,11 @@ int main(int argc, char **argv)
       int size = CPULoadRom(szFile);
       failed = (size == 0);
       if(!failed) {
+		  if (cpuSaveType == 0)
+			  utilGBAFindSave(size);
+		  else
+			  saveType = cpuSaveType;
+
         sdlApplyPerImagePreferences();
 
         doMirroring(mirroringEnable);

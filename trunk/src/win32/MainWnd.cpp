@@ -525,6 +525,8 @@ bool MainWnd::FileRun()
 
 	if (cpuSaveType == 0)
 		utilGBAFindSave(theApp.romSize);
+	else
+		saveType = cpuSaveType;
 
     GetModuleFileName(NULL, tempName, 2048);
 
@@ -1114,8 +1116,9 @@ void MainWnd::OnFileLoadDotCode()
 		FALSE);
 	if (file.DoModal() == IDOK)
 	{
-		theApp.loadDotCodeFile = file.GetPathName();
-		SetLoadDotCodeFile(theApp.loadDotCodeFile);
+		const char* filename = file.GetPathName();
+		strcpy(loadDotCodeFile, filename);
+		SetLoadDotCodeFile(loadDotCodeFile);
 	}
 }
 
@@ -1136,8 +1139,9 @@ void MainWnd::OnFileSaveDotCode()
 		TRUE);
 	if (file.DoModal() == IDOK)
 	{
-		theApp.saveDotCodeFile = file.GetPathName();
-		SetLoadDotCodeFile(theApp.saveDotCodeFile);
+		const char* filename = file.GetPathName();
+		strcpy(saveDotCodeFile, filename);
+		SetLoadDotCodeFile(saveDotCodeFile);
 	}
 }
 
