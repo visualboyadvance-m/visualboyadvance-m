@@ -1116,9 +1116,7 @@ void MainWnd::OnFileLoadDotCode()
 		FALSE);
 	if (file.DoModal() == IDOK)
 	{
-		const char* filename = file.GetPathName();
-		strcpy(loadDotCodeFile, filename);
-		SetLoadDotCodeFile(loadDotCodeFile);
+		loadDotCodeFile = strdup(file.GetPathName());
 	}
 }
 
@@ -1139,9 +1137,7 @@ void MainWnd::OnFileSaveDotCode()
 		TRUE);
 	if (file.DoModal() == IDOK)
 	{
-		const char* filename = file.GetPathName();
-		strcpy(saveDotCodeFile, filename);
-		SetLoadDotCodeFile(saveDotCodeFile);
+		saveDotCodeFile = strdup(file.GetPathName());
 	}
 }
 

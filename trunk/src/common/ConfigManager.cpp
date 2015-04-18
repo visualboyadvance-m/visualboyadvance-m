@@ -61,6 +61,8 @@ enum named_opts
 	OPT_CAPTURE_FORMAT,
 	OPT_CHEAT,
 	OPT_CPU_SAVE_TYPE,
+	OPT_DOTCODE_FILE_NAME_LOAD,
+	OPT_DOTCODE_FILE_NAME_SAVE,
 	OPT_EMULATOR_TYPE,
 	OPT_FS_ADAPTER,
 	OPT_FS_COLOR_DEPTH,
@@ -124,6 +126,8 @@ char* batteryDir;
 char* biosFileNameGB;
 char* biosFileNameGBA;
 char* biosFileNameGBC;
+char* loadDotCodeFile;
+char* saveDotCodeFile;
 char* linkHostAddr;
 char* movieRecordDir;
 char* rewindMemory = NULL;
@@ -282,6 +286,8 @@ struct option argOptions[] = {
 	{ "disable-mmx", no_argument, &disableMMX, 1 },
 	{ "disable-sfx", no_argument, &cpuDisableSfx, 1 },
 	{ "disable-status-messages", no_argument, &disableStatusMessages, 1 },
+	{ "dotcode-file-name-load", required_argument, 0, OPT_DOTCODE_FILE_NAME_LOAD },
+	{ "dotcode-file-name-save", required_argument, 0, OPT_DOTCODE_FILE_NAME_SAVE },
 	{ "emulator-type", required_argument, 0, OPT_EMULATOR_TYPE },
 	{ "filter", required_argument, 0, 'f' },
 	{ "filter-enable-multi-threading", no_argument, &filterMT, 1 },
@@ -538,6 +544,9 @@ void LoadConfig()
 	biosFileNameGB = ReadPrefString("biosFileGB");
 	biosFileNameGBA = ReadPrefString("biosFileGBA");
 	biosFileNameGBC = ReadPrefString("biosFileGBC");
+
+	loadDotCodeFile = ReadPrefString("loadDotCodeFile");
+	saveDotCodeFile = ReadPrefString("saveDotCodeFile");
 
 	aviRecordDir = ReadPrefString("aviRecordDir");
 	movieRecordDir = ReadPrefString("movieRecordDir");
@@ -1264,67 +1273,67 @@ int ReadOpts(int argc, char ** argv)
 
 		case OPT_BIOS_FILE_NAME_GB:
 			// --bios-file-name-gb
-			strcpy(biosFileNameGB, optarg);
+			biosFileNameGB = optarg;
 			break;
 
 		case OPT_BIOS_FILE_NAME_GBA:
 			// --bios-file-name-gba
-			strcpy(biosFileNameGBA, optarg);
+			biosFileNameGBA = optarg;
 			break;
 
 		case OPT_BIOS_FILE_NAME_GBC:
 			// --bios-file-name-gbc
-			strcpy(biosFileNameGBC, optarg);
+			biosFileNameGBC = optarg;
 			break;
 
 		case OPT_AVI_RECORD_DIR:
 			// --avi-record-dir
-			strcpy(aviRecordDir, optarg);
+			aviRecordDir = optarg;
 			break;
 
 		case OPT_MOVIE_RECORD_DIR:
 			// --movie-record-dir
-			strcpy(movieRecordDir, optarg);
+			movieRecordDir = optarg;
 			break;
 
 		case OPT_SOUND_RECORD_DIR:
 			// --sound-record-dir
-			strcpy(soundRecordDir, optarg);
+			soundRecordDir = optarg;
 			break;
 
 		case OPT_SCREEN_SHOT_DIR:
 			// --screen-shot-dir
-			strcpy(screenShotDir, optarg);
+			screenShotDir = optarg;
 			break;
 
 		case OPT_SAVE_DIR:
 			// --save-dir
-			strcpy(saveDir, optarg);
+			saveDir = optarg;
 			break;
 
 		case OPT_BATTERY_DIR:
 			// --battery-dir
-			strcpy(batteryDir, optarg);
+			batteryDir = optarg;
 			break;
 
 		case OPT_ROM_DIR_GBC:
 			// --rom-dir-gbc
-			strcpy(romDirGBC, optarg);
+			romDirGBC = optarg;
 			break;
 
 		case OPT_ROM_DIR_GB:
 			// --rom-dir-gb
-			strcpy(romDirGB, optarg);
+			romDirGB = optarg;
 			break;
 
 		case OPT_ROM_DIR_GBA:
 			// --rom-dir-gba
-			strcpy(romDirGBA, optarg);
+			romDirGBA = optarg;
 			break;
 
 		case OPT_LINK_HOST_ADDR:
 			// --link-host-addr
-			strcpy(linkHostAddr, optarg);
+			linkHostAddr = optarg;
 			break;
 
 		case OPT_CPU_SAVE_TYPE:
@@ -1341,6 +1350,15 @@ int ReadOpts(int argc, char ** argv)
 			}
 			break;
 
+		case OPT_DOTCODE_FILE_NAME_LOAD:
+			// --dotcode-file-name-load
+			loadDotCodeFile = optarg;
+			break;
+
+		case OPT_DOTCODE_FILE_NAME_SAVE:
+			// --dotcode-file-name-save
+			saveDotCodeFile = optarg;
+			break;
 		}
 	}
 	return op;

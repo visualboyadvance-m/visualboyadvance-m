@@ -166,9 +166,6 @@ u8 memoryWaitSeq32[16] =
 
 u8 biosProtected[4];
 
-const char *loadDotCodeFile;
-const char *saveDotCodeFile;
-
 #ifdef WORDS_BIGENDIAN
 bool cpuBiosSwapped = false;
 #endif
@@ -1795,12 +1792,12 @@ const char* GetSaveDotCodeFile()
 
 void SetLoadDotCodeFile(const char *szFile)
 {
-	loadDotCodeFile = szFile;
+	loadDotCodeFile = strdup(szFile);
 }
 
 void SetSaveDotCodeFile(const char *szFile)
 {
-	saveDotCodeFile = szFile;
+	saveDotCodeFile = strdup(szFile);
 }
 
 void CPUUpdateRender()
