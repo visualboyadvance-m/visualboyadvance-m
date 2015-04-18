@@ -472,7 +472,6 @@ void LoadConfig()
 	recentFreeze = ReadPref("recentFreeze", false) ? true : false;
 	autoPatch = ReadPref("autoPatch", 1) == 1 ? true : false;
 	cpuDisableSfx = ReadPref("disableSfx", 0) ? true : false;
-	saveType = ReadPref("saveType", 0);
 	ifbType = ReadPref("ifbType", 0);
 	winFlashSize = ReadPref("flashSize", 0x10000);
 	agbPrintEnable(ReadPref("agbPrint", 0) ? true : false);
