@@ -710,62 +710,62 @@ void MainWnd::OnUpdateOptionsEmulatorShowSpeed(CCmdUI *pCmdUI)
 
 void MainWnd::OnOptionsEmulatorSavetypeAutomatic()
 {
-  saveType = 0;
+  cpuSaveType = 0;
 }
 
 void MainWnd::OnUpdateOptionsEmulatorSavetypeAutomatic(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(saveType == 0);
+  pCmdUI->SetCheck(cpuSaveType == 0);
 }
 
 void MainWnd::OnOptionsEmulatorSavetypeEeprom()
 {
-  saveType = 1;
+  cpuSaveType = 1;
 }
 
 void MainWnd::OnUpdateOptionsEmulatorSavetypeEeprom(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(saveType == 1);
+  pCmdUI->SetCheck(cpuSaveType == 1);
 }
 
 void MainWnd::OnOptionsEmulatorSavetypeSram()
 {
-  saveType = 2;
+  cpuSaveType = 2;
 }
 
 void MainWnd::OnUpdateOptionsEmulatorSavetypeSram(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(saveType == 2);
+  pCmdUI->SetCheck(cpuSaveType == 2);
 }
 
 void MainWnd::OnOptionsEmulatorSavetypeFlash()
 {
-  saveType = 3;
+  cpuSaveType = 3;
 }
 
 void MainWnd::OnUpdateOptionsEmulatorSavetypeFlash(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(saveType == 3);
+  pCmdUI->SetCheck(cpuSaveType == 3);
 }
 
 void MainWnd::OnOptionsEmulatorSavetypeEepromsensor()
 {
-  saveType = 4;
+  cpuSaveType = 4;
 }
 
 void MainWnd::OnUpdateOptionsEmulatorSavetypeEepromsensor(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(saveType == 4);
+  pCmdUI->SetCheck(cpuSaveType == 4);
 }
 
 void MainWnd::OnOptionsEmulatorSavetypeNone()
 {
-  saveType = 5;
+  cpuSaveType = 5;
 }
 
 void MainWnd::OnUpdateOptionsEmulatorSavetypeNone(CCmdUI* pCmdUI)
 {
-  pCmdUI->SetCheck(saveType == 5);
+  pCmdUI->SetCheck(cpuSaveType == 5);
 }
 
 void MainWnd::OnOptionsEmulatorSavetypeFlash512k()

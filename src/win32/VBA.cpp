@@ -250,7 +250,7 @@ VBA::VBA()
   winGbBorderOn = 0;
   winFlashSize = 0x20000;
   rtcEnabled = false;
-  saveType = 0;
+  cpuSaveType = 0;
   rewindMemory = NULL;
   rewindPos = 0;
   rewindTopPos = 0;
@@ -1574,9 +1574,9 @@ void VBA::loadSettings()
 
   cpuDisableSfx = regQueryDwordValue("disableSfx", 0) ? true : false;
 
-  saveType = regQueryDwordValue("saveType", 0);
-  if(saveType < 0 || saveType > 5)
-    saveType = 0;
+  cpuSaveType = regQueryDwordValue("saveType", 0);
+  if(cpuSaveType < 0 || cpuSaveType > 5)
+    cpuSaveType = 0;
 
   ifbType = (IFBFilter)regQueryDwordValue("ifbType", 0);
   if(ifbType < 0 || ifbType > 2)
@@ -2578,7 +2578,7 @@ void VBA::saveSettings()
 
   regSetDwordValue("disableSfx", cpuDisableSfx);
 
-  regSetDwordValue("saveType", saveType);
+  regSetDwordValue("saveType", cpuSaveType);
 
   regSetDwordValue("ifbType", ifbType);
 
