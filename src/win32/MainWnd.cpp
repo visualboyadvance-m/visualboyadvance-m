@@ -522,7 +522,6 @@ bool MainWnd::FileRun()
 
     flashSetSize(winFlashSize);
     rtcEnable(rtcEnabled);
-    cpuSaveType = saveType;
 
 	if (cpuSaveType == 0)
 		utilGBAFindSave(theApp.romSize);
