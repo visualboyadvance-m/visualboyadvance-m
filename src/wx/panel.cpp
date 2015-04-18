@@ -204,7 +204,7 @@ void GameArea::LoadGame(const wxString &name)
 		cpuSaveType = gopts.save_type;
 		
 		if (cpuSaveType == 0)
-		  utilGBAFindSave(size);
+		  utilGBAFindSave(rom_size);
 		else
 		  saveType = cpuSaveType;
 		
@@ -216,7 +216,7 @@ void GameArea::LoadGame(const wxString &name)
 	    flashSetSize(0x10000 << gopts.flash_size);
 	    cpuSaveType = gopts.save_type;
 		if (cpuSaveType == 0)
-		  utilGBAFindSave(size);
+		  utilGBAFindSave(rom_size);
 		else
 		  saveType = cpuSaveType;	    
 	    // mirroring short ROMs is such an uncommon thing that any
