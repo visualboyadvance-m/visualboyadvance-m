@@ -151,9 +151,6 @@ bool soundBufferLow = 0;
 void winSignal(int,int);
 void winOutput(const char *, u32);
 
-void (*dbgSignal)(int,int) = winSignal;
-void (*dbgOutput)(const char *, u32) = winOutput;
-
 #ifdef MMX
 extern "C" bool cpu_mmx;
 #endif

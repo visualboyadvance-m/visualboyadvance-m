@@ -182,17 +182,12 @@ enum VIDEO_SIZE{
 u32 throttleLastTime = 0;
 
 bool pauseNextFrame = false;
-bool debuggerStub = false;
 int sdlMirroringEnable = 0;
 
 static int ignore_first_resize_event = 0;
 
-void (*dbgMain)();
 /* forward */
 void systemConsoleMessage(const char*);
-
-void (*dbgSignal)(int,int);
-void (*dbgOutput)(const char *, u32);
 
 char* home;
 
@@ -1157,7 +1152,6 @@ void sdlPollEvents()
         }
         break;
       case SDLK_F11:
-        if(dbgMain == remoteStubMain) {
           if(armState) {
             armNextPC -= 4;
             reg[15].I -= 4;
@@ -1165,7 +1159,6 @@ void sdlPollEvents()
             armNextPC -= 2;
             reg[15].I -= 2;
           }
-        }
         debugger = true;
         break;
       case SDLK_F1:
@@ -1569,7 +1562,7 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
-  if (!debuggerStub) {
+  if (!debugger) {
 	  if (optind >= argc) {
 		  systemMessage(0, "Missing image name");
 		  usage(argv[0]);
@@ -1701,7 +1694,7 @@ int main(int argc, char **argv)
 
   sdlReadBattery();
 
-  if(debuggerStub)
+  if(debugger)
     remoteInit();
 
   int flags = SDL_INIT_VIDEO|SDL_INIT_AUDIO|
@@ -1810,7 +1803,7 @@ int main(int argc, char **argv)
   while(emulating) {
     if(!paused && active) {
       if(debugger && emulator.emuHasDebugger)
-        dbgMain();
+        remoteStubMain();
       else {
         emulator.emuMain(emulator.emuCount);
         if(rewindSaveNeeded && rewindMemory && emulator.emuWriteMemState) {

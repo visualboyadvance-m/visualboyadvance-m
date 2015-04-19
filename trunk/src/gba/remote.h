@@ -76,4 +76,10 @@ void deleteFromBreakRegList(u8 regnum, int location);
 void addBreakRegToList(u8 regnum, u8 flags, u32 value);
 void printBreakRegList(bool verbose);
 
+void remoteStubMain();
+void remoteStubSignal(int sig, int number);
+void remoteOutput(const char *s, u32 addr);
+void remoteSetProtocol(int p);
+void remoteSetPort(int port);
+
 #endif // REMOTE_H

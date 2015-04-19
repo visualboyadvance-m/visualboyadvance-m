@@ -20,6 +20,7 @@ extern "C" {
 #include "../gba/agbprint.h"
 #include "../gba/Flash.h"
 #include "../gba/Cheats.h"
+#include "../gba/remote.h"
 #include "../gba/RTC.h"
 #include "../gba/Sound.h"
 #include "../gb/gb.h"
@@ -252,7 +253,9 @@ int ifbType = kIFBNone;
 int	patchNum = 0;
 char *(patchNames[PATCH_MAX_NUM]) = { NULL }; // and so on
 
-
+void(*dbgMain)() = remoteStubMain;
+void(*dbgSignal)(int, int) = remoteStubSignal;
+void(*dbgOutput)(const char *, u32) = remoteOutput;
 
 char* homeDir = NULL;
 char* arg0 = NULL;
@@ -894,7 +897,7 @@ int ReadOpts(int argc, char ** argv)
 				log("Missing BIOS file name\n");
 				break;
 			}
-			strcpy(biosFileNameGBA, optarg + 1);
+			strcpy(biosFileNameGBA, optarg);
 			break;
 		case 'c':
 		{
@@ -902,13 +905,13 @@ int ReadOpts(int argc, char ** argv)
 				log("Missing config file name\n");
 				break;
 			}
-			FILE *f = fopen(optarg + 1, "r");
+			FILE *f = fopen(optarg, "r");
 			if (f == NULL) {
-				log("File not found %s\n", optarg + 1);
+				log("File not found %s\n", optarg);
 				break;
 			}
 			preferences = NULL;
-			OpenPreferences(optarg + 1);
+			OpenPreferences(optarg);
 			fclose(f);
 		}
 		break;
@@ -924,49 +927,48 @@ int ReadOpts(int argc, char ** argv)
 				break;
 			}
 			if (patchNum >= PATCH_MAX_NUM) {
-				log("Too many patches given at %s (max is %d). Ignoring.\n", optarg + 1, PATCH_MAX_NUM);
+				log("Too many patches given at %s (max is %d). Ignoring.\n", optarg, PATCH_MAX_NUM);
 			}
 			else {
-				patchNames[patchNum] = (char *)malloc(1 + strlen(optarg + 1));
-				strcpy(patchNames[patchNum], optarg + 1);
+				patchNames[patchNum] = (char *)malloc(1 + strlen(optarg));
+				strcpy(patchNames[patchNum], optarg);
 				patchNum++;
 			}
 			break;
-		//case 'G':
-		//	dbgMain = remoteStubMain;
-		//	dbgSignal = remoteStubSignal;
-		//	dbgOutput = remoteOutput;
-		//	debugger = true;
-		//	debuggerStub = true;
-		//	if (optarg) {
-		//		char *s = optarg;
-		//		if (strncmp(s, "tcp:", 4) == 0) {
-		//			s += 4;
-		//			int port = atoi(s);
-		//			remoteSetProtocol(0);
-		//			remoteSetPort(port);
-		//		}
-		//		else if (strcmp(s, "tcp") == 0) {
-		//			remoteSetProtocol(0);
-		//		}
-		//		else if (strcmp(s, "pipe") == 0) {
-		//			remoteSetProtocol(1);
-		//		}
-		//		else {
-		//			log("Unknown protocol %s\n", s);
-		//			break;
-		//		}
-		//	}
-		//	else {
-		//		remoteSetProtocol(0);
-		//	}
-		//	break;
+		case 'G':
+			dbgMain = remoteStubMain;
+			dbgSignal = remoteStubSignal;
+			dbgOutput = remoteOutput;
+			debugger = true;
+			if (optarg) {
+				char *s = optarg;
+				if (strncmp(s, "tcp:", 4) == 0) {
+					s += 4;
+					int port = atoi(s);
+					remoteSetProtocol(0);
+					remoteSetPort(port);
+				}
+				else if (strcmp(s, "tcp") == 0) {
+					remoteSetProtocol(0);
+				}
+				else if (strcmp(s, "pipe") == 0) {
+					remoteSetProtocol(1);
+				}
+				else {
+					log("Unknown protocol %s\n", s);
+					break;
+				}
+			}
+			else {
+				remoteSetProtocol(0);
+			}
+			break;
 		case 'N':
 			parseDebug = false;
 			break;
 		case 'D':
 			if (optarg) {
-				systemDebug = atoi(optarg + 1);
+				systemDebug = atoi(optarg);
 			}
 			else {
 				systemDebug = 1;
@@ -978,7 +980,7 @@ int ReadOpts(int argc, char ** argv)
 			break;
 		case 'f':
 			if (optarg) {
-				filter = (Filter)atoi(optarg + 1);
+				filter = (Filter)atoi(optarg);
 			}
 			else {
 				filter = kStretch2x;
@@ -986,7 +988,7 @@ int ReadOpts(int argc, char ** argv)
 			break;
 		case 'I':
 			if (optarg) {
-				ifbType = (IFBFilter)atoi(optarg + 1);
+				ifbType = (IFBFilter)atoi(optarg);
 			}
 			else {
 				ifbType = kIFBNone;
@@ -1002,13 +1004,13 @@ int ReadOpts(int argc, char ** argv)
 #endif
 			break;
 		case 'S':
-			optFlashSize = atoi(optarg + 1);
+			optFlashSize = atoi(optarg);
 			if (optFlashSize < 0 || optFlashSize > 1)
 				optFlashSize = 0;
 			break;
 		case 's':
 			if (optarg) {
-				int a = atoi(optarg + 1);
+				int a = atoi(optarg);
 				if (a >= 0 && a <= 9) {
 					gbFrameSkip = a;
 					frameSkip = a;
@@ -1021,7 +1023,7 @@ int ReadOpts(int argc, char ** argv)
 			break;
 		case 't':
 			if (optarg) {
-				int a = atoi(optarg + 1);
+				int a = atoi(optarg);
 				if (a < 0 || a > 5)
 					a = 0;
 				cpuSaveType = a;
@@ -1029,7 +1031,7 @@ int ReadOpts(int argc, char ** argv)
 			break;
 		case 'v':
 			if (optarg) {
-				systemVerbose = atoi(optarg + 1);
+				systemVerbose = atoi(optarg);
 			}
 			else
 				systemVerbose = 0;
@@ -1039,7 +1041,7 @@ int ReadOpts(int argc, char ** argv)
 			break;
 		case 'O':
 			if (optarg) {
-				openGL = atoi(optarg + 1);
+				openGL = atoi(optarg);
 				if (openGL < 0 || openGL > 2)
 					openGL = 1;
 			}
