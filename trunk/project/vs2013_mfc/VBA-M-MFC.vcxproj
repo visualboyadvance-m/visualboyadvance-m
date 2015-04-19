@@ -71,12 +71,12 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\src;..\..\fex;..\..\..\dependencies\libpng;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\SubWCRev;..\..\..\dependencies\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NO_OAL;WIN32;_WINDOWS;_DEBUG;SFML_SYSTEM_EXPORTS;SFML_NETWORK_EXPORTS;DEV_VERSION;BKPT_SUPPORT;GBA_LOGGING;MMX;ASM;_CRT_SECURE_NO_WARNINGS;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_AFXDLL;WIN32;_WINDOWS;_DEBUG;SFML_SYSTEM_EXPORTS;SFML_NETWORK_EXPORTS;DEV_VERSION;BKPT_SUPPORT;GBA_LOGGING;MMX;ASM;_CRT_SECURE_NO_WARNINGS;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <SmallerTypeCheck>false</SmallerTypeCheck>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <PrecompiledHeader>
@@ -94,8 +94,6 @@
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <AdditionalDependencies>nafxcwd.lib;libcmtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <IgnoreSpecificDefaultLibraries>nafxcwd.lib;libcmtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -120,8 +118,8 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>..\..\src;..\..\fex;..\..\..\dependencies\libpng;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\SubWCRev;..\..\..\dependencies\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_SYSTEM_EXPORTS;SFML_NETWORK_EXPORTS;GBA_LOGGING;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>_AFXDLL;WIN32;_WINDOWS;NDEBUG;SFML_SYSTEM_EXPORTS;SFML_NETWORK_EXPORTS;GBA_LOGGING;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <PrecompiledHeader>
@@ -136,7 +134,6 @@
     </ClCompile>
     <ResourceCompile />
     <Link>
-      <AdditionalDependencies>nafxcw.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Version>
       </Version>
       <SubSystem>Windows</SubSystem>
@@ -145,7 +142,6 @@
       <AssemblyDebug>
       </AssemblyDebug>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <IgnoreSpecificDefaultLibraries>nafxcw.lib;libcmt.lib;</IgnoreSpecificDefaultLibraries>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <ProfileGuidedDatabase>$(IntDir)$(TargetName).pgd</ProfileGuidedDatabase>
