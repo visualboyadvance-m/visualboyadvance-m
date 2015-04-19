@@ -1510,6 +1510,26 @@ void SetMapMasks()
 	map[10].mask = 0x1FFFFFF;
 	map[12].mask = 0x1FFFFFF;
 	map[14].mask = 0xFFFF;
+
+	for (int i = 0; i < 16; i++) {
+		map[i].size = map[i].mask + 1;
+		if (map[i].size > 0) {
+			map[i].trace = (u8 *)calloc(map[i].size >> 3, sizeof(u8));
+
+			map[i].breakPoints = (u8 *)calloc(map[i].size >> 1, sizeof(u8)); //\\
+
+			if (map[i].trace == NULL || map[i].breakPoints == NULL) {
+				systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+					"TRACE");
+			}
+		}
+		else {
+			map[i].trace = NULL;
+			map[i].breakPoints = NULL; //\\
+
+		}
+	}
+	clearBreakRegList();
 }
 
 int CPULoadRom(const char *szFile)
@@ -1737,27 +1757,6 @@ int CPULoadRomData(const char *data, int size)
 
 #ifdef BKPT_SUPPORT
   SetMapMasks();
-
-  for (int i = 0; i < 16; i++) {
-	  map[i].size = map[i].mask + 1;
-	  if (map[i].size > 0) {
-		  map[i].trace = (u8 *)calloc(map[i].size >> 3, sizeof(u8));
-
-		  map[i].breakPoints = (u8 *)calloc(map[i].size >> 1, sizeof(u8)); //\\
-
-		  if (map[i].trace == NULL || map[i].breakPoints == NULL) {
-			  systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
-				  "TRACE");
-		  }
-	  }
-	  else {
-		  map[i].trace = NULL;
-		  map[i].breakPoints = NULL; //\\
-
-	  }
-  }
-  clearBreakRegList();
-
 #endif
 
   return romSize;
