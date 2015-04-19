@@ -43,6 +43,8 @@ extern void dexp_listVars();
 extern void dexp_saveVars(char *);
 extern void dexp_loadVars(char *);
 
+void debuggerOutput(const char *s, u32 addr);
+
 bool debuggerBreakOnExecution(u32 address, u8 state);
 bool debuggerBreakOnWrite(u32 address, u32 value, int size);
 void debuggerBreakOnWrite(u32 address, u32 oldvalue, u32 value, int size, int t);
