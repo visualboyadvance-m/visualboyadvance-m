@@ -560,11 +560,11 @@ bool soundInit()
 	return true;
 }
 
-void soundSetThrottle(unsigned short throttle)
+void soundSetThrottle(unsigned short _throttle)
 {
 	if(!soundDriver)
 		return;
-	soundDriver->setThrottle(throttle);
+	soundDriver->setThrottle(_throttle);
 }
 
 long soundGetSampleRate()
