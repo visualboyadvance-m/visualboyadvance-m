@@ -416,7 +416,7 @@ void SetHome(char *_arg0)
 
 void OpenPreferences(const char *name)
 {
-	if (!preferences)
+	if (!preferences && name)
 		preferences = iniparser_load(name);
 }
 
