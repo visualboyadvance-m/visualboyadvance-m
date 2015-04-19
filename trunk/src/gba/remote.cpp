@@ -273,6 +273,23 @@ void printBreakRegList(bool verbose){
 
 }
 
+void debuggerOutput(const char *s, u32 addr)
+{
+	if (s)
+		printf("%s", s);
+	else {
+		char c;
+
+		c = debuggerReadByte(addr);
+		addr++;
+		while (c) {
+			putchar(c);
+			c = debuggerReadByte(addr);
+			addr++;
+		}
+	}
+}
+
 // checks that the given address is in the DB list
 bool debuggerInDB(u32 address)
 {

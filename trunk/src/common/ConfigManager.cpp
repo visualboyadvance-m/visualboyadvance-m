@@ -255,7 +255,7 @@ char *(patchNames[PATCH_MAX_NUM]) = { NULL }; // and so on
 
 void(*dbgMain)() = remoteStubMain;
 void(*dbgSignal)(int, int) = remoteStubSignal;
-void(*dbgOutput)(const char *, u32) = remoteOutput;
+void(*dbgOutput)(const char *, u32) = debuggerOutput;
 
 char* homeDir = NULL;
 char* arg0 = NULL;
