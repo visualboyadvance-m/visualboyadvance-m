@@ -3377,7 +3377,6 @@ void CPUInit(const char *biosFileName, bool useBiosFile)
 #endif
   gbaSaveType = 0;
   eepromInUse = 0;
-  saveType = 0;
   useBios = false;
 
   if(useBiosFile) {
@@ -3661,7 +3660,6 @@ void CPUReset()
   fxOn = false;
   windowOn = false;
   frameCount = 0;
-  saveType = 0;
   layerEnable = DISPCNT & layerSettings;
 
   CPUUpdateRenderBuffers(true);
@@ -3705,7 +3703,7 @@ void CPUReset()
       BIOS_RegisterRamReset(0xfe);
   }
 
-  switch(cpuSaveType) {
+  switch(saveType) {
   case 0: // automatic
     cpuSramEnabled = true;
     cpuFlashEnabled = true;
