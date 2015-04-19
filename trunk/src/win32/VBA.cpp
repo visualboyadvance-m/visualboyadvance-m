@@ -852,10 +852,10 @@ void VBA::updateFilter()
 }
 
 
-void VBA::updateThrottle( unsigned short throttle )
+void VBA::updateThrottle( unsigned short _throttle )
 {
-	if( throttle ) {
-		Sm60FPS::K_fCpuSpeed = (float)throttle;
+	if( _throttle ) {
+		Sm60FPS::K_fCpuSpeed = (float)_throttle;
 		Sm60FPS::K_fTargetFps = 60.0f * Sm60FPS::K_fCpuSpeed / 100;
 		Sm60FPS::K_fDT = 1000.0f / Sm60FPS::K_fTargetFps;
 		autoFrameSkip = false;
@@ -863,7 +863,8 @@ void VBA::updateThrottle( unsigned short throttle )
 		systemFrameSkip = 0;
 	}
 
-	soundSetThrottle(throttle);
+	throttle = _throttle;
+	soundSetThrottle(_throttle);
 }
 
 
