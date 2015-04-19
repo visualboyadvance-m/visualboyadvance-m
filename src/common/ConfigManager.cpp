@@ -450,6 +450,7 @@ void LoadConfig()
 	fullScreenStretch = ReadPref("stretch", 0) ? true : false;
 	videoOption = ReadPref("video", 2); // VIDEO_3X = 2
 	fsAdapter = ReadPref("fsAdapter", 0);
+	throttle = ReadPref("throttle", 0);
 	fsWidth = ReadPref("fsWidth", 800);
 	fsHeight = ReadPref("fsHeight", 600);
 	fsColorDepth = ReadPref("fsColorDepth", 32);
