@@ -205,7 +205,7 @@ VBA::VBA()
   filterFunction = NULL;
   ifbFunction = NULL;
   ifbType = kIFBNone;
-  filterType = FILTER_NONE;
+  filter = FILTER_NONE;
   filterWidth = 0;
   filterHeight = 0;
   filterMT = false;
@@ -624,7 +624,7 @@ void VBA::updateFilter()
 	{
 		if ( systemColorDepth == 16 )
 		{
-		switch(filterType)
+		switch(filter)
 		{
 		default:
 		case FILTER_NONE:
@@ -636,7 +636,7 @@ void VBA::updateFilter()
 				filterFunction = rpiFilter;
 				filterMagnification = rpiScaleFactor();
 			} else {
-				filterType = FILTER_NONE;
+				filter = FILTER_NONE;
 				updateFilter();
 				return;
 			}
@@ -712,7 +712,7 @@ void VBA::updateFilter()
 
 		if ( systemColorDepth == 32 )
 		{
-			switch(filterType)
+			switch(filter)
 			{
 			default:
 			case FILTER_NONE:
@@ -725,7 +725,7 @@ void VBA::updateFilter()
 					filterMagnification = rpiScaleFactor();
 					b16to32Video=true;
 				} else {
-					filterType = FILTER_NONE;
+					filter = FILTER_NONE;
 					updateFilter();
 					return;
 				}
@@ -826,7 +826,7 @@ void VBA::updateFilter()
 	rect.bottom = sizeY * filterMagnification;
 
 
-	if( filterType != FILTER_NONE )
+	if( filter != FILTER_NONE )
 		memset(delta, 0xFF, sizeof(delta));
 
 	if( display )
@@ -1534,9 +1534,9 @@ void VBA::loadSettings()
     glFilter = 1;
 
 
-  filterType = regQueryDwordValue("filter", 0);
-  if(filterType < FILTER_NONE || filterType > FILTER_LAST)
-    filterType = FILTER_NONE;
+  filter = regQueryDwordValue("filter", 0);
+  if(filter < FILTER_NONE || filter > FILTER_LAST)
+    filter = FILTER_NONE;
 
   filterMT = ( 1 == regQueryDwordValue("filterEnableMultiThreading", 0) );
 
@@ -2554,7 +2554,7 @@ void VBA::saveSettings()
 
   regSetDwordValue("glFilter", glFilter);
 
-  regSetDwordValue("filter", filterType);
+  regSetDwordValue("filter", filter);
 
   regSetDwordValue("filterEnableMultiThreading", filterMT ? 1 : 0);
 
