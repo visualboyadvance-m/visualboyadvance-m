@@ -158,7 +158,7 @@ int dsoundDisableHardwareAcceleration;
 int filterHeight;
 int filterMagnification;
 int filterMT; // enable multi-threading for pixel filters
-int filterType;
+int filter = kStretch2x;
 int filterWidth;
 int frameSkip = 1;
 int frameskipadjust;
@@ -173,6 +173,7 @@ int fullScreenStretch;
 int gdbBreakOnLoad;
 int gdbPort;
 int glFilter;
+int ifbType = kIFBNone;
 int joypadDefault;
 int languageOption;
 int layerEnable = 0xff00;
@@ -244,10 +245,8 @@ unsigned short throttle;
 
 const char* preparedCheatCodes[MAX_CHEATS];
 
-Filter filter = kStretch2x;
 FilterFunc filterFunction = 0;
 IFBFilterFunc ifbFunction = 0;
-int ifbType = kIFBNone;
 
 // allow up to 100 IPS/UPS/PPF patches given on commandline
 int	patchNum = 0;
@@ -420,150 +419,126 @@ void OpenPreferences(const char *name)
 		preferences = iniparser_load(name);
 }
 
-void LoadConfig()
+void ValidateConfig()
 {
-
-	openGL = ReadPrefHex("openGL");
-	fullScreen = ReadPrefHex("fullScreen") ? 1 : 0;
-	useBios = ReadPrefHex("useBiosGBA") ? true : false;
-	skipBios = ReadPrefHex("skipBios") ? true : false;
-	disableStatusMessages = ReadPrefHex("disableStatus") ? true : false;
-	gbBorderOn = ReadPrefHex("borderOn") ? true : false;
-	gbBorderAutomatic = ReadPrefHex("borderAutomatic") ? true : false;
-	gbColorOption = ReadPrefHex("colorOption") ? true : false;
-	captureFormat = ReadPrefHex("captureFormat");
-	gbSoundSetDeclicking(ReadPrefHex("declicking") != 0);
-	showSpeedTransparent = ReadPrefHex("showSpeedTransparent");
-	autoFrameSkip = ReadPrefHex("autoFrameSkip");
-	pauseWhenInactive = ReadPrefHex("pauseWhenInactive") ? true : false;
-	agbPrint = ReadPrefHex("agbPrint");
-	rtcEnabled = ReadPrefHex("rtcEnabled");
-	synchronize = ReadPrefHex("synchronize");
-	videoOption = ReadPrefHex("video");
-	
-	languageOption = ReadPref("language", 1);
-	frameSkip = ReadPref("frameSkip", 0);
-	gbFrameSkip = ReadPref("gbFrameSkip", 0);
-	autoFrameSkip = ReadPref("autoFrameSkip", 0) ? 1 : 0;
-	vsync = ReadPref("vsync", false) ? true : false;
-	synchronize = ReadPref("synchronize", 1) ? true : false;
-	fullScreenStretch = ReadPref("stretch", 0) ? true : false;
-	videoOption = ReadPref("video", 2); // VIDEO_3X = 2
-	fsAdapter = ReadPref("fsAdapter", 0);
-	throttle = ReadPref("throttle", 0);
-	fsWidth = ReadPref("fsWidth", 800);
-	fsHeight = ReadPref("fsHeight", 600);
-	fsColorDepth = ReadPref("fsColorDepth", 32);
-	fsFrequency = ReadPref("fsFrequency", 60);
-	windowPositionX = ReadPref("windowX", 0);
-	windowPositionY = ReadPref("windowY", 0);
-	useBiosFileGBA = (ReadPref("useBiosGBA", 0) == 1) ? true : false;
-	useBiosFileGBC = (ReadPref("useBiosGBC", 0) == 1) ? true : false;
-	useBiosFileGB = (ReadPref("useBiosGB", 0) == 1) ? true : false;
-	skipBios = ReadPref("skipBios", 0) ? true : false;
-	soundSetVolume((float)(ReadPref("soundVolume", 100)) / 100.0f);
-	gb_effects_config.enabled = 1 == ReadPref("gbSoundEffectsEnabled", 0);
-	gb_effects_config.surround = 1 == ReadPref("gbSoundEffectsSurround", 0);
-	gb_effects_config.echo = (float)ReadPref("gbSoundEffectsEcho", 20) / 100.0f;
-	gb_effects_config.stereo = (float)ReadPref("gbSoundEffectsStereo", 15) / 100.0f;
-	gbSoundSetDeclicking(1 == ReadPref("gbSoundDeclicking", 1));
-	soundInterpolation = 1 == ReadPref("gbaSoundInterpolation", 1);
-	soundFiltering = (float)ReadPref("gbaSoundFiltering", 50) / 100.0f;
-	tripleBuffering = ReadPref("tripleBuffering", false) ? true : false;
-	glFilter = ReadPref("glFilter", 1);
-	filterType = ReadPref("filter", 0);
-	filterMT = (1 == ReadPref("filterEnableMultiThreading", 0));
-	disableMMX = ReadPref("disableMMX", false) ? true : false;
-	showSpeed = ReadPref("showSpeed", 0);
-	showSpeedTransparent = ReadPref("showSpeedTransparent", 1) ? true : false;
-	winGbPrinterEnabled = ReadPref("gbPrinter", false) ? true : false;
-	pauseWhenInactive = ReadPref("pauseWhenInactive", 1) ? true : false;
-	captureFormat = ReadPref("captureFormat", 0);
-	recentFreeze = ReadPref("recentFreeze", false) ? true : false;
-	autoPatch = ReadPref("autoPatch", 1) == 1 ? true : false;
-	cpuDisableSfx = ReadPref("disableSfx", 0) ? true : false;
-	ifbType = ReadPref("ifbType", 0);
-	winFlashSize = ReadPref("flashSize", 0x10000);
-	agbPrintEnable(ReadPref("agbPrint", 0) ? true : false);
-	rtcEnabled = ReadPref("rtcEnabled", 0) ? true : false;
-	winGbBorderOn = ReadPref("borderOn", 0);
-	gbBorderAutomatic = ReadPref("borderAutomatic", 0);
-	gbEmulatorType = ReadPref("emulatorType", 1);
-	gbColorOption = ReadPref("colorOption", 0);
-	threadPriority = ReadPref("priority", 2);
-	autoSaveLoadCheatList = (1 == ReadPref("autoSaveCheatList", 1)) ? true : false;
-	gbPaletteOption = ReadPref("gbPaletteOption", 0);
-	rewindTimer = ReadPref("rewindTimer", 0);
-	joypadDefault = ReadPref("joypadDefault", 0);
-	autoLoadMostRecent = (1 == ReadPref("autoLoadMostRecent", 0)) ? true : false;
-	skipSaveGameBattery = (1 == ReadPref("skipSaveGameBattery", 0)) ? true : false;
-	skipSaveGameCheats = (1 == ReadPref("skipSaveGameCheats", 0)) ? true : false;
-	cheatsEnabled = ReadPref("cheatsEnabled", false) ? true : false;
-	maxScale = ReadPref("maxScale", 0);
-	linkTimeout = ReadPref("LinkTimeout", 1000);
-	linkMode = ReadPref("LinkMode", 0); // LINK_DISCONNECTED = 0
-	linkAuto = ReadPref("LinkAuto", true);
-	linkHacks = ReadPref("LinkHacks", false);
-	linkNumPlayers = ReadPref("LinkNumPlayers", 2);
-	gdbPort = ReadPref("gdbPort", 55555);
-	gdbBreakOnLoad = ReadPref("gdbBreakOnLoad", false) ? true : false;
-	//valueType = ReadPref("gbCheatsValueType", 0);
-	//searchType = ReadPref("gbCheatsSearchType",
-	//numberType = ReadPref("gbCheatsNumberType", 2);
-	//sizeType = ReadPref("gbCheatsSizeType", 0);
-	//updateValues = ReadPref("gbCheatsUpdate", 0);
-	//numberType = ReadPref("gbCheatsNumberType", 2);
-	//sizeType = ReadPref("gbCheatsSizeType", 0);
-	//int s = ReadPref("mapViewStretch", 0);
-	//m_size = ReadPref("memViewerDataSize", 0);
-	//m_stretch = ReadPref("GBOamViewStretch", 0);
-	//scale = ReadPref("printerScale", 0);
-	//m_stretch = ReadPref("tileViewStretch", 0);
-	//valueType = ReadPref("cheatsValueType", 0);
-	//searchType = ReadPref("cheatsSearchType", SEARCH_EQ);
-	//numberType = ReadPref("cheatsNumberType", 2);
-	//sizeType = ReadPref("cheatsSizeType", 0);
-	//updateValues = ReadPref("cheatsUpdate", 0);
-	//numberType = ReadPref("cheatsNumberType", 2);
-	//sizeType = ReadPref("cheatsSizeType", 0);
-	//restoreValues = ReadPref("cheatsRestore", 0) ?
-	//selectedFilter = ReadPref(("selectedFilter"), 0);
-	//int s = ReadPref("mapViewStretch", 0);
-	//m_size = ReadPref("memViewerDataSize", 0);
-	//m_stretch = ReadPref("tileViewStretch", 0);
-
-	gbEmulatorType = (ReadPrefHex("emulatorType"));
 	if (gbEmulatorType < 0 || gbEmulatorType > 5)
 		gbEmulatorType = 1;
-	frameSkip = (ReadPrefHex("frameSkip"));
 	if (frameSkip < 0 || frameSkip > 9)
 		frameSkip = 2;
-	gbFrameSkip = (ReadPrefHex("gbFrameSkip"));
 	if (gbFrameSkip < 0 || gbFrameSkip > 9)
 		gbFrameSkip = 0;
-	filter = (Filter)fromDec(ReadPrefString("filter"));
 	if (filter < kStretch1x || filter >= kInvalidFilter)
 		filter = kStretch2x;
 
+	if (cpuSaveType < 0 || cpuSaveType > 5)
+		cpuSaveType = 0;
+	if (optFlashSize != 0 && optFlashSize != 1)
+		optFlashSize = 0;
+	if (ifbType < kIFBNone || ifbType >= kInvalidIFBFilter)
+		ifbType = kIFBNone;
+	if (showSpeed < 0 || showSpeed > 2)
+		showSpeed = 1;
+	if (rewindTimer < 0 || rewindTimer > 600)
+		rewindTimer = 0;
+	if (autoFireMaxCount < 1)
+		autoFireMaxCount = 1;
+
+	if (rewindTimer) {
+		rewindMemory = (char *)malloc(REWIND_NUM*REWIND_SIZE);
+		rewindSerials = (int *)calloc(REWIND_NUM, sizeof(int)); // init to zeroes
+	}
+}
+
+void LoadConfig()
+{
+	agbPrint = ReadPrefHex("agbPrint");
+	autoFireMaxCount = fromDec(ReadPrefString("autoFireMaxCount"));
+	autoFrameSkip = ReadPref("autoFrameSkip", 0);
+	autoLoadMostRecent = ReadPref("autoLoadMostRecent", 0);
+	autoPatch = ReadPref("autoPatch", 1);
+	autoSaveLoadCheatList = ReadPref("autoSaveCheatList", 1);
+	aviRecordDir = ReadPrefString("aviRecordDir");
+	batteryDir = ReadPrefString("batteryDir");
 	biosFileNameGB = ReadPrefString("biosFileGB");
 	biosFileNameGBA = ReadPrefString("biosFileGBA");
 	biosFileNameGBC = ReadPrefString("biosFileGBC");
-
+	captureFormat = ReadPref("captureFormat", 0);
+	cheatsEnabled = ReadPref("cheatsEnabled", 0);
+	cpuDisableSfx = ReadPref("disableSfx", 0);
+	cpuSaveType = ReadPrefHex("saveType");
+	disableMMX = ReadPref("disableMMX", 0);
+	disableStatusMessages = ReadPrefHex("disableStatus");
+	filterMT = ReadPref("filterEnableMultiThreading", 0);
+	filter = ReadPref("filter", 0);
+	frameSkip = ReadPref("frameSkip", 0);
+	fsAdapter = ReadPref("fsAdapter", 0);
+	fsColorDepth = ReadPref("fsColorDepth", 32);
+	fsFrequency = ReadPref("fsFrequency", 60);
+	fsHeight = ReadPref("fsHeight", 600);
+	fsWidth = ReadPref("fsWidth", 800);
+	fullScreen = ReadPrefHex("fullScreen");
+	fullScreenStretch = ReadPref("stretch", 0);
+	gbBorderAutomatic = ReadPref("borderAutomatic", 0);
+	gbBorderOn = ReadPrefHex("borderOn");
+	gbColorOption = ReadPref("colorOption", 0);
+	gbEmulatorType = ReadPref("emulatorType", 1);
+	gbFrameSkip = ReadPref("gbFrameSkip", 0);
+	gbPaletteOption = ReadPref("gbPaletteOption", 0);
+	gbSoundSetDeclicking(ReadPref("gbSoundDeclicking", 1));
+	gb_effects_config.echo = (float)ReadPref("gbSoundEffectsEcho", 20) / 100.0f;
+	gb_effects_config.enabled = ReadPref("gbSoundEffectsEnabled", 0);
+	gb_effects_config.stereo = (float)ReadPref("gbSoundEffectsStereo", 15) / 100.0f;
+	gb_effects_config.surround = ReadPref("gbSoundEffectsSurround", 0);
+	gdbBreakOnLoad = ReadPref("gdbBreakOnLoad", 0);
+	gdbPort = ReadPref("gdbPort", 55555);
+	glFilter = ReadPref("glFilter", 1);
+	ifbType = ReadPref("ifbType", 0);
+	joypadDefault = ReadPref("joypadDefault", 0);
+	languageOption = ReadPref("language", 1);
+	linkAuto = ReadPref("LinkAuto", 1);
+	linkHacks = ReadPref("LinkHacks", 0);
+	linkHostAddr = ReadPrefString("LinkHostAddr", "localhost");
+	linkMode = ReadPref("LinkMode", 0); // LINK_DISCONNECTED = 0
+	linkNumPlayers = ReadPref("LinkNumPlayers", 2);
+	linkTimeout = ReadPref("LinkTimeout", 1000);
 	loadDotCodeFile = ReadPrefString("loadDotCodeFile");
-	saveDotCodeFile = ReadPrefString("saveDotCodeFile");
-
-	aviRecordDir = ReadPrefString("aviRecordDir");
+	maxScale = ReadPref("maxScale", 0);
 	movieRecordDir = ReadPrefString("movieRecordDir");
-	soundRecordDir = ReadPrefString("soundRecordDir");
-	screenShotDir = ReadPrefString("screenShotDir");
-	saveDir = ReadPrefString("saveDir");
-	batteryDir = ReadPrefString("batteryDir");
-
-	romDirGBC = ReadPrefString("romDirGBC");
+	openGL = ReadPrefHex("openGL");
+	optFlashSize = ReadPrefHex("flashSize");
+	pauseWhenInactive = ReadPref("pauseWhenInactive", 1);
+	recentFreeze = ReadPref("recentFreeze", 0);
+	rewindTimer = ReadPref("rewindTimer", 0);
 	romDirGB = ReadPrefString("romDirGB");
 	romDirGBA = ReadPrefString("romDirGBA");
-
-	linkHostAddr = ReadPrefString("LinkHostAddr", "localhost");
+	romDirGBC = ReadPrefString("romDirGBC");
+	rtcEnabled = ReadPref("rtcEnabled", 0);
+	saveDir = ReadPrefString("saveDir");
+	saveDotCodeFile = ReadPrefString("saveDotCodeFile");
+	screenShotDir = ReadPrefString("screenShotDir");
+	showSpeed = ReadPref("showSpeed", 0);
+	showSpeedTransparent = ReadPref("showSpeedTransparent", 1);
+	skipBios = ReadPref("skipBios", 0);
+	skipSaveGameBattery = ReadPref("skipSaveGameBattery", 0);
+	skipSaveGameCheats = ReadPref("skipSaveGameCheats", 0);
+	soundFiltering = (float)ReadPref("gbaSoundFiltering", 50) / 100.0f;
+	soundInterpolation = ReadPref("gbaSoundInterpolation", 1);
+	soundRecordDir = ReadPrefString("soundRecordDir");
+	synchronize = ReadPref("synchronize", 1);
+	threadPriority = ReadPref("priority", 2);
+	throttle = ReadPref("throttle", 0);
+	tripleBuffering = ReadPref("tripleBuffering", 0);
+	useBios = ReadPrefHex("useBiosGBA");
+	useBiosFileGB = ReadPref("useBiosGB", 0);
+	useBiosFileGBA = ReadPref("useBiosGBA", 0);
+	useBiosFileGBC = ReadPref("useBiosGBC", 0);
+	videoOption = ReadPref("video", 2); // VIDEO_3X = 2
+	vsync = ReadPref("vsync", false);
+	windowPositionX = ReadPref("windowX", 0);
+	windowPositionY = ReadPref("windowY", 0);
+	winFlashSize = ReadPref("flashSize", 0x10000);
+	winGbBorderOn = ReadPref("borderOn", 0);
+	winGbPrinterEnabled = ReadPref("gbPrinter", 0);
 
 	int soundQuality = (ReadPrefHex("soundQuality"));
 	switch (soundQuality) {
@@ -572,53 +547,27 @@ void LoadConfig()
 	case 4:
 		break;
 	default:
-		fprintf(stdout, "Unknown sound quality %d. Defaulting to 22Khz\n",
-			soundQuality);
+		log("Unknown sound quality %d. Defaulting to 22Khz\n", soundQuality);
 		soundQuality = 2;
 		break;
 	}
 	soundSetSampleRate(44100 / soundQuality);
-	int res = (ReadPrefHex("soundEnable")) & 0x30f;
-	soundSetEnable(res);
+	int volume = ReadPref("soundVolume", 100);
+	float volume_percent = volume / 100.0f;
+	if (volume_percent < 0.0 || volume_percent > SOUND_MAX_VOLUME)
+		volume_percent = 1.0;
+	soundSetVolume(volume_percent);
+
+	soundSetEnable((ReadPrefHex("soundEnable")) & 0x30f);
 	if ((ReadPrefHex("soundStereo"))) {
-		gb_effects_config.stereo = SOUND_STEREO;
 		gb_effects_config.enabled = true;
 	}
 	if ((ReadPrefHex("soundEcho"))) {
-		gb_effects_config.echo = SOUND_ECHO;
 		gb_effects_config.enabled = true;
 	}
 	if ((ReadPrefHex("soundSurround"))) {
 		gb_effects_config.surround = true;
 		gb_effects_config.enabled = true;
-	}
-	float volume = fromDec(ReadPrefString("soundVolume")) / 100.0;
-	if (volume < 0.0 || volume > SOUND_MAX_VOLUME)
-		volume = 1.0;
-	soundSetVolume(volume);
-	cpuSaveType = (ReadPrefHex("saveType"));
-	if (cpuSaveType < 0 || cpuSaveType > 5)
-		cpuSaveType = 0;
-	optFlashSize = (ReadPrefHex("flashSize"));
-	if (optFlashSize != 0 && optFlashSize != 1)
-		optFlashSize = 0;
-	ifbType = (IFBFilter)(ReadPrefHex("ifbType"));
-	if (ifbType < kIFBNone || ifbType >= kInvalidIFBFilter)
-		ifbType = kIFBNone;
-	showSpeed = (ReadPrefHex("showSpeed"));
-	if (showSpeed < 0 || showSpeed > 2)
-		showSpeed = 1;
-	rewindTimer = (ReadPrefHex("rewindTimer"));
-	if (rewindTimer < 0 || rewindTimer > 600)
-		rewindTimer = 0;
-	rewindTimer *= 6;  // convert ReadPref("rewindTimer") to 10 frames multiple
-	autoFireMaxCount = fromDec(ReadPrefString("autoFireMaxCount"));
-	if (autoFireMaxCount < 1)
-		autoFireMaxCount = 1;
-
-	if (rewindTimer) {
-		rewindMemory = (char *)malloc(REWIND_NUM*REWIND_SIZE);
-		rewindSerials = (int *)calloc(REWIND_NUM, sizeof(int)); // init to zeroes
 	}
 
 	if (optFlashSize == 0)
@@ -639,6 +588,27 @@ void LoadConfig()
 	systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
 	optPrintUsage = 0;
+
+	// TODO
+	//int s = ReadPref("mapViewStretch", 0);
+	//m_size = ReadPref("memViewerDataSize", 0);
+	//m_stretch = ReadPref("GBOamViewStretch", 0);
+	//m_stretch = ReadPref("tileViewStretch", 0);
+	//numberType = ReadPref("cheatsNumberType", 2);
+	//numberType = ReadPref("gbCheatsNumberType", 2);
+	//restoreValues = ReadPref("cheatsRestore", 0) ?
+	//scale = ReadPref("printerScale", 0);
+	//searchType = ReadPref("cheatsSearchType", SEARCH_EQ);
+	//searchType = ReadPref("gbCheatsSearchType",
+	//selectedFilter = ReadPref(("selectedFilter"), 0);
+	//sizeType = ReadPref("cheatsSizeType", 0);
+	//sizeType = ReadPref("gbCheatsSizeType", 0);
+	//updateValues = ReadPref("cheatsUpdate", 0);
+	//updateValues = ReadPref("gbCheatsUpdate", 0);
+	//valueType = ReadPref("cheatsValueType", 0);
+	//valueType = ReadPref("gbCheatsValueType", 0);
+
+	ValidateConfig();
 }
 
 void CloseConfig()

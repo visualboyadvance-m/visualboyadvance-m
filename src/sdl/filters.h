@@ -34,13 +34,13 @@ enum Filter { kStretch1x, kStretch2x, k2xSaI, kSuper2xSaI, kSuperEagle, kPixelat
 typedef void(*FilterFunc)(u8*, u32, u8*, u8*, u32, int, int);
 
 // Initialize a filter and get the corresponding filter function pointer
-FilterFunc initFilter(const Filter f, const int colorDepth, const int srcWidth);
+FilterFunc initFilter(const int f, const int colorDepth, const int srcWidth);
 
 // Get the enlarge factor of a filter
-int getFilterEnlargeFactor(const Filter f);
+int getFilterEnlargeFactor(const int f);
 
 // Get the display name for a filter
-char* getFilterName(const Filter f);
+char* getFilterName(const int f);
 
       //
       // Interframe filters

@@ -1180,74 +1180,74 @@ BOOL MainWnd::OnOptionsFilter(UINT nID)
 	switch(nID)
 	{
 	case ID_OPTIONS_FILTER_NORMAL:
-		filterType = FILTER_NONE;
+		filter = FILTER_NONE;
 		break;
 	case ID_OPTIONS_FILTER_TVMODE:
-		filterType = FILTER_TVMODE;
+		filter = FILTER_TVMODE;
 		break;
 	case ID_OPTIONS_FILTER_PLUGIN:
-		filterType = FILTER_PLUGIN;
+		filter = FILTER_PLUGIN;
 		if( strcmp( theApp.pluginName, "" ) == 0 ) {
 			// open select plugin dialog when none selected
 			OnOptionsSelectPlugin();
 		}
 		break;
 	case ID_OPTIONS_FILTER_2XSAI:
-		filterType = FILTER_2XSAI;
+		filter = FILTER_2XSAI;
 		break;
 	case ID_OPTIONS_FILTER_SUPER2XSAI:
-		filterType = FILTER_SUPER2XSAI;
+		filter = FILTER_SUPER2XSAI;
 		break;
 	case ID_OPTIONS_FILTER_SUPEREAGLE:
-		filterType = FILTER_SUPEREAGLE;
+		filter = FILTER_SUPEREAGLE;
 		break;
 	case ID_OPTIONS_FILTER16BIT_PIXELATEEXPERIMENTAL:
-		filterType = FILTER_PIXELATE;
+		filter = FILTER_PIXELATE;
 		break;
 	case ID_OPTIONS_FILTER16BIT_ADVANCEMAMESCALE2X:
-		filterType = FILTER_MAMESCALE2X;
+		filter = FILTER_MAMESCALE2X;
 		break;
 	case ID_OPTIONS_FILTER16BIT_SIMPLE2X:
-		filterType = FILTER_SIMPLE2X;
+		filter = FILTER_SIMPLE2X;
 		break;
 	case ID_OPTIONS_FILTER_BILINEAR:
-		filterType = FILTER_BILINEAR;
+		filter = FILTER_BILINEAR;
 		break;
 	case ID_OPTIONS_FILTER_BILINEARPLUS:
-		filterType = FILTER_BILINEARPLUS;
+		filter = FILTER_BILINEARPLUS;
 		break;
 	case ID_OPTIONS_FILTER_SCANLINES:
-		filterType = FILTER_SCANLINES;
+		filter = FILTER_SCANLINES;
 		break;
 	case ID_OPTIONS_FILTER_HQ2X:
-		filterType = FILTER_HQ2X;
+		filter = FILTER_HQ2X;
 		break;
 	case ID_OPTIONS_FILTER_LQ2X:
-		filterType = FILTER_LQ2X;
+		filter = FILTER_LQ2X;
 		break;
 	case ID_OPTIONS_FILTER_SIMPLE3X:
-		filterType = FILTER_SIMPLE3X;
+		filter = FILTER_SIMPLE3X;
 		break;
 	case ID_OPTIONS_FILTER_SIMPLE4X:
-		filterType = FILTER_SIMPLE4X;
+		filter = FILTER_SIMPLE4X;
 		break;
 	case ID_OPTIONS_FILTER_HQ3X:
-		filterType = FILTER_HQ3X;
+		filter = FILTER_HQ3X;
 		break;
 	case ID_OPTIONS_FILTER_HQ4X:
-		filterType = FILTER_HQ4X;
+		filter = FILTER_HQ4X;
 		break;
 	case ID_OPTIONS_FILTER_XBRZ2X:
-		filterType = FILTER_XBRZ2X;
+		filter = FILTER_XBRZ2X;
 		break;
 	case ID_OPTIONS_FILTER_XBRZ3X:
-		filterType = FILTER_XBRZ3X;
+		filter = FILTER_XBRZ3X;
 		break;
 	case ID_OPTIONS_FILTER_XBRZ4X:
-		filterType = FILTER_XBRZ4X;
+		filter = FILTER_XBRZ4X;
 		break;
 	case ID_OPTIONS_FILTER_XBRZ5X:
-		filterType = FILTER_XBRZ5X;
+		filter = FILTER_XBRZ5X;
 		break;
 	default:
 		return FALSE;
@@ -1262,71 +1262,71 @@ void MainWnd::OnUpdateOptionsFilter(CCmdUI *pCmdUI)
 
   switch(pCmdUI->m_nID) {
   case ID_OPTIONS_FILTER_NORMAL:
-    pCmdUI->SetCheck(filterType == FILTER_NONE);
+    pCmdUI->SetCheck(filter == FILTER_NONE);
     break;
   case ID_OPTIONS_FILTER_TVMODE:
-    pCmdUI->SetCheck(filterType == FILTER_TVMODE);
+    pCmdUI->SetCheck(filter == FILTER_TVMODE);
     break;
   case ID_OPTIONS_FILTER_2XSAI:
-    pCmdUI->SetCheck(filterType == FILTER_2XSAI);
+    pCmdUI->SetCheck(filter == FILTER_2XSAI);
     break;
   case ID_OPTIONS_FILTER_SUPER2XSAI:
-    pCmdUI->SetCheck(filterType == FILTER_SUPER2XSAI);
+    pCmdUI->SetCheck(filter == FILTER_SUPER2XSAI);
     break;
   case ID_OPTIONS_FILTER_PLUGIN:
     pCmdUI->Enable( !filterMT );
-    pCmdUI->SetCheck(filterType == FILTER_PLUGIN);
+    pCmdUI->SetCheck(filter == FILTER_PLUGIN);
     break;
   case ID_OPTIONS_FILTER_SUPEREAGLE:
-    pCmdUI->SetCheck(filterType == FILTER_SUPEREAGLE);
+    pCmdUI->SetCheck(filter == FILTER_SUPEREAGLE);
     break;
   case ID_OPTIONS_FILTER16BIT_PIXELATEEXPERIMENTAL:
-    pCmdUI->SetCheck(filterType == FILTER_PIXELATE);
+    pCmdUI->SetCheck(filter == FILTER_PIXELATE);
     break;
   case ID_OPTIONS_FILTER16BIT_ADVANCEMAMESCALE2X:
-    pCmdUI->SetCheck(filterType == FILTER_MAMESCALE2X);
+    pCmdUI->SetCheck(filter == FILTER_MAMESCALE2X);
     break;
   case ID_OPTIONS_FILTER16BIT_SIMPLE2X:
-    pCmdUI->SetCheck(filterType == FILTER_SIMPLE2X);
+    pCmdUI->SetCheck(filter == FILTER_SIMPLE2X);
     break;
   case ID_OPTIONS_FILTER_BILINEAR:
-    pCmdUI->SetCheck(filterType == FILTER_BILINEAR);
+    pCmdUI->SetCheck(filter == FILTER_BILINEAR);
     break;
   case ID_OPTIONS_FILTER_BILINEARPLUS:
-    pCmdUI->SetCheck(filterType == FILTER_BILINEARPLUS);
+    pCmdUI->SetCheck(filter == FILTER_BILINEARPLUS);
     break;
   case ID_OPTIONS_FILTER_SCANLINES:
-    pCmdUI->SetCheck(filterType == FILTER_SCANLINES);
+    pCmdUI->SetCheck(filter == FILTER_SCANLINES);
     break;
   case ID_OPTIONS_FILTER_HQ2X:
-    pCmdUI->SetCheck(filterType == FILTER_HQ2X);
+    pCmdUI->SetCheck(filter == FILTER_HQ2X);
     break;
   case ID_OPTIONS_FILTER_LQ2X:
-    pCmdUI->SetCheck(filterType == FILTER_LQ2X);
+    pCmdUI->SetCheck(filter == FILTER_LQ2X);
     break;
   case ID_OPTIONS_FILTER_SIMPLE3X:
-    pCmdUI->SetCheck(filterType == FILTER_SIMPLE3X);
+    pCmdUI->SetCheck(filter == FILTER_SIMPLE3X);
     break;
   case ID_OPTIONS_FILTER_SIMPLE4X:
-    pCmdUI->SetCheck(filterType == FILTER_SIMPLE4X);
+    pCmdUI->SetCheck(filter == FILTER_SIMPLE4X);
     break;
   case ID_OPTIONS_FILTER_HQ3X:
-    pCmdUI->SetCheck(filterType == FILTER_HQ3X);
+    pCmdUI->SetCheck(filter == FILTER_HQ3X);
     break;
   case ID_OPTIONS_FILTER_HQ4X:
-    pCmdUI->SetCheck(filterType == FILTER_HQ4X);
+    pCmdUI->SetCheck(filter == FILTER_HQ4X);
     break;
   case ID_OPTIONS_FILTER_XBRZ2X:
-    pCmdUI->SetCheck(filterType == FILTER_XBRZ2X);
+    pCmdUI->SetCheck(filter == FILTER_XBRZ2X);
     break;
   case ID_OPTIONS_FILTER_XBRZ3X:
-    pCmdUI->SetCheck(filterType == FILTER_XBRZ3X);
+    pCmdUI->SetCheck(filter == FILTER_XBRZ3X);
     break;
   case ID_OPTIONS_FILTER_XBRZ4X:
-    pCmdUI->SetCheck(filterType == FILTER_XBRZ4X);
+    pCmdUI->SetCheck(filter == FILTER_XBRZ4X);
     break;
   case ID_OPTIONS_FILTER_XBRZ5X:
-    pCmdUI->SetCheck(filterType == FILTER_XBRZ5X);
+    pCmdUI->SetCheck(filter == FILTER_XBRZ5X);
     break;
   }
 }
@@ -1605,7 +1605,7 @@ void MainWnd::OnOptionsSelectPlugin()
 
   if (dlg.DoModal() == IDOK)
   {
-	filterType = FILTER_PLUGIN;
+	filter = FILTER_PLUGIN;
 	theApp.updateFilter();
   }
 }
@@ -1782,6 +1782,6 @@ void MainWnd::OnPixelfilterMultiThreading()
 
 void MainWnd::OnUpdatePixelfilterMultiThreading(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable( filterType != FILTER_PLUGIN );
+	pCmdUI->Enable( filter != FILTER_PLUGIN );
 	pCmdUI->SetCheck( filterMT ? 1 : 0 );
 }
