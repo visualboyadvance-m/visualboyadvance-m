@@ -97,17 +97,17 @@ const FilterDesc Filters[] = {
   { "xbrz5x", 5, 0, 0, xbrz5x32 }
 };
 
-int getFilterEnlargeFactor(const Filter f)
+int getFilterEnlargeFactor(const int f)
 {
 	return Filters[f].enlargeFactor;
 }
 
-char* getFilterName(const Filter f)
+char* getFilterName(const int f)
 {
 	return (char*)Filters[f].name;
 }
 
-FilterFunc initFilter(const Filter f, const int colorDepth, const int srcWidth)
+FilterFunc initFilter(const int f, const int colorDepth, const int srcWidth)
 {
   FilterFunc func;
 

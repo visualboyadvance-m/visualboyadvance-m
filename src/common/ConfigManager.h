@@ -54,7 +54,7 @@ extern int dsoundDisableHardwareAcceleration;
 extern int filterHeight;
 extern int filterMagnification;
 extern int filterMT; // enable multi-threading for pixel filters
-extern int filterType;
+extern int filter;
 extern int filterWidth;
 extern int frameSkip;
 extern int frameskipadjust;
@@ -69,6 +69,7 @@ extern int fullScreenStretch;
 extern int gdbBreakOnLoad;
 extern int gdbPort;
 extern int glFilter;
+extern int ifbType;
 extern int joypadDefault;
 extern int languageOption;
 extern int layerEnable;
@@ -149,10 +150,8 @@ extern char *(patchNames[PATCH_MAX_NUM]); // and so on
 
 extern int mouseCounter;
 
-extern Filter filter;
 extern FilterFunc filterFunction;
 extern IFBFilterFunc ifbFunction;
-extern int ifbType;
 
 
 extern char* homeDir;
