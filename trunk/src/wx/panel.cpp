@@ -7,6 +7,7 @@
 #include "../common/Patch.h"
 #include <wx/dcbuffer.h>
 #include "../sdl/text.h"
+#include "filters.h"
 
 int emulating;
 
@@ -314,20 +315,20 @@ void GameArea::LoadGame(const wxString &name)
     cheats_dirty = (did_autoload && !skipSaveGameCheats) ||
 	(loaded == IMAGE_GB ? gbCheatNumber > 0 : cheatsNumber > 0);
     if(gopts.autoload_cheats && (!did_autoload || skipSaveGameCheats)) {
-        wxFileName cfn = loaded_game;
-        // SetExt may strip something off by accident, so append to text instead
-        cfn.SetFullName(cfn.GetFullName() + wxT(".clt"));
-            if(cfn.IsFileReadable()) {
-                bool cld;
-                if(loaded == IMAGE_GB)
-                    cld = gbCheatsLoadCheatList(cfn.GetFullPath().mb_fn_str());
-                else
-                    cld = cheatsLoadCheatList(cfn.GetFullPath().mb_fn_str());
-                if(cld) {
-                    systemScreenMessage(_("Loaded cheats"));
-                    cheats_dirty = false;
-                }
-            }
+	wxFileName cfn = loaded_game;
+	// SetExt may strip something off by accident, so append to text instead
+	cfn.SetFullName(cfn.GetFullName() + wxT(".clt"));
+	if(cfn.IsFileReadable()) {
+	    bool cld;
+	    if(loaded == IMAGE_GB)
+		cld = gbCheatsLoadCheatList(cfn.GetFullPath().mb_fn_str());
+	    else
+		cld = cheatsLoadCheatList(cfn.GetFullPath().mb_fn_str());
+	    if(cld) {
+		systemScreenMessage(_("Loaded cheats"));
+		cheats_dirty = false;
+	    }
+	}
     }
 }
 
@@ -338,7 +339,7 @@ void GameArea::SetFrameTitle()
 	tit = wxT("VBA-M ");
 	tit.append(loaded_game.GetFullName());
     } else
-	tit = wxT("VisualBoyAdvance-M " VERSION);
+	tit = wxT("VisualBoyAdvance-M ");
 #ifndef NO_LINK
 	int playerId = GetLinkPlayerId();
 	if (playerId >= 0) {
@@ -1504,7 +1505,7 @@ DrawingPanel::~DrawingPanel()
 		threads[i].src = NULL;
 		threads[i].sig.Signal();
 		threads[i].lock.Unlock();
-		threads[i].Wait();
+                threads[i].Wait();
 	    }
 	delete[] threads;
     }
@@ -1585,7 +1586,7 @@ void BasicDrawingPanel::DrawArea(wxWindowDC &dc)
 #include <GL/glx.h>
 #endif
 #ifdef __WXMSW__
-#include <GL/wglext.h>
+#include <GL/glext.h>
 #endif
 
 IMPLEMENT_CLASS2(GLDrawingPanel, DrawingPanel, wxGLCanvas)
@@ -1708,7 +1709,7 @@ void GLDrawingPanel::Init()
     CGLContextObj cgl_context = CGLGetCurrentContext();
     CGLSetParameter(cgl_context, kCGLCPSwapInterval, &swap_interval);
 #else
-#warning no vsync support on this platform
+//#warning no vsync support on this platform
 #endif
 #endif
 #endif

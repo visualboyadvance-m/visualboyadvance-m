@@ -135,8 +135,8 @@ opt_desc opts[] = {
 #endif
     ENUMOPT("Display/Filter", wxTRANSLATE("Full-screen filter to apply"), gopts.filter,
 	    wxTRANSLATE("none|2xsai|super2xsai|supereagle|pixelate|advmame|"
-			"bilinear|bilinearplus|scanlines|tvmode|hq2x|lq2x|"
-			"simple2x|simple3x|hq3x|simple4x|hq4x|xbrz|plugin")),
+			L"bilinear|bilinearplus|scanlines|tvmode|hq2x|lq2x|"
+			L"simple2x|simple3x|hq3x|simple4x|hq4x|xbrz|plugin")),
 	STROPT ("Display/FilterPlugin", wxTRANSLATE("Filter plugin library"), gopts.filter_plugin),
     BOOLOPT("Display/Fullscreen", wxTRANSLATE("Enter fullscreen mode at startup"), gopts.fullscreen),
     INTOPT ("Display/FullscreenDepth", wxTRANSLATE("Fullscreen mode color depth (0 = any)"), gopts.fs_mode.bpp, 0, 999),
@@ -146,17 +146,11 @@ opt_desc opts[] = {
     ENUMOPT("Display/IFB", wxTRANSLATE("Interframe blending function"), gopts.ifb, wxTRANSLATE("none|smart|motionblur")),
     INTOPT ("Display/MaxScale", wxTRANSLATE("Maximum scale factor (0 = no limit)"), gopts.max_scale, 0, 100),
     INTOPT ("Display/MaxThreads", wxTRANSLATE("Maximum number of threads to run filters in"), gopts.max_threads, 1, 8),
-    ENUMOPT("Display/RenderMethod", wxTRANSLATE("Render method; if unsupported, simple method will be used"), gopts.render_method,
 #ifdef __WXMSW__
-	    // try to keep variations to a minimum to ease translation
-	    // since the config file stores strings rather than numbers, the
-	    // ordering does not have to stay fixed
-	    // but the numbers need to match the usage in code
-	    wxTRANSLATE("simple|opengl|cairo|direct3d")
+	ENUMOPT("Display/RenderMethod", wxTRANSLATE("Render method; if unsupported, simple method will be used"), gopts.render_method, wxTRANSLATE("simple|opengl|cairo|direct3d")),
 #else
-	    wxTRANSLATE("simple|opengl|cairo")
+	ENUMOPT("Display/RenderMethod", wxTRANSLATE("Render method; if unsupported, simple method will be used"), gopts.render_method, wxTRANSLATE("simple|opengl|cairo")),
 #endif
-	   ),
     INTOPT ("Display/Scale", wxTRANSLATE("Default scale factor"), gopts.video_scale, 1, 6),
     ENUMOPT("Display/ShowSpeed", wxTRANSLATE("Show speed indicator"), gopts.osd_speed, wxTRANSLATE("no|percent|detailed")),
     BOOLOPT("Display/Stretch", wxTRANSLATE("Retain aspect ratio when resizing"), gopts.retain_aspect),
@@ -200,9 +194,6 @@ opt_desc opts[] = {
 #endif
     STROPT ("GBA/ROMDir", wxTRANSLATE("Directory to look for ROM files"), gopts.gba_rom_dir),
     ENUMOPT("GBA/SaveType", wxTRANSLATE("Native save (\"battery\") hardware type (vba-over.ini override is saveType integer 0-5)"), gopts.save_type, wxTRANSLATE("auto|eeprom|sram|flash|eeprom+sensor|none")),
-#if 0 // currently disabled
-    BOOLOPT("GBA/SkipIntro", wxTRANSLATE("Skip intro"), gopts.skip_intro),
-#endif
     BOOLOPT("GBA/UseBiosFile", wxTRANSLATE("Use the specified BIOS file"), gopts.gba_use_bios),
     
     /// General
@@ -234,14 +225,11 @@ opt_desc opts[] = {
     {   wxT("Keyboard/*"), wxTRANSLATE("The parameter Keyboard/<cmd> contains a comma-separated list of key names (e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is executed.") },
     
     /// Sound
-    ENUMOPT("Sound/AudioAPI", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api,
 #ifdef __WXMSW__
-      // see comment on Display/RenderMethod
-      wxTRANSLATE("sdl|openal|directsound|xaudio2")
+	ENUMOPT("Sound/AudioAPI", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl|openal|directsound|xaudio2")),
 #else
-      wxTRANSLATE("sdl|openal")
+	ENUMOPT("Sound/AudioAPI", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl|openal")),
 #endif
-    ),
     INTOPT ("Sound/Buffers", wxTRANSLATE("Number of sound buffers"), gopts.audio_buffers, 2, 10),
     INTOPT ("Sound/Enable", wxTRANSLATE("Bit mask of sound channels to enable"), gopts.sound_en, 0, 0x30f),
     INTOPT ("Sound/GBAFiltering", wxTRANSLATE("GBA sound filtering (%)"), gopts.gba_sound_filter, 0, 100),

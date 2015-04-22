@@ -177,14 +177,6 @@ void debuggerSignal(int, int)
 {
 }
 
-void debuggerOutput(const char *, u32)
-{
-}
-
-void (*dbgMain)() = debuggerMain;
-void (*dbgSignal)(int, int) = debuggerSignal;
-void (*dbgOutput)(const char *, u32) = debuggerOutput;
-
 void log(const char *defaultMsg, ...)
 {
   static FILE *out = NULL;

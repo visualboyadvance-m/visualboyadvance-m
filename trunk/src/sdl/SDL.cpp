@@ -118,7 +118,6 @@ int systemRedShift = 0;
 int systemBlueShift = 0;
 int systemGreenShift = 0;
 int systemColorDepth = 0;
-int systemDebug = 0;
 int systemVerbose = 0;
 int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
@@ -1382,7 +1381,6 @@ Options:\n\
   -T, --throttle=THROTTLE      Set the desired throttle (5...1000)\n\
   -b, --bios=BIOS              Use given bios file\n\
   -c, --config=FILE            Read the given configuration file\n\
-  -d, --debug                  Enter debugger\n\
   -f, --filter=FILTER          Select filter:\n\
 ");
   for (int i  = 0; i < (int)kInvalidFilter; i++)

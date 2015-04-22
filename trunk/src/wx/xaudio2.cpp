@@ -6,6 +6,7 @@
 
 // Interface
 #include "../common/SoundDriver.h"
+#include "../common/ConfigManager.h"
 
 // XAudio2
 #include <XAudio2.h>
