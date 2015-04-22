@@ -3808,31 +3808,6 @@ void CPULoop(int ticks)
 
 
   for(;;) {
-#ifndef FINAL_VERSION
-    if(systemDebug) {
-      if(systemDebug >= 10 && !holdState) {
-        CPUUpdateCPSR();
-#ifdef BKPT_SUPPORT
-		if (debugger_last)
-		{
-		winlog("R00=%08x R01=%08x R02=%08x R03=%08x R04=%08x R05=%08x R06=%08x R07=%08x R08=%08x R09=%08x R10=%08x R11=%08x R12=%08x R13=%08x R14=%08x R15=%08x R16=%08x R17=%08x\n",
-                 oldreg[0], oldreg[1], oldreg[2], oldreg[3], oldreg[4], oldreg[5],
-                 oldreg[6], oldreg[7], oldreg[8], oldreg[9], oldreg[10], oldreg[11],
-                 oldreg[12], oldreg[13], oldreg[14], oldreg[15], oldreg[16],
-                 oldreg[17]);
-		}
-#endif
-        winlog("R00=%08x R01=%08x R02=%08x R03=%08x R04=%08x R05=%08x R06=%08x R07=%08x R08=%08x R09=%08x R10=%08x R11=%08x R12=%08x R13=%08x R14=%08x R15=%08x R16=%08x R17=%08x\n",
-                 reg[0].I, reg[1].I, reg[2].I, reg[3].I, reg[4].I, reg[5].I,
-                 reg[6].I, reg[7].I, reg[8].I, reg[9].I, reg[10].I, reg[11].I,
-                 reg[12].I, reg[13].I, reg[14].I, reg[15].I, reg[16].I,
-                 reg[17].I);
-      } else if(!holdState) {
-        winlog("PC=%08x\n", armNextPC);
-      }
-    }
-#endif /* FINAL_VERSION */
-
     if(!holdState && !SWITicks) {
       if(armState) {
 		  armOpcodeCount++;

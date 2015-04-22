@@ -452,38 +452,37 @@ public:
 	    // It might be safest to only support desc edits, and force the
 	    // user to re-enter codes to change them
 	    int ncodes = isgb ? gbCheatNumber : cheatsNumber;
-	    if(ncodes > id + 1)
-	    {
-            std::vector<wxString> codes;
-            std::vector<wxString> descs;
-            bool checked[ncodes - id - 1];
-            bool v3[ncodes - id - 1];
-            for(int i = id + 1; i < ncodes; i++) {
-                codes[i - id - 1] = wxString(isgb ?
-                            gbCheatList[i].cheatCode :
-                            cheatsList[i].codestring,
-                            wxConvLibc);
-                descs[i - id - 1] = wxString(isgb ?
-                            gbCheatList[i].cheatDesc :
-                            cheatsList[i].desc,
-                            wxConvUTF8);
-                checked[i - id - 1] = isgb ? gbCheatList[i].enabled :
-                                        cheatsList[i].enabled;
-                v3[i - id - 1] = isgb ? false : cheatsList[i].code == 257;
-            }
-            for(int i = ncodes - 1; i >= id; i--) {
-                list->DeleteItem(i);
-                if(isgb)
-                    gbCheatRemove(i);
-                else
-                    cheatsDelete(i, cheatsList[i].enabled);
-            }
-            AddCheat();
-            if(!ochecked) {
-                if(isgb)
-                    gbCheatDisable(id);
-                else
-                    cheatsDisable(id);
+	    if(ncodes > id + 1) {
+		wxString codes[100];
+		wxString descs[100];
+		bool checked[100];
+		bool v3[100];
+		for(int i = id + 1; i < ncodes; i++) {
+		    codes[i - id - 1] = wxString(isgb ?
+						 gbCheatList[i].cheatCode :
+						 cheatsList[i].codestring,
+						 wxConvLibc);
+		    descs[i - id - 1] = wxString(isgb ?
+						 gbCheatList[i].cheatDesc :
+						 cheatsList[i].desc,
+						 wxConvUTF8);
+		    checked[i - id - 1] = isgb ? gbCheatList[i].enabled :
+			                         cheatsList[i].enabled;
+		    v3[i - id - 1] = isgb ? false : cheatsList[i].code == 257;
+		}
+		for(int i = ncodes - 1; i >= id; i--) {
+		    list->DeleteItem(i);
+		    if(isgb)
+			gbCheatRemove(i);
+		    else
+			cheatsDelete(i, cheatsList[i].enabled);
+		}
+		AddCheat();
+		if(!ochecked) {
+		    if(isgb)
+			gbCheatDisable(id);
+		    else
+			cheatsDisable(id);
             }
             for(int i = id + 1; i < ncodes; i++) {
                 ce_codes = codes[i - id - 1];
@@ -532,8 +531,8 @@ public:
                 if(isgb)
                     gbCheatDisable(id);
                 else
-                    cheatsDisable(id);
-            }
+			cheatsDisable(id);
+		}
 	    }
 	    Reload(id);
 	} else if(ce_desc != odesc) {
@@ -1321,6 +1320,7 @@ public:
 	umix->Enable(api == AUD_XAUDIO2);
 	hwacc->Enable(api == AUD_DIRECTSOUND);
 	lastapi = api;
+	return true;
     }
     void SetAPI(wxCommandEvent &ev)
     {
@@ -2210,7 +2210,7 @@ bool MainFrame::InitMore(void)
     for(int i = 0; i < checkable_mi.size(); i++) { \
 	if(checkable_mi[i].cmd != id) \
 	    continue; \
-	checkable_mi[i].boolopt = (bool*)&f; \
+	checkable_mi[i].boolopt = &f; \
 	checkable_mi[i].mi->Check(f); \
 	break; \
     } \
@@ -2246,9 +2246,12 @@ bool MainFrame::InitMore(void)
 	add_icheck1("VideoLayersWIN1", layerSettings, (1<<14));
 	add_icheck1("VideoLayersOBJWIN", layerSettings, (1<<15));
 	add_bcheck("CheatsAutoSaveLoad", gopts.autoload_cheats);
-	add_bcheck("CheatsEnable", cheatsEnabled);
-	add_bcheck("KeepSaves", skipSaveGameBattery);
-	add_bcheck("KeepCheats", skipSaveGameCheats);
+	bool bCheatsEnabled = (cheatsEnabled != 0);
+	add_bcheck("CheatsEnable", bCheatsEnabled);
+	bool bKeepSaves = (skipSaveGameBattery != 0);
+	add_bcheck("KeepSaves", bKeepSaves);
+	bool KeepCheats = (skipSaveGameCheats != 0);
+	add_bcheck("KeepCheats", KeepCheats);
 	add_bcheck("LoadGameAutoLoad", gopts.autoload_state);
 	add_icheck1("JoypadAutofireA", autofire, KEYM_A);
 	add_icheck1("JoypadAutofireB", autofire, KEYM_B);
@@ -2263,10 +2266,6 @@ bool MainFrame::InitMore(void)
 	    checkable_mi[i].mi->GetMenu()->Remove(checkable_mi[i].mi);
 	    checkable_mi[i].mi = NULL;
 	}
-    for(checkable_mi_array_t::iterator it = checkable_mi.end();
-	it != checkable_mi.begin(); it--)
-	if(!it[-1].mi)
-	    checkable_mi.erase(it-1);
 
     set_global_accels();
 
@@ -2844,12 +2843,8 @@ bool MainFrame::InitMore(void)
         cb->SetValidator(wxBoolIntValidator(&gopts.max_threads, mthr));
         if(mthr <= 1)
             cb->Hide();
-#ifdef MMX
-        getcbb("MMX", cpu_mmx);
-#else
         cb=SafeXRCCTRL<wxCheckBox>(d, "MMX");
         cb->Hide();
-#endif
         ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "Filter",wxGenericValidator(& gopts.filter));
         // these two are filled and/or hidden at dialog load time
         wxControl *pll;
@@ -3242,22 +3237,16 @@ void MainFrame::set_global_accels()
 	if(!accels[i].GetMenuItem())
 	    len++;
     if(len) {
-        wxAcceleratorEntry * tab = new wxAcceleratorEntry[len];
-        for(int i = 0, j = 0; i < accels.size(); i++)
-        {
-            if(!accels[i].GetMenuItem())
-                tab[j++] = accels[i];
-        }
-        wxAcceleratorTable atab(len, tab);
-        // set the table on the panel, where focus usually is
-        // otherwise accelerators are lost sometimes
-        panel->SetAcceleratorTable(atab);
-        delete tab;
-    }
-    else
-    {
-        panel->SetAcceleratorTable(wxNullAcceleratorTable);
-    }
+	wxAcceleratorEntry tab[1000];
+	for(int i = 0, j = 0; i < accels.size(); i++)
+	    if(!accels[i].GetMenuItem())
+		tab[j++] = accels[i];
+	wxAcceleratorTable atab(len, tab);
+	// set the table on the panel, where focus usually is
+	// otherwise accelerators are lost sometimes
+	panel->SetAcceleratorTable(atab);
+    } else
+	panel->SetAcceleratorTable(wxNullAcceleratorTable);
 
     // save recent accels
     for(int i = 0; i < 10; i++)

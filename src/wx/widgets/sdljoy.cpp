@@ -1,6 +1,6 @@
 #include "wx/sdljoy.h"
-#include <SDL/SDL.h>
-#include <SDL/SDL_joystick.h>
+#include <SDL.h>
+#include <SDL_joystick.h>
 #include <wx/window.h>
 
 DEFINE_EVENT_TYPE(wxEVT_SDLJOY)

@@ -703,7 +703,7 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN
 		    if(f.Read(&slen, sizeof(slen)) != sizeof(slen) ||
 		      slen > 1024) // arbitrary upper bound
 			break;
-		    char buf[slen];
+			char buf[1024];
 		    if(f.Read(buf, slen) != slen)
 			break;
 		    lst->Append(wxString(buf, wxConvLibc, slen));
@@ -1898,16 +1898,16 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
 		if(cfg->Read(wxT("path"), wxEmptyString) == fn.GetPath()) {
 		    // EOL can be either \n (unix), \r\n (dos), or \r (old mac)
 		    wxString res(wxT("(^|[\n\r])" // a new line
-				     "(" // capture group as \2
-				       "(#[^\n\r]*(\r?\n|\r))?" // an optional comment line
-				       "\\[")); // the group header
+				     L"(" // capture group as \2
+				       L"(#[^\n\r]*(\r?\n|\r))?" // an optional comment line
+				       L"\\[")); // the group header
 		    res += s;
 		    res += wxT( "\\]"
-			        "([^[#]" // non-comment non-group-start chars
-				 "|[^\r\n \t][ \t]*[[#]" // or comment/grp start chars in middle of line
-				 "|#[^\n\r]*(\r?\n|\r)[^[]" // or comments not followed by grp start
-				")*"
-			       ")" // end of group
+			        L"([^[#]" // non-comment non-group-start chars
+				 L"|[^\r\n \t][ \t]*[[#]" // or comment/grp start chars in middle of line
+				 L"|#[^\n\r]*(\r?\n|\r)[^[]" // or comments not followed by grp start
+				L")*"
+			       L")" // end of group
 				// no need to try to describe what's next
 				// as the regex should maximize match size
 			      );
@@ -2141,7 +2141,7 @@ EVT_HANDLER(wxID_ABOUT, "About...")
 {
     wxAboutDialogInfo ai;
     ai.SetName(wxT("VisualBoyAdvance-M"));
-    ai.SetVersion(wxT(VERSION));
+    ai.SetVersion(wxT(""));
     // setting website, icon, license uses custom aboutbox on win32 & macosx
     // but at least win32 standard about is nothing special
     ai.SetWebSite(wxT("http://www.vba-m.com/"));

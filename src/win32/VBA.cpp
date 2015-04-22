@@ -145,7 +145,6 @@ int realsystemBlueShift = 0;
 int realsystemGreenShift = 0;
 int realsystemColorDepth = 16;
 int systemVerbose = 0;
-int systemDebug = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 bool soundBufferLow = 0;
 void winSignal(int,int);
@@ -432,11 +431,6 @@ BOOL VBA::InitInstance()
                                        "verbose",
                                        0,
                                        MakeInstanceFilename("vbam.ini"));
-
-  systemDebug = GetPrivateProfileInt("config",
-                                     "debug",
-                                     0,
-                                     MakeInstanceFilename("vbam.ini"));
 
   wndClass = AfxRegisterWndClass(0, LoadCursor(IDC_ARROW), (HBRUSH)GetStockObject(BLACK_BRUSH), LoadIcon(IDI_MAINICON));
 
