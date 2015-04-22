@@ -21,7 +21,7 @@ extern "C" {
 #include "../gba/agbprint.h"
 
 #define GetXRCDialog(n) \
-    dynamic_cast<wxDialog*>(FindWindow(XRCID(n)))
+    dynamic_cast<wxDialog*>(FindWindowByName(n))
 
 bool cmditem_lt(const struct cmditem &cmd1, const struct cmditem &cmd2)
 {
