@@ -44,7 +44,7 @@ static void mark_recursive(wxWindowBase *w)
 }
 
 #define GetXRCDialog(n) \
-    wxStaticCast(wxGetApp().frame->FindWindow(XRCID(n)), wxDialog)
+    wxStaticCast(wxGetApp().frame->FindWindowByName(n), wxDialog)
 
 // Event handlers must be methods of wxEvtHandler-derived objects
 
@@ -1979,9 +1979,11 @@ wxDialog * MainFrame::LoadXRCDialog(const char * name)
 	/* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */
 	/* this will generate a gtk warning but it is necessary for later */
 	/* retrieval using FindWindow() */
+#if (wxMAJOR_VERSION < 3)
 	if(!dialog->GetParent())
 		dialog->Reparent(this);
 	mark_recursive(dialog);
+#endif
 	return dialog;
 }
 
@@ -1996,9 +1998,11 @@ wxPropertySheetDialog * MainFrame::LoadXRCropertySheetDialog(const char * name)
 	/* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */
 	/* this will generate a gtk warning but it is necessary for later */
 	/* retrieval using FindWindow() */
+#if (wxMAJOR_VERSION < 3)
 	if(!dialog->GetParent())
 		dialog->Reparent(this);
 	mark_recursive(dialog);
+#endif
 	return dialog;
 }
 
