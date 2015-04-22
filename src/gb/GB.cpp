@@ -4859,20 +4859,6 @@ void gbEmulate(int ticksToStop)
   bool execute = false;
 
   while(1) {
-#ifndef FINAL_VERSION
-    if(systemDebug) {
-      if(!(IFF & 0x80)) {
-        if(systemDebug > 1) {
-          sprintf(gbBuffer,"PC=%04x AF=%04x BC=%04x DE=%04x HL=%04x SP=%04x I=%04x\n",
-                   PC.W, AF.W, BC.W, DE.W,HL.W,SP.W,IFF);
-        } else {
-          sprintf(gbBuffer,"PC=%04x I=%02x\n", PC.W, IFF);
-        }
-        log(gbBuffer);
-      }
-    }
-#endif
-
     u16 oldPCW = PC.W;
 
     if(IFF & 0x80) {

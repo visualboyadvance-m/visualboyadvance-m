@@ -937,14 +937,6 @@ int ReadOpts(int argc, char ** argv)
 		case 'N':
 			parseDebug = false;
 			break;
-		case 'D':
-			if (optarg) {
-				systemDebug = atoi(optarg);
-			}
-			else {
-				systemDebug = 1;
-			}
-			break;
 		case 'F':
 			fullScreen = 1;
 			mouseCounter = 120;

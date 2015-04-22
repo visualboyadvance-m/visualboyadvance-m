@@ -21,8 +21,6 @@
 // The built-in vba-over.ini
 #include "builtin-over.h"
 
-int systemDebug = 0;
-
 IMPLEMENT_APP(wxvbamApp)
 IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
 
@@ -223,7 +221,7 @@ void wxvbamApp::OnInitCmdLine(wxCmdLineParser &cl)
 {
     wxApp::OnInitCmdLine(cl);
 
-    cl.SetLogo(wxT("VisualBoyAdvance-M " VERSION "\n"));
+    cl.SetLogo(wxT("VisualBoyAdvance-M\n"));
 
     // 2.9 decided to change all of these from wxChar to char for some
     // reason
@@ -666,7 +664,7 @@ LinkMode MainFrame::getOptionsLinkMode() {
 // FIXME: move this to MainFrame
 int wxvbamApp::FilterEvent(wxEvent &event)
 {
-    if(frame && frame->IsPaused(true))
+    //if(frame && frame->IsPaused(true))
 	return -1;
     if(event.GetEventType() == wxEVT_KEY_DOWN) {
 	wxKeyEvent &ke = (wxKeyEvent &)event;

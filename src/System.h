@@ -89,7 +89,6 @@ extern int systemRedShift;
 extern int systemGreenShift;
 extern int systemBlueShift;
 extern int systemColorDepth;
-extern int systemDebug;
 extern int systemVerbose;
 extern int systemFrameSkip;
 extern int systemSaveUpdateCounter;

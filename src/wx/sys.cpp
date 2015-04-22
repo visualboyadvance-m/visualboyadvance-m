@@ -720,6 +720,7 @@ bool PrintDialog::OnPrintPage(int pno)
     xoff *= margins.width;
     yoff *= margins.height;
     dc->DrawBitmap(*bmp, margins.x - xoff, margins.y - yoff);
+	return true;
 }
 
 void PrintDialog::DoPrint(wxCommandEvent&)
@@ -949,6 +950,7 @@ SoundDriver * systemSoundInit()
     default:
 	gopts.audio_api = 0;
     }
+	return 0;
 }
 
 void systemOnWriteDataToSoundBuffer(const u16 * finalWave, int length)
@@ -1111,24 +1113,6 @@ bool debugWaitSocket()
     debug_remote = debug_server->Accept(false);
     return debug_remote != NULL;
 }
-
-static void debuggerOutput(const char *s, u32 addr)
-{
-}
-
-void debuggerSignal(int sig, int number)
-{
-}
-
-void (*dbgMain)();
-void debuggerMain()
-{
-}
-
-//bool debugger;
-
-void (*dbgOutput)(const char *s, u32 addr) = debuggerOutput;
-void (*dbgSignal)(int sig,int number) = debuggerSignal;
 
 void log(const char *defaultMsg, ...)
 {
