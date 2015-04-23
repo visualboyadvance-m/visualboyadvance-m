@@ -907,7 +907,7 @@ bool systemCanChangeSoundQuality()
     if(panel)
 	return !panel->IsRecording();
 #endif
-    return true;
+	return wxGetApp().IsMainLoopRunning();
 }
 
 bool systemPauseOnFrame()
@@ -1135,7 +1135,9 @@ void log(const char *defaultMsg, ...)
     vsnprintf(buf, 2048, defaultMsg, valist);
     va_end(valist);
     wxGetApp().log.append(wxString(buf, wxConvLibc));
-    LogDialog *d = wxGetApp().frame->logdlg;
-    if(d)
-	d->Update();
+	if (wxGetApp().IsMainLoopRunning()) {
+	    LogDialog *d = wxGetApp().frame->logdlg;
+		if(d)
+			d->Update();
+	}
 }
