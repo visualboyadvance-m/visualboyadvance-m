@@ -20,8 +20,13 @@ extern "C" {
 #include "../gb/gbPrinter.h"
 #include "../gba/agbprint.h"
 
+#if (wxMAJOR_VERSION < 3)
 #define GetXRCDialog(n) \
-    dynamic_cast<wxDialog*>(FindWindowByName(n))
+    wxStaticCast(wxGetApp().frame->FindWindow(XRCID(n)), wxDialog)
+#else
+#define GetXRCDialog(n) \
+	wxStaticCast(wxGetApp().frame->FindWindowByName(n), wxDialog)
+#endif
 
 bool cmditem_lt(const struct cmditem &cmd1, const struct cmditem &cmd2)
 {
