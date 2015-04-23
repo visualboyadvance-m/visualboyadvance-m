@@ -43,8 +43,13 @@ static void mark_recursive(wxWindowBase *w)
 	mark_recursive(*ch);
 }
 
+#if (wxMAJOR_VERSION < 3)
 #define GetXRCDialog(n) \
-    wxStaticCast(wxGetApp().frame->FindWindowByName(n), wxDialog)
+    wxStaticCast(wxGetApp().frame->FindWindow(XRCID(n)), wxDialog)
+#else
+#define GetXRCDialog(n) \
+	wxStaticCast(wxGetApp().frame->FindWindowByName(n), wxDialog)
+#endif
 
 // Event handlers must be methods of wxEvtHandler-derived objects
 
