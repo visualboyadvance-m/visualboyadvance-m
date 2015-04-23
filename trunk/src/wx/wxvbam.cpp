@@ -20,6 +20,7 @@
 
 // The built-in vba-over.ini
 #include "builtin-over.h"
+#include "common/ConfigManager.h"
 
 IMPLEMENT_APP(wxvbamApp)
 IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
@@ -388,6 +389,11 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser &cl)
 	    }
 	}
     }
+
+	home = strdup((const char*)argv[0].mb_str(wxConvUTF8));
+	SetHome(home);
+	LoadConfig(); // Parse command line arguments (overrides ini)
+	ReadOpts(argc, argv);
     return true;
 }
 

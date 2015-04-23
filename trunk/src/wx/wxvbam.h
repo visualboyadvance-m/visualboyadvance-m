@@ -97,6 +97,7 @@ public:
     }
 private:
     wxPathList config_path;
+	char* home;
 };
 
 DECLARE_APP(wxvbamApp);
