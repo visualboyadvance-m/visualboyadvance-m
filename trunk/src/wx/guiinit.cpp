@@ -1373,7 +1373,7 @@ public:
     void JoypadConfigButtons(wxCommandEvent &ev) {
 	bool clear = ev.GetId() == XRCID("Clear");
 	for(int i = 0; i < NUM_KEYS; i++) {
-	    wxJoyKeyTextCtrl *tc = XRCCTRL_D(*p, joynames[i], wxJoyKeyTextCtrl);
+		wxJoyKeyTextCtrl *tc = XRCCTRL_D(*p, wxString::FromUTF8(joynames[i]), wxJoyKeyTextCtrl);
 	    if(clear)
 		tc->SetValue(wxEmptyString);
 	    else {
@@ -1957,7 +1957,7 @@ public:
     void Init(wxShowEvent &ev)
     {
 	ev.Skip();
-	DoSetThrottleSel(gopts.throttle);
+	DoSetThrottleSel(throttle);
     }
 } throttle_ctrl;
 
@@ -1987,8 +1987,8 @@ wxDialog * MainFrame::LoadXRCDialog(const char * name)
 #if (wxMAJOR_VERSION < 3)
 	if(!dialog->GetParent())
 		dialog->Reparent(this);
-	mark_recursive(dialog);
 #endif
+	mark_recursive(dialog);
 	return dialog;
 }
 
@@ -2006,8 +2006,8 @@ wxPropertySheetDialog * MainFrame::LoadXRCropertySheetDialog(const char * name)
 #if (wxMAJOR_VERSION < 3)
 	if(!dialog->GetParent())
 		dialog->Reparent(this);
-	mark_recursive(dialog);
 #endif
+	mark_recursive(dialog);
 	return dialog;
 }
 
@@ -2627,18 +2627,23 @@ bool MainFrame::InitMore(void)
     cb=SafeXRCCTRL<wxCheckBox>(d, n); \
     cb->SetValidator(wxGenericValidator(&o)); \
 } while(0)
+#define getcbi(n, o) do { \
+    cb=SafeXRCCTRL<wxCheckBox>(d, n); \
+    cb->SetValidator(wxBoolIntValidator(&o, 1)); \
+} while(0)
+
     wxSpinCtrl *sc;
 #define getsc(n, o) do { \
     sc=SafeXRCCTRL<wxSpinCtrl>(d, n); \
     sc->SetValidator(wxGenericValidator(&o)); \
 } while(0)
     {
-	getcbb("PauseWhenInactive", gopts.defocus_pause);
-	getcbb("ApplyPatches", gopts.apply_patches);
-	getrbi("PNG", gopts.cap_format, 0);
-	getrbi("BMP", gopts.cap_format, 1);
+	getcbi("PauseWhenInactive", pauseWhenInactive);
+	getcbi("ApplyPatches", autoPatch);
+	getrbi("PNG", captureFormat, 0);
+	getrbi("BMP", captureFormat, 1);
 	getsc("RewindInterval", gopts.rewind_interval);
-	getsc("Throttle", gopts.throttle);
+	getsc("Throttle", throttle);
 	throttle_ctrl.thr = sc;
 	throttle_ctrl.thrsel=SafeXRCCTRL<wxChoice>(d, "ThrottleSel");
 	throttle_ctrl.thr->
@@ -2696,24 +2701,24 @@ bool MainFrame::InitMore(void)
 	/// Speed
 	// AutoSkip/FrameSkip are 2 controls for 1 value.  Needs post-process
 	// to ensure checkbox not ignored
-	getcbie("FrameSkipAuto", gopts.gb_frameskip, -1);
-	getsc("FrameSkip", gopts.gb_frameskip);
+	getcbie("FrameSkipAuto", gbFrameSkip, -1);
+	getsc("FrameSkip", gbFrameSkip);
 	addbier(sc, true);
 	getlab("FrameSkipLab");
 	addbier(lab, true);
 	/// Boot ROM
-	getcbbe("BootRomEn", gopts.gb_use_bios);
+	getcbie("BootRomEn", useBiosFileGB, 1);
 	getfp("BootRom", gopts.gb_bios);
 	addbe(fp);
 	getlab("BootRomLab");
 	addbe(lab);
-	getcbbe("CBootRomEn", gopts.gbc_use_bios);
+	getcbie("CBootRomEn", useBiosFileGBC, 1);
 	getfp("CBootRom", gopts.gbc_bios);
 	addbe(fp);
 	getlab("CBootRomLab");
 	addbe(lab);
 	/// Custom Colors
-	getcbb("Color", gbColorOption);
+	getcbi("Color", gbColorOption);
 	wxFarRadio *r = NULL;
 	for(int i = 0; i < 3; i++) {
 	    wxString pn;
@@ -2758,9 +2763,9 @@ bool MainFrame::InitMore(void)
     d=LoadXRCropertySheetDialog("GameBoyAdvanceConfig");
     {
 	/// System and peripherals
-	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "SaveType",wxGenericValidator(& gopts.save_type));
+	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "SaveType",wxGenericValidator(& cpuSaveType));
 	BatConfigHandler.type = ch;
-	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "FlashSize",wxGenericValidator(& gopts.flash_size));
+	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "FlashSize",wxGenericValidator(& winFlashSize));
 	BatConfigHandler.size = ch;
 	d->Connect(XRCID("SaveType"), wxEVT_COMMAND_CHOICE_SELECTED,
 		   wxCommandEventHandler(BatConfig_t::ChangeType),
@@ -2774,28 +2779,24 @@ bool MainFrame::InitMore(void)
 	d->Connect(XRCID("Detect"), wxEVT_COMMAND_BUTTON_CLICKED,
 		   wxCommandEventHandler(BatConfig_t::Detect),
 		   NULL, &BatConfigHandler);
-	getcbb("RTC", gopts.rtc);
-	getcbb("AGBPrinter", gopts.agbprint);
+	getcbi("RTC", rtcEnabled);
+	getcbi("AGBPrinter", agbPrint);
 
 	/// Speed
 	// AutoSkip/FrameSkip are 2 controls for 1 value.  Needs post-process
 	// to ensure checkbox not ignored
-	getcbie("FrameSkipAuto", gopts.gba_frameskip, -1);
-	getsc("FrameSkip", gopts.gba_frameskip);
+	getcbie("FrameSkipAuto", autoFrameSkip, -1);
+	getsc("FrameSkip", frameSkip);
 	addbier(sc, true);
 	getlab("FrameSkipLab");
 	addbier(lab, true);
 
 	/// Boot ROM
-	getcbbe("BootRomEn", gopts.gba_use_bios);
+	getcbie("BootRomEn", useBiosFileGBA, 1);
 	getfp("BootRom", gopts.gba_bios);
 	addbe(fp);
 	getlab("BootRomLab");
 	addbe(lab);
-	getcbb("SkipIntro", gopts.skip_intro);
-	addbe(cb);
-	// doesn't work right now
-	cb->Hide();
 
 	/// Game Overrides
 	getgbaw("GameSettings");
@@ -2812,19 +2813,19 @@ bool MainFrame::InitMore(void)
     {
         /// On-Screen Display
         ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "SpeedIndicator",wxGenericValidator(& gopts.osd_speed));
-        getcbb("NoStatusMsg", gopts.no_osd_status);
-        getcbb("Transparent", gopts.osd_transparent);
+        getcbi("NoStatusMsg", disableStatusMessages);
+        getcbi("Transparent", showSpeedTransparent);
 
         /// Zoom
         // this was a choice, but I'd rather not have to make an off-by-one
         // validator just for this, and spinctrl is good enough.
         getsc("DefaultScale", gopts.video_scale);
         getcbb("RetainAspect", gopts.retain_aspect);
-        getsc("MaxScale", gopts.max_scale);
+        getsc("MaxScale", maxScale);
         // fs modes should be filled in at popup time
         // since they may change based on what screen is current
         SafeXRCCTRL<wxChoice>(d, "FullscreenMode");
-        getcbb("Fullscreen", gopts.fullscreen);
+        getcbi("Fullscreen", fullScreen);
 
         /// Advanced
         getrbi("OutputSimple", gopts.render_method, RND_SIMPLE);
@@ -2841,7 +2842,7 @@ bool MainFrame::InitMore(void)
         rb->Hide();
 #endif
         getcbb("Bilinear", gopts.bilinear);
-        getcbb("VSync", gopts.vsync);
+        getcbi("VSync", vsync);
         // FIXME: make cb disabled when not GL or d3d
         int mthr = wxThread::GetCPUCount();
         if(mthr > 8)
@@ -2871,7 +2872,7 @@ bool MainFrame::InitMore(void)
         d->Fit();
     }
 
-    d=LoadXRCropertySheetDialog("SoundConfig");
+	d = LoadXRCropertySheetDialog("SoundConfig");
     wxSlider *sl;
 #define getsl(n, o) do { \
     sl=SafeXRCCTRL<wxSlider>(d, n); \
@@ -2918,7 +2919,7 @@ bool MainFrame::InitMore(void)
 #ifndef __WXMSW__
 	cb->Hide();
 #endif
-	getcbb("SyncGameAudio", synchronize);
+	getcbi("SyncGameAudio", synchronize);
 	getsl("Buffers", gopts.audio_buffers);
 	sound_config_handler.bufs = sl;
 	getlab("BuffersInfo");
@@ -2984,7 +2985,7 @@ bool MainFrame::InitMore(void)
 	cb->SetValidator(wxBoolIntValidator(&gopts.default_stick, i + 1));
 	wxWindow *prev = NULL, *prevp = NULL;
 	for(int j = 0; j < NUM_KEYS; j++) {
-	    wxJoyKeyTextCtrl *tc = XRCCTRL_D(*w, joynames[j], wxJoyKeyTextCtrl);
+		wxJoyKeyTextCtrl *tc = XRCCTRL_D(*w, wxString::FromUTF8(joynames[j]), wxJoyKeyTextCtrl);
 	    CheckThrowXRCError(tc,ToString(joynames[j]));
 	    wxWindow *p = tc->GetParent();
 	    if(p == prevp)
@@ -3140,7 +3141,7 @@ bool MainFrame::InitMore(void)
 #endif
 
     // delayed fullscreen
-    if(wxGetApp().pending_fullscreen || gopts.fullscreen)
+    if(wxGetApp().pending_fullscreen || fullScreen)
 	panel->ShowFullScreen(true);
 
 #ifndef NO_LINK

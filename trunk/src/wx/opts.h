@@ -2,7 +2,7 @@
 #define WX_OPTS_H
 
 #define NUM_KEYS 19
-extern const wxChar * const joynames[NUM_KEYS];
+extern const char * const joynames[NUM_KEYS];
 extern wxJoyKeyBinding defkeys[NUM_KEYS * 2]; // keyboard + joystick defaults
 
 extern struct opts_t {
@@ -12,44 +12,27 @@ extern struct opts_t {
 
     /// Display
     bool bilinear;
-    bool cpu_mmx;
-    bool no_osd_status;
     int filter;
     wxString filter_plugin;
     int ifb;
-    bool fullscreen;
     wxVideoMode fs_mode;
-    int max_scale;
     int max_threads;
     int render_method;
     int video_scale;
     int osd_speed;
     bool retain_aspect;
-    bool osd_transparent;
-    bool vsync;
 
     /// GB
-    bool gbBorderAutomatic;
     wxString gb_bios;
-    bool gbBorderOn;
-    int gbEmulatorType;
     bool gbprint; // gbSerialFunction
-    int gb_frameskip; // systemFrameSkip
     wxString gbc_bios;
-    bool gbc_use_bios;
     bool gbcColorOption;
-    int gbPaletteOption;
     // u16 systemGbPalette[8*3];
     bool print_auto_page, print_screen_cap;
     wxString gb_rom_dir;
-    bool gb_use_bios;
 
     /// GBA
-    bool agbprint; // AGBPrintEnable()
     wxString gba_bios;
-    bool rtc; // rtcEnable  // has per-game override
-    int flash_size; // flashSetSize  // has per-game override
-    int gba_frameskip; // systemFrameSkip
     bool gba_joybus_enabled;
     wxString joybus_host;
     bool gba_link_enabled;
@@ -59,25 +42,16 @@ extern struct opts_t {
     bool rfu_enabled;
     int linktimeout;
     wxString gba_rom_dir;
-    bool skip_intro;
-    int save_type; // cpuSaveType
-    bool gba_use_bios;
 
     /// General
-    bool apply_patches;
     bool autoload_state, autoload_cheats;
     wxString battery_dir;
-    int cap_format;
-    bool cheatsEnabled;
     bool recent_freeze;
-    bool defocus_pause;
     wxString recording_dir;
     int rewind_interval;
     wxString scrshot_dir;
-    bool skipBios;
     wxString state_dir;
     bool skipSaveGameBattery, skipSaveGameCheats;
-    int throttle; // updateThrottle()
 
     /// Joypad
     wxJoyKeyBinding_v joykey_bindings[4][NUM_KEYS];
@@ -101,7 +75,6 @@ extern struct opts_t {
     int gb_stereo;
     bool gb_effects_config_surround;
     int sound_qual; // soundSetSampleRate() / gbSoundSetSampleRate()
-    bool synchronize;
     int sound_vol; // soundSetVolume()
     bool upmix; // xa2 only
 

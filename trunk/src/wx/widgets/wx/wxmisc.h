@@ -109,7 +109,7 @@ class wxBoolEnValidator : public wxGenericValidator
 {
 public:
     wxBoolEnValidator(bool *vptr) : wxGenericValidator(vptr) {}
-    wxBoolEnValidator(bool *vptr, wxWindow_v &cnt, std::vector<bool>rev = std::vector<bool>()) :
+    wxBoolEnValidator(bool *vptr, wxWindow_v &cnt, std::vector<int>rev = std::vector<int>()) :
 	wxGenericValidator(vptr), controls(cnt), reverse(rev) {}
     wxBoolEnValidator(const wxBoolEnValidator &v) : wxGenericValidator(v),
 	controls(v.controls), reverse(v.reverse) {}
@@ -118,7 +118,7 @@ public:
     wxWindow_v controls;
     // set reverse entries to true if disabled when checkbox checked
     // controls past the end of the reverse array are not reversed
-    std::vector<bool> reverse;
+    std::vector<int> reverse;
     // inherit validate, xferfrom from parent
     bool TransferToWindow();
 };
@@ -129,7 +129,7 @@ public:
     wxBoolIntEnValidator(int *vptr, int val, int mask = ~0) :
 	wxBoolIntValidator(vptr, val, mask) {}
     wxBoolIntEnValidator(int *vptr, int val, int mask, wxWindow_v &cnt,
-		      std::vector<bool>rev = std::vector<bool>()) :
+		      std::vector<int>rev = std::vector<int>()) :
 	wxBoolIntValidator(vptr, val, mask), controls(cnt), reverse(rev) {}
     wxBoolIntEnValidator(const wxBoolIntEnValidator &v) :
 	wxBoolIntValidator(v), controls(v.controls), reverse(v.reverse) {}
@@ -138,7 +138,7 @@ public:
     wxWindow_v controls;
     // set reverse entries to true if disabled when checkbox checked
     // controls past the end of the reverse array are not reversed
-    std::vector<bool> reverse;
+    std::vector<int> reverse;
     // inherit validate, xferfrom from parent
     bool TransferToWindow();
 };
@@ -147,7 +147,7 @@ class wxBoolRevEnValidator : public wxBoolRevValidator
 {
 public:
     wxBoolRevEnValidator(bool *vptr) : wxBoolRevValidator(vptr) {}
-    wxBoolRevEnValidator(bool *vptr, wxWindow_v &cnt, std::vector<bool>rev = std::vector<bool>()) :
+    wxBoolRevEnValidator(bool *vptr, wxWindow_v &cnt, std::vector<int>rev = std::vector<int>()) :
 	wxBoolRevValidator(vptr), controls(cnt), reverse(rev) {}
     wxBoolRevEnValidator(const wxBoolRevEnValidator &v) : wxBoolRevValidator(v),
 	controls(v.controls), reverse(v.reverse) {}
@@ -156,7 +156,7 @@ public:
     wxWindow_v controls;
     // set reverse entries to true if disabled when checkbox checked
     // controls past the end of the reverse array are not reversed
-    std::vector<bool> reverse;
+    std::vector<int> reverse;
     // inherit validate, xferfrom from parent
     bool TransferToWindow();
 };
@@ -169,7 +169,7 @@ class wxBoolEnHandler : public wxEvtHandler
 {
 public:
     wxWindow_v controls;
-    std::vector<bool> reverse;
+    std::vector<int> reverse;
     void ToggleCheck(wxCommandEvent &ev);
     void Enable(wxCommandEvent &ev);
     void Disable(wxCommandEvent &ev);

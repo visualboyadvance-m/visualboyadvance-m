@@ -1,6 +1,8 @@
 #include "wxvbam.h"
 #include <algorithm>
 #include <wx/display.h>
+#include "../common/ConfigManager.h"
+
 /*
  *     disableSfx(F) -> cpuDisableSfx
  *     priority(2) -> threadPriority
@@ -99,13 +101,13 @@ const int num_def_accels = sizeof(default_accels)/sizeof(default_accels[0]);
 
 // Note: this must match GUI widget names or GUI won't work
 // This table's order determines tab order as well
-const wxChar * const joynames[NUM_KEYS] = {
-    wxT("Up"),       wxT("Down"),       wxT("Left"),       wxT("Right"),
-    wxT("A"),        wxT("B"),          wxT("L"),          wxT("R"),
-    wxT("Select"),   wxT("Start"),
-    wxT("MotionUp"), wxT("MotionDown"), wxT("MotionLeft"), wxT("MotionRight"),
-    wxT("AutoA"),    wxT("AutoB"),
-    wxT("Speed"),    wxT("Capture"),    wxT("GS")
+const char * const joynames[NUM_KEYS] = {
+    ("Up"),       ("Down"),       ("Left"),       ("Right"),
+    ("A"),        ("B"),          ("L"),          ("R"),
+    ("Select"),   ("Start"),
+    ("MotionUp"), ("MotionDown"), ("MotionLeft"), ("MotionRight"),
+    ("AutoA"),    ("AutoB"),
+    ("Speed"),    ("Capture"),    ("GS")
 };
 
 wxJoyKeyBinding defkeys[NUM_KEYS * 2] = {
@@ -126,25 +128,61 @@ wxAcceleratorEntry_v sys_accels;
 // Note: this table must be sorted in option name order
 // Both for better user display and for (fast) searching by name
 opt_desc opts[] = {
-  
+	// Core
+#ifdef MMX
+	INTOPT("preferences/disableMMX", wxTRANSLATE("Enable MMX"), disableMMX, 0, 1),
+#endif
+	INTOPT("preferences/disableStatus", wxTRANSLATE("Disable on-screen status messages"), disableStatusMessages, 0, 1),
+	INTOPT("preferences/fullScreen", wxTRANSLATE("Enter fullscreen mode at startup"), fullScreen, 0, 1),
+	INTOPT("preferences/maxScale", wxTRANSLATE("Maximum scale factor (0 = no limit)"), maxScale, 0, 100),
+	INTOPT("preferences/showSpeedTransparent", wxTRANSLATE("Draw on-screen messages transparently"), showSpeedTransparent, 0, 1),
+	INTOPT("preferences/vsync", wxTRANSLATE("Wait for vertical sync"), vsync, 0, 1),
+	INTOPT("preferences/agbPrint", wxTRANSLATE("Enable AGB printer"), agbPrint, 0, 1),
+	INTOPT("preferences/rtcEnabled", wxTRANSLATE("Enable RTC (vba-over.ini override is rtcEnabled"), rtcEnabled, 0, 1),
+	ENUMOPT("preferences/saveType", wxTRANSLATE("Native save (\"battery\") hardware type (vba-over.ini override is saveType integer 0-5)"), cpuSaveType, wxTRANSLATE("auto|eeprom|sram|flash|eeprom+sensor|none")),
+	INTOPT("preferences/useBiosGBA", wxTRANSLATE("Use the specified BIOS file"), useBiosFileGBA, 0, 1),
+	INTOPT("preferences/pauseWhenInactive", wxTRANSLATE("Pause game when main window loses focus"), pauseWhenInactive, 0, 1),
+	INTOPT("preferences/synchronize", wxTRANSLATE("Synchronize game to audio"), synchronize, 0, 1),
+	INTOPT("preferences/fsColorDepth", wxTRANSLATE("Fullscreen mode color depth (0 = any)"), fsColorDepth, 0, 999),
+	INTOPT("preferences/fsFrequency", wxTRANSLATE("Fullscreen mode frequency (0 = any)"), fsFrequency, 0, 999),
+	INTOPT("preferences/fsHeight", wxTRANSLATE("Fullscreen mode height (0 = desktop)"), fsHeight, 0, 99999),
+	INTOPT("preferences/fsWidth", wxTRANSLATE("Fullscreen mode width (0 = desktop)"), fsWidth, 0, 99999),
+	ENUMOPT("preferences/showSpeed", wxTRANSLATE("Show speed indicator"), showSpeed, wxTRANSLATE("no|percent|detailed")),
+	INTOPT("preferences/borderAutomatic", wxTRANSLATE("Automatically enable border for Super GameBoy games"), gbBorderAutomatic, 0, 1),
+	//STROPT("preferences/biosFileGB", wxTRANSLATE("BIOS file to use for GB, if enabled"), wxString::FromUTF8(biosFileNameGB)),
+	INTOPT("preferences/borderOn", wxTRANSLATE("Always enable border"), gbBorderOn, 0, 1),
+	ENUMOPT("preferences/emulatorType", wxTRANSLATE("Type of system to emulate"), gbEmulatorType, wxTRANSLATE("auto|gba|gbc|sgb|sgb2|gb")),
+	INTOPT("preferences/gbFrameSkip", wxTRANSLATE("Skip frames.  Values are 0-9 or -1 to skip automatically based on time."), gbFrameSkip, -1, 9),
+	ENUMOPT("preferences/gbPaletteOption", wxTRANSLATE("The palette to use"), gbPaletteOption, wxTRANSLATE("default|user1|user2")),
+	//STROPT("preferences/romDirGB", wxTRANSLATE("Directory to look for ROM files"), wxString::FromUTF8(romDirGB)),
+	INTOPT("preferences/useBiosFileGB", wxTRANSLATE("Use the specified BIOS file for GB"), useBiosFileGB, 0, 1),
+	//STROPT("preferences/biosFileGBA", wxTRANSLATE("BIOS file to use, if enabled"), wxString::FromUTF8(biosFileNameGBA)),
+	ENUMOPT("preferences/flashSize", wxTRANSLATE("Flash size (kb) (vba-over.ini override is flashSize in bytes)"), optFlashSize, wxTRANSLATE("64|128")),
+	INTOPT("preferences/frameSkip", wxTRANSLATE("Skip frames.  Values are 0-9 or -1 to skip automatically based on time."), frameSkip, -1, 9),
+	//STROPT("preferences/romDirGBA", wxTRANSLATE("Directory to look for ROM files"), wxString::FromUTF8(romDirGBA)),
+	INTOPT("preferences/autoPatch", wxTRANSLATE("Apply IPS/UPS/IPF patches if found"), autoPatch, 0, 1),
+	//STROPT("preferences/batteryDir", wxTRANSLATE("Directory to store game save files (relative paths are relative to ROM; blank is config dir)"), wxString::FromUTF8(batteryDir)),
+	INTOPT("preferences/autoSaveCheatList", wxTRANSLATE("Automatically save and load cheat list"), autoSaveLoadCheatList, 0, 1),
+	ENUMOPT("preferences/captureFormat", wxTRANSLATE("Screen capture file format"), captureFormat, wxTRANSLATE("png|bmp")),
+	INTOPT("preferences/cheatsEnabled", wxTRANSLATE("Enable cheats"), cheatsEnabled, 0, 1),
+	//STROPT("preferences/aviRecordDir", wxTRANSLATE("Directory to store A/V and game recordings (relative paths are relative to ROM)"), wxString::FromUTF8(aviRecordDir)),
+	//STROPT("preferences/screenShotDir", wxTRANSLATE("Directory to store screenshots (relative paths are relative to ROM)"), wxString::FromUTF8(screenShotDir)),
+	INTOPT("preferences/skipBios", wxTRANSLATE("Skip BIOS initialization"), skipBios, 0, 1),
+	INTOPT("preferences/throttle", wxTRANSLATE("Throttle game speed, even when accelerated (0-1000%, 0 = disabled)"), throttle, 0, 1000),
+	INTOPT("preferences/skipSaveGameBattery", wxTRANSLATE("Do not overwrite native (battery) save when loading state"), skipSaveGameBattery, 0, 1),
+	INTOPT("preferences/useBiosGBC", wxTRANSLATE("Use the specified BIOS file for GBC"), useBiosFileGBC, 0, 1),
+	//STROPT("preferences/saveDir", wxTRANSLATE("Directory to store saved state files (relative paths are relative to BatteryDir)"), wxString::FromUTF8(saveDir)),
+	//STROPT("preferences/biosFileGBC", wxTRANSLATE("BIOS file to use for GBC, if enabled"), wxString::FromUTF8(biosFileNameGBC)),
+
+
     /// Display
     BOOLOPT("Display/Bilinear", wxTRANSLATE("Use bilinear filter with 3d renderer"), gopts.bilinear),
-    BOOLOPT("Display/DisableStatus", wxTRANSLATE("Disable on-screen status messages"), gopts.no_osd_status),
-#ifdef MMX
-    BOOLOPT("Display/EnableMMX", wxTRANSLATE("Enable MMX"), gopts.cpu_mmx),
-#endif
     ENUMOPT("Display/Filter", wxTRANSLATE("Full-screen filter to apply"), gopts.filter,
 	    wxTRANSLATE("none|2xsai|super2xsai|supereagle|pixelate|advmame|"
 			L"bilinear|bilinearplus|scanlines|tvmode|hq2x|lq2x|"
 			L"simple2x|simple3x|hq3x|simple4x|hq4x|xbrz|plugin")),
 	STROPT ("Display/FilterPlugin", wxTRANSLATE("Filter plugin library"), gopts.filter_plugin),
-    BOOLOPT("Display/Fullscreen", wxTRANSLATE("Enter fullscreen mode at startup"), gopts.fullscreen),
-    INTOPT ("Display/FullscreenDepth", wxTRANSLATE("Fullscreen mode color depth (0 = any)"), gopts.fs_mode.bpp, 0, 999),
-    INTOPT ("Display/FullscreenFreq", wxTRANSLATE("Fullscreen mode frequency (0 = any)"), gopts.fs_mode.refresh, 0, 999),
-    INTOPT ("Display/FullscreenHeight", wxTRANSLATE("Fullscreen mode height (0 = desktop)"), gopts.fs_mode.h, 0, 99999),
-    INTOPT ("Display/FullscreenWidth", wxTRANSLATE("Fullscreen mode width (0 = desktop)"), gopts.fs_mode.w, 0, 99999),
     ENUMOPT("Display/IFB", wxTRANSLATE("Interframe blending function"), gopts.ifb, wxTRANSLATE("none|smart|motionblur")),
-    INTOPT ("Display/MaxScale", wxTRANSLATE("Maximum scale factor (0 = no limit)"), gopts.max_scale, 0, 100),
     INTOPT ("Display/MaxThreads", wxTRANSLATE("Maximum number of threads to run filters in"), gopts.max_threads, 1, 8),
 #ifdef __WXMSW__
 	ENUMOPT("Display/RenderMethod", wxTRANSLATE("Render method; if unsupported, simple method will be used"), gopts.render_method, wxTRANSLATE("simple|opengl|cairo|direct3d")),
@@ -152,36 +190,22 @@ opt_desc opts[] = {
 	ENUMOPT("Display/RenderMethod", wxTRANSLATE("Render method; if unsupported, simple method will be used"), gopts.render_method, wxTRANSLATE("simple|opengl|cairo")),
 #endif
     INTOPT ("Display/Scale", wxTRANSLATE("Default scale factor"), gopts.video_scale, 1, 6),
-    ENUMOPT("Display/ShowSpeed", wxTRANSLATE("Show speed indicator"), gopts.osd_speed, wxTRANSLATE("no|percent|detailed")),
     BOOLOPT("Display/Stretch", wxTRANSLATE("Retain aspect ratio when resizing"), gopts.retain_aspect),
-    BOOLOPT("Display/Transparent", wxTRANSLATE("Draw on-screen messages transparently"), gopts.osd_transparent),
-    BOOLOPT("Display/Vsync", wxTRANSLATE("Wait for vertical sync"), gopts.vsync),
     
     /// GB
-    BOOLOPT("GB/AutomaticBorder", wxTRANSLATE("Automatically enable border for Super GameBoy games"), gopts.gbBorderAutomatic),
     STROPT ("GB/BiosFile", wxTRANSLATE("BIOS file to use for GB, if enabled"), gopts.gb_bios),
-    BOOLOPT("GB/Border", wxTRANSLATE("Always enable border"), gopts.gbBorderOn),
-    ENUMOPT("GB/EmulatorType", wxTRANSLATE("Type of system to emulate"), gopts.gbEmulatorType, wxTRANSLATE("auto|gba|gbc|sgb|sgb2|gb")),
     BOOLOPT("GB/EnablePrinter", wxTRANSLATE("Enable printer emulation"), gopts.gbprint),
-    INTOPT ("GB/FrameSkip", wxTRANSLATE("Skip frames.  Values are 0-9 or -1 to skip automatically based on time."), gopts.gb_frameskip, -1, 9),
     STROPT ("GB/GBCBiosFile", wxTRANSLATE("BIOS file to use for GBC, if enabled"), gopts.gbc_bios),
-    BOOLOPT("GB/GBCUseBiosFile", wxTRANSLATE("Use the specified BIOS file for GBC"), gopts.gbc_use_bios),
     BOOLOPT("GB/LCDColor", wxTRANSLATE("Emulate washed colors of LCD"), gopts.gbcColorOption),
-    ENUMOPT("GB/Palette", wxTRANSLATE("The palette to use"), gopts.gbPaletteOption, wxTRANSLATE("default|user1|user2")),
     {   wxT("GB/Palette0"), wxTRANSLATE("The default palette, as 8 comma-separated 4-digit hex integers (rgb555).") },
     {   wxT("GB/Palette1"), wxTRANSLATE("The first user palette, as 8 comma-separated 4-digit hex integers (rgb555).") },
     {   wxT("GB/Palette2"), wxTRANSLATE("The second user palette, as 8 comma-separated 4-digit hex integers (rgb555).") },
     BOOLOPT("GB/PrintAutoPage", wxTRANSLATE("Automatically gather a full page before printing"), gopts.print_auto_page),
     BOOLOPT("GB/PrintScreenCap", wxTRANSLATE("Automatically save printouts as screen captures with -print suffix"), gopts.print_screen_cap),
     STROPT ("GB/ROMDir", wxTRANSLATE("Directory to look for ROM files"), gopts.gb_rom_dir),
-    BOOLOPT("GB/UseBiosFile", wxTRANSLATE("Use the specified BIOS file for GB"), gopts.gb_use_bios),
     
     /// GBA
-    BOOLOPT("GBA/AGBPrinter", wxTRANSLATE("Enable AGB printer"), gopts.agbprint),
     STROPT ("GBA/BiosFile", wxTRANSLATE("BIOS file to use, if enabled"), gopts.gba_bios),
-    BOOLOPT("GBA/EnableRTC", wxTRANSLATE("Enable RTC (vba-over.ini override is rtcEnabled"), gopts.rtc),
-    ENUMOPT("GBA/FlashSize", wxTRANSLATE("Flash size (kb) (vba-over.ini override is flashSize in bytes)"), gopts.flash_size, wxTRANSLATE("64|128")),
-    INTOPT ("GBA/FrameSkip", wxTRANSLATE("Skip frames.  Values are 0-9 or -1 to skip automatically based on time."), gopts.gba_frameskip, -1, 9),
 #ifndef NO_LINK
     BOOLOPT("GBA/Joybus", wxTRANSLATE("Enable joybus"), gopts.gba_joybus_enabled),
     STROPT ("GBA/JoybusHost", wxTRANSLATE("Joybus host address"), gopts.joybus_host),
@@ -193,26 +217,16 @@ opt_desc opts[] = {
     INTOPT ("GBA/LinkTimeout", wxTRANSLATE("Link timeout (ms)"), gopts.linktimeout, 0, 9999999),
 #endif
     STROPT ("GBA/ROMDir", wxTRANSLATE("Directory to look for ROM files"), gopts.gba_rom_dir),
-    ENUMOPT("GBA/SaveType", wxTRANSLATE("Native save (\"battery\") hardware type (vba-over.ini override is saveType integer 0-5)"), gopts.save_type, wxTRANSLATE("auto|eeprom|sram|flash|eeprom+sensor|none")),
-    BOOLOPT("GBA/UseBiosFile", wxTRANSLATE("Use the specified BIOS file"), gopts.gba_use_bios),
     
     /// General
-    BOOLOPT("General/ApplyPatches", wxTRANSLATE("Apply IPS/UPS/IPF patches if found"), gopts.apply_patches),
     BOOLOPT("General/AutoLoadLastState", wxTRANSLATE("Automatically load last saved state"), gopts.autoload_state),
-    BOOLOPT("General/AutoSaveCheatList", wxTRANSLATE("Automatically save and load cheat list"), gopts.autoload_cheats),
     STROPT ("General/BatteryDir", wxTRANSLATE("Directory to store game save files (relative paths are relative to ROM; blank is config dir)"), gopts.battery_dir),
-    ENUMOPT("General/CaptureFormat", wxTRANSLATE("Screen capture file format"), gopts.cap_format, wxTRANSLATE("png|bmp")),
-    BOOLOPT("General/EnableCheats", wxTRANSLATE("Enable cheats"), gopts.cheatsEnabled),
     BOOLOPT("General/FreezeRecent", wxTRANSLATE("Freeze recent load list"), gopts.recent_freeze),
-    BOOLOPT("General/PauseWhenInactive", wxTRANSLATE("Pause game when main window loses focus"), gopts.defocus_pause),
     STROPT ("General/RecordingDir", wxTRANSLATE("Directory to store A/V and game recordings (relative paths are relative to ROM)"), gopts.recording_dir),
     INTOPT ("General/RewindInterval", wxTRANSLATE("Number of seconds between rewind snapshots (0 to disable)"), gopts.rewind_interval, 0, 600),
     STROPT ("General/ScreenshotDir", wxTRANSLATE("Directory to store screenshots (relative paths are relative to ROM)"), gopts.scrshot_dir),
-    BOOLOPT("General/SkipBios", wxTRANSLATE("Skip BIOS initialization"), gopts.skipBios),
     STROPT ("General/StateDir", wxTRANSLATE("Directory to store saved state files (relative paths are relative to BatteryDir)"), gopts.state_dir),
-    BOOLOPT("General/StateLoadNoBattery", wxTRANSLATE("Do not overwrite native (battery) save when loading state"), gopts.skipSaveGameBattery),
     BOOLOPT("General/StateLoadNoCheat", wxTRANSLATE("Do not overwrite cheat list when loading state"), gopts.skipSaveGameCheats),
-    INTOPT ("General/Throttle", wxTRANSLATE("Throttle game speed, even when accelerated (0-1000%, 0 = disabled)"), gopts.throttle, 0, 1000),
     
     /// Joypad
     {   wxT("Joypad/*/*"), wxTRANSLATE("The parameter Joypad/<n>/<button> contains a comma-separated list of key names which map to joypad #<n> button <button>.  Button is one of Up, Down, Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Speed, Capture, GS") },
@@ -240,7 +254,6 @@ opt_desc opts[] = {
     INTOPT ("Sound/GBStereo", wxTRANSLATE("GB stereo effect (%)"), gopts.gb_stereo, 0, 100),
     BOOLOPT("Sound/GBSurround", wxTRANSLATE("GB surround sound effect (%)"), gopts.gb_effects_config_surround),
     ENUMOPT("Sound/Quality", wxTRANSLATE("Sound sample rate (kHz)"), gopts.sound_qual, wxTRANSLATE("48|44|22|11")),
-    BOOLOPT("Sound/Synchronize", wxTRANSLATE("Synchronize game to audio"), gopts.synchronize),
     INTOPT ("Sound/Volume", wxTRANSLATE("Sound volume (%)"), gopts.sound_vol, 0, 200)
 };
 const int num_opts = sizeof(opts)/sizeof(opts[0]);
@@ -250,8 +263,8 @@ const int num_opts = sizeof(opts)/sizeof(opts[0]);
 // the default value of every non-object to be 0.
 opts_t::opts_t()
 {
-    gba_frameskip = -1;
-    gb_frameskip = -1;
+    frameSkip = -1;
+    gbFrameSkip = -1;
 #ifdef __WXMSW__
     audio_api = AUD_DIRECTSOUND;
 #endif
@@ -281,7 +294,7 @@ opts_t::opts_t()
     recent = new wxFileHistory(10);
     autofire_rate = 1;
     gbprint = print_auto_page = true;
-    apply_patches = true;
+	autoPatch = true;
 }
 
 // for binary_search() and friends
@@ -308,7 +321,7 @@ void load_opts()
     // change after lang change
     // instead, translate when presented to user
 
-    wxConfig *cfg = wxGetApp().cfg;
+    wxFileConfig *cfg = wxGetApp().cfg;
     cfg->SetPath(wxT("/"));
 
     // enure there are no unknown options present
@@ -319,7 +332,7 @@ void load_opts()
     bool cont;
     for(cont = cfg->GetFirstEntry(s, grp_idx); cont;
 	cont = cfg->GetNextEntry(s, grp_idx)) {
-	wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
+	//wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
 	item_del.push_back(s);
     }
     for(cont = cfg->GetFirstGroup(s, grp_idx); cont;
@@ -347,7 +360,7 @@ void load_opts()
 		for(cont = cfg->GetFirstGroup(e, key_idx); cont;
 		    cont = cfg->GetNextGroup(e, key_idx)) {
 		    s.append(e);
-		    wxLogWarning(_("Invalid option group %s present; removing if possible"), s.c_str());
+		    //wxLogWarning(_("Invalid option group %s present; removing if possible"), s.c_str());
 		    grp_del.push_back(s);
 		    s.resize(poff2);
 		}
@@ -355,11 +368,11 @@ void load_opts()
 		    cont = cfg->GetNextEntry(e, key_idx)) {
 		    int i;
 		    for(i = 0; i < NUM_KEYS; i++)
-			if(e == joynames[i])
-			    break;
+				if (e == wxString::FromUTF8(joynames[i]))
+					break;
 		    if(i == NUM_KEYS) {
 			s.append(e);
-			wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
+			//wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
 			item_del.push_back(s);
 			s.resize(poff2);
 		    }
@@ -370,7 +383,7 @@ void load_opts()
 	    } else {
 		s.append(wxT('/'));
 		s.append(e);
-		wxLogWarning(_("Invalid option group %s present; removing if possible"), s.c_str());
+		//wxLogWarning(_("Invalid option group %s present; removing if possible"), s.c_str());
 		grp_del.push_back(s);
 		s.resize(poff);
 	    }
@@ -383,7 +396,7 @@ void load_opts()
 		if(!std::binary_search(&cmdtab[0], &cmdtab[ncmds], dummy, cmditem_lt)) {
 		    s.append(wxT('/'));
 		    s.append(e);
-		    wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
+		    //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
 		    item_del.push_back(s);
 		    s.resize(poff);
 		}
@@ -392,7 +405,7 @@ void load_opts()
 		s.append(e);
 		const opt_desc dummy = { s.c_str() };
 		if(!std::binary_search(&opts[0], &opts[num_opts], dummy, opt_lt)) {
-		    wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
+		    //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
 		    item_del.push_back(s);
 		}
 		s.resize(poff);
@@ -542,7 +555,7 @@ void load_opts()
 // Note: run load_opts() first to guarantee all config opts exist
 void update_opts()
 {
-    wxConfig *cfg = wxGetApp().cfg;
+	wxFileConfig *cfg = wxGetApp().cfg;
     for(int i = 0; i < num_opts; i++) {
 	opt_desc &opt = opts[i];
 	if(opt.stropt) {
@@ -757,8 +770,8 @@ bool opt_set(const wxChar *name, const wxChar *val)
 	    int jno = slat[1] - wxT('1');
 	    int kno;
 	    for(kno = 0; kno < NUM_KEYS; kno++)
-		if(!wxStrcmp(joynames[kno], slat + 3))
-		    break;
+			if (!wxStrcmp(wxString::FromUTF8(joynames[kno]), slat + 3))
+				break;
 	    if(kno == NUM_KEYS)
 		return false;
 	    if(!*val)

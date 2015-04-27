@@ -20,7 +20,7 @@
 
 // The built-in vba-over.ini
 #include "builtin-over.h"
-#include "common/ConfigManager.h"
+#include "../common/ConfigManager.h"
 
 IMPLEMENT_APP(wxvbamApp)
 IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
@@ -43,6 +43,7 @@ static void get_config_path(wxPathList &path, bool exists = true)
     add_path(GetResourcesDir());
     add_path(GetDataDir());
     add_path(GetLocalDataDir());
+	add_path(GetPluginsDir());
 }
 
 static void tack_full_path(wxString &s, const wxString &app = wxEmptyString)
@@ -90,7 +91,7 @@ bool wxvbamApp::OnInit()
 	    // *.xr[cs] doesn't work (double the number of scans)
 	    // 2.9 gives errors for no files found, so manual precheck needed
 	    // (yet another double the number of scans)
-	    if(!wxFindFirstFile(wxT("*.xrc")).empty())
+		if (!wxFindFirstFile(wxT("*.xrc")).empty())
 		xr->Load(wxT("*.xrc"));
 	    if(!wxFindFirstFile(wxT("*.xrs")).empty())
 		xr->Load(wxT("*.xrs"));
@@ -104,13 +105,19 @@ bool wxvbamApp::OnInit()
     // this needs to be in a subdir to support other config as well
     // but subdir flag behaves differently 2.8 vs. 2.9.  Oh well.
     // NOTE: this does not support XDG (freedesktop.org) paths
-    cfg = new wxConfig(wxEmptyString, wxEmptyString, wxEmptyString,
+#ifdef __WXMSW__
+	cfg = new wxFileConfig(wxT("vbam"), wxEmptyString,
+		wxStandardPaths::Get().GetPluginsDir() + _T("\\vbam.ini"),
+		wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
+#else
+	cfg = new wxFileConfig(wxEmptyString, wxEmptyString, wxEmptyString,
 		       wxEmptyString,
 		       // style =
 		       wxCONFIG_USE_GLOBAL_FILE|wxCONFIG_USE_LOCAL_FILE|
 		         wxCONFIG_USE_SUBDIR);
+#endif
     // set global config for e.g. Windows font mapping
-    wxConfig::Set(cfg);
+	wxFileConfig::Set(cfg);
     // yet another bug/deficiency in wxConfig: dirs are not created if needed
     // since a default config is always written, dirs are always needed
     // Can't figure out statically if using wxFileConfig w/o duplicating wx's
@@ -390,10 +397,10 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser &cl)
 	}
     }
 
-	home = strdup((const char*)argv[0].mb_str(wxConvUTF8));
+	home = strdup((const char*)wxApp::argv[0]);
 	SetHome(home);
 	LoadConfig(); // Parse command line arguments (overrides ini)
-	ReadOpts(argc, argv);
+	ReadOpts(argc, (char**)argv);
     return true;
 }
 

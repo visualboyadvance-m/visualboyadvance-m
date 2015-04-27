@@ -1,5 +1,6 @@
 #include "wxvbam.h"
 #include "viewsupt.h"
+#include "..\common\ConfigManager.h"
 
 namespace Viewers
 {
@@ -1016,13 +1017,13 @@ namespace Viewers
 	// it's just a suggested name, anyway
 	wxString def_name = panel->game_name() + wxT('-') + dname;
 	def_name.resize(def_name.size() - 6); // strlen("Viewer")
-	if(gopts.cap_format)
+	if(captureFormat)
 	    def_name += wxT(".bmp");
 	else
 	    def_name += wxT(".png");
 	wxFileDialog dlg(GetGrandParent(), _("Select output file"), bmp_save_dir, def_name,
 			 _("PNG images|*.png|BMP images|*.bmp"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
-	dlg.SetFilterIndex(gopts.cap_format);
+	dlg.SetFilterIndex(captureFormat);
 	int ret = dlg.ShowModal();
 	bmp_save_dir = dlg.GetDirectory();
 	if(ret != wxID_OK)

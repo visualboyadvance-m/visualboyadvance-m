@@ -107,7 +107,7 @@ EVT_HANDLER(RecentReset, "Reset recent ROM list")
     if(gopts.recent->GetCount()) {
 	while(gopts.recent->GetCount())
 	    gopts.recent->RemoveFileFromHistory(0);
-	wxConfig *cfg = wxGetApp().cfg;
+	wxFileConfig *cfg = wxGetApp().cfg;
 	cfg->SetPath(wxT("/Recent"));
 	gopts.recent->Save(*cfg);
 	cfg->SetPath(wxT("/"));
@@ -863,13 +863,13 @@ EVT_HANDLER_MASK(ScreenCapture, "Screen capture...", CMDEN_GB|CMDEN_GBA)
 	}
     }
     wxString def_name = panel->game_name();
-    if(gopts.cap_format == 0)
+    if(captureFormat == 0)
 	def_name.append(wxT(".png"));
     else
 	def_name.append(wxT(".bmp"));
     wxFileDialog dlg(this, _("Select output file"), scap_path, def_name,
 		     _("PNG images|*.png|BMP images|*.bmp"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
-    dlg.SetFilterIndex(gopts.cap_format);
+    dlg.SetFilterIndex(captureFormat);
     int ret = ShowModal(&dlg);
     scap_path = dlg.GetDirectory();
     if(ret != wxID_OK)
@@ -1119,7 +1119,7 @@ EVT_HANDLER(Pause, "Pause (toggle)")
     else if(!IsPaused())
 	panel->Resume();
     // undo next-frame's zeroing of frameskip
-    int fs = panel->game_type() == IMAGE_GB ? gopts.gb_frameskip : gopts.gba_frameskip;
+    int fs = panel->game_type() == IMAGE_GB ? gbFrameSkip : frameSkip;
     if(fs > 0)
 	systemFrameSkip = fs;
 }
@@ -1751,7 +1751,7 @@ EVT_HANDLER(GeneralConfigure, "General options...")
     if(ShowModal(dlg) == wxID_OK)
 	update_opts();
     if(panel->game_type() != IMAGE_UNKNOWN)
-	soundSetThrottle(gopts.throttle);
+	soundSetThrottle(throttle);
     if(rew != gopts.rewind_interval) {
 	if(!gopts.rewind_interval) {
 	    if(panel->num_rewind_states) {
@@ -1796,7 +1796,7 @@ EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
     }
     // this value might have been overwritten by FrameSkip
     if(XRCCTRL(*dlg, "FrameSkipAuto", wxCheckBox)->GetValue())
-	gopts.gb_frameskip = -1;
+	gbFrameSkip = -1;
     update_opts();
     if(panel->game_type() == IMAGE_GB) {
 	if(borderon != gbBorderOn) {
@@ -1807,8 +1807,8 @@ EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
 		panel->DelBorder();
 	}
 	// autoskip will self-adjust
-	if(gopts.gb_frameskip >= 0)
-	    systemFrameSkip = gopts.gb_frameskip;
+	if(gbFrameSkip >= 0)
+	    systemFrameSkip = gbFrameSkip;
 	// don't want to have to reset to change colors
 	memcpy(gbPalette, &systemGbPalette[gbPaletteOption * 8], 8 * sizeof(systemGbPalette[0]));
     }
@@ -1862,13 +1862,13 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
 	return;
     // this value might have been overwritten by FrameSkip
     if(XRCCTRL(*dlg, "FrameSkipAuto", wxCheckBox)->GetValue())
-	gopts.gba_frameskip = -1;
+	frameSkip = -1;
     update_opts();
     if(panel->game_type() == IMAGE_GBA) {
 	// autoskip will self-adjust
-	if(gopts.gba_frameskip >= 0)
-	    systemFrameSkip = gopts.gba_frameskip;
-	agbPrintEnable(gopts.agbprint);
+	if(frameSkip >= 0)
+	    systemFrameSkip = frameSkip;
+	agbPrintEnable(agbPrint);
 #if 0 // disabled in win32 version for undocumented "problems"
 	if(gopts.skip_intro)
 	    *((u32 *)rom) = 0xea00002e;
@@ -1971,7 +1971,7 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
 
 EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
 {
-    bool fs = gopts.fullscreen;
+    bool fs = fullScreen;
     wxVideoMode dm = gopts.fs_mode;
     
     if(gopts.max_threads != 1)
@@ -1987,9 +1987,9 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
 		return;
     update_opts();
     
-    if(fs != gopts.fullscreen)
+    if(fs != fullScreen)
 	{
-		panel->ShowFullScreen(gopts.fullscreen);
+		panel->ShowFullScreen(fullScreen);
     }
     else if(panel->IsFullScreen() && dm != gopts.fs_mode)
     {
