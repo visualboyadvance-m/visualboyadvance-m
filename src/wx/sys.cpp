@@ -316,7 +316,7 @@ int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 void system10Frames(int rate)
 {
     GameArea *panel = wxGetApp().frame->GetPanel();
-    int fs = panel->game_type() == IMAGE_GB ? gopts.gb_frameskip : gopts.gba_frameskip;
+    int fs = panel->game_type() == IMAGE_GB ? gbFrameSkip : frameSkip;
     if(fs < 0) {
 	// I don't know why this algorithm isn't in common somewhere
 	// as is, I copied it from SDL
@@ -384,7 +384,7 @@ void systemScreenCapture(int num)
 	wxString bfn;
 	bfn.Printf(wxT("%s%02d"), panel->game_name().c_str(),
 		   num++);
-	if(gopts.cap_format == 0)
+	if(captureFormat == 0)
 	    bfn.append(wxT(".png"));
 	else // if(gopts.cap_format == 1)
 	    bfn.append(wxT(".bmp"));
@@ -393,7 +393,7 @@ void systemScreenCapture(int num)
 
     fn.Mkdir(0777, wxPATH_MKDIR_FULL);
 
-    if(gopts.cap_format == 0)
+    if(captureFormat == 0)
 	panel->emusys->emuWritePNG(fn.GetFullPath().mb_fn_str());
     else // if(gopts.cap_format == 1)
 	panel->emusys->emuWriteBMP(fn.GetFullPath().mb_fn_str());
@@ -672,7 +672,7 @@ void PrintDialog::DoSave(wxCommandEvent&)
     wxString pats = _("Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|");
     pats.append(wxALL_FILES);
     wxString dn = wxGetApp().frame->GetPanel()->game_name();
-    if(gopts.cap_format == 0)
+    if(captureFormat == 0)
 	dn.append(wxT(".png"));
     else // if(gopts.cap_format == 1)
 	dn.append(wxT(".bmp"));
@@ -836,7 +836,7 @@ void systemGbPrint(u8 *data,int len, int pages,int feed,int pal,int cont)
 	    wxString bfn;
 	    bfn.Printf(wxT("%s-print%02d"), panel->game_name().c_str(),
 		       num++);
-	    if(gopts.cap_format == 0)
+	    if(captureFormat == 0)
 		bfn.append(wxT(".png"));
 	    else // if(gopts.cap_format == 1)
 		bfn.append(wxT(".bmp"));
@@ -852,7 +852,7 @@ void systemGbPrint(u8 *data,int len, int pages,int feed,int pal,int cont)
 	systemGreenShift = 5;
 	systemBlueShift = 0;
 	wxString of = fn.GetFullPath();
-	bool ret = gopts.cap_format == 0 ?
+	bool ret = captureFormat == 0 ?
 	    utilWritePNGFile(of.mb_fn_str(), 160, lines, (u8 *)to_print) :
 	    utilWriteBMPFile(of.mb_fn_str(), 160, lines, (u8 *)to_print);
 	if(ret) {

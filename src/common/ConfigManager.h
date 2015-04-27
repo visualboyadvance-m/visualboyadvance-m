@@ -136,7 +136,7 @@ extern int winPauseNextFrame;
 extern u32 autoFrameSkipLastTime;
 extern u32 movieLastJoypad;
 extern u32 movieNextJoypad;
-extern unsigned short throttle;
+extern int throttle;
 
 #define MAX_CHEATS 100
 extern int preparedCheats;

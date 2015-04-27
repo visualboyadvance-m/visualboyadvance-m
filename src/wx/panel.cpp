@@ -59,7 +59,7 @@ void GameArea::LoadGame(const wxString &name)
 	return;
     }
     {
-	wxConfig *cfg = wxGetApp().cfg;
+	wxFileConfig *cfg = wxGetApp().cfg;
 	if(!gopts.recent_freeze) {
 	    gopts.recent->AddFileToHistory(name);
 	    wxGetApp().frame->SetRecentAccels();
@@ -87,7 +87,7 @@ void GameArea::LoadGame(const wxString &name)
     // out to a temporary file and load it (and can't just use
     // AssignTempFileName because it needs correct extension)
     // too much trouble for now, though
-    bool loadpatch = gopts.apply_patches;
+    bool loadpatch = autoPatch;
     wxFileName pfn = loaded_game;
     if(loadpatch) {
 	// SetExt may strip something off by accident, so append to text instead
@@ -127,7 +127,7 @@ void GameArea::LoadGame(const wxString &name)
 	gb_effects_config.stereo = (float)gopts.gb_stereo / 100.0;
 	gbSoundSetDeclicking(gopts.gb_declick);
 	soundInit();
-	soundSetThrottle(gopts.throttle);
+	soundSetThrottle(throttle);
 	soundSetEnable(gopts.sound_en);
 	gbSoundSetSampleRate(!gopts.sound_qual ? 48000 :
 			     44100 / (1 << (gopts.sound_qual - 1)));
@@ -140,11 +140,11 @@ void GameArea::LoadGame(const wxString &name)
 	const char *fn = NULL;
 	wxCharBuffer fnb;
 	if(gbCgbMode) {
-	    use_bios = gopts.gbc_use_bios;
-	    fnb = gopts.gbc_bios.mb_fn_str();
+	    use_bios = useBiosFileGBC;
+	    fnb = biosFileNameGBC;
 	} else {
-	    use_bios = gopts.gb_use_bios;
-	    fnb = gopts.gb_bios.mb_fn_str();
+	    use_bios = useBiosFileGB;
+	    fnb = biosFileNameGB;
 	}
 	fn = fnb.data();
 	gbCPUInit(fn, use_bios);
@@ -195,14 +195,14 @@ void GameArea::LoadGame(const wxString &name)
 	if(cfg->HasGroup(id)) {
 	    cfg->SetPath(id);
 
-	    rtcEnable(cfg->Read(wxT("rtcEnabled"), gopts.rtc));
+	    rtcEnable(cfg->Read(wxT("rtcEnabled"), rtcEnabled));
 	    int fsz = cfg->Read(wxT("flashSize"), (long)0);
 	    if(fsz != 0x10000 && fsz != 0x20000)
-		fsz = 0x10000 << gopts.flash_size;
+		fsz = 0x10000 << winFlashSize;
 	    flashSetSize(fsz);
-	    cpuSaveType = cfg->Read(wxT("saveType"), gopts.save_type);
+	    cpuSaveType = cfg->Read(wxT("saveType"), cpuSaveType);
 	    if(cpuSaveType < 0 || cpuSaveType > 5)
-		cpuSaveType = gopts.save_type;
+		cpuSaveType = cpuSaveType;
 		
 		if (cpuSaveType == 0)
 		  utilGBAFindSave(rom_size);
@@ -213,9 +213,9 @@ void GameArea::LoadGame(const wxString &name)
 
 	    cfg->SetPath(wxT("/"));
 	} else {
-	    rtcEnable(gopts.rtc);
-	    flashSetSize(0x10000 << gopts.flash_size);
-	    cpuSaveType = gopts.save_type;
+	    rtcEnable(rtcEnabled);
+	    flashSetSize(0x10000 << winFlashSize);
+	    cpuSaveType = cpuSaveType;
 		if (cpuSaveType == 0)
 		  utilGBAFindSave(rom_size);
 		else
@@ -232,14 +232,14 @@ void GameArea::LoadGame(const wxString &name)
 
 	// start sound; this must happen before CPU stuff
 	soundInit();
-	soundSetThrottle(gopts.throttle);
+	soundSetThrottle(throttle);
 	soundSetEnable(gopts.sound_en);
 	soundSetSampleRate(!gopts.sound_qual ? 48000 :
 			   44100 / (1 << (gopts.sound_qual - 1)));
 	soundSetVolume((float)gopts.sound_vol / 100.0);
 
-	CPUInit(gopts.gba_bios.mb_fn_str(), gopts.gba_use_bios);
-	if(gopts.gba_use_bios && !useBios) {
+	CPUInit(gopts.gba_bios.mb_fn_str(), useBiosFileGBA);
+	if(useBiosFileGBA && !useBios) {
 	    wxLogError(_("Could not load BIOS %s"), gopts.gba_bios.c_str());
 	    // could clear use flag & file name now, but better to force
 	    // user to do it
@@ -272,10 +272,10 @@ void GameArea::LoadGame(const wxString &name)
 	gbSerialFunction = NULL;
 
     // probably only need to do this for GBA carts
-    agbPrintEnable(gopts.agbprint);
+    agbPrintEnable(agbPrint);
 
     // set frame skip based on ROM type
-    systemFrameSkip = loaded == IMAGE_GB ? gopts.gb_frameskip : gopts.gba_frameskip;
+    systemFrameSkip = loaded == IMAGE_GB ? gbFrameSkip : frameSkip;
     if(systemFrameSkip < 0)
 	systemFrameSkip = 0;
 
@@ -825,16 +825,16 @@ void GameArea::OnIdle(wxIdleEvent &event)
 	w->SetBackgroundStyle(wxBG_STYLE_CUSTOM);
 	w->Enable(false); // never give it the keyboard focus
 	w->SetSize(wxSize(basic_width, basic_height));
-	if(gopts.max_scale)
-	    w->SetMaxSize(wxSize(basic_width * gopts.max_scale,
-				 basic_height * gopts.max_scale));
+	if(maxScale)
+	    w->SetMaxSize(wxSize(basic_width * maxScale,
+				 basic_height * maxScale));
 	GetSizer()->Add(w, 1, gopts.retain_aspect ?
 			(wxSHAPED|wxALIGN_CENTER) : wxEXPAND);
 	Layout();
 	if(pointer_blanked)
 	    w->SetCursor(wxCursor(wxCURSOR_BLANK));
     }
-    if(!paused && (!gopts.defocus_pause || wxGetApp().frame->HasFocus())) {
+    if(!paused && (!pauseWhenInactive || wxGetApp().frame->HasFocus())) {
 	HidePointer();
 	event.RequestMore();
 	if(debugger) {
@@ -1378,8 +1378,8 @@ void DrawingPanel::DrawArea(u8 **data)
 	GameArea *panel = wxGetApp().frame->GetPanel();
 	if(panel->osdstat.size())
 	    drawText(todraw + outstride * (systemColorDepth != 24), outstride,
-		     10, 20, panel->osdstat.utf8_str(), gopts.osd_transparent);
-	if(!gopts.no_osd_status && !panel->osdtext.empty()) {
+		     10, 20, panel->osdstat.utf8_str(), showSpeedTransparent);
+	if(!disableStatusMessages && !panel->osdtext.empty()) {
 	    if(systemGetClock() - panel->osdtime < OSD_TIME) {
 		std::string message = ToString(panel->osdtext);
 		int linelen = (width * scale - 20) / 8;
@@ -1391,7 +1391,7 @@ void DrawingPanel::DrawArea(u8 **data)
 		    ptr[linelen] = 0;
 		    drawText(todraw + outstride * (systemColorDepth != 24),
 			     outstride, 10, cury, ptr,
-			     gopts.osd_transparent);
+			     showSpeedTransparent);
 		    cury += 10;
 		    nlines--;
 		    ptr += linelen;
@@ -1399,7 +1399,7 @@ void DrawingPanel::DrawArea(u8 **data)
 		}
 		drawText(todraw + outstride * (systemColorDepth != 24),
 			 outstride, 10, cury, ptr,
-			 gopts.osd_transparent);
+			 showSpeedTransparent);
 	    } else
 		panel->osdtext.clear();
 	}
@@ -1429,7 +1429,7 @@ void DrawingPanel::DrawOSD(wxWindowDC &dc)
     // directly into the output like DrawText, this is only enabled for
     // non-3d renderers.
     GameArea *panel = wxGetApp().frame->GetPanel();
-    dc.SetTextForeground(wxColour(255, 0, 0, gopts.osd_transparent ? 128 : 255));
+    dc.SetTextForeground(wxColour(255, 0, 0, showSpeedTransparent ? 128 : 255));
     dc.SetTextBackground(wxColour(0, 0, 0, 0));
     dc.SetUserScale(1.0, 1.0);
     if(panel->osdstat.size())
@@ -1440,7 +1440,7 @@ void DrawingPanel::DrawOSD(wxWindowDC &dc)
 	    wxGetApp().frame->PopStatusText();
 	}
     }	    
-    if(!gopts.no_osd_status && !panel->osdtext.empty()) {
+    if(!disableStatusMessages && !panel->osdtext.empty()) {
 	wxSize asz = dc.GetSize();
 	wxString msg = panel->osdtext;
 	int lw, lh;
@@ -1695,17 +1695,17 @@ void GLDrawingPanel::Init()
     if(!si)
 	si = (PFNGLXSWAPINTERVALSGIPROC)glXGetProcAddress((const GLubyte *)"glxSwapIntervalSGI");
     if(si)
-	si(gopts.vsync);
+	si(vsync);
 #else
 #if defined(__WXMSW__) && defined(WGL_EXT_swap_control)
     static PFNWGLSWAPINTERVALEXTPROC si = NULL;
     if(!si)
 	si = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
     if(si)
-	si(gopts.vsync);
+	si(vsync);
 #else
 #ifdef __WXMAC__
-    int swap_interval = gopts.vsync ? 1 : 0;
+    int swap_interval = vsync ? 1 : 0;
     CGLContextObj cgl_context = CGLGetCurrentContext();
     CGLSetParameter(cgl_context, kCGLCPSwapInterval, &swap_interval);
 #else
