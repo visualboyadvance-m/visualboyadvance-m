@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxDialog" name="GBTileViewer">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <object class="sizeritem">
+                <object class="wxStaticBoxSizer">
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="Bank0">
+                      <label>_0</label>
+                      <style>wxRB_GROUP</style>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="Bank1">
+                      <label>_1</label>
+                    </object>
+                  </object>
+                  <label>VRAM Bank</label>
+                  <orient>wxVERTICAL</orient>
+                </object>
+                <flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticBoxSizer">
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="CharBase0">
+                      <label>0x_8000</label>
+                      <style>wxRB_GROUP</style>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="CharBase1">
+                      <label>0x_8800</label>
+                    </object>
+                  </object>
+                  <label>Char Base</label>
+                  <orient>wxVERTICAL</orient>
+                </object>
+                <flag>wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Palette:</label>
+                </object>
+                <flag>wxTOP|wxLEFT|wxRIGHT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxSlider" name="Palette">
+                  <min>0</min>
+                  <max>7</max>
+                  <tickfreq>1</tickfreq>
+                  <pagesize>2</pagesize>
+                  <style>wxSL_BOTTOM</style>
+                </object>
+                <flag>wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxCheckBox" name="Stretch">
+                  <label>Stretch to _fit</label>
+                </object>
+                <flag>wxTOP|wxLEFT|wxRIGHT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxCheckBox" name="AutoUpdate">
+                  <label>Automatic _update</label>
+                </object>
+                <flag>wxBOTTOM|wxLEFT|wxRIGHT</flag>
+                <border>5</border>
+              </object>
+              <orient>wxVERTICAL</orient>
+            </object>
+            <flag>wxEXPAND</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <orient>wxVERTICAL</orient>
+              <object class="sizeritem">
+                <object class="wxGridSizer">
+                  <object class="sizeritem">
+                    <object class="wxStaticText">
+                      <label>Tile:</label>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxStaticText" name="Tile"/>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxStaticText">
+                      <label>Address:</label>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxStaticText" name="Address"/>
+                  </object>
+                  <cols>2</cols>
+                </object>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxPanel" name="Zoom" subclass="PixView">
+                  <size>64,64d</size>
+                  <style>wxBORDER_SUNKEN</style>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="unknown" name="Color"/>
+                <flag>wxALL|wxALIGN_BOTTOM</flag>
+                <border>5</border>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxScrolledWindow">
+              <object class="wxPanel" name="GfxView" subclass="GfxPanel">
+                <size>128,128d</size>
+                <style>wxFULL_REPAINT_ON_RESIZE</style>
+              </object>
+              <size>128,128d</size>
+              <style>wxBORDER_SUNKEN|wxCLIP_CHILDREN</style>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <orient>wxHORIZONTAL</orient>
+        </object>
+        <flag>wxEXPAND</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxGridSizer">
+          <object class="sizeritem">
+            <object class="wxButton" name="Refresh">
+              <label>_Refresh</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="wxID_SAVE">
+              <label>_Save...</label>
+            </object>
+            <flag>wxALL|wxALIGN_CENTRE_HORIZONTAL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="wxID_CLOSE"/>
+            <flag>wxALL|wxALIGN_RIGHT</flag>
+            <border>5</border>
+          </object>
+          <cols>3</cols>
+        </object>
+        <flag>wxEXPAND</flag>
+      </object>
+    </object>
+  </object>
+</resource>

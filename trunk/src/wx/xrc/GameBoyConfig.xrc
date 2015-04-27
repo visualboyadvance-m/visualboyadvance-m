@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxDialog" name="GameBoyConfig">
+<title>GameBoy settings</title>
+    <object class="wxBoxSizer">
+    <orient>wxVERTICAL</orient>
+    <object class="sizeritem">
+    <object class="wxNotebook">
+    <object class="notebookpage">
+      <object class="wxPanel">
+        <object class="wxBoxSizer">
+          <orient>wxVERTICAL</orient>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+            <object class="wxBoxSizer">
+              <orient>wxHORIZONTAL</orient>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Emulated _system :</label>
+                </object>
+                <option>1</option>
+                <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxChoice" name="System">
+                  <content>
+                    <item>Automatic</item>
+                    <item>Game Boy Advance</item>
+                    <item>Game Boy Color</item>
+                    <item>Super Game Boy</item>
+                    <item>Super Game Boy 2</item>
+                    <item>Game Boy</item>
+                  </content>
+                </object>
+                <option>1</option>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <orient>wxHORIZONTAL</orient>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Display _borders :</label>
+                </object>
+                <option>1</option>
+                <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxChoice" name="Borders">
+                  <content>
+                    <item>Never</item>
+                    <item>Always</item>
+                    <item>Automatic</item>
+                  </content>
+                </object>
+                <option>1</option>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxCheckBox" name="Printer">
+              <label>Emulate a Game Boy _Printer</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxCheckBox" name="PrintGather">
+              <label>Automatically _gather entire printed page</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxCheckBox" name="PrintSnap">
+              <label>Automatically _save printouts as snapshots</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxCheckBox" name="Color">
+              <label>Emulate gameboy washed colors</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+        </object>
+      </object>
+      <label>System and Peripherals</label>
+    </object>
+    <object class="notebookpage">
+      <object class="wxPanel">
+        <object class="wxBoxSizer">
+          <orient>wxVERTICAL</orient>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Frame Skip</label>
+              <font>
+                <weight>bold</weight>
+              </font>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <orient>wxVERTICAL</orient>
+              <object class="sizeritem">
+                <object class="wxCheckBox" name="FrameSkipAuto">
+                  <label>Enable _automatic frame skipping</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+                <object class="wxBoxSizer">
+                  <orient>wxHORIZONTAL</orient>
+                  <object class="sizeritem">
+                    <object class="wxStaticText" name="FrameSkipLab">
+                      <label>_Number of frames to skip :</label>
+                    </object>
+                    <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxSpinCtrl" name="FrameSkip">
+                      <min>0</min>
+                      <max>9</max>
+                    </object>
+                    <option>1</option>
+                    <flag>wxALL|wxEXPAND</flag>
+                    <border>5</border>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+        </object>
+      </object>
+      <label>Speed</label>
+    </object>
+    <object class="notebookpage">
+      <object class="wxPanel">
+        <object class="wxBoxSizer">
+          <orient>wxVERTICAL</orient>
+          <object class="sizeritem">
+            <object class="wxCheckBox" name="BootRomEn">
+              <label>Use a _Game Boy boot ROM file</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <flag>wxEXPAND</flag>
+            <object class="wxBoxSizer">
+              <orient>wxHORIZONTAL</orient>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="BootRomLab">
+                  <label>Boot _ROM file :</label>
+                </object>
+                <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxFilePickerCtrl" name="BootRom">
+                  <message>Select A File</message>
+                  <wildcard>BIOS files (*.bin;*.rom)|*.bin;*.rom|All files|*</wildcard>
+                </object>
+                <option>1</option>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxCheckBox" name="CBootRomEn">
+              <label>Use a _Color Game Boy boot ROM file</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <orient>wxHORIZONTAL</orient>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="CBootRomLab">
+                  <label>Boot ROM _file :</label>
+                </object>
+                <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxFilePickerCtrl" name="CBootRom">
+                  <message>Select A File</message>
+                  <wildcard>BIOS files (*.bin;*.rom)|*.bin;*.rom|All files|*</wildcard>
+                </object>
+                <option>1</option>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+            </object>
+            <flag>wxEXPAND</flag>
+          </object>
+        </object>
+      </object>
+      <label>Boot ROM</label>
+    </object>
+    <object class="notebookpage">
+      <object class="wxPanel">
+        <object class="wxBoxSizer">
+          <orient>wxVERTICAL</orient>
+          <object class="sizeritem">
+            <object class="wxNotebook">
+              <object class="notebookpage">
+                <object_ref name="cp1" ref="GBColorPrefPanel">
+                  <pos>0,0</pos>
+                </object_ref>
+                <label>Default</label>
+              </object>
+              <object class="notebookpage">
+                <object_ref name="cp2" ref="GBColorPrefPanel">
+                  <pos>0,0</pos>
+                </object_ref>
+                <label>User 1</label>
+              </object>
+              <object class="notebookpage">
+                <object_ref name="cp3" ref="GBColorPrefPanel">
+                  <pos>0,0</pos>
+                </object_ref>
+                <label>User 2</label>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+      <label>Custom Colors</label>
+    </object>
+  </object>
+  </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <object class="wxStdDialogButtonSizer">
+          <object class="button">
+             <object class="wxButton" name="wxID_OK"/>
+          </object>
+          <object class="button">
+             <object class="wxButton" name="wxID_CANCEL"/>
+          </object>
+        </object>
+      </object>
+  </object>
+  </object>
+</resource>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxDialog" name="CheatList">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxToolBar">
+          <object class="tool" name="wxID_OPEN">
+            <bitmap stock_id="wxART_FILE_OPEN"/>
+            <tooltip>Open cheat list</tooltip>
+          </object>
+          <object class="tool" name="wxID_SAVE">
+            <bitmap stock_id="wxART_FILE_SAVE"/>
+            <tooltip>Save cheat list</tooltip>
+          </object>
+          <object class="separator"/>
+          <object class="tool" name="wxID_ADD">
+            <bitmap stock_id="wxART_ADD_BOOKMARK"/>
+            <tooltip>Add new cheat</tooltip>
+          </object>
+          <object class="tool" name="wxID_REMOVE">
+            <bitmap stock_id="wxART_DEL_BOOKMARK"/>
+            <tooltip>Delete selected cheat</tooltip>
+          </object>
+          <object class="tool" name="wxID_CLEAR">
+            <bitmap platform="unix" stock_id="gtk-clear"/>
+            <bitmap stock_id="wxART_DELETE"/>
+            <tooltip>Delete all cheats</tooltip>
+          </object>
+          <object class="separator"/>
+          <object class="tool" name="wxID_SELECTALL">
+            <bitmap platform="unix" stock_id="gtk-select-all"/>
+            <bitmap stock_id="wxART_TICK_MARK"/>
+            <tooltip>Toggle all Cheats</tooltip>
+          </object>
+        </object>
+        <flag>wxEXPAND</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxListCtrl" name="Cheats" subclass="wxCheckedListCtrl">
+          <style>wxLC_REPORT</style>
+        </object>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <minsize>200,100d</minsize>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <object class="wxStdDialogButtonSizer">
+          <object class="button">
+            <object class="wxButton" name="wxID_OK">
+              <default>1</default>
+            </object>
+          </object>
+        </object>
+      </object>
+    </object>
+  </object>
+</resource>

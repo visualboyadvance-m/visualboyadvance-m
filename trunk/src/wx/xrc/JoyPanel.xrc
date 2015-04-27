@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxPanel" name="JoyPanel">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxNotebook">
+          <tooltip>Click a field and press a key or move joystick to add.  Press backspace to delete last added key.  Resize window or click inside and move pointer to see entire contents if too small.</tooltip>
+          <object class="notebookpage">
+            <object class="wxPanel">
+              <object class="wxFlexGridSizer">
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Up</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="Up" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <option>1</option>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>A</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="A" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <option>1</option>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Down</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="Down" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <option>1</option>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>B</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="B" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <option>1</option>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Left</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="Left" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <option>1</option>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>L</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="L" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <option>1</option>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Right</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="Right" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <option>1</option>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>R</label>
+                    <style>wxALIGN_RIGHT</style>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="R" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <option>1</option>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Select</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="Select" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <option>1</option>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Start</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="Start" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <option>1</option>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <cols>4</cols>
+                <growablecols>1,3</growablecols>
+              </object>
+            </object>
+            <label>Standard</label>
+          </object>
+          <object class="notebookpage">
+            <object class="wxPanel">
+              <object class="wxFlexGridSizer">
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Motion Up</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="MotionUp" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Autofire A</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="AutoA" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Motion Down</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="MotionDown" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Autofire B</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="AutoB" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Motion Left</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="MotionLeft" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="spacer">
+                  <flag>wxEXPAND</flag>
+                </object>
+                <object class="spacer">
+                  <flag>wxEXPAND</flag>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Motion Right</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="MotionRight" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <flag>wxALL|wxGROW</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>GameShark</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="GS" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Speed Up</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="Speed" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Screenshot</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="Capture" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <cols>4</cols>
+                <growablecols>1,3</growablecols>
+              </object>
+            </object>
+            <label>Special</label>
+          </object>
+        </object>
+        <option>1</option>
+        <flag>wxEXPAND|wxALL</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxCheckBox" name="DefaultConfig" subclass="wxFarRadio">
+          <label>Use as default</label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <object class="sizeritem">
+            <object class="wxButton" name="Defaults">
+              <label>Defaults</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="Clear">
+              <label>Clear</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <orient>wxHORIZONTAL</orient>
+        </object>
+        <flag>wxALIGN_CENTRE</flag>
+      </object>
+    </object>
+  </object>
+</resource>

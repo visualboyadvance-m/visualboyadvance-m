@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxFrame" name="MainFrame" subclass="MainFrame">
+    <object_ref ref="MainMenu"/>
+    <object class="wxStatusBar">
+      <fields>2</fields>
+      <widths>-3,-1</widths>
+    </object>
+    <object class="wxBoxSizer">
+      <orient>wxHORIZONTAL</orient>
+      <object class="sizeritem">
+        <object class="wxPanel" name="DisplayArea" subclass="GameArea">
+			<bg>#000000</bg>
+          <style>wxCLIP_CHILDREN|wxWANTS_CHARS</style>
+        </object>
+        <option>1</option>
+        <flag>wxEXPAND</flag>
+        <minsize>160,144</minsize>
+      </object>
+    </object>
+  </object>
+</resource>

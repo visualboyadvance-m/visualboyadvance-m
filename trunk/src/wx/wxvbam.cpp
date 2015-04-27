@@ -96,10 +96,18 @@ bool wxvbamApp::OnInit()
 	    if(!wxFindFirstFile(wxT("*.xrs")).empty())
 		xr->Load(wxT("*.xrs"));
 	}
-    wxSetWorkingDirectory(cwd);
 
-    // finally, load built-in xrc
-    xr->Load(wxT("memory:wxvbam.xrs"));
+	if (wxSetWorkingDirectory(wxStandardPaths::Get().GetPluginsDir() + wxT("\\xrc"))) {
+		if (!wxFindFirstFile(wxT("*.xrc")).empty())
+			xr->Load(wxT("*.xrc"));
+	}
+	else {
+		// finally, load built-in xrc
+		xr->Load(wxT("memory:wxvbam.xrs"));
+	}
+	
+
+    wxSetWorkingDirectory(cwd);
 
     // set up config file
     // this needs to be in a subdir to support other config as well
