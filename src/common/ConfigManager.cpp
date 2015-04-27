@@ -241,7 +241,7 @@ int* rewindSerials = NULL;
 u32 autoFrameSkipLastTime;
 u32 movieLastJoypad;
 u32 movieNextJoypad;
-unsigned short throttle;
+int throttle;
 
 const char* preparedCheatCodes[MAX_CHEATS];
 

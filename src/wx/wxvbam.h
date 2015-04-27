@@ -75,7 +75,7 @@ public:
     wxAcceleratorEntry_v accels;
 
     // the main configuration
-    wxConfig *cfg;
+	wxFileConfig *cfg;
     // vba-over.ini
     wxFileConfig *overrides;
     MainFrame *frame;
@@ -285,7 +285,7 @@ private:
     // Load a named wxDialog from the XRC file
     wxDialog * LoadXRCDialog(const char * name);
     // Load a named wxPropertySheetDialog from the XRC file
-    wxPropertySheetDialog * LoadXRCropertySheetDialog(const char * name);
+	wxPropertySheetDialog * LoadXRCropertySheetDialog(const char * name);
     // Returns the link mode to set according to the options
     LinkMode getOptionsLinkMode();
 #include "cmdhandlers.h"

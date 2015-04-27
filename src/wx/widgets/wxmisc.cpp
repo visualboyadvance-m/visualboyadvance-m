@@ -235,14 +235,14 @@ bool wxColorValidator::TransferFromWindow()
     return true;
 }
 
-static void enable(wxWindow_v controls, std::vector<bool>reverse, bool en)
+static void enable(wxWindow_v controls, std::vector<int>reverse, bool en)
 {
     for(int i = 0; i < controls.size(); i++)
 	controls[i]->Enable(reverse.size() <= i || !reverse[i] ? en : !en);
 }
 
 #define boolen(r) do { \
-    bool en; \
+    int en; \
     wxCheckBox *cb = wxDynamicCast(GetWindow(), wxCheckBox); \
     if(cb) \
 	en = cb->GetValue(); \
