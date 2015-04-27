@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxDialog" name="GBDisassemble">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="GotoAddress">
+              <style>wxTE_PROCESS_ENTER</style>
+            </object>
+            <option>0</option>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="Goto">
+              <label>_Go</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <orient>wxHORIZONTAL</orient>
+        </object>
+        <flag>wxEXPAND</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <object class="sizeritem">
+            <object class="wxPanel" name="Disassembly" subclass="DisList">
+              <font>
+                <family>modern</family>
+              </font>
+            </object>
+            <option>1</option>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxFlexGridSizer">
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>AF:</label>
+                </object>
+                <flag>wxRIGHT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="AF">
+                  <font>
+                    <family>modern</family>
+                  </font>
+                  <label>0000</label>
+                </object>
+                <flag>wxLEFT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>BC:</label>
+                </object>
+                <flag>wxRIGHT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="BC">
+                  <font>
+                    <family>modern</family>
+                  </font>
+                  <label>0000</label>
+                </object>
+                <flag>wxLEFT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>DE:</label>
+                </object>
+                <flag>wxRIGHT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="DE">
+                  <font>
+                    <family>modern</family>
+                  </font>
+                  <label>0000</label>
+                </object>
+                <flag>wxLEFT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>HL:</label>
+                </object>
+                <flag>wxRIGHT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="HL">
+                  <font>
+                    <family>modern</family>
+                  </font>
+                  <label>0000</label>
+                </object>
+                <flag>wxLEFT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>SP:</label>
+                </object>
+                <flag>wxRIGHT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="SP">
+                  <font>
+                    <family>modern</family>
+                  </font>
+                  <label>0000</label>
+                </object>
+                <flag>wxLEFT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>PC:</label>
+                </object>
+                <flag>wxRIGHT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="PC">
+                  <font>
+                    <family>modern</family>
+                  </font>
+                  <label>0000</label>
+                </object>
+                <flag>wxLEFT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>IFF:</label>
+                </object>
+                <flag>wxRIGHT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="IFF">
+                  <font>
+                    <family>modern</family>
+                  </font>
+                  <label>0000</label>
+                </object>
+                <flag>wxLEFT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>LY:</label>
+                </object>
+                <flag>wxRIGHT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="LY">
+                  <font>
+                    <family>modern</family>
+                  </font>
+                  <label>00</label>
+                </object>
+                <flag>wxLEFT</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxCheckBox" name="Z" subclass="DispCheckBox">
+                  <label>Z</label>
+                </object>
+              </object>
+              <object class="spacer"/>
+              <object class="sizeritem">
+                <object class="wxCheckBox" name="N" subclass="DispCheckBox">
+                  <label>N</label>
+                </object>
+              </object>
+              <object class="spacer"/>
+              <object class="sizeritem">
+                <object class="wxCheckBox" name="H" subclass="DispCheckBox">
+                  <label>H</label>
+                </object>
+              </object>
+              <object class="spacer"/>
+              <object class="sizeritem">
+                <object class="wxCheckBox" name="C" subclass="DispCheckBox">
+                  <label>C</label>
+                </object>
+              </object>
+              <cols>2</cols>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <orient>wxHORIZONTAL</orient>
+        </object>
+        <option>1</option>
+        <flag>wxEXPAND</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxCheckBox" name="AutoUpdate">
+          <label>Automatic _update</label>
+        </object>
+        <flag>wxALL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxGridSizer">
+          <cols>4</cols>
+          <object class="sizeritem">
+            <object class="wxButton" name="GotoPC">
+              <label>G_oto PC</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="Refresh">
+              <label>Re_fresh</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="Next">
+              <label>_Next</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="wxID_CLOSE"/>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+        </object>
+        <flag>wxEXPAND</flag>
+      </object>
+    </object>
+  </object>
+</resource>

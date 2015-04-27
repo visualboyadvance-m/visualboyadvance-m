@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxDialog" name="MapViewer">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxFlexGridSizer">
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <orient>wxVERTICAL</orient>
+              <object class="sizeritem">
+                <object class="wxStaticBoxSizer">
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="Frame0">
+                      <label>Frame 0</label>
+                      <style>wxRB_GROUP</style>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="Frame1">
+                      <label>Frame 1</label>
+                    </object>
+                  </object>
+                  <label>Frame</label>
+                  <orient>wxVERTICAL</orient>
+                </object>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticBoxSizer">
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="BG0">
+                      <label>BG0</label>
+                      <style>wxRB_GROUP</style>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="BG1">
+                      <label>BG1</label>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="BG2">
+                      <label>BG2</label>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="BG3">
+                      <label>BG3</label>
+                    </object>
+                  </object>
+                  <label>Background</label>
+                  <orient>wxVERTICAL</orient>
+                </object>
+                <flag>wxLEFT|wxRIGHT|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxCheckBox" name="Stretch">
+                  <label>Stretch to _fit</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxCheckBox" name="AutoUpdate">
+                  <label>Auto _update</label>
+                </object>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxFlexGridSizer">
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Mode:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="Mode"/>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Map Base:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="MapBase"/>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Char Base:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="CharBase"/>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Size:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="Size"/>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Colors:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="Colors"/>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Priority:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="Priority"/>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Mosaic:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="Mosaic"/>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Overflow:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="Overflow"/>
+              </object>
+              <object class="spacer"/>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="Coords"/>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Address:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="Address"/>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Tile:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="Tile"/>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Flip:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="Flip"/>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Palette:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="Palette"/>
+              </object>
+              <cols>2</cols>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxScrolledWindow">
+              <object class="wxPanel" name="GfxView" subclass="GfxPanel">
+                <size>128,128d</size>
+                <style>wxFULL_REPAINT_ON_RESIZE</style>
+              </object>
+              <size>128,128d</size>
+              <style>wxBORDER_SUNKEN|wxCLIP_CHILDREN</style>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxPanel" name="Zoom" subclass="PixView">
+              <size>64,64d</size>
+              <style>wxBORDER_SUNKEN</style>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="spacer"/>
+          <object class="sizeritem">
+            <object class="unknown" name="Color"/>
+            <flag>wxALL|wxALIGN_BOTTOM</flag>
+            <border>5</border>
+          </object>
+          <cols>3</cols>
+          <growablecols>1</growablecols>
+        </object>
+        <flag>wxEXPAND</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxGridSizer">
+          <object class="sizeritem">
+            <object class="wxButton" name="Refresh">
+              <label>_Refresh</label>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="Save">
+              <label>_Save</label>
+            </object>
+            <flag>wxALIGN_CENTRE_HORIZONTAL</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="wxID_CLOSE"/>
+            <flag>wxALIGN_RIGHT</flag>
+          </object>
+          <cols>3</cols>
+        </object>
+        <flag>wxEXPAND|wxALL</flag>
+        <border>5</border>
+      </object>
+    </object>
+  </object>
+</resource>

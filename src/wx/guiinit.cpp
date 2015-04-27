@@ -1992,12 +1992,12 @@ wxDialog * MainFrame::LoadXRCDialog(const char * name)
 	return dialog;
 }
 
-wxPropertySheetDialog * MainFrame::LoadXRCropertySheetDialog(const char * name)
+wxDialog * MainFrame::LoadXRCropertySheetDialog(const char * name)
 {
 	wxString dname = wxString::FromUTF8(name);
 	//Seems like the only way to do this
 	wxObject * anObject = wxXmlResource::Get()->LoadObject(this, dname, wxEmptyString);
-	wxPropertySheetDialog * dialog = dynamic_cast<wxPropertySheetDialog*>(anObject);
+	wxDialog * dialog = dynamic_cast<wxDialog*>(anObject);
 	CheckThrowXRCError(dialog,name);
 	
 	/* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */
@@ -2964,7 +2964,7 @@ bool MainFrame::InitMore(void)
 	d->Fit();
     }
 
-    wxPropertySheetDialog * joyDialog = LoadXRCropertySheetDialog("JoypadConfig");
+    wxDialog * joyDialog = LoadXRCropertySheetDialog("JoypadConfig");
     wxFarRadio *r = 0;
     for(int i = 0; i < 4; i++) {
 	wxString pn;

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxDialog" name="CheatCreate">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxListCtrl" name="CheatList" subclass="CheatListCtrl">
+          <style>wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VIRTUAL</style>
+        </object>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <minsize>-1,200</minsize>
+      </object>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <orient>wxHORIZONTAL</orient>
+          <object class="sizeritem">
+            <object class="wxStaticBoxSizer">
+              <object class="sizeritem">
+                <object class="wxRadioButton" name="EQ">
+                  <label>E_qual</label>
+                  <style>wxRB_GROUP</style>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxRadioButton" name="NE">
+                  <label>_Not equal</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxRadioButton" name="LT">
+                  <label>_Less than</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxRadioButton" name="LE">
+                  <label>L_ess or equal</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxRadioButton" name="GT">
+                  <label>_Greater than</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxRadioButton" name="GE">
+                  <label>G_reater or equal</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <label>Compare type</label>
+              <orient>wxVERTICAL</orient>
+            </object>
+            <option>1</option>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <object class="sizeritem">
+                <object class="wxStaticBoxSizer">
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="Signed">
+                      <label>S_igned</label>
+                      <style>wxRB_GROUP</style>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="Unsigned">
+                      <label>_Unsigned</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="Hexadecimal">
+                      <label>_Hexadecimal</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <label>Signed/Unsigned</label>
+                  <orient>wxVERTICAL</orient>
+                </object>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticBoxSizer">
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="Size8">
+                      <label>_8 bits</label>
+                      <style>wxRB_GROUP</style>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="Size16">
+                      <label>_16 bits</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="Size32">
+                      <label>_32 bits</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <label>Data size</label>
+                  <orient>wxVERTICAL</orient>
+                </object>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <orient>wxVERTICAL</orient>
+            </object>
+            <option>1</option>
+            <flag>wxEXPAND</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <object class="sizeritem">
+                <object class="wxStaticBoxSizer">
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="OldValue">
+                      <label>Ol_d value</label>
+                      <style>wxRB_GROUP</style>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="SpecificValue">
+                      <label>Specific _value</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxTextCtrl" name="Value"/>
+                    <option>1</option>
+                    <flag>wxALL|wxEXPAND</flag>
+                    <border>5</border>
+                  </object>
+                  <label>Search value</label>
+                  <orient>wxVERTICAL</orient>
+                </object>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <orient>wxVERTICAL</orient>
+            </object>
+            <option>1</option>
+            <flag>wxEXPAND</flag>
+          </object>
+        </object>
+        <flag>wxEXPAND</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <object class="sizeritem">
+            <object class="wxButton" name="Search">
+              <label>_Search</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="Update">
+              <label>U_pdate Old</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="Clear">
+              <label>_Clear</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="AddCheat">
+              <label>_Add cheat</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="wxID_OK"/>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <orient>wxHORIZONTAL</orient>
+        </object>
+        <flag>wxALIGN_CENTRE</flag>
+      </object>
+    </object>
+  </object>
+</resource>

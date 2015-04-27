@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxDialog" name="JoypadConfig">
+<title>Joypad Configuration</title>
+    <object class="wxBoxSizer">
+    <orient>wxVERTICAL</orient>
+    <object class="sizeritem">
+    <object class="wxNotebook">
+    <object class="notebookpage">
+      <object_ref name="joy1" ref="JoyPanel">
+        <pos>0,0</pos>
+      </object_ref>
+      <label>Player 1</label>
+    </object>
+    <object class="notebookpage">
+      <object_ref name="joy2" ref="JoyPanel">
+        <pos>0,0</pos>
+      </object_ref>
+      <label>Player 2</label>
+    </object>
+    <object class="notebookpage">
+      <object_ref name="joy3" ref="JoyPanel">
+        <pos>0,0</pos>
+      </object_ref>
+      <label>Player 3</label>
+    </object>
+    <object class="notebookpage">
+      <object_ref name="joy4" ref="JoyPanel">
+        <pos>0,0</pos>
+      </object_ref>
+      <label>Player 4</label>
+    </object>
+  </object>
+  </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <object class="wxStdDialogButtonSizer">
+          <object class="button">
+             <object class="wxButton" name="wxID_OK"/>
+          </object>
+          <object class="button">
+             <object class="wxButton" name="wxID_CANCEL"/>
+          </object>
+        </object>
+      </object>
+  </object>
+  </object>
+</resource>

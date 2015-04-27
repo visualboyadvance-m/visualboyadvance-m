@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxDialog" name="DirectoriesConfig">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxFlexGridSizer">
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Game Boy Advance ROMs</label>
+            </object>
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxDirPickerCtrl" name="GBARoms">
+              <message>Game Boy Advance ROMs</message>
+              <style>wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST</style>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Game Boy ROMs</label>
+            </object>
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxDirPickerCtrl" name="GBRoms">
+              <message>Game Boy ROMs</message>
+              <style>wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST</style>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Native Saves</label>
+            </object>
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxDirPickerCtrl" name="BatSaves">
+              <message>Native Saves</message>
+              <style>wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST</style>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Emulator Saves</label>
+            </object>
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxDirPickerCtrl" name="StateSaves">
+              <message>Emulator Saves</message>
+              <style>wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST</style>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Screenshots</label>
+            </object>
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxDirPickerCtrl" name="Screenshots">
+              <message>Screenshots</message>
+              <style>wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST</style>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Recordings</label>
+            </object>
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxDirPickerCtrl" name="Recordings">
+              <message>Recordings</message>
+              <style>wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST</style>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <cols>2</cols>
+          <growablecols>1</growablecols>
+        </object>
+        <option>1</option>
+        <flag>wxEXPAND</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStdDialogButtonSizer">
+          <object class="button">
+            <object class="wxButton" name="wxID_CANCEL"/>
+          </object>
+          <object class="button">
+            <object class="wxButton" name="wxID_OK"/>
+          </object>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+      </object>
+    </object>
+  </object>
+</resource>
