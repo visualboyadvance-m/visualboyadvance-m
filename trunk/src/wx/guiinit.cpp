@@ -2797,6 +2797,7 @@ bool MainFrame::InitMore(void)
 	addbe(fp);
 	getlab("BootRomLab");
 	addbe(lab);
+	getcbi("SkipIntro", skipBios);
 
 	/// Game Overrides
 	getgbaw("GameSettings");
@@ -2812,7 +2813,7 @@ bool MainFrame::InitMore(void)
     d=LoadXRCropertySheetDialog("DisplayConfig");
     {
         /// On-Screen Display
-        ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "SpeedIndicator",wxGenericValidator(& gopts.osd_speed));
+        ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "SpeedIndicator",wxGenericValidator(&showSpeed));
         getcbi("NoStatusMsg", disableStatusMessages);
         getcbi("Transparent", showSpeedTransparent);
 
@@ -2853,8 +2854,8 @@ bool MainFrame::InitMore(void)
         cb->SetValidator(wxBoolIntValidator(&gopts.max_threads, mthr));
         if(mthr <= 1)
             cb->Hide();
-        cb=SafeXRCCTRL<wxCheckBox>(d, "MMX");
-        cb->Hide();
+		getcbi("MMX", disableMMX);
+		//cb->Hide();
         ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "Filter",wxGenericValidator(& gopts.filter));
         // these two are filled and/or hidden at dialog load time
         wxControl *pll;

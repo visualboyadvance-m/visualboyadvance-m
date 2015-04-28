@@ -19,7 +19,6 @@ extern struct opts_t {
     int max_threads;
     int render_method;
     int video_scale;
-    int osd_speed;
     bool retain_aspect;
 
     /// GB
@@ -51,7 +50,6 @@ extern struct opts_t {
     int rewind_interval;
     wxString scrshot_dir;
     wxString state_dir;
-    bool skipSaveGameBattery, skipSaveGameCheats;
 
     /// Joypad
     wxJoyKeyBinding_v joykey_bindings[4][NUM_KEYS];
