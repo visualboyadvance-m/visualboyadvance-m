@@ -11,7 +11,7 @@
 // DirectSound8
 #define DIRECTSOUND_VERSION 0x0800
 #include <dsound.h>
-#include "common/ConfigManager.h"
+#include "../common/ConfigManager.h"
 
 extern bool soundBufferLow;
 
