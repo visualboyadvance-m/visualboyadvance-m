@@ -1,6 +1,6 @@
 #Do not use this file directly.  Always use the top level CMakeLists.txt file
 # This build is much easier if we just do it here.
-SET( CMAKE_CXX_FLAGS -std=c++11 )
+SET( CMAKE_CXX_FLAGS -std=gnu++11 )
 # not yet implemented
 option( ENABLE_CAIRO "Enable Cairo rendering for the wxWidgets port" ON )
 if( WIN32 )
