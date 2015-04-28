@@ -1307,6 +1307,9 @@ void DrawingPanel::DrawArea(u8 **data)
     } else
 	todraw = pixbuf2;
 
+	// FIXME: filters race condition?
+	gopts.max_threads = 1;
+
     // First, apply filters, if applicable, in parallel, if enabled
     if(gopts.filter != FF_NONE ||
        gopts.ifb != FF_NONE /* FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur) */ ) {
@@ -1353,8 +1356,18 @@ void DrawingPanel::DrawArea(u8 **data)
 		    threads[i].Run();
 		}
 	    }
-	} else if(nthreads == 1)
+	} else if(nthreads == 1) {
+		threads[0].threadno = 0;
+		threads[0].nthreads = 1;
+		threads[0].width = width;
+		threads[0].height = height;
+		threads[0].scale = scale;
+		threads[0].src = *data;
+		threads[0].dst = todraw;
+		threads[0].delta = delta;
+		threads[0].rpi = rpi;
 	    threads[0].Entry();
+	}
 	else {
 	    for(int i = 0; i < nthreads; i++) {
 		threads[i].lock.Lock();
