@@ -128,53 +128,6 @@ wxAcceleratorEntry_v sys_accels;
 // Note: this table must be sorted in option name order
 // Both for better user display and for (fast) searching by name
 opt_desc opts[] = {
-	// Core
-#ifdef MMX
-	INTOPT("preferences/disableMMX", wxTRANSLATE("Enable MMX"), disableMMX, 0, 1),
-#endif
-	INTOPT("preferences/disableStatus", wxTRANSLATE("Disable on-screen status messages"), disableStatusMessages, 0, 1),
-	INTOPT("preferences/fullScreen", wxTRANSLATE("Enter fullscreen mode at startup"), fullScreen, 0, 1),
-	INTOPT("preferences/maxScale", wxTRANSLATE("Maximum scale factor (0 = no limit)"), maxScale, 0, 100),
-	INTOPT("preferences/showSpeedTransparent", wxTRANSLATE("Draw on-screen messages transparently"), showSpeedTransparent, 0, 1),
-	INTOPT("preferences/vsync", wxTRANSLATE("Wait for vertical sync"), vsync, 0, 1),
-	INTOPT("preferences/agbPrint", wxTRANSLATE("Enable AGB printer"), agbPrint, 0, 1),
-	INTOPT("preferences/rtcEnabled", wxTRANSLATE("Enable RTC (vba-over.ini override is rtcEnabled"), rtcEnabled, 0, 1),
-	ENUMOPT("preferences/saveType", wxTRANSLATE("Native save (\"battery\") hardware type (vba-over.ini override is saveType integer 0-5)"), cpuSaveType, wxTRANSLATE("auto|eeprom|sram|flash|eeprom+sensor|none")),
-	INTOPT("preferences/useBiosGBA", wxTRANSLATE("Use the specified BIOS file"), useBiosFileGBA, 0, 1),
-	INTOPT("preferences/pauseWhenInactive", wxTRANSLATE("Pause game when main window loses focus"), pauseWhenInactive, 0, 1),
-	INTOPT("preferences/synchronize", wxTRANSLATE("Synchronize game to audio"), synchronize, 0, 1),
-	INTOPT("preferences/fsColorDepth", wxTRANSLATE("Fullscreen mode color depth (0 = any)"), fsColorDepth, 0, 999),
-	INTOPT("preferences/fsFrequency", wxTRANSLATE("Fullscreen mode frequency (0 = any)"), fsFrequency, 0, 999),
-	INTOPT("preferences/fsHeight", wxTRANSLATE("Fullscreen mode height (0 = desktop)"), fsHeight, 0, 99999),
-	INTOPT("preferences/fsWidth", wxTRANSLATE("Fullscreen mode width (0 = desktop)"), fsWidth, 0, 99999),
-	ENUMOPT("preferences/showSpeed", wxTRANSLATE("Show speed indicator"), showSpeed, wxTRANSLATE("no|percent|detailed")),
-	INTOPT("preferences/borderAutomatic", wxTRANSLATE("Automatically enable border for Super GameBoy games"), gbBorderAutomatic, 0, 1),
-	//STROPT("preferences/biosFileGB", wxTRANSLATE("BIOS file to use for GB, if enabled"), wxString::FromUTF8(biosFileNameGB)),
-	INTOPT("preferences/borderOn", wxTRANSLATE("Always enable border"), gbBorderOn, 0, 1),
-	ENUMOPT("preferences/emulatorType", wxTRANSLATE("Type of system to emulate"), gbEmulatorType, wxTRANSLATE("auto|gba|gbc|sgb|sgb2|gb")),
-	INTOPT("preferences/gbFrameSkip", wxTRANSLATE("Skip frames.  Values are 0-9 or -1 to skip automatically based on time."), gbFrameSkip, -1, 9),
-	ENUMOPT("preferences/gbPaletteOption", wxTRANSLATE("The palette to use"), gbPaletteOption, wxTRANSLATE("default|user1|user2")),
-	//STROPT("preferences/romDirGB", wxTRANSLATE("Directory to look for ROM files"), wxString::FromUTF8(romDirGB)),
-	INTOPT("preferences/useBiosFileGB", wxTRANSLATE("Use the specified BIOS file for GB"), useBiosFileGB, 0, 1),
-	//STROPT("preferences/biosFileGBA", wxTRANSLATE("BIOS file to use, if enabled"), wxString::FromUTF8(biosFileNameGBA)),
-	ENUMOPT("preferences/flashSize", wxTRANSLATE("Flash size (kb) (vba-over.ini override is flashSize in bytes)"), optFlashSize, wxTRANSLATE("64|128")),
-	INTOPT("preferences/frameSkip", wxTRANSLATE("Skip frames.  Values are 0-9 or -1 to skip automatically based on time."), frameSkip, -1, 9),
-	//STROPT("preferences/romDirGBA", wxTRANSLATE("Directory to look for ROM files"), wxString::FromUTF8(romDirGBA)),
-	INTOPT("preferences/autoPatch", wxTRANSLATE("Apply IPS/UPS/IPF patches if found"), autoPatch, 0, 1),
-	//STROPT("preferences/batteryDir", wxTRANSLATE("Directory to store game save files (relative paths are relative to ROM; blank is config dir)"), wxString::FromUTF8(batteryDir)),
-	INTOPT("preferences/autoSaveCheatList", wxTRANSLATE("Automatically save and load cheat list"), autoSaveLoadCheatList, 0, 1),
-	ENUMOPT("preferences/captureFormat", wxTRANSLATE("Screen capture file format"), captureFormat, wxTRANSLATE("png|bmp")),
-	INTOPT("preferences/cheatsEnabled", wxTRANSLATE("Enable cheats"), cheatsEnabled, 0, 1),
-	//STROPT("preferences/aviRecordDir", wxTRANSLATE("Directory to store A/V and game recordings (relative paths are relative to ROM)"), wxString::FromUTF8(aviRecordDir)),
-	//STROPT("preferences/screenShotDir", wxTRANSLATE("Directory to store screenshots (relative paths are relative to ROM)"), wxString::FromUTF8(screenShotDir)),
-	INTOPT("preferences/skipBios", wxTRANSLATE("Skip BIOS initialization"), skipBios, 0, 1),
-	INTOPT("preferences/throttle", wxTRANSLATE("Throttle game speed, even when accelerated (0-1000%, 0 = disabled)"), throttle, 0, 1000),
-	INTOPT("preferences/skipSaveGameBattery", wxTRANSLATE("Do not overwrite native (battery) save when loading state"), skipSaveGameBattery, 0, 1),
-	INTOPT("preferences/useBiosGBC", wxTRANSLATE("Use the specified BIOS file for GBC"), useBiosFileGBC, 0, 1),
-	//STROPT("preferences/saveDir", wxTRANSLATE("Directory to store saved state files (relative paths are relative to BatteryDir)"), wxString::FromUTF8(saveDir)),
-	//STROPT("preferences/biosFileGBC", wxTRANSLATE("BIOS file to use for GBC, if enabled"), wxString::FromUTF8(biosFileNameGBC)),
-
-
     /// Display
     BOOLOPT("Display/Bilinear", wxTRANSLATE("Use bilinear filter with 3d renderer"), gopts.bilinear),
     ENUMOPT("Display/Filter", wxTRANSLATE("Full-screen filter to apply"), gopts.filter,
@@ -226,7 +179,6 @@ opt_desc opts[] = {
     INTOPT ("General/RewindInterval", wxTRANSLATE("Number of seconds between rewind snapshots (0 to disable)"), gopts.rewind_interval, 0, 600),
     STROPT ("General/ScreenshotDir", wxTRANSLATE("Directory to store screenshots (relative paths are relative to ROM)"), gopts.scrshot_dir),
     STROPT ("General/StateDir", wxTRANSLATE("Directory to store saved state files (relative paths are relative to BatteryDir)"), gopts.state_dir),
-    BOOLOPT("General/StateLoadNoCheat", wxTRANSLATE("Do not overwrite cheat list when loading state"), gopts.skipSaveGameCheats),
     
     /// Joypad
     {   wxT("Joypad/*/*"), wxTRANSLATE("The parameter Joypad/<n>/<button> contains a comma-separated list of key names which map to joypad #<n> button <button>.  Button is one of Up, Down, Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Speed, Capture, GS") },
@@ -238,6 +190,44 @@ opt_desc opts[] = {
     /// Keyboard
     {   wxT("Keyboard/*"), wxTRANSLATE("The parameter Keyboard/<cmd> contains a comma-separated list of key names (e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is executed.") },
     
+	// Core
+	INTOPT("preferences/agbPrint", wxTRANSLATE("Enable AGB printer"), agbPrint, 0, 1),
+	INTOPT("preferences/autoPatch", wxTRANSLATE("Apply IPS/UPS/IPF patches if found"), autoPatch, 0, 1),
+	INTOPT("preferences/autoSaveCheatList", wxTRANSLATE("Automatically save and load cheat list"), autoSaveLoadCheatList, 0, 1),
+	INTOPT("preferences/borderAutomatic", wxTRANSLATE("Automatically enable border for Super GameBoy games"), gbBorderAutomatic, 0, 1),
+	INTOPT("preferences/borderOn", wxTRANSLATE("Always enable border"), gbBorderOn, 0, 1),
+	ENUMOPT("preferences/captureFormat", wxTRANSLATE("Screen capture file format"), captureFormat, wxTRANSLATE("png|bmp")),
+	INTOPT("preferences/cheatsEnabled", wxTRANSLATE("Enable cheats"), cheatsEnabled, 0, 1),
+#ifdef MMX
+	INTOPT("preferences/disableMMX", wxTRANSLATE("Enable MMX"), disableMMX, 0, 1),
+#endif
+	INTOPT("preferences/disableStatus", wxTRANSLATE("Disable on-screen status messages"), disableStatusMessages, 0, 1),
+	ENUMOPT("preferences/emulatorType", wxTRANSLATE("Type of system to emulate"), gbEmulatorType, wxTRANSLATE("auto|gba|gbc|sgb|sgb2|gb")),
+	ENUMOPT("preferences/flashSize", wxTRANSLATE("Flash size (kb) (vba-over.ini override is flashSize in bytes)"), optFlashSize, wxTRANSLATE("64|128")),
+	INTOPT("preferences/frameSkip", wxTRANSLATE("Skip frames.  Values are 0-9 or -1 to skip automatically based on time."), frameSkip, -1, 9),
+	INTOPT("preferences/fsColorDepth", wxTRANSLATE("Fullscreen mode color depth (0 = any)"), fsColorDepth, 0, 999),
+	INTOPT("preferences/fsFrequency", wxTRANSLATE("Fullscreen mode frequency (0 = any)"), fsFrequency, 0, 999),
+	INTOPT("preferences/fsHeight", wxTRANSLATE("Fullscreen mode height (0 = desktop)"), fsHeight, 0, 99999),
+	INTOPT("preferences/fsWidth", wxTRANSLATE("Fullscreen mode width (0 = desktop)"), fsWidth, 0, 99999),
+	INTOPT("preferences/fullScreen", wxTRANSLATE("Enter fullscreen mode at startup"), fullScreen, 0, 1),
+	INTOPT("preferences/gbFrameSkip", wxTRANSLATE("Skip frames.  Values are 0-9 or -1 to skip automatically based on time."), gbFrameSkip, -1, 9),
+	ENUMOPT("preferences/gbPaletteOption", wxTRANSLATE("The palette to use"), gbPaletteOption, wxTRANSLATE("default|user1|user2")),
+	INTOPT("preferences/maxScale", wxTRANSLATE("Maximum scale factor (0 = no limit)"), maxScale, 0, 100),
+	INTOPT("preferences/pauseWhenInactive", wxTRANSLATE("Pause game when main window loses focus"), pauseWhenInactive, 0, 1),
+	INTOPT("preferences/rtcEnabled", wxTRANSLATE("Enable RTC (vba-over.ini override is rtcEnabled"), rtcEnabled, 0, 1),
+	ENUMOPT("preferences/saveType", wxTRANSLATE("Native save (\"battery\") hardware type (vba-over.ini override is saveType integer 0-5)"), cpuSaveType, wxTRANSLATE("auto|eeprom|sram|flash|eeprom+sensor|none")),
+	ENUMOPT("preferences/showSpeed", wxTRANSLATE("Show speed indicator"), showSpeed, wxTRANSLATE("no|percent|detailed")),
+	INTOPT("preferences/showSpeedTransparent", wxTRANSLATE("Draw on-screen messages transparently"), showSpeedTransparent, 0, 1),
+	INTOPT("preferences/skipBios", wxTRANSLATE("Skip BIOS initialization"), skipBios, 0, 1),
+	INTOPT("preferences/skipSaveGameCheats", wxTRANSLATE("Do not overwrite cheat list when loading state"), skipSaveGameCheats, 0, 1),
+	INTOPT("preferences/skipSaveGameBattery", wxTRANSLATE("Do not overwrite native (battery) save when loading state"), skipSaveGameBattery, 0, 1),
+	INTOPT("preferences/synchronize", wxTRANSLATE("Synchronize game to audio"), synchronize, 0, 1),
+	INTOPT("preferences/throttle", wxTRANSLATE("Throttle game speed, even when accelerated (0-1000%, 0 = disabled)"), throttle, 0, 1000),
+	INTOPT("preferences/useBiosFileGB", wxTRANSLATE("Use the specified BIOS file for GB"), useBiosFileGB, 0, 1),
+	INTOPT("preferences/useBiosGBA", wxTRANSLATE("Use the specified BIOS file"), useBiosFileGBA, 0, 1),
+	INTOPT("preferences/useBiosGBC", wxTRANSLATE("Use the specified BIOS file for GBC"), useBiosFileGBC, 0, 1),
+	INTOPT("preferences/vsync", wxTRANSLATE("Wait for vertical sync"), vsync, 0, 1),
+
     /// Sound
 #ifdef __WXMSW__
 	ENUMOPT("Sound/AudioAPI", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl|openal|directsound|xaudio2")),
