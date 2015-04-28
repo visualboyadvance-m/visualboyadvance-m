@@ -1037,15 +1037,6 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
         } while(0);
     } else {
             scale = builtin_ff_scale(gopts.filter);
-#ifndef NO_ASM
-    // while there is a 32->16 frontend for these, it's probably more
-    // efficient to just use 16 to start with
-    // unfortunately, this also means that the 32-bit output needs to
-    // be sensed in lower code
-    if(gopts.filter == FF_HQ3X || gopts.filter == FF_HQ4X)
-        systemColorDepth = 16;
-    else
-#endif
 #define out_16 (systemColorDepth == 16)
             systemColorDepth = 32;
     }
@@ -1230,21 +1221,23 @@ public:
 				hq2x32(src, instride, delta, dst, outstride, width, height);
 				break;
 			case FF_HQ3X:
-				hq3x32(src, instride, delta, dst, outstride, width, height);
+				hq3x32_32(src, instride, delta, dst, outstride, width, height);
 				break;
 			case FF_HQ4X:
-				hq4x32(src, instride, delta, dst, outstride, width, height);
+				hq4x32_32(src, instride, delta, dst, outstride, width, height);
 				break;
-/* Placeholder for xbrz support
 			case FF_XBRZ2X:
-                break;
+				xbrz2x32(src, instride, delta, dst, outstride, width, height);
+				break;
             case FF_XBRZ3X:
-                break;
+				xbrz3x32(src, instride, delta, dst, outstride, width, height);
+				break;
             case FF_XBRZ4X:
-                break;
+				xbrz4x32(src, instride, delta, dst, outstride, width, height);
+				break;
             case FF_XBRZ5X:
-                break; 
-*/
+				xbrz5x32(src, instride, delta, dst, outstride, width, height);
+				break;
 			case FF_PLUGIN:
                 // MFC interface did not do plugins in parallel
                 // Probably because it's almost certain they carry state or do
