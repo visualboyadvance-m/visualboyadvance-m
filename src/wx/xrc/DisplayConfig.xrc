@@ -280,15 +280,15 @@
                     <item>TV Mode</item>
                     <item>HQ 2x</item>
                     <item>LQ 2x</item>
-                    <item>Simple 2X</item>
+                    <item>Simple 2x</item>
                     <item>Simple 3x</item>
                     <item>HQ 3x</item>
                     <item>Simple 4x</item>
                     <item>HQ 4x</item>
-					<item>XBRz 2x (note: Not available yet)</item>
-					<item>XBRz 3x (note: Not available yet)</item>
-					<item>XBRz 4x (note: Not available yet)</item>
-					<item>XBRz 5x (note: Not available yet)</item>
+					<item>xBRZ 2x</item>
+					<item>xBRZ 3x</item>
+					<item>xBRZ 4x</item>
+					<item>xBRZ 5x</item>
 					<item>Plugin</item>
                   </content>
                 </object>
