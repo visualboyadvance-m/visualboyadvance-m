@@ -426,6 +426,117 @@
       <label>_Options</label>
     </object>
     <object class="wxMenu">
+      <label>_Configure</label>
+      <object class="wxMenuItem" name="Bilinear">
+        <label>_Bilinear filter</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="RetainAspect">
+        <label>_Retain aspect ratio</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="Printer">
+        <label>_GB printer</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="Color">
+        <label>_Washed colors</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="PrintGather">
+        <label>_Gather a full page before printing</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="PrintSnap">
+        <label>_Save printouts as screen captures</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="Joybus">
+        <label>_Joybus</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="Link">
+        <label>_Link cable</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="SpeedOn">
+        <label>_Faster network protocol by default</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="RFU">
+        <label>_RFU (Wireless adapter)</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="GBASoundInterpolation">
+        <label>_GBA sound interpolation</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="GBDeclicking">
+        <label>_GB sound declicking</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="GBEnhanceSound">
+        <label>_GB sound effects</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="GBSurround">
+        <label>_GB surround sound effect</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="AGBPrinter">
+        <label>_AGB printer</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="ApplyPatches">
+        <label>_Apply IPS/UPS/IPF patches</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="NoStatusMsg">
+        <label>_Disable on-screen status messages</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="FrameSkipAuto">
+        <label>_Auto skip frames.</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="Fullscreen">
+        <label>_Fullscreen mode</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="PauseWhenInactive">
+        <label>_Pause game when main window loses focus</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="RTC">
+        <label>_Real-time clock</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="Transparent">
+        <label>_Transparent on-screen messages</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="SkipIntro">
+        <label>_Skip BIOS</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="SyncGameAudio">
+        <label>_Synchronize game to audio</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="BootRomEn">
+        <label>_Use BIOS file</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="CBootRomEn">
+        <label>_Use GBC BIOS file</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="VSync">
+        <label>_VSync</label>
+        <checkable>1</checkable>
+      </object>
+    </object>
+    <object class="wxMenu">
       <label>_Help</label>
       <object class="wxMenuItem" name="BugReport">
         <label>Report _Bugs</label>
