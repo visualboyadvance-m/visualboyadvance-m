@@ -8,6 +8,7 @@
 #include <wx/dcbuffer.h>
 #include "../sdl/text.h"
 #include "filters.h"
+#include "../../svnrev.h"
 
 int emulating;
 
@@ -15,7 +16,7 @@ IMPLEMENT_DYNAMIC_CLASS(GameArea, wxPanel)
 
 GameArea::GameArea()
     : wxPanel(), loaded(IMAGE_UNKNOWN), panel(NULL), emusys(NULL),
-      basic_width(GBWidth), basic_height(GBHeight), fullscreen(false),
+      basic_width(GBAWidth), basic_height(GBAHeight), fullscreen(false),
       paused(false), was_paused(false), rewind_time(0), do_rewind(false),
       rewind_mem(0), pointer_blanked(false), mouse_active_time(0)
 {
@@ -334,12 +335,13 @@ void GameArea::LoadGame(const wxString &name)
 
 void GameArea::SetFrameTitle()
 {
-    wxString tit;
+    wxString tit = wxT("");
     if(loaded != IMAGE_UNKNOWN) {
-	tit = wxT("VBA-M ");
-	tit.append(loaded_game.GetFullName());
-    } else
-	tit = wxT("VisualBoyAdvance-M ");
+		tit.append(loaded_game.GetFullName());
+		tit.append(wxT(" - "));
+    }
+	tit.append(wxT("VisualBoyAdvance-M "));
+	tit.append(wxT(SVN_REV_STR));
 #ifndef NO_LINK
 	int playerId = GetLinkPlayerId();
 	if (playerId >= 0) {
