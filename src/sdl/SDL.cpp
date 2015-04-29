@@ -168,7 +168,6 @@ extern int autoFireMaxCount;
 
 #define REWIND_NUM 8
 #define REWIND_SIZE 400000
-#define SYSMSG_BUFFER_SIZE 1024
 
 enum VIDEO_SIZE{
 	VIDEO_1X, VIDEO_2X, VIDEO_3X, VIDEO_4X, VIDEO_5X, VIDEO_6X,
@@ -364,7 +363,7 @@ FILE *sdlFindFile(const char *name)
     if(f != NULL)
       return f;
   }
-  
+
   if (!strchr(home, '/') &&
 	  !strchr(home, '\\')) {
     char *path = getenv("PATH");
@@ -760,7 +759,7 @@ void sdlInitVideo() {
   }
 
   u32 rmask, gmask, bmask;
-  
+
   if(openGL) {
     #if SDL_BYTEORDER == SDL_LIL_ENDIAN /* OpenGL RGBA masks */
       rmask = 0x000000FF;
@@ -768,19 +767,19 @@ void sdlInitVideo() {
       bmask = 0x00FF0000;
     #else
       rmask = 0xFF000000;
-      gmask = 0x00FF0000; 
-      bmask = 0x0000FF00; 
+      gmask = 0x00FF0000;
+      bmask = 0x0000FF00;
     #endif
   } else {
       rmask = surface->format->Rmask;
       gmask = surface->format->Gmask;
       bmask = surface->format->Bmask;
   }
-  
+
   systemRedShift = sdlCalculateShift(rmask);
   systemGreenShift = sdlCalculateShift(gmask);
   systemBlueShift = sdlCalculateShift(bmask);
-  
+
   if(openGL) {
       // Align to BGRA instead of ABGR
       systemRedShift += 8;
@@ -1570,12 +1569,6 @@ int main(int argc, char **argv)
 
   if(optind < argc) {
     char *szFile = argv[optind];
-    u32 len = strlen(szFile);
-    if (len > SYSMSG_BUFFER_SIZE)
-    {
-      fprintf(stderr,"%s :%s: File name too long\n",argv[0],szFile);
-      exit(-1);
-    }
 
     utilStripDoubleExtension(szFile, filename);
     char *p = strrchr(filename, '.');
@@ -1860,13 +1853,11 @@ int main(int argc, char **argv)
 
 void systemMessage(int num, const char *msg, ...)
 {
-  char buffer[SYSMSG_BUFFER_SIZE*2];
   va_list valist;
 
   va_start(valist, msg);
-  vsprintf(buffer, msg, valist);
-
-  fprintf(stderr, "%s\n", buffer);
+  vfprintf(stderr, msg, valist);
+  fprintf(stderr, "\n")
   va_end(valist);
 }
 
