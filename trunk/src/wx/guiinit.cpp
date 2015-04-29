@@ -2033,1155 +2033,6 @@ T * GetValidatedChild(wxWindow *parent,const char * name, V validator)
 	return child;
 }
 
-bool MainFrame::InitMore(void)
-{
-    // Make sure display panel present and correct type
-    panel = XRCCTRL(*this, "DisplayArea", GameArea);
-    if(!panel) {
-	wxLogError(_("Main display panel not found"));
-	return false;
-    }
-    panel->AdjustSize(false);
-
-    // only the panel does idle events (the emulator loop)
-    // however, do not enable until end of init, since errors will start
-    // the idle loop on wxGTK
-    wxIdleEvent::SetMode(wxIDLE_PROCESS_SPECIFIED);
-
-    // could/should probably take this from xrc as well
-    // but I don't think xrc supports icon from Windows resource
-    wxIcon icon = wxXmlResource::Get()->LoadIcon(wxT("MainIcon"));
-    if(!icon.IsOk()) {
-	wxLogInfo(_("Main icon not found"));
-	icon = wxICON(wxvbam);
-    }
-    SetIcon(icon);
-
-    // NOOP if no status area
-    SetStatusText(_("Welcome to wxVBAM!"));
-
-    // Prepare system accel table
-    for(int i = 0; i < num_def_accels; i++)
-	sys_accels.push_back(default_accels[i]);
-
-    // If there is a menubar, store all special menuitems
-#define XRCITEM_I(id) menubar->FindItem(id, NULL)
-#define XRCITEM_D(s) XRCITEM_I(XRCID_D(s))
-#define XRCITEM(s) XRCITEM_D(wxT(s))
-    wxMenuBar *menubar = GetMenuBar();
-    ctx_menu = NULL;
-    if(menubar) {
-#if 0 // doesn't work in 2.9 at all (causes main menu to malfunction)
-	// to fix, recursively copy entire menu insted of just copying
-	// menubar.  This means that every saved menu item must also be
-	// saved twice...  A lot of work for a mostly worthless feature.
-	// If you want the menu, just exit full-screen mode.
-	// Either that, or add an option to retain the regular
-	// menubar in full-screen mode
-
-	// create a context menu for fullscreen mode
-	// FIXME: on gtk port, this gives Gtk-WARNING **:
-	//   gtk_menu_attach_to_widget(): menu already attached to GtkMenuItem
-	// but it works anyway
-	// Note: menu default accelerators (e.g. alt-f for file menu) don't
-	// work with context menu (and can never work, since there is no
-	// way to pop up a submenu)
-	// It would probably be better, in the end, to use a collapsed menu
-	// bar (either Amiga-style press RMB to make appear, or Windows
-	// collapsed toolbar-style move mouse to within a pixel of top to
-	// make appear).  Not supported in wx without a lot of work, though.
-	// Maybe this feature should just be dropped; the user would simply
-	// have to exit fullscreen mode to use the menu.
-	ctx_menu = new wxMenu();
-	for(int i = 0; i < menubar->GetMenuCount(); i++)
-	    ctx_menu->AppendSubMenu(menubar->GetMenu(i), menubar->GetMenuLabel(i));
-#endif
-
-	// save all menu items in the command table
-	for(int i = 0; i < ncmds; i++) {
-	    wxMenuItem *mi = cmdtab[i].mi = XRCITEM_I(cmdtab[i].cmd_id);
-	    // remove unsupported commands first
-#ifdef NO_FFMPEG
-	    if(cmdtab[i].mask_flags & (CMDEN_SREC|CMDEN_NSREC|CMDEN_VREC|CMDEN_NVREC)) {
-		if(mi)
-		    mi->GetMenu()->Remove(mi);
-		cmdtab[i].cmd_id = XRCID("NOOP");
-		cmdtab[i].mi = NULL;
-		continue;
-	    }
-#endif
-#ifndef GBA_LOGGING
-	    if(cmdtab[i].cmd_id == XRCID("Logging")) {
-		if(mi)
-		    mi->GetMenu()->Remove(mi);
-		cmdtab[i].cmd_id = XRCID("NOOP");
-		cmdtab[i].mi = NULL;
-		continue;
-	    }
-#endif
-#ifdef NO_LINK
-	    if(cmdtab[i].cmd_id == XRCID("LinkConfigure") ||
-	       cmdtab[i].cmd_id == XRCID("LanLink")) {
-		if(mi)
-		    mi->GetMenu()->Remove(mi);
-		cmdtab[i].cmd_id = XRCID("NOOP");
-		cmdtab[i].mi = NULL;
-		continue;
-	    }
-#endif
-	    if(mi) {
-		// wxgtk provides no way to retrieve stock label/accel
-		// and does not override wxGetStockLabel()
-		// as of 2.8.12/2.9.1
-		// so override with wx's stock label  <sigh>
-		// at least you still get gtk's stock icon
-		if(mi->GetItemLabel().empty())
-		    mi->SetItemLabel(wxGetStockLabel(mi->GetId(),
-						     wxSTOCK_WITH_MNEMONIC|wxSTOCK_WITH_ACCELERATOR));
-
-		// add accelerator to global accel table
-		wxAcceleratorEntry *a = mi->GetAccel();
-		if(a) {
-		    a->Set(a->GetFlags(), a->GetKeyCode(), cmdtab[i].cmd_id, mi);
-		    // only add it if not already there
-		    for(wxAcceleratorEntry_v::iterator e = sys_accels.begin();
-			e < sys_accels.end(); e++)
-			if(a->GetFlags() == e->GetFlags() &&
-			   a->GetKeyCode() == e->GetKeyCode()) {
-			    if(e->GetMenuItem()) {
-				wxLogInfo(_("Duplicate menu accelerator: %s for %s and %s; keeping first"),
-					  wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).c_str(),
-					  e->GetMenuItem()->GetItemLabelText().c_str(),
-					  mi->GetItemLabelText().c_str());
-				delete a;
-				a = 0;
-			    } else {
-				if(e->GetCommand() != a->GetCommand()) {
-				    int cmd;
-				    for(cmd = 0; cmd < ncmds; cmd++)
-					if(cmdtab[cmd].cmd_id == e->GetCommand())
-					    break;
-				    wxLogInfo(_("Menu accelerator %s for %s overrides default for %s ; keeping menu"),
-					      wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).c_str(),
-					      mi->GetItemLabelText().c_str(),
-					      cmdtab[cmd].cmd);
-				}
-				sys_accels.erase(e);
-			    }
-			    break;
-			}
-		    if(a)
-			sys_accels.push_back(*a);
-		    else
-			// strip from label so user isn't confused
-			DoSetAccel(mi, NULL);
-		}
-
-		// store checkable items
-		if(mi->IsCheckable()) {
-		    checkable_mi_t cmi = { cmdtab[i].cmd_id, mi };
-		    checkable_mi.push_back(cmi);
-		}
-	    }
-	}
-
-        // if a recent menu is present, save its location
-	wxMenuItem *recentmi = XRCITEM("RecentMenu");
-	if(recentmi && recentmi->IsSubMenu()) {
-	    recent = recentmi->GetSubMenu();
-	    gopts.recent->UseMenu(recent);
-	    gopts.recent->AddFilesToMenu();
-	} else
-	    recent = NULL;
-	// if save/load state menu items present, save their locations
-	for(int i = 0; i < 10; i++) {
-	    wxString n;
-	    n.Printf(wxT("LoadGame%02d"),  i + 1);
-	    loadst_mi[i] = XRCITEM_D(n);
-	    n.Printf(wxT("SaveGame%02d"), i + 1);
-	    savest_mi[i] = XRCITEM_D(n);
-	}
-    } else {
-	recent = NULL;
-	for(int i = 0; i < 10; i++)
-	    loadst_mi[i] = savest_mi[i] = NULL;
-    }
-    // just setting to UNLOAD_CMDEN_KEEP is invalid
-    // so just set individual flags here
-    cmd_enable = CMDEN_NGDB_ANY | CMDEN_NREC_ANY;
-    update_state_ts(true);
-
-    // set pointers for checkable menu items
-    // and set initial checked status
-    if(checkable_mi.size()) {
-#define add_bcheck(s, f) do { \
-    int id = XRCID(s); \
-    for(int i = 0; i < checkable_mi.size(); i++) { \
-	if(checkable_mi[i].cmd != id) \
-	    continue; \
-	checkable_mi[i].boolopt = &f; \
-	checkable_mi[i].mi->Check(f); \
-	break; \
-    } \
-} while(0)
-
-#define add_icheck(s, f, m, v) do { \
-    int id = XRCID(s); \
-    for(int i = 0; i < checkable_mi.size(); i++) { \
-	if(checkable_mi[i].cmd != id) \
-	    continue; \
-	checkable_mi[i].intopt = &f; \
-	checkable_mi[i].mask = m; \
-	checkable_mi[i].val = v; \
-	checkable_mi[i].mi->Check((f & m) == v); \
-	break; \
-    } \
-} while(0)
-#define add_icheck1(s, f, m) add_icheck(s, f, m, m)
-	add_bcheck("RecentFreeze", gopts.recent_freeze);
-	add_bcheck("Pause", paused);
-	add_icheck1("SoundChannel1", gopts.sound_en, (1<<0));
-	add_icheck1("SoundChannel2", gopts.sound_en, (1<<1));
-	add_icheck1("SoundChannel3", gopts.sound_en, (1<<2));
-	add_icheck1("SoundChannel4", gopts.sound_en, (1<<3));
-	add_icheck1("DirectSoundA", gopts.sound_en, (1<<8));
-	add_icheck1("DirectSoundB", gopts.sound_en, (1<<9));
-	add_icheck1("VideoLayersBG0", layerSettings, (1<<8));
-	add_icheck1("VideoLayersBG1", layerSettings, (1<<9));
-	add_icheck1("VideoLayersBG2", layerSettings, (1<<10));
-	add_icheck1("VideoLayersBG3", layerSettings, (1<<11));
-	add_icheck1("VideoLayersOBJ", layerSettings, (1<<12));
-	add_icheck1("VideoLayersWIN0", layerSettings, (1<<13));
-	add_icheck1("VideoLayersWIN1", layerSettings, (1<<14));
-	add_icheck1("VideoLayersOBJWIN", layerSettings, (1<<15));
-	add_bcheck("CheatsAutoSaveLoad", gopts.autoload_cheats);
-	bool bCheatsEnabled = (cheatsEnabled != 0);
-	add_bcheck("CheatsEnable", bCheatsEnabled);
-	bool bKeepSaves = (skipSaveGameBattery != 0);
-	add_bcheck("KeepSaves", bKeepSaves);
-	bool KeepCheats = (skipSaveGameCheats != 0);
-	add_bcheck("KeepCheats", KeepCheats);
-	add_bcheck("LoadGameAutoLoad", gopts.autoload_state);
-	add_icheck1("JoypadAutofireA", autofire, KEYM_A);
-	add_icheck1("JoypadAutofireB", autofire, KEYM_B);
-	add_icheck1("JoypadAutofireL", autofire, KEYM_LEFT);
-	add_icheck1("JoypadAutofireR", autofire, KEYM_RIGHT);
-	add_bcheck("EmulatorSpeedupToggle", turbo);
-    }
-    for(int i = 0; i < checkable_mi.size(); i++)
-	if(!checkable_mi[i].boolopt && !checkable_mi[i].intopt) {
-	    wxLogError(_("Invalid menu item %s; removing"),
-		       checkable_mi[i].mi->GetItemLabelText().c_str());
-	    checkable_mi[i].mi->GetMenu()->Remove(checkable_mi[i].mi);
-	    checkable_mi[i].mi = NULL;
-	}
-
-    set_global_accels();
-
-    // preload and verify all resource dialogs
-    // this will take init time and memory, but catches errors in xrc sooner
-    // note that the only verification done is to ensure no crashes.  It's the
-    // user's responsibility to ensure that the GUI works as intended after
-    // modifications
-    try {
-
-    wxDialog *d = NULL;
-
-    //// displayed during run
-    d=LoadXRCDialog("GBPrinter");
-    // just verify preview window & mag sel present
-    {
-	wxPanel *prev;
-	prev=SafeXRCCTRL<wxPanel>(d,  "Preview");
-	if(!wxDynamicCast(prev->GetParent(), wxScrolledWindow))
-	    throw std::runtime_error("Unable to load a dialog control from the builtin xrc file: Preview");
-	SafeXRCCTRL<wxControlWithItems>(d, "Magnification");
-	d->Fit();
-    }
-
-    //// File menu
-    d=LoadXRCDialog("GBAROMInfo");
-    // just verify fields present
-    wxControl *lab;
-#define getlab(n) lab=SafeXRCCTRL<wxControl>(d,  n)
-    getlab("Title");
-    getlab("GameCode");
-    getlab("MakerCode");
-    getlab("MakerName");
-    getlab("UnitCode");
-    getlab("DeviceType");
-    getlab("Version");
-    getlab("CRC");
-    d->Fit();
-
-    d=LoadXRCDialog("GBROMInfo");
-    // just verify fields present
-    getlab("Title");
-    getlab("MakerCode");
-    getlab("MakerName");
-    getlab("UnitCode");
-    getlab("DeviceType");
-    getlab("Version");
-    getlab("CRC");
-    getlab("Color");
-    getlab("ROMSize");
-    getlab("RAMSize");
-    getlab("DestCode");
-    getlab("LicCode");
-    getlab("Checksum");
-    d->Fit();
-
-    d=LoadXRCDialog("CodeSelect");
-    // just verify list present
-    SafeXRCCTRL<wxControlWithItems>(d, "CodeList");
-    d->Fit();
-
-    d=LoadXRCDialog("ExportSPS");
-    // just verify text fields present
-    SafeXRCCTRL<wxTextCtrl>(d, "Title");
-    SafeXRCCTRL<wxTextCtrl>(d, "Description");
-    SafeXRCCTRL<wxTextCtrl>(d, "Notes");
-    d->Fit();
-
-    //// Emulation menu
-#ifndef NO_LINK
-    d=LoadXRCDialog("NetLink");
-#endif
-    wxRadioButton *rb;
-#define getrbi(n, o, v) do { \
-    rb=SafeXRCCTRL<wxRadioButton>(d,  n); \
-    rb->SetValidator(wxBoolIntValidator(&o, v)); \
-} while(0)
-#define getrbb(n, o) do { \
-    rb=SafeXRCCTRL<wxRadioButton>(d,  n); \
-    rb->SetValidator(wxGenericValidator(&o)); \
-} while(0)
-#define getrbbr(n, o) do { \
-    rb=SafeXRCCTRL<wxRadioButton>(d,  n); \
-    rb->SetValidator(wxBoolRevValidator(&o)); \
-} while(0)
-    wxBoolEnValidator *benval;
-    wxBoolEnHandler *ben;
-#define getbe(n, o, cv, t, wt) do { \
-    cv=SafeXRCCTRL<t>(d,  n); \
-    cv->SetValidator(wxBoolEnValidator(&o)); \
-    benval = wxStaticCast(cv->GetValidator(), wxBoolEnValidator); \
-    static wxBoolEnHandler _ben; \
-    ben = &_ben; \
-    wx##wt##BoolEnHandlerConnect(cv, wxID_ANY, _ben); \
-} while(0)
-    // brenval & friends are here just to allow yes/no radioboxes in place
-    // of checkboxes.  A lot of work for little benefit.
-    wxBoolRevEnValidator *brenval;
-#define getbre(n, o, cv, t, wt) do { \
-    cv=SafeXRCCTRL<t>(d,  n); \
-    cv->SetValidator(wxBoolRevEnValidator(&o)); \
-    brenval = wxStaticCast(cv->GetValidator(), wxBoolRevEnValidator); \
-    wx##wt##BoolEnHandlerConnect(rb, wxID_ANY, *ben); \
-} while(0)
-#define addbe(n) do { \
-    ben->controls.push_back(n); \
-    benval->controls.push_back(n); \
-} while(0)
-#define addrbe(n) do { \
-    addbe(n); \
-    brenval->controls.push_back(n); \
-} while(0)
-#define addber(n, r) do { \
-    ben->controls.push_back(n); \
-    ben->reverse.push_back(r); \
-    benval->controls.push_back(n); \
-    benval->reverse.push_back(r); \
-} while(0)
-#define addrber(n, r) do { \
-    addber(n, r); \
-    brenval->controls.push_back(n); \
-    brenval->reverse.push_back(r); \
-} while(0)
-#define getrbbe(n, o) getbe(n, o, rb, wxRadioButton, RBE)
-#define getrbbd(n, o) getbre(n, o, rb, wxRadioButton, RBD)
-    wxTextCtrl *tc;
-#define gettc(n, o) do { \
-    tc=SafeXRCCTRL<wxTextCtrl>(d,  n); \
-    tc->SetValidator(wxTextValidator(wxFILTER_NONE, &o)); \
-} while(0)
-#ifndef NO_LINK
-    {
-	net_link_handler.dlg = d;
-	getrbbe("Server", net_link_handler.server);
-	getrbbd("Client", net_link_handler.server);
-	getlab("PlayersLab");
-	addrber(lab, false);
-	getrbi("Link2P", net_link_handler.n_players, 2);
-	addrber(rb, false);
-	getrbi("Link3P", net_link_handler.n_players, 3);
-	addrber(rb, false);
-	getrbi("Link4P", net_link_handler.n_players, 4);
-	addrber(rb, false);
-	getlab("ServerIPLab");
-	addrber(lab, true);
-	gettc("ServerIP", gopts.link_host);
-	addrber(tc, true);
-	getrbbr("SpeedOff", gopts.lanlink_speed);
-	getrbb("SpeedOn", gopts.lanlink_speed);
-	wxWindow *okb = d->FindWindow(wxID_OK);
-	if(okb) { // may be gone if style guidlines removed it
-	    net_link_handler.okb = wxStaticCast(okb, wxButton);
-	    d->Connect(XRCID("Server"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
-		       wxCommandEventHandler(NetLink_t::ServerOKButton),
-		       NULL, &net_link_handler);
-	    d->Connect(XRCID("Client"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
-		       wxCommandEventHandler(NetLink_t::ClientOKButton),
-		       NULL, &net_link_handler);
-	}
-	// this should intercept wxID_OK before the dialog handler gets it
-	d->Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED,
-		   wxCommandEventHandler(NetLink_t::NetConnect),
-		   NULL, &net_link_handler);
-	d->Fit();	   
-    }
-#endif
-
-    d=LoadXRCDialog("CheatList");
-    {
-	cheat_list_handler.dlg = d;
-	d->SetEscapeId(wxID_OK);
-	wxCheckedListCtrl *cl;
-    cl=SafeXRCCTRL<wxCheckedListCtrl>(d,  "Cheats");
-	if(!cl->Init())
-	    throw std::runtime_error("Unable to initialize the Cheats dialog control from the builtin xrc file!");
-	cheat_list_handler.list = cl;
-	cl->SetValidator(CheatListFill());
-	cl->InsertColumn(0, _("Code"));
-	// can't just set font for whole column; must set in each
-	// individual item
-	wxFont of = cl->GetFont();
-	// of.SetFamily(wxFONTFAMILY_MODERN);  // doesn't work (no font change)
-	wxFont f(of.GetPointSize(), wxFONTFAMILY_MODERN, of.GetStyle(),
-		 of.GetWeight());
-	cheat_list_handler.item0.SetFont(f);
-	cheat_list_handler.item0.SetColumn(0);
-	cl->InsertColumn(1, _("Description"));
-	// too bad I can't just set the size to windowwidth - other cols
-	// default width is header width, but using following will probably
-	// make it 80 pixels wide regardless
-	// cl->SetColumnWidth(1, wxLIST_AUTOSIZE_USEHEADER);
-	cheat_list_handler.col1minw = cl->GetColumnWidth(1);
-	// on wxGTK, column 1 seems to inherit column 0's font regardless
-	// of requested font
-	cheat_list_handler.item1.SetFont(cl->GetFont());
-	cheat_list_handler.item1.SetColumn(1);
-#if 0
-	// the ideal way to set col 0's width would be to use
-	// wxLIST_AUTOSIZE after setting value to a sample:
-	cheat_list_handler.item0.SetText(wxT("00000000 00000000"));
-	cl->InsertItem(cheat_list_handler.item0);
-	cl->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	cl->RemoveItem(0);
-#else
-	// however, the generic listctrl implementation uses the wrong
-	// font to determine width (window vs. item), and does not
-	// calculate the margins the same way in calculation vs. actual
-	// drawing.  so calculate manually, using knowledge of underlying
-	// code.  This is highly version-unportable, but better than using
-	// buggy wx code..
-	int w, h;
-	cl->GetImageList(wxIMAGE_LIST_SMALL)->GetSize(0, w, h);
-	w += 5; // IMAGE_MARGIN_IN_REPORT_MODE
-	// following is missing from wxLIST_AUTOSIZE
-	w += 8; // ??? subtracted from width avail for text
-	{
-	    int charwidth, charheight;
-	    wxClientDC dc(cl);
-	    // following is item font instead of window font,
-	    // and so is missing from wxLIST_AUTOSIZE
-	    dc.SetFont(f);
-	    dc.GetTextExtent(wxT('M'), &charwidth, &charheight);
-	    w += (8 + 1 + 8) * charwidth;
-	}
-	cl->SetColumnWidth(0, w);
-#endif
-
-	d->Connect(wxEVT_COMMAND_TOOL_CLICKED,
-		   wxCommandEventHandler(CheatList_t::Tool),
-		   NULL, &cheat_list_handler);
-	d->Connect(wxEVT_COMMAND_LIST_ITEM_CHECKED,
-		   wxListEventHandler(CheatList_t::Check),
-		   NULL, &cheat_list_handler);
-	d->Connect(wxEVT_COMMAND_LIST_ITEM_UNCHECKED,
-		   wxListEventHandler(CheatList_t::UnCheck),
-		   NULL, &cheat_list_handler);
-	d->Connect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED,
-		   wxListEventHandler(CheatList_t::Edit),
-		   NULL, &cheat_list_handler);
-	d->Fit();	   
-    }
-
-    d=LoadXRCDialog("CheatEdit");
-    wxChoice *ch;
-    {
-	// d->Reparent(cheat_list_handler.dlg); // broken
-	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "Type",wxGenericValidator(& cheat_list_handler.ce_type));
-	cheat_list_handler.ce_type_ch = ch;
-	gettc("Desc", cheat_list_handler.ce_desc);
-	tc->SetMaxLength(sizeof(cheatsList[0].desc) - 1);
-	gettc("Codes", cheat_list_handler.ce_codes);
-	cheat_list_handler.ce_codes_tc = tc;
-	d->Fit();
-    }
-
-    d=LoadXRCDialog("CheatCreate");
-    {
-	cheat_find_handler.dlg = d;
-	d->SetEscapeId(wxID_OK);
-	CheatListCtrl *list;
-	list=SafeXRCCTRL<CheatListCtrl>(d, "CheatList");
-	cheat_find_handler.list = list;
-	list->SetValidator(CheatFindFill());
-	list->InsertColumn(0, _("Address"));
-	list->InsertColumn(1, _("Old Value"));
-	list->InsertColumn(2, _("New Value"));
-	getrbi("EQ", cheat_find_handler.op, SEARCH_EQ);
-	getrbi("NE", cheat_find_handler.op, SEARCH_NE);
-	getrbi("LT", cheat_find_handler.op, SEARCH_LT);
-	getrbi("LE", cheat_find_handler.op, SEARCH_LE);
-	getrbi("GT", cheat_find_handler.op, SEARCH_GT);
-	getrbi("GE", cheat_find_handler.op, SEARCH_GE);
-#define cf_make_update() \
-    rb->Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, \
-		wxCommandEventHandler(CheatFind_t::UpdateView), \
-		NULL, &cheat_find_handler)
-	getrbi("Size8", cheat_find_handler.size, BITS_8);
-	cf_make_update();
-	getrbi("Size16", cheat_find_handler.size, BITS_16);
-	cf_make_update();
-	getrbi("Size32", cheat_find_handler.size, BITS_32);
-	cf_make_update();
-	getrbi("Signed", cheat_find_handler.fmt, CFVFMT_SD);
-	cf_make_update();
-	getrbi("Unsigned", cheat_find_handler.fmt, CFVFMT_UD);
-	cf_make_update();
-	getrbi("Hexadecimal", cheat_find_handler.fmt, CFVFMT_UH);
-	cf_make_update();
-#define cf_make_valen() \
-    rb->Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, \
-		wxCommandEventHandler(CheatFind_t::EnableVal), \
-		NULL, &cheat_find_handler)
-	getrbi("OldValue", cheat_find_handler.valsrc, 1);
-	cf_make_valen();
-	cheat_find_handler.old_rb = rb;
-	rb->Disable();
-	getrbi("SpecificValue", cheat_find_handler.valsrc, 0);
-	cf_make_valen();
-	cheat_find_handler.val_rb = rb;
-	gettc("Value", cheat_find_handler.val_s);
-	cheat_find_handler.val_tc = tc;
-	wxStaticCast(tc->GetValidator(), wxTextValidator)->SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
-#define cf_button(n, f) \
-    d->Connect(XRCID(n), wxEVT_COMMAND_BUTTON_CLICKED, \
-	       wxCommandEventHandler(CheatFind_t::f), \
-	       NULL, &cheat_find_handler);
-#define cf_enbutton(n, v) do { \
-    cheat_find_handler.v=SafeXRCCTRL<wxButton>(d,  n); \
-    cheat_find_handler.v->Disable(); \
-} while(0)
-	cf_button("Search", Search);
-	cf_button("Update", UpdateVals);
-	cf_enbutton("Update", update_b);
-	cf_button("Clear", ResetSearch);
-	cf_enbutton("Clear", clear_b);
-	cf_button("AddCheat", AddCheatB);
-	cf_enbutton("AddCheat", add_b);
-	d->Connect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED,
-		   wxListEventHandler(CheatFind_t::AddCheatL),
-		   NULL, &cheat_find_handler);
-	d->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED,
-		   wxListEventHandler(CheatFind_t::Select),
-		   NULL, &cheat_find_handler);
-    d->Fit();
-    }
-
-    d=LoadXRCDialog("CheatAdd");
-    {
-	// d->Reparent(cheat_find_handler.dlg); // broken
-	gettc("Desc", cheat_find_handler.ca_desc);
-	tc->SetMaxLength(sizeof(cheatsList[0].desc) - 1);
-	gettc("Value", cheat_find_handler.ca_val);
-	cheat_find_handler.ca_val_tc = tc;
-	// MFC interface used this for cheat list's generic code adder as well,
-	// and made format selectable in interface.  I think the plain
-	// interface is good enough, even though the format for GB cheats
-	// is non-obvious.  Therefore, the format is now just a read-only
-	// field.
-	getlab("Format");
-	cheat_find_handler.ca_fmt = lab;
-	getlab("Address");
-	cheat_find_handler.ca_addr = lab;
-	d->Fit();
-    }
-
-    //// config menu
-    d=LoadXRCDialog("GeneralConfig");
-    wxCheckBox *cb;
-#define getcbb(n, o) do { \
-    cb=SafeXRCCTRL<wxCheckBox>(d, n); \
-    cb->SetValidator(wxGenericValidator(&o)); \
-} while(0)
-#define getcbi(n, o) do { \
-    cb=SafeXRCCTRL<wxCheckBox>(d, n); \
-    cb->SetValidator(wxBoolIntValidator(&o, 1)); \
-} while(0)
-
-    wxSpinCtrl *sc;
-#define getsc(n, o) do { \
-    sc=SafeXRCCTRL<wxSpinCtrl>(d, n); \
-    sc->SetValidator(wxGenericValidator(&o)); \
-} while(0)
-    {
-	getcbi("PauseWhenInactive", pauseWhenInactive);
-	getcbi("ApplyPatches", autoPatch);
-	getrbi("PNG", captureFormat, 0);
-	getrbi("BMP", captureFormat, 1);
-	getsc("RewindInterval", gopts.rewind_interval);
-	getsc("Throttle", throttle);
-	throttle_ctrl.thr = sc;
-	throttle_ctrl.thrsel=SafeXRCCTRL<wxChoice>(d, "ThrottleSel");
-	throttle_ctrl.thr->
-	    Connect(wxEVT_COMMAND_SPINCTRL_UPDATED,
-		    wxSpinEventHandler(ThrottleCtrl_t::SetThrottleSel),
-		    NULL, &throttle_ctrl);
-	throttle_ctrl.thrsel->
-	    Connect(wxEVT_COMMAND_CHOICE_SELECTED,
-		    wxCommandEventHandler(ThrottleCtrl_t::SetThrottle),
-		    NULL, &throttle_ctrl);
-	d->Connect(wxEVT_SHOW, wxShowEventHandler(ThrottleCtrl_t::Init),
-		   NULL, &throttle_ctrl);
-	d->Fit();
-    }
-
-#define getcbbe(n, o) getbe(n, o, cb, wxCheckBox, CB)
-    wxBoolIntEnValidator *bienval;
-#define getbie(n, o, v, cv, t, wt) do { \
-    cv=SafeXRCCTRL<t>(d, n); \
-    cv->SetValidator(wxBoolIntEnValidator(&o, v, v)); \
-    bienval = wxStaticCast(cv->GetValidator(), wxBoolIntEnValidator); \
-    static wxBoolEnHandler _ben; \
-    ben = &_ben; \
-    wx##wt##BoolEnHandlerConnect(cv, wxID_ANY, _ben); \
-} while(0)
-#define addbie(n) do { \
-    ben->controls.push_back(n); \
-    bienval->controls.push_back(n); \
-} while(0)
-#define addbier(n, r) do { \
-    ben->controls.push_back(n); \
-    ben->reverse.push_back(r); \
-    bienval->controls.push_back(n); \
-    bienval->reverse.push_back(r); \
-} while(0)
-#define getcbie(n, o, v) getbie(n, o, v, cb, wxCheckBox, CB)
-    wxFilePickerCtrl *fp;
-#define getfp(n, o) do { \
-    fp=SafeXRCCTRL<wxFilePickerCtrl>(d, n); \
-    fp->SetValidator(wxFileDirPickerValidator(&o)); \
-} while(0)
-    d=LoadXRCropertySheetDialog("GameBoyConfig");
-    {
-	/// System and Peripherals
-	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "System",wxGenericValidator(& gbEmulatorType));
-	// "Display borders" corresponds to 2 variables, so it is handled
-	// in command handler.  Plus making changes might require resizing
-	// game area.  Validation only here.
-	SafeXRCCTRL<wxChoice>(d, "Borders");
-	getcbbe("Printer", gopts.gbprint);
-	getcbb("PrintGather", gopts.print_auto_page);
-	addbe(cb);
-	getcbb("PrintSnap", gopts.print_screen_cap);
-	addbe(cb);
-	/// Speed
-	// AutoSkip/FrameSkip are 2 controls for 1 value.  Needs post-process
-	// to ensure checkbox not ignored
-	getcbie("FrameSkipAuto", gbFrameSkip, -1);
-	getsc("FrameSkip", gbFrameSkip);
-	addbier(sc, true);
-	getlab("FrameSkipLab");
-	addbier(lab, true);
-	/// Boot ROM
-	getcbie("BootRomEn", useBiosFileGB, 1);
-	getfp("BootRom", gopts.gb_bios);
-	addbe(fp);
-	getlab("BootRomLab");
-	addbe(lab);
-	getcbie("CBootRomEn", useBiosFileGBC, 1);
-	getfp("CBootRom", gopts.gbc_bios);
-	addbe(fp);
-	getlab("CBootRomLab");
-	addbe(lab);
-	/// Custom Colors
-	getcbi("Color", gbColorOption);
-	wxFarRadio *r = NULL;
-	for(int i = 0; i < 3; i++) {
-	    wxString pn;
-	    // NOTE: wx2.9.1 behaves differently for referenced nodes
-	    // than 2.8!  Unless there is an actual child node, the ID field
-	    // will not be overwritten.  This means that there should be a
-	    // dummy child node (e.g. position=(0,0)).  If you get
-	    // "Unable to load dialog GameBoyConfig from resources", this is
-	    // probably the reason.
-	    pn.Printf(wxT("cp%d"), i + 1);
-	    wxWindow *w = SafeXRCCTRL<wxWindow>(d, ToString(pn).c_str());
-	    GBColorConfigHandler[i].p = w;
-	    GBColorConfigHandler[i].pno = i;
-	    wxFarRadio *cb = SafeXRCCTRL<wxFarRadio>(w, "UsePalette");
-	if(r)
-		cb->SetGroup(r);
-	else
-		r = cb;
-	  cb->SetValidator(wxBoolIntValidator(&gbPaletteOption, i));
-	  ch=SafeXRCCTRL<wxChoice>(w, "ColorSet");
-	  GBColorConfigHandler[i].c = ch;
-	    for(int j = 0; j < 8; j++) {
-		wxString s;
-		s.Printf(wxT("Color%d"), j);
-		wxColourPickerCtrl *cp = SafeXRCCTRL<wxColourPickerCtrl>(w, ToString(s).c_str());
-		GBColorConfigHandler[i].cp[j] = cp;
-		cp->SetValidator(wxColorValidator(&systemGbPalette[i * 8 + j]));
-	    }
-	    w->Connect(wxEVT_COMMAND_CHOICE_SELECTED,
-		       wxCommandEventHandler(GBColorConfig_t::ColorSel),
-		       NULL, &GBColorConfigHandler[i]);
-	    w->Connect(XRCID("Reset"), wxEVT_COMMAND_BUTTON_CLICKED,
-		       wxCommandEventHandler(GBColorConfig_t::ColorReset),
-		       NULL, &GBColorConfigHandler[i]);
-	    w->Connect(wxID_ANY, wxEVT_COMMAND_COLOURPICKER_CHANGED,
-		       wxCommandEventHandler(GBColorConfig_t::ColorButton),
-		       NULL, &GBColorConfigHandler[i]);
-	}
-	d->Fit();
-    }
-
-    d=LoadXRCropertySheetDialog("GameBoyAdvanceConfig");
-    {
-	/// System and peripherals
-	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "SaveType",wxGenericValidator(& cpuSaveType));
-	BatConfigHandler.type = ch;
-	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "FlashSize",wxGenericValidator(& winFlashSize));
-	BatConfigHandler.size = ch;
-	d->Connect(XRCID("SaveType"), wxEVT_COMMAND_CHOICE_SELECTED,
-		   wxCommandEventHandler(BatConfig_t::ChangeType),
-		   NULL, &BatConfigHandler);
-#define getgbaw(n) do { \
-    wxWindow *w = d->FindWindow(XRCID(n)); \
-    CheckThrowXRCError(w,n); \
-    w->SetValidator(GBACtrlEnabler()); \
-} while(0)
-	getgbaw("Detect");
-	d->Connect(XRCID("Detect"), wxEVT_COMMAND_BUTTON_CLICKED,
-		   wxCommandEventHandler(BatConfig_t::Detect),
-		   NULL, &BatConfigHandler);
-	getcbi("RTC", rtcEnabled);
-	getcbi("AGBPrinter", agbPrint);
-
-	/// Speed
-	// AutoSkip/FrameSkip are 2 controls for 1 value.  Needs post-process
-	// to ensure checkbox not ignored
-	getcbie("FrameSkipAuto", autoFrameSkip, -1);
-	getsc("FrameSkip", frameSkip);
-	addbier(sc, true);
-	getlab("FrameSkipLab");
-	addbier(lab, true);
-
-	/// Boot ROM
-	getcbie("BootRomEn", useBiosFileGBA, 1);
-	getfp("BootRom", gopts.gba_bios);
-	addbe(fp);
-	getlab("BootRomLab");
-	addbe(lab);
-	getcbi("SkipIntro", skipBios);
-
-	/// Game Overrides
-	getgbaw("GameSettings");
-	// the rest must be filled in by command handler; just validate
-	SafeXRCCTRL<wxTextCtrl>(d, "Comment");
-	SafeXRCCTRL<wxChoice>(d, "OvRTC");
-	SafeXRCCTRL<wxChoice>(d, "OvSaveType");
-	SafeXRCCTRL<wxChoice>(d, "OvFlashSize");
-	SafeXRCCTRL<wxChoice>(d, "OvMirroring");
-	d->Fit();
-    }
-
-    d=LoadXRCropertySheetDialog("DisplayConfig");
-    {
-        /// On-Screen Display
-        ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "SpeedIndicator",wxGenericValidator(&showSpeed));
-        getcbi("NoStatusMsg", disableStatusMessages);
-        getcbi("Transparent", showSpeedTransparent);
-
-        /// Zoom
-        // this was a choice, but I'd rather not have to make an off-by-one
-        // validator just for this, and spinctrl is good enough.
-        getsc("DefaultScale", gopts.video_scale);
-        getcbb("RetainAspect", gopts.retain_aspect);
-        getsc("MaxScale", maxScale);
-        // fs modes should be filled in at popup time
-        // since they may change based on what screen is current
-        SafeXRCCTRL<wxChoice>(d, "FullscreenMode");
-        getcbi("Fullscreen", fullScreen);
-
-        /// Advanced
-        getrbi("OutputSimple", gopts.render_method, RND_SIMPLE);
-        getrbi("OutputOpenGL", gopts.render_method, RND_OPENGL);
-#ifdef NO_OGL
-        rb->Hide();
-#endif
-        getrbi("OutputCairo", gopts.render_method, RND_CAIRO);
-#ifdef NO_CAIRO
-        rb->Hide();
-#endif
-        getrbi("OutputDirect3D", gopts.render_method, RND_DIRECT3D);
-#if !defined(__WXMSW__) || defined(NO_D3D) || 1 // not implemented
-        rb->Hide();
-#endif
-        getcbb("Bilinear", gopts.bilinear);
-        getcbi("VSync", vsync);
-        // FIXME: make cb disabled when not GL or d3d
-        int mthr = wxThread::GetCPUCount();
-        if(mthr > 8)
-            mthr = 8;
-        if(mthr < 0)
-            mthr = 2;
-        cb=SafeXRCCTRL<wxCheckBox>(d, "Multithread");
-        cb->SetValidator(wxBoolIntValidator(&gopts.max_threads, mthr));
-        if(mthr <= 1)
-            cb->Hide();
-		getcbi("MMX", disableMMX);
-		//cb->Hide();
-        ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "Filter",wxGenericValidator(& gopts.filter));
-        // these two are filled and/or hidden at dialog load time
-        wxControl *pll;
-        wxChoice *pl;
-        pll=SafeXRCCTRL<wxControl>(d, "PluginLab");
-        pl=SafeXRCCTRL<wxChoice>(d, "Plugin");
-        pll->SetValidator(PluginEnabler());
-        pl->SetValidator(PluginListFiller(d, pll, ch));
-        PluginEnableHandler.lab = pll;
-        PluginEnableHandler.ch = pl;
-        ch->Connect(wxEVT_COMMAND_CHOICE_SELECTED,
-		    wxCommandEventHandler(PluginEnable_t::ToggleChoice),
-		    NULL, &PluginEnableHandler);
-        ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "IFB",wxGenericValidator(& gopts.ifb));
-        d->Fit();
-    }
-
-	d = LoadXRCropertySheetDialog("SoundConfig");
-    wxSlider *sl;
-#define getsl(n, o) do { \
-    sl=SafeXRCCTRL<wxSlider>(d, n); \
-    sl->SetValidator(wxGenericValidator(&o)); \
-} while(0)
-    {
-	/// Basic
-	getsl("Volume", gopts.sound_vol);
-	sound_config_handler.vol = sl;
-	d->Connect(XRCID("Volume100"), wxEVT_COMMAND_BUTTON_CLICKED,
-		   wxCommandEventHandler(SoundConfig_t::FullVol),
-		   NULL, &sound_config_handler);
-	ch=GetValidatedChild<wxChoice,wxGenericValidator>(d, "Rate",wxGenericValidator(& gopts.sound_qual));
-
-	/// Advanced
-#define audapi_rb(n, v) do {\
-    getrbi(n, gopts.audio_api, v); \
-    rb->Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, \
-		wxCommandEventHandler(SoundConfig_t::SetAPI), \
-		NULL, &sound_config_handler); \
-} while(0)
-	audapi_rb("SDL", AUD_SDL);
-	audapi_rb("OpenAL", AUD_OPENAL);
-#ifdef NO_OAL
-	rb->Hide();
-#endif
-	audapi_rb("DirectSound", AUD_DIRECTSOUND);
-#ifndef __WXMSW__
-	rb->Hide();
-#endif
-	audapi_rb("XAudio2", AUD_XAUDIO2);
-#if !defined(__WXMSW__) || defined(NO_XAUDIO2)
-	rb->Hide();
-#endif
-	sound_config_handler.dev=SafeXRCCTRL<wxChoice>(d, "Device");
-	sound_config_handler.dev->SetValidator(SoundConfigLoad());
-	getcbb("Upmix", gopts.upmix);
-	sound_config_handler.umix = cb;
-#if !defined(__WXMSW__) || defined(NO_XAUDIO2)
-	cb->Hide();
-#endif
-	getcbb("HWAccel", gopts.dsound_hw_accel);
-	sound_config_handler.hwacc = cb;
-#ifndef __WXMSW__
-	cb->Hide();
-#endif
-	getcbi("SyncGameAudio", synchronize);
-	getsl("Buffers", gopts.audio_buffers);
-	sound_config_handler.bufs = sl;
-	getlab("BuffersInfo");
-	sound_config_handler.bufinfo = lab;
-	sl->Connect(wxEVT_SCROLL_CHANGED,
-		    wxCommandEventHandler(SoundConfig_t::AdjustFramesEv),
-		    NULL, &sound_config_handler);
-	sl->Connect(wxEVT_SCROLL_THUMBTRACK,
-		    wxCommandEventHandler(SoundConfig_t::AdjustFramesEv),
-		    NULL, &sound_config_handler);
-	sound_config_handler.AdjustFrames(10);
-
-	/// Game Boy
-	getcbb("GBDeclicking", gopts.gb_declick);
-	getcbbe("GBEnhanceSound", gb_effects_config.enabled);
-	wxPanel *p;
-	p=SafeXRCCTRL<wxPanel>(d, "GBEnhanceSoundDep");
-	addbe(p);
-	getcbb("GBSurround", gb_effects_config.surround);
-	getsl("GBEcho", gopts.gb_echo);
-	getsl("GBStereo", gopts.gb_stereo);
-
-	/// Game Boy Advance
-	getcbb("GBASoundInterpolation", soundInterpolation);
-	getsl("GBASoundFiltering", gopts.gba_sound_filter);
-	d->Fit();
-    }
-
-    wxDirPickerCtrl *dp;
-#define getdp(n, o) do { \
-    dp=SafeXRCCTRL<wxDirPickerCtrl>(d, n); \
-    dp->SetValidator(wxFileDirPickerValidator(&o)); \
-} while(0)
-    d=LoadXRCDialog("DirectoriesConfig");
-    {
-	getdp("GBARoms", gopts.gba_rom_dir);
-	getdp("GBRoms", gopts.gb_rom_dir);
-	getdp("BatSaves", gopts.battery_dir);
-	getdp("StateSaves", gopts.state_dir);
-	getdp("Screenshots", gopts.scrshot_dir);
-	getdp("Recordings", gopts.recording_dir);
-	d->Fit();
-    }
-
-    wxDialog * joyDialog = LoadXRCropertySheetDialog("JoypadConfig");
-    wxFarRadio *r = 0;
-    for(int i = 0; i < 4; i++) {
-	wxString pn;
-	// NOTE: wx2.9.1 behaves differently for referenced nodes
-	// than 2.8!  Unless there is an actual child node, the ID field
-	// will not be overwritten.  This means that there should be a
-	// dummy child node (e.g. position=(0,0)).  If you get
-	// "Unable to load dialog JoypadConfig from resources", this is
-	// probably the reason.
-	pn.Printf(wxT("joy%d"), i + 1);
-	wxWindow *w = SafeXRCCTRL<wxWindow>(joyDialog, ToString(pn).c_str());
-	wxFarRadio *cb;
-	cb=SafeXRCCTRL<wxFarRadio>(w, "DefaultConfig");
-	if(r)
-	    cb->SetGroup(r);
-	else
-	    r = cb;
-	cb->SetValidator(wxBoolIntValidator(&gopts.default_stick, i + 1));
-	wxWindow *prev = NULL, *prevp = NULL;
-	for(int j = 0; j < NUM_KEYS; j++) {
-		wxJoyKeyTextCtrl *tc = XRCCTRL_D(*w, wxString::FromUTF8(joynames[j]), wxJoyKeyTextCtrl);
-	    CheckThrowXRCError(tc,ToString(joynames[j]));
-	    wxWindow *p = tc->GetParent();
-	    if(p == prevp)
-		tc->MoveAfterInTabOrder(prev);
-	    prev = tc;
-	    prevp = p;
-	    tc->SetValidator(wxJoyKeyValidator(&gopts.joykey_bindings[i][j]));
-	}
-	JoyPadConfigHandler[i].p = w;
-	w->Connect(XRCID("Defaults"), wxEVT_COMMAND_BUTTON_CLICKED,
-		   wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
-		   NULL, &JoyPadConfigHandler[i]);
-	w->Connect(XRCID("Clear"), wxEVT_COMMAND_BUTTON_CLICKED,
-		   wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
-		   NULL, &JoyPadConfigHandler[i]);
-	joyDialog->Fit();
-    }
-
-#ifndef NO_LINK
-    d=LoadXRCDialog("LinkConfig");
-    {
-	getcbbe("Joybus", gopts.gba_joybus_enabled);
-	getlab("JoybusHostLab");
-	addbe(lab);
-	gettc("JoybusHost", gopts.joybus_host);
-	addbe(tc);
-	getcbbe("Link", gopts.gba_link_enabled);
-	getcbb("RFU", gopts.rfu_enabled);
-	addbe(cb);
-	getlab("LinkTimeoutLab");
-	addbe(lab);
-	getsc("LinkTimeout", gopts.linktimeout);
-	addbe(sc);
-	d->Fit();
-    }
-#endif
-
-    d=LoadXRCDialog("AccelConfig");
-    {
-	wxTreeCtrl *tc;
-	tc=SafeXRCCTRL<wxTreeCtrl>(d, "Commands");
-	accel_config_handler.tc = tc;
-	wxControlWithItems *lb;
-	lb=SafeXRCCTRL<wxControlWithItems>(d, "Current");
-	accel_config_handler.lb = lb;
-	accel_config_handler.asb=SafeXRCCTRL<wxButton>(d, "Assign");
-	accel_config_handler.remb=SafeXRCCTRL<wxButton>(d, "Remove");
-	accel_config_handler.key=SafeXRCCTRL<wxKeyTextCtrl>(d, "Shortcut");
-	accel_config_handler.curas=SafeXRCCTRL<wxControl>(d, "AlreadyThere");
-	accel_config_handler.key->MoveBeforeInTabOrder(accel_config_handler.asb);
-	accel_config_handler.key->SetMultikey(0);
-	accel_config_handler.key->SetClearable(false);
-	wxTreeItemId rid = tc->AddRoot(wxT("root"));
-	if(menubar) {
-	    wxTreeItemId mid = tc->AppendItem(rid, _("Menu commands"));
-	    for(int i = 0; i < menubar->GetMenuCount(); i++) {
-#if wxCHECK_VERSION(2,8,8)
-		wxTreeItemId id = tc->AppendItem(mid, menubar->GetMenuLabelText(i));
-#else
-		// 2.8.4 has no equivalent for GetMenuLabelText()
-		wxString txt = menubar->GetMenuLabel(i);
-		txt.Replace(wxT("&"), wxT(""));
-		wxTreeItemId id = tc->AppendItem(mid, txt);
-#endif
-		add_menu_accels(tc, id, menubar->GetMenu(i));
-	    }
-	}
-	wxTreeItemId oid;
-	int noop_id = XRCID("NOOP");
-	for(int i = 0; i < ncmds; i++) {
-	    if(cmdtab[i].mi || (recent && cmdtab[i].cmd_id >= wxID_FILE1 &&
-			        cmdtab[i].cmd_id <= wxID_FILE10) ||
-	       cmdtab[i].cmd_id == noop_id)
-		continue;
-	    if(!oid.IsOk())
-		oid = tc->AppendItem(rid, _("Other commands"));
-	    TreeInt *val = new TreeInt(i);
-	    tc->AppendItem(oid, cmdtab[i].name, -1, -1, val);
-	}
-	tc->ExpandAll();
-	// FIXME: make this actually show the entire line w/o scrolling
-	// BestSize cuts off on rhs; MaxSize is completely invalid
-	wxSize sz = tc->GetBestSize();
-	if(sz.GetHeight() > 200)
-	    sz.SetHeight(200);
-	tc->SetSize(sz);
-	sz.SetWidth(-1);  // maybe allow it to become bigger
-	tc->SetSizeHints(sz, sz);
-	int w, h;
-	lb->GetTextExtent(wxT("CTRL-ALT-SHIFT-ENTER"), &w, &h);
-	sz.Set(w, h);
-	lb->SetMinSize(sz);
-	sz.Set(0, 0);
-	wxControl *curas = accel_config_handler.curas;
-	for(int i = 0; i < ncmds; i++) {
-	    wxString labs;
-	    treeid_to_name(i, labs, tc, tc->GetRootItem());
-	    curas->GetTextExtent(labs, &w, &h);
-	    if(w > sz.GetWidth())
-		sz.SetWidth(w);
-	    if(h > sz.GetHeight())
-		sz.SetHeight(h);
-	}
-	curas->SetSize(sz);
-	curas->SetSizeHints(sz);
-	tc->Connect(wxEVT_COMMAND_TREE_SEL_CHANGING,
-		   wxTreeEventHandler(AccelConfig_t::CommandSel),
-		   NULL, &accel_config_handler);
-	tc->Connect(wxEVT_COMMAND_TREE_SEL_CHANGED,
-		   wxTreeEventHandler(AccelConfig_t::CommandSel),
-		   NULL, &accel_config_handler);
-	d->Connect(wxEVT_SHOW, wxShowEventHandler(AccelConfig_t::Init),
-		   NULL, &accel_config_handler);
-	d->Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED,
-		   wxCommandEventHandler(AccelConfig_t::Set),
-		   NULL, &accel_config_handler);
-	d->Connect(XRCID("Assign"), wxEVT_COMMAND_BUTTON_CLICKED,
-		   wxCommandEventHandler(AccelConfig_t::Assign),
-		   NULL, &accel_config_handler);
-	d->Connect(XRCID("Remove"), wxEVT_COMMAND_BUTTON_CLICKED,
-		   wxCommandEventHandler(AccelConfig_t::Remove),
-		   NULL, &accel_config_handler);
-	d->Connect(XRCID("ResetAll"), wxEVT_COMMAND_BUTTON_CLICKED,
-		   wxCommandEventHandler(AccelConfig_t::ResetAll),
-		   NULL, &accel_config_handler);
-	lb->Connect(wxEVT_COMMAND_LISTBOX_SELECTED,
-		    wxCommandEventHandler(AccelConfig_t::KeySel),
-		    NULL, &accel_config_handler);
-	d->Connect(XRCID("Shortcut"), wxEVT_COMMAND_TEXT_UPDATED,
-		   wxCommandEventHandler(AccelConfig_t::CheckKey),
-		   NULL, &accel_config_handler);
-	d->Fit();
-    }
-    }
-    catch (std::exception& e)
-    {
-		wxLogError(wxString::FromUTF8(e.what()));
-		return false;
-	}
-
-    //// Debug menu
-    // actually, the viewers can be instantiated multiple times.
-    // since they're for debugging, it's probably OK to just detect errors
-    // at popup time.
-    // The only one that can only be popped up once is logging, so allocate
-    // and check it already.
-    logdlg = new LogDialog;
-
-    // activate OnDropFile event handler
-#if !defined(__WXGTK__) || wxCHECK_VERSION(2,8,10)
-    // may not actually do anything, but verfied to work w/ Linux/Nautilus
-    DragAcceptFiles(true);
-#endif
-
-    // delayed fullscreen
-    if(wxGetApp().pending_fullscreen || fullScreen)
-	panel->ShowFullScreen(true);
-
-#ifndef NO_LINK
-    LinkMode linkMode = getOptionsLinkMode();
-
-	if (linkMode == LINK_GAMECUBE_DOLPHIN) {
-		bool isv = !gopts.joybus_host.empty();
-		if(isv) {
-			isv = SetLinkServerHost(gopts.joybus_host.mb_str());
-		}
-		
-		if(!isv) {
-			wxLogError(_("JoyBus host invalid; disabling"));
-			gopts.gba_joybus_enabled = false;
-		} else {
-		    linkMode = LINK_DISCONNECTED;
-		}
-	}
-	
-	ConnectionState linkState = InitLink(linkMode);
-	if (linkState != LINK_OK) {
-		CloseLink();
-	}
-	
-	if (GetLinkMode() != LINK_DISCONNECTED)
-		cmd_enable |= CMDEN_LINK_ANY;
-#endif
-
-    enable_menus();
-
-    panel->SetFrameTitle();
-
-    // All OK; activate idle loop
-    panel->SetExtraStyle(panel->GetExtraStyle() | wxWS_EX_PROCESS_IDLE);
-
-    return true;
-}
-
-
 wxAcceleratorEntry_v MainFrame::get_accels(wxAcceleratorEntry_v user_accels)
 {
     // set global accelerators
@@ -3268,3 +2119,1172 @@ void MainFrame::set_global_accels()
 	    recent_accel[accels[i].GetCommand() - wxID_FILE1] = accels[i];
     SetRecentAccels();
 }
+
+void MainFrame::MenuOptionBool(const char* menuName, bool field)
+{
+	int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
+	for (int i = 0; i < checkable_mi.size(); i++) {
+		if (checkable_mi[i].cmd != id)
+			continue;
+		checkable_mi[i].boolopt = &field;
+		checkable_mi[i].mi->Check(field);
+		break;
+	}
+}
+
+void MainFrame::MenuOptionInt(const char* menuName, int field, int mask)
+{
+	int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
+	int v = mask;
+	for (int i = 0; i < checkable_mi.size(); i++) {
+		if (checkable_mi[i].cmd != id)
+			continue;
+		checkable_mi[i].intopt = &field;
+		checkable_mi[i].mask = mask;
+		checkable_mi[i].val = v;
+		checkable_mi[i].mi->Check((field & mask) == v);
+		break;
+	}
+}
+
+// If there is a menubar, store all special menuitems
+#define XRCITEM_I(id) menubar->FindItem(id, NULL)
+#define XRCITEM_D(s) XRCITEM_I(XRCID_D(s))
+#define XRCITEM(s) XRCITEM_D(wxT(s))
+
+bool MainFrame::BindControls()
+{
+	// Make sure display panel present and correct type
+	panel = XRCCTRL(*this, "DisplayArea", GameArea);
+	if (!panel) {
+		wxLogError(_("Main display panel not found"));
+		return false;
+	}
+	panel->AdjustSize(false);
+
+	// only the panel does idle events (the emulator loop)
+	// however, do not enable until end of init, since errors will start
+	// the idle loop on wxGTK
+	wxIdleEvent::SetMode(wxIDLE_PROCESS_SPECIFIED);
+
+	// could/should probably take this from xrc as well
+	// but I don't think xrc supports icon from Windows resource
+	wxIcon icon = wxXmlResource::Get()->LoadIcon(wxT("MainIcon"));
+	if (!icon.IsOk()) {
+		wxLogInfo(_("Main icon not found"));
+		icon = wxICON(wxvbam);
+	}
+	SetIcon(icon);
+
+	// NOOP if no status area
+	SetStatusText(_("Welcome to wxVBAM!"));
+
+	// Prepare system accel table
+	for (int i = 0; i < num_def_accels; i++)
+		sys_accels.push_back(default_accels[i]);
+
+
+
+	wxMenuBar *menubar = GetMenuBar();
+	ctx_menu = NULL;
+	if (menubar) {
+#if 0 // doesn't work in 2.9 at all (causes main menu to malfunction)
+		// to fix, recursively copy entire menu insted of just copying
+		// menubar.  This means that every saved menu item must also be
+		// saved twice...  A lot of work for a mostly worthless feature.
+		// If you want the menu, just exit full-screen mode.
+		// Either that, or add an option to retain the regular
+		// menubar in full-screen mode
+
+		// create a context menu for fullscreen mode
+		// FIXME: on gtk port, this gives Gtk-WARNING **:
+		//   gtk_menu_attach_to_widget(): menu already attached to GtkMenuItem
+		// but it works anyway
+		// Note: menu default accelerators (e.g. alt-f for file menu) don't
+		// work with context menu (and can never work, since there is no
+		// way to pop up a submenu)
+		// It would probably be better, in the end, to use a collapsed menu
+		// bar (either Amiga-style press RMB to make appear, or Windows
+		// collapsed toolbar-style move mouse to within a pixel of top to
+		// make appear).  Not supported in wx without a lot of work, though.
+		// Maybe this feature should just be dropped; the user would simply
+		// have to exit fullscreen mode to use the menu.
+		ctx_menu = new wxMenu();
+		for (int i = 0; i < menubar->GetMenuCount(); i++)
+			ctx_menu->AppendSubMenu(menubar->GetMenu(i), menubar->GetMenuLabel(i));
+#endif
+
+		// save all menu items in the command table
+		for (int i = 0; i < ncmds; i++) {
+			wxMenuItem *mi = cmdtab[i].mi = XRCITEM_I(cmdtab[i].cmd_id);
+			// remove unsupported commands first
+#ifdef NO_FFMPEG
+			if (cmdtab[i].mask_flags & (CMDEN_SREC | CMDEN_NSREC | CMDEN_VREC | CMDEN_NVREC)) {
+				if (mi)
+					mi->GetMenu()->Remove(mi);
+				cmdtab[i].cmd_id = XRCID("NOOP");
+				cmdtab[i].mi = NULL;
+				continue;
+			}
+#endif
+#ifndef GBA_LOGGING
+			if (cmdtab[i].cmd_id == XRCID("Logging")) {
+				if (mi)
+					mi->GetMenu()->Remove(mi);
+				cmdtab[i].cmd_id = XRCID("NOOP");
+				cmdtab[i].mi = NULL;
+				continue;
+			}
+#endif
+#ifdef NO_LINK
+			if (cmdtab[i].cmd_id == XRCID("LinkConfigure") ||
+				cmdtab[i].cmd_id == XRCID("LanLink")) {
+				if (mi)
+					mi->GetMenu()->Remove(mi);
+				cmdtab[i].cmd_id = XRCID("NOOP");
+				cmdtab[i].mi = NULL;
+				continue;
+			}
+#endif
+			if (mi) {
+				// wxgtk provides no way to retrieve stock label/accel
+				// and does not override wxGetStockLabel()
+				// as of 2.8.12/2.9.1
+				// so override with wx's stock label  <sigh>
+				// at least you still get gtk's stock icon
+				if (mi->GetItemLabel().empty())
+					mi->SetItemLabel(wxGetStockLabel(mi->GetId(),
+					wxSTOCK_WITH_MNEMONIC | wxSTOCK_WITH_ACCELERATOR));
+
+				// add accelerator to global accel table
+				wxAcceleratorEntry *a = mi->GetAccel();
+				if (a) {
+					a->Set(a->GetFlags(), a->GetKeyCode(), cmdtab[i].cmd_id, mi);
+					// only add it if not already there
+					for (wxAcceleratorEntry_v::iterator e = sys_accels.begin();
+						e < sys_accels.end(); e++)
+						if (a->GetFlags() == e->GetFlags() &&
+							a->GetKeyCode() == e->GetKeyCode()) {
+							if (e->GetMenuItem()) {
+								wxLogInfo(_("Duplicate menu accelerator: %s for %s and %s; keeping first"),
+									wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).c_str(),
+									e->GetMenuItem()->GetItemLabelText().c_str(),
+									mi->GetItemLabelText().c_str());
+								delete a;
+								a = 0;
+							}
+							else {
+								if (e->GetCommand() != a->GetCommand()) {
+									int cmd;
+									for (cmd = 0; cmd < ncmds; cmd++)
+										if (cmdtab[cmd].cmd_id == e->GetCommand())
+											break;
+									wxLogInfo(_("Menu accelerator %s for %s overrides default for %s ; keeping menu"),
+										wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).c_str(),
+										mi->GetItemLabelText().c_str(),
+										cmdtab[cmd].cmd);
+								}
+								sys_accels.erase(e);
+							}
+							break;
+						}
+					if (a)
+						sys_accels.push_back(*a);
+					else
+						// strip from label so user isn't confused
+						DoSetAccel(mi, NULL);
+				}
+
+				// store checkable items
+				if (mi->IsCheckable()) {
+					checkable_mi_t cmi = { cmdtab[i].cmd_id, mi };
+					checkable_mi.push_back(cmi);
+
+					for (int j = 0; j < num_opts; j++)
+					{
+						wxString menuName = wxString(opts[j].cmd, wxConvUTF8);
+						if (menuName == cmdtab[i].cmd)
+						{
+							if (opts[j].intopt)
+								MenuOptionInt(opts[j].cmd, *opts[j].intopt, (1 << 0));
+							else if (opts[j].boolopt)
+								MenuOptionBool(opts[j].cmd, *opts[j].boolopt);
+						}
+					}
+				}
+			}
+		}
+
+		// if a recent menu is present, save its location
+		wxMenuItem *recentmi = XRCITEM("RecentMenu");
+		if (recentmi && recentmi->IsSubMenu()) {
+			recent = recentmi->GetSubMenu();
+			gopts.recent->UseMenu(recent);
+			gopts.recent->AddFilesToMenu();
+		}
+		else
+			recent = NULL;
+		// if save/load state menu items present, save their locations
+		for (int i = 0; i < 10; i++) {
+			wxString n;
+			n.Printf(wxT("LoadGame%02d"), i + 1);
+			loadst_mi[i] = XRCITEM_D(n);
+			n.Printf(wxT("SaveGame%02d"), i + 1);
+			savest_mi[i] = XRCITEM_D(n);
+		}
+	}
+	else {
+		recent = NULL;
+		for (int i = 0; i < 10; i++)
+			loadst_mi[i] = savest_mi[i] = NULL;
+	}
+	// just setting to UNLOAD_CMDEN_KEEP is invalid
+	// so just set individual flags here
+	cmd_enable = CMDEN_NGDB_ANY | CMDEN_NREC_ANY;
+	update_state_ts(true);
+
+	// set pointers for checkable menu items
+	// and set initial checked status
+	if (checkable_mi.size()) {
+		MenuOptionBool("RecentFreeze", gopts.recent_freeze);
+		MenuOptionBool("Pause", paused);
+		MenuOptionInt("SoundChannel1", gopts.sound_en, (1 << 0));
+		MenuOptionInt("SoundChannel2", gopts.sound_en, (1 << 1));
+		MenuOptionInt("SoundChannel3", gopts.sound_en, (1 << 2));
+		MenuOptionInt("SoundChannel4", gopts.sound_en, (1 << 3));
+		MenuOptionInt("DirectSoundA", gopts.sound_en, (1 << 8));
+		MenuOptionInt("DirectSoundB", gopts.sound_en, (1 << 9));
+		MenuOptionInt("VideoLayersBG0", layerSettings, (1 << 8));
+		MenuOptionInt("VideoLayersBG1", layerSettings, (1 << 9));
+		MenuOptionInt("VideoLayersBG2", layerSettings, (1 << 10));
+		MenuOptionInt("VideoLayersBG3", layerSettings, (1 << 11));
+		MenuOptionInt("VideoLayersOBJ", layerSettings, (1 << 12));
+		MenuOptionInt("VideoLayersWIN0", layerSettings, (1 << 13));
+		MenuOptionInt("VideoLayersWIN1", layerSettings, (1 << 14));
+		MenuOptionInt("VideoLayersOBJWIN", layerSettings, (1 << 15));
+		MenuOptionBool("CheatsAutoSaveLoad", gopts.autoload_cheats);
+		MenuOptionBool("CheatsEnable", cheatsEnabled);
+		MenuOptionBool("KeepSaves", skipSaveGameBattery);
+		MenuOptionBool("KeepCheats", skipSaveGameCheats);
+		MenuOptionBool("LoadGameAutoLoad", gopts.autoload_state);
+		MenuOptionInt("JoypadAutofireA", autofire, KEYM_A);
+		MenuOptionInt("JoypadAutofireB", autofire, KEYM_B);
+		MenuOptionInt("JoypadAutofireL", autofire, KEYM_LEFT);
+		MenuOptionInt("JoypadAutofireR", autofire, KEYM_RIGHT);
+		MenuOptionBool("EmulatorSpeedupToggle", turbo);
+	}
+	for (int i = 0; i < checkable_mi.size(); i++)
+		if (!checkable_mi[i].boolopt && !checkable_mi[i].intopt) {
+			wxLogError(_("Invalid menu item %s; removing"),
+				checkable_mi[i].mi->GetItemLabelText().c_str());
+			checkable_mi[i].mi->GetMenu()->Remove(checkable_mi[i].mi);
+			checkable_mi[i].mi = NULL;
+		}
+
+	set_global_accels();
+
+	// preload and verify all resource dialogs
+	// this will take init time and memory, but catches errors in xrc sooner
+	// note that the only verification done is to ensure no crashes.  It's the
+	// user's responsibility to ensure that the GUI works as intended after
+	// modifications
+	try {
+
+		wxDialog *d = NULL;
+
+		//// displayed during run
+		d = LoadXRCDialog("GBPrinter");
+		// just verify preview window & mag sel present
+		{
+			wxPanel *prev;
+			prev = SafeXRCCTRL<wxPanel>(d, "Preview");
+			if (!wxDynamicCast(prev->GetParent(), wxScrolledWindow))
+				throw std::runtime_error("Unable to load a dialog control from the builtin xrc file: Preview");
+			SafeXRCCTRL<wxControlWithItems>(d, "Magnification");
+			d->Fit();
+		}
+
+		//// File menu
+		d = LoadXRCDialog("GBAROMInfo");
+		// just verify fields present
+		wxControl *lab;
+#define getlab(n) lab=SafeXRCCTRL<wxControl>(d,  n)
+		getlab("Title");
+		getlab("GameCode");
+		getlab("MakerCode");
+		getlab("MakerName");
+		getlab("UnitCode");
+		getlab("DeviceType");
+		getlab("Version");
+		getlab("CRC");
+		d->Fit();
+
+		d = LoadXRCDialog("GBROMInfo");
+		// just verify fields present
+		getlab("Title");
+		getlab("MakerCode");
+		getlab("MakerName");
+		getlab("UnitCode");
+		getlab("DeviceType");
+		getlab("Version");
+		getlab("CRC");
+		getlab("Color");
+		getlab("ROMSize");
+		getlab("RAMSize");
+		getlab("DestCode");
+		getlab("LicCode");
+		getlab("Checksum");
+		d->Fit();
+
+		d = LoadXRCDialog("CodeSelect");
+		// just verify list present
+		SafeXRCCTRL<wxControlWithItems>(d, "CodeList");
+		d->Fit();
+
+		d = LoadXRCDialog("ExportSPS");
+		// just verify text fields present
+		SafeXRCCTRL<wxTextCtrl>(d, "Title");
+		SafeXRCCTRL<wxTextCtrl>(d, "Description");
+		SafeXRCCTRL<wxTextCtrl>(d, "Notes");
+		d->Fit();
+
+		//// Emulation menu
+#ifndef NO_LINK
+		d = LoadXRCDialog("NetLink");
+#endif
+		wxRadioButton *rb;
+#define getrbi(n, o, v) do { \
+    rb=SafeXRCCTRL<wxRadioButton>(d,  n); \
+    rb->SetValidator(wxBoolIntValidator(&o, v)); \
+		} while(0)
+#define getrbb(n, o) do { \
+    rb=SafeXRCCTRL<wxRadioButton>(d,  n); \
+    rb->SetValidator(wxGenericValidator(&o)); \
+		} while(0)
+#define getrbbr(n, o) do { \
+    rb=SafeXRCCTRL<wxRadioButton>(d,  n); \
+    rb->SetValidator(wxBoolRevValidator(&o)); \
+		} while(0)
+		wxBoolEnValidator *benval;
+		wxBoolEnHandler *ben;
+#define getbe(n, o, cv, t, wt) do { \
+    cv=SafeXRCCTRL<t>(d,  n); \
+    cv->SetValidator(wxBoolEnValidator(&o)); \
+    benval = wxStaticCast(cv->GetValidator(), wxBoolEnValidator); \
+    static wxBoolEnHandler _ben; \
+    ben = &_ben; \
+    wx##wt##BoolEnHandlerConnect(cv, wxID_ANY, _ben); \
+		} while(0)
+		// brenval & friends are here just to allow yes/no radioboxes in place
+		// of checkboxes.  A lot of work for little benefit.
+		wxBoolRevEnValidator *brenval;
+#define getbre(n, o, cv, t, wt) do { \
+    cv=SafeXRCCTRL<t>(d,  n); \
+    cv->SetValidator(wxBoolRevEnValidator(&o)); \
+    brenval = wxStaticCast(cv->GetValidator(), wxBoolRevEnValidator); \
+    wx##wt##BoolEnHandlerConnect(rb, wxID_ANY, *ben); \
+		} while(0)
+#define addbe(n) do { \
+    ben->controls.push_back(n); \
+    benval->controls.push_back(n); \
+		} while(0)
+#define addrbe(n) do { \
+    addbe(n); \
+    brenval->controls.push_back(n); \
+		} while(0)
+#define addber(n, r) do { \
+    ben->controls.push_back(n); \
+    ben->reverse.push_back(r); \
+    benval->controls.push_back(n); \
+    benval->reverse.push_back(r); \
+		} while(0)
+#define addrber(n, r) do { \
+    addber(n, r); \
+    brenval->controls.push_back(n); \
+    brenval->reverse.push_back(r); \
+		} while(0)
+#define getrbbe(n, o) getbe(n, o, rb, wxRadioButton, RBE)
+#define getrbbd(n, o) getbre(n, o, rb, wxRadioButton, RBD)
+		wxTextCtrl *tc;
+#define gettc(n, o) do { \
+    tc=SafeXRCCTRL<wxTextCtrl>(d,  n); \
+    tc->SetValidator(wxTextValidator(wxFILTER_NONE, &o)); \
+		} while(0)
+#ifndef NO_LINK
+		{
+			net_link_handler.dlg = d;
+			getrbbe("Server", net_link_handler.server);
+			getrbbd("Client", net_link_handler.server);
+			getlab("PlayersLab");
+			addrber(lab, false);
+			getrbi("Link2P", net_link_handler.n_players, 2);
+			addrber(rb, false);
+			getrbi("Link3P", net_link_handler.n_players, 3);
+			addrber(rb, false);
+			getrbi("Link4P", net_link_handler.n_players, 4);
+			addrber(rb, false);
+			getlab("ServerIPLab");
+			addrber(lab, true);
+			gettc("ServerIP", gopts.link_host);
+			addrber(tc, true);
+			getrbbr("SpeedOff", gopts.lanlink_speed);
+			getrbb("SpeedOn", gopts.lanlink_speed);
+			wxWindow *okb = d->FindWindow(wxID_OK);
+			if (okb) { // may be gone if style guidlines removed it
+				net_link_handler.okb = wxStaticCast(okb, wxButton);
+				d->Connect(XRCID("Server"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
+					wxCommandEventHandler(NetLink_t::ServerOKButton),
+					NULL, &net_link_handler);
+				d->Connect(XRCID("Client"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
+					wxCommandEventHandler(NetLink_t::ClientOKButton),
+					NULL, &net_link_handler);
+			}
+			// this should intercept wxID_OK before the dialog handler gets it
+			d->Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED,
+				wxCommandEventHandler(NetLink_t::NetConnect),
+				NULL, &net_link_handler);
+			d->Fit();
+		}
+#endif
+
+		d = LoadXRCDialog("CheatList");
+		{
+			cheat_list_handler.dlg = d;
+			d->SetEscapeId(wxID_OK);
+			wxCheckedListCtrl *cl;
+			cl = SafeXRCCTRL<wxCheckedListCtrl>(d, "Cheats");
+			if (!cl->Init())
+				throw std::runtime_error("Unable to initialize the Cheats dialog control from the builtin xrc file!");
+			cheat_list_handler.list = cl;
+			cl->SetValidator(CheatListFill());
+			cl->InsertColumn(0, _("Code"));
+			// can't just set font for whole column; must set in each
+			// individual item
+			wxFont of = cl->GetFont();
+			// of.SetFamily(wxFONTFAMILY_MODERN);  // doesn't work (no font change)
+			wxFont f(of.GetPointSize(), wxFONTFAMILY_MODERN, of.GetStyle(),
+				of.GetWeight());
+			cheat_list_handler.item0.SetFont(f);
+			cheat_list_handler.item0.SetColumn(0);
+			cl->InsertColumn(1, _("Description"));
+			// too bad I can't just set the size to windowwidth - other cols
+			// default width is header width, but using following will probably
+			// make it 80 pixels wide regardless
+			// cl->SetColumnWidth(1, wxLIST_AUTOSIZE_USEHEADER);
+			cheat_list_handler.col1minw = cl->GetColumnWidth(1);
+			// on wxGTK, column 1 seems to inherit column 0's font regardless
+			// of requested font
+			cheat_list_handler.item1.SetFont(cl->GetFont());
+			cheat_list_handler.item1.SetColumn(1);
+#if 0
+			// the ideal way to set col 0's width would be to use
+			// wxLIST_AUTOSIZE after setting value to a sample:
+			cheat_list_handler.item0.SetText(wxT("00000000 00000000"));
+			cl->InsertItem(cheat_list_handler.item0);
+			cl->SetColumnWidth(0, wxLIST_AUTOSIZE);
+			cl->RemoveItem(0);
+#else
+			// however, the generic listctrl implementation uses the wrong
+			// font to determine width (window vs. item), and does not
+			// calculate the margins the same way in calculation vs. actual
+			// drawing.  so calculate manually, using knowledge of underlying
+			// code.  This is highly version-unportable, but better than using
+			// buggy wx code..
+			int w, h;
+			cl->GetImageList(wxIMAGE_LIST_SMALL)->GetSize(0, w, h);
+			w += 5; // IMAGE_MARGIN_IN_REPORT_MODE
+			// following is missing from wxLIST_AUTOSIZE
+			w += 8; // ??? subtracted from width avail for text
+			{
+				int charwidth, charheight;
+				wxClientDC dc(cl);
+				// following is item font instead of window font,
+				// and so is missing from wxLIST_AUTOSIZE
+				dc.SetFont(f);
+				dc.GetTextExtent(wxT('M'), &charwidth, &charheight);
+				w += (8 + 1 + 8) * charwidth;
+			}
+			cl->SetColumnWidth(0, w);
+#endif
+
+			d->Connect(wxEVT_COMMAND_TOOL_CLICKED,
+				wxCommandEventHandler(CheatList_t::Tool),
+				NULL, &cheat_list_handler);
+			d->Connect(wxEVT_COMMAND_LIST_ITEM_CHECKED,
+				wxListEventHandler(CheatList_t::Check),
+				NULL, &cheat_list_handler);
+			d->Connect(wxEVT_COMMAND_LIST_ITEM_UNCHECKED,
+				wxListEventHandler(CheatList_t::UnCheck),
+				NULL, &cheat_list_handler);
+			d->Connect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED,
+				wxListEventHandler(CheatList_t::Edit),
+				NULL, &cheat_list_handler);
+			d->Fit();
+		}
+
+		d = LoadXRCDialog("CheatEdit");
+		wxChoice *ch;
+		{
+			// d->Reparent(cheat_list_handler.dlg); // broken
+			ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "Type", wxGenericValidator(&cheat_list_handler.ce_type));
+			cheat_list_handler.ce_type_ch = ch;
+			gettc("Desc", cheat_list_handler.ce_desc);
+			tc->SetMaxLength(sizeof(cheatsList[0].desc) - 1);
+			gettc("Codes", cheat_list_handler.ce_codes);
+			cheat_list_handler.ce_codes_tc = tc;
+			d->Fit();
+		}
+
+		d = LoadXRCDialog("CheatCreate");
+		{
+			cheat_find_handler.dlg = d;
+			d->SetEscapeId(wxID_OK);
+			CheatListCtrl *list;
+			list = SafeXRCCTRL<CheatListCtrl>(d, "CheatList");
+			cheat_find_handler.list = list;
+			list->SetValidator(CheatFindFill());
+			list->InsertColumn(0, _("Address"));
+			list->InsertColumn(1, _("Old Value"));
+			list->InsertColumn(2, _("New Value"));
+			getrbi("EQ", cheat_find_handler.op, SEARCH_EQ);
+			getrbi("NE", cheat_find_handler.op, SEARCH_NE);
+			getrbi("LT", cheat_find_handler.op, SEARCH_LT);
+			getrbi("LE", cheat_find_handler.op, SEARCH_LE);
+			getrbi("GT", cheat_find_handler.op, SEARCH_GT);
+			getrbi("GE", cheat_find_handler.op, SEARCH_GE);
+#define cf_make_update() \
+    rb->Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, \
+		wxCommandEventHandler(CheatFind_t::UpdateView), \
+		NULL, &cheat_find_handler)
+			getrbi("Size8", cheat_find_handler.size, BITS_8);
+			cf_make_update();
+			getrbi("Size16", cheat_find_handler.size, BITS_16);
+			cf_make_update();
+			getrbi("Size32", cheat_find_handler.size, BITS_32);
+			cf_make_update();
+			getrbi("Signed", cheat_find_handler.fmt, CFVFMT_SD);
+			cf_make_update();
+			getrbi("Unsigned", cheat_find_handler.fmt, CFVFMT_UD);
+			cf_make_update();
+			getrbi("Hexadecimal", cheat_find_handler.fmt, CFVFMT_UH);
+			cf_make_update();
+#define cf_make_valen() \
+    rb->Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, \
+		wxCommandEventHandler(CheatFind_t::EnableVal), \
+		NULL, &cheat_find_handler)
+			getrbi("OldValue", cheat_find_handler.valsrc, 1);
+			cf_make_valen();
+			cheat_find_handler.old_rb = rb;
+			rb->Disable();
+			getrbi("SpecificValue", cheat_find_handler.valsrc, 0);
+			cf_make_valen();
+			cheat_find_handler.val_rb = rb;
+			gettc("Value", cheat_find_handler.val_s);
+			cheat_find_handler.val_tc = tc;
+			wxStaticCast(tc->GetValidator(), wxTextValidator)->SetStyle(wxFILTER_INCLUDE_CHAR_LIST);
+#define cf_button(n, f) \
+    d->Connect(XRCID(n), wxEVT_COMMAND_BUTTON_CLICKED, \
+	       wxCommandEventHandler(CheatFind_t::f), \
+	       NULL, &cheat_find_handler);
+#define cf_enbutton(n, v) do { \
+    cheat_find_handler.v=SafeXRCCTRL<wxButton>(d,  n); \
+    cheat_find_handler.v->Disable(); \
+			} while(0)
+			cf_button("Search", Search);
+			cf_button("Update", UpdateVals);
+			cf_enbutton("Update", update_b);
+			cf_button("Clear", ResetSearch);
+			cf_enbutton("Clear", clear_b);
+			cf_button("AddCheat", AddCheatB);
+			cf_enbutton("AddCheat", add_b);
+			d->Connect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED,
+				wxListEventHandler(CheatFind_t::AddCheatL),
+				NULL, &cheat_find_handler);
+			d->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED,
+				wxListEventHandler(CheatFind_t::Select),
+				NULL, &cheat_find_handler);
+			d->Fit();
+		}
+
+		d = LoadXRCDialog("CheatAdd");
+		{
+			// d->Reparent(cheat_find_handler.dlg); // broken
+			gettc("Desc", cheat_find_handler.ca_desc);
+			tc->SetMaxLength(sizeof(cheatsList[0].desc) - 1);
+			gettc("Value", cheat_find_handler.ca_val);
+			cheat_find_handler.ca_val_tc = tc;
+			// MFC interface used this for cheat list's generic code adder as well,
+			// and made format selectable in interface.  I think the plain
+			// interface is good enough, even though the format for GB cheats
+			// is non-obvious.  Therefore, the format is now just a read-only
+			// field.
+			getlab("Format");
+			cheat_find_handler.ca_fmt = lab;
+			getlab("Address");
+			cheat_find_handler.ca_addr = lab;
+			d->Fit();
+		}
+
+		//// config menu
+		d = LoadXRCDialog("GeneralConfig");
+		wxCheckBox *cb;
+#define getcbb(n, o) do { \
+    cb=SafeXRCCTRL<wxCheckBox>(d, n); \
+    cb->SetValidator(wxGenericValidator(&o)); \
+		} while(0)
+#define getcbi(n, o) do { \
+    cb=SafeXRCCTRL<wxCheckBox>(d, n); \
+    cb->SetValidator(wxBoolIntValidator(&o, 1)); \
+		} while(0)
+
+		wxSpinCtrl *sc;
+#define getsc(n, o) do { \
+    sc=SafeXRCCTRL<wxSpinCtrl>(d, n); \
+    sc->SetValidator(wxGenericValidator(&o)); \
+		} while(0)
+		{
+			getcbi("PauseWhenInactive", pauseWhenInactive);
+			getcbi("ApplyPatches", autoPatch);
+			getrbi("PNG", captureFormat, 0);
+			getrbi("BMP", captureFormat, 1);
+			getsc("RewindInterval", gopts.rewind_interval);
+			getsc("Throttle", throttle);
+			throttle_ctrl.thr = sc;
+			throttle_ctrl.thrsel = SafeXRCCTRL<wxChoice>(d, "ThrottleSel");
+			throttle_ctrl.thr->
+				Connect(wxEVT_COMMAND_SPINCTRL_UPDATED,
+				wxSpinEventHandler(ThrottleCtrl_t::SetThrottleSel),
+				NULL, &throttle_ctrl);
+			throttle_ctrl.thrsel->
+				Connect(wxEVT_COMMAND_CHOICE_SELECTED,
+				wxCommandEventHandler(ThrottleCtrl_t::SetThrottle),
+				NULL, &throttle_ctrl);
+			d->Connect(wxEVT_SHOW, wxShowEventHandler(ThrottleCtrl_t::Init),
+				NULL, &throttle_ctrl);
+			d->Fit();
+		}
+
+#define getcbbe(n, o) getbe(n, o, cb, wxCheckBox, CB)
+		wxBoolIntEnValidator *bienval;
+#define getbie(n, o, v, cv, t, wt) do { \
+    cv=SafeXRCCTRL<t>(d, n); \
+    cv->SetValidator(wxBoolIntEnValidator(&o, v, v)); \
+    bienval = wxStaticCast(cv->GetValidator(), wxBoolIntEnValidator); \
+    static wxBoolEnHandler _ben; \
+    ben = &_ben; \
+    wx##wt##BoolEnHandlerConnect(cv, wxID_ANY, _ben); \
+		} while(0)
+#define addbie(n) do { \
+    ben->controls.push_back(n); \
+    bienval->controls.push_back(n); \
+		} while(0)
+#define addbier(n, r) do { \
+    ben->controls.push_back(n); \
+    ben->reverse.push_back(r); \
+    bienval->controls.push_back(n); \
+    bienval->reverse.push_back(r); \
+		} while(0)
+#define getcbie(n, o, v) getbie(n, o, v, cb, wxCheckBox, CB)
+		wxFilePickerCtrl *fp;
+#define getfp(n, o) do { \
+    fp=SafeXRCCTRL<wxFilePickerCtrl>(d, n); \
+    fp->SetValidator(wxFileDirPickerValidator(&o)); \
+		} while(0)
+		d = LoadXRCropertySheetDialog("GameBoyConfig");
+		{
+			/// System and Peripherals
+			ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "System", wxGenericValidator(&gbEmulatorType));
+			// "Display borders" corresponds to 2 variables, so it is handled
+			// in command handler.  Plus making changes might require resizing
+			// game area.  Validation only here.
+			SafeXRCCTRL<wxChoice>(d, "Borders");
+			getcbbe("Printer", gopts.gbprint);
+			getcbb("PrintGather", gopts.print_auto_page);
+			addbe(cb);
+			getcbb("PrintSnap", gopts.print_screen_cap);
+			addbe(cb);
+			/// Speed
+			// AutoSkip/FrameSkip are 2 controls for 1 value.  Needs post-process
+			// to ensure checkbox not ignored
+			getcbie("FrameSkipAuto", gbFrameSkip, -1);
+			getsc("FrameSkip", gbFrameSkip);
+			addbier(sc, true);
+			getlab("FrameSkipLab");
+			addbier(lab, true);
+			/// Boot ROM
+			getcbie("BootRomEn", useBiosFileGB, 1);
+			getfp("BootRom", gopts.gb_bios);
+			addbe(fp);
+			getlab("BootRomLab");
+			addbe(lab);
+			getcbie("CBootRomEn", useBiosFileGBC, 1);
+			getfp("CBootRom", gopts.gbc_bios);
+			addbe(fp);
+			getlab("CBootRomLab");
+			addbe(lab);
+			/// Custom Colors
+			getcbi("Color", gbColorOption);
+			wxFarRadio *r = NULL;
+			for (int i = 0; i < 3; i++) {
+				wxString pn;
+				// NOTE: wx2.9.1 behaves differently for referenced nodes
+				// than 2.8!  Unless there is an actual child node, the ID field
+				// will not be overwritten.  This means that there should be a
+				// dummy child node (e.g. position=(0,0)).  If you get
+				// "Unable to load dialog GameBoyConfig from resources", this is
+				// probably the reason.
+				pn.Printf(wxT("cp%d"), i + 1);
+				wxWindow *w = SafeXRCCTRL<wxWindow>(d, ToString(pn).c_str());
+				GBColorConfigHandler[i].p = w;
+				GBColorConfigHandler[i].pno = i;
+				wxFarRadio *cb = SafeXRCCTRL<wxFarRadio>(w, "UsePalette");
+				if (r)
+					cb->SetGroup(r);
+				else
+					r = cb;
+				cb->SetValidator(wxBoolIntValidator(&gbPaletteOption, i));
+				ch = SafeXRCCTRL<wxChoice>(w, "ColorSet");
+				GBColorConfigHandler[i].c = ch;
+				for (int j = 0; j < 8; j++) {
+					wxString s;
+					s.Printf(wxT("Color%d"), j);
+					wxColourPickerCtrl *cp = SafeXRCCTRL<wxColourPickerCtrl>(w, ToString(s).c_str());
+					GBColorConfigHandler[i].cp[j] = cp;
+					cp->SetValidator(wxColorValidator(&systemGbPalette[i * 8 + j]));
+				}
+				w->Connect(wxEVT_COMMAND_CHOICE_SELECTED,
+					wxCommandEventHandler(GBColorConfig_t::ColorSel),
+					NULL, &GBColorConfigHandler[i]);
+				w->Connect(XRCID("Reset"), wxEVT_COMMAND_BUTTON_CLICKED,
+					wxCommandEventHandler(GBColorConfig_t::ColorReset),
+					NULL, &GBColorConfigHandler[i]);
+				w->Connect(wxID_ANY, wxEVT_COMMAND_COLOURPICKER_CHANGED,
+					wxCommandEventHandler(GBColorConfig_t::ColorButton),
+					NULL, &GBColorConfigHandler[i]);
+			}
+			d->Fit();
+		}
+
+		d = LoadXRCropertySheetDialog("GameBoyAdvanceConfig");
+		{
+			/// System and peripherals
+			ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "SaveType", wxGenericValidator(&cpuSaveType));
+			BatConfigHandler.type = ch;
+			ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "FlashSize", wxGenericValidator(&winFlashSize));
+			BatConfigHandler.size = ch;
+			d->Connect(XRCID("SaveType"), wxEVT_COMMAND_CHOICE_SELECTED,
+				wxCommandEventHandler(BatConfig_t::ChangeType),
+				NULL, &BatConfigHandler);
+#define getgbaw(n) do { \
+    wxWindow *w = d->FindWindow(XRCID(n)); \
+    CheckThrowXRCError(w,n); \
+    w->SetValidator(GBACtrlEnabler()); \
+			} while(0)
+			getgbaw("Detect");
+			d->Connect(XRCID("Detect"), wxEVT_COMMAND_BUTTON_CLICKED,
+				wxCommandEventHandler(BatConfig_t::Detect),
+				NULL, &BatConfigHandler);
+			getcbi("RTC", rtcEnabled);
+			getcbi("AGBPrinter", agbPrint);
+
+			/// Speed
+			// AutoSkip/FrameSkip are 2 controls for 1 value.  Needs post-process
+			// to ensure checkbox not ignored
+			getcbie("FrameSkipAuto", autoFrameSkip, -1);
+			getsc("FrameSkip", frameSkip);
+			addbier(sc, true);
+			getlab("FrameSkipLab");
+			addbier(lab, true);
+
+			/// Boot ROM
+			getcbie("BootRomEn", useBiosFileGBA, 1);
+			getfp("BootRom", gopts.gba_bios);
+			addbe(fp);
+			getlab("BootRomLab");
+			addbe(lab);
+			getcbi("SkipIntro", skipBios);
+
+			/// Game Overrides
+			getgbaw("GameSettings");
+			// the rest must be filled in by command handler; just validate
+			SafeXRCCTRL<wxTextCtrl>(d, "Comment");
+			SafeXRCCTRL<wxChoice>(d, "OvRTC");
+			SafeXRCCTRL<wxChoice>(d, "OvSaveType");
+			SafeXRCCTRL<wxChoice>(d, "OvFlashSize");
+			SafeXRCCTRL<wxChoice>(d, "OvMirroring");
+			d->Fit();
+		}
+
+		d = LoadXRCropertySheetDialog("DisplayConfig");
+		{
+			/// On-Screen Display
+			ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "SpeedIndicator", wxGenericValidator(&showSpeed));
+			getcbi("NoStatusMsg", disableStatusMessages);
+			getcbi("Transparent", showSpeedTransparent);
+
+			/// Zoom
+			// this was a choice, but I'd rather not have to make an off-by-one
+			// validator just for this, and spinctrl is good enough.
+			getsc("DefaultScale", gopts.video_scale);
+			getcbb("RetainAspect", gopts.retain_aspect);
+			getsc("MaxScale", maxScale);
+			// fs modes should be filled in at popup time
+			// since they may change based on what screen is current
+			SafeXRCCTRL<wxChoice>(d, "FullscreenMode");
+			getcbi("Fullscreen", fullScreen);
+
+			/// Advanced
+			getrbi("OutputSimple", gopts.render_method, RND_SIMPLE);
+			getrbi("OutputOpenGL", gopts.render_method, RND_OPENGL);
+#ifdef NO_OGL
+			rb->Hide();
+#endif
+			getrbi("OutputCairo", gopts.render_method, RND_CAIRO);
+#ifdef NO_CAIRO
+			rb->Hide();
+#endif
+			getrbi("OutputDirect3D", gopts.render_method, RND_DIRECT3D);
+#if !defined(__WXMSW__) || defined(NO_D3D) || 1 // not implemented
+			rb->Hide();
+#endif
+			getcbb("Bilinear", gopts.bilinear);
+			getcbi("VSync", vsync);
+			// FIXME: make cb disabled when not GL or d3d
+			int mthr = wxThread::GetCPUCount();
+			if (mthr > 8)
+				mthr = 8;
+			if (mthr < 0)
+				mthr = 2;
+			cb = SafeXRCCTRL<wxCheckBox>(d, "Multithread");
+			cb->SetValidator(wxBoolIntValidator(&gopts.max_threads, mthr));
+			if (mthr <= 1)
+				cb->Hide();
+			getcbi("MMX", disableMMX);
+			//cb->Hide();
+			ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "Filter", wxGenericValidator(&gopts.filter));
+			// these two are filled and/or hidden at dialog load time
+			wxControl *pll;
+			wxChoice *pl;
+			pll = SafeXRCCTRL<wxControl>(d, "PluginLab");
+			pl = SafeXRCCTRL<wxChoice>(d, "Plugin");
+			pll->SetValidator(PluginEnabler());
+			pl->SetValidator(PluginListFiller(d, pll, ch));
+			PluginEnableHandler.lab = pll;
+			PluginEnableHandler.ch = pl;
+			ch->Connect(wxEVT_COMMAND_CHOICE_SELECTED,
+				wxCommandEventHandler(PluginEnable_t::ToggleChoice),
+				NULL, &PluginEnableHandler);
+			ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "IFB", wxGenericValidator(&gopts.ifb));
+			d->Fit();
+		}
+
+		d = LoadXRCropertySheetDialog("SoundConfig");
+		wxSlider *sl;
+#define getsl(n, o) do { \
+    sl=SafeXRCCTRL<wxSlider>(d, n); \
+    sl->SetValidator(wxGenericValidator(&o)); \
+		} while(0)
+		{
+			/// Basic
+			getsl("Volume", gopts.sound_vol);
+			sound_config_handler.vol = sl;
+			d->Connect(XRCID("Volume100"), wxEVT_COMMAND_BUTTON_CLICKED,
+				wxCommandEventHandler(SoundConfig_t::FullVol),
+				NULL, &sound_config_handler);
+			ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "Rate", wxGenericValidator(&gopts.sound_qual));
+
+			/// Advanced
+#define audapi_rb(n, v) do {\
+    getrbi(n, gopts.audio_api, v); \
+    rb->Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, \
+		wxCommandEventHandler(SoundConfig_t::SetAPI), \
+		NULL, &sound_config_handler); \
+			} while(0)
+			audapi_rb("SDL", AUD_SDL);
+			audapi_rb("OpenAL", AUD_OPENAL);
+#ifdef NO_OAL
+			rb->Hide();
+#endif
+			audapi_rb("DirectSound", AUD_DIRECTSOUND);
+#ifndef __WXMSW__
+			rb->Hide();
+#endif
+			audapi_rb("XAudio2", AUD_XAUDIO2);
+#if !defined(__WXMSW__) || defined(NO_XAUDIO2)
+			rb->Hide();
+#endif
+			sound_config_handler.dev = SafeXRCCTRL<wxChoice>(d, "Device");
+			sound_config_handler.dev->SetValidator(SoundConfigLoad());
+			getcbb("Upmix", gopts.upmix);
+			sound_config_handler.umix = cb;
+#if !defined(__WXMSW__) || defined(NO_XAUDIO2)
+			cb->Hide();
+#endif
+			getcbb("HWAccel", gopts.dsound_hw_accel);
+			sound_config_handler.hwacc = cb;
+#ifndef __WXMSW__
+			cb->Hide();
+#endif
+			getcbi("SyncGameAudio", synchronize);
+			getsl("Buffers", gopts.audio_buffers);
+			sound_config_handler.bufs = sl;
+			getlab("BuffersInfo");
+			sound_config_handler.bufinfo = lab;
+			sl->Connect(wxEVT_SCROLL_CHANGED,
+				wxCommandEventHandler(SoundConfig_t::AdjustFramesEv),
+				NULL, &sound_config_handler);
+			sl->Connect(wxEVT_SCROLL_THUMBTRACK,
+				wxCommandEventHandler(SoundConfig_t::AdjustFramesEv),
+				NULL, &sound_config_handler);
+			sound_config_handler.AdjustFrames(10);
+
+			/// Game Boy
+			getcbb("GBDeclicking", gopts.gb_declick);
+			getcbbe("GBEnhanceSound", gb_effects_config.enabled);
+			wxPanel *p;
+			p = SafeXRCCTRL<wxPanel>(d, "GBEnhanceSoundDep");
+			addbe(p);
+			getcbb("GBSurround", gb_effects_config.surround);
+			getsl("GBEcho", gopts.gb_echo);
+			getsl("GBStereo", gopts.gb_stereo);
+
+			/// Game Boy Advance
+			getcbb("GBASoundInterpolation", soundInterpolation);
+			getsl("GBASoundFiltering", gopts.gba_sound_filter);
+			d->Fit();
+		}
+
+		wxDirPickerCtrl *dp;
+#define getdp(n, o) do { \
+    dp=SafeXRCCTRL<wxDirPickerCtrl>(d, n); \
+    dp->SetValidator(wxFileDirPickerValidator(&o)); \
+		} while(0)
+		d = LoadXRCDialog("DirectoriesConfig");
+		{
+			getdp("GBARoms", gopts.gba_rom_dir);
+			getdp("GBRoms", gopts.gb_rom_dir);
+			getdp("BatSaves", gopts.battery_dir);
+			getdp("StateSaves", gopts.state_dir);
+			getdp("Screenshots", gopts.scrshot_dir);
+			getdp("Recordings", gopts.recording_dir);
+			d->Fit();
+		}
+
+		wxDialog * joyDialog = LoadXRCropertySheetDialog("JoypadConfig");
+		wxFarRadio *r = 0;
+		for (int i = 0; i < 4; i++) {
+			wxString pn;
+			// NOTE: wx2.9.1 behaves differently for referenced nodes
+			// than 2.8!  Unless there is an actual child node, the ID field
+			// will not be overwritten.  This means that there should be a
+			// dummy child node (e.g. position=(0,0)).  If you get
+			// "Unable to load dialog JoypadConfig from resources", this is
+			// probably the reason.
+			pn.Printf(wxT("joy%d"), i + 1);
+			wxWindow *w = SafeXRCCTRL<wxWindow>(joyDialog, ToString(pn).c_str());
+			wxFarRadio *cb;
+			cb = SafeXRCCTRL<wxFarRadio>(w, "DefaultConfig");
+			if (r)
+				cb->SetGroup(r);
+			else
+				r = cb;
+			cb->SetValidator(wxBoolIntValidator(&gopts.default_stick, i + 1));
+			wxWindow *prev = NULL, *prevp = NULL;
+			for (int j = 0; j < NUM_KEYS; j++) {
+				wxJoyKeyTextCtrl *tc = XRCCTRL_D(*w, wxString::FromUTF8(joynames[j]), wxJoyKeyTextCtrl);
+				CheckThrowXRCError(tc, ToString(joynames[j]));
+				wxWindow *p = tc->GetParent();
+				if (p == prevp)
+					tc->MoveAfterInTabOrder(prev);
+				prev = tc;
+				prevp = p;
+				tc->SetValidator(wxJoyKeyValidator(&gopts.joykey_bindings[i][j]));
+			}
+			JoyPadConfigHandler[i].p = w;
+			w->Connect(XRCID("Defaults"), wxEVT_COMMAND_BUTTON_CLICKED,
+				wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
+				NULL, &JoyPadConfigHandler[i]);
+			w->Connect(XRCID("Clear"), wxEVT_COMMAND_BUTTON_CLICKED,
+				wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
+				NULL, &JoyPadConfigHandler[i]);
+			joyDialog->Fit();
+		}
+
+#ifndef NO_LINK
+		d = LoadXRCDialog("LinkConfig");
+		{
+			getcbbe("Joybus", gopts.gba_joybus_enabled);
+			getlab("JoybusHostLab");
+			addbe(lab);
+			gettc("JoybusHost", gopts.joybus_host);
+			addbe(tc);
+			getcbbe("Link", gopts.gba_link_enabled);
+			getcbb("RFU", gopts.rfu_enabled);
+			addbe(cb);
+			getlab("LinkTimeoutLab");
+			addbe(lab);
+			getsc("LinkTimeout", gopts.linktimeout);
+			addbe(sc);
+			d->Fit();
+		}
+#endif
+
+		d = LoadXRCDialog("AccelConfig");
+		{
+			wxTreeCtrl *tc;
+			tc = SafeXRCCTRL<wxTreeCtrl>(d, "Commands");
+			accel_config_handler.tc = tc;
+			wxControlWithItems *lb;
+			lb = SafeXRCCTRL<wxControlWithItems>(d, "Current");
+			accel_config_handler.lb = lb;
+			accel_config_handler.asb = SafeXRCCTRL<wxButton>(d, "Assign");
+			accel_config_handler.remb = SafeXRCCTRL<wxButton>(d, "Remove");
+			accel_config_handler.key = SafeXRCCTRL<wxKeyTextCtrl>(d, "Shortcut");
+			accel_config_handler.curas = SafeXRCCTRL<wxControl>(d, "AlreadyThere");
+			accel_config_handler.key->MoveBeforeInTabOrder(accel_config_handler.asb);
+			accel_config_handler.key->SetMultikey(0);
+			accel_config_handler.key->SetClearable(false);
+			wxTreeItemId rid = tc->AddRoot(wxT("root"));
+			if (menubar) {
+				wxTreeItemId mid = tc->AppendItem(rid, _("Menu commands"));
+				for (int i = 0; i < menubar->GetMenuCount(); i++) {
+#if wxCHECK_VERSION(2,8,8)
+					wxTreeItemId id = tc->AppendItem(mid, menubar->GetMenuLabelText(i));
+#else
+					// 2.8.4 has no equivalent for GetMenuLabelText()
+					wxString txt = menubar->GetMenuLabel(i);
+					txt.Replace(wxT("&"), wxT(""));
+					wxTreeItemId id = tc->AppendItem(mid, txt);
+#endif
+					add_menu_accels(tc, id, menubar->GetMenu(i));
+				}
+			}
+			wxTreeItemId oid;
+			int noop_id = XRCID("NOOP");
+			for (int i = 0; i < ncmds; i++) {
+				if (cmdtab[i].mi || (recent && cmdtab[i].cmd_id >= wxID_FILE1 &&
+					cmdtab[i].cmd_id <= wxID_FILE10) ||
+					cmdtab[i].cmd_id == noop_id)
+					continue;
+				if (!oid.IsOk())
+					oid = tc->AppendItem(rid, _("Other commands"));
+				TreeInt *val = new TreeInt(i);
+				tc->AppendItem(oid, cmdtab[i].name, -1, -1, val);
+			}
+			tc->ExpandAll();
+			// FIXME: make this actually show the entire line w/o scrolling
+			// BestSize cuts off on rhs; MaxSize is completely invalid
+			wxSize sz = tc->GetBestSize();
+			if (sz.GetHeight() > 200)
+				sz.SetHeight(200);
+			tc->SetSize(sz);
+			sz.SetWidth(-1);  // maybe allow it to become bigger
+			tc->SetSizeHints(sz, sz);
+			int w, h;
+			lb->GetTextExtent(wxT("CTRL-ALT-SHIFT-ENTER"), &w, &h);
+			sz.Set(w, h);
+			lb->SetMinSize(sz);
+			sz.Set(0, 0);
+			wxControl *curas = accel_config_handler.curas;
+			for (int i = 0; i < ncmds; i++) {
+				wxString labs;
+				treeid_to_name(i, labs, tc, tc->GetRootItem());
+				curas->GetTextExtent(labs, &w, &h);
+				if (w > sz.GetWidth())
+					sz.SetWidth(w);
+				if (h > sz.GetHeight())
+					sz.SetHeight(h);
+			}
+			curas->SetSize(sz);
+			curas->SetSizeHints(sz);
+			tc->Connect(wxEVT_COMMAND_TREE_SEL_CHANGING,
+				wxTreeEventHandler(AccelConfig_t::CommandSel),
+				NULL, &accel_config_handler);
+			tc->Connect(wxEVT_COMMAND_TREE_SEL_CHANGED,
+				wxTreeEventHandler(AccelConfig_t::CommandSel),
+				NULL, &accel_config_handler);
+			d->Connect(wxEVT_SHOW, wxShowEventHandler(AccelConfig_t::Init),
+				NULL, &accel_config_handler);
+			d->Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED,
+				wxCommandEventHandler(AccelConfig_t::Set),
+				NULL, &accel_config_handler);
+			d->Connect(XRCID("Assign"), wxEVT_COMMAND_BUTTON_CLICKED,
+				wxCommandEventHandler(AccelConfig_t::Assign),
+				NULL, &accel_config_handler);
+			d->Connect(XRCID("Remove"), wxEVT_COMMAND_BUTTON_CLICKED,
+				wxCommandEventHandler(AccelConfig_t::Remove),
+				NULL, &accel_config_handler);
+			d->Connect(XRCID("ResetAll"), wxEVT_COMMAND_BUTTON_CLICKED,
+				wxCommandEventHandler(AccelConfig_t::ResetAll),
+				NULL, &accel_config_handler);
+			lb->Connect(wxEVT_COMMAND_LISTBOX_SELECTED,
+				wxCommandEventHandler(AccelConfig_t::KeySel),
+				NULL, &accel_config_handler);
+			d->Connect(XRCID("Shortcut"), wxEVT_COMMAND_TEXT_UPDATED,
+				wxCommandEventHandler(AccelConfig_t::CheckKey),
+				NULL, &accel_config_handler);
+			d->Fit();
+		}
+	}
+	catch (std::exception& e)
+	{
+		wxLogError(wxString::FromUTF8(e.what()));
+		return false;
+	}
+
+	//// Debug menu
+	// actually, the viewers can be instantiated multiple times.
+	// since they're for debugging, it's probably OK to just detect errors
+	// at popup time.
+	// The only one that can only be popped up once is logging, so allocate
+	// and check it already.
+	logdlg = new LogDialog;
+
+	// activate OnDropFile event handler
+#if !defined(__WXGTK__) || wxCHECK_VERSION(2,8,10)
+	// may not actually do anything, but verfied to work w/ Linux/Nautilus
+	DragAcceptFiles(true);
+#endif
+
+	// delayed fullscreen
+	if (wxGetApp().pending_fullscreen || fullScreen)
+		panel->ShowFullScreen(true);
+
+#ifndef NO_LINK
+	LinkMode linkMode = getOptionsLinkMode();
+
+	if (linkMode == LINK_GAMECUBE_DOLPHIN) {
+		bool isv = !gopts.joybus_host.empty();
+		if (isv) {
+			isv = SetLinkServerHost(gopts.joybus_host.mb_str());
+		}
+
+		if (!isv) {
+			wxLogError(_("JoyBus host invalid; disabling"));
+			gopts.gba_joybus_enabled = false;
+		}
+		else {
+			linkMode = LINK_DISCONNECTED;
+		}
+	}
+
+	ConnectionState linkState = InitLink(linkMode);
+	if (linkState != LINK_OK) {
+		CloseLink();
+	}
+
+	if (GetLinkMode() != LINK_DISCONNECTED)
+		cmd_enable |= CMDEN_LINK_ANY;
+#endif
+
+	enable_menus();
+
+	panel->SetFrameTitle();
+
+	// All OK; activate idle loop
+	panel->SetExtraStyle(panel->GetExtraStyle() | wxWS_EX_PROCESS_IDLE);
+
+	return true;
+}
+
+

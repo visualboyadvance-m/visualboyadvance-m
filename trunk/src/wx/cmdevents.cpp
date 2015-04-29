@@ -2192,6 +2192,176 @@ EVT_HANDLER(wxID_ABOUT, "About...")
     wxAboutBox(ai);
 }
 
+EVT_HANDLER(Bilinear, "Use bilinear filter with 3d renderer")
+{
+	update_bcheck("Bilinear", gopts.bilinear);
+	update_opts();
+}
+
+EVT_HANDLER(RetainAspect, "Retain aspect ratio when resizing")
+{
+	update_bcheck("RetainAspect", gopts.retain_aspect);
+	update_opts();
+}
+
+EVT_HANDLER(Printer, "Enable printer emulation")
+{
+	update_bcheck("Printer", gopts.gbprint);
+	update_opts();
+}
+
+EVT_HANDLER(Color, "Emulate washed colors of LCD")
+{
+	update_bcheck("Color", gopts.gbcColorOption);
+	update_opts();
+}
+
+EVT_HANDLER(PrintGather, "Automatically gather a full page before printing")
+{
+	update_bcheck("PrintGather", gopts.print_auto_page);
+	update_opts();
+}
+
+EVT_HANDLER(PrintSnap, "Automatically save printouts as screen captures with -print suffix")
+{
+	update_bcheck("PrintSnap", gopts.print_screen_cap);
+	update_opts();
+}
+
+EVT_HANDLER(Joybus, "Enable joybus")
+{
+	update_bcheck("Joybus", gopts.gba_joybus_enabled);
+	update_opts();
+}
+
+EVT_HANDLER(Link, "Enable link cable")
+{
+	update_bcheck("Link", gopts.gba_link_enabled);
+	update_opts();
+}
+
+EVT_HANDLER(SpeedOn, "Enable faster network protocol by default")
+{
+	update_bcheck("SpeedOn", gopts.lanlink_speed);
+	update_opts();
+}
+
+EVT_HANDLER(RFU, "Enable RFU for link")
+{
+	update_bcheck("RFU", gopts.rfu_enabled);
+	update_opts();
+}
+
+EVT_HANDLER(GBASoundInterpolation, "GBA sound interpolation")
+{
+	update_bcheck("GBASoundInterpolation", gopts.soundInterpolation);
+	update_opts();
+}
+
+EVT_HANDLER(GBDeclicking, "GB sound declicking")
+{
+	update_bcheck("GBDeclicking", gopts.gb_declick);
+	update_opts();
+}
+
+EVT_HANDLER(GBEnhanceSound, "Enable GB sound effects")
+{
+	update_bcheck("GBEnhanceSound", gopts.gb_effects_config_enabled);
+	update_opts();
+}
+
+EVT_HANDLER(GBSurround, "GB surround sound effect (%)")
+{
+	update_bcheck("GBSurround", gopts.gb_effects_config_surround);
+	update_opts();
+}
+
+EVT_HANDLER(AGBPrinter, "Enable AGB printer")
+{
+	update_icheck1("AGBPrinter", agbPrint, 1);
+	update_opts();
+}
+
+EVT_HANDLER(ApplyPatches, "Apply IPS/UPS/IPF patches if found")
+{
+	update_icheck1("ApplyPatches", autoPatch, 1);
+	update_opts();
+}
+
+EVT_HANDLER(MMX, "Enable MMX")
+{
+	update_icheck1("MMX", disableMMX, 1);
+	update_opts();
+}
+
+EVT_HANDLER(NoStatusMsg, "Disable on-screen status messages")
+{
+	update_icheck1("NoStatusMsg", disableStatusMessages, 1);
+	update_opts();
+}
+
+EVT_HANDLER(FrameSkipAuto, "Skip frames.  Values are 0-9 or -1 to skip automatically based on time.")
+{
+	update_icheck1("FrameSkipAuto", frameSkip, 1);
+	update_opts();
+}
+
+EVT_HANDLER(Fullscreen, "Enter fullscreen mode at startup")
+{
+	update_icheck1("Fullscreen", fullScreen, 1);
+	update_opts();
+}
+
+EVT_HANDLER(PauseWhenInactive, "Pause game when main window loses focus")
+{
+	update_icheck1("PauseWhenInactive", pauseWhenInactive, 1);
+	update_opts();
+}
+
+EVT_HANDLER(RTC, "Enable RTC (vba-over.ini override is rtcEnabled")
+{
+	update_icheck1("RTC", rtcEnabled, 1);
+	update_opts();
+}
+
+EVT_HANDLER(Transparent, "Draw on-screen messages transparently")
+{
+	update_icheck1("Transparent", showSpeedTransparent, 1);
+	update_opts();
+}
+
+EVT_HANDLER(SkipIntro, "Skip BIOS initialization")
+{
+	update_icheck1("SkipIntro", skipBios, 1);
+	update_opts();
+}
+
+EVT_HANDLER(SyncGameAudio, "Synchronize game to audio")
+{
+	update_icheck1("SyncGameAudio", synchronize, 1);
+	update_opts();
+}
+
+EVT_HANDLER(BootRomEn, "Use the specified BIOS file")
+{
+	update_icheck1("BootRomEn", useBiosFileGBA, 1);
+	update_opts();
+}
+
+EVT_HANDLER(CBootRomEn, "Use the specified BIOS file for GBC")
+{
+	update_icheck1("CBootRomEn", useBiosFileGBC, 1);
+	update_opts();
+}
+
+EVT_HANDLER(VSync, "Wait for vertical sync")
+{
+	update_icheck1("VSync", vsync, 1);
+	update_opts();
+}
+
+
+
 // Dummy for disabling system key bindings
 EVT_HANDLER_MASK(NOOP, "Do nothing", CMDEN_NEVER)
 {
