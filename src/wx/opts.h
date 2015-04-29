@@ -84,7 +84,9 @@ extern struct opts_t {
 } gopts;
 
 extern struct opt_desc {
-    const wxChar *opt, *desc;
+	const wxChar *opt;
+	const char *cmd;
+	const wxChar *desc;
     wxString *stropt;
     int *intopt;
     const wxChar *enumvals;

@@ -170,9 +170,11 @@ public:
     MainFrame();
     ~MainFrame();
 
-    bool InitMore(void);
+	bool BindControls();
+	void MenuOptionInt(const char*  s, int f, int m);
+	void MenuOptionBool(const char*  s, bool f);
 
-    void SetJoystick(void);
+    void SetJoystick();
 
     GameArea *GetPanel() { return panel; }
 

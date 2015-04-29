@@ -225,7 +225,7 @@ bool wxvbamApp::OnInit()
 	return false;
     }
     // Create() cannot be overridden easily
-    if(!frame->InitMore())
+    if(!frame->BindControls())
 	return false;
 
     frame->Show(true);
