@@ -1857,7 +1857,7 @@ void systemMessage(int num, const char *msg, ...)
 
   va_start(valist, msg);
   vfprintf(stderr, msg, valist);
-  fprintf(stderr, "\n")
+  fprintf(stderr, "\n");
   va_end(valist);
 }
 
