@@ -156,6 +156,7 @@ opt_desc opts[] = {
     BOOLOPT("GB/PrintAutoPage", "PrintGather", wxTRANSLATE("Automatically gather a full page before printing"), gopts.print_auto_page),
     BOOLOPT("GB/PrintScreenCap", "PrintSnap", wxTRANSLATE("Automatically save printouts as screen captures with -print suffix"), gopts.print_screen_cap),
     STROPT ("GB/ROMDir", "", wxTRANSLATE("Directory to look for ROM files"), gopts.gb_rom_dir),
+	STROPT ("GB/GBCROMDir", "", wxTRANSLATE("Directory to look for GBC ROM files"), gopts.gbc_rom_dir),
     
     /// GBA
     STROPT ("GBA/BiosFile", "", wxTRANSLATE("BIOS file to use, if enabled"), gopts.gba_bios),
