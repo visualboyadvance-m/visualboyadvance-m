@@ -29,6 +29,7 @@ extern struct opts_t {
     // u16 systemGbPalette[8*3];
     bool print_auto_page, print_screen_cap;
     wxString gb_rom_dir;
+	wxString gbc_rom_dir;
 
     /// GBA
     wxString gba_bios;

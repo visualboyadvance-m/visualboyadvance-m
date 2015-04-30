@@ -3063,6 +3063,7 @@ bool MainFrame::BindControls()
 		{
 			getdp("GBARoms", gopts.gba_rom_dir);
 			getdp("GBRoms", gopts.gb_rom_dir);
+			getdp("GBCRoms", gopts.gbc_rom_dir);
 			getdp("BatSaves", gopts.battery_dir);
 			getdp("StateSaves", gopts.state_dir);
 			getdp("Screenshots", gopts.scrshot_dir);

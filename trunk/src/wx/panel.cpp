@@ -46,6 +46,10 @@ void GameArea::LoadGame(const wxString &name)
 	    fnfn.SetPath(gopts.gb_rom_dir + wxT('/') + rp);
 	    badfile = !fnfn.IsFileReadable();
 	}
+	if (badfile && !gopts.gbc_rom_dir.empty()) {
+		fnfn.SetPath(gopts.gbc_rom_dir + wxT('/') + rp);
+		badfile = !fnfn.IsFileReadable();
+	}
     }
     // auto-conversion of wxCharBuffer to const char * seems broken
     // so save underlying wxCharBuffer (or create one of none is used)
