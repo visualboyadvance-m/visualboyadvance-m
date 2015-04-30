@@ -41,7 +41,7 @@ extern bool debugger;
 extern int emulating;
 extern void CPUUpdateCPSR();
 
-int remotePort = 55555;
+int remotePort = 0;
 int remoteSignal = 5;
 SOCKET remoteSocket = -1;
 SOCKET remoteListenSocket = -1;
