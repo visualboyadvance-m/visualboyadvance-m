@@ -39,6 +39,16 @@
       </object>
       <object class="separator"/>
       <object class="wxMenu">
+        <label>_e-Reader</label>      
+        <object class="wxMenuItem" name="LoadDotCodeFile">
+          <label>_Load Dot Code...</label>
+        </object>
+        <object class="wxMenuItem" name="SaveDotCodeFile">
+          <label>_Save Dot Code...</label>
+        </object>
+      </object>
+      <object class="separator"/>
+      <object class="wxMenu">
         <object class="wxMenuItem" name="ImportBatteryFile">
           <label>_Battery file...</label>
         </object>
