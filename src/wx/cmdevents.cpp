@@ -94,7 +94,6 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
 		      "*.dmg;*.gb;*.gbc;*.cgb;*.sgb"
 		      "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz"
 		      "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z"
-			  "|"
 		      );
     pats.append(wxALL_FILES);
     wxFileDialog dlg(this, _("Open ROM file"), open_dir, wxT(""),
@@ -102,7 +101,7 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
 		     wxFD_OPEN|wxFD_FILE_MUST_EXIST);
     dlg.SetFilterIndex(open_ft);
     if(ShowModal(&dlg) == wxID_OK)
-	wxGetApp().pending_load = dlg.GetPath();
+		wxGetApp().pending_load = dlg.GetPath();
     open_ft = dlg.GetFilterIndex();
     open_dir = dlg.GetDirectory();
 }
@@ -634,6 +633,37 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB|CMDEN_GBA)
 	}
 	break;
     }
+}
+
+static wxString loaddotcodefile_path;
+static wxString savedotcodefile_path;
+
+EVT_HANDLER_MASK(LoadDotCodeFile, "Load e-Reader Dot Code...", CMDEN_GBA)
+{
+	wxFileDialog dlg(this, _("Select Dot Code file"), loaddotcodefile_path, wxEmptyString,
+		_(
+		"e-Reader Dot Code (*.bin;*.raw)|"
+		"*.bin;*.raw"
+		), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+	int ret = ShowModal(&dlg);
+	if (ret != wxID_OK)
+		return;
+	loaddotcodefile_path = dlg.GetPath();
+	SetLoadDotCodeFile(loaddotcodefile_path.mb_str(wxConvUTF8));
+}
+
+EVT_HANDLER_MASK(SaveDotCodeFile, "Save e-Reader Dot Code...", CMDEN_GBA)
+{
+	wxFileDialog dlg(this, _("Select Dot Code file"), savedotcodefile_path, wxEmptyString,
+		_(
+		"e-Reader Dot Code (*.bin;*.raw)|"
+		"*.bin;*.raw"
+		), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	int ret = ShowModal(&dlg);
+	if (ret != wxID_OK)
+		return;
+	savedotcodefile_path = dlg.GetPath();
+	SetLoadDotCodeFile(savedotcodefile_path.mb_str(wxConvUTF8));
 }
 
 static wxString batimp_path;
