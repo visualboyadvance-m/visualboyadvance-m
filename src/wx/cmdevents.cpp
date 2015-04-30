@@ -28,6 +28,8 @@ extern "C" {
 	wxStaticCast(wxGetApp().frame->FindWindowByName(n), wxDialog)
 #endif
 
+void GDBBreak(MainFrame* mf);
+
 bool cmditem_lt(const struct cmditem &cmd1, const struct cmditem &cmd2)
 {
     return wxStrcmp(cmd1.cmd, cmd2.cmd) < 0;
@@ -131,51 +133,71 @@ EVT_HANDLER(RecentFreeze, "Freeze recent ROM list (toggle)")
 EVT_HANDLER(wxID_FILE1, "Load recent ROM 1")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(0));
+	if (gdbBreakOnLoad)
+		GDBBreak(this);
 }
 
 EVT_HANDLER(wxID_FILE2, "Load recent ROM 2")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(1));
+	if (gdbBreakOnLoad)
+		GDBBreak(this);
 }
 
 EVT_HANDLER(wxID_FILE3, "Load recent ROM 3")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(2));
+	if (gdbBreakOnLoad)
+		GDBBreak(this);
 }
 
 EVT_HANDLER(wxID_FILE4, "Load recent ROM 4")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(3));
+	if (gdbBreakOnLoad)
+		GDBBreak(this);
 }
 
 EVT_HANDLER(wxID_FILE5, "Load recent ROM 5")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(4));
+	if (gdbBreakOnLoad)
+		GDBBreak(this);
 }
 
 EVT_HANDLER(wxID_FILE6, "Load recent ROM 6")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(5));
+	if (gdbBreakOnLoad)
+		GDBBreak(this);
 }
 
 EVT_HANDLER(wxID_FILE7, "Load recent ROM 7")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(6));
+	if (gdbBreakOnLoad)
+		GDBBreak(this);
 }
 
 EVT_HANDLER(wxID_FILE8, "Load recent ROM 8")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(7));
+	if (gdbBreakOnLoad)
+		GDBBreak(this);
 }
 
 EVT_HANDLER(wxID_FILE9, "Load recent ROM 9")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(8));
+	if (gdbBreakOnLoad)
+		GDBBreak(this);
 }
 
 EVT_HANDLER(wxID_FILE10, "Load recent ROM 10")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(9));
+	if (gdbBreakOnLoad)
+		GDBBreak(this);
 }
 
 static const struct rom_maker {
@@ -1682,88 +1704,115 @@ EVT_HANDLER_MASK(TileViewer, "Tile Viewer...", CMDEN_GB|CMDEN_GBA)
 
 extern int remotePort;
 
-EVT_HANDLER_MASK(DebugGDB, "Wait for GDB connection...", CMDEN_NGDB_GBA)
+int GetGDBPort(MainFrame* mf)
 {
-    ModalPause mp;
-    int port = wxGetNumberFromUser(
+	ModalPause mp;
+	return wxGetNumberFromUser(
 #ifdef __WXMSW__
-				   wxEmptyString,
+		wxEmptyString,
 #else
-				   _("Set to 0 for pseudo tty"),
+		_("Set to 0 for pseudo tty"),
 #endif
-				   _("Port to wait for connection:"),
-				   _("GDB Connection"), remotePort,
+		_("Port to wait for connection:"),
+		_("GDB Connection"), gdbPort,
 #ifdef __WXMSW__
-				   1025,
+		1025,
 #else
-				   0,
+		0,
 #endif
-				   65535, this);
-    if(port < 0)
-	return;
-    remotePort = port;
-    wxString msg;
-#ifndef __WXMSW__
-    if(!port) {
-	if(!debugOpenPty())
-	    return;
-	msg.Printf(_("Waiting for connection at %s"), debugGetSlavePty().c_str());
-    } else
-#endif
-    {
-	if(!debugStartListen(port))
-	    return;
-	msg.Printf(_("Waiting for connection on port %d"), port);
-    }
-    wxProgressDialog dlg(_("Waiting for GDB..."), msg, 100, this,
-			 wxPD_APP_MODAL|wxPD_CAN_ABORT|wxPD_ELAPSED_TIME);
-    bool connected = false;
-    while(dlg.Pulse()) {
-#ifndef __WXMSW__
-	if(!port)
-	    connected = debugWaitPty();
-	else
-#endif
-	    connected = debugWaitSocket();
-	if(connected)
-	    break;
-	// sleep a bit more in case of infinite loop
-	wxMilliSleep(10);
-    }
-    if(!connected)
-	remoteCleanUp();
-    else {
-	debugger = true;
-	dbgMain = remoteStubMain;
-	dbgSignal = remoteStubSignal;
-	dbgOutput = remoteOutput;
-	cmd_enable &= ~(CMDEN_NGDB_ANY|CMDEN_NGDB_GBA);
-	cmd_enable |= CMDEN_GDB;
-	enable_menus();
-    }
+		65535, mf);
 }
 
-EVT_HANDLER_MASK(DebugGDBLoad, "Load and wait for GDB...", CMDEN_NGDB_ANY)
+EVT_HANDLER(DebugGDBPort, "Configure port...")
 {
-    wxCommandEvent ev;
-    ModalPause mp;
-    OnwxID_OPEN(ev);
-    if(wxGetApp().pending_load.empty())
-	return;
-    panel->UnloadGame();
-    DoDebugGDB();
+	gdbPort = GetGDBPort(this);
+	update_opts();
 }
 
-EVT_HANDLER_MASK(DebugGDBBreak, "Break into GDB", CMDEN_GDB)
+EVT_HANDLER(DebugGDBBreakOnLoad, "Break on load")
 {
-    if(armState) {
-	armNextPC -= 4;
-	reg[15].I -= 4;
-    } else {
-	armNextPC -= 2;
-	reg[15].I -= 2;
-    }
-    debugger = true;
+	update_icheck1("DebugGDBBreakOnLoad", gdbBreakOnLoad, 1);
+	update_opts();
+}
+
+void GDBBreak(MainFrame* mf)
+{
+	ModalPause mp;
+
+	if (gdbPort == 0)
+	{
+		gdbPort = GetGDBPort(mf);
+		update_opts();
+	}
+
+	if (gdbPort != 0) {
+		if (!remotePort)
+		{
+			wxString msg;
+#ifndef __WXMSW__
+			if (!gdbPort) {
+				if (!debugOpenPty())
+					return;
+				msg.Printf(_("Waiting for connection at %s"), debugGetSlavePty().c_str());
+			}
+			else
+#endif
+			{
+				if (!debugStartListen(gdbPort))
+					return;
+				msg.Printf(_("Waiting for connection on port %d"), gdbPort);
+			}
+			wxProgressDialog dlg(_("Waiting for GDB..."), msg, 100, mf,
+				wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME);
+			bool connected = false;
+			while (dlg.Pulse()) {
+#ifndef __WXMSW__
+				if (!gdbPort)
+					connected = debugWaitPty();
+				else
+#endif
+					connected = debugWaitSocket();
+				if (connected)
+					break;
+				// sleep a bit more in case of infinite loop
+				wxMilliSleep(10);
+			}
+
+			if (connected) {
+				remotePort = gdbPort;
+				debugger = true;
+				emulating = 1;
+
+				dbgMain = remoteStubMain;
+				dbgSignal = remoteStubSignal;
+				dbgOutput = remoteOutput;
+				mf->cmd_enable &= ~(CMDEN_NGDB_ANY | CMDEN_NGDB_GBA);
+				mf->cmd_enable |= CMDEN_GDB;
+				mf->enable_menus();
+			}
+			else
+			{
+				remoteCleanUp();
+			}
+		}
+		else
+		{
+			if (armState) {
+				armNextPC -= 4;
+				reg[15].I -= 4;
+			}
+			else {
+				armNextPC -= 2;
+				reg[15].I -= 2;
+			}
+			debugger = true;
+		}
+	}
+}
+
+EVT_HANDLER_MASK(DebugGDBBreak, "Break into GDB", CMDEN_NGDB_GBA | CMDEN_GDB)
+{
+	GDBBreak(this);
 }
 
 EVT_HANDLER_MASK(DebugGDBDisconnect, "Disconnect GDB", CMDEN_GDB)

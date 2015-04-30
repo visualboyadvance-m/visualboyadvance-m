@@ -410,14 +410,15 @@
       <object class="separator"/>
       <label>_Debug</label>
       <object class="wxMenu">
-        <object class="wxMenuItem" name="DebugGDB">
-          <label>_Wait for connection...</label>
-        </object>
-        <object class="wxMenuItem" name="DebugGDBLoad">
-          <label>_Load and wait...</label>
-        </object>
         <object class="wxMenuItem" name="DebugGDBBreak">
           <label>_Break into GDB</label>
+        </object>
+        <object class="wxMenuItem" name="DebugGDBPort">
+          <label>_Configure port...</label>
+        </object>
+        <object class="wxMenuItem" name="DebugGDBBreakOnLoad">
+          <label>_Break on load</label>
+          <checkable>1</checkable>          
         </object>
         <object class="wxMenuItem" name="DebugGDBDisconnect">
           <label>_Disconnect</label>
