@@ -37,6 +37,21 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
+              <label>Game Boy Color ROMs</label>
+            </object>
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxDirPickerCtrl" name="GBCRoms">
+              <message>Game Boy Color ROMs</message>
+              <style>wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST</style>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText">
               <label>Native Saves</label>
             </object>
             <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
