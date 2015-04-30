@@ -212,6 +212,8 @@ opt_desc opts[] = {
 	INTOPT ("preferences/fullScreen", "Fullscreen", wxTRANSLATE("Enter fullscreen mode at startup"), fullScreen, 0, 1),
 	INTOPT ("preferences/gbFrameSkip", "", wxTRANSLATE("Skip frames.  Values are 0-9 or -1 to skip automatically based on time."), gbFrameSkip, -1, 9),
 	ENUMOPT("preferences/gbPaletteOption", "", wxTRANSLATE("The palette to use"), gbPaletteOption, wxTRANSLATE("default|user1|user2")),
+	INTOPT ("preferences/gdbBreakOnLoad", "DebugGDBBreakOnLoad", wxTRANSLATE("Break into GDB after loading the game."), gdbBreakOnLoad, 0, 1),
+	INTOPT ("preferences/gdbPort", "DebugGDBPort", wxTRANSLATE("Port to connect GDB to."), gdbPort, 0, 65535),
 	INTOPT ("preferences/maxScale", "", wxTRANSLATE("Maximum scale factor (0 = no limit)"), maxScale, 0, 100),
 	INTOPT ("preferences/pauseWhenInactive", "PauseWhenInactive", wxTRANSLATE("Pause game when main window loses focus"), pauseWhenInactive, 0, 1),
 	INTOPT ("preferences/rtcEnabled", "RTC", wxTRANSLATE("Enable RTC (vba-over.ini override is rtcEnabled"), rtcEnabled, 0, 1),
