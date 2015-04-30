@@ -77,10 +77,16 @@ static wxString open_dir;
 
 EVT_HANDLER(wxID_OPEN, "Open ROM...")
 {
-    if(!open_dir.size())
-	open_dir = gopts.gba_rom_dir;
+	if (gbEmulatorType == 1)
+		open_dir = gopts.gba_rom_dir;
+	else // if (gbEmulatorType == 5) // TODO: GBC rom dir
+		open_dir = gopts.gb_rom_dir;
+
 	// FIXME: ignore if non-existent or not a dir
-    wxString pats = _("GameBoy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb)|"
+    wxString pats = _(
+			  "Archives (*.zip;*.7z;*.rar)|"
+			  "*.zip;*.7z;*.rar"
+			  "|GameBoy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb)|"
 		      "*.agb;*.gba;*.bin;*.elf;*.mb"
 		      "*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz"
 		       "*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z"
@@ -88,8 +94,8 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
 		      "*.dmg;*.gb;*.gbc;*.cgb;*.sgb"
 		      "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz"
 		      "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z"
-		      "|Archives (*.zip;*.7z;*.rar)"
-		      "|*.zip;*.7z;*.rar|");
+			  "|"
+		      );
     pats.append(wxALL_FILES);
     wxFileDialog dlg(this, _("Open ROM file"), open_dir, wxT(""),
 		     pats,
