@@ -1675,7 +1675,7 @@ void VBA::loadSettings()
   updateThrottle( (unsigned short)regQueryDwordValue( "throttle", 0 ) );
 
 #ifndef NO_LINK
-  linkTimeout = regQueryDwordValue("LinkTimeout", 1000);
+  linkTimeout = regQueryDwordValue("LinkTimeout", 1);
 
   linkMode = regQueryDwordValue("LinkMode", LINK_DISCONNECTED);
 

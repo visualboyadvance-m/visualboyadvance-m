@@ -665,13 +665,33 @@ void MainFrame::StopModal()
 	panel->Resume();
 }
 
-LinkMode MainFrame::getOptionsLinkMode() {
-	if (gopts.gba_joybus_enabled) {
+LinkMode MainFrame::GetConfiguredLinkMode() {
+	switch (gopts.gba_link_type)
+	{
+	case 0:
+		return LINK_DISCONNECTED;
+		break;
+	case 1:
+		if (gopts.link_proto)
+			return LINK_CABLE_IPC;
+		else
+			return LINK_CABLE_SOCKET;
+		break;
+	case 2:
+		if (gopts.link_proto)
+			return LINK_RFU_IPC;
+		else
+			return LINK_RFU_SOCKET;
+		break;
+	case 3:
 		return LINK_GAMECUBE_DOLPHIN;
-	} else if (gopts.rfu_enabled) {
-		return LINK_RFU_IPC;
-	} else if (gopts.gba_link_enabled) {
-		return LINK_CABLE_IPC;
+		break;
+	case 4:
+		return LINK_GAMEBOY;
+		break;
+	default:
+		return LINK_DISCONNECTED;
+		break;
 	}
 	
 	return LINK_DISCONNECTED;

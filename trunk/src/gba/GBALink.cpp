@@ -455,7 +455,7 @@ public:
 };
 
 static int i, j;
-static int linktimeout = 1000;
+static int linktimeout = 1;
 static LANLINKDATA lanlink;
 static u16 cable_data[4];
 static CableServer ls;

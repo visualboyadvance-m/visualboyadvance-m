@@ -171,8 +171,9 @@ public:
     ~MainFrame();
 
 	bool BindControls();
-	void MenuOptionInt(const char* menuName, int field, int mask);
-	void MenuOptionBool(const char* menuName, bool field);
+	void MenuOptionIntMask(const char* menuName, int &field, int mask);
+	void MenuOptionIntRadioValue(const char* menuName, int &field, int mask);
+	void MenuOptionBool(const char* menuName, bool &field);
 	void GetMenuOptionInt(const char* menuName, int &field, int mask);
 	void GetMenuOptionBool(const char* menuName, bool &field);
 	void SetMenuOption(const char* menuName, int value);
@@ -198,6 +199,7 @@ public:
 
     // adjust menus based on current cmd_enable
     void enable_menus();
+	void EnableNetworkMenu();
 
     // adjust menus based on available save game states
     void update_state_ts(bool force = false);
@@ -219,6 +221,12 @@ public:
 
     // 2.8 has no HasFocus(), and FindFocus() doesn't work right
     bool HasFocus() { return focused; }
+
+	// Returns the link mode to set according to the options
+	LinkMode GetConfiguredLinkMode();
+
+	// Start GDB listener
+	void GDBBreak();
 
     // The various viewer popups; these can be popped up as often as
     // desired
@@ -291,8 +299,6 @@ private:
     wxDialog * LoadXRCDialog(const char * name);
     // Load a named wxDialog from the XRC file
 	wxDialog * LoadXRCropertySheetDialog(const char * name);
-    // Returns the link mode to set according to the options
-    LinkMode getOptionsLinkMode();
 #include "cmdhandlers.h"
 };
 
