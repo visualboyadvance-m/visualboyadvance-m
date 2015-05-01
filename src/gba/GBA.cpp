@@ -1764,11 +1764,18 @@ int CPULoadRomData(const char *data, int size)
 
 void doMirroring (bool b)
 {
-  u32 mirroredRomSize = (((romSize)>>20) & 0x3F)<<20;
-  u32 mirroredRomAddress = romSize;
+  int romSizeRounded = romSize;
+  romSizeRounded--;
+  romSizeRounded |= romSizeRounded >> 1;
+  romSizeRounded |= romSizeRounded >> 2;
+  romSizeRounded |= romSizeRounded >> 4;
+  romSizeRounded |= romSizeRounded >> 8;
+  romSizeRounded |= romSizeRounded >> 16;
+  romSizeRounded++;
+  u32 mirroredRomSize = (((romSizeRounded) >> 20) & 0x3F) << 20;
+  u32 mirroredRomAddress = mirroredRomSize;
   if ((mirroredRomSize <=0x800000) && (b))
   {
-    mirroredRomAddress = mirroredRomSize;
     if (mirroredRomSize==0)
         mirroredRomSize=0x100000;
     while (mirroredRomAddress<0x01000000)
