@@ -171,8 +171,11 @@ public:
     ~MainFrame();
 
 	bool BindControls();
-	void MenuOptionInt(const char*  s, int f, int m);
-	void MenuOptionBool(const char*  s, bool f);
+	void MenuOptionInt(const char* menuName, int field, int mask);
+	void MenuOptionBool(const char* menuName, bool field);
+	void GetMenuOptionInt(const char* menuName, int &field, int mask);
+	void GetMenuOptionBool(const char* menuName, bool &field);
+	void SetMenuOption(const char* menuName, int value);
 
     void SetJoystick();
 

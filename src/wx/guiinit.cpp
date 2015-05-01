@@ -2135,14 +2135,14 @@ void MainFrame::MenuOptionBool(const char* menuName, bool field)
 void MainFrame::MenuOptionInt(const char* menuName, int field, int mask)
 {
 	int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
-	int v = mask;
+	int value = mask;
 	for (int i = 0; i < checkable_mi.size(); i++) {
 		if (checkable_mi[i].cmd != id)
 			continue;
 		checkable_mi[i].intopt = &field;
 		checkable_mi[i].mask = mask;
-		checkable_mi[i].val = v;
-		checkable_mi[i].mi->Check((field & mask) == v);
+		checkable_mi[i].val = value;
+		checkable_mi[i].mi->Check((field & mask) == value);
 		break;
 	}
 }
