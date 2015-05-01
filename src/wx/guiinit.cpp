@@ -78,77 +78,82 @@ public:
 		if(!dlg->Validate() || !dlg->TransferDataFromWindow())
 			return;
 
-		if (!server) {
+		if (!server) 
+		{
 			bool valid = SetLinkServerHost(gopts.link_host.mb_str());
-		if (!valid) {
-			wxMessageBox(_("You must enter a valid host name"),
-				 _("Host name invalid"), wxICON_ERROR | wxOK);
-			return;
-		}
-	}
-
-	update_opts(); // save fast flag and client host
-
-	// Close any previous link
-	CloseLink();
-
-	wxString connmsg;
-	wxString title;
-
-	SetLinkTimeout(gopts.linktimeout);
-	EnableSpeedHacks(gopts.lanlink_speed);
-	EnableLinkServer(server, n_players - 1);
-
-	if (server) {
-		char host[length];
-		GetLinkServerHost(host, length);
-
-		title.Printf(_("Waiting for clients..."));
-		connmsg.Printf(_("Server IP address is: %s\n"), wxString(host, wxConvLibc).c_str());
-	} else {
-		title.Printf(_("Waiting for connection..."));
-		connmsg.Printf(_("Connecting to %s\n"), gopts.link_host.c_str());
-	}
-
-	// Init link
-	ConnectionState state = InitLink(LINK_CABLE_SOCKET);
-
-	// Display a progress dialog while the connection is establishing
-	if (state == LINK_NEEDS_UPDATE) {
-		wxProgressDialog pdlg(title, connmsg,
-			100, dlg, wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME);
-
-		while (state == LINK_NEEDS_UPDATE) {
-			// Ask the core for updates
-			char message[length];
-			state = ConnectLinkUpdate(message, length);
-
-			connmsg = wxString(message, wxConvLibc);
-
-			// Does the user want to abort?
-			if (!pdlg.Pulse(connmsg)) {
-				state = LINK_ABORT;
+			if (!valid)
+			{
+				wxMessageBox(_("You must enter a valid host name"),
+					 _("Host name invalid"), wxICON_ERROR | wxOK);
+				return;
 			}
 		}
-	}
 
-	// The user canceled the connection attempt
-	if (state == LINK_ABORT) {
+		linkNumPlayers = n_players;
+
+		update_opts(); // save fast flag and client host
+
+		// Close any previous link
 		CloseLink();
-	}
 
-	// Something failed during init
-	if (state == LINK_ERROR) {
-		CloseLink();
-		wxLogError(_("Error occurred.\nPlease try again."));
-	}
+		wxString connmsg;
+		wxString title;
 
-	if(GetLinkMode() != LINK_DISCONNECTED) {
-		connmsg.Replace(wxT("\n"), wxT(" "));
-		systemScreenMessage(connmsg);
+		SetLinkTimeout(linkTimeout);
+		EnableSpeedHacks(linkHacks);
+		EnableLinkServer(server, linkNumPlayers - 1);
 
-		ev.Skip(); // all OK
-	}
+		if (server) {
+			char host[length];
+			GetLinkServerHost(host, length);
+
+			title.Printf(_("Waiting for clients..."));
+			connmsg.Printf(_("Server IP address is: %s\n"), wxString(host, wxConvLibc).c_str());
+		} else {
+			title.Printf(_("Waiting for connection..."));
+			connmsg.Printf(_("Connecting to %s\n"), gopts.link_host.c_str());
+		}
+
+		// Init link
+		MainFrame *mf = wxGetApp().frame;
+		ConnectionState state = InitLink(mf->GetConfiguredLinkMode());
+
+		// Display a progress dialog while the connection is establishing
+		if (state == LINK_NEEDS_UPDATE) {
+			wxProgressDialog pdlg(title, connmsg,
+				100, dlg, wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME);
+
+			while (state == LINK_NEEDS_UPDATE) {
+				// Ask the core for updates
+				char message[length];
+				state = ConnectLinkUpdate(message, length);
+
+				connmsg = wxString(message, wxConvLibc);
+
+				// Does the user want to abort?
+				if (!pdlg.Pulse(connmsg)) {
+					state = LINK_ABORT;
+				}
+			}
+		}
+
+		// The user canceled the connection attempt
+		if (state == LINK_ABORT) {
+			CloseLink();
+		}
+
+		// Something failed during init
+		if (state == LINK_ERROR) {
+			CloseLink();
+			wxLogError(_("Error occurred.\nPlease try again."));
+		}
+
+		if(GetLinkMode() != LINK_DISCONNECTED) {
+			connmsg.Replace(wxT("\n"), wxT(" "));
+			systemScreenMessage(connmsg);
+
+			ev.Skip(); // all OK
+		}
     }
 } net_link_handler;
 #endif
@@ -2120,7 +2125,7 @@ void MainFrame::set_global_accels()
     SetRecentAccels();
 }
 
-void MainFrame::MenuOptionBool(const char* menuName, bool field)
+void MainFrame::MenuOptionBool(const char* menuName, bool &field)
 {
 	int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
 	for (int i = 0; i < checkable_mi.size(); i++) {
@@ -2132,7 +2137,7 @@ void MainFrame::MenuOptionBool(const char* menuName, bool field)
 	}
 }
 
-void MainFrame::MenuOptionInt(const char* menuName, int field, int mask)
+void MainFrame::MenuOptionIntMask(const char* menuName, int &field, int mask)
 {
 	int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
 	int value = mask;
@@ -2143,6 +2148,19 @@ void MainFrame::MenuOptionInt(const char* menuName, int field, int mask)
 		checkable_mi[i].mask = mask;
 		checkable_mi[i].val = value;
 		checkable_mi[i].mi->Check((field & mask) == value);
+		break;
+	}
+}
+
+void MainFrame::MenuOptionIntRadioValue(const char* menuName, int &field, int value)
+{
+	int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
+	for (int i = 0; i < checkable_mi.size(); i++) {
+		if (checkable_mi[i].cmd != id)
+			continue;
+		checkable_mi[i].intopt = &field;
+		checkable_mi[i].val = field;
+		checkable_mi[i].mi->Check(field == value);
 		break;
 	}
 }
@@ -2306,7 +2324,7 @@ bool MainFrame::BindControls()
 						if (menuName == cmdtab[i].cmd)
 						{
 							if (opts[j].intopt)
-								MenuOptionInt(opts[j].cmd, *opts[j].intopt, (1 << 0));
+								MenuOptionIntMask(opts[j].cmd, *opts[j].intopt, (1 << 0));
 							else if (opts[j].boolopt)
 								MenuOptionBool(opts[j].cmd, *opts[j].boolopt);
 						}
@@ -2348,30 +2366,36 @@ bool MainFrame::BindControls()
 	if (checkable_mi.size()) {
 		MenuOptionBool("RecentFreeze", gopts.recent_freeze);
 		MenuOptionBool("Pause", paused);
-		MenuOptionInt("SoundChannel1", gopts.sound_en, (1 << 0));
-		MenuOptionInt("SoundChannel2", gopts.sound_en, (1 << 1));
-		MenuOptionInt("SoundChannel3", gopts.sound_en, (1 << 2));
-		MenuOptionInt("SoundChannel4", gopts.sound_en, (1 << 3));
-		MenuOptionInt("DirectSoundA", gopts.sound_en, (1 << 8));
-		MenuOptionInt("DirectSoundB", gopts.sound_en, (1 << 9));
-		MenuOptionInt("VideoLayersBG0", layerSettings, (1 << 8));
-		MenuOptionInt("VideoLayersBG1", layerSettings, (1 << 9));
-		MenuOptionInt("VideoLayersBG2", layerSettings, (1 << 10));
-		MenuOptionInt("VideoLayersBG3", layerSettings, (1 << 11));
-		MenuOptionInt("VideoLayersOBJ", layerSettings, (1 << 12));
-		MenuOptionInt("VideoLayersWIN0", layerSettings, (1 << 13));
-		MenuOptionInt("VideoLayersWIN1", layerSettings, (1 << 14));
-		MenuOptionInt("VideoLayersOBJWIN", layerSettings, (1 << 15));
+		MenuOptionIntMask("SoundChannel1", gopts.sound_en, (1 << 0));
+		MenuOptionIntMask("SoundChannel2", gopts.sound_en, (1 << 1));
+		MenuOptionIntMask("SoundChannel3", gopts.sound_en, (1 << 2));
+		MenuOptionIntMask("SoundChannel4", gopts.sound_en, (1 << 3));
+		MenuOptionIntMask("DirectSoundA", gopts.sound_en, (1 << 8));
+		MenuOptionIntMask("DirectSoundB", gopts.sound_en, (1 << 9));
+		MenuOptionIntMask("VideoLayersBG0", layerSettings, (1 << 8));
+		MenuOptionIntMask("VideoLayersBG1", layerSettings, (1 << 9));
+		MenuOptionIntMask("VideoLayersBG2", layerSettings, (1 << 10));
+		MenuOptionIntMask("VideoLayersBG3", layerSettings, (1 << 11));
+		MenuOptionIntMask("VideoLayersOBJ", layerSettings, (1 << 12));
+		MenuOptionIntMask("VideoLayersWIN0", layerSettings, (1 << 13));
+		MenuOptionIntMask("VideoLayersWIN1", layerSettings, (1 << 14));
+		MenuOptionIntMask("VideoLayersOBJWIN", layerSettings, (1 << 15));
 		MenuOptionBool("CheatsAutoSaveLoad", gopts.autoload_cheats);
-		MenuOptionBool("CheatsEnable", cheatsEnabled);
-		MenuOptionBool("KeepSaves", skipSaveGameBattery);
-		MenuOptionBool("KeepCheats", skipSaveGameCheats);
+		MenuOptionIntMask("CheatsEnable", cheatsEnabled, 1);
+		MenuOptionIntMask("KeepSaves", skipSaveGameBattery, 1);
+		MenuOptionIntMask("KeepCheats", skipSaveGameCheats, 1);
 		MenuOptionBool("LoadGameAutoLoad", gopts.autoload_state);
-		MenuOptionInt("JoypadAutofireA", autofire, KEYM_A);
-		MenuOptionInt("JoypadAutofireB", autofire, KEYM_B);
-		MenuOptionInt("JoypadAutofireL", autofire, KEYM_LEFT);
-		MenuOptionInt("JoypadAutofireR", autofire, KEYM_RIGHT);
+		MenuOptionIntMask("JoypadAutofireA", autofire, KEYM_A);
+		MenuOptionIntMask("JoypadAutofireB", autofire, KEYM_B);
+		MenuOptionIntMask("JoypadAutofireL", autofire, KEYM_LEFT);
+		MenuOptionIntMask("JoypadAutofireR", autofire, KEYM_RIGHT);
 		MenuOptionBool("EmulatorSpeedupToggle", turbo);
+
+		MenuOptionIntRadioValue("LinkType0Nothing", gopts.gba_link_type, 0);
+		MenuOptionIntRadioValue("LinkType1Cable", gopts.gba_link_type, 1);
+		MenuOptionIntRadioValue("LinkType2Wireless", gopts.gba_link_type, 2);
+		MenuOptionIntRadioValue("LinkType3GameCube", gopts.gba_link_type, 3);
+		MenuOptionIntRadioValue("LinkType4Gameboy", gopts.gba_link_type, 4);
 	}
 	for (int i = 0; i < checkable_mi.size(); i++)
 		if (!checkable_mi[i].boolopt && !checkable_mi[i].intopt) {
@@ -2513,6 +2537,7 @@ bool MainFrame::BindControls()
 #ifndef NO_LINK
 		{
 			net_link_handler.dlg = d;
+			net_link_handler.n_players = linkNumPlayers;
 			getrbbe("Server", net_link_handler.server);
 			getrbbd("Client", net_link_handler.server);
 			getlab("PlayersLab");
@@ -2527,8 +2552,6 @@ bool MainFrame::BindControls()
 			addrber(lab, true);
 			gettc("ServerIP", gopts.link_host);
 			addrber(tc, true);
-			getrbbr("SpeedOff", gopts.lanlink_speed);
-			getrbb("SpeedOn", gopts.lanlink_speed);
 			wxWindow *okb = d->FindWindow(wxID_OK);
 			if (okb) { // may be gone if style guidlines removed it
 				net_link_handler.okb = wxStaticCast(okb, wxButton);
@@ -3114,17 +3137,9 @@ bool MainFrame::BindControls()
 #ifndef NO_LINK
 		d = LoadXRCDialog("LinkConfig");
 		{
-			getcbbe("Joybus", gopts.gba_joybus_enabled);
-			getlab("JoybusHostLab");
-			addbe(lab);
-			gettc("JoybusHost", gopts.joybus_host);
-			addbe(tc);
-			getcbbe("Link", gopts.gba_link_enabled);
-			getcbb("RFU", gopts.rfu_enabled);
-			addbe(cb);
 			getlab("LinkTimeoutLab");
 			addbe(lab);
-			getsc("LinkTimeout", gopts.linktimeout);
+			getsc("LinkTimeout", linkTimeout);
 			addbe(sc);
 			d->Fit();
 		}
@@ -3252,17 +3267,16 @@ bool MainFrame::BindControls()
 		panel->ShowFullScreen(true);
 
 #ifndef NO_LINK
-	LinkMode linkMode = getOptionsLinkMode();
+	LinkMode linkMode = GetConfiguredLinkMode();
 
 	if (linkMode == LINK_GAMECUBE_DOLPHIN) {
-		bool isv = !gopts.joybus_host.empty();
+		bool isv = !gopts.link_host.empty();
 		if (isv) {
-			isv = SetLinkServerHost(gopts.joybus_host.mb_str());
+			isv = SetLinkServerHost(gopts.link_host.mb_str());
 		}
 
 		if (!isv) {
 			wxLogError(_("JoyBus host invalid; disabling"));
-			gopts.gba_joybus_enabled = false;
 		}
 		else {
 			linkMode = LINK_DISCONNECTED;
@@ -3275,7 +3289,14 @@ bool MainFrame::BindControls()
 	}
 
 	if (GetLinkMode() != LINK_DISCONNECTED)
+	{
 		cmd_enable |= CMDEN_LINK_ANY;
+		SetLinkTimeout(linkTimeout);
+		EnableSpeedHacks(linkHacks);
+	}
+
+	EnableNetworkMenu();
+
 #endif
 
 	enable_menus();

@@ -33,14 +33,10 @@ extern struct opts_t {
 
     /// GBA
     wxString gba_bios;
-    bool gba_joybus_enabled;
-    wxString joybus_host;
-    bool gba_link_enabled;
-    bool lanlink_speed;
+    int gba_link_type;
     wxString link_host;
     int link_proto;
-    bool rfu_enabled;
-    int linktimeout;
+    bool link_auto;
     wxString gba_rom_dir;
 
     /// General
