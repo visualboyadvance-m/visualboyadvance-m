@@ -150,9 +150,6 @@
           <checkable>1</checkable>
         </object>
       </object>
-      <object class="wxMenuItem" name="LanLink">
-        <label>Start _Network Link...</label>
-      </object>
       <object class="separator"/>
       <object class="wxMenu">
         <object class="wxMenuItem" name="LoadGameRecent">
@@ -448,9 +445,6 @@
       <object class="wxMenuItem" name="JoypadConfigure">
         <label>_Joypads ...</label>
       </object>
-      <object class="wxMenuItem" name="LinkConfigure">
-        <label>_Link ...</label>
-      </object>
       <object class="wxMenuItem" name="Customize">
         <label>_Key Shortcuts ...</label>
       </object>
@@ -480,22 +474,6 @@
       </object>
       <object class="wxMenuItem" name="PrintSnap">
         <label>_Save printouts as screen captures</label>
-        <checkable>1</checkable>
-      </object>
-      <object class="wxMenuItem" name="Joybus">
-        <label>_Joybus</label>
-        <checkable>1</checkable>
-      </object>
-      <object class="wxMenuItem" name="Link">
-        <label>_Link cable</label>
-        <checkable>1</checkable>
-      </object>
-      <object class="wxMenuItem" name="SpeedOn">
-        <label>_Faster network protocol by default</label>
-        <checkable>1</checkable>
-      </object>
-      <object class="wxMenuItem" name="RFU">
-        <label>_RFU (Wireless adapter)</label>
         <checkable>1</checkable>
       </object>
       <object class="wxMenuItem" name="GBASoundInterpolation">
@@ -566,7 +544,51 @@
         <label>_VSync</label>
         <checkable>1</checkable>
       </object>
-    </object>    
+    </object>
+    <object class="wxMenu">
+      <label>_Link</label>
+      <object class="wxMenuItem" name="LanLink">
+        <label>Start _Network Link...</label>
+      </object>
+      <object class="wxMenu">
+        <label>_Type</label>
+        <object class="wxMenuItem" name="LinkType0Nothing">
+          <label>_Nothing</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="LinkType1Cable">
+          <label>_Cable</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="LinkType2Wireless">
+          <label>_Wireless</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="LinkType3GameCube">
+          <label>_GameCube</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="LinkType4Gameboy">
+          <label>_Gameboy</label>
+          <checkable>1</checkable>
+        </object>
+      </object>
+      <object class="wxMenuItem" name="LinkProto">
+        <label>_Local mode</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="LinkAuto">
+        <label>_Link at boot</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="SpeedOn">
+        <label>_Speed hack</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="LinkConfigure">
+        <label>_Configure...</label>
+      </object>
+    </object>
     <object class="wxMenu">
       <label>_Help</label>
       <object class="wxMenuItem" name="BugReport">
@@ -1116,68 +1138,6 @@
             <flag>wxALL|wxEXPAND</flag>
             <border>5</border>
           </object>
-          <object class="sizeritem">
-            <object class="wxStaticText">
-              <label>Protocol:</label>
-              <hidden>1</hidden>
-            </object>
-            <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxGridSizer">
-              <cols>2</cols>
-              <object class="sizeritem">
-                <object class="wxRadioButton" name="TCP">
-                  <label>TCP</label>
-                  <hidden>1</hidden>
-                  <style>wxRB_GROUP</style>
-                </object>
-                <flag>wxALL|wxALIGN_CENTRE</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxRadioButton" name="UDP">
-                  <label>UDP</label>
-                  <hidden>1</hidden>
-                </object>
-                <flag>wxALL|wxALIGN_CENTRE</flag>
-                <border>5</border>
-              </object>
-            </object>
-            <flag>wxEXPAND</flag>
-          </object>
-          <object class="sizeritem">
-            <object class="wxStaticText">
-              <label>Speed hacks:</label>
-            </object>
-            <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxGridSizer">
-              <cols>2</cols>
-              <rows>2</rows>
-              <object class="sizeritem">
-                <object class="wxRadioButton" name="SpeedOff">
-                  <label>Off (accurate)</label>
-                  <style>wxRB_GROUP</style>
-                </object>
-                <flag>wxALL|wxALIGN_CENTRE</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxRadioButton" name="SpeedOn">
-                  <label>On (fast)</label>
-                </object>
-                <flag>wxALL|wxALIGN_CENTRE</flag>
-                <border>5</border>
-              </object>
-            </object>
-            <flag>wxEXPAND</flag>
-          </object>
-          <cols>2</cols>
-          <growablecols>1</growablecols>
         </object>
         <flag>wxEXPAND</flag>
       </object>
@@ -3704,48 +3664,6 @@
     <title>Link Options</title>
     <object class="wxBoxSizer">
       <orient>wxVERTICAL</orient>
-      <object class="sizeritem">
-        <object class="wxCheckBox" name="Joybus">
-          <label>Enable joybus</label>
-        </object>
-        <flag>wxALL</flag>
-        <border>5</border>
-      </object>
-      <object class="sizeritem">
-        <object class="wxBoxSizer">
-          <object class="sizeritem">
-            <object class="wxStaticText" name="JoybusHostLab">
-              <label>Joybus host</label>
-            </object>
-            <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxTextCtrl" name="JoybusHost"/>
-            <option>1</option>
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-          </object>
-          <orient>wxHORIZONTAL</orient>
-        </object>
-        <flag>wxALL|wxEXPAND</flag>
-        <border>5</border>
-      </object>
-      <object class="sizeritem">
-        <object class="wxCheckBox" name="Link">
-          <label>Enable link</label>
-        </object>
-        <flag>wxALL</flag>
-        <border>5</border>
-      </object>
-      <object class="sizeritem">
-        <object class="wxCheckBox" name="RFU">
-          <label>Enable wireless</label>
-          <tooltip>Please note that this is the first version of RFU emulation code and it's probably got more bugs than the link code.  Also, it is only supported with 2 players in local mode.</tooltip>
-        </object>
-        <flag>wxALL</flag>
-        <border>5</border>
-      </object>
       <object class="sizeritem">
         <object class="wxBoxSizer">
           <object class="sizeritem">

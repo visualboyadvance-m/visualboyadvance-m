@@ -4,48 +4,6 @@
     <object class="wxBoxSizer">
       <orient>wxVERTICAL</orient>
       <object class="sizeritem">
-        <object class="wxCheckBox" name="Joybus">
-          <label>Enable joybus</label>
-        </object>
-        <flag>wxALL</flag>
-        <border>5</border>
-      </object>
-      <object class="sizeritem">
-        <object class="wxBoxSizer">
-          <object class="sizeritem">
-            <object class="wxStaticText" name="JoybusHostLab">
-              <label>Joybus host</label>
-            </object>
-            <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxTextCtrl" name="JoybusHost"/>
-            <option>1</option>
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-          </object>
-          <orient>wxHORIZONTAL</orient>
-        </object>
-        <flag>wxALL|wxEXPAND</flag>
-        <border>5</border>
-      </object>
-      <object class="sizeritem">
-        <object class="wxCheckBox" name="Link">
-          <label>Enable link</label>
-        </object>
-        <flag>wxALL</flag>
-        <border>5</border>
-      </object>
-      <object class="sizeritem">
-        <object class="wxCheckBox" name="RFU">
-          <label>Enable wireless</label>
-          <tooltip>Please note that this is the first version of RFU emulation code and it's probably got more bugs than the link code.  Also, it is only supported with 2 players in local mode.</tooltip>
-        </object>
-        <flag>wxALL</flag>
-        <border>5</border>
-      </object>
-      <object class="sizeritem">
         <object class="wxBoxSizer">
           <object class="sizeritem">
             <object class="wxStaticText" name="LinkTimeoutLab">

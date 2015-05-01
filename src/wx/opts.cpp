@@ -14,7 +14,7 @@
 
 /* not sure how well other compilers support field-init syntax */
 #define STROPT(c, n, d, v) {wxT(c), (n), d, &v}
-#define INTOPT(c, n, d, v, max, min) {wxT(c), (n), d, NULL, &v, NULL, max, min}
+#define INTOPT(c, n, d, v, min, max) {wxT(c), (n), d, NULL, &v, NULL, min, max}
 #define BOOLOPT(c, n, d, v) {wxT(c), (n), d, NULL, NULL, NULL, 0, 0, &v}
 #define ENUMOPT(c, n, d, v, e) {wxT(c), (n), d, NULL, &v, e}
 
@@ -161,14 +161,12 @@ opt_desc opts[] = {
     /// GBA
     STROPT ("GBA/BiosFile", "", wxTRANSLATE("BIOS file to use, if enabled"), gopts.gba_bios),
 #ifndef NO_LINK
-    BOOLOPT("GBA/Joybus", "Joybus", wxTRANSLATE("Enable joybus"), gopts.gba_joybus_enabled),
-    STROPT ("GBA/JoybusHost", "", wxTRANSLATE("Joybus host address"), gopts.joybus_host),
-    BOOLOPT("GBA/Link", "Link", wxTRANSLATE("Enable link cable"), gopts.gba_link_enabled),
-    BOOLOPT("GBA/LinkFast", "SpeedOn", wxTRANSLATE("Enable faster network protocol by default"), gopts.lanlink_speed),
+	BOOLOPT("GBA/LinkAuto", "LinkAuto", wxTRANSLATE("Enable link at boot"), gopts.link_auto),
+	INTOPT ("GBA/LinkFast", "SpeedOn", wxTRANSLATE("Enable faster network protocol by default"), linkHacks, 0, 1),
     STROPT ("GBA/LinkHost", "", wxTRANSLATE("Default network link client host"), gopts.link_host),
-    ENUMOPT("GBA/LinkProto", "", wxTRANSLATE("Default network protocol"), gopts.link_proto, wxTRANSLATE("tcp|udp")),
-    BOOLOPT("GBA/LinkRFU", "RFU", wxTRANSLATE("Enable RFU for link"), gopts.rfu_enabled),
-    INTOPT ("GBA/LinkTimeout", "", wxTRANSLATE("Link timeout (ms)"), gopts.linktimeout, 0, 9999999),
+	INTOPT ("GBA/LinkProto", "LinkProto", wxTRANSLATE("Default network protocol"), gopts.link_proto, 0, 1),
+    INTOPT ("GBA/LinkTimeout", "LinkTimeout", wxTRANSLATE("Link timeout (ms)"), linkTimeout, 0, 9999999),
+	INTOPT ("GBA/LinkType", "LinkType", wxTRANSLATE("Link cable type"), gopts.gba_link_type, 0, 5),
 #endif
     STROPT ("GBA/ROMDir", "", wxTRANSLATE("Directory to look for ROM files"), gopts.gba_rom_dir),
     
@@ -215,6 +213,7 @@ opt_desc opts[] = {
 	ENUMOPT("preferences/gbPaletteOption", "", wxTRANSLATE("The palette to use"), gbPaletteOption, wxTRANSLATE("default|user1|user2")),
 	INTOPT ("preferences/gdbBreakOnLoad", "DebugGDBBreakOnLoad", wxTRANSLATE("Break into GDB after loading the game."), gdbBreakOnLoad, 0, 1),
 	INTOPT ("preferences/gdbPort", "DebugGDBPort", wxTRANSLATE("Port to connect GDB to."), gdbPort, 0, 65535),
+	INTOPT ("preferences/LinkNumPlayers", "", wxTRANSLATE("Number of players in network"), linkNumPlayers, 2, 4),
 	INTOPT ("preferences/maxScale", "", wxTRANSLATE("Maximum scale factor (0 = no limit)"), maxScale, 0, 100),
 	INTOPT ("preferences/pauseWhenInactive", "PauseWhenInactive", wxTRANSLATE("Pause game when main window loses focus"), pauseWhenInactive, 0, 1),
 	INTOPT ("preferences/rtcEnabled", "RTC", wxTRANSLATE("Enable RTC (vba-over.ini override is rtcEnabled"), rtcEnabled, 0, 1),

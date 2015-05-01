@@ -140,70 +140,70 @@ EVT_HANDLER(wxID_FILE1, "Load recent ROM 1")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(0));
 	if (gdbBreakOnLoad)
-		GDBBreak(this);
+		GDBBreak();
 }
 
 EVT_HANDLER(wxID_FILE2, "Load recent ROM 2")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(1));
 	if (gdbBreakOnLoad)
-		GDBBreak(this);
+		GDBBreak();
 }
 
 EVT_HANDLER(wxID_FILE3, "Load recent ROM 3")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(2));
 	if (gdbBreakOnLoad)
-		GDBBreak(this);
+		GDBBreak();
 }
 
 EVT_HANDLER(wxID_FILE4, "Load recent ROM 4")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(3));
 	if (gdbBreakOnLoad)
-		GDBBreak(this);
+		GDBBreak();
 }
 
 EVT_HANDLER(wxID_FILE5, "Load recent ROM 5")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(4));
 	if (gdbBreakOnLoad)
-		GDBBreak(this);
+		GDBBreak();
 }
 
 EVT_HANDLER(wxID_FILE6, "Load recent ROM 6")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(5));
 	if (gdbBreakOnLoad)
-		GDBBreak(this);
+		GDBBreak();
 }
 
 EVT_HANDLER(wxID_FILE7, "Load recent ROM 7")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(6));
 	if (gdbBreakOnLoad)
-		GDBBreak(this);
+		GDBBreak();
 }
 
 EVT_HANDLER(wxID_FILE8, "Load recent ROM 8")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(7));
 	if (gdbBreakOnLoad)
-		GDBBreak(this);
+		GDBBreak();
 }
 
 EVT_HANDLER(wxID_FILE9, "Load recent ROM 9")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(8));
 	if (gdbBreakOnLoad)
-		GDBBreak(this);
+		GDBBreak();
 }
 
 EVT_HANDLER(wxID_FILE10, "Load recent ROM 10")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(9));
 	if (gdbBreakOnLoad)
-		GDBBreak(this);
+		GDBBreak();
 }
 
 static const struct rom_maker {
@@ -1225,29 +1225,6 @@ EVT_HANDLER(JoypadAutofireR, "Autofire R (toggle)")
     GetMenuOptionInt("JoypadAutofireR", autofire, KEYM_RIGHT);
 }
 
-// new
-EVT_HANDLER_MASK(LanLink, "Start LAN link", CMDEN_LINK_ANY)
-{
-#ifndef NO_LINK
-    LinkMode mode = GetLinkMode();
-
-    if (mode == LINK_CABLE_SOCKET) {
-        // while we could deactivate the command when connected, it is more
-        // user-friendly to display a message indidcating why
-        wxLogError(_("LAN link is already active.  Disable link mode to disconnect."));
-        return;
-    }
-    if (mode == LINK_RFU_IPC || mode == LINK_GAMECUBE_DOLPHIN) {
-        // see above comment
-        wxLogError(_("RFU and Joybus are only supported in local mode."));
-        return;
-    }
-    wxDialog *dlg = GetXRCDialog("NetLink");
-    ShowModal(dlg);
-    panel->SetFrameTitle();
-#endif
-}
-
 EVT_HANDLER_MASK(LoadGameRecent, "Load most recent save", CMDEN_SAVST)
 {
     panel->LoadState();
@@ -1741,13 +1718,13 @@ EVT_HANDLER(DebugGDBBreakOnLoad, "Break on load")
 	update_opts();
 }
 
-void GDBBreak(MainFrame* mf)
+void MainFrame::GDBBreak()
 {
 	ModalPause mp;
 
 	if (gdbPort == 0)
 	{
-		gdbPort = GetGDBPort(mf);
+		gdbPort = GetGDBPort(this);
 		update_opts();
 	}
 
@@ -1768,7 +1745,7 @@ void GDBBreak(MainFrame* mf)
 					return;
 				msg.Printf(_("Waiting for connection on port %d"), gdbPort);
 			}
-			wxProgressDialog dlg(_("Waiting for GDB..."), msg, 100, mf,
+			wxProgressDialog dlg(_("Waiting for GDB..."), msg, 100, this,
 				wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME);
 			bool connected = false;
 			while (dlg.Pulse()) {
@@ -1792,9 +1769,9 @@ void GDBBreak(MainFrame* mf)
 				dbgMain = remoteStubMain;
 				dbgSignal = remoteStubSignal;
 				dbgOutput = remoteOutput;
-				mf->cmd_enable &= ~(CMDEN_NGDB_ANY | CMDEN_NGDB_GBA);
-				mf->cmd_enable |= CMDEN_GDB;
-				mf->enable_menus();
+				cmd_enable &= ~(CMDEN_NGDB_ANY | CMDEN_NGDB_GBA);
+				cmd_enable |= CMDEN_GDB;
+				enable_menus();
 			}
 			else
 			{
@@ -1818,7 +1795,7 @@ void GDBBreak(MainFrame* mf)
 
 EVT_HANDLER_MASK(DebugGDBBreak, "Break into GDB", CMDEN_NGDB_GBA | CMDEN_GDB)
 {
-	GDBBreak(this);
+	GDBBreak();
 }
 
 EVT_HANDLER_MASK(DebugGDBDisconnect, "Disconnect GDB", CMDEN_GDB)
@@ -1903,11 +1880,14 @@ EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
 	// don't want to have to reset to change colors
 	memcpy(gbPalette, &systemGbPalette[gbPaletteOption * 8], 8 * sizeof(systemGbPalette[0]));
     }
+#if (defined __WIN32__ || defined _WIN32)
+	gbSerialFunction = gbStartLink;
+#else
+	gbSerialFunction = NULL;
+#endif
     if(printeron != gopts.gbprint) {
-	if(gopts.gbprint)
-	    gbSerialFunction = gbPrinterSend;
-	else
-	    gbSerialFunction = NULL;
+		if(gopts.gbprint)
+			gbSerialFunction = gbPrinterSend;
     }
 }
 
@@ -2176,45 +2156,6 @@ EVT_HANDLER(JoypadConfigure, "Joypad options...")
     SetJoystick();
 }
 
-// new
-EVT_HANDLER(LinkConfigure, "Link options...")
-{
-#ifndef NO_LINK
-    wxString jh = gopts.joybus_host;
-    wxDialog *dlg = GetXRCDialog("LinkConfig");
-    if (ShowModal(dlg) != wxID_OK)
-        return;
-
-	bool valid = SetLinkServerHost(gopts.joybus_host.mb_str());
-	if (!valid) {
-		wxMessageBox(_("You must enter a valid host name"),
-			 _("Host name invalid"), wxICON_ERROR | wxOK);
-		return;
-	}
-
-    update_opts();
-    
-    SetLinkTimeout(gopts.linktimeout);
-
-    LinkMode oldLinkMode = GetLinkMode();
-    LinkMode newLinkMode = getOptionsLinkMode();
-    bool dolphinHostChanged = jh != gopts.joybus_host;
-    
-    if (newLinkMode != oldLinkMode || dolphinHostChanged) {
-        CloseLink();
-        InitLink(newLinkMode);
-    }
-
-    cmd_enable &= ~CMDEN_LINK_ANY;
-
-    if (GetLinkMode() != LINK_DISCONNECTED) {
-        cmd_enable |= CMDEN_LINK_ANY;
-    }
-    
-    enable_menus();
-#endif
-}
-
 EVT_HANDLER(Customize, "Customize UI...")
 {
     wxDialog *dlg = GetXRCDialog("AccelConfig");
@@ -2316,30 +2257,6 @@ EVT_HANDLER(PrintGather, "Automatically gather a full page before printing")
 EVT_HANDLER(PrintSnap, "Automatically save printouts as screen captures with -print suffix")
 {
 	GetMenuOptionBool("PrintSnap", gopts.print_screen_cap);
-	update_opts();
-}
-
-EVT_HANDLER(Joybus, "Enable joybus")
-{
-	GetMenuOptionBool("Joybus", gopts.gba_joybus_enabled);
-	update_opts();
-}
-
-EVT_HANDLER(Link, "Enable link cable")
-{
-	GetMenuOptionBool("Link", gopts.gba_link_enabled);
-	update_opts();
-}
-
-EVT_HANDLER(SpeedOn, "Enable faster network protocol by default")
-{
-	GetMenuOptionBool("SpeedOn", gopts.lanlink_speed);
-	update_opts();
-}
-
-EVT_HANDLER(RFU, "Enable RFU for link")
-{
-	GetMenuOptionBool("RFU", gopts.rfu_enabled);
 	update_opts();
 }
 
@@ -2450,6 +2367,118 @@ EVT_HANDLER(VSync, "Wait for vertical sync")
 	GetMenuOptionInt("VSync", vsync, 1);
 	update_opts();
 }
+
+#ifndef NO_LINK
+
+void MainFrame::EnableNetworkMenu()
+{
+	cmd_enable &= ~CMDEN_LINK_ANY;
+
+	if (gopts.gba_link_type != 0)
+		cmd_enable |= CMDEN_LINK_ANY;
+
+	if (gopts.link_proto)
+		cmd_enable &= ~CMDEN_LINK_ANY;
+
+	enable_menus();
+}
+
+void SetLinkTypeMenu(const char *type, int value)
+{
+	MainFrame *mf = wxGetApp().frame;
+	mf->SetMenuOption("LinkType0Nothing", 0);
+	mf->SetMenuOption("LinkType1Cable", 0);
+	mf->SetMenuOption("LinkType2Wireless", 0);
+	mf->SetMenuOption("LinkType3GameCube", 0);
+	mf->SetMenuOption("LinkType4Gameboy", 0);
+
+	mf->SetMenuOption(type, 1);
+	gopts.gba_link_type = value;
+	update_opts();
+	mf->EnableNetworkMenu();
+}
+
+EVT_HANDLER_MASK(LanLink, "Start Network link", CMDEN_LINK_ANY)
+{
+	LinkMode mode = GetLinkMode();
+
+	if (mode != LINK_DISCONNECTED) {
+		// while we could deactivate the command when connected, it is more
+		// user-friendly to display a message indidcating why
+		wxLogError(_("LAN link is already active.  Disable link mode to disconnect."));
+		return;
+	}
+	if (gopts.link_proto) {
+		// see above comment
+		wxLogError(_("Network is not supported in local mode."));
+		return;
+	}
+	wxDialog *dlg = GetXRCDialog("NetLink");
+	ShowModal(dlg);
+	panel->SetFrameTitle();
+}
+
+EVT_HANDLER(LinkType0Nothing, "Link nothing")
+{
+	SetLinkTypeMenu("LinkType0Nothing", 0);
+}
+
+EVT_HANDLER(LinkType1Cable, "Link cable")
+{
+	SetLinkTypeMenu("LinkType1Cable", 1);
+}
+
+EVT_HANDLER(LinkType2Wireless, "Link wireless")
+{
+	SetLinkTypeMenu("LinkType2Wireless", 2);
+}
+
+EVT_HANDLER(LinkType3GameCube, "Link GameCube")
+{
+	SetLinkTypeMenu("LinkType3GameCube", 3);
+}
+
+EVT_HANDLER(LinkType4Gameboy, "Link Gameboy")
+{
+	SetLinkTypeMenu("LinkType4Gameboy", 4);
+}
+
+EVT_HANDLER(LinkAuto, "Enable link at boot")
+{
+	GetMenuOptionBool("LinkAuto", gopts.link_auto);
+	update_opts();
+}
+
+EVT_HANDLER(SpeedOn, "Enable faster network protocol by default")
+{
+	GetMenuOptionInt("SpeedOn", linkHacks, 1);
+	update_opts();
+}
+
+EVT_HANDLER(LinkProto, "Local host IPC")
+{
+	GetMenuOptionInt("LinkProto", gopts.link_proto, 1);
+	update_opts();
+
+	enable_menus();
+	EnableNetworkMenu();
+}
+
+EVT_HANDLER(LinkConfigure, "Link options...")
+{
+	wxDialog *dlg = GetXRCDialog("LinkConfig");
+	if (ShowModal(dlg) != wxID_OK)
+		return;
+
+	SetLinkTimeout(linkTimeout);
+
+	update_opts();
+
+	EnableNetworkMenu();
+}
+
+#endif
+
 
 
 

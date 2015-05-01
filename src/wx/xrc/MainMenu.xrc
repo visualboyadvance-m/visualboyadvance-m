@@ -130,9 +130,6 @@
           <checkable>1</checkable>
         </object>
       </object>
-      <object class="wxMenuItem" name="LanLink">
-        <label>Start _Network Link...</label>
-      </object>
       <object class="separator"/>
       <object class="wxMenu">
         <object class="wxMenuItem" name="LoadGameRecent">
@@ -428,9 +425,6 @@
       <object class="wxMenuItem" name="JoypadConfigure">
         <label>_Joypads ...</label>
       </object>
-      <object class="wxMenuItem" name="LinkConfigure">
-        <label>_Link ...</label>
-      </object>
       <object class="wxMenuItem" name="Customize">
         <label>_Key Shortcuts ...</label>
       </object>
@@ -460,22 +454,6 @@
       </object>
       <object class="wxMenuItem" name="PrintSnap">
         <label>_Save printouts as screen captures</label>
-        <checkable>1</checkable>
-      </object>
-      <object class="wxMenuItem" name="Joybus">
-        <label>_Joybus</label>
-        <checkable>1</checkable>
-      </object>
-      <object class="wxMenuItem" name="Link">
-        <label>_Link cable</label>
-        <checkable>1</checkable>
-      </object>
-      <object class="wxMenuItem" name="SpeedOn">
-        <label>_Faster network protocol by default</label>
-        <checkable>1</checkable>
-      </object>
-      <object class="wxMenuItem" name="RFU">
-        <label>_RFU (Wireless adapter)</label>
         <checkable>1</checkable>
       </object>
       <object class="wxMenuItem" name="GBASoundInterpolation">
@@ -545,6 +523,50 @@
       <object class="wxMenuItem" name="VSync">
         <label>_VSync</label>
         <checkable>1</checkable>
+      </object>
+    </object>
+    <object class="wxMenu">
+      <label>_Link</label>
+      <object class="wxMenuItem" name="LanLink">
+        <label>Start _Network Link...</label>
+      </object>
+      <object class="wxMenu">
+        <label>_Type</label>
+        <object class="wxMenuItem" name="LinkType0Nothing">
+          <label>_Nothing</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="LinkType1Cable">
+          <label>_Cable</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="LinkType2Wireless">
+          <label>_Wireless</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="LinkType3GameCube">
+          <label>_GameCube</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="LinkType4Gameboy">
+          <label>_Gameboy</label>
+          <checkable>1</checkable>
+        </object>
+      </object>
+      <object class="wxMenuItem" name="LinkProto">
+        <label>_Local mode</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="LinkAuto">
+        <label>_Link at boot</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="SpeedOn">
+        <label>_Speed hack</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="LinkConfigure">
+        <label>_Configure...</label>
       </object>
     </object>
     <object class="wxMenu">

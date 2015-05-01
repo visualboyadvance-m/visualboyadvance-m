@@ -179,10 +179,10 @@ int languageOption;
 int layerEnable = 0xff00;
 int layerSettings = 0xff00;
 int linkAuto;
-int linkHacks;
+int linkHacks = 1;
 int linkMode;
 int linkNumPlayers;
-int linkTimeout;
+int linkTimeout = 1;
 int maxScale;
 int mouseCounter = 0;
 int movieFrame;
@@ -500,7 +500,7 @@ void LoadConfig()
 	linkHostAddr = ReadPrefString("LinkHostAddr", "localhost");
 	linkMode = ReadPref("LinkMode", 0); // LINK_DISCONNECTED = 0
 	linkNumPlayers = ReadPref("LinkNumPlayers", 2);
-	linkTimeout = ReadPref("LinkTimeout", 1000);
+	linkTimeout = ReadPref("LinkTimeout", 1);
 	loadDotCodeFile = ReadPrefString("loadDotCodeFile");
 	maxScale = ReadPref("maxScale", 0);
 	movieRecordDir = ReadPrefString("movieRecordDir");

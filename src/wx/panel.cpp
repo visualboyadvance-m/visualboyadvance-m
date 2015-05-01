@@ -1,11 +1,12 @@
+#include <wx/dcbuffer.h>
+
 #include "wxvbam.h"
 #include "drawing.h"
 #include "../common/ConfigManager.h"
+#include "../common/Patch.h"
+#include "../gb/gbPrinter.h"
 #include "../gba/RTC.h"
 #include "../gba/agbprint.h"
-#include "../gb/gbPrinter.h"
-#include "../common/Patch.h"
-#include <wx/dcbuffer.h>
 #include "../sdl/text.h"
 #include "filters.h"
 #include "../../svnrev.h"
@@ -271,11 +272,14 @@ void GameArea::LoadGame(const wxString &name)
     mf->cmd_enable |= loaded == IMAGE_GB ? CMDEN_GB : (CMDEN_GBA | CMDEN_NGDB_GBA);
     mf->enable_menus();
 
+#if (defined __WIN32__ || defined _WIN32)
+	gbSerialFunction = gbStartLink;
+#else
+	gbSerialFunction = NULL;
+#endif
     // probably only need to do this for GB carts
     if(gopts.gbprint)
-	gbSerialFunction = gbPrinterSend;
-    else
-	gbSerialFunction = NULL;
+		gbSerialFunction = gbPrinterSend;
 
     // probably only need to do this for GBA carts
     agbPrintEnable(agbPrint);
@@ -336,6 +340,14 @@ void GameArea::LoadGame(const wxString &name)
 	    }
 	}
     }
+
+#ifndef NO_LINK
+	if (gopts.link_auto)
+	{
+		linkMode = mf->GetConfiguredLinkMode();
+		BootLink(linkMode, gopts.link_host.mb_str(wxConvUTF8), linkTimeout, linkHacks, linkNumPlayers);
+	}
+#endif
 }
 
 void GameArea::SetFrameTitle()
@@ -785,14 +797,17 @@ void GameArea::OnIdle(wxIdleEvent &event)
 {
     wxString pl = wxGetApp().pending_load;
     if(pl.size()) {
-	// sometimes this gets into a loop if LoadGame() called before
-	// clearing pending_load.  weird.
-	wxGetApp().pending_load = wxEmptyString;
-	LoadGame(pl);
-	if(debugger && loaded != IMAGE_GBA) {
-	    wxLogError(_("Not a valid GBA cartridge"));
-	    UnloadGame();
-	}
+		// sometimes this gets into a loop if LoadGame() called before
+		// clearing pending_load.  weird.
+		wxGetApp().pending_load = wxEmptyString;
+		LoadGame(pl);
+		MainFrame* mf = wxGetApp().frame;
+		if (gdbBreakOnLoad)
+			mf->GDBBreak();
+		if(debugger && loaded != IMAGE_GBA) {
+			wxLogError(_("Not a valid GBA cartridge"));
+			UnloadGame();
+		}
     }
     // stupid wx doesn't resize to screen size
     // forcing it this way just puts it in an infinite loop, though
