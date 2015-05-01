@@ -207,20 +207,21 @@ void GameArea::LoadGame(const wxString &name)
 	    flashSetSize(fsz);
 	    cpuSaveType = cfg->Read(wxT("saveType"), cpuSaveType);
 	    if(cpuSaveType < 0 || cpuSaveType > 5)
-		cpuSaveType = cpuSaveType;
+			cpuSaveType = 0;
 		
 		if (cpuSaveType == 0)
 		  utilGBAFindSave(rom_size);
 		else
 		  saveType = cpuSaveType;
 		
-	    mirroringEnable = cfg->Read(wxT("mirroringEnabled"), (long)0);
+	    mirroringEnable = cfg->Read(wxT("mirroringEnabled"), (long)1);
 
 	    cfg->SetPath(wxT("/"));
 	} else {
 	    rtcEnable(rtcEnabled);
 	    flashSetSize(0x10000 << winFlashSize);
-	    cpuSaveType = cpuSaveType;
+		if (cpuSaveType < 0 || cpuSaveType > 5)
+			cpuSaveType = 0;
 		if (cpuSaveType == 0)
 		  utilGBAFindSave(rom_size);
 		else
