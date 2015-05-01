@@ -35,39 +35,42 @@ bool cmditem_lt(const struct cmditem &cmd1, const struct cmditem &cmd2)
     return wxStrcmp(cmd1.cmd, cmd2.cmd) < 0;
 }
 
-#define update_bcheck(s, f) do { \
-    f = !f; \
-    int id = XRCID(s); \
-    for(int i = 0; i < checkable_mi.size(); i++) { \
-	if(checkable_mi[i].cmd != id) \
-	    continue; \
-	f = checkable_mi[i].mi->IsChecked(); \
-	break; \
-    } \
-} while(0)
+void MainFrame::GetMenuOptionBool(const char* menuName, bool &field)
+{
+    field = !field;
+	int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
+    for(int i = 0; i < checkable_mi.size(); i++) {
+		if(checkable_mi[i].cmd != id)
+			continue;
+		field = checkable_mi[i].mi->IsChecked();
+		break;
+    }
+}
 
-#define update_icheck(s, f, m, v) do { \
-    bool is_checked = ((f) & (m)) != (v); \
-    int id = XRCID(s); \
-    for(int i = 0; i < checkable_mi.size(); i++) { \
-	if(checkable_mi[i].cmd != id) \
-	    continue; \
-	is_checked = checkable_mi[i].mi->IsChecked(); \
-	break; \
-    } \
-    f = ((f) & ~(m)) | (is_checked ? (v) : 0); \
-} while(0)
-#define update_icheck1(s, f, m) update_icheck(s, f, m, m)
+void MainFrame::GetMenuOptionInt(const char* menuName, int &field, int mask)
+{
+	int value = mask;
+    bool is_checked = ((field) & (mask)) != (value);
+	int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
+    for(int i = 0; i < checkable_mi.size(); i++) {
+		if(checkable_mi[i].cmd != id)
+			continue;
+		is_checked = checkable_mi[i].mi->IsChecked();
+		break;
+    }
+    field = ((field) & ~(mask)) | (is_checked ? (value) : 0);
+}
 
-#define update_check(s, v) do { \
-    int id = XRCID(s); \
-    for(int i = 0; i < checkable_mi.size(); i++) { \
-	if(checkable_mi[i].cmd != id) \
-	    continue; \
-	checkable_mi[i].mi->Check(v); \
-	break; \
-    } \
-} while(0)
+void MainFrame::SetMenuOption(const char* menuName, int value)
+{
+	int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
+    for(int i = 0; i < checkable_mi.size(); i++) {
+		if(checkable_mi[i].cmd != id)
+			continue;
+		checkable_mi[i].mi->Check(value);
+		break;
+    }
+}
 
 //// File menu
 
@@ -127,7 +130,7 @@ EVT_HANDLER(RecentReset, "Reset recent ROM list")
 
 EVT_HANDLER(RecentFreeze, "Freeze recent ROM list (toggle)")
 {
-    update_bcheck("RecentFreeze", gopts.recent_freeze);
+    GetMenuOptionBool("RecentFreeze", gopts.recent_freeze);
     update_opts();
 }
 
@@ -1174,7 +1177,7 @@ EVT_HANDLER(wxID_EXIT, "Exit")
 // Emulation menu
 EVT_HANDLER(Pause, "Pause (toggle)")
 {
-    update_bcheck("Pause", paused);
+    GetMenuOptionBool("Pause", paused);
     if(paused)
 	panel->Pause();
     else if(!IsPaused())
@@ -1188,7 +1191,7 @@ EVT_HANDLER(Pause, "Pause (toggle)")
 // new
 EVT_HANDLER_MASK(EmulatorSpeedupToggle, "Turbo mode (toggle)", CMDEN_GB|CMDEN_GBA)
 {
-    update_bcheck("EmulatorSpeedupToggle", turbo);
+    GetMenuOptionBool("EmulatorSpeedupToggle", turbo);
 }
 
 EVT_HANDLER_MASK(Reset, "Reset", CMDEN_GB|CMDEN_GBA)
@@ -1204,22 +1207,22 @@ EVT_HANDLER(ToggleFullscreen, "Full screen (toggle)")
 
 EVT_HANDLER(JoypadAutofireA, "Autofire A (toggle)")
 {
-    update_icheck1("JoypadAutofireA", autofire, KEYM_A);
+    GetMenuOptionInt("JoypadAutofireA", autofire, KEYM_A);
 }
 
 EVT_HANDLER(JoypadAutofireB, "Autofire B (toggle)")
 {
-    update_icheck1("JoypadAutofireB", autofire, KEYM_B);
+    GetMenuOptionInt("JoypadAutofireB", autofire, KEYM_B);
 }
 
 EVT_HANDLER(JoypadAutofireL, "Autofire L (toggle)")
 {
-    update_icheck1("JoypadAutofireL", autofire, KEYM_LEFT);
+    GetMenuOptionInt("JoypadAutofireL", autofire, KEYM_LEFT);
 }
 
 EVT_HANDLER(JoypadAutofireR, "Autofire R (toggle)")
 {
-    update_icheck1("JoypadAutofireR", autofire, KEYM_RIGHT);
+    GetMenuOptionInt("JoypadAutofireR", autofire, KEYM_RIGHT);
 }
 
 // new
@@ -1252,7 +1255,7 @@ EVT_HANDLER_MASK(LoadGameRecent, "Load most recent save", CMDEN_SAVST)
 
 EVT_HANDLER(LoadGameAutoLoad, "Auto load most recent save (toggle)")
 {
-    update_bcheck("LoadGameAutoLoad", gopts.autoload_state);
+    GetMenuOptionBool("LoadGameAutoLoad", gopts.autoload_state);
     update_opts();
 }
 
@@ -1324,14 +1327,14 @@ EVT_HANDLER_MASK(Load, "Load state...", CMDEN_GB|CMDEN_GBA)
 // new
 EVT_HANDLER(KeepSaves, "Do not load battery saves (toggle)")
 {
-    update_bcheck("KeepSaves", skipSaveGameBattery);
+    GetMenuOptionInt("KeepSaves", skipSaveGameBattery, 1);
     update_opts();
 }
 
 // new
 EVT_HANDLER(KeepCheats, "Do not change cheat list (toggle)")
 {
-    update_bcheck("KeepCheats", skipSaveGameCheats);
+    GetMenuOptionInt("KeepCheats", skipSaveGameCheats, 1);
     update_opts();
 }
 
@@ -1476,7 +1479,7 @@ EVT_HANDLER_MASK(CheatsSearch, "Create cheat...", CMDEN_GB|CMDEN_GBA)
 // new
 EVT_HANDLER(CheatsAutoSaveLoad, "Auto save/load cheats (toggle)")
 {
-    update_bcheck("CheatsAutoSaveLoad", gopts.autoload_cheats);
+    GetMenuOptionBool("CheatsAutoSaveLoad", gopts.autoload_cheats);
     update_opts();
 }
 
@@ -1484,7 +1487,7 @@ EVT_HANDLER(CheatsAutoSaveLoad, "Auto save/load cheats (toggle)")
 // changed for convenience to match internal variable functionality
 EVT_HANDLER(CheatsEnable, "Enable cheats (toggle)")
 {
-    update_bcheck("CheatsEnable", cheatsEnabled);
+    GetMenuOptionInt("CheatsEnable", cheatsEnabled, 1);
     update_opts();
 }
 
@@ -1492,56 +1495,56 @@ EVT_HANDLER(CheatsEnable, "Enable cheats (toggle)")
 // Debug menu
 EVT_HANDLER_MASK(VideoLayersBG0, "Video layer BG0 (toggle)", CMDEN_GB|CMDEN_GBA)
 {
-    update_icheck1("VideoLayersBG0", layerSettings, (1<<8));
+    GetMenuOptionInt("VideoLayersBG0", layerSettings, (1<<8));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersBG1, "Video layer BG1 (toggle)", CMDEN_GB|CMDEN_GBA)
 {
-    update_icheck1("VideoLayersBG1", layerSettings, (1<<9));
+    GetMenuOptionInt("VideoLayersBG1", layerSettings, (1<<9));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersBG2, "Video layer BG2 (toggle)", CMDEN_GB|CMDEN_GBA)
 {
-    update_icheck1("VideoLayersBG2", layerSettings, (1<<10));
+    GetMenuOptionInt("VideoLayersBG2", layerSettings, (1<<10));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersBG3, "Video layer BG3 (toggle)", CMDEN_GB|CMDEN_GBA)
 {
-    update_icheck1("VideoLayersBG3", layerSettings, (1<<11));
+    GetMenuOptionInt("VideoLayersBG3", layerSettings, (1<<11));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersOBJ, "Video layer OBJ (toggle)", CMDEN_GB|CMDEN_GBA)
 {
-    update_icheck1("VideoLayersOBJ", layerSettings, (1<<12));
+    GetMenuOptionInt("VideoLayersOBJ", layerSettings, (1<<12));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersWIN0, "Video layer WIN0 (toggle)", CMDEN_GB|CMDEN_GBA)
 {
-    update_icheck1("VideoLayersWIN0", layerSettings, (1<<13));
+    GetMenuOptionInt("VideoLayersWIN0", layerSettings, (1<<13));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersWIN1, "Video layer WIN1 (toggle)", CMDEN_GB|CMDEN_GBA)
 {
-    update_icheck1("VideoLayersWIN1", layerSettings, (1<<14));
+    GetMenuOptionInt("VideoLayersWIN1", layerSettings, (1<<14));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersOBJWIN, "Video layer OBJWIN (toggle)", CMDEN_GB|CMDEN_GBA)
 {
-    update_icheck1("VideoLayersOBJWIN", layerSettings, (1<<15));
+    GetMenuOptionInt("VideoLayersOBJWIN", layerSettings, (1<<15));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
@@ -1572,42 +1575,42 @@ EVT_HANDLER_MASK(VideoLayersReset, "Show all video layers", CMDEN_GB|CMDEN_GBA)
 
 EVT_HANDLER_MASK(SoundChannel1, "Sound Channel 1 (toggle)", CMDEN_GB|CMDEN_GBA)
 {
-    update_icheck1("SoundChannel1", gopts.sound_en, (1<<0));
+    GetMenuOptionInt("SoundChannel1", gopts.sound_en, (1<<0));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(SoundChannel2, "Sound Channel 2 (toggle)", CMDEN_GB|CMDEN_GBA)
 {
-    update_icheck1("SoundChannel2", gopts.sound_en, (1<<1));
+    GetMenuOptionInt("SoundChannel2", gopts.sound_en, (1<<1));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(SoundChannel3, "Sound Channel 3 (toggle)", CMDEN_GB|CMDEN_GBA)
 {
-    update_icheck1("SoundChannel3", gopts.sound_en, (1<<2));
+    GetMenuOptionInt("SoundChannel3", gopts.sound_en, (1<<2));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(SoundChannel4, "Sound Channel 4 (toggle)", CMDEN_GB|CMDEN_GBA)
 {
-    update_icheck1("SoundChannel4", gopts.sound_en, (1<<3));
+    GetMenuOptionInt("SoundChannel4", gopts.sound_en, (1<<3));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(DirectSoundA, "Direct Sound A (toggle)", CMDEN_GBA)
 {
-    update_icheck1("DirectSoundA", gopts.sound_en, (1<<8));
+    GetMenuOptionInt("DirectSoundA", gopts.sound_en, (1<<8));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(DirectSoundB, "Direct Sound B (toggle)", CMDEN_GBA)
 {
-    update_icheck1("DirectSoundB", gopts.sound_en, (1<<9));
+    GetMenuOptionInt("DirectSoundB", gopts.sound_en, (1<<9));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
@@ -1616,12 +1619,12 @@ EVT_HANDLER(ToggleSound, "Enable/disable all sound channels")
 {
     bool en = gopts.sound_en == 0;
     gopts.sound_en = en ? 0x30f : 0;
-    update_check("SoundChannel1", en);
-    update_check("SoundChannel2", en);
-    update_check("SoundChannel3", en);
-    update_check("SoundChannel4", en);
-    update_check("DirectSoundA", en);
-    update_check("DirectSoundB", en);
+	SetMenuOption("SoundChannel1", en);
+	SetMenuOption("SoundChannel2", en);
+	SetMenuOption("SoundChannel3", en);
+	SetMenuOption("SoundChannel4", en);
+	SetMenuOption("DirectSoundA", en);
+	SetMenuOption("DirectSoundB", en);
     soundSetEnable(gopts.sound_en);
     update_opts();
     systemScreenMessage(en ? _("Sound enabled") : _("Sound disabled"));
@@ -1653,7 +1656,7 @@ EVT_HANDLER(DecreaseVolume, "Decrease volume")
 
 EVT_HANDLER_MASK(NextFrame, "Next Frame", CMDEN_GB|CMDEN_GBA)
 {
-    update_check("Pause", true);
+	SetMenuOption("Pause", true);
     paused = true;
     pause_next = true;
     if(!IsPaused())
@@ -1734,7 +1737,7 @@ EVT_HANDLER(DebugGDBPort, "Configure port...")
 
 EVT_HANDLER(DebugGDBBreakOnLoad, "Break on load")
 {
-	update_icheck1("DebugGDBBreakOnLoad", gdbBreakOnLoad, 1);
+	GetMenuOptionInt("DebugGDBBreakOnLoad", gdbBreakOnLoad, 1);
 	update_opts();
 }
 
@@ -2282,169 +2285,169 @@ EVT_HANDLER(wxID_ABOUT, "About...")
 
 EVT_HANDLER(Bilinear, "Use bilinear filter with 3d renderer")
 {
-	update_bcheck("Bilinear", gopts.bilinear);
+	GetMenuOptionBool("Bilinear", gopts.bilinear);
 	update_opts();
 }
 
 EVT_HANDLER(RetainAspect, "Retain aspect ratio when resizing")
 {
-	update_bcheck("RetainAspect", gopts.retain_aspect);
+	GetMenuOptionBool("RetainAspect", gopts.retain_aspect);
 	update_opts();
 }
 
 EVT_HANDLER(Printer, "Enable printer emulation")
 {
-	update_bcheck("Printer", gopts.gbprint);
+	GetMenuOptionBool("Printer", gopts.gbprint);
 	update_opts();
 }
 
 EVT_HANDLER(Color, "Emulate washed colors of LCD")
 {
-	update_bcheck("Color", gopts.gbcColorOption);
+	GetMenuOptionBool("Color", gopts.gbcColorOption);
 	update_opts();
 }
 
 EVT_HANDLER(PrintGather, "Automatically gather a full page before printing")
 {
-	update_bcheck("PrintGather", gopts.print_auto_page);
+	GetMenuOptionBool("PrintGather", gopts.print_auto_page);
 	update_opts();
 }
 
 EVT_HANDLER(PrintSnap, "Automatically save printouts as screen captures with -print suffix")
 {
-	update_bcheck("PrintSnap", gopts.print_screen_cap);
+	GetMenuOptionBool("PrintSnap", gopts.print_screen_cap);
 	update_opts();
 }
 
 EVT_HANDLER(Joybus, "Enable joybus")
 {
-	update_bcheck("Joybus", gopts.gba_joybus_enabled);
+	GetMenuOptionBool("Joybus", gopts.gba_joybus_enabled);
 	update_opts();
 }
 
 EVT_HANDLER(Link, "Enable link cable")
 {
-	update_bcheck("Link", gopts.gba_link_enabled);
+	GetMenuOptionBool("Link", gopts.gba_link_enabled);
 	update_opts();
 }
 
 EVT_HANDLER(SpeedOn, "Enable faster network protocol by default")
 {
-	update_bcheck("SpeedOn", gopts.lanlink_speed);
+	GetMenuOptionBool("SpeedOn", gopts.lanlink_speed);
 	update_opts();
 }
 
 EVT_HANDLER(RFU, "Enable RFU for link")
 {
-	update_bcheck("RFU", gopts.rfu_enabled);
+	GetMenuOptionBool("RFU", gopts.rfu_enabled);
 	update_opts();
 }
 
 EVT_HANDLER(GBASoundInterpolation, "GBA sound interpolation")
 {
-	update_bcheck("GBASoundInterpolation", gopts.soundInterpolation);
+	GetMenuOptionBool("GBASoundInterpolation", gopts.soundInterpolation);
 	update_opts();
 }
 
 EVT_HANDLER(GBDeclicking, "GB sound declicking")
 {
-	update_bcheck("GBDeclicking", gopts.gb_declick);
+	GetMenuOptionBool("GBDeclicking", gopts.gb_declick);
 	update_opts();
 }
 
 EVT_HANDLER(GBEnhanceSound, "Enable GB sound effects")
 {
-	update_bcheck("GBEnhanceSound", gopts.gb_effects_config_enabled);
+	GetMenuOptionBool("GBEnhanceSound", gopts.gb_effects_config_enabled);
 	update_opts();
 }
 
 EVT_HANDLER(GBSurround, "GB surround sound effect (%)")
 {
-	update_bcheck("GBSurround", gopts.gb_effects_config_surround);
+	GetMenuOptionBool("GBSurround", gopts.gb_effects_config_surround);
 	update_opts();
 }
 
 EVT_HANDLER(AGBPrinter, "Enable AGB printer")
 {
-	update_icheck1("AGBPrinter", agbPrint, 1);
+	GetMenuOptionInt("AGBPrinter", agbPrint, 1);
 	update_opts();
 }
 
 EVT_HANDLER(ApplyPatches, "Apply IPS/UPS/IPF patches if found")
 {
-	update_icheck1("ApplyPatches", autoPatch, 1);
+	GetMenuOptionInt("ApplyPatches", autoPatch, 1);
 	update_opts();
 }
 
 EVT_HANDLER(MMX, "Enable MMX")
 {
-	update_icheck1("MMX", disableMMX, 1);
+	GetMenuOptionInt("MMX", disableMMX, 1);
 	update_opts();
 }
 
 EVT_HANDLER(NoStatusMsg, "Disable on-screen status messages")
 {
-	update_icheck1("NoStatusMsg", disableStatusMessages, 1);
+	GetMenuOptionInt("NoStatusMsg", disableStatusMessages, 1);
 	update_opts();
 }
 
 EVT_HANDLER(FrameSkipAuto, "Skip frames.  Values are 0-9 or -1 to skip automatically based on time.")
 {
-	update_icheck1("FrameSkipAuto", frameSkip, 1);
+	GetMenuOptionInt("FrameSkipAuto", frameSkip, 1);
 	update_opts();
 }
 
 EVT_HANDLER(Fullscreen, "Enter fullscreen mode at startup")
 {
-	update_icheck1("Fullscreen", fullScreen, 1);
+	GetMenuOptionInt("Fullscreen", fullScreen, 1);
 	update_opts();
 }
 
 EVT_HANDLER(PauseWhenInactive, "Pause game when main window loses focus")
 {
-	update_icheck1("PauseWhenInactive", pauseWhenInactive, 1);
+	GetMenuOptionInt("PauseWhenInactive", pauseWhenInactive, 1);
 	update_opts();
 }
 
 EVT_HANDLER(RTC, "Enable RTC (vba-over.ini override is rtcEnabled")
 {
-	update_icheck1("RTC", rtcEnabled, 1);
+	GetMenuOptionInt("RTC", rtcEnabled, 1);
 	update_opts();
 }
 
 EVT_HANDLER(Transparent, "Draw on-screen messages transparently")
 {
-	update_icheck1("Transparent", showSpeedTransparent, 1);
+	GetMenuOptionInt("Transparent", showSpeedTransparent, 1);
 	update_opts();
 }
 
 EVT_HANDLER(SkipIntro, "Skip BIOS initialization")
 {
-	update_icheck1("SkipIntro", skipBios, 1);
+	GetMenuOptionInt("SkipIntro", skipBios, 1);
 	update_opts();
 }
 
 EVT_HANDLER(SyncGameAudio, "Synchronize game to audio")
 {
-	update_icheck1("SyncGameAudio", synchronize, 1);
+	GetMenuOptionInt("SyncGameAudio", synchronize, 1);
 	update_opts();
 }
 
 EVT_HANDLER(BootRomEn, "Use the specified BIOS file")
 {
-	update_icheck1("BootRomEn", useBiosFileGBA, 1);
+	GetMenuOptionInt("BootRomEn", useBiosFileGBA, 1);
 	update_opts();
 }
 
 EVT_HANDLER(CBootRomEn, "Use the specified BIOS file for GBC")
 {
-	update_icheck1("CBootRomEn", useBiosFileGBC, 1);
+	GetMenuOptionInt("CBootRomEn", useBiosFileGBC, 1);
 	update_opts();
 }
 
 EVT_HANDLER(VSync, "Wait for vertical sync")
 {
-	update_icheck1("VSync", vsync, 1);
+	GetMenuOptionInt("VSync", vsync, 1);
 	update_opts();
 }
 
