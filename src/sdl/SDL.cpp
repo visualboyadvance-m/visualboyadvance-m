@@ -180,7 +180,7 @@ enum VIDEO_SIZE{
 u32 throttleLastTime = 0;
 
 bool pauseNextFrame = false;
-int sdlMirroringEnable = 0;
+int sdlMirroringEnable = 1;
 
 static int ignore_first_resize_event = 0;
 
