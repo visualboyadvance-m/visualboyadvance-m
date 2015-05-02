@@ -5220,11 +5220,8 @@
           <object class="sizeritem">
             <object class="wxScrolledWindow">
               <object class="wxPanel" name="GfxView" subclass="GfxPanel">
-                <size>128,128d</size>
-                <style>wxFULL_REPAINT_ON_RESIZE</style>
+                <size>544,496</size>
               </object>
-              <size>128,128d</size>
-              <style>wxBORDER_SUNKEN|wxCLIP_CHILDREN</style>
             </object>
             <flag>wxALL</flag>
             <border>5</border>
