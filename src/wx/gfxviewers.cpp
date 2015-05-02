@@ -725,7 +725,7 @@ namespace Viewers {
     class OAMViewer : public GfxViewer
     {
     public:
-	OAMViewer() : GfxViewer(wxT("OAMViewer"), 64, 64)
+		OAMViewer() : GfxViewer(wxT("OAMViewer"), 544, 496)
 	{
 	    sprite = 0;
 	    getspin(,"Sprite", sprite);
@@ -743,155 +743,212 @@ namespace Viewers {
 	}
 	void Update()
 	{
-	    u16 *sparms = &((u16 *)oam)[4 * sprite];
-	    u16 a0 = sparms[0], a1 = sparms[1], a2 = sparms[2];
-	    u16 *pal = &((u16 *)paletteRAM)[0x100];
-	    u8 *bmp = image.GetData();
+		BMPSize(544, 496);
 
-	    int sizeX = 8, sizeY = 8;
+		wxImage screen(240, 160);
+		systemRedShift = 19;
+		systemGreenShift = 11;
+		systemBlueShift = 3;
+		utilReadScreenPixels(screen.GetData(), 240, 160);
+		systemRedShift = 3;
+		systemGreenShift = 11;
+		systemBlueShift = 19;
 
-	    // following is almost verbatim from OamView.cpp
-	    // shape = (a0 >> 14) & 3;
-	    // size = (a1 >> 14) & 3;
-	    switch(((a0 >> 12) & 0xc) | (a1 >> 14)) {
-	    case 0:
-		break;
-	    case 1:
-		sizeX = sizeY = 16;
-		break;
-	    case 2:
-		sizeX = sizeY = 32;
-		break;
-	    case 3:
-		sizeX = sizeY = 64;
-		break;
-	    case 4:
-		sizeX = 16;
-		break;
-	    case 5:
-		sizeX = 32;
-		break;
-	    case 6:
-		sizeX = 32;
-		sizeY = 16;
-		break;
-	    case 7:
-		sizeX = 64;
-		sizeY = 32;
-		break;
-	    case 8:
-		sizeY = 16;
-		break;
-	    case 9:
-		sizeY = 32;
-		break;
-	    case 10:
-		sizeX = 16;
-		sizeY = 32;
-		break;
-	    case 11:
-		sizeX = 32;
-		sizeY = 64;
-		break;
-	    default:
-		pos->SetLabel(wxEmptyString);
-		mode->SetLabel(wxEmptyString);
-		colors->SetLabel(wxEmptyString);
-		pallab->SetLabel(wxEmptyString);
-		tile->SetLabel(wxEmptyString);
-		prio->SetLabel(wxEmptyString);
-		size->SetLabel(wxEmptyString);
-		rot->SetLabel(wxEmptyString);
-		flg->SetLabel(wxEmptyString);
-		BMPSize(sizeX, sizeY);
-		memset(bmp, 0, 8 * 8 * 3);
+		for (int sprite_no = 0; sprite_no < 128; sprite_no++)
+		{
+			u16 *sparms = &((u16 *)oam)[4 * sprite_no];
+			u16 a0 = sparms[0], a1 = sparms[1], a2 = sparms[2];
+			u16 *pal = &((u16 *)paletteRAM)[0x100];
+
+			int sizeX = 8, sizeY = 8;
+
+			// following is almost verbatim from OamView.cpp
+			// shape = (a0 >> 14) & 3;
+			// size = (a1 >> 14) & 3;
+			switch (((a0 >> 12) & 0xc) | (a1 >> 14)) {
+			case 0:
+				break;
+			case 1:
+				sizeX = sizeY = 16;
+				break;
+			case 2:
+				sizeX = sizeY = 32;
+				break;
+			case 3:
+				sizeX = sizeY = 64;
+				break;
+			case 4:
+				sizeX = 16;
+				break;
+			case 5:
+				sizeX = 32;
+				break;
+			case 6:
+				sizeX = 32;
+				sizeY = 16;
+				break;
+			case 7:
+				sizeX = 64;
+				sizeY = 32;
+				break;
+			case 8:
+				sizeY = 16;
+				break;
+			case 9:
+				sizeY = 32;
+				break;
+			case 10:
+				sizeX = 16;
+				sizeY = 32;
+				break;
+			case 11:
+				sizeX = 32;
+				sizeY = 64;
+				break;
+			default:
+				pos->SetLabel(wxEmptyString);
+				mode->SetLabel(wxEmptyString);
+				colors->SetLabel(wxEmptyString);
+				pallab->SetLabel(wxEmptyString);
+				tile->SetLabel(wxEmptyString);
+				prio->SetLabel(wxEmptyString);
+				size->SetLabel(wxEmptyString);
+				rot->SetLabel(wxEmptyString);
+				flg->SetLabel(wxEmptyString);
+				continue;
+			}
+
+			wxImage spriteData(64, 64);
+			u8 *bmp = spriteData.GetData();
+
+			int sy = (a0 & 255);
+
+			if (a0 & 0x2000) {
+				int c = (a2 & 0x3FF);
+				//if((DISPCNT & 7) > 2 && (c < 512))
+				//    return;
+				int inc = 32;
+				if (DISPCNT & 0x40)
+					inc = sizeX >> 2;
+				else
+					c &= 0x3FE;
+
+				for (int y = 0; y < sizeY; y++) {
+					for (int x = 0; x < sizeX; x++) {
+						u32 color = vram[0x10000 + (((c + (y >> 3) * inc) *
+										 32 + (y & 7) * 8 + (x >> 3) * 64 +
+										 (x & 7)) & 0x7FFF)];
+						color = pal[color];
+						*bmp++ = (color & 0x1f) << 3;
+						*bmp++ = ((color >> 5) & 0x1f) << 3;
+						*bmp++ = ((color >> 10) & 0x1f) << 3;
+					}
+					bmp += (64 - sizeX) * 3;
+				}
+			}
+			else {
+				int c = (a2 & 0x3FF);
+				//if((DISPCNT & 7) > 2 && (c < 512))
+				//    return;
+				int inc = 32;
+				if (DISPCNT & 0x40)
+					inc = sizeX >> 3;
+				int palette = (a2 >> 8) & 0xF0;
+				for (int y = 0; y < sizeY; y++) {
+					for (int x = 0; x < sizeX; x++) {
+						u32 color = vram[0x10000 + (((c + (y >> 3) * inc) *
+										 32 + (y & 7) * 4 + (x >> 3) * 32 +
+										 ((x & 7) >> 1)) & 0x7FFF)];
+						if (x & 1)
+							color >>= 4;
+						else
+							color &= 0x0F;
+
+						color = pal[palette + color];
+						*bmp++ = (color & 0x1f) << 3;
+						*bmp++ = ((color >> 5) & 0x1f) << 3;
+						*bmp++ = ((color >> 10) & 0x1f) << 3;
+					}
+					bmp += (64 - sizeX) * 3;
+				}
+			}
+
+			if (sprite == sprite_no)
+			{
+				wxString s;
+				s.Printf(wxT("%d,%d"), a1 & 511, a0 & 255);
+				pos->SetLabel(s);
+				s.Printf(wxT("%d"), (a0 >> 10) & 3);
+				mode->SetLabel(s);
+				colors->SetLabel(a0 & 8192 ? wxT("256") : wxT("16"));
+				s.Printf(wxT("%d"), (a2 >> 12) & 15);
+				pallab->SetLabel(s);
+				s.Printf(wxT("%d"), a2 & 1023);
+				tile->SetLabel(s);
+				s.Printf(wxT("%d"), (a2 >> 10) & 3);
+				prio->SetLabel(s);
+				s.Printf(wxT("%dx%d"), sizeX, sizeY);
+				s.Printf(wxT("%dx%d"), 0, 0);
+				size->SetLabel(s);
+				if(a0 & 512) {
+				s.Printf(wxT("%d"), (a1 >> 9) & 31);
+				rot->SetLabel(s);
+				} else
+				rot->SetLabel(wxEmptyString);
+				s = wxEmptyString;
+				if(a0 & 512)
+				s.append(wxT("R--"));
+				else {
+				s.append(wxT('-'));
+				s.append(a1 & 4096 ? wxT('H') : wxT('-'));
+				s.append(a1 & 8192 ? wxT('V') : wxT('-'));
+				}
+				s.append(a0 & 4096 ? wxT('M') : wxT('-'));
+				s.append(a0 & 1024 ? wxT('D') : wxT('-'));
+				flg->SetLabel(s);
+
+				u8 *box = spriteData.GetData();
+				int sprite_posx = a1 & 511;
+				int sprite_posy = a0 & 255;
+				u8 *screen_box = screen.GetData();
+				if (sprite_posx >= 0 && sprite_posx <= (239 - sizeY) && sprite_posy >= 0 && sprite_posy <= (159 - sizeX))
+					screen_box += (sprite_posx * 3) + (sprite_posy * screen.GetWidth() * 3);
+				for (int y = 0; y < sizeY; y++) {
+					for (int x = 0; x < sizeX; x++) {
+						u32 color = 0;
+
+						if (y == 0 || y == sizeY - 1 || x == 0 || x == sizeX - 1)
+						{
+							color = 255;
+							*box++ = (color & 0x1f) << 3;
+							*box++ = ((color >> 5) & 0x1f) << 3;
+							*box++ = ((color >> 10) & 0x1f) << 3;
+							if (sprite_posx >= 0 && sprite_posx <= (239 - sizeY) && sprite_posy >= 0 && sprite_posy <= (159 - sizeX))
+							{
+								*screen_box++ = (color & 0x1f) << 3;
+								*screen_box++ = ((color >> 5) & 0x1f) << 3;
+								*screen_box++ = ((color >> 10) & 0x1f) << 3;
+							}
+						}
+						else
+						{
+							box += 3;
+							if (sprite_posx >= 0 && sprite_posx <= (239 - sizeY) && sprite_posy >= 0 && sprite_posy <= (159 - sizeX))
+								screen_box += 3;
+						}
+					}
+					box += (spriteData.GetWidth() - sizeX) * 3;
+					if (sprite_posx >= 0 && sprite_posx <= (239 - sizeY) && sprite_posy >= 0 && sprite_posy <= (159 - sizeX))
+						screen_box += (screen.GetWidth() - sizeX) * 3;
+				}
+			}
+
+			image.Paste(spriteData, (sprite_no % 16) * 34, (sprite_no / 16) * 34);
+		}
+
+		image.Paste(screen, 0, 304);
+
 		ChangeBMP();
-		return;
-	    }
-	    BMPSize(sizeX, sizeY);
-
-	    int sy = (a0 & 255);
-
-	    if(a0 & 0x2000) {
-		int c = (a2 & 0x3FF);
-		//if((DISPCNT & 7) > 2 && (c < 512))
-		//    return;
-		int inc = 32;
-		if(DISPCNT & 0x40)
-		    inc = sizeX >> 2;
-		else
-		    c &= 0x3FE;
-
-		for(int y = 0; y < sizeY; y++) {
-		    for(int x = 0; x < sizeX; x++) {
-			u32 color = vram[0x10000 + (((c + (y>>3) * inc)*
-						     32 + (y & 7) * 8 + (x >> 3) * 64 +
-						     (x & 7))&0x7FFF)];
-			color = pal[color];
-			*bmp++ = (color & 0x1f) << 3;
-			*bmp++ = ((color >> 5) & 0x1f) << 3;
-			*bmp++ = ((color >> 10) & 0x1f) << 3;
-		    }
-		    bmp += (64 - sizeX) * 3;
-		}
-	    } else {
-		int c = (a2 & 0x3FF);
-		//if((DISPCNT & 7) > 2 && (c < 512))
-		//    return;
-		int inc = 32;
-		if(DISPCNT & 0x40)
-		    inc = sizeX >> 3;
-		int palette = (a2 >> 8) & 0xF0;
-		for(int y = 0; y < sizeY; y++) {
-		    for(int x = 0; x < sizeX; x++) {
-			u32 color = vram[0x10000 + (((c + (y>>3) * inc)*
-						     32 + (y & 7) * 4 + (x >> 3) * 32 +
-						     ((x & 7)>>1))&0x7FFF)];
-			if(x & 1)
-			    color >>= 4;
-			else
-			    color &= 0x0F;
-
-			color = pal[palette+color];
-			*bmp++ = (color & 0x1f) << 3;
-			*bmp++ = ((color >> 5) & 0x1f) << 3;
-			*bmp++ = ((color >> 10) & 0x1f) << 3;
-		    }
-		    bmp += (64 - sizeX) * 3;
-		}
-	    }
-	    ChangeBMP();
-
-	    wxString s;
-	    s.Printf(wxT("%d,%d"), a1 & 511, a0 & 255);
-	    pos->SetLabel(s);
-	    s.Printf(wxT("%d"), (a0 >> 10) & 3);
-	    mode->SetLabel(s);
-	    colors->SetLabel(a0 & 8192 ? wxT("256") : wxT("16"));
-	    s.Printf(wxT("%d"), (a2 >> 12) & 15);
-	    pallab->SetLabel(s);
-	    s.Printf(wxT("%d"), a2 & 1023);
-	    tile->SetLabel(s);
-	    s.Printf(wxT("%d"), (a2 >> 10) & 3);
-	    prio->SetLabel(s);
-	    s.Printf(wxT("%dx%d"), sizeX, sizeY);
-	    size->SetLabel(s);
-	    if(a0 & 512) {
-		s.Printf(wxT("%d"), (a1 >> 9) & 31);
-		rot->SetLabel(s);
-	    } else
-		rot->SetLabel(wxEmptyString);
-	    s = wxEmptyString;
-	    if(a0 & 512)
-		s.append(wxT("R--"));
-	    else {
-		s.append(wxT('-'));
-		s.append(a1 & 4096 ? wxT('H') : wxT('-'));
-		s.append(a1 & 8192 ? wxT('V') : wxT('-'));
-	    }
-	    s.append(a0 & 4096 ? wxT('M') : wxT('-'));
-	    s.append(a0 & 1024 ? wxT('D') : wxT('-'));
-	    flg->SetLabel(s);
 	}
     protected:
 	int sprite;
