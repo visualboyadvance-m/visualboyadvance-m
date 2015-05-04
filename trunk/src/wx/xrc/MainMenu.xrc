@@ -309,8 +309,16 @@
         <object class="wxMenuItem" name="DisplayConfigure">
           <label>_Configure ...</label>
         </object>
+        <object class="wxMenuItem" name="Fullscreen">
+          <label>_Fullscreen mode</label>
+          <checkable>1</checkable>
+        </object>
         <object class="wxMenuItem" name="Bilinear">
           <label>_Bilinear filter</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="Multithread">
+          <label>_Multithread filter</label>
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="RetainAspect">
@@ -325,10 +333,6 @@
           <label>_Transparent on-screen messages</label>
           <checkable>1</checkable>
         </object>
-        <object class="wxMenuItem" name="Fullscreen">
-          <label>_Fullscreen mode</label>
-          <checkable>1</checkable>
-        </object>
       </object>
       <object class="wxMenu">
         <label>_Audio</label>
@@ -340,11 +344,15 @@
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="GBEnhanceSound">
-          <label>_GB sound effects</label>
+          <label>_GB sound enhancement</label>
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="GBSurround">
           <label>_GB surround sound effect</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="GBDeclicking">
+          <label>_GB sound declicking</label>
           <checkable>1</checkable>
         </object>
       </object>
@@ -418,10 +426,6 @@
         </object>
         <object class="wxMenuItem" name="PrintSnap">
           <label>_Save printouts as screen captures</label>
-          <checkable>1</checkable>
-        </object>
-        <object class="wxMenuItem" name="GBDeclicking">
-          <label>_GB sound declicking</label>
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="CBootRomEn">

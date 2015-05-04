@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
   <object class="wxDialog" name="SoundConfig">
-<title>Sound Settings</title>
+    <title>Sound Settings</title>
     <object class="wxBoxSizer">
     <orient>wxVERTICAL</orient>
     <object class="sizeritem">
@@ -157,13 +157,6 @@
             <border>5</border>
           </object>
           <object class="sizeritem">
-            <object class="wxCheckBox" name="SyncGameAudio">
-              <label>_Sync game to audio</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
             <object class="wxStaticBoxSizer">
               <object class="sizeritem">
                 <object class="wxSlider" name="Buffers">
@@ -202,31 +195,9 @@
         <object class="wxBoxSizer">
           <orient>wxVERTICAL</orient>
           <object class="sizeritem">
-            <object class="wxCheckBox" name="GBDeclicking">
-              <label>Declicking</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxCheckBox" name="GBEnhanceSound">
-              <label>Enhance sound</label>
-              <label>Enhance sound</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
             <object class="wxPanel" name="GBEnhanceSoundDep">
               <object class="wxBoxSizer">
                 <orient>wxVERTICAL</orient>
-                <object class="sizeritem">
-                  <object class="wxCheckBox" name="GBSurround">
-                    <label>Surround</label>
-                  </object>
-                  <flag>wxALL</flag>
-                  <border>5</border>
-                </object>
                 <object class="sizeritem">
                   <object class="wxStaticBoxSizer">
                     <object class="sizeritem">
@@ -315,13 +286,6 @@
       <object class="wxPanel">
         <object class="wxBoxSizer">
           <orient>wxVERTICAL</orient>
-          <object class="sizeritem">
-            <object class="wxCheckBox" name="GBASoundInterpolation">
-              <label>Sound interpolation</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
           <object class="sizeritem">
             <object class="wxStaticBoxSizer">
               <label>Sound filtering</label>

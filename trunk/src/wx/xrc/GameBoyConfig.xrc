@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
   <object class="wxDialog" name="GameBoyConfig">
-<title>GameBoy settings</title>
+    <title>GameBoy settings</title>
     <object class="wxBoxSizer">
     <orient>wxVERTICAL</orient>
     <object class="sizeritem">
@@ -65,34 +65,6 @@
               </object>
             </object>
             <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxCheckBox" name="Printer">
-              <label>Emulate a Game Boy _Printer</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxCheckBox" name="PrintGather">
-              <label>Automatically _gather entire printed page</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxCheckBox" name="PrintSnap">
-              <label>Automatically _save printouts as snapshots</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxCheckBox" name="Color">
-              <label>Emulate gameboy washed colors</label>
-            </object>
-            <flag>wxALL</flag>
             <border>5</border>
           </object>
         </object>
@@ -159,13 +131,6 @@
         <object class="wxBoxSizer">
           <orient>wxVERTICAL</orient>
           <object class="sizeritem">
-            <object class="wxCheckBox" name="BootRomEn">
-              <label>Use a _Game Boy boot ROM file</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
             <flag>wxEXPAND</flag>
             <object class="wxBoxSizer">
               <orient>wxHORIZONTAL</orient>
@@ -188,18 +153,11 @@
             </object>
           </object>
           <object class="sizeritem">
-            <object class="wxCheckBox" name="CBootRomEn">
-              <label>Use a _Color Game Boy boot ROM file</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
             <object class="wxBoxSizer">
               <orient>wxHORIZONTAL</orient>
               <object class="sizeritem">
                 <object class="wxStaticText" name="CBootRomLab">
-                  <label>Boot ROM _file :</label>
+                  <label>GBC Boot ROM _file :</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
