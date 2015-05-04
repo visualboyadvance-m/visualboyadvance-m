@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
   <object class="wxDialog" name="GameBoyAdvanceConfig">
-<title>Game Boy Advance settings</title>
+    <title>Game Boy Advance settings</title>
     <object class="wxBoxSizer">
     <orient>wxVERTICAL</orient>
     <object class="sizeritem">
@@ -72,20 +72,6 @@
             <flag>wxALL|wxEXPAND</flag>
             <border>5</border>
           </object>
-          <object class="sizeritem">
-            <object class="wxCheckBox" name="RTC">
-              <label>Enable real-time clock</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxCheckBox" name="AGBPrinter">
-              <label>Enable AGB Printer</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
         </object>
       </object>
       <label>System and peripherals</label>
@@ -107,13 +93,6 @@
           <object class="sizeritem">
             <object class="wxBoxSizer">
               <orient>wxVERTICAL</orient>
-              <object class="sizeritem">
-                <object class="wxCheckBox" name="FrameSkipAuto">
-                  <label>Enable _automatic frame skipping</label>
-                </object>
-                <flag>wxALL</flag>
-                <border>5</border>
-              </object>
               <object class="sizeritem">
                 <flag>wxALL|wxEXPAND</flag>
                 <border>5</border>
@@ -152,13 +131,6 @@
           <object class="sizeritem">
             <object class="wxBoxSizer">
               <object class="sizeritem">
-                <object class="wxCheckBox" name="BootRomEn">
-                  <label>Use a bios file</label>
-                </object>
-                <flag>wxALL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
                 <flag>wxALL|wxEXPAND</flag>
                 <border>5</border>
                 <object class="wxBoxSizer">
@@ -181,13 +153,6 @@
                 </object>
               </object>
               <orient>wxVERTICAL</orient>
-              <object class="sizeritem">
-                <object class="wxCheckBox" name="SkipIntro">
-                  <label>Skip BIOS intro</label>
-                </object>
-                <flag>wxALL</flag>
-                <border>5</border>
-              </object>
             </object>
             <flag>wxALL|wxEXPAND</flag>
             <border>5</border>

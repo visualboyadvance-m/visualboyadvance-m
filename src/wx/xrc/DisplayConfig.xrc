@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
   <object class="wxDialog" name="DisplayConfig">
-<title>Display settings</title>
+    <title>Display settings</title>
     <object class="wxBoxSizer">
     <orient>wxVERTICAL</orient>
     <object class="sizeritem">
@@ -40,20 +40,6 @@
               <orient>wxVERTICAL</orient>
             </object>
           </object>
-          <object class="sizeritem">
-            <object class="wxCheckBox" name="NoStatusMsg">
-              <label>Disable status messages</label>
-            </object>
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxCheckBox" name="Transparent">
-              <label>Transparent status and speed</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
         </object>
       </object>
       <label>On-Screen Display</label>
@@ -82,13 +68,6 @@
               </object>
               <orient>wxHORIZONTAL</orient>
             </object>
-          </object>
-          <object class="sizeritem">
-            <object class="wxCheckBox" name="RetainAspect">
-              <label>Retain aspect ratio</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
           </object>
           <object class="sizeritem">
             <object class="wxBoxSizer">
@@ -141,13 +120,6 @@
                   <orient>wxHORIZONTAL</orient>
                 </object>
                 <flag>wxEXPAND</flag>
-              </object>
-              <object class="sizeritem">
-                <object class="wxCheckBox" name="Fullscreen">
-                  <label>Full screen at startup</label>
-                </object>
-                <flag>wxALL</flag>
-                <border>5</border>
               </object>
               <orient>wxVERTICAL</orient>
             </object>
@@ -210,26 +182,6 @@
                   </object>
                 </object>
               </object>
-              <object class="sizeritem">
-                <object class="wxGridSizer">
-                  <object class="sizeritem">
-                    <object class="wxCheckBox" name="Bilinear">
-                      <label>Bilinear scaling filter</label>
-                    </object>
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                  </object>
-                  <cols>2</cols>
-                  <object class="sizeritem">
-                    <object class="wxCheckBox" name="VSync">
-                      <label>Wait for VSync</label>
-                    </object>
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                  </object>
-                </object>
-                <flag>wxEXPAND</flag>
-              </object>
             </object>
           </object>
           <object class="sizeritem">
@@ -244,20 +196,6 @@
           </object>
           <object class="sizeritem">
             <object class="wxFlexGridSizer">
-              <object class="sizeritem">
-                <object class="wxCheckBox" name="MMX">
-                  <label>Enable MMX</label>
-                </object>
-                <flag>wxALL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxCheckBox" name="Multithread">
-                  <label>Enable multithreading</label>
-                </object>
-                <flag>wxALL</flag>
-                <border>5</border>
-              </object>
               <object class="sizeritem">
                 <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
