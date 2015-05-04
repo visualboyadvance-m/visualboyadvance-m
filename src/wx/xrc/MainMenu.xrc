@@ -309,6 +309,10 @@
         <object class="wxMenuItem" name="DisplayConfigure">
           <label>_Configure ...</label>
         </object>
+        <object class="wxMenuItem" name="Color">
+          <label>_GB washed colors</label>
+          <checkable>1</checkable>
+        </object>        
         <object class="wxMenuItem" name="Fullscreen">
           <label>_Fullscreen mode</label>
           <checkable>1</checkable>
@@ -414,10 +418,6 @@
         </object>
         <object class="wxMenuItem" name="Printer">
           <label>_GB printer</label>
-          <checkable>1</checkable>
-        </object>
-        <object class="wxMenuItem" name="Color">
-          <label>_Washed colors</label>
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="PrintGather">
