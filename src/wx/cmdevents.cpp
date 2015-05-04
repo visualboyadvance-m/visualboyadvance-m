@@ -1863,9 +1863,6 @@ EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
 	break;
     }
     // this value might have been overwritten by FrameSkip
-    if(XRCCTRL(*dlg, "FrameSkipAuto", wxCheckBox)->GetValue())
-	gbFrameSkip = -1;
-    update_opts();
     if(panel->game_type() == IMAGE_GB) {
 	if(borderon != gbBorderOn) {
 	    if(gbBorderOn) {
@@ -1889,6 +1886,7 @@ EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
 		if(gopts.gbprint)
 			gbSerialFunction = gbPrinterSend;
     }
+	update_opts();
 }
 
 EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
@@ -1931,21 +1929,11 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
     }
     if(ShowModal(dlg) != wxID_OK)
 	return;
-    // this value might have been overwritten by FrameSkip
-    if(XRCCTRL(*dlg, "FrameSkipAuto", wxCheckBox)->GetValue())
-	frameSkip = -1;
-    update_opts();
     if(panel->game_type() == IMAGE_GBA) {
 	// autoskip will self-adjust
 	if(frameSkip >= 0)
 	    systemFrameSkip = frameSkip;
 	agbPrintEnable(agbPrint);
-#if 0 // disabled in win32 version for undocumented "problems"
-	if(gopts.skip_intro)
-	    *((u32 *)rom) = 0xea00002e;
-	else
-	    *((u32 *)rom) = /* original value */;
-#endif
 	wxString s = wxString((const char *)&rom[0xac], wxConvLibc, 4);
 	wxFileConfig *cfg = wxGetApp().overrides;
 	bool chg;
@@ -2038,6 +2026,7 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
 	    fos.Commit();
 	}
     }
+	update_opts();
 }
 
 EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
@@ -2056,8 +2045,6 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
     wxDialog *dlg = GetXRCDialog("DisplayConfig");
     if(ShowModal(dlg) != wxID_OK)
 		return;
-    update_opts();
-    
     if(fs != fullScreen)
 	{
 		panel->ShowFullScreen(fullScreen);
@@ -2073,6 +2060,7 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
 		panel->panel->Delete();
 		panel->panel = NULL;
     }
+	update_opts();
 }
 
 EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
@@ -2109,7 +2097,6 @@ EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
     wxDialog *dlg = GetXRCDialog("SoundConfig");
     if(ShowModal(dlg) != wxID_OK)
 	return;
-    update_opts();
     switch(panel->game_type()) {
     case IMAGE_UNKNOWN:
 	return;
@@ -2137,6 +2124,7 @@ EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
 	soundInit();
     }
     soundSetVolume((float)gopts.sound_vol / 100.0);
+	update_opts();
 }
 
 EVT_HANDLER(EmulatorDirectories, "Directories...")

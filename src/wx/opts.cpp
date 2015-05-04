@@ -136,7 +136,7 @@ opt_desc opts[] = {
 			L"simple2x|simple3x|hq3x|simple4x|hq4x|xbrz2x|xbrz3x|xbrz4x|xbrz5x|plugin")),
 	STROPT ("Display/FilterPlugin", "", wxTRANSLATE("Filter plugin library"), gopts.filter_plugin),
     ENUMOPT("Display/IFB", "", wxTRANSLATE("Interframe blending function"), gopts.ifb, wxTRANSLATE("none|smart|motionblur")),
-    INTOPT ("Display/MaxThreads", "", wxTRANSLATE("Maximum number of threads to run filters in"), gopts.max_threads, 1, 8),
+    INTOPT ("Display/MaxThreads", "Multithread", wxTRANSLATE("Maximum number of threads to run filters in"), gopts.max_threads, 1, 8),
 #ifdef __WXMSW__
 	ENUMOPT("Display/RenderMethod", "", wxTRANSLATE("Render method; if unsupported, simple method will be used"), gopts.render_method, wxTRANSLATE("simple|opengl|cairo|direct3d")),
 #else

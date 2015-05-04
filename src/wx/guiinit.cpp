@@ -2766,8 +2766,6 @@ bool MainFrame::BindControls()
     sc->SetValidator(wxGenericValidator(&o)); \
 		} while(0)
 		{
-			getcbi("PauseWhenInactive", pauseWhenInactive);
-			getcbi("ApplyPatches", autoPatch);
 			getrbi("PNG", captureFormat, 0);
 			getrbi("BMP", captureFormat, 1);
 			getsc("RewindInterval", gopts.rewind_interval);
@@ -2821,32 +2819,25 @@ bool MainFrame::BindControls()
 			// in command handler.  Plus making changes might require resizing
 			// game area.  Validation only here.
 			SafeXRCCTRL<wxChoice>(d, "Borders");
-			getcbbe("Printer", gopts.gbprint);
-			getcbb("PrintGather", gopts.print_auto_page);
-			addbe(cb);
-			getcbb("PrintSnap", gopts.print_screen_cap);
-			addbe(cb);
 			/// Speed
 			// AutoSkip/FrameSkip are 2 controls for 1 value.  Needs post-process
 			// to ensure checkbox not ignored
-			getcbie("FrameSkipAuto", gbFrameSkip, -1);
+			getcbie("FrameSkipAuto", autoFrameSkip, -1);
 			getsc("FrameSkip", gbFrameSkip);
 			addbier(sc, true);
 			getlab("FrameSkipLab");
 			addbier(lab, true);
 			/// Boot ROM
-			getcbie("BootRomEn", useBiosFileGB, 1);
 			getfp("BootRom", gopts.gb_bios);
 			addbe(fp);
 			getlab("BootRomLab");
 			addbe(lab);
-			getcbie("CBootRomEn", useBiosFileGBC, 1);
 			getfp("CBootRom", gopts.gbc_bios);
 			addbe(fp);
 			getlab("CBootRomLab");
 			addbe(lab);
 			/// Custom Colors
-			getcbi("Color", gbColorOption);
+			//getcbi("Color", gbColorOption);
 			wxFarRadio *r = NULL;
 			for (int i = 0; i < 3; i++) {
 				wxString pn;
@@ -2907,25 +2898,21 @@ bool MainFrame::BindControls()
 			d->Connect(XRCID("Detect"), wxEVT_COMMAND_BUTTON_CLICKED,
 				wxCommandEventHandler(BatConfig_t::Detect),
 				NULL, &BatConfigHandler);
-			getcbi("RTC", rtcEnabled);
-			getcbi("AGBPrinter", agbPrint);
 
 			/// Speed
 			// AutoSkip/FrameSkip are 2 controls for 1 value.  Needs post-process
 			// to ensure checkbox not ignored
-			getcbie("FrameSkipAuto", autoFrameSkip, -1);
+			//getcbie("FrameSkipAuto", autoFrameSkip, -1);
 			getsc("FrameSkip", frameSkip);
 			addbier(sc, true);
 			getlab("FrameSkipLab");
 			addbier(lab, true);
 
 			/// Boot ROM
-			getcbie("BootRomEn", useBiosFileGBA, 1);
 			getfp("BootRom", gopts.gba_bios);
 			addbe(fp);
 			getlab("BootRomLab");
 			addbe(lab);
-			getcbi("SkipIntro", skipBios);
 
 			/// Game Overrides
 			getgbaw("GameSettings");
@@ -2942,19 +2929,14 @@ bool MainFrame::BindControls()
 		{
 			/// On-Screen Display
 			ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "SpeedIndicator", wxGenericValidator(&showSpeed));
-			getcbi("NoStatusMsg", disableStatusMessages);
-			getcbi("Transparent", showSpeedTransparent);
-
 			/// Zoom
 			// this was a choice, but I'd rather not have to make an off-by-one
 			// validator just for this, and spinctrl is good enough.
 			getsc("DefaultScale", gopts.video_scale);
-			getcbb("RetainAspect", gopts.retain_aspect);
 			getsc("MaxScale", maxScale);
 			// fs modes should be filled in at popup time
 			// since they may change based on what screen is current
 			SafeXRCCTRL<wxChoice>(d, "FullscreenMode");
-			getcbi("Fullscreen", fullScreen);
 
 			/// Advanced
 			getrbi("OutputSimple", gopts.render_method, RND_SIMPLE);
@@ -2970,20 +2952,6 @@ bool MainFrame::BindControls()
 #if !defined(__WXMSW__) || defined(NO_D3D) || 1 // not implemented
 			rb->Hide();
 #endif
-			getcbb("Bilinear", gopts.bilinear);
-			getcbi("VSync", vsync);
-			// FIXME: make cb disabled when not GL or d3d
-			int mthr = wxThread::GetCPUCount();
-			if (mthr > 8)
-				mthr = 8;
-			if (mthr < 0)
-				mthr = 2;
-			cb = SafeXRCCTRL<wxCheckBox>(d, "Multithread");
-			cb->SetValidator(wxBoolIntValidator(&gopts.max_threads, mthr));
-			if (mthr <= 1)
-				cb->Hide();
-			getcbi("MMX", disableMMX);
-			//cb->Hide();
 			ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "Filter", wxGenericValidator(&gopts.filter));
 			// these two are filled and/or hidden at dialog load time
 			wxControl *pll;
@@ -3048,7 +3016,6 @@ bool MainFrame::BindControls()
 #ifndef __WXMSW__
 			cb->Hide();
 #endif
-			getcbi("SyncGameAudio", synchronize);
 			getsl("Buffers", gopts.audio_buffers);
 			sound_config_handler.bufs = sl;
 			getlab("BuffersInfo");
@@ -3062,17 +3029,13 @@ bool MainFrame::BindControls()
 			sound_config_handler.AdjustFrames(10);
 
 			/// Game Boy
-			getcbb("GBDeclicking", gopts.gb_declick);
-			getcbbe("GBEnhanceSound", gb_effects_config.enabled);
 			wxPanel *p;
 			p = SafeXRCCTRL<wxPanel>(d, "GBEnhanceSoundDep");
 			addbe(p);
-			getcbb("GBSurround", gb_effects_config.surround);
 			getsl("GBEcho", gopts.gb_echo);
 			getsl("GBStereo", gopts.gb_stereo);
 
 			/// Game Boy Advance
-			getcbb("GBASoundInterpolation", soundInterpolation);
 			getsl("GBASoundFiltering", gopts.gba_sound_filter);
 			d->Fit();
 		}
