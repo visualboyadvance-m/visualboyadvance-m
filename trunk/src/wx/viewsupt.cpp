@@ -1,6 +1,6 @@
 #include "wxvbam.h"
 #include "viewsupt.h"
-#include "..\common\ConfigManager.h"
+#include "../common/ConfigManager.h"
 
 namespace Viewers
 {

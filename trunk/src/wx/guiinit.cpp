@@ -2255,8 +2255,17 @@ bool MainFrame::BindControls()
 			}
 #endif
 #ifdef NO_LINK
-			if (cmdtab[i].cmd_id == XRCID("LinkConfigure") ||
-				cmdtab[i].cmd_id == XRCID("LanLink")) {
+			if (cmdtab[i].cmd_id == XRCID("LanLink") ||
+				cmdtab[i].cmd_id == XRCID("LinkType0Nothing") ||
+				cmdtab[i].cmd_id == XRCID("LinkType1Cable") ||
+				cmdtab[i].cmd_id == XRCID("LinkType2Wireless") ||
+				cmdtab[i].cmd_id == XRCID("LinkType3GameCube") ||
+				cmdtab[i].cmd_id == XRCID("LinkType4Gameboy") ||
+				cmdtab[i].cmd_id == XRCID("LinkAuto") ||
+				cmdtab[i].cmd_id == XRCID("SpeedOn") ||
+				cmdtab[i].cmd_id == XRCID("LinkProto") ||
+				cmdtab[i].cmd_id == XRCID("LinkConfigure")
+				) {
 				if (mi)
 					mi->GetMenu()->Remove(mi);
 				cmdtab[i].cmd_id = XRCID("NOOP");
@@ -2829,13 +2838,9 @@ bool MainFrame::BindControls()
 			addbier(lab, true);
 			/// Boot ROM
 			getfp("BootRom", gopts.gb_bios);
-			addbe(fp);
 			getlab("BootRomLab");
-			addbe(lab);
 			getfp("CBootRom", gopts.gbc_bios);
-			addbe(fp);
 			getlab("CBootRomLab");
-			addbe(lab);
 			/// Custom Colors
 			//getcbi("Color", gbColorOption);
 			wxFarRadio *r = NULL;
@@ -2910,9 +2915,7 @@ bool MainFrame::BindControls()
 
 			/// Boot ROM
 			getfp("BootRom", gopts.gba_bios);
-			addbe(fp);
 			getlab("BootRomLab");
-			addbe(lab);
 
 			/// Game Overrides
 			getgbaw("GameSettings");
@@ -3031,7 +3034,6 @@ bool MainFrame::BindControls()
 			/// Game Boy
 			wxPanel *p;
 			p = SafeXRCCTRL<wxPanel>(d, "GBEnhanceSoundDep");
-			addbe(p);
 			getsl("GBEcho", gopts.gb_echo);
 			getsl("GBStereo", gopts.gb_stereo);
 
