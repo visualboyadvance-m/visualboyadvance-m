@@ -213,7 +213,9 @@ opt_desc opts[] = {
 	INTOPT ("preferences/gbPaletteOption", "", wxTRANSLATE("The palette to use"), gbPaletteOption, 0, 2),
 	INTOPT ("preferences/gdbBreakOnLoad", "DebugGDBBreakOnLoad", wxTRANSLATE("Break into GDB after loading the game."), gdbBreakOnLoad, 0, 1),
 	INTOPT ("preferences/gdbPort", "DebugGDBPort", wxTRANSLATE("Port to connect GDB to."), gdbPort, 0, 65535),
+#ifndef NO_LINK
 	INTOPT ("preferences/LinkNumPlayers", "", wxTRANSLATE("Number of players in network"), linkNumPlayers, 2, 4),
+#endif
 	INTOPT ("preferences/maxScale", "", wxTRANSLATE("Maximum scale factor (0 = no limit)"), maxScale, 0, 100),
 	INTOPT ("preferences/pauseWhenInactive", "PauseWhenInactive", wxTRANSLATE("Pause game when main window loses focus"), pauseWhenInactive, 0, 1),
 	INTOPT ("preferences/rtcEnabled", "RTC", wxTRANSLATE("Enable RTC (vba-over.ini override is rtcEnabled"), rtcEnabled, 0, 1),

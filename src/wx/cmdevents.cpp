@@ -2356,8 +2356,6 @@ EVT_HANDLER(VSync, "Wait for vertical sync")
 	update_opts();
 }
 
-#ifndef NO_LINK
-
 void MainFrame::EnableNetworkMenu()
 {
 	cmd_enable &= ~CMDEN_LINK_ANY;
@@ -2388,6 +2386,7 @@ void SetLinkTypeMenu(const char *type, int value)
 
 EVT_HANDLER_MASK(LanLink, "Start Network link", CMDEN_LINK_ANY)
 {
+#ifndef NO_LINK
 	LinkMode mode = GetLinkMode();
 
 	if (mode != LINK_DISCONNECTED) {
@@ -2401,9 +2400,11 @@ EVT_HANDLER_MASK(LanLink, "Start Network link", CMDEN_LINK_ANY)
 		wxLogError(_("Network is not supported in local mode."));
 		return;
 	}
+
 	wxDialog *dlg = GetXRCDialog("NetLink");
 	ShowModal(dlg);
 	panel->SetFrameTitle();
+#endif
 }
 
 EVT_HANDLER(LinkType0Nothing, "Link nothing")
@@ -2454,6 +2455,8 @@ EVT_HANDLER(LinkProto, "Local host IPC")
 
 EVT_HANDLER(LinkConfigure, "Link options...")
 {
+#ifndef NO_LINK
+
 	wxDialog *dlg = GetXRCDialog("LinkConfig");
 	if (ShowModal(dlg) != wxID_OK)
 		return;
@@ -2463,9 +2466,9 @@ EVT_HANDLER(LinkConfigure, "Link options...")
 	update_opts();
 
 	EnableNetworkMenu();
-}
 
 #endif
+}
 
 
 
