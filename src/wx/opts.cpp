@@ -227,9 +227,9 @@ opt_desc opts[] = {
 	INTOPT ("preferences/skipSaveGameBattery", "", wxTRANSLATE("Do not overwrite native (battery) save when loading state"), skipSaveGameBattery, 0, 1),
 	INTOPT ("preferences/synchronize", "SyncGameAudio", wxTRANSLATE("Synchronize game to audio"), synchronize, 0, 1),
 	INTOPT ("preferences/throttle", "", wxTRANSLATE("Throttle game speed, even when accelerated (0-1000%, 0 = disabled)"), throttle, 0, 1000),
-	INTOPT ("preferences/useBiosFileGB", "", wxTRANSLATE("Use the specified BIOS file for GB"), useBiosFileGB, 0, 1),
+	INTOPT ("preferences/useBiosGB", "BootRomGB", wxTRANSLATE("Use the specified BIOS file for GB"), useBiosFileGB, 0, 1),
 	INTOPT ("preferences/useBiosGBA", "BootRomEn", wxTRANSLATE("Use the specified BIOS file"), useBiosFileGBA, 0, 1),
-	INTOPT ("preferences/useBiosGBC", "CBootRomEn", wxTRANSLATE("Use the specified BIOS file for GBC"), useBiosFileGBC, 0, 1),
+	INTOPT ("preferences/useBiosGBC", "BootRomGBC", wxTRANSLATE("Use the specified BIOS file for GBC"), useBiosFileGBC, 0, 1),
 	INTOPT ("preferences/vsync", "VSync", wxTRANSLATE("Wait for vertical sync"), vsync, 0, 1),
 
     /// Sound
