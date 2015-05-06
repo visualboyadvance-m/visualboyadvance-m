@@ -147,10 +147,10 @@ void GameArea::LoadGame(const wxString &name)
 	wxCharBuffer fnb;
 	if(gbCgbMode) {
 	    use_bios = useBiosFileGBC;
-	    fnb = biosFileNameGBC;
+		fnb = gopts.gbc_bios.mb_fn_str();
 	} else {
 	    use_bios = useBiosFileGB;
-	    fnb = biosFileNameGB;
+	    fnb = gopts.gb_bios.mb_fn_str();
 	}
 	fn = fnb.data();
 	gbCPUInit(fn, use_bios);

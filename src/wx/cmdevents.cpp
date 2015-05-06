@@ -2338,15 +2338,21 @@ EVT_HANDLER(SyncGameAudio, "Synchronize game to audio")
 	update_opts();
 }
 
-EVT_HANDLER(BootRomEn, "Use the specified BIOS file")
+EVT_HANDLER(BootRomEn, "Use the specified BIOS file for GBA")
 {
 	GetMenuOptionInt("BootRomEn", useBiosFileGBA, 1);
 	update_opts();
 }
 
-EVT_HANDLER(CBootRomEn, "Use the specified BIOS file for GBC")
+EVT_HANDLER(BootRomGB, "Use the specified BIOS file for GB")
 {
-	GetMenuOptionInt("CBootRomEn", useBiosFileGBC, 1);
+	GetMenuOptionInt("BootRomGB", useBiosFileGB, 1);
+	update_opts();
+}
+
+EVT_HANDLER(BootRomGBC, "Use the specified BIOS file for GBC")
+{
+	GetMenuOptionInt("BootRomGBC", useBiosFileGBC, 1);
 	update_opts();
 }
 
