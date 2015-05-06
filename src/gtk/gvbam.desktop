@@ -2,8 +2,8 @@
 Version=1.0
 Type=Application
 Name=VBA-M
-GenericName=GameBoy Advance Emulator
-Comment=Nindendo GameBoy Advance Emulator
+GenericName=Game Boy Advance Emulator
+Comment=Nintendo Game Boy Advance Emulator
 Exec=gvbam %f
 Icon=vbam
 Categories=Game;Emulator;GTK;
