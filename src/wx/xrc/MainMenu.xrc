@@ -29,113 +29,6 @@
       </object>
       <object class="separator"/>
       <object class="wxMenu">
-        <object class="wxMenuItem" name="ImportBatteryFile">
-          <label>_Battery file...</label>
-        </object>
-        <object class="wxMenuItem" name="ImportGamesharkCodeFile">
-          <label>Gameshark _code file...</label>
-        </object>
-        <object class="wxMenuItem" name="ImportGamesharkActionReplaySnapshot">
-          <label>_Gameshark snapshot...</label>
-        </object>
-        <label>_Import</label>
-      </object>
-      <object class="wxMenu">
-        <object class="wxMenuItem" name="ExportBatteryFile">
-          <label>_Battery file...</label>
-        </object>
-        <object class="wxMenuItem" name="ExportGamesharkSnapshot">
-          <label>_Gameshark snapshot...</label>
-        </object>
-        <label>_Export</label>
-      </object>
-      <object class="separator"/>
-      <object class="wxMenuItem" name="ScreenCapture">
-        <label>Screen capt_ure...</label>
-      </object>
-      <object class="wxMenu">
-        <object class="wxMenuItem" name="RecordSoundStartRecording">
-          <label>Start _sound recording...</label>
-        </object>
-        <object class="wxMenuItem" name="RecordSoundStopRecording">
-          <label>Stop s_ound recording</label>
-        </object>
-        <object class="wxMenuItem" name="RecordAVIStartRecording">
-          <label>Start _video recording...</label>
-        </object>
-        <object class="wxMenuItem" name="RecordAVIStopRecording">
-          <label>Stop v_ideo recording</label>
-        </object>
-        <object class="wxMenuItem" name="RecordMovieStartRecording">
-          <label>Start _game recording...</label>
-        </object>
-        <object class="wxMenuItem" name="RecordMovieStopRecording">
-          <label>Stop g_ame recording</label>
-        </object>
-        <label>_Record</label>
-      </object>
-      <object class="wxMenu">
-        <object class="wxMenuItem" name="PlayMovieStartPlaying">
-          <label>Start playing _movie...</label>
-        </object>
-        <object class="wxMenuItem" name="PlayMovieStopPlaying">
-          <label>Stop playing m_ovie</label>
-        </object>
-        <label>_Play</label>
-      </object>
-      <object class="separator"/>
-      <object class="wxMenuItem" name="wxID_CLOSE"/>
-      <object class="wxMenuItem" name="wxID_EXIT"/>
-    </object>
-    <object class="wxMenu">
-      <label>_Emulation</label>
-      <object class="wxMenuItem" name="Pause">
-        <label>_Pause</label>
-        <accel>Ctrl+P</accel>
-        <checkable>1</checkable>
-      </object>
-      <object class="wxMenuItem" name="NextFrame">
-        <label>_Next frame</label>
-        <accel>Ctrl+N</accel>
-      </object>
-      <object class="wxMenuItem" name="Rewind">
-        <label>Re_wind</label>
-        <accel>Ctrl+B</accel>
-      </object>
-      <object class="separator"/>
-      <object class="wxMenuItem" name="ToggleFullscreen">
-        <label>_Fullscreen</label>
-        <bitmap platform="unix" stock_id="gtk-fullscreen"/>
-        <accel>F11</accel>
-      </object>
-      <object class="separator"/>
-      <object class="wxMenuItem" name="EmulatorSpeedupToggle">
-        <label>_Turbo mode</label>
-        <checkable>1</checkable>
-      </object>
-      <object class="wxMenuItem" name="VSync">
-        <label>_VSync</label>
-        <checkable>1</checkable>
-      </object>
-      <object class="wxMenuItem" name="SyncGameAudio">
-        <label>_Audio sync</label>
-        <checkable>1</checkable>
-      </object>
-      <object class="wxMenuItem" name="FrameSkipAuto">
-        <label>_Auto skip frames</label>
-        <checkable>1</checkable>
-      </object>
-      <object class="separator"/>
-      <object class="wxMenuItem" name="ApplyPatches">
-        <label>_Auto IPS/UPS/IPF patch</label>
-        <checkable>1</checkable>
-      </object>
-      <object class="wxMenuItem" name="PauseWhenInactive">
-        <label>_Pause when inactive</label>
-        <checkable>1</checkable>
-      </object>
-      <object class="separator"/>
-      <object class="wxMenu">
         <object class="wxMenuItem" name="LoadGameRecent">
           <label>Most _recent</label>
           <accel>Ctrl+L</accel>
@@ -251,6 +144,113 @@
           <label>To _File ...</label>
         </object>
         <label>_Save state</label>
+      </object>
+      <object class="separator"/>
+      <object class="wxMenu">
+        <object class="wxMenuItem" name="ImportBatteryFile">
+          <label>_Battery file...</label>
+        </object>
+        <object class="wxMenuItem" name="ImportGamesharkCodeFile">
+          <label>Gameshark _code file...</label>
+        </object>
+        <object class="wxMenuItem" name="ImportGamesharkActionReplaySnapshot">
+          <label>_Gameshark snapshot...</label>
+        </object>
+        <label>_Import</label>
+      </object>
+      <object class="wxMenu">
+        <object class="wxMenuItem" name="ExportBatteryFile">
+          <label>_Battery file...</label>
+        </object>
+        <object class="wxMenuItem" name="ExportGamesharkSnapshot">
+          <label>_Gameshark snapshot...</label>
+        </object>
+        <label>_Export</label>
+      </object>
+      <object class="separator"/>
+      <object class="wxMenuItem" name="ScreenCapture">
+        <label>Screen capt_ure...</label>
+      </object>
+      <object class="wxMenu">
+        <object class="wxMenuItem" name="RecordSoundStartRecording">
+          <label>Start _sound recording...</label>
+        </object>
+        <object class="wxMenuItem" name="RecordSoundStopRecording">
+          <label>Stop s_ound recording</label>
+        </object>
+        <object class="wxMenuItem" name="RecordAVIStartRecording">
+          <label>Start _video recording...</label>
+        </object>
+        <object class="wxMenuItem" name="RecordAVIStopRecording">
+          <label>Stop v_ideo recording</label>
+        </object>
+        <object class="wxMenuItem" name="RecordMovieStartRecording">
+          <label>Start _game recording...</label>
+        </object>
+        <object class="wxMenuItem" name="RecordMovieStopRecording">
+          <label>Stop g_ame recording</label>
+        </object>
+        <label>_Record</label>
+      </object>
+      <object class="wxMenu">
+        <object class="wxMenuItem" name="PlayMovieStartPlaying">
+          <label>Start playing _movie...</label>
+        </object>
+        <object class="wxMenuItem" name="PlayMovieStopPlaying">
+          <label>Stop playing m_ovie</label>
+        </object>
+        <label>_Play</label>
+      </object>
+      <object class="separator"/>
+      <object class="wxMenuItem" name="wxID_CLOSE"/>
+      <object class="wxMenuItem" name="wxID_EXIT"/>
+    </object>
+    <object class="wxMenu">
+      <label>_Emulation</label>
+      <object class="wxMenuItem" name="Pause">
+        <label>_Pause</label>
+        <accel>Ctrl+P</accel>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="NextFrame">
+        <label>_Next frame</label>
+        <accel>Ctrl+N</accel>
+      </object>
+      <object class="wxMenuItem" name="Rewind">
+        <label>Re_wind</label>
+        <accel>Ctrl+B</accel>
+      </object>
+      <object class="separator"/>
+      <object class="wxMenuItem" name="ToggleFullscreen">
+        <label>_Fullscreen</label>
+        <bitmap platform="unix" stock_id="gtk-fullscreen"/>
+        <accel>F11</accel>
+      </object>
+      <object class="separator"/>
+      <object class="wxMenuItem" name="EmulatorSpeedupToggle">
+        <label>_Turbo mode</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="VSync">
+        <label>_VSync</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="SyncGameAudio">
+        <label>_Audio sync</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="FrameSkipAuto">
+        <label>_Auto skip frames</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="separator"/>
+      <object class="wxMenuItem" name="ApplyPatches">
+        <label>_Auto IPS/UPS/IPF patch</label>
+        <checkable>1</checkable>
+      </object>
+      <object class="wxMenuItem" name="PauseWhenInactive">
+        <label>_Pause when inactive</label>
+        <checkable>1</checkable>
       </object>
       <object class="separator"/>
       <object class="wxMenuItem" name="Reset">
