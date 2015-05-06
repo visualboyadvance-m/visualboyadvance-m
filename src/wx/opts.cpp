@@ -202,7 +202,7 @@ opt_desc opts[] = {
 #endif
 	INTOPT ("preferences/disableStatus", "NoStatusMsg", wxTRANSLATE("Disable on-screen status messages"), disableStatusMessages, 0, 1),
 	INTOPT ("preferences/emulatorType", "", wxTRANSLATE("Type of system to emulate"), gbEmulatorType, 0, 5),
-	INTOPT ("preferences/flashSize", "", wxTRANSLATE("Flash size (kb) (vba-over.ini override is flashSize in bytes)"), optFlashSize, 65536, 131072),
+	INTOPT ("preferences/flashSize", "", wxTRANSLATE("Flash size 0 = 64KB 1 = 128KB"), optFlashSize, 0, 1),
 	INTOPT ("preferences/frameSkip", "FrameSkipAuto", wxTRANSLATE("Skip frames.  Values are 0-9 or -1 to skip automatically based on time."), frameSkip, -1, 9),
 	INTOPT ("preferences/fsColorDepth", "", wxTRANSLATE("Fullscreen mode color depth (0 = any)"), fsColorDepth, 0, 999),
 	INTOPT ("preferences/fsFrequency", "", wxTRANSLATE("Fullscreen mode frequency (0 = any)"), fsFrequency, 0, 999),
