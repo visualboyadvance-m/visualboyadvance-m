@@ -641,10 +641,7 @@ char* FindConfigFile(char *name)
 #define EXE_NAME "vbam"
 #endif // ! _WIN32
 
-	log("Searching for file %s\n", name);
-
 	if (GETCWD(buffer, 2048)) {
-		log("Searching current directory: %s\n", buffer);
 	}
 
 	if (FileExists(name))
@@ -653,7 +650,6 @@ char* FindConfigFile(char *name)
 	}
 
 	if (homeDir) {
-		log("Searching home directory: %s%c%s\n", homeDir, FILE_SEP, DOT_DIR);
 		sprintf(path, "%s%c%s%c%s", homeDir, FILE_SEP, DOT_DIR, FILE_SEP, name);
 		if (FileExists(path))
 		{
@@ -664,7 +660,6 @@ char* FindConfigFile(char *name)
 #ifdef _WIN32
 	char *home = getenv("USERPROFILE");
 	if (home != NULL) {
-		log("Searching user profile directory: %s\n", home);
 		sprintf(path, "%s%c%s", home, FILE_SEP, name);
 		if (FileExists(path))
 		{
@@ -677,7 +672,6 @@ char* FindConfigFile(char *name)
 		char *path = getenv("PATH");
 
 		if (path != NULL) {
-			log("Searching PATH\n");
 			strncpy(buffer, path, 4096);
 			buffer[4095] = 0;
 			char *tok = strtok(buffer, PATH_SEP);
@@ -697,7 +691,6 @@ char* FindConfigFile(char *name)
 	}
 	else {
 		// executable is relative to some directory
-		log("Searching executable directory\n");
 		strcpy(buffer, arg0);
 		char *p = strrchr(buffer, FILE_SEP);
 		if (p) {
@@ -710,14 +703,12 @@ char* FindConfigFile(char *name)
 		}
 	}
 #else // ! _WIN32
-	log("Searching data directory: %s\n", PKGDATADIR);
 	sprintf(path, "%s%c%s", PKGDATADIR, FILE_SEP, name);
 	if (FileExists(path))
 	{
 		return path;
 	}
 
-	log("Searching system config directory: %s\n", SYSCONFDIR);
 	sprintf(path, "%s%c%s", SYSCONFDIR, FILE_SEP, name);
 	if (FileExists(path))
 	{
