@@ -709,12 +709,12 @@ void utilGBAFindSave(const int size)
 
     if(d == 0x52504545) {
       if(memcmp(p, "EEPROM_", 7) == 0) {
-        if(detectedSaveType == 0)
+        if(detectedSaveType == 0 || detectedSaveType == 4)
           detectedSaveType = 1;
       }
     } else if (d == 0x4D415253) {
       if(memcmp(p, "SRAM_", 5) == 0) {
-        if(detectedSaveType == 0)
+        if(detectedSaveType == 0 || detectedSaveType == 4)
           detectedSaveType = 2;
       }
     } else if (d == 0x53414C46) {
@@ -725,7 +725,7 @@ void utilGBAFindSave(const int size)
         }
       } else if(memcmp(p, "FLASH", 5) == 0) {
         if(detectedSaveType == 0) {
-          detectedSaveType = 3;
+          detectedSaveType = 4;
           flashSize = 0x10000;
         }
       }
@@ -738,6 +738,9 @@ void utilGBAFindSave(const int size)
   // if no matches found, then set it to NONE
   if(detectedSaveType == 0) {
     detectedSaveType = 5;
+  }
+  if(detectedSaveType == 4) {
+    detectedSaveType = 3;
   }
   rtcEnable(rtcFound);
   saveType = detectedSaveType;
