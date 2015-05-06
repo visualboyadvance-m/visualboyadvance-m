@@ -2195,7 +2195,7 @@ bool MainFrame::BindControls()
 	SetIcon(icon);
 
 	// NOOP if no status area
-	SetStatusText(_("Welcome to wxVBAM!"));
+	SetStatusText(_(""));
 
 	// Prepare system accel table
 	for (int i = 0; i < num_def_accels; i++)
