@@ -67,14 +67,14 @@ FIND_PACKAGE ( OpenGL REQUIRED )
 FIND_PACKAGE ( SDL REQUIRED )
 
 if( ENABLE_LINK )
-    FIND_PACKAGE ( SFML REQUIRED )
+    FIND_PACKAGE ( SFML 2 COMPONENTS network system )
 endif( ENABLE_LINK )
 # set the standard libraries all ports use
 SET(VBAMCORE_LIBS
     vbamcore
     fex
     ${SDL_LIBRARY}
-    ${SFML_LIBRARY}
+    ${SFML_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${ZLIB_LIBRARY}
     ${PNG_LIBRARY}
