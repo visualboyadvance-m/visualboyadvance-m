@@ -244,6 +244,10 @@
         <checkable>1</checkable>
       </object>
       <object class="separator"/>
+      <object class="wxMenuItem" name="SkipIntro">
+        <label>_Skip BIOS</label>
+        <checkable>1</checkable>
+      </object>
       <object class="wxMenuItem" name="ApplyPatches">
         <label>_Auto IPS/UPS/IPF patch</label>
         <checkable>1</checkable>
@@ -406,10 +410,6 @@
           <label>_Use BIOS file</label>
           <checkable>1</checkable>
         </object>
-        <object class="wxMenuItem" name="SkipIntro">
-          <label>_Skip BIOS</label>
-          <checkable>1</checkable>
-        </object>
       </object>
       <object class="wxMenu">
         <label>_Game Boy</label>
@@ -428,7 +428,11 @@
           <label>_Save printouts as screen captures</label>
           <checkable>1</checkable>
         </object>
-        <object class="wxMenuItem" name="CBootRomEn">
+        <object class="wxMenuItem" name="BootRomGB">
+          <label>_Use GB BIOS file</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="BootRomGBC">
           <label>_Use GBC BIOS file</label>
           <checkable>1</checkable>
         </object>
