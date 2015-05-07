@@ -40,7 +40,7 @@
 #include <time.h>
 
 #include "../AutoBuild.h"
-#include "../svnrev.h"
+#include "../version.h"
 
 #include <SDL.h>
 
