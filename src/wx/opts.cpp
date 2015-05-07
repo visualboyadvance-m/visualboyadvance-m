@@ -106,21 +106,22 @@ const char * const joynames[NUM_KEYS] = {
     ("A"),        ("B"),          ("L"),          ("R"),
     ("Select"),   ("Start"),
     ("MotionUp"), ("MotionDown"), ("MotionLeft"), ("MotionRight"),
-    ("AutoA"),    ("AutoB"),
+	("MotionIn"), ("MotionOut"),  ("AutoA"), ("AutoB"),
     ("Speed"),    ("Capture"),    ("GS")
 };
 
 wxJoyKeyBinding defkeys[NUM_KEYS * 2] = {
-    { WXK_UP },          { 1, WXJB_AXIS_MINUS, 1 }, { WXK_DOWN },         { 1, WXJB_AXIS_PLUS, 1 },
-    { WXK_LEFT },        { 0, WXJB_AXIS_MINUS, 1 }, { WXK_RIGHT },        { 0, WXJB_AXIS_PLUS, 1 },
-    { wxT('X') },        { 0, WXJB_BUTTON, 1 },     { wxT('Z') },         { 1, WXJB_BUTTON, 1 },
-    { wxT('A') },        { 2, WXJB_BUTTON, 1 },     { wxT('S') },         { 3, WXJB_BUTTON, 1 },
-    { WXK_BACK },        { 4, WXJB_BUTTON, 1 },     { WXK_RETURN },       { 5, WXJB_BUTTON, 1 },
-    { WXK_NUMPAD_UP },   { 2, WXJB_AXIS_PLUS, 1 },  { WXK_NUMPAD_DOWN },  { 2, WXJB_AXIS_MINUS, 1 },
-    { WXK_NUMPAD_LEFT }, { 3, WXJB_AXIS_MINUS, 1 }, { WXK_NUMPAD_RIGHT }, { 3, WXJB_AXIS_PLUS, 1 },
-    { wxT('W') },        { 0 },                     { wxT('Q') },         { 0 },
-    { WXK_SPACE },       { 0 },                     { WXK_F11 },          { 0 },
-    { 0 }      ,         { 0 }
+    { WXK_UP },            { 1, WXJB_AXIS_MINUS, 1 }, { WXK_DOWN },            { 1, WXJB_AXIS_PLUS, 1 },
+    { WXK_LEFT },          { 0, WXJB_AXIS_MINUS, 1 }, { WXK_RIGHT },           { 0, WXJB_AXIS_PLUS, 1 },
+    { wxT('X') },          { 0, WXJB_BUTTON, 1 },     { wxT('Z') },            { 1, WXJB_BUTTON, 1 },
+    { wxT('A') },          { 2, WXJB_BUTTON, 1 },     { wxT('S') },            { 3, WXJB_BUTTON, 1 },
+    { WXK_BACK },          { 4, WXJB_BUTTON, 1 },     { WXK_RETURN },          { 5, WXJB_BUTTON, 1 },
+    { WXK_NUMPAD_UP },     { 2, WXJB_AXIS_PLUS, 1 },  { WXK_NUMPAD_DOWN },     { 2, WXJB_AXIS_MINUS, 1 },
+    { WXK_NUMPAD_LEFT },   { 3, WXJB_AXIS_MINUS, 1 }, { WXK_NUMPAD_RIGHT },    { 3, WXJB_AXIS_PLUS, 1 },
+	{ WXK_NUMPAD_PAGEUP }, { 4, WXJB_AXIS_PLUS, 1 },  { WXK_NUMPAD_PAGEDOWN }, { 4, WXJB_AXIS_MINUS, 1 },
+	{ wxT('W') },          { 0 },                     { wxT('Q') },            { 0 },
+    { WXK_SPACE },         { 0 },                     { WXK_F11 },             { 0 },
+    { 0 }      ,           { 0 }
 };
 
 wxAcceleratorEntry_v sys_accels;
