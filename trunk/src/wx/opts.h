@@ -1,7 +1,7 @@
 #ifndef WX_OPTS_H
 #define WX_OPTS_H
 
-#define NUM_KEYS 19
+#define NUM_KEYS 21
 extern const char * const joynames[NUM_KEYS];
 extern wxJoyKeyBinding defkeys[NUM_KEYS * 2]; // keyboard + joystick defaults
 

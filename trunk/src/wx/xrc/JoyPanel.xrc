@@ -227,7 +227,7 @@
                 </object>
                 <object class="sizeritem">
                   <object class="wxStaticText">
-                    <label>Motion Left</label>
+                    <label>Motion Left/Dark</label>
                   </object>
                   <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
                   <border>5</border>
@@ -237,26 +237,6 @@
                     <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
                   </object>
                   <flag>wxALL|wxEXPAND</flag>
-                  <border>5</border>
-                </object>
-                <object class="spacer">
-                  <flag>wxEXPAND</flag>
-                </object>
-                <object class="spacer">
-                  <flag>wxEXPAND</flag>
-                </object>
-                <object class="sizeritem">
-                  <object class="wxStaticText">
-                    <label>Motion Right</label>
-                  </object>
-                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
-                  <border>5</border>
-                </object>
-                <object class="sizeritem">
-                  <object class="wxTextCtrl" name="MotionRight" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
-                  </object>
-                  <flag>wxALL|wxGROW</flag>
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
@@ -275,6 +255,20 @@
                 </object>
                 <object class="sizeritem">
                   <object class="wxStaticText">
+                    <label>Motion Right/Light</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="MotionRight" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <flag>wxALL|wxGROW</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
                     <label>Speed Up</label>
                   </object>
                   <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
@@ -285,6 +279,40 @@
                     <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
                   </object>
                   <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Spin Left</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="MotionIn" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                </object>
+                <object class="spacer">
+                  <flag>wxEXPAND</flag>
+                </object>
+                <object class="spacer">
+                  <flag>wxEXPAND</flag>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText">
+                    <label>Spin Right</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="MotionOut" subclass="wxJoyKeyTextCtrl">
+                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  </object>
+                  <flag>wxALL|wxGROW</flag>
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
