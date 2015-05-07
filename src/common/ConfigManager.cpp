@@ -12,7 +12,7 @@ extern "C" {
 #include <cmath>
 
 #include "../AutoBuild.h"
-#include "../svnrev.h"
+#include "../version.h"
 
 #include "../common/Patch.h"
 #include "../common/ConfigManager.h"
