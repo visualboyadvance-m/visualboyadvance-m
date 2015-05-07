@@ -406,20 +406,18 @@ static inline u8 CPUReadByte(u32 address)
     goto unreadable;
   case 14:
   case 15:
-    if(cpuSramEnabled | cpuFlashEnabled)
-      return flashRead(address);
-    if(cpuEEPROMSensorEnabled) {
-      switch(address & 0x00008f00) {
-  case 0x8200:
-    return systemGetSensorX() & 255;
-  case 0x8300:
-    return (systemGetSensorX() >> 8)|0x80;
-  case 0x8400:
-    return systemGetSensorY() & 255;
-  case 0x8500:
-    return systemGetSensorY() >> 8;
-      }
+    switch(address & 0x00008f00) {
+	  case 0x8200:
+		return systemGetSensorX() & 255;
+	  case 0x8300:
+		return (systemGetSensorX() >> 8)|0x80;
+	  case 0x8400:
+		return systemGetSensorY() & 255;
+	  case 0x8500:
+		return systemGetSensorY() >> 8;
     }
+	if (cpuSramEnabled | cpuFlashEnabled)
+		return flashRead(address);
     // default
   default:
 unreadable:

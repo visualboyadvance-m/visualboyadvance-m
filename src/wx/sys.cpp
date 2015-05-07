@@ -30,7 +30,7 @@ int RGB_LOW_BITS_MASK;
 
 // these are local, though.
 int joypress[4], autofire;
-static int sensorx[4], sensory[4];
+static int sensorx[4], sensory[4], sensorz[4];
 bool pause_next;
 bool turbo;
 
@@ -531,6 +531,36 @@ void systemUpdateMotionSensor()
 		    if(sensory[i] > 2047)
 			sensory[i] = 2047;
 		}
+
+		const int lowZ = -1800;
+		const int centerZ = 0;
+		const int highZ = 1800;
+		const int accelZ = 3;
+		if (joypress[i] & KEYM_MOTION_IN) {
+			sensorz[i] += accelZ;
+			if (sensorz[i] > highZ)
+				sensorz[i] = highZ;
+			if (sensorz[i] < centerZ)
+				sensorz[i] = centerZ + (accelZ * 300);
+		}
+		else if (joypress[i] & KEYM_MOTION_OUT) {
+			sensorz[i] -= accelZ;
+			if (sensorz[i] < lowZ)
+				sensorz[i] = lowZ;
+			if (sensorz[i] > centerZ)
+				sensorz[i] = centerZ - (accelZ * 300);
+		}
+		else if (sensorz[i] > centerZ) {
+			sensorz[i] -= (accelZ * 100);
+			if (sensorz[i] < centerZ)
+				sensorz[i] = centerZ;
+		}
+		else {
+			sensorz[i] += (accelZ * 100);
+			if (sensorz[i] > centerZ)
+				sensorz[i] = centerZ;
+		}
+
 	}
 	systemUpdateSolarSensor();
 }
@@ -547,7 +577,7 @@ int  systemGetSensorY()
 
 int  systemGetSensorZ()
 {
-    return sensory[gopts.default_stick - 1];
+    return sensorz[gopts.default_stick - 1] / 10;
 }
 
 class PrintDialog : public wxEvtHandler, public wxPrintout

@@ -34,6 +34,7 @@ typedef struct {
 
 static RTCCLOCKDATA rtcClockData;
 static bool rtcEnabled = true;
+static bool rtcRumbleEnabled = false;
 
 void rtcEnable(bool e)
 {
@@ -45,9 +46,13 @@ bool rtcIsEnabled()
   return rtcEnabled;
 }
 
+void rtcEnableRumble(bool e)
+{
+	rtcRumbleEnabled = e;
+}
+
 u16 rtcRead(u32 address)
 {
-  if(rtcEnabled) {
     switch(address){
     case 0x80000c8:
       return rtcClockData.byte2;
@@ -71,16 +76,16 @@ u16 rtcRead(u32 address)
 		else if (rtcClockData.byte1 == 0x0b) {
 			//sprintf(DebugStr, "Reading Twisted Sensor bit %d", rtcClockData.reserved[11]);
 			u16 v = systemGetSensorZ();
+			v = 0x6C0 + v;
 			return ((v >> rtcClockData.reserved[11]) & 1) << 2;
 		}
 		// Real Time Clock
-		else {
+		else if (rtcEnabled) {
 			//sprintf(DebugStr, "Reading RTC %02x, %02x, %02x", rtcClockData.byte0, rtcClockData.byte1, rtcClockData.byte2);
 			return rtcClockData.byte0;
 		}
       break;
     }
-  }
 
   return READ16LE((&rom[address & 0x1FFFFFE]));
 }
@@ -95,20 +100,17 @@ static u8 toBCD(u8 value)
 
 bool rtcWrite(u32 address, u16 value)
 {
-  if(!rtcEnabled)
-    return false;
-
   if(address == 0x80000c8) {
     rtcClockData.byte2 = (u8)value; // bit 0 = enable reading from 0x80000c4 c6 and c8
   }
   else if (address == 0x80000c6) {
 	  rtcClockData.byte1 = (u8)value; // 0=read/1=write (for each of 4 low bits)
 	  // rumble is off when not writing to that pin
-	  if (/*rtcWarioRumbleEnabled &&*/ !(value & 8)) systemCartridgeRumble(false);
+	  if (rtcRumbleEnabled && !(value & 8)) systemCartridgeRumble(false);
   }
   else if (address == 0x80000c4) { // 4 bits of I/O Port Data (upper bits not used)
 	  // WarioWare Twisted rumble
-	  if (/*rtcWarioRumbleEnabled &&*/ (rtcClockData.byte1 & 8)) {
+	  if (rtcRumbleEnabled && (rtcClockData.byte1 & 8)) {
 		  systemCartridgeRumble(value & 8);
 	  }
 	  // Boktai solar sensor

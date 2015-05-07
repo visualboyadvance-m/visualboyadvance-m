@@ -616,6 +616,8 @@ extern int joypress[4], autofire;
 #define KEYM_MOTION_DOWN  (1<<16)
 #define KEYM_MOTION_LEFT  (1<<17)
 #define KEYM_MOTION_RIGHT (1<<18)
+#define KEYM_MOTION_IN    (1<<19)
+#define KEYM_MOTION_OUT   (1<<20)
 
 #include "filters.h"
 
