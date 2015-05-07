@@ -1,3 +1,4 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
@@ -29,6 +30,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL", "..\..\..\dependencies\sdl\vs2013\SDL\SDL.vcxproj", "{81CE8DAF-EBB2-4761-8E45-B71ABCCA8C68}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDLmain", "..\..\..\dependencies\sdl\vs2013\SDLmain\SDLmain.vcxproj", "{DA956FD3-E142-46F2-9DD5-C78BEBB56B7A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL2", "..\..\..\dependencies\sdl2\VisualC\SDL\SDL_VS2013.vcxproj", "{680B6B6E-D55A-4B7B-AEC8-3838854F1802}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL2main", "..\..\..\dependencies\sdl2\VisualC\SDLmain\SDLmain_VS2013.vcxproj", "{6A964F2F-2D24-431E-B4BF-38A9D40E5DE5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,6 +77,14 @@ Global
 		{DA956FD3-E142-46F2-9DD5-C78BEBB56B7A}.Debug|Win32.Build.0 = Debug|Win32
 		{DA956FD3-E142-46F2-9DD5-C78BEBB56B7A}.Release|Win32.ActiveCfg = Release|Win32
 		{DA956FD3-E142-46F2-9DD5-C78BEBB56B7A}.Release|Win32.Build.0 = Release|Win32
+		{680B6B6E-D55A-4B7B-AEC8-3838854F1802}.Debug|Win32.ActiveCfg = Debug|Win32
+		{680B6B6E-D55A-4B7B-AEC8-3838854F1802}.Debug|Win32.Build.0 = Debug|Win32
+		{680B6B6E-D55A-4B7B-AEC8-3838854F1802}.Release|Win32.ActiveCfg = Release|Win32
+		{680B6B6E-D55A-4B7B-AEC8-3838854F1802}.Release|Win32.Build.0 = Release|Win32
+		{6A964F2F-2D24-431E-B4BF-38A9D40E5DE5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6A964F2F-2D24-431E-B4BF-38A9D40E5DE5}.Debug|Win32.Build.0 = Debug|Win32
+		{6A964F2F-2D24-431E-B4BF-38A9D40E5DE5}.Release|Win32.ActiveCfg = Release|Win32
+		{6A964F2F-2D24-431E-B4BF-38A9D40E5DE5}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,5 +96,7 @@ Global
 		{7AEC599C-7C82-4F00-AA60-411E0A359CB0} = {8B814174-883E-43D0-969E-3A17D8EDE080}
 		{81CE8DAF-EBB2-4761-8E45-B71ABCCA8C68} = {8B814174-883E-43D0-969E-3A17D8EDE080}
 		{DA956FD3-E142-46F2-9DD5-C78BEBB56B7A} = {8B814174-883E-43D0-969E-3A17D8EDE080}
+		{680B6B6E-D55A-4B7B-AEC8-3838854F1802} = {8B814174-883E-43D0-969E-3A17D8EDE080}
+		{6A964F2F-2D24-431E-B4BF-38A9D40E5DE5} = {8B814174-883E-43D0-969E-3A17D8EDE080}
 	EndGlobalSection
 EndGlobal
