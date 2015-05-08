@@ -190,7 +190,7 @@ opt_desc opts[] = {
     {   wxT("Keyboard/*"), "", wxTRANSLATE("The parameter Keyboard/<cmd> contains a comma-separated list of key names (e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is executed.") },
     
 	// Core
-	INTOPT ("preferences/agbPrint", "AGBPrinter", wxTRANSLATE("Enable AGB printer"), agbPrint, 0, 1),
+	INTOPT ("preferences/agbPrint", "AGBPrinter", wxTRANSLATE("Enable AGB debug print"), agbPrint, 0, 1),
 	INTOPT ("preferences/autoPatch", "ApplyPatches", wxTRANSLATE("Apply IPS/UPS/IPF patches if found"), autoPatch, 0, 1),
 	INTOPT ("preferences/autoSaveCheatList", "", wxTRANSLATE("Automatically save and load cheat list"), autoSaveLoadCheatList, 0, 1),
 	INTOPT ("preferences/borderAutomatic", "", wxTRANSLATE("Automatically enable border for Super GameBoy games"), gbBorderAutomatic, 0, 1),
