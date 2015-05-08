@@ -398,16 +398,16 @@
         <object class="wxMenuItem" name="GameBoyAdvanceConfigure">
           <label>Configure ...</label>
         </object>
-        <object class="wxMenuItem" name="AGBPrinter">
-          <label>_AGB printer</label>
-          <checkable>1</checkable>
-        </object>
         <object class="wxMenuItem" name="RTC">
           <label>_Real-time clock</label>
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="BootRomEn">
           <label>_Use BIOS file</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="AGBPrinter">
+          <label>_Debug print</label>
           <checkable>1</checkable>
         </object>
       </object>
