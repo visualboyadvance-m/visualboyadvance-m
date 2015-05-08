@@ -2228,12 +2228,6 @@ EVT_HANDLER(Printer, "Enable printer emulation")
 	update_opts();
 }
 
-EVT_HANDLER(Color, "Emulate washed colors of LCD")
-{
-	GetMenuOptionBool("Color", gopts.gbcColorOption);
-	update_opts();
-}
-
 EVT_HANDLER(PrintGather, "Automatically gather a full page before printing")
 {
 	GetMenuOptionBool("PrintGather", gopts.print_auto_page);

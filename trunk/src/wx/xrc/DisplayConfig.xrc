@@ -90,42 +90,6 @@
             </object>
             <flag>wxEXPAND</flag>
           </object>
-          <object class="sizeritem">
-            <object class="wxStaticText">
-              <label>Full screen</label>
-              <font>
-                <weight>bold</weight>
-              </font>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxBoxSizer">
-              <object class="sizeritem">
-                <object class="wxBoxSizer">
-                  <object class="sizeritem">
-                    <object class="wxStaticText">
-                      <label>Video Mode :</label>
-                    </object>
-                    <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
-                    <border>5</border>
-                  </object>
-                  <object class="sizeritem">
-                    <object class="wxChoice" name="FullscreenMode"/>
-                    <option>1</option>
-                    <flag>wxALL|wxEXPAND</flag>
-                    <border>5</border>
-                  </object>
-                  <orient>wxHORIZONTAL</orient>
-                </object>
-                <flag>wxEXPAND</flag>
-              </object>
-              <orient>wxVERTICAL</orient>
-            </object>
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-          </object>
         </object>
       </object>
       <label>Zoom</label>
