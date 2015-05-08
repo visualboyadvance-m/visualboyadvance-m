@@ -148,7 +148,6 @@ opt_desc opts[] = {
     
     /// GB
     STROPT ("GB/BiosFile", "", wxTRANSLATE("BIOS file to use for GB, if enabled"), gopts.gb_bios),
-    BOOLOPT("GB/EnablePrinter", "Printer", wxTRANSLATE("Enable printer emulation"), gopts.gbprint),
     STROPT ("GB/GBCBiosFile", "", wxTRANSLATE("BIOS file to use for GBC, if enabled"), gopts.gbc_bios),
     BOOLOPT("GB/LCDColor", "Color", wxTRANSLATE("Emulate washed colors of LCD"), gopts.gbcColorOption),
     {   wxT("GB/Palette0"), "", wxTRANSLATE("The default palette, as 8 comma-separated 4-digit hex integers (rgb555).") },
@@ -212,6 +211,7 @@ opt_desc opts[] = {
 	INTOPT ("preferences/fullScreen", "Fullscreen", wxTRANSLATE("Enter fullscreen mode at startup"), fullScreen, 0, 1),
 	INTOPT ("preferences/gbFrameSkip", "", wxTRANSLATE("Skip frames.  Values are 0-9 or -1 to skip automatically based on time."), gbFrameSkip, -1, 9),
 	INTOPT ("preferences/gbPaletteOption", "", wxTRANSLATE("The palette to use"), gbPaletteOption, 0, 2),
+	INTOPT ("preferences/gbPrinter", "Printer", wxTRANSLATE("Enable printer emulation"), winGbPrinterEnabled, 0, 1),
 	INTOPT ("preferences/gdbBreakOnLoad", "DebugGDBBreakOnLoad", wxTRANSLATE("Break into GDB after loading the game."), gdbBreakOnLoad, 0, 1),
 	INTOPT ("preferences/gdbPort", "DebugGDBPort", wxTRANSLATE("Port to connect GDB to."), gdbPort, 0, 65535),
 #ifndef NO_LINK
@@ -288,7 +288,7 @@ opts_t::opts_t()
     }
     recent = new wxFileHistory(10);
     autofire_rate = 1;
-    gbprint = print_auto_page = true;
+    print_auto_page = true;
 	autoPatch = true;
 }
 

@@ -278,7 +278,7 @@ void GameArea::LoadGame(const wxString &name)
 	gbSerialFunction = NULL;
 #endif
     // probably only need to do this for GB carts
-    if(gopts.gbprint)
+    if(winGbPrinterEnabled)
 		gbSerialFunction = gbPrinterSend;
 
     // probably only need to do this for GBA carts
