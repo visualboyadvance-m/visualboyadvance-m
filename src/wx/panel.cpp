@@ -9,7 +9,7 @@
 #include "../gba/agbprint.h"
 #include "../sdl/text.h"
 #include "filters.h"
-#include "../../svnrev.h"
+#include "../../version.h"
 
 int emulating;
 
