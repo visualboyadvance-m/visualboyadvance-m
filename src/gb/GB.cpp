@@ -1007,7 +1007,7 @@ void  gbWriteMemory(register u16 address, register u8 value)
 		}
 		EmuReseted = false;
 		gbMemory[0xff02] = value;
-		if (gbSerialOn && GetLinkMode() == LINK_GAMEBOY) {
+		if (gbSerialOn && (GetLinkMode() == LINK_GAMEBOY || winGbPrinterEnabled)) {
 			gbSerialTicks = GBSERIAL_CLOCK_TICKS;
 
 			LinkIsWaiting = true;

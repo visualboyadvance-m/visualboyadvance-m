@@ -23,7 +23,6 @@ extern struct opts_t {
 
     /// GB
     wxString gb_bios;
-    bool gbprint; // gbSerialFunction
     wxString gbc_bios;
     bool gbcColorOption;
     // u16 systemGbPalette[8*3];

@@ -1841,7 +1841,6 @@ EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
     wxDialog *dlg = GetXRCDialog("GameBoyConfig");
     wxChoice *c = XRCCTRL(*dlg, "Borders", wxChoice);
     bool borderon = gbBorderOn;
-    bool printeron = gopts.gbprint;
     if(!gbBorderOn && !gbBorderAutomatic)
 	c->SetSelection(0);
     else if(gbBorderOn)
@@ -1876,15 +1875,6 @@ EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
 	    systemFrameSkip = gbFrameSkip;
 	// don't want to have to reset to change colors
 	memcpy(gbPalette, &systemGbPalette[gbPaletteOption * 8], 8 * sizeof(systemGbPalette[0]));
-    }
-#if (defined __WIN32__ || defined _WIN32)
-	gbSerialFunction = gbStartLink;
-#else
-	gbSerialFunction = NULL;
-#endif
-    if(printeron != gopts.gbprint) {
-		if(gopts.gbprint)
-			gbSerialFunction = gbPrinterSend;
     }
 	update_opts();
 }
@@ -2226,7 +2216,15 @@ EVT_HANDLER(RetainAspect, "Retain aspect ratio when resizing")
 
 EVT_HANDLER(Printer, "Enable printer emulation")
 {
-	GetMenuOptionBool("Printer", gopts.gbprint);
+	GetMenuOptionInt("Printer", winGbPrinterEnabled, 1);
+#if (defined __WIN32__ || defined _WIN32)
+	gbSerialFunction = gbStartLink;
+#else
+	gbSerialFunction = NULL;
+#endif
+	if (winGbPrinterEnabled)
+		gbSerialFunction = gbPrinterSend;
+
 	update_opts();
 }
 
