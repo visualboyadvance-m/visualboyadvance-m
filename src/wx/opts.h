@@ -24,7 +24,6 @@ extern struct opts_t {
     /// GB
     wxString gb_bios;
     wxString gbc_bios;
-    bool gbcColorOption;
     // u16 systemGbPalette[8*3];
     bool print_auto_page, print_screen_cap;
     wxString gb_rom_dir;

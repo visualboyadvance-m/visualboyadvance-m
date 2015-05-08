@@ -149,7 +149,6 @@ opt_desc opts[] = {
     /// GB
     STROPT ("GB/BiosFile", "", wxTRANSLATE("BIOS file to use for GB, if enabled"), gopts.gb_bios),
     STROPT ("GB/GBCBiosFile", "", wxTRANSLATE("BIOS file to use for GBC, if enabled"), gopts.gbc_bios),
-    BOOLOPT("GB/LCDColor", "Color", wxTRANSLATE("Emulate washed colors of LCD"), gopts.gbcColorOption),
     {   wxT("GB/Palette0"), "", wxTRANSLATE("The default palette, as 8 comma-separated 4-digit hex integers (rgb555).") },
     {   wxT("GB/Palette1"), "", wxTRANSLATE("The first user palette, as 8 comma-separated 4-digit hex integers (rgb555).") },
     {   wxT("GB/Palette2"), "", wxTRANSLATE("The second user palette, as 8 comma-separated 4-digit hex integers (rgb555).") },

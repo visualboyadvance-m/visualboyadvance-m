@@ -313,14 +313,16 @@
         <object class="wxMenuItem" name="DisplayConfigure">
           <label>_Configure ...</label>
         </object>
-        <object class="wxMenuItem" name="Color">
-          <label>_GB washed colors</label>
-          <checkable>1</checkable>
-        </object>        
+        <object class="separator"/>
         <object class="wxMenuItem" name="Fullscreen">
           <label>_Fullscreen mode</label>
           <checkable>1</checkable>
         </object>
+        <object class="wxMenuItem" name="RetainAspect">
+          <label>_Retain aspect ratio</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="Bilinear">
           <label>_Bilinear filter</label>
           <checkable>1</checkable>
@@ -329,16 +331,13 @@
           <label>_Multithread filter</label>
           <checkable>1</checkable>
         </object>
-        <object class="wxMenuItem" name="RetainAspect">
-          <label>_Retain aspect ratio</label>
-          <checkable>1</checkable>
-        </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="NoStatusMsg">
-          <label>_Disable on-screen status messages</label>
+          <label>_Disable on-screen display</label>
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="Transparent">
-          <label>_Transparent on-screen messages</label>
+          <label>_Transparent on-screen display</label>
           <checkable>1</checkable>
         </object>
       </object>
@@ -347,10 +346,12 @@
         <object class="wxMenuItem" name="SoundConfigure">
           <label>_Configure ...</label>
         </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="GBASoundInterpolation">
           <label>_GBA sound interpolation</label>
           <checkable>1</checkable>
         </object>
+        <object class="separator"/>        
         <object class="wxMenuItem" name="GBEnhanceSound">
           <label>_GB sound enhancement</label>
           <checkable>1</checkable>
@@ -369,6 +370,7 @@
         <object class="wxMenuItem" name="JoypadConfigure">
           <label>_Configure ...</label>
         </object>
+        <object class="separator"/>        
         <object class="wxMenu">
           <label>_Autofire</label>
           <object class="wxMenuItem" name="JoypadAutofireA">
@@ -398,6 +400,7 @@
         <object class="wxMenuItem" name="GameBoyAdvanceConfigure">
           <label>Configure ...</label>
         </object>
+        <object class="separator"/>        
         <object class="wxMenuItem" name="RTC">
           <label>_Real-time clock</label>
           <checkable>1</checkable>
@@ -416,6 +419,7 @@
         <object class="wxMenuItem" name="GameBoyConfigure">
           <label>Configure ...</label>
         </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="Printer">
           <label>_GB printer</label>
           <checkable>1</checkable>
@@ -428,6 +432,7 @@
           <label>_Save printouts as screen captures</label>
           <checkable>1</checkable>
         </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="BootRomGB">
           <label>_Use GB BIOS file</label>
           <checkable>1</checkable>
@@ -459,6 +464,7 @@
           <label>Find c_heat ...</label>
           <accel>Ctrl+F</accel>
         </object>
+        <object class="separator"/>        
         <object class="wxMenuItem" name="CheatsAutoSaveLoad">
           <label>A_utomatically save/load cheats</label>
           <checkable>1</checkable>
@@ -473,6 +479,7 @@
         <object class="wxMenuItem" name="DebugGDBBreak">
           <label>_Break into GDB</label>
         </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="DebugGDBPort">
           <label>_Configure port...</label>
         </object>
@@ -480,6 +487,7 @@
           <label>_Break on load</label>
           <checkable>1</checkable>
         </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="DebugGDBDisconnect">
           <label>_Disconnect</label>
         </object>

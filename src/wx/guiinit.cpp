@@ -2937,9 +2937,6 @@ bool MainFrame::BindControls()
 			// validator just for this, and spinctrl is good enough.
 			getsc("DefaultScale", gopts.video_scale);
 			getsc("MaxScale", maxScale);
-			// fs modes should be filled in at popup time
-			// since they may change based on what screen is current
-			SafeXRCCTRL<wxChoice>(d, "FullscreenMode");
 
 			/// Advanced
 			getrbi("OutputSimple", gopts.render_method, RND_SIMPLE);
