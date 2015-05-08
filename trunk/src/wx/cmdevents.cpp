@@ -2162,7 +2162,7 @@ EVT_HANDLER(wxID_ABOUT, "About...")
     ai.SetWebSite(wxT("http://www.vba-m.com/"));
     ai.SetIcon(GetIcon());
     ai.SetDescription(_("Nintendo GameBoy (+Color+Advance) emulator."));
-    ai.SetCopyright(_("Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2011 VBA-M development team"));
+    ai.SetCopyright(_("Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2015 VBA-M development team"));
     ai.SetLicense(_("This program is free software: you can redistribute it and/or modify\n"
 		    "it under the terms of the GNU General Public License as published by\n"
 		    "the Free Software Foundation, either version 2 of the License, or\n"

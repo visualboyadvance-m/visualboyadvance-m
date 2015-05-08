@@ -178,12 +178,12 @@ FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     ICON            IDI_MAINICON,IDC_STATIC,6,6,20,20
     CTEXT           "VisualBoyAdvance-M Emulator",IDC_STATIC,36,6,138,8
-    CTEXT           "Copyright © 2008 VBA-M development team",IDC_STATIC,6,48,168,8
+    CTEXT           "Copyright © 2015 VBA-M development team",IDC_STATIC,6,48,168,8
     CTEXT           "http://vba-m.com",IDC_URL,7,149,168,8
     RTEXT           "Version:",IDC_STATIC,36,18,54,8
     LTEXT           "",IDC_VERSION,96,18,78,8,SS_NOPREFIX
     GROUPBOX        "VBA-M dev team:",IDC_STATIC,7,65,90,84
-    CTEXT           "mudlord\nNach\nJonas Quinn\nDJRobX\nSpacy\nSquall Leonhart\nNormmatt\nTheCanadianBacon\nSkidau",IDC_STATIC,15,73,76,72
+    CTEXT           "mudlord\nNach\nJonas Quinn\nDJRobX\nSpacy\nSquall Leonhart\nNormmatt\nTheCanadianBacon\nskidau",IDC_STATIC,15,73,76,72
     RTEXT           "Date compiled:",IDC_STATIC,36,30,54,8
     LTEXT           "",IDC_DATE,96,30,78,8,SS_NOPREFIX
     GROUPBOX        "Thanks go to:",IDC_STATIC,100,65,72,84
@@ -1549,7 +1549,7 @@ BEGIN
             VALUE "FileDescription", "VisualBoyAdvance-M"
             VALUE "FileVersion", "1, 8, 0, 0"
             VALUE "InternalName", "VBA-M"
-            VALUE "LegalCopyright", "Copyright © 2008-2009 VBA-M development team"
+            VALUE "LegalCopyright", "Copyright © 2008-2015 VBA-M development team"
             VALUE "OriginalFilename", "VisualBoyAdvance-M.exe"
             VALUE "ProductName", "GB/C/A emulator for Windows"
             VALUE "ProductVersion", "1, 8, 0, 0"
