@@ -74,9 +74,9 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/icons/wxvbam.xpm DESTINATION ${CMAKE_CURRE
 # wxrc does not support xrs files in -c output (> 10x compression)
 # so do it manually using slow but portable bin2c.cmake script
 ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xrs
-                   COMMAND wxrc xrc/*.xrc -o wxvbam.xrs
+                   COMMAND wxrc ${CMAKE_CURRENT_SOURCE_DIR}/xrc/*.xrc -o wxvbam.xrs
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		   DEPENDS xrc/*.xrc)
+		   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/xrc/*.xrc)
 ADD_CUSTOM_COMMAND(OUTPUT builtin-xrc.h
                    COMMAND ${CMAKE_COMMAND} -DINFILE=wxvbam.xrs -DOUTFILE=builtin-xrc.h -DVARNAME=builtin_xrs -P ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.cmake
 		   DEPENDS wxvbam.xrs)
