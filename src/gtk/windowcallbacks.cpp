@@ -501,7 +501,7 @@ void Window::vOnHelpAbout()
     "along with this program.  If not, see <http://www.gnu.org/licenses/>.";
   const char csCopyright[] = "Copyright (C) 1999-2003 Forgotten\n"
                              "Copyright (C) 2004-2006 VBA development team\n"
-                             "Copyright (C) 2007-2011 VBA-M development team";
+                             "Copyright (C) 2007-2015 VBA-M development team";
 
   oAboutDialog.set_transient_for(*this);
 
