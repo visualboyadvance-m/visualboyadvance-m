@@ -285,9 +285,9 @@ void GameArea::LoadGame(const wxString &name)
     agbPrintEnable(agbPrint);
 
     // set frame skip based on ROM type
-    systemFrameSkip = loaded == IMAGE_GB ? gbFrameSkip : frameSkip;
+    systemFrameSkip = frameSkip;
     if(systemFrameSkip < 0)
-	systemFrameSkip = 0;
+		systemFrameSkip = 0;
 
     // load battery and/or saved state
     recompute_dirs();
