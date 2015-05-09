@@ -51,9 +51,9 @@ ENDIF( NOT VERSION )
 
 # Fill in SDLMAIN_LIBRARY on OS X manually to avoid using SDLMain.m
 # OS X users will have to compile and install SDL from source.
-if( APPLE )
+if( APPLE AND ENABLE_SDL )
     SET(SDLMAIN_LIBRARY "-lSDLmain")
-endif( APPLE )
+endif( APPLE AND ENABLE_SDL )
 
 # Check for nasm
 if( ENABLE_ASM_SCALERS )
