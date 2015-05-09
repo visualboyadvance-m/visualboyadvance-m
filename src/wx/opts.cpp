@@ -190,6 +190,7 @@ opt_desc opts[] = {
     
 	// Core
 	INTOPT ("preferences/agbPrint", "AGBPrinter", wxTRANSLATE("Enable AGB debug print"), agbPrint, 0, 1),
+	INTOPT ("preferences/autoFrameSkip", "FrameSkipAuto", wxTRANSLATE("Auto skip frames."), autoFrameSkip, 0, 1),
 	INTOPT ("preferences/autoPatch", "ApplyPatches", wxTRANSLATE("Apply IPS/UPS/IPF patches if found"), autoPatch, 0, 1),
 	INTOPT ("preferences/autoSaveCheatList", "", wxTRANSLATE("Automatically save and load cheat list"), autoSaveLoadCheatList, 0, 1),
 	INTOPT ("preferences/borderAutomatic", "", wxTRANSLATE("Automatically enable border for Super GameBoy games"), gbBorderAutomatic, 0, 1),
@@ -202,13 +203,12 @@ opt_desc opts[] = {
 	INTOPT ("preferences/disableStatus", "NoStatusMsg", wxTRANSLATE("Disable on-screen status messages"), disableStatusMessages, 0, 1),
 	INTOPT ("preferences/emulatorType", "", wxTRANSLATE("Type of system to emulate"), gbEmulatorType, 0, 5),
 	INTOPT ("preferences/flashSize", "", wxTRANSLATE("Flash size 0 = 64KB 1 = 128KB"), optFlashSize, 0, 1),
-	INTOPT ("preferences/frameSkip", "FrameSkipAuto", wxTRANSLATE("Skip frames.  Values are 0-9 or -1 to skip automatically based on time."), frameSkip, -1, 9),
+	INTOPT ("preferences/frameSkip", "FrameSkip", wxTRANSLATE("Skip frames.  Values are 0-9 or -1 to skip automatically based on time."), frameSkip, -1, 9),
 	INTOPT ("preferences/fsColorDepth", "", wxTRANSLATE("Fullscreen mode color depth (0 = any)"), fsColorDepth, 0, 999),
 	INTOPT ("preferences/fsFrequency", "", wxTRANSLATE("Fullscreen mode frequency (0 = any)"), fsFrequency, 0, 999),
 	INTOPT ("preferences/fsHeight", "", wxTRANSLATE("Fullscreen mode height (0 = desktop)"), fsHeight, 0, 99999),
 	INTOPT ("preferences/fsWidth", "", wxTRANSLATE("Fullscreen mode width (0 = desktop)"), fsWidth, 0, 99999),
 	INTOPT ("preferences/fullScreen", "Fullscreen", wxTRANSLATE("Enter fullscreen mode at startup"), fullScreen, 0, 1),
-	INTOPT ("preferences/gbFrameSkip", "", wxTRANSLATE("Skip frames.  Values are 0-9 or -1 to skip automatically based on time."), gbFrameSkip, -1, 9),
 	INTOPT ("preferences/gbPaletteOption", "", wxTRANSLATE("The palette to use"), gbPaletteOption, 0, 2),
 	INTOPT ("preferences/gbPrinter", "Printer", wxTRANSLATE("Enable printer emulation"), winGbPrinterEnabled, 0, 1),
 	INTOPT ("preferences/gdbBreakOnLoad", "DebugGDBBreakOnLoad", wxTRANSLATE("Break into GDB after loading the game."), gdbBreakOnLoad, 0, 1),
@@ -258,7 +258,6 @@ const int num_opts = sizeof(opts)/sizeof(opts[0]);
 opts_t::opts_t()
 {
     frameSkip = -1;
-    gbFrameSkip = -1;
 #ifdef __WXMSW__
     audio_api = AUD_DIRECTSOUND;
 #endif

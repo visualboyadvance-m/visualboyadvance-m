@@ -69,62 +69,7 @@
           </object>
         </object>
       </object>
-      <label>System and Peripherals</label>
-    </object>
-    <object class="notebookpage">
-      <object class="wxPanel">
-        <object class="wxBoxSizer">
-          <orient>wxVERTICAL</orient>
-          <object class="sizeritem">
-            <object class="wxStaticText">
-              <label>Frame Skip</label>
-              <font>
-                <weight>bold</weight>
-              </font>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxBoxSizer">
-              <orient>wxVERTICAL</orient>
-              <object class="sizeritem">
-                <object class="wxCheckBox" name="FrameSkipAuto">
-                  <label>Enable _automatic frame skipping</label>
-                </object>
-                <flag>wxALL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <flag>wxALL|wxEXPAND</flag>
-                <border>5</border>
-                <object class="wxBoxSizer">
-                  <orient>wxHORIZONTAL</orient>
-                  <object class="sizeritem">
-                    <object class="wxStaticText" name="FrameSkipLab">
-                      <label>_Number of frames to skip :</label>
-                    </object>
-                    <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-                    <border>5</border>
-                  </object>
-                  <object class="sizeritem">
-                    <object class="wxSpinCtrl" name="FrameSkip">
-                      <min>0</min>
-                      <max>9</max>
-                    </object>
-                    <option>1</option>
-                    <flag>wxALL|wxEXPAND</flag>
-                    <border>5</border>
-                  </object>
-                </object>
-              </object>
-            </object>
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-          </object>
-        </object>
-      </object>
-      <label>Speed</label>
+      <label>System</label>
     </object>
     <object class="notebookpage">
       <object class="wxPanel">
