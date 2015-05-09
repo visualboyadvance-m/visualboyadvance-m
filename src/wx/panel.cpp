@@ -1662,7 +1662,6 @@ void BasicDrawingPanel::DrawArea(wxWindowDC &dc)
 }
 
 #ifndef NO_OGL
-#include <GL/glext.h> // for 16-bit texture data formats on win32
 // following 3 for vsync
 #ifdef __WXMAC__
 #include <OpenGL/OpenGL.h>
