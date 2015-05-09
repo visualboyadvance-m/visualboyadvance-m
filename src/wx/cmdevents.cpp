@@ -1183,9 +1183,9 @@ EVT_HANDLER(Pause, "Pause (toggle)")
     else if(!IsPaused())
 	panel->Resume();
     // undo next-frame's zeroing of frameskip
-    int fs = panel->game_type() == IMAGE_GB ? gbFrameSkip : frameSkip;
-    if(fs > 0)
-	systemFrameSkip = fs;
+    int fs = frameSkip;
+    if(fs >= 0)
+		systemFrameSkip = fs;
 }
 
 // new
@@ -1870,9 +1870,6 @@ EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
 	    } else
 		panel->DelBorder();
 	}
-	// autoskip will self-adjust
-	if(gbFrameSkip >= 0)
-	    systemFrameSkip = gbFrameSkip;
 	// don't want to have to reset to change colors
 	memcpy(gbPalette, &systemGbPalette[gbPaletteOption * 8], 8 * sizeof(systemGbPalette[0]));
     }
@@ -1920,9 +1917,6 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
     if(ShowModal(dlg) != wxID_OK)
 	return;
     if(panel->game_type() == IMAGE_GBA) {
-	// autoskip will self-adjust
-	if(frameSkip >= 0)
-	    systemFrameSkip = frameSkip;
 	agbPrintEnable(agbPrint);
 	wxString s = wxString((const char *)&rom[0xac], wxConvLibc, 4);
 	wxFileConfig *cfg = wxGetApp().overrides;
@@ -2035,6 +2029,10 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
     wxDialog *dlg = GetXRCDialog("DisplayConfig");
     if(ShowModal(dlg) != wxID_OK)
 		return;
+
+	if (frameSkip >= 0)
+		systemFrameSkip = frameSkip;
+
     if(fs != fullScreen)
 	{
 		panel->ShowFullScreen(fullScreen);
@@ -2288,9 +2286,9 @@ EVT_HANDLER(NoStatusMsg, "Disable on-screen status messages")
 	update_opts();
 }
 
-EVT_HANDLER(FrameSkipAuto, "Skip frames.  Values are 0-9 or -1 to skip automatically based on time.")
+EVT_HANDLER(FrameSkipAuto, "Auto Skip frames.")
 {
-	GetMenuOptionInt("FrameSkipAuto", frameSkip, 1);
+	GetMenuOptionInt("FrameSkipAuto", autoFrameSkip, 1);
 	update_opts();
 }
 

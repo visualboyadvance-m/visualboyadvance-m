@@ -2828,14 +2828,6 @@ bool MainFrame::BindControls()
 			// in command handler.  Plus making changes might require resizing
 			// game area.  Validation only here.
 			SafeXRCCTRL<wxChoice>(d, "Borders");
-			/// Speed
-			// AutoSkip/FrameSkip are 2 controls for 1 value.  Needs post-process
-			// to ensure checkbox not ignored
-			getcbie("FrameSkipAuto", autoFrameSkip, -1);
-			getsc("FrameSkip", gbFrameSkip);
-			addbier(sc, true);
-			getlab("FrameSkipLab");
-			addbier(lab, true);
 			/// Boot ROM
 			getfp("BootRom", gopts.gb_bios);
 			getlab("BootRomLab");
@@ -2904,15 +2896,6 @@ bool MainFrame::BindControls()
 				wxCommandEventHandler(BatConfig_t::Detect),
 				NULL, &BatConfigHandler);
 
-			/// Speed
-			// AutoSkip/FrameSkip are 2 controls for 1 value.  Needs post-process
-			// to ensure checkbox not ignored
-			//getcbie("FrameSkipAuto", autoFrameSkip, -1);
-			getsc("FrameSkip", frameSkip);
-			addbier(sc, true);
-			getlab("FrameSkipLab");
-			addbier(lab, true);
-
 			/// Boot ROM
 			getfp("BootRom", gopts.gba_bios);
 			getlab("BootRomLab");
@@ -2930,6 +2913,15 @@ bool MainFrame::BindControls()
 
 		d = LoadXRCropertySheetDialog("DisplayConfig");
 		{
+			/// Speed
+			// AutoSkip/FrameSkip are 2 controls for 1 value.  Needs post-process
+			// to ensure checkbox not ignored
+			getsc("FrameSkip", frameSkip);
+			getlab("FrameSkipLab");
+			int fs = frameSkip;
+			if (fs >= 0)
+				systemFrameSkip = fs;
+
 			/// On-Screen Display
 			ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "SpeedIndicator", wxGenericValidator(&showSpeed));
 			/// Zoom

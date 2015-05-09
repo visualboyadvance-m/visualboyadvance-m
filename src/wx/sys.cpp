@@ -316,7 +316,7 @@ int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 void system10Frames(int rate)
 {
     GameArea *panel = wxGetApp().frame->GetPanel();
-    int fs = panel->game_type() == IMAGE_GB ? gbFrameSkip : frameSkip;
+    int fs = frameSkip;
     if(fs < 0) {
 	// I don't know why this algorithm isn't in common somewhere
 	// as is, I copied it from SDL
