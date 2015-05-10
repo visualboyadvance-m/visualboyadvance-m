@@ -313,6 +313,7 @@ ENDIF( ENABLE_FFMPEG )
 
 ADD_LIBRARY (
     vbamcore
+    STATIC
     ${PROJECT_SRCS}
     ${SRC_MAIN}
     ${SRC_GBA}

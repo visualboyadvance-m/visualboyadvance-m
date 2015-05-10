@@ -28,7 +28,7 @@
 // ImageMagick makes the name wxvbam, but wx expects wxvbam_xpm
 #define wxvbam wxvbam_xpm
 const
-#include "wxvbam.xpm"
+#include "xrx/wxvbam.xpm"
 #undef wxvbam
 #endif
 

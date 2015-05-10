@@ -38,5 +38,6 @@ INCLUDE_DIRECTORIES(
 
 ADD_LIBRARY(
     fex
+    STATIC
     ${SRC_FEX}
 )
