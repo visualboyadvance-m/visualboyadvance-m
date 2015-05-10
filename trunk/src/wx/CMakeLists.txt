@@ -124,7 +124,7 @@ SET( SRC_WX
    cmdhandlers.h
    cmd-evtable.h
    #Icon File
-   xrc/wxvbam.xpm
+   xrc/vbam.xpm
 )
 
 IF(ENABLE_OPENAL)
