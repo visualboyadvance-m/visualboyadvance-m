@@ -2195,6 +2195,8 @@ EVT_HANDLER(wxID_ABOUT, "About...")
     ai.AddDeveloper(wxT("Costis"));
     ai.AddDeveloper(wxT("chrono"));
     ai.AddDeveloper(wxT("xKiv"));
+    ai.AddDeveloper(wxT("Skidau"));
+    ai.AddDeveloper(wxT("TheCanadianBacon"));
     ai.AddDeveloper(wxT("Orig. VBA team"));
 
     wxAboutBox(ai);
