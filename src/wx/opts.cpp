@@ -248,7 +248,7 @@ opt_desc opts[] = {
     INTOPT ("Sound/GBStereo", "", wxTRANSLATE("GB stereo effect (%)"), gopts.gb_stereo, 0, 100),
     BOOLOPT("Sound/GBSurround", "GBSurround", wxTRANSLATE("GB surround sound effect (%)"), gopts.gb_effects_config_surround),
     ENUMOPT("Sound/Quality", "", wxTRANSLATE("Sound sample rate (kHz)"), gopts.sound_qual, wxTRANSLATE("48|44|22|11")),
-    INTOPT ("Sound/Volume", "", wxTRANSLATE("Sound volume (%)"), gopts.sound_vol, 0, 200)
+    INTOPT ("Sound/Volume", "", wxTRANSLATE("Sound volume (%)"), gopts.sound_vol, 0, 400)
 };
 const int num_opts = sizeof(opts)/sizeof(opts[0]);
 
@@ -340,6 +340,7 @@ void load_opts()
 	int poff = s.size();
 	long entry_idx;
 	wxString e;
+	std::sort(&opts[0], &opts[num_opts], opt_lt);
 	for(cont = cfg->GetFirstGroup(e, entry_idx); cont;
 	    cont = cfg->GetNextGroup(e, entry_idx)) {
 	    // the only one with subgroups
