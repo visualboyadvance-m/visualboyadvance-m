@@ -2086,8 +2086,6 @@ EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
     if(ShowModal(dlg) != wxID_OK)
 	return;
     switch(panel->game_type()) {
-    case IMAGE_UNKNOWN:
-	return;
     case IMAGE_GB:
 	gb_effects_config.echo = (float)gopts.gb_echo / 100.0;
 	gb_effects_config.stereo = (float)gopts.gb_stereo / 100.0;
@@ -2097,7 +2095,8 @@ EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
 			     44100 / (1 << (gopts.sound_qual - 1)));
 	break;
     case IMAGE_GBA:
-	soundSetSampleRate(!gopts.sound_qual ? 48000 :
+	case IMAGE_UNKNOWN:
+		soundSetSampleRate(!gopts.sound_qual ? 48000 :
 			   44100 / (1 << (gopts.sound_qual - 1)));
 	break;
     }
