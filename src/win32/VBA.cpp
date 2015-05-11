@@ -1403,7 +1403,6 @@ void VBA::loadSettings()
   autoFrameSkip = regQueryDwordValue("autoFrameSkip", FALSE) ? TRUE : FALSE;
   
   vsync = regQueryDwordValue("vsync", false) ? true : false ;
-  synchronize = regQueryDwordValue("synchronize", 1) ? true : false;
   fullScreenStretch = regQueryDwordValue("stretch", 0) ? true : false;
 
   videoOption = regQueryDwordValue("video", VIDEO_3X);
@@ -2487,7 +2486,6 @@ void VBA::saveSettings()
 
   regSetDwordValue("autoFrameSkip", autoFrameSkip);
   regSetDwordValue("vsync", vsync);
-  regSetDwordValue("synchronize", synchronize);
   regSetDwordValue("stretch", fullScreenStretch);
 
   regSetDwordValue("video", videoOption);

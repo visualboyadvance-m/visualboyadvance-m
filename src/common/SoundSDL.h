@@ -42,6 +42,8 @@ private:
 	SDL_sem *_semBufferFull;
 	SDL_sem *_semBufferEmpty;
 
+	int current_rate;
+
 	bool _initialized;
 
 	// Defines what delay in seconds we keep in the sound buffer

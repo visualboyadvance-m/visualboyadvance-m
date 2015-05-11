@@ -2323,12 +2323,6 @@ EVT_HANDLER(SkipIntro, "Skip BIOS initialization")
 	update_opts();
 }
 
-EVT_HANDLER(SyncGameAudio, "Synchronize game to audio")
-{
-	GetMenuOptionInt("SyncGameAudio", synchronize, 1);
-	update_opts();
-}
-
 EVT_HANDLER(BootRomEn, "Use the specified BIOS file for GBA")
 {
 	GetMenuOptionInt("BootRomEn", useBiosFileGBA, 1);
