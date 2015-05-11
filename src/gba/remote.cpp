@@ -244,7 +244,7 @@ void printBreakRegList(bool verbose){
 				for (int j = 0; j < regBreakCounter[i][k]; j++){
 					if (tmp->flags & 8)
 					{
-						sprintf(monbuf, "No. %d:\tBreak if (signed)%s %08x\n", j, flagsToOP[tmp->flags], tmp->intVal); monprintf(monbuf);
+						sprintf(monbuf, "No. %d:\tBreak if (signed)%s %08x\n", j, flagsToOP[tmp->flags & 7], tmp->intVal); monprintf(monbuf);
 					}
 					else
 					{
