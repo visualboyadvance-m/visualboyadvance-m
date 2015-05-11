@@ -581,18 +581,6 @@ void MainWnd::OnUpdateOptionsEmulatorDisablestatusmessages(CCmdUI* pCmdUI)
   pCmdUI->SetCheck(disableStatusMessages);
 }
 
-void MainWnd::OnOptionsEmulatorSynchronize()
-{
-  synchronize = !synchronize;
-  if (synchronize)
-	  throttle = false;
-}
-
-void MainWnd::OnUpdateOptionsEmulatorSynchronize(CCmdUI* pCmdUI)
-{
-  pCmdUI->SetCheck(synchronize);
-}
-
 void MainWnd::OnOptionsEmulatorPausewheninactive()
 {
   pauseWhenInactive = !pauseWhenInactive;

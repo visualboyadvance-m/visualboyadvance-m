@@ -18,15 +18,17 @@
 #include "SoundSDL.h"
 #include "ConfigManager.h"
 #include "../gba/Globals.h"
+#include "../gba/Sound.h"
 
 extern int emulating;
 
-// Hold up to 100 ms of data in the ring buffer
-const float SoundSDL::_delay = 0.1f;
+// Hold up to 32 ms of data in the ring buffer
+const float SoundSDL::_delay = 0.032f;
 
 SoundSDL::SoundSDL():
 	_rbuf(0),
-	_initialized(false)
+	_initialized(false),
+	current_rate(0)
 {
 
 }
@@ -45,7 +47,7 @@ void SoundSDL::read(u16 * stream, int length)
 	/* since this is running in a different thread, speedup and
 	 * throttle can change at any time; save the value so locks
 	 * stay in sync */
-	bool lock = (emulating && !speedup && synchronize && !gba_joybus_active) ? true : false;
+	bool lock = (emulating && !speedup && throttle && !gba_joybus_active) ? true : false;
 
 	if (lock)
 		SDL_SemWait (_semBufferFull);
@@ -74,7 +76,7 @@ void SoundSDL::write(u16 * finalWave, int length)
 	std::size_t avail;
 	while ((avail = _rbuf.avail() / 2) < samples)
 	{
-		bool lock = (emulating && !speedup && synchronize && !gba_joybus_active) ? true : false;
+		bool lock = (emulating && !speedup && throttle && !gba_joybus_active) ? true : false;
 
 		_rbuf.write(finalWave, avail * 2);
 
@@ -86,6 +88,12 @@ void SoundSDL::write(u16 * finalWave, int length)
 		if (lock)
 		{
 			SDL_SemWait(_semBufferEmpty);
+			if (throttle > 0 && throttle != current_rate)
+			{
+				SDL_CloseAudio();
+				init(soundGetSampleRate() * throttle / 100);
+				current_rate = throttle;
+			}
 		}
 		else
 		{
@@ -119,10 +127,13 @@ bool SoundSDL::init(long sampleRate)
 
 	_rbuf.reset(_delay * sampleRate * 2);
 
-	_mutex          = SDL_CreateMutex();
-	_semBufferFull  = SDL_CreateSemaphore (0);
-	_semBufferEmpty = SDL_CreateSemaphore (1);
-	_initialized    = true;
+	if (!_initialized)
+	{
+		_mutex = SDL_CreateMutex();
+		_semBufferFull  = SDL_CreateSemaphore (0);
+		_semBufferEmpty = SDL_CreateSemaphore (1);
+		_initialized    = true;
+	}
 
 	return true;
 }
@@ -132,24 +143,9 @@ SoundSDL::~SoundSDL()
 	if (!_initialized)
 		return;
 
-	SDL_mutexP(_mutex);
-	int iSave = emulating;
-	emulating = 0;
-	SDL_SemPost(_semBufferFull);
-	SDL_SemPost(_semBufferEmpty);
-	SDL_mutexV(_mutex);
+	reset();
 
-	SDL_DestroySemaphore(_semBufferFull);
-	SDL_DestroySemaphore(_semBufferEmpty);
-	_semBufferFull  = NULL;
-	_semBufferEmpty = NULL;
-
-	SDL_DestroyMutex(_mutex);
-	_mutex = NULL;
-
-	SDL_CloseAudio();
-
-	emulating = iSave;
+	_initialized = false;
 }
 
 void SoundSDL::pause()
@@ -170,4 +166,22 @@ void SoundSDL::resume()
 
 void SoundSDL::reset()
 {
+	SDL_mutexP(_mutex);
+	int iSave = emulating;
+	emulating = 0;
+	SDL_SemPost(_semBufferFull);
+	SDL_SemPost(_semBufferEmpty);
+	SDL_mutexV(_mutex);
+
+	SDL_DestroySemaphore(_semBufferFull);
+	SDL_DestroySemaphore(_semBufferEmpty);
+	_semBufferFull = NULL;
+	_semBufferEmpty = NULL;
+
+	SDL_DestroyMutex(_mutex);
+	_mutex = NULL;
+
+	SDL_CloseAudio();
+
+	emulating = iSave;
 }

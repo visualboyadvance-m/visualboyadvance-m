@@ -733,7 +733,6 @@
 #define ID_OPTIONS_VIDEO_X5             40014
 #define ID_OPTIONS_VIDEO_X6             40015
 #define ID_OPTIONS_JOYPAD               40016
-#define ID_OPTIONS_EMULATOR_SYNCHRONIZE 40017
 #define ID_FILE_RESET                   40018
 #define ID_FILE_LOAD                    40019
 #define ID_OPTIONS_SOUND_DIRECTSOUNDA   40020

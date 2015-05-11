@@ -1760,8 +1760,6 @@ BEGIN
                 MENUITEM "  Configuration...",          ID_OUTPUTAPI_OALCONFIGURATION
                 MENUITEM SEPARATOR
                 MENUITEM "DirectSound 8",               ID_OUTPUTAPI_DIRECTSOUND
-                MENUITEM SEPARATOR
-                MENUITEM "&Sync game to audio",         ID_OPTIONS_EMULATOR_SYNCHRONIZE
             END
             MENUITEM SEPARATOR
             MENUITEM "Core Settings...",            ID_AUDIO_CORE_SETTINGS

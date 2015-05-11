@@ -235,10 +235,6 @@
         <label>_VSync</label>
         <checkable>1</checkable>
       </object>
-      <object class="wxMenuItem" name="SyncGameAudio">
-        <label>_Audio sync</label>
-        <checkable>1</checkable>
-      </object>
       <object class="wxMenuItem" name="FrameSkipAuto">
         <label>_Auto skip frames</label>
         <checkable>1</checkable>

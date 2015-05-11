@@ -221,7 +221,6 @@ int speedupToggle;
 int sunBars;
 int surfaceSizeX;
 int surfaceSizeY;
-int synchronize = false;
 int threadPriority;
 int tripleBuffering;
 int useBios = 0;
@@ -524,7 +523,6 @@ void LoadConfig()
 	soundFiltering = (float)ReadPref("gbaSoundFiltering", 50) / 100.0f;
 	soundInterpolation = ReadPref("gbaSoundInterpolation", 1);
 	soundRecordDir = ReadPrefString("soundRecordDir");
-	synchronize = ReadPref("synchronize", 1);
 	threadPriority = ReadPref("priority", 2);
 	throttle = ReadPref("throttle", 0);
 	tripleBuffering = ReadPref("tripleBuffering", 0);
@@ -1035,13 +1033,6 @@ int ReadOpts(int argc, char ** argv)
 			// --rtc-enabled
 			if (optarg) {
 				rtcEnabled = atoi(optarg);
-			}
-			break;
-
-		case OPT_SYNCHRONIZE:
-			// --synchronize
-			if (optarg) {
-				synchronize = atoi(optarg);
 			}
 			break;
 

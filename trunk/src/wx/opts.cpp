@@ -225,7 +225,6 @@ opt_desc opts[] = {
 	INTOPT ("preferences/skipBios", "SkipIntro", wxTRANSLATE("Skip BIOS initialization"), skipBios, 0, 1),
 	INTOPT ("preferences/skipSaveGameCheats", "", wxTRANSLATE("Do not overwrite cheat list when loading state"), skipSaveGameCheats, 0, 1),
 	INTOPT ("preferences/skipSaveGameBattery", "", wxTRANSLATE("Do not overwrite native (battery) save when loading state"), skipSaveGameBattery, 0, 1),
-	INTOPT ("preferences/synchronize", "SyncGameAudio", wxTRANSLATE("Synchronize game to audio"), synchronize, 0, 1),
 	INTOPT ("preferences/throttle", "", wxTRANSLATE("Throttle game speed, even when accelerated (0-1000%, 0 = disabled)"), throttle, 0, 1000),
 	INTOPT ("preferences/useBiosGB", "BootRomGB", wxTRANSLATE("Use the specified BIOS file for GB"), useBiosFileGB, 0, 1),
 	INTOPT ("preferences/useBiosGBA", "BootRomEn", wxTRANSLATE("Use the specified BIOS file"), useBiosFileGBA, 0, 1),
