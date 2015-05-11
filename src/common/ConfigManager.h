@@ -117,7 +117,6 @@ extern int speedupToggle;
 extern int sunBars;
 extern int surfaceSizeX;
 extern int surfaceSizeY;
-extern int synchronize;
 extern int threadPriority;
 extern int tripleBuffering;
 extern int useBios;

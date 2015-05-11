@@ -239,7 +239,7 @@ void DirectSound::write(u16 * finalWave, int length)
 	LPVOID       lpvPtr2;
 	DWORD        dwBytes2 = 0;
 
-	if (!speedup && synchronize && !throttle && !gba_joybus_active) {
+	if (!speedup && throttle && !gba_joybus_active) {
 		hr = dsbSecondary->GetStatus(&status);
 		if( status & DSBSTATUS_PLAYING ) {
 			if( !soundPaused ) {
