@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-12 21:52+1000\n"
+"POT-Creation-Date: 2015-05-13 00:20+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -365,18 +365,18 @@ msgstr ""
 msgid "Waiting for GDB..."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2161
+#: ../src/wx/cmdevents.cpp:2166
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2162
+#: ../src/wx/cmdevents.cpp:2167
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2015 VBA-M development team"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2163
+#: ../src/wx/cmdevents.cpp:2168
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -392,11 +392,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2386
+#: ../src/wx/cmdevents.cpp:2391
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2391
+#: ../src/wx/cmdevents.cpp:2396
 msgid "Network is not supported in local mode."
 msgstr ""
 
@@ -3153,6 +3153,10 @@ msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:608
 msgid "VBA-M Support &Forum"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:611
+msgid "Translations"
 msgstr ""
 
 #: ../src/wx/xrc/MapViewer.xrc:15

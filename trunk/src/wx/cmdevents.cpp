@@ -2148,6 +2148,11 @@ EVT_HANDLER(FAQ, "VBA-M support forum")
     wxLaunchDefaultBrowser(wxT("http://vba-m.com/forum/"));
 }
 
+EVT_HANDLER(Translate, "Translations")
+{
+	wxLaunchDefaultBrowser(wxT("http://www.transifex.com/projects/p/vba-m"));
+}
+
 // was About
 EVT_HANDLER(wxID_ABOUT, "About...")
 {
