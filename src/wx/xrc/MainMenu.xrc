@@ -607,6 +607,10 @@
       <object class="wxMenuItem" name="FAQ">
         <label>VBA-M Support _Forum</label>
       </object>
+      <object class="wxMenuItem" name="Translate">
+        <label>Translations</label>
+      </object>
+      <object class="separator"/>
       <object class="wxMenuItem" name="wxID_ABOUT"/>
     </object>
   </object>
