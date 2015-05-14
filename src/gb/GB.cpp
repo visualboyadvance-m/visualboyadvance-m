@@ -1007,7 +1007,7 @@ void  gbWriteMemory(register u16 address, register u8 value)
 		}
 		EmuReseted = false;
 		gbMemory[0xff02] = value;
-		if (gbSerialOn && (GetLinkMode() == LINK_GAMEBOY || winGbPrinterEnabled)) {
+		if (gbSerialOn && (GetLinkMode() == LINK_GAMEBOY_IPC || GetLinkMode() == LINK_GAMEBOY_SOCKET || winGbPrinterEnabled)) {
 			gbSerialTicks = GBSERIAL_CLOCK_TICKS;
 
 			LinkIsWaiting = true;
@@ -2496,7 +2496,7 @@ void gbReset()
 {
 #ifndef NO_LINK
 #if (defined __WIN32__ || defined _WIN32)
-	if (GetLinkMode() == LINK_GAMEBOY) {
+	if (GetLinkMode() == LINK_GAMEBOY_IPC || GetLinkMode() == LINK_GAMEBOY_SOCKET) {
 		EmuReseted = true;
 		gbInitLink();
 	}
@@ -5554,7 +5554,7 @@ void gbEmulate(int ticksToStop)
 	SIOctr++;
 	if (SIOctr % 5)
 		//Transfer Started
-		if (gbSerialOn && GetLinkMode() == LINK_GAMEBOY) {
+		if (gbSerialOn && (GetLinkMode() == LINK_GAMEBOY_IPC || GetLinkMode() == LINK_GAMEBOY_SOCKET)) {
 #ifdef OLD_GB_LINK
 			if (linkConnected) {
 				gbSerialTicks -= clockTicks;
