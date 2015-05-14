@@ -686,7 +686,10 @@ LinkMode MainFrame::GetConfiguredLinkMode() {
 		return LINK_GAMECUBE_DOLPHIN;
 		break;
 	case 4:
-		return LINK_GAMEBOY;
+		if (gopts.link_proto)
+			return LINK_GAMEBOY_IPC;
+		else
+			return LINK_GAMEBOY_SOCKET;
 		break;
 	default:
 		return LINK_DISCONNECTED;

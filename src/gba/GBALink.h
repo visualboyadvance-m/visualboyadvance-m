@@ -12,7 +12,8 @@ enum LinkMode
 	LINK_RFU_IPC,
 	LINK_RFU_SOCKET,
 	LINK_GAMECUBE_DOLPHIN,
-	LINK_GAMEBOY
+	LINK_GAMEBOY_IPC,
+	LINK_GAMEBOY_SOCKET
 };
 
 /**
@@ -198,7 +199,10 @@ extern bool LinkFirstTime;
 extern bool EmuReseted;
 extern void gbInitLink();
 extern u8   gbStartLink(u8 b);
-extern u16 gbLinkUpdate(u8 b, int gbSerialOn);
+extern u16  gbLinkUpdate(u8 b, int gbSerialOn);
+extern void gbInitLinkIPC();
+extern u8   gbStartLinkIPC(u8 b);
+extern u16  gbLinkUpdateIPC(u8 b, int gbSerialOn);
 
 extern void BootLink(int m_type, const char *host, int timeout, bool m_hacks, int m_numplayers);
 
