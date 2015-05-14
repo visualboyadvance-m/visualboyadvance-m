@@ -81,9 +81,6 @@ bool gba_link_enabled = false;
 
 bool speedhack = true;
 
-bool LinkIsWaiting = false;
-bool LinkFirstTime = true;
-
 #define LOCAL_LINK_NAME "VBA link memory"
 #define IP_LINK_PORT 5738
 
@@ -353,6 +350,11 @@ u32 rfu_clientlist[5];
 
 static RFUServer rfu_server;
 static RFUClient rfu_client;
+
+u8 gbSIO_SC = 0;
+bool EmuReseted = true;
+bool LinkIsWaiting = false;
+bool LinkFirstTime = true;
 
 #if (defined __WIN32__ || defined _WIN32)
 
@@ -4103,9 +4105,6 @@ static void UpdateRFUIPC(int ticks)
 		}
 	}
 }
-
-u8 gbSIO_SC = 0;
-bool EmuReseted = true;
 
 void gbInitLinkIPC()
 {
