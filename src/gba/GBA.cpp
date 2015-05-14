@@ -3662,7 +3662,6 @@ void CPUReset()
   dma2Dest = 0;
   dma3Source = 0;
   dma3Dest = 0;
-  cpuSaveGameFunc = flashSaveDecide;
   renderLine = mode0RenderLine;
   fxOn = false;
   windowOn = false;
@@ -3691,9 +3690,6 @@ void CPUReset()
 
   SetMapMasks();
 
-  eepromReset();
-  flashReset();
-
   soundReset();
 
   CPUUpdateWindow0();
@@ -3716,14 +3712,16 @@ void CPUReset()
     cpuFlashEnabled = true;
     cpuEEPROMEnabled = true;
     cpuEEPROMSensorEnabled = false;
-    saveType = gbaSaveType = 0;
+    gbaSaveType = 0;
+	cpuSaveGameFunc = flashSaveDecide;
     break;
   case 1: // EEPROM
+    eepromReset();
     cpuSramEnabled = false;
     cpuFlashEnabled = false;
     cpuEEPROMEnabled = true;
     cpuEEPROMSensorEnabled = false;
-    saveType = gbaSaveType = 3;
+    gbaSaveType = 3;
     // EEPROM usage is automatically detected
     break;
   case 2: // SRAM
@@ -3732,15 +3730,16 @@ void CPUReset()
     cpuEEPROMEnabled = false;
     cpuEEPROMSensorEnabled = false;
     cpuSaveGameFunc = sramDelayedWrite; // to insure we detect the write
-    saveType = gbaSaveType = 1;
+    gbaSaveType = 1;
     break;
   case 3: // FLASH
+    flashReset();
     cpuSramEnabled = false;
     cpuFlashEnabled = true;
     cpuEEPROMEnabled = false;
     cpuEEPROMSensorEnabled = false;
     cpuSaveGameFunc = flashDelayedWrite; // to insure we detect the write
-    saveType = gbaSaveType = 2;
+    gbaSaveType = 2;
     break;
   case 4: // EEPROM+Sensor
     cpuSramEnabled = false;
@@ -3748,7 +3747,7 @@ void CPUReset()
     cpuEEPROMEnabled = true;
     cpuEEPROMSensorEnabled = true;
     // EEPROM usage is automatically detected
-    saveType = gbaSaveType = 3;
+    gbaSaveType = 3;
     break;
   case 5: // NONE
     cpuSramEnabled = false;
@@ -3756,7 +3755,7 @@ void CPUReset()
     cpuEEPROMEnabled = false;
     cpuEEPROMSensorEnabled = false;
     // no save at all
-    saveType = gbaSaveType = 5;
+    gbaSaveType = 5;
     break;
   }
 

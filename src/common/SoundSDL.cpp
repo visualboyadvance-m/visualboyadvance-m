@@ -143,7 +143,24 @@ SoundSDL::~SoundSDL()
 	if (!_initialized)
 		return;
 
-	reset();
+	SDL_mutexP(_mutex);
+	int iSave = emulating;
+	emulating = 0;
+	SDL_SemPost(_semBufferFull);
+	SDL_SemPost(_semBufferEmpty);
+	SDL_mutexV(_mutex);
+
+	SDL_DestroySemaphore(_semBufferFull);
+	SDL_DestroySemaphore(_semBufferEmpty);
+	_semBufferFull = NULL;
+	_semBufferEmpty = NULL;
+
+	SDL_DestroyMutex(_mutex);
+	_mutex = NULL;
+
+	SDL_CloseAudio();
+
+	emulating = iSave;
 
 	_initialized = false;
 }
@@ -166,22 +183,4 @@ void SoundSDL::resume()
 
 void SoundSDL::reset()
 {
-	SDL_mutexP(_mutex);
-	int iSave = emulating;
-	emulating = 0;
-	SDL_SemPost(_semBufferFull);
-	SDL_SemPost(_semBufferEmpty);
-	SDL_mutexV(_mutex);
-
-	SDL_DestroySemaphore(_semBufferFull);
-	SDL_DestroySemaphore(_semBufferEmpty);
-	_semBufferFull = NULL;
-	_semBufferEmpty = NULL;
-
-	SDL_DestroyMutex(_mutex);
-	_mutex = NULL;
-
-	SDL_CloseAudio();
-
-	emulating = iSave;
 }

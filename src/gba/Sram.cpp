@@ -9,7 +9,7 @@ u8 sramRead(u32 address)
 }
 void sramDelayedWrite(u32 address, u8 byte)
 {
-  saveType = 1;
+  saveType = 2;
   cpuSaveGameFunc = sramWrite;
   sramWrite(address, byte);
 }
