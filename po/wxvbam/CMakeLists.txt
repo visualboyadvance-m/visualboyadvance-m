@@ -2,6 +2,7 @@ GETTEXT_CREATE_TRANSLATIONS(
    wxvbam.pot
    cs.po
    en.po
+   es_ES.po
    nl.po
    zh_TW.po
 )
