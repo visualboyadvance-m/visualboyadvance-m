@@ -46,14 +46,14 @@
     <GenerateManifest>true</GenerateManifest>
     <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\Binary\</OutDir>
     <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\Build\$(ProjectName)\</IntDir>
-    <IncludePath>..\..\..\dependencies\openal-soft\include\AL\;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\..\dependencies\openal-soft\include\AL;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\Binary\</OutDir>
     <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\Build\$(ProjectName)\</IntDir>
     <GenerateManifest>true</GenerateManifest>
-    <IncludePath>..\..\..\dependencies\openal-soft\include\AL\;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\..\dependencies\openal-soft\include\AL;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>vc_mswud_x64\</OutDir>

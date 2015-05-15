@@ -24,7 +24,7 @@ private:
 	LPDIRECTSOUNDNOTIFY dsbNotify;
 	HANDLE               dsbEvent;
 	WAVEFORMATEX         wfx;          // Primary buffer wave format
-	int					 soundBufferLen;
+	int                  soundBufferLen;
 	int                  soundBufferTotalLen;
 	unsigned int         soundNextPosition;
 
@@ -36,7 +36,7 @@ public:
 	void pause();  // pause the secondary sound buffer
 	void reset();  // stop and reset the secondary sound buffer
 	void resume(); // resume the secondary sound buffer
-	void write(u16 * finalWave, int length);  // write the emulated sound to the secondary sound buffer
+	void write(u16* finalWave, int length);   // write the emulated sound to the secondary sound buffer
 };
 
 
@@ -47,7 +47,6 @@ DirectSound::DirectSound()
 	dsbSecondary  = NULL;
 	dsbNotify     = NULL;
 	dsbEvent      = NULL;
-
 	soundBufferTotalLen = 14700;
 	soundNextPosition = 0;
 }
@@ -55,23 +54,28 @@ DirectSound::DirectSound()
 
 DirectSound::~DirectSound()
 {
-	if(dsbNotify) {
+	if (dsbNotify)
+	{
 		dsbNotify->Release();
 		dsbNotify = NULL;
 	}
 
-	if(dsbEvent) {
+	if (dsbEvent)
+	{
 		CloseHandle(dsbEvent);
 		dsbEvent = NULL;
 	}
 
-	if(pDirectSound) {
-		if(dsbPrimary) {
+	if (pDirectSound)
+	{
+		if (dsbPrimary)
+		{
 			dsbPrimary->Release();
 			dsbPrimary = NULL;
 		}
 
-		if(dsbSecondary) {
+		if (dsbSecondary)
+		{
 			dsbSecondary->Release();
 			dsbSecondary = NULL;
 		}
@@ -88,39 +92,47 @@ bool DirectSound::init(long sampleRate)
 	DWORD freq;
 	DSBUFFERDESC dsbdesc;
 	int i;
+	hr = CoCreateInstance(CLSID_DirectSound8, NULL, CLSCTX_INPROC_SERVER, IID_IDirectSound8, (LPVOID*)&pDirectSound);
 
-	hr = CoCreateInstance( CLSID_DirectSound8, NULL, CLSCTX_INPROC_SERVER, IID_IDirectSound8, (LPVOID *)&pDirectSound );
-	if( hr != S_OK ) {
+	if (hr != S_OK)
+	{
 		wxLogError(_("Cannot create DirectSound %08x"), hr);
 		return false;
 	}
 
 	GUID dev;
-	if(gopts.audio_dev.empty())
+
+	if (gopts.audio_dev.empty())
 		dev = DSDEVID_DefaultPlayback;
 	else
-		CLSIDFromString(const_cast<wxChar *>(gopts.audio_dev.wx_str()), &dev);
-	pDirectSound->Initialize( &dev );
-	if( hr != DS_OK ) {
+		CLSIDFromString(const_cast<wxChar*>(gopts.audio_dev.wx_str()), &dev);
+
+	pDirectSound->Initialize(&dev);
+
+	if (hr != DS_OK)
+	{
 		wxLogError(_("Cannot create DirectSound %08x"), hr);
 		return false;
 	}
 
-	if( FAILED( hr = pDirectSound->SetCooperativeLevel( (HWND)wxGetApp().frame->GetHandle(), DSSCL_EXCLUSIVE ) ) ) {
+	if (FAILED(hr = pDirectSound->SetCooperativeLevel((HWND)wxGetApp().frame->GetHandle(), DSSCL_EXCLUSIVE)))
+	{
 		wxLogError(_("Cannot SetCooperativeLevel %08x"), hr);
 		return false;
 	}
 
-
 	// Create primary sound buffer
-	ZeroMemory( &dsbdesc, sizeof(DSBUFFERDESC) );
+	ZeroMemory(&dsbdesc, sizeof(DSBUFFERDESC));
 	dsbdesc.dwSize = sizeof(DSBUFFERDESC);
 	dsbdesc.dwFlags = DSBCAPS_PRIMARYBUFFER;
-	if( !gopts.dsound_hw_accel ) {
+
+	if (!gopts.dsound_hw_accel)
+	{
 		dsbdesc.dwFlags |= DSBCAPS_LOCSOFTWARE;
 	}
 
-	if( FAILED( hr = pDirectSound->CreateSoundBuffer( &dsbdesc, &dsbPrimary, NULL ) ) ) {
+	if (FAILED(hr = pDirectSound->CreateSoundBuffer(&dsbdesc, &dsbPrimary, NULL)))
+	{
 		wxLogError(_("Cannot CreateSoundBuffer %08x"), hr);
 		return false;
 	}
@@ -128,11 +140,10 @@ bool DirectSound::init(long sampleRate)
 	freq = sampleRate;
 	// calculate the number of samples per frame first
 	// then multiply it with the size of a sample frame (16 bit * stereo)
-	soundBufferLen = ( freq / 60 ) * 4;
+	soundBufferLen = (freq / 60) * 4;
 	soundBufferTotalLen = soundBufferLen * 10;
 	soundNextPosition = 0;
-
-	ZeroMemory( &wfx, sizeof(WAVEFORMATEX) );
+	ZeroMemory(&wfx, sizeof(WAVEFORMATEX));
 	wfx.wFormatTag = WAVE_FORMAT_PCM;
 	wfx.nChannels = 2;
 	wfx.nSamplesPerSec = freq;
@@ -140,42 +151,50 @@ bool DirectSound::init(long sampleRate)
 	wfx.nBlockAlign = wfx.nChannels * wfx.wBitsPerSample / 8;
 	wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
 
-	if( FAILED( hr = dsbPrimary->SetFormat( &wfx ) ) ) {
-		wxLogError( _("CreateSoundBuffer(primary) failed %08x"), hr );
+	if (FAILED(hr = dsbPrimary->SetFormat(&wfx)))
+	{
+		wxLogError(_("CreateSoundBuffer(primary) failed %08x"), hr);
 		return false;
 	}
 
-
 	// Create secondary sound buffer
-	ZeroMemory( &dsbdesc, sizeof(DSBUFFERDESC) );
+	ZeroMemory(&dsbdesc, sizeof(DSBUFFERDESC));
 	dsbdesc.dwSize = sizeof(DSBUFFERDESC);
 	dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLPOSITIONNOTIFY | DSBCAPS_GLOBALFOCUS;
-	if( !gopts.dsound_hw_accel ) {
+
+	if (!gopts.dsound_hw_accel)
+	{
 		dsbdesc.dwFlags |= DSBCAPS_LOCSOFTWARE;
 	}
+
 	dsbdesc.dwBufferBytes = soundBufferTotalLen;
 	dsbdesc.lpwfxFormat = &wfx;
 
-	if( FAILED( hr = pDirectSound->CreateSoundBuffer( &dsbdesc, &dsbSecondary, NULL ) ) ) {
-		wxLogError(_("CreateSoundBuffer(secondary) failed %08x"), hr );
+	if (FAILED(hr = pDirectSound->CreateSoundBuffer(&dsbdesc, &dsbSecondary, NULL)))
+	{
+		wxLogError(_("CreateSoundBuffer(secondary) failed %08x"), hr);
 		return false;
 	}
 
-	if( FAILED( hr = dsbSecondary->SetCurrentPosition( 0 ) ) ) {
-		wxLogError(_("dsbSecondary->SetCurrentPosition failed %08x"), hr );
+	if (FAILED(hr = dsbSecondary->SetCurrentPosition(0)))
+	{
+		wxLogError(_("dsbSecondary->SetCurrentPosition failed %08x"), hr);
 		return false;
 	}
 
-
-	if( SUCCEEDED( hr = dsbSecondary->QueryInterface( IID_IDirectSoundNotify8, (LPVOID*)&dsbNotify ) ) ) {
-		dsbEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
+	if (SUCCEEDED(hr = dsbSecondary->QueryInterface(IID_IDirectSoundNotify8, (LPVOID*)&dsbNotify)))
+	{
+		dsbEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 		DSBPOSITIONNOTIFY notify[10];
-		for( i = 0; i < 10; i++ ) {
+
+		for (i = 0; i < 10; i++)
+		{
 			notify[i].dwOffset = i * soundBufferLen;
 			notify[i].hEventNotify = dsbEvent;
 		}
 
-		if( FAILED( dsbNotify->SetNotificationPositions( 10, notify ) ) ) {
+		if (FAILED(dsbNotify->SetNotificationPositions(10, notify)))
+		{
 			dsbNotify->Release();
 			dsbNotify = NULL;
 			CloseHandle(dsbEvent);
@@ -183,10 +202,10 @@ bool DirectSound::init(long sampleRate)
 		}
 	}
 
-
 	// Play primary buffer
-	if( FAILED( hr = dsbPrimary->Play( 0, 0, DSBPLAY_LOOPING ) ) ) {
-		wxLogError( _("Cannot Play primary %08x"), hr );
+	if (FAILED(hr = dsbPrimary->Play(0, 0, DSBPLAY_LOOPING)))
+	{
+		wxLogError(_("Cannot Play primary %08x"), hr);
 		return false;
 	}
 
@@ -196,40 +215,36 @@ bool DirectSound::init(long sampleRate)
 
 void DirectSound::pause()
 {
-	if( dsbSecondary == NULL ) return;
+	if (dsbSecondary == NULL) return;
 
 	DWORD status;
+	dsbSecondary->GetStatus(&status);
 
-	dsbSecondary->GetStatus( &status );
-
-	if( status & DSBSTATUS_PLAYING ) dsbSecondary->Stop();
+	if (status & DSBSTATUS_PLAYING) dsbSecondary->Stop();
 }
 
 
 void DirectSound::reset()
 {
-	if( dsbSecondary == NULL ) return;
+	if (dsbSecondary == NULL) return;
 
 	dsbSecondary->Stop();
-
-	dsbSecondary->SetCurrentPosition( 0 );
-
+	dsbSecondary->SetCurrentPosition(0);
 	soundNextPosition = 0;
 }
 
 
 void DirectSound::resume()
 {
-	if( dsbSecondary == NULL ) return;
+	if (dsbSecondary == NULL) return;
 
-	dsbSecondary->Play( 0, 0, DSBPLAY_LOOPING );
+	dsbSecondary->Play(0, 0, DSBPLAY_LOOPING);
 }
 
 
-void DirectSound::write(u16 * finalWave, int length)
+void DirectSound::write(u16* finalWave, int length)
 {
-	if(!pDirectSound) return;
-
+	if (!pDirectSound) return;
 
 	HRESULT      hr;
 	DWORD        status = 0;
@@ -239,88 +254,103 @@ void DirectSound::write(u16 * finalWave, int length)
 	LPVOID       lpvPtr2;
 	DWORD        dwBytes2 = 0;
 
-	if (!speedup && throttle && !gba_joybus_active) {
+	if (!speedup && throttle && !gba_joybus_active)
+	{
 		hr = dsbSecondary->GetStatus(&status);
-		if( status & DSBSTATUS_PLAYING ) {
-			if( !soundPaused ) {
-				while( true ) {
+
+		if (status & DSBSTATUS_PLAYING)
+		{
+			if (!soundPaused)
+			{
+				while (true)
+				{
 					dsbSecondary->GetCurrentPosition(&play, NULL);
-					  int BufferLeft = ((soundNextPosition <= play) ?
-					  play - soundNextPosition :
-					  soundBufferTotalLen - soundNextPosition + play);
+					int BufferLeft = ((soundNextPosition <= play) ?
+					                  play - soundNextPosition :
+					                  soundBufferTotalLen - soundNextPosition + play);
 
-		          if(BufferLeft > soundBufferLen)
-				  {
-					if (BufferLeft > soundBufferTotalLen - (soundBufferLen * 3))
-						soundBufferLow = true;
-					break;
-				   }
-				   soundBufferLow = false;
+					if (BufferLeft > soundBufferLen)
+					{
+						if (BufferLeft > soundBufferTotalLen - (soundBufferLen * 3))
+							soundBufferLow = true;
 
-		          if(dsbEvent) {
-		            WaitForSingleObject(dsbEvent, 50);
-		          }
-		        }
+						break;
+					}
+
+					soundBufferLow = false;
+
+					if (dsbEvent)
+					{
+						WaitForSingleObject(dsbEvent, 50);
+					}
+				}
 			}
 		}/* else {
-		 // TODO: remove?
-			 setsoundPaused(true);
-		}*/
-	}
 
+         // TODO: remove?
+             setsoundPaused(true);
+        }*/
+	}
 
 	// Obtain memory address of write block.
 	// This will be in two parts if the block wraps around.
-	if( DSERR_BUFFERLOST == ( hr = dsbSecondary->Lock(
-		soundNextPosition,
-		soundBufferLen,
-		&lpvPtr1,
-		&dwBytes1,
-		&lpvPtr2,
-		&dwBytes2,
-		0 ) ) ) {
-			// If DSERR_BUFFERLOST is returned, restore and retry lock.
-			dsbSecondary->Restore();
-			hr = dsbSecondary->Lock(
-				soundNextPosition,
-				soundBufferLen,
-				&lpvPtr1,
-				&dwBytes1,
-				&lpvPtr2,
-				&dwBytes2,
-				0 );
+	if (DSERR_BUFFERLOST == (hr = dsbSecondary->Lock(
+	                                  soundNextPosition,
+	                                  soundBufferLen,
+	                                  &lpvPtr1,
+	                                  &dwBytes1,
+	                                  &lpvPtr2,
+	                                  &dwBytes2,
+	                                  0)))
+	{
+		// If DSERR_BUFFERLOST is returned, restore and retry lock.
+		dsbSecondary->Restore();
+		hr = dsbSecondary->Lock(
+		         soundNextPosition,
+		         soundBufferLen,
+		         &lpvPtr1,
+		         &dwBytes1,
+		         &lpvPtr2,
+		         &dwBytes2,
+		         0);
 	}
 
 	soundNextPosition += soundBufferLen;
 	soundNextPosition = soundNextPosition % soundBufferTotalLen;
 
-	if( SUCCEEDED( hr ) ) {
+	if (SUCCEEDED(hr))
+	{
 		// Write to pointers.
-		CopyMemory( lpvPtr1, finalWave, dwBytes1 );
-		if ( lpvPtr2 ) {
-			CopyMemory( lpvPtr2, finalWave + dwBytes1, dwBytes2 );
+		CopyMemory(lpvPtr1, finalWave, dwBytes1);
+
+		if (lpvPtr2)
+		{
+			CopyMemory(lpvPtr2, finalWave + dwBytes1, dwBytes2);
 		}
 
 		// Release the data back to DirectSound.
-		hr = dsbSecondary->Unlock( lpvPtr1, dwBytes1, lpvPtr2, dwBytes2 );
-	} else {
-		wxLogError(_("dsbSecondary->Lock() failed: %08x"), hr );
+		hr = dsbSecondary->Unlock(lpvPtr1, dwBytes1, lpvPtr2, dwBytes2);
+	}
+	else
+	{
+		wxLogError(_("dsbSecondary->Lock() failed: %08x"), hr);
 		return;
 	}
 }
 
-SoundDriver *newDirectSound()
+SoundDriver* newDirectSound()
 {
 	return new DirectSound();
 }
 
-struct devnames {
-	wxArrayString *names, *ids;
+struct devnames
+{
+	wxArrayString* names, *ids;
 };
 
 static BOOL CALLBACK DSEnumCB(LPGUID guid, LPCTSTR desc, LPCTSTR drvnam, LPVOID user)
 {
-	devnames *dn = (devnames *)user;
+	devnames* dn = (devnames*)user;
 	dn->names->push_back(desc);
 	WCHAR buf[32 + 4 + 2 + 1]; // hex digits + "-" + "{}" + \0
 	StringFromGUID2(*guid, buf, sizeof(buf));

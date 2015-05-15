@@ -3,15 +3,15 @@
 
 // For compilers that support precompilation, includes <wx/wx.h>.
 #include <wx/wxprec.h>
- 
+
 #ifdef __BORLANDC__
-    #pragma hdrstop
+#pragma hdrstop
 #endif
 
 // for all others, include the necessary headers (this file is usually all you
 // need because it includes almost all "standard" wxWidgets headers)
 #ifndef WX_PRECOMP
-    #include <wx/wx.h>
+#include <wx/wx.h>
 #endif
 
 // The following are not pulled in by wx.h
@@ -65,28 +65,36 @@
 
 #include "wx/keyedit.h"
 
-static inline void DoSetAccel(wxMenuItem *mi, wxAcceleratorEntry *acc)
+static inline void DoSetAccel(wxMenuItem* mi, wxAcceleratorEntry* acc)
 {
-    wxString lab = mi->GetItemLabel();
-    size_t tab = lab.find(wxT('\t'));
-    // following short circuit returns are to avoid UI update on no change
-    if(tab == wxString::npos && !acc)
-	return;
-    wxString accs;
-    if(acc)
-	// actually, use keyedit's ToString(), as it is more reliable
-	// and doesn't generate wx assertions
-	// accs = acc->ToString();
-	accs = wxKeyTextCtrl::ToString(acc->GetFlags(), acc->GetKeyCode());
-    if(tab != wxString::npos && accs == lab.substr(tab + 1))
-	return;
-    if(tab != wxString::npos)
-	lab.resize(tab);
-    if(acc) {
-	lab.append(wxT('\t'));
-	lab.append(accs);
-    }
-    mi->SetItemLabel(lab);
+	wxString lab = mi->GetItemLabel();
+	size_t tab = lab.find(wxT('\t'));
+
+	// following short circuit returns are to avoid UI update on no change
+	if (tab == wxString::npos && !acc)
+		return;
+
+	wxString accs;
+
+	if (acc)
+		// actually, use keyedit's ToString(), as it is more reliable
+		// and doesn't generate wx assertions
+		// accs = acc->ToString();
+		accs = wxKeyTextCtrl::ToString(acc->GetFlags(), acc->GetKeyCode());
+
+	if (tab != wxString::npos && accs == lab.substr(tab + 1))
+		return;
+
+	if (tab != wxString::npos)
+		lab.resize(tab);
+
+	if (acc)
+	{
+		lab.append(wxT('\t'));
+		lab.append(accs);
+	}
+
+	mi->SetItemLabel(lab);
 }
 
 // wxrc helpers (for dynamic strings instead of constant)
