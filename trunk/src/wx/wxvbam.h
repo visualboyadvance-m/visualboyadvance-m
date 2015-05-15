@@ -78,6 +78,10 @@ public:
 	wxFileConfig* cfg;
 	// vba-over.ini
 	wxFileConfig* overrides;
+
+	wxFileName rom_database;
+	wxFileName rom_database_scene;
+
 	MainFrame* frame;
 	// use this to get ms since program lauch
 	wxStopWatch timer;
@@ -227,6 +231,8 @@ public:
 
 	// Returns the link mode to set according to the options
 	LinkMode GetConfiguredLinkMode();
+
+	void IdentifyRom();
 
 	// Start GDB listener
 	void GDBBreak();
@@ -429,6 +435,16 @@ public:
 	char* rewind_mem; // should be u8, really
 	int num_rewind_states;
 	int next_rewind_state;
+
+	// Loaded rom information
+	IMAGE_TYPE loaded;
+	wxFileName loaded_game;
+	u32 rom_crc32;
+	wxString rom_name;
+	wxString rom_scene_rls;
+	wxString rom_scene_rls_name;
+	u32 rom_size;
+
 	// FIXME: size this properly
 #define REWIND_SIZE 400000
 	// FIXME: make this a config option
@@ -458,9 +474,6 @@ protected:
 	// set minsize of frame & panel to scaled screen size
 	void AdjustMinSize();
 
-	IMAGE_TYPE loaded;
-	u32 rom_size;
-	wxFileName loaded_game;
 	wxString batdir, statedir;
 
 	int basic_width, basic_height;
