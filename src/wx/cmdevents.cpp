@@ -462,6 +462,12 @@ static bool maker_lt(const rom_maker &r1, const rom_maker &r2)
 	return wxStrcmp(r1.code, r2.code) < 0;
 }
 
+void SetDialogLabel(wxDialog* dlg, wxChar* id, wxString ts, size_t l)
+{
+	ts.Replace(wxT("&"), wxT("&&"), true);
+	(dynamic_cast<wxControl*>((*dlg).FindWindow(wxXmlResource::GetXRCID(id))))->SetLabel(ts);
+}
+
 EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
 {
 	wxString s;
@@ -719,8 +725,15 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
 
 	case IMAGE_GBA:
 	{
+		IdentifyRom();
 		wxDialog* dlg = GetXRCDialog("GBAROMInfo");
-		setlabs("Title", rom[0xa0], 12);
+		wxString rom_crc32;
+		rom_crc32.Printf(wxT("%08X"), panel->rom_crc32);
+		SetDialogLabel(dlg, wxT("Title"), panel->rom_name, 30);
+		setlabs("IntTitle", rom[0xa0], 12);
+		SetDialogLabel(dlg, wxT("Scene"), panel->rom_scene_rls_name, 30);
+		SetDialogLabel(dlg, wxT("Release"), panel->rom_scene_rls, 4);
+		SetDialogLabel(dlg, wxT("CRC32"), rom_crc32, 8);
 		setlabs("GameCode", rom[0xac], 4);
 		setlabs("MakerCode", rom[0xb0], 2);
 		const rom_maker m = { s.c_str() }, *rm;

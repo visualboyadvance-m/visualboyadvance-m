@@ -12,6 +12,7 @@
 #include <wx/wfstream.h>
 #include <wx/mstream.h>
 #include <wx/sstream.h>
+#include <wx/txtstrm.h>
 #include <wx/cmdline.h>
 #include <wx/regex.h>
 
@@ -195,6 +196,27 @@ bool wxvbamApp::OnInit()
 	for (int i = config_path.size() - 1; i >= 0 ; i--)
 	{
 		wxFileName fn(config_path[i], wxT("vba-over.ini"));
+		wxFileName rdb(config_path[i], wxT("Nintendo - Game Boy Advance*.dat"));
+		wxFileName scene_rdb(config_path[i], wxT("Nintendo - Game Boy Advance (Scene)*.dat"));
+		wxString f = wxFindFirstFile(scene_rdb.GetFullPath(), wxFILE);
+
+		if (!f.empty() && wxFileName(f).IsFileReadable())
+			rom_database_scene = f;
+
+		f = wxFindFirstFile(rdb.GetFullPath(), wxFILE);
+
+		while (!f.empty())
+		{
+			if (f == rom_database_scene.GetFullPath())
+			{
+				f = wxFindNextFile();
+			}
+			else if (wxFileName(f).IsFileReadable())
+			{
+				rom_database = f;
+				break;
+			}
+		}
 
 		if (!fn.IsFileReadable())
 			continue;
@@ -842,6 +864,66 @@ LinkMode MainFrame::GetConfiguredLinkMode()
 	}
 
 	return LINK_DISCONNECTED;
+}
+
+void MainFrame::IdentifyRom()
+{
+	if (!panel->rom_name.empty())
+		return;
+
+	panel->rom_name = panel->loaded_game.GetFullName();
+	wxString name;
+	wxString scene_rls;
+	wxString scene_name;
+	wxString rom_crc32_str;
+	rom_crc32_str.Printf(_("crc %08X"), panel->rom_crc32);
+
+	if (wxGetApp().rom_database_scene.FileExists())
+	{
+		wxFileInputStream input(wxGetApp().rom_database_scene.GetFullPath());
+		wxTextInputStream text(input, wxT("\x09"), wxConvUTF8);
+
+		while (input.IsOk() && !input.Eof())
+		{
+			wxString line = text.ReadLine();
+
+			if (line.StartsWith(wxT("\tname")))
+			{
+				scene_rls = line.AfterFirst('[').BeforeFirst(']');
+				scene_name = line.AfterLast(' ').BeforeLast('"');
+			}
+
+			if (line.StartsWith(wxT("\trom")) && line.Contains(rom_crc32_str))
+			{
+				panel->rom_scene_rls = scene_rls;
+				panel->rom_scene_rls_name = scene_name;
+				panel->rom_name = scene_name;
+				break;
+			}
+		}
+	}
+
+	if (wxGetApp().rom_database.FileExists())
+	{
+		wxFileInputStream input(wxGetApp().rom_database.GetFullPath());
+		wxTextInputStream text(input, wxT("\x09"), wxConvUTF8);
+
+		while (input.IsOk() && !input.Eof())
+		{
+			wxString line = text.ReadLine();
+
+			if (line.StartsWith(wxT("\tname")))
+			{
+				name = line.AfterFirst('"').BeforeLast('"');
+			}
+
+			if (line.StartsWith(wxT("\trom")) && line.Contains(rom_crc32_str))
+			{
+				panel->rom_name = name;
+				break;
+			}
+		}
+	}
 }
 
 // global event filter

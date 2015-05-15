@@ -31,6 +31,9 @@ GameArea::GameArea()
 
 void GameArea::LoadGame(const wxString &name)
 {
+	rom_scene_rls = wxT("-");
+	rom_scene_rls_name = wxT("-");
+	rom_name = wxT("");
 	// fex just crashes if file does not exist and it's compressed,
 	// so check first
 	wxFileName fnfn(name);
@@ -221,6 +224,8 @@ void GameArea::LoadGame(const wxString &name)
 			return;
 		}
 
+		rom_crc32 = crc32(0L, rom, rom_size);
+
 		if (loadpatch)
 		{
 			// don't use real rom size or it might try to resize rom[]
@@ -233,13 +238,6 @@ void GameArea::LoadGame(const wxString &name)
 			// that means we no longer really know rom_size either <sigh>
 		}
 
-#if 0 // disabled in win32 version for undocumented "problems"
-
-		// FIXME: store original value
-		if (gopts.skip_intro)
-			*((u32*)rom) = 0xea00002e;
-
-#endif
 		wxFileConfig* cfg = wxGetApp().overrides;
 		wxString id = wxString((const char*)&rom[0xac], wxConvLibc, 4);
 
