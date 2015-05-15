@@ -15,17 +15,18 @@
 // since the ALC typedefs are broken on Mac:
 
 #ifdef __WXMAC__
-typedef ALCcontext *   (ALC_APIENTRY *LPALCCREATECONTEXT) (ALCdevice *device, const ALCint *attrlist);
-typedef ALCboolean     (ALC_APIENTRY *LPALCMAKECONTEXTCURRENT)( ALCcontext *context );
-typedef void           (ALC_APIENTRY *LPALCDESTROYCONTEXT)( ALCcontext *context );
-typedef ALCdevice *    (ALC_APIENTRY *LPALCOPENDEVICE)( const ALCchar *devicename );
-typedef ALCboolean     (ALC_APIENTRY *LPALCCLOSEDEVICE)( ALCdevice *device );
-typedef ALCboolean     (ALC_APIENTRY *LPALCISEXTENSIONPRESENT)( ALCdevice *device, const ALCchar *extname );
-typedef const ALCchar* (ALC_APIENTRY *LPALCGETSTRING)( ALCdevice *device, ALCenum param );
+typedef ALCcontext*    (ALC_APIENTRY* LPALCCREATECONTEXT)(ALCdevice* device, const ALCint* attrlist);
+typedef ALCboolean(ALC_APIENTRY* LPALCMAKECONTEXTCURRENT)(ALCcontext* context);
+typedef void (ALC_APIENTRY* LPALCDESTROYCONTEXT)(ALCcontext* context);
+typedef ALCdevice*     (ALC_APIENTRY* LPALCOPENDEVICE)(const ALCchar* devicename);
+typedef ALCboolean(ALC_APIENTRY* LPALCCLOSEDEVICE)(ALCdevice* device);
+typedef ALCboolean(ALC_APIENTRY* LPALCISEXTENSIONPRESENT)(ALCdevice* device, const ALCchar* extname);
+typedef const ALCchar* (ALC_APIENTRY* LPALCGETSTRING)(ALCdevice* device, ALCenum param);
 #endif
 
 // no more use of copyrighted OpenAL code just to load the stupid library
-struct OPENALFNTABLE {
+struct OPENALFNTABLE
+{
 	//LPALENABLE alEnable;
 	//LPALDISABLE alDisable;
 	//LPALISENABLED alIsEnabled;
