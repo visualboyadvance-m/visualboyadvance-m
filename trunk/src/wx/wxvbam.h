@@ -81,6 +81,7 @@ public:
 
 	wxFileName rom_database;
 	wxFileName rom_database_scene;
+	wxFileName rom_database_nointro;
 
 	wxString data_path;
 

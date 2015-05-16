@@ -200,7 +200,13 @@ bool wxvbamApp::OnInit()
 		wxFileName fn(config_path[i], wxT("vba-over.ini"));
 		wxFileName rdb(config_path[i], wxT("Nintendo - Game Boy Advance*.dat"));
 		wxFileName scene_rdb(config_path[i], wxT("Nintendo - Game Boy Advance (Scene)*.dat"));
-		wxString f = wxFindFirstFile(scene_rdb.GetFullPath(), wxFILE);
+		wxFileName nointro_rdb(config_path[i], wxT("Official No-Intro Nintendo Gameboy Advance Number (Date).xml"));
+		wxString f = wxFindFirstFile(nointro_rdb.GetFullPath(), wxFILE);
+
+		if (!f.empty() && wxFileName(f).IsFileReadable())
+			rom_database_nointro = f;
+
+		f = wxFindFirstFile(scene_rdb.GetFullPath(), wxFILE);
 
 		if (!f.empty() && wxFileName(f).IsFileReadable())
 			rom_database_scene = f;
@@ -588,10 +594,8 @@ void MainFrame::DownloadFile(wxString host, wxString url)
 
 			while (entry = zip.GetNextEntry())
 			{
-				// access meta-data
 				wxFileName name(wxGetApp().data_path, entry->GetName(), wxEmptyString);
 
-				// read 'zip' to access the entry's data
 				if (!entry->IsDir())
 				{
 					zip.OpenEntry(*entry);
@@ -925,7 +929,29 @@ void MainFrame::IdentifyRom()
 	wxString scene_rls;
 	wxString scene_name;
 	wxString rom_crc32_str;
-	rom_crc32_str.Printf(_("crc %08X"), panel->rom_crc32);
+	rom_crc32_str.Printf(_("%08X"), panel->rom_crc32);
+
+	if (wxGetApp().rom_database_nointro.FileExists())
+	{
+		wxFileInputStream input(wxGetApp().rom_database_nointro.GetFullPath());
+		wxTextInputStream text(input, wxT("\x09"), wxConvUTF8);
+
+		while (input.IsOk() && !input.Eof())
+		{
+			wxString line = text.ReadLine();
+
+			if (line.Contains(wxT("<releaseNumber>")))
+			{
+				scene_rls = line.AfterFirst('>').BeforeLast('<');
+			}
+
+			if (line.Contains(wxT("romCRC ")) && line.Contains(rom_crc32_str))
+			{
+				panel->rom_scene_rls = scene_rls;
+				break;
+			}
+		}
+	}
 
 	if (wxGetApp().rom_database_scene.FileExists())
 	{
@@ -938,13 +964,11 @@ void MainFrame::IdentifyRom()
 
 			if (line.StartsWith(wxT("\tname")))
 			{
-				scene_rls = line.AfterFirst('[').BeforeFirst(']');
 				scene_name = line.AfterLast(' ').BeforeLast('"');
 			}
 
-			if (line.StartsWith(wxT("\trom")) && line.Contains(rom_crc32_str))
+			if (line.StartsWith(wxT("\trom")) && line.Contains(wxT("crc ") + rom_crc32_str))
 			{
-				panel->rom_scene_rls = scene_rls;
 				panel->rom_scene_rls_name = scene_name;
 				panel->rom_name = scene_name;
 				break;
@@ -966,7 +990,7 @@ void MainFrame::IdentifyRom()
 				name = line.AfterFirst('"').BeforeLast('"');
 			}
 
-			if (line.StartsWith(wxT("\trom")) && line.Contains(rom_crc32_str))
+			if (line.StartsWith(wxT("\trom")) && line.Contains(wxT("crc ") + rom_crc32_str))
 			{
 				panel->rom_name = name;
 				break;

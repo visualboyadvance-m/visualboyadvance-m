@@ -2508,13 +2508,14 @@ EVT_HANDLER(Translate, "Translations")
 
 EVT_HANDLER(UpdateRDB, "Update ROM database")
 {
-	int ret = wxMessageBox(_("This will download and update two GBA No-Intro DAT files.  Do you want to continue?"),
+	int ret = wxMessageBox(_("This will download and update three GBA No-Intro DAT files.  Do you want to continue?"),
 	                       _("Confirm Update"), wxYES_NO | wxICON_EXCLAMATION);
 
 	if (ret == wxYES)
 	{
 		DownloadFile(_T("sourceforge.net"), _T("/p/vbam/code/HEAD/tree/trunk/data/Nintendo%20-%20Game%20Boy%20Advance.zip?format=raw"));
 		DownloadFile(_T("sourceforge.net"), _T("/p/vbam/code/HEAD/tree/trunk/data/Nintendo%20-%20Game%20Boy%20Advance%20%28Scene%29.zip?format=raw"));
+		DownloadFile(_T("sourceforge.net"), _T("/p/vbam/code/HEAD/tree/trunk/data/Official%20No-Intro%20Nintendo%20Gameboy%20Advance%20Number%20%28Date%29.zip?format=raw"));
 	}
 }
 
