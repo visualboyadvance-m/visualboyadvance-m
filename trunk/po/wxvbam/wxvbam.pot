@@ -3,13 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: ../src/wx/guiinit.cpp:2198
+#: ../src/wx/guiinit.cpp:2660
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-13 00:20+1000\n"
+"POT-Creation-Date: 2015-05-16 14:01+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/wx/cmdevents.cpp:94
+#: ../src/wx/cmdevents.cpp:106
 msgid ""
 "Archives (*.zip;*.7z;*.rar)|*.zip;*.7z;*.rar|GameBoy Advance Files (*.agb;*."
 "gba;*.bin;*.elf;*.mb)|*.agb;*.gba;*.bin;*.elf;*.mb*.agb.gz;*.gba.gz;*.bin.gz;"
@@ -27,124 +27,124 @@ msgid ""
 "gz;*.cgb.gz;*.sgb.gz*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z|"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:107
+#: ../src/wx/cmdevents.cpp:119
 msgid "Open ROM file"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:475 ../src/wx/cmdevents.cpp:562
-#: ../src/wx/cmdevents.cpp:591 ../src/wx/cmdevents.cpp:645
+#: ../src/wx/cmdevents.cpp:514 ../src/wx/cmdevents.cpp:631
+#: ../src/wx/cmdevents.cpp:671 ../src/wx/cmdevents.cpp:747
 msgid "Unknown"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:481
+#: ../src/wx/cmdevents.cpp:523
 msgid "ROM"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:484
+#: ../src/wx/cmdevents.cpp:527
 msgid "ROM+MBC1"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:487
+#: ../src/wx/cmdevents.cpp:531
 msgid "ROM+MBC1+RAM"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:490
+#: ../src/wx/cmdevents.cpp:535
 msgid "ROM+MBC1+RAM+BATT"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:493
+#: ../src/wx/cmdevents.cpp:539
 msgid "ROM+MBC2"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:496
+#: ../src/wx/cmdevents.cpp:543
 msgid "ROM+MBC2+BATT"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:499
+#: ../src/wx/cmdevents.cpp:547
 msgid "ROM+MMM01"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:502
+#: ../src/wx/cmdevents.cpp:551
 msgid "ROM+MMM01+RAM"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:505
+#: ../src/wx/cmdevents.cpp:555
 msgid "ROM+MMM01+RAM+BATT"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:508
+#: ../src/wx/cmdevents.cpp:559
 msgid "ROM+MBC3+TIMER+BATT"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:511
+#: ../src/wx/cmdevents.cpp:563
 msgid "ROM+MBC3+TIMER+RAM+BATT"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:514
+#: ../src/wx/cmdevents.cpp:567
 msgid "ROM+MBC3"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:517
+#: ../src/wx/cmdevents.cpp:571
 msgid "ROM+MBC3+RAM"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:520
+#: ../src/wx/cmdevents.cpp:575
 msgid "ROM+MBC3+RAM+BATT"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:523
+#: ../src/wx/cmdevents.cpp:579
 msgid "ROM+MBC5"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:526
+#: ../src/wx/cmdevents.cpp:583
 msgid "ROM+MBC5+RAM"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:529
+#: ../src/wx/cmdevents.cpp:587
 msgid "ROM+MBC5+RAM+BATT"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:532
+#: ../src/wx/cmdevents.cpp:591
 msgid "ROM+MBC5+RUMBLE"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:535
+#: ../src/wx/cmdevents.cpp:595
 msgid "ROM+MBC5+RUMBLE+RAM"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:538
+#: ../src/wx/cmdevents.cpp:599
 msgid "ROM+MBC5+RUMBLE+RAM+BATT"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:541
+#: ../src/wx/cmdevents.cpp:603
 msgid "ROM+MBC7+BATT"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:544 ../src/wx/guiinit.cpp:607
+#: ../src/wx/cmdevents.cpp:607 ../src/wx/guiinit.cpp:725
 msgid "GameGenie"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:547
+#: ../src/wx/cmdevents.cpp:611
 msgid "GameShark V3.0"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:550
+#: ../src/wx/cmdevents.cpp:615
 msgid "ROM+POCKET CAMERA"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:553
+#: ../src/wx/cmdevents.cpp:619
 msgid "ROM+BANDAI TAMA5"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:556
+#: ../src/wx/cmdevents.cpp:623
 msgid "ROM+HuC-3"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:559
+#: ../src/wx/cmdevents.cpp:627
 msgid "ROM+HuC-1"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:596 ../src/wx/guiinit.cpp:1509
+#: ../src/wx/cmdevents.cpp:679 ../src/wx/guiinit.cpp:1830
 #: ../src/wx/xrc/DisplayConfig.xrc:77 ../src/wx/xrc/DisplayConfig.xrc:221
 #: ../src/wx/xrc/DisplayConfig.xrc:270
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
@@ -153,230 +153,240 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:671 ../src/wx/cmdevents.cpp:685
+#: ../src/wx/cmdevents.cpp:778 ../src/wx/cmdevents.cpp:794
 msgid "Select Dot Code file"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:673 ../src/wx/cmdevents.cpp:687
+#: ../src/wx/cmdevents.cpp:780 ../src/wx/cmdevents.cpp:796
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:703 ../src/wx/cmdevents.cpp:865
+#: ../src/wx/cmdevents.cpp:815 ../src/wx/cmdevents.cpp:1029
 msgid "Select battery file"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:704 ../src/wx/cmdevents.cpp:866
+#: ../src/wx/cmdevents.cpp:816 ../src/wx/cmdevents.cpp:1030
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:710
+#: ../src/wx/cmdevents.cpp:824
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:711 ../src/wx/cmdevents.cpp:736
-#: ../src/wx/cmdevents.cpp:833
+#: ../src/wx/cmdevents.cpp:825 ../src/wx/cmdevents.cpp:856
+#: ../src/wx/cmdevents.cpp:989
 msgid "Confirm import"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:715 ../src/wx/panel.cpp:312
+#: ../src/wx/cmdevents.cpp:832 ../src/wx/panel.cpp:368
 #, c-format
 msgid "Loaded battery %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:717
+#: ../src/wx/cmdevents.cpp:834
 #, c-format
 msgid "Error loading battery %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:725
+#: ../src/wx/cmdevents.cpp:843
 msgid "Select code file"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:727
+#: ../src/wx/cmdevents.cpp:845
 msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:728
+#: ../src/wx/cmdevents.cpp:846
 msgid "Gameshark Code File (*.gcf)|*.gcf"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:735
+#: ../src/wx/cmdevents.cpp:855
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:749
+#: ../src/wx/cmdevents.cpp:875
 #, c-format
 msgid "Cannot open file %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:759
+#: ../src/wx/cmdevents.cpp:888
 #, c-format
 msgid "Unsupported code file %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:810
+#: ../src/wx/cmdevents.cpp:963
 #, c-format
 msgid "Loaded code file %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:812
+#: ../src/wx/cmdevents.cpp:965
 #, c-format
 msgid "Error loading code file %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:822 ../src/wx/cmdevents.cpp:888
+#: ../src/wx/cmdevents.cpp:976 ../src/wx/cmdevents.cpp:1058
 msgid "Select snapshot file"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:824
+#: ../src/wx/cmdevents.cpp:978
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots (*.gsv)|"
 "*.gsv"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:825
+#: ../src/wx/cmdevents.cpp:979
 msgid "Gameboy Snapshot (*.gbs)|*.gbs"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:832
+#: ../src/wx/cmdevents.cpp:988
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:854
+#: ../src/wx/cmdevents.cpp:1016
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:856
+#: ../src/wx/cmdevents.cpp:1018
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:874 ../src/wx/panel.cpp:567
+#: ../src/wx/cmdevents.cpp:1041 ../src/wx/panel.cpp:664
 #, c-format
 msgid "Wrote battery %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:876 ../src/wx/panel.cpp:569
+#: ../src/wx/cmdevents.cpp:1043 ../src/wx/panel.cpp:666
 #, c-format
 msgid "Error writing battery %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:883
+#: ../src/wx/cmdevents.cpp:1052
 msgid "EEPROM saves cannot be exported"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:889
+#: ../src/wx/cmdevents.cpp:1059
 msgid "Gameshark Snapshot (*.sps)|*.sps"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:901
+#: ../src/wx/cmdevents.cpp:1073
 msgid "Exported from VisualBoyAdvance-M"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:911
+#: ../src/wx/cmdevents.cpp:1085
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:913
+#: ../src/wx/cmdevents.cpp:1087
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:934 ../src/wx/cmdevents.cpp:1011
-#: ../src/wx/cmdevents.cpp:1083 ../src/wx/cmdevents.cpp:1119
-#: ../src/wx/viewers.cpp:495 ../src/wx/viewers.cpp:664
-#: ../src/wx/viewsupt.cpp:1024
+#: ../src/wx/cmdevents.cpp:1118 ../src/wx/cmdevents.cpp:1219
+#: ../src/wx/cmdevents.cpp:1311 ../src/wx/cmdevents.cpp:1354
+#: ../src/wx/viewers.cpp:555 ../src/wx/viewers.cpp:750
+#: ../src/wx/viewsupt.cpp:1239
 msgid "Select output file"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:935 ../src/wx/viewsupt.cpp:1025
+#: ../src/wx/cmdevents.cpp:1119 ../src/wx/viewsupt.cpp:1240
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:954 ../src/wx/sys.cpp:401
+#: ../src/wx/cmdevents.cpp:1144 ../src/wx/sys.cpp:493
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:975 ../src/wx/cmdevents.cpp:1047
+#: ../src/wx/cmdevents.cpp:1170 ../src/wx/cmdevents.cpp:1262
 msgid " files ("
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1120 ../src/wx/cmdevents.cpp:1151
+#: ../src/wx/cmdevents.cpp:1355 ../src/wx/cmdevents.cpp:1393
 msgid "VBA Movie files|*.vmv"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1150
+#: ../src/wx/cmdevents.cpp:1392
 msgid "Select file"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1295 ../src/wx/cmdevents.cpp:1377
+#: ../src/wx/cmdevents.cpp:1543 ../src/wx/cmdevents.cpp:1628
 msgid "Select state file"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1296 ../src/wx/cmdevents.cpp:1378
+#: ../src/wx/cmdevents.cpp:1544 ../src/wx/cmdevents.cpp:1629
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1607
+#: ../src/wx/cmdevents.cpp:1864
 msgid "Sound enabled"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1607
+#: ../src/wx/cmdevents.cpp:1864
 msgid "Sound disabled"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1618 ../src/wx/cmdevents.cpp:1630
+#: ../src/wx/cmdevents.cpp:1877 ../src/wx/cmdevents.cpp:1891
 #, c-format
 msgid "Volume: %d%%"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1697
+#: ../src/wx/cmdevents.cpp:1960
 msgid "Set to 0 for pseudo tty"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1699
+#: ../src/wx/cmdevents.cpp:1962
 msgid "Port to wait for connection:"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1700
+#: ../src/wx/cmdevents.cpp:1963
 msgid "GDB Connection"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1739
+#: ../src/wx/cmdevents.cpp:2006
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1746
+#: ../src/wx/cmdevents.cpp:2014
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1748
+#: ../src/wx/cmdevents.cpp:2017
 msgid "Waiting for GDB..."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2166
+#: ../src/wx/cmdevents.cpp:2511
+msgid ""
+"This will download and update two GBA No-Intro DAT files.  Do you want to "
+"continue?"
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:2512
+msgid "Confirm Update"
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:2531
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2167
+#: ../src/wx/cmdevents.cpp:2532
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2015 VBA-M development team"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2168
+#: ../src/wx/cmdevents.cpp:2533
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -392,643 +402,643 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2391
+#: ../src/wx/cmdevents.cpp:2756
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2396
+#: ../src/wx/cmdevents.cpp:2763
 msgid "Network is not supported in local mode."
 msgstr ""
 
-#: ../src/wx/dsound.cpp:94 ../src/wx/dsound.cpp:105
+#: ../src/wx/dsound.cpp:99 ../src/wx/dsound.cpp:114
 #, c-format
 msgid "Cannot create DirectSound %08x"
 msgstr ""
 
-#: ../src/wx/dsound.cpp:110
+#: ../src/wx/dsound.cpp:120
 #, c-format
 msgid "Cannot SetCooperativeLevel %08x"
 msgstr ""
 
-#: ../src/wx/dsound.cpp:124
+#: ../src/wx/dsound.cpp:136
 #, c-format
 msgid "Cannot CreateSoundBuffer %08x"
 msgstr ""
 
-#: ../src/wx/dsound.cpp:144
+#: ../src/wx/dsound.cpp:156
 #, c-format
 msgid "CreateSoundBuffer(primary) failed %08x"
 msgstr ""
 
-#: ../src/wx/dsound.cpp:160
+#: ../src/wx/dsound.cpp:175
 #, c-format
 msgid "CreateSoundBuffer(secondary) failed %08x"
 msgstr ""
 
-#: ../src/wx/dsound.cpp:165
+#: ../src/wx/dsound.cpp:181
 #, c-format
 msgid "dsbSecondary->SetCurrentPosition failed %08x"
 msgstr ""
 
-#: ../src/wx/dsound.cpp:189
+#: ../src/wx/dsound.cpp:208
 #, c-format
 msgid "Cannot Play primary %08x"
 msgstr ""
 
-#: ../src/wx/dsound.cpp:307
+#: ../src/wx/dsound.cpp:336
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
 msgstr ""
 
-#: ../src/wx/gfxviewers.cpp:1098
+#: ../src/wx/gfxviewers.cpp:1274
 msgid "Select output file and type"
 msgstr ""
 
-#: ../src/wx/gfxviewers.cpp:1099
+#: ../src/wx/gfxviewers.cpp:1275
 msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:68
+#: ../src/wx/guiinit.cpp:69
 msgid "Start!"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:72 ../src/wx/xrc/NetLink.xrc:85
+#: ../src/wx/guiinit.cpp:73 ../src/wx/xrc/NetLink.xrc:85
 msgid "Connect"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:86
+#: ../src/wx/guiinit.cpp:89
 msgid "You must enter a valid host name"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:87
+#: ../src/wx/guiinit.cpp:90
 msgid "Host name invalid"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:110
+#: ../src/wx/guiinit.cpp:109
 msgid "Waiting for clients..."
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:111
+#: ../src/wx/guiinit.cpp:110
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:113
+#: ../src/wx/guiinit.cpp:114
 msgid "Waiting for connection..."
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:114
+#: ../src/wx/guiinit.cpp:115
 #, c-format
 msgid "Connecting to %s\n"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:148
+#: ../src/wx/guiinit.cpp:153
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:217 ../src/wx/guiinit.cpp:240
+#: ../src/wx/guiinit.cpp:229 ../src/wx/guiinit.cpp:260
 msgid "Select cheat file"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:218 ../src/wx/guiinit.cpp:241
+#: ../src/wx/guiinit.cpp:230 ../src/wx/guiinit.cpp:261
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:232 ../src/wx/panel.cpp:338
+#: ../src/wx/guiinit.cpp:249 ../src/wx/panel.cpp:401
 msgid "Loaded cheats"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:255
+#: ../src/wx/guiinit.cpp:279
 msgid "Saved cheats"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:279 ../src/wx/guiinit.cpp:296
+#: ../src/wx/guiinit.cpp:310 ../src/wx/guiinit.cpp:334
 msgid "Restore old values?"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:280 ../src/wx/guiinit.cpp:297
+#: ../src/wx/guiinit.cpp:311 ../src/wx/guiinit.cpp:335
 msgid "Removing cheats"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:606 ../src/wx/xrc/JoyPanel.xrc:244
+#: ../src/wx/guiinit.cpp:724 ../src/wx/xrc/JoyPanel.xrc:244
 msgid "GameShark"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:609
+#: ../src/wx/guiinit.cpp:729
 msgid "Generic Code"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:610
+#: ../src/wx/guiinit.cpp:730
 msgid "GameShark Advance"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:611
+#: ../src/wx/guiinit.cpp:731
 msgid "CodeBreaker Advance"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:670 ../src/wx/guiinit.cpp:876
+#: ../src/wx/guiinit.cpp:793 ../src/wx/guiinit.cpp:1060
 msgid "Number cannot be empty"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:698
+#: ../src/wx/guiinit.cpp:834
 #, c-format
 msgid "Search produced %d results.  Please refine better"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:708
+#: ../src/wx/guiinit.cpp:847
 msgid "Search produced no results"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:848
+#: ../src/wx/guiinit.cpp:1022
 msgid "8-bit "
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:851
+#: ../src/wx/guiinit.cpp:1026
 msgid "16-bit "
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:854
+#: ../src/wx/guiinit.cpp:1030
 msgid "32-bit "
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:859
+#: ../src/wx/guiinit.cpp:1037
 msgid "signed decimal"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:862
+#: ../src/wx/guiinit.cpp:1041
 msgid "unsigned decimal"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:865
+#: ../src/wx/guiinit.cpp:1045
 msgid "unsigned hexadecimal"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1288
+#: ../src/wx/guiinit.cpp:1566
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1299
+#: ../src/wx/guiinit.cpp:1577
 msgid "Default device"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1413
+#: ../src/wx/guiinit.cpp:1717
 msgid "Desktop mode"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1419
+#: ../src/wx/guiinit.cpp:1725
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1546
+#: ../src/wx/guiinit.cpp:1875
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1563 ../src/wx/xrc/DisplayConfig.xrc:242
+#: ../src/wx/guiinit.cpp:1898 ../src/wx/xrc/DisplayConfig.xrc:242
 msgid "Plugin"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1586
+#: ../src/wx/guiinit.cpp:1931
 msgid "Please select a plugin or a different filter"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1587
+#: ../src/wx/guiinit.cpp:1932
 msgid "Plugin selection error"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1762
+#: ../src/wx/guiinit.cpp:2136
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1763
+#: ../src/wx/guiinit.cpp:2137
 msgid "Confirm"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2178
+#: ../src/wx/guiinit.cpp:2639
 msgid "Main display panel not found"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2192
+#: ../src/wx/guiinit.cpp:2654
 msgid "Main icon not found"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2296
+#: ../src/wx/guiinit.cpp:2779
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2309
+#: ../src/wx/guiinit.cpp:2796
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2411
+#: ../src/wx/guiinit.cpp:2912
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2592
+#: ../src/wx/guiinit.cpp:3093
 msgid "Code"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2601
+#: ../src/wx/guiinit.cpp:3102
 msgid "Description"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2678 ../src/wx/xrc/CheatAdd.xrc:30
+#: ../src/wx/guiinit.cpp:3176 ../src/wx/xrc/CheatAdd.xrc:30
 msgid "Address"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2679
+#: ../src/wx/guiinit.cpp:3177
 msgid "Old Value"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2680
+#: ../src/wx/guiinit.cpp:3178
 msgid "New Value"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3119
+#: ../src/wx/guiinit.cpp:3621
 msgid "Menu commands"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3140
+#: ../src/wx/guiinit.cpp:3648
 msgid "Other commands"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3233
+#: ../src/wx/guiinit.cpp:3753
 msgid "JoyBus host invalid; disabling"
 msgstr ""
 
-#: ../src/wx/openal.cpp:162
+#: ../src/wx/openal.cpp:157
 msgid ""
 "OpenAL library could not be found on your system.  Please install the "
 "runtime from http://openal.org"
 msgstr ""
 
-#: ../src/wx/opts.cpp:442 ../src/wx/opts.cpp:686
+#: ../src/wx/opts.cpp:499 ../src/wx/opts.cpp:834
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr ""
 
-#: ../src/wx/opts.cpp:464 ../src/wx/opts.cpp:701
+#: ../src/wx/opts.cpp:532 ../src/wx/opts.cpp:856
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr ""
 
-#: ../src/wx/opts.cpp:513 ../src/wx/opts.cpp:530 ../src/wx/opts.cpp:755
-#: ../src/wx/opts.cpp:775
+#: ../src/wx/opts.cpp:600 ../src/wx/opts.cpp:625 ../src/wx/opts.cpp:935
+#: ../src/wx/opts.cpp:964
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr ""
 
-#: ../src/wx/opts.cpp:667
+#: ../src/wx/opts.cpp:808
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr ""
 
-#: ../src/wx/panel.cpp:62
+#: ../src/wx/panel.cpp:76
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr ""
 
-#: ../src/wx/panel.cpp:63 ../src/wx/panel.cpp:115 ../src/wx/panel.cpp:178
+#: ../src/wx/panel.cpp:77 ../src/wx/panel.cpp:139 ../src/wx/panel.cpp:222
 msgid "Problem loading file"
 msgstr ""
 
-#: ../src/wx/panel.cpp:114
+#: ../src/wx/panel.cpp:138
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr ""
 
-#: ../src/wx/panel.cpp:158 ../src/wx/panel.cpp:250
+#: ../src/wx/panel.cpp:193 ../src/wx/panel.cpp:301
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr ""
 
-#: ../src/wx/panel.cpp:177
+#: ../src/wx/panel.cpp:221
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr ""
 
-#: ../src/wx/panel.cpp:365
+#: ../src/wx/panel.cpp:435
 msgid " player "
 msgstr ""
 
-#: ../src/wx/panel.cpp:514
+#: ../src/wx/panel.cpp:607
 #, c-format
 msgid "Loaded state %s"
 msgstr ""
 
-#: ../src/wx/panel.cpp:514
+#: ../src/wx/panel.cpp:607
 #, c-format
 msgid "Error loading state %s"
 msgstr ""
 
-#: ../src/wx/panel.cpp:538
+#: ../src/wx/panel.cpp:631
 #, c-format
 msgid "Saved state %s"
 msgstr ""
 
-#: ../src/wx/panel.cpp:538
+#: ../src/wx/panel.cpp:631
 #, c-format
 msgid "Error saving state %s"
 msgstr ""
 
-#: ../src/wx/panel.cpp:709
+#: ../src/wx/panel.cpp:837
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr ""
 
-#: ../src/wx/panel.cpp:739
+#: ../src/wx/panel.cpp:878
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr ""
 
-#: ../src/wx/panel.cpp:743
+#: ../src/wx/panel.cpp:883
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr ""
 
-#: ../src/wx/panel.cpp:750
+#: ../src/wx/panel.cpp:893
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr ""
 
-#: ../src/wx/panel.cpp:753
+#: ../src/wx/panel.cpp:898
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr ""
 
-#: ../src/wx/panel.cpp:808
+#: ../src/wx/panel.cpp:967
 msgid "Not a valid GBA cartridge"
 msgstr ""
 
-#: ../src/wx/panel.cpp:887
+#: ../src/wx/panel.cpp:1079
 msgid "No memory for rewinding"
 msgstr ""
 
-#: ../src/wx/panel.cpp:894
+#: ../src/wx/panel.cpp:1087
 msgid "Error writing rewind state"
 msgstr ""
 
-#: ../src/wx/panel.cpp:1932
+#: ../src/wx/panel.cpp:2298
 msgid "Cannot create conversion buffer"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2000
+#: ../src/wx/panel.cpp:2373
 msgid "memory allocation error"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2002
+#: ../src/wx/panel.cpp:2376
 msgid "error initializing codec"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2004
+#: ../src/wx/panel.cpp:2379
 msgid "error writing to output file"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2006
+#: ../src/wx/panel.cpp:2382
 msgid "can't guess output format from file name"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2010
+#: ../src/wx/panel.cpp:2387
 msgid "programming error; aborting!"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2022 ../src/wx/panel.cpp:2050
+#: ../src/wx/panel.cpp:2400 ../src/wx/panel.cpp:2432
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2075
+#: ../src/wx/panel.cpp:2462
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2080
+#: ../src/wx/panel.cpp:2469
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2089
+#: ../src/wx/panel.cpp:2480
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr ""
 
-#: ../src/wx/sys.cpp:109 ../src/wx/sys.cpp:159
+#: ../src/wx/sys.cpp:124 ../src/wx/sys.cpp:187
 msgid "No game in progress to record"
 msgstr ""
 
-#: ../src/wx/sys.cpp:119
+#: ../src/wx/sys.cpp:139
 #, c-format
 msgid "Cannot open output file %s"
 msgstr ""
 
-#: ../src/wx/sys.cpp:124 ../src/wx/sys.cpp:144 ../src/wx/sys.cpp:270
+#: ../src/wx/sys.cpp:147 ../src/wx/sys.cpp:169 ../src/wx/sys.cpp:329
 msgid "Error writing game recording"
 msgstr ""
 
-#: ../src/wx/sys.cpp:163
+#: ../src/wx/sys.cpp:193
 msgid "Cannot play game recording while recording"
 msgstr ""
 
-#: ../src/wx/sys.cpp:174
+#: ../src/wx/sys.cpp:209
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr ""
 
-#: ../src/wx/sys.cpp:180 ../src/wx/sys.cpp:188
+#: ../src/wx/sys.cpp:218 ../src/wx/sys.cpp:229
 msgid "Error reading game recording"
 msgstr ""
 
-#: ../src/wx/sys.cpp:281
+#: ../src/wx/sys.cpp:345
 msgid "Playback ended"
 msgstr ""
 
-#: ../src/wx/sys.cpp:298
+#: ../src/wx/sys.cpp:364
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr ""
 
-#: ../src/wx/sys.cpp:304
+#: ../src/wx/sys.cpp:373
 #, c-format
 msgid "%d%%"
 msgstr ""
 
-#: ../src/wx/sys.cpp:667 ../src/wx/xrc/GBPrinter.xrc:65
+#: ../src/wx/sys.cpp:827 ../src/wx/xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr ""
 
-#: ../src/wx/sys.cpp:702
+#: ../src/wx/sys.cpp:861
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr ""
 
-#: ../src/wx/sys.cpp:709
+#: ../src/wx/sys.cpp:870
 msgid "Save printer image to"
 msgstr ""
 
-#: ../src/wx/sys.cpp:720 ../src/wx/sys.cpp:890
+#: ../src/wx/sys.cpp:885 ../src/wx/sys.cpp:1094
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr ""
 
-#: ../src/wx/sys.cpp:724 ../src/wx/sys.cpp:792
+#: ../src/wx/sys.cpp:891 ../src/wx/sys.cpp:964
 msgid "&Close"
 msgstr ""
 
-#: ../src/wx/sys.cpp:788
+#: ../src/wx/sys.cpp:958
 msgid "Printed"
 msgstr ""
 
-#: ../src/wx/sys.cpp:1046
+#: ../src/wx/sys.cpp:1281
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr ""
 
-#: ../src/wx/sys.cpp:1132
+#: ../src/wx/sys.cpp:1380
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:493
+#: ../src/wx/viewers.cpp:553
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:615 ../src/wx/viewers.cpp:662
+#: ../src/wx/viewers.cpp:688 ../src/wx/viewers.cpp:748
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:617
+#: ../src/wx/viewers.cpp:690
 msgid "Select memory dump file"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:703
+#: ../src/wx/viewers.cpp:791
 msgid "0x00000000 - BIOS"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:704
+#: ../src/wx/viewers.cpp:792
 msgid "0x02000000 - WRAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:705
+#: ../src/wx/viewers.cpp:793
 msgid "0x03000000 - IRAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:706
+#: ../src/wx/viewers.cpp:794
 msgid "0x04000000 - I/O"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:707
+#: ../src/wx/viewers.cpp:795
 msgid "0x05000000 - PALETTE"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:708
+#: ../src/wx/viewers.cpp:796
 msgid "0x06000000 - VRAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:709
+#: ../src/wx/viewers.cpp:797
 msgid "0x07000000 - OAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:710
+#: ../src/wx/viewers.cpp:798
 msgid "0x08000000 - ROM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:798
+#: ../src/wx/viewers.cpp:903
 msgid "0x0000 - ROM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:799
+#: ../src/wx/viewers.cpp:904
 msgid "0x4000 - ROM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:800
+#: ../src/wx/viewers.cpp:905
 msgid "0x8000 - VRAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:801
+#: ../src/wx/viewers.cpp:906
 msgid "0xA000 - SRAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:802
+#: ../src/wx/viewers.cpp:907
 msgid "0xC000 - RAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:803
+#: ../src/wx/viewers.cpp:908
 msgid "0xD000 - WRAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:804
+#: ../src/wx/viewers.cpp:909
 msgid "0xFF00 - I/O"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:805
+#: ../src/wx/viewers.cpp:910
 msgid "0xFF80 - RAM"
 msgstr ""
 
-#: ../src/wx/viewsupt.cpp:676
+#: ../src/wx/viewsupt.cpp:817
 msgid "R:"
 msgstr ""
 
-#: ../src/wx/viewsupt.cpp:681
+#: ../src/wx/viewsupt.cpp:822
 msgid "G:"
 msgstr ""
 
-#: ../src/wx/viewsupt.cpp:686
+#: ../src/wx/viewsupt.cpp:827
 msgid "B:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:223
+#: ../src/wx/wxvbam.cpp:270
 msgid "Could not create main window"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:255
+#: ../src/wx/wxvbam.cpp:302
 msgid "Save built-in XRC file and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:257
+#: ../src/wx/wxvbam.cpp:306
 msgid "Save built-in vba-over.ini and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:259
+#: ../src/wx/wxvbam.cpp:310
 msgid "Print configuration path and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:261
+#: ../src/wx/wxvbam.cpp:314
 msgid "Start in full-screen mode"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:264
+#: ../src/wx/wxvbam.cpp:319
 msgid "Delete shared link state first, if it exists"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:270
+#: ../src/wx/wxvbam.cpp:327
 msgid "List all settable options and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:272
+#: ../src/wx/wxvbam.cpp:331
 msgid "ROM file"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:274
+#: ../src/wx/wxvbam.cpp:335
 msgid "<config>=<value>"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:294
+#: ../src/wx/wxvbam.cpp:359
 msgid "save-xrc"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:302
+#: ../src/wx/wxvbam.cpp:369
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:309
+#: ../src/wx/wxvbam.cpp:377
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
@@ -1037,19 +1047,19 @@ msgid ""
 "built-in:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:318
+#: ../src/wx/wxvbam.cpp:387
 msgid "print-cfg-path"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:323
+#: ../src/wx/wxvbam.cpp:392
 msgid "Configuration is read from, in order:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:328
+#: ../src/wx/wxvbam.cpp:398
 msgid "save-over"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:336
+#: ../src/wx/wxvbam.cpp:406
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
@@ -1057,13 +1067,13 @@ msgid ""
 "from search path:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:341
+#: ../src/wx/wxvbam.cpp:411
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:349
+#: ../src/wx/wxvbam.cpp:423
 msgid ""
 "Options set from the command line are saved if any configuration changes are "
 "made in the user interface.\n"
@@ -1072,149 +1082,154 @@ msgid ""
 "\n"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:354
+#: ../src/wx/wxvbam.cpp:430
 msgid "flag"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:355 ../src/wx/wxvbam.cpp:358
+#: ../src/wx/wxvbam.cpp:431 ../src/wx/wxvbam.cpp:434
 msgid "string"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:357
+#: ../src/wx/wxvbam.cpp:433
 msgid "int"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:368
+#: ../src/wx/wxvbam.cpp:450
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:398
+#: ../src/wx/wxvbam.cpp:500
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr ""
 
-#: ../src/wx/xaudio2.cpp:30
+#: ../src/wx/wxvbam.cpp:928
+#, c-format
+msgid "crc %08X"
+msgstr ""
+
+#: ../src/wx/xaudio2.cpp:32
 msgid "XAudio2: Enumerating devices failed!"
 msgstr ""
 
-#: ../src/wx/xaudio2.cpp:61 ../src/wx/xaudio2.cpp:351
+#: ../src/wx/xaudio2.cpp:75 ../src/wx/xaudio2.cpp:379
 msgid "The XAudio2 interface failed to initialize!"
 msgstr ""
 
-#: ../src/wx/xaudio2.cpp:387
+#: ../src/wx/xaudio2.cpp:411
 msgid "XAudio2: Creating mastering voice failed!"
 msgstr ""
 
-#: ../src/wx/xaudio2.cpp:396
+#: ../src/wx/xaudio2.cpp:421
 msgid "XAudio2: Creating source voice failed!"
 msgstr ""
 
-#: ../src/wx/viewsupt.h:38
+#: ../src/wx/viewsupt.h:39
 #, c-format
 msgid "Unable to load dialog %s from resources"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:78
+#: ../src/wx/widgets/joyedit.cpp:100
 #, c-format
 msgid "Joy%d-"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:82
+#: ../src/wx/widgets/joyedit.cpp:106
 #, c-format
 msgid "Axis%d+"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:85
+#: ../src/wx/widgets/joyedit.cpp:110
 #, c-format
 msgid "Axis%d-"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:88
+#: ../src/wx/widgets/joyedit.cpp:114
 #, c-format
 msgid "Button%d"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:91
+#: ../src/wx/widgets/joyedit.cpp:118
 #, c-format
 msgid "Hat%dN"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:94
+#: ../src/wx/widgets/joyedit.cpp:122
 #, c-format
 msgid "Hat%dS"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:97
+#: ../src/wx/widgets/joyedit.cpp:126
 #, c-format
 msgid "Hat%dW"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:100
+#: ../src/wx/widgets/joyedit.cpp:130
 #, c-format
 msgid "Hat%dE"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:103
+#: ../src/wx/widgets/joyedit.cpp:134
 #, c-format
 msgid "Hat%dNW"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:106
+#: ../src/wx/widgets/joyedit.cpp:138
 #, c-format
 msgid "Hat%dNE"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:109
+#: ../src/wx/widgets/joyedit.cpp:142
 #, c-format
 msgid "Hat%dSW"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:112
+#: ../src/wx/widgets/joyedit.cpp:146
 #, c-format
 msgid "Hat%dSE"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:139
+#: ../src/wx/widgets/joyedit.cpp:180
 msgid "^Joy([0-9]+)[-+]"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:141
+#: ../src/wx/widgets/joyedit.cpp:182
 msgid "Axis([0-9]+)([+-])"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:143
+#: ../src/wx/widgets/joyedit.cpp:184
 msgid "Button([0-9]+)"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:146
+#: ../src/wx/widgets/joyedit.cpp:187
 msgid ""
 "Hat([0-9]+)((N|North|U|Up)|(S|South|D|Down)|(E|East|R|Right)|(W|West|L|Left)|"
 "(NE|NorthEast|UR|UpRight)|(SE|SouthEast|DR|DownRight)|(SW|SouthWest|DL|"
 "DownLeft)|(NW|NorthWest|UL|UpLeft))"
 msgstr ""
 
-#: ../src/wx/widgets/keyedit.cpp:78 ../src/wx/widgets/keyedit.cpp:166
+#: ../src/wx/widgets/keyedit.cpp:100 ../src/wx/widgets/keyedit.cpp:206
 msgid "SHIFT"
 msgstr ""
 
-#: ../src/wx/widgets/keyedit.cpp:81 ../src/wx/widgets/keyedit.cpp:165
+#: ../src/wx/widgets/keyedit.cpp:104 ../src/wx/widgets/keyedit.cpp:205
 msgid "ALT"
 msgstr ""
 
-#: ../src/wx/widgets/keyedit.cpp:84 ../src/wx/widgets/keyedit.cpp:167
+#: ../src/wx/widgets/keyedit.cpp:108 ../src/wx/widgets/keyedit.cpp:207
 msgid "CTRL"
 msgstr ""
 
-#: ../src/wx/widgets/keyedit.cpp:95 ../src/wx/widgets/keyedit.cpp:139
+#: ../src/wx/widgets/keyedit.cpp:122 ../src/wx/widgets/keyedit.cpp:177
 msgid "Meta-"
 msgstr ""
 
-#: ../src/wx/widgets/keyedit.cpp:140
+#: ../src/wx/widgets/keyedit.cpp:178
 msgid "Meta+"
 msgstr ""
 
-#: ../src/wx/widgets/keyedit.cpp:168
+#: ../src/wx/widgets/keyedit.cpp:208
 msgid "CONTROL"
 msgstr ""
 
@@ -1767,39 +1782,59 @@ msgstr ""
 msgid "Notes:"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:10 ../src/wx/xrc/GBROMInfo.xrc:11
+#: ../src/wx/xrc/GBAROMInfo.xrc:4
+msgid "Rom Information"
+msgstr ""
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:11 ../src/wx/xrc/GBROMInfo.xrc:11
 msgid "Game title:"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:22
+#: ../src/wx/xrc/GBAROMInfo.xrc:23
+msgid "Internal title:"
+msgstr ""
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:35
+msgid "Scene Release:"
+msgstr ""
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:47
+msgid "Release Number:"
+msgstr ""
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:59
+msgid "CRC32:"
+msgstr ""
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:71
 msgid "Game code:"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:34 ../src/wx/xrc/GBROMInfo.xrc:23
+#: ../src/wx/xrc/GBAROMInfo.xrc:83 ../src/wx/xrc/GBROMInfo.xrc:23
 msgid "Maker code:"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:46 ../src/wx/xrc/GBROMInfo.xrc:35
+#: ../src/wx/xrc/GBAROMInfo.xrc:95 ../src/wx/xrc/GBROMInfo.xrc:35
 msgid "Maker name:"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:58
+#: ../src/wx/xrc/GBAROMInfo.xrc:107
 msgid "Main unit code:"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:70
+#: ../src/wx/xrc/GBAROMInfo.xrc:119
 msgid "Device type:"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:82 ../src/wx/xrc/GBROMInfo.xrc:71
+#: ../src/wx/xrc/GBAROMInfo.xrc:131 ../src/wx/xrc/GBROMInfo.xrc:71
 msgid "ROM version:"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:94 ../src/wx/xrc/GBROMInfo.xrc:83
+#: ../src/wx/xrc/GBAROMInfo.xrc:143 ../src/wx/xrc/GBROMInfo.xrc:83
 msgid "CRC:"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:101
+#: ../src/wx/xrc/GBAROMInfo.xrc:150
 msgid "ROM Information"
 msgstr ""
 
@@ -3157,6 +3192,10 @@ msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:611
 msgid "Translations"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:614
+msgid "Update ROM database"
 msgstr ""
 
 #: ../src/wx/xrc/MapViewer.xrc:15

@@ -610,6 +610,9 @@
       <object class="wxMenuItem" name="Translate">
         <label>Translations</label>
       </object>
+      <object class="wxMenuItem" name="UpdateRDB">
+        <label>Update ROM database</label>
+      </object>
       <object class="separator"/>
       <object class="wxMenuItem" name="wxID_ABOUT"/>
     </object>

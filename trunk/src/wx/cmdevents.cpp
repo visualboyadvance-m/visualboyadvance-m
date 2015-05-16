@@ -2,6 +2,7 @@
 #define __STDC_LIMIT_MACROS // required for ffmpeg
 #define __STDC_CONSTANT_MACROS // required for ffmpeg
 #endif
+
 #include "wxvbam.h"
 #include <algorithm>
 #include <wx/aboutdlg.h>
@@ -11,6 +12,7 @@
 #include <wx/regex.h>
 #include <wx/numdlg.h>
 #include <wx/progdlg.h>
+
 #ifndef NO_FFMPEG
 extern "C" {
 #include <libavformat/avformat.h>
@@ -2502,6 +2504,18 @@ EVT_HANDLER(FAQ, "VBA-M support forum")
 EVT_HANDLER(Translate, "Translations")
 {
 	wxLaunchDefaultBrowser(wxT("http://www.transifex.com/projects/p/vba-m"));
+}
+
+EVT_HANDLER(UpdateRDB, "Update ROM database")
+{
+	int ret = wxMessageBox(_("This will download and update two GBA No-Intro DAT files.  Do you want to continue?"),
+	                       _("Confirm Update"), wxYES_NO | wxICON_EXCLAMATION);
+
+	if (ret == wxYES)
+	{
+		DownloadFile(_T("sourceforge.net"), _T("/p/vbam/code/HEAD/tree/trunk/data/Nintendo%20-%20Game%20Boy%20Advance.zip?format=raw"));
+		DownloadFile(_T("sourceforge.net"), _T("/p/vbam/code/HEAD/tree/trunk/data/Nintendo%20-%20Game%20Boy%20Advance%20%28Scene%29.zip?format=raw"));
+	}
 }
 
 // was About
