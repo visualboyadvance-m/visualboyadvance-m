@@ -15,6 +15,8 @@
 #include <wx/txtstrm.h>
 #include <wx/cmdline.h>
 #include <wx/regex.h>
+#include <wx/protocol/http.h>
+#include <wx/zipstrm.h>
 
 // The built-in xrc file
 #include "builtin-xrc.h"
@@ -221,6 +223,7 @@ bool wxvbamApp::OnInit()
 		if (!fn.IsFileReadable())
 			continue;
 
+		data_path = config_path[i];
 		wxStringOutputStream sos;
 		wxFileInputStream fis(fn.GetFullPath());
 		// not the most efficient thing to do: read entire file into a string
@@ -562,6 +565,52 @@ void MainFrame::OnMenu(wxContextMenuEvent &event)
 #endif
 		PopupMenu(ctx_menu, p);
 	}
+}
+
+void MainFrame::DownloadFile(wxString host, wxString url)
+{
+	wxHTTP get;
+	get.SetHeader(_T("Content-type"), _T("text/html; charset=utf-8"));
+	get.SetTimeout(10);
+
+	while (!get.Connect(host))
+		wxSleep(5);
+
+	wxApp::IsMainLoopRunning();
+	wxInputStream* httpStream = get.GetInputStream(url);
+
+	if (get.GetError() == wxPROTO_NOERR)
+	{
+		if (httpStream != NULL)
+		{
+			wxZipInputStream zip(httpStream);
+			wxZipEntry* entry;
+
+			while (entry = zip.GetNextEntry())
+			{
+				// access meta-data
+				wxFileName name(wxGetApp().data_path, entry->GetName(), wxEmptyString);
+
+				// read 'zip' to access the entry's data
+				if (!entry->IsDir())
+				{
+					zip.OpenEntry(*entry);
+
+					if (zip.CanRead())
+					{
+						wxFileOutputStream file(name.GetFullPath());
+
+						if (file.IsOk())
+						{
+							zip.Read(file);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	get.Close();
 }
 
 void MainFrame::SetJoystick()

@@ -82,6 +82,8 @@ public:
 	wxFileName rom_database;
 	wxFileName rom_database_scene;
 
+	wxString data_path;
+
 	MainFrame* frame;
 	// use this to get ms since program lauch
 	wxStopWatch timer;
@@ -308,6 +310,9 @@ private:
 	wxDialog* LoadXRCDialog(const char* name);
 	// Load a named wxDialog from the XRC file
 	wxDialog* LoadXRCropertySheetDialog(const char* name);
+
+	void DownloadFile(wxString host, wxString url);
+
 #include "cmdhandlers.h"
 };
 
