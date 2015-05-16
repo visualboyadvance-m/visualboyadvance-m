@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-16 14:01+1000\n"
+"POT-Creation-Date: 2015-05-16 17:45+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -367,7 +367,7 @@ msgstr ""
 
 #: ../src/wx/cmdevents.cpp:2511
 msgid ""
-"This will download and update two GBA No-Intro DAT files.  Do you want to "
+"This will download and update three GBA No-Intro DAT files.  Do you want to "
 "continue?"
 msgstr ""
 
@@ -375,18 +375,18 @@ msgstr ""
 msgid "Confirm Update"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2531
+#: ../src/wx/cmdevents.cpp:2532
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2532
+#: ../src/wx/cmdevents.cpp:2533
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2015 VBA-M development team"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2533
+#: ../src/wx/cmdevents.cpp:2534
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -402,11 +402,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2756
+#: ../src/wx/cmdevents.cpp:2757
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2763
+#: ../src/wx/cmdevents.cpp:2764
 msgid "Network is not supported in local mode."
 msgstr ""
 
@@ -994,51 +994,51 @@ msgstr ""
 msgid "B:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:270
+#: ../src/wx/wxvbam.cpp:276
 msgid "Could not create main window"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:302
+#: ../src/wx/wxvbam.cpp:308
 msgid "Save built-in XRC file and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:306
+#: ../src/wx/wxvbam.cpp:312
 msgid "Save built-in vba-over.ini and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:310
+#: ../src/wx/wxvbam.cpp:316
 msgid "Print configuration path and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:314
+#: ../src/wx/wxvbam.cpp:320
 msgid "Start in full-screen mode"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:319
+#: ../src/wx/wxvbam.cpp:325
 msgid "Delete shared link state first, if it exists"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:327
+#: ../src/wx/wxvbam.cpp:333
 msgid "List all settable options and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:331
+#: ../src/wx/wxvbam.cpp:337
 msgid "ROM file"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:335
+#: ../src/wx/wxvbam.cpp:341
 msgid "<config>=<value>"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:359
+#: ../src/wx/wxvbam.cpp:365
 msgid "save-xrc"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:369
+#: ../src/wx/wxvbam.cpp:375
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:377
+#: ../src/wx/wxvbam.cpp:383
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
@@ -1047,19 +1047,19 @@ msgid ""
 "built-in:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:387
+#: ../src/wx/wxvbam.cpp:393
 msgid "print-cfg-path"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:392
+#: ../src/wx/wxvbam.cpp:398
 msgid "Configuration is read from, in order:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:398
+#: ../src/wx/wxvbam.cpp:404
 msgid "save-over"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:406
+#: ../src/wx/wxvbam.cpp:412
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
@@ -1067,13 +1067,13 @@ msgid ""
 "from search path:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:411
+#: ../src/wx/wxvbam.cpp:417
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:423
+#: ../src/wx/wxvbam.cpp:429
 msgid ""
 "Options set from the command line are saved if any configuration changes are "
 "made in the user interface.\n"
@@ -1082,31 +1082,31 @@ msgid ""
 "\n"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:430
+#: ../src/wx/wxvbam.cpp:436
 msgid "flag"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:431 ../src/wx/wxvbam.cpp:434
+#: ../src/wx/wxvbam.cpp:437 ../src/wx/wxvbam.cpp:440
 msgid "string"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:433
+#: ../src/wx/wxvbam.cpp:439
 msgid "int"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:450
+#: ../src/wx/wxvbam.cpp:456
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:500
+#: ../src/wx/wxvbam.cpp:506
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:928
+#: ../src/wx/wxvbam.cpp:932
 #, c-format
-msgid "crc %08X"
+msgid "%08X"
 msgstr ""
 
 #: ../src/wx/xaudio2.cpp:32
