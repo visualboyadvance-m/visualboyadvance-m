@@ -104,7 +104,8 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Gtk::Builder> & _poXml
   m_iJoypadMax      (PAD_4),
   m_iVideoOutputMin (OutputCairo),
   m_iVideoOutputMax (OutputOpenGL),
-  m_bFullscreen     (false)
+  m_bFullscreen     (false),
+  m_psavestate      (NULL)
 {
   m_poXml            = _poXml;
   m_poFileOpenDialog = NULL;
@@ -526,7 +527,12 @@ void Window::vInitConfig()
   m_poCoreConfig->vSetKey("emulator_type",     EmulatorAuto );
   m_poCoreConfig->vSetKey("pause_when_inactive", true       );
   m_poCoreConfig->vSetKey("show_speed",        ShowPercentage );
-  
+
+  // Rewind
+  //
+  m_poCoreConfig->vSetKey("rewind_count_max", STATE_MAX_DEFAULT);
+  m_poCoreConfig->vSetKey("rewind_interval", STATE_INTERVAL_DEFAULT);
+
   // Display section
   //
   m_poDisplayConfig = m_oConfig.poAddSection("Display");
@@ -569,6 +575,7 @@ void Window::vCheckConfig()
 {
   int iValue;
   int iAdjusted;
+  unsigned short i16Value;
   float fValue;
   float fAdjusted;
   std::string sValue;
@@ -664,6 +671,22 @@ void Window::vCheckConfig()
   {
     m_poCoreConfig->vSetKey("emulator_type", iAdjusted);
   }
+
+  // Rewind feature
+  // move to value change cb
+  i16Value = m_poCoreConfig->oGetKey<unsigned short>("rewind_count_max");
+  if (i16Value > 65535u)
+  {
+    m_poCoreConfig->vSetKey("rewind_count_max", STATE_MAX_DEFAULT);
+  }
+  m_state_count_max = m_poCoreConfig->oGetKey<unsigned short>("rewind_count_max");
+
+  iValue = m_poCoreConfig->oGetKey<unsigned short>("rewind_interval");
+  if (i16Value > 65535u)
+  {
+    m_poCoreConfig->vSetKey("rewind_interval", STATE_INTERVAL_DEFAULT);
+  }
+  m_rewind_interval = m_poCoreConfig->oGetKey<unsigned short>("rewind_interval");
 
   // Display section
   //
@@ -1108,6 +1131,15 @@ bool Window::bLoadROM(const std::string & _rsFile)
     vOnLoadGameMostRecent();
   }
 
+  // reserve rewind space for write operation
+  // this is used as work space
+  // actual state blocks are reserved in bOnEmuSaveStateRewind()
+  // when resulted size is known
+  //
+  if (m_state_count_max > 0 && m_psavestate == NULL) {
+    m_psavestate = new char[SZSTATE];
+  }
+
   vStartEmu();
 
   return true;
@@ -1414,6 +1446,9 @@ void Window::vSaveCheats()
 
 void Window::vStartEmu()
 {
+  m_oEmuRewindSig.disconnect();
+  m_oEmuRewindSig = Glib::signal_timeout().connect(sigc::mem_fun(*this, &Window::bOnEmuSaveStateRewind), m_rewind_interval);
+
   if (m_oEmuSig.connected())
   {
     return;
@@ -1426,6 +1461,7 @@ void Window::vStartEmu()
 void Window::vStopEmu()
 {
   m_oEmuSig.disconnect();
+  m_oEmuRewindSig.disconnect();
   m_bWasEmulating = false;
 }
 

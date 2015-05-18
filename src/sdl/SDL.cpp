@@ -1438,13 +1438,14 @@ void handleRewinds()
 		rewindCount = REWIND_NUM;
 
 	curSavePos	= (rewindTopPos + 1) % rewindCount; // [1] depends on previous
-
+	long ressize;
 	if(
 			emulator.emuWriteMemState
 		&&
 			emulator.emuWriteMemState(
 				&rewindMemory[curSavePos*REWIND_SIZE],
-				REWIND_SIZE
+				REWIND_SIZE, /* available*/
+				ressize /* actual size */
 			)
 	) {
 		char rewMsgBuf[100];
@@ -2046,6 +2047,16 @@ void systemScreenCapture(int a)
   }
 
   systemScreenMessage("Screen capture");
+}
+
+void systemSaveOldest()
+{
+    // I need to be implemented
+}
+
+void systemLoadRecent()
+{
+    // I need to be implemented
 }
 
 u32 systemGetClock()

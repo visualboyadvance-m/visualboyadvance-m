@@ -31,13 +31,13 @@ struct EmulatedSystem {
    // save state
    bool (*emuWriteState)(const char *);
 #endif
-   // load memory state (rewind)
-   bool (*emuReadMemState)(char *, int);
-   // write memory state (rewind)
-   bool (*emuWriteMemState)(char *, int);
-   // write PNG file
-   bool (*emuWritePNG)(const char *);
-   // write BMP file
+  // load memory state (rewind)
+  bool (*emuReadMemState)(char *, int);
+  // write memory state (rewind)
+  bool (*emuWriteMemState)(char *, int, long&);
+  // write PNG file
+  bool (*emuWritePNG)(const char *);
+  // write BMP file
    bool (*emuWriteBMP)(const char *);
    // emulator update CPSR (ARM only)
    void (*emuUpdateCPSR)();

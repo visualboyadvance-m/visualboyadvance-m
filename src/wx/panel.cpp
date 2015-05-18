@@ -1081,8 +1081,10 @@ void GameArea::OnIdle(wxIdleEvent &event)
 			return;
 		}
 
+		long ressize;
+
 		if (!emusys->emuWriteMemState(&rewind_mem[REWIND_SIZE * next_rewind_state],
-		                              REWIND_SIZE))
+		                              REWIND_SIZE, ressize /* actual size */))
 			// if you see a lot of these, maybe increase REWIND_SIZE
 			wxLogInfo(_("Error writing rewind state"));
 		else
