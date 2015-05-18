@@ -18,6 +18,8 @@
 
 #include "window.h"
 
+#include <deque>
+
 #include <gtkmm/stock.h>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/aboutdialog.h>
@@ -341,6 +343,13 @@ void Window::vOnFileClose()
     m_eCartridge = CartridgeNone;
     emulating = 0;
 
+    while (!m_rewind_load_q.empty()) {
+         delete[] m_rewind_load_q.front();
+         m_rewind_load_q.pop_front();
+    }
+    delete[] m_psavestate;
+    m_psavestate = NULL;
+
     vUpdateGameSlots();
 
     for (std::list<Gtk::Widget *>::iterator it = m_listSensitiveWhenPlaying.begin();
@@ -534,6 +543,57 @@ void Window::vOnHelpAbout()
   oAboutDialog.run();
 }
 
+bool Window::bOnEmuRewind()
+{
+  if( !m_rewind_load_q.empty() ) {
+    // load a rewind save state
+    char *psavestate = m_rewind_load_q.front();
+    //memset(m_psavestate, 0x0, SZSTATE);
+    long szstate = *((long*)psavestate); // first there is size
+    //memmove(m_psavestate, psavestate+sizeof(szstate), szstate-sizeof(szstate));
+    if (m_stEmulator.emuReadMemState(psavestate+sizeof(szstate), szstate)) {
+      // the save state is now used so delete it and we have more space
+      m_rewind_load_q.pop_front();
+      delete[] psavestate;
+      //printf ("Restored %p! (%li bytes)\n", psavestate, szstate);
+    }
+    return true;
+  } else {
+    // no more save states; either disabled, too early, or rewinded all the way to start
+    return false;
+  }
+}
+
+bool Window::bOnEmuSaveStateRewind() {
+  // check if we're disabled
+  char *psavestate;
+  if (m_state_count_max == 0u) {
+    return false;
+  } else if (m_rewind_load_q.size() >= m_state_count_max) { // check if we can reserve more memory for save states
+    // if we can't reserve more memory let's take away used save states starting from oldest
+    psavestate = m_rewind_load_q.back();
+    m_rewind_load_q.pop_back();
+    delete[] psavestate;
+  } // otherwise we can reserve more memory
+
+  // Do the actual saving
+  long ressize;
+  if (m_stEmulator.emuWriteMemState(m_psavestate, SZSTATE, ressize)) {
+    /*ressize*=2; // if tell does not return correct size this leverage factor is needed
+    if (ressize > SZSTATE) ressize = SZSTATE;*/
+    g_assert( ressize <= SZSTATE );
+    ressize+=(sizeof(ressize)*8); // some leverage
+    psavestate = new char[ressize];
+    memmove(psavestate, &ressize, sizeof(ressize)); // pack size first
+    memmove(psavestate+sizeof(ressize), m_psavestate, ressize-sizeof(ressize)); // then actual save data
+    //printf("Wrote %p (%li bytes %i %i)\n", psavestate, ressize, *((long*)psavestate), sizeof(ressize));
+    m_rewind_load_q.push_front(psavestate);
+    return true;
+  } else {
+    return false;
+  }
+}
+
 bool Window::bOnEmuIdle()
 {
   vSDLPollEvents();
@@ -573,6 +633,17 @@ bool Window::on_key_press_event(GdkEventKey * _pstEvent)
     return true;
   }
 
+  // Rewind key CTRL+B
+  if (m_state_count_max > 0u && (_pstEvent->state & GDK_CONTROL_MASK) && _pstEvent->keyval == GDK_b) {
+    // disable saves first and then connect new handler
+    if (m_oEmuRewindSig.connected()) m_oEmuRewindSig.disconnect();
+    m_state_count_max = 0u;
+    //return this->bOnEmuRewind();
+    m_oEmuRewindSig = Glib::signal_timeout().connect(sigc::mem_fun(*this, &Window::bOnEmuRewind),
+                                                     65u);
+    return true;
+  }
+
   // Forward the keyboard event to the input module by faking a SDL event
   SDL_Event event;
   event.type = SDL_KEYDOWN;
@@ -584,6 +655,15 @@ bool Window::on_key_press_event(GdkEventKey * _pstEvent)
 
 bool Window::on_key_release_event(GdkEventKey * _pstEvent)
 {
+  // Rewind key CTRL+B
+  if (_pstEvent->keyval == GDK_b /*&& !(_pstEvent->state & GDK_CONTROL_MASK)*/) {
+    // connect save handler back
+    if (m_oEmuRewindSig.connected()) m_oEmuRewindSig.disconnect();
+    m_state_count_max = m_poCoreConfig->oGetKey<unsigned short>("rewind_count_max");
+    m_oEmuRewindSig = Glib::signal_timeout().connect(sigc::mem_fun(*this, &Window::bOnEmuSaveStateRewind), m_rewind_interval);
+    return true;
+  }
+
   // Forward the keyboard event to the input module by faking a SDL event
   SDL_Event event;
   event.type = SDL_KEYUP;

@@ -166,6 +166,8 @@ protected:
   virtual void vOnCheatDisableToggled(Gtk::CheckMenuItem * _poCMI);
   virtual void vOnHelpAbout();
   virtual bool bOnEmuIdle();
+  virtual bool bOnEmuSaveStateRewind();
+  virtual bool bOnEmuRewind();
 
   virtual bool on_focus_in_event(GdkEventFocus * _pstEvent);
   virtual bool on_focus_out_event(GdkEventFocus * _pstEvent);
@@ -242,7 +244,7 @@ private:
 
   std::list<Gtk::Widget *> m_listSensitiveWhenPlaying;
 
-  sigc::connection m_oEmuSig;
+  sigc::connection m_oEmuSig, m_oEmuRewindSig;
 
   int m_bFullscreen;
   int m_iScreenWidth;
@@ -256,6 +258,16 @@ private:
   bool           m_bWasEmulating;
   bool           m_bAutoFrameskip;
   EShowSpeed     m_eShowSpeed;
+
+
+  /* State saving into memory & rewind to saved state */
+  u16 m_state_count_max;
+  u16 m_rewind_interval;
+  static const u32 SZSTATE = 1024*512;
+  static const u16 STATE_MAX_DEFAULT = 180u;
+  static const u16 STATE_INTERVAL_DEFAULT = 165u;
+  std::deque<char*> m_rewind_load_q;
+  char *m_psavestate;
 
   void vInitSystem();
   void vUnInitSystem();

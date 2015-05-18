@@ -621,7 +621,7 @@ unsigned int CPUWriteState(u8* data, unsigned size)
    return (ptrdiff_t)data - (ptrdiff_t)orig;
 }
 
-bool CPUWriteMemState(char *memory, int available)
+bool CPUWriteMemState(char *memory, int available, long& reserved)
 {
    return false;
 }
@@ -684,7 +684,7 @@ bool CPUWriteState(const char *file)
 }
 
 
-bool CPUWriteMemState(char *memory, int available)
+bool CPUWriteMemState(char *memory, int available, long& reserved)
 {
   gzFile gzFile = utilMemGzOpen(memory, available, "w");
 
@@ -694,9 +694,9 @@ bool CPUWriteMemState(char *memory, int available)
 
   bool res = CPUWriteState(gzFile);
 
-  long pos = utilGzMemTell(gzFile)+8;
+  reserved = utilGzMemTell(gzFile)+8;
 
-  if(pos >= (available))
+  if(reserved >= (available))
     res = false;
 
   utilGzClose(gzFile);
