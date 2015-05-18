@@ -21,6 +21,7 @@ extern "C" {
 #include "../common/ConfigManager.h"
 #include "../gb/gbPrinter.h"
 #include "../gba/agbprint.h"
+#include "../../version.h"
 
 #if (wxMAJOR_VERSION < 3)
 #define GetXRCDialog(n) \
@@ -2524,7 +2525,11 @@ EVT_HANDLER(wxID_ABOUT, "About...")
 {
 	wxAboutDialogInfo ai;
 	ai.SetName(wxT("VisualBoyAdvance-M"));
-	ai.SetVersion(wxT(""));
+	wxString version = wxT("");
+#ifdef SVNCOMPILE
+	version = version + wxT("-") + wxT(SVN_REV_STR);
+#endif
+	ai.SetVersion(version);
 	// setting website, icon, license uses custom aboutbox on win32 & macosx
 	// but at least win32 standard about is nothing special
 	ai.SetWebSite(wxT("http://www.vba-m.com/"));
@@ -2565,7 +2570,7 @@ EVT_HANDLER(wxID_ABOUT, "About...")
 	ai.AddDeveloper(wxT("Costis"));
 	ai.AddDeveloper(wxT("chrono"));
 	ai.AddDeveloper(wxT("xKiv"));
-	ai.AddDeveloper(wxT("Skidau"));
+	ai.AddDeveloper(wxT("skidau"));
 	ai.AddDeveloper(wxT("TheCanadianBacon"));
 	ai.AddDeveloper(wxT("Orig. VBA team"));
 	wxAboutBox(ai);
