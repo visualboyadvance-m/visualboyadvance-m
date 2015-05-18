@@ -494,6 +494,17 @@ void systemScreenCapture(int num)
 	systemScreenMessage(msg);
 }
 
+void systemSaveOldest()
+{
+	// I need to be implemented
+}
+
+void systemLoadRecent()
+{
+	// I need to be implemented
+}
+
+
 u32 systemGetClock()
 {
 	return wxGetApp().timer.Time();

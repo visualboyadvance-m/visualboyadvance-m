@@ -452,9 +452,9 @@ public:
 	u32 rom_size;
 
 	// FIXME: size this properly
-#define REWIND_SIZE 400000
-	// FIXME: make this a config option
 #define NUM_REWINDS 8
+#define REWIND_SIZE 1024*512*NUM_REWINDS
+	// FIXME: make this a config option
 
 	void ShowFullScreen(bool full);
 	bool IsFullScreen() { return fullscreen; }

@@ -3929,7 +3929,7 @@ static bool gbWriteSaveState(gzFile gzFile)
   return true;
 }
 
-bool gbWriteMemSaveState(char *memory, int available)
+bool gbWriteMemSaveState(char *memory, int available, long& reserved)
 {
   gzFile gzFile = utilMemGzOpen(memory, available, "w");
 
@@ -3939,9 +3939,9 @@ bool gbWriteMemSaveState(char *memory, int available)
 
   bool res = gbWriteSaveState(gzFile);
 
-  long pos = utilGzMemTell(gzFile)+8;
+  reserved = utilGzMemTell(gzFile)+8;
 
-  if(pos >= (available))
+  if(reserved >= (available))
     res = false;
 
   utilGzClose(gzFile);
