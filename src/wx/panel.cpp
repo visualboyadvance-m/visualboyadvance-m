@@ -426,7 +426,9 @@ void GameArea::SetFrameTitle()
 	}
 
 	tit.append(wxT("VisualBoyAdvance-M "));
+#ifdef SVNCOMPILE
 	tit.append(wxT(SVN_REV_STR));
+#endif
 #ifndef NO_LINK
 	int playerId = GetLinkPlayerId();
 
