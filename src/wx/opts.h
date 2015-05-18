@@ -21,6 +21,7 @@ extern struct opts_t
 	int render_method;
 	int video_scale;
 	bool retain_aspect;
+	bool keep_on_top;
 
 	/// GB
 	wxString gb_bios;

@@ -3782,6 +3782,13 @@ bool MainFrame::BindControls()
 	if (wxGetApp().pending_fullscreen || fullScreen)
 		panel->ShowFullScreen(true);
 
+	MainFrame* mf = wxGetApp().frame;
+
+	if (gopts.keep_on_top)
+		mf->SetWindowStyle(mf->GetWindowStyle() | wxSTAY_ON_TOP);
+	else
+		mf->SetWindowStyle(mf->GetWindowStyle() & ~wxSTAY_ON_TOP);
+
 #ifndef NO_LINK
 	LinkMode linkMode = GetConfiguredLinkMode();
 

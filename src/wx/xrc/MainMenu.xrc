@@ -328,6 +328,11 @@
           <checkable>1</checkable>
         </object>
         <object class="separator"/>
+        <object class="wxMenuItem" name="KeepOnTop">
+          <label>_Keep window on top</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="NoStatusMsg">
           <label>_Disable on-screen display</label>
           <checkable>1</checkable>
