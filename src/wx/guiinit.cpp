@@ -1575,56 +1575,19 @@ public:
 	}
 	void Detect(wxCommandEvent &ev)
 	{
-		// note: win32 version just pops up a dialog stating what it found
-		// which is appropriate becauase it was in a menu
-		// this code sets the controls instead, since there right there
 		u32 sz = wxGetApp().frame->GetPanel()->game_size();
-#define ch4(a, b, c, d) \
-    wxUINT32_SWAP_ON_BE(a + (b << 8) + (c << 16) + (d << 24))
+		utilGBAFindSave(sz);
+		type->SetSelection(saveType);
 
-		for (u32 addr = 0; addr < sz - 10; addr += 4)
+		if (saveType == 3)
 		{
-			switch (*(u32*)&rom[addr])
-			{
-			case ch4('E', 'E', 'P', 'R'):
-				if (memcmp(&rom[addr + 4], "OM_V", 4))
-					break;
-
-				// apparently no sensor autodetection
-				type->SetSelection(1);
-				size->Disable();
-				return;
-
-			case ch4('S', 'R', 'A', 'M'):
-				if (memcmp(&rom[addr + 4], "_V", 2))
-					break;
-
-				type->SetSelection(2);
-				size->Disable();
-				return;
-
-			case ch4('F', 'L', 'A', 'S'):
-				if (!memcmp(&rom[addr + 4], "H_V", 3))
-				{
-					type->SetSelection(3);
-					size->SetSelection(0);
-					size->Enable();
-					return;
-				}
-				else if (!memcmp(&rom[addr + 4], "H1M_V", 5))
-				{
-					type->SetSelection(3);
-					size->SetSelection(1);
-					size->Enable();
-					return;
-				}
-
-				break;
-			}
+			size->SetSelection(flashSize == 0x20000 ? 1 : 0);
+			size->Enable();
 		}
-
-		type->SetSelection(5);
-		size->Disable();
+		else
+		{
+			size->Disable();
+		}
 	}
 } BatConfigHandler;
 
