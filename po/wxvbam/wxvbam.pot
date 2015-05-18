@@ -3,13 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: ../src/wx/guiinit.cpp:2660
+#: ../src/wx/guiinit.cpp:2743
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-16 17:45+1000\n"
+"POT-Creation-Date: 2015-05-18 10:14+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -120,7 +120,7 @@ msgstr ""
 msgid "ROM+MBC7+BATT"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:607 ../src/wx/guiinit.cpp:725
+#: ../src/wx/cmdevents.cpp:607 ../src/wx/guiinit.cpp:807
 msgid "GameGenie"
 msgstr ""
 
@@ -144,7 +144,7 @@ msgstr ""
 msgid "ROM+HuC-1"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:679 ../src/wx/guiinit.cpp:1830
+#: ../src/wx/cmdevents.cpp:679 ../src/wx/guiinit.cpp:1913
 #: ../src/wx/xrc/DisplayConfig.xrc:77 ../src/wx/xrc/DisplayConfig.xrc:221
 #: ../src/wx/xrc/DisplayConfig.xrc:270
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
@@ -460,218 +460,226 @@ msgid ""
 "Table (*.act)|*.act"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:69
+#: ../src/wx/guiinit.cpp:71
 msgid "Start!"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:73 ../src/wx/xrc/NetLink.xrc:85
+#: ../src/wx/guiinit.cpp:75 ../src/wx/xrc/NetLink.xrc:85
 msgid "Connect"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:89
+#: ../src/wx/guiinit.cpp:91
 msgid "You must enter a valid host name"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:90
+#: ../src/wx/guiinit.cpp:92
 msgid "Host name invalid"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:109
+#: ../src/wx/guiinit.cpp:111
 msgid "Waiting for clients..."
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:110
+#: ../src/wx/guiinit.cpp:112
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:114
+#: ../src/wx/guiinit.cpp:116
 msgid "Waiting for connection..."
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:115
+#: ../src/wx/guiinit.cpp:117
 #, c-format
 msgid "Connecting to %s\n"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:153
+#: ../src/wx/guiinit.cpp:155
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:229 ../src/wx/guiinit.cpp:260
+#: ../src/wx/guiinit.cpp:231 ../src/wx/guiinit.cpp:296
 msgid "Select cheat file"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:230 ../src/wx/guiinit.cpp:261
-msgid "VBA cheat lists (*.clt)|*.clt"
+#: ../src/wx/guiinit.cpp:232
+msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:249 ../src/wx/panel.cpp:401
+#: ../src/wx/guiinit.cpp:254 ../src/wx/panel.cpp:401
 msgid "Loaded cheats"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:279
+#: ../src/wx/guiinit.cpp:297
+msgid "VBA cheat lists (*.clt)|*.clt"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:315
 msgid "Saved cheats"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:310 ../src/wx/guiinit.cpp:334
+#: ../src/wx/guiinit.cpp:346 ../src/wx/guiinit.cpp:370
 msgid "Restore old values?"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:311 ../src/wx/guiinit.cpp:335
+#: ../src/wx/guiinit.cpp:347 ../src/wx/guiinit.cpp:371
 msgid "Removing cheats"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:724 ../src/wx/xrc/JoyPanel.xrc:244
+#: ../src/wx/guiinit.cpp:806 ../src/wx/xrc/JoyPanel.xrc:244
 msgid "GameShark"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:729
+#: ../src/wx/guiinit.cpp:811
 msgid "Generic Code"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:730
+#: ../src/wx/guiinit.cpp:812
 msgid "GameShark Advance"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:731
+#: ../src/wx/guiinit.cpp:813
 msgid "CodeBreaker Advance"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:793 ../src/wx/guiinit.cpp:1060
+#: ../src/wx/guiinit.cpp:814
+msgid "Flashcart CHT"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:876 ../src/wx/guiinit.cpp:1143
 msgid "Number cannot be empty"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:834
+#: ../src/wx/guiinit.cpp:917
 #, c-format
 msgid "Search produced %d results.  Please refine better"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:847
+#: ../src/wx/guiinit.cpp:930
 msgid "Search produced no results"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1022
+#: ../src/wx/guiinit.cpp:1105
 msgid "8-bit "
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1026
+#: ../src/wx/guiinit.cpp:1109
 msgid "16-bit "
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1030
+#: ../src/wx/guiinit.cpp:1113
 msgid "32-bit "
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1037
+#: ../src/wx/guiinit.cpp:1120
 msgid "signed decimal"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1041
+#: ../src/wx/guiinit.cpp:1124
 msgid "unsigned decimal"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1045
+#: ../src/wx/guiinit.cpp:1128
 msgid "unsigned hexadecimal"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1566
+#: ../src/wx/guiinit.cpp:1649
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1577
+#: ../src/wx/guiinit.cpp:1660
 msgid "Default device"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1717
+#: ../src/wx/guiinit.cpp:1800
 msgid "Desktop mode"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1725
+#: ../src/wx/guiinit.cpp:1808
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1875
+#: ../src/wx/guiinit.cpp:1958
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1898 ../src/wx/xrc/DisplayConfig.xrc:242
+#: ../src/wx/guiinit.cpp:1981 ../src/wx/xrc/DisplayConfig.xrc:242
 msgid "Plugin"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1931
+#: ../src/wx/guiinit.cpp:2014
 msgid "Please select a plugin or a different filter"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1932
+#: ../src/wx/guiinit.cpp:2015
 msgid "Plugin selection error"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2136
+#: ../src/wx/guiinit.cpp:2219
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2137
+#: ../src/wx/guiinit.cpp:2220
 msgid "Confirm"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2639
+#: ../src/wx/guiinit.cpp:2722
 msgid "Main display panel not found"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2654
+#: ../src/wx/guiinit.cpp:2737
 msgid "Main icon not found"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2779
+#: ../src/wx/guiinit.cpp:2862
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2796
+#: ../src/wx/guiinit.cpp:2879
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2912
+#: ../src/wx/guiinit.cpp:2995
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3093
+#: ../src/wx/guiinit.cpp:3176
 msgid "Code"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3102
+#: ../src/wx/guiinit.cpp:3185
 msgid "Description"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3176 ../src/wx/xrc/CheatAdd.xrc:30
+#: ../src/wx/guiinit.cpp:3259 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3177
+#: ../src/wx/guiinit.cpp:3260
 msgid "Old Value"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3178
+#: ../src/wx/guiinit.cpp:3261
 msgid "New Value"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3621
+#: ../src/wx/guiinit.cpp:3704
 msgid "Menu commands"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3648
+#: ../src/wx/guiinit.cpp:3731
 msgid "Other commands"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3753
+#: ../src/wx/guiinit.cpp:3836
 msgid "JoyBus host invalid; disabling"
 msgstr ""
 
@@ -1265,135 +1273,151 @@ msgstr ""
 msgid "Shortcut Key:"
 msgstr ""
 
-#: ../src/wx/xrc/CheatAdd.xrc:8 ../src/wx/xrc/CheatEdit.xrc:8
+#: ../src/wx/xrc/CheatAdd.xrc:4
+msgid "Add Cheat"
+msgstr ""
+
+#: ../src/wx/xrc/CheatAdd.xrc:9 ../src/wx/xrc/CheatEdit.xrc:9
 msgid "&Description"
 msgstr ""
 
-#: ../src/wx/xrc/CheatAdd.xrc:52
+#: ../src/wx/xrc/CheatAdd.xrc:53
 msgid "&Value"
 msgstr ""
 
-#: ../src/wx/xrc/CheatAdd.xrc:76
+#: ../src/wx/xrc/CheatAdd.xrc:77
 msgid "Format"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:22
+#: ../src/wx/xrc/CheatCreate.xrc:4
+msgid "Cheat Search"
+msgstr ""
+
+#: ../src/wx/xrc/CheatCreate.xrc:23
 msgid "E&qual"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:30
+#: ../src/wx/xrc/CheatCreate.xrc:31
 msgid "&Not equal"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:37
+#: ../src/wx/xrc/CheatCreate.xrc:38
 msgid "&Less than"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:44
+#: ../src/wx/xrc/CheatCreate.xrc:45
 msgid "L&ess or equal"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:51
+#: ../src/wx/xrc/CheatCreate.xrc:52
 msgid "&Greater than"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:58
+#: ../src/wx/xrc/CheatCreate.xrc:59
 msgid "G&reater or equal"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:63
+#: ../src/wx/xrc/CheatCreate.xrc:64
 msgid "Compare type"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:76
+#: ../src/wx/xrc/CheatCreate.xrc:77
 msgid "S&igned"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:84
+#: ../src/wx/xrc/CheatCreate.xrc:85
 msgid "&Unsigned"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:91
+#: ../src/wx/xrc/CheatCreate.xrc:92
 msgid "&Hexadecimal"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:96
+#: ../src/wx/xrc/CheatCreate.xrc:97
 msgid "Signed/Unsigned"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:106
+#: ../src/wx/xrc/CheatCreate.xrc:107
 msgid "&8 bits"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:114
+#: ../src/wx/xrc/CheatCreate.xrc:115
 msgid "&16 bits"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:121
+#: ../src/wx/xrc/CheatCreate.xrc:122
 msgid "&32 bits"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:126
+#: ../src/wx/xrc/CheatCreate.xrc:127
 msgid "Data size"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:143
+#: ../src/wx/xrc/CheatCreate.xrc:144
 msgid "Ol&d value"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:151
+#: ../src/wx/xrc/CheatCreate.xrc:152
 msgid "Specific &value"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:162
+#: ../src/wx/xrc/CheatCreate.xrc:163
 msgid "Search value"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:180
+#: ../src/wx/xrc/CheatCreate.xrc:181
 msgid "&Search"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:187
+#: ../src/wx/xrc/CheatCreate.xrc:188
 msgid "U&pdate Old"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:194 ../src/wx/xrc/Logging.xrc:118
+#: ../src/wx/xrc/CheatCreate.xrc:195 ../src/wx/xrc/Logging.xrc:118
 msgid "&Clear"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:201
+#: ../src/wx/xrc/CheatCreate.xrc:202
 msgid "&Add cheat"
 msgstr ""
 
-#: ../src/wx/xrc/CheatEdit.xrc:30 ../src/wx/xrc/MainMenu.xrc:269
+#: ../src/wx/xrc/CheatEdit.xrc:4
+msgid "Edit Cheat"
+msgstr ""
+
+#: ../src/wx/xrc/CheatEdit.xrc:31 ../src/wx/xrc/MainMenu.xrc:269
 msgid "&Type"
 msgstr ""
 
-#: ../src/wx/xrc/CheatEdit.xrc:52
+#: ../src/wx/xrc/CheatEdit.xrc:53
 msgid "C&odes"
 msgstr ""
 
-#: ../src/wx/xrc/CheatList.xrc:10
+#: ../src/wx/xrc/CheatList.xrc:4
+msgid "Cheat List"
+msgstr ""
+
+#: ../src/wx/xrc/CheatList.xrc:11
 msgid "Open cheat list"
 msgstr ""
 
-#: ../src/wx/xrc/CheatList.xrc:14
+#: ../src/wx/xrc/CheatList.xrc:15
 msgid "Save cheat list"
 msgstr ""
 
-#: ../src/wx/xrc/CheatList.xrc:19
+#: ../src/wx/xrc/CheatList.xrc:20
 msgid "Add new cheat"
 msgstr ""
 
-#: ../src/wx/xrc/CheatList.xrc:23
+#: ../src/wx/xrc/CheatList.xrc:24
 msgid "Delete selected cheat"
 msgstr ""
 
-#: ../src/wx/xrc/CheatList.xrc:28
+#: ../src/wx/xrc/CheatList.xrc:29
 msgid "Delete all cheats"
 msgstr ""
 
-#: ../src/wx/xrc/CheatList.xrc:34
+#: ../src/wx/xrc/CheatList.xrc:35
 msgid "Toggle all Cheats"
 msgstr ""
 
