@@ -847,6 +847,11 @@ void MainFrame::MenuPopped(wxMenuEvent &evt)
 // uses dialog_opened as a nesting counter
 int MainFrame::ShowModal(wxDialog* dlg)
 {
+	if (gopts.keep_on_top)
+		dlg->SetWindowStyle(dlg->GetWindowStyle() | wxSTAY_ON_TOP);
+	else
+		dlg->SetWindowStyle(dlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
+
 	CheckPointer(dlg);
 	StartModal();
 	int ret = dlg->ShowModal();
