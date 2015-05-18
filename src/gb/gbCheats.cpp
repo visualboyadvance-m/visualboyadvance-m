@@ -12,7 +12,7 @@
 #include "gb.h"
 #include "../common/ConfigManager.h"
 
-gbCheat gbCheatList[100];
+gbCheat gbCheatList[MAX_CHEATS];
 int gbCheatNumber = 0;
 int gbNextCheat = 0;
 bool gbCheatMap[0x10000];

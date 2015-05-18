@@ -2,6 +2,7 @@
 #define GBCHEATS_H
 
 #include "../System.h"
+#include "../common/ConfigManager.h"
 
 struct gbXxCheat {
   char cheatDesc[100];
@@ -38,7 +39,7 @@ bool gbVerifyGgCode(const char *code);
 
 
 extern int gbCheatNumber;
-extern gbCheat gbCheatList[100];
+extern gbCheat gbCheatList[MAX_CHEATS];
 extern bool gbCheatMap[0x10000];
 
 #endif // GBCHEATS_H

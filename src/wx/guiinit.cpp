@@ -267,7 +267,7 @@ public:
 					{
 						wxString line = text.ReadLine().Trim();
 
-						if (line.Contains(wxT("[")))
+						if (line.Contains(wxT("[")) && !line.Contains(wxT("=")))
 						{
 							cheat_desc = line.AfterFirst('[').BeforeLast(']');
 						}
@@ -599,10 +599,10 @@ public:
 
 			if (ncodes > id + 1)
 			{
-				wxString codes[100];
-				wxString descs[100];
-				bool checked[100];
-				bool v3[100];
+				wxString codes[MAX_CHEATS];
+				wxString descs[MAX_CHEATS];
+				bool checked[MAX_CHEATS];
+				bool v3[MAX_CHEATS];
 
 				for (int i = id + 1; i < ncodes; i++)
 				{
