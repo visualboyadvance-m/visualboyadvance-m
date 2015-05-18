@@ -714,7 +714,7 @@ void utilGBAFindSave(const int size)
       }
     } else if (d == 0x4D415253) {
       if(memcmp(p, "SRAM_", 5) == 0) {
-        if(detectedSaveType == 0 || detectedSaveType == 4)
+        if(detectedSaveType == 0 || detectedSaveType == 1 || detectedSaveType == 4)
           detectedSaveType = 2;
       }
     } else if (d == 0x53414C46) {
@@ -723,6 +723,11 @@ void utilGBAFindSave(const int size)
           detectedSaveType = 3;
           flashSize = 0x20000;
         }
+	  } else if (memcmp(p, "FLASH512_", 9) == 0) {
+		  if (detectedSaveType == 0) {
+			  detectedSaveType = 3;
+			  flashSize = 0x10000;
+		  }
       } else if(memcmp(p, "FLASH", 5) == 0) {
         if(detectedSaveType == 0) {
           detectedSaveType = 4;
