@@ -33,17 +33,17 @@ typedef struct {
 } RTCCLOCKDATA;
 
 static RTCCLOCKDATA rtcClockData;
-static bool rtcEnabled = true;
+static bool rtcClockEnabled = true;
 static bool rtcRumbleEnabled = false;
 
 void rtcEnable(bool e)
 {
-  rtcEnabled = e;
+  rtcClockEnabled = e;
 }
 
 bool rtcIsEnabled()
 {
-  return rtcEnabled;
+  return rtcClockEnabled;
 }
 
 void rtcEnableRumble(bool e)
@@ -80,7 +80,7 @@ u16 rtcRead(u32 address)
 			return ((v >> rtcClockData.reserved[11]) & 1) << 2;
 		}
 		// Real Time Clock
-		else if (rtcEnabled) {
+		else if (rtcClockEnabled) {
 			//sprintf(DebugStr, "Reading RTC %02x, %02x, %02x", rtcClockData.byte0, rtcClockData.byte1, rtcClockData.byte2);
 			return rtcClockData.byte0;
 		}

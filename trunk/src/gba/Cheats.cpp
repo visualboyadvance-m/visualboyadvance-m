@@ -178,7 +178,7 @@
 #define CHEATS_16_BIT_WRITE           114
 #define CHEATS_32_BIT_WRITE           115
 
-CheatsData cheatsList[100];
+CheatsData cheatsList[MAX_CHEATS];
 int cheatsNumber = 0;
 u32 rompatch2addr [4];
 u16 rompatch2val [4];
@@ -1314,7 +1314,7 @@ void cheatsAdd(const char *codeStr,
                int code,
                int size)
 {
-  if(cheatsNumber < 100) {
+  if(cheatsNumber < MAX_CHEATS) {
     int x = cheatsNumber;
     cheatsList[x].code = code;
     cheatsList[x].size = size;

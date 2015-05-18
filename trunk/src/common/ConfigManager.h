@@ -14,6 +14,8 @@
 # include <getopt.h>
 #endif // ! __GNUC__
 
+#define MAX_CHEATS 16384
+
 extern bool cpuIsMultiBoot;
 extern bool mirroringEnable;
 extern bool parseDebug;
@@ -137,7 +139,6 @@ extern u32 movieLastJoypad;
 extern u32 movieNextJoypad;
 extern int throttle;
 
-#define MAX_CHEATS 100
 extern int preparedCheats;
 extern const char* preparedCheatCodes[MAX_CHEATS];
 

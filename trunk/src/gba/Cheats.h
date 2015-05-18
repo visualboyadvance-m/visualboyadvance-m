@@ -1,6 +1,8 @@
 #ifndef CHEATS_H
 #define CHEATS_H
 
+#include "../common/ConfigManager.h"
+
 struct CheatsData {
   int code;
   int size;
@@ -36,6 +38,6 @@ void cheatsWriteByte(u32 address, u8 value);
 int cheatsCheckKeys(u32 keys, u32 extended);
 
 extern int cheatsNumber;
-extern CheatsData cheatsList[100];
+extern CheatsData cheatsList[MAX_CHEATS];
 
 #endif // CHEATS_H
