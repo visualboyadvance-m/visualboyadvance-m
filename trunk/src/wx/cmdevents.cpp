@@ -2657,6 +2657,19 @@ EVT_HANDLER(MMX, "Enable MMX")
 	update_opts();
 }
 
+EVT_HANDLER(KeepOnTop, "Keep window on top")
+{
+	GetMenuOptionBool("KeepOnTop", gopts.keep_on_top);
+	MainFrame* mf = wxGetApp().frame;
+
+	if (gopts.keep_on_top)
+		mf->SetWindowStyle(mf->GetWindowStyle() | wxSTAY_ON_TOP);
+	else
+		mf->SetWindowStyle(mf->GetWindowStyle() & ~wxSTAY_ON_TOP);
+
+	update_opts();
+}
+
 EVT_HANDLER(NoStatusMsg, "Disable on-screen status messages")
 {
 	GetMenuOptionInt("NoStatusMsg", disableStatusMessages, 1);
