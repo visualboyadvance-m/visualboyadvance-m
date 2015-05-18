@@ -115,16 +115,16 @@ void GameArea::LoadGame(const wxString &name)
 	if (loadpatch)
 	{
 		// SetExt may strip something off by accident, so append to text instead
-		// pfn.SetExt(wxT(".ips")
+		// pfn.SetExt(wxT("ips")
 		pfn.SetFullName(pfn.GetFullName() + wxT(".ips"));
 
 		if (!pfn.IsFileReadable())
 		{
-			pfn.SetExt(wxT(".ups"));
+			pfn.SetExt(wxT("ups"));
 
 			if (!pfn.IsFileReadable())
 			{
-				pfn.SetExt(wxT(".ppf"));
+				pfn.SetExt(wxT("ppf"));
 				loadpatch = pfn.IsFileReadable();
 			}
 		}
