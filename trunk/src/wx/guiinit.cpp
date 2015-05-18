@@ -17,8 +17,10 @@
 #include <wx/filepicker.h>
 #include <wx/dir.h>
 #include <wx/tokenzr.h>
-#include "wx/checkedlistctrl.h"
+#include <wx/checkedlistctrl.h>
 #include <wx/progdlg.h>
+#include <wx/wfstream.h>
+#include <wx/txtstrm.h>
 
 #include "../common/ConfigManager.h"
 #include "../gba/CheatSearch.h"
@@ -226,8 +228,8 @@ public:
 		{
 		case wxID_OPEN:
 		{
-			wxFileDialog subdlg(dlg, _("Select cheat file"), cheatdir,
-			                    cheatfn, _("VBA cheat lists (*.clt)|*.clt"),
+			wxFileDialog subdlg(dlg, _("Select cheat file"), cheatdir, cheatfn,
+			                    _("VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"),
 			                    wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 			int ret = subdlg.ShowModal();
 			cheatdir = subdlg.GetDirectory();
@@ -241,15 +243,49 @@ public:
 			if (isgb)
 				cld = gbCheatsLoadCheatList(cheatfn.mb_fn_str());
 			else
-				cld = cheatsLoadCheatList(cheatfn.mb_fn_str());
-
-			if (cld)
 			{
-				*dirty = cheatfn != deffn;
-				systemScreenMessage(_("Loaded cheats"));
+				if (cheatfn.EndsWith(wxT(".clt")))
+				{
+					cld = cheatsLoadCheatList(cheatfn.mb_fn_str());
+
+					if (cld)
+					{
+						*dirty = cheatfn != deffn;
+						systemScreenMessage(_("Loaded cheats"));
+					}
+					else
+						*dirty = true; // attempted load always clears
+				}
+				else
+				{
+					// cht format
+					wxFileInputStream input(cheatfn);
+					wxTextInputStream text(input, wxT("\x09"), wxConvUTF8);
+					wxString cheat_desc = wxT("");
+
+					while (input.IsOk() && !input.Eof())
+					{
+						wxString line = text.ReadLine().Trim();
+
+						if (line.Contains(wxT("[")))
+						{
+							cheat_desc = line.AfterFirst('[').BeforeLast(']');
+						}
+
+						if (line.Contains(wxT("=")) && cheat_desc != wxT("GameInfo"))
+						{
+							while ((input.IsOk() && !input.Eof()) && (line.EndsWith(wxT(";")) || line.EndsWith(wxT(","))))
+							{
+								line = line + text.ReadLine().Trim();
+							}
+
+							ParseChtLine(cheat_desc, line);
+						}
+					}
+
+					*dirty = true;
+				}
 			}
-			else
-				*dirty = true; // attempted load always clears
 
 			Reload();
 		}
@@ -455,7 +491,13 @@ public:
 			}
 			else
 			{
-				if (!ce_type)
+				// Flashcart CHT format
+				if (tok.Contains(wxT("=")))
+				{
+					ParseChtLine(ce_desc, tok);
+				}
+				// Generic Code
+				else if (tok.Contains(wxT(":")))
 					cheatsAddCheatCode(tok.mb_str(), ce_desc.mb_str());
 				// following determination of type by lengths is
 				// same used by win32 and gtk code
@@ -500,6 +542,8 @@ public:
 			}
 		}
 	}
+
+	void ParseChtLine(wxString desc, wxString tok);
 
 	void Edit(wxListEvent &ev)
 	{
@@ -696,6 +740,44 @@ public:
 	}
 } cheat_list_handler;
 
+void CheatList_t::ParseChtLine(wxString desc, wxString tok)
+{
+	wxString cheat_opt = tok.BeforeFirst(wxT('='));
+	wxString cheat_set = tok.AfterFirst(wxT('='));
+	wxStringTokenizer addr_tk(cheat_set.MakeUpper(), wxT(";"));
+
+	while (addr_tk.HasMoreTokens())
+	{
+		wxString addr_token = addr_tk.GetNextToken();
+		wxString cheat_addr = addr_token.BeforeFirst(wxT(','));
+		wxString values = addr_token.AfterFirst(wxT(','));
+		wxString cheat_desc = desc + wxT(":") + cheat_opt;
+		wxString cheat_line;
+		wxString cheat_value;
+		u32 address = 0;
+		u32 value = 0;
+		sscanf(cheat_addr.mb_str(), "%8x", &address);
+
+		if (address < 0x40000)
+			address += 0x2000000;
+		else
+			address += 0x3000000 - 0x40000;
+
+		wxStringTokenizer value_tk(values.MakeUpper(), wxT(","));
+
+		while (value_tk.HasMoreTokens())
+		{
+			wxString value_token = value_tk.GetNextToken();
+			sscanf(value_token.mb_str(), "%2x", &value);
+			cheat_line.Printf(wxT("%08X"), address);
+			cheat_value.Printf(wxT("%02X"), value);
+			cheat_line = cheat_line + wxT(":") + cheat_value;
+			cheatsAddCheatCode(cheat_line.mb_str(), cheat_desc.mb_str());
+			address++;
+		}
+	}
+}
+
 // onshow handler for above, in the form of an overzealous validator
 class CheatListFill : public wxValidator
 {
@@ -729,6 +811,7 @@ public:
 			ch->Append(_("Generic Code"));
 			ch->Append(_("GameShark Advance"));
 			ch->Append(_("CodeBreaker Advance"));
+			ch->Append(_("Flashcart CHT"));
 		}
 
 		ch->SetSelection(0);
