@@ -182,8 +182,8 @@ SET( CMAKE_C_FLAGS_DEBUG "-g -Wall")
 SET( CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
 
 if (MINGW)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc -static")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ -static")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc -static -I../dependencies/include")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ -static -I../dependencies/include")
 endif (MINGW)
 
 
