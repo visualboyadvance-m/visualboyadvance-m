@@ -524,7 +524,7 @@ void LoadConfig()
 	soundInterpolation = ReadPref("gbaSoundInterpolation", 1);
 	soundRecordDir = ReadPrefString("soundRecordDir");
 	threadPriority = ReadPref("priority", 2);
-	throttle = ReadPref("throttle", 0);
+	throttle = ReadPref("throttle", 100);
 	tripleBuffering = ReadPref("tripleBuffering", 0);
 	useBios = ReadPrefHex("useBiosGBA");
 	useBiosFileGB = ReadPref("useBiosGB", 0);
