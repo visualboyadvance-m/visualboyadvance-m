@@ -2462,6 +2462,7 @@ EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
 
 	soundSetVolume((float)gopts.sound_vol / 100.0);
 	update_opts();
+	soundReset();
 }
 
 EVT_HANDLER(EmulatorDirectories, "Directories...")

@@ -1704,7 +1704,7 @@ public:
 		SoundConfig_t &sch = sound_config_handler;
 		int devs = sch.dev->GetSelection();
 
-		if (!devs)
+		if (devs <= 0)
 			gopts.audio_dev = wxEmptyString;
 		else
 			gopts.audio_dev = sch.dev_ids[devs - 1];
