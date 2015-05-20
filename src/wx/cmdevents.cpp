@@ -2537,7 +2537,7 @@ EVT_HANDLER(wxID_ABOUT, "About...")
 	wxAboutDialogInfo ai;
 	ai.SetName(wxT("VisualBoyAdvance-M"));
 	wxString version = wxT("");
-#ifdef SVNCOMPILE
+#ifdef FINAL_BUILD
 	version = version + wxT("-") + wxT(SVN_REV_STR);
 #endif
 	ai.SetVersion(version);
