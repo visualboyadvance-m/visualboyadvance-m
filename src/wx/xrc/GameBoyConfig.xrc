@@ -90,6 +90,7 @@
                 <object class="wxFilePickerCtrl" name="BootRom">
                   <message>Select A File</message>
                   <wildcard>BIOS files (*.bin;*.rom)|*.bin;*.rom|All files|*</wildcard>
+                  <size>472,30</size>
                 </object>
                 <option>1</option>
                 <flag>wxALL|wxEXPAND</flag>
@@ -111,6 +112,7 @@
                 <object class="wxFilePickerCtrl" name="CBootRom">
                   <message>Select A File</message>
                   <wildcard>BIOS files (*.bin;*.rom)|*.bin;*.rom|All files|*</wildcard>
+                  <size>472,30</size>
                 </object>
                 <option>1</option>
                 <flag>wxALL|wxEXPAND</flag>

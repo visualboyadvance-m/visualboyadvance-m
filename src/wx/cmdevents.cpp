@@ -1972,8 +1972,13 @@ int GetGDBPort(MainFrame* mf)
 
 EVT_HANDLER(DebugGDBPort, "Configure port...")
 {
-	gdbPort = GetGDBPort(this);
-	update_opts();
+	int port_selected = GetGDBPort(this);
+
+	if (port_selected != -1)
+	{
+		gdbPort = port_selected;
+		update_opts();
+	}
 }
 
 EVT_HANDLER(DebugGDBBreakOnLoad, "Break on load")
@@ -1988,11 +1993,16 @@ void MainFrame::GDBBreak()
 
 	if (gdbPort == 0)
 	{
-		gdbPort = GetGDBPort(this);
-		update_opts();
+		int port_selected = GetGDBPort(this);
+
+		if (port_selected != -1)
+		{
+			gdbPort = port_selected;
+			update_opts();
+		}
 	}
 
-	if (gdbPort != 0)
+	if (gdbPort > 0)
 	{
 		if (!remotePort)
 		{

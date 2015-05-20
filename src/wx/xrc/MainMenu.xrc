@@ -507,7 +507,7 @@
         <label>&amp;Map Viewer...</label>
       </object>
       <object class="wxMenuItem" name="MemoryViewer">
-        <label>M_emory viewer...</label>
+        <label>M_emory Viewer...</label>
       </object>
       <object class="wxMenuItem" name="OAMViewer">
         <label>_OAM Viewer...</label>
