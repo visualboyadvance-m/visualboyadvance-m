@@ -18,6 +18,7 @@
               <object class="sizeritem">
                 <object class="wxTreeCtrl" name="Commands">
                   <style>wxTR_HAS_BUTTONS|wxTR_NO_LINES|wxTR_FULL_ROW_HIGHLIGHT|wxTR_HIDE_ROOT</style>
+                  <size>300,300</size>
                 </object>
                 <flag>wxALL|wxEXPAND</flag>
                 <border>5</border>

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-18 23:10+1000\n"
+"POT-Creation-Date: 2015-05-21 00:08+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -148,7 +148,7 @@ msgstr ""
 #: ../src/wx/xrc/DisplayConfig.xrc:77 ../src/wx/xrc/DisplayConfig.xrc:221
 #: ../src/wx/xrc/DisplayConfig.xrc:270
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:182
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:183
 #: ../src/wx/xrc/SoundConfig.xrc:212 ../src/wx/xrc/SoundConfig.xrc:302
 msgid "None"
 msgstr ""
@@ -351,42 +351,42 @@ msgstr ""
 msgid "GDB Connection"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2007
+#: ../src/wx/cmdevents.cpp:2017
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2015
+#: ../src/wx/cmdevents.cpp:2025
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2018
+#: ../src/wx/cmdevents.cpp:2028
 msgid "Waiting for GDB..."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2512
+#: ../src/wx/cmdevents.cpp:2523
 msgid ""
 "This will download and update three GBA No-Intro DAT files.  Do you want to "
 "continue?"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2513
+#: ../src/wx/cmdevents.cpp:2524
 msgid "Confirm Update"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2537
+#: ../src/wx/cmdevents.cpp:2548
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2538
+#: ../src/wx/cmdevents.cpp:2549
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2015 VBA-M development team"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2539
+#: ../src/wx/cmdevents.cpp:2550
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -402,11 +402,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2775
+#: ../src/wx/cmdevents.cpp:2786
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2782
+#: ../src/wx/cmdevents.cpp:2793
 msgid "Network is not supported in local mode."
 msgstr ""
 
@@ -464,7 +464,7 @@ msgstr ""
 msgid "Start!"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:75 ../src/wx/xrc/NetLink.xrc:85
+#: ../src/wx/guiinit.cpp:75 ../src/wx/xrc/NetLink.xrc:86
 msgid "Connect"
 msgstr ""
 
@@ -1112,7 +1112,7 @@ msgstr ""
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:932
+#: ../src/wx/wxvbam.cpp:937
 #, c-format
 msgid "%08X"
 msgstr ""
@@ -1249,27 +1249,27 @@ msgstr ""
 msgid "Co&mmands:"
 msgstr ""
 
-#: ../src/wx/xrc/AccelConfig.xrc:33
+#: ../src/wx/xrc/AccelConfig.xrc:34
 msgid "Current Keys:"
 msgstr ""
 
-#: ../src/wx/xrc/AccelConfig.xrc:52
+#: ../src/wx/xrc/AccelConfig.xrc:53
 msgid "&Assign"
 msgstr ""
 
-#: ../src/wx/xrc/AccelConfig.xrc:59
+#: ../src/wx/xrc/AccelConfig.xrc:60
 msgid "&Remove"
 msgstr ""
 
-#: ../src/wx/xrc/AccelConfig.xrc:66
+#: ../src/wx/xrc/AccelConfig.xrc:67
 msgid "Re&set All"
 msgstr ""
 
-#: ../src/wx/xrc/AccelConfig.xrc:80
+#: ../src/wx/xrc/AccelConfig.xrc:81
 msgid "Currently assigned to:"
 msgstr ""
 
-#: ../src/wx/xrc/AccelConfig.xrc:95
+#: ../src/wx/xrc/AccelConfig.xrc:96
 msgid "Shortcut Key:"
 msgstr ""
 
@@ -1373,7 +1373,7 @@ msgstr ""
 msgid "U&pdate Old"
 msgstr ""
 
-#: ../src/wx/xrc/CheatCreate.xrc:195 ../src/wx/xrc/Logging.xrc:118
+#: ../src/wx/xrc/CheatCreate.xrc:195 ../src/wx/xrc/Logging.xrc:119
 msgid "&Clear"
 msgstr ""
 
@@ -1430,187 +1430,191 @@ msgstr ""
 msgid "Game Boy Advance ROMs"
 msgstr ""
 
-#: ../src/wx/xrc/DirectoriesConfig.xrc:26
-#: ../src/wx/xrc/DirectoriesConfig.xrc:33
+#: ../src/wx/xrc/DirectoriesConfig.xrc:27
+#: ../src/wx/xrc/DirectoriesConfig.xrc:34
 msgid "Game Boy ROMs"
 msgstr ""
 
-#: ../src/wx/xrc/DirectoriesConfig.xrc:41
-#: ../src/wx/xrc/DirectoriesConfig.xrc:48
+#: ../src/wx/xrc/DirectoriesConfig.xrc:42
+#: ../src/wx/xrc/DirectoriesConfig.xrc:49
 msgid "Game Boy Color ROMs"
 msgstr ""
 
-#: ../src/wx/xrc/DirectoriesConfig.xrc:56
-#: ../src/wx/xrc/DirectoriesConfig.xrc:63
+#: ../src/wx/xrc/DirectoriesConfig.xrc:57
+#: ../src/wx/xrc/DirectoriesConfig.xrc:64
 msgid "Native Saves"
 msgstr ""
 
-#: ../src/wx/xrc/DirectoriesConfig.xrc:71
-#: ../src/wx/xrc/DirectoriesConfig.xrc:78
+#: ../src/wx/xrc/DirectoriesConfig.xrc:72
+#: ../src/wx/xrc/DirectoriesConfig.xrc:79
 msgid "Emulator Saves"
 msgstr ""
 
-#: ../src/wx/xrc/DirectoriesConfig.xrc:86
-#: ../src/wx/xrc/DirectoriesConfig.xrc:93
+#: ../src/wx/xrc/DirectoriesConfig.xrc:87
+#: ../src/wx/xrc/DirectoriesConfig.xrc:94
 msgid "Screenshots"
 msgstr ""
 
-#: ../src/wx/xrc/DirectoriesConfig.xrc:101
-#: ../src/wx/xrc/DirectoriesConfig.xrc:108
+#: ../src/wx/xrc/DirectoriesConfig.xrc:102
+#: ../src/wx/xrc/DirectoriesConfig.xrc:109
 msgid "Recordings"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:14
+#: ../src/wx/xrc/Disassemble.xrc:4
+msgid "Disassemble"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:15
 msgid "&Automatic"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:22
+#: ../src/wx/xrc/Disassemble.xrc:23
 msgid "A&RM"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:29
+#: ../src/wx/xrc/Disassemble.xrc:30
 msgid "&THUMB"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:44 ../src/wx/xrc/GBDisassemble.xrc:18
-#: ../src/wx/xrc/MemViewer.xrc:46
+#: ../src/wx/xrc/Disassemble.xrc:45 ../src/wx/xrc/GBDisassemble.xrc:18
+#: ../src/wx/xrc/MemViewer.xrc:47
 msgid "&Go"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:72
+#: ../src/wx/xrc/Disassemble.xrc:73
 msgid "R0:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:82 ../src/wx/xrc/Disassemble.xrc:99
-#: ../src/wx/xrc/Disassemble.xrc:116 ../src/wx/xrc/Disassemble.xrc:133
-#: ../src/wx/xrc/Disassemble.xrc:150 ../src/wx/xrc/Disassemble.xrc:167
-#: ../src/wx/xrc/Disassemble.xrc:184 ../src/wx/xrc/Disassemble.xrc:201
-#: ../src/wx/xrc/Disassemble.xrc:218 ../src/wx/xrc/Disassemble.xrc:235
-#: ../src/wx/xrc/Disassemble.xrc:252 ../src/wx/xrc/Disassemble.xrc:269
-#: ../src/wx/xrc/Disassemble.xrc:286 ../src/wx/xrc/Disassemble.xrc:303
-#: ../src/wx/xrc/Disassemble.xrc:320 ../src/wx/xrc/Disassemble.xrc:337
-#: ../src/wx/xrc/Disassemble.xrc:354
+#: ../src/wx/xrc/Disassemble.xrc:83 ../src/wx/xrc/Disassemble.xrc:100
+#: ../src/wx/xrc/Disassemble.xrc:117 ../src/wx/xrc/Disassemble.xrc:134
+#: ../src/wx/xrc/Disassemble.xrc:151 ../src/wx/xrc/Disassemble.xrc:168
+#: ../src/wx/xrc/Disassemble.xrc:185 ../src/wx/xrc/Disassemble.xrc:202
+#: ../src/wx/xrc/Disassemble.xrc:219 ../src/wx/xrc/Disassemble.xrc:236
+#: ../src/wx/xrc/Disassemble.xrc:253 ../src/wx/xrc/Disassemble.xrc:270
+#: ../src/wx/xrc/Disassemble.xrc:287 ../src/wx/xrc/Disassemble.xrc:304
+#: ../src/wx/xrc/Disassemble.xrc:321 ../src/wx/xrc/Disassemble.xrc:338
+#: ../src/wx/xrc/Disassemble.xrc:355
 msgid "00000000"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:89
+#: ../src/wx/xrc/Disassemble.xrc:90
 msgid "R1:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:106
+#: ../src/wx/xrc/Disassemble.xrc:107
 msgid "R2:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:123
+#: ../src/wx/xrc/Disassemble.xrc:124
 msgid "R3:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:140
+#: ../src/wx/xrc/Disassemble.xrc:141
 msgid "R4:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:157
+#: ../src/wx/xrc/Disassemble.xrc:158
 msgid "R5:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:174
+#: ../src/wx/xrc/Disassemble.xrc:175
 msgid "R6:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:191
+#: ../src/wx/xrc/Disassemble.xrc:192
 msgid "R7:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:208
+#: ../src/wx/xrc/Disassemble.xrc:209
 msgid "R8:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:225
+#: ../src/wx/xrc/Disassemble.xrc:226
 msgid "R9:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:242
+#: ../src/wx/xrc/Disassemble.xrc:243
 msgid "R10:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:259
+#: ../src/wx/xrc/Disassemble.xrc:260
 msgid "R11:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:276
+#: ../src/wx/xrc/Disassemble.xrc:277
 msgid "R12:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:293 ../src/wx/xrc/GBDisassemble.xrc:111
+#: ../src/wx/xrc/Disassemble.xrc:294 ../src/wx/xrc/GBDisassemble.xrc:111
 msgid "SP:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:310
+#: ../src/wx/xrc/Disassemble.xrc:311
 msgid "LR:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:327 ../src/wx/xrc/GBDisassemble.xrc:128
+#: ../src/wx/xrc/Disassemble.xrc:328 ../src/wx/xrc/GBDisassemble.xrc:128
 msgid "PC:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:344
+#: ../src/wx/xrc/Disassemble.xrc:345
 msgid "CPSR:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:361 ../src/wx/xrc/GBDisassemble.xrc:185
+#: ../src/wx/xrc/Disassemble.xrc:362 ../src/wx/xrc/GBDisassemble.xrc:185
 msgid "N"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:368
+#: ../src/wx/xrc/Disassemble.xrc:369
 msgid "I"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:375 ../src/wx/xrc/GBDisassemble.xrc:179
+#: ../src/wx/xrc/Disassemble.xrc:376 ../src/wx/xrc/GBDisassemble.xrc:179
 msgid "Z"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:382
+#: ../src/wx/xrc/Disassemble.xrc:383
 msgid "F"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:389 ../src/wx/xrc/GBDisassemble.xrc:197
+#: ../src/wx/xrc/Disassemble.xrc:390 ../src/wx/xrc/GBDisassemble.xrc:197
 msgid "C"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:396
+#: ../src/wx/xrc/Disassemble.xrc:397
 msgid "T"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:403
+#: ../src/wx/xrc/Disassemble.xrc:404
 msgid "V"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:413 ../src/wx/xrc/MapViewer.xrc:75
-#: ../src/wx/xrc/OAMViewer.xrc:36
+#: ../src/wx/xrc/Disassemble.xrc:414 ../src/wx/xrc/MapViewer.xrc:76
+#: ../src/wx/xrc/OAMViewer.xrc:37
 msgid "Mode:"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:423 ../src/wx/xrc/GBDisassemble.xrc:172
+#: ../src/wx/xrc/Disassemble.xrc:424 ../src/wx/xrc/GBDisassemble.xrc:172
 msgid "00"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:442 ../src/wx/xrc/GBDisassemble.xrc:212
+#: ../src/wx/xrc/Disassemble.xrc:443 ../src/wx/xrc/GBDisassemble.xrc:212
 #: ../src/wx/xrc/GBOAMViewer.xrc:93 ../src/wx/xrc/GBPaletteViewer.xrc:105
-#: ../src/wx/xrc/GBTileViewer.xrc:75 ../src/wx/xrc/IOViewer.xrc:317
-#: ../src/wx/xrc/MemViewer.xrc:71 ../src/wx/xrc/OAMViewer.xrc:108
-#: ../src/wx/xrc/PaletteViewer.xrc:80 ../src/wx/xrc/TileViewer.xrc:90
+#: ../src/wx/xrc/GBTileViewer.xrc:75 ../src/wx/xrc/IOViewer.xrc:318
+#: ../src/wx/xrc/MemViewer.xrc:72 ../src/wx/xrc/OAMViewer.xrc:109
+#: ../src/wx/xrc/PaletteViewer.xrc:81 ../src/wx/xrc/TileViewer.xrc:91
 msgid "Automatic &update"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:452 ../src/wx/xrc/GBDisassemble.xrc:222
+#: ../src/wx/xrc/Disassemble.xrc:453 ../src/wx/xrc/GBDisassemble.xrc:222
 msgid "G&oto PC"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:459 ../src/wx/xrc/GBDisassemble.xrc:229
+#: ../src/wx/xrc/Disassemble.xrc:460 ../src/wx/xrc/GBDisassemble.xrc:229
 msgid "Re&fresh"
 msgstr ""
 
-#: ../src/wx/xrc/Disassemble.xrc:466 ../src/wx/xrc/GBDisassemble.xrc:236
+#: ../src/wx/xrc/Disassemble.xrc:467 ../src/wx/xrc/GBDisassemble.xrc:236
 msgid "&Next"
 msgstr ""
 
@@ -1899,7 +1903,7 @@ msgid "Real 'GB on GBASP' Colors"
 msgstr ""
 
 #: ../src/wx/xrc/GBColorPrefPanel.xrc:46 ../src/wx/xrc/GBPaletteViewer.xrc:17
-#: ../src/wx/xrc/MapViewer.xrc:53 ../src/wx/xrc/PaletteViewer.xrc:18
+#: ../src/wx/xrc/MapViewer.xrc:54 ../src/wx/xrc/PaletteViewer.xrc:19
 msgid "Background"
 msgstr ""
 
@@ -1959,7 +1963,7 @@ msgid "0x8800"
 msgstr ""
 
 #: ../src/wx/xrc/GBMapViewer.xrc:23 ../src/wx/xrc/GBTileViewer.xrc:42
-#: ../src/wx/xrc/TileViewer.xrc:57
+#: ../src/wx/xrc/TileViewer.xrc:58
 msgid "Char Base"
 msgstr ""
 
@@ -1976,62 +1980,62 @@ msgid "Map Base"
 msgstr ""
 
 #: ../src/wx/xrc/GBMapViewer.xrc:54 ../src/wx/xrc/GBOAMViewer.xrc:88
-#: ../src/wx/xrc/GBTileViewer.xrc:68 ../src/wx/xrc/MapViewer.xrc:61
-#: ../src/wx/xrc/OAMViewer.xrc:103 ../src/wx/xrc/TileViewer.xrc:83
+#: ../src/wx/xrc/GBTileViewer.xrc:68 ../src/wx/xrc/MapViewer.xrc:62
+#: ../src/wx/xrc/OAMViewer.xrc:104 ../src/wx/xrc/TileViewer.xrc:84
 msgid "Stretch to &fit"
 msgstr ""
 
-#: ../src/wx/xrc/GBMapViewer.xrc:59 ../src/wx/xrc/MapViewer.xrc:66
+#: ../src/wx/xrc/GBMapViewer.xrc:59 ../src/wx/xrc/MapViewer.xrc:67
 msgid "Auto &update"
 msgstr ""
 
 #: ../src/wx/xrc/GBMapViewer.xrc:74 ../src/wx/xrc/GBTileViewer.xrc:99
-#: ../src/wx/xrc/MapViewer.xrc:143 ../src/wx/xrc/MemSelRegion.xrc:10
-#: ../src/wx/xrc/PaletteViewer.xrc:49 ../src/wx/xrc/TileViewer.xrc:114
+#: ../src/wx/xrc/MapViewer.xrc:144 ../src/wx/xrc/MemSelRegion.xrc:10
+#: ../src/wx/xrc/PaletteViewer.xrc:50 ../src/wx/xrc/TileViewer.xrc:115
 msgid "Address:"
 msgstr ""
 
 #: ../src/wx/xrc/GBMapViewer.xrc:82 ../src/wx/xrc/GBOAMViewer.xrc:37
-#: ../src/wx/xrc/GBTileViewer.xrc:91 ../src/wx/xrc/MapViewer.xrc:151
-#: ../src/wx/xrc/OAMViewer.xrc:60 ../src/wx/xrc/TileViewer.xrc:106
+#: ../src/wx/xrc/GBTileViewer.xrc:91 ../src/wx/xrc/MapViewer.xrc:152
+#: ../src/wx/xrc/OAMViewer.xrc:61 ../src/wx/xrc/TileViewer.xrc:107
 msgid "Tile:"
 msgstr ""
 
-#: ../src/wx/xrc/GBMapViewer.xrc:90 ../src/wx/xrc/MapViewer.xrc:159
+#: ../src/wx/xrc/GBMapViewer.xrc:90 ../src/wx/xrc/MapViewer.xrc:160
 msgid "Flip:"
 msgstr ""
 
 #: ../src/wx/xrc/GBMapViewer.xrc:98 ../src/wx/xrc/GBTileViewer.xrc:50
-#: ../src/wx/xrc/MapViewer.xrc:167 ../src/wx/xrc/TileViewer.xrc:65
+#: ../src/wx/xrc/MapViewer.xrc:168 ../src/wx/xrc/TileViewer.xrc:66
 msgid "Palette:"
 msgstr ""
 
-#: ../src/wx/xrc/GBMapViewer.xrc:106 ../src/wx/xrc/MapViewer.xrc:115
+#: ../src/wx/xrc/GBMapViewer.xrc:106 ../src/wx/xrc/MapViewer.xrc:116
 msgid "Priority:"
 msgstr ""
 
 #: ../src/wx/xrc/GBMapViewer.xrc:152 ../src/wx/xrc/GBOAMViewer.xrc:142
 #: ../src/wx/xrc/GBPaletteViewer.xrc:114 ../src/wx/xrc/GBTileViewer.xrc:145
-#: ../src/wx/xrc/IOViewer.xrc:326 ../src/wx/xrc/MapViewer.xrc:213
-#: ../src/wx/xrc/MemViewer.xrc:100 ../src/wx/xrc/OAMViewer.xrc:154
-#: ../src/wx/xrc/PaletteViewer.xrc:99 ../src/wx/xrc/TileViewer.xrc:160
+#: ../src/wx/xrc/IOViewer.xrc:327 ../src/wx/xrc/MapViewer.xrc:214
+#: ../src/wx/xrc/MemViewer.xrc:101 ../src/wx/xrc/OAMViewer.xrc:155
+#: ../src/wx/xrc/PaletteViewer.xrc:100 ../src/wx/xrc/TileViewer.xrc:161
 msgid "&Refresh"
 msgstr ""
 
-#: ../src/wx/xrc/GBMapViewer.xrc:157 ../src/wx/xrc/Logging.xrc:111
-#: ../src/wx/xrc/MapViewer.xrc:218
+#: ../src/wx/xrc/GBMapViewer.xrc:157 ../src/wx/xrc/Logging.xrc:112
+#: ../src/wx/xrc/MapViewer.xrc:219
 msgid "&Save"
 msgstr ""
 
-#: ../src/wx/xrc/GBOAMViewer.xrc:13 ../src/wx/xrc/OAMViewer.xrc:13
+#: ../src/wx/xrc/GBOAMViewer.xrc:13 ../src/wx/xrc/OAMViewer.xrc:14
 msgid "Sprite:"
 msgstr ""
 
-#: ../src/wx/xrc/GBOAMViewer.xrc:29 ../src/wx/xrc/OAMViewer.xrc:28
+#: ../src/wx/xrc/GBOAMViewer.xrc:29 ../src/wx/xrc/OAMViewer.xrc:29
 msgid "Pos:"
 msgstr ""
 
-#: ../src/wx/xrc/GBOAMViewer.xrc:45 ../src/wx/xrc/OAMViewer.xrc:68
+#: ../src/wx/xrc/GBOAMViewer.xrc:45 ../src/wx/xrc/OAMViewer.xrc:69
 msgid "Prio:"
 msgstr ""
 
@@ -2039,11 +2043,11 @@ msgstr ""
 msgid "OAP:"
 msgstr ""
 
-#: ../src/wx/xrc/GBOAMViewer.xrc:61 ../src/wx/xrc/OAMViewer.xrc:52
+#: ../src/wx/xrc/GBOAMViewer.xrc:61 ../src/wx/xrc/OAMViewer.xrc:53
 msgid "Pal:"
 msgstr ""
 
-#: ../src/wx/xrc/GBOAMViewer.xrc:69 ../src/wx/xrc/OAMViewer.xrc:92
+#: ../src/wx/xrc/GBOAMViewer.xrc:69 ../src/wx/xrc/OAMViewer.xrc:93
 msgid "Flags:"
 msgstr ""
 
@@ -2052,24 +2056,24 @@ msgid "Bank:"
 msgstr ""
 
 #: ../src/wx/xrc/GBOAMViewer.xrc:149 ../src/wx/xrc/GBTileViewer.xrc:152
-#: ../src/wx/xrc/MemViewer.xrc:114 ../src/wx/xrc/OAMViewer.xrc:161
-#: ../src/wx/xrc/TileViewer.xrc:167
+#: ../src/wx/xrc/MemViewer.xrc:115 ../src/wx/xrc/OAMViewer.xrc:162
+#: ../src/wx/xrc/TileViewer.xrc:168
 msgid "&Save..."
 msgstr ""
 
-#: ../src/wx/xrc/GBPaletteViewer.xrc:8 ../src/wx/xrc/PaletteViewer.xrc:8
+#: ../src/wx/xrc/GBPaletteViewer.xrc:8 ../src/wx/xrc/PaletteViewer.xrc:9
 msgid "Click on a color for more information"
 msgstr ""
 
-#: ../src/wx/xrc/GBPaletteViewer.xrc:27 ../src/wx/xrc/PaletteViewer.xrc:104
+#: ../src/wx/xrc/GBPaletteViewer.xrc:27 ../src/wx/xrc/PaletteViewer.xrc:105
 msgid "Save &BG..."
 msgstr ""
 
-#: ../src/wx/xrc/GBPaletteViewer.xrc:38 ../src/wx/xrc/PaletteViewer.xrc:32
+#: ../src/wx/xrc/GBPaletteViewer.xrc:38 ../src/wx/xrc/PaletteViewer.xrc:33
 msgid "Sprite"
 msgstr ""
 
-#: ../src/wx/xrc/GBPaletteViewer.xrc:48 ../src/wx/xrc/PaletteViewer.xrc:110
+#: ../src/wx/xrc/GBPaletteViewer.xrc:48 ../src/wx/xrc/PaletteViewer.xrc:111
 msgid "Save &Sprite..."
 msgstr ""
 
@@ -2077,8 +2081,8 @@ msgstr ""
 msgid "Index:"
 msgstr ""
 
-#: ../src/wx/xrc/GBPaletteViewer.xrc:79 ../src/wx/xrc/IOViewer.xrc:20
-#: ../src/wx/xrc/PaletteViewer.xrc:61
+#: ../src/wx/xrc/GBPaletteViewer.xrc:79 ../src/wx/xrc/IOViewer.xrc:21
+#: ../src/wx/xrc/PaletteViewer.xrc:62
 msgid "Value:"
 msgstr ""
 
@@ -2168,23 +2172,23 @@ msgid "Save type :"
 msgstr ""
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:27
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:177
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:178
 #: ../src/wx/xrc/GameBoyConfig.xrc:29 ../src/wx/xrc/GameBoyConfig.xrc:59
 msgid "Automatic"
 msgstr ""
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:28
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:178
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:179
 msgid "EEPROM"
 msgstr ""
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:29
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:179
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:180
 msgid "SRAM"
 msgstr ""
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:30
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:180
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:181
 msgid "Flash"
 msgstr ""
 
@@ -2197,12 +2201,12 @@ msgid "Flash size :"
 msgstr ""
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:49
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:199
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:200
 msgid "64K"
 msgstr ""
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:50
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:200
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:201
 msgid "128K"
 msgstr ""
 
@@ -2222,62 +2226,62 @@ msgstr ""
 msgid "Bios file :"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:114
-#: ../src/wx/xrc/GameBoyConfig.xrc:124
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:115
+#: ../src/wx/xrc/GameBoyConfig.xrc:126
 msgid "Boot ROM"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:124
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:125
 msgid "Game Code"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:138
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:139
 msgid "Comment"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:150
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:151
 msgid "Real Time Clock:"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:158
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:176
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:198
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:216
-#: ../src/wx/xrc/GameBoyConfig.xrc:136
-msgid "Default"
-msgstr ""
-
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:159
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:177
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:199
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:217
-msgid "Disabled"
+#: ../src/wx/xrc/GameBoyConfig.xrc:138
+msgid "Default"
 msgstr ""
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:160
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:218
+msgid "Disabled"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:161
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:219
 msgid "Enabled"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:168
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:169
 msgid "Save Type:"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:181
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:182
 msgid "EEPROM+Sensor"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:190
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:191
 msgid "Flash Size:"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:208
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:209
 msgid "Mirroring:"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:232
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:233
 msgid "&Defaults"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:239
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:240
 msgid "Game Overrides"
 msgstr ""
 
@@ -2329,23 +2333,23 @@ msgstr ""
 msgid "Boot &ROM file :"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:91 ../src/wx/xrc/GameBoyConfig.xrc:112
+#: ../src/wx/xrc/GameBoyConfig.xrc:91 ../src/wx/xrc/GameBoyConfig.xrc:113
 msgid "Select A File"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:105
+#: ../src/wx/xrc/GameBoyConfig.xrc:106
 msgid "GBC Boot ROM &file :"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:142
+#: ../src/wx/xrc/GameBoyConfig.xrc:144
 msgid "User 1"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:148
+#: ../src/wx/xrc/GameBoyConfig.xrc:150
 msgid "User 2"
 msgstr ""
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:154
+#: ../src/wx/xrc/GameBoyConfig.xrc:156
 msgid "Custom Colors"
 msgstr ""
 
@@ -2418,75 +2422,79 @@ msgstr ""
 msgid "200%"
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:9
-msgid "a"
+#: ../src/wx/xrc/IOViewer.xrc:4
+msgid "IO Viewer"
 msgstr ""
 
 #: ../src/wx/xrc/IOViewer.xrc:10
+msgid "a"
+msgstr ""
+
+#: ../src/wx/xrc/IOViewer.xrc:11
 msgid "b"
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:46
+#: ../src/wx/xrc/IOViewer.xrc:47
 msgid "15 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:63
+#: ../src/wx/xrc/IOViewer.xrc:64
 msgid "14 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:80
+#: ../src/wx/xrc/IOViewer.xrc:81
 msgid "13 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:97
+#: ../src/wx/xrc/IOViewer.xrc:98
 msgid "12 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:114
+#: ../src/wx/xrc/IOViewer.xrc:115
 msgid "11 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:131
+#: ../src/wx/xrc/IOViewer.xrc:132
 msgid "10 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:148
+#: ../src/wx/xrc/IOViewer.xrc:149
 msgid "9 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:165
+#: ../src/wx/xrc/IOViewer.xrc:166
 msgid "8 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:182
+#: ../src/wx/xrc/IOViewer.xrc:183
 msgid "7 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:199
+#: ../src/wx/xrc/IOViewer.xrc:200
 msgid "6 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:216
+#: ../src/wx/xrc/IOViewer.xrc:217
 msgid "5 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:233
+#: ../src/wx/xrc/IOViewer.xrc:234
 msgid "4 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:250
+#: ../src/wx/xrc/IOViewer.xrc:251
 msgid "3 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:267
+#: ../src/wx/xrc/IOViewer.xrc:268
 msgid "2 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:284
+#: ../src/wx/xrc/IOViewer.xrc:285
 msgid "1 "
 msgstr ""
 
-#: ../src/wx/xrc/IOViewer.xrc:301
+#: ../src/wx/xrc/IOViewer.xrc:302
 msgid "0 "
 msgstr ""
 
@@ -2621,51 +2629,55 @@ msgstr ""
 msgid "Link timeout (in milliseconds)"
 msgstr ""
 
-#: ../src/wx/xrc/Logging.xrc:12
+#: ../src/wx/xrc/Logging.xrc:4
+msgid "Logging"
+msgstr ""
+
+#: ../src/wx/xrc/Logging.xrc:13
 msgid "SW&I"
 msgstr ""
 
-#: ../src/wx/xrc/Logging.xrc:19
+#: ../src/wx/xrc/Logging.xrc:20
 msgid "Unaligned &memory"
 msgstr ""
 
-#: ../src/wx/xrc/Logging.xrc:26
+#: ../src/wx/xrc/Logging.xrc:27
 msgid "Illegal &write"
 msgstr ""
 
-#: ../src/wx/xrc/Logging.xrc:33
+#: ../src/wx/xrc/Logging.xrc:34
 msgid "Illegal &read"
 msgstr ""
 
-#: ../src/wx/xrc/Logging.xrc:40
+#: ../src/wx/xrc/Logging.xrc:41
 msgid "DMA &0"
 msgstr ""
 
-#: ../src/wx/xrc/Logging.xrc:47
+#: ../src/wx/xrc/Logging.xrc:48
 msgid "DMA &1"
 msgstr ""
 
-#: ../src/wx/xrc/Logging.xrc:54
+#: ../src/wx/xrc/Logging.xrc:55
 msgid "DMA &2"
 msgstr ""
 
-#: ../src/wx/xrc/Logging.xrc:61
+#: ../src/wx/xrc/Logging.xrc:62
 msgid "DMA &3"
 msgstr ""
 
-#: ../src/wx/xrc/Logging.xrc:68
+#: ../src/wx/xrc/Logging.xrc:69
 msgid "&Undefined instruction"
 msgstr ""
 
-#: ../src/wx/xrc/Logging.xrc:75
+#: ../src/wx/xrc/Logging.xrc:76
 msgid "&AGBPrint"
 msgstr ""
 
-#: ../src/wx/xrc/Logging.xrc:82
+#: ../src/wx/xrc/Logging.xrc:83
 msgid "Soun&d output"
 msgstr ""
 
-#: ../src/wx/xrc/Logging.xrc:87
+#: ../src/wx/xrc/Logging.xrc:88
 msgid "Verbose"
 msgstr ""
 
@@ -3127,7 +3139,7 @@ msgid "&Map Viewer..."
 msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:510
-msgid "M&emory viewer..."
+msgid "M&emory Viewer..."
 msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:513
@@ -3226,112 +3238,132 @@ msgstr ""
 msgid "Update ROM database"
 msgstr ""
 
-#: ../src/wx/xrc/MapViewer.xrc:15
+#: ../src/wx/xrc/MapViewer.xrc:4
+msgid "Map Viewer"
+msgstr ""
+
+#: ../src/wx/xrc/MapViewer.xrc:16
 msgid "Frame 0"
 msgstr ""
 
-#: ../src/wx/xrc/MapViewer.xrc:21
+#: ../src/wx/xrc/MapViewer.xrc:22
 msgid "Frame 1"
 msgstr ""
 
-#: ../src/wx/xrc/MapViewer.xrc:24
+#: ../src/wx/xrc/MapViewer.xrc:25
 msgid "Frame"
 msgstr ""
 
-#: ../src/wx/xrc/MapViewer.xrc:34
+#: ../src/wx/xrc/MapViewer.xrc:35
 msgid "BG0"
 msgstr ""
 
-#: ../src/wx/xrc/MapViewer.xrc:40
+#: ../src/wx/xrc/MapViewer.xrc:41
 msgid "BG1"
 msgstr ""
 
-#: ../src/wx/xrc/MapViewer.xrc:45
+#: ../src/wx/xrc/MapViewer.xrc:46
 msgid "BG2"
 msgstr ""
 
-#: ../src/wx/xrc/MapViewer.xrc:50
+#: ../src/wx/xrc/MapViewer.xrc:51
 msgid "BG3"
 msgstr ""
 
-#: ../src/wx/xrc/MapViewer.xrc:83
+#: ../src/wx/xrc/MapViewer.xrc:84
 msgid "Map Base:"
 msgstr ""
 
-#: ../src/wx/xrc/MapViewer.xrc:91
+#: ../src/wx/xrc/MapViewer.xrc:92
 msgid "Char Base:"
 msgstr ""
 
-#: ../src/wx/xrc/MapViewer.xrc:99 ../src/wx/xrc/MemSelRegion.xrc:22
-#: ../src/wx/xrc/OAMViewer.xrc:76
+#: ../src/wx/xrc/MapViewer.xrc:100 ../src/wx/xrc/MemSelRegion.xrc:22
+#: ../src/wx/xrc/OAMViewer.xrc:77
 msgid "Size:"
 msgstr ""
 
-#: ../src/wx/xrc/MapViewer.xrc:107 ../src/wx/xrc/OAMViewer.xrc:44
+#: ../src/wx/xrc/MapViewer.xrc:108 ../src/wx/xrc/OAMViewer.xrc:45
 msgid "Colors:"
 msgstr ""
 
-#: ../src/wx/xrc/MapViewer.xrc:123
+#: ../src/wx/xrc/MapViewer.xrc:124
 msgid "Mosaic:"
 msgstr ""
 
-#: ../src/wx/xrc/MapViewer.xrc:131
+#: ../src/wx/xrc/MapViewer.xrc:132
 msgid "Overflow:"
 msgstr ""
 
-#: ../src/wx/xrc/MemViewer.xrc:16
+#: ../src/wx/xrc/MemViewer.xrc:4
+msgid "Memory Viewer"
+msgstr ""
+
+#: ../src/wx/xrc/MemViewer.xrc:17
 msgid "&8-bit"
 msgstr ""
 
-#: ../src/wx/xrc/MemViewer.xrc:24
+#: ../src/wx/xrc/MemViewer.xrc:25
 msgid "&16-bit"
 msgstr ""
 
-#: ../src/wx/xrc/MemViewer.xrc:31
+#: ../src/wx/xrc/MemViewer.xrc:32
 msgid "&32-bit"
 msgstr ""
 
-#: ../src/wx/xrc/MemViewer.xrc:82
+#: ../src/wx/xrc/MemViewer.xrc:83
 msgid "Current address:"
 msgstr ""
 
-#: ../src/wx/xrc/MemViewer.xrc:107
+#: ../src/wx/xrc/MemViewer.xrc:108
 msgid "&Load..."
 msgstr ""
 
-#: ../src/wx/xrc/NetLink.xrc:10
+#: ../src/wx/xrc/NetLink.xrc:4
+msgid "Start Network Link"
+msgstr ""
+
+#: ../src/wx/xrc/NetLink.xrc:11
 msgid "Server"
 msgstr ""
 
-#: ../src/wx/xrc/NetLink.xrc:18
+#: ../src/wx/xrc/NetLink.xrc:19
 msgid "Client"
 msgstr ""
 
-#: ../src/wx/xrc/NetLink.xrc:31
+#: ../src/wx/xrc/NetLink.xrc:32
 msgid "Players:"
 msgstr ""
 
-#: ../src/wx/xrc/NetLink.xrc:40
+#: ../src/wx/xrc/NetLink.xrc:41
 msgid "2"
 msgstr ""
 
-#: ../src/wx/xrc/NetLink.xrc:48
+#: ../src/wx/xrc/NetLink.xrc:49
 msgid "3"
 msgstr ""
 
-#: ../src/wx/xrc/NetLink.xrc:55
+#: ../src/wx/xrc/NetLink.xrc:56
 msgid "4"
 msgstr ""
 
-#: ../src/wx/xrc/NetLink.xrc:66
+#: ../src/wx/xrc/NetLink.xrc:67
 msgid "Server:"
 msgstr ""
 
-#: ../src/wx/xrc/OAMViewer.xrc:84
+#: ../src/wx/xrc/OAMViewer.xrc:4
+msgid "OAM Viewer"
+msgstr ""
+
+#: ../src/wx/xrc/OAMViewer.xrc:85
 msgid "Rot.:"
 msgstr ""
 
-#: ../src/wx/xrc/PaletteViewer.xrc:87
+#: ../src/wx/xrc/PaletteViewer.xrc:4
+msgid "Palette Viewer"
+msgstr ""
+
+#: ../src/wx/xrc/PaletteViewer.xrc:88
 msgid "C&hange backdrop color..."
 msgstr ""
 
@@ -3431,34 +3463,38 @@ msgstr ""
 msgid "Sound filtering"
 msgstr ""
 
-#: ../src/wx/xrc/TileViewer.xrc:14
+#: ../src/wx/xrc/TileViewer.xrc:4
+msgid "Tile Viewer"
+msgstr ""
+
+#: ../src/wx/xrc/TileViewer.xrc:15
 msgid "1&6"
 msgstr ""
 
-#: ../src/wx/xrc/TileViewer.xrc:20
+#: ../src/wx/xrc/TileViewer.xrc:21
 msgid "&256"
 msgstr ""
 
-#: ../src/wx/xrc/TileViewer.xrc:23
+#: ../src/wx/xrc/TileViewer.xrc:24
 msgid "Colors"
 msgstr ""
 
-#: ../src/wx/xrc/TileViewer.xrc:33
+#: ../src/wx/xrc/TileViewer.xrc:34
 msgid "0x600&0000"
 msgstr ""
 
-#: ../src/wx/xrc/TileViewer.xrc:39
+#: ../src/wx/xrc/TileViewer.xrc:40
 msgid "0x600&4000"
 msgstr ""
 
-#: ../src/wx/xrc/TileViewer.xrc:44
+#: ../src/wx/xrc/TileViewer.xrc:45
 msgid "0x600&8000"
 msgstr ""
 
-#: ../src/wx/xrc/TileViewer.xrc:49
+#: ../src/wx/xrc/TileViewer.xrc:50
 msgid "0x600&C000"
 msgstr ""
 
-#: ../src/wx/xrc/TileViewer.xrc:54
+#: ../src/wx/xrc/TileViewer.xrc:55
 msgid "0x60&10000"
 msgstr ""
