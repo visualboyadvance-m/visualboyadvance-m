@@ -362,7 +362,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser &cl)
 
 	wxString s;
 
-	if (cl.Found(_("save-xrc"), &s))
+	if (cl.Found(wxT("save-xrc"), &s))
 	{
 		// This was most likely done on a command line, so use
 		// stderr instead of gui for messages
@@ -390,7 +390,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser &cl)
 		return false;
 	}
 
-	if (cl.Found(_("print-cfg-path")))
+	if (cl.Found(wxT("print-cfg-path")))
 	{
 		// This was most likely done on a command line, so use
 		// stderr instead of gui for messages
@@ -401,7 +401,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser &cl)
 		return false;
 	}
 
-	if (cl.Found(_("save-over"), &s))
+	if (cl.Found(wxT("save-over"), &s))
 	{
 		// This was most likely done on a command line, so use
 		// stderr instead of gui for messages
@@ -433,11 +433,11 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser &cl)
 		for (int i = 0; i < num_opts; i++)
 		{
 			wxPrintf(wxT("%s (%s"), opts[i].opt,
-			         opts[i].boolopt ? (const wxChar*)_("flag") :
-			         opts[i].stropt ? (const wxChar*)_("string") :
+			         opts[i].boolopt ? (const wxChar*)wxT("flag") :
+			         opts[i].stropt ? (const wxChar*)wxT("string") :
 			         opts[i].enumvals ? opts[i].enumvals :
-			         opts[i].intopt ? (const wxChar*)_("int") :
-			         (const wxChar*)_("string"));
+			         opts[i].intopt ? (const wxChar*)wxT("int") :
+			         (const wxChar*)wxT("string"));
 
 			if (opts[i].enumvals)
 			{
@@ -934,7 +934,7 @@ void MainFrame::IdentifyRom()
 	wxString scene_rls;
 	wxString scene_name;
 	wxString rom_crc32_str;
-	rom_crc32_str.Printf(_("%08X"), panel->rom_crc32);
+	rom_crc32_str.Printf(wxT("%08X"), panel->rom_crc32);
 
 	if (wxGetApp().rom_database_nointro.FileExists())
 	{
