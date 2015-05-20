@@ -17,6 +17,7 @@
             <object class="wxDirPickerCtrl" name="GBARoms">
               <message>Game Boy Advance ROMs</message>
               <style>wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST</style>
+              <size>439,30</size>
             </object>
             <flag>wxALL|wxEXPAND</flag>
             <border>5</border>

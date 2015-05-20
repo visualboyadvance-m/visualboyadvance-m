@@ -97,6 +97,7 @@
                   <object class="sizeritem">
                     <object class="wxFilePickerCtrl" name="BootRom">
                       <wildcard>BIOS files (*.bin;*.rom)|*.bin;*.rom|All files|*</wildcard>
+                      <size>527,30</size>
                     </object>
                     <option>1</option>
                     <flag>wxALL|wxEXPAND</flag>
