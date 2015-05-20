@@ -42,7 +42,7 @@
 	     <key>UTTypeDescription</key>
 	     <string>GameBoy Advance ROM</string>
 	     <key>UTTypeIconFile</key>
-	     <string>wxvbam.icns</string>
+	     <string>${MACOSX_BUNDLE_ICON_FILE}</string>
 	     <key>UTTypeConformsTo</key>
 	     <array>
 	        <string>public.data</string>
@@ -77,7 +77,7 @@
 	     <key>UTTypeDescription</key>
 	     <string>GameBoy ROM</string>
 	     <key>UTTypeIconFile</key>
-	     <string>wxvbam.icns</string>
+	     <string>${MACOSX_BUNDLE_ICON_FILE}</string>
 	     <key>UTTypeConformsTo</key>
 	     <array>
 	        <string>public.data</string>
