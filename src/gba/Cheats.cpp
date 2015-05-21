@@ -2747,7 +2747,7 @@ bool cheatsLoadCheatList(const char *file)
   }
   if (type == 1)
   {
-    if(fread(cheatsList, 1, sizeof(cheatsList), f) != sizeof(cheatsList)) {
+    if(fread(cheatsList, 1, sizeof(cheatsList), f) > sizeof(cheatsList)) {
       fclose(f);
       return false;
     }
