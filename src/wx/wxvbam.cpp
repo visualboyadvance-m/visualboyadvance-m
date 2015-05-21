@@ -62,7 +62,10 @@ static void tack_full_path(wxString &s, const wxString &app = wxEmptyString)
 bool wxvbamApp::OnInit()
 {
 	// use consistent names for config
-	SetAppName(_T("wxvbam"));
+	SetAppName(_("VBA-M"));
+#if (wxMAJOR_VERSION >= 3)
+	SetAppDisplayName(_T("VisualBoyAdvance-M"));
+#endif
 	// load system default locale, if available
 	locale.Init();
 	locale.AddCatalog(_T("wxvbam"));
