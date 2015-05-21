@@ -1416,7 +1416,8 @@ void log(const char* defaultMsg, ...)
 	if (out == NULL)
 	{
 		// FIXME: this should be an option
-		out = fopen("trace.log", "w");
+		wxFileName trace_log(wxStandardPaths::Get().GetUserLocalDataDir(), wxT("trace.log"));
+		out = fopen(trace_log.GetFullPath().mb_str(), "w");
 
 		if (!out)
 			return;
