@@ -1159,10 +1159,14 @@ void systemScreenMessage(const char* msg)
 bool systemCanChangeSoundQuality()
 {
 #ifndef NO_FFMPEG
-	GameArea* panel = wxGetApp().frame->GetPanel();
 
-	if (panel)
-		return !panel->IsRecording();
+	if (emulating)
+	{
+		GameArea* panel = wxGetApp().frame->GetPanel();
+
+		if (panel)
+			return !panel->IsRecording();
+	}
 
 #endif
 	return wxGetApp().IsMainLoopRunning();
