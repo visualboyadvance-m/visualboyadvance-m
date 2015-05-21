@@ -62,7 +62,7 @@ static void tack_full_path(wxString &s, const wxString &app = wxEmptyString)
 bool wxvbamApp::OnInit()
 {
 	// use consistent names for config
-	SetAppName(_("VBA-M"));
+	SetAppName(_("vbam"));
 #if (wxMAJOR_VERSION >= 3)
 	SetAppDisplayName(_T("VisualBoyAdvance-M"));
 #endif
@@ -152,6 +152,9 @@ bool wxvbamApp::OnInit()
 #endif
 		// only the path part gets created
 		// note that 0777 is default (assumes umask will do og-w)
+		s.Mkdir(0777, wxPATH_MKDIR_FULL);
+		s = wxStandardPaths::Get().GetUserLocalDataDir();
+		s.AppendDir(s.GetFullName());
 		s.Mkdir(0777, wxPATH_MKDIR_FULL);
 	}
 
