@@ -67,6 +67,9 @@ FIND_PACKAGE ( OpenGL REQUIRED )
 FIND_PACKAGE ( SDL REQUIRED )
 
 if( ENABLE_LINK )
+    if( WIN32 )
+        set(SFML_STATIC_LIBRARIES TRUE)
+    endif( WIN32 )
     FIND_PACKAGE ( SFML 2 COMPONENTS network system )
 endif( ENABLE_LINK )
 # set the standard libraries all ports use
