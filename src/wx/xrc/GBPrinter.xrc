@@ -9,7 +9,7 @@
             <style>wxFULL_REPAINT_ON_RESIZE</style>
           </object>
           <size>320,288</size>
-          <style>wxBORDER_SIMPLE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL</style>
+          <style>wxBORDER_SIMPLE|wxHSCROLL|wxVSCROLL</style>
         </object>
         <flag>wxALL|wxALIGN_CENTRE</flag>
         <border>5</border>
