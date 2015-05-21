@@ -264,8 +264,6 @@ private:
   u16 m_state_count_max;
   u16 m_rewind_interval;
   static const u32 SZSTATE = 1024*512;
-  static const u16 STATE_MAX_DEFAULT = 180u;
-  static const u16 STATE_INTERVAL_DEFAULT = 165u;
   std::deque<char*> m_rewind_load_q;
   char *m_psavestate;
 
