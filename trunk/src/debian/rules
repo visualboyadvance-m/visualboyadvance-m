@@ -1,0 +1,40 @@
+#!/usr/bin/make -f
+
+# Copyright (C) 2014, 2015 Sergio Benjamim (sergio-br2) <sergio_br2@yahoo.com.br>
+# Copyright (C) 2009 Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Uncomment this to turn on verbose mode
+#export DH_VERBOSE=1
+
+ifeq ($(DH_VERBOSE),1)
+EXTRA_CMAKE_FLAGS += -DCMAKE_VERBOSE_MAKEFILE=ON
+endif
+
+#DEB_BUILD_ARCH_CPU ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU)
+
+#ifneq (,$(filter $(DEB_BUILD_ARCH_CPU),i386 amd64))
+#EXTRA_CMAKE_FLAGS += -DUSE_ASM_SCALERS=ON -DUSE_ASM_CORE=ON
+#endif
+
+CMAKE_EXTRA_FLAGS += -DCMAKE_INSTALL_PREFIX=/usr \
+						-DENABLE_LIRC=ON -DENABLE_LINK=ON \
+						-DCMAKE_SKIP_RPATH=ON $(EXTRA_CMAKE_FLAGS)
+
+%:
+	dh $@ --buildsystem=cmake --parallel
+
+override_dh_auto_configure:
+	dh_auto_configure -- $(CMAKE_EXTRA_FLAGS)

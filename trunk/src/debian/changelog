@@ -1,0 +1,98 @@
+vbam (1.8.0.1458-1) UNRELEASED; urgency=low
+
+  * Update some commits of 2.0.0 beta 1.
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Wed, 20 May 2015 18:30:00 -0300
+
+vbam (1.8.0.1447-1) UNRELEASED; urgency=low
+
+  * Update, 2.0.0 beta 1 release.
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Mon, 18 May 2015 17:01:00 -0300
+
+vbam (1.8.0.1231-3) UNRELEASED; urgency=low
+
+  * Revert SDL sound changes to upstream svn 1226, until they fix it (bug #147)
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Sun, 11 May 2014 11:09:00 +0100
+
+vbam (1.8.0.1231-2) UNRELEASED; urgency=low
+
+  * Manual merge from upstream
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Sun, 11 May 2014 11:08:00 +0100
+
+vbam (1.8.0.1231-1) UNRELEASED; urgency=low
+
+  * Re-added rWindows/other stuff (easy recipe to merge upstream changes to fixes)
+  * New icons
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Sun, 11 May 2014 09:20:00 +0100
+
+vbam (1.8.0.1230-2) UNRELEASED; urgency=low
+
+  * Added missing Build-Depends
+  * Package for vbam-sdl
+  * Fixed some lintian warnings/errors
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Sun, 27 Apr 2014 15:48:00 +0100
+
+vbam (1.8.0.1230-1) UNRELEASED; urgency=low
+
+  * Fixing launchpad orig.tar.gz error
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Sat, 22 Mar 2014 16:23:00 +0100
+
+vbam (1.8.0.1229-2) UNRELEASED; urgency=low
+
+  * Updated copyright year and fixed homepage link
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Sat, 22 Mar 2014 15:59:00 +0100
+
+vbam (1.8.0.1229-1) UNRELEASED; urgency=low
+
+  * Use new version from upstream
+
+ -- Sérgio Benjamim <sergio_br2@yahoo.com.br>  Thu, 20 Mar 2014 19:30:00 +0100
+
+vbam (1.8.0.1042-1) lucid; urgency=low
+
+  * Use new version from upstream
+
+ -- Bastien Bouclet <bgk@users.sourceforge.net>  Sun, 04 Dec 2011 08:48:11 +0100
+
+vbam (1.8.0.1016-1) unstable; urgency=low
+
+  * Use new version from upstream, with wxwidgets patches
+
+ -- Thomas J. Moore <darktjm@gmail.com>  Sun, 22 May 2011 14:08:05 -0500
+
+vbam (1.8.0.1001-1) unstable; urgency=low
+
+  * Use new version from upstream
+
+ -- Bastien Bouclet <bgk@users.sourceforge.net>  Fri, 25 Feb 2011 12:25:25 +0100
+
+vbam (1.8.0.914-1) unstable; urgency=low
+
+  * Cleanup, packages split into SDL and GTK+ versions
+
+ -- Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>  Sun, 04 Oct 2009 19:58:09 -0300
+
+vbam (1.8.0.913-1) unstable; urgency=low
+
+  * Using assembly optmizations for i386 and amd64 platforms
+
+ -- Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>  Sat, 03 Oct 2009 22:41:55 -0300
+
+vbam (1.8.0.912-1) unstable; urgency=low
+
+  * Added libglademm-2.4-dev as a build-time dependency
+
+ -- Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>  Sun, 27 Sep 2009 23:26:23 -0300
+
+vbam (1.8.0.905-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Fernando Tarlá Cardoso Lemos <fernandotcl@gmail.com>  Sat, 12 Sep 2009 19:39:52 -0300
