@@ -1,0 +1,76 @@
+Source: vbam
+Section: otherosfs
+Priority: optional
+Maintainer: Sérgio Benjamim <sergio_br2@yahoo.com.br>
+Build-Depends:	debhelper (>= 9),
+				cmake (>= 2.6.0),
+				libpng12-dev, 
+				imagemagick, 
+				libopenal-dev, 
+				libsdl1.2-dev, 
+				libgtkmm-2.4-dev, 
+				libgtkglextmm-x11-1.2-dev, 
+				libwxbase3.0-dev,
+				libwxgtk3.0-dev, 
+				libcairo2-dev, 
+				libsfml-dev, 
+				nasm [i386 amd64], 
+				liblircclient-dev, 
+				libavcodec-dev, 
+				libavformat-dev, 
+				libswscale-dev, 
+				libavutil-dev,
+				libgl1-mesa-dev,
+				zip,
+				zlib1g-dev
+Standards-Version: 3.9.5
+Homepage: http://vba-m.com
+Vcs-Svn: svn://svn.code.sf.net/p/vbam/code/trunk
+Vcs-Browser: http://svn.code.sf.net/p/vbam/code/trunk
+
+Package: vbam-sdl
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Nintendo Game Boy Advance emulator
+ VisualBoyAdvance-M is a Nintendo Game Boy Emulator with high compatibility
+ with commercial games. It emulates the Nintendo Game Boy Advance handheld
+ console, in addition to the original Game Boy handhelds and its Super and
+ Color variants.
+ .
+ This package does not provide a GUI version of VBA-M.
+ See the vbam-gtk package for the GTK+ version of this program.
+ See the vbam-wx package for the wxWidgets version of this program.
+ .
+ Game Boy, Game Boy Color, Super Game Boy and Game Boy Advance are registered
+ trademarks of Nintendo of America Inc. VBA-M is not affiliated with or endorsed
+ by any of the companies mentioned.
+
+#Package: vbam-gtk
+#Architecture: any
+#Depends: ${shlibs:Depends}, ${misc:Depends}
+#Description: Nintendo Game Boy Advance emulator (GTK+ frontend)
+# VisualBoyAdvance-M is a Nintendo Game Boy Emulator with high compatibility
+# with commercial games. It emulates the Nintendo Game Boy Advance handheld
+# console, in addition to the original Game Boy handhelds and its Super and
+# Color variants.
+# .
+# This package provides the GTK+ GUI version of VBA-M.
+# .
+# Game Boy, Game Boy Color, Super Game Boy and Game Boy Advance are registered
+# trademarks of Nintendo of America Inc. VBA-M is not affiliated with or endorsed
+# by any of the companies mentioned.
+
+Package: vbam-wx
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Nintendo Game Boy Advance emulator (wxWidgets frontend)
+ VisualBoyAdvance-M is a Nintendo Game Boy Emulator with high compatibility
+ with commercial games. It emulates the Nintendo Game Boy Advance handheld
+ console, in addition to the original Game Boy handhelds and its Super and
+ Color variants.
+ .
+ This package provides the wxWidgets GUI version of VBA-M.
+ .
+ Game Boy, Game Boy Color, Super Game Boy and Game Boy Advance are registered
+ trademarks of Nintendo of America Inc. VBA-M is not affiliated with or endorsed
+ by any of the companies mentioned.
