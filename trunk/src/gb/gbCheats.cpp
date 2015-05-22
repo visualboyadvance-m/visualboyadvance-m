@@ -162,7 +162,7 @@ bool gbCheatsLoadCheatList(const char *file)
     return false;
   }
 
-  if(fread(gbCheatList, 1, sizeof(gbCheatList), f) != sizeof(gbCheatList)) {
+  if(fread(gbCheatList, 1, sizeof(gbCheatList), f) > sizeof(gbCheatList)) {
     fclose(f);
     return false;
   }
