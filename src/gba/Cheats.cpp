@@ -2699,7 +2699,7 @@ void cheatsSaveCheatList(const char *file)
   int type = 1;
   fwrite(&type, 1, sizeof(type), f);
   fwrite(&cheatsNumber, 1, sizeof(cheatsNumber), f);
-  fwrite(cheatsList, 1, sizeof(cheatsList), f);
+  fwrite(cheatsList, 1, sizeof(CheatsData) * cheatsNumber, f);
   fclose(f);
 }
 
