@@ -3472,6 +3472,62 @@ void CPUInit(const char *biosFileName, bool useBiosFile)
   }
 }
 
+void SetSaveType(int st)
+{
+	switch (st) {
+	case 0: // automatic
+		cpuSramEnabled = true;
+		cpuFlashEnabled = true;
+		cpuEEPROMEnabled = true;
+		cpuEEPROMSensorEnabled = false;
+		gbaSaveType = 0;
+		cpuSaveGameFunc = flashSaveDecide;
+		break;
+	case 1: // EEPROM
+		eepromReset();
+		cpuSramEnabled = false;
+		cpuFlashEnabled = false;
+		cpuEEPROMEnabled = true;
+		cpuEEPROMSensorEnabled = false;
+		gbaSaveType = 3;
+		// EEPROM usage is automatically detected
+		break;
+	case 2: // SRAM
+		cpuSramEnabled = true;
+		cpuFlashEnabled = false;
+		cpuEEPROMEnabled = false;
+		cpuEEPROMSensorEnabled = false;
+		cpuSaveGameFunc = sramDelayedWrite; // to insure we detect the write
+		gbaSaveType = 1;
+		break;
+	case 3: // FLASH
+		flashReset();
+		cpuSramEnabled = false;
+		cpuFlashEnabled = true;
+		cpuEEPROMEnabled = false;
+		cpuEEPROMSensorEnabled = false;
+		cpuSaveGameFunc = flashDelayedWrite; // to insure we detect the write
+		gbaSaveType = 2;
+		break;
+	case 4: // EEPROM+Sensor
+		cpuSramEnabled = false;
+		cpuFlashEnabled = false;
+		cpuEEPROMEnabled = true;
+		cpuEEPROMSensorEnabled = true;
+		// EEPROM usage is automatically detected
+		gbaSaveType = 3;
+		break;
+	case 5: // NONE
+		cpuSramEnabled = false;
+		cpuFlashEnabled = false;
+		cpuEEPROMEnabled = false;
+		cpuEEPROMSensorEnabled = false;
+		// no save at all
+		gbaSaveType = 5;
+		break;
+	}
+}
+
 void CPUReset()
 {
   if(gbaSaveType == 0) {
@@ -3479,10 +3535,10 @@ void CPUReset()
       gbaSaveType = 3;
     else
       switch(saveType) {
-      case 1:
+      case 2:
         gbaSaveType = 1;
         break;
-      case 2:
+      case 3:
         gbaSaveType = 2;
         break;
       }
@@ -3711,58 +3767,7 @@ void CPUReset()
       BIOS_RegisterRamReset(0xfe);
   }
 
-  switch(saveType) {
-  case 0: // automatic
-    cpuSramEnabled = true;
-    cpuFlashEnabled = true;
-    cpuEEPROMEnabled = true;
-    cpuEEPROMSensorEnabled = false;
-    gbaSaveType = 0;
-	cpuSaveGameFunc = flashSaveDecide;
-    break;
-  case 1: // EEPROM
-    eepromReset();
-    cpuSramEnabled = false;
-    cpuFlashEnabled = false;
-    cpuEEPROMEnabled = true;
-    cpuEEPROMSensorEnabled = false;
-    gbaSaveType = 3;
-    // EEPROM usage is automatically detected
-    break;
-  case 2: // SRAM
-    cpuSramEnabled = true;
-    cpuFlashEnabled = false;
-    cpuEEPROMEnabled = false;
-    cpuEEPROMSensorEnabled = false;
-    cpuSaveGameFunc = sramDelayedWrite; // to insure we detect the write
-    gbaSaveType = 1;
-    break;
-  case 3: // FLASH
-    flashReset();
-    cpuSramEnabled = false;
-    cpuFlashEnabled = true;
-    cpuEEPROMEnabled = false;
-    cpuEEPROMSensorEnabled = false;
-    cpuSaveGameFunc = flashDelayedWrite; // to insure we detect the write
-    gbaSaveType = 2;
-    break;
-  case 4: // EEPROM+Sensor
-    cpuSramEnabled = false;
-    cpuFlashEnabled = false;
-    cpuEEPROMEnabled = true;
-    cpuEEPROMSensorEnabled = true;
-    // EEPROM usage is automatically detected
-    gbaSaveType = 3;
-    break;
-  case 5: // NONE
-    cpuSramEnabled = false;
-    cpuFlashEnabled = false;
-    cpuEEPROMEnabled = false;
-    cpuEEPROMSensorEnabled = false;
-    // no save at all
-    gbaSaveType = 5;
-    break;
-  }
+  SetSaveType(saveType);
 
   ARM_PREFETCH;
 
