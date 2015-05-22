@@ -197,7 +197,7 @@ bool gbVerifyGsCode(const char *code)
 
 bool gbAddGsCheat(const char *code, const char *desc)
 {
-  if(gbCheatNumber > 99) {
+  if(gbCheatNumber > (MAX_CHEATS - 1)) {
     systemMessage(MSG_MAXIMUM_NUMBER_OF_CHEATS,
                   N_("Maximum number of cheats reached."));
     return false;
@@ -317,7 +317,7 @@ bool gbVerifyGgCode(const char *code)
 
 bool gbAddGgCheat(const char *code, const char *desc)
 {
-  if(gbCheatNumber > 99) {
+  if(gbCheatNumber > (MAX_CHEATS - 1)) {
     systemMessage(MSG_MAXIMUM_NUMBER_OF_CHEATS,
                   N_("Maximum number of cheats reached."));
     return false;
