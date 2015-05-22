@@ -1068,7 +1068,7 @@ bool CPUWriteBatteryFile(const char *fileName)
           return false;
         }
       } else {
-        if(fwrite(flashSaveMemory, 1, 0x10000, file) != 0x10000) {
+        if(fwrite(flashSaveMemory, 1, 0x8000, file) != 0x8000) {
           fclose(file);
           return false;
         }
@@ -1335,12 +1335,17 @@ bool CPUReadBatteryFile(const char *fileName)
         return false;
       }
       flashSetSize(0x20000);
-    } else {
+    } else if(size == 0x10000) {
       if(fread(flashSaveMemory, 1, 0x10000, file) != 0x10000) {
         fclose(file);
         return false;
       }
       flashSetSize(0x10000);
+	} else if (size == 0x8000) {
+	  if (fread(flashSaveMemory, 1, 0x8000, file) != 0x8000) {
+		  fclose(file);
+		  return false;
+	  }
     }
   }
   fclose(file);
