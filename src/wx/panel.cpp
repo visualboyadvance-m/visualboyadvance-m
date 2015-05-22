@@ -111,6 +111,7 @@ void GameArea::LoadGame(const wxString &name)
 	// too much trouble for now, though
 	bool loadpatch = autoPatch;
 	wxFileName pfn = loaded_game;
+	int ovSaveType = 0;
 
 	if (loadpatch)
 	{
@@ -251,15 +252,15 @@ void GameArea::LoadGame(const wxString &name)
 				fsz = 0x10000 << winFlashSize;
 
 			flashSetSize(fsz);
-			cpuSaveType = cfg->Read(wxT("saveType"), cpuSaveType);
+			ovSaveType = cfg->Read(wxT("saveType"), cpuSaveType);
 
-			if (cpuSaveType < 0 || cpuSaveType > 5)
-				cpuSaveType = 0;
+			if (ovSaveType < 0 || ovSaveType > 5)
+				ovSaveType = 0;
 
-			if (cpuSaveType == 0)
+			if (ovSaveType == 0)
 				utilGBAFindSave(rom_size);
 			else
-				saveType = cpuSaveType;
+				saveType = ovSaveType;
 
 			mirroringEnable = cfg->Read(wxT("mirroringEnabled"), (long)1);
 			cfg->SetPath(wxT("/"));
@@ -277,12 +278,6 @@ void GameArea::LoadGame(const wxString &name)
 			else
 				saveType = cpuSaveType;
 
-			// mirroring short ROMs is such an uncommon thing that any
-			// carts needing it should be added to vba-over.ini.
-			// on the other hand, I would see nothing wrong with enabling
-			// by default on carts that are small enough (i.e., always
-			// set this to true and ignore vba-over.ini).  It's just a one-time
-			// init.
 			mirroringEnable = true;
 		}
 
@@ -367,6 +362,35 @@ void GameArea::LoadGame(const wxString &name)
 			wxString msg;
 			msg.Printf(_("Loaded battery %s"), bat.GetFullPath().c_str());
 			systemScreenMessage(msg);
+
+			if (cpuSaveType == 0 && ovSaveType == 0 && t == IMAGE_GBA)
+			{
+				switch (bat.GetSize().GetValue())
+				{
+				case 0x200:
+				case 0x2000:
+					saveType = 1;
+					break;
+
+				case 0x8000:
+					saveType = 2;
+					break;
+
+				case 0x10000:
+					if (saveType == 1 || saveType == 2)
+						break;
+
+				case 0x20000:
+					saveType = 3;
+					flashSetSize(fnb.length());
+					break;
+
+				default:
+					break;
+				}
+
+				SetSaveType(saveType);
+			}
 		}
 
 		// forget old save writes
