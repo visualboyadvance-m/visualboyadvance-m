@@ -113,7 +113,7 @@ void gbCheatsSaveCheatList(const char *file)
   int type = 1;
   fwrite(&type, 1, sizeof(type), f);
   fwrite(&gbCheatNumber, 1, sizeof(gbCheatNumber), f);
-  fwrite(gbCheatList, 1, sizeof(gbCheatList), f);
+  fwrite(gbCheatList, 1, sizeof(gbCheat) * gbCheatNumber, f);
   fclose(f);
 }
 
