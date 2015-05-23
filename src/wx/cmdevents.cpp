@@ -87,37 +87,78 @@ void MainFrame::SetMenuOption(const char* menuName, int value)
 
 //// File menu
 
-// formerly OpenGBA, OpenGBC, OpenGB
-// having just one means separate ROM dirs only make sense on the cmd line
-
 static int open_ft = 0;
 static wxString open_dir;
 
 EVT_HANDLER(wxID_OPEN, "Open ROM...")
 {
-	if (gbEmulatorType == 1)
-		open_dir = gopts.gba_rom_dir;
-	else if (gbEmulatorType == 5)
-		open_dir = gopts.gb_rom_dir;
-	else
-		open_dir = gopts.gbc_rom_dir;
-
+	open_dir = gopts.gba_rom_dir;
 	// FIXME: ignore if non-existent or not a dir
 	wxString pats = _(
-	                    "Archives (*.zip;*.7z;*.rar)|"
+	                    "GameBoy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|"
+	                    "*.agb;*.gba;*.bin;*.elf;*.mb;"
+	                    "*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;"
+	                    "*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;"
 	                    "*.zip;*.7z;*.rar"
-	                    "|GameBoy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb)|"
-	                    "*.agb;*.gba;*.bin;*.elf;*.mb"
-	                    "*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz"
-	                    "*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z"
-	                    "|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb)|"
-	                    "*.dmg;*.gb;*.gbc;*.cgb;*.sgb"
-	                    "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz"
-	                    "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z"
+	                    "|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
+	                    "*.dmg;*.gb;*.gbc;*.cgb;*.sgb;"
+	                    "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;"
+	                    "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
+	                    "*.zip;*.7z;*.rar"
 	                    "|"
 	                );
 	pats.append(wxALL_FILES);
 	wxFileDialog dlg(this, _("Open ROM file"), open_dir, wxT(""),
+	                 pats,
+	                 wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+	dlg.SetFilterIndex(open_ft);
+
+	if (ShowModal(&dlg) == wxID_OK)
+		wxGetApp().pending_load = dlg.GetPath();
+
+	open_ft = dlg.GetFilterIndex();
+	open_dir = dlg.GetDirectory();
+}
+
+EVT_HANDLER(OpenGB, "Open GB...")
+{
+	open_dir = gopts.gb_rom_dir;
+	// FIXME: ignore if non-existent or not a dir
+	wxString pats = _(
+	                    "GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
+	                    "*.dmg;*.gb;*.gbc;*.cgb;*.sgb;"
+	                    "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;"
+	                    "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
+	                    "*.zip;*.7z;*.rar"
+	                    "|"
+	                );
+	pats.append(wxALL_FILES);
+	wxFileDialog dlg(this, _("Open GB ROM file"), open_dir, wxT(""),
+	                 pats,
+	                 wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+	dlg.SetFilterIndex(open_ft);
+
+	if (ShowModal(&dlg) == wxID_OK)
+		wxGetApp().pending_load = dlg.GetPath();
+
+	open_ft = dlg.GetFilterIndex();
+	open_dir = dlg.GetDirectory();
+}
+
+EVT_HANDLER(OpenGBC, "Open GBC...")
+{
+	open_dir = gopts.gbc_rom_dir;
+	// FIXME: ignore if non-existent or not a dir
+	wxString pats = _(
+	                    "GameBoy Color Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
+	                    "*.dmg;*.gb;*.gbc;*.cgb;*.sgb;"
+	                    "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;"
+	                    "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
+	                    "*.zip;*.7z;*.rar"
+	                    "|"
+	                );
+	pats.append(wxALL_FILES);
+	wxFileDialog dlg(this, _("Open GBC ROM file"), open_dir, wxT(""),
 	                 pats,
 	                 wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	dlg.SetFilterIndex(open_ft);
