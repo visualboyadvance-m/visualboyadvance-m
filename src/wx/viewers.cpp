@@ -717,6 +717,11 @@ public:
 		s.Printf(addrlen == 4 ? wxT("%04X") : wxT("%08X"), len);
 		selreg_len->SetValue(s);
 
+		if (gopts.keep_on_top)
+			selregion->SetWindowStyle(selregion->GetWindowStyle() | wxSTAY_ON_TOP);
+		else
+			selregion->SetWindowStyle(selregion->GetWindowStyle() & ~wxSTAY_ON_TOP);
+
 		if (selregion->ShowModal() != wxID_OK)
 			return;
 
@@ -734,6 +739,11 @@ public:
 		selreg_len->Enable();
 		selreg_lenlab->Enable();
 		selreg_len->SetValue(wxEmptyString);
+
+		if (gopts.keep_on_top)
+			selregion->SetWindowStyle(selregion->GetWindowStyle() | wxSTAY_ON_TOP);
+		else
+			selregion->SetWindowStyle(selregion->GetWindowStyle() & ~wxSTAY_ON_TOP);
 
 		if (selregion->ShowModal() != wxID_OK)
 			return;
