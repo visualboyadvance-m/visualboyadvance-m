@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-23 11:00+1000\n"
+"POT-Creation-Date: 2015-05-23 11:19+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2871,7 +2871,7 @@ msgid "Re&wind"
 msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:231
-msgid "&Fullscreen"
+msgid "Toggle &full screen"
 msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:237
@@ -2930,8 +2930,8 @@ msgstr ""
 msgid "&GameCube"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:293
-msgid "&Gameboy"
+#: ../src/wx/xrc/MainMenu.xrc:293 ../src/wx/xrc/MainMenu.xrc:425
+msgid "&Game Boy"
 msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:298
@@ -2956,7 +2956,7 @@ msgid "&Video"
 msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:320
-msgid "&Fullscreen mode"
+msgid "&Start in full screen"
 msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:324
@@ -3045,10 +3045,6 @@ msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:420
 msgid "&Debug print"
-msgstr ""
-
-#: ../src/wx/xrc/MainMenu.xrc:425
-msgid "&Game Boy"
 msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:431
