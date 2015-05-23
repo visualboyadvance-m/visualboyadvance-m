@@ -382,7 +382,7 @@ void GameArea::LoadGame(const wxString &name)
 
 				case 0x20000:
 					saveType = 3;
-					flashSetSize(fnb.length());
+					flashSetSize(bat.GetSize().GetValue());
 					break;
 
 				default:
