@@ -747,7 +747,16 @@ class PrintDialog : public wxEvtHandler, public wxPrintout
 public:
 	PrintDialog(const u16* data, int lines, bool cont);
 	~PrintDialog();
-	int ShowModal() {CheckPointer(wxGetApp().frame); return wxGetApp().frame->ShowModal(dlg); }
+	int ShowModal()
+	{
+		if (gopts.keep_on_top)
+			dlg->SetWindowStyle(dlg->GetWindowStyle() | wxSTAY_ON_TOP);
+		else
+			dlg->SetWindowStyle(dlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
+
+		CheckPointer(wxGetApp().frame);
+		return wxGetApp().frame->ShowModal(dlg);
+	}
 private:
 	void DoSave(wxCommandEvent &);
 	void DoPrint(wxCommandEvent &);

@@ -321,6 +321,12 @@ public:
 			int ncheats = isgb ? gbCheatNumber : cheatsNumber;
 			ce_codes = wxEmptyString;
 			wxDialog* subdlg = GetXRCDialog("CheatEdit");
+
+			if (gopts.keep_on_top)
+				subdlg->SetWindowStyle(subdlg->GetWindowStyle() | wxSTAY_ON_TOP);
+			else
+				subdlg->SetWindowStyle(subdlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
+
 			subdlg->ShowModal();
 			AddCheat();
 			Reload(ncheats);
@@ -580,6 +586,11 @@ public:
 		}
 
 		wxDialog* subdlg = GetXRCDialog("CheatEdit");
+
+		if (gopts.keep_on_top)
+			subdlg->SetWindowStyle(subdlg->GetWindowStyle() | wxSTAY_ON_TOP);
+		else
+			subdlg->SetWindowStyle(subdlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
 
 		if (subdlg->ShowModal() != wxID_OK)
 			return;
@@ -1134,6 +1145,11 @@ public:
 		ca_val = list->OnGetItemText(idx, 2); // sugest "New" value
 		SetValVal(ca_val_tc);
 		wxDialog* subdlg = GetXRCDialog("CheatAdd");
+
+		if (gopts.keep_on_top)
+			subdlg->SetWindowStyle(subdlg->GetWindowStyle() | wxSTAY_ON_TOP);
+		else
+			subdlg->SetWindowStyle(subdlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
 
 		if (subdlg->ShowModal() != wxID_OK)
 			return;
