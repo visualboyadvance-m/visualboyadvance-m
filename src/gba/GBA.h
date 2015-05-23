@@ -3,6 +3,8 @@
 
 #include "../System.h"
 
+const u64 TICKS_PER_SECOND = 16777216;
+
 #define SAVE_GAME_VERSION_1 1
 #define SAVE_GAME_VERSION_2 2
 #define SAVE_GAME_VERSION_3 3
