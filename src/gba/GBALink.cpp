@@ -225,8 +225,7 @@ static ConnectionState ConnectUpdateSocket(char * const message, size_t size);
 static void UpdateCableSocket(int ticks);
 static void CloseSocket();
 
-const u64 TICKS_PER_FRAME = 16777216 / 60;
-const u64 TICKS_PER_SECOND = 16777216;
+const u64 TICKS_PER_FRAME = TICKS_PER_SECOND / 60;
 const u64 BITS_PER_SECOND = 115200;
 const u64 BYTES_PER_SECOND = BITS_PER_SECOND / 8;
 

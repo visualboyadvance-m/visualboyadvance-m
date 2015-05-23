@@ -32,9 +32,12 @@ typedef struct {
   u32 reserved3;
 } RTCCLOCKDATA;
 
+struct tm gba_time;
 static RTCCLOCKDATA rtcClockData;
 static bool rtcClockEnabled = true;
 static bool rtcRumbleEnabled = false;
+
+u32 countTicks = 0;
 
 void rtcEnable(bool e)
 {
@@ -96,6 +99,25 @@ static u8 toBCD(u8 value)
   int l = value % 10;
   int h = value / 10;
   return h * 16 + l;
+}
+
+void SetGBATime()
+{
+	time_t long_time;
+
+	time(&long_time);                /* Get time as long integer. */
+	gba_time = *localtime(&long_time); /* Convert to local time. */
+	countTicks = 0;
+}
+
+void rtcUpdateTime(int ticks)
+{
+	countTicks += ticks;
+	if (countTicks > TICKS_PER_SECOND)
+	{
+		countTicks -= TICKS_PER_SECOND;
+		gba_time.tm_sec++;
+	}
 }
 
 bool rtcWrite(u32 address, u16 value)
@@ -175,35 +197,27 @@ bool rtcWrite(u32 address, u16 value)
               break;
             case 0x65:
               {
-                struct tm *newtime;
-                time_t long_time;
-
-                time( &long_time );                /* Get time as long integer. */
-                newtime = localtime( &long_time ); /* Convert to local time. */
-
+                if (rtcEnabled)
+                  SetGBATime();
                 rtcClockData.dataLen = 7;
-                rtcClockData.data[0] = toBCD(newtime->tm_year);
-                rtcClockData.data[1] = toBCD(newtime->tm_mon+1);
-                rtcClockData.data[2] = toBCD(newtime->tm_mday);
-                rtcClockData.data[3] = toBCD(newtime->tm_wday);
-                rtcClockData.data[4] = toBCD(newtime->tm_hour);
-                rtcClockData.data[5] = toBCD(newtime->tm_min);
-                rtcClockData.data[6] = toBCD(newtime->tm_sec);
+                rtcClockData.data[0] = toBCD(gba_time.tm_year);
+                rtcClockData.data[1] = toBCD(gba_time.tm_mon+1);
+                rtcClockData.data[2] = toBCD(gba_time.tm_mday);
+                rtcClockData.data[3] = toBCD(gba_time.tm_wday);
+                rtcClockData.data[4] = toBCD(gba_time.tm_hour);
+                rtcClockData.data[5] = toBCD(gba_time.tm_min);
+                rtcClockData.data[6] = toBCD(gba_time.tm_sec);
                 rtcClockData.state = DATA;
               }
               break;
             case 0x67:
               {
-                struct tm *newtime;
-                time_t long_time;
-
-                time( &long_time );                /* Get time as long integer. */
-                newtime = localtime( &long_time ); /* Convert to local time. */
-
+                if (rtcEnabled)
+                  SetGBATime();
                 rtcClockData.dataLen = 3;
-                rtcClockData.data[0] = toBCD(newtime->tm_hour);
-                rtcClockData.data[1] = toBCD(newtime->tm_min);
-                rtcClockData.data[2] = toBCD(newtime->tm_sec);
+                rtcClockData.data[0] = toBCD(gba_time.tm_hour);
+                rtcClockData.data[1] = toBCD(gba_time.tm_min);
+                rtcClockData.data[2] = toBCD(gba_time.tm_sec);
                 rtcClockData.state = DATA;
               }
               break;
@@ -262,6 +276,8 @@ void rtcReset()
   rtcClockData.bits = 0;
   rtcClockData.state = IDLE;
   rtcClockData.reserved[11] = 0;
+
+  SetGBATime();
 }
 
 #ifdef __LIBRETRO__
