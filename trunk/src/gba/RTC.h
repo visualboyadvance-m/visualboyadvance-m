@@ -2,6 +2,7 @@
 #define RTC_H
 
 u16 rtcRead(u32 address);
+void rtcUpdateTime(int ticks);
 bool rtcWrite(u32 address, u16 value);
 void rtcEnable(bool);
 void rtcEnableRumble(bool e);
