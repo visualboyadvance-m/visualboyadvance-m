@@ -228,7 +228,7 @@
       </object>
       <object class="separator"/>
       <object class="wxMenuItem" name="ToggleFullscreen">
-        <label>_Fullscreen</label>
+        <label>Toggle _full screen</label>
         <bitmap platform="unix" stock_id="gtk-fullscreen"/>
         <accel>F11</accel>
       </object>
@@ -290,7 +290,7 @@
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="LinkType4Gameboy">
-            <label>_Gameboy</label>
+            <label>_Game Boy</label>
             <checkable>1</checkable>
           </object>
         </object>
@@ -317,7 +317,7 @@
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="Fullscreen">
-          <label>_Fullscreen mode</label>
+          <label>_Start in full screen</label>
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="RetainAspect">
