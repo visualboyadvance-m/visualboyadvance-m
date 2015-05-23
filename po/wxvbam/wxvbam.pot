@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-23 11:19+1000\n"
+"POT-Creation-Date: 2015-05-23 11:54+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -142,7 +142,7 @@ msgstr ""
 msgid "ROM+MBC7+BATT"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:649 ../src/wx/guiinit.cpp:807
+#: ../src/wx/cmdevents.cpp:649 ../src/wx/guiinit.cpp:818
 msgid "GameGenie"
 msgstr ""
 
@@ -166,7 +166,7 @@ msgstr ""
 msgid "ROM+HuC-1"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:721 ../src/wx/guiinit.cpp:1876
+#: ../src/wx/cmdevents.cpp:721 ../src/wx/guiinit.cpp:1892
 #: ../src/wx/xrc/DisplayConfig.xrc:77 ../src/wx/xrc/DisplayConfig.xrc:221
 #: ../src/wx/xrc/DisplayConfig.xrc:270
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
@@ -314,7 +314,7 @@ msgstr ""
 
 #: ../src/wx/cmdevents.cpp:1160 ../src/wx/cmdevents.cpp:1261
 #: ../src/wx/cmdevents.cpp:1353 ../src/wx/cmdevents.cpp:1396
-#: ../src/wx/viewers.cpp:555 ../src/wx/viewers.cpp:750
+#: ../src/wx/viewers.cpp:555 ../src/wx/viewers.cpp:760
 #: ../src/wx/viewsupt.cpp:1239
 msgid "Select output file"
 msgstr ""
@@ -542,166 +542,166 @@ msgstr ""
 msgid "Saved cheats"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:346 ../src/wx/guiinit.cpp:370
+#: ../src/wx/guiinit.cpp:352 ../src/wx/guiinit.cpp:376
 msgid "Restore old values?"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:347 ../src/wx/guiinit.cpp:371
+#: ../src/wx/guiinit.cpp:353 ../src/wx/guiinit.cpp:377
 msgid "Removing cheats"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:806 ../src/wx/xrc/JoyPanel.xrc:244
+#: ../src/wx/guiinit.cpp:817 ../src/wx/xrc/JoyPanel.xrc:244
 msgid "GameShark"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:811
+#: ../src/wx/guiinit.cpp:822
 msgid "Generic Code"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:812
+#: ../src/wx/guiinit.cpp:823
 msgid "GameShark Advance"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:813
+#: ../src/wx/guiinit.cpp:824
 msgid "CodeBreaker Advance"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:814
+#: ../src/wx/guiinit.cpp:825
 msgid "Flashcart CHT"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:876 ../src/wx/guiinit.cpp:1143
+#: ../src/wx/guiinit.cpp:887 ../src/wx/guiinit.cpp:1159
 msgid "Number cannot be empty"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:917
+#: ../src/wx/guiinit.cpp:928
 #, c-format
 msgid "Search produced %d results.  Please refine better"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:930
+#: ../src/wx/guiinit.cpp:941
 msgid "Search produced no results"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1105
+#: ../src/wx/guiinit.cpp:1116
 msgid "8-bit "
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1109
+#: ../src/wx/guiinit.cpp:1120
 msgid "16-bit "
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1113
+#: ../src/wx/guiinit.cpp:1124
 msgid "32-bit "
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1120
+#: ../src/wx/guiinit.cpp:1131
 msgid "signed decimal"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1124
+#: ../src/wx/guiinit.cpp:1135
 msgid "unsigned decimal"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1128
+#: ../src/wx/guiinit.cpp:1139
 msgid "unsigned hexadecimal"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1612
+#: ../src/wx/guiinit.cpp:1628
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1623
+#: ../src/wx/guiinit.cpp:1639
 msgid "Default device"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1763
+#: ../src/wx/guiinit.cpp:1779
 msgid "Desktop mode"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1771
+#: ../src/wx/guiinit.cpp:1787
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1921
+#: ../src/wx/guiinit.cpp:1937
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1944 ../src/wx/xrc/DisplayConfig.xrc:242
+#: ../src/wx/guiinit.cpp:1960 ../src/wx/xrc/DisplayConfig.xrc:242
 msgid "Plugin"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1977
+#: ../src/wx/guiinit.cpp:1993
 msgid "Please select a plugin or a different filter"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1978
+#: ../src/wx/guiinit.cpp:1994
 msgid "Plugin selection error"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2182
+#: ../src/wx/guiinit.cpp:2198
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2183
+#: ../src/wx/guiinit.cpp:2199
 msgid "Confirm"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2685
+#: ../src/wx/guiinit.cpp:2701
 msgid "Main display panel not found"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2700
+#: ../src/wx/guiinit.cpp:2716
 msgid "Main icon not found"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2825
+#: ../src/wx/guiinit.cpp:2841
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2842
+#: ../src/wx/guiinit.cpp:2858
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2958
+#: ../src/wx/guiinit.cpp:2974
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3139
+#: ../src/wx/guiinit.cpp:3155
 msgid "Code"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3148
+#: ../src/wx/guiinit.cpp:3164
 msgid "Description"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3222 ../src/wx/xrc/CheatAdd.xrc:31
+#: ../src/wx/guiinit.cpp:3238 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3223
+#: ../src/wx/guiinit.cpp:3239
 msgid "Old Value"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3224
+#: ../src/wx/guiinit.cpp:3240
 msgid "New Value"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3667
+#: ../src/wx/guiinit.cpp:3683
 msgid "Menu commands"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3694
+#: ../src/wx/guiinit.cpp:3710
 msgid "Other commands"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3806
+#: ../src/wx/guiinit.cpp:3822
 msgid "JoyBus host invalid; disabling"
 msgstr ""
 
@@ -901,37 +901,37 @@ msgstr ""
 msgid "%d%%"
 msgstr ""
 
-#: ../src/wx/sys.cpp:838 ../src/wx/xrc/GBPrinter.xrc:65
+#: ../src/wx/sys.cpp:847 ../src/wx/xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr ""
 
-#: ../src/wx/sys.cpp:872
+#: ../src/wx/sys.cpp:881
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr ""
 
-#: ../src/wx/sys.cpp:881
+#: ../src/wx/sys.cpp:890
 msgid "Save printer image to"
 msgstr ""
 
-#: ../src/wx/sys.cpp:896 ../src/wx/sys.cpp:1105
+#: ../src/wx/sys.cpp:905 ../src/wx/sys.cpp:1114
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr ""
 
-#: ../src/wx/sys.cpp:902 ../src/wx/sys.cpp:975
+#: ../src/wx/sys.cpp:911 ../src/wx/sys.cpp:984
 msgid "&Close"
 msgstr ""
 
-#: ../src/wx/sys.cpp:969
+#: ../src/wx/sys.cpp:978
 msgid "Printed"
 msgstr ""
 
-#: ../src/wx/sys.cpp:1296
+#: ../src/wx/sys.cpp:1305
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr ""
 
-#: ../src/wx/sys.cpp:1395
+#: ../src/wx/sys.cpp:1404
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr ""
@@ -940,7 +940,7 @@ msgstr ""
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:688 ../src/wx/viewers.cpp:748
+#: ../src/wx/viewers.cpp:688 ../src/wx/viewers.cpp:758
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
 msgstr ""
 
@@ -948,67 +948,67 @@ msgstr ""
 msgid "Select memory dump file"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:791
+#: ../src/wx/viewers.cpp:801
 msgid "0x00000000 - BIOS"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:792
+#: ../src/wx/viewers.cpp:802
 msgid "0x02000000 - WRAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:793
+#: ../src/wx/viewers.cpp:803
 msgid "0x03000000 - IRAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:794
+#: ../src/wx/viewers.cpp:804
 msgid "0x04000000 - I/O"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:795
+#: ../src/wx/viewers.cpp:805
 msgid "0x05000000 - PALETTE"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:796
+#: ../src/wx/viewers.cpp:806
 msgid "0x06000000 - VRAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:797
+#: ../src/wx/viewers.cpp:807
 msgid "0x07000000 - OAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:798
+#: ../src/wx/viewers.cpp:808
 msgid "0x08000000 - ROM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:903
+#: ../src/wx/viewers.cpp:913
 msgid "0x0000 - ROM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:904
+#: ../src/wx/viewers.cpp:914
 msgid "0x4000 - ROM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:905
+#: ../src/wx/viewers.cpp:915
 msgid "0x8000 - VRAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:906
+#: ../src/wx/viewers.cpp:916
 msgid "0xA000 - SRAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:907
+#: ../src/wx/viewers.cpp:917
 msgid "0xC000 - RAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:908
+#: ../src/wx/viewers.cpp:918
 msgid "0xD000 - WRAM"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:909
+#: ../src/wx/viewers.cpp:919
 msgid "0xFF00 - I/O"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:910
+#: ../src/wx/viewers.cpp:920
 msgid "0xFF80 - RAM"
 msgstr ""
 
@@ -1807,11 +1807,11 @@ msgstr ""
 msgid "Notes:"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:4
+#: ../src/wx/xrc/GBAROMInfo.xrc:4 ../src/wx/xrc/GBROMInfo.xrc:4
 msgid "Rom Information"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:11 ../src/wx/xrc/GBROMInfo.xrc:11
+#: ../src/wx/xrc/GBAROMInfo.xrc:11 ../src/wx/xrc/GBROMInfo.xrc:12
 msgid "Game title:"
 msgstr ""
 
@@ -1835,11 +1835,11 @@ msgstr ""
 msgid "Game code:"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:83 ../src/wx/xrc/GBROMInfo.xrc:23
+#: ../src/wx/xrc/GBAROMInfo.xrc:83 ../src/wx/xrc/GBROMInfo.xrc:24
 msgid "Maker code:"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:95 ../src/wx/xrc/GBROMInfo.xrc:35
+#: ../src/wx/xrc/GBAROMInfo.xrc:95 ../src/wx/xrc/GBROMInfo.xrc:36
 msgid "Maker name:"
 msgstr ""
 
@@ -1851,11 +1851,11 @@ msgstr ""
 msgid "Device type:"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:131 ../src/wx/xrc/GBROMInfo.xrc:71
+#: ../src/wx/xrc/GBAROMInfo.xrc:131 ../src/wx/xrc/GBROMInfo.xrc:72
 msgid "ROM version:"
 msgstr ""
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:143 ../src/wx/xrc/GBROMInfo.xrc:83
+#: ../src/wx/xrc/GBAROMInfo.xrc:143 ../src/wx/xrc/GBROMInfo.xrc:84
 msgid "CRC:"
 msgstr ""
 
@@ -2107,35 +2107,35 @@ msgstr ""
 msgid "C&ontinue"
 msgstr ""
 
-#: ../src/wx/xrc/GBROMInfo.xrc:47
+#: ../src/wx/xrc/GBROMInfo.xrc:48
 msgid "Unit code:"
 msgstr ""
 
-#: ../src/wx/xrc/GBROMInfo.xrc:59
+#: ../src/wx/xrc/GBROMInfo.xrc:60
 msgid "Cartridge type:"
 msgstr ""
 
-#: ../src/wx/xrc/GBROMInfo.xrc:95
+#: ../src/wx/xrc/GBROMInfo.xrc:96
 msgid "Color:"
 msgstr ""
 
-#: ../src/wx/xrc/GBROMInfo.xrc:107
+#: ../src/wx/xrc/GBROMInfo.xrc:108
 msgid "ROM size:"
 msgstr ""
 
-#: ../src/wx/xrc/GBROMInfo.xrc:119
+#: ../src/wx/xrc/GBROMInfo.xrc:120
 msgid "RAM size:"
 msgstr ""
 
-#: ../src/wx/xrc/GBROMInfo.xrc:131
+#: ../src/wx/xrc/GBROMInfo.xrc:132
 msgid "Dest. code:"
 msgstr ""
 
-#: ../src/wx/xrc/GBROMInfo.xrc:143
+#: ../src/wx/xrc/GBROMInfo.xrc:144
 msgid "License code:"
 msgstr ""
 
-#: ../src/wx/xrc/GBROMInfo.xrc:155
+#: ../src/wx/xrc/GBROMInfo.xrc:156
 msgid "Checksum:"
 msgstr ""
 
