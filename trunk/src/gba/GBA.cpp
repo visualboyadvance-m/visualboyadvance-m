@@ -948,28 +948,7 @@ static bool CPUReadState(gzFile gzFile)
   CPUUpdateWindow0();
   CPUUpdateWindow1();
   gbaSaveType = 0;
-  switch(saveType) {
-  case 0:
-    cpuSaveGameFunc = flashSaveDecide;
-    break;
-  case 1:
-    cpuSaveGameFunc = sramWrite;
-    gbaSaveType = 1;
-    break;
-  case 2:
-    cpuSaveGameFunc = flashWrite;
-    gbaSaveType = 2;
-    break;
-  case 3:
-     break;
-  case 5:
-    gbaSaveType = 5;
-    break;
-  default:
-    systemMessage(MSG_UNSUPPORTED_SAVE_TYPE,
-                  N_("Unsupported save type %d"), saveType);
-    break;
-  }
+  SetSaveType(saveType);
   if(eepromInUse)
     gbaSaveType = 3;
 
