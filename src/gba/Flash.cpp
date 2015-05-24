@@ -161,6 +161,9 @@ u8 flashRead(u32 address)
 
 void flashSaveDecide(u32 address, u8 byte)
 {
+  if (saveType == 1)
+    return;
+
   //  log("Deciding save type %08x\n", address);
   if(address == 0x0e005555) {
     saveType = 3;
