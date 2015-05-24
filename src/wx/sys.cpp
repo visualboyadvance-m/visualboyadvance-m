@@ -570,26 +570,6 @@ void systemUpdateSolarSensor()
 		break;
 	}
 
-	struct tm* newtime;
-
-	time_t long_time;
-	// regardless of the weather, there should be no sun at night time!
-	time(&long_time); // Get time as long integer.
-	newtime = localtime(&long_time); // Convert to local time.
-
-	if (newtime->tm_hour > 21 || newtime->tm_hour < 5)
-	{
-		sun = 0; // total darkness, 9pm - 5am
-	}
-	else if (newtime->tm_hour > 20 || newtime->tm_hour < 6)
-	{
-		sun /= 9; // almost total darkness 8pm-9pm, 5am-6am
-	}
-	else if (newtime->tm_hour > 18 || newtime->tm_hour < 7)
-	{
-		sun >>= 1;
-	}
-
 	sensorDarkness = 0xE8 - sun;
 }
 
