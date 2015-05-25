@@ -27,11 +27,11 @@
                 <object class="wxChoice" name="System">
                   <content>
                     <item>Automatic</item>
-                    <item>Game Boy Advance</item>
                     <item>Game Boy Color</item>
                     <item>Super Game Boy</item>
-                    <item>Super Game Boy 2</item>
                     <item>Game Boy</item>
+                    <item>Game Boy Advance</item>
+                    <item>Super Game Boy 2</item>
                   </content>
                 </object>
                 <option>1</option>
