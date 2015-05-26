@@ -716,6 +716,7 @@ public:
 		selreg_lenlab->Disable();
 		s.Printf(addrlen == 4 ? wxT("%04X") : wxT("%08X"), len);
 		selreg_len->SetValue(s);
+		selregion->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
 		if (gopts.keep_on_top)
 			selregion->SetWindowStyle(selregion->GetWindowStyle() | wxSTAY_ON_TOP);
@@ -739,6 +740,7 @@ public:
 		selreg_len->Enable();
 		selreg_lenlab->Enable();
 		selreg_len->SetValue(wxEmptyString);
+		selregion->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
 		if (gopts.keep_on_top)
 			selregion->SetWindowStyle(selregion->GetWindowStyle() | wxSTAY_ON_TOP);

@@ -57,8 +57,9 @@ protected:
 
 #define LoadXRCViewer(t) do { \
     wxDialog *d = new Viewers::t##Viewer; \
-    if(d) \
-    d->Show(); \
+    if(d) { \
+    d->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER); \
+    d->Show(); } \
 } while(0)
 
 // a list box with no horizontal scrollbar and a funky vertical scrollbar:

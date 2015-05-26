@@ -1956,6 +1956,13 @@ EVT_HANDLER_MASK(Disassemble, "Disassemble...", CMDEN_GB | CMDEN_GBA)
 EVT_HANDLER_MASK(Logging, "Logging...", CMDEN_GBA)
 {
 	wxDialog* dlg = wxGetApp().frame->logdlg;
+	dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
+
+	if (gopts.keep_on_top)
+		dlg->SetWindowStyle(dlg->GetWindowStyle() | wxSTAY_ON_TOP);
+	else
+		dlg->SetWindowStyle(dlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
+
 	dlg->Show();
 	dlg->Raise();
 }
