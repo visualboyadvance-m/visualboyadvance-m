@@ -729,6 +729,8 @@ public:
 	~PrintDialog();
 	int ShowModal()
 	{
+		dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
+
 		if (gopts.keep_on_top)
 			dlg->SetWindowStyle(dlg->GetWindowStyle() | wxSTAY_ON_TOP);
 		else
