@@ -33,7 +33,7 @@ endif(ENABLE_OPENAL)
 # adv is for wxAboutBox
 # xml, html is for xrc
 SET( wxWidgets_USE_LIBS xrc xml html adv gl net core base )
-#list(APPEND wxWidgets_CONFIG_OPTIONS --version=2.8)
+list(APPEND wxWidgets_CONFIG_OPTIONS --version=3.0)
 FIND_PACKAGE ( wxWidgets REQUIRED )
 #EXECUTE_PROCESS(COMMAND sh "${wxWidgets_CONFIG_EXECUTABLE}" --cxxflags)
 INCLUDE( ${wxWidgets_USE_FILE} )
@@ -179,5 +179,5 @@ if(APPLE)
     SET(MACOSX_BUNDLE_ICON_FILE vbam.icns)
     SET_SOURCE_FILES_PROPERTIES(${VBAM_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 endif(APPLE)
-    
+
 SET(WX_EXE_NAME wxvbam${CMAKE_EXECUTABLE_SUFFIX})
