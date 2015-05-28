@@ -137,7 +137,7 @@ ENDIF(ENABLE_XAUDIO2)
 
 IF( WIN32 )
     SET( SRC_WX ${SRC_WX} wxvbam.rc dsound.cpp )
-    SET(DIRECTX_LIBRARIES -ldxguid -ldsound)
+    SET(DIRECTX_LIBRARIES -ldxguid -ldsound -lws2_32)
     # not strictly directx, but win32-related
     IF(ENABLE_DEBUGGER)
         SET(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} -lwsock32)
