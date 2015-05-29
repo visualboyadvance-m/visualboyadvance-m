@@ -12,7 +12,7 @@ Bit		Value
 6 -		Always on ARM
 7 -		Always on THUMB
 
-Each flag is independant, and can be used as such, as well as together.
+Each flag is independent, and can be used as such, as well as together.
 You can define a break on access (0xf), break on IO (0x3), break on 
 execution(0xc) or any other combination you need. 0xf0 will always break on
 any passage through the address
@@ -56,7 +56,7 @@ if indicates that the following there is a condition. no If counts as always bre
 anything.
 <op> is one of the comparation Operands. Full list bellow
 <EXP_val> is the value to compare to.
-Following can be a ||(or), that adds a second, independant break condition, or
+Following can be a ||(or), that adds a second, independent break condition, or
 a &&(and), that specifies that the next condition is a conjoined requisite to the break.
 EX: [0x03005000] == 0x77777777 && 0x50 == [0x03005000]
 	Would be impossible, but tested anyway, and make it never break due to this condition.

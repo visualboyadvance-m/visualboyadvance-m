@@ -1316,9 +1316,9 @@ BOOL VBA::OnIdle(LONG lCount)
         rewindCount++;
         if(rewindCount > 8)
           rewindCount = 8;
-        long ressize;
+        long resize;
         if(emulator.emuWriteMemState(&rewindMemory[rewindPos*REWIND_SIZE],
-                                     REWIND_SIZE, ressize)) { /* available and actual size */
+                                     REWIND_SIZE, resize)) { /* available and actual size */
           rewindPos = ++rewindPos & 7;
           if(rewindCount == 8)
             rewindTopPos = ++rewindTopPos & 7;

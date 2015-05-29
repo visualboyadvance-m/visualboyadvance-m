@@ -97,7 +97,7 @@ Less important:
 
 - Merge HQ2x/LQ2x C code into code for HQ3x/4x
 
-- Apply pixel filter to sprites and BG seperately for better image quality
+- Apply pixel filter to sprites and BG separately for better image quality
 
 - Add CGB Bios support
 

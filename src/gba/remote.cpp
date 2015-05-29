@@ -2472,7 +2472,7 @@ void debuggerUsage(char *cmd)
 		monprintf("cond is the condition to be evaluated.\n");
 		monprintf("If && or || are not present, the chain of evaluation stops.\n");
 		monprintf("&& states the next condition must happen with the previous one, or the break\nfails.\n");
-		monprintf("|| states the next condition is independant from the last one, and break\nseperately.\n\n");
+		monprintf("|| states the next condition is independent from the last one, and break\nseparately.\n\n");
 		monprintf("Type can be:\n");
 		monprintf("   [u8, b, byte],[u16, h, hword, halfword],[u32,w, word]\n");
 		monprintf("   [s8, sb, sbyte],[s16, sh, shword, short, shalfword],[s32, int, sw, word]\n");
