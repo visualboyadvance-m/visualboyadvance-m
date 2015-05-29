@@ -1438,14 +1438,14 @@ void handleRewinds()
 		rewindCount = REWIND_NUM;
 
 	curSavePos	= (rewindTopPos + 1) % rewindCount; // [1] depends on previous
-	long ressize;
+	long resize;
 	if(
 			emulator.emuWriteMemState
 		&&
 			emulator.emuWriteMemState(
 				&rewindMemory[curSavePos*REWIND_SIZE],
 				REWIND_SIZE, /* available*/
-				ressize /* actual size */
+				resize /* actual size */
 			)
 	) {
 		char rewMsgBuf[100];

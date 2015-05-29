@@ -577,16 +577,16 @@ bool Window::bOnEmuSaveStateRewind() {
   } // otherwise we can reserve more memory
 
   // Do the actual saving
-  long ressize;
-  if (m_stEmulator.emuWriteMemState(m_psavestate, SZSTATE, ressize)) {
-    /*ressize*=2; // if tell does not return correct size this leverage factor is needed
-    if (ressize > SZSTATE) ressize = SZSTATE;*/
-    g_assert( ressize <= SZSTATE );
-    ressize+=(sizeof(ressize)*8); // some leverage
-    psavestate = new char[ressize];
-    memmove(psavestate, &ressize, sizeof(ressize)); // pack size first
-    memmove(psavestate+sizeof(ressize), m_psavestate, ressize-sizeof(ressize)); // then actual save data
-    //printf("Wrote %p (%li bytes %i %i)\n", psavestate, ressize, *((long*)psavestate), sizeof(ressize));
+  long resize;
+  if (m_stEmulator.emuWriteMemState(m_psavestate, SZSTATE, resize)) {
+    /*resize*=2; // if tell does not return correct size this leverage factor is needed
+    if (resize > SZSTATE) resize = SZSTATE;*/
+    g_assert( resize <= SZSTATE );
+    resize+=(sizeof(resize)*8); // some leverage
+    psavestate = new char[resize];
+    memmove(psavestate, &resize, sizeof(resize)); // pack size first
+    memmove(psavestate+sizeof(resize), m_psavestate, resize-sizeof(resize)); // then actual save data
+    //printf("Wrote %p (%li bytes %i %i)\n", psavestate, resize, *((long*)psavestate), sizeof(resize));
     m_rewind_load_q.push_front(psavestate);
     return true;
   } else {
