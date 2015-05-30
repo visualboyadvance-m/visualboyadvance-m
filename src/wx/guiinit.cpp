@@ -1743,7 +1743,7 @@ public:
 
 		for (int i = 0; i < NUM_KEYS; i++)
 		{
-			wxJoyKeyTextCtrl* tc = XRCCTRL_D(*p, wxString::FromUTF8(joynames[i]), wxJoyKeyTextCtrl);
+			wxJoyKeyTextCtrl* tc = XRCCTRL_D(*p, joynames[i], wxJoyKeyTextCtrl);
 
 			if (clear)
 				tc->SetValue(wxEmptyString);
@@ -3632,7 +3632,7 @@ bool MainFrame::BindControls()
 
 			for (int j = 0; j < NUM_KEYS; j++)
 			{
-				wxJoyKeyTextCtrl* tc = XRCCTRL_D(*w, wxString::FromUTF8(joynames[j]), wxJoyKeyTextCtrl);
+				wxJoyKeyTextCtrl* tc = XRCCTRL_D(*w, joynames[j], wxJoyKeyTextCtrl);
 				CheckThrowXRCError(tc, ToString(joynames[j]));
 				wxWindow* p = tc->GetParent();
 

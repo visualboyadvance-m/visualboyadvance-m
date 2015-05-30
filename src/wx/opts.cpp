@@ -102,14 +102,14 @@ const int num_def_accels = sizeof(default_accels) / sizeof(default_accels[0]);
 
 // Note: this must match GUI widget names or GUI won't work
 // This table's order determines tab order as well
-const char* const joynames[NUM_KEYS] =
+const wxChar* const joynames[NUM_KEYS] =
 {
-	("Up"), ("Down"), ("Left"), ("Right"),
-	("A"), ("B"), ("L"), ("R"),
-	("Select"), ("Start"),
-	("MotionUp"), ("MotionDown"), ("MotionLeft"), ("MotionRight"),
-	("MotionIn"), ("MotionOut"), ("AutoA"), ("AutoB"),
-	("Speed"), ("Capture"), ("GS")
+	wxT("Up"), wxT("Down"), wxT("Left"), wxT("Right"),
+	wxT("A"), wxT("B"), wxT("L"), wxT("R"),
+	wxT("Select"), wxT("Start"),
+	wxT("MotionUp"), wxT("MotionDown"), wxT("MotionLeft"), wxT("MotionRight"),
+	wxT("MotionIn"), wxT("MotionOut"), wxT("AutoA"), wxT("AutoB"),
+	wxT("Speed"), wxT("Capture"), wxT("GS")
 };
 
 wxJoyKeyBinding defkeys[NUM_KEYS * 2] =
@@ -388,7 +388,7 @@ void load_opts()
 					int i;
 
 					for (i = 0; i < NUM_KEYS; i++)
-						if (e == wxString::FromUTF8(joynames[i]))
+						if (e == joynames[i])
 							break;
 
 					if (i == NUM_KEYS)
@@ -949,7 +949,7 @@ bool opt_set(const wxChar* name, const wxChar* val)
 			int kno;
 
 			for (kno = 0; kno < NUM_KEYS; kno++)
-				if (!wxStrcmp(wxString::FromUTF8(joynames[kno]), slat + 3))
+				if (!wxStrcmp(joynames[kno], slat + 3))
 					break;
 
 			if (kno == NUM_KEYS)
