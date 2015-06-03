@@ -8,8 +8,8 @@ IDI_MAINICON  ICON "../win32/res/VBA.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,8,0,0
- PRODUCTVERSION 1,8,0,0
+ FILEVERSION 2,0,0,0
+ PRODUCTVERSION 2,0,0,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -27,12 +27,12 @@ BEGIN
             VALUE "Comments", "VBA-M comes with NO WARRANTY. Use it at your own risk."
             VALUE "CompanyName", "http://vba-m.com/"
             VALUE "FileDescription", "VisualBoyAdvance-M"
-            VALUE "FileVersion", "1, 8, 0, 0"
+            VALUE "FileVersion", "2, 0, 0, 0"
             VALUE "InternalName", "VBA-M"
             VALUE "LegalCopyright", "Copyright © 2008-2015 VBA-M development team"
             VALUE "OriginalFilename", "VisualBoyAdvance-M.exe"
-            VALUE "ProductName", "GB/C/A emulator for Windows"
-            VALUE "ProductVersion", "1, 8, 0, 0"
+            VALUE "ProductName", "VisualBoyAdvance-M"
+            VALUE "ProductVersion", "2, 0, 0, 0"
         END
     END
     BLOCK "VarFileInfo"

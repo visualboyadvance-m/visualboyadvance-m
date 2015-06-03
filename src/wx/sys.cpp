@@ -454,18 +454,7 @@ void systemFrame()
 void systemScreenCapture(int num)
 {
 	GameArea* panel = wxGetApp().frame->GetPanel();
-	wxFileName fn;
-
-	if (!gopts.scrshot_dir.size())
-		fn = wxFileName(panel->game_dir(), wxEmptyString);
-	else
-	{
-		fn = wxFileName(gopts.scrshot_dir, wxEmptyString);
-
-		if (!fn.IsAbsolute())
-			fn = wxFileName(panel->game_dir() + wxT('/') +
-			                gopts.scrshot_dir, wxEmptyString);
-	}
+	wxFileName fn = wxFileName(wxGetApp().frame->GetGamePath(gopts.scrshot_dir), wxEmptyString);
 
 	do
 	{
@@ -1048,19 +1037,7 @@ void systemGbPrint(u8* data, int len, int pages, int feed, int pal, int cont)
 
 	if (gopts.print_screen_cap)
 	{
-		wxFileName fn;
-
-		if (!gopts.scrshot_dir.size())
-			fn = wxFileName(panel->game_dir(), wxEmptyString);
-		else
-		{
-			fn = wxFileName(gopts.scrshot_dir, wxEmptyString);
-
-			if (!fn.IsAbsolute())
-				fn = wxFileName(panel->game_dir() + wxT('/') +
-				                gopts.scrshot_dir, wxEmptyString);
-		}
-
+		wxFileName fn = wxFileName(wxGetApp().frame->GetGamePath(gopts.scrshot_dir), wxEmptyString);
 		int num = 1;
 
 		do
@@ -1130,16 +1107,19 @@ void systemGbPrint(u8* data, int len, int pages, int feed, int pal, int cont)
 
 void systemScreenMessage(const wxString &msg)
 {
-	wxPuts(msg);
-	MainFrame* f = wxGetApp().frame;
-	GameArea* panel = f->GetPanel();
+	if (wxGetApp().frame && wxGetApp().frame->IsShown())
+	{
+		wxPuts(msg);
+		MainFrame* f = wxGetApp().frame;
+		GameArea* panel = f->GetPanel();
 
-	if (!panel->osdtext.empty())
-		f->PopStatusText();
+		if (!panel->osdtext.empty())
+			f->PopStatusText();
 
-	f->PushStatusText(msg);
-	panel->osdtext = msg;
-	panel->osdtime = systemGetClock();
+		f->PushStatusText(msg);
+		panel->osdtext = msg;
+		panel->osdtime = systemGetClock();
+	}
 }
 
 void systemScreenMessage(const char* msg)
@@ -1403,21 +1383,7 @@ bool debugWaitSocket()
 void log(const char* defaultMsg, ...)
 {
 	static FILE* out = NULL;
-
-	if (out == NULL)
-	{
-		// FIXME: this should be an option
-		wxFileName trace_log(wxStandardPaths::Get().GetUserLocalDataDir(), wxT("trace.log"));
-		out = fopen(trace_log.GetFullPath().mb_str(), "w");
-
-		if (!out)
-			return;
-	}
-
 	va_list valist;
-	va_start(valist, defaultMsg);
-	vfprintf(out, defaultMsg, valist);
-	va_end(valist);
 	char buf[2048];
 	va_start(valist, defaultMsg);
 	vsnprintf(buf, 2048, defaultMsg, valist);
@@ -1428,7 +1394,25 @@ void log(const char* defaultMsg, ...)
 	{
 		LogDialog* d = wxGetApp().frame->logdlg;
 
-		if (d)
+		if (d && d->IsShown())
+		{
 			d->Update();
+		}
+
+		systemScreenMessage(buf);
 	}
+
+	if (out == NULL)
+	{
+		// FIXME: this should be an option
+		wxFileName trace_log(wxGetApp().GetConfigurationPath(), wxT("trace.log"));
+		out = fopen(trace_log.GetFullPath().mb_str(), "w");
+
+		if (!out)
+			return;
+	}
+
+	va_start(valist, defaultMsg);
+	vfprintf(out, defaultMsg, valist);
+	va_end(valist);
 }
