@@ -1212,20 +1212,7 @@ void GfxViewer::StretchTog(wxCommandEvent &ev)
 void GfxViewer::SaveBMP(wxCommandEvent &ev)
 {
 	GameArea* panel = wxGetApp().frame->GetPanel();
-
-	if (bmp_save_dir.empty())
-	{
-		bmp_save_dir = gopts.scrshot_dir;
-
-		if (bmp_save_dir.size())
-		{
-			wxFileName sp(bmp_save_dir, wxEmptyString);
-
-			if (!sp.IsAbsolute())
-				bmp_save_dir = panel->game_dir() + wxT('/') + gopts.scrshot_dir;
-		}
-	}
-
+	bmp_save_dir = wxGetApp().frame->GetGamePath(gopts.scrshot_dir);
 	// no attempt is made here to translate the dialog type name
 	// it's just a suggested name, anyway
 	wxString def_name = panel->game_name() + wxT('-') + dname;

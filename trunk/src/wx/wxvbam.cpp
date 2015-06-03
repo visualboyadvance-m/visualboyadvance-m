@@ -40,13 +40,13 @@ static void get_config_path(wxPathList &path, bool exists = true)
     path.Add(s); \
 } while(0)
 	// NOTE: this does not support XDG (freedesktop.org) paths
+	add_path(GetPluginsDir());
 	add_path(GetUserLocalDataDir());
 	add_path(GetUserDataDir());
 	add_path(GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()));
 	add_path(GetResourcesDir());
 	add_path(GetDataDir());
 	add_path(GetLocalDataDir());
-	add_path(GetPluginsDir());
 }
 
 static void tack_full_path(wxString &s, const wxString &app = wxEmptyString)
@@ -57,6 +57,47 @@ static void tack_full_path(wxString &s, const wxString &app = wxEmptyString)
 
 	for (int i = 0; i < full_config_path.size(); i++)
 		s += wxT("\n\t") + full_config_path[i] + app;
+}
+
+wxString wxvbamApp::GetConfigurationPath()
+{
+	if (data_path.empty())
+	{
+		get_config_path(config_path);
+
+		for (int i = 0; i < config_path.size(); i++)
+		{
+			wxFileName fn(config_path[i], wxT("vbam.ini"));
+
+			if (fn.FileExists() && fn.IsFileWritable())
+			{
+				data_path = config_path[i];
+				break;
+			}
+			// Check if path is writeable
+			else if (wxIsWritable(config_path[i]))
+			{
+				data_path = config_path[i];
+				break;
+			}
+		}
+	}
+
+	return data_path;
+}
+
+wxString wxvbamApp::GetAbsolutePath(wxString path)
+{
+	wxFileName dir(path);
+
+	if (dir.IsRelative())
+	{
+		wxFileName fn(GetConfigurationPath(), path);
+		fn.Normalize();
+		return fn.GetFullPath();
+	}
+
+	return path;
 }
 
 bool wxvbamApp::OnInit()
@@ -103,9 +144,9 @@ bool wxvbamApp::OnInit()
 				xr->Load(wxT("*.xrs"));
 		}
 
-	wxString xrcDir = wxStandardPaths::Get().GetPluginsDir() + wxT("\\xrc");
+	wxFileName xrcDir(GetConfigurationPath() + wxT("//xrc"), wxEmptyString);
 
-	if (wxDirExists(xrcDir) && wxSetWorkingDirectory(xrcDir) && !wxFindFirstFile(wxT("*.xrc")).empty())
+	if (xrcDir.DirExists() && wxSetWorkingDirectory(xrcDir.GetFullPath()) && !wxFindFirstFile(wxT("*.xrc")).empty())
 	{
 		xr->Load(wxT("*.xrc"));
 	}
@@ -121,8 +162,9 @@ bool wxvbamApp::OnInit()
 	// but subdir flag behaves differently 2.8 vs. 2.9.  Oh well.
 	// NOTE: this does not support XDG (freedesktop.org) paths
 #ifdef __WXMSW__
+	wxFileName vbamconf(GetConfigurationPath(), _T("vbam.ini"));
 	cfg = new wxFileConfig(wxT("vbam"), wxEmptyString,
-	                       wxStandardPaths::Get().GetPluginsDir() + _T("\\vbam.ini"),
+	                       vbamconf.GetFullPath(),
 	                       wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
 #else
 	cfg = new wxFileConfig(wxEmptyString, wxEmptyString, wxEmptyString,
@@ -139,9 +181,9 @@ bool wxvbamApp::OnInit()
 	// logic, so do it at run-time
 	// wxFileConfig *f = wxDynamicCast(cfg, wxFileConfig);
 	// wxConfigBase does not derive from wxObject!!! so no wxDynamicCast
-	wxFileConfig* f = dynamic_cast<wxFileConfig*>(cfg);
+	wxFileConfig* fc = dynamic_cast<wxFileConfig*>(cfg);
 
-	if (f)
+	if (fc)
 	{
 		wxFileName s(wxFileConfig::GetLocalFileName(GetAppName()));
 		// at least up to 2.8.12, GetLocalFileName returns the dir if
@@ -153,7 +195,7 @@ bool wxvbamApp::OnInit()
 		// only the path part gets created
 		// note that 0777 is default (assumes umask will do og-w)
 		s.Mkdir(0777, wxPATH_MKDIR_FULL);
-		s = wxStandardPaths::Get().GetUserLocalDataDir();
+		s = GetConfigurationPath();
 		s.AppendDir(s.GetFullName());
 		s.Mkdir(0777, wxPATH_MKDIR_FULL);
 	}
@@ -201,41 +243,37 @@ bool wxvbamApp::OnInit()
 		overrides->Write(s + wxT("/comment"), cmt);
 	}
 
-	for (int i = config_path.size() - 1; i >= 0 ; i--)
+	wxFileName fn(GetConfigurationPath(), wxT("vba-over.ini"));
+	wxFileName rdb(GetConfigurationPath(), wxT("Nintendo - Game Boy Advance*.dat"));
+	wxFileName scene_rdb(GetConfigurationPath(), wxT("Nintendo - Game Boy Advance (Scene)*.dat"));
+	wxFileName nointro_rdb(GetConfigurationPath(), wxT("Official No-Intro Nintendo Gameboy Advance Number (Date).xml"));
+	wxString f = wxFindFirstFile(nointro_rdb.GetFullPath(), wxFILE);
+
+	if (!f.empty() && wxFileName(f).IsFileReadable())
+		rom_database_nointro = f;
+
+	f = wxFindFirstFile(scene_rdb.GetFullPath(), wxFILE);
+
+	if (!f.empty() && wxFileName(f).IsFileReadable())
+		rom_database_scene = f;
+
+	f = wxFindFirstFile(rdb.GetFullPath(), wxFILE);
+
+	while (!f.empty())
 	{
-		wxFileName fn(config_path[i], wxT("vba-over.ini"));
-		wxFileName rdb(config_path[i], wxT("Nintendo - Game Boy Advance*.dat"));
-		wxFileName scene_rdb(config_path[i], wxT("Nintendo - Game Boy Advance (Scene)*.dat"));
-		wxFileName nointro_rdb(config_path[i], wxT("Official No-Intro Nintendo Gameboy Advance Number (Date).xml"));
-		wxString f = wxFindFirstFile(nointro_rdb.GetFullPath(), wxFILE);
-
-		if (!f.empty() && wxFileName(f).IsFileReadable())
-			rom_database_nointro = f;
-
-		f = wxFindFirstFile(scene_rdb.GetFullPath(), wxFILE);
-
-		if (!f.empty() && wxFileName(f).IsFileReadable())
-			rom_database_scene = f;
-
-		f = wxFindFirstFile(rdb.GetFullPath(), wxFILE);
-
-		while (!f.empty())
+		if (f == rom_database_scene.GetFullPath())
 		{
-			if (f == rom_database_scene.GetFullPath())
-			{
-				f = wxFindNextFile();
-			}
-			else if (wxFileName(f).IsFileReadable())
-			{
-				rom_database = f;
-				break;
-			}
+			f = wxFindNextFile();
 		}
+		else if (wxFileName(f).IsFileReadable())
+		{
+			rom_database = f;
+			break;
+		}
+	}
 
-		if (!fn.IsFileReadable())
-			continue;
-
-		data_path = config_path[i];
+	if (fn.FileExists())
+	{
 		wxStringOutputStream sos;
 		wxFileInputStream fis(fn.GetFullPath());
 		// not the most efficient thing to do: read entire file into a string
@@ -252,7 +290,7 @@ bool wxvbamApp::OnInit()
 			overrides->DeleteGroup(s);
 			overrides->SetPath(s);
 			ov.SetPath(s);
-			overrides->Write(wxT("path"), config_path[i]);
+			overrides->Write(wxT("path"), GetConfigurationPath());
 			// apparently even MacOSX sometimes uses \r by itself
 			wxString cmt(CMT_RE_START);
 			cmt += s + wxT("\\]");
@@ -621,6 +659,29 @@ void MainFrame::DownloadFile(wxString host, wxString url)
 	}
 
 	get.Close();
+}
+
+wxString MainFrame::GetGamePath(wxString path)
+{
+	wxString game_path = path;
+
+	if (game_path.size())
+	{
+		game_path = wxGetApp().GetAbsolutePath(game_path);
+	}
+	else
+	{
+		game_path = panel->game_dir();
+		wxFileName::Mkdir(game_path, 0777, wxPATH_MKDIR_FULL);
+	}
+
+	if (!wxFileName::DirExists(game_path))
+		game_path = wxFileName::GetCwd();
+
+	if (!wxIsWritable(game_path))
+		game_path = wxGetApp().GetConfigurationPath();
+
+	return game_path;
 }
 
 void MainFrame::SetJoystick()
