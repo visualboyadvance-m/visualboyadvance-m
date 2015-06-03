@@ -60,6 +60,8 @@ public:
 	virtual bool OnInit();
 	virtual void OnInitCmdLine(wxCmdLineParser &);
 	virtual bool OnCmdLineParsed(wxCmdLineParser &);
+	wxString GetConfigurationPath();
+	wxString GetAbsolutePath(wxString path);
 	// name of a file to load at earliest opportunity
 	wxString pending_load;
 	// list of options to set after config file loaded
@@ -191,6 +193,8 @@ public:
 	void SetJoystick();
 
 	GameArea* GetPanel() { return panel; }
+
+	wxString GetGamePath(wxString path);
 
 	// wxMSW pauses the game for menu popups and modal dialogs, but wxGTK
 	// does not.  It's probably desirable to pause the game.  To do this for

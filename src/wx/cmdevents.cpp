@@ -92,7 +92,7 @@ static wxString open_dir;
 
 EVT_HANDLER(wxID_OPEN, "Open ROM...")
 {
-	open_dir = gopts.gba_rom_dir;
+	open_dir = wxGetApp().GetAbsolutePath(gopts.gba_rom_dir);
 	// FIXME: ignore if non-existent or not a dir
 	wxString pats = _(
 	                    "GameBoy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|"
@@ -122,7 +122,7 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
 
 EVT_HANDLER(OpenGB, "Open GB...")
 {
-	open_dir = gopts.gb_rom_dir;
+	open_dir = wxGetApp().GetAbsolutePath(gopts.gb_rom_dir);
 	// FIXME: ignore if non-existent or not a dir
 	wxString pats = _(
 	                    "GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
@@ -147,7 +147,7 @@ EVT_HANDLER(OpenGB, "Open GB...")
 
 EVT_HANDLER(OpenGBC, "Open GBC...")
 {
-	open_dir = gopts.gbc_rom_dir;
+	open_dir = wxGetApp().GetAbsolutePath(gopts.gbc_rom_dir);
 	// FIXME: ignore if non-existent or not a dir
 	wxString pats = _(
 	                    "GameBoy Color Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
@@ -844,7 +844,7 @@ EVT_HANDLER_MASK(SaveDotCodeFile, "Save e-Reader Dot Code...", CMDEN_GBA)
 		return;
 
 	savedotcodefile_path = dlg.GetPath();
-	SetLoadDotCodeFile(savedotcodefile_path.mb_str(wxConvUTF8));
+	SetSaveDotCodeFile(savedotcodefile_path.mb_str(wxConvUTF8));
 }
 
 static wxString batimp_path;
@@ -1133,23 +1133,7 @@ EVT_HANDLER_MASK(ExportGamesharkSnapshot, "Export GameShark snapshot...", CMDEN_
 
 EVT_HANDLER_MASK(ScreenCapture, "Screen capture...", CMDEN_GB | CMDEN_GBA)
 {
-	static wxString scap_path;
-
-	if (!scap_path.size())
-	{
-		scap_path = gopts.scrshot_dir;
-
-		if (scap_path.size())
-		{
-			wxFileName sp(scap_path, wxEmptyString);
-
-			if (!sp.IsAbsolute())
-				scap_path = panel->game_dir() + wxT('/') + gopts.scrshot_dir;
-
-			wxFileName::Mkdir(scap_path, 0777, wxPATH_MKDIR_FULL);
-		}
-	}
-
+	wxString scap_path = GetGamePath(gopts.scrshot_dir);
 	wxString def_name = panel->game_name();
 
 	if (captureFormat == 0)
@@ -1230,23 +1214,7 @@ EVT_HANDLER_MASK(RecordSoundStartRecording, "Start sound recording...", CMDEN_NS
 			sound_extno = extno;
 	}
 
-	if (!sound_path.size())
-	{
-		if (!gopts.recording_dir.size())
-			sound_path = panel->game_dir();
-		else
-		{
-			wxFileName sp(gopts.recording_dir, wxEmptyString);
-
-			if (sp.IsAbsolute())
-				sound_path = gopts.recording_dir;
-			else
-				sound_path = panel->game_dir() + wxT('/') + gopts.recording_dir;
-		}
-
-		wxFileName::Mkdir(sound_path, 0777, wxPATH_MKDIR_FULL);
-	}
-
+	sound_path = GetGamePath(gopts.recording_dir);
 	wxString def_name = panel->game_name();
 	const wxChar* extoff = sound_exts.c_str();
 
@@ -1322,23 +1290,7 @@ EVT_HANDLER_MASK(RecordAVIStartRecording, "Start video recording...", CMDEN_NVRE
 			vid_extno = extno;
 	}
 
-	if (!vid_path.size())
-	{
-		if (!gopts.recording_dir.size())
-			vid_path = panel->game_dir();
-		else
-		{
-			wxFileName sp(gopts.recording_dir, wxEmptyString);
-
-			if (sp.IsAbsolute())
-				vid_path = gopts.recording_dir;
-			else
-				vid_path = panel->game_dir() + wxT('/') + gopts.recording_dir;
-		}
-
-		wxFileName::Mkdir(vid_path, 0777, wxPATH_MKDIR_FULL);
-	}
-
+	vid_path = GetGamePath(gopts.recording_dir);
 	wxString def_name = panel->game_name();
 	const wxChar* extoff = vid_exts.c_str();
 
@@ -1375,23 +1327,7 @@ static wxString mov_path;
 
 EVT_HANDLER_MASK(RecordMovieStartRecording, "Start game recording...", CMDEN_NGREC)
 {
-	if (!mov_path.size())
-	{
-		if (!gopts.recording_dir.size())
-			mov_path = panel->game_dir();
-		else
-		{
-			wxFileName sp(gopts.recording_dir, wxEmptyString);
-
-			if (sp.IsAbsolute())
-				mov_path = gopts.recording_dir;
-			else
-				mov_path = panel->game_dir() + wxT('/') + gopts.recording_dir;
-		}
-
-		wxFileName::Mkdir(mov_path, 0777, wxPATH_MKDIR_FULL);
-	}
-
+	mov_path = GetGamePath(gopts.recording_dir);
 	wxString def_name = panel->game_name() + wxT(".vmv");
 	wxFileDialog dlg(this, _("Select output file"), mov_path, def_name,
 	                 _("VBA Movie files|*.vmv"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
@@ -1411,24 +1347,7 @@ EVT_HANDLER_MASK(RecordMovieStopRecording, "Stop game recording", CMDEN_GREC)
 
 EVT_HANDLER_MASK(PlayMovieStartPlaying, "Start playing movie...", CMDEN_NGREC | CMDEN_NGPLAY)
 {
-	if (!mov_path.size())
-	{
-		if (!gopts.recording_dir.size())
-			mov_path = panel->game_dir();
-		else
-		{
-			wxFileName sp(gopts.recording_dir, wxEmptyString);
-
-			if (sp.IsAbsolute())
-				mov_path = gopts.recording_dir;
-			else
-				mov_path = panel->game_dir() + wxT('/') + gopts.recording_dir;
-		}
-
-		if (!wxFileName::DirExists(mov_path))
-			mov_path = wxFileName::GetCwd();
-	}
-
+	mov_path = GetGamePath(gopts.recording_dir);
 	systemStopGamePlayback();
 	wxString def_name = panel->game_name() + wxT(".vmv");
 	wxFileDialog dlg(this, _("Select file"), mov_path, def_name,
@@ -1951,9 +1870,7 @@ EVT_HANDLER_MASK(Disassemble, "Disassemble...", CMDEN_GB | CMDEN_GBA)
 	Disassemble();
 }
 
-// only GBA generates the log messages this handles
-// you could view them even w/o a gba cart, but why?
-EVT_HANDLER_MASK(Logging, "Logging...", CMDEN_GBA)
+EVT_HANDLER(Logging, "Logging...")
 {
 	wxDialog* dlg = wxGetApp().frame->logdlg;
 	dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
@@ -2310,7 +2227,7 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
 		if (chg)
 		{
 			wxString vba_over;
-			wxFileName fn(wxStandardPaths::Get().GetUserDataDir(), wxT("vba-over.ini"));
+			wxFileName fn(wxGetApp().GetConfigurationPath(), wxT("vba-over.ini"));
 
 			if (fn.FileExists())
 			{
@@ -2587,7 +2504,7 @@ EVT_HANDLER(wxID_ABOUT, "About...")
 	wxAboutDialogInfo ai;
 	ai.SetName(wxT("VisualBoyAdvance-M"));
 	wxString version = wxT("");
-#ifdef FINAL_BUILD
+#ifndef FINAL_BUILD
 	version = version + wxT("-") + wxT(SVN_REV_STR);
 #endif
 	ai.SetVersion(version);

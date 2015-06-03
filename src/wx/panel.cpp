@@ -45,21 +45,21 @@ void GameArea::LoadGame(const wxString &name)
 		wxString rp = fnfn.GetPath();
 
 		// can't really decide which dir to use, so try GBA first, then GB
-		if (!gopts.gba_rom_dir.empty())
+		if (!wxGetApp().GetAbsolutePath(gopts.gba_rom_dir).empty())
 		{
-			fnfn.SetPath(gopts.gba_rom_dir + wxT('/') + rp);
+			fnfn.SetPath(wxGetApp().GetAbsolutePath(gopts.gba_rom_dir) + wxT('/') + rp);
 			badfile = !fnfn.IsFileReadable();
 		}
 
-		if (badfile && !gopts.gb_rom_dir.empty())
+		if (badfile && !wxGetApp().GetAbsolutePath(gopts.gb_rom_dir).empty())
 		{
-			fnfn.SetPath(gopts.gb_rom_dir + wxT('/') + rp);
+			fnfn.SetPath(wxGetApp().GetAbsolutePath(gopts.gb_rom_dir) + wxT('/') + rp);
 			badfile = !fnfn.IsFileReadable();
 		}
 
-		if (badfile && !gopts.gbc_rom_dir.empty())
+		if (badfile && !wxGetApp().GetAbsolutePath(gopts.gbc_rom_dir).empty())
 		{
-			fnfn.SetPath(gopts.gbc_rom_dir + wxT('/') + rp);
+			fnfn.SetPath(wxGetApp().GetAbsolutePath(gopts.gbc_rom_dir) + wxT('/') + rp);
 			badfile = !fnfn.IsFileReadable();
 		}
 	}
@@ -450,7 +450,7 @@ void GameArea::SetFrameTitle()
 	}
 
 	tit.append(wxT("VisualBoyAdvance-M "));
-#ifdef FINAL_BUILD
+#ifndef FINAL_BUILD
 	tit.append(_(SVN_REV_STR));
 #endif
 #ifndef NO_LINK
@@ -471,26 +471,30 @@ void GameArea::recompute_dirs()
 	batdir = gopts.battery_dir;
 
 	if (!batdir.size())
-		batdir = wxStandardPaths::Get().GetUserLocalDataDir();
+	{
+		batdir = loaded_game.GetPathWithSep();
+	}
 	else
 	{
-		wxFileName bp(batdir, wxEmptyString);
-
-		if (!bp.IsAbsolute())
-			batdir = loaded_game.GetPathWithSep() + batdir;
+		batdir = wxGetApp().GetAbsolutePath(gopts.battery_dir);
 	}
 
 	statedir = gopts.state_dir;
 
 	if (!statedir.size())
-		statedir = batdir;
+	{
+		statedir = loaded_game.GetPathWithSep();
+	}
 	else
 	{
-		wxFileName sp(statedir, wxEmptyString);
-
-		if (!sp.IsAbsolute())
-			statedir = batdir + wxT('/') + statedir;
+		statedir = wxGetApp().GetAbsolutePath(gopts.state_dir);
 	}
+
+	if (!wxIsWritable(batdir))
+		batdir = wxGetApp().GetConfigurationPath();
+
+	if (!wxIsWritable(statedir))
+		statedir = wxGetApp().GetConfigurationPath();
 }
 
 void GameArea::UnloadGame(bool destruct)
