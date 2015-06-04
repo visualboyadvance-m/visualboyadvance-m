@@ -2505,7 +2505,10 @@ EVT_HANDLER(wxID_ABOUT, "About...")
 	ai.SetName(wxT("VisualBoyAdvance-M"));
 	wxString version = wxT("");
 #ifndef FINAL_BUILD
-	version = version + wxT("-") + wxT(SVN_REV_STR);
+	if (!version.IsEmpty())
+		version = version + wxT("-");
+
+	version = version + wxT(SVN_REV_STR);
 #endif
 	ai.SetVersion(version);
 	// setting website, icon, license uses custom aboutbox on win32 & macosx
