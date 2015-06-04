@@ -3370,7 +3370,7 @@ void CPUInit(const char *biosFileName, bool useBiosFile)
   eepromInUse = 0;
   useBios = false;
 
-  if(useBiosFile) {
+  if(useBiosFile && strlen(biosFileName) > 0) {
     int size = 0x4000;
     if(utilLoad(biosFileName,
                 CPUIsGBABios,
