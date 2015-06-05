@@ -17,6 +17,8 @@
 #include <wx/regex.h>
 #include <wx/protocol/http.h>
 #include <wx/zipstrm.h>
+#include <wx/progdlg.h>
+#include <wx/url.h>
 
 // The built-in xrc file
 #include "builtin-xrc.h"
@@ -36,7 +38,7 @@ static void get_config_path(wxPathList &path, bool exists = true)
 	wxStandardPathsBase &stdp = wxStandardPaths::Get();
 #define add_path(p) do { \
     const wxString& s = stdp.p; \
-    if(!exists || wxDirExists(s)) \
+    if((!exists || wxDirExists(s)) && wxIsWritable(s)) \
     path.Add(s); \
 } while(0)
 	// NOTE: this does not support XDG (freedesktop.org) paths
@@ -659,6 +661,110 @@ void MainFrame::DownloadFile(wxString host, wxString url)
 	}
 
 	get.Close();
+}
+
+void MainFrame::UpdateFile(wxString host, wxString url)
+{
+	wxProgressDialog progress(_T("Downloading..."), _T("Please wait while the VisualBoyAdvance-M update is downloading."));
+	wxHTTP get;
+	get.SetHeader(_T("Content-type"), _T("text/html; charset=utf-8"));
+	get.SetTimeout(10);
+
+	while (!get.Connect(host))
+		wxSleep(5);
+
+	wxInputStream* httpStream = get.GetInputStream(url);
+
+	if (get.GetError() == wxPROTO_NOERR)
+	{
+		if (httpStream != NULL)
+		{
+			size_t size = httpStream->GetSize();
+			char* data = new char[size];
+			wxFileName name(wxStandardPaths::Get().GetPluginsDir(), url.AfterLast('/'), wxEmptyString);
+
+			if (httpStream)
+			{
+				size_t chunks = 100;
+				size_t chunkSize = httpStream->GetSize() / chunks;
+				char* fileContent = new char[chunkSize];
+#if (wxMAJOR_VERSION >= 3)
+				progress.SetRange(chunks);
+#endif
+				wxFFile file(name.GetFullPath(), _T("wb"));
+
+				for (size_t i = 0; i <= chunks; i++)
+				{
+					progress.Update(i);
+					httpStream->Read(fileContent, chunkSize);
+					file.Write(fileContent, httpStream->LastRead());
+				}
+
+				file.Flush();
+				wxDELETE(fileContent);
+			}
+
+			if (name.FileExists() && name.GetFullName().Lower().Contains(wxT(".7z")))
+			{
+				utilExtract(name.GetPathWithSep().mb_str(wxConvUTF8), name.GetFullName().mb_str(wxConvUTF8));
+			}
+
+			delete[] data;
+			delete httpStream;
+		}
+	}
+
+	get.Close();
+}
+
+wxString MainFrame::CheckForUpdates(wxString host, wxString url)
+{
+	wxString update_url = wxT("");
+	wxHTTP get;
+	get.SetHeader(_T("Content-type"), _T("text/html; charset=utf-8"));
+#ifdef __WXMSW__
+	get.SetHeader(wxT("User-Agent"), wxT("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0"));
+#endif
+	get.SetTimeout(10);
+
+	while (!get.Connect(host))
+		wxSleep(5);
+
+	wxInputStream* httpStream = get.GetInputStream(url);
+
+	if (get.GetError() == wxPROTO_NOERR)
+	{
+		if (httpStream != NULL)
+		{
+			size_t size = httpStream->GetSize();
+
+			if (httpStream)
+			{
+				wxTextInputStream text(*httpStream, wxT("\x09"), wxConvUTF8);
+
+				while (httpStream->IsOk() && !httpStream->Eof() && update_url.IsEmpty())
+				{
+					wxString line = text.ReadLine();
+
+					if (line.Contains(wxT("direct-download")))
+					{
+						wxURL redirect_url(line.SubString(line.Find(wxT("http://")), line.Find(wxT("\" "))).BeforeLast('\"'));
+						update_url = CheckForUpdates(redirect_url.GetServer(), redirect_url.GetPath() + wxT("?") + redirect_url.GetQuery());
+					}
+
+					if (line.Contains(wxT(" redirected ")))
+					{
+						update_url = line.SubString(line.Find(wxT("http://")), line.Find(wxT(";"))).BeforeLast(';');
+					}
+				}
+			}
+
+			delete httpStream;
+		}
+	}
+
+	get.Close();
+	return update_url;
 }
 
 wxString MainFrame::GetGamePath(wxString path)

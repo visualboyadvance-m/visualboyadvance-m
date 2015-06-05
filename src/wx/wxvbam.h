@@ -317,6 +317,8 @@ private:
 	wxDialog* LoadXRCropertySheetDialog(const char* name);
 
 	void DownloadFile(wxString host, wxString url);
+	void UpdateFile(wxString host, wxString url);
+	wxString CheckForUpdates(wxString host, wxString url);
 
 #include "cmdhandlers.h"
 };
