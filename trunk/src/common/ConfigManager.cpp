@@ -30,10 +30,8 @@ extern "C" {
 #include "../Util.h"
 
 #ifndef _WIN32
-#include <unistd.h>
 #define GETCWD getcwd
 #else // _WIN32
-#include <io.h>
 #include <direct.h>
 #define GETCWD _getcwd
 #define snprintf sprintf
@@ -613,16 +611,6 @@ void CloseConfig()
 {
 	if (preferences)
 		iniparser_freedict(preferences);
-}
-
-bool FileExists(const char *filename)
-{
-#ifdef _WIN32
-	return (_access(filename, 0) != -1);
-#else
-	struct stat buffer;
-	return (stat(filename, &buffer) == 0);
-#endif
 }
 
 char* FindConfigFile(char *name)

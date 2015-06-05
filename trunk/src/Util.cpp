@@ -1,6 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string>
+
+#ifndef _WIN32
+#include <unistd.h>
+#include <sys/stat.h>
+#else // _WIN32
+#include <io.h>
+#include <direct.h>
+#endif // _WIN32
+
 #include <zlib.h>
 
 #ifndef NO_PNG
@@ -43,6 +52,16 @@ static int (ZEXPORT *utilGzWriteFunc)(gzFile, const voidp, unsigned int) = NULL;
 static int (ZEXPORT *utilGzReadFunc)(gzFile, voidp, unsigned int) = NULL;
 static int (ZEXPORT *utilGzCloseFunc)(gzFile) = NULL;
 static z_off_t (ZEXPORT *utilGzSeekFunc)(gzFile, z_off_t, int) = NULL;
+
+bool FileExists(const char *filename)
+{
+#ifdef _WIN32
+	return (_access(filename, 0) != -1);
+#else
+	struct stat buffer;
+	return (stat(filename, &buffer) == 0);
+#endif
+}
 
 void utilReadScreenPixels(u8* dest, int w, int h)
 {
@@ -613,6 +632,67 @@ u8 *utilLoad(const char *file,
 	size = fileSize;
 
 	return image;
+}
+
+void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+	if (from.empty())
+		return;
+	size_t start_pos = 0;
+	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+	}
+}
+
+void utilExtract(const char* filepath, const char* filename)
+{
+	fex_t* fex;
+	std::string archive_name(filepath);
+	archive_name.append(filename);
+
+	fex_open(&fex, archive_name.c_str());
+	while (!fex_done(fex))
+	{
+		std::string extracted_filename(filepath);
+		extracted_filename.append(fex_name(fex));
+#ifdef WIN32
+		replaceAll(extracted_filename, "/", "\\");
+#endif
+
+		std::string new_dir(filepath);
+		new_dir.append(fex_name(fex));
+#ifdef WIN32
+		replaceAll(new_dir, "/", "\\");
+#endif
+		new_dir = new_dir.substr(0, new_dir.find_last_of("\\"));
+		if (!FileExists(new_dir.c_str()))
+			mkdir(new_dir.c_str()
+#ifndef WIN32
+			,0777
+#endif
+			);
+
+		if (FileExists(extracted_filename.c_str()))
+		{
+			std::string new_name(filepath);
+			new_name.append("old-");
+			new_name.append(fex_name(fex));
+#ifdef WIN32
+			replaceAll(new_name, "/", "\\");
+#endif
+			remove(new_name.c_str());
+			rename(extracted_filename.c_str(), new_name.c_str());
+		}
+
+		FILE *extracted_file = fopen(extracted_filename.c_str(), "wb");
+		const void* p;
+		fex_data(fex, &p);
+		fwrite(p, fex_size(fex), 1, extracted_file);
+		fclose(extracted_file);
+		fex_next(fex);
+	}
+	fex_close(fex);
+
 }
 
 void utilWriteInt(gzFile gzFile, int i)
