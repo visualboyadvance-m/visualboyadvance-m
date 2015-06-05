@@ -14,6 +14,9 @@ typedef struct {
 	void *address;
 	int size;
 } variable_desc;
+
+bool FileExists(const char *filename);
+
 void utilReadScreenPixels(u8* dest, int w, int h);
 bool utilWritePNGFile(const char *, int, int, u8 *);
 bool utilWriteBMPFile(const char *, int, int, u8 *);
@@ -25,6 +28,7 @@ bool utilIsZipFile(const char *);
 void utilStripDoubleExtension(const char *, char *);
 IMAGE_TYPE utilFindType(const char *);
 uint8_t *utilLoad(const char *, bool (*)(const char*), uint8_t *, int &);
+void utilExtract(const char* filepath, const char* filename);
 
 void utilPutDword(uint8_t *, uint32_t);
 void utilPutWord(uint8_t *, uint16_t);
