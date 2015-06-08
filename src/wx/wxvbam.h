@@ -268,22 +268,24 @@ public:
 	// call this to update the viewers once a frame:
 	void UpdateViewers();
 
+	// Check for online updates to the emulator
+	bool CheckForUpdates();
+
 	// required for building from xrc
 	DECLARE_DYNAMIC_CLASS();
 	// required for event handling
 	DECLARE_EVENT_TABLE();
+
+	bool IsPaused(bool incendental = false)
+	{
+		return (paused && !pause_next && !incendental) || menus_opened || dialog_opened;
+	}
 private:
 	GameArea* panel;
 
 	// the various reasons the game might be paused
 	bool paused;
 	int menus_opened, dialog_opened;
-public:
-	bool IsPaused(bool incendental = false)
-	{
-		return (paused && !pause_next && !incendental) || menus_opened || dialog_opened;
-	}
-private:
 
 	bool autoLoadMostRecent;
 	// copy of top-level menu bar as a context menu

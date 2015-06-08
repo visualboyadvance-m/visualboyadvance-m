@@ -178,6 +178,7 @@ opt_desc opts[] =
 	BOOLOPT("General/AutoLoadLastState", "", wxTRANSLATE("Automatically load last saved state"), gopts.autoload_state),
 	STROPT("General/BatteryDir", "", wxTRANSLATE("Directory to store game save files (relative paths are relative to ROM; blank is config dir)"), gopts.battery_dir),
 	BOOLOPT("General/FreezeRecent", "", wxTRANSLATE("Freeze recent load list"), gopts.recent_freeze),
+	ENUMOPT("General/OnlineUpdates", "", wxTRANSLATE("Automatically check for online updates"), gopts.onlineupdates, wxTRANSLATE("never|daily|weekly")),
 	STROPT("General/RecordingDir", "", wxTRANSLATE("Directory to store A/V and game recordings (relative paths are relative to ROM)"), gopts.recording_dir),
 	INTOPT("General/RewindInterval", "", wxTRANSLATE("Number of seconds between rewind snapshots (0 to disable)"), gopts.rewind_interval, 0, 600),
 	STROPT("General/ScreenshotDir", "", wxTRANSLATE("Directory to store screenshots (relative paths are relative to ROM)"), gopts.scrshot_dir),
@@ -299,6 +300,7 @@ opts_t::opts_t()
 	autofire_rate = 1;
 	print_auto_page = true;
 	autoPatch = true;
+	onlineupdates = 1;
 }
 
 // for binary_search() and friends
@@ -343,6 +345,11 @@ void load_opts()
 		item_del.push_back(s);
 	}
 
+	// Date of last online update check;
+	gopts.last_update = cfg->Read(wxT("General/LastUpdated"), (long)0);
+	cfg->Read(wxT("General/LastUpdatedFileName"), &gopts.last_updated_filename);
+	std::sort(&opts[0], &opts[num_opts], opt_lt);
+
 	for (cont = cfg->GetFirstGroup(s, grp_idx); cont;
 	        cont = cfg->GetNextGroup(s, grp_idx))
 	{
@@ -358,7 +365,6 @@ void load_opts()
 		int poff = s.size();
 		long entry_idx;
 		wxString e;
-		std::sort(&opts[0], &opts[num_opts], opt_lt);
 
 		for (cont = cfg->GetFirstGroup(e, entry_idx); cont;
 		        cont = cfg->GetNextGroup(e, entry_idx))
@@ -436,8 +442,11 @@ void load_opts()
 				s.append(wxT('/'));
 				s.append(e);
 				const opt_desc dummy = { s.c_str() };
+				wxString opt_name(dummy.opt);
 
-				if (!std::binary_search(&opts[0], &opts[num_opts], dummy, opt_lt))
+				if (!std::binary_search(&opts[0], &opts[num_opts], dummy, opt_lt) &&
+				        opt_name != wxT("General/LastUpdated") &&
+				        opt_name != wxT("General/LastUpdatedFileName"))
 				{
 					//wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
 					item_del.push_back(s);
