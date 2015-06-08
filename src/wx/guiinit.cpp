@@ -3335,6 +3335,10 @@ bool MainFrame::BindControls()
     sc->SetValidator(wxGenericValidator(&o)); \
         } while(0)
 		{
+			// Online Auto Update check frequency
+			getrbi("UpdateNever", gopts.onlineupdates, 0);
+			getrbi("UpdateDaily", gopts.onlineupdates, 1);
+			getrbi("UpdateWeekly", gopts.onlineupdates, 7);
 			getrbi("PNG", captureFormat, 0);
 			getrbi("BMP", captureFormat, 1);
 			getsc("RewindInterval", gopts.rewind_interval);

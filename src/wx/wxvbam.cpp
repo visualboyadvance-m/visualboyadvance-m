@@ -42,13 +42,13 @@ static void get_config_path(wxPathList &path, bool exists = true)
     path.Add(s); \
 } while(0)
 	// NOTE: this does not support XDG (freedesktop.org) paths
-	add_path(GetPluginsDir());
 	add_path(GetUserLocalDataDir());
 	add_path(GetUserDataDir());
 	add_path(GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()));
 	add_path(GetResourcesDir());
 	add_path(GetDataDir());
 	add_path(GetLocalDataDir());
+	add_path(GetPluginsDir());
 }
 
 static void tack_full_path(wxString &s, const wxString &app = wxEmptyString)
@@ -67,7 +67,7 @@ wxString wxvbamApp::GetConfigurationPath()
 	{
 		get_config_path(config_path);
 
-		for (int i = 0; i < config_path.size(); i++)
+		for (int i = config_path.size() - 1; i >= 0 ; i--)
 		{
 			wxFileName fn(config_path[i], wxT("vbam.ini"));
 
@@ -214,38 +214,8 @@ bool wxvbamApp::OnInit()
 	}
 
 	pending_optset.clear();
-	// load vba-over.ini
-	// rather than dealing with wxConfig's broken search path, just use
-	// the same one that the xrc overrides use
-	// this also allows us to override a group at a time, add commments, and
-	// add the file from which the group came
-	wxMemoryInputStream mis(builtin_over, sizeof(builtin_over));
-	overrides = new wxFileConfig(mis);
-	wxRegEx cmtre;
-	// not the most efficient thing to do: read entire file into a string
-	// just to parse the comments out
-	wxString bovs((const char*)builtin_over, wxConvUTF8, sizeof(builtin_over));
-	bool cont;
-	wxString s;
-	long grp_idx;
 
-	for (cont = overrides->GetFirstGroup(s, grp_idx); cont;
-	        cont = overrides->GetNextGroup(s, grp_idx))
-	{
-		// apparently even MacOSX sometimes uses the old \r by itself
-#define CMT_RE_START wxT("(^|[\n\r])# ?([^\n\r]*)(\r?\n|\r)\\[")
-		wxString cmt(CMT_RE_START);
-		cmt += s + wxT("\\]");
-
-		if (cmtre.Compile(cmt) && cmtre.Matches(bovs))
-			cmt = cmtre.GetMatch(bovs, 2);
-		else
-			cmt = wxEmptyString;
-
-		overrides->Write(s + wxT("/comment"), cmt);
-	}
-
-	wxFileName fn(GetConfigurationPath(), wxT("vba-over.ini"));
+	wxFileName vba_over(GetConfigurationPath(), wxT("vba-over.ini"));
 	wxFileName rdb(GetConfigurationPath(), wxT("Nintendo - Game Boy Advance*.dat"));
 	wxFileName scene_rdb(GetConfigurationPath(), wxT("Nintendo - Game Boy Advance (Scene)*.dat"));
 	wxFileName nointro_rdb(GetConfigurationPath(), wxT("Official No-Intro Nintendo Gameboy Advance Number (Date).xml"));
@@ -274,10 +244,42 @@ bool wxvbamApp::OnInit()
 		}
 	}
 
-	if (fn.FileExists())
+	// load vba-over.ini
+	// rather than dealing with wxConfig's broken search path, just use
+	// the same one that the xrc overrides use
+	// this also allows us to override a group at a time, add commments, and
+	// add the file from which the group came
+	wxMemoryInputStream mis(builtin_over, sizeof(builtin_over));
+	overrides = new wxFileConfig(mis);
+	wxRegEx cmtre;
+	// not the most efficient thing to do: read entire file into a string
+	// just to parse the comments out
+	wxString bovs((const char*)builtin_over, wxConvUTF8, sizeof(builtin_over));
+	bool cont;
+	wxString s;
+	long grp_idx;
+
+#define CMT_RE_START wxT("(^|[\n\r])# ?([^\n\r]*)(\r?\n|\r)\\[")
+
+	for (cont = overrides->GetFirstGroup(s, grp_idx); cont;
+		 cont = overrides->GetNextGroup(s, grp_idx))
+	{
+		// apparently even MacOSX sometimes uses the old \r by itself
+		wxString cmt(CMT_RE_START);
+		cmt += s + wxT("\\]");
+
+		if (cmtre.Compile(cmt) && cmtre.Matches(bovs))
+			cmt = cmtre.GetMatch(bovs, 2);
+		else
+			cmt = wxEmptyString;
+
+		overrides->Write(s + wxT("/comment"), cmt);
+	}
+
+	if (vba_over.FileExists())
 	{
 		wxStringOutputStream sos;
-		wxFileInputStream fis(fn.GetFullPath());
+		wxFileInputStream fis(vba_over.GetFullPath());
 		// not the most efficient thing to do: read entire file into a string
 		// just to parse the comments out
 		fis.Read(sos);
@@ -765,6 +767,46 @@ wxString MainFrame::CheckForUpdates(wxString host, wxString url)
 
 	get.Close();
 	return update_url;
+}
+
+bool MainFrame::CheckForUpdates()
+{
+#ifndef __WXMSW__
+	int ret = wxMessageBox(_("Online updates are available on Windows only. Please browse this site for updates.\n\nhttps://sourceforge.net/projects/vbam/files/latest/download"),
+	                       _("Online Update"), wxOK | wxICON_INFORMATION);
+	return true;
+#endif
+	bool new_update_available = false;
+	wxString update_url = CheckForUpdates(_T("sourceforge.net"), _T("/projects/vbam/files/latest/download"));
+
+	if (!update_url.IsEmpty())
+	{
+		wxFileConfig* cfg = wxGetApp().cfg;
+		wxString update_filename = update_url.AfterLast('/');
+
+		if (gopts.last_updated_filename != update_filename)
+		{
+			new_update_available = true;
+			int ret = wxMessageBox(_("A new update is available. To update, VisualBoyAdvance-M must be Run as administrator. Would you like to download and update VisualBoyAdvance-M?\n\nhttps://sourceforge.net/projects/vbam/files/latest/download"),
+			                       _("New Update Available"), wxYES_NO | wxICON_QUESTION);
+
+			if (ret == wxYES)
+			{
+				wxURL url(update_url);
+				UpdateFile(url.GetServer(), url.GetPath());
+				ret = wxMessageBox(_("The update has been downloaded and installed.  Please restart VisualBoyAdvance-M."),
+				                   _("Update Downloaded"), wxOK | wxICON_INFORMATION);
+				gopts.last_updated_filename = update_filename;
+				cfg->Write(wxT("General/LastUpdatedFileName"), gopts.last_updated_filename);
+			}
+		}
+
+		gopts.last_update = wxDateTime::Now().GetTicks();
+		cfg->Write(wxT("General/LastUpdated"), gopts.last_update);
+		cfg->Flush();
+	}
+
+	return new_update_available;
 }
 
 wxString MainFrame::GetGamePath(wxString path)

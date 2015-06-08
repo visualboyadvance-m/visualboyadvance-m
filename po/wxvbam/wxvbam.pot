@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-05 23:39+1000\n"
+"POT-Creation-Date: 2015-06-08 16:23+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -397,52 +397,26 @@ msgstr ""
 msgid "Confirm Update"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2505
-msgid ""
-"Online updates are available on Windows only. Please browse this site for "
-"updates.\n"
-"\n"
-"https://sourceforge.net/projects/vbam/files/latest/download"
-msgstr ""
-
 #: ../src/wx/cmdevents.cpp:2506
-msgid "Online Update"
+msgid "There are no new updates at this time."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2513
-msgid ""
-"A new update is available. To update, VisualBoyAdvance-M must be Run as "
-"administrator. Would you like to download and update VisualBoyAdvance-M?\n"
-"\n"
-"https://sourceforge.net/projects/vbam/files/latest/download"
+#: ../src/wx/cmdevents.cpp:2507 ../src/wx/xrc/MainMenu.xrc:628
+msgid "Check for updates"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2514
-msgid "New Update Available"
-msgstr ""
-
-#: ../src/wx/cmdevents.cpp:2520
-msgid ""
-"The update has been downloaded and installed.  Please restart "
-"VisualBoyAdvance-M."
-msgstr ""
-
-#: ../src/wx/cmdevents.cpp:2521
-msgid "Update Downloaded"
-msgstr ""
-
-#: ../src/wx/cmdevents.cpp:2544
+#: ../src/wx/cmdevents.cpp:2529
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2545
+#: ../src/wx/cmdevents.cpp:2530
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2015 VBA-M development team"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2546
+#: ../src/wx/cmdevents.cpp:2531
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -458,11 +432,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2782
+#: ../src/wx/cmdevents.cpp:2767
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2789
+#: ../src/wx/cmdevents.cpp:2774
 msgid "Network is not supported in local mode."
 msgstr ""
 
@@ -727,15 +701,15 @@ msgstr ""
 msgid "New Value"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3686
+#: ../src/wx/guiinit.cpp:3690
 msgid "Menu commands"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3713
+#: ../src/wx/guiinit.cpp:3717
 msgid "Other commands"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3825
+#: ../src/wx/guiinit.cpp:3829
 msgid "JoyBus host invalid; disabling"
 msgstr ""
 
@@ -745,23 +719,23 @@ msgid ""
 "runtime from http://openal.org"
 msgstr ""
 
-#: ../src/wx/opts.cpp:500 ../src/wx/opts.cpp:835
+#: ../src/wx/opts.cpp:509 ../src/wx/opts.cpp:844
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr ""
 
-#: ../src/wx/opts.cpp:533 ../src/wx/opts.cpp:857
+#: ../src/wx/opts.cpp:542 ../src/wx/opts.cpp:866
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr ""
 
-#: ../src/wx/opts.cpp:601 ../src/wx/opts.cpp:626 ../src/wx/opts.cpp:936
-#: ../src/wx/opts.cpp:965
+#: ../src/wx/opts.cpp:610 ../src/wx/opts.cpp:635 ../src/wx/opts.cpp:945
+#: ../src/wx/opts.cpp:974
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr ""
 
-#: ../src/wx/opts.cpp:809
+#: ../src/wx/opts.cpp:818
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr ""
@@ -843,54 +817,54 @@ msgstr ""
 msgid "Not a valid GBA cartridge"
 msgstr ""
 
-#: ../src/wx/panel.cpp:1109
+#: ../src/wx/panel.cpp:1122
 msgid "No memory for rewinding"
 msgstr ""
 
-#: ../src/wx/panel.cpp:1119
+#: ../src/wx/panel.cpp:1132
 msgid "Error writing rewind state"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2330
+#: ../src/wx/panel.cpp:2343
 msgid "Cannot create conversion buffer"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2405
+#: ../src/wx/panel.cpp:2418
 msgid "memory allocation error"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2408
+#: ../src/wx/panel.cpp:2421
 msgid "error initializing codec"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2411
+#: ../src/wx/panel.cpp:2424
 msgid "error writing to output file"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2414
+#: ../src/wx/panel.cpp:2427
 msgid "can't guess output format from file name"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2419
+#: ../src/wx/panel.cpp:2432
 msgid "programming error; aborting!"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2432 ../src/wx/panel.cpp:2464
+#: ../src/wx/panel.cpp:2445 ../src/wx/panel.cpp:2477
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2494
+#: ../src/wx/panel.cpp:2507
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2501
+#: ../src/wx/panel.cpp:2514
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2512
+#: ../src/wx/panel.cpp:2525
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr ""
@@ -1062,47 +1036,47 @@ msgstr ""
 msgid "vbam"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:322
+#: ../src/wx/wxvbam.cpp:324
 msgid "Could not create main window"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:354
+#: ../src/wx/wxvbam.cpp:356
 msgid "Save built-in XRC file and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:358
+#: ../src/wx/wxvbam.cpp:360
 msgid "Save built-in vba-over.ini and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:362
+#: ../src/wx/wxvbam.cpp:364
 msgid "Print configuration path and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:366
+#: ../src/wx/wxvbam.cpp:368
 msgid "Start in full-screen mode"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:371
+#: ../src/wx/wxvbam.cpp:373
 msgid "Delete shared link state first, if it exists"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:379
+#: ../src/wx/wxvbam.cpp:381
 msgid "List all settable options and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:383
+#: ../src/wx/wxvbam.cpp:385
 msgid "ROM file"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:387
+#: ../src/wx/wxvbam.cpp:389
 msgid "<config>=<value>"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:421
+#: ../src/wx/wxvbam.cpp:423
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:429
+#: ../src/wx/wxvbam.cpp:431
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
@@ -1111,11 +1085,11 @@ msgid ""
 "built-in:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:444
+#: ../src/wx/wxvbam.cpp:446
 msgid "Configuration is read from, in order:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:458
+#: ../src/wx/wxvbam.cpp:460
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
@@ -1123,13 +1097,13 @@ msgid ""
 "from search path:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:463
+#: ../src/wx/wxvbam.cpp:465
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:475
+#: ../src/wx/wxvbam.cpp:477
 msgid ""
 "Options set from the command line are saved if any configuration changes are "
 "made in the user interface.\n"
@@ -1138,14 +1112,48 @@ msgid ""
 "\n"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:502
+#: ../src/wx/wxvbam.cpp:504
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:552
+#: ../src/wx/wxvbam.cpp:554
 msgid "Bad configuration option or multiple ROM files given:\n"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:775
+msgid ""
+"Online updates are available on Windows only. Please browse this site for "
+"updates.\n"
+"\n"
+"https://sourceforge.net/projects/vbam/files/latest/download"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:776
+msgid "Online Update"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:790
+msgid ""
+"A new update is available. To update, VisualBoyAdvance-M must be Run as "
+"administrator. Would you like to download and update VisualBoyAdvance-M?\n"
+"\n"
+"https://sourceforge.net/projects/vbam/files/latest/download"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:791
+msgid "New Update Available"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:797
+msgid ""
+"The update has been downloaded and installed.  Please restart "
+"VisualBoyAdvance-M."
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:798
+msgid "Update Downloaded"
 msgstr ""
 
 #: ../src/wx/xaudio2.cpp:32
@@ -2393,63 +2401,79 @@ msgid "General"
 msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:26
-msgid "Screenshot Format:"
+msgid "Check for updates:"
 msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:33
-msgid "&PNG"
+msgid "&Never"
 msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:42
+msgid "&Daily"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:50
+msgid "&Weekly"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:64
+msgid "Screenshot Format:"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:71
+msgid "&PNG"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:80
 msgid "&BMP"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:57
+#: ../src/wx/xrc/GeneralConfig.xrc:95
 msgid "&Rewind interval :"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:58
+#: ../src/wx/xrc/GeneralConfig.xrc:96
 msgid "If not empty or 0, enable rewind (seconds)"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:67
+#: ../src/wx/xrc/GeneralConfig.xrc:105
 msgid "seconds (0-600); 0 = disable"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:78
+#: ../src/wx/xrc/GeneralConfig.xrc:116
 msgid "&Throttle"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:96
+#: ../src/wx/xrc/GeneralConfig.xrc:134
 #, c-format
 msgid "% of normal:"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:106
+#: ../src/wx/xrc/GeneralConfig.xrc:144
 msgid "0 = no throttle"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:115
+#: ../src/wx/xrc/GeneralConfig.xrc:153
 msgid "No throttle"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:116
+#: ../src/wx/xrc/GeneralConfig.xrc:154
 msgid "25%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:117
+#: ../src/wx/xrc/GeneralConfig.xrc:155
 msgid "50%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:118 ../src/wx/xrc/SoundConfig.xrc:45
+#: ../src/wx/xrc/GeneralConfig.xrc:156 ../src/wx/xrc/SoundConfig.xrc:45
 msgid "100%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:119
+#: ../src/wx/xrc/GeneralConfig.xrc:157
 msgid "150%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:120
+#: ../src/wx/xrc/GeneralConfig.xrc:158
 msgid "200%"
 msgstr ""
 
@@ -3271,10 +3295,6 @@ msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:625
 msgid "Update ROM database"
-msgstr ""
-
-#: ../src/wx/xrc/MainMenu.xrc:628
-msgid "Check for updates"
 msgstr ""
 
 #: ../src/wx/xrc/MapViewer.xrc:4
