@@ -42,6 +42,9 @@ extern struct opts_t
 	/// General
 	bool autoload_state, autoload_cheats;
 	wxString battery_dir;
+	int onlineupdates;
+	long last_update;
+	wxString last_updated_filename;
 	bool recent_freeze;
 	wxString recording_dir;
 	int rewind_interval;

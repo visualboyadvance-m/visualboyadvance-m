@@ -2501,25 +2501,10 @@ EVT_HANDLER(UpdateRDB, "Update ROM database")
 
 EVT_HANDLER(UpdateEmu, "Check for updates")
 {
-#ifndef __WXMSW__
-	int ret = wxMessageBox(_("Online updates are available on Windows only. Please browse this site for updates.\n\nhttps://sourceforge.net/projects/vbam/files/latest/download"),
-	                       _("Online Update"), wxOK | wxICON_INFORMATION);
-	return;
-#endif
-	wxString update_url = CheckForUpdates(_T("sourceforge.net"), _T("/projects/vbam/files/latest/download"));
-
-	if (!update_url.IsEmpty())
+	if (!CheckForUpdates())
 	{
-		int ret = wxMessageBox(_("A new update is available. To update, VisualBoyAdvance-M must be Run as administrator. Would you like to download and update VisualBoyAdvance-M?\n\nhttps://sourceforge.net/projects/vbam/files/latest/download"),
-		                       _("New Update Available"), wxYES_NO | wxICON_QUESTION);
-
-		if (ret == wxYES)
-		{
-			wxURL url(update_url);
-			UpdateFile(url.GetServer(), url.GetPath());
-			ret = wxMessageBox(_("The update has been downloaded and installed.  Please restart VisualBoyAdvance-M."),
-			                   _("Update Downloaded"), wxOK | wxICON_INFORMATION);
-		}
+		wxMessageBox(_("There are no new updates at this time."),
+		             _("Check for updates"), wxOK | wxICON_INFORMATION);
 	}
 }
 
