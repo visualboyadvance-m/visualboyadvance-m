@@ -339,6 +339,10 @@
           <checkable>1</checkable>
         </object>
         <object class="separator"/>
+        <object class="wxMenuItem" name="StatusBar">
+          <label>_Status bar</label>
+          <checkable>1</checkable>
+        </object>
         <object class="wxMenuItem" name="NoStatusMsg">
           <label>_Disable on-screen display</label>
           <checkable>1</checkable>

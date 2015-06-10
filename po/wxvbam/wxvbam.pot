@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-08 16:23+1000\n"
+"POT-Creation-Date: 2015-06-10 13:10+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -401,7 +401,7 @@ msgstr ""
 msgid "There are no new updates at this time."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2507 ../src/wx/xrc/MainMenu.xrc:628
+#: ../src/wx/cmdevents.cpp:2507 ../src/wx/xrc/MainMenu.xrc:632
 msgid "Check for updates"
 msgstr ""
 
@@ -432,11 +432,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2767
+#: ../src/wx/cmdevents.cpp:2781
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2774
+#: ../src/wx/cmdevents.cpp:2788
 msgid "Network is not supported in local mode."
 msgstr ""
 
@@ -709,7 +709,7 @@ msgstr ""
 msgid "Other commands"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3829
+#: ../src/wx/guiinit.cpp:3834
 msgid "JoyBus host invalid; disabling"
 msgstr ""
 
@@ -719,23 +719,23 @@ msgid ""
 "runtime from http://openal.org"
 msgstr ""
 
-#: ../src/wx/opts.cpp:509 ../src/wx/opts.cpp:844
+#: ../src/wx/opts.cpp:510 ../src/wx/opts.cpp:845
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr ""
 
-#: ../src/wx/opts.cpp:542 ../src/wx/opts.cpp:866
+#: ../src/wx/opts.cpp:543 ../src/wx/opts.cpp:867
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr ""
 
-#: ../src/wx/opts.cpp:610 ../src/wx/opts.cpp:635 ../src/wx/opts.cpp:945
-#: ../src/wx/opts.cpp:974
+#: ../src/wx/opts.cpp:611 ../src/wx/opts.cpp:636 ../src/wx/opts.cpp:946
+#: ../src/wx/opts.cpp:975
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr ""
 
-#: ../src/wx/opts.cpp:818
+#: ../src/wx/opts.cpp:819
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr ""
@@ -1036,47 +1036,47 @@ msgstr ""
 msgid "vbam"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:324
+#: ../src/wx/wxvbam.cpp:322
 msgid "Could not create main window"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:356
+#: ../src/wx/wxvbam.cpp:354
 msgid "Save built-in XRC file and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:360
+#: ../src/wx/wxvbam.cpp:358
 msgid "Save built-in vba-over.ini and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:364
+#: ../src/wx/wxvbam.cpp:362
 msgid "Print configuration path and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:368
+#: ../src/wx/wxvbam.cpp:366
 msgid "Start in full-screen mode"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:373
+#: ../src/wx/wxvbam.cpp:371
 msgid "Delete shared link state first, if it exists"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:381
+#: ../src/wx/wxvbam.cpp:379
 msgid "List all settable options and exit"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:385
+#: ../src/wx/wxvbam.cpp:383
 msgid "ROM file"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:389
+#: ../src/wx/wxvbam.cpp:387
 msgid "<config>=<value>"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:423
+#: ../src/wx/wxvbam.cpp:421
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:431
+#: ../src/wx/wxvbam.cpp:429
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
@@ -1085,11 +1085,11 @@ msgid ""
 "built-in:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:446
+#: ../src/wx/wxvbam.cpp:444
 msgid "Configuration is read from, in order:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:460
+#: ../src/wx/wxvbam.cpp:458
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
@@ -1097,13 +1097,13 @@ msgid ""
 "from search path:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:465
+#: ../src/wx/wxvbam.cpp:463
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:477
+#: ../src/wx/wxvbam.cpp:475
 msgid ""
 "Options set from the command line are saved if any configuration changes are "
 "made in the user interface.\n"
@@ -1112,17 +1112,17 @@ msgid ""
 "\n"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:504
+#: ../src/wx/wxvbam.cpp:502
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:554
+#: ../src/wx/wxvbam.cpp:552
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:775
+#: ../src/wx/wxvbam.cpp:773
 msgid ""
 "Online updates are available on Windows only. Please browse this site for "
 "updates.\n"
@@ -1130,11 +1130,11 @@ msgid ""
 "https://sourceforge.net/projects/vbam/files/latest/download"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:776
+#: ../src/wx/wxvbam.cpp:774
 msgid "Online Update"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:790
+#: ../src/wx/wxvbam.cpp:788
 msgid ""
 "A new update is available. To update, VisualBoyAdvance-M must be Run as "
 "administrator. Would you like to download and update VisualBoyAdvance-M?\n"
@@ -1142,17 +1142,17 @@ msgid ""
 "https://sourceforge.net/projects/vbam/files/latest/download"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:791
+#: ../src/wx/wxvbam.cpp:789
 msgid "New Update Available"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:797
+#: ../src/wx/wxvbam.cpp:795
 msgid ""
 "The update has been downloaded and installed.  Please restart "
 "VisualBoyAdvance-M."
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:798
+#: ../src/wx/wxvbam.cpp:796
 msgid "Update Downloaded"
 msgstr ""
 
@@ -2988,7 +2988,7 @@ msgstr ""
 msgid "&GameCube"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:293 ../src/wx/xrc/MainMenu.xrc:425
+#: ../src/wx/xrc/MainMenu.xrc:293 ../src/wx/xrc/MainMenu.xrc:429
 msgid "&Game Boy"
 msgstr ""
 
@@ -3005,7 +3005,7 @@ msgid "&Speed hack"
 msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:310 ../src/wx/xrc/MainMenu.xrc:316
-#: ../src/wx/xrc/MainMenu.xrc:354 ../src/wx/xrc/MainMenu.xrc:378
+#: ../src/wx/xrc/MainMenu.xrc:358 ../src/wx/xrc/MainMenu.xrc:382
 msgid "&Configure ..."
 msgstr ""
 
@@ -3034,266 +3034,270 @@ msgid "&Keep window on top"
 msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:343
-msgid "&Disable on-screen display"
+msgid "&Status bar"
 msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:347
+msgid "&Disable on-screen display"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:351
 msgid "&Transparent on-screen display"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:352
+#: ../src/wx/xrc/MainMenu.xrc:356
 msgid "&Audio"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:358
+#: ../src/wx/xrc/MainMenu.xrc:362
 msgid "&GBA sound interpolation"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:363
+#: ../src/wx/xrc/MainMenu.xrc:367
 msgid "&GB sound enhancement"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:367
+#: ../src/wx/xrc/MainMenu.xrc:371
 msgid "&GB surround sound effect"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:371
+#: ../src/wx/xrc/MainMenu.xrc:375
 msgid "&GB sound declicking"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:376
+#: ../src/wx/xrc/MainMenu.xrc:380
 msgid "&Input"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:382
+#: ../src/wx/xrc/MainMenu.xrc:386
 msgid "&Autofire"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:384
+#: ../src/wx/xrc/MainMenu.xrc:388
 msgid "&A"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:389
+#: ../src/wx/xrc/MainMenu.xrc:393
 msgid "&B"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:394
+#: ../src/wx/xrc/MainMenu.xrc:398
 msgid "&L"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:399
+#: ../src/wx/xrc/MainMenu.xrc:403
 msgid "&R"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:406
+#: ../src/wx/xrc/MainMenu.xrc:410
 msgid "&Game Boy Advance"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:408 ../src/wx/xrc/MainMenu.xrc:427
+#: ../src/wx/xrc/MainMenu.xrc:412 ../src/wx/xrc/MainMenu.xrc:431
 msgid "Configure ..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:412
+#: ../src/wx/xrc/MainMenu.xrc:416
 msgid "&Real-time clock"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:416
+#: ../src/wx/xrc/MainMenu.xrc:420
 msgid "&Use BIOS file"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:420
+#: ../src/wx/xrc/MainMenu.xrc:424
 msgid "&Debug print"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:431
+#: ../src/wx/xrc/MainMenu.xrc:435
 msgid "&GB printer"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:435
+#: ../src/wx/xrc/MainMenu.xrc:439
 msgid "&Gather a full page before printing"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:439
+#: ../src/wx/xrc/MainMenu.xrc:443
 msgid "&Save printouts as screen captures"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:444
+#: ../src/wx/xrc/MainMenu.xrc:448
 msgid "&Use GB BIOS file"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:448
+#: ../src/wx/xrc/MainMenu.xrc:452
 msgid "&Use GBC BIOS file"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:453
+#: ../src/wx/xrc/MainMenu.xrc:457
 msgid "&General ..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:456
+#: ../src/wx/xrc/MainMenu.xrc:460
 msgid "D&irectories ..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:459
+#: ../src/wx/xrc/MainMenu.xrc:463
 msgid "&Key Shortcuts ..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:463
+#: ../src/wx/xrc/MainMenu.xrc:467
 msgid "&Tools"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:465
+#: ../src/wx/xrc/MainMenu.xrc:469
 msgid "&Cheats"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:467
+#: ../src/wx/xrc/MainMenu.xrc:471
 msgid "List &cheats ..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:471
+#: ../src/wx/xrc/MainMenu.xrc:475
 msgid "Find c&heat ..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:476
+#: ../src/wx/xrc/MainMenu.xrc:480
 msgid "A&utomatically save/load cheats"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:480
+#: ../src/wx/xrc/MainMenu.xrc:484
 msgid "&Enable cheats"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:487
+#: ../src/wx/xrc/MainMenu.xrc:491
 msgid "&Break into GDB"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:491
+#: ../src/wx/xrc/MainMenu.xrc:495
 msgid "&Configure port..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:494
+#: ../src/wx/xrc/MainMenu.xrc:498
 msgid "&Break on load"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:499
+#: ../src/wx/xrc/MainMenu.xrc:503
 msgid "&Disconnect"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:501
+#: ../src/wx/xrc/MainMenu.xrc:505
 msgid "&GDB"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:504
+#: ../src/wx/xrc/MainMenu.xrc:508
 msgid "&Disassemble..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:507
+#: ../src/wx/xrc/MainMenu.xrc:511
 msgid "&Logging..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:510
+#: ../src/wx/xrc/MainMenu.xrc:514
 msgid "&IO Viewer..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:513
+#: ../src/wx/xrc/MainMenu.xrc:517
 msgid "&Map Viewer..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:516
+#: ../src/wx/xrc/MainMenu.xrc:520
 msgid "M&emory Viewer..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:519
+#: ../src/wx/xrc/MainMenu.xrc:523
 msgid "&OAM Viewer..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:522
+#: ../src/wx/xrc/MainMenu.xrc:526
 msgid "&Palette Viewer..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:525
+#: ../src/wx/xrc/MainMenu.xrc:529
 msgid "&Tile Viewer..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:530
+#: ../src/wx/xrc/MainMenu.xrc:534
 msgid "BG &0"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:536
+#: ../src/wx/xrc/MainMenu.xrc:540
 msgid "BG &1"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:542
+#: ../src/wx/xrc/MainMenu.xrc:546
 msgid "BG &2"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:548
+#: ../src/wx/xrc/MainMenu.xrc:552
 msgid "BG &3"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:554
+#: ../src/wx/xrc/MainMenu.xrc:558
 msgid "&OBJ"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:560
+#: ../src/wx/xrc/MainMenu.xrc:564
 msgid "&WIN 0"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:566
+#: ../src/wx/xrc/MainMenu.xrc:570
 msgid "W&IN 1"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:572
+#: ../src/wx/xrc/MainMenu.xrc:576
 msgid "O&BJ WIN"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:577
+#: ../src/wx/xrc/MainMenu.xrc:581
 msgid "&View Layers"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:581
+#: ../src/wx/xrc/MainMenu.xrc:585
 msgid "Channel &1"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:586
+#: ../src/wx/xrc/MainMenu.xrc:590
 msgid "Channel &2"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:591
+#: ../src/wx/xrc/MainMenu.xrc:595
 msgid "Channel &3"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:596
+#: ../src/wx/xrc/MainMenu.xrc:600
 msgid "Channel &4"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:601
+#: ../src/wx/xrc/MainMenu.xrc:605
 msgid "Direct Sound &A"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:606
+#: ../src/wx/xrc/MainMenu.xrc:610
 msgid "Direct Sound &B"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:610
+#: ../src/wx/xrc/MainMenu.xrc:614
 msgid "&Sound Channels"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:614
+#: ../src/wx/xrc/MainMenu.xrc:618
 msgid "&Help"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:616
+#: ../src/wx/xrc/MainMenu.xrc:620
 msgid "Report &Bugs"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:619
+#: ../src/wx/xrc/MainMenu.xrc:623
 msgid "VBA-M Support &Forum"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:622
+#: ../src/wx/xrc/MainMenu.xrc:626
 msgid "Translations"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:625
+#: ../src/wx/xrc/MainMenu.xrc:629
 msgid "Update ROM database"
 msgstr ""
 
