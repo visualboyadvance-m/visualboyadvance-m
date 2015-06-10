@@ -19,8 +19,10 @@
 
 #define VBA_NAME "VisualBoyAdvance-M"
 
+#ifdef _WIN32
 #ifndef FINAL_BUILD
 #include "svnrev.h"
+#endif
 #else
 #ifdef SVN_REV
 #define SVN_REV_STR SVN_REV
