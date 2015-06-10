@@ -214,7 +214,6 @@ bool wxvbamApp::OnInit()
 	}
 
 	pending_optset.clear();
-
 	wxFileName vba_over(GetConfigurationPath(), wxT("vba-over.ini"));
 	wxFileName rdb(GetConfigurationPath(), wxT("Nintendo - Game Boy Advance*.dat"));
 	wxFileName scene_rdb(GetConfigurationPath(), wxT("Nintendo - Game Boy Advance (Scene)*.dat"));
@@ -258,11 +257,10 @@ bool wxvbamApp::OnInit()
 	bool cont;
 	wxString s;
 	long grp_idx;
-
 #define CMT_RE_START wxT("(^|[\n\r])# ?([^\n\r]*)(\r?\n|\r)\\[")
 
 	for (cont = overrides->GetFirstGroup(s, grp_idx); cont;
-		 cont = overrides->GetNextGroup(s, grp_idx))
+	        cont = overrides->GetNextGroup(s, grp_idx))
 	{
 		// apparently even MacOSX sometimes uses the old \r by itself
 		wxString cmt(CMT_RE_START);

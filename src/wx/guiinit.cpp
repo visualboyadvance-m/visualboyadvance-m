@@ -3807,6 +3807,11 @@ bool MainFrame::BindControls()
 
 	MainFrame* mf = wxGetApp().frame;
 
+	if (gopts.statusbar)
+		mf->GetStatusBar()->Show();
+	else
+		mf->GetStatusBar()->Hide();
+
 	if (gopts.keep_on_top)
 		mf->SetWindowStyle(mf->GetWindowStyle() | wxSTAY_ON_TOP);
 	else

@@ -2662,6 +2662,20 @@ EVT_HANDLER(KeepOnTop, "Keep window on top")
 	update_opts();
 }
 
+EVT_HANDLER(StatusBar, "Enable status bar")
+{
+	GetMenuOptionInt("StatusBar", gopts.statusbar, 1);
+	update_opts();
+	MainFrame* mf = wxGetApp().frame;
+
+	if (gopts.statusbar)
+		mf->GetStatusBar()->Show();
+	else
+		mf->GetStatusBar()->Hide();
+
+	mf->SendSizeEvent();
+}
+
 EVT_HANDLER(NoStatusMsg, "Disable on-screen status messages")
 {
 	GetMenuOptionInt("NoStatusMsg", disableStatusMessages, 1);
