@@ -1808,7 +1808,7 @@ void DrawingPanel::DrawArea(u8** data)
 
 	// draw OSD text old-style (directly into output buffer), if needed
 	// new style flickers too much, so we'll stick to this for now
-	if (wxGetApp().frame->IsFullScreen())
+	if (wxGetApp().frame->IsFullScreen() || !gopts.statusbar)
 	{
 		GameArea* panel = wxGetApp().frame->GetPanel();
 
