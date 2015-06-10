@@ -2674,6 +2674,7 @@ EVT_HANDLER(StatusBar, "Enable status bar")
 		mf->GetStatusBar()->Hide();
 
 	mf->SendSizeEvent();
+	panel->AdjustSize(true);
 }
 
 EVT_HANDLER(NoStatusMsg, "Disable on-screen status messages")
