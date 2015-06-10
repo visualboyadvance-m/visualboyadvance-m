@@ -50,6 +50,7 @@ extern struct opts_t
 	int rewind_interval;
 	wxString scrshot_dir;
 	wxString state_dir;
+	int statusbar;
 
 	/// Joypad
 	wxJoyKeyBinding_v joykey_bindings[4][NUM_KEYS];
