@@ -1,0 +1,396 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Artistic Style - News</title>
+    <meta http-equiv="Content-Language" content="en-us" />
+    <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+    <link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+    <h1>Artistic Style News</h1>
+
+    <p>
+        &nbsp;
+    </p>
+
+    <h3>Artistic Style 2.05&nbsp; (November 2014)</h3>
+
+    <p>Release 2.05.1 (December 2014) is a maintenance release and no new features were added. A list of changes is in 
+        the Release Notes. The following information is for the original 2.05 release.</p>
+
+    <p>
+        A new bracket style option, &quot;style=vtk&quot;, has been added. It uses indented brackets, like Whitesmith,
+        except opening brackets for classes, functions, and methods are not indented. A complete description of the VTK
+        style is available at the &quot;Visualization Toolkit&quot; website (http://www.vtk.org/).
+    </p>
+    <p>
+        A new preprocessor indent option "indent-preproc-block" will indent preprocessor block statements one additional
+        indent. The block must be top-level, or included within a namespace, and there are restrictions on what can be
+        indented.
+        The option is described in the "Indentation Options" section of the documentation.
+    </p>
+    <p>
+        A new option, "dry-run", will run Artistic Style without updating the files. The report will be output as usual.
+    </p>
+    <p>
+        Formatting of source code may now be disabled for portions of a program by embedding special comment tags in the
+        program. These are described in a new &quot;Disable Formatting&quot; section of the documentation. They work the
+        same as in other formatters. There are tags to disable formatting for a block of code, and a tag to disable formatting
+        of a single line. This should allow any custom formatting to be retained.
+    </p>
+    <p>
+        The product version number has been added to the filename of shared library (DLL) compiles. This will allow multiple
+        versions of a shared library on the same system without conflicts.
+    </p>
+    <p>
+        An attribute &#39;__attribute__ ((visibility (&quot;default&quot;)))&#39; has been added to exported functions
+        on Linux shared libraries. This allows the option &quot;-fvisibility=hidden&quot; to be used on dynamic library
+        compiles. According to the GNU documentation, &quot;Using this feature can very substantially improve linking
+        and load times of shared object libraries, produce more optimized code, provide near-perfect API export and prevent
+        symbol clashes. It is strongly recommended that you use this in any shared objects you distribute.&quot;
+    </p>
+    <p>
+        Improvements have been made in the formatting of C++11 uniform initializers (enclosed by brackets). The opening
+        bracket will not be space padded unless it is padded initially. The closing bracket will not be broken from the
+        final line unless it is broken initially. And the known problems with uniform initializers in class constructors
+        have been fixed.
+    </p>
+    <p>
+        The Windows compiler definition ASTYLE_NO_VCX (no Visual Studio exports) has been changed to ASTYLE_NO_EXPORTS.
+        It is sometimes needed for static libraries on other compilers to prevent error and warning messages.
+    </p>
+    <p>
+        Qt and Boost macros foreach, forever, Q_FOREACH, and Q_FOREVER will now be recognized as headers.
+    </p>
+    <p>
+        The main documentation for Artistic Style is in HTML format. Until now there has not been a way to display it
+        from the astyle console program. A new option, "html" or "-!" will display the help documentation in the default
+        browser. This documentation is more complete than the astyle "help" option. It includes examples, and has an index
+        for easier navigation. Since astyle is typically run from a script this should allow an easy way to access the
+        documentation. The option is available only from the command line.
+    </p>
+    <p>
+        The new "html" option assumes the documentation is installed in the standard install path. This is /usr/share/doc/astyle/html
+        for Linux and the path %programfiles%\AStyle\doc for Windows. If it is installed to a different directory, use
+        the variation "html=&lt;actual_install_path&gt;astyle.html. This option can also be used to open other HTML files.
+        More information is in the "Command Line Only" section of the documentation.
+    </p>
+    <p>
+        The "html" option on Linux uses the script "xdg-open" from the install package "xdg-utils" to find the default
+        browser. This should be available on most systems. &nbsp;If it is not available on your system you can file a
+        bug report requesting a change. It would be helpful if you could determine how it is done before filing the report.
+        You can also file a bug report if the documentation is not installed to the above "default" directories. The HTML
+        documentation takes quite a bit of effort to maintain and I would like to make it easily available.
+    </p>
+    <p>
+        The "help" option has been changed to send the output to stdout instead of stderr. This will allow piping and
+        redirection of the output. A common way to use the option on Linux is "astyle --help&nbsp;|&nbsp;less", which
+        will page the display. The "version" option has also been changed to stdout.
+    </p>
+    <p>
+        A shared library error handler argument has been changed from &quot;char*&quot; to &quot;const char*&quot;. In
+        some cases this may cause compile errors in a user program until the references have been changed.
+    </p>
+    <p>
+        The "Indent Style" topic on Wikipedia states that the "ANSI" style refers to K&amp;R style brackets
+        and not Allman style as used by Artistic Style. The option "style=ansi" is therefore being depreciated and will
+        be removed in a future release. Use one of the other long options instead (style=allman, style=bsd, or style=break).
+    </p>
+    <p>
+        Some of the documentation has been removed from the distribution package. It still contains all files needed to
+        install and run Artistic Style. The included files can be used without an Internet connection.
+    </p>
+    <p>
+        There are now build files available for Xcode on Mac. The makefile is still available for those who want it. Both
+        now use the LLVM Clang compiler. There has been a
+        change to the makefile debug locations to make them similar to Xcode. The &quot;Install Instructions&quot; have
+        been updated for both.
+    </p>
+    <p>
+        The Python Example in the Developer Information now supports Iron Python. The 
+        programming instructions are sometimes different since the ctypes module works differently. The example script
+        documents the differences. If you use Python Tools for Visual Studio, it now installs in the Express editions
+        (beginning with release 2.1). Node.js can also be installed in Visual Studio Express.
+    </p>
+    <p>
+        The executable in the Windows distribution package is now compiled with Visual Studio 2013 and will no longer
+        work on XP. If you are using XP, Artistic Style will need to be recompiled on the XP machine.
+    </p>
+    <p>
+        A new <a href="http://www.visualstudio.com/news/vs2013-community-vs" target="astyle" title="open new window">Visual
+            Studio Community Edition</a> has been released. It is free, combines all of the Express editions into a single
+        development environment, and allows the addition of Visual Studio extensions. There is an 
+        <a href="https://visualstudiogallery.msdn.microsoft.com/2f3f04cd-2866-4e47-a671-d1cc9cc3fb02" target="astyle" title="open new window">
+            AStyle Extension</a> available for installation. It has a graphic interface, adds menu entries, and can be
+        used from within Visual Studio. To install it search the &quot;Extensions and Updates&quot;, &quot;Online&quot;
+        entry for &quot;astyle&quot;.
+    </p>
+    <p>
+        Thanks to Peter A. Bigot, HyungKi Jeong, David Faure, and Carl Moore for their contributions.
+    </p>
+
+    <h3>Artistic Style 2.04&nbsp; (November 2013)</h3>
+
+    <p>
+        With a new Artistic Style release some unchanged source files will be formatted because of changes to Artistic
+        Style. You may want to format your source before making program changes in order to bring it up to date.
+    </p>
+    <p>
+        A new programming language, Objective&#8209;C, has been added to Artistic Style. Four new options, "align&#8209;method&#8209;colon",
+        "pad&#8209;method&#8209;colon=", "pad&#8209;method&#8209;prefix", and "unpad&#8209;method&#8209;prefix" have been
+        added to format the methods. The options are described in a new "Objective&#8209;C" section in the documentation.
+        These new options affect only Objective&#8209;C source code. They have no effect on the other programming languages.
+    </p>
+    <p>
+        Because of the longer continuation indents sometimes needed for Objective&#8209;C, the option "max-instatement-indent"
+        may need to be increased. If you are not getting the paren and square bracket alignment you want, try increasing
+        this value. The default minimum is 40 and the maximum is 120.
+    </p>
+    <p>
+        A new bracket style option, "style=google", has been added. It uses attached brackets and indents the class access
+        modifiers one-half indent.&nbsp; A complete description of the Google style is available at the google&#8209;styleguide
+        website (https://code.google.com/p/google-styleguide/). The website has standards for several programming languages
+        along with a python program to verify the style and an emacs script for using the style.
+    </p>
+    <p>
+        A new indent option "indent-modifiers" will indent class access modifiers (public, protected, or 'private) one-half
+        indent. The rest of the class is not indented. It is described in the "Indentation Options" section of the documentation.
+    </p>
+    <p>
+        Four new bracket modify options, "attach-namespaces", "attach-classes", "attach-inlines", and "attach-extern-c",
+        can be used to modify your selected bracket style. They are described in a new "Bracket Modify Options" section
+        of the documentation.
+    </p>
+    <p>
+        A new option, "remove-brackets", will remove brackets from conditional statements. The statement must be a single
+        statement on a single line. It is described in the "Formatting Options" section of the documentation.
+    </p>
+    <p>
+        A new option, "indent-preproc-cond", will indent preprocessor conditional statements (#if #elif, #else, #endif).
+        It is described in the "Indentation Options" section of the documentation. The option "indent-preprocessor" has
+        been deprecated and will be removed in a future release. Use "indent-preproc-define" instead. The processing of
+        preprocessor #define statements has not changed.
+    </p>
+    <p>
+        A new option, "remove-comment-prefix", will remove a leading '*' from multi-line comments. It is described in
+        the "Formatting Options" section of the documentation. With the syntax coloring of modern editors a leading '*'
+        for comment lines is not as useful as it once was. The current trend is toward code that is easier to maintain.
+        The idea is that a style that is hard to maintain will discourage modification and updating. The converted style
+        should retain most of the formatting within the comment and result in a comment that is easier to maintain. For
+        consistency the option also indents multi-line comments that are not preceded by the '*'. This may slightly modify
+        the indentation of any commented-out code.
+    </p>
+    <p>
+        The option "pad-first-paren-out" was fixed to not pad if the following paren is empty. This makes the option consistent
+        with "pad-paren-out". To fix empty parens that have been padded run with the option "unpad-paren" in addition
+        to "pad-first-paren-out". This needs to be done only once.
+    </p>
+    <p>
+        Processing of C++11 raw string literals has been added.
+    </p>
+    <p>
+        The compiler definition ASTYLE_NO_VCX (no Visual Studio exports) has been changed to ASTYLE_NO_EXPORTS and can
+        be used with any Windows compiler. The Clang compiler needs this option to avoid errors on dynamic libraries.
+        It removes the "__declspec(dllexport)"
+        definition from exported functions. Linux compilers do not use this.
+    </p>
+    <p>
+        A new shared object (DLL) entry point, AStyleMainUtf16, has been added for processing C# UTF-16 strings. C# does
+        not have built in functions for converting the UTF-16 strings to UTF-8. This entry point will accept UTF-16 strings,
+        format the source code, and return UTF-16 strings. The error handling function and version number still use UTF-8
+        strings. The C# example program in the "Developer Information" shows the new calling procedure. Changes from the
+        previous release are marked in the example.
+    </p>
+    <p>
+        C# strings are UTF-16 on both Windows and Linux. C# does not use the UTF-32 wchar_t strings on Linux. Qt also
+        uses UTF-16 on both Windows and Linux, but has built in UTF-8 conversion functions. Qt strings can be converted
+        to UTF-8 by Qt, or the new entry point can be used. There may be other "managed code" applications on Linux that
+        use UTF-16.
+    </p>
+    <p>
+        The "Links" page has two new sections for links mentioned in previous versions of Artistic Style. It links to
+        free software and other information.
+    </p>
+    <p>
+        The "Developer Information" section has a new example and download for calling Artistic Style from an Objective&#8209;C
+        program. Since it is another "C" language the only thing needed is to link the program with a library build of
+        Artistic Style. The example was developed on Windows and Linux using the GNUstep project. Since the example is
+        a console program the problems with the GNUstep GUI have been avoided. It has not been tested on a Mac, but should
+        be close to working. The "Developer Information" section also has new page for "Objective&#8209;C on Windows and
+        Linux" which has information on compiling and running the example on those systems.
+    </p>
+    <p>
+        The executable included in the Windows distribution was compiled with Visual Studio 2010 (platform toolset v100).
+        Higher releases contain dependencies on Windows API functions that exist only on Windows Vista, Windows 7, and
+        Windows 8. This means that applications built with a Visual Studio 2012 C++ compiler would fail to load and execute
+        on Windows XP.
+    </p>
+    <p>
+        If you are using Windows Vista or higher, and have a Visual Studio 2012 or higher compiler available, recompiling
+        will probably result in faster execution. If you use a compiler other than Visual Studio, you can probably get
+        better execution by compiling using the C++11 standards. Artistic Style uses a lot of string vectors and the new
+        move semantics will probably result in faster execution.
+    </p>
+    <p>
+        Thanks to Evmenov Georgiy, Matthew Woehlke, Jiang, Ruzzz, and beta100100 for their contributions.
+    </p>
+
+    <h3>Artistic Style 2.03&nbsp; (April 2013)</h3>
+
+    <p>
+        With a new Artistic Style release some unchanged source files will be formatted because of changes to Artistic
+        Style. You may want to format your source before making program changes in order to bring it up to date.
+    </p>
+    <p>
+        A new option, "max-code-length=#" or "xC#", will limit the length of code on a line. A new option "break&#8209;after&#8209;logical",
+        or "xL", will modify a line break for conditionals. See the documentation for details.
+    </p>
+    <p>
+        A new option, "pad-first-paren-out" or "xd", will pad only the first paren in a series on the outside. See the
+        documentation for details.
+    </p>
+    <p>
+        A new option, "indent=force-tab-tab=#" or "xT#", will allow force tab indents with a tab length that is different
+        than the indent length. See the documentation for details.
+    </p>
+    <p>
+        The short option for delete-empty-lines has changed from "xd" to "xe".
+    </p>
+    <p>
+        The C++11 standard for range-based "for" loops, "enum" with a base type, and rvalue references is now supported.
+        The formatting of rvalue references is determined from the existing &quot;align-pointer&quot; and &quot;align-reference&quot;
+        options.
+    </p>
+    <p>
+        Closing the ending angle brackets of templates is now allowed by the C++11 standard. A new option, &quot;close-templates&quot;
+        or "xy", will close the whitespace in the angle brackets of template definitions. Be sure your compiler supports
+        this before making the changes.
+    </p>
+    <p>
+        The C/C++ keyword 'extern "C"' in a preprocessor no longer causes an extra indent.
+    </p>
+    <p>
+        Formatting of C++/CLI managed pointers (the &#39;^&#39; character) has been added to the &quot;align-pointer&quot;
+        option.
+    </p>
+    <p>
+        &nbsp;The breaking of switch &quot;default&quot; statements has been fixed. The &quot;default&quot; statements
+        that have been incorrectly broken will be fixed in this release.
+    </p>
+    <p>
+        The byte order mark (BOM) has been removed from ASLocalizer.cpp for all platforms. The encoding of the file is
+        UTF-8. Many Windows editors can now recognize UTF-8 encoding without the BOM. Visual Studio has an option that
+        needs to be set. With others. such as CodeBlocks, identification is automatic. On Linux, UTF-8 is the default
+        encoding.
+    </p>
+    <p>
+        Translations have been added for Dutch, Finnish, Italian, Japanese, Korean, Polish, Portuguese, Russian, Swedish,
+        and Ukrainian. The translations were done with an automated translation program, Google Translate, so they may
+        not be the best translation possible. The translations are at the end of ASLocalizer.cpp in the form of an English&#8209;Translation
+        pair. If you correct a translation, send the source as a bug report and it will be included in the next release.
+        To add a language, see "Internationalization" in the "General Information" section of the documentation. Send
+        the addition as a bug report and it will be included in the next release.
+    </p>
+    <p>
+        There is a new Linux makefile for the Clang Compiler. Clang is a free compiler can be installed as a package on
+        many Linux distributions. Some of its features are fast compiles, low memory use, expressive diagnostic messages,
+        and GCC compatibility. It includes a static analyzer tool that finds potential bugs in your source code. An experimental
+        version can be installed on a Windows platform. There is more information in the Install Information documentation.
+    </p>
+    <p>
+        Visual Studio automatically creates an import library and an export file when you link a program that contains
+        exports. It will do this for even a static library if it contains a __declspec(dllexport) definition. The Artistic
+        Style library (ASTYLE_LIB) build contains such exports which causes an import library and export file to be created
+        when they may not be needed. A new preprocessor definition, ASTYLE_NO_VCX (no Visual Studio exports) can be declared
+        to eliminate the files from the output. Use this only for static libraries or when the AStyle source is included
+        in the compile. Do NOT use this when compiled as a shared (dynamic) library. It is effective only for Visual Studio
+        2012. It will NOT work with previous versions. It has no effect with other compilers since they require a separate
+        option to create the import library and export files.
+    </p>
+    <p>
+        The executable included in the Windows distribution was compiled with Visual Studio 2010 (platform toolset v100).
+        Visual Studio 2012 (platform toolset v110) contains dependencies on Windows API functions that exist only on Windows
+        Vista, Windows 7, and Windows 8. This means that applications built with a Visual Studio 2012 C++ compiler would
+        fail to load and execute on Windows XP. Artistic Style was therefore compiled with Visual Studio 2010 to work
+        on computers using Windows XP.
+    </p>
+    <p>
+        If you are using Windows Vista or higher, and have the Visual Studio 2012 compiler available, recompiling with
+        Visual Studio 2012 will probably result in faster execution. The Windows distribution has Visual Studio 2012 project
+        files available.
+    </p>
+    <p>
+        If you use a compiler other than Visual Studio, you can probably get better execution by compiling using the C++11
+        standards. Artistic Style uses a lot of string vectors and the new move semantics will probably result in faster
+        execution. (To use C++11 on GCC and MinGW use the option --std=c++0x). This may change on future compiler releases.).
+    </p>
+    <p>
+        The "Developer Information" page has a new example and download for calling Artistic Style from a Python script.
+        It will run with both Python 2 and Python 3. Using Python 3 shows an example of formatting a Unicode string with
+        Artistic Style. Unicode strings must be encoded to UTF-8 before formatting and decoded back to Unicode afterward.
+        The example script shows the technique for doing this. It also shows how to set up the function pointers and allocate
+        memory in Python.
+    </p>
+    <p>
+        If you use Visual Studio on Windows, it can now be used for Python development. Python Tools for Visual Studio
+        (PTVS) is a free and open source plug-in for Visual Studio 2010 that supports Python and Iron Python. Other interpreters
+        such Jython can be added. It can be easily switched between Python versions or different interpreters. But the
+        best thing is the Visual Studio debugging support using the .NET debugger and the normal Visual Studio debugger.
+        It enables you to set break points, step through functions, change the current statement, inspect local variables,
+        and perform other operations while debugging. It is best to use it with a project file, a minor irritation for
+        single page scripts. And there are some minor bugs. But overall it works quite well.
+    </p>
+    <p>
+        Thanks to Christopher Sean Morrison, Keith OHara, louis6g, and J for their contributions.
+    </p>
+    <p>
+        &nbsp;
+    </p>
+    <p>
+        <strong>Previous releases are available in the <a href="http://astyle.sourceforge.net/newsArchives.html">News Archives</a>.</strong>
+    </p>
+    <p>
+        &nbsp;
+    </p>
+
+    <center style="margin-left: -0.4in;">
+        <a href="http://sourceforge.net/projects/astyle">
+            <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=2319&type=16" alt="" /></a>
+    </center>
+
+    <p>
+        &nbsp;
+    </p>
+
+    <!-- Piwik -->
+
+    <script type="text/javascript">
+        var pkBaseURL = (("https:" == document.location.protocol) ? "https://sourceforge.net/apps/piwik/astyle/" : "http://sourceforge.net/apps/piwik/astyle/");
+        document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+
+    <script type="text/javascript">
+        try {
+            var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+            piwikTracker.trackPageView();
+            piwikTracker.enableLinkTracking();
+        } catch (err) { }
+    </script>
+
+    <noscript>
+        <p>
+            <img src="http://sourceforge.net/apps/piwik/astyle/piwik.php?idsite=1" style="border: 0" alt="" />
+        </p>
+    </noscript>
+
+    <!-- End Piwik Tag -->
+
+</body>
+
+</html>
+

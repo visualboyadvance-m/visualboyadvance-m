@@ -94,7 +94,7 @@
     <ClCompile Include="..\..\src\wx\widgets\wxmisc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\dependencies\msvc\getopt.c">
+    <ClCompile Include="..\..\dependencies\msvc\getopt.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\sdl\text.cpp">
@@ -201,7 +201,7 @@
     <ClInclude Include="..\..\src\wx\widgets\wx\wxmisc.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\dependencies\msvc\getopt.h">
+    <ClInclude Include="..\..\dependencies\msvc\getopt.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\common\SoundSDL.h">

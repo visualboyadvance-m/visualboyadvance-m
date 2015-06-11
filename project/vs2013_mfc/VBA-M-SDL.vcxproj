@@ -50,10 +50,10 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\dependencies\openal-soft\libs\Win32;$(DXSDK_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\dependencies\openal-soft\include\AL\;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\dependencies\openal-soft\include\AL\;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\dependencies\openal-soft\libs\Win32;$(DXSDK_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\dependencies\openal-soft\libs\Win32;$(DXSDK_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\dependencies\openal-soft\include\AL\;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\dependencies\openal-soft\include\AL\;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\dependencies\openal-soft\libs\Win32;$(DXSDK_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Platform)\$(Configuration)\Binary\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Platform)\$(Configuration)\Build\$(ProjectName)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Platform)\$(Configuration)\Binary\</OutDir>
@@ -62,7 +62,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <BuildLog />
     <PreBuildEvent>
-      <Command>"..\..\..\dependencies\SubWCRev\SubWCRev.bat"</Command>
+      <Command>"..\..\dependencies\SubWCRev\SubWCRev.bat"</Command>
     </PreBuildEvent>
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -70,7 +70,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\src;..\..\fex;..\..\..\dependencies\sdl\include;..\..\..\dependencies\libpng;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\SubWCRev;..\..\..\dependencies\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src;..\..\fex;..\..\dependencies\sdl\include;..\..\dependencies\libpng;..\..\dependencies\msvc;..\..\dependencies\SFML\include;..\..\dependencies\SubWCRev;..\..\dependencies\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;SFML_SYSTEM_EXPORTS;SFML_NETWORK_EXPORTS;DEV_VERSION;BKPT_SUPPORT;GBA_LOGGING;MMX;ASM;_CRT_SECURE_NO_WARNINGS;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -106,7 +106,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <BuildLog />
     <PreBuildEvent>
-      <Command>"..\..\..\dependencies\SubWCRev\SubWCRev.bat"</Command>
+      <Command>"..\..\dependencies\SubWCRev\SubWCRev.bat"</Command>
     </PreBuildEvent>
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -115,7 +115,7 @@
     <ClCompile>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>..\..\src;..\..\fex;..\..\..\dependencies\sdl\include;..\..\..\dependencies\libpng;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\SubWCRev;..\..\..\dependencies\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src;..\..\fex;..\..\dependencies\sdl\include;..\..\dependencies\libpng;..\..\dependencies\msvc;..\..\dependencies\SFML\include;..\..\dependencies\SubWCRev;..\..\dependencies\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_SYSTEM_EXPORTS;SFML_NETWORK_EXPORTS;GBA_LOGGING;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -169,7 +169,7 @@
     <ResourceCompile Include="..\..\src\win32\VBA.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\dependencies\msvc\getopt.c" />
+    <ClCompile Include="..\..\dependencies\msvc\getopt.c" />
     <ClCompile Include="..\..\src\common\SoundSDL.cpp" />
     <ClCompile Include="..\..\src\filters\2xSaI.cpp">
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</WholeProgramOptimization>
@@ -234,10 +234,10 @@
     </NASM>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\dependencies\sdl\vs2013\SDLmain\SDLmain.vcxproj">
+    <ProjectReference Include="..\..\dependencies\sdl\vs2013\SDLmain\SDLmain.vcxproj">
       <Project>{da956fd3-e142-46f2-9dd5-c78bebb56b7a}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\dependencies\sdl\vs2013\SDL\SDL.vcxproj">
+    <ProjectReference Include="..\..\dependencies\sdl\vs2013\SDL\SDL.vcxproj">
       <Project>{81ce8daf-ebb2-4761-8e45-b71abcca8c68}</Project>
     </ProjectReference>
     <ProjectReference Include="VBA2013.vcxproj">

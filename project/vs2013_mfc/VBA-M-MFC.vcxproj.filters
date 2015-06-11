@@ -535,7 +535,7 @@
     <ClCompile Include="..\..\src\win32\LinkOptions.cpp">
       <Filter>MFC</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\dependencies\msvc\getopt.c">
+    <ClCompile Include="..\..\dependencies\msvc\getopt.c">
       <Filter>Main</Filter>
     </ClCompile>
   </ItemGroup>

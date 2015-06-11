@@ -52,10 +52,10 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\dependencies\openal-soft\libs\Win32;$(DXSDK_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\dependencies\openal-soft\include\AL\;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\dependencies\openal-soft\include\AL\;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\dependencies\openal-soft\libs\Win32;$(DXSDK_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\dependencies\openal-soft\libs\Win32;$(DXSDK_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\dependencies\openal-soft\include\AL\;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\dependencies\openal-soft\include\AL\;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\dependencies\openal-soft\libs\Win32;$(DXSDK_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Platform)\$(Configuration)\Build\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Platform)\$(Configuration)\Build\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Platform)\$(Configuration)\Build\</OutDir>
@@ -64,7 +64,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <BuildLog />
     <PreBuildEvent>
-      <Command>"..\..\..\dependencies\SubWCRev\SubWCRev.bat"</Command>
+      <Command>"..\..\dependencies\SubWCRev\SubWCRev.bat"</Command>
     </PreBuildEvent>
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -72,7 +72,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\src;..\..\fex;..\..\..\dependencies\libpng;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\SubWCRev;..\..\..\dependencies\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src;..\..\fex;..\..\dependencies\libpng;..\..\dependencies\msvc;..\..\dependencies\SFML\include;..\..\dependencies\SubWCRev;..\..\dependencies\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;SFML_SYSTEM_EXPORTS;SFML_NETWORK_EXPORTS;DEV_VERSION;BKPT_SUPPORT;GBA_LOGGING;MMX;ASM;_CRT_SECURE_NO_WARNINGS;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -109,7 +109,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <BuildLog />
     <PreBuildEvent>
-      <Command>"..\..\..\dependencies\SubWCRev\SubWCRev.bat"</Command>
+      <Command>"..\..\dependencies\SubWCRev\SubWCRev.bat"</Command>
     </PreBuildEvent>
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -118,7 +118,7 @@
     <ClCompile>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>..\..\src;..\..\fex;..\..\..\dependencies\libpng;..\..\..\dependencies\msvc;..\..\..\dependencies\SFML\include;..\..\..\dependencies\SubWCRev;..\..\..\dependencies\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src;..\..\fex;..\..\dependencies\libpng;..\..\dependencies\msvc;..\..\dependencies\SFML\include;..\..\dependencies\SubWCRev;..\..\dependencies\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;SFML_SYSTEM_EXPORTS;SFML_NETWORK_EXPORTS;GBA_LOGGING;OEMRESOURCE;MMX;ASM;FINAL_VERSION;BKPT_SUPPORT;_CRT_SECURE_NO_DEPRECATE;HAS_FILE_EXTRACTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
@@ -265,14 +265,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\dependencies\libpng\project\vs2013\libpng.vcxproj">
+    <ProjectReference Include="..\..\dependencies\libpng\project\vs2013\libpng.vcxproj">
       <Project>{0008960e-e0dd-41a6-8265-00b31ddb4c21}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\dependencies\SFML\build\vc2013\sfml-network.vcxproj">
+    <ProjectReference Include="..\..\dependencies\SFML\build\vc2013\sfml-network.vcxproj">
       <Project>{823ddc98-42d5-4a38-88cf-9dc06c788ae4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\dependencies\zlib\project\vs2013\zlib.vcxproj">
+    <ProjectReference Include="..\..\dependencies\zlib\project\vs2013\zlib.vcxproj">
       <Project>{3e03c179-8251-46e4-81f4-466f114bac63}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\fex\File_Extractor2013.vcxproj">

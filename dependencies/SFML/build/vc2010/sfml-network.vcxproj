@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>SFML</ProjectName>
+    <ProjectGuid>{823DDC98-42D5-4A38-88CF-9DC06C788AE4}</ProjectGuid>
+    <RootNamespace>sfml-network</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\Build\</OutDir>
+    <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\Build\</OutDir>
+    <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <CustomBuildStep>
+      <Message>
+      </Message>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src;$(ProjectDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;SFML_STATIC;_SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <CustomBuildStep>
+      <Message>
+      </Message>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <ClCompile>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src;$(ProjectDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;SFML_STATIC;_SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\SFML\Network\Ftp.cpp" />
+    <ClCompile Include="..\..\src\SFML\Network\Http.cpp" />
+    <ClCompile Include="..\..\src\SFML\Network\IpAddress.cpp" />
+    <ClCompile Include="..\..\src\SFML\Network\Packet.cpp" />
+    <ClCompile Include="..\..\src\SFML\Network\Socket.cpp" />
+    <ClCompile Include="..\..\src\SFML\Network\SocketSelector.cpp" />
+    <ClCompile Include="..\..\src\SFML\Network\TcpListener.cpp" />
+    <ClCompile Include="..\..\src\SFML\Network\TcpSocket.cpp" />
+    <ClCompile Include="..\..\src\SFML\Network\UdpSocket.cpp" />
+    <ClCompile Include="..\..\src\SFML\Network\Win32\SocketImpl.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\Clock.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\Err.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\Lock.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\Mutex.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\Sleep.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\String.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\Thread.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\ThreadLocal.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\Time.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\Win32\ClockImpl.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\Win32\MutexImpl.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\Win32\SleepImpl.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\Win32\ThreadImpl.cpp" />
+    <ClCompile Include="..\..\src\SFML\System\Win32\ThreadLocalImpl.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\SFML\Network\Export.hpp" />
+    <ClInclude Include="..\..\include\SFML\Network\Ftp.hpp" />
+    <ClInclude Include="..\..\include\SFML\Network\Http.hpp" />
+    <ClInclude Include="..\..\include\SFML\Network\IpAddress.hpp" />
+    <ClInclude Include="..\..\include\SFML\Network\Packet.hpp" />
+    <ClInclude Include="..\..\include\SFML\Network\Socket.hpp" />
+    <ClInclude Include="..\..\include\SFML\Network\SocketHandle.hpp" />
+    <ClInclude Include="..\..\include\SFML\Network\SocketSelector.hpp" />
+    <ClInclude Include="..\..\include\SFML\Network\TcpListener.hpp" />
+    <ClInclude Include="..\..\include\SFML\Network\TcpSocket.hpp" />
+    <ClInclude Include="..\..\include\SFML\Network\UdpSocket.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\Clock.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\Err.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\Export.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\InputStream.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\Lock.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\Mutex.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\NonCopyable.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\Sleep.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\String.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\Thread.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\ThreadLocal.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\ThreadLocalPtr.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\Time.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\Utf.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\Vector2.hpp" />
+    <ClInclude Include="..\..\include\SFML\System\Vector3.hpp" />
+    <ClInclude Include="..\..\src\SFML\Network\SocketImpl.hpp" />
+    <ClInclude Include="..\..\src\SFML\Network\Win32\SocketImpl.hpp" />
+    <ClInclude Include="..\..\src\SFML\System\Win32\ClockImpl.hpp" />
+    <ClInclude Include="..\..\src\SFML\System\Win32\MutexImpl.hpp" />
+    <ClInclude Include="..\..\src\SFML\System\Win32\SleepImpl.hpp" />
+    <ClInclude Include="..\..\src\SFML\System\Win32\ThreadImpl.hpp" />
+    <ClInclude Include="..\..\src\SFML\System\Win32\ThreadLocalImpl.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\include\SFML\System\String.inl" />
+    <None Include="..\..\include\SFML\System\Thread.inl" />
+    <None Include="..\..\include\SFML\System\ThreadLocalPtr.inl" />
+    <None Include="..\..\include\SFML\System\Utf.inl" />
+    <None Include="..\..\include\SFML\System\Vector2.inl" />
+    <None Include="..\..\include\SFML\System\Vector3.inl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

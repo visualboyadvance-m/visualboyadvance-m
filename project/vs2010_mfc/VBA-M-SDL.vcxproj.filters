@@ -106,7 +106,7 @@
     <ClCompile Include="..\..\src\sdl\text.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\dependencies\msvc\getopt.c">
+    <ClCompile Include="..\..\dependencies\msvc\getopt.c">
       <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\sdl\SDL.cpp">
