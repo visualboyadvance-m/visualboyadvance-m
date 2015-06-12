@@ -21,7 +21,6 @@
 
 #ifdef _WIN32
 #ifndef FINAL_BUILD
-#include "svnrev.h"
 #endif
 #else
 #ifdef SVN_REV
