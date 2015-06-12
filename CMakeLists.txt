@@ -38,6 +38,7 @@ endif( NOT ENABLE_DEBUGGER AND ENABLE_SDL )
 
 # Set the version number with -DVERSION=X.X.X-uber
 IF( NOT VERSION )
+#Will need to change this over to git
     SET( VERSION "2.0.0-SVN" )
 
     IF(EXISTS "${CMAKE_SOURCE_DIR}/.svn")
