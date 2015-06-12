@@ -6,7 +6,7 @@ option( ENABLE_CAIRO "Enable Cairo rendering for the wxWidgets port" ON )
 if( WIN32 )
   # not yet implemented
   option( ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" ON )
-  option( ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" OFF )
+  option( ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ON )
 endif( WIN32 )
 option( ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" ON )
 
