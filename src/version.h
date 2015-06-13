@@ -21,6 +21,7 @@
 
 #ifdef _WIN32
 #ifndef FINAL_BUILD
+#define SVN_REV_STR "Git:"
 #endif
 #else
 #ifdef SVN_REV

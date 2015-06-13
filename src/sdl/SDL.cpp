@@ -1469,7 +1469,7 @@ void handleRewinds()
 int main(int argc, char **argv)
 {
 #ifndef FINAL_BUILD
-  fprintf(stdout, "VBA-M version %s [SDL]\n", SVN_REV_STR);
+  fprintf(stdout, "VBA-M version %s [SDL]\n", "Git:");
 #else
   fprintf(stdout, "VBA-M version %s [SDL]");
 #endif
