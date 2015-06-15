@@ -304,6 +304,9 @@ void GameArea::LoadGame(const wxString &name)
 		emusys = &GBASystem;
 	}
 
+	if (fullScreen)
+		GameArea::ShowFullScreen(true);
+
 	loaded = t;
 	SetFrameTitle();
 	SetFocus();
