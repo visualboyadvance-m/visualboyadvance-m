@@ -195,7 +195,7 @@ SET( CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
 
 if (WIN32)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc -static -I./dependencies/include")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ -static -I../dependencies/include")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ -static -I./dependencies/include")
 endif (WIN32)
 
 
@@ -405,5 +405,5 @@ ENDIF( UNIX )
 SET(CPACK_GENERATOR "ZIP")
 SET(CPACK_PACKAGE_VERSION_MAJOR "2")
 SET(CPACK_PACKAGE_VERSION_MINOR "0")
-SET(CPACK_PACKAGE_VERSION_PATCH "0-SVN")
+SET(CPACK_PACKAGE_VERSION_PATCH "0-Git:" ${COMMITHASH})
 INCLUDE(CPack)
