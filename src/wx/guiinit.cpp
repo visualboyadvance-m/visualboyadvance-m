@@ -3802,7 +3802,7 @@ bool MainFrame::BindControls()
 #endif
 
 	// delayed fullscreen
-	if (wxGetApp().pending_fullscreen || fullScreen)
+	if (wxGetApp().pending_fullscreen)
 		panel->ShowFullScreen(true);
 
 	MainFrame* mf = wxGetApp().frame;
