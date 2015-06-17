@@ -15,7 +15,7 @@ extern struct opts_t {
     bool cpu_mmx;
     bool no_osd_status;
     wxString filter;
-    int ifb;
+    wxString ifb;
     bool fullscreen;
     wxVideoMode fs_mode;
     int max_scale;

@@ -133,13 +133,13 @@ opt_desc opts[] = {
 #ifdef MMX
     BOOLOPT("Display/EnableMMX", wxTRANSLATE("Enable MMX"), gopts.cpu_mmx),
 #endif
-    STROPT("Display/Filter", wxTRANSLATE("Full-screen filter to apply"), gopts.filter),
+    STROPT ("Display/Filter", wxTRANSLATE("Full-screen filter to apply"), gopts.filter),
     BOOLOPT("Display/Fullscreen", wxTRANSLATE("Enter fullscreen mode at startup"), gopts.fullscreen),
     INTOPT ("Display/FullscreenDepth", wxTRANSLATE("Fullscreen mode color depth (0 = any)"), gopts.fs_mode.bpp, 0, 999),
     INTOPT ("Display/FullscreenFreq", wxTRANSLATE("Fullscreen mode frequency (0 = any)"), gopts.fs_mode.refresh, 0, 999),
     INTOPT ("Display/FullscreenHeight", wxTRANSLATE("Fullscreen mode height (0 = desktop)"), gopts.fs_mode.h, 0, 99999),
     INTOPT ("Display/FullscreenWidth", wxTRANSLATE("Fullscreen mode width (0 = desktop)"), gopts.fs_mode.w, 0, 99999),
-    ENUMOPT("Display/IFB", wxTRANSLATE("Interframe blending function"), gopts.ifb, wxTRANSLATE("none|smart|motionblur")),
+    STROPT ("Display/IFB", wxTRANSLATE("Interframe blending function"), gopts.ifb),
     INTOPT ("Display/MaxScale", wxTRANSLATE("Maximum scale factor (0 = no limit)"), gopts.max_scale, 0, 100),
     INTOPT ("Display/MaxThreads", wxTRANSLATE("Maximum number of threads to run filters in"), gopts.max_threads, 1, 8),
     ENUMOPT("Display/RenderMethod", wxTRANSLATE("Render method; if unsupported, simple method will be used"), gopts.render_method,

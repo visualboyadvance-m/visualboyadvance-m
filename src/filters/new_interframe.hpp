@@ -40,30 +40,21 @@ public:
     bool exists() {return true;}
 };
 
-//WX
-enum ifbfunc {
-    // this order must match order of option enum and selector widget
-    IFB_NONE, IFB_SMART, IFB_MOTION_BLUR
-};
-
 ///Use this to select/create the filter to use
 class interframe_factory
 {
 public:
-    static filter_base * createIFB(ifbfunc filter_select,unsigned int width,unsigned int height)
+    static filter_base * createIFB(std::string filterName,unsigned int width,unsigned int height)
     {
-        switch(filter_select)
+        if(filterName == "Smart interframe blending")
         {
-            case IFB_SMART:
-                return new SmartIB(width,height);
-                break;
-            case IFB_MOTION_BLUR:
-                return new MotionBlurIB(width,height);
-                break;
-            default:
-                return new filter_base(width,height);
-                break;
+            return new SmartIB(width,height);
         }
+        else if(filterName == "Interframe motion blur")
+        {
+            return new MotionBlurIB(width,height);
+        }
+        return new filter_base(width,height);
     }
 };
 

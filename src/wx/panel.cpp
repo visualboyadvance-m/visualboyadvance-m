@@ -1099,7 +1099,7 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
             threads[i].band_lower = band_height * i;
             threads[i].dst = reinterpret_cast<u32 *>(&todraw);
             threads[i].mainFilter=filter_factory::createFilter(ToString(gopts.filter),width,band_height);
-            threads[i].iFilter=interframe_factory::createIFB((ifbfunc)gopts.ifb,width,band_height);
+            threads[i].iFilter=interframe_factory::createIFB(ToString(gopts.ifb),width,band_height);
             threads[i].done = &filt_done;
             threads[i].lock.Lock();
             threads[i].Create();

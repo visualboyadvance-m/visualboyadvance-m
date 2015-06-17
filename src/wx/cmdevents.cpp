@@ -2008,8 +2008,6 @@ EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
 
 EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
 {
-    gopts.ifb = (gopts.ifb + 1) % 3;
-    update_opts();
     if(panel->panel)
     {
         panel->panel->Delete();
