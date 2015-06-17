@@ -12,17 +12,23 @@ class filter_base
 private:
     //Need to give the filter a width,height at initialization
     filter_base();
-    ///The filter's width
+    ///The filter's input width
     unsigned int width;
-    ///The filter's height
+    ///The filter's input height
     unsigned int height;
+    ///The filter's scale
+    unsigned int scale;
+protected:
+    void setScale(unsigned int _scale) {scale=_scale;};
 public:
-    filter_base(unsigned int _width,unsigned int _height): width(_width),height(_height) {}
+    filter_base(unsigned int _width,unsigned int _height): width(_width),height(_height),scale(1) {}
     virtual ~filter_base() {}
     unsigned int getWidth() {return width;}
     unsigned int getHeight() {return height;}
+    unsigned int getOutWidth() {return width*scale;}
+    unsigned int getOutHeight() {return height*scale;}
     virtual std::string getName() {return "Dummy Filter";}
-    virtual unsigned int getScale() {return 1;}
+    virtual unsigned int getScale() {return scale;}
     virtual bool exists() {return false;}
     /**
      * Run the filter.

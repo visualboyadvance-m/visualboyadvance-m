@@ -27,8 +27,6 @@ private:
     std::string name;
     ///The internal filter used
     FilterFunc myFilter;
-    ///The internal scale
-    unsigned int myScale;
     //Don't need to calculate these every time (based off width)
     ///The number of pixels per horizontal row
     unsigned int horiz_bytes;
@@ -37,13 +35,13 @@ private:
 public:
     raw_filter(std::string _name,FilterFunc _myFilter,unsigned int _scale,unsigned int _width,unsigned int _height):
         filter_base(_width,_height),
-        name(_name), myFilter(_myFilter), myScale(_scale),
+        name(_name), myFilter(_myFilter),
         horiz_bytes(_width * 4), horiz_bytes_out(_width * 4 * _scale)
     {
+        this->setScale(_scale);
 //         std::cerr << name << std::endl;
     }
     std::string getName() {return name;}
-    unsigned int getScale() {return myScale;}
     bool exists() {return true;}
     ///Run the filter pointed to by the internal FilterFunc
     void run(u32 *srcPtr, u32 *dstPtr)
@@ -64,15 +62,13 @@ class xbr : public filter_base
 private:
     //Must enter width and height at filter initialization
     xbr();
-    unsigned int myscale;
 public:
-    xbr(unsigned int _width,unsigned int _height,unsigned int _myscale): filter_base(_width,_height), myscale(_myscale) {}
-    std::string getName() {return "XBR "+std::to_string(myscale)+"x";}
-    unsigned int getScale() {return myscale;}
+    xbr(unsigned int _width,unsigned int _height,unsigned int scale = 5): filter_base(_width,_height) {this->setScale(scale);}
+    std::string getName() {return "XBR "+std::to_string(this->getScale())+"x";}
     bool exists() {return true;}
     void run(u32 *srcPtr,u32 *dstPtr)
     {
-        xbrz::scale(myscale, //valid range:
+        xbrz::scale(this->getScale(),
            srcPtr, dstPtr, getWidth(), getHeight(),
            xbrz::ColorFormat::ARGB);
     }
