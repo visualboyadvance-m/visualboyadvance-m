@@ -27,8 +27,6 @@
 #include "../gb/gbCheats.h"
 #include "../gba/Cheats.h"
 
-#include "../filters/new_interframe.hpp"
-
 template <typename T>
 void CheckPointer(T pointer)
 {

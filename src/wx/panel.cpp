@@ -6,7 +6,9 @@
 #include "../common/Patch.h"
 #include <wx/dcbuffer.h>
 #include "../sdl/text.h"
-#include "../filters/filters.hpp"
+#include "../filters/filter_helper.hpp"
+#include "../filters/filter_factory.hpp"
+
 
 int emulating;
 
@@ -24,8 +26,6 @@ GameArea::GameArea()
     // all renderers prefer 32-bit
     // well, "simple" prefers 24-bit, but that's not available for filters
     systemColorDepth = 32;
-    hq2x_init(32);
-    Init_2xSaI(32);
 }
 
 void GameArea::LoadGame(const wxString &name)
@@ -1099,7 +1099,7 @@ DrawingPanel::DrawingPanel(int _width, int _height) :
             threads[i].band_lower = band_height * i;
             threads[i].dst = reinterpret_cast<u32 *>(&todraw);
             threads[i].mainFilter=filter_factory::createFilter(ToString(gopts.filter),width,band_height);
-            threads[i].iFilter=interframe_factory::createIFB(ToString(gopts.ifb),width,band_height);
+            threads[i].iFilter=filter_factory::createFilter(ToString(gopts.ifb),width,band_height);
             threads[i].done = &filt_done;
             threads[i].lock.Lock();
             threads[i].Create();

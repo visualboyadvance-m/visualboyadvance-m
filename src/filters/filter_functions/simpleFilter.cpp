@@ -1,4 +1,7 @@
-#include "../System.h"
+
+#include <cstdint>
+typedef uint8_t u8;
+typedef uint32_t u32;
 
 void Simple2x32(u8 *srcPtr, u32 srcPitch,
                 u8 *dstPtr, u32 dstPitch, int width, int height)

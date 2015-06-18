@@ -6,18 +6,19 @@
  ***********************************************************************/
 #include "multifilter.hpp"
 #include "filter_base.hpp"
+#include "filter_factory.hpp"
 
 /***********************************************************************
  *  Method: multifilter::multifilter
  *  Params: std::vector<std::string> filters, unsigned int X, unsigned int, Y
  * Effects: 
  ***********************************************************************/
-multifilter::multifilter(std::vector<std::string> filters, unsigned int X, unsigned int, Y):
+multifilter::multifilter(std::vector<std::string> filters, unsigned int X, unsigned int Y):
     filterNames(filters),numFilters(filters.size()),inX(X),inY(Y)
 {
     //Do the first one separate
     filter_base * aFilter = filter_factory::createFilter(filters[0],X,Y);
-    filterPtrs.append(aFilter);
+    filterPtrs.push_back(aFilter);
 
     for(unsigned int i=1;i<numFilters;i++)
     {
@@ -26,10 +27,10 @@ multifilter::multifilter(std::vector<std::string> filters, unsigned int X, unsig
         Y=aFilter->getOutHeight();
         //Create, and append the new filter
         aFilter = filter_factory::createFilter(filters[i],X,Y);
-        filterPtrs.append(aFilter);
+        filterPtrs.push_back(aFilter);
         //Create and append the buffers
         u32* aBuffer = new u32[X*Y];
-        filterBuffers.append(aBuffer);
+        filterBuffers.push_back(aBuffer);
     }
 }
 
@@ -39,7 +40,7 @@ multifilter::multifilter(std::vector<std::string> filters, unsigned int X, unsig
  *  Params: 
  * Effects: 
  ***********************************************************************/
-multifilter::getOutX()
+unsigned int multifilter::getOutX()
 {
     filterPtrs.back()->getOutWidth();
 }
@@ -50,7 +51,7 @@ multifilter::getOutX()
  *  Params: 
  * Effects: 
  ***********************************************************************/
-multifilter::getOutY()
+unsigned int multifilter::getOutY()
 {
     filterPtrs.back()->getOutHeight();
 }
@@ -61,7 +62,7 @@ multifilter::getOutY()
  *  Params: u32 *image
  * Effects: 
  ***********************************************************************/
-multifilter::setInImage(u32 *image)
+void multifilter::setInImage(u32 *image)
 {
     inImage=image;
 }
@@ -72,7 +73,7 @@ multifilter::setInImage(u32 *image)
  *  Params: u32 *image
  * Effects: 
  ***********************************************************************/
-multifilter::setOutImage(u32 *image)
+void multifilter::setOutImage(u32 *image)
 {
     outImage=image;
 }
@@ -83,7 +84,7 @@ multifilter::setOutImage(u32 *image)
  *  Params: 
  * Effects: 
  ***********************************************************************/
-multifilter::run()
+void multifilter::run()
 {
     //Do the first one separate
     filterPtrs[0]->run(inImage,filterBuffers[0]);
@@ -94,5 +95,3 @@ multifilter::run()
     //Do the last one separate
     filterPtrs.back()->run(filterBuffers.back(),outImage);
 }
-
-

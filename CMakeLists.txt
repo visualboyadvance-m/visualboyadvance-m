@@ -271,22 +271,24 @@ SET(SRC_SDL
 )
 
 SET(SRC_FILTERS
-    src/filters/filters.cpp
-    src/filters/new_interframe.cpp
-    src/filters/2xSaI.cpp
-    src/filters/admame.cpp
-    src/filters/bilinear.cpp
-    src/filters/hq2x.cpp
-    src/filters/interframe.cpp
-    src/filters/pixel.cpp
-    src/filters/scanline.cpp
-    src/filters/simpleFilter.cpp
-    src/filters/sdl.cpp
-    src/filters/xBRZ/xbrz.cpp
+    src/filters/filter_factory.cpp
+    src/filters/multifilter.cpp
+    src/filters/filter_functions/filters.cpp
+    src/filters/filter_functions/new_interframe.cpp
+    src/filters/filter_functions/2xSaI.cpp
+    src/filters/filter_functions/admame.cpp
+    src/filters/filter_functions/bilinear.cpp
+    src/filters/filter_functions/hq2x.cpp
+    src/filters/filter_functions/interframe.cpp
+    src/filters/filter_functions/pixel.cpp
+    src/filters/filter_functions/scanline.cpp
+    src/filters/filter_functions/simpleFilter.cpp
+    src/filters/filter_functions/sdl.cpp
+    src/filters/filter_functions/xBRZ/xbrz.cpp
 )
 
 SET(SRC_HQ_C
-    src/filters/hq/c/hq_implementation.cpp
+    src/filters/filter_functions/hq/c/hq_implementation.cpp
 )
 
 SET(SRC_HQ_ASM

@@ -4,7 +4,13 @@
  **	Written: 6/14/00 - JSF
  **/
 
-#include "../System.h"
+#include <cstdint>
+typedef uint8_t u8;
+typedef uint32_t u32;
+
+extern int systemRedShift;
+extern int systemGreenShift;
+extern int systemBlueShift;
 
 #define RGB(r,g,b) ((r)>>3) << systemRedShift |\
   ((g) >> 3) << systemGreenShift |\

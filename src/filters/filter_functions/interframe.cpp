@@ -1,8 +1,11 @@
-#include "../System.h"
 #include <stdlib.h>
 #include <memory.h>
 
-#include "interframe.hpp"
+#include <cstdint>
+typedef uint8_t u8;
+typedef uint32_t u32;
+
+#include "../interframe.hpp"
 
 #ifdef MMX
 extern "C" bool cpu_mmx;

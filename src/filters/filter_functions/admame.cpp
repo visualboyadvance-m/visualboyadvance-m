@@ -35,7 +35,9 @@
  * - the whole source code of the program is released with the binary.
  */
 
-#include "../System.h"
+#include <cstdint>
+typedef uint8_t u8;
+typedef uint32_t u32;
 
 #ifdef MMX
 extern "C" bool cpu_mmx;

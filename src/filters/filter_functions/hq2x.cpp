@@ -27,7 +27,11 @@
  * file, but you are not obligated to do so.  If you do not wish to
  * do so, delete this exception statement from your version.
  */
-#include "../System.h"
+#include <cstdint>
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+
 #include "interp.h"
 
 /***************************************************************************/

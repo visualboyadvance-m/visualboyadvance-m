@@ -2,15 +2,15 @@
 #ifndef FILTERS_FILTERS_HPP
 #define FILTERS_FILTERS_HPP
 
-#include <map>
 #include <string>
 #include <stdexcept>
-#include <iostream>
-#include <cstring>  //For memcpy
 
-#include "../common/Types.h"
+#include <cstdint>
+typedef uint8_t u8;
+typedef uint32_t u32;
+
 #include "filter_base.hpp"
-#include "xBRZ/xbrz.h"
+#include "filter_functions/xBRZ/xbrz.h"
 
 //sdl
 // Function pointer type for a filter function
@@ -39,7 +39,6 @@ public:
         horiz_bytes(_width * 4), horiz_bytes_out(_width * 4 * _scale)
     {
         this->setScale(_scale);
-//         std::cerr << name << std::endl;
     }
     std::string getName() {return name;}
     bool exists() {return true;}
@@ -71,59 +70,6 @@ public:
         xbrz::scale(this->getScale(),
            srcPtr, dstPtr, getWidth(), getHeight(),
            xbrz::ColorFormat::ARGB);
-    }
-};
-
-typedef std::pair<std::string,FilterFunc> namedfilter;
-
-class filter_factory
-{
-private:
-    //A named map of all the (original) filters
-    static const std::map<std::string,FilterFunc> filterMap;
-public:
-    ///Returns an instance of a filter of filterName
-    ///If the filter doesn't exist, it returns a dummy filter instead
-    static filter_base * createFilter(std::string filterName,unsigned int width,unsigned int height)
-    {
-        std::map<std::string,FilterFunc>::const_iterator found = filterMap.find(filterName);
-        //If we found the filter:
-        if(found != filterMap.end()){
-            return new raw_filter(filterName,found->second,GetFilterScale(filterName),width,height);
-        }
-
-        if("XBR 2x" == filterName)
-        {
-            return new xbr(width,height,2);
-        }
-        if("XBR 3x" == filterName)
-        {
-            return new xbr(width,height,3);
-        }
-        if("XBR 4x" == filterName)
-        {
-            return new xbr(width,height,4);
-        }
-        if("XBR 5x" == filterName)
-        {
-            return new xbr(width,height,5);
-        }
-
-        //If nothing found, just return a default filter
-        return new filter_base(width,height);
-    }
-
-    ///Returns the filter's scaling factor
-    ///TODO:  De hardcode this
-    static int GetFilterScale(std::string filterName)
-    {
-        if(filterName == "HQ 4x" || filterName == "Simple 4x")
-            return 4;
-        if(filterName == "HQ 3x" || filterName == "Simple 3x")
-            return 3;
-        if(filterName == "None")
-            return 1;
-        return 2;
     }
 };
 
@@ -218,33 +164,5 @@ extern void sdlStretch2x(u8*,u32,u8*,u32,int,int);
 extern void sdlStretch3x(u8*,u32,u8*,u32,int,int);
 extern void sdlStretch4x(u8*,u32,u8*,u32,int,int);
 
-/**
-    * Convert a 32 bit image to a 24 bit one
-    *
-    * This centralizes a decent bit of code.
-    * NOTE:  This takes width and height, and ASSUMES they are accurate!!!!!
-    *
-    * \param[in] src    A pointer to the input 32 bit RGB Pixel Array
-    * \param[in] dst    A pointer to the output 24 bit RGB Pixel Array
-    * \param[in] width  The image width (in pixels)
-    * \param[in] height The height width (in pixels)
-    */
-void convert32To24(u32* src,u8* dst,unsigned int width, unsigned int height);
-
-/**
- * Get a pointer to the first pixel of a row inside an image
- *
- * NOTE:  If width or vertical_offset is too large, this function WILL produce an invalid pointer
- *
- * \param[in] image_pointer     A pointer to the start of an image
- * \param[in] width             The image's width
- * \param[in] vertical_offset   How many rows from the start of the image
- * \param[in] scale             How much larger the output image will be
- * \return                      A pointer to the first pixel in the chosen row
- */
-inline u32 * GetVerticalOffset(u32 * image_pointer,unsigned int width,unsigned int vertical_offset,unsigned int scale=1)
-{
-    return image_pointer + (width * vertical_offset*scale*scale);
-}
 
 #endif //FILTERS_FILTERS_HPP

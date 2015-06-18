@@ -1,4 +1,15 @@
 
+#ifndef MULTIFILTER_HPP
+#define MULTIFILTER_HPP
+
+#include <vector>
+#include <string>
+
+#include <cstdint>
+typedef uint32_t u32;
+
+class filter_base;
+
 class multifilter
 {
 private:
@@ -19,12 +30,12 @@ private:
     ///Output image buffer
     u32* outImage;
 public:
-    multifilter(std::vector<std::string> filters,unsigned int X,unsigned int, Y);
-    getOutX();
-    getOutY();
-    setInImage(u32* image);
-    setOutImage(u32* image);
-    run();
+    multifilter(std::vector<std::string> filters,unsigned int X,unsigned int Y);
+    unsigned int getOutX();
+    unsigned int getOutY();
+    void setInImage(u32* image);
+    void setOutImage(u32* image);
+    void run();
 };
 
 /*
@@ -36,3 +47,6 @@ public:
  * myFilters.setOutImage(outImage);
  * myFilters.run();
  */
+
+
+#endif //MULTIFILTER_HPP

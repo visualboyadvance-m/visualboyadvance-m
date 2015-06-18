@@ -40,22 +40,4 @@ public:
     bool exists() {return true;}
 };
 
-///Use this to select/create the filter to use
-class interframe_factory
-{
-public:
-    static filter_base * createIFB(std::string filterName,unsigned int width,unsigned int height)
-    {
-        if(filterName == "Smart interframe blending")
-        {
-            return new SmartIB(width,height);
-        }
-        else if(filterName == "Interframe motion blur")
-        {
-            return new MotionBlurIB(width,height);
-        }
-        return new filter_base(width,height);
-    }
-};
-
 #endif  //NEW_INTERFRAME_HPP

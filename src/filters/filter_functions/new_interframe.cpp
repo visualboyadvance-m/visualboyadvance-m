@@ -2,12 +2,14 @@
 //  Kawaks' Mr. K for the code
 //  Incorporated into vba by Anthony Di Franco
 //  Converted to C++ by Arthur Moore
-#include "../System.h"
 #include <stdlib.h>
 #include <memory.h>
 #include <stdexcept>
 
-#include "new_interframe.hpp"
+#include <cstdint>
+typedef uint32_t u32;
+
+#include "../new_interframe.hpp"
 
 SmartIB::SmartIB(unsigned int _width,unsigned int _height): filter_base(_width,_height)
 {
