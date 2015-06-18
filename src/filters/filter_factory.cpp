@@ -108,6 +108,10 @@ filter_base * filter_factory::createFilter(std::string filterName,unsigned int w
     {
         return new MotionBlurIB(width,height);
     }
+    if("Harsh"  == filterName)
+    {
+        return new harsh(width,height);
+    }
 
     //If nothing found, just return a default filter
     return new filter_base(width,height);

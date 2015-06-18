@@ -73,6 +73,21 @@ public:
     }
 };
 
+///Arthur's harsh filter
+///All colors are either off or full color
+class harsh : public filter_base
+{
+private:
+    //Must enter width and height at filter initialization
+    harsh();
+public:
+    harsh(unsigned int _width,unsigned int _height): filter_base(_width,_height) {}
+    ~harsh(){}
+    std::string getName() {return "Harsh";};
+    bool exists() {return true;}
+    void run(u32 *srcPtr,u32 *dstPtr);
+};
+
 //These are the available filters
 
 //wx

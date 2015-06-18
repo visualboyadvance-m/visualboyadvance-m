@@ -285,6 +285,7 @@ SET(SRC_FILTERS
     src/filters/filter_functions/simpleFilter.cpp
     src/filters/filter_functions/sdl.cpp
     src/filters/filter_functions/xBRZ/xbrz.cpp
+    src/filters/filter_functions/harsh.cpp
 )
 
 SET(SRC_HQ_C
