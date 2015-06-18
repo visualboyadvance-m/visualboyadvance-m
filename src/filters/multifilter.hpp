@@ -27,10 +27,9 @@ private:
     unsigned int outX, outY;
     ///Input image buffer
     u32* inImage;
-    ///Output image buffer
-    u32* outImage;
 public:
     multifilter(std::vector<std::string> filters,unsigned int X,unsigned int Y);
+    ~multifilter();
     unsigned int getOutX();
     unsigned int getOutY();
     void setInImage(u32* image);

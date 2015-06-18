@@ -8,90 +8,76 @@
 #include "filter_base.hpp"
 #include "filter_factory.hpp"
 
-/***********************************************************************
- *  Method: multifilter::multifilter
- *  Params: std::vector<std::string> filters, unsigned int X, unsigned int, Y
- * Effects: 
- ***********************************************************************/
+#include <iostream>
+
 multifilter::multifilter(std::vector<std::string> filters, unsigned int X, unsigned int Y):
     filterNames(filters),numFilters(filters.size()),inX(X),inY(Y)
 {
-    //Do the first one separate
-    filter_base * aFilter = filter_factory::createFilter(filters[0],X,Y);
-    filterPtrs.push_back(aFilter);
-
-    for(unsigned int i=1;i<numFilters;i++)
+    std::cerr << "X="<<X<<", Y="<<Y<<std::endl;
+    for(unsigned int i=0;i<numFilters;i++)
     {
-        //Get the size of the last filter's output
+        //Create, and append the new filter
+        filter_base* aFilter = filter_factory::createFilter(filters[i],X,Y);
+        filterPtrs.push_back(aFilter);
+        //Get the size of the filter's output
         X=aFilter->getOutWidth();
         Y=aFilter->getOutHeight();
-        //Create, and append the new filter
-        aFilter = filter_factory::createFilter(filters[i],X,Y);
-        filterPtrs.push_back(aFilter);
-        //Create and append the buffers
+        std::cerr << "X="<<X<<", Y="<<Y<<std::endl;
+        //Create and append the buffer with the new size
         u32* aBuffer = new u32[X*Y];
         filterBuffers.push_back(aBuffer);
     }
+    //Remove the last filter buffer, the last filer outputs directly
+    //Putting the null pointer on the end for use with setOutImage
+    delete filterBuffers.back();
+    filterBuffers.pop_back();
+    filterBuffers.push_back(NULL);
 }
 
+multifilter::~multifilter()
+{
+    //Remove the last item from this vector, we don't manage external memory
+    filterBuffers.pop_back();
+    //Properly delete everything
+    for (std::vector<filter_base*>::iterator it = filterPtrs.begin() ; it != filterPtrs.end(); ++it)
+    {
+        delete *it;
+    }
+    for (std::vector<u32*>::iterator it = filterBuffers.begin() ; it != filterBuffers.end(); ++it)
+    {
+        delete[] *it;
+    }
+}
 
-/***********************************************************************
- *  Method: multifilter::getOutX
- *  Params: 
- * Effects: 
- ***********************************************************************/
 unsigned int multifilter::getOutX()
 {
     filterPtrs.back()->getOutWidth();
 }
 
-
-/***********************************************************************
- *  Method: multifilter::getOutY
- *  Params: 
- * Effects: 
- ***********************************************************************/
 unsigned int multifilter::getOutY()
 {
     filterPtrs.back()->getOutHeight();
 }
 
-
-/***********************************************************************
- *  Method: multifilter::setInImage
- *  Params: u32 *image
- * Effects: 
- ***********************************************************************/
 void multifilter::setInImage(u32 *image)
 {
     inImage=image;
 }
 
-
-/***********************************************************************
- *  Method: multifilter::setOutImage
- *  Params: u32 *image
- * Effects: 
- ***********************************************************************/
 void multifilter::setOutImage(u32 *image)
 {
-    outImage=image;
+    //Remove the last buffer/image from the vector, and replace it with the current output image
+    filterBuffers.pop_back();
+    filterBuffers.push_back(image);
 }
 
-
-/***********************************************************************
- *  Method: multifilter::run
- *  Params: 
- * Effects: 
- ***********************************************************************/
 void multifilter::run()
 {
     //Do the first one separate
     filterPtrs[0]->run(inImage,filterBuffers[0]);
-    for(unsigned int i=1;i<(numFilters-1);i++)
+    for(unsigned int i=1;i<numFilters;i++)
     {
         filterPtrs[i]->run(filterBuffers[i-1],filterBuffers[i]);
     }
-    //Do the last one separate
-    filterPtrs.back()->run(filterBuffers.back(),outImage);
+    //Note:  Since, the output image is the last in the vector, don't need to worry about doing the last separate
 }
