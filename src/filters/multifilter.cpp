@@ -51,12 +51,12 @@ multifilter::~multifilter()
 
 unsigned int multifilter::getOutX()
 {
-    filterPtrs.back()->getOutWidth();
+    return filterPtrs.back()->getOutWidth();
 }
 
 unsigned int multifilter::getOutY()
 {
-    filterPtrs.back()->getOutHeight();
+    return filterPtrs.back()->getOutHeight();
 }
 
 void multifilter::setInImage(u32 *image)

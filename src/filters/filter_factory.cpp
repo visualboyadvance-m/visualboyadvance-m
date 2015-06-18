@@ -71,11 +71,17 @@ static int GetFilterScale(std::string filterName)
 filter_base * filter_factory::createFilter(std::string filterName,unsigned int width,unsigned int height)
 {
 
-    // Initialize the filters
-    // This is the best place to do this, even if they aren't ever used
+    // Initialize the two special filters
     // \HACK:  Shouldn't have to initialize anything
-    hq2x_init(32);
-    Init_2xSaI(32);
+    // \WARNING:  These functions may cause the program to hang on exit
+    if("HQ 2x" == filterName)
+    {
+        hq2x_init(32);
+    }
+    if("2xSaI" == filterName)
+    {
+        Init_2xSaI(32);
+    }
 
     //Search the raw filters first
     std::map<std::string,FilterFunc>::const_iterator found = filterMap.find(filterName);
