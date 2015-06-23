@@ -2609,7 +2609,7 @@ EVT_HANDLER(PrintSnap, "Automatically save printouts as screen captures with -pr
 
 EVT_HANDLER(GBASoundInterpolation, "GBA sound interpolation")
 {
-	GetMenuOptionBool("GBASoundInterpolation", gopts.soundInterpolation);
+	GetMenuOptionBool("GBASoundInterpolation", soundInterpolation);
 	update_opts();
 }
 
