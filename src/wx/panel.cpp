@@ -283,12 +283,18 @@ void GameArea::LoadGame(const wxString &name)
 
 		doMirroring(mirroringEnable);
 		// start sound; this must happen before CPU stuff
+		gb_effects_config.echo = (float)gopts.gb_echo / 100.0;
+		gb_effects_config.stereo = (float)gopts.gb_stereo / 100.0;
+		gbSoundSetDeclicking(gopts.gb_declick);
 		soundInit();
 		soundSetThrottle(throttle);
 		soundSetEnable(gopts.sound_en);
+		gbSoundSetSampleRate(!gopts.sound_qual ? 48000 :
+							 44100 / (1 << (gopts.sound_qual - 1)));
 		soundSetSampleRate(!gopts.sound_qual ? 48000 :
 		                   44100 / (1 << (gopts.sound_qual - 1)));
 		soundSetVolume((float)gopts.sound_vol / 100.0);
+		soundFiltering = (float)gopts.gba_sound_filter / 100.0f;
 		CPUInit(gopts.gba_bios.mb_fn_str(), useBiosFileGBA);
 
 		if (useBiosFileGBA && !useBios)

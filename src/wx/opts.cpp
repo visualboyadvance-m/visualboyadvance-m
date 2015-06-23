@@ -247,7 +247,7 @@ opt_desc opts[] =
 	INTOPT("Sound/Buffers", "", wxTRANSLATE("Number of sound buffers"), gopts.audio_buffers, 2, 10),
 	INTOPT("Sound/Enable", "", wxTRANSLATE("Bit mask of sound channels to enable"), gopts.sound_en, 0, 0x30f),
 	INTOPT("Sound/GBAFiltering", "", wxTRANSLATE("GBA sound filtering (%)"), gopts.gba_sound_filter, 0, 100),
-	BOOLOPT("Sound/GBAInterpolation", "GBASoundInterpolation", wxTRANSLATE("GBA sound interpolation"), gopts.soundInterpolation),
+	BOOLOPT("Sound/GBAInterpolation", "GBASoundInterpolation", wxTRANSLATE("GBA sound interpolation"), soundInterpolation),
 	BOOLOPT("Sound/GBDeclicking", "GBDeclicking", wxTRANSLATE("GB sound declicking"), gopts.gb_declick),
 	INTOPT("Sound/GBEcho", "", wxTRANSLATE("GB echo effect (%)"), gopts.gb_echo, 0, 100),
 	BOOLOPT("Sound/GBEnableEffects", "GBEnhanceSound", wxTRANSLATE("Enable GB sound effects"), gopts.gb_effects_config_enabled),
