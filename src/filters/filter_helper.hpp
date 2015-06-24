@@ -3,6 +3,10 @@
 #ifndef FILTER_HELPER_HPP
 #define FILTER_HELPER_HPP
 
+#include <vector>
+
+#include <cstdint>
+typedef uint32_t u32;
 
 /**
     * Convert a 32 bit image to a 24 bit one
@@ -15,26 +19,7 @@
     * \param[in] width  The image width (in pixels)
     * \param[in] height The height width (in pixels)
     */
-inline void convert32To24(u32* src,u8* dst,unsigned int width, unsigned int height)
-{
-    //Need src as a single byte pointer for this to work
-    u8 * u8src = (u8*)src;
-
-    for(unsigned int y = 0; y < height ; y++)
-    {
-        for(unsigned int x = 0; x < width; x++)
-        {
-            //For each pixel copy r,g,b one byte at a time
-            for(unsigned int i = 0; i<3; i++)
-            {
-                *dst++ = *u8src++;
-            }
-            //Skip the alpha channel
-            u8src++;
-        }
-    }
-}
-
+void convert32To24(u32* src,u8* dst,unsigned int width, unsigned int height);
 /**
  * Get a pointer to the first pixel of a row inside an image
  *
@@ -46,9 +31,27 @@ inline void convert32To24(u32* src,u8* dst,unsigned int width, unsigned int heig
  * \param[in] scale             How much larger the output image will be
  * \return                      A pointer to the first pixel in the chosen row
  */
-inline u32 * GetVerticalOffset(u32 * image_pointer,unsigned int width,unsigned int vertical_offset,unsigned int scale=1)
+inline u32 * GetVerticalOffset(u32 * image_pointer,unsigned int width,unsigned int vertical_offset,unsigned int scale=1);
+
+/**
+ * A simple struct to keep track of an image pointer, and the image's size.
+ */
+struct raw_image
 {
-    return image_pointer + (width * vertical_offset*scale*scale);
-}
+    u32* image;
+    unsigned int width;
+    unsigned int height;
+};
+
+/**
+ * Split an image into multiple sections, with each section being a certain number of rows of the original image
+ *
+ * NOTE:  The returned images are not separate.  The pointers merely point to different parts of the original image.
+ *
+ * \param[in] inImage   The original image
+ * \param[in] number    The number of sections to split the image into
+ * \return              A vector containing the sections of the original image
+ */
+std::vector<raw_image> splitImage(raw_image inImage, unsigned int number);
 
 #endif //FILTER_HELPER_HPP
