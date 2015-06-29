@@ -1,391 +1,1656 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
-#   <appukonrad@gmail.com>, 2012.
-#   <gsanky+transifex@gmail.com>, 2012.
-#: ../src/wx/guiinit.cpp:2198
+# Jiří Vírava <appukonrad@gmail.com>, 2012
+# Sanky <gsanky+transifex@gmail.com>, 2012
+# Zbyněk Schwarz <zbynek.schwarz@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-09 18:07-0400\n"
-"PO-Revision-Date: 2012-09-06 09:39+0000\n"
-"Last-Translator: jui <appukonrad@gmail.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2015-06-10 13:10+1000\n"
+"PO-Revision-Date: 2015-06-16 15:15+0000\n"
+"Last-Translator: Zbyněk Schwarz <zbynek.schwarz@gmail.com>\n"
+"Language-Team: Czech (http://www.transifex.com/projects/p/vba-m/language/"
+"cs/)\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: ../src/wx/wxvbam.cpp:341
+#: ../src/wx/wxvbam.cpp:463
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr ""
+"\n"
+"\tzabudované"
 
-#: ../src/wx/cmdevents.cpp:975 ../src/wx/cmdevents.cpp:1047
+#: ../src/wx/cmdevents.cpp:1197 ../src/wx/cmdevents.cpp:1273
 msgid " files ("
 msgstr " soubory ("
 
-#: ../src/wx/panel.cpp:365
+#: ../src/wx/panel.cpp:461
 msgid " player "
 msgstr " hráč "
 
-#: ../src/wx/guiinit.cpp:1288
+#: ../src/wx/xrc/GeneralConfig.xrc:134
+#, c-format
+msgid "% of normal:"
+msgstr "% z normálu:"
+
+#: ../src/wx/guiinit.cpp:1631
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr "%d snímků = %.2f ms"
 
-#: ../src/wx/guiinit.cpp:1419
+#: ../src/wx/guiinit.cpp:1790
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: ../src/wx/sys.cpp:304
+#: ../src/wx/sys.cpp:373
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: ../src/wx/sys.cpp:298
+#: ../src/wx/sys.cpp:364
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: ../src/wx/panel.cpp:62
+#: ../src/wx/panel.cpp:76
 #, c-format
 msgid "%s is not a valid ROM file"
-msgstr "%s není validní ROM soubor"
+msgstr "%s není platný soubor ROM"
 
-#: ../src/wx/sys.cpp:724 ../src/wx/sys.cpp:792
+#: ../src/wx/xrc/GBTileViewer.xrc:14
+msgid "&0"
+msgstr "&0"
+
+#: ../src/wx/xrc/GBTileViewer.xrc:20 ../src/wx/xrc/MainMenu.xrc:48
+#: ../src/wx/xrc/MainMenu.xrc:109
+msgid "&1"
+msgstr "&1"
+
+#: ../src/wx/xrc/CheatCreate.xrc:115
+msgid "&16 bits"
+msgstr "&16 bitů"
+
+#: ../src/wx/xrc/MemViewer.xrc:25
+msgid "&16-bit"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:52 ../src/wx/xrc/MainMenu.xrc:113
+msgid "&2"
+msgstr "&2"
+
+#: ../src/wx/xrc/TileViewer.xrc:21
+msgid "&256"
+msgstr "&256"
+
+#: ../src/wx/xrc/MainMenu.xrc:56 ../src/wx/xrc/MainMenu.xrc:117
+msgid "&3"
+msgstr "&3"
+
+#: ../src/wx/xrc/CheatCreate.xrc:122
+msgid "&32 bits"
+msgstr "&32 bitů"
+
+#: ../src/wx/xrc/MemViewer.xrc:32
+msgid "&32-bit"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:60 ../src/wx/xrc/MainMenu.xrc:121
+msgid "&4"
+msgstr "&4"
+
+#: ../src/wx/xrc/MainMenu.xrc:64 ../src/wx/xrc/MainMenu.xrc:125
+msgid "&5"
+msgstr "&5"
+
+#: ../src/wx/xrc/MainMenu.xrc:68 ../src/wx/xrc/MainMenu.xrc:129
+msgid "&6"
+msgstr "&6"
+
+#: ../src/wx/xrc/MainMenu.xrc:72 ../src/wx/xrc/MainMenu.xrc:133
+msgid "&7"
+msgstr "&7"
+
+#: ../src/wx/xrc/MainMenu.xrc:76 ../src/wx/xrc/MainMenu.xrc:137
+msgid "&8"
+msgstr "&8"
+
+#: ../src/wx/xrc/CheatCreate.xrc:107
+msgid "&8 bits"
+msgstr "&8 bitů"
+
+#: ../src/wx/xrc/MemViewer.xrc:17
+msgid "&8-bit"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:80 ../src/wx/xrc/MainMenu.xrc:141
+msgid "&9"
+msgstr "&9"
+
+#: ../src/wx/xrc/MainMenu.xrc:388
+msgid "&A"
+msgstr "&A"
+
+#: ../src/wx/xrc/Logging.xrc:76
+msgid "&AGBPrint"
+msgstr ""
+
+#: ../src/wx/xrc/CheatCreate.xrc:202
+msgid "&Add cheat"
+msgstr "&Přidat cheat"
+
+#: ../src/wx/xrc/AccelConfig.xrc:53
+msgid "&Assign"
+msgstr "&Přiřadit"
+
+#: ../src/wx/xrc/MainMenu.xrc:356
+msgid "&Audio"
+msgstr "&Zvuk"
+
+#: ../src/wx/xrc/MainMenu.xrc:254
+msgid "&Auto IPS/UPS/IPF patch"
+msgstr "&Automaticky použít záplatu IPS/UPS/IPF"
+
+#: ../src/wx/xrc/MainMenu.xrc:43
+msgid "&Auto load most recent"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:245
+msgid "&Auto skip frames"
+msgstr "&Automaticky přeskakovat snímky"
+
+#: ../src/wx/xrc/MainMenu.xrc:386
+msgid "&Autofire"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:15
+msgid "&Automatic"
+msgstr "&Automatické"
+
+#: ../src/wx/xrc/MainMenu.xrc:393
+msgid "&B"
+msgstr "&B"
+
+#: ../src/wx/xrc/GeneralConfig.xrc:80
+msgid "&BMP"
+msgstr "&BMP"
+
+#: ../src/wx/xrc/MainMenu.xrc:157 ../src/wx/xrc/MainMenu.xrc:169
+msgid "&Battery file..."
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:329
+msgid "&Bilinear filter"
+msgstr "&Bilineární filtr"
+
+#: ../src/wx/xrc/MainMenu.xrc:491
+msgid "&Break into GDB"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:498
+msgid "&Break on load"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:281
+msgid "&Cable"
+msgstr "&Kabel"
+
+#: ../src/wx/xrc/MainMenu.xrc:469
+msgid "&Cheats"
+msgstr "&Cheaty"
+
+#: ../src/wx/xrc/CheatCreate.xrc:195 ../src/wx/xrc/Logging.xrc:119
+msgid "&Clear"
+msgstr "&Vyčistit"
+
+#: ../src/wx/sys.cpp:882 ../src/wx/sys.cpp:955
 msgid "&Close"
+msgstr "&Zavřít"
+
+#: ../src/wx/xrc/MainMenu.xrc:310 ../src/wx/xrc/MainMenu.xrc:316
+#: ../src/wx/xrc/MainMenu.xrc:358 ../src/wx/xrc/MainMenu.xrc:382
+msgid "&Configure ..."
+msgstr "&Nastavení ..."
+
+#: ../src/wx/xrc/MainMenu.xrc:495
+msgid "&Configure port..."
+msgstr "&Nastavit port..."
+
+#: ../src/wx/xrc/GeneralConfig.xrc:42
+msgid "&Daily"
+msgstr "&Denně"
+
+#: ../src/wx/xrc/MainMenu.xrc:424
+msgid "&Debug print"
 msgstr ""
 
-#: ../src/wx/sys.cpp:667
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:233
+msgid "&Defaults"
+msgstr "&Výchozí"
+
+#: ../src/wx/xrc/CheatAdd.xrc:9 ../src/wx/xrc/CheatEdit.xrc:9
+msgid "&Description"
+msgstr "&Popis"
+
+#: ../src/wx/xrc/MainMenu.xrc:347
+msgid "&Disable on-screen display"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:508
+msgid "&Disassemble..."
+msgstr ""
+
+#: ../src/wx/sys.cpp:818 ../src/wx/xrc/GBPrinter.xrc:65
 msgid "&Discard"
+msgstr "&Zahodit"
+
+#: ../src/wx/xrc/MainMenu.xrc:503
+msgid "&Disconnect"
+msgstr "&Odpojit"
+
+#: ../src/wx/xrc/MainMenu.xrc:215
+msgid "&Emulation"
+msgstr "&Emulace"
+
+#: ../src/wx/xrc/MainMenu.xrc:484
+msgid "&Enable cheats"
+msgstr "&Povolit cheaty"
+
+#: ../src/wx/xrc/MainMenu.xrc:174
+msgid "&Export"
+msgstr "E&xportovat"
+
+#: ../src/wx/xrc/MainMenu.xrc:5
+msgid "&File"
+msgstr "&Soubor"
+
+#: ../src/wx/xrc/MainMenu.xrc:19
+msgid "&Freeze recent list"
+msgstr "&Uzamknout seznam nedávných her"
+
+#: ../src/wx/xrc/MainMenu.xrc:435
+msgid "&GB printer"
+msgstr "&Tiskárna GB"
+
+#: ../src/wx/xrc/MainMenu.xrc:375
+msgid "&GB sound declicking"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:798
+#: ../src/wx/xrc/MainMenu.xrc:367
+msgid "&GB sound enhancement"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:371
+msgid "&GB surround sound effect"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:362
+msgid "&GBA sound interpolation"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:505
+msgid "&GDB"
+msgstr "&GDB"
+
+#: ../src/wx/xrc/MainMenu.xrc:293 ../src/wx/xrc/MainMenu.xrc:429
+msgid "&Game Boy"
+msgstr "&Game Boy"
+
+#: ../src/wx/xrc/MainMenu.xrc:410
+msgid "&Game Boy Advance"
+msgstr "&Game Boy Advance"
+
+#: ../src/wx/xrc/MainMenu.xrc:289
+msgid "&GameCube"
+msgstr "&GameCube"
+
+#: ../src/wx/xrc/MainMenu.xrc:163 ../src/wx/xrc/MainMenu.xrc:172
+msgid "&Gameshark snapshot..."
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:439
+msgid "&Gather a full page before printing"
+msgstr "&Shromáždit celou stránku před vytištěním"
+
+#: ../src/wx/xrc/MainMenu.xrc:457
+msgid "&General ..."
+msgstr "&Obecné..."
+
+#: ../src/wx/xrc/Disassemble.xrc:45 ../src/wx/xrc/GBDisassemble.xrc:18
+#: ../src/wx/xrc/MemViewer.xrc:47
+msgid "&Go"
+msgstr "&Přejít"
+
+#: ../src/wx/xrc/CheatCreate.xrc:52
+msgid "&Greater than"
+msgstr "&Větší než"
+
+#: ../src/wx/xrc/MainMenu.xrc:618
+msgid "&Help"
+msgstr "&Nápověda"
+
+#: ../src/wx/xrc/CheatCreate.xrc:92
+msgid "&Hexadecimal"
+msgstr "Š&estnáctkové"
+
+#: ../src/wx/xrc/MainMenu.xrc:514
+msgid "&IO Viewer..."
+msgstr "Prohlížeč &vstupu/výstupu..."
+
+#: ../src/wx/xrc/MainMenu.xrc:165
+msgid "&Import"
+msgstr "&Importovat"
+
+#: ../src/wx/xrc/MainMenu.xrc:380
+msgid "&Input"
+msgstr "&Vstup"
+
+#: ../src/wx/xrc/MainMenu.xrc:338
+msgid "&Keep window on top"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:463
+msgid "&Key Shortcuts ..."
+msgstr "&Klávesové zkratky ..."
+
+#: ../src/wx/xrc/MainMenu.xrc:398
+msgid "&L"
+msgstr "&L"
+
+#: ../src/wx/xrc/CheatCreate.xrc:38
+msgid "&Less than"
+msgstr "&Menší než"
+
+#: ../src/wx/xrc/MainMenu.xrc:270
+msgid "&Link"
+msgstr "&Propojení"
+
+#: ../src/wx/xrc/MainMenu.xrc:302
+msgid "&Link at boot"
+msgstr "&Propojit při zavedení"
+
+#: ../src/wx/xrc/MainMenu.xrc:30
+msgid "&Load Dot Code..."
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:100
+msgid "&Load state"
+msgstr "&Načíst stav"
+
+#: ../src/wx/xrc/MemViewer.xrc:108
+msgid "&Load..."
+msgstr "&Načíst..."
+
+#: ../src/wx/xrc/MainMenu.xrc:298
+msgid "&Local mode"
+msgstr "&Místní režim"
+
+#: ../src/wx/xrc/MainMenu.xrc:511
+msgid "&Logging..."
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:517
+msgid "&Map Viewer..."
+msgstr "Prohlížeč &mapy..."
+
+#: ../src/wx/xrc/MainMenu.xrc:333
+msgid "&Multithread filter"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:33
+msgid "&Never"
+msgstr "&Nikdy"
+
+#: ../src/wx/xrc/Disassemble.xrc:467 ../src/wx/xrc/GBDisassemble.xrc:236
+msgid "&Next"
+msgstr "&Další"
+
+#: ../src/wx/xrc/MainMenu.xrc:222
+msgid "&Next frame"
+msgstr "&Další snímek"
+
+#: ../src/wx/xrc/CheatCreate.xrc:31
+msgid "&Not equal"
+msgstr "&Nerovná se"
+
+#: ../src/wx/xrc/MainMenu.xrc:277
+msgid "&Nothing"
+msgstr "Žá&dné"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:33
+msgid "&Number of frames to skip :"
+msgstr "&Počet snímků k přeskočení :"
+
+#: ../src/wx/xrc/MainMenu.xrc:523
+msgid "&OAM Viewer..."
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:558
+msgid "&OBJ"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:104
+msgid "&Oldest slot"
+msgstr "&Nejstarší pozice"
+
+#: ../src/wx/xrc/MainMenu.xrc:268
+msgid "&Options"
+msgstr "&Možnosti"
+
+#: ../src/wx/xrc/GeneralConfig.xrc:71
+msgid "&PNG"
+msgstr "&PNG"
+
+#: ../src/wx/xrc/MainMenu.xrc:526
+msgid "&Palette Viewer..."
+msgstr "Prohlížeč &palety"
+
+#: ../src/wx/xrc/MainMenu.xrc:217
+msgid "&Pause"
+msgstr "&Pozastavit"
+
+#: ../src/wx/xrc/MainMenu.xrc:258
+msgid "&Pause when inactive"
+msgstr "Pozastavit při nečinnosti"
+
+#: ../src/wx/xrc/MainMenu.xrc:208
+msgid "&Play"
+msgstr "&Přehrát"
+
+#: ../src/wx/xrc/MainMenu.xrc:403
+msgid "&R"
+msgstr "&R"
+
+#: ../src/wx/xrc/MainMenu.xrc:416
+msgid "&Real-time clock"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:199
+msgid "&Record"
+msgstr "&Nahrát"
+
+#: ../src/wx/xrc/GBMapViewer.xrc:152 ../src/wx/xrc/GBOAMViewer.xrc:142
+#: ../src/wx/xrc/GBPaletteViewer.xrc:114 ../src/wx/xrc/GBTileViewer.xrc:145
+#: ../src/wx/xrc/IOViewer.xrc:327 ../src/wx/xrc/MapViewer.xrc:214
+#: ../src/wx/xrc/MemViewer.xrc:101 ../src/wx/xrc/OAMViewer.xrc:155
+#: ../src/wx/xrc/PaletteViewer.xrc:100 ../src/wx/xrc/TileViewer.xrc:161
+msgid "&Refresh"
+msgstr ""
+
+#: ../src/wx/xrc/AccelConfig.xrc:60
+msgid "&Remove"
+msgstr "&Odstranit"
+
+#: ../src/wx/xrc/MainMenu.xrc:263
+msgid "&Reset"
+msgstr "&Resetovat"
+
+#: ../src/wx/xrc/MainMenu.xrc:16
+msgid "&Reset recent list"
+msgstr "&Resetovat seznam nedávných her"
+
+#: ../src/wx/xrc/MainMenu.xrc:324
+msgid "&Retain aspect ratio"
+msgstr "&Zachovat poměr stran"
+
+#: ../src/wx/xrc/GeneralConfig.xrc:95
+msgid "&Rewind interval :"
+msgstr ""
+
+#: ../src/wx/xrc/GBMapViewer.xrc:157 ../src/wx/xrc/Logging.xrc:112
+#: ../src/wx/xrc/MapViewer.xrc:219
+msgid "&Save"
+msgstr "&Uložit"
+
+#: ../src/wx/xrc/MainMenu.xrc:33
+msgid "&Save Dot Code..."
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:443
+msgid "&Save printouts as screen captures"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:152
+msgid "&Save state"
+msgstr "&Uložit stav"
+
+#: ../src/wx/xrc/GBOAMViewer.xrc:149 ../src/wx/xrc/GBTileViewer.xrc:152
+#: ../src/wx/xrc/MemViewer.xrc:115 ../src/wx/xrc/OAMViewer.xrc:162
+#: ../src/wx/xrc/TileViewer.xrc:168
+msgid "&Save..."
+msgstr "&Uložit..."
+
+#: ../src/wx/xrc/CheatCreate.xrc:181
+msgid "&Search"
+msgstr "&Hledat"
+
+#: ../src/wx/xrc/MainMenu.xrc:250
+msgid "&Skip BIOS"
+msgstr "&Přeskočit BIOS"
+
+#: ../src/wx/xrc/MainMenu.xrc:614
+msgid "&Sound Channels"
+msgstr "&Zvukové kanály"
+
+#: ../src/wx/xrc/MainMenu.xrc:306
+msgid "&Speed hack"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:320
+msgid "&Start in full screen"
+msgstr "&Spustit v režimu celé obrazovky"
+
+#: ../src/wx/xrc/MainMenu.xrc:343
+msgid "&Status bar"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:30
+msgid "&THUMB"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:116
+msgid "&Throttle"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:529
+msgid "&Tile Viewer..."
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:467
+msgid "&Tools"
+msgstr "&Nástroje"
+
+#: ../src/wx/xrc/MainMenu.xrc:351
+msgid "&Transparent on-screen display"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:237
+msgid "&Turbo mode"
+msgstr ""
+
+#: ../src/wx/xrc/CheatEdit.xrc:31 ../src/wx/xrc/MainMenu.xrc:275
+msgid "&Type"
+msgstr "&Typ"
+
+#: ../src/wx/xrc/Logging.xrc:69
+msgid "&Undefined instruction"
+msgstr "Neurčená &instrukce"
+
+#: ../src/wx/xrc/CheatCreate.xrc:85
+msgid "&Unsigned"
+msgstr "&Bez znaménka"
+
+#: ../src/wx/xrc/MainMenu.xrc:420
+msgid "&Use BIOS file"
+msgstr "&Použít soubor BIOS"
+
+#: ../src/wx/xrc/MainMenu.xrc:448
+msgid "&Use GB BIOS file"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:452
+msgid "&Use GBC BIOS file"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:241
+msgid "&VSync"
+msgstr "&VSynchronizace"
+
+#: ../src/wx/xrc/CheatAdd.xrc:53
+msgid "&Value"
+msgstr "&Hodnota"
+
+#: ../src/wx/xrc/MainMenu.xrc:314
+msgid "&Video"
+msgstr "&Obraz"
+
+#: ../src/wx/xrc/MainMenu.xrc:581
+msgid "&View Layers"
+msgstr "Zobrazit &vrstvy"
+
+#: ../src/wx/xrc/MainMenu.xrc:564
+msgid "&WIN 0"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:50
+msgid "&Weekly"
+msgstr "&Týdně"
+
+#: ../src/wx/xrc/MainMenu.xrc:285
+msgid "&Wireless"
+msgstr "&Bezdrátové"
+
+#: ../src/wx/xrc/MainMenu.xrc:28
+msgid "&e-Reader"
+msgstr "&e-čtečka"
+
+#: ../src/wx/xrc/IOViewer.xrc:302
+msgid "0 "
+msgstr "0 "
+
+#: ../src/wx/xrc/DisplayConfig.xrc:133
+msgid "0 = no limit"
+msgstr "0 = bez limitu"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:125
+msgid "0 = no maximum"
+msgstr "0 = žádné maximum"
+
+#: ../src/wx/xrc/GeneralConfig.xrc:144
+msgid "0 = no throttle"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:424 ../src/wx/xrc/GBDisassemble.xrc:172
+msgid "00"
+msgstr "00"
+
+#: ../src/wx/xrc/GBDisassemble.xrc:53 ../src/wx/xrc/GBDisassemble.xrc:70
+#: ../src/wx/xrc/GBDisassemble.xrc:87 ../src/wx/xrc/GBDisassemble.xrc:104
+#: ../src/wx/xrc/GBDisassemble.xrc:121 ../src/wx/xrc/GBDisassemble.xrc:138
+#: ../src/wx/xrc/GBDisassemble.xrc:155
+msgid "0000"
+msgstr "0000"
+
+#: ../src/wx/xrc/Disassemble.xrc:83 ../src/wx/xrc/Disassemble.xrc:100
+#: ../src/wx/xrc/Disassemble.xrc:117 ../src/wx/xrc/Disassemble.xrc:134
+#: ../src/wx/xrc/Disassemble.xrc:151 ../src/wx/xrc/Disassemble.xrc:168
+#: ../src/wx/xrc/Disassemble.xrc:185 ../src/wx/xrc/Disassemble.xrc:202
+#: ../src/wx/xrc/Disassemble.xrc:219 ../src/wx/xrc/Disassemble.xrc:236
+#: ../src/wx/xrc/Disassemble.xrc:253 ../src/wx/xrc/Disassemble.xrc:270
+#: ../src/wx/xrc/Disassemble.xrc:287 ../src/wx/xrc/Disassemble.xrc:304
+#: ../src/wx/xrc/Disassemble.xrc:321 ../src/wx/xrc/Disassemble.xrc:338
+#: ../src/wx/xrc/Disassemble.xrc:355
+msgid "00000000"
+msgstr "00000000"
+
+#: ../src/wx/xrc/GBTileViewer.xrc:33
+msgid "0x&8000"
+msgstr "0x&8000"
+
+#: ../src/wx/xrc/GBTileViewer.xrc:39
+msgid "0x&8800"
+msgstr "0x&8800"
+
+#: ../src/wx/viewers.cpp:915
 msgid "0x0000 - ROM"
-msgstr ""
+msgstr "0x0000 - ROM"
 
-#: ../src/wx/viewers.cpp:703
+#: ../src/wx/viewers.cpp:803
 msgid "0x00000000 - BIOS"
-msgstr ""
+msgstr "0x00000000 - BIOS"
 
-#: ../src/wx/viewers.cpp:704
+#: ../src/wx/viewers.cpp:804
 msgid "0x02000000 - WRAM"
-msgstr ""
+msgstr "0x02000000 - WRAM"
 
-#: ../src/wx/viewers.cpp:705
+#: ../src/wx/viewers.cpp:805
 msgid "0x03000000 - IRAM"
-msgstr ""
+msgstr "0x03000000 - IRAM"
 
-#: ../src/wx/viewers.cpp:706
+#: ../src/wx/viewers.cpp:806
 msgid "0x04000000 - I/O"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:707
+#: ../src/wx/viewers.cpp:807
 msgid "0x05000000 - PALETTE"
-msgstr ""
+msgstr "0x05000000 - PALETA"
 
-#: ../src/wx/viewers.cpp:708
+#: ../src/wx/viewers.cpp:808
 msgid "0x06000000 - VRAM"
-msgstr ""
+msgstr "0x06000000 - VRAM"
 
-#: ../src/wx/viewers.cpp:709
+#: ../src/wx/viewers.cpp:809
 msgid "0x07000000 - OAM"
-msgstr ""
+msgstr "0x07000000 - OAM"
 
-#: ../src/wx/viewers.cpp:710
+#: ../src/wx/viewers.cpp:810
 msgid "0x08000000 - ROM"
-msgstr ""
+msgstr "0x08000000 - ROM"
 
-#: ../src/wx/viewers.cpp:799
+#: ../src/wx/viewers.cpp:916
 msgid "0x4000 - ROM"
-msgstr ""
+msgstr "0x4000 - ROM"
 
-#: ../src/wx/viewers.cpp:800
+#: ../src/wx/xrc/TileViewer.xrc:55
+msgid "0x60&10000"
+msgstr "0x60&10000"
+
+#: ../src/wx/xrc/TileViewer.xrc:34
+msgid "0x600&0000"
+msgstr "0x600&0000"
+
+#: ../src/wx/xrc/TileViewer.xrc:40
+msgid "0x600&4000"
+msgstr "0x600&4000"
+
+#: ../src/wx/xrc/TileViewer.xrc:45
+msgid "0x600&8000"
+msgstr "0x600&8000"
+
+#: ../src/wx/xrc/TileViewer.xrc:50
+msgid "0x600&C000"
+msgstr "0x600&C000"
+
+#: ../src/wx/xrc/GBMapViewer.xrc:14
+msgid "0x8000"
+msgstr "0x8000"
+
+#: ../src/wx/viewers.cpp:917
 msgid "0x8000 - VRAM"
-msgstr ""
+msgstr "0x8000 - VRAM"
 
-#: ../src/wx/viewers.cpp:801
+#: ../src/wx/xrc/GBMapViewer.xrc:20
+msgid "0x8800"
+msgstr "0x8800"
+
+#: ../src/wx/xrc/GBMapViewer.xrc:33
+msgid "0x9800"
+msgstr "0x9800"
+
+#: ../src/wx/xrc/GBMapViewer.xrc:39
+msgid "0x9C00"
+msgstr "0x9C00"
+
+#: ../src/wx/viewers.cpp:918
 msgid "0xA000 - SRAM"
-msgstr ""
+msgstr "0xA000 - SRAM"
 
-#: ../src/wx/viewers.cpp:802
+#: ../src/wx/viewers.cpp:919
 msgid "0xC000 - RAM"
-msgstr ""
+msgstr "0xC000 - RAM"
 
-#: ../src/wx/viewers.cpp:803
+#: ../src/wx/viewers.cpp:920
 msgid "0xD000 - WRAM"
-msgstr ""
+msgstr "0xD000 - WRAM"
 
-#: ../src/wx/viewers.cpp:804
+#: ../src/wx/viewers.cpp:921
 msgid "0xFF00 - I/O"
 msgstr ""
 
-#: ../src/wx/viewers.cpp:805
+#: ../src/wx/viewers.cpp:922
 msgid "0xFF80 - RAM"
-msgstr ""
+msgstr "0xFF80 - RAM"
 
-#: ../src/wx/guiinit.cpp:851
+#: ../src/wx/xrc/IOViewer.xrc:285
+msgid "1 "
+msgstr "1 "
+
+#: ../src/wx/xrc/MainMenu.xrc:84 ../src/wx/xrc/MainMenu.xrc:145
+msgid "1&0"
+msgstr "1&0"
+
+#: ../src/wx/xrc/TileViewer.xrc:15
+msgid "1&6"
+msgstr "1&6"
+
+#: ../src/wx/xrc/IOViewer.xrc:132
+msgid "10 "
+msgstr "10 "
+
+#: ../src/wx/xrc/GeneralConfig.xrc:156 ../src/wx/xrc/SoundConfig.xrc:45
+msgid "100%"
+msgstr "100%"
+
+#: ../src/wx/xrc/IOViewer.xrc:115
+msgid "11 "
+msgstr "11 "
+
+#: ../src/wx/xrc/SoundConfig.xrc:80
+msgid "11 KHz"
+msgstr "11 KHz"
+
+#: ../src/wx/xrc/IOViewer.xrc:98
+msgid "12 "
+msgstr "12 "
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:50
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:201
+msgid "128K"
+msgstr "128K"
+
+#: ../src/wx/xrc/IOViewer.xrc:81
+msgid "13 "
+msgstr "13 "
+
+#: ../src/wx/xrc/IOViewer.xrc:64
+msgid "14 "
+msgstr "14 "
+
+#: ../src/wx/xrc/IOViewer.xrc:47
+msgid "15 "
+msgstr "15 "
+
+#: ../src/wx/xrc/GeneralConfig.xrc:157
+msgid "150%"
+msgstr "150%"
+
+#: ../src/wx/guiinit.cpp:1122
 msgid "16-bit "
-msgstr "16-bit "
+msgstr "16-bitové"
 
-#: ../src/wx/guiinit.cpp:854
+#: ../src/wx/xrc/GBPrinter.xrc:29
+msgid "1x"
+msgstr "1x"
+
+#: ../src/wx/xrc/NetLink.xrc:41
+msgid "2"
+msgstr "2"
+
+#: ../src/wx/xrc/IOViewer.xrc:268
+msgid "2 "
+msgstr "2 "
+
+#: ../src/wx/xrc/GeneralConfig.xrc:158
+msgid "200%"
+msgstr "200%"
+
+#: ../src/wx/xrc/SoundConfig.xrc:79
+msgid "22 KHz"
+msgstr "22 KHz"
+
+#: ../src/wx/xrc/GeneralConfig.xrc:154
+msgid "25%"
+msgstr "25%"
+
+#: ../src/wx/xrc/GBPrinter.xrc:30
+msgid "2x"
+msgstr "2x"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:222
+msgid "2xSaI"
+msgstr ""
+
+#: ../src/wx/xrc/NetLink.xrc:49
+msgid "3"
+msgstr "3"
+
+#: ../src/wx/xrc/IOViewer.xrc:251
+msgid "3 "
+msgstr "3 "
+
+#: ../src/wx/guiinit.cpp:1126
 msgid "32-bit "
-msgstr "32-bit "
+msgstr "32-bitové"
 
-#: ../src/wx/guiinit.cpp:848
+#: ../src/wx/xrc/GBPrinter.xrc:31
+msgid "3x"
+msgstr "3x"
+
+#: ../src/wx/xrc/NetLink.xrc:56
+msgid "4"
+msgstr "4"
+
+#: ../src/wx/xrc/IOViewer.xrc:234
+msgid "4 "
+msgstr "4 "
+
+#: ../src/wx/xrc/SoundConfig.xrc:78
+msgid "44.1 KHz"
+msgstr "44.1 KHz"
+
+#: ../src/wx/xrc/SoundConfig.xrc:77
+msgid "48 KHz"
+msgstr "48 KHz"
+
+#: ../src/wx/xrc/GBPrinter.xrc:32
+msgid "4x"
+msgstr "4x"
+
+#: ../src/wx/xrc/IOViewer.xrc:217
+msgid "5 "
+msgstr "5 "
+
+#: ../src/wx/xrc/GeneralConfig.xrc:155
+msgid "50%"
+msgstr "50%"
+
+#: ../src/wx/xrc/IOViewer.xrc:200
+msgid "6 "
+msgstr "6 "
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:49
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:200
+msgid "64K"
+msgstr "64K"
+
+#: ../src/wx/xrc/IOViewer.xrc:183
+msgid "7 "
+msgstr "7 "
+
+#: ../src/wx/xrc/IOViewer.xrc:166
+msgid "8 "
+msgstr "8 "
+
+#: ../src/wx/guiinit.cpp:1118
 msgid "8-bit "
-msgstr "8-bit "
+msgstr "8-bitové"
 
-#: ../src/wx/wxvbam.cpp:274
+#: ../src/wx/xrc/IOViewer.xrc:149
+msgid "9 "
+msgstr "9 "
+
+#: ../src/wx/wxvbam.cpp:387
 msgid "<config>=<value>"
+msgstr "<nastavení>=<hodnota>"
+
+#: ../src/wx/xrc/JoyPanel.xrc:29
+msgid "A"
+msgstr "A"
+
+#: ../src/wx/wxvbam.cpp:788
+msgid ""
+"A new update is available. To update, VisualBoyAdvance-M must be Run as "
+"administrator. Would you like to download and update VisualBoyAdvance-M?\n"
+"\n"
+"https://sourceforge.net/projects/vbam/files/latest/download"
 msgstr ""
 
-#: ../src/wx/widgets/keyedit.cpp:81 ../src/wx/widgets/keyedit.cpp:165
+#: ../src/wx/xrc/Disassemble.xrc:23
+msgid "A&RM"
+msgstr "A&RM"
+
+#: ../src/wx/xrc/MainMenu.xrc:480
+msgid "A&utomatically save/load cheats"
+msgstr "Automaticky ukládat/načíst &cheaty"
+
+#: ../src/wx/xrc/GBDisassemble.xrc:43
+msgid "AF:"
+msgstr ""
+
+#: ../src/wx/widgets/keyedit.cpp:104 ../src/wx/widgets/keyedit.cpp:205
 msgid "ALT"
+msgstr "ALT"
+
+#: ../src/wx/xrc/CheatAdd.xrc:4
+msgid "Add Cheat"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2678
+#: ../src/wx/xrc/CheatList.xrc:20
+msgid "Add new cheat"
+msgstr "Přidat nový cheat"
+
+#: ../src/wx/guiinit.cpp:3241 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Adresa"
 
-#: ../src/wx/cmdevents.cpp:94
-#, fuzzy
-msgid ""
-"Archives (*.zip;*.7z;*.rar)|*.zip;*.7z;*.rar|GameBoy Advance Files (*.agb;*."
-"gba;*.bin;*.elf;*.mb)|*.agb;*.gba;*.bin;*.elf;*.mb*.agb.gz;*.gba.gz;*.bin.gz;"
-"*.elf.gz;*.mb.gz*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z|GameBoy Files (*.dmg;"
-"*.gb;*.gbc;*.cgb;*.sgb)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb*.dmg.gz;*.gb.gz;*.gbc."
-"gz;*.cgb.gz;*.sgb.gz*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z|"
-msgstr ""
-"GameBoy Advance soubory (*.agb;*.gba;*.bin;*.elf;*.mb)|*.agb;*.gba;*.bin;*."
-"elf;*.mb*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz*.agb.z;*.gba.z;*.bin.z;*."
-"elf.z;*.mb.z|GameBoy soubory (*.dmg;*.gb;*.gbc;*.cgb;*.sgb)|*.dmg;*.gb;*.gbc;"
-"*.cgb;*.sgb*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz*.dmg.z;*.gb.z;*.gbc.z;"
-"*.cgb.z;*.sgb.z|Archivy (*.zip;*.7z;*.rar)|*.zip;*.7z;*.rar|"
+#: ../src/wx/xrc/GBMapViewer.xrc:74 ../src/wx/xrc/GBTileViewer.xrc:99
+#: ../src/wx/xrc/MapViewer.xrc:144 ../src/wx/xrc/MemSelRegion.xrc:10
+#: ../src/wx/xrc/PaletteViewer.xrc:50 ../src/wx/xrc/TileViewer.xrc:115
+msgid "Address:"
+msgstr "Adresa:"
 
-#: ../src/wx/widgets/joyedit.cpp:82
+#: ../src/wx/xrc/DisplayConfig.xrc:226
+msgid "Advance MAME Scale2x"
+msgstr ""
+
+#: ../src/wx/xrc/DisplayConfig.xrc:286 ../src/wx/xrc/SoundConfig.xrc:191
+msgid "Advanced"
+msgstr "Pokročilé"
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:58
+msgid "Always"
+msgstr "Vždy"
+
+#: ../src/wx/xrc/GBMapViewer.xrc:59 ../src/wx/xrc/MapViewer.xrc:67
+msgid "Auto &update"
+msgstr "&Automatické aktualizace"
+
+#: ../src/wx/xrc/JoyPanel.xrc:188
+msgid "Autofire A"
+msgstr ""
+
+#: ../src/wx/xrc/JoyPanel.xrc:216
+msgid "Autofire B"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:27
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:178
+#: ../src/wx/xrc/GameBoyConfig.xrc:29 ../src/wx/xrc/GameBoyConfig.xrc:59
+msgid "Automatic"
+msgstr "Automatický"
+
+#: ../src/wx/xrc/Disassemble.xrc:443 ../src/wx/xrc/GBDisassemble.xrc:212
+#: ../src/wx/xrc/GBOAMViewer.xrc:93 ../src/wx/xrc/GBPaletteViewer.xrc:105
+#: ../src/wx/xrc/GBTileViewer.xrc:75 ../src/wx/xrc/IOViewer.xrc:318
+#: ../src/wx/xrc/MemViewer.xrc:72 ../src/wx/xrc/OAMViewer.xrc:109
+#: ../src/wx/xrc/PaletteViewer.xrc:81 ../src/wx/xrc/TileViewer.xrc:91
+msgid "Automatic &update"
+msgstr "&Automatické aktualizace"
+
+#: ../src/wx/widgets/joyedit.cpp:106
 #, c-format
 msgid "Axis%d+"
-msgstr ""
+msgstr "  Osa%d+"
 
-#: ../src/wx/widgets/joyedit.cpp:85
+#: ../src/wx/widgets/joyedit.cpp:110
 #, c-format
 msgid "Axis%d-"
-msgstr ""
+msgstr "  Osa%d-"
 
-#: ../src/wx/widgets/joyedit.cpp:141
+#: ../src/wx/widgets/joyedit.cpp:182
 msgid "Axis([0-9]+)([+-])"
-msgstr ""
+msgstr "Osa([0-9]+)([+-])"
 
-#: ../src/wx/viewsupt.cpp:686
+#: ../src/wx/xrc/JoyPanel.xrc:59
+msgid "B"
+msgstr "B"
+
+#: ../src/wx/viewsupt.cpp:827
 msgid "B:"
+msgstr "B:"
+
+#: ../src/wx/xrc/GBDisassemble.xrc:60
+msgid "BC:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:398
+#: ../src/wx/xrc/MainMenu.xrc:534
+msgid "BG &0"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:540
+msgid "BG &1"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:546
+msgid "BG &2"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:552
+msgid "BG &3"
+msgstr ""
+
+#: ../src/wx/xrc/MapViewer.xrc:35
+msgid "BG0"
+msgstr "Pozadí0"
+
+#: ../src/wx/xrc/MapViewer.xrc:41
+msgid "BG1"
+msgstr "Pozadí1"
+
+#: ../src/wx/xrc/MapViewer.xrc:46
+msgid "BG2"
+msgstr "Pozadí2"
+
+#: ../src/wx/xrc/MapViewer.xrc:51
+msgid "BG3"
+msgstr "Pozadí3"
+
+#: ../src/wx/xrc/GBColorPrefPanel.xrc:46 ../src/wx/xrc/GBPaletteViewer.xrc:17
+#: ../src/wx/xrc/MapViewer.xrc:54 ../src/wx/xrc/PaletteViewer.xrc:19
+msgid "Background"
+msgstr "Pozadí"
+
+#: ../src/wx/wxvbam.cpp:552
 msgid "Bad configuration option or multiple ROM files given:\n"
+msgstr "Špatná volba nastavení, nebo předáno více souborů ROM:\n"
+
+#: ../src/wx/xrc/GBOAMViewer.xrc:77
+msgid "Bank:"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:704 ../src/wx/cmdevents.cpp:866
+#: ../src/wx/xrc/SoundConfig.xrc:91
+msgid "Basic"
+msgstr "Základní"
+
+#: ../src/wx/cmdevents.cpp:859 ../src/wx/cmdevents.cpp:1073
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "Soubor s baterií (*.sav)|*.sav|Flashové uložení (*.dat)|*.dat"
 
-#: ../src/wx/widgets/joyedit.cpp:88
+#: ../src/wx/xrc/DisplayConfig.xrc:227
+msgid "Bilinear"
+msgstr ""
+
+#: ../src/wx/xrc/DisplayConfig.xrc:228
+msgid "Bilinear Plus"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:92
+msgid "Bios file :"
+msgstr "Soubor BIOS :"
+
+#: ../src/wx/xrc/GBColorPrefPanel.xrc:11
+msgid "Blue Sea"
+msgstr "Modré moře"
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:84
+msgid "Boot &ROM file :"
+msgstr "Zavést soubor &ROM :"
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:115
+#: ../src/wx/xrc/GameBoyConfig.xrc:126
+msgid "Boot ROM"
+msgstr "Zavést ROM"
+
+#: ../src/wx/widgets/joyedit.cpp:114
 #, c-format
 msgid "Button%d"
-msgstr ""
+msgstr "  Tlačítko%d"
 
-#: ../src/wx/widgets/joyedit.cpp:143
+#: ../src/wx/widgets/joyedit.cpp:184
 msgid "Button([0-9]+)"
+msgstr "Tlačítko([0-9]+)"
+
+#: ../src/wx/xrc/Disassemble.xrc:390 ../src/wx/xrc/GBDisassemble.xrc:197
+msgid "C"
 msgstr ""
 
-#: ../src/wx/widgets/keyedit.cpp:168
+#: ../src/wx/xrc/PaletteViewer.xrc:88
+msgid "C&hange backdrop color..."
+msgstr ""
+
+#: ../src/wx/xrc/CheatEdit.xrc:53
+msgid "C&odes"
+msgstr "&Kódy"
+
+#: ../src/wx/xrc/GBPrinter.xrc:58
+msgid "C&ontinue"
+msgstr "&Pokračovat"
+
+#: ../src/wx/widgets/keyedit.cpp:208
 msgid "CONTROL"
 msgstr ""
 
-#: ../src/wx/widgets/keyedit.cpp:84 ../src/wx/widgets/keyedit.cpp:167
-msgid "CTRL"
+#: ../src/wx/xrc/Disassemble.xrc:345
+msgid "CPSR:"
 msgstr ""
 
-#: ../src/wx/dsound.cpp:124
+#: ../src/wx/xrc/GBAROMInfo.xrc:59
+msgid "CRC32:"
+msgstr "CRC32:"
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:143 ../src/wx/xrc/GBROMInfo.xrc:84
+msgid "CRC:"
+msgstr "CRC:"
+
+#: ../src/wx/widgets/keyedit.cpp:108 ../src/wx/widgets/keyedit.cpp:207
+msgid "CTRL"
+msgstr "CTRL"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:190
+msgid "Cairo"
+msgstr "Cairo"
+
+#: ../src/wx/dsound.cpp:136
 #, c-format
 msgid "Cannot CreateSoundBuffer %08x"
 msgstr "Nelze CreateSoundBuffer %08x"
 
-#: ../src/wx/dsound.cpp:189
+#: ../src/wx/dsound.cpp:208
 #, c-format
 msgid "Cannot Play primary %08x"
 msgstr "Nelze Play primary %08x"
 
-#: ../src/wx/dsound.cpp:110
+#: ../src/wx/dsound.cpp:120
 #, c-format
 msgid "Cannot SetCooperativeLevel %08x"
 msgstr "Nelze SetCooperativeLevel %08x"
 
-#: ../src/wx/dsound.cpp:94 ../src/wx/dsound.cpp:105
+#: ../src/wx/dsound.cpp:99 ../src/wx/dsound.cpp:114
 #, c-format
 msgid "Cannot create DirectSound %08x"
 msgstr "Nelze vytvořit DirectSound %08x"
 
-#: ../src/wx/panel.cpp:1932
+#: ../src/wx/panel.cpp:2343
 msgid "Cannot create conversion buffer"
-msgstr ""
+msgstr "Nelze vytvořit převodní vyrovnávací paměť"
 
-#: ../src/wx/cmdevents.cpp:749
+#: ../src/wx/cmdevents.cpp:918
 #, c-format
 msgid "Cannot open file %s"
 msgstr "Nelze otevřít soubor %s"
 
-#: ../src/wx/sys.cpp:119
+#: ../src/wx/sys.cpp:139
 #, c-format
 msgid "Cannot open output file %s"
-msgstr ""
+msgstr "Nelze otevřít výstupní soubor %s"
 
-#: ../src/wx/sys.cpp:174
+#: ../src/wx/sys.cpp:209
 #, c-format
 msgid "Cannot open recording file %s"
-msgstr ""
+msgstr "Nelze otevřít soubor s nahrávkou %s"
 
-#: ../src/wx/sys.cpp:163
+#: ../src/wx/sys.cpp:193
 msgid "Cannot play game recording while recording"
 msgstr ""
 
-#: ../src/wx/panel.cpp:750
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:69
+msgid "Cartridge"
+msgstr ""
+
+#: ../src/wx/xrc/GBROMInfo.xrc:60
+msgid "Cartridge type:"
+msgstr ""
+
+#: ../src/wx/xrc/SoundConfig.xrc:251
+msgid "Center"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:585
+msgid "Channel &1"
+msgstr "Kanál &1"
+
+#: ../src/wx/xrc/MainMenu.xrc:590
+msgid "Channel &2"
+msgstr "Kanál &2"
+
+#: ../src/wx/xrc/MainMenu.xrc:595
+msgid "Channel &3"
+msgstr "Kanál &3"
+
+#: ../src/wx/xrc/MainMenu.xrc:600
+msgid "Channel &4"
+msgstr "Kanál &4"
+
+#: ../src/wx/xrc/GBMapViewer.xrc:23 ../src/wx/xrc/GBTileViewer.xrc:42
+#: ../src/wx/xrc/TileViewer.xrc:58
+msgid "Char Base"
+msgstr ""
+
+#: ../src/wx/xrc/MapViewer.xrc:92
+msgid "Char Base:"
+msgstr ""
+
+#: ../src/wx/xrc/CheatList.xrc:4
+msgid "Cheat List"
+msgstr "Seznam cheatů"
+
+#: ../src/wx/xrc/CheatCreate.xrc:4
+msgid "Cheat Search"
+msgstr "Hledání cheatů"
+
+#: ../src/wx/cmdevents.cpp:2507 ../src/wx/xrc/MainMenu.xrc:632
+msgid "Check for updates"
+msgstr "Zkontrolovat aktualizace"
+
+#: ../src/wx/xrc/GeneralConfig.xrc:26
+msgid "Check for updates:"
+msgstr "Kontrolovat aktualizace:"
+
+#: ../src/wx/xrc/GBROMInfo.xrc:156
+msgid "Checksum:"
+msgstr "Kontrolní součet:"
+
+#: ../src/wx/panel.cpp:923
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2592
+#: ../src/wx/xrc/JoyPanel.xrc:358
+msgid "Clear"
+msgstr "Vyčistit"
+
+#: ../src/wx/xrc/JoyPanel.xrc:8
+msgid ""
+"Click a field and press a key or move joystick to add.  Press backspace to "
+"delete last added key.  Resize window or click inside and move pointer to "
+"see entire contents if too small."
+msgstr ""
+
+#: ../src/wx/xrc/GBPaletteViewer.xrc:8 ../src/wx/xrc/PaletteViewer.xrc:9
+msgid "Click on a color for more information"
+msgstr ""
+
+#: ../src/wx/xrc/NetLink.xrc:19
+msgid "Client"
+msgstr "Klient"
+
+#: ../src/wx/xrc/AccelConfig.xrc:13
+msgid "Co&mmands:"
+msgstr "&Příkazy:"
+
+#: ../src/wx/guiinit.cpp:3158
 msgid "Code"
 msgstr "Kód"
 
-#: ../src/wx/guiinit.cpp:611
+#: ../src/wx/guiinit.cpp:826
 msgid "CodeBreaker Advance"
 msgstr "CodeBreaker Advance"
 
-#: ../src/wx/wxvbam.cpp:323
+#: ../src/wx/xrc/GBROMInfo.xrc:96
+msgid "Color:"
+msgstr "Barva:"
+
+#: ../src/wx/xrc/TileViewer.xrc:24
+msgid "Colors"
+msgstr "Barvy"
+
+#: ../src/wx/xrc/MapViewer.xrc:108 ../src/wx/xrc/OAMViewer.xrc:45
+msgid "Colors:"
+msgstr "Barvy:"
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:139
+msgid "Comment"
+msgstr "Komentář"
+
+#: ../src/wx/xrc/CheatCreate.xrc:64
+msgid "Compare type"
+msgstr "Typ porovnání"
+
+#: ../src/wx/wxvbam.cpp:444
 msgid "Configuration is read from, in order:"
-msgstr ""
+msgstr "Nastavení je načítáno z umístění v tomto pořadí:"
 
-#: ../src/wx/wxvbam.cpp:302
+#: ../src/wx/wxvbam.cpp:421
 msgid "Configuration/build error: can't find built-in xrc"
-msgstr ""
+msgstr "Chyba sestavení/nastavení: nelze najít zabudovaný xrc"
 
-#: ../src/wx/guiinit.cpp:1763
+#: ../src/wx/xrc/MainMenu.xrc:412 ../src/wx/xrc/MainMenu.xrc:431
+msgid "Configure ..."
+msgstr "Nastavení ..."
+
+#: ../src/wx/guiinit.cpp:2202
 msgid "Confirm"
 msgstr "Potvrdit"
 
-#: ../src/wx/cmdevents.cpp:711 ../src/wx/cmdevents.cpp:736
-#: ../src/wx/cmdevents.cpp:833
+#: ../src/wx/cmdevents.cpp:2492
+msgid "Confirm Update"
+msgstr "Potvrdit aktualizaci"
+
+#: ../src/wx/cmdevents.cpp:868 ../src/wx/cmdevents.cpp:899
+#: ../src/wx/cmdevents.cpp:1032
 msgid "Confirm import"
 msgstr "Potvrdit import"
 
-#: ../src/wx/guiinit.cpp:72
+#: ../src/wx/guiinit.cpp:75 ../src/wx/xrc/NetLink.xrc:86
 msgid "Connect"
 msgstr "Připojit"
 
-#: ../src/wx/guiinit.cpp:114
+#: ../src/wx/guiinit.cpp:117
 #, c-format
 msgid "Connecting to %s\n"
 msgstr "Připojování k %s\n"
 
-#: ../src/wx/cmdevents.cpp:2163
-#, fuzzy
+#: ../src/wx/cmdevents.cpp:2530
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2015 VBA-M development team"
 msgstr ""
-"Copyright (C) 1999-2003 Forgotten\n"
-"Copyright (C) 2004-2006 VBA development team\n"
-"Copyright (C) 2007-2011 VBA-M development team"
+"Všechna práva vyhrazena (C) 1999-2003 Forgotten\n"
+"Všechna práva vyhrazena (C) 2004-2006 Vývojářský tým VBA\n"
+"Všechna práva vyhrazena (C) 2007-2015 Vývojářský tým VBA-M"
 
-#: ../src/wx/wxvbam.cpp:223
+#: ../src/wx/wxvbam.cpp:322
 msgid "Could not create main window"
-msgstr ""
+msgstr "Nelze vytvořit hlavní okno"
 
-#: ../src/wx/panel.cpp:158 ../src/wx/panel.cpp:250
+#: ../src/wx/panel.cpp:194 ../src/wx/panel.cpp:296
 #, c-format
 msgid "Could not load BIOS %s"
-msgstr "Nelze nahrát BIOS %s"
+msgstr "Nelze načíst BIOS %s"
 
-#: ../src/wx/dsound.cpp:144
+#: ../src/wx/dsound.cpp:156
 #, c-format
 msgid "CreateSoundBuffer(primary) failed %08x"
-msgstr "CreateSoundBuffer(primary) nezdařeno: %08x"
+msgstr "CreateSoundBuffer(hlavní) nezdařeno: %08x"
 
-#: ../src/wx/dsound.cpp:160
+#: ../src/wx/dsound.cpp:175
 #, c-format
 msgid "CreateSoundBuffer(secondary) failed %08x"
 msgstr "CreateSoundBuffer(secondary) nezdařeno: %08x"
 
-#: ../src/wx/guiinit.cpp:1299
+#: ../src/wx/xrc/AccelConfig.xrc:34
+msgid "Current Keys:"
+msgstr "Současné klávesy:"
+
+#: ../src/wx/xrc/MemViewer.xrc:83
+msgid "Current address:"
+msgstr "Současná adresa:"
+
+#: ../src/wx/xrc/AccelConfig.xrc:81
+msgid "Currently assigned to:"
+msgstr "Nyní přiřazeno k:"
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:156
+msgid "Custom Colors"
+msgstr "Vlastní barvy"
+
+#: ../src/wx/xrc/MainMenu.xrc:460
+msgid "D&irectories ..."
+msgstr "&Adresáře ..."
+
+#: ../src/wx/xrc/GBDisassemble.xrc:77
+msgid "DE:"
+msgstr ""
+
+#: ../src/wx/xrc/Logging.xrc:41
+msgid "DMA &0"
+msgstr ""
+
+#: ../src/wx/xrc/Logging.xrc:48
+msgid "DMA &1"
+msgstr ""
+
+#: ../src/wx/xrc/Logging.xrc:55
+msgid "DMA &2"
+msgstr ""
+
+#: ../src/wx/xrc/Logging.xrc:62
+msgid "DMA &3"
+msgstr ""
+
+#: ../src/wx/xrc/GBColorPrefPanel.xrc:12
+msgid "Dark Night"
+msgstr "Temná noc"
+
+#: ../src/wx/xrc/CheatCreate.xrc:127
+msgid "Data size"
+msgstr "Velikost dat"
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:159
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:177
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:199
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:217
+#: ../src/wx/xrc/GameBoyConfig.xrc:138
+msgid "Default"
+msgstr "Výchozí"
+
+#: ../src/wx/guiinit.cpp:1642
 msgid "Default device"
 msgstr "Výchozí zařízení"
 
-#: ../src/wx/wxvbam.cpp:264
+#: ../src/wx/xrc/DisplayConfig.xrc:103
+msgid "Default magnification :"
+msgstr "Výchozí zvětšení :"
+
+#: ../src/wx/xrc/JoyPanel.xrc:351
+msgid "Defaults"
+msgstr "Výchozí"
+
+#: ../src/wx/xrc/CheatList.xrc:29
+msgid "Delete all cheats"
+msgstr "Smazat všechny cheaty"
+
+#: ../src/wx/xrc/CheatList.xrc:24
+msgid "Delete selected cheat"
+msgstr "Smazat vybraný cheat"
+
+#: ../src/wx/wxvbam.cpp:371
 msgid "Delete shared link state first, if it exists"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2601
+#: ../src/wx/guiinit.cpp:3167
 msgid "Description"
 msgstr "Popis"
 
-#: ../src/wx/guiinit.cpp:1413
+#: ../src/wx/xrc/ExportSPS.xrc:22
+msgid "Description:"
+msgstr "Popis:"
+
+#: ../src/wx/guiinit.cpp:1782
 msgid "Desktop mode"
+msgstr "Režim plochy"
+
+#: ../src/wx/xrc/GBROMInfo.xrc:132
+msgid "Dest. code:"
+msgstr "Cílový kód:"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:79
+msgid "Detailed"
+msgstr "Podrobné"
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:64
+msgid "Detect Now"
+msgstr "Zjistit nyní"
+
+#: ../src/wx/xrc/SoundConfig.xrc:139
+msgid "Device"
+msgstr "Zařízení"
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:119
+msgid "Device type:"
+msgstr "Typ zařízení:"
+
+#: ../src/wx/xrc/MainMenu.xrc:605
+msgid "Direct Sound &A"
+msgstr "Direct Sound &A"
+
+#: ../src/wx/xrc/MainMenu.xrc:610
+msgid "Direct Sound &B"
+msgstr "Direct Sound &B"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:183
+msgid "Direct3D 9"
+msgstr "Direct3D 9"
+
+#: ../src/wx/xrc/SoundConfig.xrc:125
+msgid "DirectSound"
+msgstr "DirectSound"
+
+#: ../src/wx/xrc/DirectoriesConfig.xrc:4
+msgid "Directories"
+msgstr "Adresáře"
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:160
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:218
+msgid "Disabled"
+msgstr "Zakázáno"
+
+#: ../src/wx/xrc/Disassemble.xrc:4
+msgid "Disassemble"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2296
+#: ../src/wx/xrc/GameBoyConfig.xrc:48
+msgid "Display &borders :"
+msgstr "Zobrazit &okraje :"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:4
+msgid "Display settings"
+msgstr "Nastavení zobrazení"
+
+#: ../src/wx/xrc/MainMenu.xrc:93
+msgid "Do not change &battery save"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:97
+msgid "Do not change &cheat list"
+msgstr ""
+
+#: ../src/wx/xrc/JoyPanel.xrc:44
+msgid "Down"
+msgstr "Dolů"
+
+#: ../src/wx/guiinit.cpp:2844
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:883
+#: ../src/wx/xrc/CheatCreate.xrc:23
+msgid "E&qual"
+msgstr "&Rovná se"
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:28
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:179
+msgid "EEPROM"
+msgstr "EEPROM"
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:31
+msgid "EEPROM + Sensor"
+msgstr "EEPROM + Senzor"
+
+#: ../src/wx/cmdevents.cpp:1095
 msgid "EEPROM saves cannot be exported"
 msgstr "EEPROM uložení nelze exportovat"
 
-#: ../src/wx/panel.cpp:2080
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:182
+msgid "EEPROM+Sensor"
+msgstr "EEPROM+Senzor"
+
+#: ../src/wx/xrc/SoundConfig.xrc:232
+msgid "Echo"
+msgstr "Ozvěna"
+
+#: ../src/wx/xrc/CheatEdit.xrc:4
+msgid "Edit Cheat"
+msgstr "Upravit cheat"
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:20
+msgid "Emulated &system :"
+msgstr "Emulovaný &systém :  "
+
+#: ../src/wx/xrc/DirectoriesConfig.xrc:72
+#: ../src/wx/xrc/DirectoriesConfig.xrc:79
+msgid "Emulator Saves"
+msgstr "Uložené pozice emulátoru"
+
+#: ../src/wx/xrc/SoundConfig.xrc:154
+msgid "Enable hardware acceleration"
+msgstr "Povolit hardwarovou akceleraci"
+
+#: ../src/wx/xrc/SoundConfig.xrc:147
+msgid "Enable stereo upmixing"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:161
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:219
+msgid "Enabled"
+msgstr "Povoleno"
+
+#: ../src/wx/panel.cpp:2514
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2075
+#: ../src/wx/panel.cpp:2507
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr ""
 
-#: ../src/wx/panel.cpp:2089
+#: ../src/wx/panel.cpp:2525
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:717
+#: ../src/wx/cmdevents.cpp:877
 #, c-format
 msgid "Error loading battery %s"
 msgstr "Chyba nahrávání baterie %s"
 
-#: ../src/wx/cmdevents.cpp:812
+#: ../src/wx/cmdevents.cpp:1008
 #, c-format
 msgid "Error loading code file %s"
 msgstr "Chyba při nahrávání souboru s kódy %s"
 
-#: ../src/wx/cmdevents.cpp:856
+#: ../src/wx/cmdevents.cpp:1061
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "Chyba při nahrávání snapshot souboru %s"
 
-#: ../src/wx/panel.cpp:514
+#: ../src/wx/panel.cpp:637
 #, c-format
 msgid "Error loading state %s"
-msgstr ""
+msgstr "Chyba při načítání stavu %s"
 
-#: ../src/wx/guiinit.cpp:148
+#: ../src/wx/guiinit.cpp:155
 msgid ""
 "Error occurred.\n"
 "Please try again."
@@ -393,71 +1658,148 @@ msgstr ""
 "Nastala chyba.\n"
 "Prosím, zkuste to znovu."
 
-#: ../src/wx/sys.cpp:1046
+#: ../src/wx/sys.cpp:1267
 #, c-format
 msgid "Error opening pseudo tty: %s"
-msgstr ""
+msgstr "Chyba při otevírání pseudo tty: %s"
 
-#: ../src/wx/sys.cpp:180 ../src/wx/sys.cpp:188
+#: ../src/wx/sys.cpp:218 ../src/wx/sys.cpp:229
 msgid "Error reading game recording"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:913
+#: ../src/wx/cmdevents.cpp:1130
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "Chyba  ukládání snapshot souboru %s"
 
-#: ../src/wx/panel.cpp:538
+#: ../src/wx/panel.cpp:661
 #, c-format
 msgid "Error saving state %s"
-msgstr ""
+msgstr "Chyba při ukládání stavu %s"
 
-#: ../src/wx/sys.cpp:1132
+#: ../src/wx/sys.cpp:1366
 #, c-format
 msgid "Error setting up server socket (%d)"
-msgstr ""
+msgstr "Chyba při nastavování soketu serveru (%d)"
 
-#: ../src/wx/cmdevents.cpp:876 ../src/wx/panel.cpp:569
+#: ../src/wx/cmdevents.cpp:1086 ../src/wx/panel.cpp:696
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Chyba zapisování baterie %s"
 
-#: ../src/wx/sys.cpp:124 ../src/wx/sys.cpp:144 ../src/wx/sys.cpp:270
+#: ../src/wx/sys.cpp:147 ../src/wx/sys.cpp:169 ../src/wx/sys.cpp:329
 msgid "Error writing game recording"
 msgstr ""
 
-#: ../src/wx/panel.cpp:894
+#: ../src/wx/panel.cpp:1132
 msgid "Error writing rewind state"
-msgstr ""
+msgstr "Chyba při zápisu stavu přetočení"
 
-#: ../src/wx/cmdevents.cpp:901
+#: ../src/wx/cmdevents.cpp:1116
 msgid "Exported from VisualBoyAdvance-M"
 msgstr "Exportován z VisualBoyAdvance-M"
 
-#: ../src/wx/panel.cpp:753
-#, c-format
-msgid "Failed to change mode to %dx%d-%d@%d"
+#: ../src/wx/xrc/Disassemble.xrc:383
+msgid "F"
 msgstr ""
 
-#: ../src/wx/panel.cpp:739
+#: ../src/wx/panel.cpp:928
+#, c-format
+msgid "Failed to change mode to %dx%d-%d@%d"
+msgstr "Nelze změnit režim na %dx%d-%d@%d"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:201
+msgid "Filters"
+msgstr "Filtry"
+
+#: ../src/wx/xrc/MainMenu.xrc:475
+msgid "Find c&heat ..."
+msgstr "&Najít cheat ..."
+
+#: ../src/wx/xrc/GBOAMViewer.xrc:69 ../src/wx/xrc/OAMViewer.xrc:93
+msgid "Flags:"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:30
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:181
+msgid "Flash"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:191
+msgid "Flash Size:"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:43
+msgid "Flash size :"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:827
+msgid "Flashcart CHT"
+msgstr ""
+
+#: ../src/wx/xrc/GBMapViewer.xrc:90 ../src/wx/xrc/MapViewer.xrc:160
+msgid "Flip:"
+msgstr ""
+
+#: ../src/wx/xrc/CheatAdd.xrc:77
+msgid "Format"
+msgstr "Formát"
+
+#: ../src/wx/xrc/MapViewer.xrc:25
+msgid "Frame"
+msgstr "Snímek"
+
+#: ../src/wx/xrc/MapViewer.xrc:16
+msgid "Frame 0"
+msgstr "Snímek 0"
+
+#: ../src/wx/xrc/MapViewer.xrc:22
+msgid "Frame 1"
+msgstr "Snímek 1"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:15
+msgid "Frame Skip"
+msgstr "Přeskakování snímku"
+
+#: ../src/wx/xrc/MainMenu.xrc:89
+msgid "From &File ..."
+msgstr "Ze &souboru"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:215
+msgid "Fullscreen filter :"
+msgstr ""
+
+#: ../src/wx/panel.cpp:908
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr ""
 
-#: ../src/wx/panel.cpp:709
+#: ../src/wx/panel.cpp:867
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr ""
 
-#: ../src/wx/viewsupt.cpp:681
-msgid "G:"
+#: ../src/wx/xrc/Disassemble.xrc:453 ../src/wx/xrc/GBDisassemble.xrc:222
+msgid "G&oto PC"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1700
+#: ../src/wx/xrc/CheatCreate.xrc:59
+msgid "G&reater or equal"
+msgstr "&větší nebo rovno"
+
+#: ../src/wx/viewsupt.cpp:822
+msgid "G:"
+msgstr "G:"
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:106
+msgid "GBC Boot ROM &file :"
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:1930
 msgid "GDB Connection"
 msgstr "GDB Připojení"
 
-#: ../src/wx/cmdevents.cpp:824
+#: ../src/wx/cmdevents.cpp:1021
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots (*.gsv)|"
 "*.gsv"
@@ -465,114 +1807,268 @@ msgstr ""
 "GS & PAC Snapshoty (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshoty (*.gsv)|"
 "*.gsv"
 
-#: ../src/wx/cmdevents.cpp:544 ../src/wx/guiinit.cpp:607
+#: ../src/wx/xrc/GameBoyConfig.xrc:32 ../src/wx/xrc/SoundConfig.xrc:283
+msgid "Game Boy"
+msgstr "Game Boy"
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:33 ../src/wx/xrc/SoundConfig.xrc:328
+msgid "Game Boy Advance"
+msgstr "Game Boy Advance"
+
+#: ../src/wx/xrc/DirectoriesConfig.xrc:11
+#: ../src/wx/xrc/DirectoriesConfig.xrc:18
+msgid "Game Boy Advance ROMs"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:4
+msgid "Game Boy Advance settings"
+msgstr "Nastavení Game Boy Advance"
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:30
+msgid "Game Boy Color"
+msgstr "Game Boy Color"
+
+#: ../src/wx/xrc/DirectoriesConfig.xrc:42
+#: ../src/wx/xrc/DirectoriesConfig.xrc:49
+msgid "Game Boy Color ROMs"
+msgstr ""
+
+#: ../src/wx/xrc/DirectoriesConfig.xrc:27
+#: ../src/wx/xrc/DirectoriesConfig.xrc:34
+msgid "Game Boy ROMs"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:125
+msgid "Game Code"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:240
+msgid "Game Overrides"
+msgstr ""
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:71
+msgid "Game code:"
+msgstr "Kód hry:"
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:11 ../src/wx/xrc/GBROMInfo.xrc:12
+msgid "Game title:"
+msgstr "Název hry:"
+
+#: ../src/wx/cmdevents.cpp:99
+msgid ""
+"GameBoy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;"
+"*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*."
+"gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy Files (*.dmg;*.gb;*."
+"gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb."
+"gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;"
+"*.7z;*.rar|"
+msgstr ""
+"Soubory GameBoy Advance\n"
+"(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;"
+"*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;"
+"*.mb.z;*.zip;*.7z;*.rar|Soubory GameBoy\n"
+"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;"
+"*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*."
+"sgb.z;*.zip;*.7z;*.rar|"
+
+#: ../src/wx/cmdevents.cpp:154
+msgid ""
+"GameBoy Color Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*."
+"gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*."
+"gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr ""
+"Soubory GameBoy Color\n"
+"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;"
+"*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*."
+"sgb.z;*.zip;*.7z;*.rar|"
+
+#: ../src/wx/cmdevents.cpp:129
+msgid ""
+"GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*."
+"gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*."
+"gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr ""
+"Soubory GameBoy\n"
+"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;"
+"*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*."
+"sgb.z;*.zip;*.7z;*.rar|"
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:4
+msgid "GameBoy settings"
+msgstr "Nastavení GameBoy"
+
+#: ../src/wx/cmdevents.cpp:650 ../src/wx/guiinit.cpp:820
 msgid "GameGenie"
 msgstr "GameGenie"
 
-#: ../src/wx/guiinit.cpp:606
+#: ../src/wx/guiinit.cpp:819 ../src/wx/xrc/JoyPanel.xrc:244
 msgid "GameShark"
 msgstr "GameShark"
 
-#: ../src/wx/guiinit.cpp:610
+#: ../src/wx/guiinit.cpp:825
 msgid "GameShark Advance"
 msgstr "GameShark Advance"
 
-#: ../src/wx/cmdevents.cpp:547
+#: ../src/wx/cmdevents.cpp:654
 msgid "GameShark V3.0"
 msgstr "GameShark V3.0"
 
-#: ../src/wx/cmdevents.cpp:825
+#: ../src/wx/cmdevents.cpp:1022
 msgid "Gameboy Snapshot (*.gbs)|*.gbs"
 msgstr "Gameboy Snapshot (*.gbs)|*.gbs"
 
-#: ../src/wx/cmdevents.cpp:728
+#: ../src/wx/xrc/MainMenu.xrc:160
+msgid "Gameshark &code file..."
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:889
 msgid "Gameshark Code File (*.gcf)|*.gcf"
 msgstr "Gameshark soubor (*.gcf)|*.gcf"
 
-#: ../src/wx/cmdevents.cpp:727
+#: ../src/wx/cmdevents.cpp:888
 msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr "Gameshark soubor (*.spc;*.xpc)|*.spc;*.xpc"
+msgstr "Gameshark soubor s kódy (*.spc;*.xpc)|*.spc;*.xpc"
 
-#: ../src/wx/cmdevents.cpp:889
+#: ../src/wx/cmdevents.cpp:1102
 msgid "Gameshark Snapshot (*.sps)|*.sps"
 msgstr "Gameshark Snapshot (*.sps)|*.sps"
 
-#: ../src/wx/guiinit.cpp:609
+#: ../src/wx/xrc/GeneralConfig.xrc:9
+msgid "General"
+msgstr "Obecné"
+
+#: ../src/wx/xrc/GeneralConfig.xrc:4
+msgid "General settings"
+msgstr "Obecná nastavení"
+
+#: ../src/wx/guiinit.cpp:824
 msgid "Generic Code"
 msgstr "Generický kód"
 
-#: ../src/wx/widgets/joyedit.cpp:100
+#: ../src/wx/xrc/GBColorPrefPanel.xrc:13
+msgid "Green Forest"
+msgstr "Zelený les"
+
+#: ../src/wx/xrc/GBDisassemble.xrc:191
+msgid "H"
+msgstr ""
+
+#: ../src/wx/xrc/GBDisassemble.xrc:94
+msgid "HL:"
+msgstr ""
+
+#: ../src/wx/xrc/DisplayConfig.xrc:231
+msgid "HQ 2x"
+msgstr "HQ 2x"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:235
+msgid "HQ 3x"
+msgstr "HQ 3x"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:237
+msgid "HQ 4x"
+msgstr "HQ 4x"
+
+#: ../src/wx/widgets/joyedit.cpp:130
 #, c-format
 msgid "Hat%dE"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:91
+#: ../src/wx/widgets/joyedit.cpp:118
 #, c-format
 msgid "Hat%dN"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:106
+#: ../src/wx/widgets/joyedit.cpp:138
 #, c-format
 msgid "Hat%dNE"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:103
+#: ../src/wx/widgets/joyedit.cpp:134
 #, c-format
 msgid "Hat%dNW"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:94
+#: ../src/wx/widgets/joyedit.cpp:122
 #, c-format
 msgid "Hat%dS"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:112
+#: ../src/wx/widgets/joyedit.cpp:146
 #, c-format
 msgid "Hat%dSE"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:109
+#: ../src/wx/widgets/joyedit.cpp:142
 #, c-format
 msgid "Hat%dSW"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:97
+#: ../src/wx/widgets/joyedit.cpp:126
 #, c-format
 msgid "Hat%dW"
 msgstr ""
 
-#: ../src/wx/widgets/joyedit.cpp:146
+#: ../src/wx/widgets/joyedit.cpp:187
 msgid ""
 "Hat([0-9]+)((N|North|U|Up)|(S|South|D|Down)|(E|East|R|Right)|(W|West|L|Left)|"
 "(NE|NorthEast|UR|UpRight)|(SE|SouthEast|DR|DownRight)|(SW|SouthWest|DL|"
 "DownLeft)|(NW|NorthWest|UL|UpLeft))"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:87
+#: ../src/wx/guiinit.cpp:92
 msgid "Host name invalid"
-msgstr "Hostname není validní"
+msgstr "Název hostitele není platný"
 
-#: ../src/wx/sys.cpp:702
-msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
+#: ../src/wx/xrc/GBColorPrefPanel.xrc:14
+msgid "Hot Desert"
+msgstr "Horká poušť"
+
+#: ../src/wx/xrc/Disassemble.xrc:369
+msgid "I"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:710
+#: ../src/wx/xrc/GBDisassemble.xrc:145
+msgid "IFF:"
+msgstr ""
+
+#: ../src/wx/xrc/IOViewer.xrc:4
+msgid "IO Viewer"
+msgstr "Prohlížeč vstupu/výstupu..."
+
+#: ../src/wx/xrc/GeneralConfig.xrc:96
+msgid "If not empty or 0, enable rewind (seconds)"
+msgstr ""
+
+#: ../src/wx/xrc/Logging.xrc:34
+msgid "Illegal &read"
+msgstr "&Neplatné čtení"
+
+#: ../src/wx/xrc/Logging.xrc:27
+msgid "Illegal &write"
+msgstr "Neplatný &zápis"
+
+#: ../src/wx/sys.cpp:852
+msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
+msgstr "Obrázkový soubor (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
+
+#: ../src/wx/cmdevents.cpp:867
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr ""
-"Importování souboru s baterií odstraní všechny uložené hry (permanentně po "
+"Importování souboru s baterií odstraní všechny uložené hry (natvralo po "
 "příštím zápise).  Přejete si pokračovat?"
 
-#: ../src/wx/cmdevents.cpp:735
+#: ../src/wx/cmdevents.cpp:898
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
 msgstr ""
-"Nahrávání souboru s kódy přepíše všechny načtené cheaty.  Přejete si "
+"Nahrání souboru s kódy nahradí všechny načtené cheaty.  Přejete si "
 "pokračovat?"
 
-#: ../src/wx/cmdevents.cpp:832
+#: ../src/wx/cmdevents.cpp:1031
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
@@ -580,155 +2076,411 @@ msgstr ""
 "Nahrání snapshot souboru přepíše všechny uložené hry (permanentně po příštím "
 "uložení).  Přejete si pokračovat?"
 
-#: ../src/wx/opts.cpp:667
+#: ../src/wx/xrc/GBPaletteViewer.xrc:67
+msgid "Index:"
+msgstr "Rejstřík:"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:262
+msgid "Interframe blending :"
+msgstr ""
+
+#: ../src/wx/xrc/DisplayConfig.xrc:272
+msgid "Interframe motion blur"
+msgstr ""
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:23
+msgid "Internal title:"
+msgstr ""
+
+#: ../src/wx/opts.cpp:819
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr ""
 
-#: ../src/wx/opts.cpp:513 ../src/wx/opts.cpp:530 ../src/wx/opts.cpp:755
-#: ../src/wx/opts.cpp:775
+#: ../src/wx/opts.cpp:611 ../src/wx/opts.cpp:636 ../src/wx/opts.cpp:946
+#: ../src/wx/opts.cpp:975
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2411
+#: ../src/wx/guiinit.cpp:2977
 #, c-format
 msgid "Invalid menu item %s; removing"
-msgstr ""
+msgstr "Neplatná položka nabídky %s; odstraňování"
 
-#: ../src/wx/opts.cpp:464 ../src/wx/opts.cpp:701
+#: ../src/wx/opts.cpp:543 ../src/wx/opts.cpp:867
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
-msgstr ""
+msgstr "Neplatná hodnota %d pro volbu %s; platné hodnoty jsou %d - %d"
 
-#: ../src/wx/opts.cpp:442 ../src/wx/opts.cpp:686
+#: ../src/wx/opts.cpp:510 ../src/wx/opts.cpp:845
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
-msgstr ""
+msgstr "Neplatná hodnota %s pro volbu %s; platné hodnoty jsou %s%s%s"
 
-#: ../src/wx/widgets/joyedit.cpp:78
+#: ../src/wx/widgets/joyedit.cpp:100
 #, c-format
 msgid "Joy%d-"
-msgstr ""
+msgstr "Joy%d-"
 
-#: ../src/wx/guiinit.cpp:3233
+#: ../src/wx/guiinit.cpp:3834
 msgid "JoyBus host invalid; disabling"
-msgstr ""
+msgstr "Neplatný hostitel JoyBus; probíhá vypínání"
 
-#: ../src/wx/cmdevents.cpp:2391
+#: ../src/wx/xrc/JoypadConfig.xrc:4
+msgid "Joypad Configuration"
+msgstr "Nastavení joypadu"
+
+#: ../src/wx/xrc/AccelConfig.xrc:4
+msgid "Key Shortcuts"
+msgstr "Klávesové zkratky"
+
+#: ../src/wx/xrc/JoyPanel.xrc:89
+msgid "L"
+msgstr "L"
+
+#: ../src/wx/xrc/CheatCreate.xrc:45
+msgid "L&ess or equal"
+msgstr "&Menší nebo rovno"
+
+#: ../src/wx/cmdevents.cpp:2781
 msgid "LAN link is already active.  Disable link mode to disconnect."
-msgstr "LAN spojení je již aktivní.  Zakažte spojení pro odpojení."
+msgstr "LAN spojení je již aktivní. Zakažte režim propojení pro odpojení."
 
-#: ../src/wx/wxvbam.cpp:270
-msgid "List all settable options and exit"
+#: ../src/wx/xrc/DisplayConfig.xrc:232
+msgid "LQ 2x"
+msgstr "LQ 2x"
+
+#: ../src/wx/xrc/Disassemble.xrc:311
+msgid "LR:"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:715 ../src/wx/panel.cpp:312
+#: ../src/wx/xrc/GBDisassemble.xrc:162
+msgid "LY:"
+msgstr ""
+
+#: ../src/wx/xrc/JoyPanel.xrc:74
+msgid "Left"
+msgstr "Doleva"
+
+#: ../src/wx/xrc/SoundConfig.xrc:262
+msgid "Left/Right"
+msgstr ""
+
+#: ../src/wx/xrc/GBROMInfo.xrc:144
+msgid "License code:"
+msgstr "Kód licence:"
+
+#: ../src/wx/xrc/LinkConfig.xrc:4
+msgid "Link configuration"
+msgstr "Nastavení propojení"
+
+#: ../src/wx/xrc/LinkConfig.xrc:11
+msgid "Link timeout (in milliseconds)"
+msgstr "Časový limit propojení (v milisekundách)"
+
+#: ../src/wx/xrc/MainMenu.xrc:471
+msgid "List &cheats ..."
+msgstr "&Seznam cheatů"
+
+#: ../src/wx/wxvbam.cpp:379
+msgid "List all settable options and exit"
+msgstr "Vypsat všechny nastavitelné volby a ukončit"
+
+#: ../src/wx/cmdevents.cpp:875 ../src/wx/panel.cpp:363
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Nahrána baterie %s"
 
-#: ../src/wx/guiinit.cpp:232 ../src/wx/panel.cpp:338
+#: ../src/wx/guiinit.cpp:254 ../src/wx/panel.cpp:425
 msgid "Loaded cheats"
-msgstr "Nahrané cheaty"
+msgstr "Načtené cheaty"
 
-#: ../src/wx/cmdevents.cpp:810
+#: ../src/wx/cmdevents.cpp:1006
 #, c-format
 msgid "Loaded code file %s"
-msgstr "Nahrán soubor s kódy %s"
+msgstr "Načten soubor s kódy %s "
 
-#: ../src/wx/cmdevents.cpp:854
+#: ../src/wx/cmdevents.cpp:1059
 #, c-format
 msgid "Loaded snapshot file %s"
-msgstr "Nahrán snapshot soubor %s"
+msgstr "Nahrán soubor se snímkem %s"
 
-#: ../src/wx/panel.cpp:514
+#: ../src/wx/panel.cpp:637
 #, c-format
 msgid "Loaded state %s"
-msgstr ""
+msgstr "Stav %s načten"
 
-#: ../src/wx/guiinit.cpp:2178
+#: ../src/wx/xrc/Logging.xrc:4
+msgid "Logging"
+msgstr "Záznam"
+
+#: ../src/wx/xrc/SoundConfig.xrc:223
+msgid "Lots"
+msgstr "Spoustu"
+
+#: ../src/wx/xrc/MainMenu.xrc:520
+msgid "M&emory Viewer..."
+msgstr "Prohlížeč p&aměti..."
+
+#: ../src/wx/guiinit.cpp:2704
 msgid "Main display panel not found"
-msgstr "Hlavní display panel nenalezen"
+msgstr "Panel hlavního displeje nenalezen"
 
-#: ../src/wx/guiinit.cpp:2192
+#: ../src/wx/guiinit.cpp:2719
 msgid "Main icon not found"
 msgstr "Hlavní ikona nenalezena"
 
-#: ../src/wx/viewers.cpp:615 ../src/wx/viewers.cpp:662
+#: ../src/wx/xrc/GBAROMInfo.xrc:107
+msgid "Main unit code:"
+msgstr "Kód hlavní jednotky:"
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:83 ../src/wx/xrc/GBROMInfo.xrc:24
+msgid "Maker code:"
+msgstr "Kód tvůrce:"
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:95 ../src/wx/xrc/GBROMInfo.xrc:36
+msgid "Maker name:"
+msgstr "Název tvůrce:"
+
+#: ../src/wx/xrc/GBMapViewer.xrc:42
+msgid "Map Base"
+msgstr ""
+
+#: ../src/wx/xrc/MapViewer.xrc:84
+msgid "Map Base:"
+msgstr ""
+
+#: ../src/wx/xrc/MapViewer.xrc:4
+msgid "Map Viewer"
+msgstr ""
+
+#: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:313
+msgid "Maximum"
+msgstr "Maximální"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:124
+msgid "Maximum magnification factor :"
+msgstr "Maximální faktor zvětšení :"
+
+#: ../src/wx/xrc/MemViewer.xrc:4
+msgid "Memory Viewer"
+msgstr "Prohlížeč paměti"
+
+#: ../src/wx/viewers.cpp:688 ../src/wx/viewers.cpp:760
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
 msgstr "Výpisy paměti (*.dmp;*.bin)|*.dmp;*.bin|"
 
-#: ../src/wx/guiinit.cpp:2309
+#: ../src/wx/guiinit.cpp:2861
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr ""
+"Klávesová zkratka nabídky %s pro %s přepisuje výchozí pro %s ; ponechána "
+"zkratka nabídky"
 
-#: ../src/wx/guiinit.cpp:3119
+#: ../src/wx/guiinit.cpp:3690
 msgid "Menu commands"
-msgstr "Menu příkazy"
+msgstr "Příkazy nabídky"
 
-#: ../src/wx/widgets/keyedit.cpp:140
+#: ../src/wx/widgets/keyedit.cpp:178
 msgid "Meta+"
-msgstr ""
+msgstr "Meta+"
 
-#: ../src/wx/widgets/keyedit.cpp:95 ../src/wx/widgets/keyedit.cpp:139
+#: ../src/wx/widgets/keyedit.cpp:122 ../src/wx/widgets/keyedit.cpp:177
 msgid "Meta-"
+msgstr "Meta-"
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:209
+msgid "Mirroring:"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2396
-#, fuzzy
-msgid "Network is not supported in local mode."
-msgstr "RFU je v současnosti podporováno jen v lokálním módu."
+#: ../src/wx/xrc/Disassemble.xrc:414 ../src/wx/xrc/MapViewer.xrc:76
+#: ../src/wx/xrc/OAMViewer.xrc:37
+msgid "Mode:"
+msgstr "Režim:"
 
-#: ../src/wx/guiinit.cpp:2680
+#: ../src/wx/xrc/MapViewer.xrc:124
+msgid "Mosaic:"
+msgstr "Mozaika:"
+
+#: ../src/wx/xrc/MainMenu.xrc:39
+msgid "Most &recent"
+msgstr "&Nedávné"
+
+#: ../src/wx/xrc/JoyPanel.xrc:202
+msgid "Motion Down"
+msgstr "Pohyb dolů"
+
+#: ../src/wx/xrc/JoyPanel.xrc:230
+msgid "Motion Left/Dark"
+msgstr ""
+
+#: ../src/wx/xrc/JoyPanel.xrc:258
+msgid "Motion Right/Light"
+msgstr ""
+
+#: ../src/wx/xrc/JoyPanel.xrc:174
+msgid "Motion Up"
+msgstr "Pohyb nahoru"
+
+#: ../src/wx/xrc/SoundConfig.xrc:34
+msgid "Mute"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:362 ../src/wx/xrc/GBDisassemble.xrc:185
+msgid "N"
+msgstr ""
+
+#: ../src/wx/xrc/DirectoriesConfig.xrc:57
+#: ../src/wx/xrc/DirectoriesConfig.xrc:64
+msgid "Native Saves"
+msgstr "Uložené pozice hry"
+
+#: ../src/wx/cmdevents.cpp:2788
+msgid "Network is not supported in local mode."
+msgstr "Síť není podporována v místním režimu."
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:57
+msgid "Never"
+msgstr "Nikdy"
+
+#: ../src/wx/wxvbam.cpp:789
+msgid "New Update Available"
+msgstr "Jsou dostupné nové aktualizace"
+
+#: ../src/wx/guiinit.cpp:3243
 msgid "New Value"
 msgstr "Nová hodnota"
 
-#: ../src/wx/cmdevents.cpp:2162
+#: ../src/wx/cmdevents.cpp:2529
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
-msgstr "Nintendo GameBoy (+Color+Advance) emulátor."
+msgstr "Emulátor Nintendo GameBoy (+Color+Advance)."
 
-#: ../src/wx/sys.cpp:109 ../src/wx/sys.cpp:159
+#: ../src/wx/sys.cpp:124 ../src/wx/sys.cpp:187
 msgid "No game in progress to record"
 msgstr ""
 
-#: ../src/wx/panel.cpp:887
+#: ../src/wx/panel.cpp:1122
 msgid "No memory for rewinding"
+msgstr "Žádná paměť pro přetočení"
+
+#: ../src/wx/xrc/GeneralConfig.xrc:153
+msgid "No throttle"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:1546
+#: ../src/wx/guiinit.cpp:1940
 #, c-format
 msgid "No usable rpi plugins found in %s"
-msgstr "Použitelné rpi pluginy nenalezeny v %s"
+msgstr "V %s nenalezeny žádné použitelné zásuvné moduly rpi"
 
-#: ../src/wx/cmdevents.cpp:596 ../src/wx/guiinit.cpp:1509
+#: ../src/wx/cmdevents.cpp:722 ../src/wx/guiinit.cpp:1895
+#: ../src/wx/xrc/DisplayConfig.xrc:77 ../src/wx/xrc/DisplayConfig.xrc:221
+#: ../src/wx/xrc/DisplayConfig.xrc:270
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:183
+#: ../src/wx/xrc/SoundConfig.xrc:212 ../src/wx/xrc/SoundConfig.xrc:302
 msgid "None"
-msgstr "Není"
+msgstr "Žádné"
 
-#: ../src/wx/panel.cpp:808
+#: ../src/wx/panel.cpp:997
 msgid "Not a valid GBA cartridge"
-msgstr "Není validní GBA cartridge"
+msgstr "Není platná karta GBA"
 
-#: ../src/wx/guiinit.cpp:670 ../src/wx/guiinit.cpp:876
+#: ../src/wx/xrc/ExportSPS.xrc:34
+msgid "Notes:"
+msgstr "Poznámky:"
+
+#: ../src/wx/guiinit.cpp:889 ../src/wx/guiinit.cpp:1162
 msgid "Number cannot be empty"
 msgstr "Číslo nemůže být prázdné"
 
-#: ../src/wx/guiinit.cpp:2679
+#: ../src/wx/xrc/SoundConfig.xrc:183
+msgid "Number of sound buffers:"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:576
+msgid "O&BJ WIN"
+msgstr ""
+
+#: ../src/wx/xrc/OAMViewer.xrc:4
+msgid "OAM Viewer"
+msgstr ""
+
+#: ../src/wx/xrc/GBOAMViewer.xrc:53
+msgid "OAP:"
+msgstr ""
+
+#: ../src/wx/xrc/CheatCreate.xrc:144
+msgid "Ol&d value"
+msgstr "&Stará hodnota"
+
+#: ../src/wx/guiinit.cpp:3242
 msgid "Old Value"
 msgstr "Stará hodnota"
 
-#: ../src/wx/cmdevents.cpp:107
-msgid "Open ROM file"
-msgstr "Otevřít ROM soubor"
+#: ../src/wx/xrc/DisplayConfig.xrc:93
+msgid "On-Screen Display"
+msgstr ""
 
-#: ../src/wx/openal.cpp:162
+#: ../src/wx/wxvbam.cpp:774
+msgid "Online Update"
+msgstr "Aktualizace online"
+
+#: ../src/wx/wxvbam.cpp:773
+msgid ""
+"Online updates are available on Windows only. Please browse this site for "
+"updates.\n"
+"\n"
+"https://sourceforge.net/projects/vbam/files/latest/download"
+msgstr ""
+"Aktualizace online jsou dostupné pouze pro Windows. Navštivte tuto stránku "
+"pro jejich získání.\n"
+"\n"
+"https://sourceforge.net/projects/vbam/files/latest/download"
+
+#: ../src/wx/xrc/MainMenu.xrc:8
+msgid "Open &GB..."
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:137
+msgid "Open GB ROM file"
+msgstr "Otevřít soubor GB ROM"
+
+#: ../src/wx/xrc/MainMenu.xrc:11
+msgid "Open GB&C..."
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:162
+msgid "Open GBC ROM file"
+msgstr "Otevřít soubor GBC ROM"
+
+#: ../src/wx/cmdevents.cpp:112
+msgid "Open ROM file"
+msgstr "Otevřít soubor ROM"
+
+#: ../src/wx/xrc/CheatList.xrc:11
+msgid "Open cheat list"
+msgstr "Otevřít seznam cheatů"
+
+#: ../src/wx/xrc/MainMenu.xrc:14
+msgid "Open rece&nt"
+msgstr "Otevřít &nedávné"
+
+#: ../src/wx/xrc/SoundConfig.xrc:111
+msgid "OpenAL"
+msgstr "OpenAL"
+
+#: ../src/wx/openal.cpp:157
 msgid ""
 "OpenAL library could not be found on your system.  Please install the "
 "runtime from http://openal.org"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:349
+#: ../src/wx/xrc/DisplayConfig.xrc:176
+msgid "OpenGL"
+msgstr "OpenGL"
+
+#: ../src/wx/wxvbam.cpp:475
 msgid ""
 "Options set from the command line are saved if any configuration changes are "
 "made in the user interface.\n"
@@ -737,285 +2489,767 @@ msgid ""
 "\n"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:3140
+#: ../src/wx/guiinit.cpp:3717
 msgid "Other commands"
 msgstr "Jiné příkazy"
 
-#: ../src/wx/cmdevents.cpp:935 ../src/wx/viewsupt.cpp:1025
+#: ../src/wx/xrc/DisplayConfig.xrc:151
+msgid "Output module"
+msgstr "Výstupní modul"
+
+#: ../src/wx/xrc/MapViewer.xrc:132
+msgid "Overflow:"
+msgstr "Přetečení:"
+
+#: ../src/wx/xrc/Disassemble.xrc:328 ../src/wx/xrc/GBDisassemble.xrc:128
+msgid "PC:"
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:1146 ../src/wx/viewsupt.cpp:1227
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG obrázky|*.png|BMP obrázky|*.bmp"
 
-#: ../src/wx/sys.cpp:281
+#: ../src/wx/xrc/GBOAMViewer.xrc:61 ../src/wx/xrc/OAMViewer.xrc:53
+msgid "Pal:"
+msgstr ""
+
+#: ../src/wx/xrc/PaletteViewer.xrc:4
+msgid "Palette Viewer"
+msgstr "Prohlížeč palety"
+
+#: ../src/wx/xrc/GBMapViewer.xrc:98 ../src/wx/xrc/GBTileViewer.xrc:50
+#: ../src/wx/xrc/MapViewer.xrc:168 ../src/wx/xrc/TileViewer.xrc:66
+msgid "Palette:"
+msgstr "Paleta:"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:78
+msgid "Percentage"
+msgstr "Procenta"
+
+#: ../src/wx/xrc/GBColorPrefPanel.xrc:15
+msgid "Pink Dreams"
+msgstr "Růžové sny"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:225
+msgid "Pixelate"
+msgstr ""
+
+#: ../src/wx/sys.cpp:345
 msgid "Playback ended"
 msgstr "Konec přehrávání"
 
-#: ../src/wx/guiinit.cpp:1586
+#: ../src/wx/xrc/JoypadConfig.xrc:13
+msgid "Player 1"
+msgstr "Hráč 1"
+
+#: ../src/wx/xrc/JoypadConfig.xrc:19
+msgid "Player 2"
+msgstr "Hráč 2"
+
+#: ../src/wx/xrc/JoypadConfig.xrc:25
+msgid "Player 3"
+msgstr "Hráč 3"
+
+#: ../src/wx/xrc/JoypadConfig.xrc:31
+msgid "Player 4"
+msgstr "Hráč 4"
+
+#: ../src/wx/xrc/NetLink.xrc:32
+msgid "Players:"
+msgstr "Hráči:"
+
+#: ../src/wx/guiinit.cpp:1996
 msgid "Please select a plugin or a different filter"
-msgstr "Vyberte prosím plugin nebo jiný filtr"
+msgstr "Vyberte prosím zásuvný modul nebo jiný filtr"
 
-#: ../src/wx/guiinit.cpp:1563
+#: ../src/wx/guiinit.cpp:1963 ../src/wx/xrc/DisplayConfig.xrc:242
 msgid "Plugin"
-msgstr "Plugin"
+msgstr "Zásuvný modul"
 
-#: ../src/wx/guiinit.cpp:1587
+#: ../src/wx/xrc/DisplayConfig.xrc:250
+msgid "Plugin :"
+msgstr "Zásuvný modul :"
+
+#: ../src/wx/guiinit.cpp:1997
 msgid "Plugin selection error"
-msgstr "Chyba ve výběru pluginu"
+msgstr "Chyba při výběru zásuvného modulu"
 
-#: ../src/wx/cmdevents.cpp:1699
+#: ../src/wx/cmdevents.cpp:1929
 msgid "Port to wait for connection:"
 msgstr "Port kde očekávat připojení:"
 
-#: ../src/wx/wxvbam.cpp:259
+#: ../src/wx/xrc/GBOAMViewer.xrc:29 ../src/wx/xrc/OAMViewer.xrc:29
+msgid "Pos:"
+msgstr ""
+
+#: ../src/wx/xrc/GBPrinter.xrc:21
+msgid "Print Si&ze"
+msgstr ""
+
+#: ../src/wx/wxvbam.cpp:362
 msgid "Print configuration path and exit"
-msgstr ""
+msgstr "Vypsat cestu pro nastavení a ukončit"
 
-#: ../src/wx/sys.cpp:788
+#: ../src/wx/sys.cpp:949
 msgid "Printed"
+msgstr "Vytisknuto"
+
+#: ../src/wx/xrc/GBOAMViewer.xrc:45 ../src/wx/xrc/OAMViewer.xrc:69
+msgid "Prio:"
 msgstr ""
 
-#: ../src/wx/panel.cpp:63 ../src/wx/panel.cpp:115 ../src/wx/panel.cpp:178
+#: ../src/wx/xrc/GBMapViewer.xrc:106 ../src/wx/xrc/MapViewer.xrc:116
+msgid "Priority:"
+msgstr "Priorita:"
+
+#: ../src/wx/panel.cpp:77 ../src/wx/panel.cpp:140 ../src/wx/panel.cpp:223
 msgid "Problem loading file"
 msgstr "Chyba při načítání souboru"
 
-#: ../src/wx/viewsupt.cpp:676
-msgid "R:"
+#: ../src/wx/xrc/JoyPanel.xrc:119
+msgid "R"
+msgstr "R"
+
+#: ../src/wx/xrc/Disassemble.xrc:73
+msgid "R0:"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:481
+#: ../src/wx/xrc/Disassemble.xrc:243
+msgid "R10:"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:260
+msgid "R11:"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:277
+msgid "R12:"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:90
+msgid "R1:"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:107
+msgid "R2:"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:124
+msgid "R3:"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:141
+msgid "R4:"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:158
+msgid "R5:"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:175
+msgid "R6:"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:192
+msgid "R7:"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:209
+msgid "R8:"
+msgstr ""
+
+#: ../src/wx/xrc/Disassemble.xrc:226
+msgid "R9:"
+msgstr ""
+
+#: ../src/wx/viewsupt.cpp:817
+msgid "R:"
+msgstr "R:"
+
+#: ../src/wx/xrc/GBROMInfo.xrc:120
+msgid "RAM size:"
+msgstr "Velikost RAM:"
+
+#: ../src/wx/cmdevents.cpp:566
 msgid "ROM"
 msgstr "ROM"
 
-#: ../src/wx/wxvbam.cpp:272
+#: ../src/wx/xrc/GBAROMInfo.xrc:150
+msgid "ROM Information"
+msgstr "Informace o ROM"
+
+#: ../src/wx/wxvbam.cpp:383
 msgid "ROM file"
+msgstr "Soubor ROM"
+
+#: ../src/wx/xrc/MainMenu.xrc:24
+msgid "ROM in&formation..."
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:553
+#: ../src/wx/xrc/GBROMInfo.xrc:108
+msgid "ROM size:"
+msgstr "Velikost ROM:"
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:131 ../src/wx/xrc/GBROMInfo.xrc:72
+msgid "ROM version:"
+msgstr "Verze ROM:"
+
+#: ../src/wx/cmdevents.cpp:662
 msgid "ROM+BANDAI TAMA5"
 msgstr "ROM+BANDAI TAMA5"
 
-#: ../src/wx/cmdevents.cpp:559
+#: ../src/wx/cmdevents.cpp:670
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: ../src/wx/cmdevents.cpp:556
+#: ../src/wx/cmdevents.cpp:666
 msgid "ROM+HuC-3"
 msgstr "ROM+HuC-3"
 
-#: ../src/wx/cmdevents.cpp:484
+#: ../src/wx/cmdevents.cpp:570
 msgid "ROM+MBC1"
 msgstr "ROM+MBC1"
 
-#: ../src/wx/cmdevents.cpp:487
+#: ../src/wx/cmdevents.cpp:574
 msgid "ROM+MBC1+RAM"
 msgstr "ROM+MBC1+RAM"
 
-#: ../src/wx/cmdevents.cpp:490
+#: ../src/wx/cmdevents.cpp:578
 msgid "ROM+MBC1+RAM+BATT"
 msgstr "ROM+MBC1+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:493
+#: ../src/wx/cmdevents.cpp:582
 msgid "ROM+MBC2"
 msgstr "ROM+MBC2"
 
-#: ../src/wx/cmdevents.cpp:496
+#: ../src/wx/cmdevents.cpp:586
 msgid "ROM+MBC2+BATT"
 msgstr "ROM+MBC2+BATT"
 
-#: ../src/wx/cmdevents.cpp:514
+#: ../src/wx/cmdevents.cpp:610
 msgid "ROM+MBC3"
 msgstr "ROM+MBC3"
 
-#: ../src/wx/cmdevents.cpp:517
+#: ../src/wx/cmdevents.cpp:614
 msgid "ROM+MBC3+RAM"
 msgstr "ROM+MBC3+RAM"
 
-#: ../src/wx/cmdevents.cpp:520
+#: ../src/wx/cmdevents.cpp:618
 msgid "ROM+MBC3+RAM+BATT"
 msgstr "ROM+MBC3+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:508
+#: ../src/wx/cmdevents.cpp:602
 msgid "ROM+MBC3+TIMER+BATT"
 msgstr "ROM+MBC3+TIMER+BATT"
 
-#: ../src/wx/cmdevents.cpp:511
+#: ../src/wx/cmdevents.cpp:606
 msgid "ROM+MBC3+TIMER+RAM+BATT"
 msgstr "ROM+MBC3+TIMER+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:523
+#: ../src/wx/cmdevents.cpp:622
 msgid "ROM+MBC5"
 msgstr "ROM+MBC5"
 
-#: ../src/wx/cmdevents.cpp:526
+#: ../src/wx/cmdevents.cpp:626
 msgid "ROM+MBC5+RAM"
 msgstr "ROM+MBC5+RAM"
 
-#: ../src/wx/cmdevents.cpp:529
+#: ../src/wx/cmdevents.cpp:630
 msgid "ROM+MBC5+RAM+BATT"
 msgstr "ROM+MBC5+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:532
+#: ../src/wx/cmdevents.cpp:634
 msgid "ROM+MBC5+RUMBLE"
 msgstr "ROM+MBC5+RUMBLE"
 
-#: ../src/wx/cmdevents.cpp:535
+#: ../src/wx/cmdevents.cpp:638
 msgid "ROM+MBC5+RUMBLE+RAM"
 msgstr "ROM+MBC5+RUMBLE+RAM"
 
-#: ../src/wx/cmdevents.cpp:538
+#: ../src/wx/cmdevents.cpp:642
 msgid "ROM+MBC5+RUMBLE+RAM+BATT"
 msgstr "ROM+MBC5+RUMBLE+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:541
+#: ../src/wx/cmdevents.cpp:646
 msgid "ROM+MBC7+BATT"
 msgstr "ROM+MBC7+BATT"
 
-#: ../src/wx/cmdevents.cpp:499
+#: ../src/wx/cmdevents.cpp:590
 msgid "ROM+MMM01"
 msgstr "ROM+MMM01"
 
-#: ../src/wx/cmdevents.cpp:502
+#: ../src/wx/cmdevents.cpp:594
 msgid "ROM+MMM01+RAM"
 msgstr "ROM+MMM01+RAM"
 
-#: ../src/wx/cmdevents.cpp:505
+#: ../src/wx/cmdevents.cpp:598
 msgid "ROM+MMM01+RAM+BATT"
 msgstr "ROM+MMM01+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:550
+#: ../src/wx/cmdevents.cpp:658
 msgid "ROM+POCKET CAMERA"
 msgstr "ROM+POCKET CAMERA"
 
-#: ../src/wx/guiinit.cpp:280 ../src/wx/guiinit.cpp:297
+#: ../src/wx/xrc/Disassemble.xrc:460 ../src/wx/xrc/GBDisassemble.xrc:229
+msgid "Re&fresh"
+msgstr "&Obnovit"
+
+#: ../src/wx/xrc/AccelConfig.xrc:67
+msgid "Re&set All"
+msgstr "Re&setovat vše"
+
+#: ../src/wx/xrc/MainMenu.xrc:226
+msgid "Re&wind"
+msgstr "&Přetočit"
+
+#: ../src/wx/xrc/GBColorPrefPanel.xrc:18
+msgid "Real 'GB on GBASP' Colors"
+msgstr ""
+
+#: ../src/wx/xrc/GBColorPrefPanel.xrc:17
+msgid "Real GB Colors"
+msgstr "Opravdové barvy GB"
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:151
+msgid "Real Time Clock:"
+msgstr "Opravdové hodiny:"
+
+#: ../src/wx/xrc/DirectoriesConfig.xrc:102
+#: ../src/wx/xrc/DirectoriesConfig.xrc:109
+msgid "Recordings"
+msgstr "Nahrávky"
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:47
+msgid "Release Number:"
+msgstr ""
+
+#: ../src/wx/guiinit.cpp:354 ../src/wx/guiinit.cpp:378
 msgid "Removing cheats"
 msgstr "Odstraňují se cheaty"
 
-#: ../src/wx/guiinit.cpp:279 ../src/wx/guiinit.cpp:296
+#: ../src/wx/xrc/MainMenu.xrc:620
+msgid "Report &Bugs"
+msgstr "Nahlásit &chyby"
+
+#: ../src/wx/xrc/GBColorPrefPanel.xrc:94
+msgid "Restore"
+msgstr "Obnovit"
+
+#: ../src/wx/guiinit.cpp:353 ../src/wx/guiinit.cpp:377
 msgid "Restore old values?"
 msgstr "Obnovit staré hodnoty?"
 
-#: ../src/wx/widgets/keyedit.cpp:78 ../src/wx/widgets/keyedit.cpp:166
+#: ../src/wx/xrc/JoyPanel.xrc:104
+msgid "Right"
+msgstr "Doprava"
+
+#: ../src/wx/xrc/GBAROMInfo.xrc:4 ../src/wx/xrc/GBROMInfo.xrc:4
+msgid "Rom Information"
+msgstr ""
+
+#: ../src/wx/xrc/OAMViewer.xrc:85
+msgid "Rot.:"
+msgstr "Otočení:"
+
+#: ../src/wx/xrc/CheatCreate.xrc:77
+msgid "S&igned"
+msgstr "&Se znaménkem"
+
+#: ../src/wx/xrc/SoundConfig.xrc:103
+msgid "SDL"
+msgstr "SDL"
+
+#: ../src/wx/widgets/keyedit.cpp:100 ../src/wx/widgets/keyedit.cpp:206
 msgid "SHIFT"
+msgstr "SHIFT"
+
+#: ../src/wx/xrc/Disassemble.xrc:294 ../src/wx/xrc/GBDisassemble.xrc:111
+msgid "SP:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:255
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:29
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:180
+msgid "SRAM"
+msgstr "SRAM"
+
+#: ../src/wx/xrc/Logging.xrc:13
+msgid "SW&I"
+msgstr ""
+
+#: ../src/wx/xrc/SoundConfig.xrc:71
+msgid "Sample rate :"
+msgstr "Vzorkovací frekvence :"
+
+#: ../src/wx/xrc/GBPaletteViewer.xrc:27 ../src/wx/xrc/PaletteViewer.xrc:105
+msgid "Save &BG..."
+msgstr ""
+
+#: ../src/wx/xrc/GBPaletteViewer.xrc:48 ../src/wx/xrc/PaletteViewer.xrc:111
+msgid "Save &Sprite..."
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:169
+msgid "Save Type:"
+msgstr "Typ uložení:"
+
+#: ../src/wx/wxvbam.cpp:354
 msgid "Save built-in XRC file and exit"
-msgstr ""
+msgstr "Uložit soubor zabudovaného XRC a ukončit"
 
-#: ../src/wx/wxvbam.cpp:257
+#: ../src/wx/wxvbam.cpp:358
 msgid "Save built-in vba-over.ini and exit"
-msgstr ""
+msgstr "Uložit zabudované vba-over.ini a ukončit"
 
-#: ../src/wx/sys.cpp:709
+#: ../src/wx/xrc/CheatList.xrc:15
+msgid "Save cheat list"
+msgstr "Uložit seznam cheatů"
+
+#: ../src/wx/sys.cpp:861
 msgid "Save printer image to"
-msgstr ""
+msgstr "Uložit obrázek tiskárny do"
 
-#: ../src/wx/guiinit.cpp:255
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:77
+msgid "Save type"
+msgstr "Typ uložení"
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:21
+msgid "Save type :"
+msgstr "Typ uložení :"
+
+#: ../src/wx/guiinit.cpp:315
 msgid "Saved cheats"
 msgstr "Uložené cheaty"
 
-#: ../src/wx/cmdevents.cpp:911
+#: ../src/wx/cmdevents.cpp:1128
 #, c-format
 msgid "Saved snapshot file %s"
-msgstr "Uložen snapshot soubor %s"
+msgstr "Soubor snímku %s uložen"
 
-#: ../src/wx/panel.cpp:538
+#: ../src/wx/panel.cpp:661
 #, c-format
 msgid "Saved state %s"
+msgstr "Stav %s uložen"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:229
+msgid "Scanlines"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:698
+#: ../src/wx/xrc/GBAROMInfo.xrc:35
+msgid "Scene Release:"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:178
+msgid "Screen capt&ure..."
+msgstr ""
+
+#: ../src/wx/xrc/JoyPanel.xrc:320
+msgid "Screenshot"
+msgstr "Snímek obrazovky"
+
+#: ../src/wx/xrc/GeneralConfig.xrc:64
+msgid "Screenshot Format:"
+msgstr "Formát snímku obrazovky:"
+
+#: ../src/wx/xrc/DirectoriesConfig.xrc:87
+#: ../src/wx/xrc/DirectoriesConfig.xrc:94
+msgid "Screenshots"
+msgstr "Snímky obrazovky"
+
+#: ../src/wx/guiinit.cpp:930
 #, c-format
 msgid "Search produced %d results.  Please refine better"
 msgstr "Nalezeno %d výsledků.  Prosím, blíže specifikujte"
 
-#: ../src/wx/guiinit.cpp:708
+#: ../src/wx/guiinit.cpp:943
 msgid "Search produced no results"
-msgstr "Nebylo nic nalezeno"
+msgstr "Hledání nic nenalezlo"
 
-#: ../src/wx/cmdevents.cpp:671 ../src/wx/cmdevents.cpp:685
-#, fuzzy
+#: ../src/wx/xrc/CheatCreate.xrc:163
+msgid "Search value"
+msgstr "Hledat hodnotu"
+
+#: ../src/wx/xrc/JoyPanel.xrc:135
+msgid "Select"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:91 ../src/wx/xrc/GameBoyConfig.xrc:113
+msgid "Select A File"
+msgstr "Vyberte soubor"
+
+#: ../src/wx/cmdevents.cpp:821 ../src/wx/cmdevents.cpp:837
 msgid "Select Dot Code file"
-msgstr "Vybrat soubor s kódy"
+msgstr "Vybrat soubor s tečkovým kódem"
 
-#: ../src/wx/cmdevents.cpp:703 ../src/wx/cmdevents.cpp:865
+#: ../src/wx/cmdevents.cpp:858 ../src/wx/cmdevents.cpp:1072
 msgid "Select battery file"
 msgstr "Vybrat soubor s baterií"
 
-#: ../src/wx/guiinit.cpp:217 ../src/wx/guiinit.cpp:240
+#: ../src/wx/guiinit.cpp:231 ../src/wx/guiinit.cpp:296
 msgid "Select cheat file"
-msgstr "Vybrat soubor s cheaty"
+msgstr "Vyberte soubor s cheaty"
 
-#: ../src/wx/cmdevents.cpp:725
+#: ../src/wx/cmdevents.cpp:886
 msgid "Select code file"
 msgstr "Vybrat soubor s kódy"
 
-#: ../src/wx/cmdevents.cpp:1150
+#: ../src/wx/cmdevents.cpp:1354
 msgid "Select file"
 msgstr "Vybrat soubor"
 
-#: ../src/wx/viewers.cpp:617
+#: ../src/wx/viewers.cpp:690
 msgid "Select memory dump file"
-msgstr ""
+msgstr "Vyberte soubor výpisu paměti"
 
-#: ../src/wx/cmdevents.cpp:934 ../src/wx/cmdevents.cpp:1011
-#: ../src/wx/cmdevents.cpp:1083 ../src/wx/cmdevents.cpp:1119
-#: ../src/wx/viewers.cpp:495 ../src/wx/viewers.cpp:664
-#: ../src/wx/viewsupt.cpp:1024
+#: ../src/wx/cmdevents.cpp:1145 ../src/wx/cmdevents.cpp:1230
+#: ../src/wx/cmdevents.cpp:1306 ../src/wx/cmdevents.cpp:1333
+#: ../src/wx/viewers.cpp:555 ../src/wx/viewers.cpp:762
+#: ../src/wx/viewsupt.cpp:1226
 msgid "Select output file"
-msgstr "Vybrat výstupní soubor"
+msgstr "Vyberte výstupní soubor"
 
-#: ../src/wx/gfxviewers.cpp:1098
+#: ../src/wx/gfxviewers.cpp:1274
 msgid "Select output file and type"
-msgstr "Vybrat výstupní soubor a typ"
+msgstr "Vyberte výstupní soubor a typ"
 
-#: ../src/wx/cmdevents.cpp:822 ../src/wx/cmdevents.cpp:888
+#: ../src/wx/cmdevents.cpp:1019 ../src/wx/cmdevents.cpp:1101
 msgid "Select snapshot file"
-msgstr "Vybrat snapshot soubor"
+msgstr "Vyberte soubor se snímkem"
 
-#: ../src/wx/cmdevents.cpp:1295 ../src/wx/cmdevents.cpp:1377
+#: ../src/wx/cmdevents.cpp:1505 ../src/wx/cmdevents.cpp:1590
 msgid "Select state file"
 msgstr "Vybrat uložení"
 
-#: ../src/wx/guiinit.cpp:111
+#: ../src/wx/xrc/NetLink.xrc:11
+msgid "Server"
+msgstr "Server"
+
+#: ../src/wx/guiinit.cpp:112
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr "IP adresa serveru je: %s\n"
 
-#: ../src/wx/cmdevents.cpp:1697
-msgid "Set to 0 for pseudo tty"
-msgstr "Nastavte 0 pro pseudo tty"
+#: ../src/wx/xrc/NetLink.xrc:67
+msgid "Server:"
+msgstr "Server:"
 
-#: ../src/wx/cmdevents.cpp:1607
+#: ../src/wx/cmdevents.cpp:1927
+msgid "Set to 0 for pseudo tty"
+msgstr "Nastavte na 0 pro pseudo tty"
+
+#: ../src/wx/xrc/AccelConfig.xrc:96
+msgid "Shortcut Key:"
+msgstr "Klávesová zkratka:"
+
+#: ../src/wx/xrc/CheatCreate.xrc:97
+msgid "Signed/Unsigned"
+msgstr ""
+
+#: ../src/wx/xrc/DisplayConfig.xrc:169
+msgid "Simple"
+msgstr "Jednoduché"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:233
+msgid "Simple 2x"
+msgstr ""
+
+#: ../src/wx/xrc/DisplayConfig.xrc:234
+msgid "Simple 3x"
+msgstr ""
+
+#: ../src/wx/xrc/DisplayConfig.xrc:236
+msgid "Simple 4x"
+msgstr ""
+
+#: ../src/wx/xrc/MapViewer.xrc:100 ../src/wx/xrc/MemSelRegion.xrc:22
+#: ../src/wx/xrc/OAMViewer.xrc:77
+msgid "Size:"
+msgstr "Velikost:"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:271
+msgid "Smart interframe blending"
+msgstr ""
+
+#: ../src/wx/xrc/Logging.xrc:83
+msgid "Soun&d output"
+msgstr "&Výstup zvuku"
+
+#: ../src/wx/xrc/SoundConfig.xrc:4
+msgid "Sound Settings"
+msgstr "Nastavení zvuku"
+
+#: ../src/wx/cmdevents.cpp:1826
 msgid "Sound disabled"
 msgstr "Zvuk zakázán"
 
-#: ../src/wx/cmdevents.cpp:1607
+#: ../src/wx/cmdevents.cpp:1826
 msgid "Sound enabled"
 msgstr "Zvuk povolen"
 
-#: ../src/wx/wxvbam.cpp:261
-msgid "Start in full-screen mode"
+#: ../src/wx/xrc/SoundConfig.xrc:291
+msgid "Sound filtering"
+msgstr "Filtrování zvuku"
+
+#: ../src/wx/xrc/JoyPanel.xrc:336
+msgid "Special"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:68
+#: ../src/wx/xrc/CheatCreate.xrc:152
+msgid "Specific &value"
+msgstr "Konkrétní &hodnota"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:55
+msgid "Speed"
+msgstr "Rychlost"
+
+#: ../src/wx/xrc/JoyPanel.xrc:272
+msgid "Speed Up"
+msgstr "Zrychlení"
+
+#: ../src/wx/xrc/DisplayConfig.xrc:71
+msgid "Speed indicator :"
+msgstr ""
+
+#: ../src/wx/xrc/JoyPanel.xrc:286
+msgid "Spin Left"
+msgstr "Otáčení doleva"
+
+#: ../src/wx/xrc/JoyPanel.xrc:306
+msgid "Spin Right"
+msgstr "Otáčení doprava"
+
+#: ../src/wx/xrc/GBPaletteViewer.xrc:38 ../src/wx/xrc/PaletteViewer.xrc:33
+msgid "Sprite"
+msgstr ""
+
+#: ../src/wx/xrc/GBOAMViewer.xrc:13 ../src/wx/xrc/OAMViewer.xrc:14
+msgid "Sprite:"
+msgstr ""
+
+#: ../src/wx/xrc/GBColorPrefPanel.xrc:74
+msgid "Sprites"
+msgstr ""
+
+#: ../src/wx/xrc/GBColorPrefPanel.xrc:10 ../src/wx/xrc/JoyPanel.xrc:167
+msgid "Standard"
+msgstr "Standardní"
+
+#: ../src/wx/xrc/JoyPanel.xrc:150
+msgid "Start"
+msgstr "Start"
+
+#: ../src/wx/xrc/MainMenu.xrc:272
+msgid "Start &Network Link ..."
+msgstr "Zahájit &síťové propojení"
+
+#: ../src/wx/xrc/MainMenu.xrc:194
+msgid "Start &game recording..."
+msgstr "Spustit nahrávání &hry..."
+
+#: ../src/wx/xrc/MainMenu.xrc:182
+msgid "Start &sound recording..."
+msgstr "&Spustit nahrávání zvuku..."
+
+#: ../src/wx/xrc/MainMenu.xrc:188
+msgid "Start &video recording..."
+msgstr "Spustit nahrávání videa..."
+
+#: ../src/wx/xrc/NetLink.xrc:4
+msgid "Start Network Link"
+msgstr "Zahájit síťové propojení"
+
+#: ../src/wx/wxvbam.cpp:366
+msgid "Start in full-screen mode"
+msgstr "Spustit v režimu celé obrazovky"
+
+#: ../src/wx/xrc/MainMenu.xrc:203
+msgid "Start playing &movie..."
+msgstr "Spustit přehrávání &videa"
+
+#: ../src/wx/guiinit.cpp:71
 msgid "Start!"
 msgstr "Spustit!"
 
-#: ../src/wx/viewers.cpp:493
+#: ../src/wx/xrc/SoundConfig.xrc:240
+msgid "Stereo"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:197
+msgid "Stop g&ame recording"
+msgstr "Zastavit nahrávání h&ry"
+
+#: ../src/wx/xrc/MainMenu.xrc:206
+msgid "Stop playing m&ovie"
+msgstr "Zastavit přehrávání vi&dea"
+
+#: ../src/wx/xrc/MainMenu.xrc:185
+msgid "Stop s&ound recording"
+msgstr "&Zastavit nahrávání zvuku"
+
+#: ../src/wx/xrc/MainMenu.xrc:191
+msgid "Stop v&ideo recording"
+msgstr "Zastavit nahrávání v&idea"
+
+#: ../src/wx/xrc/GBMapViewer.xrc:54 ../src/wx/xrc/GBOAMViewer.xrc:88
+#: ../src/wx/xrc/GBTileViewer.xrc:68 ../src/wx/xrc/MapViewer.xrc:62
+#: ../src/wx/xrc/OAMViewer.xrc:104 ../src/wx/xrc/TileViewer.xrc:84
+msgid "Stretch to &fit"
+msgstr ""
+
+#: ../src/wx/xrc/DisplayConfig.xrc:223
+msgid "Super 2xSaI"
+msgstr ""
+
+#: ../src/wx/xrc/DisplayConfig.xrc:224
+msgid "Super Eagle"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:31
+msgid "Super Game Boy"
+msgstr "Super Game Boy"
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:34
+msgid "Super Game Boy 2"
+msgstr "Super Game Boy 2"
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:72
+msgid "System"
+msgstr "Systém"
+
+#: ../src/wx/xrc/Disassemble.xrc:397
+msgid "T"
+msgstr ""
+
+#: ../src/wx/xrc/DisplayConfig.xrc:230
+msgid "TV Mode"
+msgstr "Režim TV"
+
+#: ../src/wx/viewers.cpp:553
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "Textové soubory (*.txt;*.log)|*.txt;*.log|"
 
-#: ../src/wx/xaudio2.cpp:61 ../src/wx/xaudio2.cpp:351
+#: ../src/wx/xaudio2.cpp:75 ../src/wx/xaudio2.cpp:379
 msgid "The XAudio2 interface failed to initialize!"
-msgstr ""
+msgstr "Rozhraní XAudio2 se nepodařilo zavést!"
 
-#: ../src/wx/wxvbam.cpp:368
+#: ../src/wx/wxvbam.cpp:502
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2164
+#: ../src/wx/wxvbam.cpp:795
+msgid ""
+"The update has been downloaded and installed.  Please restart "
+"VisualBoyAdvance-M."
+msgstr ""
+"Aktualizace byla stažena a nainstalována. Prosím restartujte "
+"VisualBoyAdvance-M."
+
+#: ../src/wx/cmdevents.cpp:2506
+msgid "There are no new updates at this time."
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:2531
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -1031,9 +3265,9 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr ""
 "Tento program je svobodný software: můžete jej šířit a upravovat podle "
-"ustanovení Obecné veřejné licence GNU (GNU General Public Licence), vydávané "
-"Free Software Foundation a to buď podle 2. verze této Licence, nebo (podle "
-"vašeho uvážení) kterékoli pozdější verze.\n"
+"ustanovení GNU General Public Licence, vydávané Free Software Foundation a "
+"to buď podle 2. verze této Licence, nebo (podle vašeho uvážení) kterékoli "
+"pozdější verze.\n"
 "\n"
 "Tento program je rozšiřován v naději, že bude užitečný, avšak BEZ JAKÉKOLIV "
 "ZÁRUKY. Neposkytují se ani odvozené záruky PRODEJNOSTI anebo VHODNOSTI PRO "
@@ -1042,98 +3276,211 @@ msgstr ""
 "Kopii Obecné veřejné licence GNU jste měli obdržet spolu s tímto programem. "
 "Pokud se tak nestalo, najdete ji zde: <http://www.gnu.org/licenses/>."
 
-#: ../src/wx/guiinit.cpp:1762
+#: ../src/wx/guiinit.cpp:2201
 msgid "This will clear all user-defined accelerators.  Are you sure?"
-msgstr "Toto smaže všechny uživatelské akcelerátory.  Jste si jisti?"
+msgstr "Toto smaže všechny uživatelské zkratky. Jste si jisti?"
 
-#: ../src/wx/panel.cpp:2022 ../src/wx/panel.cpp:2050
+#: ../src/wx/cmdevents.cpp:2491
+msgid ""
+"This will download and update three GBA No-Intro DAT files.  Do you want to "
+"continue?"
+msgstr ""
+
+#: ../src/wx/xrc/TileViewer.xrc:4
+msgid "Tile Viewer"
+msgstr ""
+
+#: ../src/wx/xrc/GBMapViewer.xrc:82 ../src/wx/xrc/GBOAMViewer.xrc:37
+#: ../src/wx/xrc/GBTileViewer.xrc:91 ../src/wx/xrc/MapViewer.xrc:152
+#: ../src/wx/xrc/OAMViewer.xrc:61 ../src/wx/xrc/TileViewer.xrc:107
+msgid "Tile:"
+msgstr ""
+
+#: ../src/wx/xrc/ExportSPS.xrc:10
+msgid "Title:"
+msgstr "Název:"
+
+#: ../src/wx/xrc/MainMenu.xrc:150
+msgid "To &File ..."
+msgstr "&Do souboru ..."
+
+#: ../src/wx/xrc/MainMenu.xrc:231
+msgid "Toggle &full screen"
+msgstr ""
+
+#: ../src/wx/xrc/CheatList.xrc:35
+msgid "Toggle all Cheats"
+msgstr "Přepnout všechny Cheaty"
+
+#: ../src/wx/xrc/MainMenu.xrc:626
+msgid "Translations"
+msgstr "Překlady"
+
+#: ../src/wx/xrc/CheatCreate.xrc:188
+msgid "U&pdate Old"
+msgstr "&Aktualizovat staré"
+
+#: ../src/wx/panel.cpp:2445 ../src/wx/panel.cpp:2477
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr ""
 
-#: ../src/wx/panel.cpp:177
+#: ../src/wx/panel.cpp:222
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
-msgstr "Nelze nahrát Game Boy Advance ROM %s"
+msgstr "Nelze načíst Game Boy Advance ROM %s"
 
-#: ../src/wx/panel.cpp:114
+#: ../src/wx/panel.cpp:139
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
-msgstr "Nelze nahrát Game Boy ROM %s"
+msgstr "Nelze načíst Game Boy ROM %s"
 
-#: ../src/wx/viewsupt.h:38
+#: ../src/wx/viewsupt.h:39
 #, c-format
 msgid "Unable to load dialog %s from resources"
+msgstr "Nelze načíst dialogové okno %s ze zdrojů."
+
+#: ../src/wx/xrc/Logging.xrc:20
+msgid "Unaligned &memory"
+msgstr "Nezarovnaná &paměť"
+
+#: ../src/wx/xrc/GBROMInfo.xrc:48
+msgid "Unit code:"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:475 ../src/wx/cmdevents.cpp:562
-#: ../src/wx/cmdevents.cpp:591 ../src/wx/cmdevents.cpp:645
+#: ../src/wx/cmdevents.cpp:557 ../src/wx/cmdevents.cpp:674
+#: ../src/wx/cmdevents.cpp:714 ../src/wx/cmdevents.cpp:790
 msgid "Unknown"
 msgstr "Neznámý"
 
-#: ../src/wx/cmdevents.cpp:759
+#: ../src/wx/cmdevents.cpp:931
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "Nepodporovaný soubor s kódy %s"
 
-#: ../src/wx/cmdevents.cpp:1120 ../src/wx/cmdevents.cpp:1151
+#: ../src/wx/xrc/JoyPanel.xrc:14
+msgid "Up"
+msgstr "Nahoru"
+
+#: ../src/wx/wxvbam.cpp:796
+msgid "Update Downloaded"
+msgstr "Aktualizace stáhnuta"
+
+#: ../src/wx/xrc/MainMenu.xrc:629
+msgid "Update ROM database"
+msgstr "Aktualizovat databázi ROM"
+
+#: ../src/wx/xrc/JoyPanel.xrc:344
+msgid "Use as default"
+msgstr "Použít jako výchozí"
+
+#: ../src/wx/xrc/GBColorPrefPanel.xrc:84
+msgid "Use this palette"
+msgstr "Použít tuto paletu"
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:144
+msgid "User 1"
+msgstr "Uživatel 1"
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:150
+msgid "User 2"
+msgstr "Uživatel 2"
+
+#: ../src/wx/xrc/Disassemble.xrc:404
+msgid "V"
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:1334 ../src/wx/cmdevents.cpp:1355
 msgid "VBA Movie files|*.vmv"
-msgstr "VBA Movie soubory|*.vmv"
+msgstr "VBA video soubory|*.vmv"
 
-#: ../src/wx/guiinit.cpp:218 ../src/wx/guiinit.cpp:241
+#: ../src/wx/guiinit.cpp:297
 msgid "VBA cheat lists (*.clt)|*.clt"
-msgstr "VBA cheat seznamy (*.clt)|*.clt"
+msgstr "Seznam cheatů VBA (*.clt)|*.clt"
 
-#: ../src/wx/panel.cpp:743
+#: ../src/wx/guiinit.cpp:232
+msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:623
+msgid "VBA-M Support &Forum"
+msgstr ""
+
+#: ../src/wx/xrc/GBTileViewer.xrc:23
+msgid "VRAM Bank"
+msgstr ""
+
+#: ../src/wx/panel.cpp:913
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1296 ../src/wx/cmdevents.cpp:1378
+#: ../src/wx/xrc/GBPaletteViewer.xrc:79 ../src/wx/xrc/IOViewer.xrc:21
+#: ../src/wx/xrc/PaletteViewer.xrc:62
+msgid "Value:"
+msgstr "Hodnota:"
+
+#: ../src/wx/xrc/Logging.xrc:88
+msgid "Verbose"
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:1506 ../src/wx/cmdevents.cpp:1591
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "Soubory VisualBoyAdvance uložení|*.sgm"
 
-#: ../src/wx/cmdevents.cpp:1618 ../src/wx/cmdevents.cpp:1630
+#: ../src/wx/xrc/SoundConfig.xrc:16
+msgid "Volume :"
+msgstr "Hlasitost :"
+
+#: ../src/wx/cmdevents.cpp:1839 ../src/wx/cmdevents.cpp:1853
 #, c-format
 msgid "Volume: %d%%"
 msgstr "Hlasitost: %d%%"
 
-#: ../src/wx/cmdevents.cpp:1748
+#: ../src/wx/xrc/MainMenu.xrc:570
+msgid "W&IN 1"
+msgstr ""
+
+#: ../src/wx/cmdevents.cpp:1994
 msgid "Waiting for GDB..."
-msgstr "Čekám na GDB..."
+msgstr "Čekání na GDB..."
 
-#: ../src/wx/guiinit.cpp:110
+#: ../src/wx/guiinit.cpp:111
 msgid "Waiting for clients..."
-msgstr "Čeká se na klienty..."
+msgstr "Čekání na klienty..."
 
-#: ../src/wx/cmdevents.cpp:1739
+#: ../src/wx/cmdevents.cpp:1983
 #, c-format
 msgid "Waiting for connection at %s"
-msgstr "Čekám na připojení na %s"
+msgstr "Připojení očekáváno na %s"
 
-#: ../src/wx/cmdevents.cpp:1746
+#: ../src/wx/cmdevents.cpp:1991
 #, c-format
 msgid "Waiting for connection on port %d"
-msgstr "Čekám na připojení na portu %d"
+msgstr "Připojení očekáváno na portu %d"
 
-#: ../src/wx/guiinit.cpp:113
+#: ../src/wx/guiinit.cpp:116
 msgid "Waiting for connection..."
 msgstr "Čeká se na připojení..."
 
-#: ../src/wx/gfxviewers.cpp:1099
+#: ../src/wx/xrc/GBColorPrefPanel.xrc:16
+msgid "Weird Colors"
+msgstr "Divné barvy"
+
+#: ../src/wx/gfxviewers.cpp:1275
 msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
 msgstr ""
-"Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
-"Table (*.act)|*.act"
+"Windows Paleta (*.pal)|*.pal|PaintShop Paleta (*.pal)|*.pal|Adobe tabulka "
+"barev (*.act)|*.act"
 
-#: ../src/wx/cmdevents.cpp:874 ../src/wx/panel.cpp:567
+#: ../src/wx/cmdevents.cpp:1084 ../src/wx/panel.cpp:694
 #, c-format
 msgid "Wrote battery %s"
 msgstr "Zapsána baterie %s"
 
-#: ../src/wx/wxvbam.cpp:309
+#: ../src/wx/wxvbam.cpp:429
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
@@ -1142,7 +3489,7 @@ msgid ""
 "built-in:"
 msgstr ""
 
-#: ../src/wx/wxvbam.cpp:336
+#: ../src/wx/wxvbam.cpp:458
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
@@ -1150,265 +3497,122 @@ msgid ""
 "from search path:"
 msgstr ""
 
-#: ../src/wx/sys.cpp:720 ../src/wx/sys.cpp:890
+#: ../src/wx/sys.cpp:876 ../src/wx/sys.cpp:1073
 #, c-format
 msgid "Wrote printer output to %s"
-msgstr ""
+msgstr "Výstup tiskárny zapsán do %s"
 
-#: ../src/wx/cmdevents.cpp:954 ../src/wx/sys.cpp:401
+#: ../src/wx/cmdevents.cpp:1171 ../src/wx/sys.cpp:482
 #, c-format
 msgid "Wrote snapshot %s"
-msgstr "Zapsán snapshot %s"
+msgstr "Snímek %s zapsán"
 
-#: ../src/wx/xaudio2.cpp:387
+#: ../src/wx/xrc/SoundConfig.xrc:118
+msgid "XAudio2"
+msgstr "XAudio2"
+
+#: ../src/wx/xaudio2.cpp:411
 msgid "XAudio2: Creating mastering voice failed!"
 msgstr ""
 
-#: ../src/wx/xaudio2.cpp:396
+#: ../src/wx/xaudio2.cpp:421
 msgid "XAudio2: Creating source voice failed!"
-msgstr ""
+msgstr "XAudio2: Vytváření zdrojového hlasu selhalo!"
 
-#: ../src/wx/xaudio2.cpp:30
+#: ../src/wx/xaudio2.cpp:32
 msgid "XAudio2: Enumerating devices failed!"
-msgstr ""
+msgstr "XAudio2: Výčet zařízení selhal!"
 
-#: ../src/wx/guiinit.cpp:86
+#: ../src/wx/guiinit.cpp:91
 msgid "You must enter a valid host name"
-msgstr "Musíte zadat validní hostname"
+msgstr "Musíte zadat platný název hostitele"
 
-#: ../src/wx/widgets/joyedit.cpp:139
+#: ../src/wx/xrc/Disassemble.xrc:376 ../src/wx/xrc/GBDisassemble.xrc:179
+msgid "Z"
+msgstr ""
+
+#: ../src/wx/xrc/DisplayConfig.xrc:143
+msgid "Zoom"
+msgstr "Příblížení"
+
+#: ../src/wx/widgets/joyedit.cpp:180
 msgid "^Joy([0-9]+)[-+]"
-msgstr ""
+msgstr "^Joy([0-9]+)[-+]"
 
-#: ../src/wx/panel.cpp:2006
+#: ../src/wx/xrc/IOViewer.xrc:10
+msgid "a"
+msgstr "a"
+
+#: ../src/wx/xrc/IOViewer.xrc:11
+msgid "b"
+msgstr "b"
+
+#: ../src/wx/panel.cpp:2427
 msgid "can't guess output format from file name"
-msgstr ""
+msgstr "nešlo odhadnout výstupní formát z názvu souboru"
 
-#: ../src/wx/dsound.cpp:307
+#: ../src/wx/dsound.cpp:336
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
 msgstr "dsbSecondary->Lock() nezdařeno: %08x"
 
-#: ../src/wx/dsound.cpp:165
+#: ../src/wx/dsound.cpp:181
 #, c-format
 msgid "dsbSecondary->SetCurrentPosition failed %08x"
 msgstr "dsbSecondary->SetCurrentPosition nezdařeno: %08x"
 
-#: ../src/wx/cmdevents.cpp:673 ../src/wx/cmdevents.cpp:687
+#: ../src/wx/cmdevents.cpp:823 ../src/wx/cmdevents.cpp:839
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr ""
+msgstr "Tečkový kód pro E-čtečku (*.bin;*.raw)|*.bin;*.raw"
 
-#: ../src/wx/panel.cpp:2002
+#: ../src/wx/panel.cpp:2421
 msgid "error initializing codec"
-msgstr ""
+msgstr "chyba při zavádění kodeku"
 
-#: ../src/wx/panel.cpp:2004
+#: ../src/wx/panel.cpp:2424
 msgid "error writing to output file"
-msgstr ""
+msgstr "chyba při zápisu do výstupního souboru"
 
-#: ../src/wx/wxvbam.cpp:354
-msgid "flag"
-msgstr ""
-
-#: ../src/wx/wxvbam.cpp:357
-msgid "int"
-msgstr ""
-
-#: ../src/wx/panel.cpp:2000
+#: ../src/wx/panel.cpp:2418
 msgid "memory allocation error"
-msgstr ""
+msgstr "chyba přidělení paměti"
 
-#: ../src/wx/wxvbam.cpp:318
-msgid "print-cfg-path"
-msgstr ""
-
-#: ../src/wx/panel.cpp:2010
+#: ../src/wx/panel.cpp:2432
 msgid "programming error; aborting!"
-msgstr ""
+msgstr "chyba programování; probíhá ukončování!"
 
-#: ../src/wx/wxvbam.cpp:328
-msgid "save-over"
-msgstr ""
+#: ../src/wx/xrc/GeneralConfig.xrc:105
+msgid "seconds (0-600); 0 = disable"
+msgstr "vteřin (0-600); 0 = zakázáno"
 
-#: ../src/wx/wxvbam.cpp:294
-msgid "save-xrc"
-msgstr ""
-
-#: ../src/wx/guiinit.cpp:859
+#: ../src/wx/guiinit.cpp:1133
 msgid "signed decimal"
 msgstr "signed decimal"
 
-#: ../src/wx/wxvbam.cpp:355 ../src/wx/wxvbam.cpp:358
-msgid "string"
-msgstr ""
-
-#: ../src/wx/guiinit.cpp:862
+#: ../src/wx/guiinit.cpp:1137
 msgid "unsigned decimal"
 msgstr "unsigned decimal"
 
-#: ../src/wx/guiinit.cpp:865
+#: ../src/wx/guiinit.cpp:1141
 msgid "unsigned hexadecimal"
 msgstr "unsigned hexadecimal"
 
-#~ msgid "&0"
-#~ msgstr "&0"
+#: ../src/wx/wxvbam.cpp:108
+msgid "vbam"
+msgstr "vbam"
 
-#~ msgid "&16-bit"
-#~ msgstr "&16-bit"
+#: ../src/wx/xrc/DisplayConfig.xrc:238
+msgid "xBRZ 2x"
+msgstr "xBRZ 2x"
 
-#~ msgid "&256"
-#~ msgstr "&256"
+#: ../src/wx/xrc/DisplayConfig.xrc:239
+msgid "xBRZ 3x"
+msgstr "xBRZ 3x"
 
-#~ msgid "&32-bit"
-#~ msgstr "&32-bit"
+#: ../src/wx/xrc/DisplayConfig.xrc:240
+msgid "xBRZ 4x"
+msgstr "xBRZ 4x"
 
-#~ msgid "&8-bit"
-#~ msgstr "&8-bit"
-
-#~ msgid "0 "
-#~ msgstr "0 "
-
-#~ msgid "0x&8000"
-#~ msgstr "0x&8000"
-
-#~ msgid "0x&8800"
-#~ msgstr "0x&8800"
-
-#~ msgid "0x60&10000"
-#~ msgstr "0x60&10000"
-
-#~ msgid "0x600&0000"
-#~ msgstr "0x600&0000"
-
-#~ msgid "0x600&4000"
-#~ msgstr "0x600&4000"
-
-#~ msgid "0x600&8000"
-#~ msgstr "0x600&8000"
-
-#~ msgid "0x600&C000"
-#~ msgstr "0x600&C000"
-
-#~ msgid "0x8000"
-#~ msgstr "0x8000"
-
-#~ msgid "0x8800"
-#~ msgstr "0x8800"
-
-#~ msgid "0x9800"
-#~ msgstr "0x9800"
-
-#~ msgid "0x9C00"
-#~ msgstr "0x9C00"
-
-#~ msgid "1 "
-#~ msgstr "1 "
-
-#~ msgid "1&6"
-#~ msgstr "1&6"
-
-#~ msgid "10 "
-#~ msgstr "10 "
-
-#~ msgid "11 "
-#~ msgstr "11 "
-
-#~ msgid "12 "
-#~ msgstr "12 "
-
-#~ msgid "13 "
-#~ msgstr "13 "
-
-#~ msgid "14 "
-#~ msgstr "14 "
-
-#~ msgid "15 "
-#~ msgstr "15 "
-
-#~ msgid "2 "
-#~ msgstr "2 "
-
-#~ msgid "3 "
-#~ msgstr "3 "
-
-#~ msgid "4 "
-#~ msgstr "4 "
-
-#~ msgid "5 "
-#~ msgstr "5 "
-
-#~ msgid "6 "
-#~ msgstr "6 "
-
-#~ msgid "7 "
-#~ msgstr "7 "
-
-#~ msgid "8 "
-#~ msgstr "8 "
-
-#~ msgid "9 "
-#~ msgstr "9 "
-
-#~ msgid "All players joined."
-#~ msgstr "Všichni hráči se připojili."
-
-#~ msgid "BG0"
-#~ msgstr "BG0"
-
-#~ msgid "BG1"
-#~ msgstr "BG1"
-
-#~ msgid "BG2"
-#~ msgstr "BG2"
-
-#~ msgid "BG3"
-#~ msgstr "BG3"
-
-#~ msgid "Colors"
-#~ msgstr "Barvy"
-
-#~ msgid "Connected as #%d\n"
-#~ msgstr "Připojeno jako #%d\n"
-
-#~ msgid "Current Keys:"
-#~ msgstr "Aktuální klávesy:"
-
-#~ msgid "Enable wireless"
-#~ msgstr "Povolit bezdrát"
-
-#~ msgid ""
-#~ "Error %d occurred.\n"
-#~ "Please try again."
-#~ msgstr ""
-#~ "Nastala chyba %d.\n"
-#~ "Prosím, zkuste to znovu."
-
-#~ msgid "Index:"
-#~ msgstr "Index:"
-
-#~ msgid "Invalid option %s present; removing if possible"
-#~ msgstr "Chyba při nahrávání snapshot souboru %s"
-
-#~ msgid "Player %d connected\n"
-#~ msgstr "Hráč %d se připojil\n"
-
-#~ msgid ""
-#~ "Please note that this is the first version of RFU emulation code and it's "
-#~ "probably got more bugs than the link code.  Also, it is only supported "
-#~ "with 2 players in local mode."
-#~ msgstr ""
-#~ "Vezměte prosím na vědomí, že toto je první verze kódu emulace RFU a má "
-#~ "asi víc chyb než kódu. Takže, jsou podporováni pouze 2 hráči v lokálním "
-#~ "režimu."
-
-#~ msgid "VRAM Bank"
-#~ msgstr "VRAM Banka"
-
-#~ msgid "Value:"
-#~ msgstr "Hodnota:"
-
-#~ msgid "Waiting for %d players to join"
-#~ msgstr "Čeká se na připojení %d hráčů"
-
-#~ msgid "Welcome to wxVBAM!"
-#~ msgstr "Vítejte v wxVBAM!"
+#: ../src/wx/xrc/DisplayConfig.xrc:241
+msgid "xBRZ 5x"
+msgstr "xBRZ 5x"
