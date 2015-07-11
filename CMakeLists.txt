@@ -61,6 +61,7 @@ ENDIF( NOT VERSION )
 # Fill in SDLMAIN_LIBRARY on OS X manually to avoid using SDLMain.m
 # OS X users will have to compile and install SDL from source.
 if( APPLE AND ENABLE_SDL )
+    ADD_DEFINITIONS (-DwxMAC_USE_CORE_GRAPHICS )
     SET(SDLMAIN_LIBRARY "-lSDLmain")
 endif( APPLE AND ENABLE_SDL )
 

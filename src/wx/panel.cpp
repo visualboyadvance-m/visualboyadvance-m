@@ -2324,8 +2324,8 @@ void CairoDrawingPanel::DrawArea(wxWindowDC &dc)
 	cr = cairo_reference((cairo_t*)gc->GetNativeContext());
 #else
 #if defined(__WXMAC__) && wxMAC_USE_CORE_GRAPHICS
-	CGContextRef* c = gc->GetNativeContext();
-	cairo_surface_t* s = cairo_quartz_surface_create_for_cg_context(c);
+	CGContextRef c = static_cast<CGContextRef>(gc->GetNativeContext());
+	cairo_surface_t* s = cairo_quartz_surface_create_for_cg_context(c, width, height);
 	cr = cairo_create(s);
 	cairo_surface_destroy(s);
 #else
