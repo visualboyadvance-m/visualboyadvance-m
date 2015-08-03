@@ -101,7 +101,7 @@ skipBios=0
 # 4 = Super Eagle, 5 = Pixelate, 6 = AdvanceMAME Scale2x, 7 = Bilinear,
 # 8 = Bilinear Plus, 9 = Scanlines, 10 = TV Mode, 11 = lq2x, 12 = hq2x,
 # 13 = xbrz2x, 14 = Stretch 3x, 15 = hq3x, 16 = xbrz3x, 17 = Stretch 4x,
-# 18 = hq4x, 19 = xbrz4x, 20 = xbrz5x
+# 18 = hq4x, 19 = xbrz4x, 20 = xbrz5x, 21 = xbrz6x
 filter=1
 
 # Disable status messages. 0=false, any other value means true

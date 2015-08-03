@@ -1237,6 +1237,9 @@ BOOL MainWnd::OnOptionsFilter(UINT nID)
 	case ID_OPTIONS_FILTER_XBRZ5X:
 		filter = FILTER_XBRZ5X;
 		break;
+	case ID_OPTIONS_FILTER_XBRZ6X:
+		filter = FILTER_XBRZ6X;
+		break;
 	default:
 		return FALSE;
 	}
@@ -1315,6 +1318,9 @@ void MainWnd::OnUpdateOptionsFilter(CCmdUI *pCmdUI)
     break;
   case ID_OPTIONS_FILTER_XBRZ5X:
     pCmdUI->SetCheck(filter == FILTER_XBRZ5X);
+    break;
+  case ID_OPTIONS_FILTER_XBRZ6X:
+    pCmdUI->SetCheck(filter == FILTER_XBRZ6X);
     break;
   }
 }
