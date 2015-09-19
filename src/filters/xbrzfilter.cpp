@@ -21,3 +21,8 @@ void xbrz5x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dst
 {
     xbrz::scale(5, (const uint32_t *)srcPtr, width, height, srcPitch, (uint32_t *)dstPtr, dstPitch, xbrz::RGB);
 }
+
+void xbrz6x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch, int width, int height)
+{
+    xbrz::scale(6, (const uint32_t *)srcPtr, width, height, srcPitch, (uint32_t *)dstPtr, dstPitch, xbrz::RGB);
+}

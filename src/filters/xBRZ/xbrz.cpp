@@ -44,19 +44,19 @@ inline uint32_t makePixel(unsigned char a, unsigned char r, unsigned char g, uns
 
 template <unsigned int M, unsigned int N>
 FORCE_INLINE
-unsigned char calcBlend(unsigned char colFront, unsigned char colBack)
+unsigned char calcColor(unsigned char colFront, unsigned char colBack)
 {
-	return (colFront * M + colBack * (N - M)) / N;
+    return (colFront * M + colBack * (N - M)) / N;
 }
 
 template <unsigned int M, unsigned int N> inline
-uint32_t alphaGradRGB(uint32_t pixFront, uint32_t pixBack) //blend front color with opacity M / N over opaque background: http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
+uint32_t gradientRGB(uint32_t pixFront, uint32_t pixBack) //blend front color with opacity M / N over opaque background: http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
 {
     //~ static_assert(0 < M && M < N && N <= 1000, "");
 
-    return makePixel(calcBlend<M, N>(getRed  (pixFront), getRed  (pixBack)),
-                     calcBlend<M, N>(getGreen(pixFront), getGreen(pixBack)),
-                     calcBlend<M, N>(getBlue (pixFront), getBlue (pixBack)));
+    return makePixel(calcColor<M, N>(getRed  (pixFront), getRed  (pixBack)),
+                     calcColor<M, N>(getGreen(pixFront), getGreen(pixBack)),
+                     calcColor<M, N>(getBlue (pixFront), getBlue (pixBack)));
 }
 
 FORCE_INLINE
@@ -66,7 +66,7 @@ unsigned char calcColor(unsigned char colFront, unsigned char colBack, const uns
 }
 
 template <unsigned int M, unsigned int N> inline
-uint32_t alphaGradARGB(uint32_t pixFront, uint32_t pixBack) //find intermediate color between two colors with alpha channels (=> NO alpha blending!!!)
+uint32_t gradientARGB(uint32_t pixFront, uint32_t pixBack) //find intermediate color between two colors with alpha channels (=> NO alpha blending!!!)
 {
     //~ static_assert(0 < M && M < N && N <= 1000, "");
 
@@ -284,14 +284,14 @@ template <class ColorDistance>
 FORCE_INLINE
 double dist(uint32_t pix1, uint32_t pix2, const xbrz::ScalerCfg& cfg)
 {
-    return ColorDistance::dist(pix1, pix2, cfg.luminanceWeight_);
+    return ColorDistance::dist(pix1, pix2, cfg.luminanceWeight);
 }
 
 template <class ColorDistance>
 FORCE_INLINE
 bool eq(uint32_t pix1, uint32_t pix2, const xbrz::ScalerCfg& cfg)
 {
-    return ColorDistance::dist(pix1, pix2, cfg.luminanceWeight_) < cfg.equalColorTolerance_;
+    return ColorDistance::dist(pix1, pix2, cfg.luminanceWeight) < cfg.equalColorTolerance;
 }
 
 /*
@@ -398,9 +398,9 @@ template <> inline unsigned char rotateBlendInfo<ROT_270>(unsigned char b) { ret
 
 
 #ifndef NDEBUG
+#ifdef _MSC_VER
     int debugPixelX = -1;
     int debugPixelY = 12;
-#ifdef _MSC_VER
     __declspec(thread) bool breakIntoDebugger = false;
 #endif
 #endif
@@ -754,9 +754,9 @@ struct Scaler3x : public ColorGradient
     template <class OutputMatrix>
     static void blendLineDiagonal(uint32_t col, OutputMatrix& out)
     {
-        alphaGrad<1, 8>(out.template ref<1, 2>(), col);
+        alphaGrad<1, 8>(out.template ref<1, 2>(), col); //conflict with other rotations for this odd scale
         alphaGrad<1, 8>(out.template ref<2, 1>(), col);
-        alphaGrad<7, 8>(out.template ref<2, 2>(), col);
+        alphaGrad<7, 8>(out.template ref<2, 2>(), col); //
     }
 
     template <class OutputMatrix>
@@ -812,7 +812,9 @@ struct Scaler4x : public ColorGradient
         alphaGrad<3, 4>(out.template ref<1, 3>(), col);
         alphaGrad<1, 4>(out.template ref<3, 0>(), col);
         alphaGrad<1, 4>(out.template ref<0, 3>(), col);
+
         alphaGrad<1, 3>(out.template ref<2, 2>(), col); //[!] fixes 1/4 used in xBR
+
         out.template ref<3, 3>() = col;
         out.template ref<3, 2>() = col;
         out.template ref<2, 3>() = col;
@@ -889,23 +891,22 @@ struct Scaler5x : public ColorGradient
         alphaGrad<1, 4>(out.template ref<scale - 2, 2>(), col);
         alphaGrad<3, 4>(out.template ref<scale - 1, 1>(), col);
 
+        alphaGrad<2, 3>(out.template ref<3, 3>(), col);
+
         out.template ref<2, scale - 1>() = col;
         out.template ref<3, scale - 1>() = col;
+        out.template ref<4, scale - 1>() = col;
 
         out.template ref<scale - 1, 2>() = col;
         out.template ref<scale - 1, 3>() = col;
-
-        out.template ref<4, scale - 1>() = col;
-
-        alphaGrad<2, 3>(out.template ref<3, 3>(), col);
     }
 
     template <class OutputMatrix>
     static void blendLineDiagonal(uint32_t col, OutputMatrix& out)
     {
-        alphaGrad<1, 8>(out.template ref<scale - 1, scale / 2    >(), col);
+        alphaGrad<1, 8>(out.template ref<scale - 1, scale / 2    >(), col); //conflict with other rotations for this odd scale
         alphaGrad<1, 8>(out.template ref<scale - 2, scale / 2 + 1>(), col);
-        alphaGrad<1, 8>(out.template ref<scale - 3, scale / 2 + 2>(), col);
+        alphaGrad<1, 8>(out.template ref<scale - 3, scale / 2 + 2>(), col); //
 
         alphaGrad<7, 8>(out.template ref<4, 3>(), col);
         alphaGrad<7, 8>(out.template ref<3, 4>(), col);
@@ -922,6 +923,105 @@ struct Scaler5x : public ColorGradient
         alphaGrad<23, 100>(out.template ref<3, 4>(), col); //0.2306749731
         //alphaGrad<1, 64>(out.template ref<4, 2>(), col); //0.01676812367 -> negligible + avoid conflicts with other rotations for this odd scale
         //alphaGrad<1, 64>(out.template ref<2, 4>(), col); //0.01676812367
+    }
+};
+
+
+template <class ColorGradient>
+struct Scaler6x : public ColorGradient
+{
+    static const int scale = 6;
+
+    template <unsigned int M, unsigned int N> //bring template function into scope for GCC
+    static void alphaGrad(uint32_t& pixBack, uint32_t pixFront) { ColorGradient::template alphaGrad<M, N>(pixBack, pixFront); }
+
+
+    template <class OutputMatrix>
+    static void blendLineShallow(uint32_t col, OutputMatrix& out)
+    {
+        alphaGrad<1, 4>(out.template ref<scale - 1, 0>(), col);
+        alphaGrad<1, 4>(out.template ref<scale - 2, 2>(), col);
+        alphaGrad<1, 4>(out.template ref<scale - 3, 4>(), col);
+
+        alphaGrad<3, 4>(out.template ref<scale - 1, 1>(), col);
+        alphaGrad<3, 4>(out.template ref<scale - 2, 3>(), col);
+        alphaGrad<3, 4>(out.template ref<scale - 3, 5>(), col);
+
+        out.template ref<scale - 1, 2>() = col;
+        out.template ref<scale - 1, 3>() = col;
+        out.template ref<scale - 1, 4>() = col;
+        out.template ref<scale - 1, 5>() = col;
+
+        out.template ref<scale - 2, 4>() = col;
+        out.template ref<scale - 2, 5>() = col;
+    }
+
+    template <class OutputMatrix>
+    static void blendLineSteep(uint32_t col, OutputMatrix& out)
+    {
+        alphaGrad<1, 4>(out.template ref<0, scale - 1>(), col);
+        alphaGrad<1, 4>(out.template ref<2, scale - 2>(), col);
+        alphaGrad<1, 4>(out.template ref<4, scale - 3>(), col);
+
+        alphaGrad<3, 4>(out.template ref<1, scale - 1>(), col);
+        alphaGrad<3, 4>(out.template ref<3, scale - 2>(), col);
+        alphaGrad<3, 4>(out.template ref<5, scale - 3>(), col);
+
+        out.template ref<2, scale - 1>() = col;
+        out.template ref<3, scale - 1>() = col;
+        out.template ref<4, scale - 1>() = col;
+        out.template ref<5, scale - 1>() = col;
+
+        out.template ref<4, scale - 2>() = col;
+        out.template ref<5, scale - 2>() = col;
+    }
+
+    template <class OutputMatrix>
+    static void blendLineSteepAndShallow(uint32_t col, OutputMatrix& out)
+    {
+        alphaGrad<1, 4>(out.template ref<0, scale - 1>(), col);
+        alphaGrad<1, 4>(out.template ref<2, scale - 2>(), col);
+        alphaGrad<3, 4>(out.template ref<1, scale - 1>(), col);
+        alphaGrad<3, 4>(out.template ref<3, scale - 2>(), col);
+
+        alphaGrad<1, 4>(out.template ref<scale - 1, 0>(), col);
+        alphaGrad<1, 4>(out.template ref<scale - 2, 2>(), col);
+        alphaGrad<3, 4>(out.template ref<scale - 1, 1>(), col);
+        alphaGrad<3, 4>(out.template ref<scale - 2, 3>(), col);
+
+        out.template ref<2, scale - 1>() = col;
+        out.template ref<3, scale - 1>() = col;
+        out.template ref<4, scale - 1>() = col;
+        out.template ref<5, scale - 1>() = col;
+
+        out.template ref<4, scale - 2>() = col;
+        out.template ref<5, scale - 2>() = col;
+
+        out.template ref<scale - 1, 2>() = col;
+        out.template ref<scale - 1, 3>() = col;
+    }
+
+    template <class OutputMatrix>
+    static void blendLineDiagonal(uint32_t col, OutputMatrix& out)
+    {
+        alphaGrad<1, 2>(out.template ref<scale - 1, scale / 2    >(), col);
+        alphaGrad<1, 2>(out.template ref<scale - 2, scale / 2 + 1>(), col);
+        alphaGrad<1, 2>(out.template ref<scale - 3, scale / 2 + 2>(), col);
+
+        out.template ref<scale - 2, scale - 1>() = col;
+        out.template ref<scale - 1, scale - 1>() = col;
+        out.template ref<scale - 1, scale - 2>() = col;
+    }
+
+    template <class OutputMatrix>
+    static void blendCorner(uint32_t col, OutputMatrix& out)
+    {
+        //model a round corner
+        alphaGrad<97, 100>(out.template ref<5, 5>(), col); //exact: 0.9711013910
+        alphaGrad<42, 100>(out.template ref<4, 5>(), col); //0.4236372243
+        alphaGrad<42, 100>(out.template ref<5, 4>(), col); //0.4236372243
+        alphaGrad< 6, 100>(out.template ref<5, 3>(), col); //0.05652034508
+        alphaGrad< 6, 100>(out.template ref<3, 5>(), col); //0.05652034508
     }
 };
 
@@ -950,16 +1050,18 @@ struct ColorDistanceARGB
 
         	1. if a1 = a2, distance should be: a1 * distYCbCr()
         	2. if a1 = 0,  distance should be: a2 * distYCbCr(black, white) = a2 * 255
-        	3. if a1 = 1,  distance should be: 255 * (1 - a2) + a2 * distYCbCr()
+        	3. if a1 = 1,  ??? maybe: 255 * (1 - a2) + a2 * distYCbCr()
         */
 
-        //return std::min(a1, a2) * distYCbCrBuffer.dist<ColorDistance>(pix1, pix2) + 255 * abs(a1 - a2);
+        //return std::min(a1, a2) * distYCbCrBuffer.dist(pix1, pix2) + 255 * abs(a1 - a2);
         //=> following code is 15% faster:
         const double d = distYCbCrBuffer.dist(pix1, pix2);
         if (a1 < a2)
             return a1 * d + 255 * (a2 - a1);
         else
             return a2 * d + 255 * (a1 - a2);
+
+        //alternative? return std::sqrt(a1 * a2 * square(distYCbCrBuffer.dist(pix1, pix2)) + square(255 * (a1 - a2)));
     }
 };
 
@@ -969,7 +1071,7 @@ struct ColorGradientRGB
     template <unsigned int M, unsigned int N>
     static void alphaGrad(uint32_t& pixBack, uint32_t pixFront)
     {
-        pixBack = alphaGradRGB<M, N>(pixFront, pixBack);
+        pixBack = gradientRGB<M, N>(pixFront, pixBack);
     }
 };
 
@@ -978,7 +1080,7 @@ struct ColorGradientARGB
     template <unsigned int M, unsigned int N>
     static void alphaGrad(uint32_t& pixBack, uint32_t pixFront)
     {
-        pixBack = alphaGradARGB<M, N>(pixFront, pixBack);
+        pixBack = gradientARGB<M, N>(pixFront, pixBack);
     }
 };
 }
@@ -989,7 +1091,7 @@ void xbrz::scale(size_t factor, const uint32_t* src, int srcWidth, int srcHeight
     if (srcPitch %  static_cast<int>(sizeof(uint32_t)) != 0 ||
         trgPitch %  static_cast<int>(sizeof(uint32_t)) != 0 ||
         srcPitch < srcWidth * static_cast<int>(sizeof(uint32_t)) ||
-        trgPitch < srcWidth * factor * static_cast<int>(sizeof(uint32_t)))
+        trgPitch < srcWidth * static_cast<int>(factor) * static_cast<int>(sizeof(uint32_t)))
     {
         assert(false);
         return;
@@ -1011,6 +1113,8 @@ void xbrz::scale(size_t factor, const uint32_t* src, int srcWidth, int srcHeight
                     return scaleImage<Scaler4x<ColorGradientARGB>, ColorDistanceARGB>(src, srcWidth, srcHeight, srcPPitch, trg, trgWidth, cfg, yFirst, yLast);
                 case 5:
                     return scaleImage<Scaler5x<ColorGradientARGB>, ColorDistanceARGB>(src, srcWidth, srcHeight, srcPPitch, trg, trgWidth, cfg, yFirst, yLast);
+                case 6:
+                    return scaleImage<Scaler6x<ColorGradientARGB>, ColorDistanceARGB>(src, srcWidth, srcHeight, srcPPitch, trg, trgWidth, cfg, yFirst, yLast);
             }
             break;
 
@@ -1025,6 +1129,8 @@ void xbrz::scale(size_t factor, const uint32_t* src, int srcWidth, int srcHeight
                     return scaleImage<Scaler4x<ColorGradientRGB>, ColorDistanceRGB>(src, srcWidth, srcHeight, srcPPitch, trg, trgWidth, cfg, yFirst, yLast);
                 case 5:
                     return scaleImage<Scaler5x<ColorGradientRGB>, ColorDistanceRGB>(src, srcWidth, srcHeight, srcPPitch, trg, trgWidth, cfg, yFirst, yLast);
+                case 6:
+                    return scaleImage<Scaler6x<ColorGradientRGB>, ColorDistanceRGB>(src, srcWidth, srcHeight, srcPPitch, trg, trgWidth, cfg, yFirst, yLast);
             }
             break;
     }

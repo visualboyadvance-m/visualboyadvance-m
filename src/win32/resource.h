@@ -1017,13 +1017,14 @@
 #define ID_OPTIONS_FILTER_XBRZ3X        40378
 #define ID_OPTIONS_FILTER_XBRZ4X        40379
 #define ID_OPTIONS_FILTER_XBRZ5X        40380
+#define ID_OPTIONS_FILTER_XBRZ6X        40381
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        167
-#define _APS_NEXT_COMMAND_VALUE         40381
+#define _APS_NEXT_COMMAND_VALUE         40382
 #define _APS_NEXT_CONTROL_VALUE         1437
 #define _APS_NEXT_SYMED_VALUE           103
 #endif

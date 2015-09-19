@@ -64,6 +64,7 @@ extern void xbrz2x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void xbrz3x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void xbrz4x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void xbrz5x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void xbrz6x32(u8*,u32,u8*,u8*,u32,int,int);
 
 struct FilterDesc {
 	char name[30];
@@ -94,7 +95,8 @@ const FilterDesc Filters[] = {
   { "Stretch 4x", 4, sdlStretch4x, sdlStretch4x, sdlStretch4x },
   { "hq4x", 4, hq4x16, 0, hq4x32_32 },
   { "xbrz4x", 4, 0, 0, xbrz4x32 },
-  { "xbrz5x", 5, 0, 0, xbrz5x32 }
+  { "xbrz5x", 5, 0, 0, xbrz5x32 },
+  { "xbrz6x", 6, 0, 0, xbrz6x32 }
 };
 
 int getFilterEnlargeFactor(const int f)

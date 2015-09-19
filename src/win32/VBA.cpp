@@ -82,6 +82,7 @@ extern void xbrz2x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void xbrz3x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void xbrz4x32(u8*,u32,u8*,u8*,u32,int,int);
 extern void xbrz5x32(u8*,u32,u8*,u8*,u32,int,int);
+extern void xbrz6x32(u8*,u32,u8*,u8*,u32,int,int);
 
 extern void SmartIB(u8*,u32,int,int);
 extern void SmartIB32(u8*,u32,int,int);
@@ -811,6 +812,10 @@ void VBA::updateFilter()
 			case FILTER_XBRZ5X:
 				filterFunction = xbrz5x32;
 				filterMagnification = 5;
+				break;
+			case FILTER_XBRZ6X:
+				filterFunction = xbrz6x32;
+				filterMagnification = 6;
 				break;
 			}
 		}

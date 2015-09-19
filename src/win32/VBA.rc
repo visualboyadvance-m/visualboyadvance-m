@@ -1734,6 +1734,10 @@ BEGIN
                 BEGIN
                     MENUITEM "&xBRZ5x",                     ID_OPTIONS_FILTER_XBRZ5X
                 END
+                POPUP "&6X"
+                BEGIN
+                    MENUITEM "&xBRZ6x",                     ID_OPTIONS_FILTER_XBRZ6X
+                END
             END
             MENUITEM SEPARATOR
             MENUITEM "&Use Filter Plugin",          ID_OPTIONS_FILTER_PLUGIN
