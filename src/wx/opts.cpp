@@ -138,7 +138,7 @@ opt_desc opts[] =
 	ENUMOPT("Display/Filter", "", wxTRANSLATE("Full-screen filter to apply"), gopts.filter,
 	wxTRANSLATE("none|2xsai|super2xsai|supereagle|pixelate|advmame|"
 	L"bilinear|bilinearplus|scanlines|tvmode|hq2x|lq2x|"
-	L"simple2x|simple3x|hq3x|simple4x|hq4x|xbrz2x|xbrz3x|xbrz4x|xbrz5x|plugin")),
+	L"simple2x|simple3x|hq3x|simple4x|hq4x|xbrz2x|xbrz3x|xbrz4x|xbrz5x|xbrz6x|plugin")),
 	STROPT("Display/FilterPlugin", "", wxTRANSLATE("Filter plugin library"), gopts.filter_plugin),
 	ENUMOPT("Display/IFB", "", wxTRANSLATE("Interframe blending function"), gopts.ifb, wxTRANSLATE("none|smart|motionblur")),
 	BOOLOPT("Display/KeepOnTop", "KeepOnTop", wxTRANSLATE("Keep window on top"), gopts.keep_on_top),

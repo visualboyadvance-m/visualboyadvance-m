@@ -66,6 +66,7 @@ void xbrz2x32(u8* src, u32 spitch, u8*, u8* dst, u32 dstp, int w, int h);
 void xbrz3x32(u8* src, u32 spitch, u8*, u8* dst, u32 dstp, int w, int h);
 void xbrz4x32(u8* src, u32 spitch, u8*, u8* dst, u32 dstp, int w, int h);
 void xbrz5x32(u8* src, u32 spitch, u8*, u8* dst, u32 dstp, int w, int h);
+void xbrz6x32(u8* src, u32 spitch, u8*, u8* dst, u32 dstp, int w, int h);
 
 // call ifc to ignore previous frame / when starting new
 void InterframeCleanup();

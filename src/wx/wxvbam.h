@@ -345,10 +345,11 @@ enum filtfunc
 	FF_NONE, FF_2XSAI, FF_SUPER2XSAI, FF_SUPEREAGLE, FF_PIXELATE,
 	FF_ADVMAME, FF_BILINEAR, FF_BILINEARPLUS, FF_SCANLINES, FF_TV,
 	FF_HQ2X, FF_LQ2X, FF_SIMPLE2X, FF_SIMPLE3X, FF_HQ3X, FF_SIMPLE4X,
-	FF_HQ4X, FF_XBRZ2X, FF_XBRZ3X, FF_XBRZ4X, FF_XBRZ5X, FF_PLUGIN  // plugin must always be last
+	FF_HQ4X, FF_XBRZ2X, FF_XBRZ3X, FF_XBRZ4X, FF_XBRZ5X, FF_XBRZ6X, FF_PLUGIN  // plugin must always be last
 };
 #define builtin_ff_scale(x) \
-    ((x == FF_XBRZ5X) ? 5 : \
+    ((x == FF_XBRZ6X) ? 6 : \
+    (x == FF_XBRZ5X) ? 5 : \
     (x == FF_XBRZ4X || x == FF_HQ4X || x == FF_SIMPLE4X) ? 4 : \
     (x == FF_XBRZ3X || x == FF_HQ3X || x == FF_SIMPLE3X) ? 3 : \
      x == FF_PLUGIN ? 0 : x == FF_NONE ? 1 : 2)

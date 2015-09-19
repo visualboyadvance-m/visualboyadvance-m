@@ -1652,6 +1652,10 @@ public:
 			case FF_XBRZ5X:
 				xbrz5x32(src, instride, delta, dst, outstride, width, height);
 				break;
+			
+			case FF_XBRZ6X:
+				xbrz6x32(src, instride, delta, dst, outstride, width, height);
+				break;
 
 			case FF_PLUGIN:
 				// MFC interface did not do plugins in parallel
