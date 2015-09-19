@@ -1,0 +1,3 @@
+[submodule "dependencies"]
+	path = dependencies
+	url = https://github.com/visualboyadvance-m/dependencies.git
