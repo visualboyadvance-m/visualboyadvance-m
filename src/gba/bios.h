@@ -25,5 +25,11 @@ extern void BIOS_SoftReset();
 extern void BIOS_Sqrt();
 extern void BIOS_MidiKey2Freq();
 extern void BIOS_SndDriverJmpTableCopy();
+extern void BIOS_SndDriverInit();
+extern void BIOS_SndDriverMode();
+extern void BIOS_SndDriverMain();
+extern void BIOS_SndDriverVSync();
+extern void BIOS_SndDriverVSyncOff();
+extern void BIOS_SndChannelClear();
 
 #endif // BIOS_H

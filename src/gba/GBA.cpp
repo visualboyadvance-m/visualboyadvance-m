@@ -2342,6 +2342,28 @@ void CPUSoftwareInterrupt(int comment)
     else
       soundResume();
     break;
+  case 0x1A:
+    BIOS_SndDriverInit();
+    SWITicks = 252000;
+    break;
+  case 0x1B:
+    BIOS_SndDriverMode();
+    SWITicks = 280000;
+    break;
+  case 0x1C:
+    BIOS_SndDriverMain();
+    SWITicks = 11050;//avg
+    break;
+  case 0x1D:
+    BIOS_SndDriverVSync();
+    SWITicks = 44;
+    break;
+  case 0x1E:
+    BIOS_SndChannelClear();
+    break;
+  case 0x28:
+    BIOS_SndDriverVSyncOff();
+    break;
   case 0x1F:
     BIOS_MidiKey2Freq();
     break;
