@@ -460,7 +460,7 @@ void GameArea::SetFrameTitle()
 
 	tit.append(wxT("VisualBoyAdvance-M "));
 #ifndef FINAL_BUILD
-	tit.append(_("Git:"));
+	tit.append(_(VERSION));
 #endif
 #ifndef NO_LINK
 	int playerId = GetLinkPlayerId();

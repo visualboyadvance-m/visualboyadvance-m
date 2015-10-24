@@ -2519,7 +2519,7 @@ EVT_HANDLER(wxID_ABOUT, "About...")
 	if (!version.IsEmpty())
 		version = version + wxT("-");
 
-	version = version + wxT("Git:");
+	version = version + wxT(VERSION);
 #endif
 	ai.SetVersion(version);
 	// setting website, icon, license uses custom aboutbox on win32 & macosx
