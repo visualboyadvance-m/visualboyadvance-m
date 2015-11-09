@@ -38,7 +38,9 @@ static void get_config_path(wxPathList &path, bool exists = true)
 	wxStandardPathsBase &stdp = wxStandardPaths::Get();
 #define add_path(p) do { \
     const wxString& s = stdp.p; \
-    if((!exists || wxDirExists(s)) && wxIsWritable(s)) \
+    wxFileName parent = wxFileName::DirName(s + wxT("//..")); \
+    parent.MakeAbsolute(); \
+    if((wxDirExists(s) && wxIsWritable(s)) || ((!exists || !wxDirExists(s)) && parent.IsDirWritable())) \
     path.Add(s); \
 } while(0)
 	// NOTE: this does not support XDG (freedesktop.org) paths
@@ -84,6 +86,23 @@ wxString wxvbamApp::GetConfigurationPath()
 			}
 		}
 	}
+
+        // if no config dir was found, search for writable parent to
+        // create it in in reverse order
+        if (data_path.empty())
+        {
+		for (int i = 0; i < config_path.size() ; i++)
+                {
+                    wxFileName parent_dir = wxFileName::DirName(config_path[i] + wxT("//.."));
+                    parent_dir.MakeAbsolute();
+
+                    if (parent_dir.IsDirWritable())
+                    {
+                        data_path = config_path[i];
+                        break;
+                    }
+                }
+        }
 
 	return data_path;
 }
@@ -134,7 +153,7 @@ bool wxvbamApp::OnInit()
 	wxString cwd = wxGetCwd();
 
 	for (int i = 0; i < config_path.size(); i++)
-		if (wxSetWorkingDirectory(config_path[i]))
+		if (wxDirExists(config_path[i]) && wxSetWorkingDirectory(config_path[i]))
 		{
 			// *.xr[cs] doesn't work (double the number of scans)
 			// 2.9 gives errors for no files found, so manual precheck needed
@@ -163,7 +182,7 @@ bool wxvbamApp::OnInit()
 	// this needs to be in a subdir to support other config as well
 	// but subdir flag behaves differently 2.8 vs. 2.9.  Oh well.
 	// NOTE: this does not support XDG (freedesktop.org) paths
-#ifdef __WXMSW__
+#if defined(__WXMSW__) || defined(__APPLE__)
 	wxFileName vbamconf(GetConfigurationPath(), _T("vbam.ini"));
 	cfg = new wxFileConfig(wxT("vbam"), wxEmptyString,
 	                       vbamconf.GetFullPath(),
@@ -197,8 +216,7 @@ bool wxvbamApp::OnInit()
 		// only the path part gets created
 		// note that 0777 is default (assumes umask will do og-w)
 		s.Mkdir(0777, wxPATH_MKDIR_FULL);
-		s = GetConfigurationPath();
-		s.AppendDir(s.GetFullName());
+		s = wxFileName::DirName(GetConfigurationPath());
 		s.Mkdir(0777, wxPATH_MKDIR_FULL);
 	}
 
