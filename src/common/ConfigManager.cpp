@@ -706,7 +706,7 @@ char* FindConfigFile(char *name)
 
 void LoadConfigFile()
 {
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__APPLE__)
 	// Get home dir
 	char buf[1024];
 	struct stat s;
@@ -734,7 +734,7 @@ void LoadConfigFile()
 
 void SaveConfigFile()
 {
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__APPLE__)
 	// Get home dir
 	char buf[1024];
 	struct stat s;
