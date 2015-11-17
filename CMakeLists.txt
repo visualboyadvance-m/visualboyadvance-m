@@ -58,6 +58,8 @@ IF( NOT VERSION )
     endif(EXISTS ${PROJECT_SOURCE_DIR}/.git)
 ENDIF( NOT VERSION )
 
+
+
 # Fill in SDLMAIN_LIBRARY on OS X manually to avoid using SDLMain.m
 # OS X users will have to compile and install SDL from source.
 if( APPLE AND ENABLE_SDL )
@@ -65,9 +67,40 @@ if( APPLE AND ENABLE_SDL )
     SET(SDLMAIN_LIBRARY "-lSDLmain")
 endif( APPLE AND ENABLE_SDL )
 
+# Add support for MacPorts and Homebrew on OS X
+# and ObjectiveC code
+IF(APPLE)
+    SET(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH};/usr/local/include;/opt/local/include")
+    SET(CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH};/usr/local/lib;/opt/local/lib")
+    SET(CMAKE_PROGRAM_PATH "${CMAKE_PROGRAM_PATH};/usr/local/bin;/opt/local/bin")
+
+    link_directories("/usr/local/lib")
+    include_directories("/usr/local/include")
+
+    link_directories("/opt/local/lib")
+    include_directories("/opt/local/include")
+
+    # and compile as Objective-C++ for ObjectiveC #ifdefs
+    SET(CMAKE_CXX_COMPILE_OBJECT "<CMAKE_CXX_COMPILER> -x objective-c++ <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT> -c <SOURCE>")
+ENDIF()
+
+# We do not support amd64 asm yet
+IF((ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX)
+   AND CMAKE_SYSTEM_PROCESSOR MATCHES "[xX]86|[aA][mM][dD]64|[xX]64"
+   AND CMAKE_C_SIZEOF_DATA_PTR EQUAL 8)
+    MESSAGE(FATAL_ERROR "The options ASM_CORE, ASM_SCALERS and MMX are not supported on AMD64 yet.")
+ENDIF()
+
 # Check for nasm
 if( ENABLE_ASM_SCALERS )
-    ENABLE_LANGUAGE( ASM_NASM )
+    IF(EXISTS "/usr/local/bin/nasm")
+        SET(CMAKE_ASM_NASM_COMPILER "/usr/local/bin/nasm")
+    ELSEIF(EXISTS "/opt/local/bin/nasm")
+        SET(CMAKE_ASM_NASM_COMPILER "/opt/local/bin/nasm")
+    ELSE()
+        SET(CMAKE_ASM_NASM_COMPILER "/usr/bin/nasm")
+    ENDIF()
+    ENABLE_LANGUAGE(ASM_NASM)
 endif( ENABLE_ASM_SCALERS )
 
 # Look for some dependencies using CMake scripts
@@ -166,6 +199,14 @@ if( ENABLE_NLS )
     ADD_DEFINITIONS ( -DENABLE_NLS )
     ADD_DEFINITIONS ( -DLOCALEDIR=\\\"${LOCALEDIR}\\\" )
     # for now, only GBALink.cpp uses gettext() directly
+    IF(APPLE)
+        # use Homebrew gettext if available
+        IF(EXISTS "/usr/local/opt/gettext")
+            SET(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH};/usr/local/opt/gettext/include")
+            SET(CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH};/usr/local/opt/gettext/lib")
+            SET(CMAKE_PROGRAM_PATH "${CMAKE_PROGRAM_PATH};/usr/local/opt/gettext/bin")
+        ENDIF()
+    ENDIF()
     IF(ENABLE_LINK)
         FIND_PATH(LIBINTL_INC libintl.h )
         FIND_LIBRARY(LIBINTL_LIB intl )
@@ -176,18 +217,25 @@ if( ENABLE_NLS )
         INCLUDE(CheckFunctionExists)
         CHECK_FUNCTION_EXISTS(gettext GETTEXT_FN)
         IF(NOT LIBINTL_INC OR NOT GETTEXT_FN)
-            message( SEND_ERROR "NLS requires libintl" )
+            MESSAGE(FATAL_ERROR "NLS requires libintl/gettext")
         ENDIF(NOT LIBINTL_INC OR NOT GETTEXT_FN)
         INCLUDE_DIRECTORIES(${LIBINTL_INC})
     ENDIF(ENABLE_LINK)
 endif( ENABLE_NLS )
 
 # Compiler flags
-IF ( WIN32 )
-    SET( CMAKE_ASM_NASM_FLAGS "-I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -w-orphan-labels")
-ELSE ( WIN32 )
-    SET( CMAKE_ASM_NASM_FLAGS "-I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -DELF -w-orphan-labels")
-ENDIF ( WIN32 )
+IF(WIN32)
+    SET( CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -w-orphan-labels")
+ELSEIF(APPLE)
+    SET( CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -DMACHO -w-orphan-labels")
+ELSEIF("${CMAKE_SYSTEM}" MATCHES "Linux")
+    SET( CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -DELF -w-orphan-labels")
+ENDIF()
+
+IF(CMAKE_SYSTEM_PROCESSOR MATCHES "[xX]86|[aA][mM][dD]64|[xX]64" AND CMAKE_C_SIZEOF_DATA_PTR EQUAL 8)
+    ADD_DEFINITIONS( -D__AMD64__ )
+    SET(CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -D__AMD64__")
+ENDIF()
 
 SET( CMAKE_C_FLAGS_RELEASE "-O3")
 SET( CMAKE_CXX_FLAGS_RELEASE "-O3")

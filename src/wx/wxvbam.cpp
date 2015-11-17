@@ -65,6 +65,8 @@ static void tack_full_path(wxString &s, const wxString &app = wxEmptyString)
 
 wxString wxvbamApp::GetConfigurationPath()
 {
+        // first check if config files exists in reverse order
+        // (from system paths to more local paths.)
 	if (data_path.empty())
 	{
 		get_config_path(config_path);
@@ -78,21 +80,25 @@ wxString wxvbamApp::GetConfigurationPath()
 				data_path = config_path[i];
 				break;
 			}
-			// Check if path is writeable
-			else if (wxIsWritable(config_path[i]))
-			{
-				data_path = config_path[i];
-				break;
-			}
 		}
 	}
 
-        // if no config dir was found, search for writable parent to
-        // create it in in reverse order
+        // if no config file was not found, search for writable config
+        // dir or parent to create it in in OnInit in normal order
+        // (from user paths to system paths.)
         if (data_path.empty())
         {
 		for (int i = 0; i < config_path.size() ; i++)
                 {
+                    // Check if path is writeable
+                    if (wxIsWritable(config_path[i]))
+                    {
+                            data_path = config_path[i];
+                            break;
+                    }
+
+                    // check if parent of path is writable, so we can
+                    // create the path in OnInit
                     wxFileName parent_dir = wxFileName::DirName(config_path[i] + wxT("//.."));
                     parent_dir.MakeAbsolute();
 
