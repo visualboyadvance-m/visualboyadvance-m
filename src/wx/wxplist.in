@@ -32,6 +32,12 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+
+        <!-- this is for retina support in rendered text -->
+        <!-- see: https://wiki.wxwidgets.org/WxMac-specific_topics#Retina_display_support -->
+        <key>NSPrincipalClass</key>
+        <string>NSApplication</string>
+
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 	   <dict>
