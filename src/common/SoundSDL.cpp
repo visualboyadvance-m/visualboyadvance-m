@@ -27,8 +27,9 @@ const float SoundSDL::_delay = 0.032f;
 
 SoundSDL::SoundSDL():
 	_rbuf(0),
-	_initialized(false),
-	current_rate(0)
+	_dev(-1),
+	current_rate(0),
+	_initialized(false)
 {
 
 }
@@ -66,8 +67,8 @@ void SoundSDL::write(u16 * finalWave, int length)
 	if (!_initialized)
 		return;
 
-	if (SDL_GetAudioStatus() != SDL_AUDIO_PLAYING)
-		SDL_PauseAudio(0);
+	if (SDL_GetAudioDeviceStatus(_dev) != SDL_AUDIO_PLAYING)
+		SDL_PauseAudioDevice(_dev, 0);
 
 	SDL_mutexP(_mutex);
 
@@ -119,7 +120,10 @@ bool SoundSDL::init(long sampleRate)
 	audio.callback = soundCallback;
 	audio.userdata = this;
 
-	if(SDL_OpenAudio(&audio, NULL))
+	if (!SDL_WasInit(SDL_INIT_AUDIO)) SDL_Init(SDL_INIT_AUDIO);
+
+	_dev = SDL_OpenAudioDevice(NULL, 0, &audio, NULL, SDL_AUDIO_ALLOW_ANY_CHANGE);
+	if(_dev < 0)
 	{
 		fprintf(stderr,"Failed to open audio: %s\n", SDL_GetError());
 		return false;
@@ -158,7 +162,7 @@ SoundSDL::~SoundSDL()
 	SDL_DestroyMutex(_mutex);
 	_mutex = NULL;
 
-	SDL_CloseAudio();
+	SDL_CloseAudioDevice(_dev);
 
 	emulating = iSave;
 
@@ -170,7 +174,7 @@ void SoundSDL::pause()
 	if (!_initialized)
 		return;
 
-	SDL_PauseAudio(1);
+	SDL_PauseAudioDevice(_dev, 1);
 }
 
 void SoundSDL::resume()
@@ -178,7 +182,7 @@ void SoundSDL::resume()
 	if (!_initialized)
 		return;
 
-	SDL_PauseAudio(0);
+	SDL_PauseAudioDevice(_dev, 0);
 }
 
 void SoundSDL::reset()

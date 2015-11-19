@@ -41,6 +41,7 @@ private:
 	SDL_mutex * _mutex;
 	SDL_sem *_semBufferFull;
 	SDL_sem *_semBufferEmpty;
+	SDL_AudioDeviceID _dev;
 
 	int current_rate;
 

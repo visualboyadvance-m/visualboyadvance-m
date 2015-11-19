@@ -70,18 +70,18 @@ static uint32_t joypad[5][SDLBUTTONS_NUM] = {
 };
 
 static uint32_t motion[4] = {
-  SDLK_KP4, SDLK_KP6, SDLK_KP8, SDLK_KP2
+  SDLK_KP_4, SDLK_KP_6, SDLK_KP_8, SDLK_KP_2
 };
 
 static uint32_t defaultMotion[4] = {
-  SDLK_KP4, SDLK_KP6, SDLK_KP8, SDLK_KP2
+  SDLK_KP_4, SDLK_KP_6, SDLK_KP_8, SDLK_KP_2
 };
 
 
 static uint32_t sdlGetHatCode(const SDL_Event &event)
 {
     if (!event.jhat.value) return 0;
-    
+
     return (
                 ((event.jhat.which + 1) << 16) |
                 32 |
@@ -220,17 +220,17 @@ static void sdlUpdateKey(uint32_t key, bool down)
   int i;
   for(int j = 0; j < 4; j++) {
     for(i = 0 ; i < SDLBUTTONS_NUM; i++) {
-      if((joypad[j][i] & 0xffff0000) == 0) {
+      //if((joypad[j][i] & 0xffff0000) == 0) {
         if(key == joypad[j][i])
           sdlButtons[j][i] = down;
-      }
+      //}
     }
   }
   for(i = 0 ; i < 4; i++) {
-    if((motion[i] & 0xffff0000) == 0) {
+    //if((motion[i] & 0xffff0000) == 0) {
       if(key == motion[i])
         sdlMotionButtons[i] = down;
-    }
+    //}
   }
 }
 
@@ -463,10 +463,10 @@ void inputProcessSDLEvent(const SDL_Event &event)
     switch(event.type)
     {
         case SDL_KEYDOWN:
-            sdlUpdateKey(event.key.keysym.sym, true);
+            if (!event.key.keysym.mod) sdlUpdateKey(event.key.keysym.sym, true);
             break;
         case SDL_KEYUP:
-            sdlUpdateKey(event.key.keysym.sym, false);
+            if (!event.key.keysym.mod) sdlUpdateKey(event.key.keysym.sym, false);
             break;
         case SDL_JOYHATMOTION:
             sdlUpdateJoyHat(event.jhat.which,

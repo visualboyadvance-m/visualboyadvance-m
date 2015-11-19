@@ -112,6 +112,10 @@ struct EmulatedSystem emulator = {
 };
 
 SDL_Surface *surface = NULL;
+SDL_Window *window = NULL;
+SDL_Renderer *renderer = NULL;
+SDL_Texture *texture = NULL;
+SDL_GLContext glcontext;
 
 int systemSpeed = 0;
 int systemRedShift = 0;
@@ -182,7 +186,7 @@ u32 throttleLastTime = 0;
 bool pauseNextFrame = false;
 int sdlMirroringEnable = 1;
 
-static int ignore_first_resize_event = 0;
+//static int ignore_first_resize_event = 0;
 
 /* forward */
 void systemConsoleMessage(const char*);
@@ -418,16 +422,12 @@ FILE *sdlFindFile(const char *name)
 #endif // ! _WIN32
 
   return NULL;
-}void sdlOpenGLInit(int w, int h)
+}
+
+static void sdlOpenGLScaleWithAspect(int w, int h)
 {
   float screenAspect = (float) sizeX / sizeY,
         windowAspect = (float) w / h;
-
-  if(glIsTexture(screenTexture))
-  glDeleteTextures(1, &screenTexture);
-
-  glDisable(GL_CULL_FACE);
-  glEnable(GL_TEXTURE_2D);
 
   if(windowAspect == screenAspect)
     glViewport(0, 0, w, h);
@@ -438,14 +438,12 @@ FILE *sdlFindFile(const char *name)
     int width = (int)(h * screenAspect);
     glViewport((w - width) / 2, 0, width, h);
   }
+}
 
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-
-  glOrtho(0.0, 1.0, 1.0, 0.0, 0.0, 1.0);
-
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+static void sdlOpenGLVideoResize()
+{
+  if(glIsTexture(screenTexture))
+  glDeleteTextures(1, &screenTexture);
 
   glGenTextures(1, &screenTexture);
   glBindTexture(GL_TEXTURE_2D, screenTexture);
@@ -467,10 +465,73 @@ FILE *sdlFindFile(const char *name)
   textureSize = (int)pow(2.0f, n);
 
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureSize, textureSize, 0,
-               GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+               GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+  glClear( GL_COLOR_BUFFER_BIT );
+
+  sdlOpenGLScaleWithAspect(destWidth, destHeight);
+}
+
+void sdlOpenGLInit(int w, int h)
+{
+
+#if 0
+  float screenAspect = (float) sizeX / sizeY,
+        windowAspect = (float) w / h;
+
+  if(glIsTexture(screenTexture))
+  glDeleteTextures(1, &screenTexture);
+#endif
+  glDisable(GL_CULL_FACE);
+  glEnable(GL_TEXTURE_2D);
+
+#if 0
+  if(windowAspect == screenAspect)
+    glViewport(0, 0, w, h);
+  else if (windowAspect < screenAspect) {
+    int height = (int)(w / screenAspect);
+    glViewport(0, (h - height) / 2, w, height);
+  } else {
+    int width = (int)(h * screenAspect);
+    glViewport((w - width) / 2, 0, width, h);
+  }
+#endif
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+
+  glOrtho(0.0, 1.0, 1.0, 0.0, 0.0, 1.0);
+
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+
+#if 0
+  glGenTextures(1, &screenTexture);
+  glBindTexture(GL_TEXTURE_2D, screenTexture);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                  openGL == 2 ? GL_LINEAR : GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  openGL == 2 ? GL_LINEAR : GL_NEAREST);
+
+  // Calculate texture size as a the smallest working power of two
+  float n1 = log10((float)destWidth ) / log10( 2.0f);
+  float n2 = log10((float)destHeight ) / log10( 2.0f);
+  float n = (n1 > n2)? n1 : n2;
+
+    // round up
+  if (((float)((int)n)) != n)
+    n = ((float)((int)n)) + 1.0f;
+
+  textureSize = (int)pow(2.0f, n);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureSize, textureSize, 0,
+               GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+#endif
 
   glClearColor(0.0,0.0,0.0,1.0);
-  glClear( GL_COLOR_BUFFER_BIT );
+
+  sdlOpenGLVideoResize();
 }
 
 static void sdlApplyPerImagePreferences()
@@ -720,9 +781,41 @@ void sdlReadBattery()
 }
 
 void sdlReadDesktopVideoMode() {
-  const SDL_VideoInfo* vInfo = SDL_GetVideoInfo();
-  desktopWidth = vInfo->current_w;
-  desktopHeight = vInfo->current_h;
+  SDL_DisplayMode dm;
+  SDL_GetDesktopDisplayMode(SDL_GetWindowDisplayIndex(window), &dm);
+  desktopWidth = dm.w;
+  desktopHeight = dm.h;
+}
+
+static void sdlResizeVideo() {
+  filter_enlarge = getFilterEnlargeFactor(filter);
+
+  destWidth = filter_enlarge * sizeX;
+  destHeight = filter_enlarge * sizeY;
+
+  if(openGL) {
+    free(filterPix);
+    filterPix = (u8 *)calloc(1, (systemColorDepth >> 3) * destWidth * destHeight);
+    sdlOpenGLVideoResize();
+  }
+
+  if (surface) SDL_FreeSurface(surface);
+  if (texture) SDL_DestroyTexture(texture);
+
+  if (!openGL) {
+    surface = SDL_CreateRGBSurface(0, destWidth, destHeight, 32,
+                                   0x00FF0000, 0x0000FF00,
+                                   0x000000FF, 0xFF000000);
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
+                                SDL_TEXTUREACCESS_STREAMING,
+                                destWidth, destHeight);
+  }
+
+  if(!openGL && surface == NULL) {
+    systemMessage(0, "Failed to set video mode");
+    SDL_Quit();
+    exit(-1);
+  }
 }
 
 void sdlInitVideo() {
@@ -735,24 +828,24 @@ void sdlInitVideo() {
   destWidth = filter_enlarge * sizeX;
   destHeight = filter_enlarge * sizeY;
 
-  flags = SDL_ANYFORMAT | (fullScreen ? SDL_FULLSCREEN : 0);
+  flags = fullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0;
   if(openGL) {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    flags |= SDL_OPENGL | SDL_RESIZABLE;
-  } else
-    flags |= SDL_HWSURFACE | SDL_DOUBLEBUF;
-
-  if (fullScreen && openGL) {
-    screenWidth = desktopWidth;
-    screenHeight = desktopHeight;
-  } else {
-    screenWidth = destWidth;
-    screenHeight = destHeight;
+    flags |= SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
   }
 
-  surface = SDL_SetVideoMode(screenWidth, screenHeight, 0, flags);
+    screenWidth = destWidth;
+    screenHeight = destHeight;
 
-  if(surface == NULL) {
+  if (window) SDL_DestroyWindow(window);
+  if (renderer) SDL_DestroyRenderer(renderer);
+  window = SDL_CreateWindow("VBA-M", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                            screenWidth, screenHeight, flags);
+  if (!openGL) {
+    renderer = SDL_CreateRenderer(window, -1, 0);
+  }
+
+  if(window == NULL) {
     systemMessage(0, "Failed to set video mode");
     SDL_Quit();
     exit(-1);
@@ -760,6 +853,7 @@ void sdlInitVideo() {
 
   u32 rmask, gmask, bmask;
 
+#if 0
   if(openGL) {
     #if SDL_BYTEORDER == SDL_LIL_ENDIAN /* OpenGL RGBA masks */
       rmask = 0x000000FF;
@@ -775,10 +869,25 @@ void sdlInitVideo() {
       gmask = surface->format->Gmask;
       bmask = surface->format->Bmask;
   }
+#endif
+
+  if(openGL) {
+    rmask = 0xFF000000;
+    gmask = 0x00FF0000;
+    bmask = 0x0000FF00;
+  } else {
+    rmask = 0x00FF0000;
+    gmask = 0x0000FF00;
+    bmask = 0x000000FF;
+  }
 
   systemRedShift = sdlCalculateShift(rmask);
   systemGreenShift = sdlCalculateShift(gmask);
   systemBlueShift = sdlCalculateShift(bmask);
+
+  //printf("systemRedShift %d, systemGreenShift %d, systemBlueShift %d\n",
+  //         systemRedShift, systemGreenShift, systemBlueShift);
+  //  originally 3, 11, 19 -> 27, 19, 11
 
   if(openGL) {
       // Align to BGRA instead of ABGR
@@ -787,7 +896,24 @@ void sdlInitVideo() {
       systemBlueShift += 8;
   }
 
-  systemColorDepth = surface->format->BitsPerPixel;
+#if 0
+  if (openGL) {
+    systemColorDepth = 0;
+    int i;
+    glcontext = SDL_GL_CreateContext(window);
+    SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &i);
+    systemColorDepth += i;
+    SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &i);
+    systemColorDepth += i;
+    SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &i);
+    systemColorDepth += i;
+    printf("color depth (without alpha) is %d\n", systemColorDepth);
+    SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE, &i);
+    systemColorDepth += i;
+    printf("color depth is %d\n", systemColorDepth);
+  }
+  else
+    systemColorDepth = 32;
 
   if(systemColorDepth == 16) {
     srcPitch = sizeX*2 + 4;
@@ -798,6 +924,19 @@ void sdlInitVideo() {
       srcPitch = sizeX*3;
   }
 
+#endif
+
+  systemColorDepth = 32;
+  srcPitch = sizeX*4 + 4;
+
+  if (openGL) {
+    glcontext = SDL_GL_CreateContext(window);
+    sdlOpenGLInit(screenWidth, screenHeight);
+  }
+
+  sdlResizeVideo();
+
+#if 0
   if(openGL) {
     int scaledWidth = screenWidth * sdlOpenglScale;
     int scaledHeight = screenHeight * sdlOpenglScale;
@@ -821,8 +960,11 @@ void sdlInitVideo() {
 	ignore_first_resize_event	= 1;
     }
   }
-
+#endif
 }
+#if defined(KMOD_GUI)
+#define KMOD_META KMOD_GUI
+#endif
 
 #define MOD_KEYS    (KMOD_CTRL|KMOD_SHIFT|KMOD_ALT|KMOD_META)
 #define MOD_NOCTRL  (KMOD_SHIFT|KMOD_ALT|KMOD_META)
@@ -962,6 +1104,7 @@ void sdlPollEvents()
     case SDL_QUIT:
       emulating = 0;
       break;
+#if 0
     case SDL_VIDEORESIZE:
       if (ignore_first_resize_event)
       {
@@ -993,6 +1136,35 @@ void sdlPollEvents()
 
           memset(delta,255,delta_size);
         }
+      }
+      break;
+#endif
+    case SDL_WINDOWEVENT:
+      switch (event.window.event) {
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+          if(pauseWhenInactive)
+              if(paused) {
+                if(emulating) {
+                  paused = 0;
+                  soundResume();
+                }
+              }
+          break;
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+          if(pauseWhenInactive) {
+              wasPaused = true;
+              if(emulating) {
+                paused = 1;
+                soundPause();
+              }
+
+              memset(delta,255,delta_size);
+          }
+          break;
+        case SDL_WINDOWEVENT_RESIZED:
+          if (openGL)
+            sdlOpenGLScaleWithAspect(event.window.data1, event.window.data2);
+          break;
       }
       break;
     case SDL_MOUSEMOTION:
@@ -1119,7 +1291,10 @@ void sdlPollEvents()
         if(!(event.key.keysym.mod & MOD_NOCTRL) &&
            (event.key.keysym.mod & KMOD_CTRL)) {
           paused = !paused;
-          SDL_PauseAudio(paused);
+          if (paused)
+            soundPause();
+          else
+            soundResume();
           if(paused)
             wasPaused = true;
 	  systemConsoleMessage(paused?"Pause on":"Pause off");
@@ -1132,7 +1307,15 @@ void sdlPollEvents()
         if(!(event.key.keysym.mod & MOD_NOCTRL) &&
            (event.key.keysym.mod & KMOD_CTRL)) {
           fullScreen = !fullScreen;
-          sdlInitVideo();
+          SDL_SetWindowFullscreen(window, fullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+          if (openGL)
+          {
+            if (fullScreen)
+              sdlOpenGLScaleWithAspect(desktopWidth, desktopHeight);
+            else
+              sdlOpenGLScaleWithAspect(destWidth, destHeight);
+          }
+          //sdlInitVideo();
         }
         break;
       case SDLK_g:
@@ -1144,8 +1327,11 @@ void sdlPollEvents()
 			      filter = (Filter)((filter + 1) % kInvalidFilter);
 		        filterFunction = initFilter(filter, systemColorDepth, sizeX);
 		      }
-		      if (getFilterEnlargeFactor(filter) != filter_enlarge)
-		        sdlInitVideo();
+		      if (getFilterEnlargeFactor(filter) != filter_enlarge) {
+		        sdlResizeVideo();
+		        if (!fullScreen)
+		          SDL_SetWindowSize(window, destWidth, destHeight);
+		      }
 		      systemScreenMessage(getFilterName(filter));
         }
         break;
@@ -1286,7 +1472,10 @@ void lircCheckInput(void)
             emulating = 0;
           } else if( strcmp( CmdLIRC, "PAUSE" ) == 0 ) {
             paused = !paused;
-            SDL_PauseAudio(paused);
+            if (paused)
+              soundPause();
+            else
+              soundResume();
             if(paused) wasPaused = true;
             systemConsoleMessage( paused?"Pause on":"Pause off" );
             systemScreenMessage( paused?"Pause on":"Pause off" );
@@ -1693,15 +1882,14 @@ int main(int argc, char **argv)
   if(debugger)
     remoteInit();
 
-  int flags = SDL_INIT_VIDEO|SDL_INIT_AUDIO|
-    SDL_INIT_TIMER|SDL_INIT_NOPARACHUTE;
+  int flags = SDL_INIT_VIDEO|SDL_INIT_TIMER;
 
-  if(SDL_Init(flags)) {
+  if(SDL_Init(flags) < 0) {
     systemMessage(0, "Failed to init SDL: %s", SDL_GetError());
     exit(-1);
   }
 
-  if(SDL_InitSubSystem(SDL_INIT_JOYSTICK)) {
+  if(SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0) {
     systemMessage(0, "Failed to init joystick support: %s", SDL_GetError());
   }
 
@@ -1770,8 +1958,6 @@ int main(int argc, char **argv)
 
   autoFrameSkipLastTime = throttleLastTime = systemGetClock();
 
-  SDL_WM_SetCaption("VBA-M", NULL);
-
   // now we can enable cheats?
   {
 	int i;
@@ -1826,6 +2012,11 @@ int main(int argc, char **argv)
   fprintf(stdout,"Shutting down\n");
   remoteCleanUp();
   soundShutdown();
+
+  if (openGL)
+  {
+    SDL_GL_DeleteContext(glcontext);
+  }
 
   if(gbRom != NULL || rom != NULL) {
     sdlWriteBattery();
@@ -1915,6 +2106,19 @@ void systemDrawScreen()
   filterFunction(pix + srcPitch, srcPitch, delta, screen,
                  destPitch, sizeX, sizeY);
 
+  if (openGL)
+  {
+    int bytes = (systemColorDepth >> 3);
+    for (int i = 0; i < destWidth; i++)
+      for (int j = 0; j < destHeight; j++)
+      {
+         u8 k;
+         k = filterPix[i * bytes + j*destPitch + 3];
+         filterPix[i * bytes + j*destPitch + 3] = filterPix[i * bytes + j*destPitch + 1];
+         filterPix[i * bytes + j*destPitch + 1] = k;
+      }
+  }
+
   drawScreenMessage(screen, destPitch, 10, destHeight - 20, 3000);
 
   if (showSpeed && fullScreen)
@@ -1928,7 +2132,8 @@ void systemDrawScreen()
                       GL_RGB, GL_UNSIGNED_SHORT_5_6_5, screen);
     else
       glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
-                      GL_BGRA, GL_UNSIGNED_INT_8_8_8_8, screen);
+                      //GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, screen);
+                      GL_RGBA, GL_UNSIGNED_BYTE, screen);
 
     glBegin(GL_TRIANGLE_STRIP);
       glTexCoord2f(0.0f, 0.0f);
@@ -1941,17 +2146,19 @@ void systemDrawScreen()
                   destHeight / (GLfloat) textureSize);
 	  glVertex3i(1, 1, 0);
     glEnd();
-    SDL_GL_SwapBuffers();
+    SDL_GL_SwapWindow(window);
   } else {
     SDL_UnlockSurface(surface);
-    SDL_Flip(surface);
+    SDL_UpdateTexture(texture, NULL, surface->pixels, surface->pitch);
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    SDL_RenderPresent(renderer);
   }
 
 }
 
 void systemSetTitle(const char *title)
 {
-  SDL_WM_SetCaption(title, NULL);
+  SDL_SetWindowTitle(window, title);
 }
 
 void systemShowSpeed(int speed)
@@ -2177,7 +2384,7 @@ int systemGetSensorZ()
 
 u8 systemGetSensorDarkness()
 {
-	return 0;
+	return 0xE8;
 }
 
 SoundDriver * systemSoundInit()

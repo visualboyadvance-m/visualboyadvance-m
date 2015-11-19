@@ -12,6 +12,7 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
 option( ENABLE_SDL "Build the SDL port" ON )
 option( ENABLE_GTK "Build the GTK+ GUI" OFF )
+option( ENABLE_GTK3 "Build the GTK+ GUI" OFF )
 option( ENABLE_WX "Build the wxWidgets port" ON )
 option( ENABLE_DEBUGGER "Enable the debugger" ON )
 option( ENABLE_NLS "Enable translations" ON )
@@ -64,7 +65,7 @@ ENDIF( NOT VERSION )
 # OS X users will have to compile and install SDL from source.
 if( APPLE AND ENABLE_SDL )
     ADD_DEFINITIONS (-DwxMAC_USE_CORE_GRAPHICS )
-    SET(SDLMAIN_LIBRARY "-lSDLmain")
+    SET(SDL2MAIN_LIBRARY "-lSDL2main")
 endif( APPLE AND ENABLE_SDL )
 
 # Add support for MacPorts and Homebrew on OS X
@@ -107,7 +108,7 @@ endif( ENABLE_ASM_SCALERS )
 FIND_PACKAGE ( ZLIB REQUIRED )
 FIND_PACKAGE ( PNG REQUIRED )
 FIND_PACKAGE ( OpenGL REQUIRED )
-FIND_PACKAGE ( SDL REQUIRED )
+FIND_PACKAGE ( SDL2 REQUIRED )
 
 if( ENABLE_LINK )
     if( WIN32 )
@@ -119,7 +120,7 @@ endif( ENABLE_LINK )
 SET(VBAMCORE_LIBS
     vbamcore
     fex
-    ${SDL_LIBRARY}
+    ${SDL2_LIBRARY}
     ${SFML_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${ZLIB_LIBRARY}
@@ -369,7 +370,7 @@ INCLUDE_DIRECTORIES(
     ${ZLIB_INCLUDE_DIR}
     fex
     ${PNG_INCLUDE_DIR}
-    ${SDL_INCLUDE_DIR}
+    ${SDL2_INCLUDE_DIR}
 )
 
 IF( ENABLE_FFMPEG )
@@ -417,24 +418,24 @@ IF( ENABLE_SDL )
 		INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam DESTINATION bin)
 	ENDIF( WIN32 )
 		INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
-				DESTINATION ${SYSCONFDIR}
+				DESTINATION ${CMAKE_INSTALL_PREFIX}/${SYSCONFDIR}
 				RENAME vbam.cfg)
 ENDIF( ENABLE_SDL )
 
-IF( ENABLE_GTK )
+IF( ENABLE_GTK OR ENABLE_GTK3 )
 	add_subdirectory (src/gtk)
-ENDIF( ENABLE_GTK )
+ENDIF( ENABLE_GTK OR ENABLE_GTK3 )
 
 IF( ENABLE_WX )
     add_subdirectory(src/wx)
 ENDIF( ENABLE_WX )
 
-if( ENABLE_GTK OR ENABLE_WX )
+if( ENABLE_GTK OR ENABLE_GTK3 OR ENABLE_WX )
     # Native Language Support
     if( ENABLE_NLS )
         add_subdirectory(po)
     endif( ENABLE_NLS )
-endif( ENABLE_GTK OR ENABLE_WX )
+endif( ENABLE_GTK OR ENABLE_GTK3 OR ENABLE_WX )
 INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini DESTINATION ${DATA_INSTALL_DIR})
 IF(NOT APPLE)
     INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/icons/ DESTINATION share/icons/hicolor PATTERN ".svn" EXCLUDE)
