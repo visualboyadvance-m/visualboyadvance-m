@@ -65,7 +65,12 @@ protected:
   bool     m_bEnableRender;
 
   bool             m_bShowCursor;
+
+#if !GTK_CHECK_VERSION(3, 0, 0)
   Gdk::Cursor *    m_poEmptyCursor;
+#else
+  Glib::RefPtr<Gdk::Cursor> m_poEmptyCursor;
+#endif
   sigc::connection m_oCursorSig;
 
   void vUpdateSize();

@@ -19,6 +19,7 @@
 #ifndef __VBA_GAMEBOYCONFIG_H__
 #define __VBA_GAMEBOYCONFIG_H__
 
+#include <gtkmm/checkbutton.h>
 #include <gtkmm/combobox.h>
 #include <gtkmm/filechooserbutton.h>
 

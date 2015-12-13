@@ -19,7 +19,9 @@
 #ifndef __VBA_GENERALCONFIG_H__
 #define __VBA_GENERALCONFIG_H__
 
-#include <gtkmm.h>
+#include <gtkmm/checkbutton.h>
+#include <gtkmm/spinbutton.h>
+#include <gtkmm/combobox.h>
 
 #include "configfile.h"
 #include "window.h"

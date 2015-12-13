@@ -106,6 +106,7 @@ void systemUpdateMotionSensor()
 
 u8 systemGetSensorDarkness()
 {
+  return 0xE8;
 }
 
 int systemGetSensorX()

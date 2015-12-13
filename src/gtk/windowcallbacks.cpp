@@ -18,6 +18,11 @@
 
 #include "window.h"
 
+#include <glibmm/convert.h>
+#include <glibmm/fileutils.h>
+#include <glibmm/miscutils.h>
+#include <glibmm/main.h>
+
 #include <deque>
 
 #include <gtkmm/stock.h>
@@ -98,9 +103,15 @@ void Window::vOnFileLoad()
     oDialog.add_shortcut_folder(sSaveDir);
   }
 
+#if !GTK_CHECK_VERSION(3, 0, 0)
   Gtk::FileFilter oSaveFilter;
   oSaveFilter.set_name(_("VisualBoyAdvance save game"));
   oSaveFilter.add_pattern("*.[sS][gG][mM]");
+#else
+  const Glib::RefPtr<Gtk::FileFilter> oSaveFilter = Gtk::FileFilter::create();
+  oSaveFilter->set_name(_("VisualBoyAdvance save game"));
+  oSaveFilter->add_pattern("*.[sS][gG][mM]");
+#endif
 
   oDialog.add_filter(oSaveFilter);
 
@@ -133,9 +144,15 @@ void Window::vOnFileSave()
   }
   oDialog.set_current_name(sCutSuffix(Glib::path_get_basename(m_sRomFile)));
 
+#if !GTK_CHECK_VERSION(3, 0, 0)
   Gtk::FileFilter oSaveFilter;
   oSaveFilter.set_name(_("VisualBoyAdvance save game"));
   oSaveFilter.add_pattern("*.[sS][gG][mM]");
+#else
+  const Glib::RefPtr<Gtk::FileFilter> oSaveFilter = Gtk::FileFilter::create();
+  oSaveFilter->set_name(_("VisualBoyAdvance save game"));
+  oSaveFilter->add_pattern("*.[sS][gG][mM]");
+#endif
 
   oDialog.add_filter(oSaveFilter);
 
@@ -293,9 +310,15 @@ void Window::vOnFileScreenCapture()
   }
   oDialog.set_current_name(sCutSuffix(Glib::path_get_basename(m_sRomFile)));
 
+#if !GTK_CHECK_VERSION(3, 0, 0)
   Gtk::FileFilter oPngFilter;
   oPngFilter.set_name(_("PNG image"));
   oPngFilter.add_pattern("*.[pP][nN][gG]");
+#else
+  const Glib::RefPtr<Gtk::FileFilter> oPngFilter = Gtk::FileFilter::create();
+  oPngFilter->set_name(_("PNG image"));
+  oPngFilter->add_pattern("*.[pP][nN][gG]");
+#endif
 
   oDialog.add_filter(oPngFilter);
 
@@ -523,7 +546,7 @@ void Window::vOnHelpAbout()
 
   oAboutDialog.set_website("http://www.vba-m.com/");
 
-  std::list<Glib::ustring> list_authors;
+  std::vector<Glib::ustring> list_authors;
   list_authors.push_back("Forgotten");
   list_authors.push_back("kxu");
   list_authors.push_back("Pokemonhacker");
@@ -534,7 +557,7 @@ void Window::vOnHelpAbout()
   list_authors.push_back("bgK");
   oAboutDialog.set_authors(list_authors);
 
-  std::list<Glib::ustring> list_artists;
+  std::vector<Glib::ustring> list_artists;
   list_artists.push_back("Matteo Drera");
   list_artists.push_back("Jakub Steiner");
   list_artists.push_back("Jones Lee");
@@ -581,7 +604,7 @@ bool Window::bOnEmuSaveStateRewind() {
   if (m_stEmulator.emuWriteMemState(m_psavestate, SZSTATE, resize)) {
     /*resize*=2; // if tell does not return correct size this leverage factor is needed
     if (resize > SZSTATE) resize = SZSTATE;*/
-    g_assert( resize <= SZSTATE );
+    g_assert( resize <= (int) SZSTATE );
     resize+=(sizeof(resize)*8); // some leverage
     psavestate = new char[resize];
     memmove(psavestate, &resize, sizeof(resize)); // pack size first
@@ -627,14 +650,14 @@ bool Window::on_focus_out_event(GdkEventFocus * _pstEvent)
 bool Window::on_key_press_event(GdkEventKey * _pstEvent)
 {
   // The menu accelerators are disabled when it is hidden
-  if (_pstEvent->keyval == GDK_F11 && !m_poMenuBar->is_visible())
+  if (_pstEvent->keyval == GDK_KEY_F11 && !m_poMenuBar->is_visible())
   {
     vToggleFullscreen();
     return true;
   }
 
   // Rewind key CTRL+B
-  if (m_state_count_max > 0u && (_pstEvent->state & GDK_CONTROL_MASK) && _pstEvent->keyval == GDK_b) {
+  if (m_state_count_max > 0u && (_pstEvent->state & GDK_CONTROL_MASK) && _pstEvent->keyval == GDK_KEY_b) {
     // disable saves first and then connect new handler
     if (m_oEmuRewindSig.connected()) m_oEmuRewindSig.disconnect();
     m_state_count_max = 0u;
@@ -647,7 +670,11 @@ bool Window::on_key_press_event(GdkEventKey * _pstEvent)
   // Forward the keyboard event to the input module by faking a SDL event
   SDL_Event event;
   event.type = SDL_KEYDOWN;
-  event.key.keysym.sym = (SDLKey)_pstEvent->keyval;
+  //event.key.timestamp = SDL_GetTicks();
+  //event.key.windowID = 0;
+  //event.key.repeat = 0;
+  //event.key.keysym.sym = (SDLKey)_pstEvent->keyval;
+  event.key.keysym.sym = (SDL_Keycode)_pstEvent->keyval;
   inputProcessSDLEvent(event);
 
   return Gtk::Window::on_key_press_event(_pstEvent);
@@ -656,7 +683,7 @@ bool Window::on_key_press_event(GdkEventKey * _pstEvent)
 bool Window::on_key_release_event(GdkEventKey * _pstEvent)
 {
   // Rewind key CTRL+B
-  if (_pstEvent->keyval == GDK_b /*&& !(_pstEvent->state & GDK_CONTROL_MASK)*/) {
+  if (_pstEvent->keyval == GDK_KEY_b /*&& !(_pstEvent->state & GDK_CONTROL_MASK)*/) {
     // connect save handler back
     if (m_oEmuRewindSig.connected()) m_oEmuRewindSig.disconnect();
     m_state_count_max = m_poCoreConfig->oGetKey<unsigned short>("rewind_count_max");
@@ -667,7 +694,11 @@ bool Window::on_key_release_event(GdkEventKey * _pstEvent)
   // Forward the keyboard event to the input module by faking a SDL event
   SDL_Event event;
   event.type = SDL_KEYUP;
-  event.key.keysym.sym = (SDLKey)_pstEvent->keyval;
+  //event.key.timestamp = SDL_GetTicks();
+  //event.key.windowID = 0;
+  //event.key.repeat = 0;
+  //event.key.keysym.sym = (SDLKey)_pstEvent->keyval;
+  event.key.keysym.sym = (SDL_Keycode)_pstEvent->keyval;
   inputProcessSDLEvent(event);
 
 

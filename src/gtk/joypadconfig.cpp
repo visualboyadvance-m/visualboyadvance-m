@@ -18,6 +18,7 @@
 
 #include "joypadconfig.h"
 
+#include <glibmm/main.h>
 #include <gtkmm/stock.h>
 
 #include "intl.h"
@@ -44,9 +45,9 @@ const JoypadConfigDialog::SJoypadKey JoypadConfigDialog::m_astKeys[] =
 };
 
 JoypadConfigDialog::JoypadConfigDialog(Config::Section * _poConfig) :
-  Gtk::Dialog(_("Joypad config"), true, true),
+  Gtk::Dialog(_("Joypad config"), true),
   m_oTitleHBox(false, 5),
-  m_oTitleLabel(_("Joypad :"), Gtk::ALIGN_RIGHT),
+  m_oTitleLabel(_("Joypad :"), Gtk::ALIGN_END),
   m_oDefaultJoypad(_("Default joypad")),
   m_oTable(G_N_ELEMENTS(m_astKeys), 2, false),
   m_iCurrentEntry(-1),
@@ -55,10 +56,17 @@ JoypadConfigDialog::JoypadConfigDialog(Config::Section * _poConfig) :
   m_poConfig(_poConfig)
 {
   // Joypad selection
+#if !GTK_CHECK_VERSION(3, 0, 0)
   m_oTitleCombo.append_text("1");
   m_oTitleCombo.append_text("2");
   m_oTitleCombo.append_text("3");
   m_oTitleCombo.append_text("4");
+#else
+  m_oTitleCombo.append("1");
+  m_oTitleCombo.append("2");
+  m_oTitleCombo.append("3");
+  m_oTitleCombo.append("4");
+#endif
 
   m_oTitleHBox.pack_start(m_oTitleLabel, Gtk::PACK_SHRINK);
   m_oTitleHBox.pack_start(m_oTitleCombo);
@@ -66,7 +74,7 @@ JoypadConfigDialog::JoypadConfigDialog(Config::Section * _poConfig) :
   // Joypad buttons
   for (guint i = 0; i < G_N_ELEMENTS(m_astKeys); i++)
   {
-    Gtk::Label * poLabel = Gtk::manage( new Gtk::Label(gettext(m_astKeys[i].m_csKeyName), Gtk::ALIGN_RIGHT) );
+    Gtk::Label * poLabel = Gtk::manage( new Gtk::Label(gettext(m_astKeys[i].m_csKeyName), Gtk::ALIGN_END) );
     Gtk::Entry * poEntry = Gtk::manage( new Gtk::Entry() );
     m_oTable.attach(* poLabel, 0, 1, i, i + 1);
     m_oTable.attach(* poEntry, 1, 2, i, i + 1);
@@ -199,7 +207,11 @@ bool JoypadConfigDialog::on_key_press_event(GdkEventKey * _pstEvent)
   // Forward the keyboard event by faking a SDL event
   SDL_Event event;
   event.type = SDL_KEYDOWN;
-  event.key.keysym.sym = (SDLKey)_pstEvent->keyval;
+  //event.key.timestamp = SDL_GetTicks();
+  //event.key.windowID = 0;
+  //event.key.repeat = 0;
+  //event.key.keysym.sym = (SDLKey)_pstEvent->keyval;
+  event.key.keysym.sym = (SDL_Keycode)_pstEvent->keyval;
   vOnInputEvent(event);
 
   return true;

@@ -22,6 +22,9 @@
 #include <gtkmm/alignment.h>
 #include <gtkmm/messagedialog.h>
 #include <glibmm/keyfile.h>
+#include <glibmm/fileutils.h>
+#include <glibmm/miscutils.h>
+#include <glibmm/main.h>
 
 #include <sys/stat.h>
 
@@ -42,7 +45,7 @@
 #include "intl.h"
 #include "screenarea-cairo.h"
 
-#ifdef USE_OPENGL
+#if defined(USE_OPENGL) && !GTK_CHECK_VERSION(3, 0, 0)
 #include "screenarea-opengl.h"
 #endif // USE_OPENGL
 
@@ -135,6 +138,7 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Gtk::Builder> & _poXml
   {
     vLoadConfig(m_sConfigFile);
     vCheckConfig();
+    LoadConfig();
   }
   else
   {
@@ -245,8 +249,13 @@ Window::Window(GtkWindow * _pstWindow, const Glib::RefPtr<Gtk::Builder> & _poXml
   //
   m_poRecentManager = Gtk::RecentManager::get_default();
 
+#if !GTK_CHECK_VERSION(3, 0, 0)
   Gtk::RecentFilter oRecentFilter;
   oRecentFilter.add_application( Glib::get_application_name() );
+#else
+  Glib::RefPtr<Gtk::RecentFilter> oRecentFilter = Gtk::RecentFilter::create();
+  oRecentFilter->add_application( Glib::get_application_name() );
+#endif
 
   m_poRecentChooserMenu = Gtk::manage( new Gtk::RecentChooserMenu(m_poRecentManager) );
   m_poRecentChooserMenu->set_show_numbers();
@@ -413,7 +422,7 @@ void Window::vApplyConfigScreenArea()
   {
     switch (eVideoOutput)
     {
-#ifdef USE_OPENGL
+#if defined(USE_OPENGL) && !GTK_CHECK_VERSION(3, 0, 0)
       case OutputOpenGL:
         vInitColors(ColorFormatBGR);
         m_poScreenArea = Gtk::manage(new ScreenAreaGl(m_iScreenWidth, m_iScreenHeight));
@@ -465,28 +474,20 @@ void Window::vInitSDL()
   if (bDone)
     return;
 
-  int iFlags = (SDL_INIT_EVERYTHING | SDL_INIT_NOPARACHUTE);
-
-  if (SDL_Init(iFlags) < 0)
-  {
-    fprintf(stderr, _("Failed to init SDL: %s"), SDL_GetError());
-    abort();
-  }
-
-  inputSetKeymap(PAD_DEFAULT, KEY_LEFT, GDK_Left);
-  inputSetKeymap(PAD_DEFAULT, KEY_RIGHT, GDK_Right);
-  inputSetKeymap(PAD_DEFAULT, KEY_UP, GDK_Up);
-  inputSetKeymap(PAD_DEFAULT, KEY_DOWN, GDK_Down);
-  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_A, GDK_z);
-  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_B, GDK_x);
-  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_START, GDK_Return);
-  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_SELECT, GDK_BackSpace);
-  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_L, GDK_a);
-  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_R, GDK_s);
-  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_SPEED, GDK_space);
-  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_CAPTURE, GDK_F12);
-  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_AUTO_A, GDK_q);
-  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_AUTO_B, GDK_w);
+  inputSetKeymap(PAD_DEFAULT, KEY_LEFT, GDK_KEY_Left);
+  inputSetKeymap(PAD_DEFAULT, KEY_RIGHT, GDK_KEY_Right);
+  inputSetKeymap(PAD_DEFAULT, KEY_UP, GDK_KEY_Up);
+  inputSetKeymap(PAD_DEFAULT, KEY_DOWN, GDK_KEY_Down);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_A, GDK_KEY_z);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_B, GDK_KEY_x);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_START, GDK_KEY_Return);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_SELECT, GDK_KEY_BackSpace);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_L, GDK_KEY_a);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_R, GDK_KEY_s);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_SPEED, GDK_KEY_space);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_CAPTURE, GDK_KEY_F12);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_AUTO_A, GDK_KEY_q);
+  inputSetKeymap(PAD_DEFAULT, KEY_BUTTON_AUTO_B, GDK_KEY_w);
 
   // TODO : remove
   int sdlNumDevices = SDL_NumJoysticks();
@@ -541,7 +542,7 @@ void Window::vInitConfig()
   m_poDisplayConfig->vSetKey("scale",               1              );
   m_poDisplayConfig->vSetKey("filter2x",            FilterNone     );
   m_poDisplayConfig->vSetKey("filterIB",            FilterIBNone   );
-#ifdef USE_OPENGL
+#if defined(USE_OPENGL) && !GTK_CHECK_VERSION(3, 0, 0)
   m_poDisplayConfig->vSetKey("output",              OutputOpenGL   );
 #else
   m_poDisplayConfig->vSetKey("output",              OutputCairo    );
@@ -1339,6 +1340,7 @@ void Window::vCreateFileOpenDialog()
     "*.7[zZ]",
   };
 
+#if !GTK_CHECK_VERSION(3, 0, 0)
   Gtk::FileFilter oAllGBAFilter;
   oAllGBAFilter.set_name(_("All Gameboy Advance files"));
   for (guint i = 0; i < G_N_ELEMENTS(acsPattern); i++)
@@ -1359,6 +1361,28 @@ void Window::vCreateFileOpenDialog()
   {
     oGBFilter.add_pattern(acsPattern[i]);
   }
+#else
+  const Glib::RefPtr<Gtk::FileFilter> oAllGBAFilter = Gtk::FileFilter::create();
+  oAllGBAFilter->set_name(_("All Gameboy Advance files"));
+  for (guint i = 0; i < G_N_ELEMENTS(acsPattern); i++)
+  {
+    oAllGBAFilter->add_pattern(acsPattern[i]);
+  }
+
+  const Glib::RefPtr<Gtk::FileFilter> oGBAFilter = Gtk::FileFilter::create();
+  oGBAFilter->set_name(_("Gameboy Advance files"));
+  for (int i = 0; i < 3; i++)
+  {
+    oGBAFilter->add_pattern(acsPattern[i]);
+  }
+
+  const Glib::RefPtr<Gtk::FileFilter> oGBFilter = Gtk::FileFilter::create();
+  oGBFilter->set_name(_("Gameboy files"));
+  for (int i = 3; i < 7; i++)
+  {
+    oGBFilter->add_pattern(acsPattern[i]);
+  }
+#endif
 
   poDialog->add_filter(oAllGBAFilter);
   poDialog->add_filter(oGBAFilter);
@@ -1578,6 +1602,7 @@ std::string Window::sGetUiFilePath(const std::string &_sFileName)
 {
   // Use the ui file from the source folder if it exists
   // to make gvbam runnable without installation
+  //std::string sUiFile = SOURCEDIR "/src/gtk/ui/" + _sFileName;
   std::string sUiFile = "src/gtk/ui/" + _sFileName;
   if (!Glib::file_test(sUiFile, Glib::FILE_TEST_EXISTS))
   {

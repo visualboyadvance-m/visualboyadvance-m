@@ -39,6 +39,7 @@ void ScreenAreaCairo::vDrawPixels(u8 * _puiData)
   queue_draw();
 }
 
+#if !GTK_CHECK_VERSION(3, 0, 0)
 bool ScreenAreaCairo::on_expose_event(GdkEventExpose * _pstEvent)
 {
   DrawingArea::on_expose_event(_pstEvent);
@@ -50,16 +51,16 @@ bool ScreenAreaCairo::on_expose_event(GdkEventExpose * _pstEvent)
 
   poContext = get_window()->create_cairo_context();
 
-  poContext->set_identity_matrix();
+  //poContext->set_identity_matrix();
   poContext->scale(m_dScaleFactor, m_dScaleFactor);
 
   poImage = Cairo::ImageSurface::create((u8 *)m_puiPixels, Cairo::FORMAT_RGB24,
                                     m_iScaledWidth, m_iScaledHeight, iScaledPitch);
 
-  cairo_matrix_init_translate(&oMatrix, -m_iAreaLeft, -m_iAreaTop);
+  //cairo_matrix_init_translate(&oMatrix, -m_iAreaLeft, -m_iAreaTop);
   poPattern = Cairo::SurfacePattern::create(poImage);
   poPattern->set_filter(Cairo::FILTER_NEAREST);
-  poPattern->set_matrix (oMatrix);
+  //poPattern->set_matrix (oMatrix);
   poContext->set_source_rgb(0.0, 0.0, 0.0);
   poContext->paint();
 
@@ -68,10 +69,38 @@ bool ScreenAreaCairo::on_expose_event(GdkEventExpose * _pstEvent)
 
   return true;
 }
+#else
+bool ScreenAreaCairo::on_draw(const Cairo::RefPtr<Cairo::Context> &poContext)
+{
+  DrawingArea::on_draw(poContext);
+  Cairo::RefPtr< Cairo::ImageSurface >   poImage;
+  Cairo::RefPtr< Cairo::SurfacePattern > poPattern;
+  Cairo::Matrix oMatrix;
+  const int iScaledPitch = (m_iScaledWidth + 1) * sizeof(u32);
+
+  //poContext->set_identity_matrix();
+  poContext->scale(m_dScaleFactor, m_dScaleFactor);
+
+  poImage = Cairo::ImageSurface::create((u8 *)m_puiPixels, Cairo::FORMAT_RGB24,
+                                    m_iScaledWidth, m_iScaledHeight, iScaledPitch);
+
+  //cairo_matrix_init_translate(&oMatrix, -m_iAreaLeft, -m_iAreaTop);
+  poPattern = Cairo::SurfacePattern::create(poImage);
+  poPattern->set_filter(Cairo::FILTER_NEAREST);
+  //poPattern->set_matrix (oMatrix);
+  poContext->set_source_rgb(0.0, 0.0, 0.0);
+  poContext->paint();
+
+  poContext->set_source(poPattern);
+  poContext->paint();
+
+  return true;
+}
+#endif
 
 void ScreenAreaCairo::vDrawBlackScreen()
 {
-  if (m_puiPixels && is_realized())
+  if (m_puiPixels && get_realized())
   {
     memset(m_puiPixels, 0, m_iHeight * (m_iWidth + 1) * sizeof(u32));
     queue_draw_area(0, 0, get_width(), get_height());

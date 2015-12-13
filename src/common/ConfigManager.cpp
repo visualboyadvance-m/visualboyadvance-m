@@ -46,6 +46,7 @@ extern "C" {
 #include <getopt.h>
 #endif // ! __GNUC__
 #include <string>
+#include <sstream>
 
 enum named_opts
 {
@@ -120,22 +121,22 @@ bool mirroringEnable = true;
 bool parseDebug = true;
 bool speedHack = false;
 bool speedup = false;
-char* aviRecordDir;
-char* batteryDir;
-char* biosFileNameGB;
-char* biosFileNameGBA;
-char* biosFileNameGBC;
-char* loadDotCodeFile;
-char* saveDotCodeFile;
-char* linkHostAddr;
-char* movieRecordDir;
+const char* aviRecordDir;
+const char* batteryDir;
+const char* biosFileNameGB;
+const char* biosFileNameGBA;
+const char* biosFileNameGBC;
+const char* loadDotCodeFile;
+const char* saveDotCodeFile;
+const char* linkHostAddr;
+const char* movieRecordDir;
 char* rewindMemory = NULL;
-char* romDirGB;
-char* romDirGBA;
-char* romDirGBC;
-char* saveDir;
-char* screenShotDir;
-char* soundRecordDir;
+const char* romDirGB;
+const char* romDirGBA;
+const char* romDirGBC;
+const char* saveDir;
+const char* screenShotDir;
+const char* soundRecordDir;
 int active = 1;
 int agbPrint;
 int autoFire;
@@ -387,7 +388,7 @@ struct option argOptions[] = {
 };
 
 
-u32 fromHex(char *s)
+u32 fromHex(const char *s)
 {
 	if (!s)
 		return 0;
@@ -396,7 +397,7 @@ u32 fromHex(char *s)
 	return value;
 }
 
-u32 fromDec(char *s)
+u32 fromDec(const char *s)
 {
 	if (!s)
 		return 0;
@@ -554,7 +555,7 @@ void LoadConfig()
 		volume_percent = 1.0;
 	soundSetVolume(volume_percent);
 
-	soundSetEnable((ReadPrefHex("soundEnable")) & 0x30f);
+	soundSetEnable((ReadPrefHex("soundEnable", 0x30f)) & 0x30f);
 	if ((ReadPrefHex("soundStereo"))) {
 		gb_effects_config.enabled = true;
 	}
@@ -613,7 +614,7 @@ void CloseConfig()
 		iniparser_freedict(preferences);
 }
 
-char* FindConfigFile(char *name)
+const char* FindConfigFile(const char *name)
 {
 	char buffer[4096];
 
@@ -721,13 +722,13 @@ void LoadConfigFile()
 
 	if (preferences == NULL)
 	{
-		char* configFile = FindConfigFile("vbam.ini");
+		const char* configFile = FindConfigFile("vbam.ini");
 		OpenPreferences(configFile);
 	}
 
 	if (preferences == NULL)
 	{
-		char* configFile = FindConfigFile("vbam.cfg");
+		const char* configFile = FindConfigFile("vbam.cfg");
 		OpenPreferences(configFile);
 	}
 }
@@ -747,7 +748,7 @@ void SaveConfigFile()
 	homeDir = 0;
 #endif
 
-	char* configFile = FindConfigFile("vbam.ini");
+	const char* configFile = FindConfigFile("vbam.ini");
 
 	if (configFile == NULL)
 	{
@@ -772,7 +773,20 @@ void SaveConfigFile()
 	}
 }
 
-u32 ReadPrefHex(char* pref_key)
+u32 ReadPrefHex(const char* pref_key, int default_value)
+{
+    std::stringstream ss;
+    std::string default_string;
+    ss.setf(std::ios::hex|std::ios::showbase, std::ios::basefield);
+    ss << default_value;
+    ss >> default_string;
+    LoadConfigFile();
+    std::string pref = "preferences:";
+    pref.append(pref_key);
+    return fromHex(iniparser_getstring(preferences, pref.c_str(), default_string.c_str()));
+}
+
+u32 ReadPrefHex(const char* pref_key)
 {
 	LoadConfigFile();
 	std::string pref = "preferences:";
@@ -780,7 +794,7 @@ u32 ReadPrefHex(char* pref_key)
 	return fromHex(iniparser_getstring(preferences, pref.c_str(), 0));
 }
 
-u32 ReadPref(char* pref_key, int default_value)
+u32 ReadPref(const char* pref_key, int default_value)
 {
 	LoadConfigFile();
 	std::string pref = "preferences:";
@@ -788,12 +802,12 @@ u32 ReadPref(char* pref_key, int default_value)
 	return iniparser_getint(preferences, pref.c_str(), default_value);
 }
 
-u32 ReadPref(char* pref_key)
+u32 ReadPref(const char* pref_key)
 {
 	return ReadPref(pref_key, 0);
 }
 
-char* ReadPrefString(char* pref_key, char* default_value)
+const char* ReadPrefString(const char* pref_key, const char* default_value)
 {
 	LoadConfigFile();
 	std::string pref = "preferences:";
@@ -801,7 +815,7 @@ char* ReadPrefString(char* pref_key, char* default_value)
 	return iniparser_getstring(preferences, pref.c_str(), default_value);
 }
 
-char* ReadPrefString(char* pref_key)
+const char* ReadPrefString(const char* pref_key)
 {
 	return ReadPrefString(pref_key, "");
 }
@@ -845,7 +859,7 @@ int ReadOpts(int argc, char ** argv)
 				log("Missing BIOS file name\n");
 				break;
 			}
-			strcpy(biosFileNameGBA, optarg);
+			biosFileNameGBA = strdup(optarg);
 			break;
 		case 'c':
 		{

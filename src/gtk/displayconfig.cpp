@@ -22,6 +22,7 @@
 #include <gtkmm/frame.h>
 #include <gtkmm/radiobutton.h>
 #include <gtkmm/liststore.h>
+#include <gtkmm/radiobutton.h>
 
 #include "intl.h"
 #include "filters.h"

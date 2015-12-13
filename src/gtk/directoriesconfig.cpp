@@ -36,7 +36,7 @@ const DirectoriesConfigDialog::SDirEntry DirectoriesConfigDialog::m_astDirs[] =
 };
 
 DirectoriesConfigDialog::DirectoriesConfigDialog(Config::Section * _poConfig) :
-  Gtk::Dialog(_("Directories config"), true, true),
+  Gtk::Dialog(_("Directories config"), true),
   m_poConfig(_poConfig)
 {
   Gtk::Table * poTable = Gtk::manage( new Gtk::Table(G_N_ELEMENTS(m_astDirs), 2, false));
@@ -45,7 +45,7 @@ DirectoriesConfigDialog::DirectoriesConfigDialog(Config::Section * _poConfig) :
 
   for (guint i = 0; i < G_N_ELEMENTS(m_astDirs); i++)
   {
-    Gtk::Label * poLabel = Gtk::manage( new Gtk::Label(gettext(m_astDirs[i].m_csLabel), Gtk::ALIGN_RIGHT) );
+    Gtk::Label * poLabel = Gtk::manage( new Gtk::Label(gettext(m_astDirs[i].m_csLabel), Gtk::ALIGN_END) );
     m_poButtons[i] = Gtk::manage( new Gtk::FileChooserButton(Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER) );
     m_poButtons[i]->set_current_folder(m_poConfig->sGetKey(m_astDirs[i].m_csKey));
 

@@ -271,9 +271,9 @@ void StopLirc(void)
 #define S_IFDIR _S_IFDIR
 #endif
 
-void sdlCheckDirectory(char *dir)
+void sdlCheckDirectory(const char *dir)
 {
-	if (!dir)
+	if (!dir || !dir[0])
 	{
 		return;
 	}
@@ -282,7 +282,7 @@ void sdlCheckDirectory(char *dir)
 
   int len = strlen(dir);
 
-  char *p = dir + len - 1;
+  char *p = (char *)dir + len - 1;
 
   if(*p == '/' ||
      *p == '\\')

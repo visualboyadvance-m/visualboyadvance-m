@@ -19,6 +19,7 @@
 #include "screenarea.h"
 
 #include <cstring>
+#include <glibmm/main.h>
 
 namespace VBA
 {
@@ -45,16 +46,14 @@ ScreenArea::ScreenArea(int _iWidth, int _iHeight, int _iScale) :
              | Gdk::ENTER_NOTIFY_MASK
              | Gdk::LEAVE_NOTIFY_MASK);
 
-  char aiEmptyData[8];
-  memset(aiEmptyData, 0, sizeof(aiEmptyData));
-  Glib::RefPtr<Gdk::Bitmap> poSource = Gdk::Bitmap::create(aiEmptyData, 8, 8);
-  Glib::RefPtr<Gdk::Bitmap> poMask = Gdk::Bitmap::create(aiEmptyData, 8, 8);
-  Gdk::Color oFg;
-  Gdk::Color oBg;
-  oFg.set_rgb(0, 0, 0);
-  oBg.set_rgb(0, 0, 0);
+  Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, true, 8, 8, 8);
+  pixbuf->fill(0);
 
-  m_poEmptyCursor = new Gdk::Cursor(poSource, poMask, oFg, oBg, 0, 0);
+#if !GTK_CHECK_VERSION(3, 0, 0)
+  m_poEmptyCursor = new Gdk::Cursor(get_display, pixbuf, 0, 0);
+#else
+  m_poEmptyCursor = Gdk::Cursor::create(get_display(), pixbuf, 0, 0);
+#endif
 }
 
 ScreenArea::~ScreenArea()
@@ -69,10 +68,14 @@ ScreenArea::~ScreenArea()
     delete[] m_puiDelta;
   }
 
+#if !GTK_CHECK_VERSION(3, 0, 0)
   if (m_poEmptyCursor != NULL)
   {
     delete m_poEmptyCursor;
   }
+#else
+  m_poEmptyCursor.reset();
+#endif
 }
 
 void ScreenArea::vSetSize(int _iWidth, int _iHeight)
@@ -133,7 +136,11 @@ void ScreenArea::vStopCursorTimeout()
 
 void ScreenArea::vHideCursor()
 {
+#if !GTK_CHECK_VERSION(3, 0, 0)
   get_window()->set_cursor(*m_poEmptyCursor);
+#else
+  get_window()->set_cursor(m_poEmptyCursor);
+#endif
   m_bShowCursor = false;
 }
 

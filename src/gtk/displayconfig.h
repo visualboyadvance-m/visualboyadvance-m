@@ -22,6 +22,7 @@
 #include <gtkmm/dialog.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/combobox.h>
+#include <gtkmm/radiobutton.h>
 
 #include "configfile.h"
 #include "window.h"

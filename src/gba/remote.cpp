@@ -86,23 +86,23 @@ int debuggerRadix = 0;
 #define NUMBEROFDB 1000
 u32 debuggerNoBreakpointList[NUMBEROFDB];
 
-char* cmdAliasTable[] = { "help", "?", "h", "?", "continue", "c", "next", "n",
+const char* cmdAliasTable[] = { "help", "?", "h", "?", "continue", "c", "next", "n",
 "cpyb", "copyb", "cpyh", "copyh", "cpyw", "copyw",
 "exe", "execute", "exec", "execute",
 NULL, NULL };
 
 struct DebuggerCommand {
-	char *name;
+	const char *name;
 	void(*function)(int, char **);
-	char *help;
-	char *syntax;
+	const char *help;
+	const char *syntax;
 };
 
 char monbuf[1000];
 void monprintf(std::string line);
 std::string StringToHex(std::string &cmd);
 std::string HexToString(char * p);
-void debuggerUsage(char *cmd);
+void debuggerUsage(const char *cmd);
 void debuggerHelp(int n, char **args);
 void printFlagHelp();
 void dbgExecute(std::string &cmd);
@@ -230,7 +230,7 @@ void addBreakRegToList(u8 regnum, u8 flags, u32 value){
 }
 
 void printBreakRegList(bool verbose){
-	char* flagsToOP[] = { "never", "==", ">", ">=", "<", "<=", "!=", "always" };
+	const char* flagsToOP[] = { "never", "==", ">", ">=", "<", "<=", "!=", "always" };
 	bool anyPrint = false;
 	for (int i = 0; i<4; i++){
 		for (int k = 0; k<4; k++){
@@ -416,7 +416,7 @@ void debuggerEditByte(int n, char **args)
 			{ sprintf(monbuf, "Invalid expression in address.\n"); monprintf(monbuf); }
 			return;
 		}
-		for (u32 i = 2; i < n; i++){
+		for (int i = 2; i < n; i++){
 			if (!dexp_eval(args[i], &value)) {
 				{ sprintf(monbuf, "Invalid expression in %d value.Ignored.\n", (i - 1)); monprintf(monbuf); }
 			}
@@ -441,7 +441,7 @@ void debuggerEditHalfWord(int n, char **args)
 			{ sprintf(monbuf, "Error: address must be half-word aligned\n"); monprintf(monbuf); }
 			return;
 		}
-		for (u32 i = 2; i < n; i++){
+		for (int i = 2; i < n; i++){
 			if (!dexp_eval(args[i], &value)) {
 				{ sprintf(monbuf, "Invalid expression in %d value.Ignored.\n", (i - 1)); monprintf(monbuf); }
 			}
@@ -466,7 +466,7 @@ void debuggerEditWord(int n, char **args)
 			{ sprintf(monbuf, "Error: address must be word aligned\n"); monprintf(monbuf); }
 			return;
 		}
-		for (u32 i = 2; i < n; i++){
+		for (int i = 2; i < n; i++){
 			if (!dexp_eval(args[i], &value)) {
 				{ sprintf(monbuf, "Invalid expression in %d value.Ignored.\n", (i - 1)); monprintf(monbuf); }
 			}
@@ -479,7 +479,7 @@ void debuggerEditWord(int n, char **args)
 }
 
 bool debuggerBreakOnRegisterCondition(u8 registerName, u32 compareVal, u32 regVal, u8 type){
-	char* typeName;
+	const char* typeName;
 	switch (type){
 	case 1:
 		typeName = "equal to";
@@ -1401,7 +1401,7 @@ void debuggerSymbols(int argc, char **argv)
 					continue;
 				}
 			}
-			char *ts = "?";
+			const char *ts = "?";
 			switch (type) {
 			case 2:
 				ts = "ARM";
@@ -1656,7 +1656,7 @@ void debuggerBreakRegisterDelete(int n, char** args){
 //WARNING: Some old particle to new code conversion may convert a single command
 //into two or more words. Such words are separated by space, so a new tokenizer can
 //find them.
-char* replaceAlias(char* lower_cmd, char** aliasTable){
+const char* replaceAlias(const char* lower_cmd, const char** aliasTable){
 	for (int i = 0; aliasTable[i]; i = i + 2){
 		if (strcmp(lower_cmd, aliasTable[i]) == 0){
 			return aliasTable[i + 1];
@@ -1665,7 +1665,7 @@ char* replaceAlias(char* lower_cmd, char** aliasTable){
 	return lower_cmd;
 }
 
-char* breakAliasTable[] = {
+const char* breakAliasTable[] = {
 
 	//actual beginning
 	"break", "b 0 0",
@@ -1813,13 +1813,13 @@ char* breakSymbolCombo(char * command, int* length){
 	return res;
 }
 
-char* typeMapping[] = { "'u8", "'u16", "'u32", "'u32", "'s8", "'s16", "'s32", "'s32" };
+const char* typeMapping[] = { "'u8", "'u16", "'u32", "'u32", "'s8", "'s16", "'s32", "'s32" };
 
-char* compareFlagMapping[] = { "Never", "==", ">", ">=", "<", "<=", "!=", "<=>" };
+const char* compareFlagMapping[] = { "Never", "==", ">", ">=", "<", "<=", "!=", "<=>" };
 
 struct intToString{
 	int value;
-	char mapping[20];
+	const char mapping[20];
 };
 
 struct intToString breakFlagMapping[] = {
@@ -1837,9 +1837,9 @@ struct intToString breakFlagMapping[] = {
 //printers
 void printCondition(struct ConditionalBreakNode* toPrint){
 	if (toPrint){
-		char* firstType = typeMapping[toPrint->exp_type_flags & 0x7];
-		char* secondType = typeMapping[(toPrint->exp_type_flags >> 4) & 0x7];
-		char* operand = compareFlagMapping[toPrint->cond_flags & 0x7];
+		const char* firstType = typeMapping[toPrint->exp_type_flags & 0x7];
+                const char* secondType = typeMapping[(toPrint->exp_type_flags >> 4) & 0x7];
+                const char* operand = compareFlagMapping[toPrint->cond_flags & 0x7];
 		{ sprintf(monbuf, "%s %s %s%s %s %s", firstType, toPrint->address,
 			((toPrint->cond_flags & 8) ? "s" : ""), operand,
 			secondType, toPrint->value);
@@ -2036,8 +2036,8 @@ void deleteBreak(u32 address, u8 flags, char** expression, int howToDelete){
 	bool applyOr = true;
 	if (howToDelete > 0){
 		if (((expression[0][0] == '&') && !expression[0][1]) ||
-			(tolower(expression[0][0]) == 'o') && (tolower(expression[0][1]) == 'n') &&
-			(tolower(expression[0][0]) == 'l') && (tolower(expression[0][1]) == 'y')){
+			((tolower(expression[0][0]) == 'o') && (tolower(expression[0][1]) == 'n')) ||
+			((tolower(expression[0][0]) == 'l') && (tolower(expression[0][1]) == 'y'))){
 			applyOr = false;
 			howToDelete--;
 			expression++;
@@ -2124,7 +2124,7 @@ void executeBreakCommands(int n, char** cmd){
 		for (int i = 0; cmd[0][i]; i++){
 			cmd[0][i] = tolower(cmd[0][i]);
 		}
-		char* replaced = replaceAlias(cmd[0], breakAliasTable);
+		const char* replaced = replaceAlias(cmd[0], breakAliasTable);
 		if (replaced == cmd[0]){
 			target = '*';
 		}
@@ -2207,9 +2207,9 @@ void executeBreakCommands(int n, char** cmd){
 	}
 	else if (operation == clearBreaks){
 		if (!hasAddress && (n >= 1)){
-			if (((cmd[0][0] == '|' && cmd[0][1] == '|') ||
+			if ((cmd[0][0] == '|' && cmd[0][1] == '|') ||
 				((cmd[0][0] == 'O' || cmd[0][0] == 'o') &&
-				cmd[0][1] == 'r' || cmd[0][1] == 'r'))) {
+				(cmd[0][1] == 'R' || cmd[0][1] == 'r'))) {
 				operation(address, flag, NULL, 2);
 			}
 			else{
@@ -2411,7 +2411,7 @@ void printFlagHelp()
 	monprintf("Special flags: always(all true), never(all false).\n");
 }
 
-void debuggerUsage(char *cmd)
+void debuggerUsage(const char *cmd)
 {
 	if (!strcmp(cmd, "break")){
 		monprintf("Break command, composed of three parts:\n");
@@ -2650,7 +2650,7 @@ void dbgExecute(char* toRun){
 	//	return;
 	//}
 
-	commands[0] = replaceAlias(commands[0], cmdAliasTable);
+	commands[0] = (char*)replaceAlias(commands[0], cmdAliasTable);
 
 	if (commands[0][0] == 'b'){
 		executeBreakCommands(commandCount, commands);
@@ -3563,7 +3563,7 @@ std::string HexToString(char * p)
 	std::string hex(p);
 	std::string cmd;
 	std::stringstream ss;
-	int offset = 0;
+	u32 offset = 0;
 	while (offset < hex.length()) {
 		unsigned int buffer = 0;
 		ss.clear();
@@ -3579,7 +3579,7 @@ std::string StringToHex(std::string &cmd)
 {
 	std::stringstream ss;
 	ss << std::hex;
-	for (int i = 0; i < cmd.length(); ++i)
+	for (u32 i = 0; i < cmd.length(); ++i)
 		ss << std::setw(2) << std::setfill('0') << (int)cmd.c_str()[i];
 	return ss.str();
 }

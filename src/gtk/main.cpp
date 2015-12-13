@@ -19,10 +19,14 @@
 #include <gtkmm/main.h>
 #include <gtkmm/window.h>
 #include <gtkmm/messagedialog.h>
+#include <glibmm/miscutils.h>
 
-#ifdef USE_OPENGL
+#if defined(USE_OPENGL) && !GTK_CHECK_VERSION(3, 0, 0)
 #include <gtkmm/gl/init.h>
 #endif // USE_OPENGL
+
+// this will be ifdefed soon
+#include <X11/Xlib.h>
 
 #include "window.h"
 #include "intl.h"
@@ -39,12 +43,14 @@ int main(int argc, char * argv[])
   bindtextdomain("gvbam", LOCALEDIR);
   textdomain("gvbam");
 #endif // ENABLE_NLS
+  //will be ifdefed
+  XInitThreads();
 
   Glib::set_application_name(_("VBA-M"));
 
   Gtk::Main oKit(argc, argv);
 
-#ifdef USE_OPENGL
+#if defined(USE_OPENGL) && !GTK_CHECK_VERSION(3, 0, 0)
   Gtk::GL::init(argc, argv);
 #endif // USE_OPENGL
 

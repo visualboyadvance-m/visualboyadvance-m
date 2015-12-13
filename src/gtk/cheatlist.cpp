@@ -18,6 +18,7 @@
 
 #include "cheatlist.h"
 
+#include <glibmm/miscutils.h>
 #include <gtkmm/stock.h>
 
 #include "intl.h"

@@ -71,6 +71,7 @@ void GameBoyAdvanceConfigDialog::vSetConfig(Config::Section * _poConfig, VBA::Wi
     "*.[bB][iI][oO][sS]", "*.[zZ][iI][pP]", "*.[zZ]", "*.[gG][zZ]"
   };
 
+#if !GTK_CHECK_VERSION(3, 0, 0)
   Gtk::FileFilter oAllFilter;
   oAllFilter.set_name(_("All files"));
   oAllFilter.add_pattern("*");
@@ -81,6 +82,18 @@ void GameBoyAdvanceConfigDialog::vSetConfig(Config::Section * _poConfig, VBA::Wi
   {
     oBiosFilter.add_pattern(acsPattern[i]);
   }
+#else
+  const Glib::RefPtr<Gtk::FileFilter> oAllFilter = Gtk::FileFilter::create();
+  oAllFilter->set_name(_("All files"));
+  oAllFilter->add_pattern("*");
+
+  const Glib::RefPtr<Gtk::FileFilter> oBiosFilter = Gtk::FileFilter::create();
+  oBiosFilter->set_name(_("Gameboy Advance BIOS"));
+  for (guint i = 0; i < G_N_ELEMENTS(acsPattern); i++)
+  {
+    oBiosFilter->add_pattern(acsPattern[i]);
+  }
+#endif
 
   m_poBiosFileChooserButton->add_filter(oAllFilter);
   m_poBiosFileChooserButton->add_filter(oBiosFilter);

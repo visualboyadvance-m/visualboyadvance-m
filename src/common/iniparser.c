@@ -215,13 +215,21 @@ void iniparser_dump_ini(dictionary * d, FILE * f)
     nsec = iniparser_getnsec(d);
     if (nsec<1) {
         /* No section in file: dump all keys as they are */
+        fprintf(f, "[preferences]\n");
         for (i=0 ; i<d->size ; i++) {
             if (d->key[i]==NULL)
                 continue ;
-            fprintf(f, "%s=%s\n", d->key[i], d->val[i]);
+            if (!strncmp(d->key[i], "preferences:", strlen("preferences:"))) {
+                 fprintf(f,
+                         "%s=%s\n",
+                         d->key[i]+strlen("preferences:"),
+                         d->val[i] ? d->val[i] : "");
+                         
+            }
         }
+        fprintf(f, "\n");
         return ;
-    }
+        }
     for (i=0 ; i<nsec ; i++) {
         secname = iniparser_getsecname(d, i) ;
         iniparser_dumpsection_ini(d, secname, f) ;
@@ -365,10 +373,10 @@ char ** iniparser_getseckeys(dictionary * d, char * s)
   the dictionary, do not free or modify it.
  */
 /*--------------------------------------------------------------------------*/
-char * iniparser_getstring(dictionary * d, const char * key, char * def)
+const char * iniparser_getstring(dictionary * d, const char * key, const char * def)
 {
     char * lc_key ;
-    char * sval ;
+    const char * sval ;
 
     if (d==NULL || key==NULL)
         return def ;
@@ -407,7 +415,7 @@ char * iniparser_getstring(dictionary * d, const char * key, char * def)
 /*--------------------------------------------------------------------------*/
 int iniparser_getint(dictionary * d, const char * key, int notfound)
 {
-    char    *   str ;
+    const char *str;
 
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (str==INI_INVALID_KEY) return notfound ;
@@ -429,7 +437,7 @@ int iniparser_getint(dictionary * d, const char * key, int notfound)
 /*--------------------------------------------------------------------------*/
 double iniparser_getdouble(dictionary * d, const char * key, double notfound)
 {
-    char    *   str ;
+    const char *str;
 
     str = iniparser_getstring(d, key, INI_INVALID_KEY);
     if (str==INI_INVALID_KEY) return notfound ;
@@ -470,7 +478,7 @@ double iniparser_getdouble(dictionary * d, const char * key, double notfound)
 /*--------------------------------------------------------------------------*/
 int iniparser_getboolean(dictionary * d, const char * key, int notfound)
 {
-    char    *   c ;
+    const char * c;
     int         ret ;
 
     c = iniparser_getstring(d, key, INI_INVALID_KEY);
@@ -699,7 +707,10 @@ dictionary * iniparser_load(const char * ininame)
             break ;
 
             case LINE_VALUE:
-            sprintf(tmp, "%s:%s", section, key);
+            if (strlen(section))
+                sprintf(tmp, "%s:%s", section, key);
+            else
+                sprintf(tmp, "preferences:%s", key);
             errs = dictionary_set(dict, tmp, val) ;
             break ;
 

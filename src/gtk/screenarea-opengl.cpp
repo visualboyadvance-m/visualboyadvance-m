@@ -109,7 +109,7 @@ void ScreenAreaGl::vDrawPixels(u8 * _puiData)
 
 void ScreenAreaGl::vDrawBlackScreen()
 {
-  if (m_puiPixels && is_realized())
+  if (m_puiPixels && get_realized())
   {
     memset(m_puiPixels, 0, m_iHeight * (m_iWidth + 1) * sizeof(u32));
     queue_draw_area(0, 0, get_width(), get_height());
@@ -177,7 +177,7 @@ bool ScreenAreaGl::on_expose_event(GdkEventExpose * _pstEvent)
 
 void ScreenAreaGl::vOnSizeUpdated()
 {
-  if (!is_realized())
+  if (!get_realized())
     return;
 
   Glib::RefPtr<Gdk::GL::Window> glwindow = get_gl_window();

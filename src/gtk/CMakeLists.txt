@@ -1,20 +1,32 @@
 #Do not use this file directly.  Always use the top level CMakeLists.txt file
-
+SET( CMAKE_CXX_FLAGS -std=gnu++11 )
 
 #GTK dependencies
 FIND_PACKAGE ( PkgConfig REQUIRED )
 FIND_PACKAGE ( Gettext REQUIRED )
 
 # These dependencies require pkg-config to be found
-PKG_CHECK_MODULES ( GTKMM REQUIRED gtkmm-2.4 )
-PKG_CHECK_MODULES ( GDKMM REQUIRED gdkmm-2.4 )
 PKG_CHECK_MODULES ( GLIBMM REQUIRED glibmm-2.4 )
 PKG_CHECK_MODULES ( GIOMM REQUIRED giomm-2.4 )
-PKG_CHECK_MODULES ( GTKGLMM REQUIRED gtkglextmm-x11-1.2 )
+
+if(ENABLE_GTK)
+    PKG_CHECK_MODULES ( GTKMM REQUIRED gtkmm-2.4 )
+    PKG_CHECK_MODULES ( GDKMM REQUIRED gdkmm-2.4 )
+    PKG_CHECK_MODULES ( GTKGLMM REQUIRED gtkglextmm-x11-1.2 )
+endif(ENABLE_GTK)
+
+if(ENABLE_GTK3)
+    PKG_CHECK_MODULES ( GTKMM REQUIRED gtkmm-3.0 )
+    PKG_CHECK_MODULES ( GDKMM REQUIRED gdkmm-3.0 )
+endif(ENABLE_GTK3)
+
+if(NOT APPLE AND NOT WIN32)
+    FIND_PACKAGE ( X11 REQUIRED )
+endif(NOT APPLE AND NOT WIN32)
 
 #Make sure the gtk ui elements are available for out of tree builds
 #See window.cpp:1544 (the sGetUiFilePath function) for more details
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ui/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/ui/)
+#file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ui/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/ui/)
 
 SET(SRC_GTK
     configfile.cpp
@@ -35,7 +47,7 @@ SET(SRC_GTK
     soundconfig.cpp
     screenarea.cpp
     screenarea-cairo.cpp
-    screenarea-opengl.cpp
+    #screenarea-opengl.cpp
     tools.cpp
     window.cpp
     ../sdl/inputSDL.cpp
@@ -47,6 +59,7 @@ INCLUDE_DIRECTORIES(
     ${GTKMM_INCLUDE_DIRS}
     ${GDKMM_INCLUDE_DIRS}
     ${GTKGLMM_INCLUDE_DIRS}
+    ${X11_INCLUDE_DIRS}
 )
 
 LINK_DIRECTORIES(
@@ -61,6 +74,7 @@ ADD_EXECUTABLE (
     WIN32
     MACOSX_BUNDLE
     ${SRC_GTK}
+    ../common/SoundSDL.cpp
 )
 
 TARGET_LINK_LIBRARIES (
@@ -68,6 +82,7 @@ TARGET_LINK_LIBRARIES (
     ${VBAMCORE_LIBS}
     ${GTKMM_LIBRARIES}
     ${GTKGLMM_LIBRARIES}
+    ${X11_LIBRARIES}
 )
 
 INSTALL(PROGRAMS ${PROJECT_BINARY_DIR}/gvbam DESTINATION bin)
