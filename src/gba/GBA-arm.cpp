@@ -298,18 +298,18 @@ static void count(u32 opcode, int cond_res)
 #ifdef __GNUC__
  #define ALU_HEADER           asm("mov %%ecx, %%edi; "
  #define ALU_TRAILER          : "=D" (opcode) : "c" (opcode) : "eax", "ebx", "edx", "esi")
- #define EMIT0(op)            #op"; "
- #define EMIT1(op,arg)        #op" "arg"; "
- #define EMIT2(op,src,dest)   #op" "src", "dest"; "
- #define KONST(val)           "$"#val
+ #define EMIT0(op)            #op "; "
+ #define EMIT1(op,arg)        #op " " arg "; "
+ #define EMIT2(op,src,dest)   #op " " src ", " dest "; "
+ #define KONST(val)           "$" #val
  #define ASMVAR(cvar)         ASMVAR2 (__USER_LABEL_PREFIX__, cvar)
  #define ASMVAR2(prefix,cvar) STRING (prefix) cvar
  #define STRING(x)            #x
  #define VAR(var)             ASMVAR(#var)
  #define VARL(var)            ASMVAR(#var)
- #define REGREF1(index)       ASMVAR("reg("index")")
- #define REGREF2(index,scale) ASMVAR("reg(,"index","#scale")")
- #define LABEL(n)             #n": "
+ #define REGREF1(index)       ASMVAR("reg(" index ")")
+ #define REGREF2(index,scale) ASMVAR("reg(," index "," #scale ")")
+ #define LABEL(n)             #n ": "
  #define LABELREF(n,dir)      #n#dir
  #define al "%%al"
  #define ah "%%ah"

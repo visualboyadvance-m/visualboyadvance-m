@@ -305,15 +305,15 @@ static INSN_REGPARM void thumbBreakpoint(u32 opcode)
                 V_FLAG = (Flags >> 26) & 1;			\
             }
 #else
-  #define EMIT1(op,arg)        #op" "arg"; "
-  #define EMIT2(op,src,dest)   #op" "src", "dest"; "
-  #define KONST(val)           "$"#val
+  #define EMIT1(op,arg)        #op " " arg "; "
+  #define EMIT2(op,src,dest)   #op " " src ", " dest "; "
+  #define KONST(val)           "$" #val
   #define ASMVAR(cvar)         ASMVAR2 (__USER_LABEL_PREFIX__, cvar)
   #define ASMVAR2(prefix,cvar) STRING (prefix) cvar
   #define STRING(x)            #x
   #define VAR(var)             ASMVAR(#var)
-  #define REGREF1(index)       ASMVAR("reg("index")")
-  #define REGREF2(index,scale) ASMVAR("reg(,"index","#scale")")
+  #define REGREF1(index)       ASMVAR("reg(" index ")")
+  #define REGREF2(index,scale) ASMVAR("reg(," index "," #scale ")")
   #define eax "%%eax"
   #define ecx "%%ecx"
   #define edx "%%edx"
