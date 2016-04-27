@@ -123,10 +123,16 @@ MediaRet MediaRecorder::setup_sound_stream(const char *fname, AVOutputFormat *fm
 	oc = NULL;
 	return MRET_ERR_NOMEM;
     }
+
+    AVCodec *codec = avcodec_find_encoder(fmt->audio_codec);
+
     ctx = aud_st->codec;
     ctx->codec_id = fmt->audio_codec;
     ctx->codec_type = AVMEDIA_TYPE_AUDIO;
-    ctx->sample_fmt = AV_SAMPLE_FMT_S16;
+    // Some encoders don't like s16 (SAMPLE_FMT_S16)
+    ctx->sample_fmt = codec->sample_fmts[0];
+    // This was changed in the initial ffmpeg 3.0 update,
+    // but shouldn't (as far as I'm aware) cause problems with older versions
     ctx->bit_rate = 128000; // arbitrary; in case we're generating mp3
     ctx->sample_rate = soundGetSampleRate();
     ctx->channels = 2;
@@ -135,7 +141,6 @@ MediaRet MediaRecorder::setup_sound_stream(const char *fname, AVOutputFormat *fm
     if(fmt->flags & AVFMT_GLOBALHEADER)
 	ctx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
-    AVCodec *codec = avcodec_find_encoder(fmt->audio_codec);
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(53,6,0)
     if(!codec || avcodec_open(ctx, codec)) {
 #else
