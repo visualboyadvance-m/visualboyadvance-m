@@ -458,6 +458,53 @@ MediaRet MediaRecorder::AddFrame(const u8 *vid)
     return MRET_OK;
 }
 
+#if LIBAVCODEC_VERSION_MAJOR > 56
+/* FFmpeg depricated avcodec_encode_audio.
+ * It was removed completely in 3.0.
+ * This will at least get audio recording *working*
+ */
+static inline int MediaRecorderEncodeAudio(AVCodecContext *ctx,
+                                           AVPacket *pkt,
+                                           uint8_t *buf, int buf_size,
+                                           const short *samples)
+{
+    AVFrame *frame;
+    av_init_packet(pkt);
+    int ret, samples_size, got_packet = 0;
+
+    pkt->data = buf;
+    pkt->size = buf_size;
+    if (samples) {
+        frame = frame = av_frame_alloc();
+        if (ctx->frame_size) {
+            frame->nb_samples = ctx->frame_size;
+        } else {
+            frame->nb_samples = (int64_t)buf_size * 8 /
+                            (av_get_bits_per_sample(ctx->codec_id) *
+                            ctx->channels);
+        }
+        frame->format = ctx->sample_fmt;
+        frame->channel_layout = ctx->channel_layout;
+        samples_size = av_samples_get_buffer_size(NULL, ctx->channels,
+                        frame->nb_samples, ctx->sample_fmt, 1);
+        avcodec_fill_audio_frame(frame, ctx->channels, ctx->sample_fmt,
+                        (const uint8_t *)samples, samples_size, 1);
+        //frame->pts = AV_NOPTS_VALUE;
+    } else {
+        frame = NULL;
+    }
+        ret = avcodec_encode_audio2(ctx, pkt, frame, &got_packet);
+    if (!ret && got_packet && ctx->coded_frame) {
+        ctx->coded_frame->pts = pkt->pts;
+        ctx->coded_frame->key_frame = !!(pkt->flags & AV_PKT_FLAG_KEY);
+    }
+        if (frame && frame->extended_data != frame->data)
+        av_freep(&frame->extended_data);
+        return ret;
+
+}
+#endif
+
 MediaRet MediaRecorder::AddFrame(const u16 *aud)
 {
     if(!oc || !aud_st)
@@ -485,13 +532,19 @@ MediaRet MediaRecorder::AddFrame(const u16 *aud)
     }
     while(len + in_audio_buf2 >= frame_len) {
 	av_init_packet(&pkt);
+	#if LIBAVCODEC_VERSION_MAJOR > 56
+	MediaRecorderEncodeAudio(ctx, &pkt, audio_buf, frame_len,
+	#else
 	pkt.size = avcodec_encode_audio(ctx, audio_buf, frame_len,
+	#endif
 					(const short *)(in_audio_buf2 ? audio_buf2 : aud));
 	if(ctx->coded_frame && ctx->coded_frame->pts != AV_NOPTS_VALUE)
 	    pkt.pts = av_rescale_q(ctx->coded_frame->pts, ctx->time_base, aud_st->time_base);
 	pkt.flags |= AV_PKT_FLAG_KEY;
 	pkt.stream_index = aud_st->index;
+	#if LIBAVCODEC_VERSION_MAJOR < 57
 	pkt.data = audio_buf;
+	#endif
 	if(av_interleaved_write_frame(oc, &pkt) < 0) {
 	    avformat_free_context(oc);
 	    oc = NULL;
