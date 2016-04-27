@@ -394,6 +394,7 @@ MediaRecorder::~MediaRecorder()
     Stop();
 }
 
+// Still needs updating for avcodec_encode_video2
 MediaRet MediaRecorder::AddFrame(const u8 *vid)
 {
     if(!oc || !vid_st)
@@ -401,6 +402,9 @@ MediaRet MediaRecorder::AddFrame(const u8 *vid)
 
     AVCodecContext *ctx = vid_st->codec;
     AVPacket pkt;
+#if LIBAVCODEC_VERSION_MAJOR > 56
+    int ret, got_packet = 0;
+#endif
 
     // strip borders.  inconsistent between depths for some reason
     // but fortunately consistent between gb/gba.
@@ -438,7 +442,20 @@ MediaRet MediaRecorder::AddFrame(const u8 *vid)
 	pkt.data = f->data[0];
 	pkt.size = linesize * ctx->height;
     } else {
+#if LIBAVCODEC_VERSION_MAJOR > 56
+        pkt.data = video_buf;
+        pkt.size = VIDEO_BUF_LEN;
+        f->format = ctx->pix_fmt;
+        f->width = ctx->width;
+        f->height = ctx->height;
+        ret = avcodec_encode_video2(ctx, &pkt, f, &got_packet);
+        if(!ret && got_packet && ctx->coded_frame) {
+            ctx->coded_frame->pts = pkt.pts;
+            ctx->coded_frame->key_frame = !!(pkt.flags & AV_PKT_FLAG_KEY);
+        }
+#else
 	pkt.size = avcodec_encode_video(ctx, video_buf, VIDEO_BUF_LEN, f);
+#endif
 	if(!pkt.size)
 	    return MRET_OK;
 	if(ctx->coded_frame && ctx->coded_frame->pts != AV_NOPTS_VALUE)
