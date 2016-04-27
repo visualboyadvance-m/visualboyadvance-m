@@ -53,6 +53,26 @@ static void avformat_free_context(AVFormatContext *ctx)
 #endif
 }
 
+// For compatibility with 3.0+ ffmpeg
+#include <libavutil/version.h>
+#ifndef PixelFormat
+#define PixelFormat AVPixelFormat
+#endif
+#if LIBAVCODEC_VERSION_MAJOR > 56
+#define CODEC_ID_NONE AV_CODEC_ID_NONE
+#define CODEC_ID_PCM_S16LE AV_CODEC_ID_PCM_S16LE
+#define CODEC_ID_PCM_S16BE AV_CODEC_ID_PCM_S16BE
+#define CODEC_ID_PCM_U16LE AV_CODEC_ID_PCM_U16LE
+#define CODEC_ID_PCM_U16BE AV_CODEC_ID_PCM_U16BE
+#define CODEC_FLAG_GLOBAL_HEADER AV_CODEC_FLAG_GLOBAL_HEADER
+#endif
+#if LIBAVUTIL_VERSION_MAJOR > 54
+#define avcodec_alloc_frame av_frame_alloc
+#define PIX_FMT_RGB565LE AV_PIX_FMT_RGB565LE
+#define PIX_FMT_RGB24 AV_PIX_FMT_RGB24
+#define PIX_FMT_RGBA AV_PIX_FMT_RGBA
+#endif
+
 #define priv_AVFormatContext AVFormatContext
 #define priv_AVStream AVStream
 #define priv_AVOutputFormat AVOutputFormat
