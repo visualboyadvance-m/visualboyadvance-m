@@ -261,9 +261,30 @@ SET(SRC_MAIN
     src/common/SoundSDL.cpp
 )
 
+SET(HDR_MAIN
+    src/AutoBuild.h
+    src/System.h
+    src/Util.h
+    src/version.h
+    src/common/array.h
+    src/common/ConfigManager.h
+    src/common/dictionary.h
+    src/common/iniparser.h
+    src/common/memgzio.h
+    src/common/Port.h
+    src/common/SoundDriver.h
+    src/common/SoundSDL.h
+    src/common/Types.h
+)
+
 if(ENABLE_FFMPEG)
     SET(SRC_MAIN ${SRC_MAIN} src/common/ffmpeg.cpp)
+    SET(HDR_MAIN ${HDR_MAIN} src/common/ffmpeg.h)
 endif(ENABLE_FFMPEG)
+
+if(ENABLE_NLS)
+    SET(HDR_MAIN ${HDR_MAIN} src/NLS.h)
+endif(ENABLE_NLS)
 
 SET(SRC_GBA
     src/gba/agbprint.cpp
@@ -295,6 +316,29 @@ SET(SRC_GBA
     src/gba/Sram.cpp
 )
 
+SET(HDR_GBA
+    src/gba/agbprint.h
+    src/gba/bios.h
+    src/gba/BreakpointStructures.h
+    src/gba/Cheats.h
+    src/gba/CheatSearch.h
+    src/gba/debugger-expr-yacc.hpp
+    src/gba/EEprom.h
+    src/gba/ereader.h
+    src/gba/Flash.h
+    src/gba/GBA.h
+    src/gba/GBAcpu.h
+    src/gba/gbafilter.h
+    src/gba/GBAGfx.h
+    src/gba/GBAinline.h
+    src/gba/GBALink.h
+    src/gba/GBASockClient.h
+    src/gba/Globals.h
+    src/gba/RTC.h
+    src/gba/Sound.h
+    src/gba/Sram.h
+)
+
 SET(SRC_GB
     src/gb/GB.cpp
     src/gb/gbCheats.cpp
@@ -307,6 +351,18 @@ SET(SRC_GB
     src/gb/gbSound.cpp
 )
 
+SET(HDR_GB
+    src/gb/gb.h
+    src/gb/gbCheats.h
+    src/gb/gbCodes.h
+    src/gb/gbCodesCB.h
+    src/gb/gbGlobals.h
+    src/gb/gbMemory.h
+    src/gb/gbPrinter.h
+    src/gb/gbSGB.h
+    src/gb/gbSound.h
+)
+
 SET(SRC_APU
     src/apu/Blip_Buffer.cpp
     src/apu/Effects_Buffer.cpp
@@ -314,6 +370,17 @@ SET(SRC_APU
     src/apu/Gb_Apu_State.cpp
     src/apu/Gb_Oscs.cpp
     src/apu/Multi_Buffer.cpp
+)
+
+SET(HDR_APU
+    src/apu/blargg_common.h #Unused(?) but in the VS projects
+    src/apu/blargg_config.h #Unused(?) but in the VS projects
+    src/apu/blargg_source.h
+    src/apu/Blip_Buffer.h
+    src/apu/Effects_Buffer.h
+    src/apu/Gb_Apu.h
+    src/apu/Gb_Oscs.h
+    src/apu/Multi_Buffer.h
 )
 
 SET(SRC_SDL
@@ -324,6 +391,14 @@ SET(SRC_SDL
     src/sdl/expr.cpp
     src/sdl/exprNode.cpp
     src/sdl/expr-lex.cpp
+)
+
+SET(HDR_SDL
+    src/sdl/filters.h
+    src/sdl/text.h
+    src/sdl/inputSDL.h
+    src/sdl/expr.cpp.h
+    src/sdl/exprNode.h
 )
 
 SET(SRC_FILTERS
@@ -339,8 +414,23 @@ SET(SRC_FILTERS
     src/filters/xBRZ/xbrz.cpp
 )
 
+SET(HDR_FILTERS
+    src/filters/hq2x.h
+    src/filters/interp.h
+    src/filters/lq2x.h
+    src/filters/xBRZ/config.h
+    src/filters/xBRZ/xbrz.h
+)
+
 SET(SRC_HQ_C
     src/filters/hq/c/hq_implementation.cpp
+)
+
+SET(HDR_HQ_C
+    src/filters/hq/c/hq3x_pattern.h
+    src/filters/hq/c/hq4x_pattern.h
+    src/filters/hq/c/hq_base.h
+    src/filters/hq/c/hq_shared.h
 )
 
 SET(SRC_HQ_ASM
@@ -355,6 +445,7 @@ if( ENABLE_ASM_SCALERS )
     SET(SRC_FILTERS ${SRC_FILTERS} ${SRC_HQ_ASM})
 else( ENABLE_ASM_SCALERS )
     SET(SRC_FILTERS ${SRC_FILTERS} ${SRC_HQ_C})
+    SET(HDR_FILTERS ${HDR_FILTERS} ${HDR_HQ_C})
     ADD_DEFINITIONS ( -DNO_ASM )
 endif( ENABLE_ASM_SCALERS )
 
@@ -363,6 +454,11 @@ if( ENABLE_DEBUGGER )
         src/gba/armdis.cpp
         src/gba/elf.cpp
         src/gba/remote.cpp
+    )
+    SET(HDR_DEBUGGER
+        src/gba/armdis.h
+        src/gba/elf.h
+        src/gba/remote.h
     )
 endif( ENABLE_DEBUGGER )
 
@@ -384,11 +480,17 @@ ADD_LIBRARY (
     STATIC
     ${PROJECT_SRCS}
     ${SRC_MAIN}
+    ${HDR_MAIN}
     ${SRC_GBA}
+    ${HDR_GBA}
     ${SRC_GB}
+    ${HDR_GB}
     ${SRC_APU}
+    ${HDR_APU}
     ${SRC_FILTERS}
+    ${HDR_FILTERS}
     ${SRC_DEBUGGER}
+    ${HDR_DEBUGGER}
 )
 
 IF( ENABLE_SDL )
@@ -396,6 +498,7 @@ IF( ENABLE_SDL )
         vbam
         WIN32
         ${SRC_SDL}
+        ${HDR_SDL}
     )
 
     IF( WIN32 )
