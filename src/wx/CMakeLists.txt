@@ -131,8 +131,40 @@ SET( SRC_WX
    xrc/vbam.xpm
 )
 
+SET( HDR_WX
+   wxvbam.h
+   drawing.h
+   filters.h
+   ioregs.h
+   opts.h
+   viewsupt.h
+   wxhead.h
+   widgets/wx/keyedit.h
+   widgets/wx/joyedit.h
+   widgets/wx/sdljoy.h
+   widgets/wx/webupdatedef.h
+   widgets/wx/wxmisc.h
+   # probably ought to be in common
+   ../sdl/text.h
+   # from external source with minor modifications
+   widgets/wx/checkedlistctrl.h
+)
+
+FILE(GLOB XRC_WX xrc/*.xrc)
+
+SET( RES_WX
+    ${XRC_WX}
+    ../vba-over.ini
+)
+
+SET( CM_STUFF
+    bin2c.cmake
+    copy-events.cmake
+)
+
 IF(ENABLE_OPENAL)
     SET( SRC_WX ${SRC_WX} openal.cpp )
+    SET( HDR_WX ${HDR_WX} openal.h )
 ENDIF(ENABLE_OPENAL)
 
 IF(ENABLE_XAUDIO2)
@@ -159,7 +191,10 @@ ADD_EXECUTABLE (
     WIN32
     MACOSX_BUNDLE
     ${SRC_WX}
+    ${HDR_WX}
+    ${RES_WX}
     ${VBAM_ICON}
+    ${CM_STUFF}
 )
 
 TARGET_LINK_LIBRARIES (
