@@ -641,7 +641,7 @@ static char * sdlStateName(int num)
 {
   static char stateName[2048];
 
-  if(saveDir)
+  if(saveDir && strlen(saveDir))
     sprintf(stateName, "%s/%s%d.sgm", saveDir, sdlGetFilename(filename),
             num+1);
   else if (homeDir)
