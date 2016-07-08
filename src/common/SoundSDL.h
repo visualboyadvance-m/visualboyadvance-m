@@ -18,40 +18,40 @@
 #ifndef __VBA_SOUND_SDL_H__
 #define __VBA_SOUND_SDL_H__
 
-#include "SoundDriver.h"
 #include "RingBuffer.h"
+#include "SoundDriver.h"
 
 #include <SDL.h>
 
-class SoundSDL: public SoundDriver
+class SoundSDL : public SoundDriver
 {
-public:
-	SoundSDL();
-	virtual ~SoundSDL();
+        public:
+        SoundSDL();
+        virtual ~SoundSDL();
 
-	virtual bool init(long sampleRate);
-	virtual void pause();
-	virtual void reset();
-	virtual void resume();
-	virtual void write(u16 * finalWave, int length);
+        virtual bool init(long sampleRate);
+        virtual void pause();
+        virtual void reset();
+        virtual void resume();
+        virtual void write(u16 *finalWave, int length);
 
-private:
-	RingBuffer<u16> _rbuf;
+        private:
+        RingBuffer<u16> _rbuf;
 
-	SDL_mutex * _mutex;
-	SDL_sem *_semBufferFull;
-	SDL_sem *_semBufferEmpty;
-	SDL_AudioDeviceID _dev;
+        SDL_mutex *_mutex;
+        SDL_sem *_semBufferFull;
+        SDL_sem *_semBufferEmpty;
+        SDL_AudioDeviceID _dev;
 
-	int current_rate;
+        int current_rate;
 
-	bool _initialized;
+        bool _initialized;
 
-	// Defines what delay in seconds we keep in the sound buffer
-	static const float _delay;
+        // Defines what delay in seconds we keep in the sound buffer
+        static const float _delay;
 
-	static void soundCallback(void *data, u8 *stream, int length);
-	virtual void read(u16 * stream, int length);
+        static void soundCallback(void *data, u8 *stream, int length);
+        virtual void read(u16 *stream, int length);
 };
 
 #endif // __VBA_SOUND_SDL_H__

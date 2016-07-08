@@ -1,7 +1,7 @@
 #if !defined(AFX_COLORCONTROL_H__747E1E47_DDFA_4D67_B337_A473F2BACB86__INCLUDED_)
 #define AFX_COLORCONTROL_H__747E1E47_DDFA_4D67_B337_A473F2BACB86__INCLUDED_
 
-#include "../System.h"  // Added by ClassView
+#include "../System.h" // Added by ClassView
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
@@ -13,38 +13,37 @@
 
 class ColorControl : public CWnd
 {
-  // Construction
- public:
-  ColorControl();
+        // Construction
+        public:
+        ColorControl();
 
-  // Attributes
- public:
-  // Operations
-  static bool isRegistered;
+        // Attributes
+        public:
+        // Operations
+        static bool isRegistered;
 
-  // Operations
- public:
+        // Operations
+        public:
+        // Overrides
+        // ClassWizard generated virtual function overrides
+        //{{AFX_VIRTUAL(ColorControl)
+        //}}AFX_VIRTUAL
 
-  // Overrides
-  // ClassWizard generated virtual function overrides
-  //{{AFX_VIRTUAL(ColorControl)
-  //}}AFX_VIRTUAL
+        // Implementation
+        public:
+        void setColor(u16 c);
+        u16 color;
+        virtual ~ColorControl();
 
-  // Implementation
- public:
-  void setColor(u16 c);
-  u16 color;
-  virtual ~ColorControl();
-
-  // Generated message map functions
- protected:
-  //{{AFX_MSG(ColorControl)
-  afx_msg void OnPaint();
-  afx_msg BOOL OnEraseBkgnd(CDC* pDC);
-  //}}AFX_MSG
-  DECLARE_MESSAGE_MAP()
-    private:
-  void registerClass();
+        // Generated message map functions
+        protected:
+        //{{AFX_MSG(ColorControl)
+        afx_msg void OnPaint();
+        afx_msg BOOL OnEraseBkgnd(CDC *pDC);
+        //}}AFX_MSG
+        DECLARE_MESSAGE_MAP()
+        private:
+        void registerClass();
 };
 
 /////////////////////////////////////////////////////////////////////////////

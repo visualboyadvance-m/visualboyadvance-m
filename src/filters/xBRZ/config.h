@@ -16,25 +16,23 @@
 #ifndef XBRZ_CONFIG_HEADER_284578425345
 #define XBRZ_CONFIG_HEADER_284578425345
 
-//do NOT include any headers here! used by xBRZ_dll!!!
+// do NOT include any headers here! used by xBRZ_dll!!!
 
 namespace xbrz
 {
-struct ScalerCfg
-{
-    ScalerCfg() :
-        luminanceWeight(1),
-        equalColorTolerance(30),
-        dominantDirectionThreshold(3.6),
-        steepDirectionThreshold(2.2),
-        newTestAttribute(0) {}
+struct ScalerCfg {
+        ScalerCfg()
+            : luminanceWeight(1), equalColorTolerance(30), dominantDirectionThreshold(3.6),
+              steepDirectionThreshold(2.2), newTestAttribute(0)
+        {
+        }
 
-    double luminanceWeight;
-    double equalColorTolerance;
-    double dominantDirectionThreshold;
-    double steepDirectionThreshold;
-    double newTestAttribute; //unused; test new parameters
+        double luminanceWeight;
+        double equalColorTolerance;
+        double dominantDirectionThreshold;
+        double steepDirectionThreshold;
+        double newTestAttribute; // unused; test new parameters
 };
 }
 
-#endif
+#endif

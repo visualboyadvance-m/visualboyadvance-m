@@ -4,41 +4,27 @@
 #include "../System.h"
 
 struct CheatSearchBlock {
-  int size;
-  u32 offset;
-  u8 *bits;
-  u8 *data;
-  u8 *saved;
+        int size;
+        u32 offset;
+        u8 *bits;
+        u8 *data;
+        u8 *saved;
 };
 
 struct CheatSearchData {
-  int count;
-  CheatSearchBlock *blocks;
+        int count;
+        CheatSearchBlock *blocks;
 };
 
-enum {
-  SEARCH_EQ,
-  SEARCH_NE,
-  SEARCH_LT,
-  SEARCH_LE,
-  SEARCH_GT,
-  SEARCH_GE
-};
+enum { SEARCH_EQ, SEARCH_NE, SEARCH_LT, SEARCH_LE, SEARCH_GT, SEARCH_GE };
 
-enum {
-  BITS_8,
-  BITS_16,
-  BITS_32
-};
+enum { BITS_8, BITS_16, BITS_32 };
 
-#define SET_BIT(bits,off) \
-  (bits)[(off) >> 3] |= (1 << ((off) & 7))
+#define SET_BIT(bits, off) (bits)[(off) >> 3] |= (1 << ((off)&7))
 
-#define CLEAR_BIT(bits, off) \
-  (bits)[(off) >> 3] &= ~(1 << ((off) & 7))
+#define CLEAR_BIT(bits, off) (bits)[(off) >> 3] &= ~(1 << ((off)&7))
 
-#define IS_BIT_SET(bits, off) \
-  (bits)[(off) >> 3] & (1 << ((off) & 7))
+#define IS_BIT_SET(bits, off) (bits)[(off) >> 3] & (1 << ((off)&7))
 
 extern CheatSearchData cheatSearchData;
 

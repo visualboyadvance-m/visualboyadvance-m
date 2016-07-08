@@ -21,30 +21,23 @@
 #include <SDL.h>
 
 enum EKey {
-    KEY_LEFT,
-    KEY_RIGHT,
-    KEY_UP,
-    KEY_DOWN,
-    KEY_BUTTON_A,
-    KEY_BUTTON_B,
-    KEY_BUTTON_START,
-    KEY_BUTTON_SELECT,
-    KEY_BUTTON_L,
-    KEY_BUTTON_R,
-    KEY_BUTTON_SPEED,
-    KEY_BUTTON_CAPTURE,
-    KEY_BUTTON_AUTO_A,
-    KEY_BUTTON_AUTO_B
+        KEY_LEFT,
+        KEY_RIGHT,
+        KEY_UP,
+        KEY_DOWN,
+        KEY_BUTTON_A,
+        KEY_BUTTON_B,
+        KEY_BUTTON_START,
+        KEY_BUTTON_SELECT,
+        KEY_BUTTON_L,
+        KEY_BUTTON_R,
+        KEY_BUTTON_SPEED,
+        KEY_BUTTON_CAPTURE,
+        KEY_BUTTON_AUTO_A,
+        KEY_BUTTON_AUTO_B
 };
 
-enum EPad {
-	PAD_MAIN,
-	PAD_1 = PAD_MAIN,
-	PAD_2,
-	PAD_3,
-	PAD_4,
-	PAD_DEFAULT
-};
+enum EPad { PAD_MAIN, PAD_1 = PAD_MAIN, PAD_2, PAD_3, PAD_4, PAD_DEFAULT };
 
 /**
  * Init the joysticks needed by the keymap. Verify that the keymap is compatible

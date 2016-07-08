@@ -4,28 +4,21 @@
 /**
  * Link modes to be passed to InitLink
  */
-enum LinkMode
-{
-	LINK_DISCONNECTED,
-	LINK_CABLE_IPC,
-	LINK_CABLE_SOCKET,
-	LINK_RFU_IPC,
-	LINK_RFU_SOCKET,
-	LINK_GAMECUBE_DOLPHIN,
-	LINK_GAMEBOY_IPC,
-	LINK_GAMEBOY_SOCKET
+enum LinkMode {
+        LINK_DISCONNECTED,
+        LINK_CABLE_IPC,
+        LINK_CABLE_SOCKET,
+        LINK_RFU_IPC,
+        LINK_RFU_SOCKET,
+        LINK_GAMECUBE_DOLPHIN,
+        LINK_GAMEBOY_IPC,
+        LINK_GAMEBOY_SOCKET
 };
 
 /**
  * State of the connection attempt
  */
-enum ConnectionState
-{
-	LINK_OK,
-	LINK_ERROR,
-	LINK_NEEDS_UPDATE,
-	LINK_ABORT
-};
+enum ConnectionState { LINK_OK, LINK_ERROR, LINK_NEEDS_UPDATE, LINK_ABORT };
 
 /**
  * Initialize GBA linking
@@ -41,7 +34,7 @@ extern ConnectionState InitLink(LinkMode mode);
  * @param message Information message
  * @param size Maximum message size
  */
-extern ConnectionState ConnectLinkUpdate(char * const message, size_t size);
+extern ConnectionState ConnectLinkUpdate(char *const message, size_t size);
 
 /**
  * Get the currently enabled link mode
@@ -80,7 +73,7 @@ extern bool SetLinkServerHost(const char *host);
  * If in gamecube mode, returns the IP adress of the dolphin host
  *
  */
-extern void GetLinkServerHost(char * const host, size_t size);
+extern void GetLinkServerHost(char *const host, size_t size);
 
 /**
  * Set the value in milliseconds of the timeout after which a connection is
@@ -141,56 +134,58 @@ extern void CleanLocalLink();
 extern const char *MakeInstanceFilename(const char *Input);
 
 // register definitions
-#define COMM_SIODATA32_L	0x120 // Lower 16bit on Normal mode
-#define COMM_SIODATA32_H	0x122 // Higher 16bit on Normal mode
-#define COMM_SIOCNT			0x128
-#define COMM_SIODATA8		0x12a // 8bit on Normal/UART mode, (up to 4x8bit with FIFO)
-#define COMM_SIOMLT_SEND	0x12a // SIOMLT_SEND (16bit R/W) on MultiPlayer mode (local outgoing)
-#define COMM_SIOMULTI0  	0x120 // SIOMULTI0 (16bit) on MultiPlayer mode (Parent/Master)
-#define COMM_SIOMULTI1  	0x122 // SIOMULTI1 (16bit) on MultiPlayer mode (Child1/Slave1)
-#define COMM_SIOMULTI2  	0x124 // SIOMULTI2 (16bit) on MultiPlayer mode (Child2/Slave2)
-#define COMM_SIOMULTI3  	0x126 // SIOMULTI3 (16bit) on MultiPlayer mode (Child3/Slave3)
-#define COMM_RCNT			0x134 // SIO Mode (4bit data) on GeneralPurpose mode
-#define COMM_IR 			0x136 // Infrared Register (16bit) 1bit data at a time(LED On/Off)?
-#define COMM_JOYCNT			0x140
-#define COMM_JOY_RECV_L		0x150 // Send/Receive 8bit Lower first then 8bit Higher
-#define COMM_JOY_RECV_H		0x152
-#define COMM_JOY_TRANS_L	0x154 // Send/Receive 8bit Lower first then 8bit Higher
-#define COMM_JOY_TRANS_H	0x156
-#define COMM_JOYSTAT		0x158 // Send/Receive 8bit lower only
+#define COMM_SIODATA32_L 0x120 // Lower 16bit on Normal mode
+#define COMM_SIODATA32_H 0x122 // Higher 16bit on Normal mode
+#define COMM_SIOCNT 0x128
+#define COMM_SIODATA8 0x12a    // 8bit on Normal/UART mode, (up to 4x8bit with FIFO)
+#define COMM_SIOMLT_SEND 0x12a // SIOMLT_SEND (16bit R/W) on MultiPlayer mode (local outgoing)
+#define COMM_SIOMULTI0 0x120   // SIOMULTI0 (16bit) on MultiPlayer mode (Parent/Master)
+#define COMM_SIOMULTI1 0x122   // SIOMULTI1 (16bit) on MultiPlayer mode (Child1/Slave1)
+#define COMM_SIOMULTI2 0x124   // SIOMULTI2 (16bit) on MultiPlayer mode (Child2/Slave2)
+#define COMM_SIOMULTI3 0x126   // SIOMULTI3 (16bit) on MultiPlayer mode (Child3/Slave3)
+#define COMM_RCNT 0x134        // SIO Mode (4bit data) on GeneralPurpose mode
+#define COMM_IR 0x136          // Infrared Register (16bit) 1bit data at a time(LED On/Off)?
+#define COMM_JOYCNT 0x140
+#define COMM_JOY_RECV_L 0x150 // Send/Receive 8bit Lower first then 8bit Higher
+#define COMM_JOY_RECV_H 0x152
+#define COMM_JOY_TRANS_L 0x154 // Send/Receive 8bit Lower first then 8bit Higher
+#define COMM_JOY_TRANS_H 0x156
+#define COMM_JOYSTAT 0x158 // Send/Receive 8bit lower only
 
-#define JOYSTAT_RECV		2
-#define JOYSTAT_SEND		8
+#define JOYSTAT_RECV 2
+#define JOYSTAT_SEND 8
 
-#define JOYCNT_RESET			1
-#define JOYCNT_RECV_COMPLETE	2
-#define JOYCNT_SEND_COMPLETE	4
-#define JOYCNT_INT_ENABLE		0x40
+#define JOYCNT_RESET 1
+#define JOYCNT_RECV_COMPLETE 2
+#define JOYCNT_SEND_COMPLETE 4
+#define JOYCNT_INT_ENABLE 0x40
 
-#define LINK_PARENTLOST	0x80
+#define LINK_PARENTLOST 0x80
 
-#define UNSUPPORTED		-1
-#define MULTIPLAYER		0
-#define NORMAL8			1
-#define NORMAL32		2 // wireless use normal32 also
-#define UART			3
-#define JOYBUS			4
-#define GP				5
-#define INFRARED		6 // Infrared Register at 4000136h
+#define UNSUPPORTED -1
+#define MULTIPLAYER 0
+#define NORMAL8 1
+#define NORMAL32 2 // wireless use normal32 also
+#define UART 3
+#define JOYBUS 4
+#define GP 5
+#define INFRARED 6 // Infrared Register at 4000136h
 
-#define RFU_INIT	0
-#define RFU_COMM	1
-#define RFU_SEND	2
-#define RFU_RECV	3
+#define RFU_INIT 0
+#define RFU_COMM 1
+#define RFU_SEND 2
+#define RFU_RECV 3
 
-#define RF_RECVCMD			0x278 // Unknown, Seems to be related to Wireless Adapter(RF_RCNT or armMode/CPSR or CMD sent by the adapter when RF_SIOCNT=0x83 or when RCNT=0x80aX?)
-#define RF_CNT				0x27a // Unknown, Seems to be related to Wireless Adapter(RF_SIOCNT?)		
+#define RF_RECVCMD                                                                                 \
+        0x278 // Unknown, Seems to be related to Wireless Adapter(RF_RCNT or armMode/CPSR or CMD
+              // sent by the adapter when RF_SIOCNT=0x83 or when RCNT=0x80aX?)
+#define RF_CNT 0x27a // Unknown, Seems to be related to Wireless Adapter(RF_SIOCNT?)
 
 typedef struct {
-	u8 len; //data len in 32bit words
-	u8 gbaid; //source id
-	u32 time; //linktime
-	u32 data[255];
+        u8 len;   // data len in 32bit words
+        u8 gbaid; // source id
+        u32 time; // linktime
+        u32 data[255];
 } rfu_datarec;
 
 extern u8 gbSIO_SC;
@@ -198,11 +193,11 @@ extern bool LinkIsWaiting;
 extern bool LinkFirstTime;
 extern bool EmuReseted;
 extern void gbInitLink();
-extern u8   gbStartLink(u8 b);
-extern u16  gbLinkUpdate(u8 b, int gbSerialOn);
+extern u8 gbStartLink(u8 b);
+extern u16 gbLinkUpdate(u8 b, int gbSerialOn);
 extern void gbInitLinkIPC();
-extern u8   gbStartLinkIPC(u8 b);
-extern u16  gbLinkUpdateIPC(u8 b, int gbSerialOn);
+extern u8 gbStartLinkIPC(u8 b);
+extern u16 gbLinkUpdateIPC(u8 b, int gbSerialOn);
 
 extern void BootLink(int m_type, const char *host, int timeout, bool m_hacks, int m_numplayers);
 

@@ -26,51 +26,43 @@ int Init_2xSaI(u32);
 
 namespace VBA
 {
-
 typedef void (*Filter)(u8 *, u32, u8 *, u8 *, u32, int, int);
 typedef void (*FilterIB)(u8 *, u32, int, int);
 
-enum EFilter
-{
-  FirstFilter,
-  FilterNone = FirstFilter,
-  Filter2xSaI,
-  FilterSuper2xSaI,
-  FilterSuperEagle,
-  FilterPixelate,
-  FilterAdMame2x,
-  FilterBilinear,
-  FilterBilinearPlus,
-  FilterScanlines,
-  FilterScanlinesTV,
-  FilterHq2x,
-  FilterLq2x,
-  FilterxBRZ2x,
-  LastFilter = FilterxBRZ2x
+enum EFilter {
+        FirstFilter,
+        FilterNone = FirstFilter,
+        Filter2xSaI,
+        FilterSuper2xSaI,
+        FilterSuperEagle,
+        FilterPixelate,
+        FilterAdMame2x,
+        FilterBilinear,
+        FilterBilinearPlus,
+        FilterScanlines,
+        FilterScanlinesTV,
+        FilterHq2x,
+        FilterLq2x,
+        FilterxBRZ2x,
+        LastFilter = FilterxBRZ2x
 };
 
-enum EFilterIB
-{
-  FirstFilterIB,
-  FilterIBNone = FirstFilterIB,
-  FilterIBSmart,
-  FilterIBMotionBlur,
-  LastFilterIB = FilterIBMotionBlur
+enum EFilterIB {
+        FirstFilterIB,
+        FilterIBNone = FirstFilterIB,
+        FilterIBSmart,
+        FilterIBMotionBlur,
+        LastFilterIB = FilterIBMotionBlur
 };
 
-enum EFilterDepth
-{
-  FilterDepth16,
-  FilterDepth32
-};
+enum EFilterDepth { FilterDepth16, FilterDepth32 };
 
 Filter pvGetFilter(EFilter _eFilter, EFilterDepth _eDepth);
-const char* pcsGetFilterName(const EFilter _eFilter);
+const char *pcsGetFilterName(const EFilter _eFilter);
 
 FilterIB pvGetFilterIB(EFilterIB _eFilterIB, EFilterDepth _eDepth);
-const char* pcsGetFilterIBName(const EFilterIB _eFilterIB);
+const char *pcsGetFilterIBName(const EFilterIB _eFilterIB);
 
 } // namespace VBA
-
 
 #endif // __VBA_FILTERS_H__

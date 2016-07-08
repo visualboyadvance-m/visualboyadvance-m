@@ -20,279 +20,247 @@
 #ifndef __VBA_WINDOW_H__
 #define __VBA_WINDOW_H__
 
-#include <gtkmm/window.h>
+#include <gtkmm/builder.h>
 #include <gtkmm/checkmenuitem.h>
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/menubar.h>
 #include <gtkmm/recentchoosermenu.h>
-#include <gtkmm/builder.h>
+#include <gtkmm/window.h>
 
 #include "../System.h"
 #include "../sdl/inputSDL.h"
 
 #include "configfile.h"
-#include "screenarea.h"
 #include "filters.h"
+#include "screenarea.h"
 
 namespace VBA
 {
-
 class Window : public Gtk::Window
 {
-  friend class Gtk::Builder;
+        friend class Gtk::Builder;
 
-public:
-  virtual ~Window();
+        public:
+        virtual ~Window();
 
-  inline static Window * poGetInstance() { return m_poInstance; }
-  static std::string sGetUiFilePath(const std::string &_sFileName);
+        inline static Window *poGetInstance()
+        {
+                return m_poInstance;
+        }
+        static std::string sGetUiFilePath(const std::string &_sFileName);
 
-  enum ECartridge
-  {
-    CartridgeNone,
-    CartridgeGB,
-    CartridgeGBA
-  };
+        enum ECartridge { CartridgeNone, CartridgeGB, CartridgeGBA };
 
-  enum EVideoOutput
-  {
-    OutputCairo,
-    OutputOpenGL
-  };
-  
-  enum EEmulatorType
-  {
-    EmulatorAuto,
-    EmulatorCGB,
-    EmulatorSGB,
-    EmulatorGB,
-    EmulatorGBA,
-    EmulatorSGB2
-  };
+        enum EVideoOutput { OutputCairo, OutputOpenGL };
 
-  enum ESaveType
-  {
-    SaveAuto,
-    SaveEEPROM,
-    SaveSRAM,
-    SaveFlash,
-    SaveEEPROMSensor,
-    SaveNone
-  };
+        enum EEmulatorType {
+                EmulatorAuto,
+                EmulatorCGB,
+                EmulatorSGB,
+                EmulatorGB,
+                EmulatorGBA,
+                EmulatorSGB2
+        };
 
-  // GB/GBA screen sizes
-  const int m_iGBScreenWidth;
-  const int m_iGBScreenHeight;
-  const int m_iSGBScreenWidth;
-  const int m_iSGBScreenHeight;
-  const int m_iGBAScreenWidth;
-  const int m_iGBAScreenHeight;
+        enum ESaveType { SaveAuto, SaveEEPROM, SaveSRAM, SaveFlash, SaveEEPROMSensor, SaveNone };
 
-  bool bLoadROM(const std::string & _rsFile);
-  void vPopupError(const char * _csFormat, ...);
-  void vPopupErrorV(const char * _csFormat, va_list _args);
-  void vDrawScreen();
-  void vComputeFrameskip(int _iRate);
-  void vShowSpeed(int _iSpeed);
-  void vCaptureScreen(int _iNum);
-  void vApplyConfigFilter();
-  void vApplyConfigFilterIB();
-  void vApplyConfigScreenArea();
-  void vApplyConfigMute();
-  void vApplyConfigVolume();
-  void vApplyConfigSoundSampleRate();
-  void vApplyConfigGBSystem();
-  void vApplyConfigGBBorder();
-  void vApplyConfigGBPrinter();
-  void vApplyConfigGBASaveType();
-  void vApplyConfigGBAFlashSize();
-  void vApplyConfigGBARTC();
-  void vApplyConfigFrameskip();
-  void vApplyConfigShowSpeed();
-  void vApplyPerGameConfig();
-  void vUpdateScreen();
+        // GB/GBA screen sizes
+        const int m_iGBScreenWidth;
+        const int m_iGBScreenHeight;
+        const int m_iSGBScreenWidth;
+        const int m_iSGBScreenHeight;
+        const int m_iGBAScreenWidth;
+        const int m_iGBAScreenHeight;
 
-  inline ECartridge eGetCartridge() const { return m_eCartridge; }
+        bool bLoadROM(const std::string &_rsFile);
+        void vPopupError(const char *_csFormat, ...);
+        void vPopupErrorV(const char *_csFormat, va_list _args);
+        void vDrawScreen();
+        void vComputeFrameskip(int _iRate);
+        void vShowSpeed(int _iSpeed);
+        void vCaptureScreen(int _iNum);
+        void vApplyConfigFilter();
+        void vApplyConfigFilterIB();
+        void vApplyConfigScreenArea();
+        void vApplyConfigMute();
+        void vApplyConfigVolume();
+        void vApplyConfigSoundSampleRate();
+        void vApplyConfigGBSystem();
+        void vApplyConfigGBBorder();
+        void vApplyConfigGBPrinter();
+        void vApplyConfigGBASaveType();
+        void vApplyConfigGBAFlashSize();
+        void vApplyConfigGBARTC();
+        void vApplyConfigFrameskip();
+        void vApplyConfigShowSpeed();
+        void vApplyPerGameConfig();
+        void vUpdateScreen();
 
-protected:
-  Window(GtkWindow * _pstWindow,
-         const Glib::RefPtr<Gtk::Builder> & _poXml);
+        inline ECartridge eGetCartridge() const
+        {
+                return m_eCartridge;
+        }
 
-  enum EShowSpeed
-  {
-    ShowNone,
-    ShowPercentage,
-    ShowDetailed
-  };
+        protected:
+        Window(GtkWindow *_pstWindow, const Glib::RefPtr<Gtk::Builder> &_poXml);
 
-  enum ESoundStatus
-  {
-    SoundOff,
-    SoundMute,
-    SoundOn
-  };
+        enum EShowSpeed { ShowNone, ShowPercentage, ShowDetailed };
 
-  enum EColorFormat
-  {
-    ColorFormatRGB,
-    ColorFormatBGR
-  };
+        enum ESoundStatus { SoundOff, SoundMute, SoundOn };
 
-  virtual void vOnMenuEnter();
-  virtual void vOnMenuExit();
-  virtual void vOnFileOpen();
-  virtual void vOnFileLoad();
-  virtual void vOnFileSave();
-  virtual void vOnLoadGameMostRecent();
-  virtual void vOnLoadGameAutoToggled(Gtk::CheckMenuItem * _poCMI);
-  void vOnLoadGame(int _iSlot);
-  virtual void vOnSaveGameOldest();
-  void vOnSaveGame(int _iSlot);
-  virtual void vOnFilePauseToggled(Gtk::CheckMenuItem * _poCMI);
-  virtual void vOnFileReset();
-  virtual void vOnRecentFile();
-  virtual void vOnFileScreenCapture();
-  virtual void vOnFileClose();
-  virtual void vOnFileExit();
-  virtual void vOnVideoFullscreen();
-  virtual void vOnDirectories();
-  virtual void vOnGeneralConfigure();
-  virtual void vOnJoypadConfigure();
-  virtual void vOnDisplayConfigure();
-  virtual void vOnSoundConfigure();
-  virtual void vOnGameBoyConfigure();
-  virtual void vOnGameBoyAdvanceConfigure();
-  virtual void vOnCheatList();
-  virtual void vOnCheatDisableToggled(Gtk::CheckMenuItem * _poCMI);
-  virtual void vOnHelpAbout();
-  virtual bool bOnEmuIdle();
-  virtual bool bOnEmuSaveStateRewind();
-  virtual bool bOnEmuRewind();
+        enum EColorFormat { ColorFormatRGB, ColorFormatBGR };
 
-  virtual bool on_focus_in_event(GdkEventFocus * _pstEvent);
-  virtual bool on_focus_out_event(GdkEventFocus * _pstEvent);
-  virtual bool on_key_press_event(GdkEventKey * _pstEvent);
-  virtual bool on_key_release_event(GdkEventKey * _pstEvent);
-  virtual bool on_window_state_event(GdkEventWindowState* _pstEvent);
+        virtual void vOnMenuEnter();
+        virtual void vOnMenuExit();
+        virtual void vOnFileOpen();
+        virtual void vOnFileLoad();
+        virtual void vOnFileSave();
+        virtual void vOnLoadGameMostRecent();
+        virtual void vOnLoadGameAutoToggled(Gtk::CheckMenuItem *_poCMI);
+        void vOnLoadGame(int _iSlot);
+        virtual void vOnSaveGameOldest();
+        void vOnSaveGame(int _iSlot);
+        virtual void vOnFilePauseToggled(Gtk::CheckMenuItem *_poCMI);
+        virtual void vOnFileReset();
+        virtual void vOnRecentFile();
+        virtual void vOnFileScreenCapture();
+        virtual void vOnFileClose();
+        virtual void vOnFileExit();
+        virtual void vOnVideoFullscreen();
+        virtual void vOnDirectories();
+        virtual void vOnGeneralConfigure();
+        virtual void vOnJoypadConfigure();
+        virtual void vOnDisplayConfigure();
+        virtual void vOnSoundConfigure();
+        virtual void vOnGameBoyConfigure();
+        virtual void vOnGameBoyAdvanceConfigure();
+        virtual void vOnCheatList();
+        virtual void vOnCheatDisableToggled(Gtk::CheckMenuItem *_poCMI);
+        virtual void vOnHelpAbout();
+        virtual bool bOnEmuIdle();
+        virtual bool bOnEmuSaveStateRewind();
+        virtual bool bOnEmuRewind();
 
-private:
-  // Config limits
-  const int m_iFrameskipMin;
-  const int m_iFrameskipMax;
-  const int m_iScaleMin;
-  const int m_iScaleMax;
-  const int m_iShowSpeedMin;
-  const int m_iShowSpeedMax;
-  const int m_iSaveTypeMin;
-  const int m_iSaveTypeMax;
-  const int m_iSoundSampleRateMin;
-  const int m_iSoundSampleRateMax;
-  const float m_fSoundVolumeMin;
-  const float m_fSoundVolumeMax;
-  const int m_iEmulatorTypeMin;
-  const int m_iEmulatorTypeMax;
-  const int m_iFilter2xMin;
-  const int m_iFilter2xMax;
-  const int m_iFilterIBMin;
-  const int m_iFilterIBMax;
-  const EPad m_iJoypadMin;
-  const EPad m_iJoypadMax;
-  const int m_iVideoOutputMin;
-  const int m_iVideoOutputMax;
+        virtual bool on_focus_in_event(GdkEventFocus *_pstEvent);
+        virtual bool on_focus_out_event(GdkEventFocus *_pstEvent);
+        virtual bool on_key_press_event(GdkEventKey *_pstEvent);
+        virtual bool on_key_release_event(GdkEventKey *_pstEvent);
+        virtual bool on_window_state_event(GdkEventWindowState *_pstEvent);
 
-  static Window * m_poInstance;
+        private:
+        // Config limits
+        const int m_iFrameskipMin;
+        const int m_iFrameskipMax;
+        const int m_iScaleMin;
+        const int m_iScaleMax;
+        const int m_iShowSpeedMin;
+        const int m_iShowSpeedMax;
+        const int m_iSaveTypeMin;
+        const int m_iSaveTypeMax;
+        const int m_iSoundSampleRateMin;
+        const int m_iSoundSampleRateMax;
+        const float m_fSoundVolumeMin;
+        const float m_fSoundVolumeMax;
+        const int m_iEmulatorTypeMin;
+        const int m_iEmulatorTypeMax;
+        const int m_iFilter2xMin;
+        const int m_iFilter2xMax;
+        const int m_iFilterIBMin;
+        const int m_iFilterIBMax;
+        const EPad m_iJoypadMin;
+        const EPad m_iJoypadMax;
+        const int m_iVideoOutputMin;
+        const int m_iVideoOutputMax;
 
-  Glib::RefPtr<Gtk::Builder> m_poXml;
+        static Window *m_poInstance;
 
-  std::string       m_sUserDataDir;
-  std::string       m_sConfigFile;
-  Config::File      m_oConfig;
-  Config::Section * m_poDirConfig;
-  Config::Section * m_poCoreConfig;
-  Config::Section * m_poDisplayConfig;
-  Config::Section * m_poSoundConfig;
-  Config::Section * m_poInputConfig;
+        Glib::RefPtr<Gtk::Builder> m_poXml;
 
-  Gtk::FileChooserDialog * m_poFileOpenDialog;
+        std::string m_sUserDataDir;
+        std::string m_sConfigFile;
+        Config::File m_oConfig;
+        Config::Section *m_poDirConfig;
+        Config::Section *m_poCoreConfig;
+        Config::Section *m_poDisplayConfig;
+        Config::Section *m_poSoundConfig;
+        Config::Section *m_poInputConfig;
 
-  ScreenArea *         m_poScreenArea;
-  Gtk::CheckMenuItem * m_poFilePauseItem;
-  Gtk::MenuBar *       m_poMenuBar;
+        Gtk::FileChooserDialog *m_poFileOpenDialog;
 
-  struct SGameSlot
-  {
-    bool        m_bEmpty;
-    std::string m_sFile;
-    time_t      m_uiTime;
-  };
+        ScreenArea *m_poScreenArea;
+        Gtk::CheckMenuItem *m_poFilePauseItem;
+        Gtk::MenuBar *m_poMenuBar;
 
-  struct SJoypadKey
-  {
-  	const char * m_csKey;
-  	const EKey   m_eKeyFlag;
-  };
+        struct SGameSlot {
+                bool m_bEmpty;
+                std::string m_sFile;
+                time_t m_uiTime;
+        };
 
-  static const SJoypadKey m_astJoypad[];
+        struct SJoypadKey {
+                const char *m_csKey;
+                const EKey m_eKeyFlag;
+        };
 
-  Gtk::MenuItem * m_apoLoadGameItem[10];
-  Gtk::MenuItem * m_apoSaveGameItem[10];
-  SGameSlot       m_astGameSlot[10];
+        static const SJoypadKey m_astJoypad[];
 
-  Glib::RefPtr<Gtk::RecentManager> m_poRecentManager;
-  Gtk::MenuItem *                  m_poRecentMenu;
-  Gtk::RecentChooserMenu *         m_poRecentChooserMenu;
+        Gtk::MenuItem *m_apoLoadGameItem[10];
+        Gtk::MenuItem *m_apoSaveGameItem[10];
+        SGameSlot m_astGameSlot[10];
 
-  std::list<Gtk::Widget *> m_listSensitiveWhenPlaying;
+        Glib::RefPtr<Gtk::RecentManager> m_poRecentManager;
+        Gtk::MenuItem *m_poRecentMenu;
+        Gtk::RecentChooserMenu *m_poRecentChooserMenu;
 
-  sigc::connection m_oEmuSig, m_oEmuRewindSig;
+        std::list<Gtk::Widget *> m_listSensitiveWhenPlaying;
 
-  int m_bFullscreen;
-  int m_iScreenWidth;
-  int m_iScreenHeight;
-  int m_iFrameCount;
+        sigc::connection m_oEmuSig, m_oEmuRewindSig;
 
-  std::string    m_sRomFile;
-  ECartridge     m_eCartridge;
-  EmulatedSystem m_stEmulator;
-  bool           m_bPaused;
-  bool           m_bWasEmulating;
-  bool           m_bAutoFrameskip;
-  EShowSpeed     m_eShowSpeed;
+        int m_bFullscreen;
+        int m_iScreenWidth;
+        int m_iScreenHeight;
+        int m_iFrameCount;
 
+        std::string m_sRomFile;
+        ECartridge m_eCartridge;
+        EmulatedSystem m_stEmulator;
+        bool m_bPaused;
+        bool m_bWasEmulating;
+        bool m_bAutoFrameskip;
+        EShowSpeed m_eShowSpeed;
 
-  /* State saving into memory & rewind to saved state */
-  u16 m_state_count_max;
-  u16 m_rewind_interval;
-  static const u32 SZSTATE = 1024*512;
-  std::deque<char*> m_rewind_load_q;
-  char *m_psavestate;
+        /* State saving into memory & rewind to saved state */
+        u16 m_state_count_max;
+        u16 m_rewind_interval;
+        static const u32 SZSTATE = 1024 * 512;
+        std::deque<char *> m_rewind_load_q;
+        char *m_psavestate;
 
-  void vInitSystem();
-  void vUnInitSystem();
-  void vInitSDL();
-  void vInitConfig();
-  void vCheckConfig();
-  void vInitColors(EColorFormat _eColorFormat);
-  void vLoadConfig(const std::string & _rsFile);
-  void vSaveConfig(const std::string & _rsFile);
-  void vHistoryAdd(const std::string & _rsFile);
-  void vApplyConfigJoypads();
-  void vSaveJoypadsToConfig();
-  void vDrawDefaultScreen();
-  void vSetDefaultTitle();
-  void vCreateFileOpenDialog();
-  void vLoadBattery();
-  void vLoadCheats();
-  void vSaveBattery();
-  void vSaveCheats();
-  void vStartEmu();
-  void vStopEmu();
-  void vUpdateGameSlots();
-  void vToggleFullscreen();
-  void vSDLPollEvents();
+        void vInitSystem();
+        void vUnInitSystem();
+        void vInitSDL();
+        void vInitConfig();
+        void vCheckConfig();
+        void vInitColors(EColorFormat _eColorFormat);
+        void vLoadConfig(const std::string &_rsFile);
+        void vSaveConfig(const std::string &_rsFile);
+        void vHistoryAdd(const std::string &_rsFile);
+        void vApplyConfigJoypads();
+        void vSaveJoypadsToConfig();
+        void vDrawDefaultScreen();
+        void vSetDefaultTitle();
+        void vCreateFileOpenDialog();
+        void vLoadBattery();
+        void vLoadCheats();
+        void vSaveBattery();
+        void vSaveCheats();
+        void vStartEmu();
+        void vStopEmu();
+        void vUpdateGameSlots();
+        void vToggleFullscreen();
+        void vSDLPollEvents();
 };
 
 } // namespace VBA
-
 
 #endif // __VBA_WINDOW_H__

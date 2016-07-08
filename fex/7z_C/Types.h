@@ -49,7 +49,12 @@ typedef int WRes;
 #endif
 
 #ifndef RINOK
-#define RINOK(x) { int __result__ = (x); if (__result__ != 0) return __result__; }
+#define RINOK(x)                                                                                   \
+        {                                                                                          \
+                int __result__ = (x);                                                              \
+                if (__result__ != 0)                                                               \
+                        return __result__;                                                         \
+        }
 #endif
 
 typedef unsigned char Byte;
@@ -81,7 +86,7 @@ typedef unsigned __int64 UInt64;
 #else
 typedef long long int Int64;
 typedef unsigned long long int UInt64;
-#define UINT64_CONST(n) n ## ULL
+#define UINT64_CONST(n) n##ULL
 #endif
 
 #endif
@@ -95,7 +100,6 @@ typedef size_t SizeT;
 typedef int Bool;
 #define True 1
 #define False 0
-
 
 #ifdef _WIN32
 #define MY_STD_CALL __stdcall
@@ -121,24 +125,20 @@ typedef int Bool;
 
 #endif
 
-
 /* The following interfaces use first parameter as pointer to structure */
 
-typedef struct
-{
-  Byte (*Read)(void *p); /* reads one byte, returns 0 in case of EOF or error */
+typedef struct {
+        Byte (*Read)(void *p); /* reads one byte, returns 0 in case of EOF or error */
 } IByteIn;
 
-typedef struct
-{
-  void (*Write)(void *p, Byte b);
+typedef struct {
+        void (*Write)(void *p, Byte b);
 } IByteOut;
 
-typedef struct
-{
-  SRes (*Read)(void *p, void *buf, size_t *size);
-    /* if (input(*size) != 0 && output(*size) == 0) means end_of_stream.
-       (output(*size) < input(*size)) is allowed */
+typedef struct {
+        SRes (*Read)(void *p, void *buf, size_t *size);
+        /* if (input(*size) != 0 && output(*size) == 0) means end_of_stream.
+           (output(*size) < input(*size)) is allowed */
 } ISeqInStream;
 
 /* it can return SZ_ERROR_INPUT_EOF */
@@ -146,38 +146,30 @@ SRes SeqInStream_Read(ISeqInStream *stream, void *buf, size_t size);
 SRes SeqInStream_Read2(ISeqInStream *stream, void *buf, size_t size, SRes errorType);
 SRes SeqInStream_ReadByte(ISeqInStream *stream, Byte *buf);
 
-typedef struct
-{
-  size_t (*Write)(void *p, const void *buf, size_t size);
-    /* Returns: result - the number of actually written bytes.
-       (result < size) means error */
+typedef struct {
+        size_t (*Write)(void *p, const void *buf, size_t size);
+        /* Returns: result - the number of actually written bytes.
+           (result < size) means error */
 } ISeqOutStream;
 
-typedef enum
-{
-  SZ_SEEK_SET = 0,
-  SZ_SEEK_CUR = 1,
-  SZ_SEEK_END = 2
-} ESzSeek;
+typedef enum { SZ_SEEK_SET = 0, SZ_SEEK_CUR = 1, SZ_SEEK_END = 2 } ESzSeek;
 
-typedef struct
-{
-  SRes (*Read)(void *p, void *buf, size_t *size);  /* same as ISeqInStream::Read */
-  SRes (*Seek)(void *p, Int64 *pos, ESzSeek origin);
+typedef struct {
+        SRes (*Read)(void *p, void *buf, size_t *size); /* same as ISeqInStream::Read */
+        SRes (*Seek)(void *p, Int64 *pos, ESzSeek origin);
 } ISeekInStream;
 
-typedef struct
-{
-  SRes (*Look)(void *p, const void **buf, size_t *size);
-    /* if (input(*size) != 0 && output(*size) == 0) means end_of_stream.
-       (output(*size) > input(*size)) is not allowed
-       (output(*size) < input(*size)) is allowed */
-  SRes (*Skip)(void *p, size_t offset);
-    /* offset must be <= output(*size) of Look */
+typedef struct {
+        SRes (*Look)(void *p, const void **buf, size_t *size);
+        /* if (input(*size) != 0 && output(*size) == 0) means end_of_stream.
+           (output(*size) > input(*size)) is not allowed
+           (output(*size) < input(*size)) is allowed */
+        SRes (*Skip)(void *p, size_t offset);
+        /* offset must be <= output(*size) of Look */
 
-  SRes (*Read)(void *p, void *buf, size_t *size);
-    /* reads directly (without buffer). It's same as ISeqInStream::Read */
-  SRes (*Seek)(void *p, Int64 *pos, ESzSeek origin);
+        SRes (*Read)(void *p, void *buf, size_t *size);
+        /* reads directly (without buffer). It's same as ISeqInStream::Read */
+        SRes (*Seek)(void *p, Int64 *pos, ESzSeek origin);
 } ILookInStream;
 
 SRes LookInStream_LookRead(ILookInStream *stream, void *buf, size_t *size);
@@ -189,45 +181,40 @@ SRes LookInStream_Read(ILookInStream *stream, void *buf, size_t size);
 
 #define LookToRead_BUF_SIZE (1 << 14)
 
-typedef struct
-{
-  ILookInStream s;
-  ISeekInStream *realStream;
-  size_t pos;
-  size_t size;
-  Byte buf[LookToRead_BUF_SIZE];
+typedef struct {
+        ILookInStream s;
+        ISeekInStream *realStream;
+        size_t pos;
+        size_t size;
+        Byte buf[LookToRead_BUF_SIZE];
 } CLookToRead;
 
 void LookToRead_CreateVTable(CLookToRead *p, int lookahead);
 void LookToRead_Init(CLookToRead *p);
 
-typedef struct
-{
-  ISeqInStream s;
-  ILookInStream *realStream;
+typedef struct {
+        ISeqInStream s;
+        ILookInStream *realStream;
 } CSecToLook;
 
 void SecToLook_CreateVTable(CSecToLook *p);
 
-typedef struct
-{
-  ISeqInStream s;
-  ILookInStream *realStream;
+typedef struct {
+        ISeqInStream s;
+        ILookInStream *realStream;
 } CSecToRead;
 
 void SecToRead_CreateVTable(CSecToRead *p);
 
-typedef struct
-{
-  SRes (*Progress)(void *p, UInt64 inSize, UInt64 outSize);
-    /* Returns: result. (result != SZ_OK) means break.
-       Value (UInt64)(Int64)-1 for size means unknown value. */
+typedef struct {
+        SRes (*Progress)(void *p, UInt64 inSize, UInt64 outSize);
+        /* Returns: result. (result != SZ_OK) means break.
+           Value (UInt64)(Int64)-1 for size means unknown value. */
 } ICompressProgress;
 
-typedef struct
-{
-  void *(*Alloc)(void *p, size_t size);
-  void (*Free)(void *p, void *address); /* address can be 0 */
+typedef struct {
+        void *(*Alloc)(void *p, size_t size);
+        void (*Free)(void *p, void *address); /* address can be 0 */
 } ISzAlloc;
 
 #define IAlloc_Alloc(p, size) (p)->Alloc((p), size)

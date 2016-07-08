@@ -28,86 +28,84 @@
 #ifndef __CMDACCEL_OB_INCLUDE
 #define __CMDACCEL_OB_INCLUDE
 
-#include <afxtempl.h>  // MFC Templates extension
+#include <afxtempl.h> // MFC Templates extension
 
 ////////////////////////////////////////////////////////////////////////
 //
 //
 typedef struct tagMAPVIRTKEYS {
-  WORD wKey;
-  TCHAR szKey[15];
+        WORD wKey;
+        TCHAR szKey[15];
 } MAPVIRTKEYS, *PMAPVIRTKEYS;
 
+////////////////////////////////////////////////////////////////////////
+//
+//
+#define sizetable(table) (sizeof(table) / sizeof(table[0]))
 
 ////////////////////////////////////////////////////////////////////////
 //
 //
-#define sizetable(table) (sizeof(table)/sizeof(table[0]))
+class CAccelsOb : public CObject
+{
+        public:
+        CAccelsOb();
+        CAccelsOb(CAccelsOb *pFrom);
+        CAccelsOb(BYTE cVirt, WORD wKey, bool bLocked = false);
+        CAccelsOb(LPACCEL pACCEL);
 
+        public:
+        CAccelsOb &operator=(const CAccelsOb &from);
 
-////////////////////////////////////////////////////////////////////////
-//
-//
-class CAccelsOb : public CObject {
- public:
-  CAccelsOb();
-  CAccelsOb(CAccelsOb* pFrom);
-  CAccelsOb(BYTE cVirt, WORD wKey, bool bLocked = false);
-  CAccelsOb(LPACCEL pACCEL);
+        void GetString(CString &szBuffer);
+        bool IsEqual(WORD wKey, bool bCtrl, bool bAlt, bool bShift);
+        DWORD GetData();
+        bool SetData(DWORD dwDatas);
 
- public:
-  CAccelsOb& operator=(const CAccelsOb& from);
-
-  void GetString(CString& szBuffer);
-  bool IsEqual(WORD wKey, bool bCtrl, bool bAlt, bool bShift);
-  DWORD GetData();
-  bool SetData(DWORD dwDatas);
-
- public:
+        public:
 #ifdef _DEBUG
-  virtual void AssertValid() const;
-  virtual void Dump(CDumpContext& dc) const;
+        virtual void AssertValid() const;
+        virtual void Dump(CDumpContext &dc) const;
 #endif
 
- public:
-  BYTE m_cVirt;
-  WORD m_wKey;
-  bool m_bLocked;
+        public:
+        BYTE m_cVirt;
+        WORD m_wKey;
+        bool m_bLocked;
 };
-
 
 //////////////////////////////////////////////////////////////////////
 //
 //
-class CCmdAccelOb : public CObject {
- public:
-  CCmdAccelOb();
-  CCmdAccelOb(WORD wIDCommand, LPCTSTR szCommand);
-  CCmdAccelOb(BYTE cVirt, WORD wIDCommand, WORD wKey, LPCTSTR szCommand, bool bLocked = false);
-  ~CCmdAccelOb();
+class CCmdAccelOb : public CObject
+{
+        public:
+        CCmdAccelOb();
+        CCmdAccelOb(WORD wIDCommand, LPCTSTR szCommand);
+        CCmdAccelOb(BYTE cVirt, WORD wIDCommand, WORD wKey, LPCTSTR szCommand,
+                    bool bLocked = false);
+        ~CCmdAccelOb();
 
- public:
-  void Add(CAccelsOb* pAccel);
-  void Add(BYTE cVirt, WORD wKey, bool bLocked = false);
-  void Reset();
-  void DeleteUserAccels();
+        public:
+        void Add(CAccelsOb *pAccel);
+        void Add(BYTE cVirt, WORD wKey, bool bLocked = false);
+        void Reset();
+        void DeleteUserAccels();
 
-  CCmdAccelOb& operator=(const CCmdAccelOb& from);
- public:
+        CCmdAccelOb &operator=(const CCmdAccelOb &from);
+
+        public:
 #ifdef _DEBUG
-  virtual void AssertValid() const;
-  virtual void Dump(CDumpContext& dc) const;
+        virtual void AssertValid() const;
+        virtual void Dump(CDumpContext &dc) const;
 #endif
 
- public:
-  WORD m_wIDCommand;
-  CString m_szCommand;
+        public:
+        WORD m_wIDCommand;
+        CString m_szCommand;
 
-  CList< CAccelsOb*, CAccelsOb*& > m_Accels;
+        CList<CAccelsOb *, CAccelsOb *&> m_Accels;
 };
-
 
 ////////////////////////////////////////////////////////////////////////
 #endif // __CMDACCEL_OB_INCLUDE
-
-

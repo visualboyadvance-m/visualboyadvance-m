@@ -20,26 +20,20 @@
 #ifndef __VBA_TOOLS_H__
 #define __VBA_TOOLS_H__
 
+#include <glibmm/ustring.h>
 #include <string>
 #include <vector>
-#include <glibmm/ustring.h>
 
 namespace VBA
 {
+std::string sCutSuffix(const std::string &_rsString, const std::string &_rsSep = ".");
 
-std::string sCutSuffix(const std::string & _rsString,
-                       const std::string & _rsSep = ".");
+Glib::ustring sCutSuffix(const Glib::ustring &_rsString, const Glib::ustring &_rsSep = ".");
 
-Glib::ustring sCutSuffix(const Glib::ustring & _rsString,
-                         const Glib::ustring & _rsSep = ".");
-
-bool bHasSuffix(const Glib::ustring & _rsString,
-                const Glib::ustring & _rsSuffix,
+bool bHasSuffix(const Glib::ustring &_rsString, const Glib::ustring &_rsSuffix,
                 bool _bCaseSensitive = true);
-                
-void vTokenize(Glib::ustring source, std::vector<Glib::ustring>& tokens);
 
+void vTokenize(Glib::ustring source, std::vector<Glib::ustring> &tokens);
 }
-
 
 #endif // __VBA_TOOLS_H__

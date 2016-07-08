@@ -3,21 +3,17 @@
 
 #include "System.h"
 
-enum IMAGE_TYPE {
-  IMAGE_UNKNOWN = -1,
-  IMAGE_GBA     = 0,
-  IMAGE_GB      = 1
-};
+enum IMAGE_TYPE { IMAGE_UNKNOWN = -1, IMAGE_GBA = 0, IMAGE_GB = 1 };
 
 // save game
 typedef struct {
-	void *address;
-	int size;
+        void *address;
+        int size;
 } variable_desc;
 
 bool FileExists(const char *filename);
 
-void utilReadScreenPixels(u8* dest, int w, int h);
+void utilReadScreenPixels(u8 *dest, int w, int h);
 bool utilWritePNGFile(const char *, int, int, u8 *);
 bool utilWriteBMPFile(const char *, int, int, u8 *);
 void utilApplyIPS(const char *ips, uint8_t **rom, int *size);
@@ -27,24 +23,23 @@ bool utilIsGzipFile(const char *);
 bool utilIsZipFile(const char *);
 void utilStripDoubleExtension(const char *, char *);
 IMAGE_TYPE utilFindType(const char *);
-uint8_t *utilLoad(const char *, bool (*)(const char*), uint8_t *, int &);
-void utilExtract(const char* filepath, const char* filename);
+uint8_t *utilLoad(const char *, bool (*)(const char *), uint8_t *, int &);
+void utilExtract(const char *filepath, const char *filename);
 
 void utilPutDword(uint8_t *, uint32_t);
 void utilPutWord(uint8_t *, uint16_t);
 void utilGBAFindSave(const int);
 void utilUpdateSystemColorMaps(bool lcd = false);
-bool utilFileExists( const char *filename );
-
+bool utilFileExists(const char *filename);
 
 #ifdef __LIBRETRO__
-void utilWriteIntMem(uint8_t *& data, int);
-void utilWriteMem(uint8_t *& data, const void *in_data, unsigned size);
-void utilWriteDataMem(uint8_t *& data, variable_desc *);
+void utilWriteIntMem(uint8_t *&data, int);
+void utilWriteMem(uint8_t *&data, const void *in_data, unsigned size);
+void utilWriteDataMem(uint8_t *&data, variable_desc *);
 
-int utilReadIntMem(const uint8_t *& data);
-void utilReadMem(void *buf, const uint8_t *& data, unsigned size);
-void utilReadDataMem(const uint8_t *& data, variable_desc *);
+int utilReadIntMem(const uint8_t *&data);
+void utilReadMem(void *buf, const uint8_t *&data, unsigned size);
+void utilReadDataMem(const uint8_t *&data, variable_desc *);
 #else
 gzFile utilGzOpen(const char *file, const char *mode);
 gzFile utilMemGzOpen(char *memory, int available, const char *mode);
@@ -59,6 +54,5 @@ void utilReadDataSkip(gzFile, variable_desc *);
 int utilReadInt(gzFile);
 void utilWriteInt(gzFile, int);
 #endif
-
 
 #endif // UTIL_H

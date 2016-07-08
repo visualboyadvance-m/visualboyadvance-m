@@ -15,7 +15,7 @@ bool soundInit();
 void soundSetThrottle(unsigned short throttle);
 
 // Manages sound volume, where 1.0 is normal
-void soundSetVolume( float );
+void soundSetVolume(float);
 float soundGetVolume();
 
 // Manages muting bitmask. The bits control the following channels:
@@ -25,8 +25,8 @@ float soundGetVolume();
 // 0x008 Noise
 // 0x100 PCM 1
 // 0x200 PCM 2
-void soundSetEnable( int mask );
-int  soundGetEnable();
+void soundSetEnable(int mask);
+int soundGetEnable();
 
 // Pauses/resumes system sound output
 void soundPause();
@@ -45,7 +45,6 @@ void soundSetSampleRate(long sampleRate);
 extern bool soundInterpolation; // 1 if PCM should have low-pass filtering
 extern float soundFiltering;    // 0.0 = none, 1.0 = max
 
-
 //// GBA sound emulation
 
 // GBA sound registers
@@ -59,31 +58,31 @@ extern float soundFiltering;    // 0.0 = none, 1.0 = max
 void soundReset();
 
 // Emulates write to sound hardware
-void soundEvent( u32 addr, u8  data );
-void soundEvent( u32 addr, u16 data ); // TODO: error-prone to overload like this
+void soundEvent(u32 addr, u8 data);
+void soundEvent(u32 addr, u16 data); // TODO: error-prone to overload like this
 
 // Notifies emulator that a timer has overflowed
-void soundTimerOverflow( int which );
+void soundTimerOverflow(int which);
 
 // Notifies emulator that PCM rate may have changed
 void interp_rate();
 
 // Notifies emulator that SOUND_CLOCK_TICKS clocks have passed
 void psoundTickfn();
-extern int SOUND_CLOCK_TICKS;   // Number of 16.8 MHz clocks between calls to soundTick()
-extern int soundTicks;          // Number of 16.8 MHz clocks until soundTick() will be called
+extern int SOUND_CLOCK_TICKS; // Number of 16.8 MHz clocks between calls to soundTick()
+extern int soundTicks;        // Number of 16.8 MHz clocks until soundTick() will be called
 
 // Saves/loads emulator state
 #ifdef __LIBRETRO__
-void soundSaveGame( u8 *& );
-void soundReadGame(const u8*& in, int version );
+void soundSaveGame(u8 *&);
+void soundReadGame(const u8 *&in, int version);
 #else
-void soundSaveGame( gzFile );
-void soundReadGame( gzFile, int version );
+void soundSaveGame(gzFile);
+void soundReadGame(gzFile, int version);
 #endif
 
 class Multi_Buffer;
 
-void flush_samples(Multi_Buffer * buffer);
+void flush_samples(Multi_Buffer *buffer);
 
 #endif // SOUND_H

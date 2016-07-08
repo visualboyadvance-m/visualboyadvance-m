@@ -19,4 +19,4 @@
 
 extern void debuggerMain();
 extern void debuggerOutput(const char *, u32);
-extern void debuggerSignal(int,int);
+extern void debuggerSignal(int, int);

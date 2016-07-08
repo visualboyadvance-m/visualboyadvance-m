@@ -18,14 +18,11 @@
 //#define BLARGG_BUILD_DLL 1
 
 // Support only the listed archive types. Remove any you don't need.
-#define FEX_TYPE_LIST \
-	fex_7z_type,\
-	fex_gz_type,\
-	fex_zip_type,
+#define FEX_TYPE_LIST fex_7z_type, fex_gz_type, fex_zip_type,
 
 // Use standard config.h if present
 #ifdef HAVE_CONFIG_H
-	#include "config.h"
+#include "config.h"
 #endif
 
 #endif

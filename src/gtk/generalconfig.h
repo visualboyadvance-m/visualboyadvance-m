@@ -20,39 +20,35 @@
 #define __VBA_GENERALCONFIG_H__
 
 #include <gtkmm/checkbutton.h>
-#include <gtkmm/spinbutton.h>
 #include <gtkmm/combobox.h>
+#include <gtkmm/spinbutton.h>
 
 #include "configfile.h"
 #include "window.h"
 
 namespace VBA
 {
-
 class PreferencesDialog : public Gtk::Dialog
 {
-public:
-  PreferencesDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder);
+        public:
+        PreferencesDialog(GtkDialog *_pstDialog, const Glib::RefPtr<Gtk::Builder> &refBuilder);
 
-  void vSetConfig(Config::Section * _poConfig, VBA::Window * _poWindow);
+        void vSetConfig(Config::Section *_poConfig, VBA::Window *_poWindow);
 
-private:
-  void vOnPauseWhenInactiveChanged();
-  void vOnFrameskipChanged();
-  void vOnSpeedIndicatorChanged();
+        private:
+        void vOnPauseWhenInactiveChanged();
+        void vOnFrameskipChanged();
+        void vOnSpeedIndicatorChanged();
 
+        VBA::Window *m_poWindow;
 
-  VBA::Window *             m_poWindow;
-
-  Config::Section *         m_poConfig;
-  Gtk::CheckButton *        m_poPauseWhenInactiveCheckButton;
-  Gtk::CheckButton *        m_poFrameSkipAutomaticCheckButton;
-  Gtk::SpinButton *         m_poFrameSkipLevelSpinButton;
-  Gtk::ComboBox *           m_poSpeedIndicatorComboBox;
-
+        Config::Section *m_poConfig;
+        Gtk::CheckButton *m_poPauseWhenInactiveCheckButton;
+        Gtk::CheckButton *m_poFrameSkipAutomaticCheckButton;
+        Gtk::SpinButton *m_poFrameSkipLevelSpinButton;
+        Gtk::ComboBox *m_poSpeedIndicatorComboBox;
 };
 
 } // namespace VBA
-
 
 #endif // __VBA_GENERALCONFIG_H__

@@ -7,27 +7,25 @@
 
 //// GB sound options
 
-void gbSoundSetSampleRate( long sampleRate );
+void gbSoundSetSampleRate(long sampleRate);
 
 // Manages declicking mode. When enabled, clicks are reduced. Note that clicks
 // are normal for GB and GBC sound hardware.
-void gbSoundSetDeclicking( bool enable );
+void gbSoundSetDeclicking(bool enable);
 bool gbSoundGetDeclicking();
 
 // Effects configuration
-struct gb_effects_config_t
-{
-	bool enabled;   // false = disable all effects
+struct gb_effects_config_t {
+        bool enabled; // false = disable all effects
 
-	float echo;     // 0.0 = none, 1.0 = lots
-	float stereo;   // 0.0 = channels in center, 1.0 = channels on left/right
-	bool surround;  // true = put some channels in back
+        float echo;    // 0.0 = none, 1.0 = lots
+        float stereo;  // 0.0 = channels in center, 1.0 = channels on left/right
+        bool surround; // true = put some channels in back
 };
 
 // Changes effects configuration
-void gbSoundConfigEffects( gb_effects_config_t const& );
+void gbSoundConfigEffects(gb_effects_config_t const &);
 extern gb_effects_config_t gb_effects_config; // current configuration
-
 
 //// GB sound emulation
 
@@ -58,19 +56,19 @@ extern gb_effects_config_t gb_effects_config; // current configuration
 void gbSoundReset();
 
 // Emulates write to sound hardware
-void gbSoundEvent( u16 address, int data );
+void gbSoundEvent(u16 address, int data);
 #define SOUND_EVENT gbSoundEvent
 
 // Emulates read from sound hardware
-u8 gbSoundRead( u16 address );
+u8 gbSoundRead(u16 address);
 
 // Notifies emulator that SOUND_CLOCK_TICKS clocks have passed
 void gbSoundTick();
-extern int SOUND_CLOCK_TICKS;   // Number of 16.8 MHz clocks between calls to gbSoundTick()
-extern int soundTicks;          // Number of 16.8 MHz clocks until gbSoundTick() will be called
+extern int SOUND_CLOCK_TICKS; // Number of 16.8 MHz clocks between calls to gbSoundTick()
+extern int soundTicks;        // Number of 16.8 MHz clocks until gbSoundTick() will be called
 
 // Saves/loads emulator state
-void gbSoundSaveGame( gzFile out );
-void gbSoundReadGame( int version, gzFile in );
+void gbSoundSaveGame(gzFile out);
+void gbSoundReadGame(int version, gzFile in);
 
 #endif // GBSOUND_H

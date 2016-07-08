@@ -1,84 +1,90 @@
 ---
-AccessModifierOffset: 0
-AlignAfterOpenBracket: true
+Language:        Cpp
+# BasedOnStyle:  WebKit
+AccessModifierOffset: -4
+AlignAfterOpenBracket: DontAlign
 AlignConsecutiveAssignments: false
-#uncomment for clang 3.9
-#AlignConsecutiveDeclarations: false
+AlignConsecutiveDeclarations: false
 AlignEscapedNewlinesLeft: false
-AlignOperands: true
-AlignTrailingComments: true
+AlignOperands:   false
+AlignTrailingComments: false
 AllowAllParametersOfDeclarationOnNextLine: true
 AllowShortBlocksOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: None
+AllowShortFunctionsOnASingleLine: All
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
-# AlwaysBreakAfterDefinitionReturnType: None
-#uncomment for clang 3.9
-#AlwaysBreakAfterReturnType: None
-AlwaysBreakBeforeMultilineStrings: true
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: false
-BinPackArguments: false
+BinPackArguments: true
 BinPackParameters: true
-# BraceWrapping: (not set since BreakBeforeBraces is not Custom)
-BreakBeforeBinaryOperators: None
-# BreakAfterJavaFieldAnnotations: (not java)
-BreakBeforeBinaryOperators: None
-BreakBeforeBraces: Linux
+BraceWrapping:   
+  AfterClass:      false
+  AfterControlStatement: false
+  AfterEnum:       false
+  AfterFunction:   true
+  AfterNamespace:  false
+  AfterObjCDeclaration: false
+  AfterStruct:     false
+  AfterUnion:      false
+  BeforeCatch:     false
+  BeforeElse:      false
+  IndentBraces:    false
+BreakBeforeBinaryOperators: All
+BreakBeforeBraces: WebKit
 BreakBeforeTernaryOperators: true
-BreakConstructorInitializersBeforeComma: false
-#uncomment for clang 3.9
-#BreakStringLiterals: false
-ColumnLimit: 100
-CommentPragmas:  '\*\<'
+BreakConstructorInitializersBeforeComma: true
+ColumnLimit:     0
+CommentPragmas:  '^ IWYU pragma:'
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
 Cpp11BracedListStyle: false
 DerivePointerAlignment: false
-DisableFormat: false
+DisableFormat:   false
 ExperimentalAutoDetectBinPacking: false
-ForEachMacros: [ NC_LIST_FOREACH ]
-#Uncomment for clang 3.9
-#IncludeCategories:
-#  - Regex: '^"'
-#    Priority: 1
-# IncludeIsMainRegex: (project doesn't use a main includes that can add other includes via regex)
+ForEachMacros:   [ foreach, Q_FOREACH, BOOST_FOREACH ]
+IncludeCategories: 
+  - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'
+    Priority:        2
+  - Regex:           '^(<|"(gtest|isl|json)/)'
+    Priority:        3
+  - Regex:           '.*'
+    Priority:        1
 IndentCaseLabels: false
-IndentWidth: 8
+IndentWidth:     4
 IndentWrappedFunctionNames: false
-# JavaScriptQuotes: (not javascript)
-KeepEmptyLinesAtTheStartOfBlocks: false
-Language: Cpp
+KeepEmptyLinesAtTheStartOfBlocks: true
 MacroBlockBegin: ''
 MacroBlockEnd:   ''
 MaxEmptyLinesToKeep: 1
-NamespaceIndentation: None
-# ObjCBlockIndentWidth: (not objc)
-# ObjCSpaceAfterProperty: (not objc)
-# ObjCSpaceBeforeProtocolList: (not objc)
-PenaltyBreakBeforeFirstCallParameter: 400
-PenaltyBreakComment: 0
-# PenaltyBreakFirstLessLess: (not cpp)
-PenaltyBreakString: 500
-PenaltyExcessCharacter: 10000
-PenaltyReturnTypeOnItsOwnLine: 600
-PointerAlignment: Right
-#uncomment for clang 3.9
-#ReflowComments: true
-#uncomment for clang 3.9
-#SortIncludes: true
+NamespaceIndentation: Inner
+ObjCBlockIndentWidth: 4
+ObjCSpaceAfterProperty: true
+ObjCSpaceBeforeProtocolList: true
+PenaltyBreakBeforeFirstCallParameter: 19
+PenaltyBreakComment: 300
+PenaltyBreakFirstLessLess: 120
+PenaltyBreakString: 1000
+PenaltyExcessCharacter: 1000000
+PenaltyReturnTypeOnItsOwnLine: 60
+PointerAlignment: Left
+ReflowComments:  true
+SortIncludes:    true
 SpaceAfterCStyleCast: false
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeParens: ControlStatements
 SpaceInEmptyParentheses: false
 SpacesBeforeTrailingComments: 1
-SpacesInAngles: false
+SpacesInAngles:  false
+SpacesInContainerLiterals: true
 SpacesInCStyleCastParentheses: false
-# SpacesInContainerLiterals: (not objc or javascript)
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
-Standard:        Cpp11
+Standard:        Cpp03
 TabWidth:        8
 UseTab:          Never
 ...
+

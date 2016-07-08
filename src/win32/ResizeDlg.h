@@ -3,38 +3,42 @@
 
 #ifndef _INC_TCHAR
 #include <tchar.h>
-#endif  //      _INC_TCHAR
+#endif //      _INC_TCHAR
 
 //
 //      Predefined sizing information
-#define DS_MoveX                1
-#define DS_MoveY                2
-#define DS_SizeX                4
-#define DS_SizeY                8
+#define DS_MoveX 1
+#define DS_MoveY 2
+#define DS_SizeX 4
+#define DS_SizeY 8
 
-typedef struct DialogSizerSizingItem    //      sdi
+typedef struct DialogSizerSizingItem //      sdi
 {
-  UINT uControlID;
-  UINT uSizeInfo;
+        UINT uControlID;
+        UINT uSizeInfo;
 } DialogSizerSizingItem;
 
-#define DIALOG_SIZER_START( name )      DialogSizerSizingItem name[] = {
-#define DIALOG_SIZER_ENTRY( controlID, flags )  { controlID, flags },
-#define DIALOG_SIZER_END()      { 0xFFFFFFFF, 0xFFFFFFFF } };
+#define DIALOG_SIZER_START(name) DialogSizerSizingItem name[] = {
+#define DIALOG_SIZER_ENTRY(controlID, flags) { controlID, flags },
+#define DIALOG_SIZER_END()                                                                         \
+        {                                                                                          \
+                0xFFFFFFFF, 0xFFFFFFFF                                                             \
+        }                                                                                          \
+        }                                                                                          \
+        ;
 
-class ResizeDlg : public CDialog {
-  void *dd;
- public:
-  ResizeDlg(UINT id, CWnd *parent = NULL);
+class ResizeDlg : public CDialog
+{
+        void *dd;
 
-  void *AddDialogData();
-  BOOL SetData(const DialogSizerSizingItem *psd,
-               BOOL bShowSizingGrip,
-               HKEY hkRootSave,
-               LPCTSTR pcszName,
-               SIZE *psizeMax);
-  void UpdateWindowSize(const int cx, const int cy, HWND);
+        public:
+        ResizeDlg(UINT id, CWnd *parent = NULL);
 
-  virtual BOOL OnWndMsg(UINT, WPARAM, LPARAM, LRESULT *);
+        void *AddDialogData();
+        BOOL SetData(const DialogSizerSizingItem *psd, BOOL bShowSizingGrip, HKEY hkRootSave,
+                     LPCTSTR pcszName, SIZE *psizeMax);
+        void UpdateWindowSize(const int cx, const int cy, HWND);
+
+        virtual BOOL OnWndMsg(UINT, WPARAM, LPARAM, LRESULT *);
 };
 #endif

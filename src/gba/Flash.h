@@ -4,8 +4,8 @@
 #define FLASH_128K_SZ 0x20000
 
 #ifdef __LIBRETRO__
-extern void flashSaveGame(u8 *& data);
-extern void flashReadGame(const u8 *& data, int);
+extern void flashSaveGame(u8 *&data);
+extern void flashReadGame(const u8 *&data, int);
 #else
 extern void flashSaveGame(gzFile _gzFile);
 extern void flashReadGame(gzFile _gzFile, int version);

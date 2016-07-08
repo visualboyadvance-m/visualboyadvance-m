@@ -7,14 +7,14 @@
 #define Z_FLAG 0x80
 
 typedef union {
-  struct {
+        struct {
 #ifdef WORDS_BIGENDIAN
-    u8 B1, B0;
+                u8 B1, B0;
 #else
-    u8 B0,B1;
+                u8 B0, B1;
 #endif
-  } B;
-  u16 W;
+        } B;
+        u16 W;
 } gbRegister;
 
 extern gbRegister AF, BC, DE, HL, SP, PC;
@@ -30,12 +30,12 @@ bool gbIsGameboyRom(const char *);
 void gbGetHardwareType();
 void gbReset();
 void gbCleanUp();
-void gbCPUInit(const char *,bool);
+void gbCPUInit(const char *, bool);
 bool gbWriteBatteryFile(const char *);
 bool gbWriteBatteryFile(const char *, bool);
 bool gbReadBatteryFile(const char *);
 bool gbWriteSaveState(const char *);
-bool gbWriteMemSaveState(char *, int, long&);
+bool gbWriteMemSaveState(char *, int, long &);
 bool gbReadSaveState(const char *);
 bool gbReadMemSaveState(char *, int);
 void gbSgbRenderBorder();

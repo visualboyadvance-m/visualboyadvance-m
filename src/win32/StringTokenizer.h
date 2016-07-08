@@ -7,15 +7,15 @@
 
 class StringTokenizer
 {
- public:
-  const char * next();
-  StringTokenizer(CString str, CString token);
-  virtual ~StringTokenizer();
+        public:
+        const char *next();
+        StringTokenizer(CString str, CString token);
+        virtual ~StringTokenizer();
 
- private:
-  CString m_token;
-  CString m_delim;
-  CString m_right;
+        private:
+        CString m_token;
+        CString m_delim;
+        CString m_right;
 };
 
 #endif // !defined(AFX_STRINGTOKENIZER_H__1AB4CD12_6B7A_49E4_A87F_75D3DC3FF20F__INCLUDED_)

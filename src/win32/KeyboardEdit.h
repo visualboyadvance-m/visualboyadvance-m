@@ -39,49 +39,50 @@
 
 class CKeyboardEdit : public CEdit
 {
-  // Construction
- public:
-  CKeyboardEdit();
+        // Construction
+        public:
+        CKeyboardEdit();
 
-  // Attributes
- public:
-  bool m_bKeyDefined;
+        // Attributes
+        public:
+        bool m_bKeyDefined;
 
-  WORD m_wVirtKey;
-  bool m_bCtrlPressed;
-  bool m_bAltPressed;
-  bool m_bShiftPressed;
+        WORD m_wVirtKey;
+        bool m_bCtrlPressed;
+        bool m_bAltPressed;
+        bool m_bShiftPressed;
 
-  // Operations
- public:
-  bool GetAccelKey(WORD& wVirtKey, bool& bCtrl, bool& bAlt, bool& bShift);
-  void ResetKey ();
+        // Operations
+        public:
+        bool GetAccelKey(WORD &wVirtKey, bool &bCtrl, bool &bAlt, bool &bShift);
+        void ResetKey();
 
- protected:
-  void DisplayKeyboardString ();
+        protected:
+        void DisplayKeyboardString();
 
-  // Overrides
-  // ClassWizard generated virtual function overrides
-  //{{AFX_VIRTUAL(CKeyboardEdit)
- public:
-  virtual BOOL PreTranslateMessage(MSG* pMsg);
-  //}}AFX_VIRTUAL
+        // Overrides
+        // ClassWizard generated virtual function overrides
+        //{{AFX_VIRTUAL(CKeyboardEdit)
+        public:
+        virtual BOOL PreTranslateMessage(MSG *pMsg);
+        //}}AFX_VIRTUAL
 
-  // Implementation
- public:
-  virtual ~CKeyboardEdit();
+        // Implementation
+        public:
+        virtual ~CKeyboardEdit();
 
-  // Generated message map functions
- protected:
-  //{{AFX_MSG(CKeyboardEdit)
-  //}}AFX_MSG
+        // Generated message map functions
+        protected:
+        //{{AFX_MSG(CKeyboardEdit)
+        //}}AFX_MSG
 
-  DECLARE_MESSAGE_MAP()
-    };
+        DECLARE_MESSAGE_MAP()
+};
 
-    /////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
 //{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.
+// Microsoft Developer Studio will insert additional declarations immediately before the previous
+// line.
 
 #endif // !defined(AFX_KEYBOARDEDIT_H__88E35AB0_2E23_11D2_BA24_0060B0B5E151__INCLUDED_)

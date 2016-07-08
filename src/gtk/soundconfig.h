@@ -19,35 +19,33 @@
 #ifndef __VBA_SOUNDCONFIG_H__
 #define __VBA_SOUNDCONFIG_H__
 
-#include <gtkmm/dialog.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/combobox.h>
+#include <gtkmm/dialog.h>
 
 #include "configfile.h"
 #include "window.h"
 
 namespace VBA
 {
-
 class SoundConfigDialog : public Gtk::Dialog
 {
-public:
-  SoundConfigDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder);
+        public:
+        SoundConfigDialog(GtkDialog *_pstDialog, const Glib::RefPtr<Gtk::Builder> &refBuilder);
 
-  void vSetConfig(Config::Section * _poConfig, VBA::Window * _poWindow);
+        void vSetConfig(Config::Section *_poConfig, VBA::Window *_poWindow);
 
-private:
-  void vOnVolumeChanged();
-  void vOnRateChanged();
+        private:
+        void vOnVolumeChanged();
+        void vOnRateChanged();
 
-  VBA::Window *             m_poWindow;
+        VBA::Window *m_poWindow;
 
-  Config::Section *         m_poConfig;
-  Gtk::ComboBox *           m_poVolumeComboBox;
-  Gtk::ComboBox *           m_poRateComboBox;
+        Config::Section *m_poConfig;
+        Gtk::ComboBox *m_poVolumeComboBox;
+        Gtk::ComboBox *m_poRateComboBox;
 };
 
 } // namespace VBA
-
 
 #endif // __VBA_SOUNDCONFIG_H__

@@ -43,8 +43,8 @@ extern u8 gbSCXLine[300];
 // gbBgpLine is used for the emulation of the
 // Prehistorik Man's title screen scroller.
 extern u8 gbBgpLine[300];
-extern u8 gbObp0Line [300];
-extern u8 gbObp1Line [300];
+extern u8 gbObp0Line[300];
+extern u8 gbObp1Line[300];
 // gbSpritesTicks is used for the emulation of Parodius' Laser Beam.
 extern u8 gbSpritesTicks[300];
 

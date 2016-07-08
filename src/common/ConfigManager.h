@@ -2,16 +2,16 @@
 #define _CONFIGMANAGER_H
 
 #pragma once
-#include <stdio.h>
 #include "../sdl/filters.h"
+#include <stdio.h>
 
 #ifndef __GNUC__
-# define HAVE_DECL_GETOPT 0
-# define __STDC__ 1
-# include "getopt.h"
+#define HAVE_DECL_GETOPT 0
+#define __STDC__ 1
+#include "getopt.h"
 #else // ! __GNUC__
-# define HAVE_DECL_GETOPT 1
-# include <getopt.h>
+#define HAVE_DECL_GETOPT 1
+#include <getopt.h>
 #endif // ! __GNUC__
 
 #define MAX_CHEATS 16384
@@ -21,20 +21,20 @@ extern bool mirroringEnable;
 extern bool parseDebug;
 extern bool speedHack;
 extern bool speedup;
-extern char* rewindMemory;
-extern const char* aviRecordDir;
-extern const char* biosFileNameGB;
-extern const char* biosFileNameGBA;
-extern const char* biosFileNameGBC;
-extern const char* loadDotCodeFile;
-extern const char* saveDotCodeFile;
-extern const char* linkHostAddr;
-extern const char* movieRecordDir;
-extern const char* romDirGB;
-extern const char* romDirGBA;
-extern const char* romDirGBC;
-extern const char* soundRecordDir;
-extern int* rewindSerials;
+extern char *rewindMemory;
+extern const char *aviRecordDir;
+extern const char *biosFileNameGB;
+extern const char *biosFileNameGBA;
+extern const char *biosFileNameGBC;
+extern const char *loadDotCodeFile;
+extern const char *saveDotCodeFile;
+extern const char *linkHostAddr;
+extern const char *movieRecordDir;
+extern const char *romDirGB;
+extern const char *romDirGBA;
+extern const char *romDirGBC;
+extern const char *soundRecordDir;
+extern int *rewindSerials;
 extern int active;
 extern int agbPrint;
 extern int autoFire;
@@ -100,7 +100,7 @@ extern int rewindPos;
 extern int rewindSaveNeeded;
 extern int rewindTimer;
 extern int rewindTopPos;
-//extern int romSize;
+// extern int romSize;
 extern int rtcEnabled;
 extern int saveType;
 extern int screenMessage;
@@ -140,8 +140,7 @@ extern u32 movieNextJoypad;
 extern int throttle;
 
 extern int preparedCheats;
-extern const char* preparedCheatCodes[MAX_CHEATS];
-
+extern const char *preparedCheatCodes[MAX_CHEATS];
 
 // allow up to 100 IPS/UPS/PPF patches given on commandline
 #define PATCH_MAX_NUM 100
@@ -153,11 +152,10 @@ extern int mouseCounter;
 extern FilterFunc filterFunction;
 extern IFBFilterFunc ifbFunction;
 
-
-extern char* homeDir;
-extern const char* screenShotDir;
-extern const char* saveDir;
-extern const char* batteryDir;
+extern char *homeDir;
+extern const char *screenShotDir;
+extern const char *saveDir;
+extern const char *batteryDir;
 
 // Directory within homedir to use for default save location.
 #define DOT_DIR ".vbam"
@@ -165,13 +163,13 @@ extern const char* batteryDir;
 void SetHome(char *_arg0);
 void SaveConfigFile();
 void CloseConfig();
-u32 ReadPrefHex(const char* pref_key, int default_value);
-u32 ReadPrefHex(const char* pref_key);
-u32 ReadPref(const char* pref_key, int default_value);
-u32 ReadPref(const char* pref_key);
-const char* ReadPrefString(const char* pref_key, const char* default_value);
-const char* ReadPrefString(const char* pref_key);
-void LoadConfigFile(int argc, char ** argv);
+u32 ReadPrefHex(const char *pref_key, int default_value);
+u32 ReadPrefHex(const char *pref_key);
+u32 ReadPref(const char *pref_key, int default_value);
+u32 ReadPref(const char *pref_key);
+const char *ReadPrefString(const char *pref_key, const char *default_value);
+const char *ReadPrefString(const char *pref_key);
+void LoadConfigFile(int argc, char **argv);
 void LoadConfig();
-int ReadOpts(int argc, char ** argv);
+int ReadOpts(int argc, char **argv);
 #endif

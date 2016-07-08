@@ -20,37 +20,34 @@
 #define __VBA_DIRECTORIESCONFIG_H__
 
 #include <gtkmm/dialog.h>
+#include <gtkmm/filechooserbutton.h>
 #include <gtkmm/label.h>
 #include <gtkmm/table.h>
-#include <gtkmm/filechooserbutton.h>
 
 #include "configfile.h"
 
 namespace VBA
 {
-
 class DirectoriesConfigDialog : public Gtk::Dialog
 {
-public:
-  DirectoriesConfigDialog(Config::Section * _poConfig);
+        public:
+        DirectoriesConfigDialog(Config::Section *_poConfig);
 
-protected:
-  void on_response(int response_id);
+        protected:
+        void on_response(int response_id);
 
-private:
-  struct SDirEntry
-  {
-    const char * m_csKey;
-    const char * m_csLabel;
-    const char * m_csFileChooserButton;
-  };
+        private:
+        struct SDirEntry {
+                const char *m_csKey;
+                const char *m_csLabel;
+                const char *m_csFileChooserButton;
+        };
 
-  Config::Section *         m_poConfig;
-  static const SDirEntry    m_astDirs[];
-  Gtk::FileChooserButton *  m_poButtons[6];
+        Config::Section *m_poConfig;
+        static const SDirEntry m_astDirs[];
+        Gtk::FileChooserButton *m_poButtons[6];
 };
 
 } // namespace VBA
-
 
 #endif // __VBA_DIRECTORIESCONFIG_H__

@@ -20,10 +20,10 @@
 #ifndef __AUTOBUILD_H__
 #define __AUTOBUILD_H__
 #include "version.h"
-//change the FALSE to TRUE for autoincrement of build number
+// change the FALSE to TRUE for autoincrement of build number
 #define INCREMENT_VERSION FALSE
-#define FILEVER        2,0,0,600
-#define PRODUCTVER     2,0,0,600
-#define STRFILEVER     "2, 0, 0, 600\0"
-#define STRPRODUCTVER  "2, 0, 0, 600\0"
+#define FILEVER 2, 0, 0, 600
+#define PRODUCTVER 2, 0, 0, 600
+#define STRFILEVER "2, 0, 0, 600\0"
+#define STRPRODUCTVER "2, 0, 0, 600\0"
 #endif //__AUTOBUILD_H__

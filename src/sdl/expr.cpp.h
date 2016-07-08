@@ -35,18 +35,18 @@
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     TOKEN_IDENTIFIER = 258,
-     TOKEN_DOT = 259,
-     TOKEN_STAR = 260,
-     TOKEN_ARROW = 261,
-     TOKEN_ADDR = 262,
-     TOKEN_SIZEOF = 263,
-     TOKEN_NUMBER = 264
-   };
+#define YYTOKENTYPE
+/* Put the tokens into the symbol table, so that GDB and other debuggers
+   know about them.  */
+enum yytokentype {
+        TOKEN_IDENTIFIER = 258,
+        TOKEN_DOT = 259,
+        TOKEN_STAR = 260,
+        TOKEN_ARROW = 261,
+        TOKEN_ADDR = 262,
+        TOKEN_SIZEOF = 263,
+        TOKEN_NUMBER = 264
+};
 #endif
 /* Tokens.  */
 #define TOKEN_IDENTIFIER 258
@@ -57,15 +57,11 @@
 #define TOKEN_SIZEOF 263
 #define TOKEN_NUMBER 264
 
-
-
-
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+#if !defined YYSTYPE && !defined YYSTYPE_IS_DECLARED
 typedef int YYSTYPE;
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
-# define YYSTYPE_IS_DECLARED 1
-# define YYSTYPE_IS_TRIVIAL 1
+#define yystype YYSTYPE /* obsolescent; will be withdrawn */
+#define YYSTYPE_IS_DECLARED 1
+#define YYSTYPE_IS_TRIVIAL 1
 #endif
 
 extern YYSTYPE yylval;
-

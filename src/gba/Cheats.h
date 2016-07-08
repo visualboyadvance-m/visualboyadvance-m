@@ -4,19 +4,20 @@
 #include "../common/ConfigManager.h"
 
 struct CheatsData {
-  int code;
-  int size;
-  int status;
-  bool enabled;
-  u32 rawaddress;
-  u32 address;
-  u32 value;
-  u32 oldValue;
-  char codestring[20];
-  char desc[32];
+        int code;
+        int size;
+        int status;
+        bool enabled;
+        u32 rawaddress;
+        u32 address;
+        u32 value;
+        u32 oldValue;
+        char codestring[20];
+        char desc[32];
 };
 
-void cheatsAdd(const char *codeStr, const char *desc, u32 rawaddress, u32 address, u32 value, int code, int size);
+void cheatsAdd(const char *codeStr, const char *desc, u32 rawaddress, u32 address, u32 value,
+               int code, int size);
 void cheatsAddCheatCode(const char *code, const char *desc);
 void cheatsAddGSACode(const char *code, const char *desc, bool v3);
 void cheatsAddCBACode(const char *code, const char *desc);

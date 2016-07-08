@@ -18,17 +18,17 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 struct Node {
-  Type *type;
-  u32 location;
-  u32 objLocation;
-  LocationType locType;
-  int value;
-  int index;
-  const char *name;
-  Node *expression;
-  Member *member;
-  void (*print)(Node *);
-  bool (*resolve)(Node *, Function *f, CompileUnit *u);
+        Type *type;
+        u32 location;
+        u32 objLocation;
+        LocationType locType;
+        int value;
+        int index;
+        const char *name;
+        Node *expression;
+        Member *member;
+        void (*print)(Node *);
+        bool (*resolve)(Node *, Function *f, CompileUnit *u);
 };
 
 extern void exprNodeCleanUp();

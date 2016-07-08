@@ -27,65 +27,66 @@
 
 namespace VBA
 {
-
 class ListCheatCodeColumns : public Gtk::TreeModel::ColumnRecord
 {
-  public:
-    ListCheatCodeColumns()
-    {
-      add(iIndex);
-      add(bEnabled);
-      add(uDesc);
-    }
+        public:
+        ListCheatCodeColumns()
+        {
+                add(iIndex);
+                add(bEnabled);
+                add(uDesc);
+        }
 
-    ~ListCheatCodeColumns() {}
+        ~ListCheatCodeColumns()
+        {
+        }
 
-    Gtk::TreeModelColumn<int> iIndex;
-    Gtk::TreeModelColumn<bool> bEnabled;
-    Gtk::TreeModelColumn<Glib::ustring> uDesc;
+        Gtk::TreeModelColumn<int> iIndex;
+        Gtk::TreeModelColumn<bool> bEnabled;
+        Gtk::TreeModelColumn<Glib::ustring> uDesc;
 };
 
 class CheatListDialog : public Gtk::Dialog
 {
-public:
-  CheatListDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder);
-  void vSetWindow(VBA::Window * _poWindow);
+        public:
+        CheatListDialog(GtkDialog *_pstDialog, const Glib::RefPtr<Gtk::Builder> &refBuilder);
+        void vSetWindow(VBA::Window *_poWindow);
 
-protected:
-  virtual void vAddCheat(Glib::ustring sDesc, ECheatType type, Glib::RefPtr<Gtk::TextBuffer> buffer) = 0;
-  virtual bool vCheatListOpen(const char *file) = 0;
-  virtual void vCheatListSave(const char *file) = 0;
-  virtual void vRemoveCheat(int index) = 0;
-  virtual void vRemoveAllCheats() = 0;
-  virtual void vToggleCheat(int index, bool enable) = 0;
-  virtual void vUpdateList(int previous = 0) = 0;
+        protected:
+        virtual void vAddCheat(Glib::ustring sDesc, ECheatType type,
+                               Glib::RefPtr<Gtk::TextBuffer> buffer) = 0;
+        virtual bool vCheatListOpen(const char *file) = 0;
+        virtual void vCheatListSave(const char *file) = 0;
+        virtual void vRemoveCheat(int index) = 0;
+        virtual void vRemoveAllCheats() = 0;
+        virtual void vToggleCheat(int index, bool enable) = 0;
+        virtual void vUpdateList(int previous = 0) = 0;
 
-  Glib::RefPtr<Gtk::ListStore>  m_poCheatListStore;
-  ListCheatCodeColumns          m_oRecordModel;
+        Glib::RefPtr<Gtk::ListStore> m_poCheatListStore;
+        ListCheatCodeColumns m_oRecordModel;
 
-private:
-  void vOnCheatListOpen();
-  void vOnCheatListSave();
-  void vOnCheatAdd();
-  void vOnCheatRemove();
-  void vOnCheatRemoveAll();
-  void vOnCheatMarkAll();
-  void vOnCheatToggled(Glib::ustring const& string_path);
+        private:
+        void vOnCheatListOpen();
+        void vOnCheatListSave();
+        void vOnCheatAdd();
+        void vOnCheatRemove();
+        void vOnCheatRemoveAll();
+        void vOnCheatMarkAll();
+        void vOnCheatToggled(Glib::ustring const &string_path);
 
-  VBA::Window *                 m_poWindow;
+        VBA::Window *m_poWindow;
 
-  Gtk::ToolButton *             m_poCheatOpenButton;
-  Gtk::ToolButton *             m_poCheatSaveButton;
-  Gtk::ToolButton *             m_poCheatAddButton;
-  Gtk::ToolButton *             m_poCheatRemoveButton;
-  Gtk::ToolButton *             m_poCheatRemoveAllButton;
-  Gtk::ToolButton *             m_poCheatMarkAllButton;
-  Gtk::TreeView *               m_poCheatTreeView;
-  
-  bool bMark;
+        Gtk::ToolButton *m_poCheatOpenButton;
+        Gtk::ToolButton *m_poCheatSaveButton;
+        Gtk::ToolButton *m_poCheatAddButton;
+        Gtk::ToolButton *m_poCheatRemoveButton;
+        Gtk::ToolButton *m_poCheatRemoveAllButton;
+        Gtk::ToolButton *m_poCheatMarkAllButton;
+        Gtk::TreeView *m_poCheatTreeView;
+
+        bool bMark;
 };
 
 } // namespace VBA
-
 
 #endif
