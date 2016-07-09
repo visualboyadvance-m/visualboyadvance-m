@@ -95,10 +95,10 @@ w, word, u32							--> word
 sw, sword, s32, int						--> signed word
 */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 #include "BreakpointStructures.h"
 #include "remote.h"
@@ -107,14 +107,14 @@ sw, sword, s32, int						--> signed word
 #define strdup _strdup
 #endif
 
-extern bool dexp_eval(char *, u32*);
+extern bool dexp_eval(char*, u32*);
 
 //struct intToString{
 //	int value;
 //	char mapping[20];
 //};
 
-struct ConditionalBreak* conditionals[16] = {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0}; 
+struct ConditionalBreak* conditionals[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 //struct intToString breakFlagMapping[] = {
 //	{0x80,"Thumb"},
@@ -143,156 +143,158 @@ struct intToString compareFlagMapping[] = {
 //
 //char* compareFlagMapping[] = {"Never","==",">",">=","<","<=","!=","<=>"};
 
-
-
-
 //Constructors
-			//case '*':	flag = 0xf;	break;
-			//case 't':	flag = 0x8;	break; // thumb
-			//case 'a':	flag = 0x4;	break; // arm
-			//case 'x':	flag = 0xC;	break;
-			//case 'r':	flag = 0x2;	break; // mem read
-			//case 'w':	flag = 0x1;	break; // mem write
-			//case 'i':	flag = 0x3;	break;
-struct ConditionalBreak* addConditionalBreak(u32 address, u8 flag){
-	u8 condIndex = address>>24;
-	struct ConditionalBreak* cond = NULL;
-	BreakSet((&map[condIndex])->breakPoints,address & (&map[condIndex])->mask,((flag&0xf)|(flag>>4)));
-	if(flag & 0xf0){
-		struct ConditionalBreak* base = conditionals[condIndex];
-		struct ConditionalBreak* prev = conditionals[condIndex];
-		if(conditionals[condIndex]){	
-			while((base) && (address >= base->break_address)){
-				if(base->break_address == address){
-					if(base->type_flags & 0xf0){
-						base->type_flags |= (flag&0xf0);
-						flag &= 0xf;
-						cond = base;
-						goto addCB_nextHandle;
-					}else{
-						goto condCreateForFlagAlways;
-					}	
-				}else{
-					prev = base;
-					base = base->next;
-				}
-			}
-		}
-condCreateForFlagAlways:
-			cond = (struct ConditionalBreak*)malloc(sizeof(struct ConditionalBreak));
-			cond->break_address = address;
-			cond->type_flags = flag&0xf0;
-			cond->next = base;
-			cond->firstCond = NULL;
-			if(prev == conditionals[condIndex])
-				conditionals[condIndex] = cond;
-			else
-				prev->next = cond;
-	}
-	flag &= 0xf;
+//case '*':	flag = 0xf;	break;
+//case 't':	flag = 0x8;	break; // thumb
+//case 'a':	flag = 0x4;	break; // arm
+//case 'x':	flag = 0xC;	break;
+//case 'r':	flag = 0x2;	break; // mem read
+//case 'w':	flag = 0x1;	break; // mem write
+//case 'i':	flag = 0x3;	break;
+struct ConditionalBreak* addConditionalBreak(u32 address, u8 flag)
+{
+    u8 condIndex = address >> 24;
+    struct ConditionalBreak* cond = NULL;
+    BreakSet((&map[condIndex])->breakPoints, address & (&map[condIndex])->mask, ((flag & 0xf) | (flag >> 4)));
+    if (flag & 0xf0) {
+        struct ConditionalBreak* base = conditionals[condIndex];
+        struct ConditionalBreak* prev = conditionals[condIndex];
+        if (conditionals[condIndex]) {
+            while ((base) && (address >= base->break_address)) {
+                if (base->break_address == address) {
+                    if (base->type_flags & 0xf0) {
+                        base->type_flags |= (flag & 0xf0);
+                        flag &= 0xf;
+                        cond = base;
+                        goto addCB_nextHandle;
+                    } else {
+                        goto condCreateForFlagAlways;
+                    }
+                } else {
+                    prev = base;
+                    base = base->next;
+                }
+            }
+        }
+    condCreateForFlagAlways:
+        cond = (struct ConditionalBreak*)malloc(sizeof(struct ConditionalBreak));
+        cond->break_address = address;
+        cond->type_flags = flag & 0xf0;
+        cond->next = base;
+        cond->firstCond = NULL;
+        if (prev == conditionals[condIndex])
+            conditionals[condIndex] = cond;
+        else
+            prev->next = cond;
+    }
+    flag &= 0xf;
 
-addCB_nextHandle:	
-	if(flag == 0)
-		return cond;
+addCB_nextHandle:
+    if (flag == 0)
+        return cond;
 
-	cond = (struct ConditionalBreak*)malloc(sizeof(struct ConditionalBreak));
-		cond->break_address = address;
-		cond->type_flags = flag;
-		cond->next = NULL;
-		cond->firstCond = NULL;
-	if(conditionals[condIndex] == NULL){
-		conditionals[condIndex] = cond;
-		return cond;
-	}else{
-		struct ConditionalBreak *curr, *prev;
-		curr = conditionals[condIndex];
-		prev = conditionals[condIndex];
-		while(curr){
-			if(curr->break_address > address){
-				if(prev == curr){
-					conditionals[condIndex] = cond;
-				}else{
-					prev->next = cond;
-				}
-				cond->next = curr;
-				return cond;
-			}
-			prev = curr;
-			curr = prev->next;
-		}
-		prev->next = cond;
-		return cond;
-	}
+    cond = (struct ConditionalBreak*)malloc(sizeof(struct ConditionalBreak));
+    cond->break_address = address;
+    cond->type_flags = flag;
+    cond->next = NULL;
+    cond->firstCond = NULL;
+    if (conditionals[condIndex] == NULL) {
+        conditionals[condIndex] = cond;
+        return cond;
+    } else {
+        struct ConditionalBreak *curr, *prev;
+        curr = conditionals[condIndex];
+        prev = conditionals[condIndex];
+        while (curr) {
+            if (curr->break_address > address) {
+                if (prev == curr) {
+                    conditionals[condIndex] = cond;
+                } else {
+                    prev->next = cond;
+                }
+                cond->next = curr;
+                return cond;
+            }
+            prev = curr;
+            curr = prev->next;
+        }
+        prev->next = cond;
+        return cond;
+    }
 }
 
-
-void addCondition(struct ConditionalBreak* base, struct ConditionalBreakNode* toAdd){
-	if(base->firstCond){
-		struct ConditionalBreakNode* curr, *prev;
-		curr = base->firstCond;
-		prev = base->firstCond;
-		while(curr){
-			prev = curr;
-			curr = curr->next;
-		}
-		prev->next = toAdd;
-	}else{
-		base->firstCond = toAdd;
-	}
+void addCondition(struct ConditionalBreak* base, struct ConditionalBreakNode* toAdd)
+{
+    if (base->firstCond) {
+        struct ConditionalBreakNode *curr, *prev;
+        curr = base->firstCond;
+        prev = base->firstCond;
+        while (curr) {
+            prev = curr;
+            curr = curr->next;
+        }
+        prev->next = toAdd;
+    } else {
+        base->firstCond = toAdd;
+    }
 }
 
 //destructors
-void freeConditionalBreak(struct ConditionalBreak* toFree){
-	struct ConditionalBreakNode* freeMe;
-	while(toFree->firstCond){
-		freeMe = toFree->firstCond;
-		toFree->firstCond = toFree->firstCond->next;
-		free(freeMe);
-	}
-	free(toFree);
+void freeConditionalBreak(struct ConditionalBreak* toFree)
+{
+    struct ConditionalBreakNode* freeMe;
+    while (toFree->firstCond) {
+        freeMe = toFree->firstCond;
+        toFree->firstCond = toFree->firstCond->next;
+        free(freeMe);
+    }
+    free(toFree);
 }
 
-void freeConditionalNode(struct ConditionalBreakNode* toDel){
-	if(toDel->next)
-		freeConditionalNode(toDel->next);
-	if(toDel->address)
-		free(toDel->address);
-	if(toDel->value)
-		free(toDel->value);
-	free(toDel);
+void freeConditionalNode(struct ConditionalBreakNode* toDel)
+{
+    if (toDel->next)
+        freeConditionalNode(toDel->next);
+    if (toDel->address)
+        free(toDel->address);
+    if (toDel->value)
+        free(toDel->value);
+    free(toDel);
 }
 
-void freeAllConditionals(){
-	for(int i = 0; i<16; i++){
-			while(conditionals[i]){
-				struct ConditionalBreak* tmp = conditionals[i];
-				conditionals[i] = conditionals[i]->next;
-				freeConditionalBreak(tmp);
-			}
-		}
-	}
+void freeAllConditionals()
+{
+    for (int i = 0; i < 16; i++) {
+        while (conditionals[i]) {
+            struct ConditionalBreak* tmp = conditionals[i];
+            conditionals[i] = conditionals[i]->next;
+            freeConditionalBreak(tmp);
+        }
+    }
+}
 
-int removeConditionalBreak(struct ConditionalBreak* toDelete){
-	if(toDelete){
-		u8 condIndex = toDelete->break_address>>24;
-		struct ConditionalBreak* base = conditionals[condIndex];
-		struct ConditionalBreak* prev = conditionals[condIndex];
-	while(base){
-		if(base == toDelete){
-			if(base == prev){
-				conditionals[condIndex] = base->next;
-			}else{
-				prev->next = base->next;
-			}
-			freeConditionalBreak(toDelete);
-			return 0;
-		}
-		prev = base;
-		base = base->next;
-	}
-	return -1;	//failed to remove
-	}
-	return -2; //delete failed because container was not there
+int removeConditionalBreak(struct ConditionalBreak* toDelete)
+{
+    if (toDelete) {
+        u8 condIndex = toDelete->break_address >> 24;
+        struct ConditionalBreak* base = conditionals[condIndex];
+        struct ConditionalBreak* prev = conditionals[condIndex];
+        while (base) {
+            if (base == toDelete) {
+                if (base == prev) {
+                    conditionals[condIndex] = base->next;
+                } else {
+                    prev->next = base->next;
+                }
+                freeConditionalBreak(toDelete);
+                return 0;
+            }
+            prev = base;
+            base = base->next;
+        }
+        return -1; //failed to remove
+    }
+    return -2; //delete failed because container was not there
 }
 
 /*
@@ -391,217 +393,217 @@ int removeAllConditions(u32 address, u8 flags){
 	return true;
 }*/
 
-void recountFlagsForAddress(u32 address){
-	struct ConditionalBreak* base = conditionals[address>>24];
-	u8 flags = 0;
-	while(base){
-		if(base->break_address < address){
-			base = base->next;
-		}else{
-			if(base->break_address == address){
-				flags |= base->type_flags;
-			}else{
-				BreakClear((&map[address>>24])->breakPoints,address & (&map[address>>24])->mask,0xff);
-				BreakSet((&map[address>>24])->breakPoints,address & (&map[address>>24])->mask,((flags>>4) | (flags&0x8)));
-				return;
-			}
-			base = base->next;
-		}
-	}
-	BreakClear((&map[address>>24])->breakPoints,address & (&map[address>>24])->mask,0xff);
-	BreakSet((&map[address>>24])->breakPoints,address & (&map[address>>24])->mask,((flags>>4) | (flags&0x8)));
+void recountFlagsForAddress(u32 address)
+{
+    struct ConditionalBreak* base = conditionals[address >> 24];
+    u8 flags = 0;
+    while (base) {
+        if (base->break_address < address) {
+            base = base->next;
+        } else {
+            if (base->break_address == address) {
+                flags |= base->type_flags;
+            } else {
+                BreakClear((&map[address >> 24])->breakPoints, address & (&map[address >> 24])->mask, 0xff);
+                BreakSet((&map[address >> 24])->breakPoints, address & (&map[address >> 24])->mask, ((flags >> 4) | (flags & 0x8)));
+                return;
+            }
+            base = base->next;
+        }
+    }
+    BreakClear((&map[address >> 24])->breakPoints, address & (&map[address >> 24])->mask, 0xff);
+    BreakSet((&map[address >> 24])->breakPoints, address & (&map[address >> 24])->mask, ((flags >> 4) | (flags & 0x8)));
 }
-
 
 //Removers
-int removeConditionalBreakNo(u32 addrNo, u8 number){
-if(conditionals[addrNo>>24]){
-		struct ConditionalBreak* base = conditionals[addrNo>>24];
-		struct ConditionalBreak* curr = conditionals[addrNo>>24];
-		u8 count = 1;
-		while (curr->break_address < addrNo){
-			base = curr;
-			curr = curr->next;
-		}
-		if(curr->break_address == addrNo){
-			if(number == 1){
-				if(base == curr){
-					conditionals[addrNo>>24] = curr->next;
-					freeConditionalBreak(curr);
-				}else{
-					base->next = curr->next;
-					freeConditionalBreak(curr);
-				}
-				recountFlagsForAddress(addrNo);
-				return 0;
-			}else{
-			int count = 1;
-			while(curr && (curr->break_address == addrNo)){
-				if(count == number){
-					base->next = curr->next;
-					freeConditionalBreak(curr);
-					recountFlagsForAddress(addrNo);
-					return 1;
-				}
-				count++;
-				base = curr;
-				curr = curr->next;
-			}
-			return -1;
-		}
-		}
-	}
-	return -2;
+int removeConditionalBreakNo(u32 addrNo, u8 number)
+{
+    if (conditionals[addrNo >> 24]) {
+        struct ConditionalBreak* base = conditionals[addrNo >> 24];
+        struct ConditionalBreak* curr = conditionals[addrNo >> 24];
+        u8 count = 1;
+        while (curr->break_address < addrNo) {
+            base = curr;
+            curr = curr->next;
+        }
+        if (curr->break_address == addrNo) {
+            if (number == 1) {
+                if (base == curr) {
+                    conditionals[addrNo >> 24] = curr->next;
+                    freeConditionalBreak(curr);
+                } else {
+                    base->next = curr->next;
+                    freeConditionalBreak(curr);
+                }
+                recountFlagsForAddress(addrNo);
+                return 0;
+            } else {
+                int count = 1;
+                while (curr && (curr->break_address == addrNo)) {
+                    if (count == number) {
+                        base->next = curr->next;
+                        freeConditionalBreak(curr);
+                        recountFlagsForAddress(addrNo);
+                        return 1;
+                    }
+                    count++;
+                    base = curr;
+                    curr = curr->next;
+                }
+                return -1;
+            }
+        }
+    }
+    return -2;
 }
 
-int removeFlagFromConditionalBreakNo(u32 addrNo, u8 number, u8 flag){
-	if(conditionals[addrNo>>24]){
-		struct ConditionalBreak* base = conditionals[addrNo>>24];
-		struct ConditionalBreak* curr = conditionals[addrNo>>24];
-		u8 count = 1;
-		while (curr->break_address < addrNo){
-			base = curr;
-			curr = curr->next;
-		}
-		if(curr->break_address == addrNo){
-			if(number == 1){
-				curr->type_flags &= ~flag;
-				if(curr->type_flags == 0){
-					if(base == curr){
-						conditionals[addrNo>>24] = curr->next;
-						freeConditionalBreak(curr);
-					}else{
-						base->next = curr->next;
-						freeConditionalBreak(curr);
-					}
-				}
-				recountFlagsForAddress(addrNo);
-				return 0;
-			}else{
-			int count = 1;
-			while(curr && (curr->break_address == addrNo)){
-				if(count == number){
-					curr->type_flags &= ~flag;
-					if(!curr->type_flags){
-						base->next = curr->next;
-						freeConditionalBreak(curr);
-						recountFlagsForAddress(addrNo);
-						return 1;
-					}
-					recountFlagsForAddress(addrNo);
-					return 0;
-				}
-				count++;
-				base = curr;
-				curr = curr->next;
-			}
-			return -1;
-		}
-		}
-	}
-	return -2;
+int removeFlagFromConditionalBreakNo(u32 addrNo, u8 number, u8 flag)
+{
+    if (conditionals[addrNo >> 24]) {
+        struct ConditionalBreak* base = conditionals[addrNo >> 24];
+        struct ConditionalBreak* curr = conditionals[addrNo >> 24];
+        u8 count = 1;
+        while (curr->break_address < addrNo) {
+            base = curr;
+            curr = curr->next;
+        }
+        if (curr->break_address == addrNo) {
+            if (number == 1) {
+                curr->type_flags &= ~flag;
+                if (curr->type_flags == 0) {
+                    if (base == curr) {
+                        conditionals[addrNo >> 24] = curr->next;
+                        freeConditionalBreak(curr);
+                    } else {
+                        base->next = curr->next;
+                        freeConditionalBreak(curr);
+                    }
+                }
+                recountFlagsForAddress(addrNo);
+                return 0;
+            } else {
+                int count = 1;
+                while (curr && (curr->break_address == addrNo)) {
+                    if (count == number) {
+                        curr->type_flags &= ~flag;
+                        if (!curr->type_flags) {
+                            base->next = curr->next;
+                            freeConditionalBreak(curr);
+                            recountFlagsForAddress(addrNo);
+                            return 1;
+                        }
+                        recountFlagsForAddress(addrNo);
+                        return 0;
+                    }
+                    count++;
+                    base = curr;
+                    curr = curr->next;
+                }
+                return -1;
+            }
+        }
+    }
+    return -2;
 }
 
-int removeConditionalWithAddress(u32 address){
-	u8 addrNo = address>>24;
-	if(conditionals[addrNo] != NULL){
-		struct ConditionalBreak* base = conditionals[addrNo];
-		struct ConditionalBreak* curr = conditionals[addrNo];
-		u8 count = 0;
-		u8 flags = 0;
-		while(curr && address >= curr->break_address){
-			if(curr->break_address == address){
-				base->next = curr->next;
-				flags |= curr->type_flags;
-				freeConditionalBreak(curr);
-				curr = base->next;
-				count++;
-			}else{
-				base = curr;
-				curr = curr->next;
-			}
-		}
-		BreakClear((&map[address>>24])->breakPoints,address & (&map[address>>24])->mask,((flags&0xf)|(flags>>4)));
-		return count;
-	}
-	return -2;
+int removeConditionalWithAddress(u32 address)
+{
+    u8 addrNo = address >> 24;
+    if (conditionals[addrNo] != NULL) {
+        struct ConditionalBreak* base = conditionals[addrNo];
+        struct ConditionalBreak* curr = conditionals[addrNo];
+        u8 count = 0;
+        u8 flags = 0;
+        while (curr && address >= curr->break_address) {
+            if (curr->break_address == address) {
+                base->next = curr->next;
+                flags |= curr->type_flags;
+                freeConditionalBreak(curr);
+                curr = base->next;
+                count++;
+            } else {
+                base = curr;
+                curr = curr->next;
+            }
+        }
+        BreakClear((&map[address >> 24])->breakPoints, address & (&map[address >> 24])->mask, ((flags & 0xf) | (flags >> 4)));
+        return count;
+    }
+    return -2;
 }
 
-int removeConditionalWithFlag(u8 flag, bool orMode){
-	for(u8 addrNo = 0; addrNo < 16;addrNo++){
-		if(conditionals[addrNo] != NULL){
-			struct ConditionalBreak* base = conditionals[addrNo];
-			struct ConditionalBreak* curr = conditionals[addrNo];
-			u8 count = 0;
-			while(curr){
-				if(((curr->type_flags & flag) == curr->type_flags) || (orMode && (curr->type_flags & flag))){
-					curr->type_flags &= ~flag;
-					BreakClear((&map[addrNo])->breakPoints,curr->break_address & (&map[addrNo])->mask,((flag&0xf)|(flag>>4)));
-					if(curr->type_flags == 0){
-						if(base == conditionals[addrNo]){
-							conditionals[addrNo]= curr->next;
-							base = curr->next;
-							curr = base;
-						}
-						else{
-							base->next = curr->next;
-							freeConditionalBreak(curr);
-							curr = base->next;
-						}
-						count++;
-					}else{
-						base = curr;
-						curr = curr->next;
-					}
-				}else{
-					base = curr;
-					curr = curr->next;
-				}
-			}
-			return count;
-		}
-	}
-	return -2;
+int removeConditionalWithFlag(u8 flag, bool orMode)
+{
+    for (u8 addrNo = 0; addrNo < 16; addrNo++) {
+        if (conditionals[addrNo] != NULL) {
+            struct ConditionalBreak* base = conditionals[addrNo];
+            struct ConditionalBreak* curr = conditionals[addrNo];
+            u8 count = 0;
+            while (curr) {
+                if (((curr->type_flags & flag) == curr->type_flags) || (orMode && (curr->type_flags & flag))) {
+                    curr->type_flags &= ~flag;
+                    BreakClear((&map[addrNo])->breakPoints, curr->break_address & (&map[addrNo])->mask, ((flag & 0xf) | (flag >> 4)));
+                    if (curr->type_flags == 0) {
+                        if (base == conditionals[addrNo]) {
+                            conditionals[addrNo] = curr->next;
+                            base = curr->next;
+                            curr = base;
+                        } else {
+                            base->next = curr->next;
+                            freeConditionalBreak(curr);
+                            curr = base->next;
+                        }
+                        count++;
+                    } else {
+                        base = curr;
+                        curr = curr->next;
+                    }
+                } else {
+                    base = curr;
+                    curr = curr->next;
+                }
+            }
+            return count;
+        }
+    }
+    return -2;
 }
 
-int removeConditionalWithAddressAndFlag(u32 address, u8 flag, bool orMode){
-	u8 addrNo = address>>24;
-	if(conditionals[addrNo] != NULL){
-		struct ConditionalBreak* base = conditionals[addrNo];
-		struct ConditionalBreak* curr = conditionals[addrNo];
-		u8 count = 0;
-		while(curr && address >= curr->break_address){
-			if((curr->break_address == address) &&
-				(((curr->type_flags & flag) == curr->type_flags) || (orMode && (curr->type_flags & flag)))){
-					curr->type_flags &= ~flag;
-					BreakClear((&map[address>>24])->breakPoints,curr->break_address & (&map[address>>24])->mask,((flag&0xf)|(flag>>4)));
-					if(curr->type_flags == 0){
-						if(curr == conditionals[addrNo]){
-							conditionals[addrNo] = curr->next;
-							freeConditionalBreak(curr);
-							curr = conditionals[addrNo];
-						}
-						else{
-							base->next = curr->next;
-							freeConditionalBreak(curr);
-							curr = base->next;
-						}	
-						count++;
-					}else{
-						base = curr;
-						curr = curr->next;
-					}
-			}else{
-				base = curr;
-				curr = curr->next;
-			}
-		}
-		return count;
-	}
-	return -2;
+int removeConditionalWithAddressAndFlag(u32 address, u8 flag, bool orMode)
+{
+    u8 addrNo = address >> 24;
+    if (conditionals[addrNo] != NULL) {
+        struct ConditionalBreak* base = conditionals[addrNo];
+        struct ConditionalBreak* curr = conditionals[addrNo];
+        u8 count = 0;
+        while (curr && address >= curr->break_address) {
+            if ((curr->break_address == address) && (((curr->type_flags & flag) == curr->type_flags) || (orMode && (curr->type_flags & flag)))) {
+                curr->type_flags &= ~flag;
+                BreakClear((&map[address >> 24])->breakPoints, curr->break_address & (&map[address >> 24])->mask, ((flag & 0xf) | (flag >> 4)));
+                if (curr->type_flags == 0) {
+                    if (curr == conditionals[addrNo]) {
+                        conditionals[addrNo] = curr->next;
+                        freeConditionalBreak(curr);
+                        curr = conditionals[addrNo];
+                    } else {
+                        base->next = curr->next;
+                        freeConditionalBreak(curr);
+                        curr = base->next;
+                    }
+                    count++;
+                } else {
+                    base = curr;
+                    curr = curr->next;
+                }
+            } else {
+                base = curr;
+                curr = curr->next;
+            }
+        }
+        return count;
+    }
+    return -2;
 }
-
-
 
 //true creating code for a given expression.
 //It assumes an if was found, and that all up to the if was removed.
@@ -610,236 +612,259 @@ int removeConditionalWithAddressAndFlag(u32 address, u8 flag, bool orMode){
 //<expType is optional, and always assumes int-compare as default.
 u8 parseExpressionType(char* type);
 u8 parseConditionOperand(char* type);
-void parseAndCreateConditionalBreaks(u32 address, u8 flags, char** exp, int n){
-	struct ConditionalBreak *workBreak = addConditionalBreak(address, flags);
-	flags &= 0xf;
-	if(!flags)
-		return;
-	bool notBk = true;
-	struct ConditionalBreakNode* now = (struct ConditionalBreakNode*)malloc(sizeof(struct ConditionalBreakNode));
-	struct ConditionalBreakNode* toAdd = now;
-	for(int i = 0; i < n; i++){
-		now->next = 0;
-		now->exp_type_flags = 0;
-		if(exp[i][0] == '\''){
-			now->exp_type_flags |= parseExpressionType(&exp[i][1]);
-			i++;
-			if(i >= n) goto fail;
-		}else{
-			now->exp_type_flags |= 6;	//assume signed word
-		}
-		now->address = strdup(exp[i]);
-		i++;
-		if(i >= n) goto fail;
-		char* operandName = exp[i];
-		now->cond_flags = parseConditionOperand(exp[i]);
-		i++;
-		if(i >= n) goto fail;
+void parseAndCreateConditionalBreaks(u32 address, u8 flags, char** exp, int n)
+{
+    struct ConditionalBreak* workBreak = addConditionalBreak(address, flags);
+    flags &= 0xf;
+    if (!flags)
+        return;
+    bool notBk = true;
+    struct ConditionalBreakNode* now = (struct ConditionalBreakNode*)malloc(sizeof(struct ConditionalBreakNode));
+    struct ConditionalBreakNode* toAdd = now;
+    for (int i = 0; i < n; i++) {
+        now->next = 0;
+        now->exp_type_flags = 0;
+        if (exp[i][0] == '\'') {
+            now->exp_type_flags |= parseExpressionType(&exp[i][1]);
+            i++;
+            if (i >= n)
+                goto fail;
+        } else {
+            now->exp_type_flags |= 6; //assume signed word
+        }
+        now->address = strdup(exp[i]);
+        i++;
+        if (i >= n)
+            goto fail;
+        char* operandName = exp[i];
+        now->cond_flags = parseConditionOperand(exp[i]);
+        i++;
+        if (i >= n)
+            goto fail;
 
-		if(exp[i][0] == '\''){
-			now->exp_type_flags |= (parseExpressionType(&exp[i][1])<<4);
-			i++;
-			if(i >= n) goto fail;
-		}else{
-			now->exp_type_flags |= 0x60;	//assume signed word
-		}
-		now->value = strdup(exp[i]);
-		i++;
-		u32 val;
-		if(!dexp_eval(now->value, &val) || !dexp_eval(now->address, &val)){
-			printf("Invalid expression.\n");
-			if(workBreak)
-				removeConditionalBreak(workBreak);
-			return;
-		}
-		if(i < n){
-			if(strcmp(exp[i], "&&") == 0){
-				now = (struct ConditionalBreakNode*)malloc(sizeof(struct ConditionalBreakNode));
-				toAdd->next = now;
-			}else if (strcmp(exp[i], "||") == 0){
-				addCondition(workBreak,toAdd);
-				printf("Added break on address %08x, with condition:\n%s %s %s\n", address, now->address, operandName,now->value);
-				workBreak = addConditionalBreak(address, flags);
-				now = (struct ConditionalBreakNode*)malloc(sizeof(struct ConditionalBreakNode));
-				toAdd = now;
-			}
-		}else{
-			addCondition(workBreak,toAdd);
-			printf("Added break on address %08x, ending with condition: \n%s %s %s\n", address, now->address, operandName,now->value);
-			return;
-		}
-	}
-	return;
+        if (exp[i][0] == '\'') {
+            now->exp_type_flags |= (parseExpressionType(&exp[i][1]) << 4);
+            i++;
+            if (i >= n)
+                goto fail;
+        } else {
+            now->exp_type_flags |= 0x60; //assume signed word
+        }
+        now->value = strdup(exp[i]);
+        i++;
+        u32 val;
+        if (!dexp_eval(now->value, &val) || !dexp_eval(now->address, &val)) {
+            printf("Invalid expression.\n");
+            if (workBreak)
+                removeConditionalBreak(workBreak);
+            return;
+        }
+        if (i < n) {
+            if (strcmp(exp[i], "&&") == 0) {
+                now = (struct ConditionalBreakNode*)malloc(sizeof(struct ConditionalBreakNode));
+                toAdd->next = now;
+            } else if (strcmp(exp[i], "||") == 0) {
+                addCondition(workBreak, toAdd);
+                printf("Added break on address %08x, with condition:\n%s %s %s\n", address, now->address, operandName, now->value);
+                workBreak = addConditionalBreak(address, flags);
+                now = (struct ConditionalBreakNode*)malloc(sizeof(struct ConditionalBreakNode));
+                toAdd = now;
+            }
+        } else {
+            addCondition(workBreak, toAdd);
+            printf("Added break on address %08x, ending with condition: \n%s %s %s\n", address, now->address, operandName, now->value);
+            return;
+        }
+    }
+    return;
 
-	fail:
-		printf("Not enough material (expressions) to work with.");
-		removeConditionalBreak(workBreak);
-		return;
+fail:
+    printf("Not enough material (expressions) to work with.");
+    removeConditionalBreak(workBreak);
+    return;
 }
 
 //aux
-u8 parseExpressionType(char* given_type){
-	u8 flags = 0;
-	//for such a small string, pays off to convert first
-	char* type = strdup(given_type);
-	for(int i = 0; type[i] != '\0'; i++){
-		type[i] = toupper(type[i]);
-	}
-	if((type[0] == 'S') || type[0] == 'U'){
-		flags |= (4 - ((type[0]-'S')<<1));
-		type++;
-		if(type[0] == 'H'){
-			type[0] = '1';
-			type[1] = '6';
-			type[2] = '\0';
-		}else if(type[0] == 'W'){
-			type[0] = '3';
-			type[1] = '2';
-			type[2] = '\0';
-		}else if(type[0] == 'B'){
-			type[0] = '8';
-			type[1] = '\0';
-		}
-		int size;
-		sscanf(type, "%d",&size);
-		size = (size>>3) - 1;
-		flags |= (size >= 2 ? 2: ((u8)size));
-		free(type);
-		return flags;
-	}
-	if(strcmp(type, "INT")==0){
-		flags = 6;
-	}
-	if(type[0] == 'H'){
-			flags = 1;
-	}else if(type[0] == 'W'){
-			flags = 2;
-	}else if(type[0] == 'B'){
-			flags = 0;
-	}else{
-		flags = 6;
-	}
-	free(type);
-	return flags;
+u8 parseExpressionType(char* given_type)
+{
+    u8 flags = 0;
+    //for such a small string, pays off to convert first
+    char* type = strdup(given_type);
+    for (int i = 0; type[i] != '\0'; i++) {
+        type[i] = toupper(type[i]);
+    }
+    if ((type[0] == 'S') || type[0] == 'U') {
+        flags |= (4 - ((type[0] - 'S') << 1));
+        type++;
+        if (type[0] == 'H') {
+            type[0] = '1';
+            type[1] = '6';
+            type[2] = '\0';
+        } else if (type[0] == 'W') {
+            type[0] = '3';
+            type[1] = '2';
+            type[2] = '\0';
+        } else if (type[0] == 'B') {
+            type[0] = '8';
+            type[1] = '\0';
+        }
+        int size;
+        sscanf(type, "%d", &size);
+        size = (size >> 3) - 1;
+        flags |= (size >= 2 ? 2 : ((u8)size));
+        free(type);
+        return flags;
+    }
+    if (strcmp(type, "INT") == 0) {
+        flags = 6;
+    }
+    if (type[0] == 'H') {
+        flags = 1;
+    } else if (type[0] == 'W') {
+        flags = 2;
+    } else if (type[0] == 'B') {
+        flags = 0;
+    } else {
+        flags = 6;
+    }
+    free(type);
+    return flags;
 }
 
-u8 parseConditionOperand(char* type){
-	u8 flag = 0;
-	if(toupper(type[0]) == 'S'){
-		flag = 8;
-		type++;
-	}
-	switch(type[0]){
-		case '!':		if(type[1] == '=' || type[1] == '\0')
-							return flag | 0x6;
-						break;
-		case '=':		if(type[1] == '=' || type[1] == '\0')
-							return flag | 0x1;
-						break;
-		case '<':		if(type[1] == '>')
-							return flag | 0x6;
-						if(type[1] == '=')
-							return flag | 0x5;
-						if(type[1] == '\0')
-							return flag | 0x4;
-						break;
-		case '>':		if(type[1] == '<')
-							return flag | 0x6;
-						if(type[1] == '=')
-							return flag | 0x3;
-						if(type[1] == '\0')
-							return flag | 0x2;
-						break;
-		default:		;	
-	}
-	switch(tolower(type[0])){
-		case 'l':		if(tolower(type[1]) == 'e')
-							return flag | 0x5;
-						if(tolower(type[1]) == 't')
-							return flag | 0x4;
-						break; 
-		case 'g':		if(tolower(type[1]) == 'e')
-							return flag | 0x3;
-						if(tolower(type[1]) == 't')
-							return flag | 0x2;
+u8 parseConditionOperand(char* type)
+{
+    u8 flag = 0;
+    if (toupper(type[0]) == 'S') {
+        flag = 8;
+        type++;
+    }
+    switch (type[0]) {
+    case '!':
+        if (type[1] == '=' || type[1] == '\0')
+            return flag | 0x6;
+        break;
+    case '=':
+        if (type[1] == '=' || type[1] == '\0')
+            return flag | 0x1;
+        break;
+    case '<':
+        if (type[1] == '>')
+            return flag | 0x6;
+        if (type[1] == '=')
+            return flag | 0x5;
+        if (type[1] == '\0')
+            return flag | 0x4;
+        break;
+    case '>':
+        if (type[1] == '<')
+            return flag | 0x6;
+        if (type[1] == '=')
+            return flag | 0x3;
+        if (type[1] == '\0')
+            return flag | 0x2;
+        break;
+    default:;
+    }
+    switch (tolower(type[0])) {
+    case 'l':
+        if (tolower(type[1]) == 'e')
+            return flag | 0x5;
+        if (tolower(type[1]) == 't')
+            return flag | 0x4;
+        break;
+    case 'g':
+        if (tolower(type[1]) == 'e')
+            return flag | 0x3;
+        if (tolower(type[1]) == 't')
+            return flag | 0x2;
 
-		case 'e':		if(tolower(type[1]) == 'q')
-							return flag | 0x1;
-						if(type[1] == '\0')
-							return flag | 0x1;
-		case 'n':		if(tolower(type[1]) == 'e')
-							return flag | 0x6;
-		default:;
-	}
-	return flag;	
+    case 'e':
+        if (tolower(type[1]) == 'q')
+            return flag | 0x1;
+        if (type[1] == '\0')
+            return flag | 0x1;
+    case 'n':
+        if (tolower(type[1]) == 'e')
+            return flag | 0x6;
+    default:;
+    }
+    return flag;
 }
 
-u32 calculateFinalValue(char* expToEval, u8 type_of_flags){
-	u32 val; 
-	if(!dexp_eval(expToEval, &val)){
-			printf("Invalid expression.\n");
-			return 0;
-	}
-	if(type_of_flags&0x4){
-		switch(type_of_flags&0x3){
-			case 0:		return (s8)(val&0xff);
-			case 1:		return (s16)(val&0xffff);
-			default:	return (int)val;
-		}
-	}else{
-		switch(type_of_flags&0x3){
-			case 0:		return (u8)(val&0xff);
-			case 1:		return (u16)(val&0xffff);
-			default:	return val;
-		}
-	}
+u32 calculateFinalValue(char* expToEval, u8 type_of_flags)
+{
+    u32 val;
+    if (!dexp_eval(expToEval, &val)) {
+        printf("Invalid expression.\n");
+        return 0;
+    }
+    if (type_of_flags & 0x4) {
+        switch (type_of_flags & 0x3) {
+        case 0:
+            return (s8)(val & 0xff);
+        case 1:
+            return (s16)(val & 0xffff);
+        default:
+            return (int)val;
+        }
+    } else {
+        switch (type_of_flags & 0x3) {
+        case 0:
+            return (u8)(val & 0xff);
+        case 1:
+            return (u16)(val & 0xffff);
+        default:
+            return val;
+        }
+    }
 }
 
 //check for execution
-bool isCorrectBreak(struct ConditionalBreak* toTest, u8 accessType){
+bool isCorrectBreak(struct ConditionalBreak* toTest, u8 accessType)
+{
 
-	return (toTest->type_flags & accessType);
+    return (toTest->type_flags & accessType);
 }
 
+bool doBreak(struct ConditionalBreak* toTest)
+{
+    struct ConditionalBreakNode* toExamine = toTest->firstCond;
 
-bool doBreak(struct ConditionalBreak* toTest){
-	struct ConditionalBreakNode* toExamine = toTest->firstCond;
-	
-	bool globalVeredict = true;
-	bool veredict = false;
-	while(toExamine && globalVeredict){
-		u32 address = calculateFinalValue(toExamine->address, toExamine->exp_type_flags&0xf);
-		u32 value = calculateFinalValue(toExamine->value, toExamine->exp_type_flags>>4);
-		if((toExamine->cond_flags &0x7) != 0){
-			veredict = veredict || ((toExamine->cond_flags&1)? (address == value):false);
-			veredict = veredict || ((toExamine->cond_flags&4)? ((toExamine->cond_flags&8)? ((int)address < (int)value) : (address < value)) : false);
-			veredict = veredict || ((toExamine->cond_flags&2)? ((toExamine->cond_flags&8)? ((int)address > (int)value) : (address > value)) : false);
-		}
-		toExamine = toExamine->next;
-		globalVeredict = veredict && globalVeredict;
-
-	}
-	return globalVeredict;
+    bool globalVeredict = true;
+    bool veredict = false;
+    while (toExamine && globalVeredict) {
+        u32 address = calculateFinalValue(toExamine->address, toExamine->exp_type_flags & 0xf);
+        u32 value = calculateFinalValue(toExamine->value, toExamine->exp_type_flags >> 4);
+        if ((toExamine->cond_flags & 0x7) != 0) {
+            veredict = veredict || ((toExamine->cond_flags & 1) ? (address == value) : false);
+            veredict = veredict || ((toExamine->cond_flags & 4) ? ((toExamine->cond_flags & 8) ? ((int)address < (int)value) : (address < value)) : false);
+            veredict = veredict || ((toExamine->cond_flags & 2) ? ((toExamine->cond_flags & 8) ? ((int)address > (int)value) : (address > value)) : false);
+        }
+        toExamine = toExamine->next;
+        globalVeredict = veredict && globalVeredict;
+    }
+    return globalVeredict;
 }
 
-bool doesBreak(u32 address, u8 allowedFlags){
-	u8 addrNo = address>>24;
- 	if(conditionals[addrNo]){
-		struct ConditionalBreak* base = conditionals[addrNo];
-		while(base && base->break_address < address){
-			base = base->next;
-		}
-		while(base && base->break_address == address){
-			if(base->type_flags & allowedFlags &0xf0){
-				return true;
-			}
-			if(isCorrectBreak(base,allowedFlags) && doBreak(base)){
-				return true;
-			}
-			base = base->next;
-		}
-	}
-	return false;
+bool doesBreak(u32 address, u8 allowedFlags)
+{
+    u8 addrNo = address >> 24;
+    if (conditionals[addrNo]) {
+        struct ConditionalBreak* base = conditionals[addrNo];
+        while (base && base->break_address < address) {
+            base = base->next;
+        }
+        while (base && base->break_address == address) {
+            if (base->type_flags & allowedFlags & 0xf0) {
+                return true;
+            }
+            if (isCorrectBreak(base, allowedFlags) && doBreak(base)) {
+                return true;
+            }
+            base = base->next;
+        }
+    }
+    return false;
 }
 
 /*

@@ -36,15 +36,15 @@ extern int layerEnable;
 extern int cpuSaveType;
 extern int customBackdropColor;
 
-extern u8 *bios;
-extern u8 *rom;
-extern u8 *internalRAM;
-extern u8 *workRAM;
-extern u8 *paletteRAM;
-extern u8 *vram;
-extern u8 *pix;
-extern u8 *oam;
-extern u8 *ioMem;
+extern u8* bios;
+extern u8* rom;
+extern u8* internalRAM;
+extern u8* workRAM;
+extern u8* paletteRAM;
+extern u8* vram;
+extern u8* pix;
+extern u8* oam;
+extern u8* ioMem;
 
 extern u16 DISPCNT;
 extern u16 DISPSTAT;

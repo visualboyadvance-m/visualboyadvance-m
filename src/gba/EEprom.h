@@ -2,8 +2,8 @@
 #define EEPROM_H
 
 #ifdef __LIBRETRO__
-extern void eepromSaveGame(u8 *&data);
-extern void eepromReadGame(const u8 *&data, int version);
+extern void eepromSaveGame(u8*& data);
+extern void eepromReadGame(const u8*& data, int version);
 #else
 extern void eepromSaveGame(gzFile _gzFile);
 extern void eepromReadGame(gzFile _gzFile, int version);
@@ -14,7 +14,7 @@ extern void eepromWrite(u32 address, u8 value);
 extern void eepromInit();
 extern void eepromReset();
 #ifdef __LIBRETRO__
-extern u8 *eepromData;
+extern u8* eepromData;
 #else
 extern u8 eepromData[0x2000];
 #endif

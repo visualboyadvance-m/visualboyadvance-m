@@ -1,11 +1,10 @@
 #include <memory.h>
 
 #include "../Util.h"
-#include "../common/Types.h"
 #include "gbGlobals.h"
 #include "gbSGB.h"
 
-u8 gbInvertTab[256] = {
+uint8_t gbInvertTab[256] = {
     0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0,
     0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0,
     0x08, 0x88, 0x48, 0xc8, 0x28, 0xa8, 0x68, 0xe8,
@@ -40,16 +39,16 @@ u8 gbInvertTab[256] = {
     0x1f, 0x9f, 0x5f, 0xdf, 0x3f, 0xbf, 0x7f, 0xff
 };
 
-u16 gbLineMix[160];
-u16 gbWindowColor[160];
+uint16_t gbLineMix[160];
+uint16_t gbWindowColor[160];
 extern int inUseRegister_WY;
 extern int layerSettings;
 
 void gbRenderLine()
 {
     memset(gbLineMix, 0, sizeof(gbLineMix));
-    u8* bank0;
-    u8* bank1;
+    uint8_t* bank0;
+    uint8_t* bank1;
     if (gbCgbMode) {
         bank0 = &gbVram[0x0000];
         bank1 = &gbVram[0x2000];
@@ -91,11 +90,11 @@ void gbRenderLine()
 
     int tile_map_address = tile_map_line_y + tx;
 
-    u8 attrs = 0;
+    uint8_t attrs = 0;
     if (bank1 != NULL)
         attrs = bank1[tile_map_address];
 
-    u8 tile = bank0[tile_map_address];
+    uint8_t tile = bank0[tile_map_address];
 
     tile_map_address++;
 
@@ -108,8 +107,8 @@ void gbRenderLine()
         if ((register_LCDC & 0x01 || gbCgbMode) && (layerSettings & 0x0100)) {
             while (x < 160) {
 
-                u8 tile_a = 0;
-                u8 tile_b = 0;
+                uint8_t tile_a = 0;
+                uint8_t tile_b = 0;
 
                 if (attrs & 0x40) {
                     tile_pattern_address = tile_pattern + tile * 16 + (7 - by) * 2;
@@ -129,7 +128,7 @@ void gbRenderLine()
                 }
 
                 while (bx > 0) {
-                    u8 c = (tile_a & bx) ? 1 : 0;
+                    uint8_t c = (tile_a & bx) ? 1 : 0;
                     c += ((tile_b & bx) ? 2 : 0);
 
                     gbLineBuffer[x] = c; // mark the gbLineBuffer color
@@ -204,7 +203,7 @@ void gbRenderLine()
             // (this fixes white flashes on Last Bible II)
             // Also added the gbColorOption (fixes Dracula Densetsu II color problems)
             for (int i = 0; i < 160; i++) {
-                u16 color = gbColorOption ? gbColorFilter[0x7FFF] : 0x7FFF;
+                uint16_t color = gbColorOption ? gbColorFilter[0x7FFF] : 0x7FFF;
                 if (!gbCgbMode)
                     color = gbColorOption ? gbColorFilter[gbPalette[gbBgpLine[i + (gbSpeed ? 5 : 11) + gbSpritesTicks[i] * (gbSpeed ? 2 : 4)] & 3] & 0x7FFF] : gbPalette[gbBgpLine[i + (gbSpeed ? 5 : 11) + gbSpritesTicks[i] * (gbSpeed ? 2 : 4)] & 3] & 0x7FFF;
                 gbLineMix[i] = color;
@@ -279,7 +278,7 @@ void gbRenderLine()
                     x = wx;
 
                     tile = bank0[tile_map_address];
-                    u8 attrs = 0;
+                    uint8_t attrs = 0;
                     if (bank1)
                         attrs = bank1[tile_map_address];
                     tile_map_address++;
@@ -298,8 +297,8 @@ void gbRenderLine()
                             gbLineMix[i] = gbWindowColor[i];
 
                     while (x < 160) {
-                        u8 tile_a = 0;
-                        u8 tile_b = 0;
+                        uint8_t tile_a = 0;
+                        uint8_t tile_b = 0;
 
                         if (attrs & 0x40) {
                             tile_pattern_address = tile_pattern + tile * 16 + (7 - by) * 2;
@@ -319,7 +318,7 @@ void gbRenderLine()
                         }
 
                         while (bx > 0) {
-                            u8 c = (tile_a & bx) != 0 ? 1 : 0;
+                            uint8_t c = (tile_a & bx) != 0 ? 1 : 0;
                             c += ((tile_b & bx) != 0 ? 2 : 0);
 
                             if (x >= 0) {
@@ -386,7 +385,7 @@ void gbRenderLine()
                 gbWindowLine = 0;
         }
     } else {
-        u16 color = gbColorOption ? gbColorFilter[0x7FFF] : 0x7FFF;
+        uint16_t color = gbColorOption ? gbColorFilter[0x7FFF] : 0x7FFF;
         if (!gbCgbMode)
             color = gbColorOption ? gbColorFilter[gbPalette[0] & 0x7FFF] : gbPalette[0] & 0x7FFF;
         for (int i = 0; i < 160; i++) {
@@ -399,8 +398,8 @@ void gbRenderLine()
 void gbDrawSpriteTile(int tile, int x, int y, int t, int flags,
     int size, int spriteNumber)
 {
-    u8* bank0;
-    u8* bank1;
+    uint8_t* bank0;
+    uint8_t* bank1;
     if (gbCgbMode) {
         bank0 = &gbVram[0x0000];
         bank1 = &gbVram[0x2000];
@@ -415,7 +414,7 @@ void gbDrawSpriteTile(int tile, int x, int y, int t, int flags,
         gbObp0[i] = (gbObp0Line[x + 11 + gbSpritesTicks[x] * (gbSpeed ? 2 : 4)] >> (i << 1)) & 3;
         gbObp1[i] = (gbObp1Line[x + 11 + gbSpritesTicks[x] * (gbSpeed ? 2 : 4)] >> (i << 1)) & 3;
     }
-    u8* pal = gbObp0;
+    uint8_t* pal = gbObp0;
 
     int flipx = (flags & 0x20);
     int flipy = (flags & 0x40);
@@ -442,8 +441,8 @@ void gbDrawSpriteTile(int tile, int x, int y, int t, int flags,
     }
 
     for (int xx = 0; xx < 8; xx++) {
-        u8 mask = 1 << (7 - xx);
-        u8 c = 0;
+        uint8_t mask = 1 << (7 - xx);
+        uint8_t c = 0;
         if ((a & mask))
             c++;
         if ((b & mask))
@@ -459,7 +458,7 @@ void gbDrawSpriteTile(int tile, int x, int y, int t, int flags,
         if (xxx < 0 || xxx > 159)
             continue;
 
-        u16 color = gbLineBuffer[xxx];
+        uint16_t color = gbLineBuffer[xxx];
 
         // Fixes OAM-BG priority
         if (prio && (register_LCDC & 1)) {

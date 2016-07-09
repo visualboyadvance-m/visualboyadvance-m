@@ -43,7 +43,7 @@ void soundSetSampleRate(long sampleRate);
 
 // Sound settings
 extern bool soundInterpolation; // 1 if PCM should have low-pass filtering
-extern float soundFiltering;    // 0.0 = none, 1.0 = max
+extern float soundFiltering; // 0.0 = none, 1.0 = max
 
 //// GBA sound emulation
 
@@ -70,12 +70,12 @@ void interp_rate();
 // Notifies emulator that SOUND_CLOCK_TICKS clocks have passed
 void psoundTickfn();
 extern int SOUND_CLOCK_TICKS; // Number of 16.8 MHz clocks between calls to soundTick()
-extern int soundTicks;        // Number of 16.8 MHz clocks until soundTick() will be called
+extern int soundTicks; // Number of 16.8 MHz clocks until soundTick() will be called
 
 // Saves/loads emulator state
 #ifdef __LIBRETRO__
-void soundSaveGame(u8 *&);
-void soundReadGame(const u8 *&in, int version);
+void soundSaveGame(u8*&);
+void soundReadGame(const u8*& in, int version);
 #else
 void soundSaveGame(gzFile);
 void soundReadGame(gzFile, int version);
@@ -83,6 +83,6 @@ void soundReadGame(gzFile, int version);
 
 class Multi_Buffer;
 
-void flush_samples(Multi_Buffer *buffer);
+void flush_samples(Multi_Buffer* buffer);
 
 #endif // SOUND_H
