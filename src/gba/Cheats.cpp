@@ -180,31 +180,31 @@
 
 CheatsData cheatsList[MAX_CHEATS];
 int cheatsNumber = 0;
-u32 rompatch2addr[4];
-u16 rompatch2val[4];
-u16 rompatch2oldval[4];
+uint32_t rompatch2addr[4];
+uint16_t rompatch2val[4];
+uint16_t rompatch2oldval[4];
 
-u8 cheatsCBASeedBuffer[0x30];
-u32 cheatsCBASeed[4];
-u32 cheatsCBATemporaryValue = 0;
-u16 cheatsCBATable[256];
+uint8_t cheatsCBASeedBuffer[0x30];
+uint32_t cheatsCBASeed[4];
+uint32_t cheatsCBATemporaryValue = 0;
+uint16_t cheatsCBATable[256];
 bool cheatsCBATableGenerated = false;
-u16 super = 0;
-extern u32 mastercode;
+uint16_t super = 0;
+extern uint32_t mastercode;
 
-u8 cheatsCBACurrentSeed[12] = {
+uint8_t cheatsCBACurrentSeed[12] = {
     0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00
 };
 
-u32 seeds_v1[4];
-u32 seeds_v3[4];
+uint32_t seeds_v1[4];
+uint32_t seeds_v3[4];
 
-u32 seed_gen(u8 upper, u8 seed, u8* deadtable1, u8* deadtable2);
+uint32_t seed_gen(uint8_t upper, uint8_t seed, uint8_t* deadtable1, uint8_t* deadtable2);
 
 //seed tables for AR v1
-u8 v1_deadtable1[256] = {
+uint8_t v1_deadtable1[256] = {
     0x31, 0x1C, 0x23, 0xE5, 0x89, 0x8E, 0xA1, 0x37, 0x74, 0x6D, 0x67, 0xFC, 0x1F, 0xC0, 0xB1, 0x94,
     0x3B, 0x05, 0x56, 0x86, 0x00, 0x24, 0xF0, 0x17, 0x72, 0xA2, 0x3D, 0x1B, 0xE3, 0x17, 0xC5, 0x0B,
     0xB9, 0xE2, 0xBD, 0x58, 0x71, 0x1B, 0x2C, 0xFF, 0xE4, 0xC9, 0x4C, 0x5E, 0xC9, 0x55, 0x33, 0x45,
@@ -222,7 +222,7 @@ u8 v1_deadtable1[256] = {
     0x69, 0x3B, 0x71, 0x00, 0x2F, 0xBB, 0xBA, 0x08, 0xB1, 0xAE, 0xBB, 0xB3, 0xE1, 0xC9, 0xA6, 0x7F,
     0x17, 0x97, 0x28, 0x72, 0x12, 0x6E, 0x91, 0xAE, 0x3A, 0xA2, 0x35, 0x46, 0x27, 0xF8, 0x12, 0x50
 };
-u8 v1_deadtable2[256] = {
+uint8_t v1_deadtable2[256] = {
     0xD8, 0x65, 0x04, 0xC2, 0x65, 0xD5, 0xB0, 0x0C, 0xDF, 0x9D, 0xF0, 0xC3, 0x9A, 0x17, 0xC9, 0xA6,
     0xE1, 0xAC, 0x0D, 0x14, 0x2F, 0x3C, 0x2C, 0x87, 0xA2, 0xBF, 0x4D, 0x5F, 0xAC, 0x2D, 0x9D, 0xE1,
     0x0C, 0x9C, 0xE7, 0x7F, 0xFC, 0xA8, 0x66, 0x59, 0xAC, 0x18, 0xD7, 0x05, 0xF0, 0xBF, 0xD1, 0x8B,
@@ -242,7 +242,7 @@ u8 v1_deadtable2[256] = {
 };
 
 //seed tables for AR v3
-u8 v3_deadtable1[256] = {
+uint8_t v3_deadtable1[256] = {
     0xD0, 0xFF, 0xBA, 0xE5, 0xC1, 0xC7, 0xDB, 0x5B, 0x16, 0xE3, 0x6E, 0x26, 0x62, 0x31, 0x2E, 0x2A,
     0xD1, 0xBB, 0x4A, 0xE6, 0xAE, 0x2F, 0x0A, 0x90, 0x29, 0x90, 0xB6, 0x67, 0x58, 0x2A, 0xB4, 0x45,
     0x7B, 0xCB, 0xF0, 0x73, 0x84, 0x30, 0x81, 0xC2, 0xD7, 0xBE, 0x89, 0xD7, 0x4E, 0x73, 0x5C, 0xC7,
@@ -260,7 +260,7 @@ u8 v3_deadtable1[256] = {
     0x0C, 0x22, 0xC9, 0x4A, 0xD8, 0xB1, 0x8D, 0xF0, 0x55, 0x2E, 0x77, 0x50, 0x1C, 0x64, 0x77, 0xAA,
     0x3E, 0xAC, 0xD3, 0x3D, 0xCE, 0x60, 0xCA, 0x5D, 0xA0, 0x92, 0x78, 0xC6, 0x51, 0xFE, 0xF9, 0x30
 };
-u8 v3_deadtable2[256] = {
+uint8_t v3_deadtable2[256] = {
     0xAA, 0xAF, 0xF0, 0x72, 0x90, 0xF7, 0x71, 0x27, 0x06, 0x11, 0xEB, 0x9C, 0x37, 0x12, 0x72, 0xAA,
     0x65, 0xBC, 0x0D, 0x4A, 0x76, 0xF6, 0x5C, 0xAA, 0xB0, 0x7A, 0x7D, 0x81, 0xC1, 0xCE, 0x2F, 0x9F,
     0x02, 0x75, 0x38, 0xC8, 0xFC, 0x66, 0x05, 0xC2, 0x2C, 0xBD, 0x91, 0xAD, 0x03, 0xB1, 0x88, 0x93,
@@ -300,10 +300,10 @@ u8 v3_deadtable2[256] = {
 #define CHEAT_IS_HEX(a) (((a) >= 'A' && (a) <= 'F') || ((a) >= '0' && (a) <= '9'))
 
 #define CHEAT_PATCH_ROM_16BIT(a, v) \
-    WRITE16LE(((u16*)&rom[(a)&0x1ffffff]), v);
+    WRITE16LE(((uint16_t*)&rom[(a)&0x1ffffff]), v);
 
 #define CHEAT_PATCH_ROM_32BIT(a, v) \
-    WRITE32LE(((u32*)&rom[(a)&0x1ffffff]), v);
+    WRITE32LE(((uint32_t*)&rom[(a)&0x1ffffff]), v);
 
 static bool isMultilineWithData(int i)
 {
@@ -563,7 +563,7 @@ static int getCodeLength(int num)
     return 1;
 }
 
-int cheatsCheckKeys(u32 keys, u32 extended)
+int cheatsCheckKeys(uint32_t keys, uint32_t extended)
 {
     bool onoff = true;
     int ticks = 0;
@@ -601,8 +601,8 @@ int cheatsCheckKeys(u32 keys, u32 extended)
         case GSA_8_BIT_SLIDE:
             i++;
             if (i < cheatsNumber) {
-                u32 addr = cheatsList[i - 1].value;
-                u8 value = cheatsList[i].rawaddress;
+                uint32_t addr = cheatsList[i - 1].value;
+                uint8_t value = cheatsList[i].rawaddress;
                 int vinc = (cheatsList[i].value >> 24) & 255;
                 int count = (cheatsList[i].value >> 16) & 255;
                 int ainc = (cheatsList[i].value & 0xffff);
@@ -617,8 +617,8 @@ int cheatsCheckKeys(u32 keys, u32 extended)
         case GSA_16_BIT_SLIDE:
             i++;
             if (i < cheatsNumber) {
-                u32 addr = cheatsList[i - 1].value;
-                u16 value = cheatsList[i].rawaddress;
+                uint32_t addr = cheatsList[i - 1].value;
+                uint16_t value = cheatsList[i].rawaddress;
                 int vinc = (cheatsList[i].value >> 24) & 255;
                 int count = (cheatsList[i].value >> 16) & 255;
                 int ainc = (cheatsList[i].value & 0xffff) * 2;
@@ -633,8 +633,8 @@ int cheatsCheckKeys(u32 keys, u32 extended)
         case GSA_32_BIT_SLIDE:
             i++;
             if (i < cheatsNumber) {
-                u32 addr = cheatsList[i - 1].value;
-                u32 value = cheatsList[i].rawaddress;
+                uint32_t addr = cheatsList[i - 1].value;
+                uint32_t value = cheatsList[i].rawaddress;
                 int vinc = (cheatsList[i].value >> 24) & 255;
                 int count = (cheatsList[i].value >> 16) & 255;
                 int ainc = (cheatsList[i].value & 0xffff) * 4;
@@ -742,8 +742,8 @@ int cheatsCheckKeys(u32 keys, u32 extended)
                 }
                 break;
             case CBA_IF_KEYS_PRESSED: {
-                u16 value = cheatsList[i].value;
-                u32 addr = cheatsList[i].address;
+                uint16_t value = cheatsList[i].value;
+                uint32_t addr = cheatsList[i].address;
                 if ((addr & 0xF0) == 0x20) {
                     if ((keys & value) == 0) {
                         i++;
@@ -764,12 +764,12 @@ int cheatsCheckKeys(u32 keys, u32 extended)
                 }
                 break;
             case CBA_SLIDE_CODE: {
-                u32 address = cheatsList[i].address;
-                u16 value = cheatsList[i].value;
+                uint32_t address = cheatsList[i].address;
+                uint16_t value = cheatsList[i].value;
                 i++;
                 if (i < cheatsNumber) {
                     int count = ((cheatsList[i].address - 1) & 0xFFFF);
-                    u16 vinc = (cheatsList[i].address >> 16) & 0xFFFF;
+                    uint16_t vinc = (cheatsList[i].address >> 16) & 0xFFFF;
                     int inc = cheatsList[i].value;
                     for (int x = 0; x <= count; x++) {
                         CPUWriteHalfWord(address, value);
@@ -808,18 +808,18 @@ int cheatsCheckKeys(u32 keys, u32 extended)
                 }
                 break;
             case GSA_8_BIT_FILL: {
-                u32 addr = cheatsList[i].address;
-                u8 v = cheatsList[i].value & 0xff;
-                u32 end = addr + (cheatsList[i].value >> 8);
+                uint32_t addr = cheatsList[i].address;
+                uint8_t v = cheatsList[i].value & 0xff;
+                uint32_t end = addr + (cheatsList[i].value >> 8);
                 do {
                     CPUWriteByte(addr, v);
                     addr++;
                 } while (addr <= end);
             } break;
             case GSA_16_BIT_FILL: {
-                u32 addr = cheatsList[i].address;
-                u16 v = cheatsList[i].value & 0xffff;
-                u32 end = addr + ((cheatsList[i].value >> 16) << 1);
+                uint32_t addr = cheatsList[i].address;
+                uint16_t v = cheatsList[i].value & 0xffff;
+                uint32_t end = addr + ((cheatsList[i].value >> 16) << 1);
                 do {
                     CPUWriteHalfWord(addr, v);
                     addr += 2;
@@ -880,9 +880,9 @@ int cheatsCheckKeys(u32 keys, u32 extended)
                 break;
             case CBA_SUPER: {
                 int count = 2 * ((cheatsList[i].value - 1) & 0xFFFF) + 1;
-                u32 address = cheatsList[i].address;
+                uint32_t address = cheatsList[i].address;
                 for (int x = 0; x <= count; x++) {
-                    u8 b;
+                    uint8_t b;
                     int res = x % 6;
                     if (res == 0)
                         i++;
@@ -1204,7 +1204,7 @@ int cheatsCheckKeys(u32 keys, u32 extended)
                 break;
             case GSA_GROUP_WRITE: {
                 int count = ((cheatsList[i].address) & 0xFFFE) + 1;
-                u32 value = cheatsList[i].value;
+                uint32_t value = cheatsList[i].value;
                 if (count == 0)
                     i++;
                 else
@@ -1282,9 +1282,9 @@ int cheatsCheckKeys(u32 keys, u32 extended)
 
 void cheatsAdd(const char* codeStr,
     const char* desc,
-    u32 rawaddress,
-    u32 address,
-    u32 value,
+    uint32_t rawaddress,
+    uint32_t address,
+    uint32_t value,
     int code,
     int size)
 {
@@ -1331,10 +1331,10 @@ void cheatsDelete(int number, bool restore)
         if (restore) {
             switch (cheatsList[x].size) {
             case INT_8_BIT_WRITE:
-                CPUWriteByte(cheatsList[x].address, (u8)cheatsList[x].oldValue);
+                CPUWriteByte(cheatsList[x].address, (uint8_t)cheatsList[x].oldValue);
                 break;
             case INT_16_BIT_WRITE:
-                CPUWriteHalfWord(cheatsList[x].address, (u16)cheatsList[x].oldValue);
+                CPUWriteHalfWord(cheatsList[x].address, (uint16_t)cheatsList[x].oldValue);
                 break;
             case INT_32_BIT_WRITE:
                 CPUWriteMemory(cheatsList[x].address, cheatsList[x].oldValue);
@@ -1452,8 +1452,8 @@ bool cheatsVerifyCheatCode(const char* code, const char* desc)
         }
     }
 
-    u32 address = 0;
-    u32 value = 0;
+    uint32_t address = 0;
+    uint32_t value = 0;
 
     char buffer[10];
     strncpy(buffer, code, 8);
@@ -1497,7 +1497,7 @@ void cheatsAddCheatCode(const char* code, const char* desc)
     cheatsVerifyCheatCode(code, desc);
 }
 
-u16 cheatsGSAGetDeadface(bool v3)
+uint16_t cheatsGSAGetDeadface(bool v3)
 {
     for (int i = cheatsNumber - 1; i >= 0; i--)
         if ((cheatsList[i].address == 0xDEADFACE) && (cheatsList[i].code == (v3 ? 257 : 256)))
@@ -1505,29 +1505,29 @@ u16 cheatsGSAGetDeadface(bool v3)
     return 0;
 }
 
-void cheatsGSAChangeEncryption(u16 value, bool v3)
+void cheatsGSAChangeEncryption(uint16_t value, bool v3)
 {
     int i;
-    u8 *deadtable1, *deadtable2;
+    uint8_t *deadtable1, *deadtable2;
 
     if (v3) {
-        deadtable1 = (u8*)(&v3_deadtable1);
-        deadtable2 = (u8*)(&v3_deadtable2);
+        deadtable1 = (uint8_t*)(&v3_deadtable1);
+        deadtable2 = (uint8_t*)(&v3_deadtable2);
         for (i = 0; i < 4; i++)
             seeds_v3[i] = seed_gen(((value & 0xFF00) >> 8), (value & 0xFF) + i, deadtable1, deadtable2);
     } else {
-        deadtable1 = (u8*)(&v1_deadtable1);
-        deadtable2 = (u8*)(&v1_deadtable2);
+        deadtable1 = (uint8_t*)(&v1_deadtable1);
+        deadtable2 = (uint8_t*)(&v1_deadtable2);
         for (i = 0; i < 4; i++) {
             seeds_v1[i] = seed_gen(((value & 0xFF00) >> 8), (value & 0xFF) + i, deadtable1, deadtable2);
         }
     }
 }
 
-u32 seed_gen(u8 upper, u8 seed, u8* deadtable1, u8* deadtable2)
+uint32_t seed_gen(uint8_t upper, uint8_t seed, uint8_t* deadtable1, uint8_t* deadtable2)
 {
     int i;
-    u32 newseed = 0;
+    uint32_t newseed = 0;
 
     for (i = 0; i < 4; i++)
         newseed = ((newseed << 8) | ((deadtable1[(i + upper) & 0xFF] + deadtable2[seed]) & 0xFF));
@@ -1535,10 +1535,10 @@ u32 seed_gen(u8 upper, u8 seed, u8* deadtable1, u8* deadtable2)
     return newseed;
 }
 
-void cheatsDecryptGSACode(u32& address, u32& value, bool v3)
+void cheatsDecryptGSACode(uint32_t& address, uint32_t& value, bool v3)
 {
-    u32 rollingseed = 0xC6EF3720;
-    u32* seeds = v3 ? seeds_v3 : seeds_v1;
+    uint32_t rollingseed = 0xC6EF3720;
+    uint32_t* seeds = v3 ? seeds_v3 : seeds_v1;
 
     int bitsleft = 32;
     while (bitsleft > 0) {
@@ -1571,23 +1571,23 @@ void cheatsAddGSACode(const char* code, const char* desc, bool v3)
     char buffer[10];
     strncpy(buffer, code, 8);
     buffer[8] = 0;
-    u32 address;
+    uint32_t address;
     sscanf(buffer, "%x", &address);
     strncpy(buffer, &code[8], 8);
     buffer[8] = 0;
-    u32 value;
+    uint32_t value;
     sscanf(buffer, "%x", &value);
     cheatsGSAChangeEncryption(cheatsGSAGetDeadface(v3), v3);
     cheatsDecryptGSACode(address, value, v3);
 
     if (value == 0x1DC0DE) {
-        u32 gamecode = READ32LE(((u32*)&rom[0xac]));
+        uint32_t gamecode = READ32LE(((uint32_t*)&rom[0xac]));
         if (gamecode != address) {
             char buffer[5];
-            *((u32*)buffer) = address;
+            *((uint32_t*)buffer) = address;
             buffer[4] = 0;
             char buffer2[5];
-            *((u32*)buffer2) = READ32LE(((u32*)&rom[0xac]));
+            *((uint32_t*)buffer2) = READ32LE(((uint32_t*)&rom[0xac]));
             buffer2[4] = 0;
             systemMessage(MSG_GBA_CODE_WARNING, N_("Warning: cheats are for game %s. Current game is %s.\nCodes may not work correctly."),
                 buffer, buffer2);
@@ -1602,8 +1602,8 @@ void cheatsAddGSACode(const char* code, const char* desc, bool v3)
     }
     if (v3) {
         int type = ((address >> 25) & 127) | ((address >> 17) & 0x80);
-        u32 addr = (address & 0x00F00000) << 4 | (address & 0x0003FFFF);
-        u16 mcode = (address >> 24 & 0xFF);
+        uint32_t addr = (address & 0x00F00000) << 4 | (address & 0x0003FFFF);
+        uint16_t mcode = (address >> 24 & 0xFF);
 
         if ((mcode & 0xFE) == 0xC4) {
             cheatsAdd(code, desc, address, (address & 0x1FFFFFF) | (0x08000000),
@@ -2097,7 +2097,7 @@ bool cheatsImportGSACodeFile(const char* name, int game, bool v3)
     return false;
 }
 
-void cheatsCBAReverseArray(u8* array, u8* dest)
+void cheatsCBAReverseArray(uint8_t* array, uint8_t* dest)
 {
     dest[0] = array[3];
     dest[1] = array[2];
@@ -2107,34 +2107,34 @@ void cheatsCBAReverseArray(u8* array, u8* dest)
     dest[5] = array[4];
 }
 
-void chatsCBAScramble(u8* array, int count, u8 b)
+void chatsCBAScramble(uint8_t* array, int count, uint8_t b)
 {
-    u8* x = array + (count >> 3);
-    u8* y = array + (b >> 3);
-    u32 z = *x & (1 << (count & 7));
-    u32 x0 = (*x & (~(1 << (count & 7))));
+    uint8_t* x = array + (count >> 3);
+    uint8_t* y = array + (b >> 3);
+    uint32_t z = *x & (1 << (count & 7));
+    uint32_t x0 = (*x & (~(1 << (count & 7))));
     if (z != 0)
         z = 1;
     if ((*y & (1 << (b & 7))) != 0)
         x0 |= (1 << (count & 7));
     *x = x0;
-    u32 temp = *y & (~(1 << (b & 7)));
+    uint32_t temp = *y & (~(1 << (b & 7)));
     if (z != 0)
         temp |= (1 << (b & 7));
     *y = temp;
 }
 
-u32 cheatsCBAGetValue(u8* array)
+uint32_t cheatsCBAGetValue(uint8_t* array)
 {
     return array[0] | array[1] << 8 | array[2] << 16 | array[3] << 24;
 }
 
-u16 cheatsCBAGetData(u8* array)
+uint16_t cheatsCBAGetData(uint8_t* array)
 {
     return array[4] | array[5] << 8;
 }
 
-void cheatsCBAArrayToValue(u8* array, u8* dest)
+void cheatsCBAArrayToValue(uint8_t* array, uint8_t* dest)
 {
     dest[0] = array[3];
     dest[1] = array[2];
@@ -2144,7 +2144,7 @@ void cheatsCBAArrayToValue(u8* array, u8* dest)
     dest[5] = array[4];
 }
 
-void cheatsCBAParseSeedCode(u32 address, u32 value, u32* array)
+void cheatsCBAParseSeedCode(uint32_t address, uint32_t value, uint32_t* array)
 {
     array[0] = 1;
     array[1] = value & 0xFF;
@@ -2156,11 +2156,11 @@ void cheatsCBAParseSeedCode(u32 address, u32 value, u32* array)
     array[7] = value;
 }
 
-u32 cheatsCBAEncWorker()
+uint32_t cheatsCBAEncWorker()
 {
-    u32 x = (cheatsCBATemporaryValue * 0x41c64e6d) + 0x3039;
-    u32 y = (x * 0x41c64e6d) + 0x3039;
-    u32 z = x >> 0x10;
+    uint32_t x = (cheatsCBATemporaryValue * 0x41c64e6d) + 0x3039;
+    uint32_t y = (x * 0x41c64e6d) + 0x3039;
+    uint32_t z = x >> 0x10;
     x = ((y >> 0x10) & 0x7fff) << 0x0f;
     z = (z << 0x1e) | x;
     x = (y * 0x41c64e6d) + 0x3039;
@@ -2171,7 +2171,7 @@ u32 cheatsCBAEncWorker()
 #define ROR(v, s) \
     (((v) >> (s)) | (((v) & ((1 << (s)) - 1)) << (32 - (s))))
 
-u32 cheatsCBACalcIndex(u32 x, u32 y)
+uint32_t cheatsCBACalcIndex(uint32_t x, uint32_t y)
 {
     if (y != 0) {
         if (y == 1)
@@ -2182,7 +2182,7 @@ u32 cheatsCBACalcIndex(u32 x, u32 y)
             return x;
         else if (x < y)
             return x;
-        u32 x0 = 1;
+        uint32_t x0 = 1;
 
         while (y < 0x10000000) {
             if (y < x) {
@@ -2201,7 +2201,7 @@ u32 cheatsCBACalcIndex(u32 x, u32 y)
         }
 
     loop:
-        u32 z = 0;
+        uint32_t z = 0;
         if (x >= y)
             x -= y;
         if (x >= (y >> 1)) {
@@ -2217,7 +2217,7 @@ u32 cheatsCBACalcIndex(u32 x, u32 y)
             z |= ROR(x0, 3);
         }
 
-        u32 temp = x0;
+        uint32_t temp = x0;
 
         if (x != 0) {
             x0 = x0 >> 4;
@@ -2248,21 +2248,21 @@ u32 cheatsCBACalcIndex(u32 x, u32 y)
     return 0;
 }
 
-void cheatsCBAUpdateSeedBuffer(u32 a, u8* buffer, int count)
+void cheatsCBAUpdateSeedBuffer(uint32_t a, uint8_t* buffer, int count)
 {
     int i;
     for (i = 0; i < count; i++)
         buffer[i] = i;
-    for (i = 0; (u32)i < a; i++) {
-        u32 a = cheatsCBACalcIndex(cheatsCBAEncWorker(), count);
-        u32 b = cheatsCBACalcIndex(cheatsCBAEncWorker(), count);
-        u32 t = buffer[a];
+    for (i = 0; (uint32_t)i < a; i++) {
+        uint32_t a = cheatsCBACalcIndex(cheatsCBAEncWorker(), count);
+        uint32_t b = cheatsCBACalcIndex(cheatsCBAEncWorker(), count);
+        uint32_t t = buffer[a];
         buffer[a] = buffer[b];
         buffer[b] = t;
     }
 }
 
-void cheatsCBAChangeEncryption(u32* seed)
+void cheatsCBAChangeEncryption(uint32_t* seed)
 {
     int i;
 
@@ -2270,7 +2270,7 @@ void cheatsCBAChangeEncryption(u32* seed)
     cheatsCBAUpdateSeedBuffer(0x50, cheatsCBASeedBuffer, 0x30);
     cheatsCBATemporaryValue = 0x4efad1c3;
 
-    for (i = 0; (u32)i < seed[4]; i++) {
+    for (i = 0; (uint32_t)i < seed[4]; i++) {
         cheatsCBATemporaryValue = cheatsCBAEncWorker();
     }
     cheatsCBASeed[2] = cheatsCBAEncWorker();
@@ -2278,28 +2278,28 @@ void cheatsCBAChangeEncryption(u32* seed)
 
     cheatsCBATemporaryValue = seed[3] ^ 0xf254;
 
-    for (i = 0; (u32)i < seed[3]; i++) {
+    for (i = 0; (uint32_t)i < seed[3]; i++) {
         cheatsCBATemporaryValue = cheatsCBAEncWorker();
     }
 
     cheatsCBASeed[0] = cheatsCBAEncWorker();
     cheatsCBASeed[1] = cheatsCBAEncWorker();
 
-    *((u32*)&cheatsCBACurrentSeed[0]) = seed[6];
-    *((u32*)&cheatsCBACurrentSeed[4]) = seed[7];
-    *((u32*)&cheatsCBACurrentSeed[8]) = 0;
+    *((uint32_t*)&cheatsCBACurrentSeed[0]) = seed[6];
+    *((uint32_t*)&cheatsCBACurrentSeed[4]) = seed[7];
+    *((uint32_t*)&cheatsCBACurrentSeed[8]) = 0;
 }
 
-u16 cheatsCBAGenValue(u32 x, u32 y, u32 z)
+uint16_t cheatsCBAGenValue(uint32_t x, uint32_t y, uint32_t z)
 {
     y <<= 0x10;
     z <<= 0x10;
     x <<= 0x18;
-    u32 x0 = (int)y >> 0x10;
+    uint32_t x0 = (int)y >> 0x10;
     z = (int)z >> 0x10;
     x = (int)x >> 0x10;
     for (int i = 0; i < 8; i++) {
-        u32 temp = z ^ x;
+        uint32_t temp = z ^ x;
         if ((int)temp >= 0) {
             temp = z << 0x11;
         } else {
@@ -2322,9 +2322,9 @@ void cheatsCBAGenTable()
     cheatsCBATableGenerated = true;
 }
 
-u16 cheatsCBACalcCRC(u8* rom, int count)
+uint16_t cheatsCBACalcCRC(uint8_t* rom, int count)
 {
-    u32 crc = 0xffffffff;
+    uint32_t crc = 0xffffffff;
 
     if (count & 3) {
         // 0x08000EAE
@@ -2332,19 +2332,19 @@ u16 cheatsCBACalcCRC(u8* rom, int count)
         count = (count >> 2) - 1;
         if (count != -1) {
             while (count != -1) {
-                crc = (((crc << 0x08) ^ cheatsCBATable[(((u32)crc << 0x10) >> 0x18)
+                crc = (((crc << 0x08) ^ cheatsCBATable[(((uint32_t)crc << 0x10) >> 0x18)
                                             ^ *rom++])
                           << 0x10)
                     >> 0x10;
-                crc = (((crc << 0x08) ^ cheatsCBATable[(((u32)crc << 0x10) >> 0x18)
+                crc = (((crc << 0x08) ^ cheatsCBATable[(((uint32_t)crc << 0x10) >> 0x18)
                                             ^ *rom++])
                           << 0x10)
                     >> 0x10;
-                crc = (((crc << 0x08) ^ cheatsCBATable[(((u32)crc << 0x10) >> 0x18)
+                crc = (((crc << 0x08) ^ cheatsCBATable[(((uint32_t)crc << 0x10) >> 0x18)
                                             ^ *rom++])
                           << 0x10)
                     >> 0x10;
-                crc = (((crc << 0x08) ^ cheatsCBATable[(((u32)crc << 0x10) >> 0x18)
+                crc = (((crc << 0x08) ^ cheatsCBATable[(((uint32_t)crc << 0x10) >> 0x18)
                                             ^ *rom++])
                           << 0x10)
                     >> 0x10;
@@ -2355,10 +2355,10 @@ u16 cheatsCBACalcCRC(u8* rom, int count)
     return crc & 0xffff;
 }
 
-void cheatsCBADecrypt(u8* decrypt)
+void cheatsCBADecrypt(uint8_t* decrypt)
 {
-    u8 buffer[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    u8* array = &buffer[1];
+    uint8_t buffer[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    uint8_t* array = &buffer[1];
 
     cheatsCBAReverseArray(decrypt, array);
 
@@ -2366,12 +2366,12 @@ void cheatsCBADecrypt(u8* decrypt)
         chatsCBAScramble(array, count, cheatsCBASeedBuffer[count]);
     }
     cheatsCBAArrayToValue(array, decrypt);
-    *((u32*)decrypt) = cheatsCBAGetValue(decrypt) ^ cheatsCBASeed[0];
-    *((u16*)(decrypt + 4)) = (cheatsCBAGetData(decrypt) ^ cheatsCBASeed[1]) & 0xffff;
+    *((uint32_t*)decrypt) = cheatsCBAGetValue(decrypt) ^ cheatsCBASeed[0];
+    *((uint16_t*)(decrypt + 4)) = (cheatsCBAGetData(decrypt) ^ cheatsCBASeed[1]) & 0xffff;
 
     cheatsCBAReverseArray(decrypt, array);
 
-    u32 cs = cheatsCBAGetValue(cheatsCBACurrentSeed);
+    uint32_t cs = cheatsCBAGetValue(cheatsCBACurrentSeed);
     for (int i = 0; i <= 4; i++) {
         array[i] = ((cs >> 8) ^ array[i + 1]) ^ array[i];
     }
@@ -2384,9 +2384,9 @@ void cheatsCBADecrypt(u8* decrypt)
 
     cheatsCBAArrayToValue(array, decrypt);
 
-    *((u32*)decrypt) = cheatsCBAGetValue(decrypt)
+    *((uint32_t*)decrypt) = cheatsCBAGetValue(decrypt)
         ^ cheatsCBASeed[2];
-    *((u16*)(decrypt + 4)) = (cheatsCBAGetData(decrypt)
+    *((uint16_t*)(decrypt + 4)) = (cheatsCBAGetData(decrypt)
                                  ^ cheatsCBASeed[3])
         & 0xffff;
 }
@@ -2448,14 +2448,14 @@ void cheatsAddCBACode(const char* code, const char* desc)
     char buffer[10];
     strncpy(buffer, code, 8);
     buffer[8] = 0;
-    u32 address;
+    uint32_t address;
     sscanf(buffer, "%x", &address);
     strncpy(buffer, &code[9], 4);
     buffer[4] = 0;
-    u32 value;
+    uint32_t value;
     sscanf(buffer, "%x", &value);
 
-    u8 array[8] = {
+    uint8_t array[8] = {
         address & 255,
         (address >> 8) & 255,
         (address >> 16) & 255,
@@ -2467,7 +2467,7 @@ void cheatsAddCBACode(const char* code, const char* desc)
     };
 
     if (cheatsCBAGetCount() == 0 && (address >> 28) == 9) {
-        u32 seed[8];
+        uint32_t seed[8];
         cheatsCBAParseSeedCode(address, value, seed);
         cheatsCBAChangeEncryption(seed);
         cheatsAdd(code, desc, address, address & 0x0FFFFFFF, value, 512, UNKNOWN_CODE);
@@ -2475,8 +2475,8 @@ void cheatsAddCBACode(const char* code, const char* desc)
         if (cheatsCBAShouldDecrypt())
             cheatsCBADecrypt(array);
 
-        address = READ32LE(((u32*)array));
-        value = READ16LE(((u16*)&array[4]));
+        address = READ32LE(((uint32_t*)array));
+        value = READ16LE(((uint16_t*)&array[4]));
 
         int type = (address >> 28) & 15;
 
@@ -2491,7 +2491,7 @@ void cheatsAddCBACode(const char* code, const char* desc)
         case 0x00: {
             if (!cheatsCBATableGenerated)
                 cheatsCBAGenTable();
-            u32 crc = cheatsCBACalcCRC(rom, 0x10000);
+            uint32_t crc = cheatsCBACalcCRC(rom, 0x10000);
             if (crc != address) {
                 systemMessage(MSG_CBA_CODE_WARNING,
                     N_("Warning: Codes seem to be for a different game.\nCodes may not work correctly."));
@@ -2591,10 +2591,10 @@ void cheatsReadGame(gzFile file, int version)
             cheatsList[i].size = utilReadInt(file);
             cheatsList[i].status = utilReadInt(file);
             cheatsList[i].enabled = utilReadInt(file) ? true : false;
-            utilGzRead(file, &cheatsList[i].address, sizeof(u32));
+            utilGzRead(file, &cheatsList[i].address, sizeof(uint32_t));
             cheatsList[i].rawaddress = cheatsList[i].address;
-            utilGzRead(file, &cheatsList[i].value, sizeof(u32));
-            utilGzRead(file, &cheatsList[i].oldValue, sizeof(u32));
+            utilGzRead(file, &cheatsList[i].value, sizeof(uint32_t));
+            utilGzRead(file, &cheatsList[i].oldValue, sizeof(uint32_t));
             utilGzRead(file, &cheatsList[i].codestring, 20 * sizeof(char));
             utilGzRead(file, &cheatsList[i].desc, 32 * sizeof(char));
         }
@@ -2626,15 +2626,15 @@ void cheatsReadGame(gzFile file, int version)
             char buffer[10];
             strncpy(buffer, cheatsList[i].codestring, 8);
             buffer[8] = 0;
-            u32 address;
+            uint32_t address;
             sscanf(buffer, "%x", &address);
             if ((address >> 28) == 9) {
                 strncpy(buffer, &cheatsList[i].codestring[9], 4);
                 buffer[4] = 0;
-                u32 value;
+                uint32_t value;
                 sscanf(buffer, "%x", &value);
 
-                u32 seed[8];
+                uint32_t seed[8];
                 cheatsCBAParseSeedCode(address, value, seed);
                 cheatsCBAChangeEncryption(seed);
             }
@@ -2728,10 +2728,10 @@ bool cheatsLoadCheatList(const char* file)
             fread(&cheatsList[i].status, 1, sizeof(int), f);
             fread(&cheatsList[i].enabled, 1, sizeof(int), f);
             cheatsList[i].enabled = cheatsList[i].enabled ? true : false;
-            fread(&cheatsList[i].address, 1, sizeof(u32), f);
+            fread(&cheatsList[i].address, 1, sizeof(uint32_t), f);
             cheatsList[i].rawaddress = cheatsList[i].address;
-            fread(&cheatsList[i].value, 1, sizeof(u32), f);
-            fread(&cheatsList[i].oldValue, 1, sizeof(u32), f);
+            fread(&cheatsList[i].value, 1, sizeof(uint32_t), f);
+            fread(&cheatsList[i].oldValue, 1, sizeof(uint32_t), f);
             fread(&cheatsList[i].codestring, 1, 20 * sizeof(char), f);
             if (fread(&cheatsList[i].desc, 1, 32 * sizeof(char), f) != 32 * sizeof(char)) {
                 fclose(f);
@@ -2766,15 +2766,15 @@ bool cheatsLoadCheatList(const char* file)
             char buffer[10];
             strncpy(buffer, cheatsList[i].codestring, 8);
             buffer[8] = 0;
-            u32 address;
+            uint32_t address;
             sscanf(buffer, "%x", &address);
             if ((address >> 28) == 9) {
                 strncpy(buffer, &cheatsList[i].codestring[9], 4);
                 buffer[4] = 0;
-                u32 value;
+                uint32_t value;
                 sscanf(buffer, "%x", &value);
 
-                u32 seed[8];
+                uint32_t seed[8];
                 cheatsCBAParseSeedCode(address, value, seed);
                 cheatsCBAChangeEncryption(seed);
             }
@@ -2788,10 +2788,10 @@ bool cheatsLoadCheatList(const char* file)
 
 extern int cpuNextEvent;
 
-extern void debuggerBreakOnWrite(u32, u32, u32, int, int);
+extern void debuggerBreakOnWrite(uint32_t, uint32_t, uint32_t, int, int);
 
 #ifdef BKPT_SUPPORT
-static u8 cheatsGetType(u32 address)
+static uint8_t cheatsGetType(uint32_t address)
 {
     switch (address >> 24) {
     case 2:
@@ -2812,12 +2812,12 @@ static u8 cheatsGetType(u32 address)
 }
 #endif
 
-void cheatsWriteMemory(u32 address, u32 value)
+void cheatsWriteMemory(uint32_t address, uint32_t value)
 {
 #ifdef BKPT_SUPPORT
     if (cheatsNumber == 0) {
         int type = cheatsGetType(address);
-        u32 oldValue = debuggerReadMemory(address);
+        uint32_t oldValue = debuggerReadMemory(address);
         if (type == 1 || (type == 2 && oldValue != value)) {
             debuggerBreakOnWrite(address, oldValue, value, 2, type);
             cpuNextEvent = 0;
@@ -2827,12 +2827,12 @@ void cheatsWriteMemory(u32 address, u32 value)
 #endif
 }
 
-void cheatsWriteHalfWord(u32 address, u16 value)
+void cheatsWriteHalfWord(uint32_t address, uint16_t value)
 {
 #ifdef BKPT_SUPPORT
     if (cheatsNumber == 0) {
         int type = cheatsGetType(address);
-        u16 oldValue = debuggerReadHalfWord(address);
+        uint16_t oldValue = debuggerReadHalfWord(address);
         if (type == 1 || (type == 2 && oldValue != value)) {
             debuggerBreakOnWrite(address, oldValue, value, 1, type);
             cpuNextEvent = 0;
@@ -2842,12 +2842,12 @@ void cheatsWriteHalfWord(u32 address, u16 value)
 #endif
 }
 
-void cheatsWriteByte(u32 address, u8 value)
+void cheatsWriteByte(uint32_t address, uint8_t value)
 {
 #ifdef BKPT_SUPPORT
     if (cheatsNumber == 0) {
         int type = cheatsGetType(address);
-        u8 oldValue = debuggerReadByte(address);
+        uint8_t oldValue = debuggerReadByte(address);
         if (type == 1 || (type == 2 && oldValue != value)) {
             debuggerBreakOnWrite(address, oldValue, value, 0, type);
             cpuNextEvent = 0;

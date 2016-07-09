@@ -10,32 +10,32 @@ CheatSearchData cheatSearchData = {
     cheatSearchBlocks
 };
 
-static bool cheatSearchEQ(u32 a, u32 b)
+static bool cheatSearchEQ(uint32_t a, uint32_t b)
 {
     return a == b;
 }
 
-static bool cheatSearchNE(u32 a, u32 b)
+static bool cheatSearchNE(uint32_t a, uint32_t b)
 {
     return a != b;
 }
 
-static bool cheatSearchLT(u32 a, u32 b)
+static bool cheatSearchLT(uint32_t a, uint32_t b)
 {
     return a < b;
 }
 
-static bool cheatSearchLE(u32 a, u32 b)
+static bool cheatSearchLE(uint32_t a, uint32_t b)
 {
     return a <= b;
 }
 
-static bool cheatSearchGT(u32 a, u32 b)
+static bool cheatSearchGT(uint32_t a, uint32_t b)
 {
     return a > b;
 }
 
-static bool cheatSearchGE(u32 a, u32 b)
+static bool cheatSearchGE(uint32_t a, uint32_t b)
 {
     return a >= b;
 }
@@ -70,7 +70,7 @@ static bool cheatSearchSignedGE(s32 a, s32 b)
     return a >= b;
 }
 
-static bool (*cheatSearchFunc[])(u32, u32) = {
+static bool (*cheatSearchFunc[])(uint32_t, uint32_t) = {
     cheatSearchEQ,
     cheatSearchNE,
     cheatSearchLT,
@@ -111,36 +111,36 @@ void cheatSearchStart(const CheatSearchData* cs)
     }
 }
 
-s32 cheatSearchSignedRead(u8* data, int off, int size)
+s32 cheatSearchSignedRead(uint8_t* data, int off, int size)
 {
-    u32 res = data[off++];
+    uint32_t res = data[off++];
 
     switch (size) {
     case BITS_8:
         res <<= 24;
         return ((s32)res) >> 24;
     case BITS_16:
-        res |= ((u32)data[off++]) << 8;
+        res |= ((uint32_t)data[off++]) << 8;
         res <<= 16;
         return ((s32)res) >> 16;
     case BITS_32:
-        res |= ((u32)data[off++]) << 8;
-        res |= ((u32)data[off++]) << 16;
-        res |= ((u32)data[off++]) << 24;
+        res |= ((uint32_t)data[off++]) << 8;
+        res |= ((uint32_t)data[off++]) << 16;
+        res |= ((uint32_t)data[off++]) << 24;
         return (s32)res;
     }
     return (s32)res;
 }
 
-u32 cheatSearchRead(u8* data, int off, int size)
+uint32_t cheatSearchRead(uint8_t* data, int off, int size)
 {
-    u32 res = data[off++];
+    uint32_t res = data[off++];
     if (size == BITS_16)
-        res |= ((u32)data[off++]) << 8;
+        res |= ((uint32_t)data[off++]) << 8;
     else if (size == BITS_32) {
-        res |= ((u32)data[off++]) << 8;
-        res |= ((u32)data[off++]) << 16;
-        res |= ((u32)data[off++]) << 24;
+        res |= ((uint32_t)data[off++]) << 8;
+        res |= ((uint32_t)data[off++]) << 16;
+        res |= ((uint32_t)data[off++]) << 24;
     }
     return res;
 }
@@ -162,9 +162,9 @@ void cheatSearch(const CheatSearchData* cs, int compare, int size,
         for (int i = 0; i < cs->count; i++) {
             CheatSearchBlock* block = &cs->blocks[i];
             int size2 = block->size;
-            u8* bits = block->bits;
-            u8* data = block->data;
-            u8* saved = block->saved;
+            uint8_t* bits = block->bits;
+            uint8_t* data = block->data;
+            uint8_t* saved = block->saved;
 
             for (int j = 0; j < size2; j += inc) {
                 if (IS_BIT_SET(bits, j)) {
@@ -184,19 +184,19 @@ void cheatSearch(const CheatSearchData* cs, int compare, int size,
             }
         }
     } else {
-        bool (*func)(u32, u32) = cheatSearchFunc[compare];
+        bool (*func)(uint32_t, uint32_t) = cheatSearchFunc[compare];
 
         for (int i = 0; i < cs->count; i++) {
             CheatSearchBlock* block = &cs->blocks[i];
             int size2 = block->size;
-            u8* bits = block->bits;
-            u8* data = block->data;
-            u8* saved = block->saved;
+            uint8_t* bits = block->bits;
+            uint8_t* data = block->data;
+            uint8_t* saved = block->saved;
 
             for (int j = 0; j < size2; j += inc) {
                 if (IS_BIT_SET(bits, j)) {
-                    u32 a = cheatSearchRead(data, j, size);
-                    u32 b = cheatSearchRead(saved, j, size);
+                    uint32_t a = cheatSearchRead(data, j, size);
+                    uint32_t b = cheatSearchRead(saved, j, size);
 
                     if (!func(a, b)) {
                         CLEAR_BIT(bits, j);
@@ -214,7 +214,7 @@ void cheatSearch(const CheatSearchData* cs, int compare, int size,
 }
 
 void cheatSearchValue(const CheatSearchData* cs, int compare, int size,
-    bool isSigned, u32 value)
+    bool isSigned, uint32_t value)
 {
     if (compare < 0 || compare > SEARCH_GE)
         return;
@@ -230,8 +230,8 @@ void cheatSearchValue(const CheatSearchData* cs, int compare, int size,
         for (int i = 0; i < cs->count; i++) {
             CheatSearchBlock* block = &cs->blocks[i];
             int size2 = block->size;
-            u8* bits = block->bits;
-            u8* data = block->data;
+            uint8_t* bits = block->bits;
+            uint8_t* data = block->data;
 
             for (int j = 0; j < size2; j += inc) {
                 if (IS_BIT_SET(bits, j)) {
@@ -251,17 +251,17 @@ void cheatSearchValue(const CheatSearchData* cs, int compare, int size,
             }
         }
     } else {
-        bool (*func)(u32, u32) = cheatSearchFunc[compare];
+        bool (*func)(uint32_t, uint32_t) = cheatSearchFunc[compare];
 
         for (int i = 0; i < cs->count; i++) {
             CheatSearchBlock* block = &cs->blocks[i];
             int size2 = block->size;
-            u8* bits = block->bits;
-            u8* data = block->data;
+            uint8_t* bits = block->bits;
+            uint8_t* data = block->data;
 
             for (int j = 0; j < size2; j += inc) {
                 if (IS_BIT_SET(bits, j)) {
-                    u32 a = cheatSearchRead(data, j, size);
+                    uint32_t a = cheatSearchRead(data, j, size);
 
                     if (!func(a, value)) {
                         CLEAR_BIT(bits, j);
@@ -291,7 +291,7 @@ int cheatSearchGetCount(const CheatSearchData* cs, int size)
         CheatSearchBlock* block = &cs->blocks[i];
 
         int size2 = block->size;
-        u8* bits = block->bits;
+        uint8_t* bits = block->bits;
         for (int j = 0; j < size2; j += inc) {
             if (IS_BIT_SET(bits, j))
                 res++;

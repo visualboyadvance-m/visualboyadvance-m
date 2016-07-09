@@ -5,10 +5,10 @@
 
 struct CheatSearchBlock {
     int size;
-    u32 offset;
-    u8* bits;
-    u8* data;
-    u8* saved;
+    uint32_t offset;
+    uint8_t* bits;
+    uint8_t* data;
+    uint8_t* saved;
 };
 
 struct CheatSearchData {
@@ -38,10 +38,10 @@ extern CheatSearchData cheatSearchData;
 void cheatSearchCleanup(CheatSearchData* cs);
 void cheatSearchStart(const CheatSearchData* cs);
 void cheatSearch(const CheatSearchData* cs, int compare, int size, bool isSigned);
-void cheatSearchValue(const CheatSearchData* cs, int compare, int size, bool isSigned, u32 value);
+void cheatSearchValue(const CheatSearchData* cs, int compare, int size, bool isSigned, uint32_t value);
 int cheatSearchGetCount(const CheatSearchData* cs, int size);
 void cheatSearchUpdateValues(const CheatSearchData* cs);
-s32 cheatSearchSignedRead(u8* data, int off, int size);
-u32 cheatSearchRead(u8* data, int off, int size);
+int32_t cheatSearchSignedRead(uint8_t* data, int off, int size);
+uint32_t cheatSearchRead(uint8_t* data, int off, int size);
 
 #endif // CHEATSEARCH_H
