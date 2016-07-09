@@ -101,165 +101,165 @@ break;
 case 0x10:
 // RL B
 if (BC.B.B1 & 0x80) {
-        BC.B.B1 = (BC.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[BC.B.B1] | C_FLAG;
+    BC.B.B1 = (BC.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[BC.B.B1] | C_FLAG;
 } else {
-        BC.B.B1 = (BC.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[BC.B.B1];
+    BC.B.B1 = (BC.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[BC.B.B1];
 }
 break;
 case 0x11:
 // RL C
 if (BC.B.B0 & 0x80) {
-        BC.B.B0 = (BC.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[BC.B.B0] | C_FLAG;
+    BC.B.B0 = (BC.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[BC.B.B0] | C_FLAG;
 } else {
-        BC.B.B0 = (BC.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[BC.B.B0];
+    BC.B.B0 = (BC.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[BC.B.B0];
 }
 break;
 case 0x12:
 // RL D
 if (DE.B.B1 & 0x80) {
-        DE.B.B1 = (DE.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[DE.B.B1] | C_FLAG;
+    DE.B.B1 = (DE.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[DE.B.B1] | C_FLAG;
 } else {
-        DE.B.B1 = (DE.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[DE.B.B1];
+    DE.B.B1 = (DE.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[DE.B.B1];
 }
 break;
 case 0x13:
 // RL E
 if (DE.B.B0 & 0x80) {
-        DE.B.B0 = (DE.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[DE.B.B0] | C_FLAG;
+    DE.B.B0 = (DE.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[DE.B.B0] | C_FLAG;
 } else {
-        DE.B.B0 = (DE.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[DE.B.B0];
+    DE.B.B0 = (DE.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[DE.B.B0];
 }
 break;
 case 0x14:
 // RL H
 if (HL.B.B1 & 0x80) {
-        HL.B.B1 = (HL.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[HL.B.B1] | C_FLAG;
+    HL.B.B1 = (HL.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[HL.B.B1] | C_FLAG;
 } else {
-        HL.B.B1 = (HL.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[HL.B.B1];
+    HL.B.B1 = (HL.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[HL.B.B1];
 }
 break;
 case 0x15:
 // RL L
 if (HL.B.B0 & 0x80) {
-        HL.B.B0 = (HL.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[HL.B.B0] | C_FLAG;
+    HL.B.B0 = (HL.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[HL.B.B0] | C_FLAG;
 } else {
-        HL.B.B0 = (HL.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[HL.B.B0];
+    HL.B.B0 = (HL.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[HL.B.B0];
 }
 break;
 case 0x16:
 // RL (HL)
 tempValue = gbReadMemory(HL.W);
 if (tempValue & 0x80) {
-        tempValue = (tempValue << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[tempValue] | C_FLAG;
+    tempValue = (tempValue << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[tempValue] | C_FLAG;
 } else {
-        tempValue = (tempValue << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[tempValue];
+    tempValue = (tempValue << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[tempValue];
 }
 gbWriteMemory(HL.W, tempValue);
 break;
 case 0x17:
 // RL A
 if (AF.B.B1 & 0x80) {
-        AF.B.B1 = (AF.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[AF.B.B1] | C_FLAG;
+    AF.B.B1 = (AF.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[AF.B.B1] | C_FLAG;
 } else {
-        AF.B.B1 = (AF.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-        AF.B.B0 = ZeroTable[AF.B.B1];
+    AF.B.B1 = (AF.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[AF.B.B1];
 }
 break;
 case 0x18:
 // RR B
 if (BC.B.B1 & 0x01) {
-        BC.B.B1 = (BC.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[BC.B.B1] | C_FLAG;
+    BC.B.B1 = (BC.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[BC.B.B1] | C_FLAG;
 } else {
-        BC.B.B1 = (BC.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[BC.B.B1];
+    BC.B.B1 = (BC.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[BC.B.B1];
 }
 break;
 case 0x19:
 // RR C
 if (BC.B.B0 & 0x01) {
-        BC.B.B0 = (BC.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[BC.B.B0] | C_FLAG;
+    BC.B.B0 = (BC.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[BC.B.B0] | C_FLAG;
 } else {
-        BC.B.B0 = (BC.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[BC.B.B0];
+    BC.B.B0 = (BC.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[BC.B.B0];
 }
 break;
 case 0x1a:
 // RR D
 if (DE.B.B1 & 0x01) {
-        DE.B.B1 = (DE.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[DE.B.B1] | C_FLAG;
+    DE.B.B1 = (DE.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[DE.B.B1] | C_FLAG;
 } else {
-        DE.B.B1 = (DE.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[DE.B.B1];
+    DE.B.B1 = (DE.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[DE.B.B1];
 }
 break;
 case 0x1b:
 // RR E
 if (DE.B.B0 & 0x01) {
-        DE.B.B0 = (DE.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[DE.B.B0] | C_FLAG;
+    DE.B.B0 = (DE.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[DE.B.B0] | C_FLAG;
 } else {
-        DE.B.B0 = (DE.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[DE.B.B0];
+    DE.B.B0 = (DE.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[DE.B.B0];
 }
 break;
 case 0x1c:
 // RR H
 if (HL.B.B1 & 0x01) {
-        HL.B.B1 = (HL.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[HL.B.B1] | C_FLAG;
+    HL.B.B1 = (HL.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[HL.B.B1] | C_FLAG;
 } else {
-        HL.B.B1 = (HL.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[HL.B.B1];
+    HL.B.B1 = (HL.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[HL.B.B1];
 }
 break;
 case 0x1d:
 // RR L
 if (HL.B.B0 & 0x01) {
-        HL.B.B0 = (HL.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[HL.B.B0] | C_FLAG;
+    HL.B.B0 = (HL.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[HL.B.B0] | C_FLAG;
 } else {
-        HL.B.B0 = (HL.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[HL.B.B0];
+    HL.B.B0 = (HL.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[HL.B.B0];
 }
 break;
 case 0x1e:
 // RR (HL)
 tempValue = gbReadMemory(HL.W);
 if (tempValue & 0x01) {
-        tempValue = (tempValue >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[tempValue] | C_FLAG;
+    tempValue = (tempValue >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[tempValue] | C_FLAG;
 } else {
-        tempValue = (tempValue >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[tempValue];
+    tempValue = (tempValue >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[tempValue];
 }
 gbWriteMemory(HL.W, tempValue);
 break;
 case 0x1f:
 // RR A
 if (AF.B.B1 & 0x01) {
-        AF.B.B1 = (AF.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[AF.B.B1] | C_FLAG;
+    AF.B.B1 = (AF.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[AF.B.B1] | C_FLAG;
 } else {
-        AF.B.B1 = (AF.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-        AF.B.B0 = ZeroTable[AF.B.B1];
+    AF.B.B1 = (AF.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[AF.B.B1];
 }
 break;
 case 0x20:
@@ -1264,7 +1264,7 @@ AF.B.B1 |= 1 << 7;
 break;
 default:
 if (gbSystemMessage == false) {
-        systemMessage(0, N_("Unknown opcode %02x at %04x"), gbReadOpcode(PC.W - 1), PC.W - 1);
-        gbSystemMessage = true;
+    systemMessage(0, N_("Unknown opcode %02x at %04x"), gbReadOpcode(PC.W - 1), PC.W - 1);
+    gbSystemMessage = true;
 }
 return;

@@ -7,41 +7,41 @@
 #define Z_FLAG 0x80
 
 typedef union {
-        struct {
+    struct {
 #ifdef WORDS_BIGENDIAN
-                uint8_t B1, B0;
+        uint8_t B1, B0;
 #else
-                uint8_t B0, B1;
+        uint8_t B0, B1;
 #endif
-        } B;
-        uint16_t W;
+    } B;
+    uint16_t W;
 } gbRegister;
 
 extern gbRegister AF, BC, DE, HL, SP, PC;
 extern uint16_t IFF;
-int gbDis(char *, u16);
+int gbDis(char*, u16);
 
-bool gbLoadRom(const char *);
+bool gbLoadRom(const char*);
 bool gbUpdateSizes();
 void gbEmulate(int);
 void gbWriteMemory(register uint16_t, register uint8_t);
 void gbDrawLine();
-bool gbIsGameboyRom(const char *);
+bool gbIsGameboyRom(const char*);
 void gbGetHardwareType();
 void gbReset();
 void gbCleanUp();
-void gbCPUInit(const char *, bool);
-bool gbWriteBatteryFile(const char *);
-bool gbWriteBatteryFile(const char *, bool);
-bool gbReadBatteryFile(const char *);
-bool gbWriteSaveState(const char *);
-bool gbWriteMemSaveState(char *, int, long &);
-bool gbReadSaveState(const char *);
-bool gbReadMemSaveState(char *, int);
+void gbCPUInit(const char*, bool);
+bool gbWriteBatteryFile(const char*);
+bool gbWriteBatteryFile(const char*, bool);
+bool gbReadBatteryFile(const char*);
+bool gbWriteSaveState(const char*);
+bool gbWriteMemSaveState(char*, int, long&);
+bool gbReadSaveState(const char*);
+bool gbReadMemSaveState(char*, int);
 void gbSgbRenderBorder();
-bool gbWritePNGFile(const char *);
-bool gbWriteBMPFile(const char *);
-bool gbReadGSASnapshot(const char *);
+bool gbWritePNGFile(const char*);
+bool gbWriteBMPFile(const char*);
+bool gbReadGSASnapshot(const char*);
 
 extern int gbHardware;
 

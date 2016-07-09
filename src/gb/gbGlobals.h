@@ -7,17 +7,17 @@ extern int gbRamSize;
 extern int gbRamSizeMask;
 extern int gbTAMA5ramSize;
 
-extern u8 *bios;
+extern u8* bios;
 
-extern u8 *gbRom;
-extern u8 *gbRam;
-extern u8 *gbVram;
-extern u8 *gbWram;
-extern u8 *gbMemory;
-extern u16 *gbLineBuffer;
-extern u8 *gbTAMA5ram;
+extern u8* gbRom;
+extern u8* gbRam;
+extern u8* gbVram;
+extern u8* gbWram;
+extern u8* gbMemory;
+extern u16* gbLineBuffer;
+extern u8* gbTAMA5ram;
 
-extern u8 *gbMemoryMap[16];
+extern u8* gbMemoryMap[16];
 
 extern int gbFrameSkip;
 extern u16 gbColorFilter[32768];
