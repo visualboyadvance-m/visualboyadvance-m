@@ -34,12 +34,12 @@ SoundSDL::SoundSDL():
 
 }
 
-void SoundSDL::soundCallback(void *data, u8 *stream, int len)
+void SoundSDL::soundCallback(void *data, uint8_t *stream, int len)
 {
-	reinterpret_cast<SoundSDL*>(data)->read(reinterpret_cast<u16 *>(stream), len);
+	reinterpret_cast<SoundSDL*>(data)->read(reinterpret_cast<uint16_t *>(stream), len);
 }
 
-void SoundSDL::read(u16 * stream, int length)
+void SoundSDL::read(uint16_t * stream, int length)
 {
 	if (!_initialized || length <= 0 || !emulating)
 		return;
@@ -62,7 +62,7 @@ void SoundSDL::read(u16 * stream, int length)
 	SDL_SemPost (_semBufferEmpty);
 }
 
-void SoundSDL::write(u16 * finalWave, int length)
+void SoundSDL::write(uint16_t * finalWave, int length)
 {
 	if (!_initialized)
 		return;

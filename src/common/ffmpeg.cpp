@@ -285,14 +285,14 @@ MediaRet MediaRecorder::finish_setup(const char *fname)
 	case CODEC_ID_PCM_U16BE:
 	    frame_len = sample_len;
 	}
-	audio_buf = (u8 *)malloc(AUDIO_BUF_LEN);
+	audio_buf = (uint8_t *)malloc(AUDIO_BUF_LEN);
 	if(!audio_buf) {
 	    avformat_free_context(oc);
 	    oc = NULL;
 	    return MRET_ERR_NOMEM;
 	}
 	if(frame_len != sample_len && (frame_len > sample_len || sample_len % frame_len)) {
-	    audio_buf2 = (u16 *)malloc(frame_len);
+	    audio_buf2 = (uint16_t *)malloc(frame_len);
 	    if(!audio_buf2) {
 		avformat_free_context(oc);
 		oc = NULL;
@@ -304,7 +304,7 @@ MediaRet MediaRecorder::finish_setup(const char *fname)
     if(video_buf)
 	free(video_buf);
     if(vid_st) {
-	video_buf = (u8 *)malloc(VIDEO_BUF_LEN);
+	video_buf = (uint8_t *)malloc(VIDEO_BUF_LEN);
 	if(!video_buf) {
 	    avformat_free_context(oc);
 	    oc = NULL;
@@ -361,7 +361,7 @@ void MediaRecorder::Stop()
 {
     if(oc) {
 	if(in_audio_buf2)
-	    AddFrame((u16 *)0);
+	    AddFrame((uint16_t *)0);
 	av_write_trailer(oc);
 	avformat_free_context(oc);
 	oc = NULL;
@@ -395,7 +395,7 @@ MediaRecorder::~MediaRecorder()
 }
 
 // Still needs updating for avcodec_encode_video2
-MediaRet MediaRecorder::AddFrame(const u8 *vid)
+MediaRet MediaRecorder::AddFrame(const uint8_t *vid)
 {
     if(!oc || !vid_st)
 	return MRET_OK;
@@ -527,7 +527,7 @@ static inline int MediaRecorderEncodeAudio(AVCodecContext *ctx,
 }
 #endif
 
-MediaRet MediaRecorder::AddFrame(const u16 *aud)
+MediaRet MediaRecorder::AddFrame(const uint16_t *aud)
 {
     if(!oc || !aud_st)
 	return MRET_OK;

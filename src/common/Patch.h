@@ -3,6 +3,6 @@
 
 #include "Types.h"
 
-bool applyPatch(const char *patchname, u8 **rom, int *size);
+bool applyPatch(const char *patchname, uint8_t **rom, int *size);
 
 #endif // PATCH_H

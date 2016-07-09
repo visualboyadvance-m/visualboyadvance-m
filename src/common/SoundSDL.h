@@ -36,7 +36,7 @@ class SoundSDL : public SoundDriver
         virtual void write(u16 *finalWave, int length);
 
         private:
-        RingBuffer<u16> _rbuf;
+        RingBuffer<uint16_t> _rbuf;
 
         SDL_mutex *_mutex;
         SDL_sem *_semBufferFull;
@@ -51,7 +51,7 @@ class SoundSDL : public SoundDriver
         static const float _delay;
 
         static void soundCallback(void *data, u8 *stream, int length);
-        virtual void read(u16 *stream, int length);
+        virtual void read(uint16_t *stream, int length);
 };
 
 #endif // __VBA_SOUND_SDL_H__

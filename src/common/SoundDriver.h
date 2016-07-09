@@ -18,8 +18,6 @@
 #ifndef __VBA_SOUND_DRIVER_H__
 #define __VBA_SOUND_DRIVER_H__
 
-#include "Types.h"
-
 /**
  * Sound driver abstract interface for the core to use to output sound.
  * Subclass this to implement a new sound driver.
@@ -56,7 +54,7 @@ class SoundDriver
         /**
          * Write length bytes of data from the finalWave buffer to the driver output buffer.
          */
-        virtual void write(u16 *finalWave, int length) = 0;
+        virtual void write(uint16_t *finalWave, int length) = 0;
 
         virtual void setThrottle(unsigned short throttle){};
 };
