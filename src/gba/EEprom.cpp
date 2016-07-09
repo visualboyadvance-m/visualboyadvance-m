@@ -13,13 +13,13 @@ int eepromAddress = 0;
 
 #ifdef __LIBRETRO__
 // Workaround for broken-by-design GBA save semantics
-extern u8 libretro_save_buf[0x20000 + 0x2000];
-u8* eepromData = libretro_save_buf + 0x20000;
+extern uint8_t libretro_save_buf[0x20000 + 0x2000];
+uint8_t* eepromData = libretro_save_buf + 0x20000;
 #else
-u8 eepromData[0x2000];
+uint8_t eepromData[0x2000];
 #endif
 
-u8 eepromBuffer[16];
+uint8_t eepromBuffer[16];
 bool eepromInUse = false;
 int eepromSize = 512;
 
@@ -103,7 +103,7 @@ void eepromReadGameSkip(gzFile gzFile, int version)
 }
 #endif
 
-int eepromRead(u32 /* address */)
+int eepromRead(uint32_t /* address */)
 {
     switch (eepromMode) {
     case EEPROM_IDLE:
@@ -137,7 +137,7 @@ int eepromRead(u32 /* address */)
     return 1;
 }
 
-void eepromWrite(u32 /* address */, u8 value)
+void eepromWrite(uint32_t /* address */, uint8_t value)
 {
     if (cpuDmaCount == 0)
         return;
