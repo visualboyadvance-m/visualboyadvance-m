@@ -236,9 +236,9 @@ int winGbBorderOn;
 int winGbPrinterEnabled;
 int winPauseNextFrame;
 int* rewindSerials = NULL;
-u32 autoFrameSkipLastTime;
-u32 movieLastJoypad;
-u32 movieNextJoypad;
+uint32_t autoFrameSkipLastTime;
+uint32_t movieLastJoypad;
+uint32_t movieNextJoypad;
 int throttle;
 
 const char* preparedCheatCodes[MAX_CHEATS];
@@ -252,7 +252,7 @@ char *(patchNames[PATCH_MAX_NUM]) = { NULL }; // and so on
 
 void(*dbgMain)() = remoteStubMain;
 void(*dbgSignal)(int, int) = remoteStubSignal;
-void(*dbgOutput)(const char *, u32) = debuggerOutput;
+void(*dbgOutput)(const char *, uint32_t) = debuggerOutput;
 
 char* homeDir = NULL;
 char* arg0 = NULL;
@@ -388,20 +388,20 @@ struct option argOptions[] = {
 };
 
 
-u32 fromHex(const char *s)
+uint32_t fromHex(const char *s)
 {
 	if (!s)
 		return 0;
-	u32 value;
+	uint32_t value;
 	sscanf(s, "%x", &value);
 	return value;
 }
 
-u32 fromDec(const char *s)
+uint32_t fromDec(const char *s)
 {
 	if (!s)
 		return 0;
-	u32 value = 0;
+	uint32_t value = 0;
 	sscanf(s, "%u", &value);
 	return value;
 }
@@ -773,7 +773,7 @@ void SaveConfigFile()
 	}
 }
 
-u32 ReadPrefHex(const char* pref_key, int default_value)
+uint32_t ReadPrefHex(const char* pref_key, int default_value)
 {
     std::stringstream ss;
     std::string default_string;
@@ -786,7 +786,7 @@ u32 ReadPrefHex(const char* pref_key, int default_value)
     return fromHex(iniparser_getstring(preferences, pref.c_str(), default_string.c_str()));
 }
 
-u32 ReadPrefHex(const char* pref_key)
+uint32_t ReadPrefHex(const char* pref_key)
 {
 	LoadConfigFile();
 	std::string pref = "preferences:";
@@ -794,7 +794,7 @@ u32 ReadPrefHex(const char* pref_key)
 	return fromHex(iniparser_getstring(preferences, pref.c_str(), 0));
 }
 
-u32 ReadPref(const char* pref_key, int default_value)
+uint32_t ReadPref(const char* pref_key, int default_value)
 {
 	LoadConfigFile();
 	std::string pref = "preferences:";
@@ -802,7 +802,7 @@ u32 ReadPref(const char* pref_key, int default_value)
 	return iniparser_getint(preferences, pref.c_str(), default_value);
 }
 
-u32 ReadPref(const char* pref_key)
+uint32_t ReadPref(const char* pref_key)
 {
 	return ReadPref(pref_key, 0);
 }
