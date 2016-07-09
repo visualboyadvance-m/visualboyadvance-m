@@ -21,7 +21,7 @@
 #define _stricmp strcasecmp
 #endif
 
-extern u8 *pix;
+extern uint8_t *pix;
 bool gbUpdateSizes();
 bool inBios = false;
 
@@ -29,12 +29,12 @@ bool inBios = false;
 bool memorydebug = false;
 char gbBuffer[2048];
 
-extern u16 gbLineMix[160];
+extern uint16_t gbLineMix[160];
 
 // mappers
-void (*mapper)(u16,u8) = NULL;
-void (*mapperRAM)(u16,u8) = NULL;
-u8 (*mapperReadRAM)(u16) = NULL;
+void (*mapper)(uint16_t,uint8_t) = NULL;
+void (*mapperRAM)(uint16_t,uint8_t) = NULL;
+uint8_t (*mapperReadRAM)(uint16_t) = NULL;
 void (*mapperUpdateClock)() = NULL;
 
 // registers
@@ -44,51 +44,51 @@ gbRegister AF;
 gbRegister BC;
 gbRegister DE;
 gbRegister HL;
-u16 IFF = 0;
+uint16_t IFF = 0;
 // 0xff04
-u8 register_DIV   = 0;
+uint8_t register_DIV   = 0;
 // 0xff05
-u8 register_TIMA  = 0;
+uint8_t register_TIMA  = 0;
 // 0xff06
-u8 register_TMA   = 0;
+uint8_t register_TMA   = 0;
 // 0xff07
-u8 register_TAC   = 0;
+uint8_t register_TAC   = 0;
 // 0xff0f
-u8 register_IF    = 0;
+uint8_t register_IF    = 0;
 // 0xff40
-u8 register_LCDC  = 0;
+uint8_t register_LCDC  = 0;
 // 0xff41
-u8 register_STAT  = 0;
+uint8_t register_STAT  = 0;
 // 0xff42
-u8 register_SCY   = 0;
+uint8_t register_SCY   = 0;
 // 0xff43
-u8 register_SCX   = 0;
+uint8_t register_SCX   = 0;
 // 0xff44
-u8 register_LY    = 0;
+uint8_t register_LY    = 0;
 // 0xff45
-u8 register_LYC   = 0;
+uint8_t register_LYC   = 0;
 // 0xff46
-u8 register_DMA   = 0;
+uint8_t register_DMA   = 0;
 // 0xff4a
-u8 register_WY    = 0;
+uint8_t register_WY    = 0;
 // 0xff4b
-u8 register_WX    = 0;
+uint8_t register_WX    = 0;
 // 0xff4f
-u8 register_VBK   = 0;
+uint8_t register_VBK   = 0;
 // 0xff51
-u8 register_HDMA1 = 0;
+uint8_t register_HDMA1 = 0;
 // 0xff52
-u8 register_HDMA2 = 0;
+uint8_t register_HDMA2 = 0;
 // 0xff53
-u8 register_HDMA3 = 0;
+uint8_t register_HDMA3 = 0;
 // 0xff54
-u8 register_HDMA4 = 0;
+uint8_t register_HDMA4 = 0;
 // 0xff55
-u8 register_HDMA5 = 0;
+uint8_t register_HDMA5 = 0;
 // 0xff70
-u8 register_SVBK  = 0;
+uint8_t register_SVBK  = 0;
 // 0xffff
-u8 register_IE    = 0;
+uint8_t register_IE    = 0;
 
 // ticks definition
 int GBDIV_CLOCK_TICKS          = 64;
@@ -116,7 +116,7 @@ int gbRemainingClockTicks = 0;
 int gbOldClockTicks = 0;
 int gbIntBreak = 0;
 int gbInterruptLaunched = 0;
-u8 gbCheatingDevice = 0; // 1 = GS, 2 = GG
+uint8_t gbCheatingDevice = 0; // 1 = GS, 2 = GG
 // breakpoint
 bool breakpoint = false;
 // interrupt
@@ -136,8 +136,8 @@ bool gbIncreased = false;
 // not reset by writing to register_TIMA/TMA, but by
 // writing to register_DIV...
 int gbInternalTimer = 0x55;
-const u8 gbTimerMask [4] = {0xff, 0x3, 0xf, 0x3f};
-const u8 gbTimerBug [8] = {0x80, 0x80, 0x02, 0x02, 0x0, 0xff, 0x0, 0xff};
+const uint8_t gbTimerMask [4] = {0xff, 0x3, 0xf, 0x3f};
+const uint8_t gbTimerBug [8] = {0x80, 0x80, 0x02, 0x02, 0x0, 0xff, 0x0, 0xff};
 bool gbTimerModeChange = false;
 bool gbTimerOnChange = false;
 // lcd
@@ -149,13 +149,13 @@ int gbLcdTicksDelayed = GBLCD_MODE_2_CLOCK_TICKS;
 int gbLcdLYIncrementTicks = 114;
 int gbLcdLYIncrementTicksDelayed = 115;
 int gbScreenTicks = 0;
-u8 gbSCYLine[300];
-u8 gbSCXLine[300];
-u8 gbBgpLine[300];
-u8 gbObp0Line [300];
-u8 gbObp1Line [300];
-u8 gbSpritesTicks [300];
-u8 oldRegister_WY;
+uint8_t gbSCYLine[300];
+uint8_t gbSCXLine[300];
+uint8_t gbBgpLine[300];
+uint8_t gbObp0Line [300];
+uint8_t gbObp1Line [300];
+uint8_t gbSpritesTicks [300];
+uint8_t oldRegister_WY;
 bool gbLYChangeHappened = false;
 bool gbLCDChangeHappened = false;
 int gbLine99Ticks = 1;
@@ -187,9 +187,9 @@ int gbFrameCount = 0;
 int gbFrameSkip = 0;
 int gbFrameSkipCount = 0;
 // timing
-u32 gbLastTime = 0;
-u32 gbElapsedTime = 0;
-u32 gbTimeNow = 0;
+uint32_t gbLastTime = 0;
+uint32_t gbElapsedTime = 0;
+uint32_t gbTimeNow = 0;
 int gbSynchronizeTicks = GBSYNCHRONIZE_CLOCK_TICKS;
 // emulator features
 int gbBattery = 0;
@@ -199,7 +199,7 @@ bool gbCapture = false;
 bool gbCapturePrevious = false;
 int gbJoymask[4] = { 0, 0, 0, 0 };
 
-u8 gbRamFill = 0xff;
+uint8_t gbRamFill = 0xff;
 
 int gbRomSizes[] = { 0x00008000, // 32K
                      0x00010000, // 64K
@@ -278,7 +278,7 @@ int gbCyclesCB[] = {
     2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 4, 2   // f
 };
 
-u16 DAATable[] = {
+uint16_t DAATable[] = {
   0x0080,0x0100,0x0200,0x0300,0x0400,0x0500,0x0600,0x0700,
   0x0800,0x0900,0x1000,0x1100,0x1200,0x1300,0x1400,0x1500,
   0x1000,0x1100,0x1200,0x1300,0x1400,0x1500,0x1600,0x1700,
@@ -537,7 +537,7 @@ u16 DAATable[] = {
   0x9250,0x9350,0x9450,0x9550,0x9650,0x9750,0x9850,0x9950,
 };
 
-u8 ZeroTable[256] = {
+uint8_t ZeroTable[256] = {
   0x80,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -565,7 +565,7 @@ u8 ZeroTable[256] = {
 };
 
 // Title checksums that are treated specially by the CGB boot ROM
-static const u8 gbColorizationChecksums[79] = {
+static const uint8_t gbColorizationChecksums[79] = {
   0x00, 0x88, 0x16, 0x36, 0xD1, 0xDB, 0xF2, 0x3C, 0x8C, 0x92, 0x3D, 0x5C,
   0x58, 0xC9, 0x3E, 0x70, 0x1D, 0x59, 0x69, 0x19, 0x35, 0xA8, 0x14, 0xAA,
   0x75, 0x95, 0x99, 0x34, 0x6F, 0x15, 0xFF, 0x97, 0x4B, 0x90, 0x17, 0x10,
@@ -577,7 +577,7 @@ static const u8 gbColorizationChecksums[79] = {
 
 // For titles with colliding checksums, the fourth character of the game title
 // for disambiguation.
-static const u8 gbColorizationDisambigChars[29] = {
+static const uint8_t gbColorizationDisambigChars[29] = {
   'B', 'E', 'F', 'A', 'A', 'R', 'B', 'E',
   'K', 'E', 'K', ' ', 'R', '-', 'U', 'R',
   'A', 'R', ' ', 'I', 'N', 'A', 'I', 'L',
@@ -585,7 +585,7 @@ static const u8 gbColorizationDisambigChars[29] = {
 };
 
 // Palette ID | (Flags << 5)
-static const u8 gbColorizationPaletteInfo[94] = {
+static const uint8_t gbColorizationPaletteInfo[94] = {
   0x7C, 0x08, 0x12, 0xA3, 0xA2, 0x07, 0x87, 0x4B, 0x20, 0x12, 0x65, 0xA8,
   0x16, 0xA9, 0x86, 0xB1, 0x68, 0xA0, 0x87, 0x66, 0x12, 0xA1, 0x30, 0x3C,
   0x12, 0x85, 0x12, 0x64, 0x1B, 0x07, 0x06, 0x6F, 0x6E, 0x6E, 0xAE, 0xAF,
@@ -598,7 +598,7 @@ static const u8 gbColorizationPaletteInfo[94] = {
 
 
 // Uncompressed palette data from the CGB boot ROM
-static const u16 gbColorizationPaletteData[32][3][4] = {
+static const uint16_t gbColorizationPaletteData[32][3][4] = {
   {
     { 0x7FFF, 0x01DF, 0x0112, 0x0000 },
     { 0x7FFF, 0x7EEB, 0x001F, 0x7C00 },
@@ -825,7 +825,7 @@ bool gbIsGameboyRom(char * file)
   return false;
 }
 
-void gbCopyMemory(u16 d, u16 s, int count)
+void gbCopyMemory(uint16_t d, uint16_t s, int count)
 {
   while(count) {
     gbMemoryMap[d>>12][d & 0x0fff] = gbMemoryMap[s>>12][s & 0x0fff];
@@ -900,7 +900,7 @@ void gbCompareLYToLYC()
   }
 }
 
-void  gbWriteMemory(register u16 address, register u8 value)
+void  gbWriteMemory(register uint16_t address, register uint8_t value)
 {
 
   if(address < 0x8000) {
@@ -1535,7 +1535,7 @@ void  gbWriteMemory(register u16 address, register u8 value)
       {
         gbMemoryMap[0x00] = &gbRom[0x0000];
         if (gbHardware & 5) {
-          memcpy ((u8 *)(gbRom+0x100), (u8 *)(gbMemory + 0x100), 0xF00);
+          memcpy ((uint8_t *)(gbRom+0x100), (uint8_t *)(gbMemory + 0x100), 0xF00);
         }
         inBios = false;
       }
@@ -1788,7 +1788,7 @@ void  gbWriteMemory(register u16 address, register u8 value)
   gbMemory[address] = value;
 }
 
-u8 gbReadOpcode(register u16 address)
+uint8_t gbReadOpcode(register uint16_t address)
 {
   if(gbCheatMap[address])
     return gbCheatRead(address);
@@ -1953,7 +1953,7 @@ u8 gbReadOpcode(register u16 address)
   return gbMemoryMap[address>>12][address & 0x0fff];
 }
 
-u8 gbReadMemory(register u16 address)
+uint8_t gbReadMemory(register uint16_t address)
 {
   if(gbCheatMap[address])
     return gbCheatRead(address);
@@ -2410,7 +2410,7 @@ static void gbSelectColorizationPalette()
 	  (gbRom[0x014B] == 0x33 && gbRom[0x0144] == 0x30 && gbRom[0x0145] == 0x31))
   {
     // Calculate the checksum over 16 title bytes.
-    u8 checksum = 0;
+    uint8_t checksum = 0;
     for (int i = 0; i < 16; i++)
     {
       checksum += gbRom[0x0134 + i];
@@ -2449,13 +2449,13 @@ static void gbSelectColorizationPalette()
       }
     }
   }
-  u8 palette = gbColorizationPaletteInfo[infoIdx] & 0x1F;
-  u8 flags = (gbColorizationPaletteInfo[infoIdx] & 0xE0) >> 5;
+  uint8_t palette = gbColorizationPaletteInfo[infoIdx] & 0x1F;
+  uint8_t flags = (gbColorizationPaletteInfo[infoIdx] & 0xE0) >> 5;
 
 
   // Normally the first palette is used as OBP0.
   // If bit 0 is zero, the third palette is used instead.
-  const u16* obp0 = 0;
+  const uint16_t* obp0 = 0;
   if (flags & 1)
   {
     obp0 = gbColorizationPaletteData[palette][0];
@@ -2470,7 +2470,7 @@ static void gbSelectColorizationPalette()
   // Normally the second palette is used as OBP1.
   // If bit 1 is set, the first palette is used instead.
   // If bit 2 is zero, the third palette is used instead.
-  const u16* obp1 = 0;
+  const uint16_t* obp1 = 0;
   if (!(flags & 4))
   {
     obp1 = gbColorizationPaletteData[palette][2];
@@ -2506,9 +2506,9 @@ void gbReset()
 
   if(gbCgbMode == 1) {
       if (gbVram == NULL)
-        gbVram = (u8 *)malloc(0x4000);
+        gbVram = (uint8_t *)malloc(0x4000);
       if (gbWram == NULL)
-        gbWram = (u8 *)malloc(0x8000);
+        gbWram = (uint8_t *)malloc(0x8000);
       memset(gbVram,0,0x4000);
       memset(gbPalette,0, 2*128);
   }
@@ -2585,7 +2585,7 @@ void gbReset()
   {
       for (int i = 0; i<8; i++)
           if (i != 2)
-      memcpy ((u16 *)(gbWram+i*0x1000), (u16 *)(gbMemory+0xC000), 0x1000);
+      memcpy ((uint16_t *)(gbWram+i*0x1000), (uint16_t *)(gbMemory+0xC000), 0x1000);
   }
 
   memset(gbSCYLine,0,sizeof(gbSCYLine));
@@ -2766,13 +2766,13 @@ void gbReset()
   {
     if (gbHardware & 5)
     {
-      memcpy ((u8 *)(gbMemory), (u8 *)(gbRom), 0x1000);
-      memcpy ((u8 *)(gbMemory), (u8 *)(bios), 0x100);
+      memcpy ((uint8_t *)(gbMemory), (uint8_t *)(gbRom), 0x1000);
+      memcpy ((uint8_t *)(gbMemory), (uint8_t *)(bios), 0x100);
     }
     else
     {
-      memcpy ((u8 *)(gbMemory), (u8 *)(bios), 0x900);
-      memcpy ((u8 *)(gbMemory + 0x100), (u8 *)(gbRom + 0x100), 0x100);
+      memcpy ((uint8_t *)(gbMemory), (uint8_t *)(bios), 0x900);
+      memcpy ((uint8_t *)(gbMemory + 0x100), (uint8_t *)(gbRom + 0x100), 0x100);
     }
     gbWhiteScreen = 0;
 
@@ -2795,7 +2795,7 @@ void gbReset()
   else if (gbHardware & 0xa)
   {
     // Set compatibility mode if it is a DMG ROM. 
-    gbMemory[0xff6c] = 0xfe | (u8)!(gbRom[0x143] & 0x80);
+    gbMemory[0xff6c] = 0xfe | (uint8_t)!(gbRom[0x143] & 0x80);
   }
 
 
@@ -3245,7 +3245,7 @@ bool gbReadSaveMBC1(const char * name)
     }
 
     // Also checks if the battery file it bigger than gbRamSizeMask+1 !
-    u8 data[1];
+    uint8_t data[1];
     data[0] = 0;
 
     read = gzread(gzFile,
@@ -3291,7 +3291,7 @@ bool gbReadSaveMBC2(const char * name)
     }
 
     // Also checks if the battery file it bigger than gbRamSizeMask+1 !
-    u8 data[1];
+    uint8_t data[1];
     data[0] = 0;
 
     read = fread(&data[0],
@@ -3357,7 +3357,7 @@ bool gbReadSaveMBC3(const char * name)
     else
     {
       // Also checks if the battery file it bigger than gbRamSizeMask+1+RTC !
-      u8 data[1];
+      uint8_t data[1];
       data[0] = 0;
 
       read = gzread(gzFile,
@@ -3400,7 +3400,7 @@ bool gbReadSaveMBC5(const char * name)
 
 
     // Also checks if the battery file it bigger than gbRamSizeMask+1 !
-    u8 data[1];
+    uint8_t data[1];
     data[0] = 0;
 
     read = gzread(gzFile,
@@ -3445,7 +3445,7 @@ bool gbReadSaveMBC7(const char * name)
     }
 
     // Also checks if the battery file it bigger than gbRamSizeMask+1 !
-    u8 data[1];
+    uint8_t data[1];
     data[0] = 0;
 
     read = fread(&data[0],
@@ -3514,7 +3514,7 @@ bool gbReadSaveTAMA5(const char * name)
     else
     {
       // Also checks if the battery file it bigger than gbRamSizeMask+1+RTC !
-      u8 data[1];
+      uint8_t data[1];
       data[0] = 0;
 
       read = gzread(gzFile,
@@ -3557,7 +3557,7 @@ bool gbReadSaveMMM01(const char * name)
     }
 
     // Also checks if the battery file it bigger than gbRamSizeMask+1 !
-    u8 data[1];
+    uint8_t data[1];
     data[0] = 0;
 
     read = gzread(gzFile,
@@ -3583,11 +3583,11 @@ void gbInit()
   gbGenFilter();
   gbSgbInit();
 
-  gbMemory = (u8 *)malloc(65536);
+  gbMemory = (uint8_t *)malloc(65536);
 
-  pix = (u8 *)calloc(1,4*257*226);
+  pix = (uint8_t *)calloc(1,4*257*226);
 
-  gbLineBuffer = (u16 *)malloc(160 * sizeof(u16));
+  gbLineBuffer = (uint16_t *)malloc(160 * sizeof(uint16_t));
 }
 
 bool gbWriteBatteryFile(const char *file, bool extendedSave)
@@ -3683,7 +3683,7 @@ bool gbReadBatteryFile(const char *file)
       break;
     case 0xfd:
       if(!gbReadSaveTAMA5(file)) {
-        u8 gbDaysinMonth [12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        uint8_t gbDaysinMonth [12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
         time(&gbDataTAMA5.mapperLastTime);
         struct tm *lt;
         lt = localtime(&gbDataTAMA5.mapperLastTime);
@@ -3785,13 +3785,13 @@ bool gbReadGSASnapshot(const char *fileName)
 }
 
 variable_desc gbSaveGameStruct[] = {
-  { &PC.W, sizeof(u16) },
-  { &SP.W, sizeof(u16) },
-  { &AF.W, sizeof(u16) },
-  { &BC.W, sizeof(u16) },
-  { &DE.W, sizeof(u16) },
-  { &HL.W, sizeof(u16) },
-  { &IFF,  sizeof(u8) },
+  { &PC.W, sizeof(uint16_t) },
+  { &SP.W, sizeof(uint16_t) },
+  { &AF.W, sizeof(uint16_t) },
+  { &BC.W, sizeof(uint16_t) },
+  { &DE.W, sizeof(uint16_t) },
+  { &HL.W, sizeof(uint16_t) },
+  { &IFF,  sizeof(uint8_t) },
   { &GBLCD_MODE_0_CLOCK_TICKS, sizeof(int) },
   { &GBLCD_MODE_1_CLOCK_TICKS, sizeof(int) },
   { &GBLCD_MODE_2_CLOCK_TICKS, sizeof(int) },
@@ -3828,40 +3828,40 @@ variable_desc gbSaveGameStruct[] = {
   { &gbHdmaOn, sizeof(int) },
   { &gbSpeed, sizeof(int) },
   { &gbSgbMode, sizeof(int) },
-  { &register_DIV, sizeof(u8) },
-  { &register_TIMA, sizeof(u8) },
-  { &register_TMA, sizeof(u8) },
-  { &register_TAC, sizeof(u8) },
-  { &register_IF, sizeof(u8) },
-  { &register_LCDC, sizeof(u8) },
-  { &register_STAT, sizeof(u8) },
-  { &register_SCY, sizeof(u8) },
-  { &register_SCX, sizeof(u8) },
-  { &register_LY, sizeof(u8) },
-  { &register_LYC, sizeof(u8) },
-  { &register_DMA, sizeof(u8) },
-  { &register_WY, sizeof(u8) },
-  { &register_WX, sizeof(u8) },
-  { &register_VBK, sizeof(u8) },
-  { &register_HDMA1, sizeof(u8) },
-  { &register_HDMA2, sizeof(u8) },
-  { &register_HDMA3, sizeof(u8) },
-  { &register_HDMA4, sizeof(u8) },
-  { &register_HDMA5, sizeof(u8) },
-  { &register_SVBK, sizeof(u8) },
-  { &register_IE , sizeof(u8) },
-  { &gbBgp[0], sizeof(u8) },
-  { &gbBgp[1], sizeof(u8) },
-  { &gbBgp[2], sizeof(u8) },
-  { &gbBgp[3], sizeof(u8) },
-  { &gbObp0[0], sizeof(u8) },
-  { &gbObp0[1], sizeof(u8) },
-  { &gbObp0[2], sizeof(u8) },
-  { &gbObp0[3], sizeof(u8) },
-  { &gbObp1[0], sizeof(u8) },
-  { &gbObp1[1], sizeof(u8) },
-  { &gbObp1[2], sizeof(u8) },
-  { &gbObp1[3], sizeof(u8) },
+  { &register_DIV, sizeof(uint8_t) },
+  { &register_TIMA, sizeof(uint8_t) },
+  { &register_TMA, sizeof(uint8_t) },
+  { &register_TAC, sizeof(uint8_t) },
+  { &register_IF, sizeof(uint8_t) },
+  { &register_LCDC, sizeof(uint8_t) },
+  { &register_STAT, sizeof(uint8_t) },
+  { &register_SCY, sizeof(uint8_t) },
+  { &register_SCX, sizeof(uint8_t) },
+  { &register_LY, sizeof(uint8_t) },
+  { &register_LYC, sizeof(uint8_t) },
+  { &register_DMA, sizeof(uint8_t) },
+  { &register_WY, sizeof(uint8_t) },
+  { &register_WX, sizeof(uint8_t) },
+  { &register_VBK, sizeof(uint8_t) },
+  { &register_HDMA1, sizeof(uint8_t) },
+  { &register_HDMA2, sizeof(uint8_t) },
+  { &register_HDMA3, sizeof(uint8_t) },
+  { &register_HDMA4, sizeof(uint8_t) },
+  { &register_HDMA5, sizeof(uint8_t) },
+  { &register_SVBK, sizeof(uint8_t) },
+  { &register_IE , sizeof(uint8_t) },
+  { &gbBgp[0], sizeof(uint8_t) },
+  { &gbBgp[1], sizeof(uint8_t) },
+  { &gbBgp[2], sizeof(uint8_t) },
+  { &gbBgp[3], sizeof(uint8_t) },
+  { &gbObp0[0], sizeof(uint8_t) },
+  { &gbObp0[1], sizeof(uint8_t) },
+  { &gbObp0[2], sizeof(uint8_t) },
+  { &gbObp0[3], sizeof(uint8_t) },
+  { &gbObp1[0], sizeof(uint8_t) },
+  { &gbObp1[1], sizeof(uint8_t) },
+  { &gbObp1[2], sizeof(uint8_t) },
+  { &gbObp1[3], sizeof(uint8_t) },
   { NULL, 0 }
 };
 
@@ -3895,7 +3895,7 @@ static bool gbWriteSaveState(gzFile gzFile)
     utilGzWrite(gzFile, gbTAMA5ram, gbTAMA5ramSize);
   utilGzWrite(gzFile, &gbDataMMM01, sizeof(gbDataMMM01));
 
-  utilGzWrite(gzFile, gbPalette, 128 * sizeof(u16));
+  utilGzWrite(gzFile, gbPalette, 128 * sizeof(uint16_t));
 
   utilGzWrite(gzFile, &gbMemory[0x8000], 0x8000);
 
@@ -3972,7 +3972,7 @@ static bool gbReadSaveState(gzFile gzFile)
     return false;
   }
 
-  u8 romname[20];
+  uint8_t romname[20];
 
   utilGzRead(gzFile, romname, 15);
 
@@ -4025,9 +4025,9 @@ static bool gbReadSaveState(gzFile gzFile)
   else
   {
     if(gbVram == NULL)
-      gbVram = (u8 *)malloc(0x4000);
+      gbVram = (uint8_t *)malloc(0x4000);
     if(gbWram == NULL)
-      gbWram = (u8 *)malloc(0x8000);
+      gbWram = (uint8_t *)malloc(0x8000);
     memset(gbVram,0,0x4000);
     memset(gbPalette,0, 2*128);
   }
@@ -4072,17 +4072,17 @@ static bool gbReadSaveState(gzFile gzFile)
   }
 
   if(version < GBSAVE_GAME_VERSION_5) {
-    utilGzRead(gzFile, pix, 256*224*sizeof(u16));
+    utilGzRead(gzFile, pix, 256*224*sizeof(uint16_t));
   }
-  memset(pix, 0, 257*226*sizeof(u32));
+  memset(pix, 0, 257*226*sizeof(uint32_t));
 
   if(version < GBSAVE_GAME_VERSION_6) {
-    utilGzRead(gzFile, gbPalette, 64 * sizeof(u16));
+    utilGzRead(gzFile, gbPalette, 64 * sizeof(uint16_t));
   } else
-    utilGzRead(gzFile, gbPalette, 128 * sizeof(u16));
+    utilGzRead(gzFile, gbPalette, 128 * sizeof(uint16_t));
 
   if (version < 11)
-    utilGzRead(gzFile, gbPalette, 128 * sizeof(u16));
+    utilGzRead(gzFile, gbPalette, 128 * sizeof(uint16_t));
 
   if(version < GBSAVE_GAME_VERSION_10) {
     if(!gbCgbMode && !gbSgbMode) {
@@ -4127,11 +4127,11 @@ static bool gbReadSaveState(gzFile gzFile)
   {
     gbMemoryMap[0x00] = &gbMemory[0x0000];
     if (gbHardware & 5) {
-      memcpy ((u8 *)(gbMemory), (u8 *)(gbRom), 0x1000);
-      memcpy ((u8 *)(gbMemory), (u8 *)(bios), 0x100);
+      memcpy ((uint8_t *)(gbMemory), (uint8_t *)(gbRom), 0x1000);
+      memcpy ((uint8_t *)(gbMemory), (uint8_t *)(bios), 0x100);
     } else if (gbHardware & 2) {
-      memcpy ((u8 *)(gbMemory), (u8 *)(bios), 0x900);
-      memcpy ((u8 *)(gbMemory + 0x100), (u8 *)(gbRom + 0x100), 0x100);
+      memcpy ((uint8_t *)(gbMemory), (uint8_t *)(bios), 0x900);
+      memcpy ((uint8_t *)(gbMemory + 0x100), (uint8_t *)(gbRom + 0x100), 0x100);
     }
 
   }
@@ -4452,7 +4452,7 @@ bool gbLoadRom(const char *szFile)
     free(bios);
     bios = NULL;
   }
-  bios = (u8 *)calloc(1,0x900);
+  bios = (uint8_t *)calloc(1,0x900);
 
   return gbUpdateSizes();
 }
@@ -4466,7 +4466,7 @@ bool gbUpdateSizes()
   }
 
   if(gbRomSize < gbRomSizes[gbRom[0x148]]) {
-    u8 *gbRomNew = (u8 *)realloc(gbRom, gbRomSizes[gbRom[0x148]]);
+    uint8_t *gbRomNew = (uint8_t *)realloc(gbRom, gbRomSizes[gbRom[0x148]]);
     if( !gbRomNew ) { assert( false ); return false; };
     gbRom = gbRomNew;
     for (int i = gbRomSize; i<gbRomSizes[gbRom[0x148]]; i++)
@@ -4486,7 +4486,7 @@ bool gbUpdateSizes()
       }
       gbRom[0x148]++;
     }
-    u8 *gbRomNew = (u8 *)realloc(gbRom, gbRomSizes[gbRom[0x148]]);
+    uint8_t *gbRomNew = (uint8_t *)realloc(gbRom, gbRomSizes[gbRom[0x148]]);
     if( !gbRomNew ) { assert( false ); return false; };
     gbRom = gbRomNew;
   }
@@ -4502,7 +4502,7 @@ bool gbUpdateSizes()
   // overwritten if you wrongly enable this option for a game
   // you already played (and vice-versa, ie. if you forgot to
   // enable the option for a game you played with it enabled, like Shawu Story).
-  u8 ramsize = genericflashcardEnable ? 5 : gbRom[0x149];
+  uint8_t ramsize = genericflashcardEnable ? 5 : gbRom[0x149];
   gbRom[0x149] = ramsize;
 
   if ((gbRom[2] == 0x6D) && (gbRom[5] == 0x47) && (gbRom[6] == 0x65) && (gbRom[7] == 0x6E) &&
@@ -4637,7 +4637,7 @@ bool gbUpdateSizes()
     gbTAMA5ramSize = 0x100;
 
     if (gbTAMA5ram == NULL)
-      gbTAMA5ram = (u8 *)malloc(gbTAMA5ramSize);
+      gbTAMA5ram = (uint8_t *)malloc(gbTAMA5ramSize);
     memset(gbTAMA5ram, 0x0, gbTAMA5ramSize);
 
     mapperRAM = mapperTAMA5RAM;
@@ -4662,7 +4662,7 @@ bool gbUpdateSizes()
   }
 
   if(gbRamSize) {
-    gbRam = (u8 *)malloc(gbRamSize);
+    gbRam = (uint8_t *)malloc(gbRamSize);
     memset(gbRam, gbRamFill, gbRamSize);
   }
 
@@ -4733,7 +4733,7 @@ void gbDrawLine()
   switch(systemColorDepth) {
     case 16:
     {
-      u16 * dest = (u16 *)pix +
+      uint16_t * dest = (uint16_t *)pix +
                    (gbBorderLineSkip+2) * (register_LY + gbBorderRowSkip+1)
                    + gbBorderColumnSkip;
       for(int x = 0; x < 160; ) {
@@ -4765,44 +4765,44 @@ void gbDrawLine()
 
     case 24:
     {
-      u8 *dest = (u8 *)pix +
+      uint8_t *dest = (uint8_t *)pix +
                  3*(gbBorderLineSkip * (register_LY + gbBorderRowSkip) +
                  gbBorderColumnSkip);
       for(int x = 0; x < 160;) {
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
         dest+= 3;
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
         dest+= 3;
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
         dest+= 3;
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
-        dest+= 3;
-
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
-        dest+= 3;
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
-        dest+= 3;
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
-        dest+= 3;
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
         dest+= 3;
 
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
         dest+= 3;
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
         dest+= 3;
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
         dest+= 3;
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
         dest+= 3;
 
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
         dest+= 3;
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
         dest+= 3;
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
         dest+= 3;
-        *((u32 *)dest) = systemColorMap32[gbLineMix[x++]];
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
+        dest+= 3;
+
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
+        dest+= 3;
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
+        dest+= 3;
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
+        dest+= 3;
+        *((uint32_t *)dest) = systemColorMap32[gbLineMix[x++]];
         dest+= 3;
       }
     }
@@ -4810,7 +4810,7 @@ void gbDrawLine()
 
     case 32:
     {
-      u32 * dest = (u32 *)pix +
+      uint32_t * dest = (uint32_t *)pix +
                    (gbBorderLineSkip+1) * (register_LY + gbBorderRowSkip+1)
                    + gbBorderColumnSkip;
       for(int x = 0; x < 160;) {
@@ -4842,8 +4842,8 @@ void gbDrawLine()
 void gbEmulate(int ticksToStop)
 {
   gbRegister tempRegister;
-  u8 tempValue;
-  s8 offset;
+  uint8_t tempValue;
+  int8_t offset;
 
   clockTicks = 0;
   gbDmaTicks = 0;
@@ -4855,7 +4855,7 @@ void gbEmulate(int ticksToStop)
   bool execute = false;
 
   while(1) {
-    u16 oldPCW = PC.W;
+    uint16_t oldPCW = PC.W;
 
     if(IFF & 0x80) {
       if(register_LCDC & 0x80) {
@@ -5262,7 +5262,7 @@ void gbEmulate(int ticksToStop)
                   system10Frames(60);
 
                 if(gbFrameCount >= 60) {
-                  u32 currentTime = systemGetClock();
+                  uint32_t currentTime = systemGetClock();
                   if(currentTime != gbLastTime)
                     systemShowSpeed(100000/(currentTime - gbLastTime));
                   else
@@ -5372,7 +5372,7 @@ void gbEmulate(int ticksToStop)
                     }
                     else if (gbBlackScreen)
                     {
-                      u16 color = gbColorOption ? gbColorFilter[0] : 0;
+                      uint16_t color = gbColorOption ? gbColorFilter[0] : 0;
                       if (!gbCgbMode)
                       color = gbColorOption ? gbColorFilter[gbPalette[3] & 0x7FFF] : gbPalette[3] & 0x7FFF;
                       for(int i = 0; i < 160; i++)
@@ -5447,10 +5447,10 @@ void gbEmulate(int ticksToStop)
         if (gbScreenTicks <= 0)
         {
           gbWhiteScreen = 1;
-          u8 register_LYLcdOff = ((register_LY+154)%154);
+          uint8_t register_LYLcdOff = ((register_LY+154)%154);
           for (register_LY=0;register_LY <=  0x90;register_LY++)
           {
-            u16 color = gbColorOption ? gbColorFilter[0x7FFF] : 0x7FFF;
+            uint16_t color = gbColorOption ? gbColorFilter[0x7FFF] : 0x7FFF;
             if (!gbCgbMode)
             color = gbColorOption ? gbColorFilter[gbPalette[0] & 0x7FFF] : gbPalette[0] & 0x7FFF;
             for(int i = 0; i < 160; i++)
@@ -5475,7 +5475,7 @@ void gbEmulate(int ticksToStop)
           if (register_LY<144)
           {
 
-            u16 color = gbColorOption ? gbColorFilter[0x7FFF] : 0x7FFF;
+            uint16_t color = gbColorOption ? gbColorFilter[0x7FFF] : 0x7FFF;
             if (!gbCgbMode)
             color = gbColorOption ? gbColorFilter[gbPalette[0] & 0x7FFF] : gbPalette[0] & 0x7FFF;
             for(int i = 0; i < 160; i++)
@@ -5527,7 +5527,7 @@ void gbEmulate(int ticksToStop)
               system10Frames(60);
 
             if(gbFrameCount >= 60) {
-              u32 currentTime = systemGetClock();
+              uint32_t currentTime = systemGetClock();
               if(currentTime != gbLastTime)
                 systemShowSpeed(100000/(currentTime - gbLastTime));
               else
@@ -5603,7 +5603,7 @@ void gbEmulate(int ticksToStop)
 						gbSerialBits++;
 						if (gbSerialBits >= 8) {
 							// end of transmission
-							u16 dat = 0;
+							uint16_t dat = 0;
 							if (LinkIsWaiting)
 								if (gbSerialFunction) { // external device
 									gbSIO_SC = gbMemory[0xff02];

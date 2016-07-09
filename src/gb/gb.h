@@ -9,22 +9,22 @@
 typedef union {
         struct {
 #ifdef WORDS_BIGENDIAN
-                u8 B1, B0;
+                uint8_t B1, B0;
 #else
-                u8 B0, B1;
+                uint8_t B0, B1;
 #endif
         } B;
-        u16 W;
+        uint16_t W;
 } gbRegister;
 
 extern gbRegister AF, BC, DE, HL, SP, PC;
-extern u16 IFF;
+extern uint16_t IFF;
 int gbDis(char *, u16);
 
 bool gbLoadRom(const char *);
 bool gbUpdateSizes();
 void gbEmulate(int);
-void gbWriteMemory(register u16, register u8);
+void gbWriteMemory(register uint16_t, register uint8_t);
 void gbDrawLine();
 bool gbIsGameboyRom(const char *);
 void gbGetHardwareType();
