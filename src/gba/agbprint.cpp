@@ -7,15 +7,15 @@
 #include "Globals.h"
 
 #define debuggerWriteHalfWord(addr, value) \
-    WRITE16LE((u16*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask], (value))
+    WRITE16LE((uint16_t*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask], (value))
 
 #define debuggerReadHalfWord(addr) \
-    READ16LE(((u16*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]))
+    READ16LE(((uint16_t*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]))
 
 static bool agbPrintEnabled = false;
 static bool agbPrintProtect = false;
 
-bool agbPrintWrite(u32 address, u16 value)
+bool agbPrintWrite(uint32_t address, uint16_t value)
 {
     if (agbPrintEnabled) {
         if (address == 0x9fe2ffe) { // protect
@@ -51,10 +51,10 @@ bool agbPrintIsEnabled()
 
 void agbPrintFlush()
 {
-    u16 get = debuggerReadHalfWord(0x9fe20fc);
-    u16 put = debuggerReadHalfWord(0x9fe20fe);
+    uint16_t get = debuggerReadHalfWord(0x9fe20fc);
+    uint16_t put = debuggerReadHalfWord(0x9fe20fe);
 
-    u32 address = (debuggerReadHalfWord(0x9fe20fa) << 16);
+    uint32_t address = (debuggerReadHalfWord(0x9fe20fa) << 16);
     if (address != 0xfd0000 && address != 0x1fd0000) {
         dbgOutput("Did you forget to call AGBPrintInit?\n", 0);
         // get rid of the text otherwise we will continue to be called
@@ -62,7 +62,7 @@ void agbPrintFlush()
         return;
     }
 
-    u8* data = &rom[address];
+    uint8_t* data = &rom[address];
 
     while (get != put) {
         char c = data[get++];

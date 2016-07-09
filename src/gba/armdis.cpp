@@ -10,16 +10,16 @@
 #include "elf.h"
 
 struct Opcodes {
-    u32 mask;
-    u32 cval;
+    uint32_t mask;
+    uint32_t cval;
     const char* mnemonic;
 };
 
 #define debuggerReadMemory(addr) \
-    READ32LE(((u32*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]))
+    READ32LE(((uint32_t*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]))
 
 #define debuggerReadHalfWord(addr) \
-    READ16LE(((u16*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]))
+    READ16LE(((uint16_t*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]))
 
 #define debuggerReadByte(addr) \
     map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]
@@ -199,7 +199,7 @@ char* addStr(char* dest, const char* src)
     return dest;
 }
 
-char* addHex(char* dest, int siz, u32 val)
+char* addHex(char* dest, int siz, uint32_t val)
 {
     if (siz == 0) {
         siz = 28;
@@ -214,9 +214,9 @@ char* addHex(char* dest, int siz, u32 val)
     return dest;
 }
 
-int disArm(u32 offset, char* dest, int flags)
+int disArm(uint32_t offset, char* dest, int flags)
 {
-    u32 opcode = debuggerReadMemory(offset);
+    uint32_t opcode = debuggerReadMemory(offset);
 
     const Opcodes* sp = armOpcodes;
     while (sp->cval != (opcode & sp->mask))
@@ -523,9 +523,9 @@ int disArm(u32 offset, char* dest, int flags)
     return 4;
 }
 
-int disThumb(u32 offset, char* dest, int flags)
+int disThumb(uint32_t offset, char* dest, int flags)
 {
-    u32 opcode = debuggerReadHalfWord(offset);
+    uint32_t opcode = debuggerReadHalfWord(offset);
 
     const Opcodes* sp = thumbOpcodes;
     int ret = 2;
@@ -593,7 +593,7 @@ int disThumb(u32 offset, char* dest, int flags)
                 dest = addHex(dest, 32, (offset & 0xfffffffc) + 4 + ((opcode & 0xff) << 2));
                 break;
             case 'J': {
-                u32 value = debuggerReadMemory((offset & 0xfffffffc) + 4 + ((opcode & 0xff) << 2));
+                uint32_t value = debuggerReadMemory((offset & 0xfffffffc) + 4 + ((opcode & 0xff) << 2));
                 *dest++ = '$';
                 dest = addHex(dest, 32, value);
                 const char* s = elfGetAddressSymbol(value);
@@ -603,7 +603,7 @@ int disThumb(u32 offset, char* dest, int flags)
                 }
             } break;
             case 'K': {
-                u32 value = (offset & 0xfffffffc) + 4 + ((opcode & 0xff) << 2);
+                uint32_t value = (offset & 0xfffffffc) + 4 + ((opcode & 0xff) << 2);
                 *dest++ = '$';
                 dest = addHex(dest, 32, value);
                 const char* s = elfGetAddressSymbol(value);
