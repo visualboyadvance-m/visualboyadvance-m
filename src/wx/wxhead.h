@@ -65,35 +65,35 @@
 
 #include "wx/keyedit.h"
 
-static inline void DoSetAccel(wxMenuItem *mi, wxAcceleratorEntry *acc)
+static inline void DoSetAccel(wxMenuItem* mi, wxAcceleratorEntry* acc)
 {
-        wxString lab = mi->GetItemLabel();
-        size_t tab = lab.find(wxT('\t'));
+    wxString lab = mi->GetItemLabel();
+    size_t tab = lab.find(wxT('\t'));
 
-        // following short circuit returns are to avoid UI update on no change
-        if (tab == wxString::npos && !acc)
-                return;
+    // following short circuit returns are to avoid UI update on no change
+    if (tab == wxString::npos && !acc)
+        return;
 
-        wxString accs;
+    wxString accs;
 
-        if (acc)
-                // actually, use keyedit's ToString(), as it is more reliable
-                // and doesn't generate wx assertions
-                // accs = acc->ToString();
-                accs = wxKeyTextCtrl::ToString(acc->GetFlags(), acc->GetKeyCode());
+    if (acc)
+        // actually, use keyedit's ToString(), as it is more reliable
+        // and doesn't generate wx assertions
+        // accs = acc->ToString();
+        accs = wxKeyTextCtrl::ToString(acc->GetFlags(), acc->GetKeyCode());
 
-        if (tab != wxString::npos && accs == lab.substr(tab + 1))
-                return;
+    if (tab != wxString::npos && accs == lab.substr(tab + 1))
+        return;
 
-        if (tab != wxString::npos)
-                lab.resize(tab);
+    if (tab != wxString::npos)
+        lab.resize(tab);
 
-        if (acc) {
-                lab.append(wxT('\t'));
-                lab.append(accs);
-        }
+    if (acc) {
+        lab.append(wxT('\t'));
+        lab.append(accs);
+    }
 
-        mi->SetItemLabel(lab);
+    mi->SetItemLabel(lab);
 }
 
 // wxrc helpers (for dynamic strings instead of constant)
@@ -109,7 +109,7 @@ static inline void DoSetAccel(wxMenuItem *mi, wxAcceleratorEntry *acc)
 // I bypassed wx's stuff to use real dynamic_cast as well, so get a better
 // compiler.
 #undef XRCCTRL
-#define XRCCTRL_I(win, id, type) (dynamic_cast<type *>((win).FindWindow(id)))
+#define XRCCTRL_I(win, id, type) (dynamic_cast<type*>((win).FindWindow(id)))
 #define XRCCTRL(win, id, type) XRCCTRL_I(win, XRCID(id), type)
 #define XRCCTRL_D(win, id, type) XRCCTRL_I(win, XRCID_D(id), type)
 

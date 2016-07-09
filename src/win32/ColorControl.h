@@ -11,39 +11,38 @@
 /////////////////////////////////////////////////////////////////////////////
 // ColorControl window
 
-class ColorControl : public CWnd
-{
-        // Construction
-        public:
-        ColorControl();
+class ColorControl : public CWnd {
+    // Construction
+public:
+    ColorControl();
 
-        // Attributes
-        public:
-        // Operations
-        static bool isRegistered;
+    // Attributes
+public:
+    // Operations
+    static bool isRegistered;
 
-        // Operations
-        public:
-        // Overrides
-        // ClassWizard generated virtual function overrides
-        //{{AFX_VIRTUAL(ColorControl)
-        //}}AFX_VIRTUAL
+    // Operations
+public:
+    // Overrides
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(ColorControl)
+    //}}AFX_VIRTUAL
 
-        // Implementation
-        public:
-        void setColor(u16 c);
-        u16 color;
-        virtual ~ColorControl();
+    // Implementation
+public:
+    void setColor(u16 c);
+    u16 color;
+    virtual ~ColorControl();
 
-        // Generated message map functions
-        protected:
-        //{{AFX_MSG(ColorControl)
-        afx_msg void OnPaint();
-        afx_msg BOOL OnEraseBkgnd(CDC *pDC);
-        //}}AFX_MSG
-        DECLARE_MESSAGE_MAP()
-        private:
-        void registerClass();
+    // Generated message map functions
+protected:
+    //{{AFX_MSG(ColorControl)
+    afx_msg void OnPaint();
+    afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+    //}}AFX_MSG
+    DECLARE_MESSAGE_MAP()
+private:
+    void registerClass();
 };
 
 /////////////////////////////////////////////////////////////////////////////

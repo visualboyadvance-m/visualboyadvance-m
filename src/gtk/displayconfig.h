@@ -27,29 +27,27 @@
 #include "configfile.h"
 #include "window.h"
 
-namespace VBA
-{
-class DisplayConfigDialog : public Gtk::Dialog
-{
-        public:
-        DisplayConfigDialog(GtkDialog *_pstDialog, const Glib::RefPtr<Gtk::Builder> &refBuilder);
+namespace VBA {
+class DisplayConfigDialog : public Gtk::Dialog {
+public:
+    DisplayConfigDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder);
 
-        void vSetConfig(Config::Section *_poConfig, VBA::Window *_poWindow);
+    void vSetConfig(Config::Section* _poConfig, VBA::Window* _poWindow);
 
-        private:
-        void vOnFilterChanged();
-        void vOnFilterIBChanged();
-        void vOnOutputChanged(VBA::Window::EVideoOutput _eOutput);
-        void vOnScaleChanged();
+private:
+    void vOnFilterChanged();
+    void vOnFilterIBChanged();
+    void vOnOutputChanged(VBA::Window::EVideoOutput _eOutput);
+    void vOnScaleChanged();
 
-        VBA::Window *m_poWindow;
+    VBA::Window* m_poWindow;
 
-        Config::Section *m_poConfig;
-        Gtk::ComboBox *m_poFiltersComboBox;
-        Gtk::ComboBox *m_poIBFiltersComboBox;
-        Gtk::ComboBox *m_poDefaultScaleComboBox;
-        Gtk::RadioButton *m_poOutputOpenGLRadioButton;
-        Gtk::RadioButton *m_poOutputCairoRadioButton;
+    Config::Section* m_poConfig;
+    Gtk::ComboBox* m_poFiltersComboBox;
+    Gtk::ComboBox* m_poIBFiltersComboBox;
+    Gtk::ComboBox* m_poDefaultScaleComboBox;
+    Gtk::RadioButton* m_poOutputOpenGLRadioButton;
+    Gtk::RadioButton* m_poOutputCairoRadioButton;
 };
 
 } // namespace VBA

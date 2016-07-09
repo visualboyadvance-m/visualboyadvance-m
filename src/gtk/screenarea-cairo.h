@@ -22,27 +22,25 @@
 
 #include "screenarea.h"
 
-namespace VBA
-{
-class ScreenAreaCairo : public ScreenArea
-{
-        public:
-        ScreenAreaCairo(int _iWidth, int _iHeight, int _iScale = 1);
-        void vDrawPixels(u8 *_puiData);
-        void vDrawBlackScreen();
+namespace VBA {
+class ScreenAreaCairo : public ScreenArea {
+public:
+    ScreenAreaCairo(int _iWidth, int _iHeight, int _iScale = 1);
+    void vDrawPixels(u8* _puiData);
+    void vDrawBlackScreen();
 
-        protected:
+protected:
 #if !GTK_CHECK_VERSION(3, 0, 0)
-        bool on_expose_event(GdkEventExpose *_pstEvent);
+    bool on_expose_event(GdkEventExpose* _pstEvent);
 #else
-        bool on_draw(const Cairo::RefPtr<Cairo::Context> &poContext);
+    bool on_draw(const Cairo::RefPtr<Cairo::Context>& poContext);
 #endif
-        void vOnWidgetResize();
+    void vOnWidgetResize();
 
-        private:
-        double m_dScaleFactor;
-        int m_iAreaTop;
-        int m_iAreaLeft;
+private:
+    double m_dScaleFactor;
+    int m_iAreaTop;
+    int m_iAreaLeft;
 };
 
 } // namespace VBA

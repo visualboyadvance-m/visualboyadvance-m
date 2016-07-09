@@ -14,39 +14,38 @@
 /////////////////////////////////////////////////////////////////////////////
 // ZoomControl window
 
-class ZoomControl : public CWnd
-{
-        // Construction
-        public:
-        ZoomControl();
+class ZoomControl : public CWnd {
+    // Construction
+public:
+    ZoomControl();
 
-        // Attributes
-        public:
-        // Operations
-        public:
-        // Overrides
-        // ClassWizard generated virtual function overrides
-        //{{AFX_VIRTUAL(ZoomControl)
-        //}}AFX_VIRTUAL
+    // Attributes
+public:
+    // Operations
+public:
+    // Overrides
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(ZoomControl)
+    //}}AFX_VIRTUAL
 
-        // Implementation
-        public:
-        void setColors(const u8 *c);
-        static bool isRegistered;
-        virtual ~ZoomControl();
+    // Implementation
+public:
+    void setColors(const u8* c);
+    static bool isRegistered;
+    virtual ~ZoomControl();
 
-        // Generated message map functions
-        protected:
-        //{{AFX_MSG(ZoomControl)
-        afx_msg void OnPaint();
-        afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
-        afx_msg BOOL OnEraseBkgnd(CDC *pDC);
-        //}}AFX_MSG
-        DECLARE_MESSAGE_MAP()
-        private:
-        int selected;
-        u8 colors[3 * 64];
-        void registerClass();
+    // Generated message map functions
+protected:
+    //{{AFX_MSG(ZoomControl)
+    afx_msg void OnPaint();
+    afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+    afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+    //}}AFX_MSG
+    DECLARE_MESSAGE_MAP()
+private:
+    int selected;
+    u8 colors[3 * 64];
+    void registerClass();
 };
 
 /////////////////////////////////////////////////////////////////////////////

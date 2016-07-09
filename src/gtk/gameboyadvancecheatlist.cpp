@@ -21,133 +21,122 @@
 
 #include <vector>
 
-namespace VBA
-{
+namespace VBA {
 
-GameBoyAdvanceCheatListDialog::GameBoyAdvanceCheatListDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder) :
-  CheatListDialog(_pstDialog, refBuilder)
+GameBoyAdvanceCheatListDialog::GameBoyAdvanceCheatListDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder)
+    : CheatListDialog(_pstDialog, refBuilder)
 {
-  vUpdateList();
+    vUpdateList();
 }
 
 void GameBoyAdvanceCheatListDialog::vAddCheat(Glib::ustring sDesc, ECheatType type, Glib::RefPtr<Gtk::TextBuffer> buffer)
 {
-  int previous = cheatsNumber;
+    int previous = cheatsNumber;
 
-  switch (type)
-  {
-  // Generic Code
-  case CheatGeneric:
-  {
-    std::vector<Glib::ustring> tokens;
+    switch (type) {
+    // Generic Code
+    case CheatGeneric: {
+        std::vector<Glib::ustring> tokens;
 
-    vTokenize(buffer->get_text(), tokens);
+        vTokenize(buffer->get_text(), tokens);
 
-    for (std::vector<Glib::ustring>::iterator it = tokens.begin();
-        it != tokens.end();
-        it++)
-    {
-      Glib::ustring sToken = it->uppercase();
+        for (std::vector<Glib::ustring>::iterator it = tokens.begin();
+             it != tokens.end();
+             it++) {
+            Glib::ustring sToken = it->uppercase();
 
-      cheatsAddCheatCode(sToken.c_str(), sDesc.c_str());
-    }
-
-    break;
-  }
-  // Gameshark Advance & CodeBreaker Advance
-  case CheatGSA:
-  case CheatCBA:
-  {
-    std::vector<Glib::ustring> tokens;
-
-    Glib::ustring sToken;
-    Glib::ustring sCode;
-    Glib::ustring sPart = "";
-
-    vTokenize(buffer->get_text(), tokens);
-
-    for (std::vector<Glib::ustring>::iterator it = tokens.begin();
-        it != tokens.end();
-        it++)
-    {
-
-      sToken = it->uppercase();
-      const char *cToken = sToken.c_str();
-
-      if (sToken.size() == 16)
-        cheatsAddGSACode(cToken, sDesc.c_str(), false);
-      else if (sToken.size() == 12)
-      {
-        sCode = sToken.substr(0,8);
-        sCode += " ";
-        sCode += sToken.substr(9,4);
-        cheatsAddCBACode(sCode.c_str(), sDesc.c_str());
-      }
-      else
-        if (sPart.empty())
-          sPart = sToken;
-        else
-        {
-          if (sToken.size() == 4)
-          {
-            sCode = sPart;
-            sCode += " ";
-            sCode += cToken;
-            cheatsAddCBACode(sCode.c_str(), sDesc.c_str());
-          }
-          else
-          {
-            sCode = sPart + sToken;
-            cheatsAddGSACode(sCode.c_str(), sDesc.c_str(), true);
-          }
-
-          sPart = "";
+            cheatsAddCheatCode(sToken.c_str(), sDesc.c_str());
         }
-    } // end of loop
 
-  } // end of case
-  default:; // silence warnings
-  } // end of switch
+        break;
+    }
+    // Gameshark Advance & CodeBreaker Advance
+    case CheatGSA:
+    case CheatCBA: {
+        std::vector<Glib::ustring> tokens;
 
-  vUpdateList(previous);
+        Glib::ustring sToken;
+        Glib::ustring sCode;
+        Glib::ustring sPart = "";
+
+        vTokenize(buffer->get_text(), tokens);
+
+        for (std::vector<Glib::ustring>::iterator it = tokens.begin();
+             it != tokens.end();
+             it++) {
+
+            sToken = it->uppercase();
+            const char* cToken = sToken.c_str();
+
+            if (sToken.size() == 16)
+                cheatsAddGSACode(cToken, sDesc.c_str(), false);
+            else if (sToken.size() == 12) {
+                sCode = sToken.substr(0, 8);
+                sCode += " ";
+                sCode += sToken.substr(9, 4);
+                cheatsAddCBACode(sCode.c_str(), sDesc.c_str());
+            } else if (sPart.empty())
+                sPart = sToken;
+            else {
+                if (sToken.size() == 4) {
+                    sCode = sPart;
+                    sCode += " ";
+                    sCode += cToken;
+                    cheatsAddCBACode(sCode.c_str(), sDesc.c_str());
+                } else {
+                    sCode = sPart + sToken;
+                    cheatsAddGSACode(sCode.c_str(), sDesc.c_str(), true);
+                }
+
+                sPart = "";
+            }
+        } // end of loop
+
+    } // end of case
+    default:; // silence warnings
+    } // end of switch
+
+    vUpdateList(previous);
 }
 
-bool GameBoyAdvanceCheatListDialog::vCheatListOpen(const char *file)
+bool GameBoyAdvanceCheatListDialog::vCheatListOpen(const char* file)
 {
-  return cheatsLoadCheatList(file);
+    return cheatsLoadCheatList(file);
 }
 
-void GameBoyAdvanceCheatListDialog::vCheatListSave(const char *file)
+void GameBoyAdvanceCheatListDialog::vCheatListSave(const char* file)
 {
-  cheatsSaveCheatList(file);
+    cheatsSaveCheatList(file);
 }
 
-void GameBoyAdvanceCheatListDialog::vRemoveCheat(int index) {
-  cheatsDelete(index, false);
+void GameBoyAdvanceCheatListDialog::vRemoveCheat(int index)
+{
+    cheatsDelete(index, false);
 }
 
-void GameBoyAdvanceCheatListDialog::vRemoveAllCheats() {
-  cheatsDeleteAll(false);
+void GameBoyAdvanceCheatListDialog::vRemoveAllCheats()
+{
+    cheatsDeleteAll(false);
 }
 
-void GameBoyAdvanceCheatListDialog::vToggleCheat(int index, bool enable) {
-  if (enable)
-    cheatsEnable(index);
-  else
-    cheatsDisable(index);
+void GameBoyAdvanceCheatListDialog::vToggleCheat(int index, bool enable)
+{
+    if (enable)
+        cheatsEnable(index);
+    else
+        cheatsDisable(index);
 }
 
 void GameBoyAdvanceCheatListDialog::vUpdateList(int previous)
 {
-  for (int i = previous; i < cheatsNumber;  i++)
-  {
-    // Add row for each newly added cheat
-    Gtk::TreeModel::Row row = *(m_poCheatListStore->append());
+    for (int i = previous; i < cheatsNumber; i++) {
+        // Add row for each newly added cheat
+        Gtk::TreeModel::Row row = *(m_poCheatListStore->append());
 
-    row[m_oRecordModel.iIndex] = i;
-    row[m_oRecordModel.bEnabled] = cheatsList[i].enabled;
-    row[m_oRecordModel.uDesc] = cheatsList[i].desc;
-  }
+        row[m_oRecordModel.iIndex] = i;
+        row[m_oRecordModel.bEnabled] = cheatsList[i].enabled;
+        row[m_oRecordModel.uDesc] = cheatsList[i].desc;
+    }
 }
 
 } // namespace VBA

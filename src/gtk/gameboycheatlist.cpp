@@ -21,102 +21,96 @@
 
 #include <vector>
 
-namespace VBA
-{
+namespace VBA {
 
-GameBoyCheatListDialog::GameBoyCheatListDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder) :
-  CheatListDialog(_pstDialog, refBuilder)
+GameBoyCheatListDialog::GameBoyCheatListDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder)
+    : CheatListDialog(_pstDialog, refBuilder)
 {
-  vUpdateList();
+    vUpdateList();
 }
 
 void GameBoyCheatListDialog::vAddCheat(Glib::ustring sDesc, ECheatType type, Glib::RefPtr<Gtk::TextBuffer> buffer)
 {
-  int previous = gbCheatNumber;
+    int previous = gbCheatNumber;
 
-  switch (type)
-  {
-  // GameShark
-  case CheatGS:
-  {
-    std::vector<Glib::ustring> tokens;
+    switch (type) {
+    // GameShark
+    case CheatGS: {
+        std::vector<Glib::ustring> tokens;
 
-    vTokenize(buffer->get_text(), tokens);
+        vTokenize(buffer->get_text(), tokens);
 
-    for (std::vector<Glib::ustring>::iterator it = tokens.begin();
-        it != tokens.end();
-        it++)
-    {
-      Glib::ustring sToken = it->uppercase();
+        for (std::vector<Glib::ustring>::iterator it = tokens.begin();
+             it != tokens.end();
+             it++) {
+            Glib::ustring sToken = it->uppercase();
 
-      gbAddGsCheat(sToken.c_str(), sDesc.c_str());
+            gbAddGsCheat(sToken.c_str(), sDesc.c_str());
+        }
+
+        break;
     }
+    // GameGenie
+    case CheatGG: {
+        std::vector<Glib::ustring> tokens;
 
-    break;
-  }
-  // GameGenie
-  case CheatGG:
-  {
-    std::vector<Glib::ustring> tokens;
+        vTokenize(buffer->get_text(), tokens);
 
-    vTokenize(buffer->get_text(), tokens);
+        for (std::vector<Glib::ustring>::iterator it = tokens.begin();
+             it != tokens.end();
+             it++) {
+            Glib::ustring sToken = it->uppercase();
 
-    for (std::vector<Glib::ustring>::iterator it = tokens.begin();
-        it != tokens.end();
-        it++)
-    {
-      Glib::ustring sToken = it->uppercase();
+            gbAddGgCheat(sToken.c_str(), sDesc.c_str());
+        }
 
-      gbAddGgCheat(sToken.c_str(), sDesc.c_str());
+        break;
     }
+    default:; // silence warnings
+    }
+    // end of switch
 
-    break;
-  }
-  default:; // silence warnings
-  }
-  // end of switch
-
-  vUpdateList(previous);
+    vUpdateList(previous);
 }
 
-bool GameBoyCheatListDialog::vCheatListOpen(const char *file)
+bool GameBoyCheatListDialog::vCheatListOpen(const char* file)
 {
-  return gbCheatsLoadCheatList(file);
+    return gbCheatsLoadCheatList(file);
 }
 
-void GameBoyCheatListDialog::vCheatListSave(const char *file)
+void GameBoyCheatListDialog::vCheatListSave(const char* file)
 {
-  gbCheatsSaveCheatList(file);
+    gbCheatsSaveCheatList(file);
 }
 
 void GameBoyCheatListDialog::vRemoveCheat(int index)
 {
-  gbCheatRemove(index);
+    gbCheatRemove(index);
 }
 
 void GameBoyCheatListDialog::vRemoveAllCheats()
 {
-  gbCheatRemoveAll();
+    gbCheatRemoveAll();
 }
 
-void GameBoyCheatListDialog::vToggleCheat(int index, bool enable) {
-  if (enable)
-    gbCheatEnable(index);
-  else
-    gbCheatDisable(index);
+void GameBoyCheatListDialog::vToggleCheat(int index, bool enable)
+{
+    if (enable)
+        gbCheatEnable(index);
+    else
+        gbCheatDisable(index);
 }
 
 void GameBoyCheatListDialog::vUpdateList(int previous)
 {
-  for (int i = previous; i < gbCheatNumber;  i++)
-  {
-    // Add row for each newly added cheat
-    Gtk::TreeModel::Row row = *(m_poCheatListStore->append());
+    for (int i = previous; i < gbCheatNumber; i++) {
+        // Add row for each newly added cheat
+        Gtk::TreeModel::Row row = *(m_poCheatListStore->append());
 
-    row[m_oRecordModel.iIndex] = i;
-    row[m_oRecordModel.bEnabled] = gbCheatList[i].enabled;
-    row[m_oRecordModel.uDesc] = gbCheatList[i].cheatDesc;
-  }
+        row[m_oRecordModel.iIndex] = i;
+        row[m_oRecordModel.bEnabled] = gbCheatList[i].enabled;
+        row[m_oRecordModel.uDesc] = gbCheatList[i].cheatDesc;
+    }
 }
 
 } // namespace VBA

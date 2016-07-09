@@ -1,9 +1,9 @@
 #pragma once
 
 // make windows controls look newer / enable visual styles:
-#pragma comment(                                                                                   \
-    linker,                                                                                        \
-    "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' "                 \
+#pragma comment(                                                                   \
+    linker,                                                                        \
+    "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' " \
     "version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #ifndef VC_EXTRALEAN
@@ -29,4 +29,4 @@
 #endif
 #ifndef _AFX_NO_AFXCMN_SUPPORT
 #include <afxcmn.h> // MFC support for Windows Common Controls
-#endif              // _AFX_NO_AFXCMN_SUPPORT
+#endif // _AFX_NO_AFXCMN_SUPPORT

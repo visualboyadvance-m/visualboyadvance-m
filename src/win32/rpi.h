@@ -10,41 +10,41 @@
 #if defined(_WIN32)
 #include <windows.h>
 #else
-#define HMODULE void *
+#define HMODULE void*
 #endif
 
 //---------------------------------------------------------------------------------------------------------------------------
 typedef struct {
-        unsigned long Size;
-        unsigned long Flags;
-        void *SrcPtr;
-        unsigned long SrcPitch;
-        unsigned long SrcW;
-        unsigned long SrcH;
-        void *DstPtr;
-        unsigned long DstPitch;
-        unsigned long DstW;
-        unsigned long DstH;
-        unsigned long OutW;
-        unsigned long OutH;
+    unsigned long Size;
+    unsigned long Flags;
+    void* SrcPtr;
+    unsigned long SrcPitch;
+    unsigned long SrcW;
+    unsigned long SrcH;
+    void* DstPtr;
+    unsigned long DstPitch;
+    unsigned long DstW;
+    unsigned long DstH;
+    unsigned long OutW;
+    unsigned long OutH;
 } RENDER_PLUGIN_OUTP;
 
 //---------------------------------------------------------------------------------------------------------------------------
 
-typedef void (*RENDPLUG_Output)(RENDER_PLUGIN_OUTP *);
+typedef void (*RENDPLUG_Output)(RENDER_PLUGIN_OUTP*);
 
 //---------------------------------------------------------------------------------------------------------------------------
 
 typedef struct {
-        char Name[60];
-        unsigned long Flags;
-        HMODULE Handle;
-        RENDPLUG_Output Output;
+    char Name[60];
+    unsigned long Flags;
+    HMODULE Handle;
+    RENDPLUG_Output Output;
 } RENDER_PLUGIN_INFO;
 
 //---------------------------------------------------------------------------------------------------------------------------
 
-typedef RENDER_PLUGIN_INFO *(*RENDPLUG_GetInfo)(void);
+typedef RENDER_PLUGIN_INFO* (*RENDPLUG_GetInfo)(void);
 
 //---------------------------------------------------------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ typedef RENDER_PLUGIN_INFO *(*RENDPLUG_GetInfo)(void);
 //---------------------------------------------------------------------------------------------------------------------------
 
 int rpiScaleFactor();
-bool rpiInit(const char *sPluginName);
-void rpiFilter(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr, u8 *dstPtr, u32 dstPitch, int width,
-               int height);
+bool rpiInit(const char* sPluginName);
+void rpiFilter(u8* srcPtr, u32 srcPitch, u8* deltaPtr, u8* dstPtr, u32 dstPitch, int width,
+    int height);
 void rpiCleanup();

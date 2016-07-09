@@ -18,5 +18,5 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 extern void debuggerMain();
-extern void debuggerOutput(const char *, u32);
+extern void debuggerOutput(const char*, u32);
 extern void debuggerSignal(int, int);

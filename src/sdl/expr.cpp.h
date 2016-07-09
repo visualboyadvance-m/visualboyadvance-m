@@ -39,13 +39,13 @@
 /* Put the tokens into the symbol table, so that GDB and other debuggers
    know about them.  */
 enum yytokentype {
-        TOKEN_IDENTIFIER = 258,
-        TOKEN_DOT = 259,
-        TOKEN_STAR = 260,
-        TOKEN_ARROW = 261,
-        TOKEN_ADDR = 262,
-        TOKEN_SIZEOF = 263,
-        TOKEN_NUMBER = 264
+    TOKEN_IDENTIFIER = 258,
+    TOKEN_DOT = 259,
+    TOKEN_STAR = 260,
+    TOKEN_ARROW = 261,
+    TOKEN_ADDR = 262,
+    TOKEN_SIZEOF = 263,
+    TOKEN_NUMBER = 264
 };
 #endif
 /* Tokens.  */

@@ -20,17 +20,16 @@
 
 #include "../common/SoundDriver.h"
 
-class SoundRetro : public SoundDriver
-{
-        public:
-        SoundRetro();
-        virtual ~SoundRetro();
+class SoundRetro : public SoundDriver {
+public:
+    SoundRetro();
+    virtual ~SoundRetro();
 
-        virtual bool init(long sampleRate);
-        virtual void pause();
-        virtual void reset();
-        virtual void resume();
-        virtual void write(u16 *finalWave, int length);
+    virtual bool init(long sampleRate);
+    virtual void pause();
+    virtual void reset();
+    virtual void resume();
+    virtual void write(u16* finalWave, int length);
 };
 
 #endif // __VBA_SOUND_RETRO_H__

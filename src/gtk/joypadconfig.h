@@ -33,49 +33,47 @@
 #include "../sdl/inputSDL.h"
 #include "configfile.h"
 
-namespace VBA
-{
-class JoypadConfigDialog : public Gtk::Dialog
-{
-        public:
-        JoypadConfigDialog(Config::Section *_poConfig);
-        virtual ~JoypadConfigDialog();
+namespace VBA {
+class JoypadConfigDialog : public Gtk::Dialog {
+public:
+    JoypadConfigDialog(Config::Section* _poConfig);
+    virtual ~JoypadConfigDialog();
 
-        protected:
-        bool bOnEntryFocusIn(GdkEventFocus *_pstEvent, guint _uiEntry);
-        bool bOnEntryFocusOut(GdkEventFocus *_pstEvent);
+protected:
+    bool bOnEntryFocusIn(GdkEventFocus* _pstEvent, guint _uiEntry);
+    bool bOnEntryFocusOut(GdkEventFocus* _pstEvent);
 
-        void vOnInputEvent(const SDL_Event &event);
-        bool on_key_press_event(GdkEventKey *_pstEvent);
-        void on_response(int response_id);
+    void vOnInputEvent(const SDL_Event& event);
+    bool on_key_press_event(GdkEventKey* _pstEvent);
+    void on_response(int response_id);
 
-        private:
-        struct SJoypadKey {
-                const EKey m_eKeyFlag;
-                const char *m_csKeyName;
-        };
+private:
+    struct SJoypadKey {
+        const EKey m_eKeyFlag;
+        const char* m_csKeyName;
+    };
 
-        Gtk::HBox m_oTitleHBox;
-        Gtk::Label m_oTitleLabel;
-        Gtk::ComboBoxText m_oTitleCombo;
-        Gtk::HSeparator m_oSeparator;
-        Gtk::CheckButton m_oDefaultJoypad;
-        Gtk::Table m_oTable;
-        Gtk::Button *m_poOkButton;
-        std::vector<Gtk::Entry *> m_oEntries;
-        gint m_iCurrentEntry;
-        bool m_bUpdating;
-        static const SJoypadKey m_astKeys[];
-        sigc::connection m_oConfigSig;
-        SDL_Event m_oPreviousEvent;
-        EPad m_ePad;
-        Config::Section *m_poConfig;
+    Gtk::HBox m_oTitleHBox;
+    Gtk::Label m_oTitleLabel;
+    Gtk::ComboBoxText m_oTitleCombo;
+    Gtk::HSeparator m_oSeparator;
+    Gtk::CheckButton m_oDefaultJoypad;
+    Gtk::Table m_oTable;
+    Gtk::Button* m_poOkButton;
+    std::vector<Gtk::Entry*> m_oEntries;
+    gint m_iCurrentEntry;
+    bool m_bUpdating;
+    static const SJoypadKey m_astKeys[];
+    sigc::connection m_oConfigSig;
+    SDL_Event m_oPreviousEvent;
+    EPad m_ePad;
+    Config::Section* m_poConfig;
 
-        bool bOnConfigIdle();
-        void vOnJoypadSelect();
-        void vOnDefaultJoypadSelect();
-        void vUpdateEntries();
-        void vEmptyEventQueue();
+    bool bOnConfigIdle();
+    void vOnJoypadSelect();
+    void vOnDefaultJoypadSelect();
+    void vUpdateEntries();
+    void vEmptyEventQueue();
 };
 
 } // namespace VBA

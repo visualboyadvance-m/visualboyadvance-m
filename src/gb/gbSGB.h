@@ -6,18 +6,18 @@ void gbSgbShutdown();
 void gbSgbCommand();
 void gbSgbResetPacketState();
 void gbSgbReset();
-void gbSgbDoBitTransfer(u8);
+void gbSgbDoBitTransfer(uint8_t);
 void gbSgbSaveGame(gzFile);
 void gbSgbReadGame(gzFile, int version);
 void gbSgbRenderBorder();
 
-extern u8 gbSgbATF[20 * 18];
+extern uint8_t gbSgbATF[20 * 18];
 extern int gbSgbMode;
 extern int gbSgbMask;
 extern int gbSgbMultiplayer;
-extern u8 gbSgbNextController;
+extern uint8_t gbSgbNextController;
 extern int gbSgbPacketTimeout;
-extern u8 gbSgbReadingController;
+extern uint8_t gbSgbReadingController;
 extern int gbSgbFourPlayers;
 
 #endif // GBSGB_H

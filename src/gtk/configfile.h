@@ -23,27 +23,24 @@
 #include <list>
 #include <sstream>
 
-namespace VBA
-{
-namespace Config
-{
-class NotFound
-{
-        public:
+namespace VBA {
+namespace Config {
+    class NotFound {
+    public:
         virtual ~NotFound()
         {
         }
 
-        protected:
+    protected:
         NotFound()
         {
         }
-};
+    };
 
-class SectionNotFound : public NotFound
-{
-        public:
-        SectionNotFound(const std::string &_rsName) : m_sName(_rsName)
+    class SectionNotFound : public NotFound {
+    public:
+        SectionNotFound(const std::string& _rsName)
+            : m_sName(_rsName)
         {
         }
         virtual ~SectionNotFound()
@@ -52,18 +49,18 @@ class SectionNotFound : public NotFound
 
         inline std::string sGetName() const
         {
-                return m_sName;
+            return m_sName;
         }
 
-        private:
+    private:
         std::string m_sName;
-};
+    };
 
-class KeyNotFound : public NotFound
-{
-        public:
-        KeyNotFound(const std::string &_rsSection, const std::string &_rsKey)
-            : m_sSection(_rsSection), m_sKey(_rsKey)
+    class KeyNotFound : public NotFound {
+    public:
+        KeyNotFound(const std::string& _rsSection, const std::string& _rsKey)
+            : m_sSection(_rsSection)
+            , m_sKey(_rsKey)
         {
         }
         virtual ~KeyNotFound()
@@ -72,135 +69,136 @@ class KeyNotFound : public NotFound
 
         inline std::string sGetSection() const
         {
-                return m_sSection;
+            return m_sSection;
         }
         inline std::string sGetKey() const
         {
-                return m_sKey;
+            return m_sKey;
         }
 
-        private:
+    private:
         std::string m_sSection;
         std::string m_sKey;
-};
+    };
 
-class Line
-{
-        public:
-        Line(const std::string &_rsKey, const std::string &_rsValue);
+    class Line {
+    public:
+        Line(const std::string& _rsKey, const std::string& _rsValue);
 
         std::string m_sKey;
         std::string m_sValue;
-};
+    };
 
-class Section : private std::list<Line>
-{
-        public:
-        explicit Section(const std::string &_rsName);
+    class Section : private std::list<Line> {
+    public:
+        explicit Section(const std::string& _rsName);
 
         inline std::string sGetName() const
         {
-                return m_sName;
+            return m_sName;
         }
 
-        bool bKeyExists(const std::string &_rsKey);
-        void vSetKey(const std::string &_rsKey, const std::string &_rsValue);
-        std::string sGetKey(const std::string &_rsKey) const;
-        void vRemoveKey(const std::string &_rsKey);
+        bool bKeyExists(const std::string& _rsKey);
+        void vSetKey(const std::string& _rsKey, const std::string& _rsValue);
+        std::string sGetKey(const std::string& _rsKey) const;
+        void vRemoveKey(const std::string& _rsKey);
 
-        template <typename T> void vSetKey(const std::string &_rsKey, const T &_rValue);
+        template <typename T>
+        void vSetKey(const std::string& _rsKey, const T& _rValue);
 
-        template <typename T> T oGetKey(const std::string &_rsKey) const;
+        template <typename T>
+        T oGetKey(const std::string& _rsKey) const;
 
         // read only
         typedef std::list<Line>::const_iterator const_iterator;
         inline const_iterator begin() const
         {
-                return std::list<Line>::begin();
+            return std::list<Line>::begin();
         }
         inline const_iterator end() const
         {
-                return std::list<Line>::end();
+            return std::list<Line>::end();
         }
 
-        private:
+    private:
         inline iterator begin()
         {
-                return std::list<Line>::begin();
+            return std::list<Line>::begin();
         }
         inline iterator end()
         {
-                return std::list<Line>::end();
+            return std::list<Line>::end();
         }
 
         std::string m_sName;
-};
+    };
 
-class File : private std::list<Section>
-{
-        public:
+    class File : private std::list<Section> {
+    public:
         File();
-        File(const std::string &_rsFile);
+        File(const std::string& _rsFile);
         virtual ~File();
 
-        bool bSectionExists(const std::string &_rsName);
-        Section *poAddSection(const std::string &_rsName);
-        Section *poGetSection(const std::string &_rsName);
-        void vRemoveSection(const std::string &_rsName);
-        void vLoad(const std::string &_rsFile, bool _bAddSection = true, bool _bAddKey = true);
-        void vSave(const std::string &_rsFile);
+        bool bSectionExists(const std::string& _rsName);
+        Section* poAddSection(const std::string& _rsName);
+        Section* poGetSection(const std::string& _rsName);
+        void vRemoveSection(const std::string& _rsName);
+        void vLoad(const std::string& _rsFile, bool _bAddSection = true, bool _bAddKey = true);
+        void vSave(const std::string& _rsFile);
         void vClear();
 
         // read only
         typedef std::list<Section>::const_iterator const_iterator;
         inline const_iterator begin() const
         {
-                return std::list<Section>::begin();
+            return std::list<Section>::begin();
         }
         inline const_iterator end() const
         {
-                return std::list<Section>::end();
+            return std::list<Section>::end();
         }
 
-        private:
+    private:
         inline iterator begin()
         {
-                return std::list<Section>::begin();
+            return std::list<Section>::begin();
         }
         inline iterator end()
         {
-                return std::list<Section>::end();
+            return std::list<Section>::end();
         }
-};
+    };
 
-// debug
-std::ostream &operator<<(std::ostream &_roOut, const File &_roConfig);
+    // debug
+    std::ostream& operator<<(std::ostream& _roOut, const File& _roConfig);
 
-template <typename T> void Section::vSetKey(const std::string &_rsKey, const T &_rValue)
-{
+    template <typename T>
+    void Section::vSetKey(const std::string& _rsKey, const T& _rValue)
+    {
         std::ostringstream oOut;
         oOut << _rValue;
         for (iterator it = begin(); it != end(); it++) {
-                if (it->m_sKey == _rsKey) {
-                        it->m_sValue = oOut.str();
-                        return;
-                }
+            if (it->m_sKey == _rsKey) {
+                it->m_sValue = oOut.str();
+                return;
+            }
         }
         push_back(Line(_rsKey, oOut.str()));
-}
+    }
 
-template <typename T> T Section::oGetKey(const std::string &_rsKey) const
-{
+    template <typename T>
+    T Section::oGetKey(const std::string& _rsKey) const
+    {
         T oValue;
         for (const_iterator it = begin(); it != end(); it++) {
-                if (it->m_sKey == _rsKey) {
-                        std::istringstream oIn(it->m_sValue);
-                        oIn >> oValue;
-                        return oValue;
-                }
+            if (it->m_sKey == _rsKey) {
+                std::istringstream oIn(it->m_sValue);
+                oIn >> oValue;
+                return oValue;
+            }
         }
         throw KeyNotFound(m_sName, _rsKey);
-}
+    }
 
 } // namespace Config
 } // namespace VBA

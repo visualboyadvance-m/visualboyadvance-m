@@ -20,100 +20,100 @@
 
 #include <cstring>
 
-namespace VBA
-{
+namespace VBA {
 
-template<typename T> T min( T x, T y ) { return x < y ? x : y; }
-template<typename T> T max( T x, T y ) { return x > y ? x : y; }
+template <typename T>
+T min(T x, T y) { return x < y ? x : y; }
+template <typename T>
+T max(T x, T y) { return x > y ? x : y; }
 
-ScreenAreaCairo::ScreenAreaCairo(int _iWidth, int _iHeight, int _iScale) :
-  ScreenArea(_iWidth, _iHeight, _iScale)
+ScreenAreaCairo::ScreenAreaCairo(int _iWidth, int _iHeight, int _iScale)
+    : ScreenArea(_iWidth, _iHeight, _iScale)
 {
-  vUpdateSize();
+    vUpdateSize();
 }
 
-void ScreenAreaCairo::vDrawPixels(u8 * _puiData)
+void ScreenAreaCairo::vDrawPixels(u8* _puiData)
 {
-  ScreenArea::vDrawPixels(_puiData);
+    ScreenArea::vDrawPixels(_puiData);
 
-  queue_draw();
+    queue_draw();
 }
 
 #if !GTK_CHECK_VERSION(3, 0, 0)
-bool ScreenAreaCairo::on_expose_event(GdkEventExpose * _pstEvent)
+bool ScreenAreaCairo::on_expose_event(GdkEventExpose* _pstEvent)
 {
-  DrawingArea::on_expose_event(_pstEvent);
-  Cairo::RefPtr< Cairo::ImageSurface >   poImage;
-  Cairo::RefPtr< Cairo::SurfacePattern > poPattern;
-  Cairo::RefPtr< Cairo::Context >        poContext;
-  Cairo::Matrix oMatrix;
-  const int iScaledPitch = (m_iScaledWidth + 1) * sizeof(u32);
+    DrawingArea::on_expose_event(_pstEvent);
+    Cairo::RefPtr<Cairo::ImageSurface> poImage;
+    Cairo::RefPtr<Cairo::SurfacePattern> poPattern;
+    Cairo::RefPtr<Cairo::Context> poContext;
+    Cairo::Matrix oMatrix;
+    const int iScaledPitch = (m_iScaledWidth + 1) * sizeof(u32);
 
-  poContext = get_window()->create_cairo_context();
+    poContext = get_window()->create_cairo_context();
 
-  //poContext->set_identity_matrix();
-  poContext->scale(m_dScaleFactor, m_dScaleFactor);
+    //poContext->set_identity_matrix();
+    poContext->scale(m_dScaleFactor, m_dScaleFactor);
 
-  poImage = Cairo::ImageSurface::create((u8 *)m_puiPixels, Cairo::FORMAT_RGB24,
-                                    m_iScaledWidth, m_iScaledHeight, iScaledPitch);
+    poImage = Cairo::ImageSurface::create((u8*)m_puiPixels, Cairo::FORMAT_RGB24,
+        m_iScaledWidth, m_iScaledHeight, iScaledPitch);
 
-  //cairo_matrix_init_translate(&oMatrix, -m_iAreaLeft, -m_iAreaTop);
-  poPattern = Cairo::SurfacePattern::create(poImage);
-  poPattern->set_filter(Cairo::FILTER_NEAREST);
-  //poPattern->set_matrix (oMatrix);
-  poContext->set_source_rgb(0.0, 0.0, 0.0);
-  poContext->paint();
+    //cairo_matrix_init_translate(&oMatrix, -m_iAreaLeft, -m_iAreaTop);
+    poPattern = Cairo::SurfacePattern::create(poImage);
+    poPattern->set_filter(Cairo::FILTER_NEAREST);
+    //poPattern->set_matrix (oMatrix);
+    poContext->set_source_rgb(0.0, 0.0, 0.0);
+    poContext->paint();
 
-  poContext->set_source(poPattern);
-  poContext->paint();
+    poContext->set_source(poPattern);
+    poContext->paint();
 
-  return true;
+    return true;
 }
 #else
-bool ScreenAreaCairo::on_draw(const Cairo::RefPtr<Cairo::Context> &poContext)
+bool ScreenAreaCairo::on_draw(const Cairo::RefPtr<Cairo::Context>& poContext)
 {
-  DrawingArea::on_draw(poContext);
-  Cairo::RefPtr< Cairo::ImageSurface >   poImage;
-  Cairo::RefPtr< Cairo::SurfacePattern > poPattern;
-  Cairo::Matrix oMatrix;
-  const int iScaledPitch = (m_iScaledWidth + 1) * sizeof(u32);
+    DrawingArea::on_draw(poContext);
+    Cairo::RefPtr<Cairo::ImageSurface> poImage;
+    Cairo::RefPtr<Cairo::SurfacePattern> poPattern;
+    Cairo::Matrix oMatrix;
+    const int iScaledPitch = (m_iScaledWidth + 1) * sizeof(u32);
 
-  //poContext->set_identity_matrix();
-  poContext->scale(m_dScaleFactor, m_dScaleFactor);
+    //poContext->set_identity_matrix();
+    poContext->scale(m_dScaleFactor, m_dScaleFactor);
 
-  poImage = Cairo::ImageSurface::create((u8 *)m_puiPixels, Cairo::FORMAT_RGB24,
-                                    m_iScaledWidth, m_iScaledHeight, iScaledPitch);
+    poImage = Cairo::ImageSurface::create((u8*)m_puiPixels, Cairo::FORMAT_RGB24,
+        m_iScaledWidth, m_iScaledHeight, iScaledPitch);
 
-  //cairo_matrix_init_translate(&oMatrix, -m_iAreaLeft, -m_iAreaTop);
-  poPattern = Cairo::SurfacePattern::create(poImage);
-  poPattern->set_filter(Cairo::FILTER_NEAREST);
-  //poPattern->set_matrix (oMatrix);
-  poContext->set_source_rgb(0.0, 0.0, 0.0);
-  poContext->paint();
+    //cairo_matrix_init_translate(&oMatrix, -m_iAreaLeft, -m_iAreaTop);
+    poPattern = Cairo::SurfacePattern::create(poImage);
+    poPattern->set_filter(Cairo::FILTER_NEAREST);
+    //poPattern->set_matrix (oMatrix);
+    poContext->set_source_rgb(0.0, 0.0, 0.0);
+    poContext->paint();
 
-  poContext->set_source(poPattern);
-  poContext->paint();
+    poContext->set_source(poPattern);
+    poContext->paint();
 
-  return true;
+    return true;
 }
 #endif
 
 void ScreenAreaCairo::vDrawBlackScreen()
 {
-  if (m_puiPixels && get_realized())
-  {
-    memset(m_puiPixels, 0, m_iHeight * (m_iWidth + 1) * sizeof(u32));
-    queue_draw_area(0, 0, get_width(), get_height());
-  }
+    if (m_puiPixels && get_realized()) {
+        memset(m_puiPixels, 0, m_iHeight * (m_iWidth + 1) * sizeof(u32));
+        queue_draw_area(0, 0, get_width(), get_height());
+    }
 }
 
 void ScreenAreaCairo::vOnWidgetResize()
 {
-  m_dScaleFactor = min<double>(get_height() / (double)m_iHeight, get_width() / (double)m_iWidth);
-  m_dScaleFactor /= m_iFilterScale;
+    m_dScaleFactor = min<double>(get_height() / (double)m_iHeight, get_width() / (double)m_iWidth);
+    m_dScaleFactor /= m_iFilterScale;
 
-  m_iAreaTop = (get_height() / m_dScaleFactor - m_iHeight * m_iFilterScale) / 2;
-  m_iAreaLeft = (get_width() / m_dScaleFactor - m_iWidth * m_iFilterScale) / 2;
+    m_iAreaTop = (get_height() / m_dScaleFactor - m_iHeight * m_iFilterScale) / 2;
+    m_iAreaLeft = (get_width() / m_dScaleFactor - m_iWidth * m_iFilterScale) / 2;
 }
 
 } // namespace VBA

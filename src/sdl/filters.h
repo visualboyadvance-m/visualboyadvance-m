@@ -27,33 +27,33 @@
 
 // List of available filters
 enum Filter {
-        kStretch1x,
-        kStretch2x,
-        k2xSaI,
-        kSuper2xSaI,
-        kSuperEagle,
-        kPixelate,
-        kAdMame2x,
-        kBilinear,
-        kBilinearPlus,
-        kScanlines,
-        kScanlinesTV,
-        klq2x,
-        khq2x,
-        xbrz2x,
-        kStretch3x,
-        khq3x,
-        xbrz3x,
-        kStretch4x,
-        khq4x,
-        xbrz4x,
-        xbrz5x,
-        xbrz6x,
-        kInvalidFilter
+    kStretch1x,
+    kStretch2x,
+    k2xSaI,
+    kSuper2xSaI,
+    kSuperEagle,
+    kPixelate,
+    kAdMame2x,
+    kBilinear,
+    kBilinearPlus,
+    kScanlines,
+    kScanlinesTV,
+    klq2x,
+    khq2x,
+    xbrz2x,
+    kStretch3x,
+    khq3x,
+    xbrz3x,
+    kStretch4x,
+    khq4x,
+    xbrz4x,
+    xbrz5x,
+    xbrz6x,
+    kInvalidFilter
 };
 
 // Function pointer type for a filter function
-typedef void (*FilterFunc)(u8 *, u32, u8 *, u8 *, u32, int, int);
+typedef void (*FilterFunc)(u8*, u32, u8*, u8*, u32, int, int);
 
 // Initialize a filter and get the corresponding filter function pointer
 FilterFunc initFilter(const int f, const int colorDepth, const int srcWidth);
@@ -62,22 +62,25 @@ FilterFunc initFilter(const int f, const int colorDepth, const int srcWidth);
 int getFilterEnlargeFactor(const int f);
 
 // Get the display name for a filter
-char *getFilterName(const int f);
+char* getFilterName(const int f);
 
 //
 // Interframe filters
 //
 
 // List of available IFB filters
-enum IFBFilter { kIFBNone, kIBMotionBlur, kIBSmart, kInvalidIFBFilter };
+enum IFBFilter { kIFBNone,
+    kIBMotionBlur,
+    kIBSmart,
+    kInvalidIFBFilter };
 
 // Function pointer type for an IFB filter function
-typedef void (*IFBFilterFunc)(u8 *, u32, int, int);
+typedef void (*IFBFilterFunc)(u8*, u32, int, int);
 
 // Initialize an IFB filter and get the corresponding filter function pointer
 IFBFilterFunc initIFBFilter(const int f, const int colorDepth);
 
 // Get the display name for an IFB filter
-char *getIFBFilterName(const IFBFilter f);
+char* getIFBFilterName(const IFBFilter f);
 
 #endif // VBA_SDL_FILTERS_H

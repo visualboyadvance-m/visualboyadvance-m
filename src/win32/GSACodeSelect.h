@@ -10,36 +10,35 @@
 /////////////////////////////////////////////////////////////////////////////
 // GSACodeSelect dialog
 
-class GSACodeSelect : public CDialog
-{
-        // Construction
-        public:
-        GSACodeSelect(FILE *file, CWnd *pParent = NULL); // standard constructor
+class GSACodeSelect : public CDialog {
+    // Construction
+public:
+    GSACodeSelect(FILE* file, CWnd* pParent = NULL); // standard constructor
 
-        // Dialog Data
-        //{{AFX_DATA(GSACodeSelect)
-        enum { IDD = IDD_CODE_SELECT };
-        CListBox m_games;
-        //}}AFX_DATA
-        FILE *m_file;
+    // Dialog Data
+    //{{AFX_DATA(GSACodeSelect)
+    enum { IDD = IDD_CODE_SELECT };
+    CListBox m_games;
+    //}}AFX_DATA
+    FILE* m_file;
 
-        // Overrides
-        // ClassWizard generated virtual function overrides
-        //{{AFX_VIRTUAL(GSACodeSelect)
-        protected:
-        virtual void DoDataExchange(CDataExchange *pDX); // DDX/DDV support
-                                                         //}}AFX_VIRTUAL
+    // Overrides
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(GSACodeSelect)
+protected:
+    virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+    //}}AFX_VIRTUAL
 
-        // Implementation
-        protected:
-        // Generated message map functions
-        //{{AFX_MSG(GSACodeSelect)
-        afx_msg void OnCancel();
-        afx_msg void OnOk();
-        afx_msg void OnSelchangeGameList();
-        virtual BOOL OnInitDialog();
-        //}}AFX_MSG
-        DECLARE_MESSAGE_MAP()
+    // Implementation
+protected:
+    // Generated message map functions
+    //{{AFX_MSG(GSACodeSelect)
+    afx_msg void OnCancel();
+    afx_msg void OnOk();
+    afx_msg void OnSelchangeGameList();
+    virtual BOOL OnInitDialog();
+    //}}AFX_MSG
+    DECLARE_MESSAGE_MAP()
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -27,50 +27,51 @@
 
 #include "window.h"
 
-namespace VBA
-{
-enum ECheatType { CheatGeneric, CheatGSA, CheatCBA, CheatGS, CheatGG };
+namespace VBA {
+enum ECheatType { CheatGeneric,
+    CheatGSA,
+    CheatCBA,
+    CheatGS,
+    CheatGG };
 
-class EditCheatCodeColumns : public Gtk::TreeModel::ColumnRecord
-{
-        public:
-        EditCheatCodeColumns()
-        {
-                add(uText);
-                add(iType);
-        }
+class EditCheatCodeColumns : public Gtk::TreeModel::ColumnRecord {
+public:
+    EditCheatCodeColumns()
+    {
+        add(uText);
+        add(iType);
+    }
 
-        ~EditCheatCodeColumns()
-        {
-        }
+    ~EditCheatCodeColumns()
+    {
+    }
 
-        Gtk::TreeModelColumn<Glib::ustring> uText;
-        Gtk::TreeModelColumn<ECheatType> iType;
+    Gtk::TreeModelColumn<Glib::ustring> uText;
+    Gtk::TreeModelColumn<ECheatType> iType;
 };
 
-class CheatEditDialog : public Gtk::Dialog
-{
-        public:
-        CheatEditDialog(GtkDialog *_pstDialog, const Glib::RefPtr<Gtk::Builder> &refBuilder);
-        Glib::RefPtr<Gtk::TextBuffer> vGetCode();
-        Glib::ustring vGetDesc();
-        ECheatType vGetType();
-        void vSetWindow(VBA::Window *_poWindow);
+class CheatEditDialog : public Gtk::Dialog {
+public:
+    CheatEditDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder);
+    Glib::RefPtr<Gtk::TextBuffer> vGetCode();
+    Glib::ustring vGetDesc();
+    ECheatType vGetType();
+    void vSetWindow(VBA::Window* _poWindow);
 
-        private:
-        void vOnApply();
-        void vOnCancel();
+private:
+    void vOnApply();
+    void vOnCancel();
 
-        VBA::Window *m_poWindow;
+    VBA::Window* m_poWindow;
 
-        Gtk::Entry *m_poCheatDescEntry;
-        Gtk::ComboBox *m_poCheatTypeComboBox;
-        Gtk::TextView *m_poCheatInputTextView;
-        Gtk::Button *m_poCheatApplyButton;
-        Gtk::Button *m_poCheatCancelButton;
-        Glib::RefPtr<Gtk::TextBuffer> m_poCheatInputBuffer;
-        Glib::RefPtr<Gtk::ListStore> m_poCheatTypeStore;
-        EditCheatCodeColumns m_oTypeModel;
+    Gtk::Entry* m_poCheatDescEntry;
+    Gtk::ComboBox* m_poCheatTypeComboBox;
+    Gtk::TextView* m_poCheatInputTextView;
+    Gtk::Button* m_poCheatApplyButton;
+    Gtk::Button* m_poCheatCancelButton;
+    Glib::RefPtr<Gtk::TextBuffer> m_poCheatInputBuffer;
+    Glib::RefPtr<Gtk::ListStore> m_poCheatTypeStore;
+    EditCheatCodeColumns m_oTypeModel;
 };
 
 } // namespace VBA

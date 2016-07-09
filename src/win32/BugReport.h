@@ -29,36 +29,35 @@
 /////////////////////////////////////////////////////////////////////////////
 // BugReport dialog
 
-class BugReport : public CDialog
-{
-        // Construction
-        public:
-        BugReport(CWnd *pParent = NULL); // standard constructor
+class BugReport : public CDialog {
+    // Construction
+public:
+    BugReport(CWnd* pParent = NULL); // standard constructor
 
-        // Dialog Data
-        //{{AFX_DATA(BugReport)
-        enum { IDD = IDD_BUG_REPORT };
-        CEdit m_report;
-        //}}AFX_DATA
+    // Dialog Data
+    //{{AFX_DATA(BugReport)
+    enum { IDD = IDD_BUG_REPORT };
+    CEdit m_report;
+    //}}AFX_DATA
 
-        // Overrides
-        // ClassWizard generated virtual function overrides
-        //{{AFX_VIRTUAL(BugReport)
-        protected:
-        virtual void DoDataExchange(CDataExchange *pDX); // DDX/DDV support
-                                                         //}}AFX_VIRTUAL
+    // Overrides
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(BugReport)
+protected:
+    virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+    //}}AFX_VIRTUAL
 
-        // Implementation
-        protected:
-        CString createReport();
+    // Implementation
+protected:
+    CString createReport();
 
-        // Generated message map functions
-        //{{AFX_MSG(BugReport)
-        afx_msg void OnCopy();
-        afx_msg void OnOk();
-        virtual BOOL OnInitDialog();
-        //}}AFX_MSG
-        DECLARE_MESSAGE_MAP()
+    // Generated message map functions
+    //{{AFX_MSG(BugReport)
+    afx_msg void OnCopy();
+    afx_msg void OnOk();
+    virtual BOOL OnInitDialog();
+    //}}AFX_MSG
+    DECLARE_MESSAGE_MAP()
 };
 
 //{{AFX_INSERT_LOCATION}}

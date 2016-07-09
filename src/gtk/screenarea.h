@@ -25,61 +25,59 @@
 
 #include "filters.h"
 
-namespace VBA
-{
-class ScreenArea : public Gtk::DrawingArea
-{
-        public:
-        ScreenArea(int _iWidth, int _iHeight, int _iScale = 1);
-        virtual ~ScreenArea();
+namespace VBA {
+class ScreenArea : public Gtk::DrawingArea {
+public:
+    ScreenArea(int _iWidth, int _iHeight, int _iScale = 1);
+    virtual ~ScreenArea();
 
-        void vSetSize(int _iWidth, int _iHeight);
-        void vSetScale(int _iScale);
-        void vSetFilter(EFilter _eFilter);
-        void vSetFilterIB(EFilterIB _eFilterIB);
-        void vSetEnableRender(bool _bEnable);
-        virtual void vDrawPixels(u8 *_puiData);
-        virtual void vDrawBlackScreen() = 0;
+    void vSetSize(int _iWidth, int _iHeight);
+    void vSetScale(int _iScale);
+    void vSetFilter(EFilter _eFilter);
+    void vSetFilterIB(EFilterIB _eFilterIB);
+    void vSetEnableRender(bool _bEnable);
+    virtual void vDrawPixels(u8* _puiData);
+    virtual void vDrawBlackScreen() = 0;
 
-        protected:
-        virtual bool on_motion_notify_event(GdkEventMotion *_pstEvent);
-        virtual bool on_enter_notify_event(GdkEventCrossing *_pstEvent);
-        virtual bool on_leave_notify_event(GdkEventCrossing *_pstEvent);
-        virtual bool on_configure_event(GdkEventConfigure *event);
-        virtual bool bOnCursorTimeout();
-        virtual void vOnSizeUpdated()
-        {
-        }
+protected:
+    virtual bool on_motion_notify_event(GdkEventMotion* _pstEvent);
+    virtual bool on_enter_notify_event(GdkEventCrossing* _pstEvent);
+    virtual bool on_leave_notify_event(GdkEventCrossing* _pstEvent);
+    virtual bool on_configure_event(GdkEventConfigure* event);
+    virtual bool bOnCursorTimeout();
+    virtual void vOnSizeUpdated()
+    {
+    }
 
-        int m_iWidth;
-        int m_iHeight;
-        int m_iScale;
-        int m_iFilterScale;
-        int m_iAreaWidth;
-        int m_iAreaHeight;
-        Filter m_vFilter2x;
-        FilterIB m_vFilterIB;
-        u32 *m_puiPixels;
-        u8 *m_puiDelta;
-        int m_iScaledWidth;
-        int m_iScaledHeight;
-        bool m_bEnableRender;
+    int m_iWidth;
+    int m_iHeight;
+    int m_iScale;
+    int m_iFilterScale;
+    int m_iAreaWidth;
+    int m_iAreaHeight;
+    Filter m_vFilter2x;
+    FilterIB m_vFilterIB;
+    u32* m_puiPixels;
+    u8* m_puiDelta;
+    int m_iScaledWidth;
+    int m_iScaledHeight;
+    bool m_bEnableRender;
 
-        bool m_bShowCursor;
+    bool m_bShowCursor;
 
 #if !GTK_CHECK_VERSION(3, 0, 0)
-        Gdk::Cursor *m_poEmptyCursor;
+    Gdk::Cursor* m_poEmptyCursor;
 #else
-        Glib::RefPtr<Gdk::Cursor> m_poEmptyCursor;
+    Glib::RefPtr<Gdk::Cursor> m_poEmptyCursor;
 #endif
-        sigc::connection m_oCursorSig;
+    sigc::connection m_oCursorSig;
 
-        void vUpdateSize();
-        virtual void vOnWidgetResize() = 0;
-        void vStartCursorTimeout();
-        void vStopCursorTimeout();
-        void vHideCursor();
-        void vShowCursor();
+    void vUpdateSize();
+    virtual void vOnWidgetResize() = 0;
+    void vStartCursorTimeout();
+    void vStopCursorTimeout();
+    void vHideCursor();
+    void vShowCursor();
 };
 
 } // namespace VBA

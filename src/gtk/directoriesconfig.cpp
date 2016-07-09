@@ -22,48 +22,44 @@
 
 #include "intl.h"
 
-namespace VBA
-{
+namespace VBA {
 
-const DirectoriesConfigDialog::SDirEntry DirectoriesConfigDialog::m_astDirs[] =
-{
-    { "gba_roms",  N_("GBA roms :"),  "GBARomsDirEntry"   },
-    { "gb_roms",   N_("GB roms :"),   "GBRomsDirEntry"    },
+const DirectoriesConfigDialog::SDirEntry DirectoriesConfigDialog::m_astDirs[] = {
+    { "gba_roms", N_("GBA roms :"), "GBARomsDirEntry" },
+    { "gb_roms", N_("GB roms :"), "GBRomsDirEntry" },
     { "batteries", N_("Batteries :"), "BatteriesDirEntry" },
-    { "cheats",    N_("Cheats :"),    "CheatsDirEntry"    },
-    { "saves",     N_("Saves :"),     "SavesDirEntry"     },
-    { "captures",  N_("Captures :"),  "CapturesDirEntry"  }
+    { "cheats", N_("Cheats :"), "CheatsDirEntry" },
+    { "saves", N_("Saves :"), "SavesDirEntry" },
+    { "captures", N_("Captures :"), "CapturesDirEntry" }
 };
 
-DirectoriesConfigDialog::DirectoriesConfigDialog(Config::Section * _poConfig) :
-  Gtk::Dialog(_("Directories config"), true),
-  m_poConfig(_poConfig)
+DirectoriesConfigDialog::DirectoriesConfigDialog(Config::Section* _poConfig)
+    : Gtk::Dialog(_("Directories config"), true)
+    , m_poConfig(_poConfig)
 {
-  Gtk::Table * poTable = Gtk::manage( new Gtk::Table(G_N_ELEMENTS(m_astDirs), 2, false));
-  poTable->set_border_width(5);
-  poTable->set_spacings(5);
+    Gtk::Table* poTable = Gtk::manage(new Gtk::Table(G_N_ELEMENTS(m_astDirs), 2, false));
+    poTable->set_border_width(5);
+    poTable->set_spacings(5);
 
-  for (guint i = 0; i < G_N_ELEMENTS(m_astDirs); i++)
-  {
-    Gtk::Label * poLabel = Gtk::manage( new Gtk::Label(gettext(m_astDirs[i].m_csLabel), Gtk::ALIGN_END) );
-    m_poButtons[i] = Gtk::manage( new Gtk::FileChooserButton(Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER) );
-    m_poButtons[i]->set_current_folder(m_poConfig->sGetKey(m_astDirs[i].m_csKey));
+    for (guint i = 0; i < G_N_ELEMENTS(m_astDirs); i++) {
+        Gtk::Label* poLabel = Gtk::manage(new Gtk::Label(gettext(m_astDirs[i].m_csLabel), Gtk::ALIGN_END));
+        m_poButtons[i] = Gtk::manage(new Gtk::FileChooserButton(Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER));
+        m_poButtons[i]->set_current_folder(m_poConfig->sGetKey(m_astDirs[i].m_csKey));
 
-    poTable->attach(* poLabel, 0, 1, i, i + 1);
-    poTable->attach(* m_poButtons[i], 1, 2, i, i + 1);
-  }
+        poTable->attach(*poLabel, 0, 1, i, i + 1);
+        poTable->attach(*m_poButtons[i], 1, 2, i, i + 1);
+    }
 
-  add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
-  get_vbox()->pack_start(* poTable);
-  show_all_children();
+    add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
+    get_vbox()->pack_start(*poTable);
+    show_all_children();
 }
 
 void DirectoriesConfigDialog::on_response(int response_id)
 {
-  for (guint i = 0; i < G_N_ELEMENTS(m_astDirs); i++)
-  {
-    m_poConfig->vSetKey(m_astDirs[i].m_csKey, m_poButtons[i]->get_current_folder());
-  }
+    for (guint i = 0; i < G_N_ELEMENTS(m_astDirs); i++) {
+        m_poConfig->vSetKey(m_astDirs[i].m_csKey, m_poButtons[i]->get_current_folder());
+    }
 }
 
 } // namespace VBA

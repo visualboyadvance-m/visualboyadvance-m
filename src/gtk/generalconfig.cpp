@@ -18,87 +18,82 @@
 
 #include "generalconfig.h"
 
-#include <gtkmm/stock.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/liststore.h>
+#include <gtkmm/stock.h>
 
 #include "intl.h"
 
-namespace VBA
+namespace VBA {
+
+PreferencesDialog::PreferencesDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder)
+    : Gtk::Dialog(_pstDialog)
+    , m_poConfig(0)
 {
+    refBuilder->get_widget("PauseWhenInactiveCheckButton", m_poPauseWhenInactiveCheckButton);
+    refBuilder->get_widget("FrameSkipAutomaticCheckButton", m_poFrameSkipAutomaticCheckButton);
+    refBuilder->get_widget("FrameSkipLevelSpinButton", m_poFrameSkipLevelSpinButton);
+    refBuilder->get_widget("SpeedIndicatorComboBox", m_poSpeedIndicatorComboBox);
 
-PreferencesDialog::PreferencesDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder) :
-  Gtk::Dialog(_pstDialog),
-  m_poConfig(0)
-{
-  refBuilder->get_widget("PauseWhenInactiveCheckButton", m_poPauseWhenInactiveCheckButton);
-  refBuilder->get_widget("FrameSkipAutomaticCheckButton", m_poFrameSkipAutomaticCheckButton);
-  refBuilder->get_widget("FrameSkipLevelSpinButton", m_poFrameSkipLevelSpinButton);
-  refBuilder->get_widget("SpeedIndicatorComboBox", m_poSpeedIndicatorComboBox);
-
-  m_poPauseWhenInactiveCheckButton->signal_toggled().connect(sigc::mem_fun(*this, &PreferencesDialog::vOnPauseWhenInactiveChanged));
-  m_poFrameSkipAutomaticCheckButton->signal_toggled().connect(sigc::mem_fun(*this, &PreferencesDialog::vOnFrameskipChanged));
-  m_poFrameSkipLevelSpinButton->signal_changed().connect(sigc::mem_fun(*this, &PreferencesDialog::vOnFrameskipChanged));
-  m_poSpeedIndicatorComboBox->signal_changed().connect(sigc::mem_fun(*this, &PreferencesDialog::vOnSpeedIndicatorChanged));
-
+    m_poPauseWhenInactiveCheckButton->signal_toggled().connect(sigc::mem_fun(*this, &PreferencesDialog::vOnPauseWhenInactiveChanged));
+    m_poFrameSkipAutomaticCheckButton->signal_toggled().connect(sigc::mem_fun(*this, &PreferencesDialog::vOnFrameskipChanged));
+    m_poFrameSkipLevelSpinButton->signal_changed().connect(sigc::mem_fun(*this, &PreferencesDialog::vOnFrameskipChanged));
+    m_poSpeedIndicatorComboBox->signal_changed().connect(sigc::mem_fun(*this, &PreferencesDialog::vOnSpeedIndicatorChanged));
 }
 
-void PreferencesDialog::vSetConfig(Config::Section * _poConfig, VBA::Window * _poWindow)
+void PreferencesDialog::vSetConfig(Config::Section* _poConfig, VBA::Window* _poWindow)
 {
-  m_poConfig = _poConfig;
-  m_poWindow = _poWindow;
+    m_poConfig = _poConfig;
+    m_poWindow = _poWindow;
 
-  bool bPauseWhenInactive = m_poConfig->oGetKey<bool>("pause_when_inactive");
-  m_poPauseWhenInactiveCheckButton->set_active(bPauseWhenInactive);
+    bool bPauseWhenInactive = m_poConfig->oGetKey<bool>("pause_when_inactive");
+    m_poPauseWhenInactiveCheckButton->set_active(bPauseWhenInactive);
 
-  std::string sFrameskip = m_poConfig->oGetKey<std::string>("frameskip");
-  int iFrameskip = 0;
-  bool bAutoFrameskip = false;
-  
-  if (sFrameskip == "auto")
-    bAutoFrameskip = true;
-  else
-    iFrameskip = m_poConfig->oGetKey<int>("frameskip");
+    std::string sFrameskip = m_poConfig->oGetKey<std::string>("frameskip");
+    int iFrameskip = 0;
+    bool bAutoFrameskip = false;
 
-  m_poFrameSkipAutomaticCheckButton->set_active(bAutoFrameskip);
-  m_poFrameSkipLevelSpinButton->set_sensitive(!bAutoFrameskip);
-  m_poFrameSkipLevelSpinButton->set_value(iFrameskip);
+    if (sFrameskip == "auto")
+        bAutoFrameskip = true;
+    else
+        iFrameskip = m_poConfig->oGetKey<int>("frameskip");
 
-  int iShowSpeed = m_poConfig->oGetKey<int>("show_speed");
-  m_poSpeedIndicatorComboBox->set_active(iShowSpeed);
+    m_poFrameSkipAutomaticCheckButton->set_active(bAutoFrameskip);
+    m_poFrameSkipLevelSpinButton->set_sensitive(!bAutoFrameskip);
+    m_poFrameSkipLevelSpinButton->set_value(iFrameskip);
+
+    int iShowSpeed = m_poConfig->oGetKey<int>("show_speed");
+    m_poSpeedIndicatorComboBox->set_active(iShowSpeed);
 }
 
 void PreferencesDialog::vOnPauseWhenInactiveChanged()
 {
-  bool bPauseWhenInactive = m_poPauseWhenInactiveCheckButton->get_active();
-  m_poConfig->vSetKey("pause_when_inactive", bPauseWhenInactive);
+    bool bPauseWhenInactive = m_poPauseWhenInactiveCheckButton->get_active();
+    m_poConfig->vSetKey("pause_when_inactive", bPauseWhenInactive);
 }
 
 void PreferencesDialog::vOnFrameskipChanged()
 {
-  bool bAutoFrameskip = m_poFrameSkipAutomaticCheckButton->get_active();
-  
-  if (bAutoFrameskip)
-  {
-    m_poConfig->vSetKey("frameskip", "auto");
-  }
-  else
-  {
-    int iFrameskip = m_poFrameSkipLevelSpinButton->get_value();
-    m_poConfig->vSetKey("frameskip", iFrameskip);
-  }
-  
-  m_poFrameSkipLevelSpinButton->set_sensitive(!bAutoFrameskip);  
-  
-  m_poWindow->vApplyConfigFrameskip();
+    bool bAutoFrameskip = m_poFrameSkipAutomaticCheckButton->get_active();
+
+    if (bAutoFrameskip) {
+        m_poConfig->vSetKey("frameskip", "auto");
+    } else {
+        int iFrameskip = m_poFrameSkipLevelSpinButton->get_value();
+        m_poConfig->vSetKey("frameskip", iFrameskip);
+    }
+
+    m_poFrameSkipLevelSpinButton->set_sensitive(!bAutoFrameskip);
+
+    m_poWindow->vApplyConfigFrameskip();
 }
 
 void PreferencesDialog::vOnSpeedIndicatorChanged()
 {
-  int iShowSpeed = m_poSpeedIndicatorComboBox->get_active_row_number();
-  m_poConfig->vSetKey<int>("show_speed", iShowSpeed);
-  
-  m_poWindow->vApplyConfigShowSpeed();
+    int iShowSpeed = m_poSpeedIndicatorComboBox->get_active_row_number();
+    m_poConfig->vSetKey<int>("show_speed", iShowSpeed);
+
+    m_poWindow->vApplyConfigShowSpeed();
 }
 
 } // namespace VBA

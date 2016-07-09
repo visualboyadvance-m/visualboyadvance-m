@@ -14,31 +14,30 @@
 
 typedef struct DialogSizerSizingItem //      sdi
 {
-        UINT uControlID;
-        UINT uSizeInfo;
+    UINT uControlID;
+    UINT uSizeInfo;
 } DialogSizerSizingItem;
 
 #define DIALOG_SIZER_START(name) DialogSizerSizingItem name[] = {
 #define DIALOG_SIZER_ENTRY(controlID, flags) { controlID, flags },
-#define DIALOG_SIZER_END()                                                                         \
-        {                                                                                          \
-                0xFFFFFFFF, 0xFFFFFFFF                                                             \
-        }                                                                                          \
-        }                                                                                          \
-        ;
+#define DIALOG_SIZER_END()     \
+    {                          \
+        0xFFFFFFFF, 0xFFFFFFFF \
+    }                          \
+    }                          \
+    ;
 
-class ResizeDlg : public CDialog
-{
-        void *dd;
+class ResizeDlg : public CDialog {
+    void* dd;
 
-        public:
-        ResizeDlg(UINT id, CWnd *parent = NULL);
+public:
+    ResizeDlg(UINT id, CWnd* parent = NULL);
 
-        void *AddDialogData();
-        BOOL SetData(const DialogSizerSizingItem *psd, BOOL bShowSizingGrip, HKEY hkRootSave,
-                     LPCTSTR pcszName, SIZE *psizeMax);
-        void UpdateWindowSize(const int cx, const int cy, HWND);
+    void* AddDialogData();
+    BOOL SetData(const DialogSizerSizingItem* psd, BOOL bShowSizingGrip, HKEY hkRootSave,
+        LPCTSTR pcszName, SIZE* psizeMax);
+    void UpdateWindowSize(const int cx, const int cy, HWND);
 
-        virtual BOOL OnWndMsg(UINT, WPARAM, LPARAM, LRESULT *);
+    virtual BOOL OnWndMsg(UINT, WPARAM, LPARAM, LRESULT*);
 };
 #endif

@@ -3,8 +3,8 @@
 #include "../common/Port.h"
 #include "gb.h"
 #include "gbGlobals.h"
-u8 gbDaysinMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-const u8 gbDisabledRam[8] = { 0x80, 0xff, 0xf0, 0x00, 0x30, 0xbf, 0xbf, 0xbf };
+uint8_t gbDaysinMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+const uint8_t gbDisabledRam[8] = { 0x80, 0xff, 0xf0, 0x00, 0x30, 0xbf, 0xbf, 0xbf };
 extern int gbGBCColorType;
 extern gbRegister PC;
 
@@ -19,7 +19,7 @@ mapperMBC1 gbDataMBC1 = {
 };
 
 // MBC1 ROM write registers
-void mapperMBC1ROM(u16 address, u8 value)
+void mapperMBC1ROM(uint16_t address, uint8_t value)
 {
     int tmpAddress = 0;
 
@@ -153,7 +153,7 @@ void mapperMBC1ROM(u16 address, u8 value)
 }
 
 // MBC1 RAM write
-void mapperMBC1RAM(u16 address, u8 value)
+void mapperMBC1RAM(uint16_t address, uint8_t value)
 {
     if (gbDataMBC1.mapperRAMEnable) {
         if (gbRamSize) {
@@ -164,7 +164,7 @@ void mapperMBC1RAM(u16 address, u8 value)
 }
 
 // MBC1 read RAM
-u8 mapperMBC1ReadRAM(u16 address)
+uint8_t mapperMBC1ReadRAM(uint16_t address)
 {
 
     if (gbDataMBC1.mapperRAMEnable)
@@ -237,7 +237,7 @@ mapperMBC2 gbDataMBC2 = {
 };
 
 // MBC2 ROM write registers
-void mapperMBC2ROM(u16 address, u8 value)
+void mapperMBC2ROM(uint16_t address, uint8_t value)
 {
     switch (address & 0x6000) {
     case 0x0000: // RAM enable
@@ -269,7 +269,7 @@ void mapperMBC2ROM(u16 address, u8 value)
 }
 
 // MBC2 RAM write
-void mapperMBC2RAM(u16 address, u8 value)
+void mapperMBC2RAM(uint16_t address, uint8_t value)
 {
     if (gbDataMBC2.mapperRAMEnable) {
         if (gbRamSize && address < 0xa200) {
@@ -353,7 +353,7 @@ void memoryUpdateMBC3Clock()
 }
 
 // MBC3 ROM write registers
-void mapperMBC3ROM(u16 address, u8 value)
+void mapperMBC3ROM(uint16_t address, uint8_t value)
 {
     int tmpAddress = 0;
 
@@ -412,7 +412,7 @@ void mapperMBC3ROM(u16 address, u8 value)
 }
 
 // MBC3 RAM write
-void mapperMBC3RAM(u16 address, u8 value)
+void mapperMBC3RAM(uint16_t address, uint8_t value)
 {
     if (gbDataMBC3.mapperRAMEnable) {
         if (gbDataMBC3.mapperRAMBank != -1) {
@@ -447,7 +447,7 @@ void mapperMBC3RAM(u16 address, u8 value)
 }
 
 // MBC3 read RAM
-u8 mapperMBC3ReadRAM(u16 address)
+uint8_t mapperMBC3ReadRAM(uint16_t address)
 {
     if (gbDataMBC3.mapperRAMEnable) {
         if (gbDataMBC3.mapperRAMBank != -1) {
@@ -520,7 +520,7 @@ mapperMBC5 gbDataMBC5 = {
 };
 
 // MBC5 ROM write registers
-void mapperMBC5ROM(u16 address, u8 value)
+void mapperMBC5ROM(uint16_t address, uint8_t value)
 {
     int tmpAddress = 0;
 
@@ -580,7 +580,7 @@ void mapperMBC5ROM(u16 address, u8 value)
 }
 
 // MBC5 RAM write
-void mapperMBC5RAM(u16 address, u8 value)
+void mapperMBC5RAM(uint16_t address, uint8_t value)
 {
     if (gbDataMBC5.mapperRAMEnable) {
         if (gbRamSize) {
@@ -591,7 +591,7 @@ void mapperMBC5RAM(u16 address, u8 value)
 }
 
 // MBC5 read RAM
-u8 mapperMBC5ReadRAM(u16 address)
+uint8_t mapperMBC5ReadRAM(uint16_t address)
 {
 
     if (gbDataMBC5.mapperRAMEnable)
@@ -652,7 +652,7 @@ mapperMBC7 gbDataMBC7 = {
 };
 
 // MBC7 ROM write registers
-void mapperMBC7ROM(u16 address, u8 value)
+void mapperMBC7ROM(uint16_t address, uint8_t value)
 {
     int tmpAddress = 0;
 
@@ -694,7 +694,7 @@ void mapperMBC7ROM(u16 address, u8 value)
 }
 
 // MBC7 read RAM
-u8 mapperMBC7ReadRAM(u16 address)
+uint8_t mapperMBC7ReadRAM(uint16_t address)
 {
     switch (address & 0xa0f0) {
     case 0xa000:
@@ -738,7 +738,7 @@ u8 mapperMBC7ReadRAM(u16 address)
 }
 
 // MBC7 RAM write
-void mapperMBC7RAM(u16 address, u8 value)
+void mapperMBC7RAM(uint16_t address, uint8_t value)
 {
     if (address == 0xa080) {
         // special processing needed
@@ -827,7 +827,7 @@ void mapperMBC7RAM(u16 address, u8 value)
                             } else if ((gbDataMBC7.address >> 6) == 2) {
                                 if (gbDataMBC7.writeEnable) {
                                     for (int i = 0; i < 256; i++)
-                                        WRITE16LE((u16*)&gbMemory[0xa000 + i * 2], 0xffff);
+                                        WRITE16LE((uint16_t*)&gbMemory[0xa000 + i * 2], 0xffff);
                                     systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
                                 }
                                 gbDataMBC7.state = 5;
@@ -901,7 +901,7 @@ mapperHuC1 gbDataHuC1 = {
 };
 
 // HuC1 ROM write registers
-void mapperHuC1ROM(u16 address, u8 value)
+void mapperHuC1ROM(uint16_t address, uint8_t value)
 {
     int tmpAddress = 0;
 
@@ -956,7 +956,7 @@ void mapperHuC1ROM(u16 address, u8 value)
 }
 
 // HuC1 RAM write
-void mapperHuC1RAM(u16 address, u8 value)
+void mapperHuC1RAM(uint16_t address, uint8_t value)
 {
     if (gbDataHuC1.mapperRAMEnable) {
         if (gbRamSize) {
@@ -995,7 +995,7 @@ mapperHuC3 gbDataHuC3 = {
 };
 
 // HuC3 ROM write registers
-void mapperHuC3ROM(u16 address, u8 value)
+void mapperHuC3ROM(uint16_t address, uint8_t value)
 {
     int tmpAddress = 0;
 
@@ -1039,7 +1039,7 @@ void mapperHuC3ROM(u16 address, u8 value)
 }
 
 // HuC3 read RAM
-u8 mapperHuC3ReadRAM(u16 address)
+uint8_t mapperHuC3ReadRAM(uint16_t address)
 {
     if (gbDataHuC3.mapperRAMFlag > 0x0b && gbDataHuC3.mapperRAMFlag < 0x0e) {
         if (gbDataHuC3.mapperRAMFlag != 0x0c)
@@ -1050,7 +1050,7 @@ u8 mapperHuC3ReadRAM(u16 address)
 }
 
 // HuC3 RAM write
-void mapperHuC3RAM(u16 address, u8 value)
+void mapperHuC3RAM(uint16_t address, uint8_t value)
 {
     int* p;
 
@@ -1225,7 +1225,7 @@ void memoryUpdateTAMA5Clock()
 }
 
 // TAMA5 RAM write
-void mapperTAMA5RAM(u16 address, u8 value)
+void mapperTAMA5RAM(uint16_t address, uint8_t value)
 {
     if ((address & 0xffff) <= 0xa001) {
         switch (address & 1) {
@@ -1390,7 +1390,7 @@ void mapperTAMA5RAM(u16 address, u8 value)
                 if ((value & 0x0e) == 0x0c) {
                     gbDataTAMA5.mapperRamByteSelect = gbDataTAMA5.mapperCommands[6] | (gbDataTAMA5.mapperCommands[7] << 4);
 
-                    u8 byte = gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect];
+                    uint8_t byte = gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect];
 
                     gbMemoryMap[0xa][0] = (value & 1) ? byte >> 4 : byte & 0x0f;
 
@@ -1413,7 +1413,7 @@ void mapperTAMA5RAM(u16 address, u8 value)
 }
 
 // TAMA5 read RAM
-u8 mapperTAMA5ReadRAM(u16 address)
+uint8_t mapperTAMA5ReadRAM(uint16_t address)
 {
     return gbMemoryMap[address >> 12][address & 0xfff];
 }
@@ -1448,7 +1448,7 @@ mapperMMM01 gbDataMMM01 = {
 };
 
 // MMM01 ROM write registers
-void mapperMMM01ROM(u16 address, u8 value)
+void mapperMMM01ROM(uint16_t address, uint8_t value)
 {
     int tmpAddress = 0;
 
@@ -1518,7 +1518,7 @@ void mapperMMM01ROM(u16 address, u8 value)
 }
 
 // MMM01 RAM write
-void mapperMMM01RAM(u16 address, u8 value)
+void mapperMMM01RAM(uint16_t address, uint8_t value)
 {
     if (gbDataMMM01.mapperRAMEnable) {
         if (gbRamSize) {
@@ -1558,7 +1558,7 @@ void memoryUpdateMapMMM01()
 }
 
 // GameGenie ROM write registers
-void mapperGGROM(u16 address, u8 value)
+void mapperGGROM(uint16_t address, uint8_t value)
 {
     switch (address & 0x6000) {
     case 0x0000: // RAM enable register
@@ -1577,7 +1577,7 @@ void mapperGGROM(u16 address, u8 value)
 // GS3 Used to emulate the GS V3.0 rom bank switching
 mapperGS3 gbDataGS3 = { 1 }; // ROM bank
 
-void mapperGS3ROM(u16 address, u8 value)
+void mapperGS3ROM(uint16_t address, uint8_t value)
 {
     int tmpAddress = 0;
 

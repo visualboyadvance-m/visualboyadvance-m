@@ -3,6 +3,6 @@
 
 #include "../System.h"
 
-u8 gbPrinterSend(u8 b);
+uint8_t gbPrinterSend(uint8_t b);
 
 #endif // GBPRINTER_H

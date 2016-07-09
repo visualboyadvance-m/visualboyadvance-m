@@ -56,11 +56,11 @@ extern gb_effects_config_t gb_effects_config; // current configuration
 void gbSoundReset();
 
 // Emulates write to sound hardware
-void gbSoundEvent(u16 address, int data);
+void gbSoundEvent(uint16_t address, int data);
 #define SOUND_EVENT gbSoundEvent
 
 // Emulates read from sound hardware
-u8 gbSoundRead(u16 address);
+uint8_t gbSoundRead(uint16_t address);
 
 // Notifies emulator that SOUND_CLOCK_TICKS clocks have passed
 void gbSoundTick();

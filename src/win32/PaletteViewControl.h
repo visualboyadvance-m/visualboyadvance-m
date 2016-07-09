@@ -11,55 +11,54 @@
 /////////////////////////////////////////////////////////////////////////////
 // PaletteViewControl window
 
-class PaletteViewControl : public CWnd
-{
-        int w;
-        int h;
-        int colors;
-        u8 *data;
-        BITMAPINFO bmpInfo;
-        static bool isRegistered;
-        int selected;
+class PaletteViewControl : public CWnd {
+    int w;
+    int h;
+    int colors;
+    u8* data;
+    BITMAPINFO bmpInfo;
+    static bool isRegistered;
+    int selected;
 
-        protected:
-        u16 palette[256];
-        int paletteAddress;
-        // Construction
-        public:
-        PaletteViewControl();
+protected:
+    u16 palette[256];
+    int paletteAddress;
+    // Construction
+public:
+    PaletteViewControl();
 
-        virtual void updatePalette() = 0;
+    virtual void updatePalette() = 0;
 
-        // Attributes
-        public:
-        // Operations
-        public:
-        // Overrides
-        // ClassWizard generated virtual function overrides
-        //{{AFX_VIRTUAL(PaletteViewControl)
-        //}}AFX_VIRTUAL
+    // Attributes
+public:
+    // Operations
+public:
+    // Overrides
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(PaletteViewControl)
+    //}}AFX_VIRTUAL
 
-        // Implementation
-        public:
-        void registerClass();
-        void refresh();
-        void render(u16 color, int x, int y);
-        void setSelected(int s);
-        void setPaletteAddress(int address);
-        bool saveJASCPAL(const char *name);
-        bool saveMSPAL(const char *name);
-        bool saveAdobe(const char *name);
-        void init(int c, int w, int h);
-        virtual ~PaletteViewControl();
+    // Implementation
+public:
+    void registerClass();
+    void refresh();
+    void render(u16 color, int x, int y);
+    void setSelected(int s);
+    void setPaletteAddress(int address);
+    bool saveJASCPAL(const char* name);
+    bool saveMSPAL(const char* name);
+    bool saveAdobe(const char* name);
+    void init(int c, int w, int h);
+    virtual ~PaletteViewControl();
 
-        // Generated message map functions
-        protected:
-        //{{AFX_MSG(PaletteViewControl)
-        afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
-        afx_msg BOOL OnEraseBkgnd(CDC *pDC);
-        afx_msg void OnPaint();
-        //}}AFX_MSG
-        DECLARE_MESSAGE_MAP()
+    // Generated message map functions
+protected:
+    //{{AFX_MSG(PaletteViewControl)
+    afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+    afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+    afx_msg void OnPaint();
+    //}}AFX_MSG
+    DECLARE_MESSAGE_MAP()
 };
 
 /////////////////////////////////////////////////////////////////////////////

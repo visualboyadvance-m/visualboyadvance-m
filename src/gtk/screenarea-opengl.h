@@ -23,26 +23,24 @@
 #include "screenarea.h"
 #include <gtkmm/gl/widget.h>
 
-namespace VBA
-{
-class ScreenAreaGl : public ScreenArea, public Gtk::GL::Widget<ScreenAreaGl>
-{
-        public:
-        ScreenAreaGl(int _iWidth, int _iHeight, int _iScale = 1);
-        void vDrawPixels(u8 *_puiData);
-        void vDrawBlackScreen();
+namespace VBA {
+class ScreenAreaGl : public ScreenArea, public Gtk::GL::Widget<ScreenAreaGl> {
+public:
+    ScreenAreaGl(int _iWidth, int _iHeight, int _iScale = 1);
+    void vDrawPixels(u8* _puiData);
+    void vDrawBlackScreen();
 
-        protected:
-        void on_realize();
-        bool on_expose_event(GdkEventExpose *_pstEvent);
-        void vOnWidgetResize();
+protected:
+    void on_realize();
+    bool on_expose_event(GdkEventExpose* _pstEvent);
+    void vOnWidgetResize();
 
-        private:
-        GLuint m_uiScreenTexture;
-        int m_iTextureSize;
+private:
+    GLuint m_uiScreenTexture;
+    int m_iTextureSize;
 
-        void vUpdateTexture();
-        void vOnSizeUpdated();
+    void vUpdateTexture();
+    void vOnSizeUpdated();
 };
 
 } // namespace VBA

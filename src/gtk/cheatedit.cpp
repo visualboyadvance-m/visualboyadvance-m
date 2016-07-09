@@ -20,104 +20,101 @@
 
 #include "intl.h"
 
-namespace VBA
-{
+namespace VBA {
 
 /**
  * GameBoyAdvanceCheatEditDialog
  *
  * A unified cheat editing dialog for multiple code types.
  */
-CheatEditDialog::CheatEditDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder) :
-  Gtk::Dialog(_pstDialog)
+CheatEditDialog::CheatEditDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder)
+    : Gtk::Dialog(_pstDialog)
 {
-  refBuilder->get_widget("CheatDescEntry", m_poCheatDescEntry);
-  refBuilder->get_widget("CheatTypeComboBox", m_poCheatTypeComboBox);
-  refBuilder->get_widget("CheatInputTextView", m_poCheatInputTextView);
-  refBuilder->get_widget("CheatApplyButton", m_poCheatApplyButton);
-  refBuilder->get_widget("CheatCancelButton", m_poCheatCancelButton);
+    refBuilder->get_widget("CheatDescEntry", m_poCheatDescEntry);
+    refBuilder->get_widget("CheatTypeComboBox", m_poCheatTypeComboBox);
+    refBuilder->get_widget("CheatInputTextView", m_poCheatInputTextView);
+    refBuilder->get_widget("CheatApplyButton", m_poCheatApplyButton);
+    refBuilder->get_widget("CheatCancelButton", m_poCheatCancelButton);
 
-  // Tree View model
-  m_poCheatTypeStore = Gtk::ListStore::create(m_oTypeModel);
+    // Tree View model
+    m_poCheatTypeStore = Gtk::ListStore::create(m_oTypeModel);
 
-  m_poCheatTypeComboBox->set_model(m_poCheatTypeStore);
+    m_poCheatTypeComboBox->set_model(m_poCheatTypeStore);
 
-  m_poCheatApplyButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatEditDialog::vOnApply));
-  m_poCheatCancelButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatEditDialog::vOnCancel));
+    m_poCheatApplyButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatEditDialog::vOnApply));
+    m_poCheatCancelButton->signal_clicked().connect(sigc::mem_fun(*this, &CheatEditDialog::vOnCancel));
 }
 
 Glib::RefPtr<Gtk::TextBuffer> CheatEditDialog::vGetCode()
 {
-  return m_poCheatInputTextView->get_buffer();
+    return m_poCheatInputTextView->get_buffer();
 }
 
 Glib::ustring CheatEditDialog::vGetDesc()
 {
-  return m_poCheatDescEntry->get_text();
+    return m_poCheatDescEntry->get_text();
 }
 
 ECheatType CheatEditDialog::vGetType()
 {
-  Gtk::TreeModel::iterator iter = m_poCheatTypeComboBox->get_active();
+    Gtk::TreeModel::iterator iter = m_poCheatTypeComboBox->get_active();
 
-  if (iter)
-  {
-    Gtk::TreeModel::Row row = *iter;
+    if (iter) {
+        Gtk::TreeModel::Row row = *iter;
 
-    return row[m_oTypeModel.iType];
-  }
+        return row[m_oTypeModel.iType];
+    }
 
-  return CheatGeneric;
+    return CheatGeneric;
 }
 
-void CheatEditDialog::vSetWindow(VBA::Window * _poWindow)
+void CheatEditDialog::vSetWindow(VBA::Window* _poWindow)
 {
-  m_poWindow = _poWindow;
+    m_poWindow = _poWindow;
 
-  // GameBoy Advance
-  if (m_poWindow->eGetCartridge() == VBA::Window::CartridgeGBA)
-  {
-    Gtk::TreeModel::Row row = *(m_poCheatTypeStore->append());
+    // GameBoy Advance
+    if (m_poWindow->eGetCartridge() == VBA::Window::CartridgeGBA) {
+        Gtk::TreeModel::Row row = *(m_poCheatTypeStore->append());
 
-    row[m_oTypeModel.iType] = CheatGeneric;
-    row[m_oTypeModel.uText] = _("Generic Code");
+        row[m_oTypeModel.iType] = CheatGeneric;
+        row[m_oTypeModel.uText] = _("Generic Code");
 
-    row = *(m_poCheatTypeStore->append());
+        row = *(m_poCheatTypeStore->append());
 
-    row[m_oTypeModel.iType] = CheatGSA;
-    row[m_oTypeModel.uText] = _("Gameshark Advance");
+        row[m_oTypeModel.iType] = CheatGSA;
+        row[m_oTypeModel.uText] = _("Gameshark Advance");
 
-    row = *(m_poCheatTypeStore->append());
+        row = *(m_poCheatTypeStore->append());
 
-    row[m_oTypeModel.iType] = CheatCBA;
-    row[m_oTypeModel.uText] = _("CodeBreaker Advance");
+        row[m_oTypeModel.iType] = CheatCBA;
+        row[m_oTypeModel.uText] = _("CodeBreaker Advance");
 
-    m_poCheatTypeComboBox->set_active(CheatGeneric);
-  }
-  // GameBoy
-  else if (m_poWindow->eGetCartridge() == VBA::Window::CartridgeGB)
-  {
-    Gtk::TreeModel::Row row = *(m_poCheatTypeStore->append());
+        m_poCheatTypeComboBox->set_active(CheatGeneric);
+    }
+    // GameBoy
+    else if (m_poWindow->eGetCartridge() == VBA::Window::CartridgeGB) {
+        Gtk::TreeModel::Row row = *(m_poCheatTypeStore->append());
 
-    row[m_oTypeModel.iType] = CheatGS;
-    row[m_oTypeModel.uText] = _("GameShark");
+        row[m_oTypeModel.iType] = CheatGS;
+        row[m_oTypeModel.uText] = _("GameShark");
 
-    row = *(m_poCheatTypeStore->append());
+        row = *(m_poCheatTypeStore->append());
 
-    row[m_oTypeModel.iType] = CheatGG;
-    row[m_oTypeModel.uText] = _("GameGenie");
+        row[m_oTypeModel.iType] = CheatGG;
+        row[m_oTypeModel.uText] = _("GameGenie");
 
-    m_poCheatTypeComboBox->set_active(0);
-  }
+        m_poCheatTypeComboBox->set_active(0);
+    }
 }
 
 void CheatEditDialog::vOnApply()
 {
-  response(Gtk::RESPONSE_APPLY);
+    response(Gtk::RESPONSE_APPLY);
 }
 
-void CheatEditDialog::vOnCancel() {
-  response(Gtk::RESPONSE_CANCEL);
+void CheatEditDialog::vOnCancel()
+{
+    response(Gtk::RESPONSE_CANCEL);
 }
 
 } // namespace VBA

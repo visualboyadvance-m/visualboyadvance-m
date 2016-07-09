@@ -29,7 +29,7 @@ static inline blip_time_t blip_time()
     return (SOUND_CLOCK_TICKS - soundTicks) * ticks_to_time;
 }
 
-u8 gbSoundRead(u16 address)
+uint8_t gbSoundRead(uint16_t address)
 {
     if (gb_apu && address >= NR10 && address <= 0xFF3F)
         return gb_apu->read_register(blip_time(), address);
@@ -37,7 +37,7 @@ u8 gbSoundRead(u16 address)
     return gbMemory[address];
 }
 
-void gbSoundEvent(register u16 address, register int data)
+void gbSoundEvent(register uint16_t address, register int data)
 {
     gbMemory[address] = data;
 
@@ -326,9 +326,9 @@ static variable_desc gbsound_format2[] = {
 };
 
 static variable_desc gbsound_format3[] = {
-    SKIP(u8[2 * 735], soundBuffer),
-    SKIP(u8[2 * 735], soundBuffer),
-    SKIP(u16[735], soundFinalWave),
+    SKIP(uint8_t[2 * 735], soundBuffer),
+    SKIP(uint8_t[2 * 735], soundBuffer),
+    SKIP(uint16_t[735], soundFinalWave),
     { NULL, 0 }
 };
 
@@ -402,7 +402,7 @@ static variable_desc gb_state[] = {
     LOAD(int, state.version), // room_for_expansion will be used by later versions
 
     // APU
-    LOAD(u8[0x40], state.apu.regs), // last values written to registers and wave RAM (both banks)
+    LOAD(uint8_t[0x40], state.apu.regs), // last values written to registers and wave RAM (both banks)
     LOAD(int, state.apu.frame_time), // clocks until next frame sequencer action
     LOAD(int, state.apu.frame_phase), // next step frame sequencer will run
 

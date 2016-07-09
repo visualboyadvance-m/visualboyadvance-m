@@ -2,10 +2,10 @@
 #include <memory.h>
 #include <stdio.h>
 
-u8 gbPrinterStatus = 0;
+uint8_t gbPrinterStatus = 0;
 int gbPrinterState = 0;
-u8 gbPrinterData[0x280 * 9];
-u8 gbPrinterPacket[0x400];
+uint8_t gbPrinterData[0x280 * 9];
+uint8_t gbPrinterPacket[0x400];
 int gbPrinterCount = 0;
 int gbPrinterDataCount = 0;
 int gbPrinterDataSize = 0;
@@ -13,7 +13,7 @@ int gbPrinterResult = 0;
 
 bool gbPrinterCheckCRC()
 {
-    u16 crc = 0;
+    uint16_t crc = 0;
 
     for (int i = 2; i < (6 + gbPrinterDataSize); i++) {
         crc += gbPrinterPacket[i];
@@ -61,7 +61,7 @@ void gbPrinterShowData()
   pal[3].b = 0;
   set_palette(pal);
   acquire_screen();
-  u8 *data = gbPrinterData;
+  uint8_t *data = gbPrinterData;
   for(int y = 0; y < 0x12; y++) {
     for(int x = 0; x < 0x14; x++) {
       for(int k = 0; k < 8; k++) {
@@ -89,11 +89,11 @@ void gbPrinterReceiveData()
 {
     int i = gbPrinterDataCount;
     if (gbPrinterPacket[3]) { // compressed
-        u8* data = &gbPrinterPacket[6];
-        u8* dest = &gbPrinterData[gbPrinterDataCount];
+        uint8_t* data = &gbPrinterPacket[6];
+        uint8_t* dest = &gbPrinterData[gbPrinterDataCount];
         int len = 0;
         while (len < gbPrinterDataSize) {
-            u8 control = *data++;
+            uint8_t control = *data++;
             if (control & 0x80) { // repeated data
                 control &= 0x7f;
                 control += 2;
@@ -139,7 +139,7 @@ void gbPrinterCommand()
     }
 }
 
-u8 gbPrinterSend(u8 b)
+uint8_t gbPrinterSend(uint8_t b)
 {
     switch (gbPrinterState) {
     case 0:

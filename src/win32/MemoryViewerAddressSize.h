@@ -11,42 +11,41 @@
 /////////////////////////////////////////////////////////////////////////////
 // MemoryViewerAddressSize dialog
 
-class MemoryViewerAddressSize : public CDialog
-{
-        u32 address;
-        int size;
-        // Construction
-        public:
-        int getSize();
-        u32 getAddress();
-        void setSize(int s);
-        void setAddress(u32 a);
-        MemoryViewerAddressSize(u32 a = 0xffffff, int s = -1, CWnd *pParent = NULL); // standard
-                                                                                     // constructor
+class MemoryViewerAddressSize : public CDialog {
+    u32 address;
+    int size;
+    // Construction
+public:
+    int getSize();
+    u32 getAddress();
+    void setSize(int s);
+    void setAddress(u32 a);
+    MemoryViewerAddressSize(u32 a = 0xffffff, int s = -1, CWnd* pParent = NULL); // standard
+    // constructor
 
-        // Dialog Data
-        //{{AFX_DATA(MemoryViewerAddressSize)
-        enum { IDD = IDD_ADDR_SIZE };
-        CEdit m_size;
-        CEdit m_address;
-        //}}AFX_DATA
+    // Dialog Data
+    //{{AFX_DATA(MemoryViewerAddressSize)
+    enum { IDD = IDD_ADDR_SIZE };
+    CEdit m_size;
+    CEdit m_address;
+    //}}AFX_DATA
 
-        // Overrides
-        // ClassWizard generated virtual function overrides
-        //{{AFX_VIRTUAL(MemoryViewerAddressSize)
-        protected:
-        virtual void DoDataExchange(CDataExchange *pDX); // DDX/DDV support
-                                                         //}}AFX_VIRTUAL
+    // Overrides
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(MemoryViewerAddressSize)
+protected:
+    virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+    //}}AFX_VIRTUAL
 
-        // Implementation
-        protected:
-        // Generated message map functions
-        //{{AFX_MSG(MemoryViewerAddressSize)
-        virtual BOOL OnInitDialog();
-        afx_msg void OnOk();
-        afx_msg void OnCancel();
-        //}}AFX_MSG
-        DECLARE_MESSAGE_MAP()
+    // Implementation
+protected:
+    // Generated message map functions
+    //{{AFX_MSG(MemoryViewerAddressSize)
+    virtual BOOL OnInitDialog();
+    afx_msg void OnOk();
+    afx_msg void OnCancel();
+    //}}AFX_MSG
+    DECLARE_MESSAGE_MAP()
 };
 
 //{{AFX_INSERT_LOCATION}}

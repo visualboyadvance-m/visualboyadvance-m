@@ -26,31 +26,29 @@
 #include "configfile.h"
 #include "window.h"
 
-namespace VBA
-{
-class GameBoyAdvanceConfigDialog : public Gtk::Dialog
-{
-        public:
-        GameBoyAdvanceConfigDialog(GtkDialog *_pstDialog,
-                                   const Glib::RefPtr<Gtk::Builder> &refBuilder);
+namespace VBA {
+class GameBoyAdvanceConfigDialog : public Gtk::Dialog {
+public:
+    GameBoyAdvanceConfigDialog(GtkDialog* _pstDialog,
+        const Glib::RefPtr<Gtk::Builder>& refBuilder);
 
-        void vSetConfig(Config::Section *_poConfig, VBA::Window *_poWindow);
+    void vSetConfig(Config::Section* _poConfig, VBA::Window* _poWindow);
 
-        private:
-        void vOnSaveTypeChanged();
-        void vOnFlashSizeChanged();
-        void vOnUseBiosChanged();
-        void vOnBiosSelectionChanged();
-        void vOnEnableRTCChanged();
+private:
+    void vOnSaveTypeChanged();
+    void vOnFlashSizeChanged();
+    void vOnUseBiosChanged();
+    void vOnBiosSelectionChanged();
+    void vOnEnableRTCChanged();
 
-        VBA::Window *m_poWindow;
+    VBA::Window* m_poWindow;
 
-        Config::Section *m_poConfig;
-        Gtk::ComboBox *m_poSaveTypeComboBox;
-        Gtk::ComboBox *m_poFlashSizeComboBox;
-        Gtk::CheckButton *m_poBiosCheckButton;
-        Gtk::FileChooserButton *m_poBiosFileChooserButton;
-        Gtk::CheckButton *m_poRTCCheckButton;
+    Config::Section* m_poConfig;
+    Gtk::ComboBox* m_poSaveTypeComboBox;
+    Gtk::ComboBox* m_poFlashSizeComboBox;
+    Gtk::CheckButton* m_poBiosCheckButton;
+    Gtk::FileChooserButton* m_poBiosFileChooserButton;
+    Gtk::CheckButton* m_poRTCCheckButton;
 };
 
 } // namespace VBA

@@ -18,51 +18,51 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 struct Node {
-        Type *type;
-        u32 location;
-        u32 objLocation;
-        LocationType locType;
-        int value;
-        int index;
-        const char *name;
-        Node *expression;
-        Member *member;
-        void (*print)(Node *);
-        bool (*resolve)(Node *, Function *f, CompileUnit *u);
+    Type* type;
+    u32 location;
+    u32 objLocation;
+    LocationType locType;
+    int value;
+    int index;
+    const char* name;
+    Node* expression;
+    Member* member;
+    void (*print)(Node*);
+    bool (*resolve)(Node*, Function* f, CompileUnit* u);
 };
 
 extern void exprNodeCleanUp();
 
-extern Node *exprNodeIdentifier();
-extern void exprNodeIdentifierPrint(Node *);
-extern bool exprNodeIdentifierResolve(Node *, Function *, CompileUnit *);
+extern Node* exprNodeIdentifier();
+extern void exprNodeIdentifierPrint(Node*);
+extern bool exprNodeIdentifierResolve(Node*, Function*, CompileUnit*);
 
-extern Node *exprNodeNumber();
-extern void exprNodeNumberPrint(Node *);
-extern bool exprNodeNumberResolve(Node *, Function *, CompileUnit *);
+extern Node* exprNodeNumber();
+extern void exprNodeNumberPrint(Node*);
+extern bool exprNodeNumberResolve(Node*, Function*, CompileUnit*);
 
-extern Node *exprNodeStar(Node *);
-extern void exprNodeStarPrint(Node *);
-extern bool exprNodeStarResolve(Node *, Function *, CompileUnit *);
+extern Node* exprNodeStar(Node*);
+extern void exprNodeStarPrint(Node*);
+extern bool exprNodeStarResolve(Node*, Function*, CompileUnit*);
 
-extern Node *exprNodeDot(Node *, Node *);
-extern void exprNodeDotPrint(Node *);
-extern bool exprNodeDotResolve(Node *, Function *, CompileUnit *);
+extern Node* exprNodeDot(Node*, Node*);
+extern void exprNodeDotPrint(Node*);
+extern bool exprNodeDotResolve(Node*, Function*, CompileUnit*);
 
-extern Node *exprNodeArrow(Node *, Node *);
-extern void exprNodeArrowPrint(Node *);
-extern bool exprNodeArrowResolve(Node *, Function *, CompileUnit *);
+extern Node* exprNodeArrow(Node*, Node*);
+extern void exprNodeArrowPrint(Node*);
+extern bool exprNodeArrowResolve(Node*, Function*, CompileUnit*);
 
-extern Node *exprNodeAddr(Node *);
-extern void exprNodeAddrPrint(Node *);
-extern bool exprNodeAddrResolve(Node *, Function *, CompileUnit *);
+extern Node* exprNodeAddr(Node*);
+extern void exprNodeAddrPrint(Node*);
+extern bool exprNodeAddrResolve(Node*, Function*, CompileUnit*);
 
-extern Node *exprNodeSizeof(Node *);
-extern void exprNodeSizeofPrint(Node *);
-extern bool exprNodeSizeofResolve(Node *, Function *, CompileUnit *);
+extern Node* exprNodeSizeof(Node*);
+extern void exprNodeSizeofPrint(Node*);
+extern bool exprNodeSizeofResolve(Node*, Function*, CompileUnit*);
 
-extern Node *exprNodeArray(Node *, Node *);
-extern void exprNodeArrayPrint(Node *);
-extern bool exprNodeArrayResolve(Node *, Function *, CompileUnit *);
+extern Node* exprNodeArray(Node*, Node*);
+extern void exprNodeArrayPrint(Node*);
+extern bool exprNodeArrayResolve(Node*, Function*, CompileUnit*);
 
-#define YYSTYPE struct Node *
+#define YYSTYPE struct Node*

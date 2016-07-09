@@ -26,24 +26,22 @@
 #include "configfile.h"
 #include "window.h"
 
-namespace VBA
-{
-class SoundConfigDialog : public Gtk::Dialog
-{
-        public:
-        SoundConfigDialog(GtkDialog *_pstDialog, const Glib::RefPtr<Gtk::Builder> &refBuilder);
+namespace VBA {
+class SoundConfigDialog : public Gtk::Dialog {
+public:
+    SoundConfigDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder);
 
-        void vSetConfig(Config::Section *_poConfig, VBA::Window *_poWindow);
+    void vSetConfig(Config::Section* _poConfig, VBA::Window* _poWindow);
 
-        private:
-        void vOnVolumeChanged();
-        void vOnRateChanged();
+private:
+    void vOnVolumeChanged();
+    void vOnRateChanged();
 
-        VBA::Window *m_poWindow;
+    VBA::Window* m_poWindow;
 
-        Config::Section *m_poConfig;
-        Gtk::ComboBox *m_poVolumeComboBox;
-        Gtk::ComboBox *m_poRateComboBox;
+    Config::Section* m_poConfig;
+    Gtk::ComboBox* m_poVolumeComboBox;
+    Gtk::ComboBox* m_poRateComboBox;
 };
 
 } // namespace VBA

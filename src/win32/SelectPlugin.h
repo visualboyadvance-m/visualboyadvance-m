@@ -10,40 +10,39 @@
 /////////////////////////////////////////////////////////////////////////////
 // SelectPlugin dialog
 struct PluginDesc {
-        char sFile[MAX_PATH];
-        char sDesc[60];
+    char sFile[MAX_PATH];
+    char sDesc[60];
 };
 
-class SelectPlugin : public CDialog
-{
-        // Construction
-        public:
-        SelectPlugin(CWnd *pParent = NULL); // standard constructor
-        size_t EnumPlugins();
-        bool GetPluginDesc(const char *sRpi, PluginDesc *pDesc);
+class SelectPlugin : public CDialog {
+    // Construction
+public:
+    SelectPlugin(CWnd* pParent = NULL); // standard constructor
+    size_t EnumPlugins();
+    bool GetPluginDesc(const char* sRpi, PluginDesc* pDesc);
 
-        // Dialog Data
-        //{{AFX_DATA(SelectPlugin)
-        enum { IDD = IDD_SELECT_PLUGIN };
-        CComboBox m_comboPlugin;
-        //}}AFX_DATA
+    // Dialog Data
+    //{{AFX_DATA(SelectPlugin)
+    enum { IDD = IDD_SELECT_PLUGIN };
+    CComboBox m_comboPlugin;
+    //}}AFX_DATA
 
-        // Overrides
-        // ClassWizard generated virtual function overrides
-        //{{AFX_VIRTUAL(SelectPlugin)
-        protected:
-        virtual void DoDataExchange(CDataExchange *pDX); // DDX/DDV support
-                                                         //}}AFX_VIRTUAL
+    // Overrides
+    // ClassWizard generated virtual function overrides
+    //{{AFX_VIRTUAL(SelectPlugin)
+protected:
+    virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+    //}}AFX_VIRTUAL
 
-        // Implementation
-        protected:
-        // Generated message map functions
-        //{{AFX_MSG(SelectPlugin)
-        virtual void OnOK();
-        virtual void OnCancel();
-        virtual BOOL OnInitDialog();
-        //}}AFX_MSG
-        DECLARE_MESSAGE_MAP()
+    // Implementation
+protected:
+    // Generated message map functions
+    //{{AFX_MSG(SelectPlugin)
+    virtual void OnOK();
+    virtual void OnCancel();
+    virtual BOOL OnInitDialog();
+    //}}AFX_MSG
+    DECLARE_MESSAGE_MAP()
 };
 
 //{{AFX_INSERT_LOCATION}}

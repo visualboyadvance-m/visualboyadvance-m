@@ -23,239 +23,203 @@
 #include <glibmm/fileutils.h>
 #include <glibmm/iochannel.h>
 
-namespace VBA
-{
-namespace Config
-{
+namespace VBA {
+namespace Config {
 
-using std::string;
-using Glib::IOChannel;
+    using std::string;
+    using Glib::IOChannel;
 
-Line::Line(const string & _rsKey, const string & _rsValue) :
-  m_sKey(_rsKey),
-  m_sValue(_rsValue)
-{
-}
-
-Section::Section(const string & _rsName) :
-  m_sName(_rsName)
-{
-}
-
-bool Section::bKeyExists(const string & _rsKey)
-{
-  for (iterator it = begin(); it != end(); it++)
-  {
-    if (it->m_sKey == _rsKey)
+    Line::Line(const string& _rsKey, const string& _rsValue)
+        : m_sKey(_rsKey)
+        , m_sValue(_rsValue)
     {
-      return true;
     }
-  }
-  return false;
-}
 
-void Section::vSetKey(const string & _rsKey, const string & _rsValue)
-{
-  for (iterator it = begin(); it != end(); it++)
-  {
-    if (it->m_sKey == _rsKey)
+    Section::Section(const string& _rsName)
+        : m_sName(_rsName)
     {
-      it->m_sValue = _rsValue;
-      return;
     }
-  }
-  push_back(Line(_rsKey, _rsValue));
-}
 
-string Section::sGetKey(const string & _rsKey) const
-{
-  for (const_iterator it = begin(); it != end(); it++)
-  {
-    if (it->m_sKey == _rsKey)
+    bool Section::bKeyExists(const string& _rsKey)
     {
-      return it->m_sValue;
-    }
-  }
-  throw KeyNotFound(m_sName, _rsKey);
-}
-
-void Section::vRemoveKey(const string & _rsKey)
-{
-  for (iterator it = begin(); it != end(); it++)
-  {
-    if (it->m_sKey == _rsKey)
-    {
-      erase(it);
-      return;
-    }
-  }
-}
-
-File::File()
-{
-}
-
-File::File(const string & _rsFile)
-{
-  vLoad(_rsFile);
-}
-
-File::~File()
-{
-}
-
-bool File::bSectionExists(const string & _rsName)
-{
-  for (iterator it = begin(); it != end(); it++)
-  {
-    if (it->sGetName() == _rsName)
-    {
-      return true;
-    }
-  }
-  return false;
-}
-
-Section * File::poAddSection(const string & _rsName)
-{
-  Section * poSection = NULL;
-  for (iterator it = begin(); it != end(); it++)
-  {
-    if (it->sGetName() == _rsName)
-    {
-      poSection = &(*it);
-    }
-  }
-  if (poSection == NULL)
-  {
-    push_back(Section(_rsName));
-    poSection = &back();
-  }
-  return poSection;
-}
-
-Section * File::poGetSection(const string & _rsName)
-{
-  for (iterator it = begin(); it != end(); it++)
-  {
-    if (it->sGetName() == _rsName)
-    {
-      return &(*it);
-    }
-  }
-  throw SectionNotFound(_rsName);
-}
-
-void File::vRemoveSection(const string & _rsName)
-{
-  for (iterator it = begin(); it != end(); it++)
-  {
-    if (it->sGetName() == _rsName)
-    {
-      erase(it);
-      return;
-    }
-  }
-}
-
-void File::vLoad(const string & _rsFile,
-                 bool _bAddSection,
-                 bool _bAddKey)
-{
-  string sBuffer = Glib::file_get_contents(_rsFile);
-  Section * poSection = NULL;
-  char ** lines = g_strsplit(sBuffer.c_str(), "\n", 0);
-  char * tmp;
-  int i = 0;
-  while (lines[i])
-  {
-    if (lines[i][0] == '[')
-    {
-      if ((tmp = strchr(lines[i], ']')))
-      {
-        *tmp = '\0';
-        if (_bAddSection)
-        {
-          poSection = poAddSection(&lines[i][1]);
+        for (iterator it = begin(); it != end(); it++) {
+            if (it->m_sKey == _rsKey) {
+                return true;
+            }
         }
-        else
-        {
-          try
-          {
-            poSection = poGetSection(&lines[i][1]);
-          }
-          catch (...)
-          {
-            poSection = NULL;
-          }
+        return false;
+    }
+
+    void Section::vSetKey(const string& _rsKey, const string& _rsValue)
+    {
+        for (iterator it = begin(); it != end(); it++) {
+            if (it->m_sKey == _rsKey) {
+                it->m_sValue = _rsValue;
+                return;
+            }
         }
-      }
+        push_back(Line(_rsKey, _rsValue));
     }
-    else if (lines[i][0] != '#' && poSection != NULL)
+
+    string Section::sGetKey(const string& _rsKey) const
     {
-      if ((tmp = strchr(lines[i], '=')))
-      {
-        *tmp = '\0';
-        tmp++;
-        if (_bAddKey || poSection->bKeyExists(lines[i]))
-        {
-          poSection->vSetKey(lines[i], tmp);
+        for (const_iterator it = begin(); it != end(); it++) {
+            if (it->m_sKey == _rsKey) {
+                return it->m_sValue;
+            }
         }
-      }
+        throw KeyNotFound(m_sName, _rsKey);
     }
-    i++;
-  }
-  g_strfreev(lines);
-}
 
-void File::vSave(const string & _rsFile)
-{
-  Glib::RefPtr<IOChannel> poFile = IOChannel::create_from_file(_rsFile, "w");
-  poFile->set_encoding("");
-
-  for (const_iterator poSection = begin();
-       poSection != end();
-       poSection++)
-  {
-    string sName = "[" + poSection->sGetName() + "]\n";
-    poFile->write(sName);
-
-    for (Section::const_iterator poLine = poSection->begin();
-         poLine != poSection->end();
-         poLine++)
+    void Section::vRemoveKey(const string& _rsKey)
     {
-      string sLine = poLine->m_sKey + "=" + poLine->m_sValue + "\n";
-      poFile->write(sLine);
+        for (iterator it = begin(); it != end(); it++) {
+            if (it->m_sKey == _rsKey) {
+                erase(it);
+                return;
+            }
+        }
     }
-    poFile->write("\n");
-  }
-}
 
-void File::vClear()
-{
-  clear();
-}
-
-std::ostream & operator<<(std::ostream & _roOut, const File & _roFile)
-{
-  for (File::const_iterator poSection = _roFile.begin();
-       poSection != _roFile.end();
-       poSection++)
-  {
-    string sName = "[" + poSection->sGetName() + "]\n";
-    _roOut << sName;
-
-    for (Section::const_iterator poLine = poSection->begin();
-         poLine != poSection->end();
-         poLine++)
+    File::File()
     {
-      string sLine = poLine->m_sKey + "=" + poLine->m_sValue + "\n";
-      _roOut << sLine;
     }
-    _roOut << "\n";
-  }
-  return _roOut;
-}
+
+    File::File(const string& _rsFile)
+    {
+        vLoad(_rsFile);
+    }
+
+    File::~File()
+    {
+    }
+
+    bool File::bSectionExists(const string& _rsName)
+    {
+        for (iterator it = begin(); it != end(); it++) {
+            if (it->sGetName() == _rsName) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    Section* File::poAddSection(const string& _rsName)
+    {
+        Section* poSection = NULL;
+        for (iterator it = begin(); it != end(); it++) {
+            if (it->sGetName() == _rsName) {
+                poSection = &(*it);
+            }
+        }
+        if (poSection == NULL) {
+            push_back(Section(_rsName));
+            poSection = &back();
+        }
+        return poSection;
+    }
+
+    Section* File::poGetSection(const string& _rsName)
+    {
+        for (iterator it = begin(); it != end(); it++) {
+            if (it->sGetName() == _rsName) {
+                return &(*it);
+            }
+        }
+        throw SectionNotFound(_rsName);
+    }
+
+    void File::vRemoveSection(const string& _rsName)
+    {
+        for (iterator it = begin(); it != end(); it++) {
+            if (it->sGetName() == _rsName) {
+                erase(it);
+                return;
+            }
+        }
+    }
+
+    void File::vLoad(const string& _rsFile,
+        bool _bAddSection,
+        bool _bAddKey)
+    {
+        string sBuffer = Glib::file_get_contents(_rsFile);
+        Section* poSection = NULL;
+        char** lines = g_strsplit(sBuffer.c_str(), "\n", 0);
+        char* tmp;
+        int i = 0;
+        while (lines[i]) {
+            if (lines[i][0] == '[') {
+                if ((tmp = strchr(lines[i], ']'))) {
+                    *tmp = '\0';
+                    if (_bAddSection) {
+                        poSection = poAddSection(&lines[i][1]);
+                    } else {
+                        try {
+                            poSection = poGetSection(&lines[i][1]);
+                        } catch (...) {
+                            poSection = NULL;
+                        }
+                    }
+                }
+            } else if (lines[i][0] != '#' && poSection != NULL) {
+                if ((tmp = strchr(lines[i], '='))) {
+                    *tmp = '\0';
+                    tmp++;
+                    if (_bAddKey || poSection->bKeyExists(lines[i])) {
+                        poSection->vSetKey(lines[i], tmp);
+                    }
+                }
+            }
+            i++;
+        }
+        g_strfreev(lines);
+    }
+
+    void File::vSave(const string& _rsFile)
+    {
+        Glib::RefPtr<IOChannel> poFile = IOChannel::create_from_file(_rsFile, "w");
+        poFile->set_encoding("");
+
+        for (const_iterator poSection = begin();
+             poSection != end();
+             poSection++) {
+            string sName = "[" + poSection->sGetName() + "]\n";
+            poFile->write(sName);
+
+            for (Section::const_iterator poLine = poSection->begin();
+                 poLine != poSection->end();
+                 poLine++) {
+                string sLine = poLine->m_sKey + "=" + poLine->m_sValue + "\n";
+                poFile->write(sLine);
+            }
+            poFile->write("\n");
+        }
+    }
+
+    void File::vClear()
+    {
+        clear();
+    }
+
+    std::ostream& operator<<(std::ostream& _roOut, const File& _roFile)
+    {
+        for (File::const_iterator poSection = _roFile.begin();
+             poSection != _roFile.end();
+             poSection++) {
+            string sName = "[" + poSection->sGetName() + "]\n";
+            _roOut << sName;
+
+            for (Section::const_iterator poLine = poSection->begin();
+                 poLine != poSection->end();
+                 poLine++) {
+                string sLine = poLine->m_sKey + "=" + poLine->m_sValue + "\n";
+                _roOut << sLine;
+            }
+            _roOut << "\n";
+        }
+        return _roOut;
+    }
 
 } // namespace Config
 } // namespace VBA

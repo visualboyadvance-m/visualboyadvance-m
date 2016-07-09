@@ -26,30 +26,28 @@
 #include "configfile.h"
 #include "window.h"
 
-namespace VBA
-{
-class GameBoyConfigDialog : public Gtk::Dialog
-{
-        public:
-        GameBoyConfigDialog(GtkDialog *_pstDialog, const Glib::RefPtr<Gtk::Builder> &refBuilder);
+namespace VBA {
+class GameBoyConfigDialog : public Gtk::Dialog {
+public:
+    GameBoyConfigDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder);
 
-        void vSetConfig(Config::Section *_poConfig, VBA::Window *_poWindow);
+    void vSetConfig(Config::Section* _poConfig, VBA::Window* _poWindow);
 
-        private:
-        void vOnSystemChanged();
-        void vOnBorderChanged();
-        void vOnPrinterChanged();
-        void vOnUseBootRomChanged();
-        void vOnBootRomSelectionChanged();
+private:
+    void vOnSystemChanged();
+    void vOnBorderChanged();
+    void vOnPrinterChanged();
+    void vOnUseBootRomChanged();
+    void vOnBootRomSelectionChanged();
 
-        VBA::Window *m_poWindow;
+    VBA::Window* m_poWindow;
 
-        Config::Section *m_poConfig;
-        Gtk::ComboBox *m_poSystemComboBox;
-        Gtk::CheckButton *m_poBorderCheckButton;
-        Gtk::CheckButton *m_poPrinterCheckButton;
-        Gtk::CheckButton *m_poBootRomCheckButton;
-        Gtk::FileChooserButton *m_poBootRomFileChooserButton;
+    Config::Section* m_poConfig;
+    Gtk::ComboBox* m_poSystemComboBox;
+    Gtk::CheckButton* m_poBorderCheckButton;
+    Gtk::CheckButton* m_poPrinterCheckButton;
+    Gtk::CheckButton* m_poBootRomCheckButton;
+    Gtk::FileChooserButton* m_poBootRomFileChooserButton;
 };
 
 } // namespace VBA

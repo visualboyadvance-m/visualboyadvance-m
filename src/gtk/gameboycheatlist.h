@@ -22,21 +22,19 @@
 #include "../gb/gbCheats.h"
 #include "cheatlist.h"
 
-namespace VBA
-{
-class GameBoyCheatListDialog : public CheatListDialog
-{
-        public:
-        GameBoyCheatListDialog(GtkDialog *_pstDialog, const Glib::RefPtr<Gtk::Builder> &refBuilder);
+namespace VBA {
+class GameBoyCheatListDialog : public CheatListDialog {
+public:
+    GameBoyCheatListDialog(GtkDialog* _pstDialog, const Glib::RefPtr<Gtk::Builder>& refBuilder);
 
-        protected:
-        void vAddCheat(Glib::ustring sDesc, ECheatType type, Glib::RefPtr<Gtk::TextBuffer> buffer);
-        bool vCheatListOpen(const char *file);
-        void vCheatListSave(const char *file);
-        void vRemoveCheat(int index);
-        void vRemoveAllCheats();
-        void vToggleCheat(int index, bool enable);
-        void vUpdateList(int previous = 0);
+protected:
+    void vAddCheat(Glib::ustring sDesc, ECheatType type, Glib::RefPtr<Gtk::TextBuffer> buffer);
+    bool vCheatListOpen(const char* file);
+    void vCheatListSave(const char* file);
+    void vRemoveCheat(int index);
+    void vRemoveAllCheats();
+    void vToggleCheat(int index, bool enable);
+    void vUpdateList(int previous = 0);
 };
 
 } // namespace VBA
