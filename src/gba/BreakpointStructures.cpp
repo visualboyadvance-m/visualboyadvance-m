@@ -71,28 +71,28 @@ Ex: to implement stop only when r2 is 0xf, use
 
 /*
 Full Operands lists
-Op1, op2, ...,opN						--> Meaning
+Op1, op2, ...,opN                       --> Meaning
 
-== , =, eq								--> equal
+== , =, eq                              --> equal
 
-<, lt									--> lesser than
+<, lt                                   --> lesser than
 
-<=, le									--> less or equal to
+<=, le                                  --> less or equal to
 
-> gt									--> greater than
+> gt                                    --> greater than
 
->=, ge									--> greater or equal to
+>=, ge                                  --> greater or equal to
 
-!=, <>, ne								--> not equal to
+!=, <>, ne                              --> not equal to
 
 
 valid content types
-b, byte, u8								--> byte
-sb,	sbyte, s8							--> signed byte
-h,hw, halfword, u16, ushort				--> halfword
-sh, shw, shalfword, s16	short				--> signed halfword
-w, word, u32							--> word
-sw, sword, s32, int						--> signed word
+b, byte, uint8_t                        --> byte
+sb, sbyte, int8_t                       --> signed byte
+h,hw, halfword, uint16_t, ushort        --> halfword
+sh, shw, shalfword, int16_t short       --> signed halfword
+w, word, uint2_t                        --> word
+sw, sword, int32_t, int                 --> signed word
 */
 
 #include <ctype.h>
@@ -107,7 +107,7 @@ sw, sword, s32, int						--> signed word
 #define strdup _strdup
 #endif
 
-extern bool dexp_eval(char*, u32*);
+extern bool dexp_eval(char*, uint32_t*);
 
 //struct intToString{
 //	int value;
@@ -139,7 +139,7 @@ struct intToString compareFlagMapping[] = {
 	{0x0,"Never"}
 };*/
 
-//char* typeMapping[] = {"'u8","'u16","'u32","'u32","'s8","'s16","'s32","'s32"};
+//char* typeMapping[] = {"'uint8_t","'uint16_t","'uint32_t","'uint32_t","'int8_t","'int16_t","'int32_t","'int32_t"};
 //
 //char* compareFlagMapping[] = {"Never","==",">",">=","<","<=","!=","<=>"};
 
@@ -151,9 +151,9 @@ struct intToString compareFlagMapping[] = {
 //case 'r':	flag = 0x2;	break; // mem read
 //case 'w':	flag = 0x1;	break; // mem write
 //case 'i':	flag = 0x3;	break;
-struct ConditionalBreak* addConditionalBreak(u32 address, u8 flag)
+struct ConditionalBreak* addConditionalBreak(uint32_t address, uint8_t flag)
 {
-    u8 condIndex = address >> 24;
+    uint8_t condIndex = address >> 24;
     struct ConditionalBreak* cond = NULL;
     BreakSet((&map[condIndex])->breakPoints, address & (&map[condIndex])->mask, ((flag & 0xf) | (flag >> 4)));
     if (flag & 0xf0) {
@@ -276,7 +276,7 @@ void freeAllConditionals()
 int removeConditionalBreak(struct ConditionalBreak* toDelete)
 {
     if (toDelete) {
-        u8 condIndex = toDelete->break_address >> 24;
+        uint8_t condIndex = toDelete->break_address >> 24;
         struct ConditionalBreak* base = conditionals[condIndex];
         struct ConditionalBreak* prev = conditionals[condIndex];
         while (base) {
@@ -298,11 +298,11 @@ int removeConditionalBreak(struct ConditionalBreak* toDelete)
 }
 
 /*
-int removeConditionalBreak(u32 address, u8 num, u8 flag){
-	u8 condIndex = address>>24;
+int removeConditionalBreak(uint32_t address, uint8_t num, uint8_t flag){
+	uint8_t condIndex = address>>24;
 	struct ConditionalBreak* base = conditionals[condIndex];
 	struct ConditionalBreak* prev = conditionals[condIndex];
-	u8 counter = 0;
+	uint8_t counter = 0;
 	while(base){
 		if(base->break_address > address)
 			return -2;	//failed to remove
@@ -352,7 +352,7 @@ bool removeCondition(struct ConditionalBreak* base, struct ConditionalBreakNode*
 	return false;
 }
 
-bool removeCondition(u32 address, u8 flags, u8 num){
+bool removeCondition(uint32_t address, uint8_t flags, uint8_t num){
 	struct ConditionalBreak* base  = conditionals[address>>24];
 	while(base && base->break_address < address){
 		base = base->next;
@@ -376,7 +376,7 @@ bool removeCondition(u32 address, u8 flags, u8 num){
 }*/
 
 /*
-int removeAllConditions(u32 address, u8 flags){
+int removeAllConditions(uint32_t address, uint8_t flags){
 	struct ConditionalBreak* base  = conditionals[address>>24];
 	while(base && base->break_address < address){
 		base = base->next;
@@ -393,10 +393,10 @@ int removeAllConditions(u32 address, u8 flags){
 	return true;
 }*/
 
-void recountFlagsForAddress(u32 address)
+void recountFlagsForAddress(uint32_t address)
 {
     struct ConditionalBreak* base = conditionals[address >> 24];
-    u8 flags = 0;
+    uint8_t flags = 0;
     while (base) {
         if (base->break_address < address) {
             base = base->next;
@@ -416,12 +416,12 @@ void recountFlagsForAddress(u32 address)
 }
 
 //Removers
-int removeConditionalBreakNo(u32 addrNo, u8 number)
+int removeConditionalBreakNo(uint32_t addrNo, uint8_t number)
 {
     if (conditionals[addrNo >> 24]) {
         struct ConditionalBreak* base = conditionals[addrNo >> 24];
         struct ConditionalBreak* curr = conditionals[addrNo >> 24];
-        u8 count = 1;
+        uint8_t count = 1;
         while (curr->break_address < addrNo) {
             base = curr;
             curr = curr->next;
@@ -457,12 +457,12 @@ int removeConditionalBreakNo(u32 addrNo, u8 number)
     return -2;
 }
 
-int removeFlagFromConditionalBreakNo(u32 addrNo, u8 number, u8 flag)
+int removeFlagFromConditionalBreakNo(uint32_t addrNo, uint8_t number, uint8_t flag)
 {
     if (conditionals[addrNo >> 24]) {
         struct ConditionalBreak* base = conditionals[addrNo >> 24];
         struct ConditionalBreak* curr = conditionals[addrNo >> 24];
-        u8 count = 1;
+        uint8_t count = 1;
         while (curr->break_address < addrNo) {
             base = curr;
             curr = curr->next;
@@ -506,14 +506,14 @@ int removeFlagFromConditionalBreakNo(u32 addrNo, u8 number, u8 flag)
     return -2;
 }
 
-int removeConditionalWithAddress(u32 address)
+int removeConditionalWithAddress(uint32_t address)
 {
-    u8 addrNo = address >> 24;
+    uint8_t addrNo = address >> 24;
     if (conditionals[addrNo] != NULL) {
         struct ConditionalBreak* base = conditionals[addrNo];
         struct ConditionalBreak* curr = conditionals[addrNo];
-        u8 count = 0;
-        u8 flags = 0;
+        uint8_t count = 0;
+        uint8_t flags = 0;
         while (curr && address >= curr->break_address) {
             if (curr->break_address == address) {
                 base->next = curr->next;
@@ -532,13 +532,13 @@ int removeConditionalWithAddress(u32 address)
     return -2;
 }
 
-int removeConditionalWithFlag(u8 flag, bool orMode)
+int removeConditionalWithFlag(uint8_t flag, bool orMode)
 {
-    for (u8 addrNo = 0; addrNo < 16; addrNo++) {
+    for (uint8_t addrNo = 0; addrNo < 16; addrNo++) {
         if (conditionals[addrNo] != NULL) {
             struct ConditionalBreak* base = conditionals[addrNo];
             struct ConditionalBreak* curr = conditionals[addrNo];
-            u8 count = 0;
+            uint8_t count = 0;
             while (curr) {
                 if (((curr->type_flags & flag) == curr->type_flags) || (orMode && (curr->type_flags & flag))) {
                     curr->type_flags &= ~flag;
@@ -569,13 +569,13 @@ int removeConditionalWithFlag(u8 flag, bool orMode)
     return -2;
 }
 
-int removeConditionalWithAddressAndFlag(u32 address, u8 flag, bool orMode)
+int removeConditionalWithAddressAndFlag(uint32_t address, uint8_t flag, bool orMode)
 {
-    u8 addrNo = address >> 24;
+    uint8_t addrNo = address >> 24;
     if (conditionals[addrNo] != NULL) {
         struct ConditionalBreak* base = conditionals[addrNo];
         struct ConditionalBreak* curr = conditionals[addrNo];
-        u8 count = 0;
+        uint8_t count = 0;
         while (curr && address >= curr->break_address) {
             if ((curr->break_address == address) && (((curr->type_flags & flag) == curr->type_flags) || (orMode && (curr->type_flags & flag)))) {
                 curr->type_flags &= ~flag;
@@ -610,9 +610,9 @@ int removeConditionalWithAddressAndFlag(u32 address, u8 flag, bool orMode)
 //receives an array of chars following the pattern:
 //{'<expType>,<exp>,<op>,'<expType>,<exp>,<And_symbol|or_symbol>, (repeats)
 //<expType is optional, and always assumes int-compare as default.
-u8 parseExpressionType(char* type);
-u8 parseConditionOperand(char* type);
-void parseAndCreateConditionalBreaks(u32 address, u8 flags, char** exp, int n)
+uint8_t parseExpressionType(char* type);
+uint8_t parseConditionOperand(char* type);
+void parseAndCreateConditionalBreaks(uint32_t address, uint8_t flags, char** exp, int n)
 {
     struct ConditionalBreak* workBreak = addConditionalBreak(address, flags);
     flags &= 0xf;
@@ -652,7 +652,7 @@ void parseAndCreateConditionalBreaks(u32 address, u8 flags, char** exp, int n)
         }
         now->value = strdup(exp[i]);
         i++;
-        u32 val;
+        uint32_t val;
         if (!dexp_eval(now->value, &val) || !dexp_eval(now->address, &val)) {
             printf("Invalid expression.\n");
             if (workBreak)
@@ -685,9 +685,9 @@ fail:
 }
 
 //aux
-u8 parseExpressionType(char* given_type)
+uint8_t parseExpressionType(char* given_type)
 {
-    u8 flags = 0;
+    uint8_t flags = 0;
     //for such a small string, pays off to convert first
     char* type = strdup(given_type);
     for (int i = 0; type[i] != '\0'; i++) {
@@ -711,7 +711,7 @@ u8 parseExpressionType(char* given_type)
         int size;
         sscanf(type, "%d", &size);
         size = (size >> 3) - 1;
-        flags |= (size >= 2 ? 2 : ((u8)size));
+        flags |= (size >= 2 ? 2 : ((uint8_t)size));
         free(type);
         return flags;
     }
@@ -731,9 +731,9 @@ u8 parseExpressionType(char* given_type)
     return flags;
 }
 
-u8 parseConditionOperand(char* type)
+uint8_t parseConditionOperand(char* type)
 {
-    u8 flag = 0;
+    uint8_t flag = 0;
     if (toupper(type[0]) == 'S') {
         flag = 8;
         type++;
@@ -791,9 +791,9 @@ u8 parseConditionOperand(char* type)
     return flag;
 }
 
-u32 calculateFinalValue(char* expToEval, u8 type_of_flags)
+uint32_t calculateFinalValue(char* expToEval, uint8_t type_of_flags)
 {
-    u32 val;
+    uint32_t val;
     if (!dexp_eval(expToEval, &val)) {
         printf("Invalid expression.\n");
         return 0;
@@ -801,18 +801,18 @@ u32 calculateFinalValue(char* expToEval, u8 type_of_flags)
     if (type_of_flags & 0x4) {
         switch (type_of_flags & 0x3) {
         case 0:
-            return (s8)(val & 0xff);
+            return (int8_t)(val & 0xff);
         case 1:
-            return (s16)(val & 0xffff);
+            return (int16_t)(val & 0xffff);
         default:
             return (int)val;
         }
     } else {
         switch (type_of_flags & 0x3) {
         case 0:
-            return (u8)(val & 0xff);
+            return (uint8_t)(val & 0xff);
         case 1:
-            return (u16)(val & 0xffff);
+            return (uint16_t)(val & 0xffff);
         default:
             return val;
         }
@@ -820,7 +820,7 @@ u32 calculateFinalValue(char* expToEval, u8 type_of_flags)
 }
 
 //check for execution
-bool isCorrectBreak(struct ConditionalBreak* toTest, u8 accessType)
+bool isCorrectBreak(struct ConditionalBreak* toTest, uint8_t accessType)
 {
 
     return (toTest->type_flags & accessType);
@@ -833,8 +833,8 @@ bool doBreak(struct ConditionalBreak* toTest)
     bool globalVeredict = true;
     bool veredict = false;
     while (toExamine && globalVeredict) {
-        u32 address = calculateFinalValue(toExamine->address, toExamine->exp_type_flags & 0xf);
-        u32 value = calculateFinalValue(toExamine->value, toExamine->exp_type_flags >> 4);
+        uint32_t address = calculateFinalValue(toExamine->address, toExamine->exp_type_flags & 0xf);
+        uint32_t value = calculateFinalValue(toExamine->value, toExamine->exp_type_flags >> 4);
         if ((toExamine->cond_flags & 0x7) != 0) {
             veredict = veredict || ((toExamine->cond_flags & 1) ? (address == value) : false);
             veredict = veredict || ((toExamine->cond_flags & 4) ? ((toExamine->cond_flags & 8) ? ((int)address < (int)value) : (address < value)) : false);
@@ -846,9 +846,9 @@ bool doBreak(struct ConditionalBreak* toTest)
     return globalVeredict;
 }
 
-bool doesBreak(u32 address, u8 allowedFlags)
+bool doesBreak(uint32_t address, uint8_t allowedFlags)
 {
-    u8 addrNo = address >> 24;
+    uint8_t addrNo = address >> 24;
     if (conditionals[addrNo]) {
         struct ConditionalBreak* base = conditionals[addrNo];
         while (base && base->break_address < address) {

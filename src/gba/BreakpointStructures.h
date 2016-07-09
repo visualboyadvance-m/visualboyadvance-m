@@ -1,8 +1,6 @@
 #ifndef VBA_BKS_H
 #define VBA_BKS_H
 
-#include "../common/Types.h"
-
 #define readWord(addr) \
     ((map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]) + ((map[(addr + 1) >> 24].address[(addr + 1) & map[(addr + 1) >> 24].mask]) << 8) + ((map[(addr + 2) >> 24].address[(addr + 2) & map[(addr + 2) >> 24].mask]) << 16) + ((map[(addr + 3) >> 24].address[(addr + 3) & map[(addr + 3) >> 24].mask]) << 24))
 
@@ -14,14 +12,14 @@
 struct ConditionalBreakNode {
     char* address;
     char* value;
-    u8 cond_flags;
-    u8 exp_type_flags;
+    uint8_t cond_flags;
+    uint8_t exp_type_flags;
     struct ConditionalBreakNode* next;
 };
 
 struct ConditionalBreak {
-    u32 break_address;
-    u8 type_flags;
+    uint32_t break_address;
+    uint8_t type_flags;
     struct ConditionalBreakNode* firstCond;
     struct ConditionalBreak* next;
 };
@@ -36,31 +34,31 @@ extern struct ConditionalBreak* conditionals[16];
 // case 'r':	flag = 0x2;	break; // mem read
 // case 'w':	flag = 0x1;	break; // mem write
 // case 'i':	flag = 0x3;	break;
-struct ConditionalBreak* addConditionalBreak(u32 address, u8 flag);
+struct ConditionalBreak* addConditionalBreak(uint32_t address, uint8_t flag);
 
-int removeConditionalBreakNo(u32 address, u8 number);
-int removeFlagFromConditionalBreakNo(u32 address, u8 number, u8 flag);
-int removeConditionalWithAddress(u32 address);
-int removeConditionalWithFlag(u8 flag, bool orMode);
-int removeConditionalWithAddressAndFlag(u32 address, u8 flag, bool orMode);
+int removeConditionalBreakNo(uint32_t address, uint8_t number);
+int removeFlagFromConditionalBreakNo(uint32_t address, uint8_t number, uint8_t flag);
+int removeConditionalWithAddress(uint32_t address);
+int removeConditionalWithFlag(uint8_t flag, bool orMode);
+int removeConditionalWithAddressAndFlag(uint32_t address, uint8_t flag, bool orMode);
 // void freeConditionalBreak(struct ConditionalBreak* toFree);
 
 void addCondition(struct ConditionalBreak* base, struct ConditionalBreakNode* toAdd);
 // bool removeCondition(struct ConditionalBreak* base, struct ConditionalBreakNode* toDel);
-// bool removeCondition(u32 address, u8 flags, u8 num);
+// bool removeCondition(uint32_t address, uint8_t flags, uint8_t num);
 
 void freeConditionalNode(struct ConditionalBreakNode* toDel);
 
-void parseAndCreateConditionalBreaks(u32 address, u8 flags, char** exp, int n);
+void parseAndCreateConditionalBreaks(uint32_t address, uint8_t flags, char** exp, int n);
 
-bool isCorrectBreak(struct ConditionalBreak* toTest, u8 accessType);
-bool doesBreak(u32 address, u8 allowedFlags);
+bool isCorrectBreak(struct ConditionalBreak* toTest, uint8_t accessType);
+bool doesBreak(uint32_t address, uint8_t allowedFlags);
 bool doBreak(struct ConditionalBreak* toTest);
 
 // printing the structure(AKA list Breaks)
 // void printConditionalBreak(struct ConditionalBreak* toPrint, bool printAddress);
 // void printAllConditionals();
-// u8 printConditionalsFromAddress(u32 address);
-// void printAllFlagConditionals(u8 flag, bool orMode);
-// void printAllFlagConditionalsWithAddress(u32 address, u8 flag, bool orMode);
+// uint8_t printConditionalsFromAddress(uint32_t address);
+// void printAllFlagConditionals(uint8_t flag, bool orMode);
+// void printAllFlagConditionalsWithAddress(uint32_t address, uint8_t flag, bool orMode);
 #endif
