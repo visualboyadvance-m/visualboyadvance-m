@@ -7,8 +7,8 @@ extern int systemRedShift;
 extern int systemGreenShift;
 extern int systemBlueShift;
 
-extern u16 systemColorMap16[0x10000];
-extern u32 systemColorMap32[0x10000];
+extern uint16_t systemColorMap16[0x10000];
+extern uint32_t systemColorMap32[0x10000];
 
 static const unsigned char curve[32] = { 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0e, 0x10, 0x12,
     0x14, 0x16, 0x18, 0x1c, 0x20, 0x28, 0x30, 0x38,
@@ -27,7 +27,7 @@ inline void swap(short& a, short& b)
     b = temp;
 }
 
-void gbafilter_pal(u16* buf, int count)
+void gbafilter_pal(uint16_t* buf, int count)
 {
     short temp[3 * 3], s;
     unsigned pix;
@@ -101,7 +101,7 @@ void gbafilter_pal(u16* buf, int count)
     }
 }
 
-void gbafilter_pal32(u32* buf, int count)
+void gbafilter_pal32(uint32_t* buf, int count)
 {
     short temp[3 * 3], s;
     unsigned pix;
@@ -205,7 +205,7 @@ void gbafilter_pad(u8* buf, int count)
         break;
     case 32:
         while (count--) {
-            *((u32*)buf) &= mask.whole;
+            *((uint32_t*)buf) &= mask.whole;
             buf += 4;
         }
     }

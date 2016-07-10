@@ -1,5 +1,5 @@
 #include "../System.h"
 
-void gbafilter_pal(u16* buf, int count);
-void gbafilter_pal32(u32* buf, int count);
-void gbafilter_pad(u8* buf, int count);
+void gbafilter_pal(uint16_t* buf, int count);
+void gbafilter_pal32(uint32_t* buf, int count);
+void gbafilter_pad(uint8_t* buf, int count);
