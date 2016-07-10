@@ -127,11 +127,11 @@ void flashSetSize(int size)
     // Added to make 64k saves compatible with 128k ones
     // (allow wrongfuly set 64k saves to work for Pokemon games)
     if ((size == 0x20000) && (flashSize == 0x10000))
-        memcpy((u8*)(flashSaveMemory + 0x10000), (u8*)(flashSaveMemory), 0x10000);
+        memcpy((uint8_t*)(flashSaveMemory + 0x10000), (uint8_t*)(flashSaveMemory), 0x10000);
     flashSize = size;
 }
 
-u8 flashRead(u32 address)
+uint8_t flashRead(uint32_t address)
 {
     //  log("Reading %08x from %08x\n", address, reg[15].I);
     //  log("Current read state is %d\n", flashReadState);
@@ -158,7 +158,7 @@ u8 flashRead(u32 address)
     return 0;
 }
 
-void flashSaveDecide(u32 address, u8 byte)
+void flashSaveDecide(uint32_t address, uint8_t byte)
 {
     if (saveType == 1)
         return;
@@ -175,14 +175,14 @@ void flashSaveDecide(u32 address, u8 byte)
     (*cpuSaveGameFunc)(address, byte);
 }
 
-void flashDelayedWrite(u32 address, u8 byte)
+void flashDelayedWrite(uint32_t address, uint8_t byte)
 {
     saveType = 3;
     cpuSaveGameFunc = flashWrite;
     flashWrite(address, byte);
 }
 
-void flashWrite(u32 address, u8 byte)
+void flashWrite(uint32_t address, uint8_t byte)
 {
     //  log("Writing %02x at %08x\n", byte, address);
     //  log("Current state is %d\n", flashState);

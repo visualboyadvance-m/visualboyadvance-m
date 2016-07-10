@@ -80,7 +80,7 @@ int dotcodepointer;
 int dotcodeinterleave;
 int decodestate;
 
-u32 GFpow;
+uint32_t GFpow;
 
 unsigned char* DotCodeData;
 char filebuffer[2048];
@@ -108,9 +108,9 @@ int CheckEReaderRegion(void) //US = 1, JAP = 2, JAP+ = 3
     return 0;
 }
 
-int LoadDotCodeData(int size, u32* DCdata, unsigned long MEM1, unsigned long MEM2, int loadraw)
+int LoadDotCodeData(int size, uint32_t* DCdata, unsigned long MEM1, unsigned long MEM2, int loadraw)
 {
-    u32 temp1;
+    uint32_t temp1;
     int i, j;
 
     unsigned char scanmap[28];
@@ -201,17 +201,17 @@ int LoadDotCodeData(int size, u32* DCdata, unsigned long MEM1, unsigned long MEM
     return 0;
 }
 
-void EReaderWriteMemory(u32 address, u32 value)
+void EReaderWriteMemory(uint32_t address, uint32_t value)
 {
     switch (address >> 24) {
     case 2:
-        WRITE32LE(((u32*)&workRAM[address & 0x3FFFF]), value);
+        WRITE32LE(((uint32_t*)&workRAM[address & 0x3FFFF]), value);
         break;
     case 3:
-        WRITE32LE(((u32*)&internalRAM[address & 0x7FFF]), value);
+        WRITE32LE(((uint32_t*)&internalRAM[address & 0x7FFF]), value);
         break;
     default:
-        WRITE32LE(((u32*)&rom[address & 0x1FFFFFF]), value);
+        WRITE32LE(((uint32_t*)&rom[address & 0x1FFFFFF]), value);
         //rom[address & 0x1FFFFFF] = data;
         break;
     }
@@ -271,15 +271,15 @@ void BIOS_EReader_ScanCard(int swi_num)
 
             switch (CheckEReaderRegion()) {
             case 1: //US
-                LoadDotCodeData(i, (u32*)DotCodeData, 0x2032D14, 0x2028B28, 1);
+                LoadDotCodeData(i, (uint32_t*)DotCodeData, 0x2032D14, 0x2028B28, 1);
                 EReaderWriteMemory(0x80091BA, 0x46C0DFE2);
                 break;
             case 2:
-                LoadDotCodeData(i, (u32*)DotCodeData, 0x2006EC4, 0x2002478, 1);
+                LoadDotCodeData(i, (uint32_t*)DotCodeData, 0x2006EC4, 0x2002478, 1);
                 EReaderWriteMemory(0x8008B12, 0x46C0DFE2);
                 break;
             case 3:
-                LoadDotCodeData(i, (u32*)DotCodeData, 0x202F8A4, 0x2031034, 1);
+                LoadDotCodeData(i, (uint32_t*)DotCodeData, 0x202F8A4, 0x2031034, 1);
                 EReaderWriteMemory(0x800922E, 0x46C0DFE2);
                 break;
             }
@@ -294,15 +294,15 @@ void BIOS_EReader_ScanCard(int swi_num)
 
             switch (CheckEReaderRegion()) {
             case 1: //US
-                LoadDotCodeData(dotcodesize, (u32*)NULL, 0x2032D14, 0x2028B28, 0);
+                LoadDotCodeData(dotcodesize, (uint32_t*)NULL, 0x2032D14, 0x2028B28, 0);
                 EReaderWriteMemory(0x80091BA, 0x46C0DFE1);
                 break;
             case 2:
-                LoadDotCodeData(dotcodesize, (u32*)NULL, 0x2006EC4, 0x2002478, 0);
+                LoadDotCodeData(dotcodesize, (uint32_t*)NULL, 0x2006EC4, 0x2002478, 0);
                 EReaderWriteMemory(0x8008B12, 0x46C0DFE1);
                 break;
             case 3:
-                LoadDotCodeData(dotcodesize, (u32*)NULL, 0x202F8A4, 0x2031034, 0);
+                LoadDotCodeData(dotcodesize, (uint32_t*)NULL, 0x202F8A4, 0x2031034, 0);
                 EReaderWriteMemory(0x800922E, 0x46C0DFE1);
                 break;
             }
