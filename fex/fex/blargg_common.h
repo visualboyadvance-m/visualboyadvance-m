@@ -12,7 +12,7 @@
 typedef const char *blargg_err_t; // 0 on success, otherwise error string
 
 // Success; no error
-int const blargg_ok = 0;
+#define blargg_ok NULL
 
 // BLARGG_RESTRICT: equivalent to C99's restrict, where supported
 #if __GNUC__ >= 3 || _MSC_VER >= 1100
