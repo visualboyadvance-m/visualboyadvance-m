@@ -33,7 +33,7 @@ class SoundSDL : public SoundDriver
         virtual void pause();
         virtual void reset();
         virtual void resume();
-        virtual void write(u16 *finalWave, int length);
+        virtual void write(uint16_t *finalWave, int length);
 
         private:
         RingBuffer<uint16_t> _rbuf;
@@ -50,7 +50,7 @@ class SoundSDL : public SoundDriver
         // Defines what delay in seconds we keep in the sound buffer
         static const float _delay;
 
-        static void soundCallback(void *data, u8 *stream, int length);
+        static void soundCallback(void *data, uint8_t *stream, int length);
         virtual void read(uint16_t *stream, int length);
 };
 
