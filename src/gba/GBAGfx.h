@@ -9,16 +9,16 @@
 //#define SPRITE_DEBUG
 
 #ifdef TILED_RENDERING
-extern void gfxDrawTextScreen(u16, u16, u16, u32*);
+extern void gfxDrawTextScreen(uint16_t, uint16_t, uint16_t, u32*);
 #else
-static void gfxDrawTextScreen(u16, u16, u16, u32*);
+static void gfxDrawTextScreen(uint16_t, uint16_t, uint16_t, u32*);
 #endif
-static void gfxDrawRotScreen(u16, u16, u16, u16, u16, u16, u16, u16, u16, int&, int&, int, u32*);
-static void gfxDrawRotScreen16Bit(u16, u16, u16, u16, u16, u16, u16, u16, u16, int&, int&, int,
+static void gfxDrawRotScreen(uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, int&, int&, int, u32*);
+static void gfxDrawRotScreen16Bit(uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, int&, int&, int,
     u32*);
-static void gfxDrawRotScreen256(u16, u16, u16, u16, u16, u16, u16, u16, u16, int&, int&, int,
+static void gfxDrawRotScreen256(uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, int&, int&, int,
     u32*);
-static void gfxDrawRotScreen16Bit160(u16, u16, u16, u16, u16, u16, u16, u16, u16, int&, int&, int,
+static void gfxDrawRotScreen16Bit160(uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t, int&, int&, int,
     u32*);
 static void gfxDrawSprites(u32*);
 static void gfxIncreaseBrightness(u32* line, int coeff);
@@ -78,11 +78,11 @@ static inline void gfxClearArray(u32* array)
 }
 
 #ifndef TILED_RENDERING
-static inline void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs, u32* line)
+static inline void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t vofs, u32* line)
 {
-    u16* palette = (u16*)paletteRAM;
+    uint16_t* palette = (uint16_t*)paletteRAM;
     u8* charBase = &vram[((control >> 2) & 0x03) * 0x4000];
-    u16* screenBase = (u16*)&vram[((control >> 8) & 0x1f) * 0x800];
+    uint16_t* screenBase = (u16*)&vram[((control >> 8) & 0x1f) * 0x800];
     u32 prio = ((control & 3) << 25) + 0x1000000;
     int sizeX = 256;
     int sizeY = 256;
@@ -161,9 +161,9 @@ static inline void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs, u32* line)
             }
         }
     } else {
-        u16* screenSource = screenBase + 0x400 * (xxx >> 8) + ((xxx & 255) >> 3) + yshift;
+        uint16_t* screenSource = screenBase + 0x400 * (xxx >> 8) + ((xxx & 255) >> 3) + yshift;
         for (int x = 0; x < 240; x++) {
-            u16 data = READ16LE(screenSource);
+            uint16_t data = READ16LE(screenSource);
 
             int tile = data & 0x3FF;
             int tileX = (xxx & 7);
@@ -218,11 +218,11 @@ static inline void gfxDrawTextScreen(u16 control, u16 hofs, u16 vofs, u32* line)
 }
 #endif
 
-static inline void gfxDrawRotScreen(u16 control, u16 x_l, u16 x_h, u16 y_l, u16 y_h, u16 pa, u16 pb,
-    u16 pc, u16 pd, int& currentX, int& currentY, int changed,
+static inline void gfxDrawRotScreen(uint16_t control, uint16_t x_l, uint16_t x_h, uint16_t y_l, uint16_t y_h, uint16_t pa, uint16_t pb,
+    uint16_t pc, uint16_t pd, int& currentX, int& currentY, int changed,
     u32* line)
 {
-    u16* palette = (u16*)paletteRAM;
+    uint16_t* palette = (uint16_t*)paletteRAM;
     u8* charBase = &vram[((control >> 2) & 0x03) * 0x4000];
     u8* screenBase = (u8*)&vram[((control >> 8) & 0x1f) * 0x800];
     int prio = ((control & 3) << 25) + 0x1000000;
@@ -345,11 +345,11 @@ static inline void gfxDrawRotScreen(u16 control, u16 x_l, u16 x_h, u16 y_l, u16 
     }
 }
 
-static inline void gfxDrawRotScreen16Bit(u16 control, u16 x_l, u16 x_h, u16 y_l, u16 y_h, u16 pa,
-    u16 pb, u16 pc, u16 pd, int& currentX, int& currentY,
+static inline void gfxDrawRotScreen16Bit(uint16_t control, uint16_t x_l, uint16_t x_h, uint16_t y_l, uint16_t y_h, uint16_t pa,
+    uint16_t pb, uint16_t pc, uint16_t pd, int& currentX, int& currentY,
     int changed, u32* line)
 {
-    u16* screenBase = (u16*)&vram[0];
+    uint16_t* screenBase = (uint16_t*)&vram[0];
     int prio = ((control & 3) << 25) + 0x1000000;
     int sizeX = 240;
     int sizeY = 160;
@@ -434,11 +434,11 @@ static inline void gfxDrawRotScreen16Bit(u16 control, u16 x_l, u16 x_h, u16 y_l,
     }
 }
 
-static inline void gfxDrawRotScreen256(u16 control, u16 x_l, u16 x_h, u16 y_l, u16 y_h, u16 pa,
-    u16 pb, u16 pc, u16 pd, int& currentX, int& currentY,
+static inline void gfxDrawRotScreen256(uint16_t control, uint16_t x_l, uint16_t x_h, uint16_t y_l, uint16_t y_h, uint16_t pa,
+    uint16_t pb, uint16_t pc, uint16_t pd, int& currentX, int& currentY,
     int changed, u32* line)
 {
-    u16* palette = (u16*)paletteRAM;
+    uint16_t* palette = (u16*)paletteRAM;
     u8* screenBase = (DISPCNT & 0x0010) ? &vram[0xA000] : &vram[0x0000];
     int prio = ((control & 3) << 25) + 0x1000000;
     int sizeX = 240;
@@ -527,11 +527,11 @@ static inline void gfxDrawRotScreen256(u16 control, u16 x_l, u16 x_h, u16 y_l, u
     }
 }
 
-static inline void gfxDrawRotScreen16Bit160(u16 control, u16 x_l, u16 x_h, u16 y_l, u16 y_h, u16 pa,
-    u16 pb, u16 pc, u16 pd, int& currentX, int& currentY,
+static inline void gfxDrawRotScreen16Bit160(uint16_t control, uint16_t x_l, uint16_t x_h, uint16_t y_l, uint16_t y_h, uint16_t pa,
+    uint16_t pb, uint16_t pc, uint16_t pd, int& currentX, int& currentY,
     int changed, u32* line)
 {
-    u16* screenBase = (DISPCNT & 0x0010) ? (u16*)&vram[0xa000] : (u16*)&vram[0];
+    uint16_t* screenBase = (DISPCNT & 0x0010) ? (uint16_t*)&vram[0xa000] : (uint16_t*)&vram[0];
     int prio = ((control & 3) << 25) + 0x1000000;
     int sizeX = 160;
     int sizeY = 128;
