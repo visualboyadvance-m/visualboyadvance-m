@@ -250,10 +250,10 @@ public:
     }
     void UpdateDis()
     {
-        Z->SetValue(AF.B.B0 & Z_FLAG);
-        N->SetValue(AF.B.B0 & N_FLAG);
-        H->SetValue(AF.B.B0 & H_FLAG);
-        C->SetValue(AF.B.B0 & C_FLAG);
+        Z->SetValue(AF.B.B0 & GB_Z_FLAG);
+        N->SetValue(AF.B.B0 & GB_N_FLAG);
+        H->SetValue(AF.B.B0 & GB_H_FLAG);
+        C->SetValue(AF.B.B0 & GB_C_FLAG);
 #define grv16(n, val)                    \
     do {                                 \
         wxString s;                      \

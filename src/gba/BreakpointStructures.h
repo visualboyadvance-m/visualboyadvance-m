@@ -1,6 +1,8 @@
 #ifndef VBA_BKS_H
 #define VBA_BKS_H
 
+#include <cstdint>
+
 #define readWord(addr) \
     ((map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]) + ((map[(addr + 1) >> 24].address[(addr + 1) & map[(addr + 1) >> 24].mask]) << 8) + ((map[(addr + 2) >> 24].address[(addr + 2) & map[(addr + 2) >> 24].mask]) << 16) + ((map[(addr + 3) >> 24].address[(addr + 3) & map[(addr + 3) >> 24].mask]) << 24))
 

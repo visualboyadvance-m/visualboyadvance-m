@@ -1,6 +1,9 @@
 #ifndef FLASH_H
 #define FLASH_H
 
+#include <cstdint>
+#include <zlib.h>
+
 #define FLASH_128K_SZ 0x20000
 
 #ifdef __LIBRETRO__

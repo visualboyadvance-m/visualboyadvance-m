@@ -1,6 +1,9 @@
 #ifndef EEPROM_H
 #define EEPROM_H
 
+#include <cstdint>
+#include <zlib.h>
+
 #ifdef __LIBRETRO__
 extern void eepromSaveGame(uint8_t*& data);
 extern void eepromReadGame(const uint8_t*& data, int version);

@@ -1,10 +1,10 @@
 #ifndef GB_H
 #define GB_H
 
-#define C_FLAG 0x10
-#define H_FLAG 0x20
-#define N_FLAG 0x40
-#define Z_FLAG 0x80
+const int GB_C_FLAG = 0x10;
+const int GB_H_FLAG = 0x20;
+const int GB_N_FLAG = 0x40;
+const int GB_Z_FLAG = 0x80;
 
 typedef union {
     struct {
