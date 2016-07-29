@@ -4,7 +4,7 @@
 
 void mode3RenderLine()
 {
-    u16* palette = (u16*)paletteRAM;
+    uint16_t* palette = (uint16_t*)paletteRAM;
 
     if (DISPCNT & 0x80) {
         for (int x = 0; x < 240; x++) {
@@ -29,7 +29,7 @@ void mode3RenderLine()
 
     gfxDrawSprites(lineOBJ);
 
-    u32 background;
+    uint32_t background;
     if (customBackdropColor == -1) {
         background = (READ16LE(&palette[0]) | 0x30000000);
     } else {
@@ -37,23 +37,23 @@ void mode3RenderLine()
     }
 
     for (int x = 0; x < 240; x++) {
-        u32 color = background;
-        u8 top = 0x20;
+        uint32_t color = background;
+        uint8_t top = 0x20;
 
         if (line2[x] < color) {
             color = line2[x];
             top = 0x04;
         }
 
-        if ((u8)(lineOBJ[x] >> 24) < (u8)(color >> 24)) {
+        if ((uint8_t)(lineOBJ[x] >> 24) < (uint8_t)(color >> 24)) {
             color = lineOBJ[x];
             top = 0x10;
         }
 
         if ((top & 0x10) && (color & 0x00010000)) {
             // semi-transparent OBJ
-            u32 back = background;
-            u8 top2 = 0x20;
+            uint32_t back = background;
+            uint8_t top2 = 0x20;
 
             if (line2[x] < back) {
                 back = line2[x];
@@ -86,7 +86,7 @@ void mode3RenderLine()
 
 void mode3RenderLineNoWindow()
 {
-    u16* palette = (u16*)paletteRAM;
+    uint16_t* palette = (uint16_t*)paletteRAM;
 
     if (DISPCNT & 0x80) {
         for (int x = 0; x < 240; x++) {
@@ -111,7 +111,7 @@ void mode3RenderLineNoWindow()
 
     gfxDrawSprites(lineOBJ);
 
-    u32 background;
+    uint32_t background;
     if (customBackdropColor == -1) {
         background = (READ16LE(&palette[0]) | 0x30000000);
     } else {
@@ -119,15 +119,15 @@ void mode3RenderLineNoWindow()
     }
 
     for (int x = 0; x < 240; x++) {
-        u32 color = background;
-        u8 top = 0x20;
+        uint32_t color = background;
+        uint8_t top = 0x20;
 
         if (line2[x] < color) {
             color = line2[x];
             top = 0x04;
         }
 
-        if ((u8)(lineOBJ[x] >> 24) < (u8)(color >> 24)) {
+        if ((uint8_t)(lineOBJ[x] >> 24) < (uint8_t)(color >> 24)) {
             color = lineOBJ[x];
             top = 0x10;
         }
@@ -138,8 +138,8 @@ void mode3RenderLineNoWindow()
                 break;
             case 1: {
                 if (top & BLDMOD) {
-                    u32 back = background;
-                    u8 top2 = 0x20;
+                    uint32_t back = background;
+                    uint8_t top2 = 0x20;
 
                     if (line2[x] < back) {
                         if (top != 0x04) {
@@ -148,7 +148,7 @@ void mode3RenderLineNoWindow()
                         }
                     }
 
-                    if ((u8)(lineOBJ[x] >> 24) < (u8)(back >> 24)) {
+                    if ((uint8_t)(lineOBJ[x] >> 24) < (uint8_t)(back >> 24)) {
                         if (top != 0x10) {
                             back = lineOBJ[x];
                             top2 = 0x10;
@@ -172,8 +172,8 @@ void mode3RenderLineNoWindow()
             }
         } else {
             // semi-transparent OBJ
-            u32 back = background;
-            u8 top2 = 0x20;
+            uint32_t back = background;
+            uint8_t top2 = 0x20;
 
             if (line2[x] < back) {
                 back = line2[x];
@@ -206,7 +206,7 @@ void mode3RenderLineNoWindow()
 
 void mode3RenderLineAll()
 {
-    u16* palette = (u16*)paletteRAM;
+    uint16_t* palette = (uint16_t*)paletteRAM;
 
     if (DISPCNT & 0x80) {
         for (int x = 0; x < 240; x++) {
@@ -220,8 +220,8 @@ void mode3RenderLineAll()
     bool inWindow1 = false;
 
     if (layerEnable & 0x2000) {
-        u8 v0 = WIN0V >> 8;
-        u8 v1 = WIN0V & 255;
+        uint8_t v0 = WIN0V >> 8;
+        uint8_t v1 = WIN0V & 255;
         inWindow0 = ((v0 == v1) && (v0 >= 0xe8));
         if (v1 >= v0)
             inWindow0 |= (VCOUNT >= v0 && VCOUNT < v1);
@@ -229,8 +229,8 @@ void mode3RenderLineAll()
             inWindow0 |= (VCOUNT >= v0 || VCOUNT < v1);
     }
     if (layerEnable & 0x4000) {
-        u8 v0 = WIN1V >> 8;
-        u8 v1 = WIN1V & 255;
+        uint8_t v0 = WIN1V >> 8;
+        uint8_t v1 = WIN1V & 255;
         inWindow1 = ((v0 == v1) && (v0 >= 0xe8));
         if (v1 >= v0)
             inWindow1 |= (VCOUNT >= v0 && VCOUNT < v1);
@@ -254,11 +254,11 @@ void mode3RenderLineAll()
     gfxDrawSprites(lineOBJ);
     gfxDrawOBJWin(lineOBJWin);
 
-    u8 inWin0Mask = WININ & 0xFF;
-    u8 inWin1Mask = WININ >> 8;
-    u8 outMask = WINOUT & 0xFF;
+    uint8_t inWin0Mask = WININ & 0xFF;
+    uint8_t inWin1Mask = WININ >> 8;
+    uint8_t outMask = WINOUT & 0xFF;
 
-    u32 background;
+    uint32_t background;
     if (customBackdropColor == -1) {
         background = (READ16LE(&palette[0]) | 0x30000000);
     } else {
@@ -266,9 +266,9 @@ void mode3RenderLineAll()
     }
 
     for (int x = 0; x < 240; x++) {
-        u32 color = background;
-        u8 top = 0x20;
-        u8 mask = outMask;
+        uint32_t color = background;
+        uint8_t top = 0x20;
+        uint8_t mask = outMask;
 
         if (!(lineOBJWin[x] & 0x80000000)) {
             mask = WINOUT >> 8;
@@ -290,15 +290,15 @@ void mode3RenderLineAll()
             top = 0x04;
         }
 
-        if ((mask & 16) && ((u8)(lineOBJ[x] >> 24) < (u8)(color >> 24))) {
+        if ((mask & 16) && ((uint8_t)(lineOBJ[x] >> 24) < (uint8_t)(color >> 24))) {
             color = lineOBJ[x];
             top = 0x10;
         }
 
         if (color & 0x00010000) {
             // semi-transparent OBJ
-            u32 back = background;
-            u8 top2 = 0x20;
+            uint32_t back = background;
+            uint8_t top2 = 0x20;
 
             if ((mask & 4) && line2[x] < back) {
                 back = line2[x];
@@ -327,8 +327,8 @@ void mode3RenderLineAll()
                 break;
             case 1: {
                 if (top & BLDMOD) {
-                    u32 back = background;
-                    u8 top2 = 0x20;
+                    uint32_t back = background;
+                    uint8_t top2 = 0x20;
 
                     if ((mask & 4) && line2[x] < back) {
                         if (top != 0x04) {
@@ -337,7 +337,7 @@ void mode3RenderLineAll()
                         }
                     }
 
-                    if ((mask & 16) && (u8)(lineOBJ[x] >> 24) < (u8)(back >> 24)) {
+                    if ((mask & 16) && (uint8_t)(lineOBJ[x] >> 24) < (uint8_t)(back >> 24)) {
                         if (top != 0x10) {
                             back = lineOBJ[x];
                             top2 = 0x10;

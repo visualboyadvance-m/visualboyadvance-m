@@ -19,7 +19,7 @@ typedef union {
 
 extern gbRegister AF, BC, DE, HL, SP, PC;
 extern uint16_t IFF;
-int gbDis(char*, u16);
+int gbDis(char*, uint16_t);
 
 bool gbLoadRom(const char*);
 bool gbUpdateSizes();

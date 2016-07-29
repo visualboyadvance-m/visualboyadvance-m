@@ -40,7 +40,7 @@ public:
     void pause(); // pause the secondary sound buffer
     void reset(); // stop and reset the secondary sound buffer
     void resume(); // play/resume the secondary sound buffer
-    void write(u16* finalWave, int length); // write the emulated sound to a sound buffer
+    void write(uint16_t* finalWave, int length); // write the emulated sound to a sound buffer
 
 private:
     OPENALFNTABLE ALFunction;
@@ -235,7 +235,7 @@ void OpenAL::reset()
     debugState();
 }
 
-void OpenAL::write(u16* finalWave, int length)
+void OpenAL::write(uint16_t* finalWave, int length)
 {
     if (!initialized)
         return;

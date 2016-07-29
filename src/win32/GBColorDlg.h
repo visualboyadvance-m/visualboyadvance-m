@@ -17,9 +17,9 @@ class GBColorDlg : public CDialog {
 public:
     int getWhich();
     afx_msg void OnColorClicked(UINT id);
-    u16* getColors();
+    uint16_t* getColors();
     void setWhich(int w);
-    u16 colors[24];
+    uint16_t colors[24];
     ColorButton colorControls[8];
     GBColorDlg(CWnd* pParent = NULL); // standard constructor
 

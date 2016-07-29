@@ -125,7 +125,7 @@ AF.B.B0 = tempValue;
 break;
 case 0x18:
 // JR NN
-PC.W += (s8)gbReadOpcode(PC.W) + 1;
+PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
 break;
 case 0x19:
 // ADD HL,DE
@@ -166,7 +166,7 @@ case 0x20:
 if (AF.B.B0 & GB_Z_FLAG)
     PC.W++;
 else {
-    PC.W += (s8)gbReadOpcode(PC.W) + 1;
+    PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
     clockTicks++;
 }
 break;
@@ -206,7 +206,7 @@ break;
 case 0x28:
 // JR Z,NN
 if (AF.B.B0 & GB_Z_FLAG) {
-    PC.W += (s8)gbReadOpcode(PC.W) + 1;
+    PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
     clockTicks++;
 } else
     PC.W++;
@@ -249,7 +249,7 @@ case 0x30:
 if (AF.B.B0 & GB_C_FLAG)
     PC.W++;
 else {
-    PC.W += (s8)gbReadOpcode(PC.W) + 1;
+    PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
     clockTicks++;
 }
 break;
@@ -289,7 +289,7 @@ break;
 case 0x38:
 // JR C,NN
 if (AF.B.B0 & GB_C_FLAG) {
-    PC.W += (s8)gbReadOpcode(PC.W) + 1;
+    PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
     clockTicks++;
 } else
     PC.W++;
@@ -1230,7 +1230,7 @@ PC.W = 0x0020;
 break;
 case 0xe8:
 // ADD SP,NN
-offset = (s8)gbReadOpcode(PC.W++);
+offset = (int8_t)gbReadOpcode(PC.W++);
 tempRegister.W = SP.W + offset;
 AF.B.B0 = ((SP.W ^ offset ^ tempRegister.W) & 0x100 ? GB_C_FLAG : 0) | ((SP.W ^ offset ^ tempRegister.W) & 0x10 ? GB_H_FLAG : 0);
 SP.W = tempRegister.W;
@@ -1308,7 +1308,7 @@ PC.W = 0x0030;
 break;
 case 0xf8:
 // LD HL,SP+NN
-offset = (s8)gbReadOpcode(PC.W++);
+offset = (int8_t)gbReadOpcode(PC.W++);
 tempRegister.W = SP.W + offset;
 AF.B.B0 = ((SP.W ^ offset ^ tempRegister.W) & 0x100 ? GB_C_FLAG : 0) | ((SP.W ^ offset ^ tempRegister.W) & 0x10 ? GB_H_FLAG : 0);
 HL.W = tempRegister.W;

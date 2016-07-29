@@ -254,7 +254,7 @@ static LPCTSTR winGBARomInfoFindMakerCode(LPCTSTR code)
 /////////////////////////////////////////////////////////////////////////////
 // RomInfoGB dialog
 
-RomInfoGB::RomInfoGB(u8* rom, CWnd* pParent /*=NULL*/)
+RomInfoGB::RomInfoGB(uint8_t* rom, CWnd* pParent /*=NULL*/)
     : CDialog(RomInfoGB::IDD, pParent)
 {
     //{{AFX_DATA_INIT(RomInfoGB)
@@ -463,7 +463,7 @@ BOOL RomInfoGB::OnInitDialog()
     sprintf(buffer, "%02x", rom[0x14c]);
     GetDlgItem(IDC_ROM_VERSION)->SetWindowText(buffer);
 
-    u8 crc = 25;
+    uint8_t crc = 25;
     int i;
     for (i = 0x134; i < 0x14d; i++) {
         crc += rom[i];
@@ -474,7 +474,7 @@ BOOL RomInfoGB::OnInitDialog()
     sprintf(buffer, "%02x (%02x)", crc, rom[0x14d]);
     GetDlgItem(IDC_ROM_CRC)->SetWindowText(buffer);
 
-    u16 crc16 = 0;
+    uint16_t crc16 = 0;
     for (i = 0; i < gbRomSize; i++) {
         crc16 += rom[i];
     }
@@ -492,7 +492,7 @@ BOOL RomInfoGB::OnInitDialog()
 /////////////////////////////////////////////////////////////////////////////
 // RomInfoGBA dialog
 
-RomInfoGBA::RomInfoGBA(u8* rom, CWnd* pParent /*=NULL*/)
+RomInfoGBA::RomInfoGBA(uint8_t* rom, CWnd* pParent /*=NULL*/)
     : CDialog(RomInfoGBA::IDD, pParent)
 {
     //{{AFX_DATA_INIT(RomInfoGBA)
@@ -555,7 +555,7 @@ BOOL RomInfoGBA::OnInitDialog()
     sprintf(buffer, "%02x", rom[0xbc]);
     GetDlgItem(IDC_ROM_VERSION)->SetWindowText(buffer);
 
-    u8 crc = 0x19;
+    uint8_t crc = 0x19;
     for (int i = 0xa0; i < 0xbd; i++) {
         crc += rom[i];
     }

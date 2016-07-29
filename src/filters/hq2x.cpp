@@ -37,14 +37,14 @@
  * This effect is a rewritten implementation of the hq2x effect made by Maxim Stepin
  */
 
-static void hq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, const u16* src2, unsigned count)
+static void hq2x_16_def(uint16_t* dst0, uint16_t* dst1, const uint16_t* src0, const uint16_t* src1, const uint16_t* src2, unsigned count)
 {
   unsigned i;
 
   for(i=0;i<count;++i) {
     unsigned char mask;
 
-    u16 c[9];
+    uint16_t c[9];
 
     c[1] = src0[0];
     c[4] = src1[0];
@@ -147,14 +147,14 @@ static void hq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, 
   }
 }
 
-static void hq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, const u32* src2, unsigned count)
+static void hq2x_32_def(uint32_t* dst0, uint32_t* dst1, const uint32_t* src0, const uint32_t* src1, const uint32_t* src2, unsigned count)
 {
   unsigned i;
 
   for(i=0;i<count;++i) {
     unsigned char mask;
 
-    u32 c[9];
+    uint32_t c[9];
 
     c[1] = src0[0];
     c[4] = src1[0];
@@ -264,14 +264,14 @@ static void hq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, 
  * This effect is derived from the hq2x effect made by Maxim Stepin
  */
 
-static void lq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, const u16* src2, unsigned count)
+static void lq2x_16_def(uint16_t* dst0, uint16_t* dst1, const uint16_t* src0, const uint16_t* src1, const uint16_t* src2, unsigned count)
 {
   unsigned i;
 
   for(i=0;i<count;++i) {
     unsigned char mask;
 
-    u16 c[9];
+    uint16_t c[9];
 
     c[1] = src0[0];
     c[4] = src1[0];
@@ -374,14 +374,14 @@ static void lq2x_16_def(u16* dst0, u16* dst1, const u16* src0, const u16* src1, 
   }
 }
 
-static void lq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, const u32* src2, unsigned count)
+static void lq2x_32_def(uint32_t* dst0, uint32_t* dst1, const uint32_t* src0, const uint32_t* src1, const uint32_t* src2, unsigned count)
 {
   unsigned i;
 
   for(i=0;i<count;++i) {
     unsigned char mask;
 
-    u32 c[9];
+    uint32_t c[9];
 
     c[1] = src0[0];
     c[4] = src1[0];
@@ -484,15 +484,15 @@ static void lq2x_32_def(u32* dst0, u32* dst1, const u32* src0, const u32* src1, 
   }
 }
 
-void hq2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-          u8 *dstPtr, u32 dstPitch, int width, int height)
+void hq2x(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+          uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u16 *dst0 = (u16 *)dstPtr;
-  u16 *dst1 = dst0 + (dstPitch >> 1);
+  uint16_t *dst0 = (uint16_t *)dstPtr;
+  uint16_t *dst1 = dst0 + (dstPitch >> 1);
 
-  u16 *src0 = (u16 *)srcPtr;
-  u16 *src1 = src0 + (srcPitch >> 1);
-  u16 *src2 = src1 + (srcPitch >> 1);
+  uint16_t *src0 = (uint16_t *)srcPtr;
+  uint16_t *src1 = src0 + (srcPitch >> 1);
+  uint16_t *src2 = src1 + (srcPitch >> 1);
 
   hq2x_16_def(dst0, dst1, src0, src0, src1, width);
 
@@ -513,15 +513,15 @@ void hq2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
   hq2x_16_def(dst0, dst1, src0, src1, src1, width);
 }
 
-void hq2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-            u8 *dstPtr, u32 dstPitch, int width, int height)
+void hq2x32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+            uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u32 *dst0 = (u32 *)dstPtr;
-  u32 *dst1 = dst0 + (dstPitch >> 2);
+  uint32_t *dst0 = (uint32_t *)dstPtr;
+  uint32_t *dst1 = dst0 + (dstPitch >> 2);
 
-  u32 *src0 = (u32 *)srcPtr;
-  u32 *src1 = src0 + (srcPitch >> 2);
-  u32 *src2 = src1 + (srcPitch >> 2);
+  uint32_t *src0 = (uint32_t *)srcPtr;
+  uint32_t *src1 = src0 + (srcPitch >> 2);
+  uint32_t *src2 = src1 + (srcPitch >> 2);
   hq2x_32_def(dst0, dst1, src0, src0, src1, width);
 
   int count = height;
@@ -541,15 +541,15 @@ void hq2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
   hq2x_32_def(dst0, dst1, src0, src1, src1, width);
 }
 
-void lq2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-          u8 *dstPtr, u32 dstPitch, int width, int height)
+void lq2x(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+          uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u16 *dst0 = (u16 *)dstPtr;
-  u16 *dst1 = dst0 + (dstPitch >> 1);
+  uint16_t *dst0 = (uint16_t *)dstPtr;
+  uint16_t *dst1 = dst0 + (dstPitch >> 1);
 
-  u16 *src0 = (u16 *)srcPtr;
-  u16 *src1 = src0 + (srcPitch >> 1);
-  u16 *src2 = src1 + (srcPitch >> 1);
+  uint16_t *src0 = (uint16_t *)srcPtr;
+  uint16_t *src1 = src0 + (srcPitch >> 1);
+  uint16_t *src2 = src1 + (srcPitch >> 1);
 
   lq2x_16_def(dst0, dst1, src0, src0, src1, width);
 
@@ -570,15 +570,15 @@ void lq2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
   lq2x_16_def(dst0, dst1, src0, src1, src1, width);
 }
 
-void lq2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-            u8 *dstPtr, u32 dstPitch, int width, int height)
+void lq2x32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+            uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u32 *dst0 = (u32 *)dstPtr;
-  u32 *dst1 = dst0 + (dstPitch >> 2);
+  uint32_t *dst0 = (uint32_t *)dstPtr;
+  uint32_t *dst1 = dst0 + (dstPitch >> 2);
 
-  u32 *src0 = (u32 *)srcPtr;
-  u32 *src1 = src0 + (srcPitch >> 2);
-  u32 *src2 = src1 + (srcPitch >> 2);
+  uint32_t *src0 = (uint32_t *)srcPtr;
+  uint32_t *src1 = src0 + (srcPitch >> 2);
+  uint32_t *src2 = src1 + (srcPitch >> 2);
   lq2x_32_def(dst0, dst1, src0, src0, src1, width);
 
   int count = height;

@@ -22,7 +22,7 @@
     } while (0)
 
 // FIXME: this should be in a header
-extern u8 gbInvertTab[256];
+extern uint8_t gbInvertTab[256];
 
 // avoid exporting classes
 namespace Viewers {
@@ -179,9 +179,9 @@ public:
         // not paused since last refresh
     }
 
-    u32 AddressFromSel()
+    uint32_t AddressFromSel()
     {
-        u32 base = ((control >> 8) & 0x1f) * 0x800 + 0x6000000;
+        uint32_t base = ((control >> 8) & 0x1f) * 0x800 + 0x6000000;
 
         // all text bgs (16 bits)
         if (mode == 0 || (mode < 3 && bg < 2) || mode == 6 || mode == 7) {
@@ -225,12 +225,12 @@ public:
             wxString s;
             s.Printf(wxT("(%d,%d)"), selx, sely);
             coords->SetLabel(s);
-            u32 address = AddressFromSel();
+            uint32_t address = AddressFromSel();
             s.Printf(wxT("0x%08X"), address);
             addr->SetLabel(s);
 
             if (!mode || (mode < 3 || mode > 5) && bg < 2) {
-                u16 value = *((u16*)&vram[address - 0x6000000]);
+                uint16_t value = *((uint16_t*)&vram[address - 0x6000000]);
                 s.Printf(wxT("%d"), value & 1023);
                 tile->SetLabel(s);
                 s = value & 1024 ? wxT('H') : wxT('-');
@@ -252,7 +252,7 @@ public:
     }
 
 protected:
-    u16 control, mode;
+    uint16_t control, mode;
     int frame, bg;
     wxRadioButton *fr0, *fr1, *bg0, *bg1, *bg2, *bg3;
     wxControl *modelab, *mapbase, *charbase, *size, *colors, *prio, *mosaic,
@@ -267,10 +267,10 @@ protected:
 
     void renderTextScreen()
     {
-        u16* palette = (u16*)paletteRAM;
-        u8* charBase = &vram[((control >> 2) & 0x03) * 0x4000];
-        u16* screenBase = (u16*)&vram[((control >> 8) & 0x1f) * 0x800];
-        u8* bmp = image.GetData();
+        uint16_t* palette = (uint16_t*)paletteRAM;
+        uint8_t* charBase = &vram[((control >> 2) & 0x03) * 0x4000];
+        uint16_t* screenBase = (uint16_t*)&vram[((control >> 8) & 0x1f) * 0x800];
+        uint8_t* bmp = image.GetData();
         int sizeX = 256;
         int sizeY = 256;
 
@@ -305,10 +305,10 @@ protected:
                         screenBase += 0x400;
                 }
 
-                u16* screenSource = screenBase + ((yy >> 3) * 32);
+                uint16_t* screenSource = screenBase + ((yy >> 3) * 32);
 
                 for (int x = 0; x < sizeX; x++) {
-                    u16 data = *screenSource;
+                    uint16_t data = *screenSource;
                     int tile = data & 0x3FF;
                     int tileX = (x & 7);
                     int tileY = y & 7;
@@ -319,8 +319,8 @@ protected:
                     if (data & 0x0800)
                         tileY = 7 - tileY;
 
-                    u8 c = charBase[tile * 64 + tileY * 8 + tileX];
-                    u16 color = palette[c];
+                    uint8_t c = charBase[tile * 64 + tileY * 8 + tileX];
+                    uint16_t color = palette[c];
                     *bmp++ = (color & 0x1f) << 3;
                     *bmp++ = ((color >> 5) & 0x1f) << 3;
                     *bmp++ = ((color >> 10) & 0x1f) << 3;
@@ -349,10 +349,10 @@ protected:
                         screenBase += 0x400;
                 }
 
-                u16* screenSource = screenBase + ((yy >> 3) * 32);
+                uint16_t* screenSource = screenBase + ((yy >> 3) * 32);
 
                 for (int x = 0; x < sizeX; x++) {
-                    u16 data = *screenSource;
+                    uint16_t data = *screenSource;
                     int tile = data & 0x3FF;
                     int tileX = (x & 7);
                     int tileY = y & 7;
@@ -363,7 +363,7 @@ protected:
                     if (data & 0x0800)
                         tileY = 7 - tileY;
 
-                    u8 color = charBase[tile * 32 + tileY * 4 + (tileX >> 1)];
+                    uint8_t color = charBase[tile * 32 + tileY * 4 + (tileX >> 1)];
 
                     if (tileX & 1) {
                         color = (color >> 4);
@@ -372,7 +372,7 @@ protected:
                     }
 
                     int pal = (*screenSource >> 8) & 0xF0;
-                    u16 color2 = palette[pal + color];
+                    uint16_t color2 = palette[pal + color];
                     *bmp++ = (color2 & 0x1f) << 3;
                     *bmp++ = ((color2 >> 5) & 0x1f) << 3;
                     *bmp++ = ((color2 >> 10) & 0x1f) << 3;
@@ -438,10 +438,10 @@ protected:
 
     void renderRotScreen()
     {
-        u16* palette = (u16*)paletteRAM;
-        u8* charBase = &vram[((control >> 2) & 0x03) * 0x4000];
-        u8* screenBase = (u8*)&vram[((control >> 8) & 0x1f) * 0x800];
-        u8* bmp = image.GetData();
+        uint16_t* palette = (uint16_t*)paletteRAM;
+        uint8_t* charBase = &vram[((control >> 2) & 0x03) * 0x4000];
+        uint8_t* screenBase = (uint8_t*)&vram[((control >> 8) & 0x1f) * 0x800];
+        uint8_t* bmp = image.GetData();
         int sizeX = 128;
         int sizeY = 128;
 
@@ -470,8 +470,8 @@ protected:
                     int tile = screenBase[(x >> 3) + (y >> 3) * (sizeX >> 3)];
                     int tileX = (x & 7);
                     int tileY = y & 7;
-                    u8 color = charBase[tile * 64 + tileY * 8 + tileX];
-                    u16 color2 = palette[color];
+                    uint8_t color = charBase[tile * 64 + tileY * 8 + tileX];
+                    uint16_t color2 = palette[color];
                     *bmp++ = (color2 & 0x1f) << 3;
                     *bmp++ = ((color2 >> 5) & 0x1f) << 3;
                     *bmp++ = ((color2 >> 10) & 0x1f) << 3;
@@ -485,8 +485,8 @@ protected:
                     int tile = screenBase[(x >> 3) + (y >> 3) * (sizeX >> 3)];
                     int tileX = (x & 7);
                     int tileY = y & 7;
-                    u8 color = charBase[tile * 64 + tileY * 8 + tileX];
-                    u16 color2 = palette[color];
+                    uint8_t color = charBase[tile * 64 + tileY * 8 + tileX];
+                    uint16_t color2 = palette[color];
                     *bmp++ = (color2 & 0x1f) << 3;
                     *bmp++ = ((color2 >> 5) & 0x1f) << 3;
                     *bmp++ = ((color2 >> 10) & 0x1f) << 3;
@@ -496,8 +496,8 @@ protected:
             bmp += 3 * (1024 - sizeX);
         }
 
-        u32 xx;
-        u32 yy;
+        uint32_t xx;
+        uint32_t yy;
 
         switch (bg) {
         case 2:
@@ -530,13 +530,13 @@ protected:
 
     void renderMode3()
     {
-        u8* bmp = image.GetData();
-        u16* src = (u16*)&vram[0];
+        uint8_t* bmp = image.GetData();
+        uint16_t* src = (uint16_t*)&vram[0];
         BMPSize(240, 160);
 
         for (int y = 0; y < 160; y++) {
             for (int x = 0; x < 240; x++) {
-                u16 data = *src++;
+                uint16_t data = *src++;
                 *bmp++ = (data & 0x1f) << 3;
                 *bmp++ = ((data >> 5) & 0x1f) << 3;
                 *bmp++ = ((data >> 10) & 0x1f) << 3;
@@ -548,15 +548,15 @@ protected:
 
     void renderMode4()
     {
-        u8* bmp = image.GetData();
-        u8* src = frame ? &vram[0xa000] : &vram[0];
-        u16* pal = (u16*)&paletteRAM[0];
+        uint8_t* bmp = image.GetData();
+        uint8_t* src = frame ? &vram[0xa000] : &vram[0];
+        uint16_t* pal = (uint16_t*)&paletteRAM[0];
         BMPSize(240, 160);
 
         for (int y = 0; y < 160; y++) {
             for (int x = 0; x < 240; x++) {
-                u8 c = *src++;
-                u16 data = pal[c];
+                uint8_t c = *src++;
+                uint16_t data = pal[c];
                 *bmp++ = (data & 0x1f) << 3;
                 *bmp++ = ((data >> 5) & 0x1f) << 3;
                 *bmp++ = ((data >> 10) & 0x1f) << 3;
@@ -568,13 +568,13 @@ protected:
 
     void renderMode5()
     {
-        u8* bmp = image.GetData();
-        u16* src = (u16*)(frame ? &vram[0xa000] : &vram[0]);
+        uint8_t* bmp = image.GetData();
+        uint16_t* src = (uint16_t*)(frame ? &vram[0xa000] : &vram[0]);
         BMPSize(160, 128);
 
         for (int y = 0; y < 128; y++) {
             for (int x = 0; x < 160; x++) {
-                u16 data = *src++;
+                uint16_t data = *src++;
                 *bmp++ = (data & 0x1f) << 3;
                 *bmp++ = ((data >> 5) & 0x1f) << 3;
                 *bmp++ = ((data >> 10) & 0x1f) << 3;
@@ -612,7 +612,7 @@ public:
     }
     void Update()
     {
-        u8 *bank0, *bank1;
+        uint8_t *bank0, *bank1;
 
         if (gbCgbMode) {
             bank0 = &gbVram[0x0000];
@@ -628,13 +628,13 @@ public:
 
         for (int y = 0; y < 32; y++) {
             for (int x = 0; x < 32; x++) {
-                u8* bmp = &image.GetData()[y * 8 * 32 * 24 + x * 24];
-                u8 attrs = 0;
+                uint8_t* bmp = &image.GetData()[y * 8 * 32 * 24 + x * 24];
+                uint8_t attrs = 0;
 
                 if (bank1 != NULL)
                     attrs = bank1[tile_map_address];
 
-                u8 tile = bank0[tile_map_address];
+                uint8_t tile = bank0[tile_map_address];
                 tile_map_address++;
 
                 if (charbase) {
@@ -646,8 +646,8 @@ public:
 
                 for (int j = 0; j < 8; j++) {
                     int charbase_address = attrs & 0x40 ? charbase + tile * 16 + (7 - j) * 2 : charbase + tile * 16 + j * 2;
-                    u8 tile_a = 0;
-                    u8 tile_b = 0;
+                    uint8_t tile_a = 0;
+                    uint8_t tile_b = 0;
 
                     if (attrs & 0x08) {
                         tile_a = bank1[charbase_address++];
@@ -662,16 +662,16 @@ public:
                         tile_b = gbInvertTab[tile_b];
                     }
 
-                    u8 mask = 0x80;
+                    uint8_t mask = 0x80;
 
                     while (mask > 0) {
-                        u8 c = (tile_a & mask) ? 1 : 0;
+                        uint8_t c = (tile_a & mask) ? 1 : 0;
                         c += (tile_b & mask) ? 2 : 0;
 
                         if (gbCgbMode)
                             c = c + (attrs & 7) * 4;
 
-                        u16 color = gbPalette[c];
+                        uint16_t color = gbPalette[c];
                         *bmp++ = (color & 0x1f) << 3;
                         *bmp++ = ((color >> 5) & 0x1f) << 3;
                         *bmp++ = ((color >> 10) & 0x1f) << 3;
@@ -711,11 +711,11 @@ public:
             wxString s;
             s.Printf(wxT("(%d,%d)"), selx, sely);
             coords->SetLabel(s);
-            u16 address = mapbase + 0x8000 + (sely >> 3) * 32 + (selx >> 3);
+            uint16_t address = mapbase + 0x8000 + (sely >> 3) * 32 + (selx >> 3);
             s.Printf(wxT("0x%04X"), address);
             addr->SetLabel(s);
-            u8 attrs = 0;
-            u8 tilev = gbMemoryMap[9][address & 0xfff];
+            uint8_t attrs = 0;
+            uint8_t tilev = gbMemoryMap[9][address & 0xfff];
 
             if (gbCgbMode) {
                 attrs = gbVram[0x2000 + address - 0x8000];
@@ -804,9 +804,9 @@ public:
         systemBlueShift = 19;
 
         for (int sprite_no = 0; sprite_no < 128; sprite_no++) {
-            u16* sparms = &((u16*)oam)[4 * sprite_no];
-            u16 a0 = sparms[0], a1 = sparms[1], a2 = sparms[2];
-            u16* pal = &((u16*)paletteRAM)[0x100];
+            uint16_t* sparms = &((uint16_t*)oam)[4 * sprite_no];
+            uint16_t a0 = sparms[0], a1 = sparms[1], a2 = sparms[2];
+            uint16_t* pal = &((uint16_t*)paletteRAM)[0x100];
             int sizeX = 8, sizeY = 8;
 
             // following is almost verbatim from OamView.cpp
@@ -878,7 +878,7 @@ public:
             }
 
             wxImage spriteData(64, 64);
-            u8* bmp = spriteData.GetData();
+            uint8_t* bmp = spriteData.GetData();
             int sy = (a0 & 255);
 
             if (a0 & 0x2000) {
@@ -894,7 +894,7 @@ public:
 
                 for (int y = 0; y < sizeY; y++) {
                     for (int x = 0; x < sizeX; x++) {
-                        u32 color = vram[0x10000 + (((c + (y >> 3) * inc) * 32 + (y & 7) * 8 + (x >> 3) * 64 + (x & 7)) & 0x7FFF)];
+                        uint32_t color = vram[0x10000 + (((c + (y >> 3) * inc) * 32 + (y & 7) * 8 + (x >> 3) * 64 + (x & 7)) & 0x7FFF)];
                         color = pal[color];
                         *bmp++ = (color & 0x1f) << 3;
                         *bmp++ = ((color >> 5) & 0x1f) << 3;
@@ -916,7 +916,7 @@ public:
 
                 for (int y = 0; y < sizeY; y++) {
                     for (int x = 0; x < sizeX; x++) {
-                        u32 color = vram[0x10000 + (((c + (y >> 3) * inc) * 32 + (y & 7) * 4 + (x >> 3) * 32 + ((x & 7) >> 1)) & 0x7FFF)];
+                        uint32_t color = vram[0x10000 + (((c + (y >> 3) * inc) * 32 + (y & 7) * 4 + (x >> 3) * 32 + ((x & 7) >> 1)) & 0x7FFF)];
 
                         if (x & 1)
                             color >>= 4;
@@ -969,17 +969,17 @@ public:
                 s.append(a0 & 4096 ? wxT('M') : wxT('-'));
                 s.append(a0 & 1024 ? wxT('D') : wxT('-'));
                 flg->SetLabel(s);
-                u8* box = spriteData.GetData();
+                uint8_t* box = spriteData.GetData();
                 int sprite_posx = a1 & 511;
                 int sprite_posy = a0 & 255;
-                u8* screen_box = screen.GetData();
+                uint8_t* screen_box = screen.GetData();
 
                 if (sprite_posx >= 0 && sprite_posx <= (239 - sizeY) && sprite_posy >= 0 && sprite_posy <= (159 - sizeX))
                     screen_box += (sprite_posx * 3) + (sprite_posy * screen.GetWidth() * 3);
 
                 for (int y = 0; y < sizeY; y++) {
                     for (int x = 0; x < sizeX; x++) {
-                        u32 color = 0;
+                        uint32_t color = 0;
 
                         if (y == 0 || y == sizeY - 1 || x == 0 || x == sizeX - 1) {
                             color = 255;
@@ -1038,23 +1038,23 @@ public:
     }
     void Update()
     {
-        u8* bmp = image.GetData();
+        uint8_t* bmp = image.GetData();
         // following is almost verbatim from GBOamView.cpp
-        u16 addr = sprite * 4 + 0xfe00;
+        uint16_t addr = sprite * 4 + 0xfe00;
         int size = register_LCDC & 4;
-        u8 y = gbMemory[addr++];
-        u8 x = gbMemory[addr++];
-        u8 tile = gbMemory[addr++];
+        uint8_t y = gbMemory[addr++];
+        uint8_t x = gbMemory[addr++];
+        uint8_t tile = gbMemory[addr++];
 
         if (size)
             tile &= 254;
 
-        u8 flags = gbMemory[addr++];
+        uint8_t flags = gbMemory[addr++];
         int w = 8;
         int h = size ? 16 : 8;
         BMPSize(w, h);
-        u8* bank0;
-        u8* bank1;
+        uint8_t* bank0;
+        uint8_t* bank1;
 
         if (gbCgbMode) {
             if (register_VBK & 1) {
@@ -1070,7 +1070,7 @@ public:
         }
 
         int init = 0x0000;
-        u8* pal = gbObp0;
+        uint8_t* pal = gbObp0;
 
         if ((flags & 0x10))
             pal = gbObp1;
@@ -1089,8 +1089,8 @@ public:
             }
 
             for (int xx = 0; xx < 8; xx++) {
-                u8 mask = 1 << (7 - xx);
-                u8 c = 0;
+                uint8_t mask = 1 << (7 - xx);
+                uint8_t c = 0;
 
                 if ((a & mask))
                     c++;
@@ -1105,7 +1105,7 @@ public:
                     c = pal[c];
                 }
 
-                u16 color = gbPalette[c];
+                uint16_t color = gbPalette[c];
                 *bmp++ = (color & 0x1f) << 3;
                 *bmp++ = ((color >> 5) & 0x1f) << 3;
                 *bmp++ = ((color >> 10) & 0x1f) << 3;
@@ -1150,7 +1150,7 @@ void MainFrame::OAMViewer()
 namespace Viewers {
 static int ptype = 0;
 static wxString pdir;
-void savepal(wxWindow* parent, const u8* data, int ncols, const wxChar* type)
+void savepal(wxWindow* parent, const uint8_t* data, int ncols, const wxChar* type)
 {
     // no attempt is made here to translate the palette type name
     // it's just a suggested name, anyway
@@ -1179,19 +1179,19 @@ void savepal(wxWindow* parent, const u8* data, int ncols, const wxChar* type)
     case 0: // Windows palette
     {
         f.Write("RIFF", 4);
-        u32 d = wxUINT32_SWAP_ON_BE(256 * 4 + 16);
+        uint32_t d = wxUINT32_SWAP_ON_BE(256 * 4 + 16);
         f.Write(&d, 4);
         f.Write("PAL data", 8);
         d = wxUINT32_SWAP_ON_BE(256 * 4 + 4);
         f.Write(&d, 4);
-        u16 w = wxUINT16_SWAP_ON_BE(0x0300);
+        uint16_t w = wxUINT16_SWAP_ON_BE(0x0300);
         f.Write(&w, 2);
         w = wxUINT16_SWAP_ON_BE(256); // cuases problems if not 16 or 256
         f.Write(&w, 2);
 
         for (int i = 0; i < ncols; i++, data += 3) {
             f.Write(data, 3);
-            u8 z = 0;
+            uint8_t z = 0;
             f.Write(&z, 1);
         }
 
@@ -1221,7 +1221,7 @@ void savepal(wxWindow* parent, const u8* data, int ncols, const wxChar* type)
     case 2: // Adobe color table
     {
         f.Write(data, ncols * 3);
-        u32 d = 0;
+        uint32_t d = 0;
 
         for (int i = ncols; i < 256; i++)
             f.Write(&d, 3);
@@ -1247,8 +1247,8 @@ public:
     void Update()
     {
         if (paletteRAM) {
-            u16* pp = (u16*)paletteRAM;
-            u8* bmp = colbmp;
+            uint16_t* pp = (uint16_t*)paletteRAM;
+            uint8_t* bmp = colbmp;
 
             for (int i = 0; i < 512; i++, pp++) {
                 *bmp++ = (*pp & 0x1f) << 3;
@@ -1294,8 +1294,8 @@ public:
         if (!isbg)
             off += 16 * 16;
 
-        u8* pix = &colbmp[off * 3];
-        u16 v = (pix[0] >> 3) + ((pix[1] >> 3) << 5) + ((pix[2] >> 3) << 10);
+        uint8_t* pix = &colbmp[off * 3];
+        uint16_t v = (pix[0] >> 3) + ((pix[1] >> 3) << 5) + ((pix[2] >> 3) << 10);
         wxString s;
         s.Printf(wxT("0x%04X"), (int)v);
         val->SetLabel(s);
@@ -1334,7 +1334,7 @@ public:
 protected:
     ColorView* cv;
     PixView *bpv, *spv;
-    u8 colbmp[16 * 16 * 3 * 2];
+    uint8_t colbmp[16 * 16 * 3 * 2];
     wxControl *addr, *val;
 
     DECLARE_EVENT_TABLE()
@@ -1363,8 +1363,8 @@ public:
     }
     void Update()
     {
-        u16* pp = gbPalette;
-        u8* bmp = colbmp;
+        uint16_t* pp = gbPalette;
+        uint8_t* bmp = colbmp;
 
         for (int i = 0; i < 64; i++, pp++) {
             *bmp++ = (*pp & 0x1f) << 3;
@@ -1403,12 +1403,12 @@ public:
             }
         }
 
-        u8* pix = &colbmp[(x + y * 4) * 3];
+        uint8_t* pix = &colbmp[(x + y * 4) * 3];
 
         if (isbg)
             pix += 4 * 8 * 3;
 
-        u16 v = (pix[0] >> 3) + ((pix[1] >> 3) << 5) + ((pix[2] >> 3) << 10);
+        uint16_t v = (pix[0] >> 3) + ((pix[1] >> 3) << 5) + ((pix[2] >> 3) << 10);
         wxString s;
         s.Printf(wxT("0x%04X"), (int)v);
         val->SetLabel(s);
@@ -1427,7 +1427,7 @@ public:
 protected:
     ColorView* cv;
     PixView *bpv, *spv;
-    u8 colbmp[4 * 8 * 3 * 2];
+    uint8_t colbmp[4 * 8 * 3 * 2];
     wxControl *idx, *val;
     DECLARE_EVENT_TABLE()
 };
@@ -1477,8 +1477,8 @@ public:
     void Update()
     {
         // Following copied almost verbatim from TileView.cpp
-        u16* palette = (u16*)paletteRAM;
-        u8* charBase = &vram[charbase];
+        uint16_t* palette = (uint16_t*)paletteRAM;
+        uint8_t* charBase = &vram[charbase];
         int maxY;
 
         if (is256) {
@@ -1548,14 +1548,14 @@ public:
         }
     }
     // following 2 functions copied almost verbatim from TileView.cpp
-    void render256(int tile, int x, int y, u8* charBase, u16* palette)
+    void render256(int tile, int x, int y, uint8_t* charBase, uint16_t* palette)
     {
-        u8* bmp = &image.GetData()[24 * x + 8 * 32 * 24 * y];
+        uint8_t* bmp = &image.GetData()[24 * x + 8 * 32 * 24 * y];
 
         for (int j = 0; j < 8; j++) {
             for (int i = 0; i < 8; i++) {
-                u8 c = charBase[tile * 64 + j * 8 + i];
-                u16 color = palette[c];
+                uint8_t c = charBase[tile * 64 + j * 8 + i];
+                uint16_t color = palette[c];
                 *bmp++ = (color & 0x1f) << 3;
                 *bmp++ = ((color >> 5) & 0x1f) << 3;
                 *bmp++ = ((color >> 10) & 0x1f) << 3;
@@ -1565,9 +1565,9 @@ public:
         }
     }
 
-    void render16(int tile, int x, int y, u8* charBase, u16* palette)
+    void render16(int tile, int x, int y, uint8_t* charBase, uint16_t* palette)
     {
-        u8* bmp = &image.GetData()[24 * x + 8 * 32 * 24 * y];
+        uint8_t* bmp = &image.GetData()[24 * x + 8 * 32 * 24 * y];
         int pal = this->palette;
 
         if (this->charbase == 4 * 0x4000)
@@ -1575,14 +1575,14 @@ public:
 
         for (int j = 0; j < 8; j++) {
             for (int i = 0; i < 8; i++) {
-                u8 c = charBase[tile * 32 + j * 4 + (i >> 1)];
+                uint8_t c = charBase[tile * 32 + j * 4 + (i >> 1)];
 
                 if (i & 1)
                     c = c >> 4;
                 else
                     c = c & 15;
 
-                u16 color = palette[pal * 16 + c];
+                uint16_t color = palette[pal * 16 + c];
                 *bmp++ = (color & 0x1f) << 3;
                 *bmp++ = ((color >> 5) & 0x1f) << 3;
                 *bmp++ = ((color >> 10) & 0x1f) << 3;
@@ -1624,7 +1624,7 @@ public:
     void Update()
     {
         // following copied almost verbatim from GBTileView.cpp
-        u8* charBase = (gbVram != NULL) ? &gbVram[bank + charbase] : &gbMemory[0x8000 + charbase];
+        uint8_t* charBase = (gbVram != NULL) ? &gbVram[bank + charbase] : &gbMemory[0x8000 + charbase];
         int tile = 0;
 
         for (int y = 0; y < 16; y++) {
@@ -1665,17 +1665,17 @@ public:
     }
 
     // following function copied almost verbatim from GBTileView.cpp
-    void render(int tile, int x, int y, u8* charBase)
+    void render(int tile, int x, int y, uint8_t* charBase)
     {
-        u8* bmp = &image.GetData()[24 * x + 8 * 16 * 24 * y];
+        uint8_t* bmp = &image.GetData()[24 * x + 8 * 16 * 24 * y];
 
         for (int j = 0; j < 8; j++) {
-            u8 mask = 0x80;
-            u8 tile_a = charBase[tile * 16 + j * 2];
-            u8 tile_b = charBase[tile * 16 + j * 2 + 1];
+            uint8_t mask = 0x80;
+            uint8_t tile_a = charBase[tile * 16 + j * 2];
+            uint8_t tile_b = charBase[tile * 16 + j * 2 + 1];
 
             for (int i = 0; i < 8; i++) {
-                u8 c = (tile_a & mask) ? 1 : 0;
+                uint8_t c = (tile_a & mask) ? 1 : 0;
                 c += ((tile_b & mask) ? 2 : 0);
 
                 if (gbCgbMode) {
@@ -1684,7 +1684,7 @@ public:
                     c = gbBgp[c];
                 }
 
-                u16 color = gbPalette[c];
+                uint16_t color = gbPalette[c];
                 *bmp++ = (color & 0x1f) << 3;
                 *bmp++ = ((color >> 5) & 0x1f) << 3;
                 *bmp++ = ((color >> 10) & 0x1f) << 3;

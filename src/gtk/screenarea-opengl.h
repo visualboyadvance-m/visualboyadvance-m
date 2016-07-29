@@ -27,7 +27,7 @@ namespace VBA {
 class ScreenAreaGl : public ScreenArea, public Gtk::GL::Widget<ScreenAreaGl> {
 public:
     ScreenAreaGl(int _iWidth, int _iHeight, int _iScale = 1);
-    void vDrawPixels(u8* _puiData);
+    void vDrawPixels(uint8_t* _puiData);
     void vDrawBlackScreen();
 
 protected:

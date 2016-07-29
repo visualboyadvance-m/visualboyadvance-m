@@ -176,8 +176,8 @@ void GBPaletteView::OnClose()
 
 LRESULT GBPaletteView::OnPalInfo(WPARAM wParam, LPARAM lParam)
 {
-    u16 color = (u16)wParam;
-    u32 address = (u32)lParam;
+    uint16_t color = (uint16_t)wParam;
+    uint32_t address = (uint32_t)lParam;
     CString buffer;
 
     bool isOBJ = address >= 32;

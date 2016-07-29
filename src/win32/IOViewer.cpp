@@ -75,7 +75,7 @@ void IOViewer::OnClose()
 void IOViewer::bitChange()
 {
     CString buffer;
-    u16 data = 0;
+    uint16_t data = 0;
 
     for (int i = 0; i < 16; i++) {
         CButton* pWnd = (CButton*)GetDlgItem(IDC_BIT_0 + i);
@@ -174,7 +174,7 @@ void IOViewer::update()
     CString buffer;
 
     const IOData* sel = &ioViewRegisters[selected];
-    u16 data = sel->address ? *sel->address : (ioMem ? *((u16*)&ioMem[sel->offset]) : 0);
+    uint16_t data = sel->address ? *sel->address : (ioMem ? *((uint16_t*)&ioMem[sel->offset]) : 0);
 
     for (int i = 0; i < 16; i++) {
         CButton* pWnd = (CButton*)GetDlgItem(IDC_BIT_0 + i);
@@ -198,7 +198,7 @@ void IOViewer::OnApply()
 {
     if (rom != NULL) {
         const IOData* sel = &ioViewRegisters[selected];
-        u16 res = 0;
+        uint16_t res = 0;
         for (int i = 0; i < 16; i++) {
             CButton* pWnd = (CButton*)GetDlgItem(IDC_BIT_0 + i);
 

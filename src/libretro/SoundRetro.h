@@ -29,7 +29,7 @@ public:
     virtual void pause();
     virtual void reset();
     virtual void resume();
-    virtual void write(u16* finalWave, int length);
+    virtual void write(uint16_t* finalWave, int length);
 };
 
 #endif // __VBA_SOUND_RETRO_H__

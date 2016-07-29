@@ -28,7 +28,7 @@
 #include <gl/GL.h> // main include file
 #include <gl/glext.h>
 typedef BOOL(APIENTRY* PFNWGLSWAPINTERVALFARPROC)(int);
-extern int Init_2xSaI(u32);
+extern int Init_2xSaI(uint32_t);
 extern void winlog(const char*, ...);
 extern int systemSpeed;
 
@@ -50,12 +50,12 @@ private:
     GLuint texture;
     int width, height;
     float size;
-    u8* filterData;
+    uint8_t* filterData;
     RECT destRect;
     bool failed;
     GLFONT font;
     int pitch;
-    u8* data;
+    uint8_t* data;
     DWORD currentAdapter;
 
     void initializeMatrices(int w, int h);
@@ -374,8 +374,8 @@ void OpenGLDisplay::render()
         theApp.filterFunction(
             pix + pitch,
             pitch,
-            (u8*)theApp.delta,
-            (u8*)filterData,
+            (uint8_t*)theApp.delta,
+            (uint8_t*)filterData,
             width * 4,
             filterWidth,
             filterHeight);
@@ -580,7 +580,7 @@ bool OpenGLDisplay::changeRenderSize(int w, int h)
         }
         if (filterData)
             free(filterData);
-        filterData = (u8*)malloc(4 * w * h);
+        filterData = (uint8_t*)malloc(4 * w * h);
     }
 
     return true;

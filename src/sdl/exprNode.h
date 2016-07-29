@@ -19,8 +19,8 @@
 
 struct Node {
     Type* type;
-    u32 location;
-    u32 objLocation;
+    uint32_t location;
+    uint32_t objLocation;
     LocationType locType;
     int value;
     int index;

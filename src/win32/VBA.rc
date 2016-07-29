@@ -144,7 +144,7 @@ CAPTION "Waiting for players"
 FONT 8, "MS Sans Serif"
 BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,63,69,50,14
-    CONTROL         "Progress1",IDC_SERVERWAIT,"msctls_progress32",WS_BORDER,33,50,120,13
+    CONTROL         "Progress1",IDC_SERVERWAIT,"msctls_progresint32_t",WS_BORDER,33,50,120,13
     LTEXT           "",IDC_STATIC1,7,7,154,8
     LTEXT           "",IDC_STATIC2,7,17,105,8
     LTEXT           "",IDC_STATIC3,7,25,105,8

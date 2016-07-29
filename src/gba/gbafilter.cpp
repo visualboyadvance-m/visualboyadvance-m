@@ -31,7 +31,7 @@ void gbafilter_pal(uint16_t* buf, int count)
 {
     short temp[3 * 3], s;
     unsigned pix;
-    u8 red, green, blue;
+    uint8_t red, green, blue;
 
     while (count--) {
         pix = *buf;
@@ -105,7 +105,7 @@ void gbafilter_pal32(uint32_t* buf, int count)
 {
     short temp[3 * 3], s;
     unsigned pix;
-    u8 red, green, blue;
+    uint8_t red, green, blue;
 
     while (count--) {
         pix = *buf;
@@ -178,15 +178,15 @@ void gbafilter_pal32(uint32_t* buf, int count)
 
 // for palette mode to work with the three spoony filters in 32bpp depth
 
-void gbafilter_pad(u8* buf, int count)
+void gbafilter_pad(uint8_t* buf, int count)
 {
     union {
         struct
         {
-            u8 r;
-            u8 g;
-            u8 b;
-            u8 a;
+            uint8_t r;
+            uint8_t g;
+            uint8_t b;
+            uint8_t a;
         } part;
         unsigned whole;
     } mask;

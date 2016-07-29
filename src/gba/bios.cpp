@@ -478,7 +478,7 @@ void BIOS_Div()
         reg[0].I = number / denom;
         reg[1].I = number % denom;
         int32_t temp = (int32_t)reg[0].I;
-        reg[3].I = temp < 0 ? (u32)-temp : (u32)temp;
+        reg[3].I = temp < 0 ? (uint32_t)-temp : (uint32_t)temp;
     }
 #ifdef GBA_LOGGING
     if (systemVerbose & VERBOSE_SWI) {
@@ -842,7 +842,7 @@ void BIOS_ObjAffineSet()
     }
 }
 
-void BIOS_RegisterRamReset(u32 flags)
+void BIOS_RegisterRamReset(uint32_t flags)
 {
     // no need to trace here. this is only called directly from GBA.cpp
     // to emulate bios initialization
@@ -1221,7 +1221,7 @@ static int32_t BIOS_SndDriver_3e4(uint32_t const r0a, uint32_t const r1a) // 0x3
         return v5;
 }
 
-static void BIOS_SndDriverSub1(u32 p1) // 0x170a
+static void BIOS_SndDriverSub1(uint32_t p1) // 0x170a
 {
     uint8_t local1 = (p1 & 0x000F0000) >> 16; // param is r0
     uint32_t const puser1 = CPUReadMemory(0x3007FF0); // 7FC0 + 0x30
@@ -1298,7 +1298,7 @@ void BIOS_SndDriverInit() // 0x166a
     uint32_t const user1 = reg[0].I;
 
     uint32_t base3 = 0x040000BC;
-    //u32 base4 = 0x03007FF0;
+    //uint32_t base4 = 0x03007FF0;
 
     CPUWriteHalfWord(base1 + 6, 0);
     CPUWriteHalfWord(base1 + 12, 0);
@@ -1306,7 +1306,7 @@ void BIOS_SndDriverInit() // 0x166a
     CPUWriteHalfWord(base2 + 4, 0x8F);
     CPUWriteHalfWord(base2 + 2, 0xA90E);
 
-    u16 val9 = CPUReadHalfWord(base2 + 9);
+    uint16_t val9 = CPUReadHalfWord(base2 + 9);
     CPUWriteHalfWord(base2 + 9, val9 & ADBITS_MASK); // DA?
 
     CPUWriteMemory(base3 + 0, (user1 + 0x350)); //0x350, 640int

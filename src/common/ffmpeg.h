@@ -14,8 +14,6 @@
 // is the code to find the available formats & associated extensions for
 // the file dialog.
 
-#include "../common/Types.h"
-
 // return codes
 // probably ought to put in own namespace, but this is good enough
 enum MediaRet {
@@ -47,10 +45,10 @@ class MediaRecorder
         // add a frame of video; width+height+depth already given
         // assumes a 1-pixel border on top & right
         // always assumes being passed 1/60th of a second of video
-        MediaRet AddFrame(const u8 *vid);
+        MediaRet AddFrame(const uint8_t *vid);
         // add a frame of audio; uses current sample rate to know length
         // always assumes being passed 1/60th of a second of audio.
-        MediaRet AddFrame(const u16 *aud);
+        MediaRet AddFrame(const uint16_t *aud);
 
         private:
         static bool did_init;
@@ -66,8 +64,8 @@ class MediaRecorder
 #endif
         priv_AVFormatContext *oc;
         priv_AVStream *vid_st, *aud_st;
-        u8 *audio_buf, *video_buf;
-        u16 *audio_buf2;
+        uint8_t *audio_buf, *video_buf;
+        uint16_t *audio_buf2;
         int frame_len, sample_len, in_audio_buf2;
         int linesize, pixsize;
         priv_PixelFormat pixfmt;

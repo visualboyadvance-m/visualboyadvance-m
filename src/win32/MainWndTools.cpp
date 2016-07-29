@@ -474,7 +474,7 @@ void MainWnd::OnToolsRecordStopmovierecording()
             // record the last joypad change so that the correct time can be
             // recorded
             fwrite(&movieFrame, 1, sizeof(int), theApp.movieFile);
-            fwrite(&movieLastJoypad, 1, sizeof(u32), theApp.movieFile);
+            fwrite(&movieLastJoypad, 1, sizeof(uint32_t), theApp.movieFile);
             fclose(theApp.movieFile);
             theApp.movieFile = NULL;
         }

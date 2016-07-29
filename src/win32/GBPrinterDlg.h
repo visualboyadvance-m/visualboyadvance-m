@@ -12,13 +12,13 @@
 
 class GBPrinterDlg : public CDialog {
 private:
-    u8 bitmapHeader[sizeof(BITMAPINFO) + 4 * sizeof(RGBQUAD)];
+    uint8_t bitmapHeader[sizeof(BITMAPINFO) + 4 * sizeof(RGBQUAD)];
     BITMAPINFO* bitmap;
-    u8* bitmapData;
+    uint8_t* bitmapData;
     int scale;
     // Construction
 public:
-    void processData(u8* data);
+    void processData(uint8_t* data);
     void saveAsPNG(const char* name);
     void saveAsBMP(const char* name);
     GBPrinterDlg(CWnd* pParent = NULL); // standard constructor

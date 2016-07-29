@@ -2,27 +2,27 @@
 
 extern int RGB_LOW_BITS_MASK;
 
-void Scanlines (u8 *srcPtr, u32 srcPitch, u8 *,
-                u8 *dstPtr, u32 dstPitch, int width, int height)
+void Scanlines (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *,
+                uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u8 *nextLine, *finish;
+  uint8_t *nextLine, *finish;
 
   nextLine = dstPtr + dstPitch;
 
   do {
-    u32 *bP = (u32 *) srcPtr;
-    u32 *dP = (u32 *) dstPtr;
-    u32 *nL = (u32 *) nextLine;
-    u32 currentPixel;
-    u32 nextPixel;
+    uint32_t *bP = (uint32_t *) srcPtr;
+    uint32_t *dP = (uint32_t *) dstPtr;
+    uint32_t *nL = (uint32_t *) nextLine;
+    uint32_t currentPixel;
+    uint32_t nextPixel;
 
-    finish = (u8 *) bP + ((width+2) << 1);
+    finish = (uint8_t *) bP + ((width+2) << 1);
     nextPixel = *bP++;
 
     do {
       currentPixel = nextPixel;
       nextPixel = *bP++;
-      u32 colorA, colorB;
+      uint32_t colorA, colorB;
 
 #ifdef WORDS_BIGENDIAN
       colorA = currentPixel >> 16;
@@ -46,7 +46,7 @@ void Scanlines (u8 *srcPtr, u32 srcPitch, u8 *,
 
       dP += 2;
       nL += 2;
-    } while ((u8 *) bP < finish);
+    } while ((uint8_t *) bP < finish);
 
     srcPtr += srcPitch;
     dstPtr += dstPitch << 1;
@@ -55,28 +55,28 @@ void Scanlines (u8 *srcPtr, u32 srcPitch, u8 *,
   while (--height);
 }
 
-void Scanlines32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-                 u8 *dstPtr, u32 dstPitch, int width, int height)
+void Scanlines32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+                 uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u8 *nextLine, *finish;
+  uint8_t *nextLine, *finish;
 
   nextLine = dstPtr + dstPitch;
 
   do {
-    u32 *bP = (u32 *) srcPtr;
-    u32 *dP = (u32 *) dstPtr;
-    u32 *nL = (u32 *) nextLine;
-    u32 currentPixel;
-    u32 nextPixel;
+    uint32_t *bP = (uint32_t *) srcPtr;
+    uint32_t *dP = (uint32_t *) dstPtr;
+    uint32_t *nL = (uint32_t *) nextLine;
+    uint32_t currentPixel;
+    uint32_t nextPixel;
 
-    finish = (u8 *) bP + ((width+1) << 2);
+    finish = (uint8_t *) bP + ((width+1) << 2);
     nextPixel = *bP++;
 
     do {
       currentPixel = nextPixel;
       nextPixel = *bP++;
 
-      u32 colorA, colorB;
+      uint32_t colorA, colorB;
 
       colorA = currentPixel;
       colorB = nextPixel;
@@ -95,7 +95,7 @@ void Scanlines32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 
       dP += 4;
       nL += 4;
-    } while ((u8 *) bP < finish);
+    } while ((uint8_t *) bP < finish);
 
     srcPtr += srcPitch;
     dstPtr += dstPitch << 1;
@@ -104,29 +104,29 @@ void Scanlines32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
   while (--height);
 }
 
-void ScanlinesTV(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-                 u8 *dstPtr, u32 dstPitch, int width, int height)
+void ScanlinesTV(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+                 uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u8 *nextLine, *finish;
-  u32 colorMask = ~(RGB_LOW_BITS_MASK | (RGB_LOW_BITS_MASK << 16));
+  uint8_t *nextLine, *finish;
+  uint32_t colorMask = ~(RGB_LOW_BITS_MASK | (RGB_LOW_BITS_MASK << 16));
 
   nextLine = dstPtr + dstPitch;
 
   do {
-    u32 *bP = (u32 *) srcPtr;
-    u32 *dP = (u32 *) dstPtr;
-    u32 *nL = (u32 *) nextLine;
-    u32 currentPixel;
-    u32 nextPixel;
+    uint32_t *bP = (uint32_t *) srcPtr;
+    uint32_t *dP = (uint32_t *) dstPtr;
+    uint32_t *nL = (uint32_t *) nextLine;
+    uint32_t currentPixel;
+    uint32_t nextPixel;
 
-    finish = (u8 *) bP + ((width+2) << 1);
+    finish = (uint8_t *) bP + ((width+2) << 1);
     nextPixel = *bP++;
 
     do {
       currentPixel = nextPixel;
       nextPixel = *bP++;
 
-      u32 colorA, colorB;
+      uint32_t colorA, colorB;
 
 #ifdef WORDS_BIGENDIAN
       colorA = currentPixel >> 16;
@@ -153,7 +153,7 @@ void ScanlinesTV(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 
       dP += 2;
       nL += 2;
-    } while ((u8 *) bP < finish);
+    } while ((uint8_t *) bP < finish);
 
     srcPtr += srcPitch;
     dstPtr += dstPitch << 1;
@@ -162,29 +162,29 @@ void ScanlinesTV(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
   while (--height);
 }
 
-void ScanlinesTV32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-                   u8 *dstPtr, u32 dstPitch, int width, int height)
+void ScanlinesTV32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+                   uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u8 *nextLine, *finish;
-  u32 colorMask = ~RGB_LOW_BITS_MASK;
+  uint8_t *nextLine, *finish;
+  uint32_t colorMask = ~RGB_LOW_BITS_MASK;
 
   nextLine = dstPtr + dstPitch;
 
   do {
-    u32 *bP = (u32 *) srcPtr;
-    u32 *dP = (u32 *) dstPtr;
-    u32 *nL = (u32 *) nextLine;
-    u32 currentPixel;
-    u32 nextPixel;
+    uint32_t *bP = (uint32_t *) srcPtr;
+    uint32_t *dP = (uint32_t *) dstPtr;
+    uint32_t *nL = (uint32_t *) nextLine;
+    uint32_t currentPixel;
+    uint32_t nextPixel;
 
-    finish = (u8 *) bP + ((width+1) << 2);
+    finish = (uint8_t *) bP + ((width+1) << 2);
     nextPixel = *bP++;
 
     do {
       currentPixel = nextPixel;
       nextPixel = *bP++;
 
-      u32 colorA, colorB, temp;
+      uint32_t colorA, colorB, temp;
 
       colorA = currentPixel;
       colorB = nextPixel;
@@ -202,7 +202,7 @@ void ScanlinesTV32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 
       dP += 2;
       nL += 2;
-    } while ((u8 *) bP < finish);
+    } while ((uint8_t *) bP < finish);
 
     srcPtr += srcPitch;
     dstPtr += dstPitch << 1;

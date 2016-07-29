@@ -2,7 +2,7 @@
 #include "VBA.h"
 #include "stdafx.h"
 
-extern void SuperEagle(u8*, u32, u8*, u8*, u32, int, int);
+extern void SuperEagle(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
 
 static HINSTANCE rpiDLL = NULL;
 static RENDPLUG_Output fnOutput = NULL;
@@ -14,8 +14,8 @@ static int nScaleFactor;
 extern int systemRedShift, systemGreenShift, systemBlueShift;
 extern int realsystemRedShift, realsystemGreenShift, realsystemBlueShift;
 extern int realsystemColorDepth;
-u8* pBuffer16 = NULL;
-u32 Buffer16Size = 0;
+uint8_t* pBuffer16 = NULL;
+uint32_t Buffer16Size = 0;
 
 bool rpiInit(const char* sPluginName)
 {
@@ -67,19 +67,19 @@ bool rpiInit(const char* sPluginName)
     return true;
 }
 
-void rpiFilter(u8* srcPtr, u32 srcPitch, u8* deltaPtr, u8* dstPtr, u32 dstPitch, int width, int height)
+void rpiFilter(uint8_t* srcPtr, uint32_t srcPitch, uint8_t* deltaPtr, uint8_t* dstPtr, uint32_t dstPitch, int width, int height)
 {
-    u8* pBuff;
+    uint8_t* pBuff;
 
     if (realsystemColorDepth == 32) {
         // Kega filters are 16 bit only.  Assumes we've forced 16 bit input
         ASSERT(systemColorDepth == 16);
-        u32 bufferNeeded = dstPitch * (height + nScaleFactor) * nScaleFactor;
+        uint32_t bufferNeeded = dstPitch * (height + nScaleFactor) * nScaleFactor;
         if (Buffer16Size < bufferNeeded) {
             Buffer16Size = bufferNeeded;
             if (pBuffer16)
                 free(pBuffer16);
-            pBuffer16 = (u8*)malloc(Buffer16Size);
+            pBuffer16 = (uint8_t*)malloc(Buffer16Size);
         }
         pBuff = pBuffer16;
     } else
@@ -110,11 +110,11 @@ void rpiFilter(u8* srcPtr, u32 srcPitch, u8* deltaPtr, u8* dstPtr, u32 dstPitch,
         int gshiftDiff = realsystemGreenShift - systemGreenShift;
         int bshiftDiff = realsystemBlueShift - systemBlueShift;
 
-        u16 *pI, *pICur;
-        u32 *pO, *pOCur;
+        uint16_t *pI, *pICur;
+        uint32_t *pO, *pOCur;
 
-        pI = pICur = (u16*)pBuff;
-        pO = pOCur = (u32*)dstPtr;
+        pI = pICur = (uint16_t*)pBuff;
+        pO = pOCur = (uint32_t*)dstPtr;
 
         if (rshiftDiff >= 0) {
             for (j = 0; j < height * nScaleFactor; j++) {
@@ -122,8 +122,8 @@ void rpiFilter(u8* srcPtr, u32 srcPitch, u8* deltaPtr, u8* dstPtr, u32 dstPitch,
                     *(pOCur++) = ((*pICur & 0xF800) << rshiftDiff) | ((*pICur & 0x07E0) << gshiftDiff) | ((*pICur & 0x001F) << bshiftDiff);
                     *(pICur++);
                 }
-                pI = pICur = (u16*)((char*)pI + dstPitch);
-                pO = pOCur = (u32*)((char*)pO + dstPitch);
+                pI = pICur = (uint16_t*)((char*)pI + dstPitch);
+                pO = pOCur = (uint32_t*)((char*)pO + dstPitch);
             }
         } else {
             // red shift is negative.  That means we're most likely swapping RGB to BGR
@@ -135,8 +135,8 @@ void rpiFilter(u8* srcPtr, u32 srcPitch, u8* deltaPtr, u8* dstPtr, u32 dstPitch,
                     *(pOCur++) = ((*pICur & 0xF800) >> rshiftDiff) | ((*pICur & 0x07E0) << gshiftDiff) | ((*pICur & 0x001F) << bshiftDiff);
                     *(pICur++);
                 }
-                pI = pICur = (u16*)((char*)pI + dstPitch);
-                pO = pOCur = (u32*)((char*)pO + dstPitch);
+                pI = pICur = (uint16_t*)((char*)pI + dstPitch);
+                pO = pOCur = (uint32_t*)((char*)pO + dstPitch);
             }
         }
     }

@@ -13,7 +13,7 @@
 class RomInfoGB : public CDialog {
     // Construction
 public:
-    RomInfoGB(u8* rom, CWnd* pParent = NULL); // standard constructor
+    RomInfoGB(uint8_t* rom, CWnd* pParent = NULL); // standard constructor
 
     // Dialog Data
     //{{AFX_DATA(RomInfoGB)
@@ -27,7 +27,7 @@ public:
 protected:
     virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
     //}}AFX_VIRTUAL
-    u8* rom;
+    uint8_t* rom;
 
     // Implementation
 protected:
@@ -45,14 +45,14 @@ protected:
 class RomInfoGBA : public CDialog {
     // Construction
 public:
-    RomInfoGBA(u8* rom, CWnd* pParent = NULL); // standard constructor
+    RomInfoGBA(uint8_t* rom, CWnd* pParent = NULL); // standard constructor
 
     // Dialog Data
     //{{AFX_DATA(RomInfoGBA)
     enum { IDD = IDD_GBA_ROM_INFO };
     // NOTE: the ClassWizard will add data members here
     //}}AFX_DATA
-    u8* rom;
+    uint8_t* rom;
 
     // Overrides
     // ClassWizard generated virtual function overrides

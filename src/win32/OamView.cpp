@@ -46,7 +46,7 @@ OamViewable::OamViewable(int index, CDialog* parent)
     bmpInfo.bmiHeader.biCompression = BI_RGB;
     w = 64;
     h = 64;
-    data = (u8*)calloc(1, 3 * 64 * 64);
+    data = (uint8_t*)calloc(1, 3 * 64 * 64);
     oamView.setSize(64, 64);
     oamView.setData(data);
     oamView.setBmpInfo(&bmpInfo);
@@ -70,7 +70,7 @@ OamView::OamView(CWnd* pParent /*=NULL*/)
     bmpInfo.bmiHeader.biPlanes = 1;
     bmpInfo.bmiHeader.biBitCount = 24;
     bmpInfo.bmiHeader.biCompression = BI_RGB;
-    data_screen = (u8*)calloc(1, 3 * 240 * 160);
+    data_screen = (uint8_t*)calloc(1, 3 * 240 * 160);
     oamScreen.setSize(240, 160);
     oamScreen.setData(data_screen);
     oamScreen.setBmpInfo(&bmpInfo);
@@ -99,13 +99,13 @@ void OamView::paint()
 }
 void OamView::UpdateOAM(int index)
 {
-    u16* sprites = &((u16*)oam)[4 * index];
-    u16* spritePalette = &((u16*)paletteRAM)[0x100];
-    u8* bmp = oamViews[index]->data;
+    uint16_t* sprites = &((uint16_t*)oam)[4 * index];
+    uint16_t* spritePalette = &((uint16_t*)paletteRAM)[0x100];
+    uint8_t* bmp = oamViews[index]->data;
 
-    u16 a0 = *sprites++;
-    u16 a1 = *sprites++;
-    u16 a2 = *sprites++;
+    uint16_t a0 = *sprites++;
+    uint16_t a1 = *sprites++;
+    uint16_t a2 = *sprites++;
 
     int sizeY = 8;
     int sizeX = 8;
@@ -169,7 +169,7 @@ void OamView::UpdateOAM(int index)
 
         for (int y = 0; y < sizeY; y++) {
             for (int x = 0; x < sizeX; x++) {
-                u32 color = vram[0x10000 + (((c + (y >> 3) * inc) * 32 + (y & 7) * 8 + (x >> 3) * 64 + (x & 7)) & 0x7FFF)];
+                uint32_t color = vram[0x10000 + (((c + (y >> 3) * inc) * 32 + (y & 7) * 8 + (x >> 3) * 64 + (x & 7)) & 0x7FFF)];
                 color = spritePalette[color];
                 *bmp++ = ((color >> 10) & 0x1f) << 3;
                 *bmp++ = ((color >> 5) & 0x1f) << 3;
@@ -187,7 +187,7 @@ void OamView::UpdateOAM(int index)
         int palette = (a2 >> 8) & 0xF0;
         for (int y = 0; y < sizeY; y++) {
             for (int x = 0; x < sizeX; x++) {
-                u32 color = vram[0x10000 + (((c + (y >> 3) * inc) * 32 + (y & 7) * 4 + (x >> 3) * 32 + ((x & 7) >> 1)) & 0x7FFF)];
+                uint32_t color = vram[0x10000 + (((c + (y >> 3) * inc) * 32 + (y & 7) * 4 + (x >> 3) * 32 + ((x & 7) >> 1)) & 0x7FFF)];
                 if (x & 1)
                     color >>= 4;
                 else
@@ -213,14 +213,14 @@ void OamView::render()
     for (int i = 0; i < 128; i++) {
         UpdateOAM(i);
     }
-    u16* sprites = &((u16*)oam)[4 * selectednumber];
-    u16 a0 = *sprites++;
-    u16 a1 = *sprites++;
-    u16 a2 = *sprites++;
+    uint16_t* sprites = &((uint16_t*)oam)[4 * selectednumber];
+    uint16_t a0 = *sprites++;
+    uint16_t a1 = *sprites++;
+    uint16_t a2 = *sprites++;
     setAttributes(a0, a1, a2);
 }
 
-void OamView::setAttributes(u16 a0, u16 a1, u16 a2)
+void OamView::setAttributes(uint16_t a0, uint16_t a1, uint16_t a2)
 {
     CString buffer;
 
@@ -384,7 +384,7 @@ END_MESSAGE_MAP()
 void OamView::saveBMP(const char* name)
 {
     OamViewable* ov = oamViews[selectednumber];
-    u8 writeBuffer[1024 * 3];
+    uint8_t writeBuffer[1024 * 3];
 
     FILE* fp = fopen(name, "wb");
 
@@ -394,29 +394,29 @@ void OamView::saveBMP(const char* name)
     }
 
     struct {
-        u8 ident[2];
-        u8 filesize[4];
-        u8 reserved[4];
-        u8 dataoffset[4];
-        u8 headersize[4];
-        u8 width[4];
-        u8 height[4];
-        u8 planes[2];
-        u8 bitsperpixel[2];
-        u8 compression[4];
-        u8 datasize[4];
-        u8 hres[4];
-        u8 vres[4];
-        u8 colors[4];
-        u8 importantcolors[4];
-        u8 pad[2];
+        uint8_t ident[2];
+        uint8_t filesize[4];
+        uint8_t reserved[4];
+        uint8_t dataoffset[4];
+        uint8_t headersize[4];
+        uint8_t width[4];
+        uint8_t height[4];
+        uint8_t planes[2];
+        uint8_t bitsperpixel[2];
+        uint8_t compression[4];
+        uint8_t datasize[4];
+        uint8_t hres[4];
+        uint8_t vres[4];
+        uint8_t colors[4];
+        uint8_t importantcolors[4];
+        uint8_t pad[2];
     } bmpheader;
     memset(&bmpheader, 0, sizeof(bmpheader));
 
     bmpheader.ident[0] = 'B';
     bmpheader.ident[1] = 'M';
 
-    u32 fsz = sizeof(bmpheader) + ov->w * ov->h * 3;
+    uint32_t fsz = sizeof(bmpheader) + ov->w * ov->h * 3;
     utilPutDword(bmpheader.filesize, fsz);
     utilPutDword(bmpheader.dataoffset, 0x38);
     utilPutDword(bmpheader.headersize, 0x28);
@@ -428,12 +428,12 @@ void OamView::saveBMP(const char* name)
 
     fwrite(&bmpheader, 1, sizeof(bmpheader), fp);
 
-    u8* b = writeBuffer;
+    uint8_t* b = writeBuffer;
 
     int sizeX = ov->w;
     int sizeY = ov->h;
 
-    u8* pixU8 = (u8*)ov->data + 3 * ov->w * (ov->h - 1);
+    uint8_t* pixU8 = (uint8_t*)ov->data + 3 * ov->w * (ov->h - 1);
     for (int y = 0; y < sizeY; y++) {
         for (int x = 0; x < sizeX; x++) {
             *b++ = *pixU8++; // B
@@ -452,7 +452,7 @@ void OamView::saveBMP(const char* name)
 void OamView::savePNG(const char* name)
 {
     OamViewable* ov = oamViews[selectednumber];
-    u8 writeBuffer[1024 * 3];
+    uint8_t writeBuffer[1024 * 3];
 
     FILE* fp = fopen(name, "wb");
 
@@ -498,12 +498,12 @@ void OamView::savePNG(const char* name)
 
     png_write_info(png_ptr, info_ptr);
 
-    u8* b = writeBuffer;
+    uint8_t* b = writeBuffer;
 
     int sizeX = ov->w;
     int sizeY = ov->h;
 
-    u8* pixU8 = (u8*)ov->data;
+    uint8_t* pixU8 = (uint8_t*)ov->data;
     for (int y = 0; y < sizeY; y++) {
         for (int x = 0; x < sizeX; x++) {
             int blue = *pixU8++;

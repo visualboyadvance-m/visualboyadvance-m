@@ -50,7 +50,7 @@ static unsigned interp_bits_per_pixel;
 #define INTERP_16_MASK_1(v) (v & interp_mask[0])
 #define INTERP_16_MASK_2(v) (v & interp_mask[1])
 
-static inline u16 interp_16_521(u16 p1, u16 p2, u16 p3)
+static inline uint16_t interp_16_521(uint16_t p1, uint16_t p2, uint16_t p3)
 {
         return INTERP_16_MASK_1((INTERP_16_MASK_1(p1) * 5 + INTERP_16_MASK_1(p2) * 2 +
                                  INTERP_16_MASK_1(p3) * 1) /
@@ -60,7 +60,7 @@ static inline u16 interp_16_521(u16 p1, u16 p2, u16 p3)
                                 8);
 }
 
-static inline u16 interp_16_332(u16 p1, u16 p2, u16 p3)
+static inline uint16_t interp_16_332(uint16_t p1, uint16_t p2, uint16_t p3)
 {
         return INTERP_16_MASK_1((INTERP_16_MASK_1(p1) * 3 + INTERP_16_MASK_1(p2) * 3 +
                                  INTERP_16_MASK_1(p3) * 2) /
@@ -70,7 +70,7 @@ static inline u16 interp_16_332(u16 p1, u16 p2, u16 p3)
                                 8);
 }
 
-static inline u16 interp_16_611(u16 p1, u16 p2, u16 p3)
+static inline uint16_t interp_16_611(uint16_t p1, uint16_t p2, uint16_t p3)
 {
         return INTERP_16_MASK_1(
                    (INTERP_16_MASK_1(p1) * 6 + INTERP_16_MASK_1(p2) + INTERP_16_MASK_1(p3)) / 8) |
@@ -78,13 +78,13 @@ static inline u16 interp_16_611(u16 p1, u16 p2, u16 p3)
                    (INTERP_16_MASK_2(p1) * 6 + INTERP_16_MASK_2(p2) + INTERP_16_MASK_2(p3)) / 8);
 }
 
-static inline u16 interp_16_71(u16 p1, u16 p2)
+static inline uint16_t interp_16_71(uint16_t p1, uint16_t p2)
 {
         return INTERP_16_MASK_1((INTERP_16_MASK_1(p1) * 7 + INTERP_16_MASK_1(p2)) / 8) |
                INTERP_16_MASK_2((INTERP_16_MASK_2(p1) * 7 + INTERP_16_MASK_2(p2)) / 8);
 }
 
-static inline u16 interp_16_211(u16 p1, u16 p2, u16 p3)
+static inline uint16_t interp_16_211(uint16_t p1, uint16_t p2, uint16_t p3)
 {
         return INTERP_16_MASK_1(
                    (INTERP_16_MASK_1(p1) * 2 + INTERP_16_MASK_1(p2) + INTERP_16_MASK_1(p3)) / 4) |
@@ -92,7 +92,7 @@ static inline u16 interp_16_211(u16 p1, u16 p2, u16 p3)
                    (INTERP_16_MASK_2(p1) * 2 + INTERP_16_MASK_2(p2) + INTERP_16_MASK_2(p3)) / 4);
 }
 
-static inline u16 interp_16_772(u16 p1, u16 p2, u16 p3)
+static inline uint16_t interp_16_772(uint16_t p1, uint16_t p2, uint16_t p3)
 {
         return INTERP_16_MASK_1(
                    ((INTERP_16_MASK_1(p1) + INTERP_16_MASK_1(p2)) * 7 + INTERP_16_MASK_1(p3) * 2) /
@@ -102,19 +102,19 @@ static inline u16 interp_16_772(u16 p1, u16 p2, u16 p3)
                    16);
 }
 
-static inline u16 interp_16_11(u16 p1, u16 p2)
+static inline uint16_t interp_16_11(uint16_t p1, uint16_t p2)
 {
         return INTERP_16_MASK_1((INTERP_16_MASK_1(p1) + INTERP_16_MASK_1(p2)) / 2) |
                INTERP_16_MASK_2((INTERP_16_MASK_2(p1) + INTERP_16_MASK_2(p2)) / 2);
 }
 
-static inline u16 interp_16_31(u16 p1, u16 p2)
+static inline uint16_t interp_16_31(uint16_t p1, uint16_t p2)
 {
         return INTERP_16_MASK_1((INTERP_16_MASK_1(p1) * 3 + INTERP_16_MASK_1(p2)) / 4) |
                INTERP_16_MASK_2((INTERP_16_MASK_2(p1) * 3 + INTERP_16_MASK_2(p2)) / 4);
 }
 
-static inline u16 interp_16_1411(u16 p1, u16 p2, u16 p3)
+static inline uint16_t interp_16_1411(uint16_t p1, uint16_t p2, uint16_t p3)
 {
         return INTERP_16_MASK_1(
                    (INTERP_16_MASK_1(p1) * 14 + INTERP_16_MASK_1(p2) + INTERP_16_MASK_1(p3)) / 16) |
@@ -122,7 +122,7 @@ static inline u16 interp_16_1411(u16 p1, u16 p2, u16 p3)
                    (INTERP_16_MASK_2(p1) * 14 + INTERP_16_MASK_2(p2) + INTERP_16_MASK_2(p3)) / 16);
 }
 
-static inline u16 interp_16_431(u16 p1, u16 p2, u16 p3)
+static inline uint16_t interp_16_431(uint16_t p1, uint16_t p2, uint16_t p3)
 {
         return INTERP_16_MASK_1(
                    (INTERP_16_MASK_1(p1) * 4 + INTERP_16_MASK_1(p2) * 3 + INTERP_16_MASK_1(p3)) /
@@ -132,19 +132,19 @@ static inline u16 interp_16_431(u16 p1, u16 p2, u16 p3)
                    8);
 }
 
-static inline u16 interp_16_53(u16 p1, u16 p2)
+static inline uint16_t interp_16_53(uint16_t p1, uint16_t p2)
 {
         return INTERP_16_MASK_1((INTERP_16_MASK_1(p1) * 5 + INTERP_16_MASK_1(p2) * 3) / 8) |
                INTERP_16_MASK_2((INTERP_16_MASK_2(p1) * 5 + INTERP_16_MASK_2(p2) * 3) / 8);
 }
 
-static inline u16 interp_16_151(u16 p1, u16 p2)
+static inline uint16_t interp_16_151(uint16_t p1, uint16_t p2)
 {
         return INTERP_16_MASK_1((INTERP_16_MASK_1(p1) * 15 + INTERP_16_MASK_1(p2)) / 16) |
                INTERP_16_MASK_2((INTERP_16_MASK_2(p1) * 15 + INTERP_16_MASK_2(p2)) / 16);
 }
 
-static inline u16 interp_16_97(u16 p1, u16 p2)
+static inline uint16_t interp_16_97(uint16_t p1, uint16_t p2)
 {
         return INTERP_16_MASK_1((INTERP_16_MASK_1(p1) * 9 + INTERP_16_MASK_1(p2) * 7) / 16) |
                INTERP_16_MASK_2((INTERP_16_MASK_2(p1) * 9 + INTERP_16_MASK_2(p2) * 7) / 16);
@@ -153,7 +153,7 @@ static inline u16 interp_16_97(u16 p1, u16 p2)
 #define INTERP_32_MASK_1(v) (v & 0xFF00FF)
 #define INTERP_32_MASK_2(v) (v & 0x00FF00)
 
-static inline u32 interp_32_521(u32 p1, u32 p2, u32 p3)
+static inline uint32_t interp_32_521(uint32_t p1, uint32_t p2, uint32_t p3)
 {
         return INTERP_32_MASK_1((INTERP_32_MASK_1(p1) * 5 + INTERP_32_MASK_1(p2) * 2 +
                                  INTERP_32_MASK_1(p3) * 1) /
@@ -163,7 +163,7 @@ static inline u32 interp_32_521(u32 p1, u32 p2, u32 p3)
                                 8);
 }
 
-static inline u32 interp_32_332(u32 p1, u32 p2, u32 p3)
+static inline uint32_t interp_32_332(uint32_t p1, uint32_t p2, uint32_t p3)
 {
         return INTERP_32_MASK_1((INTERP_32_MASK_1(p1) * 3 + INTERP_32_MASK_1(p2) * 3 +
                                  INTERP_32_MASK_1(p3) * 2) /
@@ -173,7 +173,7 @@ static inline u32 interp_32_332(u32 p1, u32 p2, u32 p3)
                                 8);
 }
 
-static inline u32 interp_32_211(u32 p1, u32 p2, u32 p3)
+static inline uint32_t interp_32_211(uint32_t p1, uint32_t p2, uint32_t p3)
 {
         return INTERP_32_MASK_1(
                    (INTERP_32_MASK_1(p1) * 2 + INTERP_32_MASK_1(p2) + INTERP_32_MASK_1(p3)) / 4) |
@@ -181,7 +181,7 @@ static inline u32 interp_32_211(u32 p1, u32 p2, u32 p3)
                    (INTERP_32_MASK_2(p1) * 2 + INTERP_32_MASK_2(p2) + INTERP_32_MASK_2(p3)) / 4);
 }
 
-static inline u32 interp_32_611(u32 p1, u32 p2, u32 p3)
+static inline uint32_t interp_32_611(uint32_t p1, uint32_t p2, uint32_t p3)
 {
         return INTERP_32_MASK_1(
                    (INTERP_32_MASK_1(p1) * 6 + INTERP_32_MASK_1(p2) + INTERP_32_MASK_1(p3)) / 8) |
@@ -189,13 +189,13 @@ static inline u32 interp_32_611(u32 p1, u32 p2, u32 p3)
                    (INTERP_32_MASK_2(p1) * 6 + INTERP_32_MASK_2(p2) + INTERP_32_MASK_2(p3)) / 8);
 }
 
-static inline u32 interp_32_71(u32 p1, u32 p2)
+static inline uint32_t interp_32_71(uint32_t p1, uint32_t p2)
 {
         return INTERP_32_MASK_1((INTERP_32_MASK_1(p1) * 7 + INTERP_32_MASK_1(p2)) / 8) |
                INTERP_32_MASK_2((INTERP_32_MASK_2(p1) * 7 + INTERP_32_MASK_2(p2)) / 8);
 }
 
-static inline u32 interp_32_772(u32 p1, u32 p2, u32 p3)
+static inline uint32_t interp_32_772(uint32_t p1, uint32_t p2, uint32_t p3)
 {
         return INTERP_32_MASK_1(
                    ((INTERP_32_MASK_1(p1) + INTERP_32_MASK_1(p2)) * 7 + INTERP_32_MASK_1(p3) * 2) /
@@ -205,19 +205,19 @@ static inline u32 interp_32_772(u32 p1, u32 p2, u32 p3)
                    16);
 }
 
-static inline u32 interp_32_11(u32 p1, u32 p2)
+static inline uint32_t interp_32_11(uint32_t p1, uint32_t p2)
 {
         return INTERP_32_MASK_1((INTERP_32_MASK_1(p1) + INTERP_32_MASK_1(p2)) / 2) |
                INTERP_32_MASK_2((INTERP_32_MASK_2(p1) + INTERP_32_MASK_2(p2)) / 2);
 }
 
-static inline u32 interp_32_31(u32 p1, u32 p2)
+static inline uint32_t interp_32_31(uint32_t p1, uint32_t p2)
 {
         return INTERP_32_MASK_1((INTERP_32_MASK_1(p1) * 3 + INTERP_32_MASK_1(p2)) / 4) |
                INTERP_32_MASK_2((INTERP_32_MASK_2(p1) * 3 + INTERP_32_MASK_2(p2)) / 4);
 }
 
-static inline u32 interp_32_1411(u32 p1, u32 p2, u32 p3)
+static inline uint32_t interp_32_1411(uint32_t p1, uint32_t p2, uint32_t p3)
 {
         return INTERP_32_MASK_1(
                    (INTERP_32_MASK_1(p1) * 14 + INTERP_32_MASK_1(p2) + INTERP_32_MASK_1(p3)) / 16) |
@@ -225,7 +225,7 @@ static inline u32 interp_32_1411(u32 p1, u32 p2, u32 p3)
                    (INTERP_32_MASK_2(p1) * 14 + INTERP_32_MASK_2(p2) + INTERP_32_MASK_2(p3)) / 16);
 }
 
-static inline u32 interp_32_431(u32 p1, u32 p2, u32 p3)
+static inline uint32_t interp_32_431(uint32_t p1, uint32_t p2, uint32_t p3)
 {
         return INTERP_32_MASK_1(
                    (INTERP_32_MASK_1(p1) * 4 + INTERP_32_MASK_1(p2) * 3 + INTERP_32_MASK_1(p3)) /
@@ -235,19 +235,19 @@ static inline u32 interp_32_431(u32 p1, u32 p2, u32 p3)
                    8);
 }
 
-static inline u32 interp_32_53(u32 p1, u32 p2)
+static inline uint32_t interp_32_53(uint32_t p1, uint32_t p2)
 {
         return INTERP_32_MASK_1((INTERP_32_MASK_1(p1) * 5 + INTERP_32_MASK_1(p2) * 3) / 8) |
                INTERP_32_MASK_2((INTERP_32_MASK_2(p1) * 5 + INTERP_32_MASK_2(p2) * 3) / 8);
 }
 
-static inline u32 interp_32_151(u32 p1, u32 p2)
+static inline uint32_t interp_32_151(uint32_t p1, uint32_t p2)
 {
         return INTERP_32_MASK_1((INTERP_32_MASK_1(p1) * 15 + INTERP_32_MASK_1(p2)) / 16) |
                INTERP_32_MASK_2((INTERP_32_MASK_2(p1) * 15 + INTERP_32_MASK_2(p2)) / 16);
 }
 
-static inline u32 interp_32_97(u32 p1, u32 p2)
+static inline uint32_t interp_32_97(uint32_t p1, uint32_t p2)
 {
         return INTERP_32_MASK_1((INTERP_32_MASK_1(p1) * 9 + INTERP_32_MASK_1(p2) * 7) / 16) |
                INTERP_32_MASK_2((INTERP_32_MASK_2(p1) * 9 + INTERP_32_MASK_2(p2) * 7) / 16);
@@ -260,7 +260,7 @@ static inline u32 interp_32_97(u32 p1, u32 p2)
 #define INTERP_U_LIMIT (0x07 * 4)
 #define INTERP_V_LIMIT (0x06 * 8)
 
-static int interp_16_diff(u16 p1, u16 p2)
+static int interp_16_diff(uint16_t p1, uint16_t p2)
 {
         int r, g, b;
         int y, u, v;
@@ -294,7 +294,7 @@ static int interp_16_diff(u16 p1, u16 p2)
         return 0;
 }
 
-static int interp_32_diff(u32 p1, u32 p2)
+static int interp_32_diff(uint32_t p1, uint32_t p2)
 {
         int r, g, b;
         int y, u, v;

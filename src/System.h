@@ -1,6 +1,8 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
-#include "common/Types.h"
+
+#include <cstdint>
+
 #ifndef __LIBRETRO__
 #include <zlib.h>
 #endif
@@ -22,9 +24,9 @@ struct EmulatedSystem {
         bool (*emuWriteBattery)(const char *);
 #ifdef __LIBRETRO__
         // load state
-        bool (*emuReadState)(const u8 *, unsigned);
+        bool (*emuReadState)(const uint8_t *, unsigned);
         // load state
-        unsigned (*emuWriteState)(u8 *, unsigned);
+        unsigned (*emuWriteState)(uint8_t *, unsigned);
 #else
         // load state
         bool (*emuReadState)(const char *);
@@ -49,25 +51,25 @@ struct EmulatedSystem {
 
 extern void log(const char *, ...);
 extern bool systemPauseOnFrame();
-extern void systemGbPrint(u8 *, int, int, int, int, int);
+extern void systemGbPrint(uint8_t *, int, int, int, int, int);
 extern void systemScreenCapture(int);
 extern void systemDrawScreen();
 // updates the joystick data
 extern bool systemReadJoypads();
 // return information about the given joystick, -1 for default joystick
-extern u32 systemReadJoypad(int);
-extern u32 systemGetClock();
+extern uint32_t systemReadJoypad(int);
+extern uint32_t systemGetClock();
 extern void systemMessage(int, const char *, ...);
 extern void systemSetTitle(const char *);
 extern SoundDriver *systemSoundInit();
-extern void systemOnWriteDataToSoundBuffer(const u16 *finalWave, int length);
+extern void systemOnWriteDataToSoundBuffer(const uint16_t *finalWave, int length);
 extern void systemOnSoundShutdown();
 extern void systemScreenMessage(const char *);
 extern void systemUpdateMotionSensor();
 extern int systemGetSensorX();
 extern int systemGetSensorY();
 extern int systemGetSensorZ();
-extern u8 systemGetSensorDarkness();
+extern uint8_t systemGetSensorDarkness();
 extern void systemCartridgeRumble(bool);
 extern void systemPossibleCartridgeRumble(bool);
 extern void updateRumbleFrame();
@@ -80,11 +82,11 @@ extern void Sm60FPS_Init();
 extern bool Sm60FPS_CanSkipFrame();
 extern void Sm60FPS_Sleep();
 extern void DbgMsg(const char *msg, ...);
-extern void (*dbgOutput)(const char *s, u32 addr);
+extern void (*dbgOutput)(const char *s, uint32_t addr);
 extern void (*dbgSignal)(int sig, int number);
-extern u16 systemColorMap16[0x10000];
-extern u32 systemColorMap32[0x10000];
-extern u16 systemGbPalette[24];
+extern uint16_t systemColorMap16[0x10000];
+extern uint32_t systemColorMap32[0x10000];
+extern uint16_t systemGbPalette[24];
 extern int systemRedShift;
 extern int systemGreenShift;
 extern int systemBlueShift;

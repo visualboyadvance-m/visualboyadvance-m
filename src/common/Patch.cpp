@@ -62,9 +62,9 @@ static int readInt3(FILE* f)
     return c + (res << 8);
 }
 
-static s64 readInt4(FILE* f)
+static int64_t readInt4(FILE* f)
 {
-    s64 tmp, res = 0;
+    int64_t tmp, res = 0;
     int c;
 
     for (int i = 0; i < 4; i++) {
@@ -78,9 +78,9 @@ static s64 readInt4(FILE* f)
     return res;
 }
 
-static s64 readInt8(FILE* f)
+static int64_t readInt8(FILE* f)
 {
-    s64 tmp, res = 0;
+    int64_t tmp, res = 0;
     int c;
 
     for (int i = 0; i < 8; i++) {
@@ -94,9 +94,9 @@ static s64 readInt8(FILE* f)
     return res;
 }
 
-static s64 readVarPtr(FILE* f)
+static int64_t readVarPtr(FILE* f)
 {
-    s64 offset = 0, shift = 1;
+    int64_t offset = 0, shift = 1;
     for (;;) {
         int c = fgetc(f);
         if (c == EOF)
@@ -191,7 +191,7 @@ static bool patchApplyIPS(const char* patchname, uint8_t** r, int* s)
 
 static bool patchApplyUPS(const char* patchname, uint8_t** rom, int* size)
 {
-    s64 srcCRC, dstCRC, patchCRC;
+    int64_t srcCRC, dstCRC, patchCRC;
 
     FILE* f = fopen(patchname, "rb");
     if (!f)
@@ -231,9 +231,9 @@ static bool patchApplyUPS(const char* patchname, uint8_t** rom, int* size)
     crc = crc32(crc, *rom, *size);
 
     fseeko64(f, 4, SEEK_SET);
-    s64 dataSize;
-    s64 srcSize = readVarPtr(f);
-    s64 dstSize = readVarPtr(f);
+    int64_t dataSize;
+    int64_t srcSize = readVarPtr(f);
+    int64_t dstSize = readVarPtr(f);
 
     if (crc == srcCRC) {
         if (srcSize != *size) {
@@ -257,14 +257,14 @@ static bool patchApplyUPS(const char* patchname, uint8_t** rom, int* size)
         *size = dataSize;
     }
 
-    s64 relative = 0;
+    int64_t relative = 0;
     uint8_t* mem;
     while (ftello64(f) < patchSize - 12) {
         relative += readVarPtr(f);
         if (relative > dataSize)
             continue;
         mem = *rom + relative;
-        for (s64 i = relative; i < dataSize; i++) {
+        for (int64_t i = relative; i < dataSize; i++) {
             int x = fgetc(f);
             relative++;
             if (!x)

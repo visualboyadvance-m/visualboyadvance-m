@@ -1077,9 +1077,9 @@ void MainWnd::OnOptionsGameboyColors()
     GBColorDlg dlg;
     if (dlg.DoModal()) {
         gbPaletteOption = dlg.getWhich();
-        memcpy(systemGbPalette, dlg.getColors(), 24 * sizeof(u16));
+        memcpy(systemGbPalette, dlg.getColors(), 24 * sizeof(uint16_t));
         if (emulating && theApp.cartridgeType == 1) {
-            memcpy(gbPalette, &systemGbPalette[dlg.getWhich() * 8], 8 * sizeof(u16));
+            memcpy(gbPalette, &systemGbPalette[dlg.getWhich() * 8], 8 * sizeof(uint16_t));
         }
     }
 }

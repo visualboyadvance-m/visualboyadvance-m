@@ -41,7 +41,7 @@
 extern "C" bool cpu_mmx;
 #endif
 
-static void internal_scale2x_16_def(u16 *dst, const u16* src0, const u16* src1, const u16* src2, unsigned count) {
+static void internal_scale2x_16_def(uint16_t *dst, const uint16_t* src0, const uint16_t* src1, const uint16_t* src2, unsigned count) {
   /* first pixel */
   dst[0] = src1[0];
   if (src1[1] == src0[0] && src2[0] != src0[0])
@@ -79,10 +79,10 @@ static void internal_scale2x_16_def(u16 *dst, const u16* src0, const u16* src1, 
   dst[1] = src1[0];
 }
 
-static void internal_scale2x_32_def(u32* dst,
-                                    const u32* src0,
-                                    const u32* src1,
-                                    const u32* src2,
+static void internal_scale2x_32_def(uint32_t* dst,
+                                    const uint32_t* src0,
+                                    const uint32_t* src1,
+                                    const uint32_t* src2,
                                     unsigned count)
 {
   /* first pixel */
@@ -123,7 +123,7 @@ static void internal_scale2x_32_def(u32* dst,
 }
 
 #ifdef MMX
-static void internal_scale2x_16_mmx_single(u16* dst, const u16* src0, const u16* src1, const u16* src2, unsigned count) {
+static void internal_scale2x_16_mmx_single(uint16_t* dst, const uint16_t* src0, const uint16_t* src1, const uint16_t* src2, unsigned count) {
   /* always do the first and last run */
   count -= 2*4;
 
@@ -505,7 +505,7 @@ static void internal_scale2x_16_mmx_single(u16* dst, const u16* src0, const u16*
 #endif
 }
 
-static void internal_scale2x_32_mmx_single(u32* dst, const u32* src0, const u32* src1, const u32* src2, unsigned count) {
+static void internal_scale2x_32_mmx_single(uint32_t* dst, const uint32_t* src0, const uint32_t* src1, const uint32_t* src2, unsigned count) {
   /* always do the first and last run */
   count -= 2*2;
 
@@ -886,28 +886,28 @@ label1:
 #endif
 }
 
-static void internal_scale2x_16_mmx(u16* dst0, u16* dst1, const u16* src0, const u16* src1, const u16* src2, unsigned count) {
+static void internal_scale2x_16_mmx(uint16_t* dst0, uint16_t* dst1, const uint16_t* src0, const uint16_t* src1, const uint16_t* src2, unsigned count) {
   //	assert( count >= 2*4 );
   internal_scale2x_16_mmx_single(dst0, src0, src1, src2, count);
   internal_scale2x_16_mmx_single(dst1, src2, src1, src0, count);
 }
 
-static void internal_scale2x_32_mmx(u32* dst0, u32* dst1, const u32* src0, const u32* src1, const u32* src2, unsigned count) {
+static void internal_scale2x_32_mmx(uint32_t* dst0, uint32_t* dst1, const uint32_t* src0, const uint32_t* src1, const uint32_t* src2, unsigned count) {
   //	assert( count >= 2*2 );
   internal_scale2x_32_mmx_single(dst0, src0, src1, src2, count);
   internal_scale2x_32_mmx_single(dst1, src2, src1, src0, count);
 }
 #endif
 
-void AdMame2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-              u8 *dstPtr, u32 dstPitch, int width, int height)
+void AdMame2x(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+              uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u16 *dst0 = (u16 *)dstPtr;
-  u16 *dst1 = dst0 + (dstPitch >> 1);
+  uint16_t *dst0 = (uint16_t *)dstPtr;
+  uint16_t *dst1 = dst0 + (dstPitch >> 1);
 
-  u16 *src0 = (u16 *)srcPtr;
-  u16 *src1 = src0 + (srcPitch >> 1);
-  u16 *src2 = src1 + (srcPitch >> 1);
+  uint16_t *src0 = (uint16_t *)srcPtr;
+  uint16_t *src1 = src0 + (srcPitch >> 1);
+  uint16_t *src2 = src1 + (srcPitch >> 1);
 #ifdef MMX
   if(cpu_mmx) {
     internal_scale2x_16_mmx(dst0, dst1, src0, src0, src1, width);
@@ -954,15 +954,15 @@ void AdMame2x(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 #endif
 }
 
-void AdMame2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-                u8 *dstPtr, u32 dstPitch, int width, int height)
+void AdMame2x32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+                uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u32 *dst0 = (u32 *)dstPtr;
-  u32 *dst1 = dst0 + (dstPitch >> 2);
+  uint32_t *dst0 = (uint32_t *)dstPtr;
+  uint32_t *dst1 = dst0 + (dstPitch >> 2);
 
-  u32 *src0 = (u32 *)srcPtr;
-  u32 *src1 = src0 + (srcPitch >> 2);
-  u32 *src2 = src1 + (srcPitch >> 2);
+  uint32_t *src0 = (uint32_t *)srcPtr;
+  uint32_t *src1 = src0 + (srcPitch >> 2);
+  uint32_t *src2 = src1 + (srcPitch >> 2);
 #ifdef MMX
   if(cpu_mmx) {
     internal_scale2x_32_mmx(dst0, dst1, src0, src0, src1, width);

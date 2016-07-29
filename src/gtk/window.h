@@ -241,9 +241,9 @@ private:
     EShowSpeed m_eShowSpeed;
 
     /* State saving into memory & rewind to saved state */
-    u16 m_state_count_max;
-    u16 m_rewind_interval;
-    static const u32 SZSTATE = 1024 * 512;
+    uint16_t m_state_count_max;
+    uint16_t m_rewind_interval;
+    static const uint32_t SZSTATE = 1024 * 512;
     std::deque<char*> m_rewind_load_q;
     char* m_psavestate;
 

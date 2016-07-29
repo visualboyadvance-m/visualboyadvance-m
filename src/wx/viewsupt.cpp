@@ -237,11 +237,11 @@ void DisList::SetSel()
     if (!issel)
         return;
 
-    if (nlines > addrs.size() || (u32)addrs[0] > seladdr || (u32)addrs[nlines - 1] <= seladdr)
+    if (nlines > addrs.size() || (uint32_t)addrs[0] > seladdr || (uint32_t)addrs[nlines - 1] <= seladdr)
         return;
 
     for (int i = 0, start = 0; i < nlines; i++) {
-        if ((u32)addrs[i + 1] > seladdr) {
+        if ((uint32_t)addrs[i + 1] > seladdr) {
             int end = start + strings[i].size() + 1;
 // on win32, wx helpfully inserts a CR before every LF
 // it also doesn't highlight the whole line, but that's
@@ -258,12 +258,12 @@ void DisList::SetSel()
     }
 }
 
-void DisList::SetSel(u32 addr)
+void DisList::SetSel(uint32_t addr)
 {
     seladdr = addr;
     issel = true;
 
-    if (addrs.size() < 4 || addrs.size() < nlines || topaddr > addr || (u32)addrs[addrs.size() - 4] < addr) {
+    if (addrs.size() < 4 || addrs.size() < nlines || topaddr > addr || (uint32_t)addrs[addrs.size() - 4] < addr) {
         topaddr = addr;
         strings.clear();
         addrs.clear();
@@ -386,7 +386,7 @@ void MemView::ShowCaret()
 
     if (addrlab) {
         wxString lab;
-        u32 addr = seladdr + selnib / 2;
+        uint32_t addr = seladdr + selnib / 2;
 
         if (!isasc)
             addr &= ~((1 << fmt) - 1);
@@ -414,7 +414,7 @@ void MemView::ShowCaret()
 
 void MemView::KeyEvent(wxKeyEvent& ev)
 {
-    u32 k = ev.GetKeyCode();
+    uint32_t k = ev.GetKeyCode();
     int nnib = 2 << fmt;
 
     switch (k) {
@@ -502,7 +502,7 @@ void MemView::KeyEvent(wxKeyEvent& ev)
             }
         }
 
-        u32 mask, val;
+        uint32_t mask, val;
 
         if (isasc) {
             mask = 0xff << bno * 8;
@@ -651,7 +651,7 @@ void MemView::Refill(wxDC& dc)
         line.Printf(maxaddr > 0xffff ? wxT("%08X   ") : wxT("%04X   "), topaddr + i * 16);
 
         for (int j = 0; j < 4; j++) {
-            u32 v = words[i * 4 + j];
+            uint32_t v = words[i * 4 + j];
 
             switch (fmt) {
             case 0:
@@ -675,7 +675,7 @@ void MemView::Refill(wxDC& dc)
         line.append(wxT("  "));
 
         for (int j = 0; j < 4; j++) {
-            u32 v = words[i * 4 + j];
+            uint32_t v = words[i * 4 + j];
 #define appendc(c) line.append(isascii((c)&0xff) && isprint((c)&0xff) ? (wxChar)((c)&0xff) : wxT('.'))
             appendc(v);
             appendc(v >> 8);
@@ -716,12 +716,12 @@ void MemView::Resize(wxSizeEvent& ev)
         Refill();
 }
 
-void MemView::Show(u32 addr, bool force_update)
+void MemView::Show(uint32_t addr, bool force_update)
 {
     if (addr < topaddr || addr >= topaddr + (nlines - 1) * 16) {
         // align to nearest 16-byte block
         // note that mfc interface only aligns to nearest (1<<fmt)-byte
-        u32 newtopaddr = addr & ~0xf;
+        uint32_t newtopaddr = addr & ~0xf;
 
         if (newtopaddr + nlines * 16 > maxaddr)
             newtopaddr = maxaddr - nlines * 16 + 1;
@@ -737,7 +737,7 @@ void MemView::Show(u32 addr, bool force_update)
         ShowCaret();
 }
 
-u32 MemView::GetAddr()
+uint32_t MemView::GetAddr()
 {
     if (selnib < 0)
         return topaddr;

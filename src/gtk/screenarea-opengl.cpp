@@ -101,7 +101,7 @@ void ScreenAreaGl::on_realize()
     glwindow->gl_end();
 }
 
-void ScreenAreaGl::vDrawPixels(u8* _puiData)
+void ScreenAreaGl::vDrawPixels(uint8_t* _puiData)
 {
     ScreenArea::vDrawPixels(_puiData);
 
@@ -111,7 +111,7 @@ void ScreenAreaGl::vDrawPixels(u8* _puiData)
 void ScreenAreaGl::vDrawBlackScreen()
 {
     if (m_puiPixels && get_realized()) {
-        memset(m_puiPixels, 0, m_iHeight * (m_iWidth + 1) * sizeof(u32));
+        memset(m_puiPixels, 0, m_iHeight * (m_iWidth + 1) * sizeof(uint32_t));
         queue_draw_area(0, 0, get_width(), get_height());
     }
 }

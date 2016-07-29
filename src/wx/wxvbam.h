@@ -435,7 +435,7 @@ public:
     {
         return loaded;
     }
-    u32 game_size()
+    uint32_t game_size()
     {
         return rom_size;
     }
@@ -491,25 +491,25 @@ public:
 
     // osdtext is displayed for 3 seconds after osdtime, and then cleared
     wxString osdtext;
-    u32 osdtime;
+    uint32_t osdtime;
 
     // Rewind: count down to 0 and rewind
-    u32 rewind_time;
+    uint32_t rewind_time;
     // Rewind: flag to OnIdle to do a rewind
     bool do_rewind;
     // Rewind: rewind states
-    char* rewind_mem; // should be u8, really
+    char* rewind_mem; // should be uint8_t, really
     int num_rewind_states;
     int next_rewind_state;
 
     // Loaded rom information
     IMAGE_TYPE loaded;
     wxFileName loaded_game;
-    u32 rom_crc32;
+    uint32_t rom_crc32;
     wxString rom_name;
     wxString rom_scene_rls;
     wxString rom_scene_rls_name;
-    u32 rom_size;
+    uint32_t rom_size;
 
 // FIXME: size this properly
 #define NUM_REWINDS 8
@@ -528,8 +528,8 @@ public:
     void StopSoundRecording();
     void StartVidRecording(const wxString& fname);
     void StopVidRecording();
-    void AddFrame(const u8* data); // video
-    void AddFrame(const u16* data, int length); // audio
+    void AddFrame(const uint8_t* data); // video
+    void AddFrame(const uint16_t* data, int length); // audio
     bool IsRecording()
     {
         return snd_rec.IsRecording() || vid_rec.IsRecording();
@@ -571,7 +571,7 @@ protected:
         ShowPointer();
     }
     bool pointer_blanked;
-    u32 mouse_active_time;
+    uint32_t mouse_active_time;
 
     DECLARE_DYNAMIC_CLASS()
     DECLARE_EVENT_TABLE()
@@ -603,7 +603,7 @@ class DrawingPanel : public wxObject {
 public:
     DrawingPanel(int _width, int _height);
     ~DrawingPanel();
-    void DrawArea(u8** pixels);
+    void DrawArea(uint8_t** pixels);
     // the following wouldn't be necessary with virtual inheritance
     virtual wxWindow* GetWindow() = 0;
     virtual void Delete() = 0;
@@ -612,15 +612,15 @@ protected:
     virtual void DrawArea(wxWindowDC&) = 0;
     virtual void DrawOSD(wxWindowDC&);
     int width, height, scale;
-    u8* todraw;
-    u8 *pixbuf1, *pixbuf2;
+    uint8_t* todraw;
+    uint8_t *pixbuf1, *pixbuf2;
     FilterThread* threads;
     int nthreads;
     wxSemaphore filt_done;
     wxDynamicLibrary filt_plugin;
     const RENDER_PLUGIN_INFO* rpi; // also flag indicating plugin loaded
     // largest buffer required is 32-bit * (max width + 1) * (max height + 2)
-    u8 delta[257 * 4 * 226];
+    uint8_t delta[257 * 4 * 226];
 
     // following can't work in 2.8 as intended
     // inheriting from wxEvtHandler is required, but also breaks subclasses
@@ -662,11 +662,11 @@ extern bool GetXA2Devices(wxArrayString& names, wxArrayString& ids);
 extern bool debugger;
 extern void (*dbgMain)();
 extern void (*dbgSignal)(int, int);
-extern void (*dbgOutput)(const char*, u32);
+extern void (*dbgOutput)(const char*, uint32_t);
 extern void remoteStubMain();
 extern void remoteCleanUp();
 extern void remoteStubSignal(int, int);
-extern void remoteOutput(const char*, u32);
+extern void remoteOutput(const char*, uint32_t);
 
 extern bool debugOpenPty();
 extern const wxString& debugGetSlavePty();

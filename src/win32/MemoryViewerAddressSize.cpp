@@ -11,7 +11,7 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // MemoryViewerAddressSize dialog
 
-MemoryViewerAddressSize::MemoryViewerAddressSize(u32 a, int s, CWnd* pParent /*=NULL*/)
+MemoryViewerAddressSize::MemoryViewerAddressSize(uint32_t a, int s, CWnd* pParent /*=NULL*/)
     : CDialog(MemoryViewerAddressSize::IDD, pParent)
 {
     //{{AFX_DATA_INIT(MemoryViewerAddressSize)
@@ -90,7 +90,7 @@ void MemoryViewerAddressSize::OnCancel()
     EndDialog(FALSE);
 }
 
-void MemoryViewerAddressSize::setAddress(u32 a)
+void MemoryViewerAddressSize::setAddress(uint32_t a)
 {
     address = a;
 }
@@ -100,7 +100,7 @@ void MemoryViewerAddressSize::setSize(int s)
     size = s;
 }
 
-u32 MemoryViewerAddressSize::getAddress()
+uint32_t MemoryViewerAddressSize::getAddress()
 {
     return address;
 }

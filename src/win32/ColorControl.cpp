@@ -55,7 +55,7 @@ BOOL ColorControl::OnEraseBkgnd(CDC* pDC)
     return TRUE;
 }
 
-void ColorControl::setColor(u16 c)
+void ColorControl::setColor(uint16_t c)
 {
     color = c;
     Invalidate();

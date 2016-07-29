@@ -23,13 +23,13 @@ extern int emulating;
 #define CPUWriteByteQuick(addr, b) \
     ::map[(addr) >> 24].address[(addr) & ::map[(addr) >> 24].mask] = (b)
 #define CPUReadHalfWordQuick(addr) \
-    *((u16*)&::map[(addr) >> 24].address[(addr) & ::map[(addr) >> 24].mask])
+    *((uint16_t*)&::map[(addr) >> 24].address[(addr) & ::map[(addr) >> 24].mask])
 #define CPUWriteHalfWordQuick(addr, b) \
-    *((u16*)&::map[(addr) >> 24].address[(addr) & ::map[(addr) >> 24].mask]) = (b)
+    *((uint16_t*)&::map[(addr) >> 24].address[(addr) & ::map[(addr) >> 24].mask]) = (b)
 #define CPUReadMemoryQuick(addr) \
-    *((u32*)&::map[(addr) >> 24].address[(addr) & ::map[(addr) >> 24].mask])
+    *((uint32_t*)&::map[(addr) >> 24].address[(addr) & ::map[(addr) >> 24].mask])
 #define CPUWriteMemoryQuick(addr, b) \
-    *((u32*)&::map[(addr) >> 24].address[(addr) & ::map[(addr) >> 24].mask]) = (b)
+    *((uint32_t*)&::map[(addr) >> 24].address[(addr) & ::map[(addr) >> 24].mask]) = (b)
 
 /////////////////////////////////////////////////////////////////////////////
 // GBAMemoryViewer control
@@ -40,7 +40,7 @@ GBAMemoryViewer::GBAMemoryViewer()
     setAddressSize(0);
 }
 
-void GBAMemoryViewer::readData(u32 address, int len, u8* data)
+void GBAMemoryViewer::readData(uint32_t address, int len, uint8_t* data)
 {
     if (emulating && rom != NULL) {
         for (int i = 0; i < len; i++) {
@@ -55,9 +55,9 @@ void GBAMemoryViewer::readData(u32 address, int len, u8* data)
     }
 }
 
-void GBAMemoryViewer::editData(u32 address, int size, int mask, u32 value)
+void GBAMemoryViewer::editData(uint32_t address, int size, int mask, uint32_t value)
 {
-    u32 oldValue;
+    uint32_t oldValue;
 
     switch (size) {
     case 8:
@@ -242,7 +242,7 @@ void MemoryViewerDlg::OnGo()
 
     m_address.GetWindowText(buffer);
 
-    u32 address;
+    uint32_t address;
     sscanf(buffer, "%x", &address);
     if (m_viewer.getSize() == 1)
         address &= ~1;
@@ -283,7 +283,7 @@ void MemoryViewerDlg::OnSelchangeAddresses()
     }
 }
 
-void MemoryViewerDlg::setCurrentAddress(u32 address)
+void MemoryViewerDlg::setCurrentAddress(uint32_t address)
 {
     CString buffer;
 
@@ -325,7 +325,7 @@ void MemoryViewerDlg::OnSave()
                 }
 
                 int size = dlg.getSize();
-                u32 addr = dlg.getAddress();
+                uint32_t addr = dlg.getAddress();
 
                 for (int i = 0; i < size; i++) {
                     fputc(CPUReadByteQuick(addr), f);
@@ -379,7 +379,7 @@ void MemoryViewerDlg::OnLoad()
 
             if (dlg.DoModal() == IDOK) {
                 int size = dlg.getSize();
-                u32 addr = dlg.getAddress();
+                uint32_t addr = dlg.getAddress();
 
                 for (int i = 0; i < size; i++) {
                     int c = fgetc(f);

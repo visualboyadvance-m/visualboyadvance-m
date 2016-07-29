@@ -22,11 +22,11 @@
 
 #include "../System.h"
 
-int Init_2xSaI(u32);
+int Init_2xSaI(uint32_t);
 
 namespace VBA {
-typedef void (*Filter)(u8*, u32, u8*, u8*, u32, int, int);
-typedef void (*FilterIB)(u8*, u32, int, int);
+typedef void (*Filter)(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+typedef void (*FilterIB)(uint8_t*, uint32_t, int, int);
 
 enum EFilter {
     FirstFilter,

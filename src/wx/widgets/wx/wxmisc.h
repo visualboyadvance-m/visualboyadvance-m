@@ -2,6 +2,8 @@
 #define WX_MISC_H
 // utility widgets
 
+#include <wx/checkbox.h>
+
 // simple radio button not under the same parent window
 // note that it must be checkbox, as wx radio buttons have rigid behavior
 class wxFarRadio : public wxCheckBox {

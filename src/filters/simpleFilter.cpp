@@ -1,26 +1,26 @@
 #include "../System.h"
 
-void Simple2x16(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-              u8 *dstPtr, u32 dstPitch, int width, int height)
+void Simple2x16(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+              uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u8 *nextLine, *finish;
+  uint8_t *nextLine, *finish;
 
   nextLine = dstPtr + dstPitch;
 
   do {
-    u32 *bP = (u32 *) srcPtr;
-    u32 *dP = (u32 *) dstPtr;
-    u32 *nL = (u32 *) nextLine;
-    u32 currentPixel;
+    uint32_t *bP = (uint32_t *) srcPtr;
+    uint32_t *dP = (uint32_t *) dstPtr;
+    uint32_t *nL = (uint32_t *) nextLine;
+    uint32_t currentPixel;
 
-    finish = (u8 *) bP + ((width+2) << 1);
+    finish = (uint8_t *) bP + ((width+2) << 1);
     currentPixel = *bP++;
 
     do {
 #ifdef WORDS_BIGENDIAN
-      u32 color = currentPixel >> 16;
+      uint32_t color = currentPixel >> 16;
 #else
-      u32 color = currentPixel & 0xffff;
+      uint32_t color = currentPixel & 0xffff;
 #endif
 
       color = color | (color << 16);
@@ -41,7 +41,7 @@ void Simple2x16(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 
       dP += 2;
       nL += 2;
-    } while ((u8 *) bP < finish);
+    } while ((uint8_t *) bP < finish);
 
     srcPtr += srcPitch;
     dstPtr += dstPitch << 1;
@@ -50,24 +50,24 @@ void Simple2x16(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
   while (--height);
 }
 
-void Simple2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-                u8 *dstPtr, u32 dstPitch, int width, int height)
+void Simple2x32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+                uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u8 *nextLine, *finish;
+  uint8_t *nextLine, *finish;
 
   nextLine = dstPtr + dstPitch;
 
   do {
-    u32 *bP = (u32 *) srcPtr;
-    u32 *dP = (u32 *) dstPtr;
-    u32 *nL = (u32 *) nextLine;
-    u32 currentPixel;
+    uint32_t *bP = (uint32_t *) srcPtr;
+    uint32_t *dP = (uint32_t *) dstPtr;
+    uint32_t *nL = (uint32_t *) nextLine;
+    uint32_t currentPixel;
 
-    finish = (u8 *) bP + ((width+1) << 2);
+    finish = (uint8_t *) bP + ((width+1) << 2);
     currentPixel = *bP++;
 
     do {
-      u32 color = currentPixel;
+      uint32_t color = currentPixel;
 
       *(dP) = color;
       *(dP+1) = color;
@@ -78,7 +78,7 @@ void Simple2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 
       dP += 2;
       nL += 2;
-    } while ((u8 *) bP < finish);
+    } while ((uint8_t *) bP < finish);
 
     srcPtr += srcPitch;
     dstPtr += dstPitch << 1;
@@ -88,8 +88,8 @@ void Simple2x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 }
 
 
-void Simple3x16(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-              u8 *dstPtr, u32 dstPitch, int width, int height)
+void Simple3x16(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+              uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
 #define magnification	3
 #define colorBytes 2 // 16 bit colors = 2 byte colors
@@ -138,8 +138,8 @@ void Simple3x16(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 
 
 
-void Simple3x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-                u8 *dstPtr, u32 dstPitch, int width, int height)
+void Simple3x32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+                uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
 #define magnification	3
 #define colorBytes 4 // 32 bit colors = 4 byte colors
@@ -186,8 +186,8 @@ void Simple3x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 #undef colorBytes
 }
 
-void Simple4x16(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-              u8 *dstPtr, u32 dstPitch, int width, int height)
+void Simple4x16(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+              uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
 #define magnification	4
 #define colorBytes 2 // 16 bit colors = 2 byte colors
@@ -236,8 +236,8 @@ void Simple4x16(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 
 
 
-void Simple4x32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-                u8 *dstPtr, u32 dstPitch, int width, int height)
+void Simple4x32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+                uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
 #define magnification	4
 #define colorBytes 4 // 32 bit colors = 4 byte colors

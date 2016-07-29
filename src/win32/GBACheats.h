@@ -12,7 +12,7 @@
 // GBACheatSearch dialog
 
 struct WinCheatsData {
-    u32 addr;
+    uint32_t addr;
     char address[9];
     char oldValue[12];
     char newValue[12];
@@ -25,7 +25,7 @@ public:
     afx_msg void OnNumberType(UINT id);
     afx_msg void OnSearchType(UINT id);
     afx_msg void OnValueType(UINT id);
-    void addChange(int index, u32 address, u32 oldValue, u32 newValue);
+    void addChange(int index, uint32_t address, uint32_t oldValue, uint32_t newValue);
     GBACheatSearch(CWnd* pParent = NULL); // standard constructor
     ~GBACheatSearch();
 
@@ -76,8 +76,8 @@ public:
     bool addCheat();
     afx_msg void OnSizeType(UINT id);
     afx_msg void OnNumberType(UINT id);
-    u32 address;
-    AddCheat(u32 address, CWnd* pParent = NULL); // standard constructor
+    uint32_t address;
+    AddCheat(uint32_t address, CWnd* pParent = NULL); // standard constructor
 
     // Dialog Data
     //{{AFX_DATA(AddCheat)

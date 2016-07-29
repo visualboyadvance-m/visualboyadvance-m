@@ -18,10 +18,10 @@ class GBDisassemble : public ResizeDlg, IUpdateListener {
     // Construction
 public:
     void refresh();
-    u16 lastAddress;
+    uint16_t lastAddress;
     int count;
     bool autoUpdate;
-    u16 address;
+    uint16_t address;
     GBDisassemble(CWnd* pParent = NULL); // standard constructor
 
     virtual void update();

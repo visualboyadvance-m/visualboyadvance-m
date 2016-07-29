@@ -51,8 +51,8 @@
 
 extern int RGB_LOW_BITS_MASK;
 
-static const u16 STATE_MAX_DEFAULT = 180u;
-static const u16 STATE_INTERVAL_DEFAULT = 165u;
+static const uint16_t STATE_MAX_DEFAULT = 180u;
+static const uint16_t STATE_INTERVAL_DEFAULT = 165u;
 
 namespace VBA {
 

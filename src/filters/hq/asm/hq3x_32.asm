@@ -2393,7 +2393,7 @@ NEWSYM hq3x_32
     mov     [edi+ebx*2+4],eax
     mov     [edi+ebx*2+8],edx
     jmp     .loopx_end
-..@cross8
+..@crosint8_t
     mov     ecx,[ebp-w8]
     mov     edx,eax
     shl     edx,2
@@ -2570,6 +2570,6 @@ FuncTable
 FuncTable2
     dd ..@cross0, ..@cross1, ..@cross2, ..@crossN,
     dd ..@cross4, ..@crossN, ..@crossN, ..@crossN,
-    dd ..@cross8, ..@crossN, ..@crossN, ..@crossN,
+    dd ..@crosint8_t, ..@crossN, ..@crossN, ..@crossN,
     dd ..@crossN, ..@crossN, ..@crossN, ..@crossN
 

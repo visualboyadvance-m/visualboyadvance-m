@@ -133,13 +133,13 @@ void Disassemble::OnNext()
     if (rom != NULL) {
         CPULoop(1);
         if (armState) {
-            u32 total = address + count * 4;
+            uint32_t total = address + count * 4;
             if (armNextPC >= address && armNextPC < total) {
             } else {
                 OnGopc();
             }
         } else {
-            u32 total = address + count * 2;
+            uint32_t total = address + count * 2;
             if (armNextPC >= address && armNextPC < total) {
             } else {
                 OnGopc();
@@ -282,7 +282,7 @@ void Disassemble::refresh()
         return;
 
     char buffer[80];
-    u32 addr = address;
+    uint32_t addr = address;
     int i;
     int sel = -1;
     for (i = 0; i < count; i++) {

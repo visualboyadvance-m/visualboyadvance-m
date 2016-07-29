@@ -21,7 +21,7 @@ public:
     void refresh();
     int count;
     bool autoUpdate;
-    u32 address;
+    uint32_t address;
     Disassemble(CWnd* pParent = NULL); // standard constructor
 
     // Dialog Data

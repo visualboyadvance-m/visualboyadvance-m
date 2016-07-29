@@ -14,7 +14,7 @@ extern "C" {
 #include <png.h>
 }
 
-extern u8 gbInvertTab[256];
+extern uint8_t gbInvertTab[256];
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -41,7 +41,7 @@ GBMapView::GBMapView(CWnd* pParent /*=NULL*/)
     bmpInfo.bmiHeader.biPlanes = 1;
     bmpInfo.bmiHeader.biBitCount = 24;
     bmpInfo.bmiHeader.biCompression = BI_RGB;
-    data = (u8*)calloc(1, 3 * 1024 * 1024);
+    data = (uint8_t*)calloc(1, 3 * 1024 * 1024);
 
     mapView.setData(data);
     mapView.setBmpInfo(&bmpInfo);
@@ -88,7 +88,7 @@ GBMapView::~GBMapView()
 
 void GBMapView::saveBMP(const char* name)
 {
-    u8 writeBuffer[1024 * 3];
+    uint8_t writeBuffer[1024 * 3];
 
     FILE* fp = fopen(name, "wb");
 
@@ -98,29 +98,29 @@ void GBMapView::saveBMP(const char* name)
     }
 
     struct {
-        u8 ident[2];
-        u8 filesize[4];
-        u8 reserved[4];
-        u8 dataoffset[4];
-        u8 headersize[4];
-        u8 width[4];
-        u8 height[4];
-        u8 planes[2];
-        u8 bitsperpixel[2];
-        u8 compression[4];
-        u8 datasize[4];
-        u8 hres[4];
-        u8 vres[4];
-        u8 colors[4];
-        u8 importantcolors[4];
-        u8 pad[2];
+        uint8_t ident[2];
+        uint8_t filesize[4];
+        uint8_t reserved[4];
+        uint8_t dataoffset[4];
+        uint8_t headersize[4];
+        uint8_t width[4];
+        uint8_t height[4];
+        uint8_t planes[2];
+        uint8_t bitsperpixel[2];
+        uint8_t compression[4];
+        uint8_t datasize[4];
+        uint8_t hres[4];
+        uint8_t vres[4];
+        uint8_t colors[4];
+        uint8_t importantcolors[4];
+        uint8_t pad[2];
     } bmpheader;
     memset(&bmpheader, 0, sizeof(bmpheader));
 
     bmpheader.ident[0] = 'B';
     bmpheader.ident[1] = 'M';
 
-    u32 fsz = sizeof(bmpheader) + w * h * 3;
+    uint32_t fsz = sizeof(bmpheader) + w * h * 3;
     utilPutDword(bmpheader.filesize, fsz);
     utilPutDword(bmpheader.dataoffset, 0x38);
     utilPutDword(bmpheader.headersize, 0x28);
@@ -132,12 +132,12 @@ void GBMapView::saveBMP(const char* name)
 
     fwrite(&bmpheader, 1, sizeof(bmpheader), fp);
 
-    u8* b = writeBuffer;
+    uint8_t* b = writeBuffer;
 
     int sizeX = w;
     int sizeY = h;
 
-    u8* pixU8 = (u8*)data + 3 * w * (h - 1);
+    uint8_t* pixU8 = (uint8_t*)data + 3 * w * (h - 1);
     for (int y = 0; y < sizeY; y++) {
         for (int x = 0; x < sizeX; x++) {
             *b++ = *pixU8++; // B
@@ -155,7 +155,7 @@ void GBMapView::saveBMP(const char* name)
 
 void GBMapView::savePNG(const char* name)
 {
-    u8 writeBuffer[1024 * 3];
+    uint8_t writeBuffer[1024 * 3];
 
     FILE* fp = fopen(name, "wb");
 
@@ -201,12 +201,12 @@ void GBMapView::savePNG(const char* name)
 
     png_write_info(png_ptr, info_ptr);
 
-    u8* b = writeBuffer;
+    uint8_t* b = writeBuffer;
 
     int sizeX = w;
     int sizeY = h;
 
-    u8* pixU8 = (u8*)data;
+    uint8_t* pixU8 = (uint8_t*)data;
     for (int y = 0; y < sizeY; y++) {
         for (int x = 0; x < sizeX; x++) {
             int blue = *pixU8++;
@@ -264,8 +264,8 @@ void GBMapView::OnSave()
 
 void GBMapView::render()
 {
-    u8* bank0;
-    u8* bank1;
+    uint8_t* bank0;
+    uint8_t* bank1;
     if (gbCgbMode) {
         bank0 = &gbVram[0x0000];
         bank1 = &gbVram[0x2000];
@@ -288,11 +288,11 @@ void GBMapView::render()
     int tile = 0;
     for (int y = 0; y < 32; y++) {
         for (int x = 0; x < 32; x++) {
-            u8* bmp = &data[y * 8 * 32 * 24 + x * 24];
-            u8 attrs = 0;
+            uint8_t* bmp = &data[y * 8 * 32 * 24 + x * 24];
+            uint8_t attrs = 0;
             if (bank1 != NULL)
                 attrs = bank1[tile_map_address];
-            u8 tile = bank0[tile_map_address];
+            uint8_t tile = bank0[tile_map_address];
             tile_map_address++;
 
             if (bank == 1) {
@@ -304,8 +304,8 @@ void GBMapView::render()
             for (int j = 0; j < 8; j++) {
                 int tile_pattern_address = attrs & 0x40 ? tile_pattern + tile * 16 + (7 - j) * 2 : tile_pattern + tile * 16 + j * 2;
 
-                u8 tile_a = 0;
-                u8 tile_b = 0;
+                uint8_t tile_a = 0;
+                uint8_t tile_b = 0;
 
                 if (attrs & 0x08) {
                     tile_a = bank1[tile_pattern_address++];
@@ -320,16 +320,16 @@ void GBMapView::render()
                     tile_b = gbInvertTab[tile_b];
                 }
 
-                u8 mask = 0x80;
+                uint8_t mask = 0x80;
 
                 while (mask > 0) {
-                    u8 c = (tile_a & mask) ? 1 : 0;
+                    uint8_t c = (tile_a & mask) ? 1 : 0;
                     c += (tile_b & mask) ? 2 : 0;
 
                     if (gbCgbMode)
                         c = c + (attrs & 7) * 4;
 
-                    u16 color = gbPalette[c];
+                    uint16_t color = gbPalette[c];
 
                     *bmp++ = ((color >> 10) & 0x1f) << 3;
                     *bmp++ = ((color >> 5) & 0x1f) << 3;
@@ -461,9 +461,9 @@ void GBMapView::OnClose()
     DestroyWindow();
 }
 
-u32 GBMapView::GetClickAddress(int x, int y)
+uint32_t GBMapView::GetClickAddress(int x, int y)
 {
-    u32 base = 0x9800;
+    uint32_t base = 0x9800;
     if (bg == 1)
         base = 0x9c00;
 
@@ -472,7 +472,7 @@ u32 GBMapView::GetClickAddress(int x, int y)
 
 LRESULT GBMapView::OnMapInfo(WPARAM wParam, LPARAM lParam)
 {
-    u8* colors = (u8*)lParam;
+    uint8_t* colors = (uint8_t*)lParam;
     mapViewZoom.setColors(colors);
 
     int x = (int)(wParam & 0xffff);
@@ -482,13 +482,13 @@ LRESULT GBMapView::OnMapInfo(WPARAM wParam, LPARAM lParam)
     buffer.Format("(%d,%d)", x, y);
     GetDlgItem(IDC_XY)->SetWindowText(buffer);
 
-    u32 address = GetClickAddress(x, y);
+    uint32_t address = GetClickAddress(x, y);
     buffer.Format("0x%08X", address);
     GetDlgItem(IDC_ADDRESS)->SetWindowText(buffer);
 
-    u8 attrs = 0;
+    uint8_t attrs = 0;
 
-    u8 tile = gbMemoryMap[9][address & 0xfff];
+    uint8_t tile = gbMemoryMap[9][address & 0xfff];
     if (gbCgbMode) {
         attrs = gbVram[0x2000 + address - 0x8000];
         tile = gbVram[address & 0x1fff];
@@ -527,7 +527,7 @@ LRESULT GBMapView::OnMapInfo(WPARAM wParam, LPARAM lParam)
 
 LRESULT GBMapView::OnColInfo(WPARAM wParam, LPARAM)
 {
-    u16 c = (u16)wParam;
+    uint16_t c = (uint16_t)wParam;
 
     color.setColor(c);
 

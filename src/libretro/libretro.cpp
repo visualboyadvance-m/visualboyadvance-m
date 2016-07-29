@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -13,7 +14,6 @@
 #include "../apu/Gb_Apu.h"
 #include "../apu/Gb_Oscs.h"
 #include "../common/Port.h"
-#include "../common/Types.h"
 #include "../gba/Cheats.h"
 #include "../gba/EEprom.h"
 #include "../gba/Flash.h"
@@ -47,9 +47,9 @@ static unsigned libretro_save_size = sizeof(libretro_save_buf);
 
 int RGB_LOW_BITS_MASK = 0;
 
-u16 systemColorMap16[0x10000];
-u32 systemColorMap32[0x10000];
-u16 systemGbPalette[24];
+uint16_t systemColorMap16[0x10000];
+uint32_t systemColorMap32[0x10000];
+uint16_t systemGbPalette[24];
 int systemRedShift = 0;
 int systemBlueShift = 0;
 int systemGreenShift = 0;
@@ -61,9 +61,9 @@ int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 int systemSpeed = 0;
 
 u64 startTime = 0;
-u32 renderedFrames = 0;
+uint32_t renderedFrames = 0;
 
-void (*dbgOutput)(const char* s, u32 addr);
+void (*dbgOutput)(const char* s, uint32_t addr);
 void (*dbgSignal)(int sig, int number);
 
 void* retro_get_memory_data(unsigned id)
@@ -686,7 +686,7 @@ unsigned retro_get_region(void)
     return RETRO_REGION_NTSC;
 }
 
-void systemOnWriteDataToSoundBuffer(const u16* finalWave, int length)
+void systemOnWriteDataToSoundBuffer(const uint16_t* finalWave, int length)
 {
 }
 
@@ -747,12 +747,12 @@ int systemGetSensorZ(void)
     return 0;
 }
 
-u32 systemReadJoypad(int which)
+uint32_t systemReadJoypad(int which)
 {
     if (which == -1)
         which = 0;
 
-    u32 J = 0;
+    uint32_t J = 0;
 
     for (unsigned i = 0; i < 10; i++) {
         if (controller_layout[0] == 1)
@@ -771,14 +771,14 @@ u32 systemReadJoypad(int which)
 bool systemReadJoypads() { return true; }
 
 void systemUpdateMotionSensor() {}
-u8 systemGetSensorDarkness() {}
+uint8_t systemGetSensorDarkness() {}
 
 void systemCartridgeRumble(bool)
 {
 }
 
 bool systemPauseOnFrame() { return false; }
-void systemGbPrint(u8* data, int pages, int feed, int palette, int contrast) {}
+void systemGbPrint(uint8_t* data, int pages, int feed, int palette, int contrast) {}
 void systemScreenCapture(int a) {}
 void systemScreenMessage(const char* msg)
 {
@@ -790,7 +790,7 @@ void systemSetTitle(const char* title) {}
 void systemShowSpeed(int speed) {}
 void system10Frames(int rate) {}
 
-u32 systemGetClock()
+uint32_t systemGetClock()
 {
     return 0;
 }

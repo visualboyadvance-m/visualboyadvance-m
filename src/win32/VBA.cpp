@@ -44,50 +44,50 @@
 #include "../gba/GBALink.h"
 /* ---------------- */
 
-extern void Pixelate(u8*, u32, u8*, u8*, u32, int, int);
-extern void Pixelate32(u8*, u32, u8*, u8*, u32, int, int);
-extern void _2xSaI(u8*, u32, u8*, u8*, u32, int, int);
-extern void _2xSaI32(u8*, u32, u8*, u8*, u32, int, int);
-extern void Super2xSaI(u8*, u32, u8*, u8*, u32, int, int);
-extern void Super2xSaI32(u8*, u32, u8*, u8*, u32, int, int);
-extern void SuperEagle(u8*, u32, u8*, u8*, u32, int, int);
-extern void SuperEagle32(u8*, u32, u8*, u8*, u32, int, int);
-extern void AdMame2x(u8*, u32, u8*, u8*, u32, int, int);
-extern void AdMame2x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void Bilinear(u8*, u32, u8*, u8*, u32, int, int);
-extern void Bilinear32(u8*, u32, u8*, u8*, u32, int, int);
-extern void BilinearPlus(u8*, u32, u8*, u8*, u32, int, int);
-extern void BilinearPlus32(u8*, u32, u8*, u8*, u32, int, int);
-extern void Scanlines(u8*, u32, u8*, u8*, u32, int, int);
-extern void Scanlines32(u8*, u32, u8*, u8*, u32, int, int);
-extern void ScanlinesTV(u8*, u32, u8*, u8*, u32, int, int);
-extern void ScanlinesTV32(u8*, u32, u8*, u8*, u32, int, int);
-extern void hq2x(u8*, u32, u8*, u8*, u32, int, int);
-extern void hq2x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void lq2x(u8*, u32, u8*, u8*, u32, int, int);
-extern void lq2x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void Simple2x16(u8*, u32, u8*, u8*, u32, int, int);
-extern void Simple2x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void Simple3x16(u8*, u32, u8*, u8*, u32, int, int);
-extern void Simple3x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void Simple4x16(u8*, u32, u8*, u8*, u32, int, int);
-extern void Simple4x32(u8*, u32, u8*, u8*, u32, int, int);
+extern void Pixelate(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Pixelate32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void _2xSaI(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void _2xSaI32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Super2xSaI(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Super2xSaI32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void SuperEagle(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void SuperEagle32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void AdMame2x(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void AdMame2x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Bilinear(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Bilinear32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void BilinearPlus(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void BilinearPlus32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Scanlines(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Scanlines32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void ScanlinesTV(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void ScanlinesTV32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void hq2x(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void hq2x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void lq2x(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void lq2x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Simple2x16(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Simple2x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Simple3x16(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Simple3x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Simple4x16(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Simple4x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
 #ifndef WIN64
-extern void hq3x16(u8*, u32, u8*, u8*, u32, int, int);
-extern void hq4x16(u8*, u32, u8*, u8*, u32, int, int);
-extern void hq3x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void hq4x32(u8*, u32, u8*, u8*, u32, int, int);
+extern void hq3x16(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void hq4x16(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void hq3x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void hq4x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
 #endif
-extern void xbrz2x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void xbrz3x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void xbrz4x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void xbrz5x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void xbrz6x32(u8*, u32, u8*, u8*, u32, int, int);
+extern void xbrz2x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void xbrz3x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void xbrz4x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void xbrz5x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void xbrz6x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
 
-extern void SmartIB(u8*, u32, int, int);
-extern void SmartIB32(u8*, u32, int, int);
-extern void MotionBlurIB(u8*, u32, int, int);
-extern void MotionBlurIB32(u8*, u32, int, int);
+extern void SmartIB(uint8_t*, uint32_t, int, int);
+extern void SmartIB32(uint8_t*, uint32_t, int, int);
+extern void MotionBlurIB(uint8_t*, uint32_t, int, int);
+extern void MotionBlurIB32(uint8_t*, uint32_t, int, int);
 
 extern IDisplay* newGDIDisplay();
 extern IDisplay* newDirectDrawDisplay();
@@ -109,7 +109,7 @@ extern SoundDriver* newXAudio2_Output();
 #endif
 
 extern void remoteStubSignal(int, int);
-extern void remoteOutput(char*, u32);
+extern void remoteOutput(char*, uint32_t);
 extern void remoteStubMain();
 extern void remoteSetProtocol(int);
 extern void remoteCleanUp();
@@ -134,9 +134,9 @@ int RGB_LOW_BITS_MASK = 0;
 bool b16to32Video = false;
 int systemFrameSkip = 0;
 int systemSpeed = 0;
-u32 systemColorMap32[0x10000];
-u16 systemColorMap16[0x10000];
-u16 systemGbPalette[24];
+uint32_t systemColorMap32[0x10000];
+uint16_t systemColorMap16[0x10000];
+uint16_t systemGbPalette[24];
 int systemRedShift = 0;
 int systemBlueShift = 0;
 int systemGreenShift = 0;
@@ -149,7 +149,7 @@ int systemVerbose = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 bool soundBufferLow = 0;
 void winSignal(int, int);
-void winOutput(const char*, u32);
+void winOutput(const char*, uint32_t);
 
 #ifdef MMX
 extern "C" bool cpu_mmx;
@@ -160,10 +160,10 @@ float K_fCpuSpeed = 100.0f; // was 98.0f before, but why?
 float K_fTargetFps = 60.0f * K_fCpuSpeed / 100;
 float K_fDT = 1000.0f / K_fTargetFps;
 
-u32 dwTimeElapse;
-u32 dwTime0;
-u32 dwTime1;
-u32 nFrameCnt;
+uint32_t dwTimeElapse;
+uint32_t dwTime0;
+uint32_t dwTime1;
+uint32_t nFrameCnt;
 float fWantFPS;
 float fCurFPS;
 bool bLastSkip;
@@ -369,7 +369,7 @@ VBA::~VBA()
             // record the last joypad change so that the correct time can be
             // recorded
             fwrite(&movieFrame, 1, sizeof(int), movieFile);
-            fwrite(&movieLastJoypad, 1, sizeof(u32), movieFile);
+            fwrite(&movieLastJoypad, 1, sizeof(uint32_t), movieFile);
             fclose(movieFile);
             movieFile = NULL;
         }
@@ -899,14 +899,14 @@ bool systemReadJoypads()
     return false;
 }
 
-u32 systemReadJoypad(int which)
+uint32_t systemReadJoypad(int which)
 {
     if (theApp.input)
         return theApp.input->readDevice(which);
     return 0;
 }
 
-static u8 sensorDarkness = 0xE8; // total darkness (including daylight on rainy days)
+static uint8_t sensorDarkness = 0xE8; // total darkness (including daylight on rainy days)
 
 // TODO: implement
 void systemCartridgeRumble(bool) {}
@@ -914,7 +914,7 @@ void systemPossibleCartridgeRumble(bool) {}
 void updateRumbleFrame() {}
 int systemGetSensorZ() { return 0; }
 
-u8 systemGetSensorDarkness()
+uint8_t systemGetSensorDarkness()
 {
     return sensorDarkness;
 }
@@ -983,7 +983,7 @@ void systemScreenCapture(int captureNumber)
         ((MainWnd*)theApp.m_pMainWnd)->screenCapture(captureNumber);
 }
 
-u32 systemGetClock()
+uint32_t systemGetClock()
 {
     return GetTickCount();
 }
@@ -1049,8 +1049,8 @@ void system10Frames(int rate)
 {
 
     if (autoFrameSkip) {
-        u32 time = systemGetClock();
-        u32 diff = time - autoFrameSkipLastTime;
+        uint32_t time = systemGetClock();
+        uint32_t diff = time - autoFrameSkipLastTime;
         autoFrameSkipLastTime = time;
         if (diff) {
             // countermeasure against div/0 when debugging
@@ -1104,7 +1104,7 @@ void systemScreenMessage(const char* msg)
 
 void systemUpdateSolarSensor()
 {
-    u8 sun = 0x0; //sun = 0xE8 - 0xE8 (case 0 and default)
+    uint8_t sun = 0x0; //sun = 0xE8 - 0xE8 (case 0 and default)
     int level = sunBars / 10;
     switch (level) {
     case 1:
@@ -1217,11 +1217,11 @@ void systemOnSoundShutdown()
     soundRecording = false;
 }
 
-void systemOnWriteDataToSoundBuffer(const u16* finalWave, int length)
+void systemOnWriteDataToSoundBuffer(const uint16_t* finalWave, int length)
 {
     if (soundRecording) {
         if (theApp.soundRecorder) {
-            theApp.soundRecorder->AddSound((const u8*)finalWave, length);
+            theApp.soundRecorder->AddSound((const uint8_t*)finalWave, length);
         } else {
             WAVEFORMATEX format;
             format.cbSize = 0;
@@ -1242,7 +1242,7 @@ void systemOnWriteDataToSoundBuffer(const u16* finalWave, int length)
         if (theApp.skipAudioFrames) {
             theApp.skipAudioFrames--;
         } else {
-            if (false == theApp.aviRecorder->AddAudioFrame((u8*)finalWave)) {
+            if (false == theApp.aviRecorder->AddAudioFrame((uint8_t*)finalWave)) {
                 systemMessage(IDS_AVI_CANNOT_WRITE_AUDIO, "Cannot write audio frame to AVI file.");
                 delete theApp.aviRecorder;
                 theApp.aviRecorder = NULL;
@@ -1608,7 +1608,7 @@ void VBA::loadSettings()
         gbPaletteOption = 2;
 
     regQueryBinaryValue("gbPalette", (char*)systemGbPalette,
-        24 * sizeof(u16));
+        24 * sizeof(uint16_t));
 
     rewindTimer = regQueryDwordValue("rewindTimer", 0);
 
@@ -2393,7 +2393,7 @@ void VBA::movieReadNext()
         bool movieEnd = false;
 
         if (fread(&moviePlayFrame, 1, sizeof(int), movieFile) == sizeof(int)) {
-            if (fread(&movieNextJoypad, 1, sizeof(u32), movieFile) == sizeof(int)) {
+            if (fread(&movieNextJoypad, 1, sizeof(uint32_t), movieFile) == sizeof(int)) {
                 // make sure we don't have spurious entries on the movie that can
                 // cause us to play it forever
                 if (moviePlayFrame <= movieFrame)
@@ -2530,7 +2530,7 @@ void VBA::saveSettings()
     regSetDwordValue("gbPaletteOption", gbPaletteOption);
 
     regSetBinaryValue("gbPalette", (char*)systemGbPalette,
-        24 * sizeof(u16));
+        24 * sizeof(uint16_t));
 
     regSetDwordValue("rewindTimer", rewindTimer / 6);
 
@@ -2593,7 +2593,7 @@ void winSignal(int, int)
 #define CPUReadByteQuick(addr) \
     map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]
 
-void winOutput(const char* s, u32 addr)
+void winOutput(const char* s, uint32_t addr)
 {
     if (s) {
         toolsLog(s);
@@ -2670,8 +2670,8 @@ bool Sm60FPS_CanSkipFrame()
 void Sm60FPS_Sleep()
 {
     if (autoFrameSkip) {
-        u32 dwTimePass = Sm60FPS::dwTimeElapse + (GetTickCount() - Sm60FPS::dwTime0);
-        u32 dwTimeShould = (u32)(Sm60FPS::nFrameCnt * Sm60FPS::K_fDT);
+        uint32_t dwTimePass = Sm60FPS::dwTimeElapse + (GetTickCount() - Sm60FPS::dwTime0);
+        uint32_t dwTimeShould = (uint32_t)(Sm60FPS::nFrameCnt * Sm60FPS::K_fDT);
         if (dwTimeShould > dwTimePass && !gba_joybus_active) {
             Sleep(dwTimeShould - dwTimePass);
         }

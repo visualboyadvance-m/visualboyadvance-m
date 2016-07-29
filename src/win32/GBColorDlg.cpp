@@ -7,9 +7,9 @@
 extern int gbPaletteOption;
 extern int emulating;
 extern int cartridgeType;
-extern u16 gbPalette[128];
+extern uint16_t gbPalette[128];
 
-static u16 defaultPalettes[][24] = {
+static uint16_t defaultPalettes[][24] = {
     {
         0x7FFF, 0x56B5, 0x318C, 0x0000, 0x7FFF, 0x56B5, 0x318C, 0x0000,
     },
@@ -188,7 +188,7 @@ void GBColorDlg::setWhich(int w)
     }
 }
 
-u16* GBColorDlg::getColors()
+uint16_t* GBColorDlg::getColors()
 {
     return colors;
 }
@@ -197,7 +197,7 @@ void GBColorDlg::OnColorClicked(UINT id)
 {
     id -= IDC_COLOR_BG0;
 
-    u16 color = colors[which * 8 + id];
+    uint16_t color = colors[which * 8 + id];
 
     COLORREF colorInit = RGB((color & 0x1f) << 3, ((color >> 5) & 0x1f) << 3, ((color >> 10) & 0x1f) << 3);
 
@@ -207,7 +207,7 @@ void GBColorDlg::OnColorClicked(UINT id)
     if (IDOK == dlg.DoModal()) {
         COLORREF c = dlg.GetColor();
 
-        colors[which * 8 + id] = (u16)((c >> 3) & 0x1f | ((c >> 11) & 0x1f) << 5 | ((c >> 19) & 0x1f) << 10);
+        colors[which * 8 + id] = (uint16_t)((c >> 3) & 0x1f | ((c >> 11) & 0x1f) << 5 | ((c >> 19) & 0x1f) << 10);
 
         colorControls[id].setColor(colors[which * 8 + id]);
     }

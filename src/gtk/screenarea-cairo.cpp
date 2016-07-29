@@ -33,7 +33,7 @@ ScreenAreaCairo::ScreenAreaCairo(int _iWidth, int _iHeight, int _iScale)
     vUpdateSize();
 }
 
-void ScreenAreaCairo::vDrawPixels(u8* _puiData)
+void ScreenAreaCairo::vDrawPixels(uint8_t* _puiData)
 {
     ScreenArea::vDrawPixels(_puiData);
 
@@ -48,14 +48,14 @@ bool ScreenAreaCairo::on_expose_event(GdkEventExpose* _pstEvent)
     Cairo::RefPtr<Cairo::SurfacePattern> poPattern;
     Cairo::RefPtr<Cairo::Context> poContext;
     Cairo::Matrix oMatrix;
-    const int iScaledPitch = (m_iScaledWidth + 1) * sizeof(u32);
+    const int iScaledPitch = (m_iScaledWidth + 1) * sizeof(uint32_t);
 
     poContext = get_window()->create_cairo_context();
 
     //poContext->set_identity_matrix();
     poContext->scale(m_dScaleFactor, m_dScaleFactor);
 
-    poImage = Cairo::ImageSurface::create((u8*)m_puiPixels, Cairo::FORMAT_RGB24,
+    poImage = Cairo::ImageSurface::create((uint8_t*)m_puiPixels, Cairo::FORMAT_RGB24,
         m_iScaledWidth, m_iScaledHeight, iScaledPitch);
 
     //cairo_matrix_init_translate(&oMatrix, -m_iAreaLeft, -m_iAreaTop);
@@ -77,12 +77,12 @@ bool ScreenAreaCairo::on_draw(const Cairo::RefPtr<Cairo::Context>& poContext)
     Cairo::RefPtr<Cairo::ImageSurface> poImage;
     Cairo::RefPtr<Cairo::SurfacePattern> poPattern;
     Cairo::Matrix oMatrix;
-    const int iScaledPitch = (m_iScaledWidth + 1) * sizeof(u32);
+    const int iScaledPitch = (m_iScaledWidth + 1) * sizeof(uint32_t);
 
     //poContext->set_identity_matrix();
     poContext->scale(m_dScaleFactor, m_dScaleFactor);
 
-    poImage = Cairo::ImageSurface::create((u8*)m_puiPixels, Cairo::FORMAT_RGB24,
+    poImage = Cairo::ImageSurface::create((uint8_t*)m_puiPixels, Cairo::FORMAT_RGB24,
         m_iScaledWidth, m_iScaledHeight, iScaledPitch);
 
     //cairo_matrix_init_translate(&oMatrix, -m_iAreaLeft, -m_iAreaTop);
@@ -102,7 +102,7 @@ bool ScreenAreaCairo::on_draw(const Cairo::RefPtr<Cairo::Context>& poContext)
 void ScreenAreaCairo::vDrawBlackScreen()
 {
     if (m_puiPixels && get_realized()) {
-        memset(m_puiPixels, 0, m_iHeight * (m_iWidth + 1) * sizeof(u32));
+        memset(m_puiPixels, 0, m_iHeight * (m_iWidth + 1) * sizeof(uint32_t));
         queue_draw_area(0, 0, get_width(), get_height());
     }
 }

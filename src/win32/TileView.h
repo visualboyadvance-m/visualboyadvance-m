@@ -22,7 +22,7 @@ class TileView : public ResizeDlg, IUpdateListener {
     int palette;
     BitmapControl tileView;
     BITMAPINFO bmpInfo;
-    u8* data;
+    uint8_t* data;
     ZoomControl zoom;
     ColorControl color;
     int w;
@@ -32,8 +32,8 @@ class TileView : public ResizeDlg, IUpdateListener {
 public:
     void paint();
     void render();
-    void renderTile16(int tile, int x, int y, u8* charBase, u16* palette);
-    void renderTile256(int tile, int x, int y, u8* charBase, u16* palette);
+    void renderTile16(int tile, int x, int y, uint8_t* charBase, uint16_t* palette);
+    void renderTile256(int tile, int x, int y, uint8_t* charBase, uint16_t* palette);
     void savePNG(const char* name);
     void saveBMP(const char* name);
     TileView(CWnd* pParent = NULL); // standard constructor

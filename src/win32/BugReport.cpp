@@ -150,9 +150,9 @@ CString BugReport::createReport()
 
         char buffer[20];
         if (theApp.cartridgeType == 0) {
-            u32 check = 0;
+            uint32_t check = 0;
             for (int i = 0; i < 0x4000; i += 4) {
-                check += *((u32*)&bios[i]);
+                check += *((uint32_t*)&bios[i]);
             }
             AppendFormat(report, "BIOS Checksum: %08X\r\n", check);
 
@@ -165,10 +165,10 @@ CString BugReport::createReport()
             AppendFormat(report, "Game code    : %s\r\n", buffer);
 
             CString res = "";
-            u32* p = (u32*)rom;
-            u32* end = (u32*)((char*)rom + theApp.romSize);
+            uint32_t* p = (uint32_t*)rom;
+            uint32_t* end = (uint32_t*)((char*)rom + theApp.romSize);
             while (p < end) {
-                u32 d = READ32LE(p);
+                uint32_t d = READ32LE(p);
 
                 if (d == 0x52504545) {
                     if (memcmp(p, "EEPROM_", 7) == 0) {

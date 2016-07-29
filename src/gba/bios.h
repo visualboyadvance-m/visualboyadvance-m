@@ -18,7 +18,7 @@ extern void BIOS_LZ77UnCompVram();
 extern void BIOS_LZ77UnCompWram();
 extern void BIOS_ObjAffineSet();
 extern void BIOS_RegisterRamReset();
-extern void BIOS_RegisterRamReset(u32);
+extern void BIOS_RegisterRamReset(uint32_t);
 extern void BIOS_RLUnCompVram();
 extern void BIOS_RLUnCompWram();
 extern void BIOS_SoftReset();

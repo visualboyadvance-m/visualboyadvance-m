@@ -84,16 +84,16 @@ void GBACheatSearch::OnStart()
         CheatSearchBlock* block = &cheatSearchData.blocks[0];
         block->size = 0x40000;
         block->offset = 0x2000000;
-        block->bits = (u8*)malloc(0x40000 >> 3);
+        block->bits = (uint8_t*)malloc(0x40000 >> 3);
         block->data = workRAM;
-        block->saved = (u8*)malloc(0x40000);
+        block->saved = (uint8_t*)malloc(0x40000);
 
         block = &cheatSearchData.blocks[1];
         block->size = 0x8000;
         block->offset = 0x3000000;
-        block->bits = (u8*)malloc(0x8000 >> 3);
+        block->bits = (uint8_t*)malloc(0x8000 >> 3);
         block->data = internalRAM;
-        block->saved = (u8*)malloc(0x8000);
+        block->saved = (uint8_t*)malloc(0x8000);
 
         cheatSearchData.count = 2;
     }
@@ -151,7 +151,7 @@ void GBACheatSearch::OnAddCheat()
         item.mask = LVIF_PARAM;
         item.iItem = mark;
         if (m_list.GetItem(&item)) {
-            AddCheat dlg((u32)item.lParam);
+            AddCheat dlg((uint32_t)item.lParam);
             dlg.DoModal();
         }
     }
@@ -341,7 +341,7 @@ void GBACheatSearch::addChanges(bool showMsgs)
     }
 }
 
-void GBACheatSearch::addChange(int index, u32 address, u32 oldValue, u32 newValue)
+void GBACheatSearch::addChange(int index, uint32_t address, uint32_t oldValue, uint32_t newValue)
 {
     data[index].addr = address;
     sprintf(data[index].address, "%08x", address);
@@ -474,7 +474,7 @@ void GBACheatSearch::OnSizeType(UINT id)
 /////////////////////////////////////////////////////////////////////////////
 // AddCheat dialog
 
-AddCheat::AddCheat(u32 address, CWnd* pParent /*=NULL*/)
+AddCheat::AddCheat(uint32_t address, CWnd* pParent /*=NULL*/)
     : CDialog(AddCheat::IDD, pParent)
 {
     //{{AFX_DATA_INIT(AddCheat)
@@ -602,7 +602,7 @@ bool AddCheat::addCheat()
     CString code;
 
     m_address.GetWindowText(buffer);
-    u32 address = 0;
+    uint32_t address = 0;
     sscanf(buffer, "%x", &address);
     if ((address >= 0x02000000 && address < 0x02040000) || (address >= 0x03000000 && address < 0x03008000)) {
     } else {
@@ -621,7 +621,7 @@ bool AddCheat::addCheat()
             return false;
         }
     }
-    u32 value;
+    uint32_t value;
     m_value.GetWindowText(buffer);
 
     if (buffer.IsEmpty()) {

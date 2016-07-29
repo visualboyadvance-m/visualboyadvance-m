@@ -143,7 +143,7 @@ void ZoomControl::OnLButtonDown(UINT nFlags, CPoint point)
     selected = point.x / multX + 8 * (point.y / multY);
 
     int c = point.x / multX + 8 * (point.y / multY);
-    u16 color = colors[c * 3] << 7 | colors[c * 3 + 1] << 2 | (colors[c * 3 + 2] >> 3);
+    uint16_t color = colors[c * 3] << 7 | colors[c * 3 + 1] << 2 | (colors[c * 3 + 2] >> 3);
 
     GetParent()->PostMessage(WM_COLINFO,
         color,
@@ -157,7 +157,7 @@ BOOL ZoomControl::OnEraseBkgnd(CDC* pDC)
     return TRUE;
 }
 
-void ZoomControl::setColors(const u8* c)
+void ZoomControl::setColors(const uint8_t* c)
 {
     memcpy(colors, c, 3 * 64);
     selected = -1;

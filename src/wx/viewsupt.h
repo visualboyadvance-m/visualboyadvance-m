@@ -1,8 +1,16 @@
 #ifndef WX_VIEWSUPT_H
 #define WX_VIEWSUPT_H
 
+#include <wx/window.h>
 #include <wx/caret.h>
 #include <wx/spinctrl.h>
+#include <wx/dialog.h>
+#include <wx/panel.h>
+#include <wx/dialog.h>
+#include <wx/textctrl.h>
+#include <wx/scrolbar.h>
+#include <wx/stattext.h>
+#include <wx/checkbox.h>
 
 // avoid exporting too much stuff
 namespace Viewers {
@@ -106,7 +114,7 @@ private:
 
 public:
     // make addr visible and then select it
-    void SetSel(u32 addr);
+    void SetSel(uint32_t addr);
     void UnSel()
     {
         issel = false;
@@ -121,9 +129,9 @@ public:
     // how far back to scroll for single line
     int back_size;
     // address of top line
-    u32 topaddr;
+    uint32_t topaddr;
     // max address for scrollbar
-    u32 maxaddr;
+    uint32_t maxaddr;
 
 protected:
     // assigned to textctrl to avoid mouse input
@@ -138,7 +146,7 @@ protected:
     // need to know if tc/sb have been Create()d yet
     bool didinit;
     // selection info
-    u32 seladdr;
+    uint32_t seladdr;
     bool issel;
 
     DECLARE_DYNAMIC_CLASS() // for xrc
@@ -181,22 +189,22 @@ private:
 
 public:
     // make addr visible
-    void Show(u32 addr, bool force_update = false);
+    void Show(uint32_t addr, bool force_update = false);
 
     // current selection, or topaddr if none
-    u32 GetAddr();
+    uint32_t GetAddr();
     // currently visible lines
     int nlines;
     // at least nlines * 4 words to display
     wxArrayInt words;
     // address of top line
-    u32 topaddr;
+    uint32_t topaddr;
     // max address for scrollbar
-    u32 maxaddr;
+    uint32_t maxaddr;
     // bytes per word == (1 << fmt)
     int fmt;
     // after write, these contain write addr and val
-    u32 writeaddr, writeval;
+    uint32_t writeaddr, writeval;
     // when selection is made, this widget is updated w/ addr
     wxControl* addrlab;
 

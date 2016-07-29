@@ -708,7 +708,7 @@ bool MainWnd::fileImportGSACodeFile(CString& fileName)
         return false;
     }
 
-    u32 len;
+    uint32_t len;
     fread(&len, 1, 4, f);
     if (len != 14) {
         fclose(f);

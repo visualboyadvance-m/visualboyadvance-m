@@ -115,11 +115,11 @@ public:
 
     Input* input;
 
-    u8* delta[257 * 244 * 4];
+    uint8_t* delta[257 * 244 * 4];
     unsigned int maxCpuCores; // maximum number of CPU cores VBA should use, 0 means auto-detect
     unsigned int skipAudioFrames;
-    void (*filterFunction)(u8*, u32, u8*, u8*, u32, int, int);
-    void (*ifbFunction)(u8*, u32, int, int);
+    void (*filterFunction)(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+    void (*ifbFunction)(uint8_t*, uint32_t, int, int);
     WavWriter* soundRecorder;
 
     bool changingVideoSize;

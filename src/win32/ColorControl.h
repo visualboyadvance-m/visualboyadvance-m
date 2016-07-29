@@ -30,8 +30,8 @@ public:
 
     // Implementation
 public:
-    void setColor(u16 c);
-    u16 color;
+    void setColor(uint16_t c);
+    uint16_t color;
     virtual ~ColorControl();
 
     // Generated message map functions

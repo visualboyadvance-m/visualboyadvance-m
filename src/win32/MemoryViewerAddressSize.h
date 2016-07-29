@@ -12,15 +12,15 @@
 // MemoryViewerAddressSize dialog
 
 class MemoryViewerAddressSize : public CDialog {
-    u32 address;
+    uint32_t address;
     int size;
     // Construction
 public:
     int getSize();
-    u32 getAddress();
+    uint32_t getAddress();
     void setSize(int s);
-    void setAddress(u32 a);
-    MemoryViewerAddressSize(u32 a = 0xffffff, int s = -1, CWnd* pParent = NULL); // standard
+    void setAddress(uint32_t a);
+    MemoryViewerAddressSize(uint32_t a = 0xffffff, int s = -1, CWnd* pParent = NULL); // standard
     // constructor
 
     // Dialog Data

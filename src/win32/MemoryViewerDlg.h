@@ -14,8 +14,8 @@
 class GBAMemoryViewer : public MemoryViewer {
 public:
     GBAMemoryViewer();
-    virtual void readData(u32, int, u8*);
-    virtual void editData(u32, int, int, u32);
+    virtual void readData(uint32_t, int, uint8_t*);
+    virtual void editData(uint32_t, int, int, uint32_t);
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ class MemoryViewerDlg : public ResizeDlg, IUpdateListener, IMemoryViewerDlg {
     GBAMemoryViewer m_viewer;
     // Construction
 public:
-    void setCurrentAddress(u32 address);
+    void setCurrentAddress(uint32_t address);
     bool autoUpdate;
     void update();
     MemoryViewerDlg(CWnd* pParent = NULL); // standard constructor

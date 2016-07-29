@@ -21,7 +21,7 @@ class GBTileView : public ResizeDlg, IUpdateListener {
     int bank;
     BitmapControl tileView;
     BITMAPINFO bmpInfo;
-    u8* data;
+    uint8_t* data;
     ZoomControl zoom;
     ColorControl color;
     int w;
@@ -31,7 +31,7 @@ class GBTileView : public ResizeDlg, IUpdateListener {
 public:
     void paint();
     void render();
-    void renderTile(int tile, int x, int y, u8* charBase);
+    void renderTile(int tile, int x, int y, uint8_t* charBase);
     void savePNG(const char* name);
     void saveBMP(const char* name);
     GBTileView(CWnd* pParent = NULL); // standard constructor

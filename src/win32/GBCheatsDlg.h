@@ -12,7 +12,7 @@
 
 struct WinGbCheatsData {
     int bank;
-    u16 addr;
+    uint16_t addr;
     char address[9];
     char oldValue[12];
     char newValue[12];
@@ -26,8 +26,8 @@ public:
     afx_msg void OnSearchType(UINT id);
     afx_msg void OnValueType(UINT id);
     void addChanges(bool showMsg);
-    void addChange(int index, int bank, u16 address, int offset, u32 oldValue, u32 newValue);
-    int getBank(u16 addr, int j);
+    void addChange(int index, int bank, uint16_t address, int offset, uint32_t oldValue, uint32_t newValue);
+    int getBank(uint16_t addr, int j);
     GBCheatSearch(CWnd* pParent = NULL); // standard constructor
     ~GBCheatSearch();
 
@@ -77,7 +77,7 @@ public:
     afx_msg void OnSizeType(UINT id);
     afx_msg void OnNumberType(UINT id);
     bool addCheat();
-    AddGBCheat(u32 addr, CWnd* pParent = NULL); // standard constructor
+    AddGBCheat(uint32_t addr, CWnd* pParent = NULL); // standard constructor
 
     // Dialog Data
     //{{AFX_DATA(AddGBCheat)

@@ -32,7 +32,7 @@ void gbCheatRemove(int);
 void gbCheatRemoveAll();
 void gbCheatEnable(int);
 void gbCheatDisable(int);
-uint8_t gbCheatRead(u16);
+uint8_t gbCheatRead(uint16_t);
 void gbCheatWrite(bool);
 bool gbVerifyGsCode(const char* code);
 bool gbVerifyGgCode(const char* code);

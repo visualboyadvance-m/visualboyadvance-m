@@ -210,7 +210,7 @@ void BitmapControl::setBmpInfo(BITMAPINFO* info)
     bmpInfo = info;
 }
 
-void BitmapControl::setData(u8* d)
+void BitmapControl::setData(uint8_t* d)
 {
     data = d;
 }

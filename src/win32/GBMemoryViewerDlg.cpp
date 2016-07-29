@@ -21,9 +21,9 @@ GBMemoryViewer::GBMemoryViewer()
     setAddressSize(1);
 }
 
-void GBMemoryViewer::readData(u32 address, int len, u8* data)
+void GBMemoryViewer::readData(uint32_t address, int len, uint8_t* data)
 {
-    u16 addr = address & 0xffff;
+    uint16_t addr = address & 0xffff;
     if (emulating && gbRom != NULL) {
         for (int i = 0; i < len; i++) {
             *data++ = gbMemoryMap[addr >> 12][addr & 0xfff];
@@ -43,28 +43,28 @@ void GBMemoryViewer::readData(u32 address, int len, u8* data)
 #define GB_WRITEBYTE_QUICK(addr, v) \
     gbMemoryMap[(addr) >> 12][(addr)&0xfff] = (v)
 
-void GBMemoryViewer::editData(u32 address, int size, int mask, u32 value)
+void GBMemoryViewer::editData(uint32_t address, int size, int mask, uint32_t value)
 {
-    u32 oldValue;
-    u16 addr = (u16)address & 0xffff;
+    uint32_t oldValue;
+    uint16_t addr = (uint16_t)address & 0xffff;
     switch (size) {
     case 8:
         oldValue = GB_READBYTE_QUICK(addr);
         oldValue &= mask;
-        oldValue |= (u8)value;
+        oldValue |= (uint8_t)value;
         GB_WRITEBYTE_QUICK(addr, oldValue);
         break;
     case 16:
         oldValue = GB_READBYTE_QUICK(addr) | (GB_READBYTE_QUICK(addr + 1) << 8);
         oldValue &= mask;
-        oldValue |= (u16)value;
+        oldValue |= (uint16_t)value;
         GB_WRITEBYTE_QUICK(addr, (oldValue & 255));
         GB_WRITEBYTE_QUICK(addr + 1, (oldValue >> 8));
         break;
     case 32:
         oldValue = GB_READBYTE_QUICK(addr) | (GB_READBYTE_QUICK(addr + 1) << 8) | (GB_READBYTE_QUICK(addr + 2) << 16) | (GB_READBYTE_QUICK(addr + 3) << 24);
         oldValue &= mask;
-        oldValue |= (u32)value;
+        oldValue |= (uint32_t)value;
         GB_WRITEBYTE_QUICK(addr, (oldValue & 255));
         GB_WRITEBYTE_QUICK(addr + 1, (oldValue >> 8));
         GB_WRITEBYTE_QUICK(addr + 2, (oldValue >> 16));
@@ -240,7 +240,7 @@ void GBMemoryViewerDlg::OnGo()
 
     m_address.GetWindowText(buffer);
 
-    u32 address;
+    uint32_t address;
     sscanf(buffer, "%x", &address);
     if (m_viewer.getSize() == 1)
         address &= ~1;
@@ -281,7 +281,7 @@ void GBMemoryViewerDlg::OnSelchangeAddresses()
     }
 }
 
-void GBMemoryViewerDlg::setCurrentAddress(u32 address)
+void GBMemoryViewerDlg::setCurrentAddress(uint32_t address)
 {
     CString buffer;
 
@@ -321,7 +321,7 @@ void GBMemoryViewerDlg::OnSave()
             }
 
             int size = dlg.getSize();
-            u16 addr = dlg.getAddress() & 0xffff;
+            uint16_t addr = dlg.getAddress() & 0xffff;
 
             for (int i = 0; i < size; i++) {
                 fputc(gbMemoryMap[addr >> 12][addr & 0xfff], f);
@@ -372,7 +372,7 @@ void GBMemoryViewerDlg::OnLoad()
 
         if (dlg.DoModal() == IDOK) {
             int size = dlg.getSize();
-            u16 addr = dlg.getAddress() & 0xffff;
+            uint16_t addr = dlg.getAddress() & 0xffff;
 
             for (int i = 0; i < size; i++) {
                 int c = fgetc(f);

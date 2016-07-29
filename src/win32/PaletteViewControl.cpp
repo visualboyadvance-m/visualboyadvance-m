@@ -25,7 +25,7 @@ PaletteViewControl::PaletteViewControl()
     bmpInfo.bmiHeader.biPlanes = 1;
     bmpInfo.bmiHeader.biBitCount = 24;
     bmpInfo.bmiHeader.biCompression = BI_RGB;
-    data = (u8*)malloc(3 * 256 * 256);
+    data = (uint8_t*)malloc(3 * 256 * 256);
 
     w = 256;
     h = 256;
@@ -75,17 +75,17 @@ bool PaletteViewControl::saveAdobe(const char* name)
         return false;
 
     for (int i = 0; i < colors; i++) {
-        u16 c = palette[i];
+        uint16_t c = palette[i];
         int r = (c & 0x1f) << 3;
         int g = (c & 0x3e0) >> 2;
         int b = (c & 0x7c00) >> 7;
 
-        u8 data[3] = { r, g, b };
+        uint8_t data[3] = { r, g, b };
         fwrite(data, 1, 3, f);
     }
     if (colors < 256) {
         for (int i = colors; i < 256; i++) {
-            u8 data[3] = { 0, 0, 0 };
+            uint8_t data[3] = { 0, 0, 0 };
             fwrite(data, 1, 3, f);
         }
     }
@@ -101,14 +101,14 @@ bool PaletteViewControl::saveMSPAL(const char* name)
     if (!f)
         return false;
 
-    u8 data[4] = { 'R', 'I', 'F', 'F' };
+    uint8_t data[4] = { 'R', 'I', 'F', 'F' };
 
     fwrite(data, 1, 4, f);
     utilPutDword(data, 256 * 4 + 16);
     fwrite(data, 1, 4, f);
-    u8 data3[4] = { 'P', 'A', 'L', ' ' };
+    uint8_t data3[4] = { 'P', 'A', 'L', ' ' };
     fwrite(data3, 1, 4, f);
-    u8 data4[4] = { 'd', 'a', 't', 'a' };
+    uint8_t data4[4] = { 'd', 'a', 't', 'a' };
     fwrite(data4, 1, 4, f);
     utilPutDword(data, 256 * 4 + 4);
     fwrite(data, 1, 4, f);
@@ -117,17 +117,17 @@ bool PaletteViewControl::saveMSPAL(const char* name)
     fwrite(data, 1, 4, f);
 
     for (int i = 0; i < colors; i++) {
-        u16 c = palette[i];
+        uint16_t c = palette[i];
         int r = (c & 0x1f) << 3;
         int g = (c & 0x3e0) >> 2;
         int b = (c & 0x7c00) >> 7;
 
-        u8 data7[4] = { r, g, b, 0 };
+        uint8_t data7[4] = { r, g, b, 0 };
         fwrite(data7, 1, 4, f);
     }
     if (colors < 256) {
         for (int i = colors; i < 256; i++) {
-            u8 data7[4] = { 0, 0, 0, 0 };
+            uint8_t data7[4] = { 0, 0, 0, 0 };
             fwrite(data7, 1, 4, f);
         }
     }
@@ -146,7 +146,7 @@ bool PaletteViewControl::saveJASCPAL(const char* name)
     fprintf(f, "JASC-PAL\r\n0100\r\n256\r\n");
 
     for (int i = 0; i < colors; i++) {
-        u16 c = palette[i];
+        uint16_t c = palette[i];
         int r = (c & 0x1f) << 3;
         int g = (c & 0x3e0) >> 2;
         int b = (c & 0x7c00) >> 7;
@@ -173,9 +173,9 @@ void PaletteViewControl::setSelected(int s)
     InvalidateRect(NULL, FALSE);
 }
 
-void PaletteViewControl::render(u16 color, int x, int y)
+void PaletteViewControl::render(uint16_t color, int x, int y)
 {
-    u8* start = data + y * 16 * w * 3 + x * 16 * 3;
+    uint8_t* start = data + y * 16 * w * 3 + x * 16 * 3;
     int skip = w * 3 - 16 * 3;
 
     int r = (color & 0x1f) << 3;

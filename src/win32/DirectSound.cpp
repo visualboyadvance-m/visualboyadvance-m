@@ -41,7 +41,7 @@ public:
     void pause(); // pause the secondary sound buffer
     void reset(); // stop and reset the secondary sound buffer
     void resume(); // resume the secondary sound buffer
-    void write(u16* finalWave, int length); // write the emulated sound to the secondary sound buffer
+    void write(uint16_t* finalWave, int length); // write the emulated sound to the secondary sound buffer
 };
 
 DirectSound::DirectSound()
@@ -219,7 +219,7 @@ void DirectSound::resume()
     dsbSecondary->Play(0, 0, DSBPLAY_LOOPING);
 }
 
-void DirectSound::write(u16* finalWave, int length)
+void DirectSound::write(uint16_t* finalWave, int length)
 {
     if (!pDirectSound)
         return;

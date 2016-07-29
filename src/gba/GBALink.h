@@ -108,14 +108,14 @@ extern int GetLinkPlayerId();
  *
  * @param siocnt the value of SIOCNT to be written
  */
-extern void StartLink(u16 siocnt);
+extern void StartLink(uint16_t siocnt);
 
 /**
  * Start a general purpose link transfer
  *
  * @param rcnt the value of RCNT to be written
  */
-extern void StartGPLink(u16 rcnt);
+extern void StartGPLink(uint16_t rcnt);
 
 /**
  * Emulate the linked device
@@ -185,22 +185,22 @@ extern const char* MakeInstanceFilename(const char* Input);
 #define RF_CNT 0x27a // Unknown, Seems to be related to Wireless Adapter(RF_SIOCNT?)
 
 typedef struct {
-    u8 len; // data len in 32bit words
-    u8 gbaid; // source id
-    u32 time; // linktime
-    u32 data[255];
+    uint8_t len; // data len in 32bit words
+    uint8_t gbaid; // source id
+    uint32_t time; // linktime
+    uint32_t data[255];
 } rfu_datarec;
 
-extern u8 gbSIO_SC;
+extern uint8_t gbSIO_SC;
 extern bool LinkIsWaiting;
 extern bool LinkFirstTime;
 extern bool EmuReseted;
 extern void gbInitLink();
-extern u8 gbStartLink(u8 b);
-extern u16 gbLinkUpdate(u8 b, int gbSerialOn);
+extern uint8_t gbStartLink(uint8_t b);
+extern uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn);
 extern void gbInitLinkIPC();
-extern u8 gbStartLinkIPC(u8 b);
-extern u16 gbLinkUpdateIPC(u8 b, int gbSerialOn);
+extern uint8_t gbStartLinkIPC(uint8_t b);
+extern uint16_t gbLinkUpdateIPC(uint8_t b, int gbSerialOn);
 
 extern void BootLink(int m_type, const char* host, int timeout, bool m_hacks, int m_numplayers);
 

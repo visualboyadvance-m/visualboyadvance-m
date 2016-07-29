@@ -60,13 +60,13 @@ void MemoryViewer::setDialog(IMemoryViewerDlg* d)
     dlg = d;
 }
 
-void MemoryViewer::setAddress(u32 a)
+void MemoryViewer::setAddress(uint32_t a)
 {
     address = a;
     if (displayedLines) {
         if (addressSize) {
-            u16 addr = address;
-            if ((u16)(addr + (displayedLines << 4)) < addr) {
+            uint16_t addr = address;
+            if ((uint16_t)(addr + (displayedLines << 4)) < addr) {
                 address = 0xffff - (displayedLines << 4) + 1;
             }
         } else {
@@ -149,11 +149,11 @@ void MemoryViewer::OnPaint()
 
     updateScrollInfo(lines);
 
-    u32 addr = address;
+    uint32_t addr = address;
 
     memDC.SetTextColor(RGB(0, 0, 0));
 
-    u8 data[32];
+    uint8_t data[32];
 
     RECT r;
     r.top = 3;
@@ -447,7 +447,7 @@ void MemoryViewer::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     }
 }
 
-void MemoryViewer::moveAddress(s32 offset, int nibbleOff)
+void MemoryViewer::moveAddress(int32_t offset, int nibbleOff)
 {
     if (offset == 0) {
         if (nibbleOff == -1) {
@@ -456,7 +456,7 @@ void MemoryViewer::moveAddress(s32 offset, int nibbleOff)
                 editAddress -= (maxNibble + 1) >> 1;
                 editNibble = maxNibble;
             }
-            if (address == 0 && (editAddress >= (u32)(displayedLines << 4))) {
+            if (address == 0 && (editAddress >= (uint32_t)(displayedLines << 4))) {
                 editAddress = 0;
                 editNibble = 0;
                 beep();
@@ -522,7 +522,7 @@ bool MemoryViewer::OnEditInput(UINT c)
     if (!editAscii)
         c = tolower(c);
 
-    u32 value = 256;
+    uint32_t value = 256;
 
     if (c >= 'a' && c <= 'f')
         value = 10 + (c - 'a');
@@ -535,7 +535,7 @@ bool MemoryViewer::OnEditInput(UINT c)
     } else {
         if (value != 256) {
             value <<= 4 * (maxNibble - editNibble);
-            u32 mask = ~(15 << 4 * (maxNibble - editNibble));
+            uint32_t mask = ~(15 << 4 * (maxNibble - editNibble));
             switch (dataSize) {
             case 0:
                 editData(editAddress, 8, mask, value);
@@ -581,7 +581,7 @@ void MemoryViewer::setAddressSize(int s)
     addressSize = s;
 }
 
-u32 MemoryViewer::getCurrentAddress()
+uint32_t MemoryViewer::getCurrentAddress()
 {
     return editAddress;
 }
