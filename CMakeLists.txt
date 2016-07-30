@@ -1,7 +1,7 @@
 # The project's name is VBA-M it uses C and C++ code
 PROJECT(VBA-M C CXX)
 
-cmake_minimum_required( VERSION 2.6.0 )
+cmake_minimum_required( VERSION 3.1.0 )
 if( COMMAND cmake_policy )
     cmake_policy( SET CMP0003 NEW )
     cmake_policy( SET CMP0005 OLD )
@@ -491,6 +491,8 @@ ADD_LIBRARY (
     ${SRC_DEBUGGER}
     ${HDR_DEBUGGER}
 )
+set_property(TARGET vbamcore PROPERTY CXX_STANDARD 11)
+set_property(TARGET vbamcore PROPERTY CXX_STANDARD_REQUIRED ON)
 
 IF( ENABLE_SDL )
     ADD_EXECUTABLE (
@@ -499,6 +501,8 @@ IF( ENABLE_SDL )
         ${SRC_SDL}
         ${HDR_SDL}
     )
+    set_property(TARGET vbam PROPERTY CXX_STANDARD 11)
+    set_property(TARGET vbam PROPERTY CXX_STANDARD_REQUIRED ON)
 
     IF( WIN32 )
         SET( WIN32_LIBRARIES wsock32 )
