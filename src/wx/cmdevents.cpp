@@ -2416,6 +2416,9 @@ EVT_HANDLER(wxID_ABOUT, "About...")
     ai.SetName(wxT("VisualBoyAdvance-M"));
     wxString version = wxT("");
 #ifndef FINAL_BUILD
+#ifndef VERSION
+# define VERSION "git"
+#endif
 
     if (!version.IsEmpty())
         version = version + wxT("-");
