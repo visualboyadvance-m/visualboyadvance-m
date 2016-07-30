@@ -1,5 +1,5 @@
 /* CpuArch.h -- CPU specific code
-2010-10-26: Igor Pavlov : Public domain */
+2010-12-01: Igor Pavlov : Public domain */
 
 #ifndef __CPU_ARCH_H
 #define __CPU_ARCH_H
@@ -10,8 +10,7 @@ EXTERN_C_BEGIN
 
 /*
 MY_CPU_LE means that CPU is LITTLE ENDIAN.
-If MY_CPU_LE is not defined, we don't know about that property of platform (it can be LITTLE
-ENDIAN).
+If MY_CPU_LE is not defined, we don't know about that property of platform (it can be LITTLE ENDIAN).
 
 MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned memory accesses.
 If MY_CPU_LE_UNALIGN is not defined, we don't know about these properties of platform.
@@ -49,12 +48,11 @@ If MY_CPU_LE_UNALIGN is not defined, we don't know about these properties of pla
 #define MY_CPU_LE_UNALIGN
 #endif
 
-#if defined(MY_CPU_X86_OR_AMD64) || defined(MY_CPU_ARM_LE) || defined(MY_CPU_IA64_LE) ||           \
-    defined(__ARMEL__) || defined(__MIPSEL__) || defined(__LITTLE_ENDIAN__)
+#if defined(MY_CPU_X86_OR_AMD64) || defined(MY_CPU_ARM_LE)  || defined(MY_CPU_IA64_LE) || defined(__ARMEL__) || defined(__MIPSEL__) || defined(__LITTLE_ENDIAN__)
 #define MY_CPU_LE
 #endif
 
-#if defined(__BIG_ENDIAN__)
+#if defined(__BIG_ENDIAN__) || defined(__m68k__) ||  defined(__ARMEB__) || defined(__MIPSEB__)
 #define MY_CPU_BE
 #endif
 
@@ -75,34 +73,27 @@ Stop_Compiling_Bad_Endian
 
 #define GetUi16(p) (((const Byte *)(p))[0] | ((UInt16)((const Byte *)(p))[1] << 8))
 
-#define GetUi32(p)                                                                                 \
-        (((const Byte *)(p))[0] | ((UInt32)((const Byte *)(p))[1] << 8) |                          \
-         ((UInt32)((const Byte *)(p))[2] << 16) | ((UInt32)((const Byte *)(p))[3] << 24))
+#define GetUi32(p) ( \
+             ((const Byte *)(p))[0]        | \
+    ((UInt32)((const Byte *)(p))[1] <<  8) | \
+    ((UInt32)((const Byte *)(p))[2] << 16) | \
+    ((UInt32)((const Byte *)(p))[3] << 24))
 
 #define GetUi64(p) (GetUi32(p) | ((UInt64)GetUi32(((const Byte *)(p)) + 4) << 32))
 
-#define SetUi16(p, d)                                                                              \
-        {                                                                                          \
-                UInt32 _x_ = (d);                                                                  \
-                ((Byte *)(p))[0] = (Byte)_x_;                                                      \
-                ((Byte *)(p))[1] = (Byte)(_x_ >> 8);                                               \
-        }
+#define SetUi16(p, d) { UInt32 _x_ = (d); \
+    ((Byte *)(p))[0] = (Byte)_x_; \
+    ((Byte *)(p))[1] = (Byte)(_x_ >> 8); }
 
-#define SetUi32(p, d)                                                                              \
-        {                                                                                          \
-                UInt32 _x_ = (d);                                                                  \
-                ((Byte *)(p))[0] = (Byte)_x_;                                                      \
-                ((Byte *)(p))[1] = (Byte)(_x_ >> 8);                                               \
-                ((Byte *)(p))[2] = (Byte)(_x_ >> 16);                                              \
-                ((Byte *)(p))[3] = (Byte)(_x_ >> 24);                                              \
-        }
+#define SetUi32(p, d) { UInt32 _x_ = (d); \
+    ((Byte *)(p))[0] = (Byte)_x_; \
+    ((Byte *)(p))[1] = (Byte)(_x_ >> 8); \
+    ((Byte *)(p))[2] = (Byte)(_x_ >> 16); \
+    ((Byte *)(p))[3] = (Byte)(_x_ >> 24); }
 
-#define SetUi64(p, d)                                                                              \
-        {                                                                                          \
-                UInt64 _x64_ = (d);                                                                \
-                SetUi32(p, (UInt32)_x64_);                                                         \
-                SetUi32(((Byte *)(p)) + 4, (UInt32)(_x64_ >> 32));                                 \
-        }
+#define SetUi64(p, d) { UInt64 _x64_ = (d); \
+    SetUi32(p, (UInt32)_x64_); \
+    SetUi32(((Byte *)(p)) + 4, (UInt32)(_x64_ >> 32)); }
 
 #endif
 
@@ -115,9 +106,11 @@ Stop_Compiling_Bad_Endian
 
 #else
 
-#define GetBe32(p)                                                                                 \
-        (((UInt32)((const Byte *)(p))[0] << 24) | ((UInt32)((const Byte *)(p))[1] << 16) |         \
-         ((UInt32)((const Byte *)(p))[2] << 8) | ((const Byte *)(p))[3])
+#define GetBe32(p) ( \
+    ((UInt32)((const Byte *)(p))[0] << 24) | \
+    ((UInt32)((const Byte *)(p))[1] << 16) | \
+    ((UInt32)((const Byte *)(p))[2] <<  8) | \
+             ((const Byte *)(p))[3] )
 
 #define GetBe64(p) (((UInt64)GetBe32(p) << 32) | GetBe32(((const Byte *)(p)) + 4))
 
@@ -125,18 +118,25 @@ Stop_Compiling_Bad_Endian
 
 #define GetBe16(p) (((UInt16)((const Byte *)(p))[0] << 8) | ((const Byte *)(p))[1])
 
+
 #ifdef MY_CPU_X86_OR_AMD64
 
-    typedef struct {
-        UInt32 maxFunc;
-        UInt32 vendor[3];
-        UInt32 ver;
-        UInt32 b;
-        UInt32 c;
-        UInt32 d;
+typedef struct
+{
+  UInt32 maxFunc;
+  UInt32 vendor[3];
+  UInt32 ver;
+  UInt32 b;
+  UInt32 c;
+  UInt32 d;
 } Cx86cpuid;
 
-enum { CPU_FIRM_INTEL, CPU_FIRM_AMD, CPU_FIRM_VIA };
+enum
+{
+  CPU_FIRM_INTEL,
+  CPU_FIRM_AMD,
+  CPU_FIRM_VIA
+};
 
 Bool x86cpuid_CheckAndRead(Cx86cpuid *p);
 int x86cpuid_GetFirm(const Cx86cpuid *p);
