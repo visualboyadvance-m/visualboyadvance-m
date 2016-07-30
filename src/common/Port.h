@@ -1,6 +1,8 @@
 #ifndef PORT_H
 #define PORT_H
 
+#include <cstdint>
+
 #ifdef __CELLOS_LV2__
 /* PlayStation3 */
 #include <ppu_intrinsics.h>
@@ -12,7 +14,7 @@
 #endif
 
 // swaps a 16-bit value
-static inline uint16_t swap16(u16 v)
+static inline uint16_t swap16(uint16_t v)
 {
         return (v << 8) | (v >> 8);
 }

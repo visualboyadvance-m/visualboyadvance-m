@@ -31,9 +31,9 @@ WavWriter::~WavWriter()
 void WavWriter::Close()
 {
     // calculate the total file length
-    u32 len = ftell(m_file) - 8;
+    uint32_t len = ftell(m_file) - 8;
     fseek(m_file, 4, SEEK_SET);
-    u8 data[4];
+    uint8_t data[4];
     utilPutDword(data, len);
     fwrite(data, 1, 4, m_file);
     // write out the size of the data section
@@ -53,13 +53,13 @@ bool WavWriter::Open(const char* name)
     if (!m_file)
         return false;
     // RIFF header
-    u8 data[4] = { 'R', 'I', 'F', 'F' };
+    uint8_t data[4] = { 'R', 'I', 'F', 'F' };
     fwrite(data, 1, 4, m_file);
     utilPutDword(data, 0);
     // write 0 for now. Will get filled during close
     fwrite(data, 1, 4, m_file);
     // write WAVE header
-    u8 data2[4] = { 'W', 'A', 'V', 'E' };
+    uint8_t data2[4] = { 'W', 'A', 'V', 'E' };
     fwrite(data2, 1, 4, m_file);
     return true;
 }
@@ -69,14 +69,14 @@ void WavWriter::SetFormat(const WAVEFORMATEX* format)
     if (m_file == NULL)
         return;
     // write fmt header
-    u8 data[4] = { 'f', 'm', 't', ' ' };
+    uint8_t data[4] = { 'f', 'm', 't', ' ' };
     fwrite(data, 1, 4, m_file);
-    u32 value = sizeof(WAVEFORMATEX);
+    uint32_t value = sizeof(WAVEFORMATEX);
     utilPutDword(data, value);
     fwrite(data, 1, 4, m_file);
     fwrite(format, 1, sizeof(WAVEFORMATEX), m_file);
     // start data header
-    u8 data2[4] = { 'd', 'a', 't', 'a' };
+    uint8_t data2[4] = { 'd', 'a', 't', 'a' };
     fwrite(data2, 1, 4, m_file);
 
     m_posSize = ftell(m_file);
@@ -85,7 +85,7 @@ void WavWriter::SetFormat(const WAVEFORMATEX* format)
     fwrite(data, 1, 4, m_file);
 }
 
-void WavWriter::AddSound(const u8* data, int len)
+void WavWriter::AddSound(const uint8_t* data, int len)
 {
     if (m_file == NULL)
         return;

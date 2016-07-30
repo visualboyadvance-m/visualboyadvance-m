@@ -39,7 +39,7 @@ GBOamView::GBOamView(CWnd* pParent /*=NULL*/)
     bmpInfo.bmiHeader.biPlanes = 1;
     bmpInfo.bmiHeader.biBitCount = 24;
     bmpInfo.bmiHeader.biCompression = BI_RGB;
-    data = (u8*)calloc(1, 3 * 8 * 16);
+    data = (uint8_t*)calloc(1, 3 * 8 * 16);
 
     oamView.setData(data);
     oamView.setBmpInfo(&bmpInfo);
@@ -142,26 +142,26 @@ void GBOamView::render()
     if (gbRom == NULL)
         return;
 
-    u16 addr = number * 4 + 0xfe00;
+    uint16_t addr = number * 4 + 0xfe00;
 
     int size = register_LCDC & 4;
 
-    u8 y = gbMemory[addr++];
-    u8 x = gbMemory[addr++];
-    u8 tile = gbMemory[addr++];
+    uint8_t y = gbMemory[addr++];
+    uint8_t x = gbMemory[addr++];
+    uint8_t tile = gbMemory[addr++];
     if (size)
         tile &= 254;
-    u8 flags = gbMemory[addr++];
+    uint8_t flags = gbMemory[addr++];
 
-    u8* bmp = data;
+    uint8_t* bmp = data;
 
     w = 8;
     h = size ? 16 : 8;
 
     setAttributes(y, x, tile, flags);
 
-    u8* bank0;
-    u8* bank1;
+    uint8_t* bank0;
+    uint8_t* bank1;
     if (gbCgbMode) {
         bank0 = &gbVram[0x0000];
         bank1 = &gbVram[0x2000];
@@ -172,7 +172,7 @@ void GBOamView::render()
 
     int init = 0x0000;
 
-    u8* pal = gbObp0;
+    uint8_t* pal = gbObp0;
 
     if ((flags & 0x10))
         pal = gbObp1;
@@ -191,8 +191,8 @@ void GBOamView::render()
         }
 
         for (int xx = 0; xx < 8; xx++) {
-            u8 mask = 1 << (7 - xx);
-            u8 c = 0;
+            uint8_t mask = 1 << (7 - xx);
+            uint8_t c = 0;
             if ((a & mask))
                 c++;
             if ((b & mask))
@@ -205,7 +205,7 @@ void GBOamView::render()
                 c = pal[c];
             }
 
-            u16 color = gbPalette[c];
+            uint16_t color = gbPalette[c];
             *bmp++ = ((color >> 10) & 0x1f) << 3;
             *bmp++ = ((color >> 5) & 0x1f) << 3;
             *bmp++ = (color & 0x1f) << 3;
@@ -215,7 +215,7 @@ void GBOamView::render()
 
 void GBOamView::saveBMP(const char* name)
 {
-    u8 writeBuffer[1024 * 3];
+    uint8_t writeBuffer[1024 * 3];
 
     FILE* fp = fopen(name, "wb");
 
@@ -225,29 +225,29 @@ void GBOamView::saveBMP(const char* name)
     }
 
     struct {
-        u8 ident[2];
-        u8 filesize[4];
-        u8 reserved[4];
-        u8 dataoffset[4];
-        u8 headersize[4];
-        u8 width[4];
-        u8 height[4];
-        u8 planes[2];
-        u8 bitsperpixel[2];
-        u8 compression[4];
-        u8 datasize[4];
-        u8 hres[4];
-        u8 vres[4];
-        u8 colors[4];
-        u8 importantcolors[4];
-        u8 pad[2];
+        uint8_t ident[2];
+        uint8_t filesize[4];
+        uint8_t reserved[4];
+        uint8_t dataoffset[4];
+        uint8_t headersize[4];
+        uint8_t width[4];
+        uint8_t height[4];
+        uint8_t planes[2];
+        uint8_t bitsperpixel[2];
+        uint8_t compression[4];
+        uint8_t datasize[4];
+        uint8_t hres[4];
+        uint8_t vres[4];
+        uint8_t colors[4];
+        uint8_t importantcolors[4];
+        uint8_t pad[2];
     } bmpheader;
     memset(&bmpheader, 0, sizeof(bmpheader));
 
     bmpheader.ident[0] = 'B';
     bmpheader.ident[1] = 'M';
 
-    u32 fsz = sizeof(bmpheader) + w * h * 3;
+    uint32_t fsz = sizeof(bmpheader) + w * h * 3;
     utilPutDword(bmpheader.filesize, fsz);
     utilPutDword(bmpheader.dataoffset, 0x38);
     utilPutDword(bmpheader.headersize, 0x28);
@@ -259,12 +259,12 @@ void GBOamView::saveBMP(const char* name)
 
     fwrite(&bmpheader, 1, sizeof(bmpheader), fp);
 
-    u8* b = writeBuffer;
+    uint8_t* b = writeBuffer;
 
     int sizeX = w;
     int sizeY = h;
 
-    u8* pixU8 = (u8*)data + 3 * w * (h - 1);
+    uint8_t* pixU8 = (uint8_t*)data + 3 * w * (h - 1);
     for (int y = 0; y < sizeY; y++) {
         for (int x = 0; x < sizeX; x++) {
             *b++ = *pixU8++; // B
@@ -282,7 +282,7 @@ void GBOamView::saveBMP(const char* name)
 
 void GBOamView::savePNG(const char* name)
 {
-    u8 writeBuffer[1024 * 3];
+    uint8_t writeBuffer[1024 * 3];
 
     FILE* fp = fopen(name, "wb");
 
@@ -328,12 +328,12 @@ void GBOamView::savePNG(const char* name)
 
     png_write_info(png_ptr, info_ptr);
 
-    u8* b = writeBuffer;
+    uint8_t* b = writeBuffer;
 
     int sizeX = w;
     int sizeY = h;
 
-    u8* pixU8 = (u8*)data;
+    uint8_t* pixU8 = (uint8_t*)data;
     for (int y = 0; y < sizeY; y++) {
         for (int x = 0; x < sizeX; x++) {
             int blue = *pixU8++;
@@ -467,7 +467,7 @@ void GBOamView::OnClose()
 
 LRESULT GBOamView::OnMapInfo(WPARAM, LPARAM lParam)
 {
-    u8* colors = (u8*)lParam;
+    uint8_t* colors = (uint8_t*)lParam;
     oamZoom.setColors(colors);
 
     return TRUE;
@@ -475,7 +475,7 @@ LRESULT GBOamView::OnMapInfo(WPARAM, LPARAM lParam)
 
 LRESULT GBOamView::OnColInfo(WPARAM wParam, LPARAM lParam)
 {
-    u16 c = (u16)wParam;
+    uint16_t c = (uint16_t)wParam;
 
     color.setColor(c);
 

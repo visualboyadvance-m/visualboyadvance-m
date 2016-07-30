@@ -73,7 +73,7 @@ void ColorButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
     DeleteObject(br);
 }
 
-void ColorButton::setColor(u16 c)
+void ColorButton::setColor(uint16_t c)
 {
     color = c;
     Invalidate();

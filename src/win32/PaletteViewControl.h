@@ -15,13 +15,13 @@ class PaletteViewControl : public CWnd {
     int w;
     int h;
     int colors;
-    u8* data;
+    uint8_t* data;
     BITMAPINFO bmpInfo;
     static bool isRegistered;
     int selected;
 
 protected:
-    u16 palette[256];
+    uint16_t palette[256];
     int paletteAddress;
     // Construction
 public:
@@ -42,7 +42,7 @@ public:
 public:
     void registerClass();
     void refresh();
-    void render(u16 color, int x, int y);
+    void render(uint16_t color, int x, int y);
     void setSelected(int s);
     void setPaletteAddress(int address);
     bool saveJASCPAL(const char* name);

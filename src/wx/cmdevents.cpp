@@ -743,7 +743,7 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
         setblab("DestCode", gbRom[0x14a]);
         setblab("LicCode", gbRom[0x14b]);
         setblab("Version", gbRom[0x14c]);
-        u8 crc = 25;
+        uint8_t crc = 25;
 
         for (int i = 0x134; i < 0x14d; i++)
             crc += gbRom[i];
@@ -751,7 +751,7 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
         crc = 256 - crc;
         s.Printf(wxT("%02x (%02x)"), crc, gbRom[0x14d]);
         setlab("CRC");
-        u16 crc16 = 0;
+        uint16_t crc16 = 0;
 
         for (int i = 0; i < gbRomSize; i++)
             crc16 += gbRom[i];
@@ -792,7 +792,7 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
 
         setlab("DeviceType");
         setblab("Version", rom[0xbc]);
-        u8 crc = 0x19;
+        uint8_t crc = 0x19;
 
         for (int i = 0xa0; i < 0xbd; i++)
             crc += rom[i];
@@ -908,7 +908,7 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN
 
             // FIXME: in my code, I assume file format is little-endian
             // however, in core code, it is assumed to be native-endian
-            u32 len;
+            uint32_t len;
             char buf[14];
 
             if (f.Read(&len, sizeof(len)) != sizeof(len) || wxUINT32_SWAP_ON_BE(len) != 14 || f.Read(buf, 14) != 14 || memcmp(buf, "SharkPortCODES", 14)) {
@@ -921,7 +921,7 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN
             if (f.Read(&len, sizeof(len)) != sizeof(len))
                 len = 0;
 
-            u32 game = 0;
+            uint32_t game = 0;
 
             if (len > 1) {
                 wxDialog* seldlg = GetXRCDialog("CodeSelect");
@@ -929,7 +929,7 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN
                 lst->Clear();
 
                 while (len-- > 0) {
-                    u32 slen;
+                    uint32_t slen;
 
                     if (f.Read(&slen, sizeof(slen)) != sizeof(slen) || slen > 1024) // arbitrary upper bound
                         break;
@@ -940,7 +940,7 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN
                         break;
 
                     lst->Append(wxString(buf, wxConvLibc, slen));
-                    u32 ncodes;
+                    uint32_t ncodes;
 
                     if (f.Read(&ncodes, sizeof(ncodes)) != sizeof(ncodes))
                         break;

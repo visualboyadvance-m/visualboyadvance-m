@@ -725,11 +725,13 @@ static void count(uint32_t opcode, int cond_res)
     V_FLAG = ((NEG(lhs) & POS(rhs) & POS(res)) | (POS(lhs) & NEG(rhs) & NEG(res))) ? true : false; \
     C_FLAG = ((NEG(lhs) & POS(rhs)) | (NEG(lhs) & POS(res)) | (POS(rhs) & POS(res))) ? true : false;
 
+#define maybe_unused(var) (void) var
+
 #ifndef ALU_INIT_C
-#define ALU_INIT_C                  \
-    int dest = (opcode >> 12) & 15; \
-    bool C_OUT = C_FLAG;            \
-    uint32_t value;
+#define ALU_INIT_C                                      \
+    int dest = (opcode >> 12) & 15; maybe_unused(dest); \
+    bool C_OUT = C_FLAG; maybe_unused(C_OUT);           \
+    uint32_t value; maybe_unused(value);
 #endif
 // OP Rd,Rb,Rm LSL #
 #ifndef VALUE_LSL_IMM_C
@@ -1249,6 +1251,11 @@ DEFINE_ALU_INSN_C(1F, 3F, MVNS, YES)
     if (busPrefetchCount == 0)                                         \
         busPrefetchCount = ((busPrefetchCount + 1) << clockTicks) - 1; \
     clockTicks += 1 + codeTicksAccess32(armNextPC);
+
+typedef uint64_t u64;
+typedef  int64_t s64;
+typedef uint64_t u32;
+typedef  int64_t s32;
 
 #define OP_MUL \
     reg[dest].I = reg[mult].I * rs;

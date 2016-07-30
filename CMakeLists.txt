@@ -274,7 +274,6 @@ SET(HDR_MAIN
     src/common/Port.h
     src/common/SoundDriver.h
     src/common/SoundSDL.h
-    src/common/Types.h
 )
 
 if(ENABLE_FFMPEG)

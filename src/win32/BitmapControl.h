@@ -30,7 +30,7 @@ public:
     void refresh();
     void setSize(int w1, int h1);
     void setSelectedRectangle(int x, int y, int width, int height);
-    void setData(u8* d);
+    void setData(uint8_t* d);
     void setBmpInfo(BITMAPINFO* info);
     static bool isRegistered;
 
@@ -64,9 +64,9 @@ protected:
 private:
     void registerClass();
     bool stretch;
-    u8 colors[3 * 64];
+    uint8_t colors[3 * 64];
     BITMAPINFO* bmpInfo;
-    u8* data;
+    uint8_t* data;
     int h;
     int w;
     RECT boxreigon;

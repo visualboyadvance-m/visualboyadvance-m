@@ -164,7 +164,7 @@ bool exprNodeDotResolve(Node* n, Function* f, CompileUnit* u)
         TypeEnum tt = n->expression->type->type;
 
         if (tt == TYPE_struct || tt == TYPE_union) {
-            u32 loc = n->expression->location;
+            uint32_t loc = n->expression->location;
             Type* t = n->expression->type;
             int count = t->structure->memberCount;
             int i = 0;
@@ -225,7 +225,7 @@ bool exprNodeArrowResolve(Node* n, Function* f, CompileUnit* u)
         tt = n->expression->type->pointer->type;
 
         if (tt == TYPE_struct || tt == TYPE_union) {
-            u32 loc = debuggerReadMemory(n->expression->location);
+            uint32_t loc = debuggerReadMemory(n->expression->location);
             Type* t = n->expression->type->pointer;
             int count = t->structure->memberCount;
             int i = 0;
@@ -367,7 +367,7 @@ bool exprNodeArrayResolve(Node* n, Function* f, CompileUnit* u)
         if (tt == TYPE_array) {
             Array* a = n->expression->type->array;
 
-            u32 loc = n->expression->location;
+            uint32_t loc = n->expression->location;
             Type* t = a->type;
             if (a->maxBounds > 1) {
                 int index = n->expression->index;
@@ -390,7 +390,7 @@ bool exprNodeArrayResolve(Node* n, Function* f, CompileUnit* u)
             n->locType = LOCATION_memory;
         } else {
             Type* t = n->expression->type->pointer;
-            u32 loc = n->expression->location;
+            uint32_t loc = n->expression->location;
             if (n->expression->locType == LOCATION_register)
                 loc = reg[loc].I;
             else

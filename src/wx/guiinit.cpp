@@ -671,8 +671,8 @@ void CheatList_t::ParseChtLine(wxString desc, wxString tok)
         wxString cheat_desc = desc + wxT(":") + cheat_opt;
         wxString cheat_line;
         wxString cheat_value;
-        u32 address = 0;
-        u32 value = 0;
+        uint32_t address = 0;
+        uint32_t value = 0;
         sscanf(cheat_addr.mb_str(), "%8x", &address);
 
         if (address < 0x40000)
@@ -908,43 +908,43 @@ public:
                 else
                     block->data = &gbMemory[0xa000];
 
-                block->saved = (u8*)malloc(gbRamSize);
+                block->saved = (uint8_t*)malloc(gbRamSize);
                 block->size = gbRamSize;
-                block->bits = (u8*)malloc(gbRamSize >> 3);
+                block->bits = (uint8_t*)malloc(gbRamSize >> 3);
 
                 if (gbCgbMode) {
                     block++;
                     block->offset = 0xc000;
                     block->data = &gbMemory[0xc000];
-                    block->saved = (u8*)malloc(0x1000);
+                    block->saved = (uint8_t*)malloc(0x1000);
                     block->size = 0x1000;
-                    block->bits = (u8*)malloc(0x1000 >> 3);
+                    block->bits = (uint8_t*)malloc(0x1000 >> 3);
                     block++;
                     block->offset = 0xd000;
                     block->data = gbWram;
-                    block->saved = (u8*)malloc(0x8000);
+                    block->saved = (uint8_t*)malloc(0x8000);
                     block->size = 0x8000;
-                    block->bits = (u8*)malloc(0x8000 >> 3);
+                    block->bits = (uint8_t*)malloc(0x8000 >> 3);
                 } else {
                     block++;
                     block->offset = 0xc000;
                     block->data = &gbMemory[0xc000];
-                    block->saved = (u8*)malloc(0x2000);
+                    block->saved = (uint8_t*)malloc(0x2000);
                     block->size = 0x2000;
-                    block->bits = (u8*)malloc(0x2000 >> 3);
+                    block->bits = (uint8_t*)malloc(0x2000 >> 3);
                 }
             } else {
                 block->size = 0x40000;
                 block->offset = 0x2000000;
-                block->bits = (u8*)malloc(0x40000 >> 3);
+                block->bits = (uint8_t*)malloc(0x40000 >> 3);
                 block->data = workRAM;
-                block->saved = (u8*)malloc(0x40000);
+                block->saved = (uint8_t*)malloc(0x40000);
                 block++;
                 block->size = 0x8000;
                 block->offset = 0x3000000;
-                block->bits = (u8*)malloc(0x8000 >> 3);
+                block->bits = (uint8_t*)malloc(0x8000 >> 3);
                 block->data = internalRAM;
-                block->saved = (u8*)malloc(0x8000);
+                block->saved = (uint8_t*)malloc(0x8000);
             }
 
             cheatSearchData.count = (int)((block + 1) - cheatSearchData.blocks);
@@ -1053,7 +1053,7 @@ public:
             return;
         }
 
-        u32 val = GetValue(ca_val, fmt);
+        uint32_t val = GetValue(ca_val, fmt);
 
         if (isgb) {
             long bank, addr;
@@ -1114,7 +1114,7 @@ public:
         }
     }
 
-    u32 GetValue(wxString& s, int fmt)
+    uint32_t GetValue(wxString& s, int fmt)
     {
         long val;
         // FIXME: probably ought to throw an error if ToLong
@@ -1127,41 +1127,41 @@ public:
         return val;
     }
 
-    u32 GetValue(int fmt)
+    uint32_t GetValue(int fmt)
     {
         return GetValue(val_s, fmt);
     }
 
-    u32 GetValue()
+    uint32_t GetValue()
     {
         return GetValue(fmt);
     }
 
-    s32 SignedValue(wxString& s, int fmt)
+    int32_t SignedValue(wxString& s, int fmt)
     {
-        s32 val = GetValue(s, fmt);
+        int32_t val = GetValue(s, fmt);
 
         if (fmt == CFVFMT_SD) {
             if (size == BITS_8)
-                val = (s32)(s8)val;
+                val = (int32_t)(int8_t)val;
             else if (size == BITS_16)
-                val = (s32)(s16)val;
+                val = (int32_t)(int16_t)val;
         }
 
         return val;
     }
 
-    s32 SignedValue(int fmt)
+    int32_t SignedValue(int fmt)
     {
         return SignedValue(val_s, fmt);
     }
 
-    s32 SignedValue()
+    int32_t SignedValue()
     {
         return SignedValue(fmt);
     }
 
-    void FormatValue(s32 val, wxString& s)
+    void FormatValue(int32_t val, wxString& s)
     {
         if (fmt != CFVFMT_SD && size != BITS_32)
             val &= size == BITS_8 ? 0xff : 0xffff;
@@ -1197,17 +1197,17 @@ public:
         dlg->TransferDataFromWindow();
 
         if (ofmt != fmt && !val_s.empty()) {
-            s32 val = GetValue(ofmt);
+            int32_t val = GetValue(ofmt);
 
             switch (fmt) {
             case CFVFMT_SD:
                 switch (size) {
                 case BITS_8:
-                    val = (s32)(s8)val;
+                    val = (int32_t)(int8_t)val;
                     break;
 
                 case BITS_16:
-                    val = (s32)(s16)val;
+                    val = (int32_t)(int16_t)val;
                 }
 
                 val_s.Printf(wxT("%d"), val);
@@ -1359,7 +1359,7 @@ wxString CheatListCtrl::OnGetItemText(long item, long column) const
 
 // these are the choices for canned colors; their order must match the
 // names in the choice control
-static const u16 defaultPalettes[][8] = {
+static const uint16_t defaultPalettes[][8] = {
     {
         // Standard
         0x7FFF, 0x56B5, 0x318C, 0x0000, 0x7FFF, 0x56B5, 0x318C, 0x0000,
@@ -1408,7 +1408,7 @@ public:
     void ColorSel(wxCommandEvent& ev)
     {
         if (ev.GetSelection() > 0) {
-            const u16* color = defaultPalettes[ev.GetSelection() - 1];
+            const uint16_t* color = defaultPalettes[ev.GetSelection() - 1];
 
             for (int i = 0; i < 8; i++, color++)
                 cp[i]->SetColour(wxColor(((*color << 3) & 0xf8),
@@ -1418,7 +1418,7 @@ public:
     }
     void ColorReset(wxCommandEvent& ev)
     {
-        const u16* color = &systemGbPalette[pno * 8];
+        const uint16_t* color = &systemGbPalette[pno * 8];
 
         for (int i = 0; i < 8; i++, color++)
             cp[i]->SetColour(wxColor(((*color << 3) & 0xf8),
@@ -1464,7 +1464,7 @@ public:
     }
     void Detect(wxCommandEvent& ev)
     {
-        u32 sz = wxGetApp().frame->GetPanel()->game_size();
+        uint32_t sz = wxGetApp().frame->GetPanel()->game_size();
         utilGBAFindSave(sz);
         type->SetSelection(saveType);
 

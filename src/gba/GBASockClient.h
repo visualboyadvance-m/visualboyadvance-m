@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../common/Types.h"
+#include <cstdlib>
 #include <SFML/Network.hpp>
 
 class GBASockClient {
@@ -13,7 +13,7 @@ public:
     char ReceiveCmd(char* data_in, bool block);
     void ReceiveClock(bool block);
 
-    void ClockSync(u32 ticks);
+    void ClockSync(uint32_t ticks);
     void Disconnect();
     bool IsDisconnected();
 
@@ -22,6 +22,6 @@ private:
     sf::TcpSocket client;
     sf::TcpSocket clock_client;
 
-    s32 clock_sync;
+    int32_t clock_sync;
     bool is_disconnected;
 };

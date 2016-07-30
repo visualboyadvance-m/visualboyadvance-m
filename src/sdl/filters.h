@@ -19,6 +19,8 @@
 #ifndef VBA_SDL_FILTERS_H
 #define VBA_SDL_FILTERS_H
 
+#include <cstdint>
+
 #include "../System.h"
 
 //
@@ -53,7 +55,7 @@ enum Filter {
 };
 
 // Function pointer type for a filter function
-typedef void (*FilterFunc)(u8*, u32, u8*, u8*, u32, int, int);
+typedef void (*FilterFunc)(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
 
 // Initialize a filter and get the corresponding filter function pointer
 FilterFunc initFilter(const int f, const int colorDepth, const int srcWidth);
@@ -75,7 +77,7 @@ enum IFBFilter { kIFBNone,
     kInvalidIFBFilter };
 
 // Function pointer type for an IFB filter function
-typedef void (*IFBFilterFunc)(u8*, u32, int, int);
+typedef void (*IFBFilterFunc)(uint8_t*, uint32_t, int, int);
 
 // Initialize an IFB filter and get the corresponding filter function pointer
 IFBFilterFunc initIFBFilter(const int f, const int colorDepth);

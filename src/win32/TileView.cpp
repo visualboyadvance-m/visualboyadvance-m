@@ -42,7 +42,7 @@ TileView::TileView(CWnd* pParent /*=NULL*/)
     bmpInfo.bmiHeader.biPlanes = 1;
     bmpInfo.bmiHeader.biBitCount = 24;
     bmpInfo.bmiHeader.biCompression = BI_RGB;
-    data = (u8*)calloc(1, 3 * 32 * 32 * 64);
+    data = (uint8_t*)calloc(1, 3 * 32 * 32 * 64);
 
     tileView.setData(data);
     tileView.setBmpInfo(&bmpInfo);
@@ -97,7 +97,7 @@ END_MESSAGE_MAP()
 
 void TileView::saveBMP(const char* name)
 {
-    u8 writeBuffer[1024 * 3];
+    uint8_t writeBuffer[1024 * 3];
 
     FILE* fp = fopen(name, "wb");
 
@@ -107,29 +107,29 @@ void TileView::saveBMP(const char* name)
     }
 
     struct {
-        u8 ident[2];
-        u8 filesize[4];
-        u8 reserved[4];
-        u8 dataoffset[4];
-        u8 headersize[4];
-        u8 width[4];
-        u8 height[4];
-        u8 planes[2];
-        u8 bitsperpixel[2];
-        u8 compression[4];
-        u8 datasize[4];
-        u8 hres[4];
-        u8 vres[4];
-        u8 colors[4];
-        u8 importantcolors[4];
-        u8 pad[2];
+        uint8_t ident[2];
+        uint8_t filesize[4];
+        uint8_t reserved[4];
+        uint8_t dataoffset[4];
+        uint8_t headersize[4];
+        uint8_t width[4];
+        uint8_t height[4];
+        uint8_t planes[2];
+        uint8_t bitsperpixel[2];
+        uint8_t compression[4];
+        uint8_t datasize[4];
+        uint8_t hres[4];
+        uint8_t vres[4];
+        uint8_t colors[4];
+        uint8_t importantcolors[4];
+        uint8_t pad[2];
     } bmpheader;
     memset(&bmpheader, 0, sizeof(bmpheader));
 
     bmpheader.ident[0] = 'B';
     bmpheader.ident[1] = 'M';
 
-    u32 fsz = sizeof(bmpheader) + w * h * 3;
+    uint32_t fsz = sizeof(bmpheader) + w * h * 3;
     utilPutDword(bmpheader.filesize, fsz);
     utilPutDword(bmpheader.dataoffset, 0x38);
     utilPutDword(bmpheader.headersize, 0x28);
@@ -141,12 +141,12 @@ void TileView::saveBMP(const char* name)
 
     fwrite(&bmpheader, 1, sizeof(bmpheader), fp);
 
-    u8* b = writeBuffer;
+    uint8_t* b = writeBuffer;
 
     int sizeX = w;
     int sizeY = h;
 
-    u8* pixU8 = (u8*)data + 3 * w * (h - 1);
+    uint8_t* pixU8 = (uint8_t*)data + 3 * w * (h - 1);
     for (int y = 0; y < sizeY; y++) {
         for (int x = 0; x < sizeX; x++) {
             *b++ = *pixU8++; // B
@@ -164,7 +164,7 @@ void TileView::saveBMP(const char* name)
 
 void TileView::savePNG(const char* name)
 {
-    u8 writeBuffer[1024 * 3];
+    uint8_t writeBuffer[1024 * 3];
 
     FILE* fp = fopen(name, "wb");
 
@@ -210,12 +210,12 @@ void TileView::savePNG(const char* name)
 
     png_write_info(png_ptr, info_ptr);
 
-    u8* b = writeBuffer;
+    uint8_t* b = writeBuffer;
 
     int sizeX = w;
     int sizeY = h;
 
-    u8* pixU8 = (u8*)data;
+    uint8_t* pixU8 = (uint8_t*)data;
     for (int y = 0; y < sizeY; y++) {
         for (int x = 0; x < sizeX; x++) {
             int blue = *pixU8++;
@@ -276,15 +276,15 @@ void TileView::OnSave()
     }
 }
 
-void TileView::renderTile256(int tile, int x, int y, u8* charBase, u16* palette)
+void TileView::renderTile256(int tile, int x, int y, uint8_t* charBase, uint16_t* palette)
 {
-    u8* bmp = &data[24 * x + 8 * 32 * 24 * y];
+    uint8_t* bmp = &data[24 * x + 8 * 32 * 24 * y];
 
     for (int j = 0; j < 8; j++) {
         for (int i = 0; i < 8; i++) {
-            u8 c = charBase[tile * 64 + j * 8 + i];
+            uint8_t c = charBase[tile * 64 + j * 8 + i];
 
-            u16 color = palette[c];
+            uint16_t color = palette[c];
 
             *bmp++ = ((color >> 10) & 0x1f) << 3;
             *bmp++ = ((color >> 5) & 0x1f) << 3;
@@ -294,9 +294,9 @@ void TileView::renderTile256(int tile, int x, int y, u8* charBase, u16* palette)
     }
 }
 
-void TileView::renderTile16(int tile, int x, int y, u8* charBase, u16* palette)
+void TileView::renderTile16(int tile, int x, int y, uint8_t* charBase, uint16_t* palette)
 {
-    u8* bmp = &data[24 * x + 8 * 32 * 24 * y];
+    uint8_t* bmp = &data[24 * x + 8 * 32 * 24 * y];
 
     int pal = this->palette;
 
@@ -305,14 +305,14 @@ void TileView::renderTile16(int tile, int x, int y, u8* charBase, u16* palette)
 
     for (int j = 0; j < 8; j++) {
         for (int i = 0; i < 8; i++) {
-            u8 c = charBase[tile * 32 + j * 4 + (i >> 1)];
+            uint8_t c = charBase[tile * 32 + j * 4 + (i >> 1)];
 
             if (i & 1)
                 c = c >> 4;
             else
                 c = c & 15;
 
-            u16 color = palette[pal * 16 + c];
+            uint16_t color = palette[pal * 16 + c];
 
             *bmp++ = ((color >> 10) & 0x1f) << 3;
             *bmp++ = ((color >> 5) & 0x1f) << 3;
@@ -324,8 +324,8 @@ void TileView::renderTile16(int tile, int x, int y, u8* charBase, u16* palette)
 
 void TileView::render()
 {
-    u16* palette = (u16*)paletteRAM;
-    u8* charBase = &vram[this->charBase * 0x4000];
+    uint16_t* palette = (uint16_t*)paletteRAM;
+    uint8_t* charBase = &vram[this->charBase * 0x4000];
 
     int maxY;
 
@@ -494,13 +494,13 @@ void TileView::OnStretch()
 
 LRESULT TileView::OnMapInfo(WPARAM wParam, LPARAM lParam)
 {
-    u8* colors = (u8*)lParam;
+    uint8_t* colors = (uint8_t*)lParam;
     zoom.setColors(colors);
 
     int x = (int)((wParam & 0xFFFF) / 8);
     int y = (int)(((wParam >> 16) & 0xFFFF) / 8);
 
-    u32 address = 0x6000000 + 0x4000 * charBase;
+    uint32_t address = 0x6000000 + 0x4000 * charBase;
     int tile = 32 * y + x;
     if (is256Colors)
         tile *= 2;
@@ -518,7 +518,7 @@ LRESULT TileView::OnMapInfo(WPARAM wParam, LPARAM lParam)
 
 LRESULT TileView::OnColInfo(WPARAM wParam, LPARAM)
 {
-    u16 c = (u16)wParam;
+    uint16_t c = (uint16_t)wParam;
 
     color.setColor(c);
 

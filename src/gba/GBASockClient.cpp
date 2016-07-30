@@ -27,7 +27,7 @@ GBASockClient::~GBASockClient()
     clock_client.disconnect();
 }
 
-u32 clock_sync_ticks = 0;
+uint32_t clock_sync_ticks = 0;
 
 void GBASockClient::Send(std::vector<char> data)
 {
@@ -70,15 +70,15 @@ void GBASockClient::ReceiveClock(bool block)
     if (num_received == 4) {
         clock_sync_ticks = 0;
         for (int i = 0; i < 4; i++)
-            clock_sync_ticks |= (u8)(sync_ticks[i]) << ((3 - i) * 8);
+            clock_sync_ticks |= (uint8_t)(sync_ticks[i]) << ((3 - i) * 8);
         clock_sync += clock_sync_ticks;
     }
 }
 
-void GBASockClient::ClockSync(u32 ticks)
+void GBASockClient::ClockSync(uint32_t ticks)
 {
-    if (clock_sync > (s32)ticks)
-        clock_sync -= (s32)ticks;
+    if (clock_sync > (int32_t)ticks)
+        clock_sync -= (int32_t)ticks;
     else
         clock_sync = 0;
 }

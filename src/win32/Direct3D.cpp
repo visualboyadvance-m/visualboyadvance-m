@@ -29,7 +29,7 @@
 #include <Dxerr.h> // contains debug functions
 #include <d3d9.h> // main include file
 
-extern int Init_2xSaI(u32); // initializes all pixel filters
+extern int Init_2xSaI(uint32_t); // initializes all pixel filters
 extern int systemSpeed;
 
 #ifdef _DEBUG
@@ -45,12 +45,12 @@ extern bool detectMMX();
 #endif
 
 struct PFTHREAD_DATA {
-    void (*filterFunction)(u8*, u32, u8*, u8*, u32, int, int);
-    u8* sourcePointer;
-    u32 sourcePitch;
-    u8* deltaPointer;
-    u8* destPointer;
-    u32 destPitch;
+    void (*filterFunction)(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+    uint8_t* sourcePointer;
+    uint32_t sourcePitch;
+    uint8_t* deltaPointer;
+    uint8_t* destPointer;
+    uint32_t destPitch;
     int width;
     int height;
 };
@@ -381,17 +381,17 @@ void Direct3DDisplay::render()
         DXTRACE_ERR_MSGBOX(_T("Can not lock texture"), hr);
         return;
     } else {
-        u32 pitch = sizeX * (systemColorDepth >> 3) + 4;
+        uint32_t pitch = sizeX * (systemColorDepth >> 3) + 4;
 
         if (theApp.filterFunction) {
             if (filterMT) {
-                u8* start = pix + pitch;
+                uint8_t* start = pix + pitch;
                 int src_height_per_thread = sizeY / nThreads;
                 int src_height_remaining = sizeY - ((sizeY / nThreads) * nThreads);
-                u32 src_bytes_per_thread = pitch * src_height_per_thread;
+                uint32_t src_bytes_per_thread = pitch * src_height_per_thread;
 
                 int dst_height_per_thread = src_height_per_thread * filterMagnification;
-                u32 dst_bytes_per_thread = lr.Pitch * dst_height_per_thread;
+                uint32_t dst_bytes_per_thread = lr.Pitch * dst_height_per_thread;
 
                 unsigned int i = nThreads - 1;
 
@@ -404,8 +404,8 @@ void Direct3DDisplay::render()
                     pfthread_data[i].filterFunction = theApp.filterFunction;
                     pfthread_data[i].sourcePointer = start + (i * src_bytes_per_thread);
                     pfthread_data[i].sourcePitch = pitch;
-                    pfthread_data[i].deltaPointer = (u8*)theApp.delta; // TODO: check if thread-safe
-                    pfthread_data[i].destPointer = ((u8*)lr.pBits) + (i * dst_bytes_per_thread);
+                    pfthread_data[i].deltaPointer = (uint8_t*)theApp.delta; // TODO: check if thread-safe
+                    pfthread_data[i].destPointer = ((uint8_t*)lr.pBits) + (i * dst_bytes_per_thread);
                     pfthread_data[i].destPitch = lr.Pitch;
                     pfthread_data[i].width = sizeX;
 
@@ -444,8 +444,8 @@ void Direct3DDisplay::render()
                 theApp.filterFunction(
                     pix + pitch,
                     pitch,
-                    (u8*)theApp.delta,
-                    (u8*)lr.pBits,
+                    (uint8_t*)theApp.delta,
+                    (uint8_t*)lr.pBits,
                     lr.Pitch,
                     sizeX,
                     sizeY);

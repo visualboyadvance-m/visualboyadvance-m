@@ -62,19 +62,19 @@ void remoteSetSockets(SOCKET l, SOCKET r)
 #endif
 
 #define debuggerReadMemory(addr) \
-    (*(u32*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask])
+    (*(uint32_t*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask])
 
 #define debuggerReadHalfWord(addr) \
-    (*(u16*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask])
+    (*(uint16_t*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask])
 
 #define debuggerReadByte(addr) \
     map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]
 
 #define debuggerWriteMemory(addr, value) \
-    *(u32*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask] = (value)
+    *(uint32_t*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask] = (value)
 
 #define debuggerWriteHalfWord(addr, value) \
-    *(u16*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask] = (value)
+    *(uint16_t*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask] = (value)
 
 #define debuggerWriteByte(addr, value) \
     map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask] = (value)
@@ -84,7 +84,7 @@ int debuggerNumOfDontBreak = 0;
 int debuggerRadix = 0;
 
 #define NUMBEROFDB 1000
-u32 debuggerNoBreakpointList[NUMBEROFDB];
+uint32_t debuggerNoBreakpointList[NUMBEROFDB];
 
 const char* cmdAliasTable[] = { "help", "?", "h", "?", "continue", "c", "next", "n",
     "cpyb", "copyb", "cpyh", "copyh", "cpyw", "copyw",
@@ -107,24 +107,24 @@ void debuggerHelp(int n, char** args);
 void printFlagHelp();
 void dbgExecute(std::string& cmd);
 
-extern bool debuggerBreakOnWrite(u32, u32, int);
-extern bool debuggerBreakOnRegisterCondition(u8, u32, u32, u8);
-extern bool debuggerBreakOnExecution(u32, u8);
+extern bool debuggerBreakOnWrite(uint32_t, uint32_t, int);
+extern bool debuggerBreakOnRegisterCondition(uint8_t, uint32_t, uint32_t, uint8_t);
+extern bool debuggerBreakOnExecution(uint32_t, uint8_t);
 
 regBreak* breakRegList[16];
-u8 lowRegBreakCounter[4]; //(r0-r3)
-u8 medRegBreakCounter[4]; //(r4-r7)
-u8 highRegBreakCounter[4]; //(r8-r11)
-u8 statusRegBreakCounter[4]; //(r12-r15)
-u8* regBreakCounter[4] = {
+uint8_t lowRegBreakCounter[4]; //(r0-r3)
+uint8_t medRegBreakCounter[4]; //(r4-r7)
+uint8_t highRegBreakCounter[4]; //(r8-r11)
+uint8_t statusRegBreakCounter[4]; //(r12-r15)
+uint8_t* regBreakCounter[4] = {
     &lowRegBreakCounter[0],
     &medRegBreakCounter[0],
     &highRegBreakCounter[0],
     &statusRegBreakCounter[0]
 };
-u32 lastWasBranch = 0;
+uint32_t lastWasBranch = 0;
 
-struct regBreak* getFromBreakRegList(u8 regnum, int location)
+struct regBreak* getFromBreakRegList(uint8_t regnum, int location)
 {
     if (location > regBreakCounter[regnum >> 2][regnum & 3])
         return NULL;
@@ -138,20 +138,20 @@ struct regBreak* getFromBreakRegList(u8 regnum, int location)
 
 bool enableRegBreak = false;
 reg_pair oldReg[16];
-u32 regDiff[16];
+uint32_t regDiff[16];
 
 void breakReg_check(int i)
 {
     struct regBreak* brkR = breakRegList[i];
     bool notFound = true;
-    u8 counter = regBreakCounter[i >> 2][i & 3];
+    uint8_t counter = regBreakCounter[i >> 2][i & 3];
     for (int bri = 0; (bri < counter) && notFound; bri++) {
         if (!brkR) {
-            regBreakCounter[i >> 2][i & 3] = (u8)bri;
+            regBreakCounter[i >> 2][i & 3] = (uint8_t)bri;
             break;
         } else {
             if (brkR->flags != 0) {
-                u32 regVal = (i == 15 ? (armState ? reg[15].I - 4 : reg[15].I - 2) : reg[i].I);
+                uint32_t regVal = (i == 15 ? (armState ? reg[15].I - 4 : reg[15].I - 2) : reg[i].I);
                 if ((brkR->flags & 0x1) && (regVal == brkR->intVal)) {
                     debuggerBreakOnRegisterCondition(i, brkR->intVal, regVal, 1);
                     notFound = false;
@@ -201,7 +201,7 @@ void clearBreakRegList()
     }
 }
 
-void deleteFromBreakRegList(u8 regNum, int num)
+void deleteFromBreakRegList(uint8_t regNum, int num)
 {
     int counter = regBreakCounter[regNum >> 2][regNum & 3];
     if (num >= counter) {
@@ -222,7 +222,7 @@ void deleteFromBreakRegList(u8 regNum, int num)
     regBreakCounter[regNum >> 2][regNum & 3]--;
 }
 
-void addBreakRegToList(u8 regnum, u8 flags, u32 value)
+void addBreakRegToList(uint8_t regnum, uint8_t flags, uint32_t value)
 {
     struct regBreak* ans = (struct regBreak*)malloc(sizeof(struct regBreak));
     ans->flags = flags;
@@ -298,7 +298,7 @@ void printBreakRegList(bool verbose)
     }
 }
 
-void debuggerOutput(const char* s, u32 addr)
+void debuggerOutput(const char* s, uint32_t addr)
 {
     if (s)
         printf("%s", s);
@@ -316,7 +316,7 @@ void debuggerOutput(const char* s, u32 addr)
 }
 
 // checks that the given address is in the DB list
-bool debuggerInDB(u32 address)
+bool debuggerInDB(uint32_t address)
 {
 
     for (int i = 0; i < debuggerNumOfDontBreak; i++) {
@@ -330,7 +330,7 @@ bool debuggerInDB(u32 address)
 void debuggerDontBreak(int n, char** args)
 {
     if (n == 2) {
-        u32 address = 0;
+        uint32_t address = 0;
         sscanf(args[1], "%x", &address);
         int i = debuggerNumOfDontBreak;
         if (i > NUMBEROFDB) {
@@ -361,7 +361,7 @@ void debuggerDontBreakClear(int n, char** args)
 
 void debuggerDumpLoad(int n, char** args)
 {
-    u32 address;
+    uint32_t address;
     char* file;
     FILE* f;
     int c;
@@ -405,8 +405,8 @@ void debuggerDumpLoad(int n, char** args)
 
 void debuggerDumpSave(int n, char** args)
 {
-    u32 address;
-    u32 size;
+    uint32_t address;
+    uint32_t size;
     char* file;
     FILE* f;
 
@@ -436,7 +436,7 @@ void debuggerDumpSave(int n, char** args)
             return;
         }
 
-        for (u32 i = 0; i < size; i++) {
+        for (uint32_t i = 0; i < size; i++) {
             fputc(debuggerReadByte(address), f);
             address++;
         }
@@ -449,8 +449,8 @@ void debuggerDumpSave(int n, char** args)
 void debuggerEditByte(int n, char** args)
 {
     if (n >= 3) {
-        u32 address;
-        u32 value;
+        uint32_t address;
+        uint32_t value;
         if (!dexp_eval(args[1], &address)) {
             {
                 sprintf(monbuf, "Invalid expression in address.\n");
@@ -465,7 +465,7 @@ void debuggerEditByte(int n, char** args)
                     monprintf(monbuf);
                 }
             }
-            debuggerWriteByte(address, (u16)value);
+            debuggerWriteByte(address, (uint16_t)value);
             address++;
         }
     } else
@@ -475,8 +475,8 @@ void debuggerEditByte(int n, char** args)
 void debuggerEditHalfWord(int n, char** args)
 {
     if (n >= 3) {
-        u32 address;
-        u32 value;
+        uint32_t address;
+        uint32_t value;
         if (!dexp_eval(args[1], &address)) {
             {
                 sprintf(monbuf, "Invalid expression in address.\n");
@@ -498,7 +498,7 @@ void debuggerEditHalfWord(int n, char** args)
                     monprintf(monbuf);
                 }
             }
-            debuggerWriteHalfWord(address, (u16)value);
+            debuggerWriteHalfWord(address, (uint16_t)value);
             address += 2;
         }
     } else
@@ -508,8 +508,8 @@ void debuggerEditHalfWord(int n, char** args)
 void debuggerEditWord(int n, char** args)
 {
     if (n >= 3) {
-        u32 address;
-        u32 value;
+        uint32_t address;
+        uint32_t value;
         if (!dexp_eval(args[1], &address)) {
             {
                 sprintf(monbuf, "Invalid expression in address.\n");
@@ -531,14 +531,14 @@ void debuggerEditWord(int n, char** args)
                     monprintf(monbuf);
                 }
             }
-            debuggerWriteMemory(address, (u32)value);
+            debuggerWriteMemory(address, (uint32_t)value);
             address += 4;
         }
     } else
         debuggerUsage("ew");
 }
 
-bool debuggerBreakOnRegisterCondition(u8 registerName, u32 compareVal, u32 regVal, u8 type)
+bool debuggerBreakOnRegisterCondition(uint8_t registerName, uint32_t compareVal, uint32_t regVal, uint8_t type)
 {
     const char* typeName;
     switch (type) {
@@ -602,7 +602,7 @@ void debuggerEditRegister(int n, char** args)
 {
     if (n == 3) {
         int r = getRegisterNumber(args[1]);
-        u32 val;
+        uint32_t val;
         if (r > 16) {
             {
                 sprintf(monbuf, "Error: Register must be valid (0-16)\n");
@@ -629,7 +629,7 @@ void debuggerEditRegister(int n, char** args)
 void debuggerEval(int n, char** args)
 {
     if (n == 2) {
-        u32 result = 0;
+        uint32_t result = 0;
         if (dexp_eval(args[1], &result)) {
             {
                 sprintf(monbuf, " =$%08X\n", result);
@@ -648,9 +648,9 @@ void debuggerEval(int n, char** args)
 void debuggerFillByte(int n, char** args)
 {
     if (n == 4) {
-        u32 address;
-        u32 value;
-        u32 reps;
+        uint32_t address;
+        uint32_t value;
+        uint32_t reps;
         if (!dexp_eval(args[1], &address)) {
             {
                 sprintf(monbuf, "Invalid expression in address.\n");
@@ -670,8 +670,8 @@ void debuggerFillByte(int n, char** args)
                 monprintf(monbuf);
             }
         }
-        for (u32 i = 0; i < reps; i++) {
-            debuggerWriteByte(address, (u8)value);
+        for (uint32_t i = 0; i < reps; i++) {
+            debuggerWriteByte(address, (uint8_t)value);
             address++;
         }
     } else
@@ -681,9 +681,9 @@ void debuggerFillByte(int n, char** args)
 void debuggerFillHalfWord(int n, char** args)
 {
     if (n == 4) {
-        u32 address;
-        u32 value;
-        u32 reps;
+        uint32_t address;
+        uint32_t value;
+        uint32_t reps;
         if (!dexp_eval(args[1], &address)) {
             {
                 sprintf(monbuf, "Invalid expression in address.\n");
@@ -707,8 +707,8 @@ void debuggerFillHalfWord(int n, char** args)
                 monprintf(monbuf);
             }
         }
-        for (u32 i = 0; i < reps; i++) {
-            debuggerWriteHalfWord(address, (u16)value);
+        for (uint32_t i = 0; i < reps; i++) {
+            debuggerWriteHalfWord(address, (uint16_t)value);
             address += 2;
         }
     } else
@@ -718,9 +718,9 @@ void debuggerFillHalfWord(int n, char** args)
 void debuggerFillWord(int n, char** args)
 {
     if (n == 4) {
-        u32 address;
-        u32 value;
-        u32 reps;
+        uint32_t address;
+        uint32_t value;
+        uint32_t reps;
         if (!dexp_eval(args[1], &address)) {
             {
                 sprintf(monbuf, "Invalid expression in address.\n");
@@ -744,8 +744,8 @@ void debuggerFillWord(int n, char** args)
                 monprintf(monbuf);
             }
         }
-        for (u32 i = 0; i < reps; i++) {
-            debuggerWriteMemory(address, (u32)value);
+        for (uint32_t i = 0; i < reps; i++) {
+            debuggerWriteMemory(address, (uint32_t)value);
             address += 4;
         }
     } else
@@ -754,11 +754,11 @@ void debuggerFillWord(int n, char** args)
 
 unsigned int SearchStart = 0xFFFFFFFF;
 unsigned int SearchMaxMatches = 5;
-u8 SearchData[64]; // It actually doesn't make much sense to search for more than 64 bytes, does it?
+uint8_t SearchData[64]; // It actually doesn't make much sense to search for more than 64 bytes, does it?
 unsigned int SearchLength = 0;
 unsigned int SearchResults;
 
-unsigned int AddressToGBA(u8* mem)
+unsigned int AddressToGBA(uint8_t* mem)
 {
     if (mem >= &bios[0] && mem <= &bios[0x3fff])
         return 0x00000000 + (mem - &bios[0]);
@@ -786,8 +786,8 @@ void debuggerDoSearch()
 
     while (true) {
         unsigned int final = SearchStart + SearchLength - 1;
-        u8* end;
-        u8* start;
+        uint8_t* end;
+        uint8_t* start;
 
         switch (SearchStart >> 24) {
         case 0:
@@ -873,7 +873,7 @@ void debuggerDoSearch()
         };
 
         end -= SearchLength - 1;
-        u8 firstbyte = SearchData[0];
+        uint8_t firstbyte = SearchData[0];
         while (start <= end) {
             while ((start <= end) && (*start != firstbyte))
                 start++;
@@ -1013,10 +1013,10 @@ void debuggerFindResume(int n, char** args)
 
 void debuggerCopyByte(int n, char** args)
 {
-    u32 source;
-    u32 dest;
-    u32 number = 1;
-    u32 reps = 1;
+    uint32_t source;
+    uint32_t dest;
+    uint32_t number = 1;
+    uint32_t reps = 1;
     if (n > 5 || n < 3) {
         debuggerUsage("copyb");
     }
@@ -1051,8 +1051,8 @@ void debuggerCopyByte(int n, char** args)
         }
     }
 
-    for (u32 j = 0; j < reps; j++) {
-        for (u32 i = 0; i < number; i++) {
+    for (uint32_t j = 0; j < reps; j++) {
+        for (uint32_t i = 0; i < number; i++) {
             debuggerWriteByte(dest + i, debuggerReadByte(source + i));
         }
         dest += number;
@@ -1061,10 +1061,10 @@ void debuggerCopyByte(int n, char** args)
 
 void debuggerCopyHalfWord(int n, char** args)
 {
-    u32 source;
-    u32 dest;
-    u32 number = 2;
-    u32 reps = 1;
+    uint32_t source;
+    uint32_t dest;
+    uint32_t number = 2;
+    uint32_t reps = 1;
     if (n > 5 || n < 3) {
         debuggerUsage("copyh");
     }
@@ -1100,8 +1100,8 @@ void debuggerCopyHalfWord(int n, char** args)
         }
     }
 
-    for (u32 j = 0; j < reps; j++) {
-        for (u32 i = 0; i < number; i += 2) {
+    for (uint32_t j = 0; j < reps; j++) {
+        for (uint32_t i = 0; i < number; i += 2) {
             debuggerWriteHalfWord(dest + i, debuggerReadHalfWord(source + i));
         }
         dest += number;
@@ -1110,10 +1110,10 @@ void debuggerCopyHalfWord(int n, char** args)
 
 void debuggerCopyWord(int n, char** args)
 {
-    u32 source;
-    u32 dest;
-    u32 number = 4;
-    u32 reps = 1;
+    uint32_t source;
+    uint32_t dest;
+    uint32_t number = 4;
+    uint32_t reps = 1;
     if (n > 5 || n < 3) {
         debuggerUsage("copyw");
     }
@@ -1149,8 +1149,8 @@ void debuggerCopyWord(int n, char** args)
         }
     }
 
-    for (u32 j = 0; j < reps; j++) {
-        for (u32 i = 0; i < number; i += 4) {
+    for (uint32_t j = 0; j < reps; j++) {
+        for (uint32_t i = 0; i < number; i += 4) {
             debuggerWriteMemory(dest + i, debuggerReadMemory(source + i));
         }
         dest += number;
@@ -1452,7 +1452,7 @@ char** wordSymbol;
 bool isTerminator[256];
 bool isNewline[256];
 bool isTab[256];
-u8 largestSymbol = 1;
+uint8_t largestSymbol = 1;
 
 void freeWordSymbolContents()
 {
@@ -1501,7 +1501,7 @@ void debuggerReadCharTable(int n, char** args)
             return;
         }
         char buffer[30];
-        u32 slot;
+        uint32_t slot;
         char* character = (char*)calloc(10, sizeof(char));
         wordSymbol = (char**)calloc(256, sizeof(char*));
         while (fgets(buffer, 30, tlb)) {
@@ -1541,7 +1541,7 @@ void debuggerReadCharTable(int n, char** args)
     }
 }
 
-void printCharGroup(u32 addr, bool useAscii)
+void printCharGroup(uint32_t addr, bool useAscii)
 {
     for (int i = 0; i < 16; i++) {
         if (useWordSymbol && !useAscii) {
@@ -1575,7 +1575,7 @@ void printCharGroup(u32 addr, bool useAscii)
 void debuggerMemoryByte(int n, char** args)
 {
     if (n == 2) {
-        u32 addr = 0;
+        uint32_t addr = 0;
 
         if (!dexp_eval(args[1], &addr)) {
             {
@@ -1609,7 +1609,7 @@ void debuggerMemoryByte(int n, char** args)
 void debuggerMemoryHalfWord(int n, char** args)
 {
     if (n == 2) {
-        u32 addr = 0;
+        uint32_t addr = 0;
 
         if (!dexp_eval(args[1], &addr)) {
             {
@@ -1646,7 +1646,7 @@ void debuggerMemoryHalfWord(int n, char** args)
 void debuggerMemoryWord(int n, char** args)
 {
     if (n == 2) {
-        u32 addr = 0;
+        uint32_t addr = 0;
         if (!dexp_eval(args[1], &addr)) {
             {
                 sprintf(monbuf, "Invalid expression\n");
@@ -1680,7 +1680,7 @@ void debuggerMemoryWord(int n, char** args)
 void debuggerStringRead(int n, char** args)
 {
     if (n == 2) {
-        u32 addr = 0;
+        uint32_t addr = 0;
 
         if (!dexp_eval(args[1], &addr)) {
             {
@@ -1690,7 +1690,7 @@ void debuggerStringRead(int n, char** args)
             return;
         }
         for (int i = 0; i < 512; i++) {
-            u8 slot = debuggerReadByte(addr + i);
+            uint8_t slot = debuggerReadByte(addr + i);
 
             if (useWordSymbol) {
                 if (isTerminator[slot]) {
@@ -1830,8 +1830,8 @@ void debuggerSetRadix(int argc, char** argv)
 void debuggerSymbols(int argc, char** argv)
 {
     int i = 0;
-    u32 value;
-    u32 size;
+    uint32_t value;
+    uint32_t size;
     int type;
     bool match = false;
     int matchSize = 0;
@@ -1882,13 +1882,13 @@ void debuggerSymbols(int argc, char** argv)
 
 void debuggerWhere(int n, char** args)
 {
-    void elfPrintCallChain(u32);
+    void elfPrintCallChain(uint32_t);
     elfPrintCallChain(armNextPC);
 }
 
 void debuggerVar(int n, char** args)
 {
-    u32 val;
+    uint32_t val;
 
     if (n < 2) {
         dexp_listVars();
@@ -1956,7 +1956,7 @@ void debuggerVar(int n, char** args)
     }
 }
 
-bool debuggerBreakOnExecution(u32 address, u8 state)
+bool debuggerBreakOnExecution(uint32_t address, uint8_t state)
 {
     if (dontBreakNow)
         return false;
@@ -1973,7 +1973,7 @@ bool debuggerBreakOnExecution(u32 address, u8 state)
     return true;
 }
 
-bool debuggerBreakOnRead(u32 address, int size)
+bool debuggerBreakOnRead(uint32_t address, int size)
 {
     if (dontBreakNow)
         return false;
@@ -1994,7 +1994,7 @@ bool debuggerBreakOnRead(u32 address, int size)
     return true;
 }
 
-bool debuggerBreakOnWrite(u32 address, u32 value, int size)
+bool debuggerBreakOnWrite(uint32_t address, uint32_t value, int size)
 {
     if (dontBreakNow)
         return false;
@@ -2002,25 +2002,25 @@ bool debuggerBreakOnWrite(u32 address, u32 value, int size)
         return false;
     if (!doesBreak(address, 0x11))
         return false;
-    //u32 lastValue;
+    //uint32_t lastValue;
     //dexp_eval("old_value", &lastValue);
     //if (size == 2)
     //	monprintf("Breakpoint (on write) address %08x old:%08x new:%08x\n",
     //	address, lastValue, value);
     //else if (size == 1)
     //	monprintf("Breakpoint (on write) address %08x old:%04x new:%04x\n",
-    //	address, (u16)lastValue, (u16)value);
+    //	address, (uint16_t)lastValue, (uint16_t)value);
     //else
     //	monprintf("Breakpoint (on write) address %08x old:%02x new:%02x\n",
-    //	address, (u8)lastValue, (u8)value);
+    //	address, (uint8_t)lastValue, (uint8_t)value);
     debugger = true;
     return true;
 }
 
-void debuggerBreakOnWrite(u32 address, u32 oldvalue, u32 value, int size, int t)
+void debuggerBreakOnWrite(uint32_t address, uint32_t oldvalue, uint32_t value, int size, int t)
 {
     debuggerBreakOnWrite(address, value, size);
-    //u32 lastValue;
+    //uint32_t lastValue;
     //dexp_eval("old_value", &lastValue);
 
     //const char *type = "write";
@@ -2032,14 +2032,14 @@ void debuggerBreakOnWrite(u32 address, u32 oldvalue, u32 value, int size, int t)
     //	type, address, oldvalue, value);
     //else if (size == 1)
     //	monprintf("Breakpoint (on %s) address %08x old:%04x new:%04x\n",
-    //	type, address, (u16)oldvalue, (u16)value);
+    //	type, address, (uint16_t)oldvalue, (uint16_t)value);
     //else
     //	monprintf("Breakpoint (on %s) address %08x old:%02x new:%02x\n",
-    //	type, address, (u8)oldvalue, (u8)value);
+    //	type, address, (uint8_t)oldvalue, (uint8_t)value);
     //debugger = true;
 }
 
-u8 getFlags(char* flagName)
+uint8_t getFlags(char* flagName)
 {
 
     for (int i = 0; flagName[i] != '\0'; i++) {
@@ -2054,7 +2054,7 @@ u8 getFlags(char* flagName)
         return 0x0;
     }
 
-    u8 flag = 0;
+    uint8_t flag = 0;
 
     bool negate_flag = false;
 
@@ -2096,9 +2096,9 @@ void debuggerBreakRegister(int n, char** args)
         printFlagHelp();
         return;
     }
-    u8 reg = (u8)getRegisterNumber(args[0]);
-    u8 flag = getFlags(args[1]);
-    u32 value;
+    uint8_t reg = (uint8_t)getRegisterNumber(args[0]);
+    uint8_t flag = getFlags(args[1]);
+    uint32_t value;
     if (!dexp_eval(args[2], &value)) {
         {
             sprintf(monbuf, "Invalid expression.\n");
@@ -2153,7 +2153,7 @@ void debuggerBreakRegisterDelete(int n, char** args)
         }
         return;
     }
-    u32 num;
+    uint32_t num;
     if (!dexp_eval(args[1], &num)) {
         {
             sprintf(monbuf, "Could not parse the breakpoint number:\n Correct usage requires <register> <breakpointNo>.\n");
@@ -2331,7 +2331,7 @@ char* breakSymbolCombo(char* command, int* length)
     return res;
 }
 
-const char* typeMapping[] = { "'u8", "'u16", "'u32", "'u32", "'s8", "'s16", "'s32", "'s32" };
+const char* typeMapping[] = { "'uint8_t", "'uint16_t", "'uint32_t", "'uint32_t", "'int8_t", "'int16_t", "'int32_t", "'int32_t" };
 
 const char* compareFlagMapping[] = { "Never", "==", ">", ">=", "<", "<=", "!=", "<=>" };
 
@@ -2393,7 +2393,7 @@ void printConditionalBreak(struct ConditionalBreak* toPrint, bool printAddress)
             monprintf(monbuf);
         }
         bool hasPrevCond = false;
-        u8 flgs = 0x80;
+        uint8_t flgs = 0x80;
         while (flgs != 0) {
             if (toPrint->type_flags & flgs) {
                 if (hasPrevCond) {
@@ -2455,7 +2455,7 @@ void printAllConditionals()
             }
             struct ConditionalBreak* base = conditionals[i];
             int count = 1;
-            u32 lastAddress = base->break_address;
+            uint32_t lastAddress = base->break_address;
             {
                 sprintf(monbuf, "Address %08x\n-------------------------\n", lastAddress);
                 monprintf(monbuf);
@@ -2485,9 +2485,9 @@ void printAllConditionals()
     }
 }
 
-u8 printConditionalsFromAddress(u32 address)
+uint8_t printConditionalsFromAddress(uint32_t address)
 {
-    u8 count = 1;
+    uint8_t count = 1;
     if (conditionals[address >> 24] != NULL) {
         struct ConditionalBreak* base = conditionals[address >> 24];
         while (base) {
@@ -2519,7 +2519,7 @@ u8 printConditionalsFromAddress(u32 address)
     return count;
 }
 
-void printAllFlagConditionals(u8 flag, bool orMode)
+void printAllFlagConditionals(uint8_t flag, bool orMode)
 {
     int count = 1;
     int actualCount = 1;
@@ -2528,7 +2528,7 @@ void printAllFlagConditionals(u8 flag, bool orMode)
             bool isCondStart = true;
             struct ConditionalBreak* base = conditionals[i];
 
-            u32 lastAddress = base->break_address;
+            uint32_t lastAddress = base->break_address;
 
             while (base) {
                 if (lastAddress != base->break_address) {
@@ -2568,7 +2568,7 @@ void printAllFlagConditionals(u8 flag, bool orMode)
     }
 }
 
-void printAllFlagConditionalsWithAddress(u32 address, u8 flag, bool orMode)
+void printAllFlagConditionalsWithAddress(uint32_t address, uint8_t flag, bool orMode)
 {
     int count = 1;
     int actualCount = 1;
@@ -2577,7 +2577,7 @@ void printAllFlagConditionalsWithAddress(u32 address, u8 flag, bool orMode)
             bool isCondStart = true;
             struct ConditionalBreak* base = conditionals[i];
 
-            u32 lastAddress = base->break_address;
+            uint32_t lastAddress = base->break_address;
 
             while (base) {
                 if (lastAddress != base->break_address) {
@@ -2617,7 +2617,7 @@ void printAllFlagConditionalsWithAddress(u32 address, u8 flag, bool orMode)
     }
 }
 
-void makeBreak(u32 address, u8 flags, char** expression, int n)
+void makeBreak(uint32_t address, uint8_t flags, char** expression, int n)
 {
     if (n >= 1) {
         if (tolower(expression[0][0]) == 'i' && tolower(expression[0][1]) == 'f') {
@@ -2634,7 +2634,7 @@ void makeBreak(u32 address, u8 flags, char** expression, int n)
         return;
     }
 }
-void deleteBreak(u32 address, u8 flags, char** expression, int howToDelete)
+void deleteBreak(uint32_t address, uint8_t flags, char** expression, int howToDelete)
 {
     bool applyOr = true;
     if (howToDelete > 0) {
@@ -2644,7 +2644,7 @@ void deleteBreak(u32 address, u8 flags, char** expression, int howToDelete)
             expression++;
         }
         if (howToDelete > 0) {
-            u32 number = 0;
+            uint32_t number = 0;
             if (!dexp_eval(expression[0], &number)) {
                 {
                     sprintf(monbuf, "Invalid expression for number format.\n");
@@ -2652,7 +2652,7 @@ void deleteBreak(u32 address, u8 flags, char** expression, int howToDelete)
                 }
                 return;
             }
-            removeFlagFromConditionalBreakNo(address, (u8)number, (flags | (flags >> 4)));
+            removeFlagFromConditionalBreakNo(address, (uint8_t)number, (flags | (flags >> 4)));
             {
                 sprintf(monbuf, "Removed all specified breaks from %08x.\n", address);
                 monprintf(monbuf);
@@ -2675,7 +2675,7 @@ void deleteBreak(u32 address, u8 flags, char** expression, int howToDelete)
     }
     return;
 }
-void clearBreaks(u32 address, u8 flags, char** expression, int howToClear)
+void clearBreaks(uint32_t address, uint8_t flags, char** expression, int howToClear)
 {
     if (howToClear == 2) {
         removeConditionalWithFlag(flags, true);
@@ -2690,7 +2690,7 @@ void clearBreaks(u32 address, u8 flags, char** expression, int howToClear)
     }
 }
 
-void listBreaks(u32 address, u8 flags, char** expression, int howToList)
+void listBreaks(uint32_t address, uint8_t flags, char** expression, int howToList)
 {
     flags |= (flags << 4);
     if (howToList) {
@@ -2723,10 +2723,10 @@ void executeBreakCommands(int n, char** cmd)
     }
     cmd++;
     n--;
-    void (*operation)(u32, u8, char**, int) = &makeBreak; //the function to be called
+    void (*operation)(uint32_t, uint8_t, char**, int) = &makeBreak; //the function to be called
 
-    u8 flag = 0;
-    u32 address = 0;
+    uint8_t flag = 0;
+    uint32_t address = 0;
     //if(strlen(command) == 1){
     //Cannot happen, that would mean cmd[0] != b
     //}
@@ -3158,16 +3158,16 @@ void debuggerUsage(const char* cmd)
         monprintf("&& states the next condition must happen with the previous one, or the break\nfails.\n");
         monprintf("|| states the next condition is independent from the last one, and break\nseparately.\n\n");
         monprintf("Type can be:\n");
-        monprintf("   [u8, b, byte],[u16, h, hword, halfword],[u32,w, word]\n");
-        monprintf("   [s8, sb, sbyte],[s16, sh, shword, short, shalfword],[s32, int, sw, word]\n");
-        monprintf("Types have to be preceded by a ' ex: 'int, 'u8\n\n");
+        monprintf("   [uint8_t, b, byte],[uint16_t, h, hword, halfword],[uint32_t,w, word]\n");
+        monprintf("   [int8_t, sb, sbyte],[int16_t, sh, shword, short, shalfword],[int32_t, int, sw, word]\n");
+        monprintf("Types have to be preceded by a ' ex: 'int, 'uint8_t\n\n");
         monprintf("Conditions may be:\n");
         monprintf("C-like:\t\t[<], [<=], [>], [>=] , [==], [!= or <>]\n");
         monprintf("ASM-like:\t[lt], [le], [gt], [ge] , [eq], [ne]\n\n");
-        monprintf("EX:	bw 0x03005008 if old_value == 'u32 [0x03005008]\n");
+        monprintf("EX:	bw 0x03005008 if old_value == 'uint32_t [0x03005008]\n");
         monprintf("Breaks on write from 0x03005008, when the old_value variable, that is assigned\n");
         monprintf("as the previous memory value when a write is performed, is equal to the new\ncontents of 0x03005008.\n\n");
-        monprintf("EX:	bx 0x08000500 if r0 == 1 || r0 > 1 && r2 == 0 || 'u8 [r7] == 5\n");
+        monprintf("EX:	bx 0x08000500 if r0 == 1 || r0 > 1 && r2 == 0 || 'uint8_t [r7] == 5\n");
         monprintf("Breaks in either thumb or arm execution of 0x08000500, if r0's contents are 1,\n");
         monprintf("or if r0's contents are bigger than 1 and r2 is equal to 0, or the content of\nthe address at r7(as byte) is equal to 5.\n");
         monprintf("It will not break if r0 > 1 and r2 != 0.\n");
@@ -3555,7 +3555,7 @@ void remotePutPacket(const char* packet)
     }
 }
 
-void remoteOutput(const char* s, u32 addr)
+void remoteOutput(const char* s, uint32_t addr)
 {
     char buffer[16384];
 
@@ -3597,7 +3597,7 @@ void remoteSendStatus()
     char* s = buffer;
     s += 3;
     for (int i = 0; i < 15; i++) {
-        u32 v = reg[i].I;
+        uint32_t v = reg[i].I;
         sprintf(s, "%02x:%02x%02x%02x%02x;", i,
             (v & 255),
             (v >> 8) & 255,
@@ -3605,7 +3605,7 @@ void remoteSendStatus()
             (v >> 24) & 255);
         s += 12;
     }
-    u32 v = armNextPC;
+    uint32_t v = armNextPC;
     sprintf(s, "0f:%02x%02x%02x%02x;", (v & 255),
         (v >> 8) & 255,
         (v >> 16) & 255,
@@ -3625,7 +3625,7 @@ void remoteSendStatus()
 
 void remoteBinaryWrite(char* p)
 {
-    u32 address;
+    uint32_t address;
     int count;
     sscanf(p, "%x,%x:", &address, &count);
     //  monprintf("Binary write for %08x %d\n", address, count);
@@ -3633,7 +3633,7 @@ void remoteBinaryWrite(char* p)
     p = strchr(p, ':');
     p++;
     for (int i = 0; i < count; i++) {
-        u8 b = *p++;
+        uint8_t b = *p++;
         switch (b) {
         case 0x7d:
             b = *p++;
@@ -3652,7 +3652,7 @@ void remoteBinaryWrite(char* p)
 
 void remoteMemoryWrite(char* p)
 {
-    u32 address;
+    uint32_t address;
     int count;
     sscanf(p, "%x,%x:", &address, &count);
     //  monprintf("Memory write for %08x %d\n", address, count);
@@ -3660,7 +3660,7 @@ void remoteMemoryWrite(char* p)
     p = strchr(p, ':');
     p++;
     for (int i = 0; i < count; i++) {
-        u8 v = 0;
+        uint8_t v = 0;
         char c = *p++;
         if (c <= '9')
             v = (c - '0') << 4;
@@ -3680,7 +3680,7 @@ void remoteMemoryWrite(char* p)
 
 void remoteMemoryRead(char* p)
 {
-    u32 address;
+    uint32_t address;
     int count;
     sscanf(p, "%x,%x:", &address, &count);
     //  monprintf("Memory read for %08x %d\n", address, count);
@@ -3689,7 +3689,7 @@ void remoteMemoryRead(char* p)
 
     char* s = buffer;
     for (int i = 0; i < count; i++) {
-        u8 b = debuggerReadByte(address);
+        uint8_t b = debuggerReadByte(address);
         sprintf(s, "%02x", b);
         address++;
         s += 2;
@@ -3718,8 +3718,8 @@ void remoteQuery(char* p)
 
 void remoteStepOverRange(char* p)
 {
-    u32 address;
-    u32 final;
+    uint32_t address;
+    uint32_t final;
     sscanf(p, "%x,%x", &address, & final);
 
     remotePutPacket("OK");
@@ -3738,7 +3738,7 @@ void remoteStepOverRange(char* p)
 
 void remoteSetBreakPoint(char* p)
 {
-    u32 address;
+    uint32_t address;
     int count;
     sscanf(p, ",%x,%x#", &address, &count);
 
@@ -3756,7 +3756,7 @@ void remoteSetBreakPoint(char* p)
     //	return;
     //}
 
-    //u32 final = address + count;
+    //uint32_t final = address + count;
 
     //if (address < 0x2040000 && final > 0x2040000) {
     //	remotePutPacket("E01");
@@ -3772,7 +3772,7 @@ void remoteSetBreakPoint(char* p)
 void remoteClearBreakPoint(char* p)
 {
     int result;
-    u32 address;
+    uint32_t address;
     int count;
     sscanf(p, ",%x,%x#", &address, &count);
 
@@ -3787,7 +3787,7 @@ void remoteClearBreakPoint(char* p)
 
 void remoteSetMemoryReadBreakPoint(char* p)
 {
-    u32 address;
+    uint32_t address;
     int count;
     sscanf(p, ",%x,%x#", &address, &count);
 
@@ -3805,7 +3805,7 @@ void remoteSetMemoryReadBreakPoint(char* p)
     //	return;
     //}
 
-    //u32 final = address + count;
+    //uint32_t final = address + count;
 
     //if (address < 0x2040000 && final > 0x2040000) {
     //	remotePutPacket("E01");
@@ -3822,7 +3822,7 @@ void remoteClearMemoryReadBreakPoint(char* p)
 {
     bool error = false;
     int result;
-    u32 address;
+    uint32_t address;
     int count;
     sscanf(p, ",%x,%x#", &address, &count);
 
@@ -3840,7 +3840,7 @@ void remoteClearMemoryReadBreakPoint(char* p)
 
 void remoteSetMemoryAccessBreakPoint(char* p)
 {
-    u32 address;
+    uint32_t address;
     int count;
     sscanf(p, ",%x,%x#", &address, &count);
 
@@ -3858,7 +3858,7 @@ void remoteSetMemoryAccessBreakPoint(char* p)
     //	return;
     //}
 
-    //u32 final = address + count;
+    //uint32_t final = address + count;
 
     //if (address < 0x2040000 && final > 0x2040000) {
     //	remotePutPacket("E01");
@@ -3875,7 +3875,7 @@ void remoteClearMemoryAccessBreakPoint(char* p)
 {
     bool error = false;
     int result;
-    u32 address;
+    uint32_t address;
     int count;
     sscanf(p, ",%x,%x#", &address, &count);
 
@@ -3893,7 +3893,7 @@ void remoteClearMemoryAccessBreakPoint(char* p)
 
 void remoteWriteWatch(char* p, bool active)
 {
-    u32 address;
+    uint32_t address;
     int count;
     sscanf(p, ",%x,%x#", &address, &count);
 
@@ -3918,7 +3918,7 @@ void remoteWriteWatch(char* p, bool active)
     //  return;
     //}
 
-    u32 final = address + count;
+    uint32_t final = address + count;
 
 //if(address < 0x2040000 && final > 0x2040000) {
 //  remotePutPacket("E01");
@@ -3947,7 +3947,7 @@ void remoteReadRegister(char* p)
     sscanf(p, "%x", &r);
     char buffer[1024];
     char* s = buffer;
-    u32 v = reg[r].I;
+    uint32_t v = reg[r].I;
     sprintf(s, "%02x%02x%02x%02x", v & 255, (v >> 8) & 255,
         (v >> 16) & 255, (v >> 24) & 255);
     remotePutPacket(buffer);
@@ -3961,13 +3961,13 @@ void remoteReadRegisters(char* p)
     int i;
     // regular registers
     for (i = 0; i < 15; i++) {
-        u32 v = reg[i].I;
+        uint32_t v = reg[i].I;
         sprintf(s, "%02x%02x%02x%02x", v & 255, (v >> 8) & 255,
             (v >> 16) & 255, (v >> 24) & 255);
         s += 8;
     }
     // PC
-    u32 pc = armNextPC;
+    uint32_t pc = armNextPC;
     sprintf(s, "%02x%02x%02x%02x", pc & 255, (pc >> 8) & 255,
         (pc >> 16) & 255, (pc >> 24) & 255);
     s += 8;
@@ -3983,7 +3983,7 @@ void remoteReadRegisters(char* p)
     s += 8;
     // CPSR
     CPUUpdateCPSR();
-    u32 v = reg[16].I;
+    uint32_t v = reg[16].I;
     sprintf(s, "%02x%02x%02x%02x", v & 255, (v >> 8) & 255,
         (v >> 16) & 255, (v >> 24) & 255);
     s += 8;
@@ -4002,14 +4002,14 @@ void remoteWriteRegister(char* p)
 
     char c = *p++;
 
-    u32 v = 0;
+    uint32_t v = 0;
 
-    u8 data[4] = { 0, 0, 0, 0 };
+    uint8_t data[4] = { 0, 0, 0, 0 };
 
     int i = 0;
 
     while (i < 4) {
-        u8 b = 0;
+        uint8_t b = 0;
         if (c <= '9')
             b = (c - '0') << 4;
         else
@@ -4224,7 +4224,7 @@ std::string HexToString(char* p)
     std::string hex(p);
     std::string cmd;
     std::stringstream ss;
-    u32 offset = 0;
+    uint32_t offset = 0;
     while (offset < hex.length()) {
         unsigned int buffer = 0;
         ss.clear();
@@ -4240,7 +4240,7 @@ std::string StringToHex(std::string& cmd)
 {
     std::stringstream ss;
     ss << std::hex;
-    for (u32 i = 0; i < cmd.length(); ++i)
+    for (uint32_t i = 0; i < cmd.length(); ++i)
         ss << std::setw(2) << std::setfill('0') << (int)cmd.c_str()[i];
     return ss.str();
 }

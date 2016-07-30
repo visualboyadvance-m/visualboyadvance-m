@@ -1,10 +1,10 @@
 // this is essentially a copy of ../win32/IOViewRegisters.h using translatable
 // strings and more consts
 struct IOData {
-    u16* address;
-    u16 offset;
+    uint16_t* address;
+    uint16_t offset;
     const wxChar* name;
-    u16 write;
+    uint16_t write;
     const wxChar* bits[16];
 };
 

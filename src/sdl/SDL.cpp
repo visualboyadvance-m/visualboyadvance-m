@@ -90,7 +90,7 @@ extern void remoteInit();
 extern void remoteCleanUp();
 extern void remoteStubMain();
 extern void remoteStubSignal(int, int);
-extern void remoteOutput(const char*, u32);
+extern void remoteOutput(const char*, uint32_t);
 extern void remoteSetProtocol(int);
 extern void remoteSetPort(int);
 
@@ -132,7 +132,7 @@ int destHeight = 0;
 int desktopWidth = 0;
 int desktopHeight = 0;
 
-u8* delta = NULL;
+uint8_t* delta = NULL;
 static const int delta_size = 322 * 242 * 4;
 
 int filter_enlarge = 2;
@@ -141,13 +141,13 @@ int cartridgeType = 3;
 
 int textureSize = 256;
 GLuint screenTexture = 0;
-u8* filterPix = 0;
+uint8_t* filterPix = 0;
 
 int emulating = 0;
 int RGB_LOW_BITS_MASK = 0x821;
-u32 systemColorMap32[0x10000];
-u16 systemColorMap16[0x10000];
-u16 systemGbPalette[24];
+uint32_t systemColorMap32[0x10000];
+uint16_t systemColorMap16[0x10000];
+uint16_t systemGbPalette[24];
 
 char filename[2048];
 
@@ -190,7 +190,7 @@ enum VIDEO_SIZE {
 
 #define _stricmp strcasecmp
 
-u32 throttleLastTime = 0;
+uint32_t throttleLastTime = 0;
 
 bool pauseNextFrame = false;
 int sdlMirroringEnable = 1;
@@ -203,7 +203,7 @@ void systemConsoleMessage(const char*);
 char* home;
 
 char screenMessageBuffer[21];
-u32 screenMessageTime = 0;
+uint32_t screenMessageTime = 0;
 
 #define SOUND_MAX_VOLUME 2.0
 #define SOUND_ECHO 0.2
@@ -627,7 +627,7 @@ static void sdlApplyPerImagePreferences()
     fclose(f);
 }
 
-static int sdlCalculateShift(u32 mask)
+static int sdlCalculateShift(uint32_t mask)
 {
     int m = 0;
 
@@ -795,7 +795,7 @@ static void sdlResizeVideo()
 
     if (openGL) {
         free(filterPix);
-        filterPix = (u8*)calloc(1, (systemColorDepth >> 3) * destWidth * destHeight);
+        filterPix = (uint8_t*)calloc(1, (systemColorDepth >> 3) * destWidth * destHeight);
         sdlOpenGLVideoResize();
     }
 
@@ -856,7 +856,7 @@ void sdlInitVideo()
         exit(-1);
     }
 
-    u32 rmask, gmask, bmask;
+    uint32_t rmask, gmask, bmask;
 
 #if 0
   if(openGL) {
@@ -947,7 +947,7 @@ void sdlInitVideo()
     int scaledHeight = screenHeight * sdlOpenglScale;
 
     free(filterPix);
-    filterPix = (u8 *)calloc(1, (systemColorDepth >> 3) * destWidth * destHeight);
+    filterPix = (uint8_t *)calloc(1, (systemColorDepth >> 3) * destWidth * destHeight);
     sdlOpenGLInit(screenWidth, screenHeight);
 
     if (	(!fullScreen)
@@ -1833,15 +1833,15 @@ int main(int argc, char** argv)
         soundInit();
         cartridgeType = 0;
         strcpy(filename, "gnu_stub");
-        rom = (u8*)malloc(0x2000000);
-        workRAM = (u8*)calloc(1, 0x40000);
-        bios = (u8*)calloc(1, 0x4000);
-        internalRAM = (u8*)calloc(1, 0x8000);
-        paletteRAM = (u8*)calloc(1, 0x400);
-        vram = (u8*)calloc(1, 0x20000);
-        oam = (u8*)calloc(1, 0x400);
-        pix = (u8*)calloc(1, 4 * 241 * 162);
-        ioMem = (u8*)calloc(1, 0x400);
+        rom = (uint8_t*)malloc(0x2000000);
+        workRAM = (uint8_t*)calloc(1, 0x40000);
+        bios = (uint8_t*)calloc(1, 0x4000);
+        internalRAM = (uint8_t*)calloc(1, 0x8000);
+        paletteRAM = (uint8_t*)calloc(1, 0x400);
+        vram = (uint8_t*)calloc(1, 0x20000);
+        oam = (uint8_t*)calloc(1, 0x400);
+        pix = (uint8_t*)calloc(1, 4 * 241 * 162);
+        ioMem = (uint8_t*)calloc(1, 0x400);
 
         emulator = GBASystem;
 
@@ -1917,7 +1917,7 @@ int main(int argc, char** argv)
     utilUpdateSystemColorMaps();
 
     if (delta == NULL) {
-        delta = (u8*)malloc(delta_size);
+        delta = (uint8_t*)malloc(delta_size);
         memset(delta, 255, delta_size);
     }
 
@@ -2025,7 +2025,7 @@ void systemMessage(int num, const char* msg, ...)
     va_end(valist);
 }
 
-void drawScreenMessage(u8* screen, int pitch, int x, int y, unsigned int duration)
+void drawScreenMessage(uint8_t* screen, int pitch, int x, int y, unsigned int duration)
 {
     if (screenMessage) {
         if (cartridgeType == 1 && gbBorderOn) {
@@ -2040,7 +2040,7 @@ void drawScreenMessage(u8* screen, int pitch, int x, int y, unsigned int duratio
     }
 }
 
-void drawSpeed(u8* screen, int pitch, int x, int y)
+void drawSpeed(uint8_t* screen, int pitch, int x, int y)
 {
     char buffer[50];
     if (showSpeed == 1)
@@ -2056,14 +2056,14 @@ void drawSpeed(u8* screen, int pitch, int x, int y)
 void systemDrawScreen()
 {
     unsigned int destPitch = destWidth * (systemColorDepth >> 3);
-    u8* screen;
+    uint8_t* screen;
 
     renderedFrames++;
 
     if (openGL)
         screen = filterPix;
     else {
-        screen = (u8*)surface->pixels;
+        screen = (uint8_t*)surface->pixels;
         SDL_LockSurface(surface);
     }
 
@@ -2077,7 +2077,7 @@ void systemDrawScreen()
         int bytes = (systemColorDepth >> 3);
         for (int i = 0; i < destWidth; i++)
             for (int j = 0; j < destHeight; j++) {
-                u8 k;
+                uint8_t k;
                 k = filterPix[i * bytes + j * destPitch + 3];
                 filterPix[i * bytes + j * destPitch + 3] = filterPix[i * bytes + j * destPitch + 1];
                 filterPix[i * bytes + j * destPitch + 1] = k;
@@ -2151,9 +2151,9 @@ void systemFrame()
 
 void system10Frames(int rate)
 {
-    u32 time = systemGetClock();
+    uint32_t time = systemGetClock();
     if (!wasPaused && autoFrameSkip) {
-        u32 diff = time - autoFrameSkipLastTime;
+        uint32_t diff = time - autoFrameSkipLastTime;
         int speed = 100;
 
         if (diff)
@@ -2234,12 +2234,12 @@ void systemLoadRecent()
     // I need to be implemented
 }
 
-u32 systemGetClock()
+uint32_t systemGetClock()
 {
     return SDL_GetTicks();
 }
 
-void systemGbPrint(u8* data, int len, int pages, int feed, int palette, int contrast)
+void systemGbPrint(uint8_t* data, int len, int pages, int feed, int palette, int contrast)
 {
 }
 
@@ -2310,11 +2310,11 @@ bool systemReadJoypads()
     return true;
 }
 
-u32 systemReadJoypad(int which)
+uint32_t systemReadJoypad(int which)
 {
     return inputReadJoypad(which);
 }
-//static u8 sensorDarkness = 0xE8; // total darkness (including daylight on rainy days)
+//static uint8_t sensorDarkness = 0xE8; // total darkness (including daylight on rainy days)
 
 void systemUpdateSolarSensor()
 {
@@ -2345,7 +2345,7 @@ int systemGetSensorZ()
     return 0;
 }
 
-u8 systemGetSensorDarkness()
+uint8_t systemGetSensorDarkness()
 {
     return 0xE8;
 }
@@ -2361,7 +2361,7 @@ void systemOnSoundShutdown()
 {
 }
 
-void systemOnWriteDataToSoundBuffer(const u16* finalWave, int length)
+void systemOnWriteDataToSoundBuffer(const uint16_t* finalWave, int length)
 {
 }
 

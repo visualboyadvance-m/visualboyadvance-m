@@ -129,7 +129,7 @@ MediaRet MediaRecorder::setup_sound_stream(const char *fname, AVOutputFormat *fm
     ctx = aud_st->codec;
     ctx->codec_id = fmt->audio_codec;
     ctx->codec_type = AVMEDIA_TYPE_AUDIO;
-    // Some encoders don't like s16 (SAMPLE_FMT_S16)
+    // Some encoders don't like int16_t (SAMPLE_FMT_S16)
     ctx->sample_fmt = codec->sample_fmts[0];
     // This was changed in the initial ffmpeg 3.0 update,
     // but shouldn't (as far as I'm aware) cause problems with older versions

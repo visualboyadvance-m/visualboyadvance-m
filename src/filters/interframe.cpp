@@ -12,20 +12,20 @@ extern "C" bool cpu_mmx;
    Incorporated into vba by Anthony Di Franco
 */
 
-static u8 *frm1 = NULL;
-static u8 *frm2 = NULL;
-static u8 *frm3 = NULL;
+static uint8_t *frm1 = NULL;
+static uint8_t *frm2 = NULL;
+static uint8_t *frm3 = NULL;
 
 extern int RGB_LOW_BITS_MASK;
-extern u32 qRGB_COLOR_MASK[2];
+extern uint32_t qRGB_COLOR_MASK[2];
 
 static void Init()
 {
-  frm1 = (u8 *)calloc(322*242,4);
+  frm1 = (uint8_t *)calloc(322*242,4);
   // 1 frame ago
-  frm2 = (u8 *)calloc(322*242,4);
+  frm2 = (uint8_t *)calloc(322*242,4);
   // 2 frames ago
-  frm3 = (u8 *)calloc(322*242,4);
+  frm3 = (uint8_t *)calloc(322*242,4);
   // 3 frames ago
 }
 
@@ -41,12 +41,12 @@ void InterframeCleanup()
 }
 
 #ifdef MMX
-static void SmartIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
+static void SmartIB_MMX(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int height)
 {
-  u16 *src0 = (u16 *)srcPtr + starty * srcPitch / 2;
-  u16 *src1 = (u16 *)frm1 + srcPitch * starty / 2;
-  u16 *src2 = (u16 *)frm2 + srcPitch * starty / 2;
-  u16 *src3 = (u16 *)frm3 + srcPitch * starty / 2;
+  uint16_t *src0 = (uint16_t *)srcPtr + starty * srcPitch / 2;
+  uint16_t *src1 = (uint16_t *)frm1 + srcPitch * starty / 2;
+  uint16_t *src2 = (uint16_t *)frm2 + srcPitch * starty / 2;
+  uint16_t *src3 = (uint16_t *)frm3 + srcPitch * starty / 2;
 
   int count = width >> 2;
 
@@ -152,14 +152,14 @@ static void SmartIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, int hei
   }
 
   /* Swap buffers around */
-  u8 *temp = frm1;
+  uint8_t *temp = frm1;
   frm1 = frm3;
   frm3 = frm2;
   frm2 = temp;
 }
 #endif
 
-void SmartIB(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
+void SmartIB(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int height)
 {
   if(frm1 == NULL) {
     Init();
@@ -171,19 +171,19 @@ void SmartIB(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
   }
 #endif
 
-  u16 colorMask = ~RGB_LOW_BITS_MASK;
+  uint16_t colorMask = ~RGB_LOW_BITS_MASK;
 
-  u16 *src0 = (u16 *)srcPtr + starty * srcPitch / 2;
-  u16 *src1 = (u16 *)frm1 + srcPitch * starty / 2;
-  u16 *src2 = (u16 *)frm2 + srcPitch * starty / 2;
-  u16 *src3 = (u16 *)frm3 + srcPitch * starty / 2;
+  uint16_t *src0 = (uint16_t *)srcPtr + starty * srcPitch / 2;
+  uint16_t *src1 = (uint16_t *)frm1 + srcPitch * starty / 2;
+  uint16_t *src2 = (uint16_t *)frm2 + srcPitch * starty / 2;
+  uint16_t *src3 = (uint16_t *)frm3 + srcPitch * starty / 2;
 
   int sPitch = srcPitch >> 1;
 
   int pos = 0;
   for (int j = 0; j < height;  j++)
     for (int i = 0; i < sPitch; i++) {
-      u16 color = src0[pos];
+      uint16_t color = src0[pos];
       src0[pos] =
         (src1[pos] != src2[pos]) &&
         (src3[pos] != color) &&
@@ -195,24 +195,24 @@ void SmartIB(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
     }
 
   /* Swap buffers around */
-  u8 *temp = frm1;
+  uint8_t *temp = frm1;
   frm1 = frm3;
   frm3 = frm2;
   frm2 = temp;
 }
 
-void SmartIB(u8 *srcPtr, u32 srcPitch, int width, int height)
+void SmartIB(uint8_t *srcPtr, uint32_t srcPitch, int width, int height)
 {
   SmartIB(srcPtr, srcPitch, width, 0, height);
 }
 
 #ifdef MMX
-static void SmartIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
+static void SmartIB32_MMX(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int height)
 {
-  u32 *src0 = (u32 *)srcPtr + starty * srcPitch / 4;
-  u32 *src1 = (u32 *)frm1 + starty * srcPitch / 4;
-  u32 *src2 = (u32 *)frm2 + starty * srcPitch / 4;
-  u32 *src3 = (u32 *)frm3 + starty * srcPitch / 4;
+  uint32_t *src0 = (uint32_t *)srcPtr + starty * srcPitch / 4;
+  uint32_t *src1 = (uint32_t *)frm1 + starty * srcPitch / 4;
+  uint32_t *src2 = (uint32_t *)frm2 + starty * srcPitch / 4;
+  uint32_t *src3 = (uint32_t *)frm3 + starty * srcPitch / 4;
 
   int count = width >> 1;
 
@@ -318,14 +318,14 @@ static void SmartIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, int h
     src3++;
   }
   /* Swap buffers around */
-  u8 *temp = frm1;
+  uint8_t *temp = frm1;
   frm1 = frm3;
   frm3 = frm2;
   frm2 = temp;
 }
 #endif
 
-void SmartIB32(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
+void SmartIB32(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int height)
 {
   if(frm1 == NULL) {
     Init();
@@ -337,19 +337,19 @@ void SmartIB32(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
   }
 #endif
 
-  u32 *src0 = (u32 *)srcPtr + starty * srcPitch / 4;
-  u32 *src1 = (u32 *)frm1 + starty * srcPitch / 4;
-  u32 *src2 = (u32 *)frm2 + starty * srcPitch / 4;
-  u32 *src3 = (u32 *)frm3 + starty * srcPitch / 4;
+  uint32_t *src0 = (uint32_t *)srcPtr + starty * srcPitch / 4;
+  uint32_t *src1 = (uint32_t *)frm1 + starty * srcPitch / 4;
+  uint32_t *src2 = (uint32_t *)frm2 + starty * srcPitch / 4;
+  uint32_t *src3 = (uint32_t *)frm3 + starty * srcPitch / 4;
 
-  u32 colorMask = 0xfefefe;
+  uint32_t colorMask = 0xfefefe;
 
   int sPitch = srcPitch >> 2;
   int pos = 0;
 
   for (int j = 0; j < height;  j++)
     for (int i = 0; i < sPitch; i++) {
-      u32 color = src0[pos];
+      uint32_t color = src0[pos];
       src0[pos] =
         (src1[pos] != src2[pos]) &&
         (src3[pos] != color) &&
@@ -361,22 +361,22 @@ void SmartIB32(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
     }
 
   /* Swap buffers around */
-  u8 *temp = frm1;
+  uint8_t *temp = frm1;
   frm1 = frm3;
   frm3 = frm2;
   frm2 = temp;
 }
 
-void SmartIB32(u8 *srcPtr, u32 srcPitch, int width, int height)
+void SmartIB32(uint8_t *srcPtr, uint32_t srcPitch, int width, int height)
 {
   SmartIB32(srcPtr, srcPitch, width, 0, height);
 }
 
 #ifdef MMX
-static void MotionBlurIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
+static void MotionBlurIB_MMX(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int height)
 {
-  u16 *src0 = (u16 *)srcPtr + starty * srcPitch / 2;
-  u16 *src1 = (u16 *)frm1 + starty * srcPitch / 2;
+  uint16_t *src0 = (uint16_t *)srcPtr + starty * srcPitch / 2;
+  uint16_t *src1 = (uint16_t *)frm1 + starty * srcPitch / 2;
 
   int count = width >> 2;
 
@@ -441,7 +441,7 @@ static void MotionBlurIB_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, in
 }
 #endif
 
-void MotionBlurIB(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
+void MotionBlurIB(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int height)
 {
   if(frm1 == NULL) {
     Init();
@@ -454,17 +454,17 @@ void MotionBlurIB(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
   }
 #endif
 
-  u16 colorMask = ~RGB_LOW_BITS_MASK;
+  uint16_t colorMask = ~RGB_LOW_BITS_MASK;
 
-  u16 *src0 = (u16 *)srcPtr + starty * srcPitch / 2;
-  u16 *src1 = (u16 *)frm1 + starty * srcPitch / 2;
+  uint16_t *src0 = (uint16_t *)srcPtr + starty * srcPitch / 2;
+  uint16_t *src1 = (uint16_t *)frm1 + starty * srcPitch / 2;
 
   int sPitch = srcPitch >> 1;
 
   int pos = 0;
   for (int j = 0; j < height;  j++)
     for (int i = 0; i < sPitch; i++) {
-      u16 color = src0[pos];
+      uint16_t color = src0[pos];
       src0[pos] =
         (((color & colorMask) >> 1) + ((src1[pos] & colorMask) >> 1));
       src1[pos] = color;
@@ -472,16 +472,16 @@ void MotionBlurIB(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
     }
 }
 
-void MotionBlurIB(u8 *srcPtr, u32 srcPitch, int width, int height)
+void MotionBlurIB(uint8_t *srcPtr, uint32_t srcPitch, int width, int height)
 {
   MotionBlurIB(srcPtr, srcPitch, width, 0, height);
 }
 
 #ifdef MMX
-static void MotionBlurIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
+static void MotionBlurIB32_MMX(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int height)
 {
-  u32 *src0 = (u32 *)srcPtr + starty * srcPitch / 4;
-  u32 *src1 = (u32 *)frm1 + starty * srcPitch / 4;
+  uint32_t *src0 = (uint32_t *)srcPtr + starty * srcPitch / 4;
+  uint32_t *src1 = (uint32_t *)frm1 + starty * srcPitch / 4;
 
   int count = width >> 1;
 
@@ -546,7 +546,7 @@ static void MotionBlurIB32_MMX(u8 *srcPtr, u32 srcPitch, int width, int starty, 
 }
 #endif
 
-void MotionBlurIB32(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
+void MotionBlurIB32(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int height)
 {
   if(frm1 == NULL) {
     Init();
@@ -559,17 +559,17 @@ void MotionBlurIB32(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
   }
 #endif
 
-  u32 *src0 = (u32 *)srcPtr + starty * srcPitch / 4;
-  u32 *src1 = (u32 *)frm1 + starty * srcPitch / 4;
+  uint32_t *src0 = (uint32_t *)srcPtr + starty * srcPitch / 4;
+  uint32_t *src1 = (uint32_t *)frm1 + starty * srcPitch / 4;
 
-  u32 colorMask = 0xfefefe;
+  uint32_t colorMask = 0xfefefe;
 
   int sPitch = srcPitch >> 2;
   int pos = 0;
 
   for (int j = 0; j < height;  j++)
     for (int i = 0; i < sPitch; i++) {
-      u32 color = src0[pos];
+      uint32_t color = src0[pos];
       src0[pos] = (((color & colorMask) >> 1) +
                    ((src1[pos] & colorMask) >> 1));
       src1[pos] = color;
@@ -577,7 +577,7 @@ void MotionBlurIB32(u8 *srcPtr, u32 srcPitch, int width, int starty, int height)
     }
 }
 
-void MotionBlurIB32(u8 *srcPtr, u32 srcPitch, int width, int height)
+void MotionBlurIB32(uint8_t *srcPtr, uint32_t srcPitch, int width, int height)
 {
   MotionBlurIB32(srcPtr, srcPitch, width, 0, height);
 }

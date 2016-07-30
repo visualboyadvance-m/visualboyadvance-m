@@ -240,7 +240,7 @@ public:
     bool init(long sampleRate);
 
     // Sound Data Feed
-    void write(u16* finalWave, int length);
+    void write(uint16_t* finalWave, int length);
 
     // Play Control
     void pause();
@@ -509,7 +509,7 @@ bool XAudio2_Output::init(long sampleRate)
     return true;
 }
 
-void XAudio2_Output::write(u16* finalWave, int length)
+void XAudio2_Output::write(uint16_t* finalWave, int length)
 {
     if (!initialized || failed)
         return;

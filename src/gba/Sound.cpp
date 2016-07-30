@@ -40,7 +40,7 @@ extern bool stopState; // TODO: silence sound when true
 
 int const SOUND_CLOCK_TICKS_ = 167772; // 1/100 second
 
-static u16 soundFinalWave[1600];
+static uint16_t soundFinalWave[1600];
 long soundSampleRate = 44100;
 bool soundInterpolation = true;
 bool soundPaused = true;
@@ -82,7 +82,7 @@ public:
     int readIndex;
     int count;
     int writeIndex;
-    u8 fifo[32];
+    uint8_t fifo[32];
     int dac;
 
 private:
@@ -155,7 +155,7 @@ void Gba_Pcm::update(int dac)
     if (output) {
         blip_time_t time = blip_time();
 
-        dac = (s8)dac >> shift;
+        dac = (int8_t)dac >> shift;
         int delta = dac - last_amp;
         if (delta) {
             last_amp = dac;
@@ -193,8 +193,8 @@ void Gba_Pcm_Fifo::timer_overflowed(int which_timer)
                 // Not filled by DMA, so fill with 16 bytes of silence
                 int reg = which ? FIFOB_L : FIFOA_L;
                 for (int n = 8; n--;) {
-                    soundEvent(reg, (u16)0);
-                    soundEvent(reg + 2, (u16)0);
+                    soundEvent(reg, (uint16_t)0);
+                    soundEvent(reg + 2, (uint16_t)0);
                 }
             }
         }
@@ -256,7 +256,7 @@ static int gba_to_gb_sound(int addr)
     return 0;
 }
 
-void soundEvent(u32 address, u8 data)
+void soundEvent(uint32_t address, uint8_t data)
 {
     int gb_addr = gba_to_gb_sound(address);
     if (gb_addr) {
@@ -294,7 +294,7 @@ static void write_SGCNT0_H(int data)
     apply_volume(true);
 }
 
-void soundEvent(u32 address, u16 data)
+void soundEvent(uint32_t address, uint16_t data)
 {
     switch (address) {
     case SGCNT0_H:
@@ -319,8 +319,8 @@ void soundEvent(u32 address, u16 data)
         break;
 
     default:
-        soundEvent(address & ~1, (u8)(data)); // even
-        soundEvent(address | 1, (u8)(data >> 8)); // odd
+        soundEvent(address & ~1, (uint8_t)(data)); // even
+        soundEvent(address | 1, (uint8_t)(data >> 8)); // odd
         break;
     }
 }
@@ -527,7 +527,7 @@ void soundReset()
     SOUND_CLOCK_TICKS = SOUND_CLOCK_TICKS_;
     soundTicks = SOUND_CLOCK_TICKS_;
 
-    soundEvent(NR52, (u8)0x80);
+    soundEvent(NR52, (uint8_t)0x80);
 }
 
 bool soundInit()
@@ -586,7 +586,7 @@ static struct {
     gb_apu_state_t apu;
 
     // old state
-    u8 soundDSAValue;
+    uint8_t soundDSAValue;
     int soundDSBValue;
 } state;
 
@@ -650,16 +650,16 @@ static variable_desc old_gba_state[] = {
     LOAD(int, pcm[0].readIndex),
     LOAD(int, pcm[0].count),
     LOAD(int, pcm[0].writeIndex),
-    SKIP(u8, soundDSAEnabled), // was bool, which was one byte on MS compiler
+    SKIP(uint8_t, soundDSAEnabled), // was bool, which was one byte on MS compiler
     SKIP(int, soundDSATimer),
-    LOAD(u8[32], pcm[0].fifo),
-    LOAD(u8, state.soundDSAValue),
+    LOAD(uint8_t[32], pcm[0].fifo),
+    LOAD(uint8_t, state.soundDSAValue),
     LOAD(int, pcm[1].readIndex),
     LOAD(int, pcm[1].count),
     LOAD(int, pcm[1].writeIndex),
     SKIP(int, soundDSBEnabled),
     SKIP(int, soundDSBTimer),
-    LOAD(u8[32], pcm[1].fifo),
+    LOAD(uint8_t[32], pcm[1].fifo),
     LOAD(int, state.soundDSBValue),
 
     // skipped manually
@@ -669,7 +669,7 @@ static variable_desc old_gba_state[] = {
 };
 
 variable_desc old_gba_state2[] = {
-    LOAD(u8[0x20], state.apu.regs[0x20]),
+    LOAD(uint8_t[0x20], state.apu.regs[0x20]),
     SKIP(int, sound3Bank),
     SKIP(int, sound3DataSize),
     SKIP(int, sound3ForcedOutput),
@@ -682,7 +682,7 @@ static variable_desc gba_state[] = {
     LOAD(int, pcm[0].readIndex),
     LOAD(int, pcm[0].count),
     LOAD(int, pcm[0].writeIndex),
-    LOAD(u8[32], pcm[0].fifo),
+    LOAD(uint8_t[32], pcm[0].fifo),
     LOAD(int, pcm[0].dac),
 
     SKIP(int[4], room_for_expansion),
@@ -690,13 +690,13 @@ static variable_desc gba_state[] = {
     LOAD(int, pcm[1].readIndex),
     LOAD(int, pcm[1].count),
     LOAD(int, pcm[1].writeIndex),
-    LOAD(u8[32], pcm[1].fifo),
+    LOAD(uint8_t[32], pcm[1].fifo),
     LOAD(int, pcm[1].dac),
 
     SKIP(int[4], room_for_expansion),
 
     // APU
-    LOAD(u8[0x40], state.apu.regs), // last values written to registers and wave RAM (both banks)
+    LOAD(uint8_t[0x40], state.apu.regs), // last values written to registers and wave RAM (both banks)
     LOAD(int, state.apu.frame_time), // clocks until next frame sequencer action
     LOAD(int, state.apu.frame_phase), // next step frame sequencer will run
 
@@ -727,7 +727,7 @@ static variable_desc gba_state[] = {
 };
 
 #ifdef __LIBRETRO__
-void soundSaveGame(u8*& out)
+void soundSaveGame(uint8_t*& out)
 #else
 void soundSaveGame(gzFile out)
 #endif
@@ -799,7 +799,7 @@ static void soundReadGameOld(gzFile in, int version)
 #include <stdio.h>
 
 #ifdef __LIBRETRO__
-void soundReadGame(const u8*& in, int version)
+void soundReadGame(const uint8_t*& in, int version)
 #else
 void soundReadGame(gzFile in, int version)
 #endif

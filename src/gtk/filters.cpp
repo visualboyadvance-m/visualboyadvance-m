@@ -19,34 +19,34 @@
 #include "filters.h"
 #include "intl.h"
 
-void _2xSaI(u8*, u32, u8*, u8*, u32, int, int);
-void _2xSaI32(u8*, u32, u8*, u8*, u32, int, int);
-void Super2xSaI(u8*, u32, u8*, u8*, u32, int, int);
-void Super2xSaI32(u8*, u32, u8*, u8*, u32, int, int);
-void SuperEagle(u8*, u32, u8*, u8*, u32, int, int);
-void SuperEagle32(u8*, u32, u8*, u8*, u32, int, int);
-void Pixelate(u8*, u32, u8*, u8*, u32, int, int);
-void Pixelate32(u8*, u32, u8*, u8*, u32, int, int);
-void AdMame2x(u8*, u32, u8*, u8*, u32, int, int);
-void AdMame2x32(u8*, u32, u8*, u8*, u32, int, int);
-void Bilinear(u8*, u32, u8*, u8*, u32, int, int);
-void Bilinear32(u8*, u32, u8*, u8*, u32, int, int);
-void BilinearPlus(u8*, u32, u8*, u8*, u32, int, int);
-void BilinearPlus32(u8*, u32, u8*, u8*, u32, int, int);
-void Scanlines(u8*, u32, u8*, u8*, u32, int, int);
-void Scanlines32(u8*, u32, u8*, u8*, u32, int, int);
-void ScanlinesTV(u8*, u32, u8*, u8*, u32, int, int);
-void ScanlinesTV32(u8*, u32, u8*, u8*, u32, int, int);
-void hq2x(u8*, u32, u8*, u8*, u32, int, int);
-void hq2x32(u8*, u32, u8*, u8*, u32, int, int);
-void lq2x(u8*, u32, u8*, u8*, u32, int, int);
-void lq2x32(u8*, u32, u8*, u8*, u32, int, int);
-void xbrz2x32(u8*, u32, u8*, u8*, u32, int, int);
+void _2xSaI(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void _2xSaI32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void Super2xSaI(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void Super2xSaI32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void SuperEagle(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void SuperEagle32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void Pixelate(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void Pixelate32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void AdMame2x(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void AdMame2x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void Bilinear(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void Bilinear32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void BilinearPlus(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void BilinearPlus32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void Scanlines(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void Scanlines32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void ScanlinesTV(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void ScanlinesTV32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void hq2x(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void hq2x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void lq2x(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void lq2x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+void xbrz2x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
 
-void SmartIB(u8*, u32, int, int);
-void SmartIB32(u8*, u32, int, int);
-void MotionBlurIB(u8*, u32, int, int);
-void MotionBlurIB32(u8*, u32, int, int);
+void SmartIB(uint8_t*, uint32_t, int, int);
+void SmartIB32(uint8_t*, uint32_t, int, int);
+void MotionBlurIB(uint8_t*, uint32_t, int, int);
+void MotionBlurIB32(uint8_t*, uint32_t, int, int);
 
 namespace VBA {
 

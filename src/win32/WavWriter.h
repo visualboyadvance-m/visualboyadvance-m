@@ -19,7 +19,7 @@ public:
 
     bool Open(const char* name);
     void SetFormat(const WAVEFORMATEX* format);
-    void AddSound(const u8* data, int len);
+    void AddSound(const uint8_t* data, int len);
 
 private:
     void Close();

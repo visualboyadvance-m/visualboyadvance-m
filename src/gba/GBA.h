@@ -1,6 +1,8 @@
 #ifndef GBA_H
 #define GBA_H
 
+#include <cstdint>
+
 #include "../System.h"
 
 const uint64_t TICKS_PER_SECOND = 16777216;

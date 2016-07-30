@@ -1,6 +1,8 @@
 #ifndef GBGLOBALS_H
 #define GBGLOBALS_H
 
+#include <cstdint>
+
 extern int gbRomSizeMask;
 extern int gbRomSize;
 extern int gbRamSize;

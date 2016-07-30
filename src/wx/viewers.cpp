@@ -2,6 +2,8 @@
 // these are all the viewer dialogs except for the ones with graphical areas
 // they can be instantiated multiple times
 
+#include <cstdint>
+
 #include "../gba/armdis.h"
 #include "viewsupt.h"
 #include "wxvbam.h"
@@ -70,7 +72,7 @@ public:
         dis->Refit(70);
         Fit();
         SetMinSize(GetSize());
-        dis->maxaddr = (u32)~0;
+        dis->maxaddr = (uint32_t)~0;
         dismode = 0;
         GotoPC();
     }
@@ -147,7 +149,7 @@ public:
         char buf[80];
         dis->strings.clear();
         dis->addrs.clear();
-        u32 addr = dis->topaddr;
+        uint32_t addr = dis->topaddr;
         bool arm = dismode == 1 || (armState && dismode != 2);
         dis->back_size = arm ? 4 : 2;
 
@@ -210,7 +212,7 @@ public:
         dis->Refit(26);
         Fit();
         SetMinSize(GetSize());
-        dis->maxaddr = (u32)~0;
+        dis->maxaddr = (uint32_t)~0;
         GotoPC();
     }
     void Update()
@@ -250,10 +252,10 @@ public:
     }
     void UpdateDis()
     {
-        Z->SetValue(AF.B.B0 & Z_FLAG);
-        N->SetValue(AF.B.B0 & N_FLAG);
-        H->SetValue(AF.B.B0 & H_FLAG);
-        C->SetValue(AF.B.B0 & C_FLAG);
+        Z->SetValue(AF.B.B0 & GB_Z_FLAG);
+        N->SetValue(AF.B.B0 & GB_N_FLAG);
+        H->SetValue(AF.B.B0 & GB_H_FLAG);
+        C->SetValue(AF.B.B0 & GB_C_FLAG);
 #define grv16(n, val)                    \
     do {                                 \
         wxString s;                      \
@@ -280,7 +282,7 @@ public:
         // examination of gbDis shows that max len is 26 chars
         // (e.g. 0xe2)
         char buf[30];
-        u16 addr = dis->topaddr;
+        uint16_t addr = dis->topaddr;
         dis->strings.clear();
         dis->addrs.clear();
         dis->back_size = 1;
@@ -395,7 +397,7 @@ public:
     void Select(int sel)
     {
         int i;
-        u16 mask;
+        uint16_t mask;
 
         for (mask = 1, i = 0; mask; mask <<= 1, i++) {
             bit[i]->Enable(mask & ioregs[sel].write);
@@ -412,8 +414,8 @@ public:
 
     void Update(int sel)
     {
-        u16* addr = ioregs[sel].address ? ioregs[sel].address : (u16*)&ioMem[ioregs[sel].offset];
-        u16 mask, reg = *addr;
+        uint16_t* addr = ioregs[sel].address ? ioregs[sel].address : (uint16_t*)&ioMem[ioregs[sel].offset];
+        uint16_t mask, reg = *addr;
         int i;
 
         for (mask = 1, i = 0; mask; mask <<= 1, i++)
@@ -430,7 +432,7 @@ public:
             if (ev.GetEventObject() == bit[i]) {
                 // it'd be faster to store the value and just flip
                 // the bit, but it's easier this way
-                u16 mask, reg = 0;
+                uint16_t mask, reg = 0;
                 int j;
 
                 for (mask = 1, j = 0; mask; mask <<= 1, j++)
@@ -454,8 +456,8 @@ public:
     void Apply(wxCommandEvent& ev)
     {
         int sel = addr->GetSelection();
-        u16* addr = ioregs[sel].address ? ioregs[sel].address : (u16*)&ioMem[ioregs[sel].offset];
-        u16 mask, reg = *addr;
+        uint16_t* addr = ioregs[sel].address ? ioregs[sel].address : (uint16_t*)&ioMem[ioregs[sel].offset];
+        uint16_t mask, reg = *addr;
         reg &= ~ioregs[sel].write;
         int i;
 
@@ -573,23 +575,23 @@ END_EVENT_TABLE()
 #define CPUWriteByteQuick(addr, b) \
     ::map[(addr) >> 24].address[(addr) & ::map[(addr) >> 24].mask] = (b)
 #define CPUWriteHalfWordQuick(addr, b) \
-    WRITE16LE((u16*)&::map[(addr) >> 24].address[(addr) & ::map[(addr) >> 24].mask], b)
+    WRITE16LE((uint16_t*)&::map[(addr) >> 24].address[(addr) & ::map[(addr) >> 24].mask], b)
 #define CPUWriteMemoryQuick(addr, b) \
-    WRITE32LE((u32*)&::map[(addr) >> 24].address[(addr) & ::map[(addr) >> 24].mask], b)
+    WRITE32LE((uint32_t*)&::map[(addr) >> 24].address[(addr) & ::map[(addr) >> 24].mask], b)
 #define GBWriteByteQuick(addr, b) \
-    *((u8*)&gbMemoryMap[(addr) >> 12][(addr)&0xfff]) = (b)
+    *((uint8_t*)&gbMemoryMap[(addr) >> 12][(addr)&0xfff]) = (b)
 #define GBWriteHalfWordQuick(addr, b) \
-    WRITE16LE((u16*)&gbMemoryMap[(addr) >> 12][(addr)&0xfff], b)
+    WRITE16LE((uint16_t*)&gbMemoryMap[(addr) >> 12][(addr)&0xfff], b)
 #define GBWriteMemoryQuick(addr, b) \
-    WRITE32LE((u32*)&gbMemoryMap[(addr) >> 12][(addr)&0xfff], b)
+    WRITE32LE((uint32_t*)&gbMemoryMap[(addr) >> 12][(addr)&0xfff], b)
 #define GBReadMemoryQuick(addr) \
-    READ32LE((u32*)&gbMemoryMap[(addr) >> 12][(addr)&0xfff])
+    READ32LE((uint32_t*)&gbMemoryMap[(addr) >> 12][(addr)&0xfff])
 
 namespace Viewers {
 static wxString memsave_dir = wxEmptyString;
 class MemViewerBase : public Viewer {
 public:
-    MemViewerBase(u32 max)
+    MemViewerBase(uint32_t max)
         : Viewer(wxT("MemViewer"))
     {
         if (!(mv = XRCCTRL(*this, "MemView", MemView)))
@@ -654,7 +656,7 @@ public:
         v.ToULong(&l, 16);
         Goto(l);
     }
-    void Goto(u32 addr)
+    void Goto(uint32_t addr)
     {
         mv->Show(addr, true);
     }
@@ -714,7 +716,7 @@ public:
         MemLoad(memsave_fn, addr, len);
     }
 
-    virtual void MemLoad(wxString& name, u32 addr, u32 len) = 0;
+    virtual void MemLoad(wxString& name, uint32_t addr, uint32_t len) = 0;
 
     void Save(wxCommandEvent& ev)
     {
@@ -755,7 +757,7 @@ public:
         MemSave(memsave_fn, addr, len);
     }
 
-    virtual void MemSave(wxString& name, u32 addr, u32 len) = 0;
+    virtual void MemSave(wxString& name, uint32_t addr, uint32_t len) = 0;
 
 protected:
     int addrlen;
@@ -805,7 +807,7 @@ public:
 
     void Update()
     {
-        u32 addr = mv->topaddr;
+        uint32_t addr = mv->topaddr;
         mv->words.resize(mv->nlines * 4);
 
         for (int i = 0; i < mv->nlines; i++) {
@@ -836,7 +838,7 @@ public:
         }
     }
 
-    void MemLoad(wxString& name, u32 addr, u32 len)
+    void MemLoad(wxString& name, uint32_t addr, uint32_t len)
     {
         wxFFile f(name, wxT("rb"));
 
@@ -846,8 +848,8 @@ public:
         // this does the equivalent of the CPUWriteMemoryQuick()
         while (len > 0) {
             memoryMap m = map[addr >> 24];
-            u32 off = addr & m.mask;
-            u32 wlen = (off + len) > m.mask ? m.mask + 1 - off : len;
+            uint32_t off = addr & m.mask;
+            uint32_t wlen = (off + len) > m.mask ? m.mask + 1 - off : len;
             wlen = f.Read(m.address + off, wlen);
 
             if (wlen < 0)
@@ -858,7 +860,7 @@ public:
         }
     }
 
-    void MemSave(wxString& name, u32 addr, u32 len)
+    void MemSave(wxString& name, uint32_t addr, uint32_t len)
     {
         wxFFile f(name, wxT("wb"));
 
@@ -868,8 +870,8 @@ public:
         // this does the equivalent of the CPUReadMemoryQuick()
         while (len > 0) {
             memoryMap m = map[addr >> 24];
-            u32 off = addr & m.mask;
-            u32 wlen = (off + len) > m.mask ? m.mask + 1 - off : len;
+            uint32_t off = addr & m.mask;
+            uint32_t wlen = (off + len) > m.mask ? m.mask + 1 - off : len;
             wlen = f.Write(m.address + off, wlen);
 
             if (wlen < 0)
@@ -891,7 +893,7 @@ END_EVENT_TABLE()
 class GBMemViewer : public MemViewerBase {
 public:
     GBMemViewer()
-        : MemViewerBase((u16)~0)
+        : MemViewerBase((uint16_t)~0)
     {
         bs->Append(_("0x0000 - ROM"));
         bs->Append(_("0x4000 - ROM"));
@@ -913,11 +915,11 @@ public:
 
     void Update()
     {
-        u32 addr = mv->topaddr;
+        uint32_t addr = mv->topaddr;
         mv->words.resize(mv->nlines * 4);
 
         for (int i = 0; i < mv->nlines; i++) {
-            if (i && !(u16)addr)
+            if (i && !(uint16_t)addr)
                 break;
 
             for (int j = 0; j < 4; j++, addr += 4)
@@ -944,7 +946,7 @@ public:
         }
     }
 
-    void MemLoad(wxString& name, u32 addr, u32 len)
+    void MemLoad(wxString& name, uint32_t addr, uint32_t len)
     {
         wxFFile f(name, wxT("rb"));
 
@@ -953,9 +955,9 @@ public:
 
         // this does the equivalent of the GBWriteMemoryQuick()
         while (len > 0) {
-            u8* maddr = gbMemoryMap[addr >> 12];
-            u32 off = addr & 0xfff;
-            u32 wlen = (off + len) > 0xfff ? 0x1000 - off : len;
+            uint8_t* maddr = gbMemoryMap[addr >> 12];
+            uint32_t off = addr & 0xfff;
+            uint32_t wlen = (off + len) > 0xfff ? 0x1000 - off : len;
             wlen = f.Read(maddr + off, wlen);
 
             if (wlen < 0)
@@ -966,7 +968,7 @@ public:
         }
     }
 
-    void MemSave(wxString& name, u32 addr, u32 len)
+    void MemSave(wxString& name, uint32_t addr, uint32_t len)
     {
         wxFFile f(name, wxT("wb"));
 
@@ -975,9 +977,9 @@ public:
 
         // this does the equivalent of the GBReadMemoryQuick()
         while (len > 0) {
-            u8* maddr = gbMemoryMap[addr >> 12];
-            u32 off = addr & 0xfff;
-            u32 wlen = (off + len) > 0xfff ? 0x1000 - off : len;
+            uint8_t* maddr = gbMemoryMap[addr >> 12];
+            uint32_t off = addr & 0xfff;
+            uint32_t wlen = (off + len) > 0xfff ? 0x1000 - off : len;
             wlen = f.Write(maddr + off, wlen);
 
             if (wlen < 0)

@@ -10,7 +10,7 @@ class OamViewable {
 public:
     BITMAPINFO bmpInfo;
     BitmapControl oamView;
-    u8* data;
+    uint8_t* data;
     OamViewable(int index, CDialog* parent);
     int w;
     int h;
@@ -23,7 +23,7 @@ public:
     void savePNG(const char* name);
     void saveBMP(const char* name);
     void render();
-    void setAttributes(u16 a0, u16 a1, u16 a2);
+    void setAttributes(uint16_t a0, uint16_t a1, uint16_t a2);
     void paint();
 
     virtual ~OamView();
@@ -36,7 +36,7 @@ public:
 private:
     OamViewable* oamViews[128];
     BITMAPINFO bmpInfo;
-    u8* data_screen;
+    uint8_t* data_screen;
     BitmapControl oamScreen;
     BitmapControl oamPreview;
     void UpdateOAM(int index);

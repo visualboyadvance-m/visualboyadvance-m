@@ -20,7 +20,7 @@
 class GBOamView : public ResizeDlg, IUpdateListener {
 private:
     BITMAPINFO bmpInfo;
-    u8* data;
+    uint8_t* data;
     int w;
     int h;
     int number;

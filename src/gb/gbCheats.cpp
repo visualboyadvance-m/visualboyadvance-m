@@ -451,7 +451,7 @@ uint8_t gbCheatRead(uint16_t address)
 void gbCheatWrite(bool reboot)
 {
     if (cheatsEnabled) {
-        u16 address = 0;
+        uint16_t address = 0;
 
         if (gbNextCheat >= gbCheatNumber)
             gbNextCheat = 0;

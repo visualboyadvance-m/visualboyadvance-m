@@ -25,7 +25,7 @@ static char THIS_FILE[] = __FILE__;
 GBPrinterDlg::GBPrinterDlg(CWnd* pParent /*=NULL*/)
     : CDialog(GBPrinterDlg::IDD, pParent)
 {
-    bitmapData = new u8[160 * 144];
+    bitmapData = new uint8_t[160 * 144];
     //{{AFX_DATA_INIT(GBPrinterDlg)
     m_scale = -1;
     //}}AFX_DATA_INIT
@@ -83,7 +83,7 @@ END_MESSAGE_MAP()
 
 void GBPrinterDlg::saveAsBMP(const char* name)
 {
-    u8 writeBuffer[512 * 3];
+    uint8_t writeBuffer[512 * 3];
 
     FILE* fp = fopen(name, "wb");
 
@@ -93,29 +93,29 @@ void GBPrinterDlg::saveAsBMP(const char* name)
     }
 
     struct {
-        u8 ident[2];
-        u8 filesize[4];
-        u8 reserved[4];
-        u8 dataoffset[4];
-        u8 headersize[4];
-        u8 width[4];
-        u8 height[4];
-        u8 planes[2];
-        u8 bitsperpixel[2];
-        u8 compression[4];
-        u8 datasize[4];
-        u8 hres[4];
-        u8 vres[4];
-        u8 colors[4];
-        u8 importantcolors[4];
-        u8 pad[2];
+        uint8_t ident[2];
+        uint8_t filesize[4];
+        uint8_t reserved[4];
+        uint8_t dataoffset[4];
+        uint8_t headersize[4];
+        uint8_t width[4];
+        uint8_t height[4];
+        uint8_t planes[2];
+        uint8_t bitsperpixel[2];
+        uint8_t compression[4];
+        uint8_t datasize[4];
+        uint8_t hres[4];
+        uint8_t vres[4];
+        uint8_t colors[4];
+        uint8_t importantcolors[4];
+        uint8_t pad[2];
     } bmpheader;
     memset(&bmpheader, 0, sizeof(bmpheader));
 
     bmpheader.ident[0] = 'B';
     bmpheader.ident[1] = 'M';
 
-    u32 fsz = sizeof(bmpheader) + 160 * 144 * 3;
+    uint32_t fsz = sizeof(bmpheader) + 160 * 144 * 3;
     utilPutDword(bmpheader.filesize, fsz);
     utilPutDword(bmpheader.dataoffset, 0x38);
     utilPutDword(bmpheader.headersize, 0x28);
@@ -127,12 +127,12 @@ void GBPrinterDlg::saveAsBMP(const char* name)
 
     fwrite(&bmpheader, 1, sizeof(bmpheader), fp);
 
-    u8* b = writeBuffer;
-    u8* data = (u8*)bitmapData;
-    u8* p = data + (160 * 143);
+    uint8_t* b = writeBuffer;
+    uint8_t* data = (uint8_t*)bitmapData;
+    uint8_t* p = data + (160 * 143);
     for (int y = 0; y < 144; y++) {
         for (int x = 0; x < 160; x++) {
-            u8 c = *p++;
+            uint8_t c = *p++;
 
             *b++ = bitmap->bmiColors[c].rgbBlue;
             *b++ = bitmap->bmiColors[c].rgbGreen;
@@ -149,7 +149,7 @@ void GBPrinterDlg::saveAsBMP(const char* name)
 
 void GBPrinterDlg::saveAsPNG(const char* name)
 {
-    u8 writeBuffer[160 * 3];
+    uint8_t writeBuffer[160 * 3];
 
     FILE* fp = fopen(name, "wb");
 
@@ -196,15 +196,15 @@ void GBPrinterDlg::saveAsPNG(const char* name)
 
     png_write_info(png_ptr, info_ptr);
 
-    u8* b = writeBuffer;
+    uint8_t* b = writeBuffer;
 
     int sizeX = 160;
     int sizeY = 144;
 
-    u8* pixU8 = bitmapData;
+    uint8_t* pixU8 = bitmapData;
     for (int y = 0; y < sizeY; y++) {
         for (int x = 0; x < sizeX; x++) {
-            u8 c = *pixU8++;
+            uint8_t c = *pixU8++;
             *b++ = bitmap->bmiColors[c].rgbRed;
             *b++ = bitmap->bmiColors[c].rgbGreen;
             *b++ = bitmap->bmiColors[c].rgbBlue;
@@ -348,7 +348,7 @@ void GBPrinterDlg::OnPrint()
     }
 }
 
-void GBPrinterDlg::processData(u8* data)
+void GBPrinterDlg::processData(uint8_t* data)
 {
     for (int y = 0; y < 0x12; y++) {
         for (int x = 0; x < 0x14; x++) {
@@ -448,7 +448,7 @@ void GBPrinterDlg::OnPaint()
         SRCCOPY);
 }
 
-void systemGbPrint(u8* data,
+void systemGbPrint(uint8_t* data,
     int datalen,
     int pages,
     int feed,

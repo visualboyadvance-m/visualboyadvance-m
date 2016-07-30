@@ -18,9 +18,9 @@ extern gbRegister DE;
 extern gbRegister HL;
 extern gbRegister SP;
 extern gbRegister PC;
-extern u8 register_LY;
-extern u16 IFF;
-extern int gbDis(char*, u16);
+extern uint8_t register_LY;
+extern uint16_t IFF;
+extern int gbDis(char*, uint16_t);
 
 /////////////////////////////////////////////////////////////////////////////
 // GBDisassemble dialog
@@ -193,7 +193,7 @@ void GBDisassemble::refresh()
         return;
 
     char buffer[80];
-    u16 addr = address;
+    uint16_t addr = address;
     int i;
     int sel = -1;
     for (i = 0; i < count; i++) {

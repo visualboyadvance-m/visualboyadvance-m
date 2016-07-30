@@ -99,7 +99,7 @@ void GBCheatSearch::OnAddCheat()
         item.mask = LVIF_PARAM;
         item.iItem = mark;
         if (m_list.GetItem(&item)) {
-            AddGBCheat dlg((u32)item.lParam);
+            AddGBCheat dlg((uint32_t)item.lParam);
             dlg.DoModal();
         }
     }
@@ -156,32 +156,32 @@ void GBCheatSearch::OnStart()
                 block->data = gbRam;
             else
                 block->data = &gbMemory[0xa000];
-            block->saved = (u8*)malloc(gbRamSize);
+            block->saved = (uint8_t*)malloc(gbRamSize);
             block->size = gbRamSize;
-            block->bits = (u8*)malloc(gbRamSize >> 3);
+            block->bits = (uint8_t*)malloc(gbRamSize >> 3);
             i++;
         }
         block = &cheatSearchData.blocks[i];
         if (gbCgbMode) {
             block->offset = 0xc000;
             block->data = &gbMemory[0xc000];
-            block->saved = (u8*)malloc(0x1000);
+            block->saved = (uint8_t*)malloc(0x1000);
             block->size = 0x1000;
-            block->bits = (u8*)malloc(0x1000 >> 3);
+            block->bits = (uint8_t*)malloc(0x1000 >> 3);
             i++;
             block = &cheatSearchData.blocks[i];
             block->offset = 0xd000;
             block->data = gbWram;
-            block->saved = (u8*)malloc(0x8000);
+            block->saved = (uint8_t*)malloc(0x8000);
             block->size = 0x8000;
-            block->bits = (u8*)malloc(0x8000 >> 3);
+            block->bits = (uint8_t*)malloc(0x8000 >> 3);
             i++;
         } else {
             block->offset = 0xc000;
             block->data = &gbMemory[0xc000];
-            block->saved = (u8*)malloc(0x2000);
+            block->saved = (uint8_t*)malloc(0x2000);
             block->size = 0x2000;
-            block->bits = (u8*)malloc(0x2000 >> 3);
+            block->bits = (uint8_t*)malloc(0x2000 >> 3);
             i++;
         }
         cheatSearchData.count = i;
@@ -285,7 +285,7 @@ void GBCheatSearch::OnItemchangedCheatList(NMHDR* pNMHDR, LRESULT* pResult)
     GetDlgItem(IDC_ADD_CHEAT)->EnableWindow(m_list.GetSelectionMark() != -1);
 }
 
-int GBCheatSearch::getBank(u16 addr, int j)
+int GBCheatSearch::getBank(uint16_t addr, int j)
 {
     switch (addr >> 12) {
     case 0x0a:
@@ -296,7 +296,7 @@ int GBCheatSearch::getBank(u16 addr, int j)
     return 0;
 }
 
-void GBCheatSearch::addChange(int index, int bank, u16 address, int offset, u32 oldValue, u32 newValue)
+void GBCheatSearch::addChange(int index, int bank, uint16_t address, int offset, uint32_t oldValue, uint32_t newValue)
 {
     data[index].bank = bank;
     if (bank) {
@@ -532,7 +532,7 @@ void GBCheatSearch::OnSizeType(UINT id)
 /////////////////////////////////////////////////////////////////////////////
 // AddGBCheat dialog
 
-AddGBCheat::AddGBCheat(u32 addr, CWnd* pParent /*=NULL*/)
+AddGBCheat::AddGBCheat(uint32_t addr, CWnd* pParent /*=NULL*/)
     : CDialog(AddGBCheat::IDD, pParent)
 {
     //{{AFX_DATA_INIT(AddGBCheat)
@@ -584,7 +584,7 @@ bool AddGBCheat::addCheat()
     CString buffer;
     CString code;
 
-    u32 value;
+    uint32_t value;
     m_value.GetWindowText(buffer);
 
     if (buffer.IsEmpty()) {

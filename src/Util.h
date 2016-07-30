@@ -13,9 +13,9 @@ typedef struct {
 
 bool FileExists(const char *filename);
 
-void utilReadScreenPixels(u8 *dest, int w, int h);
-bool utilWritePNGFile(const char *, int, int, u8 *);
-bool utilWriteBMPFile(const char *, int, int, u8 *);
+void utilReadScreenPixels(uint8_t *dest, int w, int h);
+bool utilWritePNGFile(const char *, int, int, uint8_t *);
+bool utilWriteBMPFile(const char *, int, int, uint8_t *);
 void utilApplyIPS(const char *ips, uint8_t **rom, int *size);
 bool utilIsGBAImage(const char *);
 bool utilIsGBImage(const char *);

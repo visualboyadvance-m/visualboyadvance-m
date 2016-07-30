@@ -1,160 +1,160 @@
 case 0x00:
 // RLC B
-AF.B.B0 = (BC.B.B1 & 0x80) ? C_FLAG : 0;
+AF.B.B0 = (BC.B.B1 & 0x80) ? GB_C_FLAG : 0;
 BC.B.B1 = (BC.B.B1 << 1) | (BC.B.B1 >> 7);
 AF.B.B0 |= ZeroTable[BC.B.B1];
 break;
 case 0x01:
 // RLC C
-AF.B.B0 = (BC.B.B0 & 0x80) ? C_FLAG : 0;
+AF.B.B0 = (BC.B.B0 & 0x80) ? GB_C_FLAG : 0;
 BC.B.B0 = (BC.B.B0 << 1) | (BC.B.B0 >> 7);
 AF.B.B0 |= ZeroTable[BC.B.B0];
 break;
 case 0x02:
 // RLC D
-AF.B.B0 = (DE.B.B1 & 0x80) ? C_FLAG : 0;
+AF.B.B0 = (DE.B.B1 & 0x80) ? GB_C_FLAG : 0;
 DE.B.B1 = (DE.B.B1 << 1) | (DE.B.B1 >> 7);
 AF.B.B0 |= ZeroTable[DE.B.B1];
 break;
 case 0x03:
 // RLC E
-AF.B.B0 = (DE.B.B0 & 0x80) ? C_FLAG : 0;
+AF.B.B0 = (DE.B.B0 & 0x80) ? GB_C_FLAG : 0;
 DE.B.B0 = (DE.B.B0 << 1) | (DE.B.B0 >> 7);
 AF.B.B0 |= ZeroTable[DE.B.B0];
 break;
 case 0x04:
 // RLC H
-AF.B.B0 = (HL.B.B1 & 0x80) ? C_FLAG : 0;
+AF.B.B0 = (HL.B.B1 & 0x80) ? GB_C_FLAG : 0;
 HL.B.B1 = (HL.B.B1 << 1) | (HL.B.B1 >> 7);
 AF.B.B0 |= ZeroTable[HL.B.B1];
 break;
 case 0x05:
 // RLC L
-AF.B.B0 = (HL.B.B0 & 0x80) ? C_FLAG : 0;
+AF.B.B0 = (HL.B.B0 & 0x80) ? GB_C_FLAG : 0;
 HL.B.B0 = (HL.B.B0 << 1) | (HL.B.B0 >> 7);
 AF.B.B0 |= ZeroTable[HL.B.B0];
 break;
 case 0x06:
 // RLC (HL)
 tempValue = gbReadMemory(HL.W);
-AF.B.B0 = (tempValue & 0x80) ? C_FLAG : 0;
+AF.B.B0 = (tempValue & 0x80) ? GB_C_FLAG : 0;
 tempValue = (tempValue << 1) | (tempValue >> 7);
 AF.B.B0 |= ZeroTable[tempValue];
 gbWriteMemory(HL.W, tempValue);
 break;
 case 0x07:
 // RLC A
-AF.B.B0 = (AF.B.B1 & 0x80) ? C_FLAG : 0;
+AF.B.B0 = (AF.B.B1 & 0x80) ? GB_C_FLAG : 0;
 AF.B.B1 = (AF.B.B1 << 1) | (AF.B.B1 >> 7);
 AF.B.B0 |= ZeroTable[AF.B.B1];
 break;
 case 0x08:
 // RRC B
-AF.B.B0 = (BC.B.B1 & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (BC.B.B1 & 0x01 ? GB_C_FLAG : 0);
 BC.B.B1 = (BC.B.B1 >> 1) | (BC.B.B1 << 7);
 AF.B.B0 |= ZeroTable[BC.B.B1];
 break;
 case 0x09:
 // RRC C
-AF.B.B0 = (BC.B.B0 & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (BC.B.B0 & 0x01 ? GB_C_FLAG : 0);
 BC.B.B0 = (BC.B.B0 >> 1) | (BC.B.B0 << 7);
 AF.B.B0 |= ZeroTable[BC.B.B0];
 break;
 case 0x0a:
 // RRC D
-AF.B.B0 = (DE.B.B1 & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (DE.B.B1 & 0x01 ? GB_C_FLAG : 0);
 DE.B.B1 = (DE.B.B1 >> 1) | (DE.B.B1 << 7);
 AF.B.B0 |= ZeroTable[DE.B.B1];
 break;
 case 0x0b:
 // RRC E
-AF.B.B0 = (DE.B.B0 & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (DE.B.B0 & 0x01 ? GB_C_FLAG : 0);
 DE.B.B0 = (DE.B.B0 >> 1) | (DE.B.B0 << 7);
 AF.B.B0 |= ZeroTable[DE.B.B0];
 break;
 case 0x0c:
 // RRC H
-AF.B.B0 = (HL.B.B1 & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (HL.B.B1 & 0x01 ? GB_C_FLAG : 0);
 HL.B.B1 = (HL.B.B1 >> 1) | (HL.B.B1 << 7);
 AF.B.B0 |= ZeroTable[HL.B.B1];
 break;
 case 0x0d:
 // RRC L
-AF.B.B0 = (HL.B.B0 & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (HL.B.B0 & 0x01 ? GB_C_FLAG : 0);
 HL.B.B0 = (HL.B.B0 >> 1) | (HL.B.B0 << 7);
 AF.B.B0 |= ZeroTable[HL.B.B0];
 break;
 case 0x0e:
 // RRC (HL)
 tempValue = gbReadMemory(HL.W);
-AF.B.B0 = (tempValue & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (tempValue & 0x01 ? GB_C_FLAG : 0);
 tempValue = (tempValue >> 1) | (tempValue << 7);
 AF.B.B0 |= ZeroTable[tempValue];
 gbWriteMemory(HL.W, tempValue);
 break;
 case 0x0f:
 // RRC A
-AF.B.B0 = (AF.B.B1 & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (AF.B.B1 & 0x01 ? GB_C_FLAG : 0);
 AF.B.B1 = (AF.B.B1 >> 1) | (AF.B.B1 << 7);
 AF.B.B0 |= ZeroTable[AF.B.B1];
 break;
 case 0x10:
 // RL B
 if (BC.B.B1 & 0x80) {
-    BC.B.B1 = (BC.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-    AF.B.B0 = ZeroTable[BC.B.B1] | C_FLAG;
+    BC.B.B1 = (BC.B.B1 << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[BC.B.B1] | GB_C_FLAG;
 } else {
-    BC.B.B1 = (BC.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    BC.B.B1 = (BC.B.B1 << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
     AF.B.B0 = ZeroTable[BC.B.B1];
 }
 break;
 case 0x11:
 // RL C
 if (BC.B.B0 & 0x80) {
-    BC.B.B0 = (BC.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-    AF.B.B0 = ZeroTable[BC.B.B0] | C_FLAG;
+    BC.B.B0 = (BC.B.B0 << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[BC.B.B0] | GB_C_FLAG;
 } else {
-    BC.B.B0 = (BC.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    BC.B.B0 = (BC.B.B0 << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
     AF.B.B0 = ZeroTable[BC.B.B0];
 }
 break;
 case 0x12:
 // RL D
 if (DE.B.B1 & 0x80) {
-    DE.B.B1 = (DE.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-    AF.B.B0 = ZeroTable[DE.B.B1] | C_FLAG;
+    DE.B.B1 = (DE.B.B1 << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[DE.B.B1] | GB_C_FLAG;
 } else {
-    DE.B.B1 = (DE.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    DE.B.B1 = (DE.B.B1 << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
     AF.B.B0 = ZeroTable[DE.B.B1];
 }
 break;
 case 0x13:
 // RL E
 if (DE.B.B0 & 0x80) {
-    DE.B.B0 = (DE.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-    AF.B.B0 = ZeroTable[DE.B.B0] | C_FLAG;
+    DE.B.B0 = (DE.B.B0 << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[DE.B.B0] | GB_C_FLAG;
 } else {
-    DE.B.B0 = (DE.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    DE.B.B0 = (DE.B.B0 << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
     AF.B.B0 = ZeroTable[DE.B.B0];
 }
 break;
 case 0x14:
 // RL H
 if (HL.B.B1 & 0x80) {
-    HL.B.B1 = (HL.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-    AF.B.B0 = ZeroTable[HL.B.B1] | C_FLAG;
+    HL.B.B1 = (HL.B.B1 << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[HL.B.B1] | GB_C_FLAG;
 } else {
-    HL.B.B1 = (HL.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    HL.B.B1 = (HL.B.B1 << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
     AF.B.B0 = ZeroTable[HL.B.B1];
 }
 break;
 case 0x15:
 // RL L
 if (HL.B.B0 & 0x80) {
-    HL.B.B0 = (HL.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-    AF.B.B0 = ZeroTable[HL.B.B0] | C_FLAG;
+    HL.B.B0 = (HL.B.B0 << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[HL.B.B0] | GB_C_FLAG;
 } else {
-    HL.B.B0 = (HL.B.B0 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    HL.B.B0 = (HL.B.B0 << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
     AF.B.B0 = ZeroTable[HL.B.B0];
 }
 break;
@@ -162,10 +162,10 @@ case 0x16:
 // RL (HL)
 tempValue = gbReadMemory(HL.W);
 if (tempValue & 0x80) {
-    tempValue = (tempValue << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-    AF.B.B0 = ZeroTable[tempValue] | C_FLAG;
+    tempValue = (tempValue << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[tempValue] | GB_C_FLAG;
 } else {
-    tempValue = (tempValue << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    tempValue = (tempValue << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
     AF.B.B0 = ZeroTable[tempValue];
 }
 gbWriteMemory(HL.W, tempValue);
@@ -173,70 +173,70 @@ break;
 case 0x17:
 // RL A
 if (AF.B.B1 & 0x80) {
-    AF.B.B1 = (AF.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
-    AF.B.B0 = ZeroTable[AF.B.B1] | C_FLAG;
+    AF.B.B1 = (AF.B.B1 << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+    AF.B.B0 = ZeroTable[AF.B.B1] | GB_C_FLAG;
 } else {
-    AF.B.B1 = (AF.B.B1 << 1) | (AF.B.B0 & C_FLAG ? 1 : 0);
+    AF.B.B1 = (AF.B.B1 << 1) | (AF.B.B0 & GB_C_FLAG ? 1 : 0);
     AF.B.B0 = ZeroTable[AF.B.B1];
 }
 break;
 case 0x18:
 // RR B
 if (BC.B.B1 & 0x01) {
-    BC.B.B1 = (BC.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-    AF.B.B0 = ZeroTable[BC.B.B1] | C_FLAG;
+    BC.B.B1 = (BC.B.B1 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[BC.B.B1] | GB_C_FLAG;
 } else {
-    BC.B.B1 = (BC.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    BC.B.B1 = (BC.B.B1 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
     AF.B.B0 = ZeroTable[BC.B.B1];
 }
 break;
 case 0x19:
 // RR C
 if (BC.B.B0 & 0x01) {
-    BC.B.B0 = (BC.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-    AF.B.B0 = ZeroTable[BC.B.B0] | C_FLAG;
+    BC.B.B0 = (BC.B.B0 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[BC.B.B0] | GB_C_FLAG;
 } else {
-    BC.B.B0 = (BC.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    BC.B.B0 = (BC.B.B0 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
     AF.B.B0 = ZeroTable[BC.B.B0];
 }
 break;
 case 0x1a:
 // RR D
 if (DE.B.B1 & 0x01) {
-    DE.B.B1 = (DE.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-    AF.B.B0 = ZeroTable[DE.B.B1] | C_FLAG;
+    DE.B.B1 = (DE.B.B1 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[DE.B.B1] | GB_C_FLAG;
 } else {
-    DE.B.B1 = (DE.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    DE.B.B1 = (DE.B.B1 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
     AF.B.B0 = ZeroTable[DE.B.B1];
 }
 break;
 case 0x1b:
 // RR E
 if (DE.B.B0 & 0x01) {
-    DE.B.B0 = (DE.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-    AF.B.B0 = ZeroTable[DE.B.B0] | C_FLAG;
+    DE.B.B0 = (DE.B.B0 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[DE.B.B0] | GB_C_FLAG;
 } else {
-    DE.B.B0 = (DE.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    DE.B.B0 = (DE.B.B0 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
     AF.B.B0 = ZeroTable[DE.B.B0];
 }
 break;
 case 0x1c:
 // RR H
 if (HL.B.B1 & 0x01) {
-    HL.B.B1 = (HL.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-    AF.B.B0 = ZeroTable[HL.B.B1] | C_FLAG;
+    HL.B.B1 = (HL.B.B1 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[HL.B.B1] | GB_C_FLAG;
 } else {
-    HL.B.B1 = (HL.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    HL.B.B1 = (HL.B.B1 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
     AF.B.B0 = ZeroTable[HL.B.B1];
 }
 break;
 case 0x1d:
 // RR L
 if (HL.B.B0 & 0x01) {
-    HL.B.B0 = (HL.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-    AF.B.B0 = ZeroTable[HL.B.B0] | C_FLAG;
+    HL.B.B0 = (HL.B.B0 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[HL.B.B0] | GB_C_FLAG;
 } else {
-    HL.B.B0 = (HL.B.B0 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    HL.B.B0 = (HL.B.B0 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
     AF.B.B0 = ZeroTable[HL.B.B0];
 }
 break;
@@ -244,10 +244,10 @@ case 0x1e:
 // RR (HL)
 tempValue = gbReadMemory(HL.W);
 if (tempValue & 0x01) {
-    tempValue = (tempValue >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-    AF.B.B0 = ZeroTable[tempValue] | C_FLAG;
+    tempValue = (tempValue >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[tempValue] | GB_C_FLAG;
 } else {
-    tempValue = (tempValue >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    tempValue = (tempValue >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
     AF.B.B0 = ZeroTable[tempValue];
 }
 gbWriteMemory(HL.W, tempValue);
@@ -255,110 +255,110 @@ break;
 case 0x1f:
 // RR A
 if (AF.B.B1 & 0x01) {
-    AF.B.B1 = (AF.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
-    AF.B.B0 = ZeroTable[AF.B.B1] | C_FLAG;
+    AF.B.B1 = (AF.B.B1 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
+    AF.B.B0 = ZeroTable[AF.B.B1] | GB_C_FLAG;
 } else {
-    AF.B.B1 = (AF.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+    AF.B.B1 = (AF.B.B1 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
     AF.B.B0 = ZeroTable[AF.B.B1];
 }
 break;
 case 0x20:
 // SLA B
-AF.B.B0 = (BC.B.B1 & 0x80 ? C_FLAG : 0);
+AF.B.B0 = (BC.B.B1 & 0x80 ? GB_C_FLAG : 0);
 BC.B.B1 <<= 1;
 AF.B.B0 |= ZeroTable[BC.B.B1];
 break;
 case 0x21:
 // SLA C
-AF.B.B0 = (BC.B.B0 & 0x80 ? C_FLAG : 0);
+AF.B.B0 = (BC.B.B0 & 0x80 ? GB_C_FLAG : 0);
 BC.B.B0 <<= 1;
 AF.B.B0 |= ZeroTable[BC.B.B0];
 break;
 case 0x22:
 // SLA D
-AF.B.B0 = (DE.B.B1 & 0x80 ? C_FLAG : 0);
+AF.B.B0 = (DE.B.B1 & 0x80 ? GB_C_FLAG : 0);
 DE.B.B1 <<= 1;
 AF.B.B0 |= ZeroTable[DE.B.B1];
 break;
 case 0x23:
 // SLA E
-AF.B.B0 = (DE.B.B0 & 0x80 ? C_FLAG : 0);
+AF.B.B0 = (DE.B.B0 & 0x80 ? GB_C_FLAG : 0);
 DE.B.B0 <<= 1;
 AF.B.B0 |= ZeroTable[DE.B.B0];
 break;
 case 0x24:
 // SLA H
-AF.B.B0 = (HL.B.B1 & 0x80 ? C_FLAG : 0);
+AF.B.B0 = (HL.B.B1 & 0x80 ? GB_C_FLAG : 0);
 HL.B.B1 <<= 1;
 AF.B.B0 |= ZeroTable[HL.B.B1];
 break;
 case 0x25:
 // SLA L
-AF.B.B0 = (HL.B.B0 & 0x80 ? C_FLAG : 0);
+AF.B.B0 = (HL.B.B0 & 0x80 ? GB_C_FLAG : 0);
 HL.B.B0 <<= 1;
 AF.B.B0 |= ZeroTable[HL.B.B0];
 break;
 case 0x26:
 // SLA (HL)
 tempValue = gbReadMemory(HL.W);
-AF.B.B0 = (tempValue & 0x80 ? C_FLAG : 0);
+AF.B.B0 = (tempValue & 0x80 ? GB_C_FLAG : 0);
 tempValue <<= 1;
 AF.B.B0 |= ZeroTable[tempValue];
 gbWriteMemory(HL.W, tempValue);
 break;
 case 0x27:
 // SLA A
-AF.B.B0 = (AF.B.B1 & 0x80 ? C_FLAG : 0);
+AF.B.B0 = (AF.B.B1 & 0x80 ? GB_C_FLAG : 0);
 AF.B.B1 <<= 1;
 AF.B.B0 |= ZeroTable[AF.B.B1];
 break;
 case 0x28:
 // SRA B
-AF.B.B0 = (BC.B.B1 & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (BC.B.B1 & 0x01 ? GB_C_FLAG : 0);
 BC.B.B1 = (BC.B.B1 >> 1) | (BC.B.B1 & 0x80);
 AF.B.B0 |= ZeroTable[BC.B.B1];
 break;
 case 0x29:
 // SRA C
-AF.B.B0 = (BC.B.B0 & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (BC.B.B0 & 0x01 ? GB_C_FLAG : 0);
 BC.B.B0 = (BC.B.B0 >> 1) | (BC.B.B0 & 0x80);
 AF.B.B0 |= ZeroTable[BC.B.B0];
 break;
 case 0x2a:
 // SRA D
-AF.B.B0 = (DE.B.B1 & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (DE.B.B1 & 0x01 ? GB_C_FLAG : 0);
 DE.B.B1 = (DE.B.B1 >> 1) | (DE.B.B1 & 0x80);
 AF.B.B0 |= ZeroTable[DE.B.B1];
 break;
 case 0x2b:
 // SRA E
-AF.B.B0 = (DE.B.B0 & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (DE.B.B0 & 0x01 ? GB_C_FLAG : 0);
 DE.B.B0 = (DE.B.B0 >> 1) | (DE.B.B0 & 0x80);
 AF.B.B0 |= ZeroTable[DE.B.B0];
 break;
 case 0x2c:
 // SRA H
-AF.B.B0 = (HL.B.B1 & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (HL.B.B1 & 0x01 ? GB_C_FLAG : 0);
 HL.B.B1 = (HL.B.B1 >> 1) | (HL.B.B1 & 0x80);
 AF.B.B0 |= ZeroTable[HL.B.B1];
 break;
 case 0x2d:
 // SRA L
-AF.B.B0 = (HL.B.B0 & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (HL.B.B0 & 0x01 ? GB_C_FLAG : 0);
 HL.B.B0 = (HL.B.B0 >> 1) | (HL.B.B0 & 0x80);
 AF.B.B0 |= ZeroTable[HL.B.B0];
 break;
 case 0x2e:
 // SRA (HL)
 tempValue = gbReadMemory(HL.W);
-AF.B.B0 = (tempValue & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (tempValue & 0x01 ? GB_C_FLAG : 0);
 tempValue = (tempValue >> 1) | (tempValue & 0x80);
 AF.B.B0 |= ZeroTable[tempValue];
 gbWriteMemory(HL.W, tempValue);
 break;
 case 0x2f:
 // SRA A
-AF.B.B0 = (AF.B.B1 & 0x01 ? C_FLAG : 0);
+AF.B.B0 = (AF.B.B1 & 0x01 ? GB_C_FLAG : 0);
 AF.B.B1 = (AF.B.B1 >> 1) | (AF.B.B1 & 0x80);
 AF.B.B0 |= ZeroTable[AF.B.B1];
 break;
@@ -406,317 +406,317 @@ AF.B.B0 = ZeroTable[AF.B.B1];
 break;
 case 0x38:
 // SRL B
-AF.B.B0 = (BC.B.B1 & 0x01) ? C_FLAG : 0;
+AF.B.B0 = (BC.B.B1 & 0x01) ? GB_C_FLAG : 0;
 BC.B.B1 >>= 1;
 AF.B.B0 |= ZeroTable[BC.B.B1];
 break;
 case 0x39:
 // SRL C
-AF.B.B0 = (BC.B.B0 & 0x01) ? C_FLAG : 0;
+AF.B.B0 = (BC.B.B0 & 0x01) ? GB_C_FLAG : 0;
 BC.B.B0 >>= 1;
 AF.B.B0 |= ZeroTable[BC.B.B0];
 break;
 case 0x3a:
 // SRL D
-AF.B.B0 = (DE.B.B1 & 0x01) ? C_FLAG : 0;
+AF.B.B0 = (DE.B.B1 & 0x01) ? GB_C_FLAG : 0;
 DE.B.B1 >>= 1;
 AF.B.B0 |= ZeroTable[DE.B.B1];
 break;
 case 0x3b:
 // SRL E
-AF.B.B0 = (DE.B.B0 & 0x01) ? C_FLAG : 0;
+AF.B.B0 = (DE.B.B0 & 0x01) ? GB_C_FLAG : 0;
 DE.B.B0 >>= 1;
 AF.B.B0 |= ZeroTable[DE.B.B0];
 break;
 case 0x3c:
 // SRL H
-AF.B.B0 = (HL.B.B1 & 0x01) ? C_FLAG : 0;
+AF.B.B0 = (HL.B.B1 & 0x01) ? GB_C_FLAG : 0;
 HL.B.B1 >>= 1;
 AF.B.B0 |= ZeroTable[HL.B.B1];
 break;
 case 0x3d:
 // SRL L
-AF.B.B0 = (HL.B.B0 & 0x01) ? C_FLAG : 0;
+AF.B.B0 = (HL.B.B0 & 0x01) ? GB_C_FLAG : 0;
 HL.B.B0 >>= 1;
 AF.B.B0 |= ZeroTable[HL.B.B0];
 break;
 case 0x3e:
 // SRL (HL)
 tempValue = gbReadMemory(HL.W);
-AF.B.B0 = (tempValue & 0x01) ? C_FLAG : 0;
+AF.B.B0 = (tempValue & 0x01) ? GB_C_FLAG : 0;
 tempValue >>= 1;
 AF.B.B0 |= ZeroTable[tempValue];
 gbWriteMemory(HL.W, tempValue);
 break;
 case 0x3f:
 // SRL A
-AF.B.B0 = (AF.B.B1 & 0x01) ? C_FLAG : 0;
+AF.B.B0 = (AF.B.B1 & 0x01) ? GB_C_FLAG : 0;
 AF.B.B1 >>= 1;
 AF.B.B0 |= ZeroTable[AF.B.B1];
 break;
 case 0x40:
 // BIT 0,B
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B1 & (1 << 0) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B1 & (1 << 0) ? 0 : GB_Z_FLAG);
 break;
 case 0x41:
 // BIT 0,C
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B0 & (1 << 0) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B0 & (1 << 0) ? 0 : GB_Z_FLAG);
 break;
 case 0x42:
 // BIT 0,D
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B1 & (1 << 0) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B1 & (1 << 0) ? 0 : GB_Z_FLAG);
 break;
 case 0x43:
 // BIT 0,E
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B0 & (1 << 0) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B0 & (1 << 0) ? 0 : GB_Z_FLAG);
 break;
 case 0x44:
 // BIT 0,H
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B1 & (1 << 0) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B1 & (1 << 0) ? 0 : GB_Z_FLAG);
 break;
 case 0x45:
 // BIT 0,L
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B0 & (1 << 0) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B0 & (1 << 0) ? 0 : GB_Z_FLAG);
 break;
 case 0x46:
 // BIT 0,(HL)
 tempValue = gbReadMemory(HL.W);
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (tempValue & (1 << 0) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (tempValue & (1 << 0) ? 0 : GB_Z_FLAG);
 break;
 case 0x47:
 // BIT 0,A
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (AF.B.B1 & (1 << 0) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (AF.B.B1 & (1 << 0) ? 0 : GB_Z_FLAG);
 break;
 case 0x48:
 // BIT 1,B
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B1 & (1 << 1) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B1 & (1 << 1) ? 0 : GB_Z_FLAG);
 break;
 case 0x49:
 // BIT 1,C
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B0 & (1 << 1) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B0 & (1 << 1) ? 0 : GB_Z_FLAG);
 break;
 case 0x4a:
 // BIT 1,D
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B1 & (1 << 1) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B1 & (1 << 1) ? 0 : GB_Z_FLAG);
 break;
 case 0x4b:
 // BIT 1,E
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B0 & (1 << 1) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B0 & (1 << 1) ? 0 : GB_Z_FLAG);
 break;
 case 0x4c:
 // BIT 1,H
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B1 & (1 << 1) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B1 & (1 << 1) ? 0 : GB_Z_FLAG);
 break;
 case 0x4d:
 // BIT 1,L
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B0 & (1 << 1) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B0 & (1 << 1) ? 0 : GB_Z_FLAG);
 break;
 case 0x4e:
 // BIT 1,(HL)
 tempValue = gbReadMemory(HL.W);
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (tempValue & (1 << 1) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (tempValue & (1 << 1) ? 0 : GB_Z_FLAG);
 break;
 case 0x4f:
 // BIT 1,A
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (AF.B.B1 & (1 << 1) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (AF.B.B1 & (1 << 1) ? 0 : GB_Z_FLAG);
 break;
 case 0x50:
 // BIT 2,B
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B1 & (1 << 2) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B1 & (1 << 2) ? 0 : GB_Z_FLAG);
 break;
 case 0x51:
 // BIT 2,C
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B0 & (1 << 2) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B0 & (1 << 2) ? 0 : GB_Z_FLAG);
 break;
 case 0x52:
 // BIT 2,D
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B1 & (1 << 2) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B1 & (1 << 2) ? 0 : GB_Z_FLAG);
 break;
 case 0x53:
 // BIT 2,E
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B0 & (1 << 2) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B0 & (1 << 2) ? 0 : GB_Z_FLAG);
 break;
 case 0x54:
 // BIT 2,H
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B1 & (1 << 2) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B1 & (1 << 2) ? 0 : GB_Z_FLAG);
 break;
 case 0x55:
 // BIT 2,L
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B0 & (1 << 2) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B0 & (1 << 2) ? 0 : GB_Z_FLAG);
 break;
 case 0x56:
 // BIT 2,(HL)
 tempValue = gbReadMemory(HL.W);
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (tempValue & (1 << 2) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (tempValue & (1 << 2) ? 0 : GB_Z_FLAG);
 break;
 case 0x57:
 // BIT 2,A
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (AF.B.B1 & (1 << 2) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (AF.B.B1 & (1 << 2) ? 0 : GB_Z_FLAG);
 break;
 case 0x58:
 // BIT 3,B
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B1 & (1 << 3) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B1 & (1 << 3) ? 0 : GB_Z_FLAG);
 break;
 case 0x59:
 // BIT 3,C
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B0 & (1 << 3) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B0 & (1 << 3) ? 0 : GB_Z_FLAG);
 break;
 case 0x5a:
 // BIT 3,D
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B1 & (1 << 3) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B1 & (1 << 3) ? 0 : GB_Z_FLAG);
 break;
 case 0x5b:
 // BIT 3,E
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B0 & (1 << 3) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B0 & (1 << 3) ? 0 : GB_Z_FLAG);
 break;
 case 0x5c:
 // BIT 3,H
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B1 & (1 << 3) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B1 & (1 << 3) ? 0 : GB_Z_FLAG);
 break;
 case 0x5d:
 // BIT 3,L
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B0 & (1 << 3) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B0 & (1 << 3) ? 0 : GB_Z_FLAG);
 break;
 case 0x5e:
 // BIT 3,(HL)
 tempValue = gbReadMemory(HL.W);
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (tempValue & (1 << 3) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (tempValue & (1 << 3) ? 0 : GB_Z_FLAG);
 break;
 case 0x5f:
 // BIT 3,A
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (AF.B.B1 & (1 << 3) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (AF.B.B1 & (1 << 3) ? 0 : GB_Z_FLAG);
 break;
 case 0x60:
 // BIT 4,B
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B1 & (1 << 4) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B1 & (1 << 4) ? 0 : GB_Z_FLAG);
 break;
 case 0x61:
 // BIT 4,C
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B0 & (1 << 4) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B0 & (1 << 4) ? 0 : GB_Z_FLAG);
 break;
 case 0x62:
 // BIT 4,D
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B1 & (1 << 4) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B1 & (1 << 4) ? 0 : GB_Z_FLAG);
 break;
 case 0x63:
 // BIT 4,E
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B0 & (1 << 4) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B0 & (1 << 4) ? 0 : GB_Z_FLAG);
 break;
 case 0x64:
 // BIT 4,H
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B1 & (1 << 4) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B1 & (1 << 4) ? 0 : GB_Z_FLAG);
 break;
 case 0x65:
 // BIT 4,L
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B0 & (1 << 4) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B0 & (1 << 4) ? 0 : GB_Z_FLAG);
 break;
 case 0x66:
 // BIT 4,(HL)
 tempValue = gbReadMemory(HL.W);
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (tempValue & (1 << 4) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (tempValue & (1 << 4) ? 0 : GB_Z_FLAG);
 break;
 case 0x67:
 // BIT 4,A
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (AF.B.B1 & (1 << 4) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (AF.B.B1 & (1 << 4) ? 0 : GB_Z_FLAG);
 break;
 case 0x68:
 // BIT 5,B
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B1 & (1 << 5) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B1 & (1 << 5) ? 0 : GB_Z_FLAG);
 break;
 case 0x69:
 // BIT 5,C
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B0 & (1 << 5) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B0 & (1 << 5) ? 0 : GB_Z_FLAG);
 break;
 case 0x6a:
 // BIT 5,D
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B1 & (1 << 5) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B1 & (1 << 5) ? 0 : GB_Z_FLAG);
 break;
 case 0x6b:
 // BIT 5,E
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B0 & (1 << 5) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B0 & (1 << 5) ? 0 : GB_Z_FLAG);
 break;
 case 0x6c:
 // BIT 5,H
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B1 & (1 << 5) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B1 & (1 << 5) ? 0 : GB_Z_FLAG);
 break;
 case 0x6d:
 // BIT 5,L
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B0 & (1 << 5) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B0 & (1 << 5) ? 0 : GB_Z_FLAG);
 break;
 case 0x6e:
 // BIT 5,(HL)
 tempValue = gbReadMemory(HL.W);
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (tempValue & (1 << 5) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (tempValue & (1 << 5) ? 0 : GB_Z_FLAG);
 break;
 case 0x6f:
 // BIT 5,A
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (AF.B.B1 & (1 << 5) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (AF.B.B1 & (1 << 5) ? 0 : GB_Z_FLAG);
 break;
 case 0x70:
 // BIT 6,B
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B1 & (1 << 6) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B1 & (1 << 6) ? 0 : GB_Z_FLAG);
 break;
 case 0x71:
 // BIT 6,C
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B0 & (1 << 6) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B0 & (1 << 6) ? 0 : GB_Z_FLAG);
 break;
 case 0x72:
 // BIT 6,D
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B1 & (1 << 6) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B1 & (1 << 6) ? 0 : GB_Z_FLAG);
 break;
 case 0x73:
 // BIT 6,E
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B0 & (1 << 6) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B0 & (1 << 6) ? 0 : GB_Z_FLAG);
 break;
 case 0x74:
 // BIT 6,H
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B1 & (1 << 6) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B1 & (1 << 6) ? 0 : GB_Z_FLAG);
 break;
 case 0x75:
 // BIT 6,L
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B0 & (1 << 6) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B0 & (1 << 6) ? 0 : GB_Z_FLAG);
 break;
 case 0x76:
 // BIT 6,(HL)
 tempValue = gbReadMemory(HL.W);
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (tempValue & (1 << 6) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (tempValue & (1 << 6) ? 0 : GB_Z_FLAG);
 break;
 case 0x77:
 // BIT 6,A
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (AF.B.B1 & (1 << 6) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (AF.B.B1 & (1 << 6) ? 0 : GB_Z_FLAG);
 break;
 case 0x78:
 // BIT 7,B
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B1 & (1 << 7) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B1 & (1 << 7) ? 0 : GB_Z_FLAG);
 break;
 case 0x79:
 // BIT 7,C
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (BC.B.B0 & (1 << 7) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (BC.B.B0 & (1 << 7) ? 0 : GB_Z_FLAG);
 break;
 case 0x7a:
 // BIT 7,D
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B1 & (1 << 7) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B1 & (1 << 7) ? 0 : GB_Z_FLAG);
 break;
 case 0x7b:
 // BIT 7,E
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (DE.B.B0 & (1 << 7) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (DE.B.B0 & (1 << 7) ? 0 : GB_Z_FLAG);
 break;
 case 0x7c:
 // BIT 7,H
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B1 & (1 << 7) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B1 & (1 << 7) ? 0 : GB_Z_FLAG);
 break;
 case 0x7d:
 // BIT 7,L
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (HL.B.B0 & (1 << 7) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (HL.B.B0 & (1 << 7) ? 0 : GB_Z_FLAG);
 break;
 case 0x7e:
 // BIT 7,(HL)
 tempValue = gbReadMemory(HL.W);
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (tempValue & (1 << 7) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (tempValue & (1 << 7) ? 0 : GB_Z_FLAG);
 break;
 case 0x7f:
 // BIT 7,A
-AF.B.B0 = (AF.B.B0 & C_FLAG) | H_FLAG | (AF.B.B1 & (1 << 7) ? 0 : Z_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | GB_H_FLAG | (AF.B.B1 & (1 << 7) ? 0 : GB_Z_FLAG);
 break;
 case 0x80:
 // RES 0,B

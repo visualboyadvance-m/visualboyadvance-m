@@ -26,45 +26,45 @@
 // Screen filters
 //
 
-extern int Init_2xSaI(u32);
+extern int Init_2xSaI(uint32_t);
 extern void hq2x_init(unsigned);
 extern bool sdlStretchInit(int colorDepth, int sizeMultiplier, int srcWidth);
 
-extern void sdlStretch1x(u8*, u32, u8*, u8*, u32, int, int);
-extern void sdlStretch2x(u8*, u32, u8*, u8*, u32, int, int);
-extern void sdlStretch3x(u8*, u32, u8*, u8*, u32, int, int);
-extern void sdlStretch4x(u8*, u32, u8*, u8*, u32, int, int);
-extern void _2xSaI(u8*, u32, u8*, u8*, u32, int, int);
-extern void _2xSaI32(u8*, u32, u8*, u8*, u32, int, int);
-extern void Super2xSaI(u8*, u32, u8*, u8*, u32, int, int);
-extern void Super2xSaI32(u8*, u32, u8*, u8*, u32, int, int);
-extern void SuperEagle(u8*, u32, u8*, u8*, u32, int, int);
-extern void SuperEagle32(u8*, u32, u8*, u8*, u32, int, int);
-extern void Pixelate(u8*, u32, u8*, u8*, u32, int, int);
-extern void Pixelate32(u8*, u32, u8*, u8*, u32, int, int);
-extern void AdMame2x(u8*, u32, u8*, u8*, u32, int, int);
-extern void AdMame2x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void Bilinear(u8*, u32, u8*, u8*, u32, int, int);
-extern void Bilinear32(u8*, u32, u8*, u8*, u32, int, int);
-extern void BilinearPlus(u8*, u32, u8*, u8*, u32, int, int);
-extern void BilinearPlus32(u8*, u32, u8*, u8*, u32, int, int);
-extern void Scanlines(u8*, u32, u8*, u8*, u32, int, int);
-extern void Scanlines32(u8*, u32, u8*, u8*, u32, int, int);
-extern void ScanlinesTV(u8*, u32, u8*, u8*, u32, int, int);
-extern void ScanlinesTV32(u8*, u32, u8*, u8*, u32, int, int);
-extern void hq2x(u8*, u32, u8*, u8*, u32, int, int);
-extern void hq2x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void lq2x(u8*, u32, u8*, u8*, u32, int, int);
-extern void lq2x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void hq3x16(u8*, u32, u8*, u8*, u32, int, int);
-extern void hq4x16(u8*, u32, u8*, u8*, u32, int, int);
-extern void hq3x32_32(u8*, u32, u8*, u8*, u32, int, int);
-extern void hq4x32_32(u8*, u32, u8*, u8*, u32, int, int);
-extern void xbrz2x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void xbrz3x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void xbrz4x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void xbrz5x32(u8*, u32, u8*, u8*, u32, int, int);
-extern void xbrz6x32(u8*, u32, u8*, u8*, u32, int, int);
+extern void sdlStretch1x(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void sdlStretch2x(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void sdlStretch3x(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void sdlStretch4x(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void _2xSaI(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void _2xSaI32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Super2xSaI(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Super2xSaI32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void SuperEagle(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void SuperEagle32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Pixelate(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Pixelate32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void AdMame2x(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void AdMame2x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Bilinear(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Bilinear32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void BilinearPlus(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void BilinearPlus32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Scanlines(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void Scanlines32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void ScanlinesTV(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void ScanlinesTV32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void hq2x(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void hq2x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void lq2x(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void lq2x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void hq3x16(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void hq4x16(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void hq3x32_32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void hq4x32_32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void xbrz2x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void xbrz3x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void xbrz4x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void xbrz5x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
+extern void xbrz6x32(uint8_t*, uint32_t, uint8_t*, uint8_t*, uint32_t, int, int);
 
 struct FilterDesc {
     char name[30];
@@ -168,10 +168,10 @@ FilterFunc initFilter(const int f, const int colorDepth, const int srcWidth)
 // Interframe blending filters
 //
 
-extern void SmartIB(u8*, u32, int, int);
-extern void SmartIB32(u8*, u32, int, int);
-extern void MotionBlurIB(u8*, u32, int, int);
-extern void MotionBlurIB32(u8*, u32, int, int);
+extern void SmartIB(uint8_t*, uint32_t, int, int);
+extern void SmartIB32(uint8_t*, uint32_t, int, int);
+extern void MotionBlurIB(uint8_t*, uint32_t, int, int);
+extern void MotionBlurIB32(uint8_t*, uint32_t, int, int);
 
 struct IFBFilterDesc {
     char name[30];
@@ -216,7 +216,7 @@ char* getIFBFilterName(const IFBFilter f)
 //
 
 #ifndef C_CORE
-u8 sdlStretcher[16384];
+uint8_t sdlStretcher[16384];
 
 #ifdef _MSC_VER
 #define SDL_CALL_STRETCHER                                                                   \
@@ -229,7 +229,7 @@ u8 sdlStretcher[16384];
 #endif
 
 #define SDL_LONG(val)                              \
-    *((u32*)&sdlStretcher[sdlStretcherPos]) = val; \
+    *((uint32_t*)&sdlStretcher[sdlStretcherPos]) = val; \
     sdlStretcherPos += 4;
 
 #define SDL_AND_EAX(val)                    \
@@ -466,13 +466,13 @@ void sdlMakeStretcher(int width, int sizeOption)
 
 #else // C_CORE
 
-void (*sdlStretcher)(u8*, u8*, int) = 0;
+void (*sdlStretcher)(uint8_t*, uint8_t*, int) = 0;
 
 #define SDL_CALL_STRETCHER \
     sdlStretcher(srcPtr, dstPtr, width)
 
 template <typename T>
-void sdlStretchx1(u8* src, u8* dest, int width)
+void sdlStretchx1(uint8_t* src, uint8_t* dest, int width)
 {
     T* s = (T*)src;
     T* d = (T*)dest;
@@ -481,7 +481,7 @@ void sdlStretchx1(u8* src, u8* dest, int width)
 }
 
 template <typename T>
-void sdlStretchx2(u8* src, u8* dest, int width)
+void sdlStretchx2(uint8_t* src, uint8_t* dest, int width)
 {
     T* s = (T*)src;
     T* d = (T*)dest;
@@ -492,7 +492,7 @@ void sdlStretchx2(u8* src, u8* dest, int width)
 }
 
 template <typename T>
-void sdlStretchx3(u8* src, u8* dest, int width)
+void sdlStretchx3(uint8_t* src, uint8_t* dest, int width)
 {
     T* s = (T*)src;
     T* d = (T*)dest;
@@ -504,7 +504,7 @@ void sdlStretchx3(u8* src, u8* dest, int width)
 }
 
 template <typename T>
-void sdlStretchx4(u8* src, u8* dest, int width)
+void sdlStretchx4(uint8_t* src, uint8_t* dest, int width)
 {
     T* s = (T*)src;
     T* d = (T*)dest;
@@ -516,24 +516,24 @@ void sdlStretchx4(u8* src, u8* dest, int width)
     }
 }
 
-void (*sdlStretcher16[4])(u8*, u8*, int) = {
-    sdlStretchx1<u16>,
-    sdlStretchx2<u16>,
-    sdlStretchx3<u16>,
-    sdlStretchx4<u16>
+void (*sdlStretcher16[4])(uint8_t*, uint8_t*, int) = {
+    sdlStretchx1<uint16_t>,
+    sdlStretchx2<uint16_t>,
+    sdlStretchx3<uint16_t>,
+    sdlStretchx4<uint16_t>
 };
 
-void (*sdlStretcher32[4])(u8*, u8*, int) = {
-    sdlStretchx1<u32>,
-    sdlStretchx2<u32>,
-    sdlStretchx3<u32>,
-    sdlStretchx4<u32>
+void (*sdlStretcher32[4])(uint8_t*, uint8_t*, int) = {
+    sdlStretchx1<uint32_t>,
+    sdlStretchx2<uint32_t>,
+    sdlStretchx3<uint32_t>,
+    sdlStretchx4<uint32_t>
 };
 
-void sdlStretch24x1(u8* src, u8* dest, int width)
+void sdlStretch24x1(uint8_t* src, uint8_t* dest, int width)
 {
-    u8* s = src;
-    u8* d = dest;
+    uint8_t* s = src;
+    uint8_t* d = dest;
     for (int i = 0; i < width; i++) {
         *d++ = *s++;
         *d++ = *s++;
@@ -541,10 +541,10 @@ void sdlStretch24x1(u8* src, u8* dest, int width)
     }
 }
 
-void sdlStretch24x2(u8* src, u8* dest, int width)
+void sdlStretch24x2(uint8_t* src, uint8_t* dest, int width)
 {
-    u8* s = (u8*)src;
-    u8* d = (u8*)dest;
+    uint8_t* s = (uint8_t*)src;
+    uint8_t* d = (uint8_t*)dest;
     for (int i = 0; i < width; i++) {
         *d++ = *s;
         *d++ = *(s + 1);
@@ -557,35 +557,11 @@ void sdlStretch24x2(u8* src, u8* dest, int width)
     }
 }
 
-void sdlStretch24x3(u8* src, u8* dest, int width)
+void sdlStretch24x3(uint8_t* src, uint8_t* dest, int width)
 {
-    u8* s = (u8*)src;
-    u8* d = (u8*)dest;
+    uint8_t* s = (uint8_t*)src;
+    uint8_t* d = (uint8_t*)dest;
     for (int i = 0; i < width; i++) {
-        *d++ = *s;
-        *d++ = *(s + 1);
-        *d++ = *(s + 2);
-        s += 3;
-        *d++ = *s;
-        *d++ = *(s + 1);
-        *d++ = *(s + 2);
-        s += 3;
-        *d++ = *s;
-        *d++ = *(s + 1);
-        *d++ = *(s + 2);
-        s += 3;
-    }
-}
-
-void sdlStretch24x4(u8* src, u8* dest, int width)
-{
-    u8* s = (u8*)src;
-    u8* d = (u8*)dest;
-    for (int i = 0; i < width; i++) {
-        *d++ = *s;
-        *d++ = *(s + 1);
-        *d++ = *(s + 2);
-        s += 3;
         *d++ = *s;
         *d++ = *(s + 1);
         *d++ = *(s + 2);
@@ -601,7 +577,31 @@ void sdlStretch24x4(u8* src, u8* dest, int width)
     }
 }
 
-void (*sdlStretcher24[4])(u8*, u8*, int) = {
+void sdlStretch24x4(uint8_t* src, uint8_t* dest, int width)
+{
+    uint8_t* s = (uint8_t*)src;
+    uint8_t* d = (uint8_t*)dest;
+    for (int i = 0; i < width; i++) {
+        *d++ = *s;
+        *d++ = *(s + 1);
+        *d++ = *(s + 2);
+        s += 3;
+        *d++ = *s;
+        *d++ = *(s + 1);
+        *d++ = *(s + 2);
+        s += 3;
+        *d++ = *s;
+        *d++ = *(s + 1);
+        *d++ = *(s + 2);
+        s += 3;
+        *d++ = *s;
+        *d++ = *(s + 1);
+        *d++ = *(s + 2);
+        s += 3;
+    }
+}
+
+void (*sdlStretcher24[4])(uint8_t*, uint8_t*, int) = {
     sdlStretch24x1,
     sdlStretch24x2,
     sdlStretch24x3,
@@ -632,11 +632,11 @@ bool sdlStretchInit(int colorDepth, int sizeMultiplier, int srcWidth)
     return true;
 }
 
-void sdlStretch1x(u8* srcPtr, u32 srcPitch, u8* /* deltaPtr */, u8* dstPtr, u32 dstPitch, int width, int height)
+void sdlStretch1x(uint8_t* srcPtr, uint32_t srcPitch, uint8_t* /* deltaPtr */, uint8_t* dstPtr, uint32_t dstPitch, int width, int height)
 {
     int i;
 #ifndef C_CORE
-    u32* stretcher = (u32*)sdlStretcher;
+    uint32_t* stretcher = (uint32_t*)sdlStretcher;
 #endif
     for (i = 0; i < height; i++) {
         SDL_CALL_STRETCHER;
@@ -644,11 +644,11 @@ void sdlStretch1x(u8* srcPtr, u32 srcPitch, u8* /* deltaPtr */, u8* dstPtr, u32 
         dstPtr += dstPitch;
     }
 }
-void sdlStretch2x(u8* srcPtr, u32 srcPitch, u8* /* deltaPtr */, u8* dstPtr, u32 dstPitch, int width, int height)
+void sdlStretch2x(uint8_t* srcPtr, uint32_t srcPitch, uint8_t* /* deltaPtr */, uint8_t* dstPtr, uint32_t dstPitch, int width, int height)
 {
     int i;
 #ifndef C_CORE
-    u32* stretcher = (u32*)sdlStretcher;
+    uint32_t* stretcher = (uint32_t*)sdlStretcher;
 #endif
     for (i = 0; i < height; i++) {
         SDL_CALL_STRETCHER;
@@ -658,11 +658,11 @@ void sdlStretch2x(u8* srcPtr, u32 srcPitch, u8* /* deltaPtr */, u8* dstPtr, u32 
         dstPtr += dstPitch;
     }
 }
-void sdlStretch3x(u8* srcPtr, u32 srcPitch, u8* /* deltaPtr */, u8* dstPtr, u32 dstPitch, int width, int height)
+void sdlStretch3x(uint8_t* srcPtr, uint32_t srcPitch, uint8_t* /* deltaPtr */, uint8_t* dstPtr, uint32_t dstPitch, int width, int height)
 {
     int i;
 #ifndef C_CORE
-    u32* stretcher = (u32*)sdlStretcher;
+    uint32_t* stretcher = (uint32_t*)sdlStretcher;
 #endif
     for (i = 0; i < height; i++) {
         SDL_CALL_STRETCHER;
@@ -674,11 +674,11 @@ void sdlStretch3x(u8* srcPtr, u32 srcPitch, u8* /* deltaPtr */, u8* dstPtr, u32 
         dstPtr += dstPitch;
     }
 }
-void sdlStretch4x(u8* srcPtr, u32 srcPitch, u8* /* deltaPtr */, u8* dstPtr, u32 dstPitch, int width, int height)
+void sdlStretch4x(uint8_t* srcPtr, uint32_t srcPitch, uint8_t* /* deltaPtr */, uint8_t* dstPtr, uint32_t dstPitch, int width, int height)
 {
     int i;
 #ifndef C_CORE
-    u32* stretcher = (u32*)sdlStretcher;
+    uint32_t* stretcher = (uint32_t*)sdlStretcher;
 #endif
     for (i = 0; i < height; i++) {
         SDL_CALL_STRETCHER;

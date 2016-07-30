@@ -18,18 +18,18 @@ enum RTCSTATE {
 
 typedef struct
 {
-    u8 byte0;
-    u8 select;
-    u8 enable;
-    u8 command;
+    uint8_t byte0;
+    uint8_t select;
+    uint8_t enable;
+    uint8_t command;
     int dataLen;
     int bits;
     RTCSTATE state;
-    u8 data[12];
+    uint8_t data[12];
     // reserved variables for future
-    u8 reserved[12];
+    uint8_t reserved[12];
     bool reserved2;
-    u32 reserved3;
+    uint32_t reserved3;
 } RTCCLOCKDATA;
 
 struct tm gba_time;
@@ -37,7 +37,7 @@ static RTCCLOCKDATA rtcClockData;
 static bool rtcClockEnabled = true;
 static bool rtcRumbleEnabled = false;
 
-u32 countTicks = 0;
+uint32_t countTicks = 0;
 
 void rtcEnable(bool e)
 {
@@ -54,7 +54,7 @@ void rtcEnableRumble(bool e)
     rtcRumbleEnabled = e;
 }
 
-u16 rtcRead(u32 address)
+uint16_t rtcRead(uint32_t address)
 {
     int res = 0;
 
@@ -81,7 +81,7 @@ u16 rtcRead(u32 address)
 
         // WarioWare Twisted Tilt Sensor
         if (rtcClockData.select == 0x0b) {
-            u16 v = systemGetSensorZ();
+            uint16_t v = systemGetSensorZ();
             v = 0x6C0 + v;
             res |= ((v >> rtcClockData.reserved[11]) & 1) << 2;
         }
@@ -98,7 +98,7 @@ u16 rtcRead(u32 address)
     return READ16LE((&rom[address & 0x1FFFFFE]));
 }
 
-static u8 toBCD(u8 value)
+static uint8_t toBCD(uint8_t value)
 {
     value = value % 100;
     int l = value % 10;
@@ -124,12 +124,12 @@ void rtcUpdateTime(int ticks)
     }
 }
 
-bool rtcWrite(u32 address, u16 value)
+bool rtcWrite(uint32_t address, uint16_t value)
 {
     if (address == 0x80000c8) {
-        rtcClockData.enable = (u8)value; // bit 0 = enable reading from 0x80000c4 c6 and c8
+        rtcClockData.enable = (uint8_t)value; // bit 0 = enable reading from 0x80000c4 c6 and c8
     } else if (address == 0x80000c6) {
-        rtcClockData.select = (u8)value; // 0=read/1=write (for each of 4 low bits)
+        rtcClockData.select = (uint8_t)value; // 0=read/1=write (for each of 4 low bits)
 
         // rumble is off when not writing to that pin
         if (rtcRumbleEnabled && !(value & 8))
@@ -183,7 +183,7 @@ bool rtcWrite(u32 address, u16 value)
                 rtcClockData.command = 0;
             } else if (!(rtcClockData.byte0 & 1) && (value & 1)) // bit transfer
             {
-                rtcClockData.byte0 = (u8)value;
+                rtcClockData.byte0 = (uint8_t)value;
 
                 switch (rtcClockData.state) {
                 case COMMAND:
@@ -283,7 +283,7 @@ bool rtcWrite(u32 address, u16 value)
                     break;
                 }
             } else
-                rtcClockData.byte0 = (u8)value;
+                rtcClockData.byte0 = (uint8_t)value;
         }
     }
 
@@ -305,12 +305,12 @@ void rtcReset()
 }
 
 #ifdef __LIBRETRO__
-void rtcSaveGame(u8*& data)
+void rtcSaveGame(uint8_t*& data)
 {
     utilWriteMem(data, &rtcClockData, sizeof(rtcClockData));
 }
 
-void rtcReadGame(const u8*& data)
+void rtcReadGame(const uint8_t*& data)
 {
     utilReadMem(&rtcClockData, data, sizeof(rtcClockData));
 }

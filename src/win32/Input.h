@@ -38,7 +38,7 @@ public:
     virtual bool initialize() = 0;
 
     virtual bool readDevices() = 0;
-    virtual u32 readDevice(int which) = 0;
+    virtual uint32_t readDevice(int which) = 0;
     virtual CString getKeyName(LONG_PTR key) = 0;
     virtual void checkKeys() = 0;
     virtual void checkMotionKeys() = 0;

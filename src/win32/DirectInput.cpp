@@ -31,7 +31,7 @@ public:
 
     virtual bool initialize();
     virtual bool readDevices();
-    virtual u32 readDevice(int which);
+    virtual uint32_t readDevice(int which);
     virtual CString getKeyName(LONG_PTR key);
     virtual void checkKeys();
     virtual void checkMotionKeys();
@@ -592,9 +592,9 @@ bool DirectInput::readDevices()
     return ok;
 }
 
-u32 DirectInput::readDevice(int which)
+uint32_t DirectInput::readDevice(int which)
 {
-    u32 res = 0;
+    uint32_t res = 0;
     int i = joypadDefault;
     if (which >= 0 && which <= 3)
         i = which;

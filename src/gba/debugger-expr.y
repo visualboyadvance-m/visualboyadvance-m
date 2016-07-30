@@ -14,7 +14,7 @@ extern int dexp_error(char *);
 extern int dexp_lex();
 extern char *dexp_text;
 
-std::map<std::string, u32> dexp_vars;
+std::map<std::string, uint32_t> dexp_vars;
 
 #define readWord(addr) \
   READ32LE((&map[(addr)>>24].address[(addr) & map[(addr)>>24].mask]))
@@ -85,7 +85,7 @@ exp: TOK_NUMBER           { $$ = $1; }
 ;
 %%
 
-bool dexp_eval(char *expr, u32 *result)
+bool dexp_eval(char *expr, uint32_t *result)
 {
   extern void dexp_flush();
   extern char *dexprString;
@@ -110,7 +110,7 @@ int dexp_error(char *s)
   return 0;
 }
 
-void dexp_setVar(char *name, u32 value)
+void dexp_setVar(char *name, uint32_t value)
 {
   std::string a(name);
   dexp_vars[a] = value;
@@ -118,7 +118,7 @@ void dexp_setVar(char *name, u32 value)
 
 void dexp_listVars()
 {
-  std::map<std::string, u32>::iterator iter;
+  std::map<std::string, uint32_t>::iterator iter;
 
   for (iter = dexp_vars.begin(); iter != dexp_vars.end(); iter++) {
     printf("%s = %08X\n", iter->first.c_str(), iter->second);
@@ -127,7 +127,7 @@ void dexp_listVars()
 
 void dexp_saveVars(char *file)
 {
-  std::map<std::string, u32>::iterator iter;
+  std::map<std::string, uint32_t>::iterator iter;
 
   FILE *f = fopen(file, "w");
   if (!f) {
@@ -143,10 +143,10 @@ void dexp_saveVars(char *file)
 
 void dexp_loadVars(char *file)
 {
-  std::map<std::string, u32>::iterator iter;
+  std::map<std::string, uint32_t>::iterator iter;
   char buffer[500];
   char name[500];
-  u32 val;
+  uint32_t val;
 
   FILE *f = fopen(file, "r");
   if (!f) {

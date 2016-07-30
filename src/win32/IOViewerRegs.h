@@ -1,8 +1,8 @@
 struct IOData {
-    u16* address;
-    u16 offset;
+    uint16_t* address;
+    uint16_t offset;
     char* name;
-    u16 write;
+    uint16_t write;
     char* bits[16];
 };
 

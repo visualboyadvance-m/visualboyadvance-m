@@ -13,11 +13,11 @@
 
 class IMemoryViewerDlg {
 public:
-    virtual void setCurrentAddress(u32 address) = 0;
+    virtual void setCurrentAddress(uint32_t address) = 0;
 };
 
 class MemoryViewer : public CWnd {
-    u32 address;
+    uint32_t address;
     int addressSize;
     int dataSize;
     bool hasCaret;
@@ -25,7 +25,7 @@ class MemoryViewer : public CWnd {
     int caretHeight;
     HFONT font;
     CSize fontSize;
-    u32 editAddress;
+    uint32_t editAddress;
     int editNibble;
     int maxNibble;
     int displayedLines;
@@ -43,8 +43,8 @@ public:
 public:
     // Operations
 public:
-    virtual void readData(u32, int, u8*) = 0;
-    virtual void editData(u32, int, int, u32) = 0;
+    virtual void readData(uint32_t, int, uint8_t*) = 0;
+    virtual void editData(uint32_t, int, int, uint32_t) = 0;
 
     // Overrides
     // ClassWizard generated virtual function overrides
@@ -54,18 +54,18 @@ public:
     // Implementation
 public:
     int getSize();
-    u32 getCurrentAddress();
+    uint32_t getCurrentAddress();
     void setAddressSize(int s);
     void registerClass();
     void beep();
     bool OnEditInput(UINT c);
-    void moveAddress(s32 offset, int nibbleOff);
+    void moveAddress(int32_t offset, int nibbleOff);
     void setCaretPos();
     void destroyEditCaret();
     void createEditCaret(int w, int h);
     void updateScrollInfo(int lines);
     void setSize(int s);
-    void setAddress(u32 a);
+    void setAddress(uint32_t a);
     void setDialog(IMemoryViewerDlg* d);
     virtual ~MemoryViewer();
 

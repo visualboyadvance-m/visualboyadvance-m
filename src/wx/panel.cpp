@@ -1392,11 +1392,11 @@ public:
     int nthreads, threadno;
     int width, height, scale;
     const RENDER_PLUGIN_INFO* rpi;
-    u8 *dst, *delta;
+    uint8_t *dst, *delta;
 
     // set this param every round
     // if NULL, end thread
-    u8* src;
+    uint8_t* src;
 
     ExitCode Entry()
     {
@@ -1583,7 +1583,7 @@ public:
     }
 };
 
-void DrawingPanel::DrawArea(u8** data)
+void DrawingPanel::DrawArea(uint8_t** data)
 {
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
@@ -1601,7 +1601,7 @@ void DrawingPanel::DrawArea(u8** data)
             alloch = GameArea::SGBHeight;
         }
 
-        pixbuf2 = (u8*)calloc(allocstride, (alloch + 2) * scale);
+        pixbuf2 = (uint8_t*)calloc(allocstride, (alloch + 2) * scale);
     }
 
     if (gopts.filter == FF_NONE) {
@@ -1877,8 +1877,8 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
     } else if (out_16) {
         // scaled by filters, top/right borders, transform to 24-bit
         wxImage im(width * scale, height * scale, false);
-        u16* src = (u16*)todraw + (width + 2) * scale; // skip top border
-        u8* dst = im.GetData();
+        uint16_t* src = (uint16_t*)todraw + (width + 2) * scale; // skip top border
+        uint8_t* dst = im.GetData();
 
         for (int y = 0; y < height * scale; y++) {
             for (int x = 0; x < width * scale; x++, src++) {
@@ -1895,8 +1895,8 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
     {
         // scaled by filters, top/right borders, transform to 24-bit
         wxImage im(width * scale, height * scale, false);
-        u32* src = (u32*)todraw + (width + 1) * scale; // skip top border
-        u8* dst = im.GetData();
+        uint32_t* src = (uint32_t*)todraw + (width + 1) * scale; // skip top border
+        uint8_t* dst = im.GetData();
 
         for (int y = 0; y < height * scale; y++) {
             for (int x = 0; x < width * scale; x++, src++) {
@@ -2205,8 +2205,8 @@ void CairoDrawingPanel::DrawArea(wxWindowDC& dc)
         }
 
         surf = cairo_surface_reference(conv_surf);
-        u16* src = (u16*)todraw + (width + 2) * scale; // skip top border
-        u32* dst = (u32*)cairo_image_surface_get_data(surf);
+        uint16_t* src = (uint16_t*)todraw + (width + 2) * scale; // skip top border
+        uint32_t* dst = (uint32_t*)cairo_image_surface_get_data(surf);
 
         for (int y = 0; y < height * scale; y++) {
             for (int x = 0; x < width * scale; x++, src++) {
@@ -2353,7 +2353,7 @@ void GameArea::StopSoundRecording()
     mf->enable_menus();
 }
 
-void GameArea::AddFrame(const u16* data, int length)
+void GameArea::AddFrame(const uint16_t* data, int length)
 {
     MediaRet ret;
 
@@ -2369,7 +2369,7 @@ void GameArea::AddFrame(const u16* data, int length)
     }
 }
 
-void GameArea::AddFrame(const u8* data)
+void GameArea::AddFrame(const uint8_t* data)
 {
     MediaRet ret;
 

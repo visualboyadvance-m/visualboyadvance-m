@@ -40,32 +40,32 @@ static bool cheatSearchGE(uint32_t a, uint32_t b)
     return a >= b;
 }
 
-static bool cheatSearchSignedEQ(s32 a, s32 b)
+static bool cheatSearchSignedEQ(int32_t a, int32_t b)
 {
     return a == b;
 }
 
-static bool cheatSearchSignedNE(s32 a, s32 b)
+static bool cheatSearchSignedNE(int32_t a, int32_t b)
 {
     return a != b;
 }
 
-static bool cheatSearchSignedLT(s32 a, s32 b)
+static bool cheatSearchSignedLT(int32_t a, int32_t b)
 {
     return a < b;
 }
 
-static bool cheatSearchSignedLE(s32 a, s32 b)
+static bool cheatSearchSignedLE(int32_t a, int32_t b)
 {
     return a <= b;
 }
 
-static bool cheatSearchSignedGT(s32 a, s32 b)
+static bool cheatSearchSignedGT(int32_t a, int32_t b)
 {
     return a > b;
 }
 
-static bool cheatSearchSignedGE(s32 a, s32 b)
+static bool cheatSearchSignedGE(int32_t a, int32_t b)
 {
     return a >= b;
 }
@@ -79,7 +79,7 @@ static bool (*cheatSearchFunc[])(uint32_t, uint32_t) = {
     cheatSearchGE
 };
 
-static bool (*cheatSearchSignedFunc[])(s32, s32) = {
+static bool (*cheatSearchSignedFunc[])(int32_t, int32_t) = {
     cheatSearchSignedEQ,
     cheatSearchSignedNE,
     cheatSearchSignedLT,
@@ -111,25 +111,25 @@ void cheatSearchStart(const CheatSearchData* cs)
     }
 }
 
-s32 cheatSearchSignedRead(uint8_t* data, int off, int size)
+int32_t cheatSearchSignedRead(uint8_t* data, int off, int size)
 {
     uint32_t res = data[off++];
 
     switch (size) {
     case BITS_8:
         res <<= 24;
-        return ((s32)res) >> 24;
+        return ((int32_t)res) >> 24;
     case BITS_16:
         res |= ((uint32_t)data[off++]) << 8;
         res <<= 16;
-        return ((s32)res) >> 16;
+        return ((int32_t)res) >> 16;
     case BITS_32:
         res |= ((uint32_t)data[off++]) << 8;
         res |= ((uint32_t)data[off++]) << 16;
         res |= ((uint32_t)data[off++]) << 24;
-        return (s32)res;
+        return (int32_t)res;
     }
-    return (s32)res;
+    return (int32_t)res;
 }
 
 uint32_t cheatSearchRead(uint8_t* data, int off, int size)
@@ -157,7 +157,7 @@ void cheatSearch(const CheatSearchData* cs, int compare, int size,
         inc = 4;
 
     if (isSigned) {
-        bool (*func)(s32, s32) = cheatSearchSignedFunc[compare];
+        bool (*func)(int32_t, int32_t) = cheatSearchSignedFunc[compare];
 
         for (int i = 0; i < cs->count; i++) {
             CheatSearchBlock* block = &cs->blocks[i];
@@ -168,8 +168,8 @@ void cheatSearch(const CheatSearchData* cs, int compare, int size,
 
             for (int j = 0; j < size2; j += inc) {
                 if (IS_BIT_SET(bits, j)) {
-                    s32 a = cheatSearchSignedRead(data, j, size);
-                    s32 b = cheatSearchSignedRead(saved, j, size);
+                    int32_t a = cheatSearchSignedRead(data, j, size);
+                    int32_t b = cheatSearchSignedRead(saved, j, size);
 
                     if (!func(a, b)) {
                         CLEAR_BIT(bits, j);
@@ -225,7 +225,7 @@ void cheatSearchValue(const CheatSearchData* cs, int compare, int size,
         inc = 4;
 
     if (isSigned) {
-        bool (*func)(s32, s32) = cheatSearchSignedFunc[compare];
+        bool (*func)(int32_t, int32_t) = cheatSearchSignedFunc[compare];
 
         for (int i = 0; i < cs->count; i++) {
             CheatSearchBlock* block = &cs->blocks[i];
@@ -235,8 +235,8 @@ void cheatSearchValue(const CheatSearchData* cs, int compare, int size,
 
             for (int j = 0; j < size2; j += inc) {
                 if (IS_BIT_SET(bits, j)) {
-                    s32 a = cheatSearchSignedRead(data, j, size);
-                    s32 b = (s32)value;
+                    int32_t a = cheatSearchSignedRead(data, j, size);
+                    int32_t b = (int32_t)value;
 
                     if (!func(a, b)) {
                         CLEAR_BIT(bits, j);

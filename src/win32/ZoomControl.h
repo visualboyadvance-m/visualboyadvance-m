@@ -30,7 +30,7 @@ public:
 
     // Implementation
 public:
-    void setColors(const u8* c);
+    void setColors(const uint8_t* c);
     static bool isRegistered;
     virtual ~ZoomControl();
 
@@ -44,7 +44,7 @@ protected:
     DECLARE_MESSAGE_MAP()
 private:
     int selected;
-    u8 colors[3 * 64];
+    uint8_t colors[3 * 64];
     void registerClass();
 };
 

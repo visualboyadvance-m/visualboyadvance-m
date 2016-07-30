@@ -24,7 +24,7 @@ SoundRetro::SoundRetro()
 {
 }
 
-void SoundRetro::write(u16* finalWave, int length)
+void SoundRetro::write(uint16_t* finalWave, int length)
 {
     const int16_t* wave = (const int16_t*)finalWave;
     int frames = length >> 1;

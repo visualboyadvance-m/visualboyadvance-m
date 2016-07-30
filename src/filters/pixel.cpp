@@ -2,25 +2,25 @@
 
 extern int RGB_LOW_BITS_MASK;
 
-void Pixelate(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
-          u8 *dstPtr, u32 dstPitch, int width, int height)
+void Pixelate(uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
+          uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u8 *nextLine, *finish;
-  u32 colorMask = ~(RGB_LOW_BITS_MASK | (RGB_LOW_BITS_MASK << 16));
+  uint8_t *nextLine, *finish;
+  uint32_t colorMask = ~(RGB_LOW_BITS_MASK | (RGB_LOW_BITS_MASK << 16));
 
   nextLine = dstPtr + dstPitch;
 
   do {
-    u32 *bP = (u32 *) srcPtr;
-    u32 *xP = (u32 *) deltaPtr;
-    u32 *dP = (u32 *) dstPtr;
-    u32 *nL = (u32 *) nextLine;
-    u32 currentPixel;
-    u32 nextPixel;
-    u32 currentDelta;
-    u32 nextDelta;
+    uint32_t *bP = (uint32_t *) srcPtr;
+    uint32_t *xP = (uint32_t *) deltaPtr;
+    uint32_t *dP = (uint32_t *) dstPtr;
+    uint32_t *nL = (uint32_t *) nextLine;
+    uint32_t currentPixel;
+    uint32_t nextPixel;
+    uint32_t currentDelta;
+    uint32_t nextDelta;
 
-    finish = (u8 *) bP + ((width+2) << 1);
+    finish = (uint8_t *) bP + ((width+2) << 1);
     nextPixel = *bP++;
     nextDelta = *xP++;
 
@@ -31,7 +31,7 @@ void Pixelate(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
       nextDelta = *xP++;
 
       if ((nextPixel != nextDelta) || (currentPixel != currentDelta)) {
-        u32 colorA, colorB, product;
+        uint32_t colorA, colorB, product;
 
         *(xP - 2) = currentPixel;
 #ifdef WORDS_BIGENDIAN
@@ -68,7 +68,7 @@ void Pixelate(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
 
       dP += 2;
       nL += 2;
-    } while ((u8 *) bP < finish);
+    } while ((uint8_t *) bP < finish);
 
     deltaPtr += srcPitch;
     srcPtr += srcPitch;
@@ -78,30 +78,30 @@ void Pixelate(u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
   while (--height);
 }
 
-void Pixelate32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-                u8 *dstPtr, u32 dstPitch, int width, int height)
+void Pixelate32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+                uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u8 *nextLine, *finish;
-  u32 colorMask = ~RGB_LOW_BITS_MASK;
+  uint8_t *nextLine, *finish;
+  uint32_t colorMask = ~RGB_LOW_BITS_MASK;
 
   nextLine = dstPtr + dstPitch;
 
   do {
-    u32 *bP = (u32 *) srcPtr;
-    //    u32 *xP = (u32 *) deltaPtr;
-    u32 *dP = (u32 *) dstPtr;
-    u32 *nL = (u32 *) nextLine;
-    u32 currentPixel;
-    u32 nextPixel;
+    uint32_t *bP = (uint32_t *) srcPtr;
+    //    uint32_t *xP = (uint32_t *) deltaPtr;
+    uint32_t *dP = (uint32_t *) dstPtr;
+    uint32_t *nL = (uint32_t *) nextLine;
+    uint32_t currentPixel;
+    uint32_t nextPixel;
 
-    finish = (u8 *) bP + ((width+1) << 2);
+    finish = (uint8_t *) bP + ((width+1) << 2);
     nextPixel = *bP++;
 
     do {
       currentPixel = nextPixel;
       nextPixel = *bP++;
 
-      u32 colorA, colorB, product;
+      uint32_t colorA, colorB, product;
 
       colorA = currentPixel;
       colorB = nextPixel;
@@ -122,7 +122,7 @@ void Pixelate32(u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
 
       dP += 4;
       nL += 4;
-    } while ((u8 *) bP < finish);
+    } while ((uint8_t *) bP < finish);
 
     srcPtr += srcPitch;
     dstPtr += dstPitch << 1;

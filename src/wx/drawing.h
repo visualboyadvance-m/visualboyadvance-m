@@ -1,6 +1,8 @@
 #ifndef GAME_DRAWING_H
 #define GAME_DRAWING_H
 
+#include "wxvbam.h"
+
 class BasicDrawingPanel : public DrawingPanel, public wxPanel {
 public:
     BasicDrawingPanel(wxWindow* parent, int _width, int _height);

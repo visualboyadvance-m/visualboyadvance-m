@@ -4239,7 +4239,7 @@ void CPULoop(int ticks)
 }
 
 #ifdef TILED_RENDERING
-union u8h {
+union uint8_th {
     struct
     {
         /* 0*/ unsigned lo : 4;
@@ -4316,7 +4316,7 @@ inline const TileLine gfxReadTilePal(const uint16_t* screenSource, const int yyy
     palette += tile.palette * 16;
     TileLine tileLine;
 
-    const u8h* tileBase = (u8h*)&charBase[tile.tileNum * 32 + tileY * 4];
+    const uint8_th* tileBase = (uint8_th*)&charBase[tile.tileNum * 32 + tileY * 4];
 
     if (!tile.hFlip) {
         gfxDrawPixel(&tileLine.pixels[0], tileBase[0].lo, palette, prio);

@@ -17,12 +17,12 @@ break;
 case 0x04:
 // INC B
 BC.B.B1++;
-AF.B.B0 = (AF.B.B0 & C_FLAG) | ZeroTable[BC.B.B1] | (BC.B.B1 & 0x0F ? 0 : H_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | ZeroTable[BC.B.B1] | (BC.B.B1 & 0x0F ? 0 : GB_H_FLAG);
 break;
 case 0x05:
 // DEC B
 BC.B.B1--;
-AF.B.B0 = N_FLAG | (AF.B.B0 & C_FLAG) | ZeroTable[BC.B.B1] | ((BC.B.B1 & 0x0F) == 0x0F ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[BC.B.B1] | ((BC.B.B1 & 0x0F) == 0x0F ? GB_H_FLAG : 0);
 break;
 case 0x06:
 // LD B, NN
@@ -30,7 +30,7 @@ BC.B.B1 = gbReadOpcode(PC.W++);
 break;
 case 0x07:
 // RLCA
-tempValue = AF.B.B1 & 0x80 ? C_FLAG : 0;
+tempValue = AF.B.B1 & 0x80 ? GB_C_FLAG : 0;
 AF.B.B1 = (AF.B.B1 << 1) | (AF.B.B1 >> 7);
 AF.B.B0 = tempValue;
 break;
@@ -44,7 +44,7 @@ break;
 case 0x09:
 // ADD HL,BC
 tempRegister.W = (HL.W + BC.W) & 0xFFFF;
-AF.B.B0 = (AF.B.B0 & Z_FLAG) | ((HL.W ^ BC.W ^ tempRegister.W) & 0x1000 ? H_FLAG : 0) | (((long)HL.W + (long)BC.W) & 0x10000 ? C_FLAG : 0);
+AF.B.B0 = (AF.B.B0 & GB_Z_FLAG) | ((HL.W ^ BC.W ^ tempRegister.W) & 0x1000 ? GB_H_FLAG : 0) | (((long)HL.W + (long)BC.W) & 0x10000 ? GB_C_FLAG : 0);
 HL.W = tempRegister.W;
 break;
 case 0x0a:
@@ -58,12 +58,12 @@ break;
 case 0x0c:
 // INC C
 BC.B.B0++;
-AF.B.B0 = (AF.B.B0 & C_FLAG) | ZeroTable[BC.B.B0] | (BC.B.B0 & 0x0F ? 0 : H_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | ZeroTable[BC.B.B0] | (BC.B.B0 & 0x0F ? 0 : GB_H_FLAG);
 break;
 case 0x0d:
 // DEC C
 BC.B.B0--;
-AF.B.B0 = N_FLAG | (AF.B.B0 & C_FLAG) | ZeroTable[BC.B.B0] | ((BC.B.B0 & 0x0F) == 0x0F ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[BC.B.B0] | ((BC.B.B0 & 0x0F) == 0x0F ? GB_H_FLAG : 0);
 break;
 case 0x0e:
 // LD C, NN
@@ -106,12 +106,12 @@ break;
 case 0x14:
 // INC D
 DE.B.B1++;
-AF.B.B0 = (AF.B.B0 & C_FLAG) | ZeroTable[DE.B.B1] | (DE.B.B1 & 0x0F ? 0 : H_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | ZeroTable[DE.B.B1] | (DE.B.B1 & 0x0F ? 0 : GB_H_FLAG);
 break;
 case 0x15:
 // DEC D
 DE.B.B1--;
-AF.B.B0 = N_FLAG | (AF.B.B0 & C_FLAG) | ZeroTable[DE.B.B1] | ((DE.B.B1 & 0x0F) == 0x0F ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[DE.B.B1] | ((DE.B.B1 & 0x0F) == 0x0F ? GB_H_FLAG : 0);
 break;
 case 0x16:
 //  LD D,NN
@@ -119,18 +119,18 @@ DE.B.B1 = gbReadOpcode(PC.W++);
 break;
 case 0x17:
 // RLA
-tempValue = AF.B.B1 & 0x80 ? C_FLAG : 0;
-AF.B.B1 = (AF.B.B1 << 1) | ((AF.B.B0 & C_FLAG) >> 4);
+tempValue = AF.B.B1 & 0x80 ? GB_C_FLAG : 0;
+AF.B.B1 = (AF.B.B1 << 1) | ((AF.B.B0 & GB_C_FLAG) >> 4);
 AF.B.B0 = tempValue;
 break;
 case 0x18:
 // JR NN
-PC.W += (s8)gbReadOpcode(PC.W) + 1;
+PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
 break;
 case 0x19:
 // ADD HL,DE
 tempRegister.W = (HL.W + DE.W) & 0xFFFF;
-AF.B.B0 = (AF.B.B0 & Z_FLAG) | ((HL.W ^ DE.W ^ tempRegister.W) & 0x1000 ? H_FLAG : 0) | (((long)HL.W + (long)DE.W) & 0x10000 ? C_FLAG : 0);
+AF.B.B0 = (AF.B.B0 & GB_Z_FLAG) | ((HL.W ^ DE.W ^ tempRegister.W) & 0x1000 ? GB_H_FLAG : 0) | (((long)HL.W + (long)DE.W) & 0x10000 ? GB_C_FLAG : 0);
 HL.W = tempRegister.W;
 break;
 case 0x1a:
@@ -144,12 +144,12 @@ break;
 case 0x1c:
 // INC E
 DE.B.B0++;
-AF.B.B0 = (AF.B.B0 & C_FLAG) | ZeroTable[DE.B.B0] | (DE.B.B0 & 0x0F ? 0 : H_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | ZeroTable[DE.B.B0] | (DE.B.B0 & 0x0F ? 0 : GB_H_FLAG);
 break;
 case 0x1d:
 // DEC E
 DE.B.B0--;
-AF.B.B0 = N_FLAG | (AF.B.B0 & C_FLAG) | ZeroTable[DE.B.B0] | ((DE.B.B0 & 0x0F) == 0x0F ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[DE.B.B0] | ((DE.B.B0 & 0x0F) == 0x0F ? GB_H_FLAG : 0);
 break;
 case 0x1e:
 // LD E,NN
@@ -158,15 +158,15 @@ break;
 case 0x1f:
 // RRA
 tempValue = AF.B.B1 & 0x01;
-AF.B.B1 = (AF.B.B1 >> 1) | (AF.B.B0 & C_FLAG ? 0x80 : 0);
+AF.B.B1 = (AF.B.B1 >> 1) | (AF.B.B0 & GB_C_FLAG ? 0x80 : 0);
 AF.B.B0 = (tempValue << 4);
 break;
 case 0x20:
 // JR NZ,NN
-if (AF.B.B0 & Z_FLAG)
+if (AF.B.B0 & GB_Z_FLAG)
     PC.W++;
 else {
-    PC.W += (s8)gbReadOpcode(PC.W) + 1;
+    PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
     clockTicks++;
 }
 break;
@@ -186,12 +186,12 @@ break;
 case 0x24:
 // INC H
 HL.B.B1++;
-AF.B.B0 = (AF.B.B0 & C_FLAG) | ZeroTable[HL.B.B1] | (HL.B.B1 & 0x0F ? 0 : H_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | ZeroTable[HL.B.B1] | (HL.B.B1 & 0x0F ? 0 : GB_H_FLAG);
 break;
 case 0x25:
 // DEC H
 HL.B.B1--;
-AF.B.B0 = N_FLAG | (AF.B.B0 & C_FLAG) | ZeroTable[HL.B.B1] | ((HL.B.B1 & 0x0F) == 0x0F ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[HL.B.B1] | ((HL.B.B1 & 0x0F) == 0x0F ? GB_H_FLAG : 0);
 break;
 case 0x26:
 // LD H,NN
@@ -200,13 +200,13 @@ break;
 case 0x27:
 // DAA
 tempRegister.W = AF.B.B1;
-tempRegister.W |= (AF.B.B0 & (C_FLAG | H_FLAG | N_FLAG)) << 4;
+tempRegister.W |= (AF.B.B0 & (GB_C_FLAG | GB_H_FLAG | GB_N_FLAG)) << 4;
 AF.W = DAATable[tempRegister.W];
 break;
 case 0x28:
 // JR Z,NN
-if (AF.B.B0 & Z_FLAG) {
-    PC.W += (s8)gbReadOpcode(PC.W) + 1;
+if (AF.B.B0 & GB_Z_FLAG) {
+    PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
     clockTicks++;
 } else
     PC.W++;
@@ -214,7 +214,7 @@ break;
 case 0x29:
 // ADD HL,HL
 tempRegister.W = (HL.W + HL.W) & 0xFFFF;
-AF.B.B0 = (AF.B.B0 & Z_FLAG) | ((HL.W ^ HL.W ^ tempRegister.W) & 0x1000 ? H_FLAG : 0) | (((long)HL.W + (long)HL.W) & 0x10000 ? C_FLAG : 0);
+AF.B.B0 = (AF.B.B0 & GB_Z_FLAG) | ((HL.W ^ HL.W ^ tempRegister.W) & 0x1000 ? GB_H_FLAG : 0) | (((long)HL.W + (long)HL.W) & 0x10000 ? GB_C_FLAG : 0);
 HL.W = tempRegister.W;
 break;
 case 0x2a:
@@ -228,12 +228,12 @@ break;
 case 0x2c:
 // INC L
 HL.B.B0++;
-AF.B.B0 = (AF.B.B0 & C_FLAG) | ZeroTable[HL.B.B0] | (HL.B.B0 & 0x0F ? 0 : H_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | ZeroTable[HL.B.B0] | (HL.B.B0 & 0x0F ? 0 : GB_H_FLAG);
 break;
 case 0x2d:
 // DEC L
 HL.B.B0--;
-AF.B.B0 = N_FLAG | (AF.B.B0 & C_FLAG) | ZeroTable[HL.B.B0] | ((HL.B.B0 & 0x0F) == 0x0F ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[HL.B.B0] | ((HL.B.B0 & 0x0F) == 0x0F ? GB_H_FLAG : 0);
 break;
 case 0x2e:
 // LD L,NN
@@ -242,14 +242,14 @@ break;
 case 0x2f:
 // CPL
 AF.B.B1 ^= 255;
-AF.B.B0 |= N_FLAG | H_FLAG;
+AF.B.B0 |= GB_N_FLAG | GB_H_FLAG;
 break;
 case 0x30:
 // JR NC,NN
-if (AF.B.B0 & C_FLAG)
+if (AF.B.B0 & GB_C_FLAG)
     PC.W++;
 else {
-    PC.W += (s8)gbReadOpcode(PC.W) + 1;
+    PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
     clockTicks++;
 }
 break;
@@ -269,13 +269,13 @@ break;
 case 0x34:
 // INC (HL)
 tempValue = gbReadMemory(HL.W) + 1;
-AF.B.B0 = (AF.B.B0 & C_FLAG) | ZeroTable[tempValue] | (tempValue & 0x0F ? 0 : H_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | ZeroTable[tempValue] | (tempValue & 0x0F ? 0 : GB_H_FLAG);
 gbWriteMemory(HL.W, tempValue);
 break;
 case 0x35:
 // DEC (HL)
 tempValue = gbReadMemory(HL.W) - 1;
-AF.B.B0 = N_FLAG | (AF.B.B0 & C_FLAG) | ZeroTable[tempValue] | ((tempValue & 0x0F) == 0x0F ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[tempValue] | ((tempValue & 0x0F) == 0x0F ? GB_H_FLAG : 0);
 gbWriteMemory(HL.W, tempValue);
 break;
 case 0x36:
@@ -284,12 +284,12 @@ gbWriteMemory(HL.W, gbReadOpcode(PC.W++));
 break;
 case 0x37:
 // SCF
-AF.B.B0 = (AF.B.B0 & Z_FLAG) | C_FLAG;
+AF.B.B0 = (AF.B.B0 & GB_Z_FLAG) | GB_C_FLAG;
 break;
 case 0x38:
 // JR C,NN
-if (AF.B.B0 & C_FLAG) {
-    PC.W += (s8)gbReadOpcode(PC.W) + 1;
+if (AF.B.B0 & GB_C_FLAG) {
+    PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
     clockTicks++;
 } else
     PC.W++;
@@ -297,7 +297,7 @@ break;
 case 0x39:
 // ADD HL,SP
 tempRegister.W = (HL.W + SP.W) & 0xFFFF;
-AF.B.B0 = (AF.B.B0 & Z_FLAG) | ((HL.W ^ SP.W ^ tempRegister.W) & 0x1000 ? H_FLAG : 0) | (((long)HL.W + (long)SP.W) & 0x10000 ? C_FLAG : 0);
+AF.B.B0 = (AF.B.B0 & GB_Z_FLAG) | ((HL.W ^ SP.W ^ tempRegister.W) & 0x1000 ? GB_H_FLAG : 0) | (((long)HL.W + (long)SP.W) & 0x10000 ? GB_C_FLAG : 0);
 HL.W = tempRegister.W;
 break;
 case 0x3a:
@@ -311,12 +311,12 @@ break;
 case 0x3c:
 // INC A
 AF.B.B1++;
-AF.B.B0 = (AF.B.B0 & C_FLAG) | ZeroTable[AF.B.B1] | (AF.B.B1 & 0x0F ? 0 : H_FLAG);
+AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | ZeroTable[AF.B.B1] | (AF.B.B1 & 0x0F ? 0 : GB_H_FLAG);
 break;
 case 0x3d:
 // DEC A
 AF.B.B1--;
-AF.B.B0 = N_FLAG | (AF.B.B0 & C_FLAG) | ZeroTable[AF.B.B1] | ((AF.B.B1 & 0x0F) == 0x0F ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[AF.B.B1] | ((AF.B.B1 & 0x0F) == 0x0F ? GB_H_FLAG : 0);
 break;
 case 0x3e:
 // LD A,NN
@@ -324,8 +324,8 @@ AF.B.B1 = gbReadOpcode(PC.W++);
 break;
 case 0x3f:
 // CCF
-AF.B.B0 ^= C_FLAG;
-AF.B.B0 &= ~(N_FLAG | H_FLAG);
+AF.B.B0 ^= GB_C_FLAG;
+AF.B.B0 &= ~(GB_N_FLAG | GB_H_FLAG);
 break;
 case 0x40:
 // LD B,B
@@ -599,238 +599,238 @@ break;
 case 0x80:
 // ADD B
 tempRegister.W = AF.B.B1 + BC.B.B1;
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x81:
 // ADD C
 tempRegister.W = AF.B.B1 + BC.B.B0;
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x82:
 // ADD D
 tempRegister.W = AF.B.B1 + DE.B.B1;
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x83:
 // ADD E
 tempRegister.W = AF.B.B1 + DE.B.B0;
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x84:
 // ADD H
 tempRegister.W = AF.B.B1 + HL.B.B1;
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x85:
 // ADD L
 tempRegister.W = AF.B.B1 + HL.B.B0;
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x86:
 // ADD (HL)
 tempValue = gbReadMemory(HL.W);
 tempRegister.W = AF.B.B1 + tempValue;
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x87:
 // ADD A
 tempRegister.W = AF.B.B1 + AF.B.B1;
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ AF.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ AF.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x88:
 // ADC B:
-tempRegister.W = AF.B.B1 + BC.B.B1 + (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 + BC.B.B1 + (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x89:
 // ADC C
-tempRegister.W = AF.B.B1 + BC.B.B0 + (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 + BC.B.B0 + (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x8a:
 // ADC D
-tempRegister.W = AF.B.B1 + DE.B.B1 + (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 + DE.B.B1 + (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x8b:
 // ADC E
-tempRegister.W = AF.B.B1 + DE.B.B0 + (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 + DE.B.B0 + (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x8c:
 // ADC H
-tempRegister.W = AF.B.B1 + HL.B.B1 + (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 + HL.B.B1 + (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x8d:
 // ADC L
-tempRegister.W = AF.B.B1 + HL.B.B0 + (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 + HL.B.B0 + (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x8e:
 // ADC (HL)
 tempValue = gbReadMemory(HL.W);
-tempRegister.W = AF.B.B1 + tempValue + (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 + tempValue + (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x8f:
 // ADC A
-tempRegister.W = AF.B.B1 + AF.B.B1 + (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ AF.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 + AF.B.B1 + (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ AF.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x90:
 // SUB B
 tempRegister.W = AF.B.B1 - BC.B.B1;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x91:
 // SUB C
 tempRegister.W = AF.B.B1 - BC.B.B0;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x92:
 // SUB D
 tempRegister.W = AF.B.B1 - DE.B.B1;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x93:
 // SUB E
 tempRegister.W = AF.B.B1 - DE.B.B0;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x94:
 // SUB H
 tempRegister.W = AF.B.B1 - HL.B.B1;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x95:
 // SUB L
 tempRegister.W = AF.B.B1 - HL.B.B0;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x96:
 // SUB (HL)
 tempValue = gbReadMemory(HL.W);
 tempRegister.W = AF.B.B1 - tempValue;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x97:
 // SUB A
 AF.B.B1 = 0;
-AF.B.B0 = N_FLAG | Z_FLAG;
+AF.B.B0 = GB_N_FLAG | GB_Z_FLAG;
 break;
 case 0x98:
 // SBC B
-tempRegister.W = AF.B.B1 - BC.B.B1 - (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 - BC.B.B1 - (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x99:
 // SBC C
-tempRegister.W = AF.B.B1 - BC.B.B0 - (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 - BC.B.B0 - (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x9a:
 // SBC D
-tempRegister.W = AF.B.B1 - DE.B.B1 - (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 - DE.B.B1 - (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x9b:
 // SBC E
-tempRegister.W = AF.B.B1 - DE.B.B0 - (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 - DE.B.B0 - (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x9c:
 // SBC H
-tempRegister.W = AF.B.B1 - HL.B.B1 - (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 - HL.B.B1 - (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x9d:
 // SBC L
-tempRegister.W = AF.B.B1 - HL.B.B0 - (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 - HL.B.B0 - (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x9e:
 // SBC (HL)
 tempValue = gbReadMemory(HL.W);
-tempRegister.W = AF.B.B1 - tempValue - (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 - tempValue - (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0x9f:
 // SBC A
-tempRegister.W = AF.B.B1 - AF.B.B1 - (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ AF.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 - AF.B.B1 - (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ AF.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0xa0:
 // AND B
 AF.B.B1 &= BC.B.B1;
-AF.B.B0 = H_FLAG | ZeroTable[AF.B.B1];
+AF.B.B0 = GB_H_FLAG | ZeroTable[AF.B.B1];
 break;
 case 0xa1:
 // AND C
 AF.B.B1 &= BC.B.B0;
-AF.B.B0 = H_FLAG | ZeroTable[AF.B.B1];
+AF.B.B0 = GB_H_FLAG | ZeroTable[AF.B.B1];
 break;
 case 0xa2:
 // AND_D
 AF.B.B1 &= DE.B.B1;
-AF.B.B0 = H_FLAG | ZeroTable[AF.B.B1];
+AF.B.B0 = GB_H_FLAG | ZeroTable[AF.B.B1];
 break;
 case 0xa3:
 // AND E
 AF.B.B1 &= DE.B.B0;
-AF.B.B0 = H_FLAG | ZeroTable[AF.B.B1];
+AF.B.B0 = GB_H_FLAG | ZeroTable[AF.B.B1];
 break;
 case 0xa4:
 // AND H
 AF.B.B1 &= HL.B.B1;
-AF.B.B0 = H_FLAG | ZeroTable[AF.B.B1];
+AF.B.B0 = GB_H_FLAG | ZeroTable[AF.B.B1];
 break;
 case 0xa5:
 // AND L
 AF.B.B1 &= HL.B.B0;
-AF.B.B0 = H_FLAG | ZeroTable[AF.B.B1];
+AF.B.B0 = GB_H_FLAG | ZeroTable[AF.B.B1];
 break;
 case 0xa6:
 // AND (HL)
 tempValue = gbReadMemory(HL.W);
 AF.B.B1 &= tempValue;
-AF.B.B0 = H_FLAG | ZeroTable[AF.B.B1];
+AF.B.B0 = GB_H_FLAG | ZeroTable[AF.B.B1];
 break;
 case 0xa7:
 // AND A
 AF.B.B1 &= AF.B.B1;
-AF.B.B0 = H_FLAG | ZeroTable[AF.B.B1];
+AF.B.B0 = GB_H_FLAG | ZeroTable[AF.B.B1];
 break;
 case 0xa8:
 // XOR B
@@ -871,7 +871,7 @@ break;
 case 0xaf:
 // XOR A
 AF.B.B1 = 0;
-AF.B.B0 = Z_FLAG;
+AF.B.B0 = GB_Z_FLAG;
 break;
 case 0xb0:
 // OR B
@@ -917,46 +917,46 @@ break;
 case 0xb8:
 // CP B:
 tempRegister.W = AF.B.B1 - BC.B.B1;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 break;
 case 0xb9:
 // CP C
 tempRegister.W = AF.B.B1 - BC.B.B0;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ BC.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 break;
 case 0xba:
 // CP D
 tempRegister.W = AF.B.B1 - DE.B.B1;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 break;
 case 0xbb:
 // CP E
 tempRegister.W = AF.B.B1 - DE.B.B0;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ DE.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 break;
 case 0xbc:
 // CP H
 tempRegister.W = AF.B.B1 - HL.B.B1;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B1 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B1 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 break;
 case 0xbd:
 // CP L
 tempRegister.W = AF.B.B1 - HL.B.B0;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B0 ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ HL.B.B0 ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 break;
 case 0xbe:
 // CP (HL)
 tempValue = gbReadMemory(HL.W);
 tempRegister.W = AF.B.B1 - tempValue;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 break;
 case 0xbf:
 // CP A
-AF.B.B0 = N_FLAG | Z_FLAG;
+AF.B.B0 = GB_N_FLAG | GB_Z_FLAG;
 break;
 case 0xc0:
 // RET NZ
-if (!(AF.B.B0 & Z_FLAG)) {
+if (!(AF.B.B0 & GB_Z_FLAG)) {
     PC.B.B0 = gbReadMemory(SP.W++);
     PC.B.B1 = gbReadMemory(SP.W++);
     clockTicks += 3;
@@ -969,7 +969,7 @@ BC.B.B1 = gbReadMemory(SP.W++);
 break;
 case 0xc2:
 // JP NZ,NNNN
-if (AF.B.B0 & Z_FLAG)
+if (AF.B.B0 & GB_Z_FLAG)
     PC.W += 2;
 else {
     tempRegister.B.B0 = gbReadOpcode(PC.W++);
@@ -986,7 +986,7 @@ PC.W = tempRegister.W;
 break;
 case 0xc4:
 // CALL NZ,NNNN
-if (AF.B.B0 & Z_FLAG)
+if (AF.B.B0 & GB_Z_FLAG)
     PC.W += 2;
 else {
     tempRegister.B.B0 = gbReadOpcode(PC.W++);
@@ -1006,7 +1006,7 @@ case 0xc6:
 // ADD NN
 tempValue = gbReadOpcode(PC.W++);
 tempRegister.W = AF.B.B1 + tempValue;
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0xc7:
@@ -1017,7 +1017,7 @@ PC.W = 0x0000;
 break;
 case 0xc8:
 // RET Z
-if (AF.B.B0 & Z_FLAG) {
+if (AF.B.B0 & GB_Z_FLAG) {
     PC.B.B0 = gbReadMemory(SP.W++);
     PC.B.B1 = gbReadMemory(SP.W++);
     clockTicks += 3;
@@ -1030,7 +1030,7 @@ PC.B.B1 = gbReadMemory(SP.W++);
 break;
 case 0xca:
 // JP Z,NNNN
-if (AF.B.B0 & Z_FLAG) {
+if (AF.B.B0 & GB_Z_FLAG) {
     tempRegister.B.B0 = gbReadOpcode(PC.W++);
     tempRegister.B.B1 = gbReadOpcode(PC.W);
     PC.W = tempRegister.W;
@@ -1041,7 +1041,7 @@ break;
 // CB done outside
 case 0xcc:
 // CALL Z,NNNN
-if (AF.B.B0 & Z_FLAG) {
+if (AF.B.B0 & GB_Z_FLAG) {
     tempRegister.B.B0 = gbReadOpcode(PC.W++);
     tempRegister.B.B1 = gbReadOpcode(PC.W++);
     gbWriteMemory(--SP.W, PC.B.B1);
@@ -1062,8 +1062,8 @@ break;
 case 0xce:
 // ADC NN
 tempValue = gbReadOpcode(PC.W++);
-tempRegister.W = AF.B.B1 + tempValue + (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 + tempValue + (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0xcf:
@@ -1074,7 +1074,7 @@ PC.W = 0x0008;
 break;
 case 0xd0:
 // RET NC
-if (!(AF.B.B0 & C_FLAG)) {
+if (!(AF.B.B0 & GB_C_FLAG)) {
     PC.B.B0 = gbReadMemory(SP.W++);
     PC.B.B1 = gbReadMemory(SP.W++);
     clockTicks += 3;
@@ -1087,7 +1087,7 @@ DE.B.B1 = gbReadMemory(SP.W++);
 break;
 case 0xd2:
 // JP NC,NNNN
-if (AF.B.B0 & C_FLAG)
+if (AF.B.B0 & GB_C_FLAG)
     PC.W += 2;
 else {
     tempRegister.B.B0 = gbReadOpcode(PC.W++);
@@ -1103,7 +1103,7 @@ IFF = 0;
 break;
 case 0xd4:
 // CALL NC,NNNN
-if (AF.B.B0 & C_FLAG)
+if (AF.B.B0 & GB_C_FLAG)
     PC.W += 2;
 else {
     tempRegister.B.B0 = gbReadOpcode(PC.W++);
@@ -1123,7 +1123,7 @@ case 0xd6:
 // SUB NN
 tempValue = gbReadOpcode(PC.W++);
 tempRegister.W = AF.B.B1 - tempValue;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0xd7:
@@ -1134,7 +1134,7 @@ PC.W = 0x0010;
 break;
 case 0xd8:
 // RET C
-if (AF.B.B0 & C_FLAG) {
+if (AF.B.B0 & GB_C_FLAG) {
     PC.B.B0 = gbReadMemory(SP.W++);
     PC.B.B1 = gbReadMemory(SP.W++);
     clockTicks += 3;
@@ -1148,7 +1148,7 @@ IFF |= 0x01;
 break;
 case 0xda:
 // JP C,NNNN
-if (AF.B.B0 & C_FLAG) {
+if (AF.B.B0 & GB_C_FLAG) {
     tempRegister.B.B0 = gbReadOpcode(PC.W++);
     tempRegister.B.B1 = gbReadOpcode(PC.W);
     PC.W = tempRegister.W;
@@ -1163,7 +1163,7 @@ IFF = 0;
 break;
 case 0xdc:
 // CALL C,NNNN
-if (AF.B.B0 & C_FLAG) {
+if (AF.B.B0 & GB_C_FLAG) {
     tempRegister.B.B0 = gbReadOpcode(PC.W++);
     tempRegister.B.B1 = gbReadOpcode(PC.W++);
     gbWriteMemory(--SP.W, PC.B.B1);
@@ -1181,8 +1181,8 @@ break;
 case 0xde:
 // SBC NN
 tempValue = gbReadOpcode(PC.W++);
-tempRegister.W = AF.B.B1 - tempValue - (AF.B.B0 & C_FLAG ? 1 : 0);
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+tempRegister.W = AF.B.B1 - tempValue - (AF.B.B0 & GB_C_FLAG ? 1 : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
 break;
 case 0xdf:
@@ -1220,7 +1220,7 @@ case 0xe6:
 // AND NN
 tempValue = gbReadOpcode(PC.W++);
 AF.B.B1 &= tempValue;
-AF.B.B0 = H_FLAG | ZeroTable[AF.B.B1];
+AF.B.B0 = GB_H_FLAG | ZeroTable[AF.B.B1];
 break;
 case 0xe7:
 // RST 20
@@ -1230,9 +1230,9 @@ PC.W = 0x0020;
 break;
 case 0xe8:
 // ADD SP,NN
-offset = (s8)gbReadOpcode(PC.W++);
+offset = (int8_t)gbReadOpcode(PC.W++);
 tempRegister.W = SP.W + offset;
-AF.B.B0 = ((SP.W ^ offset ^ tempRegister.W) & 0x100 ? C_FLAG : 0) | ((SP.W ^ offset ^ tempRegister.W) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = ((SP.W ^ offset ^ tempRegister.W) & 0x100 ? GB_C_FLAG : 0) | ((SP.W ^ offset ^ tempRegister.W) & 0x10 ? GB_H_FLAG : 0);
 SP.W = tempRegister.W;
 break;
 case 0xe9:
@@ -1308,9 +1308,9 @@ PC.W = 0x0030;
 break;
 case 0xf8:
 // LD HL,SP+NN
-offset = (s8)gbReadOpcode(PC.W++);
+offset = (int8_t)gbReadOpcode(PC.W++);
 tempRegister.W = SP.W + offset;
-AF.B.B0 = ((SP.W ^ offset ^ tempRegister.W) & 0x100 ? C_FLAG : 0) | ((SP.W ^ offset ^ tempRegister.W) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = ((SP.W ^ offset ^ tempRegister.W) & 0x100 ? GB_C_FLAG : 0) | ((SP.W ^ offset ^ tempRegister.W) & 0x10 ? GB_H_FLAG : 0);
 HL.W = tempRegister.W;
 break;
 case 0xf9:
@@ -1346,7 +1346,7 @@ case 0xfe:
 // CP NN
 tempValue = gbReadOpcode(PC.W++);
 tempRegister.W = AF.B.B1 - tempValue;
-AF.B.B0 = N_FLAG | (tempRegister.B.B1 ? C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? H_FLAG : 0);
+AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 break;
 case 0xff:
 // RST 38

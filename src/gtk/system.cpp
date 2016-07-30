@@ -32,9 +32,9 @@ int systemColorDepth;
 int systemVerbose;
 int systemSaveUpdateCounter;
 int systemFrameSkip;
-u32 systemColorMap32[0x10000];
-u16 systemColorMap16[0x10000];
-u16 systemGbPalette[24];
+uint32_t systemColorMap32[0x10000];
+uint16_t systemColorMap16[0x10000];
+uint16_t systemGbPalette[24];
 
 int emulating;
 int RGB_LOW_BITS_MASK;
@@ -66,7 +66,7 @@ bool systemReadJoypads()
     return true;
 }
 
-u32 systemReadJoypad(int joy)
+uint32_t systemReadJoypad(int joy)
 {
     return inputReadJoypad(joy);
 }
@@ -99,7 +99,7 @@ void systemScreenCapture(int _iNum)
         ->vCaptureScreen(_iNum);
 }
 
-u32 systemGetClock()
+uint32_t systemGetClock()
 {
     Glib::TimeVal time;
     time.assign_current_time();
@@ -110,7 +110,7 @@ void systemUpdateMotionSensor()
 {
 }
 
-u8 systemGetSensorDarkness()
+uint8_t systemGetSensorDarkness()
 {
     return 0xE8;
 }
@@ -134,7 +134,7 @@ void systemCartridgeRumble(bool)
 {
 }
 
-void systemGbPrint(u8* _puiData,
+void systemGbPrint(uint8_t* _puiData,
     int _iLen,
     int _iPages,
     int _iFeed,
@@ -172,7 +172,7 @@ void systemOnSoundShutdown()
 {
 }
 
-void systemOnWriteDataToSoundBuffer(const u16* finalWave, int length)
+void systemOnWriteDataToSoundBuffer(const uint16_t* finalWave, int length)
 {
 }
 

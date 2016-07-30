@@ -20,9 +20,9 @@
 class MapView : public ResizeDlg, IUpdateListener {
 private:
     BITMAPINFO bmpInfo;
-    u8* data;
+    uint8_t* data;
     int frame;
-    u16 control;
+    uint16_t control;
     int bg;
     int w;
     int h;
@@ -37,8 +37,8 @@ public:
     void saveBMP(const char* name);
     afx_msg LRESULT OnColInfo(WPARAM wParam, LPARAM lParam);
     afx_msg LRESULT OnMapInfo(WPARAM wParam, LPARAM lParam);
-    u32 GetClickAddress(int x, int y);
-    u32 GetTextClickAddress(u32 base, int x, int y);
+    uint32_t GetClickAddress(int x, int y);
+    uint32_t GetTextClickAddress(uint32_t base, int x, int y);
     void update();
     void enableButtons(int mode);
     void paint();
@@ -48,8 +48,8 @@ public:
     void renderMode2();
     void renderMode1();
     void renderMode0();
-    void renderRotScreen(u16 control);
-    void renderTextScreen(u16 control);
+    void renderRotScreen(uint16_t control);
+    void renderTextScreen(uint16_t control);
     MapView(CWnd* pParent = NULL); // standard constructor
     ~MapView();
 

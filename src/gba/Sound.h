@@ -58,8 +58,8 @@ extern float soundFiltering; // 0.0 = none, 1.0 = max
 void soundReset();
 
 // Emulates write to sound hardware
-void soundEvent(u32 addr, u8 data);
-void soundEvent(u32 addr, u16 data); // TODO: error-prone to overload like this
+void soundEvent(uint32_t addr, uint8_t data);
+void soundEvent(uint32_t addr, uint16_t data); // TODO: error-prone to overload like this
 
 // Notifies emulator that a timer has overflowed
 void soundTimerOverflow(int which);
@@ -74,8 +74,8 @@ extern int soundTicks; // Number of 16.8 MHz clocks until soundTick() will be ca
 
 // Saves/loads emulator state
 #ifdef __LIBRETRO__
-void soundSaveGame(u8*&);
-void soundReadGame(const u8*& in, int version);
+void soundSaveGame(uint8_t*&);
+void soundReadGame(const uint8_t*& in, int version);
 #else
 void soundSaveGame(gzFile);
 void soundReadGame(gzFile, int version);

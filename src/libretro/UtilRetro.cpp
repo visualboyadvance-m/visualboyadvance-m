@@ -32,7 +32,7 @@ bool utilWritePNGFile(const char* fileName, int w, int h, uint8_t* pix)
     return false;
 }
 
-void utilPutDword(u8* p, u32 value)
+void utilPutDword(uint8_t* p, uint32_t value)
 {
     *p++ = value & 255;
     *p++ = (value >> 8) & 255;

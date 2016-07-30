@@ -20,7 +20,7 @@
 class GBMapView : public ResizeDlg, IUpdateListener {
 private:
     BITMAPINFO bmpInfo;
-    u8* data;
+    uint8_t* data;
     int bank;
     int bg;
     int w;
@@ -33,7 +33,7 @@ private:
 public:
     afx_msg LRESULT OnColInfo(WPARAM wParam, LPARAM lParam);
     afx_msg LRESULT OnMapInfo(WPARAM wParam, LPARAM lParam);
-    u32 GetClickAddress(int x, int y);
+    uint32_t GetClickAddress(int x, int y);
     void update();
     void paint();
     void render();

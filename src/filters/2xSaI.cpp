@@ -6,38 +6,38 @@ extern "C"
 {
 
 #ifdef MMX
-  void _2xSaILine (u8 *srcPtr, u8 *deltaPtr, u32 srcPitch,
-                   u32 width, u8 *dstPtr, u32 dstPitch);
-  void _2xSaISuperEagleLine (u8 *srcPtr, u8 *deltaPtr,
-                             u32 srcPitch, u32 width,
-                             u8 *dstPtr, u32 dstPitch);
-  void _2xSaISuper2xSaILine (u8 *srcPtr, u8 *deltaPtr,
-                             u32 srcPitch, u32 width,
-                             u8 *dstPtr, u32 dstPitch);
-    void Init_2xSaIMMX (u32 BitFormat);
-  void BilinearMMX (u16 * A, u16 * B, u16 * C, u16 * D,
-                    u16 * dx, u16 * dy, u8 *dP);
-  void BilinearMMXGrid0 (u16 * A, u16 * B, u16 * C, u16 * D,
-                         u16 * dx, u16 * dy, u8 *dP);
-  void BilinearMMXGrid1 (u16 * A, u16 * B, u16 * C, u16 * D,
-                         u16 * dx, u16 * dy, u8 *dP);
+  void _2xSaILine (uint8_t *srcPtr, uint8_t *deltaPtr, uint32_t srcPitch,
+                   uint32_t width, uint8_t *dstPtr, uint32_t dstPitch);
+  void _2xSaISuperEagleLine (uint8_t *srcPtr, uint8_t *deltaPtr,
+                             uint32_t srcPitch, uint32_t width,
+                             uint8_t *dstPtr, uint32_t dstPitch);
+  void _2xSaISuper2xSaILine (uint8_t *srcPtr, uint8_t *deltaPtr,
+                             uint32_t srcPitch, uint32_t width,
+                             uint8_t *dstPtr, uint32_t dstPitch);
+    void Init_2xSaIMMX (uint32_t BitFormat);
+  void BilinearMMX (uint16_t * A, uint16_t * B, uint16_t * C, uint16_t * D,
+                    uint16_t * dx, uint16_t * dy, uint8_t *dP);
+  void BilinearMMXGrid0 (uint16_t * A, uint16_t * B, uint16_t * C, uint16_t * D,
+                         uint16_t * dx, uint16_t * dy, uint8_t *dP);
+  void BilinearMMXGrid1 (uint16_t * A, uint16_t * B, uint16_t * C, uint16_t * D,
+                         uint16_t * dx, uint16_t * dy, uint8_t *dP);
   void EndMMX ();
 
   bool cpu_mmx = 1;
 #endif
 }
-static u32 colorMask = 0xF7DEF7DE;
-static u32 lowPixelMask = 0x08210821;
-static u32 qcolorMask = 0xE79CE79C;
-static u32 qlowpixelMask = 0x18631863;
-static u32 redblueMask = 0xF81F;
-static u32 greenMask = 0x7E0;
+static uint32_t colorMask = 0xF7DEF7DE;
+static uint32_t lowPixelMask = 0x08210821;
+static uint32_t qcolorMask = 0xE79CE79C;
+static uint32_t qlowpixelMask = 0x18631863;
+static uint32_t redblueMask = 0xF81F;
+static uint32_t greenMask = 0x7E0;
 
-u32 qRGB_COLOR_MASK[2] = { 0xF7DEF7DE, 0xF7DEF7DE };
+uint32_t qRGB_COLOR_MASK[2] = { 0xF7DEF7DE, 0xF7DEF7DE };
 
 extern void hq2x_init(unsigned);
 
-int Init_2xSaI(u32 BitFormat)
+int Init_2xSaI(uint32_t BitFormat)
 {
   if(systemColorDepth == 16) {
     if (BitFormat == 565) {
@@ -81,8 +81,8 @@ int Init_2xSaI(u32 BitFormat)
   return 1;
 }
 
-static inline int GetResult1 (u32 A, u32 B, u32 C, u32 D,
-                              u32 /* E */)
+static inline int GetResult1 (uint32_t A, uint32_t B, uint32_t C, uint32_t D,
+                              uint32_t /* E */)
 {
     int x = 0;
     int y = 0;
@@ -103,8 +103,8 @@ static inline int GetResult1 (u32 A, u32 B, u32 C, u32 D,
     return r;
 }
 
-static inline int GetResult2 (u32 A, u32 B, u32 C, u32 D,
-                              u32 /* E */)
+static inline int GetResult2 (uint32_t A, uint32_t B, uint32_t C, uint32_t D,
+                              uint32_t /* E */)
 {
   int x = 0;
   int y = 0;
@@ -125,7 +125,7 @@ static inline int GetResult2 (u32 A, u32 B, u32 C, u32 D,
   return r;
 }
 
-static inline int GetResult (u32 A, u32 B, u32 C, u32 D)
+static inline int GetResult (uint32_t A, uint32_t B, uint32_t C, uint32_t D)
 {
   int x = 0;
   int y = 0;
@@ -146,7 +146,7 @@ static inline int GetResult (u32 A, u32 B, u32 C, u32 D)
   return r;
 }
 
-static inline u32 INTERPOLATE (u32 A, u32 B)
+static inline uint32_t INTERPOLATE (uint32_t A, uint32_t B)
 {
   if (A != B) {
     return (((A & colorMask) >> 1) + ((B & colorMask) >> 1) +
@@ -155,20 +155,20 @@ static inline u32 INTERPOLATE (u32 A, u32 B)
     return A;
 }
 
-static inline u32 Q_INTERPOLATE (u32 A, u32 B, u32 C, u32 D)
+static inline uint32_t Q_INTERPOLATE (uint32_t A, uint32_t B, uint32_t C, uint32_t D)
 {
-  register u32 x = ((A & qcolorMask) >> 2) +
+  register uint32_t x = ((A & qcolorMask) >> 2) +
     ((B & qcolorMask) >> 2) +
     ((C & qcolorMask) >> 2) + ((D & qcolorMask) >> 2);
-  register u32 y = (A & qlowpixelMask) +
+  register uint32_t y = (A & qlowpixelMask) +
     (B & qlowpixelMask) + (C & qlowpixelMask) + (D & qlowpixelMask);
 
   y = (y >> 2) & qlowpixelMask;
   return x + y;
 }
 
-static inline int GetResult1_32 (u32 A, u32 B, u32 C, u32 D,
-                                 u32 /* E */)
+static inline int GetResult1_32 (uint32_t A, uint32_t B, uint32_t C, uint32_t D,
+                                 uint32_t /* E */)
 {
     int x = 0;
     int y = 0;
@@ -189,8 +189,8 @@ static inline int GetResult1_32 (u32 A, u32 B, u32 C, u32 D,
     return r;
 }
 
-static inline int GetResult2_32 (u32 A, u32 B, u32 C, u32 D,
-                                 u32 /* E */)
+static inline int GetResult2_32 (uint32_t A, uint32_t B, uint32_t C, uint32_t D,
+                                 uint32_t /* E */)
 {
   int x = 0;
   int y = 0;
@@ -219,14 +219,14 @@ static inline int GetResult2_32 (u32 A, u32 B, u32 C, u32 D,
 #define RED_MASK555 0x7C007C00
 #define GREEN_MASK555 0x03E003E0
 
-void Super2xSaI (u8 *srcPtr, u32 srcPitch,
-                 u8 *deltaPtr, u8 *dstPtr, u32 dstPitch,
+void Super2xSaI (uint8_t *srcPtr, uint32_t srcPitch,
+                 uint8_t *deltaPtr, uint8_t *dstPtr, uint32_t dstPitch,
                  int width, int height)
 {
-  u16 *bP;
-  u8  *dP;
-  u32 inc_bP;
-  u32 Nextline = srcPitch >> 1;
+  uint16_t *bP;
+  uint8_t  *dP;
+  uint32_t inc_bP;
+  uint32_t Nextline = srcPitch >> 1;
 #ifdef MMX
   if (cpu_mmx) {
     for (; height; height--) {
@@ -242,15 +242,15 @@ void Super2xSaI (u8 *srcPtr, u32 srcPitch,
       inc_bP = 1;
 
       for (; height; height--) {
-        bP = (u16 *) srcPtr;
-        dP = (u8 *) dstPtr;
+        bP = (uint16_t *) srcPtr;
+        dP = (uint8_t *) dstPtr;
 
-        for (u32 finish = width; finish; finish -= inc_bP) {
-          u32 color4, color5, color6;
-          u32 color1, color2, color3;
-          u32 colorA0, colorA1, colorA2, colorA3,
+        for (uint32_t finish = width; finish; finish -= inc_bP) {
+          uint32_t color4, color5, color6;
+          uint32_t color1, color2, color3;
+          uint32_t colorA0, colorA1, colorA2, colorA3,
             colorB0, colorB1, colorB2, colorB3, colorS1, colorS2;
-          u32 product1a, product1b, product2a, product2b;
+          uint32_t product1a, product1b, product2a, product2b;
 
           //---------------------------------------    B1 B2
           //                                         4  5  6 S2
@@ -349,11 +349,11 @@ void Super2xSaI (u8 *srcPtr, u32 srcPitch,
           product2a = product2a | (product2b << 16);
 #endif
 
-          *((u32 *) dP) = product1a;
-          *((u32 *) (dP + dstPitch)) = product2a;
+          *((uint32_t *) dP) = product1a;
+          *((uint32_t *) (dP + dstPitch)) = product2a;
 
           bP += inc_bP;
-          dP += sizeof (u32);
+          dP += sizeof (uint32_t);
         }                       // end of for ( finish= width etc..)
 
         srcPtr   += srcPitch;
@@ -363,26 +363,26 @@ void Super2xSaI (u8 *srcPtr, u32 srcPitch,
     }
 }
 
-void Super2xSaI32 (u8 *srcPtr, u32 srcPitch,
-                   u8 * /* deltaPtr */, u8 *dstPtr, u32 dstPitch,
+void Super2xSaI32 (uint8_t *srcPtr, uint32_t srcPitch,
+                   uint8_t * /* deltaPtr */, uint8_t *dstPtr, uint32_t dstPitch,
                    int width, int height)
 {
-  u32 *bP;
-  u32 *dP;
-  u32 inc_bP;
-  u32 Nextline = srcPitch >> 2;
+  uint32_t *bP;
+  uint32_t *dP;
+  uint32_t inc_bP;
+  uint32_t Nextline = srcPitch >> 2;
   inc_bP = 1;
 
   for (; height; height--) {
-    bP = (u32 *) srcPtr;
-    dP = (u32 *) dstPtr;
+    bP = (uint32_t *) srcPtr;
+    dP = (uint32_t *) dstPtr;
 
-    for (u32 finish = width; finish; finish -= inc_bP) {
-      u32 color4, color5, color6;
-      u32 color1, color2, color3;
-      u32 colorA0, colorA1, colorA2, colorA3,
+    for (uint32_t finish = width; finish; finish -= inc_bP) {
+      uint32_t color4, color5, color6;
+      uint32_t color1, color2, color3;
+      uint32_t colorA0, colorA1, colorA2, colorA3,
         colorB0, colorB1, colorB2, colorB3, colorS1, colorS2;
-      u32 product1a, product1b, product2a, product2b;
+      uint32_t product1a, product1b, product2a, product2b;
 
       //---------------------------------------    B1 B2
       //                                         4  5  6 S2
@@ -487,13 +487,13 @@ void Super2xSaI32 (u8 *srcPtr, u32 srcPitch,
   }                 // endof: for (; height; height--)
 }
 
-void SuperEagle (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
-                 u8 *dstPtr, u32 dstPitch, int width, int height)
+void SuperEagle (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
+                 uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u8  *dP;
-  u16 *bP;
-  u16 *xP;
-  u32 inc_bP;
+  uint8_t  *dP;
+  uint16_t *bP;
+  uint16_t *xP;
+  uint32_t inc_bP;
 
 #ifdef MMX
   if (cpu_mmx) {
@@ -509,17 +509,17 @@ void SuperEagle (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
   {
     inc_bP = 1;
 
-    u32 Nextline = srcPitch >> 1;
+    uint32_t Nextline = srcPitch >> 1;
 
     for (; height; height--) {
-      bP = (u16 *) srcPtr;
-      xP = (u16 *) deltaPtr;
+      bP = (uint16_t *) srcPtr;
+      xP = (uint16_t *) deltaPtr;
       dP = dstPtr;
-      for (u32 finish = width; finish; finish -= inc_bP) {
-        u32 color4, color5, color6;
-        u32 color1, color2, color3;
-        u32 colorA1, colorA2, colorB1, colorB2, colorS1, colorS2;
-        u32 product1a, product1b, product2a, product2b;
+      for (uint32_t finish = width; finish; finish -= inc_bP) {
+        uint32_t color4, color5, color6;
+        uint32_t color1, color2, color3;
+        uint32_t colorA1, colorA2, colorB1, colorB2, colorS1, colorS2;
+        uint32_t product1a, product1b, product2a, product2b;
 
         colorB1 = *(bP - Nextline);
         colorB2 = *(bP - Nextline + 1);
@@ -618,13 +618,13 @@ void SuperEagle (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
         product2a = product2a | (product2b << 16);
 #endif
 
-        *((u32 *) dP) = product1a;
-        *((u32 *) (dP + dstPitch)) = product2a;
+        *((uint32_t *) dP) = product1a;
+        *((uint32_t *) (dP + dstPitch)) = product2a;
         *xP = color5;
 
         bP += inc_bP;
         xP += inc_bP;
-        dP += sizeof (u32);
+        dP += sizeof (uint32_t);
       }                 // end of for ( finish= width etc..)
 
       srcPtr += srcPitch;
@@ -634,27 +634,27 @@ void SuperEagle (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
   }
 }
 
-void SuperEagle32 (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
-                   u8 *dstPtr, u32 dstPitch, int width, int height)
+void SuperEagle32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
+                   uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u32  *dP;
-  u32 *bP;
-  u32 *xP;
-  u32 inc_bP;
+  uint32_t  *dP;
+  uint32_t *bP;
+  uint32_t *xP;
+  uint32_t inc_bP;
 
   inc_bP = 1;
 
-  u32 Nextline = srcPitch >> 2;
+  uint32_t Nextline = srcPitch >> 2;
 
   for (; height; height--) {
-    bP = (u32 *) srcPtr;
-    xP = (u32 *) deltaPtr;
-    dP = (u32 *)dstPtr;
-    for (u32 finish = width; finish; finish -= inc_bP) {
-      u32 color4, color5, color6;
-      u32 color1, color2, color3;
-      u32 colorA1, colorA2, colorB1, colorB2, colorS1, colorS2;
-      u32 product1a, product1b, product2a, product2b;
+    bP = (uint32_t *) srcPtr;
+    xP = (uint32_t *) deltaPtr;
+    dP = (uint32_t *)dstPtr;
+    for (uint32_t finish = width; finish; finish -= inc_bP) {
+      uint32_t color4, color5, color6;
+      uint32_t color1, color2, color3;
+      uint32_t colorA1, colorA2, colorB1, colorB2, colorS1, colorS2;
+      uint32_t product1a, product1b, product2a, product2b;
 
       colorB1 = *(bP - Nextline);
       colorB2 = *(bP - Nextline + 1);
@@ -762,12 +762,12 @@ void SuperEagle32 (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
   }                   // endof: for (height; height; height--)
 }
 
-void _2xSaI (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
-             u8 *dstPtr, u32 dstPitch, int width, int height)
+void _2xSaI (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
+             uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u8  *dP;
-  u16 *bP;
-  u32 inc_bP;
+  uint8_t  *dP;
+  uint16_t *bP;
+  uint32_t inc_bP;
 
 #ifdef MMX
   if (cpu_mmx) {
@@ -782,21 +782,21 @@ void _2xSaI (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
   {
     inc_bP = 1;
 
-    u32 Nextline = srcPitch >> 1;
+    uint32_t Nextline = srcPitch >> 1;
 
     for (; height; height--) {
-      bP = (u16 *) srcPtr;
+      bP = (uint16_t *) srcPtr;
       dP = dstPtr;
 
-      for (u32 finish = width; finish; finish -= inc_bP) {
+      for (uint32_t finish = width; finish; finish -= inc_bP) {
 
-        register u32 colorA, colorB;
-        u32 colorC, colorD,
+        register uint32_t colorA, colorB;
+        uint32_t colorC, colorD,
           colorE, colorF, colorG, colorH,
           colorI, colorJ, colorK, colorL,
 
           colorM, colorN, colorO, colorP;
-        u32 product, product1, product2;
+        uint32_t product, product1, product2;
 
         //---------------------------------------
         // Map of the pixels:                    I|E F|J
@@ -922,11 +922,11 @@ void _2xSaI (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
         product = colorA | (product << 16);
         product1 = product1 | (product2 << 16);
 #endif
-        *((s32 *) dP) = product;
-        *((u32 *) (dP + dstPitch)) = product1;
+        *((int32_t *) dP) = product;
+        *((uint32_t *) (dP + dstPitch)) = product1;
 
         bP += inc_bP;
-        dP += sizeof (u32);
+        dP += sizeof (uint32_t);
       }                 // end of for ( finish= width etc..)
 
       srcPtr += srcPitch;
@@ -936,27 +936,27 @@ void _2xSaI (u8 *srcPtr, u32 srcPitch, u8 *deltaPtr,
   }
 }
 
-void _2xSaI32 (u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-               u8 *dstPtr, u32 dstPitch, int width, int height)
+void _2xSaI32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+               uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  u32  *dP;
-  u32 *bP;
-  u32 inc_bP = 1;
+  uint32_t  *dP;
+  uint32_t *bP;
+  uint32_t inc_bP = 1;
 
-  u32 Nextline = srcPitch >> 2;
+  uint32_t Nextline = srcPitch >> 2;
 
   for (; height; height--) {
-    bP = (u32 *) srcPtr;
-    dP = (u32 *) dstPtr;
+    bP = (uint32_t *) srcPtr;
+    dP = (uint32_t *) dstPtr;
 
-    for (u32 finish = width; finish; finish -= inc_bP) {
-      register u32 colorA, colorB;
-      u32 colorC, colorD,
+    for (uint32_t finish = width; finish; finish -= inc_bP) {
+      register uint32_t colorA, colorB;
+      uint32_t colorC, colorD,
         colorE, colorF, colorG, colorH,
         colorI, colorJ, colorK, colorL,
 
         colorM, colorN, colorO, colorP;
-      u32 product, product1, product2;
+      uint32_t product, product1, product2;
 
       //---------------------------------------
       // Map of the pixels:                    I|E F|J
@@ -1089,7 +1089,7 @@ void _2xSaI32 (u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
   }                   // endof: for (height; height; height--)
 }
 
-static u32 Bilinear (u32 A, u32 B, u32 x)
+static uint32_t Bilinear (uint32_t A, uint32_t B, uint32_t x)
 {
   unsigned long areaA, areaB;
   unsigned long result;
@@ -1108,8 +1108,8 @@ static u32 Bilinear (u32 A, u32 B, u32 x)
   return (result & redblueMask) | ((result >> 16) & greenMask);
 }
 
-static u32 Bilinear4 (u32 A, u32 B, u32 C, u32 D, u32 x,
-                         u32 y)
+static uint32_t Bilinear4 (uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t x,
+                         uint32_t y)
 {
   unsigned long areaA, areaB, areaC, areaD;
   unsigned long result, xy;
@@ -1133,21 +1133,21 @@ static u32 Bilinear4 (u32 A, u32 B, u32 C, u32 D, u32 x,
   return (result & redblueMask) | ((result >> 16) & greenMask);
 }
 
-void Scale_2xSaI (u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
-                  u8 *dstPtr, u32 dstPitch,
-                  u32 dstWidth, u32 dstHeight, int width, int height)
+void Scale_2xSaI (uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
+                  uint8_t *dstPtr, uint32_t dstPitch,
+                  uint32_t dstWidth, uint32_t dstHeight, int width, int height)
 {
-  u8  *dP;
-  u16 *bP;
+  uint8_t  *dP;
+  uint16_t *bP;
 
-  u32 w;
-  u32 h;
-  u32 dw;
-  u32 dh;
-  u32 hfinish;
-  u32 wfinish;
+  uint32_t w;
+  uint32_t h;
+  uint32_t dw;
+  uint32_t dh;
+  uint32_t hfinish;
+  uint32_t wfinish;
 
-  u32 Nextline = srcPitch >> 1;
+  uint32_t Nextline = srcPitch >> 1;
 
   wfinish = (width - 1) << 16;  // convert to fixed point
   dw = wfinish / (dstWidth - 1);
@@ -1155,21 +1155,21 @@ void Scale_2xSaI (u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
   dh = hfinish / (dstHeight - 1);
 
   for (h = 0; h < hfinish; h += dh) {
-    u32 y1, y2;
+    uint32_t y1, y2;
 
     y1 = h & 0xffff;    // fraction part of fixed point
-    bP = (u16 *) (srcPtr + ((h >> 16) * srcPitch));
+    bP = (uint16_t *) (srcPtr + ((h >> 16) * srcPitch));
     dP = dstPtr;
     y2 = 0x10000 - y1;
 
     w = 0;
 
     for (; w < wfinish;) {
-      u32 A, B, C, D;
-      u32 E, F, G, H;
-      u32 I, J, K, L;
-      u32 x1, x2, a1, f1, f2;
-      u32 position, product1;
+      uint32_t A, B, C, D;
+      uint32_t E, F, G, H;
+      uint32_t I, J, K, L;
+      uint32_t x1, x2, a1, f1, f2;
+      uint32_t position, product1;
 
       position = w >> 16;
       A = bP[position]; // current pixel
@@ -1268,7 +1268,7 @@ void Scale_2xSaI (u8 *srcPtr, u32 srcPitch, u8 * /* deltaPtr */,
           }
 
       //end First Pixel
-      *(u32 *) dP = product1;
+      *(uint32_t *) dP = product1;
       dP += 2;
       w += dw;
     }

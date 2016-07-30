@@ -15,10 +15,10 @@ int systemRedShift;
 int systemGreenShift;
 int systemBlueShift;
 int systemColorDepth;
-u16 systemColorMap16[0x10000];
-u32 systemColorMap32[0x10000];
+uint16_t systemColorMap16[0x10000];
+uint32_t systemColorMap32[0x10000];
 #define gs555(x) (x | (x << 5) | (x << 10))
-u16 systemGbPalette[24] = {
+uint16_t systemGbPalette[24] = {
     gs555(0x1f), gs555(0x15), gs555(0x0c), 0,
     gs555(0x1f), gs555(0x15), gs555(0x0c), 0,
     gs555(0x1f), gs555(0x15), gs555(0x0c), 0,
@@ -108,8 +108,8 @@ void systemDrawScreen()
 
 wxFFile game_file;
 bool game_recording, game_playback;
-u32 game_frame;
-u32 game_joypad;
+uint32_t game_frame;
+uint32_t game_joypad;
 
 void systemStartGameRecording(const wxString& fname)
 {
@@ -126,7 +126,7 @@ void systemStartGameRecording(const wxString& fname)
     if (fn.size() < 4 || !wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmv"), false))
         fn.append(wxT(".vmv"));
 
-    u32 version = 1;
+    uint32_t version = 1;
 
     if (!game_file.Open(fn.c_str(), wxT("wb")) || game_file.Write(&version, sizeof(version)) != sizeof(version)) {
         wxLogError(_("Cannot open output file %s"), fname.c_str());
@@ -165,7 +165,7 @@ void systemStopGameRecording()
     mf->enable_menus();
 }
 
-u32 game_next_frame, game_next_joypad;
+uint32_t game_next_frame, game_next_joypad;
 
 void systemStartGamePlayback(const wxString& fname)
 {
@@ -187,14 +187,14 @@ void systemStartGamePlayback(const wxString& fname)
     if (fn.size() < 4 || !wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmv"), false))
         fn.append(wxT(".vmv"));
 
-    u32 version;
+    uint32_t version;
 
     if (!game_file.Open(fn.c_str(), wxT("rb")) || game_file.Read(&version, sizeof(version)) != sizeof(version) || wxUINT32_SWAP_ON_BE(version) != 1) {
         wxLogError(_("Cannot open recording file %s"), fname.c_str());
         return;
     }
 
-    u32 gf, jp;
+    uint32_t gf, jp;
 
     if (game_file.Read(&gf, sizeof(gf)) != sizeof(gf) || game_file.Read(&jp, sizeof(jp)) != sizeof(jp)) {
         wxLogError(_("Error reading game recording"));
@@ -241,7 +241,7 @@ bool systemReadJoypads()
 }
 
 // return information about the given joystick, -1 for default joystick
-u32 systemReadJoypad(int joy)
+uint32_t systemReadJoypad(int joy)
 {
     if (joy < 0 || joy > 3)
         joy = gopts.default_stick - 1;
@@ -251,7 +251,7 @@ u32 systemReadJoypad(int joy)
     if (turbo)
         ret |= KEYM_SPEED;
 
-    u32 af = autofire;
+    uint32_t af = autofire;
 
     if (ret & KEYM_AUTO_A) {
         ret |= KEYM_A;
@@ -265,7 +265,7 @@ u32 systemReadJoypad(int joy)
 
     static int autofire_trigger = 1;
     static bool autofire_state = true;
-    u32 af_but = af & ret;
+    uint32_t af_but = af & ret;
 
     if (af_but) {
         if (!autofire_state)
@@ -285,12 +285,12 @@ u32 systemReadJoypad(int joy)
     ret &= REALKEY_MASK;
 
     if (game_recording) {
-        u32 rret = ret & ~(KEYM_SPEED | KEYM_CAPTURE);
+        uint32_t rret = ret & ~(KEYM_SPEED | KEYM_CAPTURE);
 
         if (rret != game_joypad) {
             game_joypad = rret;
-            u32 gf = wxUINT32_SWAP_ON_BE(game_frame);
-            u32 jp = wxUINT32_SWAP_ON_BE(game_joypad);
+            uint32_t gf = wxUINT32_SWAP_ON_BE(game_frame);
+            uint32_t jp = wxUINT32_SWAP_ON_BE(game_joypad);
 
             if (game_file.Write(&gf, sizeof(gf)) != sizeof(gf) || game_file.Write(&jp, sizeof(jp)) != sizeof(jp)) {
                 game_file.Close();
@@ -301,7 +301,7 @@ u32 systemReadJoypad(int joy)
     } else if (game_playback) {
         while (game_frame >= game_next_frame) {
             game_joypad = game_next_joypad;
-            u32 gf, jp;
+            uint32_t gf, jp;
 
             if (game_file.Read(&gf, sizeof(gf)) != sizeof(gf) || game_file.Read(&jp, sizeof(jp)) != sizeof(jp)) {
                 game_file.Close();
@@ -355,9 +355,9 @@ void system10Frames(int rate)
     if (fs < 0) {
         // I don't know why this algorithm isn't in common somewhere
         // as is, I copied it from SDL
-        static u32 prevclock = 0;
+        static uint32_t prevclock = 0;
         static int speedadj = 0;
-        u32 t = systemGetClock();
+        uint32_t t = systemGetClock();
 
         if (!panel->was_paused && prevclock && (t - prevclock) != 10000 / rate) {
             int speed = t == prevclock ? 100 * 10000 / rate - (t - prevclock) : 100;
@@ -448,23 +448,23 @@ void systemLoadRecent()
     // I need to be implemented
 }
 
-u32 systemGetClock()
+uint32_t systemGetClock()
 {
     return wxGetApp().timer.Time();
 }
 
 void systemCartridgeRumble(bool) {}
 
-static u8 sensorDarkness = 0xE8; // total darkness (including daylight on rainy days)
+static uint8_t sensorDarkness = 0xE8; // total darkness (including daylight on rainy days)
 
-u8 systemGetSensorDarkness()
+uint8_t systemGetSensorDarkness()
 {
     return sensorDarkness;
 }
 
 void systemUpdateSolarSensor()
 {
-    u8 sun = 0x0; //sun = 0xE8 - 0xE8 (case 0 and default)
+    uint8_t sun = 0x0; //sun = 0xE8 - 0xE8 (case 0 and default)
     int level = sunBars / 10;
 
     switch (level) {
@@ -644,7 +644,7 @@ int systemGetSensorZ()
 
 class PrintDialog : public wxEvtHandler, public wxPrintout {
 public:
-    PrintDialog(const u16* data, int lines, bool cont);
+    PrintDialog(const uint16_t* data, int lines, bool cont);
     ~PrintDialog();
     int ShowModal()
     {
@@ -691,7 +691,7 @@ private:
 
 IMPLEMENT_CLASS(PrintDialog, wxEvtHandler)
 
-PrintDialog::PrintDialog(const u16* data, int lines, bool cont)
+PrintDialog::PrintDialog(const uint16_t* data, int lines, bool cont)
     : img(160, lines)
     , npw(1)
     , nph(1)
@@ -722,7 +722,7 @@ PrintDialog::PrintDialog(const u16* data, int lines, bool cont)
 
     for (int y = 0; y < lines; y++) {
         for (int x = 0; x < 160; x++) {
-            u16 d = *data++;
+            uint16_t d = *data++;
             img.SetRGB(x, y, ((d >> 10) & 0x1f) << 3, ((d >> 5) & 0x1f) << 3,
                 (d & 0x1f) << 3);
         }
@@ -889,16 +889,16 @@ void PrintDialog::DoPrint(wxCommandEvent&)
     }
 }
 
-void systemGbPrint(u8* data, int len, int pages, int feed, int pal, int cont)
+void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int cont)
 {
     ModalPause mp; // this might take a while, so signal a pause
     GameArea* panel = wxGetApp().frame->GetPanel();
-    static u16* accum_prdata;
+    static uint16_t* accum_prdata;
     static int accum_prdata_len = 0, accum_prdata_size = 0;
-    static u16 prdata[162 * 145] = { 0 };
+    static uint16_t prdata[162 * 145] = { 0 };
     static int picno = 0;
     int lines = len / 40;
-    u16* out = prdata + 162; // 1-pix top border
+    uint16_t* out = prdata + 162; // 1-pix top border
 
     for (int y = 0; y < lines / 8; y++) {
         for (int x = 0; x < 160 / 8; x++) {
@@ -930,7 +930,7 @@ void systemGbPrint(u8* data, int len, int pages, int feed, int pal, int cont)
     // assume no bottom margin means "more coming"
     // probably ought to make this time out somehow
     // or at the very least dump when the game state changes
-    u16* to_print = prdata;
+    uint16_t* to_print = prdata;
 
     if ((gopts.print_auto_page && !(feed & 15)) || accum_prdata_len) {
         if (!accum_prdata_len)
@@ -940,9 +940,9 @@ void systemGbPrint(u8* data, int len, int pages, int feed, int pal, int cont)
 
         if (accum_prdata_size < accum_prdata_len) {
             if (!accum_prdata_size)
-                accum_prdata = (u16*)calloc(accum_prdata_len, 2);
+                accum_prdata = (uint16_t*)calloc(accum_prdata_len, 2);
             else
-                accum_prdata = (u16*)realloc(accum_prdata, accum_prdata_len * 2);
+                accum_prdata = (uint16_t*)realloc(accum_prdata, accum_prdata_len * 2);
 
             accum_prdata_size = accum_prdata_len;
         }
@@ -983,7 +983,7 @@ void systemGbPrint(u8* data, int len, int pages, int feed, int pal, int cont)
         systemGreenShift = 5;
         systemBlueShift = 0;
         wxString of = fn.GetFullPath();
-        bool ret = captureFormat == 0 ? utilWritePNGFile(of.mb_fn_str(), 160, lines, (u8*)to_print) : utilWriteBMPFile(of.mb_fn_str(), 160, lines, (u8*)to_print);
+        bool ret = captureFormat == 0 ? utilWritePNGFile(of.mb_fn_str(), 160, lines, (uint8_t*)to_print) : utilWriteBMPFile(of.mb_fn_str(), 160, lines, (uint8_t*)to_print);
 
         if (ret) {
             wxString msg;
@@ -1007,9 +1007,9 @@ void systemGbPrint(u8* data, int len, int pages, int feed, int pal, int cont)
         if (to_print != accum_prdata) {
             if (accum_prdata_size < accum_prdata_len) {
                 if (!accum_prdata_size)
-                    accum_prdata = (u16*)calloc(accum_prdata_len, 2);
+                    accum_prdata = (uint16_t*)calloc(accum_prdata_len, 2);
                 else
-                    accum_prdata = (u16*)realloc(accum_prdata, accum_prdata_len * 2);
+                    accum_prdata = (uint16_t*)realloc(accum_prdata, accum_prdata_len * 2);
 
                 accum_prdata_size = accum_prdata_len;
             }
@@ -1106,7 +1106,7 @@ SoundDriver* systemSoundInit()
     return 0;
 }
 
-void systemOnWriteDataToSoundBuffer(const u16* finalWave, int length)
+void systemOnWriteDataToSoundBuffer(const uint16_t* finalWave, int length)
 {
 #ifndef NO_FFMPEG
     GameArea* panel = wxGetApp().frame->GetPanel();
