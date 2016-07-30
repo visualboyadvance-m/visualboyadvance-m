@@ -1,5 +1,5 @@
 #include "wx/sdljoy.h"
-#include <SDL.h>
+#include "SDL.h"
 #include <SDL_joystick.h>
 #include <wx/window.h>
 

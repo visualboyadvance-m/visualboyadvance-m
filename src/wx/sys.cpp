@@ -1,7 +1,7 @@
 #include "../common/ConfigManager.h"
 #include "../common/SoundSDL.h"
 #include "wxvbam.h"
-#include <SDL.h>
+#include "SDL.h"
 #include <wx/ffile.h>
 #include <wx/generic/prntdlgg.h>
 #include <wx/print.h>

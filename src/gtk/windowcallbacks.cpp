@@ -30,7 +30,7 @@
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/stock.h>
 
-#include <SDL.h>
+#include "SDL.h"
 
 #include "../Util.h"
 #include "../common/ConfigManager.h"

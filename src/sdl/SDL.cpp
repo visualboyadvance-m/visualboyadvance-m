@@ -43,7 +43,7 @@
 #include "../AutoBuild.h"
 #include "../version.h"
 
-#include <SDL.h>
+#include "SDL.h"
 
 #include "../Util.h"
 #include "../common/ConfigManager.h"
