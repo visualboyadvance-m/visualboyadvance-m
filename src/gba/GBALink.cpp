@@ -232,9 +232,9 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size);
 static void UpdateCableSocket(int ticks);
 static void CloseSocket();
 
-const u64 TICKS_PER_FRAME = TICKS_PER_SECOND / 60;
-const u64 BITS_PER_SECOND = 115200;
-const u64 BYTES_PER_SECOND = BITS_PER_SECOND / 8;
+const uint64_t TICKS_PER_FRAME = TICKS_PER_SECOND / 60;
+const uint64_t BITS_PER_SECOND = 115200;
+const uint64_t BYTES_PER_SECOND = BITS_PER_SECOND / 8;
 
 static uint32_t lastjoybusupdate = 0;
 static uint32_t nextjoybusupdate = 0;
