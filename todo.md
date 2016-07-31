@@ -1,9 +1,9 @@
 # The Visualboyadvance-M todo list for those that care
 
- * remove silly type defs, Come on... It's 2016 [in-progress]
- * Fix the updater in the wxwidgets interface, some people have been reporting issues of timing out with not internet.
- * Fix the libretro interface
- * Next will be removing the majority of the interface code and going straight libretro (Will make it easier to maintain one interface that's platform independent.
+- [x] remove silly type defs, Come on... It's 2016
+- [ ] Fix the updater in the wxwidgets interface, some people have been reporting issues of timing out with not internet.
+- [ ] Fix the libretro interface
+- [ ] Next will be removing the majority of the interface code and going straight libretro (Will make it easier to maintain one interface that's platform independent.
 
 # Coding Guidelines (for those that want to help out and send a pull request.)
 
