@@ -1,7 +1,9 @@
 #ifndef WX_VIEWSUPT_H
 #define WX_VIEWSUPT_H
 
+#include <wx/wx.h>
 #include <wx/window.h>
+#include <wx/image.h>
 #include <wx/caret.h>
 #include <wx/spinctrl.h>
 #include <wx/dialog.h>

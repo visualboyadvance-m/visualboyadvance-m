@@ -33,6 +33,7 @@
 #include <OpenGL/glext.h>
 #include <OpenGL/glu.h>
 #else
+#include <GL/gl.h>
 #include <GL/glext.h>
 #include <GL/glu.h>
 #endif
@@ -42,7 +43,7 @@
 #include "../AutoBuild.h"
 #include "../version.h"
 
-#include <SDL.h>
+#include "SDL.h"
 
 #include "../Util.h"
 #include "../common/ConfigManager.h"

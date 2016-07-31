@@ -28,7 +28,7 @@
 
 #include <sys/stat.h>
 
-#include <SDL.h>
+#include "SDL.h"
 
 #include "../Util.h"
 #include "../common/ConfigManager.h"

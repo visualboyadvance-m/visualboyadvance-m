@@ -21,4 +21,13 @@ int ZEXPORT memgzclose(gzFile file);
 long ZEXPORT memtell(gzFile file);
 z_off_t ZEXPORT memgzseek(gzFile file, z_off_t off, int whence);
 
+// Newer version of zlib dropped gzio support
+#ifndef OF /* function prototypes */
+#  ifdef STDC
+#    define OF(args)  args
+#  else
+#    define OF(args)  ()
+#  endif
+#endif
+
 #endif // MEMGZIO_H
