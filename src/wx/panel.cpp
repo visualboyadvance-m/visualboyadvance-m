@@ -958,9 +958,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
     // Check for online updates
     if (gopts.onlineupdates > 0 && !emusys) {
-        if ((wxDateTime::Now().GetTicks() - gopts.last_update) > gopts.onlineupdates * 24 * 60 * 60) {
-            wxGetApp().frame->CheckForUpdates();
-        }
+        wxGetApp().frame->CheckForUpdates();
     }
 
 #endif
