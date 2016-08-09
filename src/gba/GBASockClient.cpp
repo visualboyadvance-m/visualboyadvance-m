@@ -7,7 +7,7 @@
 GBASockClient::GBASockClient(sf::IpAddress _server_addr)
 {
     if (_server_addr == sf::IpAddress::None)
-        server_addr = sf::IpAddress::LocalHost;
+        server_addr = sf::IpAddress::getPublicAddress();
     else
         server_addr = _server_addr;
 

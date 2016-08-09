@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdlib>
+#include <cstdint>
 #include <SFML/Network.hpp>
 
 class GBASockClient {
