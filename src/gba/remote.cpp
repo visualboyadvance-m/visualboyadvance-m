@@ -3945,6 +3945,11 @@ void remoteReadRegister(char* p)
 {
     int r;
     sscanf(p, "%x", &r);
+    if(r < 0 || r > 15)
+    {
+        remotePutPacket("E 00");
+        return;
+    }
     char buffer[1024];
     char* s = buffer;
     uint32_t v = reg[r].I;
@@ -3996,6 +4001,12 @@ void remoteWriteRegister(char* p)
     int r;
 
     sscanf(p, "%x=", &r);
+
+    if(r < 0 || r > 15)
+    {
+        remotePutPacket("E 00");
+        return;
+    }
 
     p = strchr(p, '=');
     p++;
