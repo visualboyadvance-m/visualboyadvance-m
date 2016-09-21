@@ -350,7 +350,7 @@ bool OpenAL::LoadOAL()
 #else
 #ifdef __WXMAC__
         // on macosx, it's just plain OpenAL
-        !Lib.Load(wxT("OpenAL"), wxDL_NOW | wxDL_VERBATIM) &&
+        !Lib.Load(wxT("/System/Library/Frameworks/OpenAL.framework/Versions/A/OpenAL"), wxDL_NOW | wxDL_VERBATIM) &&
 #endif
 #endif
         // on linux, it's libopenal.so

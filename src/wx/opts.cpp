@@ -273,6 +273,10 @@ opts_t::opts_t()
     frameSkip = -1;
 #ifdef __WXMSW__
     audio_api = AUD_DIRECTSOUND;
+#else
+#ifdef __WXMAC__
+    audio_api = AUD_OPENAL;
+#endif
 #endif
     video_scale = 3;
     retain_aspect = true;
