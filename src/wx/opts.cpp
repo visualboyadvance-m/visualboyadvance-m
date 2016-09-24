@@ -275,7 +275,8 @@ opts_t::opts_t()
     audio_api = AUD_DIRECTSOUND;
 #else
 #ifdef __WXMAC__
-    audio_api = AUD_OPENAL;
+    audio_api     = AUD_OPENAL;
+    render_method = RND_OPENGL;
 #endif
 #endif
     video_scale = 3;
