@@ -59,7 +59,11 @@ IF( NOT VERSION )
     endif(EXISTS ${PROJECT_SOURCE_DIR}/.git)
 ENDIF( NOT VERSION )
 
-
+IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    ADD_DEFINITIONS(-DDEBUG)
+ELSE()
+    ADD_DEFINITIONS(-NDEBUG)
+ENDIF()
 
 # Fill in SDLMAIN_LIBRARY on OS X manually to avoid using SDLMain.m
 # OS X users will have to compile and install SDL from source.
@@ -68,18 +72,38 @@ if( APPLE AND ENABLE_SDL )
     SET(SDL2MAIN_LIBRARY "-lSDL2main")
 endif( APPLE AND ENABLE_SDL )
 
-# Add support for MacPorts and Homebrew on OS X
-# and ObjectiveC code
+# Add support for Homebrew, MacPorts and Fink on OS X
+# as well as for ObjectiveC code
 IF(APPLE)
-    SET(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH};/usr/local/include;/opt/local/include")
-    SET(CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH};/usr/local/lib;/opt/local/lib")
-    SET(CMAKE_PROGRAM_PATH "${CMAKE_PROGRAM_PATH};/usr/local/bin;/opt/local/bin")
+    IF(EXISTS /usr/local/include)
+        SET(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH};/usr/local/include")
+        INCLUDE_DIRECTORIES("/usr/local/include")
+    ELSEIF(EXISTS /opt/local/include)
+        SET(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH};/opt/local/include")
+        INCLUDE_DIRECTORIES("/opt/local/include")
+    ELSEIF(EXISTS /sw/include)
+        SET(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH};/sw/include")
+        INCLUDE_DIRECTORIES("/sw/include")
+    ENDIF()
 
-    link_directories("/usr/local/lib")
-    include_directories("/usr/local/include")
+    IF(EXISTS /usr/local/lib)
+        SET(CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH};/usr/local/lib")
+        LINK_DIRECTORIES("/usr/local/lib")
+    ELSEIF(EXISTS /opt/local/lib)
+        SET(CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH};/opt/local/lib")
+        LINK_DIRECTORIES("/opt/local/lib")
+    ELSEIF(EXISTS /sw/lib)
+        SET(CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH};/sw/lib")
+        LINK_DIRECTORIES("/sw/lib")
+    ENDIF()
 
-    link_directories("/opt/local/lib")
-    include_directories("/opt/local/include")
+    IF(EXISTS /usr/local/bin)
+        SET(CMAKE_PROGRAM_PATH "${CMAKE_PROGRAM_PATH};/usr/local/bin")
+    ELSEIF(EXISTS /opt/local/bin)
+        SET(CMAKE_PROGRAM_PATH "${CMAKE_PROGRAM_PATH};/opt/local/bin")
+    ELSEIF(EXISTS /sw/bin)
+        SET(CMAKE_PROGRAM_PATH "${CMAKE_PROGRAM_PATH};/sw/bin")
+    ENDIF()
 
     # and compile as Objective-C++ for ObjectiveC #ifdefs
     SET(CMAKE_CXX_COMPILE_OBJECT "<CMAKE_CXX_COMPILER> -x objective-c++ <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT> -c <SOURCE>")

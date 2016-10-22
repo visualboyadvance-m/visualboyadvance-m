@@ -2522,6 +2522,8 @@ bool MainFrame::BindControls()
         return false;
     }
 
+    panel->SetMainFrame(this);
+
     panel->AdjustSize(false);
     // only the panel does idle events (the emulator loop)
     // however, do not enable until end of init, since errors will start

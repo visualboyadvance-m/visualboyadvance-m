@@ -21,6 +21,10 @@
     {                                            \
         wxT(c), (n), d, NULL, &v, NULL, min, max \
     }
+#define DOUBLEOPT(c, n, d, v, min, max)                      \
+    {                                                        \
+        wxT(c), (n), d, NULL, NULL, NULL, min, max, NULL, &v \
+    }
 #define BOOLOPT(c, n, d, v)                        \
     {                                              \
         wxT(c), (n), d, NULL, NULL, NULL, 0, 0, &v \
@@ -156,7 +160,7 @@ opt_desc opts[] = {
 #else
     ENUMOPT("Display/RenderMethod", "", wxTRANSLATE("Render method; if unsupported, simple method will be used"), gopts.render_method, wxTRANSLATE("simple|opengl|cairo")),
 #endif
-    INTOPT("Display/Scale", "", wxTRANSLATE("Default scale factor"), gopts.video_scale, 1, 6),
+    DOUBLEOPT("Display/Scale", "", wxTRANSLATE("Default scale factor"), gopts.video_scale, 1, 6),
     BOOLOPT("Display/Stretch", "RetainAspect", wxTRANSLATE("Retain aspect ratio when resizing"), gopts.retain_aspect),
 
     /// GB
@@ -523,6 +527,13 @@ void load_opts()
                 wxLogWarning(_("Invalid value %d for option %s; valid values are %d - %d"), opt.curint, opt.opt, opt.min, opt.max);
             } else
                 *opt.intopt = opt.curint;
+        } else if (opt.doubleopt) {
+            cfg->Read(opt.opt, &opt.curdouble, *opt.doubleopt);
+
+            if (opt.curdouble < opt.min || opt.curdouble > opt.max) {
+                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), opt.curdouble, opt.opt, opt.min, opt.max);
+            } else
+                *opt.doubleopt = opt.curdouble;
         } else if (opt.boolopt) {
             cfg->Read(opt.opt, opt.boolopt, *opt.boolopt);
             opt.curbool = *opt.boolopt;
@@ -648,6 +659,9 @@ void update_opts()
         } else if (opt.intopt) {
             if (*opt.intopt != opt.curint)
                 cfg->Write(opt.opt, (opt.curint = *opt.intopt));
+        } else if (opt.doubleopt) {
+            if (*opt.doubleopt != opt.curdouble)
+                cfg->Write(opt.opt, (opt.curdouble = *opt.doubleopt));
         } else if (opt.boolopt) {
             if (*opt.boolopt != opt.curbool)
                 cfg->Write(opt.opt, (opt.curbool = *opt.boolopt));
@@ -805,6 +819,14 @@ bool opt_set(const wxChar* name, const wxChar* val)
                 wxLogWarning(_("Invalid value %d for option %s; valid values are %d - %d"), ival, name, opt->min, opt->max);
             else
                 *opt->intopt = ival;
+        } else if (opt->doubleopt) {
+            const wxString s(val);
+            double dval;
+
+            if (!s.ToDouble(&dval) || dval < opt->min || dval > opt->max)
+                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), dval, name, opt->min, opt->max);
+            else
+                *opt->doubleopt = dval;
         } else {
             // GB/Palette[0-2] is virtual
             for (int i = 0; i < 3; i++) {

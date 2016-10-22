@@ -38,6 +38,9 @@ void CheckPointer(T pointer)
     }
 }
 
+// For spewing stuff to terminal
+void vbamDebug(const char* format, ...);
+
 /// Helper functions to convert WX's crazy string types to std::string
 
 inline std::string ToString(wxCharBuffer aString)
@@ -278,6 +281,12 @@ public:
     // Check for online updates to the emulator
     bool CheckForUpdates();
 
+    virtual bool MenusOpened() { return menus_opened != 0; }
+
+    virtual void SetMenusOpened(bool state);
+
+    virtual bool DialogOpened() { return dialog_opened != 0; }
+
     // required for building from xrc
     DECLARE_DYNAMIC_CLASS();
     // required for event handling
@@ -331,6 +340,15 @@ private:
     wxString CheckForUpdates(wxString host, wxString url);
 
 #include "cmdhandlers.h"
+};
+
+// helper class to add HiDPI awareness (mostly for Mac OS X)
+class HiDPIAware {
+public:
+    double HiDPIScaleFactor();
+    virtual wxWindow* GetWindow() = 0;
+private:
+    double hidpi_scale_factor = 0;
 };
 
 // a helper class to avoid forgetting StopModal()
@@ -420,10 +438,12 @@ enum audioapi { AUD_SDL,
 
 class DrawingPanel;
 
-class GameArea : public wxPanel {
+class GameArea : public wxPanel, public HiDPIAware {
 public:
     GameArea();
     virtual ~GameArea();
+
+    virtual void SetMainFrame(MainFrame* parent) { main_frame = parent; }
 
     // set to game title + link info
     void SetFrameTitle();
@@ -540,7 +560,11 @@ public:
     void StartGamePlayback(const wxString& fname);
     void StopGamePlayback();
 
+    virtual wxWindow* GetWindow() { return this; }
+
 protected:
+    MainFrame* main_frame;
+
     // set minsize of frame & panel to unscaled screen size
     void LowerMinSize();
     // set minsize of frame & panel to scaled screen size
@@ -599,7 +623,7 @@ extern bool cmditem_lt(const struct cmditem& cmd1, const struct cmditem& cmd2);
 
 class FilterThread;
 
-class DrawingPanel : public wxObject {
+class DrawingPanel : public wxObject, public HiDPIAware {
 public:
     DrawingPanel(int _width, int _height);
     ~DrawingPanel();
@@ -611,7 +635,10 @@ public:
 protected:
     virtual void DrawArea(wxWindowDC&) = 0;
     virtual void DrawOSD(wxWindowDC&);
-    int width, height, scale;
+    int width, height;
+    double scale;
+    virtual void DrawingPanelInit();
+    bool did_init = false;
     uint8_t* todraw;
     uint8_t *pixbuf1, *pixbuf2;
     FilterThread* threads;

@@ -18,7 +18,7 @@ extern struct opts_t {
     wxVideoMode fs_mode;
     int max_threads;
     int render_method;
-    int video_scale;
+    double video_scale;
     bool retain_aspect;
     bool keep_on_top;
 
@@ -90,11 +90,13 @@ extern struct opt_desc {
     wxString* stropt;
     int* intopt;
     const wxChar* enumvals;
-    int min, max;
+    double min, max;
     bool* boolopt;
+    double* doubleopt;
     // current configured value
     wxString curstr;
     int curint;
+    double curdouble;
 #define curbool curint
 } opts[];
 extern const int num_opts;

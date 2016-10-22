@@ -47,13 +47,11 @@ protected:
     {
         PaintEv(ev);
     }
-    void OnSize(wxSizeEvent&);
     void DrawArea(wxWindowDC& dc);
-#if wxCHECK_VERSION(2, 9, 0) || !defined(__WXMAC__)
-    wxGLContext ctx;
+#if wxCHECK_VERSION(2, 9, 0)
+    wxGLContext* ctx;
 #endif
-    bool did_init;
-    void Init();
+    void DrawingPanelInit();
     GLuint texid, vlist;
     int texsize;
 
@@ -81,8 +79,7 @@ protected:
         PaintEv(ev);
     }
     void DrawArea(wxWindowDC&);
-    bool did_init;
-    void Init();
+    void DrawingPanelInit();
 
     DECLARE_CLASS()
     DECLARE_EVENT_TABLE()

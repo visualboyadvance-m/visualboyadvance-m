@@ -30,9 +30,31 @@
 IMPLEMENT_APP(wxvbamApp)
 IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
 
+// For spewing stuff to terminal when debugging
+void vbamDebug(const char* format, ...) {
+#ifdef DEBUG
+    wxLog *active_log = wxLog::GetActiveTarget();
+
+    wxLogStderr log_to_stderr;
+
+    wxLog::SetActiveTarget(&log_to_stderr);
+
+    va_list argptr;
+    va_start(argptr, format);
+        wxVLogDebug(format, argptr);
+    va_end(argptr);
+
+    wxLog::SetActiveTarget(active_log);
+#endif
+}
+
 // generate config file path
 static void get_config_path(wxPathList& path, bool exists = true)
 {
+    // we want paths with "visualboyadvance-m" not "vbam", so change appname temporarily
+    wxString current_app_name = wxGetApp().GetAppName();
+    wxGetApp().SetAppName(_("visualboyadvance-m"));
+
     //   local config dir first, then global
     //   locale-specific res first, then main
     wxStandardPathsBase& stdp = wxStandardPaths::Get();
@@ -44,6 +66,15 @@ static void get_config_path(wxPathList& path, bool exists = true)
         if ((wxDirExists(s) && wxIsWritable(s)) || ((!exists || !wxDirExists(s)) && parent.IsDirWritable())) \
             path.Add(s);                                                                                     \
     } while (0)
+
+    vbamDebug("GetUserLocalDataDir(): %s", static_cast<const char*>(stdp.GetUserLocalDataDir().utf8_str()));
+    vbamDebug("GetUserDataDir(): %s", static_cast<const char*>(stdp.GetUserDataDir().utf8_str()));
+    vbamDebug("GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()): %s", static_cast<const char*>(stdp.GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()).utf8_str()));
+    vbamDebug("GetResourcesDir(): %s", static_cast<const char*>(stdp.GetResourcesDir().utf8_str()));
+    vbamDebug("GetDataDir(): %s", static_cast<const char*>(stdp.GetDataDir().utf8_str()));
+    vbamDebug("GetLocalDataDir(): %s", static_cast<const char*>(stdp.GetLocalDataDir().utf8_str()));
+    vbamDebug("GetPluginsDir(): %s", static_cast<const char*>(stdp.GetPluginsDir().utf8_str()));
+
     // NOTE: this does not support XDG (freedesktop.org) paths
     add_path(GetUserLocalDataDir());
     add_path(GetUserDataDir());
@@ -52,6 +83,8 @@ static void get_config_path(wxPathList& path, bool exists = true)
     add_path(GetDataDir());
     add_path(GetLocalDataDir());
     add_path(GetPluginsDir());
+
+    wxGetApp().SetAppName(current_app_name);
 }
 
 static void tack_full_path(wxString& s, const wxString& app = wxEmptyString)
@@ -459,7 +492,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
 
         for (int i = 0; i < num_opts; i++) {
             wxPrintf(wxT("%s (%s"), opts[i].opt,
-                opts[i].boolopt ? (const wxChar*)wxT("flag") : opts[i].stropt ? (const wxChar*)wxT("string") : opts[i].enumvals ? opts[i].enumvals : opts[i].intopt ? (const wxChar*)wxT("int") : (const wxChar*)wxT("string"));
+                opts[i].boolopt ? (const wxChar*)wxT("flag") : opts[i].stropt ? (const wxChar*)wxT("string") : opts[i].enumvals ? opts[i].enumvals : opts[i].intopt ? (const wxChar*)wxT("int") : opts[i].doubleopt ? (const wxChar*)wxT("decimal") : (const wxChar*)wxT("string"));
 
             if (opts[i].enumvals) {
                 const wxChar* evx = wxGetTranslation(opts[i].enumvals);
@@ -557,6 +590,7 @@ EVT_DROP_FILES(MainFrame::OnDropFile)
 // pause game if menu pops up
 EVT_MENU_OPEN(MainFrame::MenuPopped)
 EVT_MENU_CLOSE(MainFrame::MenuPopped)
+EVT_MENU_HIGHLIGHT_ALL(MainFrame::MenuPopped)
 END_EVENT_TABLE()
 
 void MainFrame::OnActivate(wxActivateEvent& event)
@@ -950,7 +984,7 @@ int MainFrame::newest_state_slot()
 // Removing the nesting counter may help, but on wxGTK I still get lockups.
 void MainFrame::MenuPopped(wxMenuEvent& evt)
 {
-    bool popped = evt.GetEventType() == wxEVT_MENU_OPEN;
+    bool popped = evt.GetEventType() != wxEVT_MENU_CLOSE;
 #if 0
 
 	if (popped)
@@ -983,6 +1017,21 @@ void MainFrame::MenuPopped(wxMenuEvent& evt)
         panel->Pause();
     else if (!IsPaused())
         panel->Resume();
+}
+
+void MainFrame::SetMenusOpened(bool state)
+{
+    if (state) {
+        menus_opened = 1;
+        paused       = true;
+        panel->Pause();
+    }
+    else {
+        menus_opened = 0;
+        paused       = false;
+        pause_next   = false;
+        panel->Resume();
+    }
 }
 
 // ShowModal that also disables emulator loop
