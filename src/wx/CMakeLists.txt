@@ -29,10 +29,15 @@ else(ENABLE_OPENAL)
     ADD_DEFINITIONS (-DNO_OAL)
 endif(ENABLE_OPENAL)
 
+IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    SET(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
 
-IF(CMAKE_BUILD_TYPE EQUAL "Debug")
-    SET(wxWidgets_USE_DEBUG ON)
+    # and if this is the case, we can't set debug level without link failing
+    IF(NOT wxWidgets_DEFINITIONS MATCHES "-DwxDEBUG_LEVEL=0")
+        ADD_DEFINITIONS(-DwxDEBUG_LEVEL=1)
+    ENDIF()
 ENDIF()
+
 SET(wxWidgets_USE_UNICODE ON)
 # adv is for wxAboutBox
 # xml, html is for xrc

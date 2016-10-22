@@ -1,5 +1,10 @@
 #include <wx/dcbuffer.h>
 
+#ifdef __WXMAC__
+#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
+#endif
+
 #include "../../version.h"
 #include "../common/ConfigManager.h"
 #include "../common/Patch.h"
@@ -12,6 +17,19 @@
 #include "wxvbam.h"
 
 int emulating;
+
+double HiDPIAware::HiDPIScaleFactor()
+{
+    if (hidpi_scale_factor == 0) {
+#ifdef __WXMAC__
+        hidpi_scale_factor = [[(NSView*)GetWindow()->GetHandle() window] backingScaleFactor];
+#else
+        hidpi_scale_factor = 1.0;
+#endif
+    }
+
+    return hidpi_scale_factor;
+}
 
 IMPLEMENT_DYNAMIC_CLASS(GameArea, wxPanel)
 
@@ -703,10 +721,13 @@ void GameArea::DelBorder()
 
 void GameArea::AdjustMinSize()
 {
-    wxWindow* frame = wxGetApp().frame;
+    wxWindow* frame           = wxGetApp().frame;
+    double hidpi_scale_factor = HiDPIScaleFactor();
+
     // note: could safely set min size to 1x or less regardless of video_scale
     // but setting it to scaled size makes resizing to default easier
-    wxSize sz(basic_width * gopts.video_scale, basic_height * gopts.video_scale);
+    wxSize sz((std::ceil(basic_width  * gopts.video_scale) / hidpi_scale_factor),
+              (std::ceil(basic_height * gopts.video_scale) / hidpi_scale_factor));
     SetMinSize(sz);
 #if wxCHECK_VERSION(2, 8, 8)
     sz = frame->ClientToWindowSize(sz);
@@ -718,8 +739,12 @@ void GameArea::AdjustMinSize()
 
 void GameArea::LowerMinSize()
 {
-    wxWindow* frame = wxGetApp().frame;
-    wxSize sz(basic_width, basic_height);
+    wxWindow* frame           = wxGetApp().frame;
+    double hidpi_scale_factor = HiDPIScaleFactor();
+
+    wxSize sz(std::ceil(basic_width  / hidpi_scale_factor),
+              std::ceil(basic_height / hidpi_scale_factor));
+
     SetMinSize(sz);
     // do not take decorations into account
     frame->SetMinSize(sz);
@@ -732,7 +757,9 @@ void GameArea::AdjustSize(bool force)
     if (fullscreen)
         return;
 
-    const wxSize newsz(basic_width * gopts.video_scale, basic_height * gopts.video_scale);
+    double hidpi_scale_factor = HiDPIScaleFactor();
+    const wxSize newsz((std::ceil(basic_width  * gopts.video_scale) / hidpi_scale_factor),
+                       (std::ceil(basic_height * gopts.video_scale) / hidpi_scale_factor));
 
     if (!force) {
         wxSize sz = GetSize();
@@ -755,6 +782,15 @@ void GameArea::ShowFullScreen(bool full)
 
         return;
     }
+
+    // Some kbd accels can send a menu open event without a close event,
+    // this happens on Mac in HiDPI mode for the fullscreen toggle accel.
+    main_frame->SetMenusOpened(false);
+
+// on Mac maximize is native fullscreen, so ignore fullscreen requests
+#ifdef __WXMAC__
+    if (full && main_frame->IsMaximized()) return;
+#endif
 
     fullscreen = full;
 
@@ -1300,12 +1336,12 @@ DrawingPanel::DrawingPanel(int _width, int _height)
                 // unused (as is rpi->Handle)
                 _rpi->Output = (RENDPLUG_Output)filt_plugin.GetSymbol(wxT("RenderPluginOutput"));
 
-            scale = (_rpi->Flags & RPI_OUT_SCLMSK) >> RPI_OUT_SCLSH;
+            scale *= (_rpi->Flags & RPI_OUT_SCLMSK) >> RPI_OUT_SCLSH;
             rpi = _rpi;
             gopts.filter = FF_PLUGIN; // now that there is a valid plugin
         } while (0);
     } else {
-        scale = builtin_ff_scale(gopts.filter);
+        scale *= builtin_ff_scale(gopts.filter);
 #define out_16 (systemColorDepth == 16)
         systemColorDepth = 32;
     }
@@ -1334,6 +1370,11 @@ DrawingPanel::DrawingPanel(int _width, int _height)
     // FIXME: should be "true" for GBA carts if lcd mode selected
     // which means this needs to be re-run at pref change time
     utilUpdateSystemColorMaps(false);
+}
+
+void DrawingPanel::DrawingPanelInit()
+{
+    did_init = true;
 }
 
 void DrawingPanel::PaintEv(wxPaintEvent& ev)
@@ -1388,7 +1429,8 @@ public:
 
     // Set these params before running
     int nthreads, threadno;
-    int width, height, scale;
+    int width, height;
+    double scale;
     const RENDER_PLUGIN_INFO* rpi;
     uint8_t *dst, *delta;
 
@@ -1407,10 +1449,10 @@ public:
         int instride = (width + inrb) * inbpp;
         int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
         int outrb = systemColorDepth == 24 ? 0 : 4;
-        int outstride = width * outbpp * scale + outrb;
+        int outstride = std::ceil(width * outbpp * scale) + outrb;
         delta += instride * procy;
         // + 1 for stupid top border
-        dst += outstride * (procy + 1) * scale;
+        dst += (int)std::ceil(outstride * (procy + 1) * scale);
 
         while (nthreads == 1 || sig.Wait() == wxCOND_NO_ERROR) {
             if (!src /* && nthreads > 1 */) {
@@ -1561,10 +1603,10 @@ public:
                 outdesc.SrcH = height; // + scale / 2
                 outdesc.DstPtr = dst;
                 outdesc.DstPitch = outstride;
-                outdesc.DstW = width * scale;
+                outdesc.DstW = std::ceil(width * scale);
                 // on the other hand, there is at least 1 line below, so I'll add
                 // that to dest in case safety checks in plugin use < instead of <=
-                outdesc.DstH = height * scale + 1; // + scale * (scale / 2)
+                outdesc.DstH = std::ceil(height * scale) + 1; // + scale * (scale / 2)
                 rpi->Output(&outdesc);
                 break;
 
@@ -1588,18 +1630,18 @@ void DrawingPanel::DrawArea(uint8_t** data)
     //   if not filtering, we still retain current image for redraws
     int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
     int outrb = systemColorDepth == 24 ? 0 : 4;
-    int outstride = width * outbpp * scale + outrb;
+    int outstride = std::ceil(width * outbpp * scale) + outrb;
 
     if (!pixbuf2) {
         int allocstride = outstride, alloch = height;
 
         // gb may write borders, so allocate enough for them
         if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
-            allocstride = GameArea::SGBWidth * outbpp * scale + outrb;
+            allocstride = std::ceil(GameArea::SGBWidth * outbpp * scale) + outrb;
             alloch = GameArea::SGBHeight;
         }
 
-        pixbuf2 = (uint8_t*)calloc(allocstride, (alloch + 2) * scale);
+        pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
     }
 
     if (gopts.filter == FF_NONE) {
@@ -1701,7 +1743,7 @@ void DrawingPanel::DrawArea(uint8_t** data)
         if (!disableStatusMessages && !panel->osdtext.empty()) {
             if (systemGetClock() - panel->osdtime < OSD_TIME) {
                 std::string message = ToString(panel->osdtext);
-                int linelen = (width * scale - 20) / 8;
+                int linelen = std::ceil(width * scale - 20) / 8;
                 int nlines = (message.length() + linelen - 1) / linelen;
                 int cury = height - 14 - nlines * 10;
                 char* ptr = const_cast<char*>(message.c_str());
@@ -1862,6 +1904,7 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
     if (gopts.filter == FF_NONE && gopts.ifb == IFB_NONE)
         // changing from 32 to 24 does not require regenerating color tables
         systemColorDepth = 24;
+    if (!did_init) DrawingPanelInit();
 }
 
 void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
@@ -1874,12 +1917,12 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
         bm = new wxBitmap(im);
     } else if (out_16) {
         // scaled by filters, top/right borders, transform to 24-bit
-        wxImage im(width * scale, height * scale, false);
-        uint16_t* src = (uint16_t*)todraw + (width + 2) * scale; // skip top border
+        wxImage im(std::ceil(width * scale), std::ceil(height * scale), false);
+        uint16_t* src = (uint16_t*)todraw + (int)std::ceil((width + 2) * scale); // skip top border
         uint8_t* dst = im.GetData();
 
-        for (int y = 0; y < height * scale; y++) {
-            for (int x = 0; x < width * scale; x++, src++) {
+        for (int y = 0; y < std::ceil(height * scale); y++) {
+            for (int x = 0; x < std::ceil(width * scale); x++, src++) {
                 *dst++ = ((*src >> systemRedShift) & 0x1f) << 3;
                 *dst++ = ((*src >> systemGreenShift) & 0x1f) << 3;
                 *dst++ = ((*src >> systemBlueShift) & 0x1f) << 3;
@@ -1892,12 +1935,12 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
     } else // 32-bit
     {
         // scaled by filters, top/right borders, transform to 24-bit
-        wxImage im(width * scale, height * scale, false);
-        uint32_t* src = (uint32_t*)todraw + (width + 1) * scale; // skip top border
+        wxImage im(std::ceil(width * scale), std::ceil(height * scale), false);
+        uint32_t* src = (uint32_t*)todraw + (int)std::ceil((width + 1) * scale); // skip top border
         uint8_t* dst = im.GetData();
 
-        for (int y = 0; y < height * scale; y++) {
-            for (int x = 0; x < width * scale; x++, src++) {
+        for (int y = 0; y < std::ceil(height * scale); y++) {
+            for (int x = 0; x < std::ceil(width * scale); x++, src++) {
                 *dst++ = *src >> (systemRedShift - 3);
                 *dst++ = *src >> (systemGreenShift - 3);
                 *dst++ = *src >> (systemBlueShift - 3);
@@ -1912,8 +1955,8 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
     double sx, sy;
     int w, h;
     GetClientSize(&w, &h);
-    sx = (double)w / (double)(width * scale);
-    sy = (double)h / (double)(height * scale);
+    sx = w / (width * scale);
+    sy = h / (height * scale);
     dc.SetUserScale(sx, sy);
     dc.DrawBitmap(*bm, 0, 0);
     delete bm;
@@ -1936,7 +1979,6 @@ IMPLEMENT_CLASS2(GLDrawingPanel, DrawingPanel, wxGLCanvas)
 // this would be easier in 2.9
 BEGIN_EVENT_TABLE(GLDrawingPanel, wxGLCanvas)
 EVT_PAINT(GLDrawingPanel::PaintEv2)
-EVT_SIZE(GLDrawingPanel::OnSize)
 END_EVENT_TABLE()
 
 // This is supposed to be the default, but DOUBLEBUFFER doesn't seem to be
@@ -1945,7 +1987,7 @@ static int glopts[] = {
     WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0
 };
 
-#if wxCHECK_VERSION(2, 9, 0) || !defined(__WXMAC__)
+#if wxCHECK_VERSION(2, 9, 0)
 #define glc wxGLCanvas
 #else
 // shuffled parms for 2.9 indicates non-auto glcontext
@@ -1957,23 +1999,30 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
     : glc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetSize(),
           wxFULL_REPAINT_ON_RESIZE)
     , DrawingPanel(_width, _height)
-    , did_init(false)
-#if wxCHECK_VERSION(2, 9, 0) || !defined(__WXMAC__)
-    , ctx(this)
-#endif
 {
+#ifdef __WXMAC__
+    [(NSView *)GetHandle() setWantsBestResolutionOpenGLSurface:YES];
+#endif
+#if wxCHECK_VERSION(2, 9, 0)
+    ctx = new wxGLContext(this);
+    SetCurrent(*ctx);
+#endif
+    if (!did_init) DrawingPanelInit();
 }
 
 GLDrawingPanel::~GLDrawingPanel()
 {
+#if wxCHECK_VERSION(2, 9, 0)
+    delete ctx;
+#endif
 #if 0
 
 	// this should be automatically deleted w/ context
 	// it's also unsafe if panel no longer displayed
 	if (did_init)
 	{
-#if wxCHECK_VERSION(2, 9, 0) || !defined(__WXMAC__)
-		SetContext(ctx);
+#if wxCHECK_VERSION(2, 9, 0)
+		SetContext(*ctx);
 #else
 		SetContext();
 #endif
@@ -1984,8 +2033,21 @@ GLDrawingPanel::~GLDrawingPanel()
 #endif
 }
 
-void GLDrawingPanel::Init()
+void GLDrawingPanel::DrawingPanelInit()
 {
+#if wxCHECK_VERSION(2, 9, 0)
+    SetCurrent(*ctx);
+#endif
+
+    DrawingPanel::DrawingPanelInit();
+
+#ifdef DEBUG
+    // you can use this to check that the gl surface is indeed high res
+    GLint m_viewport[4];
+    glGetIntegerv(GL_VIEWPORT, m_viewport);
+    vbamDebug("GL VIEWPORT: %d, %d, %d, %d", m_viewport[0], m_viewport[1], m_viewport[2], m_viewport[3]);
+#endif
+
     // taken from GTK front end almost verbatim
     glDisable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
@@ -2013,12 +2075,13 @@ void GLDrawingPanel::Init()
         gopts.bilinear ? GL_LINEAR : GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
         gopts.bilinear ? GL_LINEAR : GL_NEAREST);
+
 #define int_fmt out_16 ? GL_RGB5 : GL_RGB
 #define tex_fmt out_16 ? GL_BGRA : GL_RGBA, \
                 out_16 ? GL_UNSIGNED_SHORT_1_5_5_5_REV : GL_UNSIGNED_BYTE
 #if 0
 	texsize = width > height ? width : height;
-	texsize *= scale;
+	texsize = std::ceil(texsize * scale);
 	// texsize = 1 << ffs(texsize);
 	texsize = texsize | (texsize >> 1);
 	texsize = texsize | (texsize >> 2);
@@ -2029,7 +2092,7 @@ void GLDrawingPanel::Init()
 #else
     // but really, most cards support non-p2 and rect
     // if not, use cairo or wx renderer
-    glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, width * scale, height * scale, 0, tex_fmt, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), std::ceil(height * scale), 0, tex_fmt, NULL);
 #endif
     glClearColor(0.0, 0.0, 0.0, 1.0);
 // non-portable vsync code
@@ -2062,22 +2125,21 @@ void GLDrawingPanel::Init()
 #endif
 #endif
 #endif
-    did_init = true;
 }
 
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 {
-#if wxCHECK_VERSION(2, 9, 0) || !defined(__WXMAC__)
-    SetCurrent(ctx);
+#if wxCHECK_VERSION(2, 9, 0)
+    SetCurrent(*ctx);
 #else
     SetCurrent();
 #endif
 
     if (!did_init)
-        Init();
+        DrawingPanelInit();
 
     if (todraw) {
-        int rowlen = width * scale + (out_16 ? 2 : 1);
+        int rowlen = std::ceil(width * scale) + (out_16 ? 2 : 1);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
 #if wxBYTE_ORDER == wxBIG_ENDIAN
 
@@ -2086,29 +2148,13 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
             glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
 
 #endif
-        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, width * scale, height * scale,
-            0, tex_fmt, todraw + rowlen * (out_16 ? 2 : 4) * scale);
+        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), (int)std::ceil(height * scale),
+            0, tex_fmt, todraw + (int)std::ceil(rowlen * (out_16 ? 2 : 4) * scale));
         glCallList(vlist);
     } else
         glClear(GL_COLOR_BUFFER_BIT);
 
     SwapBuffers();
-}
-
-void GLDrawingPanel::OnSize(wxSizeEvent& ev)
-{
-    if (!did_init)
-        return;
-
-    int w, h;
-    GetClientSize(&w, &h);
-#if wxCHECK_VERSION(2, 9, 0) || !defined(__WXMAC__)
-    SetCurrent(ctx);
-#else
-    SetCurrent();
-#endif
-    glViewport(0, 0, w, h);
-    ev.Skip(); // propagate to parent
 }
 #endif
 
@@ -2141,6 +2187,8 @@ CairoDrawingPanel::CairoDrawingPanel(wxWindow* parent, int _width, int _height)
 
     // FIXME: should be "true" for GBA carts if lcd mode selected
     utilUpdateSystemColorMaps(false);
+
+    if (!did_init) DrawingPanelInit();
 }
 
 CairoDrawingPanel::~CairoDrawingPanel()
@@ -2194,8 +2242,8 @@ void CairoDrawingPanel::DrawArea(wxWindowDC& dc)
     else {
         if (!conv_surf)
             conv_surf = cairo_image_surface_create(CAIRO_FORMAT_RGB24,
-                width * scale,
-                height * scale);
+                std::ceil(width * scale),
+                std::ceil(height * scale));
 
         if (!conv_surf) {
             wxLogError(_("Cannot create conversion buffer"));
@@ -2203,11 +2251,11 @@ void CairoDrawingPanel::DrawArea(wxWindowDC& dc)
         }
 
         surf = cairo_surface_reference(conv_surf);
-        uint16_t* src = (uint16_t*)todraw + (width + 2) * scale; // skip top border
+        uint16_t* src = (uint16_t*)todraw + (int)std::ceil((width + 2) * scale); // skip top border
         uint32_t* dst = (uint32_t*)cairo_image_surface_get_data(surf);
 
-        for (int y = 0; y < height * scale; y++) {
-            for (int x = 0; x < width * scale; x++, src++) {
+        for (int y = 0; y < std::ceil(height * scale); y++) {
+            for (int x = 0; x < std::ceil(width * scale); x++, src++) {
                 *dst++ = (((*src >> systemRedShift) & 0x1f) << 19) | (((*src >> systemGreenShift) & 0x1f) << 11) | (((*src >> systemBlueShift) & 0x1f) << 3);
             }
 
@@ -2222,8 +2270,8 @@ void CairoDrawingPanel::DrawArea(wxWindowDC& dc)
     double sx, sy;
     int w, h;
     GetClientSize(&w, &h);
-    sx = (double)width / (double)w;
-    sy = (double)height / (double)h;
+    sx = (double)width / w;
+    sy = (double)height / h;
     cairo_matrix_t mat;
     cairo_matrix_init_scale(&mat, sx, sy);
     cairo_pattern_set_matrix(pat, &mat);
@@ -2253,6 +2301,7 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     , DrawingPanel(_width, _height)
 {
     // FIXME: implement
+    if (!did_init) DrawingPanelInit();
 }
 
 void DXDrawingPanel::DrawArea(wxWindowDC& dc)
@@ -2401,7 +2450,8 @@ void GameArea::HidePointer()
         return;
 
     // FIXME: make time configurable
-    if (fullscreen || (systemGetClock() - mouse_active_time) > 3000) {
+    if ((fullscreen || (systemGetClock() - mouse_active_time) > 3000) &&
+        !(main_frame && (main_frame->MenusOpened() || main_frame->DialogOpened()))) {
         pointer_blanked = true;
         SetCursor(wxCursor(wxCURSOR_BLANK));
 
