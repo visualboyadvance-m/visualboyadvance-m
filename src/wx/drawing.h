@@ -6,14 +6,6 @@
 class BasicDrawingPanel : public DrawingPanel, public wxPanel {
 public:
     BasicDrawingPanel(wxWindow* parent, int _width, int _height);
-    wxWindow* GetWindow()
-    {
-        return this;
-    }
-    void Delete()
-    {
-        Destroy();
-    }
 
 protected:
     void PaintEv2(wxPaintEvent& ev)
@@ -33,14 +25,6 @@ class GLDrawingPanel : public DrawingPanel, public wxGLCanvas {
 public:
     GLDrawingPanel(wxWindow* parent, int _width, int _height);
     virtual ~GLDrawingPanel();
-    wxWindow* GetWindow()
-    {
-        return this;
-    }
-    void Delete()
-    {
-        Destroy();
-    }
 
 protected:
     void PaintEv2(wxPaintEvent& ev)
@@ -64,14 +48,6 @@ protected:
 class DXDrawingPanel : public DrawingPanel, public wxPanel {
 public:
     DXDrawingPanel(wxWindow* parent, int _width, int _height);
-    wxWindow* GetWindow()
-    {
-        return this;
-    }
-    void Delete()
-    {
-        Destroy();
-    }
 
 protected:
     void PaintEv2(wxPaintEvent& ev)
@@ -93,14 +69,6 @@ class CairoDrawingPanel : public DrawingPanel, public wxPanel {
 public:
     CairoDrawingPanel(wxWindow* parent, int _width, int _height);
     ~CairoDrawingPanel();
-    wxWindow* GetWindow()
-    {
-        return this;
-    }
-    void Delete()
-    {
-        Destroy();
-    }
 
 protected:
     void PaintEv2(wxPaintEvent& ev)
