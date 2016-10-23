@@ -47,7 +47,7 @@ SET(SRC_GTK
     soundconfig.cpp
     screenarea.cpp
     screenarea-cairo.cpp
-    #screenarea-opengl.cpp
+    screenarea-opengl.cpp
     tools.cpp
     window.cpp
     ../sdl/inputSDL.cpp

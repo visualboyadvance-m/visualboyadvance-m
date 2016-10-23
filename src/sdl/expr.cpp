@@ -85,14 +85,10 @@ enum yytokentype {
 /* Copy the first part of user declarations.  */
 #line 1 "expr.ypp"
 
-namespace std {
 #include <memory.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-}
-
-using namespace std;
+#include <cstdlib>
 
 #include "../System.h"
 #include "../gba/elf.h"
