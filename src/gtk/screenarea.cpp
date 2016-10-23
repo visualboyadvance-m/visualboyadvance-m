@@ -49,7 +49,7 @@ ScreenArea::ScreenArea(int _iWidth, int _iHeight, int _iScale)
     pixbuf->fill(0);
 
 #if !GTK_CHECK_VERSION(3, 0, 0)
-    m_poEmptyCursor = new Gdk::Cursor(get_display, pixbuf, 0, 0);
+    m_poEmptyCursor = new Gdk::Cursor(get_display(), pixbuf, 0, 0);
 #else
     m_poEmptyCursor = Gdk::Cursor::create(get_display(), pixbuf, 0, 0);
 #endif
