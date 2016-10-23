@@ -628,9 +628,11 @@ public:
     DrawingPanel(int _width, int _height);
     ~DrawingPanel();
     void DrawArea(uint8_t** pixels);
-    // the following wouldn't be necessary with virtual inheritance
-    virtual wxWindow* GetWindow() = 0;
-    virtual void Delete() = 0;
+
+    // using dynamic_cast<> to not force trivial reimplementation in concrete classes
+    // TODO: figure something out for PaintEv as well
+    virtual wxWindow* GetWindow() { return dynamic_cast<wxWindow*>(this); }
+    virtual void Delete() { (dynamic_cast<wxWindow*>(this))->Destroy(); }
 
 protected:
     virtual void DrawArea(wxWindowDC&) = 0;

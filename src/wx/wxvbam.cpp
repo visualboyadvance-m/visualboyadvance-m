@@ -53,7 +53,11 @@ static void get_config_path(wxPathList& path, bool exists = true)
 {
     // we want paths with "visualboyadvance-m" not "vbam", so change appname temporarily
     wxString current_app_name = wxGetApp().GetAppName();
+
+    // keep config path as ~/.vbam on UNIX for now for backcompat
+#if defined(__WXMSW__) || defined(__WXMAC__)
     wxGetApp().SetAppName(_("visualboyadvance-m"));
+#endif
 
     //   local config dir first, then global
     //   locale-specific res first, then main
