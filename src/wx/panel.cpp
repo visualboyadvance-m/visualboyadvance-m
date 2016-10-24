@@ -1041,6 +1041,10 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
         if (pointer_blanked)
             w->SetCursor(wxCursor(wxCURSOR_BLANK));
+
+        // if user changed Display/Scale config, this needs to run
+        AdjustMinSize();
+        AdjustSize(false);
     }
 
     if (!paused && (!pauseWhenInactive || wxGetApp().frame->HasFocus())) {

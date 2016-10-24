@@ -2899,6 +2899,11 @@ bool MainFrame::BindControls()
         tc = SafeXRCCTRL<wxTextCtrl>(d, n);                   \
         tc->SetValidator(wxTextValidator(wxFILTER_NONE, &o)); \
     } while (0)
+#define getgtc(n, o)                                          \
+    do {                                                      \
+        tc = SafeXRCCTRL<wxTextCtrl>(d, n);                   \
+        tc->SetValidator(wxGenericValidator(&o));             \
+    } while (0)
 #ifndef NO_LINK
         {
             net_link_handler.dlg = d;
@@ -3294,7 +3299,7 @@ bool MainFrame::BindControls()
             /// Zoom
             // this was a choice, but I'd rather not have to make an off-by-one
             // validator just for this, and spinctrl is good enough.
-            getsc("DefaultScale", gopts.video_scale);
+            getgtc("DefaultScale", gopts.video_scale);
             getsc("MaxScale", maxScale);
             /// Advanced
             getrbi("OutputSimple", gopts.render_method, RND_SIMPLE);
