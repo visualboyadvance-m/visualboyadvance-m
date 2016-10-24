@@ -1,12 +1,9 @@
 %{
-namespace std {  
 #include <stdio.h>
 #include <memory.h>
-#include <stdlib.h>
 #include <string.h>
 #include <cstdlib>
-}
- 
+
 #include "../System.h"
 #include "../gba/elf.h"
 #include "exprNode.h" 
