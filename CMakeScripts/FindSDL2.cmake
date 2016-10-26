@@ -1,8 +1,21 @@
-
 # This module defines
 # SDL2_LIBRARY, the name of the library to link against
 # SDL2_FOUND, if false, do not try to link to SDL2
 # SDL2_INCLUDE_DIR, where to find SDL.h
+#
+# If you have pkg-config, these extra variables are also defined:
+# SDL2_DEFINITIONS, extra CFLAGS
+# SDL2_EXTRA_LIBS, extra link libs
+# SDL2_LINKER_FLAGS, extra link flags
+#
+# The latter two are automatically added to SDL2_LIBRARY
+#
+# To use them, add code such as:
+#
+# # SET(SDL2_STATIC ON) # if you want to link SDL2 statically
+# FIND_PACKAGE(SDL2 REQUIRED)
+# ADD_DEFINITIONS(${SDL2_DEFINITIONS})
+# TARGET_LINK_LIBRARIES(your-executable-target ${SDL2_LIBRARY} ...)
 #
 # This module responds to the the flag:
 # SDL2_BUILDING_LIBRARY
@@ -11,6 +24,8 @@
 # Otherwise, it is assumed you are building an application and this
 # module will attempt to locate and set the the proper link flags
 # as part of the returned SDL2_LIBRARY variable.
+#
+# If you want to link SDL2 statically, set SDL2_STATIC to ON.
 #
 # Don't forget to include SDLmain.h and SDLmain.m your project for the
 # OS X framework based version. (Other versions link to -lSDL2main which
@@ -47,7 +62,7 @@
 # SDL2_LIBRARY to override this selection or set the CMake environment
 # CMAKE_INCLUDE_PATH to modify the search paths.
 #
-# Note that the header path has changed from SDL2/SDL.h to just SDL.h
+# Note that the header path has changed from SDL3/SDL.h to just SDL.h
 # This needed to change because "proper" SDL convention
 # is #include "SDL.h", not <SDL2/SDL.h>. This is done for portability
 # reasons because not all systems place things in SDL2/ (see FreeBSD).
@@ -86,11 +101,21 @@ FIND_PATH(SDL2_INCLUDE_DIR SDL.h
 	PATHS ${SDL2_SEARCH_PATHS}
 )
 
+SET(CURRENT_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
+
+IF(SDL2_STATIC)
+    IF(WIN32)
+        SET(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a)
+    ELSE(WIN32)
+        SET(CMAKE_FIND_LIBRARY_SUFFIXES .a)
+    ENDIF(WIN32)
+ENDIF(SDL2_STATIC)
+
 FIND_LIBRARY(SDL2_LIBRARY_TEMP
 	NAMES SDL2
 	HINTS
 	$ENV{SDL2DIR}
-	PATH_SUFFIXES lib64 lib
+	PATH_SUFFIXES lib64 lib lib/x64 lib/x86
 	PATHS ${SDL2_SEARCH_PATHS}
 )
 
@@ -104,11 +129,14 @@ IF(NOT SDL2_BUILDING_LIBRARY)
 			NAMES SDL2main
 			HINTS
 			$ENV{SDL2DIR}
-			PATH_SUFFIXES lib64 lib
+			PATH_SUFFIXES lib64 lib lib/x64 lib/x86
 			PATHS ${SDL2_SEARCH_PATHS}
 		)
 	ENDIF(NOT ${SDL2_INCLUDE_DIR} MATCHES ".framework")
 ENDIF(NOT SDL2_BUILDING_LIBRARY)
+
+SET(CMAKE_FIND_LIBRARY_SUFFIXES ${CURRENT_FIND_LIBRARY_SUFFIXES})
+UNSET(CURRENT_FIND_LIBRARY_SUFFIXES)
 
 # SDL2 may require threads on your system.
 # The Apple build may not need an explicit flag because one of the
@@ -118,11 +146,10 @@ IF(NOT APPLE)
 	FIND_PACKAGE(Threads)
 ENDIF(NOT APPLE)
 
-# MinGW needs an additional library, mwindows
-# It's total link flags should look like -lmingw32 -lSDL2main -lSDL2 -lmwindows
-# (Actually on second look, I think it only needs one of the m* libraries.)
+# MinGW needs an additional link flag, -mwindows
+# It's total link flags should look like -lmingw32 -lSDL2main -lSDL2 -mwindows
 IF(MINGW)
-	SET(MINGW32_LIBRARY mingw32 CACHE STRING "mwindows for MinGW")
+	SET(MINGW32_LIBRARY mingw32 "-mwindows" CACHE STRING "mwindows for MinGW")
 ENDIF(MINGW)
 
 IF(SDL2_LIBRARY_TEMP)
@@ -155,6 +182,37 @@ IF(SDL2_LIBRARY_TEMP)
 		SET(SDL2_LIBRARY_TEMP ${MINGW32_LIBRARY} ${SDL2_LIBRARY_TEMP})
 	ENDIF(MINGW)
 
+        # Add some stuff from pkg-config, if available
+        IF(NOT PKG_CONFIG_EXECUTABLE)
+            FIND_PACKAGE(PkgConfig QUIET)
+        ENDIF(NOT PKG_CONFIG_EXECUTABLE)
+
+        IF(PKG_CONFIG_EXECUTABLE)
+            # get any definitions
+            EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE} --cflags-only-other sdl2 OUTPUT_VARIABLE SDL2_DEFINITIONS)
+
+            SET(SDL2_DEFINITIONS ${SDL2_DEFINITIONS} CACHE STRING "Extra CFLAGS for SDL2 from pkg-config")
+
+            # get any extra stuff needed for linking
+            IF(NOT SDL2_STATIC)
+                EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE}          --libs-only-other sdl2 OUTPUT_VARIABLE SDL2_LINKER_FLAGS_RAW    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+                EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE}          --libs-only-l     sdl2 OUTPUT_VARIABLE SDL2_EXTRA_LIBS_RAW      OUTPUT_STRIP_TRAILING_WHITESPACE)
+            ELSE(NOT SDL2_STATIC)
+                EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE} --static --libs-only-other sdl2 OUTPUT_VARIABLE SDL2_LINKER_FLAGS_RAW    OUTPUT_STRIP_TRAILING_WHITESPACE)
+                EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE} --static --libs-only-l     sdl2 OUTPUT_VARIABLE SDL2_EXTRA_LIBS_RAW      OUTPUT_STRIP_TRAILING_WHITESPACE)
+            ENDIF(NOT SDL2_STATIC)
+
+            STRING(REGEX REPLACE "[^ ]+SDL2[^ ]*" ""  SDL2_EXTRA_LIBS_RAW2 "${SDL2_EXTRA_LIBS_RAW}")
+            STRING(REGEX REPLACE " +"             ";" SDL2_EXTRA_LIBS      "${SDL2_EXTRA_LIBS_RAW2}")
+            STRING(REGEX REPLACE " +"             ";" SDL2_LINKER_FLAGS    "${SDL2_LINKER_FLAGS_RAW}")
+
+            SET(SDL2_LINKER_FLAGS ${SDL2_LINKER_FLAGS} CACHE STRING "Linker flags for linking SDL2")
+            SET(SDL2_EXTRA_LIBS   ${SDL2_EXTRA_LIBS}   CACHE STRING "Extra libraries for linking SDL2")
+
+            SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} ${SDL2_EXTRA_LIBS} ${SDL2_LINKER_FLAGS})
+        ENDIF(PKG_CONFIG_EXECUTABLE)
+
 	# Set the final string here so the GUI reflects the final state.
 	SET(SDL2_LIBRARY ${SDL2_LIBRARY_TEMP} CACHE STRING "Where the SDL2 Library can be found")
 	# Set the temp variable to INTERNAL so it is not seen in the CMake GUI
@@ -166,4 +224,3 @@ message("</FindSDL2.cmake>")
 INCLUDE(FindPackageHandleStandardArgs)
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(SDL2 REQUIRED_VARS SDL2_LIBRARY SDL2_INCLUDE_DIR)
-

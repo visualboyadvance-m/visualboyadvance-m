@@ -6,3 +6,5 @@ src/wx/cmdtab.cpp
 src/wx/wxvbam.xrs
 build/
 
+# vim swap files
+*.sw?
