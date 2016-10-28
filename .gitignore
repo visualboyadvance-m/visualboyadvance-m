@@ -8,3 +8,6 @@ build/
 
 # vim swap files
 *.sw?
+
+# mac finder crap
+*.DS_Store

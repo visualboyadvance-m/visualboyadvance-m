@@ -1,8 +1,17 @@
 #Do not use this file directly.  Always use the top level CMakeLists.txt file
 # This build is much easier if we just do it here.
 SET( CMAKE_CXX_FLAGS -std=gnu++11 )
+
 # not yet implemented
-option( ENABLE_CAIRO "Enable Cairo rendering for the wxWidgets port" ON )
+IF(APPLE)
+    # does not work, no reason to link to it
+    SET(CAIRO_DEFAULT OFF)
+ELSE(APPLE)
+    SET(CAIRO_DEFAULT ON)
+ENDIF(APPLE)
+
+option(ENABLE_CAIRO "Enable Cairo rendering for the wxWidgets port" ${CAIRO_DEFAULT})
+
 if( WIN32 )
   # not yet implemented
   option( ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" ON )
@@ -201,6 +210,11 @@ SET(VBAM_ICON vbam.icns)
 
 SET(VBAM_ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icons/${VBAM_ICON})
 
+IF(APPLE)
+    SET(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+    SET(CMAKE_INSTALL_RPATH "@loader_path/../Frameworks")
+ENDIF(APPLE)
+
 ADD_EXECUTABLE (
     visualboyadvance-m
     WIN32
@@ -232,6 +246,9 @@ if(APPLE)
     SET_PROPERTY(TARGET visualboyadvance-m APPEND PROPERTY MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/wxplist.in)
     SET(MACOSX_BUNDLE_ICON_FILE ${VBAM_ICON})
     SET_SOURCE_FILES_PROPERTIES(${VBAM_ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
+    ADD_CUSTOM_COMMAND(TARGET visualboyadvance-m POST_BUILD
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/osx/third_party_libs_tool "$<TARGET_FILE_DIR:visualboyadvance-m>/../..")
 endif(APPLE)
 
 SET(WX_EXE_NAME visualboyadvance-m-wx${CMAKE_EXECUTABLE_SUFFIX})
