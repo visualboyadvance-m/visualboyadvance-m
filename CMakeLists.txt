@@ -65,13 +65,6 @@ ELSE()
     ADD_DEFINITIONS(-DNDEBUG)
 ENDIF()
 
-# Fill in SDLMAIN_LIBRARY on OS X manually to avoid using SDLMain.m
-# OS X users will have to compile and install SDL from source.
-if( APPLE AND ENABLE_SDL )
-    ADD_DEFINITIONS (-DwxMAC_USE_CORE_GRAPHICS )
-    SET(SDL2MAIN_LIBRARY "-lSDL2main")
-endif( APPLE AND ENABLE_SDL )
-
 # Add support for Homebrew, MacPorts and Fink on OS X
 # as well as for ObjectiveC code
 IF(APPLE)
@@ -107,7 +100,7 @@ IF(APPLE)
 
     # and compile as Objective-C++ for ObjectiveC #ifdefs
     SET(CMAKE_CXX_COMPILE_OBJECT "<CMAKE_CXX_COMPILER> -x objective-c++ <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT> -c <SOURCE>")
-ENDIF()
+ENDIF(APPLE)
 
 # We do not support amd64 asm yet
 IF((ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX)
@@ -129,17 +122,26 @@ if( ENABLE_ASM_SCALERS )
 endif( ENABLE_ASM_SCALERS )
 
 # Look for some dependencies using CMake scripts
-FIND_PACKAGE ( ZLIB REQUIRED )
-FIND_PACKAGE ( PNG REQUIRED )
-FIND_PACKAGE ( OpenGL REQUIRED )
-FIND_PACKAGE ( SDL2 REQUIRED )
+FIND_PACKAGE(ZLIB REQUIRED)
+FIND_PACKAGE(OpenGL REQUIRED)
+
+# TODO: make static on mac
+FIND_PACKAGE(PNG REQUIRED)
+
+IF(APPLE)
+    SET(SDL2_STATIC ON)
+ENDIF(APPLE)
+
+FIND_PACKAGE(SDL2 REQUIRED)
+ADD_DEFINITIONS(${SDL2_DEFINITIONS})
 
 if( ENABLE_LINK )
-    if( WIN32 )
+    if(WIN32 OR APPLE)
         set(SFML_STATIC_LIBRARIES TRUE)
-    endif( WIN32 )
+    endif(WIN32 OR APPLE)
     FIND_PACKAGE ( SFML 2 COMPONENTS network system )
 endif( ENABLE_LINK )
+
 # set the standard libraries all ports use
 SET(VBAMCORE_LIBS
     vbamcore

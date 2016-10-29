@@ -6,3 +6,8 @@ src/wx/cmdtab.cpp
 src/wx/wxvbam.xrs
 build/
 
+# vim swap files
+*.sw?
+
+# mac finder crap
+*.DS_Store

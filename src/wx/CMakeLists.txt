@@ -1,14 +1,27 @@
 #Do not use this file directly.  Always use the top level CMakeLists.txt file
 # This build is much easier if we just do it here.
 SET( CMAKE_CXX_FLAGS -std=gnu++11 )
+
 # not yet implemented
-option( ENABLE_CAIRO "Enable Cairo rendering for the wxWidgets port" ON )
+IF(APPLE)
+    # does not work, no reason to link to it
+    SET(CAIRO_DEFAULT OFF)
+ELSE(APPLE)
+    SET(CAIRO_DEFAULT ON)
+ENDIF(APPLE)
+
+option(ENABLE_CAIRO "Enable Cairo rendering for the wxWidgets port" ${CAIRO_DEFAULT})
+
 if( WIN32 )
   # not yet implemented
   option( ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" ON )
   option( ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ON )
 endif( WIN32 )
 option( ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" ON )
+
+IF(APPLE)
+    ADD_DEFINITIONS(-DwxMAC_USE_CORE_GRAPHICS)
+ENDIF(APPLE)
 
 if( NOT ENABLE_CAIRO )
     ADD_DEFINITIONS (-DNO_CAIRO)
@@ -37,6 +50,10 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
         ADD_DEFINITIONS(-DwxDEBUG_LEVEL=1)
     ENDIF()
 ENDIF()
+
+IF(APPLE)
+    SET(wxWidgets_USE_STATIC ON)
+ENDIF(APPLE)
 
 SET(wxWidgets_USE_UNICODE ON)
 # adv is for wxAboutBox
@@ -189,7 +206,14 @@ ENDIF( WIN32 )
 
 link_directories( ${CMAKE_BINARY_DIR} )
 
-SET(VBAM_ICON ${CMAKE_CURRENT_SOURCE_DIR}/icons/vbam.icns)
+SET(VBAM_ICON vbam.icns)
+
+SET(VBAM_ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icons/${VBAM_ICON})
+
+IF(APPLE)
+    SET(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+    SET(CMAKE_INSTALL_RPATH "@loader_path/../Frameworks")
+ENDIF(APPLE)
 
 ADD_EXECUTABLE (
     visualboyadvance-m
@@ -198,7 +222,7 @@ ADD_EXECUTABLE (
     ${SRC_WX}
     ${HDR_WX}
     ${RES_WX}
-    ${VBAM_ICON}
+    ${VBAM_ICON_PATH}
     ${CM_STUFF}
 )
 
@@ -221,7 +245,10 @@ if(APPLE)
     # this should set ROM file types correctly
     SET_PROPERTY(TARGET visualboyadvance-m APPEND PROPERTY MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/wxplist.in)
     SET(MACOSX_BUNDLE_ICON_FILE ${VBAM_ICON})
-    SET_SOURCE_FILES_PROPERTIES(${VBAM_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    SET_SOURCE_FILES_PROPERTIES(${VBAM_ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
+    ADD_CUSTOM_COMMAND(TARGET visualboyadvance-m POST_BUILD
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/osx/third_party_libs_tool "$<TARGET_FILE_DIR:visualboyadvance-m>/../..")
 endif(APPLE)
 
 SET(WX_EXE_NAME visualboyadvance-m-wx${CMAKE_EXECUTABLE_SUFFIX})
