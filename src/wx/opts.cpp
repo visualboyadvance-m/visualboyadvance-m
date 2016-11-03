@@ -293,7 +293,10 @@ opts_t::opts_t()
     if (max_threads < 0)
         max_threads = 2;
 
-    audio_buffers = 5;
+    // 10 fixes stuttering on mac with openal, as opposed to 5
+    // also should be better for modern hardware in general
+    audio_buffers = 10;
+
     sound_en = 0x30f;
     sound_vol = 100;
     sound_qual = 1;

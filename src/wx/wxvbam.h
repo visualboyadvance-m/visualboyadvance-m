@@ -630,10 +630,10 @@ public:
     void DrawArea(uint8_t** pixels);
 
     // using dynamic_cast<> to not force trivial reimplementation in concrete classes
-    // TODO: figure something out for PaintEv as well
     virtual wxWindow* GetWindow() { return dynamic_cast<wxWindow*>(this); }
     virtual void Delete() { (dynamic_cast<wxWindow*>(this))->Destroy(); }
 
+    void PaintEv(wxPaintEvent& ev);
 protected:
     virtual void DrawArea(wxWindowDC&) = 0;
     virtual void DrawOSD(wxWindowDC&);
@@ -650,13 +650,6 @@ protected:
     const RENDER_PLUGIN_INFO* rpi; // also flag indicating plugin loaded
     // largest buffer required is 32-bit * (max width + 1) * (max height + 2)
     uint8_t delta[257 * 4 * 226];
-
-    // following can't work in 2.8 as intended
-    // inheriting from wxEvtHandler is required, but also breaks subclasses
-    // due to lack of virtual inheritance (2.9 drops wxEvtHandler req)
-    // so each child must have a paint event handler (not override of this,
-    // but it's not virtual anyway, so that won't happen) that calls this
-    void PaintEv(wxPaintEvent& ev);
 
     DECLARE_ABSTRACT_CLASS()
 };

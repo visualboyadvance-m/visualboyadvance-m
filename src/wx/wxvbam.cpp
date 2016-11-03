@@ -71,13 +71,19 @@ static void get_config_path(wxPathList& path, bool exists = true)
             path.Add(s);                                                                                     \
     } while (0)
 
-    vbamDebug("GetUserLocalDataDir(): %s", static_cast<const char*>(stdp.GetUserLocalDataDir().utf8_str()));
-    vbamDebug("GetUserDataDir(): %s", static_cast<const char*>(stdp.GetUserDataDir().utf8_str()));
-    vbamDebug("GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()): %s", static_cast<const char*>(stdp.GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()).utf8_str()));
-    vbamDebug("GetResourcesDir(): %s", static_cast<const char*>(stdp.GetResourcesDir().utf8_str()));
-    vbamDebug("GetDataDir(): %s", static_cast<const char*>(stdp.GetDataDir().utf8_str()));
-    vbamDebug("GetLocalDataDir(): %s", static_cast<const char*>(stdp.GetLocalDataDir().utf8_str()));
-    vbamDebug("GetPluginsDir(): %s", static_cast<const char*>(stdp.GetPluginsDir().utf8_str()));
+    static bool debug_dumped = false;
+
+    if (!debug_dumped) {
+        vbamDebug("GetUserLocalDataDir(): %s", static_cast<const char*>(stdp.GetUserLocalDataDir().utf8_str()));
+        vbamDebug("GetUserDataDir(): %s", static_cast<const char*>(stdp.GetUserDataDir().utf8_str()));
+        vbamDebug("GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()): %s", static_cast<const char*>(stdp.GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()).utf8_str()));
+        vbamDebug("GetResourcesDir(): %s", static_cast<const char*>(stdp.GetResourcesDir().utf8_str()));
+        vbamDebug("GetDataDir(): %s", static_cast<const char*>(stdp.GetDataDir().utf8_str()));
+        vbamDebug("GetLocalDataDir(): %s", static_cast<const char*>(stdp.GetLocalDataDir().utf8_str()));
+        vbamDebug("GetPluginsDir(): %s", static_cast<const char*>(stdp.GetPluginsDir().utf8_str()));
+        
+        debug_dumped = true;
+    }
 
     // NOTE: this does not support XDG (freedesktop.org) paths
     add_path(GetUserLocalDataDir());
@@ -591,10 +597,16 @@ EVT_CONTEXT_MENU(MainFrame::OnMenu)
 EVT_ACTIVATE(MainFrame::OnActivate)
 // requires DragAcceptFiles(true); even then may not do anything
 EVT_DROP_FILES(MainFrame::OnDropFile)
+
 // pause game if menu pops up
+//
+// this causes problems with keyboard game keys on mac, disable for now
+#ifndef __WXMAC__
 EVT_MENU_OPEN(MainFrame::MenuPopped)
 EVT_MENU_CLOSE(MainFrame::MenuPopped)
 EVT_MENU_HIGHLIGHT_ALL(MainFrame::MenuPopped)
+#endif
+
 END_EVENT_TABLE()
 
 void MainFrame::OnActivate(wxActivateEvent& event)
