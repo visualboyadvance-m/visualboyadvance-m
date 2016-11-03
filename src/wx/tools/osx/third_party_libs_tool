@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version=0.1
+version=0.6
 
 main() {
     # parse options
@@ -32,7 +32,7 @@ main() {
 
     mktmp
 
-    app_bundle=$(echo "$1" | fully_resolve_links | sed 's,/*$,,')
+    app_bundle=$(echo "$1" | fully_resolve_links)
 
     case "$app_bundle" in
         *.app|*.APP)
@@ -146,10 +146,14 @@ lib_scan() {
 
 fully_resolve_links() {
     while read -r file; do
+        # get initial part for non-absolute path, or blank for absolute
+        path=${file%%/*}
+        # and set $file to the rest
+        file=${file#*/}
+
         OLDIFS=$IFS
         IFS='
 '
-        path=
         for part in $(echo "$file" | sed 's,^/*,,; s,/*$,,; s,//*,\
 ,g'); do
             path=$(resolve_link "$path/$part")
@@ -168,6 +172,9 @@ fully_resolve_links() {
             esac
         done
 
+        # remove trailing /s
+        path=$(echo "$path" | sed 's,/*$,,')
+
         echo "$path"
     done
 }
@@ -176,7 +183,7 @@ resolve_link() {
     file="$1"
 
     while [ -h "$file" ]; do
-        ls0=`ls -l "$file"`
+        ls0=`ls -ld "$file"`
         new_link=`expr "$ls0" : '.* -> \(.*\)$'`
         if expr "$new_link" : '/.*' > /dev/null; then
             file="$new_link"
@@ -234,9 +241,28 @@ relink() {
         head -1
     )
 
-    if [ -n "$lib_link_path" ]; then
-        install_name_tool -change "$lib_link_path" "@rpath/$lib_basename" "$target"
+    [ -z "$lib_link_path" ] && return 0
+
+    # check that the shorter basename is the prefix of the longer basename
+    # that is, the lib versions match
+    lib1=${lib_basename%.dylib}
+    lib2=${lib_link_path##*/}
+    lib2=${lib2%.dylib}
+
+    if [ "${#lib1}" -le "${#lib2}" ]; then
+        shorter=$lib1
+        longer=$lib2
+    else
+        shorter=$lib2
+        longer=$lib1
     fi
+
+    case "$longer" in
+        "$shorter"*)
+            # and if so, relink target to the lib
+            install_name_tool -change "$lib_link_path" "@rpath/$lib_basename" "$target"
+            ;;
+    esac
 }
 
 # try with sudo in case it fails,

@@ -2,7 +2,7 @@
 // these are all the viewer dialogs except for the ones with graphical areas
 // they can be instantiated multiple times
 
-#include <cstdint>
+#include "../common/cstdint.h"
 
 #include "../gba/armdis.h"
 #include "viewsupt.h"

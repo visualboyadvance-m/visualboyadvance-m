@@ -1,7 +1,7 @@
 #ifndef PATCH_H
 #define PATCH_H
 
-#include <cstdint>
+#include "cstdint.h"
 
 bool applyPatch(const char *patchname, uint8_t **rom, int *size);
 

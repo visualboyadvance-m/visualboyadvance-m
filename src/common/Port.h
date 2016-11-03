@@ -1,7 +1,7 @@
 #ifndef PORT_H
 #define PORT_H
 
-#include <cstdint>
+#include "cstdint.h"
 
 #ifdef __CELLOS_LV2__
 /* PlayStation3 */

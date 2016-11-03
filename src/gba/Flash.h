@@ -1,7 +1,7 @@
 #ifndef FLASH_H
 #define FLASH_H
 
-#include <cstdint>
+#include "../common/cstdint.h"
 #include <zlib.h>
 
 #define FLASH_128K_SZ 0x20000
