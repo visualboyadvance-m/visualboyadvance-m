@@ -249,7 +249,7 @@ if(APPLE)
 
     # budle dylibs and relink them for releasing .app
     # but only in Release mode
-    IF(CMAKE_BUILD_TYPE STREQUAL "Release")
+    IF(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
         ADD_CUSTOM_COMMAND(TARGET visualboyadvance-m POST_BUILD
             COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/osx/third_party_libs_tool "$<TARGET_FILE_DIR:visualboyadvance-m>/../..")
     ENDIF()
