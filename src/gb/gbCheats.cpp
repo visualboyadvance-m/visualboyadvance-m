@@ -64,7 +64,7 @@ void gbCheatsReadGame(gzFile gzFile, int version)
     } else {
         gbCheatNumber = utilReadInt(gzFile);
 
-        if (gbCheatNumber > 0) {
+        if (gbCheatNumber > 0 && gbCheatNumber <= MAX_CHEATS) {
             utilGzRead(gzFile, &gbCheatList[0], sizeof(gbCheat) * gbCheatNumber);
         }
     }
