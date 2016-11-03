@@ -1029,7 +1029,6 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
         wxWindow* w = panel->GetWindow();
         w->SetBackgroundStyle(wxBG_STYLE_CUSTOM);
-        w->Enable(false); // never give it the keyboard focus
         w->SetSize(wxSize(basic_width, basic_height));
 
         if (maxScale)
@@ -1045,6 +1044,13 @@ void GameArea::OnIdle(wxIdleEvent& event)
         // if user changed Display/Scale config, this needs to run
         AdjustMinSize();
         AdjustSize(false);
+
+        // set focus to panel
+        w->SetFocus();
+
+        // capture keyboard events
+        w->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(GameArea::OnKeyDown), NULL, this);
+        w->Connect(wxEVT_KEY_UP,    wxKeyEventHandler(GameArea::OnKeyUp),   NULL, this);
     }
 
     if (!paused && (!pauseWhenInactive || wxGetApp().frame->HasFocus())) {
@@ -1125,8 +1131,10 @@ static uint32_t bmask[NUM_KEYS] = {
 
 static wxJoyKeyBinding_v keys_pressed;
 
-static void process_key_press(bool down, int key, int mod, int joy = 0)
+static bool process_key_press(bool down, int key, int mod, int joy = 0)
 {
+    static bool in_game_key = false;
+
     // check if key is already pressed
     int kpno;
 
@@ -1137,14 +1145,14 @@ static void process_key_press(bool down, int key, int mod, int joy = 0)
     if (kpno < keys_pressed.size()) {
         // double press is noop
         if (down)
-            return;
+            return in_game_key;
 
         // otherwise forget it
         keys_pressed.erase(keys_pressed.begin() + kpno);
     } else {
         // double release is noop
         if (!down)
-            return;
+            return in_game_key;
 
         // otherwise remember it
         // c++0x
@@ -1153,6 +1161,8 @@ static void process_key_press(bool down, int key, int mod, int joy = 0)
         keys_pressed.push_back(jb);
     }
 
+    bool matched_game_key = false;
+
     // find all game keys this is bound to
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < NUM_KEYS; j++) {
@@ -1160,8 +1170,10 @@ static void process_key_press(bool down, int key, int mod, int joy = 0)
 
             for (int k = 0; k < b.size(); k++)
                 if (b[k].key == key && b[k].mod == mod && b[k].joy == joy) {
-                    if (down)
+                    if (down) {
                         joypress[i] |= bmask[j];
+                        matched_game_key = true;
+                    }
                     else {
                         // only release if no others pressed
                         int k2;
@@ -1178,25 +1190,29 @@ static void process_key_press(bool down, int key, int mod, int joy = 0)
                                 break;
                         }
 
-                        if (k2 == b.size())
+                        if (k2 == b.size()) {
                             joypress[i] &= ~bmask[j];
+                            matched_game_key = true;
+                        }
                     }
 
                     break;
                 }
         }
+
+    in_game_key = matched_game_key;
+
+    return in_game_key;
 }
 
 void GameArea::OnKeyDown(wxKeyEvent& ev)
 {
-    process_key_press(true, ev.GetKeyCode(), 0 /* ev.GetModifiers() */);
-    ev.Skip(); // process accelerators
+    ev.Skip(!process_key_press(true, ev.GetKeyCode(), 0 /* ev.GetModifiers() */));
 }
 
 void GameArea::OnKeyUp(wxKeyEvent& ev)
 {
-    process_key_press(false, ev.GetKeyCode(), 0 /* ev.GetModifiers() */);
-    ev.Skip(); // process accelerators
+    ev.Skip(!process_key_press(false, ev.GetKeyCode(), 0 /* ev.GetModifiers() */));
 }
 
 void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
@@ -1378,6 +1394,11 @@ DrawingPanel::DrawingPanel(int _width, int _height)
 
 void DrawingPanel::DrawingPanelInit()
 {
+    wxWindow* w = dynamic_cast<wxWindow*>(this);
+
+    // this is not 2.8 compatible, sorry
+    w->Bind(wxEVT_PAINT, &DrawingPanel::PaintEv, this);
+
     did_init = true;
 }
 
@@ -1894,13 +1915,9 @@ DrawingPanel::~DrawingPanel()
 
 IMPLEMENT_CLASS2(BasicDrawingPanel, DrawingPanel, wxPanel)
 
-BEGIN_EVENT_TABLE(BasicDrawingPanel, wxPanel)
-EVT_PAINT(BasicDrawingPanel::PaintEv2)
-END_EVENT_TABLE()
-
 BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
     : wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetSize(),
-          wxFULL_REPAINT_ON_RESIZE)
+          wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
     , DrawingPanel(_width, _height)
 {
     // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
@@ -1980,11 +1997,6 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 
 IMPLEMENT_CLASS2(GLDrawingPanel, DrawingPanel, wxGLCanvas)
 
-// this would be easier in 2.9
-BEGIN_EVENT_TABLE(GLDrawingPanel, wxGLCanvas)
-EVT_PAINT(GLDrawingPanel::PaintEv2)
-END_EVENT_TABLE()
-
 // This is supposed to be the default, but DOUBLEBUFFER doesn't seem to be
 // turned on by default for wxGTK.
 static int glopts[] = {
@@ -2001,7 +2013,7 @@ static int glopts[] = {
 
 GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
     : glc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetSize(),
-          wxFULL_REPAINT_ON_RESIZE)
+          wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
     , DrawingPanel(_width, _height)
 {
 #ifdef __WXMAC__
@@ -2166,13 +2178,9 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 
 IMPLEMENT_CLASS(CairoDrawingPanel, DrawingPanel)
 
-BEGIN_EVENT_TABLE(CairoDrawingPanel, wxPanel)
-EVT_PAINT(CairoDrawingPanel::PaintEv2)
-END_EVENT_TABLE()
-
 CairoDrawingPanel::CairoDrawingPanel(wxWindow* parent, int _width, int _height)
     : wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetSize(),
-          wxFULL_REPAINT_ON_RESIZE)
+          wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
     , DrawingPanel(_width, _height)
 {
     conv_surf = NULL;
@@ -2295,13 +2303,9 @@ void CairoDrawingPanel::DrawArea(wxWindowDC& dc)
 
 IMPLEMENT_CLASS(DXDrawingPanel, DrawingPanel)
 
-BEGIN_EVENT_TABLE(DXDrawingPanel, wxPanel)
-EVT_PAINT(DXDrawingPanel::PaintEv2)
-END_EVENT_TABLE()
-
 DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     : wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetSize(),
-          wxFULL_REPAINT_ON_RESIZE)
+          wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
     , DrawingPanel(_width, _height)
 {
     // FIXME: implement

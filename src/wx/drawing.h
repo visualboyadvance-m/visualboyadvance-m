@@ -8,14 +8,9 @@ public:
     BasicDrawingPanel(wxWindow* parent, int _width, int _height);
 
 protected:
-    void PaintEv2(wxPaintEvent& ev)
-    {
-        PaintEv(ev);
-    }
     void DrawArea(wxWindowDC& dc);
 
     DECLARE_CLASS()
-    DECLARE_EVENT_TABLE()
 };
 
 #ifndef NO_OGL
@@ -27,10 +22,6 @@ public:
     virtual ~GLDrawingPanel();
 
 protected:
-    void PaintEv2(wxPaintEvent& ev)
-    {
-        PaintEv(ev);
-    }
     void DrawArea(wxWindowDC& dc);
 #if wxCHECK_VERSION(2, 9, 0)
     wxGLContext* ctx;
@@ -40,7 +31,6 @@ protected:
     int texsize;
 
     DECLARE_CLASS()
-    DECLARE_EVENT_TABLE()
 };
 #endif
 
@@ -50,15 +40,10 @@ public:
     DXDrawingPanel(wxWindow* parent, int _width, int _height);
 
 protected:
-    void PaintEv2(wxPaintEvent& ev)
-    {
-        PaintEv(ev);
-    }
     void DrawArea(wxWindowDC&);
     void DrawingPanelInit();
 
     DECLARE_CLASS()
-    DECLARE_EVENT_TABLE()
 };
 #endif
 
@@ -71,15 +56,10 @@ public:
     ~CairoDrawingPanel();
 
 protected:
-    void PaintEv2(wxPaintEvent& ev)
-    {
-        PaintEv(ev);
-    }
     void DrawArea(wxWindowDC&);
     cairo_surface_t* conv_surf;
 
     DECLARE_CLASS()
-    DECLARE_EVENT_TABLE()
 };
 #endif
 
