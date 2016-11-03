@@ -1,7 +1,7 @@
 #ifndef GBMEMORY_H
 #define GBMEMORY_H
 
-#include <cstdint>
+#include "../common/cstdint.h"
 #include <time.h>
 
 struct mapperMBC1 {

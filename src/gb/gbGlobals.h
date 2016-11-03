@@ -1,7 +1,7 @@
 #ifndef GBGLOBALS_H
 #define GBGLOBALS_H
 
-#include <cstdint>
+#include "../common/cstdint.h"
 
 extern int gbRomSizeMask;
 extern int gbRomSize;

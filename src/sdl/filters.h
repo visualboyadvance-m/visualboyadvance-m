@@ -19,7 +19,7 @@
 #ifndef VBA_SDL_FILTERS_H
 #define VBA_SDL_FILTERS_H
 
-#include <cstdint>
+#include "../common/cstdint.h"
 
 #include "../System.h"
 

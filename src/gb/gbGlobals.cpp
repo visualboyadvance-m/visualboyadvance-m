@@ -1,5 +1,5 @@
 #include <cstddef>
-#include <cstdint>
+#include "../common/cstdint.h"
 
 uint8_t* gbMemoryMap[16];
 

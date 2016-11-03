@@ -30,6 +30,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
 #include <OpenGL/glext.h>
 #include <OpenGL/glu.h>
 #else

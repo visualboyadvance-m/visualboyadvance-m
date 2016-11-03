@@ -1,7 +1,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#include <cstdint>
+#include "common/cstdint.h"
 
 #ifndef __LIBRETRO__
 #include <zlib.h>

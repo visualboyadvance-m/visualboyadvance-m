@@ -22,7 +22,14 @@ double HiDPIAware::HiDPIScaleFactor()
 {
     if (hidpi_scale_factor == 0) {
 #ifdef __WXMAC__
-        hidpi_scale_factor = [[(NSView*)GetWindow()->GetHandle() window] backingScaleFactor];
+        NSWindow* window = [(NSView*)GetWindow()->GetHandle() window];
+
+        if ([window respondsToSelector:@selector(backingScaleFactor)]) {
+            hidpi_scale_factor = [window backingScaleFactor];
+        }
+        else {
+            hidpi_scale_factor = 1.0;
+        }
 #else
         hidpi_scale_factor = 1.0;
 #endif
@@ -2017,7 +2024,11 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
     , DrawingPanel(_width, _height)
 {
 #ifdef __WXMAC__
-    [(NSView *)GetHandle() setWantsBestResolutionOpenGLSurface:YES];
+    NSView* view = (NSView*)GetHandle();
+
+    if ([view respondsToSelector:@selector(setWantsBestResolutionOpenGLSurface:)]) {
+        [view setWantsBestResolutionOpenGLSurface:YES];
+    }
 #endif
 #if wxCHECK_VERSION(2, 9, 0)
     ctx = new wxGLContext(this);
