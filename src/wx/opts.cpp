@@ -282,6 +282,10 @@ opts_t::opts_t()
     audio_api     = AUD_OPENAL;
     render_method = RND_OPENGL;
 #endif
+#ifdef __WXGTK__
+    audio_api     = AUD_OPENAL;
+    render_method = RND_OPENGL;
+#endif
 #endif
     video_scale = 3;
     retain_aspect = true;
