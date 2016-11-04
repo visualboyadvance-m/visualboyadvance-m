@@ -2579,6 +2579,9 @@ void cheatsReadGame(gzFile file, int version)
     cheatsNumber = 0;
 
     cheatsNumber = utilReadInt(file);
+    
+    if (cheatsNumber > MAX_CHEATS)
+        cheatsNumber = MAX_CHEATS;
 
     if (version > 8)
         utilGzRead(file, cheatsList, sizeof(cheatsList));
