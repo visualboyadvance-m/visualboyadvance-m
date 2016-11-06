@@ -5,7 +5,7 @@
 - [ ] Fix the libretro interface
 - [ ] Next will be removing the majority of the interface code and going straight libretro (Will make it easier to maintain one interface that's platform independent.
 - [ ] add OnSize handler for GLDrawingPanel in wx back to reset the GL viewport, and set viewport on init as well
-- [ ] fix wx accels that are a game key with a modifier, e.g. ALT+ENTER when ENTER is a game key 
+- [x] fix wx accels that are a game key with a modifier, e.g. ALT+ENTER when ENTER is a game key 
 - [ ] add an option to the video config dialog to choose native or non-native fullscreen for Mac (and check if the OS supports it)
 - [ ] fix SFML cmake stuff to detect brew SFML on Mac
 - [ ] update FindSDL2.cmake to use sdl2-config if available and pkg-config is not, get PR merged upstream
