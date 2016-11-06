@@ -153,6 +153,10 @@ SET( SRC_WX
    xrc/vbam.xpm
 )
 
+IF(APPLE)
+    SET(SRC_WX ${SRC_WX} macsupport.mm)
+ENDIF(APPLE)
+
 SET( HDR_WX
    wxvbam.h
    drawing.h

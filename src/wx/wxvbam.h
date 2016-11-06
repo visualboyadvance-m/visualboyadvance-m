@@ -345,7 +345,8 @@ private:
 // helper class to add HiDPI awareness (mostly for Mac OS X)
 class HiDPIAware {
 public:
-    double HiDPIScaleFactor();
+    virtual double HiDPIScaleFactor();
+    virtual void RequestHighResolutionOpenGLSurface();
     virtual wxWindow* GetWindow() = 0;
 private:
     double hidpi_scale_factor = 0;
