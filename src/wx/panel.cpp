@@ -1,10 +1,5 @@
 #include <wx/dcbuffer.h>
 
-#ifdef __WXMAC__
-#import <Foundation/Foundation.h>
-#import <Cocoa/Cocoa.h>
-#endif
-
 #include "../../version.h"
 #include "../common/ConfigManager.h"
 #include "../common/Patch.h"
@@ -17,26 +12,6 @@
 #include "wxvbam.h"
 
 int emulating;
-
-double HiDPIAware::HiDPIScaleFactor()
-{
-    if (hidpi_scale_factor == 0) {
-#ifdef __WXMAC__
-        NSWindow* window = [(NSView*)GetWindow()->GetHandle() window];
-
-        if ([window respondsToSelector:@selector(backingScaleFactor)]) {
-            hidpi_scale_factor = [window backingScaleFactor];
-        }
-        else {
-            hidpi_scale_factor = 1.0;
-        }
-#else
-        hidpi_scale_factor = 1.0;
-#endif
-    }
-
-    return hidpi_scale_factor;
-}
 
 IMPLEMENT_DYNAMIC_CLASS(GameArea, wxPanel)
 
@@ -2023,13 +1998,7 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
           wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
     , DrawingPanel(_width, _height)
 {
-#ifdef __WXMAC__
-    NSView* view = (NSView*)GetHandle();
-
-    if ([view respondsToSelector:@selector(setWantsBestResolutionOpenGLSurface:)]) {
-        [view setWantsBestResolutionOpenGLSurface:YES];
-    }
-#endif
+    RequestHighResolutionOpenGLSurface();
 #if wxCHECK_VERSION(2, 9, 0)
     ctx = new wxGLContext(this);
     SetCurrent(*ctx);
@@ -2479,3 +2448,19 @@ void GameArea::HidePointer()
             panel->GetWindow()->SetCursor(wxCursor(wxCURSOR_BLANK));
     }
 }
+
+// stub HiDPI methods, see macsupport.mm for the Mac support
+#ifndef __WXMAC__
+double HiDPIAware::HiDPIScaleFactor()
+{
+    if (hidpi_scale_factor == 0) {
+        hidpi_scale_factor = 1.0;
+    }
+
+    return hidpi_scale_factor;
+}
+
+void HiDPIAware::RequestHighResolutionOpenGLSurface()
+{
+}
+#endif // HiDPI stubs

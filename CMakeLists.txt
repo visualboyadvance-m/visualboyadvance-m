@@ -97,9 +97,6 @@ IF(APPLE)
     ELSEIF(EXISTS /sw/bin)
         SET(CMAKE_PROGRAM_PATH "${CMAKE_PROGRAM_PATH};/sw/bin")
     ENDIF()
-
-    # and compile as Objective-C++ for ObjectiveC #ifdefs
-    SET(CMAKE_CXX_COMPILE_OBJECT "<CMAKE_CXX_COMPILER> -x objective-c++ <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT> -c <SOURCE>")
 ENDIF(APPLE)
 
 # We do not support amd64 asm yet
