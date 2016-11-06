@@ -1214,12 +1214,12 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
 
 void GameArea::OnKeyDown(wxKeyEvent& ev)
 {
-    ev.Skip(!process_key_press(true, ev.GetKeyCode(), 0 /* ev.GetModifiers() */));
+    ev.Skip(!process_key_press(true, ev.GetKeyCode(), ev.GetModifiers()));
 }
 
 void GameArea::OnKeyUp(wxKeyEvent& ev)
 {
-    ev.Skip(!process_key_press(false, ev.GetKeyCode(), 0 /* ev.GetModifiers() */));
+    ev.Skip(!process_key_press(false, ev.GetKeyCode(), ev.GetModifiers()));
 }
 
 void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
