@@ -347,6 +347,7 @@ class HiDPIAware {
 public:
     virtual double HiDPIScaleFactor();
     virtual void RequestHighResolutionOpenGLSurface();
+    virtual void GetRealPixelClientSize(int* x, int* y);
     virtual wxWindow* GetWindow() = 0;
 private:
     double hidpi_scale_factor = 0;

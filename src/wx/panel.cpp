@@ -2037,12 +2037,9 @@ void GLDrawingPanel::DrawingPanelInit()
 
     DrawingPanel::DrawingPanelInit();
 
-#ifdef DEBUG
-    // you can use this to check that the gl surface is indeed high res
-    GLint m_viewport[4];
-    glGetIntegerv(GL_VIEWPORT, m_viewport);
-    vbamDebug("GL VIEWPORT: %d, %d, %d, %d", m_viewport[0], m_viewport[1], m_viewport[2], m_viewport[3]);
-#endif
+    AdjustViewport();
+
+    Connect(wxEVT_SIZE, wxSizeEventHandler(GLDrawingPanel::OnSize), NULL, this);
 
     // taken from GTK front end almost verbatim
     glDisable(GL_CULL_FACE);
@@ -2120,6 +2117,25 @@ void GLDrawingPanel::DrawingPanelInit()
 //#warning no vsync support on this platform
 #endif
 #endif
+#endif
+}
+
+void GLDrawingPanel::OnSize(wxSizeEvent& ev)
+{
+    AdjustViewport();
+}
+
+void GLDrawingPanel::AdjustViewport()
+{
+    int x, y;
+    GetRealPixelClientSize(&x, &y);
+    glViewport(0, 0, x, y);
+
+#ifdef DEBUG
+    // you can use this to check that the gl surface is indeed high res
+    GLint m_viewport[4];
+    glGetIntegerv(GL_VIEWPORT, m_viewport);
+    vbamDebug("GL VIEWPORT: %d, %d, %d, %d", m_viewport[0], m_viewport[1], m_viewport[2], m_viewport[3]);
 #endif
 }
 
@@ -2462,5 +2478,10 @@ double HiDPIAware::HiDPIScaleFactor()
 
 void HiDPIAware::RequestHighResolutionOpenGLSurface()
 {
+}
+
+void HiDPIAware::GetRealPixelClientSize(int* x, int* y)
+{
+    GetWindow()->GetClientSize(x, y);
 }
 #endif // HiDPI stubs

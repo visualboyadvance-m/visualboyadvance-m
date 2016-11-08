@@ -23,6 +23,8 @@ public:
 
 protected:
     void DrawArea(wxWindowDC& dc);
+    void OnSize(wxSizeEvent& ev);
+    void AdjustViewport();
 #if wxCHECK_VERSION(2, 9, 0)
     wxGLContext* ctx;
 #endif
