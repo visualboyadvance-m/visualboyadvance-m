@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version=0.6
+version=0.7
 
 main() {
     # parse options
@@ -237,7 +237,7 @@ relink() {
     # remove full path and version of lib in executable
     lib_link_path=$(
         otool -l "$target" 2>/dev/null | \
-        sed -n 's,^ *name \(/.*/*'"$lib_basename_unversioned_re"'[0-9.-]*\.dylib\) (offset .*,\1,p' | \
+        sed -n 's,^ *name \(.*/*'"$lib_basename_unversioned_re"'[0-9.-]*\.dylib\) (offset .*,\1,p' | \
         head -1
     )
 

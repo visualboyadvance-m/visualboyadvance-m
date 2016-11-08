@@ -3,12 +3,7 @@
 SET( CMAKE_CXX_FLAGS -std=gnu++11 )
 
 # not yet implemented
-IF(APPLE)
-    # does not work, no reason to link to it
-    SET(CAIRO_DEFAULT OFF)
-ELSE(APPLE)
-    SET(CAIRO_DEFAULT ON)
-ENDIF(APPLE)
+SET(CAIRO_DEFAULT OFF)
 
 option(ENABLE_CAIRO "Enable Cairo rendering for the wxWidgets port" ${CAIRO_DEFAULT})
 

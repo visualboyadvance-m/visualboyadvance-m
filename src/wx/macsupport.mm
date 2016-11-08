@@ -27,3 +27,13 @@ void HiDPIAware::RequestHighResolutionOpenGLSurface()
         [view setWantsBestResolutionOpenGLSurface:YES];
     }
 }
+
+void HiDPIAware::GetRealPixelClientSize(int* x, int* y)
+{
+    NSView* view = (NSView*)(GetWindow()->GetHandle());
+
+    NSSize backing_size = [view convertSizeToBacking:view.bounds.size];
+
+    *x = backing_size.width;
+    *y = backing_size.height;
+}
