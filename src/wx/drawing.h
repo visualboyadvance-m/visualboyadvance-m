@@ -43,7 +43,6 @@ public:
 
 protected:
     void DrawArea(wxWindowDC&);
-    void DrawingPanelInit();
 
     DECLARE_CLASS()
 };
