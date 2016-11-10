@@ -60,7 +60,7 @@ int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 int systemSpeed = 0;
 
-u64 startTime = 0;
+uint64_t startTime = 0;
 uint32_t renderedFrames = 0;
 
 void (*dbgOutput)(const char* s, uint32_t addr);
@@ -70,6 +70,10 @@ void* retro_get_memory_data(unsigned id)
 {
     if (id == RETRO_MEMORY_SAVE_RAM)
         return libretro_save_buf;
+   if (id == RETRO_MEMORY_SYSTEM_RAM)
+      return workRAM;
+   if (id == RETRO_MEMORY_VIDEO_RAM)
+      return vram;
 
     return NULL;
 }
@@ -78,6 +82,10 @@ size_t retro_get_memory_size(unsigned id)
 {
     if (id == RETRO_MEMORY_SAVE_RAM)
         return libretro_save_size;
+   if (id == RETRO_MEMORY_SYSTEM_RAM)
+      return 0x40000;
+   if (id == RETRO_MEMORY_VIDEO_RAM)
+      return 0x20000;
 
     return 0;
 }
@@ -173,42 +181,52 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
 
 void retro_set_environment(retro_environment_t cb)
 {
-    environ_cb = cb;
+   environ_cb = cb;
 
-    struct retro_variable variables[] = {
+   struct retro_variable variables[] = {
+      { "vbam_layer_1", "Show layer 1; Yes|No" },
+      { "vbam_layer_2", "Show layer 2; Yes|No" },
+      { "vbam_layer_3", "Show layer 3; Yes|No" },
+      { "vbam_layer_4", "Show layer 4; Yes|No" },
+      { "vbam_layer_5", "Show sprite layer; Yes|No" },
+      { "vbam_layer_6", "Show window layer 1; Yes|No" },
+      { "vbam_layer_7", "Show window layer 2; Yes|No" },
+      { "vbam_layer_8", "Show sprite window layer; Yes|No" },
+      { NULL, NULL },
+   };
+   
+   static const struct retro_controller_description port_1[] = {
+      { "GBA Joypad", RETRO_DEVICE_GBA },
+      { "Alt Joypad YB", RETRO_DEVICE_GBA_ALT1 },
+      { "Alt Joypad AB", RETRO_DEVICE_GBA_ALT2 },
+   };
 
-        { NULL, NULL },
-    };
+   static const struct retro_controller_info ports[] = {{ port_1, 3 },{ NULL,0 }};
+      
+   
 
-    static const struct retro_controller_description port_1[] = {
-        { "GBA Joypad", RETRO_DEVICE_GBA },
-        { "Alt Joypad YB", RETRO_DEVICE_GBA_ALT1 },
-        { "Alt Joypad AB", RETRO_DEVICE_GBA_ALT2 },
-    };
-
-    static const struct retro_controller_info ports[] = { { port_1, 4 }, { 0, 0 } };
-
-    cb(RETRO_ENVIRONMENT_SET_VARIABLES, variables);
-    cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void*)ports);
+   cb(RETRO_ENVIRONMENT_SET_VARIABLES, variables);
+   cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void*)ports);   
 }
 
-void retro_get_system_info(struct retro_system_info* info)
+void retro_get_system_info(struct retro_system_info *info)
 {
-    info->need_fullpath = false;
-    info->valid_extensions = "gba";
-    info->library_version = "svn";
-    info->library_name = "VBA-M";
-    info->block_extract = false;
+   info->need_fullpath = false;
+   info->valid_extensions = "gba";
+   info->library_version = "git";
+   info->library_name = "VBA-M";
+   info->block_extract = false;
 }
 
-void retro_get_system_av_info(struct retro_system_av_info* info)
+void retro_get_system_av_info(struct retro_system_av_info *info)
 {
-    info->geometry.base_width = 240;
-    info->geometry.base_height = 160;
-    info->geometry.max_width = 240;
-    info->geometry.max_height = 160;
-    info->timing.fps = 16777216.0 / 280896.0;
-    info->timing.sample_rate = 32000.0;
+   info->geometry.base_width = 240;
+   info->geometry.base_height = 160;
+   info->geometry.max_width = 240;
+   info->geometry.max_height = 160;
+   info->geometry.aspect_ratio = 3.0 / 2.0;
+   info->timing.fps =  16777216.0 / 280896.0;
+   info->timing.sample_rate = 32000.0;
 }
 
 void retro_init(void)
@@ -246,111 +264,113 @@ typedef struct {
 } ini_t;
 
 static const ini_t gbaover[256] = {
-    //romtitle,							    	romid	flash	save	rtc	mirror	bios
-    { "2 Games in 1 - Dragon Ball Z - The Legacy of Goku I & II (USA)", "BLFE", 0, 1, 0, 0, 0 },
-    { "2 Games in 1 - Dragon Ball Z - Buu's Fury + Dragon Ball GT - Transformation (USA)", "BUFE", 0, 1, 0, 0, 0 },
-    { "Boktai - The Sun Is in Your Hand (Europe)(En,Fr,De,Es,It)", "U3IP", 0, 0, 1, 0, 0 },
-    { "Boktai - The Sun Is in Your Hand (USA)", "U3IE", 0, 0, 1, 0, 0 },
-    { "Boktai 2 - Solar Boy Django (USA)", "U32E", 0, 0, 1, 0, 0 },
-    { "Boktai 2 - Solar Boy Django (Europe)(En,Fr,De,Es,It)", "U32P", 0, 0, 1, 0, 0 },
-    { "Bokura no Taiyou - Taiyou Action RPG (Japan)", "U3IJ", 0, 0, 1, 0, 0 },
-    { "Card e-Reader+ (Japan)", "PSAJ", 131072, 0, 0, 0, 0 },
-    { "Classic NES Series - Bomberman (USA, Europe)", "FBME", 0, 1, 0, 1, 0 },
-    { "Classic NES Series - Castlevania (USA, Europe)", "FADE", 0, 1, 0, 1, 0 },
-    { "Classic NES Series - Donkey Kong (USA, Europe)", "FDKE", 0, 1, 0, 1, 0 },
-    { "Classic NES Series - Dr. Mario (USA, Europe)", "FDME", 0, 1, 0, 1, 0 },
-    { "Classic NES Series - Excitebike (USA, Europe)", "FEBE", 0, 1, 0, 1, 0 },
-    { "Classic NES Series - Legend of Zelda (USA, Europe)", "FZLE", 0, 1, 0, 1, 0 },
-    { "Classic NES Series - Ice Climber (USA, Europe)", "FICE", 0, 1, 0, 1, 0 },
-    { "Classic NES Series - Metroid (USA, Europe)", "FMRE", 0, 1, 0, 1, 0 },
-    { "Classic NES Series - Pac-Man (USA, Europe)", "FP7E", 0, 1, 0, 1, 0 },
-    { "Classic NES Series - Super Mario Bros. (USA, Europe)", "FSME", 0, 1, 0, 1, 0 },
-    { "Classic NES Series - Xevious (USA, Europe)", "FXVE", 0, 1, 0, 1, 0 },
-    { "Classic NES Series - Zelda II - The Adventure of Link (USA, Europe)", "FLBE", 0, 1, 0, 1, 0 },
-    { "Digi Communication 2 - Datou! Black Gemagema Dan (Japan)", "BDKJ", 0, 1, 0, 0, 0 },
-    { "e-Reader (USA)", "PSAE", 131072, 0, 0, 0, 0 },
-    { "Dragon Ball GT - Transformation (USA)", "BT4E", 0, 1, 0, 0, 0 },
-    { "Dragon Ball Z - Buu's Fury (USA)", "BG3E", 0, 1, 0, 0, 0 },
-    { "Dragon Ball Z - Taiketsu (Europe)(En,Fr,De,Es,It)", "BDBP", 0, 1, 0, 0, 0 },
-    { "Dragon Ball Z - Taiketsu (USA)", "BDBE", 0, 1, 0, 0, 0 },
-    { "Dragon Ball Z - The Legacy of Goku II International (Japan)", "ALFJ", 0, 1, 0, 0, 0 },
-    { "Dragon Ball Z - The Legacy of Goku II (Europe)(En,Fr,De,Es,It)", "ALFP", 0, 1, 0, 0, 0 },
-    { "Dragon Ball Z - The Legacy of Goku II (USA)", "ALFE", 0, 1, 0, 0, 0 },
-    { "Dragon Ball Z - The Legacy Of Goku (Europe)(En,Fr,De,Es,It)", "ALGP", 0, 1, 0, 0, 0 },
-    { "Dragon Ball Z - The Legacy of Goku (USA)", "ALGE", 131072, 1, 0, 0, 0 },
-    { "F-Zero - Climax (Japan)", "BFTJ", 131072, 0, 0, 0, 0 },
-    { "Famicom Mini Vol. 01 - Super Mario Bros. (Japan)", "FMBJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 12 - Clu Clu Land (Japan)", "FCLJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 13 - Balloon Fight (Japan)", "FBFJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 14 - Wrecking Crew (Japan)", "FWCJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 15 - Dr. Mario (Japan)", "FDMJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 16 - Dig Dug (Japan)", "FTBJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 17 - Takahashi Meijin no Boukenjima (Japan)", "FTBJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 18 - Makaimura (Japan)", "FMKJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 19 - Twin Bee (Japan)", "FTWJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 20 - Ganbare Goemon! Karakuri Douchuu (Japan)", "FGGJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 21 - Super Mario Bros. 2 (Japan)", "FM2J", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 22 - Nazo no Murasame Jou (Japan)", "FNMJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 23 - Metroid (Japan)", "FMRJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 24 - Hikari Shinwa - Palthena no Kagami (Japan)", "FPTJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 25 - The Legend of Zelda 2 - Link no Bouken (Japan)", "FLBJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 26 - Famicom Mukashi Banashi - Shin Onigashima - Zen Kou Hen (Japan)", "FFMJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 27 - Famicom Tantei Club - Kieta Koukeisha - Zen Kou Hen (Japan)", "FTKJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 28 - Famicom Tantei Club Part II - Ushiro ni Tatsu Shoujo - Zen Kou Hen (Japan)", "FTUJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 29 - Akumajou Dracula (Japan)", "FADJ", 0, 1, 0, 1, 0 },
-    { "Famicom Mini Vol. 30 - SD Gundam World - Gachapon Senshi Scramble Wars (Japan)", "FSDJ", 0, 1, 0, 1, 0 },
-    { "Game Boy Wars Advance 1+2 (Japan)", "BGWJ", 131072, 0, 0, 0, 0 },
-    { "Golden Sun - The Lost Age (USA)", "AGFE", 65536, 0, 0, 1, 0 },
-    { "Golden Sun (USA)", "AGSE", 65536, 0, 0, 1, 0 },
-    { "Koro Koro Puzzle - Happy Panechu! (Japan)", "KHPJ", 0, 4, 0, 0, 0 },
-    { "Mario vs. Donkey Kong (Europe)", "BM5P", 0, 3, 0, 0, 0 },
-    { "Pocket Monsters - Emerald (Japan)", "BPEJ", 131072, 0, 1, 0, 0 },
-    { "Pocket Monsters - Fire Red (Japan)", "BPRJ", 131072, 0, 0, 0, 0 },
-    { "Pocket Monsters - Leaf Green (Japan)", "BPGJ", 131072, 0, 0, 0, 0 },
-    { "Pocket Monsters - Ruby (Japan)", "AXVJ", 131072, 0, 1, 0, 0 },
-    { "Pocket Monsters - Sapphire (Japan)", "AXPJ", 131072, 0, 1, 0, 0 },
-    { "Pokemon Mystery Dungeon - Red Rescue Team (USA, Australia)", "B24E", 131072, 0, 0, 0, 0 },
-    { "Pokemon Mystery Dungeon - Red Rescue Team (En,Fr,De,Es,It)", "B24P", 131072, 0, 0, 0, 0 },
-    { "Pokemon - Blattgruene Edition (Germany)", "BPGD", 131072, 0, 0, 0, 0 },
-    { "Pokemon - Edicion Rubi (Spain)", "AXVS", 131072, 0, 1, 0, 0 },
-    { "Pokemon - Edicion Esmeralda (Spain)", "BPES", 131072, 0, 1, 0, 0 },
-    { "Pokemon - Edicion Rojo Fuego (Spain)", "BPRS", 131072, 1, 0, 0, 0 },
-    { "Pokemon - Edicion Verde Hoja (Spain)", "BPGS", 131072, 1, 0, 0, 0 },
-    { "Pokemon - Eidicion Zafiro (Spain)", "AXPS", 131072, 0, 1, 0, 0 },
-    { "Pokemon - Emerald Version (USA, Europe)", "BPEE", 131072, 0, 1, 0, 0 },
-    { "Pokemon - Feuerrote Edition (Germany)", "BPRD", 131072, 0, 0, 0, 0 },
-    { "Pokemon - Fire Red Version (USA, Europe)", "BPRE", 131072, 0, 0, 0, 0 },
-    { "Pokemon - Leaf Green Version (USA, Europe)", "BPGE", 131072, 0, 0, 0, 0 },
-    { "Pokemon - Rubin Edition (Germany)", "AXVD", 131072, 0, 1, 0, 0 },
-    { "Pokemon - Ruby Version (USA, Europe)", "AXVE", 131072, 0, 1, 0, 0 },
-    { "Pokemon - Sapphire Version (USA, Europe)", "AXPE", 131072, 0, 1, 0, 0 },
-    { "Pokemon - Saphir Edition (Germany)", "AXPD", 131072, 0, 1, 0, 0 },
-    { "Pokemon - Smaragd Edition (Germany)", "BPED", 131072, 0, 1, 0, 0 },
-    { "Pokemon - Version Emeraude (France)", "BPEF", 131072, 0, 1, 0, 0 },
-    { "Pokemon - Version Rouge Feu (France)", "BPRF", 131072, 0, 0, 0, 0 },
-    { "Pokemon - Version Rubis (France)", "AXVF", 131072, 0, 1, 0, 0 },
-    { "Pokemon - Version Saphir (France)", "AXPF", 131072, 0, 1, 0, 0 },
-    { "Pokemon - Version Vert Feuille (France)", "BPGF", 131072, 0, 0, 0, 0 },
-    { "Pokemon - Versione Rubino (Italy)", "AXVI", 131072, 0, 1, 0, 0 },
-    { "Pokemon - Versione Rosso Fuoco (Italy)", "BPRI", 131072, 0, 0, 0, 0 },
-    { "Pokemon - Versione Smeraldo (Italy)", "BPEI", 131072, 0, 1, 0, 0 },
-    { "Pokemon - Versione Verde Foglia (Italy)", "BPGI", 131072, 0, 0, 0, 0 },
-    { "Pokemon - Versione Zaffiro (Italy)", "AXPI", 131072, 0, 1, 0, 0 },
-    { "Rockman EXE 4.5 - Real Operation (Japan)", "BR4J", 0, 0, 1, 0, 0 },
-    { "Rocky (Europe)(En,Fr,De,Es,It)", "AROP", 0, 1, 0, 0, 0 },
-    { "Rocky (USA)(En,Fr,De,Es,It)", "AR8e", 0, 1, 0, 0, 0 },
-    { "Sennen Kazoku (Japan)", "BKAJ", 131072, 0, 1, 0, 0 },
-    { "Shin Bokura no Taiyou - Gyakushuu no Sabata (Japan)", "U33J", 0, 1, 1, 0, 0 },
-    { "Super Mario Advance 4 (Japan)", "AX4J", 131072, 0, 0, 0, 0 },
-    { "Super Mario Advance 4 - Super Mario Bros. 3 (Europe)(En,Fr,De,Es,It)", "AX4P", 131072, 0, 0, 0, 0 },
-    { "Super Mario Advance 4 - Super Mario Bros 3 - Super Mario Advance 4 v1.1 (USA)", "AX4E", 131072, 0, 0, 0, 0 },
-    { "Top Gun - Combat Zones (USA)(En,Fr,De,Es,It)", "A2YE", 0, 5, 0, 0, 0 },
-    { "Yoshi's Universal Gravitation (Europe)(En,Fr,De,Es,It)", "KYGP", 0, 4, 0, 0, 0 },
-    { "Yoshi no Banyuuinryoku (Japan)", "KYGJ", 0, 4, 0, 0, 0 },
-    { "Yoshi - Topsy-Turvy (USA)", "KYGE", 0, 1, 0, 0, 0 },
-    { "Yu-Gi-Oh! GX - Duel Academy (USA)", "BYGE", 0, 2, 0, 0, 1 },
-    { "Yu-Gi-Oh! - Ultimate Masters - 2006 (Europe)(En,Jp,Fr,De,Es,It)", "BY6P", 0, 2, 0, 0, 0 },
-    { "Zoku Bokura no Taiyou - Taiyou Shounen Django (Japan)", "U32J", 0, 0, 1, 0, 0 }
+			//romtitle,							    	romid	flash	save	rtc	mirror	bios
+			{"2 Games in 1 - Dragon Ball Z - The Legacy of Goku I & II (USA)",	"BLFE",	0,	1,	0,	0,	0},
+			{"2 Games in 1 - Dragon Ball Z - Buu's Fury + Dragon Ball GT - Transformation (USA)", "BUFE", 0, 1, 0, 0, 0},
+			{"Boktai - The Sun Is in Your Hand (Europe)(En,Fr,De,Es,It)",		"U3IP",	0,	0,	1,	0,	0},
+			{"Boktai - The Sun Is in Your Hand (USA)",				"U3IE",	0,	0,	1,	0,	0},
+			{"Boktai 2 - Solar Boy Django (USA)",					"U32E",	0,	0,	1,	0,	0},
+			{"Boktai 2 - Solar Boy Django (Europe)(En,Fr,De,Es,It)",		"U32P",	0,	0,	1,	0,	0},
+			{"Bokura no Taiyou - Taiyou Action RPG (Japan)",			"U3IJ",	0,	0,	1,	0,	0},
+			{"Card e-Reader+ (Japan)",						"PSAJ",	131072,	0,	0,	0,	0},
+			{"Classic NES Series - Bomberman (USA, Europe)",			"FBME",	0,	1,	0,	1,	0},
+			{"Classic NES Series - Castlevania (USA, Europe)",			"FADE",	0,	1,	0,	1,	0},
+			{"Classic NES Series - Donkey Kong (USA, Europe)",			"FDKE",	0,	1,	0,	1,	0},
+			{"Classic NES Series - Dr. Mario (USA, Europe)",			"FDME",	0,	1,	0,	1,	0},
+			{"Classic NES Series - Excitebike (USA, Europe)",			"FEBE",	0,	1,	0,	1,	0},
+			{"Classic NES Series - Legend of Zelda (USA, Europe)",			"FZLE",	0,	1,	0,	1,	0},
+			{"Classic NES Series - Ice Climber (USA, Europe)",			"FICE",	0,	1,	0,	1,	0},
+			{"Classic NES Series - Metroid (USA, Europe)",				"FMRE",	0,	1,	0,	1,	0},
+			{"Classic NES Series - Pac-Man (USA, Europe)",				"FP7E",	0,	1,	0,	1,	0},
+			{"Classic NES Series - Super Mario Bros. (USA, Europe)",		"FSME",	0,	1,	0,	1,	0},
+			{"Classic NES Series - Xevious (USA, Europe)",				"FXVE",	0,	1,	0,	1,	0},
+			{"Classic NES Series - Zelda II - The Adventure of Link (USA, Europe)",	"FLBE",	0,	1,	0,	1,	0},
+			{"Digi Communication 2 - Datou! Black Gemagema Dan (Japan)",		"BDKJ",	0,	1,	0,	0,	0},
+			{"e-Reader (USA)",							"PSAE",	131072,	0,	0,	0,	0},
+			{"Dragon Ball GT - Transformation (USA)",				"BT4E",	0,	1,	0,	0,	0},
+			{"Dragon Ball Z - Buu's Fury (USA)",					"BG3E",	0,	1,	0,	0,	0},
+			{"Dragon Ball Z - Taiketsu (Europe)(En,Fr,De,Es,It)",			"BDBP",	0,	1,	0,	0,	0},
+			{"Dragon Ball Z - Taiketsu (USA)",					"BDBE",	0,	1,	0,	0,	0},
+			{"Dragon Ball Z - The Legacy of Goku II International (Japan)",		"ALFJ",	0,	1,	0,	0,	0},
+			{"Dragon Ball Z - The Legacy of Goku II (Europe)(En,Fr,De,Es,It)",	"ALFP", 0,	1,	0,	0,	0},
+			{"Dragon Ball Z - The Legacy of Goku II (USA)",				"ALFE",	0,	1,	0,	0,	0},
+			{"Dragon Ball Z - The Legacy Of Goku (Europe)(En,Fr,De,Es,It)",		"ALGP",	0,	1,	0,	0,	0},
+			{"Dragon Ball Z - The Legacy of Goku (USA)",				"ALGE",	131072,	1,	0,	0,	0},
+			{"F-Zero - Climax (Japan)",						"BFTJ",	131072,	0,	0,	0,	0},
+			{"Famicom Mini Vol. 01 - Super Mario Bros. (Japan)",			"FMBJ",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 12 - Clu Clu Land (Japan)",				"FCLJ",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 13 - Balloon Fight (Japan)",			"FBFJ",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 14 - Wrecking Crew (Japan)",			"FWCJ",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 15 - Dr. Mario (Japan)",				"FDMJ",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 16 - Dig Dug (Japan)",				"FTBJ",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 17 - Takahashi Meijin no Boukenjima (Japan)",	"FTBJ",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 18 - Makaimura (Japan)",				"FMKJ",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 19 - Twin Bee (Japan)",				"FTWJ",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 20 - Ganbare Goemon! Karakuri Douchuu (Japan)",	"FGGJ",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 21 - Super Mario Bros. 2 (Japan)",			"FM2J",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 22 - Nazo no Murasame Jou (Japan)",			"FNMJ",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 23 - Metroid (Japan)",				"FMRJ",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 24 - Hikari Shinwa - Palthena no Kagami (Japan)",	"FPTJ",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 25 - The Legend of Zelda 2 - Link no Bouken (Japan)","FLBJ",0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 26 - Famicom Mukashi Banashi - Shin Onigashima - Zen Kou Hen (Japan)","FFMJ",0,1,0,	1,	0},
+			{"Famicom Mini Vol. 27 - Famicom Tantei Club - Kieta Koukeisha - Zen Kou Hen (Japan)","FTKJ",0,1,0,	1,	0},
+			{"Famicom Mini Vol. 28 - Famicom Tantei Club Part II - Ushiro ni Tatsu Shoujo - Zen Kou Hen (Japan)","FTUJ",0,1,0,1,0},
+			{"Famicom Mini Vol. 29 - Akumajou Dracula (Japan)",			"FADJ",	0,	1,	0,	1,	0},
+			{"Famicom Mini Vol. 30 - SD Gundam World - Gachapon Senshi Scramble Wars (Japan)","FSDJ",0,1,	0,	1,	0},
+			{"Game Boy Wars Advance 1+2 (Japan)",					"BGWJ",	131072,	0,	0,	0,	0},
+			{"Golden Sun - The Lost Age (USA)",					"AGFE",	65536,	0,	0,	1,	0},
+			{"Golden Sun (USA)",							"AGSE",	65536,	0,	0,	1,	0},
+			{"Iridion II (Europe) (En,Fr,De)",							"AI2P",	0,	5,	0,	0,	0},
+			{"Iridion II (USA)",							"AI2E",	0,	5,	0,	0,	0},
+			{"Koro Koro Puzzle - Happy Panechu! (Japan)",				"KHPJ",	0,	4,	0,	0,	0},
+			{"Mario vs. Donkey Kong (Europe)",					"BM5P",	0,	3,	0,	0,	0},
+			{"Pocket Monsters - Emerald (Japan)",					"BPEJ",	131072,	0,	1,	0,	0},
+			{"Pocket Monsters - Fire Red (Japan)",					"BPRJ",	131072,	0,	0,	0,	0},
+			{"Pocket Monsters - Leaf Green (Japan)",				"BPGJ",	131072,	0,	0,	0,	0},
+			{"Pocket Monsters - Ruby (Japan)",					"AXVJ",	131072,	0,	1,	0,	0},
+			{"Pocket Monsters - Sapphire (Japan)",					"AXPJ",	131072,	0,	1,	0,	0},
+			{"Pokemon Mystery Dungeon - Red Rescue Team (USA, Australia)",		"B24E",	131072,	0,	0,	0,	0},
+			{"Pokemon Mystery Dungeon - Red Rescue Team (En,Fr,De,Es,It)",		"B24P",	131072,	0,	0,	0,	0},
+			{"Pokemon - Blattgruene Edition (Germany)",				"BPGD",	131072,	0,	0,	0,	0},
+			{"Pokemon - Edicion Rubi (Spain)",					"AXVS",	131072,	0,	1,	0,	0},
+			{"Pokemon - Edicion Esmeralda (Spain)",					"BPES",	131072,	0,	1,	0,	0},
+			{"Pokemon - Edicion Rojo Fuego (Spain)",				"BPRS",	131072,	1,	0,	0,	0},
+			{"Pokemon - Edicion Verde Hoja (Spain)",				"BPGS",	131072,	1,	0,	0,	0},
+			{"Pokemon - Eidicion Zafiro (Spain)",					"AXPS",	131072,	0,	1,	0,	0},
+			{"Pokemon - Emerald Version (USA, Europe)",				"BPEE",	131072,	0,	1,	0,	0},
+			{"Pokemon - Feuerrote Edition (Germany)",				"BPRD",	131072,	0,	0,	0,	0},
+			{"Pokemon - Fire Red Version (USA, Europe)",				"BPRE",	131072,	0,	0,	0,	0},
+			{"Pokemon - Leaf Green Version (USA, Europe)",				"BPGE",	131072,	0,	0,	0,	0},
+			{"Pokemon - Rubin Edition (Germany)",					"AXVD",	131072,	0,	1,	0,	0},
+			{"Pokemon - Ruby Version (USA, Europe)",				"AXVE",	131072,	0,	1,	0,	0},
+			{"Pokemon - Sapphire Version (USA, Europe)",				"AXPE",	131072,	0,	1,	0,	0},
+			{"Pokemon - Saphir Edition (Germany)",					"AXPD",	131072,	0,	1,	0,	0},
+			{"Pokemon - Smaragd Edition (Germany)",					"BPED",	131072,	0,	1,	0,	0},
+			{"Pokemon - Version Emeraude (France)",					"BPEF",	131072,	0,	1,	0,	0},
+			{"Pokemon - Version Rouge Feu (France)",				"BPRF",	131072,	0,	0,	0,	0},
+			{"Pokemon - Version Rubis (France)",					"AXVF",	131072,	0,	1,	0,	0},
+			{"Pokemon - Version Saphir (France)",					"AXPF",	131072,	0,	1,	0,	0},
+			{"Pokemon - Version Vert Feuille (France)",				"BPGF",	131072,	0,	0,	0,	0},
+			{"Pokemon - Versione Rubino (Italy)",					"AXVI",	131072,	0,	1,	0,	0},
+			{"Pokemon - Versione Rosso Fuoco (Italy)",				"BPRI",	131072,	0,	0,	0,	0},
+			{"Pokemon - Versione Smeraldo (Italy)",					"BPEI",	131072,	0,	1,	0,	0},
+			{"Pokemon - Versione Verde Foglia (Italy)",				"BPGI",	131072,	0,	0,	0,	0},
+			{"Pokemon - Versione Zaffiro (Italy)",					"AXPI",	131072,	0,	1,	0,	0},
+			{"Rockman EXE 4.5 - Real Operation (Japan)",				"BR4J",	0,	0,	1,	0,	0},
+			{"Rocky (Europe)(En,Fr,De,Es,It)",					"AROP",	0,	1,	0,	0,	0},
+			{"Rocky (USA)(En,Fr,De,Es,It)",						"AR8e",	0,	1,	0,	0,	0},
+			{"Sennen Kazoku (Japan)",						"BKAJ",	131072,	0,	1,	0,	0},
+			{"Shin Bokura no Taiyou - Gyakushuu no Sabata (Japan)",			"U33J",	0,	1,	1,	0,	0},
+			{"Super Mario Advance 4 (Japan)",					"AX4J",	131072,	0,	0,	0,	0},
+			{"Super Mario Advance 4 - Super Mario Bros. 3 (Europe)(En,Fr,De,Es,It)","AX4P",	131072,	0,	0,	0,	0},
+			{"Super Mario Advance 4 - Super Mario Bros 3 - Super Mario Advance 4 v1.1 (USA)","AX4E",131072,0,0,0,0},
+			{"Top Gun - Combat Zones (USA)(En,Fr,De,Es,It)",			"A2YE",	0,	5,	0,	0,	0},
+			{"Yoshi's Universal Gravitation (Europe)(En,Fr,De,Es,It)",		"KYGP",	0,	4,	0,	0,	0},
+			{"Yoshi no Banyuuinryoku (Japan)",					"KYGJ",	0,	4,	0,	0,	0},
+			{"Yoshi - Topsy-Turvy (USA)",						"KYGE",	0,	1,	0,	0,	0},
+			{"Yu-Gi-Oh! GX - Duel Academy (USA)",					"BYGE",	0,	2,	0,	0,	1},
+			{"Yu-Gi-Oh! - Ultimate Masters - 2006 (Europe)(En,Jp,Fr,De,Es,It)",	"BY6P",	0,	2,	0,	0,	0},
+			{"Zoku Bokura no Taiyou - Taiyou Shounen Django (Japan)",		"U32J",	0,	0,	1,	0,	0}
 };
 
 static void load_image_preferences(void)
@@ -418,12 +438,8 @@ static void gba_init(void)
     systemBlueShift = 3;
 #endif
 
-    utilUpdateSystemColorMaps(false);
 
-    if (cpuSaveType == 0)
-        utilGBAFindSave(size);
-    else
-        saveType = cpuSaveType;
+   utilUpdateSystemColorMaps(false);
 
     load_image_preferences();
 
@@ -505,6 +521,25 @@ static unsigned has_frame;
 
 static void update_variables(void)
 {
+   char key[256];
+   struct retro_variable var;
+   var.key=key;
+   
+   int disabled_layers=0;
+   
+   strcpy(key, "vbam_layer_x");
+   for (int i=0;i<8;i++)
+   {
+      key[strlen("vbam_layer_")]='1'+i;
+      var.value=NULL;
+      if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0]=='N')
+      {
+         disabled_layers|=0x100<<i;
+      }
+   }
+   layerSettings = 0xFF00 ^ disabled_layers;
+   layerEnable = DISPCNT & layerSettings;
+   CPUUpdateRenderBuffers(false);
 }
 
 #ifdef FINAL_VERSION
@@ -554,120 +589,102 @@ void retro_cheat_set(unsigned index, bool enabled, const char* code)
 
     begin = c = code;
 
-    if (!code)
-        return;
+   if (!code)
+      return;
 
-    do {
-        if (*c != '+' && *c != '\0')
-            continue;
+   do {
+      if (*c != '+' && *c != '\0')
+         continue;
 
-        char buf[32] = { 0 };
-        int len = c - begin;
-        int i;
+      char buf[32] = {0};
+      int len = c - begin;
+      int i;
 
-        // make sure it's using uppercase letters
-        for (i = 0; i < len; i++)
-            buf[i] = toupper(begin[i]);
-        buf[i] = 0;
+      // make sure it's using uppercase letters
+      for (i = 0; i < len; i++)
+         buf[i] = toupper(begin[i]);
+      buf[i] = 0;
 
-        begin = ++c;
+      begin = ++c;
 
-        if (len == 16)
-            cheatsAddGSACode(buf, "", false);
-        else {
-            char* space = strrchr(buf, ' ');
-            if (space != NULL) {
-                if ((buf + len - space - 1) == 4)
-                    cheatsAddCBACode(buf, "");
-                else {
-                    memmove(space, space + 1, strlen(space + 1) + 1);
-                    cheatsAddGSACode(buf, "", true);
-                }
-            } else if (log_cb)
-                log_cb(RETRO_LOG_ERROR, "[VBA] Invalid cheat code '%s'\n", buf);
-        }
+      if (len == 16)
+         cheatsAddGSACode(buf, "", false);
+      else {
+         char *space = strrchr(buf, ' ');
+         if (space != NULL) {
+            if ((buf + len - space - 1) == 4)
+               cheatsAddCBACode(buf, "");
+            else {
+               memmove(space, space+1, strlen(space+1)+1);
+               cheatsAddGSACode(buf, "", true);
+            }
+         } else if (log_cb)
+            log_cb(RETRO_LOG_ERROR, "[VBA] Invalid cheat code '%s'\n", buf);
+      }
 
-    } while (*c++);
+   } while (*c++);
 }
 
-bool retro_load_game(const struct retro_game_info* game)
+bool retro_load_game(const struct retro_game_info *game)
 {
-    update_variables();
+   update_variables();
 
-    struct retro_input_descriptor input_desc[] = {
-        { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT, "D-Pad Left" },
-        { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP, "D-Pad Up" },
-        { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN, "D-Pad Down" },
-        { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
-        { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B, "B" },
-        { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A, "A" },
-        { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L, "L" },
-        { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R, "R" },
-        { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
-        { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+   struct retro_input_descriptor input_desc[] = {
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "L" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "R" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
 
-        { 0 },
-    };
+      { 0 },
+   };
 
-    environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_desc);
+   environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_desc);
 
-    bool ret = CPULoadRomData((const char*)game->data, game->size);
+   int romSize = CPULoadRomData((const char*)game->data, game->size);
+   if (!romSize)
+      return false;
 
-    gba_init();
+   gba_init();
 
-    struct retro_memory_descriptor desc[9];
-    memset(desc, 0, sizeof(desc));
-    desc[0].start = 0x03000000;
-    desc[0].select = 0xFF000000;
-    desc[0].len = 0x8000;
-    desc[0].ptr = internalRAM; //fast WRAM
-    desc[1].start = 0x02000000;
-    desc[1].select = 0xFF000000;
-    desc[1].len = 0x40000;
-    desc[1].ptr = workRAM; //slow WRAM
-    desc[2].start = 0x0E000000;
-    desc[2].select = 0xFF000000;
-    desc[2].len = libretro_save_size;
-    desc[2].ptr = flashSaveMemory; //SRAM
-    desc[3].start = 0x08000000;
-    desc[3].select = 0xFC000000;
-    desc[3].len = 0x2000000;
-    desc[3].ptr = rom; //ROM, parts 1 and 2
-    desc[3].flags = RETRO_MEMDESC_CONST; //we need two mappings since its size is not a power of 2
-    desc[4].start = 0x0C000000;
-    desc[4].select = 0xFE000000;
-    desc[4].len = 0x2000000;
-    desc[4].ptr = rom; //ROM part 3
-    desc[4].flags = RETRO_MEMDESC_CONST;
-    desc[5].start = 0x00000000;
-    desc[5].select = 0xFF000000;
-    desc[5].len = 0x4000;
-    desc[5].ptr = bios; //BIOS
-    desc[5].flags = RETRO_MEMDESC_CONST;
-    desc[6].start = 0x06000000;
-    desc[6].select = 0xFF000000;
-    desc[6].len = 0x18000;
-    desc[6].ptr = vram; //VRAM
-    desc[7].start = 0x07000000;
-    desc[7].select = 0xFF000000;
-    desc[7].len = 0x400;
-    desc[7].ptr = paletteRAM; //palettes
-    desc[8].start = 0x05000000;
-    desc[8].select = 0xFF000000;
-    desc[8].len = 0x400;
-    desc[8].ptr = oam; //OAM
-    struct retro_memory_map retromap = { desc, sizeof(desc) / sizeof(*desc) };
-    if (ret)
-        environ_cb(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &retromap);
-    return ret;
+   struct retro_memory_descriptor desc[11];
+   memset(desc, 0, sizeof(desc));
+   
+   desc[0].start=0x03000000; desc[0].select=0xFF000000; desc[0].len=0x8000;    desc[0].ptr=internalRAM;//fast WRAM
+   desc[1].start=0x02000000; desc[1].select=0xFF000000; desc[1].len=0x40000;   desc[1].ptr=workRAM;//slow WRAM
+   /* TODO: if SRAM is flash, use start=0 addrspace="S" instead */
+   desc[2].start=0x0E000000; desc[2].select=0;          desc[2].len=libretro_save_size; desc[2].ptr=flashSaveMemory;//SRAM
+   desc[3].start=0x08000000; desc[3].select=0;          desc[3].len=romSize;   desc[3].ptr=rom;//ROM
+      desc[3].flags=RETRO_MEMDESC_CONST;
+   desc[4].start=0x0A000000; desc[4].select=0;          desc[4].len=romSize;   desc[4].ptr=rom;//ROM mirror 1
+      desc[4].flags=RETRO_MEMDESC_CONST;
+   desc[5].start=0x0C000000; desc[5].select=0;          desc[5].len=romSize;   desc[5].ptr=rom;//ROM mirror 2
+      desc[5].flags=RETRO_MEMDESC_CONST;
+   desc[6].start=0x00000000; desc[6].select=0;          desc[6].len=0x4000;    desc[6].ptr=bios;//BIOS
+      desc[6].flags=RETRO_MEMDESC_CONST;
+   desc[7].start=0x06000000; desc[7].select=0xFF000000; desc[7].len=0x18000;   desc[7].ptr=vram;//VRAM
+   desc[8].start=0x05000000; desc[8].select=0xFF000000; desc[8].len=0x400;     desc[8].ptr=paletteRAM;//palettes
+   desc[9].start=0x07000000; desc[9].select=0xFF000000; desc[9].len=0x400;     desc[9].ptr=oam;//OAM
+   desc[10].start=0x04000000;desc[10].select=0;         desc[10].len=0x400;    desc[10].ptr=ioMem;//bunch of registers
+   struct retro_memory_map retromap={ desc, sizeof(desc)/sizeof(*desc) };
+   environ_cb(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &retromap);
+   
+   bool yes = true;
+   environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
+   
+   return true;
 }
 
 bool retro_load_game_special(
-    unsigned game_type,
-    const struct retro_game_info* info, size_t num_info)
-{
-    return false;
-}
+  unsigned game_type,
+  const struct retro_game_info *info, size_t num_info
+)
+{ return false; }
 
 extern unsigned g_audio_frames;
 static unsigned g_video_frames;

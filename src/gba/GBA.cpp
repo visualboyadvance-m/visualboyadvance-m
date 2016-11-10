@@ -1466,7 +1466,7 @@ void CPUCleanUp()
 
     emulating = 0;
 }
-
+#ifndef __LIBRETRO__
 void SetMapMasks()
 {
     map[0].mask = 0x3FFF;
@@ -1501,7 +1501,7 @@ void SetMapMasks()
     }
     clearBreakRegList();
 }
-
+#endif
 int CPULoadRom(const char* szFile)
 {
     romSize = 0x2000000;
@@ -3662,8 +3662,9 @@ void CPUReset()
     map[12].address = rom;
     map[14].address = flashSaveMemory;
 
+#ifndef __LIBRETRO__
     SetMapMasks();
-
+#endif
     soundReset();
 
     CPUUpdateWindow0();
