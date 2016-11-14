@@ -23,6 +23,11 @@
 - [ ] see what code we can steal from other emu folks, e.g. filters etc.
 - [ ] update config handling, to switch to XDG on linux etc.
 - [ ] add simple 'mute audio' option for wx interface
+- [ ] HiDPI support on Windows
+- [ ] ./installdeps for more platforms
+- [ ] console-mode Wx app on Windows in debug mode
+- [ ] fix keyboard game input on msys2 builds
+- [ ] fix the -D\*DIR defines to have the correct paths on various platforms
 
 # Coding Guidelines (for those that want to help out and send a pull request.)
 

@@ -12,7 +12,16 @@ if( WIN32 )
   option( ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" ON )
   option( ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ON )
 endif( WIN32 )
+
 option( ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" ON )
+
+IF(WIN32 AND MINGW)
+    IF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../dependencies")
+        MESSAGE(FATAL_ERROR "Please run: git submodule update --init --recursive")
+    ENDIF()
+
+    INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../../dependencies/mingw-xaudio/include")
+ENDIF()
 
 IF(APPLE)
     ADD_DEFINITIONS(-DwxMAC_USE_CORE_GRAPHICS)
@@ -202,8 +211,6 @@ IF( WIN32 )
     IF(ENABLE_DEBUGGER)
         SET(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} -lwsock32)
     ENDIF(ENABLE_DEBUGGER)
-ELSE( WIN32 )
-    SET(DIRECTX_LIBRARIES )
 ENDIF( WIN32 )
 
 link_directories( ${CMAKE_BINARY_DIR} )

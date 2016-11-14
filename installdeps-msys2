@@ -1,0 +1,29 @@
+#!/bin/sh
+
+cd "$(dirname $0)"
+
+MINGW_DEPS='SDL2 cairo ffmpeg openal sfml wxWidgets zlib binutils cmake crt-git extra-cmake-modules gcc gcc-libs gdb headers-git make pkg-config tools-git windows-default-manifest libmangle-git'
+MINGW64_DEPS=
+MINGW32_DEPS=
+
+for dep in $MINGW_DEPS; do
+    MINGW64_DEPS="$MINGW64_DEPS mingw-w64-x86_64-$dep"
+    MINGW32_DEPS="$MINGW32_DEPS mingw-w64-i686-$dep"
+done
+
+echo '[32mInstalling deps....[0m'
+echo
+
+pacman --noconfirm --needed -Syuu git make zip $MINGW64_DEPS $MINGW32_DEPS
+
+git submodule update --init --recursive
+
+cat <<'EOF'
+
+[32mDone! To build do:[0m
+
+mkdir build
+cd build
+cmake .. -G 'MSYS Makefiles'
+make -j10
+EOF
