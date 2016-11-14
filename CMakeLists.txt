@@ -20,7 +20,15 @@ option( ENABLE_ASM_CORE "Enable x86 ASM CPU cores" OFF )
 option( ENABLE_ASM_SCALERS "Enable x86 ASM graphic filters" OFF )
 option( ENABLE_LINK "Enable GBA linking functionality" ON )
 option( ENABLE_LIRC "Enable LIRC support" OFF )
-option( ENABLE_FFMPEG "Enable ffmpeg A/V recording" ON )
+
+SET(FFMPEG_DEFAULT ON)
+
+IF((WIN32 AND NOT (MINGW AND MSYS)) OR APPLE)
+    SET(FFMPEG_DEFAULT OFF)
+ENDIF()
+
+option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
+
 if(ENABLE_ASM_SCALERS)
     option( ENABLE_MMX "Enable MMX" OFF )
 endif(ENABLE_ASM_SCALERS)
@@ -133,9 +141,10 @@ FIND_PACKAGE(SDL2 REQUIRED)
 ADD_DEFINITIONS(${SDL2_DEFINITIONS})
 
 if( ENABLE_LINK )
-    if(WIN32)
+    # msys2 does not have static sfml libs atm
+    if(WIN32 AND NOT (MINGW AND MSYS))
         set(SFML_STATIC_LIBRARIES TRUE)
-    endif(WIN32)
+    endif()
     FIND_PACKAGE ( SFML 2 COMPONENTS network system REQUIRED )
 endif( ENABLE_LINK )
 
@@ -221,7 +230,7 @@ ENDIF( NOT ENABLE_ASM_CORE )
 if( ENABLE_NLS )
     SET( LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale )
     ADD_DEFINITIONS ( -DENABLE_NLS )
-    ADD_DEFINITIONS ( -DLOCALEDIR=\\\"${LOCALEDIR}\\\" )
+    ADD_DEFINITIONS ( -DLOCALEDIR='"${LOCALEDIR}"' )
     # for now, only GBALink.cpp uses gettext() directly
     IF(APPLE)
         # use Homebrew gettext if available
