@@ -243,7 +243,9 @@ bool rtcWrite(uint32_t address, uint16_t value)
                         } break;
 
                         default:
+#ifndef __LIBRETRO__
                             log(N_("Unknown RTC command %02x"), rtcClockData.command);
+#endif
                             rtcClockData.state = IDLE;
                             break;
                         }

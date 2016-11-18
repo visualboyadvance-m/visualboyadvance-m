@@ -1,0 +1,15 @@
+extern bool cpuIsMultiBoot;
+extern int cpuDisableSfx;
+extern int cpuSaveType;
+extern bool mirroringEnable;
+extern bool parseDebug;
+extern bool speedHack;
+extern bool speedup;
+extern int cheatsEnabled;
+extern int layerEnable;
+extern int layerSettings;
+extern int skipBios;
+extern int useBios;
+extern const char *loadDotCodeFile;
+extern const char *saveDotCodeFile;
+extern int rtcEnabled;
