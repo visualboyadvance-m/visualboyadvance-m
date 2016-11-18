@@ -1,49 +1,227 @@
+/*
+BSD 2-Clause License
+
+Copyright (c) 2016, Rafael Kitover
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdarg.h>
+#include <ctype.h>
+#include <wchar.h>
+#include <locale.h>
+#include <unistd.h>
 
-int main(int argc, char** argv) {
-    char* in_file_name  = argv[1];
-    char* out_file_name = argv[2];
-    char* var_name      = argv[3];
-    FILE* in_file       = fopen(in_file_name,  "rb");
-    char* in_file_err   = !in_file ? strerror(errno) : NULL;
-    FILE* out_file      = fopen(out_file_name, "w");
-    char* out_file_err  = !out_file ? strerror(errno) : NULL;
-    unsigned char* buf  = (unsigned char*)malloc(4096);
-    size_t bytes_read;
-    int file_pos        = 0;
+#define BUF_SIZE  4096
+#define WBUF_SIZE BUF_SIZE * sizeof(wchar_t)
+#define MSG_SIZE  256
 
-    if (!buf) return 1;
+const char* version    = "0.3";
 
-    if (!in_file) {
-        fprintf(stderr, "Can't open input file '%s': %s\n", in_file_name, in_file_err);
-        return 1;
+const char* msg_prefix = "bin2c: ";
+
+void format_perror(const char* fmt, va_list args) {
+    static char error_str[MSG_SIZE];
+    static char fmt_str[MSG_SIZE];
+    strcpy(fmt_str, msg_prefix);
+    strncat(fmt_str, fmt, MSG_SIZE - sizeof(msg_prefix));
+    vsnprintf(error_str, sizeof(error_str), fmt_str, args);
+    perror(error_str);
+}
+
+void die(const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    format_perror(fmt, args);
+    va_end(args);
+    exit(1);
+}
+
+void* safe_malloc(size_t size) {
+    void* allocated;
+    if (!(allocated = malloc(size)))
+        die("out of memory");
+    return allocated;
+}
+
+char* file_name_to_identifier(const char* file_name_cstr) {
+    wchar_t* file_name       = safe_malloc(WBUF_SIZE);
+    wchar_t* identifier      = safe_malloc(WBUF_SIZE);
+    char*    identifier_cstr = safe_malloc(WBUF_SIZE);
+    wchar_t* file_name_ptr   = file_name;
+    wchar_t* identifier_ptr  = identifier;
+    wchar_t* file_name_end   = NULL;
+    size_t   file_name_len   = 0;
+    int between_tokens       = 0;
+
+    if ((file_name_len = mbstowcs(file_name, file_name_cstr, BUF_SIZE - 1)) == -1)
+        die("cannot convert '%s' to locale representation", file_name_cstr);
+
+    *identifier = 0;
+
+    file_name_end = file_name + file_name_len + 1;
+
+    while (file_name_ptr < file_name_end) {
+        if (iswalnum(*file_name_ptr)) {
+            *identifier_ptr = *file_name_ptr;
+            identifier_ptr++;
+            between_tokens = 0;
+        }
+        else if (!between_tokens) {
+            mbstowcs(identifier_ptr, "_", 1);
+            identifier_ptr++;
+            between_tokens  = 1;
+        }
+
+        file_name_ptr++;
     }
 
-    if (!out_file) {
-        fprintf(stderr, "Can't open '%s' for writing: %s\n", out_file_name, out_file_err);
-        return 1;
-    }
+    /* terminate identifier, on _ or on next position */
+    if (between_tokens) identifier_ptr--;
 
-    fprintf(out_file, "/* generated from %s: do not edit */\n"
-                      "const unsigned char %s[] = {\n", in_file_name, var_name);
+    *identifier_ptr = 0;
 
-    while ((bytes_read = fread(buf, 1, 4096, in_file))) {
-        int i = 0;
-        for (; i < bytes_read; i++) {
-            char* comma = feof(in_file) && i == bytes_read - 1 ? "" : ",";
+    if (wcstombs(identifier_cstr, identifier, WBUF_SIZE - 1) == -1)
+        die("failed to convert wide character string to bytes");
 
-            fprintf(out_file, "0x%02x%s", buf[i], comma);
+    free(file_name);
+    free(identifier);
 
-            if (++file_pos % 16 == 0) fprintf(out_file, "\n");
+    return identifier_cstr;
+}
+
+void usage(int err) {
+    FILE* stream = err ? stderr : stdout;
+
+    fputs(
+"Usage: [32mbin2c [1;34m[[1;35mIN_FILE [1;34m[[1;35mOUT_FILE [1;34m[[1;35mVAR_NAME[1;34m][1;34m][1;34m][0m\n"
+"Write [1;35mIN_FILE[0m as a C array of bytes named [1;35mVAR_NAME[0m into [1;35mOUT_FILE[0m.\n"
+"\n"
+"By default, [1mSTDIN[0m is the input and [1mSTDOUT[0m is the output, either can be explicitly specified with [1;35m-[0m.\n"
+"\n"
+"The default [1;35mVAR_NAME[0m is the [1;35mIN_FILE[0m name converted to an identifier, or [1m\"resource_data\"[0m\n"
+"if it's [1mSTDIN[0m.\n"
+"\n"
+"  [1m-h, --help[0m                        Show this help screen and exit.\n"
+"  [1m-v, --version[0m                     Print version and exit.\n"
+"\n"
+"Examples:\n"
+"  # write data from file [1;35m./compiled-resources.xrs[0m into header file [1;35m./resources.h[0m using variable name [1;35mresource_data[0m\n"
+"  [32mbin2c [1;35m./compiled-resources.xrs[0m [1;35m./resources.h[0m [1;35mresource_data[0m\n"
+"  # write data from [1mSTDIN[0m to [1mSTDOUT[0m with [1m\"resource_data\"[0m as the [1;35mVAR_NAME[0m\n"
+"  [32mbin2c[0m\n"
+"  # write data from [1;35m./compiled-resources.xrs[0m to [1mSTDOUT[0m with [1m\"compiled_resources_xrs\"[0m as the [1;35mVAR_NAME[0m\n"
+"  [32mbin2c [1;35m./compiled-resources.xrs[0m\n"
+"  # write data from [1;35m./compiled-resources.xrs[0m to [1;35m./resources.h[0m with [1m\"compiled_resources_xrs\"[0m as the [1;35mVAR_NAME[0m\n"
+"  [32mbin2c [1;35m./compiled-resources.xrs [1;35m./resources.h[0m\n"
+"\n"
+"Project homepage and documentation: <[1;34mhttp://github.com/rkitover/bin2c[0m>\n"
+    , stream);
+}
+
+void die_usage(const char* fmt, ...) {
+    static char fmt_str[MSG_SIZE];
+    va_list args;
+    va_start(args, fmt);
+    strcpy(fmt_str, msg_prefix);
+    strncat(fmt_str, fmt, MSG_SIZE - sizeof(msg_prefix));
+    strcat(fmt_str, "\n");
+    vfprintf(stderr, fmt_str, args);
+    va_end(args);
+    usage(1);
+    exit(1);
+}
+
+void exit_usage(int exit_code) {
+    usage(exit_code);
+    exit(exit_code);
+}
+
+int main(int argc, const char** argv) {
+    const char* usage_opts[]   = {"-h", "--help"};
+    const char* version_opts[] = {"-v", "--version"};
+    const char* in_file_name   = argc >= 2 ? argv[1] : NULL;
+    const char* out_file_name  = argc >= 3 ? argv[2] : NULL;
+    const char* var_name       = argc >= 4 ? argv[3] : NULL;
+    char* computed_identifier  = NULL;
+    int i = 0, file_pos = 0, in_fd = -1;
+    size_t bytes_read   = 0;
+    unsigned char* buf  = safe_malloc(BUF_SIZE);
+    FILE *in_file, *out_file;
+
+    setlocale(LC_ALL, "");
+
+    if (argc > 4)
+        die_usage("invalid number of arguments");
+
+    if (argc >= 2) {
+        for (i = 0; i < (sizeof(usage_opts)/sizeof(char*)); i++) {
+            if (!strcmp(argv[1], usage_opts[i])) exit_usage(0);
+        }
+
+        for (i = 0; i < (sizeof(version_opts)/sizeof(char*)); i++) {
+            if (!strcmp(argv[1], version_opts[i])) {
+                printf("bin2c %s\n", version);
+                return 0;
+            }
         }
     }
 
-    fprintf(out_file, "};\n");
+    if (!(in_file  = !in_file_name  || !strcmp(in_file_name, "-")  ?  stdin : fopen(in_file_name,  "rb")))
+        die("can't open input file '%s'", in_file_name);
+
+    if (!(out_file = !out_file_name || !strcmp(out_file_name, "-") ? stdout : fopen(out_file_name, "w")))
+        die("can't open '%s' for writing", out_file_name);
+
+    if (in_file_name && !var_name)
+        var_name = computed_identifier = file_name_to_identifier(in_file_name);
+
+    fprintf(out_file, "/* generated from %s: do not edit */\n"
+                      "const unsigned char %s[] = {\n",
+                      in_file_name ? in_file_name : "resource data",
+                      var_name     ? var_name     : "resource_data"
+    );
+
+    in_fd = fileno(in_file);
+
+    while ((bytes_read = read(in_fd, buf, BUF_SIZE))) {
+        for (i = 0; i < bytes_read; i++) {
+            char* comma = bytes_read < BUF_SIZE && i == bytes_read - 1 ? "" : ",";
+
+            fprintf(out_file, "0x%02x%s", buf[i], comma);
+
+            if (++file_pos % 16 == 0) fputc('\n', out_file);
+        }
+    }
+
+    fputs("};\n", out_file);
 
     free(buf);
+    free(computed_identifier);
     fclose(in_file);
     fclose(out_file);
 
