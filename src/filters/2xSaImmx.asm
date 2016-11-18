@@ -26,19 +26,12 @@
 
 
 
-          BITS 32
-%ifdef __DJGPP__
-          GLOBAL __2xSaILine
-          GLOBAL __2xSaISuperEagleLine
-                  GLOBAL __2xSaISuper2xSaILine
-          GLOBAL _Init_2xSaIMMX
-%else
-          GLOBAL _2xSaILine
-          GLOBAL _2xSaISuperEagleLine
-                  GLOBAL _2xSaISuper2xSaILine
-          GLOBAL Init_2xSaIMMX
-%endif
-          SECTION .text ALIGN = 32
+BITS 32
+GLOBAL __2xSaILine
+GLOBAL __2xSaISuperEagleLine
+GLOBAL __2xSaISuper2xSaILine
+GLOBAL _Init_2xSaIMMX
+SECTION .text ALIGN = 32
 
 %ifdef FAR_POINTER
 ;EXTERN_C void _2xSaILine (uint8 *srcPtr, uint32 srcPitch, uint32 width,
@@ -86,11 +79,7 @@ colorA3   equ 4
 
 
 
-%ifdef __DJGPP__
 __2xSaISuper2xSaILine:
-%else
-_2xSaISuper2xSaILine:
-%endif
 ; Store some stuff
          push ebp
          mov ebp, esp
@@ -825,11 +814,7 @@ _2xSaISuper2xSaILine:
 
 
 
-%ifdef __DJGPP__
 __2xSaISuperEagleLine:
-%else
-_2xSaISuperEagleLine:
-%endif
 ; Store some stuff
          push ebp
          mov ebp, esp
@@ -1405,11 +1390,7 @@ colorN   equ 0
 colorO   equ 2
 colorP   equ 4
 
-%ifdef __DJGPP__
 __2xSaILine:
-%else
-_2xSaILine:
-%endif
 ; Store some stuff
          push ebp
          mov ebp, esp
@@ -1996,11 +1977,7 @@ _2xSaILine:
 ;-------------------------------------------------------------------------
 ;-------------------------------------------------------------------------
 
-%ifdef __DJGPP__
 _Init_2xSaIMMX:
-%else
-Init_2xSaIMMX:
-%endif
 ; Store some stuff
          push ebp
          mov ebp, esp

@@ -2,7 +2,7 @@
 
 cd "$(dirname $0)"
 
-MINGW_DEPS='SDL2 cairo ffmpeg openal sfml wxWidgets zlib binutils cmake crt-git extra-cmake-modules gcc gcc-libs gdb headers-git make pkg-config tools-git windows-default-manifest libmangle-git'
+MINGW_DEPS='SDL2 cairo ffmpeg openal sfml wxWidgets zlib binutils cmake crt-git extra-cmake-modules gcc gcc-libs gdb headers-git make pkg-config tools-git windows-default-manifest libmangle-git nasm'
 MINGW64_DEPS=
 MINGW32_DEPS=
 

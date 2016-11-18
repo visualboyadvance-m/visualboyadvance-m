@@ -16,8 +16,26 @@ option( ENABLE_GTK3 "Build the GTK+ GUI" OFF )
 option( ENABLE_WX "Build the wxWidgets port" ON )
 option( ENABLE_DEBUGGER "Enable the debugger" ON )
 option( ENABLE_NLS "Enable translations" ON )
-option( ENABLE_ASM_CORE "Enable x86 ASM CPU cores" OFF )
-option( ENABLE_ASM_SCALERS "Enable x86 ASM graphic filters" OFF )
+
+SET(ASM_CORE_DEFAULT OFF)
+SET(ASM_SCALERS_DEFAULT OFF)
+SET(MMX_DEFAULT OFF)
+
+# turn asm on by default on 32bit x86
+IF(CMAKE_SYSTEM_PROCESSOR MATCHES "[xX]86|[aA][mM][dD]64|[xX]64"
+   AND CMAKE_C_SIZEOF_DATA_PTR EQUAL 4)
+    SET(ASM_CORE_DEFAULT ON)
+    SET(ASM_SCALERS_DEFAULT ON)
+    SET(MMX_DEFAULT ON)
+ENDIF()
+
+option( ENABLE_ASM_CORE "Enable x86 ASM CPU cores" ${ASM_CORE_DEFAULT})
+option( ENABLE_ASM_SCALERS "Enable x86 ASM graphic filters" ${ASM_SCALERS_DEFAULT})
+
+if(ENABLE_ASM_SCALERS)
+    option( ENABLE_MMX "Enable MMX" ${MMX_DEFAULT})
+endif(ENABLE_ASM_SCALERS)
+
 option( ENABLE_LINK "Enable GBA linking functionality" ON )
 option( ENABLE_LIRC "Enable LIRC support" OFF )
 
@@ -29,9 +47,6 @@ ENDIF()
 
 option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
 
-if(ENABLE_ASM_SCALERS)
-    option( ENABLE_MMX "Enable MMX" OFF )
-endif(ENABLE_ASM_SCALERS)
 option( ENABLE_GBA_LOGGING "Enable extended GBA logging" ON )
 if( ENABLE_GBA_LOGGING )
    ADD_DEFINITIONS (-DGBA_LOGGING )
@@ -98,12 +113,27 @@ IF(APPLE)
         LINK_DIRECTORIES("/sw/lib")
     ENDIF()
 
+    IF(EXISTS "/usr/local/bin/nasm")
+        SET(CMAKE_ASM_NASM_COMPILER "/usr/local/bin/nasm")
+    ELSEIF(EXISTS "/opt/local/bin/nasm")
+        SET(CMAKE_ASM_NASM_COMPILER "/opt/local/bin/nasm")
+    ENDIF()
+
     IF(EXISTS /usr/local/bin)
         SET(CMAKE_PROGRAM_PATH "${CMAKE_PROGRAM_PATH};/usr/local/bin")
+        IF(EXISTS "/usr/local/bin/nasm")
+            SET(CMAKE_ASM_NASM_COMPILER "/usr/local/bin/nasm")
+        ENDIF()
     ELSEIF(EXISTS /opt/local/bin)
         SET(CMAKE_PROGRAM_PATH "${CMAKE_PROGRAM_PATH};/opt/local/bin")
+        IF(EXISTS "/opt/local/bin/nasm")
+            SET(CMAKE_ASM_NASM_COMPILER "/opt/local/bin/nasm")
+        ENDIF()
     ELSEIF(EXISTS /sw/bin)
         SET(CMAKE_PROGRAM_PATH "${CMAKE_PROGRAM_PATH};/sw/bin")
+        IF(EXISTS "/sw/bin/nasm")
+            SET(CMAKE_ASM_NASM_COMPILER "/sw/bin/nasm")
+        ENDIF()
     ENDIF()
 ENDIF(APPLE)
 
@@ -114,17 +144,9 @@ IF((ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX)
     MESSAGE(FATAL_ERROR "The options ASM_CORE, ASM_SCALERS and MMX are not supported on AMD64 yet.")
 ENDIF()
 
-# Check for nasm
-if( ENABLE_ASM_SCALERS )
-    IF(EXISTS "/usr/local/bin/nasm")
-        SET(CMAKE_ASM_NASM_COMPILER "/usr/local/bin/nasm")
-    ELSEIF(EXISTS "/opt/local/bin/nasm")
-        SET(CMAKE_ASM_NASM_COMPILER "/opt/local/bin/nasm")
-    ELSE()
-        SET(CMAKE_ASM_NASM_COMPILER "/usr/bin/nasm")
-    ENDIF()
+IF(ENABLE_ASM_SCALERS)
     ENABLE_LANGUAGE(ASM_NASM)
-endif( ENABLE_ASM_SCALERS )
+ENDIF(ENABLE_ASM_SCALERS)
 
 # Look for some dependencies using CMake scripts
 FIND_PACKAGE(ZLIB REQUIRED)
@@ -474,6 +496,9 @@ SET(SRC_HQ_ASM
 
 if( ENABLE_ASM_SCALERS )
     SET(SRC_FILTERS ${SRC_FILTERS} ${SRC_HQ_ASM})
+    IF(ENABLE_MMX)
+        SET(SRC_FILTERS ${SRC_FILTERS} src/filters/2xSaImmx.asm)
+    ENDIF(ENABLE_MMX)
 else( ENABLE_ASM_SCALERS )
     SET(SRC_FILTERS ${SRC_FILTERS} ${SRC_HQ_C})
     SET(HDR_FILTERS ${HDR_FILTERS} ${HDR_HQ_C})
