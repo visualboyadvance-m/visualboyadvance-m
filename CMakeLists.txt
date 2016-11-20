@@ -10,7 +10,7 @@ SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts )
 #Output all binaries at top level
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
-option( ENABLE_SDL "Build the SDL port" ON )
+option( ENABLE_SDL "Build the SDL port" OFF )
 option( ENABLE_GTK "Build the GTK+ GUI" OFF )
 option( ENABLE_GTK3 "Build the GTK+ GUI" OFF )
 option( ENABLE_WX "Build the wxWidgets port" ON )
