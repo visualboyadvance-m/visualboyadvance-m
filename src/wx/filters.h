@@ -6,6 +6,9 @@
 // most 16-bit filters require space in src rounded up to uint32_t
 // those that take delta take 1 src line of pixels, rounded up to uint32_t size
 // initial value appears to be all-0xff
+
+#include "../filters/interframe.hpp"
+
 void Pixelate32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
 void Pixelate(uint8_t* src, uint32_t spitch, uint8_t* delta, uint8_t* dst, uint32_t dstp, int w, int h);
 // next 3*2 use Init_2xSaI(555|565) and do not take into account
@@ -67,17 +70,5 @@ void xbrz3x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t ds
 void xbrz4x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
 void xbrz5x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
 void xbrz6x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
-
-// call ifc to ignore previous frame / when starting new
-void InterframeCleanup();
-// all 4 are MMX-accelerated if enabled
-void SmartIB(uint8_t* src, uint32_t spitch, int width, int height);
-void SmartIB32(uint8_t* src, uint32_t spitch, int width, int height);
-void MotionBlurIB(uint8_t* src, uint32_t spitch, int width, int height);
-void MotionBlurIB32(uint8_t* src, uint32_t spitch, int width, int height);
-void SmartIB(uint8_t* src, uint32_t spitch, int width, int starty, int height);
-void SmartIB32(uint8_t* src, uint32_t spitch, int width, int starty, int height);
-void MotionBlurIB(uint8_t* src, uint32_t spitch, int width, int starty, int height);
-void MotionBlurIB32(uint8_t* src, uint32_t spitch, int width, int starty, int height);
 
 #endif /* FILTERS_H */

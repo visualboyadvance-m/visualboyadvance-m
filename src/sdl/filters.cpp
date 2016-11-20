@@ -22,6 +22,8 @@
 
 #include "filters.h"
 
+#include "../filters/interframe.hpp"
+
 //
 // Screen filters
 //
@@ -163,15 +165,6 @@ FilterFunc initFilter(const int f, const int colorDepth, const int srcWidth)
 
     return func;
 }
-
-//
-// Interframe blending filters
-//
-
-extern void SmartIB(uint8_t*, uint32_t, int, int);
-extern void SmartIB32(uint8_t*, uint32_t, int, int);
-extern void MotionBlurIB(uint8_t*, uint32_t, int, int);
-extern void MotionBlurIB32(uint8_t*, uint32_t, int, int);
 
 struct IFBFilterDesc {
     char name[30];

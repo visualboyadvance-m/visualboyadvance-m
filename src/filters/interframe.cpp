@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <memory.h>
 
+#include "interframe.hpp"
+
 #ifdef MMX
 extern "C" bool cpu_mmx;
 #endif
@@ -16,7 +18,6 @@ static uint8_t *frm1 = NULL;
 static uint8_t *frm2 = NULL;
 static uint8_t *frm3 = NULL;
 
-extern int RGB_LOW_BITS_MASK;
 extern uint32_t qRGB_COLOR_MASK[2];
 
 static void Init()
@@ -31,11 +32,12 @@ static void Init()
 
 void InterframeCleanup()
 {
+  //Hack to prevent double freeing *It looks like this is not being called in a thread safe manner)
   if(frm1)
     free(frm1);
-  if(frm2)
+  if(frm2 && (frm1 != frm2))
     free(frm2);
-  if(frm3)
+  if(frm3 && (frm1 != frm3) && (frm2 != frm3))
     free(frm3);
   frm1 = frm2 = frm3 = NULL;
 }
