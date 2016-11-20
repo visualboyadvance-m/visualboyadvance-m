@@ -16,11 +16,11 @@ endif( WIN32 )
 option( ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" ON )
 
 IF(WIN32 AND MINGW)
-    IF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../dependencies")
+    IF(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies")
         MESSAGE(FATAL_ERROR "Please run: git submodule update --init --recursive")
     ENDIF()
 
-    INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../../dependencies/mingw-xaudio/include")
+    INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
 ENDIF()
 
 IF(APPLE)

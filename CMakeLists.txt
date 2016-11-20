@@ -1,7 +1,12 @@
 # The project's name is VBA-M it uses C and C++ code
 PROJECT(VBA-M C CXX)
 
-cmake_minimum_required( VERSION 3.1.0 )
+cmake_minimum_required( VERSION 3.3.2 )
+
+IF(CMAKE_BUILD_TYPE STREQUAL "")
+    SET(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type" FORCE)
+ENDIF()
+
 if( COMMAND cmake_policy )
     cmake_policy( SET CMP0003 NEW )
     cmake_policy( SET CMP0005 OLD )
@@ -88,15 +93,6 @@ ELSE()
     ADD_DEFINITIONS(-DNDEBUG)
 ENDIF()
 
-# Set compiler flags for gcc/clang
-IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        ADD_COMPILE_OPTIONS(-g2 -mtune=generic -O2 -pipe -fPIC -Wformat -Wformat-security -fomit-frame-pointer -fstack-protector-strong --param ssp-buffer-size=4 -fexceptions -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types -Wall)
-    ELSE()
-        ADD_COMPILE_OPTIONS(    -mtune=generic -O2 -pipe -fPIC -Wformat -Wformat-security -fomit-frame-pointer -fstack-protector-strong --param ssp-buffer-size=4 -fexceptions -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types -Wno-error)
-    ENDIF()
-ENDIF()
-
 # Add support for Homebrew, MacPorts and Fink on OS X
 IF(APPLE)
     IF(EXISTS /usr/local/include)
@@ -146,9 +142,10 @@ IF((ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX)
     MESSAGE(FATAL_ERROR "The options ASM_CORE, ASM_SCALERS and MMX are not supported on AMD64 yet.")
 ENDIF()
 
-IF(ENABLE_ASM_SCALERS)
+IF(ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS)
     ENABLE_LANGUAGE(ASM_NASM)
-ENDIF(ENABLE_ASM_SCALERS)
+    SET(ASM_ENABLED ON)
+ENDIF()
 
 # Look for some dependencies using CMake scripts
 FIND_PACKAGE(ZLIB REQUIRED)
@@ -280,30 +277,70 @@ if( ENABLE_NLS )
     ENDIF(ENABLE_LINK)
 endif( ENABLE_NLS )
 
-# Compiler flags
+# Win32 deps submodule
 IF(WIN32)
-    SET( CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -w-orphan-labels")
-ELSEIF(APPLE)
-    SET( CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -DMACHO -w-orphan-labels")
+    IF(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies" AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+        MESSAGE(FATAL_ERROR "Please pull in git submodules, e.g. run: git submodule update --init --recursive")
+    ENDIF()
+
+    INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/dependencies/include")
+ENDIF()
+
+# Compiler flags
+
+IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    # common flags
+    SET(MY_C_AND_CXX_FLAGS -mtune=generic -pipe -fPIC -Wformat -Wformat-security -fomit-frame-pointer -fstack-protector-strong --param ssp-buffer-size=4 -fexceptions -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types)
+
+    SET(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_AND_CXX_FLAGS})
+    SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} ${MY_C_AND_CXX_FLAGS})
+
+    IF(MINGW)
+        SET(MY_C_FLAGS   ${MY_C_FLAGS}   -static-libgcc)
+        SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} -static-libgcc -static-libstdc++)
+    ENDIF(MINGW)
+
+    IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        SET(MY_C_FLAGS   ${MY_C_FLAGS}   -g2 -Wall)
+        SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} -g2 -Wall)
+    ELSE()
+        SET(MY_C_FLAGS   ${MY_C_FLAGS}   -O2 -Wno-error)
+        SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} -O2 -Wno-error)
+    ENDIF()
+
+    FOREACH(C_COMPILE_FLAG ${MY_C_FLAGS})
+        ADD_COMPILE_OPTIONS($<$<COMPILE_LANGUAGE:C>:${C_COMPILE_FLAG}>)
+    ENDFOREACH()
+
+    FOREACH(CXX_COMPILE_FLAG ${MY_CXX_FLAGS})
+        ADD_COMPILE_OPTIONS($<$<COMPILE_LANGUAGE:CXX>:${CXX_COMPILE_FLAG}>)
+    ENDFOREACH()
+
+    # for the gcc -fstack-protector* flags we need libssp
+    # clang does not have this
+    IF(CMAKE_COMPILER_IS_GNUCXX)
+        SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -lssp")
+        SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   -lssp")
+    ENDIF()
+ENDIF()
+
+# Assembler flags
+
+IF(ASM_ENABLED)
+    FOREACH(ASM_FLAG -I${CMAKE_SOURCE_DIR}/src/filters/hq/asm/ -O1 -w-orphan-labels)
+        ADD_COMPILE_OPTIONS($<$<COMPILE_LANGUAGE:ASM_NASM>:${ASM_FLAG}>)
+    ENDFOREACH()
+ENDIF(ASM_ENABLED)
+
+IF(APPLE)
+    ADD_DEFINITIONS(-DMACHO)
 ELSEIF("${CMAKE_SYSTEM}" MATCHES "Linux")
-    SET( CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -I$(CMAKE_SOURCE_DIR)/src/filters/hq/asm/ -O1 -DELF -w-orphan-labels")
+    ADD_DEFINITIONS(-DELF)
 ENDIF()
 
 IF(CMAKE_SYSTEM_PROCESSOR MATCHES "[xX]86|[aA][mM][dD]64|[xX]64" AND CMAKE_C_SIZEOF_DATA_PTR EQUAL 8)
-    ADD_DEFINITIONS( -D__AMD64__ )
-    SET(CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -D__AMD64__")
+    ADD_DEFINITIONS(-D__AMD64__)
 ENDIF()
-
-SET( CMAKE_C_FLAGS_RELEASE "-O3")
-SET( CMAKE_CXX_FLAGS_RELEASE "-O3")
-SET( CMAKE_C_FLAGS_DEBUG "-g -Wall")
-SET( CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
-
-if (WIN32)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc -static -I./dependencies/include")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ -static -I./dependencies/include")
-endif (WIN32)
-
 
 add_subdirectory (fex)
 

@@ -179,7 +179,7 @@ IF(SDL2_LIBRARY_TEMP)
 
 	# For MinGW library
 	IF(MINGW)
-		SET(SDL2_LIBRARY_TEMP ${MINGW32_LIBRARY} ${SDL2_LIBRARY_TEMP})
+		SET(SDL2_LIBRARY_TEMP ${MINGW32_LIBRARY} ${SDL2_LIBRARY_TEMP} -lversion -limm32)
 	ENDIF(MINGW)
 
         # Add some stuff from pkg-config, if available
