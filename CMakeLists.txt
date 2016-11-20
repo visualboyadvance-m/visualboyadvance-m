@@ -90,7 +90,6 @@ ELSE()
 ENDIF()
 
 # Add support for Homebrew, MacPorts and Fink on OS X
-# as well as for ObjectiveC code
 IF(APPLE)
     IF(EXISTS /usr/local/include)
         SET(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH};/usr/local/include")
@@ -112,12 +111,6 @@ IF(APPLE)
     ELSEIF(EXISTS /sw/lib)
         SET(CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH};/sw/lib")
         LINK_DIRECTORIES("/sw/lib")
-    ENDIF()
-
-    IF(EXISTS "/usr/local/bin/nasm")
-        SET(CMAKE_ASM_NASM_COMPILER "/usr/local/bin/nasm")
-    ELSEIF(EXISTS "/opt/local/bin/nasm")
-        SET(CMAKE_ASM_NASM_COMPILER "/opt/local/bin/nasm")
     ENDIF()
 
     IF(EXISTS /usr/local/bin)
