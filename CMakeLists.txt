@@ -82,11 +82,19 @@ IF( NOT VERSION )
     endif(EXISTS ${PROJECT_SOURCE_DIR}/.git)
 ENDIF( NOT VERSION )
 
-# Set compiler flags
 IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    ADD_COMPILE_OPTIONS(-DDEBUG -g2 -mtune=generic -O2 -pipe -fPIC -Wformat -Wformat-security -fomit-frame-pointer -fstack-protector-strong --param ssp-buffer-size=4 -fexceptions -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types -Wall)
+    ADD_DEFINITIONS(-DDEBUG)
 ELSE()
-    ADD_COMPILE_OPTIONS(-DNDEBUG    -mtune=generic -O2 -pipe -fPIC -Wformat -Wformat-security -fomit-frame-pointer -fstack-protector-strong --param ssp-buffer-size=4 -fexceptions -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types -Wno-error)
+    ADD_DEFINITIONS(-DNDEBUG)
+ENDIF()
+
+# Set compiler flags for gcc/clang
+IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        ADD_COMPILE_OPTIONS(-g2 -mtune=generic -O2 -pipe -fPIC -Wformat -Wformat-security -fomit-frame-pointer -fstack-protector-strong --param ssp-buffer-size=4 -fexceptions -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types -Wall)
+    ELSE()
+        ADD_COMPILE_OPTIONS(    -mtune=generic -O2 -pipe -fPIC -Wformat -Wformat-security -fomit-frame-pointer -fstack-protector-strong --param ssp-buffer-size=4 -fexceptions -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types -Wno-error)
+    ENDIF()
 ENDIF()
 
 # Add support for Homebrew, MacPorts and Fink on OS X
