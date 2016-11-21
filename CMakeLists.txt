@@ -7,6 +7,8 @@ IF(CMAKE_BUILD_TYPE STREQUAL "")
     SET(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type" FORCE)
 ENDIF()
 
+SET(ALL_TARGETS fex gvbam visualboyadvance-m vbamcore vbam)
+
 if( COMMAND cmake_policy )
     cmake_policy( SET CMP0003 NEW )
     cmake_policy( SET CMP0005 OLD )
@@ -289,8 +291,21 @@ ENDIF()
 # Compiler flags
 
 IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    # common optimization flags
+    SET(MY_C_AND_CXX_OPT_FLAGS      -O2 -mtune=generic -fomit-frame-pointer -flto=10)
+    SET(MY_C_AND_CXX_OPT_FLAGS_STR "-O2 -mtune=generic -fomit-frame-pointer -flto=10")
+
+    # common debug flags
+    IF(CMAKE_COMPILER_IS_GNUCXX)
+        SET(MY_C_AND_CXX_DBG_FLAGS      -ggdb3 -Og)
+        SET(MY_C_AND_CXX_DBG_FLAGS_STR "-ggdb3 -Og")
+    ELSE()
+        SET(MY_C_AND_CXX_DBG_FLAGS      -g)
+        SET(MY_C_AND_CXX_DBG_FLAGS_STR "-g")
+    ENDIF()
+
     # common flags
-    SET(MY_C_AND_CXX_FLAGS -mtune=generic -pipe -fPIC -Wformat -Wformat-security -fomit-frame-pointer -fstack-protector-strong --param ssp-buffer-size=4 -fexceptions -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types)
+    SET(MY_C_AND_CXX_FLAGS -pipe -fPIC -Wformat -Wformat-security -fstack-protector-strong --param ssp-buffer-size=4 -fexceptions -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types)
 
     SET(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_AND_CXX_FLAGS})
     SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} ${MY_C_AND_CXX_FLAGS})
@@ -300,12 +315,12 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} -static-libgcc -static-libstdc++)
     ENDIF(MINGW)
 
-    IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        SET(MY_C_FLAGS   ${MY_C_FLAGS}   -g2 -Wall)
-        SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} -g2 -Wall)
+    IF(CMAKE_BUILD_TYPE STREQUAL Debug)
+        SET(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_AND_CXX_DBG_FLAGS} -Wall)
+        SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} ${MY_C_AND_CXX_DBG_FLAGS} -Wall)
     ELSE()
-        SET(MY_C_FLAGS   ${MY_C_FLAGS}   -O2 -Wno-error)
-        SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} -O2 -Wno-error)
+        SET(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_AND_CXX_OPT_FLAGS} -Wno-error)
+        SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} ${MY_C_AND_CXX_OPT_FLAGS} -Wno-error)
     ENDIF()
 
     FOREACH(C_COMPILE_FLAG ${MY_C_FLAGS})
@@ -316,11 +331,34 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         ADD_COMPILE_OPTIONS($<$<COMPILE_LANGUAGE:CXX>:${CXX_COMPILE_FLAG}>)
     ENDFOREACH()
 
+    # need opt flags for link step for LTO, including -flto
+    # but don't use LTO for debug builds, too slow
+    IF(CMAKE_BUILD_TYPE STREQUAL Debug)
+        SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${MY_C_AND_CXX_DBG_FLAGS_STR}")
+        SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${MY_C_AND_CXX_DBG_FLAGS_STR}")
+    ELSE()
+        SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${MY_C_AND_CXX_OPT_FLAGS_STR}")
+        SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${MY_C_AND_CXX_OPT_FLAGS_STR}")
+    ENDIF()
+
     # for the gcc -fstack-protector* flags we need libssp
-    # clang does not have this
+    # we also have to use the gcc- binutils for LTO to work
     IF(CMAKE_COMPILER_IS_GNUCXX)
-        SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -lssp")
-        SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   -lssp")
+        INCLUDE(UseGCCBinUtilsWrappers)
+
+        IF(WIN32)
+            SET(SSP_STATIC ON)
+        ENDIF(WIN32)
+
+        FIND_PACKAGE(SSP)
+
+        IF(SSP_LIBRARY)
+            SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${SSP_LIBRARY}")
+            SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${SSP_LIBRARY}")
+        ENDIF(SSP_LIBRARY)
+
+        SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,-allow-multiple-definition")
+        SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   -Wl,-allow-multiple-definition")
     ENDIF()
 ENDIF()
 
