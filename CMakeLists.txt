@@ -292,16 +292,13 @@ ENDIF()
 
 IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # common optimization flags
-    SET(MY_C_AND_CXX_OPT_FLAGS      -O2 -mtune=generic -fomit-frame-pointer -flto=10)
-    SET(MY_C_AND_CXX_OPT_FLAGS_STR "-O2 -mtune=generic -fomit-frame-pointer -flto=10")
+    SET(MY_C_AND_CXX_OPT_FLAGS -O2 -mtune=generic -fomit-frame-pointer -flto=10)
 
     # common debug flags
     IF(CMAKE_COMPILER_IS_GNUCXX)
-        SET(MY_C_AND_CXX_DBG_FLAGS      -ggdb3 -Og)
-        SET(MY_C_AND_CXX_DBG_FLAGS_STR "-ggdb3 -Og")
+        SET(MY_C_AND_CXX_DBG_FLAGS -ggdb3 -Og)
     ELSE()
-        SET(MY_C_AND_CXX_DBG_FLAGS      -g)
-        SET(MY_C_AND_CXX_DBG_FLAGS_STR "-g")
+        SET(MY_C_AND_CXX_DBG_FLAGS -g)
     ENDIF()
 
     # common flags
@@ -331,15 +328,21 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         ADD_COMPILE_OPTIONS($<$<COMPILE_LANGUAGE:CXX>:${CXX_COMPILE_FLAG}>)
     ENDFOREACH()
 
-    # need opt flags for link step for LTO, including -flto
-    # but don't use LTO for debug builds, too slow
-    IF(CMAKE_BUILD_TYPE STREQUAL Debug)
-        SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${MY_C_AND_CXX_DBG_FLAGS_STR}")
-        SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${MY_C_AND_CXX_DBG_FLAGS_STR}")
-    ELSE()
-        SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${MY_C_AND_CXX_OPT_FLAGS_STR}")
-        SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${MY_C_AND_CXX_OPT_FLAGS_STR}")
-    ENDIF()
+    # make a string of compile options to add to link flags
+    UNSET(C_COMPILE_FLAGS_STR)
+    UNSET(CXX_COMPILE_FLAGS_STR)
+
+    FOREACH(ARG ${MY_C_FLAGS})
+        SET(C_COMPILE_FLAGS_STR "${C_COMPILE_FLAGS_STR} ${ARG}")
+    ENDFOREACH()
+
+    FOREACH(ARG ${MY_CXX_FLAGS})
+        SET(CXX_COMPILE_FLAGS_STR "${CXX_COMPILE_FLAGS_STR} ${ARG}")
+    ENDFOREACH()
+
+    # need all flags for linking, because of -flto etc.
+    SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${C_COMPILE_FLAGS_STR}")
+    SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${CXX_COMPILE_FLAGS_STR}")
 
     # for the gcc -fstack-protector* flags we need libssp
     # we also have to use the gcc- binutils for LTO to work
@@ -353,12 +356,12 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         FIND_PACKAGE(SSP)
 
         IF(SSP_LIBRARY)
-            SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${SSP_LIBRARY}")
             SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${SSP_LIBRARY}")
+            SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${SSP_LIBRARY}")
         ENDIF(SSP_LIBRARY)
 
-        SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,-allow-multiple-definition")
         SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   -Wl,-allow-multiple-definition")
+        SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,-allow-multiple-definition")
     ENDIF()
 ENDIF()
 
