@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version=0.7
+version=1.0
 
 main() {
     # parse options
@@ -68,7 +68,7 @@ main() {
 
     mkdir -p "$frameworks" 2>/dev/null
 
-    lib_scan "$@" | fully_resolve_links | sort -u | \
+    scan_libs "$@" | fully_resolve_links | sort -u | \
     while read lib; do
         if [ -n "$list" ]; then
             echo "$lib"
@@ -116,6 +116,15 @@ quit() {
     exit ${1:-0}
 }
 
+scan_libs() {
+    scratch_dir="$tmp/lib_scan"
+    mkdir -p "$scratch_dir"
+
+    lib_scan "$@"
+
+    rm -rf "$scratch_dir"
+}
+
 lib_scan() {
     for bin in "$@"; do
         case "$bin" in
@@ -126,12 +135,21 @@ lib_scan() {
                 ;;
         esac
 
+        # if binary is already processed, continue
+        [ -d "$scratch_dir/$bin" ] && continue
+
+        # otherwise mark it processed
+        mkdir -p "$scratch_dir/$bin"
+
         set --
 
         OLDIFS=$IFS
         IFS='
 '
-        for lib in $(otool -L "$bin" 2>/dev/null | sed -n 's/^	\([^ ]*\).*/\1/p' | grep -v '^/System/' | grep -v '^/usr/lib/'); do
+        for lib in $(otool -L "$bin" 2>/dev/null \
+            | awk '/^([^ \t]|([ \t]*\/(System|usr\/lib)\/))/ { next } \
+                   { sub("^[ \t]*", ""); sub("[ \t]*\\(.*\\)[ \t]*$", ""); print }'); do
+
             [ "$lib" = "$bin" ] && continue
 
             echo "$lib"
@@ -152,15 +170,13 @@ fully_resolve_links() {
         file=${file#*/}
 
         OLDIFS=$IFS
-        IFS='
-'
-        for part in $(echo "$file" | sed 's,^/*,,; s,/*$,,; s,//*,\
-,g'); do
-            path=$(resolve_link "$path/$part")
+        IFS='/'
+        for part in $file; do
+            [ ! -z "$part" ] && path=$(resolve_link "$path/$part")
         done
         IFS=$OLDIFS
 
-        # remove '..' path parts
+        # remove 'foo/..' path parts
         while :; do
             case "$path" in
                 */../*|*/..)
@@ -173,18 +189,20 @@ fully_resolve_links() {
         done
 
         # remove trailing /s
-        path=$(echo "$path" | sed 's,/*$,,')
+        while [ "$path" != "${path%/}" ]; do
+            path=${path%/}
+        done
 
         echo "$path"
     done
 }
 
 resolve_link() {
-    file="$1"
+    file=$1
 
     while [ -h "$file" ]; do
-        ls0=`ls -ld "$file"`
-        new_link=`expr "$ls0" : '.* -> \(.*\)$'`
+        ls0=$(ls -ld "$file")
+        new_link=$(expr "$ls0" : '.* -> \(.*\)$')
         if expr "$new_link" : '/.*' > /dev/null; then
             file="$new_link"
         else
