@@ -291,8 +291,14 @@ ENDIF()
 # Compiler flags
 
 IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    IF(CMAKE_COMPILER_IS_GNUCXX)
+        SET(LTO_FLAG -flto=10)
+    ELSE()
+        SET(LTO_FLAG -flto)
+    ENDIF()
+
     # common optimization flags
-    SET(MY_C_AND_CXX_OPT_FLAGS -O2 -mtune=generic -fomit-frame-pointer -flto=10)
+    SET(MY_C_AND_CXX_OPT_FLAGS -O2 -mtune=generic -fomit-frame-pointer ${LTO_FLAG})
 
     # common debug flags
     IF(CMAKE_COMPILER_IS_GNUCXX)
