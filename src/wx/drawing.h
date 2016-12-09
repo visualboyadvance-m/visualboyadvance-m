@@ -9,6 +9,7 @@ public:
 
 protected:
     void DrawArea(wxWindowDC& dc);
+    virtual void DrawImage(wxWindowDC& dc, wxImage* im);
 
     DECLARE_CLASS()
 };
@@ -60,6 +61,17 @@ protected:
     void DrawArea(wxWindowDC&);
     cairo_surface_t* conv_surf;
 
+    DECLARE_CLASS()
+};
+#endif
+
+#if defined(__WXMAC__)
+class Quartz2DDrawingPanel : public BasicDrawingPanel {
+public:
+    Quartz2DDrawingPanel(wxWindow* parent, int _width, int _height);
+    virtual void DrawImage(wxWindowDC& dc, wxImage* im);
+
+protected:
     DECLARE_CLASS()
 };
 #endif

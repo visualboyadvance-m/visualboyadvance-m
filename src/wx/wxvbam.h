@@ -416,10 +416,13 @@ enum ifbfunc {
 };
 
 // make sure and keep this in sync with opts.cpp!
-enum renderer { RND_SIMPLE,
+enum renderer {
+    RND_SIMPLE,
     RND_OPENGL,
     RND_CAIRO,
-    RND_DIRECT3D };
+    RND_DIRECT3D,
+    RND_QUARTZ2D,
+};
 
 // likewise
 enum audioapi { AUD_SDL,
@@ -635,7 +638,8 @@ public:
     virtual wxWindow* GetWindow() { return dynamic_cast<wxWindow*>(this); }
     virtual void Delete() { (dynamic_cast<wxWindow*>(this))->Destroy(); }
 
-    void PaintEv(wxPaintEvent& ev);
+    virtual void PaintEv(wxPaintEvent& ev);
+    virtual void EraseBackground(wxEraseEvent& ev);
 protected:
     virtual void DrawArea(wxWindowDC&) = 0;
     virtual void DrawOSD(wxWindowDC&);

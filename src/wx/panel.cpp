@@ -989,20 +989,22 @@ void GameArea::OnIdle(wxIdleEvent& event)
         case RND_SIMPLE:
             panel = new BasicDrawingPanel(this, basic_width, basic_height);
             break;
+#ifdef __WXMAC__
+        case RND_QUARTZ2D:
+            panel = new Quartz2DDrawingPanel(this, basic_width, basic_height);
+            break;
+#endif
 #ifndef NO_OGL
-
         case RND_OPENGL:
             panel = new GLDrawingPanel(this, basic_width, basic_height);
             break;
 #endif
 #ifndef NO_CAIRO
-
         case RND_CAIRO:
             panel = new CairoDrawingPanel(this, basic_width, basic_height);
             break;
 #endif
 #ifdef __WXMSW__
-
         case RND_DIRECT3D:
             panel = new DXDrawingPanel(this, basic_width, basic_height);
             break;
@@ -1380,6 +1382,7 @@ void DrawingPanel::DrawingPanelInit()
 
     // this is not 2.8 compatible, sorry
     w->Bind(wxEVT_PAINT, &DrawingPanel::PaintEv, this);
+    w->Bind(wxEVT_ERASE_BACKGROUND, &DrawingPanel::EraseBackground, this);
 
     did_init = true;
 }
@@ -1401,6 +1404,11 @@ void DrawingPanel::PaintEv(wxPaintEvent& ev)
 
     DrawArea(dc);
     DrawOSD(dc);
+}
+
+void DrawingPanel::EraseBackground(wxEraseEvent& ev)
+{
+    // do nothing, do not allow propagation
 }
 
 // In order to run filters in parallel, they have to run from the method of
@@ -1912,17 +1920,16 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
 
 void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 {
-    wxBitmap* bm;
+    wxImage* im;
 
     if (systemColorDepth == 24) {
         // never scaled, no borders, no transformations needed
-        wxImage im(width, height, todraw, true);
-        bm = new wxBitmap(im);
+        im = new wxImage(width, height, todraw, true);
     } else if (out_16) {
         // scaled by filters, top/right borders, transform to 24-bit
-        wxImage im(std::ceil(width * scale), std::ceil(height * scale), false);
+        im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
         uint16_t* src = (uint16_t*)todraw + (int)std::ceil((width + 2) * scale); // skip top border
-        uint8_t* dst = im.GetData();
+        uint8_t* dst = im->GetData();
 
         for (int y = 0; y < std::ceil(height * scale); y++) {
             for (int x = 0; x < std::ceil(width * scale); x++, src++) {
@@ -1933,14 +1940,12 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 
             src += 2; // skip rhs border
         }
-
-        bm = new wxBitmap(im);
     } else // 32-bit
     {
         // scaled by filters, top/right borders, transform to 24-bit
-        wxImage im(std::ceil(width * scale), std::ceil(height * scale), false);
+        im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
         uint32_t* src = (uint32_t*)todraw + (int)std::ceil((width + 1) * scale); // skip top border
-        uint8_t* dst = im.GetData();
+        uint8_t* dst = im->GetData();
 
         for (int y = 0; y < std::ceil(height * scale); y++) {
             for (int x = 0; x < std::ceil(width * scale); x++, src++) {
@@ -1951,18 +1956,23 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 
             ++src; // skip rhs border
         }
-
-        bm = new wxBitmap(im);
     }
 
+    DrawImage(dc, im);
+
+    delete im;
+}
+
+void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
+{
     double sx, sy;
     int w, h;
     GetClientSize(&w, &h);
     sx = w / (width * scale);
     sy = h / (height * scale);
     dc.SetUserScale(sx, sy);
-    dc.DrawBitmap(*bm, 0, 0);
-    delete bm;
+    wxBitmap bm(*im);
+    dc.DrawBitmap(bm, 0, 0);
 }
 
 #ifndef NO_OGL

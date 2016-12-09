@@ -3301,8 +3301,12 @@ bool MainFrame::BindControls()
             // validator just for this, and spinctrl is good enough.
             getgtc("DefaultScale", gopts.video_scale);
             getsc("MaxScale", maxScale);
-            /// Advanced
+            /// Basic
             getrbi("OutputSimple", gopts.render_method, RND_SIMPLE);
+            getrbi("OutputQuartz2D", gopts.render_method, RND_QUARTZ2D);
+#if !defined(__WXMAC__)
+            rb->Hide();
+#endif
             getrbi("OutputOpenGL", gopts.render_method, RND_OPENGL);
 #ifdef NO_OGL
             rb->Hide();
