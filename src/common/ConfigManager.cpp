@@ -696,7 +696,7 @@ const char* FindConfigFile(const char *name)
 		return path;
 	}
 
-	sprintf(path, "%s%c%s", SYSCONFDIR, FILE_SEP, name);
+	sprintf(path, "%s%c%s", SYSCONF_INSTALL_DIR, FILE_SEP, name);
 	if (FileExists(path))
 	{
 		return path;

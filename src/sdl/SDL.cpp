@@ -422,8 +422,8 @@ FILE* sdlFindFile(const char* name)
     if (f != NULL)
         return f;
 
-    fprintf(stdout, "Searching system config directory: %s\n", SYSCONFDIR);
-    sprintf(path, "%s%c%s", SYSCONFDIR, FILE_SEP, name);
+    fprintf(stdout, "Searching system config directory: %s\n", SYSCONF_INSTALL_DIR);
+    sprintf(path, "%s%c%s", SYSCONF_INSTALL_DIR, FILE_SEP, name);
     f = fopen(path, "r");
     if (f != NULL)
         return f;
