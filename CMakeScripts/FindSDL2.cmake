@@ -80,24 +80,21 @@
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
-message("<FindSDL2.cmake>")
-
 SET(SDL2_SEARCH_PATHS
 	~/Library/Frameworks
 	/Library/Frameworks
-	/usr/local
+	/usr/local # Mac Homebrew and local installs
 	/usr
 	/sw # Fink
-	/opt/local # DarwinPorts
-	/opt/csw # Blastwave
+	/opt/local # MacPorts
+	/opt/csw # OpenCSW (Solaris)
 	/opt
 	${SDL2_PATH}
 )
 
 FIND_PATH(SDL2_INCLUDE_DIR SDL.h
-	HINTS
-	$ENV{SDL2DIR}
-	PATH_SUFFIXES include/SDL2 include
+	HINTS $ENV{SDL2DIR}
+	PATH_SUFFIXES SDL2
 	PATHS ${SDL2_SEARCH_PATHS}
 )
 
@@ -113,8 +110,7 @@ ENDIF(SDL2_STATIC)
 
 FIND_LIBRARY(SDL2_LIBRARY_TEMP
 	NAMES SDL2
-	HINTS
-	$ENV{SDL2DIR}
+	HINTS $ENV{SDL2DIR}
 	PATH_SUFFIXES lib64 lib lib/x64 lib/x86
 	PATHS ${SDL2_SEARCH_PATHS}
 )
@@ -149,7 +145,7 @@ ENDIF(NOT APPLE)
 # MinGW needs an additional link flag, -mwindows
 # It's total link flags should look like -lmingw32 -lSDL2main -lSDL2 -mwindows
 IF(MINGW)
-	SET(MINGW32_LIBRARY mingw32 "-mwindows" CACHE STRING "mwindows for MinGW")
+	SET(MINGW32_LIBRARY -lmingw32 -mwindows CACHE STRING "mwindows for MinGW")
 ENDIF(MINGW)
 
 IF(SDL2_LIBRARY_TEMP)
@@ -189,18 +185,18 @@ IF(SDL2_LIBRARY_TEMP)
 
         IF(PKG_CONFIG_EXECUTABLE)
             # get any definitions
-            EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE} --cflags-only-other sdl2 OUTPUT_VARIABLE SDL2_DEFINITIONS)
+            EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE} --cflags-only-other sdl2 OUTPUT_VARIABLE SDL2_DEFINITIONS ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 
             SET(SDL2_DEFINITIONS ${SDL2_DEFINITIONS} CACHE STRING "Extra CFLAGS for SDL2 from pkg-config")
 
             # get any extra stuff needed for linking
             IF(NOT SDL2_STATIC)
-                EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE}          --libs-only-other sdl2 OUTPUT_VARIABLE SDL2_LINKER_FLAGS_RAW    OUTPUT_STRIP_TRAILING_WHITESPACE)
+                EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE}          --libs-only-other sdl2 OUTPUT_VARIABLE SDL2_LINKER_FLAGS_RAW    ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-                EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE}          --libs-only-l     sdl2 OUTPUT_VARIABLE SDL2_EXTRA_LIBS_RAW      OUTPUT_STRIP_TRAILING_WHITESPACE)
+                EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE}          --libs-only-l     sdl2 OUTPUT_VARIABLE SDL2_EXTRA_LIBS_RAW      ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
             ELSE(NOT SDL2_STATIC)
-                EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE} --static --libs-only-other sdl2 OUTPUT_VARIABLE SDL2_LINKER_FLAGS_RAW    OUTPUT_STRIP_TRAILING_WHITESPACE)
-                EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE} --static --libs-only-l     sdl2 OUTPUT_VARIABLE SDL2_EXTRA_LIBS_RAW      OUTPUT_STRIP_TRAILING_WHITESPACE)
+                EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE} --static --libs-only-other sdl2 OUTPUT_VARIABLE SDL2_LINKER_FLAGS_RAW    ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+                EXECUTE_PROCESS(COMMAND ${PKG_CONFIG_EXECUTABLE} --static --libs-only-l     sdl2 OUTPUT_VARIABLE SDL2_EXTRA_LIBS_RAW      ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
             ENDIF(NOT SDL2_STATIC)
 
             STRING(REGEX REPLACE "[^ ]+SDL2[^ ]*" ""  SDL2_EXTRA_LIBS_RAW2 "${SDL2_EXTRA_LIBS_RAW}")
@@ -218,8 +214,6 @@ IF(SDL2_LIBRARY_TEMP)
 	# Set the temp variable to INTERNAL so it is not seen in the CMake GUI
 	SET(SDL2_LIBRARY_TEMP "${SDL2_LIBRARY_TEMP}" CACHE INTERNAL "")
 ENDIF(SDL2_LIBRARY_TEMP)
-
-message("</FindSDL2.cmake>")
 
 INCLUDE(FindPackageHandleStandardArgs)
 

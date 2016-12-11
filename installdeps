@@ -1,0 +1,152 @@
+#!/bin/sh
+
+main() {
+    cd "$(dirname $0)"
+
+    case "$(uname -s)" in
+        Linux)
+            linux_installdeps
+            ;;
+        Darwin)
+            osx_installdeps
+            ;;
+        MINGW*|MSYS*)
+            msys2_installdeps
+            ;;
+        *)
+            echo "Don't know how to install deps on your OS." >&2
+            exit 1
+            ;;
+    esac
+
+    exit 0
+}
+
+linux_installdeps() {
+    if [ -f /etc/debian_version ]; then
+        debian_installdeps
+    elif [ -f /etc/arch-release ]; then
+        archlinux_installdeps
+    else
+        echo "Don't know how to install deps on your version of Linux." >&2
+        exit 1
+    fi
+}
+
+debian_installdeps() {
+    echo '[32mInstalling deps....[0m'
+    echo
+
+    sudo apt-get -y update || exit 1
+    sudo apt-get -y install build-essential g++ zlib1g-dev libgl1-mesa-dev cmake libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libjpeg-dev libpng16-dev libtiff5-dev libsdl2-dev libsfml-dev libopenal-dev libwxgtk3.0-dev || exit 1
+
+    generic_build_instructions
+}
+
+archlinux_installdeps() {
+    echo '[32mInstalling deps....[0m'
+    echo
+
+    pacman="sudo pacman"
+    command -v pacaur >/dev/null && pacman=pacaur
+
+    $pacman --noconfirm --needed -Syuu base-devel gcc zlib mesa cairo cmake ffmpeg gettext libpng libtiff pkg-config sdl2 sfml openal wxgtk || exit 1
+
+    generic_build_instructions
+}
+
+msys2_installdeps() {
+    MINGW_DEPS='SDL2 cairo ffmpeg openal sfml wxWidgets zlib binutils cmake crt-git extra-cmake-modules gcc gcc-libs gdb headers-git make pkg-config tools-git windows-default-manifest libmangle-git nasm'
+    MINGW64_DEPS=
+    MINGW32_DEPS=
+
+    for dep in $MINGW_DEPS; do
+        MINGW64_DEPS="$MINGW64_DEPS mingw-w64-x86_64-$dep"
+        MINGW32_DEPS="$MINGW32_DEPS mingw-w64-i686-$dep"
+    done
+
+    echo '[32mInstalling deps....[0m'
+    echo
+
+    pacman --noconfirm --needed -Syuu git make zip $MINGW64_DEPS $MINGW32_DEPS || exit 1
+
+    git submodule update --init --recursive
+
+    cmake_flags="-G 'MSYS Makefiles'"
+
+    generic_build_instructions
+}
+
+osx_installdeps() {
+    if ! xcode-select -p >/dev/null 2>&1 && \
+       ! pkgutil --pkg-info=com.apple.pkg.CLTools_Executables >/dev/null 2>&1 && \
+       ! pkgutil --pkg-info=com.apple.pkg.DeveloperToolsCLI >/dev/null 2>&1; then
+
+        echo 'Please install XCode and the XCode Command Line Tools, then run this script again.' >&2
+        echo 'On newer systems this can be done with: xcode-select --install' >&2
+        exit 1
+    fi
+
+    if command -v brew >/dev/null; then
+        brew_installdeps
+    elif command -v port >/dev/null; then
+        macports_installdeps
+    elif command -v fink >/dev/null; then
+        fink_installdeps
+    else
+        echo 'You have no package manager, please install homebrew, macports or fink.' >&2
+        echo 'Homebrew is recommended.' >&2
+    fi
+}
+
+brew_installdeps() {
+    echo '[32mInstalling deps....[0m'
+    echo
+
+    brew -v update || exit 1
+    brew -v install cairo cmake ffmpeg gettext jpeg libpng libtiff pkg-config sdl2 sfml wxmac || exit 1
+
+    brew -v cleanup
+
+    generic_build_instructions
+}
+
+macports_installdeps() {
+    echo '[32mInstalling deps....[0m'
+    echo
+
+    sudo port -v selfupdate || exit 1
+    sudo port -v install cairo cmake ffmpeg gettext jpeg libpng tiff pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv || exit 1
+    sudo port select wxWidgets wxWidgets-3.0
+
+    generic_build_instructions
+}
+
+fink_installdeps() {
+    echo '[32mInstalling deps....[0m'
+    echo
+
+    sudo fink -vy selfupdate || exit 1
+    sudo fink -vy install cairo cmake ffmpeg libgettext8-dev libjpeg9 libpng16 libtiff5 pkgconfig sdl2 wxwidgets300-osxcocoa libiconv-dev || exit 1
+
+    echo
+    echo '[31mWARNING:[0m SFML is required for LINK support, there is currently no SFML package for Fink, if you want LINK support you will need to install it manually.'
+
+    cmake_flags='-DENABLE_LINK=NO'
+
+    generic_build_instructions
+}
+
+generic_build_instructions() {
+    cat <<EOF
+
+[32mDone! To build do:[0m
+
+mkdir build
+cd build
+cmake .. $cmake_flags
+make -j10
+EOF
+}
+
+main "$@"
