@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+ <id>gvbam.desktop</id>
+ <metadata_license>GPLv2</metadata_license>
+ <project_license>GPLv2</project_license>
+ <name>VBAM (GTK)</name>
+ <summary>GTK3 GUI for VBA-M, a high compatibility Gameboy Advance Emulator</summary>
+ <description>
+  <p>
+   VisualBoyAdvance-M is a Nintendo Game Boy Emulator with high compatibility with
+   commercial games. It emulates the Nintendo Game Boy Advance hand held console,
+   in addition to the original Game Boy hand held systems and its Super and Color
+   variants. VBA-M is a continued development of the now inactive VisualBoy
+   Advance project, with many improvements from various developments of VBA.
+  </p>
+ </description>
+ <url type="homepage">http://vba-m.com/</url>
+ <url type="bugtracker">https://github.com/visualboyadvance-m/visualboyadvance-m/issues</url>
+</component>
