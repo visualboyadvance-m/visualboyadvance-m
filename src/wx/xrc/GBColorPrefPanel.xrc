@@ -93,7 +93,7 @@
             <object class="wxButton" name="Reset">
               <label>Restore</label>
             </object>
-            <flag>wxALL|wxALIGN_RIGHT</flag>
+            <flag>wxALL</flag>
             <border>5</border>
           </object>
           <orient>wxHORIZONTAL</orient>
