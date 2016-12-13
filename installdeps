@@ -63,16 +63,19 @@ host OS.
 This program may require [1;35msudo[0m.
 
 A cross-compile target may be specified as the only parameter, of either
-[1;35mmingw-w64-i686[0m or [1;35mmingw-w64-x86_64[0m. This is only supported on Arch Linux.
+[1;35mMinGW-w64-i686[0m or [1;35mMinGW-w64-x86_64[0m.
+This is only supported on Arch Linux and MSYS2.
 
 OPn MSYS2 dependencies are installed for both 32 and 64 bit native Windows
-targets implicitly.
+targets by default, unless you specify one or the other. MSYS2 layer builds are
+not supported.
 
   [1m-h, --help, --usage[0m                Show this help screen and exit.
 
 Examples:
   [32m./installdeps[0m                        # install dependencies for a host build
-  [32m./installdeps [1;35mmingw-w64-i686[0m         # cross-compile for 32 bit windows (Arch Linux only)
+  [32m./installdeps [1;35mMinGW-w64-i686[0m         # cross-compile for 32 bit windows (Arch Linux or MSYS2)
+  [32m./installdeps [1;35mMinGW-w64-x86_64[0m       # cross-compile for 64 bit windows (Arch Linux or MSYS2)
 EOF
 }
 
@@ -127,11 +130,11 @@ linux_installdeps() {
 }
 
 check_cross() {
-    [ -z "$target" ]     && return
+    [ -z "$target" ] && return
 
-    [ -n "$msys2" ]      && error 'on MSYS2 deps are *only* installed for native targets, both 32 and 64 bit, MSYS2-layer targets or any other type of cross targets are not supported'
-
-    [ -z "$arch_linux" ] && error 'cross compiling is only supported on Arch Linux with pacaur at the moment'
+    if [ -z "$arch_linux" -a -z "$msys2" ]; then
+        error 'cross compiling targets are only supported on Arch Linux and MSYS2 at the moment'
+    fi
 
     target=$(echo "$target" | tr 'A-Z' 'a-z')
 
@@ -252,7 +255,7 @@ archlinux_installdeps() {
                 set -- "$@" "${pkg_prefix}${p}"
             fi
         done
-        check $pacman --noconfirm --needed -S "$@"
+        [ $# -gt 0 ] && check $pacman --noconfirm --needed -S "$@"
 
         warning 'SFML is required for LINK support, the SFML package in AUR is currently broken, if you want LINK support you will need to install it manually'
     fi
@@ -266,20 +269,27 @@ msys2_installdeps() {
     check_cross
     installing
 
-    MINGW_DEPS='SDL2 cairo ffmpeg openal sfml wxWidgets zlib binutils cmake crt-git extra-cmake-modules gcc gcc-libs gdb headers-git make pkg-config tools-git windows-default-manifest libmangle-git nasm'
-    MINGW64_DEPS=
-    MINGW32_DEPS=
-
-    for dep in $MINGW_DEPS; do
-        MINGW64_DEPS="$MINGW64_DEPS mingw-w64-x86_64-$dep"
-        MINGW32_DEPS="$MINGW32_DEPS mingw-w64-i686-$dep"
-    done
-
     # update catalogs
     check pacman -Sy
 
+    set --
+    for p in SDL2 cairo ffmpeg openal sfml wxWidgets zlib binutils cmake crt-git extra-cmake-modules gcc gcc-libs gdb headers-git make pkg-config tools-git windows-default-manifest libmangle-git nasm; do
+        if [ -n "$target" ]; then
+            if ! pacman -Q "${target}-${p}" >/dev/null 2>&1; then
+                set -- "$@" "${target}-${p}"
+            fi
+        else
+            # install both 32 and 64 bit versions
+            for p_ in "mingw-w64-x86_64-$p" "mingw-w64-i686-$p"; do
+                if ! pacman -Q "$p_" >/dev/null 2>&1; then
+                    set -- "$@" "$p_"
+                fi
+            done
+        fi
+    done
+
     # install
-    check pacman --noconfirm --needed -S git make zip $MINGW64_DEPS $MINGW32_DEPS
+    check pacman --noconfirm --needed -S git make zip "$@"
 
     check git submodule update --init --recursive
 
@@ -312,7 +322,14 @@ brew_installdeps() {
     installing
 
     check brew -v update
-    check brew -v install cairo cmake ffmpeg gettext jpeg libpng libtiff pkg-config sdl2 sfml wxmac
+
+    set --
+    for f in cairo cmake ffmpeg gettext jpeg libpng libtiff pkg-config sdl2 sfml wxmac; do
+        if brew info "$f" | grep -Eq '^Not installed$'; then
+            set -- "$@" "$f"
+        fi
+    done
+    [ $# -gt 0 ] && check brew -v install "$@"
 
     brew -v cleanup
 
