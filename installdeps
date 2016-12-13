@@ -217,9 +217,9 @@ archlinux_installdeps() {
 
         pkg_prefix='mingw-w64-'
 
-        # cross toolchain (without crt)
+        # cross toolchain (without headers and crt, we'll use -git versions)
         set --
-        for p in binutils gcc headers winpthreads; do
+        for p in binutils gcc winpthreads; do
             set -- "$@" "${pkg_prefix}${p}"
         done
         check $pacman --noconfirm --needed -S "$@"
@@ -242,10 +242,14 @@ archlinux_installdeps() {
 
         # now do the AUR builds
 
-        # first we need -crt-git (unless -crt is installed)
-        if ! $pacman -Q "${pkg_prefix}crt" >/dev/null 2>&1; then
-            check $pacman --noconfirm --needed -S "${pkg_prefix}crt-git"
-        fi
+        # first we need -headers-git and -crt-git (unless the non-git packages are installed)
+        for p in "${pkg_prefix}headers" "${pkg_prefix}crt"; do
+          if ! $pacman -Q "$p" >/dev/null 2>&1; then
+              check $pacman --noconfirm --needed -S "${p}-git"
+          else
+              warning "${pkg_prefix}headers-git and ${pkg_prefix}crt-git are recommended over the regular versions, if you have build failures try to install them"
+          fi
+        done
 
         # and the actual deps
         for p in zlib gettext libpng libtiff pkg-config sdl2 openal wxmsw; do
