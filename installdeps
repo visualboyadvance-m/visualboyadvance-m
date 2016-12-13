@@ -3,6 +3,27 @@
 main() {
     cd "$(dirname $0)"
 
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            -h|--help|--usage)
+                usage
+                quit 0
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+
+    if [ $# -gt 1 ]; then
+        usage
+        quit 1
+    fi
+
+    target=$1
+
+    mktmp
+
     case "$(uname -s)" in
         Linux)
             linux_installdeps
@@ -14,12 +35,85 @@ main() {
             msys2_installdeps
             ;;
         *)
-            echo "Don't know how to install deps on your OS." >&2
-            exit 1
+            error "Don't know how to install deps on your OS"
             ;;
     esac
 
-    exit 0
+    quit 0
+}
+
+mktmp() {
+    tmp="/tmp/installdeps_$$"
+    mkdir "$tmp" || quit 1
+    chmod 700 "$tmp" 2>/dev/null
+    trap "quit 1" PIPE HUP INT QUIT ILL TRAP KILL BUS TERM
+}
+
+quit() {
+    [ -n "$tmp" ] && rm -rf "$tmp" 2>/dev/null
+    exit ${1:-0}
+}
+
+usage() {
+    cat <<'EOF'
+Usage: [32m./installdeps [1;35m[TARGET][0m
+Try to install the dependencies needed for this project appropriately on the
+host OS.
+
+This program may require [1;35msudo[0m.
+
+A cross-compile target may be specified as the only parameter, of either
+[1;35mmingw-w64-i686[0m or [1;35mmingw-w64-x86_64[0m. This is only supported on Arch Linux.
+
+OPn MSYS2 dependencies are installed for both 32 and 64 bit native Windows
+targets implicitly.
+
+  [1m-h, --help, --usage[0m                Show this help screen and exit.
+
+Examples:
+  [32m./installdeps[0m                        # install dependencies for a host build
+  [32m./installdeps [1;35mmingw-w64-i686[0m         # cross-compile for 32 bit windows (Arch Linux only)
+EOF
+}
+
+error() {
+    printf '\n[31mERROR[0m: %s.\n\n' "$1" >&2
+    [ -z "$2" ] && quit 1
+}
+
+warning() {
+    printf '\n[35mWARNING[0m: %s.\n\n' "$1" >&2
+}
+
+
+info_msg() {
+    printf '\n[32mINFO[0m: %s.\n\n' "$1" >&2
+}
+
+installing() {
+    echo '[32mInstalling deps....[0m'
+    echo
+}
+
+check() {
+    "$@"
+    if [ $? -ne 0 ]; then
+        error 'command failed' NOQUIT
+        printf '%s:\n' 'The failing command was' 
+        echo "$@"
+        quit 1
+    fi
+}
+
+countdown() {
+    secs=$1
+    echo
+    while [ "$secs" -ne 0 ]; do
+        printf '%s\r' "Starting in $secs seconds..."
+        sleep 1
+        secs=$((secs-1))
+    done
+    printf '\n\n'
 }
 
 linux_installdeps() {
@@ -28,34 +122,150 @@ linux_installdeps() {
     elif [ -f /etc/arch-release ]; then
         archlinux_installdeps
     else
-        echo "Don't know how to install deps on your version of Linux." >&2
-        exit 1
+        error "Don't know how to install deps on your version of Linux"
     fi
 }
 
-debian_installdeps() {
-    echo '[32mInstalling deps....[0m'
-    echo
+check_cross() {
+    [ -z "$target" ]     && return
 
-    sudo apt-get -y update || exit 1
-    sudo apt-get -y install build-essential g++ zlib1g-dev libgl1-mesa-dev cmake libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libjpeg-dev libpng16-dev libtiff5-dev libsdl2-dev libsfml-dev libopenal-dev libwxgtk3.0-dev || exit 1
+    [ -n "$msys2" ]      && error 'on MSYS2 deps are *only* installed for native targets, both 32 and 64 bit, MSYS2-layer targets or any other type of cross targets are not supported'
+
+    [ -z "$arch_linux" ] && error 'cross compiling is only supported on Arch Linux with pacaur at the moment'
+
+    target=$(echo "$target" | tr 'A-Z' 'a-z')
+
+    case "$target" in
+        mingw-w64-x86_64)
+            ;;
+        mingw-w64-i686)
+            ;;
+        *)
+            error "target must be one of 'MinGW-w64-i686' or 'MinGW-w64-x86_64'"
+            ;;
+    esac
+}
+
+debian_installdeps() {
+    check_cross
+    installing
+
+    check sudo apt-get -y update
+    check sudo apt-get -y install build-essential g++ zlib1g-dev libgl1-mesa-dev cmake libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libjpeg-dev libpng16-dev libtiff5-dev libsdl2-dev libsfml-dev libopenal-dev libwxgtk3.0-dev
 
     generic_build_instructions
 }
 
 archlinux_installdeps() {
-    echo '[32mInstalling deps....[0m'
-    echo
+    arch_linux=1
 
-    pacman="sudo pacman"
-    command -v pacaur >/dev/null && pacman=pacaur
+    pacman='sudo pacman'
+    command -v pacaur >/dev/null && pacman='pacaur --noedit'
+    command -v yaourt >/dev/null && pacman='yaourt --aur --m-arg=--skipinteg'
 
-    $pacman --noconfirm --needed -Syuu base-devel gcc zlib mesa cairo cmake ffmpeg gettext libpng libtiff pkg-config sdl2 sfml openal wxgtk || exit 1
+    check_cross
+    installing
+
+    # check for gcc-multilib
+    gcc_pkg=gcc
+    if $pacman -Q gcc-multilib >/dev/null 2>&1; then
+        gcc_pkg=gcc-multilib
+    fi
+
+    # update catalogs
+    check $pacman -Sy
+
+    if [ -z "$target" ]; then
+        # native build
+        check $pacman --noconfirm --needed -S base-devel "$gcc_pkg" nasm zlib mesa cairo cmake ffmpeg gettext libpng libtiff pkg-config sdl2 sfml openal wxgtk
+    else
+        # windows cross build
+        case "$target" in
+            *i686*)
+                cmake_flags='-DCMAKE_TOOLCHAIN_FILE=../CMakeScripts/Toolchain-cross-MinGW-w64-i686.cmake -DENABLE_LINK=NO'
+                ;;
+            *x86_64*)
+                cmake_flags='-DCMAKE_TOOLCHAIN_FILE=../CMakeScripts/Toolchain-cross-MinGW-w64-x86_64.cmake -DENABLE_LINK=NO'
+                ;;
+            *)
+                # this will never be reached, it's checked in check_cross()
+                error 'unknown cross target'
+                ;;
+        esac
+
+        # base devel packages
+        check $pacman --noconfirm --needed -S base-devel "$gcc_pkg" nasm cmake git
+
+        # now install yaourt if we don't have it
+        if ! command -v yaourt >/dev/null; then
+            (
+                cd "$tmp"
+                git clone https://aur.archlinux.org/package-query.git
+                cd package-query
+                makepkg --noconfirm -si
+                cd ..
+                git clone https://aur.archlinux.org/yaourt.git
+                cd yaourt
+                makepkg --noconfirm -si
+            )
+            [ $? -ne 0 ] && error 'could not install yaourt'
+        fi
+        pacman='yaourt --aur --m-arg=--skipinteg'
+
+        pkg_prefix='mingw-w64-'
+
+        # cross toolchain (without crt)
+        set --
+        for p in binutils gcc headers winpthreads; do
+            set -- "$@" "${pkg_prefix}${p}"
+        done
+        check $pacman --noconfirm --needed -S "$@"
+
+        # build library deps from AUR
+
+        info_msg 'We will now build dependencies from AUR, this will take quite a while and has a high probability of failure. In fact, it is definitely broken at the time of this writing. Press CTRL-C now to abort'
+
+        countdown 16
+
+        # pass appropriate make -jX flag through makepkg
+        export MAKEPKG_CONF=${MAKEPKG_CONF:-/etc/makepkg.conf}
+
+        grep -Ev '^[ 	]*MAKEFLAGS=' "$MAKEPKG_CONF" > "$tmp/makepkg.conf"
+
+        export MAKEFLAGS="-j$(($(cat /proc/cpuinfo | grep -E '^processor	' | wc -l)+1))"
+        echo "MAKEFLAGS=\"$MAKEFLAGS\"" >> "$tmp/makepkg.conf"
+
+        export MAKEPKG_CONF="$tmp/makepkg.conf"
+
+        # now do the AUR builds
+
+        # first we need -crt-git (unless -crt is installed)
+        if ! $pacman -Q "${pkg_prefix}crt" >/dev/null 2>&1; then
+            check $pacman --noconfirm --needed -S "${pkg_prefix}crt-git"
+        fi
+
+        # and the actual deps
+        for p in zlib gettext libpng libtiff pkg-config sdl2 openal wxmsw; do
+            pkg="${pkg_prefix}${p}"
+            # check if already installed
+            if ! $pacman -Q "$pkg" >/dev/null 2>&1; then
+                set -- "$@" "${pkg_prefix}${p}"
+            fi
+        done
+        check $pacman --noconfirm --needed -S "$@"
+
+        warning 'SFML is required for LINK support, the SFML package in AUR is currently broken, if you want LINK support you will need to install it manually'
+    fi
 
     generic_build_instructions
 }
 
 msys2_installdeps() {
+    msys2=1
+
+    check_cross
+    installing
+
     MINGW_DEPS='SDL2 cairo ffmpeg openal sfml wxWidgets zlib binutils cmake crt-git extra-cmake-modules gcc gcc-libs gdb headers-git make pkg-config tools-git windows-default-manifest libmangle-git nasm'
     MINGW64_DEPS=
     MINGW32_DEPS=
@@ -65,12 +275,13 @@ msys2_installdeps() {
         MINGW32_DEPS="$MINGW32_DEPS mingw-w64-i686-$dep"
     done
 
-    echo '[32mInstalling deps....[0m'
-    echo
+    # update catalogs
+    check pacman -Sy
 
-    pacman --noconfirm --needed -Syuu git make zip $MINGW64_DEPS $MINGW32_DEPS || exit 1
+    # install
+    check pacman --noconfirm --needed -S git make zip $MINGW64_DEPS $MINGW32_DEPS
 
-    git submodule update --init --recursive
+    check git submodule update --init --recursive
 
     cmake_flags="-G 'MSYS Makefiles'"
 
@@ -82,9 +293,7 @@ osx_installdeps() {
        ! pkgutil --pkg-info=com.apple.pkg.CLTools_Executables >/dev/null 2>&1 && \
        ! pkgutil --pkg-info=com.apple.pkg.DeveloperToolsCLI >/dev/null 2>&1; then
 
-        echo 'Please install XCode and the XCode Command Line Tools, then run this script again.' >&2
-        echo 'On newer systems this can be done with: xcode-select --install' >&2
-        exit 1
+        error 'Please install XCode and the XCode Command Line Tools, then run this script again. On newer systems this can be done with: xcode-select --install   '
     fi
 
     if command -v brew >/dev/null; then
@@ -94,17 +303,16 @@ osx_installdeps() {
     elif command -v fink >/dev/null; then
         fink_installdeps
     else
-        echo 'You have no package manager, please install homebrew, macports or fink.' >&2
-        echo 'Homebrew is recommended.' >&2
+        error 'You have no package manager, please install homebrew, macports or fink'
     fi
 }
 
 brew_installdeps() {
-    echo '[32mInstalling deps....[0m'
-    echo
+    check_cross
+    installing
 
-    brew -v update || exit 1
-    brew -v install cairo cmake ffmpeg gettext jpeg libpng libtiff pkg-config sdl2 sfml wxmac || exit 1
+    check brew -v update
+    check brew -v install cairo cmake ffmpeg gettext jpeg libpng libtiff pkg-config sdl2 sfml wxmac
 
     brew -v cleanup
 
@@ -112,25 +320,24 @@ brew_installdeps() {
 }
 
 macports_installdeps() {
-    echo '[32mInstalling deps....[0m'
-    echo
+    check_cross
+    installing
 
-    sudo port -v selfupdate || exit 1
-    sudo port -v install cairo cmake ffmpeg gettext jpeg libpng tiff pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv || exit 1
-    sudo port select wxWidgets wxWidgets-3.0
+    check sudo port -v selfupdate
+    check sudo port -v install cairo cmake ffmpeg gettext jpeg libpng tiff pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv
+    check sudo port select wxWidgets wxWidgets-3.0
 
     generic_build_instructions
 }
 
 fink_installdeps() {
-    echo '[32mInstalling deps....[0m'
-    echo
+    check_cross
+    installing
 
-    sudo fink -vy selfupdate || exit 1
-    sudo fink -vy install cairo cmake ffmpeg libgettext8-dev libjpeg9 libpng16 libtiff5 pkgconfig sdl2 wxwidgets300-osxcocoa libiconv-dev || exit 1
+    check sudo fink -vy selfupdate
+    check sudo fink -vy install cairo cmake ffmpeg libgettext8-dev libjpeg9 libpng16 libtiff5 pkgconfig sdl2 wxwidgets300-osxcocoa libiconv-dev
 
-    echo
-    echo '[31mWARNING:[0m SFML is required for LINK support, there is currently no SFML package for Fink, if you want LINK support you will need to install it manually.'
+    warning 'SFML is required for LINK support, there is currently no SFML package for Fink, if you want LINK support you will need to install it manually'
 
     cmake_flags='-DENABLE_LINK=NO'
 
@@ -142,8 +349,7 @@ generic_build_instructions() {
 
 [32mDone! To build do:[0m
 
-mkdir build
-cd build
+mkdir build && cd build
 cmake .. $cmake_flags
 make -j10
 EOF
