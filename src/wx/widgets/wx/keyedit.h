@@ -108,4 +108,42 @@ protected:
     DECLARE_CLASS(wxKeyValidator)
 };
 
+const struct {
+    wxKeyCode code;
+    const char *name;
+    const char *display_name;
+} keys_with_display_names[] = {
+    { WXK_BACK,              wxTRANSLATE("Back"),           wxTRANSLATE("Backspace") },
+    { WXK_PAGEUP,            wxTRANSLATE("PageUp"),         wxTRANSLATE("Page Up") },
+    { WXK_PAGEDOWN,          wxTRANSLATE("PageDown"),       wxTRANSLATE("Page Down") },
+    { WXK_NUMLOCK,           wxTRANSLATE("Num_lock"),       wxTRANSLATE("Num Lock") },
+    { WXK_SCROLL,            wxTRANSLATE("Scroll_lock"),    wxTRANSLATE("Scroll Lock") },
+    { WXK_NUMPAD_SPACE,      wxTRANSLATE("KP_Space"),       wxTRANSLATE("Num Space") },
+    { WXK_NUMPAD_TAB,        wxTRANSLATE("KP_Tab"),         wxTRANSLATE("Num Tab") },
+    { WXK_NUMPAD_ENTER,      wxTRANSLATE("KP_Enter"),       wxTRANSLATE("Num Enter") },
+    { WXK_NUMPAD_HOME,       wxTRANSLATE("KP_Home"),        wxTRANSLATE("Num Home") },
+    { WXK_NUMPAD_LEFT,       wxTRANSLATE("KP_Left"),        wxTRANSLATE("Num left") },
+    { WXK_NUMPAD_UP,         wxTRANSLATE("KP_Up"),          wxTRANSLATE("Num Up") },
+    { WXK_NUMPAD_RIGHT,      wxTRANSLATE("KP_Right"),       wxTRANSLATE("Num Right") },
+    { WXK_NUMPAD_DOWN,       wxTRANSLATE("KP_Down"),        wxTRANSLATE("Num Down") },
+
+    // these two are in some 3.1+ builds for whatever reason
+    { WXK_NUMPAD_PAGEUP,     wxTRANSLATE("KP_PageUp"),      wxTRANSLATE("Num PageUp") },
+    { WXK_NUMPAD_PAGEDOWN,   wxTRANSLATE("KP_PageDown"),    wxTRANSLATE("Num PageDown") },
+
+    { WXK_NUMPAD_PAGEUP,     wxTRANSLATE("KP_PageUp"),      wxTRANSLATE("Num Page Up") },
+    { WXK_NUMPAD_PAGEDOWN,   wxTRANSLATE("KP_PageDown"),    wxTRANSLATE("Num Page Down") },
+    { WXK_NUMPAD_END,        wxTRANSLATE("KP_End"),         wxTRANSLATE("Num End") },
+    { WXK_NUMPAD_BEGIN,      wxTRANSLATE("KP_Begin"),       wxTRANSLATE("Num Begin") },
+    { WXK_NUMPAD_INSERT,     wxTRANSLATE("KP_Insert"),      wxTRANSLATE("Num Insert") },
+    { WXK_NUMPAD_DELETE,     wxTRANSLATE("KP_Delete"),      wxTRANSLATE("Num Delete") },
+    { WXK_NUMPAD_EQUAL,      wxTRANSLATE("KP_Equal"),       wxTRANSLATE("Num =") },
+    { WXK_NUMPAD_MULTIPLY,   wxTRANSLATE("KP_Multiply"),    wxTRANSLATE("Num *") },
+    { WXK_NUMPAD_ADD,        wxTRANSLATE("KP_Add"),         wxTRANSLATE("Num +") },
+    { WXK_NUMPAD_SEPARATOR,  wxTRANSLATE("KP_Separator"),   wxTRANSLATE("Num ,") },
+    { WXK_NUMPAD_SUBTRACT,   wxTRANSLATE("KP_Subtract"),    wxTRANSLATE("Num -") },
+    { WXK_NUMPAD_DECIMAL,    wxTRANSLATE("KP_Decimal"),     wxTRANSLATE("Num .") },
+    { WXK_NUMPAD_DIVIDE,     wxTRANSLATE("KP_Divide"),      wxTRANSLATE("Num /") },
+};
+
 #endif /* WX_KEYTEXT_H */

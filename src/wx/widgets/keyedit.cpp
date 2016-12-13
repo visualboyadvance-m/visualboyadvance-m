@@ -100,6 +100,11 @@ wxString wxKeyTextCtrl::ToString(int mod, int key)
             s.append(_("CTRL"));
             break;
 
+        // this is the cmd key on macs
+        case WXK_RAW_CONTROL:
+            s.append(_("RAWCTRL"));
+            break;
+
         default:
             s.append((wxChar)key);
         }
@@ -118,6 +123,21 @@ wxString wxKeyTextCtrl::ToString(int mod, int key)
     if (s.empty() || (key != wxT('-') && s[s.size() - 1] == wxT('-')))
         // bad key combo; probably also generates an assertion in wx
         return wxEmptyString;
+
+// hacky workaround for bug in wx 3.1+ not parsing key display names, or
+// parsing modifiers that aren't a combo correctly
+    s.MakeUpper();
+
+    int keys_el_size = sizeof(keys_with_display_names)/sizeof(keys_with_display_names[0]);
+
+    for (int i = 0; i < keys_el_size; i++) {
+        wxString name(keys_with_display_names[i].name);
+        wxString display_name(keys_with_display_names[i].display_name);
+        name.MakeUpper();
+        display_name.MakeUpper();
+
+        s.Replace(display_name, name, true);
+    }
 
     return s;
 }
@@ -193,10 +213,18 @@ bool wxKeyTextCtrl::ParseString(const wxChar* s, int len, int& mod, int& key)
         chk_str(wxT("SHIFT"), WXK_SHIFT);
         chk_str(wxT("CTRL"), WXK_CONTROL);
         chk_str(wxT("CONTROL"), WXK_CONTROL);
+        chk_str(wxT("RAWCTRL"), WXK_CONTROL);
+        chk_str(wxT("RAW_CTRL"), WXK_RAW_CONTROL);
+        chk_str(wxT("RAWCONTROL"), WXK_RAW_CONTROL);
+        chk_str(wxT("RAW_CONTROL"), WXK_RAW_CONTROL);
         chk_str(_("ALT"), WXK_ALT);
         chk_str(_("SHIFT"), WXK_SHIFT);
         chk_str(_("CTRL"), WXK_CONTROL);
         chk_str(_("CONTROL"), WXK_CONTROL);
+        chk_str(_("RAWCTRL"), WXK_RAW_CONTROL);
+        chk_str(_("RAW_CTRL"), WXK_RAW_CONTROL);
+        chk_str(_("RAWCONTROL"), WXK_RAW_CONTROL);
+        chk_str(_("RAW_CONTROL"), WXK_RAW_CONTROL);
         return false;
     }
 
