@@ -329,7 +329,9 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # for the gcc -fstack-protector* flags we need libssp
     # we also have to use the gcc- binutils for LTO to work
     IF(CMAKE_COMPILER_IS_GNUCXX)
-        INCLUDE(UseGCCBinUtilsWrappers)
+        IF(ENABLE_LTO)
+            INCLUDE(UseGCCBinUtilsWrappers)
+        ENDIF(ENABLE_LTO)
 
         IF(WIN32)
             SET(SSP_STATIC ON)
