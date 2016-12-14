@@ -1131,9 +1131,11 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
         case WXK_CONTROL:
             mod |= wxMOD_CONTROL;
             break;
+#ifdef __WXMAC__
         case WXK_RAW_CONTROL:
             mod |= wxMOD_RAW_CONTROL;
             break;
+#endif
     }
 
     // check if key is already pressed

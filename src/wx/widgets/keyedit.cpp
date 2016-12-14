@@ -101,10 +101,12 @@ wxString wxKeyTextCtrl::ToString(int mod, int key)
             s.append(_("CTRL"));
             break;
 
-        // this is the cmd key on macs
+        // this is the control key on macs
+#ifdef __WXMAC__
         case WXK_RAW_CONTROL:
             s.append(_("RAWCTRL"));
             break;
+#endif
 
         default:
             s.append((wxChar)key);
