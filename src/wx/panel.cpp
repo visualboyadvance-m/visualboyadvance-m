@@ -1119,6 +1119,23 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
 {
     static bool in_game_key = false;
 
+    // modifier-only key releases do not set the modifier flag
+    // so we set it here to match key release events to key press events
+    switch (key) {
+        case WXK_SHIFT:
+            mod |= wxMOD_SHIFT;
+            break;
+        case WXK_ALT:
+            mod |= wxMOD_ALT;
+            break;
+        case WXK_CONTROL:
+            mod |= wxMOD_CONTROL;
+            break;
+        case WXK_RAW_CONTROL:
+            mod |= wxMOD_RAW_CONTROL;
+            break;
+    }
+
     // check if key is already pressed
     int kpno;
 
@@ -1155,6 +1172,7 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
             for (int k = 0; k < b.size(); k++)
                 if (b[k].key == key && b[k].mod == mod && b[k].joy == joy) {
                     if (down) {
+                        // press button
                         joypress[i] |= bmask[j];
                         matched_game_key = true;
                     }
@@ -1175,6 +1193,7 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
                         }
 
                         if (k2 == b.size()) {
+                            // release button
                             joypress[i] &= ~bmask[j];
                             matched_game_key = true;
                         }
@@ -1185,7 +1204,7 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
         }
 
     in_game_key = matched_game_key;
-
+    
     return in_game_key;
 }
 

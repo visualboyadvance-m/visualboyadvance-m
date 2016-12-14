@@ -1,3 +1,4 @@
+#include <wx/log.h>
 #include "wx/keyedit.h"
 
 IMPLEMENT_DYNAMIC_CLASS(wxKeyTextCtrl, wxTextCtrl)
@@ -71,7 +72,7 @@ wxString wxKeyTextCtrl::ToString(int mod, int key)
     // before passing to ToString()
     bool char_override = key > 32 && key < WXK_START && !wxIsalnum(key);
     // wx also ignores modifiers (and does not report meta at all)
-    bool mod_override = key == WXK_SHIFT || key == WXK_CONTROL || key == WXK_ALT;
+    bool mod_override = key == WXK_SHIFT || key == WXK_CONTROL || key == WXK_ALT || key == WXK_RAW_CONTROL;
     wxAcceleratorEntry ae(mod, char_override || mod_override ? WXK_F1 : key);
     // Note: wx translates unconditionally (2.8.12, 2.9.1)!
     // So any strings added below must also be translated unconditionally
@@ -120,7 +121,8 @@ wxString wxKeyTextCtrl::ToString(int mod, int key)
 
 #endif
 
-    if (s.empty() || (key != wxT('-') && s[s.size() - 1] == wxT('-')))
+    if (s.empty() || (key != wxT('-') && s[s.size() - 1] == wxT('-'))
+                  || (key != wxT('+') && s[s.size() - 1] == wxT('+')))
         // bad key combo; probably also generates an assertion in wx
         return wxEmptyString;
 
@@ -193,38 +195,39 @@ bool wxKeyTextCtrl::ParseString(const wxChar* s, int len, int& mod, int& key)
     // unlike ToString(), this generates a debug message rather than
     // an assertion error, so it's easy to ignore and expensive to avoid
     // beforehand.  Instead, check for them on failure
+    wxLogNull disable_logging;
     if (!ae.FromString(a)) {
         a.MakeUpper();
-#define chk_str(n, k)                                                    \
+#define chk_str(n, k, m)                                                 \
     do {                                                                 \
         wxString t = n;                                                  \
         if (a.size() > t.size() && a.substr(a.size() - t.size()) == t) { \
             a.replace(a.size() - t.size(), t.size(), wxT("F1"));         \
             wxString ss(s);                                              \
             if (ae.FromString(a)) {                                      \
-                mod |= ae.GetFlags();                                    \
+                mod |= ae.GetFlags() | m;                                \
                 key = k;                                                 \
                 return true;                                             \
             }                                                            \
             a.replace(a.size() - 2, 2, n);                               \
         }                                                                \
     } while (0)
-        chk_str(wxT("ALT"), WXK_ALT);
-        chk_str(wxT("SHIFT"), WXK_SHIFT);
-        chk_str(wxT("CTRL"), WXK_CONTROL);
-        chk_str(wxT("CONTROL"), WXK_CONTROL);
-        chk_str(wxT("RAWCTRL"), WXK_CONTROL);
-        chk_str(wxT("RAW_CTRL"), WXK_RAW_CONTROL);
-        chk_str(wxT("RAWCONTROL"), WXK_RAW_CONTROL);
-        chk_str(wxT("RAW_CONTROL"), WXK_RAW_CONTROL);
-        chk_str(_("ALT"), WXK_ALT);
-        chk_str(_("SHIFT"), WXK_SHIFT);
-        chk_str(_("CTRL"), WXK_CONTROL);
-        chk_str(_("CONTROL"), WXK_CONTROL);
-        chk_str(_("RAWCTRL"), WXK_RAW_CONTROL);
-        chk_str(_("RAW_CTRL"), WXK_RAW_CONTROL);
-        chk_str(_("RAWCONTROL"), WXK_RAW_CONTROL);
-        chk_str(_("RAW_CONTROL"), WXK_RAW_CONTROL);
+        chk_str(wxT("ALT"), WXK_ALT, wxMOD_ALT);
+        chk_str(wxT("SHIFT"), WXK_SHIFT, wxMOD_SHIFT);
+        chk_str(wxT("RAWCTRL"), WXK_RAW_CONTROL, wxMOD_RAW_CONTROL);
+        chk_str(wxT("RAW_CTRL"), WXK_RAW_CONTROL, wxMOD_RAW_CONTROL);
+        chk_str(wxT("RAWCONTROL"), WXK_RAW_CONTROL, wxMOD_RAW_CONTROL);
+        chk_str(wxT("RAW_CONTROL"), WXK_RAW_CONTROL, wxMOD_RAW_CONTROL);
+        chk_str(_("ALT"), WXK_ALT, wxMOD_ALT);
+        chk_str(_("SHIFT"), WXK_SHIFT, wxMOD_SHIFT);
+        chk_str(_("RAWCTRL"), WXK_RAW_CONTROL, wxMOD_RAW_CONTROL);
+        chk_str(_("RAW_CTRL"), WXK_RAW_CONTROL, wxMOD_RAW_CONTROL);
+        chk_str(_("RAWCONTROL"), WXK_RAW_CONTROL, wxMOD_RAW_CONTROL);
+        chk_str(_("RAW_CONTROL"), WXK_RAW_CONTROL, wxMOD_RAW_CONTROL);
+        chk_str(wxT("CTRL"), WXK_CONTROL, wxMOD_CONTROL);
+        chk_str(wxT("CONTROL"), WXK_CONTROL, wxMOD_CONTROL);
+        chk_str(_("CTRL"), WXK_CONTROL, wxMOD_CONTROL);
+        chk_str(_("CONTROL"), WXK_CONTROL, wxMOD_CONTROL);
         return false;
     }
 
