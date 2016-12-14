@@ -2489,11 +2489,12 @@ EVT_HANDLER(Printer, "Enable printer emulation")
 {
     GetMenuOptionInt("Printer", winGbPrinterEnabled, 1);
 #if (defined __WIN32__ || defined _WIN32)
+#ifndef NO_LINK
     gbSerialFunction = gbStartLink;
 #else
     gbSerialFunction = NULL;
 #endif
-
+#endif
     if (winGbPrinterEnabled)
         gbSerialFunction = gbPrinterSend;
 
