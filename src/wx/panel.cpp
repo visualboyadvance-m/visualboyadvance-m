@@ -1,4 +1,5 @@
 #include <wx/dcbuffer.h>
+#include <SDL/SDL_joystick.h>
 
 #include "../../version.h"
 #include "../common/ConfigManager.h"
@@ -1236,62 +1237,11 @@ void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
         process_key_press(false, key, WXJB_AXIS_PLUS, joy);
         process_key_press(ev.GetControlValue() != 0, key, mod, joy);
     } else if (mod >= WXJB_HAT_FIRST && mod <= WXJB_HAT_LAST) {
-        if (ev.GetControlValue() == 0) {
-            process_key_press(false, key, WXJB_HAT_N, joy);
-            process_key_press(false, key, WXJB_HAT_S, joy);
-            process_key_press(false, key, WXJB_HAT_E, joy);
-            process_key_press(false, key, WXJB_HAT_W, joy);
-        } else {
-            switch (mod) {
-            case WXJB_HAT_N:
-                process_key_press(ev.GetControlValue() != 0, key, WXJB_HAT_N, joy);
-                process_key_press(false, key, WXJB_HAT_S, joy);
-                break;
-
-            case WXJB_HAT_S:
-                process_key_press(ev.GetControlValue() != 0, key, WXJB_HAT_S, joy);
-                process_key_press(false, key, WXJB_HAT_N, joy);
-                break;
-
-            case WXJB_HAT_E:
-                process_key_press(ev.GetControlValue() != 0, key, WXJB_HAT_E, joy);
-                process_key_press(false, key, WXJB_HAT_W, joy);
-                break;
-
-            case WXJB_HAT_W:
-                process_key_press(ev.GetControlValue() != 0, key, WXJB_HAT_W, joy);
-                process_key_press(false, key, WXJB_HAT_E, joy);
-                break;
-
-            case WXJB_HAT_NE:
-                process_key_press(ev.GetControlValue() != 0, key, WXJB_HAT_N, joy);
-                process_key_press(ev.GetControlValue() != 0, key, WXJB_HAT_E, joy);
-                process_key_press(false, key, WXJB_HAT_S, joy);
-                process_key_press(false, key, WXJB_HAT_W, joy);
-                break;
-
-            case WXJB_HAT_NW:
-                process_key_press(ev.GetControlValue() != 0, key, WXJB_HAT_N, joy);
-                process_key_press(ev.GetControlValue() != 0, key, WXJB_HAT_W, joy);
-                process_key_press(false, key, WXJB_HAT_S, joy);
-                process_key_press(false, key, WXJB_HAT_E, joy);
-                break;
-
-            case WXJB_HAT_SE:
-                process_key_press(ev.GetControlValue() != 0, key, WXJB_HAT_S, joy);
-                process_key_press(ev.GetControlValue() != 0, key, WXJB_HAT_E, joy);
-                process_key_press(false, key, WXJB_HAT_N, joy);
-                process_key_press(false, key, WXJB_HAT_W, joy);
-                break;
-
-            case WXJB_HAT_SW:
-                process_key_press(ev.GetControlValue() != 0, key, WXJB_HAT_S, joy);
-                process_key_press(ev.GetControlValue() != 0, key, WXJB_HAT_W, joy);
-                process_key_press(false, key, WXJB_HAT_N, joy);
-                process_key_press(false, key, WXJB_HAT_E, joy);
-                break;
-            }
-        }
+        int value = ev.GetControlValue();
+        process_key_press(value & SDL_HAT_UP, key, WXJB_HAT_N, joy);
+        process_key_press(value & SDL_HAT_DOWN, key, WXJB_HAT_S, joy);
+        process_key_press(value & SDL_HAT_RIGHT, key, WXJB_HAT_E, joy);
+        process_key_press(value & SDL_HAT_LEFT, key, WXJB_HAT_W, joy);
     } else
         process_key_press(ev.GetControlValue() != 0, key, mod, joy);
 }
