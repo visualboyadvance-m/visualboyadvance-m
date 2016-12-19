@@ -1,5 +1,5 @@
 #include <wx/dcbuffer.h>
-#include <SDL/SDL_joystick.h>
+#include <SDL_joystick.h>
 
 #include "../../version.h"
 #include "../common/ConfigManager.h"
