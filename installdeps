@@ -356,7 +356,7 @@ fink_installdeps() {
     installing
 
     check sudo fink -vy selfupdate
-    check sudo fink -vy install cairo cmake ffmpeg libgettext8-dev libjpeg9 libpng16 libtiff5 pkgconfig sdl2 wxwidgets300-osxcocoa libiconv-dev
+    check sudo fink -vy install cairo cmake ffmpeg libgettext8-dev gettext-tools libjpeg9 libpng16 libtiff5 pkgconfig sdl2 wxwidgets300-osxcocoa libiconv-dev
 
     warning 'SFML is required for LINK support, there is currently no SFML package for Fink, if you want LINK support you will need to install it manually'
 
