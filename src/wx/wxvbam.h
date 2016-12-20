@@ -623,7 +623,7 @@ extern const int ncmds;
 // for binary search
 extern bool cmditem_lt(const struct cmditem& cmd1, const struct cmditem& cmd2);
 
-#include "../win32/rpi.h"
+#include "rpi.h"
 #include <wx/dynlib.h>
 
 class FilterThread;
