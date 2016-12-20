@@ -10,7 +10,7 @@
 
 Operating System (Windows, Mac, Linux, etc.):
 
-Interface (wX, GTK, SDL, MFC, default is wX):
+Interface (wx, SDL, default is wx):
 
 Version of code (pre-built binary version, or commit ref, or just "master"):
 
