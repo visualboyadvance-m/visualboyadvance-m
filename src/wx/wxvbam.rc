@@ -1,4 +1,4 @@
-IDI_MAINICON  ICON "../win32/res/VBA.ico"
+IDI_MAINICON  ICON "icons/VBA.ico"
 
 #include "wx/msw/wx.rc"
 

@@ -100,22 +100,27 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # wxrc does not support xrs files in -c output (> 10x compression)
 # we do it using the bin2.c utility
 
-ADD_EXECUTABLE(bin2c bin2c.c)
-# don't want SDL_main here
-SET_TARGET_PROPERTIES(bin2c PROPERTIES COMPILE_FLAGS "-Dmain=main")
+SET(BIN2C ${CMAKE_BINARY_DIR}/bin2c)
 
+IF(CMAKE_HOST_WIN32)
+    SET(BIN2C ${BIN2C}.exe)
+ENDIF()
+
+ADD_CUSTOM_COMMAND(OUTPUT ${BIN2C}
+                   COMMAND cc ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c -o ${BIN2C}
+		   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c)
 ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xrs
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    COMMAND wxrc ${CMAKE_CURRENT_SOURCE_DIR}/xrc/*.xrc -o wxvbam.xrs
 		   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/xrc/*.xrc)
 ADD_CUSTOM_COMMAND(OUTPUT builtin-xrc.h
-                   COMMAND bin2c wxvbam.xrs builtin-xrc.h builtin_xrs
-		   DEPENDS bin2c wxvbam.xrs)
+                   COMMAND ${BIN2C} wxvbam.xrs builtin-xrc.h builtin_xrs
+                   DEPENDS ${BIN2C} wxvbam.xrs)
 
 # use a built-in vba-over.ini if no config file present
 ADD_CUSTOM_COMMAND(OUTPUT builtin-over.h
-                   COMMAND bin2c ${CMAKE_CURRENT_SOURCE_DIR}/../vba-over.ini builtin-over.h builtin_over
-                   DEPENDS bin2c ../vba-over.ini)
+                   COMMAND ${BIN2C} ${CMAKE_CURRENT_SOURCE_DIR}/../vba-over.ini builtin-over.h builtin_over
+                   DEPENDS ${BIN2C} ../vba-over.ini)
 
 # I don't like duplicating/triplicating code, so I only declare
 # event handlers once, and copy them in other places they are needed

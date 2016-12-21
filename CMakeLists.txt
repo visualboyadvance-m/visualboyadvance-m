@@ -58,7 +58,7 @@ option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
 
 SET(LTO_DEFAULT ON)
 
-IF(AMD64 AND WIN32 AND CMAKE_COMPILER_IS_GNUCXX)
+IF((AMD64 AND WIN32 AND CMAKE_COMPILER_IS_GNUCXX) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)
     SET(LTO_DEFAULT OFF)
 ENDIF()
 
@@ -136,7 +136,8 @@ ADD_DEFINITIONS(${SDL2_DEFINITIONS})
 
 if( ENABLE_LINK )
     # msys2 does not have static sfml libs atm
-    if(WIN32 AND NOT (MINGW AND MSYS))
+    # while on mxe we use static libs
+    if(WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe))
         set(SFML_STATIC_LIBRARIES TRUE)
     endif()
     FIND_PACKAGE ( SFML 2 COMPONENTS network system REQUIRED )
@@ -235,28 +236,28 @@ if( ENABLE_NLS )
         ENDIF()
     ENDIF()
     IF(ENABLE_LINK)
-        FIND_PATH(LIBINTL_INC libintl.h )
-        FIND_LIBRARY(LIBINTL_LIB intl )
-    IF(LIBINTL_LIB)
+        FIND_PATH(LIBINTL_INC libintl.h)
+        FIND_LIBRARY(LIBINTL_LIB intl)
+        IF(LIBINTL_LIB)
             SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${LIBINTL_LIB})
             SET(VBAMCORE_LIBS ${VBAMCORE_LIBS} ${LIBINTL_LIB})
-    ENDIF(LIBINTL_LIB)
+        ENDIF(LIBINTL_LIB)
         INCLUDE(CheckFunctionExists)
         CHECK_FUNCTION_EXISTS(gettext GETTEXT_FN)
-        IF(NOT LIBINTL_INC OR NOT GETTEXT_FN)
+        IF(NOT (LIBINTL_INC OR GETTEXT_FN))
             MESSAGE(FATAL_ERROR "NLS requires libintl/gettext")
-        ENDIF(NOT LIBINTL_INC OR NOT GETTEXT_FN)
+        ENDIF()
         INCLUDE_DIRECTORIES(${LIBINTL_INC})
     ENDIF(ENABLE_LINK)
 endif( ENABLE_NLS )
 
 # Win32 deps submodule
 IF(WIN32)
-    IF(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies" AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
-        MESSAGE(FATAL_ERROR "Please pull in git submodules, e.g. run: git submodule update --init --recursive")
+    IF(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include" AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+        MESSAGE(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --recursive")
     ENDIF()
 
-    INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/dependencies/include")
+    INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
 ENDIF()
 
 # Compiler flags

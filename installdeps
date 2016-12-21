@@ -1,5 +1,7 @@
 #!/bin/sh
 
+cmake=cmake
+
 main() {
     cd "$(dirname $0)"
 
@@ -63,10 +65,11 @@ host OS.
 This program may require [1;35msudo[0m.
 
 A cross-compile target may be specified as the only parameter, of either
-[1;35mMinGW-w64-i686[0m or [1;35mMinGW-w64-x86_64[0m.
-This is only supported on Arch Linux and MSYS2.
+[1;35mwin32[0m, [1;35mMinGW-w64-i686[0m or [1;35mMinGW-w64-x86_64[0m.
+[1;35mwin32[0m is an alias for [1;35mMinGW-w64-i686[0m.
+This is only supported on Debian/Ubuntu, Arch Linux and MSYS2.
 
-OPn MSYS2 dependencies are installed for both 32 and 64 bit native Windows
+On MSYS2 dependencies are installed for both 32 and 64 bit native Windows
 targets by default, unless you specify one or the other. MSYS2 layer builds are
 not supported.
 
@@ -74,8 +77,9 @@ not supported.
 
 Examples:
   [32m./installdeps[0m                        # install dependencies for a host build
-  [32m./installdeps [1;35mMinGW-w64-i686[0m         # cross-compile for 32 bit windows (Arch Linux or MSYS2)
-  [32m./installdeps [1;35mMinGW-w64-x86_64[0m       # cross-compile for 64 bit windows (Arch Linux or MSYS2)
+  [32m./installdeps [1;35mwin32[0m                  # cross-compile for 32 bit windows (Debian/Ubuntu, Arch Linux or MSYS2)
+  [32m./installdeps [1;35mMinGW-w64-i686[0m         # likewise
+  [32m./installdeps [1;35mMinGW-w64-x86_64[0m       # cross-compile for 64 bit windows (Debian/Ubuntu, Arch Linux or MSYS2)
 EOF
 }
 
@@ -132,16 +136,19 @@ linux_installdeps() {
 check_cross() {
     [ -z "$target" ] && return
 
-    if [ -z "$arch_linux" -a -z "$msys2" ]; then
-        error 'cross compiling targets are only supported on Arch Linux and MSYS2 at the moment'
+    if [ -z "$arch_linux" -a -z "$msys2" -a -z "$debian" ]; then
+        error 'cross compiling targets are only supported on Debian/Ubuntu, Arch Linux and MSYS2 at the moment'
     fi
 
     target=$(echo "$target" | tr 'A-Z' 'a-z')
 
     case "$target" in
-        mingw-w64-x86_64)
+        win32)
+            target='mingw-w64-i686'
             ;;
         mingw-w64-i686)
+            ;;
+        mingw-w64-x86_64)
             ;;
         *)
             error "target must be one of 'MinGW-w64-i686' or 'MinGW-w64-x86_64'"
@@ -150,11 +157,46 @@ check_cross() {
 }
 
 debian_installdeps() {
+    debian=1
     check_cross
     installing
 
-    check sudo apt-get -y update
-    check sudo apt-get -y install build-essential g++ zlib1g-dev libgl1-mesa-dev cmake libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libjpeg-dev libpng16-dev libtiff5-dev libsdl2-dev libsfml-dev libopenal-dev libwxgtk3.0-dev
+    if [ -z "$target" ]; then
+        check sudo apt-get -qq update
+        check sudo apt-get -qy install build-essential g++ zlib1g-dev libgl1-mesa-dev cmake libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libjpeg-dev libpng16-dev libtiff5-dev libsdl2-dev libsfml-dev libopenal-dev libwxgtk3.0-dev
+    else
+        case "$target" in
+            mingw-w64-i686)
+                target='i686-w64-mingw32.static'
+                ;;
+            mingw-w64-x86_64)
+                target='x86-64-w64-mingw32.static'
+                ;;
+            *)
+                error "unknown cross target (you shouldn't see this)"
+                ;;
+        esac
+
+        cmake="/usr/lib/mxe/usr/bin/${target}-cmake"
+
+        mxe_apt_sources='/etc/apt/sources.list.d/mxeapt.list'
+
+        check sudo apt-get -qq update
+        if [ -z "$(apt-cache search '^mxe-source$')" ]; then
+            if [ ! -f "$mxe_apt_sources" ]; then
+                echo "deb http://pkg.mxe.cc/repos/apt/debian wheezy main" | sudo -- sh -c "cat > $mxe_apt_sources"
+                check sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D43A795B73B16ABE9643FE1AFD8FFF16DB45C6AB
+            else
+                error "$mxe_apt_sources exists but mxe packages are not found in apt, either delete it or fix it"
+            fi
+        fi
+
+        set --
+        for dep in gcc zlib ffmpeg gettext jpeg tiff sdl2 sfml openal wxwidgets cairo; do
+            set -- "$@" "mxe-${target}-$dep"
+        done
+        check sudo apt-get -qy install build-essential cmake "$@"
+    fi
 
     generic_build_instructions
 }
@@ -371,7 +413,7 @@ generic_build_instructions() {
 [32mDone! To build do:[0m
 
 mkdir build && cd build
-cmake .. $cmake_flags
+$cmake .. $cmake_flags
 make -j10
 EOF
 }
