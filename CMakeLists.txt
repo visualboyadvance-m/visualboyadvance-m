@@ -7,7 +7,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL "")
     SET(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type" FORCE)
 ENDIF()
 
-SET(ALL_TARGETS fex gvbam visualboyadvance-m vbamcore vbam)
+SET(ALL_TARGETS fex visualboyadvance-m vbamcore vbam)
 
 if( COMMAND cmake_policy )
     cmake_policy( SET CMP0003 NEW )
@@ -662,9 +662,6 @@ if( ENABLE_WX )
     endif( ENABLE_NLS )
 endif( ENABLE_WX )
 INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini DESTINATION ${DATA_INSTALL_DIR})
-IF(NOT APPLE)
-    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/gtk/icons/ DESTINATION share/icons/hicolor PATTERN ".svn" EXCLUDE)
-ENDIF(NOT APPLE)
 
 # manual pages
 IF( UNIX )
