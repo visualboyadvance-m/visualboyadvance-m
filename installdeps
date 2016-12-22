@@ -33,7 +33,10 @@ main() {
         Darwin)
             osx_installdeps
             ;;
-        MINGW*|MSYS*)
+        MSYS*)
+            error 'You must run this program from a MINGW 32 bit or 64 bit shell, not the MSYS shell'
+            ;;
+        MINGW*)
             msys2_installdeps
             ;;
         *)
@@ -69,9 +72,9 @@ A cross-compile target may be specified as the only parameter, of either
 [1;35mwin32[0m is an alias for [1;35mMinGW-w64-i686[0m.
 This is only supported on Debian/Ubuntu, Arch Linux and MSYS2.
 
-On MSYS2 dependencies are installed for both 32 and 64 bit native Windows
-targets by default, unless you specify one or the other. MSYS2 layer builds are
-not supported.
+On MSYS2 dependencies are installed for 32 or 64 bit native Windows targets
+based on which shell you started (the value of $MSYSTEM) unless you specify one
+or the other. MSYS2 POSIX layer builds are not supported.
 
   [1m-h, --help, --usage[0m                Show this help screen and exit.
 
@@ -134,7 +137,23 @@ linux_installdeps() {
 }
 
 check_cross() {
-    [ -z "$target" ] && return
+    if [ -z "$target" ]; then
+        if [ -n "$msys2" ]; then
+            case "$MSYSTEM" in
+                MINGW32)
+                    target='mingw-w64-i686'
+                    ;;
+                MINGW64)
+                    target='mingw-w64-x86_64'
+                    ;;
+                *)
+                    error 'unknown value for $MSYSTEM: '"$MSYSTEM"' '
+                    ;;
+            esac
+        else
+            return
+        fi
+    fi
 
     if [ -z "$arch_linux" -a -z "$msys2" -a -z "$debian" ]; then
         error 'cross compiling targets are only supported on Debian/Ubuntu, Arch Linux and MSYS2 at the moment'
@@ -198,7 +217,7 @@ debian_installdeps() {
         check sudo apt-get -qy install build-essential cmake "$@"
     fi
 
-    generic_build_instructions
+    build_instructions
 }
 
 archlinux_installdeps() {
@@ -234,7 +253,7 @@ archlinux_installdeps() {
                 ;;
             *)
                 # this will never be reached, it's checked in check_cross()
-                error 'unknown cross target'
+                error 'unknown cross target (you should not see this)'
                 ;;
         esac
 
@@ -306,7 +325,7 @@ archlinux_installdeps() {
         warning 'SFML is required for LINK support, the SFML package in AUR is currently broken, if you want LINK support you will need to install it manually'
     fi
 
-    generic_build_instructions
+    build_instructions
 }
 
 msys2_installdeps() {
@@ -320,28 +339,20 @@ msys2_installdeps() {
 
     set --
     for p in SDL2 cairo ffmpeg openal sfml wxWidgets zlib binutils cmake crt-git extra-cmake-modules gcc gcc-libs gdb headers-git make pkg-config tools-git windows-default-manifest libmangle-git nasm; do
-        if [ -n "$target" ]; then
-            if ! pacman -Q "${target}-${p}" >/dev/null 2>&1; then
-                set -- "$@" "${target}-${p}"
-            fi
-        else
-            # install both 32 and 64 bit versions
-            for p_ in "mingw-w64-x86_64-$p" "mingw-w64-i686-$p"; do
-                if ! pacman -Q "$p_" >/dev/null 2>&1; then
-                    set -- "$@" "$p_"
-                fi
-            done
+        if ! pacman -Q "${target}-${p}" >/dev/null 2>&1; then
+            set -- "$@" "${target}-${p}"
         fi
     done
 
     # install
     check pacman --noconfirm --needed -S git make zip "$@"
 
+    # pull necessary win32 headers
     check git submodule update --init --recursive
 
     cmake_flags="-G 'MSYS Makefiles'"
 
-    generic_build_instructions
+    build_instructions
 }
 
 osx_installdeps() {
@@ -379,7 +390,7 @@ brew_installdeps() {
 
     brew -v cleanup
 
-    generic_build_instructions
+    build_instructions
 }
 
 macports_installdeps() {
@@ -390,7 +401,7 @@ macports_installdeps() {
     check sudo port -v install cairo cmake ffmpeg gettext jpeg libpng tiff pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv
     check sudo port select wxWidgets wxWidgets-3.0
 
-    generic_build_instructions
+    build_instructions
 }
 
 fink_installdeps() {
@@ -404,10 +415,10 @@ fink_installdeps() {
 
     cmake_flags='-DENABLE_LINK=NO'
 
-    generic_build_instructions
+    build_instructions
 }
 
-generic_build_instructions() {
+build_instructions() {
     cat <<EOF
 
 [32mDone! To build do:[0m
