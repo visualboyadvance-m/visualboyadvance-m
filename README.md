@@ -115,9 +115,9 @@ in the shell where you built it.
 will try to fix this for debug builds.
 
 If you want to start the binary from e.g. a shortcut or Explorer, you will need
-to put `c:\msys64\mingw32\bin` for 32 bit builds and `c:\msys64\mingw64\bin` for
-64 bit builds in your PATH (to edit system PATH, go to Control Panel -> Advanced
--> Environment Variables.)
+to put `c:\msys64\mingw32\bin` for 32 bit builds and `c:\msys64\mingw64\bin`
+for 64 bit builds in your PATH (to edit system PATH, go to Control Panel ->
+System -> Advanced system settings -> Environment Variables.)
 
 If you want to package the binary, you will need to include the MinGW DLLs it
 depends on, they can install to the same directory as the binary.
