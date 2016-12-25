@@ -173,6 +173,9 @@ check_cross() {
             error "target must be one of 'MinGW-w64-i686' or 'MinGW-w64-x86_64'"
             ;;
     esac
+
+    # all good, get the necessary win32 headers
+    check git submodule update --init --recursive
 }
 
 debian_installdeps() {
@@ -346,9 +349,6 @@ msys2_installdeps() {
 
     # install
     check pacman --noconfirm --needed -S git make zip "$@"
-
-    # pull necessary win32 headers
-    check git submodule update --init --recursive
 
     cmake_flags="-G 'MSYS Makefiles'"
 
