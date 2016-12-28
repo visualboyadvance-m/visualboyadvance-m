@@ -21,8 +21,8 @@ cmake ..
 make -j10
 ```
 
-`./installdeps` is supported on MSys2, Linux (Debian/Ubuntu or Arch Linux) and
-Mac OS X (homebrew, macports or fink.)
+`./installdeps` is supported on MSys2, Linux (Debian/Ubuntu, Fedora or Arch
+Linux) and Mac OS X (homebrew, macports or fink.)
 
 If your OS is not supported, you will need the following:
 

@@ -127,8 +127,20 @@ countdown() {
 }
 
 linux_installdeps() {
+    # detect host architecture
+    case "$(uname -a)" in
+        *x86_64*)
+            amd64=1
+            ;;
+        *i686*)
+            i686=1
+            ;;
+    esac
+
     if [ -f /etc/debian_version ]; then
         debian_installdeps
+    elif [ -f /etc/fedora-release ]; then
+        fedora_installdeps
     elif [ -f /etc/arch-release ]; then
         archlinux_installdeps
     else
@@ -185,7 +197,7 @@ debian_installdeps() {
 
     if [ -z "$target" ]; then
         check sudo apt-get -qq update
-        check sudo apt-get -qy install build-essential g++ zlib1g-dev libgl1-mesa-dev cmake libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libjpeg-dev libpng16-dev libtiff5-dev libsdl2-dev libsfml-dev libopenal-dev libwxgtk3.0-dev
+        check sudo apt-get -qy install build-essential g++ nasm cmake zlib1g-dev libgl1-mesa-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libjpeg-dev libpng16-dev libtiff5-dev libsdl2-dev libsfml-dev libopenal-dev libwxgtk3.0-dev
     else
         case "$target" in
             mingw-w64-i686)
@@ -219,6 +231,31 @@ debian_installdeps() {
         done
         check sudo apt-get -qy install build-essential cmake "$@"
     fi
+
+    build_instructions
+}
+
+fedora_installdeps() {
+    fedora=1
+    check_cross
+    installing
+
+    # make sure rpmfusion is installed for ffmpeg
+    check sudo su -c 'dnf -y install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm'
+
+    # non-multiarch packages first
+    check sudo dnf -y install gcc gcc-c++ make cmake git nasm
+
+    # install both 64bit and 32bit versions on 64 bit hosts
+    set --
+    for pkg in pkgconfig zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libjpeg-turbo-devel libpng-devel libtiff-devel SDL2-devel SFML-devel openal-soft-devel wxGTK3-devel; do
+        if [ -n "$amd64" ]; then
+            set -- "$@" "${pkg}.x86_64" "${pkg}.i686"
+        else
+            set -- "$@" "$pkg"
+        fi
+    done
+    check sudo dnf -y install "$@"
 
     build_instructions
 }
@@ -381,7 +418,7 @@ brew_installdeps() {
     check brew -v update
 
     set --
-    for f in cairo cmake ffmpeg gettext jpeg libpng libtiff pkg-config sdl2 sfml wxmac; do
+    for f in cairo nasm cmake ffmpeg gettext jpeg libpng libtiff pkg-config sdl2 sfml wxmac; do
         if brew info "$f" | grep -Eq '^Not installed$'; then
             set -- "$@" "$f"
         fi
@@ -398,7 +435,7 @@ macports_installdeps() {
     installing
 
     check sudo port -v selfupdate
-    check sudo port -v install cairo cmake ffmpeg gettext jpeg libpng tiff pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv
+    check sudo port -v install cairo cmake nasm ffmpeg gettext jpeg libpng tiff pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv
     check sudo port select wxWidgets wxWidgets-3.0
 
     build_instructions
@@ -409,7 +446,7 @@ fink_installdeps() {
     installing
 
     check sudo fink -vy selfupdate
-    check sudo fink -vy install cairo cmake ffmpeg libgettext8-dev gettext-tools libjpeg9 libpng16 libtiff5 pkgconfig sdl2 wxwidgets300-osxcocoa libiconv-dev
+    check sudo fink -vy install cairo cmake nasm ffmpeg libgettext8-dev gettext-tools libjpeg9 libpng16 libtiff5 pkgconfig sdl2 wxwidgets300-osxcocoa libiconv-dev
 
     warning 'SFML is required for LINK support, there is currently no SFML package for Fink, if you want LINK support you will need to install it manually'
 
