@@ -20,7 +20,6 @@ int g_allocCountTemp = 0;
 
 void* SzAlloc(void* p, size_t size)
 {
-    p = p;
     if (size == 0)
         return 0;
 #ifdef _SZ_ALLOC_DEBUG
@@ -32,7 +31,6 @@ void* SzAlloc(void* p, size_t size)
 
 void SzFree(void* p, void* address)
 {
-    p = p;
 #ifdef _SZ_ALLOC_DEBUG
     if (address != 0) {
         g_allocCount--;
@@ -44,7 +42,6 @@ void SzFree(void* p, void* address)
 
 void* SzAllocTemp(void* p, size_t size)
 {
-    p = p;
     if (size == 0)
         return 0;
 #ifdef _SZ_ALLOC_DEBUG
@@ -59,7 +56,6 @@ void* SzAllocTemp(void* p, size_t size)
 
 void SzFreeTemp(void* p, void* address)
 {
-    p = p;
 #ifdef _SZ_ALLOC_DEBUG
     if (address != 0) {
         g_allocCountTemp--;
