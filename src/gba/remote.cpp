@@ -2685,7 +2685,7 @@ void clearBreaks(uint32_t address, uint8_t flags, char** expression, int howToCl
         removeConditionalWithFlag(flags << 4, false);
     }
     {
-        sprintf(monbuf, "Cleared all requested breaks.\n", address);
+        sprintf(monbuf, "Cleared all requested breaks.\n");
         monprintf(monbuf);
     }
 }
