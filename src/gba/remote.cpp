@@ -3346,7 +3346,6 @@ void dbgExecute(char* toRun)
 
     //although it mights seem wierd, the old step is the last one to be executed.
     for (int j = 0;; j++) {
-        bool notFound = false;
         if (debuggerCommands[j].name == NULL) {
             {
                 sprintf(monbuf, "Unrecognized command %s. Type h for help.\n", commands[0]);

@@ -1656,7 +1656,6 @@ void RFUClient::Recv(void)
         //transferring = false;
         //return;
     }
-    size_t nr;
     sf::Packet packet;
     sf::Socket::Status status = lanlink.tcpsocket.receive(packet);
     if (status == sf::Socket::Disconnected) {
@@ -1781,7 +1780,6 @@ static void StartRFUSocket(uint16_t value)
         return;
     }
 
-    static bool logstartd;
     uint32_t CurCOM = 0, CurDAT = 0;
     bool rfulogd = (READ16LE(&ioMem[COMM_SIOCNT]) != value);
 
@@ -2999,7 +2997,6 @@ static void StartRFU(uint16_t value)
 
     linktimeout = 1;
 
-    static bool logstartd;
     uint32_t CurCOM = 0, CurDAT = 0;
     bool rfulogd = (READ16LE(&ioMem[COMM_SIOCNT]) != value);
 

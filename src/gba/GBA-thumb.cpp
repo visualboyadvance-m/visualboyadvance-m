@@ -1917,7 +1917,7 @@ static INSN_REGPARM void thumbBreakpoint(uint32_t opcode)
                              // SWI #comment
                              static INSN_REGPARM void thumbDF(uint32_t opcode)
                              {
-                                 uint32_t address = 0;
+                                 //uint32_t address = 0;
                                  //clockTicks = codeTicksAccessSeq16(address)*2 + codeTicksAccess16(address)+3;
                                  clockTicks = 3;
                                  busPrefetchCount = 0;

@@ -237,8 +237,6 @@ static const BOOST::uint8_t val_tab[6]={0,0xC0,0xE0,0xF0,0xF8,0xFC};
 
 size_t utf8_char_len_from_header( char p_c )
 {
-	BOOST::uint8_t c = (BOOST::uint8_t)p_c;
-
 	size_t cnt = 0;
 	for(;;)
 	{
