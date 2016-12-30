@@ -3344,7 +3344,7 @@ void dbgExecute(char* toRun)
             return;
     }
 
-    //although it mights seem wierd, the old step is the last one to be executed.
+    //although it mights seem weird, the old step is the last one to be executed.
     for (int j = 0;; j++) {
         if (debuggerCommands[j].name == NULL) {
             {
