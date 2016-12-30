@@ -298,7 +298,7 @@ public:
     sf::IpAddress udpaddr[5];
     RFUServer(void);
     sf::Packet& Serialize(sf::Packet& packet, int slave);
-    void DeSerialize(sf::Packet packet, int slave);
+    void DeSerialize(sf::Packet& packet, int slave);
     void Send(void);
     void Recv(void);
 };
@@ -315,7 +315,7 @@ public:
     void Send(void);
     void Recv(void);
     sf::Packet& Serialize(sf::Packet& packet);
-    void DeSerialize(sf::Packet packet);
+    void DeSerialize(sf::Packet& packet);
     void CheckConn(void);
 };
 
@@ -1465,7 +1465,7 @@ sf::Packet& RFUServer::Serialize(sf::Packet& packet, int slave)
     return packet;
 }
 
-void RFUServer::DeSerialize(sf::Packet packet, int slave)
+void RFUServer::DeSerialize(sf::Packet& packet, int slave)
 {
     bool slave_is_host = false;
     packet >> slave_is_host;
@@ -1601,7 +1601,7 @@ sf::Packet& RFUClient::Serialize(sf::Packet& packet)
     return packet;
 }
 
-void RFUClient::DeSerialize(sf::Packet packet)
+void RFUClient::DeSerialize(sf::Packet& packet)
 {
     bool is_current_host = false;
     for (int i = 0; i < MAX_CLIENTS; i++) {
