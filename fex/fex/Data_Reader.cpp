@@ -354,7 +354,8 @@ size_t utf16_encode_char( unsigned cur_wchar, wchar_t * out )
 {
 	if ( cur_wchar < 0x10000 )
 	{
-		if ( out ) *out = (wchar_t) cur_wchar; return 1;
+		if ( out ) *out = (wchar_t) cur_wchar;
+		return 1;
 	}
 	else if ( cur_wchar < ( 1 << 20 ) )
 	{
@@ -370,7 +371,8 @@ size_t utf16_encode_char( unsigned cur_wchar, wchar_t * out )
 	}
 	else
 	{
-		if ( out ) *out = '?'; return 1;
+		if ( out ) *out = '?';
+		return 1;
 	}
 }
 
