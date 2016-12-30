@@ -4087,7 +4087,7 @@ uint16_t gbLinkUpdateIPC(uint8_t b, int gbSerialOn) //used on external clock
     rfu_enabled = false;
 
     if (gbSerialOn) {
-        if (gba_link_enabled)
+        if (gba_link_enabled) {
             //Single Computer
             if (GetLinkMode() == LINK_GAMEBOY_IPC) {
                 uint32_t tm; // = GetTickCount();
@@ -4117,6 +4117,7 @@ uint16_t gbLinkUpdateIPC(uint8_t b, int gbSerialOn) //used on external clock
                     SetEvent(linksync[linkid]);
                 }
             }
+        }
 
         if (dat == 0xff /*||dat==0x00||b==0x00*/) //dat==0xff||dat==0x00
             LinkFirstTime = true;
