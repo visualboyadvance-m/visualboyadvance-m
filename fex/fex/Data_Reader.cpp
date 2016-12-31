@@ -237,8 +237,6 @@ static const BOOST::uint8_t val_tab[6]={0,0xC0,0xE0,0xF0,0xF8,0xFC};
 
 size_t utf8_char_len_from_header( char p_c )
 {
-	BOOST::uint8_t c = (BOOST::uint8_t)p_c;
-
 	size_t cnt = 0;
 	for(;;)
 	{
@@ -354,7 +352,8 @@ size_t utf16_encode_char( unsigned cur_wchar, wchar_t * out )
 {
 	if ( cur_wchar < 0x10000 )
 	{
-		if ( out ) *out = (wchar_t) cur_wchar; return 1;
+		if ( out ) *out = (wchar_t) cur_wchar;
+		return 1;
 	}
 	else if ( cur_wchar < ( 1 << 20 ) )
 	{
@@ -370,7 +369,8 @@ size_t utf16_encode_char( unsigned cur_wchar, wchar_t * out )
 	}
 	else
 	{
-		if ( out ) *out = '?'; return 1;
+		if ( out ) *out = '?';
+		return 1;
 	}
 }
 

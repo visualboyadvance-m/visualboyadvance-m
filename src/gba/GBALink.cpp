@@ -298,7 +298,7 @@ public:
     sf::IpAddress udpaddr[5];
     RFUServer(void);
     sf::Packet& Serialize(sf::Packet& packet, int slave);
-    void DeSerialize(sf::Packet packet, int slave);
+    void DeSerialize(sf::Packet& packet, int slave);
     void Send(void);
     void Recv(void);
 };
@@ -315,7 +315,7 @@ public:
     void Send(void);
     void Recv(void);
     sf::Packet& Serialize(sf::Packet& packet);
-    void DeSerialize(sf::Packet packet);
+    void DeSerialize(sf::Packet& packet);
     void CheckConn(void);
 };
 
@@ -1465,7 +1465,7 @@ sf::Packet& RFUServer::Serialize(sf::Packet& packet, int slave)
     return packet;
 }
 
-void RFUServer::DeSerialize(sf::Packet packet, int slave)
+void RFUServer::DeSerialize(sf::Packet& packet, int slave)
 {
     bool slave_is_host = false;
     packet >> slave_is_host;
@@ -1601,7 +1601,7 @@ sf::Packet& RFUClient::Serialize(sf::Packet& packet)
     return packet;
 }
 
-void RFUClient::DeSerialize(sf::Packet packet)
+void RFUClient::DeSerialize(sf::Packet& packet)
 {
     bool is_current_host = false;
     for (int i = 0; i < MAX_CLIENTS; i++) {
@@ -1656,7 +1656,6 @@ void RFUClient::Recv(void)
         //transferring = false;
         //return;
     }
-    size_t nr;
     sf::Packet packet;
     sf::Socket::Status status = lanlink.tcpsocket.receive(packet);
     if (status == sf::Socket::Disconnected) {
@@ -1781,7 +1780,6 @@ static void StartRFUSocket(uint16_t value)
         return;
     }
 
-    static bool logstartd;
     uint32_t CurCOM = 0, CurDAT = 0;
     bool rfulogd = (READ16LE(&ioMem[COMM_SIOCNT]) != value);
 
@@ -2999,7 +2997,6 @@ static void StartRFU(uint16_t value)
 
     linktimeout = 1;
 
-    static bool logstartd;
     uint32_t CurCOM = 0, CurDAT = 0;
     bool rfulogd = (READ16LE(&ioMem[COMM_SIOCNT]) != value);
 
@@ -4090,7 +4087,7 @@ uint16_t gbLinkUpdateIPC(uint8_t b, int gbSerialOn) //used on external clock
     rfu_enabled = false;
 
     if (gbSerialOn) {
-        if (gba_link_enabled)
+        if (gba_link_enabled) {
             //Single Computer
             if (GetLinkMode() == LINK_GAMEBOY_IPC) {
                 uint32_t tm; // = GetTickCount();
@@ -4120,6 +4117,7 @@ uint16_t gbLinkUpdateIPC(uint8_t b, int gbSerialOn) //used on external clock
                     SetEvent(linksync[linkid]);
                 }
             }
+        }
 
         if (dat == 0xff /*||dat==0x00||b==0x00*/) //dat==0xff||dat==0x00
             LinkFirstTime = true;

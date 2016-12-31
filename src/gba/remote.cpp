@@ -2685,7 +2685,7 @@ void clearBreaks(uint32_t address, uint8_t flags, char** expression, int howToCl
         removeConditionalWithFlag(flags << 4, false);
     }
     {
-        sprintf(monbuf, "Cleared all requested breaks.\n", address);
+        sprintf(monbuf, "Cleared all requested breaks.\n");
         monprintf(monbuf);
     }
 }
@@ -3344,9 +3344,8 @@ void dbgExecute(char* toRun)
             return;
     }
 
-    //although it mights seem wierd, the old step is the last one to be executed.
+    //although it mights seem weird, the old step is the last one to be executed.
     for (int j = 0;; j++) {
-        bool notFound = false;
         if (debuggerCommands[j].name == NULL) {
             {
                 sprintf(monbuf, "Unrecognized command %s. Type h for help.\n", commands[0]);

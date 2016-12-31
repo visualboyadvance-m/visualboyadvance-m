@@ -95,7 +95,6 @@ Here is the complete list:
 | ENABLE_FFMPEG        | Enable ffmpeg A/V recording                                          | ON on Linux and MSys2 |
 | ENABLE_LTO           | Compile with Link Time Optimization (gcc and clang only)             | ON where works        |
 | ENABLE_GBA_LOGGING   | Enable extended GBA logging                                          | ON                    |
-| ENABLE_SDL           | Build the SDL port                                                   | OFF                   |
 | ENABLE_CAIRO         | Enable Cairo rendering for wxWidgets                                 | OFF                   |
 | ENABLE_DIRECT3D      | Direct3D rendering for wxWidgets (Windows, **NOT IMPLEMENTED!!!**)   | ON                    |
 | ENABLE_XAUDIO2       | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |

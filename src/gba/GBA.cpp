@@ -3721,7 +3721,6 @@ void CPULoop(int ticks)
 {
     int clockTicks;
     int timerOverflow = 0;
-    uint32_t memAddr = 0;
     // variable used by the CPU core
     cpuTotalTicks = 0;
 

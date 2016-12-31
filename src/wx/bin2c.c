@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <wchar.h>
 #include <locale.h>
 #include <unistd.h>
+#include <wctype.h>
 
 #define BUF_SIZE  4096
 #define WBUF_SIZE BUF_SIZE * sizeof(wchar_t)
