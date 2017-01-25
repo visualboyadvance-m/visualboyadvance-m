@@ -142,10 +142,15 @@ IF(NOT APPLE)
 	FIND_PACKAGE(Threads)
 ENDIF(NOT APPLE)
 
-# MinGW needs an additional link flag, -mwindows
+# MinGW needs an additional link flag, -mwindows (to make a GUI app)
+# but we only add it when not making a Debug build.
 # It's total link flags should look like -lmingw32 -lSDL2main -lSDL2 -mwindows
 IF(MINGW)
-	SET(MINGW32_LIBRARY -lmingw32 -mwindows CACHE STRING "mwindows for MinGW")
+	SET(MINGW32_LIBRARY -lmingw32 CACHE STRING "MinGW library")
+
+        IF(NOT CMAKE_BUILD_TYPE STREQUAL Debug)
+            SET(MINGW32_LIBRARY ${MINGW32_LIBRARY} -mwindows)
+        ENDIF()
 ENDIF(MINGW)
 
 IF(SDL2_LIBRARY_TEMP)

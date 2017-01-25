@@ -2899,10 +2899,10 @@ bool MainFrame::BindControls()
         tc = SafeXRCCTRL<wxTextCtrl>(d, n);                   \
         tc->SetValidator(wxTextValidator(wxFILTER_NONE, &o)); \
     } while (0)
-#define getgtc(n, o)                                          \
+#define getdtc(n, o)                                          \
     do {                                                      \
         tc = SafeXRCCTRL<wxTextCtrl>(d, n);                   \
-        tc->SetValidator(wxGenericValidator(&o));             \
+        tc->SetValidator(wxPositiveDoubleValidator(&o));      \
     } while (0)
 #ifndef NO_LINK
         {
@@ -3297,9 +3297,9 @@ bool MainFrame::BindControls()
             /// On-Screen Display
             ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "SpeedIndicator", wxGenericValidator(&showSpeed));
             /// Zoom
+            getdtc("DefaultScale", gopts.video_scale);
             // this was a choice, but I'd rather not have to make an off-by-one
             // validator just for this, and spinctrl is good enough.
-            getgtc("DefaultScale", gopts.video_scale);
             getsc("MaxScale", maxScale);
             /// Basic
             getrbi("OutputSimple", gopts.render_method, RND_SIMPLE);

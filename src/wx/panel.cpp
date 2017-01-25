@@ -532,7 +532,7 @@ void GameArea::UnloadGame(bool destruct)
     // in destructor, panel should be auto-deleted by wx since all panels
     // are derived from a window attached as child to GameArea
     if (panel)
-        panel->Delete();
+        panel->Destroy();
 
     panel = NULL;
 
@@ -680,7 +680,7 @@ void GameArea::AddBorder()
     GetSizer()->Detach(panel->GetWindow());
 
     if (panel)
-        panel->Delete();
+        panel->Destroy();
 
     panel = NULL;
 }
@@ -699,7 +699,7 @@ void GameArea::DelBorder()
     GetSizer()->Detach(panel->GetWindow());
 
     if (panel)
-        panel->Delete();
+        panel->Destroy();
 
     panel = NULL;
 }
@@ -782,7 +782,7 @@ void GameArea::ShowFullScreen(bool full)
     // just in case screen mode is going to change, go ahead and preemptively
     // delete panel to be recreated immediately after resize
     if (panel) {
-        panel->Delete();
+        panel->Destroy();
         panel = NULL;
     }
 
@@ -1035,9 +1035,14 @@ void GameArea::OnIdle(wxIdleEvent& event)
         // set focus to panel
         w->SetFocus();
 
-        // capture keyboard events
-        w->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(GameArea::OnKeyDown), NULL, this);
-        w->Connect(wxEVT_KEY_UP,    wxKeyEventHandler(GameArea::OnKeyUp),   NULL, this);
+        // set up event handlers
+        // use both CHAR_HOOK and KEY_DOWN in case CHAR_HOOK does not work for whatever reason
+        w->Connect(wxEVT_CHAR_HOOK,        wxKeyEventHandler(GameArea::OnKeyDown),         NULL, this);
+        w->Connect(wxEVT_KEY_DOWN,         wxKeyEventHandler(GameArea::OnKeyDown),         NULL, this);
+        w->Connect(wxEVT_KEY_UP,           wxKeyEventHandler(GameArea::OnKeyUp),           NULL, this);
+        w->Connect(wxEVT_PAINT,            wxPaintEventHandler(GameArea::PaintEv),         NULL, this);
+        w->Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(GameArea::EraseBackground), NULL, this);
+        w->Connect(wxEVT_SIZE,             wxSizeEventHandler(GameArea::OnSize),           NULL, this);
     }
 
     if (!paused && (!pauseWhenInactive || wxGetApp().frame->HasFocus())) {
@@ -1223,6 +1228,28 @@ void GameArea::OnKeyUp(wxKeyEvent& ev)
     ev.Skip(!process_key_press(false, ev.GetKeyCode(), ev.GetModifiers()));
 }
 
+// these three are forwarded to the DrawingPanel instance
+void GameArea::PaintEv(wxPaintEvent& ev)
+{
+    DrawingPanelBase* panel = dynamic_cast<DrawingPanelBase*>(ev.GetEventObject());
+
+    panel->PaintEv(ev);
+}
+
+void GameArea::EraseBackground(wxEraseEvent& ev)
+{
+    DrawingPanelBase* panel = dynamic_cast<DrawingPanelBase*>(ev.GetEventObject());
+
+    panel->EraseBackground(ev);
+}
+
+void GameArea::OnSize(wxSizeEvent& ev)
+{
+    DrawingPanelBase* panel = dynamic_cast<DrawingPanelBase*>(ev.GetEventObject());
+
+    panel->OnSize(ev);
+}
+
 void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
 {
     int key = ev.GetControlIndex();
@@ -1256,11 +1283,8 @@ EVT_KEY_UP(GameArea::OnKeyUp)
 EVT_MOUSE_EVENTS(GameArea::MouseEvent)
 END_EVENT_TABLE()
 
-IMPLEMENT_ABSTRACT_CLASS(DrawingPanel, wxEvtHandler)
-
-DrawingPanel::DrawingPanel(int _width, int _height)
-    : wxObject()
-    , width(_width)
+DrawingPanelBase::DrawingPanelBase(int _width, int _height)
+    : width(_width)
     , height(_height)
     , scale(1)
     , todraw(0)
@@ -1349,18 +1373,19 @@ DrawingPanel::DrawingPanel(int _width, int _height)
     utilUpdateSystemColorMaps(false);
 }
 
-void DrawingPanel::DrawingPanelInit()
+DrawingPanel::DrawingPanel(wxWindow* parent, int _width, int _height)
+    : DrawingPanelBase(_width, _height)
+    , wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetSize(),
+          wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
 {
-    wxWindow* w = dynamic_cast<wxWindow*>(this);
+}
 
-    // this is not 2.8 compatible, sorry
-    w->Bind(wxEVT_PAINT, &DrawingPanel::PaintEv, this);
-    w->Bind(wxEVT_ERASE_BACKGROUND, &DrawingPanel::EraseBackground, this);
-
+void DrawingPanelBase::DrawingPanelInit()
+{
     did_init = true;
 }
 
-void DrawingPanel::PaintEv(wxPaintEvent& ev)
+void DrawingPanelBase::PaintEv(wxPaintEvent& ev)
 {
     wxPaintDC dc(GetWindow());
 
@@ -1379,7 +1404,7 @@ void DrawingPanel::PaintEv(wxPaintEvent& ev)
     DrawOSD(dc);
 }
 
-void DrawingPanel::EraseBackground(wxEraseEvent& ev)
+void DrawingPanelBase::EraseBackground(wxEraseEvent& ev)
 {
     // do nothing, do not allow propagation
 }
@@ -1611,7 +1636,7 @@ public:
     }
 };
 
-void DrawingPanel::DrawArea(uint8_t** data)
+void DrawingPanelBase::DrawArea(uint8_t** data)
 {
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
@@ -1766,7 +1791,7 @@ void DrawingPanel::DrawArea(uint8_t** data)
         DrawOSD(dc);
 }
 
-void DrawingPanel::DrawOSD(wxWindowDC& dc)
+void DrawingPanelBase::DrawOSD(wxWindowDC& dc)
 {
     // draw OSD message, if available
     // doing this here rather than using drawText() directly into the screen
@@ -1854,7 +1879,12 @@ void DrawingPanel::DrawOSD(wxWindowDC& dc)
     }
 }
 
-DrawingPanel::~DrawingPanel()
+void DrawingPanelBase::OnSize(wxSizeEvent& ev)
+{
+    ev.Skip(true);
+}
+
+DrawingPanelBase::~DrawingPanelBase()
 {
     // pixbuf1 freed by emulator
     if (pixbuf2)
@@ -1876,12 +1906,8 @@ DrawingPanel::~DrawingPanel()
     }
 }
 
-IMPLEMENT_CLASS2(BasicDrawingPanel, DrawingPanel, wxPanel)
-
 BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
-    : wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetSize(),
-          wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
-    , DrawingPanel(_width, _height)
+    : DrawingPanel(parent, _width, _height)
 {
     // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
     // 16 or 32, though
@@ -1957,10 +1983,9 @@ void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
 #include <GL/glx.h>
 #endif
 #ifdef __WXMSW__
+#include <GL/gl.h>
 #include <GL/glext.h>
 #endif
-
-IMPLEMENT_CLASS2(GLDrawingPanel, DrawingPanel, wxGLCanvas)
 
 // This is supposed to be the default, but DOUBLEBUFFER doesn't seem to be
 // turned on by default for wxGTK.
@@ -1968,21 +1993,13 @@ static int glopts[] = {
     WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0
 };
 
-#if wxCHECK_VERSION(2, 9, 0)
-#define glc wxGLCanvas
-#else
-// shuffled parms for 2.9 indicates non-auto glcontext
-// before 2.9, wxMAC does not have this (but wxGTK & wxMSW do)
-#define glc(a, b, c, d, e, f) wxGLCanvas(a, b, d, e, f, wxEmptyString, c)
-#endif
-
 GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
-    : glc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetSize(),
+    : DrawingPanelBase(_width, _height)
+    , wxglc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetSize(),
           wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
-    , DrawingPanel(_width, _height)
 {
     RequestHighResolutionOpenGLSurface();
-#if wxCHECK_VERSION(2, 9, 0)
+#ifndef wxGL_IMPLICIT_CONTEXT
     ctx = new wxGLContext(this);
     SetCurrent(*ctx);
 #endif
@@ -1991,38 +2008,35 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
 
 GLDrawingPanel::~GLDrawingPanel()
 {
-#if wxCHECK_VERSION(2, 9, 0)
-    delete ctx;
-#endif
-#if 0
-
-	// this should be automatically deleted w/ context
-	// it's also unsafe if panel no longer displayed
-	if (did_init)
-	{
-#if wxCHECK_VERSION(2, 9, 0)
-		SetContext(*ctx);
+    // this should be automatically deleted w/ context
+    // it's also unsafe if panel no longer displayed
+    if (did_init)
+    {
+#ifndef wxGL_IMPLICIT_CONTEXT
+        SetCurrent(*ctx);
 #else
-		SetContext();
+        SetCurrent();
 #endif
-		glDeleteLists(vlist, 1);
-		glDeleteTextures(1, &texid);
-	}
+        glDeleteLists(vlist, 1);
+        glDeleteTextures(1, &texid);
+    }
 
+#ifndef wxGL_IMPLICIT_CONTEXT
+    delete ctx;
 #endif
 }
 
 void GLDrawingPanel::DrawingPanelInit()
 {
-#if wxCHECK_VERSION(2, 9, 0)
+#ifndef wxGL_IMPLICIT_CONTEXT
     SetCurrent(*ctx);
+#else
+    SetCurrent();
 #endif
 
-    DrawingPanel::DrawingPanelInit();
+    DrawingPanelBase::DrawingPanelInit();
 
     AdjustViewport();
-
-    Connect(wxEVT_SIZE, wxSizeEventHandler(GLDrawingPanel::OnSize), NULL, this);
 
     // taken from GTK front end almost verbatim
     glDisable(GL_CULL_FACE);
@@ -2105,7 +2119,18 @@ void GLDrawingPanel::DrawingPanelInit()
 
 void GLDrawingPanel::OnSize(wxSizeEvent& ev)
 {
+#ifndef wxGL_IMPLICIT_CONTEXT
+    SetCurrent(*ctx);
+#else
+    SetCurrent();
+#endif
+    SetSize(ev.GetSize());
+
     AdjustViewport();
+
+    Center();
+
+    ev.Skip(true);
 }
 
 void GLDrawingPanel::AdjustViewport()
@@ -2118,13 +2143,13 @@ void GLDrawingPanel::AdjustViewport()
     // you can use this to check that the gl surface is indeed high res
     GLint m_viewport[4];
     glGetIntegerv(GL_VIEWPORT, m_viewport);
-    vbamDebug("GL VIEWPORT: %d, %d, %d, %d", m_viewport[0], m_viewport[1], m_viewport[2], m_viewport[3]);
+    wxLogDebug(wxT("GL VIEWPORT: %d, %d, %d, %d"), m_viewport[0], m_viewport[1], m_viewport[2], m_viewport[3]);
 #endif
 }
 
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 {
-#if wxCHECK_VERSION(2, 9, 0)
+#ifndef wxGL_IMPLICIT_CONTEXT
     SetCurrent(*ctx);
 #else
     SetCurrent();
@@ -2151,16 +2176,13 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 
     SwapBuffers();
 }
-#endif
+
+#endif // GL support
 
 #ifndef NO_CAIRO
 
-IMPLEMENT_CLASS(CairoDrawingPanel, DrawingPanel)
-
 CairoDrawingPanel::CairoDrawingPanel(wxWindow* parent, int _width, int _height)
-    : wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetSize(),
-          wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
-    , DrawingPanel(_width, _height)
+    : DrawingPanel(parent, _width, _height)
 {
     conv_surf = NULL;
 
@@ -2280,12 +2302,8 @@ void CairoDrawingPanel::DrawArea(wxWindowDC& dc)
 #include <d3d9.h>
 //#include <Dxerr.h>
 
-IMPLEMENT_CLASS(DXDrawingPanel, DrawingPanel)
-
 DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
-    : wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetSize(),
-          wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
-    , DrawingPanel(_width, _height)
+    : DrawingPanel(parent, _width, _height)
 {
     // FIXME: implement
     if (!did_init) DrawingPanelInit();

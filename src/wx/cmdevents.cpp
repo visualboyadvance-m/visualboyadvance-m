@@ -2270,7 +2270,7 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
     }
 
     if (panel->panel) {
-        panel->panel->Delete();
+        panel->panel->Destroy();
         panel->panel = NULL;
     }
 
@@ -2288,7 +2288,7 @@ EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
     update_opts();
 
     if (panel->panel) {
-        panel->panel->Delete();
+        panel->panel->Destroy();
         panel->panel = NULL;
     }
 }
@@ -2299,7 +2299,7 @@ EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
     update_opts();
 
     if (panel->panel) {
-        panel->panel->Delete();
+        panel->panel->Destroy();
         panel->panel = NULL;
     }
 }

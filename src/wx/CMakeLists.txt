@@ -48,23 +48,74 @@ endif(ENABLE_OPENAL)
 
 IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
     SET(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
-
-    # and if this is the case, we can't set debug level without link failing
-    IF(NOT wxWidgets_DEFINITIONS MATCHES "-DwxDEBUG_LEVEL=0")
-        ADD_DEFINITIONS(-DwxDEBUG_LEVEL=1)
-    ENDIF()
 ENDIF()
 
-IF(APPLE)
+IF(APPLE OR (WINDOWS AND FEDORA_HOST))
     SET(wxWidgets_USE_STATIC ON)
-ENDIF(APPLE)
+ENDIF()
 
 SET(wxWidgets_USE_UNICODE ON)
 # adv is for wxAboutBox
 # xml, html is for xrc
-SET( wxWidgets_USE_LIBS xrc xml html adv gl net core base )
+SET(wxWidgets_USE_LIBS xrc xml html adv gl net core base gl)
 #list(APPEND wxWidgets_CONFIG_OPTIONS --version=2.8)
-FIND_PACKAGE ( wxWidgets REQUIRED )
+FIND_PACKAGE(wxWidgets REQUIRED)
+INCLUDE_DIRECTORIES(${wxWidgets_INCLUDE_DIRS})
+
+IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    # tell wx to enable debug mode if possible, if the cmake module did not do it for us
+    EXECUTE_PROCESS(COMMAND "${wxWidgets_CONFIG_EXECUTABLE} --debug=yes" RESULT_VARIABLE WX_CONFIG_DEBUG OUTPUT_QUIET ERROR_QUIET)
+
+    IF(WX_CONFIG_DEBUG EQUAL 0)
+        ADD_DEFINITIONS(-DwxDEBUG_LEVEL=1)
+    ENDIF()
+
+    # this one should be safe in non-debug builds too
+    ADD_DEFINITIONS(-DWXDEBUG)
+ENDIF()
+
+# check if this build of wx actually has OpenGL support
+
+SET(CURRENT_CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES})
+SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${wxWidgets_LIBRARIES})
+SET(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS} ${wxWidgets_CXX_FLAGS} -fPIC)
+SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${wxWidgets_INCLUDE_DIRS})
+
+FOREACH(DEF ${wxWidgets_DEFINITIONS})
+    SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} "-D${DEF}")
+    ADD_DEFINITIONS("-D${DEF}")
+ENDFOREACH()
+
+# CheckCXXSourceCompiles ignores compiler flags, so we have to stuff them into the definitions
+SET(CURRENT_CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS})
+SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} ${CMAKE_REQUIRED_FLAGS})
+
+INCLUDE(CheckCXXSourceCompiles)
+
+CHECK_CXX_SOURCE_COMPILES("
+#include <wx/config.h>
+#include <wx/glcanvas.h>
+
+int main(int argc, char** argv) {
+    wxGLCanvas canvas(NULL, wxID_ANY, NULL, wxPoint(0, 0), wxSize(300, 300), 0);
+    return 0;
+}" WX_HAS_OPENGL)
+
+IF(NOT WX_HAS_OPENGL)
+    ADD_DEFINITIONS(-DNO_OGL)
+    LIST(REMOVE_ITEM wxWidgets_USE_LIBS gl)
+    FIND_PACKAGE(wxWidgets REQUIRED)
+ENDIF()
+
+SET(CMAKE_REQUIRED_LIBRARIES   ${CURRENT_CMAKE_REQUIRED_LIBRARIES})
+SET(CMAKE_REQUIRED_DEFINITIONS ${CURRENT_CMAKE_REQUIRED_DEFINITIONS})
+
+# end of wx OpenGL check
+
+FOREACH(CXX_COMPILE_FLAG ${wxWidgets_CXX_FLAGS})
+    ADD_COMPILE_OPTIONS($<$<COMPILE_LANGUAGE:CXX>:${CXX_COMPILE_FLAG}>)
+ENDFOREACH()
+
 #EXECUTE_PROCESS(COMMAND sh "${wxWidgets_CONFIG_EXECUTABLE}" --cxxflags)
 INCLUDE( ${wxWidgets_USE_FILE} )
 FIND_PACKAGE ( Gettext REQUIRED )
@@ -248,6 +299,12 @@ TARGET_LINK_LIBRARIES (
     ${DIRECTX_LIBRARIES}
     ${CAIRO_LIBRARIES}
 )
+
+# Build a console app in debug mode on Windows
+IF(WIN32 AND CMAKE_BUILD_TYPE STREQUAL Debug)
+    SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,console")
+ENDIF()
+
 IF(WIN32)
     INSTALL(PROGRAMS ${PROJECT_BINARY_DIR}/visualboyadvance-m${CMAKE_EXECUTABLE_SUFFIX} DESTINATION ${CMAKE_BINARY_DIR})
 ENDIF(WIN32)

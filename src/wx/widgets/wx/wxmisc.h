@@ -3,6 +3,7 @@
 // utility widgets
 
 #include <wx/checkbox.h>
+#include <wx/valgen.h>
 
 // simple radio button not under the same parent window
 // note that it must be checkbox, as wx radio buttons have rigid behavior
@@ -57,6 +58,18 @@ public:
 
 protected:
     int val, mask, *vptr;
+};
+
+class wxPositiveDoubleValidator : public wxGenericValidator {
+public:
+    wxPositiveDoubleValidator(double* _val);
+    bool TransferToWindow();
+    bool TransferFromWindow();
+    bool Validate(wxWindow* parent);
+    wxObject* Clone() const;
+protected:
+    double* double_val;
+    wxString str_val;
 };
 
 // boolean copy-only validator with reversed value

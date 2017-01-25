@@ -110,8 +110,8 @@ protected:
 
 const struct {
     wxKeyCode code;
-    const char *name;
-    const char *display_name;
+    wxString name;
+    wxString display_name;
 } keys_with_display_names[] = {
     { WXK_BACK,              wxTRANSLATE("Back"),           wxTRANSLATE("Backspace") },
     { WXK_PAGEUP,            wxTRANSLATE("PageUp"),         wxTRANSLATE("Page Up") },
@@ -145,5 +145,11 @@ const struct {
     { WXK_NUMPAD_DECIMAL,    wxTRANSLATE("KP_Decimal"),     wxTRANSLATE("Num .") },
     { WXK_NUMPAD_DIVIDE,     wxTRANSLATE("KP_Divide"),      wxTRANSLATE("Num /") },
 };
+
+// 2.x does not have the WXK_RAW_XXX values for Mac
+#if wxMAJOR_VERSION < 3
+    #define WXK_RAW_CONTROL   WXK_COMMAND
+    #define wxMOD_RAW_CONTROL wxMOD_CMD
+#endif
 
 #endif /* WX_KEYTEXT_H */

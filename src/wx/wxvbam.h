@@ -4,7 +4,12 @@
 #include <list>
 #include <stdexcept>
 #include <typeinfo>
+#include <iostream>
+#include <stdio.h>
+#include <time.h>
+#include <wx/log.h>
 #include <wx/propdlg.h>
+#include <wx/datetime.h>
 
 #include "wx/joyedit.h"
 #include "wx/keyedit.h"
@@ -27,6 +32,23 @@
 #include "../gba/Globals.h"
 #include "../gba/Sound.h"
 
+// make wxLogDebug work on non-debug builds of Wx, and make it use the console
+// on Windows
+// (this works on 2.8 too!)
+#if !defined(NDEBUG) && (!wxDEBUG_LEVEL || defined(__WXMSW__))
+    #ifdef __WXMSW__
+        #define VBAM_DEBUG_STREAM stdout
+    #else
+        #define VBAM_DEBUG_STREAM stderr
+    #endif
+    #undef  wxLogDebug
+    #define wxLogDebug(...)                                                                                                           \
+    do {                                                                                                                              \
+        fputs(wxString::Format(wxDateTime::UNow().Format(wxT("%X")) + wxT(": Debug: ") + __VA_ARGS__).utf8_str(), VBAM_DEBUG_STREAM); \
+        fputc('\n', VBAM_DEBUG_STREAM);                                                                                               \
+    } while(0)
+#endif
+
 template <typename T>
 void CheckPointer(T pointer)
 {
@@ -37,9 +59,6 @@ void CheckPointer(T pointer)
         throw std::runtime_error(errormessage);
     }
 }
-
-// For spewing stuff to terminal
-void vbamDebug(const char* format, ...);
 
 /// Helper functions to convert WX's crazy string types to std::string
 
@@ -441,7 +460,7 @@ enum audioapi { AUD_SDL,
 // display time, in ms
 #define OSD_TIME 3000
 
-class DrawingPanel;
+class DrawingPanelBase;
 
 class GameArea : public wxPanel, public HiDPIAware {
 public:
@@ -501,7 +520,7 @@ public:
     void AddBorder();
     void DelBorder();
     // Delete() & set to NULL to force reinit
-    DrawingPanel* panel;
+    DrawingPanelBase* panel;
     struct EmulatedSystem* emusys;
 
     // pause game or signal a long operation, similar to pausing
@@ -585,6 +604,9 @@ protected:
     void OnKeyDown(wxKeyEvent& ev);
     void OnKeyUp(wxKeyEvent& ev);
     void OnSDLJoy(wxSDLJoyEvent& ev);
+    void PaintEv(wxPaintEvent& ev);
+    void EraseBackground(wxEraseEvent& ev);
+    void OnSize(wxSizeEvent& ev);
 
 #ifndef NO_FFMPEG
     MediaRecorder snd_rec, vid_rec;
@@ -628,18 +650,17 @@ extern bool cmditem_lt(const struct cmditem& cmd1, const struct cmditem& cmd2);
 
 class FilterThread;
 
-class DrawingPanel : public wxObject, public HiDPIAware {
+class DrawingPanelBase : public HiDPIAware {
 public:
-    DrawingPanel(int _width, int _height);
-    ~DrawingPanel();
+    DrawingPanelBase(int _width, int _height);
+    ~DrawingPanelBase();
     void DrawArea(uint8_t** pixels);
-
-    // using dynamic_cast<> to not force trivial reimplementation in concrete classes
-    virtual wxWindow* GetWindow() { return dynamic_cast<wxWindow*>(this); }
-    virtual void Delete() { (dynamic_cast<wxWindow*>(this))->Destroy(); }
 
     virtual void PaintEv(wxPaintEvent& ev);
     virtual void EraseBackground(wxEraseEvent& ev);
+    virtual void OnSize(wxSizeEvent& ev);
+    wxWindow* GetWindow() { return dynamic_cast<wxWindow*>(this); }
+    virtual bool Destroy() { return GetWindow()->Destroy(); }
 protected:
     virtual void DrawArea(wxWindowDC&) = 0;
     virtual void DrawOSD(wxWindowDC&);
@@ -656,8 +677,12 @@ protected:
     const RENDER_PLUGIN_INFO* rpi; // also flag indicating plugin loaded
     // largest buffer required is 32-bit * (max width + 1) * (max height + 2)
     uint8_t delta[257 * 4 * 226];
+};
 
-    DECLARE_ABSTRACT_CLASS()
+// base class with a wxPanel when a subclass (such as wxGLCanvas) is not being used
+class DrawingPanel : public DrawingPanelBase, public wxPanel {
+public:
+    DrawingPanel(wxWindow* parent, int _width, int _height);
 };
 
 class LogDialog : public wxDialog {

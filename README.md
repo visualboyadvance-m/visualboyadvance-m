@@ -60,6 +60,9 @@ value of `$MSYSTEM`.) It will not run in the MSys shell.
 
 On Debian/Ubuntu this uses the MXE apt repository and works really well.
 
+On Fedora it can build using the Fedora MinGW packages, albeit with wx 2.8, no
+OpenGL support, and no Link support for lack of SFML.
+
 On Arch it currently doesn't work at all because the AUR stuff is completely
 broken, I will at some point redo the arch stuff to use MXE as well.
 
@@ -110,8 +113,8 @@ To run the resulting binary, you can simply type:
 
 in the shell where you built it.
 
-**NOTE:** you will not see debug console messages because it is a GUI app, we
-will try to fix this for debug builds.
+If you built with `-DCMAKE_BUILD_TYPE=Debug`, you will get a console app and
+will see debug messages, even in mintty.
 
 If you want to start the binary from e.g. a shortcut or Explorer, you will need
 to put `c:\msys64\mingw32\bin` for 32 bit builds and `c:\msys64\mingw64\bin`
@@ -122,6 +125,26 @@ If you want to package the binary, you will need to include the MinGW DLLs it
 depends on, they can install to the same directory as the binary.
 
 For our own builds, we use MXE to make static builds.
+
+## Debug Messages
+
+We have an override for `wxLogDebug()` to make it work even in non-debug builds
+of wx and on windows, even in mintty. Using this function for console debug
+messages is recommended.
+
+It works like `printf()`, but using `wxString`, so use `wxT()` e.g.:
+
+```cpp
+int foo = 42;
+wxLogDebug(wxT("the value of foo = %d"), foo);
+```
+
+`%s` does not work for `wxString`, so use concatenation instead, e.g.:
+
+```cpp
+wxString world = "world";
+wxLogDebug(wxT("Hello, ") + world + wxT("!"));
+```
 
 ## CONTRIBUTING
 

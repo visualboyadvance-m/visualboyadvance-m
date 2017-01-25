@@ -5,6 +5,8 @@
 //   create & display main frame
 
 #include "wxvbam.h"
+#include <unistd.h>
+#include <stdio.h>
 #include <wx/cmdline.h>
 #include <wx/file.h>
 #include <wx/filesys.h>
@@ -29,24 +31,6 @@
 
 IMPLEMENT_APP(wxvbamApp)
 IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
-
-// For spewing stuff to terminal when debugging
-void vbamDebug(const char* format, ...) {
-#ifdef DEBUG
-    wxLog *active_log = wxLog::GetActiveTarget();
-
-    wxLogStderr log_to_stderr;
-
-    wxLog::SetActiveTarget(&log_to_stderr);
-
-    va_list argptr;
-    va_start(argptr, format);
-        wxVLogDebug(format, argptr);
-    va_end(argptr);
-
-    wxLog::SetActiveTarget(active_log);
-#endif
-}
 
 // generate config file path
 static void get_config_path(wxPathList& path, bool exists = true)
@@ -74,13 +58,13 @@ static void get_config_path(wxPathList& path, bool exists = true)
     static bool debug_dumped = false;
 
     if (!debug_dumped) {
-        vbamDebug("GetUserLocalDataDir(): %s", static_cast<const char*>(stdp.GetUserLocalDataDir().utf8_str()));
-        vbamDebug("GetUserDataDir(): %s", static_cast<const char*>(stdp.GetUserDataDir().utf8_str()));
-        vbamDebug("GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()): %s", static_cast<const char*>(stdp.GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()).utf8_str()));
-        vbamDebug("GetResourcesDir(): %s", static_cast<const char*>(stdp.GetResourcesDir().utf8_str()));
-        vbamDebug("GetDataDir(): %s", static_cast<const char*>(stdp.GetDataDir().utf8_str()));
-        vbamDebug("GetLocalDataDir(): %s", static_cast<const char*>(stdp.GetLocalDataDir().utf8_str()));
-        vbamDebug("GetPluginsDir(): %s", static_cast<const char*>(stdp.GetPluginsDir().utf8_str()));
+        wxLogDebug(wxT("GetUserLocalDataDir(): %s"), stdp.GetUserLocalDataDir().c_str());
+        wxLogDebug(wxT("GetUserDataDir(): %s"), stdp.GetUserDataDir().c_str());
+        wxLogDebug(wxT("GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()): %s"), stdp.GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()).c_str());
+        wxLogDebug(wxT("GetResourcesDir(): %s"), stdp.GetResourcesDir().c_str());
+        wxLogDebug(wxT("GetDataDir(): %s"), stdp.GetDataDir().c_str());
+        wxLogDebug(wxT("GetLocalDataDir(): %s"), stdp.GetLocalDataDir().c_str());
+        wxLogDebug(wxT("GetPluginsDir(): %s"), stdp.GetPluginsDir().c_str());
         
         debug_dumped = true;
     }
@@ -165,6 +149,17 @@ wxString wxvbamApp::GetAbsolutePath(wxString path)
 
 bool wxvbamApp::OnInit()
 {
+    // set up logging
+#ifndef NDEBUG
+    wxLog::SetLogLevel(wxLOG_Trace);
+#endif
+    // turn off output buffering on Windows to support mintty
+#ifdef __WXMSW__
+    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stderr, NULL, _IONBF, 0);
+    dup2(1, 2); // redirect stderr to stdout
+#endif
+
     // use consistent names for config
     SetAppName(_("vbam"));
 #if (wxMAJOR_VERSION >= 3)

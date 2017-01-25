@@ -41,8 +41,6 @@ void HiDPIAware::GetRealPixelClientSize(int* x, int* y)
     *y = backing_size.height;
 }
 
-IMPLEMENT_CLASS(Quartz2DDrawingPanel, BasicDrawingPanel)
-
 Quartz2DDrawingPanel::Quartz2DDrawingPanel(wxWindow* parent, int _width, int _height)
     : BasicDrawingPanel(parent, _width, _height)
 {
