@@ -199,7 +199,7 @@ debian_installdeps() {
 
     if [ -z "$target" ]; then
         check sudo apt-get -qq update
-        check sudo apt-get -qy install build-essential g++ nasm cmake zlib1g-dev libgl1-mesa-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libjpeg-dev libpng16-dev libtiff5-dev libsdl2-dev libsfml-dev libopenal-dev libwxgtk3.0-dev
+        check sudo apt-get -qy install build-essential g++ nasm cmake gettext zlib1g-dev libgl1-mesa-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libjpeg-dev libpng-dev libtiff5-dev libsdl2-dev libsfml-dev libopenal-dev libwxgtk3.0-dev
     else
         case "$target" in
             mingw-w64-i686)

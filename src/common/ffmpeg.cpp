@@ -58,12 +58,14 @@ static void avformat_free_context(AVFormatContext *ctx)
 #ifndef PixelFormat
 #define PixelFormat AVPixelFormat
 #endif
-#if LIBAVCODEC_VERSION_MAJOR > 56
+#if LIBAVCODEC_VERSION_MAJOR >= 56
 #define CODEC_ID_NONE AV_CODEC_ID_NONE
 #define CODEC_ID_PCM_S16LE AV_CODEC_ID_PCM_S16LE
 #define CODEC_ID_PCM_S16BE AV_CODEC_ID_PCM_S16BE
 #define CODEC_ID_PCM_U16LE AV_CODEC_ID_PCM_U16LE
 #define CODEC_ID_PCM_U16BE AV_CODEC_ID_PCM_U16BE
+#endif
+#if LIBAVCODEC_VERSION_MAJOR > 56
 #define CODEC_FLAG_GLOBAL_HEADER AV_CODEC_FLAG_GLOBAL_HEADER
 #endif
 #if LIBAVUTIL_VERSION_MAJOR > 54
@@ -408,7 +410,7 @@ MediaRet MediaRecorder::AddFrame(const uint8_t *vid)
 
     AVCodecContext *ctx = vid_st->codec;
     AVPacket pkt;
-#if LIBAVCODEC_VERSION_MAJOR > 56
+#if LIBAVCODEC_VERSION_MAJOR >= 56
     int ret, got_packet = 0;
 #endif
 
@@ -448,7 +450,7 @@ MediaRet MediaRecorder::AddFrame(const uint8_t *vid)
 	pkt.data = f->data[0];
 	pkt.size = linesize * ctx->height;
     } else {
-#if LIBAVCODEC_VERSION_MAJOR > 56
+#if LIBAVCODEC_VERSION_MAJOR >= 56
         pkt.data = video_buf;
         pkt.size = VIDEO_BUF_LEN;
         f->format = ctx->pix_fmt;
@@ -486,7 +488,7 @@ MediaRet MediaRecorder::AddFrame(const uint8_t *vid)
     return MRET_OK;
 }
 
-#if LIBAVCODEC_VERSION_MAJOR > 56
+#if LIBAVCODEC_VERSION_MAJOR >= 56
 /* FFmpeg depricated avcodec_encode_audio.
  * It was removed completely in 3.0.
  * This will at least get audio recording *working*
@@ -560,7 +562,7 @@ MediaRet MediaRecorder::AddFrame(const uint16_t *aud)
     }
     while(len + in_audio_buf2 >= frame_len) {
 	av_init_packet(&pkt);
-	#if LIBAVCODEC_VERSION_MAJOR > 56
+	#if LIBAVCODEC_VERSION_MAJOR >= 56
 	MediaRecorderEncodeAudio(ctx, &pkt, audio_buf, frame_len,
 	#else
 	pkt.size = avcodec_encode_audio(ctx, audio_buf, frame_len,

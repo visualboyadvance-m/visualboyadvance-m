@@ -1,7 +1,7 @@
 # The project's name is VBA-M it uses C and C++ code
 PROJECT(VBA-M C CXX)
 
-cmake_minimum_required( VERSION 3.3.2 )
+cmake_minimum_required( VERSION 2.8.12 )
 
 IF(CMAKE_BUILD_TYPE STREQUAL "")
     SET(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type" FORCE)
@@ -286,57 +286,61 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     ENDIF(ENABLE_LTO)
 
     # common optimization flags
-    SET(MY_C_AND_CXX_OPT_FLAGS -O2 -mtune=generic -fomit-frame-pointer ${LTO_FLAG})
+    SET(MY_C_OPT_FLAGS -O2 -mtune=generic -fomit-frame-pointer ${LTO_FLAG})
 
     # common debug flags
     IF(CMAKE_COMPILER_IS_GNUCXX)
-        SET(MY_C_AND_CXX_DBG_FLAGS -ggdb3 -Og)
+        SET(MY_C_DBG_FLAGS -ggdb3 -Og)
     ELSE()
-        SET(MY_C_AND_CXX_DBG_FLAGS -g)
+        SET(MY_C_DBG_FLAGS -g)
     ENDIF()
 
     # common flags
-    SET(MY_C_AND_CXX_FLAGS -pipe -fPIC -Wformat -Wformat-security -fstack-protector-strong --param ssp-buffer-size=4 -fexceptions -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types)
+    SET(MY_C_FLAGS -pipe -fPIC -fpermissive -Wformat -Wformat-security -fexceptions -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types)
 
-    SET(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_AND_CXX_FLAGS})
-    SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} ${MY_C_AND_CXX_FLAGS})
+    # check if SSP flags are supported
+    INCLUDE(CheckCXXCompilerFlag)
+    CHECK_CXX_COMPILER_FLAG(-fstack-protector-strong  F_STACK_PROTECTOR_STRONG_FLAG)
+
+    IF(F_STACK_PROTECTOR_STRONG_FLAG)
+        SET(MY_C_FLAGS ${MY_C_FLAGS} -fstack-protector-strong)
+
+        CHECK_CXX_COMPILER_FLAG("--param ssp-buffer-size=4" SSP_BUFFER_SIZE_FLAG)
+
+        IF(SSP_BUFFER_SIZE_FLAG)
+            SET(MY_C_FLAGS ${MY_C_FLAGS} --param ssp-buffer-size=4)
+        ENDIF()
+    ENDIF()
+
+    # clang doesn't like -std=c++11 for non-C++ sources
+    IF(CMAKE_COMPILER_IS_GNUCXX)
+        SET(MY_C_FLAGS ${MY_C_FLAGS} -std=c++11)
+    ENDIF() 
 
     IF(MINGW)
-        SET(MY_C_FLAGS   ${MY_C_FLAGS}   -static-libgcc)
-        SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} -static-libgcc -static-libstdc++)
+        SET(MY_C_FLAGS ${MY_C_FLAGS} -static-libgcc -static-libstdc++)
     ENDIF(MINGW)
 
     IF(CMAKE_BUILD_TYPE STREQUAL Debug)
-        SET(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_AND_CXX_DBG_FLAGS} -Wall -Wextra)
-        SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} ${MY_C_AND_CXX_DBG_FLAGS} -Wall -Wextra)
+        SET(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_DBG_FLAGS} -Wall -Wextra)
     ELSE()
-        SET(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_AND_CXX_OPT_FLAGS} -Wno-error)
-        SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} ${MY_C_AND_CXX_OPT_FLAGS} -Wno-error)
+        SET(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_OPT_FLAGS} -Wno-error)
     ENDIF()
 
     FOREACH(C_COMPILE_FLAG ${MY_C_FLAGS})
-        ADD_COMPILE_OPTIONS($<$<COMPILE_LANGUAGE:C>:${C_COMPILE_FLAG}>)
-    ENDFOREACH()
-
-    FOREACH(CXX_COMPILE_FLAG ${MY_CXX_FLAGS})
-        ADD_COMPILE_OPTIONS($<$<COMPILE_LANGUAGE:CXX>:${CXX_COMPILE_FLAG}>)
+        ADD_COMPILE_OPTIONS(${C_COMPILE_FLAG})
     ENDFOREACH()
 
     # make a string of compile options to add to link flags
     UNSET(C_COMPILE_FLAGS_STR)
-    UNSET(CXX_COMPILE_FLAGS_STR)
 
     FOREACH(ARG ${MY_C_FLAGS})
         SET(C_COMPILE_FLAGS_STR "${C_COMPILE_FLAGS_STR} ${ARG}")
     ENDFOREACH()
 
-    FOREACH(ARG ${MY_CXX_FLAGS})
-        SET(CXX_COMPILE_FLAGS_STR "${CXX_COMPILE_FLAGS_STR} ${ARG}")
-    ENDFOREACH()
-
     # need all flags for linking, because of -flto etc.
     SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${C_COMPILE_FLAGS_STR}")
-    SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${CXX_COMPILE_FLAGS_STR}")
+    SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${C_COMPILE_FLAGS_STR}")
 
     # for the gcc -fstack-protector* flags we need libssp
     # we also have to use the gcc- binutils for LTO to work

@@ -20,7 +20,7 @@ extern "C" {
 }
 // For compatibility with 3.0+ ffmpeg
 #include <libavcodec/version.h>
-#if LIBAVCODEC_VERSION_MAJOR > 56
+#if LIBAVCODEC_VERSION_MAJOR >= 56
 #define CODEC_ID_NONE AV_CODEC_ID_NONE
 #endif
 #endif
