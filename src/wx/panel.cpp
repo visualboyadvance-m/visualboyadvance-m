@@ -1402,6 +1402,10 @@ void DrawingPanelBase::PaintEv(wxPaintEvent& ev)
 
     DrawArea(dc);
     DrawOSD(dc);
+#ifndef NO_CAIRO
+    if (!paused)
+        GetWindow()->Refresh();
+#endif
 }
 
 void DrawingPanelBase::EraseBackground(wxEraseEvent& ev)
