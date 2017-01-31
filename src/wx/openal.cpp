@@ -47,6 +47,9 @@ public:
     void resume(); // play/resume the secondary sound buffer
     void write(uint16_t* finalWave, int length); // write the emulated sound to a sound buffer
 
+protected:
+    static bool LoadLibrary(wxString name, int flags);
+
 private:
     static OPENALFNTABLE ALFunction;
     bool initialized;
@@ -341,21 +344,32 @@ SoundDriver* newOpenAL()
 OPENALFNTABLE OpenAL::ALFunction = { NULL };
 wxDynamicLibrary OpenAL::Lib;
 
+bool OpenAL::LoadLibrary(wxString name, int flags=wxDL_DEFAULT)
+{
+    wxLogNull disable_log;
+    bool result = false;
+    try {
+        result = Lib.Load(name, flags);
+    } catch (...) {}
+    return result;
+}
+
 bool OpenAL::LoadOAL()
 {
     if (!Lib.IsLoaded() &&
 #ifdef __WXMSW__
         // on win32, it's openal32.dll
-        !Lib.Load(wxT("openal32")) &&
+        !LoadLibrary(wxT("openal32")) &&
 #else
 #ifdef __WXMAC__
         // on macosx, it's just plain OpenAL
-        !Lib.Load(wxT("/System/Library/Frameworks/OpenAL.framework/Versions/A/OpenAL"), wxDL_NOW | wxDL_VERBATIM) &&
+        !LoadLibrary(wxT("/System/Library/Frameworks/OpenAL.framework/Versions/A/OpenAL"), wxDL_NOW | wxDL_VERBATIM) &&
 #endif
 #endif
-        // on linux, it's libopenal.so
+        // on linux, it's libopenal.so.1 or libopenal.so
+        !LoadLibrary(wxDynamicLibrary::CanonicalizeName(wxT("openal")) + wxT(".1")) && 
         // try standard name on all platforms
-        !Lib.Load(wxDynamicLibrary::CanonicalizeName(wxT("openal"))))
+        !LoadLibrary(wxDynamicLibrary::CanonicalizeName(wxT("openal"))))
         return false;
 
 #define loadfn(t, n)                                     \
