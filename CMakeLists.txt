@@ -312,9 +312,8 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         ENDIF()
     ENDIF()
 
-    # clang doesn't like -std=c++11 for non-C++ sources
     IF(CMAKE_COMPILER_IS_GNUCXX)
-        SET(MY_C_FLAGS ${MY_C_FLAGS} -std=c++11)
+        SET(MY_C_FLAGS ${MY_C_FLAGS} -std=gnu++11)
     ENDIF() 
 
     IF(MINGW)
