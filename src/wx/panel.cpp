@@ -1123,10 +1123,22 @@ static uint32_t bmask[NUM_KEYS] = {
 
 static wxJoyKeyBinding_v keys_pressed;
 
+static bool game_key_pressed()
+{
+    bool game_key_pressed = false;
+
+    for (int i = 0; i < 4; i++) {
+        if (joypress[i] != 0) {
+            game_key_pressed = true;
+            break;
+        }
+    }
+
+    return game_key_pressed;
+}
+
 static bool process_key_press(bool down, int key, int mod, int joy = 0)
 {
-    static bool in_game_key = false;
-
     // modifier-only key releases do not set the modifier flag
     // so we set it here to match key release events to key press events
     switch (key) {
@@ -1156,14 +1168,15 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
     if (kpno < keys_pressed.size()) {
         // double press is noop
         if (down)
-            return in_game_key;
+            return game_key_pressed();
 
         // otherwise forget it
         keys_pressed.erase(keys_pressed.begin() + kpno);
     } else {
         // double release is noop
         if (!down)
-            return in_game_key;
+            // we will just mark it processed so it is ignored, this is not entirely correct
+            return true;
 
         // otherwise remember it
         // c++0x
@@ -1172,7 +1185,7 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
         keys_pressed.push_back(jb);
     }
 
-    bool matched_game_key = false;
+    bool game_key_released = false;
 
     // find all game keys this is bound to
     for (int i = 0; i < 4; i++)
@@ -1184,7 +1197,6 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
                     if (down) {
                         // press button
                         joypress[i] |= bmask[j];
-                        matched_game_key = true;
                     }
                     else {
                         // only release if no others pressed
@@ -1205,7 +1217,7 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
                         if (k2 == b.size()) {
                             // release button
                             joypress[i] &= ~bmask[j];
-                            matched_game_key = true;
+                            game_key_released = true;
                         }
                     }
 
@@ -1213,40 +1225,51 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
                 }
         }
 
-    in_game_key = matched_game_key;
-    
-    return in_game_key;
+    if (down) {
+        return game_key_pressed();
+    }
+    else {
+        return game_key_released;
+    }
 }
 
 void GameArea::OnKeyDown(wxKeyEvent& ev)
 {
-    ev.Skip(!process_key_press(true, ev.GetKeyCode(), ev.GetModifiers()));
+    if (process_key_press(true, ev.GetKeyCode(), ev.GetModifiers())) {
+        ev.Skip(false);
+        ev.StopPropagation();
+        wxWakeUpIdle();
+    }
+    else {
+        ev.Skip(true);
+    }
 }
 
 void GameArea::OnKeyUp(wxKeyEvent& ev)
 {
-    ev.Skip(!process_key_press(false, ev.GetKeyCode(), ev.GetModifiers()));
+    if (process_key_press(false, ev.GetKeyCode(), ev.GetModifiers())) {
+        ev.Skip(false);
+        ev.StopPropagation();
+        wxWakeUpIdle();
+    }
+    else {
+        ev.Skip(true);
+    }
 }
 
 // these three are forwarded to the DrawingPanel instance
 void GameArea::PaintEv(wxPaintEvent& ev)
 {
-    DrawingPanelBase* panel = dynamic_cast<DrawingPanelBase*>(ev.GetEventObject());
-
     panel->PaintEv(ev);
 }
 
 void GameArea::EraseBackground(wxEraseEvent& ev)
 {
-    DrawingPanelBase* panel = dynamic_cast<DrawingPanelBase*>(ev.GetEventObject());
-
     panel->EraseBackground(ev);
 }
 
 void GameArea::OnSize(wxSizeEvent& ev)
 {
-    DrawingPanelBase* panel = dynamic_cast<DrawingPanelBase*>(ev.GetEventObject());
-
     panel->OnSize(ev);
 }
 
@@ -1276,8 +1299,6 @@ void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
 BEGIN_EVENT_TABLE(GameArea, wxPanel)
 EVT_IDLE(GameArea::OnIdle)
 EVT_SDLJOY(GameArea::OnSDLJoy)
-EVT_KEY_DOWN(GameArea::OnKeyDown)
-EVT_KEY_UP(GameArea::OnKeyUp)
 // FIXME: wxGTK does not generate motion events in MainFrame (not sure
 // what to do about it)
 EVT_MOUSE_EVENTS(GameArea::MouseEvent)
