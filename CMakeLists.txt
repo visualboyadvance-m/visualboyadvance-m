@@ -275,7 +275,7 @@ ENDIF()
 
 # Compiler flags
 
-IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     SET(LTO_FLAG "")
     IF(ENABLE_LTO)
         IF(CMAKE_COMPILER_IS_GNUCXX)
@@ -286,7 +286,12 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     ENDIF(ENABLE_LTO)
 
     # common optimization flags
-    SET(MY_C_OPT_FLAGS -O2 -mtune=generic -fomit-frame-pointer ${LTO_FLAG})
+    IF(NOT (APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.3))
+        SET(MY_C_OPT_FLAGS -O2 -mtune=generic -fomit-frame-pointer ${LTO_FLAG})
+    ELSE()
+        # LTO and -fomit-frame-pointer generate broken binaries on Lion with XCode 4.2 tools
+        SET(MY_C_OPT_FLAGS -O2 -mtune=generic)
+    ENDIF()
 
     # common debug flags
     IF(CMAKE_COMPILER_IS_GNUCXX)
