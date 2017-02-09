@@ -610,6 +610,15 @@ void MainFrame::OnActivate(wxActivateEvent& event)
 
     if (panel && focused)
         panel->SetFocus();
+
+    if (pauseWhenInactive) {
+        if (panel && focused) {
+            panel->Resume();
+        }
+        else if (panel && !focused) {
+            panel->Pause();
+        }
+    }
 }
 
 void MainFrame::OnDropFile(wxDropFilesEvent& event)

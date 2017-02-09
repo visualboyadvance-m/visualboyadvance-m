@@ -192,14 +192,16 @@ bool DirectSound::init(long sampleRate)
 
 void DirectSound::pause()
 {
-    if (dsbSecondary == NULL)
-        return;
+    for (auto buf : {dsbPrimary, dsbSecondary}) {
+        if (buf == NULL)
+            continue;
 
-    DWORD status;
-    dsbSecondary->GetStatus(&status);
+        DWORD status;
+        buf->GetStatus(&status);
 
-    if (status & DSBSTATUS_PLAYING)
-        dsbSecondary->Stop();
+        if (status & DSBSTATUS_PLAYING)
+            buf->Stop();
+    }
 }
 
 void DirectSound::reset()
@@ -214,10 +216,12 @@ void DirectSound::reset()
 
 void DirectSound::resume()
 {
-    if (dsbSecondary == NULL)
-        return;
+    for (auto buf : {dsbPrimary, dsbSecondary}) {
+        if (buf == NULL)
+            return;
 
-    dsbSecondary->Play(0, 0, DSBPLAY_LOOPING);
+        buf->Play(0, 0, DSBPLAY_LOOPING);
+    }
 }
 
 void DirectSound::write(uint16_t* finalWave, int length)
