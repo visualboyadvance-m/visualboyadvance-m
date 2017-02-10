@@ -148,6 +148,47 @@ include_directories(widgets)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+SET(XRC_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/AccelConfig.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatAdd.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatCreate.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatEdit.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatList.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CodeSelect.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/DirectoriesConfig.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/Disassemble.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/DisplayConfig.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/ExportSPS.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBAROMInfo.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBColorPrefPanel.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBDisassemble.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBMapViewer.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBOAMViewer.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBPaletteViewer.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBPrinter.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBROMInfo.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBTileViewer.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GameBoyAdvanceConfig.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GameBoyConfig.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GeneralConfig.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/IOViewer.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/JoyPanel.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/JoypadConfig.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/LinkConfig.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/Logging.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MainFrame.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MainIcon.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MainMenu.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MapViewer.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MemSelRegion.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MemViewer.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/NetLink.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/OAMViewer.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/PaletteViewer.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/SoundConfig.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/TileViewer.xrc
+)
+
 # wxrc does not support xrs files in -c output (> 10x compression)
 # we do it using the bin2.c utility
 
@@ -162,8 +203,8 @@ ADD_CUSTOM_COMMAND(OUTPUT ${BIN2C}
 		   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c)
 ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xrs
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                   COMMAND wxrc ${CMAKE_CURRENT_SOURCE_DIR}/xrc/*.xrc -o wxvbam.xrs
-		   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/xrc/*.xrc)
+                   COMMAND wxrc ${XRC_SOURCES} -o wxvbam.xrs
+                   DEPENDS ${XRC_SOURCES})
 ADD_CUSTOM_COMMAND(OUTPUT builtin-xrc.h
                    COMMAND ${BIN2C} wxvbam.xrs builtin-xrc.h builtin_xrs
                    DEPENDS ${BIN2C} wxvbam.xrs)
@@ -240,10 +281,8 @@ SET( HDR_WX
    widgets/wx/checkedlistctrl.h
 )
 
-FILE(GLOB XRC_WX xrc/*.xrc)
-
 SET( RES_WX
-    ${XRC_WX}
+    ${XRC_SOURCES}
     ../vba-over.ini
 )
 
