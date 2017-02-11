@@ -275,16 +275,12 @@ IF(WIN32)
     ENDIF()
 
     INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
-ENDIF()
 
-IF(MSVC)
-    SET(DEPS_MSVC "${CMAKE_SOURCE_DIR}/dependencies/msvc")
-    IF(NOT EXISTS "${DEPS_MSVC}" AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
-        MESSAGE(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --recursive")
+    IF(MSVC)
+        SET(DEPS_MSVC "${CMAKE_SOURCE_DIR}/dependencies/msvc")
+        INCLUDE_DIRECTORIES("${DEPS_MSVC}") # for GL/glext.h and getopt.h
     ENDIF()
-
-    INCLUDE_DIRECTORIES("${DEPS_MSVC}") # for GL/glext.h
-ENDIF(MSVC)
+ENDIF()
 
 # Compiler flags
 
@@ -634,12 +630,6 @@ IF( ENABLE_FFMPEG )
         ${FFMPEG_INCLUDE_DIRS}
     )
 ENDIF( ENABLE_FFMPEG )
-
-if(MSVC)
-    INCLUDE_DIRECTORIES(
-        dependencies/msvc    # for getopt.h
-    )
-endif()
 
 ADD_LIBRARY (
     vbamcore
