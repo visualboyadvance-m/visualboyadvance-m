@@ -24,6 +24,8 @@ make -j10
 `./installdeps` is supported on MSys2, Linux (Debian/Ubuntu, Fedora or Arch
 Linux) and Mac OS X (homebrew, macports or fink.)
 
+The Ninja cmake generator is also now supported, including on msys2.
+
 If your OS is not supported, you will need the following:
 
 - c++ compiler and binutils

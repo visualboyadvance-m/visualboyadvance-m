@@ -109,6 +109,11 @@ ELSE()
     ADD_DEFINITIONS(-DNDEBUG)
 ENDIF()
 
+# hack for ninja in msys2
+IF(WIN32 AND CMAKE_GENERATOR STREQUAL Ninja AND (NOT $ENV{MSYSTEM} STREQUAL ""))
+    SET(MSYS ON)
+ENDIF()
+
 # Add support for Homebrew, MacPorts and Fink on OS X
 IF(APPLE)
     INCLUDE(MacPackageManagers)
