@@ -204,14 +204,15 @@ IF(CMAKE_HOST_WIN32)
 ENDIF()
 
 IF(MSVC)
-    SET(NATIVE_CC cl)
+    ADD_CUSTOM_COMMAND(OUTPUT ${BIN2C}
+                       COMMAND cl ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c /link "/out:${BIN2C}"
+                       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c)
 ELSE(MSVC)
-    SET(NATIVE_CC cc)
+    ADD_CUSTOM_COMMAND(OUTPUT ${BIN2C}
+                       COMMAND cc ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c -o ${BIN2C}
+                       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c)
 ENDIF(MSVC)
 
-ADD_CUSTOM_COMMAND(OUTPUT ${BIN2C}
-                   COMMAND ${NATIVE_CC} ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c -o ${BIN2C}
-		   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c)
 ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xrs
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    COMMAND wxrc ${XRC_SOURCES} -o wxvbam.xrs
