@@ -34,7 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctype.h>
 #include <wchar.h>
 #include <locale.h>
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 #include <wctype.h>
 
 #define BUF_SIZE  4096

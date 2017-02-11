@@ -64,6 +64,10 @@ ENDIF()
 
 OPTION(ENABLE_LTO "Compile with Link Time Optimization (gcc and clang only)" ${LTO_DEFAULT})
 
+if(MSVC)
+    ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+endif(MSVC)
+
 option( ENABLE_GBA_LOGGING "Enable extended GBA logging" ON )
 if( ENABLE_GBA_LOGGING )
    ADD_DEFINITIONS (-DGBA_LOGGING )
@@ -191,8 +195,8 @@ IF( NOT SYSCONF_INSTALL_DIR )
 ENDIF( NOT SYSCONF_INSTALL_DIR )
 
 # C defines
-ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONF_INSTALL_DIR='"${SYSCONF_INSTALL_DIR}"' -DWITH_LIRC='${WITHLIRC}')
-ADD_DEFINITIONS (-DVERSION='"${VERSION}"' -DPKGDATADIR='"${PKGDATADIR}"' -DPACKAGE='')
+ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONF_INSTALL_DIR=\\\""${SYSCONF_INSTALL_DIR}"\\\" -DWITH_LIRC=${WITHLIRC})
+ADD_DEFINITIONS (-DVERSION=\\\""${VERSION}"\\\" -DPKGDATADIR=\\\""${PKGDATADIR}"\\\" -DPACKAGE=)
 
 if( ENABLE_LINK )
     # IPC linking code needs sem_timedwait which can be either in librt or pthreads
@@ -233,7 +237,7 @@ ENDIF( NOT ENABLE_ASM_CORE )
 if( ENABLE_NLS )
     SET( LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale )
     ADD_DEFINITIONS ( -DENABLE_NLS )
-    ADD_DEFINITIONS ( -DLOCALEDIR='"${LOCALEDIR}"' )
+    ADD_DEFINITIONS ( -DLOCALEDIR=\\\""${LOCALEDIR}"\\\" )
     # for now, only GBALink.cpp uses gettext() directly
     IF(APPLE)
         # use Homebrew gettext if available
@@ -271,6 +275,11 @@ IF(WIN32)
     ENDIF()
 
     INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
+
+    IF(MSVC)
+        SET(DEPS_MSVC "${CMAKE_SOURCE_DIR}/dependencies/msvc")
+        INCLUDE_DIRECTORIES("${DEPS_MSVC}") # for GL/glext.h and getopt.h
+    ENDIF()
 ENDIF()
 
 # Compiler flags
@@ -317,10 +326,6 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         ENDIF()
     ENDIF()
 
-    IF(CMAKE_COMPILER_IS_GNUCXX)
-        SET(MY_C_FLAGS ${MY_C_FLAGS} -std=gnu++11)
-    ENDIF() 
-
     IF(MINGW)
         SET(MY_C_FLAGS ${MY_C_FLAGS} -static-libgcc -static-libstdc++)
     ENDIF(MINGW)
@@ -334,6 +339,11 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     FOREACH(C_COMPILE_FLAG ${MY_C_FLAGS})
         ADD_COMPILE_OPTIONS(${C_COMPILE_FLAG})
     ENDFOREACH()
+
+    # This one must be set for C++ only, and we can't use generator expressions
+    # in ADD_COMPILE_OPTIONS because that's a cmake 3.3 feature and we need
+    # 2.8.12 compat for Ubuntu 14.
+    SET(CMAKE_CXX_COMPILE_OBJECT "${CMAKE_CXX_COMPILE_OBJECT} -std=gnu++11")
 
     # make a string of compile options to add to link flags
     UNSET(C_COMPILE_FLAGS_STR)
@@ -397,6 +407,10 @@ SET(SRC_MAIN
     src/common/SoundSDL.cpp
 )
 
+if(MSVC)
+	SET(SRC_MAIN ${SRC_MAIN} "dependencies/msvc/getopt.c")
+endif(MSVC)
+
 SET(HDR_MAIN
     src/AutoBuild.h
     src/System.h
@@ -411,6 +425,10 @@ SET(HDR_MAIN
     src/common/SoundDriver.h
     src/common/SoundSDL.h
 )
+
+if(MSVC)
+	SET(HDR_MAIN ${HDR_MAIN} "dependencies/msvc/getopt.h")
+endif(MSVC)
 
 if(ENABLE_FFMPEG)
     SET(SRC_MAIN ${SRC_MAIN} src/common/ffmpeg.cpp)

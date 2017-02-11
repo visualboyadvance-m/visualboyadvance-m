@@ -14,6 +14,8 @@
 #include <wx/stattext.h>
 #include <wx/checkbox.h>
 
+#include <stdint.h> // for uint32_t
+
 // avoid exporting too much stuff
 namespace Viewers {
 // common to all viewers:
@@ -151,7 +153,7 @@ protected:
     uint32_t seladdr;
     bool issel;
 
-    DECLARE_DYNAMIC_CLASS() // for xrc
+    DECLARE_DYNAMIC_CLASS(DisList) // for xrc
     DECLARE_EVENT_TABLE()
 };
 
@@ -229,7 +231,7 @@ protected:
     bool isasc;
     void ShowCaret();
 
-    DECLARE_DYNAMIC_CLASS() // for xrc
+    DECLARE_DYNAMIC_CLASS(MemView) // for xrc
     DECLARE_EVENT_TABLE()
 };
 
@@ -314,7 +316,7 @@ protected:
     int ox, oy, selx, sely;
 
     DECLARE_EVENT_TABLE()
-    DECLARE_DYNAMIC_CLASS()
+    DECLARE_DYNAMIC_CLASS(PixView)
 };
 #define pixview(v, n, w, h, cv)         \
     do {                                \
@@ -348,7 +350,7 @@ protected:
 private:
     int selx, sely;
 
-    DECLARE_DYNAMIC_CLASS()
+    DECLARE_DYNAMIC_CLASS(GfxPanel)
     DECLARE_EVENT_TABLE()
 };
 
@@ -398,7 +400,7 @@ protected:
     // always generates a GFX_CLICK
     void SelPoint(wxMouseEvent& ev);
     void click();
-    DECLARE_DYNAMIC_CLASS()
+    DECLARE_DYNAMIC_CLASS(PixViewEvt)
 };
 
 // a display-only checkbox which does not look like it's disabled
@@ -412,7 +414,7 @@ public:
     {
     }
     DECLARE_EVENT_TABLE()
-    DECLARE_DYNAMIC_CLASS()
+    DECLARE_DYNAMIC_CLASS(DispCheckBox)
 };
 
 // standard widgets in graphical viewers

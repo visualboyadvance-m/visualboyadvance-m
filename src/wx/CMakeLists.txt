@@ -1,6 +1,7 @@
 #Do not use this file directly.  Always use the top level CMakeLists.txt file
 # This build is much easier if we just do it here.
-SET( CMAKE_CXX_FLAGS -std=gnu++11 )
+
+cmake_policy(SET CMP0043 NEW) # for wxWidgets
 
 # not yet implemented
 SET(CAIRO_DEFAULT OFF)
@@ -198,9 +199,16 @@ IF(CMAKE_HOST_WIN32)
     SET(BIN2C ${BIN2C}.exe)
 ENDIF()
 
-ADD_CUSTOM_COMMAND(OUTPUT ${BIN2C}
-                   COMMAND cc ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c -o ${BIN2C}
-		   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c)
+IF(MSVC)
+    ADD_CUSTOM_COMMAND(OUTPUT ${BIN2C}
+                       COMMAND cl ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c /link "/out:${BIN2C}"
+                       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c)
+ELSE(MSVC)
+    ADD_CUSTOM_COMMAND(OUTPUT ${BIN2C}
+                       COMMAND cc ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c -o ${BIN2C}
+                       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c)
+ENDIF(MSVC)
+
 ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xrs
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    COMMAND wxrc ${XRC_SOURCES} -o wxvbam.xrs
@@ -301,10 +309,14 @@ ENDIF(ENABLE_XAUDIO2)
 
 IF( WIN32 )
     SET( SRC_WX ${SRC_WX} wxvbam.rc dsound.cpp )
-    SET(DIRECTX_LIBRARIES -ldxguid -ldsound -lws2_32)
+    SET(DIRECTX_LIBRARIES dxguid dsound ws2_32)
+    IF(MSVC)
+        # workaround for some symbols needed by static SDL2.lib
+        SET(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} imm32 version)
+    ENDIF(MSVC)
     # not strictly directx, but win32-related
     IF(ENABLE_DEBUGGER)
-        SET(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} -lwsock32)
+        SET(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} wsock32)
     ENDIF(ENABLE_DEBUGGER)
 ENDIF( WIN32 )
 

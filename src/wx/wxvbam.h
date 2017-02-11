@@ -307,7 +307,7 @@ public:
     virtual bool DialogOpened() { return dialog_opened != 0; }
 
     // required for building from xrc
-    DECLARE_DYNAMIC_CLASS();
+    DECLARE_DYNAMIC_CLASS(MainFrame);
     // required for event handling
     DECLARE_EVENT_TABLE();
 
@@ -364,12 +364,13 @@ private:
 // helper class to add HiDPI awareness (mostly for Mac OS X)
 class HiDPIAware {
 public:
+    HiDPIAware() { hidpi_scale_factor = 0; }
     virtual double HiDPIScaleFactor();
     virtual void RequestHighResolutionOpenGLSurface();
     virtual void GetRealPixelClientSize(int* x, int* y);
     virtual wxWindow* GetWindow() = 0;
 private:
-    double hidpi_scale_factor = 0;
+    double hidpi_scale_factor;
 };
 
 // a helper class to avoid forgetting StopModal()
@@ -624,7 +625,7 @@ protected:
     bool pointer_blanked;
     uint32_t mouse_active_time;
 
-    DECLARE_DYNAMIC_CLASS()
+    DECLARE_DYNAMIC_CLASS(GameArea)
     DECLARE_EVENT_TABLE()
 };
 
@@ -667,7 +668,7 @@ protected:
     int width, height;
     double scale;
     virtual void DrawingPanelInit();
-    bool did_init = false;
+    bool did_init;
     uint8_t* todraw;
     uint8_t *pixbuf1, *pixbuf2;
     FilterThread* threads;

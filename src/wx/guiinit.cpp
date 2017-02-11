@@ -752,7 +752,7 @@ public:
     int count8, count16, count32; // number of aligned addresses in addrs
     wxString OnGetItemText(long item, long column) const;
 
-    DECLARE_DYNAMIC_CLASS()
+    DECLARE_DYNAMIC_CLASS(CheatListCtrl)
 };
 
 IMPLEMENT_DYNAMIC_CLASS(CheatListCtrl, wxListCtrl);

@@ -192,7 +192,8 @@ bool DirectSound::init(long sampleRate)
 
 void DirectSound::pause()
 {
-    for (auto buf : {dsbPrimary, dsbSecondary}) {
+    LPDIRECTSOUNDBUFFER bufs[] = {dsbPrimary, dsbSecondary};
+    for (auto buf : bufs) {
         if (buf == NULL)
             continue;
 
@@ -216,7 +217,8 @@ void DirectSound::reset()
 
 void DirectSound::resume()
 {
-    for (auto buf : {dsbPrimary, dsbSecondary}) {
+    LPDIRECTSOUNDBUFFER bufs[] = {dsbPrimary, dsbSecondary};
+    for (auto buf : bufs) {
         if (buf == NULL)
             return;
 
