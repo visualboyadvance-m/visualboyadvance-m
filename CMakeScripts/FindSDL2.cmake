@@ -89,7 +89,8 @@ SET(SDL2_SEARCH_PATHS
 	/opt/local # MacPorts
 	/opt/csw # OpenCSW (Solaris)
 	/opt
-	${SDL2_PATH}
+	${SDL2_PATH}/include
+	${SDL2_PATH}/lib
 )
 
 FIND_PATH(SDL2_INCLUDE_DIR SDL.h
