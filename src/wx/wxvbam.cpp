@@ -5,7 +5,6 @@
 //   create & display main frame
 
 #include "wxvbam.h"
-#include <unistd.h>
 #include <stdio.h>
 #include <wx/cmdline.h>
 #include <wx/file.h>

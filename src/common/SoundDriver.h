@@ -18,6 +18,8 @@
 #ifndef __VBA_SOUND_DRIVER_H__
 #define __VBA_SOUND_DRIVER_H__
 
+#include <stdint.h> // for uint16_t
+
 /**
  * Sound driver abstract interface for the core to use to output sound.
  * Subclass this to implement a new sound driver.

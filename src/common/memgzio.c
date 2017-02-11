@@ -717,8 +717,9 @@ int ZEXPORT memgzclose(file) gzFile file;
 
 long ZEXPORT memtell(file) gzFile file;
 {
+        mem_stream *s;
         do_flush(file, Z_FULL_FLUSH); // makes memtell to tell truth
-        mem_stream *s = (mem_stream *)file;
+        s = (mem_stream *)file;
 
         if (s == NULL)
                 return Z_STREAM_ERROR;

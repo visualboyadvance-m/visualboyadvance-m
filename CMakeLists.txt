@@ -64,6 +64,10 @@ ENDIF()
 
 OPTION(ENABLE_LTO "Compile with Link Time Optimization (gcc and clang only)" ${LTO_DEFAULT})
 
+if(MSVC)
+    ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+endif(MSVC)
+
 option( ENABLE_GBA_LOGGING "Enable extended GBA logging" ON )
 if( ENABLE_GBA_LOGGING )
    ADD_DEFINITIONS (-DGBA_LOGGING )
@@ -191,8 +195,8 @@ IF( NOT SYSCONF_INSTALL_DIR )
 ENDIF( NOT SYSCONF_INSTALL_DIR )
 
 # C defines
-ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONF_INSTALL_DIR='"${SYSCONF_INSTALL_DIR}"' -DWITH_LIRC='${WITHLIRC}')
-ADD_DEFINITIONS (-DVERSION='"${VERSION}"' -DPKGDATADIR='"${PKGDATADIR}"' -DPACKAGE='')
+ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONF_INSTALL_DIR=\\\""${SYSCONF_INSTALL_DIR}"\\\" -DWITH_LIRC=${WITHLIRC})
+ADD_DEFINITIONS (-DVERSION=\\\""${VERSION}"\\\" -DPKGDATADIR=\\\""${PKGDATADIR}"\\\" -DPACKAGE=)
 
 if( ENABLE_LINK )
     # IPC linking code needs sem_timedwait which can be either in librt or pthreads
@@ -233,7 +237,7 @@ ENDIF( NOT ENABLE_ASM_CORE )
 if( ENABLE_NLS )
     SET( LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale )
     ADD_DEFINITIONS ( -DENABLE_NLS )
-    ADD_DEFINITIONS ( -DLOCALEDIR='"${LOCALEDIR}"' )
+    ADD_DEFINITIONS ( -DLOCALEDIR=\\\"${LOCALEDIR}\\\" )
     # for now, only GBALink.cpp uses gettext() directly
     IF(APPLE)
         # use Homebrew gettext if available
@@ -397,6 +401,10 @@ SET(SRC_MAIN
     src/common/SoundSDL.cpp
 )
 
+if(MSVC)
+	SET(SRC_MAIN ${SRC_MAIN} "dependencies/msvc/getopt.c")
+endif(MSVC)
+
 SET(HDR_MAIN
     src/AutoBuild.h
     src/System.h
@@ -411,6 +419,10 @@ SET(HDR_MAIN
     src/common/SoundDriver.h
     src/common/SoundSDL.h
 )
+
+if(MSVC)
+	SET(HDR_MAIN ${HDR_MAIN} "dependencies/msvc/getopt.h")
+endif(MSVC)
 
 if(ENABLE_FFMPEG)
     SET(SRC_MAIN ${SRC_MAIN} src/common/ffmpeg.cpp)
@@ -612,6 +624,12 @@ IF( ENABLE_FFMPEG )
         ${FFMPEG_INCLUDE_DIRS}
     )
 ENDIF( ENABLE_FFMPEG )
+
+if(MSVC)
+    INCLUDE_DIRECTORIES(
+        dependencies/msvc    # for getopt.h
+    )
+endif()
 
 ADD_LIBRARY (
     vbamcore

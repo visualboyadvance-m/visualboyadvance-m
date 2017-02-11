@@ -62,7 +62,7 @@ public:
 protected:
     void OnJoy(wxSDLJoyEvent&);
 
-    DECLARE_DYNAMIC_CLASS();
+    DECLARE_DYNAMIC_CLASS(wxJoyKeyTextCtrl);
     DECLARE_EVENT_TABLE();
 };
 

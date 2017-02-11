@@ -1,6 +1,11 @@
 #Do not use this file directly.  Always use the top level CMakeLists.txt file
 # This build is much easier if we just do it here.
-SET( CMAKE_CXX_FLAGS -std=gnu++11 )
+
+cmake_policy(SET CMP0043 NEW) # for wxWidgets
+
+IF(CMAKE_COMPILER_IS_GNUCXX)
+    SET( CMAKE_CXX_FLAGS -std=gnu++11 )
+ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 # not yet implemented
 SET(CAIRO_DEFAULT OFF)
@@ -143,6 +148,10 @@ ENDIF(WIN32 AND ENABLE_DIRECTX)
 
 # contrib widgets
 include_directories(widgets)
+
+IF(MSVC)
+    include_directories(../../dependencies/msvc) # for GL/glext.h
+ENDIF(MSVC)
 
 # for out-of-tree builds, grab includes from both target and source dirs
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -301,10 +310,14 @@ ENDIF(ENABLE_XAUDIO2)
 
 IF( WIN32 )
     SET( SRC_WX ${SRC_WX} wxvbam.rc dsound.cpp )
-    SET(DIRECTX_LIBRARIES -ldxguid -ldsound -lws2_32)
+    SET(DIRECTX_LIBRARIES dxguid dsound ws2_32)
+    IF(MSVC)
+        # workaround for some symbols needed by static SDL2.lib
+        SET(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} imm32 version)
+    ENDIF(MSVC)
     # not strictly directx, but win32-related
     IF(ENABLE_DEBUGGER)
-        SET(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} -lwsock32)
+        SET(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} wsock32)
     ENDIF(ENABLE_DEBUGGER)
 ENDIF( WIN32 )
 

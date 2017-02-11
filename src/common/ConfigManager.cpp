@@ -820,6 +820,28 @@ const char* ReadPrefString(const char* pref_key)
 	return ReadPrefString(pref_key, "");
 }
 
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Duplicate a string
+  @param    s String to duplicate
+  @return   Pointer to a newly allocated string, to be freed with free()
+
+  This is a replacement for strdup(). This implementation is provided
+  for systems that do not have it.
+ */
+/*--------------------------------------------------------------------------*/
+static char *xstrdup(const char *s)
+{
+        char *t;
+        if (!s)
+                return NULL;
+        t = (char *)malloc(strlen(s) + 1);
+        if (t) {
+                strcpy(t, s);
+        }
+        return t;
+}
+
 int ReadOpts(int argc, char ** argv)
 {
 	int op = -1;
@@ -859,7 +881,7 @@ int ReadOpts(int argc, char ** argv)
 				log("Missing BIOS file name\n");
 				break;
 			}
-			biosFileNameGBA = strdup(optarg);
+			biosFileNameGBA = xstrdup(optarg);
 			break;
 		case 'c':
 		{

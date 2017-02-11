@@ -23,7 +23,7 @@ protected:
     void UpdatedValue();
     void UpdateEvt(wxCommandEvent& ev);
     wxFarRadio* Next;
-    DECLARE_DYNAMIC_CLASS()
+    DECLARE_DYNAMIC_CLASS(wxFarRadio)
     DECLARE_EVENT_TABLE()
 };
 

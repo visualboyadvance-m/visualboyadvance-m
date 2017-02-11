@@ -74,7 +74,7 @@ protected:
     // the last keydown event received; this is processed on next keyup
     int lastmod, lastkey;
 
-    DECLARE_DYNAMIC_CLASS();
+    DECLARE_DYNAMIC_CLASS(wxKeyTextCtrl);
     DECLARE_EVENT_TABLE();
 };
 

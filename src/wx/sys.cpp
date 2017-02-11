@@ -686,7 +686,7 @@ private:
     wxRect margins;
     int npw, nph;
 
-    DECLARE_CLASS()
+    DECLARE_CLASS(PrintDialog)
 };
 
 IMPLEMENT_CLASS(PrintDialog, wxEvtHandler)
