@@ -3,10 +3,6 @@
 
 cmake_policy(SET CMP0043 NEW) # for wxWidgets
 
-IF(CMAKE_COMPILER_IS_GNUCXX)
-    SET( CMAKE_CXX_FLAGS -std=gnu++11 )
-ENDIF(CMAKE_COMPILER_IS_GNUCXX)
-
 # not yet implemented
 SET(CAIRO_DEFAULT OFF)
 

@@ -330,10 +330,6 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         ENDIF()
     ENDIF()
 
-    IF(CMAKE_COMPILER_IS_GNUCXX)
-        SET(MY_C_FLAGS ${MY_C_FLAGS} -std=gnu++11)
-    ENDIF() 
-
     IF(MINGW)
         SET(MY_C_FLAGS ${MY_C_FLAGS} -static-libgcc -static-libstdc++)
     ENDIF(MINGW)
@@ -347,6 +343,11 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     FOREACH(C_COMPILE_FLAG ${MY_C_FLAGS})
         ADD_COMPILE_OPTIONS(${C_COMPILE_FLAG})
     ENDFOREACH()
+
+    # This one must be set for C++ only, and we can't use generator expressions
+    # in ADD_COMPILE_OPTIONS because that's a cmake 3.3 feature and we need
+    # 2.8.12 compat for Ubuntu 14.
+    SET(CMAKE_CXX_COMPILE_OBJECT "${CMAKE_CXX_COMPILE_OBJECT} -std=gnu++11")
 
     # make a string of compile options to add to link flags
     UNSET(C_COMPILE_FLAGS_STR)
