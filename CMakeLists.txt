@@ -277,6 +277,15 @@ IF(WIN32)
     INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
 ENDIF()
 
+IF(MSVC)
+    SET(DEPS_MSVC "${CMAKE_SOURCE_DIR}/dependencies/msvc")
+    IF(NOT EXISTS "${DEPS_MSVC}" AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+        MESSAGE(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --recursive")
+    ENDIF()
+
+    INCLUDE_DIRECTORIES("${DEPS_MSVC}") # for GL/glext.h
+ENDIF(MSVC)
+
 # Compiler flags
 
 IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)

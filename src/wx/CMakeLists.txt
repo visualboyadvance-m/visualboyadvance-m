@@ -149,10 +149,6 @@ ENDIF(WIN32 AND ENABLE_DIRECTX)
 # contrib widgets
 include_directories(widgets)
 
-IF(MSVC)
-    include_directories(../../dependencies/msvc) # for GL/glext.h
-ENDIF(MSVC)
-
 # for out-of-tree builds, grab includes from both target and source dirs
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
