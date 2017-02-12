@@ -2040,9 +2040,14 @@ bool cheatsImportGSACodeFile(const char* name, int game, bool v3)
         return false;
 
     int games = 0;
-    int len = 0;
     fseek(f, 0x1e, SEEK_CUR);
-    fread(&games, 1, 4, f);
+    if(fread(&games, 1, 4, f) == 0)
+    {
+        fclose(f);
+        return false;
+    }
+
+    int len = 0;
     bool found = false;
     int g = 0;
     while (games > 0) {
