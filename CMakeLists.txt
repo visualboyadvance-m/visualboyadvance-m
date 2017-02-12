@@ -716,11 +716,12 @@ IF( UNIX )
     ENDIF( ENABLE_WX )
 ENDIF( UNIX )
 
-# linux data files
+# linux data and icon files
 IF( NOT WIN32 AND NOT APPLE )
     IF( ENABLE_WX )
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/wx/wxvbam.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/wx/wxvbam.appdata.xml DESTINATION ${CMAKE_INSTALL_PREFIX}/share/appdata)
+        INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/wx/icons/sizes/ DESTINATION share/icons/hicolor)
     ENDIF( ENABLE_WX )
 ENDIF( NOT WIN32 AND NOT APPLE )
 
