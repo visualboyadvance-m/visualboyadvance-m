@@ -297,9 +297,6 @@ public:
     // call this to update the viewers once a frame:
     void UpdateViewers();
 
-    // Check for online updates to the emulator
-    bool CheckForUpdates();
-
     virtual bool MenusOpened() { return menus_opened != 0; }
 
     virtual void SetMenusOpened(bool state);
@@ -353,10 +350,6 @@ private:
     wxDialog* LoadXRCDialog(const char* name);
     // Load a named wxDialog from the XRC file
     wxDialog* LoadXRCropertySheetDialog(const char* name);
-
-    void DownloadFile(wxString host, wxString url);
-    void UpdateFile(wxString host, wxString url);
-    wxString CheckForUpdates(wxString host, wxString url);
 
 #include "cmdhandlers.h"
 };

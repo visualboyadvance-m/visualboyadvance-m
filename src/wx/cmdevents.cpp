@@ -2389,26 +2389,6 @@ EVT_HANDLER(Translate, "Translations")
     wxLaunchDefaultBrowser(wxT("http://www.transifex.com/projects/p/vba-m"));
 }
 
-EVT_HANDLER(UpdateRDB, "Update ROM database")
-{
-    int ret = wxMessageBox(_("This will download and update three GBA No-Intro DAT files.  Do you want to continue?"),
-        _("Confirm Update"), wxYES_NO | wxICON_EXCLAMATION);
-
-    if (ret == wxYES) {
-        DownloadFile(_T("sourceforge.net"), _T("/p/vbam/code/HEAD/tree/trunk/data/Nintendo%20-%20Game%20Boy%20Advance.zip?format=raw"));
-        DownloadFile(_T("sourceforge.net"), _T("/p/vbam/code/HEAD/tree/trunk/data/Nintendo%20-%20Game%20Boy%20Advance%20%28Scene%29.zip?format=raw"));
-        DownloadFile(_T("sourceforge.net"), _T("/p/vbam/code/HEAD/tree/trunk/data/Official%20No-Intro%20Nintendo%20Gameboy%20Advance%20Number%20%28Date%29.zip?format=raw"));
-    }
-}
-
-EVT_HANDLER(UpdateEmu, "Check for updates")
-{
-    if (!CheckForUpdates()) {
-        wxMessageBox(_("There are no new updates at this time."),
-            _("Check for updates"), wxOK | wxICON_INFORMATION);
-    }
-}
-
 // was About
 EVT_HANDLER(wxID_ABOUT, "About...")
 {
@@ -2431,7 +2411,7 @@ EVT_HANDLER(wxID_ABOUT, "About...")
     ai.SetWebSite(wxT("http://www.vba-m.com/"));
     ai.SetIcon(GetIcon());
     ai.SetDescription(_("Nintendo GameBoy (+Color+Advance) emulator."));
-    ai.SetCopyright(_("Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2015 VBA-M development team"));
+    ai.SetCopyright(_("Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2017 VBA-M development team"));
     ai.SetLicense(_("This program is free software: you can redistribute it and/or modify\n"
                     "it under the terms of the GNU General Public License as published by\n"
                     "the Free Software Foundation, either version 2 of the License, or\n"
@@ -2468,8 +2448,9 @@ EVT_HANDLER(wxID_ABOUT, "About...")
     ai.AddDeveloper(wxT("xKiv"));
     ai.AddDeveloper(wxT("skidau"));
     ai.AddDeveloper(wxT("TheCanadianBacon"));
-    ai.AddDeveloper(wxT("Caelum"));
+    ai.AddDeveloper(wxT("rkitover"));
     ai.AddDeveloper(wxT("Orig. VBA team"));
+    ai.AddDeveloper(wxT("... many contributors who send us patches/PRs"));
     wxAboutBox(ai);
 }
 

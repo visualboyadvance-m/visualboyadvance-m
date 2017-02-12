@@ -975,15 +975,6 @@ void GameArea::OnIdle(wxIdleEvent& event)
         }
     }
 
-#ifdef __WXMSW__
-
-    // Check for online updates
-    if (gopts.onlineupdates > 0 && !emusys) {
-        wxGetApp().frame->CheckForUpdates();
-    }
-
-#endif
-
     if (!emusys)
         return;
 

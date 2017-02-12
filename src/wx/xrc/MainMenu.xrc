@@ -626,12 +626,14 @@
       <object class="wxMenuItem" name="Translate">
         <label>Translations</label>
       </object>
+      <!-- FIXME: turn this back on when Sparkle is implemented
       <object class="wxMenuItem" name="UpdateRDB">
         <label>Update ROM database</label>
       </object>
       <object class="wxMenuItem" name="UpdateEmu">
         <label>Check for updates</label>
       </object>
+      -->
       <object class="separator"/>
       <object class="wxMenuItem" name="wxID_ABOUT"/>
     </object>
