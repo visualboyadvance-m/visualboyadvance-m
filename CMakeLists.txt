@@ -315,7 +315,7 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     ENDIF()
 
     # common flags
-    SET(MY_C_FLAGS -pipe -fPIC -fpermissive -Wformat -Wformat-security -fexceptions -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types)
+    SET(MY_C_FLAGS -pipe -fPIC -Wformat -Wformat-security -fexceptions -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types)
 
     # check if SSP flags are supported
     INCLUDE(CheckCXXCompilerFlag)
