@@ -2094,7 +2094,7 @@ bool cheatsImportGSACodeFile(const char* name, int game, bool v3)
         }
     }
     fclose(f);
-    return false;
+    return true;
 }
 
 void cheatsCBAReverseArray(uint8_t* array, uint8_t* dest)
