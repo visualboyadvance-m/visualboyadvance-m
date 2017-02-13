@@ -315,7 +315,7 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     ENDIF()
 
     # common flags
-    SET(MY_C_FLAGS -pipe -fPIC -fpermissive -Wformat -Wformat-security -fexceptions -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types)
+    SET(MY_C_FLAGS -pipe -fPIC -Wformat -Wformat-security -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types)
 
     # check if SSP flags are supported
     INCLUDE(CheckCXXCompilerFlag)
@@ -345,10 +345,10 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         ADD_COMPILE_OPTIONS(${C_COMPILE_FLAG})
     ENDFOREACH()
 
-    # This one must be set for C++ only, and we can't use generator expressions
-    # in ADD_COMPILE_OPTIONS because that's a cmake 3.3 feature and we need
-    # 2.8.12 compat for Ubuntu 14.
-    SET(CMAKE_CXX_COMPILE_OBJECT "${CMAKE_CXX_COMPILE_OBJECT} -std=gnu++11")
+    # These must be set for C++ only, and we can't use generator expressions in
+    # ADD_COMPILE_OPTIONS because that's a cmake 3.3 feature and we need 2.8.12
+    # compat for Ubuntu 14.
+    STRING(REGEX REPLACE "<FLAGS>" "<FLAGS> -std=gnu++11 -fpermissive -fexceptions " CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
 
     # make a string of compile options to add to link flags
     UNSET(C_COMPILE_FLAGS_STR)

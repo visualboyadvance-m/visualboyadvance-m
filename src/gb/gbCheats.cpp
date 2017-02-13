@@ -403,7 +403,11 @@ bool gbCheatReadGSCodeFile(const char* fileName)
 
     fseek(file, 0x18, SEEK_SET);
     int count = 0;
-    fread(&count, 1, 2, file);
+    if(fread(&count, 1, 2, file) == 0 ) {
+        fclose(file);
+        return false;
+    }
+
     int dummy = 0;
     gbCheatRemoveAll();
     char desc[13];

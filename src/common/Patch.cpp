@@ -356,8 +356,8 @@ static bool patchApplyPPF2(FILE* f, uint8_t** rom, int* size)
     uint8_t* mem = *rom;
 
     uint8_t block[1024];
-    fread(&block, 1, 1024, f);
-    if (memcmp(&mem[0x9320], &block, 1024) != 0)
+    if (fread(&block, 1, 1024, f) == 0 ||
+            memcmp(&mem[0x9320], &block, 1024) != 0)
         return false;
 
     int idlen = ppfFileIdLen(f, 2);
@@ -402,8 +402,8 @@ static bool patchApplyPPF3(FILE* f, uint8_t** rom, int* size)
 
     if (blockcheck) {
         uint8_t block[1024];
-        fread(&block, 1, 1024, f);
-        if (memcmp(&mem[(imagetype == 0) ? 0x9320 : 0x80A0], &block, 1024) != 0)
+        if (fread(&block, 1, 1024, f) == 0 ||
+                memcmp(&mem[(imagetype == 0) ? 0x9320 : 0x80A0], &block, 1024) != 0)
             return false;
         count -= 1024;
     }
