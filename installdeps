@@ -260,6 +260,10 @@ fedora_installdeps() {
     set --
     if [ -z "$target" ]; then
         # try to install both 64 bit and 32 bit versions on 64 bit hosts (see below)
+        if [ -n "$amd64" ]; then
+            # this is sometimes necessary for rawhide
+            set -- --exclude='glibc32*'
+        fi
         for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libjpeg-turbo-devel libpng-devel libtiff-devel SDL2-devel SFML-devel openal-soft-devel wxGTK3-devel; do
             if [ -n "$amd64" ]; then
                 set -- "$@" "${pkg}.x86_64" "${pkg}.i686"
