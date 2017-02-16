@@ -111,7 +111,7 @@ check() {
     "$@"
     if [ $? -ne 0 ]; then
         error 'command failed' NOQUIT
-        printf '%s:\n' 'The failing command was' 
+        echo 'The failing command was:'
         echo "$@"
         quit 1
     fi
@@ -248,12 +248,19 @@ fedora_installdeps() {
     check sudo su -c 'dnf -y install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm'
 
     # non-multiarch packages first
-    check sudo dnf -y install gcc gcc-c++ make cmake git nasm redhat-rpm-config
+    check sudo dnf -y install gcc gcc-c++ make cmake git nasm redhat-rpm-config pkgconfig
+
+    # older fedora has separate 32 bit and 64 bit pkgconfig packages
+    # try to install both, ignoring errors
+    if [ -n "$amd64" ]; then
+        sudo dnf -y install pkgconfig.x86_64 >/dev/null 2>&1
+        sudo dnf -y install pkgconfig.i686   >/dev/null 2>&1
+    fi
 
     set --
     if [ -z "$target" ]; then
-        # install both 64bit and 32bit versions on 64 bit hosts
-        for pkg in pkgconfig zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libjpeg-turbo-devel libpng-devel libtiff-devel SDL2-devel SFML-devel openal-soft-devel wxGTK3-devel; do
+        # try to install both 64 bit and 32 bit versions on 64 bit hosts (see below)
+        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libjpeg-turbo-devel libpng-devel libtiff-devel SDL2-devel SFML-devel openal-soft-devel wxGTK3-devel; do
             if [ -n "$amd64" ]; then
                 set -- "$@" "${pkg}.x86_64" "${pkg}.i686"
             else
@@ -287,7 +294,20 @@ fedora_installdeps() {
         warning='SFML is required for LINK support, Fedora does not currently have a MinGW SFML package, if you want LINK support you will need to install it manually'
     fi
 
-    check sudo dnf -y install "$@"
+    if ! sudo dnf -y install "$@"; then
+        if [ -n "$amd64" ]; then
+            # try without 32 bit packages, this is a problem on rawhide currently
+            warning 'installing 32 bit packages failed, trying to install 64 bit only packages...'
+            unset amd64
+            fedora_installdeps
+            return $?
+        else
+            error 'installing dependencies for Fedora failed' NOQUIT
+            echo 'The failing command was:'
+            echo sudo dnf -y install "$@"
+            quit 1
+        fi
+    fi
 
     warning "$warning"
 
