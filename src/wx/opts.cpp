@@ -746,7 +746,7 @@ void update_opts()
         cfg->SetPath(wxT("/Keyboard"));
 
     for (wxAcceleratorEntry_v::iterator i = gopts.accels.begin();
-         i < gopts.accels.end(); i++) {
+         i < gopts.accels.end(); ++i) {
         int cmd_id = i->GetCommand();
         int cmd;
 
@@ -756,7 +756,7 @@ void update_opts()
 
         wxAcceleratorEntry_v::iterator j;
 
-        for (j = i + 1; j < gopts.accels.end(); j++)
+        for (j = i + 1; j < gopts.accels.end(); ++j)
             if (j->GetCommand() != cmd_id)
                 break;
 
@@ -880,11 +880,11 @@ bool opt_set(const wxChar* name, const wxChar* val)
                 return false;
 
             for (wxAcceleratorEntry_v::iterator i = gopts.accels.begin();
-                 i < gopts.accels.end(); i++)
+                 i < gopts.accels.end(); ++i)
                 if (i->GetCommand() == cmd->cmd_id) {
                     wxAcceleratorEntry_v::iterator j;
 
-                    for (j = i; j < gopts.accels.end(); j++)
+                    for (j = i; j < gopts.accels.end(); ++j)
                         if (j->GetCommand() != cmd->cmd_id)
                             break;
 
