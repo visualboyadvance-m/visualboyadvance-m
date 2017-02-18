@@ -710,7 +710,7 @@ void MainFrame::enable_menus()
 
 void MainFrame::SetRecentAccels()
 {
-    for (int i = 0; i <= 10; i++) {
+    for (int i = 0; i < 10; i++) {
         wxMenuItem* mi = recent->FindItem(i + wxID_FILE1);
 
         if (!mi)
