@@ -9,7 +9,7 @@ void Viewer::CloseDlg(wxCloseEvent& ev)
     MainFrame* f = wxGetApp().frame;
 
     for (dialog_list_t::iterator i = f->popups.begin();
-         i != f->popups.end(); i++)
+         i != f->popups.end(); ++i)
         if (*i == this) {
             f->popups.erase(i);
             break;
@@ -63,7 +63,7 @@ END_EVENT_TABLE()
 
 void MainFrame::UpdateViewers()
 {
-    for (dialog_list_t::iterator i = popups.begin(); i != popups.end(); i++) {
+    for (dialog_list_t::iterator i = popups.begin(); i != popups.end(); ++i) {
         Viewers::Viewer* d = static_cast<Viewers::Viewer*>(*i);
 
         if (d->auto_update)

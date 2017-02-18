@@ -43,7 +43,7 @@ const
     w->SetExtraStyle(w->GetExtraStyle() | wxWS_EX_VALIDATE_RECURSIVELY);
     wxWindowList l = w->GetChildren();
 
-    for (wxWindowList::iterator ch = l.begin(); ch != l.end(); ch++)
+    for (wxWindowList::iterator ch = l.begin(); ch != l.end(); ++ch)
         mark_recursive(*ch);
 }
 
@@ -2020,7 +2020,7 @@ public:
 
         // first drop from user accels, if applicable
         for (wxAcceleratorEntry_v::iterator i = user_accels.begin();
-             i < user_accels.end(); i++)
+             i < user_accels.end(); ++i)
             if (i->GetFlags() == selmod && i->GetKeyCode() == selkey) {
                 user_accels.erase(i);
                 break;
@@ -2037,7 +2037,7 @@ public:
 
         // finally, remove from accels instead of recomputing
         for (wxAcceleratorEntry_v::iterator i = accels.begin();
-             i < accels.end(); i++)
+             i < accels.end(); ++i)
             if (i->GetFlags() == selmod && i->GetKeyCode() == selkey) {
                 accels.erase(i);
                 break;
@@ -2081,7 +2081,7 @@ public:
 
         // first drop from user accels, if applicable
         for (wxAcceleratorEntry_v::iterator i = user_accels.begin();
-             i < user_accels.end(); i++)
+             i < user_accels.end(); ++i)
             if (i->GetFlags() == acmod && i->GetKeyCode() == ackey) {
                 user_accels.erase(i);
                 break;
@@ -2149,7 +2149,7 @@ void MainFrame::add_menu_accels(wxTreeCtrl* tc, wxTreeItemId& parent, wxMenu* me
 {
     wxMenuItemList mil = menu->GetMenuItems();
 
-    for (wxMenuItemList::iterator mi = mil.begin(); mi != mil.end(); mi++) {
+    for (wxMenuItemList::iterator mi = mil.begin(); mi != mil.end(); ++mi) {
         if ((*mi)->IsSeparator()) {
             tc->AppendItem(parent, wxT("-----"));
         } else if ((*mi)->IsSubMenu()) {
@@ -2374,7 +2374,7 @@ wxAcceleratorEntry_v MainFrame::get_accels(wxAcceleratorEntry_v user_accels)
     for (int i = 0; i < user_accels.size(); i++) {
         const wxAcceleratorEntry& ae = user_accels[i];
 
-        for (wxAcceleratorEntry_v::iterator e = accels.begin(); e < accels.end(); e++)
+        for (wxAcceleratorEntry_v::iterator e = accels.begin(); e < accels.end(); ++e)
             if (ae.GetFlags() == e->GetFlags() && ae.GetKeyCode() == e->GetKeyCode()) {
                 accels.erase(e);
                 break;
@@ -2636,7 +2636,7 @@ bool MainFrame::BindControls()
 
                     // only add it if not already there
                     for (wxAcceleratorEntry_v::iterator e = sys_accels.begin();
-                         e < sys_accels.end(); e++)
+                         e < sys_accels.end(); ++e)
                         if (a->GetFlags() == e->GetFlags() && a->GetKeyCode() == e->GetKeyCode()) {
                             if (e->GetMenuItem()) {
                                 wxLogInfo(_("Duplicate menu accelerator: %s for %s and %s; keeping first"),
