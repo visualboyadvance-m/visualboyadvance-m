@@ -864,7 +864,8 @@ void MainFrame::MenuPopped(wxMenuEvent& evt)
     if (popped)
         panel->ShowPointer();
 
-    if (menus_opened)
+    // don't pause on menu when link is active #83
+    if (menus_opened && !gba_joybus_active)
         panel->Pause();
     else if (!IsPaused())
         panel->Resume();
