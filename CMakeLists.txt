@@ -706,8 +706,10 @@ if( ENABLE_WX )
 endif( ENABLE_WX )
 INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini DESTINATION ${DATA_INSTALL_DIR})
 
-# manual pages
+# icons and manual pages
 IF( UNIX )
+    INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/wx/icons/*/ DESTINATION share/icons/hicolor PATTERN "*.*" EXCLUDE)
+
     IF( ENABLE_SDL )
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/debian/vbam.6 DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man6)
     ENDIF( ENABLE_SDL )
