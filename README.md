@@ -40,9 +40,7 @@ And the following development libraries:
 - mesa (if using X11 or any OpenGL otherwise)
 - ffmpeg (optional, for game recording)
 - gettext and gettext tools
-- jpeg
 - png
-- tiff
 - SDL2
 - SFML (optional, for link)
 - OpenAL (optional, a sound interface)
@@ -50,7 +48,7 @@ And the following development libraries:
 - cairo (completely optional)
 
 On Linux and similar, you also need the version of GTK your wxWidgets is linked
-to (usuall 2 or 3).
+to (usually 2 or 3).
 
 Support for more OSes/distributions for `./installdeps` is planned.
 
