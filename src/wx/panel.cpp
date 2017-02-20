@@ -1414,7 +1414,9 @@ void DrawingPanelBase::PaintEv(wxPaintEvent& ev)
     }
 
     DrawArea(dc);
-    DrawOSD(dc);
+
+    // currently we draw the OSD directly on the framebuffer to reduce flickering
+    //DrawOSD(dc);
 }
 
 void DrawingPanelBase::EraseBackground(wxEraseEvent& ev)
@@ -1794,14 +1796,12 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
         }
     }
 
-    // next, draw the game
-    wxClientDC dc(GetWindow());
-    DrawArea(dc);
+    // next, draw the frame (queue a PaintEv)
+    GetWindow()->Refresh();
 
     // finally, draw on-screen text using wx method, if possible
     // this method flickers too much right now
-    if (0)
-        DrawOSD(dc);
+    //DrawOSD(dc);
 }
 
 void DrawingPanelBase::DrawOSD(wxWindowDC& dc)

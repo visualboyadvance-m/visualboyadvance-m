@@ -142,6 +142,48 @@ IF(WIN32 AND ENABLE_DIRECTX)
     FIND_PACKGE ( DirectX REQUIRED )
 ENDIF(WIN32 AND ENABLE_DIRECTX)
 
+# we make some direct gtk/gdk calls on linux and such
+# so need to link the gtk that wx was built with
+IF(NOT WIN32 AND NOT APPLE)
+    FIND_PATH(WX_CONFIG_H NAMES wx/config.h PATHS ${wxWidgets_INCLUDE_DIRS})
+    IF(NOT WX_CONFIG_H)
+        MESSAGE(FATAL_ERROR "Could not find wx/config.h in ${wxWidgets_INCLUDE_DIRS}")
+    ENDIF()
+    SET(WX_CONFIG_H "${WX_CONFIG_H}/wx/config.h")
+
+    INCLUDE(CheckCXXSymbolExists)
+    CHECK_CXX_SYMBOL_EXISTS(__WXGTK3__ ${WX_CONFIG_H} WX_USING_GTK3)
+    IF(WX_USING_GTK3)
+        FIND_PACKAGE(PkgConfig REQUIRED)
+        PKG_CHECK_MODULES(GTK3 REQUIRED gtk+-3.0)
+        IF(NOT GTK3_INCLUDE_DIRS)
+            MESSAGE(FATAL_ERROR "Could not find gtk3")
+        ENDIF()
+        INCLUDE_DIRECTORIES(${GTK3_INCLUDE_DIRS})
+        LINK_DIRECTORIES(${GTK3_LIBRARY_DIRS})
+        ADD_COMPILE_OPTIONS(${GTK3_CFLAGS_OTHER})
+        SET(GTK_LIBRARIES ${GTK3_LIBRARIES})
+    ELSE()
+        CHECK_CXX_SYMBOL_EXISTS(__WXGTK20__ ${WX_CONFIG_H} WX_USING_GTK2)
+        IF(WX_USING_GTK2)
+            FIND_PACKAGE(GTK2 REQUIRED gtk)
+            IF(NOT GTK2_INCLUDE_DIRS)
+                MESSAGE(FATAL_ERROR "Could not find gtk2")
+            ENDIF()
+            INCLUDE_DIRECTORIES(${GTK2_INCLUDE_DIRS})
+            ADD_COMPILE_OPTIONS(${GTK2_DEFINITIONS})
+            SET(GTK_LIBRARIES ${GTK2_LIBRARIES})
+        ELSE()
+            FIND_PACKAGE(GTK REQUIRED gtk)
+            IF(NOT GTK_INCLUDE_DIRS)
+                MESSAGE(FATAL_ERROR "Could not find gtk")
+            ENDIF()
+            INCLUDE_DIRECTORIES(${GTK_INCLUDE_DIRS})
+            ADD_COMPILE_OPTIONS(${GTK_DEFINITIONS})
+        ENDIF()
+    ENDIF()
+ENDIF()
+
 # contrib widgets
 include_directories(widgets)
 
@@ -247,6 +289,7 @@ SET( SRC_WX
    sys.cpp
    panel.cpp
    viewsupt.cpp
+   wayland.cpp
    widgets/keyedit.cpp
    widgets/joyedit.cpp
    widgets/sdljoy.cpp
@@ -278,6 +321,7 @@ SET( HDR_WX
    opts.h
    viewsupt.h
    wxhead.h
+   wayland.h
    widgets/wx/keyedit.h
    widgets/wx/joyedit.h
    widgets/wx/sdljoy.h
@@ -349,6 +393,7 @@ TARGET_LINK_LIBRARIES (
     ${FFMPEG_LIBRARIES}
     ${DIRECTX_LIBRARIES}
     ${CAIRO_LIBRARIES}
+    ${GTK_LIBRARIES}
 )
 
 # Build a console app in debug mode on Windows

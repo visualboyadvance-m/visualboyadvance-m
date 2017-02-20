@@ -279,16 +279,13 @@ opts_t::opts_t()
     frameSkip = -1;
 #ifdef __WXMSW__
     audio_api = AUD_DIRECTSOUND;
-#else
-#ifdef __WXMAC__
-    audio_api     = AUD_OPENAL;
+#elif !defined(NO_OAL) && (defined(__WXMAC__) || defined(__WXGTK__))
+    audio_api = AUD_OPENAL;
+#endif
+#ifndef NO_OGL
     render_method = RND_OPENGL;
 #endif
-#ifdef __WXGTK__
-    audio_api     = AUD_OPENAL;
-    render_method = RND_OPENGL;
-#endif
-#endif
+
     video_scale = 3;
     retain_aspect = true;
     max_threads = wxThread::GetCPUCount();

@@ -1,4 +1,3 @@
-
 // mainline:
 //   parse cmd line
 //   load xrc file (guiinit.cpp does most of instantiation)
@@ -20,6 +19,8 @@
 #include <wx/url.h>
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
+
+#include "wayland.h"
 
 // The built-in xrc file
 #include "builtin-xrc.h"
@@ -158,6 +159,7 @@ bool wxvbamApp::OnInit()
     setvbuf(stderr, NULL, _IONBF, 0);
     dup2(1, 2); // redirect stderr to stdout
 #endif
+    using_wayland = IsItWayland();
 
     // use consistent names for config
     SetAppName(_("vbam"));
@@ -251,6 +253,11 @@ bool wxvbamApp::OnInit()
     }
 
     load_opts();
+
+    // wxGLCanvas segfaults under wayland
+    if (UsingWayland() && gopts.render_method == RND_OPENGL) {
+        gopts.render_method = RND_SIMPLE;
+    }
 
     // process command-line options
     for (int i = 0; i < pending_optset.size(); i++) {

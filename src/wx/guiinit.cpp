@@ -3311,6 +3311,12 @@ bool MainFrame::BindControls()
 #ifdef NO_OGL
             rb->Hide();
 #endif
+#ifdef __WXGTK__
+            // wxGLCanvas segfaults on Wayland
+            if (wxGetApp().UsingWayland()) {
+                rb->Hide();
+            }
+#endif
             getrbi("OutputCairo", gopts.render_method, RND_CAIRO);
 #ifdef NO_CAIRO
             rb->Hide();

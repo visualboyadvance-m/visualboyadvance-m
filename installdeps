@@ -199,7 +199,7 @@ debian_installdeps() {
 
     if [ -z "$target" ]; then
         check sudo apt-get -qq update
-        check sudo apt-get -qy install build-essential g++ nasm cmake gettext zlib1g-dev libgl1-mesa-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libjpeg-dev libpng-dev libtiff5-dev libsdl2-dev libsfml-dev libopenal-dev libwxgtk3.0-dev
+        check sudo apt-get -qy install build-essential g++ nasm cmake gettext zlib1g-dev libgl1-mesa-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libjpeg-dev libpng-dev libtiff5-dev libsdl2-dev libsfml-dev libopenal-dev libwxgtk3.0-dev libgtk2.0-dev libgtk-3-dev libcairo2-dev
     else
         case "$target" in
             mingw-w64-i686)
@@ -264,7 +264,7 @@ fedora_installdeps() {
             # this is sometimes necessary for rawhide
             set -- --exclude='glibc32*'
         fi
-        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libjpeg-turbo-devel libpng-devel libtiff-devel SDL2-devel SFML-devel openal-soft-devel wxGTK3-devel; do
+        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libjpeg-turbo-devel libpng-devel libtiff-devel SDL2-devel SFML-devel openal-soft-devel wxGTK3-devel gtk2-devel gtk3-devel; do
             if [ -n "$amd64" ]; then
                 set -- "$@" "${pkg}.x86_64" "${pkg}.i686"
             else
@@ -339,7 +339,7 @@ archlinux_installdeps() {
 
     if [ -z "$target" ]; then
         # native build
-        check $pacman --noconfirm --needed -S base-devel "$gcc_pkg" nasm zlib mesa cairo cmake ffmpeg gettext libpng libtiff pkg-config sdl2 sfml openal wxgtk
+        check $pacman --noconfirm --needed -S base-devel "$gcc_pkg" nasm zlib mesa cairo cmake ffmpeg gettext libpng libtiff pkg-config sdl2 sfml openal wxgtk gtk2 gtk3
     else
         # windows cross build
         case "$target" in

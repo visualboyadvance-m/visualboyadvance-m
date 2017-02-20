@@ -79,9 +79,11 @@ public:
     wxvbamApp()
         : wxApp()
         , pending_fullscreen(false)
+        , using_wayland(false)
     {
     }
     virtual bool OnInit();
+    virtual bool UsingWayland() { return using_wayland; }
     virtual void OnInitCmdLine(wxCmdLineParser&);
     virtual bool OnCmdLineParsed(wxCmdLineParser&);
     wxString GetConfigurationPath();
@@ -132,6 +134,8 @@ public:
             return false;
         }
     }
+protected:
+    bool using_wayland;
 
 private:
     wxPathList config_path;

@@ -49,6 +49,9 @@ And the following development libraries:
 - wxWidgets
 - cairo (completely optional)
 
+On Linux and similar, you also need the version of GTK your wxWidgets is linked
+to (usuall 2 or 3).
+
 Support for more OSes/distributions for `./installdeps` is planned.
 
 ## Cross Compiling for Win32
