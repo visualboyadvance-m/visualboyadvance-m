@@ -1,7 +1,9 @@
 #Do not use this file directly.  Always use the top level CMakeLists.txt file
 # This build is much easier if we just do it here.
 
-cmake_policy(SET CMP0043 NEW) # for wxWidgets
+IF(NOT CMAKE_VERSION VERSION_LESS 3.0)
+    cmake_policy(SET CMP0043 NEW) # for wxWidgets
+ENDIF()
 
 # not yet implemented
 SET(CAIRO_DEFAULT OFF)
