@@ -18,7 +18,7 @@
 #ifndef __VBA_SOUND_SDL_H__
 #define __VBA_SOUND_SDL_H__
 
-#include "RingBuffer.h"
+#include "ringbuffer.h"
 #include "SoundDriver.h"
 
 #include "SDL.h"
