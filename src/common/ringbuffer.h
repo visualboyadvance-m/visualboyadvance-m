@@ -34,7 +34,7 @@ template <typename T> class RingBuffer
 
   void reset(size_type size)
   {
-    this->m_size = size+1;
+    this->m_size = size+1; //Add one to allow for a seperator between the write and read pointers, and avoid various issues
     this->m_pos_read = this->m_pos_write = 0;
     this->m_buffer.reset(size ? this->m_size : 0);
   }
@@ -58,7 +58,7 @@ template <typename T> class RingBuffer
 
   size_type avail() const
   {
-    return(this->m_size - this->used());
+    return((this->m_size-1) - this->used()); //Lose one from the size to prevent writing an entry casuing write to equal read pointer and causing other checks to think the buffer is empty
   }
 
   size_type used() const
