@@ -152,6 +152,13 @@ lib_scan() {
 
             [ "$lib" = "$bin" ] && continue
 
+            # check for libs already linked as @rpath/ which usually means /usr/local/lib/
+            case "$lib" in
+                '@rpath/'*)
+                    lib='/usr/local/lib'"${lib#@rpath}"
+                    ;;
+            esac
+
             echo "$lib"
             set -- "$@" "$lib"
         done

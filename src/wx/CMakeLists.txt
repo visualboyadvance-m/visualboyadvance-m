@@ -416,11 +416,11 @@ if(APPLE)
     SET(MACOSX_BUNDLE_ICON_FILE ${VBAM_ICON})
     SET_SOURCE_FILES_PROPERTIES(${VBAM_ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
-    # budle dylibs and relink them for releasing .app
+    # bundle dylibs and relink them for releasing .app
     # but only in Release mode
     IF(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
         ADD_CUSTOM_COMMAND(TARGET visualboyadvance-m POST_BUILD
-            COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/osx/third_party_libs_tool "$<TARGET_FILE_DIR:visualboyadvance-m>/../..")
+            COMMAND ${CMAKE_SOURCE_DIR}/tools/osx/third_party_libs_tool "$<TARGET_FILE_DIR:visualboyadvance-m>/../..")
     ENDIF()
 endif(APPLE)
 
