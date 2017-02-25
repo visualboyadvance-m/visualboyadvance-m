@@ -93,7 +93,9 @@ extern int optPrintUsage;
 extern int paused;
 extern int pauseWhenInactive;
 extern int recentFreeze;
+#ifndef __LIBRETRO__
 extern int renderedFrames;
+#endif
 extern int rewindCount;
 extern int rewindCounter;
 extern int rewindPos;
