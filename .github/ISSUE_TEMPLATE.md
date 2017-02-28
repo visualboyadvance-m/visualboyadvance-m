@@ -6,14 +6,26 @@
 
 ### Steps to reproduce the behavior
 
+### ROM details
+
+Which games are affected by the issue (please state if GBA or GB game):
+
+Which games, if any, are NOT affected by the issue (please state if GBA or GB game):
+
+### Option details
+
+Video driver (simple, opengl or cairo):
+
+Sound driver (directsound, xaudio, openal, SDL):
+
 ### Build details
 
-Operating System (Windows, Mac, Linux, etc.):
+Operating System (Windows, Mac, Linux (state distribution), etc.):
 
-Interface (wx, SDL, default is wx):
+If using Linux, specify if using xorg or Wayland:
 
 Version of code (pre-built binary version, or commit ref, or just "master"):
 
-Any other relevant build information:
+### Hardware details:
 
-If this is e.g. a joystick or video issue, then the relevant hardware information:
+If relevant, the joystick you are using and the drivers you are using for it:
