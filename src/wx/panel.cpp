@@ -747,7 +747,7 @@ void GameArea::AdjustSize(bool force)
                        (std::ceil(basic_height * gopts.video_scale) / hidpi_scale_factor));
 
     if (!force) {
-        wxSize sz = GetSize();
+        wxSize sz = GetClientSize();
 
         if (sz.GetWidth() >= newsz.GetWidth() && sz.GetHeight() >= newsz.GetHeight())
             return;
@@ -767,10 +767,6 @@ void GameArea::ShowFullScreen(bool full)
 
         return;
     }
-
-    // Some kbd accels can send a menu open event without a close event,
-    // this happens on Mac in HiDPI mode for the fullscreen toggle accel.
-    main_frame->SetMenusOpened(false);
 
 // on Mac maximize is native fullscreen, so ignore fullscreen requests
 #ifdef __WXMAC__
@@ -815,6 +811,10 @@ void GameArea::ShowFullScreen(bool full)
         // close all non-modal dialogs
         while (!tlw->popups.empty())
             tlw->popups.front()->Close();
+
+        // Some kbd accels can send a menu open event without a close event,
+        // this happens on Mac in HiDPI mode for the fullscreen toggle accel.
+        main_frame->SetMenusOpened(false);
 
         // mouse stays blank whenever full-screen
         HidePointer();
@@ -1013,15 +1013,18 @@ void GameArea::OnIdle(wxIdleEvent& event)
             w->SetMaxSize(wxSize(basic_width * maxScale,
                 basic_height * maxScale));
 
-        GetSizer()->Add(w, 1, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER) : wxEXPAND);
-        Layout();
-
-        if (pointer_blanked)
-            w->SetCursor(wxCursor(wxCURSOR_BLANK));
-
         // if user changed Display/Scale config, this needs to run
         AdjustMinSize();
         AdjustSize(false);
+
+        GetSizer()->Add(w, 1, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER) : wxEXPAND);
+        Layout();
+        // this is necessary for GL + fullscreen, why I have no clue
+        wxSizeEvent size_ev = wxSizeEvent(w->GetClientSize());
+        panel->OnSize(size_ev);
+
+        if (pointer_blanked)
+            w->SetCursor(wxCursor(wxCURSOR_BLANK));
 
         // set focus to panel
         w->SetFocus();
@@ -1388,7 +1391,7 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
 
 DrawingPanel::DrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanelBase(_width, _height)
-    , wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetSize(),
+    , wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetClientSize(),
           wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
 {
 }
@@ -2008,7 +2011,7 @@ static int glopts[] = {
 
 GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanelBase(_width, _height)
-    , wxglc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetSize(),
+    , wxglc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetClientSize(),
           wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
 {
     RequestHighResolutionOpenGLSurface();
@@ -2132,22 +2135,19 @@ void GLDrawingPanel::DrawingPanelInit()
 
 void GLDrawingPanel::OnSize(wxSizeEvent& ev)
 {
-#ifndef wxGL_IMPLICIT_CONTEXT
-    SetCurrent(*ctx);
-#else
-    SetCurrent();
-#endif
-    SetSize(ev.GetSize());
-
     AdjustViewport();
-
-    Center();
 
     ev.Skip(true);
 }
 
 void GLDrawingPanel::AdjustViewport()
 {
+#ifndef wxGL_IMPLICIT_CONTEXT
+    SetCurrent(*ctx);
+#else
+    SetCurrent();
+#endif
+
     int x, y;
     GetRealPixelClientSize(&x, &y);
     glViewport(0, 0, x, y);
