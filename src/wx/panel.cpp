@@ -162,10 +162,11 @@ void GameArea::LoadGame(const wxString& name)
         gb_effects_config.stereo = (float)gopts.gb_stereo / 100.0;
         gbSoundSetDeclicking(gopts.gb_declick);
         soundInit();
-        soundSetThrottle(throttle);
         soundSetEnable(gopts.sound_en);
         gbSoundSetSampleRate(!gopts.sound_qual ? 48000 : 44100 / (1 << (gopts.sound_qual - 1)));
         soundSetVolume((float)gopts.sound_vol / 100.0);
+        // this **MUST** be called **AFTER** setting sample rate because the core calls soundInit()
+        soundSetThrottle(throttle);
         gbGetHardwareType();
         bool use_bios = false;
         // auto-conversion of wxCharBuffer to const char * seems broken
@@ -272,11 +273,12 @@ void GameArea::LoadGame(const wxString& name)
         gb_effects_config.stereo = (float)gopts.gb_stereo / 100.0;
         gbSoundSetDeclicking(gopts.gb_declick);
         soundInit();
-        soundSetThrottle(throttle);
         soundSetEnable(gopts.sound_en);
         gbSoundSetSampleRate(!gopts.sound_qual ? 48000 : 44100 / (1 << (gopts.sound_qual - 1)));
         soundSetSampleRate(!gopts.sound_qual ? 48000 : 44100 / (1 << (gopts.sound_qual - 1)));
         soundSetVolume((float)gopts.sound_vol / 100.0);
+        // this **MUST** be called **AFTER** setting sample rate because the core calls soundInit()
+        soundSetThrottle(throttle);
         soundFiltering = (float)gopts.gba_sound_filter / 100.0f;
         CPUInit(gopts.gba_bios.mb_fn_str(), useBiosFileGBA);
 
