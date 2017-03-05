@@ -2376,7 +2376,7 @@ EVT_HANDLER(Customize, "Customize UI...")
 
 EVT_HANDLER(BugReport, "Report bugs...")
 {
-    wxLaunchDefaultBrowser(wxT("http://sourceforge.net/tracker/?group_id=212795&atid=1023154"));
+    wxLaunchDefaultBrowser(wxT("https://github.com/visualboyadvance-m/visualboyadvance-m/issues"));
 }
 
 EVT_HANDLER(FAQ, "VBA-M support forum")
