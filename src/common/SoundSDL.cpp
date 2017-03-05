@@ -114,7 +114,7 @@ void SoundSDL::write(uint16_t * finalWave, int length)
 bool SoundSDL::init(long sampleRate)
 {
 	SDL_AudioSpec audio;
-	audio.freq = sampleRate * throttle / 100;
+	audio.freq = throttle ? sampleRate * (throttle / 100.0) : sampleRate;
 	audio.format = AUDIO_S16SYS;
 	audio.channels = 2;
 	audio.samples = 1024;

@@ -32,6 +32,7 @@ public:
     virtual ~DirectSound();
 
     bool init(long sampleRate); // initialize the primary and secondary sound buffer
+    void setThrottle(unsigned short throttle_); // set game speed
     void pause(); // pause the secondary sound buffer
     void reset(); // stop and reset the secondary sound buffer
     void resume(); // resume the secondary sound buffer
@@ -145,7 +146,7 @@ bool DirectSound::init(long sampleRate)
     // Create secondary sound buffer
     ZeroMemory(&dsbdesc, sizeof(DSBUFFERDESC));
     dsbdesc.dwSize = sizeof(DSBUFFERDESC);
-    dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLPOSITIONNOTIFY | DSBCAPS_GLOBALFOCUS;
+    dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLPOSITIONNOTIFY | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLFREQUENCY;
 
     if (!gopts.dsound_hw_accel) {
         dsbdesc.dwFlags |= DSBCAPS_LOCSOFTWARE;
@@ -188,6 +189,19 @@ bool DirectSound::init(long sampleRate)
     }
 
     return true;
+}
+
+void DirectSound::setThrottle(unsigned short throttle_) {
+    HRESULT hr;
+
+    if (!throttle_)
+        throttle_ = 100;
+
+    long freq = soundGetSampleRate();
+
+    if (FAILED(hr = dsbSecondary->SetFrequency(freq * (throttle_ / 100.0)))) {
+        wxLogDebug(wxT("Cannot SetFrequency %ld: %08x"), (long)(freq * (throttle_ / 100.0)), hr);
+    }
 }
 
 void DirectSound::pause()

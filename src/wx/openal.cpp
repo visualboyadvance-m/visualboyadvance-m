@@ -20,7 +20,7 @@
 
 // Debug
 #include <assert.h>
-#define ASSERT_SUCCESS assert(AL_NO_ERROR == ALFunction.alGetError())
+#define ASSERT_SUCCESS assert(AL_NO_ERROR == alGetError())
 
 #ifndef LOGALL
 // replace logging functions with comments
@@ -38,20 +38,15 @@ public:
     OpenAL();
     virtual ~OpenAL();
 
-    static wxDynamicLibrary Lib;
-    static bool LoadOAL();
     static bool GetDevices(wxArrayString& names, wxArrayString& ids);
     bool init(long sampleRate); // initialize the sound buffer queue
+    void setThrottle(unsigned short throttle_); // set game speed
     void pause(); // pause the secondary sound buffer
     void reset(); // stop and reset the secondary sound buffer
     void resume(); // play/resume the secondary sound buffer
     void write(uint16_t* finalWave, int length); // write the emulated sound to a sound buffer
 
-protected:
-    static bool LoadLibrary(wxString name, int flags);
-
 private:
-    static OPENALFNTABLE ALFunction;
     bool initialized;
     bool buffersLoaded;
     ALCdevice* device;
@@ -84,33 +79,33 @@ OpenAL::~OpenAL()
     if (!initialized)
         return;
 
-    ALFunction.alSourceStop(source);
+    alSourceStop(source);
     ASSERT_SUCCESS;
-    ALFunction.alSourcei(source, AL_BUFFER, 0);
+    alSourcei(source, AL_BUFFER, 0);
     ASSERT_SUCCESS;
-    ALFunction.alDeleteSources(1, &source);
+    alDeleteSources(1, &source);
     ASSERT_SUCCESS;
-    ALFunction.alDeleteBuffers(gopts.audio_buffers, buffer);
+    alDeleteBuffers(gopts.audio_buffers, buffer);
     ASSERT_SUCCESS;
     free(buffer);
-    ALFunction.alcMakeContextCurrent(NULL);
+    alcMakeContextCurrent(NULL);
     // Wine incorrectly returns ALC_INVALID_VALUE
     // and then fails the rest of these functions as well
     // so there will be a leak under Wine, but that's a bug in Wine, not
     // this code
     //ASSERT_SUCCESS;
-    ALFunction.alcDestroyContext(context);
+    alcDestroyContext(context);
     //ASSERT_SUCCESS;
-    ALFunction.alcCloseDevice(device);
+    alcCloseDevice(device);
     //ASSERT_SUCCESS;
-    ALFunction.alGetError(); // reset error state
+    alGetError(); // reset error state
 }
 
 #ifdef LOGALL
 void OpenAL::debugState()
 {
     ALint value = 0;
-    ALFunction.alGetSourcei(source, AL_SOURCE_STATE, &value);
+    alGetSourcei(source, AL_SOURCE_STATE, &value);
     ASSERT_SUCCESS;
     winlog(" soundPaused = %i\n", soundPaused);
     winlog(" Source:\n");
@@ -138,10 +133,10 @@ void OpenAL::debugState()
         break;
     }
 
-    ALFunction.alGetSourcei(source, AL_BUFFERS_QUEUED, &value);
+    alGetSourcei(source, AL_BUFFERS_QUEUED, &value);
     ASSERT_SUCCESS;
     winlog("  Buffers in queue: %i\n", value);
-    ALFunction.alGetSourcei(source, AL_BUFFERS_PROCESSED, &value);
+    alGetSourcei(source, AL_BUFFERS_PROCESSED, &value);
     ASSERT_SUCCESS;
     winlog("  Buffers processed: %i\n", value);
 }
@@ -152,25 +147,20 @@ bool OpenAL::init(long sampleRate)
     winlog("OpenAL::init\n");
     assert(initialized == false);
 
-    if (!LoadOAL()) {
-        wxLogError(_("OpenAL library could not be found on your system.  Please install the runtime from http://openal.org"));
-        return false;
-    }
-
     if (!gopts.audio_dev.empty()) {
-        device = ALFunction.alcOpenDevice(gopts.audio_dev.mb_str());
+        device = alcOpenDevice(gopts.audio_dev.mb_str());
     } else {
-        device = ALFunction.alcOpenDevice(NULL);
+        device = alcOpenDevice(NULL);
     }
 
     assert(device != NULL);
-    context = ALFunction.alcCreateContext(device, NULL);
+    context = alcCreateContext(device, NULL);
     assert(context != NULL);
-    ALCboolean retVal = ALFunction.alcMakeContextCurrent(context);
+    ALCboolean retVal = alcMakeContextCurrent(context);
     assert(ALC_TRUE == retVal);
-    ALFunction.alGenBuffers(gopts.audio_buffers, buffer);
+    alGenBuffers(gopts.audio_buffers, buffer);
     ASSERT_SUCCESS;
-    ALFunction.alGenSources(1, &source);
+    alGenSources(1, &source);
     ASSERT_SUCCESS;
     freq = sampleRate;
     // calculate the number of samples per frame first
@@ -178,6 +168,17 @@ bool OpenAL::init(long sampleRate)
     soundBufferLen = (freq / 60) * 4;
     initialized = true;
     return true;
+}
+
+void OpenAL::setThrottle(unsigned short throttle_) {
+    if (!initialized)
+        return;
+
+    if (!throttle_)
+        throttle_ = 100;
+
+    alSourcef(source, AL_PITCH, throttle_ / 100.0);
+    ASSERT_SUCCESS;
 }
 
 void OpenAL::resume()
@@ -192,11 +193,11 @@ void OpenAL::resume()
 
     debugState();
     ALint sourceState = 0;
-    ALFunction.alGetSourcei(source, AL_SOURCE_STATE, &sourceState);
+    alGetSourcei(source, AL_SOURCE_STATE, &sourceState);
     ASSERT_SUCCESS;
 
     if (sourceState != AL_PLAYING) {
-        ALFunction.alSourcePlay(source);
+        alSourcePlay(source);
         ASSERT_SUCCESS;
     }
 
@@ -215,11 +216,11 @@ void OpenAL::pause()
 
     debugState();
     ALint sourceState = 0;
-    ALFunction.alGetSourcei(source, AL_SOURCE_STATE, &sourceState);
+    alGetSourcei(source, AL_SOURCE_STATE, &sourceState);
     ASSERT_SUCCESS;
 
     if (sourceState == AL_PLAYING) {
-        ALFunction.alSourcePause(source);
+        alSourcePause(source);
         ASSERT_SUCCESS;
     }
 
@@ -238,11 +239,11 @@ void OpenAL::reset()
 
     debugState();
     ALint sourceState = 0;
-    ALFunction.alGetSourcei(source, AL_SOURCE_STATE, &sourceState);
+    alGetSourcei(source, AL_SOURCE_STATE, &sourceState);
     ASSERT_SUCCESS;
 
     if (sourceState != AL_STOPPED) {
-        ALFunction.alSourceStop(source);
+        alSourceStop(source);
         ASSERT_SUCCESS;
     }
 
@@ -266,17 +267,17 @@ void OpenAL::write(uint16_t* finalWave, int length)
         for (int i = 0; i < gopts.audio_buffers; i++) {
             // Filling the buffers explicitly with silence would be cleaner,
             // but the very first sample is usually silence anyway.
-            ALFunction.alBufferData(buffer[i], AL_FORMAT_STEREO16, finalWave, soundBufferLen, freq);
+            alBufferData(buffer[i], AL_FORMAT_STEREO16, finalWave, soundBufferLen, freq);
             ASSERT_SUCCESS;
         }
 
-        ALFunction.alSourceQueueBuffers(source, gopts.audio_buffers, buffer);
+        alSourceQueueBuffers(source, gopts.audio_buffers, buffer);
         ASSERT_SUCCESS;
         buffersLoaded = true;
     } else {
         // ==normal buffer refreshing==
         nBuffersProcessed = 0;
-        ALFunction.alGetSourcei(source, AL_BUFFERS_PROCESSED, &nBuffersProcessed);
+        alGetSourcei(source, AL_BUFFERS_PROCESSED, &nBuffersProcessed);
         ASSERT_SUCCESS;
 
         if (nBuffersProcessed == gopts.audio_buffers) {
@@ -296,7 +297,7 @@ void OpenAL::write(uint16_t* finalWave, int length)
                 // wait for about half the time one buffer needs to finish
                 // unoptimized: ( sourceBufferLen * 1000 ) / ( freq * 2 * 2 ) * 1/2
                 wxMilliSleep(soundBufferLen / (freq >> 7));
-                ALFunction.alGetSourcei(source, AL_BUFFERS_PROCESSED, &nBuffersProcessed);
+                alGetSourcei(source, AL_BUFFERS_PROCESSED, &nBuffersProcessed);
                 ASSERT_SUCCESS;
             }
         } else {
@@ -305,24 +306,25 @@ void OpenAL::write(uint16_t* finalWave, int length)
         }
 
         assert(nBuffersProcessed > 0);
+
         // unqueue buffer
         tempBuffer = 0;
-        ALFunction.alSourceUnqueueBuffers(source, 1, &tempBuffer);
+        alSourceUnqueueBuffers(source, 1, &tempBuffer);
         ASSERT_SUCCESS;
         // refill buffer
-        ALFunction.alBufferData(tempBuffer, AL_FORMAT_STEREO16, finalWave, soundBufferLen, freq);
+        alBufferData(tempBuffer, AL_FORMAT_STEREO16, finalWave, soundBufferLen, freq);
         ASSERT_SUCCESS;
         // requeue buffer
-        ALFunction.alSourceQueueBuffers(source, 1, &tempBuffer);
+        alSourceQueueBuffers(source, 1, &tempBuffer);
         ASSERT_SUCCESS;
     }
 
     // start playing the source if necessary
-    ALFunction.alGetSourcei(source, AL_SOURCE_STATE, &sourceState);
+    alGetSourcei(source, AL_SOURCE_STATE, &sourceState);
     ASSERT_SUCCESS;
 
     if (!soundPaused && (sourceState != AL_PLAYING)) {
-        ALFunction.alSourcePlay(source);
+        alSourcePlay(source);
         ASSERT_SUCCESS;
     }
 }
@@ -333,146 +335,6 @@ SoundDriver* newOpenAL()
     return new OpenAL();
 }
 
-// no more use of copyrighted OpenAL code just to load the stupid library
-// this is for compatibility with MFC version
-// positive:  make an OpenAL-capable binary which does not require OpenAL
-// negative:  openal lib may not be in library path
-//            openal lib name is OS-dependent, and may even change based
-//            on where it was installed from
-// On UNIX, it would probably be better to just hard link with libopenal
-
-OPENALFNTABLE OpenAL::ALFunction = { NULL };
-wxDynamicLibrary OpenAL::Lib;
-
-bool OpenAL::LoadLibrary(wxString name, int flags=wxDL_DEFAULT)
-{
-    wxLogNull disable_log;
-    bool result = false;
-    try {
-        result = Lib.Load(name, flags);
-    } catch (...) {}
-    return result;
-}
-
-bool OpenAL::LoadOAL()
-{
-    if (!Lib.IsLoaded() &&
-#ifdef __WXMSW__
-        // on win32, it's openal32.dll
-        !LoadLibrary(wxT("openal32")) &&
-#else
-#ifdef __WXMAC__
-        // on macosx, it's just plain OpenAL
-        !LoadLibrary(wxT("/System/Library/Frameworks/OpenAL.framework/Versions/A/OpenAL"), wxDL_NOW | wxDL_VERBATIM) &&
-#endif
-#endif
-        // on linux, it's libopenal.so.1 or libopenal.so
-        !LoadLibrary(wxDynamicLibrary::CanonicalizeName(wxT("openal")) + wxT(".1")) && 
-        // try standard name on all platforms
-        !LoadLibrary(wxDynamicLibrary::CanonicalizeName(wxT("openal"))))
-        return false;
-
-#define loadfn(t, n)                                     \
-    do {                                                 \
-        if (!(ALFunction.n = (t)Lib.GetSymbol(wxT(#n)))) \
-            return false;                                \
-    } while (0)
-    //loadfn(LPALENABLE, alEnable);
-    //loadfn(LPALDISABLE, alDisable);
-    //loadfn(LPALISENABLED, alIsEnabled);
-    //loadfn(LPALGETSTRING, alGetString);
-    //loadfn(LPALGETBOOLEANV, alGetBooleanv);
-    //loadfn(LPALGETINTEGERV, alGetIntegerv);
-    //loadfn(LPALGETFLOATV, alGetFloatv);
-    //loadfn(LPALGETDOUBLEV, alGetDoublev);
-    //loadfn(LPALGETBOOLEAN, alGetBoolean);
-    //loadfn(LPALGETINTEGER, alGetInteger);
-    //loadfn(LPALGETFLOAT, alGetFloat);
-    //loadfn(LPALGETDOUBLE, alGetDouble);
-    loadfn(LPALGETERROR, alGetError);
-    //loadfn(LPALISEXTENSIONPRESENT, alIsExtensionPresent);
-    //loadfn(LPALGETPROCADDRESS, alGetProcAddress);
-    //loadfn(LPALGETENUMVALUE, alGetEnumValue);
-    //loadfn(LPALLISTENERF, alListenerf);
-    //loadfn(LPALLISTENER3F, alListener3f);
-    //loadfn(LPALLISTENERFV, alListenerfv);
-    //loadfn(LPALLISTENERI, alListeneri);
-    //loadfn(LPALLISTENER3I, alListener3i);
-    //loadfn(LPALLISTENERIV, alListeneriv);
-    //loadfn(LPALGETLISTENERF, alGetListenerf);
-    //loadfn(LPALGETLISTENER3F, alGetListener3f);
-    //loadfn(LPALGETLISTENERFV, alGetListenerfv);
-    //loadfn(LPALGETLISTENERI, alGetListeneri);
-    //loadfn(LPALGETLISTENER3I, alGetListener3i);
-    //loadfn(LPALGETLISTENERIV, alGetListeneriv);
-    loadfn(LPALGENSOURCES, alGenSources);
-    loadfn(LPALDELETESOURCES, alDeleteSources);
-    //loadfn(LPALISSOURCE, alIsSource);
-    //loadfn(LPALSOURCEF, alSourcef);
-    //loadfn(LPALSOURCE3F, alSource3f);
-    //loadfn(LPALSOURCEFV, alSourcefv);
-    loadfn(LPALSOURCEI, alSourcei);
-    //loadfn(LPALSOURCE3I, alSource3i);
-    //loadfn(LPALSOURCEIV, alSourceiv);
-    //loadfn(LPALGETSOURCEF, alGetSourcef);
-    //loadfn(LPALGETSOURCE3F, alGetSource3f);
-    //loadfn(LPALGETSOURCEFV, alGetSourcefv);
-    loadfn(LPALGETSOURCEI, alGetSourcei);
-    //loadfn(LPALGETSOURCE3I, alGetSource3i);
-    //loadfn(LPALGETSOURCEIV, alGetSourceiv);
-    //loadfn(LPALSOURCEPLAYV, alSourcePlayv);
-    //loadfn(LPALSOURCESTOPV, alSourceStopv);
-    //loadfn(LPALSOURCEREWINDV, alSourceRewindv);
-    //loadfn(LPALSOURCEPAUSEV, alSourcePausev);
-    loadfn(LPALSOURCEPLAY, alSourcePlay);
-    loadfn(LPALSOURCESTOP, alSourceStop);
-    //loadfn(LPALSOURCEREWIND, alSourceRewind);
-    loadfn(LPALSOURCEPAUSE, alSourcePause);
-    loadfn(LPALSOURCEQUEUEBUFFERS, alSourceQueueBuffers);
-    loadfn(LPALSOURCEUNQUEUEBUFFERS, alSourceUnqueueBuffers);
-    loadfn(LPALGENBUFFERS, alGenBuffers);
-    loadfn(LPALDELETEBUFFERS, alDeleteBuffers);
-    //loadfn(LPALISBUFFER, alIsBuffer);
-    loadfn(LPALBUFFERDATA, alBufferData);
-    //loadfn(LPALBUFFERF, alBufferf);
-    //loadfn(LPALBUFFER3F, alBuffer3f);
-    //loadfn(LPALBUFFERFV, alBufferfv);
-    //loadfn(LPALBUFFERI, alBufferi);
-    //loadfn(LPALBUFFER3I, alBuffer3i);
-    //loadfn(LPALBUFFERIV, alBufferiv);
-    //loadfn(LPALGETBUFFERF, alGetBufferf);
-    //loadfn(LPALGETBUFFER3F, alGetBuffer3f);
-    //loadfn(LPALGETBUFFERFV, alGetBufferfv);
-    //loadfn(LPALGETBUFFERI, alGetBufferi);
-    //loadfn(LPALGETBUFFER3I, alGetBuffer3i);
-    //loadfn(LPALGETBUFFERIV, alGetBufferiv);
-    //loadfn(LPALDOPPLERFACTOR, alDopplerFactor);
-    //loadfn(LPALDOPPLERVELOCITY, alDopplerVelocity);
-    //loadfn(LPALSPEEDOFSOUND, alSpeedOfSound);
-    //loadfn(LPALDISTANCEMODEL, alDistanceModel);
-    loadfn(LPALCCREATECONTEXT, alcCreateContext);
-    loadfn(LPALCMAKECONTEXTCURRENT, alcMakeContextCurrent);
-    //loadfn(LPALCPROCESSCONTEXT, alcProcessContext);
-    //loadfn(LPALCSUSPENDCONTEXT, alcSuspendContext);
-    loadfn(LPALCDESTROYCONTEXT, alcDestroyContext);
-    //loadfn(LPALCGETCURRENTCONTEXT, alcGetCurrentContext);
-    //loadfn(LPALCGETCONTEXTSDEVICE, alcGetContextsDevice);
-    loadfn(LPALCOPENDEVICE, alcOpenDevice);
-    loadfn(LPALCCLOSEDEVICE, alcCloseDevice);
-    //loadfn(LPALCGETERROR, alcGetError);
-    loadfn(LPALCISEXTENSIONPRESENT, alcIsExtensionPresent);
-    //loadfn(LPALCGETPROCADDRESS, alcGetProcAddress);
-    //loadfn(LPALCGETENUMVALUE, alcGetEnumValue);
-    loadfn(LPALCGETSTRING, alcGetString);
-    //loadfn(LPALCGETINTEGERV, alcGetIntegerv);
-    //loadfn(LPALCCAPTUREOPENDEVICE, alcCaptureOpenDevice);
-    //loadfn(LPALCCAPTURECLOSEDEVICE, alcCaptureCloseDevice);
-    //loadfn(LPALCCAPTURESTART, alcCaptureStart);
-    //loadfn(LPALCCAPTURESTOP, alcCaptureStop);
-    //loadfn(LPALCCAPTURESAMPLES, alcCaptureSamples);
-    return true;
-}
-
 bool GetOALDevices(wxArrayString& names, wxArrayString& ids)
 {
     return OpenAL::GetDevices(names, ids);
@@ -480,16 +342,13 @@ bool GetOALDevices(wxArrayString& names, wxArrayString& ids)
 
 bool OpenAL::GetDevices(wxArrayString& names, wxArrayString& ids)
 {
-    if (!OpenAL::LoadOAL())
-        return false;
-
 #ifdef ALC_DEVICE_SPECIFIER
 
-    if (ALFunction.alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT") == AL_FALSE)
+    if (alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT") == AL_FALSE)
         // this extension isn't critical to OpenAL operating
         return true;
 
-    const char* devs = ALFunction.alcGetString(NULL, ALC_DEVICE_SPECIFIER);
+    const char* devs = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
 
     while (*devs) {
         names.push_back(wxString(devs, wxConvLibc));

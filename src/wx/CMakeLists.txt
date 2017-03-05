@@ -396,6 +396,7 @@ TARGET_LINK_LIBRARIES (
     ${DIRECTX_LIBRARIES}
     ${CAIRO_LIBRARIES}
     ${GTK_LIBRARIES}
+    ${OPENAL_LIBRARY}
 )
 
 # Build a console app in debug mode on Windows
