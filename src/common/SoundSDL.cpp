@@ -28,7 +28,7 @@ const float SoundSDL::_delay = 0.032f;
 SoundSDL::SoundSDL():
 	_rbuf(0),
 	_dev(-1),
-	current_rate(0),
+	current_rate(throttle),
 	_initialized(false)
 {
 
@@ -91,8 +91,9 @@ void SoundSDL::write(uint16_t * finalWave, int length)
 			SDL_SemWait(_semBufferEmpty);
 			if (throttle > 0 && throttle != current_rate)
 			{
-				SDL_CloseAudio();
-				init(soundGetSampleRate() * throttle / 100);
+				SDL_CloseAudioDevice(_dev);
+				//Reinit on throttle change:
+				init(soundGetSampleRate());
 				current_rate = throttle;
 			}
 		}
@@ -113,7 +114,7 @@ void SoundSDL::write(uint16_t * finalWave, int length)
 bool SoundSDL::init(long sampleRate)
 {
 	SDL_AudioSpec audio;
-	audio.freq = sampleRate;
+	audio.freq = sampleRate * throttle / 100;
 	audio.format = AUDIO_S16SYS;
 	audio.channels = 2;
 	audio.samples = 1024;
