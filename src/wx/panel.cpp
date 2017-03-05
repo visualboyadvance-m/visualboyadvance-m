@@ -922,6 +922,12 @@ void GameArea::Pause()
     if (paused)
         return;
 
+    // don't pause when linked
+#ifndef NO_LINK
+    if (GetLinkMode() != LINK_DISCONNECTED)
+        return;
+#endif
+
     paused = was_paused = true;
 
     if (loaded != IMAGE_UNKNOWN)
@@ -1039,7 +1045,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
         w->Connect(wxEVT_SIZE,             wxSizeEventHandler(GameArea::OnSize),           NULL, this);
     }
 
-    if (!paused && (!pauseWhenInactive || wxGetApp().frame->HasFocus())) {
+    if (!paused) {
         HidePointer();
         event.RequestMore();
 
