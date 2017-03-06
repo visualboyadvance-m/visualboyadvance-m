@@ -537,15 +537,15 @@ void LoadConfig()
 	winGbBorderOn = ReadPref("borderOn", 0);
 	winGbPrinterEnabled = ReadPref("gbPrinter", 0);
 
-	int soundQuality = (ReadPrefHex("soundQuality"));
+	int soundQuality = (ReadPrefHex("soundQuality", 1));
 	switch (soundQuality) {
 	case 1:
 	case 2:
 	case 4:
 		break;
 	default:
-		log("Unknown sound quality %d. Defaulting to 22Khz\n", soundQuality);
-		soundQuality = 2;
+		log("Unknown sound quality %d. Defaulting to 44Khz\n", soundQuality);
+		soundQuality = 1;
 		break;
 	}
 	soundSetSampleRate(44100 / soundQuality);
