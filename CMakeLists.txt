@@ -667,7 +667,7 @@ IF( ENABLE_SDL )
     set_property(TARGET vbam PROPERTY CXX_STANDARD_REQUIRED ON)
 
     IF( WIN32 )
-        SET( WIN32_LIBRARIES wsock32 )
+        SET( WIN32_LIBRARIES wsock32 ws2_32 )
     ENDIF( WIN32 )
 
     IF( ENABLE_LIRC )
