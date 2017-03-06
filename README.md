@@ -6,9 +6,11 @@ Homepage and Forum: http://vba-m.com
 
 Windows and Mac builds are in the [releases tab](https://github.com/visualboyadvance-m/visualboyadvance-m/releases).
 
-Daily Ubuntu packages here: https://code.launchpad.net/~sergio-br2/+recipe/vbam-daily
+Daily Ubuntu packages here: https://code.launchpad.net/~sergio-br2/+archive/ubuntu/vbam-trunk
 
 Your distribution may have packages available as well, search for "vbam".
+
+It is also generally very easy to build from source, see below.
 
 ## Building
 
