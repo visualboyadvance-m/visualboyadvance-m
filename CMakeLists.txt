@@ -22,21 +22,23 @@ option( ENABLE_WX "Build the wxWidgets port" ON )
 option( ENABLE_DEBUGGER "Enable the debugger" ON )
 option( ENABLE_NLS "Enable translations" ON )
 
-SET(ASM_CORE_DEFAULT OFF)
-SET(ASM_SCALERS_DEFAULT OFF)
-SET(MMX_DEFAULT OFF)
+SET(ASM_DEFAULT OFF)
 
 # turn asm on by default on 32bit x86
 IF(CMAKE_SYSTEM_PROCESSOR MATCHES "[xX]86|[aA][mM][dD]64|[xX]64")
     IF(CMAKE_C_SIZEOF_DATA_PTR EQUAL 4) # 32 bit
-        SET(ASM_CORE_DEFAULT ON)
-        SET(ASM_SCALERS_DEFAULT ON)
-        SET(MMX_DEFAULT ON)
+        SET(ASM_DEFAULT ON)
         SET(X86_32 ON)
     ELSE()
         SET(AMD64 ON)
     ENDIF()
 ENDIF()
+
+OPTION(ENABLE_ASM "Enable x86 ASM related options" ${ASM_DEFAULT})
+
+SET(ASM_CORE_DEFAULT ${ENABLE_ASM})
+SET(ASM_SCALERS_DEFAULT ${ENABLE_ASM})
+SET(MMX_DEFAULT ${ENABLE_ASM})
 
 option( ENABLE_ASM_CORE "Enable x86 ASM CPU cores" ${ASM_CORE_DEFAULT})
 option( ENABLE_ASM_SCALERS "Enable x86 ASM graphic filters" ${ASM_SCALERS_DEFAULT})
