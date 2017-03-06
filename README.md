@@ -4,6 +4,12 @@ Game Boy Advance Emulator
 
 Homepage and Forum: http://vba-m.com
 
+Windows and Mac builds are in the [releases tab](https://github.com/visualboyadvance-m/visualboyadvance-m/releases).
+
+Daily Ubuntu packages here: https://code.launchpad.net/~sergio-br2/+recipe/vbam-daily
+
+Your distribution may have packages available as well, search for "vbam".
+
 ## Building
 
 The basic formula to build vba-m is:
@@ -18,7 +24,7 @@ cd visualboyadvance-m
 
 mkdir build && cd build
 cmake ..
-make -j10
+make -j8
 ```
 
 `./installdeps` is supported on MSys2, Linux (Debian/Ubuntu, Fedora or Arch
@@ -32,20 +38,20 @@ If your OS is not supported, you will need the following:
 - make
 - cmake
 - git
-- nasm (for 32 bit builds)
+- nasm (optional, for 32 bit builds)
 
 And the following development libraries:
 
-- zlib
+- zlib (required)
 - mesa (if using X11 or any OpenGL otherwise)
 - ffmpeg (optional, for game recording)
-- gettext and gettext tools
-- png
-- SDL2
+- gettext and gettext tools (optional, with ENABLE_NLS)
+- png (required)
+- SDL2 (required)
 - SFML (optional, for link)
 - OpenAL (optional, a sound interface)
-- wxWidgets
-- cairo (completely optional)
+- wxWidgets (required, 2.8 is still supported)
+- cairo (optional, rendering interface)
 
 On Linux and similar, you also need the version of GTK your wxWidgets is linked
 to (usually 2 or 3).
@@ -93,6 +99,7 @@ Here is the complete list:
 | ENABLE_WX            | Build the wxWidgets port                                             | ON                    |
 | ENABLE_DEBUGGER      | Enable the debugger                                                  | ON                    |
 | ENABLE_NLS           | Enable translations                                                  | ON                    |
+| ENABLE_ASM           | Enable the following three ASM options                               | ON for 32 bit builds  |
 | ENABLE_ASM_CORE      | Enable x86 ASM CPU cores                                             | ON for 32 bit builds  |
 | ENABLE_ASM_SCALERS   | Enable x86 ASM graphic filters                                       | ON for 32 bit builds  |
 | ENABLE_MMX           | Enable MMX                                                           | ON for 32 bit builds  |
@@ -142,11 +149,11 @@ int foo = 42;
 wxLogDebug(wxT("the value of foo = %d"), foo);
 ```
 
-`%s` does not work for `wxString`, so use concatenation instead, e.g.:
+`%s` does not work for `wxString`, so you can do something like this:
 
 ```cpp
 wxString world = "world";
-wxLogDebug(wxT("Hello, ") + world + wxT("!"));
+wxLogDebug(wxT("Hello, %s!"), world.utf8_str());
 ```
 
 ## CONTRIBUTING

@@ -520,7 +520,7 @@ build_instructions() {
 
 mkdir build && cd build
 $cmake .. $cmake_flags
-make -j10
+make -j8
 EOF
 }
 
