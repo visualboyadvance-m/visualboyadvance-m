@@ -137,7 +137,7 @@ captureFormat=0
 
 # Sound quality
 # 1=44 Khz, 2=22Khz, 4=11Khz
-soundQuality=2
+soundQuality=1
 
 # GB Sound Stereo
 # 0=false, anything else for true
@@ -185,7 +185,7 @@ autoFrameSkip=0
 
 # Sets the desired throttle
 # 0=disable, 5...1000 valid throttle speeds
-throttle=0
+throttle=100
 
 # Pauses the emulator when the window is inactive
 # 0=disable, anything else to enable
