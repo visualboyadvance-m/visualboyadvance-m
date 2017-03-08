@@ -317,7 +317,11 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     ENDIF()
 
     # common flags
-    SET(MY_C_FLAGS -pipe -fPIC -Wformat -Wformat-security -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types)
+    SET(MY_C_FLAGS -pipe -Wformat -Wformat-security -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types)
+
+    IF(NOT WIN32)
+        SET(MY_C_FLAGS ${MY_C_FLAGS} -fPIC)
+    ENDIF()
 
     # check if SSP flags are supported
     INCLUDE(CheckCXXCompilerFlag)
@@ -347,21 +351,24 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         ADD_COMPILE_OPTIONS(${C_COMPILE_FLAG})
     ENDFOREACH()
 
+    SET(MY_CXX_FLAGS -std=gnu++11 -fpermissive -fexceptions)
+
+    FOREACH(ARG ${MY_CXX_FLAGS})
+        SET(MY_CXX_FLAGS_STR "${MY_CXX_FLAGS_STR} ${ARG}")
+    ENDFOREACH()
+
     # These must be set for C++ only, and we can't use generator expressions in
     # ADD_COMPILE_OPTIONS because that's a cmake 3.3 feature and we need 2.8.12
     # compat for Ubuntu 14.
-    STRING(REGEX REPLACE "<FLAGS>" "<FLAGS> -std=gnu++11 -fpermissive -fexceptions " CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
-
-    # make a string of compile options to add to link flags
-    UNSET(C_COMPILE_FLAGS_STR)
+    STRING(REGEX REPLACE "<FLAGS>" "<FLAGS> ${MY_CXX_FLAGS_STR} " CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
 
     FOREACH(ARG ${MY_C_FLAGS})
-        SET(C_COMPILE_FLAGS_STR "${C_COMPILE_FLAGS_STR} ${ARG}")
+        SET(MY_C_FLAGS_STR "${MY_C_FLAGS_STR} ${ARG}")
     ENDFOREACH()
 
     # need all flags for linking, because of -flto etc.
-    SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${C_COMPILE_FLAGS_STR}")
-    SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${C_COMPILE_FLAGS_STR}")
+    SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${MY_C_FLAGS_STR}")
+    SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${MY_C_FLAGS_STR}")
 
     # for the gcc -fstack-protector* flags we need libssp
     # we also have to use the gcc- binutils for LTO to work
@@ -377,13 +384,19 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         FIND_PACKAGE(SSP)
 
         IF(SSP_LIBRARY)
-            SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${SSP_LIBRARY}")
-            SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${SSP_LIBRARY}")
+            SET(MY_C_LINKER_FLAGS ${MY_C_LINKER_FLAGS} ${SSP_LIBRARY})
         ENDIF(SSP_LIBRARY)
 
-        SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   -Wl,-allow-multiple-definition")
-        SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,-allow-multiple-definition")
+        SET(MY_C_LINKER_FLAGS ${MY_C_LINKER_FLAGS} -Wl,-allow-multiple-definition)
     ENDIF()
+
+    # set linker flags
+    FOREACH(ARG ${MY_C_LINKER_FLAGS})
+        SET(MY_C_LINKER_FLAGS_STR "${MY_C_LINKER_FLAGS_STR} ${ARG}")
+    ENDFOREACH()
+
+    SET(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${MY_C_LINKER_FLAGS_STR}")
+    SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${MY_C_LINKER_FLAGS_STR}")
 ENDIF()
 
 # Assembler flags
