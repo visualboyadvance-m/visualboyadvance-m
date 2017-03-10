@@ -345,7 +345,7 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         CHECK_CXX_COMPILER_FLAG("--param ssp-buffer-size=4" SSP_BUFFER_SIZE_FLAG)
 
         IF(SSP_BUFFER_SIZE_FLAG)
-            SET(MY_C_FLAGS ${MY_C_FLAGS} --param ssp-buffer-size=4)
+            SET(MY_C_FLAGS ${MY_C_FLAGS} "--param ssp-buffer-size=4")
         ENDIF()
     ENDIF()
 
