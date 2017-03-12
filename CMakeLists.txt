@@ -335,17 +335,20 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         SET(MY_C_FLAGS ${MY_C_FLAGS} -fPIC)
     ENDIF()
 
-    # check if SSP flags are supported
     INCLUDE(CheckCXXCompilerFlag)
-    CHECK_CXX_COMPILER_FLAG(-fstack-protector-strong  F_STACK_PROTECTOR_STRONG_FLAG)
 
-    IF(F_STACK_PROTECTOR_STRONG_FLAG)
-        SET(MY_C_FLAGS ${MY_C_FLAGS} -fstack-protector-strong)
+    # check if ssp flags are supported for this version of gcc
+    IF(CMAKE_COMPILER_IS_GNUCXX)
+        CHECK_CXX_COMPILER_FLAG(-fstack-protector-strong  F_STACK_PROTECTOR_STRONG_FLAG)
 
-        CHECK_CXX_COMPILER_FLAG("--param ssp-buffer-size=4" SSP_BUFFER_SIZE_FLAG)
+        IF(F_STACK_PROTECTOR_STRONG_FLAG)
+            SET(MY_C_FLAGS ${MY_C_FLAGS} -fstack-protector-strong)
 
-        IF(SSP_BUFFER_SIZE_FLAG)
-            SET(MY_C_FLAGS ${MY_C_FLAGS} "--param ssp-buffer-size=4")
+            CHECK_CXX_COMPILER_FLAG("--param ssp-buffer-size=4" SSP_BUFFER_SIZE_FLAG)
+
+            IF(SSP_BUFFER_SIZE_FLAG)
+                SET(MY_C_FLAGS ${MY_C_FLAGS} "--param ssp-buffer-size=4")
+            ENDIF()
         ENDIF()
     ENDIF()
 
