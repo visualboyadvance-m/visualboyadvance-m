@@ -102,7 +102,7 @@ Here is the complete list:
 | ENABLE_DEBUGGER      | Enable the debugger                                                  | ON                    |
 | ENABLE_NLS           | Enable translations                                                  | ON                    |
 | ENABLE_ASM           | Enable the following three ASM options                               | ON for 32 bit builds  |
-| ENABLE_ASM_CORE      | Enable x86 ASM CPU cores                                             | ON for 32 bit builds  |
+| ENABLE_ASM_CORE      | Enable x86 ASM CPU cores (**BUGGY AND DANGEROUS**)                   | OFF                   |
 | ENABLE_ASM_SCALERS   | Enable x86 ASM graphic filters                                       | ON for 32 bit builds  |
 | ENABLE_MMX           | Enable MMX                                                           | ON for 32 bit builds  |
 | ENABLE_LINK          | Enable GBA linking functionality (requires SFML)                     | ON                    |

@@ -48,11 +48,17 @@ ENDIF()
 
 OPTION(ENABLE_ASM "Enable x86 ASM related options" ${ASM_DEFAULT})
 
-SET(ASM_CORE_DEFAULT ${ENABLE_ASM})
+# The ARM ASM core seems to be very buggy, see #98 and #54. Default to it being
+# OFF for the time being, until it is either fixed or replaced.
+option( ENABLE_ASM_CORE "Enable x86 ASM CPU cores" OFF)
+
+IF(ENABLE_ASM_CORE)
+    MESSAGE(WARNING "!!!!!! The x86 ASM cores are considered buggy and dangerous, use at your own risk. !!!!!!")
+ENDIF()
+
 SET(ASM_SCALERS_DEFAULT ${ENABLE_ASM})
 SET(MMX_DEFAULT ${ENABLE_ASM})
 
-option( ENABLE_ASM_CORE "Enable x86 ASM CPU cores" ${ASM_CORE_DEFAULT})
 option( ENABLE_ASM_SCALERS "Enable x86 ASM graphic filters" ${ASM_SCALERS_DEFAULT})
 
 if(ENABLE_ASM_SCALERS)
