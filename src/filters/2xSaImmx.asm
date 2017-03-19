@@ -31,6 +31,11 @@ GLOBAL __2xSaILine
 GLOBAL __2xSaISuperEagleLine
 GLOBAL __2xSaISuper2xSaILine
 GLOBAL _Init_2xSaIMMX
+
+GLOBAL _2xSaILine
+GLOBAL _2xSaISuperEagleLine
+GLOBAL _2xSaISuper2xSaILine
+GLOBAL Init_2xSaIMMX
 SECTION .text ALIGN = 32
 
 %ifdef FAR_POINTER
@@ -80,6 +85,7 @@ colorA3   equ 4
 
 
 __2xSaISuper2xSaILine:
+_2xSaISuper2xSaILine:
 ; Store some stuff
          push ebp
          mov ebp, esp
@@ -815,6 +821,7 @@ __2xSaISuper2xSaILine:
 
 
 __2xSaISuperEagleLine:
+_2xSaISuperEagleLine:
 ; Store some stuff
          push ebp
          mov ebp, esp
@@ -1391,6 +1398,7 @@ colorO   equ 2
 colorP   equ 4
 
 __2xSaILine:
+_2xSaILine:
 ; Store some stuff
          push ebp
          mov ebp, esp
@@ -1978,6 +1986,7 @@ __2xSaILine:
 ;-------------------------------------------------------------------------
 
 _Init_2xSaIMMX:
+Init_2xSaIMMX:
 ; Store some stuff
          push ebp
          mov ebp, esp
