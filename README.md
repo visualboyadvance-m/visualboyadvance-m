@@ -29,8 +29,8 @@ cmake ..
 make -j8
 ```
 
-`./installdeps` is supported on MSys2, Linux (Debian/Ubuntu, Fedora or Arch
-Linux) and Mac OS X (homebrew, macports or fink.)
+`./installdeps` is supported on MSys2, Linux (Debian/Ubuntu, Fedora, Arch or
+Solus) and Mac OS X (homebrew, macports or fink.)
 
 The Ninja cmake generator is also now supported, including on msys2.
 

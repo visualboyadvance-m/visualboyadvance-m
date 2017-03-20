@@ -145,6 +145,8 @@ linux_installdeps() {
         fedora_installdeps
     elif [ -f /etc/arch-release ]; then
         archlinux_installdeps
+    elif [ -f /etc/solus-release ]; then
+        solus_installdeps
     else
         error "Don't know how to install deps on your version of Linux"
     fi
@@ -422,6 +424,13 @@ archlinux_installdeps() {
 
         warning 'SFML is required for LINK support, the SFML package in AUR is currently broken, if you want LINK support you will need to install it manually'
     fi
+
+    build_instructions
+}
+
+solus_installdeps() {
+    check sudo eopkg -y install -c system.devel
+    check sudo eopkg -y install git cmake pkg-config nasm zlib-devel mesalib-devel libcairo-devel ffmpeg-devel gettext-devel libpng-devel sdl2-devel SFML-devel openal-soft-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel
 
     build_instructions
 }
