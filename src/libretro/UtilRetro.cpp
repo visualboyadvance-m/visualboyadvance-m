@@ -14,6 +14,8 @@
 #include "gb/gbGlobals.h"
 #include "gba/gbafilter.h"
 
+#include "UtilRetro.h"
+
 #ifndef _MSC_VER
 #include <strings.h>
 #define _stricmp strcasecmp
@@ -23,6 +25,26 @@ extern int systemColorDepth;
 extern int systemRedShift;
 extern int systemGreenShift;
 extern int systemBlueShift;
+
+// Because Configmanager was introduced, this has to be done.
+
+const char* loadDotCodeFile;
+const char* saveDotCodeFile;
+
+int cheatsEnabled = true;
+int saveType = 0;
+int rtcEnabled;
+int frameSkip = 1;
+bool speedup = false;
+bool cpuIsMultiBoot = false;
+bool parseDebug = true;
+int layerSettings = 0xff00;
+int layerEnable = 0xff00;
+bool speedHack = false;
+int cpuSaveType = 0;
+bool mirroringEnable = true;
+bool skipSaveGameBattery = false;
+bool skipSaveGameCheats = false;
 
 extern uint16_t systemColorMap16[0x10000];
 extern uint32_t systemColorMap32[0x10000];

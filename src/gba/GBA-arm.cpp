@@ -7,7 +7,11 @@
 #include "../NLS.h"
 #include "../System.h"
 #include "../Util.h"
+#ifndef __LIBRETRO__
 #include "../common/ConfigManager.h"
+#else
+#include "../src/libretro/Utilretro.h"
+#endif
 #include "Cheats.h"
 #include "EEprom.h"
 #include "Flash.h"
