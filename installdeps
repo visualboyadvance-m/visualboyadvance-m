@@ -430,7 +430,7 @@ archlinux_installdeps() {
 
 solus_installdeps() {
     check sudo eopkg -y install -c system.devel
-    check sudo eopkg -y install git cmake pkg-config nasm zlib-devel mesalib-devel libcairo-devel ffmpeg-devel gettext-devel libpng-devel sdl2-devel SFML-devel openal-soft-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel
+    check sudo eopkg -y install git ffmpeg-devel sdl2-devel SFML-devel openal-soft-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel
 
     build_instructions
 }
