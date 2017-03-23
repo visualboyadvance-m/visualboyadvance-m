@@ -62,6 +62,12 @@ to (usually 2 or 3).
 
 Support for more OSes/distributions for `./installdeps` is planned.
 
+## Cross compiling for 32 bit on a 64 bit host
+
+`./installdeps m32` will set things up to build a 32 bit binary.
+
+This is supported on Fedora, Arch, Solus and MSYS2.
+
 ## Cross Compiling for Win32
 
 `./installdeps` takes one optional parameter for cross-compiling target, which

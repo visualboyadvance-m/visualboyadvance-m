@@ -87,7 +87,7 @@ ENDFOREACH()
 
 # check if this build of wx actually has OpenGL support
 
-SET(CMAKE_REQUIRED_LIBRARIES ${MY_CXX_FLAGS} ${MY_C_FLAGS} ${MY_CXX_LINKER_FLAGS} ${MY_C_LINKER_FLAGS} ${CMAKE_REQUIRED_LIBRARIES} ${wxWidgets_LIBRARIES})
+SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${MY_CXX_FLAGS} ${MY_C_FLAGS} ${MY_CXX_LINKER_FLAGS} ${MY_C_LINKER_FLAGS} ${wxWidgets_LIBRARIES})
 SET(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS} ${wxWidgets_CXX_FLAGS} ${MY_CXX_FLAGS} ${MY_C_FLAGS})
 
 SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${wxWidgets_INCLUDE_DIRS})
@@ -97,7 +97,7 @@ FOREACH(DEF ${wxWidgets_DEFINITIONS})
 ENDFOREACH()
 
 # CheckCXXSourceCompiles ignores compiler flags, so we have to stuff them into the definitions
-SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} ${CMAKE_REQUIRED_FLAGS})
+SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_FLAGS} ${CMAKE_REQUIRED_DEFINITIONS})
 
 INCLUDE(CheckCXXSourceCompiles)
 
@@ -171,13 +171,23 @@ IF(NOT WIN32 AND NOT APPLE)
     ELSE()
         CHECK_CXX_SYMBOL_EXISTS(__WXGTK20__ ${WX_CONFIG_H} WX_USING_GTK2)
         IF(WX_USING_GTK2)
-            FIND_PACKAGE(GTK2 REQUIRED gtk)
-            IF(NOT GTK2_INCLUDE_DIRS)
-                MESSAGE(FATAL_ERROR "Could not find gtk2")
+            # try to use pkg-config to find gtk2 first
+            PKG_CHECK_MODULES(GTK2 REQUIRED gtk+-2.0)
+            IF(GTK2_INCLUDE_DIRS)
+                INCLUDE_DIRECTORIES(${GTK2_INCLUDE_DIRS})
+                LINK_DIRECTORIES(${GTK2_LIBRARY_DIRS})
+                ADD_COMPILE_OPTIONS(${GTK2_CFLAGS_OTHER})
+                SET(GTK_LIBRARIES ${GTK2_LIBRARIES})
+            ELSE()
+                # and if that fails, use the cmake module
+                FIND_PACKAGE(GTK2 REQUIRED gtk)
+                IF(NOT GTK2_INCLUDE_DIRS)
+                    MESSAGE(FATAL_ERROR "Could not find gtk2")
+                ENDIF()
+                INCLUDE_DIRECTORIES(${GTK2_INCLUDE_DIRS})
+                ADD_COMPILE_OPTIONS(${GTK2_DEFINITIONS})
+                SET(GTK_LIBRARIES ${GTK2_LIBRARIES})
             ENDIF()
-            INCLUDE_DIRECTORIES(${GTK2_INCLUDE_DIRS})
-            ADD_COMPILE_OPTIONS(${GTK2_DEFINITIONS})
-            SET(GTK_LIBRARIES ${GTK2_LIBRARIES})
         ELSE()
             FIND_PACKAGE(GTK REQUIRED gtk)
             IF(NOT GTK_INCLUDE_DIRS)
