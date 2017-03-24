@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
+#include <vector>
 
 #include "SoundRetro.h"
 #include "libretro.h"
@@ -26,6 +28,8 @@
 #define RETRO_DEVICE_GBA RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 0)
 #define RETRO_DEVICE_GBA_ALT1 RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 1)
 #define RETRO_DEVICE_GBA_ALT2 RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 2)
+
+#define ISHEXDEC ((codeLine[cursor]>='0') && (codeLine[cursor]<='9')) || ((codeLine[cursor]>='a') && (codeLine[cursor]<='f')) || ((codeLine[cursor]>='A') && (codeLine[cursor]<='F'))
 
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
@@ -194,7 +198,7 @@ void retro_set_environment(retro_environment_t cb)
       { "vbam_layer_8", "Show sprite window layer; Yes|No" },
       { NULL, NULL },
    };
-   
+
    static const struct retro_controller_description port_1[] = {
       { "GBA Joypad", RETRO_DEVICE_GBA },
       { "Alt Joypad YB", RETRO_DEVICE_GBA_ALT1 },
@@ -202,18 +206,18 @@ void retro_set_environment(retro_environment_t cb)
    };
 
    static const struct retro_controller_info ports[] = {{ port_1, 3 },{ NULL,0 }};
-      
-   
+
+
 
    cb(RETRO_ENVIRONMENT_SET_VARIABLES, variables);
-   cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void*)ports);   
+   cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void*)ports);
 }
 
 void retro_get_system_info(struct retro_system_info *info)
 {
    info->need_fullpath = false;
    info->valid_extensions = "gba";
-   info->library_version = "git";
+   info->library_version = "git" GIT_VERSION;
    info->library_name = "VBA-M";
    info->block_extract = false;
 }
@@ -524,9 +528,9 @@ static void update_variables(void)
    char key[256];
    struct retro_variable var;
    var.key=key;
-   
+
    int disabled_layers=0;
-   
+
    strcpy(key, "vbam_layer_x");
    for (int i=0;i<8;i++)
    {
@@ -585,6 +589,7 @@ void retro_cheat_reset(void)
 
 void retro_cheat_set(unsigned index, bool enabled, const char* code)
 {
+    /*
     const char *begin, *c;
 
     begin = c = code;
@@ -623,6 +628,54 @@ void retro_cheat_set(unsigned index, bool enabled, const char* code)
       }
 
    } while (*c++);
+   */
+   std::string codeLine=code;
+   std::string name="cheat_"+index;
+   int matchLength=0;
+   std::vector<std::string> codeParts;
+   int cursor;
+
+    //Break the code into Parts
+    for (cursor=0;;cursor++)
+    {
+      if (ISHEXDEC){
+         matchLength++;
+      } else {
+         if (matchLength){
+            if (matchLength>8){
+               codeParts.push_back(codeLine.substr(cursor-matchLength,8));
+               codeParts.push_back(codeLine.substr(cursor-matchLength+8,matchLength-8));
+
+            } else {
+               codeParts.push_back(codeLine.substr(cursor-matchLength,matchLength));
+            }
+            matchLength=0;
+         }
+      }
+      if (!codeLine[cursor]){
+         break;
+      }
+    }
+
+   //Add to core
+   for (cursor=0;cursor<codeParts.size();cursor+=2){
+      std::string codeString;
+      codeString+=codeParts[cursor];
+
+      if (codeParts[cursor+1].length()==8){
+         codeString+=codeParts[cursor+1];
+         cheatsAddGSACode(codeString.c_str(),name.c_str(),true);
+      } else if (codeParts[cursor+1].length()==4) {
+         codeString+=" ";
+         codeString+=codeParts[cursor+1];
+         cheatsAddCBACode(codeString.c_str(),name.c_str());
+      } else {
+         codeString+=" ";
+         codeString+=codeParts[cursor+1];
+         log_cb(RETRO_LOG_ERROR, "[VBA] Invalid cheat code '%s'\n", codeString.c_str());
+      }
+      log_cb(RETRO_LOG_INFO, "[VBA] Cheat code added: '%s'\n", codeString.c_str());
+   }
 }
 
 bool retro_load_game(const struct retro_game_info *game)
@@ -654,7 +707,7 @@ bool retro_load_game(const struct retro_game_info *game)
 
    struct retro_memory_descriptor desc[11];
    memset(desc, 0, sizeof(desc));
-   
+
    desc[0].start=0x03000000; desc[0].select=0xFF000000; desc[0].len=0x8000;    desc[0].ptr=internalRAM;//fast WRAM
    desc[1].start=0x02000000; desc[1].select=0xFF000000; desc[1].len=0x40000;   desc[1].ptr=workRAM;//slow WRAM
    /* TODO: if SRAM is flash, use start=0 addrspace="S" instead */
@@ -673,10 +726,10 @@ bool retro_load_game(const struct retro_game_info *game)
    desc[10].start=0x04000000;desc[10].select=0;         desc[10].len=0x400;    desc[10].ptr=ioMem;//bunch of registers
    struct retro_memory_map retromap={ desc, sizeof(desc)/sizeof(*desc) };
    environ_cb(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &retromap);
-   
+
    bool yes = true;
    environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
-   
+
    return true;
 }
 
