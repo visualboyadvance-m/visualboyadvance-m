@@ -1,3 +1,5 @@
+[![Join the chat at https://gitter.im/visualboyadvance-m/Lobby](https://badges.gitter.im/visualboyadvance-m/Lobby.svg)](https://gitter.im/visualboyadvance-m/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 # Visual Boy Advance - M
 
 Game Boy Advance Emulator
@@ -59,6 +61,12 @@ On Linux and similar, you also need the version of GTK your wxWidgets is linked
 to (usually 2 or 3).
 
 Support for more OSes/distributions for `./installdeps` is planned.
+
+## Cross compiling for 32 bit on a 64 bit host
+
+`./installdeps m32` will set things up to build a 32 bit binary.
+
+This is supported on Fedora, Arch, Solus and MSYS2.
 
 ## Cross Compiling for Win32
 
