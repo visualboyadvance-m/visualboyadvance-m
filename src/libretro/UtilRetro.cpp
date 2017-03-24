@@ -33,15 +33,18 @@ const char* saveDotCodeFile;
 
 int cheatsEnabled = true;
 int saveType = 0;
+int skipBios = 0;
 int rtcEnabled;
 int frameSkip = 1;
 bool speedup = false;
 bool cpuIsMultiBoot = false;
+int cpuDisableSfx = false;
 bool parseDebug = true;
 int layerSettings = 0xff00;
 int layerEnable = 0xff00;
 bool speedHack = false;
 int cpuSaveType = 0;
+int useBios = 0;
 bool mirroringEnable = true;
 bool skipSaveGameBattery = false;
 bool skipSaveGameCheats = false;
