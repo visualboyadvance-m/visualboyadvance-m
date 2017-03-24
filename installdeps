@@ -518,12 +518,12 @@ solus_installdeps() {
     if [ -n "$amd64" -a "$target" = m32 ]; then
         info_msg 'Calculating dependencies, this will take a while..'
 
-        # first expand all dep lists recursively
+        # first expand all dep lists recursively for -devel packages
         curdeps=
         newdeps=$@
         while [ "$curdeps" != "$newdeps" ]; do
             curdeps=$newdeps
-            set -- $(echo "$@" $(sudo eopkg info "$@" 2>/dev/null | sed -n 's/^Dependencies  *:  *\(.*\)/\1/p' | sort -u) | sed 's/  */\n/g' | sort -u)
+            set -- $(echo "$@" $(sudo eopkg info "$@" 2>/dev/null | sed -n 's/^Dependencies  *:  *\(.*\)/\1/p' | sort -u) | sed 's/  */\n/g' | grep -- '-devel$' | sort -u)
             newdeps=$@
         done
 
@@ -534,7 +534,17 @@ solus_installdeps() {
                 set --
                 first=0
             fi
-            set -- "$@" "${pkg%-devel}-32bit-devel"
+            case "$pkg" in
+                *-32bit-devel)
+                    # already 32 bit
+                    ;;
+                *-devel)
+                    set -- "$@" "${pkg%-devel}-32bit-devel"
+                    ;;
+                *)
+                    set -- "$@" "$pkg"
+                    ;;
+            esac
         done
 
         # prune the ones that don't exist
