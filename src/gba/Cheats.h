@@ -4,7 +4,7 @@
 #ifndef __LIBRETRO__
 #include "../common/ConfigManager.h"
 #else
-#include "../src/libretro/Utilretro.h"
+#include "../src/libretro/UtilRetro.h"
 #endif
 
 struct CheatsData {
