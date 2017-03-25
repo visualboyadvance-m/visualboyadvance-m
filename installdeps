@@ -277,8 +277,41 @@ fedora_installdeps() {
 
     # using --nogpgcheck with dnf because keys can be a problem on rawhide
 
+    fedora_release=$(rpm -E %fedora)
+    tries=3
+    curdir=$(pwd)
+
     # make sure rpmfusion is installed for ffmpeg
-    check sudo su -c 'dnf -y --nogpgcheck install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm'
+    while [ $tries -gt 0 ]; do
+        mkdir -p "${tmp}/fusion"
+        cd "${tmp}/fusion"
+        if ! curl -fLO https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-${fedora_release}.noarch.rpm; then
+            fedora_release=$((fedora_release - 1))
+            tries=$((tries - 1))
+            continue
+        fi
+        if ! curl -fLO https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${fedora_release}.noarch.rpm; then
+            tries=0
+            break
+        fi
+        # check if already installed
+        if rpm -q rpmfusion-free-release-${fedora_release} && rpm -q rpmfusion-nonfree-release-${fedora_release}; then
+            info_msg 'rpmfusion already installed, good'
+            break
+        fi
+        # otherwise try to install
+        if ! sudo rpm --nodeps -Uvh ./rpmfusion-*.rpm; then
+            tries=0
+            break
+        fi
+        break
+    done
+    cd "$curdir"
+    if [ $tries -eq 0 ]; then
+        warning 'installing rpmfusion repos failed, continuing without ffmpeg'
+        no_ffmpeg=1
+        cmake_flags="$cmake_flags -DENABLE_FFMPEG=NO"
+    fi
 
     # non-multiarch packages first
     check sudo dnf -y --nogpgcheck --best --allowerasing install gcc gcc-c++ make cmake git nasm redhat-rpm-config pkgconfig
@@ -302,6 +335,12 @@ fedora_installdeps() {
             set -- --exclude='glibc32*'
         fi
         for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libpng-devel SDL2-devel SFML-devel openal-soft-devel wxGTK3-devel cairo-devel gtk2-devel gtk3-devel; do
+            case $pkg in
+                *ffmpeg*)
+                    [ -n $no_ffmpeg ] && continue
+                    ;;
+            esac
+
             if [ -n "$amd64" ]; then
                 if [ "$target" = m32 ]; then
                     set -- "$@" "${pkg}.i686"
@@ -353,6 +392,14 @@ fedora_installdeps() {
     fi
 
     check sudo dnf -y --nogpgcheck --best --allowerasing install "$@"
+
+    ffmpeg=ffmpeg-devel
+    [ -n $amd64 -a $target = m32 ] && ffmpeg=ffmpeg-devel.i686
+
+    if ! rpm -q $ffmpeg; then
+        warning 'ffmpeg failed to install (probably due to conflicts)'
+        cmake_flags="$cmake_flags -DENABLE_FFMPEG=NO"
+    fi
 
     [ -n "$warning" ] && warning "$warning"
 
