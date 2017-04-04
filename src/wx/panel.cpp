@@ -1014,6 +1014,16 @@ void GameArea::OnIdle(wxIdleEvent& event)
         }
 
         wxWindow* w = panel->GetWindow();
+
+        // set up event handlers
+        // use both CHAR_HOOK and KEY_DOWN in case CHAR_HOOK does not work for whatever reason
+        w->Connect(wxEVT_CHAR_HOOK,        wxKeyEventHandler(GameArea::OnKeyDown),         NULL, this);
+        w->Connect(wxEVT_KEY_DOWN,         wxKeyEventHandler(GameArea::OnKeyDown),         NULL, this);
+        w->Connect(wxEVT_KEY_UP,           wxKeyEventHandler(GameArea::OnKeyUp),           NULL, this);
+        w->Connect(wxEVT_PAINT,            wxPaintEventHandler(GameArea::PaintEv),         NULL, this);
+        w->Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(GameArea::EraseBackground), NULL, this);
+        w->Connect(wxEVT_SIZE,             wxSizeEventHandler(GameArea::OnSize),           NULL, this);
+
         w->SetBackgroundStyle(wxBG_STYLE_CUSTOM);
         w->SetSize(wxSize(basic_width, basic_height));
 
@@ -1027,24 +1037,12 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
         GetSizer()->Add(w, 1, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER) : wxEXPAND);
         Layout();
-        // this is necessary for GL + fullscreen, why I have no clue
-        wxSizeEvent size_ev = wxSizeEvent(w->GetClientSize());
-        panel->OnSize(size_ev);
 
         if (pointer_blanked)
             w->SetCursor(wxCursor(wxCURSOR_BLANK));
 
         // set focus to panel
         w->SetFocus();
-
-        // set up event handlers
-        // use both CHAR_HOOK and KEY_DOWN in case CHAR_HOOK does not work for whatever reason
-        w->Connect(wxEVT_CHAR_HOOK,        wxKeyEventHandler(GameArea::OnKeyDown),         NULL, this);
-        w->Connect(wxEVT_KEY_DOWN,         wxKeyEventHandler(GameArea::OnKeyDown),         NULL, this);
-        w->Connect(wxEVT_KEY_UP,           wxKeyEventHandler(GameArea::OnKeyUp),           NULL, this);
-        w->Connect(wxEVT_PAINT,            wxPaintEventHandler(GameArea::PaintEv),         NULL, this);
-        w->Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(GameArea::EraseBackground), NULL, this);
-        w->Connect(wxEVT_SIZE,             wxSizeEventHandler(GameArea::OnSize),           NULL, this);
     }
 
     if (!paused) {
