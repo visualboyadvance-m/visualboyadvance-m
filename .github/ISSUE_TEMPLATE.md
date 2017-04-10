@@ -28,4 +28,10 @@ Version of code (pre-built binary version, or commit ref, or just "master"):
 
 ### Hardware details:
 
+If your joystick or gamepad isn't working in Linux, please try to troubleshoot
+using the information on this page:
+https://wiki.archlinux.org/index.php/Gamepad **BEFORE** filing an issue. We use
+SDL for joystick support, any problems will generally be an issue with SDL and
+**NOT** the emulator.
+
 If relevant, the joystick you are using and the drivers you are using for it:
