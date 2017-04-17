@@ -758,6 +758,10 @@ void SaveConfigFile()
 	if (configFile != NULL)
 	{
 		FILE *f = fopen(configFile, "w");
+		if (f == NULL) {
+			log("Configuration file could not be opened %s\n", optarg);
+			return;
+		}
 		// Needs mixed case version of the option name to add new options into the ini
 		//for (int i = 0; i < (sizeof(argOptions) / sizeof(option)); i++)
 		//{
