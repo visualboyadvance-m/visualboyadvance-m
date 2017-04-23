@@ -265,7 +265,7 @@ CompileUnit* elfGetCompileUnit(uint32_t addr)
 
 const char* elfGetAddressSymbol(uint32_t addr)
 {
-    static char buffer[256];
+    static char buffer[256];		//defining globalscope here just feels so wrong
 
     CompileUnit* unit = elfGetCompileUnit(addr);
     // found unit, need to find function
@@ -278,9 +278,11 @@ const char* elfGetAddressSymbol(uint32_t addr)
                 if (!name)
                     name = "";
                 if (offset)
-                    sprintf(buffer, "%s+%d", name, offset);
-                else
-                    strcpy(buffer, name);
+                    snprintf(buffer, 256, "%s+%d", name, offset);
+                else {
+                    strncpy(buffer, name, 255);		//strncpy does not allways append a '\0'
+		    buffer[255] = '\0';
+		}
                 return buffer;
             }
             func = func->next;
@@ -296,20 +298,22 @@ const char* elfGetAddressSymbol(uint32_t addr)
                 if (name == NULL)
                     name = "";
                 if (offset)
-                    sprintf(buffer, "%s+%d", name, addr - s->value);
-                else
-                    strcpy(buffer, name);
+                    snprintf(buffer, 256,"%s+%d", name, addr - s->value);
+                else {
+                    strncpy(buffer, name, 255);
+		    buffer[255] = '\0';
+		}
                 return buffer;
             } else if (addr == s->value) {
-                if (s->name)
-                    strcpy(buffer, s->name);
-                else
+                if (s->name) {
+                    strncpy(buffer, s->name, 255);
+		    buffer[255] = '\0';
+		} else
                     strcpy(buffer, "");
                 return buffer;
             }
         }
     }
-
     return "";
 }
 
