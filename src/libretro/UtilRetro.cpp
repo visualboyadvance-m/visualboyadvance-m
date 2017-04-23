@@ -99,16 +99,19 @@ bool utilIsGBAImage(const char* file)
 
 bool utilIsGBImage(const char* file)
 {
-    if (strlen(file) > 4) {
-        const char* p = strrchr(file, '.');
-
-        if (p != NULL) {
-            if ((_stricmp(p, ".dmg") == 0) || (_stricmp(p, ".gb") == 0) || (_stricmp(p, ".gbc") == 0) || (_stricmp(p, ".cgb") == 0) || (_stricmp(p, ".sgb") == 0))
-                return true;
-        }
-    }
-
-    return false;
+	FILE *fp;
+	bool ret = false;
+	char buffer[47];
+	if (!file || !(fd = fopen (file, "r")))		//TODO more checks here (does file exist, is it a file, a symlink or a blockdevice)
+		return ret;
+	fseek (fp, 0, SEEK_END);
+	if (ftell (fp) >= 0x8000) {			//afaik there can be no gb-rom smaller than this
+		fseek (fp, 0x104, SEEK_SET);
+		fread (buffer, sizeof (char), 47, fp);
+		ret = !memcmp (buffer, gb_image_header, 47);
+	}
+	fclose (fp);
+	return ret;
 }
 
 // strip .gz or .z off end
