@@ -2079,6 +2079,8 @@ bool cheatsImportGSACodeFile(const char* name, int game, bool v3)
         fread(&codes, 1, 4, f);
         while (codes > 0) {
             fread(&len, 1, 4, f);
+	    if (len > 255)
+		    goto evil_gsa_code_file;	//XXX: this functione needs a rewrite in general, so for the short this is better than nothing
             fread(desc, 1, len, f);
             desc[len] = 0;
             desc[31] = 0;
@@ -2098,6 +2100,7 @@ bool cheatsImportGSACodeFile(const char* name, int game, bool v3)
             codes--;
         }
     }
+evil_gsa_code_file:
     fclose(f);
     return true;
 }
