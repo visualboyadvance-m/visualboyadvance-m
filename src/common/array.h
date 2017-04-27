@@ -22,17 +22,38 @@ template <typename T> class Array
         private:
         pointer m_p;
         size_type m_size;
+        bool dealloc;
 
         public:
-        Array(size_type size = 0) : m_p(size ? new value_type[size] : 0), m_size(size)
+        Array(size_type size = 0)
         {
+            m_p = NULL;
+            dealloc = false;
+
+            if (size) {
+                m_p = new value_type[size];
+                m_size = size;
+                dealloc = true;
+            }
         }
 
         void reset(size_t size)
         {
-                delete[] this->m_p;
-                this->m_p = size ? new value_type[size] : 0;
+                if (this->m_p) {
+                    delete[] this->m_p;
+                    this->m_p = NULL;
+                }
+
+                if (size) {
+                    this->m_p = new value_type[size];
+                    dealloc = true;
+                }
                 this->m_size = size;
+        }
+
+        ~Array()
+        {
+            if (dealloc) delete m_p;
         }
 
         size_type size() const
