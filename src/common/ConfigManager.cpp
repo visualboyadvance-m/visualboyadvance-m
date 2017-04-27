@@ -759,7 +759,9 @@ void SaveConfigFile()
 	{
 		FILE *f = fopen(configFile, "w");
 		if (f == NULL) {
-			log("Configuration file could not be opened %s\n", optarg);
+                        char err_buf[4096];
+                        char* err_msg = strerror_r(errno, err_buf, 4096);
+			fprintf(stderr, "Configuration file '%s' could not be written to: %s\n", configFile, err_msg);
 			return;
 		}
 		// Needs mixed case version of the option name to add new options into the ini
