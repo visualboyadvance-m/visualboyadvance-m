@@ -283,10 +283,12 @@ void StopLirc(void)
 #define S_IFDIR _S_IFDIR
 #endif
 
-void sdlCheckDirectory(const char* dir)
+bool sdlCheckDirectory(const char* dir)
 {
+    bool res = false;
+
     if (!dir || !dir[0]) {
-        return;
+        return false;
     }
 
     struct stat buf;
@@ -295,16 +297,21 @@ void sdlCheckDirectory(const char* dir)
 
     char* p = (char*)dir + len - 1;
 
-    if (*p == '/' || *p == '\\')
+    while (p != dir && (*p == '/' || *p == '\\')) {
         *p = 0;
+        p--;
+    }
 
     if (stat(dir, &buf) == 0) {
         if (!(buf.st_mode & S_IFDIR)) {
             fprintf(stderr, "Error: %s is not a directory\n", dir);
         }
+        res = true;
     } else {
         fprintf(stderr, "Error: %s does not exist\n", dir);
     }
+
+    return res;
 }
 
 char* sdlGetFilename(char* name)
@@ -649,7 +656,7 @@ static char* sdlStateName(int num)
 {
     static char stateName[2048];
 
-    if (saveDir && strlen(saveDir))
+    if (saveDir)
         sprintf(stateName, "%s/%s%d.sgm", saveDir, sdlGetFilename(filename),
             num + 1);
     else if (homeDir)
@@ -1716,9 +1723,12 @@ int main(int argc, char** argv)
     LoadConfig(); // Parse command line arguments (overrides ini)
     ReadOpts(argc, argv);
 
-    sdlCheckDirectory(screenShotDir);
-    sdlCheckDirectory(saveDir);
-    sdlCheckDirectory(batteryDir);
+    if (!sdlCheckDirectory(screenShotDir))
+        screenShotDir = NULL;
+    if (!sdlCheckDirectory(saveDir))
+        saveDir = NULL;
+    if (!sdlCheckDirectory(batteryDir))
+        batteryDir = NULL;
 
     sdlSaveKeysSwitch = (ReadPrefHex("saveKeysSwitch"));
     sdlOpenglScale = (ReadPrefHex("openGLscale"));
