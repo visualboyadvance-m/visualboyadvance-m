@@ -1,3 +1,8 @@
+// necessary to get portable strerror_r
+#undef _GNU_SOURCE
+#include <string.h>
+#define _GNU_SOURCE 1
+
 #include "ConfigManager.h"
 extern "C" {
 #include "../common/iniparser.h"
@@ -759,8 +764,8 @@ void SaveConfigFile()
 	{
 		FILE *f = fopen(configFile, "w");
 		if (f == NULL) {
-                        char err_buf[4096];
-                        char* err_msg = strerror_r(errno, err_buf, 4096);
+                        char err_msg[4096] = "unknown error";
+                        strerror_r(errno, err_msg, 4096);
 			fprintf(stderr, "Configuration file '%s' could not be written to: %s\n", configFile, err_msg);
 			return;
 		}
