@@ -1,3 +1,4 @@
+#include <cmath>
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 

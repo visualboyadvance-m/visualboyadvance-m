@@ -1,3 +1,4 @@
+#include <cmath>
 #include <wx/dcbuffer.h>
 #include <SDL_joystick.h>
 
