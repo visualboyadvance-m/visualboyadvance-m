@@ -1,4 +1,4 @@
-# Build configuration for https://www.tea-ci.org
+6# Build configuration for https://www.tea-ci.org
 # Tea CI is a fork of Drone CI with Cygwin/Msys2 support
 # Feel free to share Tea CI to more open source developers
 # http://docs.tea-ci.org/usage/overview/
@@ -12,7 +12,7 @@ build:
     - if [ $$arch = 32 ]; then target=i686; fi
     - if [ $$arch = 64 ]; then target=x86_64; fi
     - pacman -S --needed --noconfirm --noprogressbar mingw-w64-${target}-cmake mingw-w64-${target}-ffmpeg mingw-w64-${target}-SDL2 mingw-w64-${target}-openal mingw-w64-${target}-sfml mingw-w64-${target}-extra-cmake-modules mingw-w64-${target}-cairo mingw-w64-${target}-zlib mingw-w64-${target}-libpng nasm
-    - cmake -DENABLE_FFMPEG=ON -DENABLE_SDL=ON
+    - cmake -DENABLE_FFMPEG=ON -DENABLE_SDL=ON -G"MSYS Makefiles"
     - make
 notify:
   irc:
