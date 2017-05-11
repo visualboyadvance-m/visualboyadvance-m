@@ -1,5 +1,5 @@
 [![Join the chat at https://gitter.im/visualboyadvance-m/Lobby](https://badges.gitter.im/visualboyadvance-m/Lobby.svg)](https://gitter.im/visualboyadvance-m/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
+[![Build Status](https://tea-ci.org/api/badges/visualboyadvance-m/visualboyadvance-m/status.svg)](https://tea-ci.org/visualboyadvance-m/visualboyadvance-m)
 # Visual Boy Advance - M
 
 Game Boy Advance Emulator
