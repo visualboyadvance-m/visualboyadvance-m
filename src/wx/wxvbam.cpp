@@ -136,10 +136,10 @@ wxString wxvbamApp::GetConfigurationPath()
 
 wxString wxvbamApp::GetAbsolutePath(wxString path)
 {
-    wxFileName dir(path);
+    wxFileName fn(path);
 
-    if (dir.IsRelative()) {
-        wxFileName fn(GetConfigurationPath(), path);
+    if (fn.IsRelative()) {
+        fn.MakeRelativeTo(GetConfigurationPath());
         fn.Normalize();
         return fn.GetFullPath();
     }
