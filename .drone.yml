@@ -11,7 +11,7 @@ build:
   commands:
     - if [ $$arch = 32 ]; then target=i686; fi
     - if [ $$arch = 64 ]; then target=x86_64; fi
-    - pacman -S --needed --noconfirm --noprogressbar mingw-w64-${target}-cmake mingw-w64-${target}-ffmpeg mingw-w64-${target}-SDL2 mingw-w64-${target}-openal mingw-w64-${target}-sfml mingw-w64-${target}-extra-cmake-modules mingw-w64-${target}-cairo mingw-w64-${target}-zlib mingw-w64-${target}-libpng nasm mingw-w64-${target}-wxWidgets
+    - pacman -S --needed --noconfirm --noprogressbar mingw-w64-${target}-cmake mingw-w64-${target}-ffmpeg mingw-w64-${target}-SDL2 mingw-w64-${target}-openal mingw-w64-${target}-sfml mingw-w64-${target}-extra-cmake-modules mingw-w64-${target}-cairo mingw-w64-${target}-zlib mingw-w64-${target}-libpng nasm mingw-w64-${target}-wxWidgets mingw-w64-${target}-crt-git mingw-w64-${target}-headers-git zip
     - git submodule update --init --recursive
     - cmake -DENABLE_FFMPEG=ON -DENABLE_SDL=ON -G "MSYS Makefiles"
     - make
