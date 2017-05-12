@@ -766,7 +766,7 @@ void SaveConfigFile()
 		if (f == NULL) {
                         char err_msg[4096] = "unknown error";
 #ifdef _WIN32
-                        sterror_s(errno, err_msg, 4096);
+                        strerror_s(err_msg, errno, 4096);
 #else
                         strerror_r(errno, err_msg, 4096);
 #endif
