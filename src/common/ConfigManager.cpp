@@ -765,7 +765,11 @@ void SaveConfigFile()
 		FILE *f = fopen(configFile, "w");
 		if (f == NULL) {
                         char err_msg[4096] = "unknown error";
+#ifdef _WIN32
+                        sterror_s(errno, err_msg, 4096);
+#else
                         strerror_r(errno, err_msg, 4096);
+#endif
 			fprintf(stderr, "Configuration file '%s' could not be written to: %s\n", configFile, err_msg);
 			return;
 		}
