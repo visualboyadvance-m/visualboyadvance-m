@@ -12,6 +12,7 @@ build:
     - if [ $$arch = 32 ]; then target=i686; fi
     - if [ $$arch = 64 ]; then target=x86_64; fi
     - pacman -S --needed --noconfirm --noprogressbar mingw-w64-${target}-cmake mingw-w64-${target}-ffmpeg mingw-w64-${target}-SDL2 mingw-w64-${target}-openal mingw-w64-${target}-sfml mingw-w64-${target}-extra-cmake-modules mingw-w64-${target}-cairo mingw-w64-${target}-zlib mingw-w64-${target}-libpng nasm
+    - git submodule update --init --recursive
     - cmake -DENABLE_FFMPEG=ON -DENABLE_SDL=ON -G "MSYS Makefiles"
     - make
 notify:
@@ -27,11 +28,11 @@ matrix:
     - 64
     - 32
 
-publish:
-  github_release:
-    api_key: 4cd466723ff104154a6a206814ddaa159131f2ec
-    files:
-      - vbam.exe
-      - visualboyadvance-m.exe
-    checksum:
-      - sha256
+#publish:
+#  github_release:
+#    api_key: 4cd466723ff104154a6a206814ddaa159131f2ec
+#    files:
+#      - vbam.exe
+#      - visualboyadvance-m.exe
+#    checksum:
+#      - sha256
