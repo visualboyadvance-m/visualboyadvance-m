@@ -122,9 +122,10 @@ Here is the complete list:
 | ENABLE_DIRECT3D      | Direct3D rendering for wxWidgets (Windows, **NOT IMPLEMENTED!!!**)   | ON                    |
 | ENABLE_XAUDIO2       | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
 | ENABLE_OPENAL        | Enable OpenAL for the wxWidgets port                                 | ON                    |
-| BIN_INSTALL_DIR      | Configure the default binary directory                               | bin                   |
-| DATA_INSTALL_DIR     | Configure the default data directory                                 | share/vbam            |
-| MAN_INSTALL_DIR      | Configure the default manual directory                               | share/man             |
+
+Note for distro packagers, we use the CMake module
+[GNUInstallDirs](https://cmake.org/cmake/help/v2.8.12/cmake.html#module:GNUInstallDirs)
+to configure installation directories.
 
 ## MSys2 Notes
 
