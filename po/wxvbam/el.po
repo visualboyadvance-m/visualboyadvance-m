@@ -3,23 +3,19 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# MELERIX, 2015
-# javidg96, 2015
-# Marco123V <MarcoVillalejos@hotmail.com>, 2015
-# MELERIX, 2015
-# MELERIX, 2015
+# Stathis Galazios <infin1ty@hol.gr>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-06-10 13:10+1000\n"
 "PO-Revision-Date: 2017-06-03 16:14+0000\n"
-"Last-Translator: Javier Díaz <javidg96@hotmail.com>\n"
-"Language-Team: Spanish (http://www.transifex.com/bgk/vba-m/language/es/)\n"
+"Last-Translator: Stathis Galazios <infin1ty@hol.gr>\n"
+"Language-Team: Greek (http://www.transifex.com/bgk/vba-m/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: es\n"
+"Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../src/wx/cmdevents.cpp:99
@@ -28,36 +24,36 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
 " Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "Archivos de GameBoy Advance (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Archivos de GameBoy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "Αρχεία GameBoy Advance (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Αρχεία GameBoy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: ../src/wx/cmdevents.cpp:112
 msgid "Open ROM file"
-msgstr "Abrir archivo ROM"
+msgstr "Άνοιγμα αρχείου ROM"
 
 #: ../src/wx/cmdevents.cpp:129
 msgid ""
 "GameBoy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "Archivos de GameBoy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "Αρχεία GameBoy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: ../src/wx/cmdevents.cpp:137
 msgid "Open GB ROM file"
-msgstr "Abrir archivo ROM de GB"
+msgstr "Άνοιγμα αρχείου GB ROM"
 
 #: ../src/wx/cmdevents.cpp:154
 msgid ""
 "GameBoy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "Archivos de GameBoy Color (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "Αρχεία GameBoy Color (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: ../src/wx/cmdevents.cpp:162
 msgid "Open GBC ROM file"
-msgstr "Abrir archivo ROM de GBC"
+msgstr "Άνοιγμα αρχείου GBC ROM"
 
 #: ../src/wx/cmdevents.cpp:557 ../src/wx/cmdevents.cpp:674
 #: ../src/wx/cmdevents.cpp:714 ../src/wx/cmdevents.cpp:790
 msgid "Unknown"
-msgstr "Desconocido"
+msgstr "Άγνωστο"
 
 #: ../src/wx/cmdevents.cpp:566
 msgid "ROM"
@@ -153,7 +149,7 @@ msgstr "GameShark V3.0"
 
 #: ../src/wx/cmdevents.cpp:658
 msgid "ROM+POCKET CAMERA"
-msgstr "ROM+POCKET CÁMARA"
+msgstr "ROM+POCKET CAMERA"
 
 #: ../src/wx/cmdevents.cpp:662
 msgid "ROM+BANDAI TAMA5"
@@ -174,248 +170,248 @@ msgstr "ROM+HuC-1"
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:183
 #: ../src/wx/xrc/SoundConfig.xrc:212 ../src/wx/xrc/SoundConfig.xrc:302
 msgid "None"
-msgstr "Ninguno"
+msgstr "Κανένα"
 
 #: ../src/wx/cmdevents.cpp:821 ../src/wx/cmdevents.cpp:837
 msgid "Select Dot Code file"
-msgstr "Seleccionar archivo de Código de Puntos"
+msgstr "Επιλογή αρχείου Dot Code"
 
 #: ../src/wx/cmdevents.cpp:823 ../src/wx/cmdevents.cpp:839
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr "Código de Puntos e-Reader (*.bin;*.raw)|*.bin;*.raw"
+msgstr "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 
 #: ../src/wx/cmdevents.cpp:858 ../src/wx/cmdevents.cpp:1072
 msgid "Select battery file"
-msgstr "Seleccionar archivo de batería"
+msgstr "Επιλογή αρχείου μπαταρίας"
 
 #: ../src/wx/cmdevents.cpp:859 ../src/wx/cmdevents.cpp:1073
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
-msgstr "Archivo de batería (*.sav)|*.sav|Guardado rápido (*.dat)|*.dat"
+msgstr "Αρχείο μπαταρίας (*.sav)|*.sav|Αποθήκευση Flash (*.dat)|*.dat"
 
 #: ../src/wx/cmdevents.cpp:867
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
-msgstr "La importación de un archivo de batería, borrará todos los juegos guardados (permanentemente después de la siguiente escritura). ¿Quieres continuar?"
+msgstr "Η εισαγωγή αρχείου μπαταρίας θα σβήσει τυχόν αποθηκευμένα παιχνίδια (μόνιμα μετά την επόμενη εγγραφή). Θέλετε να συνεχίσετε;"
 
 #: ../src/wx/cmdevents.cpp:868 ../src/wx/cmdevents.cpp:899
 #: ../src/wx/cmdevents.cpp:1032
 msgid "Confirm import"
-msgstr "Confirmar importación"
+msgstr "Επιβεβαίωση εισαγωγής"
 
 #: ../src/wx/cmdevents.cpp:875 ../src/wx/panel.cpp:363
 #, c-format
 msgid "Loaded battery %s"
-msgstr "Batería cargada %s"
+msgstr "Φορτώθηκε η μπαταρία %s"
 
 #: ../src/wx/cmdevents.cpp:877
 #, c-format
 msgid "Error loading battery %s"
-msgstr "Error cargando batería %s"
+msgstr "Σφάλμα φόρτωσης μπαταρίας %s"
 
 #: ../src/wx/cmdevents.cpp:886
 msgid "Select code file"
-msgstr "Seleccionar archivo de código"
+msgstr "Επιλογή αρχείου κωδικών"
 
 #: ../src/wx/cmdevents.cpp:888
 msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr "Archivo de Código Gameshark (*.spc;*.xpc)|*.spc;*.xpc"
+msgstr "Αρχείο κωδικών Gameshark (*.spc;*.xpc)|*.spc;*.xpc"
 
 #: ../src/wx/cmdevents.cpp:889
 msgid "Gameshark Code File (*.gcf)|*.gcf"
-msgstr "Archivo de Código Gameshark (*.gcf)|*.gcf"
+msgstr "Αρχείο κωδικών Gameshark (*.gcf)|*.gcf"
 
 #: ../src/wx/cmdevents.cpp:898
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
-msgstr "La importación de un archivo de código reemplazará cualquiera de los trucos cargados. ¿Quieres continuar?"
+msgstr "Η εισαγωγή αρχείου κωδικών θα αντικαταστήσει τυχόν φορτωμένους κωδικούς. Θέλετε να συνεχίσετε;"
 
 #: ../src/wx/cmdevents.cpp:918
 #, c-format
 msgid "Cannot open file %s"
-msgstr "No se puede abrir el archivo %s"
+msgstr "Αδυναμία ανοίγματος αρχείου %s"
 
 #: ../src/wx/cmdevents.cpp:931
 #, c-format
 msgid "Unsupported code file %s"
-msgstr "Archivo de código no soportado %s"
+msgstr "Μη υποστηριζόμενο αρχείο κωδικών %s"
 
 #: ../src/wx/cmdevents.cpp:1006
 #, c-format
 msgid "Loaded code file %s"
-msgstr "Archivo de código cargado %s"
+msgstr "Φορτώθηκε το αρχείο κωδικών %s"
 
 #: ../src/wx/cmdevents.cpp:1008
 #, c-format
 msgid "Error loading code file %s"
-msgstr "Error cargando archivo de código %s"
+msgstr "Σφάλμα φόρτωσης αρχείου κωδικών %s"
 
 #: ../src/wx/cmdevents.cpp:1019 ../src/wx/cmdevents.cpp:1101
 msgid "Select snapshot file"
-msgstr "Seleccionar archivo de instantánea"
+msgstr "Επιλογή αρχείου στιγμιότυπου"
 
 #: ../src/wx/cmdevents.cpp:1021
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots "
 "(*.gsv)|*.gsv"
-msgstr "Instantáneas de GS y PAC (*.sps;*.xps)|*.sps;*.xps|Instantáneas de GameShark SP (*.gsv)|*.gsv"
+msgstr "Στυγμιότυπα GS και PAC (*.sps;*.xps)|*.sps;*.xps|Στυγμιότυπα GameShark SP (*.gsv)|*.gsv"
 
 #: ../src/wx/cmdevents.cpp:1022
 msgid "Gameboy Snapshot (*.gbs)|*.gbs"
-msgstr "Instantánea de Gameboy (*.gbs)|*.gbs"
+msgstr "Στυγμιότυπο Gameboy (*.gbs)|*.gbs"
 
 #: ../src/wx/cmdevents.cpp:1031
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
-msgstr "La importación de un archivo de instantánea borrará todos los juegos guardados (permanentemente después de la siguiente escritura). ¿Quieres continuar?"
+msgstr "Η εισαγωγή αρχείου στιγμιότυπου θα σβήσει τυχόν αποθηκευμένα παιχνίδια (μόνιμα μετά την επόμενη εγγραφή). Θέλετε να συνεχίσετε;"
 
 #: ../src/wx/cmdevents.cpp:1059
 #, c-format
 msgid "Loaded snapshot file %s"
-msgstr "Archivo de instantánea cargado %s"
+msgstr "Φορτώθηκε το αρχείο στιγμιότυπου %s"
 
 #: ../src/wx/cmdevents.cpp:1061
 #, c-format
 msgid "Error loading snapshot file %s"
-msgstr "Error cargando archivo de instantánea %s"
+msgstr "Σφάλμα φόρτωσης αρχείου στιγμιότυπου %s"
 
 #: ../src/wx/cmdevents.cpp:1084 ../src/wx/panel.cpp:694
 #, c-format
 msgid "Wrote battery %s"
-msgstr "Batería escrita %s"
+msgstr "Εγγραφή μπαταρίας %s"
 
 #: ../src/wx/cmdevents.cpp:1086 ../src/wx/panel.cpp:696
 #, c-format
 msgid "Error writing battery %s"
-msgstr "Error escribiendo batería %s"
+msgstr "Σφάλμα εγγραφής μπαταρίας %s"
 
 #: ../src/wx/cmdevents.cpp:1095
 msgid "EEPROM saves cannot be exported"
-msgstr "guardados EEPROM no pueden ser exportados"
+msgstr "Δεν είναι δυνατή η εξαγωγή αρχείων αποθήκευσης EEPROM"
 
 #: ../src/wx/cmdevents.cpp:1102
 msgid "Gameshark Snapshot (*.sps)|*.sps"
-msgstr "Instantánea de Gameshark (*.sps)|*.sps"
+msgstr "Στιγμιότυπο Gameshark (*.sps)|*.sps"
 
 #: ../src/wx/cmdevents.cpp:1116
 msgid "Exported from VisualBoyAdvance-M"
-msgstr "Exportado desde VisualBoyAdvance-M"
+msgstr "Εξαγωγή από VisualBoyAdvance-M"
 
 #: ../src/wx/cmdevents.cpp:1128
 #, c-format
 msgid "Saved snapshot file %s"
-msgstr "Archivo de instantánea guardado %s"
+msgstr "Αποθηκεύτηκε το αρχείο στιγμιότυπου %s"
 
 #: ../src/wx/cmdevents.cpp:1130
 #, c-format
 msgid "Error saving snapshot file %s"
-msgstr "Error guardando archivo de instantánea %s"
+msgstr "Σφάλμα αποθήκευσης αρχείου στιγμιότυπου %s"
 
 #: ../src/wx/cmdevents.cpp:1145 ../src/wx/cmdevents.cpp:1230
 #: ../src/wx/cmdevents.cpp:1306 ../src/wx/cmdevents.cpp:1333
 #: ../src/wx/viewers.cpp:555 ../src/wx/viewers.cpp:762
 #: ../src/wx/viewsupt.cpp:1226
 msgid "Select output file"
-msgstr "Seleccionar archivo de salida"
+msgstr "Επιλογή αρχείου εξόδου"
 
 #: ../src/wx/cmdevents.cpp:1146 ../src/wx/viewsupt.cpp:1227
 msgid "PNG images|*.png|BMP images|*.bmp"
-msgstr "imágenes PNG|*.png|imágenes BMP|*.bmp"
+msgstr "Εικόνες PNG|*.png|Εικόνες BMP|*.bmp"
 
 #: ../src/wx/cmdevents.cpp:1171 ../src/wx/sys.cpp:482
 #, c-format
 msgid "Wrote snapshot %s"
-msgstr "Instantánea escrita %s"
+msgstr "Εγγραφή στιγμιότυπου %s"
 
 #: ../src/wx/cmdevents.cpp:1197 ../src/wx/cmdevents.cpp:1273
 msgid " files ("
-msgstr "archivos ("
+msgstr "αρχεία ("
 
 #: ../src/wx/cmdevents.cpp:1334 ../src/wx/cmdevents.cpp:1355
 msgid "VBA Movie files|*.vmv"
-msgstr "Archivos de películas VBA|*.vmv"
+msgstr "Αρχεία VBA Movie|*.vmv"
 
 #: ../src/wx/cmdevents.cpp:1354
 msgid "Select file"
-msgstr "Seleccionar archivo"
+msgstr "Επιλογή αρχείου"
 
 #: ../src/wx/cmdevents.cpp:1505 ../src/wx/cmdevents.cpp:1590
 msgid "Select state file"
-msgstr "Seleccionar archivo de estado"
+msgstr "Επιλογή αρχείου κατάστασης"
 
 #: ../src/wx/cmdevents.cpp:1506 ../src/wx/cmdevents.cpp:1591
 msgid "VisualBoyAdvance saved game files|*.sgm"
-msgstr "Archivos de juego guardado de VisualBoyAdvance|*.sgm"
+msgstr "Αρχεία αποθηκευμένων παιχνιδιών VisualBoyAdvance|*.sgm"
 
 #: ../src/wx/cmdevents.cpp:1826
 msgid "Sound enabled"
-msgstr "Sonido activado"
+msgstr "Ο ήχος ενεργοποιήθηκε"
 
 #: ../src/wx/cmdevents.cpp:1826
 msgid "Sound disabled"
-msgstr "Sonido desactivado"
+msgstr "Ο ήχος απενεργοποιήθηκε"
 
 #: ../src/wx/cmdevents.cpp:1839 ../src/wx/cmdevents.cpp:1853
 #, c-format
 msgid "Volume: %d%%"
-msgstr "Volumen: %d%%"
+msgstr "Ένταση: %d%%"
 
 #: ../src/wx/cmdevents.cpp:1927
 msgid "Set to 0 for pseudo tty"
-msgstr "Establecer a 0 para pseudo tty"
+msgstr "Ορίστε το σε 0 για ψευδο-tty"
 
 #: ../src/wx/cmdevents.cpp:1929
 msgid "Port to wait for connection:"
-msgstr "Puerto para esperar por conexión:"
+msgstr "Θύρα για αναμονή σύνδεσης:"
 
 #: ../src/wx/cmdevents.cpp:1930
 msgid "GDB Connection"
-msgstr "Conexión GDB"
+msgstr "Σύνδεση GDB"
 
 #: ../src/wx/cmdevents.cpp:1983
 #, c-format
 msgid "Waiting for connection at %s"
-msgstr "Esperando por conexión en %s"
+msgstr "Αναμονή για σύνδεση σε %s"
 
 #: ../src/wx/cmdevents.cpp:1991
 #, c-format
 msgid "Waiting for connection on port %d"
-msgstr "Esperando por conexión en puerto %d"
+msgstr "Αναμονή για σύνδεση στη θύρα %d"
 
 #: ../src/wx/cmdevents.cpp:1994
 msgid "Waiting for GDB..."
-msgstr "Esperando por GDB..."
+msgstr "Αναμονή για GDB..."
 
 #: ../src/wx/cmdevents.cpp:2491
 msgid ""
 "This will download and update three GBA No-Intro DAT files.  Do you want to "
 "continue?"
-msgstr "Esto descargará y actualizará tres archivos DAT No-Intro de GBA. ¿Quieres continuar?"
+msgstr "Αυτό θα κατεβάσει και θα ενημερώσει τρία αρχεία DAT GBA No-Intro. Θέλετε να συνεχίσετε;"
 
 #: ../src/wx/cmdevents.cpp:2492
 msgid "Confirm Update"
-msgstr "Confirmar Actualización"
+msgstr "Επιβεβαίωση ενημέρωσης"
 
 #: ../src/wx/cmdevents.cpp:2506
 msgid "There are no new updates at this time."
-msgstr "No hay nuevas actualizaciones en este momento."
+msgstr "Δεν υπάρχουν ενημερώσεις αυτή τη στιγμή."
 
 #: ../src/wx/cmdevents.cpp:2507 ../src/wx/xrc/MainMenu.xrc:632
 msgid "Check for updates"
-msgstr "Comprobar si hay actualizaciones"
+msgstr "Έλεγχος για ενημερώσεις"
 
 #: ../src/wx/cmdevents.cpp:2529
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
-msgstr "Emulador de Nintendo GameBoy (+Color+Advance)"
+msgstr "Εξομοιωτής Nintendo GameBoy (+Color+Advance)."
 
 #: ../src/wx/cmdevents.cpp:2530
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2015 VBA-M development team"
-msgstr "Derechos de autor (C) 1999-2003 Forgotten\nDerechos de autor (C) 2004-2006 equipo de desarrollo VBA\nDerechos de autor (C) 2007-2015 equipo de desarrollo VBA-M"
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2015 VBA-M development team"
 
 #: ../src/wx/cmdevents.cpp:2531
 msgid ""
@@ -431,133 +427,133 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program.  If not, see http://www.gnu.org/licenses ."
-msgstr "Este programa es software libre: puedes redistribuirlo y/o modificarlo\nbajo los términos de Licencia Pública General de GNU como aparece publicado en\nla Fundación de Software Libre (Free Software Foundation), sea la versión 2 de esta Licencia, o\n(según su elección) cualquier versión posterior.\n\nEste programa es distribuido con la esperanza de que será útil,\npero SIN NINGUNA GARANTÍA; sin ni siquiera la garantía implícita de\nCOMERCIALIZACIÓN o APTITUD DE USO PARA UN PROPÓSITO EN PARTICULAR.  Lea\nLa Licencia Pública General de GNU para más detalles.\n\nUsted debería haber recibido una copia de la Licencia General Pública de GNU\njunto con este programa.  En caso contrario, vea http://www.gnu.org/licenses ."
+msgstr "This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses ."
 
 #: ../src/wx/cmdevents.cpp:2781
 msgid "LAN link is already active.  Disable link mode to disconnect."
-msgstr "el enlace LAN ya esta activo. Desactivar modo de enlace para desconectar."
+msgstr "Η σύνδεση LAN είναι ήδη ενεργή. Απενεργοποιήστε τη λειτουργία σύνδεσης για να αποσυνδεθείτε."
 
 #: ../src/wx/cmdevents.cpp:2788
 msgid "Network is not supported in local mode."
-msgstr "La Red no esta soportada en modo local."
+msgstr "Το δίκτυο δεν υποστηρίζεται σε τοπική λειτουργία."
 
 #: ../src/wx/dsound.cpp:99 ../src/wx/dsound.cpp:114
 #, c-format
 msgid "Cannot create DirectSound %08x"
-msgstr "No se puede crear DirectSound %08x"
+msgstr "Αδυναμία δημιουργίας DirectSound %08x"
 
 #: ../src/wx/dsound.cpp:120
 #, c-format
 msgid "Cannot SetCooperativeLevel %08x"
-msgstr "No se puede SetCooperativeLevel %08x"
+msgstr "Αδυναμία SetCooperativeLevel %08x"
 
 #: ../src/wx/dsound.cpp:136
 #, c-format
 msgid "Cannot CreateSoundBuffer %08x"
-msgstr "No se puede CreateSoundBuffer %08x"
+msgstr "Αδυναμία CreateSoundBuffer %08x"
 
 #: ../src/wx/dsound.cpp:156
 #, c-format
 msgid "CreateSoundBuffer(primary) failed %08x"
-msgstr "CreateSoundBuffer(primario) fallido %08x"
+msgstr "Η λειτουργία CreateSoundBuffer(primary) απέτυχε %08x"
 
 #: ../src/wx/dsound.cpp:175
 #, c-format
 msgid "CreateSoundBuffer(secondary) failed %08x"
-msgstr "CreateSoundBuffer(secundario) fallido %08x"
+msgstr "Η λειτουργία CreateSoundBuffer(secondary) απέτυχε %08x"
 
 #: ../src/wx/dsound.cpp:181
 #, c-format
 msgid "dsbSecondary->SetCurrentPosition failed %08x"
-msgstr "dsbSecondary->SetCurrentPosition fallido %08x"
+msgstr "Η λειτουργία dsbSecondary->SetCurrentPosition απέτυχε %08x"
 
 #: ../src/wx/dsound.cpp:208
 #, c-format
 msgid "Cannot Play primary %08x"
-msgstr "No se puede Reproducir primario %08x"
+msgstr "Αδυναμία αναπαραγωγής πρωταρχικού %08x"
 
 #: ../src/wx/dsound.cpp:336
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
-msgstr "dsbSecondary->Lock() fallido: %08x"
+msgstr "Η λειτουργία dsbSecondary->Lock() απέτυχε %08x"
 
 #: ../src/wx/gfxviewers.cpp:1274
 msgid "Select output file and type"
-msgstr "Seleccionar archivo de salida y tipo"
+msgstr "Επιλογή τύπου και αρχείου εξόδου"
 
 #: ../src/wx/gfxviewers.cpp:1275
 msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
-msgstr "Paleta de Windows (*.pal)|*.pal|Paleta de PaintShop (*.pal)|*.pal|Tabla de Adobe Color (*.act)|*.act"
+msgstr "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color Table (*.act)|*.act"
 
 #: ../src/wx/guiinit.cpp:71
 msgid "Start!"
-msgstr "¡Iniciar!"
+msgstr "Έναρξη!"
 
 #: ../src/wx/guiinit.cpp:75 ../src/wx/xrc/NetLink.xrc:86
 msgid "Connect"
-msgstr "Conectar"
+msgstr "Σύνδεση"
 
 #: ../src/wx/guiinit.cpp:91
 msgid "You must enter a valid host name"
-msgstr "Debes ingresar un nombre de host válido"
+msgstr "Πρέπει να εισάγετε ένα έγκυρο όνομα υπολογιστή"
 
 #: ../src/wx/guiinit.cpp:92
 msgid "Host name invalid"
-msgstr "Nombre de host inválido"
+msgstr "Μη έγκυρο όνομα υπολογιστή"
 
 #: ../src/wx/guiinit.cpp:111
 msgid "Waiting for clients..."
-msgstr "Esperando por clientes..."
+msgstr "Αναμονή για συνδέσεις..."
 
 #: ../src/wx/guiinit.cpp:112
 #, c-format
 msgid "Server IP address is: %s\n"
-msgstr "La dirección IP del servidor es: %s\n"
+msgstr "Η διεύθυνση IP του διακομιστή είναι: %s\n"
 
 #: ../src/wx/guiinit.cpp:116
 msgid "Waiting for connection..."
-msgstr "Esperando por conexión..."
+msgstr "Αναμονή για σύνδεση..."
 
 #: ../src/wx/guiinit.cpp:117
 #, c-format
 msgid "Connecting to %s\n"
-msgstr "Conectando a %s \n"
+msgstr "Σύνδεση σε %s\n"
 
 #: ../src/wx/guiinit.cpp:155
 msgid ""
 "Error occurred.\n"
 "Please try again."
-msgstr "Ocurrió un error.\nPor favor intenta de nuevo."
+msgstr "Προέκυψε σφάλμα.\nΠαρακαλούμε δοκιμάστε ξανά."
 
 #: ../src/wx/guiinit.cpp:231 ../src/wx/guiinit.cpp:296
 msgid "Select cheat file"
-msgstr "Seleccionar archivo de truco"
+msgstr "Επιλογή αρχείου κωδικών"
 
 #: ../src/wx/guiinit.cpp:232
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
-msgstr "Listas de trucos VBA (*.clt)|*.clt|listas de trucos CHT (*.cht)|*.cht"
+msgstr "Λίστες κωδικών VBA (*.clt)|*.clt|Λίστες κωδικών CHT (*.cht)|*.cht"
 
 #: ../src/wx/guiinit.cpp:254 ../src/wx/panel.cpp:425
 msgid "Loaded cheats"
-msgstr "Trucos cargados"
+msgstr "Φορτώθηκαν κωδικοί"
 
 #: ../src/wx/guiinit.cpp:297
 msgid "VBA cheat lists (*.clt)|*.clt"
-msgstr "Listas de trucos VBA (*.clt)|*.clt"
+msgstr "Λίστες κωδικών VBA (*.clt)|*.clt"
 
 #: ../src/wx/guiinit.cpp:315
 msgid "Saved cheats"
-msgstr "Trucos guardados"
+msgstr "Αποθηκεύτηκαν κωδικοί"
 
 #: ../src/wx/guiinit.cpp:353 ../src/wx/guiinit.cpp:377
 msgid "Restore old values?"
-msgstr "¿Restaurar valores antiguos?"
+msgstr "Επαναφορά προηγούμενων τιμών;"
 
 #: ../src/wx/guiinit.cpp:354 ../src/wx/guiinit.cpp:378
 msgid "Removing cheats"
-msgstr "Eliminando trucos"
+msgstr "Αφαίρεση κωδικών"
 
 #: ../src/wx/guiinit.cpp:819 ../src/wx/xrc/JoyPanel.xrc:244
 msgid "GameShark"
@@ -565,15 +561,15 @@ msgstr "GameShark"
 
 #: ../src/wx/guiinit.cpp:824
 msgid "Generic Code"
-msgstr "Código Genérico"
+msgstr "Γενικός κωδικός"
 
 #: ../src/wx/guiinit.cpp:825
 msgid "GameShark Advance"
-msgstr "GameShark Avanzado"
+msgstr "GameShark Advance"
 
 #: ../src/wx/guiinit.cpp:826
 msgid "CodeBreaker Advance"
-msgstr "CodeBreaker Avanzado"
+msgstr "CodeBreaker Advance"
 
 #: ../src/wx/guiinit.cpp:827
 msgid "Flashcart CHT"
@@ -581,53 +577,53 @@ msgstr "Flashcart CHT"
 
 #: ../src/wx/guiinit.cpp:889 ../src/wx/guiinit.cpp:1162
 msgid "Number cannot be empty"
-msgstr "El número no puede estar vacío"
+msgstr "Ο αριθμός δεν μπορεί να είναι κενός"
 
 #: ../src/wx/guiinit.cpp:930
 #, c-format
 msgid "Search produced %d results.  Please refine better"
-msgstr "La búsqueda produjo %d resultados. Por favor refinar mejor"
+msgstr "Η αναζήτηση επέστρεψε %d αποτελέσματα. Παρακαλούμε προσδιορίστε καλύτερα"
 
 #: ../src/wx/guiinit.cpp:943
 msgid "Search produced no results"
-msgstr "La búsqueda no produjo resultados"
+msgstr "Η αναζήτηση δεν επέστρεψε αποτελέσματα"
 
 #: ../src/wx/guiinit.cpp:1118
 msgid "8-bit "
-msgstr "8 bits"
+msgstr "8-bit "
 
 #: ../src/wx/guiinit.cpp:1122
 msgid "16-bit "
-msgstr "16 bits"
+msgstr "16-bit "
 
 #: ../src/wx/guiinit.cpp:1126
 msgid "32-bit "
-msgstr "32 bits"
+msgstr "32-bit "
 
 #: ../src/wx/guiinit.cpp:1133
 msgid "signed decimal"
-msgstr "decimal con signo"
+msgstr "προσημασμένος δεκαδικός"
 
 #: ../src/wx/guiinit.cpp:1137
 msgid "unsigned decimal"
-msgstr "decimal sin signo"
+msgstr "μη προσημασμένος δεκαδικός"
 
 #: ../src/wx/guiinit.cpp:1141
 msgid "unsigned hexadecimal"
-msgstr "hexadecimal sin signo"
+msgstr "μη προσημασμένος δεκαεξαδικός"
 
 #: ../src/wx/guiinit.cpp:1631
 #, c-format
 msgid "%d frames = %.2f ms"
-msgstr "%d cuadros = %.2f ms"
+msgstr "%d καρέ = %.2f ms"
 
 #: ../src/wx/guiinit.cpp:1642
 msgid "Default device"
-msgstr "Dispositivo predeterminado"
+msgstr "Προεπιλεγμένη συσκευή"
 
 #: ../src/wx/guiinit.cpp:1782
 msgid "Desktop mode"
-msgstr "Modo escritorio"
+msgstr "Λειτουργία desktop"
 
 #: ../src/wx/guiinit.cpp:1790
 #, c-format
@@ -637,268 +633,268 @@ msgstr "%d x %d - %dbpp @ %dHz"
 #: ../src/wx/guiinit.cpp:1940
 #, c-format
 msgid "No usable rpi plugins found in %s"
-msgstr "No se encontraron complementos rpi usables en %s"
+msgstr "Δεν βρέθηκαν χρήσιμες επεκτάσεις rpi στο %s"
 
 #: ../src/wx/guiinit.cpp:1963 ../src/wx/xrc/DisplayConfig.xrc:242
 msgid "Plugin"
-msgstr "Complemento"
+msgstr "Επέκταση"
 
 #: ../src/wx/guiinit.cpp:1996
 msgid "Please select a plugin or a different filter"
-msgstr "Por favor seleccione un complemento o un filtro diferente"
+msgstr "Επιλέξτε μια επέκταση ή ένα διαφορετικό φίλτρο"
 
 #: ../src/wx/guiinit.cpp:1997
 msgid "Plugin selection error"
-msgstr "Error de selección de complemento"
+msgstr "Σφάλμα επιλογής επέκτασης"
 
 #: ../src/wx/guiinit.cpp:2201
 msgid "This will clear all user-defined accelerators.  Are you sure?"
-msgstr "Esto va a limpiar todos los aceleradores definidos por el usuario. ¿Estás seguro?"
+msgstr "Αυτό θα διαγράψει όλους τους επιταχυντές που ορίστηκαν από τον χρήστη. Είστε σίγουροι;"
 
 #: ../src/wx/guiinit.cpp:2202
 msgid "Confirm"
-msgstr "Confirmar"
+msgstr "Επιβεβαίωση"
 
 #: ../src/wx/guiinit.cpp:2704
 msgid "Main display panel not found"
-msgstr "Panel de pantalla principal no encontrado"
+msgstr "Το πάνελ κύριας προβολής δεν βρέθηκε"
 
 #: ../src/wx/guiinit.cpp:2719
 msgid "Main icon not found"
-msgstr "Icono principal no encontrado"
+msgstr "Το κύριο εικονίδιο δεν βρέθηκε"
 
 #: ../src/wx/guiinit.cpp:2844
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
-msgstr "Duplicar acelerador de menú: %s para %s y %s; manteniendo el primero"
+msgstr "Διπλότυπος επιταχυντής μενού: %s για %s και %s, θα κρατηθεί ο πρώτος"
 
 #: ../src/wx/guiinit.cpp:2861
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
-msgstr "Acelerador de menú %s para %s anula el predeterminado para %s ; manteniendo el primero"
+msgstr "Ο επιταχυντής μενού %s για %s παρακάμπτει την προεπιλογή για %s, διατηρείται το μενού"
 
 #: ../src/wx/guiinit.cpp:2977
 #, c-format
 msgid "Invalid menu item %s; removing"
-msgstr "Elemento del menú inválido %s; eliminando"
+msgstr "Μη έγκυρο αντικείμενο μενού %s, θα αφαιρεθεί"
 
 #: ../src/wx/guiinit.cpp:3158
 msgid "Code"
-msgstr "Código"
+msgstr "Κωδικός"
 
 #: ../src/wx/guiinit.cpp:3167
 msgid "Description"
-msgstr "Descripción"
+msgstr "Περιγραφή"
 
 #: ../src/wx/guiinit.cpp:3241 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
-msgstr "Dirección"
+msgstr "Διεύθυνση"
 
 #: ../src/wx/guiinit.cpp:3242
 msgid "Old Value"
-msgstr "Valor Antiguo"
+msgstr "Προηγούμενη τιμή"
 
 #: ../src/wx/guiinit.cpp:3243
 msgid "New Value"
-msgstr "Valor Nuevo"
+msgstr "Νέα τιμή"
 
 #: ../src/wx/guiinit.cpp:3690
 msgid "Menu commands"
-msgstr "Comandos del menú"
+msgstr "Εντολές μενού"
 
 #: ../src/wx/guiinit.cpp:3717
 msgid "Other commands"
-msgstr "Otros comandos"
+msgstr "Άλλες εντολές"
 
 #: ../src/wx/guiinit.cpp:3834
 msgid "JoyBus host invalid; disabling"
-msgstr "host de JoyBus inválido; desactivando"
+msgstr "Μη έγκυρος JoyBus host, απενεργοποίηση"
 
 #: ../src/wx/openal.cpp:157
 msgid ""
 "OpenAL library could not be found on your system.  Please install the "
 "runtime from http://openal.org"
-msgstr "La librería OpenAL no pudo ser encontrada en su sistema. Por favor instale los tiempos de ejecución desde http://openal.org"
+msgstr "Η βιβλιοθήκη OpenAL δεν βρέθηκε στο σύστημά σας.  Παρακαλούμε εγκαταστήστε το runtime από το http://openal.org"
 
 #: ../src/wx/opts.cpp:510 ../src/wx/opts.cpp:845
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
-msgstr "Valor inválido %s para la opción %s; los valores válidos son %s%s%s"
+msgstr "Μη έγκυρη τιμή %s για την επιλογή %s, οι έγκυρες τιμές είναι %s%s%s"
 
 #: ../src/wx/opts.cpp:543 ../src/wx/opts.cpp:867
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
-msgstr "Valor inválido %d para la opción %s; los valores validos son %d - %d"
+msgstr "Μη έγκυρη τιμή %d για την επιλογή %s, οι έγκυρες τιμές είναι %d - %d"
 
 #: ../src/wx/opts.cpp:611 ../src/wx/opts.cpp:636 ../src/wx/opts.cpp:946
 #: ../src/wx/opts.cpp:975
 #, c-format
 msgid "Invalid key binding %s for %s"
-msgstr "Vinculación de tecla inválida %s para %s"
+msgstr "Μη έγκυρη αντιστοίχιση πλήκτρου %s για %s"
 
 #: ../src/wx/opts.cpp:819
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
-msgstr "Opción de indicador no válido %s - %s ignorado"
+msgstr "Μη έγκυρη επιλογή σημαίας %s - %s αγνοήθηκε"
 
 #: ../src/wx/panel.cpp:76
 #, c-format
 msgid "%s is not a valid ROM file"
-msgstr "%s no es un archivo de ROM válido"
+msgstr "Το %s δεν είναι έγκυρο αρχείο ROM"
 
 #: ../src/wx/panel.cpp:77 ../src/wx/panel.cpp:140 ../src/wx/panel.cpp:223
 msgid "Problem loading file"
-msgstr "Problema cargando archivo"
+msgstr "Πρόβλημα φόρτωσης αρχείου"
 
 #: ../src/wx/panel.cpp:139
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
-msgstr "No se puede cargar ROM de Game Boy %s"
+msgstr "Αδυναμία φόρτωσης Game Boy ROM %s"
 
 #: ../src/wx/panel.cpp:194 ../src/wx/panel.cpp:296
 #, c-format
 msgid "Could not load BIOS %s"
-msgstr "No se puede cargar BIOS %s"
+msgstr "Αδυναμία φόρτωσης BIOS %s"
 
 #: ../src/wx/panel.cpp:222
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
-msgstr "No se puede cargar ROM de Game Boy Advance %s"
+msgstr "Αδυναμία φόρτωσης Game Boy Advance ROM %s"
 
 #: ../src/wx/panel.cpp:461
 msgid " player "
-msgstr "jugador"
+msgstr "παίκτης"
 
 #: ../src/wx/panel.cpp:637
 #, c-format
 msgid "Loaded state %s"
-msgstr "Estado cargado %s"
+msgstr "Φορτώθηκε η κατάσταση %s"
 
 #: ../src/wx/panel.cpp:637
 #, c-format
 msgid "Error loading state %s"
-msgstr "Error cargando estado %s"
+msgstr "Σφάλμα φόρτωσης κατάστασης %s"
 
 #: ../src/wx/panel.cpp:661
 #, c-format
 msgid "Saved state %s"
-msgstr "Estado guardado %s"
+msgstr "Αποθηκεύτηκε η κατάσταση %s"
 
 #: ../src/wx/panel.cpp:661
 #, c-format
 msgid "Error saving state %s"
-msgstr "Error guardando estado %s"
+msgstr "Σφάλμα αποθήκευσης κατάστασης %s"
 
 #: ../src/wx/panel.cpp:867
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
-msgstr "Modo de pantalla completa %dx%d-%d@%d no soportado; buscando algún otro"
+msgstr "Η λειτουργία πλήρους οθόνης %dx%d-%d@%d δεν υποστηρίζεται, αναζήτηση για άλλη"
 
 #: ../src/wx/panel.cpp:908
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
-msgstr "Modo de pantalla completa %dx%d-%d@%d no soportado"
+msgstr "Η λειτουργία πλήρους οθόνης %dx%d-%d@%d δεν υποστηρίζεται"
 
 #: ../src/wx/panel.cpp:913
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
-msgstr "Modo válido: %dx%d-%d@%d"
+msgstr "Έγκυρη λειτουργία: %dx%d-%d@%d"
 
 #: ../src/wx/panel.cpp:923
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
-msgstr "Elegir modo %dx%d-%d@%d"
+msgstr "Επιλέχθηκε η λειτουργία %dx%d-%d@%d"
 
 #: ../src/wx/panel.cpp:928
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
-msgstr "Fallo al cambiar el modo a %dx%d-%d@%d"
+msgstr "Αποτυχία αλλαγής λειτουργίας σε %dx%d-%d@%d"
 
 #: ../src/wx/panel.cpp:997
 msgid "Not a valid GBA cartridge"
-msgstr "No es un cartucho de GBA válido"
+msgstr "Μη έγκυρη κασέτα GBA"
 
 #: ../src/wx/panel.cpp:1122
 msgid "No memory for rewinding"
-msgstr "No hay memoria para rebobinar"
+msgstr "Ελλιπής μνήμη για επανάληψη"
 
 #: ../src/wx/panel.cpp:1132
 msgid "Error writing rewind state"
-msgstr "Error escribiendo estado de rebobinado"
+msgstr "Σφάλμα εγγραφής κατάστασης επανάληψης"
 
 #: ../src/wx/panel.cpp:2343
 msgid "Cannot create conversion buffer"
-msgstr "No se puede crear búfer de conversión"
+msgstr "Αδυναμία δημιουργίας προσωρινής μνήμης μετατροπής"
 
 #: ../src/wx/panel.cpp:2418
 msgid "memory allocation error"
-msgstr "error de asignación de memoria"
+msgstr "σφάλμα κατανομής μνήμης"
 
 #: ../src/wx/panel.cpp:2421
 msgid "error initializing codec"
-msgstr "error inicializando códec"
+msgstr "σφάλμα αρχικοποίησης codec"
 
 #: ../src/wx/panel.cpp:2424
 msgid "error writing to output file"
-msgstr "error escribiendo al archivo de salida"
+msgstr "σφάλμα εγγραφής σε αρχείο εξόδου"
 
 #: ../src/wx/panel.cpp:2427
 msgid "can't guess output format from file name"
-msgstr "no se puede adivinar el formato de salida desde el nombre de archivo"
+msgstr "αδυναμία υπόθεσης μορφής εξόδου από το όνομα αρχείου"
 
 #: ../src/wx/panel.cpp:2432
 msgid "programming error; aborting!"
-msgstr "error programando; ¡abortando!"
+msgstr "προγραμματιστικό σφάλμα, τερματισμός!"
 
 #: ../src/wx/panel.cpp:2445 ../src/wx/panel.cpp:2477
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
-msgstr "No es posible empezar a grabar a %s (%s)"
+msgstr "Αδυναμία έναρξης εγγραφής σε %s (%s)"
 
 #: ../src/wx/panel.cpp:2507
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
-msgstr "Error en la grabación de audio/vídeo (%s); abortando"
+msgstr "Σφάλμα στην εγγραφή ήχου/βίντεο (%s), τερματισμός"
 
 #: ../src/wx/panel.cpp:2514
 #, c-format
 msgid "Error in audio recording (%s); aborting"
-msgstr "Error en la grabación de audio (%s); abortando"
+msgstr "Σφάλμα στην εγγραφή ήχου (%s), τερματισμός"
 
 #: ../src/wx/panel.cpp:2525
 #, c-format
 msgid "Error in video recording (%s); aborting"
-msgstr "Error en la grabación de vídeo (%s); abortando"
+msgstr "Σφάλμα στην εγγραφή βίντεο (%s), τερματισμός"
 
 #: ../src/wx/sys.cpp:124 ../src/wx/sys.cpp:187
 msgid "No game in progress to record"
-msgstr "No hay juego en progreso para grabar"
+msgstr "Δεν υπάρχουν παιχνίδια σε εξέλιξη για εγγραφή"
 
 #: ../src/wx/sys.cpp:139
 #, c-format
 msgid "Cannot open output file %s"
-msgstr "No se puede abrir el archivo de salida %s"
+msgstr "Αδυναμία ανοίγματος αρχείου εξόδου %s"
 
 #: ../src/wx/sys.cpp:147 ../src/wx/sys.cpp:169 ../src/wx/sys.cpp:329
 msgid "Error writing game recording"
-msgstr "Error escribiendo la grabación del juego"
+msgstr "Σφάλμα εγγραφής καταγραφής παιχνιδιού"
 
 #: ../src/wx/sys.cpp:193
 msgid "Cannot play game recording while recording"
-msgstr "No se puede reproducir la grabación de un juego mientras se esta grabando"
+msgstr "Δεν είναι δυνατή η αναπαραγωγή εγγραφής κατά την εγγραφή"
 
 #: ../src/wx/sys.cpp:209
 #, c-format
 msgid "Cannot open recording file %s"
-msgstr "No se puede abrir archivo de grabación %s"
+msgstr "Αδυναμία ανοίγματος αρχείου εγγραφής %s"
 
 #: ../src/wx/sys.cpp:218 ../src/wx/sys.cpp:229
 msgid "Error reading game recording"
-msgstr "Error leyendo grabación del juego"
+msgstr "Σφάλμα ανάγνωσης καταγραφής παιχνιδιού"
 
 #: ../src/wx/sys.cpp:345
 msgid "Playback ended"
-msgstr "Reproducción finalizada"
+msgstr "Η αναπαραγωγή έληξε"
 
 #: ../src/wx/sys.cpp:364
 #, c-format
@@ -912,50 +908,50 @@ msgstr "%d%%"
 
 #: ../src/wx/sys.cpp:818 ../src/wx/xrc/GBPrinter.xrc:65
 msgid "&Discard"
-msgstr "&Descartar"
+msgstr "Απόρριψη"
 
 #: ../src/wx/sys.cpp:852
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
-msgstr "Archivos de imagen (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
+msgstr "Αρχεία εικόνας (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
 #: ../src/wx/sys.cpp:861
 msgid "Save printer image to"
-msgstr "Guardar la imagen de la impresora a"
+msgstr "Αποθήκευση εικόνας εκτυπωτή σε"
 
 #: ../src/wx/sys.cpp:876 ../src/wx/sys.cpp:1073
 #, c-format
 msgid "Wrote printer output to %s"
-msgstr "Salida de la impresora escrita a %s"
+msgstr "Εγγράφηκε η έξοδος εκτυπωτή σε %s"
 
 #: ../src/wx/sys.cpp:882 ../src/wx/sys.cpp:955
 msgid "&Close"
-msgstr "&Cerrar"
+msgstr "Κλείσιμο"
 
 #: ../src/wx/sys.cpp:949
 msgid "Printed"
-msgstr "Impreso"
+msgstr "Εκτπώθηκε"
 
 #: ../src/wx/sys.cpp:1267
 #, c-format
 msgid "Error opening pseudo tty: %s"
-msgstr "Error abriendo pseudo tty: %s"
+msgstr "Σφάλμα ανοίγματος ψευδο-tty: %s"
 
 #: ../src/wx/sys.cpp:1366
 #, c-format
 msgid "Error setting up server socket (%d)"
-msgstr "Error configurando el enchufe del servidor (%d)"
+msgstr "Σφάλμα ρύθμισης θύρας διακομιστή (%d)"
 
 #: ../src/wx/viewers.cpp:553
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
-msgstr "Archivos de texto (*.txt;*.log)|*.txt;*.log|"
+msgstr "Αρχεία κειμένου (*.txt;*.log)|*.txt;*.log|"
 
 #: ../src/wx/viewers.cpp:688 ../src/wx/viewers.cpp:760
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
-msgstr "Volcados de memoria (*.dmp;*.bin)|*.dmp;*.bin|"
+msgstr "Απωτυπώσεις μνήμης (*.dmp;*.bin)|*.dmp;*.bin|"
 
 #: ../src/wx/viewers.cpp:690
 msgid "Select memory dump file"
-msgstr "Seleccionar archivo de volcado de memoria"
+msgstr "Επιλογή αρχείου αποτύπωσης μνήμης"
 
 #: ../src/wx/viewers.cpp:803
 msgid "0x00000000 - BIOS"
@@ -975,7 +971,7 @@ msgstr "0x04000000 - I/O"
 
 #: ../src/wx/viewers.cpp:807
 msgid "0x05000000 - PALETTE"
-msgstr "0x05000000 - PALETA"
+msgstr "0x05000000 - PALETTE"
 
 #: ../src/wx/viewers.cpp:808
 msgid "0x06000000 - VRAM"
@@ -1039,67 +1035,67 @@ msgstr "vbam"
 
 #: ../src/wx/wxvbam.cpp:322
 msgid "Could not create main window"
-msgstr "No se puede crear la ventana principal"
+msgstr "Αδυναμία δημιουργίας κεντρικού παραθύρου"
 
 #: ../src/wx/wxvbam.cpp:354
 msgid "Save built-in XRC file and exit"
-msgstr "Guardar el archivo XRC integrado y salir"
+msgstr "Αποθήκευση ενσωματωμένου αρχείου XRC και έξοδος"
 
 #: ../src/wx/wxvbam.cpp:358
 msgid "Save built-in vba-over.ini and exit"
-msgstr "Guardar vba-over.ini integrado y salir"
+msgstr "Αποθήκευση του ενσωματωμένου vba-over.ini και έξοδος"
 
 #: ../src/wx/wxvbam.cpp:362
 msgid "Print configuration path and exit"
-msgstr "Imprimir ruta de configuración y salir"
+msgstr "Εκτύπωση διαδρομής ρυθμίσεων και έξοδος"
 
 #: ../src/wx/wxvbam.cpp:366
 msgid "Start in full-screen mode"
-msgstr "Iniciar en modo pantalla completa"
+msgstr "Έναρξη σε λειτουργία πλήρους οθόνης"
 
 #: ../src/wx/wxvbam.cpp:371
 msgid "Delete shared link state first, if it exists"
-msgstr "Borrar estado de enlace compartido primero, si este existe"
+msgstr "Διαγραφή κατάστασης κοινής σύνδεσης πρώτα, εάν υπάρχει"
 
 #: ../src/wx/wxvbam.cpp:379
 msgid "List all settable options and exit"
-msgstr "Listar todas las opciones ajustables y salir"
+msgstr "Εμφάνιση όλων των επιλογών προς ρύθμιση και έξοδος"
 
 #: ../src/wx/wxvbam.cpp:383
 msgid "ROM file"
-msgstr "Archivo ROM"
+msgstr "Αρχείο ROM"
 
 #: ../src/wx/wxvbam.cpp:387
 msgid "<config>=<value>"
-msgstr "<configuración>=<valor>"
+msgstr "<config>=<value>"
 
 #: ../src/wx/wxvbam.cpp:421
 msgid "Configuration/build error: can't find built-in xrc"
-msgstr "Error de configuración/construcción: no se puede encontrar el xrc integrado"
+msgstr "Σφάλμα ρύθμισης/δημιουργίας: αδυναμία εύρεσης ενσωματωμένου xrc"
 
 #: ../src/wx/wxvbam.cpp:429
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr "Configuración integrada escrita a %s.\nPara anular, eliminar todo menos los nodo(s) de raíz cambiados. El primer nodo de raíz encontrado con nombre correcto en cualquier archivo .xrc o .xrs en la siguiente ruta de búsqueda sobrescribirá la integrada:"
+msgstr "Έγινε εγγραφή της ενσωματωμένης διαμόρφωσης στο %s.\nΓια παράκαμψη. αφαιρέστε όλους τους ριζικούς κόμβους εκτός από τους αλλαγμένους. Ο πρώτος ριζικός κόμβος που θα βρεθεί με σωστό όνομα σε αρχεία .xrc ή .xrs στην ακόλουθη διαδρομή αναζήτησης θα παρακάμψει τον ενσωματωμένο:"
 
 #: ../src/wx/wxvbam.cpp:444
 msgid "Configuration is read from, in order:"
-msgstr "La configuración es leída desde, en orden:"
+msgstr "Οι ρυθμίσεις διαβάζονται από, κατά σειρά:"
 
 #: ../src/wx/wxvbam.cpp:458
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
-msgstr "Archivo de anulación integrada escrito a %s\nPara anular, borrar todo menos la sección cambiada. La primera sección encontrada es usada desde la ruta de búsqueda:"
+msgstr "Εγγραφή ενσωματωμένου αρχείου παρακάμψεων σε %s\nΓια παράκαμψη, διαγράψτε τα πάντα εκτός από το τμήμα με αλλαγές. Το πρώτο τμήμα που θα βρεθεί χρησιμοποιείται από τη διαδρομή αναζήτησης:"
 
 #: ../src/wx/wxvbam.cpp:463
 msgid ""
 "\n"
 "\tbuilt-in"
-msgstr "\n\tintegrado"
+msgstr "\n\tενσωματωμένο"
 
 #: ../src/wx/wxvbam.cpp:475
 msgid ""
@@ -1107,70 +1103,70 @@ msgid ""
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr "Las opciones establecidas desde la línea de comandos son guardadas si algunos cambios de configuración son realizados en la interfaz de usuario.\n\nPara opciones de indicador, verdadero y falso son especificados como 1 y 0, respectivamente.\n\n"
+msgstr "Οι επιλογές που ορίζονται από τη γραμμή εντολών αποθηκεύονται εάν γίνουν αλλαγές διαμόρφωσης στη διεπαφή χρήστη.\n\nΓια επιλογές σημαιών, τα «αληθές» και «ψευδές» ορίζονται με 1 και 0 αντίστοιχα.\n\n"
 
 #: ../src/wx/wxvbam.cpp:502
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
-msgstr "Los comandos disponibles para el Teclado/* opción son:\n\n"
+msgstr "Οι διαθέσιμες εντολές για την επιλογή Πληκτρολόγιο/* είναι:\n\n"
 
 #: ../src/wx/wxvbam.cpp:552
 msgid "Bad configuration option or multiple ROM files given:\n"
-msgstr "Mal opción de configuración o múltiples archivos ROM dados:\n"
+msgstr "Λάθος επιλογή διαμόρφωσης ή πολλά δοθέντα αρχεία ROM:\n"
 
 #: ../src/wx/wxvbam.cpp:773
 msgid ""
 "Online updates are available on Windows only. Please browse this site for updates.\n"
 "\n"
 "https://sourceforge.net/projects/vbam/files/latest/download"
-msgstr "Las actualizaciones en línea están disponibles sólo en Windows. Por favor navega este sitio para las actualizaciones.\n\nhttps://sourceforge.net/projects/vbam/files/latest/download"
+msgstr "Οι διαδικτυακές ενημερώσεις είναι διαθέσιμες μόνο στα Windows. Παρακαλούμε περιηγηθείτε σε αυτή την ιστοσελίδα για ενημερώσεις.\n\nhttps://sourceforge.net/projects/vbam/files/latest/download"
 
 #: ../src/wx/wxvbam.cpp:774
 msgid "Online Update"
-msgstr "Actualización en Línea"
+msgstr "Διαδικτυακή ενημέρωση"
 
 #: ../src/wx/wxvbam.cpp:788
 msgid ""
 "A new update is available. To update, VisualBoyAdvance-M must be Run as administrator. Would you like to download and update VisualBoyAdvance-M?\n"
 "\n"
 "https://sourceforge.net/projects/vbam/files/latest/download"
-msgstr "Una nueva actualización esta disponible. Para actualizar, VisualBoyAdvance-M debe estar ejecutado como administrador. ¿Quieres descargar y actualizar VisualBoyAdvance-M?\n\nhttps://sourceforge.net/projects/vbam/files/latest/download"
+msgstr "Μια νέα ενημέρωση είναι διαθέσιμη. Για να την εγκαταστήσετε, πρέπει να εκτελείτε το VisualBoyAdvance-M ως διαχειριστής. Θέλετε να κατεβάσετε και να εγκαταστήσετε την ενημέρωση του VisualBoyAdvance-M;\n\nhttps://sourceforge.net/projects/vbam/files/latest/download"
 
 #: ../src/wx/wxvbam.cpp:789
 msgid "New Update Available"
-msgstr "Nueva Actualización Disponible"
+msgstr "Νέα ενημέρωση διαθέσιμη"
 
 #: ../src/wx/wxvbam.cpp:795
 msgid ""
 "The update has been downloaded and installed.  Please restart "
 "VisualBoyAdvance-M."
-msgstr "La actualización ha sido descargada e instalada. Por favor reinicia VisualBoyAdvance-M."
+msgstr "Η ενημέρωση λήφθηκε και εγκαταστάθηκε. Παρακαλούμε επανεκκινήστε το VisualBoyAdvance-M."
 
 #: ../src/wx/wxvbam.cpp:796
 msgid "Update Downloaded"
-msgstr "Actualización Descargada"
+msgstr "Έγινε λήψη της ενημερώσης"
 
 #: ../src/wx/xaudio2.cpp:32
 msgid "XAudio2: Enumerating devices failed!"
-msgstr "XAudio2: ¡Enumerando dispositivos fallido!"
+msgstr "XAudio2: Η απαρίθμηση συσκευών απέτυχε!"
 
 #: ../src/wx/xaudio2.cpp:75 ../src/wx/xaudio2.cpp:379
 msgid "The XAudio2 interface failed to initialize!"
-msgstr "¡La interfaz XAudio2 fallo al inicializar!"
+msgstr "Αποτυχία αρχικοποίησης διεπαφής XAudio2!"
 
 #: ../src/wx/xaudio2.cpp:411
 msgid "XAudio2: Creating mastering voice failed!"
-msgstr "XAudio2: ¡Creando masterización de voz fallido!"
+msgstr "XAudio2: Η δημιουργία κύριας φωνής απέτυχε!"
 
 #: ../src/wx/xaudio2.cpp:421
 msgid "XAudio2: Creating source voice failed!"
-msgstr "XAudio2: ¡Creando fuente de voz fallido!"
+msgstr "XAudio2: Η δημιουργία πηγαίας φωνής απέτυχε!"
 
 #: ../src/wx/viewsupt.h:39
 #, c-format
 msgid "Unable to load dialog %s from resources"
-msgstr "No se puede leer el dialogo %s desde los recursos"
+msgstr "Αδυναμία φόρτωσης παραθύρου %s από τις πηγές"
 
 #: ../src/wx/widgets/joyedit.cpp:100
 #, c-format
@@ -1180,57 +1176,57 @@ msgstr "Joy%d-"
 #: ../src/wx/widgets/joyedit.cpp:106
 #, c-format
 msgid "Axis%d+"
-msgstr "Eje%d+"
+msgstr "Άξονας%d+"
 
 #: ../src/wx/widgets/joyedit.cpp:110
 #, c-format
 msgid "Axis%d-"
-msgstr "Eje%d-"
+msgstr "Άξονας%d-"
 
 #: ../src/wx/widgets/joyedit.cpp:114
 #, c-format
 msgid "Button%d"
-msgstr "Botón%d"
+msgstr "Κουμπί%d"
 
 #: ../src/wx/widgets/joyedit.cpp:118
 #, c-format
 msgid "Hat%dN"
-msgstr "Hat%dN"
+msgstr "Hat%dΒ"
 
 #: ../src/wx/widgets/joyedit.cpp:122
 #, c-format
 msgid "Hat%dS"
-msgstr "Hat%dS"
+msgstr "Hat%dΝ"
 
 #: ../src/wx/widgets/joyedit.cpp:126
 #, c-format
 msgid "Hat%dW"
-msgstr "Hat%dW"
+msgstr "Hat%dΔ"
 
 #: ../src/wx/widgets/joyedit.cpp:130
 #, c-format
 msgid "Hat%dE"
-msgstr "Hat%dE"
+msgstr "Hat%dΑ"
 
 #: ../src/wx/widgets/joyedit.cpp:134
 #, c-format
 msgid "Hat%dNW"
-msgstr "Hat%dNW"
+msgstr "Hat%dΒΔ"
 
 #: ../src/wx/widgets/joyedit.cpp:138
 #, c-format
 msgid "Hat%dNE"
-msgstr "Hat%dNE"
+msgstr "Hat%dΒΑ"
 
 #: ../src/wx/widgets/joyedit.cpp:142
 #, c-format
 msgid "Hat%dSW"
-msgstr "Hat%dSW"
+msgstr "Hat%dΝΔ"
 
 #: ../src/wx/widgets/joyedit.cpp:146
 #, c-format
 msgid "Hat%dSE"
-msgstr "Hat%dSE"
+msgstr "Hat%dΝΑ"
 
 #: ../src/wx/widgets/joyedit.cpp:180
 msgid "^Joy([0-9]+)[-+]"
@@ -1238,16 +1234,16 @@ msgstr "^Joy([0-9]+)[-+]"
 
 #: ../src/wx/widgets/joyedit.cpp:182
 msgid "Axis([0-9]+)([+-])"
-msgstr "Eje([0-9]+)([+-])"
+msgstr "Άξονας([0-9]+)([+-])"
 
 #: ../src/wx/widgets/joyedit.cpp:184
 msgid "Button([0-9]+)"
-msgstr "Botón([0-9]+)"
+msgstr "Κουμπί([0-9]+)"
 
 #: ../src/wx/widgets/joyedit.cpp:187
 msgid ""
 "Hat([0-9]+)((N|North|U|Up)|(S|South|D|Down)|(E|East|R|Right)|(W|West|L|Left)|(NE|NorthEast|UR|UpRight)|(SE|SouthEast|DR|DownRight)|(SW|SouthWest|DL|DownLeft)|(NW|NorthWest|UL|UpLeft))"
-msgstr "Hat([0-9]+)((N|Norte|U|Arriba)|(S|Sur|D|Abajo)|(E|Este|R|Derecha)|(W|Oeste|L|Izquierda)|(NE|Nordeste|UR|ArribaDerecha)|(SE|Sudeste|DR|AbajoDerecha)|(SW|Suroeste|DL|AbajoIzquierda)|(NW|Noroeste|UL|ArribaIzquierda))"
+msgstr "Κουμπί([0-9]+)((Β|Βόρεια|Π|Πάνω)|(Ν|Νότια|Κ|Κάτω)|(Α|Ανατολικά|Δ|Δεξιά)|(Δ|Δυτικά|Α|Αριστερά)|(ΒΑ|ΒορειοΑνατολικά|ΠΔ|Πάνω δεξιά)|(ΝΑ|ΝοτιοΑνατολικά|ΚΔ|Κάτω Δεξιά)|(ΝΔ|ΝοτιοΔυτικά|ΚΑ|Κάτω Αριστερά)|(ΒΔ|ΒορειοΔυτικά|ΠΑ|Πάνω Αριστερά))"
 
 #: ../src/wx/widgets/keyedit.cpp:100 ../src/wx/widgets/keyedit.cpp:206
 msgid "SHIFT"
@@ -1275,99 +1271,99 @@ msgstr "CONTROL"
 
 #: ../src/wx/xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
-msgstr "Atajos de Tecla"
+msgstr "Συντομεύσεις πλήκτρων"
 
 #: ../src/wx/xrc/AccelConfig.xrc:13
 msgid "Co&mmands:"
-msgstr "Co&mandos:"
+msgstr "Εντολές:"
 
 #: ../src/wx/xrc/AccelConfig.xrc:34
 msgid "Current Keys:"
-msgstr "Teclas Actuales:"
+msgstr "Τρέχοντα πλήκτρα:"
 
 #: ../src/wx/xrc/AccelConfig.xrc:53
 msgid "&Assign"
-msgstr "&Asignar"
+msgstr "Ορισμός"
 
 #: ../src/wx/xrc/AccelConfig.xrc:60
 msgid "&Remove"
-msgstr "&Eliminar"
+msgstr "Αφαίρεση"
 
 #: ../src/wx/xrc/AccelConfig.xrc:67
 msgid "Re&set All"
-msgstr "Re&iniciar Todo"
+msgstr "Επαναφορά όλων"
 
 #: ../src/wx/xrc/AccelConfig.xrc:81
 msgid "Currently assigned to:"
-msgstr "Actualmente asignada a:"
+msgstr "Τρέχον ορισμός σε:"
 
 #: ../src/wx/xrc/AccelConfig.xrc:96
 msgid "Shortcut Key:"
-msgstr "Atajo de Tecla:"
+msgstr "Πλήκτρο συντόμευσης:"
 
 #: ../src/wx/xrc/CheatAdd.xrc:4
 msgid "Add Cheat"
-msgstr "Agregar Truco"
+msgstr "Προσθήκη κωδικού"
 
 #: ../src/wx/xrc/CheatAdd.xrc:9 ../src/wx/xrc/CheatEdit.xrc:9
 msgid "&Description"
-msgstr "&Descripción"
+msgstr "Περιγραφή"
 
 #: ../src/wx/xrc/CheatAdd.xrc:53
 msgid "&Value"
-msgstr "&Valor"
+msgstr "Τιμή"
 
 #: ../src/wx/xrc/CheatAdd.xrc:77
 msgid "Format"
-msgstr "Formato"
+msgstr "Μορφή"
 
 #: ../src/wx/xrc/CheatCreate.xrc:4
 msgid "Cheat Search"
-msgstr "Buscar Truco"
+msgstr "Αναζήτηση κωδικών"
 
 #: ../src/wx/xrc/CheatCreate.xrc:23
 msgid "E&qual"
-msgstr "I&gual"
+msgstr "Ίσο"
 
 #: ../src/wx/xrc/CheatCreate.xrc:31
 msgid "&Not equal"
-msgstr "&No es igual"
+msgstr "Όχι ίσο"
 
 #: ../src/wx/xrc/CheatCreate.xrc:38
 msgid "&Less than"
-msgstr "&Menos que"
+msgstr "Μικρότερο από"
 
 #: ../src/wx/xrc/CheatCreate.xrc:45
 msgid "L&ess or equal"
-msgstr "M&enos o igual"
+msgstr "Μικρότερο ή ίσο"
 
 #: ../src/wx/xrc/CheatCreate.xrc:52
 msgid "&Greater than"
-msgstr "&Mayor que"
+msgstr "Μεγαλύτερο από"
 
 #: ../src/wx/xrc/CheatCreate.xrc:59
 msgid "G&reater or equal"
-msgstr "M&ayor o igual"
+msgstr "Μεγαλύτερο ή ίσο"
 
 #: ../src/wx/xrc/CheatCreate.xrc:64
 msgid "Compare type"
-msgstr "Comparar tipo"
+msgstr "Σύγκριση τύπου"
 
 #: ../src/wx/xrc/CheatCreate.xrc:77
 msgid "S&igned"
-msgstr "Con S&igno"
+msgstr "Προσημασμένος"
 
 #: ../src/wx/xrc/CheatCreate.xrc:85
 msgid "&Unsigned"
-msgstr "&Sin Signo"
+msgstr "Μη προσημασμένος"
 
 #: ../src/wx/xrc/CheatCreate.xrc:92
 msgid "&Hexadecimal"
-msgstr "&Hexadecimal"
+msgstr "Δεκαεξαδικός"
 
 #: ../src/wx/xrc/CheatCreate.xrc:97
 msgid "Signed/Unsigned"
-msgstr "Con Signo/Sin Signo"
+msgstr "Προσημασμένος/Μη προσημασμένος"
 
 #: ../src/wx/xrc/CheatCreate.xrc:107
 msgid "&8 bits"
@@ -1383,122 +1379,122 @@ msgstr "&32 bits"
 
 #: ../src/wx/xrc/CheatCreate.xrc:127
 msgid "Data size"
-msgstr "Tamaño de datos"
+msgstr "Μέγεθος δεδομένων"
 
 #: ../src/wx/xrc/CheatCreate.xrc:144
 msgid "Ol&d value"
-msgstr "Valor an&tiguo"
+msgstr "Προηγούμενη τιμή"
 
 #: ../src/wx/xrc/CheatCreate.xrc:152
 msgid "Specific &value"
-msgstr "&Valor especifico"
+msgstr "Συγκεκριμένη τιμή"
 
 #: ../src/wx/xrc/CheatCreate.xrc:163
 msgid "Search value"
-msgstr "Valor de búsqueda"
+msgstr "Αναζήτηση τιμής"
 
 #: ../src/wx/xrc/CheatCreate.xrc:181
 msgid "&Search"
-msgstr "&Buscar"
+msgstr "Αναζήτηση"
 
 #: ../src/wx/xrc/CheatCreate.xrc:188
 msgid "U&pdate Old"
-msgstr "A&ctualizar antiguo"
+msgstr "Ενημέρωση προηγούμενων"
 
 #: ../src/wx/xrc/CheatCreate.xrc:195 ../src/wx/xrc/Logging.xrc:119
 msgid "&Clear"
-msgstr "&Limpiar"
+msgstr "Εκκαθάριση"
 
 #: ../src/wx/xrc/CheatCreate.xrc:202
 msgid "&Add cheat"
-msgstr "&Agregar truco"
+msgstr "Προσθήκη κωδικού"
 
 #: ../src/wx/xrc/CheatEdit.xrc:4
 msgid "Edit Cheat"
-msgstr "Editar Truco"
+msgstr "Επεξεργασία κωδικού"
 
 #: ../src/wx/xrc/CheatEdit.xrc:31 ../src/wx/xrc/MainMenu.xrc:275
 msgid "&Type"
-msgstr "&Tipo"
+msgstr "Τύπος"
 
 #: ../src/wx/xrc/CheatEdit.xrc:53
 msgid "C&odes"
-msgstr "C&ódigos"
+msgstr "Κωδικοί"
 
 #: ../src/wx/xrc/CheatList.xrc:4
 msgid "Cheat List"
-msgstr "Lista de Trucos"
+msgstr "Λίστα κωδικών"
 
 #: ../src/wx/xrc/CheatList.xrc:11
 msgid "Open cheat list"
-msgstr "Abrir lista de trucos"
+msgstr "Άνοιγμα λίστας κωδικών"
 
 #: ../src/wx/xrc/CheatList.xrc:15
 msgid "Save cheat list"
-msgstr "Guardar lista de trucos"
+msgstr "Αποθήκευση λίστας κωδικών"
 
 #: ../src/wx/xrc/CheatList.xrc:20
 msgid "Add new cheat"
-msgstr "Agregar nuevo truco"
+msgstr "Προσθήκη νέου κωδικού"
 
 #: ../src/wx/xrc/CheatList.xrc:24
 msgid "Delete selected cheat"
-msgstr "Borrar truco seleccionado"
+msgstr "Διαγραφή επιλεγμένου κωδικού"
 
 #: ../src/wx/xrc/CheatList.xrc:29
 msgid "Delete all cheats"
-msgstr "Borrar todos los trucos"
+msgstr "Διαγραφή όλων των κωδικών"
 
 #: ../src/wx/xrc/CheatList.xrc:35
 msgid "Toggle all Cheats"
-msgstr "Activar todos los Trucos"
+msgstr "Εναλλαγή όλων των κωδικών"
 
 #: ../src/wx/xrc/DirectoriesConfig.xrc:4
 msgid "Directories"
-msgstr "Directorios"
+msgstr "Φάκελοι"
 
 #: ../src/wx/xrc/DirectoriesConfig.xrc:11
 #: ../src/wx/xrc/DirectoriesConfig.xrc:18
 msgid "Game Boy Advance ROMs"
-msgstr "ROMs de Game Boy Advance"
+msgstr "Game Boy Advance ROMs"
 
 #: ../src/wx/xrc/DirectoriesConfig.xrc:27
 #: ../src/wx/xrc/DirectoriesConfig.xrc:34
 msgid "Game Boy ROMs"
-msgstr "ROMs de Game Boy"
+msgstr "Game Boy ROMs"
 
 #: ../src/wx/xrc/DirectoriesConfig.xrc:42
 #: ../src/wx/xrc/DirectoriesConfig.xrc:49
 msgid "Game Boy Color ROMs"
-msgstr "ROMs de Game Boy Color"
+msgstr "Game Boy Color ROMs"
 
 #: ../src/wx/xrc/DirectoriesConfig.xrc:57
 #: ../src/wx/xrc/DirectoriesConfig.xrc:64
 msgid "Native Saves"
-msgstr "Guardados Nativos"
+msgstr "Κλασικά αρχεία αποθήκευσης"
 
 #: ../src/wx/xrc/DirectoriesConfig.xrc:72
 #: ../src/wx/xrc/DirectoriesConfig.xrc:79
 msgid "Emulator Saves"
-msgstr "Guardados del Emulador"
+msgstr "Αρχεία αποθήκευσης εξομοιωτή"
 
 #: ../src/wx/xrc/DirectoriesConfig.xrc:87
 #: ../src/wx/xrc/DirectoriesConfig.xrc:94
 msgid "Screenshots"
-msgstr "Capturas de pantalla"
+msgstr "Φωτογραφίες"
 
 #: ../src/wx/xrc/DirectoriesConfig.xrc:102
 #: ../src/wx/xrc/DirectoriesConfig.xrc:109
 msgid "Recordings"
-msgstr "Grabaciones"
+msgstr "Εγγραφές"
 
 #: ../src/wx/xrc/Disassemble.xrc:4
 msgid "Disassemble"
-msgstr "Desensamblar"
+msgstr "Αποσυναρμολόγηση"
 
 #: ../src/wx/xrc/Disassemble.xrc:15
 msgid "&Automatic"
-msgstr "&Automático"
+msgstr "Αυτόματα"
 
 #: ../src/wx/xrc/Disassemble.xrc:23
 msgid "A&RM"
@@ -1511,7 +1507,7 @@ msgstr "&THUMB"
 #: ../src/wx/xrc/Disassemble.xrc:45 ../src/wx/xrc/GBDisassemble.xrc:18
 #: ../src/wx/xrc/MemViewer.xrc:47
 msgid "&Go"
-msgstr "&Go"
+msgstr "Μετάβαση"
 
 #: ../src/wx/xrc/Disassemble.xrc:73
 msgid "R0:"
@@ -1624,7 +1620,7 @@ msgstr "V"
 #: ../src/wx/xrc/Disassemble.xrc:414 ../src/wx/xrc/MapViewer.xrc:76
 #: ../src/wx/xrc/OAMViewer.xrc:37
 msgid "Mode:"
-msgstr "Modo:"
+msgstr "Λειτουργία:"
 
 #: ../src/wx/xrc/Disassemble.xrc:424 ../src/wx/xrc/GBDisassemble.xrc:172
 msgid "00"
@@ -1636,79 +1632,79 @@ msgstr "00"
 #: ../src/wx/xrc/MemViewer.xrc:72 ../src/wx/xrc/OAMViewer.xrc:109
 #: ../src/wx/xrc/PaletteViewer.xrc:81 ../src/wx/xrc/TileViewer.xrc:91
 msgid "Automatic &update"
-msgstr "&Actualización automática"
+msgstr "Αυτόματη ενημέρωση"
 
 #: ../src/wx/xrc/Disassemble.xrc:453 ../src/wx/xrc/GBDisassemble.xrc:222
 msgid "G&oto PC"
-msgstr "&Ir a PC"
+msgstr "Μετάβαση σε PC"
 
 #: ../src/wx/xrc/Disassemble.xrc:460 ../src/wx/xrc/GBDisassemble.xrc:229
 msgid "Re&fresh"
-msgstr "Ac&tualizar"
+msgstr "Ανανέωση"
 
 #: ../src/wx/xrc/Disassemble.xrc:467 ../src/wx/xrc/GBDisassemble.xrc:236
 msgid "&Next"
-msgstr "&Siguiente"
+msgstr "Επόμενο"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:4
 msgid "Display settings"
-msgstr "Ajustes de pantalla"
+msgstr "Ρυθμίσεις οθόνης"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:15
 msgid "Frame Skip"
-msgstr "Salto de Cuadro"
+msgstr "Παράλειψη καρέ"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:33
 msgid "&Number of frames to skip :"
-msgstr "&Número de cuadros a saltar :"
+msgstr "Αριθμός καρέ για παράλειψη :"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:55
 msgid "Speed"
-msgstr "Velocidad"
+msgstr "Ταχύτητα"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:71
 msgid "Speed indicator :"
-msgstr "Indicador de velocidad :"
+msgstr "Ένδειξη ταχύτητας :"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:78
 msgid "Percentage"
-msgstr "Porcentaje"
+msgstr "Ποσοστό"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:79
 msgid "Detailed"
-msgstr "Detallado"
+msgstr "Λεπτομερής"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:93
 msgid "On-Screen Display"
-msgstr "Visualización en Pantalla"
+msgstr "Ένδειξη οθόνης"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:103
 msgid "Default magnification :"
-msgstr "Magnificación predeterminada :"
+msgstr "Προεπιλεγμένη μεγέθυνση :"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:124
 msgid "Maximum magnification factor :"
-msgstr "Factor de magnificación máximo :"
+msgstr "Μέγιστος συντελεστής μεγέθυνσης :"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:125
 msgid "0 = no maximum"
-msgstr "0 = sin máximo"
+msgstr "0 = χωρίς μέγιστο"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:133
 msgid "0 = no limit"
-msgstr "0 = sin limite"
+msgstr "0 = χωρίς όριο"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:143
 msgid "Zoom"
-msgstr "Ampliar"
+msgstr "Ζουμ"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:151
 msgid "Output module"
-msgstr "Modulo de salida"
+msgstr "Μονάδα εξόδου"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:169
 msgid "Simple"
-msgstr "Simple"
+msgstr "Απλή"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:176
 msgid "OpenGL"
@@ -1724,11 +1720,11 @@ msgstr "Cairo"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:201
 msgid "Filters"
-msgstr "Filtros"
+msgstr "Φίλτρα"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:215
 msgid "Fullscreen filter :"
-msgstr "Filtro de pantalla completa :"
+msgstr "Φίλτρο πλήρους οθόνης :"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:222
 msgid "2xSaI"
@@ -1736,15 +1732,15 @@ msgstr "2xSaI"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:223
 msgid "Super 2xSaI"
-msgstr "Súper 2xSaI"
+msgstr "Super 2xSaI"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:224
 msgid "Super Eagle"
-msgstr "Súper Eagle"
+msgstr "Super Eagle"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:225
 msgid "Pixelate"
-msgstr "Pixelizar"
+msgstr "Pixelate"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:226
 msgid "Advance MAME Scale2x"
@@ -1752,11 +1748,11 @@ msgstr "Advance MAME Scale2x"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:227
 msgid "Bilinear"
-msgstr "Bilineal"
+msgstr "Bilinear"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:228
 msgid "Bilinear Plus"
-msgstr "Bilineal Plus"
+msgstr "Bilinear Plus"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:229
 msgid "Scanlines"
@@ -1764,7 +1760,7 @@ msgstr "Scanlines"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:230
 msgid "TV Mode"
-msgstr "Modo TV"
+msgstr "TV Mode"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:231
 msgid "HQ 2x"
@@ -1812,55 +1808,55 @@ msgstr "xBRZ 5x"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:250
 msgid "Plugin :"
-msgstr "Complemento :"
+msgstr "Επέκταση :"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:262
 msgid "Interframe blending :"
-msgstr "Mezcla de cuadros-intermedios :"
+msgstr "Παρεμβολή καρέ :"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:271
 msgid "Smart interframe blending"
-msgstr "Mezcla inteligente de cuadros-intermedios"
+msgstr "Έξυπνη παρεμβολή καρέ"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:272
 msgid "Interframe motion blur"
-msgstr "Desenfoque de movimiento de cuadros-intermedios"
+msgstr "Θαμπάδα κίνησης μεταξύ των καρέ"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:286 ../src/wx/xrc/SoundConfig.xrc:191
 msgid "Advanced"
-msgstr "Avanzado"
+msgstr "Για προχωρημένους"
 
 #: ../src/wx/xrc/ExportSPS.xrc:10
 msgid "Title:"
-msgstr "Título:"
+msgstr "Τίτλος:"
 
 #: ../src/wx/xrc/ExportSPS.xrc:22
 msgid "Description:"
-msgstr "Descripción:"
+msgstr "Περιγραφή:"
 
 #: ../src/wx/xrc/ExportSPS.xrc:34
 msgid "Notes:"
-msgstr "Notas:"
+msgstr "Σημειώσεις:"
 
 #: ../src/wx/xrc/GBAROMInfo.xrc:4 ../src/wx/xrc/GBROMInfo.xrc:4
 msgid "Rom Information"
-msgstr "Información del Rom"
+msgstr "Πληροφορίες Rom"
 
 #: ../src/wx/xrc/GBAROMInfo.xrc:11 ../src/wx/xrc/GBROMInfo.xrc:12
 msgid "Game title:"
-msgstr "Título del juego:"
+msgstr "Τίτλος παιχνιδιού:"
 
 #: ../src/wx/xrc/GBAROMInfo.xrc:23
 msgid "Internal title:"
-msgstr "Título interno:"
+msgstr "Εσωτερικός τίτλος:"
 
 #: ../src/wx/xrc/GBAROMInfo.xrc:35
 msgid "Scene Release:"
-msgstr "Lanzamiento de la Escena:"
+msgstr "Ομάδα κυκλοφορίας:"
 
 #: ../src/wx/xrc/GBAROMInfo.xrc:47
 msgid "Release Number:"
-msgstr "Número de Lanzamiento:"
+msgstr "Αριθμός κυκλοφορίας:"
 
 #: ../src/wx/xrc/GBAROMInfo.xrc:59
 msgid "CRC32:"
@@ -1868,27 +1864,27 @@ msgstr "CRC32:"
 
 #: ../src/wx/xrc/GBAROMInfo.xrc:71
 msgid "Game code:"
-msgstr "Código del juego:"
+msgstr "Κωδικός παιχνιδιού:"
 
 #: ../src/wx/xrc/GBAROMInfo.xrc:83 ../src/wx/xrc/GBROMInfo.xrc:24
 msgid "Maker code:"
-msgstr "Creador de código:"
+msgstr "Κωδικός κατασκευαστή:"
 
 #: ../src/wx/xrc/GBAROMInfo.xrc:95 ../src/wx/xrc/GBROMInfo.xrc:36
 msgid "Maker name:"
-msgstr "Creador de nombre:"
+msgstr "Όνομα κατασκευαστή:"
 
 #: ../src/wx/xrc/GBAROMInfo.xrc:107
 msgid "Main unit code:"
-msgstr "Código de unidad principal:"
+msgstr "Κύριος κωδικός μονάδας:"
 
 #: ../src/wx/xrc/GBAROMInfo.xrc:119
 msgid "Device type:"
-msgstr "Tipo de dispositivo:"
+msgstr "Τύπος συσκευής:"
 
 #: ../src/wx/xrc/GBAROMInfo.xrc:131 ../src/wx/xrc/GBROMInfo.xrc:72
 msgid "ROM version:"
-msgstr "versión del ROM:"
+msgstr "Έκδοση ROM:"
 
 #: ../src/wx/xrc/GBAROMInfo.xrc:143 ../src/wx/xrc/GBROMInfo.xrc:84
 msgid "CRC:"
@@ -1896,48 +1892,48 @@ msgstr "CRC:"
 
 #: ../src/wx/xrc/GBAROMInfo.xrc:150
 msgid "ROM Information"
-msgstr "Información del ROM"
+msgstr "Πληροφορίες ROM"
 
 #: ../src/wx/xrc/GBColorPrefPanel.xrc:10 ../src/wx/xrc/JoyPanel.xrc:167
 msgid "Standard"
-msgstr "Estándar"
+msgstr "Στάνταρ"
 
 #: ../src/wx/xrc/GBColorPrefPanel.xrc:11
 msgid "Blue Sea"
-msgstr "Mar Azul"
+msgstr "Μπλε θάλασσα"
 
 #: ../src/wx/xrc/GBColorPrefPanel.xrc:12
 msgid "Dark Night"
-msgstr "Noche Oscura"
+msgstr "Σκοτεινή νύχτα"
 
 #: ../src/wx/xrc/GBColorPrefPanel.xrc:13
 msgid "Green Forest"
-msgstr "Bosque Verde"
+msgstr "Πράσινο δάσος"
 
 #: ../src/wx/xrc/GBColorPrefPanel.xrc:14
 msgid "Hot Desert"
-msgstr "Desierto Caliente"
+msgstr "Καυτή έρημος"
 
 #: ../src/wx/xrc/GBColorPrefPanel.xrc:15
 msgid "Pink Dreams"
-msgstr "Sueños Rosados"
+msgstr "Ροζ όνειρα"
 
 #: ../src/wx/xrc/GBColorPrefPanel.xrc:16
 msgid "Weird Colors"
-msgstr "Colores Extraños"
+msgstr "Περίεργα χρώματα"
 
 #: ../src/wx/xrc/GBColorPrefPanel.xrc:17
 msgid "Real GB Colors"
-msgstr "Colores Reales de GB"
+msgstr "Πραγματικά χρώματα GB"
 
 #: ../src/wx/xrc/GBColorPrefPanel.xrc:18
 msgid "Real 'GB on GBASP' Colors"
-msgstr "Colores Reales de 'GB en GBASP'"
+msgstr "Πραγματικά χρώματα «GB on GBASP»"
 
 #: ../src/wx/xrc/GBColorPrefPanel.xrc:46 ../src/wx/xrc/GBPaletteViewer.xrc:17
 #: ../src/wx/xrc/MapViewer.xrc:54 ../src/wx/xrc/PaletteViewer.xrc:19
 msgid "Background"
-msgstr "Fondo"
+msgstr "Φόντο"
 
 #: ../src/wx/xrc/GBColorPrefPanel.xrc:74
 msgid "Sprites"
@@ -1945,11 +1941,11 @@ msgstr "Sprites"
 
 #: ../src/wx/xrc/GBColorPrefPanel.xrc:84
 msgid "Use this palette"
-msgstr "Usar esta paleta"
+msgstr "Χρήση αυτής της παλέττας"
 
 #: ../src/wx/xrc/GBColorPrefPanel.xrc:94
 msgid "Restore"
-msgstr "Restaurar"
+msgstr "Επαναφορά"
 
 #: ../src/wx/xrc/GBDisassemble.xrc:43
 msgid "AF:"
@@ -1997,7 +1993,7 @@ msgstr "0x8800"
 #: ../src/wx/xrc/GBMapViewer.xrc:23 ../src/wx/xrc/GBTileViewer.xrc:42
 #: ../src/wx/xrc/TileViewer.xrc:58
 msgid "Char Base"
-msgstr "Carácter Base"
+msgstr "Char Base"
 
 #: ../src/wx/xrc/GBMapViewer.xrc:33
 msgid "0x9800"
@@ -2009,42 +2005,42 @@ msgstr "0x9C00"
 
 #: ../src/wx/xrc/GBMapViewer.xrc:42
 msgid "Map Base"
-msgstr "Mapa Base"
+msgstr "Βάση Map"
 
 #: ../src/wx/xrc/GBMapViewer.xrc:54 ../src/wx/xrc/GBOAMViewer.xrc:88
 #: ../src/wx/xrc/GBTileViewer.xrc:68 ../src/wx/xrc/MapViewer.xrc:62
 #: ../src/wx/xrc/OAMViewer.xrc:104 ../src/wx/xrc/TileViewer.xrc:84
 msgid "Stretch to &fit"
-msgstr "Estirar para &encajar"
+msgstr "Αυτόματο τέντωμα"
 
 #: ../src/wx/xrc/GBMapViewer.xrc:59 ../src/wx/xrc/MapViewer.xrc:67
 msgid "Auto &update"
-msgstr "Auto &actualización"
+msgstr "Αυτόματη ενημέρωση"
 
 #: ../src/wx/xrc/GBMapViewer.xrc:74 ../src/wx/xrc/GBTileViewer.xrc:99
 #: ../src/wx/xrc/MapViewer.xrc:144 ../src/wx/xrc/MemSelRegion.xrc:10
 #: ../src/wx/xrc/PaletteViewer.xrc:50 ../src/wx/xrc/TileViewer.xrc:115
 msgid "Address:"
-msgstr "Dirección:"
+msgstr "Διεύθυνση:"
 
 #: ../src/wx/xrc/GBMapViewer.xrc:82 ../src/wx/xrc/GBOAMViewer.xrc:37
 #: ../src/wx/xrc/GBTileViewer.xrc:91 ../src/wx/xrc/MapViewer.xrc:152
 #: ../src/wx/xrc/OAMViewer.xrc:61 ../src/wx/xrc/TileViewer.xrc:107
 msgid "Tile:"
-msgstr "Título:"
+msgstr "Τίτλος:"
 
 #: ../src/wx/xrc/GBMapViewer.xrc:90 ../src/wx/xrc/MapViewer.xrc:160
 msgid "Flip:"
-msgstr "Voltear:"
+msgstr "Αντιστροφή:"
 
 #: ../src/wx/xrc/GBMapViewer.xrc:98 ../src/wx/xrc/GBTileViewer.xrc:50
 #: ../src/wx/xrc/MapViewer.xrc:168 ../src/wx/xrc/TileViewer.xrc:66
 msgid "Palette:"
-msgstr "Paleta:"
+msgstr "Παλέτα:"
 
 #: ../src/wx/xrc/GBMapViewer.xrc:106 ../src/wx/xrc/MapViewer.xrc:116
 msgid "Priority:"
-msgstr "Prioridad:"
+msgstr "Προτεραιότητα:"
 
 #: ../src/wx/xrc/GBMapViewer.xrc:152 ../src/wx/xrc/GBOAMViewer.xrc:142
 #: ../src/wx/xrc/GBPaletteViewer.xrc:114 ../src/wx/xrc/GBTileViewer.xrc:145
@@ -2052,12 +2048,12 @@ msgstr "Prioridad:"
 #: ../src/wx/xrc/MemViewer.xrc:101 ../src/wx/xrc/OAMViewer.xrc:155
 #: ../src/wx/xrc/PaletteViewer.xrc:100 ../src/wx/xrc/TileViewer.xrc:161
 msgid "&Refresh"
-msgstr "&Actualizar"
+msgstr "Ανανέωση"
 
 #: ../src/wx/xrc/GBMapViewer.xrc:157 ../src/wx/xrc/Logging.xrc:112
 #: ../src/wx/xrc/MapViewer.xrc:219
 msgid "&Save"
-msgstr "&Guardar"
+msgstr "Αποθήκευση"
 
 #: ../src/wx/xrc/GBOAMViewer.xrc:13 ../src/wx/xrc/OAMViewer.xrc:14
 msgid "Sprite:"
@@ -2065,11 +2061,11 @@ msgstr "Sprite:"
 
 #: ../src/wx/xrc/GBOAMViewer.xrc:29 ../src/wx/xrc/OAMViewer.xrc:29
 msgid "Pos:"
-msgstr "Pos:"
+msgstr "Θέση:"
 
 #: ../src/wx/xrc/GBOAMViewer.xrc:45 ../src/wx/xrc/OAMViewer.xrc:69
 msgid "Prio:"
-msgstr "Prio:"
+msgstr "Προτ:"
 
 #: ../src/wx/xrc/GBOAMViewer.xrc:53
 msgid "OAP:"
@@ -2077,29 +2073,29 @@ msgstr "OAP:"
 
 #: ../src/wx/xrc/GBOAMViewer.xrc:61 ../src/wx/xrc/OAMViewer.xrc:53
 msgid "Pal:"
-msgstr "Pal:"
+msgstr "Παλ:"
 
 #: ../src/wx/xrc/GBOAMViewer.xrc:69 ../src/wx/xrc/OAMViewer.xrc:93
 msgid "Flags:"
-msgstr "Indicadores:"
+msgstr "Σημαίες:"
 
 #: ../src/wx/xrc/GBOAMViewer.xrc:77
 msgid "Bank:"
-msgstr "Banco:"
+msgstr "Τράπεζα:"
 
 #: ../src/wx/xrc/GBOAMViewer.xrc:149 ../src/wx/xrc/GBTileViewer.xrc:152
 #: ../src/wx/xrc/MemViewer.xrc:115 ../src/wx/xrc/OAMViewer.xrc:162
 #: ../src/wx/xrc/TileViewer.xrc:168
 msgid "&Save..."
-msgstr "&Guardar..."
+msgstr "Αποθήκευση..."
 
 #: ../src/wx/xrc/GBPaletteViewer.xrc:8 ../src/wx/xrc/PaletteViewer.xrc:9
 msgid "Click on a color for more information"
-msgstr "Haz clic en un color para mas información"
+msgstr "Πατήστε σε ένα χρώμα για περισσότερες πληροφορίες"
 
 #: ../src/wx/xrc/GBPaletteViewer.xrc:27 ../src/wx/xrc/PaletteViewer.xrc:105
 msgid "Save &BG..."
-msgstr "Guardar &BG..."
+msgstr "Αποθήκευση &BG..."
 
 #: ../src/wx/xrc/GBPaletteViewer.xrc:38 ../src/wx/xrc/PaletteViewer.xrc:33
 msgid "Sprite"
@@ -2107,20 +2103,20 @@ msgstr "Sprite"
 
 #: ../src/wx/xrc/GBPaletteViewer.xrc:48 ../src/wx/xrc/PaletteViewer.xrc:111
 msgid "Save &Sprite..."
-msgstr "Guardar &Sprite..."
+msgstr "Αποθήκευση &Sprite..."
 
 #: ../src/wx/xrc/GBPaletteViewer.xrc:67
 msgid "Index:"
-msgstr "Índice:"
+msgstr "Δείκτης:"
 
 #: ../src/wx/xrc/GBPaletteViewer.xrc:79 ../src/wx/xrc/IOViewer.xrc:21
 #: ../src/wx/xrc/PaletteViewer.xrc:62
 msgid "Value:"
-msgstr "Valor:"
+msgstr "Τιμή:"
 
 #: ../src/wx/xrc/GBPrinter.xrc:21
 msgid "Print Si&ze"
-msgstr "Ta&maño de Impresion"
+msgstr "Μέγεθος εκτύπωσης"
 
 #: ../src/wx/xrc/GBPrinter.xrc:29
 msgid "1x"
@@ -2140,39 +2136,39 @@ msgstr "4x"
 
 #: ../src/wx/xrc/GBPrinter.xrc:58
 msgid "C&ontinue"
-msgstr "C%ontinuar"
+msgstr "Συνέχεια"
 
 #: ../src/wx/xrc/GBROMInfo.xrc:48
 msgid "Unit code:"
-msgstr "Código de unidad:"
+msgstr "Κωδικός μονάδας:"
 
 #: ../src/wx/xrc/GBROMInfo.xrc:60
 msgid "Cartridge type:"
-msgstr "Tipo de Cartucho:"
+msgstr "Τύπος κασέτας:"
 
 #: ../src/wx/xrc/GBROMInfo.xrc:96
 msgid "Color:"
-msgstr "Color:"
+msgstr "Χρώμα:"
 
 #: ../src/wx/xrc/GBROMInfo.xrc:108
 msgid "ROM size:"
-msgstr "tamaño del ROM:"
+msgstr "Μέγεθος ROM:"
 
 #: ../src/wx/xrc/GBROMInfo.xrc:120
 msgid "RAM size:"
-msgstr "tamaño de la RAM:"
+msgstr "Μέγεθος RAM:"
 
 #: ../src/wx/xrc/GBROMInfo.xrc:132
 msgid "Dest. code:"
-msgstr "Destino del código:"
+msgstr "Κωδικός προορισμού:"
 
 #: ../src/wx/xrc/GBROMInfo.xrc:144
 msgid "License code:"
-msgstr "Licencia del código:"
+msgstr "Κωδικός άδειας:"
 
 #: ../src/wx/xrc/GBROMInfo.xrc:156
 msgid "Checksum:"
-msgstr "Suma de comprobación:"
+msgstr "Άθροισμα ελέγχου:"
 
 #: ../src/wx/xrc/GBTileViewer.xrc:14
 msgid "&0"
@@ -2185,7 +2181,7 @@ msgstr "&1"
 
 #: ../src/wx/xrc/GBTileViewer.xrc:23
 msgid "VRAM Bank"
-msgstr "Banco de VRAM"
+msgstr "VRAM Bank"
 
 #: ../src/wx/xrc/GBTileViewer.xrc:33
 msgid "0x&8000"
@@ -2197,17 +2193,17 @@ msgstr "0x&8800"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:4
 msgid "Game Boy Advance settings"
-msgstr "ajustes de Game Boy Advance"
+msgstr "Ρυθμίσεις Game Boy Advance"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type :"
-msgstr "Tipo de guardado :"
+msgstr "Τύπος αποθήκευσης"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:27
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:178
 #: ../src/wx/xrc/GameBoyConfig.xrc:29 ../src/wx/xrc/GameBoyConfig.xrc:59
 msgid "Automatic"
-msgstr "Automático"
+msgstr "Αυτόματα"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:28
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:179
@@ -2226,11 +2222,11 @@ msgstr "Flash"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:31
 msgid "EEPROM + Sensor"
-msgstr "EEPROM + Sensor"
+msgstr "EEPROM + Αισθητήρας"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size :"
-msgstr "tamaño de Flash :"
+msgstr "Μέγεθος Flash :"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:49
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:200
@@ -2244,36 +2240,36 @@ msgstr "128K"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
-msgstr "Detectar Ahora"
+msgstr "Ανίχνευση τώρα"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:69
 msgid "Cartridge"
-msgstr "Cartucho"
+msgstr "Κασέτα"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:77
 msgid "Save type"
-msgstr "Tipo de guardado"
+msgstr "Τύπος αποθήκευσης"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:92
 msgid "Bios file :"
-msgstr "Archivo de Bios :"
+msgstr "Αρχείο Bios :"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:115
 #: ../src/wx/xrc/GameBoyConfig.xrc:126
 msgid "Boot ROM"
-msgstr "ROM de Arranque"
+msgstr "ROM εκκίνησης"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:125
 msgid "Game Code"
-msgstr "Código del Juego"
+msgstr "Κωδικός παιχνιδιού"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:139
 msgid "Comment"
-msgstr "Comentario"
+msgstr "Σχόλιο"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:151
 msgid "Real Time Clock:"
-msgstr "Reloj de Tiempo Real:"
+msgstr "Ρολόι πραγματικού χρόνου"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:159
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:177
@@ -2281,49 +2277,49 @@ msgstr "Reloj de Tiempo Real:"
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:217
 #: ../src/wx/xrc/GameBoyConfig.xrc:138
 msgid "Default"
-msgstr "Predeterminado"
+msgstr "Προεπιλογή"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:160
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:218
 msgid "Disabled"
-msgstr "Desactivado"
+msgstr "Απενεργοποιημένο"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:161
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:219
 msgid "Enabled"
-msgstr "Activado"
+msgstr "Ενεργοποιημένο"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:169
 msgid "Save Type:"
-msgstr "Tipo de Guardado:"
+msgstr "Τύπος αποθήκευσης:"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:182
 msgid "EEPROM+Sensor"
-msgstr "EEPROM+Sensor"
+msgstr "EEPROM+Αισθητήρας"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:191
 msgid "Flash Size:"
-msgstr "Tamaño de Flash:"
+msgstr "Μέγεθος Flash:"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:209
 msgid "Mirroring:"
-msgstr "Reflejando:"
+msgstr "Καθρεπτισμός"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:233
 msgid "&Defaults"
-msgstr "&Predeterminados"
+msgstr "Προεπιλογές"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:240
 msgid "Game Overrides"
-msgstr "Anulaciones de Juego"
+msgstr "Παρακάμψεις παιχνιδιού"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:4
 msgid "GameBoy settings"
-msgstr "ajustes de GameBoy"
+msgstr "Ρυθμίσεις GameBoy"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:20
 msgid "Emulated &system :"
-msgstr "&Sistema emulado :"
+msgstr "Σύστημα εξομοίωσης :"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:30
 msgid "Game Boy Color"
@@ -2347,71 +2343,71 @@ msgstr "Super Game Boy 2"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:48
 msgid "Display &borders :"
-msgstr "Mostrar &bordes :"
+msgstr "Εμφάνιση ορίων"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:57
 msgid "Never"
-msgstr "Nunca"
+msgstr "Ποτέ"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:58
 msgid "Always"
-msgstr "Siempre"
+msgstr "Πάντα"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:72
 msgid "System"
-msgstr "Sistema"
+msgstr "Σύστημα"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:84
 msgid "Boot &ROM file :"
-msgstr "archivo ROM de Arranque :"
+msgstr "Αρχείο &ROM εκκίνησης :"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:91 ../src/wx/xrc/GameBoyConfig.xrc:113
 msgid "Select A File"
-msgstr "Seleccionar Un Archivo"
+msgstr "Επιλογή αρχείου"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:106
 msgid "GBC Boot ROM &file :"
-msgstr "archivo ROM de Arranque de GBC :"
+msgstr "Αρχείο ROM εκκίνησης GBC"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:144
 msgid "User 1"
-msgstr "Usuario 1"
+msgstr "Χρήστης 1"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:150
 msgid "User 2"
-msgstr "Usuario 2"
+msgstr "Χρήστης 2"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:156
 msgid "Custom Colors"
-msgstr "Colores Personalizados"
+msgstr "Προσαρμοσμένα χρώματα"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:4
 msgid "General settings"
-msgstr "Ajustes generales"
+msgstr "Γενικές ρυθμίσεις"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:9
 msgid "General"
-msgstr "General"
+msgstr "Γενικά"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:26
 msgid "Check for updates:"
-msgstr "Comprobar si hay actualizaciones:"
+msgstr "Έλεγχος για ενημερώσεις:"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:33
 msgid "&Never"
-msgstr "&Nunca"
+msgstr "Ποτέ"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:42
 msgid "&Daily"
-msgstr "&Diariamente"
+msgstr "Ημερησίως"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:50
 msgid "&Weekly"
-msgstr "&Semanalmente"
+msgstr "Εβδομαδιαία"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:64
 msgid "Screenshot Format:"
-msgstr "Formato de Captura de pantalla:"
+msgstr "Μορφή φωτογραφιών"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:71
 msgid "&PNG"
@@ -2423,32 +2419,32 @@ msgstr "&BMP"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:95
 msgid "&Rewind interval :"
-msgstr "&Intervalo de rebobinado :"
+msgstr "Διάστημα επανάληψης:"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:96
 msgid "If not empty or 0, enable rewind (seconds)"
-msgstr "Si no esta vació o es 0, activar rebobinado (segundos)"
+msgstr "εάν δεν είναι κενό ή 0, ενεργοποίηση επανάληψης (δευτερόλεπτα)"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:105
 msgid "seconds (0-600); 0 = disable"
-msgstr "segundos (0-600); 0 = desactivado"
+msgstr "δευτερόλεπτα (0-600), 0 = απενεργοποίηση"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:116
 msgid "&Throttle"
-msgstr "&Regulador"
+msgstr "Περιορισμός"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:134
 #, c-format
 msgid "% of normal:"
-msgstr "% de lo normal:"
+msgstr "% του κανονικού"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:144
 msgid "0 = no throttle"
-msgstr "0 = sin regulador"
+msgstr "0 = χωρίς περιορισμό"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:153
 msgid "No throttle"
-msgstr "Sin regulador"
+msgstr "Χωρίς περιορισμό"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:154
 msgid "25%"
@@ -2472,7 +2468,7 @@ msgstr "200%"
 
 #: ../src/wx/xrc/IOViewer.xrc:4
 msgid "IO Viewer"
-msgstr "Visor de IO"
+msgstr "IO Viewer"
 
 #: ../src/wx/xrc/IOViewer.xrc:10
 msgid "a"
@@ -2551,11 +2547,11 @@ msgid ""
 "Click a field and press a key or move joystick to add.  Press backspace to "
 "delete last added key.  Resize window or click inside and move pointer to "
 "see entire contents if too small."
-msgstr "Haz clic en un campo y pulsa una tecla o mueve el joystick para agregar. Presione la tecla de retroceso para borrar última tecla añadida. Cambia el tamaño de la ventana o haz clic en el interior y mueve el puntero para ver todo el contenido, si es demasiado pequeño."
+msgstr "Κάντε κλικ σε ένα πεδίο και πατήστε ένα πλήκτρο ή μετακινήστε τον μοχλό για προσθήκη. Πατήστε Backspace για να διαγράψετε το τελευταίο πλήκτρο που προστέθηκε. Μεγαλώστε το παράθυρο ή κάντε κλικ εντός και μετακινήστε τον δείκτη για να δείτε όλα τα περιεχόμενα εάν δεν φαίνονται."
 
 #: ../src/wx/xrc/JoyPanel.xrc:14
 msgid "Up"
-msgstr "Arriba"
+msgstr "Πάνω"
 
 #: ../src/wx/xrc/JoyPanel.xrc:29
 msgid "A"
@@ -2563,7 +2559,7 @@ msgstr "A"
 
 #: ../src/wx/xrc/JoyPanel.xrc:44
 msgid "Down"
-msgstr "Abajo"
+msgstr "Κάτω"
 
 #: ../src/wx/xrc/JoyPanel.xrc:59
 msgid "B"
@@ -2571,7 +2567,7 @@ msgstr "B"
 
 #: ../src/wx/xrc/JoyPanel.xrc:74
 msgid "Left"
-msgstr "Izquierda"
+msgstr "Αριστερά"
 
 #: ../src/wx/xrc/JoyPanel.xrc:89
 msgid "L"
@@ -2579,7 +2575,7 @@ msgstr "L"
 
 #: ../src/wx/xrc/JoyPanel.xrc:104
 msgid "Right"
-msgstr "Derecha"
+msgstr "Δεξιά"
 
 #: ../src/wx/xrc/JoyPanel.xrc:119
 msgid "R"
@@ -2595,91 +2591,91 @@ msgstr "Start"
 
 #: ../src/wx/xrc/JoyPanel.xrc:174
 msgid "Motion Up"
-msgstr "Movimiento Arriba"
+msgstr "Κίνηση πάνω"
 
 #: ../src/wx/xrc/JoyPanel.xrc:188
 msgid "Autofire A"
-msgstr "Autodisparo A"
+msgstr "Συνεχόμενα A"
 
 #: ../src/wx/xrc/JoyPanel.xrc:202
 msgid "Motion Down"
-msgstr "Movimiento Abajo"
+msgstr "Κίνηση κάτω"
 
 #: ../src/wx/xrc/JoyPanel.xrc:216
 msgid "Autofire B"
-msgstr "Autodisparo B"
+msgstr "Συνεχόμενα B"
 
 #: ../src/wx/xrc/JoyPanel.xrc:230
 msgid "Motion Left/Dark"
-msgstr "Movimiento Izquierda/Oscuridad"
+msgstr "Κίνηση αριστερά/Σκοτάδι"
 
 #: ../src/wx/xrc/JoyPanel.xrc:258
 msgid "Motion Right/Light"
-msgstr "Movimiento Derecha/Luz"
+msgstr "Κίνηση δεξιά/Φως"
 
 #: ../src/wx/xrc/JoyPanel.xrc:272
 msgid "Speed Up"
-msgstr "Acelerar"
+msgstr "Αύξηση ταχύτητας"
 
 #: ../src/wx/xrc/JoyPanel.xrc:286
 msgid "Spin Left"
-msgstr "Giro a la Izquierda"
+msgstr "Περιστροφή αριστερά"
 
 #: ../src/wx/xrc/JoyPanel.xrc:306
 msgid "Spin Right"
-msgstr "Giro a la Derecha"
+msgstr "Περιστροφή δεξιά"
 
 #: ../src/wx/xrc/JoyPanel.xrc:320
 msgid "Screenshot"
-msgstr "Captura de pantalla"
+msgstr "Φωτογραφία"
 
 #: ../src/wx/xrc/JoyPanel.xrc:336
 msgid "Special"
-msgstr "Especial"
+msgstr "Ειδικό"
 
 #: ../src/wx/xrc/JoyPanel.xrc:344
 msgid "Use as default"
-msgstr "Usar como predeterminado"
+msgstr "Χρήση ως προεπιλογή"
 
 #: ../src/wx/xrc/JoyPanel.xrc:351
 msgid "Defaults"
-msgstr "Predeterminados"
+msgstr "Προεπιλογές"
 
 #: ../src/wx/xrc/JoyPanel.xrc:358
 msgid "Clear"
-msgstr "Limpiar"
+msgstr "Εκκαθάριση"
 
 #: ../src/wx/xrc/JoypadConfig.xrc:4
 msgid "Joypad Configuration"
-msgstr "Configuración del Joypad"
+msgstr "Ρύθμιση χειριστηρίου"
 
 #: ../src/wx/xrc/JoypadConfig.xrc:13
 msgid "Player 1"
-msgstr "Jugador 1"
+msgstr "Παίκτης 1"
 
 #: ../src/wx/xrc/JoypadConfig.xrc:19
 msgid "Player 2"
-msgstr "Jugador 2"
+msgstr "Παίκτης 2"
 
 #: ../src/wx/xrc/JoypadConfig.xrc:25
 msgid "Player 3"
-msgstr "Jugador 3"
+msgstr "Παίκτης 3"
 
 #: ../src/wx/xrc/JoypadConfig.xrc:31
 msgid "Player 4"
-msgstr "Jugador 4"
+msgstr "Παίκτης 4"
 
 #: ../src/wx/xrc/LinkConfig.xrc:4
 msgid "Link configuration"
-msgstr "Configuración de enlace"
+msgstr "Ρύθμιση σύνδεσης"
 
 #: ../src/wx/xrc/LinkConfig.xrc:11
 msgid "Link timeout (in milliseconds)"
-msgstr "Tiempo en espera de enlace (en milisegundos)"
+msgstr "Χρονικό όριο σύνδεσης (σε χιλιοστά δευτερολέπτου)"
 
 #: ../src/wx/xrc/Logging.xrc:4
 msgid "Logging"
-msgstr "Registro"
+msgstr "Καταγραφή"
 
 #: ../src/wx/xrc/Logging.xrc:13
 msgid "SW&I"
@@ -2687,15 +2683,15 @@ msgstr "SW&I"
 
 #: ../src/wx/xrc/Logging.xrc:20
 msgid "Unaligned &memory"
-msgstr "&Memoria no alineada"
+msgstr "Μη ευθυγραμμισμένη μνήμη"
 
 #: ../src/wx/xrc/Logging.xrc:27
 msgid "Illegal &write"
-msgstr "&escritura ilegal"
+msgstr "Παράνομη εγγραφή"
 
 #: ../src/wx/xrc/Logging.xrc:34
 msgid "Illegal &read"
-msgstr "&lectura ilegal"
+msgstr "Παράνομη ανάγνωση"
 
 #: ../src/wx/xrc/Logging.xrc:41
 msgid "DMA &0"
@@ -2715,7 +2711,7 @@ msgstr "DMA &3"
 
 #: ../src/wx/xrc/Logging.xrc:69
 msgid "&Undefined instruction"
-msgstr "Instrucción &indefinida"
+msgstr "Απροσδιόριστη οδηγία"
 
 #: ../src/wx/xrc/Logging.xrc:76
 msgid "&AGBPrint"
@@ -2723,39 +2719,39 @@ msgstr "&AGBPrint"
 
 #: ../src/wx/xrc/Logging.xrc:83
 msgid "Soun&d output"
-msgstr "Salida de soni&do"
+msgstr "Έξοδος ήχου"
 
 #: ../src/wx/xrc/Logging.xrc:88
 msgid "Verbose"
-msgstr "Verboso"
+msgstr "Αναλυτικά"
 
 #: ../src/wx/xrc/MainMenu.xrc:5
 msgid "&File"
-msgstr "&Archivo"
+msgstr "Αρχείο"
 
 #: ../src/wx/xrc/MainMenu.xrc:8
 msgid "Open &GB..."
-msgstr "Abrir &GB..."
+msgstr "Άνοιγμα &GB..."
 
 #: ../src/wx/xrc/MainMenu.xrc:11
 msgid "Open GB&C..."
-msgstr "Abrir GB&C..."
+msgstr "Άνοιγμα GB&C..."
 
 #: ../src/wx/xrc/MainMenu.xrc:14
 msgid "Open rece&nt"
-msgstr "Abrir recie&nte"
+msgstr "Άνοιγμα πρόσφατου"
 
 #: ../src/wx/xrc/MainMenu.xrc:16
 msgid "&Reset recent list"
-msgstr "&Reiniciar lista reciente"
+msgstr "Επαναφορά λίστας πρόσφατων"
 
 #: ../src/wx/xrc/MainMenu.xrc:19
 msgid "&Freeze recent list"
-msgstr "&Congelar lista reciente"
+msgstr "Πάγωμα λίστας πρόσφατων"
 
 #: ../src/wx/xrc/MainMenu.xrc:24
 msgid "ROM in&formation..."
-msgstr "In&formación del ROM..."
+msgstr "Πληροφορίες ROM..."
 
 #: ../src/wx/xrc/MainMenu.xrc:28
 msgid "&e-Reader"
@@ -2763,19 +2759,19 @@ msgstr "&e-Reader"
 
 #: ../src/wx/xrc/MainMenu.xrc:30
 msgid "&Load Dot Code..."
-msgstr "&Cargar Código de Puntos..."
+msgstr "Φόρτωση Dot Code..."
 
 #: ../src/wx/xrc/MainMenu.xrc:33
 msgid "&Save Dot Code..."
-msgstr "&Guardar Código de Puntos..."
+msgstr "Αποθήκευση Dot Code..."
 
 #: ../src/wx/xrc/MainMenu.xrc:39
 msgid "Most &recent"
-msgstr "Mas &reciente"
+msgstr "Πιο πρόσφατα"
 
 #: ../src/wx/xrc/MainMenu.xrc:43
 msgid "&Auto load most recent"
-msgstr "&Auto cargar el más reciente"
+msgstr "Αυτόματη φόρτωση πιο πρόσφατου"
 
 #: ../src/wx/xrc/MainMenu.xrc:52 ../src/wx/xrc/MainMenu.xrc:113
 msgid "&2"
@@ -2815,119 +2811,119 @@ msgstr "1&0"
 
 #: ../src/wx/xrc/MainMenu.xrc:89
 msgid "From &File ..."
-msgstr "Desde &Archivo ..."
+msgstr "Από αρχείο ..."
 
 #: ../src/wx/xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
-msgstr "No cambiar guardados de &batería"
+msgstr "Χωρίς αλλαγή αποθήκευσης μπαταρίας"
 
 #: ../src/wx/xrc/MainMenu.xrc:97
 msgid "Do not change &cheat list"
-msgstr "No cambiar lista de &trucos"
+msgstr "Χωρίς αλλαγή λίστας κωδικών"
 
 #: ../src/wx/xrc/MainMenu.xrc:100
 msgid "&Load state"
-msgstr "&Cargar estado"
+msgstr "Φόρτωση κατάστασης"
 
 #: ../src/wx/xrc/MainMenu.xrc:104
 msgid "&Oldest slot"
-msgstr "&Ranura mas antigua"
+msgstr "Παλαιότερη υποδοχή"
 
 #: ../src/wx/xrc/MainMenu.xrc:150
 msgid "To &File ..."
-msgstr "Al &Archivo ..."
+msgstr "Σε αρχείο ..."
 
 #: ../src/wx/xrc/MainMenu.xrc:152
 msgid "&Save state"
-msgstr "&Guardar estado"
+msgstr "Αποθήκευση κατάστασης"
 
 #: ../src/wx/xrc/MainMenu.xrc:157 ../src/wx/xrc/MainMenu.xrc:169
 msgid "&Battery file..."
-msgstr "Archivo de &batería..."
+msgstr "Αρχείο μπαταρίας..."
 
 #: ../src/wx/xrc/MainMenu.xrc:160
 msgid "Gameshark &code file..."
-msgstr "archivo de &código Gameshark..."
+msgstr "Αρχείο κωδικών Gameshark..."
 
 #: ../src/wx/xrc/MainMenu.xrc:163 ../src/wx/xrc/MainMenu.xrc:172
 msgid "&Gameshark snapshot..."
-msgstr "instantánea de Gameshark..."
+msgstr "Στιγμιότυπο Gameshark"
 
 #: ../src/wx/xrc/MainMenu.xrc:165
 msgid "&Import"
-msgstr "&Importar"
+msgstr "Εισαγωγή"
 
 #: ../src/wx/xrc/MainMenu.xrc:174
 msgid "&Export"
-msgstr "&Exportar"
+msgstr "Εξαγωγή"
 
 #: ../src/wx/xrc/MainMenu.xrc:178
 msgid "Screen capt&ure..."
-msgstr "Capt&ura de pantalla..."
+msgstr "Καταγραφή οθόνης..."
 
 #: ../src/wx/xrc/MainMenu.xrc:182
 msgid "Start &sound recording..."
-msgstr "Iniciar grabación de &sonido..."
+msgstr "Έναρξη εγγραφής ήχου..."
 
 #: ../src/wx/xrc/MainMenu.xrc:185
 msgid "Stop s&ound recording"
-msgstr "Detener grabación de s&onido"
+msgstr "Διακοπή εγγραφής ήχου"
 
 #: ../src/wx/xrc/MainMenu.xrc:188
 msgid "Start &video recording..."
-msgstr "Iniciar grabación de &vídeo..."
+msgstr "Έναρξη εγγραφής βίντεο..."
 
 #: ../src/wx/xrc/MainMenu.xrc:191
 msgid "Stop v&ideo recording"
-msgstr "Detener grabación de v&ídeo"
+msgstr "Διακοπή εγγραφής βίντεο"
 
 #: ../src/wx/xrc/MainMenu.xrc:194
 msgid "Start &game recording..."
-msgstr "Iniciar grabación del &juego..."
+msgstr "Έναρξη εγγραφής παιχνιδιού..."
 
 #: ../src/wx/xrc/MainMenu.xrc:197
 msgid "Stop g&ame recording"
-msgstr "Detener grabación del j&uego"
+msgstr "Διακοπή εγγραφής παιχνιδιού"
 
 #: ../src/wx/xrc/MainMenu.xrc:199
 msgid "&Record"
-msgstr "Grabar"
+msgstr "Εγγραφή"
 
 #: ../src/wx/xrc/MainMenu.xrc:203
 msgid "Start playing &movie..."
-msgstr "Iniciar reproducción de &película..."
+msgstr "Έναρξη αναπαραγωγής ταινίας..."
 
 #: ../src/wx/xrc/MainMenu.xrc:206
 msgid "Stop playing m&ovie"
-msgstr "Detener reproducción de p&elícula"
+msgstr "Διακοπή αναπαραγωγής ταινίας"
 
 #: ../src/wx/xrc/MainMenu.xrc:208
 msgid "&Play"
-msgstr "&Reproducir"
+msgstr "Αναπαραγωγή"
 
 #: ../src/wx/xrc/MainMenu.xrc:215
 msgid "&Emulation"
-msgstr "&Emulación"
+msgstr "Εξομοίωση"
 
 #: ../src/wx/xrc/MainMenu.xrc:217
 msgid "&Pause"
-msgstr "&Pausar"
+msgstr "Παύση"
 
 #: ../src/wx/xrc/MainMenu.xrc:222
 msgid "&Next frame"
-msgstr "&Siguiente cuadro"
+msgstr "Επόμενο καρέ"
 
 #: ../src/wx/xrc/MainMenu.xrc:226
 msgid "Re&wind"
-msgstr "Rebobinar"
+msgstr "Επανάληψη"
 
 #: ../src/wx/xrc/MainMenu.xrc:231
 msgid "Toggle &full screen"
-msgstr "Activar &pantalla completa"
+msgstr "Εναλλαγή πλήρους οθόνης"
 
 #: ../src/wx/xrc/MainMenu.xrc:237
 msgid "&Turbo mode"
-msgstr "Modo &turbo"
+msgstr "Λειτουργία τούρμπο"
 
 #: ../src/wx/xrc/MainMenu.xrc:241
 msgid "&VSync"
@@ -2935,47 +2931,47 @@ msgstr "&VSync"
 
 #: ../src/wx/xrc/MainMenu.xrc:245
 msgid "&Auto skip frames"
-msgstr "&Auto saltar cuadros"
+msgstr "Αυτόματη παράλειψη καρέ"
 
 #: ../src/wx/xrc/MainMenu.xrc:250
 msgid "&Skip BIOS"
-msgstr "&Saltar BIOS"
+msgstr "Παράλειψη BIOS"
 
 #: ../src/wx/xrc/MainMenu.xrc:254
 msgid "&Auto IPS/UPS/IPF patch"
-msgstr "&Auto parchar IPS/UPS/IPF"
+msgstr "Αυτόματη διόρθωση των IPS/UPS/IPF"
 
 #: ../src/wx/xrc/MainMenu.xrc:258
 msgid "&Pause when inactive"
-msgstr "&Pausar cuando esté inactivo"
+msgstr "Παύση όταν είναι ανενεργό"
 
 #: ../src/wx/xrc/MainMenu.xrc:263
 msgid "&Reset"
-msgstr "&Reiniciar"
+msgstr "Επαναφορά"
 
 #: ../src/wx/xrc/MainMenu.xrc:268
 msgid "&Options"
-msgstr "&Opciones"
+msgstr "Επιλογές"
 
 #: ../src/wx/xrc/MainMenu.xrc:270
 msgid "&Link"
-msgstr "&Enlace"
+msgstr "Σύνδεση"
 
 #: ../src/wx/xrc/MainMenu.xrc:272
 msgid "Start &Network Link ..."
-msgstr "Iniciar &Enlace de Red ..."
+msgstr "Έναρξη σύνδεσης δικτύου ..."
 
 #: ../src/wx/xrc/MainMenu.xrc:277
 msgid "&Nothing"
-msgstr "&Nada"
+msgstr "Τίποτα"
 
 #: ../src/wx/xrc/MainMenu.xrc:281
 msgid "&Cable"
-msgstr "&Cable"
+msgstr "Καλώδιο"
 
 #: ../src/wx/xrc/MainMenu.xrc:285
 msgid "&Wireless"
-msgstr "&Inalámbrica"
+msgstr "Ασύρματα"
 
 #: ../src/wx/xrc/MainMenu.xrc:289
 msgid "&GameCube"
@@ -2987,84 +2983,84 @@ msgstr "&Game Boy"
 
 #: ../src/wx/xrc/MainMenu.xrc:298
 msgid "&Local mode"
-msgstr "Modo &local"
+msgstr "Τοπική λειτουργία"
 
 #: ../src/wx/xrc/MainMenu.xrc:302
 msgid "&Link at boot"
-msgstr "&Enlace al arrancar"
+msgstr "Σύνδεση με την εκκίνηση"
 
 #: ../src/wx/xrc/MainMenu.xrc:306
 msgid "&Speed hack"
-msgstr "&Hack de velocidad"
+msgstr "Αλλαγή ταχύτητας"
 
 #: ../src/wx/xrc/MainMenu.xrc:310 ../src/wx/xrc/MainMenu.xrc:316
 #: ../src/wx/xrc/MainMenu.xrc:358 ../src/wx/xrc/MainMenu.xrc:382
 msgid "&Configure ..."
-msgstr "&Configurar ..."
+msgstr "Ρύθμιση ..."
 
 #: ../src/wx/xrc/MainMenu.xrc:314
 msgid "&Video"
-msgstr "&Vídeo"
+msgstr "Βίντεο"
 
 #: ../src/wx/xrc/MainMenu.xrc:320
 msgid "&Start in full screen"
-msgstr "&Iniciar en pantalla completa"
+msgstr "Έναρξη σε πλήρη οθόνη"
 
 #: ../src/wx/xrc/MainMenu.xrc:324
 msgid "&Retain aspect ratio"
-msgstr "&Mantener relación de aspecto"
+msgstr "Διατήρηση αναλογίας εικόνας"
 
 #: ../src/wx/xrc/MainMenu.xrc:329
 msgid "&Bilinear filter"
-msgstr "Filtro &bilineal"
+msgstr "Διγραμμικό φίλτρο"
 
 #: ../src/wx/xrc/MainMenu.xrc:333
 msgid "&Multithread filter"
-msgstr "Filtro &multihilo"
+msgstr "Φίλτρο πολλαπλών thread"
 
 #: ../src/wx/xrc/MainMenu.xrc:338
 msgid "&Keep window on top"
-msgstr "&Mantener la ventana por encima"
+msgstr "Διατήρηση παραθύρου στην κορυφή"
 
 #: ../src/wx/xrc/MainMenu.xrc:343
 msgid "&Status bar"
-msgstr "&Barra de estado"
+msgstr "Γραμμή κατάστασης"
 
 #: ../src/wx/xrc/MainMenu.xrc:347
 msgid "&Disable on-screen display"
-msgstr "&Desactivar visualización en pantalla"
+msgstr "Απενεργοποίηση ένδειξης οθόνης"
 
 #: ../src/wx/xrc/MainMenu.xrc:351
 msgid "&Transparent on-screen display"
-msgstr "&Visualización en pantalla transparente"
+msgstr "Διαφανής ένδειξη οθόνης"
 
 #: ../src/wx/xrc/MainMenu.xrc:356
 msgid "&Audio"
-msgstr "&Audio"
+msgstr "Ήχος"
 
 #: ../src/wx/xrc/MainMenu.xrc:362
 msgid "&GBA sound interpolation"
-msgstr "interpolación de sonido &GBA"
+msgstr "Παρεμβολή ήχου &GBA"
 
 #: ../src/wx/xrc/MainMenu.xrc:367
 msgid "&GB sound enhancement"
-msgstr "mejora de sonido &GB"
+msgstr "Βελτίωση ήχου &GB"
 
 #: ../src/wx/xrc/MainMenu.xrc:371
 msgid "&GB surround sound effect"
-msgstr "efecto de sonido envolvente &GB"
+msgstr "Εφέ surround ήχου &GB"
 
 #: ../src/wx/xrc/MainMenu.xrc:375
 msgid "&GB sound declicking"
-msgstr "eliminación de clics de sonido &GB"
+msgstr "Αφαίρεση κλικ από ήχο &GB"
 
 #: ../src/wx/xrc/MainMenu.xrc:380
 msgid "&Input"
-msgstr "&Entrada"
+msgstr "Είσοδος"
 
 #: ../src/wx/xrc/MainMenu.xrc:386
 msgid "&Autofire"
-msgstr "&Autodisparo"
+msgstr "Συνεχόμενα"
 
 #: ../src/wx/xrc/MainMenu.xrc:388
 msgid "&A"
@@ -3088,91 +3084,91 @@ msgstr "&Game Boy Advance"
 
 #: ../src/wx/xrc/MainMenu.xrc:412 ../src/wx/xrc/MainMenu.xrc:431
 msgid "Configure ..."
-msgstr "Configurar ..."
+msgstr "Ρύθμιση ..."
 
 #: ../src/wx/xrc/MainMenu.xrc:416
 msgid "&Real-time clock"
-msgstr "Reloj de &tiempo real"
+msgstr "Ρολόι πραγματικού χρόνου"
 
 #: ../src/wx/xrc/MainMenu.xrc:420
 msgid "&Use BIOS file"
-msgstr "&Usar archivo BIOS"
+msgstr "Χρήση αρχείου BIOS"
 
 #: ../src/wx/xrc/MainMenu.xrc:424
 msgid "&Debug print"
-msgstr "&Impresión de depuración"
+msgstr "Εκτύπωση αποσφαλμάτωσης"
 
 #: ../src/wx/xrc/MainMenu.xrc:435
 msgid "&GB printer"
-msgstr "impresora &GB"
+msgstr "Εκτυπωτής &GB"
 
 #: ../src/wx/xrc/MainMenu.xrc:439
 msgid "&Gather a full page before printing"
-msgstr "&Reunir una página completa antes de imprimirla"
+msgstr "Συλλογή πλήρους σελίδας πριν την εκτύπωση"
 
 #: ../src/wx/xrc/MainMenu.xrc:443
 msgid "&Save printouts as screen captures"
-msgstr "&Guardar impresiones como capturas de pantalla"
+msgstr "Αποθήκευση εκτυπώσεων ως καταγραφές οθόνης"
 
 #: ../src/wx/xrc/MainMenu.xrc:448
 msgid "&Use GB BIOS file"
-msgstr "&Usar archivo BIOS de GB"
+msgstr "Χρήση αρχείου GB BIOS"
 
 #: ../src/wx/xrc/MainMenu.xrc:452
 msgid "&Use GBC BIOS file"
-msgstr "&Usar archivo BIOS de GBC"
+msgstr "Χρήση αρχείου GBC BIOS"
 
 #: ../src/wx/xrc/MainMenu.xrc:457
 msgid "&General ..."
-msgstr "&General ..."
+msgstr "Γενικά ..."
 
 #: ../src/wx/xrc/MainMenu.xrc:460
 msgid "D&irectories ..."
-msgstr "D&irectorios ..."
+msgstr "Φάκελοι ..."
 
 #: ../src/wx/xrc/MainMenu.xrc:463
 msgid "&Key Shortcuts ..."
-msgstr "Atajos de &Tecla ..."
+msgstr "Συντομεύσεις πλήκτρων ..."
 
 #: ../src/wx/xrc/MainMenu.xrc:467
 msgid "&Tools"
-msgstr "&Herramientas"
+msgstr "Εργαλεία"
 
 #: ../src/wx/xrc/MainMenu.xrc:469
 msgid "&Cheats"
-msgstr "&Trucos"
+msgstr "Κωδικοί"
 
 #: ../src/wx/xrc/MainMenu.xrc:471
 msgid "List &cheats ..."
-msgstr "Listar &trucos ..."
+msgstr "Λίστα κωδικών ..."
 
 #: ../src/wx/xrc/MainMenu.xrc:475
 msgid "Find c&heat ..."
-msgstr "Encontrar t&ruco ..."
+msgstr "Εύρεση κωδικού ..."
 
 #: ../src/wx/xrc/MainMenu.xrc:480
 msgid "A&utomatically save/load cheats"
-msgstr "Guardar/Cargar trucos a&utomáticamente"
+msgstr "Αυτόματη αποθήκευση/φόρτωση κωδικών"
 
 #: ../src/wx/xrc/MainMenu.xrc:484
 msgid "&Enable cheats"
-msgstr "&Activar trucos"
+msgstr "Ενεργοποίηση κωδικών"
 
 #: ../src/wx/xrc/MainMenu.xrc:491
 msgid "&Break into GDB"
-msgstr "&Detenerse en el GDB"
+msgstr "Διακοπή και χρήση GDB"
 
 #: ../src/wx/xrc/MainMenu.xrc:495
 msgid "&Configure port..."
-msgstr "&Configurar puerto..."
+msgstr "Ρύθμιση θύρας..."
 
 #: ../src/wx/xrc/MainMenu.xrc:498
 msgid "&Break on load"
-msgstr "&Detenerse al cargar"
+msgstr "Διακοπή στην εκκίνηση"
 
 #: ../src/wx/xrc/MainMenu.xrc:503
 msgid "&Disconnect"
-msgstr "&Desconectar"
+msgstr "Αποσύνδεση"
 
 #: ../src/wx/xrc/MainMenu.xrc:505
 msgid "&GDB"
@@ -3180,35 +3176,35 @@ msgstr "&GDB"
 
 #: ../src/wx/xrc/MainMenu.xrc:508
 msgid "&Disassemble..."
-msgstr "&Desensamblar..."
+msgstr "Αποσυναρμολόγηση..."
 
 #: ../src/wx/xrc/MainMenu.xrc:511
 msgid "&Logging..."
-msgstr "&Registrando..."
+msgstr "Καταγραφή..."
 
 #: ../src/wx/xrc/MainMenu.xrc:514
 msgid "&IO Viewer..."
-msgstr "Visor de &IO..."
+msgstr "Προβολή &IO..."
 
 #: ../src/wx/xrc/MainMenu.xrc:517
 msgid "&Map Viewer..."
-msgstr "Visor de &Mapa..."
+msgstr "Προβολή &Map..."
 
 #: ../src/wx/xrc/MainMenu.xrc:520
 msgid "M&emory Viewer..."
-msgstr "Visor de M&emoria..."
+msgstr "Προβολή μνήμης..."
 
 #: ../src/wx/xrc/MainMenu.xrc:523
 msgid "&OAM Viewer..."
-msgstr "Visor &OAM..."
+msgstr "Προβολή &OAM..."
 
 #: ../src/wx/xrc/MainMenu.xrc:526
 msgid "&Palette Viewer..."
-msgstr "Visor de &Paleta..."
+msgstr "Προβολή παλέτας..."
 
 #: ../src/wx/xrc/MainMenu.xrc:529
 msgid "&Tile Viewer..."
-msgstr "&Visor de Tile..."
+msgstr "Προβολή πλακιδίων..."
 
 #: ../src/wx/xrc/MainMenu.xrc:534
 msgid "BG &0"
@@ -3244,71 +3240,71 @@ msgstr "O&BJ WIN"
 
 #: ../src/wx/xrc/MainMenu.xrc:581
 msgid "&View Layers"
-msgstr "&Ver Capas"
+msgstr "Προβολή επιπέδων"
 
 #: ../src/wx/xrc/MainMenu.xrc:585
 msgid "Channel &1"
-msgstr "Canal &1"
+msgstr "Κανάλι &1"
 
 #: ../src/wx/xrc/MainMenu.xrc:590
 msgid "Channel &2"
-msgstr "Canal &2"
+msgstr "Κανάλι &2"
 
 #: ../src/wx/xrc/MainMenu.xrc:595
 msgid "Channel &3"
-msgstr "Canal &3"
+msgstr "Κανάλι &3"
 
 #: ../src/wx/xrc/MainMenu.xrc:600
 msgid "Channel &4"
-msgstr "Canal 4&"
+msgstr "Κανάλι &4"
 
 #: ../src/wx/xrc/MainMenu.xrc:605
 msgid "Direct Sound &A"
-msgstr "Direct Sound &A"
+msgstr "Άμεσος ήχος &A"
 
 #: ../src/wx/xrc/MainMenu.xrc:610
 msgid "Direct Sound &B"
-msgstr "Direct Sound &B"
+msgstr "Άμεσος ήχος &B"
 
 #: ../src/wx/xrc/MainMenu.xrc:614
 msgid "&Sound Channels"
-msgstr "Canales de &Sonido"
+msgstr "Κανάλια ήχου"
 
 #: ../src/wx/xrc/MainMenu.xrc:618
 msgid "&Help"
-msgstr "&Ayuda"
+msgstr "Βοήθεια"
 
 #: ../src/wx/xrc/MainMenu.xrc:620
 msgid "Report &Bugs"
-msgstr "Reportar &Errores"
+msgstr "Αναφορά σφαλμάτων"
 
 #: ../src/wx/xrc/MainMenu.xrc:623
 msgid "VBA-M Support &Forum"
-msgstr "&Foro de Soporte VBA-M"
+msgstr "Φόρουμ υποστήριξης VBA-M"
 
 #: ../src/wx/xrc/MainMenu.xrc:626
 msgid "Translations"
-msgstr "Traducciones"
+msgstr "Μεταφράσεις"
 
 #: ../src/wx/xrc/MainMenu.xrc:629
 msgid "Update ROM database"
-msgstr "Actualizar base de datos de ROM"
+msgstr "Ενημέρωση βάσης δεδομένων ROM"
 
 #: ../src/wx/xrc/MapViewer.xrc:4
 msgid "Map Viewer"
-msgstr "Visor de Mapa"
+msgstr "Προβολή Map"
 
 #: ../src/wx/xrc/MapViewer.xrc:16
 msgid "Frame 0"
-msgstr "Cuadro 0"
+msgstr "Καρέ 0"
 
 #: ../src/wx/xrc/MapViewer.xrc:22
 msgid "Frame 1"
-msgstr "Cuadro 1"
+msgstr "Καρέ 1"
 
 #: ../src/wx/xrc/MapViewer.xrc:25
 msgid "Frame"
-msgstr "Cuadro"
+msgstr "Καρέ"
 
 #: ../src/wx/xrc/MapViewer.xrc:35
 msgid "BG0"
@@ -3328,68 +3324,68 @@ msgstr "BG3"
 
 #: ../src/wx/xrc/MapViewer.xrc:84
 msgid "Map Base:"
-msgstr "Mapa Base:"
+msgstr "Map Base:"
 
 #: ../src/wx/xrc/MapViewer.xrc:92
 msgid "Char Base:"
-msgstr "Carácter Base:"
+msgstr "Char Base:"
 
 #: ../src/wx/xrc/MapViewer.xrc:100 ../src/wx/xrc/MemSelRegion.xrc:22
 #: ../src/wx/xrc/OAMViewer.xrc:77
 msgid "Size:"
-msgstr "Tamaño:"
+msgstr "Μέγεθος:"
 
 #: ../src/wx/xrc/MapViewer.xrc:108 ../src/wx/xrc/OAMViewer.xrc:45
 msgid "Colors:"
-msgstr "Colores:"
+msgstr "Χρώματα:"
 
 #: ../src/wx/xrc/MapViewer.xrc:124
 msgid "Mosaic:"
-msgstr "Mosaico:"
+msgstr "Μωσαϊκό:"
 
 #: ../src/wx/xrc/MapViewer.xrc:132
 msgid "Overflow:"
-msgstr "Desbordamiento:"
+msgstr "Υπερχείλιση:"
 
 #: ../src/wx/xrc/MemViewer.xrc:4
 msgid "Memory Viewer"
-msgstr "Visor de Memoria"
+msgstr "Προβολή μνήμης"
 
 #: ../src/wx/xrc/MemViewer.xrc:17
 msgid "&8-bit"
-msgstr "&8 bits"
+msgstr "&8-bit"
 
 #: ../src/wx/xrc/MemViewer.xrc:25
 msgid "&16-bit"
-msgstr "&16 bits"
+msgstr "&16-bit"
 
 #: ../src/wx/xrc/MemViewer.xrc:32
 msgid "&32-bit"
-msgstr "&32 bits"
+msgstr "&32-bit"
 
 #: ../src/wx/xrc/MemViewer.xrc:83
 msgid "Current address:"
-msgstr "Dirección actual:"
+msgstr "Τρέχουσα διεύθυνση:"
 
 #: ../src/wx/xrc/MemViewer.xrc:108
 msgid "&Load..."
-msgstr "&Cargar..."
+msgstr "Φόρτωση..."
 
 #: ../src/wx/xrc/NetLink.xrc:4
 msgid "Start Network Link"
-msgstr "Iniciar Enlace de Red"
+msgstr "Έναρξη σύνδεσης δικτύου"
 
 #: ../src/wx/xrc/NetLink.xrc:11
 msgid "Server"
-msgstr "Servidor"
+msgstr "Διακομιστής"
 
 #: ../src/wx/xrc/NetLink.xrc:19
 msgid "Client"
-msgstr "Cliente"
+msgstr "Πελάτης"
 
 #: ../src/wx/xrc/NetLink.xrc:32
 msgid "Players:"
-msgstr "Jugadores:"
+msgstr "Παίκτες:"
 
 #: ../src/wx/xrc/NetLink.xrc:41
 msgid "2"
@@ -3405,43 +3401,43 @@ msgstr "4"
 
 #: ../src/wx/xrc/NetLink.xrc:67
 msgid "Server:"
-msgstr "Servidor:"
+msgstr "Διακομιστής:"
 
 #: ../src/wx/xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
-msgstr "Visor de OAM"
+msgstr "Προβολή &OAM"
 
 #: ../src/wx/xrc/OAMViewer.xrc:85
 msgid "Rot.:"
-msgstr "Rot.:"
+msgstr "Περ.:"
 
 #: ../src/wx/xrc/PaletteViewer.xrc:4
 msgid "Palette Viewer"
-msgstr "Visor de Paleta"
+msgstr "Προβολή παλέτας"
 
 #: ../src/wx/xrc/PaletteViewer.xrc:88
 msgid "C&hange backdrop color..."
-msgstr "C&ambiar color de fondo..."
+msgstr "Αλλαγή χρώματος σκηνικού..."
 
 #: ../src/wx/xrc/SoundConfig.xrc:4
 msgid "Sound Settings"
-msgstr "Ajustes de Sonido"
+msgstr "Ρυθμίσεις ήχου"
 
 #: ../src/wx/xrc/SoundConfig.xrc:16
 msgid "Volume :"
-msgstr "Volumen :"
+msgstr "Ένταση :"
 
 #: ../src/wx/xrc/SoundConfig.xrc:34
 msgid "Mute"
-msgstr "Silenciar"
+msgstr "Σίγαση"
 
 #: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:313
 msgid "Maximum"
-msgstr "Máximo"
+msgstr "Μέγιστη"
 
 #: ../src/wx/xrc/SoundConfig.xrc:71
 msgid "Sample rate :"
-msgstr "Frecuencia de muestreo :"
+msgstr "Ρυθμός δειγματοληψίας :"
 
 #: ../src/wx/xrc/SoundConfig.xrc:77
 msgid "48 KHz"
@@ -3461,7 +3457,7 @@ msgstr "11 KHz"
 
 #: ../src/wx/xrc/SoundConfig.xrc:91
 msgid "Basic"
-msgstr "Básico"
+msgstr "Βασική"
 
 #: ../src/wx/xrc/SoundConfig.xrc:103
 msgid "SDL"
@@ -3481,47 +3477,47 @@ msgstr "DirectSound"
 
 #: ../src/wx/xrc/SoundConfig.xrc:139
 msgid "Device"
-msgstr "Dispositivo"
+msgstr "Συσκευή"
 
 #: ../src/wx/xrc/SoundConfig.xrc:147
 msgid "Enable stereo upmixing"
-msgstr "Activar mezcla ascendente estéreo"
+msgstr "Ενεργοποίηση μετατροπής σε στερεοφωνικό"
 
 #: ../src/wx/xrc/SoundConfig.xrc:154
 msgid "Enable hardware acceleration"
-msgstr "Activar aceleración por hardware"
+msgstr "Ενεργοποίηση επιτάχυνσης υλικού"
 
 #: ../src/wx/xrc/SoundConfig.xrc:183
 msgid "Number of sound buffers:"
-msgstr "Número de búferes de sonido:"
+msgstr "Αριθμός προσωρινών μνημών ήχου:"
 
 #: ../src/wx/xrc/SoundConfig.xrc:223
 msgid "Lots"
-msgstr "Lotes"
+msgstr "Πολλές"
 
 #: ../src/wx/xrc/SoundConfig.xrc:232
 msgid "Echo"
-msgstr "Eco"
+msgstr "Ηχώ"
 
 #: ../src/wx/xrc/SoundConfig.xrc:240
 msgid "Stereo"
-msgstr "Estéreo"
+msgstr "Στερεοφωνικά"
 
 #: ../src/wx/xrc/SoundConfig.xrc:251
 msgid "Center"
-msgstr "Centro"
+msgstr "Κέντρο"
 
 #: ../src/wx/xrc/SoundConfig.xrc:262
 msgid "Left/Right"
-msgstr "Izquierda/Derecha"
+msgstr "Αριστερά/Δεξιά"
 
 #: ../src/wx/xrc/SoundConfig.xrc:291
 msgid "Sound filtering"
-msgstr "Filtrado de sonido"
+msgstr "Φιλτράρισμα ήχου"
 
 #: ../src/wx/xrc/TileViewer.xrc:4
 msgid "Tile Viewer"
-msgstr "Visor de Tile"
+msgstr "Προβολή πλακιδίων"
 
 #: ../src/wx/xrc/TileViewer.xrc:15
 msgid "1&6"
@@ -3533,7 +3529,7 @@ msgstr "&256"
 
 #: ../src/wx/xrc/TileViewer.xrc:24
 msgid "Colors"
-msgstr "Colores"
+msgstr "Χρώματα"
 
 #: ../src/wx/xrc/TileViewer.xrc:34
 msgid "0x600&0000"
