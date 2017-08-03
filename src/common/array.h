@@ -53,7 +53,7 @@ template <typename T> class Array
 
         ~Array()
         {
-            if (dealloc) delete m_p;
+            if (dealloc) delete[] m_p;
         }
 
         size_type size() const
