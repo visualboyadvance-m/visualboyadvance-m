@@ -1658,6 +1658,8 @@ public:
             done->Post();
             continue;
         }
+
+        return 0;
     }
 };
 

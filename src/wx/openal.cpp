@@ -356,10 +356,10 @@ bool OpenAL::GetDevices(wxArrayString& names, wxArrayString& ids)
         devs += strlen(devs) + 1;
     }
 
-#else
+#endif
+
     // should work anyway, but must always use default driver
     return true;
-#endif
 }
 
 #endif
