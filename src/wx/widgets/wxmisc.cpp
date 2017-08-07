@@ -393,6 +393,7 @@ bool wxPositiveDoubleValidator::TransferToWindow()
         str_val = wxString::Format(wxT("%.1f"), *double_val);
         return wxGenericValidator::TransferToWindow();
     }
+    return true;
 }
 
 bool wxPositiveDoubleValidator::TransferFromWindow()

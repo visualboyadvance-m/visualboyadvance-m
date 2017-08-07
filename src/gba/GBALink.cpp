@@ -1918,7 +1918,8 @@ static void StartRFUSocket(uint16_t value)
                                     if (!ok) {
                                         rfu_curclient = rfu_numclients;
                                         rfu_data.rfu_clientidx[(rfu_masterdata[0] - 0x61f1) >> 3] = rfu_numclients;
-                                        rfu_clientlist[rfu_numclients] = rfu_masterdata[0] | (rfu_numclients++ << 16);
+                                        rfu_clientlist[rfu_numclients] = rfu_masterdata[0] | (rfu_numclients << 16);
+                                        rfu_numclients++;
                                         gbaid = (rfu_masterdata[0] - 0x61f1) >> 3;
                                         rfu_data.rfu_signal[gbaid] = 0xffffffff >> ((3 - (rfu_numclients - 1)) << 3);
                                     }
