@@ -1491,7 +1491,7 @@ void SetMapMasks()
         if (map[i].size > 0) {
             map[i].trace = (uint8_t*)calloc(map[i].size >> 3, sizeof(uint8_t));
 
-            map[i].breakPoints = (uint8_t*)calloc(map[i].size >> 1, sizeof(uint8_t)); //\\
+            map[i].breakPoints = (uint8_t*)calloc(map[i].size >> 1, sizeof(uint8_t));
 
             if (map[i].trace == NULL || map[i].breakPoints == NULL) {
                 systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
@@ -1499,7 +1499,7 @@ void SetMapMasks()
             }
         } else {
             map[i].trace = NULL;
-            map[i].breakPoints = NULL; //\\
+            map[i].breakPoints = NULL;
 
         }
     }
