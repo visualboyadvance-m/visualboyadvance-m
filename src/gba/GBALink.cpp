@@ -1838,17 +1838,12 @@ static void StartRFUSocket(uint16_t value)
                         rfu_lastcmd = rfu_cmd;
                         rfu_cmd = ioMem[COMM_SIODATA32_L];
                         rfu_cmd2 = 0;
-                        int maskid;
                         if (rfu_cmd == 0x27 || rfu_cmd == 0x37) {
                             rfu_lastcmd2 = rfu_cmd;
                             rfu_lasttime = linktime;
                         } else if (rfu_cmd == 0x24) { //non-important data shouldn't overwrite important data from 0x25
                             rfu_lastcmd2 = rfu_cmd;
                             rfu_cansend = false;
-                            if (rfu_ishost)
-                                maskid = ~rfu_data.rfu_is_host[linkid];
-                            else
-                                maskid = ~(1 << gbaid);
                             //previous important data need to be received successfully before sending another important data
                             rfu_lasttime = linktime; //just to mark the last time a data being sent
                             if (rfu_data.rfu_q[linkid] < 2) { //can overwrite now
@@ -1860,10 +1855,6 @@ static void StartRFUSocket(uint16_t value)
                         } else if (rfu_cmd == 0x25 || rfu_cmd == 0x35) {
                             rfu_lastcmd2 = rfu_cmd;
                             rfu_cansend = false;
-                            if (rfu_ishost)
-                                maskid = ~rfu_data.rfu_is_host[linkid];
-                            else
-                                maskid = ~(1 << gbaid);
                             //previous important data need to be received successfully before sending another important data
                             rfu_lasttime = linktime;
                             if (rfu_data.rfu_q[linkid] < 2) {
@@ -3052,17 +3043,12 @@ static void StartRFU(uint16_t value)
                         rfu_lastcmd = rfu_cmd;
                         rfu_cmd = ioMem[COMM_SIODATA32_L];
                         rfu_cmd2 = 0;
-                        int maskid;
                         if (rfu_cmd == 0x27 || rfu_cmd == 0x37) {
                             rfu_lastcmd2 = rfu_cmd;
                             rfu_lasttime = GetTickCount();
                         } else if (rfu_cmd == 0x24) { //non-important data shouldn't overwrite important data from 0x25
                             rfu_lastcmd2 = rfu_cmd;
                             rfu_cansend = false;
-                            if (rfu_ishost)
-                                maskid = ~linkmem->rfu_is_host[vbaid];
-                            else
-                                maskid = ~(1 << gbaid);
                             //previous important data need to be received successfully before sending another important data
                             rfu_lasttime = GetTickCount(); //just to mark the last time a data being sent
                             if (!speedhack) {
@@ -3103,10 +3089,6 @@ static void StartRFU(uint16_t value)
                         } else if (rfu_cmd == 0x25 || rfu_cmd == 0x35) {
                             rfu_lastcmd2 = rfu_cmd;
                             rfu_cansend = false;
-                            if (rfu_ishost)
-                                maskid = ~linkmem->rfu_is_host[vbaid];
-                            else
-                                maskid = ~(1 << gbaid);
                             //previous important data need to be received successfully before sending another important data
                             rfu_lasttime = GetTickCount();
                             if (!speedhack) {

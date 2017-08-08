@@ -1204,9 +1204,7 @@ void elfParseLineInfo(CompileUnit* unit, uint8_t* top)
         uint32_t address = 0;
         int file = 1;
         int line = 1;
-        int col = 0;
         int isStmt = defaultIsStmt;
-        int basicBlock = 0;
         int endSeq = 0;
 
         while (!endSeq) {
@@ -1231,7 +1229,6 @@ void elfParseLineInfo(CompileUnit* unit, uint8_t* top)
             case DW_LNS_copy:
                 //      fprintf(stderr, "Address %08x line %d (%d)\n", address, line, file);
                 elfAddLine(l, address, file, line, &max);
-                basicBlock = 0;
                 break;
             case DW_LNS_advance_pc:
                 address += minInstrSize * elfReadLEB128(data, &bytes);
@@ -1246,14 +1243,13 @@ void elfParseLineInfo(CompileUnit* unit, uint8_t* top)
                 data += bytes;
                 break;
             case DW_LNS_set_column:
-                col = elfReadLEB128(data, &bytes);
+                elfReadLEB128(data, &bytes);
                 data += bytes;
                 break;
             case DW_LNS_negate_stmt:
                 isStmt = !isStmt;
                 break;
             case DW_LNS_set_basic_block:
-                basicBlock = 1;
                 break;
             case DW_LNS_const_add_pc:
                 address += (minInstrSize * ((255 - opcodeBase) / lineRange));
@@ -1268,7 +1264,6 @@ void elfParseLineInfo(CompileUnit* unit, uint8_t* top)
                 line += lineBase + (op % lineRange);
                 elfAddLine(l, address, file, line, &max);
                 //        fprintf(stderr, "Address %08x line %d (%d)\n", address, line,file);
-                basicBlock = 1;
                 break;
             }
         }
@@ -1955,7 +1950,6 @@ uint8_t* elfParseBlock(uint8_t* data, ELFAbbrev* abbrev, CompileUnit* unit,
 {
     int bytes;
     uint32_t start = func->lowPC;
-    uint32_t end = func->highPC;
 
     for (int i = 0; i < abbrev->numAttrs; i++) {
         ELFAttr* attr = &abbrev->attrs[i];
@@ -1967,7 +1961,6 @@ uint8_t* elfParseBlock(uint8_t* data, ELFAbbrev* abbrev, CompileUnit* unit,
             start = attr->value;
             break;
         case DW_AT_high_pc:
-            end = attr->value;
             break;
         case DW_AT_ranges: // ignore for now
             break;
@@ -2117,7 +2110,6 @@ uint8_t* elfParseFunction(uint8_t* data, ELFAbbrev* abbrev, CompileUnit* unit,
     *f = func;
 
     int bytes;
-    bool mangled = false;
     bool declaration = false;
     for (int i = 0; i < abbrev->numAttrs; i++) {
         ELFAttr* attr = &abbrev->attrs[i];
@@ -2131,7 +2123,6 @@ uint8_t* elfParseFunction(uint8_t* data, ELFAbbrev* abbrev, CompileUnit* unit,
             break;
         case DW_AT_MIPS_linkage_name:
             func->name = attr->string;
-            mangled = true;
             break;
         case DW_AT_low_pc:
             func->lowPC = attr->value;

@@ -276,7 +276,6 @@ blargg_err_t Zip7_Extractor::next_v()
 		CSzFileItem const& item = impl->db.db.Files [index];
 		if ( !item.IsDir )
 		{
-			unsigned long date = 0;
 			if ( item.MTimeDefined )
 			{
 				const UInt64 epoch = ((UInt64)0x019db1de << 32) + 0xd53e8000;
@@ -294,12 +293,6 @@ blargg_err_t Zip7_Extractor::next_v()
 				localtime_r( &_time, &tm );
 			#endif
 
-				date = (( tm.tm_sec >> 1 ) & 0x1F) |
-					(( tm.tm_min & 0x3F ) << 5 ) |
-					(( tm.tm_hour & 0x1F ) << 11 ) |
-					(( tm.tm_mday & 0x1F ) << 16 ) |
-					(( ( tm.tm_mon + 1 ) & 0x0F ) << 21 ) |
-					(( ( tm.tm_year - 80 ) & 0x7F ) << 25 );
 			}
 
 			size_t name_length = SzArEx_GetFileNameUtf16( &impl->db, index, 0 );
