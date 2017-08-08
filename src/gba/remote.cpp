@@ -3917,7 +3917,7 @@ void remoteWriteWatch(char* p, bool active)
     //  return;
     //}
 
-    uint32_t final = address + count;
+    // uint32_t final = address + count;
 
 //if(address < 0x2040000 && final > 0x2040000) {
 //  remotePutPacket("E01");

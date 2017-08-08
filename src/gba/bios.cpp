@@ -1402,7 +1402,6 @@ void BIOS_SndDriverMain() // 0x1dc4 -> 0x08004024 phantasy star
 
     int const user2 = CPUReadMemory(puser1 + 0x20);
     if (user2) {
-        int const par1 = CPUReadMemory(puser1 + 0x24);
         // Call 0x2102  sub_16A8 - -> param r1
     }
 

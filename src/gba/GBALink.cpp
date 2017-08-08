@@ -334,9 +334,6 @@ static uint16_t numtransfers = 0;
 // time until next broadcast
 static int rfu_last_broadcast_time;
 
-// timer to sync data
-static int rfu_last_host_send_time;
-
 static uint32_t rfu_masterdata[255];
 bool rfu_enabled = false;
 bool rfu_initialized = false;
@@ -1781,7 +1778,6 @@ static void StartRFUSocket(uint16_t value)
     }
 
     uint32_t CurCOM = 0, CurDAT = 0;
-    bool rfulogd = (READ16LE(&ioMem[COMM_SIOCNT]) != value);
 
     switch (GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]))) {
     case NORMAL8:
@@ -1878,7 +1874,6 @@ static void StartRFUSocket(uint16_t value)
                                 rfu_waiting = true; //don't wait with speedhack
                         } else if (rfu_cmd == 0xa8 || rfu_cmd == 0xb6) {
                             //wait for [important] data when previously sent is important data, might only need to wait for the 1st 0x25 cmd
-                            bool ok = false;
                         } else if (rfu_cmd == 0x11 || rfu_cmd == 0x1a || rfu_cmd == 0x26) {
                             if (rfu_lastcmd2 == 0x24)
                                 rfu_waiting = true;
@@ -2424,7 +2419,6 @@ bool LinkRFUUpdateSocket()
     if (rfu_enabled) {
         if (transfer_direction == RECEIVING && rfu_transfer_end <= 0) {
             if (rfu_waiting) {
-                bool ok = false;
                 if (rfu_state != RFU_INIT) {
                     if (rfu_cmd == 0x24 || rfu_cmd == 0x25 || rfu_cmd == 0x35) {
                         if (rfu_data.rfu_q[linkid] < 2 || rfu_qsend > 1) {
@@ -2561,7 +2555,6 @@ uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
 {
     uint8_t dat = b; //0xff; //slave (w/ external clocks) won't be getting 0xff if master turned off
     uint8_t recvd = 0;
-    int idx = 0;
 
     gba_link_enabled = true; //(gbMemory[0xff02]!=0);
     rfu_enabled = false;

@@ -624,7 +624,6 @@ public:
 
         int tile_map_address = mapbase;
         // following copied almost verbatim from win32/GBMapView.cpp
-        int tile = 0;
 
         for (int y = 0; y < 32; y++) {
             for (int x = 0; x < 32; x++) {
@@ -879,7 +878,6 @@ public:
 
             wxImage spriteData(64, 64);
             uint8_t* bmp = spriteData.GetData();
-            int sy = (a0 & 255);
 
             if (a0 & 0x2000) {
                 int c = (a2 & 0x3FF);

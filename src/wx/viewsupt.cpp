@@ -563,7 +563,6 @@ void MemView::MoveSB()
     else
         pos = 250;
 
-    int sz = nlines > 20 ? 20 : nlines;
     sb.SetScrollbar(pos, 20, 500, 20);
 }
 

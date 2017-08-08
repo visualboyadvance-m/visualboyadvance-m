@@ -896,7 +896,6 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
     static uint16_t* accum_prdata;
     static int accum_prdata_len = 0, accum_prdata_size = 0;
     static uint16_t prdata[162 * 145] = { 0 };
-    static int picno = 0;
     int lines = len / 40;
     uint16_t* out = prdata + 162; // 1-pix top border
 
