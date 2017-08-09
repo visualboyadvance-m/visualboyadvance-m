@@ -3401,8 +3401,7 @@ bool MainFrame::BindControls()
                 NULL, &sound_config_handler);
             sound_config_handler.AdjustFrames(10);
             /// Game Boy
-            wxPanel* p;
-            p = SafeXRCCTRL<wxPanel>(d, "GBEnhanceSoundDep");
+            SafeXRCCTRL<wxPanel>(d, "GBEnhanceSoundDep");
             getsl("GBEcho", gopts.gb_echo);
             getsl("GBStereo", gopts.gb_stereo);
             /// Game Boy Advance

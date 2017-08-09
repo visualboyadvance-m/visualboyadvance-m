@@ -629,7 +629,6 @@ void MainFrame::OnActivate(wxActivateEvent& event)
 
 void MainFrame::OnDropFile(wxDropFilesEvent& event)
 {
-    int n = event.GetNumberOfFiles();
     wxString* f = event.GetFiles();
     // ignore all but last
     wxGetApp().pending_load = f[event.GetNumberOfFiles() - 1];

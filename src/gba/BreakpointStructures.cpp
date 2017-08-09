@@ -421,7 +421,6 @@ int removeConditionalBreakNo(uint32_t addrNo, uint8_t number)
     if (conditionals[addrNo >> 24]) {
         struct ConditionalBreak* base = conditionals[addrNo >> 24];
         struct ConditionalBreak* curr = conditionals[addrNo >> 24];
-        uint8_t count = 1;
         while (curr->break_address < addrNo) {
             base = curr;
             curr = curr->next;
@@ -462,7 +461,6 @@ int removeFlagFromConditionalBreakNo(uint32_t addrNo, uint8_t number, uint8_t fl
     if (conditionals[addrNo >> 24]) {
         struct ConditionalBreak* base = conditionals[addrNo >> 24];
         struct ConditionalBreak* curr = conditionals[addrNo >> 24];
-        uint8_t count = 1;
         while (curr->break_address < addrNo) {
             base = curr;
             curr = curr->next;
@@ -618,7 +616,6 @@ void parseAndCreateConditionalBreaks(uint32_t address, uint8_t flags, char** exp
     flags &= 0xf;
     if (!flags)
         return;
-    bool notBk = true;
     struct ConditionalBreakNode* now = (struct ConditionalBreakNode*)malloc(sizeof(struct ConditionalBreakNode));
     struct ConditionalBreakNode* toAdd = now;
     for (int i = 0; i < n; i++) {

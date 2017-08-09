@@ -495,37 +495,6 @@ protected:
 
             bmp += 3 * (1024 - sizeX);
         }
-
-        uint32_t xx;
-        uint32_t yy;
-
-        switch (bg) {
-        case 2:
-            xx = BG2X_L | BG2X_H << 16;
-            yy = BG2Y_L | BG2Y_H << 16;
-#if 0
-			renderView(xx, yy,
-			           BG2PA, BG2PC,
-			           BG2PB, BG2PD,
-			           (sizeX - 1) << 8,
-			           (sizeY - 1) << 8,
-			           (control & 0x2000) != 0);
-#endif
-            break;
-
-        case 3:
-            xx = BG3X_L | BG3X_H << 16;
-            yy = BG3Y_L | BG3Y_H << 16;
-#if 0
-			renderView(xx, yy,
-			           BG3PA, BG3PC,
-			           BG3PB, BG3PD,
-			           (sizeX - 1) << 8,
-			           (sizeY - 1) << 8,
-			           (control & 0x2000) != 0);
-#endif
-            break;
-        }
     }
 
     void renderMode3()
@@ -624,7 +593,6 @@ public:
 
         int tile_map_address = mapbase;
         // following copied almost verbatim from win32/GBMapView.cpp
-        int tile = 0;
 
         for (int y = 0; y < 32; y++) {
             for (int x = 0; x < 32; x++) {
@@ -879,7 +847,6 @@ public:
 
             wxImage spriteData(64, 64);
             uint8_t* bmp = spriteData.GetData();
-            int sy = (a0 & 255);
 
             if (a0 & 0x2000) {
                 int c = (a2 & 0x3FF);

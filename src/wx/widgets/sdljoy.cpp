@@ -129,7 +129,6 @@ void wxSDLJoy::Notify()
         if (dev) {
             int nax = joystate[i].nax, nhat = joystate[i].nhat,
                 nbut = joystate[i].nbut;
-            int ctrl = 0;
             short val;
 
             for (int j = 0; j < nax; j++) {
