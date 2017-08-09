@@ -9,10 +9,11 @@ ENDIF()
 
 SET(ALL_TARGETS fex visualboyadvance-m vbamcore vbam)
 
-if( COMMAND cmake_policy )
-    cmake_policy( SET CMP0003 NEW )
-    cmake_policy( SET CMP0005 OLD )
-endif( COMMAND cmake_policy )
+if(COMMAND cmake_policy)
+    cmake_policy(SET CMP0003 NEW) # link to full path of libs
+    cmake_policy(SET CMP0005 NEW) # escapes in add_definitions
+endif(COMMAND cmake_policy)
+
 SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts )
 #Output all binaries at top level
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
@@ -113,7 +114,7 @@ IF( NOT VERSION )
             if(GIT_FOUND)
                 include(GetGitRevisionDescription)
                 get_git_head_revision(REFSPEC COMMITHASH)
-                SET( VERSION "GIT Commit: " ${COMMITHASH} )
+                SET(VERSION "GIT Commit: ${COMMITHASH}")
             else(GIT_FOUND)
                 message(WARNING "Git executable not found")
             endif(GIT_FOUND)
@@ -210,8 +211,8 @@ ENDIF( ENABLE_LIRC )
 INCLUDE(GNUInstallDirs)
 
 # C defines
-ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONF_INSTALL_DIR=\\\""${CMAKE_INSTALL_FULL_SYSCONFDIR}"\\\" -DWITH_LIRC=${WITHLIRC})
-ADD_DEFINITIONS (-DVERSION=\\\""${VERSION}"\\\" -DPKGDATADIR=\\\""${CMAKE_INSTALL_FULL_DATADIR}/vbam"\\\" -DPACKAGE=)
+ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONF_INSTALL_DIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}" -DWITH_LIRC=${WITHLIRC})
+ADD_DEFINITIONS (-DVERSION="${VERSION}" -DPKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam" -DPACKAGE=)
 
 if( ENABLE_LINK )
     # IPC linking code needs sem_timedwait which can be either in librt or pthreads
@@ -252,7 +253,7 @@ ENDIF( NOT ENABLE_ASM_CORE )
 if( ENABLE_NLS )
     SET( LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale )
     ADD_DEFINITIONS ( -DENABLE_NLS )
-    ADD_DEFINITIONS ( -DLOCALEDIR=\\\""${LOCALEDIR}"\\\" )
+    ADD_DEFINITIONS ( -DLOCALEDIR="${LOCALEDIR}" )
     # for now, only GBALink.cpp uses gettext() directly
     IF(APPLE)
         # use Homebrew gettext if available
