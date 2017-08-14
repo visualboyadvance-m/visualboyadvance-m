@@ -1,4 +1,4 @@
-[![Join the chat at https://gitter.im/visualboyadvance-m/Lobby](https://badges.gitter.im/visualboyadvance-m/Lobby.svg)](https://gitter.im/visualboyadvance-m/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/visualboyadvance-m/Lobby](https://badges.gitter.im/visualboyadvance-m/Lobby.svg)](https://gitter.im/visualboyadvance-m/Lobby)
 [![Build Status](https://tea-ci.org/api/badges/visualboyadvance-m/visualboyadvance-m/status.svg)](https://tea-ci.org/visualboyadvance-m/visualboyadvance-m)
 # Visual Boy Advance - M
 
@@ -18,7 +18,7 @@ It is also generally very easy to build from source, see below.
 
 The basic formula to build vba-m is:
 
-```bash
+```shell
 cd ~ && mkdir src && cd src
 git clone https://github.com/visualboyadvance-m/visualboyadvance-m.git
 cd visualboyadvance-m
@@ -28,7 +28,7 @@ cd visualboyadvance-m
 
 mkdir build && cd build
 cmake ..
-make -j8
+make -j`nproc`
 ```
 
 `./installdeps` is supported on MSys2, Linux (Debian/Ubuntu, Fedora, Arch or
@@ -38,23 +38,23 @@ The Ninja cmake generator is also now supported, including on msys2.
 
 If your OS is not supported, you will need the following:
 
-- c++ compiler and binutils
-- make
-- cmake
-- git
+- C++ compiler and binutils
+- [make](https://en.wikipedia.org/wiki/Make_(software))
+- [CMake](https://cmake.org/)
+- [git](https://git-scm.com/)
 - nasm (optional, for 32 bit builds)
 
 And the following development libraries:
 
-- zlib (required)
-- mesa (if using X11 or any OpenGL otherwise)
+- [zlib](https://zlib.net/) (required)
+- [mesa](https://mesa3d.org/) (if using X11 or any OpenGL otherwise)
 - ffmpeg (optional, for game recording)
 - gettext and gettext tools (optional, with ENABLE_NLS)
 - png (required)
-- SDL2 (required)
-- SFML (optional, for link)
+- [SDL](https://www.libsdl.org/)2 (required)
+- [SFML](https://www.sfml-dev.org/) (optional, for link)
 - OpenAL (optional, a sound interface)
-- wxWidgets (required, 2.8 is still supported)
+- [wxWidgets](https://wxwidgets.org/) (required, 2.8 is still supported)
 - cairo (optional, rendering interface)
 
 On Linux and similar, you also need the version of GTK your wxWidgets is linked
@@ -90,14 +90,14 @@ broken, I will at some point redo the arch stuff to use MXE as well.
 The CMake code tries to guess reasonable defaults for options, but you can
 override them on the cmake command with e.g.:
 
-```bash
+```shell
 cmake .. -DENABLE_LINK=NO
 ```
 
 Of particular interest is making **RELEASE** or **DEBUG** builds, the default
 mode is **RELEASE**, to make a **DEBUG** build use something like:
 
-```bash
+```shell
 cmake .. -DCMAKE_BUILD_TYPE=Debug
 ```
 
@@ -131,7 +131,7 @@ to configure installation directories.
 
 To run the resulting binary, you can simply type:
 
-```bash
+```shell
 ./visualboyadvance-m
 ```
 
@@ -172,7 +172,7 @@ wxLogDebug(wxT("Hello, %s!"), world.utf8_str());
 
 ## CONTRIBUTING
 
-Please keep in mind that this app needs to run on Windows, Linux and Mac OS X at
+Please keep in mind that this app needs to run on Windows, Linux and macOS at
 the very least, so code should be portable and/or use the appropriate `#ifdef`s
 and the like when needed.
 
