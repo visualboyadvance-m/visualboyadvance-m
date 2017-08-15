@@ -175,7 +175,7 @@ void SoundSDL::pause()
 	if (!_initialized)
 		return;
 
-	SDL_PauseAudioDevice(_dev, 1);
+	//SDL_PauseAudioDevice(_dev, 1); // this causes thread deadlocks
 }
 
 void SoundSDL::resume()
@@ -183,7 +183,7 @@ void SoundSDL::resume()
 	if (!_initialized)
 		return;
 
-	SDL_PauseAudioDevice(_dev, 0);
+	//SDL_PauseAudioDevice(_dev, 0); // this causes thread deadlocks
 }
 
 void SoundSDL::reset()
