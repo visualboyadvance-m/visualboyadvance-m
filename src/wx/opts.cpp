@@ -136,7 +136,7 @@ wxJoyKeyBinding defkeys[NUM_KEYS * 2] = {
     { WXK_NUMPAD_LEFT }, { 3, WXJB_AXIS_MINUS, 1 }, { WXK_NUMPAD_RIGHT }, { 3, WXJB_AXIS_PLUS, 1 },
     { WXK_NUMPAD_PAGEUP }, { 4, WXJB_AXIS_PLUS, 1 }, { WXK_NUMPAD_PAGEDOWN }, { 4, WXJB_AXIS_MINUS, 1 },
     { wxT('W') }, { 0 }, { wxT('Q') }, { 0 },
-    { WXK_SPACE }, { 0 }, { WXK_F11 }, { 0 },
+    { WXK_SPACE }, { 0 }, { 0 }, { 0 },
     { 0 }, { 0 }
 };
 
