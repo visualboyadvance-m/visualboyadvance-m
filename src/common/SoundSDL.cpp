@@ -39,18 +39,17 @@ void SoundSDL::soundCallback(void *data, uint8_t *stream, int len)
 	reinterpret_cast<SoundSDL*>(data)->read(reinterpret_cast<uint16_t *>(stream), len);
 }
 
+bool SoundSDL::should_wait()
+{
+    return emulating && !speedup && throttle && !gba_joybus_active;
+}
+
 void SoundSDL::read(uint16_t * stream, int length)
 {
 	if (!_initialized || length <= 0 || !emulating)
 		return;
 
-
-	/* since this is running in a different thread, speedup and
-	 * throttle can change at any time; save the value so locks
-	 * stay in sync */
-	bool lock = (emulating && !speedup && throttle && !gba_joybus_active) ? true : false;
-
-	if (lock)
+	if (should_wait())
 		SDL_SemWait (_semBufferFull);
 
 	SDL_mutexP(_mutex);
@@ -77,8 +76,6 @@ void SoundSDL::write(uint16_t * finalWave, int length)
 	std::size_t avail;
 	while ((avail = _rbuf.avail() / 2) < samples)
 	{
-		bool lock = (emulating && !speedup && throttle && !gba_joybus_active) ? true : false;
-
 		_rbuf.write(finalWave, avail * 2);
 
 		finalWave += avail * 2;
@@ -86,7 +83,7 @@ void SoundSDL::write(uint16_t * finalWave, int length)
 
 		SDL_mutexV(_mutex);
 		SDL_SemPost(_semBufferFull);
-		if (lock)
+		if (should_wait())
 		{
 			SDL_SemWait(_semBufferEmpty);
 			if (throttle > 0 && throttle != current_rate)

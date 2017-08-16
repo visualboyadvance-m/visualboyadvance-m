@@ -34,6 +34,7 @@ class SoundSDL : public SoundDriver
         virtual void reset();
         virtual void resume();
         virtual void write(uint16_t *finalWave, int length);
+        virtual bool should_wait();
 
         private:
         RingBuffer<uint16_t> _rbuf;
