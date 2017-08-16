@@ -1024,6 +1024,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
         w->Connect(wxEVT_PAINT,            wxPaintEventHandler(GameArea::PaintEv),         NULL, this);
         w->Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(GameArea::EraseBackground), NULL, this);
         w->Connect(wxEVT_SIZE,             wxSizeEventHandler(GameArea::OnSize),           NULL, this);
+        this->Connect(wxEVT_SIZE,          wxSizeEventHandler(GameArea::OnSize),           NULL, this);
 
         w->SetBackgroundStyle(wxBG_STYLE_CUSTOM);
         w->SetSize(wxSize(basic_width, basic_height));
@@ -1234,6 +1235,15 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
     }
 }
 
+static void draw_black_background(wxWindow* win) {
+    wxClientDC dc(win);
+    wxCoord w, h;
+    dc.GetSize(&w, &h);
+    dc.SetPen(*wxBLACK_PEN);
+    dc.SetBrush(*wxBLACK_BRUSH);
+    dc.DrawRectangle(0, 0, w, h);
+}
+
 void GameArea::OnKeyDown(wxKeyEvent& ev)
 {
     if (process_key_press(true, ev.GetKeyCode(), ev.GetModifiers())) {
@@ -1271,7 +1281,9 @@ void GameArea::EraseBackground(wxEraseEvent& ev)
 
 void GameArea::OnSize(wxSizeEvent& ev)
 {
-    panel->OnSize(ev);
+    draw_black_background(this);
+    if (panel)
+        panel->OnSize(ev);
 }
 
 void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
@@ -1415,11 +1427,7 @@ void DrawingPanelBase::PaintEv(wxPaintEvent& ev)
     if (!todraw) {
         // since this is set for custom background, not drawing anything
         // will cause garbage to be displayed, so draw a black area
-        wxCoord w, h;
-        dc.GetSize(&w, &h);
-        dc.SetPen(*wxBLACK_PEN);
-        dc.SetBrush(*wxBLACK_BRUSH);
-        dc.DrawRectangle(0, 0, w, h);
+        draw_black_background(GetWindow());
         return;
     }
 
