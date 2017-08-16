@@ -43,6 +43,7 @@ class SoundSDL : public SoundDriver
         SDL_sem *_semBufferFull;
         SDL_sem *_semBufferEmpty;
         SDL_AudioDeviceID _dev;
+        SDL_AudioSpec _audio_spec;
 
         int current_rate;
 

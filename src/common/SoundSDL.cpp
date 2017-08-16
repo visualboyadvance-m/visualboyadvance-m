@@ -46,8 +46,13 @@ bool SoundSDL::should_wait()
 
 void SoundSDL::read(uint16_t * stream, int length)
 {
-	if (!_initialized || length <= 0 || !emulating)
-		return;
+	if (!_initialized || length <= 0)
+           return;
+
+        if (!emulating) {
+            SDL_memset(stream, _audio_spec.silence, length);
+            return;
+        }
 
 	if (should_wait())
 		SDL_SemWait (_semBufferFull);
@@ -111,6 +116,7 @@ void SoundSDL::write(uint16_t * finalWave, int length)
 bool SoundSDL::init(long sampleRate)
 {
 	SDL_AudioSpec audio;
+        SDL_memset(&audio, 0, sizeof(audio));
 	audio.freq = throttle ? sampleRate * (throttle / 100.0) : sampleRate;
 	audio.format = AUDIO_S16SYS;
 	audio.channels = 2;
@@ -120,7 +126,7 @@ bool SoundSDL::init(long sampleRate)
 
 	if (!SDL_WasInit(SDL_INIT_AUDIO)) SDL_Init(SDL_INIT_AUDIO);
 
-	_dev = SDL_OpenAudioDevice(NULL, 0, &audio, NULL, SDL_AUDIO_ALLOW_ANY_CHANGE);
+	_dev = SDL_OpenAudioDevice(NULL, 0, &audio, &_audio_spec, SDL_AUDIO_ALLOW_ANY_CHANGE);
 	if(_dev < 0)
 	{
 		fprintf(stderr,"Failed to open audio: %s\n", SDL_GetError());
