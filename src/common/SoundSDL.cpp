@@ -15,6 +15,8 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include <cmath>
+#include <iostream>
 #include "SoundSDL.h"
 #include "ConfigManager.h"
 #include "../gba/Globals.h"
@@ -22,173 +24,161 @@
 
 extern int emulating;
 
-// Hold up to 32 ms of data in the ring buffer
-const float SoundSDL::_delay = 0.032f;
+// Hold up to 300 ms of data in the ring buffer
+const double SoundSDL::buftime = 0.300;
 
 SoundSDL::SoundSDL():
-	_rbuf(0),
-	_dev(-1),
-	current_rate(throttle),
-	_initialized(false)
-{
+    samples_buf(0),
+    sound_device(-1),
+    current_rate(throttle ? throttle : 100),
+    initialized(false)
+{}
 
+void SoundSDL::soundCallback(void* data, uint8_t* stream, int len) {
+    reinterpret_cast<SoundSDL*>(data)->read(reinterpret_cast<uint16_t *>(stream), len);
 }
 
-void SoundSDL::soundCallback(void *data, uint8_t *stream, int len)
-{
-	reinterpret_cast<SoundSDL*>(data)->read(reinterpret_cast<uint16_t *>(stream), len);
+bool SoundSDL::should_wait() {
+    return emulating && !speedup && current_rate && !gba_joybus_active;
 }
 
-bool SoundSDL::should_wait()
-{
-    return emulating && !speedup && throttle && !gba_joybus_active;
+std::size_t SoundSDL::buffer_size() {
+    SDL_LockMutex(mutex);
+    std::size_t size = samples_buf.used();
+    SDL_UnlockMutex(mutex);
+
+    return size;
 }
 
-void SoundSDL::read(uint16_t * stream, int length)
-{
-	if (!_initialized || length <= 0)
-           return;
+void SoundSDL::read(uint16_t* stream, int length) {
+    if (!initialized || length <= 0)
+        return;
 
-        if (!emulating) {
-            SDL_memset(stream, _audio_spec.silence, length);
+    SDL_memset(stream, audio_spec.silence, length);
+
+    if (!emulating)
+        return;
+
+    if (!buffer_size())
+        if (should_wait())
+            SDL_SemWait(data_available);
+        else
             return;
-        }
+
+    SDL_LockMutex(mutex);
+
+    samples_buf.read(stream, std::min((std::size_t)(length / 2), samples_buf.used()));
+
+    SDL_UnlockMutex(mutex);
+
+    SDL_SemPost(data_read);
+}
+
+void SoundSDL::write(uint16_t * finalWave, int length) {
+    if (!initialized)
+	return;
+
+    SDL_LockMutex(mutex);
+
+    if (SDL_GetAudioDeviceStatus(sound_device) != SDL_AUDIO_PLAYING)
+	SDL_PauseAudioDevice(sound_device, 0);
+
+    unsigned int samples = length / 4;
+    std::size_t avail;
+
+    while ((avail = samples_buf.avail() / 2) < samples) {
+	samples_buf.write(finalWave, avail * 2);
+
+	finalWave += avail * 2;
+	samples -= avail;
+
+	SDL_UnlockMutex(mutex);
+
+	SDL_SemPost(data_available);
 
 	if (should_wait())
-		SDL_SemWait (_semBufferFull);
+	    SDL_SemWait(data_read);
+	else
+	    // Drop the remaining of the audio data
+	    return;
 
-	SDL_mutexP(_mutex);
+	SDL_LockMutex(mutex);
+    }
 
-	_rbuf.read(stream, std::min(static_cast<std::size_t>(length) / 2, _rbuf.used()));
+    samples_buf.write(finalWave, samples * 2);
 
-	SDL_mutexV(_mutex);
-
-	SDL_SemPost (_semBufferEmpty);
-}
-
-void SoundSDL::write(uint16_t * finalWave, int length)
-{
-	if (!_initialized)
-		return;
-
-	if (SDL_GetAudioDeviceStatus(_dev) != SDL_AUDIO_PLAYING)
-		SDL_PauseAudioDevice(_dev, 0);
-
-	SDL_mutexP(_mutex);
-
-	unsigned int samples = length / 4;
-
-	std::size_t avail;
-	while ((avail = _rbuf.avail() / 2) < samples)
-	{
-		_rbuf.write(finalWave, avail * 2);
-
-		finalWave += avail * 2;
-		samples -= avail;
-
-		SDL_mutexV(_mutex);
-		SDL_SemPost(_semBufferFull);
-		if (should_wait())
-		{
-			SDL_SemWait(_semBufferEmpty);
-			if (throttle > 0 && throttle != current_rate)
-			{
-				SDL_CloseAudioDevice(_dev);
-				//Reinit on throttle change:
-				init(soundGetSampleRate());
-				current_rate = throttle;
-			}
-		}
-		else
-		{
-			// Drop the remaining of the audio data
-			return;
-		}
-		SDL_mutexP(_mutex);
-	}
-
-	_rbuf.write(finalWave, samples * 2);
-
-	SDL_mutexV(_mutex);
+    SDL_UnlockMutex(mutex);
 }
 
 
-bool SoundSDL::init(long sampleRate)
-{
-	SDL_AudioSpec audio;
-        SDL_memset(&audio, 0, sizeof(audio));
-	audio.freq = throttle ? sampleRate * (throttle / 100.0) : sampleRate;
-	audio.format = AUDIO_S16SYS;
-	audio.channels = 2;
-	audio.samples = 1024;
-	audio.callback = soundCallback;
-	audio.userdata = this;
+bool SoundSDL::init(long sampleRate) {
+    if (initialized) deinit();
 
-	if (!SDL_WasInit(SDL_INIT_AUDIO)) SDL_Init(SDL_INIT_AUDIO);
+    SDL_AudioSpec audio;
+    SDL_memset(&audio, 0, sizeof(audio));
+    audio.freq     = sampleRate * (current_rate / 100.0);
+    audio.format   = AUDIO_S16SYS;
+    audio.channels = 2;
+    audio.samples  = 2048;
+    audio.callback = soundCallback;
+    audio.userdata = this;
 
-	_dev = SDL_OpenAudioDevice(NULL, 0, &audio, &_audio_spec, SDL_AUDIO_ALLOW_ANY_CHANGE);
-	if(_dev < 0)
-	{
-		fprintf(stderr,"Failed to open audio: %s\n", SDL_GetError());
-		return false;
-	}
+    if (!SDL_WasInit(SDL_INIT_AUDIO)) SDL_Init(SDL_INIT_AUDIO);
 
-	_rbuf.reset(_delay * sampleRate * 2);
+    sound_device = SDL_OpenAudioDevice(NULL, 0, &audio, &audio_spec, SDL_AUDIO_ALLOW_ANY_CHANGE);
 
-	if (!_initialized)
-	{
-		_mutex = SDL_CreateMutex();
-		_semBufferFull  = SDL_CreateSemaphore (0);
-		_semBufferEmpty = SDL_CreateSemaphore (1);
-		_initialized    = true;
-	}
+    if(sound_device < 0) {
+        std::cerr << "Failed to open audio: " << SDL_GetError() << std::endl;
+        return false;
+    }
 
-	return true;
+    samples_buf.reset(std::ceil(buftime * sampleRate * 2));
+
+    mutex          = SDL_CreateMutex();
+    data_available = SDL_CreateSemaphore(0);
+    data_read      = SDL_CreateSemaphore(1);
+
+    return initialized = true;
 }
 
-SoundSDL::~SoundSDL()
-{
-	if (!_initialized)
-		return;
+void SoundSDL::deinit() {
+    if (!initialized)
+        return;
 
-	SDL_mutexP(_mutex);
-	int iSave = emulating;
-	emulating = 0;
-	SDL_SemPost(_semBufferFull);
-	SDL_SemPost(_semBufferEmpty);
-	SDL_mutexV(_mutex);
+    SDL_LockMutex(mutex);
+    int is_emulating = emulating;
+    emulating = 0;
+    SDL_SemPost(data_available);
+    SDL_SemPost(data_read);
+    SDL_UnlockMutex(mutex);
 
-	SDL_DestroySemaphore(_semBufferFull);
-	SDL_DestroySemaphore(_semBufferEmpty);
-	_semBufferFull = NULL;
-	_semBufferEmpty = NULL;
+    SDL_DestroySemaphore(data_available);
+    data_available = nullptr;
+    SDL_DestroySemaphore(data_read);
+    data_read      = nullptr;
 
-	SDL_DestroyMutex(_mutex);
-	_mutex = NULL;
+    SDL_DestroyMutex(mutex);
+    mutex = nullptr;
 
-	SDL_CloseAudioDevice(_dev);
+    SDL_CloseAudioDevice(sound_device);
 
-	emulating = iSave;
+    emulating = is_emulating;
 
-	_initialized = false;
+    initialized = false;
 }
 
-void SoundSDL::pause()
-{
-	if (!_initialized)
-		return;
-
-	//SDL_PauseAudioDevice(_dev, 1); // this causes thread deadlocks
+SoundSDL::~SoundSDL() {
+    deinit();
 }
 
-void SoundSDL::resume()
-{
-	if (!_initialized)
-		return;
+void SoundSDL::pause() {}
+void SoundSDL::resume() {}
 
-	//SDL_PauseAudioDevice(_dev, 0); // this causes thread deadlocks
+void SoundSDL::reset() {
+    init(soundGetSampleRate());
 }
 
-void SoundSDL::reset()
-{
+void SoundSDL::setThrottle(unsigned short throttle_) {
+    current_rate = throttle_ ? throttle_ : 100;
+    reset();
 }
