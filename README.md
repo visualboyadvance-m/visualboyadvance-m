@@ -170,6 +170,46 @@ wxString world = "world";
 wxLogDebug(wxT("Hello, %s!"), world.utf8_str());
 ```
 
+## REPORTING CRASH BUGS
+
+If the emulator crashes and you wish to report the bug, a backtrace made with
+debug symbols would be immensely helpful.
+
+To generate one (on Linux and MSYS2) first build in debug mode by invoking
+`cmake` as:
+
+```shell
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+```
+
+After you've reproduced the crash, you need the core dump file, you may need to
+do something such as:
+
+```shell
+ulimit -c unlimited
+```
+
+in your shell to enable coredump files.
+
+[This
+post](https://ask.fedoraproject.org/en/question/98776/where-is-core-dump-located/?answer=98779#post-id-98779)
+explains how to retrieve core dump on Fedora Linux (and possibly other
+distributions.)
+
+Once you have the core dump file, open it with `gdb`, for example:
+
+```shell
+gdb -c core ./visualboyadvance-m
+```
+
+In the `gdb` shell, to print the backtrace, type:
+
+```
+bt
+```
+
+This may be a bit of a hassle, but it helps us out immensely.
+
 ## CONTRIBUTING
 
 Please keep in mind that this app needs to run on Windows, Linux and macOS at
