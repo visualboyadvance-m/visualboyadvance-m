@@ -24,7 +24,7 @@ extern "C" {
 #define CODEC_ID_NONE AV_CODEC_ID_NONE
 #endif
 #endif
-#include "../../version.h"
+#include "version.h"
 #include "../common/ConfigManager.h"
 #include "../gb/gbPrinter.h"
 #include "../gba/agbprint.h"

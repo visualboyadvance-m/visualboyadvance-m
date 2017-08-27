@@ -2,7 +2,7 @@
 #include <wx/dcbuffer.h>
 #include <SDL_joystick.h>
 
-#include "../../version.h"
+#include "version.h"
 #include "../common/ConfigManager.h"
 #include "../common/Patch.h"
 #include "../gb/gbPrinter.h"

@@ -102,27 +102,26 @@ if( NOT ENABLE_DEBUGGER AND ENABLE_SDL )
         message( SEND_ERROR "The SDL port can't be built without debugging support" )
 endif( NOT ENABLE_DEBUGGER AND ENABLE_SDL )
 
-# Set the version number with -DVERSION=X.X.X-uber
-IF( NOT VERSION )
-#Will need to change this over to git
-    SET( VERSION "https://github.com/visualboyadvance-m/visualboyadvance-m" )
+find_package(Git)
+if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    INCLUDE(GetGitRevisionDescription)
+    EXECUTE_PROCESS(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD OUTPUT_VARIABLE SHORT_SHA OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    #openmw does this
-    if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
-        if(NOT EXISTS ${PROJECT_SOURCE_DIR}/.git/shallow)
-            find_package(Git)
-            if(GIT_FOUND)
-                include(GetGitRevisionDescription)
-                get_git_head_revision(REFSPEC COMMITHASH)
-                SET(VERSION "GIT Commit: ${COMMITHASH}")
-            else(GIT_FOUND)
-                message(WARNING "Git executable not found")
-            endif(GIT_FOUND)
-        else(NOT EXISTS ${PROJECT_SOURCE_DIR}/.git/shallow)
-            message(STATUS "Shallow Git clone detected, not attempting to retrieve version info")
-        endif(NOT EXISTS ${PROJECT_SOURCE_DIR}/.git/shallow)
-    endif(EXISTS ${PROJECT_SOURCE_DIR}/.git)
-ENDIF( NOT VERSION )
+    SET(REVISION ${SHORT_SHA} CACHE STRING "git short sha" FORCE)
+
+    # only use the plugin to tie the configure state to the sha to force rebuilds
+    # of files that depend on version.h
+    include(GetGitRevisionDescription)
+    get_git_head_revision(REFSPEC COMMITHASH)
+else()
+    message(WARNING "Git not found, cannot set version info")
+
+    SET(REVISION "unknown")
+endif()
+
+# generate version.h
+include_directories(${CMAKE_BINARY_DIR})
+configure_file("${CMAKE_SOURCE_DIR}/src/version.h.in" "${CMAKE_BINARY_DIR}/version.h" @ONLY)
 
 IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
     ADD_DEFINITIONS(-DDEBUG)
@@ -212,7 +211,7 @@ INCLUDE(GNUInstallDirs)
 
 # C defines
 ADD_DEFINITIONS (-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONF_INSTALL_DIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}" -DWITH_LIRC=${WITHLIRC})
-ADD_DEFINITIONS (-DVERSION="${VERSION}" -DPKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam" -DPACKAGE=)
+ADD_DEFINITIONS (-DPKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam" -DPACKAGE=)
 
 if( ENABLE_LINK )
     # IPC linking code needs sem_timedwait which can be either in librt or pthreads
@@ -449,7 +448,6 @@ SET(HDR_MAIN
     src/AutoBuild.h
     src/System.h
     src/Util.h
-    src/version.h
     src/common/array.h
     src/common/ConfigManager.h
     src/common/dictionary.h
