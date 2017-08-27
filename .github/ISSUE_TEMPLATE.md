@@ -22,7 +22,7 @@ Which games, if any, are NOT affected by the issue (please state if GBA or GB ga
 
 ### Option details
 
-Video driver (simple, opengl or cairo):
+Video driver (simple, opengl):
 
 Sound driver (directsound, xaudio, openal, SDL):
 
