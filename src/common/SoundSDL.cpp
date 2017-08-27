@@ -30,12 +30,12 @@ const double SoundSDL::buftime = 0.300;
 SoundSDL::SoundSDL():
     samples_buf(0),
     sound_device(-1),
-    current_rate(throttle ? throttle : 100),
+    current_rate(throttle),
     initialized(false)
 {}
 
 void SoundSDL::soundCallback(void* data, uint8_t* stream, int len) {
-    reinterpret_cast<SoundSDL*>(data)->read(reinterpret_cast<uint16_t *>(stream), len);
+    reinterpret_cast<SoundSDL*>(data)->read(reinterpret_cast<uint16_t*>(stream), len);
 }
 
 bool SoundSDL::should_wait() {
@@ -99,7 +99,7 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
 	if (should_wait())
 	    SDL_SemWait(data_read);
 	else
-	    // Drop the remaining of the audio data
+	    // Drop the remainder of the audio data
 	    return;
 
 	SDL_LockMutex(mutex);
@@ -116,7 +116,10 @@ bool SoundSDL::init(long sampleRate) {
 
     SDL_AudioSpec audio;
     SDL_memset(&audio, 0, sizeof(audio));
-    audio.freq     = sampleRate * (current_rate / 100.0);
+
+    // for "no throttle" use regular rate, audio is just dropped
+    audio.freq     = current_rate ? sampleRate * (current_rate / 100.0) : sampleRate;
+
     audio.format   = AUDIO_S16SYS;
     audio.channels = 2;
     audio.samples  = 2048;
@@ -179,6 +182,6 @@ void SoundSDL::reset() {
 }
 
 void SoundSDL::setThrottle(unsigned short throttle_) {
-    current_rate = throttle_ ? throttle_ : 100;
+    current_rate = throttle_;
     reset();
 }

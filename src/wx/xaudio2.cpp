@@ -599,15 +599,15 @@ void XAudio2_Output::reset()
     playing = true;
 }
 
-void XAudio2_Output::setThrottle(unsigned short throttle)
+void XAudio2_Output::setThrottle(unsigned short throttle_)
 {
     if (!initialized || failed)
         return;
 
-    if (throttle == 0)
-        throttle = 100;
+    if (throttle_ == 0)
+        throttle_ = 100;
 
-    HRESULT hr = sVoice->SetFrequencyRatio((float)throttle / 100.0f);
+    HRESULT hr = sVoice->SetFrequencyRatio((float)throttle_ / 100.0f);
     assert(hr == S_OK);
 }
 
