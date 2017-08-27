@@ -436,7 +436,6 @@ enum ifbfunc {
 enum renderer {
     RND_SIMPLE,
     RND_OPENGL,
-    RND_CAIRO,
     RND_DIRECT3D,
     RND_QUARTZ2D,
 };

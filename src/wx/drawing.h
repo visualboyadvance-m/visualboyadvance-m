@@ -57,20 +57,6 @@ protected:
 };
 #endif
 
-#ifndef NO_CAIRO
-#include <cairo.h>
-
-class CairoDrawingPanel : public DrawingPanel {
-public:
-    CairoDrawingPanel(wxWindow* parent, int _width, int _height);
-    ~CairoDrawingPanel();
-
-protected:
-    void DrawArea(wxWindowDC&);
-    cairo_surface_t* conv_surf;
-};
-#endif
-
 #if defined(__WXMAC__)
 class Quartz2DDrawingPanel : public BasicDrawingPanel {
 public:

@@ -1002,11 +1002,6 @@ void GameArea::OnIdle(wxIdleEvent& event)
             panel = new GLDrawingPanel(this, basic_width, basic_height);
             break;
 #endif
-#ifndef NO_CAIRO
-        case RND_CAIRO:
-            panel = new CairoDrawingPanel(this, basic_width, basic_height);
-            break;
-#endif
 #ifdef __WXMSW__
         case RND_DIRECT3D:
             panel = new DXDrawingPanel(this, basic_width, basic_height);
@@ -2208,124 +2203,6 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 }
 
 #endif // GL support
-
-#ifndef NO_CAIRO
-
-CairoDrawingPanel::CairoDrawingPanel(wxWindow* parent, int _width, int _height)
-    : DrawingPanel(parent, _width, _height)
-{
-    conv_surf = NULL;
-
-    // Intialize color tables in reverse order from default
-    // probably doesn't help mmx hq3x/hq4x
-    if (systemColorDepth == 32) {
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
-        systemBlueShift = 3;
-        systemRedShift = 19;
-#else
-        systemBlueShift = 27;
-        systemRedShift = 11;
-#endif
-    }
-
-    // FIXME: should be "true" for GBA carts if lcd mode selected
-    utilUpdateSystemColorMaps(false);
-
-    if (!did_init) DrawingPanelInit();
-}
-
-CairoDrawingPanel::~CairoDrawingPanel()
-{
-    if (conv_surf)
-        cairo_surface_destroy(conv_surf);
-}
-
-#include <wx/graphics.h>
-#ifdef __WXMSW__
-#include <cairo-win32.h>
-#include <gdiplus.h>
-#endif
-#if defined(__WXMAC__) && wxMAC_USE_CORE_GRAPHICS
-#include <cairo-quartz.h>
-#endif
-
-void CairoDrawingPanel::DrawArea(wxWindowDC& dc)
-{
-    cairo_t* cr;
-    wxGraphicsContext* gc = wxGraphicsContext::Create(dc);
-#ifdef __WXMSW__
-    // not sure why this is so slow
-    // doing this only once in constructor and resize handler doesn't seem
-    // to help, and may be unsafe
-    Gdiplus::Graphics* gr = (Gdiplus::Graphics*)gc->GetNativeContext();
-    cairo_surface_t* s = cairo_win32_surface_create(gr->GetHDC());
-    cr = cairo_create(s);
-    cairo_surface_destroy(s);
-#else
-#ifdef __WXGTK__
-    cr = cairo_reference((cairo_t*)gc->GetNativeContext());
-#else
-#if defined(__WXMAC__) && wxMAC_USE_CORE_GRAPHICS
-    CGContextRef c = static_cast<CGContextRef>(gc->GetNativeContext());
-    cairo_surface_t* s = cairo_quartz_surface_create_for_cg_context(c, width, height);
-    cr = cairo_create(s);
-    cairo_surface_destroy(s);
-#else
-#error Cairo rendering is not supported on this platform
-#endif
-#endif
-#endif
-    cairo_surface_t* surf;
-
-    if (!out_16)
-        surf = cairo_image_surface_create_for_data(todraw + 4 * width,
-            CAIRO_FORMAT_RGB24,
-            width, height,
-            4 * (width + 1));
-    else {
-        if (!conv_surf)
-            conv_surf = cairo_image_surface_create(CAIRO_FORMAT_RGB24,
-                std::ceil(width * scale),
-                std::ceil(height * scale));
-
-        if (!conv_surf) {
-            wxLogError(_("Cannot create conversion buffer"));
-            wxGetApp().frame->Close(true);
-        }
-
-        surf = cairo_surface_reference(conv_surf);
-        uint16_t* src = (uint16_t*)todraw + (int)std::ceil((width + 2) * scale); // skip top border
-        uint32_t* dst = (uint32_t*)cairo_image_surface_get_data(surf);
-
-        for (int y = 0; y < std::ceil(height * scale); y++) {
-            for (int x = 0; x < std::ceil(width * scale); x++, src++) {
-                *dst++ = (((*src >> systemRedShift) & 0x1f) << 19) | (((*src >> systemGreenShift) & 0x1f) << 11) | (((*src >> systemBlueShift) & 0x1f) << 3);
-            }
-
-            src += 2; // skip rhs border
-        }
-    }
-
-    cairo_pattern_t* pat = cairo_pattern_create_for_surface(surf);
-    // GOOD is "similar to" bilinear, and FAST is "similar to" nearest
-    // could also just use BILINEAR and NEAREST directly, I suppose
-    cairo_pattern_set_filter(pat, gopts.bilinear ? CAIRO_FILTER_GOOD : CAIRO_FILTER_FAST);
-    double sx, sy;
-    int w, h;
-    GetClientSize(&w, &h);
-    sx = (double)width / w;
-    sy = (double)height / h;
-    cairo_matrix_t mat;
-    cairo_matrix_init_scale(&mat, sx, sy);
-    cairo_pattern_set_matrix(pat, &mat);
-    cairo_set_source(cr, pat);
-    cairo_paint(cr);
-    cairo_pattern_destroy(pat);
-    cairo_surface_destroy(surf);
-    cairo_destroy(cr);
-    delete gc;
-}
-#endif
 
 #if defined(__WXMSW__) && !defined(NO_D3D)
 #define DIRECT3D_VERSION 0x0900
