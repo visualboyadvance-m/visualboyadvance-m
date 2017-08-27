@@ -41,7 +41,6 @@
 
 #include <time.h>
 
-#include "../AutoBuild.h"
 #include "version.h"
 
 #include "SDL.h"

@@ -16,9 +16,6 @@ extern "C" {
 #include <sys/stat.h>
 #include <cmath>
 
-#include "../AutoBuild.h"
-#include "version.h"
-
 #include "../common/Patch.h"
 #include "../common/ConfigManager.h"
 #include "../gba/GBA.h"

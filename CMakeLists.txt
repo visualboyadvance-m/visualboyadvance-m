@@ -445,7 +445,6 @@ if(MSVC)
 endif(MSVC)
 
 SET(HDR_MAIN
-    src/AutoBuild.h
     src/System.h
     src/Util.h
     src/common/array.h
