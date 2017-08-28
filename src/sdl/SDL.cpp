@@ -41,8 +41,7 @@
 
 #include <time.h>
 
-#include "../AutoBuild.h"
-#include "../version.h"
+#include "version.h"
 
 #include "SDL.h"
 
@@ -1640,11 +1639,7 @@ void handleRewinds()
 
 int main(int argc, char** argv)
 {
-#ifndef FINAL_BUILD
-    fprintf(stdout, "VBA-M version %s [SDL]\n", "Git:");
-#else
-    fprintf(stdout, "VBA-M version %s [SDL]");
-#endif
+    fprintf(stdout, "%s\n", VBA_NAME_AND_SUBVERSION);
 
     home = argv[0];
     SetHome(home);

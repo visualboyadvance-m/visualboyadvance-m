@@ -55,7 +55,6 @@ And the following development libraries:
 - [SFML](https://www.sfml-dev.org/) (optional, for link)
 - OpenAL (optional, a sound interface)
 - [wxWidgets](https://wxwidgets.org/) (required, 2.8 is still supported)
-- cairo (optional, rendering interface)
 
 On Linux and similar, you also need the version of GTK your wxWidgets is linked
 to (usually 2 or 3).
@@ -118,7 +117,6 @@ Here is the complete list:
 | ENABLE_FFMPEG        | Enable ffmpeg A/V recording                                          | ON on Linux and MSys2 |
 | ENABLE_LTO           | Compile with Link Time Optimization (gcc and clang only)             | ON where works        |
 | ENABLE_GBA_LOGGING   | Enable extended GBA logging                                          | ON                    |
-| ENABLE_CAIRO         | Enable Cairo rendering for wxWidgets                                 | OFF                   |
 | ENABLE_DIRECT3D      | Direct3D rendering for wxWidgets (Windows, **NOT IMPLEMENTED!!!**)   | ON                    |
 | ENABLE_XAUDIO2       | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
 | ENABLE_OPENAL        | Enable OpenAL for the wxWidgets port                                 | ON                    |
