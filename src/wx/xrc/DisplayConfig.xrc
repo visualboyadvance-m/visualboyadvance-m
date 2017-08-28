@@ -56,13 +56,6 @@
                     <flag>wxALL</flag>
                     <border>5</border>
                   </object>
-                  <object class="sizeritem">
-                    <object class="wxRadioButton" name="OutputCairo">
-                      <label>Cairo</label>
-                    </object>
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                  </object>
                 </object>
               </object>
             </object>
