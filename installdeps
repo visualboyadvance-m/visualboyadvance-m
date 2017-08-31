@@ -28,12 +28,15 @@ main() {
 
     case "$(uname -s)" in
         Linux)
+            os=linux
             linux_installdeps
             ;;
         Darwin)
+            os=mac
             osx_installdeps
             ;;
         MINGW*|MSYS*)
+            os=windows
             msys2_installdeps
             ;;
         *)
@@ -152,6 +155,38 @@ linux_installdeps() {
     else
         error "Don't know how to install deps on your version of Linux"
     fi
+}
+
+# the -j flag for make parameter, empty if 1
+jobs_flag() {
+    if [ $(num_cpus) -gt 1 ]; then
+        echo "-j$(num_cpus)"
+    fi
+}
+
+# number of CPUs to use for jobs, 1 less than total to not overload resources
+num_cpus() {
+    if [ -n "$_num_cpus" ]; then
+        if [ $((_num_cpus - 1)) -lt 1 ]; then
+            echo 1
+        else
+            echo $((_num_cpus - 1))
+        fi
+        return 0
+    fi
+
+    # determine number of CPUs and cache it
+    if command -v nproc >/dev/null; then
+        _num_cpus=$(nproc)
+    elif [ $os = linux -o $os = windows ]; then
+        _num_cpus=$(grep '^processor		*:' /proc/cpuinfo | wc -l)
+    elif [ $os = mac ]; then
+        _num_cpus=$(sysctl -n hw.ncpu)
+    fi
+
+    [ -z "$_num_cpus" ] && _num_cpus=1
+
+    num_cpus
 }
 
 check_cross() {
@@ -519,7 +554,7 @@ EOF
 
         grep -Ev '^[ 	]*MAKEFLAGS=' "$MAKEPKG_CONF" > "$tmp/makepkg.conf"
 
-        export MAKEFLAGS="-j$(($(cat /proc/cpuinfo | grep -E '^processor	' | wc -l)+1))"
+        export MAKEFLAGS=$(jobs_flag)
         echo "MAKEFLAGS=\"$MAKEFLAGS\"" >> "$tmp/makepkg.conf"
 
         export MAKEPKG_CONF="$tmp/makepkg.conf"
@@ -731,7 +766,7 @@ build_instructions() {
 $pre_build
 mkdir -p build && cd build
 $cmake .. $cmake_flags
-make -j8
+make $(jobs_flag)
 $post_build
 
 EOF
