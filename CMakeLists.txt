@@ -77,11 +77,7 @@ ENDIF()
 
 option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
 
-SET(LTO_DEFAULT ON)
-
-IF(WIN32)
-    SET(LTO_DEFAULT OFF)
-ENDIF()
+SET(LTO_DEFAULT OFF)
 
 OPTION(ENABLE_LTO "Compile with Link Time Optimization (gcc and clang only)" ${LTO_DEFAULT})
 
@@ -370,6 +366,10 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     ENDFOREACH()
 
     SET(MY_CXX_FLAGS -std=gnu++11 -fpermissive -fexceptions)
+
+    IF(CMAKE_COMPILER_IS_GNUCXX)
+        SET(MY_CXX_FLAGS ${MY_CXX_FLAGS} -fabi-version=2)
+    ENDIF()
 
     FOREACH(ARG ${MY_CXX_FLAGS})
         SET(MY_CXX_FLAGS_STR "${MY_CXX_FLAGS_STR} ${ARG}")
