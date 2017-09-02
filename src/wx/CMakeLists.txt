@@ -107,7 +107,56 @@ IF(NOT WX_HAS_OPENGL)
     FIND_PACKAGE(wxWidgets REQUIRED)
 ENDIF()
 
-# end of wx OpenGL check
+IF(CMAKE_COMPILER_IS_GNUCXX)
+    INCLUDE(CheckCXXSourceRuns)
+
+    UNSET(WX_ABI_MATCHES)
+    SET(WX_ABI_VERSION 1)
+
+    SET(CURRENT_DEFS ${CMAKE_REQUIRED_DEFINITIONS})
+    SET(CURRENT_LIBS ${CMAKE_REQUIRED_LIBRARIES})
+
+    # currently goes up to 11 with gcc7, but we give it some room
+    WHILE(NOT WX_ABI_VERSION GREATER 15)
+        SET(CMAKE_REQUIRED_DEFINITIONS ${CURRENT_DEFS} "-fabi-version=${WX_ABI_VERSION}")
+        SET(CMAKE_REQUIRED_LIBRARIES   ${CURRENT_LIBS} "-fabi-version=${WX_ABI_VERSION}")
+
+        SET(WX_ABI_VAR "WX_ABI_VERSION_${WX_ABI_VERSION}")
+
+        CHECK_CXX_SOURCE_RUNS("
+#include <cstdlib>
+#include <wx/wx.h>
+
+class MyApp : public wxAppConsole {
+public:
+    virtual bool OnInit();
+};
+
+bool MyApp::OnInit() {
+    exit(0);
+}
+
+wxIMPLEMENT_APP(MyApp);
+" ${WX_ABI_VAR})
+
+        IF(${${WX_ABI_VAR}})
+            BREAK()
+        ENDIF()
+
+        MATH(EXPR WX_ABI_VERSION "${WX_ABI_VERSION} + 1")
+    ENDWHILE()
+
+    SET(CMAKE_REQUIRED_DEFINITIONS ${CURRENT_DEFS})
+    SET(CMAKE_REQUIRED_LIBRARIES   ${CURRENT_LIBS})
+
+    IF(${${WX_ABI_VAR}})
+        # add C++ flags
+        STRING(REGEX REPLACE "<FLAGS>" "<FLAGS> -fabi-version=${WX_ABI_VERSION} " CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
+        SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -fabi-version=${WX_ABI_VERSION}")
+    ENDIF()
+ENDIF()
+
+# end of wx compile checks
 
 FOREACH(CXX_COMPILE_FLAG ${wxWidgets_CXX_FLAGS})
     ADD_COMPILE_OPTIONS(${CXX_COMPILE_FLAG})
