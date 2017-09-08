@@ -93,6 +93,7 @@ SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_FLAGS} ${CMAKE_REQUIRED_DEFINITI
 INCLUDE(CheckCXXSourceCompiles)
 
 CHECK_CXX_SOURCE_COMPILES("
+#include <wx/wxprec.h>
 #include <wx/config.h>
 #include <wx/glcanvas.h>
 
@@ -110,8 +111,9 @@ ENDIF()
 IF(CMAKE_COMPILER_IS_GNUCXX)
     INCLUDE(CheckCXXSourceRuns)
 
-    CHECK_CXX_SOURCE_RUNS("
+    SET(WX_TEST_CONSOLE_APP "
 #include <cstdlib>
+#include <wx/wxprec.h>
 #include <wx/wx.h>
 
 class MyApp : public wxAppConsole {
@@ -124,7 +126,9 @@ bool MyApp::OnInit() {
 }
 
 wxIMPLEMENT_APP(MyApp);
-" WX_DEFAULT_ABI_VERSION_COMPATIBLE)
+")
+
+    CHECK_CXX_SOURCE_RUNS("${WX_TEST_CONSOLE_APP}" WX_DEFAULT_ABI_VERSION_COMPATIBLE)
 
     IF(NOT WX_DEFAULT_ABI_VERSION_COMPATIBLE)
         # currently goes up to 11 with gcc7, but we give it some room
@@ -139,21 +143,7 @@ wxIMPLEMENT_APP(MyApp);
 
             SET(WX_ABI_VAR "WX_ABI_VERSION_${WX_ABI_VERSION}")
 
-            CHECK_CXX_SOURCE_RUNS("
-#include <cstdlib>
-#include <wx/wx.h>
-
-class MyApp : public wxAppConsole {
-public:
-    virtual bool OnInit();
-};
-
-bool MyApp::OnInit() {
-    exit(0);
-}
-
-wxIMPLEMENT_APP(MyApp);
-    " ${WX_ABI_VAR})
+            CHECK_CXX_SOURCE_RUNS("${WX_TEST_CONSOLE_APP}" ${WX_ABI_VAR})
 
             IF(${${WX_ABI_VAR}})
                 BREAK()
