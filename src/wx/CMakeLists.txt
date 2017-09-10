@@ -81,6 +81,11 @@ ENDFOREACH()
 SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${MY_CXX_FLAGS} ${MY_C_FLAGS} ${MY_CXX_LINKER_FLAGS} ${MY_C_LINKER_FLAGS} ${wxWidgets_LIBRARIES})
 SET(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS} ${wxWidgets_CXX_FLAGS} ${MY_CXX_FLAGS} ${MY_C_FLAGS})
 
+IF(WIN32)
+    SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} "-Wl,--subsystem,console")
+    SET(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   "-Wl,--subsystem,console")
+ENDIF()
+
 SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${wxWidgets_INCLUDE_DIRS})
 
 FOREACH(DEF ${wxWidgets_DEFINITIONS})
@@ -109,12 +114,39 @@ IF(NOT WX_HAS_OPENGL)
 ENDIF()
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
+    SET(WX_ABI_FOUND_MATCH FALSE)
+
     INCLUDE(CheckCXXSourceRuns)
 
     SET(WX_TEST_CONSOLE_APP "
 #include <cstdlib>
+#include <iostream>
 #include <wx/wxprec.h>
 #include <wx/wx.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#include \"MinHook.h\"
+
+typedef int (WINAPI *MESSAGEBOXW)(HWND, LPCWSTR, LPCWSTR, UINT);
+typedef int (WINAPI *MESSAGEBOXA)(HWND, LPCSTR,  LPCSTR,  UINT);
+
+// Pointers for calling original MessageBoxW/A.
+MESSAGEBOXW fpMessageBoxW = NULL;
+MESSAGEBOXA fpMessageBoxA = NULL;
+
+// Detour function which overrides MessageBoxW.
+int WINAPI DetourMessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType)
+{
+    std::wcerr << lpCaption << \": \" << lpText << std::endl;
+}
+
+// Detour function which overrides MessageBoxA.
+int WINAPI DetourMessageBoxA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType)
+{
+    std::cerr << lpCaption << \": \" << lpText << std::endl;
+}
+#endif
 
 class MyApp : public wxAppConsole {
 public:
@@ -125,8 +157,41 @@ bool MyApp::OnInit() {
     exit(0);
 }
 
-wxIMPLEMENT_APP(MyApp);
+wxIMPLEMENT_APP_NO_MAIN(MyApp);
+
+int main(int argc, char** argv)
+{
+#ifdef _WIN32
+    // just in case (this does nothing though)
+    SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
+
+    // we need to install a trampoline for messageboxes, because Wx is
+    // hard-coded to show a messagebox on wxLogFatalError()
+
+    // Initialize MinHook (for trampoline).
+    if (MH_Initialize() != MH_OK) return 1;
+
+    // Create a hook for MessageBoxW and MessageBoxA
+    if (MH_CreateHook(&MessageBoxW, &DetourMessageBoxW, reinterpret_cast<LPVOID*>(&fpMessageBoxW)) != MH_OK)
+        return 1;
+    if (MH_CreateHook(&MessageBoxA, &DetourMessageBoxA, reinterpret_cast<LPVOID*>(&fpMessageBoxA)) != MH_OK)
+        return 1;
+
+    if (MH_EnableHook(&MessageBoxW) != MH_OK) return 1;
+    if (MH_EnableHook(&MessageBoxA) != MH_OK) return 1;
+#endif
+
+    wxEntry(argc, argv);
+    wxEntryCleanup();
+    return 0;
+}
 ")
+
+    # on windows we need the trampoline library from dependencies
+    IF(WIN32)
+        SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} -w -fpermissive "-I${CMAKE_SOURCE_DIR}/dependencies/minhook/include")
+        SET(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   -Wl,--subsystem,console "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook.a")
+    ENDIF()
 
     CHECK_CXX_SOURCE_RUNS("${WX_TEST_CONSOLE_APP}" WX_DEFAULT_ABI_VERSION_COMPATIBLE)
 
@@ -146,6 +211,7 @@ wxIMPLEMENT_APP(MyApp);
             CHECK_CXX_SOURCE_RUNS("${WX_TEST_CONSOLE_APP}" ${WX_ABI_VAR})
 
             IF(${${WX_ABI_VAR}})
+                SET(WX_ABI_FOUND_MATCH TRUE)
                 BREAK()
             ENDIF()
 
@@ -154,12 +220,12 @@ wxIMPLEMENT_APP(MyApp);
 
         SET(CMAKE_REQUIRED_DEFINITIONS ${CURRENT_DEFS})
         SET(CMAKE_REQUIRED_LIBRARIES   ${CURRENT_LIBS})
+    ENDIF()
 
-        IF(${${WX_ABI_VAR}})
-            # add C++ flags
-            STRING(REGEX REPLACE "<FLAGS>" "<FLAGS> -fabi-version=${WX_ABI_VERSION} " CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
-            SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -fabi-version=${WX_ABI_VERSION}")
-        ENDIF()
+    IF(WX_ABI_FOUND_MATCH)
+        # add C++ flags
+        STRING(REGEX REPLACE "<FLAGS>" "<FLAGS> -fabi-version=${WX_ABI_VERSION} " CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
+        SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -fabi-version=${WX_ABI_VERSION}")
     ENDIF()
 ENDIF()
 
