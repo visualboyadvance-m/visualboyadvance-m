@@ -2,7 +2,7 @@
 #define WX_OPTS_H
 
 #define NUM_KEYS 21
-extern const wxChar* const joynames[NUM_KEYS];
+extern const wxString joynames[NUM_KEYS];
 extern wxJoyKeyBinding defkeys[NUM_KEYS * 2]; // keyboard + joystick defaults
 
 extern struct opts_t {
@@ -84,12 +84,12 @@ extern struct opts_t {
 } gopts;
 
 extern struct opt_desc {
-    const wxChar* opt;
+    wxString opt;
     const char* cmd;
-    const wxChar* desc;
+    wxString desc;
     wxString* stropt;
     int* intopt;
-    const wxChar* enumvals;
+    wxString enumvals;
     double min, max;
     bool* boolopt;
     double* doubleopt;
@@ -112,6 +112,6 @@ void load_opts();
 // will detect changes and write config if necessary
 void update_opts();
 // returns true if option name correct; prints error if val invalid
-bool opt_set(const wxChar* name, const wxChar* val);
+bool opt_set(const wxString& name, const wxString& val);
 
 #endif /* WX_OPTS_H */

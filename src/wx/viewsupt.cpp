@@ -21,7 +21,7 @@ void Viewer::CloseDlg(wxCloseEvent& ev)
     Destroy();
 }
 
-Viewer::Viewer(const wxChar* name)
+Viewer::Viewer(const wxString& name)
     : wxDialog()
     , auto_update(false)
 {
@@ -1075,7 +1075,7 @@ EVT_LEFT_UP(GfxPanel::Click)
 EVT_MOTION(GfxPanel::MouseMove)
 END_EVENT_TABLE()
 
-GfxViewer::GfxViewer(const wxChar* dname, int maxw, int maxh)
+GfxViewer::GfxViewer(const wxString& dname, int maxw, int maxh)
     : Viewer(dname)
     , image(maxw, maxh)
 {

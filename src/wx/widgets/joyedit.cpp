@@ -189,17 +189,17 @@ static wxCriticalSection recs;
 
 // wx provides no atoi for wxChar
 // this is not a universal function; assumes valid number
-static int simple_atoi(const wxChar* s, int len)
+static int simple_atoi(const wxString& s, int len)
 {
     int ret = 0;
 
     for (int i = 0; i < len; i++)
-        ret = ret * 10 + s[i] - wxT('0');
+        ret = ret * 10 + (int)(s[i] - wxT('0'));
 
     return ret;
 }
 
-static bool ParseJoy(const wxChar* s, int len, int& mod, int& key, int& joy)
+static bool ParseJoy(const wxString& s, int len, int& mod, int& key, int& joy)
 {
     mod = key = joy = 0;
 
@@ -212,24 +212,24 @@ static bool ParseJoy(const wxChar* s, int len, int& mod, int& key, int& joy)
     if (!joyre.Matches(s) || !joyre.GetMatch(&b, &l) || b)
         return false;
 
-    const wxChar* p = s + l;
+    const wxString p = s.Mid(l);
     int alen = len - l;
     joyre.GetMatch(&b, &l, 1);
-    joy = simple_atoi(s + b, l);
+    joy = simple_atoi(s.Mid(b), l);
 #define is_ctrl(re) re.Matches(p) && re.GetMatch(&b, &l) && l == alen && !b
 
     if (is_ctrl(axre)) {
         axre.GetMatch(&b, &l, 1);
-        key = simple_atoi(p + b, l);
+        key = simple_atoi(p.Mid(b), l);
         axre.GetMatch(&b, &l, 2);
         mod = p[b] == wxT('+') ? WXJB_AXIS_PLUS : WXJB_AXIS_MINUS;
     } else if (is_ctrl(butre)) {
         butre.GetMatch(&b, &l, 1);
-        key = simple_atoi(p + b, l);
+        key = simple_atoi(p.Mid(b), l);
         mod = WXJB_BUTTON;
     } else if (is_ctrl(hatre)) {
         hatre.GetMatch(&b, &l, 1);
-        key = simple_atoi(p + b, l);
+        key = simple_atoi(p.Mid(b), l);
 #define check_dir(n, d) else if (hatre.GetMatch(&b, &l, n) && l > 0) mod = WXJB_HAT_##d
 
         if (0)
@@ -251,7 +251,7 @@ static bool ParseJoy(const wxChar* s, int len, int& mod, int& key, int& joy)
     return true;
 }
 
-bool wxJoyKeyTextCtrl::ParseString(const wxChar* s, int len, int& mod, int& key, int& joy)
+bool wxJoyKeyTextCtrl::ParseString(const wxString& s, int len, int& mod, int& key, int& joy)
 {
     if (ParseJoy(s, len, mod, key, joy))
         return true;

@@ -25,7 +25,7 @@ namespace Viewers {
 class Viewer : public wxDialog {
 public:
     void CloseDlg(wxCloseEvent& ev);
-    Viewer(const wxChar* name);
+    Viewer(const wxString& name);
     virtual ~Viewer()
     {
     }
@@ -46,7 +46,7 @@ public:
     }
 
 protected:
-    const wxChar* dname;
+    wxString dname;
     void SetAutoUpdate(wxCommandEvent& ev)
     {
         auto_update = ev.IsChecked();
@@ -372,7 +372,7 @@ END_DECLARE_EVENT_TYPES()
 // this is what actually manages the GfxPanel
 class GfxViewer : public Viewer {
 public:
-    GfxViewer(const wxChar* dname, int maxw, int maxh);
+    GfxViewer(const wxString& dname, int maxw, int maxh);
     void ChangeBMP();
     void BMPSize(int w, int h);
 

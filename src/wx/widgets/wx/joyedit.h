@@ -57,7 +57,7 @@ public:
     // returns empty array on parse errors
     static wxJoyKeyBinding_v FromString(const wxString& s, wxChar sep = wxT(','));
     // parse a single key in given wxChar array up to given len
-    static bool ParseString(const wxChar* s, int len, int& mod, int& key, int& joy);
+    static bool ParseString(const wxString& s, int len, int& mod, int& key, int& joy);
 
 protected:
     void OnJoy(wxSDLJoyEvent&);

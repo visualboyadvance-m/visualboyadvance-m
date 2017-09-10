@@ -274,7 +274,7 @@ EVT_HANDLER(wxID_FILE10, "Load recent ROM 10")
 }
 
 static const struct rom_maker {
-    const wxChar *code, *name;
+    const wxString code, name;
 } makers[] = {
     { wxT("01"), wxT("Nintendo") },
     { wxT("02"), wxT("Rocket Games") },
@@ -503,7 +503,7 @@ static bool maker_lt(const rom_maker& r1, const rom_maker& r2)
     return wxStrcmp(r1.code, r2.code) < 0;
 }
 
-void SetDialogLabel(wxDialog* dlg, wxChar* id, wxString ts, size_t l)
+void SetDialogLabel(wxDialog* dlg, const wxString& id, wxString ts, size_t l)
 {
     ts.Replace(wxT("&"), wxT("&&"), true);
     (dynamic_cast<wxControl*>((*dlg).FindWindow(wxXmlResource::GetXRCID(id))))->SetLabel(ts);
@@ -557,7 +557,7 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
 
         setlab("MakerName");
         setblab("UnitCode", gbRom[0x146]);
-        const wxChar* type;
+        wxString type;
 
         switch (gbRom[0x147]) {
         case 0x00:
@@ -1187,15 +1187,15 @@ EVT_HANDLER_MASK(RecordSoundStartRecording, "Start sound recording...", CMDEN_NS
 
     sound_path = GetGamePath(gopts.recording_dir);
     wxString def_name = panel->game_name();
-    const wxChar* extoff = sound_exts.c_str();
+    wxString extoff = sound_exts;
 
     for (int i = 0; i < sound_extno; i++) {
-        extoff = wxStrchr(extoff, wxT('|')) + 1;
-        extoff = wxStrchr(extoff, wxT('|')) + 1;
+        extoff = extoff.Mid(extoff.Find(wxT('|')) + 1);
+        extoff = extoff.Mid(extoff.Find(wxT('|')) + 1);
     }
 
-    extoff = wxStrchr(extoff, wxT('|')) + 2; // skip *
-    def_name += wxString(extoff, wxStrcspn(extoff, wxT(";|")));
+    extoff = extoff.Mid(extoff.Find(wxT('|')) + 2); // skip *
+    def_name += extoff.Left(wxStrcspn(extoff, wxT(";|")));
     wxFileDialog dlg(this, _("Select output file"), sound_path, def_name,
         sound_exts, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     dlg.SetFilterIndex(sound_extno);
@@ -1260,15 +1260,15 @@ EVT_HANDLER_MASK(RecordAVIStartRecording, "Start video recording...", CMDEN_NVRE
 
     vid_path = GetGamePath(gopts.recording_dir);
     wxString def_name = panel->game_name();
-    const wxChar* extoff = vid_exts.c_str();
+    wxString extoff = vid_exts;
 
     for (int i = 0; i < vid_extno; i++) {
-        extoff = wxStrchr(extoff, wxT('|')) + 1;
-        extoff = wxStrchr(extoff, wxT('|')) + 1;
+        extoff = extoff.Mid(extoff.Find(wxT('|')) + 1);
+        extoff = extoff.Mid(extoff.Find(wxT('|')) + 1);
     }
 
-    extoff = wxStrchr(extoff, wxT('|')) + 2; // skip *
-    def_name += wxString(extoff, wxStrcspn(extoff, wxT(";|")));
+    extoff = extoff.Mid(extoff.Find(wxT('|')) + 2); // skip *
+    def_name += extoff.Left(wxStrcspn(extoff, wxT(";|")));
     wxFileDialog dlg(this, _("Select output file"), vid_path, def_name,
         vid_exts, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     dlg.SetFilterIndex(vid_extno);

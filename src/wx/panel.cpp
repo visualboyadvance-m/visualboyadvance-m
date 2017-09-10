@@ -1,4 +1,5 @@
 #include <cmath>
+#include <cstring>
 #include <wx/dcbuffer.h>
 #include <SDL_joystick.h>
 
@@ -1785,11 +1786,14 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
         if (!disableStatusMessages && !panel->osdtext.empty()) {
             if (systemGetClock() - panel->osdtime < OSD_TIME) {
-                std::string message = ToString(panel->osdtext);
+                wxString message = panel->osdtext;
                 int linelen = std::ceil(width * scale - 20) / 8;
-                int nlines = (message.length() + linelen - 1) / linelen;
+                int nlines = (message.size() + linelen - 1) / linelen;
                 int cury = height - 14 - nlines * 10;
-                char* ptr = const_cast<char*>(message.c_str());
+                const char* msg_data = message.utf8_str();
+                char buf[message.size() + 1];
+                char* ptr = &buf[0];
+                std::strncpy(ptr, msg_data, message.size() + 1);
 
                 while (nlines > 1) {
                     char lchar = ptr[linelen];
@@ -2223,7 +2227,7 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 #endif
 
 #ifndef NO_FFMPEG
-static const wxChar* media_err(MediaRet ret)
+static const wxString media_err(MediaRet ret)
 {
     switch (ret) {
     case MRET_OK:

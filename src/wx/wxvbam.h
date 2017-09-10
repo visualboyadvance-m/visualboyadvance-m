@@ -632,7 +632,7 @@ void systemScreenMessage(const wxString& msg);
 // sorted by cmd field for binary searching
 // filled in by copy-events.cmake
 extern struct cmditem {
-    const wxChar *cmd, *name;
+    const wxString cmd, name;
     int cmd_id;
     int mask_flags; // if non-0, one of the flags must be turned on in win
     // to enable this command

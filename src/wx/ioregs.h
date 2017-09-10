@@ -3,9 +3,9 @@
 struct IOData {
     uint16_t* address;
     uint16_t offset;
-    const wxChar* name;
+    const wxString name;
     uint16_t write;
-    const wxChar* bits[16];
+    wxString bits[16];
 };
 
 /* const */ IOData ioregs[] = // not const so tranlation can be done once

@@ -2292,7 +2292,19 @@ public:
 /////////////////////////////
 //Check if a pointer from the XRC file is valid. If it's not, throw an error telling the user.
 template <typename T>
-void CheckThrowXRCError(T pointer, std::string name)
+void CheckThrowXRCError(T pointer, const wxString& name)
+{
+    if (pointer == NULL) {
+        std::string errormessage = "Unable to load a \"";
+        errormessage += typeid(pointer).name();
+        errormessage += "\" from the builtin xrc file: ";
+        errormessage += name.utf8_str();
+        throw std::runtime_error(errormessage);
+    }
+}
+
+template <typename T>
+void CheckThrowXRCError(T pointer, const char* name)
 {
     if (pointer == NULL) {
         std::string errormessage = "Unable to load a \"";
@@ -2302,6 +2314,7 @@ void CheckThrowXRCError(T pointer, std::string name)
         throw std::runtime_error(errormessage);
     }
 }
+
 wxDialog* MainFrame::LoadXRCDialog(const char* name)
 {
     wxString dname = wxString::FromUTF8(name);
@@ -2347,7 +2360,15 @@ T* SafeXRCCTRL(wxWindow* parent, const char* name)
     wxString dname = wxString::FromUTF8(name);
     //This is needed to work around a bug in XRCCTRL
     wxString Ldname = dname;
-    T* output = XRCCTRL(*parent, dname, T);
+    T* output = XRCCTRL_D(*parent, dname, T);
+    CheckThrowXRCError(output, name);
+    return output;
+}
+
+template <typename T>
+T* SafeXRCCTRL(wxWindow* parent, const wxString& name)
+{
+    T* output = XRCCTRL_D(*parent, name, T);
     CheckThrowXRCError(output, name);
     return output;
 }
@@ -3214,7 +3235,7 @@ bool MainFrame::BindControls()
                 // "Unable to load dialog GameBoyConfig from resources", this is
                 // probably the reason.
                 pn.Printf(wxT("cp%d"), i + 1);
-                wxWindow* w = SafeXRCCTRL<wxWindow>(d, ToString(pn).c_str());
+                wxWindow* w = SafeXRCCTRL<wxWindow>(d, pn);
                 GBColorConfigHandler[i].p = w;
                 GBColorConfigHandler[i].pno = i;
                 wxFarRadio* cb = SafeXRCCTRL<wxFarRadio>(w, "UsePalette");
@@ -3231,7 +3252,7 @@ bool MainFrame::BindControls()
                 for (int j = 0; j < 8; j++) {
                     wxString s;
                     s.Printf(wxT("Color%d"), j);
-                    wxColourPickerCtrl* cp = SafeXRCCTRL<wxColourPickerCtrl>(w, ToString(s).c_str());
+                    wxColourPickerCtrl* cp = SafeXRCCTRL<wxColourPickerCtrl>(w, s);
                     GBColorConfigHandler[i].cp[j] = cp;
                     cp->SetValidator(wxColorValidator(&systemGbPalette[i * 8 + j]));
                 }
@@ -3433,7 +3454,7 @@ bool MainFrame::BindControls()
             // "Unable to load dialog JoypadConfig from resources", this is
             // probably the reason.
             pn.Printf(wxT("joy%d"), i + 1);
-            wxWindow* w = SafeXRCCTRL<wxWindow>(joyDialog, ToString(pn).c_str());
+            wxWindow* w = SafeXRCCTRL<wxWindow>(joyDialog, pn);
             wxFarRadio* cb;
             cb = SafeXRCCTRL<wxFarRadio>(w, "DefaultConfig");
 
@@ -3447,7 +3468,7 @@ bool MainFrame::BindControls()
 
             for (int j = 0; j < NUM_KEYS; j++) {
                 wxJoyKeyTextCtrl* tc = XRCCTRL_D(*w, joynames[j], wxJoyKeyTextCtrl);
-                CheckThrowXRCError(tc, ToString(joynames[j]));
+                CheckThrowXRCError(tc, joynames[j]);
                 wxWindow* p = tc->GetParent();
 
                 if (p == prevp)

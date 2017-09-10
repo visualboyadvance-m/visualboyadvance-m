@@ -1117,7 +1117,7 @@ void MainFrame::OAMViewer()
 namespace Viewers {
 static int ptype = 0;
 static wxString pdir;
-void savepal(wxWindow* parent, const uint8_t* data, int ncols, const wxChar* type)
+void savepal(wxWindow* parent, const uint8_t* data, int ncols, const wxString type)
 {
     // no attempt is made here to translate the palette type name
     // it's just a suggested name, anyway

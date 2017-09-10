@@ -96,7 +96,7 @@ bool DirectSound::init(long sampleRate)
     if (gopts.audio_dev.empty())
         dev = DSDEVID_DefaultPlayback;
     else
-        CLSIDFromString(const_cast<wxChar*>(gopts.audio_dev.wx_str()), &dev);
+        CLSIDFromString(gopts.audio_dev.wc_str(), &dev);
 
     pDirectSound->Initialize(&dev);
 

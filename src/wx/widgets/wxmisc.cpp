@@ -350,7 +350,7 @@ void wxBoolEnHandler::Disable(wxCommandEvent& ev)
     ev.Skip();
 }
 
-static const wxChar* /* const */ val_hexdigits_s[] = {
+static const wxString  val_hexdigits_s[] = {
     wxT("0"), wxT("1"), wxT("2"), wxT("3"), wxT("4"), wxT("5"), wxT("6"),
     wxT("7"), wxT("8"), wxT("9"), wxT("A"), wxT("B"), wxT("C"), wxT("D"),
     wxT("E"), wxT("F"), wxT("a"), wxT("b"), wxT("c"), wxT("d"), wxT("e"),
@@ -360,7 +360,7 @@ static const wxChar* /* const */ val_hexdigits_s[] = {
 const wxArrayString val_hexdigits(sizeof(val_hexdigits_s) / sizeof(val_hexdigits_s[0]),
     val_hexdigits_s);
 
-static const wxChar* /* const */ val_sigdigits_s[] = {
+static const wxString  val_sigdigits_s[] = {
     wxT("0"), wxT("1"), wxT("2"), wxT("3"), wxT("4"), wxT("5"), wxT("6"),
     wxT("7"), wxT("8"), wxT("9"), wxT("-"), wxT("+")
 };
@@ -368,7 +368,7 @@ static const wxChar* /* const */ val_sigdigits_s[] = {
 const wxArrayString val_sigdigits(sizeof(val_sigdigits_s) / sizeof(val_sigdigits_s[0]),
     val_sigdigits_s);
 
-static const wxChar* /* const */ val_unsdigits_s[] = {
+static const wxString  val_unsdigits_s[] = {
     wxT("0"), wxT("1"), wxT("2"), wxT("3"), wxT("4"), wxT("5"), wxT("6"),
     wxT("7"), wxT("8"), wxT("9")
 };

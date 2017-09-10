@@ -503,10 +503,10 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
 
         for (int i = 0; i < num_opts; i++) {
             wxPrintf(wxT("%s (%s"), opts[i].opt,
-                opts[i].boolopt ? (const wxChar*)wxT("flag") : opts[i].stropt ? (const wxChar*)wxT("string") : opts[i].enumvals ? opts[i].enumvals : opts[i].intopt ? (const wxChar*)wxT("int") : opts[i].doubleopt ? (const wxChar*)wxT("decimal") : (const wxChar*)wxT("string"));
+                opts[i].boolopt ? wxT("flag") : opts[i].stropt ? wxT("string") : !opts[i].enumvals.empty() ? opts[i].enumvals : (wxString)(opts[i].intopt ? wxT("int") : opts[i].doubleopt ? wxT("decimal") : wxT("string")));
 
-            if (opts[i].enumvals) {
-                const wxChar* evx = wxGetTranslation(opts[i].enumvals);
+            if (!opts[i].enumvals.empty()) {
+                const wxString evx = wxGetTranslation(opts[i].enumvals);
 
                 if (wxStrcmp(evx, opts[i].enumvals))
                     wxPrintf(wxT(" = %s"), evx);
@@ -514,7 +514,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
 
             wxPrintf(wxT(")\n\t%s\n\n"), opts[i].desc);
 
-            if (opts[i].enumvals)
+            if (!opts[i].enumvals.empty())
                 opts[i].enumvals = wxGetTranslation(opts[i].enumvals);
         }
 
@@ -568,7 +568,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
         }
     }
 
-    home = strdup((const char*)wxApp::argv[0]);
+    home = strdup(wxApp::argv[0].utf8_str());
     SetHome(home);
     LoadConfig(); // Parse command line arguments (overrides ini)
     ReadOpts(argc, (char**)argv);

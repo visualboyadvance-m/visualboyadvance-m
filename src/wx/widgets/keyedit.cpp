@@ -165,7 +165,7 @@ wxString wxKeyTextCtrl::ToString(wxAcceleratorEntry_v keys, wxChar sep)
     return ret;
 }
 
-bool wxKeyTextCtrl::ParseString(const wxChar* s, int len, int& mod, int& key)
+bool wxKeyTextCtrl::ParseString(const wxString& s, int len, int& mod, int& key)
 {
     mod = key = 0;
 
@@ -173,7 +173,7 @@ bool wxKeyTextCtrl::ParseString(const wxChar* s, int len, int& mod, int& key)
         return false;
 
     wxString a = wxT('\t');
-    a.append(s, len);
+    a.Append(s.Left(len));
     wxAcceleratorEntry ae;
 #ifndef __WXMAC__
 #define check_meta(str)                                                     \

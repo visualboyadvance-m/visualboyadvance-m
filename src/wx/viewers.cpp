@@ -354,7 +354,7 @@ public:
             baddialog();
 
         addr->Clear();
-        const wxChar* longline = lline;
+        wxString longline = lline;
         int lwidth = 0;
 
         for (int i = 0; i < NUM_IOREGS; i++) {
@@ -470,14 +470,14 @@ public:
         Update(sel);
     }
 
-    static const wxChar* lline;
+    static wxString lline;
     wxChoice* addr;
     wxControl* val;
     wxCheckBox* bit[16];
     wxControl* bitlab[16];
     DECLARE_EVENT_TABLE()
 };
-const wxChar* IOViewer::lline = NULL;
+wxString IOViewer::lline;
 BEGIN_EVENT_TABLE(IOViewer, Viewer)
 EVT_BUTTON(XRCID("Refresh"), IOViewer::RefreshEv)
 EVT_BUTTON(wxID_APPLY, IOViewer::Apply)
@@ -500,7 +500,7 @@ void MainFrame::IOViewer()
     } while (0)
 LogDialog::LogDialog()
 {
-    const wxChar* dname = wxT("Logging");
+    const wxString dname = wxT("Logging");
 
     if (!wxXmlResource::Get()->LoadDialog(this, wxGetApp().frame, dname))
         baddialog();
@@ -625,7 +625,7 @@ public:
         Goto(0);
         // initialize load/save support dialog already
         {
-            const wxChar* dname = wxT("MemSelRegion");
+            const wxString dname = wxT("MemSelRegion");
             selregion = wxXmlResource::Get()->LoadDialog(this, dname);
 
             if (!selregion)
