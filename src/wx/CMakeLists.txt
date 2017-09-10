@@ -190,7 +190,15 @@ int main(int argc, char** argv)
     # on windows we need the trampoline library from dependencies
     IF(WIN32)
         SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} -w -fpermissive "-I${CMAKE_SOURCE_DIR}/dependencies/minhook/include")
-        SET(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   -Wl,--subsystem,console "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook.a")
+        SET(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   -Wl,--subsystem,console)
+
+        IF(X86_32)
+            SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook.a")
+        ELSEIF(AMD64)
+            SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook_64.a")
+        ELSE()
+            MESSAGE(FATAL_ERROR "Unknown Windows architecture target!")
+        ENDIF()
     ENDIF()
 
     CHECK_CXX_SOURCE_RUNS("${WX_TEST_CONSOLE_APP}" WX_DEFAULT_ABI_VERSION_COMPATIBLE)
