@@ -48,16 +48,25 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
     SET(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
 ENDIF()
 
-IF(APPLE OR (WINDOWS AND FEDORA_HOST))
-    SET(wxWidgets_USE_STATIC ON)
-ENDIF()
-
 SET(wxWidgets_USE_UNICODE ON)
 # adv is for wxAboutBox
 # xml, html is for xrc
 SET(wxWidgets_USE_LIBS xrc xml html adv gl net core base gl)
 #list(APPEND wxWidgets_CONFIG_OPTIONS --version=2.8)
-FIND_PACKAGE(wxWidgets REQUIRED)
+
+# the gl lib may not be available, and if it looks like it is we still have to
+# do a compile test later
+FIND_PACKAGE(wxWidgets QUIET)
+
+SET(CHECK_WX_OPENGL FALSE)
+
+IF(wxWidgets_FOUND)
+    SET(CHECK_WX_OPENGL TRUE)
+ELSE()
+    SET(WX_HAS_OPENGL   FALSE)
+    # the requirement check is later after the opengl compile test
+ENDIF()
+
 INCLUDE_DIRECTORIES(${wxWidgets_INCLUDE_DIRS})
 
 IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -97,7 +106,8 @@ SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_FLAGS} ${CMAKE_REQUIRED_DEFINITI
 
 INCLUDE(CheckCXXSourceCompiles)
 
-CHECK_CXX_SOURCE_COMPILES("
+IF(CHECK_WX_OPENGL)
+    CHECK_CXX_SOURCE_COMPILES("
 #include <wx/wxprec.h>
 #include <wx/config.h>
 #include <wx/glcanvas.h>
@@ -106,6 +116,7 @@ int main(int argc, char** argv) {
     wxGLCanvas canvas(NULL, wxID_ANY, NULL, wxPoint(0, 0), wxSize(300, 300), 0);
     return 0;
 }" WX_HAS_OPENGL)
+ENDIF()
 
 IF(NOT WX_HAS_OPENGL)
     ADD_DEFINITIONS(-DNO_OGL)
@@ -113,7 +124,7 @@ IF(NOT WX_HAS_OPENGL)
     FIND_PACKAGE(wxWidgets REQUIRED)
 ENDIF()
 
-IF(CMAKE_COMPILER_IS_GNUCXX)
+IF(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_CROSSCOMPILING)
     SET(WX_ABI_FOUND_MATCH FALSE)
 
     INCLUDE(CheckCXXSourceRuns)
@@ -192,12 +203,10 @@ int main(int argc, char** argv)
         SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} -w -fpermissive "-I${CMAKE_SOURCE_DIR}/dependencies/minhook/include")
         SET(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   -Wl,--subsystem,console)
 
-        IF(X86_32)
-            SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook.a")
-        ELSEIF(AMD64)
+        IF(AMD64)
             SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook_64.a")
-        ELSE()
-            MESSAGE(FATAL_ERROR "Unknown Windows architecture target!")
+        ELSE() # assume 32 bit windows
+            SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook.a")
         ENDIF()
     ENDIF()
 
