@@ -312,6 +312,10 @@ debian_installdeps() {
 
 fedora_installdeps() {
     fedora=1
+    ffmpeg=ffmpeg-devel
+    no_ffmpeg=
+    rpms_installed=
+
     check_cross
     installing
 
@@ -337,7 +341,7 @@ fedora_installdeps() {
             break
         fi
         # check if already installed
-        if rpm -q rpmfusion-free-release-${fedora_release} && rpm -q rpmfusion-nonfree-release-${fedora_release}; then
+        if rpm -q rpmfusion-free-release-${fedora_release} >/dev/null 2>&1 && rpm -q rpmfusion-nonfree-release-${fedora_release} >/dev/null 2>&1; then
             info_msg 'rpmfusion already installed, good'
             break
         fi
@@ -379,7 +383,7 @@ fedora_installdeps() {
         for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libpng-devel SDL2-devel SFML-devel openal-soft-devel wxGTK3-devel gtk2-devel gtk3-devel; do
             case $pkg in
                 *ffmpeg*)
-                    [ -n $no_ffmpeg ] && continue
+                    [ -n "$no_ffmpeg" ] && continue
                     ;;
             esac
 
@@ -395,7 +399,7 @@ fedora_installdeps() {
         done
 
         # fedora has a bug where all necessary -devel packages are not pulled in for 32 bit direct -devel deps
-        # this hacks adds them to the list
+        # this hack adds them to the list
         if [ -n "$amd64" -a "$target" = m32 ]; then
             info_msg 'Calculating dependencies, this will take a while..'
             curdeps=
@@ -404,7 +408,46 @@ fedora_installdeps() {
                 curdeps=$newdeps
                 set -- $(echo "$@" $(sudo dnf -y --nogpgcheck repoquery --deplist "$@" 2>/dev/null | sed -n 's/\.x86_64$/.i686/; s/^ *provider: *\([^ ]*-devel-.*\)$/\1/p' | sort -u) | sed 's/  */\n/g' | sort -u)
                 newdeps=$@
+                printf '%s' .
             done
+
+            echo
+            info_msg 'Done'
+
+            ## install the RPMs with rpm --force get around file conflicts
+
+            host_rpms=$(echo "$@" | sed 's/\.i686//g')
+
+            # first update the host arch versions to reduce chances of conflicts
+            check sudo dnf -y --nogpgcheck --allowerasing --best install $host_rpms
+
+            oldcwd=$PWD
+            mkdir "$tmp/rpms"
+            cd "$tmp/rpms"
+
+            check sudo dnf -y --nogpgcheck --allowerasing --best download "$@"
+
+            # first try installing with dnf to pull in deps
+            check sudo dnf -y --nogpgcheck --allowerasing --best --skip-broken install *.rpm
+
+            # follow up with rpm --force to ignore conflicts
+            check sudo rpm -Uvh --force *.rpm
+
+            rm -f *.rpm
+
+            # reinstall the host rpms to make sure any overwritten files are the host version
+            check sudo dnf -y --nogpgcheck --allowerasing --best download $host_rpms
+
+            check sudo dnf -y --nogpgcheck --allowerasing --best --skip-broken install *.rpm
+
+            check sudo rpm -Uvh --force *.rpm
+
+            cd "$oldcwd"
+            rm -rf "$tmp/rpms"
+
+            ffmpeg=ffmpeg-devel.i686
+
+            rpms_installed=1
         fi
     else # mingw build
         set -- "$@" pkgconfig
@@ -433,12 +476,9 @@ fedora_installdeps() {
         warning='SFML is required for LINK support, Fedora does not currently have a MinGW SFML package, if you want LINK support you will need to install it manually'
     fi
 
-    check sudo dnf -y --nogpgcheck --best --allowerasing install "$@"
+    [ -z "$rpms_installed" ] && check sudo dnf -y --nogpgcheck --best --allowerasing install "$@"
 
-    ffmpeg=ffmpeg-devel
-    [ -n $amd64 -a $target = m32 ] && ffmpeg=ffmpeg-devel.i686
-
-    if ! rpm -q $ffmpeg; then
+    if ! rpm -q $ffmpeg >/dev/null 2>&1; then
         warning 'ffmpeg failed to install (probably due to conflicts)'
         cmake_flags="$cmake_flags -DENABLE_FFMPEG=NO"
     fi
