@@ -54,7 +54,7 @@ And the following development libraries:
 - [SDL](https://www.libsdl.org/)2 (required)
 - [SFML](https://www.sfml-dev.org/) (optional, for link)
 - OpenAL (optional, a sound interface)
-- [wxWidgets](https://wxwidgets.org/) (required, 2.8 is still supported)
+- [wxWidgets](https://wxwidgets.org/) (required, 2.8 is still supported, --enable-stl is supported)
 
 On Linux and similar, you also need the version of GTK your wxWidgets is linked
 to (usually 2 or 3).

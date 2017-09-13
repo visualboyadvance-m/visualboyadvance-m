@@ -110,10 +110,10 @@ public:
             char host[length];
             GetLinkServerHost(host, length);
             title.Printf(_("Waiting for clients..."));
-            connmsg.Printf(_("Server IP address is: %s\n"), wxString(host, wxConvLibc).c_str());
+            connmsg.Printf(_("Server IP address is: %s\n"), wxString(host, wxConvLibc).mb_str());
         } else {
             title.Printf(_("Waiting for connection..."));
-            connmsg.Printf(_("Connecting to %s\n"), gopts.link_host.c_str());
+            connmsg.Printf(_("Connecting to %s\n"), gopts.link_host.mb_str());
         }
 
         // Init link
@@ -1802,7 +1802,7 @@ public:
             // to put the plugins...  it depends on where program was
             // installed, and of course OS
             wxString msg;
-            msg.Printf(_("No usable rpi plugins found in %s"), plpath.c_str());
+            msg.Printf(_("No usable rpi plugins found in %s"), plpath.mb_str());
             systemScreenMessage(msg);
             ch->Hide();
             txt->Hide();
@@ -2298,7 +2298,7 @@ void CheckThrowXRCError(T pointer, const wxString& name)
         std::string errormessage = "Unable to load a \"";
         errormessage += typeid(pointer).name();
         errormessage += "\" from the builtin xrc file: ";
-        errormessage += name.utf8_str();
+        errormessage += name.mb_str();
         throw std::runtime_error(errormessage);
     }
 }
@@ -2661,9 +2661,9 @@ bool MainFrame::BindControls()
                         if (a->GetFlags() == e->GetFlags() && a->GetKeyCode() == e->GetKeyCode()) {
                             if (e->GetMenuItem()) {
                                 wxLogInfo(_("Duplicate menu accelerator: %s for %s and %s; keeping first"),
-                                    wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).c_str(),
-                                    e->GetMenuItem()->GetItemLabelText().c_str(),
-                                    mi->GetItemLabelText().c_str());
+                                    wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).mb_str(),
+                                    e->GetMenuItem()->GetItemLabelText().mb_str(),
+                                    mi->GetItemLabelText().mb_str());
                                 delete a;
                                 a = 0;
                             } else {
@@ -2675,8 +2675,8 @@ bool MainFrame::BindControls()
                                             break;
 
                                     wxLogInfo(_("Menu accelerator %s for %s overrides default for %s ; keeping menu"),
-                                        wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).c_str(),
-                                        mi->GetItemLabelText().c_str(),
+                                        wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).mb_str(),
+                                        mi->GetItemLabelText().mb_str(),
                                         cmdtab[cmd].cmd);
                                 }
 
@@ -2781,7 +2781,7 @@ bool MainFrame::BindControls()
     for (int i = 0; i < checkable_mi.size(); i++)
         if (!checkable_mi[i].boolopt && !checkable_mi[i].intopt) {
             wxLogError(_("Invalid menu item %s; removing"),
-                checkable_mi[i].mi->GetItemLabelText().c_str());
+                checkable_mi[i].mi->GetItemLabelText().mb_str());
             checkable_mi[i].mi->GetMenu()->Remove(checkable_mi[i].mi);
             checkable_mi[i].mi = NULL;
         }

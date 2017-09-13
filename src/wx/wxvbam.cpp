@@ -19,8 +19,8 @@
 #include <wx/url.h>
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
-
 #include "wayland.h"
+#include "strutils.h"
 
 // The built-in xrc file
 #include "builtin-xrc.h"
@@ -58,13 +58,13 @@ static void get_config_path(wxPathList& path, bool exists = true)
     static bool debug_dumped = false;
 
     if (!debug_dumped) {
-        wxLogDebug(wxT("GetUserLocalDataDir(): %s"), stdp.GetUserLocalDataDir().c_str());
-        wxLogDebug(wxT("GetUserDataDir(): %s"), stdp.GetUserDataDir().c_str());
-        wxLogDebug(wxT("GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()): %s"), stdp.GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()).c_str());
-        wxLogDebug(wxT("GetResourcesDir(): %s"), stdp.GetResourcesDir().c_str());
-        wxLogDebug(wxT("GetDataDir(): %s"), stdp.GetDataDir().c_str());
-        wxLogDebug(wxT("GetLocalDataDir(): %s"), stdp.GetLocalDataDir().c_str());
-        wxLogDebug(wxT("GetPluginsDir(): %s"), stdp.GetPluginsDir().c_str());
+        wxLogDebug(wxT("GetUserLocalDataDir(): %s"), stdp.GetUserLocalDataDir().mb_str());
+        wxLogDebug(wxT("GetUserDataDir(): %s"), stdp.GetUserDataDir().mb_str());
+        wxLogDebug(wxT("GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()): %s"), stdp.GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()).mb_str());
+        wxLogDebug(wxT("GetResourcesDir(): %s"), stdp.GetResourcesDir().mb_str());
+        wxLogDebug(wxT("GetDataDir(): %s"), stdp.GetDataDir().mb_str());
+        wxLogDebug(wxT("GetLocalDataDir(): %s"), stdp.GetLocalDataDir().mb_str());
+        wxLogDebug(wxT("GetPluginsDir(): %s"), stdp.GetPluginsDir().mb_str());
         
         debug_dumped = true;
     }
@@ -261,10 +261,8 @@ bool wxvbamApp::OnInit()
 
     // process command-line options
     for (int i = 0; i < pending_optset.size(); i++) {
-        wxString p = pending_optset[i];
-        size_t eqat = p.find(wxT('='));
-        p[eqat] = 0;
-        opt_set(p.c_str(), p.c_str() + eqat + 1);
+        auto parts = str_split(pending_optset[i], wxT('='));
+        opt_set(parts[0], parts[1]);
     }
 
     pending_optset.clear();
@@ -458,7 +456,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
                     "To override, remove all but changed root node(s).  "
                     "First found root node of correct name in any .xrc or "
                     ".xrs files in following search path overrides built-in:"),
-            s.c_str());
+            s.mb_str());
         tack_full_path(lm);
         wxLogMessage(lm);
         return false;
@@ -483,7 +481,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
         wxString lm;
         lm.Printf(_("Wrote built-in override file to %s\n"
                     "To override, delete all but changed section.  First found section is used from search path:"),
-            s.c_str());
+            s.mb_str());
         wxString oi = wxFileName::GetPathSeparator();
         oi += wxT("vba-over.ini");
         tack_full_path(lm, oi);
@@ -537,42 +535,39 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
     bool complained = false, gotfile = false;
 
     for (int i = 0; i < nparm; i++) {
-        wxString p = cl.GetParam(i);
-        size_t eqat = p.find(wxT('='));
+        auto p     = cl.GetParam(i);
+        auto parts = str_split(p, wxT('='));
 
-        if (eqat != wxString::npos) {
-            p[eqat] = 0;
-
-            if (!opt_set(p.c_str(), p.c_str() + eqat + 1)) {
-                p[eqat] = wxT('=');
-                eqat = wxString::npos;
-            } else
-                p[eqat] = wxT('=');
+        if (parts.size() > 1) {
+            opt_set(parts[0], parts[1]);
 
             pending_optset.push_back(p);
         }
-
-        if (eqat == wxString::npos) {
+        else {
             if (!gotfile) {
                 pending_load = p;
                 gotfile = true;
             } else {
                 if (!complained) {
                     wxFprintf(stderr, _("Bad configuration option or multiple ROM files given:\n"));
-                    wxFprintf(stderr, wxT("%s\n"), pending_load.c_str());
+                    wxFprintf(stderr, wxT("%s\n"), pending_load.mb_str());
                     complained = true;
                 }
 
-                wxFprintf(stderr, wxT("%s\n"), p.c_str());
+                wxFprintf(stderr, wxT("%s\n"), p);
             }
         }
     }
 
-    home = strdup(wxApp::argv[0].utf8_str());
+    home = strdup(wxString(wxApp::argv[0]).char_str());
     SetHome(home);
     LoadConfig(); // Parse command line arguments (overrides ini)
     ReadOpts(argc, (char**)argv);
     return true;
+}
+
+wxvbamApp::~wxvbamApp() {
+    free(home);
 }
 
 MainFrame::MainFrame()
@@ -730,7 +725,7 @@ void MainFrame::update_state_ts(bool force)
 
         if (panel->game_type() != IMAGE_UNKNOWN) {
             wxString fn;
-            fn.Printf(SAVESLOT_FMT, panel->game_name().c_str(), i + 1);
+            fn.Printf(SAVESLOT_FMT, panel->game_name().mb_str(), i + 1);
             wxFileName fp(panel->state_dir(), fn);
             wxDateTime ts; // = wxInvalidDateTime
 

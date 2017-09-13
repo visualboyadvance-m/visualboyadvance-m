@@ -1,9 +1,8 @@
 #include "../common/ConfigManager.h"
 #include "wxvbam.h"
 #include <algorithm>
-#include <string>
-#include <vector>
 #include <wx/display.h>
+#include "strutils.h"
 
 /*
        disableSfx(F) -> cpuDisableSfx
@@ -21,15 +20,15 @@
     }
 #define INTOPT(c, n, d, v, min, max)             \
     {                                            \
-        wxT(c), (n), d, NULL, &v, "", min, max \
+        wxT(c), (n), d, NULL, &v, wxT(""), min, max \
     }
 #define DOUBLEOPT(c, n, d, v, min, max)                      \
     {                                                        \
-        wxT(c), (n), d, NULL, NULL, "", min, max, NULL, &v \
+        wxT(c), (n), d, NULL, NULL, wxT(""), min, max, NULL, &v \
     }
 #define BOOLOPT(c, n, d, v)                        \
     {                                              \
-        wxT(c), (n), d, NULL, NULL, "", 0, 0, &v \
+        wxT(c), (n), d, NULL, NULL, wxT(""), 0, 0, &v \
     }
 #define ENUMOPT(c, n, d, v, e)      \
     {                               \
@@ -333,31 +332,6 @@ bool opt_lt(const opt_desc& opt1, const opt_desc& opt2)
     return wxStrcmp(opt1.opt, opt2.opt) < 0;
 }
 
-// From: https://stackoverflow.com/a/7408245/262458
-static std::vector<wxString> split(const wxString& text_, const wxString& sep_) {
-    std::vector<wxString> tokens;
-    std::size_t start = 0, end = 0;
-    std::string text = text_.ToStdString(), sep = sep_.ToStdString();
-
-    while ((end = text.find(sep, start)) != std::string::npos) {
-	tokens.push_back(text.substr(start, end - start));
-	start = end + 1;
-    }
-
-    tokens.push_back(text.substr(start));
-
-    return tokens;
-}
-
-static std::size_t enum_idx(std::vector<wxString>& opts, const wxString& val) {
-    auto it = std::find(opts.begin(), opts.end(), val);
-
-    if (it == opts.end())
-        return wxNOT_FOUND;
-
-    return std::distance(opts.begin(), it);
-}
-
 // FIXME: simulate MakeInstanceFilename(vbam.ini) using subkeys (Slave%d/*)
 
 void load_opts()
@@ -389,7 +363,7 @@ void load_opts()
 
     for (cont = cfg->GetFirstEntry(s, grp_idx); cont;
          cont = cfg->GetNextEntry(s, grp_idx)) {
-        //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
+        //wxLogWarning(_("Invalid option %s present; removing if possible"), s.mb_str());
         item_del.push_back(s);
     }
 
@@ -427,7 +401,7 @@ void load_opts()
                 for (cont = cfg->GetFirstGroup(e, key_idx); cont;
                      cont = cfg->GetNextGroup(e, key_idx)) {
                     s.append(e);
-                    //wxLogWarning(_("Invalid option group %s present; removing if possible"), s.c_str());
+                    //wxLogWarning(_("Invalid option group %s present; removing if possible"), s.mb_str());
                     grp_del.push_back(s);
                     s.resize(poff2);
                 }
@@ -442,7 +416,7 @@ void load_opts()
 
                     if (i == NUM_KEYS) {
                         s.append(e);
-                        //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
+                        //wxLogWarning(_("Invalid option %s present; removing if possible"), s.mb_str());
                         item_del.push_back(s);
                         s.resize(poff2);
                     }
@@ -454,7 +428,7 @@ void load_opts()
             } else {
                 s.append(wxT('/'));
                 s.append(e);
-                //wxLogWarning(_("Invalid option group %s present; removing if possible"), s.c_str());
+                //wxLogWarning(_("Invalid option group %s present; removing if possible"), s.mb_str());
                 grp_del.push_back(s);
                 s.resize(poff);
             }
@@ -464,23 +438,23 @@ void load_opts()
              cont = cfg->GetNextEntry(e, entry_idx)) {
             // kb options come from a different list
             if (s == wxT("Keyboard")) {
-                const cmditem dummy = { e.c_str() };
+                const cmditem dummy = { e };
 
                 if (!std::binary_search(&cmdtab[0], &cmdtab[ncmds], dummy, cmditem_lt)) {
                     s.append(wxT('/'));
                     s.append(e);
-                    //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
+                    //wxLogWarning(_("Invalid option %s present; removing if possible"), s.mb_str());
                     item_del.push_back(s);
                     s.resize(poff);
                 }
             } else {
                 s.append(wxT('/'));
                 s.append(e);
-                const opt_desc dummy = { s.c_str() };
+                const opt_desc dummy = { s };
                 wxString opt_name(dummy.opt);
 
                 if (!std::binary_search(&opts[0], &opts[num_opts], dummy, opt_lt) && opt_name != wxT("General/LastUpdated") && opt_name != wxT("General/LastUpdatedFileName")) {
-                    //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
+                    //wxLogWarning(_("Invalid option %s present; removing if possible"), s.mb_str());
                     item_del.push_back(s);
                 }
 
@@ -507,13 +481,13 @@ void load_opts()
         if (opt.stropt) {
             opt.curstr = *opt.stropt;
         } else if (!opt.enumvals.empty()) {
-            auto enum_opts = split(opt.enumvals.MakeLower(), wxT("|"));
+            auto enum_opts = str_split(opt.enumvals.MakeLower(), wxT("|"));
             opt.curint     = *opt.intopt;
             bool gotit     = cfg->Read(opt.opt, &s); s.MakeLower();
 
             if (gotit && !s.empty()) {
-                const std::size_t found_pos = enum_idx(enum_opts, s);
-                const bool matched          = found_pos != wxNOT_FOUND;
+                const auto found_pos = vec_find(enum_opts, s);
+                const bool matched   = found_pos != wxNOT_FOUND;
 
                 if (!matched) {
                     opt.curint = 0;
@@ -560,7 +534,7 @@ void load_opts()
         wxString optn;
         optn.Printf(wxT("GB/Palette%d"), i);
         wxString val;
-        const opt_desc dummy = { optn.c_str() };
+        const opt_desc dummy = { optn };
         opt_desc* opt = std::lower_bound(&opts[0], &opts[num_opts], dummy, opt_lt);
         wxString entry;
 
@@ -605,7 +579,7 @@ void load_opts()
                 gopts.joykey_bindings[i][j] = wxJoyKeyTextCtrl::FromString(s);
 
                 if (s.size() && !gopts.joykey_bindings[i][j].size())
-                    wxLogWarning(_("Invalid key binding %s for %s"), s.c_str(), optname.c_str());
+                    wxLogWarning(_("Invalid key binding %s for %s"), s.mb_str(), optname.mb_str());
             } else {
                 s = wxJoyKeyTextCtrl::ToString(gopts.joykey_bindings[i][j]);
                 cfg->Write(optname, s);
@@ -626,7 +600,7 @@ void load_opts()
             wxAcceleratorEntry_v val = wxKeyTextCtrl::FromString(s);
 
             if (!val.size())
-                wxLogWarning(_("Invalid key binding %s for %s"), s.c_str(), kbopt.c_str());
+                wxLogWarning(_("Invalid key binding %s for %s"), s.mb_str(), kbopt.mb_str());
             else {
                 for (int j = 0; j < val.size(); j++)
                     val[j].Set(val[j].GetFlags(), val[j].GetKeyCode(),
@@ -662,7 +636,7 @@ void update_opts()
         } else if (!opt.enumvals.empty()) {
             if (*opt.intopt != opt.curint) {
                 opt.curint = *opt.intopt;
-                auto enum_opts = split(opt.enumvals.MakeLower(), wxT("|"));
+                auto enum_opts = str_split(opt.enumvals.MakeLower(), wxT("|"));
 
                 cfg->Write(opt.opt, enum_opts[opt.curint]);
             }
@@ -683,7 +657,7 @@ void update_opts()
     for (int i = 0; i < 3; i++) {
         wxString optn;
         optn.Printf(wxT("GB/Palette%d"), i);
-        const opt_desc dummy = { optn.c_str() };
+        const opt_desc dummy = { optn };
         opt_desc* opt = std::lower_bound(&opts[0], &opts[num_opts], dummy, opt_lt);
         wxString val;
         wxString entry;
@@ -727,7 +701,7 @@ void update_opts()
 
         for (bool cont = cfg->GetFirstEntry(s, entry_idx); cont;
              cont = cfg->GetNextEntry(s, entry_idx)) {
-            const cmditem dummy = { s.c_str() };
+            const cmditem dummy = { s };
             cmditem* cmd = std::lower_bound(&cmdtab[0], &cmdtab[ncmds], dummy, cmditem_lt);
             int i;
 
@@ -793,9 +767,9 @@ bool opt_set(const wxString& name, const wxString& val)
         } else if (!opt->enumvals.empty()) {
             wxString s     = val; s.MakeLower();
             wxString ev    = opt->enumvals; ev.MakeLower();
-            auto enum_opts = split(ev, wxT("|"));
+            auto enum_opts = str_split(ev, wxT("|"));
 
-            const std::size_t found_pos = enum_idx(enum_opts, s);
+            const std::size_t found_pos = vec_find(enum_opts, s);
             const bool matched          = found_pos != wxNOT_FOUND;
 
             if (!matched) {
@@ -863,7 +837,7 @@ bool opt_set(const wxString& name, const wxString& val)
         if (name.Find(wxT('/')) == wxNOT_FOUND)
             return false;
 
-        auto parts = split(name, wxT("/"));
+        auto parts = str_split(name, wxT("/"));
 
         if (parts[0] != wxT("Keyboard")) {
             const cmditem parts_1 = { parts[1] };

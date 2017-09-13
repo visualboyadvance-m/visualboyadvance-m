@@ -422,6 +422,7 @@ SET( SRC_WX
    panel.cpp
    viewsupt.cpp
    wayland.cpp
+   strutils.cpp
    widgets/keyedit.cpp
    widgets/joyedit.cpp
    widgets/sdljoy.cpp

@@ -81,7 +81,7 @@ void GameArea::LoadGame(const wxString& name)
 
     if (t == IMAGE_UNKNOWN) {
         wxString s;
-        s.Printf(_("%s is not a valid ROM file"), name.c_str());
+        s.Printf(_("%s is not a valid ROM file"), name.mb_str());
         wxMessageDialog dlg(GetParent(), s, _("Problem loading file"), wxOK | wxICON_ERROR);
         dlg.ShowModal();
         return;
@@ -138,7 +138,7 @@ void GameArea::LoadGame(const wxString& name)
     if (t == IMAGE_GB) {
         if (!gbLoadRom(fn)) {
             wxString s;
-            s.Printf(_("Unable to load Game Boy ROM %s"), name.c_str());
+            s.Printf(_("Unable to load Game Boy ROM %s"), name.mb_str());
             wxMessageDialog dlg(GetParent(), s, _("Problem loading file"), wxOK | wxICON_ERROR);
             dlg.ShowModal();
             return;
@@ -188,7 +188,7 @@ void GameArea::LoadGame(const wxString& name)
         gbCPUInit(fn, use_bios);
 
         if (use_bios && !useBios) {
-            wxLogError(_("Could not load BIOS %s"), (gbCgbMode ? gopts.gbc_bios : gopts.gb_bios).c_str());
+            wxLogError(_("Could not load BIOS %s"), (gbCgbMode ? gopts.gbc_bios : gopts.gb_bios).mb_str());
             // could clear use flag & file name now, but better to force
             // user to do it
         }
@@ -211,7 +211,7 @@ void GameArea::LoadGame(const wxString& name)
     {
         if (!(rom_size = CPULoadRom(fn))) {
             wxString s;
-            s.Printf(_("Unable to load Game Boy Advance ROM %s"), name.c_str());
+            s.Printf(_("Unable to load Game Boy Advance ROM %s"), name.mb_str());
             wxMessageDialog dlg(GetParent(), s, _("Problem loading file"), wxOK | wxICON_ERROR);
             dlg.ShowModal();
             return;
@@ -285,7 +285,7 @@ void GameArea::LoadGame(const wxString& name)
         CPUInit(gopts.gba_bios.mb_fn_str(), useBiosFileGBA);
 
         if (useBiosFileGBA && !useBios) {
-            wxLogError(_("Could not load BIOS %s"), gopts.gba_bios.c_str());
+            wxLogError(_("Could not load BIOS %s"), gopts.gba_bios.mb_str());
             // could clear use flag & file name now, but better to force
             // user to do it
         }
@@ -354,7 +354,7 @@ void GameArea::LoadGame(const wxString& name)
 
         if (emusys->emuReadBattery(fnb.data())) {
             wxString msg;
-            msg.Printf(_("Loaded battery %s"), bat.GetFullPath().c_str());
+            msg.Printf(_("Loaded battery %s"), bat.GetFullPath().mb_str());
             systemScreenMessage(msg);
 
             if (cpuSaveType == 0 && ovSaveType == 0 && t == IMAGE_GBA) {
@@ -570,7 +570,7 @@ bool GameArea::LoadState()
 bool GameArea::LoadState(int slot)
 {
     wxString fname;
-    fname.Printf(SAVESLOT_FMT, game_name().c_str(), slot);
+    fname.Printf(SAVESLOT_FMT, game_name().mb_str(), slot);
     return LoadState(wxFileName(statedir, fname));
 }
 
@@ -604,7 +604,7 @@ bool GameArea::LoadState(const wxFileName& fname)
 
     wxString msg;
     msg.Printf(ret ? _("Loaded state %s") : _("Error loading state %s"),
-        fname.GetFullPath().c_str());
+        fname.GetFullPath().mb_str());
     systemScreenMessage(msg);
     return ret;
 }
@@ -617,7 +617,7 @@ bool GameArea::SaveState()
 bool GameArea::SaveState(int slot)
 {
     wxString fname;
-    fname.Printf(SAVESLOT_FMT, game_name().c_str(), slot);
+    fname.Printf(SAVESLOT_FMT, game_name().mb_str(), slot);
     return SaveState(wxFileName(statedir, fname));
 }
 
@@ -628,7 +628,7 @@ bool GameArea::SaveState(const wxFileName& fname)
     wxGetApp().frame->update_state_ts(true);
     wxString msg;
     msg.Printf(ret ? _("Saved state %s") : _("Error saving state %s"),
-        fname.GetFullPath().c_str());
+        fname.GetFullPath().mb_str());
     systemScreenMessage(msg);
     return ret;
 }
@@ -659,9 +659,9 @@ void GameArea::SaveBattery(bool quiet)
     // of course some games just write battery way too often for such
     // a thing to be useful
     if (emusys->emuWriteBattery(fnb.data()))
-        msg.Printf(_("Wrote battery %s"), fn.c_str());
+        msg.Printf(_("Wrote battery %s"), fn.mb_str());
     else
-        msg.Printf(_("Error writing battery %s"), fn.c_str());
+        msg.Printf(_("Error writing battery %s"), fn.mb_str());
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
@@ -1782,7 +1782,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
         if (panel->osdstat.size())
             drawText(todraw + outstride * (systemColorDepth != 24), outstride,
-                10, 20, panel->osdstat.utf8_str(), showSpeedTransparent);
+                10, 20, panel->osdstat.mb_str(), showSpeedTransparent);
 
         if (!disableStatusMessages && !panel->osdtext.empty()) {
             if (systemGetClock() - panel->osdtime < OSD_TIME) {
@@ -1790,7 +1790,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                 int linelen = std::ceil(width * scale - 20) / 8;
                 int nlines = (message.size() + linelen - 1) / linelen;
                 int cury = height - 14 - nlines * 10;
-                const char* msg_data = message.utf8_str();
+                const char* msg_data = message.mb_str();
                 char buf[message.size() + 1];
                 char* ptr = &buf[0];
                 std::strncpy(ptr, msg_data, message.size() + 1);
@@ -2262,7 +2262,7 @@ void GameArea::StartVidRecording(const wxString& fname)
     if ((ret = vid_rec.Record(fnb.data(), basic_width, basic_height,
              systemColorDepth))
         != MRET_OK)
-        wxLogError(_("Unable to begin recording to %s (%s)"), fname.c_str(),
+        wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
             media_err(ret));
     else {
         MainFrame* mf = wxGetApp().frame;
@@ -2293,7 +2293,7 @@ void GameArea::StartSoundRecording(const wxString& fname)
     MediaRet ret;
 
     if ((ret = snd_rec.Record(fnb.data())) != MRET_OK)
-        wxLogError(_("Unable to begin recording to %s (%s)"), fname.c_str(),
+        wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
             media_err(ret));
     else {
         MainFrame* mf = wxGetApp().frame;

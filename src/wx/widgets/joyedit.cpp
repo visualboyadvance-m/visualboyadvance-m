@@ -261,7 +261,7 @@ bool wxJoyKeyTextCtrl::ParseString(const wxString& s, int len, int& mod, int& ke
 
 bool wxJoyKeyTextCtrl::FromString(const wxString& s, int& mod, int& key, int& joy)
 {
-    return ParseString(s.c_str(), s.size(), mod, key, joy);
+    return ParseString(s, s.size(), mod, key, joy);
 }
 
 wxJoyKeyBinding_v wxJoyKeyTextCtrl::FromString(const wxString& s, wxChar sep)
@@ -283,7 +283,7 @@ wxJoyKeyBinding_v wxJoyKeyTextCtrl::FromString(const wxString& s, wxChar sep)
                 continue;
         }
 
-        if (!ParseString(s.c_str() + lastkey + 1, len - lastkey - 1, mod, key, joy))
+        if (!ParseString(s.Mid(lastkey + 1), len - lastkey - 1, mod, key, joy))
             return empty;
 
         wxJoyKeyBinding jb = { key, mod, joy };
@@ -291,7 +291,7 @@ wxJoyKeyBinding_v wxJoyKeyTextCtrl::FromString(const wxString& s, wxChar sep)
         len = lastkey;
     }
 
-    if (!ParseString(s.c_str(), len, mod, key, joy))
+    if (!ParseString(s, len, mod, key, joy))
         return empty;
 
     wxJoyKeyBinding jb = { key, mod, joy };
