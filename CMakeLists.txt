@@ -14,7 +14,7 @@ if(COMMAND cmake_policy)
     cmake_policy(SET CMP0005 NEW) # escapes in add_definitions
 endif(COMMAND cmake_policy)
 
-SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeScripts )
+SET( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake )
 #Output all binaries at top level
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
