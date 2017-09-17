@@ -77,7 +77,12 @@ ENDIF()
 
 option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
 
-SET(LTO_DEFAULT OFF)
+SET(LTO_DEFAULT ON)
+
+IF(WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0.0)
+    # lto produces buggy binaries on gcc < 7 on win32
+    SET(LTO_DEFAULT OFF)
+ENDIF()
 
 OPTION(ENABLE_LTO "Compile with Link Time Optimization (gcc and clang only)" ${LTO_DEFAULT})
 
@@ -296,18 +301,18 @@ ENDIF()
 # Compiler flags
 
 IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-    SET(LTO_FLAG "")
+    SET(LTO_FLAGS "")
     IF(ENABLE_LTO)
         IF(CMAKE_COMPILER_IS_GNUCXX)
-            SET(LTO_FLAG -flto=10)
+            SET(LTO_FLAGS -flto=10 -ffat-lto-objects)
         ELSE()
-            SET(LTO_FLAG -flto)
+            SET(LTO_FLAGS -flto)
         ENDIF()
     ENDIF(ENABLE_LTO)
 
     # common optimization flags
     IF(NOT (APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.3))
-        SET(MY_C_OPT_FLAGS -O2 -fomit-frame-pointer ${LTO_FLAG})
+        SET(MY_C_OPT_FLAGS -O2 -fomit-frame-pointer ${LTO_FLAGS})
     ELSE()
         # LTO and -fomit-frame-pointer generate broken binaries on Lion with XCode 4.2 tools
         SET(MY_C_OPT_FLAGS -O2)

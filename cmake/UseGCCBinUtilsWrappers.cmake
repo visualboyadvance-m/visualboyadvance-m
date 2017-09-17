@@ -72,21 +72,32 @@ IF(NOT EXISTS ${GCC_RANLIB})
     FIND_PROGRAM(GCC_RANLIB NAMES gcc-ranlib gcc-ranlib.exe GCC-RANLIB.EXE HINTS ${GCC_DIRNAME})
 ENDIF()
 
+INCLUDE(PathRun)
+
 IF(EXISTS ${GCC_AR})
-    SET(CMAKE_AR ${GCC_AR})
-    MESSAGE("-- Found gcc-ar: ${CMAKE_AR}")
+    MESSAGE("-- Found gcc-ar: ${GCC_AR}")
+
+    SET(target "${CMAKE_BINARY_DIR}/gcc-ar-wrap")
+    MAKE_PATH_RUN_WRAPPER("${GCC_AR}" "${target}")
+    SET(CMAKE_AR "${target}")
 ENDIF()
 
 IF(EXISTS ${GCC_NM})
-    SET(CMAKE_NM ${GCC_NM})
-    MESSAGE("-- Found gcc-nm: ${CMAKE_NM}")
+    MESSAGE("-- Found gcc-nm: ${GCC_NM}")
+
+    SET(target "${CMAKE_BINARY_DIR}/gcc-nm-wrap")
+    MAKE_PATH_RUN_WRAPPER("${GCC_NM}" "${target}")
+    SET(CMAKE_NM "${target}")
 ENDIF()
 
 IF(EXISTS ${GCC_RANLIB})
-    SET(CMAKE_RANLIB ${GCC_RANLIB})
-    MESSAGE("-- Found gcc-ranlib: ${CMAKE_RANLIB}")
+    MESSAGE("-- Found gcc-ranlib: ${GCC_RANLIB}")
+
+    SET(target "${CMAKE_BINARY_DIR}/gcc-ranlib-wrap")
+    MAKE_PATH_RUN_WRAPPER("${GCC_RANLIB}" "${target}")
+    SET(CMAKE_RANLIB "${target}")
 ENDIF()
 
-FOREACH(VAR "GCC_AR" "GCC_NM" "GCC_RANLIB" "GCC_DIRNAME" "GCC_BASENAME" "GCC_EXE_SUFFIX")
+FOREACH(VAR "GCC_AR" "GCC_NM" "GCC_RANLIB" "GCC_DIRNAME" "GCC_BASENAME" "GCC_EXE_SUFFIX" "target")
     UNSET(${VAR})
 ENDFOREACH()

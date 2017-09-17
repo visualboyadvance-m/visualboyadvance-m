@@ -369,19 +369,9 @@ SET(XRC_SOURCES
 
 SET(BIN2C ${CMAKE_BINARY_DIR}/bin2c)
 
-IF(CMAKE_HOST_WIN32)
-    SET(BIN2C ${BIN2C}.exe)
-ENDIF()
+INCLUDE(HostCompile)
 
-IF(MSVC)
-    ADD_CUSTOM_COMMAND(OUTPUT ${BIN2C}
-                       COMMAND cl ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c /link "/out:${BIN2C}"
-                       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c)
-ELSE(MSVC)
-    ADD_CUSTOM_COMMAND(OUTPUT ${BIN2C}
-                       COMMAND cc ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c -o ${BIN2C}
-                       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c)
-ENDIF(MSVC)
+HOST_COMPILE(${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c ${BIN2C})
 
 ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xrs
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
@@ -389,12 +379,12 @@ ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xrs
                    DEPENDS ${XRC_SOURCES})
 ADD_CUSTOM_COMMAND(OUTPUT builtin-xrc.h
                    COMMAND ${BIN2C} wxvbam.xrs builtin-xrc.h builtin_xrs
-                   DEPENDS ${BIN2C} wxvbam.xrs)
+                   DEPENDS wxvbam.xrs)
 
 # use a built-in vba-over.ini if no config file present
 ADD_CUSTOM_COMMAND(OUTPUT builtin-over.h
                    COMMAND ${BIN2C} ${CMAKE_CURRENT_SOURCE_DIR}/../vba-over.ini builtin-over.h builtin_over
-                   DEPENDS ${BIN2C} ../vba-over.ini)
+                   DEPENDS ../vba-over.ini)
 
 # I don't like duplicating/triplicating code, so I only declare
 # event handlers once, and copy them in other places they are needed
