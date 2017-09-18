@@ -1,3 +1,19 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Visual Boy Advance - M](#visual-boy-advance---m)
+  - [Building](#building)
+  - [Cross compiling for 32 bit on a 64 bit host](#cross-compiling-for-32-bit-on-a-64-bit-host)
+  - [Cross Compiling for Win32](#cross-compiling-for-win32)
+  - [CMake Options](#cmake-options)
+  - [MSys2 Notes](#msys2-notes)
+  - [Debug Messages](#debug-messages)
+  - [Reporting Crash Bugs](#reporting-crash-bugs)
+  - [Contributing](#contributing)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 [![Join the chat at https://gitter.im/visualboyadvance-m/Lobby](https://badges.gitter.im/visualboyadvance-m/Lobby.svg)](https://gitter.im/visualboyadvance-m/Lobby)
 [![Build Status](https://tea-ci.org/api/badges/visualboyadvance-m/visualboyadvance-m/status.svg)](https://tea-ci.org/visualboyadvance-m/visualboyadvance-m)
 # Visual Boy Advance - M
@@ -108,14 +124,14 @@ Here is the complete list:
 | ENABLE_WX            | Build the wxWidgets port                                             | ON                    |
 | ENABLE_DEBUGGER      | Enable the debugger                                                  | ON                    |
 | ENABLE_NLS           | Enable translations                                                  | ON                    |
-| ENABLE_ASM           | Enable the following three ASM options                               | ON for 32 bit builds  |
 | ENABLE_ASM_CORE      | Enable x86 ASM CPU cores (**BUGGY AND DANGEROUS**)                   | OFF                   |
+| ENABLE_ASM           | Enable the following two ASM options                                 | ON for 32 bit builds  |
 | ENABLE_ASM_SCALERS   | Enable x86 ASM graphic filters                                       | ON for 32 bit builds  |
 | ENABLE_MMX           | Enable MMX                                                           | ON for 32 bit builds  |
 | ENABLE_LINK          | Enable GBA linking functionality (requires SFML)                     | ON                    |
 | ENABLE_LIRC          | Enable LIRC support                                                  | OFF                   |
 | ENABLE_FFMPEG        | Enable ffmpeg A/V recording                                          | ON on Linux and MSys2 |
-| ENABLE_LTO           | Compile with Link Time Optimization (gcc and clang only)             | OFF                   |
+| ENABLE_LTO           | Compile with Link Time Optimization (gcc and clang only)             | ON for release build  |
 | ENABLE_GBA_LOGGING   | Enable extended GBA logging                                          | ON                    |
 | ENABLE_DIRECT3D      | Direct3D rendering for wxWidgets (Windows, **NOT IMPLEMENTED!!!**)   | ON                    |
 | ENABLE_XAUDIO2       | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
@@ -154,21 +170,14 @@ We have an override for `wxLogDebug()` to make it work even in non-debug builds
 of wx and on windows, even in mintty. Using this function for console debug
 messages is recommended.
 
-It works like `printf()`, but using `wxString`, so use `wxT()` e.g.:
+It works like `printf()`, e.g.:
 
 ```cpp
 int foo = 42;
 wxLogDebug(wxT("the value of foo = %d"), foo);
 ```
 
-`%s` does not work for `wxString`, so you can do something like this:
-
-```cpp
-wxString world = "world";
-wxLogDebug(wxT("Hello, %s!"), world.utf8_str());
-```
-
-## REPORTING CRASH BUGS
+## Reporting Crash Bugs
 
 If the emulator crashes and you wish to report the bug, a backtrace made with
 debug symbols would be immensely helpful.
@@ -208,7 +217,7 @@ bt
 
 This may be a bit of a hassle, but it helps us out immensely.
 
-## CONTRIBUTING
+## Contributing
 
 Please keep in mind that this app needs to run on Windows, Linux and macOS at
 the very least, so code should be portable and/or use the appropriate `#ifdef`s
