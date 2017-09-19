@@ -286,13 +286,22 @@ endif( ENABLE_NLS )
 
 # Win32 deps submodule
 IF(WIN32)
-    IF(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include" AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
-        MESSAGE(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --recursive")
+    IF(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
+        set(git_checkout FALSE)
+        find_package(Git)
+        if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+            set(git_checkout TRUE)
+            execute_process(COMMAND "${GIT_EXECUTABLE}" submodule update --remote --recursive RESULT_VARIABLE git_status)
+        endif()
+
+        if(NOT (git_checkout AND git_status EQUAL 0))
+            message(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --remote --recursive")
+        endif()
     ENDIF()
 
-    INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
-
-    IF(MSVC)
+    IF(MINGW)
+        INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
+    ELSEIF(MSVC)
         SET(DEPS_MSVC "${CMAKE_SOURCE_DIR}/dependencies/msvc")
         INCLUDE_DIRECTORIES("${DEPS_MSVC}") # for GL/glext.h and getopt.h
     ENDIF()

@@ -240,7 +240,7 @@ check_cross() {
             esac
 
             # get the necessary win32 headers
-            check git submodule update --init --recursive
+            check git submodule update --remote --recursive
             ;;
         m32)
             if [ -z "$msys2" -a -z "$fedora" -a -z "$arch_linux" -a -z "$solus" ]; then
