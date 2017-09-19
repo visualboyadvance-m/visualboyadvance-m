@@ -319,6 +319,8 @@ public:
     {
         return (paused && !pause_next && !incendental) || menus_opened || dialog_opened;
     }
+protected:
+    virtual void BindAppIcon();
 
 private:
     GameArea* panel;

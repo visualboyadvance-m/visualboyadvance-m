@@ -2528,6 +2528,50 @@ void MainFrame::MenuOptionIntRadioValue(const char* menuName, int& field, int va
     }
 }
 
+// The Windows icon loading code is from:
+//
+// https://stackoverflow.com/questions/17949693/windows-volume-mixer-icon-size-is-too-large/46310786#46310786
+//
+// This works around a Windows bug where the icon is too large in the
+// app-specific volume controls.
+
+#ifdef __WXMSW__
+    #include <Windows.h>
+    #include <CommCtrl.h>
+    #include <wx/msw/private.h>
+    typedef int (WINAPI *func_LoadIconWithScaleDown)(HINSTANCE, LPCWSTR, int, int, HICON*);
+#endif
+
+void MainFrame::BindAppIcon() {
+#ifdef __WXMSW__
+    wxDynamicLibrary comctl32("comctl32", wxDL_DEFAULT | wxDL_QUIET);
+    func_LoadIconWithScaleDown load_icon_scaled = reinterpret_cast<func_LoadIconWithScaleDown>(comctl32.GetSymbol("LoadIconWithScaleDown"));
+    int icon_set_count = 0;
+
+    HICON hIconLg;
+    if (load_icon_scaled && SUCCEEDED(load_icon_scaled(wxGetInstance(), _T("AAAAA_MAINICON"), ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON), &hIconLg))) {
+        ::SendMessage(GetHandle(), WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hIconLg));
+        ++icon_set_count;
+    }
+    HICON hIconSm;
+    if (load_icon_scaled && SUCCEEDED(load_icon_scaled(wxGetInstance(), _T("AAAAA_MAINICON"), ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), &hIconSm))) {
+        ::SendMessage(GetHandle(), WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hIconSm));
+        ++icon_set_count;
+    }
+
+    if (icon_set_count == 2) return;
+    // otherwise fall back to Wx method of setting icon
+#endif
+    wxIcon icon = wxXmlResource::Get()->LoadIcon(wxT("MainIcon"));
+
+    if (!icon.IsOk()) {
+        wxLogInfo(_("Main icon not found"));
+        icon = wxICON(wxvbam);
+    }
+
+    SetIcon(icon);
+}
+
 // If there is a menubar, store all special menuitems
 #define XRCITEM_I(id) menubar->FindItem(id, NULL)
 #define XRCITEM_D(s) XRCITEM_I(XRCID_D(s))
@@ -2550,16 +2594,9 @@ bool MainFrame::BindControls()
     // however, do not enable until end of init, since errors will start
     // the idle loop on wxGTK
     wxIdleEvent::SetMode(wxIDLE_PROCESS_SPECIFIED);
-    // could/should probably take this from xrc as well
-    // but I don't think xrc supports icon from Windows resource
-    wxIcon icon = wxXmlResource::Get()->LoadIcon(wxT("MainIcon"));
 
-    if (!icon.IsOk()) {
-        wxLogInfo(_("Main icon not found"));
-        icon = wxICON(wxvbam);
-    }
+    BindAppIcon();
 
-    SetIcon(icon);
     // NOOP if no status area
     SetStatusText(wxT(""));
 
