@@ -307,13 +307,20 @@ IF(WIN32)
     ENDIF()
 ENDIF()
 
+include(ProcessorCount)
+ProcessorCount(num_cpus)
+
 # Compiler flags
 
 IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     SET(LTO_FLAGS "")
     IF(ENABLE_LTO)
         IF(CMAKE_COMPILER_IS_GNUCXX)
-            SET(LTO_FLAGS -flto=10 -ffat-lto-objects)
+            if(num_cpus GREATER 1)
+                SET(LTO_FLAGS -flto=${num_cpus} -ffat-lto-objects)
+            else()
+                SET(LTO_FLAGS -flto -ffat-lto-objects)
+            endif()
         ELSE()
             SET(LTO_FLAGS -flto)
         ENDIF()
