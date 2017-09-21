@@ -51,12 +51,13 @@ std::size_t SoundSDL::buffer_size() {
 }
 
 void SoundSDL::read(uint16_t* stream, int length) {
-    if (!initialized || length <= 0)
+    if (length <= 0)
         return;
 
     SDL_memset(stream, audio_spec.silence, length);
 
-    if (!emulating)
+    // if not initialzed, paused or shutting down, do nothing
+    if (!initialized || !emulating)
         return;
 
     if (!buffer_size())
@@ -76,7 +77,7 @@ void SoundSDL::read(uint16_t* stream, int length) {
 
 void SoundSDL::write(uint16_t * finalWave, int length) {
     if (!initialized)
-	return;
+        return;
 
     SDL_LockMutex(mutex);
 
@@ -148,12 +149,16 @@ void SoundSDL::deinit() {
     if (!initialized)
         return;
 
+    initialized = false;
+
     SDL_LockMutex(mutex);
     int is_emulating = emulating;
     emulating = 0;
     SDL_SemPost(data_available);
     SDL_SemPost(data_read);
     SDL_UnlockMutex(mutex);
+
+    SDL_Delay(100);
 
     SDL_DestroySemaphore(data_available);
     data_available = nullptr;
@@ -166,8 +171,6 @@ void SoundSDL::deinit() {
     SDL_CloseAudioDevice(sound_device);
 
     emulating = is_emulating;
-
-    initialized = false;
 }
 
 SoundSDL::~SoundSDL() {
