@@ -79,8 +79,8 @@ option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
 
 SET(LTO_DEFAULT ON)
 
-IF(WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0.0)
-    # lto produces buggy binaries on gcc < 7 on win32
+IF(WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND AMD64)
+    # lto produces buggy binaries for 64 bit win32
     SET(LTO_DEFAULT OFF)
 ENDIF()
 
