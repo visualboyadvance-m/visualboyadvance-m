@@ -840,8 +840,7 @@ bool opt_set(const wxString& name, const wxString& val)
         auto parts = str_split(name, wxT("/"));
 
         if (parts[0] != wxT("Keyboard")) {
-            const cmditem parts_1 = { parts[1] };
-            cmditem* cmd = std::lower_bound(&cmdtab[0], &cmdtab[ncmds], parts_1, cmditem_lt);
+            cmditem* cmd = std::lower_bound(&cmdtab[0], &cmdtab[ncmds], cmditem{parts[1]}, cmditem_lt);
 
             if (cmd == &cmdtab[ncmds] || wxStrcmp(parts[1], cmd->cmd))
                 return false;
