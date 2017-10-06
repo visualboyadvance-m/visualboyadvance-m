@@ -271,7 +271,7 @@ debian_installdeps() {
     installing
 
     if [ -z "$target" ]; then
-        check sudo apt-get -qq update
+        sudo apt-get -qq update
         check sudo apt-get -qy install build-essential g++ nasm cmake gettext zlib1g-dev libgl1-mesa-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libpng-dev libsdl2-dev libsfml-dev libopenal-dev libwxgtk3.0-dev libgtk2.0-dev libgtk-3-dev
     else
         case "$target" in
@@ -290,7 +290,7 @@ debian_installdeps() {
 
         mxe_apt_sources='/etc/apt/sources.list.d/mxeapt.list'
 
-        check sudo apt-get -qq update
+        sudo apt-get -qq update
         if [ -z "$(apt-cache search '^mxe-source$')" ]; then
             if [ ! -f "$mxe_apt_sources" ]; then
                 echo "deb http://pkg.mxe.cc/repos/apt/debian wheezy main" | sudo -- sh -c "cat > $mxe_apt_sources"
