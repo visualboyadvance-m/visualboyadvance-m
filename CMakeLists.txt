@@ -105,10 +105,8 @@ endif( NOT ENABLE_DEBUGGER AND ENABLE_SDL )
 
 find_package(Git)
 if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
-    INCLUDE(GetGitRevisionDescription)
-    EXECUTE_PROCESS(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD OUTPUT_VARIABLE SHORT_SHA OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-    SET(REVISION ${SHORT_SHA} CACHE STRING "git short sha" FORCE)
+    include(GitTagVersion)
+    git_version(VERSION REVISION VERSION_RELEASE)
 
     # only use the plugin to tie the configure state to the sha to force rebuilds
     # of files that depend on version.h
@@ -117,7 +115,9 @@ if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
 else()
     message(WARNING "Git not found, cannot set version info")
 
-    SET(REVISION "unknown")
+    set(VERSION  2.0.0)
+    set(REVISION "unknown")
+    set(VERSION_RELEASE 0)
 endif()
 
 # generate version.h

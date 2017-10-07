@@ -18,13 +18,13 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #define VBA_NAME "VisualBoyAdvance-M"
-#define VBA_CURRENT_VERSION "2.0.0"
+#define VBA_CURRENT_VERSION "@VERSION@"
 
 #define VBA_FEATURE_STRING ""
 
 #define _STRINGIFY(N) #N
 
-#if defined(PUBLIC_RELEASE)
+#if @VERSION_RELEASE@
     #define VBA_SUBVERSION_STRING ""
 #else
     #define VBA_SUBVERSION_STRING "-" "@REVISION@"
