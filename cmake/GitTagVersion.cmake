@@ -8,6 +8,11 @@ function(git_version version revision version_release)
         # get latest version from tag history
         execute_process(COMMAND ${GIT_EXECUTABLE} tag --sort=-creatordate OUTPUT_VARIABLE sorted_tags OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+        # if no tags (e.g. shallow clone) do nothing
+        if(NOT sorted_tags)
+            return()
+        endif()
+
         # convert to list (see: https://public.kitware.com/pipermail/cmake/2007-May/014222.html)
         string(REGEX REPLACE ";"  "\\\\;" sorted_tags "${sorted_tags}")
         string(REGEX REPLACE "\n" ";"     sorted_tags "${sorted_tags}")
@@ -28,6 +33,11 @@ function(git_version version revision version_release)
 
         # get the current revision
         execute_process(COMMAND ${GIT_EXECUTABLE} tag "--format=%(align:width=20)%(refname:short)%(end)%(if)%(*objectname)%(then)%(*objectname)%(else)%(objectname)%(end)" --sort=-creatordate OUTPUT_VARIABLE sorted_tags_refs OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+        # if no tags (e.g. shallow clone) do nothing
+        if(NOT sorted_tags_refs)
+            return()
+        endif()
 
         # convert to list (see: https://public.kitware.com/pipermail/cmake/2007-May/014222.html)
         string(REGEX REPLACE ";"  "\\\\;" sorted_tags_refs "${sorted_tags_refs}")

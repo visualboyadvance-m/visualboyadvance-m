@@ -114,7 +114,10 @@ if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
     get_git_head_revision(REFSPEC COMMITHASH)
 else()
     message(WARNING "Git not found, cannot set version info")
+endif()
 
+# no git or no tags
+if(NOT VERSION)
     set(VERSION  2.0.0)
     set(REVISION "unknown")
     set(VERSION_RELEASE 0)
