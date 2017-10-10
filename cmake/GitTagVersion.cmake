@@ -6,67 +6,54 @@ function(git_version version revision version_release)
     find_package(Git)
     if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
         # get latest version from tag history
-        execute_process(COMMAND ${GIT_EXECUTABLE} tag --sort=-creatordate OUTPUT_VARIABLE sorted_tags OUTPUT_STRIP_TRAILING_WHITESPACE)
+        execute_process(COMMAND "${GIT_EXECUTABLE}" tag "--format=%(align:width=20)%(refname:short)%(end)%(if)%(*objectname)%(then)%(*objectname)%(else)%(objectname)%(end)" --sort=-creatordate OUTPUT_VARIABLE tags OUTPUT_STRIP_TRAILING_WHITESPACE)
 
         # if no tags (e.g. shallow clone) do nothing
-        if(NOT sorted_tags)
+        if(tags STREQUAL "")
             return()
         endif()
 
-        # convert to list (see: https://public.kitware.com/pipermail/cmake/2007-May/014222.html)
-        string(REGEX REPLACE ";"  "\\\\;" sorted_tags "${sorted_tags}")
-        string(REGEX REPLACE "\n" ";"     sorted_tags "${sorted_tags}")
+        # convert to list of the form [tag0, ref0, tag1, ref1, ...]
+        string(REGEX REPLACE "[ \n]+" ";" tags "${tags}")
 
-        foreach(tag ${sorted_tags})
+        execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse HEAD OUTPUT_VARIABLE current_ref OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+        # if cannot get current ref, do nothing
+        if(current_ref STREQUAL "")
+            return()
+        endif()
+
+        list(LENGTH tags cnt)
+        set(i 0)
+        set(j 1)
+
+        while(i LESS cnt AND "${${version}}" STREQUAL "")
+            list(GET tags ${i} tag)
+            list(GET tags ${j} ref)
+
+            # tag is a version number with or without a "-revision"
             if(tag MATCHES "^v?(([0-9]+\\.?)*[0-9]*)(-(.*))?$")
                 set(${version} "${CMAKE_MATCH_1}" CACHE STRING "Latest Git Tag Version" FORCE)
-                set(revision_str "${CMAKE_MATCH_4}")
-                break()
+
+                if(i EQUAL 0)
+                    if(NOT "${CMAKE_MATCH_4}" STREQUAL "")
+                        set(${revision} "${CMAKE_MATCH_4}" CACHE STRING "Latest Git Tag Revision" FORCE)
+                    elseif(ref STREQUAL current_ref)
+                        set(${version_release} 1 CACHE STRING "Is this a versioned release without revision" FORCE)
+                    endif()
+                endif()
+            elseif(i EQUAL 0 AND ref STREQUAL current_ref)
+                # revision name tagged
+                set(${revision} "${tag}" CACHE STRING "Latest Git Tag Revision" FORCE)
             endif()
-        endforeach()
 
-        if(revision_str)
-            # don't need to read revision from tags
-            set(${revision} "${revision_str}" CACHE STRING "Latest Git Tag Revision" FORCE)
-            return()
-        endif()
+            math(EXPR i "${i} + 2")
+            math(EXPR j "${j} + 2")
+        endwhile()
 
-        # get the current revision
-        execute_process(COMMAND ${GIT_EXECUTABLE} tag "--format=%(align:width=20)%(refname:short)%(end)%(if)%(*objectname)%(then)%(*objectname)%(else)%(objectname)%(end)" --sort=-creatordate OUTPUT_VARIABLE sorted_tags_refs OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-        # if no tags (e.g. shallow clone) do nothing
-        if(NOT sorted_tags_refs)
-            return()
-        endif()
-
-        # convert to list (see: https://public.kitware.com/pipermail/cmake/2007-May/014222.html)
-        string(REGEX REPLACE ";"  "\\\\;" sorted_tags_refs "${sorted_tags_refs}")
-        string(REGEX REPLACE "\n" ";"     sorted_tags_refs "${sorted_tags_refs}")
-
-        # get the newest tag
-        list(GET sorted_tags_refs 0 tag_ref)
-
-        string(REGEX REPLACE "^([^ ]+) +([^ ]+)$" "\\1" tag "${tag_ref}")
-        string(REGEX REPLACE "^([^ ]+) +([^ ]+)$" "\\2" ref "${tag_ref}")
-
-        execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse HEAD OUTPUT_VARIABLE current_ref OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-        if(tag MATCHES "^v?(([0-9]+\\.?)*[0-9]*)(-(.*))?$" AND ref STREQUAL current_ref)
-            set(revision_str "${CMAKE_MATCH_4}")
-
-            # version and no revision tagged for current commit
-            if(NOT revision_str)
-                set(${revision} "" CACHE STRING "Latest Git Tag Revision" FORCE)
-                set(${version_release} 1 CACHE STRING "Is this a versioned release without revision" FORCE)
-            else()
-                set(${revision} "${revision_str}" CACHE STRING "Latest Git Tag Revision" FORCE)
-            endif()
-        elseif(ref STREQUAL current_ref)
-            # revision name tagged
-            set(${revision} "${tag}" CACHE STRING "Latest Git Tag Revision" FORCE)
-        else()
+        if(NOT "${${version_release}}" AND "${${revision}}" STREQUAL "")
             # dev version, use short sha for ref
-            execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD OUTPUT_VARIABLE short_sha OUTPUT_STRIP_TRAILING_WHITESPACE)
+            execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --short HEAD OUTPUT_VARIABLE short_sha OUTPUT_STRIP_TRAILING_WHITESPACE)
             set(${revision} "${short_sha}" CACHE STRING "Latest Git Tag Revision" FORCE)
         endif()
     endif()
