@@ -112,15 +112,12 @@ if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
     # of files that depend on version.h
     include(GetGitRevisionDescription)
     get_git_head_revision(REFSPEC COMMITHASH)
-else()
-    message(WARNING "Git not found, cannot set version info")
 endif()
 
-# no git or no tags
+# no git or no tags, use ChangeLog
 if(NOT VERSION)
-    set(VERSION  2.0.0)
-    set(REVISION "unknown")
-    set(VERSION_RELEASE 0)
+    include(ChangeLogVersion)
+    changelog_version(VERSION REVISION VERSION_RELEASE)
 endif()
 
 # generate version.h
