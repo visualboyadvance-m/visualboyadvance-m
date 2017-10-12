@@ -291,7 +291,7 @@ IF(WIN32)
         find_package(Git)
         if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
             set(git_checkout TRUE)
-            execute_process(COMMAND "${GIT_EXECUTABLE}" submodule update --remote --recursive RESULT_VARIABLE git_status)
+            execute_process(COMMAND "${GIT_EXECUTABLE}" submodule update --remote --recursive RESULT_VARIABLE git_status WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
         endif()
 
         if(NOT (git_checkout AND git_status EQUAL 0))

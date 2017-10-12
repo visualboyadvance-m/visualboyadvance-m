@@ -1,0 +1,276 @@
+#!/bin/sh
+
+set -e
+
+BUILD_ROOT=$HOME/vbam-build
+
+# build env
+export MACOSX_DEPLOYMENT_TARGET=10.7
+export CFLAGS="-I$BUILD_ROOT/root/include"
+export CPPFLAGS="-I$BUILD_ROOT/root/include"
+export CXXFLAGS="-I$BUILD_ROOT/root/include -std=c++11 -stdlib=libc++"
+export OBJCXXFLAGS="-I$BUILD_ROOT/root/include -std=c++11 -stdlib=libc++"
+export LDFLAGS="-L$BUILD_ROOT/root/lib"
+export CMAKE_PREFIX_PATH="$BUILD_ROOT/root"
+export PKG_CONFIG_PATH="$BUILD_ROOT/root/lib/pkgconfig"
+export PATH="$BUILD_ROOT/root/bin:$PATH"
+
+DISTS='
+    gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-latest.tar.xz                                    libintl.a
+    openssl         https://www.openssl.org/source/openssl-1.0.2l.tar.gz                                        libssl.a
+    libpng          https://download.sourceforge.net/libpng/libpng-1.6.32.tar.xz                                libpng.a
+    libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/1.5.2.tar.gz                         libjpeg.a
+    libtiff         http://dl.maptools.org/dl/libtiff/tiff-3.8.2.tar.gz                                         libtiff.a
+    sdl2            https://www.libsdl.org/release/SDL2-2.0.6.tar.gz                                            libSDL2.a
+    sfml            https://www.sfml-dev.org/files/SFML-2.4.2-sources.zip                                       libsfml-system-s.a
+    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.3/wxWidgets-3.0.3.tar.bz2     libwx_baseu-3.0.a
+    ffmpeg          http://ffmpeg.org/releases/ffmpeg-3.3.4.tar.xz                                              libavformat.a
+'
+
+CONFIGURE_ARGS="--disable-shared --enable-static --prefix=$BUILD_ROOT/root"
+CMAKE_ARGS="-DCMAKE_PREFIX_PATH=$BUILD_ROOT/root -DCMAKE_INSTALL_PREFIX=$BUILD_ROOT/root"
+
+DIST_OVERRIDES="
+    openssl     darwin64-x86_64-cc no-shared --prefix=$BUILD_ROOT/root
+"
+
+DIST_ARGS="
+    sfml        -DBUILD_SHARED_LIBS=NO
+    wxwidgets   --with-macosx-version-min=$MACOSX_DEPLOYMENT_TARGET --enable-stl LDFLAGS=-stdlib=libc++
+"
+
+main() {
+    setup
+    download_dists
+    build_dists
+    build_project
+}
+
+setup() {
+    mkdir -p "$BUILD_ROOT"
+
+    i=0
+    DIST_NAMES=
+    for item in $DISTS; do
+        if [ $((i % 3)) -eq 0 ]; then
+            DIST_NAMES="$DIST_NAMES $item"
+        fi
+        i=$((i + 1))
+    done
+
+    i=0
+    DIST_TARGETS=
+    for item in $DISTS; do
+        if [ $((i % 3)) -eq 2 ]; then
+            DIST_TARGETS="$DIST_TARGETS $item"
+        fi
+        i=$((i + 1))
+    done
+
+    NUM_CPUS=$(sysctl -n hw.ncpu)
+
+    CHECKOUT=$(find_checkout)
+}
+
+download_dists() {
+    mkdir -p "$BUILD_ROOT/dists"
+
+    i=0
+    for item in $DISTS; do
+        if [ $((i % 3)) -eq 0 ]; then
+            dist_name=$item
+        elif [ $((i % 3)) -eq 1 ]; then
+            dist_url=$item
+            dist_file="$BUILD_ROOT/dists/${dist_url##*/}"
+
+            cd "$BUILD_ROOT/dists"
+            if [ ! -e "$dist_file" ]; then
+                echo "\n[32mFetching [1;35m$dist_name[0m: [1;34m$dist_url[0m\n"
+                curl -LO "$dist_url"
+            fi
+
+            dist_dir="$BUILD_ROOT/libs/$dist_name"
+
+            if [ ! -d "$dist_dir" ]; then
+                mkdir -p "$dist_dir"
+
+                tmp_dir="$BUILD_ROOT/libs/tmp"
+                mkdir -p "$tmp_dir"
+                cd "$tmp_dir"
+
+                case "$dist_file" in
+                    *.tar.gz)
+                        tar zxf "$dist_file"
+                        ;;
+                    *.tar.xz)
+                        xzcat "$dist_file" | tar xf -
+                        ;;
+                    *.tar.bz2)
+                        bzcat "$dist_file" | tar xf -
+                        ;;
+                    *.zip)
+                        unzip -q "$dist_file"
+                        ;;
+                esac
+
+                mv */* "$dist_dir"
+                rm -rf "$tmp_dir"
+            fi
+        fi
+
+        i=$((i + 1))
+    done
+}
+
+build_dists() {
+    cd "$BUILD_ROOT/libs"
+
+    i=0
+    for dist in $DIST_NAMES; do
+        target_lib="$BUILD_ROOT/root/lib/$(list_get $i $DIST_TARGETS)"
+
+        if [ ! -e "$target_lib" ]; then
+            cd "$dist"
+
+            if [ -e configure -o -e configure.ac -o -e configure.in -o -e Makefile.am ]; then
+                echo "\n[32mBuilding [1;35m$dist[0m\n"
+
+                if [ ! -e configure ]; then
+                    aclocal
+                    glibtoolize
+                    autoheader
+                    autoconf
+                    [ -e Makefile.am ] && automake --add-missing
+                fi
+
+                ./configure $(dist_args "$dist" autoconf)
+                make -j$NUM_CPUS
+                make install prefix=$BUILD_ROOT/root
+
+                echo "\n[32mDone!!![0m\n"
+            elif [ -e CMakeLists.txt ]; then
+                echo "\n[32mBuilding [1;35m$dist[0m\n"
+
+                mkdir -p build
+                cd build
+
+                cmake .. $(dist_args "$dist" cmake)
+                make -j$NUM_CPUS
+                rm -rf destdir
+                mkdir destdir
+                make install DESTDIR="$PWD/destdir"
+
+                cd "$PWD/destdir/$BUILD_ROOT/root"
+                find . ! -type d | (cd "$BUILD_ROOT/root"; IFS='
+';              while read f; do
+                    mkdir -p "${f%/*}"
+                    cp -a "$BUILD_ROOT/libs/$dist/build/destdir/$BUILD_ROOT/root/$f" "$f"
+                done)
+
+                cd "$BUILD_ROOT/libs/$dist"
+
+                echo "\n[32mDone!!![0m\n"
+            fi
+
+            cd ..
+        fi
+
+        i=$((i + 1))
+    done
+}
+
+list_get() {
+    i=0
+    n=${1:=0}
+    shift
+
+    for item; do
+        if [ $i -eq $n ]; then
+            echo "$item"
+            return 0
+        fi
+
+        i=$((i + 1))
+    done
+}
+
+dist_args() {
+    dist=$1
+    [ -n "$dist" ] || error 'dist name required'
+    buildsys=$2
+    [ "$buildsys" = autoconf -o "$buildsys" = cmake ] || \
+        error "buildsystem type required, must be 'autoconf' or 'cmake'"
+
+    args=$(table_line "$dist" "$DIST_OVERRIDES")
+
+    if [ -z "$args" ]; then
+        case "$buildsys" in
+            autoconf)
+                args="$CONFIGURE_ARGS $(table_line "$dist" "$DIST_ARGS")"
+                ;;
+            cmake)
+                args="$CMAKE_ARGS $(table_line "$dist" "$DIST_ARGS")"
+                ;;
+        esac
+    fi
+
+    echo "$args"
+
+    return 0
+}
+
+table_line() {
+    name=$1
+    [ -n "$name" ]  || error 'item name required'
+    table=$2
+    [ -n "$table" ] || error 'table string required'
+
+    OLDIFS=$IFS
+    IFS='
+'
+    for line in $table; do
+        IFS=$OLDIFS
+        set -- $line
+        if [ "$1" = "$name" ]; then
+            shift
+            echo "$@"
+            return 0
+        fi
+    done
+
+    IFS=$OLDIFS
+}
+
+find_checkout() {
+    (
+        cd "$(dirname "$0")"
+        while [ "$PWD" != / ]; do
+            if [ -e src/version.h.in ]; then
+                echo "$PWD"
+                exit 0
+            fi
+
+            cd ..
+        done
+        exit 1
+    ) || error 'cannot find project checkout'
+}
+
+error() {
+    printf >&2 '\n[31mERROR[0m: %s.\n\n' "$1"
+    [ -z "$2" ] && exit 1
+}
+
+build_project() {
+    echo "\n[32mBuilding project: [1;34m$CHECKOUT[0m\n"
+
+    mkdir -p "$BUILD_ROOT/project"
+    cd "$BUILD_ROOT/project"
+
+    cmake "$CHECKOUT" -DCMAKE_PREFIX_PATH="$BUILD_ROOT/root" -DENABLE_FFMPEG=OFF -DSFML_STATIC_LIBRARIES=TRUE
+    make -j$NUM_CPUS
+
+    echo "\n[32mBuild Successful!!![0m\n\nBuild results can be found in: [1;34m$BUILD_ROOT/project[0m\n"
+}
+
+main "$@"

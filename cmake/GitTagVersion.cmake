@@ -6,7 +6,7 @@ function(git_version version revision version_release)
     find_package(Git)
     if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
         # get latest version from tag history
-        execute_process(COMMAND "${GIT_EXECUTABLE}" tag "--format=%(align:width=20)%(refname:short)%(end)%(if)%(*objectname)%(then)%(*objectname)%(else)%(objectname)%(end)" --sort=-creatordate OUTPUT_VARIABLE tags OUTPUT_STRIP_TRAILING_WHITESPACE)
+        execute_process(COMMAND "${GIT_EXECUTABLE}" tag "--format=%(align:width=20)%(refname:short)%(end)%(if)%(*objectname)%(then)%(*objectname)%(else)%(objectname)%(end)" --sort=-creatordate OUTPUT_VARIABLE tags OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
         # if no tags (e.g. shallow clone) do nothing
         if(tags STREQUAL "")
@@ -16,7 +16,7 @@ function(git_version version revision version_release)
         # convert to list of the form [tag0, ref0, tag1, ref1, ...]
         string(REGEX REPLACE "[ \n]+" ";" tags "${tags}")
 
-        execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse HEAD OUTPUT_VARIABLE current_ref OUTPUT_STRIP_TRAILING_WHITESPACE)
+        execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse HEAD OUTPUT_VARIABLE current_ref OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
         # if cannot get current ref, do nothing
         if(current_ref STREQUAL "")
@@ -53,7 +53,7 @@ function(git_version version revision version_release)
 
         if(NOT "${${version_release}}" AND "${${revision}}" STREQUAL "")
             # dev version, use short sha for ref
-            execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --short HEAD OUTPUT_VARIABLE short_sha OUTPUT_STRIP_TRAILING_WHITESPACE)
+            execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --short HEAD OUTPUT_VARIABLE short_sha OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
             set(${revision} "${short_sha}" CACHE STRING "Latest Git Tag Revision" FORCE)
         endif()
     endif()
