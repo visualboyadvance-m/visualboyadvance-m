@@ -25,6 +25,7 @@ DISTS='
     sfml            https://www.sfml-dev.org/files/SFML-2.4.2-sources.zip                                       lib/libsfml-system-s.a
     wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.3/wxWidgets-3.0.3.tar.bz2     lib/libwx_baseu-3.0.a
     ffmpeg          http://ffmpeg.org/releases/ffmpeg-3.3.4.tar.xz                                              lib/libavformat.a
+    xz              https://tukaani.org/xz/xz-5.2.3.tar.xz                                                      lib/liblzma.a
 '
 
 CONFIGURE_ARGS="--disable-shared --enable-static --prefix=$BUILD_ROOT/root"

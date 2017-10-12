@@ -533,7 +533,16 @@ if(APPLE)
     # but only in Release mode
     IF(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
         ADD_CUSTOM_COMMAND(TARGET visualboyadvance-m POST_BUILD
-            COMMAND ${CMAKE_SOURCE_DIR}/tools/osx/third_party_libs_tool "$<TARGET_FILE_DIR:visualboyadvance-m>/../..")
+            COMMAND ${CMAKE_SOURCE_DIR}/tools/osx/third_party_libs_tool ./visualboyadvance-m.app
+            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
+
+        ADD_CUSTOM_COMMAND(TARGET visualboyadvance-m POST_BUILD
+            COMMAND codesign -s "Developer ID Application" --deep ./visualboyadvance-m.app
+            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
+
+        ADD_CUSTOM_COMMAND(TARGET visualboyadvance-m POST_BUILD
+            COMMAND zip -9r ./visualboyadvance-m-Mac.zip ./visualboyadvance-m.app
+            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
     ENDIF()
 endif(APPLE)
 
