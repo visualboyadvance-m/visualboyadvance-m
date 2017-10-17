@@ -326,12 +326,18 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         ENDIF()
     ENDIF(ENABLE_LTO)
 
+    unset(MY_C_OPT_FLAGS)
+
+    if(X86_32 OR AMD64)
+        set(MY_C_OPT_FLAGS -mfpmath=sse -msse2)
+    endif()
+
     # common optimization flags
     IF(NOT (APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.3))
-        SET(MY_C_OPT_FLAGS -O2 -fomit-frame-pointer ${LTO_FLAGS})
+        SET(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -O2 -fomit-frame-pointer ${LTO_FLAGS})
     ELSE()
         # LTO and -fomit-frame-pointer generate broken binaries on Lion with XCode 4.2 tools
-        SET(MY_C_OPT_FLAGS -O2)
+        SET(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -O2)
     ENDIF()
 
     # only use -mtune=generic on PC architectures
