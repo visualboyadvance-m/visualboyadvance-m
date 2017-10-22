@@ -5,7 +5,7 @@ set -e
 BUILD_ROOT=$HOME/vbam-build
 
 # build env
-export HOST_SYSTEM=x86_64-w64-mingw32.static
+export HOST_SYSTEM=x86_64-w64-mingw32
 export CFLAGS="-I$BUILD_ROOT/root/include"
 export CPPFLAGS="-I$BUILD_ROOT/root/include"
 export CXXFLAGS="-I$BUILD_ROOT/root/include -std=gnu++11"
@@ -38,7 +38,7 @@ CMAKE_ARGS="-DCMAKE_PREFIX_PATH=$BUILD_ROOT/root -DCMAKE_INSTALL_PREFIX=$BUILD_R
 
 DIST_OVERRIDES="
     openssl     mingw64 no-shared --prefix=$BUILD_ROOT/root
-    gettext     --host=$HOST_SYSTEM --prefix=$BUILD_ROOT/root  --enable-static --with-included-glib --enable-threads=win32 --with-included-libcroco --with-included-libunistring --with-included-libxml LIBS=-L$BUILD_ROOT/root/lib LIBS=-liconv
+    gettext     --host=$HOST_SYSTEM --prefix=$BUILD_ROOT/root  --enable-static --with-included-glib --enable-threads=win32 --enable-static --with-included-libcroco --with-included-libunistring --with-included-libxml LDFLAGS='-L$BUILD_ROOT/root/lib'
 "
 
 DIST_ARGS="
@@ -178,7 +178,7 @@ build_dists() {
                 mkdir -p build
                 cd build
 
-                $HOST_SYSTEM-cmake .. $(dist_args "$dist" cmake)
+                cmake .. -G"MSYS Makefiles" $(dist_args "$dist" cmake)
                 make -j$NUM_CPUS
                 rm -rf destdir
                 mkdir destdir
