@@ -5,7 +5,7 @@ set -e
 BUILD_ROOT=$HOME/vbam-build
 
 # build env
-export HOST_SYSTEM=x86_64-w64-mingw32
+export HOST_SYSTEM=x86_64-w64-mingw32.static
 export CFLAGS="-I$BUILD_ROOT/root/include"
 export CPPFLAGS="-I$BUILD_ROOT/root/include"
 export CXXFLAGS="-I$BUILD_ROOT/root/include -std=gnu++11"
@@ -16,28 +16,35 @@ export PKG_CONFIG_PATH="$BUILD_ROOT/root/lib/pkgconfig"
 export PATH="$BUILD_ROOT/root/bin:$PATH"
 
 DISTS='
+    libiconv        https://ftp.gnu.org/gnu/libiconv/libiconv-1.15.tar.gz                                       lib/libiconv.a
     gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-0.19.8.1.tar.xz                                  lib/libintl.a
     openssl         https://www.openssl.org/source/openssl-1.0.2l.tar.gz                                        lib/libssl.a
     libpng          https://download.sourceforge.net/libpng/libpng-1.6.32.tar.xz                                lib/libpng.a
     libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/1.5.2.tar.gz                         lib/libjpeg.a
     libtiff         http://dl.maptools.org/dl/libtiff/tiff-3.8.2.tar.gz                                         lib/libtiff.a
     sdl2            https://www.libsdl.org/release/SDL2-2.0.6.tar.gz                                            lib/libSDL2.a
+    openal          http://kcat.strangesoft.net/openal-releases/openal-soft-1.18.2.tar.bz2                      lib/libOpenAL32.a
+    ogg             http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.xz                                  lib/libogg.a
+    vorbis          http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.xz                            lib/libvorbis.a
+    flac            https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.2.tar.xz                             libFLAC.a
     sfml            https://www.sfml-dev.org/files/SFML-2.4.2-sources.zip                                       lib/libsfml-system-s.a
     wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.3/wxWidgets-3.0.3.tar.bz2     lib/libwx_baseu-3.0.a
     ffmpeg          http://ffmpeg.org/releases/ffmpeg-3.3.4.tar.xz                                              lib/libavformat.a
     xz              https://tukaani.org/xz/xz-5.2.3.tar.xz                                                      lib/liblzma.a
 '
 
-CONFIGURE_ARGS="--disable-shared --enable-static --prefix=$BUILD_ROOT/root --host=$HOST_SYSTEM --build=$HOST_SYSTEM --target=$HOST_SYSTEM"
+CONFIGURE_ARGS="--disable-shared --enable-static --prefix=$BUILD_ROOT/root --host=$HOST_SYSTEM"
 CMAKE_ARGS="-DCMAKE_PREFIX_PATH=$BUILD_ROOT/root -DCMAKE_INSTALL_PREFIX=$BUILD_ROOT/root"
 
 DIST_OVERRIDES="
     openssl     mingw64 no-shared --prefix=$BUILD_ROOT/root
+    gettext     --host=$HOST_SYSTEM --prefix=$BUILD_ROOT/root  --enable-static --with-included-glib --enable-threads=win32 --with-included-libcroco --with-included-libunistring --with-included-libxml LIBS=-L$BUILD_ROOT/root/lib LIBS=-liconv
 "
 
 DIST_ARGS="
     sfml        -DBUILD_SHARED_LIBS=NO
     wxwidgets   --enable-stl 
+    openal      -DLIBTYPE=STATIC
 "
 
 main() {
@@ -171,7 +178,7 @@ build_dists() {
                 mkdir -p build
                 cd build
 
-                cmake .. $(dist_args "$dist" cmake)
+                $HOST_SYSTEM-cmake .. $(dist_args "$dist" cmake)
                 make -j$NUM_CPUS
                 rm -rf destdir
                 mkdir destdir
