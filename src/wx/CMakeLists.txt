@@ -5,6 +5,8 @@ IF(NOT CMAKE_VERSION VERSION_LESS 3.0)
     cmake_policy(SET CMP0043 NEW) # for wxWidgets
 ENDIF()
 
+include(VbamFunctions)
+
 if( WIN32 )
   # not yet implemented
   option( ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" ON )
@@ -511,6 +513,13 @@ TARGET_LINK_LIBRARIES (
     ${OPENAL_LIBRARY}
 )
 
+join("${FFMPEG_LDFLAGS}" " " FFMPEG_LDFLAGS_STR)
+
+set_target_properties(
+    visualboyadvance-m
+    PROPERTIES LINK_FLAGS ${FFMPEG_LDFLAGS_STR}
+)
+
 # Build a console app in debug mode on Windows
 IF(WIN32 AND CMAKE_BUILD_TYPE STREQUAL Debug)
     SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,console")
@@ -534,14 +543,6 @@ if(APPLE)
     IF(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
         ADD_CUSTOM_COMMAND(TARGET visualboyadvance-m POST_BUILD
             COMMAND ${CMAKE_SOURCE_DIR}/tools/osx/third_party_libs_tool ./visualboyadvance-m.app
-            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
-
-        ADD_CUSTOM_COMMAND(TARGET visualboyadvance-m POST_BUILD
-            COMMAND codesign -s "Developer ID Application" --deep ./visualboyadvance-m.app
-            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
-
-        ADD_CUSTOM_COMMAND(TARGET visualboyadvance-m POST_BUILD
-            COMMAND zip -9r ./visualboyadvance-m-Mac.zip ./visualboyadvance-m.app
             WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
     ENDIF()
 endif(APPLE)

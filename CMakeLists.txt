@@ -193,9 +193,21 @@ SET(VBAMCORE_LIBS
 )
 
 if(ENABLE_FFMPEG)
-    FIND_PACKAGE ( PkgConfig REQUIRED )
+    FIND_PACKAGE(PkgConfig REQUIRED)
 
     PKG_CHECK_MODULES(FFMPEG REQUIRED libavcodec libavformat libswscale libavutil)
+
+    if(FFMPEG_STATIC)
+        set(FFMPEG_LIBRARIES ${FFMPEG_STATIC_LIBRARIES})
+        set(FFMPEG_LDFLAGS   ${FFMPEG_STATIC_LDFLAGS} ${FFMPEG_STATIC_OTHER_LDFLAGS})
+
+        if(APPLE)
+            set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -framework CoreText -framework ApplicationServices)
+        endif()
+    else()
+        set(FFMPEG_LIBRARIES ${FFMPEG_LIBRARIES})
+        set(FFMPEG_LDFLAGS   ${FFMPEG_LDFLAGS} ${FFMPEG_OTHER_LDFLAGS})
+    endif()
 endif(ENABLE_FFMPEG)
 
 if(NOT ENABLE_FFMPEG)

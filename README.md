@@ -118,24 +118,26 @@ cmake .. -DCMAKE_BUILD_TYPE=Debug
 
 Here is the complete list:
 
-| **CMake Option**     | **What it Does**                                                     | **Defaults**          |
-|----------------------|----------------------------------------------------------------------|-----------------------|
-| ENABLE_SDL           | Build the SDL port                                                   | OFF                   |
-| ENABLE_WX            | Build the wxWidgets port                                             | ON                    |
-| ENABLE_DEBUGGER      | Enable the debugger                                                  | ON                    |
-| ENABLE_NLS           | Enable translations                                                  | ON                    |
-| ENABLE_ASM_CORE      | Enable x86 ASM CPU cores (**BUGGY AND DANGEROUS**)                   | OFF                   |
-| ENABLE_ASM           | Enable the following two ASM options                                 | ON for 32 bit builds  |
-| ENABLE_ASM_SCALERS   | Enable x86 ASM graphic filters                                       | ON for 32 bit builds  |
-| ENABLE_MMX           | Enable MMX                                                           | ON for 32 bit builds  |
-| ENABLE_LINK          | Enable GBA linking functionality (requires SFML)                     | ON                    |
-| ENABLE_LIRC          | Enable LIRC support                                                  | OFF                   |
-| ENABLE_FFMPEG        | Enable ffmpeg A/V recording                                          | ON on Linux and MSys2 |
-| ENABLE_LTO           | Compile with Link Time Optimization (gcc and clang only)             | ON for release build  |
-| ENABLE_GBA_LOGGING   | Enable extended GBA logging                                          | ON                    |
-| ENABLE_DIRECT3D      | Direct3D rendering for wxWidgets (Windows, **NOT IMPLEMENTED!!!**)   | ON                    |
-| ENABLE_XAUDIO2       | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
-| ENABLE_OPENAL        | Enable OpenAL for the wxWidgets port                                 | ON                    |
+| **CMake Option**      | **What it Does**                                                     | **Defaults**          |
+|-----------------------|----------------------------------------------------------------------|-----------------------|
+| ENABLE_SDL            | Build the SDL port                                                   | OFF                   |
+| ENABLE_WX             | Build the wxWidgets port                                             | ON                    |
+| ENABLE_DEBUGGER       | Enable the debugger                                                  | ON                    |
+| ENABLE_NLS            | Enable translations                                                  | ON                    |
+| ENABLE_ASM_CORE       | Enable x86 ASM CPU cores (**BUGGY AND DANGEROUS**)                   | OFF                   |
+| ENABLE_ASM            | Enable the following two ASM options                                 | ON for 32 bit builds  |
+| ENABLE_ASM_SCALERS    | Enable x86 ASM graphic filters                                       | ON for 32 bit builds  |
+| ENABLE_MMX            | Enable MMX                                                           | ON for 32 bit builds  |
+| ENABLE_LINK           | Enable GBA linking functionality (requires SFML)                     | ON                    |
+| ENABLE_LIRC           | Enable LIRC support                                                  | OFF                   |
+| ENABLE_FFMPEG         | Enable ffmpeg A/V recording                                          | ON on Linux and MSys2 |
+| ENABLE_LTO            | Compile with Link Time Optimization (gcc and clang only)             | ON for release build  |
+| ENABLE_GBA_LOGGING    | Enable extended GBA logging                                          | ON                    |
+| ENABLE_DIRECT3D       | Direct3D rendering for wxWidgets (Windows, **NOT IMPLEMENTED!!!**)   | ON                    |
+| ENABLE_XAUDIO2        | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
+| ENABLE_OPENAL         | Enable OpenAL for the wxWidgets port                                 | ON                    |
+| SFML_STATIC_LIBRARIES | Set this to ON if linking static SFML libraries                      | OFF                   |
+| FFMPEG_STATIC         | Set this to ON if linking static ffmpeg librariesl                   | OFF                   |
 
 Note for distro packagers, we use the CMake module
 [GNUInstallDirs](https://cmake.org/cmake/help/v2.8.12/cmake.html#module:GNUInstallDirs)
