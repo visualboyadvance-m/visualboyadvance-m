@@ -303,11 +303,11 @@ IF(WIN32)
         find_package(Git)
         if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
             set(git_checkout TRUE)
-            execute_process(COMMAND "${GIT_EXECUTABLE}" submodule update --remote --recursive RESULT_VARIABLE git_status WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+            execute_process(COMMAND "${GIT_EXECUTABLE}" submodule update --init --remote --recursive RESULT_VARIABLE git_status WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
         endif()
 
         if(NOT (git_checkout AND git_status EQUAL 0))
-            message(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --remote --recursive")
+            message(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --remote --recursive")
         endif()
     ENDIF()
 
