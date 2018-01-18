@@ -513,12 +513,14 @@ TARGET_LINK_LIBRARIES (
     ${OPENAL_LIBRARY}
 )
 
-join("${FFMPEG_LDFLAGS}" " " FFMPEG_LDFLAGS_STR)
+if(ENABLE_FFMPEG)
+    join("${FFMPEG_LDFLAGS}" " " FFMPEG_LDFLAGS_STR)
 
-set_target_properties(
-    visualboyadvance-m
-    PROPERTIES LINK_FLAGS ${FFMPEG_LDFLAGS_STR}
-)
+    set_target_properties(
+        visualboyadvance-m
+        PROPERTIES LINK_FLAGS ${FFMPEG_LDFLAGS_STR}
+    )
+endif(ENABLE_FFMPEG)
 
 # Build a console app in debug mode on Windows
 IF(WIN32 AND CMAKE_BUILD_TYPE STREQUAL Debug)
