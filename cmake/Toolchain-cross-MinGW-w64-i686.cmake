@@ -9,6 +9,10 @@ find_program(CMAKE_CXX_COMPILER NAMES ${COMPILER_PREFIX}-g++)
 
 SET(CMAKE_FIND_ROOT_PATH /usr/${COMPILER_PREFIX} /usr/${COMPILER_PREFIX}/sys-root/mingw)
 
+if(CMAKE_PREFIX_PATH)
+    set(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} ${CMAKE_PREFIX_PATH})
+endif()
+
 # adjust the default behaviour of the FIND_XXX() commands:
 # search headers and libraries in the target environment, search
 # programs in the host environment too

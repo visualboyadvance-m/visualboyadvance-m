@@ -2536,8 +2536,8 @@ void MainFrame::MenuOptionIntRadioValue(const char* menuName, int& field, int va
 // app-specific volume controls.
 
 #ifdef __WXMSW__
-    #include <Windows.h>
-    #include <CommCtrl.h>
+    #include <windows.h>
+    #include <commctrl.h>
     #include <wx/msw/private.h>
     typedef int (WINAPI *func_LoadIconWithScaleDown)(HINSTANCE, LPCWSTR, int, int, HICON*);
 #endif

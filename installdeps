@@ -159,6 +159,8 @@ linux_installdeps() {
         archlinux_installdeps
     elif [ -f /etc/solus-release ]; then
         solus_installdeps
+    elif path_exists /etc/os-release && [ "$(. /etc/os-release; puts "$ID_LIKE")" = suse ]; then
+        suse_installdeps
     else
         error "Don't know how to install deps on your version of Linux"
     fi
@@ -484,6 +486,16 @@ fedora_installdeps() {
     fi
 
     [ -n "$warning" ] && warning "$warning"
+
+    build_instructions
+}
+
+suse_installdeps() {
+    check_cross
+    installing
+
+    check sudo zypper in -y gcc gcc-c++ binutils make cmake nasm ffmpeg2-devel gettext-tools libpng16-devel \
+                            pkg-config libSDL2-devel sfml2-devel wxWidgets-3_0-devel
 
     build_instructions
 }

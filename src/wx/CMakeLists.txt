@@ -31,7 +31,7 @@ if(ENABLE_OPENAL)
     FIND_PACKAGE(OpenAL REQUIRED)
     INCLUDE_DIRECTORIES(${OPENAL_INCLUDE_DIR})
 
-    IF(WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe))
+    IF(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
         ADD_DEFINITIONS(-DAL_LIBTYPE_STATIC)
     ENDIF()
 else(ENABLE_OPENAL)
@@ -42,6 +42,33 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
     SET(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
 ENDIF()
 
+# on e.g. msys2 add a couple of libraries wx needs
+#if(WIN32 AND (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang))
+#    set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -luuid -lwinspool")
+#endif()
+
+# convert msys paths like /c/foo to windows paths like c:/foo
+# for variables set by FindWxWidgets
+function(normalize_wx_paths)
+    if(MSYS)
+        unset(new_paths)
+        foreach(p ${wxWidgets_LIBRARY_DIRS})
+            execute_process(COMMAND cygpath -m "${p}" OUTPUT_VARIABLE p_win OUTPUT_STRIP_TRAILING_WHITESPACE)
+            list(APPEND new_paths "${p_win}")
+        endforeach()
+
+        set(wxWidgets_LIBRARY_DIRS ${new_paths} PARENT_SCOPE)
+
+        string(REGEX REPLACE "((^| )[^/]*)/([a-zA-Z])/" "\\1\\3:/" new_libs "${wxWidgets_LIBRARIES}")
+
+        set(wxWidgets_LIBRARIES ${new_libs} PARENT_SCOPE)
+    endif()
+endfunction()
+
+if(CMAKE_PREFIX_PATH)
+    set(wxWidgets_CONFIG_OPTIONS "--prefix=${CMAKE_PREFIX_PATH}")
+endif()
+
 SET(wxWidgets_USE_UNICODE ON)
 # adv is for wxAboutBox
 # xml, html is for xrc
@@ -51,6 +78,7 @@ SET(wxWidgets_USE_LIBS xrc xml html adv gl net core base gl)
 # the gl lib may not be available, and if it looks like it is we still have to
 # do a compile test later
 FIND_PACKAGE(wxWidgets QUIET)
+normalize_wx_paths()
 
 SET(CHECK_WX_OPENGL FALSE)
 
@@ -116,6 +144,7 @@ IF(NOT WX_HAS_OPENGL)
     ADD_DEFINITIONS(-DNO_OGL)
     LIST(REMOVE_ITEM wxWidgets_USE_LIBS gl)
     FIND_PACKAGE(wxWidgets REQUIRED)
+    normalize_wx_paths()
 ENDIF()
 
 IF(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_CROSSCOMPILING)
@@ -268,8 +297,19 @@ IF(NOT WIN32 AND NOT APPLE)
     SET(WX_CONFIG_H "${WX_CONFIG_H}/wx/config.h")
 
     INCLUDE(CheckCXXSymbolExists)
+    CHECK_CXX_SYMBOL_EXISTS(__WXGTK4__ ${WX_CONFIG_H} WX_USING_GTK4)
     CHECK_CXX_SYMBOL_EXISTS(__WXGTK3__ ${WX_CONFIG_H} WX_USING_GTK3)
-    IF(WX_USING_GTK3)
+    IF(WX_USING_GTK4)
+        FIND_PACKAGE(PkgConfig REQUIRED)
+        PKG_CHECK_MODULES(GTK4 REQUIRED gtk+-4.0)
+        IF(NOT GTK4_INCLUDE_DIRS)
+            MESSAGE(FATAL_ERROR "Could not find gtk4")
+        ENDIF()
+        INCLUDE_DIRECTORIES(${GTK4_INCLUDE_DIRS})
+        LINK_DIRECTORIES(${GTK4_LIBRARY_DIRS})
+        ADD_COMPILE_OPTIONS(${GTK4_CFLAGS_OTHER})
+        SET(GTK_LIBRARIES ${GTK4_LIBRARIES})
+    ELSEIF(WX_USING_GTK3)
         FIND_PACKAGE(PkgConfig REQUIRED)
         PKG_CHECK_MODULES(GTK3 REQUIRED gtk+-3.0)
         IF(NOT GTK3_INCLUDE_DIRS)
@@ -367,10 +407,17 @@ INCLUDE(HostCompile)
 
 HOST_COMPILE(${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c ${BIN2C})
 
+if(WXRC)
+    separate_arguments(WXRC UNIX_COMMAND "${WXRC}")
+else()
+    set(WXRC wxrc)
+endif()
+
 ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xrs
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                   COMMAND wxrc ${XRC_SOURCES} -o wxvbam.xrs
+                   COMMAND ${WXRC} ${XRC_SOURCES} "--output=wxvbam.xrs"
                    DEPENDS ${XRC_SOURCES})
+
 ADD_CUSTOM_COMMAND(OUTPUT builtin-xrc.h
                    COMMAND ${BIN2C} wxvbam.xrs builtin-xrc.h builtin_xrs
                    DEPENDS wxvbam.xrs)
@@ -520,12 +567,39 @@ if(ENABLE_FFMPEG)
         visualboyadvance-m
         PROPERTIES LINK_FLAGS ${FFMPEG_LDFLAGS_STR}
     )
-endif(ENABLE_FFMPEG)
+endif()
 
-# Build a console app in debug mode on Windows
-IF(WIN32 AND CMAKE_BUILD_TYPE STREQUAL Debug)
-    SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,console")
-ENDIF()
+# link libgcc/libstdc++ statically on mingw
+# and adjust link command when making a static binary
+if(CMAKE_COMPILER_IS_GNUCXX)
+    if(WIN32)
+        # Build a console app in debug mode on Windows
+        if(CMAKE_BUILD_TYPE STREQUAL Debug)
+            set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,console")
+        else()
+            set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,windows")
+        endif()
+    endif()
+
+    if(VBAM_STATIC)
+        # some dists don't have a static libpthread
+        set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread ")
+
+        if(WIN32)
+            add_custom_command(
+                TARGET visualboyadvance-m PRE_LINK
+                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/msys-link-static.cmake
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            )
+        else()
+            add_custom_command(
+                TARGET visualboyadvance-m PRE_LINK
+                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/link-static.cmake
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            )
+        endif()
+    endif()
+endif()
 
 IF(WIN32)
     INSTALL(PROGRAMS ${PROJECT_BINARY_DIR}/visualboyadvance-m${CMAKE_EXECUTABLE_SUFFIX} DESTINATION ${CMAKE_BINARY_DIR})

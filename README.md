@@ -130,14 +130,18 @@ Here is the complete list:
 | ENABLE_MMX            | Enable MMX                                                           | ON for 32 bit builds  |
 | ENABLE_LINK           | Enable GBA linking functionality (requires SFML)                     | ON                    |
 | ENABLE_LIRC           | Enable LIRC support                                                  | OFF                   |
-| ENABLE_FFMPEG         | Enable ffmpeg A/V recording                                          | ON on Linux and MSys2 |
+| ENABLE_FFMPEG         | Enable ffmpeg A/V recording                                          | OFF                   |
 | ENABLE_LTO            | Compile with Link Time Optimization (gcc and clang only)             | ON for release build  |
 | ENABLE_GBA_LOGGING    | Enable extended GBA logging                                          | ON                    |
 | ENABLE_DIRECT3D       | Direct3D rendering for wxWidgets (Windows, **NOT IMPLEMENTED!!!**)   | ON                    |
 | ENABLE_XAUDIO2        | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
 | ENABLE_OPENAL         | Enable OpenAL for the wxWidgets port                                 | ON                    |
-| SFML_STATIC_LIBRARIES | Set this to ON if linking static SFML libraries                      | OFF                   |
-| FFMPEG_STATIC         | Set this to ON if linking static ffmpeg librariesl                   | OFF                   |
+| VBAM_STATIC           | Try link all libs statically (the following are set to ON if ON)     | OFF                   |
+| SDL2_STATIC           | Try to link static SDL2 libraries                                    | OFF                   |
+| SFML_STATIC_LIBRARIES | Try to link static SFML libraries                                    | OFF                   |
+| FFMPEG_STATIC         | Try to link static ffmpeg libraries                                  | OFF                   |
+| SSP_STATIC            | Try to link static gcc stack protector library (gcc only)            | OFF except Win32      |
+| OPENAL_STATIC         | Try to link static OpenAL libraries                                  | OFF                   |
 
 Note for distro packagers, we use the CMake module
 [GNUInstallDirs](https://cmake.org/cmake/help/v2.8.12/cmake.html#module:GNUInstallDirs)
