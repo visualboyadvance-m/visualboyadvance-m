@@ -479,6 +479,8 @@ void load_opts()
         opt_desc& opt = opts[i];
 
         if (opt.stropt) {
+            //Fix provided by nhdailey
+            cfg->Read(opt.opt, opt.stropt, *opt.stropt);
             opt.curstr = *opt.stropt;
         } else if (!opt.enumvals.empty()) {
             auto enum_opts = str_split(opt.enumvals.MakeLower(), wxT("|"));
