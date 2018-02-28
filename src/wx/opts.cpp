@@ -155,7 +155,7 @@ opt_desc opts[] = {
     STROPT("Display/FilterPlugin", "", wxTRANSLATE("Filter plugin library"), gopts.filter_plugin),
     ENUMOPT("Display/IFB", "", wxTRANSLATE("Interframe blending function"), gopts.ifb, wxTRANSLATE("none|smart|motionblur")),
     BOOLOPT("Display/KeepOnTop", "KeepOnTop", wxTRANSLATE("Keep window on top"), gopts.keep_on_top),
-    INTOPT("Display/MaxThreads", "Multithread", wxTRANSLATE("Maximum number of threads to run filters in"), gopts.max_threads, 1, 8),
+    INTOPT("Display/MaxThreads", "Multithread", wxTRANSLATE("Maximum number of threads to run filters in"), gopts.max_threads, 1, 256),
 #ifdef __WXMSW__
     ENUMOPT("Display/RenderMethod", "", wxTRANSLATE("Render method; if unsupported, simple method will be used"), gopts.render_method, wxTRANSLATE("simple|opengl|direct3d")),
 #elif defined(__WXMAC__)
@@ -291,11 +291,12 @@ opts_t::opts_t()
     retain_aspect = true;
     max_threads = wxThread::GetCPUCount();
 
-    if (max_threads > 8)
-        max_threads = 8;
+    // handle erroneous thread count values appropriately
+    if (max_threads > 256)
+        max_threads = 256;
 
-    if (max_threads < 0)
-        max_threads = 2;
+    if (max_threads < 1)
+        max_threads = 1;
 
     // 10 fixes stuttering on mac with openal, as opposed to 5
     // also should be better for modern hardware in general
