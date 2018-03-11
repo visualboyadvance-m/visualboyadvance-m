@@ -1971,11 +1971,26 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 
             src += 2; // skip rhs border
         }
+    } else if (gopts.filter != FF_NONE) {
+        // scaled by filters, top/right borders, transform to 24-bit
+        im = new wxImage(std::ceil(width * scale), std::ceil(height * scale) + 0.5, false);
+        uint32_t* src = (uint32_t*)todraw + (int)std::ceil(width * scale) + 1; // skip top border
+        uint8_t* dst = im->GetData();
+
+        for (int y = 0; y < std::ceil(height * scale); y++) {
+            for (int x = 0; x < std::ceil(width * scale); x++, src++) {
+                *dst++ = *src >> (systemRedShift - 3);
+                *dst++ = *src >> (systemGreenShift - 3);
+                *dst++ = *src >> (systemBlueShift - 3);
+            }
+
+            ++src; // skip rhs border
+        }
     } else // 32-bit
     {
-        // scaled by filters, top/right borders, transform to 24-bit
+        // not scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
-        uint32_t* src = (uint32_t*)todraw + (int)std::ceil(width * scale); // skip top border
+        uint32_t* src = (uint32_t*)todraw + (int)std::ceil((width + 1) * scale); // skip top border
         uint8_t* dst = im->GetData();
 
         for (int y = 0; y < std::ceil(height * scale); y++) {
