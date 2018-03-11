@@ -1975,7 +1975,7 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
     {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
-        uint32_t* src = (uint32_t*)todraw + (int)std::ceil((width + 1) * scale); // skip top border
+        uint32_t* src = (uint32_t*)todraw + (int)std::ceil(width * scale); // skip top border
         uint8_t* dst = im->GetData();
 
         for (int y = 0; y < std::ceil(height * scale); y++) {
