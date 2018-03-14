@@ -4,8 +4,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.2] Bug fix release 03/13/2018
+=======================
+1. 480541a - Eleuin - Modify max_threads sanity check to better handle erroneous values
+2. d5c9c6b - rkitover - change default audio driver to SDL
 
+## [67c6ad6] developmental release 02/25/2018
+========================
+
+1. 67c6ad6 - ZachBacon - implemented the fix from nhdailey, should
+resolve #153. Will put up a test build soon - 02/25/2018
+2. 669893 - rkitover - add multi-platform build system - 02/24/2018
+3. 3e052c9 - obea and rkitover - cmake: Fix -DENABLE_FFMPEG=OFF -
+01/18/2018
+4. df0bd43 - rkitover - fix deps submodule init on windows - 10/25/2017
+5. 7dca069 - ZachBacon - Added some windows specific stuff to builder
+10/22/2017
+    ..+ f527d0a - ZachBacon - The not so finished builder script for
+windows
+    ..+ 4204502 - rkitover - mac build/builder improvements
+6. c3fc4e7 - ZachBacon - Added basic windows script. 10/21/2017
+7. 21926d6 - rkitover - add -mfpmath=sse -msse2 compiler flags:
+x86/amd64 10/17/2017
+8. d7ff2af - rkitover - add mac release builder script 10/12/2017
+    ..+ 5e63398 - rkitover - mac builder refactor/improvements
+    ..+ afb1cd3 - automate codesign/zip for mac build, add xz dep
+9. 30b6ecf - ZachBacon - add a changelog 10/11/2017
+    ..+ 4648638 - rkitover - read version from CHANGELOG.md if no git
 ## [2.0.1] - 10/11/2017
 ### Added
 - initial installer script
@@ -78,4 +103,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 [2.0.1]: https://github.com/olivierlacan/keep-a-changelog/compare/throttle...v2.0.1
+
 
