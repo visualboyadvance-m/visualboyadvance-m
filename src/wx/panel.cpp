@@ -1493,8 +1493,7 @@ public:
         int outrb = systemColorDepth == 24 ? 0 : 4;
         int outstride = std::ceil(width * outbpp * scale) + outrb;
         delta += instride * procy;
-        // + 1 for stupid top border
-        dst += (int)std::ceil(outstride * (procy + 1) * scale);
+        dst += (int)std::ceil(outstride * procy * scale);
 
         while (nthreads == 1 || sig.Wait() == wxCOND_NO_ERROR) {
             if (!src /* && nthreads > 1 */) {
@@ -1502,7 +1501,6 @@ public:
                 return 0;
             }
 
-            // + 1 for stupid top border
             src += instride;
 
             // interframe blending filter
@@ -1971,9 +1969,23 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 
             src += 2; // skip rhs border
         }
-    } else // 32-bit
-    {
+    } else if (gopts.filter != FF_NONE) {
         // scaled by filters, top/right borders, transform to 24-bit
+        im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
+        uint32_t* src = (uint32_t*)todraw + (int)std::ceil(width * scale) + 1; // skip top border
+        uint8_t* dst = im->GetData();
+
+        for (int y = 0; y < std::ceil(height * scale); y++) {
+            for (int x = 0; x < std::ceil(width * scale); x++, src++) {
+                *dst++ = *src >> (systemRedShift - 3);
+                *dst++ = *src >> (systemGreenShift - 3);
+                *dst++ = *src >> (systemBlueShift - 3);
+            }
+
+            ++src; // skip rhs border
+        }
+    } else { // 32 bit
+        // not scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
         uint32_t* src = (uint32_t*)todraw + (int)std::ceil((width + 1) * scale); // skip top border
         uint8_t* dst = im->GetData();
@@ -2000,7 +2012,7 @@ void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
     int w, h;
     GetClientSize(&w, &h);
     sx = w / (width * scale);
-    sy = h / (height * scale);
+    sy = h / ((height - 1) * scale);
     dc.SetUserScale(sx, sy);
     wxBitmap bm(*im);
     dc.DrawBitmap(bm, 0, 0);
@@ -2197,7 +2209,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
             glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
 
 #endif
-        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), (int)std::ceil(height * scale),
+        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), (int)std::ceil((height - 1)* scale),
             0, tex_fmt, todraw + (int)std::ceil(rowlen * (out_16 ? 2 : 4) * scale));
         glCallList(vlist);
     } else
