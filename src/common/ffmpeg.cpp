@@ -86,10 +86,21 @@ static void avformat_free_context(AVFormatContext *ctx)
 // I have no idea what size to make these buffers
 // I don't see any ffmpeg functions to guess the size, either
 
-// use frame size, or FF_MIN_BUFFER_SIZE (that seems to be what it wants)
+#ifdef AV_INPUT_BUFFER_MIN_SIZE
+
+    // use frame size, or AV_INPUT_BUFFER_MIN_SIZE (that seems to be what it wants)
+#define AUDIO_BUF_LEN (frame_len > AV_INPUT_BUFFER_MIN_SIZE ? frame_len : AV_INPUT_BUFFER_MIN_SIZE)
+    // use maximum frame size * 32 bpp * 2 for good measure
+#define VIDEO_BUF_LEN (AV_INPUT_BUFFER_MIN_SIZE + 256 * 244 * 4 * 2)
+
+#else
+
+    // use frame size, or FF_MIN_BUFFER_SIZE (that seems to be what it wants)
 #define AUDIO_BUF_LEN (frame_len > FF_MIN_BUFFER_SIZE ? frame_len : FF_MIN_BUFFER_SIZE)
-// use maximum frame size * 32 bpp * 2 for good measure
+    // use maximum frame size * 32 bpp * 2 for good measure
 #define VIDEO_BUF_LEN (FF_MIN_BUFFER_SIZE + 256 * 244 * 4 * 2)
+
+#endif
 
 bool MediaRecorder::did_init = false;
 
@@ -443,6 +454,7 @@ MediaRet MediaRecorder::AddFrame(const uint8_t *vid)
     }
     av_init_packet(&pkt);
     pkt.stream_index = vid_st->index;
+#ifdef AVFMT_RAWPICTURE
     if(oc->oformat->flags & AVFMT_RAWPICTURE) {
 	// this won't work due to border
 	// not sure what formats set this, anyway
@@ -450,6 +462,7 @@ MediaRet MediaRecorder::AddFrame(const uint8_t *vid)
 	pkt.data = f->data[0];
 	pkt.size = linesize * ctx->height;
     } else {
+#endif
 #if LIBAVCODEC_VERSION_MAJOR >= 56
         pkt.data = video_buf;
         pkt.size = VIDEO_BUF_LEN;
@@ -476,7 +489,9 @@ MediaRet MediaRecorder::AddFrame(const uint8_t *vid)
 	if(ctx->coded_frame->key_frame)
 	    pkt.flags |= AV_PKT_FLAG_KEY;
 	pkt.data = video_buf;
+#ifdef AVFMT_RAWPICTURE
     }
+#endif
     if(av_interleaved_write_frame(oc, &pkt) < 0) {
 	avformat_free_context(oc);
 	oc = NULL;
