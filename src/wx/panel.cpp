@@ -1493,7 +1493,11 @@ public:
         int outrb = systemColorDepth == 24 ? 0 : 4;
         int outstride = std::ceil(width * outbpp * scale) + outrb;
         delta += instride * procy;
-        dst += (int)std::ceil(outstride * procy * scale);
+        if(gopts.filter == FF_NONE) {
+            dst += (int)std::ceil(outstride * (procy + 1) * scale);
+        } else {
+            dst += (int)std::ceil(outstride * procy * scale);
+        }
 
         while (nthreads == 1 || sig.Wait() == wxCOND_NO_ERROR) {
             if (!src /* && nthreads > 1 */) {
@@ -1646,7 +1650,7 @@ public:
                 outdesc.DstW = std::ceil(width * scale);
                 // on the other hand, there is at least 1 line below, so I'll add
                 // that to dest in case safety checks in plugin use < instead of <=
-                outdesc.DstH = std::ceil(height * scale) + 1; // + scale * (scale / 2)
+                outdesc.DstH = std::ceil(height * scale); // + scale * (scale / 2)
                 rpi->Output(&outdesc);
                 break;
 
@@ -2012,7 +2016,10 @@ void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
     int w, h;
     GetClientSize(&w, &h);
     sx = w / (width * scale);
-    sy = h / ((height - 1) * scale);
+    if(gopts.filter != FF_NONE)
+        sy = h / ((height * scale) - 1);
+    else
+        sy = h / (height * scale);
     dc.SetUserScale(sx, sy);
     wxBitmap bm(*im);
     dc.DrawBitmap(bm, 0, 0);
@@ -2209,8 +2216,13 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
             glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
 
 #endif
-        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), (int)std::ceil((height - 1)* scale),
-            0, tex_fmt, todraw + (int)std::ceil(rowlen * (out_16 ? 2 : 4) * scale));
+        if(gopts.filter != FF_NONE) {
+            glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), (int)std::ceil((height - 1) * scale),
+                0, tex_fmt, todraw + (int)std::ceil(rowlen * (out_16 ? 2 : 4) * scale));
+        } else {
+            glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), (int)std::ceil(height * scale),
+                0, tex_fmt, todraw + (int)std::ceil(rowlen * (out_16 ? 2 : 4) * scale));
+        }
         glCallList(vlist);
     } else
         glClear(GL_COLOR_BUFFER_BIT);
