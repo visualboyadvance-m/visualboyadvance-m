@@ -252,7 +252,7 @@ check_cross() {
             if [ -n "$msys2" ]; then
                 target='mingw-w64-i686'
             else
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../CMakeScripts/Toolchain-cross-m32.cmake"
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-m32.cmake"
             fi
             ;;
         m64)
@@ -456,11 +456,11 @@ fedora_installdeps() {
         case "$target" in
             mingw-w64-i686)
                 target=mingw32
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../CMakeScripts/Toolchain-cross-MinGW-w64-i686.cmake -DENABLE_LINK=NO"
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-i686.cmake -DENABLE_LINK=NO"
                 ;;
             mingw-w64-x86_64)
                 target=mingw64
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../CMakeScripts/Toolchain-cross-MinGW-w64-x86_64.cmake -DENABLE_LINK=NO"
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-x86_64.cmake -DENABLE_LINK=NO"
                 ;;
             *)
                 error 'unknown cross target (this should not happen)'
@@ -578,10 +578,10 @@ EOF
         # windows cross build
         case "$target" in
             *i686*)
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../CMakeScripts/Toolchain-cross-MinGW-w64-i686.cmake -DENABLE_LINK=NO"
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-i686.cmake -DENABLE_LINK=NO"
                 ;;
             *x86_64*)
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../CMakeScripts/Toolchain-cross-MinGW-w64-x86_64.cmake -DENABLE_LINK=NO"
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-x86_64.cmake -DENABLE_LINK=NO"
                 ;;
             *)
                 # this will never be reached, it's checked in check_cross()
