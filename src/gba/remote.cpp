@@ -1526,7 +1526,7 @@ void debuggerReadCharTable(int n, char** args)
                 } else
                     wordSymbol[slot] = character;
             } else
-                wordSymbol[slot] = " ";
+                wordSymbol[slot] = ' ';
 
             if (largestSymbol < strlen(character))
                 largestSymbol = strlen(character);
