@@ -1493,11 +1493,11 @@ public:
         int outrb = systemColorDepth == 24 ? 0 : 4;
         int outstride = std::ceil(width * outbpp * scale) + outrb;
         delta += instride * procy;
-        if(gopts.filter == FF_NONE) {
+        // FIXME: fugly hack
+        if(gopts.render_method == RND_OPENGL)
             dst += (int)std::ceil(outstride * (procy + 1) * scale);
-        } else {
-            dst += (int)std::ceil(outstride * procy * scale);
-        }
+        else
+            dst += (int)std::ceil(outstride * (procy + (1 / scale)) * scale);
 
         while (nthreads == 1 || sig.Wait() == wxCOND_NO_ERROR) {
             if (!src /* && nthreads > 1 */) {
@@ -2016,10 +2016,7 @@ void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
     int w, h;
     GetClientSize(&w, &h);
     sx = w / (width * scale);
-    if(gopts.filter != FF_NONE)
-        sy = h / ((height * scale) - 1);
-    else
-        sy = h / (height * scale);
+    sy = h / (height * scale);
     dc.SetUserScale(sx, sy);
     wxBitmap bm(*im);
     dc.DrawBitmap(bm, 0, 0);
@@ -2216,13 +2213,8 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
             glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
 
 #endif
-        if(gopts.filter != FF_NONE) {
-            glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), (int)std::ceil((height - 1) * scale),
-                0, tex_fmt, todraw + (int)std::ceil(rowlen * (out_16 ? 2 : 4) * scale));
-        } else {
-            glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), (int)std::ceil(height * scale),
-                0, tex_fmt, todraw + (int)std::ceil(rowlen * (out_16 ? 2 : 4) * scale));
-        }
+        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), (int)std::ceil(height * scale),
+            0, tex_fmt, todraw + (int)std::ceil(rowlen * (out_16 ? 2 : 4) * scale));
         glCallList(vlist);
     } else
         glClear(GL_COLOR_BUFFER_BIT);
