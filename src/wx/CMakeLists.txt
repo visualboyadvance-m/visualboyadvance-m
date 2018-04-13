@@ -13,7 +13,7 @@ if( WIN32 )
   option( ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ON )
 endif( WIN32 )
 
-option( ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" ON )
+option(ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" OFF)
 
 IF(APPLE)
     ADD_DEFINITIONS(-DwxMAC_USE_CORE_GRAPHICS)
