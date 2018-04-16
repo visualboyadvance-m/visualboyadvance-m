@@ -115,6 +115,11 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
 bool SoundSDL::init(long sampleRate) {
     if (initialized) deinit();
 
+    // no sound on windows unless we do this
+#ifdef _WIN32
+    SDL_setenv("SDL_AUDIODRIVER", "directsound", true);
+#endif
+
     SDL_AudioSpec audio;
     SDL_memset(&audio, 0, sizeof(audio));
 
