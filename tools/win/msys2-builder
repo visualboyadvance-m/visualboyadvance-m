@@ -8,7 +8,7 @@ case "$1" in
         if [ "$MSYSTEM" != MINGW32 ]; then
             OPWD=$PWD
             export MSYSTEM=MINGW32
-            . /etc/profile
+            . /etc/profile || :
             cd "$OPWD"
         fi
         ;;
@@ -17,7 +17,7 @@ case "$1" in
         if [ "$MSYSTEM" != MINGW64 ]; then
             OPWD=$PWD
             export MSYSTEM=MINGW64
-            . /etc/profile
+            . /etc/profile || :
             cd "$OPWD"
         fi
         ;;
@@ -36,11 +36,34 @@ case "$MSYSTEM" in
         sys_base=/mingw64
         BUILD_ROOT="$HOME/vbam-build-msys2-x86_64"
         ;;
+    MSYS)
+        exec "$0" "$@" -64
+        ;;
     *)
         echo >&2 'You must be in either the MINGW32 or MINGW64 environment.'
         exit 1
         ;;
 esac
+
+# turn on real symlinks
+new_msys= replaced=
+for part in $MSYS; do
+    case "$part" in
+        winsymlinks:*)
+            new_msys="$new_msys winsymlinks:nativestrict"
+            replaced=1
+            ;;
+        *)
+            new_msys="$new_msys $part"
+            ;;
+    esac
+done
+
+if [ -n "$replaced" ]; then
+    export MSYS=$new_msys
+else
+    export MSYS="winsymlinks:nativestrict $new_msys"
+fi
 
 CMAKE_PREFIX_PATH=
 for dir in /lib /bin "$HOST_SYSTEM/lib" "$HOST_SYSTEM/bin"; do
@@ -95,7 +118,9 @@ unset_host_env() {
     cd "$OPWD"
 }
 
-table_line_append DIST_PRE_BUILD c2man ":; sed -i.bak '/test -d c:\\//,/^fi\$/d' Configure"
+table_line_append DIST_PRE_BUILD c2man ":; \
+    sed -i.bak '/test -d c:\\//,/^fi\$/d' Configure; \
+"
 
 table_line_append DIST_PATCHES xmlto 'https://gist.githubusercontent.com/rkitover/55d51ab3d55af510b37872a49670436c/raw/b447beaffc2daa747ba6eaf222f69677c7d4a169/xmlto-0.0.28-mingw.patch'
 
@@ -123,7 +148,7 @@ table_line_replace DIST_PRE_BUILD unzip ":; \
                 s,#include <windows.h>,#include \"../unzip.h\",' win32/win32.c win32/nt.c; \
 "
 
-table_line_append  DIST_PATCHES zip 'https://gist.githubusercontent.com/rkitover/17e4c90185b7ad533e848b6230a90b8d/raw/67686e2332ae8712177957e4a4b871b24b3d07cf/zip-mingw.patch'
+table_line_append  DIST_PATCHES zip 'https://gist.githubusercontent.com/rkitover/17e4c90185b7ad533e848b6230a90b8d/raw/434e0f74c872a928e77b93bdbf4ee9a1140fe879/zip-mingw.patch'
 
 table_line_remove  DIST_CONFIGURE_OVERRIDES zip
 table_line_remove  DIST_PRE_BUILD           zip

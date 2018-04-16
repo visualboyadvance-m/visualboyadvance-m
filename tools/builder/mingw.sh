@@ -35,9 +35,14 @@ fi
 ln -sf "$BUILD_ROOT/target" "$BUILD_ROOT/root"
 
 perl_dists="$perl_dists XML-NamespaceSupport XML-SAX-Base XML-SAX"
-host_dists="$host_dists m4 gsed bison flex-2.6.3 flex docbook2x"
+perl_dists=$(list_remove_duplicates $perl_dists)
+
+host_dists="$host_dists autoconf autoconf-archive automake m4 gsed bison \
+                        flex-2.6.3 flex c2man docbook2x"
+host_dists=$(list_remove_duplicates $host_dists)
 
 both_dists="$both_dists openssl zlib bzip2 libiconv"
+both_dists=$(list_remove_duplicates $both_dists)
 
 set_host_env() {
     rm -f "$BUILD_ROOT/root"

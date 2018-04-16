@@ -648,11 +648,14 @@ msys2_install_core_deps() {
 
     # install
     # TODO: remove zip and add to dists
-    pacman --noconfirm --needed -S make tar patch diffutils ccache zip perl m4 msys2-w32api-headers msys2-runtime-devel gcc gcc-libs mpfr windows-default-manifest "$@"
+    pacman --noconfirm --needed -S make tar patch diffutils ccache zip perl m4 msys2-w32api-headers msys2-runtime-devel gcc gcc-libs mpfr windows-default-manifest python2 "$@"
 
     # make sure msys perl takes precedence over mingw perl if the latter is installed
     mkdir -p "$BUILD_ROOT/root/bin"
     ln -sf /usr/bin/perl.exe "$BUILD_ROOT/root/bin/perl.exe"
+
+    # alias python2 to python
+    ln -sf /usr/bin/python2.exe "$BUILD_ROOT/root/bin/python.exe"
 
     # activate ccache
     eval "$BUILD_ENV"
@@ -2292,9 +2295,8 @@ build_project() {
     mkdir -p "$BUILD_ROOT/project"
     cd "$BUILD_ROOT/project"
 
-    eval "set -- $CMAKE_BASE_ARGS"
     # FIXME: turn LTO back on when everything works
-    echo_eval_run "cmake '$CHECKOUT' $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_FFMPEG=OFF -DENABLE_LTO=OFF $PROJECT_ARGS $@"
+    echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_FFMPEG=OFF -DENABLE_LTO=OFF $PROJECT_ARGS $CMAKE_BASE_ARGS $@
     echo_run make -j$NUM_CPUS
 
     if [ "$os" = mac ]; then
@@ -2385,6 +2387,16 @@ list_contains() {
 
 list_length() {
     puts $#
+}
+
+list_remove_duplicates() {
+    _seen=
+    for _item; do
+        if ! list_contains $_item $_seen; then
+            _seen="$_seen $_item"
+        fi
+    done
+    echo $_seen
 }
 
 install_artifact() {
