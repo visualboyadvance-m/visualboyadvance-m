@@ -72,6 +72,8 @@ openssl_host=mingw
 
 table_line_replace DIST_CONFIGURE_OVERRIDES openssl-target "./Configure $openssl_host no-shared --prefix=/usr --openssldir=/etc/ssl"
 
+table_line_append DIST_MAKE_ARGS openssl-target "RANLIB=${target_arch}-ranlib"
+
 table_line_append DIST_PRE_BUILD bzip2-target ':; sed -i.bak '\''s,include <sys\\stat.h>,include <sys/stat.h>,g'\'' *.c;'
 
 table_line_replace DIST_POST_BUILD harfbuzz "$(table_line DIST_POST_BUILD harfbuzz | sed 's/build_dist freetype /build_dist freetype-target /')"
