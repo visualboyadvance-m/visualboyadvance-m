@@ -146,6 +146,18 @@ for dist in $remove_dists; do
     fi
 done
 
+# build bzip2 for target with autotools patch
+bzip2_target=$(table_line DISTS bzip2-target)
+
+table_line_remove DISTS bzip2-target
+
+table_insert_after DISTS libtool "bzip2-target $bzip2_target"
+
+table_line_append DIST_PATCHES bzip2-target 'https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-bzip2/bzip2-buildsystem.all.patch'
+
+table_line_remove DIST_MAKE_ARGS bzip2-target
+# done with bzip2-target
+
 table_insert_after DISTS libiconv-target '
     catgets         https://downloads.sourceforge.net/project/mingw/MinGW/Extension/catgets/mingw-catgets-1.0.1/mingw-catgets-1.0.1-src.tar.gz    include/langinfo.h
 '
