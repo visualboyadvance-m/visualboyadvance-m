@@ -70,9 +70,7 @@ fi
 openssl_host=mingw
 [ "$target_bits" -eq 64 ] && openssl_host=mingw64
 
-table_line_replace DIST_CONFIGURE_OVERRIDES openssl-target "./Configure $openssl_host no-shared --prefix=/usr --openssldir=/etc/ssl"
-
-table_line_append DIST_MAKE_ARGS openssl-target "RANLIB=${target_arch}-ranlib"
+table_line_replace DIST_CONFIGURE_OVERRIDES openssl-target "./Configure $openssl_host no-shared --prefix=/usr --openssldir=/etc/ssl --cross-compile-prefix=${target_arch}-"
 
 table_line_append DIST_PRE_BUILD bzip2-target ':; sed -i.bak '\''s,include <sys\\stat.h>,include <sys/stat.h>,g'\'' *.c;'
 
