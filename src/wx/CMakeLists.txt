@@ -399,7 +399,7 @@ SET(XRC_SOURCES
 )
 
 # wxrc does not support xrs files in -c output (> 10x compression)
-# we do it using the bin2.c utility
+# we do it using the bin2c.c utility
 
 SET(BIN2C ${CMAKE_BINARY_DIR}/bin2c)
 
@@ -411,6 +411,19 @@ if(WXRC)
     separate_arguments(WXRC UNIX_COMMAND "${WXRC}")
 else()
     set(WXRC wxrc)
+endif()
+
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL CYGWIN)
+    # pass xrc sources through cygpath in case we only have native wxrc
+
+    set(new_xrc_sources)
+
+    foreach(xrc ${XRC_SOURCES})
+        execute_process(COMMAND cygpath -m ${xrc} OUTPUT_VARIABLE win_path OUTPUT_STRIP_TRAILING_WHITESPACE)
+        list(APPEND new_xrc_sources ${win_path})
+    endforeach()
+
+    set(XRC_SOURCES ${new_xrc_sources})
 endif()
 
 ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xrs

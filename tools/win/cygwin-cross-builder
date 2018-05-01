@@ -1,0 +1,65 @@
+#!/bin/sh
+
+set -e
+
+# turn on real symlinks on cygwin
+if [ "$(uname -o 2>/dev/null || :)" = Cygwin ]; then
+    new_cygwin= replaced=
+    for part in $CYGWIN; do
+        case "$part" in
+            winsymlinks:*)
+                new_cygwin="$new_cygwin winsymlinks:native"
+                replaced=1
+                ;;
+            *)
+                new_cygwin="$new_cygwin $part"
+                ;;
+        esac
+    done
+
+    if [ -n "$replaced" ]; then
+        export CYGWIN=$new_cygwin
+    else
+        export CYGWIN="winsymlinks:native $new_cygwin"
+    fi
+fi
+
+REQUIRED_CMAKE_ARGS="-DGETTEXT_MSGFMT_EXECUTABLE:FILEPATH=\"\$BUILD_ROOT/host/bin/msgfmt\" -DGETTEXT_MSGMERGE_EXECUTABLE=\"\$BUILD_ROOT/host/bin/msgmerge\""
+
+. "${0%/*}/../builder/mingw-cross.sh"
+
+table_line_append DIST_MAKE_ARGS unzip 'CFLAGS="$CFLAGS -DNO_LCHMOD"'
+
+# FIXME: problems with autopoint that need to be sorted
+table_line_remove DISTS flex
+
+table_line_append DIST_PRE_BUILD pkgconfig ":; \
+    sed -i.bak ' \
+        s/platform_win32=yes/platform_win32=no/; \
+        s/#define G_PLATFORM_WIN32//; \
+        s/PLATFORMDEP=gwin32\\.lo/PLATFORMDEP=/ \
+    ' glib/configure; \
+"
+
+table_line_append DIST_PRE_BUILD c2man ":; \
+    sed -i.bak '/test -d c:\\//,/^fi\$/d' Configure; \
+"
+
+table_line_replace DIST_CONFIGURE_TYPES freetype-target cmake
+table_line_remove  DIST_ARGS            freetype-target
+table_line_append  DIST_POST_BUILD      freetype-target ":; \
+    sed ' \
+        s,%prefix%,$BUILD_ROOT/root,g; \
+        s,%exec_prefix%,$BUILD_ROOT/root,g; \
+        s,%libdir%,$BUILD_ROOT/root/lib,g; \
+        s,%includedir%,$BUILD_ROOT/root/include,g; \
+        s,%ft_version%,20.0.14,g; \
+        s|%REQUIRES_PRIVATE%|zlib, bzip2, libpng|; \
+        s,%LIBS_PRIVATE%,-lpng -lz -lbz2 -llzma -lharfbuzz,; \
+        s/-lfreetype/-lfreetype -lpng -lz -lbz2 -llzma/; \
+    ' ../builds/unix/freetype2.in > "$BUILD_ROOT"/root/lib/pkgconfig/freetype2.pc; \
+"
+
+table_line_append DIST_EXTRA_LIBS fontconfig-target '-lpng -lz -lbz2 -llzma'
+
+builder "$@"

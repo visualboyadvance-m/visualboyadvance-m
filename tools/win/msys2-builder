@@ -65,6 +65,8 @@ else
     export MSYS="winsymlinks:nativestrict $new_msys"
 fi
 
+PATH_SEP=';'
+
 CMAKE_PREFIX_PATH=
 for dir in /lib /bin "$HOST_SYSTEM/lib" "$HOST_SYSTEM/bin"; do
     CMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH;$(cygpath -m "$sys_base/$dir")"
@@ -98,7 +100,7 @@ DIST_TAR_ARGS="
     graphviz        --exclude COPYING --exclude graphviz.spec
 "
 
-. "$(dirname "$0")/../builder/mingw.sh"
+. "${0%/*}/../builder/mingw.sh"
 
 set_host_env() {
     ln -sf "$BUILD_ROOT/host" "$BUILD_ROOT/root"
@@ -162,11 +164,5 @@ table_line_replace DIST_POST_BUILD unzip ":; \
 "
 
 table_line_replace DIST_CONFIGURE_OVERRIDES openssl "$(table_line DIST_CONFIGURE_OVERRIDES openssl | sed 's,^./config ,./Configure Cygwin-x86_64 ,')"
-
-table_line_append DIST_PRE_BUILD zlib ":; \
-    sed -i.bak ' \
-        s/defined(_WIN32)  *||  *defined(__CYGWIN__)/defined(_WIN32)/ \
-    ' gzguts.h; \
-"
 
 builder "$@"

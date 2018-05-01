@@ -58,7 +58,7 @@ table_insert_before DISTS sfml '
 # we build and link Xorg libs as dynamic because there is no point in making
 # them static, since they are required for the resulting binary to run
 for dist in $XORG_DISTS; do
-    table_line_append DIST_ARGS $dist '--enable-shared --disable-static'
+    table_line_append DIST_ARGS $dist '--enable-shared --disable-static --disable-selective-werror'
 done
 
 # and Wayland now that that's a thing

@@ -31,8 +31,8 @@ esac
 
 export CPPFLAGS="$CPPFLAGS -I$BUILD_ROOT/root/include"
 export CFLAGS="$CFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -Wno-error=all"
-export CXXFLAGS="$CXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -Wno-error=all"
-export OBJCXXFLAGS="$OBJCXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -Wno-error=all"
+export CXXFLAGS="$CXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -Wno-error=all -fpermissive"
+export OBJCXXFLAGS="$OBJCXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -Wno-error=all -fpermissive"
 export LDFLAGS="$LDFLAGS -fPIC -L$BUILD_ROOT/root/lib -Wno-error=all"
 
 if [ -z "\$OPENMP" ] && echo "\$CC" | grep -Eq gcc; then
@@ -195,9 +195,21 @@ DISTS=$DISTS'
     libx265         https://bitbucket.org/multicoreware/x265/downloads/x265_2.5.tar.gz                          lib/libx265.a
     libxavs         https://github.com/Distrotech/xavs/archive/distrotech-xavs-git.tar.gz                       lib/libxavs.a
     libzmq          https://github.com/zeromq/libzmq/releases/download/v4.2.2/zeromq-4.2.2.tar.gz               lib/libzmq.a
-#    libzvbi         https://downloads.sourceforge.net/project/zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2           lib/libzvbi.a
+    libzvbi         https://downloads.sourceforge.net/project/zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2           lib/libzvbi.a
     ffmpeg          https://github.com/ffmpeg/ffmpeg/archive/0c78b6a416c661afed745d44495b5194f714fb96.tar.gz    lib/libavformat.a
 '
+
+# for now we don't build ffmpeg because game recording is broken
+BUILD_FFMPEG=
+PROJECT_ARGS="$PROJECT_ARGS -DENABLE_FFMPEG=NO"
+
+FFMPEG_DISTS='
+    graphite2 xvidcore fribidi libgsm libmodplug libopencore-amrnb opus snappy
+    libsoxr speex libtheora vidstab libvo-amrwbenc mp3lame libass libbluray
+    libvpx libwavpack libx264 libx265 libxavs libzmq libzvbi ffmpeg
+'
+
+: ${PATH_SEP:=':'}
 
 # these two can be set to always be included regardless of overrides
 REQUIRED_CONFIGURE_ARGS="$REQUIRED_CONFIGURE_ARGS"
@@ -205,13 +217,11 @@ REQUIRED_CMAKE_ARGS="$REQUIRED_CMAKE_ARGS"
 
 CONFIGURE_ARGS="$CONFIGURE_ARGS --disable-shared --enable-static --prefix=/usr"
 
-CMAKE_BASE_ARGS="$CMAKE_BASE_ARGS -DBUILD_SHARED_LIBS=NO -DENABLE_SHARED=NO -DCMAKE_PREFIX_PATH=\"\$CMAKE_PREFIX_PATH\" -DCMAKE_BUILD_TYPE=Release"
+CMAKE_BASE_ARGS="$CMAKE_BASE_ARGS -DBUILD_SHARED_LIBS=NO -DENABLE_SHARED=NO -DCMAKE_PREFIX_PATH:FILEPATH=\"\$CMAKE_PREFIX_PATH\" -DCMAKE_BUILD_TYPE=Release"
 
 CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=/usr"
 
 MESON_ARGS="--prefix /usr --buildtype release --default-library static -Dintrospection=false"
-
-PROJECT_ARGS="$PROJECT_ARGS"
 
 DIST_PATCHES=$DIST_PATCHES'
     docbook2x       https://gist.githubusercontent.com/rkitover/0b5dcc95a0703a9b0e0e7eb6d325a98e/raw/e256d2fad8d19633ac8abe02a0d1e119063d1fd9/docbook2x.patch
@@ -236,6 +246,10 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     docbook2x       autoreconf
 "
 
+DIST_RELOCATION_TYPES="$DIST_RELOCATION_TYPES
+    texinfo         aggressive
+"
+
 DIST_PRE_BUILD="$DIST_PRE_BUILD
 #    xz              mkdir -p build-aux; touch build-aux/config.rpath; mkdir -p po; touch po/Makefile.in.in; sed -i.bak 's/ po / /g' Makefile.am;
     getopt          sed -i.bak 's/\\\$(LDFLAGS)\\(.*\\)\$/\\1 \$(LDFLAGS)/' Makefile;
@@ -247,6 +261,7 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
     bakefile        sed -i.bak '/SUBDIRS = doc/d' Makefile.am;
     unzip           rm -f unix/Contents; ln -sf \$(find unix -mindepth 1 -maxdepth 1) .;
     zip             rm -f unix/Contents; ln -sf \$(find unix -mindepth 1 -maxdepth 1) .;
+    gettext         sed -i.bak 's/-Wl,--disable-auto-import//' m4/woe32-dll.m4;
     expat           cd expat; \
                     sed -i.bak '/doc\\/Makefile/d' configure.ac; \
                     sed -i.bak '/SUBDIRS/{; s/ doc//; }' Makefile.am; \
@@ -269,12 +284,12 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
 "
 
 DIST_POST_BUILD="$DIST_POST_BUILD
-    harfbuzz        rebuild_dist freetype --with-harfbuzz=yes;
+    harfbuzz        rebuild_dist freetype;
     flex-2.6.3      build_dist flex || :;
     glib            rebuild_dist gettext --without-included-glib --without-included-libxml;
     graphviz        (cd '$BUILD_ROOT/root/bin'; path_exists dot_static && ! path_exists dot && ln -sf '$BUILD_ROOT/root/bin/dot_static' ./dot || :)
     libxml2         mkdir -p '$BUILD_ROOT/root/etc/xml'; \
-                    xmlcatalog --noout --create '$BUILD_ROOT/root/etc/xml/catalog.xml' || :;
+                    xmlcatalog --noout --create \"\$(cygpath -m \"$BUILD_ROOT/root/etc/xml/catalog.xml\")\" || :;
     python2         pip2 install six;
     python3         pip3 install six;
     fontconfig      mkdir -p '$BUILD_ROOT/root/etc/fonts'; \
@@ -318,9 +333,10 @@ DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
 "
 
 DIST_ARGS="$DIST_ARGS
-    gettext     --with-included-gettext --with-included-glib --with-included-libcroco --with-included-libunistring --with-included-libxml CPPFLAGS=\"\$CPPFLAGS -DLIBXML_STATIC\"
+    gettext     --with-included-gettext --with-included-glib --with-included-libcroco --with-included-libunistring --with-included-libxml --disable-curses CPPFLAGS=\"\$CPPFLAGS -DLIBXML_STATIC\"
     pkgconfig   --with-internal-glib --with-libiconv=gnu
     pcre        --enable-utf8 --enable-pcre8 --enable-pcre16 --enable-pcre32 --enable-unicode-properties --enable-pcregrep-libz --enable-pcregrep-libbz2 --enable-jit
+    libxslt     --without-python
     libgd       --without-xpm
     fontconfig  --with-baseconfigdir=/etc/fonts
     graphviz    --disable-ltdl --without-x CFLAGS=\"-include \$PWD/declspec.h $CFLAGS\"
@@ -329,6 +345,7 @@ DIST_ARGS="$DIST_ARGS
     glib        --with-libiconv=gnu
     bakefile    --enable-shared
     XML-Parser  EXPATINCPATH='$BUILD_ROOT/root/include' EXPATLIBPATH='$BUILD_ROOT/root/lib'
+    doxygen     -DICONV_ACCEPTS_NONCONST_INPUT:BOOL=FALSE -DICONV_ACCEPTS_CONST_INPUT:BOOL=TRUE
     sfml        -DSFML_USE_SYSTEM_DEPS=TRUE
     freetype    --with-harfbuzz=no
     harfbuzz    --with-cairo=no --with-icu=no
@@ -343,13 +360,10 @@ DIST_ARGS="$DIST_ARGS
     libx264     --enable-pic
     libx265     -DHIGH_BIT_DEPTH=ON -DENABLE_ASSEMBLY=OFF -DENABLE_CLI=OFF
 
-    ffmpeg      --pkg-config-flags=--static --enable-nonfree --extra-version=tessus --enable-avisynth --enable-fontconfig --enable-gpl --enable-version3 --enable-libass --enable-libbluray --enable-libfreetype --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzmq --enable-openssl --enable-lzma --extra-cflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-cxxflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-objcflags='-DMODPLUG_STATIC -DZMQ_STATIC'
+    ffmpeg      --pkg-config-flags=--static --enable-nonfree --extra-version=tessus --enable-avisynth --enable-fontconfig --enable-gpl --enable-version3 --enable-libass --enable-libbluray --enable-libfreetype --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzmq --enable-libzvbi --enable-openssl --enable-lzma --extra-cflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-cxxflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-objcflags='-DMODPLUG_STATIC -DZMQ_STATIC'
 
 #
 # TODO: add these if possible (from brew) --enable-indev=qtkit --enable-securetransport --enable-chromaprint --enable-ffplay --enable-frei0r --enable-libbs2b --enable-libcaca --enable-libfdk-aac --enable-libgme --enable-libgsm --enable-librtmp --enable-librubberband --enable-libssh --enable-libtesseract --enable-libtwolame --enable-webp --enable-libzimg
-#
-# Possibly also: --enable-libzvbi
-#   I could not get libzvbi to build
 #
 # these require > 10.7:
 #   --enable-opencl       # requires 10.8
@@ -454,6 +468,12 @@ setup() {
         [ -d "$d" ] || mkdir "$d"
     done
     cd "$OPWD"
+
+    if [ -z "$BUILD_FFMPEG" ]; then
+        for dist in $FFMPEG_DISTS; do
+            table_line_remove DISTS $dist
+        done
+    fi
 
     DIST_NAMES=$(  table_column DISTS 0 3)
     DIST_URLS=$(   table_column DISTS 1 3)
@@ -622,10 +642,6 @@ windows_install_core_deps() {
     fi
 }
 
-cygwin_install_core_deps() {
-    :
-}
-
 msys2_install_core_deps() {
     case "$MSYSTEM" in
         MINGW32)
@@ -642,17 +658,44 @@ msys2_install_core_deps() {
     pacman -Sy
 
     set --
-    for p in binutils curl crt-git gcc gcc-libs gdb headers-git tools-git windows-default-manifest libmangle-git; do
+    for p in binutils curl crt-git gcc gcc-libs headers-git tools-git windows-default-manifest libmangle-git; do
         set -- "$@" "${target}-${p}"
     done
 
     # install
-    # TODO: remove zip and add to dists
-    pacman --noconfirm --needed -S make tar patch diffutils ccache zip perl m4 msys2-w32api-headers msys2-runtime-devel gcc gcc-libs mpfr windows-default-manifest python2 "$@"
+    pacman --noconfirm --needed -S make tar patch diffutils ccache perl msys2-w32api-headers msys2-runtime-devel gcc gcc-libs mpfr windows-default-manifest python2 "$@"
 
     # make sure msys perl takes precedence over mingw perl if the latter is installed
     mkdir -p "$BUILD_ROOT/root/bin"
     ln -sf /usr/bin/perl.exe "$BUILD_ROOT/root/bin/perl.exe"
+
+    # alias python2 to python
+    ln -sf /usr/bin/python2.exe "$BUILD_ROOT/root/bin/python.exe"
+
+    # activate ccache
+    eval "$BUILD_ENV"
+
+    done_msg
+}
+
+cygwin_install_core_deps() {
+    installing_core_deps
+
+    target="mingw64-${target_cpu}"
+
+    curl -L rawgit.com/transcode-open/apt-cyg/master/apt-cyg > "$BUILD_ROOT/root/bin/apt-cyg"
+    chmod +x "$BUILD_ROOT/root/bin/apt-cyg"
+
+    hash -r
+
+    apt-cyg update
+
+    set --
+    for p in binutils gcc-core gcc-g++ headers windows-default-manifest; do
+        set -- "$@" "${target}-${p}"
+    done
+
+    apt-cyg install make tar patch diffutils ccache perl m4 cygwin32-w32api-headers gcc-core gcc-g++ mpfr windows-default-manifest python2 libncurses-devel "$@"
 
     # alias python2 to python
     ln -sf /usr/bin/python2.exe "$BUILD_ROOT/root/bin/python.exe"
@@ -1540,6 +1583,9 @@ install_dist() {
     # check that key file was built
     path_exists "destdir/usr/$(install_artifact_relative "$current_dist")"
 
+    # when cross compiling, resolve build root to host or target
+    inst_root=$(resolve_link "$BUILD_ROOT/root")
+
     # build file list and sed script to replace file paths in text files and
     # scripts
 
@@ -1589,18 +1635,18 @@ install_dist() {
                 usr/*)
                     f=${f#usr/}
                     cat >>"$sed_scr_usr" <<EOF
-                        s|^/usr/\\($f/*\\)\$|$BUILD_ROOT/root/\\1|
-                        s|^/usr/\\($f[^a-zA-Z0-9]\\)|$BUILD_ROOT/root/\\1|
-                        s|\\([^a-zA-Z0-9]\\)/usr/\\($f/*\\)\$|\\1$BUILD_ROOT/root/\\2|
-                        s|\\([^a-zA-Z0-9]\\)/usr/\\($f[^a-zA-Z0-9]\\)|\\1$BUILD_ROOT/root/\\2|g
+                        s|^/usr/\\($f/*\\)\$|$inst_root/\\1|
+                        s|^/usr/\\($f[^a-zA-Z0-9]\\)|$inst_root/\\1|
+                        s|\\([^a-zA-Z0-9]\\)/usr/\\($f/*\\)\$|\\1$inst_root/\\2|
+                        s|\\([^a-zA-Z0-9]\\)/usr/\\($f[^a-zA-Z0-9]\\)|\\1$inst_root/\\2|g
 EOF
                     ;;
                 *)
                     cat >>"$sed_scr_usr" <<EOF
-                        s|^/\\($f/*\\)\$|$BUILD_ROOT/root/\\1|
-                        s|^/\\($f[^a-zA-Z0-9]\\)|$BUILD_ROOT/root/\\1|
-                        s|\\([^a-zA-Z0-9]\\)\\($f/*\\)\$|\\1$BUILD_ROOT/root/\\2|
-                        s|\\([^a-zA-Z0-9]\\)/\\($f[^a-zA-Z0-9]\\)|\\1$BUILD_ROOT/root/\\2|g
+                        s|^/\\($f/*\\)\$|$inst_root/\\1|
+                        s|^/\\($f[^a-zA-Z0-9]\\)|$inst_root/\\1|
+                        s|\\([^a-zA-Z0-9]\\)\\($f/*\\)\$|\\1$inst_root/\\2|
+                        s|\\([^a-zA-Z0-9]\\)/\\($f[^a-zA-Z0-9]\\)|\\1$inst_root/\\2|g
 EOF
                     ;;
             esac
@@ -1610,14 +1656,29 @@ EOF
 
     # group sed script under a /usr/ and /etc/ pattern addresses to speed it up
     #
-    # also add a special rule to rewrite 'prefix' variables in scripts
     cat >"${sed_scr}.work" <<EOF
         /\/usr/{
-           s|\([Pp][Rr][Ee][Ff][Ii][Xx].*=.*['"]\)/usr\(/*['"]\)|\1$BUILD_ROOT/root\2|g
+EOF
+    # also add special rules to rewrite 'prefix' variables in scripts
+    cat >>"${sed_scr}.work" <<EOF
+           s|\([Pp][Rr][Ee][Ff][Ii][Xx].*=.*['"]\)/usr\(/*['"]\)|\1$inst_root\2|g
+EOF
 
+    # if the relocation mode for the dist is 'aggressive', rewrite all '/usr'
+    # prefixes everywhere except for the shebang on the first line.
+    if [ "$(dist_relocation_type "$current_dist")" = aggressive ]; then
+        cat >>"${sed_scr}.work" <<EOF
+           2,\${
+             s|/usr|$inst_root|g
+           }
+EOF
+    fi
+
+    cat >>"${sed_scr}.work" <<EOF
 $(cat "$sed_scr_usr")
         }
 EOF
+
     if [ -f "${sed_scr_etc}" ]; then
       cat >>"${sed_scr}.work" <<EOF
         /\/etc\//{
@@ -1639,7 +1700,7 @@ EOF
 
     defer_cmds=
     OLDPWD=$PWD
-    cd "$BUILD_ROOT/root"
+    cd "$inst_root"
     IFS=$NL
     for f in $(cat "$file_list"); do
         IFS=$OIFS
@@ -1670,7 +1731,7 @@ EOF
 
         # rewrite symlinks pointing to /usr/*
         if [ -h "$tmp_prefix/$f" ]; then
-            link_dest=$(expr "$(ls -l "$tmp_prefix/$f")" : '.* -> \(.*\)$' | sed 's|^/usr/|'"$BUILD_ROOT/root/|")
+            link_dest=$(expr "$(ls -l "$tmp_prefix/$f")" : '.* -> \(.*\)$' | sed 's|^/usr/|'"$inst_root/|")
 
             # rewrite relative links to absolute ones
             case "$link_dest" in
@@ -1680,6 +1741,8 @@ EOF
                     link_dest="$PWD/${dest_f%/*}/$link_dest"
                     ;;
             esac
+
+            link_dest=$(fully_resolve_link "$link_dest")
 
             if [ -e "$link_dest" ]; then
                 echo_run ln -sf "$link_dest" "$dest_f"
@@ -1696,7 +1759,7 @@ ln -sf \"$link_dest\" \"$dest_f\"
         # don''t relocate headers, man and info pages and docs
         case "$dest_f" in
             share/doc/*|share/man/*|share/info/*|include/*)
-                echo_run cp -af "$tmp_prefix/$f" "$dest_f"
+                echo_run cp -af "$tmp_prefix/$f" "$dest_f" || echo_run cp -rf "$tmp_prefix/$f" "$dest_f"
                 continue
                 ;;
         esac
@@ -1722,9 +1785,9 @@ ln -sf \"$link_dest\" \"$dest_f\"
                             cp "$dest_f" "${dest_f}.work"
                             LANG=C sed '
                                 /\/usr/{
-                                    s|\([^a-zA-Z0-9]\)/usr$|\1'"$BUILD_ROOT/root"'|
-                                    s|\([^a-zA-Z0-9]\)/usr/|\1'"$BUILD_ROOT/root/"'|g
-                                    s|\(-[IL]\)/usr/|\1'"$BUILD_ROOT/root/"'|g
+                                    s|\([^a-zA-Z0-9]\)/usr$|\1'"$inst_root"'|
+                                    s|\([^a-zA-Z0-9]\)/usr/|\1'"$inst_root/"'|g
+                                    s|\(-[IL]\)/usr/|\1'"$inst_root/"'|g
                                 }
                             ' "${dest_f}.work" > "$dest_f"
                             rm -f "${dest_f}.work"
@@ -1742,7 +1805,16 @@ ln -sf \"$link_dest\" \"$dest_f\"
             continue
         fi
 
-        echo_run cp -af "$tmp_prefix/$f" "$dest_f"
+        echo_run cp -af "$tmp_prefix/$f" "$dest_f" || echo_run cp -rf "$tmp_prefix/$f" "$dest_f"
+
+        # when cross-compiling, link arch-suffixed libs to their normal names
+        if [ -n "$target_arch" ]; then
+            case "$f" in
+                */lib/*-${target_arch}.a)
+                    echo_run ln -sf "$PWD/$dest_f" "${dest_f%%-${target_arch}.a}.a"
+                    ;;
+            esac
+        fi
     done
     IFS=$OIFS
 
@@ -1940,6 +2012,13 @@ dist_configure_type() {
     puts "$(table_line DIST_CONFIGURE_TYPES $current_dist)" || :
 }
 
+dist_relocation_type() {
+    current_dist=$1
+    [ -n "$current_dist" ] || die 'dist_relocation_type: dist name required'
+
+    puts "$(table_line DIST_RELOCATION_TYPES $current_dist)" || :
+}
+
 dist_make_args() {
     current_dist=$1
     [ -n "$current_dist" ] || die 'dist_make_args: dist name required'
@@ -2050,17 +2129,15 @@ install_docbook_dist() {
 
     _dir="$BUILD_ROOT/root/share/xml/docbook/$_dir"
 
-    # on cygwin/msys write native POSIX paths to catalog
-    if command -v cygpath >/dev/null; then
-        _dir=$(cygpath -m "$_dir")
-    fi
-
     echo_run mkdir -p "$_dir"
-    echo_run cp -af * "$_dir"
+    echo_run cp -af * "$_dir" || echo_run cp -rf * "$_dir"
+
+    # on cygwin/msys write native POSIX paths to catalog
+    _dir=$(cygpath -m "$_dir")
 
     if [ -f "$_dir/catalog.xml" ]; then
-        echo_run xmlcatalog --noout --del "file://$_dir/catalog.xml" "$BUILD_ROOT/root/etc/xml/catalog.xml" || :
-        echo_run xmlcatalog --noout --add nextCatalog '' "file://$_dir/catalog.xml" "$BUILD_ROOT/root/etc/xml/catalog.xml"
+        echo_run xmlcatalog --noout --del "file://$_dir/catalog.xml" "$(cygpath -m "$BUILD_ROOT/root/etc/xml/catalog.xml")" || :
+        echo_run xmlcatalog --noout --add nextCatalog '' "file://$_dir/catalog.xml" "$(cygpath -m "$BUILD_ROOT/root/etc/xml/catalog.xml")"
     fi
 }
 
@@ -2296,7 +2373,7 @@ build_project() {
     cd "$BUILD_ROOT/project"
 
     # FIXME: turn LTO back on when everything works
-    echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_FFMPEG=OFF -DENABLE_LTO=OFF $PROJECT_ARGS $CMAKE_BASE_ARGS $@
+    echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=OFF $PROJECT_ARGS $CMAKE_BASE_ARGS $@
     echo_run make -j$NUM_CPUS
 
     if [ "$os" = mac ]; then
@@ -2469,6 +2546,70 @@ ln() {
         rm -f "$3"
     fi
     command ln "$@"
+}
+
+cygpath() {
+    if sh -c 'command -v cygpath' >/dev/null; then
+        command cygpath "$@"
+    else
+        case "$1" in
+            -*)
+                shift
+                ;;
+        esac
+
+        echo "$@"
+    fi
+}
+
+fully_resolve_link() {
+    file=$1
+    # get initial part for non-absolute path, or blank for absolute
+    path=${file%%/*}
+    # and set $file to the rest
+    file=${file#*/}
+
+    OLDIFS=$IFS
+    IFS='/'
+    for part in $file; do
+        [ ! -z "$part" ] && path=$(resolve_link "$path/$part")
+    done
+    IFS=$OLDIFS
+
+    # remove 'foo/..' path parts
+    while :; do
+        case "$path" in
+            */../*|*/..)
+                path=$(echo "$path" | sed 's,//*[^/][^/]*//*\.\./*,/,g')
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+
+    # remove trailing /s
+    while [ "$path" != "${path%/}" ]; do
+        path=${path%/}
+    done
+
+    echo "$path"
+}
+
+resolve_link() {
+    file=$1
+
+    while [ -h "$file" ]; do
+        ls0=$(ls -ld "$file")
+        new_link=$(expr "$ls0" : '.* -> \(.*\)$')
+        if expr "$new_link" : '/.*' > /dev/null; then
+            file="$new_link"
+        else
+            file="${file%/*}"/"$new_link"
+        fi
+    done
+
+    echo "$file"
 }
 
 # this needs to run on source, not just after entry

@@ -180,6 +180,12 @@ table_line_append DIST_ARGS openal '-DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT
 
 table_line_replace DIST_ARGS mp3lame "LDFLAGS='$LDFLAGS $BUILD_ROOT/root/lib/libcatgets.a'"
 
+table_line_append DIST_PRE_BUILD zlib ":; \
+    sed -i.bak ' \
+        s/defined(_WIN32)  *||  *defined(__CYGWIN__)/defined(_WIN32)/ \
+    ' gzguts.h; \
+"
+
 table_line_append DIST_POST_BUILD zlib-target ":; \
     rm -f \$BUILD_ROOT/root/lib/libz.dll.a \$BUILD_ROOT/root/bin/libz.dll; \
 "
