@@ -25,9 +25,9 @@
 #include "../gba/Sound.h"
 #include "../gba/bios.h"
 
-#define RETRO_DEVICE_GBA RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 0)
-#define RETRO_DEVICE_GBA_ALT1 RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 1)
-#define RETRO_DEVICE_GBA_ALT2 RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 2)
+#define RETRO_DEVICE_GBA             RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 0)
+#define RETRO_DEVICE_GBA_ALT1        RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 1)
+#define RETRO_DEVICE_GBA_ALT2        RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 2)
 
 #define ISHEXDEC ((codeLine[cursor]>='0') && (codeLine[cursor]<='9')) || ((codeLine[cursor]>='a') && (codeLine[cursor]<='f')) || ((codeLine[cursor]>='A') && (codeLine[cursor]<='F'))
 
@@ -39,7 +39,6 @@ retro_audio_sample_batch_t audio_batch_cb;
 static retro_environment_t environ_cb;
 
 bool enableRtc;
-extern uint64_t joy;
 static bool can_dupe;
 unsigned device_type = 0;
 int emulating = 0;
@@ -48,6 +47,8 @@ static int controller_layout[2] = { 0, 0 };
 uint8_t libretro_save_buf[0x20000 + 0x2000]; /* Workaround for broken-by-design GBA save semantics. */
 
 static unsigned libretro_save_size = sizeof(libretro_save_buf);
+static char biosfile[1024] = {0};
+static bool usebios = false;
 
 int RGB_LOW_BITS_MASK = 0;
 
@@ -188,14 +189,15 @@ void retro_set_environment(retro_environment_t cb)
    environ_cb = cb;
 
    struct retro_variable variables[] = {
-      { "vbam_layer_1", "Show layer 1; Yes|No" },
-      { "vbam_layer_2", "Show layer 2; Yes|No" },
-      { "vbam_layer_3", "Show layer 3; Yes|No" },
-      { "vbam_layer_4", "Show layer 4; Yes|No" },
-      { "vbam_layer_5", "Show sprite layer; Yes|No" },
-      { "vbam_layer_6", "Show window layer 1; Yes|No" },
-      { "vbam_layer_7", "Show window layer 2; Yes|No" },
-      { "vbam_layer_8", "Show sprite window layer; Yes|No" },
+      { "vbam_usebios", "Use BIOS file (Restart); disabled|enabled" },
+      { "vbam_layer_1", "Show layer 1; enabled|disabled" },
+      { "vbam_layer_2", "Show layer 2; enabled|disabled" },
+      { "vbam_layer_3", "Show layer 3; enabled|disabled" },
+      { "vbam_layer_4", "Show layer 4; enabled|disabled" },
+      { "vbam_layer_5", "Show sprite layer; enabled|disabled" },
+      { "vbam_layer_6", "Show window layer 1; enabled|disabled" },
+      { "vbam_layer_7", "Show window layer 2; enabled|disabled" },
+      { "vbam_layer_8", "Show sprite window layer; enabled|disabled" },
       { NULL, NULL },
    };
 
@@ -217,7 +219,11 @@ void retro_get_system_info(struct retro_system_info *info)
 {
    info->need_fullpath = false;
    info->valid_extensions = "gba";
-   info->library_version = "git" GIT_VERSION;
+#ifdef GIT_VERSION
+   info->library_version = "2.0.2" GIT_VERSION;
+#else
+   info->library_version = "2.0.2-GIT";
+#endif
    info->library_name = "VBA-M";
    info->block_extract = false;
 }
@@ -235,14 +241,24 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 
 void retro_init(void)
 {
-    struct retro_log_callback log;
-    memset(libretro_save_buf, 0xff, sizeof(libretro_save_buf));
-    adjust_save_ram();
-    environ_cb(RETRO_ENVIRONMENT_GET_CAN_DUPE, &can_dupe);
-    if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
-        log_cb = log.log;
-    else
-        log_cb = NULL;
+#ifdef _WIN32
+   char slash = '\\';
+#else
+   char slash = '/';
+#endif
+
+   struct retro_log_callback log;
+   memset(libretro_save_buf, 0xff, sizeof(libretro_save_buf));
+   adjust_save_ram();
+   environ_cb(RETRO_ENVIRONMENT_GET_CAN_DUPE, &can_dupe);
+   if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
+      log_cb = log.log;
+   else
+      log_cb = NULL;
+
+   const char* dir = NULL;
+   if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &dir) && dir)
+      snprintf(biosfile, sizeof(biosfile), "%s%c%s", dir, slash, "gba_bios.bin");
 
 #ifdef FRONTEND_SUPPORTS_RGB565
     enum retro_pixel_format rgb565 = RETRO_PIXEL_FORMAT_RGB565;
@@ -458,7 +474,11 @@ static void gba_init(void)
     soundInit();
     soundSetSampleRate(32000);
 
-    CPUInit(0, false);
+    if (usebios && biosfile[0])
+        CPUInit(biosfile, true);
+    else
+        CPUInit(0, false);
+
     CPUReset();
 
     soundReset();
@@ -536,7 +556,7 @@ static void update_variables(void)
    {
       key[strlen("vbam_layer_")]='1'+i;
       var.value=NULL;
-      if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0]=='N')
+      if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0]=='d')
       {
          disabled_layers|=0x100<<i;
       }
@@ -544,6 +564,15 @@ static void update_variables(void)
    layerSettings = 0xFF00 ^ disabled_layers;
    layerEnable = DISPCNT & layerSettings;
    CPUUpdateRenderBuffers(false);
+
+   var.key = "vbam_usebios";
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      bool newval = (strcmp(var.value, "enabled") == 0);
+      usebios = newval;
+   }
 }
 
 #ifdef FINAL_VERSION
@@ -841,7 +870,7 @@ uint32_t systemReadJoypad(int which)
 bool systemReadJoypads() { return true; }
 
 void systemUpdateMotionSensor() {}
-uint8_t systemGetSensorDarkness() {}
+uint8_t systemGetSensorDarkness() { return 0; }
 
 void systemCartridgeRumble(bool)
 {
