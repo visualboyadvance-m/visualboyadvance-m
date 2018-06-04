@@ -102,7 +102,7 @@ bool utilIsGBImage(const char* file)
 	FILE *fp;
 	bool ret = false;
 	char buffer[47];
-	if (!file || !(fd = fopen (file, "r")))		//TODO more checks here (does file exist, is it a file, a symlink or a blockdevice)
+	if (!file || !(fp = fopen (file, "r")))		//TODO more checks here (does file exist, is it a file, a symlink or a blockdevice)
 		return ret;
 	fseek (fp, 0, SEEK_END);
 	if (ftell (fp) >= 0x8000) {			//afaik there can be no gb-rom smaller than this
