@@ -1470,7 +1470,7 @@ void CPUCleanUp()
 
     emulating = 0;
 }
-#ifndef __LIBRETRO__
+
 void SetMapMasks()
 {
     map[0].mask = 0x3FFF;
@@ -1486,6 +1486,7 @@ void SetMapMasks()
     map[12].mask = 0x1FFFFFF;
     map[14].mask = 0xFFFF;
 
+#ifdef BKPT_SUPPORT
     for (int i = 0; i < 16; i++) {
         map[i].size = map[i].mask + 1;
         if (map[i].size > 0) {
@@ -1504,8 +1505,9 @@ void SetMapMasks()
         }
     }
     clearBreakRegList();
-}
 #endif
+}
+
 int CPULoadRom(const char* szFile)
 {
     romSize = 0x2000000;
@@ -1727,10 +1729,6 @@ int CPULoadRomData(const char* data, int size)
     eepromInit();
 
     CPUUpdateRenderBuffers(true);
-
-#ifdef BKPT_SUPPORT
-    SetMapMasks();
-#endif
 
     return romSize;
 }
@@ -3666,9 +3664,8 @@ void CPUReset()
     map[12].address = rom;
     map[14].address = flashSaveMemory;
 
-#ifndef __LIBRETRO__
     SetMapMasks();
-#endif
+
     soundReset();
 
     CPUUpdateWindow0();
