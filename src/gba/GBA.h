@@ -1,7 +1,11 @@
 #ifndef GBA_H
 #define GBA_H
 
+#ifndef __LIBRETRO__
 #include "../common/cstdint.h"
+#else
+#include <stdint.h>
+#endif
 
 #include "../System.h"
 
