@@ -1,7 +1,12 @@
 #ifndef EEPROM_H
 #define EEPROM_H
 
+#ifndef __LIBRETRO__
 #include "../common/cstdint.h"
+#else
+#include <stdint.h>
+#endif
+
 #include <zlib.h>
 
 #ifdef __LIBRETRO__

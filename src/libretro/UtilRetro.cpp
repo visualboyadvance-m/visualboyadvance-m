@@ -102,7 +102,7 @@ bool utilIsGBImage(const char* file)
 	FILE *fp;
 	bool ret = false;
 	char buffer[47];
-	if (!file || !(fd = fopen (file, "r")))		//TODO more checks here (does file exist, is it a file, a symlink or a blockdevice)
+	if (!file || !(fp = fopen (file, "r")))		//TODO more checks here (does file exist, is it a file, a symlink or a blockdevice)
 		return ret;
 	fseek (fp, 0, SEEK_END);
 	if (ftell (fp) >= 0x8000) {			//afaik there can be no gb-rom smaller than this
@@ -150,6 +150,7 @@ uint8_t *utilLoad(const char *file, bool (*accept)(const char *), uint8_t *data,
 	char *buf = NULL;
 
 	fp = fopen(file,"rb");
+	if(!fp) return NULL;
 	fseek(fp, 0, SEEK_END); //go to end
 	size = ftell(fp); // get position at end (length)
 	rewind(fp);

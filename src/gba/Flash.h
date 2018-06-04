@@ -1,7 +1,12 @@
 #ifndef FLASH_H
 #define FLASH_H
 
+#ifndef __LIBRETRO__
 #include "../common/cstdint.h"
+#else
+#include <stdint.h>
+#endif
+
 #include <zlib.h>
 
 #define FLASH_128K_SZ 0x20000

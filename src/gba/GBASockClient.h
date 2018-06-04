@@ -1,6 +1,11 @@
 #pragma once
 
+#ifndef __LIBRETRO__
 #include "../common/cstdint.h"
+#else
+#include <stdint.h>
+#endif
+
 #include <SFML/Network.hpp>
 
 class GBASockClient {
