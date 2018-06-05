@@ -457,10 +457,11 @@ static void gba_init(void)
     systemBlueShift = 3;
 #endif
 
-
-   utilUpdateSystemColorMaps(false);
+    utilUpdateSystemColorMaps(false);
 
     load_image_preferences();
+
+    saveType = cpuSaveType;
 
     if (flashSize == 0x10000 || flashSize == 0x20000)
         flashSetSize(flashSize);
