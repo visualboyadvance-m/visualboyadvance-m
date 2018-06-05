@@ -593,10 +593,10 @@ static void count(uint32_t opcode, int cond_res)
     EMIT2(cmp, KONST(0x3C), esi)   \
     EMIT1(je, LABELREF(8, f))      \
     OP SETCOND                     \
-        EMIT1(jmp, LABELREF(9, f)) \
-            LABEL(8)               \
-                OP                 \
-                    LABEL(9)
+    EMIT1(jmp, LABELREF(9, f))     \
+    LABEL(8)                       \
+    OP                             \
+    LABEL(9)
 
 #define OP_AND           \
     EMIT2(and, eax, edx) \
@@ -692,19 +692,19 @@ static void count(uint32_t opcode, int cond_res)
 #define ROR_IMM_MSR                                                                                             \
     __asm {                             \
         __asm mov ecx, shift            \
-        __asm ror value, cl \
+        __asm ror value, cl             \
     }
 
 #define ROR_OFFSET                                                                                               \
     __asm {                             \
         __asm mov ecx, shift            \
-        __asm ror offset, cl \
+        __asm ror offset, cl            \
     }
 
 #define RRX_OFFSET                                                                                              \
     __asm {                             \
         __asm bt dword ptr C_FLAG, 0    \
-        __asm rcr offset, 1 \
+        __asm rcr offset, 1             \
     }
 
 #endif // !__GNUC__
@@ -714,19 +714,19 @@ static void count(uint32_t opcode, int cond_res)
 
 // C core
 
-#define C_SETCOND_LOGICAL                   \
+#define C_SETCOND_LOGICAL                       \
     N_FLAG = ((int32_t)res < 0) ? true : false; \
-    Z_FLAG = (res == 0) ? true : false;     \
+    Z_FLAG = (res == 0) ? true : false;         \
     C_FLAG = C_OUT;
-#define C_SETCOND_ADD                                                                              \
-    N_FLAG = ((int32_t)res < 0) ? true : false;                                                        \
-    Z_FLAG = (res == 0) ? true : false;                                                            \
-    V_FLAG = ((NEG(lhs) & NEG(rhs) & POS(res)) | (POS(lhs) & POS(rhs) & NEG(res))) ? true : false; \
+#define C_SETCOND_ADD                                                                               \
+    N_FLAG = ((int32_t)res < 0) ? true : false;                                                     \
+    Z_FLAG = (res == 0) ? true : false;                                                             \
+    V_FLAG = ((NEG(lhs) & NEG(rhs) & POS(res)) | (POS(lhs) & POS(rhs) & NEG(res))) ? true : false;  \
     C_FLAG = ((NEG(lhs) & NEG(rhs)) | (NEG(lhs) & POS(res)) | (NEG(rhs) & POS(res))) ? true : false;
-#define C_SETCOND_SUB                                                                              \
-    N_FLAG = ((int32_t)res < 0) ? true : false;                                                        \
-    Z_FLAG = (res == 0) ? true : false;                                                            \
-    V_FLAG = ((NEG(lhs) & POS(rhs) & POS(res)) | (POS(lhs) & NEG(rhs) & NEG(res))) ? true : false; \
+#define C_SETCOND_SUB                                                                               \
+    N_FLAG = ((int32_t)res < 0) ? true : false;                                                     \
+    Z_FLAG = (res == 0) ? true : false;                                                             \
+    V_FLAG = ((NEG(lhs) & POS(rhs) & POS(res)) | (POS(lhs) & NEG(rhs) & NEG(res))) ? true : false;  \
     C_FLAG = ((NEG(lhs) & POS(rhs)) | (NEG(lhs) & POS(res)) | (POS(rhs) & POS(res))) ? true : false;
 
 #define maybe_unused(var) (void) var
@@ -744,7 +744,7 @@ static void count(uint32_t opcode, int cond_res)
     if (LIKELY(!shift)) { /* LSL #0 most common? */     \
         value = reg[opcode & 0x0F].I;                   \
     } else {                                            \
-        uint32_t v = reg[opcode & 0x0F].I;                   \
+        uint32_t v = reg[opcode & 0x0F].I;              \
         C_OUT = (v >> (32 - shift)) & 1 ? true : false; \
         value = v << shift;                             \
     }
@@ -752,8 +752,8 @@ static void count(uint32_t opcode, int cond_res)
 // OP Rd,Rb,Rm LSL Rs
 #ifndef VALUE_LSL_REG_C
 #define VALUE_LSL_REG_C                                     \
-    uint32_t shift = reg[(opcode >> 8) & 15].B.B0;               \
-    uint32_t rm = reg[opcode & 0x0F].I;                          \
+    uint32_t shift = reg[(opcode >> 8) & 15].B.B0;          \
+    uint32_t rm = reg[opcode & 0x0F].I;                     \
     if ((opcode & 0x0F) == 15) {                            \
         rm += 4;                                            \
     }                                                       \
@@ -762,7 +762,7 @@ static void count(uint32_t opcode, int cond_res)
             value = 0;                                      \
             C_OUT = (rm & 1 ? true : false);                \
         } else if (LIKELY(shift < 32)) {                    \
-            uint32_t v = rm;                                     \
+            uint32_t v = rm;                                \
             C_OUT = (v >> (32 - shift)) & 1 ? true : false; \
             value = v << shift;                             \
         } else {                                            \
@@ -776,9 +776,9 @@ static void count(uint32_t opcode, int cond_res)
 // OP Rd,Rb,Rm LSR #
 #ifndef VALUE_LSR_IMM_C
 #define VALUE_LSR_IMM_C                                             \
-    uint32_t shift = (opcode >> 7) & 0x1F;                               \
+    uint32_t shift = (opcode >> 7) & 0x1F;                          \
     if (LIKELY(shift)) {                                            \
-        uint32_t v = reg[opcode & 0x0F].I;                               \
+        uint32_t v = reg[opcode & 0x0F].I;                          \
         C_OUT = (v >> (shift - 1)) & 1 ? true : false;              \
         value = v >> shift;                                         \
     } else {                                                        \
@@ -790,7 +790,7 @@ static void count(uint32_t opcode, int cond_res)
 #ifndef VALUE_LSR_REG_C
 #define VALUE_LSR_REG_C                                    \
     unsigned int shift = reg[(opcode >> 8) & 15].B.B0;     \
-    uint32_t rm = reg[opcode & 0x0F].I;                         \
+    uint32_t rm = reg[opcode & 0x0F].I;                    \
     if ((opcode & 0x0F) == 15) {                           \
         rm += 4;                                           \
     }                                                      \
@@ -799,7 +799,7 @@ static void count(uint32_t opcode, int cond_res)
             value = 0;                                     \
             C_OUT = (rm & 0x80000000 ? true : false);      \
         } else if (LIKELY(shift < 32)) {                   \
-            uint32_t v = rm;                                    \
+            uint32_t v = rm;                               \
             C_OUT = (v >> (shift - 1)) & 1 ? true : false; \
             value = v >> shift;                            \
         } else {                                           \
@@ -816,7 +816,7 @@ static void count(uint32_t opcode, int cond_res)
     unsigned int shift = (opcode >> 7) & 0x1F;                \
     if (LIKELY(shift)) {                                      \
         /* VC++ BUG: uint32_t v; (int32_t)v>>n is optimized to shr! */ \
-        int32_t v = reg[opcode & 0x0F].I;                         \
+        int32_t v = reg[opcode & 0x0F].I;                     \
         C_OUT = (v >> (int)(shift - 1)) & 1 ? true : false;   \
         value = v >> (int)shift;                              \
     } else {                                                  \
@@ -833,13 +833,13 @@ static void count(uint32_t opcode, int cond_res)
 #ifndef VALUE_ASR_REG_C
 #define VALUE_ASR_REG_C                                         \
     unsigned int shift = reg[(opcode >> 8) & 15].B.B0;          \
-    uint32_t rm = reg[opcode & 0x0F].I;                              \
+    uint32_t rm = reg[opcode & 0x0F].I;                         \
     if ((opcode & 0x0F) == 15) {                                \
         rm += 4;                                                \
     }                                                           \
     if (LIKELY(shift < 32)) {                                   \
         if (LIKELY(shift)) {                                    \
-            int32_t v = rm;                                         \
+            int32_t v = rm;                                     \
             C_OUT = (v >> (int)(shift - 1)) & 1 ? true : false; \
             value = v >> (int)shift;                            \
         } else {                                                \
@@ -860,11 +860,11 @@ static void count(uint32_t opcode, int cond_res)
 #define VALUE_ROR_IMM_C                                \
     unsigned int shift = (opcode >> 7) & 0x1F;         \
     if (LIKELY(shift)) {                               \
-        uint32_t v = reg[opcode & 0x0F].I;                  \
+        uint32_t v = reg[opcode & 0x0F].I;             \
         C_OUT = (v >> (shift - 1)) & 1 ? true : false; \
         value = ((v << (32 - shift)) | (v >> shift));  \
     } else {                                           \
-        uint32_t v = reg[opcode & 0x0F].I;                  \
+        uint32_t v = reg[opcode & 0x0F].I;             \
         C_OUT = (v & 1) ? true : false;                \
         value = ((v >> 1) | (C_FLAG << 31));           \
     }
@@ -873,12 +873,12 @@ static void count(uint32_t opcode, int cond_res)
 #ifndef VALUE_ROR_REG_C
 #define VALUE_ROR_REG_C                                  \
     unsigned int shift = reg[(opcode >> 8) & 15].B.B0;   \
-    uint32_t rm = reg[opcode & 0x0F].I;                       \
+    uint32_t rm = reg[opcode & 0x0F].I;                  \
     if ((opcode & 0x0F) == 15) {                         \
         rm += 4;                                         \
     }                                                    \
     if (LIKELY(shift & 0x1F)) {                          \
-        uint32_t v = rm;                                      \
+        uint32_t v = rm;                                 \
         C_OUT = (v >> (shift - 1)) & 1 ? true : false;   \
         value = ((v << (32 - shift)) | (v >> shift));    \
     } else {                                             \
@@ -892,7 +892,7 @@ static void count(uint32_t opcode, int cond_res)
 #define VALUE_IMM_C                                    \
     int shift = (opcode & 0xF00) >> 7;                 \
     if (UNLIKELY(shift)) {                             \
-        uint32_t v = opcode & 0xFF;                         \
+        uint32_t v = opcode & 0xFF;                    \
         C_OUT = (v >> (shift - 1)) & 1 ? true : false; \
         value = ((v << (32 - shift)) | (v >> shift));  \
     } else {                                           \
@@ -938,7 +938,7 @@ static void count(uint32_t opcode, int cond_res)
         SETCOND               \
     }
 #ifndef OP_AND
-#define OP_AND                                    \
+#define OP_AND                                         \
     uint32_t res = reg[(opcode >> 16) & 15].I & value; \
     reg[dest].I = res;
 #endif
@@ -946,7 +946,7 @@ static void count(uint32_t opcode, int cond_res)
 #define OP_ANDS OP_AND C_CHECK_PC(C_SETCOND_LOGICAL)
 #endif
 #ifndef OP_EOR
-#define OP_EOR                                    \
+#define OP_EOR                                         \
     uint32_t res = reg[(opcode >> 16) & 15].I ^ value; \
     reg[dest].I = res;
 #endif
@@ -954,7 +954,7 @@ static void count(uint32_t opcode, int cond_res)
 #define OP_EORS OP_EOR C_CHECK_PC(C_SETCOND_LOGICAL)
 #endif
 #ifndef OP_SUB
-#define OP_SUB                            \
+#define OP_SUB                                 \
     uint32_t lhs = reg[(opcode >> 16) & 15].I; \
     uint32_t rhs = value;                      \
     uint32_t res = lhs - rhs;                  \
@@ -964,7 +964,7 @@ static void count(uint32_t opcode, int cond_res)
 #define OP_SUBS OP_SUB C_CHECK_PC(C_SETCOND_SUB)
 #endif
 #ifndef OP_RSB
-#define OP_RSB                            \
+#define OP_RSB                                 \
     uint32_t lhs = value;                      \
     uint32_t rhs = reg[(opcode >> 16) & 15].I; \
     uint32_t res = lhs - rhs;                  \
@@ -974,7 +974,7 @@ static void count(uint32_t opcode, int cond_res)
 #define OP_RSBS OP_RSB C_CHECK_PC(C_SETCOND_SUB)
 #endif
 #ifndef OP_ADD
-#define OP_ADD                            \
+#define OP_ADD                                 \
     uint32_t lhs = reg[(opcode >> 16) & 15].I; \
     uint32_t rhs = value;                      \
     uint32_t res = lhs + rhs;                  \
@@ -984,19 +984,19 @@ static void count(uint32_t opcode, int cond_res)
 #define OP_ADDS OP_ADD C_CHECK_PC(C_SETCOND_ADD)
 #endif
 #ifndef OP_ADC
-#define OP_ADC                            \
-    uint32_t lhs = reg[(opcode >> 16) & 15].I; \
-    uint32_t rhs = value;                      \
-    uint32_t res = lhs + rhs + (uint32_t)C_FLAG;    \
+#define OP_ADC                                   \
+    uint32_t lhs = reg[(opcode >> 16) & 15].I;   \
+    uint32_t rhs = value;                        \
+    uint32_t res = lhs + rhs + (uint32_t)C_FLAG; \
     reg[dest].I = res;
 #endif
 #ifndef OP_ADCS
 #define OP_ADCS OP_ADC C_CHECK_PC(C_SETCOND_ADD)
 #endif
 #ifndef OP_SBC
-#define OP_SBC                            \
-    uint32_t lhs = reg[(opcode >> 16) & 15].I; \
-    uint32_t rhs = value;                      \
+#define OP_SBC                                      \
+    uint32_t lhs = reg[(opcode >> 16) & 15].I;      \
+    uint32_t rhs = value;                           \
     uint32_t res = lhs - rhs - !((uint32_t)C_FLAG); \
     reg[dest].I = res;
 #endif
@@ -1004,9 +1004,9 @@ static void count(uint32_t opcode, int cond_res)
 #define OP_SBCS OP_SBC C_CHECK_PC(C_SETCOND_SUB)
 #endif
 #ifndef OP_RSC
-#define OP_RSC                            \
-    uint32_t lhs = value;                      \
-    uint32_t rhs = reg[(opcode >> 16) & 15].I; \
+#define OP_RSC                                      \
+    uint32_t lhs = value;                           \
+    uint32_t rhs = reg[(opcode >> 16) & 15].I;      \
     uint32_t res = lhs - rhs - !((uint32_t)C_FLAG); \
     reg[dest].I = res;
 #endif
@@ -1014,31 +1014,31 @@ static void count(uint32_t opcode, int cond_res)
 #define OP_RSCS OP_RSC C_CHECK_PC(C_SETCOND_SUB)
 #endif
 #ifndef OP_TST
-#define OP_TST                                      \
+#define OP_TST                                           \
     uint32_t res = reg[(opcode >> 16) & 0x0F].I & value; \
     C_SETCOND_LOGICAL;
 #endif
 #ifndef OP_TEQ
-#define OP_TEQ                                      \
+#define OP_TEQ                                           \
     uint32_t res = reg[(opcode >> 16) & 0x0F].I ^ value; \
     C_SETCOND_LOGICAL;
 #endif
 #ifndef OP_CMP
-#define OP_CMP                            \
+#define OP_CMP                                 \
     uint32_t lhs = reg[(opcode >> 16) & 15].I; \
     uint32_t rhs = value;                      \
     uint32_t res = lhs - rhs;                  \
     C_SETCOND_SUB;
 #endif
 #ifndef OP_CMN
-#define OP_CMN                            \
+#define OP_CMN                                 \
     uint32_t lhs = reg[(opcode >> 16) & 15].I; \
     uint32_t rhs = value;                      \
     uint32_t res = lhs + rhs;                  \
     C_SETCOND_ADD;
 #endif
 #ifndef OP_ORR
-#define OP_ORR                                      \
+#define OP_ORR                                           \
     uint32_t res = reg[(opcode >> 16) & 0x0F].I | value; \
     reg[dest].I = res;
 #endif
@@ -1046,7 +1046,7 @@ static void count(uint32_t opcode, int cond_res)
 #define OP_ORRS OP_ORR C_CHECK_PC(C_SETCOND_LOGICAL)
 #endif
 #ifndef OP_MOV
-#define OP_MOV       \
+#define OP_MOV            \
     uint32_t res = value; \
     reg[dest].I = res;
 #endif
@@ -1054,7 +1054,7 @@ static void count(uint32_t opcode, int cond_res)
 #define OP_MOVS OP_MOV C_CHECK_PC(C_SETCOND_LOGICAL)
 #endif
 #ifndef OP_BIC
-#define OP_BIC                                         \
+#define OP_BIC                                              \
     uint32_t res = reg[(opcode >> 16) & 0x0F].I & (~value); \
     reg[dest].I = res;
 #endif
@@ -1062,7 +1062,7 @@ static void count(uint32_t opcode, int cond_res)
 #define OP_BICS OP_BIC C_CHECK_PC(C_SETCOND_LOGICAL)
 #endif
 #ifndef OP_MVN
-#define OP_MVN        \
+#define OP_MVN             \
     uint32_t res = ~value; \
     reg[dest].I = res;
 #endif
@@ -1074,7 +1074,7 @@ static void count(uint32_t opcode, int cond_res)
 #define SETCOND_NONE /*nothing*/
 #endif
 #ifndef SETCOND_MUL
-#define SETCOND_MUL                                 \
+#define SETCOND_MUL                                     \
     N_FLAG = ((int32_t)reg[dest].I < 0) ? true : false; \
     Z_FLAG = reg[dest].I ? false : true;
 #endif
@@ -1089,7 +1089,7 @@ static void count(uint32_t opcode, int cond_res)
 #endif
 
 #ifndef ROR_IMM_MSR
-#define ROR_IMM_MSR        \
+#define ROR_IMM_MSR             \
     uint32_t v = opcode & 0xff; \
     value = ((v << (32 - shift)) | (v >> shift));
 #endif
@@ -1137,7 +1137,7 @@ static void count(uint32_t opcode, int cond_res)
 #define MODECHANGE_NO /*nothing*/
 #define MODECHANGE_YES CPUSwitchMode(reg[17].I & 0x1f, false);
 
-#define DEFINE_ALU_INSN_C(CODE1, CODE2, OP, MODECHANGE)                                                                                \
+#define DEFINE_ALU_INSN_C(CODE1, CODE2, OP, MODECHANGE)                                                                                     \
     static INSN_REGPARM void arm##CODE1##0(uint32_t opcode) { ALU_INSN(ALU_INIT_C, VALUE_LSL_IMM_C, OP_##OP, MODECHANGE_##MODECHANGE, 0); } \
     static INSN_REGPARM void arm##CODE1##1(uint32_t opcode) { ALU_INSN(ALU_INIT_C, VALUE_LSL_REG_C, OP_##OP, MODECHANGE_##MODECHANGE, 1); } \
     static INSN_REGPARM void arm##CODE1##2(uint32_t opcode) { ALU_INSN(ALU_INIT_C, VALUE_LSR_IMM_C, OP_##OP, MODECHANGE_##MODECHANGE, 0); } \
@@ -1147,7 +1147,7 @@ static void count(uint32_t opcode, int cond_res)
     static INSN_REGPARM void arm##CODE1##6(uint32_t opcode) { ALU_INSN(ALU_INIT_C, VALUE_ROR_IMM_C, OP_##OP, MODECHANGE_##MODECHANGE, 0); } \
     static INSN_REGPARM void arm##CODE1##7(uint32_t opcode) { ALU_INSN(ALU_INIT_C, VALUE_ROR_REG_C, OP_##OP, MODECHANGE_##MODECHANGE, 1); } \
     static INSN_REGPARM void arm##CODE2##0(uint32_t opcode) { ALU_INSN(ALU_INIT_C, VALUE_IMM_C, OP_##OP, MODECHANGE_##MODECHANGE, 0); }
-#define DEFINE_ALU_INSN_NC(CODE1, CODE2, OP, MODECHANGE)                                                                                 \
+#define DEFINE_ALU_INSN_NC(CODE1, CODE2, OP, MODECHANGE)                                                                                      \
     static INSN_REGPARM void arm##CODE1##0(uint32_t opcode) { ALU_INSN(ALU_INIT_NC, VALUE_LSL_IMM_NC, OP_##OP, MODECHANGE_##MODECHANGE, 0); } \
     static INSN_REGPARM void arm##CODE1##1(uint32_t opcode) { ALU_INSN(ALU_INIT_NC, VALUE_LSL_REG_NC, OP_##OP, MODECHANGE_##MODECHANGE, 1); } \
     static INSN_REGPARM void arm##CODE1##2(uint32_t opcode) { ALU_INSN(ALU_INIT_NC, VALUE_LSR_IMM_NC, OP_##OP, MODECHANGE_##MODECHANGE, 0); } \
@@ -1237,12 +1237,12 @@ DEFINE_ALU_INSN_C(1F, 3F, MVNS, YES)
 // CYCLES: base cycle count (1, 2, or 3)
 #define MUL_INSN(OP, SETCOND, CYCLES)                                  \
     int mult = (opcode & 0x0F);                                        \
-    uint32_t rs = reg[(opcode >> 8) & 0x0F].I;                              \
+    uint32_t rs = reg[(opcode >> 8) & 0x0F].I;                         \
     int acc = (opcode >> 12) & 0x0F; /* or destLo */                   \
     int dest = (opcode >> 16) & 0x0F; /* or destHi */                  \
     OP;                                                                \
     SETCOND;                                                           \
-    if ((int32_t)rs < 0)                                                   \
+    if ((int32_t)rs < 0)                                               \
         rs = ~rs;                                                      \
     if ((rs & 0xFFFFFF00) == 0)                                        \
         clockTicks += 0;                                               \
@@ -1268,13 +1268,13 @@ typedef  int64_t s32;
 #define OP_MULL(SIGN)                              \
     SIGN##64 res = (SIGN##64)(SIGN##32)reg[mult].I \
         * (SIGN##64)(SIGN##32)rs;                  \
-    reg[acc].I = (uint32_t)res;                         \
+    reg[acc].I = (uint32_t)res;                    \
     reg[dest].I = (uint32_t)(res >> 32);
 #define OP_MLAL(SIGN)                                         \
     SIGN##64 res = ((SIGN##64)reg[dest].I << 32 | reg[acc].I) \
         + ((SIGN##64)(SIGN##32)reg[mult].I                    \
                        * (SIGN##64)(SIGN##32)rs);             \
-    reg[acc].I = (uint32_t)res;                                    \
+    reg[acc].I = (uint32_t)res;                               \
     reg[dest].I = (uint32_t)(res >> 32);
 #define OP_UMULL OP_MULL(u)
 #define OP_UMLAL OP_MLAL(u)
@@ -1508,22 +1508,22 @@ static INSN_REGPARM void arm121(uint32_t opcode)
 #define OFFSET_LSR                  \
     int shift = (opcode >> 7) & 31; \
     int offset = shift ? reg[opcode & 15].I >> shift : 0;
-#define OFFSET_ASR                                        \
-    int shift = (opcode >> 7) & 31;                       \
-    int offset;                                           \
-    if (shift)                                            \
+#define OFFSET_ASR                                            \
+    int shift = (opcode >> 7) & 31;                           \
+    int offset;                                               \
+    if (shift)                                                \
         offset = (int)((int32_t)reg[opcode & 15].I >> shift); \
-    else if (reg[opcode & 15].I & 0x80000000)             \
-        offset = 0xFFFFFFFF;                              \
-    else                                                  \
+    else if (reg[opcode & 15].I & 0x80000000)                 \
+        offset = 0xFFFFFFFF;                                  \
+    else                                                      \
         offset = 0;
-#define OFFSET_ROR                   \
-    int shift = (opcode >> 7) & 31;  \
+#define OFFSET_ROR                        \
+    int shift = (opcode >> 7) & 31;       \
     uint32_t offset = reg[opcode & 15].I; \
-    if (shift) {                     \
-        ROR_OFFSET;                  \
-    } else {                         \
-        RRX_OFFSET;                  \
+    if (shift) {                          \
+        ROR_OFFSET;                       \
+    } else {                              \
+        RRX_OFFSET;                       \
     }
 
 #define ADDRESS_POST (reg[base].I)
