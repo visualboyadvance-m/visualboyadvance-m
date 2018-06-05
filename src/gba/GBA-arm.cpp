@@ -1256,30 +1256,32 @@ DEFINE_ALU_INSN_C(1F, 3F, MVNS, YES)
         busPrefetchCount = ((busPrefetchCount + 1) << clockTicks) - 1; \
     clockTicks += 1 + codeTicksAccess32(armNextPC);
 
-typedef uint64_t u64;
-typedef  int64_t s64;
-typedef uint64_t u32;
-typedef  int64_t s32;
-
 #define OP_MUL \
     reg[dest].I = reg[mult].I * rs;
 #define OP_MLA \
     reg[dest].I = reg[mult].I * rs + reg[acc].I;
-#define OP_MULL(SIGN)                              \
-    SIGN##64 res = (SIGN##64)(SIGN##32)reg[mult].I \
-        * (SIGN##64)(SIGN##32)rs;                  \
-    reg[acc].I = (uint32_t)res;                    \
-    reg[dest].I = (uint32_t)(res >> 32);
-#define OP_MLAL(SIGN)                                         \
-    SIGN##64 res = ((SIGN##64)reg[dest].I << 32 | reg[acc].I) \
-        + ((SIGN##64)(SIGN##32)reg[mult].I                    \
-                       * (SIGN##64)(SIGN##32)rs);             \
+#define OP_UMULL                                              \
+    uint64_t res = (uint64_t)(uint32_t)reg[mult].I            \
+        * (uint64_t)(uint32_t)rs;                             \
     reg[acc].I = (uint32_t)res;                               \
     reg[dest].I = (uint32_t)(res >> 32);
-#define OP_UMULL OP_MULL(u)
-#define OP_UMLAL OP_MLAL(u)
-#define OP_SMULL OP_MULL(s)
-#define OP_SMLAL OP_MLAL(s)
+#define OP_SMULL                                              \
+    int64_t res = (int64_t)(int32_t)reg[mult].I               \
+        * (int64_t)(int32_t)rs;                               \
+    reg[acc].I = (uint32_t)res;                               \
+    reg[dest].I = (uint32_t)(res >> 32);
+#define OP_UMLAL                                              \
+    uint64_t res = ((uint64_t)reg[dest].I << 32 | reg[acc].I) \
+        + ((uint64_t)(uint32_t)reg[mult].I                    \
+        * (uint64_t)(uint32_t)rs);                            \
+    reg[acc].I = (uint32_t)res;                               \
+    reg[dest].I = (uint32_t)(res >> 32);
+#define OP_SMLAL                                              \
+    int64_t res = ((int64_t)reg[dest].I << 32 | reg[acc].I)   \
+        + ((int64_t)(int32_t)reg[mult].I                      \
+        * (int64_t)(int32_t)rs);                              \
+    reg[acc].I = (uint32_t)res;                               \
+    reg[dest].I = (uint32_t)(res >> 32);
 
 // MUL Rd, Rm, Rs
 static INSN_REGPARM void arm009(uint32_t opcode) { MUL_INSN(OP_MUL, SETCOND_NONE, 1); }
