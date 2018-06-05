@@ -2239,6 +2239,7 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     }
 
     if (todraw) {
+    }
 }
 
 void DXDrawingPanel::DrawArea(wxWindowDC& dc)
