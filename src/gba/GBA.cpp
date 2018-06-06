@@ -10,11 +10,7 @@
 #include "../NLS.h"
 #include "../System.h"
 #include "../Util.h"
-#ifndef __LIBRETRO__
 #include "../common/ConfigManager.h"
-#else
-#include "../src/libretro/UtilRetro.h"
-#endif
 #include "../common/Port.h"
 #include "Cheats.h"
 #include "EEprom.h"
@@ -582,7 +578,7 @@ void CPUUpdateRenderBuffers(bool force)
 }
 
 #ifdef __LIBRETRO__
-#include <cstddef>
+#include <stddef.h>
 
 unsigned int CPUWriteState(uint8_t* data, unsigned size)
 {
@@ -603,11 +599,7 @@ unsigned int CPUWriteState(uint8_t* data, unsigned size)
     utilWriteMem(data, workRAM, 0x40000);
     utilWriteMem(data, vram, 0x20000);
     utilWriteMem(data, oam, 0x400);
-#ifdef __LIBRETRO__
     utilWriteMem(data, pix, 4 * 240 * 160);
-#else
-    utilWriteMem(data, pix, 4 * 241 * 162);
-#endif
     utilWriteMem(data, ioMem, 0x400);
 
     eepromSaveGame(data);
@@ -622,7 +614,83 @@ bool CPUWriteMemState(char* memory, int available, long& reserved)
 {
     return false;
 }
-#else
+
+bool CPUReadState(const uint8_t* data, unsigned size)
+{
+    // Don't really care about version.
+    int version = utilReadIntMem(data);
+    if (version != SAVE_GAME_VERSION)
+        return false;
+
+    char romname[16];
+    utilReadMem(romname, data, 16);
+    if (memcmp(&rom[0xa0], romname, 16) != 0)
+        return false;
+
+    // Don't care about use bios ...
+    utilReadIntMem(data);
+
+    utilReadMem(&reg[0], data, sizeof(reg));
+
+    utilReadDataMem(data, saveGameStruct);
+
+    stopState = utilReadIntMem(data) ? true : false;
+
+    IRQTicks = utilReadIntMem(data);
+    if (IRQTicks > 0)
+        intState = true;
+    else {
+        intState = false;
+        IRQTicks = 0;
+    }
+
+    utilReadMem(internalRAM, data, 0x8000);
+    utilReadMem(paletteRAM, data, 0x400);
+    utilReadMem(workRAM, data, 0x40000);
+    utilReadMem(vram, data, 0x20000);
+    utilReadMem(oam, data, 0x400);
+    utilReadMem(pix, data, 4 * 240 * 160);
+    utilReadMem(ioMem, data, 0x400);
+
+    eepromReadGame(data, version);
+    flashReadGame(data, version);
+    soundReadGame(data, version);
+    rtcReadGame(data);
+
+    //// Copypasta stuff ...
+    // set pointers!
+    layerEnable = layerSettings & DISPCNT;
+
+    CPUUpdateRender();
+
+    // CPU Update Render Buffers set to true
+    CLEAR_ARRAY(line0);
+    CLEAR_ARRAY(line1);
+    CLEAR_ARRAY(line2);
+    CLEAR_ARRAY(line3);
+    // End of CPU Update Render Buffers set to true
+
+    CPUUpdateWindow0();
+    CPUUpdateWindow1();
+    gbaSaveType = 0;
+    SetSaveType(saveType);
+    if (eepromInUse)
+        gbaSaveType = 3;
+
+    systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
+    if (armState) {
+        ARM_PREFETCH;
+    } else {
+        THUMB_PREFETCH;
+    }
+
+    CPUUpdateRegister(0x204, CPUReadHalfWordQuick(0x4000204));
+
+    return true;
+}
+
+#else // !__LIBRETRO__
+
 static bool CPUWriteState(gzFile gzFile)
 {
     utilWriteInt(gzFile, SAVE_GAME_VERSION);
@@ -645,11 +713,7 @@ static bool CPUWriteState(gzFile gzFile)
     utilGzWrite(gzFile, workRAM, 0x40000);
     utilGzWrite(gzFile, vram, 0x20000);
     utilGzWrite(gzFile, oam, 0x400);
-#ifdef __LIBRETRO__
-    utilGzWrite(gzFile, pix, 4 * 240 * 160);
-#else
     utilGzWrite(gzFile, pix, 4 * 241 * 162);
-#endif
     utilGzWrite(gzFile, ioMem, 0x400);
 
     eepromSaveGame(gzFile);
@@ -699,110 +763,7 @@ bool CPUWriteMemState(char* memory, int available, long& reserved)
 
     return res;
 }
-#endif
 
-#ifdef __LIBRETRO__
-bool CPUReadState(const uint8_t* data, unsigned size)
-{
-    // Don't really care about version.
-    int version = utilReadIntMem(data);
-    if (version != SAVE_GAME_VERSION)
-        return false;
-
-    char romname[16];
-    utilReadMem(romname, data, 16);
-    if (memcmp(&rom[0xa0], romname, 16) != 0)
-        return false;
-
-    // Don't care about use bios ...
-    utilReadIntMem(data);
-
-    utilReadMem(&reg[0], data, sizeof(reg));
-
-    utilReadDataMem(data, saveGameStruct);
-
-    stopState = utilReadIntMem(data) ? true : false;
-
-    IRQTicks = utilReadIntMem(data);
-    if (IRQTicks > 0)
-        intState = true;
-    else {
-        intState = false;
-        IRQTicks = 0;
-    }
-
-    utilReadMem(internalRAM, data, 0x8000);
-    utilReadMem(paletteRAM, data, 0x400);
-    utilReadMem(workRAM, data, 0x40000);
-    utilReadMem(vram, data, 0x20000);
-    utilReadMem(oam, data, 0x400);
-#ifdef __LIBRETRO__
-    utilReadMem(pix, data, 4 * 240 * 160);
-#else
-    utilReadMem(pix, data, 4 * 241 * 162);
-#endif
-    utilReadMem(ioMem, data, 0x400);
-
-    eepromReadGame(data, version);
-    flashReadGame(data, version);
-    soundReadGame(data, version);
-    rtcReadGame(data);
-
-    //// Copypasta stuff ...
-    // set pointers!
-    layerEnable = layerSettings & DISPCNT;
-
-    CPUUpdateRender();
-
-    // CPU Update Render Buffers set to true
-    CLEAR_ARRAY(line0);
-    CLEAR_ARRAY(line1);
-    CLEAR_ARRAY(line2);
-    CLEAR_ARRAY(line3);
-    // End of CPU Update Render Buffers set to true
-
-    CPUUpdateWindow0();
-    CPUUpdateWindow1();
-    gbaSaveType = 0;
-    switch (saveType) {
-    case 0:
-        cpuSaveGameFunc = flashSaveDecide;
-        break;
-    case 1:
-        cpuSaveGameFunc = sramWrite;
-        gbaSaveType = 1;
-        break;
-    case 2:
-        cpuSaveGameFunc = flashWrite;
-        gbaSaveType = 2;
-        break;
-    case 3:
-        break;
-    case 5:
-        gbaSaveType = 5;
-        break;
-    default:
-#ifdef CELL_VBA_DEBUG
-        systemMessage(MSG_UNSUPPORTED_SAVE_TYPE,
-            N_("Unsupported save type %d"), saveType);
-#endif
-        break;
-    }
-    if (eepromInUse)
-        gbaSaveType = 3;
-
-    systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
-    if (armState) {
-        ARM_PREFETCH;
-    } else {
-        THUMB_PREFETCH;
-    }
-
-    CPUUpdateRegister(0x204, CPUReadHalfWordQuick(0x4000204));
-
-    return true;
-}
-#else
 static bool CPUReadState(gzFile gzFile)
 {
     int version = utilReadInt(gzFile);
@@ -866,14 +827,10 @@ static bool CPUReadState(gzFile gzFile)
     utilGzRead(gzFile, workRAM, 0x40000);
     utilGzRead(gzFile, vram, 0x20000);
     utilGzRead(gzFile, oam, 0x400);
-#ifdef __LIBRETRO__
-    utilGzRead(gzFile, pix, 4 * 240 * 160);
-#else
     if (version < SAVE_GAME_VERSION_6)
         utilGzRead(gzFile, pix, 4 * 240 * 160);
     else
         utilGzRead(gzFile, pix, 4 * 241 * 162);
-#endif
     utilGzRead(gzFile, ioMem, 0x400);
 
     if (skipSaveGameBattery) {
@@ -1610,11 +1567,8 @@ int CPULoadRom(const char* szFile)
         CPUCleanUp();
         return 0;
     }
-#ifdef __LIBRETRO__
-    pix = (uint8_t*)calloc(1, 4 * 240 * 160);
-#else
+    
     pix = (uint8_t*)calloc(1, 4 * 241 * 162);
-#endif
     if (pix == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "PIX");
@@ -1706,11 +1660,8 @@ int CPULoadRomData(const char* data, int size)
         CPUCleanUp();
         return 0;
     }
-#ifdef __LIBRETRO__
+    
     pix = (uint8_t*)calloc(1, 4 * 240 * 160);
-#else
-    pix = (uint8_t*)calloc(1, 4 * 241 * 162);
-#endif
     if (pix == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "PIX");

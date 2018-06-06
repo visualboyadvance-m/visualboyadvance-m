@@ -1,11 +1,7 @@
 #ifndef CHEATS_H
 #define CHEATS_H
 
-#ifndef __LIBRETRO__
 #include "../common/ConfigManager.h"
-#else
-#include "../src/libretro/UtilRetro.h"
-#endif
 
 struct CheatsData {
     int code;

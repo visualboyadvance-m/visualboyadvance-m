@@ -17,6 +17,7 @@
 
 #include "SoundRetro.h"
 #include "libretro.h"
+
 unsigned g_audio_frames;
 extern retro_audio_sample_batch_t audio_batch_cb;
 

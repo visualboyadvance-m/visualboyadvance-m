@@ -10,11 +10,7 @@
 #include "../NLS.h"
 #include "../System.h"
 #include "../Util.h"
-#ifndef __LIBRETRO__
 #include "../common/ConfigManager.h"
-#else
-#include "../src/libretro/UtilRetro.h"
-#endif
 #include "Cheats.h"
 #include "EEprom.h"
 #include "Flash.h"
@@ -887,7 +883,7 @@ DEFINE_IMM5_INSN(IMM5_ASR, 10)
     static INSN_REGPARM void thumb##BASE##_6(uint32_t opcode) { THREEARG_INSN(OP, 6); } \
     static INSN_REGPARM void thumb##BASE##_7(uint32_t opcode) { THREEARG_INSN(OP, 7); }
 
-#define DEFINE_IMM3_INSN(OP, BASE)                                                          \ 
+#define DEFINE_IMM3_INSN(OP, BASE)                                                          \
     static INSN_REGPARM void thumb##BASE##_0(uint32_t opcode) { THREEARG_INSN(OP##_0, 0); } \
     static INSN_REGPARM void thumb##BASE##_1(uint32_t opcode) { THREEARG_INSN(OP, 1); }     \
     static INSN_REGPARM void thumb##BASE##_2(uint32_t opcode) { THREEARG_INSN(OP, 2); }     \

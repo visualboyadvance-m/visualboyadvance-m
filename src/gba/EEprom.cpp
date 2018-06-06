@@ -72,7 +72,9 @@ void eepromReadGame(const uint8_t*& data, int version)
         eepromSize = 512;
     }
 }
-#else
+
+#else // !__LIBRETRO__
+
 void eepromSaveGame(gzFile gzFile)
 {
     utilWriteData(gzFile, eepromSaveData);

@@ -82,7 +82,8 @@ void flashReadGame(const uint8_t*& data, int)
 {
     utilReadDataMem(data, flashSaveData3);
 }
-#else
+
+#else // !__LIBRETRO__
 void flashSaveGame(gzFile gzFile)
 {
     utilWriteData(gzFile, flashSaveData3);
