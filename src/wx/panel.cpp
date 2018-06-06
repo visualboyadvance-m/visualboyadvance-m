@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <cmath>
 #include <cstring>
 #include <wx/dcbuffer.h>
@@ -1792,10 +1793,8 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                 int linelen = std::ceil(width * scale - 20) / 8;
                 int nlines = (message.size() + linelen - 1) / linelen;
                 int cury = height - 14 - nlines * 10;
-                const char* msg_data = message.mb_str();
-                char buf[message.size() + 1];
-                char* ptr = &buf[0];
-                std::strncpy(ptr, msg_data, message.size() + 1);
+                char* buf = strdup(message.mb_str());
+                char* ptr = buf;
 
                 while (nlines > 1) {
                     char lchar = ptr[linelen];
@@ -1812,6 +1811,8 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                 drawText(todraw + outstride * (systemColorDepth != 24),
                     outstride, 10, cury, ptr,
                     showSpeedTransparent);
+
+                free(buf);
             } else
                 panel->osdtext.clear();
         }
