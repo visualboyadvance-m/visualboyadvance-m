@@ -2228,8 +2228,8 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 #if defined(__WXMSW__) && !defined(NO_D3D)
 #define DIRECT3D_VERSION 0x0900
 #include <d3d9.h> // main include file
-#include <d3dx9core.h> // required for font rendering
-#include <dxerr9.h> // contains debug functions
+//#include <d3dx9core.h> // required for font rendering
+//#include <dxerr9.h> // contains debug functions
 
 DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanel(parent, _width, _height)
