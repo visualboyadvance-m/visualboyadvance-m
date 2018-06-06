@@ -2464,14 +2464,14 @@ void cheatsAddCBACode(const char* code, const char* desc)
     sscanf(buffer, "%x", &value);
 
     uint8_t array[8] = {
-        static_cast<uint8_t>(address & 255,
-        (address >> 8) & 255,
-        (address >> 16) & 255,
-        (address >> 24) & 255,
-        (value & 255),
-        (value >> 8) & 255,
+        (uint8_t)(address & 255),
+        (uint8_t)((address >> 8) & 255),
+        (uint8_t)((address >> 16) & 255),
+        (uint8_t)((address >> 24) & 255),
+        (uint8_t)(value & 255),
+        (uint8_t)((value >> 8) & 255),
         0,
-        0)
+        0
     };
 
     if (cheatsCBAGetCount() == 0 && (address >> 28) == 9) {
