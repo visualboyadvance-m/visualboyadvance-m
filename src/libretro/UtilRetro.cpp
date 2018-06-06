@@ -6,6 +6,7 @@
 #include "System.h"
 #include "Util.h"
 #include "common/Port.h"
+#include "common/ConfigManager.h"
 #include "gba/Flash.h"
 #include "gba/GBA.h"
 #include "gba/Globals.h"
@@ -14,43 +15,51 @@
 #include "gb/gbGlobals.h"
 #include "gba/gbafilter.h"
 
-#include "UtilRetro.h"
-
 #ifndef _MSC_VER
 #include <strings.h>
 #define _stricmp strcasecmp
 #endif // ! _MSC_VER
+
+// Because Configmanager was introduced, this has to be done.
+int  rtcEnabled          = 0;
+int  cpuDisableSfx       = 0;
+int  skipBios            = 0;
+int  saveType            = 0;
+int  cpuSaveType         = 0;
+int  skipSaveGameBattery = 0;
+int  skipSaveGameCheats  = 0;
+int  useBios             = 0;
+int  cheatsEnabled       = 1;
+int  layerSettings       = 0xff00;
+int  layerEnable         = 0xff00;
+bool speedup             = false;
+bool parseDebug          = false;
+bool speedHack           = false;
+bool mirroringEnable     = false;
+bool cpuIsMultiBoot      = false;
+
+const char* loadDotCodeFile;
+const char* saveDotCodeFile;
 
 extern int systemColorDepth;
 extern int systemRedShift;
 extern int systemGreenShift;
 extern int systemBlueShift;
 
-// Because Configmanager was introduced, this has to be done.
-
-const char* loadDotCodeFile;
-const char* saveDotCodeFile;
-
-int cheatsEnabled = true;
-int saveType = 0;
-int skipBios = 0;
-int rtcEnabled;
-int frameSkip = 1;
-bool speedup = false;
-bool cpuIsMultiBoot = false;
-int cpuDisableSfx = false;
-bool parseDebug = true;
-int layerSettings = 0xff00;
-int layerEnable = 0xff00;
-bool speedHack = false;
-int cpuSaveType = 0;
-int useBios = 0;
-bool mirroringEnable = true;
-bool skipSaveGameBattery = false;
-bool skipSaveGameCheats = false;
-
 extern uint16_t systemColorMap16[0x10000];
 extern uint32_t systemColorMap32[0x10000];
+
+const char gb_image_header[] =
+{
+   static_cast<const char>
+   (
+      0xce, 0xed, 0x66, 0x66, 0xcc, 0x0d, 0x00, 0x0b, 0x03, 0x73, 0x00,
+      0x83, 0x00, 0x0c, 0x00, 0x0d, 0x00, 0x08, 0x11, 0x1f, 0x88, 0x89,
+      0x00, 0x0e, 0xdc, 0xcc, 0x6e, 0xe6, 0xdd, 0xdd, 0xd9, 0x99, 0xbb,
+      0xbb, 0x67, 0x63, 0x6e, 0x0e, 0xec, 0xcc, 0xdd, 0xdc, 0x99, 0x9f,
+      0xbb, 0xb9, 0x33, 0x3e
+   )
+};
 
 bool utilWritePNGFile(const char* fileName, int w, int h, uint8_t* pix)
 {

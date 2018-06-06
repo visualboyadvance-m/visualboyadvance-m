@@ -16,22 +16,18 @@
 
 #define MAX_CHEATS 16384
 
-#ifndef __LIBRETRO__
 extern bool cpuIsMultiBoot;
 extern bool mirroringEnable;
 extern bool parseDebug;
 extern bool speedHack;
 extern bool speedup;
-#endif
 extern char *rewindMemory;
 extern const char *aviRecordDir;
 extern const char *biosFileNameGB;
 extern const char *biosFileNameGBA;
 extern const char *biosFileNameGBC;
-#ifndef __LIBRETRO__
 extern const char *loadDotCodeFile;
 extern const char *saveDotCodeFile;
-#endif
 extern const char *linkHostAddr;
 extern const char *movieRecordDir;
 extern const char *romDirGB;
@@ -50,11 +46,9 @@ extern int autoPatch;
 extern int autoSaveLoadCheatList;
 extern int aviRecording;
 extern int captureFormat;
-#ifndef __LIBRETRO__
 extern int cheatsEnabled;
 extern int cpuDisableSfx;
 extern int cpuSaveType;
-#endif
 extern int dinputKeyFocus;
 extern int disableMMX;
 extern int disableStatusMessages;
@@ -80,10 +74,8 @@ extern int glFilter;
 extern int ifbType;
 extern int joypadDefault;
 extern int languageOption;
-#ifndef __LIBRETRO__
 extern int layerEnable;
 extern int layerSettings;
-#endif
 extern int linkAuto;
 extern int linkHacks;
 extern int linkMode;
@@ -101,9 +93,7 @@ extern int optPrintUsage;
 extern int paused;
 extern int pauseWhenInactive;
 extern int recentFreeze;
-#ifndef __LIBRETRO__
 extern int renderedFrames;
-#endif
 extern int rewindCount;
 extern int rewindCounter;
 extern int rewindPos;
@@ -111,10 +101,8 @@ extern int rewindSaveNeeded;
 extern int rewindTimer;
 extern int rewindTopPos;
 // extern int romSize;
-#ifndef __LIBRETRO__
 extern int rtcEnabled;
 extern int saveType;
-#endif
 extern int screenMessage;
 extern int sensorX;
 extern int sensorY;
@@ -123,9 +111,7 @@ extern int showSpeed;
 extern int showSpeedTransparent;
 extern int sizeX;
 extern int sizeY;
-#ifndef __LIBRETRO__
 extern int skipBios;
-#endif
 extern int skipSaveGameBattery;
 extern int skipSaveGameCheats;
 extern int soundRecording;
@@ -135,9 +121,7 @@ extern int surfaceSizeX;
 extern int surfaceSizeY;
 extern int threadPriority;
 extern int tripleBuffering;
-#ifndef __LIBRETRO__
 extern int useBios;
-#endif
 extern int useBiosFileGB;
 extern int useBiosFileGBA;
 extern int useBiosFileGBC;

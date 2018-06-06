@@ -15,6 +15,7 @@
 #include "../apu/Gb_Apu.h"
 #include "../apu/Gb_Oscs.h"
 #include "../common/Port.h"
+#include "../common/ConfigManager.h"
 #include "../gba/Cheats.h"
 #include "../gba/EEprom.h"
 #include "../gba/Flash.h"
@@ -37,7 +38,7 @@ static retro_input_state_t input_cb;
 retro_audio_sample_batch_t audio_batch_cb;
 static retro_environment_t environ_cb;
 
-bool enableRtc;
+static bool enableRtc;
 static bool can_dupe;
 unsigned device_type = 0;
 int emulating = 0;
@@ -64,8 +65,8 @@ int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 int systemSpeed = 0;
 
-uint64_t startTime = 0;
-uint32_t renderedFrames = 0;
+//uint64_t startTime = 0;
+//uint32_t renderedFrames = 0;
 
 void (*dbgOutput)(const char* s, uint32_t addr);
 void (*dbgSignal)(int sig, int number);
@@ -466,6 +467,7 @@ static void gba_init(void)
     if (flashSize == 0x10000 || flashSize == 0x20000)
         flashSetSize(flashSize);
 
+    rtcEnabled = enableRtc;
     if (enableRtc)
         rtcEnable(enableRtc);
 
@@ -870,6 +872,7 @@ uint32_t systemReadJoypad(int which)
 bool systemReadJoypads() { return true; }
 
 void systemUpdateMotionSensor() {}
+
 uint8_t systemGetSensorDarkness() { return 0; }
 
 void systemCartridgeRumble(bool)
