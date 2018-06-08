@@ -600,9 +600,10 @@ EVT_DROP_FILES(MainFrame::OnDropFile)
 // keyboard game keys on mac, so we will disable it for now.
 //
 // On Winodws, there will still be a pause because of how the windows event
-// model works, that needs to be investigated.
+// model works, in addition the audio will loop with SDL, so we still pause on
+// Windows, TODO: this needs to be fixed properly
 //
-#if 0
+#ifndef __WXMSW__
 EVT_MENU_OPEN(MainFrame::MenuPopped)
 EVT_MENU_CLOSE(MainFrame::MenuPopped)
 EVT_MENU_HIGHLIGHT_ALL(MainFrame::MenuPopped)
