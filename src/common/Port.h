@@ -1,11 +1,7 @@
 #ifndef PORT_H
 #define PORT_H
 
-#ifndef __LIBRETRO__
-#include "cstdint.h"
-#else
-#include <stdint.h>
-#endif
+#include "Types.h"
 
 #ifdef __CELLOS_LV2__
 /* PlayStation3 */

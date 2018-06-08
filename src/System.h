@@ -1,12 +1,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#ifndef __LIBRETRO__
-#include <zlib.h>
-#include "common/cstdint.h"
-#else
-#include <stdint.h>
-#endif
+#include "common/Types.h"
 
 #define winlog log
 
