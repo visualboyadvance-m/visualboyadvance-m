@@ -603,7 +603,7 @@ EVT_DROP_FILES(MainFrame::OnDropFile)
 // model works, in addition the audio will loop with SDL, so we still pause on
 // Windows, TODO: this needs to be fixed properly
 //
-#ifndef __WXMSW__
+#ifdef __WXMSW__
 EVT_MENU_OPEN(MainFrame::MenuPopped)
 EVT_MENU_CLOSE(MainFrame::MenuPopped)
 EVT_MENU_HIGHLIGHT_ALL(MainFrame::MenuPopped)
