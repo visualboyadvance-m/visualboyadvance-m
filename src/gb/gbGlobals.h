@@ -1,7 +1,7 @@
 #ifndef GBGLOBALS_H
 #define GBGLOBALS_H
 
-#include "../common/cstdint.h"
+#include "../common/Types.h"
 
 extern int gbRomSizeMask;
 extern int gbRomSize;

@@ -1,3 +1,6 @@
+#ifndef CSTDINT_H
+#define CSTDINT_H
+
 #if defined(__has_include)
 #   if __has_include(<cstdint>)
 #       include <cstdint>
@@ -11,3 +14,5 @@
 #else
 #   include <cstdint>
 #endif
+
+#endif // CSTDINT_H

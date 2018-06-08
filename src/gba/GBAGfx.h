@@ -216,7 +216,7 @@ static inline void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t v
         }
     }
 }
-#endif
+#endif // !__TILED_RENDERING
 
 static inline void gfxDrawRotScreen(uint16_t control, uint16_t x_l, uint16_t x_h, uint16_t y_l, uint16_t y_h, uint16_t pa, uint16_t pb,
     uint16_t pc, uint16_t pd, int& currentX, int& currentY, int changed,

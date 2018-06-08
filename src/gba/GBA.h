@@ -1,12 +1,7 @@
 #ifndef GBA_H
 #define GBA_H
 
-#ifndef __LIBRETRO__
-#include "../common/cstdint.h"
-#else
-#include <stdint.h>
-#endif
-
+#include "../common/Types.h"
 #include "../System.h"
 
 const uint64_t TICKS_PER_SECOND = 16777216;

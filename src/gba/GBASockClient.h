@@ -1,10 +1,6 @@
 #pragma once
 
-#ifndef __LIBRETRO__
-#include "../common/cstdint.h"
-#else
-#include <stdint.h>
-#endif
+#include "../common/Types.h"
 
 #include <SFML/Network.hpp>
 
