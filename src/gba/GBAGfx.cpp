@@ -28,24 +28,57 @@ int gfxBG3Y = 0;
 int gfxLastVCOUNT = 0;
 
 #ifdef TILED_RENDERING
-union uint8_th {
-    struct
-    {
-        /* 0*/ unsigned lo : 4;
-        /* 4*/ unsigned hi : 4;
-    } __attribute__((packed));
-    uint8_t val;
+#ifdef _MSC_VER
+union uint8_th
+{
+   __pragma( pack(push, 1));
+   struct
+   {
+#ifdef MSB_FIRST
+      /* 4*/	unsigned char hi:4;
+      /* 0*/	unsigned char lo:4;
+#else
+      /* 0*/	unsigned char lo:4;
+      /* 4*/	unsigned char hi:4;
+#endif
+   }
+   __pragma(pack(pop));
+   uint8_t val;
 };
+#else // !_MSC_VER
+union uint8_th
+{
+   struct
+   {
+#ifdef MSB_FIRST
+      /* 4*/	unsigned char hi:4;
+      /* 0*/	unsigned char lo:4;
+#else
+      /* 0*/	unsigned char lo:4;
+      /* 4*/	unsigned char hi:4;
+#endif
+   } __attribute__ ((packed));
+   uint8_t val;
+};
+#endif
 
-union TileEntry {
-    struct
-    {
-        /* 0*/ unsigned tileNum : 10;
-        /*12*/ unsigned hFlip : 1;
-        /*13*/ unsigned vFlip : 1;
-        /*14*/ unsigned palette : 4;
-    };
-    uint16_t val;
+union TileEntry
+{
+   struct
+   {
+#ifdef MSB_FIRST
+      /*14*/	unsigned palette:4;
+      /*13*/	unsigned vFlip:1;
+      /*12*/	unsigned hFlip:1;
+      /* 0*/	unsigned tileNum:10;
+#else
+      /* 0*/	unsigned tileNum:10;
+      /*12*/	unsigned hFlip:1;
+      /*13*/	unsigned vFlip:1;
+      /*14*/	unsigned palette:4;
+#endif
+   };
+   uint16_t val;
 };
 
 struct TileLine {
