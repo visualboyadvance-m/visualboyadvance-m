@@ -596,8 +596,13 @@ EVT_DROP_FILES(MainFrame::OnDropFile)
 
 // pause game if menu pops up
 //
-// this causes problems with keyboard game keys on mac, disable for now
-#ifndef __WXMAC__
+// This is a feature most people don't like, and it causes problems with
+// keyboard game keys on mac, so we will disable it for now.
+//
+// On Winodws, there will still be a pause because of how the windows event
+// model works, that needs to be investigated.
+//
+#if 0
 EVT_MENU_OPEN(MainFrame::MenuPopped)
 EVT_MENU_CLOSE(MainFrame::MenuPopped)
 EVT_MENU_HIGHLIGHT_ALL(MainFrame::MenuPopped)
