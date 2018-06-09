@@ -2326,6 +2326,7 @@ EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
 
     case IMAGE_GBA:
         soundSetSampleRate(!gopts.sound_qual ? 48000 : 44100 / (1 << (gopts.sound_qual - 1)));
+        soundFiltering = (float)gopts.gba_sound_filter / 100.0f;
         break;
     }
 
