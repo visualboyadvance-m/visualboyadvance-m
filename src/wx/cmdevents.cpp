@@ -2315,16 +2315,16 @@ EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
         return;
 
     switch (panel->game_type()) {
+    case IMAGE_UNKNOWN:
+        break;
+
     case IMAGE_GB:
         gb_effects_config.echo = (float)gopts.gb_echo / 100.0;
         gb_effects_config.stereo = (float)gopts.gb_stereo / 100.0;
-        // note that setting declick may reset gb sound engine
-        gbSoundSetDeclicking(gopts.gb_declick);
         gbSoundSetSampleRate(!gopts.sound_qual ? 48000 : 44100 / (1 << (gopts.sound_qual - 1)));
         break;
 
     case IMAGE_GBA:
-    case IMAGE_UNKNOWN:
         soundSetSampleRate(!gopts.sound_qual ? 48000 : 44100 / (1 << (gopts.sound_qual - 1)));
         break;
     }
@@ -2341,9 +2341,6 @@ EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
 
     soundSetVolume((float)gopts.sound_vol / 100.0);
     update_opts();
-
-    if (emulating)
-        soundReset();
 }
 
 EVT_HANDLER(EmulatorDirectories, "Directories...")
@@ -2504,18 +2501,22 @@ EVT_HANDLER(GBASoundInterpolation, "GBA sound interpolation")
 EVT_HANDLER(GBDeclicking, "GB sound declicking")
 {
     GetMenuOptionBool("GBDeclicking", gopts.gb_declick);
+    // note that setting declick may reset gb sound engine
+    gbSoundSetDeclicking(gopts.gb_declick);
     update_opts();
 }
 
 EVT_HANDLER(GBEnhanceSound, "Enable GB sound effects")
 {
     GetMenuOptionBool("GBEnhanceSound", gopts.gb_effects_config_enabled);
+    gb_effects_config.enabled = gopts.gb_effects_config_enabled;
     update_opts();
 }
 
 EVT_HANDLER(GBSurround, "GB surround sound effect (%)")
 {
     GetMenuOptionBool("GBSurround", gopts.gb_effects_config_surround);
+    gb_effects_config.surround = gopts.gb_effects_config_surround;
     update_opts();
 }
 

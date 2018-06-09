@@ -161,6 +161,8 @@ void GameArea::LoadGame(const wxString& name)
         }
 
         // start sound; this must happen before CPU stuff
+        gb_effects_config.enabled = gopts.gb_effects_config_enabled;
+        gb_effects_config.surround = gopts.gb_effects_config_surround;
         gb_effects_config.echo = (float)gopts.gb_echo / 100.0;
         gb_effects_config.stereo = (float)gopts.gb_stereo / 100.0;
         gbSoundSetDeclicking(gopts.gb_declick);
