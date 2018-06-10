@@ -2237,17 +2237,18 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanel(parent, _width, _height)
 {
     // FIXME: implement
+
+}
+
+void DXDrawingPanel::DrawArea(wxWindowDC& dc)
+{
+    // FIXME: implement
     if (!did_init) {
       DrawingPanelInit();
     }
 
     if (todraw) {
     }
-}
-
-void DXDrawingPanel::DrawArea(wxWindowDC& dc)
-{
-    // FIXME: implement
 }
 #endif
 
