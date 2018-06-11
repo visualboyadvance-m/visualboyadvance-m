@@ -65,9 +65,6 @@ int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 int systemSpeed = 0;
 
-//uint64_t startTime = 0;
-//uint32_t renderedFrames = 0;
-
 void (*dbgOutput)(const char* s, uint32_t addr);
 void (*dbgSignal)(int sig, int number);
 
@@ -75,10 +72,10 @@ void* retro_get_memory_data(unsigned id)
 {
     if (id == RETRO_MEMORY_SAVE_RAM)
         return libretro_save_buf;
-   if (id == RETRO_MEMORY_SYSTEM_RAM)
-      return workRAM;
-   if (id == RETRO_MEMORY_VIDEO_RAM)
-      return vram;
+    if (id == RETRO_MEMORY_SYSTEM_RAM)
+        return workRAM;
+    if (id == RETRO_MEMORY_VIDEO_RAM)
+        return vram;
 
     return NULL;
 }
@@ -87,10 +84,10 @@ size_t retro_get_memory_size(unsigned id)
 {
     if (id == RETRO_MEMORY_SAVE_RAM)
         return libretro_save_size;
-   if (id == RETRO_MEMORY_SYSTEM_RAM)
-      return 0x40000;
-   if (id == RETRO_MEMORY_VIDEO_RAM)
-      return 0x20000;
+    if (id == RETRO_MEMORY_SYSTEM_RAM)
+        return 0x40000;
+    if (id == RETRO_MEMORY_VIDEO_RAM)
+        return 0x20000;
 
     return 0;
 }
@@ -164,6 +161,8 @@ void retro_set_input_state(retro_input_state_t cb)
 
 void retro_set_controller_port_device(unsigned port, unsigned device)
 {
+    if (port > 0) return; // GBA Only supports 1 controller
+
     log_cb(RETRO_LOG_INFO, "Controller %d'\n", device);
     switch (device) {
 
@@ -189,6 +188,7 @@ void retro_set_environment(retro_environment_t cb)
    environ_cb = cb;
 
    struct retro_variable variables[] = {
+      { "vbam_solarsensor", "Solar Sensor Level; 0|1|2|3|4|5|6|7|8|9|10" },
       { "vbam_usebios", "Use BIOS file (Restart); disabled|enabled" },
       { "vbam_layer_1", "Show layer 1; enabled|disabled" },
       { "vbam_layer_2", "Show layer 2; enabled|disabled" },
@@ -205,11 +205,10 @@ void retro_set_environment(retro_environment_t cb)
       { "GBA Joypad", RETRO_DEVICE_GBA },
       { "Alt Joypad YB", RETRO_DEVICE_GBA_ALT1 },
       { "Alt Joypad AB", RETRO_DEVICE_GBA_ALT2 },
+      { NULL, 0 },
    };
 
    static const struct retro_controller_info ports[] = {{ port_1, 3 },{ NULL,0 }};
-
-
 
    cb(RETRO_ENVIRONMENT_SET_VARIABLES, variables);
    cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void*)ports);
@@ -543,7 +542,11 @@ static const unsigned binds2[] = {
     RETRO_DEVICE_ID_JOYPAD_L
 };
 
+static void systemUpdateSolarSensor(int level);
+
 static unsigned has_frame;
+static uint8_t sensorDarkness = 0xE8;
+static uint8_t sensorDarknessLevel = 0; // so we can adjust sensor from gamepad
 
 static void update_variables(void)
 {
@@ -575,6 +578,15 @@ static void update_variables(void)
       bool newval = (strcmp(var.value, "enabled") == 0);
       usebios = newval;
    }
+
+   var.key = "vbam_solarsensor";
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+        sensorDarknessLevel = atoi(var.value);
+        systemUpdateSolarSensor(sensorDarknessLevel);
+   }
 }
 
 #ifdef FINAL_VERSION
@@ -586,10 +598,36 @@ static void update_variables(void)
 void retro_run(void)
 {
     bool updated = false;
+    static bool buttonpressed = false;
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
         update_variables();
 
     poll_cb();
+
+    // Update solar sensor level by gamepad buttons, default L2/R2
+    if (buttonpressed)
+    {
+        buttonpressed = input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2) ||
+            input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2);
+    }
+    else
+    {
+        if (input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2))
+        {
+            sensorDarknessLevel++;
+            if (sensorDarknessLevel > 10)
+                sensorDarknessLevel = 10;
+            systemUpdateSolarSensor(sensorDarknessLevel);
+            buttonpressed = true;
+        }
+        else if (input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2))
+        {
+            if (sensorDarknessLevel)
+                sensorDarknessLevel--;
+            systemUpdateSolarSensor(sensorDarknessLevel);
+            buttonpressed = true;
+        }
+    } // end of solar sensor update
 
     has_frame = 0;
 
@@ -724,6 +762,8 @@ bool retro_load_game(const struct retro_game_info *game)
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "R" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,     "Solar Sensor (Darker)" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2,     "Solar Sensor (Lighter)" },
 
       { 0 },
    };
@@ -765,10 +805,11 @@ bool retro_load_game(const struct retro_game_info *game)
 }
 
 bool retro_load_game_special(
-  unsigned game_type,
-  const struct retro_game_info *info, size_t num_info
-)
-{ return false; }
+    unsigned game_type,
+    const struct retro_game_info *info, size_t num_info)
+{
+    return false;
+}
 
 extern unsigned g_audio_frames;
 static unsigned g_video_frames;
@@ -791,8 +832,15 @@ void systemOnWriteDataToSoundBuffer(const uint16_t* finalWave, int length)
 {
 }
 
-void systemOnSoundShutdown() {}
-bool systemCanChangeSoundQuality() { return true; }
+void systemOnSoundShutdown()
+{
+
+}
+
+bool systemCanChangeSoundQuality()
+{
+    return true;
+}
 
 #ifdef FRONTEND_SUPPORTS_RGB565
 #define BPP 2
@@ -869,11 +917,40 @@ uint32_t systemReadJoypad(int which)
     return J;
 }
 
-bool systemReadJoypads() { return true; }
+static void systemUpdateSolarSensor(int v)
+{
+    int value = 0;
+    switch (v)
+    {
+    case 1:  value = 0x06; break;
+    case 2:  value = 0x0E; break;
+    case 3:  value = 0x18; break;
+    case 4:  value = 0x20; break;
+    case 5:  value = 0x28; break;
+    case 6:  value = 0x38; break;
+    case 7:  value = 0x48; break;
+    case 8:  value = 0x60; break;
+    case 9:  value = 0x78; break;
+    case 10: value = 0x98; break;
+    default: break;
+    }
 
-void systemUpdateMotionSensor() {}
+    sensorDarkness = 0xE8 - value;
+}
 
-uint8_t systemGetSensorDarkness() { return 0; }
+bool systemReadJoypads()
+{
+    return true;
+}
+
+void systemUpdateMotionSensor()
+{
+}
+
+uint8_t systemGetSensorDarkness()
+{
+    return sensorDarkness;
+}
 
 void systemCartridgeRumble(bool)
 {
@@ -900,6 +977,5 @@ uint32_t systemGetClock()
 SoundDriver* systemSoundInit()
 {
     soundShutdown();
-
     return new SoundRetro();
 }
