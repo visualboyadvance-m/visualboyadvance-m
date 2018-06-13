@@ -475,10 +475,7 @@ static void gba_init(void)
     soundInit();
     soundSetSampleRate(32000);
 
-    if (usebios && biosfile[0])
-        CPUInit(biosfile, true);
-    else
-        CPUInit(0, false);
+    CPUInit(biosfile, usebios);
 
     CPUReset();
 
@@ -654,6 +651,7 @@ bool retro_unserialize(const void* data, size_t size)
 
 void retro_cheat_reset(void)
 {
+    cheatsEnabled = 1;
     cheatsDeleteAll(false);
 }
 
