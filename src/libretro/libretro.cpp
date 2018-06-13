@@ -914,6 +914,12 @@ uint32_t systemReadJoypad(int which)
             J |= input_cb(which, RETRO_DEVICE_JOYPAD, 0, binds[i]) << i;
     }
 
+    // Do not allow opposing directions
+    if ((J & 0x30) == 0x30)
+        J &= ~(0x30);
+    else if ((J & 0xC0) == 0xC0)
+        J &= ~(0xC0);
+
     return J;
 }
 
