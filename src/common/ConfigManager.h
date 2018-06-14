@@ -145,7 +145,7 @@ extern const char *preparedCheatCodes[MAX_CHEATS];
 // allow up to 100 IPS/UPS/PPF patches given on commandline
 #define PATCH_MAX_NUM 100
 extern int patchNum;
-extern char *(patchNames[PATCH_MAX_NUM]); // and so on
+extern char *patchNames[PATCH_MAX_NUM]; // and so on
 
 extern int mouseCounter;
 
