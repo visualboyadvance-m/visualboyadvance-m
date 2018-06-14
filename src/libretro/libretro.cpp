@@ -41,8 +41,10 @@ static retro_input_state_t input_cb;
 retro_audio_sample_batch_t audio_batch_cb;
 static retro_environment_t environ_cb;
 
-static bool enableRtc;
-static bool can_dupe;
+static float sndFiltering = 0.5f;
+static bool sndInterpolation = true;
+static bool enableRtc = false;
+static bool can_dupe = false;
 int emulating = 0;
 static unsigned controller_layout = 0;
 
@@ -192,6 +194,8 @@ void retro_set_environment(retro_environment_t cb)
    struct retro_variable variables[] = {
       { "vbam_solarsensor", "Solar Sensor Level; 0|1|2|3|4|5|6|7|8|9|10" },
       { "vbam_usebios", "Use BIOS file (Restart); disabled|enabled" },
+      { "vbam_soundinterpolation", "Sound Interpolation; disabled|enabled" },
+      { "vbam_soundfiltering", "Sound Filtering; 5|6|7|8|9|10|0|1|2|3|4" },
       { "vbam_layer_1", "Show layer 1; enabled|disabled" },
       { "vbam_layer_2", "Show layer 2; enabled|disabled" },
       { "vbam_layer_3", "Show layer 3; enabled|disabled" },
@@ -497,6 +501,12 @@ static void gba_init(void)
     emulating = 1;
 }
 
+static void gba_soundchanged(void)
+{
+    soundInterpolation = sndInterpolation;
+    soundFiltering     = sndFiltering;
+}
+
 void retro_deinit(void)
 {
     emulating = 0;
@@ -557,6 +567,7 @@ static uint8_t sensorDarknessLevel = 0; // so we can adjust sensor from gamepad
 
 static void update_variables(void)
 {
+    bool sound_changed = false;
     char key[256];
     struct retro_variable var;
     var.key = key;
@@ -591,6 +602,36 @@ static void update_variables(void)
 
     if (soundGetEnable() != sound_enabled)
         soundSetEnable(sound_enabled & 0x30F);
+
+    var.key = "vbam_soundinterpolation";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        bool newval = (strcmp(var.value, "enabled") == 0);
+        if (sndInterpolation != newval)
+        {
+            sndInterpolation = newval;
+            sound_changed = true;
+        }
+    }
+
+    var.key = "vbam_soundfiltering";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        float newval = atof(var.value) * 0.1f;
+        if (sndFiltering != newval)
+        {
+            sndFiltering = newval;
+            sound_changed = true;
+        }
+    }
+
+    if (sound_changed)
+        //Update interpolation and filtering values
+        gba_soundchanged();
 
     var.key = "vbam_usebios";
     var.value = NULL;
