@@ -482,7 +482,7 @@ void BIOS_EReader_ScanCard(int swi_num)
                 }
                 dotcodepointer++;
 
-                if ((dotcodepointer == dotcodeinterleave)) {
+                if (dotcodepointer == dotcodeinterleave) {
                     switch (dotcodeinterleave) {
                     case 0x1C:
                         j = 0x724;
