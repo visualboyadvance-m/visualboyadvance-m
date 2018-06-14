@@ -29,6 +29,9 @@
 #define RETRO_DEVICE_GBA_ALT1        RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 1)
 #define RETRO_DEVICE_GBA_ALT2        RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 2)
 
+#define SAMPLERATE                   32768
+#define FRAMERATE                    (16777216.0 / 280896.0)
+
 #define ISHEXDEC ((codeLine[cursor]>='0') && (codeLine[cursor]<='9')) || ((codeLine[cursor]>='a') && (codeLine[cursor]<='f')) || ((codeLine[cursor]>='A') && (codeLine[cursor]<='F'))
 
 static retro_log_printf_t log_cb;
@@ -197,6 +200,12 @@ void retro_set_environment(retro_environment_t cb)
       { "vbam_layer_6", "Show window layer 1; enabled|disabled" },
       { "vbam_layer_7", "Show window layer 2; enabled|disabled" },
       { "vbam_layer_8", "Show sprite window layer; enabled|disabled" },
+      { "vbam_sound_1", "Sound channel 1; enabled|disabled" },
+      { "vbam_sound_2", "Sound channel 2; enabled|disabled" },
+      { "vbam_sound_3", "Sound channel 3; enabled|disabled" },
+      { "vbam_sound_4", "Sound channel 4; enabled|disabled" },
+      { "vbam_sound_5", "Direct Sound A; enabled|disabled" },
+      { "vbam_sound_6", "Direct Sound B; enabled|disabled" },
       { NULL, NULL },
    };
 
@@ -228,13 +237,13 @@ void retro_get_system_info(struct retro_system_info *info)
 
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
-   info->geometry.base_width = 240;
-   info->geometry.base_height = 160;
-   info->geometry.max_width = 240;
-   info->geometry.max_height = 160;
+   info->geometry.base_width   = 240;
+   info->geometry.base_height  = 160;
+   info->geometry.max_width    = 240;
+   info->geometry.max_height   = 160;
    info->geometry.aspect_ratio = 3.0 / 2.0;
-   info->timing.fps =  16777216.0 / 280896.0;
-   info->timing.sample_rate = 32000.0;
+   info->timing.fps            = (double)FRAMERATE;
+   info->timing.sample_rate    = (double)SAMPLERATE;
 }
 
 void retro_init(void)
@@ -548,43 +557,58 @@ static uint8_t sensorDarknessLevel = 0; // so we can adjust sensor from gamepad
 
 static void update_variables(void)
 {
-   char key[256];
-   struct retro_variable var;
-   var.key=key;
+    char key[256];
+    struct retro_variable var;
+    var.key = key;
 
-   int disabled_layers=0;
+    int disabled_layers=0;
 
-   strcpy(key, "vbam_layer_x");
-   for (int i=0;i<8;i++)
-   {
-      key[strlen("vbam_layer_")]='1'+i;
-      var.value=NULL;
-      if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0]=='d')
-      {
-         disabled_layers|=0x100<<i;
-      }
-   }
-   layerSettings = 0xFF00 ^ disabled_layers;
-   layerEnable = DISPCNT & layerSettings;
-   CPUUpdateRenderBuffers(false);
+    strcpy(key, "vbam_layer_x");
+    for (int i = 0; i < 8; i++)
+    {
+        key[strlen("vbam_layer_")] = '1' + i;
+        var.value = NULL;
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd')
+            disabled_layers |= 0x100 << i;
+    }
 
-   var.key = "vbam_usebios";
-   var.value = NULL;
+    layerSettings = 0xFF00 ^ disabled_layers;
+    layerEnable = DISPCNT & layerSettings;
+    CPUUpdateRenderBuffers(false);
 
-   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-   {
-      bool newval = (strcmp(var.value, "enabled") == 0);
-      usebios = newval;
-   }
+    unsigned sound_enabled = 0x30F;
+    strcpy(key, "vbam_sound_x");
+    for (unsigned i = 0; i < 6; i++)
+    {
+        key[strlen("vbam_sound_")] = '1' + i;
+        var.value = NULL;
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd')
+        {
+            unsigned which = (i < 4) ? (1 << i) : (0x100 << (i - 4));
+            sound_enabled &= ~(which);
+        }
+    }
 
-   var.key = "vbam_solarsensor";
-   var.value = NULL;
+    if (soundGetEnable() != sound_enabled)
+        soundSetEnable(sound_enabled & 0x30F);
 
-   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-   {
+    var.key = "vbam_usebios";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        bool newval = (strcmp(var.value, "enabled") == 0);
+        usebios = newval;
+    }
+
+    var.key = "vbam_solarsensor";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
         sensorDarknessLevel = atoi(var.value);
         systemUpdateSolarSensor(sensorDarknessLevel);
-   }
+    }
 }
 
 #ifdef FINAL_VERSION
