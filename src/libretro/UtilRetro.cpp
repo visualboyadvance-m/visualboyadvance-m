@@ -137,7 +137,7 @@ static bool utilIsImage(const char* file)
 
 IMAGE_TYPE utilFindType(const char* file)
 {
-    char buffer[2048];
+    //char buffer[2048];
     if (!utilIsImage(file)) // TODO: utilIsArchive() instead?
     {
         return IMAGE_UNKNOWN;
@@ -156,7 +156,7 @@ static int utilGetSize(int size)
 uint8_t *utilLoad(const char *file, bool (*accept)(const char *), uint8_t *data, int &size)
 {
 	FILE *fp = NULL;
-	char *buf = NULL;
+	//char *buf = NULL;
 
 	fp = fopen(file,"rb");
 	if(!fp) return NULL;

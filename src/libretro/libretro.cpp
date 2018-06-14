@@ -587,7 +587,7 @@ static void update_variables(void)
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 
-    unsigned sound_enabled = 0x30F;
+    int sound_enabled = 0x30F;
     strcpy(key, "vbam_sound_x");
     for (unsigned i = 0; i < 6; i++)
     {

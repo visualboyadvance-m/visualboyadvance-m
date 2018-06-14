@@ -57,9 +57,9 @@ class Gb_Env : public Gb_Osc
         Gb_Env() : env_enabled(false), env_delay(0)
         {
         }
+        bool env_enabled;
         int env_delay;
         int volume;
-        bool env_enabled;
 
         void clock_envelope();
         bool write_register(int frame_phase, int reg, int old_data, int data);
