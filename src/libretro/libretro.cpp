@@ -486,7 +486,7 @@ static void gba_init(void)
     doMirroring(mirroringEnable);
 
     soundInit();
-    soundSetSampleRate(32000);
+    soundSetSampleRate(SAMPLERATE);
 
     CPUInit(biosfile, usebios);
 
