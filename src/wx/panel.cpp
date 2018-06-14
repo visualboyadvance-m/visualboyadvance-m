@@ -269,7 +269,7 @@ void GameArea::LoadGame(const wxString& name)
             else
                 saveType = cpuSaveType;
 
-            mirroringEnable = true;
+            mirroringEnable = false;
         }
 
         doMirroring(mirroringEnable);
