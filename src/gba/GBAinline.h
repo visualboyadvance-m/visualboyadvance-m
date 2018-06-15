@@ -131,11 +131,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
     case 14:
     case 15:
         if (cpuFlashEnabled | cpuSramEnabled) { // no need to swap this
-#ifdef __libretro__
-            return flashRead(address);
-#else
             value = flashRead(address) * 0x01010101;
-#endif
         }
         break;
     // default
@@ -287,14 +283,9 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
         goto unreadable;
     case 14:
     case 15:
-        if (cpuFlashEnabled | cpuSramEnabled)
-        // no need to swap this
-        {
-#ifdef __libretro__
-            return flashRead(address);
-#else
+        if (cpuFlashEnabled | cpuSramEnabled) {
+            // no need to swap this
             value = flashRead(address) * 0x0101;
-#endif
         }
     // default
     default:
