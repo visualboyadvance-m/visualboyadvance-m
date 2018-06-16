@@ -1042,3 +1042,15 @@ SoundDriver* systemSoundInit()
     soundShutdown();
     return new SoundRetro();
 }
+
+void log(const char* defaultMsg, ...)
+{
+    va_list valist;
+    char buf[2048];
+    va_start(valist, defaultMsg);
+    vsnprintf(buf, 2048, defaultMsg, valist);
+    va_end(valist);
+
+    if (log_cb)
+        log_cb(RETRO_LOG_INFO, "%s", buf);
+}
