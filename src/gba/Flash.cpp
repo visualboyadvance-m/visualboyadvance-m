@@ -164,13 +164,20 @@ void flashSaveDecide(uint32_t address, uint8_t byte)
     if (saveType == 1)
         return;
 
-    //  log("Deciding save type %08x\n", address);
-    if (address == 0x0e005555) {
-        saveType = 3;
-        cpuSaveGameFunc = flashWrite;
-    } else {
-        saveType = 2;
-        cpuSaveGameFunc = sramWrite;
+    if (cpuSramEnabled && cpuFlashEnabled) {
+        //  log("Deciding save type %08x\n", address);
+        if (address == 0x0e005555) {
+            saveType = 3;
+            cpuSramEnabled = false;
+            cpuSaveGameFunc = flashWrite;
+        } else {
+            saveType = 2;
+            cpuFlashEnabled = false;
+            cpuSaveGameFunc = sramWrite;
+        }
+
+        log("%s emulation is enabled by writing to:  $%08x : %02x\n",
+            cpuSramEnabled ? "SRAM" : "FLASH", address, byte);
     }
 
     (*cpuSaveGameFunc)(address, byte);

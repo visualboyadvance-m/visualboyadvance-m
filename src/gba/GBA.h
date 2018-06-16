@@ -67,6 +67,11 @@ extern uint8_t biosProtected[4];
 
 extern void (*cpuSaveGameFunc)(uint32_t, uint8_t);
 
+extern bool cpuSramEnabled;
+extern bool cpuFlashEnabled;
+extern bool cpuEEPROMEnabled;
+extern bool cpuEEPROMSensorEnabled;
+
 #ifdef BKPT_SUPPORT
 extern uint8_t freezeWorkRAM[0x40000];
 extern uint8_t freezeInternalRAM[0x8000];
