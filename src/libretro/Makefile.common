@@ -10,15 +10,10 @@ SOURCES_CXX := $(CORE_DIR)/gba/GBA-thumb.cpp \
 	$(CORE_DIR)/gba/Mode4.cpp \
 	$(CORE_DIR)/gba/Mode3.cpp \
 	$(CORE_DIR)/gba/Mode5.cpp \
-	$(CORE_DIR)/gba/GBALink.cpp \
 	$(CORE_DIR)/gba/Mode2.cpp \
-	$(CORE_DIR)/gba/GBASockClient.cpp \
-	$(CORE_DIR)/gba/elf.cpp \
 	$(CORE_DIR)/gba/ereader.cpp \
 	$(CORE_DIR)/gba/GBA-arm.cpp \
 	$(CORE_DIR)/gba/bios.cpp \
-	$(CORE_DIR)/gba/gbafilter.cpp \
-	$(CORE_DIR)/gba/remote.cpp \
 	$(CORE_DIR)/gba/Mode0.cpp \
 	$(CORE_DIR)/gba/Flash.cpp \
 	$(CORE_DIR)/gba/GBAGfx.cpp \
@@ -27,13 +22,11 @@ SOURCES_CXX := $(CORE_DIR)/gba/GBA-thumb.cpp \
 	$(CORE_DIR)/gba/EEprom.cpp \
 	$(CORE_DIR)/gba/RTC.cpp \
 	$(CORE_DIR)/gba/Sram.cpp \
-	$(CORE_DIR)/apu/Effects_Buffer.cpp \
 	$(CORE_DIR)/apu/Gb_Oscs.cpp \
 	$(CORE_DIR)/apu/Gb_Apu_State.cpp \
 	$(CORE_DIR)/apu/Blip_Buffer.cpp \
 	$(CORE_DIR)/apu/Multi_Buffer.cpp \
 	$(CORE_DIR)/apu/Gb_Apu.cpp \
-	$(CORE_DIR)/common/Patch.cpp \
 	$(CORE_DIR)/libretro/libretro.cpp \
 	$(CORE_DIR)/libretro/UtilRetro.cpp \
 	$(CORE_DIR)/libretro/SoundRetro.cpp \
