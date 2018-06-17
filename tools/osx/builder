@@ -1,17 +1,17 @@
-#!/bin/sh
+#!/usr/local/bin/bash
 
 set -e
 
-# bash 3 does not work for this code
-if [ -z "$IN_DASH" ]; then
-    if command -v dash >/dev/null; then
-        export IN_DASH=1
-        exec dash "$0" "$@"
-    else
-        echo >&2 "please install dash from homebrew or macports to run this script"
-        exit 1
-    fi
-fi
+## bash 3 does not work for this code
+#if [ -z "$IN_DASH" ]; then
+#    if command -v dash >/dev/null; then
+#        export IN_DASH=1
+#        exec dash "$0" "$@"
+#    else
+#        echo >&2 "please install dash from homebrew or macports to run this script"
+#        exit 1
+#    fi
+#fi
 
 BUILD_ROOT=$HOME/vbam-build-mac
 

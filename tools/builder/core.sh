@@ -20,6 +20,7 @@ export CXX="\${CXX:-g++}"
 
 case "\$CC" in
     ccache*)
+        :
         ;;
     *)
         if command -v ccache >/dev/null; then

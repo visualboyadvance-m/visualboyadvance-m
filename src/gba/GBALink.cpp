@@ -49,6 +49,12 @@ enum siocnt_lo_32bit {
     SIO_IRQ_ENABLE = 0x4000
 };
 
+#ifdef __clang__
+
+// don't define these min/max functions, they don't compile
+
+#else
+
 // The usual min/max functions for built-in types.
 //
 // template<typename T> T min( T x, T y ) { return x < y ? x : y; }
@@ -79,6 +85,8 @@ BLARGG_DEF_MIN_MAX(double)
 
 #undef max
 #define max blargg_max
+
+#endif // not clang
 
 // Joybus
 bool gba_joybus_enabled = false;
