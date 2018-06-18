@@ -72,12 +72,26 @@ endif()
 SET(wxWidgets_USE_UNICODE ON)
 # adv is for wxAboutBox
 # xml, html is for xrc
-SET(wxWidgets_USE_LIBS xrc xml html adv gl net core base gl)
+# do not include gl at first
+set(wxWidgets_USE_LIBS xrc xml html adv net core base gl)
 #list(APPEND wxWidgets_CONFIG_OPTIONS --version=2.8)
+
+# check for gtk4 then gtk3 packages first, some dists like arch rename the
+# wx-config utility for these packages
+set(wxWidgets_CONFIG_EXECUTABLE wx-config-gtk4)
+find_package(wxWidgets QUIET)
+if(NOT wxWidgets_FOUND)
+    set(wxWidgets_CONFIG_EXECUTABLE wx-config-gtk3)
+    find_package(wxWidgets QUIET)
+    if(NOT wxWidgets_FOUND)
+        unset(wxWidgets_CONFIG_EXECUTABLE)
+    endif()
+endif()
 
 # the gl lib may not be available, and if it looks like it is we still have to
 # do a compile test later
-FIND_PACKAGE(wxWidgets QUIET)
+list(APPEND wxWidgets_USE_LIBS gl)
+find_package(wxWidgets QUIET)
 normalize_wx_paths()
 
 SET(CHECK_WX_OPENGL FALSE)
