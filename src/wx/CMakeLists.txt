@@ -80,7 +80,7 @@ set(wxWidgets_USE_LIBS xrc xml html adv net core base)
 # wx-config utility for these packages to e.g. wx-config-gtk3
 #
 # Do not do the check if the WX_CONFIG env var is set.
-if(NOT $ENV{WX_CONFIG})
+if($ENV{WX_CONFIG} STREQUAL "")
     foreach(gtk_ver 4 3)
         set(wxWidgets_CONFIG_EXECUTABLE wx-config-gtk${gtk_ver})
         find_package(wxWidgets QUIET)
