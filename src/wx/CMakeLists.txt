@@ -76,18 +76,22 @@ SET(wxWidgets_USE_UNICODE ON)
 set(wxWidgets_USE_LIBS xrc xml html adv net core base)
 #list(APPEND wxWidgets_CONFIG_OPTIONS --version=2.8)
 
-# check for gtk4 then gtk3 packages first, some dists like arch rename the
-# wx-config utility for these packages
-foreach(gtk_ver 4 3)
-    set(wxWidgets_CONFIG_EXECUTABLE wx-config-gtk${gtk_ver})
-    find_package(wxWidgets QUIET)
-    if(wxWidgets_FOUND)
-        break()
-    endif()
-endforeach()
+# Check for gtk4 then gtk3 packages first, some dists like arch rename the
+# wx-config utility for these packages to e.g. wx-config-gtk3
+#
+# Do not do the check if the WX_CONFIG env var is set.
+if(NOT $ENV{WX_CONFIG})
+    foreach(gtk_ver 4 3)
+        set(wxWidgets_CONFIG_EXECUTABLE wx-config-gtk${gtk_ver})
+        find_package(wxWidgets QUIET)
+        if(wxWidgets_FOUND)
+            break()
+        endif()
+    endforeach()
 
-if(NOT wxWidgets_FOUND)
-    unset(wxWidgets_CONFIG_EXECUTABLE)
+    if(NOT wxWidgets_FOUND)
+        unset(wxWidgets_CONFIG_EXECUTABLE)
+    endif()
 endif()
 
 # the gl lib may not be available, and if it looks like it is we still have to
