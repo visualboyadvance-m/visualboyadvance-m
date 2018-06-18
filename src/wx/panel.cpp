@@ -1816,8 +1816,20 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
         }
     }
 
-    // next, draw the frame (queue a PaintEv)
+    // next, draw the frame (queue a PaintEv) Refresh must be used under
+    // Wayland or nothing is drawn, however it causes high CPU usage with GTK2,
+    // so use the old method in that case
+#ifdef __WXGTK3__
     GetWindow()->Refresh();
+#else
+    {
+        DrawingPanelBase* panel = wxGetApp().frame->GetPanel()->panel;
+        if (panel) {
+            wxClientDC dc(panel->GetWindow());
+            panel->DrawArea(dc);
+        }
+    }
+#endif
 
     // finally, draw on-screen text using wx method, if possible
     // this method flickers too much right now
