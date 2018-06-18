@@ -1819,7 +1819,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     // next, draw the frame (queue a PaintEv) Refresh must be used under
     // Wayland or nothing is drawn, however it causes high CPU usage with GTK2,
     // so use the old method in that case
-#ifdef __WXGTK3__
+#if !defined(__WXGTK__) || defined(__WXGTK3__)
     GetWindow()->Refresh();
 #else
     {
