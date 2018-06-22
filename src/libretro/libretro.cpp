@@ -43,7 +43,6 @@ static retro_environment_t environ_cb;
 
 static float sndFiltering = 0.5f;
 static bool sndInterpolation = true;
-static bool enableRtc = false;
 static bool can_dupe = false;
 int emulating = 0;
 static int retropad_layout = 0;
@@ -408,14 +407,31 @@ static const ini_t gbaover[256] = {
 			{"Zoku Bokura no Taiyou - Taiyou Shounen Django (Japan)",		"U32J",	0,	0,	1,	0,	0}
 };
 
+static int romSize = 0;
+
 static void load_image_preferences(void)
 {
+    const char *savetype[] = {
+        "AUTO",
+        "EEPROM",
+        "SRAM",
+        "FLASH",
+        "SENSOR+EEPROM",
+        "NONE"
+    };
+
     char buffer[5];
+
     buffer[0] = rom[0xac];
     buffer[1] = rom[0xad];
     buffer[2] = rom[0xae];
     buffer[3] = rom[0xaf];
     buffer[4] = 0;
+
+    cpuSaveType = 0;
+    flashSize = 0x8000;
+    rtcEnabled = false;
+    mirroringEnable = false;
 
     if (log_cb)
         log_cb(RETRO_LOG_INFO, "GameID in ROM is: %s\n", buffer);
@@ -435,33 +451,30 @@ static void load_image_preferences(void)
         if (log_cb)
             log_cb(RETRO_LOG_INFO, "Found ROM in vba-over list.\n");
 
-        enableRtc = gbaover[found_no].rtcEnabled;
+        rtcEnabled = gbaover[found_no].rtcEnabled;
 
         if (gbaover[found_no].flashSize != 0)
             flashSize = gbaover[found_no].flashSize;
-        else
-            flashSize = 65536;
 
         cpuSaveType = gbaover[found_no].saveType;
 
         mirroringEnable = gbaover[found_no].mirroringEnabled;
     }
 
+    if (!cpuSaveType/* && !found*/) {
+        utilGBAFindSave(romSize);
+    }
+
     if (log_cb) {
-        log_cb(RETRO_LOG_INFO, "RTC = %d.\n", enableRtc);
+        log_cb(RETRO_LOG_INFO, "RTC = %d.\n", rtcEnabled);
         log_cb(RETRO_LOG_INFO, "flashSize = %d.\n", flashSize);
-        log_cb(RETRO_LOG_INFO, "cpuSaveType = %d.\n", cpuSaveType);
+        log_cb(RETRO_LOG_INFO, "cpuSaveType = %s.\n", savetype[cpuSaveType]);
         log_cb(RETRO_LOG_INFO, "mirroringEnable = %d.\n", mirroringEnable);
     }
 }
 
 static void gba_init(void)
 {
-    cpuSaveType = 0;
-    flashSize = 0x10000;
-    enableRtc = false;
-    mirroringEnable = false;
-
 #ifdef FRONTEND_SUPPORTS_RGB565
     systemColorDepth = 16;
     systemRedShift = 11;
@@ -483,9 +496,8 @@ static void gba_init(void)
     if (flashSize == 0x10000 || flashSize == 0x20000)
         flashSetSize(flashSize);
 
-    rtcEnabled = enableRtc;
-    if (enableRtc)
-        rtcEnable(enableRtc);
+    rtcEnable(rtcEnabled);
+    rtcEnableRumble(!rtcEnabled);
 
     doMirroring(mirroringEnable);
 
@@ -495,8 +507,6 @@ static void gba_init(void)
     CPUInit(biosfile, usebios);
 
     CPUReset();
-
-    soundReset();
 
     uint8_t* state_buf = (uint8_t*)malloc(2000000);
     serialize_size = CPUWriteState(state_buf, 2000000);
@@ -887,7 +897,7 @@ bool retro_load_game(const struct retro_game_info *game)
    update_variables();
    update_input_descriptors();
 
-   int romSize = CPULoadRomData((const char*)game->data, game->size);
+   romSize = CPULoadRomData((const char*)game->data, game->size);
    if (!romSize)
       return false;
 
