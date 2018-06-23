@@ -30,6 +30,14 @@ Your distribution may have packages available as well, search for "vbam".
 
 It is also generally very easy to build from source, see below.
 
+## Note for Windows Users
+
+If you are having issues, try resetting your config file first.
+
+- open file explorer
+- in the location bar, type `%USERPROFILE%\AppData\Local` and press enter
+- delete the directory called `visualboyadvance-m`
+
 ## Building
 
 The basic formula to build vba-m is:
