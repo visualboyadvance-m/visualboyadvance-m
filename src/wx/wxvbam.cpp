@@ -896,7 +896,7 @@ void MainFrame::SetMenusOpened(bool state)
 // uses dialog_opened as a nesting counter
 int MainFrame::ShowModal(wxDialog* dlg)
 {
-    dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
+    dlg->SetWindowStyle(dlg->GetWindowStyle() | wxCAPTION | wxRESIZE_BORDER);
 
     if (gopts.keep_on_top)
         dlg->SetWindowStyle(dlg->GetWindowStyle() | wxSTAY_ON_TOP);
