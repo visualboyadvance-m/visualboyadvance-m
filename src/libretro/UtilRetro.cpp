@@ -186,7 +186,7 @@ void utilGBAFindSave(const int size)
 {
     bool rtcFound_ = false;
     int detectedSaveType = 0;
-    int flashSize_ = 0x8000;
+    int flashSize_ = 0x10000;
     uint32_t *p = (uint32_t *)&rom[0];
     uint32_t *end = (uint32_t *)(&rom[0] + size);
 
@@ -204,6 +204,7 @@ void utilGBAFindSave(const int size)
                 if (detectedSaveType == 0 || detectedSaveType == 1
                     || detectedSaveType == 4) {
                     detectedSaveType = 2;
+                    flashSize_ = 0x8000;
                 }
             }
         } else if (d == 0x53414C46) {

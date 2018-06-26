@@ -11,13 +11,7 @@ int eepromByte = 0;
 int eepromBits = 0;
 int eepromAddress = 0;
 
-#ifdef __LIBRETRO__
-// Workaround for broken-by-design GBA save semantics
-extern uint8_t libretro_save_buf[0x20000 + 0x2000];
-uint8_t* eepromData = libretro_save_buf + 0x20000;
-#else
 uint8_t eepromData[0x2000];
-#endif
 
 uint8_t eepromBuffer[16];
 bool eepromInUse = false;
@@ -36,11 +30,7 @@ variable_desc eepromSaveData[] = {
 
 void eepromInit()
 {
-#ifdef __LIBRETRO__
-    memset(eepromData, 255, 0x2000);
-#else
     memset(eepromData, 255, sizeof(eepromData));
-#endif
 }
 
 void eepromReset()
@@ -122,10 +112,9 @@ int eepromRead(uint32_t /* address */)
         return 0;
     }
     case EEPROM_READDATA2: {
-        int data = 0;
         int address = eepromAddress << 3;
         int mask = 1 << (7 - (eepromBits & 7));
-        data = (eepromData[address + eepromByte] & mask) ? 1 : 0;
+        int data = (eepromData[address + eepromByte] & mask) ? 1 : 0;
         eepromBits++;
         if ((eepromBits & 7) == 0)
             eepromByte++;
