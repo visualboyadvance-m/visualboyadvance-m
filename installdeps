@@ -311,7 +311,8 @@ debian_installdeps() {
             set -- "$@" "mxe-${target}-$dep"
         done
         check sudo apt-get -qq update
-        check sudo apt-get -qy install build-essential cmake "$@"
+        # native wx-common needed for wxrc executable
+        check sudo apt-get -qy install build-essential cmake wx-common "$@"
     fi
 
     build_instructions
