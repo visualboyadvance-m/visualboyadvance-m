@@ -15,7 +15,8 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 [![Join the chat at https://gitter.im/visualboyadvance-m/Lobby](https://badges.gitter.im/visualboyadvance-m/Lobby.svg)](https://gitter.im/visualboyadvance-m/Lobby)
-[![Build Status](https://tea-ci.org/api/badges/visualboyadvance-m/visualboyadvance-m/status.svg)](https://tea-ci.org/visualboyadvance-m/visualboyadvance-m)
+[![Build Status](https://travis-ci.org/visualboyadvance-m/visualboyadvance-m.svg?branch=master)](https://travis-ci.org/visualboyadvance-m/visualboyadvance-m)
+
 # Visual Boy Advance - M
 
 Game Boy Advance Emulator
