@@ -128,7 +128,7 @@ DISTS=$DISTS'
     libffi          ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz                                         lib/libffi.a
     c2man           http://www.ciselant.de/c2man/c2man-2.0@42.tar.gz                                            bin/c2man
     libxml2         ftp://xmlsoft.org/libxml2/libxml2-2.9.7.tar.gz                                              lib/libxml2.a
-    libxslt         https://git.gnome.org/browse/libxslt/snapshot/libxslt-1.1.32-rc1.tar.xz                     lib/libxslt.a
+    libxslt         https://github.com/GNOME/libxslt/archive/v1.1.33-rc1.tar.gz                                 lib/libxslt.a
     XML-NamespaceSupport https://cpan.metacpan.org/authors/id/P/PE/PERIGRIN/XML-NamespaceSupport-1.12.tar.gz    perl5/lib/perl5/XML/NamespaceSupport.pm
     XML-SAX-Base    https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-SAX-Base-1.09.tar.gz                   perl5/lib/perl5/XML/SAX/Base.pm
     XML-SAX         https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-SAX-0.99.tar.gz                        perl5/lib/perl5/XML/SAX.pm
@@ -142,7 +142,7 @@ DISTS=$DISTS'
     libgd           https://github.com/libgd/libgd/releases/download/gd-2.2.4/libgd-2.2.4.tar.xz                lib/libgd.a
     dejavu          https://downloads.sourceforge.net/project/dejavu/dejavu/2.37/dejavu-fonts-ttf-2.37.tar.bz2  share/fonts/dejavu/DejaVuSansMono.ttf
     liberation      https://releases.pagure.org/liberation-fonts/liberation-fonts-ttf-2.00.1.tar.gz             share/fonts/liberation/LiberationMono-Regular.ttf
-    urw             http://downloads.ghostscript.com/public/fonts/urw-base35-v1.10.zip                          share/fonts/urw/a010013l.pfm
+    urw             http://git.ghostscript.com/?p=urw-core35-fonts.git;a=snapshot;h=91edd6ece36e84a1c6d63a1cf63a1a6d84bd443a;sf=tgz share/fonts/urw/a010013l.pfm
     graphviz        https://gitlab.com/graphviz/graphviz/repository/archive.tar.bz2?ref=bd97cff688f7a7b85b6f1262e14eb1cac0862fcd    bin/dot_static
     docbook4.2      http://www.docbook.org/xml/4.2/docbook-xml-4.2.zip                                                    share/xml/docbook/schema/dtd/4.2/catalog.xml
     docbook4.1.2    http://www.docbook.org/xml/4.1.2/docbkx412.zip                                                        share/xml/docbook/schema/dtd/4.1.2/catalog.xml
