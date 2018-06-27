@@ -283,16 +283,16 @@ debian_installdeps() {
         case "$target" in
             mingw-w64-i686)
                 target='i686-w64-mingw32.static'
+                CMAKE="/usr/lib/mxe/usr/bin/i686-w64-mingw32.static-cmake"
                 ;;
             mingw-w64-x86_64)
                 target='x86-64-w64-mingw32.static'
+                CMAKE="/usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-cmake"
                 ;;
             *)
                 error "unknown cross target (you shouldn't see this)"
                 ;;
         esac
-
-        CMAKE="/usr/lib/mxe/usr/bin/${target}-cmake"
 
         mxe_apt_sources='/etc/apt/sources.list.d/mxeapt.list'
 
