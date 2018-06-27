@@ -1,10 +1,6 @@
 ---
 sudo: required
 
-cache:
-    directories:
-        - "$HOME/.ccache"
-
 matrix:
     fast_finish: true
     include:
@@ -20,6 +16,9 @@ matrix:
               - cmake ..
               - make -j2
 #              - ./visualboyadvance-m --help
+          cache:
+              directories:
+                  - "$HOME/.ccache"
         - env: BUILD_ENV=mingw-w64
           language: cpp
           os: linux
@@ -31,6 +30,9 @@ matrix:
               - cd build
               - /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-cmake ..
               - make -j2
+          cache:
+              directories:
+                  - "$HOME/.ccache"
         - env: BUILD_ENV=mingw-w32
           language: cpp
           os: linux
@@ -42,6 +44,9 @@ matrix:
               - cd build
               - /usr/lib/mxe/usr/bin/i686-w64-mingw32.static-cmake ..
               - make -j2
+          cache:
+              directories:
+                  - "$HOME/.ccache"
         - env: BUILD_ENV=mac
           language: cpp
           os: osx
@@ -53,3 +58,6 @@ matrix:
               - cmake ..
               - make -j2
 #              - ./visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m --help
+          cache:
+              directories:
+                  - "$HOME/.ccache"
