@@ -278,7 +278,7 @@ debian_installdeps() {
 
     if [ -z "$target" ]; then
         sudo apt-get -qq update
-        check sudo apt-get -qy install build-essential g++ nasm cmake gettext zlib1g-dev libgl1-mesa-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libpng-dev libsdl2-dev libsfml-dev libopenal-dev libwxgtk3.0-dev libgtk2.0-dev libgtk-3-dev
+        check sudo apt-get -qy install build-essential g++ nasm cmake gettext zlib1g-dev libgl1-mesa-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libpng-dev libsdl2-dev libsdl2-2.0 libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev libsfml-graphics2 libglew1.10 libsfml-window2 libsfml-network2 libopenal-dev libwxgtk3.0-dev libwxgtk3.0 libgtk2.0-dev libgtk-3-dev
     else
         case "$target" in
             mingw-w64-i686)
@@ -310,6 +310,7 @@ debian_installdeps() {
         for dep in gcc zlib ffmpeg gettext sdl2 sfml openal wxwidgets; do
             set -- "$@" "mxe-${target}-$dep"
         done
+        check sudo apt-get -qq update
         check sudo apt-get -qy install build-essential cmake "$@"
     fi
 
