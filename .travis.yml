@@ -47,6 +47,19 @@ matrix:
           cache:
               directories:
                   - "$HOME/.ccache"
+        - env: BUILD_ENV=libretro
+          language: cpp
+          os: linux
+          dist: trusty
+          before_install:
+              - sudo apt-get -qqy update
+              - sudo apt-get -qqy install build-essential ccache
+          script:
+              - cd src/libretro
+              - make -j2 CXX="ccache g++" CC="ccache gcc"
+          cache:
+              directories:
+                  - "$HOME/.ccache"
         - env: BUILD_ENV=mac
           language: cpp
           os: osx
