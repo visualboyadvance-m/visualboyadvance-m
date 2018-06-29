@@ -146,7 +146,7 @@ public:
         // what an unsafe calling convention
         // examination of disArm shows that max len is 69 chars
         // (e.g. 0x081cb6db), and I assume disThumb is shorter
-        char buf[80];
+        char buf[4096];
         dis->strings.clear();
         dis->addrs.clear();
         uint32_t addr = dis->topaddr;
@@ -157,9 +157,9 @@ public:
             dis->addrs.push_back(addr);
 
             if (arm)
-                addr += disArm(addr, buf, DIS_VIEW_CODE | DIS_VIEW_ADDRESS);
+                addr += disArm(addr, buf, 4096, DIS_VIEW_CODE | DIS_VIEW_ADDRESS);
             else
-                addr += disThumb(addr, buf, DIS_VIEW_CODE | DIS_VIEW_ADDRESS);
+                addr += disThumb(addr, buf, 4096, DIS_VIEW_CODE | DIS_VIEW_ADDRESS);
 
             dis->strings.push_back(wxString(buf, wxConvLibc));
         }

@@ -843,6 +843,9 @@ uint8_t* elfReadSection(uint8_t* data, ELFSectionHeader* sh)
 
 ELFSectionHeader* elfGetSectionByName(const char* name)
 {
+    if (elfSectionHeadersStringTable == NULL)
+        return NULL;
+
     for (int i = 0; i < elfSectionHeadersCount; i++) {
         if (strcmp(name,
                 &elfSectionHeadersStringTable[READ32LE(&elfSectionHeaders[i]->name)])
@@ -2538,7 +2541,7 @@ void elfReadSymtab(uint8_t* data)
     //  free(symtab);
 }
 
-bool elfReadProgram(ELFHeader* eh, uint8_t* data, int& size, bool parseDebug)
+bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& size, bool parseDebug)
 {
     int count = READ16LE(&eh->e_phnum);
     int i;
@@ -2559,31 +2562,53 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, int& size, bool parseDebug)
         //    printf("PH %d %08x %08x %08x %08x %08x %08x %08x %08x\n",
         //     i, ph->type, ph->offset, ph->vaddr, ph->paddr,
         //     ph->filesz, ph->memsz, ph->flags, ph->align);
+
+        unsigned address      = READ32LE(&ph->paddr);
+        unsigned offset       = READ32LE(&ph->offset);
+        unsigned section_size = READ32LE(&ph->filesz);
+
+        if (offset > data_size || section_size > data_size || offset + section_size > data_size)
+            continue;
+
+        uint8_t* source  = data + offset;
+
         if (cpuIsMultiBoot) {
-            if (READ32LE(&ph->paddr) >= 0x2000000 && READ32LE(&ph->paddr) <= 0x203ffff) {
-                memcpy(&workRAM[READ32LE(&ph->paddr) & 0x3ffff],
-                    data + READ32LE(&ph->offset),
-                    READ32LE(&ph->filesz));
-                size += READ32LE(&ph->filesz);
+            unsigned effective_address = address - 0x2000000;
+
+            if (effective_address + section_size < WORK_RAM_SIZE) {
+                memcpy(&workRAM[effective_address], source, section_size);
+                size += section_size;
             }
         } else {
-            if (READ32LE(&ph->paddr) >= 0x8000000 && READ32LE(&ph->paddr) <= 0x9ffffff) {
-                memcpy(&rom[READ32LE(&ph->paddr) & 0x1ffffff],
-                    data + READ32LE(&ph->offset),
-                    READ32LE(&ph->filesz));
-                size += READ32LE(&ph->filesz);
+            unsigned effective_address = address - 0x8000000;
+
+            if (effective_address + section_size < ROM_SIZE) {
+                memcpy(&rom[effective_address], source, section_size);
+                size += section_size;
             }
         }
     }
 
-    char* stringTable = NULL;
+    // these must be pre-declared or clang barfs on the goto statement
+    ELFSectionHeader** sh = NULL;
+    char* stringTable     = NULL;
 
-    // read section headers
+    // read section headers (if string table is good)
+    if (READ16LE(&eh->e_shstrndx) == 0)
+        goto end;
+
     p = data + READ32LE(&eh->e_shoff);
+
     count = READ16LE(&eh->e_shnum);
 
-    ELFSectionHeader** sh = (ELFSectionHeader**)
+    sh = (ELFSectionHeader**)
         malloc(sizeof(ELFSectionHeader*) * count);
+
+    stringTable = (char*)elfReadSection(data, sh[READ16LE(&eh->e_shstrndx)]);
+
+    elfSectionHeaders            = sh;
+    elfSectionHeadersStringTable = stringTable;
+    elfSectionHeadersCount       = count;
 
     for (i = 0; i < count; i++) {
         sh[i] = (ELFSectionHeader*)p;
@@ -2591,15 +2616,6 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, int& size, bool parseDebug)
         if (READ16LE(&eh->e_shentsize) != sizeof(ELFSectionHeader))
             p += READ16LE(&eh->e_shentsize) - sizeof(ELFSectionHeader);
     }
-
-    if (READ16LE(&eh->e_shstrndx) != 0) {
-        stringTable = (char*)elfReadSection(data,
-            sh[READ16LE(&eh->e_shstrndx)]);
-    }
-
-    elfSectionHeaders = sh;
-    elfSectionHeadersStringTable = stringTable;
-    elfSectionHeadersCount = count;
 
     for (i = 0; i < count; i++) {
         //    printf("SH %d %-20s %08x %08x %08x %08x %08x %08x %08x %08x\n",
@@ -2703,7 +2719,7 @@ extern bool parseDebug;
 bool elfRead(const char* name, int& siz, FILE* f)
 {
     fseek(f, 0, SEEK_END);
-    long size = ftell(f);
+    unsigned long size = ftell(f);
     elfFileData = (uint8_t*)malloc(size);
     fseek(f, 0, SEEK_SET);
     int res = fread(elfFileData, 1, size, f);
@@ -2724,7 +2740,7 @@ bool elfRead(const char* name, int& siz, FILE* f)
         return false;
     }
 
-    if (!elfReadProgram(header, elfFileData, siz, parseDebug)) {
+    if (!elfReadProgram(header, elfFileData, size, siz, parseDebug)) {
         free(elfFileData);
         elfFileData = NULL;
         return false;

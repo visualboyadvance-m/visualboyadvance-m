@@ -1355,7 +1355,7 @@ static void debuggerBreakChange(int n, char** args)
 
 static void debuggerDisassembleArm(FILE* f, uint32_t pc, int count)
 {
-    char buffer[80];
+    char buffer[4096];
     int i = 0;
     uint32_t len = 0;
     char format[30];
@@ -1367,14 +1367,14 @@ static void debuggerDisassembleArm(FILE* f, uint32_t pc, int count)
     sprintf(format, "%%08x %%-%ds %%s\n", len);
     for (i = 0; i < count; i++) {
         uint32_t addr = pc;
-        pc += disArm(pc, buffer, 2);
+        pc += disArm(pc, buffer, 4096, 2);
         fprintf(f, format, addr, elfGetAddressSymbol(addr), buffer);
     }
 }
 
 static void debuggerDisassembleThumb(FILE* f, uint32_t pc, int count)
 {
-    char buffer[80];
+    char buffer[4096];
     int i = 0;
     uint32_t len = 0;
     char format[30];
@@ -1387,7 +1387,7 @@ static void debuggerDisassembleThumb(FILE* f, uint32_t pc, int count)
 
     for (i = 0; i < count; i++) {
         uint32_t addr = pc;
-        pc += disThumb(pc, buffer, 2);
+        pc += disThumb(pc, buffer, 4096, 2);
         fprintf(f, format, addr, elfGetAddressSymbol(addr), buffer);
     }
 }

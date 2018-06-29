@@ -76,7 +76,7 @@ static profile_segment* profilSegment = NULL;
 #endif
 
 #ifdef BKPT_SUPPORT
-uint8_t freezeWorkRAM[0x40000];
+uint8_t freezeWorkRAM[WORK_RAM_SIZE];
 uint8_t freezeInternalRAM[0x8000];
 uint8_t freezeVRAM[0x18000];
 uint8_t freezePRAM[0x400];
@@ -459,7 +459,7 @@ variable_desc saveGameStruct[] = {
     { NULL, 0 }
 };
 
-static int romSize = 0x2000000;
+static int romSize = ROM_SIZE;
 
 #ifdef PROFILING
 void cpuProfil(profile_segment* seg)
@@ -596,7 +596,7 @@ unsigned int CPUWriteState(uint8_t* data, unsigned size)
 
     utilWriteMem(data, internalRAM, 0x8000);
     utilWriteMem(data, paletteRAM, 0x400);
-    utilWriteMem(data, workRAM, 0x40000);
+    utilWriteMem(data, workRAM, WORK_RAM_SIZE);
     utilWriteMem(data, vram, 0x20000);
     utilWriteMem(data, oam, 0x400);
     utilWriteMem(data, pix, 4 * 240 * 160);
@@ -646,7 +646,7 @@ bool CPUReadState(const uint8_t* data, unsigned size)
 
     utilReadMem(internalRAM, data, 0x8000);
     utilReadMem(paletteRAM, data, 0x400);
-    utilReadMem(workRAM, data, 0x40000);
+    utilReadMem(workRAM, data, WORK_RAM_SIZE);
     utilReadMem(vram, data, 0x20000);
     utilReadMem(oam, data, 0x400);
     utilReadMem(pix, data, 4 * 240 * 160);
@@ -710,7 +710,7 @@ static bool CPUWriteState(gzFile gzFile)
 
     utilGzWrite(gzFile, internalRAM, 0x8000);
     utilGzWrite(gzFile, paletteRAM, 0x400);
-    utilGzWrite(gzFile, workRAM, 0x40000);
+    utilGzWrite(gzFile, workRAM, WORK_RAM_SIZE);
     utilGzWrite(gzFile, vram, 0x20000);
     utilGzWrite(gzFile, oam, 0x400);
     utilGzWrite(gzFile, pix, 4 * 241 * 162);
@@ -824,7 +824,7 @@ static bool CPUReadState(gzFile gzFile)
 
     utilGzRead(gzFile, internalRAM, 0x8000);
     utilGzRead(gzFile, paletteRAM, 0x400);
-    utilGzRead(gzFile, workRAM, 0x40000);
+    utilGzRead(gzFile, workRAM, WORK_RAM_SIZE);
     utilGzRead(gzFile, vram, 0x20000);
     utilGzRead(gzFile, oam, 0x400);
     if (version < SAVE_GAME_VERSION_6)
@@ -1467,20 +1467,20 @@ void SetMapMasks()
 
 int CPULoadRom(const char* szFile)
 {
-    romSize = 0x2000000;
+    romSize = ROM_SIZE;
     if (rom != NULL) {
         CPUCleanUp();
     }
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    rom = (uint8_t*)malloc(0x2000000);
+    rom = (uint8_t*)malloc(romSize);
     if (rom == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "ROM");
         return 0;
     }
-    workRAM = (uint8_t*)calloc(1, 0x40000);
+    workRAM = (uint8_t*)calloc(1, WORK_RAM_SIZE);
     if (workRAM == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "WRAM");
@@ -1527,7 +1527,7 @@ int CPULoadRom(const char* szFile)
 
     uint16_t* temp = (uint16_t*)(rom + ((romSize + 1) & ~1));
     int i;
-    for (i = (romSize + 1) & ~1; i < 0x2000000; i += 2) {
+    for (i = (romSize + 1) & ~1; i < romSize; i += 2) {
         WRITE16LE(temp, (i >> 1) & 0xFFFF);
         temp++;
     }
@@ -1593,20 +1593,20 @@ int CPULoadRom(const char* szFile)
 
 int CPULoadRomData(const char* data, int size)
 {
-    romSize = 0x2000000;
+    romSize = ROM_SIZE;
     if (rom != NULL) {
         CPUCleanUp();
     }
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    rom = (uint8_t*)malloc(0x2000000);
+    rom = (uint8_t*)malloc(romSize);
     if (rom == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "ROM");
         return 0;
     }
-    workRAM = (uint8_t*)calloc(1, 0x40000);
+    workRAM = (uint8_t*)calloc(1, WORK_RAM_SIZE);
     if (workRAM == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "WRAM");
@@ -1620,7 +1620,7 @@ int CPULoadRomData(const char* data, int size)
 
     uint16_t* temp = (uint16_t*)(rom + ((romSize + 1) & ~1));
     int i;
-    for (i = (romSize + 1) & ~1; i < 0x2000000; i += 2) {
+    for (i = (romSize + 1) & ~1; i < romSize; i += 2) {
         WRITE16LE(temp, (i >> 1) & 0xFFFF);
         temp++;
     }

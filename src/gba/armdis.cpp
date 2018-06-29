@@ -2,6 +2,7 @@
 /* Arm/Thumb command set disassembler                                   */
 /************************************************************************/
 #include <stdio.h>
+#include <cstring>
 
 #include "../System.h"
 #include "../common/Port.h"
@@ -214,8 +215,13 @@ char* addHex(char* dest, int siz, uint32_t val)
     return dest;
 }
 
-int disArm(uint32_t offset, char* dest, int flags)
+int disArm(uint32_t offset, char* dest, unsigned dest_sz, int flags)
 {
+    if (dest_sz < 80) {
+        *dest = '\0';
+        return 4;
+    }
+
     uint32_t opcode = debuggerReadMemory(offset);
 
     const Opcodes* sp = armOpcodes;
@@ -523,8 +529,15 @@ int disArm(uint32_t offset, char* dest, int flags)
     return 4;
 }
 
-int disThumb(uint32_t offset, char* dest, int flags)
+int disThumb(uint32_t offset, char* dest, unsigned dest_sz, int flags)
 {
+    if (dest_sz < 80) {
+        *dest = '\0';
+        return 2;
+    }
+
+    char* end = dest + dest_sz;
+
     uint32_t opcode = debuggerReadHalfWord(offset);
 
     const Opcodes* sp = thumbOpcodes;
@@ -597,7 +610,7 @@ int disThumb(uint32_t offset, char* dest, int flags)
                 *dest++ = '$';
                 dest = addHex(dest, 32, value);
                 const char* s = elfGetAddressSymbol(value);
-                if (*s) {
+                if (*s && (dest + strlen(s) + 1) < end) {
                     *dest++ = ' ';
                     dest = addStr(dest, s);
                 }
@@ -607,7 +620,7 @@ int disThumb(uint32_t offset, char* dest, int flags)
                 *dest++ = '$';
                 dest = addHex(dest, 32, value);
                 const char* s = elfGetAddressSymbol(value);
-                if (*s) {
+                if (*s && (dest + strlen(s) + 1) < end) {
                     *dest++ = ' ';
                     dest = addStr(dest, s);
                 }
@@ -694,7 +707,7 @@ int disThumb(uint32_t offset, char* dest, int flags)
                 *dest++ = '$';
                 dest = addHex(dest, 32, offset + 4 + add);
                 const char* s = elfGetAddressSymbol(offset + 4 + add);
-                if (*s) {
+                if (*s && (dest + strlen(s) + 3) < end) {
                     *dest++ = ' ';
                     *dest++ = '(';
                     dest = addStr(dest, s);
