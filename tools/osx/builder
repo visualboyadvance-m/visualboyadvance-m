@@ -42,6 +42,7 @@ table_line_remove DISTS shared-mime-info
 
 table_line_replace DIST_CONFIGURE_OVERRIDES openssl './Configure darwin-i386-cc no-shared --prefix=/usr --openssldir=/etc/ssl'
 
+# -Wl,-no_compact_unwind must be passed in LDFLAGS to openssl
 table_line_append DIST_MAKE_ARGS openssl "LDFLAGS=\"\$LDFLAGS\""
 
 # m4 crashes on 10.13

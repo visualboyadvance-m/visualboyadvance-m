@@ -32,6 +32,8 @@ case "\$CC" in
                     REQUIRED_CMAKE_ARGS="\$REQUIRED_CMAKE_ARGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=\$CC -DCMAKE_CXX_COMPILER=\$CXX"
                     ;;
             esac
+            export CC_ORIG=\$CC
+            export CXX_ORIG=\$CXX
             export CC="ccache \$CC"
             export CXX="ccache \$CXX"
         fi
@@ -384,8 +386,9 @@ DIST_ARGS="$DIST_ARGS
 
 DIST_BARE_MAKE_ARGS='CC="$CC"'
 
+# have to disable ccache for openssl
 DIST_MAKE_ARGS="$DIST_MAKE_ARGS
-    openssl     CC=\"\$CC -fPIC\"
+    openssl     CC=\"\$CC_ORIG -fPIC\" CXX=\"\$CXX_ORIG -fPIC\"
     getopt      LDFLAGS=\"\$LDFLAGS -lintl -liconv\" CFLAGS=\"\$CFLAGS\"
     bzip2       libbz2.a bzip2 bzip2recover CFLAGS=\"\$CFLAGS\" LDFLAGS=\"\$LDFLAGS\"
     unzip       generic2
