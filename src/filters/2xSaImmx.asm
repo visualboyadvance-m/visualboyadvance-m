@@ -44,7 +44,7 @@ GLOBAL _2xSaILine
 GLOBAL _2xSaISuperEagleLine
 GLOBAL _2xSaISuper2xSaILine
 GLOBAL Init_2xSaIMMX
-SECTION .text ALIGN = 32
+SECTION .text
 
 %ifdef FAR_POINTER
 ;EXTERN_C void _2xSaILine (uint8 *srcPtr, uint32 srcPitch, uint32 width,
@@ -2068,7 +2068,7 @@ end3:
 ;-------------------------------------------------------------------------
 ;-------------------------------------------------------------------------
 
-        SECTION .data ALIGN = 32
+        SECTION .data
 ;Some constants
 colorMask     dd 0xF7DEF7DE,0xF7DEF7DE
 lowPixelMask  dd 0x08210821,0x08210821
@@ -2085,7 +2085,7 @@ TRUE          dd 0xffffffff,0xffffffff
 ONE           dd 0x00010001,0x00010001
 
 
-        SECTION .bss ALIGN = 32
+        SECTION .bss
 ACPixel       resb 8
 Mask1         resb 8
 Mask2         resb 8

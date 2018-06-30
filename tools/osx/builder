@@ -17,24 +17,49 @@ BUILD_ROOT=$HOME/vbam-build-mac
 
 BUILD_ENV=$(cat <<'EOF'
 export MACOSX_DEPLOYMENT_TARGET=10.7
+export COMMAND_MODE=unix2003
 export CC=clang
 export CXX=clang++
 export CPPFLAGS="-DICONV_CONST="
-export CFLAGS="-framework Carbon -framework Foundation -framework CoreServices -arch x86_64 -Wno-unused-command-line-argument -DICONV_CONST="
-export CXXFLAGS="-stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -arch x86_64 -Wno-unused-command-line-argument -DICONV_CONST="
-export OBJCXXFLAGS="-stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -arch x86_64 -Wno-unused-command-line-argument -DICONV_CONST="
-export LDFLAGS="-framework Carbon -framework Foundation -framework CoreServices -arch x86_64 -Wno-unused-command-line-argument"
+export CFLAGS="-m32 -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export CXXFLAGS="-m32 -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export OBJCXXFLAGS="-m32 -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export LDFLAGS="-m32 -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
 EOF
 )
 
 TAR=tar
+
+REQUIRED_CONFIGURE_ARGS='--host=i386-apple-darwin --build=x86_64-apple-darwin'
 
 . "$(dirname "$0")/../builder/core.sh"
 
 table_line_remove DISTS flex
 table_line_remove DISTS libsecret
 
-table_line_replace DIST_CONFIGURE_OVERRIDES openssl './Configure darwin64-x86_64-cc no-shared --prefix=/usr --openssldir=/etc/ssl'
+# issues with perl modules linked to our libs and brew perl
+table_line_remove DISTS shared-mime-info
+
+table_line_replace DIST_CONFIGURE_OVERRIDES openssl './Configure darwin-i386-cc no-shared --prefix=/usr --openssldir=/etc/ssl'
+
+table_line_append DIST_MAKE_ARGS openssl "LDFLAGS=\"\$LDFLAGS\""
+
+# m4 crashes on 10.13
+table_line_append DIST_PATCHES m4 '-p0 https://raw.githubusercontent.com/macports/macports-ports/edf0ee1e2cf/devel/m4/files/secure_snprintf.patch'
+
+# some dists will not cross compile without a CONFIG_SITE
+table_line_append DIST_ARGS glib '--host= --build='
+table_line_append DIST_ARGS pkgconfig '--host= --build='
+table_line_append DIST_ARGS docbook2x '--host= --build='
+
+# python does not support cross-compiling to 32bits
+table_line_append DIST_ARGS python2 '--host= --build='
+table_line_append DIST_ARGS python3 '--host= --build='
+
+table_line_append DIST_ARGS sfml '-DCMAKE_OSX_ARCHITECTURES=i386'
+table_line_append DIST_PRE_BUILD sfml " \
+    sed -i.bak '/FATAL_ERROR \"Only 64-bit architecture is supported/d' CMakeLists.txt; \
+"
 
 table_line_replace DIST_CONFIGURE_TYPES libmodplug autoreconf
 table_line_append  DIST_PRE_BUILD       libmodplug " \

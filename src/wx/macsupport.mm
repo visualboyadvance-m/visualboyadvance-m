@@ -80,7 +80,7 @@ void Quartz2DDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
     CGContextTranslateCTM(context, 0, view.bounds.size.height);
     CGContextScaleCTM(context, 1.0, -1.0);
 
-    CGContextDrawImage(context, view.bounds, image);
+    CGContextDrawImage(context, NSRectToCGRect(view.bounds), image);
 
     CGContextRestoreGState(context);
 
