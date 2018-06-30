@@ -6,13 +6,12 @@
 #ifdef __LIBRETRO__
 extern void eepromSaveGame(uint8_t*& data);
 extern void eepromReadGame(const uint8_t*& data, int version);
-extern uint8_t* eepromData;
 #else // !__LIBRETRO__
 extern void eepromSaveGame(gzFile _gzFile);
 extern void eepromReadGame(gzFile _gzFile, int version);
 extern void eepromReadGameSkip(gzFile _gzFile, int version);
-extern uint8_t eepromData[0x2000];
 #endif
+extern uint8_t eepromData[0x2000];
 extern int eepromRead(uint32_t address);
 extern void eepromWrite(uint32_t address, uint8_t value);
 extern void eepromInit();
