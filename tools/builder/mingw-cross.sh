@@ -40,8 +40,8 @@ both_dists='
 
 BUILD_ENV=$BUILD_ENV$(cat <<EOF
 
-export CC='ccache ${target_arch}-gcc'
-export CXX='ccache ${target_arch}-g++'
+export CC='${target_arch}-gcc'
+export CXX='${target_arch}-g++'
 
 EOF
 )

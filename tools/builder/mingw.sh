@@ -50,9 +50,13 @@ set_host_env() {
     if [ -z "$OCC" ]; then
         OCC=$CC
         OCXX=$CXX
+        OCC_ORIG=$CC_ORIG
+        OCXX_ORIG=$CXX_ORIG
 
         export CC='ccache gcc'
         export CXX='ccache g++'
+        export CC_ORIG="gcc"
+        export CXX_ORIG="g++"
 
         OCFLAGS=$CFLAGS OCXXFLAGS=$CXXFLAGS OLDFLAGS=$LDFLAGS
 
@@ -75,7 +79,9 @@ unset_host_env() {
     if [ -n "$OCC" ]; then
         export CC="$OCC"
         export CXX="$OCXX"
-        OCC= OCXX=
+        export CC_ORIG="$OCC_ORIG"
+        export CXX_ORIG="$OCXX_ORIG"
+        OCC= OCXX= OCC_ORIG= OCXX_ORIG=
 
         export CFLAGS="$OCFLAGS"
         export CXXFLAGS="$OCXXFLAGS"

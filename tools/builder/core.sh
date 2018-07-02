@@ -40,6 +40,9 @@ case "\$CC" in
         ;;
 esac
 
+export CC_ORIG="\${CC_ORIG:-\$CC}"
+export CXX_ORIG="\${CXX_ORIG:-\$CXX}"
+
 export CPPFLAGS="$CPPFLAGS -I$BUILD_ROOT/root/include"
 export CFLAGS="$CFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -Wno-error=all"
 export CXXFLAGS="$CXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -Wno-error=all -fpermissive"
@@ -112,7 +115,7 @@ DISTS=$DISTS'
     unzip           https://downloads.sourceforge.net/project/infozip/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz     bin/unzip
     zip             https://downloads.sourceforge.net/project/infozip/Zip%203.x%20%28latest%29/3.0/zip30.tar.gz                 bin/zip
     openssl         https://www.openssl.org/source/openssl-1.0.2o.tar.gz                                        lib/libssl.a
-    cmake           https://cmake.org/files/v3.10/cmake-3.10.0-rc3.tar.gz                                       bin/cmake
+    cmake           https://cmake.org/files/v3.10/cmake-3.10.3.tar.gz                                           bin/cmake
     zlib            https://zlib.net/zlib-1.2.11.tar.gz                                                         lib/libz.a
     m4              http://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.xz                                                  bin/m4
     autoconf        https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz                                       bin/autoconf

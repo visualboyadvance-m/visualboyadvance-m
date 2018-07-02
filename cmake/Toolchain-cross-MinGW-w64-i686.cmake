@@ -2,6 +2,11 @@ SET(CMAKE_SYSTEM_NAME Windows)
 
 set(COMPILER_PREFIX "i686-w64-mingw32")
 
+unset(CMAKE_RC_COMPILER     CACHE)
+unset(CMAKE_C_COMPILER      CACHE)
+unset(CMAKE_CXX_COMPILER    CACHE)
+unset(PKG_CONFIG_EXECUTABLE CACHE)
+
 # which compilers to use for C and C++
 find_program(CMAKE_RC_COMPILER NAMES ${COMPILER_PREFIX}-windres)
 find_program(CMAKE_C_COMPILER NAMES ${COMPILER_PREFIX}-gcc)
