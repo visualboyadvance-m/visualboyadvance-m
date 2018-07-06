@@ -992,7 +992,9 @@ void gbWriteMemory(register uint16_t address, register uint8_t value)
         }
         EmuReseted = false;
         gbMemory[0xff02] = value;
-        if (gbSerialOn && (GetLinkMode() == LINK_GAMEBOY_IPC || GetLinkMode() == LINK_GAMEBOY_SOCKET || winGbPrinterEnabled)) {
+        if (gbSerialOn && (GetLinkMode() == LINK_GAMEBOY_IPC || GetLinkMode() == LINK_GAMEBOY_SOCKET
+        || GetLinkMode() == LINK_DISCONNECTED || winGbPrinterEnabled)) {
+
             gbSerialTicks = GBSERIAL_CLOCK_TICKS;
 
             LinkIsWaiting = true;
