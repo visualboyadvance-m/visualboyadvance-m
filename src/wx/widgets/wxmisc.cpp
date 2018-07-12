@@ -27,7 +27,7 @@ void wxFarRadio::SetGroup(class wxFarRadio* grp)
     wxFarRadio* checked = GetValue() ? this : NULL;
 
     for (wxFarRadio* gp = Next; gp != this; gp = gp->Next) {
-        if (gp = grp)
+        if (gp == grp)
             return;
 
         if (gp->GetValue())
