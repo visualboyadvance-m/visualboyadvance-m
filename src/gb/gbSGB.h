@@ -7,9 +7,14 @@ void gbSgbCommand();
 void gbSgbResetPacketState();
 void gbSgbReset();
 void gbSgbDoBitTransfer(uint8_t);
+void gbSgbRenderBorder();
+#ifdef __LIBRETRO__
+void gbSgbSaveGame(uint8_t*&);
+void gbSgbReadGame(const uint8_t*&, int);
+#else
 void gbSgbSaveGame(gzFile);
 void gbSgbReadGame(gzFile, int version);
-void gbSgbRenderBorder();
+#endif
 
 extern uint8_t gbSgbATF[20 * 18];
 extern int gbSgbMode;

@@ -19,9 +19,11 @@ struct gbCheat {
     bool enabled;
 };
 
+#ifndef __LIBRETRO__
 void gbCheatsSaveGame(gzFile);
 void gbCheatsReadGame(gzFile, int);
 void gbCheatsReadGameSkip(gzFile, int);
+#endif
 void gbCheatsSaveCheatList(const char*);
 bool gbCheatsLoadCheatList(const char*);
 bool gbCheatReadGSCodeFile(const char*);

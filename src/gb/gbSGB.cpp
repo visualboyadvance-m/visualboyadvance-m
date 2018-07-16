@@ -113,7 +113,11 @@ void gbSgbFillScreen(uint16_t color)
     switch (systemColorDepth) {
     case 16: {
         for (int y = 0; y < 144; y++) {
+#ifdef __LIBRETRO__
+            int yLine = (y + gbBorderRowSkip) * gbBorderLineSkip + gbBorderColumnSkip;
+#else
             int yLine = (y + gbBorderRowSkip + 1) * (gbBorderLineSkip + 2) + gbBorderColumnSkip;
+#endif
             uint16_t* dest = (uint16_t*)pix + yLine;
             for (register int x = 0; x < 160; x++)
                 gbSgbDraw16Bit(dest++, color);
@@ -131,7 +135,11 @@ void gbSgbFillScreen(uint16_t color)
     } break;
     case 32: {
         for (int y = 0; y < 144; y++) {
+#ifdef __LIBRETRO__
+            int yLine = (y + gbBorderRowSkip) * gbBorderLineSkip + gbBorderColumnSkip;
+#else
             int yLine = (y + gbBorderRowSkip + 1) * (gbBorderLineSkip + 1) + gbBorderColumnSkip;
+#endif
             uint32_t* dest = (uint32_t*)pix + yLine;
             for (register int x = 0; x < 160; x++) {
                 gbSgbDraw32Bit(dest++, color);
@@ -181,9 +189,14 @@ void gbSgbRenderScreenToBuffer()
 
 void gbSgbDrawBorderTile(int x, int y, int tile, int attr)
 {
+#ifdef __LIBRETRO__
+    uint16_t* dest = (uint16_t*)pix + (y * 256) + x;
+    uint32_t* dest32 = (uint32_t*)pix + (y * 256) + x;
+#else
     uint16_t* dest = (uint16_t*)pix + ((y + 1) * (256 + 2)) + x;
+    uint32_t* dest32 = (uint32_t*)pix + ((y + 1) * 256 + 1) + x;
+#endif
     uint8_t* dest8 = (uint8_t*)pix + ((y * 256) + x) * 3;
-    uint32_t* dest32 = (uint32_t*)pix + ((y + 1) * 257) + x;
 
     uint8_t* tileAddress = &gbSgbBorderChar[tile * 32];
     uint8_t* tileAddress2 = &gbSgbBorderChar[tile * 32 + 16];
@@ -245,13 +258,21 @@ void gbSgbDrawBorderTile(int x, int y, int tile, int attr)
 
                 switch (systemColorDepth) {
                 case 16:
+#ifdef __LIBRETRO__
+                    gbSgbDraw16Bit(dest + yyy * 256 + xxx, cc);
+#else
                     gbSgbDraw16Bit(dest + yyy * (256 + 2) + xxx, cc);
+#endif
                     break;
                 case 24:
                     gbSgbDraw24Bit(dest8 + (yyy * 256 + xxx) * 3, cc);
                     break;
                 case 32:
+#ifdef __LIBRETRO__
+                    gbSgbDraw32Bit(dest32 + yyy * 256 + xxx, cc);
+#else
                     gbSgbDraw32Bit(dest32 + yyy * (256 + 1) + xxx, cc);
+#endif
                     break;
                 }
             }
@@ -860,6 +881,36 @@ variable_desc gbSgbSaveStructV3[] = {
     { NULL, 0 }
 };
 
+#ifdef __LIBRETRO__
+void gbSgbSaveGame(uint8_t*& data)
+{
+    utilWriteDataMem(data, gbSgbSaveStructV3);
+
+    utilWriteMem(data, gbSgbBorder, 2048);
+    utilWriteMem(data, gbSgbBorderChar, 32 * 256);
+
+    utilWriteMem(data, gbSgbPacket, 16 * 7);
+
+    utilWriteMem(data, gbSgbSCPPalette, 4 * 512 * sizeof(uint16_t));
+    utilWriteMem(data, gbSgbATF, 20 * 18);
+    utilWriteMem(data, gbSgbATFList, 45 * 20 * 18);
+}
+
+void gbSgbReadGame(const uint8_t*& data, int version)
+{
+	utilReadDataMem(data, gbSgbSaveStructV3);
+
+	utilReadMem(gbSgbBorder, data, 2048);
+    utilReadMem(gbSgbBorderChar, data, 32 * 256);
+
+    utilReadMem(gbSgbPacket, data, 16 * 7);
+
+    utilReadMem(gbSgbSCPPalette, data, 4 * 512 * sizeof(uint16_t));
+    utilReadMem(gbSgbATF, data, 20 * 18);
+    utilReadMem(gbSgbATFList, data, 45 * 20 * 18);
+}
+
+#else // !__LIBRETRO__
 void gbSgbSaveGame(gzFile gzFile)
 {
     utilWriteData(gzFile, gbSgbSaveStructV3);
@@ -894,3 +945,4 @@ void gbSgbReadGame(gzFile gzFile, int version)
     utilGzRead(gzFile, gbSgbATF, 20 * 18);
     utilGzRead(gzFile, gbSgbATFList, 45 * 20 * 18);
 }
+#endif // !__LIBRETRO__

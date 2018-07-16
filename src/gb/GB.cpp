@@ -2852,6 +2852,7 @@ void gbReset()
     gbCheatWrite(true); // Emulates GS codes.
 }
 
+#ifndef __LIBRETRO__
 void gbWriteSaveMBC1(const char* name)
 {
     if (gbRam) {
@@ -3335,6 +3336,7 @@ bool gbReadSaveMMM01(const char* name)
     } else
         return false;
 }
+#endif // !__LIBRETRO__
 
 void gbInit()
 {
@@ -3343,11 +3345,16 @@ void gbInit()
 
     gbMemory = (uint8_t*)malloc(65536);
 
+#ifdef __LIBRETRO__
+    pix = (uint8_t*)calloc(1, 4 * 256 * 224);
+#else
     pix = (uint8_t*)calloc(1, 4 * 257 * 226);
+#endif
 
     gbLineBuffer = (uint16_t*)malloc(160 * sizeof(uint16_t));
 }
 
+#ifndef __LIBRETRO__
 bool gbWriteBatteryFile(const char* file, bool extendedSave)
 {
     if (gbBattery) {
@@ -3480,6 +3487,7 @@ bool gbReadBatteryFile(const char* file)
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
     return res;
 }
+#endif // !__LIBRETRO__
 
 bool gbReadGSASnapshot(const char* fileName)
 {
@@ -3617,6 +3625,7 @@ variable_desc gbSaveGameStruct[] = {
     { NULL, 0 }
 };
 
+#ifndef __LIBRETRO__
 static bool gbWriteSaveState(gzFile gzFile)
 {
 
@@ -4091,6 +4100,7 @@ bool gbReadSaveState(const char* name)
 
     return res;
 }
+#endif // !__LIBRETRO__
 
 bool gbWritePNGFile(const char* fileName)
 {
@@ -4457,8 +4467,13 @@ void gbDrawLine()
 {
     switch (systemColorDepth) {
     case 16: {
+#ifdef __LIBRETRO__
+        uint16_t* dest = (uint16_t*)pix + gbBorderLineSkip * (register_LY + gbBorderRowSkip)
+            + gbBorderColumnSkip;
+#else
         uint16_t* dest = (uint16_t*)pix + (gbBorderLineSkip + 2) * (register_LY + gbBorderRowSkip + 1)
             + gbBorderColumnSkip;
+#endif
         for (int x = 0; x < 160;) {
             *dest++ = systemColorMap16[gbLineMix[x++]];
             *dest++ = systemColorMap16[gbLineMix[x++]];
@@ -4482,7 +4497,9 @@ void gbDrawLine()
         }
         if (gbBorderOn)
             dest += gbBorderColumnSkip;
+#ifndef __LIBRETRO__
         *dest++ = 0; // for filters that read one pixel more
+#endif
     } break;
 
     case 24: {
@@ -4527,8 +4544,13 @@ void gbDrawLine()
     } break;
 
     case 32: {
+#ifdef __LIBRETRO__
+        uint32_t* dest = (uint32_t*)pix + gbBorderLineSkip * (register_LY + gbBorderRowSkip)
+            + gbBorderColumnSkip;
+#else
         uint32_t* dest = (uint32_t*)pix + (gbBorderLineSkip + 1) * (register_LY + gbBorderRowSkip + 1)
             + gbBorderColumnSkip;
+#endif
         for (int x = 0; x < 160;) {
             *dest++ = systemColorMap32[gbLineMix[x++]];
             *dest++ = systemColorMap32[gbLineMix[x++]];
@@ -5418,6 +5440,361 @@ void gbEmulate(int ticksToStop)
     }
 }
 
+bool gbLoadRomData(const char* data, unsigned size)
+{
+    gbRomSize = size;
+    if (gbRom != NULL) {
+        gbCleanUp();
+    }
+
+    systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
+
+    gbRom = (uint8_t*)calloc(1, gbRomSize);
+    if (gbRom == NULL) {
+        return 0;
+    }
+
+    memcpy(gbRom, data, gbRomSize);
+
+    gbBatteryError = false;
+
+    if (bios != NULL) {
+        free(bios);
+        bios = NULL;
+    }
+    bios = (uint8_t*)calloc(1, 0x900);
+
+    return gbUpdateSizes();
+}
+
+#ifdef __LIBRETRO__
+#include <stddef.h>
+
+unsigned int gbWriteSaveState(uint8_t* data, unsigned)
+{
+	uint8_t* orig = data;
+
+    utilWriteIntMem(data, GBSAVE_GAME_VERSION);
+
+    utilWriteMem(data, &gbRom[0x134], 15);
+
+    utilWriteIntMem(data, useBios);
+    utilWriteIntMem(data, inBios);
+
+    utilWriteDataMem(data, gbSaveGameStruct);
+
+    utilWriteMem(data, &IFF, 2);
+
+    if (gbSgbMode) {
+        gbSgbSaveGame(data);
+    }
+
+    utilWriteMem(data, &gbDataMBC1, sizeof(gbDataMBC1));
+    utilWriteMem(data, &gbDataMBC2, sizeof(gbDataMBC2));
+    utilWriteMem(data, &gbDataMBC3, sizeof(gbDataMBC3));
+    utilWriteMem(data, &gbDataMBC5, sizeof(gbDataMBC5));
+    utilWriteMem(data, &gbDataHuC1, sizeof(gbDataHuC1));
+    utilWriteMem(data, &gbDataHuC3, sizeof(gbDataHuC3));
+    utilWriteMem(data, &gbDataTAMA5, sizeof(gbDataTAMA5));
+    if (gbTAMA5ram != NULL)
+        utilWriteMem(data, gbTAMA5ram, gbTAMA5ramSize);
+    utilWriteMem(data, &gbDataMMM01, sizeof(gbDataMMM01));
+
+    utilWriteMem(data, gbPalette, 128 * sizeof(uint16_t));
+
+    utilWriteMem(data, &gbMemory[0x8000], 0x8000);
+
+    if (gbRamSize && gbRam) {
+        utilWriteIntMem(data, gbRamSize);
+        utilWriteMem(data, gbRam, gbRamSize);
+    }
+
+    if (gbCgbMode) {
+        utilWriteMem(data, gbVram, 0x4000);
+        utilWriteMem(data, gbWram, 0x8000);
+    }
+
+    gbSoundSaveGame(data);
+
+    // We dont care about cheat saves
+    // gbCheatsSaveGame(data);
+
+    utilWriteIntMem(data, gbLcdModeDelayed);
+    utilWriteIntMem(data, gbLcdTicksDelayed);
+    utilWriteIntMem(data, gbLcdLYIncrementTicksDelayed);
+    utilWriteIntMem(data, gbSpritesTicks[299]);
+    utilWriteIntMem(data, gbTimerModeChange);
+    utilWriteIntMem(data, gbTimerOnChange);
+    utilWriteIntMem(data, gbHardware);
+    utilWriteIntMem(data, gbBlackScreen);
+    utilWriteIntMem(data, oldRegister_WY);
+    utilWriteIntMem(data, gbWindowLine);
+    utilWriteIntMem(data, inUseRegister_WY);
+    utilWriteIntMem(data, gbScreenOn);
+    utilWriteIntMem(data, 0x12345678); // end marker
+
+	return (ptrdiff_t)data - (ptrdiff_t)orig;
+}
+
+bool gbReadSaveState(const uint8_t* data, unsigned)
+{
+    int version = utilReadIntMem(data);
+
+   if (version != GBSAVE_GAME_VERSION) {
+        systemMessage(MSG_UNSUPPORTED_VB_SGM,
+            N_("Unsupported VBA-M save game version %d"), version);
+        return false;
+    }
+
+    uint8_t romname[20];
+
+    utilReadMem(romname, data, 15);
+
+    if (memcmp(&gbRom[0x134], romname, 15) != 0) {
+        systemMessage(MSG_CANNOT_LOAD_SGM_FOR,
+            N_("Cannot load save game for %s. Playing %s"),
+            romname, &gbRom[0x134]);
+        return false;
+    }
+
+    bool ub = false;
+    bool ib = false;
+
+    ub = utilReadIntMem(data) ? true : false;
+    ib = utilReadIntMem(data) ? true : false;
+
+    if ((ub != useBios) && (ib)) {
+        if (useBios)
+            systemMessage(MSG_SAVE_GAME_NOT_USING_BIOS,
+                N_("Save game is not using the BIOS files"));
+        else
+            systemMessage(MSG_SAVE_GAME_USING_BIOS,
+                N_("Save game is using the BIOS file"));
+        return false;
+    }
+
+    gbReset();
+
+    inBios = ib;
+
+    utilReadDataMem(data, gbSaveGameStruct);
+
+    // Correct crash when loading color gameboy save in regular gameboy type.
+    if (!gbCgbMode) {
+        if (gbVram != NULL) {
+            free(gbVram);
+            gbVram = NULL;
+        }
+        if (gbWram != NULL) {
+            free(gbWram);
+            gbWram = NULL;
+        }
+    } else {
+        if (gbVram == NULL)
+            gbVram = (uint8_t*)malloc(0x4000);
+        if (gbWram == NULL)
+            gbWram = (uint8_t*)malloc(0x8000);
+        memset(gbVram, 0, 0x4000);
+        memset(gbPalette, 0, 2 * 128);
+    }
+
+    utilReadMem(&IFF, data, 2);
+
+    if (gbSgbMode) {
+        gbSgbReadGame(data, version);
+    } else {
+        gbSgbMask = 0; // loading a game at the wrong time causes no display
+    }
+
+    utilReadMem(&gbDataMBC1, data, sizeof(gbDataMBC1));
+    utilReadMem(&gbDataMBC2, data, sizeof(gbDataMBC2));
+    utilReadMem(&gbDataMBC3, data, sizeof(gbDataMBC3));
+    utilReadMem(&gbDataMBC5, data, sizeof(gbDataMBC5));
+    utilReadMem(&gbDataHuC1, data, sizeof(gbDataHuC1));
+    utilReadMem(&gbDataHuC3, data, sizeof(gbDataHuC3));
+    utilReadMem(&gbDataTAMA5, data, sizeof(gbDataTAMA5));
+    if (gbTAMA5ram != NULL) {
+        utilReadMem(gbTAMA5ram, data, gbTAMA5ramSize);
+    }
+    utilReadMem(&gbDataMMM01, data, sizeof(gbDataMMM01));
+
+    utilReadMem(gbPalette, data, 128 * sizeof(uint16_t));
+
+    utilReadMem(&gbMemory[0x8000], data, 0x8000);
+
+    if (gbRamSize && gbRam) {
+        int ramSize = utilReadIntMem(data);
+        utilReadMem(gbRam, data, (gbRamSize > ramSize) ? ramSize : gbRamSize); //read
+        /*if (ramSize > gbRamSize)
+            utilGzSeek(gzFile, ramSize - gbRamSize, SEEK_CUR);*/ // Libretro Note: ????
+    }
+
+    memset(gbSCYLine, register_SCY, sizeof(gbSCYLine));
+    memset(gbSCXLine, register_SCX, sizeof(gbSCXLine));
+    memset(gbBgpLine, (gbBgp[0] | (gbBgp[1] << 2) | (gbBgp[2] << 4) | (gbBgp[3] << 6)), sizeof(gbBgpLine));
+    memset(gbObp0Line, (gbObp0[0] | (gbObp0[1] << 2) | (gbObp0[2] << 4) | (gbObp0[3] << 6)), sizeof(gbObp0Line));
+    memset(gbObp1Line, (gbObp1[0] | (gbObp1[1] << 2) | (gbObp1[2] << 4) | (gbObp1[3] << 6)), sizeof(gbObp1Line));
+    memset(gbSpritesTicks, 0x0, sizeof(gbSpritesTicks));
+
+    if (inBios) {
+        gbMemoryMap[0x00] = &gbMemory[0x0000];
+        if (gbHardware & 5) {
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(gbRom), 0x1000);
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), 0x100);
+        } else if (gbHardware & 2) {
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), 0x900);
+            memcpy((uint8_t*)(gbMemory + 0x100), (uint8_t*)(gbRom + 0x100), 0x100);
+        }
+
+    } else {
+        gbMemoryMap[0x00] = &gbRom[0x0000];
+    }
+
+    gbMemoryMap[0x01] = &gbRom[0x1000];
+    gbMemoryMap[0x02] = &gbRom[0x2000];
+    gbMemoryMap[0x03] = &gbRom[0x3000];
+    gbMemoryMap[0x04] = &gbRom[0x4000];
+    gbMemoryMap[0x05] = &gbRom[0x5000];
+    gbMemoryMap[0x06] = &gbRom[0x6000];
+    gbMemoryMap[0x07] = &gbRom[0x7000];
+    gbMemoryMap[0x08] = &gbMemory[0x8000];
+    gbMemoryMap[0x09] = &gbMemory[0x9000];
+    gbMemoryMap[0x0a] = &gbMemory[0xa000];
+    gbMemoryMap[0x0b] = &gbMemory[0xb000];
+    gbMemoryMap[0x0c] = &gbMemory[0xc000];
+    gbMemoryMap[0x0d] = &gbMemory[0xd000];
+    gbMemoryMap[0x0e] = &gbMemory[0xe000];
+    gbMemoryMap[0x0f] = &gbMemory[0xf000];
+
+    switch (gbRomType) {
+    case 0x00:
+    case 0x01:
+    case 0x02:
+    case 0x03:
+        // MBC 1
+        memoryUpdateMapMBC1();
+        break;
+    case 0x05:
+    case 0x06:
+        // MBC2
+        memoryUpdateMapMBC2();
+        break;
+    case 0x0b:
+    case 0x0c:
+    case 0x0d:
+        // MMM01
+        memoryUpdateMapMMM01();
+        break;
+    case 0x0f:
+    case 0x10:
+    case 0x11:
+    case 0x12:
+    case 0x13:
+        // MBC 3
+        memoryUpdateMapMBC3();
+        break;
+    case 0x19:
+    case 0x1a:
+    case 0x1b:
+        // MBC5
+        memoryUpdateMapMBC5();
+        break;
+    case 0x1c:
+    case 0x1d:
+    case 0x1e:
+        // MBC 5 Rumble
+        memoryUpdateMapMBC5();
+        break;
+    case 0x22:
+        // MBC 7
+        memoryUpdateMapMBC7();
+        break;
+    case 0x56:
+        // GS3
+        memoryUpdateMapGS3();
+        break;
+    case 0xfd:
+        // TAMA5
+        memoryUpdateMapTAMA5();
+        break;
+    case 0xfe:
+        // HuC3
+        memoryUpdateMapHuC3();
+        break;
+    case 0xff:
+        // HuC1
+        memoryUpdateMapHuC1();
+        break;
+    }
+
+    if (gbCgbMode) {
+        utilReadMem(gbVram, data, 0x4000);
+        utilReadMem(gbWram, data, 0x8000);
+
+        int value = register_SVBK;
+        if (value == 0)
+            value = 1;
+
+        gbMemoryMap[0x08] = &gbVram[register_VBK * 0x2000];
+        gbMemoryMap[0x09] = &gbVram[register_VBK * 0x2000 + 0x1000];
+        gbMemoryMap[0x0d] = &gbWram[value * 0x1000];
+    }
+
+    gbSoundReadGame(data, version);
+
+    if (gbCgbMode && gbSgbMode) {
+        gbSgbMode = 0;
+    }
+
+    if (gbBorderOn && !gbSgbMask) {
+        gbSgbRenderBorder();
+    }
+
+    gbLcdModeDelayed = utilReadIntMem(data);
+    gbLcdTicksDelayed = utilReadIntMem(data);
+    gbLcdLYIncrementTicksDelayed = utilReadIntMem(data);
+    gbSpritesTicks[299] = utilReadIntMem(data) & 0xff;
+    gbTimerModeChange = (utilReadIntMem(data) ? true : false);
+    gbTimerOnChange = (utilReadIntMem(data) ? true : false);
+    gbHardware = utilReadIntMem(data);
+    gbBlackScreen = (utilReadIntMem(data) ? true : false);
+    oldRegister_WY = utilReadIntMem(data);
+    gbWindowLine = utilReadIntMem(data);
+    inUseRegister_WY = utilReadIntMem(data);
+    gbScreenOn = (utilReadIntMem(data) ? true : false);
+
+    if (gbSpeed)
+        gbLine99Ticks *= 2;
+
+    systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
+
+    if (version >= 12 && utilReadIntMem(data) != 0x12345678)
+        assert(false); // fails if something read too much/little from file
+
+    return true;
+}
+
+bool gbWriteMemSaveState(char*, int, long&)
+{
+	return false;
+}
+
+bool gbReadMemSaveState(char*, int)
+{
+    return false;
+}
+
+bool gbReadBatteryFile(const char*)
+{
+    return false;
+}
+
+bool gbWriteBatteryFile(const char*)
+{
+    return false;
+}
+#endif
+
 struct EmulatedSystem GBSystem = {
     // emuMain
     gbEmulate,
@@ -5445,7 +5822,7 @@ struct EmulatedSystem GBSystem = {
     NULL,
     // emuHasDebugger
     false,
-// emuCount
+    // emuCount
 #ifdef FINAL_VERSION
     70000 / 4,
 #else

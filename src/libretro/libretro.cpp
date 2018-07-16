@@ -25,6 +25,13 @@
 #include "../gba/Sound.h"
 #include "../gba/bios.h"
 
+#include "../gb/gb.h"
+#include "../gb/gbCheats.h"
+#include "../gb/gbGlobals.h"
+#include "../gb/gbMemory.h"
+#include "../gb/gbSGB.h"
+#include "../gb/gbSound.h"
+
 #define RETRO_DEVICE_GBA             RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 0)
 #define RETRO_DEVICE_GBA_ALT1        RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 1)
 #define RETRO_DEVICE_GBA_ALT2        RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 2)
@@ -44,18 +51,23 @@ static float sndFiltering = 0.5f;
 static bool sndInterpolation = true;
 static bool can_dupe = false;
 static bool usebios = false;
-static unsigned retropad_layout =1;
+static unsigned retropad_layout = 1;
 
-static EmulatedSystem* core = NULL;
-static IMAGE_TYPE type = IMAGE_UNKNOWN;
 static const double FramesPerSecond =  (16777216.0 / 280896.0); // 59.73
 static const long SampleRate = 32768;
+static const int GBWidth = 160;
+static const int GBHeight = 144;
+static const int SGBWidth = 256;
+static const int SGBHeight = 224;
+static const int GBAWidth = 240;
+static const int GBAHeight = 160;
 static unsigned width = 240;
 static unsigned height = 160;
+static EmulatedSystem* core = NULL;
+static IMAGE_TYPE type = IMAGE_UNKNOWN;
 
 uint16_t systemColorMap16[0x10000];
 uint32_t systemColorMap32[0x10000];
-uint16_t systemGbPalette[24];
 int RGB_LOW_BITS_MASK = 0;
 int systemRedShift = 0;
 int systemBlueShift = 0;
@@ -71,14 +83,29 @@ int emulating = 0;
 void (*dbgOutput)(const char* s, uint32_t addr);
 void (*dbgSignal)(int sig, int number);
 
+#define GS555(x) (x | (x << 5) | (x << 10))
+uint16_t systemGbPalette[24] = {
+    GS555(0x1f), GS555(0x15), GS555(0x0c), 0,
+    GS555(0x1f), GS555(0x15), GS555(0x0c), 0,
+    GS555(0x1f), GS555(0x15), GS555(0x0c), 0,
+    GS555(0x1f), GS555(0x15), GS555(0x0c), 0,
+    GS555(0x1f), GS555(0x15), GS555(0x0c), 0,
+    GS555(0x1f), GS555(0x15), GS555(0x0c), 0
+};
+
 void* retro_get_memory_data(unsigned id)
 {
     if (id == RETRO_MEMORY_SAVE_RAM)
     {
-        if ((saveType == 1) | (saveType == 4))
-            return eepromData;
-        if ((saveType == 2) | (saveType == 3))
-            return flashSaveMemory;
+        if (type == IMAGE_GBA)
+        {
+            if ((saveType == 1) | (saveType == 4))
+                return eepromData;
+            if ((saveType == 2) | (saveType == 3))
+                return flashSaveMemory;
+        } else {
+            // TODO: GB / GBC saves here
+        }
     }
     if (id == RETRO_MEMORY_SYSTEM_RAM)
         return workRAM;
@@ -92,10 +119,15 @@ size_t retro_get_memory_size(unsigned id)
 {
     if (id == RETRO_MEMORY_SAVE_RAM)
     {
-        if ((saveType == 1) | (saveType == 4))
-            return eepromSize;
-        if ((saveType == 2) | (saveType == 3))
-            return flashSize;
+        if (type == IMAGE_GBA)
+        {
+            if ((saveType == 1) | (saveType == 4))
+                return eepromSize;
+            if ((saveType == 2) | (saveType == 3))
+                return flashSize;
+        } else {
+            // TODO: GB / GBC saves here
+        }
     }
     if (id == RETRO_MEMORY_SYSTEM_RAM)
         return 0x40000;
@@ -207,7 +239,7 @@ void retro_set_environment(retro_environment_t cb)
 void retro_get_system_info(struct retro_system_info *info)
 {
    info->need_fullpath = false;
-   info->valid_extensions = "gba";
+   info->valid_extensions = "dmg|gb|gbc|cgb|sgb|gba";
 #ifdef GIT_VERSION
    info->library_version = "2.1.0" GIT_VERSION;
 #else
@@ -220,6 +252,9 @@ void retro_get_system_info(struct retro_system_info *info)
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
    float aspect = (3.0f / 2.0f);
+   if (type == IMAGE_GB)
+      aspect = !gbBorderOn ? (10.0 / 9.0) : (8.0 / 7.0);
+
    info->geometry.base_width = width;
    info->geometry.base_height = height;
    info->geometry.max_width = width;
@@ -342,13 +377,7 @@ static void load_image_preferences(void)
     }
 }
 
-#ifdef _WIN32
-static const char SLASH = '\\';
-#else
-static const char SLASH = '/';
-#endif
-
-static void gba_init(void)
+static void update_colormaps(void)
 {
 #ifdef FRONTEND_SUPPORTS_RGB565
     systemColorDepth = 16;
@@ -364,8 +393,21 @@ static void gba_init(void)
 
     utilUpdateSystemColorMaps(false);
 
-    log("Loading VBA-M Core (GBA)...\n");
     log("Color Depth = %d\n", systemColorDepth);
+}
+
+
+#ifdef _WIN32
+static const char SLASH = '\\';
+#else
+static const char SLASH = '/';
+#endif
+
+static void gba_init(void)
+{
+    log("Loading VBA-M Core (GBA)...\n");
+
+    update_colormaps();
 
     load_image_preferences();
 
@@ -397,8 +439,45 @@ static void gba_init(void)
 
     core = &GBASystem;
 
-    width = 240;
-    height = 160;
+    width = GBAWidth;
+    height = GBAHeight;
+}
+
+static void gb_init(void)
+{
+    const char *biosname[] = {"gb_bios.bin", "gbc_bios.bin"};
+
+    log("Loading VBA-M Core (GB/GBC)...\n");
+
+    update_colormaps();
+
+    soundInit();
+    gbSoundSetSampleRate(SampleRate);
+
+    gbGetHardwareType();
+
+    if (usebios)
+    {
+        snprintf(biosfile, sizeof(biosfile), "%s%c%s",
+            retro_system_directory, SLASH, biosname[gbCgbMode]);
+        log("Loading bios: %s\n", biosfile);
+    }
+
+    gbCPUInit(biosfile, usebios);
+    gbReset();
+
+    if (gbBorderOn) {
+        width = gbBorderLineSkip = SGBWidth;
+        height = SGBHeight;
+        gbBorderColumnSkip = (SGBWidth - GBWidth) >> 1;
+        gbBorderRowSkip = (SGBHeight - GBHeight) >> 1;
+    } else {
+        width = gbBorderLineSkip = GBWidth;
+        height = GBHeight;
+        gbBorderColumnSkip = gbBorderRowSkip = 0;
+    }
+
+    core = &GBSystem;
 }
 
 static void gba_soundchanged(void)
@@ -618,8 +697,11 @@ bool retro_unserialize(const void* data, size_t size)
 
 void retro_cheat_reset(void)
 {
-    cheatsEnabled = 1;
-    cheatsDeleteAll(false);
+	if (type == IMAGE_GBA)
+	{
+		cheatsEnabled = 1;
+		cheatsDeleteAll(false);
+	}
 }
 
 void retro_cheat_set(unsigned index, bool enabled, const char* code)
@@ -664,6 +746,11 @@ void retro_cheat_set(unsigned index, bool enabled, const char* code)
 
    } while (*c++);
    */
+   
+   // TODO: Add cheat code support for GB/GBC
+   if (type != IMAGE_GBA)
+       return;
+
    std::string codeLine=code;
    std::string name="cheat_"+index;
    int matchLength=0;
@@ -785,36 +872,58 @@ bool retro_load_game(const struct retro_game_info *game)
    update_variables();
    update_input_descriptors();
 
-   romSize = CPULoadRomData((const char*)game->data, game->size);
-   if (!romSize)
-      return false;
+   type = utilFindType((const char *)game->path);
 
-   gba_init();
+   switch (type)
+   {
+   case IMAGE_UNKNOWN:
+      log("Unsupported image %s!\n", game->path);
+      return 0;
 
-   struct retro_memory_descriptor desc[11];
-   memset(desc, 0, sizeof(desc));
+   case IMAGE_GBA:
+      {
+      romSize = CPULoadRomData((const char*)game->data, game->size);
 
-   desc[0].start=0x03000000; desc[0].select=0xFF000000; desc[0].len=0x8000;    desc[0].ptr=internalRAM;//fast WRAM
-   desc[1].start=0x02000000; desc[1].select=0xFF000000; desc[1].len=0x40000;   desc[1].ptr=workRAM;//slow WRAM
-   /* TODO: if SRAM is flash, use start=0 addrspace="S" instead */
-   desc[2].start=0x0E000000; desc[2].select=0;          desc[2].len=flashSize; desc[2].ptr=flashSaveMemory;//SRAM
-   desc[3].start=0x08000000; desc[3].select=0;          desc[3].len=romSize;   desc[3].ptr=rom;//ROM
+      if (!romSize)
+         return false;
+
+      gba_init();
+
+      struct retro_memory_descriptor desc[11];
+      memset(desc, 0, sizeof(desc));
+
+      desc[0].start=0x03000000; desc[0].select=0xFF000000; desc[0].len=0x8000;    desc[0].ptr=internalRAM;//fast WRAM
+      desc[1].start=0x02000000; desc[1].select=0xFF000000; desc[1].len=0x40000;   desc[1].ptr=workRAM;//slow WRAM
+      /* TODO: if SRAM is flash, use start=0 addrspace="S" instead */
+      desc[2].start=0x0E000000; desc[2].select=0;          desc[2].len=flashSize; desc[2].ptr=flashSaveMemory;//SRAM
+      desc[3].start=0x08000000; desc[3].select=0;          desc[3].len=romSize;   desc[3].ptr=rom;//ROM
       desc[3].flags=RETRO_MEMDESC_CONST;
-   desc[4].start=0x0A000000; desc[4].select=0;          desc[4].len=romSize;   desc[4].ptr=rom;//ROM mirror 1
+      desc[4].start=0x0A000000; desc[4].select=0;          desc[4].len=romSize;   desc[4].ptr=rom;//ROM mirror 1
       desc[4].flags=RETRO_MEMDESC_CONST;
-   desc[5].start=0x0C000000; desc[5].select=0;          desc[5].len=romSize;   desc[5].ptr=rom;//ROM mirror 2
+      desc[5].start=0x0C000000; desc[5].select=0;          desc[5].len=romSize;   desc[5].ptr=rom;//ROM mirror 2
       desc[5].flags=RETRO_MEMDESC_CONST;
-   desc[6].start=0x00000000; desc[6].select=0;          desc[6].len=0x4000;    desc[6].ptr=bios;//BIOS
+      desc[6].start=0x00000000; desc[6].select=0;          desc[6].len=0x4000;    desc[6].ptr=bios;//BIOS
       desc[6].flags=RETRO_MEMDESC_CONST;
-   desc[7].start=0x06000000; desc[7].select=0xFF000000; desc[7].len=0x18000;   desc[7].ptr=vram;//VRAM
-   desc[8].start=0x05000000; desc[8].select=0xFF000000; desc[8].len=0x400;     desc[8].ptr=paletteRAM;//palettes
-   desc[9].start=0x07000000; desc[9].select=0xFF000000; desc[9].len=0x400;     desc[9].ptr=oam;//OAM
-   desc[10].start=0x04000000;desc[10].select=0;         desc[10].len=0x400;    desc[10].ptr=ioMem;//bunch of registers
-   struct retro_memory_map retromap={ desc, sizeof(desc)/sizeof(*desc) };
-   environ_cb(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &retromap);
+      desc[7].start=0x06000000; desc[7].select=0xFF000000; desc[7].len=0x18000;   desc[7].ptr=vram;//VRAM
+      desc[8].start=0x05000000; desc[8].select=0xFF000000; desc[8].len=0x400;     desc[8].ptr=paletteRAM;//palettes
+      desc[9].start=0x07000000; desc[9].select=0xFF000000; desc[9].len=0x400;     desc[9].ptr=oam;//OAM
+      desc[10].start=0x04000000;desc[10].select=0;         desc[10].len=0x400;    desc[10].ptr=ioMem;//bunch of registers
+      struct retro_memory_map retromap={ desc, sizeof(desc)/sizeof(*desc) };
+      environ_cb(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &retromap);
 
-   bool yes = true;
-   environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
+      bool yes = true;
+      environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
+      }
+      break;
+
+   case IMAGE_GB:
+      if (!gbLoadRomData((const char *)game->data, game->size))
+         return false;
+
+      gb_init();
+
+      break;
+   }
 
    uint8_t* state_buf = (uint8_t*)malloc(2000000);
    serialize_size = core->emuWriteState(state_buf, 2000000);
@@ -861,6 +970,19 @@ void systemDrawScreen(void)
 void systemFrame(void)
 {
     has_frame = 1;
+}
+
+void systemGbBorderOn()
+{
+	width = gbBorderLineSkip = SGBWidth;
+	height = SGBHeight;
+	gbBorderColumnSkip = (SGBWidth - GBWidth) >> 1;
+	gbBorderRowSkip = (SGBHeight - GBHeight) >> 1;
+
+	struct retro_system_av_info avinfo;
+	retro_get_system_av_info(&avinfo);
+	//environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
+	environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
 }
 
 void systemMessage(const char* fmt, ...)

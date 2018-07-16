@@ -108,6 +108,7 @@ bool utilIsGBAImage(const char* file)
 
 bool utilIsGBImage(const char* file)
 {
+/*
 	FILE *fp;
 	bool ret = false;
 	char buffer[47];
@@ -121,6 +122,20 @@ bool utilIsGBImage(const char* file)
 	}
 	fclose (fp);
 	return ret;
+*/
+    if (strlen(file) > 4) {
+        const char *p = strrchr(file, '.');
+
+        if (p != NULL) {
+            if ((_stricmp(p, ".dmg") == 0) || (_stricmp(p, ".gb") == 0)
+            || (_stricmp(p, ".gbc") == 0) || (_stricmp(p, ".cgb") == 0)
+            || (_stricmp(p, ".sgb") == 0)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 // strip .gz or .z off end

@@ -358,6 +358,7 @@ enum {
     nr52
 };
 
+#ifndef __LIBRETRO__
 static void gbSoundReadGameOld(int version, gzFile gzFile)
 {
     if (version == 11) {
@@ -395,6 +396,7 @@ static void gbSoundReadGameOld(int version, gzFile gzFile)
 
     memcpy(&s.regs[0x20], &gbMemory[0xFF30], 0x10); // wave
 }
+#endif
 
 // New state format
 
@@ -430,7 +432,11 @@ static variable_desc gb_state[] = {
     { NULL, 0 }
 };
 
+#ifdef __LIBRETRO__
+void gbSoundSaveGame(uint8_t*& out)
+#else
 void gbSoundSaveGame(gzFile out)
+#endif
 {
     gb_apu->save_state(&state.apu);
 
@@ -438,19 +444,31 @@ void gbSoundSaveGame(gzFile out)
     memset(dummy_state, 0, sizeof dummy_state);
 
     state.version = 1;
+#ifdef __LIBRETRO__
+	utilWriteDataMem(out, gb_state);
+#else
     utilWriteData(out, gb_state);
+#endif
 }
 
+#ifdef __LIBRETRO__
+void gbSoundReadGame(const uint8_t*& in, int version)
+#else
 void gbSoundReadGame(int version, gzFile in)
+#endif
 {
     // Prepare APU and default state
     reset_apu();
     gb_apu->save_state(&state.apu);
 
     if (version > 11)
+#ifdef __LIBRETRO__
+		utilReadDataMem(in, gb_state);
+#else
         utilReadData(in, gb_state);
     else
         gbSoundReadGameOld(version, in);
+#endif
 
     gb_apu->load_state(state.apu);
 }

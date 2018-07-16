@@ -30,6 +30,7 @@ void gbCheatUpdateMap()
     }
 }
 
+#ifndef __LIBRETRO__
 void gbCheatsSaveGame(gzFile gzFile)
 {
     utilWriteInt(gzFile, gbCheatNumber);
@@ -98,6 +99,7 @@ void gbCheatsReadGameSkip(gzFile gzFile, int version)
         }
     }
 }
+#endif
 
 void gbCheatsSaveCheatList(const char* file)
 {
