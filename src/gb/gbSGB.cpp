@@ -194,7 +194,7 @@ void gbSgbDrawBorderTile(int x, int y, int tile, int attr)
     uint32_t* dest32 = (uint32_t*)pix + (y * 256) + x;
 #else
     uint16_t* dest = (uint16_t*)pix + ((y + 1) * (256 + 2)) + x;
-    uint32_t* dest32 = (uint32_t*)pix + ((y + 1) * 256 + 1) + x;
+    uint32_t* dest32 = (uint32_t*)pix + ((y + 1) * (256 + 1)) + x;
 #endif
     uint8_t* dest8 = (uint8_t*)pix + ((y * 256) + x) * 3;
 
