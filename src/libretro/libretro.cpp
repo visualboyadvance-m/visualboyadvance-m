@@ -203,6 +203,8 @@ void retro_set_environment(retro_environment_t cb)
       { "vbam_usebios", "Use BIOS file (Restart); disabled|enabled" },
       { "vbam_soundinterpolation", "Sound Interpolation; disabled|enabled" },
       { "vbam_soundfiltering", "Sound Filtering; 5|6|7|8|9|10|0|1|2|3|4" },
+      { "vbam_gbHardware", "(GB) Emulated Hardware; Automatic|Game Boy Color|Super Game Boy|Game Boy|Game Boy Advance|Super Game Boy 2" },
+      { "vbam_showborders", "(GB) Show Borders; disabled|enabled|auto" },
       { "vbam_layer_1", "Show layer 1; enabled|disabled" },
       { "vbam_layer_2", "Show layer 2; enabled|disabled" },
       { "vbam_layer_3", "Show layer 3; enabled|disabled" },
@@ -542,6 +544,7 @@ static const unsigned binds[4][MAX_BUTTONS] = {
     }
 };
 
+static void systemGbBorderOff(void);
 static void systemUpdateSolarSensor(int level);
 static uint8_t sensorDarkness = 0xE8;
 static uint8_t sensorDarknessLevel = 0; // so we can adjust sensor from gamepad
@@ -632,6 +635,61 @@ static void update_variables(void)
     {
         sensorDarknessLevel = atoi(var.value);
         systemUpdateSolarSensor(sensorDarknessLevel);
+    }
+
+    var.key = "vbam_showborders";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        int oldval = (gbBorderOn << 1) | gbBorderAutomatic;
+        if (strcmp(var.value, "auto") == 0)
+        {
+            gbBorderOn = 0;
+            gbBorderAutomatic = 1;
+        }
+        else if (strcmp(var.value, "enabled") == 0)
+        {
+            gbBorderAutomatic = 0;
+            gbBorderOn = 1;
+        }
+        else // disabled
+        {
+            gbBorderOn = 0;
+            gbBorderAutomatic = 0;
+        }
+
+        if ((type == IMAGE_GB) && (oldval != ((gbBorderOn << 1) | gbBorderAutomatic)))
+        {
+            if (gbBorderOn)
+            {
+                gbSgbRenderBorder();
+                systemGbBorderOn();
+            }
+            else
+            {
+                systemGbBorderOff();
+            }
+        }
+    }
+
+    var.key = "vbam_gbHardware";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        if (strcmp(var.value, "Automatic") == 0)
+            gbEmulatorType = 0;
+        else if (strcmp(var.value, "Game Boy Color") == 0)
+            gbEmulatorType = 1;
+        else if (strcmp(var.value, "Super Game Boy") == 0)
+            gbEmulatorType = 2;
+        else if (strcmp(var.value, "Game Boy") == 0)
+            gbEmulatorType = 3;
+        else if (strcmp(var.value, "Game Boy Advance") == 0)
+            gbEmulatorType = 4;
+        else if (strcmp(var.value, "Super Game Boy 2") == 0)
+            gbEmulatorType = 5;
     }
 }
 
@@ -972,17 +1030,37 @@ void systemFrame(void)
     has_frame = 1;
 }
 
-void systemGbBorderOn()
+void systemGbBorderOn(void)
 {
-	width = gbBorderLineSkip = SGBWidth;
-	height = SGBHeight;
-	gbBorderColumnSkip = (SGBWidth - GBWidth) >> 1;
-	gbBorderRowSkip = (SGBHeight - GBHeight) >> 1;
+    bool changed = ((width != SGBWidth) || (height != SGBHeight));
+    width = gbBorderLineSkip = SGBWidth;
+    height = SGBHeight;
+    gbBorderColumnSkip = (SGBWidth - GBWidth) >> 1;
+    gbBorderRowSkip = (SGBHeight - GBHeight) >> 1;
 
-	struct retro_system_av_info avinfo;
-	retro_get_system_av_info(&avinfo);
-	//environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
-	environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
+    struct retro_system_av_info avinfo;
+    retro_get_system_av_info(&avinfo);
+
+    if (!changed)
+        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
+    else
+        environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
+}
+
+static void systemGbBorderOff(void)
+{
+    bool changed = ((width != GBWidth) || (height != GBHeight));
+    width = gbBorderLineSkip = GBWidth;
+    height = GBHeight;
+    gbBorderColumnSkip = gbBorderRowSkip = 0;
+
+    struct retro_system_av_info avinfo;
+    retro_get_system_av_info(&avinfo);
+
+    if (!changed)
+        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
+    else
+        environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
 }
 
 void systemMessage(const char* fmt, ...)
