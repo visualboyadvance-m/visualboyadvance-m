@@ -93,47 +93,178 @@ uint16_t systemGbPalette[24] = {
     GS555(0x1f), GS555(0x15), GS555(0x0c), 0
 };
 
+extern int gbRomType; // gets type from header 0x147
+extern int gbBattery; // enabled when gbRamSize != 0
+
+static bool gb_hasbattery(void)
+{
+    switch (gbRomType) {
+    case 0x03: // MBC1
+    case 0xff: // MBC1
+    case 0x0d: // MM01
+    case 0x0f:
+    case 0x10: // MBC3 + extended
+    case 0x13:
+    case 0xfc: // MBC3
+    case 0x1b:
+    case 0x1e: // MBC5
+    //incomplete, does not save gbTAMA5ram
+    case 0xfd: // TAMA5 + extended
+         return true;
+    // need to remap these
+    //case 0x06: // MBC2
+    //case 0x22: // MBC7
+    }
+    return false;
+}
+
+static bool gb_hasrtc(void)
+{
+    switch (gbRomType) {
+    case 0x0f:
+    case 0x10: // MBC3 + extended
+    case 0x13:
+    case 0xfd: // TAMA5 + extended
+        return true;
+    }
+    return false;
+}
+
+static void* gba_savedata_ptr(void)
+{
+    if ((saveType == 1) | (saveType == 4))
+        return eepromData;
+    if ((saveType == 2) | (saveType == 3))
+        return flashSaveMemory;
+    return 0;
+}
+
+static size_t gba_savedata_size(void)
+{
+    if ((saveType == 1) | (saveType == 4))
+        return eepromSize;
+    if ((saveType == 2) | (saveType == 3))
+        return flashSize;
+    return 0;
+}
+
+static void* gb_savedata_ptr(void)
+{
+    if (gb_hasbattery())
+        return gbRam;
+    return 0;
+}
+
+static size_t gb_savedata_size(void)
+{
+    if (gb_hasbattery())
+        return gbRamSize;
+    return 0;
+}
+
+static void* gb_rtcdata_prt(void)
+{
+    if (gb_hasrtc()) {
+        switch (gbRomType) {
+        case 0x0f:
+        case 0x10: // MBC3 + extended
+            return &gbDataMBC3.mapperSeconds;
+        case 0x13:
+        case 0xfd: // TAMA5 + extended
+            return &gbDataTAMA5.mapperSeconds;
+        }
+    }
+    return 0;
+}
+
+static size_t gb_rtcdata_size(void)
+{
+    if (gb_hasrtc()) {
+        switch (gbRomType) {
+        case 0x0f:
+        case 0x10: // MBC3 + extended
+            return (10 * sizeof(int) + sizeof(time_t));
+            break;
+        case 0x13:
+        case 0xfd: // TAMA5 + extended
+            return (14 * sizeof(int) + sizeof(time_t));
+            break;
+        }
+    }
+    return 0;
+}
+
+static void* savedata_ptr(void)
+{
+    if (type == IMAGE_GBA)
+        return gba_savedata_ptr();
+    if (type == IMAGE_GB)
+        return gb_savedata_ptr();
+    return 0;
+}
+
+static size_t savedata_size(void)
+{
+    if (type == IMAGE_GBA)
+        return gba_savedata_size();
+    if (type == IMAGE_GB)
+        return gb_savedata_size();
+    return 0;
+}
+
+static void* rtcdata_ptr(void)
+{
+    if (type == IMAGE_GB)
+        return gb_rtcdata_prt();
+    return 0;
+}
+
+static size_t rtcdata_size(void)
+{
+    if (type == IMAGE_GB)
+        return gb_rtcdata_size();
+    return 0;
+}
+
 void* retro_get_memory_data(unsigned id)
 {
     if (id == RETRO_MEMORY_SAVE_RAM)
-    {
+        return savedata_ptr();
+    if (id == RETRO_MEMORY_RTC)
+        return rtcdata_ptr();
+    if (id == RETRO_MEMORY_SYSTEM_RAM) {
         if (type == IMAGE_GBA)
-        {
-            if ((saveType == 1) | (saveType == 4))
-                return eepromData;
-            if ((saveType == 2) | (saveType == 3))
-                return flashSaveMemory;
-        } else {
-            // TODO: GB / GBC saves here
+            return workRAM;
+        if (type == IMAGE_GB) {
         }
     }
-    if (id == RETRO_MEMORY_SYSTEM_RAM)
-        return workRAM;
-    if (id == RETRO_MEMORY_VIDEO_RAM)
-        return vram;
-
-    return NULL;
+    if (id == RETRO_MEMORY_VIDEO_RAM) {
+        if (type == IMAGE_GBA)
+            return vram;
+        if (type == IMAGE_GB) {
+        }
+    }
+    return 0;
 }
 
 size_t retro_get_memory_size(unsigned id)
 {
     if (id == RETRO_MEMORY_SAVE_RAM)
-    {
+        return savedata_size();
+    if (id == RETRO_MEMORY_RTC)
+        return rtcdata_size();
+    if (id == RETRO_MEMORY_SYSTEM_RAM) {
         if (type == IMAGE_GBA)
-        {
-            if ((saveType == 1) | (saveType == 4))
-                return eepromSize;
-            if ((saveType == 2) | (saveType == 3))
-                return flashSize;
-        } else {
-            // TODO: GB / GBC saves here
+            return 0x40000;
+        if (type == IMAGE_GB) {
         }
     }
-    if (id == RETRO_MEMORY_SYSTEM_RAM)
-        return 0x40000;
-    if (id == RETRO_MEMORY_VIDEO_RAM)
-        return 0x20000;
-
+    if (id == RETRO_MEMORY_VIDEO_RAM) {
+        if (type == IMAGE_GBA)
+            return 0x20000;
+        if (type == IMAGE_GB) {
+        }
+    }
     return 0;
 }
 
@@ -426,8 +557,7 @@ static void gba_init(void)
     soundInit();
     soundSetSampleRate(SampleRate);
 
-    if (usebios)
-    {
+    if (usebios) {
         snprintf(biosfile, sizeof(biosfile), "%s%c%s", retro_system_directory, SLASH, "gba_bios.bin");
         log("Loading bios: %s\n", biosfile);
     }
@@ -458,8 +588,7 @@ static void gb_init(void)
 
     gbGetHardwareType();
 
-    if (usebios)
-    {
+    if (usebios) {
         snprintf(biosfile, sizeof(biosfile), "%s%c%s",
             retro_system_directory, SLASH, biosname[gbCgbMode]);
         log("Loading bios: %s\n", biosfile);
@@ -559,8 +688,7 @@ static void update_variables(void)
     int disabled_layers=0;
 
     strcpy(key, "vbam_layer_x");
-    for (int i = 0; i < 8; i++)
-    {
+    for (int i = 0; i < 8; i++) {
         key[strlen("vbam_layer_")] = '1' + i;
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd')
@@ -573,12 +701,10 @@ static void update_variables(void)
 
     int sound_enabled = 0x30F;
     strcpy(key, "vbam_sound_x");
-    for (unsigned i = 0; i < 6; i++)
-    {
+    for (unsigned i = 0; i < 6; i++) {
         key[strlen("vbam_sound_")] = '1' + i;
         var.value = NULL;
-        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd')
-        {
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd') {
             unsigned which = (i < 4) ? (1 << i) : (0x100 << (i - 4));
             sound_enabled &= ~(which);
         }
@@ -590,11 +716,9 @@ static void update_variables(void)
     var.key = "vbam_soundinterpolation";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         bool newval = (strcmp(var.value, "enabled") == 0);
-        if (sndInterpolation != newval)
-        {
+        if (sndInterpolation != newval) {
             sndInterpolation = newval;
             sound_changed = true;
         }
@@ -603,18 +727,15 @@ static void update_variables(void)
     var.key = "vbam_soundfiltering";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         float newval = atof(var.value) * 0.1f;
-        if (sndFiltering != newval)
-        {
+        if (sndFiltering != newval) {
             sndFiltering = newval;
             sound_changed = true;
         }
     }
 
-    if (sound_changed)
-    {
+    if (sound_changed) {
         //Update interpolation and filtering values
         gba_soundchanged();
     }
@@ -622,8 +743,7 @@ static void update_variables(void)
     var.key = "vbam_usebios";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         bool newval = (strcmp(var.value, "enabled") == 0);
         usebios = newval;
     }
@@ -631,8 +751,7 @@ static void update_variables(void)
     var.key = "vbam_solarsensor";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         sensorDarknessLevel = atoi(var.value);
         systemUpdateSolarSensor(sensorDarknessLevel);
     }
@@ -640,44 +759,35 @@ static void update_variables(void)
     var.key = "vbam_showborders";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         int oldval = (gbBorderOn << 1) | gbBorderAutomatic;
-        if (strcmp(var.value, "auto") == 0)
-        {
+        if (strcmp(var.value, "auto") == 0) {
             gbBorderOn = 0;
             gbBorderAutomatic = 1;
         }
-        else if (strcmp(var.value, "enabled") == 0)
-        {
+        else if (strcmp(var.value, "enabled") == 0) {
             gbBorderAutomatic = 0;
             gbBorderOn = 1;
         }
-        else // disabled
-        {
+        else { // disabled
             gbBorderOn = 0;
             gbBorderAutomatic = 0;
         }
 
-        if ((type == IMAGE_GB) && (oldval != ((gbBorderOn << 1) | gbBorderAutomatic)))
-        {
-            if (gbBorderOn)
-            {
+        if ((type == IMAGE_GB) && (oldval != ((gbBorderOn << 1) | gbBorderAutomatic))) {
+            if (gbBorderOn) {
                 gbSgbRenderBorder();
                 systemGbBorderOn();
             }
             else
-            {
                 systemGbBorderOff();
-            }
         }
     }
 
     var.key = "vbam_gbHardware";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         if (strcmp(var.value, "Automatic") == 0)
             gbEmulatorType = 0;
         else if (strcmp(var.value, "Game Boy Color") == 0)
@@ -705,23 +815,17 @@ void retro_run(void)
     poll_cb();
 
     // Update solar sensor level by gamepad buttons, default L2/R2
-    if (buttonpressed)
-    {
+    if (buttonpressed) {
         buttonpressed = input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2) ||
             input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2);
-    }
-    else
-    {
-        if (input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2))
-        {
+    } else {
+        if (input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2)) {
             sensorDarknessLevel++;
             if (sensorDarknessLevel > 10)
                 sensorDarknessLevel = 10;
             systemUpdateSolarSensor(sensorDarknessLevel);
             buttonpressed = true;
-        }
-        else if (input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2))
-        {
+        } else if (input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2)) {
             if (sensorDarknessLevel)
                 sensorDarknessLevel--;
             systemUpdateSolarSensor(sensorDarknessLevel);
@@ -755,8 +859,7 @@ bool retro_unserialize(const void* data, size_t size)
 
 void retro_cheat_reset(void)
 {
-	if (type == IMAGE_GBA)
-	{
+	if (type == IMAGE_GBA) {
 		cheatsEnabled = 1;
 		cheatsDeleteAll(false);
 	}
@@ -932,14 +1035,12 @@ bool retro_load_game(const struct retro_game_info *game)
 
    type = utilFindType((const char *)game->path);
 
-   switch (type)
-   {
+   switch (type) {
    case IMAGE_UNKNOWN:
       log("Unsupported image %s!\n", game->path);
       return 0;
 
-   case IMAGE_GBA:
-      {
+   case IMAGE_GBA: {
       romSize = CPULoadRomData((const char*)game->data, game->size);
 
       if (!romSize)
@@ -1123,8 +1224,7 @@ uint32_t systemReadJoypad(int which)
 static void systemUpdateSolarSensor(int v)
 {
     int value = 0;
-    switch (v)
-    {
+    switch (v) {
     case 1:  value = 0x06; break;
     case 2:  value = 0x0E; break;
     case 3:  value = 0x18; break;
