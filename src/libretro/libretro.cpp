@@ -226,24 +226,48 @@ static size_t rtcdata_size(void)
     return 0;
 }
 
+static void* wram_ptr(void)
+{
+    if (type == IMAGE_GBA)
+        return workRAM;
+    if (type == IMAGE_GB) {
+        // this does not work with retro_get_memory_data/size
+        // with its current memory mapping
+    }
+    return 0;
+}
+
+static size_t wram_size(void)
+{
+    if (type == IMAGE_GBA)
+        return 0x40000;
+    return 0;
+}
+
+static void* vram_ptr(void)
+{
+    if (type == IMAGE_GBA)
+        return vram;
+    return 0;
+}
+
+static size_t vram_size(void)
+{
+    if (type == IMAGE_GBA)
+        return 0x20000;
+    return 0;
+}
+
 void* retro_get_memory_data(unsigned id)
 {
     if (id == RETRO_MEMORY_SAVE_RAM)
         return savedata_ptr();
     if (id == RETRO_MEMORY_RTC)
         return rtcdata_ptr();
-    if (id == RETRO_MEMORY_SYSTEM_RAM) {
-        if (type == IMAGE_GBA)
-            return workRAM;
-        if (type == IMAGE_GB) {
-        }
-    }
-    if (id == RETRO_MEMORY_VIDEO_RAM) {
-        if (type == IMAGE_GBA)
-            return vram;
-        if (type == IMAGE_GB) {
-        }
-    }
+    if (id == RETRO_MEMORY_SYSTEM_RAM)
+        return wram_ptr();
+    if (id == RETRO_MEMORY_VIDEO_RAM)
+        return vram_ptr();
     return 0;
 }
 
@@ -253,18 +277,10 @@ size_t retro_get_memory_size(unsigned id)
         return savedata_size();
     if (id == RETRO_MEMORY_RTC)
         return rtcdata_size();
-    if (id == RETRO_MEMORY_SYSTEM_RAM) {
-        if (type == IMAGE_GBA)
-            return 0x40000;
-        if (type == IMAGE_GB) {
-        }
-    }
-    if (id == RETRO_MEMORY_VIDEO_RAM) {
-        if (type == IMAGE_GBA)
-            return 0x20000;
-        if (type == IMAGE_GB) {
-        }
-    }
+    if (id == RETRO_MEMORY_SYSTEM_RAM)
+        return wram_size();
+    if (id == RETRO_MEMORY_VIDEO_RAM)
+        return vram_size();
     return 0;
 }
 
@@ -540,8 +556,6 @@ static void gba_init(void)
 {
     log("Loading VBA-M Core (GBA)...\n");
 
-    update_colormaps();
-
     load_image_preferences();
 
     saveType = cpuSaveType;
@@ -553,8 +567,6 @@ static void gba_init(void)
     rtcEnableRumble(!rtcEnabled);
 
     doMirroring(mirroringEnable);
-
-    soundInit();
     soundSetSampleRate(SampleRate);
 
     if (usebios) {
@@ -563,16 +575,14 @@ static void gba_init(void)
     }
     CPUInit(biosfile, usebios);
 
+    width = GBAWidth;
+    height = GBAHeight;
+
     // CPUReset() will reset eepromSize to 512.
     // Save current eepromSize override then restore after CPUReset()
     int tmp = eepromSize;
     CPUReset();
     eepromSize = tmp;
-
-    core = &GBASystem;
-
-    width = GBAWidth;
-    height = GBAHeight;
 }
 
 static void gb_init(void)
@@ -580,11 +590,6 @@ static void gb_init(void)
     const char *biosname[] = {"gb_bios.bin", "gbc_bios.bin"};
 
     log("Loading VBA-M Core (GB/GBC)...\n");
-
-    update_colormaps();
-
-    soundInit();
-    gbSoundSetSampleRate(SampleRate);
 
     gbGetHardwareType();
 
@@ -595,7 +600,6 @@ static void gb_init(void)
     }
 
     gbCPUInit(biosfile, usebios);
-    gbReset();
 
     if (gbBorderOn) {
         width = gbBorderLineSkip = SGBWidth;
@@ -608,7 +612,10 @@ static void gb_init(void)
         gbBorderColumnSkip = gbBorderRowSkip = 0;
     }
 
-    core = &GBSystem;
+    gbSoundSetSampleRate(SampleRate);
+    gbSoundSetDeclicking(1);
+
+    gbReset(); // also resets sound;
 }
 
 static void gba_soundchanged(void)
@@ -1035,16 +1042,21 @@ bool retro_load_game(const struct retro_game_info *game)
 
    type = utilFindType((const char *)game->path);
 
-   switch (type) {
-   case IMAGE_UNKNOWN:
+   if (type == IMAGE_UNKNOWN) {
       log("Unsupported image %s!\n", game->path);
-      return 0;
+      return false;
+   }
 
-   case IMAGE_GBA: {
+   update_colormaps();
+   soundInit();
+
+   if (type == IMAGE_GBA) {
       romSize = CPULoadRomData((const char*)game->data, game->size);
 
       if (!romSize)
          return false;
+
+      core = &GBASystem;
 
       gba_init();
 
@@ -1067,22 +1079,84 @@ bool retro_load_game(const struct retro_game_info *game)
       desc[8].start=0x05000000; desc[8].select=0xFF000000; desc[8].len=0x400;     desc[8].ptr=paletteRAM;//palettes
       desc[9].start=0x07000000; desc[9].select=0xFF000000; desc[9].len=0x400;     desc[9].ptr=oam;//OAM
       desc[10].start=0x04000000;desc[10].select=0;         desc[10].len=0x400;    desc[10].ptr=ioMem;//bunch of registers
-      struct retro_memory_map retromap={ desc, sizeof(desc)/sizeof(*desc) };
+
+      struct retro_memory_map retromap = {
+          desc,
+          sizeof(desc)/sizeof(desc[0])
+      };
+
       environ_cb(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &retromap);
+   }
 
-      bool yes = true;
-      environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
-      }
-      break;
-
-   case IMAGE_GB:
+   else if (type == IMAGE_GB) {
       if (!gbLoadRomData((const char *)game->data, game->size))
          return false;
 
+      core = &GBSystem;
+
       gb_init();
 
-      break;
+      struct retro_memory_descriptor desc[8];
+      memset(desc, 0, sizeof(desc));
+
+      // workram bank 0 0xc000-0xcfff / bank 1-7 0xd000-0xdfff
+      desc[0].ptr   = &gbMemory[0xc000];
+      desc[0].start = 0xc000;
+      desc[0].len   = 0x1000;
+
+      // workram bank 1-7 switchable (switchable-CGB only)
+      desc[1].ptr   = gbCgbMode ? &gbWram[0x1000] : &gbMemory[0xd000];
+      desc[1].start = 0xd000;
+      desc[1].len   = 0x1000;
+
+      // high ram area
+      desc[2].ptr   = &gbMemory[0xff80];
+      desc[2].start = 0xff80;
+      desc[2].len   = 0x0080;
+
+      // save ram or cartridge ram area
+      desc[3].ptr   = gbRamSize ? &gbRam[0] : 0;
+      desc[3].start = 0xa000;
+      desc[3].len   = gbRamSize ? gbRamSize : 0;
+
+      // vram (chr ram, gb map data 1 - 2)
+      desc[4].ptr   = gbCgbMode ? &gbVram[0] : &gbMemory[0x8000];
+      desc[4].start = 0x8000;
+      desc[4].len   = 0x2000;
+
+      // oam
+      desc[5].ptr   = &gbMemory[0xfe00];
+      desc[5].start = 0xfe00;
+      desc[5].len   = 0x00a0;
+
+      // http://gameboy.mongenel.com/dmg/asmmemmap.html
+      // $4000-$7FFF 	Cartridge ROM - Switchable Banks 1-xx
+      // $0150-$3FFF 	Cartridge ROM - Bank 0 (fixed)
+      // $0100-$014F 	Cartridge Header Area
+      // $0000-$00FF 	Restart and Interrupt Vectors
+      desc[6].ptr   = gbMemoryMap[0x00];
+      desc[6].start = 0x0000;
+      desc[6].len   = 0x4000;
+      desc[6].flags = RETRO_MEMDESC_CONST;
+
+      desc[7].ptr   = gbMemoryMap[0x04];
+      desc[7].start = 0x4000;
+      desc[7].len   = 0x4000;
+      desc[7].flags = RETRO_MEMDESC_CONST;
+
+      struct retro_memory_map retromap = {
+          desc,
+          sizeof(desc) / sizeof(desc[0])
+      };
+
+      environ_cb(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &retromap);
    }
+
+   if (!core)
+       return false;
+
+   bool yes = true;
+   environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
 
    uint8_t* state_buf = (uint8_t*)malloc(2000000);
    serialize_size = core->emuWriteState(state_buf, 2000000);
