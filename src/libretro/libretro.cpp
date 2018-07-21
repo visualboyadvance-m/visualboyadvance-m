@@ -437,6 +437,125 @@ void retro_init(void)
 #endif
 }
 
+static const char *gbGetCartridgeType(void)
+{
+    const char *type = "Unknown";
+
+    switch (gbRom[0x147]) {
+    case 0x00:
+        type = "ROM";
+        break;
+    case 0x01:
+        type = "ROM+MBC1";
+        break;
+    case 0x02:
+        type = "ROM+MBC1+RAM";
+        break;
+    case 0x03:
+        type = "ROM+MBC1+RAM+BATTERY";
+        break;
+    case 0x05:
+        type = "ROM+MBC2";
+        break;
+    case 0x06:
+        type = "ROM+MBC2+BATTERY";
+        break;
+    case 0x0b:
+        type = "ROM+MMM01";
+        break;
+    case 0x0c:
+        type = "ROM+MMM01+RAM";
+        break;
+    case 0x0d:
+        type = "ROM+MMM01+RAM+BATTERY";
+        break;
+    case 0x0f:
+        type = "ROM+MBC3+TIMER+BATTERY";
+        break;
+    case 0x10:
+        type = "ROM+MBC3+TIMER+RAM+BATTERY";
+        break;
+    case 0x11:
+        type = "ROM+MBC3";
+        break;
+    case 0x12:
+        type = "ROM+MBC3+RAM";
+        break;
+    case 0x13:
+        type = "ROM+MBC3+RAM+BATTERY";
+        break;
+    case 0x19:
+        type = "ROM+MBC5";
+        break;
+    case 0x1a:
+        type = "ROM+MBC5+RAM";
+        break;
+    case 0x1b:
+        type = "ROM+MBC5+RAM+BATTERY";
+        break;
+    case 0x1c:
+        type = "ROM+MBC5+RUMBLE";
+        break;
+    case 0x1d:
+        type = "ROM+MBC5+RUMBLE+RAM";
+        break;
+    case 0x1e:
+        type = "ROM+MBC5+RUMBLE+RAM+BATTERY";
+        break;
+    case 0x22:
+        type = "ROM+MBC7+BATTERY";
+        break;
+    case 0x55:
+        type = "GameGenie";
+        break;
+    case 0x56:
+        type = "GameShark V3.0";
+        break;
+    case 0xfc:
+        type = "ROM+POCKET CAMERA";
+        break;
+    case 0xfd:
+        type = "ROM+BANDAI TAMA5";
+        break;
+    case 0xfe:
+        type = "ROM+HuC-3";
+        break;
+    case 0xff:
+        type = "ROM+HuC-1";
+        break;
+    }
+
+    return (type);
+}
+
+static const char *gbGetSaveRamSize(void)
+{
+    const char *type = "Unknown";
+
+    switch (gbRom[0x149]) {
+    case 0:
+        type = "None";
+        break;
+    case 1:
+        type = "2K";
+        break;
+    case 2:
+        type = "8K";
+        break;
+    case 3:
+        type = "32K";
+        break;
+    case 4:
+        type = "128K";
+        break;
+    case 5:
+        type = "64K";
+        break;
+    }
+
+    return (type);
+}
+
 typedef struct {
     char romtitle[256];
     char romid[5];
@@ -478,8 +597,7 @@ static void load_image_preferences(void)
     rtcEnabled = false;
     mirroringEnable = false;
 
-    if (log_cb)
-        log_cb(RETRO_LOG_INFO, "GameID in ROM is: %s\n", buffer);
+    log("GameID in ROM is: %s\n", buffer);
 
     bool found = false;
     int found_no = 0;
@@ -493,8 +611,8 @@ static void load_image_preferences(void)
     }
 
     if (found) {
-        if (log_cb)
-            log_cb(RETRO_LOG_INFO, "Found ROM in vba-over list.\n");
+        log("Found ROM in vba-over list.\n");
+        log("Name            : %s\n", gbaover[found_no].romtitle);
 
         cpuSaveType = gbaover[found_no].saveType;
 
@@ -515,15 +633,14 @@ static void load_image_preferences(void)
         utilGBAFindSave(romSize);
     }
 
-    if (log_cb) {
-        log_cb(RETRO_LOG_INFO, "RTC = %d.\n", rtcEnabled);
-        log_cb(RETRO_LOG_INFO, "cpuSaveType = %s.\n", savetype[cpuSaveType]);
-        if (cpuSaveType == 3)
-            log_cb(RETRO_LOG_INFO, "flashSize = %d.\n", flashSize);
-        if (cpuSaveType == 1)
-            log_cb(RETRO_LOG_INFO, "eepromSize = %d.\n", eepromSize);
-        log_cb(RETRO_LOG_INFO, "mirroringEnable = %d.\n", mirroringEnable);
-    }
+    log("romSize         : %dKB)\n", (romSize + 1023) / 1024);
+    log("has RTC         : %s.\n", rtcEnabled ? "Yes" : "No");
+    log("cpuSaveType     : %s.\n", savetype[cpuSaveType]);
+    if (cpuSaveType == 3)
+        log("flashSize       : %d.\n", flashSize);
+    if (cpuSaveType == 1)
+        log("eepromSize      : %d.\n", eepromSize);
+    log("mirroringEnable : %d.\n", mirroringEnable);
 }
 
 static void update_colormaps(void)
@@ -616,6 +733,26 @@ static void gb_init(void)
     gbSoundSetDeclicking(1);
 
     gbReset(); // also resets sound;
+
+    log("Rom size       : %02x (%dK)\n", gbRom[0x148], (romSize + 1023) / 1024);
+    log("Cartridge type : %02x (%s)\n", gbRom[0x147], gbGetCartridgeType());
+    log("Ram size       : %02x (%s)\n", gbRom[0x149], gbGetSaveRamSize());
+
+    int i = 0;
+    uint8_t crc = 25;
+
+    for (i = 0x134; i < 0x14d; i++)
+        crc += gbRom[i];
+    crc = 256 - crc;
+    log("CRC            : %02x (%02x)\n", crc, gbRom[0x14d]);
+
+    uint16_t crc16 = 0;
+
+    for (i = 0; i < gbRomSize; i++)
+        crc16 += gbRom[i];
+
+    crc16 -= gbRom[0x14e] + gbRom[0x14f];
+    log("Checksum       : %04x (%04x)\n", crc16, gbRom[0x14e] * 256 + gbRom[0x14f]);
 }
 
 static void gba_soundchanged(void)
@@ -1091,6 +1228,8 @@ bool retro_load_game(const struct retro_game_info *game)
    else if (type == IMAGE_GB) {
       if (!gbLoadRomData((const char *)game->data, game->size))
          return false;
+
+      romSize = game->size;
 
       core = &GBSystem;
 
