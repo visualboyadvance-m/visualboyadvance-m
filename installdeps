@@ -550,7 +550,7 @@ archlinux_installdeps() {
 
     # common needed dev packages
     # not using the base-devel group because it can break gcc-multilib
-    check $pacman --noconfirm --needed -S binutils file grep gawk gzip libtool make patch sed util-linux nasm cmake pkg-config git ccache
+    check $pacman --noconfirm --needed -S binutils file grep gawk gzip libtool make patch sed util-linux nasm cmake pkg-config git ccache zip
 
     libs="zlib mesa gettext libpng sdl2 openal wxgtk3 gtk3 sfml ffmpeg"
 
