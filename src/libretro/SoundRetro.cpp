@@ -18,7 +18,6 @@
 #include "SoundRetro.h"
 #include "libretro.h"
 
-unsigned g_audio_frames;
 extern retro_audio_sample_batch_t audio_batch_cb;
 
 SoundRetro::SoundRetro()
@@ -30,14 +29,10 @@ void SoundRetro::write(uint16_t* finalWave, int length)
     const int16_t* wave = (const int16_t*)finalWave;
     int frames = length >> 1;
     audio_batch_cb(wave, frames);
-
-    g_audio_frames += frames;
 }
 
 bool SoundRetro::init(long sampleRate)
 {
-    g_audio_frames = 0;
-
     return true;
 }
 

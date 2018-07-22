@@ -25,12 +25,16 @@
 #include "../gba/Sound.h"
 #include "../gba/bios.h"
 
+#include "../gb/gb.h"
+#include "../gb/gbCheats.h"
+#include "../gb/gbGlobals.h"
+#include "../gb/gbMemory.h"
+#include "../gb/gbSGB.h"
+#include "../gb/gbSound.h"
+
 #define RETRO_DEVICE_GBA             RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 0)
 #define RETRO_DEVICE_GBA_ALT1        RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 1)
 #define RETRO_DEVICE_GBA_ALT2        RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 2)
-
-#define SAMPLERATE                   32768
-#define FRAMERATE                    (16777216.0 / 280896.0)
 
 #define ISHEXDEC ((codeLine[cursor]>='0') && (codeLine[cursor]<='9')) || ((codeLine[cursor]>='a') && (codeLine[cursor]<='f')) || ((codeLine[cursor]>='A') && (codeLine[cursor]<='F'))
 
@@ -38,23 +42,33 @@ static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
 static retro_input_poll_t poll_cb;
 static retro_input_state_t input_cb;
-retro_audio_sample_batch_t audio_batch_cb;
 static retro_environment_t environ_cb;
+retro_audio_sample_batch_t audio_batch_cb;
 
+static char retro_system_directory[4096];
+static char biosfile[4096];
 static float sndFiltering = 0.5f;
 static bool sndInterpolation = true;
 static bool can_dupe = false;
-int emulating = 0;
-static int retropad_layout = 0;
-
-static char biosfile[1024] = {0};
 static bool usebios = false;
+static unsigned retropad_layout = 1;
 
-int RGB_LOW_BITS_MASK = 0;
+static const double FramesPerSecond =  (16777216.0 / 280896.0); // 59.73
+static const long SampleRate = 32768;
+static const int GBWidth = 160;
+static const int GBHeight = 144;
+static const int SGBWidth = 256;
+static const int SGBHeight = 224;
+static const int GBAWidth = 240;
+static const int GBAHeight = 160;
+static unsigned width = 240;
+static unsigned height = 160;
+static EmulatedSystem* core = NULL;
+static IMAGE_TYPE type = IMAGE_UNKNOWN;
 
 uint16_t systemColorMap16[0x10000];
 uint32_t systemColorMap32[0x10000];
-uint16_t systemGbPalette[24];
+int RGB_LOW_BITS_MASK = 0;
 int systemRedShift = 0;
 int systemBlueShift = 0;
 int systemGreenShift = 0;
@@ -64,41 +78,209 @@ int systemVerbose = 0;
 int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 int systemSpeed = 0;
+int emulating = 0;
 
 void (*dbgOutput)(const char* s, uint32_t addr);
 void (*dbgSignal)(int sig, int number);
 
+#define GS555(x) (x | (x << 5) | (x << 10))
+uint16_t systemGbPalette[24] = {
+    GS555(0x1f), GS555(0x15), GS555(0x0c), 0,
+    GS555(0x1f), GS555(0x15), GS555(0x0c), 0,
+    GS555(0x1f), GS555(0x15), GS555(0x0c), 0,
+    GS555(0x1f), GS555(0x15), GS555(0x0c), 0,
+    GS555(0x1f), GS555(0x15), GS555(0x0c), 0,
+    GS555(0x1f), GS555(0x15), GS555(0x0c), 0
+};
+
+extern int gbRomType; // gets type from header 0x147
+extern int gbBattery; // enabled when gbRamSize != 0
+
+static bool gb_hasbattery(void)
+{
+    switch (gbRomType) {
+    case 0x03: // MBC1
+    case 0xff: // MBC1
+    case 0x0d: // MM01
+    case 0x0f:
+    case 0x10: // MBC3 + extended
+    case 0x13:
+    case 0xfc: // MBC3
+    case 0x1b:
+    case 0x1e: // MBC5
+    //incomplete, does not save gbTAMA5ram
+    case 0xfd: // TAMA5 + extended
+         return true;
+    // need to remap these
+    //case 0x06: // MBC2
+    //case 0x22: // MBC7
+    }
+    return false;
+}
+
+static bool gb_hasrtc(void)
+{
+    switch (gbRomType) {
+    case 0x0f:
+    case 0x10: // MBC3 + extended
+    case 0x13:
+    case 0xfd: // TAMA5 + extended
+        return true;
+    }
+    return false;
+}
+
+static void* gba_savedata_ptr(void)
+{
+    if ((saveType == 1) | (saveType == 4))
+        return eepromData;
+    if ((saveType == 2) | (saveType == 3))
+        return flashSaveMemory;
+    return 0;
+}
+
+static size_t gba_savedata_size(void)
+{
+    if ((saveType == 1) | (saveType == 4))
+        return eepromSize;
+    if ((saveType == 2) | (saveType == 3))
+        return flashSize;
+    return 0;
+}
+
+static void* gb_savedata_ptr(void)
+{
+    if (gb_hasbattery())
+        return gbRam;
+    return 0;
+}
+
+static size_t gb_savedata_size(void)
+{
+    if (gb_hasbattery())
+        return gbRamSize;
+    return 0;
+}
+
+static void* gb_rtcdata_prt(void)
+{
+    if (gb_hasrtc()) {
+        switch (gbRomType) {
+        case 0x0f:
+        case 0x10: // MBC3 + extended
+            return &gbDataMBC3.mapperSeconds;
+        case 0x13:
+        case 0xfd: // TAMA5 + extended
+            return &gbDataTAMA5.mapperSeconds;
+        }
+    }
+    return 0;
+}
+
+static size_t gb_rtcdata_size(void)
+{
+    if (gb_hasrtc()) {
+        switch (gbRomType) {
+        case 0x0f:
+        case 0x10: // MBC3 + extended
+            return (10 * sizeof(int) + sizeof(time_t));
+            break;
+        case 0x13:
+        case 0xfd: // TAMA5 + extended
+            return (14 * sizeof(int) + sizeof(time_t));
+            break;
+        }
+    }
+    return 0;
+}
+
+static void* savedata_ptr(void)
+{
+    if (type == IMAGE_GBA)
+        return gba_savedata_ptr();
+    if (type == IMAGE_GB)
+        return gb_savedata_ptr();
+    return 0;
+}
+
+static size_t savedata_size(void)
+{
+    if (type == IMAGE_GBA)
+        return gba_savedata_size();
+    if (type == IMAGE_GB)
+        return gb_savedata_size();
+    return 0;
+}
+
+static void* rtcdata_ptr(void)
+{
+    if (type == IMAGE_GB)
+        return gb_rtcdata_prt();
+    return 0;
+}
+
+static size_t rtcdata_size(void)
+{
+    if (type == IMAGE_GB)
+        return gb_rtcdata_size();
+    return 0;
+}
+
+static void* wram_ptr(void)
+{
+    if (type == IMAGE_GBA)
+        return workRAM;
+    if (type == IMAGE_GB) {
+        // this does not work with retro_get_memory_data/size
+        // with its current memory mapping
+    }
+    return 0;
+}
+
+static size_t wram_size(void)
+{
+    if (type == IMAGE_GBA)
+        return 0x40000;
+    return 0;
+}
+
+static void* vram_ptr(void)
+{
+    if (type == IMAGE_GBA)
+        return vram;
+    return 0;
+}
+
+static size_t vram_size(void)
+{
+    if (type == IMAGE_GBA)
+        return 0x20000;
+    return 0;
+}
+
 void* retro_get_memory_data(unsigned id)
 {
     if (id == RETRO_MEMORY_SAVE_RAM)
-    {
-        if ((saveType == 1) | (saveType == 4))
-            return eepromData;
-        if ((saveType == 2) | (saveType == 3))
-            return flashSaveMemory;
-    }
+        return savedata_ptr();
+    if (id == RETRO_MEMORY_RTC)
+        return rtcdata_ptr();
     if (id == RETRO_MEMORY_SYSTEM_RAM)
-        return workRAM;
+        return wram_ptr();
     if (id == RETRO_MEMORY_VIDEO_RAM)
-        return vram;
-
-    return NULL;
+        return vram_ptr();
+    return 0;
 }
 
 size_t retro_get_memory_size(unsigned id)
 {
     if (id == RETRO_MEMORY_SAVE_RAM)
-    {
-        if ((saveType == 1) | (saveType == 4))
-            return eepromSize;
-        if ((saveType == 2) | (saveType == 3))
-            return flashSize;
-    }
+        return savedata_size();
+    if (id == RETRO_MEMORY_RTC)
+        return rtcdata_size();
     if (id == RETRO_MEMORY_SYSTEM_RAM)
-        return 0x40000;
+        return wram_size();
     if (id == RETRO_MEMORY_VIDEO_RAM)
-        return 0x20000;
-
+        return vram_size();
     return 0;
 }
 
@@ -143,16 +325,16 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
     case RETRO_DEVICE_JOYPAD:
     case RETRO_DEVICE_GBA:
     default:
-        retropad_layout = 0;
-        break;
-    case RETRO_DEVICE_GBA_ALT1:
         retropad_layout = 1;
         break;
-    case RETRO_DEVICE_GBA_ALT2:
+    case RETRO_DEVICE_GBA_ALT1:
         retropad_layout = 2;
         break;
+    case RETRO_DEVICE_GBA_ALT2:
+        retropad_layout = 3;
+        break;
     case RETRO_DEVICE_NONE:
-        retropad_layout = -1;
+        retropad_layout = 0;
         break;
     }
 
@@ -168,6 +350,8 @@ void retro_set_environment(retro_environment_t cb)
       { "vbam_usebios", "Use BIOS file (Restart); disabled|enabled" },
       { "vbam_soundinterpolation", "Sound Interpolation; disabled|enabled" },
       { "vbam_soundfiltering", "Sound Filtering; 5|6|7|8|9|10|0|1|2|3|4" },
+      { "vbam_gbHardware", "(GB) Emulated Hardware; Automatic|Game Boy Color|Super Game Boy|Game Boy|Game Boy Advance|Super Game Boy 2" },
+      { "vbam_showborders", "(GB) Show Borders; disabled|enabled|auto" },
       { "vbam_layer_1", "Show layer 1; enabled|disabled" },
       { "vbam_layer_2", "Show layer 2; enabled|disabled" },
       { "vbam_layer_3", "Show layer 3; enabled|disabled" },
@@ -192,7 +376,10 @@ void retro_set_environment(retro_environment_t cb)
       { NULL, 0 },
    };
 
-   static const struct retro_controller_info ports[] = {{ port_1, 3 },{ NULL,0 }};
+   static const struct retro_controller_info ports[] = {
+        {port_1, 3},
+        { NULL, 0 }
+    };
 
    cb(RETRO_ENVIRONMENT_SET_VARIABLES, variables);
    cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void*)ports);
@@ -201,7 +388,7 @@ void retro_set_environment(retro_environment_t cb)
 void retro_get_system_info(struct retro_system_info *info)
 {
    info->need_fullpath = false;
-   info->valid_extensions = "gba";
+   info->valid_extensions = "dmg|gb|gbc|cgb|sgb|gba";
 #ifdef GIT_VERSION
    info->library_version = "2.1.0" GIT_VERSION;
 #else
@@ -213,23 +400,21 @@ void retro_get_system_info(struct retro_system_info *info)
 
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
-   info->geometry.base_width   = 240;
-   info->geometry.base_height  = 160;
-   info->geometry.max_width    = 240;
-   info->geometry.max_height   = 160;
-   info->geometry.aspect_ratio = 3.0 / 2.0;
-   info->timing.fps            = (double)FRAMERATE;
-   info->timing.sample_rate    = (double)SAMPLERATE;
+   float aspect = (3.0f / 2.0f);
+   if (type == IMAGE_GB)
+      aspect = !gbBorderOn ? (10.0 / 9.0) : (8.0 / 7.0);
+
+   info->geometry.base_width = width;
+   info->geometry.base_height = height;
+   info->geometry.max_width = width;
+   info->geometry.max_height = height;
+   info->geometry.aspect_ratio = aspect;
+   info->timing.fps = FramesPerSecond;
+   info->timing.sample_rate = (double)SampleRate;
 }
 
 void retro_init(void)
 {
-#ifdef _WIN32
-   char slash = '\\';
-#else
-   char slash = '/';
-#endif
-
    struct retro_log_callback log;
    environ_cb(RETRO_ENVIRONMENT_GET_CAN_DUPE, &can_dupe);
    if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
@@ -239,7 +424,7 @@ void retro_init(void)
 
    const char* dir = NULL;
    if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &dir) && dir)
-      snprintf(biosfile, sizeof(biosfile), "%s%c%s", dir, slash, "gba_bios.bin");
+       snprintf(retro_system_directory, sizeof(retro_system_directory), "%s", dir);
 
 #ifdef FRONTEND_SUPPORTS_RGB565
     enum retro_pixel_format rgb565 = RETRO_PIXEL_FORMAT_RGB565;
@@ -251,8 +436,6 @@ void retro_init(void)
         log_cb(RETRO_LOG_INFO, "Frontend supports XRGB8888 - will use that instead of XRGB1555.\n");
 #endif
 }
-
-static unsigned serialize_size = 0;
 
 typedef struct {
     char romtitle[256];
@@ -301,7 +484,7 @@ static void load_image_preferences(void)
     bool found = false;
     int found_no = 0;
 
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < 512; i++) {
         if (!strcmp(gbaover[i].romid, buffer)) {
             found = true;
             found_no = i;
@@ -343,7 +526,7 @@ static void load_image_preferences(void)
     }
 }
 
-static void gba_init(void)
+static void update_colormaps(void)
 {
 #ifdef FRONTEND_SUPPORTS_RGB565
     systemColorDepth = 16;
@@ -359,6 +542,20 @@ static void gba_init(void)
 
     utilUpdateSystemColorMaps(false);
 
+    log("Color Depth = %d\n", systemColorDepth);
+}
+
+
+#ifdef _WIN32
+static const char SLASH = '\\';
+#else
+static const char SLASH = '/';
+#endif
+
+static void gba_init(void)
+{
+    log("Loading VBA-M Core (GBA)...\n");
+
     load_image_preferences();
 
     saveType = cpuSaveType;
@@ -370,23 +567,55 @@ static void gba_init(void)
     rtcEnableRumble(!rtcEnabled);
 
     doMirroring(mirroringEnable);
+    soundSetSampleRate(SampleRate);
 
-    soundInit();
-    soundSetSampleRate(SAMPLERATE);
-
+    if (usebios) {
+        snprintf(biosfile, sizeof(biosfile), "%s%c%s", retro_system_directory, SLASH, "gba_bios.bin");
+        log("Loading bios: %s\n", biosfile);
+    }
     CPUInit(biosfile, usebios);
+
+    width = GBAWidth;
+    height = GBAHeight;
 
     // CPUReset() will reset eepromSize to 512.
     // Save current eepromSize override then restore after CPUReset()
     int tmp = eepromSize;
     CPUReset();
     eepromSize = tmp;
+}
 
-    uint8_t* state_buf = (uint8_t*)malloc(2000000);
-    serialize_size = CPUWriteState(state_buf, 2000000);
-    free(state_buf);
+static void gb_init(void)
+{
+    const char *biosname[] = {"gb_bios.bin", "gbc_bios.bin"};
 
-    emulating = 1;
+    log("Loading VBA-M Core (GB/GBC)...\n");
+
+    gbGetHardwareType();
+
+    if (usebios) {
+        snprintf(biosfile, sizeof(biosfile), "%s%c%s",
+            retro_system_directory, SLASH, biosname[gbCgbMode]);
+        log("Loading bios: %s\n", biosfile);
+    }
+
+    gbCPUInit(biosfile, usebios);
+
+    if (gbBorderOn) {
+        width = gbBorderLineSkip = SGBWidth;
+        height = SGBHeight;
+        gbBorderColumnSkip = (SGBWidth - GBWidth) >> 1;
+        gbBorderRowSkip = (SGBHeight - GBHeight) >> 1;
+    } else {
+        width = gbBorderLineSkip = GBWidth;
+        height = GBHeight;
+        gbBorderColumnSkip = gbBorderRowSkip = 0;
+    }
+
+    gbSoundSetSampleRate(SampleRate);
+    gbSoundSetDeclicking(1);
+
+    gbReset(); // also resets sound;
 }
 
 static void gba_soundchanged(void)
@@ -398,7 +627,7 @@ static void gba_soundchanged(void)
 void retro_deinit(void)
 {
     emulating = 0;
-    CPUCleanUp();
+    core->emuCleanUp();
     soundShutdown();
 }
 
@@ -406,12 +635,13 @@ void retro_reset(void)
 {
     // save current eepromSize
     int tmp = eepromSize;
-    CPUReset();
+    core->emuReset();
     eepromSize = tmp;
 }
 
 #define MAX_BUTTONS 10
-static const unsigned binds[3][MAX_BUTTONS] = {
+static const unsigned binds[4][MAX_BUTTONS] = {
+    {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // placeholder for no input
     {
         RETRO_DEVICE_ID_JOYPAD_A,
         RETRO_DEVICE_ID_JOYPAD_B,
@@ -450,9 +680,8 @@ static const unsigned binds[3][MAX_BUTTONS] = {
     }
 };
 
+static void systemGbBorderOff(void);
 static void systemUpdateSolarSensor(int level);
-
-static unsigned has_frame;
 static uint8_t sensorDarkness = 0xE8;
 static uint8_t sensorDarknessLevel = 0; // so we can adjust sensor from gamepad
 
@@ -466,8 +695,7 @@ static void update_variables(void)
     int disabled_layers=0;
 
     strcpy(key, "vbam_layer_x");
-    for (int i = 0; i < 8; i++)
-    {
+    for (int i = 0; i < 8; i++) {
         key[strlen("vbam_layer_")] = '1' + i;
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd')
@@ -480,12 +708,10 @@ static void update_variables(void)
 
     int sound_enabled = 0x30F;
     strcpy(key, "vbam_sound_x");
-    for (unsigned i = 0; i < 6; i++)
-    {
+    for (unsigned i = 0; i < 6; i++) {
         key[strlen("vbam_sound_")] = '1' + i;
         var.value = NULL;
-        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd')
-        {
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd') {
             unsigned which = (i < 4) ? (1 << i) : (0x100 << (i - 4));
             sound_enabled &= ~(which);
         }
@@ -497,11 +723,9 @@ static void update_variables(void)
     var.key = "vbam_soundinterpolation";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         bool newval = (strcmp(var.value, "enabled") == 0);
-        if (sndInterpolation != newval)
-        {
+        if (sndInterpolation != newval) {
             sndInterpolation = newval;
             sound_changed = true;
         }
@@ -510,25 +734,23 @@ static void update_variables(void)
     var.key = "vbam_soundfiltering";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         float newval = atof(var.value) * 0.1f;
-        if (sndFiltering != newval)
-        {
+        if (sndFiltering != newval) {
             sndFiltering = newval;
             sound_changed = true;
         }
     }
 
-    if (sound_changed)
+    if (sound_changed) {
         //Update interpolation and filtering values
         gba_soundchanged();
+    }
 
     var.key = "vbam_usebios";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         bool newval = (strcmp(var.value, "enabled") == 0);
         usebios = newval;
     }
@@ -536,18 +758,59 @@ static void update_variables(void)
     var.key = "vbam_solarsensor";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         sensorDarknessLevel = atoi(var.value);
         systemUpdateSolarSensor(sensorDarknessLevel);
     }
+
+    var.key = "vbam_showborders";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        int oldval = (gbBorderOn << 1) | gbBorderAutomatic;
+        if (strcmp(var.value, "auto") == 0) {
+            gbBorderOn = 0;
+            gbBorderAutomatic = 1;
+        }
+        else if (strcmp(var.value, "enabled") == 0) {
+            gbBorderAutomatic = 0;
+            gbBorderOn = 1;
+        }
+        else { // disabled
+            gbBorderOn = 0;
+            gbBorderAutomatic = 0;
+        }
+
+        if ((type == IMAGE_GB) && (oldval != ((gbBorderOn << 1) | gbBorderAutomatic))) {
+            if (gbBorderOn) {
+                gbSgbRenderBorder();
+                systemGbBorderOn();
+            }
+            else
+                systemGbBorderOff();
+        }
+    }
+
+    var.key = "vbam_gbHardware";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        if (strcmp(var.value, "Automatic") == 0)
+            gbEmulatorType = 0;
+        else if (strcmp(var.value, "Game Boy Color") == 0)
+            gbEmulatorType = 1;
+        else if (strcmp(var.value, "Super Game Boy") == 0)
+            gbEmulatorType = 2;
+        else if (strcmp(var.value, "Game Boy") == 0)
+            gbEmulatorType = 3;
+        else if (strcmp(var.value, "Game Boy Advance") == 0)
+            gbEmulatorType = 4;
+        else if (strcmp(var.value, "Super Game Boy 2") == 0)
+            gbEmulatorType = 5;
+    }
 }
 
-#ifdef FINAL_VERSION
-#define TICKS 250000
-#else
-#define TICKS 5000
-#endif
+static unsigned has_frame;
 
 void retro_run(void)
 {
@@ -559,23 +822,17 @@ void retro_run(void)
     poll_cb();
 
     // Update solar sensor level by gamepad buttons, default L2/R2
-    if (buttonpressed)
-    {
+    if (buttonpressed) {
         buttonpressed = input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2) ||
             input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2);
-    }
-    else
-    {
-        if (input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2))
-        {
+    } else {
+        if (input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2)) {
             sensorDarknessLevel++;
             if (sensorDarknessLevel > 10)
                 sensorDarknessLevel = 10;
             systemUpdateSolarSensor(sensorDarknessLevel);
             buttonpressed = true;
-        }
-        else if (input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2))
-        {
+        } else if (input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2)) {
             if (sensorDarknessLevel)
                 sensorDarknessLevel--;
             systemUpdateSolarSensor(sensorDarknessLevel);
@@ -586,9 +843,11 @@ void retro_run(void)
     has_frame = 0;
 
     do {
-        CPULoop(TICKS);
+        core->emuMain(core->emuCount);
     } while (!has_frame);
 }
+
+static unsigned serialize_size = 0;
 
 size_t retro_serialize_size(void)
 {
@@ -597,18 +856,20 @@ size_t retro_serialize_size(void)
 
 bool retro_serialize(void* data, size_t size)
 {
-    return CPUWriteState((uint8_t*)data, size);
+    return core->emuWriteState((uint8_t*)data, size);
 }
 
 bool retro_unserialize(const void* data, size_t size)
 {
-    return CPUReadState((uint8_t*)data, size);
+    return core->emuReadState((uint8_t*)data, size);
 }
 
 void retro_cheat_reset(void)
 {
-    cheatsEnabled = 1;
-    cheatsDeleteAll(false);
+	if (type == IMAGE_GBA) {
+		cheatsEnabled = 1;
+		cheatsDeleteAll(false);
+	}
 }
 
 void retro_cheat_set(unsigned index, bool enabled, const char* code)
@@ -653,6 +914,11 @@ void retro_cheat_set(unsigned index, bool enabled, const char* code)
 
    } while (*c++);
    */
+   
+   // TODO: Add cheat code support for GB/GBC
+   if (type != IMAGE_GBA)
+       return;
+
    std::string codeLine=code;
    std::string name="cheat_"+index;
    int matchLength=0;
@@ -757,13 +1023,13 @@ static void update_input_descriptors(void)
 
    switch (retropad_layout)
    {
-   case 0:
+   case 1:
       environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_gba);
       break;
-   case 1:
+   case 2:
       environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_gba_alt1);
       break;
-   case 2:
+   case 3:
       environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_gba_alt2);
       break;
    }
@@ -774,57 +1040,140 @@ bool retro_load_game(const struct retro_game_info *game)
    update_variables();
    update_input_descriptors();
 
-   romSize = CPULoadRomData((const char*)game->data, game->size);
-   if (!romSize)
+   type = utilFindType((const char *)game->path);
+
+   if (type == IMAGE_UNKNOWN) {
+      log("Unsupported image %s!\n", game->path);
       return false;
+   }
 
-   gba_init();
+   update_colormaps();
+   soundInit();
 
-   struct retro_memory_descriptor desc[11];
-   memset(desc, 0, sizeof(desc));
+   if (type == IMAGE_GBA) {
+      romSize = CPULoadRomData((const char*)game->data, game->size);
 
-   desc[0].start=0x03000000; desc[0].select=0xFF000000; desc[0].len=0x8000;    desc[0].ptr=internalRAM;//fast WRAM
-   desc[1].start=0x02000000; desc[1].select=0xFF000000; desc[1].len=0x40000;   desc[1].ptr=workRAM;//slow WRAM
-   /* TODO: if SRAM is flash, use start=0 addrspace="S" instead */
-   desc[2].start=0x0E000000; desc[2].select=0;          desc[2].len=flashSize; desc[2].ptr=flashSaveMemory;//SRAM
-   desc[3].start=0x08000000; desc[3].select=0;          desc[3].len=romSize;   desc[3].ptr=rom;//ROM
+      if (!romSize)
+         return false;
+
+      core = &GBASystem;
+
+      gba_init();
+
+      struct retro_memory_descriptor desc[11];
+      memset(desc, 0, sizeof(desc));
+
+      desc[0].start=0x03000000; desc[0].select=0xFF000000; desc[0].len=0x8000;    desc[0].ptr=internalRAM;//fast WRAM
+      desc[1].start=0x02000000; desc[1].select=0xFF000000; desc[1].len=0x40000;   desc[1].ptr=workRAM;//slow WRAM
+      /* TODO: if SRAM is flash, use start=0 addrspace="S" instead */
+      desc[2].start=0x0E000000; desc[2].select=0;          desc[2].len=flashSize; desc[2].ptr=flashSaveMemory;//SRAM
+      desc[3].start=0x08000000; desc[3].select=0;          desc[3].len=romSize;   desc[3].ptr=rom;//ROM
       desc[3].flags=RETRO_MEMDESC_CONST;
-   desc[4].start=0x0A000000; desc[4].select=0;          desc[4].len=romSize;   desc[4].ptr=rom;//ROM mirror 1
+      desc[4].start=0x0A000000; desc[4].select=0;          desc[4].len=romSize;   desc[4].ptr=rom;//ROM mirror 1
       desc[4].flags=RETRO_MEMDESC_CONST;
-   desc[5].start=0x0C000000; desc[5].select=0;          desc[5].len=romSize;   desc[5].ptr=rom;//ROM mirror 2
+      desc[5].start=0x0C000000; desc[5].select=0;          desc[5].len=romSize;   desc[5].ptr=rom;//ROM mirror 2
       desc[5].flags=RETRO_MEMDESC_CONST;
-   desc[6].start=0x00000000; desc[6].select=0;          desc[6].len=0x4000;    desc[6].ptr=bios;//BIOS
+      desc[6].start=0x00000000; desc[6].select=0;          desc[6].len=0x4000;    desc[6].ptr=bios;//BIOS
       desc[6].flags=RETRO_MEMDESC_CONST;
-   desc[7].start=0x06000000; desc[7].select=0xFF000000; desc[7].len=0x18000;   desc[7].ptr=vram;//VRAM
-   desc[8].start=0x05000000; desc[8].select=0xFF000000; desc[8].len=0x400;     desc[8].ptr=paletteRAM;//palettes
-   desc[9].start=0x07000000; desc[9].select=0xFF000000; desc[9].len=0x400;     desc[9].ptr=oam;//OAM
-   desc[10].start=0x04000000;desc[10].select=0;         desc[10].len=0x400;    desc[10].ptr=ioMem;//bunch of registers
-   struct retro_memory_map retromap={ desc, sizeof(desc)/sizeof(*desc) };
-   environ_cb(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &retromap);
+      desc[7].start=0x06000000; desc[7].select=0xFF000000; desc[7].len=0x18000;   desc[7].ptr=vram;//VRAM
+      desc[8].start=0x05000000; desc[8].select=0xFF000000; desc[8].len=0x400;     desc[8].ptr=paletteRAM;//palettes
+      desc[9].start=0x07000000; desc[9].select=0xFF000000; desc[9].len=0x400;     desc[9].ptr=oam;//OAM
+      desc[10].start=0x04000000;desc[10].select=0;         desc[10].len=0x400;    desc[10].ptr=ioMem;//bunch of registers
+
+      struct retro_memory_map retromap = {
+          desc,
+          sizeof(desc)/sizeof(desc[0])
+      };
+
+      environ_cb(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &retromap);
+   }
+
+   else if (type == IMAGE_GB) {
+      if (!gbLoadRomData((const char *)game->data, game->size))
+         return false;
+
+      core = &GBSystem;
+
+      gb_init();
+
+      struct retro_memory_descriptor desc[8];
+      memset(desc, 0, sizeof(desc));
+
+      // workram bank 0 0xc000-0xcfff / bank 1-7 0xd000-0xdfff
+      desc[0].ptr   = &gbMemory[0xc000];
+      desc[0].start = 0xc000;
+      desc[0].len   = 0x1000;
+
+      // workram bank 1-7 switchable (switchable-CGB only)
+      desc[1].ptr   = gbCgbMode ? &gbWram[0x1000] : &gbMemory[0xd000];
+      desc[1].start = 0xd000;
+      desc[1].len   = 0x1000;
+
+      // high ram area
+      desc[2].ptr   = &gbMemory[0xff80];
+      desc[2].start = 0xff80;
+      desc[2].len   = 0x0080;
+
+      // save ram or cartridge ram area
+      desc[3].ptr   = gbRamSize ? &gbRam[0] : 0;
+      desc[3].start = 0xa000;
+      desc[3].len   = gbRamSize ? gbRamSize : 0;
+
+      // vram (chr ram, gb map data 1 - 2)
+      desc[4].ptr   = gbCgbMode ? &gbVram[0] : &gbMemory[0x8000];
+      desc[4].start = 0x8000;
+      desc[4].len   = 0x2000;
+
+      // oam
+      desc[5].ptr   = &gbMemory[0xfe00];
+      desc[5].start = 0xfe00;
+      desc[5].len   = 0x00a0;
+
+      // http://gameboy.mongenel.com/dmg/asmmemmap.html
+      // $4000-$7FFF 	Cartridge ROM - Switchable Banks 1-xx
+      // $0150-$3FFF 	Cartridge ROM - Bank 0 (fixed)
+      // $0100-$014F 	Cartridge Header Area
+      // $0000-$00FF 	Restart and Interrupt Vectors
+      desc[6].ptr   = gbMemoryMap[0x00];
+      desc[6].start = 0x0000;
+      desc[6].len   = 0x4000;
+      desc[6].flags = RETRO_MEMDESC_CONST;
+
+      desc[7].ptr   = gbMemoryMap[0x04];
+      desc[7].start = 0x4000;
+      desc[7].len   = 0x4000;
+      desc[7].flags = RETRO_MEMDESC_CONST;
+
+      struct retro_memory_map retromap = {
+          desc,
+          sizeof(desc) / sizeof(desc[0])
+      };
+
+      environ_cb(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &retromap);
+   }
+
+   if (!core)
+       return false;
 
    bool yes = true;
    environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
 
-   return true;
+   uint8_t* state_buf = (uint8_t*)malloc(2000000);
+   serialize_size = core->emuWriteState(state_buf, 2000000);
+   free(state_buf);
+
+   emulating = 1;
+
+   return emulating;
 }
 
-bool retro_load_game_special(
-    unsigned game_type,
-    const struct retro_game_info *info, size_t num_info)
+bool retro_load_game_special(unsigned,  const struct retro_game_info *, size_t)
 {
     return false;
 }
 
-extern unsigned g_audio_frames;
-static unsigned g_video_frames;
-
 void retro_unload_game(void)
 {
-    if (log_cb)
-        log_cb(RETRO_LOG_INFO, "[VBA] Sync stats: Audio frames: %u, Video frames: %u, AF/VF: %.2f\n",
-            g_audio_frames, g_video_frames, (float)g_audio_frames / g_video_frames);
-    g_audio_frames = 0;
-    g_video_frames = 0;
 }
 
 unsigned retro_get_region(void)
@@ -832,35 +1181,61 @@ unsigned retro_get_region(void)
     return RETRO_REGION_NTSC;
 }
 
-void systemOnWriteDataToSoundBuffer(const uint16_t* finalWave, int length)
+void systemOnWriteDataToSoundBuffer(const uint16_t*, int)
 {
 }
 
-void systemOnSoundShutdown()
+void systemOnSoundShutdown(void)
 {
-
 }
 
-bool systemCanChangeSoundQuality()
+bool systemCanChangeSoundQuality(void)
 {
     return true;
 }
 
-#ifdef FRONTEND_SUPPORTS_RGB565
-#define BPP 2
-#else
-#define BPP 4
-#endif
-
-void systemDrawScreen()
+void systemDrawScreen(void)
 {
-    video_cb(pix, 240, 160, 240 * BPP);
-    g_video_frames++;
+    unsigned pitch = width * (systemColorDepth >> 3);
+    video_cb(pix, width, height, pitch);
 }
 
-void systemFrame()
+void systemFrame(void)
 {
     has_frame = 1;
+}
+
+void systemGbBorderOn(void)
+{
+    bool changed = ((width != SGBWidth) || (height != SGBHeight));
+    width = gbBorderLineSkip = SGBWidth;
+    height = SGBHeight;
+    gbBorderColumnSkip = (SGBWidth - GBWidth) >> 1;
+    gbBorderRowSkip = (SGBHeight - GBHeight) >> 1;
+
+    struct retro_system_av_info avinfo;
+    retro_get_system_av_info(&avinfo);
+
+    if (!changed)
+        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
+    else
+        environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
+}
+
+static void systemGbBorderOff(void)
+{
+    bool changed = ((width != GBWidth) || (height != GBHeight));
+    width = gbBorderLineSkip = GBWidth;
+    height = GBHeight;
+    gbBorderColumnSkip = gbBorderRowSkip = 0;
+
+    struct retro_system_av_info avinfo;
+    retro_get_system_av_info(&avinfo);
+
+    if (!changed)
+        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
+    else
+        environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
 }
 
 void systemMessage(const char* fmt, ...)
@@ -907,7 +1282,7 @@ uint32_t systemReadJoypad(int which)
 
     uint32_t J = 0;
 
-    if (retropad_layout >= 0)
+    if (retropad_layout)
         for (unsigned i = 0; i < MAX_BUTTONS; i++)
             J |= input_cb(which, RETRO_DEVICE_JOYPAD, 0, binds[retropad_layout][i]) << i;
 
@@ -923,8 +1298,7 @@ uint32_t systemReadJoypad(int which)
 static void systemUpdateSolarSensor(int v)
 {
     int value = 0;
-    switch (v)
-    {
+    switch (v) {
     case 1:  value = 0x06; break;
     case 2:  value = 0x0E; break;
     case 3:  value = 0x18; break;
@@ -941,16 +1315,16 @@ static void systemUpdateSolarSensor(int v)
     sensorDarkness = 0xE8 - value;
 }
 
-bool systemReadJoypads()
+bool systemReadJoypads(void)
 {
     return true;
 }
 
-void systemUpdateMotionSensor()
+void systemUpdateMotionSensor(void)
 {
 }
 
-uint8_t systemGetSensorDarkness()
+uint8_t systemGetSensorDarkness(void)
 {
     return sensorDarkness;
 }
@@ -959,25 +1333,43 @@ void systemCartridgeRumble(bool)
 {
 }
 
-bool systemPauseOnFrame() { return false; }
-void systemGbPrint(uint8_t* data, int pages, int feed, int palette, int contrast) {}
-void systemScreenCapture(int a) {}
+bool systemPauseOnFrame(void)
+{
+    return false;
+}
+
+void systemGbPrint(uint8_t*, int, int, int, int)
+{
+}
+
+void systemScreenCapture(int)
+{
+}
+
 void systemScreenMessage(const char* msg)
 {
     if (log_cb)
         log_cb(RETRO_LOG_INFO, "%s\n", msg);
 }
 
-void systemSetTitle(const char* title) {}
-void systemShowSpeed(int speed) {}
-void system10Frames(int rate) {}
+void systemSetTitle(const char*)
+{
+}
 
-uint32_t systemGetClock()
+void systemShowSpeed(int)
+{
+}
+
+void system10Frames(int)
+{
+}
+
+uint32_t systemGetClock(void)
 {
     return 0;
 }
 
-SoundDriver* systemSoundInit()
+SoundDriver* systemSoundInit(void)
 {
     soundShutdown();
     return new SoundRetro();

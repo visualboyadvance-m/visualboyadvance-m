@@ -68,7 +68,12 @@ extern int SOUND_CLOCK_TICKS; // Number of 16.8 MHz clocks between calls to gbSo
 extern int soundTicks; // Number of 16.8 MHz clocks until gbSoundTick() will be called
 
 // Saves/loads emulator state
+#ifdef __LIBRETRO__
+void gbSoundSaveGame(uint8_t*&);
+void gbSoundReadGame(const uint8_t*&, int);
+#else
 void gbSoundSaveGame(gzFile out);
 void gbSoundReadGame(int version, gzFile in);
+#endif
 
 #endif // GBSOUND_H

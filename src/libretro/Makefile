@@ -1,5 +1,6 @@
 TILED_RENDERING=0
 STATIC_LINKING=0
+FRONTEND_SUPPORTS_RGB565=1
 
 SPACE :=
 SPACE := $(SPACE) $(SPACE)
@@ -226,7 +227,10 @@ include Makefile.common
 OBJS := $(SOURCES_CXX:.cpp=.o)
 
 VBA_DEFINES += -D__LIBRETRO__ -DFINAL_VERSION -DC_CORE -DNO_LINK -DNO_DEBUGGER
+
+ifeq ($(FRONTEND_SUPPORTS_RGB565),1)
 VBA_DEFINES += -DFRONTEND_SUPPORTS_RGB565
+endif
 
 ifneq ($(SANITIZER),)
    CFLAGS   += -fsanitize=$(SANITIZER)
@@ -234,8 +238,8 @@ ifneq ($(SANITIZER),)
 endif
 
 ifeq ($(DEBUG), 1)
-   CFLAGS += -g
-   CXXFLAGS += -g
+   CFLAGS += -O0 -g
+   CXXFLAGS += -O0 -g
 else
    CFLAGS += -O2 -DNDEBUG
    CXXFLAGS += -O2 -DNDEBUG

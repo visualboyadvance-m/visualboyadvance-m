@@ -31,17 +31,24 @@ void gbGetHardwareType();
 void gbReset();
 void gbCleanUp();
 void gbCPUInit(const char*, bool);
+#ifdef __LIBRETRO__
+unsigned int gbWriteSaveState(uint8_t*, unsigned);
+bool gbReadSaveState(const uint8_t*, unsigned);
+#else
+bool gbWriteSaveState(const char*);
+bool gbReadSaveState(const char*);
+#endif
 bool gbWriteBatteryFile(const char*);
 bool gbWriteBatteryFile(const char*, bool);
 bool gbReadBatteryFile(const char*);
-bool gbWriteSaveState(const char*);
 bool gbWriteMemSaveState(char*, int, long&);
-bool gbReadSaveState(const char*);
 bool gbReadMemSaveState(char*, int);
 void gbSgbRenderBorder();
 bool gbWritePNGFile(const char*);
 bool gbWriteBMPFile(const char*);
 bool gbReadGSASnapshot(const char*);
+
+bool gbLoadRomData(const char* data, unsigned size);
 
 extern int gbHardware;
 

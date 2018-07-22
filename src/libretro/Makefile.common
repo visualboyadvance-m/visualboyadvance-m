@@ -1,6 +1,22 @@
 INCFLAGS := -I$(CORE_DIR)
+SOURCES_CXX :=
 
-SOURCES_CXX := $(CORE_DIR)/gba/GBA-thumb.cpp \
+SOURCES_CXX += \
+	$(CORE_DIR)/libretro/libretro.cpp \
+	$(CORE_DIR)/libretro/UtilRetro.cpp \
+	$(CORE_DIR)/libretro/SoundRetro.cpp \
+	$(CORE_DIR)/libretro/scrc32.cpp
+
+SOURCES_CXX += \
+	$(CORE_DIR)/apu/Gb_Oscs.cpp \
+	$(CORE_DIR)/apu/Gb_Apu_State.cpp \
+	$(CORE_DIR)/apu/Blip_Buffer.cpp \
+	$(CORE_DIR)/apu/Multi_Buffer.cpp \
+	$(CORE_DIR)/apu/Effects_Buffer.cpp \
+	$(CORE_DIR)/apu/Gb_Apu.cpp
+
+SOURCES_CXX += \
+	$(CORE_DIR)/gba/GBA-thumb.cpp \
 	$(CORE_DIR)/gba/Sound.cpp \
 	$(CORE_DIR)/gba/Mode1.cpp \
 	$(CORE_DIR)/gba/CheatSearch.cpp \
@@ -20,13 +36,13 @@ SOURCES_CXX := $(CORE_DIR)/gba/GBA-thumb.cpp \
 	$(CORE_DIR)/gba/GBA.cpp \
 	$(CORE_DIR)/gba/EEprom.cpp \
 	$(CORE_DIR)/gba/RTC.cpp \
-	$(CORE_DIR)/gba/Sram.cpp \
-	$(CORE_DIR)/apu/Gb_Oscs.cpp \
-	$(CORE_DIR)/apu/Gb_Apu_State.cpp \
-	$(CORE_DIR)/apu/Blip_Buffer.cpp \
-	$(CORE_DIR)/apu/Multi_Buffer.cpp \
-	$(CORE_DIR)/apu/Gb_Apu.cpp \
-	$(CORE_DIR)/libretro/libretro.cpp \
-	$(CORE_DIR)/libretro/UtilRetro.cpp \
-	$(CORE_DIR)/libretro/SoundRetro.cpp \
-	$(CORE_DIR)/libretro/scrc32.cpp
+	$(CORE_DIR)/gba/Sram.cpp
+
+SOURCES_CXX += \
+	$(CORE_DIR)/gb/gbCheats.cpp \
+	$(CORE_DIR)/gb/GB.cpp \
+	$(CORE_DIR)/gb/gbGfx.cpp \
+	$(CORE_DIR)/gb/gbGlobals.cpp \
+	$(CORE_DIR)/gb/gbMemory.cpp \
+	$(CORE_DIR)/gb/gbSGB.cpp \
+	$(CORE_DIR)/gb/gbSound.cpp
