@@ -258,12 +258,64 @@ static size_t vram_size(void)
     return 0;
 }
 
+static void gbUpdateRTC(void)
+{
+    if (gb_hasbattery()) {
+        struct tm* lt;
+        time_t rawtime;
+        time(&rawtime);
+        lt = localtime(&rawtime);
+
+        switch (gbRomType) {
+        case 0x0f:
+        case 0x10: {
+                gbDataMBC3.mapperSeconds = lt->tm_sec;
+                gbDataMBC3.mapperMinutes = lt->tm_min;
+                gbDataMBC3.mapperHours = lt->tm_hour;
+                gbDataMBC3.mapperDays = lt->tm_yday & 255;
+                gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
+                gbDataMBC3.mapperLastTime = rawtime;
+            }
+            break;
+        case 0xfd: {
+                uint8_t gbDaysinMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+                gbDataTAMA5.mapperSeconds = lt->tm_sec;
+                gbDataTAMA5.mapperMinutes = lt->tm_min;
+                gbDataTAMA5.mapperHours = lt->tm_hour;
+                gbDataTAMA5.mapperDays = 1;
+                gbDataTAMA5.mapperMonths = 1;
+                gbDataTAMA5.mapperYears = 1970;
+                gbDataTAMA5.mapperLastTime = rawtime;
+                int days = lt->tm_yday + 365 * 3;
+                while (days) {
+                    gbDataTAMA5.mapperDays++;
+                    days--;
+                    if (gbDataTAMA5.mapperDays > gbDaysinMonth[gbDataTAMA5.mapperMonths - 1]) {
+                        gbDataTAMA5.mapperDays = 1;
+                        gbDataTAMA5.mapperMonths++;
+                        if (gbDataTAMA5.mapperMonths > 12) {
+                            gbDataTAMA5.mapperMonths = 1;
+                            gbDataTAMA5.mapperYears++;
+                            if ((gbDataTAMA5.mapperYears & 3) == 0)
+                                gbDaysinMonth[1] = 29;
+                            else
+                                gbDaysinMonth[1] = 28;
+                        }
+                    }
+                }
+                gbDataTAMA5.mapperControl = (gbDataTAMA5.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
+            }
+            break;
+        }
+    }
+}
+
 void* retro_get_memory_data(unsigned id)
 {
     if (id == RETRO_MEMORY_SAVE_RAM)
         return savedata_ptr();
-    if (id == RETRO_MEMORY_RTC)
-        return rtcdata_ptr();
+    //if (id == RETRO_MEMORY_RTC)
+        //return rtcdata_ptr();
     if (id == RETRO_MEMORY_SYSTEM_RAM)
         return wram_ptr();
     if (id == RETRO_MEMORY_VIDEO_RAM)
@@ -275,8 +327,8 @@ size_t retro_get_memory_size(unsigned id)
 {
     if (id == RETRO_MEMORY_SAVE_RAM)
         return savedata_size();
-    if (id == RETRO_MEMORY_RTC)
-        return rtcdata_size();
+    //if (id == RETRO_MEMORY_RTC)
+        //return rtcdata_size();
     if (id == RETRO_MEMORY_SYSTEM_RAM)
         return wram_size();
     if (id == RETRO_MEMORY_VIDEO_RAM)
@@ -734,6 +786,10 @@ static void gb_init(void)
 
     gbReset(); // also resets sound;
 
+    // VBA-M always updates time based on current time and not in-game time.
+    // No need to add RTC data to RETRO_MEMORY_RTC, so its safe to place this here.
+    gbUpdateRTC();
+
     log("Rom size       : %02x (%dK)\n", gbRom[0x148], (romSize + 1023) / 1024);
     log("Cartridge type : %02x (%s)\n", gbRom[0x147], gbGetCartridgeType());
     log("Ram size       : %02x (%s)\n", gbRom[0x149], gbGetSaveRamSize());
@@ -753,6 +809,15 @@ static void gb_init(void)
 
     crc16 -= gbRom[0x14e] + gbRom[0x14f];
     log("Checksum       : %04x (%04x)\n", crc16, gbRom[0x14e] * 256 + gbRom[0x14f]);
+
+    if (gb_hasbattery)
+        log(": Game supports battery save ram.\n");
+    if (gbRom[0x143] == 0xc0)
+        log(": Game works on CGB only\n");
+    else if (gbRom[0x143] == 0x80)
+        log(": Game supports GBC functions, GB compatible.\n");
+    if (gbRom[0x146] == 0x03)
+        log(": Game supports SGB functions\n");
 }
 
 static void gba_soundchanged(void)
