@@ -2379,7 +2379,7 @@ EVT_HANDLER(BugReport, "Report bugs...")
 
 EVT_HANDLER(FAQ, "VBA-M support forum")
 {
-    wxLaunchDefaultBrowser(wxT("http://vba-m.com/forum/"));
+    wxLaunchDefaultBrowser(wxT("https://github.com/visualboyadvance-m/visualboyadvance-m/"));
 }
 
 EVT_HANDLER(Translate, "Translations")
