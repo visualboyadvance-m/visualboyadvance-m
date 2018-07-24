@@ -1057,12 +1057,16 @@ size_t retro_serialize_size(void)
 
 bool retro_serialize(void* data, size_t size)
 {
-    return core->emuWriteState((uint8_t*)data, size);
+    if (size == serialize_size)
+        return core->emuWriteState((uint8_t*)data, size);
+    return false;
 }
 
 bool retro_unserialize(const void* data, size_t size)
 {
-    return core->emuReadState((uint8_t*)data, size);
+    if (size == serialize_size)
+        return core->emuReadState((uint8_t*)data, size);
+    return false;
 }
 
 void retro_cheat_reset(void)
