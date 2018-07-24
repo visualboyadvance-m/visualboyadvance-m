@@ -110,10 +110,9 @@ static bool gb_hasbattery(void)
     case 0x1e: // MBC5
     //incomplete, does not save gbTAMA5ram
     case 0xfd: // TAMA5 + extended
-         return true;
-    // need to remap these
-    //case 0x06: // MBC2
-    //case 0x22: // MBC7
+    case 0x06: // MBC2
+    case 0x22: // MBC7
+        return true;
     }
     return false;
 }
