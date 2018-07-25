@@ -1701,144 +1701,6 @@ void gbWriteMemory(register uint16_t address, register uint8_t value)
     gbMemory[address] = value;
 }
 
-uint8_t gbReadOpcode(register uint16_t address)
-{
-    if (gbCheatMap[address])
-        return gbCheatRead(address);
-
-    if (address < 0x8000)
-        return gbMemoryMap[address >> 12][address & 0x0fff];
-
-    if (address < 0xa000) {
-        // A lot of 'ugly' checks... But only way to emulate this particular behaviour...
-        if (
-            (
-                (gbHardware & 0xa) && ((gbLcdModeDelayed != 3) || (((register_LY == 0) && (gbScreenOn == false) && (register_LCDC & 0x80)) && (gbLcdLYIncrementTicksDelayed == (GBLY_INCREMENT_CLOCK_TICKS - GBLCD_MODE_2_CLOCK_TICKS)))))
-            || ((gbHardware & 0x5) && (gbLcdModeDelayed != 3) && ((gbLcdMode != 3) || ((register_LY == 0) && ((gbScreenOn == false) && (register_LCDC & 0x80)) && (gbLcdLYIncrementTicks == (GBLY_INCREMENT_CLOCK_TICKS - GBLCD_MODE_2_CLOCK_TICKS))))))
-            return gbMemoryMap[address >> 12][address & 0x0fff];
-
-        return 0xff;
-    }
-
-    // Used for the mirroring of 0xC000 in 0xE000
-    if ((address >= 0xe000) && (address < 0xfe00))
-        address &= ~0x2000;
-
-    switch (address & 0xf000) {
-    case 0x0a:
-    case 0x0b:
-        if (mapperReadRAM)
-            return mapperReadRAM(address);
-        break;
-    case 0x0f:
-        if (address > 0xff00) {
-            switch (address & 0x00ff) {
-            case 0x02:
-                return (gbMemory[0xff02]);
-            case 0x03:
-                return (0xff);
-            case 0x04:
-                return register_DIV;
-            case 0x05:
-                return register_TIMA;
-            case 0x06:
-                return register_TMA;
-            case 0x07:
-                return (0xf8 | register_TAC);
-            case 0x08:
-            case 0x09:
-            case 0x0a:
-            case 0x0b:
-            case 0x0c:
-            case 0x0d:
-            case 0x0e:
-                return (0xff);
-            case 0x0f:
-                return (0xe0 | gbMemory[0xff0f]);
-            case 0x40:
-                return register_LCDC;
-            case 0x41:
-                // This is a GB/C only bug (ie. not GBA/SP).
-                if ((gbHardware & 7) && (gbLcdMode == 2) && (gbLcdModeDelayed == 1) && (!gbSpeed))
-                    return (0x80 | (gbMemory[0xff41] & 0xFC));
-                else
-                    return (0x80 | gbMemory[0xff41]);
-            case 0x42:
-                return register_SCY;
-            case 0x43:
-                return register_SCX;
-            case 0x44:
-                if (((gbHardware & 7) && ((gbLcdMode == 1) && (gbLcdTicks == 0x71))) || (!(register_LCDC & 0x80)))
-                    return 0;
-                else
-                    return register_LY;
-            case 0x45:
-                return register_LYC;
-            case 0x46:
-                return register_DMA;
-            case 0x4a:
-                return register_WY;
-            case 0x4b:
-                return register_WX;
-            case 0x4c:
-                return 0xff;
-            case 0x4f:
-                return (0xfe | register_VBK);
-            case 0x51:
-                return register_HDMA1;
-            case 0x52:
-                return register_HDMA2;
-            case 0x53:
-                return register_HDMA3;
-            case 0x54:
-                return register_HDMA4;
-            case 0x55:
-                return register_HDMA5;
-            case 0x68:
-            case 0x6a:
-                if (gbCgbMode)
-                    return (0x40 | gbMemory[address]);
-                else
-                    return 0xc0;
-            case 0x69:
-            case 0x6b:
-                if (gbCgbMode) {
-                    // No access to gbPalette during mode 3 (Color Panel Demo)
-                    if (((gbLcdModeDelayed != 3) && (!((gbLcdMode == 0) && (gbLcdTicks >= (GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299] - 1)))) && (!gbSpeed)) || (gbSpeed && ((gbLcdMode == 1) || (gbLcdMode == 2) || ((gbLcdMode == 3) && (gbLcdTicks > (GBLCD_MODE_3_CLOCK_TICKS - 2))) || ((gbLcdMode == 0) && (gbLcdTicks <= (GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299] - 2))))))
-                        return (gbMemory[address]);
-                    else
-                        return 0xff;
-                } else
-                    return 0xff;
-            case 0x70:
-                if (gbCgbMode)
-                    return (0xf8 | register_SVBK);
-                else
-                    return 0xff;
-            case 0xff:
-                return register_IE;
-            }
-        }
-        // OAM not accessible during mode 2 & 3.
-        if (((address >= 0xfe00) && (address < 0xfea0)) && ((gbLcdMode | gbLcdModeDelayed) & 2))
-            return 0xff;
-        break;
-    }
-
-    if ((address >= 0xfea0) && (address < 0xff00)) {
-        if (gbHardware & 1)
-            return ((((address + ((address >> 4) - 0xfea)) >> 2) & 1) ? 0x00 : 0xff);
-        else if (gbHardware & 2)
-            return gbMemoryMap[address >> 12][address & 0x0fff];
-        else if (gbHardware & 4)
-            return ((((address + ((address >> 4) - 0xfea)) >> 2) & 1) ? 0xff : 0x00);
-        else if (gbHardware & 8)
-            return ((address & 0xf0) | ((address & 0xf0) >> 4));
-    }
-
-    return gbMemoryMap[address >> 12][address & 0x0fff];
-}
-
 uint8_t gbReadMemory(register uint16_t address)
 {
     if (gbCheatMap[address])
@@ -1858,6 +1720,7 @@ uint8_t gbReadMemory(register uint16_t address)
         return 0xff;
     }
 
+    // Used for the mirroring of 0xC000 in 0xE000
     if ((address >= 0xe000) && (address < 0xfe00))
         address &= ~0x2000;
 
@@ -1974,6 +1837,11 @@ uint8_t gbReadMemory(register uint16_t address)
             return gbMemory[0xff01];
         case 0x02:
             return (gbMemory[0xff02]);
+            case 0x03:
+                log("Undocumented Memory register read %04x PC=%04x\n",
+                address,
+                PC.W);
+                return 0xff;
         case 0x04:
             return register_DIV;
         case 0x05:
@@ -1982,6 +1850,17 @@ uint8_t gbReadMemory(register uint16_t address)
             return register_TMA;
         case 0x07:
             return (0xf8 | register_TAC);
+            case 0x08:
+            case 0x09:
+            case 0x0a:
+            case 0x0b:
+            case 0x0c:
+            case 0x0d:
+            case 0x0e:
+                log("Undocumented Memory register read %04x PC=%04x\n",
+                address,
+                PC.W);
+                return 0xff;
         case 0x0f:
             return (0xe0 | gbMemory[0xff0f]);
         case 0x30:
@@ -2018,7 +1897,7 @@ uint8_t gbReadMemory(register uint16_t address)
             return register_SCX;
         case 0x44:
             if (((gbHardware & 7) && ((gbLcdMode == 1) && (gbLcdTicks == 0x71))) || (!(register_LCDC & 0x80)))
-                return (0);
+                    return 0;
             else
                 return register_LY;
         case 0x45:
@@ -2029,6 +1908,8 @@ uint8_t gbReadMemory(register uint16_t address)
             return register_WY;
         case 0x4b:
             return register_WX;
+            case 0x4c:
+                return 0xff;
         case 0x4f:
             return (0xfe | register_VBK);
         case 0x51:
@@ -4630,7 +4511,7 @@ void gbEmulate(int ticksToStop)
             opcode2 = 0;
             execute = true;
 
-            opcode2 = opcode1 = opcode = gbReadOpcode(PC.W++);
+            opcode2 = opcode1 = opcode = gbReadMemory(PC.W++);
 
             // If HALT state was launched while IME = 0 and (register_IF & register_IE & 0x1F),
             // PC.W is not incremented for the first byte of the next instruction.
@@ -4644,7 +4525,7 @@ void gbEmulate(int ticksToStop)
             switch (opcode) {
             case 0xCB:
                 // extended opcode
-                opcode2 = opcode = gbReadOpcode(PC.W++);
+                opcode2 = opcode = gbReadMemory(PC.W++);
                 clockTicks = gbCyclesCB[opcode];
                 break;
             }
