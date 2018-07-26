@@ -3,8 +3,8 @@ case 0x00:
 break;
 case 0x01:
 // LD BC, NNNN
-BC.B.B0 = gbReadOpcode(PC.W++);
-BC.B.B1 = gbReadOpcode(PC.W++);
+BC.B.B0 = gbReadMemory(PC.W++);
+BC.B.B1 = gbReadMemory(PC.W++);
 break;
 case 0x02:
 // LD (BC),A
@@ -26,7 +26,7 @@ AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[BC.B.B1] | ((BC.B.B1 & 0
 break;
 case 0x06:
 // LD B, NN
-BC.B.B1 = gbReadOpcode(PC.W++);
+BC.B.B1 = gbReadMemory(PC.W++);
 break;
 case 0x07:
 // RLCA
@@ -36,8 +36,8 @@ AF.B.B0 = tempValue;
 break;
 case 0x08:
 // LD (NNNN), SP
-tempRegister.B.B0 = gbReadOpcode(PC.W++);
-tempRegister.B.B1 = gbReadOpcode(PC.W++);
+tempRegister.B.B0 = gbReadMemory(PC.W++);
+tempRegister.B.B1 = gbReadMemory(PC.W++);
 gbWriteMemory(tempRegister.W++, SP.B.B0);
 gbWriteMemory(tempRegister.W, SP.B.B1);
 break;
@@ -67,7 +67,7 @@ AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[BC.B.B0] | ((BC.B.B0 & 0
 break;
 case 0x0e:
 // LD C, NN
-BC.B.B0 = gbReadOpcode(PC.W++);
+BC.B.B0 = gbReadMemory(PC.W++);
 break;
 case 0x0f:
 // RRCA
@@ -77,7 +77,7 @@ AF.B.B0 = (tempValue << 4);
 break;
 case 0x10:
 // STOP
-opcode = gbReadOpcode(PC.W++);
+opcode = gbReadMemory(PC.W++);
 if (gbCgbMode) {
     if (gbMemory[0xff4d] & 1) {
         gbSpeedSwitch();
@@ -92,8 +92,8 @@ if (gbCgbMode) {
 break;
 case 0x11:
 // LD DE, NNNN
-DE.B.B0 = gbReadOpcode(PC.W++);
-DE.B.B1 = gbReadOpcode(PC.W++);
+DE.B.B0 = gbReadMemory(PC.W++);
+DE.B.B1 = gbReadMemory(PC.W++);
 break;
 case 0x12:
 // LD (DE),A
@@ -115,7 +115,7 @@ AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[DE.B.B1] | ((DE.B.B1 & 0
 break;
 case 0x16:
 //  LD D,NN
-DE.B.B1 = gbReadOpcode(PC.W++);
+DE.B.B1 = gbReadMemory(PC.W++);
 break;
 case 0x17:
 // RLA
@@ -125,7 +125,7 @@ AF.B.B0 = tempValue;
 break;
 case 0x18:
 // JR NN
-PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
+PC.W += (int8_t)gbReadMemory(PC.W) + 1;
 break;
 case 0x19:
 // ADD HL,DE
@@ -153,7 +153,7 @@ AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[DE.B.B0] | ((DE.B.B0 & 0
 break;
 case 0x1e:
 // LD E,NN
-DE.B.B0 = gbReadOpcode(PC.W++);
+DE.B.B0 = gbReadMemory(PC.W++);
 break;
 case 0x1f:
 // RRA
@@ -166,14 +166,14 @@ case 0x20:
 if (AF.B.B0 & GB_Z_FLAG)
     PC.W++;
 else {
-    PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
+    PC.W += (int8_t)gbReadMemory(PC.W) + 1;
     clockTicks++;
 }
 break;
 case 0x21:
 // LD HL,NNNN
-HL.B.B0 = gbReadOpcode(PC.W++);
-HL.B.B1 = gbReadOpcode(PC.W++);
+HL.B.B0 = gbReadMemory(PC.W++);
+HL.B.B1 = gbReadMemory(PC.W++);
 break;
 case 0x22:
 // LDI (HL),A
@@ -195,7 +195,7 @@ AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[HL.B.B1] | ((HL.B.B1 & 0
 break;
 case 0x26:
 // LD H,NN
-HL.B.B1 = gbReadOpcode(PC.W++);
+HL.B.B1 = gbReadMemory(PC.W++);
 break;
 case 0x27:
 // DAA
@@ -206,7 +206,7 @@ break;
 case 0x28:
 // JR Z,NN
 if (AF.B.B0 & GB_Z_FLAG) {
-    PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
+    PC.W += (int8_t)gbReadMemory(PC.W) + 1;
     clockTicks++;
 } else
     PC.W++;
@@ -237,7 +237,7 @@ AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[HL.B.B0] | ((HL.B.B0 & 0
 break;
 case 0x2e:
 // LD L,NN
-HL.B.B0 = gbReadOpcode(PC.W++);
+HL.B.B0 = gbReadMemory(PC.W++);
 break;
 case 0x2f:
 // CPL
@@ -249,14 +249,14 @@ case 0x30:
 if (AF.B.B0 & GB_C_FLAG)
     PC.W++;
 else {
-    PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
+    PC.W += (int8_t)gbReadMemory(PC.W) + 1;
     clockTicks++;
 }
 break;
 case 0x31:
 // LD SP,NNNN
-SP.B.B0 = gbReadOpcode(PC.W++);
-SP.B.B1 = gbReadOpcode(PC.W++);
+SP.B.B0 = gbReadMemory(PC.W++);
+SP.B.B1 = gbReadMemory(PC.W++);
 break;
 case 0x32:
 // LDD (HL),A
@@ -280,7 +280,7 @@ gbWriteMemory(HL.W, tempValue);
 break;
 case 0x36:
 // LD (HL),NN
-gbWriteMemory(HL.W, gbReadOpcode(PC.W++));
+gbWriteMemory(HL.W, gbReadMemory(PC.W++));
 break;
 case 0x37:
 // SCF
@@ -289,7 +289,7 @@ break;
 case 0x38:
 // JR C,NN
 if (AF.B.B0 & GB_C_FLAG) {
-    PC.W += (int8_t)gbReadOpcode(PC.W) + 1;
+    PC.W += (int8_t)gbReadMemory(PC.W) + 1;
     clockTicks++;
 } else
     PC.W++;
@@ -320,7 +320,7 @@ AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[AF.B.B1] | ((AF.B.B1 & 0
 break;
 case 0x3e:
 // LD A,NN
-AF.B.B1 = gbReadOpcode(PC.W++);
+AF.B.B1 = gbReadMemory(PC.W++);
 break;
 case 0x3f:
 // CCF
@@ -972,16 +972,16 @@ case 0xc2:
 if (AF.B.B0 & GB_Z_FLAG)
     PC.W += 2;
 else {
-    tempRegister.B.B0 = gbReadOpcode(PC.W++);
-    tempRegister.B.B1 = gbReadOpcode(PC.W);
+    tempRegister.B.B0 = gbReadMemory(PC.W++);
+    tempRegister.B.B1 = gbReadMemory(PC.W);
     PC.W = tempRegister.W;
     clockTicks++;
 }
 break;
 case 0xc3:
 // JP NNNN
-tempRegister.B.B0 = gbReadOpcode(PC.W++);
-tempRegister.B.B1 = gbReadOpcode(PC.W);
+tempRegister.B.B0 = gbReadMemory(PC.W++);
+tempRegister.B.B1 = gbReadMemory(PC.W);
 PC.W = tempRegister.W;
 break;
 case 0xc4:
@@ -989,8 +989,8 @@ case 0xc4:
 if (AF.B.B0 & GB_Z_FLAG)
     PC.W += 2;
 else {
-    tempRegister.B.B0 = gbReadOpcode(PC.W++);
-    tempRegister.B.B1 = gbReadOpcode(PC.W++);
+    tempRegister.B.B0 = gbReadMemory(PC.W++);
+    tempRegister.B.B1 = gbReadMemory(PC.W++);
     gbWriteMemory(--SP.W, PC.B.B1);
     gbWriteMemory(--SP.W, PC.B.B0);
     PC.W = tempRegister.W;
@@ -1004,7 +1004,7 @@ gbWriteMemory(--SP.W, BC.B.B0);
 break;
 case 0xc6:
 // ADD NN
-tempValue = gbReadOpcode(PC.W++);
+tempValue = gbReadMemory(PC.W++);
 tempRegister.W = AF.B.B1 + tempValue;
 AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
@@ -1031,8 +1031,8 @@ break;
 case 0xca:
 // JP Z,NNNN
 if (AF.B.B0 & GB_Z_FLAG) {
-    tempRegister.B.B0 = gbReadOpcode(PC.W++);
-    tempRegister.B.B1 = gbReadOpcode(PC.W);
+    tempRegister.B.B0 = gbReadMemory(PC.W++);
+    tempRegister.B.B1 = gbReadMemory(PC.W);
     PC.W = tempRegister.W;
     clockTicks++;
 } else
@@ -1042,8 +1042,8 @@ break;
 case 0xcc:
 // CALL Z,NNNN
 if (AF.B.B0 & GB_Z_FLAG) {
-    tempRegister.B.B0 = gbReadOpcode(PC.W++);
-    tempRegister.B.B1 = gbReadOpcode(PC.W++);
+    tempRegister.B.B0 = gbReadMemory(PC.W++);
+    tempRegister.B.B1 = gbReadMemory(PC.W++);
     gbWriteMemory(--SP.W, PC.B.B1);
     gbWriteMemory(--SP.W, PC.B.B0);
     PC.W = tempRegister.W;
@@ -1053,15 +1053,15 @@ if (AF.B.B0 & GB_Z_FLAG) {
 break;
 case 0xcd:
 // CALL NNNN
-tempRegister.B.B0 = gbReadOpcode(PC.W++);
-tempRegister.B.B1 = gbReadOpcode(PC.W++);
+tempRegister.B.B0 = gbReadMemory(PC.W++);
+tempRegister.B.B1 = gbReadMemory(PC.W++);
 gbWriteMemory(--SP.W, PC.B.B1);
 gbWriteMemory(--SP.W, PC.B.B0);
 PC.W = tempRegister.W;
 break;
 case 0xce:
 // ADC NN
-tempValue = gbReadOpcode(PC.W++);
+tempValue = gbReadMemory(PC.W++);
 tempRegister.W = AF.B.B1 + tempValue + (AF.B.B0 & GB_C_FLAG ? 1 : 0);
 AF.B.B0 = (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
@@ -1090,8 +1090,8 @@ case 0xd2:
 if (AF.B.B0 & GB_C_FLAG)
     PC.W += 2;
 else {
-    tempRegister.B.B0 = gbReadOpcode(PC.W++);
-    tempRegister.B.B1 = gbReadOpcode(PC.W);
+    tempRegister.B.B0 = gbReadMemory(PC.W++);
+    tempRegister.B.B1 = gbReadMemory(PC.W);
     PC.W = tempRegister.W;
     clockTicks++;
 }
@@ -1106,8 +1106,8 @@ case 0xd4:
 if (AF.B.B0 & GB_C_FLAG)
     PC.W += 2;
 else {
-    tempRegister.B.B0 = gbReadOpcode(PC.W++);
-    tempRegister.B.B1 = gbReadOpcode(PC.W++);
+    tempRegister.B.B0 = gbReadMemory(PC.W++);
+    tempRegister.B.B1 = gbReadMemory(PC.W++);
     gbWriteMemory(--SP.W, PC.B.B1);
     gbWriteMemory(--SP.W, PC.B.B0);
     PC.W = tempRegister.W;
@@ -1121,7 +1121,7 @@ gbWriteMemory(--SP.W, DE.B.B0);
 break;
 case 0xd6:
 // SUB NN
-tempValue = gbReadOpcode(PC.W++);
+tempValue = gbReadMemory(PC.W++);
 tempRegister.W = AF.B.B1 - tempValue;
 AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
@@ -1149,8 +1149,8 @@ break;
 case 0xda:
 // JP C,NNNN
 if (AF.B.B0 & GB_C_FLAG) {
-    tempRegister.B.B0 = gbReadOpcode(PC.W++);
-    tempRegister.B.B1 = gbReadOpcode(PC.W);
+    tempRegister.B.B0 = gbReadMemory(PC.W++);
+    tempRegister.B.B1 = gbReadMemory(PC.W);
     PC.W = tempRegister.W;
     clockTicks++;
 } else
@@ -1164,8 +1164,8 @@ break;
 case 0xdc:
 // CALL C,NNNN
 if (AF.B.B0 & GB_C_FLAG) {
-    tempRegister.B.B0 = gbReadOpcode(PC.W++);
-    tempRegister.B.B1 = gbReadOpcode(PC.W++);
+    tempRegister.B.B0 = gbReadMemory(PC.W++);
+    tempRegister.B.B1 = gbReadMemory(PC.W++);
     gbWriteMemory(--SP.W, PC.B.B1);
     gbWriteMemory(--SP.W, PC.B.B0);
     PC.W = tempRegister.W;
@@ -1180,7 +1180,7 @@ IFF = 0;
 break;
 case 0xde:
 // SBC NN
-tempValue = gbReadOpcode(PC.W++);
+tempValue = gbReadMemory(PC.W++);
 tempRegister.W = AF.B.B1 - tempValue - (AF.B.B0 & GB_C_FLAG ? 1 : 0);
 AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 AF.B.B1 = tempRegister.B.B0;
@@ -1193,7 +1193,7 @@ PC.W = 0x0018;
 break;
 case 0xe0:
 // LD (FF00+NN),A
-gbWriteMemory(0xff00 + gbReadOpcode(PC.W++), AF.B.B1);
+gbWriteMemory(0xff00 + gbReadMemory(PC.W++), AF.B.B1);
 break;
 case 0xe1:
 // POP HL
@@ -1218,7 +1218,7 @@ gbWriteMemory(--SP.W, HL.B.B0);
 break;
 case 0xe6:
 // AND NN
-tempValue = gbReadOpcode(PC.W++);
+tempValue = gbReadMemory(PC.W++);
 AF.B.B1 &= tempValue;
 AF.B.B0 = GB_H_FLAG | ZeroTable[AF.B.B1];
 break;
@@ -1230,7 +1230,7 @@ PC.W = 0x0020;
 break;
 case 0xe8:
 // ADD SP,NN
-offset = (int8_t)gbReadOpcode(PC.W++);
+offset = (int8_t)gbReadMemory(PC.W++);
 tempRegister.W = SP.W + offset;
 AF.B.B0 = ((SP.W ^ offset ^ tempRegister.W) & 0x100 ? GB_C_FLAG : 0) | ((SP.W ^ offset ^ tempRegister.W) & 0x10 ? GB_H_FLAG : 0);
 SP.W = tempRegister.W;
@@ -1241,8 +1241,8 @@ PC.W = HL.W;
 break;
 case 0xea:
 // LD (NNNN),A
-tempRegister.B.B0 = gbReadOpcode(PC.W++);
-tempRegister.B.B1 = gbReadOpcode(PC.W++);
+tempRegister.B.B0 = gbReadMemory(PC.W++);
+tempRegister.B.B1 = gbReadMemory(PC.W++);
 gbWriteMemory(tempRegister.W, AF.B.B1);
 break;
 // EB illegal
@@ -1256,7 +1256,7 @@ IFF = 0;
 break;
 case 0xee:
 // XOR NN
-tempValue = gbReadOpcode(PC.W++);
+tempValue = gbReadMemory(PC.W++);
 AF.B.B1 ^= tempValue;
 AF.B.B0 = ZeroTable[AF.B.B1];
 break;
@@ -1268,7 +1268,7 @@ PC.W = 0x0028;
 break;
 case 0xf0:
 // LD A,(FF00+NN)
-AF.B.B1 = gbReadMemory(0xff00 + gbReadOpcode(PC.W++));
+AF.B.B1 = gbReadMemory(0xff00 + gbReadMemory(PC.W++));
 break;
 case 0xf1:
 // POP AF
@@ -1296,7 +1296,7 @@ gbWriteMemory(--SP.W, AF.B.B0);
 break;
 case 0xf6:
 // OR NN
-tempValue = gbReadOpcode(PC.W++);
+tempValue = gbReadMemory(PC.W++);
 AF.B.B1 |= tempValue;
 AF.B.B0 = ZeroTable[AF.B.B1];
 break;
@@ -1308,7 +1308,7 @@ PC.W = 0x0030;
 break;
 case 0xf8:
 // LD HL,SP+NN
-offset = (int8_t)gbReadOpcode(PC.W++);
+offset = (int8_t)gbReadMemory(PC.W++);
 tempRegister.W = SP.W + offset;
 AF.B.B0 = ((SP.W ^ offset ^ tempRegister.W) & 0x100 ? GB_C_FLAG : 0) | ((SP.W ^ offset ^ tempRegister.W) & 0x10 ? GB_H_FLAG : 0);
 HL.W = tempRegister.W;
@@ -1319,8 +1319,8 @@ SP.W = HL.W;
 break;
 case 0xfa:
 // LD A,(NNNN)
-tempRegister.B.B0 = gbReadOpcode(PC.W++);
-tempRegister.B.B1 = gbReadOpcode(PC.W++);
+tempRegister.B.B0 = gbReadMemory(PC.W++);
+tempRegister.B.B1 = gbReadMemory(PC.W++);
 AF.B.B1 = gbReadMemory(tempRegister.W);
 break;
 case 0xfb:
@@ -1344,7 +1344,7 @@ IFF = 0;
 break;
 case 0xfe:
 // CP NN
-tempValue = gbReadOpcode(PC.W++);
+tempValue = gbReadMemory(PC.W++);
 tempRegister.W = AF.B.B1 - tempValue;
 AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegister.B.B0] | ((AF.B.B1 ^ tempValue ^ tempRegister.B.B0) & 0x10 ? GB_H_FLAG : 0);
 break;
@@ -1356,7 +1356,7 @@ PC.W = 0x0038;
 break;
 default:
 if (gbSystemMessage == false) {
-    systemMessage(0, N_("Unknown opcode %02x at %04x"), gbReadOpcode(PC.W - 1), PC.W - 1);
+    systemMessage(0, N_("Unknown opcode %02x at %04x"), gbReadMemory(PC.W - 1), PC.W - 1);
     gbSystemMessage = true;
 }
 return;

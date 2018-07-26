@@ -1264,7 +1264,7 @@ AF.B.B1 |= 1 << 7;
 break;
 default:
 if (gbSystemMessage == false) {
-    systemMessage(0, N_("Unknown opcode %02x at %04x"), gbReadOpcode(PC.W - 1), PC.W - 1);
+    systemMessage(0, N_("Unknown opcode %02x at %04x"), gbReadMemory(PC.W - 1), PC.W - 1);
     gbSystemMessage = true;
 }
 return;
