@@ -1144,6 +1144,7 @@ void gbWriteMemory(register uint16_t address, register uint8_t value)
     case 0x12:
     case 0x13:
     case 0x14:
+    case 0x15:
     case 0x16:
     case 0x17:
     case 0x18:
@@ -1153,23 +1154,23 @@ void gbWriteMemory(register uint16_t address, register uint8_t value)
     case 0x1c:
     case 0x1d:
     case 0x1e:
+    case 0x1f:
     case 0x20:
     case 0x21:
     case 0x22:
     case 0x23:
     case 0x24:
-    case 0x25: {
-        if (gbMemory[NR52] & 0x80) {
-            SOUND_EVENT(address, value);
-            return;
-        }
-    }
-
-    case 0x26: {
-        SOUND_EVENT(address, value);
-        return;
-    }
-
+    case 0x25:
+    case 0x26:
+    case 0x27:
+    case 0x28:
+    case 0x29:
+    case 0x2a:
+    case 0x2b:
+    case 0x2c:
+    case 0x2d:
+    case 0x2e:
+    case 0x2f:
     case 0x30:
     case 0x31:
     case 0x32:
@@ -1185,11 +1186,11 @@ void gbWriteMemory(register uint16_t address, register uint8_t value)
     case 0x3c:
     case 0x3d:
     case 0x3e:
-    case 0x3f: {
-        SOUND_EVENT(address, value);
+    case 0x3f:
+        // Sound registers handled by blargg
+        gbSoundEvent(address, value);
         //gbMemory[address] = value;
         return;
-    }
 
     case 0x40: {
         int lcdChange = (register_LCDC & 0x80) ^ (value & 0x80);
@@ -1761,9 +1762,6 @@ uint8_t gbReadMemory(register uint16_t address)
     }
 
     if (address >= 0xff00) {
-        if (address >= 0xFF10 && address <= 0xFF3F)
-            return gbSoundRead(address);
-
         switch (address & 0x00ff) {
         case 0x00: {
             if (gbSgbMode) {
@@ -1866,19 +1864,51 @@ uint8_t gbReadMemory(register uint16_t address)
             return register_TMA;
         case 0x07:
             return (0xf8 | register_TAC);
-            case 0x08:
-            case 0x09:
-            case 0x0a:
-            case 0x0b:
-            case 0x0c:
-            case 0x0d:
-            case 0x0e:
-                log("Undocumented Memory register read %04x PC=%04x\n",
+        case 0x08:
+        case 0x09:
+        case 0x0a:
+        case 0x0b:
+        case 0x0c:
+        case 0x0d:
+        case 0x0e:
+            log("Undocumented Memory register read %04x PC=%04x\n",
                 address,
                 PC.W);
-                return 0xff;
+            return 0xff;
         case 0x0f:
             return (0xe0 | gbMemory[0xff0f]);
+        case 0x10:
+        case 0x11:
+        case 0x12:
+        case 0x13:
+        case 0x14:
+        case 0x15:
+        case 0x16:
+        case 0x17:
+        case 0x18:
+        case 0x19:
+        case 0x1a:
+        case 0x1b:
+        case 0x1c:
+        case 0x1d:
+        case 0x1e:
+        case 0x1f:
+        case 0x20:
+        case 0x21:
+        case 0x22:
+        case 0x23:
+        case 0x24:
+        case 0x25:
+        case 0x26:
+        case 0x27:
+        case 0x28:
+        case 0x29:
+        case 0x2a:
+        case 0x2b:
+        case 0x2c:
+        case 0x2d:
+        case 0x2e:
+        case 0x2f:
         case 0x30:
         case 0x31:
         case 0x32:
@@ -1889,16 +1919,14 @@ uint8_t gbReadMemory(register uint16_t address)
         case 0x37:
         case 0x38:
         case 0x39:
-        case 0x3A:
-        case 0x3B:
-        case 0x3C:
-        case 0x3D:
-        case 0x3E:
-        case 0x3F:
-            if ((gbMemory[NR30] & 0x80) && (gbMemory[NR34] & 0x80))
-                return 0xFF;
-            else
-                return gbMemoryMap[address >> 12][address & 0x0fff];
+        case 0x3a:
+        case 0x3b:
+        case 0x3c:
+        case 0x3d:
+        case 0x3e:
+        case 0x3f:
+            // Sound registers read
+            return gbSoundRead(address);
         case 0x40:
             return register_LCDC;
         case 0x41:
