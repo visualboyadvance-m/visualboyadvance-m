@@ -1268,7 +1268,23 @@ void gbWriteMemory(register uint16_t address, register uint8_t value)
         //      (value & 0x7c);
         gbMemory[0xff41] = register_STAT = (value & 0xf8) | (register_STAT & 0x07); // fix ?
         // GB bug from Devrs FAQ
-        // proper fix
+        // http://www.devrs.com/gb/files/faqs.html#GBBugs
+        // 2018-7-26 Backported STAT register bug behavior
+        // Corrected : it happens if Lcd Mode < 2, but also if LY == LYC whatever
+        // Lcd Mode is, and if !gbInt48Signal in all cases. The screen being off
+        // doesn't matter (the bug will still happen).
+        // That fixes 'Satoru Nakajima - F-1 Hero' crash bug.
+        // Games below relies on this bug, , and are incompatible with the GBC.
+        // - Road Rash: crash after player screen
+        // - Zerg no Densetsu: crash right after showing a small portion of intro
+
+        if ((gbHardware & 5)
+            && (((!gbInt48Signal) && (gbLcdMode < 2) && (register_LCDC & 0x80))
+            || (register_LY == register_LYC))) {
+            
+            gbMemory[0xff0f] = register_IF |=2;
+        }
+
         gbInt48Signal &= ((register_STAT >> 3) & 0xF);
 
         if ((register_LCDC & 0x80)) {
