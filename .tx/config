@@ -1,0 +1,9 @@
+[main]
+host = https://www.transifex.com
+
+[vba-m.wxvbam]
+file_filter = po/wxvbam/<lang>.po
+source_file = po/wxvbam/wxvbam.pot
+source_lang = en
+type = PO
+
