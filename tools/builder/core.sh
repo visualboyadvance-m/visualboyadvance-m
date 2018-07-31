@@ -151,8 +151,8 @@ DISTS=$DISTS'
     libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/1.5.2.tar.gz                         lib/libjpeg.a
     libtiff         http://download.osgeo.org/libtiff/tiff-4.0.9.tar.gz                                         lib/libtiff.a
 #    libcroco        http://ftp.gnome.org/pub/gnome/sources/libcroco/0.6/libcroco-0.6.12.tar.xz                  lib/libcroco-0.6.a
-    freetype        http://download.savannah.gnu.org/releases/freetype/freetype-2.8.tar.bz2                     lib/libfreetype.a
-    fontconfig      https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.12.6.tar.bz2           lib/libfontconfig.a
+    freetype        http://download.savannah.gnu.org/releases/freetype/freetype-2.9.1.tar.bz2                   lib/libfreetype.a
+    fontconfig      https://freedesktop.org/software/fontconfig/release/fontconfig-2.13.0.tar.bz2               lib/libfontconfig.a
     libgd           https://github.com/libgd/libgd/releases/download/gd-2.2.4/libgd-2.2.4.tar.xz                lib/libgd.a
     dejavu          https://downloads.sourceforge.net/project/dejavu/dejavu/2.37/dejavu-fonts-ttf-2.37.tar.bz2  share/fonts/dejavu/DejaVuSansMono.ttf
     liberation      https://releases.pagure.org/liberation-fonts/liberation-fonts-ttf-2.00.1.tar.gz             share/fonts/liberation/LiberationMono-Regular.ttf
@@ -241,6 +241,7 @@ MESON_ARGS="--prefix /usr --buildtype release --default-library static -Dintrosp
 DIST_PATCHES=$DIST_PATCHES'
     docbook2x       https://gist.githubusercontent.com/rkitover/0b5dcc95a0703a9b0e0e7eb6d325a98e/raw/e256d2fad8d19633ac8abe02a0d1e119063d1fd9/docbook2x.patch
     graphite2       https://gist.githubusercontent.com/rkitover/418600634d7cf19e2bf1c3708b50c042/raw/839b72d9cda545f2e3b640d743c1bd44b89861b9/graphite2-1.3.10-static.patch
+    fontconfig      https://gist.githubusercontent.com/rkitover/542405b4509bd23daa76c98b15a94627/raw/3730cfa40c1cc067e3b76e84e6b4c45f5ee95e70/fontconfig-gperf.patch
     python2         https://gist.githubusercontent.com/rkitover/2d9e5baff1f1cc4f2618dee53083bd35/raw/7f33fcf5470a9f1013ac6ae7bb168368a98fe5a0/python-2.7.14-custom-static-openssl.patch https://gist.githubusercontent.com/rkitover/afab7ed3ac7ce1860c43a258571c8ae1/raw/6f5fc90a7acf5f5c3ffda2edf402b28f469a4b3b/python-2.7.14-static-libintl.patch
     python3         https://gist.githubusercontent.com/rkitover/93d89a679705875c59275fb0a8f22b45/raw/6149e7fa3920d6c674c79448c5a4c9313620e06c/python-3.6.3-custom-static-openssl.patch https://gist.githubusercontent.com/rkitover/b18f19eafda3775a9652cc9cdf3ec914/raw/ed14c34bf9f205ccc3a4684dbdb83f8620162b98/python-3.6.3-static-libintl.patch
     intltool        https://gist.githubusercontent.com/rkitover/d638882f52e5d5f8e392cbf6842cd6d0/raw/dcfbe358bbb8b89f88b40a9c3402494552fd33f8/intltool-0.51.0.patch
@@ -413,6 +414,7 @@ DIST_EXTRA_LDFLAGS="$DIST_EXTRA_LDFLAGS
 
 DIST_EXTRA_LIBS="$DIST_EXTRA_LIBS
     gettext             -liconv
+    fontconfig          -lintl -liconv
     shared-mime-info    \$LD_START_GROUP -lxml2 -lgio-2.0 -lgmodule-2.0 -lgobject-2.0 -lglib-2.0 -lpcre -llzma -lz -lm -lffi -lpthread -liconv -lresolv -ldl \$LD_END_GROUP
     python3             -lintl
     harfbuzz            -lz
