@@ -735,7 +735,6 @@ gentoo_installdeps() {
 
     check sudo emerge-webrsync
     check sudo emerge -vuDUa gcc make cmake binutils libsdl2 libsfml wxGTK zlib dev-util/pkgconfig nasm
-    check sudo eselect wxwidgets set 1
 
     build_instructions
 }
