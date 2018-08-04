@@ -159,6 +159,8 @@ linux_installdeps() {
         archlinux_installdeps
     elif [ -f /etc/solus-release ]; then
         solus_installdeps
+    elif [ -f /etc/gentoo-release ]; then
+        gentoo_installdeps
     elif [ -f /etc/os-release ]; then
         case "$(. /etc/os-release; echo "$ID_LIKE")" in
             *suse*)
@@ -724,6 +726,16 @@ solus_installdeps() {
 
         cmake_flags="$cmake_flags -DENABLE_LINK=NO -DENABLE_FFMPEG=NO"
     fi
+
+    build_instructions
+}
+
+gentoo_installdeps() {
+    installing
+
+    check sudo emerge-webrsync
+    check sudo emerge -vuDUa gcc make cmake binutils libsdl2 libsfml wxGTK zlib dev-util/pkgconfig nasm
+    check sudo eselect wxwidgets set 1
 
     build_instructions
 }
