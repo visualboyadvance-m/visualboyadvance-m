@@ -65,14 +65,6 @@ function(normalize_wx_paths)
     endif()
 endfunction()
 
-macro(clear_wx_vars)
-    unset(wxWidgets_FOUND        CACHE)
-    unset(wxWidgets_INCLUDE_DIRS CACHE)
-    unset(wxWidgets_LIBRARIES    CACHE)
-    unset(wxWidgets_LIBRARY_DIRS CACHE)
-    unset(wxWidgets_CXX_FLAGS    CACHE)
-endmacro()
-
 if(CMAKE_PREFIX_PATH)
     set(wxWidgets_CONFIG_OPTIONS "--prefix=${CMAKE_PREFIX_PATH}")
 endif()
@@ -88,19 +80,8 @@ set(wxWidgets_USE_LIBS xrc xml html adv net core base)
 # wx-config utility for these packages to e.g. wx-config-gtk3
 #
 # Do not do the check if the WX_CONFIG env var is set.
-if("$ENV{WX_CONFIG}" STREQUAL "")
-    foreach(gtk_ver 4 3)
-        set(wxWidgets_CONFIG_EXECUTABLE wx-config-gtk${gtk_ver})
-        find_package(wxWidgets QUIET)
-        if(wxWidgets_FOUND)
-            break()
-        endif()
-        clear_wx_vars()
-    endforeach()
-
-    if(NOT wxWidgets_FOUND)
-        unset(wxWidgets_CONFIG_EXECUTABLE)
-    endif()
+if(NOT WIN32 AND NOT APPLE AND "$ENV{WX_CONFIG}" STREQUAL "")
+    find_program(wxWidgets_CONFIG_EXECUTABLE NAMES wx-config-gtk4 wx-config-gtk3 wx-config)
 endif()
 
 # the gl lib may not be available, and if it looks like it is we still have to
