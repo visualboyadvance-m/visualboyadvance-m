@@ -508,7 +508,7 @@ suse_installdeps() {
     installing
 
     check sudo zypper in -y gcc gcc-c++ binutils make cmake nasm gettext-tools libpng16-devel pkg-config \
-                            libSDL2-devel openal-soft-devel sfml2-devel wxWidgets-3_0-devel ccache # ffmpeg2-devel
+                            libSDL2-devel openal-soft-devel sfml2-devel wxWidgets-3_0-devel ccache zip # ffmpeg2-devel
     # ffmpeg requires packman repos
 
     build_instructions
