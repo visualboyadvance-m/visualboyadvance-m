@@ -23,12 +23,12 @@ export BUILD_ROOT="$HOME/vbam-build-mingw${target_bits}"
 do_not_remove_dists=
 
 host_dists='
-    unzip zip cmake autoconf autoconf-archive automake m4 gsed bison flex-2.6.3
-    flex c2man docbook2x libtool help2man texinfo xmlto pkgconfig nasm yasm
-    xorg-macros dejavu liberation urw graphviz docbook4.2 docbook4.1.2
-    docbook4.3 docbook4.4 docbook4.5 docbook5.0 docbook-xsl docbook-xsl-ns
-    python2 python3 swig doxygen bakefile setuptools pip intltool ninja meson
-    shared-mime-info gperf
+    unzip zip cmake autoconf autoconf-archive automake getopt m4 gsed bison
+    flex-2.6.3 flex c2man docbook2x libtool help2man texinfo xmlto pkgconfig
+    nasm yasm xorg-macros dejavu liberation urw graphviz docbook4.2
+    docbook4.1.2 docbook4.3 docbook4.4 docbook4.5 docbook5.0 docbook-xsl
+    docbook-xsl-ns python2 python3 swig doxygen bakefile setuptools pip
+    intltool ninja meson shared-mime-info gperf
 '
 
 both_dists='
@@ -42,13 +42,14 @@ BUILD_ENV=$BUILD_ENV$(cat <<EOF
 
 export CC='${target_arch}-gcc'
 export CXX='${target_arch}-g++'
+export STRIP='${target_arch}-strip'
 
 EOF
 )
 
 REQUIRED_CONFIGURE_ARGS="--host=${target_arch}"
 
-REQUIRED_CMAKE_ARGS="$REQUIRED_CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE='$(readlink -f "${0%/*}/../../cmake/Toolchain-cross-MinGW-w64-${target_cpu}.cmake")'"
+REQUIRED_CMAKE_ARGS="$REQUIRED_CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE='$(perl -MCwd=abs_path -le "print abs_path(q{${0%/*}/../../cmake/Toolchain-cross-MinGW-w64-${target_cpu}.cmake})")'"
 
 . "${0%/*}/../builder/mingw.sh"
 
@@ -60,6 +61,8 @@ table_line_replace DIST_CONFIGURE_OVERRIDES openssl-target "./Configure $openssl
 table_line_append DIST_PRE_BUILD bzip2-target ':; sed -i.bak '\''s,include <sys\\stat.h>,include <sys/stat.h>,g'\'' *.c;'
 
 table_line_replace DIST_POST_BUILD harfbuzz "$(table_line DIST_POST_BUILD harfbuzz | sed 's/rebuild_dist freetype /rebuild_dist freetype-target /')"
+
+table_line_replace DIST_POST_BUILD glib     "$(table_line DIST_POST_BUILD glib     | sed 's/rebuild_dist gettext /rebuild_dist gettext-target /')"
 
 table_line_append DIST_ARGS libsoxr '-DHAVE_WORDS_BIGENDIAN_EXITCODE=0'
 

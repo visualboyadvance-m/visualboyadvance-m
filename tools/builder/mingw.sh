@@ -2,16 +2,27 @@
 
 set -e
 
+CROSS_OS=windows
+
 [ -n "$BUILD_ENV" ] && eval "$BUILD_ENV"
 
 BUILD_ENV=$BUILD_ENV$(cat <<EOF
 
 export CFLAGS="$CFLAGS -static-libgcc -static-libstdc++ -static -lpthread"
 export CXXFLAGS="$CXXFLAGS -static-libgcc -static-libstdc++ -static -lpthread"
+export OBJCXXFLAGS="$OBJCXXFLAGS -static-libgcc -static-libstdc++ -static -lpthread"
 export LDFLAGS="$LDFLAGS -static-libgcc -static-libstdc++ -static -lpthread"
+
+export UUID_LIBS="-luuid_mingw -luuid"
 
 EOF
 )
+
+: ${HOST_CC:=ccache gcc}
+: ${HOST_CXX:=ccache g++}
+: ${HOST_CC_ORIG:=gcc}
+: ${HOST_CXX_ORIG:=g++}
+: ${HOST_STRIP:=strip}
 
 . "$(dirname "$0")/../builder/core.sh"
 
@@ -42,6 +53,11 @@ host_dists="$host_dists autoconf autoconf-archive automake m4 gsed bison \
 host_dists=$(list_remove_duplicates $host_dists)
 
 both_dists="$both_dists openssl zlib bzip2 libiconv"
+
+if [ "$os" != windows ]; then
+    both_dists="$both_dists libuuid"
+fi
+
 both_dists=$(list_remove_duplicates $both_dists)
 
 set_host_env() {
@@ -52,17 +68,20 @@ set_host_env() {
         OCXX=$CXX
         OCC_ORIG=$CC_ORIG
         OCXX_ORIG=$CXX_ORIG
+        OSTRIP=$STRIP
 
-        export CC='ccache gcc'
-        export CXX='ccache g++'
-        export CC_ORIG="gcc"
-        export CXX_ORIG="g++"
+        export CC="$HOST_CC"
+        export CXX="$HOST_CXX"
+        export CC_ORIG="$HOST_CC_ORIG"
+        export CXX_ORIG="$HOST_CXX_ORIG"
+        export STRIP="$HOST_STRIP"
 
-        OCFLAGS=$CFLAGS OCXXFLAGS=$CXXFLAGS OLDFLAGS=$LDFLAGS
+        OCFLAGS=$CFLAGS OCPPFLAGS=$CPPFLAGS OCXXFLAGS=$CXXFLAGS OOBJCXXFLAGS=$OBJCXXFLAGS OLDFLAGS=$LDFLAGS
 
-        CFLAGS=$(  puts "$CFLAGS"   | sed 's/ -static-libgcc -static-libstdc++ -static -lpthread//g')
-        CXXFLAGS=$(puts "$CXXFLAGS" | sed 's/ -static-libgcc -static-libstdc++ -static -lpthread//g')
-        LDFLAGS=$( puts "$LDFLAGS"  | sed 's/ -static-libgcc -static-libstdc++ -static -lpthread//g')
+        CFLAGS=$(     puts "$CFLAGS"      | sed 's/ -static-libgcc -static-libstdc++ -static -lpthread//g')
+        CXXFLAGS=$(   puts "$CXXFLAGS"    | sed 's/ -static-libgcc -static-libstdc++ -static -lpthread//g')
+        OBJCXXFLAGS=$(puts "$OBJCXXFLAGS" | sed 's/ -static-libgcc -static-libstdc++ -static -lpthread//g')
+        LDFLAGS=$(    puts "$LDFLAGS"     | sed 's/ -static-libgcc -static-libstdc++ -static -lpthread//g')
 
         OREQUIRED_CONFIGURE_ARGS=$REQUIRED_CONFIGURE_ARGS
         OREQUIRED_CMAKE_ARGS=$REQUIRED_CMAKE_ARGS
@@ -70,6 +89,8 @@ set_host_env() {
         REQUIRED_CONFIGURE_ARGS=$(puts "$REQUIRED_CONFIGURE_ARGS" | sed 's/--host[^ ]*//g')
         REQUIRED_CMAKE_ARGS=$(puts "$REQUIRED_CMAKE_ARGS" | sed 's/-DCMAKE_TOOLCHAIN_FILE=[^ ]*//g')
     fi
+
+    set_host_env_hook 2>/dev/null || :
 }
 
 unset_host_env() {
@@ -81,12 +102,15 @@ unset_host_env() {
         export CXX="$OCXX"
         export CC_ORIG="$OCC_ORIG"
         export CXX_ORIG="$OCXX_ORIG"
-        OCC= OCXX= OCC_ORIG= OCXX_ORIG=
+        export STRIP="$OSTRIP"
+        OCC= OCXX= OCC_ORIG= OCXX_ORIG= OSTRIP=
 
         export CFLAGS="$OCFLAGS"
+        export CPPFLAGS="$OCPPFLAGS"
         export CXXFLAGS="$OCXXFLAGS"
+        export OBJCXXFLAGS="$OOBJCXXFLAGS"
         export LDFLAGS="$OLDFLAGS"
-        OCFLAGS= OCXXFLAGS= OLDFLAGS=
+        OCFLAGS= OCPPFLAGS= OCXXFLAGS= OOBJCXXFLAGS= OLDFLAGS=
 
         REQUIRED_CONFIGURE_ARGS=$OREQUIRED_CONFIGURE_ARGS
         REQUIRED_CMAKE_ARGS=$OREQUIRED_CMAKE_ARGS
@@ -104,6 +128,8 @@ unset_host_env() {
         fi
     done
     IFS=$OIFS
+
+    unset_host_env_hook 2>/dev/null || :
 }
 
 # replace install artifact paths with absolute paths into host and target trees
@@ -164,6 +190,17 @@ table_line_append DIST_PATCHES bzip2-target 'https://raw.githubusercontent.com/A
 table_line_remove DIST_MAKE_ARGS bzip2-target
 # done with bzip2-target
 
+# use mingw version of libuuid
+
+if [ "$os" != windows ]; then
+    table_line_remove  DISTS libuuid-target
+    table_insert_after DISTS libuuid "libuuid-target https://github.com/h0tw1r3/libuuid-mingw/archive/1.0.1.tar.gz lib/libuuid_mingw.a"
+else
+    table_line_replace DISTS libuuid                "https://github.com/h0tw1r3/libuuid-mingw/archive/1.0.1.tar.gz lib/libuuid_mingw.a"
+fi
+
+# done with libuuid
+
 table_insert_after DISTS libiconv-target '
     catgets         https://downloads.sourceforge.net/project/mingw/MinGW/Extension/catgets/mingw-catgets-1.0.1/mingw-catgets-1.0.1-src.tar.gz    include/langinfo.h
 '
@@ -223,13 +260,13 @@ table_line_append DIST_ARGS ffmpeg "--extra-ldflags='-Wl,-allow-multiple-definit
 
 table_line_append DIST_ARGS gettext "--enable-threads=windows"
 
-table_line_replace DISTS glib 'https://download.gnome.org/sources/glib/2.54/glib-2.54.1.tar.xz      lib/libglib-2.0.a'
-
 table_line_append  DIST_PATCHES glib "\
-    http://src.fedoraproject.org/cgit/rpms/mingw-glib2.git/plain/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch?id=f68d4a3ff32fb12f5d4467f4abfec6d2fb95b9fe \
-    http://src.fedoraproject.org/cgit/rpms/mingw-glib2.git/plain/0002-GNetworkMonitorBase-don-t-fail-when-IPv6-support-is-.patch?id=f68d4a3ff32fb12f5d4467f4abfec6d2fb95b9fe \
-    http://src.fedoraproject.org/cgit/rpms/mingw-glib2.git/plain/glib-include-time-h-for-localtime_r.patch?id=f68d4a3ff32fb12f5d4467f4abfec6d2fb95b9fe \
-    http://src.fedoraproject.org/cgit/rpms/mingw-glib2.git/plain/glib-prefer-constructors-over-DllMain.patch?id=f68d4a3ff32fb12f5d4467f4abfec6d2fb95b9fe \
+    https://src.fedoraproject.org/rpms/mingw-glib2/raw/master/f/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch \
+    https://src.fedoraproject.org/rpms/mingw-glib2/raw/master/f/glib-formaterror.patch \
+    https://src.fedoraproject.org/rpms/mingw-glib2/raw/master/f/glib-include-time-h-for-localtime_r.patch \
+    https://src.fedoraproject.org/rpms/mingw-glib2/raw/master/f/glib-ipmreqsource.patch \
+    https://src.fedoraproject.org/rpms/mingw-glib2/raw/master/f/glib-prefer-constructors-over-DllMain.patch \
+    https://gist.githubusercontent.com/rkitover/2edaf9583fb3068bb14016571e6f7d01/raw/ece80116d5618f372464f02392a9bcab670ce6c1/glib-mingw-no-strerror_s.patch \
 "
 
 table_line_append DIST_PATCHES graphite2 "\

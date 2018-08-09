@@ -48,6 +48,7 @@ export CFLAGS="$CFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -
 export CXXFLAGS="$CXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -Wno-error=all -fpermissive"
 export OBJCXXFLAGS="$OBJCXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -Wno-error=all -fpermissive"
 export LDFLAGS="$LDFLAGS -fPIC -L$BUILD_ROOT/root/lib -Wno-error=all"
+export STRIP="${STRIP:-strip}"
 
 if [ -z "\$OPENMP" ] && echo "\$CC" | grep -Eq gcc; then
     export CFLAGS="\$CFLAGS -fopenmp"
@@ -110,7 +111,7 @@ eval "$BUILD_ENV"
 PRE_BUILD_DISTS="$PRE_BUILD_DISTS bzip2 xz unzip"
 
 DISTS=$DISTS'
-    bzip2           http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz                                                    lib/libbz2.a
+    bzip2           https://github.com/nemequ/bzip2/releases/download/v1.0.6/bzip2-1.0.6.tar.gz                 lib/libbz2.a
     xz              https://tukaani.org/xz/xz-5.2.3.tar.gz                                                      lib/liblzma.a
     unzip           https://downloads.sourceforge.net/project/infozip/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz     bin/unzip
     zip             https://downloads.sourceforge.net/project/infozip/Zip%203.x%20%28latest%29/3.0/zip30.tar.gz                 bin/zip
@@ -151,6 +152,7 @@ DISTS=$DISTS'
     libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/1.5.2.tar.gz                         lib/libjpeg.a
     libtiff         http://download.osgeo.org/libtiff/tiff-4.0.9.tar.gz                                         lib/libtiff.a
 #    libcroco        http://ftp.gnome.org/pub/gnome/sources/libcroco/0.6/libcroco-0.6.12.tar.xz                  lib/libcroco-0.6.a
+    libuuid         https://downloads.sourceforge.net/project/libuuid/libuuid-1.0.3.tar.gz                      lib/libuuid.a
     freetype        http://download.savannah.gnu.org/releases/freetype/freetype-2.9.1.tar.bz2                   lib/libfreetype.a
     fontconfig      https://freedesktop.org/software/fontconfig/release/fontconfig-2.13.0.tar.bz2               lib/libfontconfig.a
     libgd           https://github.com/libgd/libgd/releases/download/gd-2.2.4/libgd-2.2.4.tar.xz                lib/libgd.a
@@ -176,7 +178,7 @@ DISTS=$DISTS'
     intltool        https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz                bin/intltoolize
     ninja           https://github.com/ninja-build/ninja/archive/v1.8.2.tar.gz                                  bin/ninja
     meson           https://github.com/mesonbuild/meson/releases/download/0.44.0/meson-0.44.0.tar.gz            bin/meson
-    glib            https://github.com/GNOME/glib/archive/8213793f341e6052d04aa24bba7bcf1be3e25ed5.tar.gz       lib/libglib-2.0.a
+    glib            https://github.com/GNOME/glib/archive/2.57.2.tar.gz                                         lib/libglib-2.0.a
     libgpg-error    https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.27.tar.bz2                     lib/libgpg-error.a
     libgcrypt       https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.2.tar.bz2                          lib/libgcrypt.a
     libsecret       http://ftp.gnome.org/pub/gnome/sources/libsecret/0.18/libsecret-0.18.5.tar.xz               lib/libsecret-1.a
@@ -187,7 +189,7 @@ DISTS=$DISTS'
     harfbuzz        https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.7.5.tar.bz2                lib/libharfbuzz.a
     sfml            https://github.com/SFML/SFML/archive/013d053277c980946bc7761a2a088f1cbb788f8c.tar.gz        lib/libsfml-system-s.a
     shared-mime-info http://freedesktop.org/~hadess/shared-mime-info-1.9.tar.xz                                 bin/update-mime-database
-    wxwidgets       https://github.com/wxWidgets/wxWidgets/archive/148079c61858ad04a8faa7fa9c2e2949753f35b6.tar.gz                              lib/libwx_baseu-3.1*.a
+    wxwidgets       https://github.com/wxWidgets/wxWidgets/archive/e09d11c7acf768a40adb156c5a32fffb53231432.tar.gz lib/libwx_baseu-3.1*.a
     graphite2       https://github.com/silnrsi/graphite/releases/download/1.3.10/graphite2-1.3.10.tgz           lib/libgraphite2.a
     xvidcore        http://downloads.xvid.org/downloads/xvidcore-1.3.4.tar.bz2                                  lib/libxvidcore.a
     fribidi         https://github.com/fribidi/fribidi/releases/download/v1.0.1/fribidi-1.0.1.tar.bz2           lib/libfribidi.a
@@ -1307,6 +1309,11 @@ build_dist() {
     shift
     extra_dist_args=$@
 
+    if ! [ -n "$(table_line DISTS $current_dist)" ]; then
+        warn "no such dist: $current_dist"
+        return
+    fi
+
     cd "$DISTS_DIR/$current_dist"
 
     puts "${NL}[32mBuilding [1;35m$current_dist[0m${NL}${NL}"
@@ -1719,11 +1726,17 @@ EOF
 EOF
 
     # if the relocation mode for the dist is 'aggressive', rewrite all '/usr'
-    # prefixes everywhere except for the shebang on the first line.
+    # prefixes everywhere except for the shebang on the first line and /usr/local
     if [ "$(dist_relocation_type "$current_dist")" = aggressive ]; then
         cat >>"${sed_scr}.work" <<EOF
            2,\${
+             s|/usr/local$|/USRLOCAL|
+             s|/usr/local/|/USRLOCAL/|g
+
              s|/usr|$inst_root|g
+
+             s|/USRLOCAL/|/usr/local/|g
+             s|/USRLOCAL$|/usr/local|
            }
 EOF
     fi
@@ -1839,9 +1852,15 @@ ln -sf \"$link_dest\" \"$dest_f\"
                             cp "$dest_f" "${dest_f}.work"
                             LANG=C sed '
                                 /\/usr/{
+                                    s|/usr/local$|/USRLOCAL|
+                                    s|/usr/local/|/USRLOCAL/|g
+
                                     s|\([^a-zA-Z0-9]\)/usr$|\1'"$inst_root"'|
                                     s|\([^a-zA-Z0-9]\)/usr/|\1'"$inst_root/"'|g
                                     s|\(-[IL]\)/usr/|\1'"$inst_root/"'|g
+
+                                    s|/USRLOCAL/|/usr/local/|g
+                                    s|/USRLOCAL$|/usr/local|
                                 }
                             ' "${dest_f}.work" > "$dest_f"
                             rm -f "${dest_f}.work"
@@ -2435,6 +2454,10 @@ die() {
 build_project() {
     puts "${NL}[32mBuilding project: [1;34m$CHECKOUT[0m${NL}${NL}"
 
+    target_os=${CROSS_OS:-$os}
+
+    dist_pre_build project
+
     mkdir -p "$BUILD_ROOT/project"
     cd "$BUILD_ROOT/project"
 
@@ -2442,14 +2465,20 @@ build_project() {
     echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=OFF $PROJECT_ARGS $CMAKE_BASE_ARGS $@
     echo_run make -j$NUM_CPUS
 
-    if [ "$os" = mac ]; then
+    if [ "$target_os" = mac ]; then
+        $STRIP visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m
+
         codesign -s "Developer ID Application" --deep ./visualboyadvance-m.app || :
 
         rm -f ./visualboyadvance-m-Mac.zip
         zip -9r ./visualboyadvance-m-Mac.zip ./visualboyadvance-m.app
-    elif [ "$os" != windows ] && path_exists visualboyadvance-m; then
-        strip visualboyadvance-m
+    elif [ "$target_os" != windows ] && path_exists visualboyadvance-m; then
+        $STRIP visualboyadvance-m
+    elif [ "$target_os" = windows ] && path_exists visualboyadvance-m.exe; then
+        $STRIP visualboyadvance-m.exe
     fi
+
+    dist_post_build project
 
     puts "${NL}[32mBuild Successful!!![0m${NL}${NL}Build results can be found in: [1;34m$BUILD_ROOT/project[0m${NL}${NL}"
 }
