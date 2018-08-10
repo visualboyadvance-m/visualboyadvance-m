@@ -427,7 +427,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         add_compile_options(${C_COMPILE_FLAG})
     endforeach()
 
-    set(MY_CXX_FLAGS -std=gnu++11 -fpermissive -fexceptions)
+    set(MY_CXX_FLAGS -std=gnu++11 -fexceptions)
 
     foreach(ARG ${MY_CXX_FLAGS})
         set(MY_CXX_FLAGS_STR "${MY_CXX_FLAGS_STR} ${ARG}")

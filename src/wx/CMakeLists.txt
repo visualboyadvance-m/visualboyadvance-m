@@ -65,6 +65,10 @@ function(normalize_wx_paths)
     endif()
 endfunction()
 
+macro(cleanup_wx_vars)
+    list(REMOVE_ITEM wxWidgets_CXX_FLAGS -fpermissive)
+endmacro()
+
 if(CMAKE_PREFIX_PATH)
     set(wxWidgets_CONFIG_OPTIONS "--prefix=${CMAKE_PREFIX_PATH}")
 endif()
@@ -88,6 +92,7 @@ endif()
 # do a compile test later
 list(APPEND wxWidgets_USE_LIBS gl)
 find_package(wxWidgets QUIET)
+cleanup_wx_vars()
 normalize_wx_paths()
 
 SET(CHECK_WX_OPENGL FALSE)
@@ -153,8 +158,9 @@ ENDIF()
 IF(NOT WX_HAS_OPENGL)
     ADD_DEFINITIONS(-DNO_OGL)
     LIST(REMOVE_ITEM wxWidgets_USE_LIBS gl)
-    FIND_PACKAGE(wxWidgets REQUIRED)
+    find_package(wxWidgets REQUIRED)
     normalize_wx_paths()
+    cleanup_wx_vars()
 ENDIF()
 
 IF(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_CROSSCOMPILING)
@@ -233,7 +239,9 @@ int main(int argc, char** argv)
 
     # on windows we need the trampoline library from dependencies
     IF(WIN32)
-        SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} -w -fpermissive "-I${CMAKE_SOURCE_DIR}/dependencies/minhook/include")
+        # minhook requires -fpermissive unfortunately
+        set(CMAKE_REQUIRED_FLAGS       ${CMAKE_REQUIRED_FLAGS}       -fpermissive)
+        SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} -fpermissive -w "-I${CMAKE_SOURCE_DIR}/dependencies/minhook/include")
         SET(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   -Wl,--subsystem,console)
 
         IF(AMD64)
@@ -244,6 +252,10 @@ int main(int argc, char** argv)
     ENDIF()
 
     CHECK_CXX_SOURCE_RUNS("${WX_TEST_CONSOLE_APP}" WX_DEFAULT_ABI_VERSION_COMPATIBLE)
+
+    # remove -fpermissive set for minhook
+    list(REMOVE_ITEM CMAKE_REQUIRED_FLAGS       -fpermissive)
+    list(REMOVE_ITEM CMAKE_REQUIRED_DEFINITIONS -fpermissive)
 
     IF(NOT WX_DEFAULT_ABI_VERSION_COMPATIBLE)
         # currently goes up to 11 with gcc7, but we give it some room
