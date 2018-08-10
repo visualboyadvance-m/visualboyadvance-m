@@ -69,6 +69,10 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "[xX]86|i[3-9]86|[aA][mM][dD]64")
     endif()
 endif()
 
+set(SSP_DEFAULT OFF)
+
+option(ENABLE_SSP "Enable gcc stack protector support" ${SSP_DEFAULT})
+
 option(ENABLE_ASM "Enable x86 ASM related options" ${ASM_DEFAULT})
 
 # The ARM ASM core seems to be very buggy, see #98 and #54. Default to it being
@@ -396,17 +400,19 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
 
     # check if ssp flags are supported for this version of gcc
     if(CMAKE_COMPILER_IS_GNUCXX)
-        check_cxx_compiler_flag(-fstack-protector-strong  F_STACK_PROTECTOR_STRONG_FLAG)
+        if(ENABLE_SSP)
+            check_cxx_compiler_flag(-fstack-protector-strong  F_STACK_PROTECTOR_STRONG_FLAG)
 
-        if(F_STACK_PROTECTOR_STRONG_FLAG)
-            set(MY_C_FLAGS ${MY_C_FLAGS} -fstack-protector-strong)
+            if(F_STACK_PROTECTOR_STRONG_FLAG)
+                set(MY_C_FLAGS ${MY_C_FLAGS} -fstack-protector-strong)
 
-            check_cxx_compiler_flag("--param ssp-buffer-size=4" SSP_BUFFER_SIZE_FLAG)
+                check_cxx_compiler_flag("--param ssp-buffer-size=4" SSP_BUFFER_SIZE_FLAG)
 
-            if(SSP_BUFFER_SIZE_FLAG)
-                # we do not add it to MY_C_FLAGS because this breaks things like CMAKE_REQUIRED_LIBRARIES
-                # which misinterpret compiler flags without leading dashes
-                add_compile_options(--param ssp-buffer-size=4)
+                if(SSP_BUFFER_SIZE_FLAG)
+                    # we do not add it to MY_C_FLAGS because this breaks things like CMAKE_REQUIRED_LIBRARIES
+                    # which misinterpret compiler flags without leading dashes
+                    add_compile_options(--param ssp-buffer-size=4)
+                endif()
             endif()
         endif()
 
@@ -457,10 +463,12 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
             set(SSP_STATIC ON)
         endif()
 
-        find_package(SSP)
+        if(ENABLE_SSP)
+            find_package(SSP)
 
-        if(SSP_LIBRARY)
-            set(MY_C_LINKER_FLAGS ${MY_C_LINKER_FLAGS} ${SSP_LIBRARY})
+            if(SSP_LIBRARY)
+                set(MY_C_LINKER_FLAGS ${MY_C_LINKER_FLAGS} ${SSP_LIBRARY})
+            endif()
         endif()
 
         set(MY_C_LINKER_FLAGS ${MY_C_LINKER_FLAGS} -Wl,-allow-multiple-definition)
