@@ -66,7 +66,9 @@ function(normalize_wx_paths)
 endfunction()
 
 macro(cleanup_wx_vars)
-    list(REMOVE_ITEM wxWidgets_CXX_FLAGS -fpermissive)
+    if(wxWidgets_CXX_FLAGS)
+        list(REMOVE_ITEM wxWidgets_CXX_FLAGS -fpermissive)
+    endif()
 endmacro()
 
 if(CMAKE_PREFIX_PATH)
