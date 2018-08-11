@@ -652,11 +652,18 @@ if(APPLE)
     SET_SOURCE_FILES_PROPERTIES(${VBAM_ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
     # bundle dylibs and relink them for releasing .app
+    # also install translations into the .app
     # but only in Release mode
     IF(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
         ADD_CUSTOM_COMMAND(TARGET visualboyadvance-m POST_BUILD
             COMMAND ${CMAKE_SOURCE_DIR}/tools/osx/third_party_libs_tool ./visualboyadvance-m.app
-            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
+            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        )
+
+        add_custom_command(TARGET visualboyadvance-m POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/mac-localizations.cmake
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
     ENDIF()
 endif(APPLE)
 
