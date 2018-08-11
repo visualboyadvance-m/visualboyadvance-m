@@ -661,7 +661,7 @@ if(APPLE)
         )
 
         add_custom_command(TARGET visualboyadvance-m POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/mac-localizations.cmake
+            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/mac-translations.cmake
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
     ENDIF()
