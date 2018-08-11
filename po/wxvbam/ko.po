@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-03 23:27-0700\n"
-"PO-Revision-Date: 2017-06-03 16:14+0000\n"
+"POT-Creation-Date: 2018-08-11 16:01-0700\n"
+"PO-Revision-Date: 2017-09-22 10:08+0000\n"
 "Last-Translator: Growgi <growgi@hanmail.net>\n"
 "Language-Team: Korean (http://www.transifex.com/bgk/vba-m/language/ko/)\n"
 "Language: ko\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../src/wx/wxvbam.cpp:490
+#: ../src/wx/wxvbam.cpp:488
 msgid ""
 "\n"
 "\tbuilt-in"
@@ -61,7 +61,7 @@ msgstr "%d%%"
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: ../src/wx/panel.cpp:83
+#: ../src/wx/panel.cpp:85
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s는 유효한 ROM 파일이 아님"
@@ -425,7 +425,7 @@ msgstr "같지 않음(&N)"
 msgid "&Nothing"
 msgstr "없음(&N)"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:184
+#: ../src/wx/xrc/DisplayConfig.xrc:177
 msgid "&Number of frames to skip :"
 msgstr "생략할 프레임 수(&N) :"
 
@@ -636,11 +636,11 @@ msgstr "&e-리더"
 msgid "0 "
 msgstr "0 "
 
-#: ../src/wx/xrc/DisplayConfig.xrc:282
+#: ../src/wx/xrc/DisplayConfig.xrc:275
 msgid "0 = no limit"
 msgstr "0 = 무제한"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:274
+#: ../src/wx/xrc/DisplayConfig.xrc:267
 msgid "0 = no maximum"
 msgstr "0 - 최대 없음"
 
@@ -864,7 +864,7 @@ msgstr "25%"
 msgid "2x"
 msgstr "2배"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:93
+#: ../src/wx/xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
 msgstr "2xSaI"
 
@@ -937,7 +937,7 @@ msgstr "8비트"
 msgid "9 "
 msgstr "9 "
 
-#: ../src/wx/wxvbam.cpp:418
+#: ../src/wx/wxvbam.cpp:416
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
@@ -969,7 +969,7 @@ msgstr "치트 추가"
 msgid "Add new cheat"
 msgstr "새 치트 추가"
 
-#: ../src/wx/guiinit.cpp:3040 ../src/wx/xrc/CheatAdd.xrc:31
+#: ../src/wx/guiinit.cpp:3098 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "주소"
 
@@ -979,7 +979,7 @@ msgstr "주소"
 msgid "Address:"
 msgstr "주소:"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:97
+#: ../src/wx/xrc/DisplayConfig.xrc:90
 msgid "Advance MAME Scale2x"
 msgstr "AdvanceMAME Scale2x"
 
@@ -1035,7 +1035,7 @@ msgstr "축([0-9]+)([+-])"
 msgid "B"
 msgstr "B"
 
-#: ../src/wx/viewsupt.cpp:777
+#: ../src/wx/viewsupt.cpp:775
 msgid "B:"
 msgstr "B:"
 
@@ -1080,7 +1080,7 @@ msgstr "BG3"
 msgid "Background"
 msgstr "배경"
 
-#: ../src/wx/wxvbam.cpp:561
+#: ../src/wx/wxvbam.cpp:552
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "설정 옵션이 잘못되었거나, 여러개의 ROM 파일이 주어졌습니다:\n"
 
@@ -1088,7 +1088,7 @@ msgstr "설정 옵션이 잘못되었거나, 여러개의 ROM 파일이 주어�
 msgid "Bank:"
 msgstr "뱅크:"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:158 ../src/wx/xrc/SoundConfig.xrc:91
+#: ../src/wx/xrc/DisplayConfig.xrc:151 ../src/wx/xrc/SoundConfig.xrc:91
 msgid "Basic"
 msgstr "기본"
 
@@ -1096,11 +1096,11 @@ msgstr "기본"
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "배터리 파일 (*.sav)|*.sav|플래시 세이브 (*.dat)|*.dat"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:98
+#: ../src/wx/xrc/DisplayConfig.xrc:91
 msgid "Bilinear"
 msgstr "바이리니어"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:99
+#: ../src/wx/xrc/DisplayConfig.xrc:92
 msgid "Bilinear Plus"
 msgstr "바이리니어 플러스"
 
@@ -1166,10 +1166,6 @@ msgstr "CRC:"
 msgid "CTRL"
 msgstr "CTRL"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:61
-msgid "Cairo"
-msgstr "Cairo"
-
 #: ../src/wx/dsound.cpp:123
 #, c-format
 msgid "Cannot CreateSoundBuffer %08x"
@@ -1189,10 +1185,6 @@ msgstr "%08x 협력레벨설정 불가"
 #, c-format
 msgid "Cannot create DirectSound %08x"
 msgstr "%08x 다이렉트사운드를 생성할 수 없음"
-
-#: ../src/wx/panel.cpp:2282
-msgid "Cannot create conversion buffer"
-msgstr "변환 버퍼 생성 불가"
 
 #: ../src/wx/cmdevents.cpp:905
 #, c-format
@@ -1297,7 +1289,7 @@ msgstr "클라이언트"
 msgid "Co&mmands:"
 msgstr "커맨드(&O):"
 
-#: ../src/wx/guiinit.cpp:2957
+#: ../src/wx/guiinit.cpp:3015
 msgid "Code"
 msgstr "코드"
 
@@ -1325,11 +1317,11 @@ msgstr "주석"
 msgid "Compare type"
 msgstr "비교 형식"
 
-#: ../src/wx/wxvbam.cpp:471
+#: ../src/wx/wxvbam.cpp:469
 msgid "Configuration is read from, in order:"
 msgstr "설정은 다음으로부터 순서대로 불러옵니다 :"
 
-#: ../src/wx/wxvbam.cpp:449
+#: ../src/wx/wxvbam.cpp:447
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr "설정/빌드 오류: built-in XRC를 찾을 수 없습니다."
 
@@ -1355,8 +1347,7 @@ msgstr "연결"
 msgid "Connecting to %s\n"
 msgstr "%s로 연결 중\n"
 
-#: ../src/wx/cmdevents.cpp:2414
-#, fuzzy
+#: ../src/wx/cmdevents.cpp:2412
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
@@ -1364,13 +1355,13 @@ msgid ""
 msgstr ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA 개발팀\n"
-"Copyright (C) 2007-2015 VBA-M 개발팀"
+"Copyright (C) 2007-2017 VBA-M 개발팀"
 
-#: ../src/wx/wxvbam.cpp:368
+#: ../src/wx/wxvbam.cpp:366
 msgid "Could not create main window"
 msgstr "메인 윈도우를 생성할 수 없습니다."
 
-#: ../src/wx/panel.cpp:190 ../src/wx/panel.cpp:287
+#: ../src/wx/panel.cpp:194 ../src/wx/panel.cpp:287
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "%s BIOS를 불러올 수 없음"
@@ -1445,7 +1436,7 @@ msgstr "기본"
 msgid "Default device"
 msgstr "기본 장치"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:254
+#: ../src/wx/xrc/DisplayConfig.xrc:247
 msgid "Default magnification :"
 msgstr "기본 확대 :"
 
@@ -1461,11 +1452,11 @@ msgstr "모든 치트 삭제"
 msgid "Delete selected cheat"
 msgstr "선택된 치트 삭제"
 
-#: ../src/wx/wxvbam.cpp:407
+#: ../src/wx/wxvbam.cpp:405
 msgid "Delete shared link state first, if it exists"
 msgstr "shared link state 파일이 존재한다면 삭제합니다."
 
-#: ../src/wx/guiinit.cpp:2966
+#: ../src/wx/guiinit.cpp:3024
 msgid "Description"
 msgstr "설명"
 
@@ -1481,7 +1472,7 @@ msgstr "데스크탑 모드"
 msgid "Dest. code:"
 msgstr "Dest. 코드:"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:230
+#: ../src/wx/xrc/DisplayConfig.xrc:223
 msgid "Detailed"
 msgstr "자세히"
 
@@ -1530,10 +1521,9 @@ msgstr "디스어셈블"
 msgid "Display &borders :"
 msgstr "경계선 표시(&B) :"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:86
-#, fuzzy
+#: ../src/wx/xrc/DisplayConfig.xrc:79
 msgid "Display filter :"
-msgstr "경계선 표시(&B) :"
+msgstr "표시 필터 :"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:4
 msgid "Display settings"
@@ -1551,7 +1541,7 @@ msgstr "치트 목록 변경하지 않기(&C)"
 msgid "Down"
 msgstr "하"
 
-#: ../src/wx/guiinit.cpp:2642
+#: ../src/wx/guiinit.cpp:2700
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "메뉴 가속기 복제: %s 는 %s 와 %s용; 첫 번째 유지"
@@ -1607,17 +1597,17 @@ msgstr "스테레오 업믹싱 사용"
 msgid "Enabled"
 msgstr "활성화됨"
 
-#: ../src/wx/panel.cpp:2439
+#: ../src/wx/panel.cpp:2361
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "(%s) 에서 오디오 녹음 오류; 종료합니다."
 
-#: ../src/wx/panel.cpp:2433
+#: ../src/wx/panel.cpp:2355
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "(%s) 에서 오디오/비디오 녹화 오류; 종료합니다."
 
-#: ../src/wx/panel.cpp:2449
+#: ../src/wx/panel.cpp:2371
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "(%s) 에서 비디오 녹화 오류; 종료합니다."
@@ -1650,7 +1640,7 @@ msgstr ""
 "오류 발생됨.\n"
 "재시도 바랍니다."
 
-#: ../src/wx/sys.cpp:1172
+#: ../src/wx/sys.cpp:1171
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "가상 tty %s를 열 수 없습니다."
@@ -1669,7 +1659,7 @@ msgstr "%s 스냅샷 파일 저장 오류"
 msgid "Error saving state %s"
 msgstr "상태 %s 저장 오류"
 
-#: ../src/wx/sys.cpp:1271
+#: ../src/wx/sys.cpp:1270
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "서버 소켓 셋업 에러 (%d)"
@@ -1683,7 +1673,7 @@ msgstr "%s 배터리 기록 오류"
 msgid "Error writing game recording"
 msgstr "게임 녹화를 기록할 수 없습니다."
 
-#: ../src/wx/panel.cpp:1096
+#: ../src/wx/panel.cpp:1092
 msgid "Error writing rewind state"
 msgstr "되감기 상태 쓰기 오류"
 
@@ -1700,7 +1690,7 @@ msgstr "F"
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "%dx%d-%d@%d 모드로 변경 실패함"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:72
+#: ../src/wx/xrc/DisplayConfig.xrc:65
 msgid "Filters"
 msgstr "필터"
 
@@ -1749,7 +1739,7 @@ msgstr "프레임 0"
 msgid "Frame 1"
 msgstr "프레임 1"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:166
+#: ../src/wx/xrc/DisplayConfig.xrc:159
 msgid "Frame Skip"
 msgstr "프레임 생략"
 
@@ -1775,7 +1765,7 @@ msgstr "PC로 가기(&o)"
 msgid "G&reater or equal"
 msgstr "크거나 같음(&R)"
 
-#: ../src/wx/viewsupt.cpp:772
+#: ../src/wx/viewsupt.cpp:770
 msgid "G:"
 msgstr "G:"
 
@@ -1941,15 +1931,15 @@ msgstr "H"
 msgid "HL:"
 msgstr "HL:"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:102
+#: ../src/wx/xrc/DisplayConfig.xrc:95
 msgid "HQ 2x"
 msgstr "HQ 2qo"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:106
+#: ../src/wx/xrc/DisplayConfig.xrc:99
 msgid "HQ 3x"
 msgstr "HQ 3qo"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:108
+#: ../src/wx/xrc/DisplayConfig.xrc:101
 msgid "HQ 4x"
 msgstr "HQ 4배"
 
@@ -2067,11 +2057,11 @@ msgstr ""
 msgid "Index:"
 msgstr "인덱스:"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:134
+#: ../src/wx/xrc/DisplayConfig.xrc:127
 msgid "Interframe blending :"
 msgstr "인터프레임 블렌딩 :"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:144
+#: ../src/wx/xrc/DisplayConfig.xrc:137
 msgid "Interframe motion blur"
 msgstr "인터프레임 모션 블러"
 
@@ -2079,33 +2069,33 @@ msgstr "인터프레임 모션 블러"
 msgid "Internal title:"
 msgstr "내부 제목:"
 
-#: ../src/wx/opts.cpp:785
+#: ../src/wx/opts.cpp:766
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "무효한 플래그 옵션 %s - %s 무시됨"
 
-#: ../src/wx/opts.cpp:599 ../src/wx/opts.cpp:620 ../src/wx/opts.cpp:903
-#: ../src/wx/opts.cpp:929
+#: ../src/wx/opts.cpp:585 ../src/wx/opts.cpp:606 ../src/wx/opts.cpp:872
+#: ../src/wx/opts.cpp:898
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "%s : %s 에 대한 무효한 키 설정"
 
-#: ../src/wx/guiinit.cpp:2762
+#: ../src/wx/guiinit.cpp:2820
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "무효한 %s 메뉴 항목 ; 제거"
 
-#: ../src/wx/opts.cpp:533 ../src/wx/opts.cpp:825
+#: ../src/wx/opts.cpp:519 ../src/wx/opts.cpp:795
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "%d 값은 %s 옵션에 대해 무효함; 유효한 값은 %d - %d"
 
-#: ../src/wx/opts.cpp:540 ../src/wx/opts.cpp:833
-#, fuzzy, c-format
+#: ../src/wx/opts.cpp:526 ../src/wx/opts.cpp:803
+#, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
-msgstr "%d 값은 %s 옵션에 대해 무효함; 유효한 값은 %d - %d"
+msgstr "%f 값은 %s 옵션에 대해 무효함; 유효한 값은 %f - %f"
 
-#: ../src/wx/opts.cpp:507 ../src/wx/opts.cpp:807
+#: ../src/wx/opts.cpp:502 ../src/wx/opts.cpp:783
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "%s 값은 %s 옵션에 대해 무효함; 유효한 값은 %s%s%s"
@@ -2115,7 +2105,7 @@ msgstr "%s 값은 %s 옵션에 대해 무효함; 유효한 값은 %s%s%s"
 msgid "Joy%d-"
 msgstr "조이스틱%d-"
 
-#: ../src/wx/guiinit.cpp:3638
+#: ../src/wx/guiinit.cpp:3691
 msgid "JoyBus host invalid; disabling"
 msgstr "조이버스 호스트 무효; 비활성화"
 
@@ -2135,13 +2125,13 @@ msgstr "L"
 msgid "L&ess or equal"
 msgstr "작거나 같음(&E)"
 
-#: ../src/wx/cmdevents.cpp:2669
+#: ../src/wx/cmdevents.cpp:2672
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr ""
 "LAN 연결이 이미 활성화 상태입니다. 연결해체를 위해 연결 모드를 비활성화 하십"
 "시오."
 
-#: ../src/wx/xrc/DisplayConfig.xrc:103
+#: ../src/wx/xrc/DisplayConfig.xrc:96
 msgid "LQ 2x"
 msgstr "LQ 2qo"
 
@@ -2177,7 +2167,7 @@ msgstr "연결 타임아웃 (ms)"
 msgid "List &cheats ..."
 msgstr "치트 목록(&C)..."
 
-#: ../src/wx/wxvbam.cpp:414
+#: ../src/wx/wxvbam.cpp:412
 msgid "List all settable options and exit"
 msgstr "설정 가능한 옵션을 나열하고 종료합니다."
 
@@ -2217,11 +2207,11 @@ msgstr "Lots"
 msgid "M&emory Viewer..."
 msgstr "메모리 뷰어(&E)..."
 
-#: ../src/wx/guiinit.cpp:2521
+#: ../src/wx/guiinit.cpp:2586
 msgid "Main display panel not found"
 msgstr "메인 디스플레이 패널을 찾을 수 없음"
 
-#: ../src/wx/guiinit.cpp:2537
+#: ../src/wx/guiinit.cpp:2568
 msgid "Main icon not found"
 msgstr "메인 아이콘을 찾을 수 없음"
 
@@ -2253,7 +2243,7 @@ msgstr "맵 뷰어"
 msgid "Maximum"
 msgstr "최대"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:273
+#: ../src/wx/xrc/DisplayConfig.xrc:266
 msgid "Maximum magnification factor :"
 msgstr "최대 확대 단위 :"
 
@@ -2265,12 +2255,12 @@ msgstr "메모리 뷰어"
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
 msgstr "메모리 덤프 (*.dmp;*.bin)|*.dmp;*.bin|"
 
-#: ../src/wx/guiinit.cpp:2656
+#: ../src/wx/guiinit.cpp:2714
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "%s 메뉴 가속기 (%s에 대해) 는 %s에 대한 초기값을 덮어씌움 ; 메뉴 유지"
 
-#: ../src/wx/guiinit.cpp:3504
+#: ../src/wx/guiinit.cpp:3557
 msgid "Menu commands"
 msgstr "메뉴 명령"
 
@@ -2328,7 +2318,7 @@ msgstr "N"
 msgid "Native Saves"
 msgstr "본래 세이브"
 
-#: ../src/wx/cmdevents.cpp:2675
+#: ../src/wx/cmdevents.cpp:2678
 msgid "Network is not supported in local mode."
 msgstr "로컬 모드에서는 네트워크가 지원되지 않습니다."
 
@@ -2336,11 +2326,11 @@ msgstr "로컬 모드에서는 네트워크가 지원되지 않습니다."
 msgid "Never"
 msgstr "안 함"
 
-#: ../src/wx/guiinit.cpp:3042
+#: ../src/wx/guiinit.cpp:3100
 msgid "New Value"
 msgstr "새 값"
 
-#: ../src/wx/cmdevents.cpp:2413
+#: ../src/wx/cmdevents.cpp:2411
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "닌텐도 게임 보이 (+컬러+어드밴스) 에뮬레이터"
 
@@ -2348,7 +2338,7 @@ msgstr "닌텐도 게임 보이 (+컬러+어드밴스) 에뮬레이터"
 msgid "No game in progress to record"
 msgstr "녹화할 진행 중인 게임이 없습니다."
 
-#: ../src/wx/panel.cpp:1086
+#: ../src/wx/panel.cpp:1082
 msgid "No memory for rewinding"
 msgstr "되감기 메모리 없음"
 
@@ -2362,8 +2352,8 @@ msgid "No usable rpi plugins found in %s"
 msgstr "%s에서 사용가능한 rpi 플러그인을 찾을 수 없음"
 
 #: ../src/wx/cmdevents.cpp:718 ../src/wx/guiinit.cpp:1766
-#: ../src/wx/xrc/DisplayConfig.xrc:92 ../src/wx/xrc/DisplayConfig.xrc:142
-#: ../src/wx/xrc/DisplayConfig.xrc:228
+#: ../src/wx/xrc/DisplayConfig.xrc:85 ../src/wx/xrc/DisplayConfig.xrc:135
+#: ../src/wx/xrc/DisplayConfig.xrc:221
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:183 ../src/wx/xrc/SoundConfig.xrc:212
 #: ../src/wx/xrc/SoundConfig.xrc:302
@@ -2402,11 +2392,11 @@ msgstr "OAP:"
 msgid "Ol&d value"
 msgstr "이전 값(&D)"
 
-#: ../src/wx/guiinit.cpp:3041
+#: ../src/wx/guiinit.cpp:3099
 msgid "Old Value"
 msgstr "이전 값"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:244
+#: ../src/wx/xrc/DisplayConfig.xrc:237
 msgid "On-Screen Display"
 msgstr "화면에 표시"
 
@@ -2446,7 +2436,7 @@ msgstr "OpenAL"
 msgid "OpenGL"
 msgstr "OpenGL"
 
-#: ../src/wx/wxvbam.cpp:500
+#: ../src/wx/wxvbam.cpp:498
 msgid ""
 "Options set from the command line are saved if any configuration changes are "
 "made in the user interface.\n"
@@ -2460,7 +2450,7 @@ msgstr ""
 "플래그 옵션은, true 와 false는 각각 1과 0으로 지정됩니다.\n"
 "\n"
 
-#: ../src/wx/guiinit.cpp:3527
+#: ../src/wx/guiinit.cpp:3580
 msgid "Other commands"
 msgstr "그 외 명령"
 
@@ -2476,7 +2466,7 @@ msgstr "오버플로우:"
 msgid "PC:"
 msgstr "PC:"
 
-#: ../src/wx/cmdevents.cpp:1119 ../src/wx/viewsupt.cpp:1156
+#: ../src/wx/cmdevents.cpp:1119 ../src/wx/viewsupt.cpp:1154
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG 이미지|*.png|BMP 이미지|*.bmp"
 
@@ -2493,7 +2483,7 @@ msgstr "팔레트 뷰어"
 msgid "Palette:"
 msgstr "팔레트:"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:229
+#: ../src/wx/xrc/DisplayConfig.xrc:222
 msgid "Percentage"
 msgstr "백분율"
 
@@ -2501,7 +2491,7 @@ msgstr "백분율"
 msgid "Pink Dreams"
 msgstr "분홍 꿈"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:96
+#: ../src/wx/xrc/DisplayConfig.xrc:89
 msgid "Pixelate"
 msgstr "픽셀레이트"
 
@@ -2533,11 +2523,11 @@ msgstr "사용자 수:"
 msgid "Please select a plugin or a different filter"
 msgstr "플러그인이나 다른 필터를 선택하십시오"
 
-#: ../src/wx/guiinit.cpp:1825 ../src/wx/xrc/DisplayConfig.xrc:114
+#: ../src/wx/guiinit.cpp:1825 ../src/wx/xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "플러그인"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:122
+#: ../src/wx/xrc/DisplayConfig.xrc:115
 msgid "Plugin :"
 msgstr "플러그인 :"
 
@@ -2557,7 +2547,7 @@ msgstr "Pos:"
 msgid "Print Si&ze"
 msgstr "출력 크기(&Z)"
 
-#: ../src/wx/wxvbam.cpp:402
+#: ../src/wx/wxvbam.cpp:400
 msgid "Print configuration path and exit"
 msgstr "설정 경로를 출력하고 종료합니다."
 
@@ -2573,13 +2563,13 @@ msgstr "Prio:"
 msgid "Priority:"
 msgstr "우선도:"
 
-#: ../src/wx/panel.cpp:84 ../src/wx/panel.cpp:141 ../src/wx/panel.cpp:214
+#: ../src/wx/panel.cpp:86 ../src/wx/panel.cpp:143 ../src/wx/panel.cpp:218
 msgid "Problem loading file"
 msgstr "파일 불러오기 문제"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:40
 msgid "Quartz2D"
-msgstr ""
+msgstr "쿼츠2D"
 
 #: ../src/wx/xrc/JoyPanel.xrc:119
 msgid "R"
@@ -2637,7 +2627,7 @@ msgstr "R8:"
 msgid "R9:"
 msgstr "R9:"
 
-#: ../src/wx/viewsupt.cpp:767
+#: ../src/wx/viewsupt.cpp:765
 msgid "R:"
 msgstr "R:"
 
@@ -2646,24 +2636,20 @@ msgid "RAM size:"
 msgstr "RAM 크기:"
 
 #: ../src/wx/widgets/keyedit.cpp:227
-#, fuzzy
 msgid "RAWCONTROL"
-msgstr "CONTROL"
+msgstr "RAWCONTROL"
 
 #: ../src/wx/widgets/keyedit.cpp:107 ../src/wx/widgets/keyedit.cpp:225
-#, fuzzy
 msgid "RAWCTRL"
-msgstr "CTRL"
+msgstr "RAWCTRL"
 
 #: ../src/wx/widgets/keyedit.cpp:228
-#, fuzzy
 msgid "RAW_CONTROL"
-msgstr "CONTROL"
+msgstr "RAW_CONTROL"
 
 #: ../src/wx/widgets/keyedit.cpp:226
-#, fuzzy
 msgid "RAW_CTRL"
-msgstr "CTRL"
+msgstr "RAW_CTRL"
 
 #: ../src/wx/cmdevents.cpp:564
 msgid "ROM"
@@ -2673,7 +2659,7 @@ msgstr "ROM"
 msgid "ROM Information"
 msgstr "ROM 정보"
 
-#: ../src/wx/wxvbam.cpp:416
+#: ../src/wx/wxvbam.cpp:414
 msgid "ROM file"
 msgstr "ROM 파일"
 
@@ -2887,11 +2873,11 @@ msgstr "스프라이트 저장(&S)..."
 msgid "Save Type:"
 msgstr "저장 형식:"
 
-#: ../src/wx/wxvbam.cpp:398
+#: ../src/wx/wxvbam.cpp:396
 msgid "Save built-in XRC file and exit"
 msgstr "built-in XRC 파일을 저장하고 종료합니다."
 
-#: ../src/wx/wxvbam.cpp:400
+#: ../src/wx/wxvbam.cpp:398
 msgid "Save built-in vba-over.ini and exit"
 msgstr "built-in vba-over.ini 를 저장하고 종료합니다."
 
@@ -2925,7 +2911,7 @@ msgstr "%s 스냅샷 파일이 저장됨"
 msgid "Saved state %s"
 msgstr "상태 %s 저장됨"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:100
+#: ../src/wx/xrc/DisplayConfig.xrc:93
 msgid "Scanlines"
 msgstr "스캔라인"
 
@@ -2998,11 +2984,11 @@ msgstr "메모리 덤프 파일을 선택"
 #: ../src/wx/cmdevents.cpp:1118 ../src/wx/cmdevents.cpp:1199
 #: ../src/wx/cmdevents.cpp:1272 ../src/wx/cmdevents.cpp:1299
 #: ../src/wx/viewers.cpp:544 ../src/wx/viewers.cpp:748
-#: ../src/wx/viewsupt.cpp:1155
+#: ../src/wx/viewsupt.cpp:1153
 msgid "Select output file"
 msgstr "출력 파일을 선택"
 
-#: ../src/wx/gfxviewers.cpp:1164
+#: ../src/wx/gfxviewers.cpp:1131
 msgid "Select output file and type"
 msgstr "출력 파일 및 형식 선택"
 
@@ -3045,15 +3031,15 @@ msgstr "부호/비부호화"
 msgid "Simple"
 msgstr "단순"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:104
+#: ../src/wx/xrc/DisplayConfig.xrc:97
 msgid "Simple 2x"
 msgstr "단순 2배"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:105
+#: ../src/wx/xrc/DisplayConfig.xrc:98
 msgid "Simple 3x"
 msgstr "단순 3배"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:107
+#: ../src/wx/xrc/DisplayConfig.xrc:100
 msgid "Simple 4x"
 msgstr "단순 4배"
 
@@ -3062,7 +3048,7 @@ msgstr "단순 4배"
 msgid "Size:"
 msgstr "크기:"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:143
+#: ../src/wx/xrc/DisplayConfig.xrc:136
 msgid "Smart interframe blending"
 msgstr "스마트 인터프레임 블렌딩"
 
@@ -3094,7 +3080,7 @@ msgstr "스페셜"
 msgid "Specific &value"
 msgstr "특정 값(&V)"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:206
+#: ../src/wx/xrc/DisplayConfig.xrc:199
 msgid "Speed"
 msgstr "속도"
 
@@ -3102,7 +3088,7 @@ msgstr "속도"
 msgid "Speed Up"
 msgstr "속도 "
 
-#: ../src/wx/xrc/DisplayConfig.xrc:222
+#: ../src/wx/xrc/DisplayConfig.xrc:215
 msgid "Speed indicator :"
 msgstr "속도 표시 단위 :"
 
@@ -3154,7 +3140,7 @@ msgstr "동영상 녹화 시작(&V)..."
 msgid "Start Network Link"
 msgstr "네트워크 연결 시작"
 
-#: ../src/wx/wxvbam.cpp:404
+#: ../src/wx/wxvbam.cpp:402
 msgid "Start in full-screen mode"
 msgstr "전체화면으로 시작"
 
@@ -3192,11 +3178,11 @@ msgstr "동영상 녹화 중지(&I)"
 msgid "Stretch to &fit"
 msgstr "화면에 맞춤(&F)"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:94
+#: ../src/wx/xrc/DisplayConfig.xrc:87
 msgid "Super 2xSaI"
 msgstr "슈퍼 2xSaI"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:95
+#: ../src/wx/xrc/DisplayConfig.xrc:88
 msgid "Super Eagle"
 msgstr "슈퍼 이글"
 
@@ -3216,7 +3202,7 @@ msgstr "시스템"
 msgid "T"
 msgstr "T"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:101
+#: ../src/wx/xrc/DisplayConfig.xrc:94
 msgid "TV Mode"
 msgstr "TV 모드"
 
@@ -3228,7 +3214,7 @@ msgstr "텍스트 파일 (*.txt;*.log)|*.txt;*.log|"
 msgid "The XAudio2 interface failed to initialize!"
 msgstr "XAudio2 인터페이스 초기화를 실패했습니다!"
 
-#: ../src/wx/wxvbam.cpp:521
+#: ../src/wx/wxvbam.cpp:519
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
@@ -3236,7 +3222,7 @@ msgstr ""
 "Keyboard/* 옵션으로 사용가능한 커맨드:\n"
 "\n"
 
-#: ../src/wx/cmdevents.cpp:2415
+#: ../src/wx/cmdevents.cpp:2413
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -3304,17 +3290,17 @@ msgstr "번역하기"
 msgid "U&pdate Old"
 msgstr "이전 값 업데이트(&U)"
 
-#: ../src/wx/panel.cpp:2374 ../src/wx/panel.cpp:2405
+#: ../src/wx/panel.cpp:2296 ../src/wx/panel.cpp:2327
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "%s (%s)부터 기록을 시작할 수 없습니다."
 
-#: ../src/wx/panel.cpp:213
+#: ../src/wx/panel.cpp:217
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "%s 게임 보이 어드밴스 ROM을 불러올 수 없음"
 
-#: ../src/wx/panel.cpp:140
+#: ../src/wx/panel.cpp:142
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "%s 게임 보이 ROM을 불러올 수 없음"
@@ -3443,7 +3429,7 @@ msgstr "연결 대기 중..."
 msgid "Weird Colors"
 msgstr "이상한 색"
 
-#: ../src/wx/gfxviewers.cpp:1165
+#: ../src/wx/gfxviewers.cpp:1132
 msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
@@ -3456,7 +3442,7 @@ msgstr ""
 msgid "Wrote battery %s"
 msgstr "%s 배터리가 기록됨"
 
-#: ../src/wx/wxvbam.cpp:457
+#: ../src/wx/wxvbam.cpp:455
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
@@ -3469,7 +3455,7 @@ msgstr ""
 "다음 검색경로의 모든 .xrc 혹은 .xrs 파일에서 먼저 검색된 정확한 이름의 root "
 "node가 오버라이드 됩니다:"
 
-#: ../src/wx/wxvbam.cpp:484
+#: ../src/wx/wxvbam.cpp:482
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
@@ -3480,7 +3466,7 @@ msgstr ""
 "오버라이드 하기 위해서는, 변경된 섹션을 제외한 모든 것을 지워주세요. 검색 경"
 "로에서 먼저 찾아낸 섹션이 사용됩니다:"
 
-#: ../src/wx/sys.cpp:808 ../src/wx/sys.cpp:990
+#: ../src/wx/sys.cpp:808 ../src/wx/sys.cpp:989
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "프린터 결과를 %s에 기록했습니다."
@@ -3514,7 +3500,7 @@ msgstr "유효한 호스트 이름을 입력해야 합니다"
 msgid "Z"
 msgstr "Z"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:292
+#: ../src/wx/xrc/DisplayConfig.xrc:285
 msgid "Zoom"
 msgstr "배율"
 
@@ -3530,7 +3516,7 @@ msgstr "a"
 msgid "b"
 msgstr "b"
 
-#: ../src/wx/panel.cpp:2355
+#: ../src/wx/panel.cpp:2277
 msgid "can't guess output format from file name"
 msgstr "파일명에서 출력포맷을 알 수 없습니다."
 
@@ -3548,19 +3534,19 @@ msgstr "dsbSecondary-> %08x 현재포지션설정 실패"
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr "e-리더 닷 코드 (*.bin;*.raw)|*.bin;*.raw"
 
-#: ../src/wx/panel.cpp:2349
+#: ../src/wx/panel.cpp:2271
 msgid "error initializing codec"
 msgstr "코덱 초기화 오류"
 
-#: ../src/wx/panel.cpp:2352
+#: ../src/wx/panel.cpp:2274
 msgid "error writing to output file"
 msgstr "출력 파일 쓰기 오류"
 
-#: ../src/wx/panel.cpp:2346
+#: ../src/wx/panel.cpp:2268
 msgid "memory allocation error"
 msgstr "메모리 할당 오류"
 
-#: ../src/wx/panel.cpp:2360
+#: ../src/wx/panel.cpp:2282
 msgid "programming error; aborting!"
 msgstr "프로그래밍 오류; 종료합니다!"
 
@@ -3586,93 +3572,30 @@ msgstr "vbam"
 
 #: ../src/wx/wxvbam.cpp:43
 msgid "visualboyadvance-m"
-msgstr ""
+msgstr "visualboyadvance-m"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:109
+#: ../src/wx/xrc/DisplayConfig.xrc:102
 msgid "xBRZ 2x"
 msgstr "xBRZ 2배"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:110
+#: ../src/wx/xrc/DisplayConfig.xrc:103
 msgid "xBRZ 3x"
 msgstr "xBRZ 3배"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:111
+#: ../src/wx/xrc/DisplayConfig.xrc:104
 msgid "xBRZ 4x"
 msgstr "xBRZ 4배"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:112
+#: ../src/wx/xrc/DisplayConfig.xrc:105
 msgid "xBRZ 5x"
 msgstr "xBRZ 5배"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:113
-#, fuzzy
+#: ../src/wx/xrc/DisplayConfig.xrc:106
 msgid "xBRZ 6x"
-msgstr "xBRZ 2배"
+msgstr "xBRZ 6배"
 
-#~ msgid ""
-#~ "A new update is available. To update, VisualBoyAdvance-M must be Run as "
-#~ "administrator. Would you like to download and update VisualBoyAdvance-M?\n"
-#~ "\n"
-#~ "https://sourceforge.net/projects/vbam/files/latest/download"
-#~ msgstr ""
-#~ "새 업데이트가 있습니다. 업데이트를 하기 위해서는, VisualBoyAdvance-M 는 반"
-#~ "드시 관리자 모드로 실행되어야 합니다. VisualBoyAdvance-M 를 다운로드하고 "
-#~ "업데이트 하시겠습니까?\n"
-#~ "\n"
-#~ "https://sourceforge.net/projects/vbam/files/latest/download"
+#~ msgid "Cairo"
+#~ msgstr "Cairo"
 
-#~ msgid "Check for updates"
-#~ msgstr "업데이트 검사"
-
-#~ msgid "Confirm Update"
-#~ msgstr "업데이트 승인"
-
-#~ msgid "Fullscreen filter :"
-#~ msgstr "전체화면 필터 :"
-
-#~ msgid "New Update Available"
-#~ msgstr "새 업데이트가 있습니다."
-
-#~ msgid "Online Update"
-#~ msgstr "온라인 업데이트"
-
-#~ msgid ""
-#~ "Online updates are available on Windows only. Please browse this site for "
-#~ "updates.\n"
-#~ "\n"
-#~ "https://sourceforge.net/projects/vbam/files/latest/download"
-#~ msgstr ""
-#~ "온라인 업데이트는 윈도우즈에서만 가능합니다. 업데이트를 위해 이 사이트를 "
-#~ "방문해주세요.\n"
-#~ "\n"
-#~ "https://sourceforge.net/projects/vbam/files/latest/download"
-
-#~ msgid ""
-#~ "OpenAL library could not be found on your system.  Please install the "
-#~ "runtime from http://openal.org"
-#~ msgstr ""
-#~ "시스템에서 OpenAL 라이브러리를 찾을 수 없습니다. http://openal.org 에서 런"
-#~ "타임을 설치해 주십시오."
-
-#~ msgid ""
-#~ "The update has been downloaded and installed.  Please restart "
-#~ "VisualBoyAdvance-M."
-#~ msgstr ""
-#~ "업데이트를 다운로드 및 설치 했습니다. VisualBoyAdvance-M을 재시작 해주세"
-#~ "요."
-
-#~ msgid "There are no new updates at this time."
-#~ msgstr "지금은 새로운 업데이트가 없습니다."
-
-#~ msgid ""
-#~ "This will download and update three GBA No-Intro DAT files.  Do you want "
-#~ "to continue?"
-#~ msgstr ""
-#~ "GBA No-Intro DAT 파일 3개를 내려받고 업데이트하게 됩니다. 계속 하시겠습니"
-#~ "까?"
-
-#~ msgid "Update Downloaded"
-#~ msgstr "업데이트 다운로드됨"
-
-#~ msgid "Update ROM database"
-#~ msgstr "ROM 데이터베이스 업데이트"
+#~ msgid "Cannot create conversion buffer"
+#~ msgstr "변환 버퍼 생성 불가"

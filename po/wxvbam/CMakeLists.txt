@@ -1,17 +1,8 @@
+file(GLOB po_files "${CMAKE_CURRENT_SOURCE_DIR}/*.po")
+
 GETTEXT_CREATE_TRANSLATIONS(
 	wxvbam.pot
-	cs.po
-	de.po
-	en.po
-	es.po
-	fr.po
-	gl.po
-	ko.po
-	nb.po
-	nl.po
-	pt_BR.po
-	ru.po
-	tr.po
-	zh_TW.po
+        ${po_files}
 )
-ADD_DEPENDENCIES(visualboyadvance-m wxvbam_translations)
+
+ADD_DEPENDENCIES(visualboyadvance-m translations)
