@@ -229,10 +229,8 @@ static void* wram_ptr(void)
 {
     if (type == IMAGE_GBA)
         return workRAM;
-    if (type == IMAGE_GB) {
-        // this does not work with retro_get_memory_data/size
-        // with its current memory mapping
-    }
+    if (type == IMAGE_GB)
+        return gbMemoryMap[0x0c];
     return 0;
 }
 
@@ -240,13 +238,19 @@ static size_t wram_size(void)
 {
     if (type == IMAGE_GBA)
         return 0x40000;
-    return 0;
+    if (type == IMAGE_GB)
+        // only use 1st bank of wram,  libretro doesnt seem to handle
+        // the switching bank properly in GBC mode. This is to avoid possible incorrect reads.
+        // For cheevos purposes, this bank is accessed using retro_memory_descriptor instead.
+        return gbCgbMode ? 0x1000 : 0x2000;
 }
 
 static void* vram_ptr(void)
 {
     if (type == IMAGE_GBA)
         return vram;
+    if (type == IMAGE_GB)
+        return gbMemoryMap[0x08] ;
     return 0;
 }
 
@@ -254,6 +258,8 @@ static size_t vram_size(void)
 {
     if (type == IMAGE_GBA)
         return 0x20000;
+    if (type == IMAGE_GB)
+        return 0x2000;;
     return 0;
 }
 
@@ -984,8 +990,8 @@ static void update_variables(void)
 
         if ((type == IMAGE_GB) && (oldval != ((gbBorderOn << 1) | gbBorderAutomatic))) {
             if (gbBorderOn) {
-                gbSgbRenderBorder();
                 systemGbBorderOn();
+                gbSgbRenderBorder();
             }
             else
                 systemGbBorderOff();
@@ -1071,10 +1077,11 @@ bool retro_unserialize(const void* data, size_t size)
 
 void retro_cheat_reset(void)
 {
-	if (type == IMAGE_GBA) {
-		cheatsEnabled = 1;
+    cheatsEnabled = 1;
+    if (type == IMAGE_GBA)
 		cheatsDeleteAll(false);
-	}
+	else if (type == IMAGE_GB)
+        gbCheatRemoveAll();
 }
 
 void retro_cheat_set(unsigned index, bool enabled, const char* code)
@@ -1120,57 +1127,59 @@ void retro_cheat_set(unsigned index, bool enabled, const char* code)
    } while (*c++);
    */
    
-   // TODO: Add cheat code support for GB/GBC
-   if (type != IMAGE_GBA)
-       return;
-
-   std::string codeLine=code;
-   std::string name="cheat_"+index;
-   int matchLength=0;
-   std::vector<std::string> codeParts;
-   int cursor;
-
-    //Break the code into Parts
-    for (cursor=0;;cursor++)
-    {
-      if (ISHEXDEC){
-         matchLength++;
-      } else {
-         if (matchLength){
-            if (matchLength>8){
-               codeParts.push_back(codeLine.substr(cursor-matchLength,8));
-               codeParts.push_back(codeLine.substr(cursor-matchLength+8,matchLength-8));
-
-            } else {
-               codeParts.push_back(codeLine.substr(cursor-matchLength,matchLength));
+    std::string codeLine = code;
+    std::string name = "cheat_" + index;
+    int matchLength = 0;
+    std::vector<std::string> codeParts;
+    int cursor;
+   
+    if (type == IMAGE_GBA) {
+        //Break the code into Parts
+        for (cursor = 0;; cursor++) {
+            if  (ISHEXDEC)
+                matchLength++;
+            else {
+                if (matchLength) {
+                    if (matchLength > 8) {
+                    codeParts.push_back(codeLine.substr(cursor - matchLength, 8));
+                    codeParts.push_back(codeLine.substr(cursor - matchLength + 8, matchLength - 8));
+                    } else
+                        codeParts.push_back(codeLine.substr(cursor - matchLength, matchLength));
+                    matchLength = 0;
+                }
             }
-            matchLength=0;
-         }
-      }
-      if (!codeLine[cursor]){
-         break;
-      }
+            if (!codeLine[cursor])
+                break;
+        }
+
+        //Add to core
+        for (cursor = 0; cursor < codeParts.size(); cursor += 2) {
+            std::string codeString;
+            codeString += codeParts[cursor];
+
+            if (codeParts[cursor + 1].length() == 8) {
+                codeString += codeParts[cursor + 1];
+                cheatsAddGSACode(codeString.c_str(), name.c_str(), true);
+            } else if (codeParts[cursor + 1].length() == 4) {
+                codeString += " ";
+                codeString += codeParts[cursor + 1];
+                cheatsAddCBACode(codeString.c_str(), name.c_str());
+            } else {
+                codeString += " ";
+                codeString += codeParts[cursor + 1];
+                log_cb(RETRO_LOG_ERROR, "Invalid cheat code '%s'\n", codeString.c_str());
+            }
+            log_cb(RETRO_LOG_INFO, "Cheat code added: '%s'\n", codeString.c_str());
+        }
+    } else if (type == IMAGE_GB) {
+        if (codeLine.find("-") != std::string::npos) {
+            if (gbAddGgCheat(code, ""))
+                log_cb(RETRO_LOG_INFO, "Cheat code added: '%s'\n", codeLine.c_str());
+        } else {
+            if (gbAddGsCheat(code, ""))
+                log_cb(RETRO_LOG_INFO, "Cheat code added: '%s'\n", codeLine.c_str());
+        }
     }
-
-   //Add to core
-   for (cursor=0;cursor<codeParts.size();cursor+=2){
-      std::string codeString;
-      codeString+=codeParts[cursor];
-
-      if (codeParts[cursor+1].length()==8){
-         codeString+=codeParts[cursor+1];
-         cheatsAddGSACode(codeString.c_str(),name.c_str(),true);
-      } else if (codeParts[cursor+1].length()==4) {
-         codeString+=" ";
-         codeString+=codeParts[cursor+1];
-         cheatsAddCBACode(codeString.c_str(),name.c_str());
-      } else {
-         codeString+=" ";
-         codeString+=codeParts[cursor+1];
-         log_cb(RETRO_LOG_ERROR, "[VBA] Invalid cheat code '%s'\n", codeString.c_str());
-      }
-      log_cb(RETRO_LOG_INFO, "[VBA] Cheat code added: '%s'\n", codeString.c_str());
-   }
 }
 
 static void update_input_descriptors(void)
