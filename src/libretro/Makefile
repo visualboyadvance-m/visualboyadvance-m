@@ -35,7 +35,7 @@ endif
 ifeq ($(platform), unix)
    TARGET := $(TARGET_NAME)_libretro.so
    fpic := -fPIC
-   SHARED := -shared
+   SHARED := -shared -Wl,-no-undefined -Wl,--version-script=link.T
 	TILED_RENDERING = 1
 else ifeq ($(platform), osx)
    TARGET := $(TARGET_NAME)_libretro.dylib
