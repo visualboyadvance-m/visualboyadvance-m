@@ -114,6 +114,7 @@ DISTS=$DISTS'
     bzip2           https://github.com/nemequ/bzip2/releases/download/v1.0.6/bzip2-1.0.6.tar.gz                 lib/libbz2.a
     xz              https://tukaani.org/xz/xz-5.2.3.tar.gz                                                      lib/liblzma.a
     unzip           https://downloads.sourceforge.net/project/infozip/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz     bin/unzip
+    ccache          https://www.samba.org/ftp/ccache/ccache-3.4.3.tar.xz                                        bin/ccache
     zip             https://downloads.sourceforge.net/project/infozip/Zip%203.x%20%28latest%29/3.0/zip30.tar.gz                 bin/zip
     openssl         https://www.openssl.org/source/openssl-1.0.2o.tar.gz                                        lib/libssl.a
     cmake           https://cmake.org/files/v3.10/cmake-3.10.3.tar.gz                                           bin/cmake
@@ -168,8 +169,8 @@ DISTS=$DISTS'
     docbook5.0      http://www.docbook.org/xml/5.0/docbook-5.0.zip                                                        share/xml/docbook/schema/dtd/5.0/catalog.xml
     docbook-xsl     https://downloads.sourceforge.net/project/docbook/docbook-xsl/1.79.1/docbook-xsl-1.79.1.tar.bz2       share/xml/docbook/stylesheet/docbook-xsl/catalog.xml
     docbook-xsl-ns  https://downloads.sourceforge.net/project/docbook/docbook-xsl-ns/1.79.1/docbook-xsl-ns-1.79.1.tar.bz2 share/xml/docbook/stylesheet/docbook-xsl-ns/catalog.xml
-    python2         https://www.python.org/ftp/python/2.7.14/Python-2.7.14.tar.xz                               bin/python
-    python3         https://github.com/python/cpython/archive/d135f20ae8887acc7716561bc8f4c7eb6d58d24c.tar.gz   bin/python3
+    python2         https://www.python.org/ftp/python/2.7.15/Python-2.7.15.tar.xz                               bin/python
+    python3         https://www.python.org/ftp/python/3.6.5/Python-3.6.5.tar.xz                                 bin/python3
     swig            https://downloads.sourceforge.net/project/swig/swig/swig-3.0.12/swig-3.0.12.tar.gz          bin/swig
     libxml2-python  ftp://xmlsoft.org/libxml2/libxml2-sources-2.9.7.tar.gz                                      lib/python2.7/site-packages/libxml2.py
     doxygen         https://downloads.sourceforge.net/project/doxygen/rel-1.8.14/doxygen-1.8.14.src.tar.gz      bin/doxygen
@@ -304,6 +305,7 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
 DIST_POST_BUILD="$DIST_POST_BUILD
     harfbuzz        rebuild_dist freetype --with-harfbuzz=yes;
     flex-2.6.3      build_dist flex || :;
+    libtool         ln -sf '$BUILD_ROOT/root/bin/libtoolize' '$BUILD_ROOT/root/bin/glibtoolize'
     glib            rebuild_dist gettext --without-included-glib --without-included-libxml;
     graphviz        (cd '$BUILD_ROOT/root/bin'; path_exists dot_static && ! path_exists dot && ln -sf '$BUILD_ROOT/root/bin/dot_static' ./dot || :)
     libxml2         mkdir -p '$BUILD_ROOT/root/etc/xml'; \
@@ -320,7 +322,7 @@ DIST_POST_CONFIGURE="$DIST_POST_CONFIGURE
 
 DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
     openssl     ./config no-shared --prefix=/usr --openssldir=/etc/ssl
-    cmake       ./configure --prefix=/usr --no-qt-gui --parallel=\$NUM_CPUS --\"\$(set -- \$CC; if [ \"\$1\" = ccache ]; then echo enable; else echo disable; fi)\"-ccache
+    cmake       ./configure --prefix=/usr --no-qt-gui --parallel=\$NUM_CPUS --enable-ccache
     zlib        ./configure --static --prefix=/usr
     XML-SAX     echo no | PERL_MM_USE_DEFAULT=0 perl Makefile.PL
     wxwidgets   ./configure $REQUIRED_CONFIGURE_ARGS --disable-shared --prefix=/usr --enable-stl --disable-precomp-headers --enable-cxx11 --enable-permissive --with-opengl --with-libpng
@@ -546,7 +548,9 @@ num_cpus() {
 
 setup_perl() {
     if command -v perl >/dev/null; then
-        perl -MApp::cpanminus -le 1 2>/dev/null || perl -MApp::Cpan -e 'App::Cpan->run' -- App::cpanminus
+        if ! command -v cpanm >/dev/null; then
+            perl -MApp::Cpan -e 'App::Cpan->run' -- -I -f -i App::cpanminus
+        fi
     fi
 }
 
@@ -1571,20 +1575,22 @@ make_install() {
     mkdir -p destdir
     cd destdir
 
+    prefix=$(dist_prefix $current_dist)
+
     # sometimes make install doesn't try to pre-create the dest dirs
-    mkdir -p usr/man/man1 usr/man/man3 usr/share/man/man1 usr/share/man/man3 usr/inc usr/include usr/bin usr/lib
+    mkdir -p ./${prefix}/man/man1 ./${prefix}/man/man3 ./${prefix}/share/man/man1 ./${prefix}/share/man/man3 ./${prefix}/inc ./${prefix}/include ./${prefix}/bin ./${prefix}/lib
 
     # some dists understand DESTDIR but not combined with prefix
     for p in man share inc include bin lib; do
-        ln -s usr/$p $p
+        ln -s ./${prefix}/$p $p
     done
 
     cd ..
 
     if grep -Eq 'DESTDIR|cmake_install\.cmake' $(find . -name Makefile -o -name makefile -o -name '*.mk' -o -name '*.mak') 2>/dev/null; then
-        echo_run make install prefix="/usr" PREFIX="/usr" DESTDIR="$PWD/destdir" "$@" || :
+        echo_run make install prefix="${prefix}" PREFIX="${prefix}" DESTDIR="$PWD/destdir" "$@" || :
     else
-        echo_run make install prefix="$PWD/destdir/usr" PREFIX="$PWD/destdir/usr" INSTALL_PREFIX="$PWD/destdir/usr" INSTALL_ROOT="$PWD/destdir/usr" INSTALLTOP='/../usr/' "$@" || :
+        echo_run make install prefix="$PWD/destdir${prefix}" PREFIX="$PWD/destdir${prefix}" INSTALL_PREFIX="$PWD/destdir${prefix}" INSTALL_ROOT="$PWD/destdir${prefix}" INSTALLTOP="/..${prefix}/" "$@" || :
     fi
 }
 
@@ -1592,30 +1598,34 @@ make_install() {
 install_dist() {
     current_dist=$1
     [ -n "$current_dist" ] || die 'install_dist: dist name required'
-    [ -d destdir      ] || die 'install_dist: ./destdir does not exist'
+    [ -d destdir         ] || die 'install_dist: ./destdir does not exist'
+
+    prefix=$(dist_prefix $current_dist)
+    rel_prefix=${prefix#/}
 
     # if there is an extra prefix, like e.g. 'msys64' on msys2 before 'usr/',
     # remove it
-    if ([ "$(list_length destdir/*)" -eq 1 ] && [ ! -d destdir/usr ]) || \
-       ([ "$(list_length destdir/*)" -eq 2 ] && [ "$(find destdir/usr -type f 2>/dev/null | wc -l)" -eq 0 ]); then
-        mv destdir/*/usr tmp-usr
+    if ([ "$(list_length destdir/*)" -eq 1 ] && [ ! -d destdir${prefix} ]) || \
+       ([ "$(list_length destdir/*)" -eq 2 ] && [ "$(find destdir${prefix} -type f 2>/dev/null | wc -l)" -eq 0 ]); then
+        mv destdir/${prefix}/* tmp-usr
         rm -rf destdir/*
-        mv tmp-usr destdir/usr
+        mkdir -p destdir${prefix%/*}
+        mv tmp-usr destdir${prefix}
     fi
 
     # move libs out of platforms dirs like lib/x86_64-linux-gnu/ and lib64/
     # and adjust pkgconfig files
 
-    dest_lib_dir='destdir/usr/lib'
+    dest_lib_dir="destdir${prefix}/lib"
 
     [ -n "$target_platform" ] && dest_platform_lib_dir="$dest_lib_dir/$target_platform"
-    [ -n "$bits"            ] && dest_bits_lib_dir="destdir/usr/lib$bits"
+    [ -n "$bits"            ] && dest_bits_lib_dir="destdir${prefix}/lib$bits"
 
     for platf_dir in "$dest_platform_lib_dir" "$dest_bits_lib_dir"; do
         if [ -n "$platf_dir" ] && [ -d "$platf_dir" ]; then
             if [ -d "$platf_dir/pkgconfig" ]; then
                 sed -i.bak "s,lib/$target_platform,lib,g" "$platf_dir/pkgconfig"/*.pc
-                rm -f "$platf_dir/pkgconfig"/*.pc.bak
+/                rm -f "$platf_dir/pkgconfig"/*.pc.bak
             fi
 
             mkdir -p "$dest_lib_dir"
@@ -1628,11 +1638,11 @@ install_dist() {
 
     # copy platform includes to the regular include dirs
     IFS=$NL
-    for platform_inc_dir in $(find "destdir/usr/lib/" -mindepth 2 -maxdepth 2 -type d -name include 2>/dev/null || :); do
+    for platform_inc_dir in $(find "destdir${prefix}/lib/" -mindepth 2 -maxdepth 2 -type d -name include 2>/dev/null || :); do
         IFS=$OIFS
         (
             inc_dir=${platform_inc_dir%/*}
-            inc_dir="destdir/usr/include/${inc_dir##*/}"
+            inc_dir="destdir${prefix}/include/${inc_dir##*/}"
 
             mkdir -p "$inc_dir"
 
@@ -1642,10 +1652,11 @@ install_dist() {
     IFS=$OIFS
 
     # check that key file was built
-    path_exists "destdir/usr/$(install_artifact_relative "$current_dist")"
+    path_exists "destdir${prefix}/$(install_artifact_relative "$current_dist")"
 
     # when cross compiling, resolve build root to host or target
     inst_root=$(resolve_link "$BUILD_ROOT/root")
+    inst_root="$inst_root/${rel_prefix#usr}"
 
     # build file list and sed script to replace file paths in text files and
     # scripts
@@ -1654,7 +1665,7 @@ install_dist() {
     rm -f "$file_list"
 
     (cd "destdir"; IFS=$NL;
-    find usr etc 2>/dev/null | while read -r f; do
+    find "./$prefix" etc 2>/dev/null | while read -r f; do
         IFS=$OIFS
 
         f=$(normalize_relative_path "$f")
@@ -1673,28 +1684,30 @@ install_dist() {
     # build sed script using shortest possible common paths,
     # ignoring docs, man and info pages and top level dirs
     IFS=$NL
-    sed '
-        /^[^\/]*$/d
-        /^usr\/man$/d
-        /^usr\/man\//d
-        /^usr\/share\/doc$/d
-        /^usr\/share\/doc\//d
-        /^usr\/share\/man$/d
-        /^usr\/share\/man\//d
-        /^usr\/share\/info$/d
-        /^usr\/share\/info\//d
-        /^usr\/[^\/][^\/]*$/d
-        s|^\(usr/[^/][^/]*/[^/][^/]*\)/[^/].*|\1|
-        s|^\(etc/[^/][^/]*\)/[^/].*|\1|
-    ' "$file_list" | sort -u | \
+    escaped_prefix=$(puts "$rel_prefix" | sed 's,/,\\/,g')
+
+    sed "
+        /^[^/]*\$/d
+        /^${escaped_prefix}\\/man\$/d
+        /^${escaped_prefix}\\/man\\//d
+        /^${escaped_prefix}\\/share\\/doc\$/d
+        /^${escaped_prefix}\\/share\\/doc\\//d
+        /^${escaped_prefix}\\/share\\/man\$/d
+        /^${escaped_prefix}\\/share\\/man\\//d
+        /^${escaped_prefix}\\/share\\/info\$/d
+        /^${escaped_prefix}\\/share\\/info\\//d
+        /^${escaped_prefix}\\/[^/][^/]*\$/d
+        s|^\\(${escaped_prefix}/[^/][^/]*/[^/][^/]*\\)/[^/].*|\\1|
+        s|^\\(etc/[^/][^/]*\\)/[^/].*|\\1|
+    " "$file_list" | sort -u | \
     while read -r f; do
         IFS=$OIFS
         variants=$f
         [ "$f" != "${f%.exe}" ] && variants="$variants ${f%.exe}"
         for f in $variants; do
             case "$f" in
-                usr/*)
-                    f=${f#usr/}
+                ${rel_prefix}/*)
+                    f=${f#${rel_prefix}/}
                     cat >>"$sed_scr_usr" <<EOF
                         s|^/usr/\\($f/*\\)\$|$inst_root/\\1|
                         s|^/usr/\\($f[^a-zA-Z0-9]\\)|$inst_root/\\1|
@@ -1717,7 +1730,7 @@ EOF
 
     # group sed script under a /usr/ and /etc/ pattern addresses to speed it up
     #
-    cat >"${sed_scr}.work" <<EOF
+    cat >"${sed_scr}.work" <<'EOF'
         /\/usr/{
 EOF
     # also add special rules to rewrite 'prefix' variables in scripts
@@ -1748,7 +1761,7 @@ EOF
 
     if [ -f "${sed_scr_etc}" ]; then
       cat >>"${sed_scr}.work" <<EOF
-        /\/etc\//{
+        /\\/etc\\//{
 $(cat "$sed_scr_etc")
         }
 EOF
@@ -1767,21 +1780,25 @@ EOF
 
     defer_cmds=
     OLDPWD=$PWD
+    mkdir -p "$inst_root"
     cd "$inst_root"
     IFS=$NL
     for f in $(cat "$file_list"); do
         IFS=$OIFS
 
         # usr/ is the prefix, but etc/* goes under root/etc/*
-        if [ "$f" = usr ]; then continue; fi
+        if [ "$f" = "$rel_prefix" ]; then continue; fi
 
-        dest_f=${f#usr/}
+        rel_prefix=${prefix#/}
+        dest_f=${f#$rel_prefix}
+        dest_f=${dest_f#/}
+        rel_prefix=${rel_prefix#usr}
+        rel_prefix=${rel_prefix#/}
 
         if [ -d "$tmp_prefix/$f" ]; then
             echo_run mkdir -p "$dest_f"
             continue
         fi
-
 
         # move usr/man files to usr/share/man
         case "$dest_f" in
@@ -1820,6 +1837,7 @@ EOF
 ln -sf \"$link_dest\" \"$dest_f\"
 "
             fi
+
             continue
         fi
 
@@ -2048,6 +2066,27 @@ dist_args() {
             die "dist_args: buildsystem type required, must be 'autoconf', 'cmake' or 'perl'"
             ;;
     esac
+}
+
+dist_prefix() {
+    current_dist=$1
+    [ -n "$current_dist" ] || die 'dist_prefix: dist name required'
+
+    prefix=$(table_line DIST_PREFIX $current_dist) || :
+    [ -n "$prefix" ] || prefix=/usr
+
+    while :; do
+        case "$prefix" in
+            */)
+                prefix=${prefix%/}
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+
+    puts "$prefix"
 }
 
 dist_tar_args() {
@@ -2575,6 +2614,9 @@ install_artifact() {
     current_dist=$1
     [ -n "$current_dist" ] || die 'install_artifact: dist name required'
 
+    prefix=$(dist_prefix $current_dist)
+    prefix=${prefix#/usr}
+
     set -- $(table_line DISTS $current_dist)
 
     eval "path=\"\$$#\""
@@ -2588,7 +2630,7 @@ install_artifact() {
             ;;
     esac
 
-    puts "$BUILD_ROOT/root/$path"
+    puts "$BUILD_ROOT/root${prefix}/${path}"
 }
 
 install_artifact_relative() {
@@ -2737,6 +2779,15 @@ resolve_link() {
 
     echo "$file"
 }
+
+#cpanm() {
+#    if command -v cpanm >/dev/null; then
+#        cpanm "$@"
+#    else
+#        # why the fuck does this segfault?
+#        perl -MApp::cpanminus::fatscript -le 'my $c = App::cpanminus::script->new; $c->parse_options(@ARGV); $c->doit;' -- "$@"
+#    fi
+#}
 
 # this needs to run on source, not just after entry
 setup
