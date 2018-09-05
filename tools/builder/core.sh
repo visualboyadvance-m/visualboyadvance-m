@@ -1625,7 +1625,7 @@ install_dist() {
         if [ -n "$platf_dir" ] && [ -d "$platf_dir" ]; then
             if [ -d "$platf_dir/pkgconfig" ]; then
                 sed -i.bak "s,lib/$target_platform,lib,g" "$platf_dir/pkgconfig"/*.pc
-/                rm -f "$platf_dir/pkgconfig"/*.pc.bak
+                rm -f "$platf_dir/pkgconfig"/*.pc.bak
             fi
 
             mkdir -p "$dest_lib_dir"
