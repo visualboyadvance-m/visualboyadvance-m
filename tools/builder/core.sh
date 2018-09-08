@@ -549,7 +549,7 @@ num_cpus() {
 setup_perl() {
     if command -v perl >/dev/null; then
         if ! command -v cpanm >/dev/null; then
-            perl -MApp::Cpan -e 'App::Cpan->run' -- -I -f -i App::cpanminus
+            perl -MApp::Cpan -e 'App::Cpan->run' -- -f -i App::cpanminus
         fi
     fi
 }
