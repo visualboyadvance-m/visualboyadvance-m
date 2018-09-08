@@ -49,7 +49,7 @@ perl_dists="$perl_dists XML-NamespaceSupport XML-SAX-Base XML-SAX"
 perl_dists=$(list_remove_duplicates $perl_dists)
 
 host_dists="$host_dists autoconf autoconf-archive automake m4 gsed bison \
-                        flex-2.6.3 flex c2man docbook2x"
+                        flex-2.6.3 flex c2man docbook2x ccache"
 host_dists=$(list_remove_duplicates $host_dists)
 
 both_dists="$both_dists openssl zlib bzip2 libiconv"
