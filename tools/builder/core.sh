@@ -305,16 +305,16 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
 DIST_POST_BUILD="$DIST_POST_BUILD
     harfbuzz        rebuild_dist freetype --with-harfbuzz=yes;
     flex-2.6.3      build_dist flex || :;
-    libtool         ln -sf '$BUILD_ROOT/root/bin/libtoolize' '$BUILD_ROOT/root/bin/glibtoolize'
+    libtool         ln -sf '$BUILD_ROOT/root/bin/libtoolize' '$BUILD_ROOT/root/bin/glibtoolize';
     glib            rebuild_dist gettext --without-included-glib --without-included-libxml;
-    graphviz        (cd '$BUILD_ROOT/root/bin'; path_exists dot_static && ! path_exists dot && ln -sf '$BUILD_ROOT/root/bin/dot_static' ./dot || :)
+    graphviz        (cd '$BUILD_ROOT/root/bin'; path_exists dot_static && ! path_exists dot && ln -sf '$BUILD_ROOT/root/bin/dot_static' ./dot || :);
     libxml2         mkdir -p '$BUILD_ROOT/root/etc/xml'; \
                     xmlcatalog --noout --create \"\$(cygpath -m \"$BUILD_ROOT/root/etc/xml/catalog.xml\")\" || :;
     python2         pip2 install six;
     python3         pip3 install six;
     fontconfig      mkdir -p '$BUILD_ROOT/root/etc/fonts'; \
                     touch '$BUILD_ROOT/root/etc/fonts/fonts.conf'; \
-                    sed -i.bak 's|/usr/share/fonts|$BUILD_ROOT/root/share/fonts|g' '$BUILD_ROOT/root/etc/fonts/fonts.conf'
+                    sed -i.bak 's|/usr/share/fonts|$BUILD_ROOT/root/share/fonts|g' '$BUILD_ROOT/root/etc/fonts/fonts.conf';
 "
 
 DIST_POST_CONFIGURE="$DIST_POST_CONFIGURE

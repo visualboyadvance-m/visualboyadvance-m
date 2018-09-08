@@ -66,6 +66,10 @@ table_line_replace DIST_POST_BUILD glib     "$(table_line DIST_POST_BUILD glib  
 
 table_line_append DIST_ARGS libsoxr '-DHAVE_WORDS_BIGENDIAN_EXITCODE=0'
 
+# don't want mingw libuuid for host fontconfig
+table_line_append DIST_PRE_BUILD  fontconfig ':; unset UUID_LIBS;'
+table_line_append DIST_POST_BUILD fontconfig ':; eval "$BUILD_ENV";'
+
 vpx_target=x86-win32-gcc
 [ "$target_bits" -eq 64 ] && vpx_target=x86_64-win64-gcc
 
