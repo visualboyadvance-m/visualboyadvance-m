@@ -6,6 +6,7 @@ case "$1" in
     -32)
         shift
         if [ "$MSYSTEM" != MINGW32 ]; then
+            unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
             OPWD=$PWD
             export MSYSTEM=MINGW32
             . /etc/profile || :
@@ -15,6 +16,7 @@ case "$1" in
     -64)
         shift
         if [ "$MSYSTEM" != MINGW64 ]; then
+            unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
             OPWD=$PWD
             export MSYSTEM=MINGW64
             . /etc/profile || :
@@ -105,6 +107,8 @@ DIST_TAR_ARGS="
 set_host_env() {
     ln -sf "$BUILD_ROOT/host" "$BUILD_ROOT/root"
 
+    unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
+
     OPWD=$PWD
     MSYSTEM=MSYS . /etc/profile || :
     eval "$BUILD_ENV"
@@ -113,6 +117,8 @@ set_host_env() {
 
 unset_host_env() {
     ln -sf "$BUILD_ROOT/target" "$BUILD_ROOT/root"
+
+    unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
 
     OPWD=$PWD
     MSYSTEM=$OMSYSTEM . /etc/profile || :

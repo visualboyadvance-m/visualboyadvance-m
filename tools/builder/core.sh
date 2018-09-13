@@ -114,11 +114,11 @@ DISTS=$DISTS'
     bzip2           https://github.com/nemequ/bzip2/releases/download/v1.0.6/bzip2-1.0.6.tar.gz                 lib/libbz2.a
     xz              https://tukaani.org/xz/xz-5.2.3.tar.gz                                                      lib/liblzma.a
     unzip           https://downloads.sourceforge.net/project/infozip/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz     bin/unzip
+    zlib            https://zlib.net/zlib-1.2.11.tar.gz                                                         lib/libz.a
     ccache          https://www.samba.org/ftp/ccache/ccache-3.4.3.tar.xz                                        bin/ccache
     zip             https://downloads.sourceforge.net/project/infozip/Zip%203.x%20%28latest%29/3.0/zip30.tar.gz                 bin/zip
     openssl         https://www.openssl.org/source/openssl-1.0.2o.tar.gz                                        lib/libssl.a
     cmake           https://cmake.org/files/v3.10/cmake-3.10.3.tar.gz                                           bin/cmake
-    zlib            https://zlib.net/zlib-1.2.11.tar.gz                                                         lib/libz.a
     m4              http://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.xz                                                  bin/m4
     autoconf        https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz                                       bin/autoconf
     autoconf-archive http://mirror.team-cymru.org/gnu/autoconf-archive/autoconf-archive-2017.09.28.tar.xz       share/aclocal/ax_check_gl.m4
@@ -1059,10 +1059,10 @@ unpack_dist() {
             $TAR $@ -zxf "$dist_file"
             ;;
         *.tar.xz)
-            xzcat "$dist_file" | $TAR $@ -xf -
+            xz -dc "$dist_file" | $TAR $@ -xf -
             ;;
         *.tar.bz2)
-            bzcat "$dist_file" | $TAR $@ -xf -
+            bzip2 -dc "$dist_file" | $TAR $@ -xf -
             ;;
         *.zip)
             unzip -q "$dist_file"
