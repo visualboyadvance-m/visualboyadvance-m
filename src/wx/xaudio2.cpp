@@ -9,7 +9,11 @@
 #include "../common/SoundDriver.h"
 
 // XAudio2
+#if _MSC_VER
+#include <xaudio2.legacy.h>
+#else
 #include <XAudio2.h>
+#endif 
 
 // MMDevice API
 #include <mmdeviceapi.h>
