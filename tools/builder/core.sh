@@ -243,6 +243,7 @@ MESON_ARGS="--prefix /usr --buildtype release --default-library static -Dintrosp
 
 DIST_PATCHES=$DIST_PATCHES'
     docbook2x       https://gist.githubusercontent.com/rkitover/0b5dcc95a0703a9b0e0e7eb6d325a98e/raw/e256d2fad8d19633ac8abe02a0d1e119063d1fd9/docbook2x.patch
+    ccache          https://gist.githubusercontent.com/rkitover/4dd30c2841a2131be8715038f538d622/raw/40a8f0f50aa6ca5f9658a0c37aa17393cc80c109/ccache-3.4.2-msys.patch
     graphite2       https://gist.githubusercontent.com/rkitover/418600634d7cf19e2bf1c3708b50c042/raw/839b72d9cda545f2e3b640d743c1bd44b89861b9/graphite2-1.3.10-static.patch
     fontconfig      https://gist.githubusercontent.com/rkitover/542405b4509bd23daa76c98b15a94627/raw/b1ffcfe67c8da22452858216eac4b86afeb93eae/fontconfig-gperf.patch
     python2         https://gist.githubusercontent.com/rkitover/2d9e5baff1f1cc4f2618dee53083bd35/raw/7f33fcf5470a9f1013ac6ae7bb168368a98fe5a0/python-2.7.14-custom-static-openssl.patch https://gist.githubusercontent.com/rkitover/afab7ed3ac7ce1860c43a258571c8ae1/raw/6f5fc90a7acf5f5c3ffda2edf402b28f469a4b3b/python-2.7.14-static-libintl.patch
