@@ -18,7 +18,7 @@ function(host_compile src dst_cmd)
         set(compile_command cc ${src} -o ${dst} ${link_flags})
     else()
         # special case for Visual Studio
-        set(compile_command cl ${src} /link "/out:${CMAKE_BINARY_DIR}/${dst}")
+        set(compile_command cl ${src} /link "/out:${dst}")
     endif()
 
     execute_process(COMMAND ${compile_command} OUTPUT_VARIABLE compile_out ERROR_VARIABLE compile_out RESULT_VARIABLE compile_result)
