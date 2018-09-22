@@ -285,7 +285,7 @@ debian_installdeps() {
 
         glew_lib=$(apt-cache search libglew | grep '^libglew[0-9]' | sed 's/ - .*//')
 
-        check sudo apt-get -qy install build-essential g++ nasm cmake gettext zlib1g-dev libgl1-mesa-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libpng-dev libsdl2-dev libsdl2-2.0 libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev $sfml_libs $glew_lib libopenal-dev libwxgtk3.0-dev libwxgtk3.0 libgtk2.0-dev libgtk-3-dev ccache
+        check sudo apt-get -qy install build-essential g++ nasm cmake gettext zlib1g-dev libgl1-mesa-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libpng-dev libsdl2-dev libsdl2-2.0 libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev $sfml_libs $glew_lib libopenal-dev libwxgtk3.0-dev libwxgtk3.0 libgtk2.0-dev libgtk-3-dev ccache zip
     else
         case "$target" in
             mingw-w64-i686)
