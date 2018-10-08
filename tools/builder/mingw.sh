@@ -216,7 +216,7 @@ table_line_append DIST_POST_BUILD catgets ":; \
 table_line_append DIST_PATCHES libgd 'https://gist.githubusercontent.com/rkitover/c64ea5b83ddea94ace58c40c7de42879/raw/fbaf4885fbefb302116b56626c0e191df514e8c6/libgd-2.2.4-mingw-static.patch'
 
 table_insert_before DISTS sfml '
-    openal          http://kcat.strangesoft.net/openal-releases/openal-soft-1.18.2.tar.bz2                      lib/libOpenAL32.a
+    openal          https://github.com/kcat/openal-soft/archive/openal-soft-1.19.0.tar.gz                      lib/libOpenAL32.a
 '
 
 table_line_append DIST_ARGS openal '-DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF -DALSOFT_TESTS=OFF'
