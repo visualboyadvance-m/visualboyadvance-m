@@ -4,6 +4,7 @@ set -e
 
 target_bits=64
 target_cpu=x86_64
+lib_suffix=64
 
 case "$1" in
     -64)
@@ -12,6 +13,7 @@ case "$1" in
     -32)
         target_bits=32
         target_cpu=i686
+        lib_suffix=
         shift
         ;;
 esac
@@ -44,6 +46,12 @@ export CC='${target_arch}-gcc'
 export CXX='${target_arch}-g++'
 export STRIP='${target_arch}-strip'
 
+export CFLAGS="\$CFLAGS -L/usr/${target_arch}/usr/lib${lib_suffix}"
+export CPPFLAGS="\$CPPFLAGS"
+export CXXFLAGS="\$CXXFLAGS -L/usr/${target_arch}/usr/lib${lib_suffix}"
+export OBJCXXFLAGS="\$OBJCXXFLAGS -L/usr/${target_arch}/usr/lib${lib_suffix}"
+export LDFLAGS="-L/usr/${target_arch}/usr/lib${lib_suffix} \$LDFLAGS"
+
 EOF
 )
 
@@ -65,10 +73,6 @@ table_line_replace DIST_POST_BUILD harfbuzz "$(table_line DIST_POST_BUILD harfbu
 table_line_replace DIST_POST_BUILD glib     "$(table_line DIST_POST_BUILD glib     | sed 's/rebuild_dist gettext /rebuild_dist gettext-target /')"
 
 table_line_append DIST_ARGS libsoxr '-DHAVE_WORDS_BIGENDIAN_EXITCODE=0'
-
-# don't want mingw libuuid for host fontconfig
-table_line_append DIST_PRE_BUILD  fontconfig ':; unset UUID_LIBS;'
-table_line_append DIST_POST_BUILD fontconfig ':; eval "$BUILD_ENV";'
 
 vpx_target=x86-win32-gcc
 [ "$target_bits" -eq 64 ] && vpx_target=x86_64-win64-gcc

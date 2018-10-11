@@ -13,10 +13,10 @@ set_host_env_hook() {
     export CC_ORIG=clang
     export CXX_ORIG=clang++
     export CPPFLAGS="-I$BUILD_ROOT/root/include -DICONV_CONST="
-    export CFLAGS="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -Wno-error=all -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
-    export CXXFLAGS="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -Wno-error=all -fpermissive -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
-    export OBJCXXFLAGS="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -Wno-error=all -fpermissive -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
-    export LDFLAGS="-fPIC -L$BUILD_ROOT/root/lib -Wno-error=all -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
+    export CFLAGS="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+    export CXXFLAGS="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+    export OBJCXXFLAGS="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+    export LDFLAGS="-fPIC -L$BUILD_ROOT/root/lib -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
 }
 
 unset_host_env_hook() {

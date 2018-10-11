@@ -44,10 +44,10 @@ export CC_ORIG="\${CC_ORIG:-\$CC}"
 export CXX_ORIG="\${CXX_ORIG:-\$CXX}"
 
 export CPPFLAGS="$CPPFLAGS -I$BUILD_ROOT/root/include"
-export CFLAGS="$CFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -Wno-error=all"
-export CXXFLAGS="$CXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -Wno-error=all -fpermissive"
-export OBJCXXFLAGS="$OBJCXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -Wno-error=all -fpermissive"
-export LDFLAGS="$LDFLAGS -fPIC -L$BUILD_ROOT/root/lib -Wno-error=all"
+export CFLAGS="$CFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -pthread"
+export CXXFLAGS="$CXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread"
+export OBJCXXFLAGS="$OBJCXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread"
+export LDFLAGS="$LDFLAGS -fPIC -L$BUILD_ROOT/root/lib -pthread"
 export STRIP="${STRIP:-strip}"
 
 if [ -z "\$OPENMP" ] && echo "\$CC" | grep -Eq gcc; then
@@ -77,7 +77,7 @@ case "\$PATH" in
     *"$BUILD_ROOT"*)
         ;;
     *)
-        export PATH="$BUILD_ROOT/host/bin:$BUILD_ROOT/root/bin:$BUILD_ROOT/root/perl5/bin:\$PATH"
+        export PATH="$BUILD_ROOT/root/bin:$BUILD_ROOT/root/perl5/bin:\$PATH"
         ;;
 esac
 
@@ -117,8 +117,8 @@ DISTS=$DISTS'
     zlib            https://zlib.net/zlib-1.2.11.tar.gz                                                         lib/libz.a
     ccache          https://www.samba.org/ftp/ccache/ccache-3.4.3.tar.xz                                        bin/ccache
     zip             https://downloads.sourceforge.net/project/infozip/Zip%203.x%20%28latest%29/3.0/zip30.tar.gz                 bin/zip
-    openssl         https://www.openssl.org/source/openssl-1.0.2o.tar.gz                                        lib/libssl.a
-    cmake           https://cmake.org/files/v3.10/cmake-3.10.3.tar.gz                                           bin/cmake
+    openssl         https://www.openssl.org/source/openssl-1.0.2p.tar.gz                                        lib/libssl.a
+    cmake           https://cmake.org/files/v3.13/cmake-3.13.0-rc1.tar.gz                                       bin/cmake
     m4              http://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.xz                                                  bin/m4
     autoconf        https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz                                       bin/autoconf
     autoconf-archive http://mirror.team-cymru.org/gnu/autoconf-archive/autoconf-archive-2017.09.28.tar.xz       share/aclocal/ax_check_gl.m4
@@ -136,6 +136,7 @@ DISTS=$DISTS'
     flex            https://github.com/westes/flex/archive/e7d45afc6aeb49745f17d21ddba4848e0c0118fc.tar.gz      bin/flex
     xmlto           https://releases.pagure.org/xmlto/xmlto-0.0.28.tar.bz2                                      bin/xmlto
     gperf           http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz                                           bin/gperf
+    libicu          https://github.com/unicode-org/icu/releases/download/release-63-rc/icu4c-63rc-src.tgz       lib/libicud*t*.a
     pkgconfig       https://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz                         bin/pkg-config
     nasm            http://repo.or.cz/nasm.git/snapshot/53371ddd17b685f8880c22b8b698e494e0f1059b.tar.gz         bin/nasm
     yasm            http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz                             bin/yasm
@@ -156,7 +157,7 @@ DISTS=$DISTS'
     libuuid         https://downloads.sourceforge.net/project/libuuid/libuuid-1.0.3.tar.gz                      lib/libuuid.a
     freetype        http://download.savannah.gnu.org/releases/freetype/freetype-2.9.1.tar.bz2                   lib/libfreetype.a
     fontconfig      https://freedesktop.org/software/fontconfig/release/fontconfig-2.13.0.tar.bz2               lib/libfontconfig.a
-    libgd           https://github.com/libgd/libgd/releases/download/gd-2.2.4/libgd-2.2.4.tar.xz                lib/libgd.a
+    libgd           https://github.com/libgd/libgd/releases/download/gd-2.2.5/libgd-2.2.5.tar.xz                lib/libgd.a
     dejavu          https://downloads.sourceforge.net/project/dejavu/dejavu/2.37/dejavu-fonts-ttf-2.37.tar.bz2  share/fonts/dejavu/DejaVuSansMono.ttf
     liberation      https://releases.pagure.org/liberation-fonts/liberation-fonts-ttf-2.00.1.tar.gz             share/fonts/liberation/LiberationMono-Regular.ttf
     urw             http://git.ghostscript.com/?p=urw-core35-fonts.git;a=snapshot;h=91edd6ece36e84a1c6d63a1cf63a1a6d84bd443a;sf=tgz share/fonts/urw/URWBookman-Light.ttf
@@ -179,7 +180,7 @@ DISTS=$DISTS'
     intltool        https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz                bin/intltoolize
     ninja           https://github.com/ninja-build/ninja/archive/v1.8.2.tar.gz                                  bin/ninja
     meson           https://github.com/mesonbuild/meson/releases/download/0.44.0/meson-0.44.0.tar.gz            bin/meson
-    glib            https://github.com/GNOME/glib/archive/2.57.2.tar.gz                                         lib/libglib-2.0.a
+    glib            https://github.com/GNOME/glib/archive/2.58.1.tar.gz                                         lib/libglib-2.0.a
     libgpg-error    https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.27.tar.bz2                     lib/libgpg-error.a
     libgcrypt       https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.2.tar.bz2                          lib/libgcrypt.a
     libsecret       http://ftp.gnome.org/pub/gnome/sources/libsecret/0.18/libsecret-0.18.5.tar.xz               lib/libsecret-1.a
@@ -257,6 +258,7 @@ DIST_TAR_ARGS="$DIST_TAR_ARGS
 DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     unzip           make
     zip             make
+    libgd           autoreconf
     harfbuzz        autoconf
     python2         autoreconf
     python3         autoreconf
@@ -273,6 +275,7 @@ DIST_RELOCATION_TYPES="$DIST_RELOCATION_TYPES
 DIST_PRE_BUILD="$DIST_PRE_BUILD
 #    xz              mkdir -p build-aux; touch build-aux/config.rpath; mkdir -p po; touch po/Makefile.in.in; sed -i.bak 's/ po / /g' Makefile.am;
     getopt          sed -i.bak 's/\\\$(LDFLAGS)\\(.*\\)\$/\\1 \$(LDFLAGS)/' Makefile;
+    libicu          cd source;
 #    flex-2.6.3      sed -i.bak '/^'\"\$TAB\"'tests \\\\\$/d' Makefile.am;
     flex            mkdir -p build-aux; touch build-aux/config.rpath; mkdir -p po; touch po/Makefile.in.in; sed -i.bak '/po \\\\$/d' Makefile.am;
     python3         sed -i.bak '/-Wl,-stack_size,/d' configure.ac;
@@ -319,6 +322,9 @@ DIST_POST_BUILD="$DIST_POST_BUILD
 "
 
 DIST_POST_CONFIGURE="$DIST_POST_CONFIGURE
+    openssl         sed -E -i.bak ' \
+        s/([^\\t]+\\\$\\((BUILD_ONE_CMD|RECURSIVE_BUILD_CMD|RECURSIVE_MAKE)\\))/+ \1/ \
+    ' \$(find . -name Makefile);
 "
 
 DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
@@ -395,6 +401,8 @@ DIST_ARGS="$DIST_ARGS
 
 DIST_BARE_MAKE_ARGS='CC="$CC"'
 
+ALL_MAKE_ARGS='V=1 VERBOSE=1'
+
 # have to disable ccache for openssl
 DIST_MAKE_ARGS="$DIST_MAKE_ARGS
     openssl     CC=\"\$CC_ORIG -fPIC\" CXX=\"\$CXX_ORIG -fPIC\"
@@ -404,6 +412,7 @@ DIST_MAKE_ARGS="$DIST_MAKE_ARGS
     zip         generic
     expat       DOCBOOK_TO_MAN=docbook2man
     shared-mime-info    -j1
+    fontconfig  LIBS=\"-lintl -liconv\"
 "
 
 DIST_MAKE_INSTALL_ARGS="$DIST_MAKE_INSTALL_ARGS
@@ -419,7 +428,6 @@ DIST_EXTRA_LDFLAGS="$DIST_EXTRA_LDFLAGS
 
 DIST_EXTRA_LIBS="$DIST_EXTRA_LIBS
     gettext             -liconv
-    fontconfig          -lintl -liconv
     shared-mime-info    \$LD_START_GROUP -lxml2 -lgio-2.0 -lgmodule-2.0 -lgobject-2.0 -lglib-2.0 -lpcre -llzma -lz -lm -lffi -lpthread -liconv -lresolv -ldl \$LD_END_GROUP
     python3             -lintl
     harfbuzz            -lz
@@ -1361,7 +1369,7 @@ build_dist() {
                 echo_run meson .. "$@"
             fi
             dist_post_configure "$current_dist"
-            eval "set -- $(dist_make_args "$current_dist")"
+            eval "set -- $(dist_ninja_args "$current_dist")"
             echo_run ninja -j $NUM_CPUS "$@"
 
             if [ -z "$install_override" ]; then
@@ -1449,6 +1457,39 @@ build_dist() {
                 eval "set -- $(dist_make_install_args "$current_dist")"
 
                 make_install "$@"
+                install_dist "$current_dist"
+            else
+                echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
+            fi
+
+            path_exists "$(install_artifact $current_dist)"
+        elif [ "$config_type" = cmakeninja ]; then
+            if ! command -v ninja >/dev/null; then
+                error "configure type 'cmakeninja' requested but ninja is not available yet";
+            fi
+
+            mkdir -p build
+            cd build
+
+            if [ -n "$configure_override" ]; then
+                eval "set -- $extra_dist_args"
+                echo_eval_run "$configure_override $@"
+            else
+                eval "set -- $REQUIRED_CMAKE_ARGS $(dist_args "$current_dist" cmake) $extra_dist_args -G Ninja"
+                echo_run cmake .. "$@"
+            fi
+            dist_post_configure "$current_dist"
+            eval "set -- $(dist_ninja_args "$current_dist")"
+            echo_run ninja -j$NUM_CPUS "$@"
+
+            if [ -z "$install_override" ]; then
+                rm -rf destdir
+                mkdir destdir
+
+                eval "set -- $(dist_make_install_args "$current_dist")"
+
+                echo_run make "$@" install DESTDIR="$PWD/destdir" || :
+
                 install_dist "$current_dist"
             else
                 echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
@@ -2136,7 +2177,14 @@ dist_make_args() {
     current_dist=$1
     [ -n "$current_dist" ] || die 'dist_make_args: dist name required'
 
-    puts "$(table_line DIST_MAKE_ARGS $current_dist)" || :
+    puts "$ALL_MAKE_ARGS $(table_line DIST_MAKE_ARGS $current_dist)" || :
+}
+
+dist_ninja_args() {
+    current_dist=$1
+    [ -n "$current_dist" ] || die 'dist_ninja_args: dist name required'
+
+    puts "-v $(table_line DIST_MAKE_ARGS $current_dist)" || :
 }
 
 dist_make_install_args() {
@@ -2185,9 +2233,11 @@ dist_patch() {
 
             # reset patch level to 1 which is default
             _patch_level=-p1
-        fi
 
-        done_msg
+            done_msg
+        else
+            puts "${NL}[32mPatch [1;34m$_patch_url[0m to [1;35m$current_dist[0m is already appplied...${NL}${NL}"
+        fi
     done
 }
 
@@ -2222,6 +2272,18 @@ dist_post_configure() {
 
         eval "$_cmd"
     fi
+
+    # sometimes PREFIX/include gets added to header search
+    # definitely don't want this
+    # also definitely don't want any kind of -Werror
+    find . -name Makefile | while IFS=$NL read -r make_file; do
+        sed -i.bak '
+            s,-I/usr/include , ,g
+            s,-I/usr/include$,,g
+            s,-Werror[^ ]* , ,g
+            s,-Werror[^ ]*$,,g
+        ' "$make_file"
+    done
 }
 
 dist_post_build() {

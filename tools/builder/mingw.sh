@@ -8,12 +8,16 @@ CROSS_OS=windows
 
 BUILD_ENV=$BUILD_ENV$(cat <<EOF
 
-export CFLAGS="$CFLAGS -static-libgcc -static-libstdc++ -static -lpthread"
-export CXXFLAGS="$CXXFLAGS -static-libgcc -static-libstdc++ -static -lpthread"
-export OBJCXXFLAGS="$OBJCXXFLAGS -static-libgcc -static-libstdc++ -static -lpthread"
-export LDFLAGS="$LDFLAGS -static-libgcc -static-libstdc++ -static -lpthread"
+export CPPFLAGS="$CPPFLAGS -DMINGW_HAS_SECURE_API"
+export CFLAGS="$CFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API"
+export CXXFLAGS="$CXXFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API"
+export OBJCXXFLAGS="$OBJCXXFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API"
+export LDFLAGS="$LDFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API"
+export LIBS="-lpthread"
 
 export UUID_LIBS="-luuid_mingw -luuid"
+
+export PKG_CONFIG="$BUILD_ROOT/root/bin/pkg-config"
 
 EOF
 )
@@ -22,6 +26,13 @@ EOF
 : ${HOST_CXX:=ccache g++}
 : ${HOST_CC_ORIG:=gcc}
 : ${HOST_CXX_ORIG:=g++}
+: ${HOST_CPPFLAGS:="-I$BUILD_ROOT/root/include"}
+: ${HOST_CFLAGS:="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -pthread"}
+: ${HOST_CXXFLAGS:="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread"}
+: ${HOST_OBJCXXFLAGS:="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread"}
+: ${HOST_LDFLAGS:="-fPIC -L$BUILD_ROOT/root/lib -pthread"}
+: ${HOST_LIBS:=}
+: ${HOST_UUID_LIBS:=}
 : ${HOST_STRIP:=strip}
 
 . "$(dirname "$0")/../builder/core.sh"
@@ -52,7 +63,7 @@ host_dists="$host_dists autoconf autoconf-archive automake m4 gsed bison \
                         flex-2.6.3 flex c2man docbook2x ccache"
 host_dists=$(list_remove_duplicates $host_dists)
 
-both_dists="$both_dists openssl zlib bzip2 libiconv"
+both_dists="$both_dists openssl zlib bzip2 libiconv libicu"
 
 if [ "$os" != windows ]; then
     both_dists="$both_dists libuuid"
@@ -68,20 +79,29 @@ set_host_env() {
         OCXX=$CXX
         OCC_ORIG=$CC_ORIG
         OCXX_ORIG=$CXX_ORIG
+        OCPPFLAGS=$CPPFLAGS
+        OCFLAGS=$CFLAGS
+        OCXXFLAGS=$CXXFLAGS
+        OOBJCXXFLAGS=$OBJCXXFLAGS
+        OLDFLAGS=$LDFLAGS
+        OLIBS=$LIBS
+        OUUID_LIBS=$UUID_LIBS
         OSTRIP=$STRIP
+        OPATH=$PATH
 
         export CC="$HOST_CC"
         export CXX="$HOST_CXX"
         export CC_ORIG="$HOST_CC_ORIG"
         export CXX_ORIG="$HOST_CXX_ORIG"
+        export CPPFLAGS="$HOST_CPPFLAGS"
+        export CFLAGS="$HOST_CFLAGS"
+        export CXXFLAGS="$HOST_CXXFLAGS"
+        export OBJCXXFLAGS="$HOST_OBJCXXFLAGS"
+        export LDFLAGS="$HOST_LDFLAGS"
+        export LIBS="$HOST_LIBS"
+        export UUID_LIBS="$HOST_UUID_LIBS"
         export STRIP="$HOST_STRIP"
-
-        OCFLAGS=$CFLAGS OCPPFLAGS=$CPPFLAGS OCXXFLAGS=$CXXFLAGS OOBJCXXFLAGS=$OBJCXXFLAGS OLDFLAGS=$LDFLAGS
-
-        CFLAGS=$(     puts "$CFLAGS"      | sed 's/ -static-libgcc -static-libstdc++ -static -lpthread//g')
-        CXXFLAGS=$(   puts "$CXXFLAGS"    | sed 's/ -static-libgcc -static-libstdc++ -static -lpthread//g')
-        OBJCXXFLAGS=$(puts "$OBJCXXFLAGS" | sed 's/ -static-libgcc -static-libstdc++ -static -lpthread//g')
-        LDFLAGS=$(    puts "$LDFLAGS"     | sed 's/ -static-libgcc -static-libstdc++ -static -lpthread//g')
+        export PATH="$BUILD_ROOT/host/bin:$PATH"
 
         OREQUIRED_CONFIGURE_ARGS=$REQUIRED_CONFIGURE_ARGS
         OREQUIRED_CMAKE_ARGS=$REQUIRED_CMAKE_ARGS
@@ -102,20 +122,20 @@ unset_host_env() {
         export CXX="$OCXX"
         export CC_ORIG="$OCC_ORIG"
         export CXX_ORIG="$OCXX_ORIG"
-        export STRIP="$OSTRIP"
-        OCC= OCXX= OCC_ORIG= OCXX_ORIG= OSTRIP=
-
-        export CFLAGS="$OCFLAGS"
         export CPPFLAGS="$OCPPFLAGS"
+        export CFLAGS="$OCFLAGS"
         export CXXFLAGS="$OCXXFLAGS"
         export OBJCXXFLAGS="$OOBJCXXFLAGS"
         export LDFLAGS="$OLDFLAGS"
-        OCFLAGS= OCPPFLAGS= OCXXFLAGS= OOBJCXXFLAGS= OLDFLAGS=
+        export LIBS="$OLIBS"
+        export UUID_LIBS="$OUUID_LIBS"
+        export STRIP="$OSTRIP"
+        export PATH="$OPATH"
+        OCC= OCXX= OCC_ORIG= OCXX_ORIG= OCPPFLAGS= OCFLAGS= OCXXFLAGS= OOBJCXXFLAGS= OLDFLAGS= OLIBS= OUUID_LIBS= OSTRIP= OPATH=
 
         REQUIRED_CONFIGURE_ARGS=$OREQUIRED_CONFIGURE_ARGS
         REQUIRED_CMAKE_ARGS=$OREQUIRED_CMAKE_ARGS
-        OREQUIRED_CONFIGURE_ARGS=
-        OREQUIRED_CMAKE_ARGS=
+        OREQUIRED_CONFIGURE_ARGS= OREQUIRED_CMAKE_ARGS=
     fi
 
     # make links to executables in the target as well
@@ -201,6 +221,37 @@ fi
 
 # done with libuuid
 
+table_line_append DIST_PRE_BUILD zlib ":; \
+    sed -i.bak ' \
+        s/defined(_WIN32)  *||  *defined(__CYGWIN__)/defined(_WIN32)/ \
+    ' gzguts.h; \
+"
+
+table_line_append DIST_POST_BUILD zlib-target ":; \
+    rm -f \$BUILD_ROOT/root/lib/libz.dll.a \$BUILD_ROOT/root/bin/libz.dll; \
+"
+
+# mingw -ldl equivalent, needed by some things
+table_insert_after DISTS zlib "dlfcn https://github.com/dlfcn-win32/dlfcn-win32/archive/v1.1.2.tar.gz lib/libdl.a"
+
+table_line_replace DIST_CONFIGURE_TYPES dlfcn cmake
+
+table_line_append DIST_ARGS libicu-target "--with-cross-build=$BUILD_ROOT/dists/libicu/source"
+
+table_line_append DIST_PATCHES libicu-target " \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0004-move-to-bin.mingw.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0007-actually-move-to-bin.mingw.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0008-data-install-dir.mingw.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0009-fix-bindir-in-config.mingw.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0010-msys-rules-for-makefiles.mingw.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0011-sbin-dir.mingw.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0012-libprefix.mingw.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0015-debug.mingw.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0016-icu-pkgconfig.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0017-icu-config-versioning.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0021-mingw-static-libraries-without-s.patch \
+"
+
 table_insert_after DISTS libiconv-target '
     catgets         https://downloads.sourceforge.net/project/mingw/MinGW/Extension/catgets/mingw-catgets-1.0.1/mingw-catgets-1.0.1-src.tar.gz    include/langinfo.h
 '
@@ -213,6 +264,16 @@ table_line_append DIST_POST_BUILD catgets ":; \
     rm -f \$BUILD_ROOT/root/lib/libcatgets.dll.a \$BUILD_ROOT/root/bin/libcatgets.dll; \
 "
 
+table_line_append DIST_PATCHES fontconfig-target " \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-fontconfig/0001-fix-config-linking.all.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-fontconfig/0002-fix-mkdir.mingw.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-fontconfig/0004-fix-mkdtemp.mingw.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-fontconfig/0005-fix-setenv.mingw.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-fontconfig/0007-pkgconfig.mingw.patch \
+"
+
+table_line_replace DIST_CONFIGURE_TYPES fontconfig-target autoreconf
+
 table_line_append DIST_PATCHES libgd 'https://gist.githubusercontent.com/rkitover/c64ea5b83ddea94ace58c40c7de42879/raw/fbaf4885fbefb302116b56626c0e191df514e8c6/libgd-2.2.4-mingw-static.patch'
 
 table_insert_before DISTS sfml '
@@ -221,17 +282,10 @@ table_insert_before DISTS sfml '
 
 table_line_append DIST_ARGS openal '-DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF -DALSOFT_TESTS=OFF'
 
+# this is necessary so the native tools openal uses to build compile when cross-compiling
+table_line_append DIST_PRE_BUILD openal ":; sed -i.bak 's/\\(-G \"\\\${CMAKE_GENERATOR}\"\\)/\\1 -DCMAKE_C_COMPILER=cc -DCMAKE_CXX_COMPILER=c++ -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache/' CMakeLists.txt;"
+
 table_line_replace DIST_ARGS mp3lame "LDFLAGS='$LDFLAGS $BUILD_ROOT/root/lib/libcatgets.a'"
-
-table_line_append DIST_PRE_BUILD zlib ":; \
-    sed -i.bak ' \
-        s/defined(_WIN32)  *||  *defined(__CYGWIN__)/defined(_WIN32)/ \
-    ' gzguts.h; \
-"
-
-table_line_append DIST_POST_BUILD zlib-target ":; \
-    rm -f \$BUILD_ROOT/root/lib/libz.dll.a \$BUILD_ROOT/root/bin/libz.dll; \
-"
 
 table_line_replace DIST_CONFIGURE_TYPES     zlib-target cmake
 table_line_append  DIST_ARGS                zlib-target -DUNIX=1
@@ -260,12 +314,11 @@ table_line_append DIST_ARGS ffmpeg "--extra-ldflags='-Wl,-allow-multiple-definit
 
 table_line_append DIST_ARGS gettext "--enable-threads=windows"
 
+table_line_append DIST_ARGS glib "--with-threads=posix --disable-libelf"
+
 table_line_append  DIST_PATCHES glib "\
-    https://src.fedoraproject.org/rpms/mingw-glib2/raw/master/f/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch \
-    https://src.fedoraproject.org/rpms/mingw-glib2/raw/master/f/glib-formaterror.patch \
-    https://src.fedoraproject.org/rpms/mingw-glib2/raw/master/f/glib-include-time-h-for-localtime_r.patch \
-    https://src.fedoraproject.org/rpms/mingw-glib2/raw/master/f/glib-ipmreqsource.patch \
-    https://src.fedoraproject.org/rpms/mingw-glib2/raw/master/f/glib-prefer-constructors-over-DllMain.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-glib2/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-glib2/0001-win32-Make-the-static-build-work-with-MinGW-when-pos.patch \
     https://gist.githubusercontent.com/rkitover/2edaf9583fb3068bb14016571e6f7d01/raw/ece80116d5618f372464f02392a9bcab670ce6c1/glib-mingw-no-strerror_s.patch \
 "
 
