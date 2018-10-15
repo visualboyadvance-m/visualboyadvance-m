@@ -44,10 +44,10 @@ export CC_ORIG="\${CC_ORIG:-\$CC}"
 export CXX_ORIG="\${CXX_ORIG:-\$CXX}"
 
 export CPPFLAGS="$CPPFLAGS -I$BUILD_ROOT/root/include"
-export CFLAGS="$CFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -pthread"
-export CXXFLAGS="$CXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread"
-export OBJCXXFLAGS="$OBJCXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread"
-export LDFLAGS="$LDFLAGS -fPIC -L$BUILD_ROOT/root/lib -pthread"
+export CFLAGS="$CFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -pthread -lm"
+export CXXFLAGS="$CXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"
+export OBJCXXFLAGS="$OBJCXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"
+export LDFLAGS="$LDFLAGS -fPIC -L$BUILD_ROOT/root/lib -pthread -lm"
 export STRIP="${STRIP:-strip}"
 
 if [ -z "\$OPENMP" ] && echo "\$CC" | grep -Eq gcc; then

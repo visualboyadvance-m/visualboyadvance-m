@@ -9,11 +9,11 @@ CROSS_OS=windows
 BUILD_ENV=$BUILD_ENV$(cat <<EOF
 
 export CPPFLAGS="$CPPFLAGS -DMINGW_HAS_SECURE_API"
-export CFLAGS="$CFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API"
-export CXXFLAGS="$CXXFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API"
-export OBJCXXFLAGS="$OBJCXXFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API"
-export LDFLAGS="$LDFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API"
-export LIBS="-lpthread"
+export CFLAGS="$CFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
+export CXXFLAGS="$CXXFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
+export OBJCXXFLAGS="$OBJCXXFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
+export LDFLAGS="$LDFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
+export LIBS="-lpthread -lm"
 
 export UUID_LIBS="-luuid_mingw -luuid"
 
@@ -27,11 +27,11 @@ EOF
 : ${HOST_CC_ORIG:=gcc}
 : ${HOST_CXX_ORIG:=g++}
 : ${HOST_CPPFLAGS:="-I$BUILD_ROOT/root/include"}
-: ${HOST_CFLAGS:="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -pthread"}
-: ${HOST_CXXFLAGS:="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread"}
-: ${HOST_OBJCXXFLAGS:="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread"}
-: ${HOST_LDFLAGS:="-fPIC -L$BUILD_ROOT/root/lib -pthread"}
-: ${HOST_LIBS:=}
+: ${HOST_CFLAGS:="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -pthread -lm"}
+: ${HOST_CXXFLAGS:="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"}
+: ${HOST_OBJCXXFLAGS:="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"}
+: ${HOST_LDFLAGS:="-fPIC -L$BUILD_ROOT/root/lib -pthread -lm"}
+: ${HOST_LIBS:=-lm}
 : ${HOST_UUID_LIBS:=}
 : ${HOST_STRIP:=strip}
 
@@ -283,7 +283,7 @@ table_insert_before DISTS sfml '
 table_line_append DIST_ARGS openal '-DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF -DALSOFT_TESTS=OFF'
 
 # this is necessary so the native tools openal uses to build compile when cross-compiling
-table_line_append DIST_PRE_BUILD openal ":; sed -i.bak 's/\\(-G \"\\\${CMAKE_GENERATOR}\"\\)/\\1 -DCMAKE_C_COMPILER=cc -DCMAKE_CXX_COMPILER=c++ -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache/' CMakeLists.txt;"
+table_line_append DIST_PRE_BUILD openal ":; sed -i.bak 's/\\(-G \"\\\${CMAKE_GENERATOR}\"\\)/\\1 -DCMAKE_C_COMPILER=cc -DCMAKE_CXX_COMPILER=c++ -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \"-DCMAKE_C_LINK_EXECUTABLE=<CMAKE_C_COMPILER> <FLAGS> <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES> -lm\" \"-DCMAKE_CXX_LINK_EXECUTABLE=<CMAKE_CXX_COMPILER> <FLAGS> <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES> -lm\" -DCMAKE_C_FLAGS= -DCMAKE_CXX_FLAGS= -DCMAKE_EXE_LINKER_FLAGS=/' CMakeLists.txt;"
 
 table_line_replace DIST_ARGS mp3lame "LDFLAGS='$LDFLAGS $BUILD_ROOT/root/lib/libcatgets.a'"
 
