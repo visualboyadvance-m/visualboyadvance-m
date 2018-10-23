@@ -2537,6 +2537,7 @@ void MainFrame::MenuOptionIntRadioValue(const char* menuName, int& field, int va
 
 #ifdef __WXMSW__
     #include <windows.h>
+    #include <VersionHelpers.h>
     #include <commctrl.h>
     #include <wx/msw/private.h>
     typedef int (WINAPI *func_LoadIconWithScaleDown)(HINSTANCE, LPCWSTR, int, int, HICON*);
@@ -2544,22 +2545,24 @@ void MainFrame::MenuOptionIntRadioValue(const char* menuName, int& field, int va
 
 void MainFrame::BindAppIcon() {
 #ifdef __WXMSW__
-    wxDynamicLibrary comctl32("comctl32", wxDL_DEFAULT | wxDL_QUIET);
-    func_LoadIconWithScaleDown load_icon_scaled = reinterpret_cast<func_LoadIconWithScaleDown>(comctl32.GetSymbol("LoadIconWithScaleDown"));
-    int icon_set_count = 0;
+    if (IsWindowsVistaOrGreater()) {
+        wxDynamicLibrary comctl32("comctl32", wxDL_DEFAULT | wxDL_QUIET);
+        func_LoadIconWithScaleDown load_icon_scaled = reinterpret_cast<func_LoadIconWithScaleDown>(comctl32.GetSymbol("LoadIconWithScaleDown"));
+        int icon_set_count = 0;
 
-    HICON hIconLg;
-    if (load_icon_scaled && SUCCEEDED(load_icon_scaled(wxGetInstance(), _T("AAAAA_MAINICON"), ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON), &hIconLg))) {
-        ::SendMessage(GetHandle(), WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hIconLg));
-        ++icon_set_count;
-    }
-    HICON hIconSm;
-    if (load_icon_scaled && SUCCEEDED(load_icon_scaled(wxGetInstance(), _T("AAAAA_MAINICON"), ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), &hIconSm))) {
-        ::SendMessage(GetHandle(), WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hIconSm));
-        ++icon_set_count;
-    }
+        HICON hIconLg;
+        if (load_icon_scaled && SUCCEEDED(load_icon_scaled(wxGetInstance(), _T("AAAAA_MAINICON"), ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON), &hIconLg))) {
+            ::SendMessage(GetHandle(), WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hIconLg));
+            ++icon_set_count;
+        }
+        HICON hIconSm;
+        if (load_icon_scaled && SUCCEEDED(load_icon_scaled(wxGetInstance(), _T("AAAAA_MAINICON"), ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), &hIconSm))) {
+            ::SendMessage(GetHandle(), WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hIconSm));
+            ++icon_set_count;
+        }
 
-    if (icon_set_count == 2) return;
+        if (icon_set_count == 2) return;
+    }
     // otherwise fall back to Wx method of setting icon
 #endif
     wxIcon icon = wxXmlResource::Get()->LoadIcon(wxT("MainIcon"));
