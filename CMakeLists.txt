@@ -344,7 +344,7 @@ if(WIN32)
     endif()
 
     if(MINGW)
-        include_directories("${CMAKE_SOURCE_DIR}/dependencies/include")
+        include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-include")
         include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
     elseif(MSVC)
         set(DEPS_MSVC "${CMAKE_SOURCE_DIR}/dependencies/msvc")
