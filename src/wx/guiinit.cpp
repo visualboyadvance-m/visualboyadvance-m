@@ -2537,7 +2537,7 @@ void MainFrame::MenuOptionIntRadioValue(const char* menuName, int& field, int va
 
 #ifdef __WXMSW__
     #include <windows.h>
-    #include <VersionHelpers.h>
+    #include <versionhelpers.h>
     #include <commctrl.h>
     #include <wx/msw/private.h>
     typedef int (WINAPI *func_LoadIconWithScaleDown)(HINSTANCE, LPCWSTR, int, int, HICON*);
