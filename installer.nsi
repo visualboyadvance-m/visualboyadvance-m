@@ -2,28 +2,61 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "VisualBoyAdvance-M"
-!define PRODUCT_VERSION "2.0.0"
+!define PRODUCT_VERSION "2.1.0"
 !define PRODUCT_PUBLISHER "visualboyadvance"
-!define PRODUCT_WEB_SITE "http://vba-m.com"
+!define PRODUCT_WEB_SITE "https://vba-m.com"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\visualboyadvance-m.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
+#If you're building this, point it to your mingw installation folder
+!define MINGW32_ROOT "D:\Development\msys64\mingw32\bin"
+!define MINGW64_ROOT "D:\Development\msys64\mingw64\bin"
+#This is where you installed vba-m with make install.
+!define VBAM_INSTALL_ROOT "D:\Development\msys64\opt\vbam"
 
+!ifdef MSYS2
+OutFile "vba-m-${PRODUCT_VERSION}-msys2.exe"
+!else
+OutFile "vba-m-${PRODUCT_VERSION}.exe
+!endif
 SetCompressor /SOLID lzma
+ShowInstDetails show
+ShowUninstDetails show
 XPStyle on
 
 !packhdr tmpexe.tmp "upx --lzma -9 --compress-icons=0 tmpexe.tmp"
 
-BrandingText "VisualBoyAdvance-M Version 2.0.0 Throttlefix"
+BrandingText "VisualBoyAdvance-M Version ${PRODUCT_VERSION}" 
 
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
+!include "Sections.nsh"
 !include "x64.nsh"
 
 ; MUI Settings
 !define MUI_ABORTWARNING
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
+
+;--------------------------------
+;Version resource
+VIProductVersion "${PRODUCT_VERSION}"
+VIAddVersionKey "ProductName" "visualboyadvance-m"
+VIAddVersionKey "FileVersion" "${PRODUCT_VERSION}"
+VIAddVersionKey "ProductVersion" "${PRODUCT_VERSION}"
+VIAddVersionKey "LegalCopyright" ""
+!ifdef MSYS2
+VIAddVersionKey "FileDescription" "visualboyadvance-m GBA Emulator (built with msys2)"
+!else
+VIAddVersionKey "FileDescription" "visualboyadvance-m GBA Emulator"
+!endif
+
+;--------------------------------
+;Reserve files used in .onInit
+;for faster start-up
+ReserveFile "${NSISDIR}\Plugins\System.dll"
+!insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
+!insertmacro MUI_RESERVEFILE_LANGDLL
 
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
@@ -55,10 +88,17 @@ InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
 
+Function onGUIInit
+  Aero::Apply
+FunctionEnd
+
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
   ${If} ${RunningX64}
+    !ifdef MSYS2
+      File "D:\Development\msys64\opt\visualboyadvance-m.exe"
+      File "
     File "..\binary\x86_64\visualboyadvance-m.exe"
     CreateDirectory "$SMPROGRAMS\VisualBoyAdvance-M"
     CreateShortCut "$SMPROGRAMS\VisualBoyAdvance-M\VisualBoyAdvance.lnk" "$INSTDIR\visualboyadvance-m.exe"
