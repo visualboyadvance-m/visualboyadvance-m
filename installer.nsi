@@ -13,11 +13,13 @@
 !define MINGW64_ROOT "D:\Development\msys64\mingw64\bin"
 #This is where you installed vba-m with make install.
 !define VBAM_INSTALL_ROOT "D:\Development\msys64\opt\vbam"
+#comment this out if not building with msys2
+!define MSYS2
 
 !ifdef MSYS2
-OutFile "vba-m-${PRODUCT_VERSION}-msys2.exe"
+  OutFile "vba-m-${PRODUCT_VERSION}-msys2.exe"
 !else
-OutFile "vba-m-${PRODUCT_VERSION}.exe
+  OutFile "vba-m-${PRODUCT_VERSION}.exe
 !endif
 SetCompressor /SOLID lzma
 ShowInstDetails show
@@ -40,7 +42,7 @@ BrandingText "VisualBoyAdvance-M Version ${PRODUCT_VERSION}"
 
 ;--------------------------------
 ;Version resource
-VIProductVersion "${PRODUCT_VERSION}"
+VIProductVersion "${PRODUCT_VERSION}.0"
 VIAddVersionKey "ProductName" "visualboyadvance-m"
 VIAddVersionKey "FileVersion" "${PRODUCT_VERSION}"
 VIAddVersionKey "ProductVersion" "${PRODUCT_VERSION}"
@@ -54,7 +56,7 @@ VIAddVersionKey "FileDescription" "visualboyadvance-m GBA Emulator"
 ;--------------------------------
 ;Reserve files used in .onInit
 ;for faster start-up
-ReserveFile "${NSISDIR}\Plugins\System.dll"
+ReserveFile "${NSISDIR}\Plugins\unicode\System.dll"
 !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
 !insertmacro MUI_RESERVEFILE_LANGDLL
 
@@ -88,29 +90,117 @@ InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
 
-Function onGUIInit
+Function .onInit
   Aero::Apply
 FunctionEnd
 
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
-  ${If} ${RunningX64}
-    !ifdef MSYS2
-      File "D:\Development\msys64\opt\visualboyadvance-m.exe"
-      File "
-    File "..\binary\x86_64\visualboyadvance-m.exe"
+  !ifdef MSYS2
+    File "${VBAM_INSTALL_ROOT}\bin\visualboyadvance-m.exe"
+    File "${MINGW64_ROOT}\libwinpthread-1.dll"
+    File "${MINGW64_ROOT}\libpng16-16.dll"
+    File "${MINGW64_ROOT}\libintl-8.dll"
+    File "${MINGW64_ROOT}\SDL2.dll"
+    File "${MINGW64_ROOT}\libsfml-network-2.dll"
+    File "${MINGW64_ROOT}\libsfml-system-2.dll"
+    File "${MINGW64_ROOT}\wxbase30u_gcc_custom.dll"
+    File "${MINGW64_ROOT}\wxbase30u_net_gcc_custom.dll"
+    File "${MINGW64_ROOT}\wxbase30u_xml_gcc_custom.dll"
+    File "${MINGW64_ROOT}\wxmsw30u_adv_gcc_custom.dll"
+    File "${MINGW64_ROOT}\wxmsw30u_core_gcc_custom.dll"
+    File "${MINGW64_ROOT}\wxmsw30u_html_gcc_custom.dll"
+    File "${MINGW64_ROOT}\wxmsw30u_gl_gcc_custom.dll"
+    File "${MINGW64_ROOT}\wxmsw30u_xrc_gcc_custom.dll"
+    File "${MINGW64_ROOT}\zlib1.dll"
+    File "${MINGW64_ROOT}\libiconv-2.dll"
+    File "${MINGW64_ROOT}\libgcc_s_seh-1.dll"
+    File "${MINGW64_ROOT}\libstdc++-6.dll"
+    File "${MINGW64_ROOT}\libjpeg-8.dll"
+    File "${MINGW64_ROOT}\libtiff-5.dll"
+    File "${MINGW64_ROOT}\libexpat-1.dll"
+    File "${MINGW64_ROOT}\liblzma-5.dll"
+  !else
+    File "${VBAM_INSTALL_ROOT}\bin\visualboyadvance-m.exe"
+  !endif
     CreateDirectory "$SMPROGRAMS\VisualBoyAdvance-M"
     CreateShortCut "$SMPROGRAMS\VisualBoyAdvance-M\VisualBoyAdvance.lnk" "$INSTDIR\visualboyadvance-m.exe"
     CreateShortCut "$DESKTOP\VisualBoyAdvance.lnk" "$INSTDIR\visualboyadvance-m.exe"
-    File "..\binary\x86_64\vbam.exe"
-  ${Else}
-    File "..\binary\i686\visualboyadvance-m.exe"
-    CreateDirectory "$SMPROGRAMS\VisualBoyAdvance-M"
-    CreateShortCut "$SMPROGRAMS\VisualBoyAdvance-M\VisualBoyAdvance.lnk" "$INSTDIR\visualboyadvance-m.exe"
-    CreateShortCut "$DESKTOP\VisualBoyAdvance.lnk" "$INSTDIR\visualboyadvance-m.exe"
-    File "..\binary\i686\vbam.exe"
-  ${Endif}
+SectionEnd
+
+Section "Localization"
+    SetOutPath "$INSTDIR\locale"
+    File "${VBAM_INSTALL_ROOT}\share\locale\ar\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\br\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\bs\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\ca\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\ca_ES\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\cs\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\da\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\da_DK\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\de\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\de_DE\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\el\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\el_GR\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\en\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\en_GB\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\en_US\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\es\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\es_419\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\es_AR\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\es_CL\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\es_CO\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\es_ES\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\es_MX\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\es_PR\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\es_US\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\fil\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\fr\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\fr_CA\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\fr_FR\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\gl\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\haw\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\he\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\he_IL\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\hr\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\hu\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\hu_HU\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\id\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\id_ID\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\it\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\it_IT\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\ja\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\ja_JP\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\jv\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\ko\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\ko_KR\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\ms_MY\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\nb\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\nl\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\nl_NL\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\no\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\pl\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\pl_PL\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\pt\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\pt_PT\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\pt_BR\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\ru\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\ru_RU\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\sk\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\sk_SK\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\sr\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\su\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\sv\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\tk\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\tr\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\zh\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\zh_CN\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\zh_CN.GB2312\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\zh_HK\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\zh_TW\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\zh_TW.Big5\LC_MESSAGES\wxvbam.mo"
+    File "${VBAM_INSTALL_ROOT}\share\locale\zh-Hans\LC_MESSAGES\wxvbam.mo"
 SectionEnd
 
 Section -AdditionalIcons
