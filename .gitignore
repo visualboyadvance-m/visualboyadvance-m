@@ -6,6 +6,7 @@ src/wx/cmdtab.cpp
 src/wx/wxvbam.xrs
 build/*
 dependencies/*
+.vs/*
 *.o
 *.so
 *.exe
