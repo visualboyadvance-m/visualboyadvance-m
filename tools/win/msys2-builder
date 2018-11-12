@@ -104,25 +104,35 @@ DIST_TAR_ARGS="
 
 . "${0%/*}/../builder/mingw.sh"
 
-set_host_env() {
+host_env() {
     ln -sf "$BUILD_ROOT/host" "$BUILD_ROOT/root"
 
-    unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
+    cat <<EOF
+unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
 
-    OPWD=$PWD
-    MSYSTEM=MSYS . /etc/profile || :
-    eval "$BUILD_ENV"
+OPWD=$PWD
+export MSYSTEM=MSYS
+. /etc/profile || :
+. ~/.bashrc 2>/dev/null || :
+$BUILD_ENV
+EOF
+
     cd "$OPWD"
 }
 
-unset_host_env() {
+target_env() {
     ln -sf "$BUILD_ROOT/target" "$BUILD_ROOT/root"
 
-    unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
+    cat <<EOF
+unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
 
-    OPWD=$PWD
-    MSYSTEM=$OMSYSTEM . /etc/profile || :
-    eval "$BUILD_ENV"
+OPWD=$PWD
+export MSYSTEM=$OMSYSTEM
+. /etc/profile || :
+. ~/.bashrc 2>/dev/null || :
+$BUILD_ENV
+EOF
+
     cd "$OPWD"
 }
 
@@ -170,5 +180,8 @@ table_line_replace DIST_POST_BUILD unzip ":; \
 "
 
 table_line_replace DIST_CONFIGURE_OVERRIDES openssl "$(table_line DIST_CONFIGURE_OVERRIDES openssl | sed 's,^./config ,./Configure Cygwin-x86_64 ,')"
+
+# parallel build of openssl doesn't work for msys2 layer
+table_line_append DIST_MAKE_ARGS openssl -j1
 
 builder "$@"

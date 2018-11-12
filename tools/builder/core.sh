@@ -43,11 +43,11 @@ esac
 export CC_ORIG="\${CC_ORIG:-\$CC}"
 export CXX_ORIG="\${CXX_ORIG:-\$CXX}"
 
-export CPPFLAGS="$CPPFLAGS -I$BUILD_ROOT/root/include"
-export CFLAGS="$CFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -pthread -lm"
-export CXXFLAGS="$CXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"
-export OBJCXXFLAGS="$OBJCXXFLAGS -fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"
-export LDFLAGS="$LDFLAGS -fPIC -L$BUILD_ROOT/root/lib -pthread -lm"
+export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-I$BUILD_ROOT/root/include"
+export CFLAGS="$CFLAGS${CFLAGS:+ }-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -pthread -lm"
+export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"
+export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"
+export LDFLAGS="$LDFLAGS${LDFLAGS:+ }-fPIC -L$BUILD_ROOT/root/lib -pthread -lm"
 export STRIP="${STRIP:-strip}"
 
 if [ -z "\$OPENMP" ] && echo "\$CC" | grep -Eq gcc; then
@@ -336,7 +336,7 @@ DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
 "
 
 DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
-    c2man          ./Configure -de -Dprefix=/usr -Dmansrc=/usr/share/man/man1; \
+    c2man          ./Configure -de -Dprefix=/usr -Dmansrc=/usr/share/man/man1 -Dcc=\"\$CC\"; \
                    sed -i.bak 's|/[^ ][^ ]*/libfl\\.[^ ]*|-L$BUILD_ROOT/root/lib -lfl|' Makefile; \
                    make -j\$NUM_CPUS; \
                    make install bin='$BUILD_ROOT/root/bin' mansrc='$BUILD_ROOT/root/share/man/man1' privlib='$BUILD_ROOT/root/lib/c2man'
@@ -405,7 +405,7 @@ ALL_MAKE_ARGS='V=1 VERBOSE=1'
 
 # have to disable ccache for openssl
 DIST_MAKE_ARGS="$DIST_MAKE_ARGS
-    openssl     CC=\"\$CC_ORIG -fPIC\" CXX=\"\$CXX_ORIG -fPIC\"
+    openssl     CC=\"\$CC\" CXX=\"\$CXX\" LDFLAGS=\"\$LDFLAGS\"
     getopt      LDFLAGS=\"\$LDFLAGS -lintl -liconv\" CFLAGS=\"\$CFLAGS\"
     bzip2       libbz2.a bzip2 bzip2recover CFLAGS=\"\$CFLAGS\" LDFLAGS=\"\$LDFLAGS\"
     unzip       generic2
@@ -461,8 +461,13 @@ builder() {
 
 read_command_line() {
     case "$1" in
-        --env)
+        --env|--target-env)
             puts "$BUILD_ENV"
+            exit 0
+            ;;
+        --host-env)
+            puts "$BUILD_ENV"
+            host_env 2>/dev/null || :
             exit 0
             ;;
         --clean)
@@ -1871,12 +1876,12 @@ EOF
             link_dest=$(fully_resolve_link "$link_dest")
 
             if [ -e "$link_dest" ]; then
-                echo_run ln -sf "$link_dest" "$dest_f"
+                echo_run ln -sf "$link_dest" "$dest_f" || :
             else
                 # this is for windows as well, where symlinks can't point to a
                 # file that doesn't (yet) exist
                 defer_cmds="$defer_cmds
-ln -sf \"$link_dest\" \"$dest_f\"
+ln -sf \"$link_dest\" \"$dest_f\" || :
 "
             fi
 
@@ -1954,12 +1959,16 @@ ln -sf \"$link_dest\" \"$dest_f\"
     wait_all_jobs running_jobs
     cleanup_jobs
 
-    IFS=$NL
-    for cmd in $defer_cmds; do
+    if [ -n "$defer_cmds" ]; then
+        message "making deferred links..."
+
+        IFS=$NL
+        for cmd in $defer_cmds; do
+            IFS=$OIFS
+            eval echo_run "$cmd"
+        done
         IFS=$OIFS
-        eval echo_run "$cmd"
-    done
-    IFS=$OIFS
+    fi
 
     cd "$OLDPWD"
 
@@ -2546,6 +2555,10 @@ error() {
 
 warn() {
     puts >&2 "${NL}[35mWARNING[0m: $@${NL}${NL}"
+}
+
+message() {
+    puts >&2 "${NL}[35mINFO[0m: $@${NL}${NL}"
 }
 
 die() {

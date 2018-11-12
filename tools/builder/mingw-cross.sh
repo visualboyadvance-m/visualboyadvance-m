@@ -35,7 +35,7 @@ host_dists='
 
 both_dists='
     openssl zlib bzip2 libiconv gettext xz libxml2 expat libpng freetype
-    fontconfig
+    fontconfig libicu
 '
 
 [ -n "$BUILD_ENV" ] && eval "$BUILD_ENV"
@@ -46,10 +46,10 @@ export CC='${target_arch}-gcc'
 export CXX='${target_arch}-g++'
 export STRIP='${target_arch}-strip'
 
-export CFLAGS="\$CFLAGS -L/usr/${target_arch}/usr/lib${lib_suffix}"
 export CPPFLAGS="\$CPPFLAGS"
-export CXXFLAGS="\$CXXFLAGS -L/usr/${target_arch}/usr/lib${lib_suffix}"
-export OBJCXXFLAGS="\$OBJCXXFLAGS -L/usr/${target_arch}/usr/lib${lib_suffix}"
+export CFLAGS="\$CFLAGS\${CFLAGS:+ }-L/usr/${target_arch}/usr/lib${lib_suffix}"
+export CXXFLAGS="\$CXXFLAGS\${CXXFLAGS:+ }-L/usr/${target_arch}/usr/lib${lib_suffix}"
+export OBJCXXFLAGS="\$OBJCXXFLAGS\${OBJCXXFLAGS:+ }-L/usr/${target_arch}/usr/lib${lib_suffix}"
 export LDFLAGS="-L/usr/${target_arch}/usr/lib${lib_suffix} \$LDFLAGS"
 
 EOF
@@ -67,6 +67,8 @@ openssl_host=mingw
 table_line_replace DIST_CONFIGURE_OVERRIDES openssl-target "./Configure $openssl_host no-shared --prefix=/usr --openssldir=/etc/ssl --cross-compile-prefix=${target_arch}-"
 
 table_line_append DIST_PRE_BUILD bzip2-target ':; sed -i.bak '\''s,include <sys\\stat.h>,include <sys/stat.h>,g'\'' *.c;'
+
+table_line_append DIST_ARGS libicu-target "--with-cross-build=$BUILD_ROOT/dists/libicu/source"
 
 table_line_replace DIST_POST_BUILD harfbuzz "$(table_line DIST_POST_BUILD harfbuzz | sed 's/rebuild_dist freetype /rebuild_dist freetype-target /')"
 

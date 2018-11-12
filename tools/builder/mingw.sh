@@ -8,11 +8,11 @@ CROSS_OS=windows
 
 BUILD_ENV=$BUILD_ENV$(cat <<EOF
 
-export CPPFLAGS="$CPPFLAGS -DMINGW_HAS_SECURE_API"
-export CFLAGS="$CFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
-export CXXFLAGS="$CXXFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
-export OBJCXXFLAGS="$OBJCXXFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
-export LDFLAGS="$LDFLAGS -static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
+export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-DMINGW_HAS_SECURE_API"
+export CFLAGS="$CFLAGS${CFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
+export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
+export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
+export LDFLAGS="$LDFLAGS${LDFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
 export LIBS="-lpthread -lm"
 
 export UUID_LIBS="-luuid_mingw -luuid"
@@ -63,7 +63,7 @@ host_dists="$host_dists autoconf autoconf-archive automake m4 gsed bison \
                         flex-2.6.3 flex c2man docbook2x ccache"
 host_dists=$(list_remove_duplicates $host_dists)
 
-both_dists="$both_dists openssl zlib bzip2 libiconv libicu"
+both_dists="$both_dists openssl zlib bzip2 libiconv"
 
 if [ "$os" != windows ]; then
     both_dists="$both_dists libuuid"
@@ -71,71 +71,75 @@ fi
 
 both_dists=$(list_remove_duplicates $both_dists)
 
-set_host_env() {
+host_env() {
     rm -f "$BUILD_ROOT/root"
     ln -sf "$BUILD_ROOT/host" "$BUILD_ROOT/root"
     if [ -z "$OCC" ]; then
-        OCC=$CC
-        OCXX=$CXX
-        OCC_ORIG=$CC_ORIG
-        OCXX_ORIG=$CXX_ORIG
-        OCPPFLAGS=$CPPFLAGS
-        OCFLAGS=$CFLAGS
-        OCXXFLAGS=$CXXFLAGS
-        OOBJCXXFLAGS=$OBJCXXFLAGS
-        OLDFLAGS=$LDFLAGS
-        OLIBS=$LIBS
-        OUUID_LIBS=$UUID_LIBS
-        OSTRIP=$STRIP
-        OPATH=$PATH
+        cat <<EOF
+OCC=$CC
+OCXX=$CXX
+OCC_ORIG=$CC_ORIG
+OCXX_ORIG=$CXX_ORIG
+OCPPFLAGS=$CPPFLAGS
+OCFLAGS=$CFLAGS
+OCXXFLAGS=$CXXFLAGS
+OOBJCXXFLAGS=$OBJCXXFLAGS
+OLDFLAGS=$LDFLAGS
+OLIBS=$LIBS
+OUUID_LIBS=$UUID_LIBS
+OSTRIP=$STRIP
+OPATH=$PATH
 
-        export CC="$HOST_CC"
-        export CXX="$HOST_CXX"
-        export CC_ORIG="$HOST_CC_ORIG"
-        export CXX_ORIG="$HOST_CXX_ORIG"
-        export CPPFLAGS="$HOST_CPPFLAGS"
-        export CFLAGS="$HOST_CFLAGS"
-        export CXXFLAGS="$HOST_CXXFLAGS"
-        export OBJCXXFLAGS="$HOST_OBJCXXFLAGS"
-        export LDFLAGS="$HOST_LDFLAGS"
-        export LIBS="$HOST_LIBS"
-        export UUID_LIBS="$HOST_UUID_LIBS"
-        export STRIP="$HOST_STRIP"
-        export PATH="$BUILD_ROOT/host/bin:$PATH"
+export CC="$HOST_CC"
+export CXX="$HOST_CXX"
+export CC_ORIG="$HOST_CC_ORIG"
+export CXX_ORIG="$HOST_CXX_ORIG"
+export CPPFLAGS="$HOST_CPPFLAGS"
+export CFLAGS="$HOST_CFLAGS"
+export CXXFLAGS="$HOST_CXXFLAGS"
+export OBJCXXFLAGS="$HOST_OBJCXXFLAGS"
+export LDFLAGS="$HOST_LDFLAGS"
+export LIBS="$HOST_LIBS"
+export UUID_LIBS="$HOST_UUID_LIBS"
+export STRIP="$HOST_STRIP"
+export PATH="$BUILD_ROOT/host/bin:$PATH"
 
-        OREQUIRED_CONFIGURE_ARGS=$REQUIRED_CONFIGURE_ARGS
-        OREQUIRED_CMAKE_ARGS=$REQUIRED_CMAKE_ARGS
+OREQUIRED_CONFIGURE_ARGS=$REQUIRED_CONFIGURE_ARGS
+OREQUIRED_CMAKE_ARGS=$REQUIRED_CMAKE_ARGS
 
-        REQUIRED_CONFIGURE_ARGS=$(puts "$REQUIRED_CONFIGURE_ARGS" | sed 's/--host[^ ]*//g')
-        REQUIRED_CMAKE_ARGS=$(puts "$REQUIRED_CMAKE_ARGS" | sed 's/-DCMAKE_TOOLCHAIN_FILE=[^ ]*//g')
+REQUIRED_CONFIGURE_ARGS=$(puts "$REQUIRED_CONFIGURE_ARGS" | sed 's/--host[^ ]*//g')
+REQUIRED_CMAKE_ARGS=$(puts "$REQUIRED_CMAKE_ARGS" | sed 's/-DCMAKE_TOOLCHAIN_FILE=[^ ]*//g')
+EOF
     fi
 
-    set_host_env_hook 2>/dev/null || :
+    host_env_hook 2>/dev/null || :
 }
 
-unset_host_env() {
+target_env() {
     rm -f "$BUILD_ROOT/root"
     ln -sf "$BUILD_ROOT/target" "$BUILD_ROOT/root"
 
     if [ -n "$OCC" ]; then
-        export CC="$OCC"
-        export CXX="$OCXX"
-        export CC_ORIG="$OCC_ORIG"
-        export CXX_ORIG="$OCXX_ORIG"
-        export CPPFLAGS="$OCPPFLAGS"
-        export CFLAGS="$OCFLAGS"
-        export CXXFLAGS="$OCXXFLAGS"
-        export OBJCXXFLAGS="$OOBJCXXFLAGS"
-        export LDFLAGS="$OLDFLAGS"
-        export LIBS="$OLIBS"
-        export UUID_LIBS="$OUUID_LIBS"
-        export STRIP="$OSTRIP"
-        export PATH="$OPATH"
-        OCC= OCXX= OCC_ORIG= OCXX_ORIG= OCPPFLAGS= OCFLAGS= OCXXFLAGS= OOBJCXXFLAGS= OLDFLAGS= OLIBS= OUUID_LIBS= OSTRIP= OPATH=
+        cat <<EOF
+export CC="$OCC"
+export CXX="$OCXX"
+export CC_ORIG="$OCC_ORIG"
+export CXX_ORIG="$OCXX_ORIG"
+export CPPFLAGS="$OCPPFLAGS"
+export CFLAGS="$OCFLAGS"
+export CXXFLAGS="$OCXXFLAGS"
+export OBJCXXFLAGS="$OOBJCXXFLAGS"
+export LDFLAGS="$OLDFLAGS"
+export LIBS="$OLIBS"
+export UUID_LIBS="$OUUID_LIBS"
+export STRIP="$OSTRIP"
+export PATH="$OPATH"
+OCC= OCXX= OCC_ORIG= OCXX_ORIG= OCPPFLAGS= OCFLAGS= OCXXFLAGS= OOBJCXXFLAGS= OLDFLAGS= OLIBS= OUUID_LIBS= OSTRIP= OPATH=
 
-        REQUIRED_CONFIGURE_ARGS=$OREQUIRED_CONFIGURE_ARGS
-        REQUIRED_CMAKE_ARGS=$OREQUIRED_CMAKE_ARGS
-        OREQUIRED_CONFIGURE_ARGS= OREQUIRED_CMAKE_ARGS=
+REQUIRED_CONFIGURE_ARGS=$OREQUIRED_CONFIGURE_ARGS
+REQUIRED_CMAKE_ARGS=$OREQUIRED_CMAKE_ARGS
+OREQUIRED_CONFIGURE_ARGS= OREQUIRED_CMAKE_ARGS=
+EOF
     fi
 
     # make links to executables in the target as well
@@ -149,7 +153,7 @@ unset_host_env() {
     done
     IFS=$OIFS
 
-    unset_host_env_hook 2>/dev/null || :
+    target_env_hook 2>/dev/null || :
 }
 
 # replace install artifact paths with absolute paths into host and target trees
@@ -163,7 +167,7 @@ pre_build_all() {
         set -- $dist
 
         case "$(table_line DIST_PRE_BUILD "$1")" in
-            *set_host_env*)
+            *host_env*)
                 path="$BUILD_ROOT/host/$3"
                 ;;
             *)
@@ -179,15 +183,15 @@ pre_build_all() {
 }
 
 for dist in $host_dists $perl_dists; do
-    table_line_append  DIST_PRE_BUILD  $dist ':; set_host_env;'
-    table_line_replace DIST_POST_BUILD $dist "unset_host_env; $(table_line DIST_POST_BUILD $dist)"
+    table_line_append  DIST_PRE_BUILD  $dist ':; eval "$(host_env)";'
+    table_line_replace DIST_POST_BUILD $dist "eval \"\$(target_env)\"; $(table_line DIST_POST_BUILD $dist)"
 done
 
 for dist in $both_dists; do
     duplicate_dist $dist "${dist}-target"
 
-    table_line_append  DIST_PRE_BUILD  $dist ':; set_host_env;'
-    table_line_replace DIST_POST_BUILD $dist "unset_host_env; $(table_line DIST_POST_BUILD $dist)"
+    table_line_append  DIST_PRE_BUILD  $dist ':; eval "$(host_env)";'
+    table_line_replace DIST_POST_BUILD $dist "eval \"\$(target_env)\"; $(table_line DIST_POST_BUILD $dist)"
 done
 
 remove_dists='graphviz python2 python3 swig libxml2-python doxygen bakefile setuptools pip meson XML-Parser intltool ninja libsecret shared-mime-info'
@@ -236,9 +240,13 @@ table_insert_after DISTS zlib "dlfcn https://github.com/dlfcn-win32/dlfcn-win32/
 
 table_line_replace DIST_CONFIGURE_TYPES dlfcn cmake
 
-table_line_append DIST_ARGS libicu-target "--with-cross-build=$BUILD_ROOT/dists/libicu/source"
+libicu=libicu
 
-table_line_append DIST_PATCHES libicu-target " \
+if [ -n "$(table_line DISTS libicu-target || :)" ]; then
+    libicu=libicu-target
+fi
+
+table_line_append DIST_PATCHES $libicu " \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0004-move-to-bin.mingw.patch \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0007-actually-move-to-bin.mingw.patch \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0008-data-install-dir.mingw.patch \
@@ -251,6 +259,8 @@ table_line_append DIST_PATCHES libicu-target " \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0017-icu-config-versioning.patch \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0021-mingw-static-libraries-without-s.patch \
 "
+
+table_line_append DIST_EXTRA_LDFLAGS $libicu "-ldl -lcatgets -lws2_32"
 
 table_insert_after DISTS libiconv-target '
     catgets         https://downloads.sourceforge.net/project/mingw/MinGW/Extension/catgets/mingw-catgets-1.0.1/mingw-catgets-1.0.1-src.tar.gz    include/langinfo.h
