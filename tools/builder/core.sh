@@ -323,7 +323,7 @@ DIST_POST_BUILD="$DIST_POST_BUILD
 
 DIST_POST_CONFIGURE="$DIST_POST_CONFIGURE
     openssl         sed -E -i.bak ' \
-        s/([^\\t]+\\\$\\((BUILD_ONE_CMD|RECURSIVE_BUILD_CMD|RECURSIVE_MAKE)\\))/+ \1/ \
+        s/^(\\t+)([^\\t]+\\\$\\((BUILD_ONE_CMD|RECURSIVE_BUILD_CMD|RECURSIVE_MAKE)\\))/\1+ \2/ \
     ' \$(find . -name Makefile);
 "
 
