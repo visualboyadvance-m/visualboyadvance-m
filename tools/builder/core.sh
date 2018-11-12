@@ -1336,6 +1336,9 @@ build_dist() {
 
     puts "${NL}[32mBuilding [1;35m$current_dist[0m${NL}${NL}"
 
+    dist_patch "$current_dist"
+    dist_pre_build "$current_dist"
+
     ORIG_LDFLAGS=$LDFLAGS
     ORIG_LIBS=$LIBS
 
@@ -1347,9 +1350,6 @@ build_dist() {
 
     export LDFLAGS="$LDFLAGS $(eval puts "$(dist_extra_ldflags "$current_dist")")"
     export LIBS="$LIBS $(eval puts "$(dist_extra_libs "$current_dist")")"
-
-    dist_patch "$current_dist"
-    dist_pre_build "$current_dist"
 
     configure_override=$(dist_configure_override "$current_dist")
     install_override=$(dist_install_override "$current_dist")

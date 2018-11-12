@@ -46,11 +46,11 @@ export CC='${target_arch}-gcc'
 export CXX='${target_arch}-g++'
 export STRIP='${target_arch}-strip'
 
-export CPPFLAGS="\$CPPFLAGS"
-export CFLAGS="\$CFLAGS\${CFLAGS:+ }-L/usr/${target_arch}/usr/lib${lib_suffix}"
-export CXXFLAGS="\$CXXFLAGS\${CXXFLAGS:+ }-L/usr/${target_arch}/usr/lib${lib_suffix}"
-export OBJCXXFLAGS="\$OBJCXXFLAGS\${OBJCXXFLAGS:+ }-L/usr/${target_arch}/usr/lib${lib_suffix}"
-export LDFLAGS="-L/usr/${target_arch}/usr/lib${lib_suffix} \$LDFLAGS"
+export CPPFLAGS="$CPPFLAGS"
+export CFLAGS="$CFLAGS${CFLAGS:+ }-L/usr/${target_arch}/usr/lib${lib_suffix}"
+export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-L/usr/${target_arch}/usr/lib${lib_suffix}"
+export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-L/usr/${target_arch}/usr/lib${lib_suffix}"
+export LDFLAGS="-L/usr/${target_arch}/usr/lib${lib_suffix} $LDFLAGS"
 
 EOF
 )
