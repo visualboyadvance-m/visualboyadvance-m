@@ -55,9 +55,11 @@ export LDFLAGS="-L/usr/${target_arch}/usr/lib${lib_suffix} $LDFLAGS"
 EOF
 )
 
-REQUIRED_CONFIGURE_ARGS="--host=${target_arch}"
+export BUILD_ENV
 
-REQUIRED_CMAKE_ARGS="$REQUIRED_CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE='$(perl -MCwd=abs_path -le "print abs_path(q{${0%/*}/../../cmake/Toolchain-cross-MinGW-w64-${target_cpu}.cmake})")'"
+export REQUIRED_CONFIGURE_ARGS="--host=${target_arch}"
+
+export REQUIRED_CMAKE_ARGS="$REQUIRED_CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE='$(perl -MCwd=abs_path -le "print abs_path(q{${0%/*}/../../cmake/Toolchain-cross-MinGW-w64-${target_cpu}.cmake})")'"
 
 . "${0%/*}/../builder/mingw.sh"
 
@@ -68,7 +70,10 @@ table_line_replace DIST_CONFIGURE_OVERRIDES openssl-target "./Configure $openssl
 
 table_line_append DIST_PRE_BUILD bzip2-target ':; sed -i.bak '\''s,include <sys\\stat.h>,include <sys/stat.h>,g'\'' *.c;'
 
-table_line_append DIST_ARGS libicu-target "--with-cross-build=$BUILD_ROOT/dists/libicu/source"
+table_line_append DIST_ARGS libicu-target "--with-cross-build=\$BUILD_ROOT/dists/libicu/source"
+
+# the native tools openal uses for building can be problematic when cross-compiling
+table_line_append DIST_PATCHES openal '-p0 https://gist.githubusercontent.com/rkitover/d371d199ee0ac67864d0940aa7e7c12c/raw/29f3bc4afaba41b35b3fcbd9d18d1f0a22e3dc13/openal-cross-no-cmake-for-native-tools.patch'
 
 table_line_replace DIST_POST_BUILD harfbuzz "$(table_line DIST_POST_BUILD harfbuzz | sed 's/rebuild_dist freetype /rebuild_dist freetype-target /')"
 
@@ -79,14 +84,14 @@ table_line_append DIST_ARGS libsoxr '-DHAVE_WORDS_BIGENDIAN_EXITCODE=0'
 vpx_target=x86-win32-gcc
 [ "$target_bits" -eq 64 ] && vpx_target=x86_64-win64-gcc
 
-table_line_replace DIST_CONFIGURE_OVERRIDES libvpx "./configure --target=$vpx_target $CONFIGURE_ARGS $(table_line DIST_ARGS libvpx)"
+table_line_replace DIST_CONFIGURE_OVERRIDES libvpx "./configure --target=$vpx_target \$CONFIGURE_ARGS $(table_line DIST_ARGS libvpx)"
 
 table_line_remove  DIST_ARGS                libvpx
 
 table_line_replace DIST_CONFIGURE_OVERRIDES ffmpeg "\
     ./configure --arch=$target_cpu --target-os=mingw32 --cross-prefix=${target_arch}- \
-        --pkg-config='$BUILD_ROOT/host/bin/pkg-config' \
-        $CONFIGURE_ARGS $(table_line DIST_ARGS ffmpeg) \
+        --pkg-config='\$BUILD_ROOT/host/bin/pkg-config' \
+        \$CONFIGURE_ARGS $(table_line DIST_ARGS ffmpeg) \
 "
 
 table_line_remove  DIST_ARGS                ffmpeg

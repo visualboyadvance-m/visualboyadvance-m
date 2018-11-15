@@ -2,7 +2,7 @@
 
 set -e
 
-CROSS_OS=windows
+export CROSS_OS=windows
 
 [ -n "$BUILD_ENV" ] && eval "$BUILD_ENV"
 
@@ -17,20 +17,20 @@ export LIBS="-lpthread -lm"
 
 export UUID_LIBS="-luuid_mingw -luuid"
 
-export PKG_CONFIG="$BUILD_ROOT/root/bin/pkg-config"
+export PKG_CONFIG="\$BUILD_ROOT/root/bin/pkg-config"
 
 EOF
 )
 
+export BUILD_ENV
+
 : ${HOST_CC:=ccache gcc}
 : ${HOST_CXX:=ccache g++}
-: ${HOST_CC_ORIG:=gcc}
-: ${HOST_CXX_ORIG:=g++}
-: ${HOST_CPPFLAGS:="-I$BUILD_ROOT/root/include"}
-: ${HOST_CFLAGS:="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -pthread -lm"}
-: ${HOST_CXXFLAGS:="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"}
-: ${HOST_OBJCXXFLAGS:="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"}
-: ${HOST_LDFLAGS:="-fPIC -L$BUILD_ROOT/root/lib -pthread -lm"}
+: ${HOST_CPPFLAGS:="-I\$BUILD_ROOT/root/include"}
+: ${HOST_CFLAGS:="-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -pthread -lm"}
+: ${HOST_CXXFLAGS:="-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"}
+: ${HOST_OBJCXXFLAGS:="-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"}
+: ${HOST_LDFLAGS:="-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm"}
 : ${HOST_LIBS:=-lm}
 : ${HOST_UUID_LIBS:=}
 : ${HOST_STRIP:=strip}
@@ -76,24 +76,22 @@ host_env() {
     ln -sf "$BUILD_ROOT/host" "$BUILD_ROOT/root"
     if [ -z "$OCC" ]; then
         cat <<EOF
-OCC="$CC"
-OCXX="$CXX"
-OCC_ORIG="$CC_ORIG"
-OCXX_ORIG="$CXX_ORIG"
-OCPPFLAGS="$CPPFLAGS"
-OCFLAGS="$CFLAGS"
-OCXXFLAGS="$CXXFLAGS"
-OOBJCXXFLAGS="$OBJCXXFLAGS"
-OLDFLAGS="$LDFLAGS"
-OLIBS="$LIBS"
-OUUID_LIBS="$UUID_LIBS"
-OSTRIP="$STRIP"
-OPATH="$PATH"
+OCC="\$CC"
+OCXX="\$CXX"
+OCPPFLAGS="\$CPPFLAGS"
+OCFLAGS="\$CFLAGS"
+OCXXFLAGS="\$CXXFLAGS"
+OOBJCXXFLAGS="\$OBJCXXFLAGS"
+OLDFLAGS="\$LDFLAGS"
+OLIBS="\$LIBS"
+OUUID_LIBS="\$UUID_LIBS"
+OSTRIP="\$STRIP"
+OPATH="\$PATH"
+
+$BUILD_ENV
 
 export CC="$HOST_CC"
 export CXX="$HOST_CXX"
-export CC_ORIG="$HOST_CC_ORIG"
-export CXX_ORIG="$HOST_CXX_ORIG"
 export CPPFLAGS="$HOST_CPPFLAGS"
 export CFLAGS="$HOST_CFLAGS"
 export CXXFLAGS="$HOST_CXXFLAGS"
@@ -102,13 +100,13 @@ export LDFLAGS="$HOST_LDFLAGS"
 export LIBS="$HOST_LIBS"
 export UUID_LIBS="$HOST_UUID_LIBS"
 export STRIP="$HOST_STRIP"
-export PATH="$BUILD_ROOT/host/bin:$PATH"
+export PATH="$BUILD_ROOT/host/bin:\$PATH"
 
-OREQUIRED_CONFIGURE_ARGS="$REQUIRED_CONFIGURE_ARGS"
-OREQUIRED_CMAKE_ARGS="$REQUIRED_CMAKE_ARGS"
+OREQUIRED_CONFIGURE_ARGS="\$REQUIRED_CONFIGURE_ARGS"
+OREQUIRED_CMAKE_ARGS="\$REQUIRED_CMAKE_ARGS"
 
-REQUIRED_CONFIGURE_ARGS="$(puts "$REQUIRED_CONFIGURE_ARGS" | sed 's/--host[^ ]*//g')"
-REQUIRED_CMAKE_ARGS="$(puts "$REQUIRED_CMAKE_ARGS" | sed 's/-DCMAKE_TOOLCHAIN_FILE=[^ ]*//g')"
+REQUIRED_CONFIGURE_ARGS="\$(puts "\$REQUIRED_CONFIGURE_ARGS" | sed 's/--host[^ ]*//g')"
+REQUIRED_CMAKE_ARGS="\$(puts "\$REQUIRED_CMAKE_ARGS" | sed 's/-DCMAKE_TOOLCHAIN_FILE=[^ ]*//g')"
 EOF
     fi
 
@@ -121,24 +119,24 @@ target_env() {
 
     if [ -n "$OCC" ]; then
         cat <<EOF
-export CC="$OCC"
-export CXX="$OCXX"
-export CC_ORIG="$OCC_ORIG"
-export CXX_ORIG="$OCXX_ORIG"
-export CPPFLAGS="$OCPPFLAGS"
-export CFLAGS="$OCFLAGS"
-export CXXFLAGS="$OCXXFLAGS"
-export OBJCXXFLAGS="$OOBJCXXFLAGS"
-export LDFLAGS="$OLDFLAGS"
-export LIBS="$OLIBS"
-export UUID_LIBS="$OUUID_LIBS"
-export STRIP="$OSTRIP"
-export PATH="$OPATH"
-OCC= OCXX= OCC_ORIG= OCXX_ORIG= OCPPFLAGS= OCFLAGS= OCXXFLAGS= OOBJCXXFLAGS= OLDFLAGS= OLIBS= OUUID_LIBS= OSTRIP= OPATH=
+export CC="\$OCC"
+export CXX="\$OCXX"
+export CPPFLAGS="\$OCPPFLAGS"
+export CFLAGS="\$OCFLAGS"
+export CXXFLAGS="\$OCXXFLAGS"
+export OBJCXXFLAGS="\$OOBJCXXFLAGS"
+export LDFLAGS="\$OLDFLAGS"
+export LIBS="\$OLIBS"
+export UUID_LIBS="\$OUUID_LIBS"
+export STRIP="\$OSTRIP"
+export PATH="\$OPATH"
+OCC= OCXX= OCPPFLAGS= OCFLAGS= OCXXFLAGS= OOBJCXXFLAGS= OLDFLAGS= OLIBS= OUUID_LIBS= OSTRIP= OPATH=
 
-REQUIRED_CONFIGURE_ARGS="$OREQUIRED_CONFIGURE_ARGS"
-REQUIRED_CMAKE_ARGS="$OREQUIRED_CMAKE_ARGS"
+REQUIRED_CONFIGURE_ARGS="\$OREQUIRED_CONFIGURE_ARGS"
+REQUIRED_CMAKE_ARGS="\$OREQUIRED_CMAKE_ARGS"
 OREQUIRED_CONFIGURE_ARGS= OREQUIRED_CMAKE_ARGS=
+
+$BUILD_ENV
 EOF
     fi
 
@@ -260,7 +258,7 @@ table_line_append DIST_PATCHES $libicu " \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0021-mingw-static-libraries-without-s.patch \
 "
 
-table_line_append DIST_EXTRA_LDFLAGS $libicu "-ldl -lcatgets -lws2_32"
+table_line_append DIST_PRE_BUILD $libicu ":; sed -E -i.bak 's/@echo -n /@printf \"%s\" /g' config/mh-mingw*;"
 
 table_insert_after DISTS libiconv-target '
     catgets         https://downloads.sourceforge.net/project/mingw/MinGW/Extension/catgets/mingw-catgets-1.0.1/mingw-catgets-1.0.1-src.tar.gz    include/langinfo.h
@@ -282,20 +280,15 @@ table_line_append DIST_PATCHES fontconfig-target " \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-fontconfig/0007-pkgconfig.mingw.patch \
 "
 
-table_line_replace DIST_CONFIGURE_TYPES fontconfig-target autoreconf
-
 table_line_append DIST_PATCHES libgd 'https://gist.githubusercontent.com/rkitover/c64ea5b83ddea94ace58c40c7de42879/raw/fbaf4885fbefb302116b56626c0e191df514e8c6/libgd-2.2.4-mingw-static.patch'
 
 table_insert_before DISTS sfml '
-    openal          https://github.com/kcat/openal-soft/archive/openal-soft-1.19.0.tar.gz                      lib/libOpenAL32.a
+    openal          https://github.com/kcat/openal-soft/archive/openal-soft-1.19.1.tar.gz                      lib/libOpenAL32.a
 '
 
 table_line_append DIST_ARGS openal '-DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF -DALSOFT_TESTS=OFF'
 
-# this is necessary so the native tools openal uses to build compile when cross-compiling
-table_line_append DIST_PRE_BUILD openal ":; sed -i.bak 's/\\(-G \"\\\${CMAKE_GENERATOR}\"\\)/\\1 -DCMAKE_C_COMPILER=cc -DCMAKE_CXX_COMPILER=c++ -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \"-DCMAKE_C_LINK_EXECUTABLE=<CMAKE_C_COMPILER> <FLAGS> <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES> -lm\" \"-DCMAKE_CXX_LINK_EXECUTABLE=<CMAKE_CXX_COMPILER> <FLAGS> <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES> -lm\" -DCMAKE_C_FLAGS= -DCMAKE_CXX_FLAGS= -DCMAKE_EXE_LINKER_FLAGS=/' CMakeLists.txt;"
-
-table_line_replace DIST_ARGS mp3lame "LDFLAGS='$LDFLAGS $BUILD_ROOT/root/lib/libcatgets.a'"
+table_line_replace DIST_ARGS mp3lame "LDFLAGS='\$LDFLAGS \$BUILD_ROOT/root/lib/libcatgets.a'"
 
 table_line_replace DIST_CONFIGURE_TYPES     zlib-target cmake
 table_line_append  DIST_ARGS                zlib-target -DUNIX=1
@@ -347,13 +340,13 @@ table_line_append DIST_PATCHES libtheora "\
 "
 
 table_line_append DIST_PRE_BUILD  wxwidgets ":; \
-    if path_exists $BUILD_ROOT/root/include/langinfo.h; then \
-        mv $BUILD_ROOT/root/include/langinfo.h $BUILD_ROOT/root/include/langinfo.bak; \
+    if path_exists \$BUILD_ROOT/root/include/langinfo.h; then \
+        mv \$BUILD_ROOT/root/include/langinfo.h \$BUILD_ROOT/root/include/langinfo.bak; \
     fi;
 "
 
 table_line_append DIST_POST_BUILD  wxwidgets ":; \
-    if path_exists $BUILD_ROOT/root/include/langinfo.bak; then \
-        mv $BUILD_ROOT/root/include/langinfo.bak $BUILD_ROOT/root/include/langinfo.h; \
+    if path_exists \$BUILD_ROOT/root/include/langinfo.bak; then \
+        mv \$BUILD_ROOT/root/include/langinfo.bak \$BUILD_ROOT/root/include/langinfo.h; \
     fi;
 "

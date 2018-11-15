@@ -2,7 +2,7 @@
 
 set -e
 
-BUILD_ROOT=$HOME/vbam-build-unix
+export BUILD_ROOT="$HOME/vbam-build-unix"
 
 . "$(dirname "$0")/../builder/core.sh"
 

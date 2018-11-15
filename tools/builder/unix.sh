@@ -1,15 +1,16 @@
 set -e
 
-: ${BUILD_ROOT:=$HOME/vbam-build-unix}
+export BUILD_ROOT="${BUILD_ROOT:-$HOME/vbam-build-unix}"
 
 BUILD_ENV=$BUILD_ENV$(cat <<EOF
 
-export LDFLAGS="$LDFLAGS -Wl,--start-group -ldl"
+export LDFLAGS="$LDFLAGS${LDFLAGS:+ }-Wl,--start-group -ldl"
 
 EOF
 )
 
-eval "$BUILD_ENV"
+export BUILD_ENV
+
 . "$(dirname "$0")/../builder/core.sh"
 
 # on mac openal is part of the system, on most unixes we need openal-soft
@@ -114,9 +115,9 @@ table_line_append DIST_ARGS libdrm '--disable-cairo-tests'
 
 table_line_append DIST_ARGS freeglut '-DFREEGLUT_BUILD_SHARED_LIBS=NO -DFREEGLUT_BUILD_STATIC_LIBS=YES'
 
-table_line_append DIST_ARGS gtk-doc "--with-xml-catalog='$BUILD_ROOT/root/etc/xml/catalog.xml'"
+table_line_append DIST_ARGS gtk-doc "--with-xml-catalog=\"\$BUILD_ROOT/root/etc/xml/catalog.xml\""
 
-table_line_append DIST_POST_BUILD gtk-doc ":; sed -i.bak 's|^prefix=/usr$|prefix=$BUILD_ROOT/root|' $BUILD_ROOT/root/bin/gtkdocize"
+table_line_append DIST_POST_BUILD gtk-doc ":; sed -i.bak \"s|^prefix=/usr\\\$|prefix=\$BUILD_ROOT/root|\" \"\$BUILD_ROOT/root/bin/gtkdocize\""
 
 table_line_replace DIST_BUILD_OVERRIDES gobject-introspection ':; cp m4/introspection.m4 "$BUILD_ROOT/root/share/aclocal";'
 

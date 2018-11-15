@@ -27,7 +27,7 @@ case "$1" in
         ;;
 esac
 
-BUILD_ROOT=$HOME/vbam-build-mac-${target_bits}bit
+export BUILD_ROOT="$HOME/vbam-build-mac-${target_bits}bit"
 
 BUILD_ENV=$(cat <<EOF
 export MACOSX_DEPLOYMENT_TARGET=10.7
@@ -45,10 +45,11 @@ export UUID_LIBS="-L\$BUILD_ROOT/root/stow/libuuid/lib -luuid"
 EOF
 )
 
-TAR=tar
+export BUILD_ENV
+export TAR=tar
 
 if [ "$target_cpu" = i386 ]; then
-    REQUIRED_CONFIGURE_ARGS='--host=i386-apple-darwin --build=x86_64-apple-darwin'
+    export REQUIRED_CONFIGURE_ARGS='--host=i386-apple-darwin --build=x86_64-apple-darwin'
 fi
 
 . "$(dirname "$0")/../builder/core.sh"
@@ -100,7 +101,7 @@ table_line_append  DIST_PRE_BUILD       libmodplug " \
 table_line_append DIST_PRE_BUILD libzmq "sed -i.bak 's/-lstdc++/-lc++/g' src/libzmq.pc.in"
 table_line_append DIST_PRE_BUILD ffmpeg "sed -i.bak 's/-lstdc++/-lc++/g' configure"
 
-table_line_append DIST_ARGS wxwidgets  "--with-macosx-version-min=$MACOSX_DEPLOYMENT_TARGET LDFLAGS='$LDFLAGS -stdlib=libc++'"
+table_line_append DIST_ARGS wxwidgets  "--with-macosx-version-min=\$MACOSX_DEPLOYMENT_TARGET LDFLAGS=\"\$LDFLAGS -stdlib=libc++\""
 table_line_append DIST_ARGS ffmpeg     "--disable-videotoolbox --extra-ldflags='-framework CoreText'"
 table_line_append DIST_ARGS libmodplug "CC=clang++ CXX=clang++"
 

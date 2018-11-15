@@ -31,12 +31,12 @@ case "$MSYSTEM" in
     MINGW32)
         export HOST_SYSTEM=i686-w64-mingw32
         sys_base=/mingw32
-        BUILD_ROOT="$HOME/vbam-build-msys2-i686"
+        export BUILD_ROOT="$HOME/vbam-build-msys2-i686"
         ;;
     MINGW64)
         export HOST_SYSTEM=x86_64-w64-mingw32
         sys_base=/mingw64
-        BUILD_ROOT="$HOME/vbam-build-msys2-x86_64"
+        export BUILD_ROOT="$HOME/vbam-build-msys2-x86_64"
         ;;
     MSYS)
         exec "$0" "$@" -64
@@ -82,9 +82,9 @@ for d in /usr /usr/include /usr/lib; do
 done
 ignore_msys_paths=${ignore_msys_paths#;}
 
-CMAKE_BASE_ARGS="-G 'MSYS Makefiles' -DCMAKE_IGNORE_PATH='$ignore_msys_paths'"
+export CMAKE_BASE_ARGS="-G 'MSYS Makefiles' -DCMAKE_IGNORE_PATH='$ignore_msys_paths'"
 
-TMP_DIR="$BUILD_ROOT/tmp_$$"
+export TMP_DIR="$BUILD_ROOT/tmp_$$"
 
 BUILD_ENV=$BUILD_ENV$(cat <<'EOF'
 
@@ -93,6 +93,8 @@ export MSYS2_ARG_CONV_EXCL="-D;/usr;/etc"
 
 EOF
 )
+
+export BUILD_ENV
 
 DIST_TAR_ARGS="
     help2man        --exclude ChangeLog
@@ -110,11 +112,11 @@ host_env() {
     cat <<EOF
 unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
 
-OPWD="$PWD"
+OPWD="\$PWD"
 export MSYSTEM=MSYS
 . /etc/profile || :
 . ~/.bashrc 2>/dev/null || :
-$BUILD_ENV
+\$BUILD_ENV
 EOF
 
     cd "$OPWD"
@@ -126,11 +128,11 @@ target_env() {
     cat <<EOF
 unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
 
-OPWD="$PWD"
-export MSYSTEM="$OMSYSTEM"
+OPWD="\$PWD"
+export MSYSTEM="\$OMSYSTEM"
 . /etc/profile || :
 . ~/.bashrc 2>/dev/null || :
-$BUILD_ENV
+\$BUILD_ENV
 EOF
 
     cd "$OPWD"
@@ -180,8 +182,5 @@ table_line_replace DIST_POST_BUILD unzip ":; \
 "
 
 table_line_replace DIST_CONFIGURE_OVERRIDES openssl "$(table_line DIST_CONFIGURE_OVERRIDES openssl | sed 's,^./config ,./Configure Cygwin-x86_64 ,')"
-
-# parallel build of openssl doesn't work for msys2 layer
-table_line_append DIST_MAKE_ARGS openssl -j1
 
 builder "$@"

@@ -24,14 +24,11 @@ if [ "$(uname -o 2>/dev/null || :)" = Cygwin ]; then
     fi
 fi
 
-REQUIRED_CMAKE_ARGS="-DGETTEXT_MSGFMT_EXECUTABLE:FILEPATH=\"\$BUILD_ROOT/host/bin/msgfmt\" -DGETTEXT_MSGMERGE_EXECUTABLE=\"\$BUILD_ROOT/host/bin/msgmerge\""
+export REQUIRED_CMAKE_ARGS="-DGETTEXT_MSGFMT_EXECUTABLE:FILEPATH=\"\$BUILD_ROOT/host/bin/msgfmt\" -DGETTEXT_MSGMERGE_EXECUTABLE=\"\$BUILD_ROOT/host/bin/msgmerge\""
 
 . "${0%/*}/../builder/mingw-cross.sh"
 
 table_line_append DIST_MAKE_ARGS unzip 'CFLAGS="$CFLAGS -DNO_LCHMOD"'
-
-# parallel build of openssl doesn't work for cygwin layer
-table_line_append DIST_MAKE_ARGS openssl -j1
 
 # FIXME: problems with autopoint that need to be sorted
 table_line_remove DISTS flex

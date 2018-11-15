@@ -4,16 +4,16 @@ set -e
 
 [ -n "$BASH_VERSION" ] && set -o posix
 
-BUILD_ROOT=${BUILD_ROOT:-$HOME/vbam-build}
-TAR=${TAR:-tar --force-local}
-CURL=${CURL:-curl --insecure}
-PERL_MAKE=${PERL_MAKE:-make}
+export BUILD_ROOT="${BUILD_ROOT:-$HOME/vbam-build}"
+export TAR="${TAR:-tar --force-local}"
+export CURL="${CURL:-curl --insecure}"
+export PERL_MAKE="${PERL_MAKE:-make}"
 
 [ -n "$BUILD_ENV" ] && eval "$BUILD_ENV"
 
 BUILD_ENV=$BUILD_ENV$(cat <<EOF
 
-export BUILD_ROOT="$BUILD_ROOT"
+export BUILD_ROOT="\$BUILD_ROOT"
 
 export CC="\${CC:-gcc}"
 export CXX="\${CXX:-g++}"
@@ -32,23 +32,18 @@ case "\$CC" in
                     REQUIRED_CMAKE_ARGS="\$REQUIRED_CMAKE_ARGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=\$CC -DCMAKE_CXX_COMPILER=\$CXX"
                     ;;
             esac
-            export CC_ORIG=\$CC
-            export CXX_ORIG=\$CXX
             export CC="ccache \$CC"
             export CXX="ccache \$CXX"
         fi
         ;;
 esac
 
-export CC_ORIG="\${CC_ORIG:-\$CC}"
-export CXX_ORIG="\${CXX_ORIG:-\$CXX}"
-
-export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-I$BUILD_ROOT/root/include"
-export CFLAGS="$CFLAGS${CFLAGS:+ }-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -pthread -lm"
-export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"
-export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"
-export LDFLAGS="$LDFLAGS${LDFLAGS:+ }-fPIC -L$BUILD_ROOT/root/lib -pthread -lm"
-export STRIP="${STRIP:-strip}"
+export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-I\$BUILD_ROOT/root/include"
+export CFLAGS="$CFLAGS${CFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -pthread -lm"
+export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"
+export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"
+export LDFLAGS="$LDFLAGS${LDFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm"
+export STRIP="\${STRIP:-strip}"
 
 if [ -z "\$OPENMP" ] && echo "\$CC" | grep -Eq gcc; then
     export CFLAGS="\$CFLAGS -fopenmp"
@@ -58,55 +53,49 @@ if [ -z "\$OPENMP" ] && echo "\$CC" | grep -Eq gcc; then
     export OPENMP=1
 fi
 
-export CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH:-$BUILD_ROOT/root}"
-export PKG_CONFIG_PATH="$BUILD_ROOT/root/lib/pkgconfig:$BUILD_ROOT/root/share/pkgconfig"
+export CMAKE_PREFIX_PATH="\${CMAKE_PREFIX_PATH:-\$BUILD_ROOT/root}"
+export PKG_CONFIG_PATH="\$BUILD_ROOT/root/lib/pkgconfig:\$BUILD_ROOT/root/share/pkgconfig"
 
-export LD_LIBRARY_PATH="$BUILD_ROOT/root/lib"
+export LD_LIBRARY_PATH="\$BUILD_ROOT/root/lib"
 
 export PERL_MM_USE_DEFAULT=1
 export PERL_EXTUTILS_AUTOINSTALL="--defaultdeps"
 
-export OPENSSL_ROOT="$BUILD_ROOT/root"
+export OPENSSL_ROOT="\$BUILD_ROOT/root"
 
-export PERL_MB_OPT='--install_base $BUILD_ROOT/root/perl5'
-export PERL_MM_OPT='INSTALL_BASE=$BUILD_ROOT/root/perl5'
-export PERL5LIB="$BUILD_ROOT/root/perl5/lib/perl5"
-export PERL_LOCAL_LIB_ROOT="$BUILD_ROOT/root/perl5"
+export PERL_MB_OPT="--install_base \$BUILD_ROOT/root/perl5"
+export PERL_MM_OPT="INSTALL_BASE=\"\$BUILD_ROOT/root/perl5\" CCFLAGS=\"\$CFLAGS\" LDDFLAGS=\"\$LDFLAGS\""
+export PERL5LIB="\$BUILD_ROOT/root/perl5/lib/perl5"
+export PERL_LOCAL_LIB_ROOT="\$BUILD_ROOT/root/perl5"
 
 case "\$PATH" in
-    *"$BUILD_ROOT"*)
+    *"\$BUILD_ROOT"*)
         ;;
     *)
-        export PATH="$BUILD_ROOT/root/bin:$BUILD_ROOT/root/perl5/bin:\$PATH"
+        export PATH="\$BUILD_ROOT/root/bin:\$BUILD_ROOT/root/perl5/bin:\$PATH"
         ;;
 esac
 
-export PERL_MM_OPT="\$PERL_MM_OPT CCFLAGS='\$CFLAGS' LDDFLAGS='\$LDFLAGS'"
+export MANPATH="\$BUILD_ROOT/root/man:\$BUILD_ROOT/root/share/man:/usr/share/man:/usr/local/share/man"
 
-export MANPATH="$BUILD_ROOT/root/man:$BUILD_ROOT/root/share/man:/usr/share/man:/usr/local/share/man"
+export XML_CATALOG_FILES="\$(cygpath -m "\$BUILD_ROOT/root/etc/xml/catalog.xml" 2>/dev/null)"
 
-export XML_CATALOG_FILES="$BUILD_ROOT/root/etc/xml/catalog.xml"
+export FORMAT_DIR="\$BUILD_ROOT/root/share/xmlto/format"
 
-export FORMAT_DIR="$BUILD_ROOT/root/share/xmlto/format"
+export XDG_DATA_DIRS="\$BUILD_ROOT/root/share"
 
-export XDG_DATA_DIRS="$BUILD_ROOT/root/share"
+export FONTCONFIG_PATH="\$BUILD_ROOT/root/etc/fonts"
 
-export FONTCONFIG_PATH="$BUILD_ROOT/root/etc/fonts"
+export BISON_PKGDATADIR="\$BUILD_ROOT/root/share/bison"
 
-export BISON_PKGDATADIR="$BUILD_ROOT/root/share/bison"
-
-export SWIG_LIB="\$(echo \$BUILD_ROOT/root/share/swig/*)"
-
-if command -v cygpath >/dev/null; then
-    export XML_CATALOG_FILES=\$(cygpath -m "\$XML_CATALOG_FILES")
-fi
+export SWIG_LIB="\$(echo \$BUILD_ROOT/root/share/swig/* 2>/dev/null)"
 
 EOF
 )
 
-ORIG_PATH=$PATH
+export BUILD_ENV
 
-eval "$BUILD_ENV"
+ORIG_PATH=$PATH
 
 PRE_BUILD_DISTS="$PRE_BUILD_DISTS bzip2 xz unzip"
 
@@ -156,7 +145,7 @@ DISTS=$DISTS'
 #    libcroco        http://ftp.gnome.org/pub/gnome/sources/libcroco/0.6/libcroco-0.6.12.tar.xz                  lib/libcroco-0.6.a
     libuuid         https://downloads.sourceforge.net/project/libuuid/libuuid-1.0.3.tar.gz                      lib/libuuid.a
     freetype        http://download.savannah.gnu.org/releases/freetype/freetype-2.9.1.tar.bz2                   lib/libfreetype.a
-    fontconfig      https://freedesktop.org/software/fontconfig/release/fontconfig-2.13.0.tar.bz2               lib/libfontconfig.a
+    fontconfig      https://freedesktop.org/software/fontconfig/release/fontconfig-2.13.1.tar.bz2               lib/libfontconfig.a
     libgd           https://github.com/libgd/libgd/releases/download/gd-2.2.5/libgd-2.2.5.tar.xz                lib/libgd.a
     dejavu          https://downloads.sourceforge.net/project/dejavu/dejavu/2.37/dejavu-fonts-ttf-2.37.tar.bz2  share/fonts/dejavu/DejaVuSansMono.ttf
     liberation      https://releases.pagure.org/liberation-fonts/liberation-fonts-ttf-2.00.1.tar.gz             share/fonts/liberation/LiberationMono-Regular.ttf
@@ -231,22 +220,21 @@ FFMPEG_DISTS='
 : ${PATH_SEP:=':'}
 
 # these two can be set to always be included regardless of overrides
-REQUIRED_CONFIGURE_ARGS="$REQUIRED_CONFIGURE_ARGS"
-REQUIRED_CMAKE_ARGS="$REQUIRED_CMAKE_ARGS"
+export REQUIRED_CONFIGURE_ARGS="$REQUIRED_CONFIGURE_ARGS"
+export REQUIRED_CMAKE_ARGS="$REQUIRED_CMAKE_ARGS"
 
-CONFIGURE_ARGS="$CONFIGURE_ARGS --disable-shared --enable-static --prefix=/usr"
+export CONFIGURE_ARGS="$CONFIGURE_ARGS --disable-shared --enable-static --prefix=/usr"
 
-CMAKE_BASE_ARGS="$CMAKE_BASE_ARGS -DBUILD_SHARED_LIBS=NO -DENABLE_SHARED=NO -DCMAKE_PREFIX_PATH:FILEPATH=\"\$CMAKE_PREFIX_PATH\" -DCMAKE_BUILD_TYPE=Release"
+export CMAKE_BASE_ARGS="$CMAKE_BASE_ARGS -DBUILD_SHARED_LIBS=NO -DENABLE_SHARED=NO -DCMAKE_PREFIX_PATH:FILEPATH=\"\$CMAKE_PREFIX_PATH\" -DCMAKE_BUILD_TYPE=Release"
 
-CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=/usr"
+export CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=/usr"
 
-MESON_ARGS="--prefix /usr --buildtype release --default-library static -Dintrospection=false"
+export MESON_ARGS="--prefix /usr --buildtype release --default-library static -Dintrospection=false"
 
 DIST_PATCHES=$DIST_PATCHES'
     docbook2x       https://gist.githubusercontent.com/rkitover/0b5dcc95a0703a9b0e0e7eb6d325a98e/raw/e256d2fad8d19633ac8abe02a0d1e119063d1fd9/docbook2x.patch
     ccache          https://gist.githubusercontent.com/rkitover/4dd30c2841a2131be8715038f538d622/raw/40a8f0f50aa6ca5f9658a0c37aa17393cc80c109/ccache-3.4.2-msys.patch
     graphite2       https://gist.githubusercontent.com/rkitover/418600634d7cf19e2bf1c3708b50c042/raw/839b72d9cda545f2e3b640d743c1bd44b89861b9/graphite2-1.3.10-static.patch
-    fontconfig      https://gist.githubusercontent.com/rkitover/542405b4509bd23daa76c98b15a94627/raw/b1ffcfe67c8da22452858216eac4b86afeb93eae/fontconfig-gperf.patch
     python2         https://gist.githubusercontent.com/rkitover/2d9e5baff1f1cc4f2618dee53083bd35/raw/7f33fcf5470a9f1013ac6ae7bb168368a98fe5a0/python-2.7.14-custom-static-openssl.patch https://gist.githubusercontent.com/rkitover/afab7ed3ac7ce1860c43a258571c8ae1/raw/6f5fc90a7acf5f5c3ffda2edf402b28f469a4b3b/python-2.7.14-static-libintl.patch
     python3         https://gist.githubusercontent.com/rkitover/93d89a679705875c59275fb0a8f22b45/raw/6149e7fa3920d6c674c79448c5a4c9313620e06c/python-3.6.3-custom-static-openssl.patch https://gist.githubusercontent.com/rkitover/b18f19eafda3775a9652cc9cdf3ec914/raw/ed14c34bf9f205ccc3a4684dbdb83f8620162b98/python-3.6.3-static-libintl.patch
     intltool        https://gist.githubusercontent.com/rkitover/d638882f52e5d5f8e392cbf6842cd6d0/raw/dcfbe358bbb8b89f88b40a9c3402494552fd33f8/intltool-0.51.0.patch
@@ -258,6 +246,7 @@ DIST_TAR_ARGS="$DIST_TAR_ARGS
 DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     unzip           make
     zip             make
+    fontconfig      autoreconf
     libgd           autoreconf
     harfbuzz        autoconf
     python2         autoreconf
@@ -278,6 +267,7 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
     libicu          cd source;
 #    flex-2.6.3      sed -i.bak '/^'\"\$TAB\"'tests \\\\\$/d' Makefile.am;
     flex            mkdir -p build-aux; touch build-aux/config.rpath; mkdir -p po; touch po/Makefile.in.in; sed -i.bak '/po \\\\$/d' Makefile.am;
+    fontconfig      sed -i.bak 'd;q' test/Makefile.am;
     python3         sed -i.bak '/-Wl,-stack_size,/d' configure.ac;
     libxml2-python  cd python; \
                     sed -i.bak \"s,^ROOT = .*,ROOT = os.getenv('BUILD_ROOT') + '/root',; s|^\\( *platformLibs = \\[ *[^]].*\\)\\] *\$|\\1, 'lzma', 'iconv', 'intl']|\" setup.py;
@@ -309,22 +299,25 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
 DIST_POST_BUILD="$DIST_POST_BUILD
     harfbuzz        rebuild_dist freetype --with-harfbuzz=yes;
     flex-2.6.3      build_dist flex || :;
-    libtool         ln -sf '$BUILD_ROOT/root/bin/libtoolize' '$BUILD_ROOT/root/bin/glibtoolize';
+    libtool         ln -sf \"\$BUILD_ROOT/root/bin/libtoolize\" \"\$BUILD_ROOT/root/bin/glibtoolize\";
     glib            rebuild_dist gettext --without-included-glib --without-included-libxml;
-    graphviz        (cd '$BUILD_ROOT/root/bin'; path_exists dot_static && ! path_exists dot && ln -sf '$BUILD_ROOT/root/bin/dot_static' ./dot || :);
-    libxml2         mkdir -p '$BUILD_ROOT/root/etc/xml'; \
-                    xmlcatalog --noout --create \"\$(cygpath -m \"$BUILD_ROOT/root/etc/xml/catalog.xml\")\" || :;
+    graphviz        (cd \"\$BUILD_ROOT/root/bin\"; path_exists dot_static && ! path_exists dot && ln -sf \"\$BUILD_ROOT/root/bin/dot_static\" ./dot || :);
+    libxml2         mkdir -p \"\$BUILD_ROOT/root/etc/xml\"; \
+                    xmlcatalog --noout --create \"\$(cygpath -m \"\$BUILD_ROOT/root/etc/xml/catalog.xml\")\" || :;
     python2         pip2 install six;
     python3         pip3 install six;
-    fontconfig      mkdir -p '$BUILD_ROOT/root/etc/fonts'; \
-                    touch '$BUILD_ROOT/root/etc/fonts/fonts.conf'; \
-                    sed -i.bak 's|/usr/share/fonts|$BUILD_ROOT/root/share/fonts|g' '$BUILD_ROOT/root/etc/fonts/fonts.conf';
+    fontconfig      mkdir -p \"\$BUILD_ROOT/root/etc/fonts\"; \
+                    touch \"\$BUILD_ROOT/root/etc/fonts/fonts.conf\"; \
+                    sed -i.bak \"s|/usr/share/fonts|\$BUILD_ROOT/root/share/fonts|g\" \"\$BUILD_ROOT/root/etc/fonts/fonts.conf\";
 "
 
 DIST_POST_CONFIGURE="$DIST_POST_CONFIGURE
-    openssl         sed -E -i.bak ' \
-        s/^(\\t+)([^\\t]+\\\$\\((BUILD_ONE_CMD|RECURSIVE_BUILD_CMD|RECURSIVE_MAKE)\\))/\1+ \2/ \
-    ' \$(find . -name Makefile);
+    #
+    # I tried to use this to make openssl build in parallel, but it fails unpredictably.
+    #
+    #openssl         sed -E -i.bak ' \
+    #    s/^(\\t+)([^\\t]+\\\$\\((BUILD_ONE_CMD|RECURSIVE_BUILD_CMD|RECURSIVE_MAKE)\\))/\1+ \2/ \
+    #' \$(find . -name Makefile);
 "
 
 DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
@@ -332,20 +325,20 @@ DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
     cmake       ./configure --prefix=/usr --no-qt-gui --parallel=\$NUM_CPUS --enable-ccache
     zlib        ./configure --static --prefix=/usr
     XML-SAX     echo no | PERL_MM_USE_DEFAULT=0 perl Makefile.PL
-    wxwidgets   ./configure $REQUIRED_CONFIGURE_ARGS --disable-shared --prefix=/usr --enable-stl --disable-precomp-headers --enable-cxx11 --enable-permissive --with-opengl --with-libpng
+    wxwidgets   ./configure \$REQUIRED_CONFIGURE_ARGS --disable-shared --prefix=/usr --enable-stl --disable-precomp-headers --enable-cxx11 --enable-permissive --with-opengl --with-libpng
 "
 
 DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
     c2man          ./Configure -de -Dprefix=/usr -Dmansrc=/usr/share/man/man1 -Dcc=\"\$CC\"; \
-                   sed -i.bak 's|/[^ ][^ ]*/libfl\\.[^ ]*|-L$BUILD_ROOT/root/lib -lfl|' Makefile; \
+                   sed -i.bak \"s|/[^ ][^ ]*/libfl[.][^ ]*|-L\$BUILD_ROOT/root/lib -lfl|\" Makefile; \
                    make -j\$NUM_CPUS; \
-                   make install bin='$BUILD_ROOT/root/bin' mansrc='$BUILD_ROOT/root/share/man/man1' privlib='$BUILD_ROOT/root/lib/c2man'
+                   make install bin=\"\$BUILD_ROOT/root/bin\" mansrc=\"\$BUILD_ROOT/root/share/man/man1\" privlib=\"\$BUILD_ROOT/root/lib/c2man\"
     libxml2-python python setup.py build install && python3 setup.py build install
     setuptools     python bootstrap.py; python easy_install.py .
     pip            easy_install .
-    ninja          python configure.py --bootstrap && cp -af ./ninja '$BUILD_ROOT/root/bin'
+    ninja          python configure.py --bootstrap && cp -af ./ninja \"\$BUILD_ROOT/root/bin\"
     docbook4.2     install_docbook_dist schema
-    docbook4.1.2   cp '$BUILD_ROOT/dists/docbook4.2/catalog.xml' . ; \
+    docbook4.1.2   cp \"\$BUILD_ROOT/dists/docbook4.2/catalog.xml\" . ; \
                    sed -i.bak 's/V4.2/V4.1.2/g; s/4.2/4.1.2/g;' catalog.xml; \
                    install_docbook_dist schema
     docbook4.3     install_docbook_dist schema
@@ -360,18 +353,19 @@ DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
 "
 
 DIST_ARGS="$DIST_ARGS
+    libicu      --disable-extras --disable-tools --disable-tests --disable-samples
     gettext     --with-included-gettext --with-included-glib --with-included-libcroco --with-included-libunistring --with-included-libxml --disable-curses CPPFLAGS=\"\$CPPFLAGS -DLIBXML_STATIC\"
     pkgconfig   --with-internal-glib --with-libiconv=gnu
     pcre        --enable-utf8 --enable-pcre8 --enable-pcre16 --enable-pcre32 --enable-unicode-properties --enable-pcregrep-libz --enable-pcregrep-libbz2 --enable-jit
     libxslt     --without-python --without-crypto
     libgd       --without-xpm
-    fontconfig  --with-baseconfigdir=/etc/fonts
-    graphviz    --disable-ltdl --without-x CFLAGS=\"-include \$PWD/declspec.h $CFLAGS\"
+    fontconfig  --with-baseconfigdir=/etc/fonts 
+    graphviz    --disable-ltdl --without-x CFLAGS=\"-include \$PWD/declspec.h \$CFLAGS\"
     python2     --with-ensurepip --with-system-expat
     python3     --with-ensurepip --with-system-expat
     glib        --with-libiconv=gnu
     bakefile    --enable-shared
-    XML-Parser  EXPATINCPATH='$BUILD_ROOT/root/include' EXPATLIBPATH='$BUILD_ROOT/root/lib'
+    XML-Parser  EXPATINCPATH=\"\$BUILD_ROOT/root/include\" EXPATLIBPATH=\"\$BUILD_ROOT/root/lib\"
     doxygen     -DICONV_ACCEPTS_NONCONST_INPUT:BOOL=FALSE -DICONV_ACCEPTS_CONST_INPUT:BOOL=TRUE
     sfml        -DSFML_USE_SYSTEM_DEPS=TRUE
     libcroco    --disable-Bsymbolic
@@ -399,13 +393,13 @@ DIST_ARGS="$DIST_ARGS
 "
 
 
-DIST_BARE_MAKE_ARGS='CC="$CC"'
+export DIST_BARE_MAKE_ARGS='CC="$CC"'
 
-ALL_MAKE_ARGS='V=1 VERBOSE=1'
+export ALL_MAKE_ARGS='V=1 VERBOSE=1'
 
 # have to disable ccache for openssl
 DIST_MAKE_ARGS="$DIST_MAKE_ARGS
-    openssl     CC=\"\$CC\" CXX=\"\$CXX\" LDFLAGS=\"\$LDFLAGS\"
+    openssl     CC=\"\$CC\" CXX=\"\$CXX\" LDFLAGS=\"\$LDFLAGS\" -j1
     getopt      LDFLAGS=\"\$LDFLAGS -lintl -liconv\" CFLAGS=\"\$CFLAGS\"
     bzip2       libbz2.a bzip2 bzip2recover CFLAGS=\"\$CFLAGS\" LDFLAGS=\"\$LDFLAGS\"
     unzip       generic2
@@ -441,6 +435,7 @@ TAB='	'
 
 
 builder() {
+    eval "$BUILD_ENV"
     setup
     read_command_line "$@"
     install_core_deps
@@ -1609,10 +1604,10 @@ build_dist() {
         fi
     fi
 
-    dist_post_build "$current_dist"
-
     export LDFLAGS="$ORIG_LDFLAGS"
     export LIBS="$ORIG_LIBS"
+
+    dist_post_build "$current_dist"
 
     done_msg
 }

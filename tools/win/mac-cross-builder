@@ -2,7 +2,7 @@
 
 set -e
 
-TAR=tar
+export TAR=tar
 
 . "${0%/*}/../builder/mingw-cross.sh"
 
@@ -11,13 +11,11 @@ host_env_hook() {
 export COMMAND_MODE=unix2003
 export CC='ccache clang'
 export CXX='ccache clang++'
-export CC_ORIG=clang
-export CXX_ORIG=clang++
-export CPPFLAGS="-I$BUILD_ROOT/root/include -DICONV_CONST="
-export CFLAGS="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
-export CXXFLAGS="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
-export OBJCXXFLAGS="-fPIC -I$BUILD_ROOT/root/include -L$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
-export LDFLAGS="-fPIC -L$BUILD_ROOT/root/lib -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
+export CPPFLAGS="-I\$BUILD_ROOT/root/include -DICONV_CONST="
+export CFLAGS="-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export CXXFLAGS="-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export OBJCXXFLAGS="-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export LDFLAGS="-fPIC -L\$BUILD_ROOT/root/lib -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
 EOF
 }
 
