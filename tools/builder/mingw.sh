@@ -234,7 +234,7 @@ table_line_append DIST_POST_BUILD zlib-target ":; \
 "
 
 # mingw -ldl equivalent, needed by some things
-table_insert_after DISTS zlib "dlfcn https://github.com/dlfcn-win32/dlfcn-win32/archive/v1.1.2.tar.gz lib/libdl.a"
+table_insert_after DISTS cmake "dlfcn https://github.com/dlfcn-win32/dlfcn-win32/archive/v1.1.2.tar.gz lib/libdl.a"
 
 table_line_replace DIST_CONFIGURE_TYPES dlfcn cmake
 
