@@ -116,7 +116,7 @@ OPWD="\$PWD"
 export MSYSTEM=MSYS
 . /etc/profile || :
 . ~/.bashrc 2>/dev/null || :
-\$BUILD_ENV
+$BUILD_ENV
 EOF
 
     cd "$OPWD"
@@ -132,7 +132,7 @@ OPWD="\$PWD"
 export MSYSTEM="\$OMSYSTEM"
 . /etc/profile || :
 . ~/.bashrc 2>/dev/null || :
-\$BUILD_ENV
+$BUILD_ENV
 EOF
 
     cd "$OPWD"
