@@ -265,7 +265,7 @@ table_insert_after DISTS libiconv-target '
 '
 
 table_line_append DIST_PATCHES catgets "\
-    https://gist.githubusercontent.com/rkitover/4fe26d4af9e20234ba7821100356b0a6/raw/715b89f23b0e13a5d1859bfeee600f43edd35c07/mingw-catgets-mc_realloc-and-langinfo.patch \
+    https://gist.githubusercontent.com/rkitover/4fe26d4af9e20234ba7821100356b0a6/raw/1f11522e9feea3c2a431beca57fc3db07ca44a1c/mingw-catgets-mc_realloc-and-langinfo.patch \
 "
 
 table_line_append DIST_POST_BUILD catgets ":; \

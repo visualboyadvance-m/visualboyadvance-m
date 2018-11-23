@@ -876,7 +876,7 @@ build_prerequisites() {
 
 dists_are_installed() {
     for current_dist; do
-        if ! path_exists "$(install_artifact $current_dist)"; then
+        if ! path_exists "$(install_artifact -f $current_dist)"; then
             return 1
         fi
     done
@@ -1299,7 +1299,7 @@ build_dist_if_needed() {
     [ -n "$current_dist" ] || die 'build_dist_if_needed: dist name required'
     shift
 
-    if ! path_exists "$(install_artifact $current_dist)"; then
+    if ! path_exists "$(install_artifact -f $current_dist)"; then
         build_dist $current_dist "$@"
         BUILT_DISTS="$BUILT_DISTS $current_dist"
     fi
@@ -1356,7 +1356,7 @@ build_dist() {
         eval "set -- $extra_dist_args"
         echo_eval_run "$build_override $@"
 
-        path_exists "$(install_artifact $current_dist)"
+        check_install_artifact "$current_dist"
     else
         if [ "$config_type" = meson ] || [ -z "$config_type" -a -f meson.build ]; then
             mkdir -p build
@@ -1384,7 +1384,7 @@ build_dist() {
                 echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
             fi
 
-            path_exists "$(install_artifact $current_dist)"
+            check_install_artifact "$current_dist"
         elif [ "$config_type" = autoconf -o "$config_type" = autoreconf ] || [ -z "$config_type" -a \( -f configure -o -f Configure -o -f configure.ac -o -f configure.in -o -f Makefile.am \) ]; then
             # workaround a sometimes autoconf bug
             touch config.rpath
@@ -1463,7 +1463,7 @@ build_dist() {
                 echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
             fi
 
-            path_exists "$(install_artifact $current_dist)"
+            check_install_artifact "$current_dist"
         elif [ "$config_type" = cmakeninja ]; then
             if ! command -v ninja >/dev/null; then
                 error "configure type 'cmakeninja' requested but ninja is not available yet";
@@ -1496,7 +1496,7 @@ build_dist() {
                 echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
             fi
 
-            path_exists "$(install_artifact $current_dist)"
+            check_install_artifact "$current_dist"
         elif [ "$config_type" = cmake ] || [ -z "$config_type" -a -f CMakeLists.txt ]; then
             mkdir -p build
             cd build
@@ -1525,7 +1525,7 @@ build_dist() {
                 echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
             fi
 
-            path_exists "$(install_artifact $current_dist)"
+            check_install_artifact "$current_dist"
         elif [ "$config_type" = python ] || [ -z "$config_type" -a -f setup.py ]; then
             if [ -z "$install_override" ]; then
                 pip=
@@ -1552,7 +1552,7 @@ build_dist() {
                 echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
             fi
 
-            path_exists "$(install_artifact $current_dist)"
+            check_install_artifact "$current_dist"
         elif [ "$config_type" = perl ] || [ -z "$config_type" -a -f Makefile.PL ]; then
             echo_run cpanm --notest --installdeps .
 
@@ -1575,7 +1575,7 @@ build_dist() {
                 echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
             fi
 
-            path_exists "$(install_artifact $current_dist)"
+            check_install_artifact "$current_dist"
         elif [ "$config_type" = make ] || [ -z "$config_type" -a \( -f Makefile -o -f makefile \) ]; then
             makefile=makefile
             if [ -f Makefile ]; then
@@ -1599,7 +1599,7 @@ build_dist() {
                 echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
             fi
 
-            path_exists "$(install_artifact $current_dist)"
+            check_install_artifact "$current_dist"
         else
             die "don't know how to build [1;35m$current_dist[0m, please define a BUILD_OVERRIDE"
         fi
@@ -1695,7 +1695,7 @@ install_dist() {
     IFS=$OIFS
 
     # check that key file was built
-    path_exists "destdir${prefix}/$(install_artifact_relative "$current_dist")"
+    check_install_artifact_relative "$current_dist" "destdir${prefix}"
 
     # when cross compiling, resolve build root to host or target
     inst_root=$(resolve_link "$BUILD_ROOT/root")
@@ -2683,6 +2683,12 @@ list_remove_duplicates() {
 }
 
 install_artifact() {
+    full=
+    if [ "$1" = "-f" ]; then
+        full=1
+        shift
+    fi
+
     current_dist=$1
     [ -n "$current_dist" ] || die 'install_artifact: dist name required'
 
@@ -2697,12 +2703,40 @@ install_artifact() {
     # trees
     case "$path" in
         /*)
-            puts "$path"
+            if [ -n "$full" ]; then
+                puts "$path"
+            else
+                puts "$(install_artifact_relative "$current_dist")"
+            fi
             return 0
             ;;
     esac
 
-    puts "$BUILD_ROOT/root${prefix}/${path}"
+    if [ -n "$full" ]; then
+        puts "$BUILD_ROOT/root${prefix}/${path}"
+    else
+        puts "$path"
+    fi
+}
+
+check_install_artifact() {
+    current_dist=$1
+    [ -n "$current_dist" ] || die 'check_install_artifact: dist name required'
+
+    if ! path_exists "$(install_artifact -f $current_dist)"; then
+        die "$current_dist: target file not found after install"
+    fi
+}
+
+check_install_artifact_relative() {
+    current_dist=$1
+    [ -n "$current_dist" ] || die 'check_install_artifact_relative: dist name required'
+    root=$2
+    [ -n "$root" ] || die 'check_install_artifact_relative: directory root relative to required'
+
+    if ! path_exists "${root}/$(install_artifact_relative $current_dist)"; then
+        die "$current_dist: target file not found in unpack directory"
+    fi
 }
 
 install_artifact_relative() {
