@@ -3684,7 +3684,7 @@ void remoteMemoryRead(char* p)
     sscanf(p, "%x,%x:", &address, &count);
     //  monprintf("Memory read for %08x %d\n", address, count);
 
-    char buffer[1024];
+    char buffer[(count*2)+1];
 
     char* s = buffer;
     for (int i = 0; i < count; i++) {
