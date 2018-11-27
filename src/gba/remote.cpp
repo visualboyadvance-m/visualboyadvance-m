@@ -3705,6 +3705,8 @@ void remoteQuery(char* p)
         remotePutPacket("l");
     } else if (!strncmp(p, "Supported", 9)) {
         remotePutPacket("PacketSize=1000");
+    } else if (!strncmp(p, "HostInfo", 8)) {
+        remotePutPacket("cputype:12;cpusubtype:5;ostype:unknown;vendor:nintendo;endian:little;ptrsize:4;");
     } else if (!strncmp(p, "Rcmd,", 5)) {
         p += 5;
         std::string cmd = HexToString(p);
