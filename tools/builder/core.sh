@@ -133,7 +133,7 @@ DISTS=$DISTS'
     libffi          ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz                                         lib/libffi.a
     c2man           http://www.ciselant.de/c2man/c2man-2.0@42.tar.gz                                            bin/c2man
     libxml2         ftp://xmlsoft.org/libxml2/libxml2-2.9.8.tar.gz                                              lib/libxml2.a
-    libxslt         https://github.com/GNOME/libxslt/archive/v1.1.33-rc1.tar.gz                                 lib/libxslt.a
+    libxslt         https://github.com/GNOME/libxslt/archive/v1.1.33-rc2.tar.gz                                 lib/libxslt.a
     XML-NamespaceSupport https://cpan.metacpan.org/authors/id/P/PE/PERIGRIN/XML-NamespaceSupport-1.12.tar.gz    perl5/lib/perl5/XML/NamespaceSupport.pm
     XML-SAX-Base    https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-SAX-Base-1.09.tar.gz                   perl5/lib/perl5/XML/SAX/Base.pm
     XML-SAX         https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-SAX-0.99.tar.gz                        perl5/lib/perl5/XML/SAX.pm
