@@ -3526,9 +3526,9 @@ void remoteInit()
 void remotePutPacket(const char* packet)
 {
     const char* hex = "0123456789abcdef";
-    char buffer[1024];
 
     size_t count = strlen(packet);
+    char buffer[count + 5];
 
     unsigned char csum = 0;
 
