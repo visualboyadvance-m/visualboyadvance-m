@@ -233,6 +233,16 @@ table_line_append DIST_POST_BUILD zlib-target ":; \
     rm -f \$BUILD_ROOT/root/lib/libz.dll.a \$BUILD_ROOT/root/bin/libz.dll; \
 "
 
+table_line_replace DIST_CONFIGURE_TYPES     zlib-target cmake
+table_line_append  DIST_ARGS                zlib-target -DUNIX=1
+table_line_remove  DIST_CONFIGURE_OVERRIDES zlib-target
+
+zlib_dist=$(table_line DISTS zlib-target)
+
+table_line_remove  DISTS zlib-target
+
+table_insert_after DISTS cmake "zlib-target $zlib_dist"
+
 # mingw -ldl equivalent, needed by some things
 table_insert_after DISTS cmake "dlfcn https://github.com/dlfcn-win32/dlfcn-win32/archive/v1.1.2.tar.gz lib/libdl.a"
 
@@ -289,10 +299,6 @@ table_insert_before DISTS sfml '
 table_line_append DIST_ARGS openal '-DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF -DALSOFT_TESTS=OFF'
 
 table_line_replace DIST_ARGS mp3lame "LDFLAGS='\$LDFLAGS \$BUILD_ROOT/root/lib/libcatgets.a'"
-
-table_line_replace DIST_CONFIGURE_TYPES     zlib-target cmake
-table_line_append  DIST_ARGS                zlib-target -DUNIX=1
-table_line_remove  DIST_CONFIGURE_OVERRIDES zlib-target
 
 table_line_append DIST_POST_BUILD libgsm ":; \
     rm -f \$BUILD_ROOT/root/lib/libgsm.dll.a \$BUILD_ROOT/root/bin/libgsm.dll; \
