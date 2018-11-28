@@ -3612,7 +3612,7 @@ void remoteSendStatus()
     s += 12;
     CPUUpdateCPSR();
     v = reg[16].I;
-    sprintf(s, "10:%02x%02x%02x%02x;", (v & 255),
+    sprintf(s, "19:%02x%02x%02x%02x;", (v & 255),
         (v >> 8) & 255,
         (v >> 16) & 255,
         (v >> 24) & 255);
