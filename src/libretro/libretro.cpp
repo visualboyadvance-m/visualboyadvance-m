@@ -409,6 +409,8 @@ void retro_set_environment(retro_environment_t cb)
       { "vbam_soundfiltering", "Sound Filtering; 5|6|7|8|9|10|0|1|2|3|4" },
       { "vbam_gbHardware", "(GB) Emulated Hardware; Automatic|Game Boy Color|Super Game Boy|Game Boy|Game Boy Advance|Super Game Boy 2" },
       { "vbam_showborders", "(GB) Show Borders; disabled|enabled|auto" },
+      { "vbam_turboenable", "Enable Turbo Buttons; disabled|enabled" },
+      { "vbam_turbodelay", "Turbo Delay (in frames); 3|4|5|6|7|8|9|10|11|12|13|14|15|1|2" },
       { "vbam_layer_1", "Show layer 1; enabled|disabled" },
       { "vbam_layer_2", "Show layer 2; enabled|disabled" },
       { "vbam_layer_3", "Show layer 3; enabled|disabled" },
@@ -887,6 +889,27 @@ static const unsigned binds[4][MAX_BUTTONS] = {
     }
 };
 
+#define TURBO_BUTTONS 2
+static bool turbo_enable = false;
+static int turbo_delay = 3;
+static int turbo_delay_counter[TURBO_BUTTONS] = {0};
+
+static const unsigned turbo_binds[4][TURBO_BUTTONS] = {
+    { 0, 0 }, // placeholder for no input
+    {
+        RETRO_DEVICE_ID_JOYPAD_X,
+        RETRO_DEVICE_ID_JOYPAD_Y
+    },
+    {
+        RETRO_DEVICE_ID_JOYPAD_A,
+        RETRO_DEVICE_ID_JOYPAD_X
+    },
+    {
+        RETRO_DEVICE_ID_JOYPAD_Y,
+        RETRO_DEVICE_ID_JOYPAD_X
+    }
+};
+
 static void systemGbBorderOff(void);
 static void systemUpdateSolarSensor(int level);
 static uint8_t sensorDarkness = 0xE8;
@@ -1015,6 +1038,21 @@ static void update_variables(void)
         else if (strcmp(var.value, "Super Game Boy 2") == 0)
             gbEmulatorType = 5;
     }
+
+    var.key = "vbam_turboenable";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        bool val = !strcmp(var.value, "enabled");
+        turbo_enable = val;
+    }
+
+    var.key = "vbam_turbodelay";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        turbo_delay = atoi(var.value);
+    }
 }
 
 static unsigned has_frame;
@@ -1079,8 +1117,8 @@ void retro_cheat_reset(void)
 {
     cheatsEnabled = 1;
     if (type == IMAGE_GBA)
-		cheatsDeleteAll(false);
-	else if (type == IMAGE_GB)
+        cheatsDeleteAll(false);
+    else if (type == IMAGE_GB)
         gbCheatRemoveAll();
 }
 
@@ -1193,6 +1231,8 @@ static void update_input_descriptors(void)
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "L" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "R" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "Turbo B" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,     "Turbo A" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,    "Solar Sensor (Darker)" },
@@ -1210,6 +1250,8 @@ static void update_input_descriptors(void)
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "A" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "L" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "R" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,     "Turbo B" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "Turbo A" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,    "Solar Sensor (Darker)" },
@@ -1227,6 +1269,8 @@ static void update_input_descriptors(void)
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "A" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "L" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "R" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,     "Turbo B" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "Turbo A" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,    "Solar Sensor (Darker)" },
@@ -1346,10 +1390,10 @@ bool retro_load_game(const struct retro_game_info *game)
       desc[5].len   = 0x00a0;
 
       // http://gameboy.mongenel.com/dmg/asmmemmap.html
-      // $4000-$7FFF 	Cartridge ROM - Switchable Banks 1-xx
-      // $0150-$3FFF 	Cartridge ROM - Bank 0 (fixed)
-      // $0100-$014F 	Cartridge Header Area
-      // $0000-$00FF 	Restart and Interrupt Vectors
+      // $4000-$7FFF    Cartridge ROM - Switchable Banks 1-xx
+      // $0150-$3FFF    Cartridge ROM - Bank 0 (fixed)
+      // $0100-$014F    Cartridge Header Area
+      // $0000-$00FF    Restart and Interrupt Vectors
       desc[6].ptr   = gbMemoryMap[0x00];
       desc[6].start = 0x0000;
       desc[6].len   = 0x4000;
@@ -1498,9 +1542,27 @@ uint32_t systemReadJoypad(int which)
 
     uint32_t J = 0;
 
-    if (retropad_layout)
-        for (unsigned i = 0; i < MAX_BUTTONS; i++)
+    if (retropad_layout) {
+        int i;
+        for (i = 0; i < MAX_BUTTONS; i++)
             J |= input_cb(which, RETRO_DEVICE_JOYPAD, 0, binds[retropad_layout][i]) << i;
+
+        if (turbo_enable) {
+            /* Handle Turbo A & B buttons */
+            for (i = 0; i < TURBO_BUTTONS; i++) {
+                if (input_cb(which, RETRO_DEVICE_JOYPAD, 0, turbo_binds[retropad_layout][i])) {
+                    if (!turbo_delay_counter[i])
+                        J |= 1 << i;
+                    turbo_delay_counter[i]++;
+                    if (turbo_delay_counter[i] > turbo_delay)
+                        /* Reset the toggle if delay value is reached */
+                        turbo_delay_counter[i] = 0;
+                } else
+                    /* If the button is not pressed, just reset the toggle */
+                    turbo_delay_counter[i] = 0;
+            }
+        }
+    }
 
     // Do not allow opposing directions
     if ((J & 0x30) == 0x30)
