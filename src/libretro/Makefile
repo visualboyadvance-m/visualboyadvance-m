@@ -26,7 +26,7 @@ endif
 endif
 endif
 
-TARGET_NAME = vbam
+TARGET_NAME = vbam_plus
 GIT_VERSION := " $(shell git rev-parse --short HEAD || echo unknown)"
 ifneq ($(GIT_VERSION)," unknown")
 	CXXFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"

@@ -451,7 +451,7 @@ void retro_get_system_info(struct retro_system_info *info)
 #else
    info->library_version = "2.1.0-GIT";
 #endif
-   info->library_name = "VBA-M";
+   info->library_name = "VBA-M Plus";
    info->block_extract = false;
 }
 
