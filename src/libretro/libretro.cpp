@@ -1,4 +1,3 @@
-#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,8 +34,6 @@
 #define RETRO_DEVICE_GBA             RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 0)
 #define RETRO_DEVICE_GBA_ALT1        RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 1)
 #define RETRO_DEVICE_GBA_ALT2        RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 2)
-
-#define ISHEXDEC ((codeLine[cursor]>='0') && (codeLine[cursor]<='9')) || ((codeLine[cursor]>='a') && (codeLine[cursor]<='f')) || ((codeLine[cursor]>='A') && (codeLine[cursor]<='F'))
 
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
@@ -1122,102 +1119,76 @@ void retro_cheat_reset(void)
         gbCheatRemoveAll();
 }
 
+#define ISHEXDEC \
+    ((code[cursor] >= '0') && (code[cursor] <= '9')) || \
+    ((code[cursor] >= 'a') && (code[cursor] <= 'f')) || \
+    ((code[cursor] >= 'A') && (code[cursor] <= 'F')) || \
+    (code[cursor] == '-') \
+
 void retro_cheat_set(unsigned index, bool enabled, const char* code)
 {
-    /*
-    const char *begin, *c;
+    // 2018-11-30 - retrowertz
+    // added support GB/GBC multiline 6/9 digit Game Genie codes and Game Shark
 
-    begin = c = code;
+    char name[128] = {0};
+    unsigned cursor = 0;
+    char *codeLine = NULL;
+    int codeLineSize = strlen(code) + 5;
+    int codePos = 0;
+    int i = 0;
 
-   if (!code)
-      return;
-
-   do {
-      if (*c != '+' && *c != '\0')
-         continue;
-
-      char buf[32] = {0};
-      int len = c - begin;
-      int i;
-
-      // make sure it's using uppercase letters
-      for (i = 0; i < len; i++)
-         buf[i] = toupper(begin[i]);
-      buf[i] = 0;
-
-      begin = ++c;
-
-      if (len == 16)
-         cheatsAddGSACode(buf, "", false);
-      else {
-         char *space = strrchr(buf, ' ');
-         if (space != NULL) {
-            if ((buf + len - space - 1) == 4)
-               cheatsAddCBACode(buf, "");
-            else {
-               memmove(space, space+1, strlen(space+1)+1);
-               cheatsAddGSACode(buf, "", true);
-            }
-         } else if (log_cb)
-            log_cb(RETRO_LOG_ERROR, "[VBA] Invalid cheat code '%s'\n", buf);
-      }
-
-   } while (*c++);
-   */
-   
-    std::string codeLine = code;
-    std::string name = "cheat_" + index;
-    int matchLength = 0;
-    std::vector<std::string> codeParts;
-    int cursor;
-   
-    if (type == IMAGE_GBA) {
-        //Break the code into Parts
-        for (cursor = 0;; cursor++) {
-            if  (ISHEXDEC)
-                matchLength++;
-            else {
-                if (matchLength) {
-                    if (matchLength > 8) {
-                    codeParts.push_back(codeLine.substr(cursor - matchLength, 8));
-                    codeParts.push_back(codeLine.substr(cursor - matchLength + 8, matchLength - 8));
-                    } else
-                        codeParts.push_back(codeLine.substr(cursor - matchLength, matchLength));
-                    matchLength = 0;
+    codeLine = (char *)calloc(codeLineSize, sizeof(char));
+    sprintf(name, "cheat_%d", index);
+    for (cursor = 0;; cursor++) {
+        if (ISHEXDEC) {
+            codeLine[codePos++] = toupper(code[cursor]);
+        } else {
+            switch (type) {
+            case IMAGE_GB:
+                if (codePos >= 7) {
+                    if (codePos == 7 || codePos == 11) {
+                        codeLine[codePos] = '\0';
+                        if (gbAddGgCheat(codeLine, name))
+                            log("Cheat code added: '%s'\n", codeLine);
+                    } else if (codePos == 8) {
+                        codeLine[codePos] = '\0';
+                        if (gbAddGsCheat(codeLine, name))
+                            log("Cheat code added: '%s'\n", codeLine);
+                    } else {
+                        codeLine[codePos] = '\0';
+                        log("Invalid cheat code '%s'\n", codeLine);
+                    }
+                    codePos = 0;
+                    memset(codeLine, 0, codeLineSize);
                 }
+                break;
+            case IMAGE_GBA:
+                if (codePos >= 12) {
+                    if (codePos == 12 ) {
+                        for (i = 0; i < 4 ; i++)
+                            codeLine[codePos - i] = codeLine[(codePos - i) - 1];
+                        codeLine[8] = ' ';
+                        codeLine[13] = '\0';
+                        cheatsAddCBACode(codeLine, name);
+                        log("Cheat code added: '%s'\n", codeLine);
+                    } else if (codePos == 16) {
+                        codeLine[16] = '\0';
+                        cheatsAddGSACode(codeLine, name, true);
+                        log("Cheat code added: '%s'\n", codeLine);
+                    } else {
+                        codeLine[codePos] = '\0';
+                        log("Invalid cheat code '%s'\n", codeLine);
+                    }
+                    codePos = 0;
+                    memset(codeLine, 0, codeLineSize);
+                }
+                break;
             }
-            if (!codeLine[cursor])
+            if (!code[cursor])
                 break;
         }
-
-        //Add to core
-        for (cursor = 0; cursor < codeParts.size(); cursor += 2) {
-            std::string codeString;
-            codeString += codeParts[cursor];
-
-            if (codeParts[cursor + 1].length() == 8) {
-                codeString += codeParts[cursor + 1];
-                cheatsAddGSACode(codeString.c_str(), name.c_str(), true);
-            } else if (codeParts[cursor + 1].length() == 4) {
-                codeString += " ";
-                codeString += codeParts[cursor + 1];
-                cheatsAddCBACode(codeString.c_str(), name.c_str());
-            } else {
-                codeString += " ";
-                codeString += codeParts[cursor + 1];
-                log_cb(RETRO_LOG_ERROR, "Invalid cheat code '%s'\n", codeString.c_str());
-            }
-            log_cb(RETRO_LOG_INFO, "Cheat code added: '%s'\n", codeString.c_str());
-        }
-    } else if (type == IMAGE_GB) {
-        if (codeLine.find("-") != std::string::npos) {
-            if (gbAddGgCheat(code, ""))
-                log_cb(RETRO_LOG_INFO, "Cheat code added: '%s'\n", codeLine.c_str());
-        } else {
-            if (gbAddGsCheat(code, ""))
-                log_cb(RETRO_LOG_INFO, "Cheat code added: '%s'\n", codeLine.c_str());
-        }
     }
+    free(codeLine);
 }
 
 static void update_input_descriptors(void)
