@@ -13,7 +13,7 @@ export PERL_MAKE="${PERL_MAKE:-make}"
 
 BUILD_ENV=$BUILD_ENV$(cat <<EOF
 
-export BUILD_ROOT="\$BUILD_ROOT"
+export BUILD_ROOT="\${BUILD_ROOT:-$BUILD_ROOT}"
 
 export CC="\${CC:-gcc}"
 export CXX="\${CXX:-g++}"

@@ -107,8 +107,6 @@ DIST_TAR_ARGS="
 . "${0%/*}/../builder/mingw.sh"
 
 host_env() {
-    ln -sf "$BUILD_ROOT/host" "$BUILD_ROOT/root"
-
     cat <<EOF
 unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
 
@@ -120,11 +118,10 @@ $BUILD_ENV
 EOF
 
     cd "$OPWD"
+    host_env_base 2>/dev/null || :
 }
 
 target_env() {
-    ln -sf "$BUILD_ROOT/target" "$BUILD_ROOT/root"
-
     cat <<EOF
 unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
 
@@ -136,6 +133,7 @@ $BUILD_ENV
 EOF
 
     cd "$OPWD"
+    target_env_base 2>/dev/null || :
 }
 
 table_line_append DIST_PRE_BUILD c2man ":; \
