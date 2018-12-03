@@ -32,11 +32,15 @@ case "$MSYSTEM" in
         export HOST_SYSTEM=i686-w64-mingw32
         sys_base=/mingw32
         export BUILD_ROOT="$HOME/vbam-build-msys2-i686"
+        target_bits=32
+        target_cpu=i686
         ;;
     MINGW64)
         export HOST_SYSTEM=x86_64-w64-mingw32
         sys_base=/mingw64
         export BUILD_ROOT="$HOME/vbam-build-msys2-x86_64"
+        target_bits=64
+        target_cpu=x86_64
         ;;
     MSYS)
         exec "$0" "$@" -64

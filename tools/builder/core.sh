@@ -1335,6 +1335,10 @@ build_dist() {
     dist_patch "$current_dist"
     dist_pre_build "$current_dist"
 
+    ORIG_CPPFLAGS=$CPPFLAGS
+    ORIG_CFLAGS=$CFLAGS
+    ORIG_CXXFLAGS=$CXXFLAGS
+    ORIG_OBJCXXFLAGS=$OBJCXXFLAGS
     ORIG_LDFLAGS=$LDFLAGS
     ORIG_LIBS=$LIBS
 
@@ -1344,6 +1348,10 @@ build_dist() {
         export LDFLAGS="$CXXFLAGS $LDFLAGS"
     fi
 
+    export CPPFLAGS="$LDFLAGS $(eval puts "$(dist_extra_cppflags "$current_dist")")"
+    export CFLAGS="$LDFLAGS $(eval puts "$(dist_extra_cflags "$current_dist")")"
+    export CXXFLAGS="$LDFLAGS $(eval puts "$(dist_extra_cxxflags "$current_dist")")"
+    export OBJCXXFLAGS="$LDFLAGS $(eval puts "$(dist_extra_objcxxflags "$current_dist")")"
     export LDFLAGS="$LDFLAGS $(eval puts "$(dist_extra_ldflags "$current_dist")")"
     export LIBS="$LIBS $(eval puts "$(dist_extra_libs "$current_dist")")"
 
@@ -1605,6 +1613,10 @@ build_dist() {
         fi
     fi
 
+    export CPPFLAGS="$ORIG_CPPFLAGS"
+    export CFLAGS="$ORIG_CFLAGS"
+    export CXXFLAGS="$ORIG_CXXFLAGS"
+    export OBJCXXFLAGS="$ORIG_OBJCXXFLAGS"
     export LDFLAGS="$ORIG_LDFLAGS"
     export LIBS="$ORIG_LIBS"
 
@@ -2197,6 +2209,34 @@ dist_make_install_args() {
     [ -n "$current_dist" ] || die 'dist_make_install_args: dist name required'
 
     puts "$(table_line DIST_MAKE_INSTALL_ARGS $current_dist)" || :
+}
+
+dist_extra_cppflags() {
+    current_dist=$1
+    [ -n "$current_dist" ] || die 'dist_extra_cppflags: dist name required'
+
+    puts "$(table_line DIST_EXTRA_CPPFLAGS $current_dist)" || :
+}
+
+dist_extra_cflags() {
+    current_dist=$1
+    [ -n "$current_dist" ] || die 'dist_extra_cflags: dist name required'
+
+    puts "$(table_line DIST_EXTRA_CFLAGS $current_dist)" || :
+}
+
+dist_extra_cxxflags() {
+    current_dist=$1
+    [ -n "$current_dist" ] || die 'dist_extra_cxxflags: dist name required'
+
+    puts "$(table_line DIST_EXTRA_CXXFLAGS $current_dist)" || :
+}
+
+dist_extra_objcxxflags() {
+    current_dist=$1
+    [ -n "$current_dist" ] || die 'dist_extra_objcxxflags: dist name required'
+
+    puts "$(table_line DIST_EXTRA_OBJCXXFLAGS $current_dist)" || :
 }
 
 dist_extra_ldflags() {

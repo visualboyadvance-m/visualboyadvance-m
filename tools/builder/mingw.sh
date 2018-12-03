@@ -256,6 +256,12 @@ table_insert_after DISTS cmake "dlfcn https://github.com/dlfcn-win32/dlfcn-win32
 
 table_line_replace DIST_CONFIGURE_TYPES dlfcn cmake
 
+if [ "$target_bits" -eq 32 ]; then
+    # this is necessary for a linkable libffi on i686 for whatever reason
+    # see: https://bugzilla.mozilla.org/show_bug.cgi?id=1336569
+    table_line_append DIST_EXTRA_CPPFLAGS libffi -DSYMBOL_UNDERSCORE
+fi
+
 libicu=libicu
 
 if [ -n "$(table_line DISTS libicu-target || :)" ]; then
