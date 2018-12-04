@@ -1348,10 +1348,10 @@ build_dist() {
         export LDFLAGS="$CXXFLAGS $LDFLAGS"
     fi
 
-    export CPPFLAGS="$LDFLAGS $(eval puts "$(dist_extra_cppflags "$current_dist")")"
-    export CFLAGS="$LDFLAGS $(eval puts "$(dist_extra_cflags "$current_dist")")"
-    export CXXFLAGS="$LDFLAGS $(eval puts "$(dist_extra_cxxflags "$current_dist")")"
-    export OBJCXXFLAGS="$LDFLAGS $(eval puts "$(dist_extra_objcxxflags "$current_dist")")"
+    export CPPFLAGS="$CPPFLAGS $(eval puts "$(dist_extra_cppflags "$current_dist")")"
+    export CFLAGS="$CFLAGS $(eval puts "$(dist_extra_cflags "$current_dist")")"
+    export CXXFLAGS="$CXXFLAGS $(eval puts "$(dist_extra_cxxflags "$current_dist")")"
+    export OBJCXXFLAGS="$OBJCXXFLAGS $(eval puts "$(dist_extra_objcxxflags "$current_dist")")"
     export LDFLAGS="$LDFLAGS $(eval puts "$(dist_extra_ldflags "$current_dist")")"
     export LIBS="$LIBS $(eval puts "$(dist_extra_libs "$current_dist")")"
 
