@@ -255,6 +255,7 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     glib            autoreconf
     graphviz        autoreconf
     docbook2x       autoreconf
+    libvorbis       autoreconf
 "
 
 DIST_RELOCATION_TYPES="$DIST_RELOCATION_TYPES
@@ -292,6 +293,7 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
                     ' Makefile;
     libx265         cd source;
     libsoxr         rm -rf tests; mkdir tests; touch tests/CMakeLists.txt;
+    libvorbis       rm -f autogen.sh;
     XML-SAX         sed -i.bak 's/-MXML::SAX/-Mblib -MXML::SAX/' Makefile.PL;
     docbook2x       sed -i.bak 's/^\\( *SUBDIRS *= *.*\\)doc\\(.*\\)\$/\1\2/'           Makefile.am; \
                     sed -i.bak 's/^\\( *SUBDIRS *= *.*\\)documentation\\(.*\\)\$/\1\2/' xslt/Makefile.am;
