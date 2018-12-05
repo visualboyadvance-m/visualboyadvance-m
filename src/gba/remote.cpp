@@ -3612,7 +3612,7 @@ void remoteSendStatus()
     s += 12;
     CPUUpdateCPSR();
     v = reg[16].I;
-    sprintf(s, "10:%02x%02x%02x%02x;", (v & 255),
+    sprintf(s, "19:%02x%02x%02x%02x;", (v & 255),
         (v >> 8) & 255,
         (v >> 16) & 255,
         (v >> 24) & 255);
@@ -3700,19 +3700,26 @@ void remoteMemoryRead(char* p)
 void remoteQuery(char* p)
 {
     if (!strncmp(p, "fThreadInfo", 11)) {
-        remotePutPacket("m-1");
+        remotePutPacket("m1");
     } else if (!strncmp(p, "sThreadInfo", 11)) {
         remotePutPacket("l");
     } else if (!strncmp(p, "Supported", 9)) {
         remotePutPacket("PacketSize=1000");
     } else if (!strncmp(p, "HostInfo", 8)) {
         remotePutPacket("cputype:12;cpusubtype:5;ostype:unknown;vendor:nintendo;endian:little;ptrsize:4;");
+    } else if (!strncmp(p, "C", 1)) {
+        remotePutPacket("QC1");
+    } else if (!strncmp(p, "Attached", 8)) {
+        remotePutPacket("1");
+    } else if (!strncmp(p, "Symbol", 6)) {
+        remotePutPacket("OK");
     } else if (!strncmp(p, "Rcmd,", 5)) {
         p += 5;
         std::string cmd = HexToString(p);
         dbgExecute(cmd);
         remotePutPacket("OK");
     } else {
+        fprintf(stderr, "Unknown packet %s\n", --p);
         remotePutPacket("");
     }
 }

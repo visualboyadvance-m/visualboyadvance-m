@@ -1968,7 +1968,6 @@ void MainFrame::GDBBreak()
 
             if (connected) {
                 remotePort = gdbPort;
-                debugger = true;
                 emulating = 1;
                 dbgMain = remoteStubMain;
                 dbgSignal = remoteStubSignal;
@@ -1976,6 +1975,7 @@ void MainFrame::GDBBreak()
                 cmd_enable &= ~(CMDEN_NGDB_ANY | CMDEN_NGDB_GBA);
                 cmd_enable |= CMDEN_GDB;
                 enable_menus();
+                debugger = true;
             } else {
                 remoteCleanUp();
             }
@@ -2004,6 +2004,7 @@ EVT_HANDLER_MASK(DebugGDBDisconnect, "Disconnect GDB", CMDEN_GDB)
     dbgMain = NULL;
     dbgSignal = NULL;
     dbgOutput = NULL;
+    remotePort = 0;
     remoteCleanUp();
     cmd_enable &= ~CMDEN_GDB;
     cmd_enable |= CMDEN_NGDB_GBA | CMDEN_NGDB_ANY;

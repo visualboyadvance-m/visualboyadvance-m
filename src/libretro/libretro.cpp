@@ -1,4 +1,3 @@
-#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,8 +34,6 @@
 #define RETRO_DEVICE_GBA             RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 0)
 #define RETRO_DEVICE_GBA_ALT1        RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 1)
 #define RETRO_DEVICE_GBA_ALT2        RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 2)
-
-#define ISHEXDEC ((codeLine[cursor]>='0') && (codeLine[cursor]<='9')) || ((codeLine[cursor]>='a') && (codeLine[cursor]<='f')) || ((codeLine[cursor]>='A') && (codeLine[cursor]<='F'))
 
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
@@ -409,6 +406,8 @@ void retro_set_environment(retro_environment_t cb)
       { "vbam_soundfiltering", "Sound Filtering; 5|6|7|8|9|10|0|1|2|3|4" },
       { "vbam_gbHardware", "(GB) Emulated Hardware; Automatic|Game Boy Color|Super Game Boy|Game Boy|Game Boy Advance|Super Game Boy 2" },
       { "vbam_showborders", "(GB) Show Borders; disabled|enabled|auto" },
+      { "vbam_turboenable", "Enable Turbo Buttons; disabled|enabled" },
+      { "vbam_turbodelay", "Turbo Delay (in frames); 3|4|5|6|7|8|9|10|11|12|13|14|15|1|2" },
       { "vbam_layer_1", "Show layer 1; enabled|disabled" },
       { "vbam_layer_2", "Show layer 2; enabled|disabled" },
       { "vbam_layer_3", "Show layer 3; enabled|disabled" },
@@ -887,6 +886,27 @@ static const unsigned binds[4][MAX_BUTTONS] = {
     }
 };
 
+#define TURBO_BUTTONS 2
+static bool turbo_enable = false;
+static int turbo_delay = 3;
+static int turbo_delay_counter[TURBO_BUTTONS] = {0};
+
+static const unsigned turbo_binds[4][TURBO_BUTTONS] = {
+    { 0, 0 }, // placeholder for no input
+    {
+        RETRO_DEVICE_ID_JOYPAD_X,
+        RETRO_DEVICE_ID_JOYPAD_Y
+    },
+    {
+        RETRO_DEVICE_ID_JOYPAD_A,
+        RETRO_DEVICE_ID_JOYPAD_X
+    },
+    {
+        RETRO_DEVICE_ID_JOYPAD_Y,
+        RETRO_DEVICE_ID_JOYPAD_X
+    }
+};
+
 static void systemGbBorderOff(void);
 static void systemUpdateSolarSensor(int level);
 static uint8_t sensorDarkness = 0xE8;
@@ -1015,6 +1035,21 @@ static void update_variables(void)
         else if (strcmp(var.value, "Super Game Boy 2") == 0)
             gbEmulatorType = 5;
     }
+
+    var.key = "vbam_turboenable";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        bool val = !strcmp(var.value, "enabled");
+        turbo_enable = val;
+    }
+
+    var.key = "vbam_turbodelay";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        turbo_delay = atoi(var.value);
+    }
 }
 
 static unsigned has_frame;
@@ -1079,107 +1114,81 @@ void retro_cheat_reset(void)
 {
     cheatsEnabled = 1;
     if (type == IMAGE_GBA)
-		cheatsDeleteAll(false);
-	else if (type == IMAGE_GB)
+        cheatsDeleteAll(false);
+    else if (type == IMAGE_GB)
         gbCheatRemoveAll();
 }
 
+#define ISHEXDEC \
+    ((code[cursor] >= '0') && (code[cursor] <= '9')) || \
+    ((code[cursor] >= 'a') && (code[cursor] <= 'f')) || \
+    ((code[cursor] >= 'A') && (code[cursor] <= 'F')) || \
+    (code[cursor] == '-') \
+
 void retro_cheat_set(unsigned index, bool enabled, const char* code)
 {
-    /*
-    const char *begin, *c;
+    // 2018-11-30 - retrowertz
+    // added support GB/GBC multiline 6/9 digit Game Genie codes and Game Shark
 
-    begin = c = code;
+    char name[128] = {0};
+    unsigned cursor = 0;
+    char *codeLine = NULL;
+    int codeLineSize = strlen(code) + 5;
+    int codePos = 0;
+    int i = 0;
 
-   if (!code)
-      return;
-
-   do {
-      if (*c != '+' && *c != '\0')
-         continue;
-
-      char buf[32] = {0};
-      int len = c - begin;
-      int i;
-
-      // make sure it's using uppercase letters
-      for (i = 0; i < len; i++)
-         buf[i] = toupper(begin[i]);
-      buf[i] = 0;
-
-      begin = ++c;
-
-      if (len == 16)
-         cheatsAddGSACode(buf, "", false);
-      else {
-         char *space = strrchr(buf, ' ');
-         if (space != NULL) {
-            if ((buf + len - space - 1) == 4)
-               cheatsAddCBACode(buf, "");
-            else {
-               memmove(space, space+1, strlen(space+1)+1);
-               cheatsAddGSACode(buf, "", true);
-            }
-         } else if (log_cb)
-            log_cb(RETRO_LOG_ERROR, "[VBA] Invalid cheat code '%s'\n", buf);
-      }
-
-   } while (*c++);
-   */
-   
-    std::string codeLine = code;
-    std::string name = "cheat_" + index;
-    int matchLength = 0;
-    std::vector<std::string> codeParts;
-    int cursor;
-   
-    if (type == IMAGE_GBA) {
-        //Break the code into Parts
-        for (cursor = 0;; cursor++) {
-            if  (ISHEXDEC)
-                matchLength++;
-            else {
-                if (matchLength) {
-                    if (matchLength > 8) {
-                    codeParts.push_back(codeLine.substr(cursor - matchLength, 8));
-                    codeParts.push_back(codeLine.substr(cursor - matchLength + 8, matchLength - 8));
-                    } else
-                        codeParts.push_back(codeLine.substr(cursor - matchLength, matchLength));
-                    matchLength = 0;
+    codeLine = (char *)calloc(codeLineSize, sizeof(char));
+    sprintf(name, "cheat_%d", index);
+    for (cursor = 0;; cursor++) {
+        if (ISHEXDEC) {
+            codeLine[codePos++] = toupper(code[cursor]);
+        } else {
+            switch (type) {
+            case IMAGE_GB:
+                if (codePos >= 7) {
+                    if (codePos == 7 || codePos == 11) {
+                        codeLine[codePos] = '\0';
+                        if (gbAddGgCheat(codeLine, name))
+                            log("Cheat code added: '%s'\n", codeLine);
+                    } else if (codePos == 8) {
+                        codeLine[codePos] = '\0';
+                        if (gbAddGsCheat(codeLine, name))
+                            log("Cheat code added: '%s'\n", codeLine);
+                    } else {
+                        codeLine[codePos] = '\0';
+                        log("Invalid cheat code '%s'\n", codeLine);
+                    }
+                    codePos = 0;
+                    memset(codeLine, 0, codeLineSize);
                 }
+                break;
+            case IMAGE_GBA:
+                if (codePos >= 12) {
+                    if (codePos == 12 ) {
+                        for (i = 0; i < 4 ; i++)
+                            codeLine[codePos - i] = codeLine[(codePos - i) - 1];
+                        codeLine[8] = ' ';
+                        codeLine[13] = '\0';
+                        cheatsAddCBACode(codeLine, name);
+                        log("Cheat code added: '%s'\n", codeLine);
+                    } else if (codePos == 16) {
+                        codeLine[16] = '\0';
+                        cheatsAddGSACode(codeLine, name, true);
+                        log("Cheat code added: '%s'\n", codeLine);
+                    } else {
+                        codeLine[codePos] = '\0';
+                        log("Invalid cheat code '%s'\n", codeLine);
+                    }
+                    codePos = 0;
+                    memset(codeLine, 0, codeLineSize);
+                }
+                break;
             }
-            if (!codeLine[cursor])
+            if (!code[cursor])
                 break;
         }
-
-        //Add to core
-        for (cursor = 0; cursor < codeParts.size(); cursor += 2) {
-            std::string codeString;
-            codeString += codeParts[cursor];
-
-            if (codeParts[cursor + 1].length() == 8) {
-                codeString += codeParts[cursor + 1];
-                cheatsAddGSACode(codeString.c_str(), name.c_str(), true);
-            } else if (codeParts[cursor + 1].length() == 4) {
-                codeString += " ";
-                codeString += codeParts[cursor + 1];
-                cheatsAddCBACode(codeString.c_str(), name.c_str());
-            } else {
-                codeString += " ";
-                codeString += codeParts[cursor + 1];
-                log_cb(RETRO_LOG_ERROR, "Invalid cheat code '%s'\n", codeString.c_str());
-            }
-            log_cb(RETRO_LOG_INFO, "Cheat code added: '%s'\n", codeString.c_str());
-        }
-    } else if (type == IMAGE_GB) {
-        if (codeLine.find("-") != std::string::npos) {
-            if (gbAddGgCheat(code, ""))
-                log_cb(RETRO_LOG_INFO, "Cheat code added: '%s'\n", codeLine.c_str());
-        } else {
-            if (gbAddGsCheat(code, ""))
-                log_cb(RETRO_LOG_INFO, "Cheat code added: '%s'\n", codeLine.c_str());
-        }
     }
+    free(codeLine);
 }
 
 static void update_input_descriptors(void)
@@ -1193,6 +1202,8 @@ static void update_input_descriptors(void)
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "L" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "R" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "Turbo B" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,     "Turbo A" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,    "Solar Sensor (Darker)" },
@@ -1210,6 +1221,8 @@ static void update_input_descriptors(void)
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "A" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "L" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "R" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,     "Turbo B" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "Turbo A" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,    "Solar Sensor (Darker)" },
@@ -1227,6 +1240,8 @@ static void update_input_descriptors(void)
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "A" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "L" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "R" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,     "Turbo B" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "Turbo A" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,    "Solar Sensor (Darker)" },
@@ -1346,10 +1361,10 @@ bool retro_load_game(const struct retro_game_info *game)
       desc[5].len   = 0x00a0;
 
       // http://gameboy.mongenel.com/dmg/asmmemmap.html
-      // $4000-$7FFF 	Cartridge ROM - Switchable Banks 1-xx
-      // $0150-$3FFF 	Cartridge ROM - Bank 0 (fixed)
-      // $0100-$014F 	Cartridge Header Area
-      // $0000-$00FF 	Restart and Interrupt Vectors
+      // $4000-$7FFF    Cartridge ROM - Switchable Banks 1-xx
+      // $0150-$3FFF    Cartridge ROM - Bank 0 (fixed)
+      // $0100-$014F    Cartridge Header Area
+      // $0000-$00FF    Restart and Interrupt Vectors
       desc[6].ptr   = gbMemoryMap[0x00];
       desc[6].start = 0x0000;
       desc[6].len   = 0x4000;
@@ -1498,9 +1513,27 @@ uint32_t systemReadJoypad(int which)
 
     uint32_t J = 0;
 
-    if (retropad_layout)
-        for (unsigned i = 0; i < MAX_BUTTONS; i++)
+    if (retropad_layout) {
+        int i;
+        for (i = 0; i < MAX_BUTTONS; i++)
             J |= input_cb(which, RETRO_DEVICE_JOYPAD, 0, binds[retropad_layout][i]) << i;
+
+        if (turbo_enable) {
+            /* Handle Turbo A & B buttons */
+            for (i = 0; i < TURBO_BUTTONS; i++) {
+                if (input_cb(which, RETRO_DEVICE_JOYPAD, 0, turbo_binds[retropad_layout][i])) {
+                    if (!turbo_delay_counter[i])
+                        J |= 1 << i;
+                    turbo_delay_counter[i]++;
+                    if (turbo_delay_counter[i] > turbo_delay)
+                        /* Reset the toggle if delay value is reached */
+                        turbo_delay_counter[i] = 0;
+                } else
+                    /* If the button is not pressed, just reset the toggle */
+                    turbo_delay_counter[i] = 0;
+            }
+        }
+    }
 
     // Do not allow opposing directions
     if ((J & 0x30) == 0x30)

@@ -20,6 +20,8 @@ Which games are affected by the issue (please state if GBA or GB game):
 
 Which games, if any, are NOT affected by the issue (please state if GBA or GB game):
 
+Include screenshots of ROM Information (File > ROM Information):
+
 ### Option details
 
 Video driver (simple, opengl):

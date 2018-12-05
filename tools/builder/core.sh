@@ -13,7 +13,7 @@ export PERL_MAKE="${PERL_MAKE:-make}"
 
 BUILD_ENV=$BUILD_ENV$(cat <<EOF
 
-export BUILD_ROOT="\$BUILD_ROOT"
+export BUILD_ROOT="\${BUILD_ROOT:-$BUILD_ROOT}"
 
 export CC="\${CC:-gcc}"
 export CXX="\${CXX:-g++}"
@@ -255,6 +255,7 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     glib            autoreconf
     graphviz        autoreconf
     docbook2x       autoreconf
+    libvorbis       autoreconf
 "
 
 DIST_RELOCATION_TYPES="$DIST_RELOCATION_TYPES
@@ -292,6 +293,7 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
                     ' Makefile;
     libx265         cd source;
     libsoxr         rm -rf tests; mkdir tests; touch tests/CMakeLists.txt;
+    libvorbis       rm -f autogen.sh;
     XML-SAX         sed -i.bak 's/-MXML::SAX/-Mblib -MXML::SAX/' Makefile.PL;
     docbook2x       sed -i.bak 's/^\\( *SUBDIRS *= *.*\\)doc\\(.*\\)\$/\1\2/'           Makefile.am; \
                     sed -i.bak 's/^\\( *SUBDIRS *= *.*\\)documentation\\(.*\\)\$/\1\2/' xslt/Makefile.am;
@@ -1335,6 +1337,10 @@ build_dist() {
     dist_patch "$current_dist"
     dist_pre_build "$current_dist"
 
+    ORIG_CPPFLAGS=$CPPFLAGS
+    ORIG_CFLAGS=$CFLAGS
+    ORIG_CXXFLAGS=$CXXFLAGS
+    ORIG_OBJCXXFLAGS=$OBJCXXFLAGS
     ORIG_LDFLAGS=$LDFLAGS
     ORIG_LIBS=$LIBS
 
@@ -1344,6 +1350,10 @@ build_dist() {
         export LDFLAGS="$CXXFLAGS $LDFLAGS"
     fi
 
+    export CPPFLAGS="$CPPFLAGS $(eval puts "$(dist_extra_cppflags "$current_dist")")"
+    export CFLAGS="$CFLAGS $(eval puts "$(dist_extra_cflags "$current_dist")")"
+    export CXXFLAGS="$CXXFLAGS $(eval puts "$(dist_extra_cxxflags "$current_dist")")"
+    export OBJCXXFLAGS="$OBJCXXFLAGS $(eval puts "$(dist_extra_objcxxflags "$current_dist")")"
     export LDFLAGS="$LDFLAGS $(eval puts "$(dist_extra_ldflags "$current_dist")")"
     export LIBS="$LIBS $(eval puts "$(dist_extra_libs "$current_dist")")"
 
@@ -1605,6 +1615,10 @@ build_dist() {
         fi
     fi
 
+    export CPPFLAGS="$ORIG_CPPFLAGS"
+    export CFLAGS="$ORIG_CFLAGS"
+    export CXXFLAGS="$ORIG_CXXFLAGS"
+    export OBJCXXFLAGS="$ORIG_OBJCXXFLAGS"
     export LDFLAGS="$ORIG_LDFLAGS"
     export LIBS="$ORIG_LIBS"
 
@@ -2197,6 +2211,34 @@ dist_make_install_args() {
     [ -n "$current_dist" ] || die 'dist_make_install_args: dist name required'
 
     puts "$(table_line DIST_MAKE_INSTALL_ARGS $current_dist)" || :
+}
+
+dist_extra_cppflags() {
+    current_dist=$1
+    [ -n "$current_dist" ] || die 'dist_extra_cppflags: dist name required'
+
+    puts "$(table_line DIST_EXTRA_CPPFLAGS $current_dist)" || :
+}
+
+dist_extra_cflags() {
+    current_dist=$1
+    [ -n "$current_dist" ] || die 'dist_extra_cflags: dist name required'
+
+    puts "$(table_line DIST_EXTRA_CFLAGS $current_dist)" || :
+}
+
+dist_extra_cxxflags() {
+    current_dist=$1
+    [ -n "$current_dist" ] || die 'dist_extra_cxxflags: dist name required'
+
+    puts "$(table_line DIST_EXTRA_CXXFLAGS $current_dist)" || :
+}
+
+dist_extra_objcxxflags() {
+    current_dist=$1
+    [ -n "$current_dist" ] || die 'dist_extra_objcxxflags: dist name required'
+
+    puts "$(table_line DIST_EXTRA_OBJCXXFLAGS $current_dist)" || :
 }
 
 dist_extra_ldflags() {

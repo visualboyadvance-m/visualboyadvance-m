@@ -71,9 +71,13 @@ fi
 
 both_dists=$(list_remove_duplicates $both_dists)
 
-host_env() {
+host_env_base() {
     rm -f "$BUILD_ROOT/root"
     ln -sf "$BUILD_ROOT/host" "$BUILD_ROOT/root"
+    host_env_hook 2>/dev/null || :
+}
+
+host_env() {
     if [ -z "$OCC" ]; then
         cat <<EOF
 OCC="\$CC"
@@ -110,13 +114,28 @@ REQUIRED_CMAKE_ARGS="\$(puts "\$REQUIRED_CMAKE_ARGS" | sed 's/-DCMAKE_TOOLCHAIN_
 EOF
     fi
 
-    host_env_hook 2>/dev/null || :
+    host_env_base 2>/dev/null || :
 }
 
-target_env() {
+target_env_base() {
     rm -f "$BUILD_ROOT/root"
     ln -sf "$BUILD_ROOT/target" "$BUILD_ROOT/root"
 
+    # make links to executables in the target as well
+    IFS=$NL
+    for exe in $(find "$BUILD_ROOT/host/bin" -maxdepth 1 -type f); do
+        IFS=$OIFS
+        basename=${exe##*/}
+        if ! path_exists "$BUILD_ROOT/target/bin/$basename"; then
+            ln -s "$exe" "$BUILD_ROOT/target/bin/$basename";
+        fi
+    done
+    IFS=$OIFS
+
+    target_env_hook 2>/dev/null || :
+}
+
+target_env() {
     if [ -n "$OCC" ]; then
         cat <<EOF
 export CC="\$OCC"
@@ -140,18 +159,7 @@ $BUILD_ENV
 EOF
     fi
 
-    # make links to executables in the target as well
-    IFS=$NL
-    for exe in $(find "$BUILD_ROOT/host/bin" -maxdepth 1 -type f); do
-        IFS=$OIFS
-        basename=${exe##*/}
-        if ! path_exists "$BUILD_ROOT/target/bin/$basename"; then
-            ln -s "$exe" "$BUILD_ROOT/target/bin/$basename";
-        fi
-    done
-    IFS=$OIFS
-
-    target_env_hook 2>/dev/null || :
+    target_env_base 2>/dev/null || :
 }
 
 # replace install artifact paths with absolute paths into host and target trees
@@ -247,6 +255,12 @@ table_insert_after DISTS cmake "zlib-target $zlib_dist"
 table_insert_after DISTS cmake "dlfcn https://github.com/dlfcn-win32/dlfcn-win32/archive/v1.1.2.tar.gz lib/libdl.a"
 
 table_line_replace DIST_CONFIGURE_TYPES dlfcn cmake
+
+if [ "$target_bits" -eq 32 ]; then
+    # this is necessary for a linkable libffi on i686 for whatever reason
+    # see: https://bugzilla.mozilla.org/show_bug.cgi?id=1336569
+    table_line_append DIST_EXTRA_CPPFLAGS libffi -DSYMBOL_UNDERSCORE
+fi
 
 libicu=libicu
 
