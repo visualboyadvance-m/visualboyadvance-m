@@ -3526,9 +3526,9 @@ void remoteInit()
 void remotePutPacket(const char* packet)
 {
     const char* hex = "0123456789abcdef";
-    char buffer[1024];
 
     size_t count = strlen(packet);
+    char buffer[count + 5];
 
     unsigned char csum = 0;
 
@@ -3684,7 +3684,7 @@ void remoteMemoryRead(char* p)
     sscanf(p, "%x,%x:", &address, &count);
     //  monprintf("Memory read for %08x %d\n", address, count);
 
-    char buffer[1024];
+    char buffer[(count*2)+1];
 
     char* s = buffer;
     for (int i = 0; i < count; i++) {
@@ -3705,6 +3705,8 @@ void remoteQuery(char* p)
         remotePutPacket("l");
     } else if (!strncmp(p, "Supported", 9)) {
         remotePutPacket("PacketSize=1000");
+    } else if (!strncmp(p, "HostInfo", 8)) {
+        remotePutPacket("cputype:12;cpusubtype:5;ostype:unknown;vendor:nintendo;endian:little;ptrsize:4;");
     } else if (!strncmp(p, "C", 1)) {
         remotePutPacket("QC1");
     } else if (!strncmp(p, "Attached", 8)) {
