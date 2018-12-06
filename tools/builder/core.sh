@@ -18,6 +18,8 @@ export BUILD_ROOT="\${BUILD_ROOT:-$BUILD_ROOT}"
 export CC="\${CC:-gcc}"
 export CXX="\${CXX:-g++}"
 
+export CC_FOR_BUILD=gcc
+
 case "\$CC" in
     ccache*)
         :
