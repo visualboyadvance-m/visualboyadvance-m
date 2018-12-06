@@ -234,6 +234,7 @@ export CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=/usr"
 export MESON_ARGS="--prefix /usr --buildtype release --default-library static -Dintrospection=false"
 
 DIST_PATCHES=$DIST_PATCHES'
+    m4              https://raw.githubusercontent.com/gentoo/gentoo/master/sys-devel/m4/files/m4-1.4.18-glibc228.patch
     docbook2x       https://gist.githubusercontent.com/rkitover/0b5dcc95a0703a9b0e0e7eb6d325a98e/raw/e256d2fad8d19633ac8abe02a0d1e119063d1fd9/docbook2x.patch
     ccache          https://gist.githubusercontent.com/rkitover/4dd30c2841a2131be8715038f538d622/raw/40a8f0f50aa6ca5f9658a0c37aa17393cc80c109/ccache-3.4.2-msys.patch
     graphite2       https://gist.githubusercontent.com/rkitover/418600634d7cf19e2bf1c3708b50c042/raw/839b72d9cda545f2e3b640d743c1bd44b89861b9/graphite2-1.3.10-static.patch
