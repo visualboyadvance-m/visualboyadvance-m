@@ -70,7 +70,9 @@ void interp_rate();
 // Notifies emulator that SOUND_CLOCK_TICKS clocks have passed
 void psoundTickfn();
 extern int SOUND_CLOCK_TICKS; // Number of 16.8 MHz clocks between calls to soundTick()
-extern int soundTicks; // Number of 16.8 MHz clocks until soundTick() will be called
+
+// 2018-12-10 - counts up from 0 since last psoundTickfn() was called
+extern int soundTicks;
 
 // Saves/loads emulator state
 #ifdef __LIBRETRO__
