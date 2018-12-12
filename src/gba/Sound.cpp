@@ -96,9 +96,9 @@ static Stereo_Buffer* stereo_buffer;
 
 static Blip_Synth<blip_best_quality, 1> pcm_synth[3]; // 32 kHz, 16 kHz, 8 kHz
 
-static inline blip_time_t blip_time()
+static inline blip_time_t blip_time(void)
 {
-    return SOUND_CLOCK_TICKS - soundTicks;
+    return soundTicks;
 }
 
 void Gba_Pcm::init()
@@ -390,7 +390,7 @@ void psoundTickfn()
 {
     if (gb_apu && stereo_buffer) {
         // Run sound hardware to present
-        end_frame(SOUND_CLOCK_TICKS);
+        end_frame(soundTicks);
 
         flush_samples(stereo_buffer);
 
@@ -400,6 +400,8 @@ void psoundTickfn()
         if (soundVolume_ != soundVolume)
             apply_volume();
     }
+
+    soundTicks = 0;
 }
 
 static void apply_muting()
@@ -429,7 +431,7 @@ static void reset_apu()
     if (stereo_buffer)
         stereo_buffer->clear();
 
-    soundTicks = SOUND_CLOCK_TICKS;
+    soundTicks = 0;
 }
 
 static void remake_stereo_buffer()
@@ -524,8 +526,7 @@ void soundReset()
     reset_apu();
 
     soundPaused = true;
-    SOUND_CLOCK_TICKS = SOUND_CLOCK_TICKS_;
-    soundTicks = SOUND_CLOCK_TICKS_;
+    soundTicks = 0;
 
     soundEvent(NR52, (uint8_t)0x80);
 }

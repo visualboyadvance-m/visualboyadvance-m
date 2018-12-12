@@ -480,8 +480,8 @@ inline int CPUUpdateTicks()
 {
     int cpuLoopTicks = lcdTicks;
 
-    if (soundTicks < cpuLoopTicks)
-        cpuLoopTicks = soundTicks;
+    //if (soundTicks < cpuLoopTicks)
+        //cpuLoopTicks = soundTicks;
 
     if (timer0On && (timer0Ticks < cpuLoopTicks)) {
         cpuLoopTicks = timer0Ticks;
@@ -1567,7 +1567,7 @@ int CPULoadRom(const char* szFile)
         CPUCleanUp();
         return 0;
     }
-    
+
     pix = (uint8_t*)calloc(1, 4 * 241 * 162);
     if (pix == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
@@ -1660,7 +1660,7 @@ int CPULoadRomData(const char* data, int size)
         CPUCleanUp();
         return 0;
     }
-    
+
     pix = (uint8_t*)calloc(1, 4 * 240 * 160);
     if (pix == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
@@ -3669,6 +3669,40 @@ void CPUInterrupt()
     biosProtected[3] = 0xe5;
 }
 
+static uint32_t joy;
+static bool has_frames;
+
+static void gbaUpdateJoypads(void)
+{
+    // update joystick information
+    if (systemReadJoypads())
+        // read default joystick
+        joy = systemReadJoypad(-1);
+
+    P1 = 0x03FF ^ (joy & 0x3FF);
+    systemUpdateMotionSensor();
+    UPDATE_REG(0x130, P1);
+    uint16_t P1CNT = READ16LE(((uint16_t*)&ioMem[0x132]));
+
+    // this seems wrong, but there are cases where the game
+    // can enter the stop state without requesting an IRQ from
+    // the joypad.
+    if ((P1CNT & 0x4000) || stopState) {
+        uint16_t p1 = (0x3FF ^ P1) & 0x3FF;
+        if (P1CNT & 0x8000) {
+            if (p1 == (P1CNT & 0x3FF)) {
+                IF |= 0x1000;
+                UPDATE_REG(0x202, IF);
+            }
+        } else {
+            if (p1 & P1CNT) {
+                IF |= 0x1000;
+                UPDATE_REG(0x202, IF);
+            }
+        }
+    }
+}
+
 void CPULoop(int ticks)
 {
     int clockTicks;
@@ -3733,6 +3767,8 @@ void CPULoop(int ticks)
 
             lcdTicks -= clockTicks;
 
+            soundTicks += clockTicks;
+
             if (lcdTicks <= 0) {
                 if (DISPSTAT & 1) { // V-BLANK
                     // if in V-Blank mode, keep computing...
@@ -3789,32 +3825,6 @@ void CPULoop(int ticks)
                                 lastTime = time;
                                 count = 0;
                             }
-                            uint32_t joy = 0;
-                            // update joystick information
-                            if (systemReadJoypads())
-                                // read default joystick
-                                joy = systemReadJoypad(-1);
-                            P1 = 0x03FF ^ (joy & 0x3FF);
-                            systemUpdateMotionSensor();
-                            UPDATE_REG(0x130, P1);
-                            uint16_t P1CNT = READ16LE(((uint16_t*)&ioMem[0x132]));
-                            // this seems wrong, but there are cases where the game
-                            // can enter the stop state without requesting an IRQ from
-                            // the joypad.
-                            if ((P1CNT & 0x4000) || stopState) {
-                                uint16_t p1 = (0x3FF ^ P1) & 0x3FF;
-                                if (P1CNT & 0x8000) {
-                                    if (p1 == (P1CNT & 0x3FF)) {
-                                        IF |= 0x1000;
-                                        UPDATE_REG(0x202, IF);
-                                    }
-                                } else {
-                                    if (p1 & P1CNT) {
-                                        IF |= 0x1000;
-                                        UPDATE_REG(0x202, IF);
-                                    }
-                                }
-                            }
 
                             uint32_t ext = (joy >> 10);
                             // If no (m) code is enabled, apply the cheats at each LCDline
@@ -3837,6 +3847,9 @@ void CPULoop(int ticks)
                                 UPDATE_REG(0x202, IF);
                             }
                             CPUCheckDMA(1, 0x0f);
+
+                            psoundTickfn();
+
                             if (frameCount >= framesToSkip) {
                                 systemDrawScreen();
                                 frameCount = 0;
@@ -3844,6 +3857,8 @@ void CPULoop(int ticks)
                                 frameCount++;
                             if (systemPauseOnFrame())
                                 ticks = 0;
+
+                            has_frames = true;
                         }
 
                         UPDATE_REG(0x04, DISPSTAT);
@@ -3971,11 +3986,12 @@ void CPULoop(int ticks)
             // we shouldn't be doing sound in stop state, but we loose synchronization
             // if sound is disabled, so in stop state, soundTick will just produce
             // mute sound
-            soundTicks -= clockTicks;
-            if (soundTicks <= 0) {
-                psoundTickfn();
-                soundTicks += SOUND_CLOCK_TICKS;
-            }
+
+            //soundTicks -= clockTicks;
+            //if (soundTicks <= 0) {
+                //psoundTickfn();
+                //soundTicks += SOUND_CLOCK_TICKS;
+            //}
 
             if (!stopState) {
                 if (timer0On) {
@@ -4180,7 +4196,8 @@ void CPULoop(int ticks)
             if (cpuNextEvent > ticks)
                 cpuNextEvent = ticks;
 
-            if (ticks <= 0 || cpuBreakLoop)
+            // end loop when a frame is done
+            if (ticks <= 0 || cpuBreakLoop || has_frames)
                 break;
         }
     }
@@ -4190,9 +4207,25 @@ void CPULoop(int ticks)
 #endif
 }
 
+void gbaEmulate(int ticks)
+{
+    has_frames = false;
+
+    // Read and process inputs
+    gbaUpdateJoypads();
+
+    // Runs nth number of ticks till vblank, outputs audio
+    // then the video frames.
+    // sanity check:
+    // wrapped in loop in case frames has not been written yet
+    do {
+        CPULoop(ticks);
+    } while (!has_frames);
+}
+
 struct EmulatedSystem GBASystem = {
     // emuMain
-    CPULoop,
+    gbaEmulate,
     // emuReset
     CPUReset,
     // emuCleanUp
@@ -4221,9 +4254,9 @@ struct EmulatedSystem GBASystem = {
     CPUUpdateCPSR,
     // emuHasDebugger
     true,
-// emuCount
+    // emuCount
 #ifdef FINAL_VERSION
-    250000
+    300000
 #else
     5000
 #endif
