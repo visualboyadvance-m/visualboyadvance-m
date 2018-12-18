@@ -20,7 +20,7 @@
 #include "../System.h" // for systemMessage()
 #include "../gba/Globals.h"
 
-int GetFA2Devices(Faudio* fa, wxArrayString* names, wxArrayString* ids,
+int GetFADevices(FAudio* fa, wxArrayString* names, wxArrayString* ids,
     const wxString* match)
 {
     HRESULT hr;
@@ -51,7 +51,7 @@ int GetFA2Devices(Faudio* fa, wxArrayString* names, wxArrayString* ids,
     return -1;
 }
 
-bool GetFA2Devices(wxArrayString& names, wxArrayString& ids)
+bool GetFADevices(wxArrayString& names, wxArrayString& ids)
 {
     HRESULT hr;
     FAudio* fa = NULL;
@@ -59,24 +59,24 @@ bool GetFA2Devices(wxArrayString& names, wxArrayString& ids)
 #ifdef _DEBUG
     flags = FAUDIO_DEBUG_ENGINE;
 #endif
-    hr = FAudioreate(&fa, flags);
+    hr = FAudioCreate(&fa, flags);
 
     if (hr != S_OK) {
         wxLogError(_("The FAudio interface failed to initialize!"));
         return false;
     }
 
-    GetFA2Devices(fa, &names, &ids, NULL);
+    GetFADevices(fa, &names, &ids, NULL);
     fa->Release();
     return true;
 }
 
-static int FAGetDev(Faudio* fa)
+static int FAGetDev(FAudio* fa)
 {
     if (gopts.audio_dev.empty())
         return 0;
     else {
-        int ret = GetFA2Devices(fa, NULL, NULL, &gopts.audio_dev);
+        int ret = GetFADevices(fa, NULL, NULL, &gopts.audio_dev);
         return ret < 0 ? 0 : ret;
     }
 }
