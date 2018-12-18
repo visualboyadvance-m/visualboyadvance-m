@@ -1,4 +1,4 @@
-#ifndef NO_XAUDIO2
+#ifndef NO_FAUDIO
 
 // Application
 #include "wxvbam.h"
@@ -8,9 +8,9 @@
 #include "../common/ConfigManager.h"
 #include "../common/SoundDriver.h"
 
-// XAudio2
+// Faudio
 #include <faudio.h>
-#endif 
+#endif
 
 // MMDevice API
 #include <mmdeviceapi.h>
@@ -21,21 +21,21 @@
 #include "../System.h" // for systemMessage()
 #include "../gba/Globals.h"
 
-int GetXA2Devices(IXAudio2* xa, wxArrayString* names, wxArrayString* ids,
+int GetFA2Devices(Faudio* fa, wxArrayString* names, wxArrayString* ids,
     const wxString* match)
 {
     HRESULT hr;
     UINT32 dev_count = 0;
-    hr = xa->FAudio_GetDeviceCount(&dev_count);
+    hr = fa->FAudio_GetDeviceCount(&dev_count);
 
     if (hr != S_OK) {
-        wxLogError(_("XAudio2: Enumerating devices failed!"));
+        wxLogError(_("FAudio: Enumerating devices failed!"));
         return true;
     } else {
-        XAUDIO2_DEVICE_DETAILS dd;
+        FaudioDeviceDetails dd;
 
         for (UINT32 i = 0; i < dev_count; i++) {
-            hr = xa->GetDeviceDetails(i, &dd);
+            hr = fa->GetDeviceDetails(i, &dd);
 
             if (hr != S_OK) {
                 continue;
@@ -52,56 +52,56 @@ int GetXA2Devices(IXAudio2* xa, wxArrayString* names, wxArrayString* ids,
     return -1;
 }
 
-bool GetXA2Devices(wxArrayString& names, wxArrayString& ids)
+bool GetFA2Devices(wxArrayString& names, wxArrayString& ids)
 {
     HRESULT hr;
-    IXAudio2* xa = NULL;
+    FAudio* fa = NULL;
     UINT32 flags = 0;
 #ifdef _DEBUG
     flags = FAUDIO_DEBUG_ENGINE;
 #endif
-    hr = XAudio2Create(&xa, flags);
+    hr = FAudioreate(&xa, flags);
 
     if (hr != S_OK) {
-        wxLogError(_("The XAudio2 interface failed to initialize!"));
+        wxLogError(_("The FAudio interface failed to initialize!"));
         return false;
     }
 
-    GetXA2Devices(xa, &names, &ids, NULL);
-    xa->Release();
+    GetFA2Devices(fa, &names, &ids, NULL);
+    fa->Release();
     return true;
 }
 
-static int XA2GetDev(IXAudio2* xa)
+static int FAGetDev(Faudio* fa)
 {
     if (gopts.audio_dev.empty())
         return 0;
     else {
-        int ret = GetXA2Devices(xa, NULL, NULL, &gopts.audio_dev);
+        int ret = GetFA2Devices(fa, NULL, NULL, &gopts.audio_dev);
         return ret < 0 ? 0 : ret;
     }
 }
 
-class XAudio2_Output;
+class FAudio_Output;
 
-static void xaudio2_device_changed(XAudio2_Output*);
+static void faudio_device_changed(FAudio_Output*);
 
-class XAudio2_Device_Notifier : public IMMNotificationClient {
+class FAudio_Device_Notifier : public IMMNotificationClient {
     volatile LONG registered;
     IMMDeviceEnumerator* pEnumerator;
 
     std::wstring last_device;
 
     CRITICAL_SECTION lock;
-    std::vector<XAudio2_Output*> instances;
+    std::vector<FAudio_Output*> instances;
 
 public:
-    XAudio2_Device_Notifier()
+    FAudio_Device_Notifier()
         : registered(0)
     {
         InitializeCriticalSection(&lock);
     }
-    ~XAudio2_Device_Notifier()
+    ~FAudio_Device_Notifier()
     {
         DeleteCriticalSection(&lock);
     }
@@ -137,7 +137,7 @@ public:
             EnterCriticalSection(&lock);
 
             for (auto it = instances.begin(); it < instances.end(); ++it) {
-                xaudio2_device_changed(*it);
+                faudio_device_changed(*it);
             }
 
             LeaveCriticalSection(&lock);
@@ -151,7 +151,7 @@ public:
     HRESULT STDMETHODCALLTYPE OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState) { return S_OK; }
     HRESULT STDMETHODCALLTYPE OnPropertyValueChanged(LPCWSTR pwstrDeviceId, const PROPERTYKEY key) { return S_OK; }
 
-    void do_register(XAudio2_Output* p_instance)
+    void do_register(FAudio_Output* p_instance)
     {
         if (InterlockedIncrement(&registered) == 1) {
             pEnumerator = NULL;
@@ -167,7 +167,7 @@ public:
         LeaveCriticalSection(&lock);
     }
 
-    void do_unregister(XAudio2_Output* p_instance)
+    void do_unregister(FAudio_Output* p_instance)
     {
         if (InterlockedDecrement(&registered) == 0) {
             if (pEnumerator) {
@@ -191,18 +191,18 @@ public:
 } g_notifier;
 
 // Synchronization Event
-class XAudio2_BufferNotify : public IXAudio2VoiceCallback {
+class FAudio_BufferNotify : public FAudioVoiceCallback {
 public:
     HANDLE hBufferEndEvent;
 
-    XAudio2_BufferNotify()
+    FAudio_BufferNotify()
     {
         hBufferEndEvent = NULL;
         hBufferEndEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
         assert(hBufferEndEvent != NULL);
     }
 
-    ~XAudio2_BufferNotify()
+    ~FAudio_BufferNotify()
     {
         CloseHandle(hBufferEndEvent);
         hBufferEndEvent = NULL;
@@ -231,11 +231,11 @@ public:
 };
 
 // Class Declaration
-class XAudio2_Output
+class FAudio_Output
     : public SoundDriver {
 public:
-    XAudio2_Output();
-    ~XAudio2_Output();
+    FAudio_Output();
+    ~FAudio_Output();
 
     // Initialization
     bool init(long sampleRate);
@@ -265,16 +265,16 @@ private:
 
     volatile bool device_changed;
 
-    IXAudio2* xaud;
-    IXAudio2MasteringVoice* mVoice; // listener
-    IXAudio2SourceVoice* sVoice; // sound source
-    XAUDIO2_BUFFER buf;
-    XAUDIO2_VOICE_STATE vState;
-    XAudio2_BufferNotify notify; // buffer end notification
+    FAudio* faud;
+    FAudioMasteringVoice* mVoice; // listener
+    FAudioSourceVoice* sVoice; // sound source
+    FAudioBuffer buf;
+    FAudioVoiceState vState;
+    FAudio_BufferNotify notify; // buffer end notification
 };
 
 // Class Implementation
-XAudio2_Output::XAudio2_Output()
+FAudio_Output::FAudio_Output()
 {
     failed = false;
     initialized = false;
@@ -284,7 +284,7 @@ XAudio2_Output::XAudio2_Output()
     buffers = NULL;
     currentBuffer = 0;
     device_changed = false;
-    xaud = NULL;
+    faud = NULL;
     mVoice = NULL;
     sVoice = NULL;
     ZeroMemory(&buf, sizeof(buf));
@@ -292,13 +292,13 @@ XAudio2_Output::XAudio2_Output()
     g_notifier.do_register(this);
 }
 
-XAudio2_Output::~XAudio2_Output()
+FAudio_Output::~FAudio_Output()
 {
     g_notifier.do_unregister(this);
     close();
 }
 
-void XAudio2_Output::close()
+void FAudio_Output::close()
 {
     initialized = false;
 
@@ -322,32 +322,32 @@ void XAudio2_Output::close()
         mVoice = NULL;
     }
 
-    if (xaud) {
-        xaud->Release();
-        xaud = NULL;
+    if (faud) {
+        faud->Release();
+        faud = NULL;
     }
 }
 
-void XAudio2_Output::device_change()
+void FAudio_Output::device_change()
 {
     device_changed = true;
 }
 
-bool XAudio2_Output::init(long sampleRate)
+bool FAudio_Output::init(long sampleRate)
 {
     if (failed || initialized)
         return false;
 
     HRESULT hr;
-    // Initialize XAudio2
+    // Initialize FAudio
     UINT32 flags = 0;
     //#ifdef _DEBUG
-    //	flags = XAUDIO2_DEBUG_ENGINE;
+    //	flags = FAUDIO_DEBUG_ENGINE;
     //#endif
-    hr = XAudio2Create(&xaud, flags);
+    hr = FAudioCreate(&faud, flags);
 
     if (hr != S_OK) {
-        wxLogError(_("The XAudio2 interface failed to initialize!"));
+        wxLogError(_("The FAudio interface failed to initialize!"));
         failed = true;
         return false;
     }
@@ -369,34 +369,34 @@ bool XAudio2_Output::init(long sampleRate)
     wfx.nBlockAlign = wfx.nChannels * (wfx.wBitsPerSample / 8);
     wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
     // create sound receiver
-    hr = xaud->CreateMasteringVoice(
+    hr = faud->CreateMasteringVoice(
         &mVoice,
-        XAUDIO2_DEFAULT_CHANNELS,
-        XAUDIO2_DEFAULT_SAMPLERATE,
+        FAUDIO_DEFAULT_CHANNELS,
+        FAUDIO_DEFAULT_SAMPLERATE,
         0,
-        XA2GetDev(xaud),
+        FAGetDev(faud),
         NULL);
 
     if (hr != S_OK) {
-        wxLogError(_("XAudio2: Creating mastering voice failed!"));
+        wxLogError(_("FAudio: Creating mastering voice failed!"));
         failed = true;
         return false;
     }
 
     // create sound emitter
-    hr = xaud->CreateSourceVoice(&sVoice, &wfx, 0, 4.0f, &notify);
+    hr = faud->CreateSourceVoice(&sVoice, &wfx, 0, 4.0f, &notify);
 
     if (hr != S_OK) {
-        wxLogError(_("XAudio2: Creating source voice failed!"));
+        wxLogError(_("FAudio: Creating source voice failed!"));
         failed = true;
         return false;
     }
 
     if (gopts.upmix) {
         // set up stereo upmixing
-        XAUDIO2_DEVICE_DETAILS dd;
+        FAudioDeviceDetails dd;
         ZeroMemory(&dd, sizeof(dd));
-        hr = xaud->FAudio_GetDeviceDetails(0, &dd);
+        hr = faud->FAudio_GetDeviceDetails(0, &dd);
         assert(hr == S_OK);
         float* matrix = NULL;
         matrix = (float*)malloc(sizeof(float) * 2 * dd.OutputFormat.Format.nChannels);
@@ -510,7 +510,7 @@ bool XAudio2_Output::init(long sampleRate)
     return true;
 }
 
-void XAudio2_Output::write(uint16_t* finalWave, int length)
+void FAudio_Output::write(uint16_t* finalWave, int length)
 {
     if (!initialized || failed)
         return;
@@ -531,7 +531,7 @@ void XAudio2_Output::write(uint16_t* finalWave, int length)
                 // buffers ran dry
                 if (systemVerbose & VERBOSE_SOUNDOUTPUT) {
                     static unsigned int i = 0;
-                    log("XAudio2: Buffers were not refilled fast enough (i=%i)\n", i++);
+                    log("FAudio: Buffers were not refilled fast enough (i=%i)\n", i++);
                 }
             }
 
@@ -561,7 +561,7 @@ void XAudio2_Output::write(uint16_t* finalWave, int length)
     assert(hr == S_OK);
 }
 
-void XAudio2_Output::pause()
+void FAudio_Output::pause()
 {
     if (!initialized || failed)
         return;
@@ -573,7 +573,7 @@ void XAudio2_Output::pause()
     }
 }
 
-void XAudio2_Output::resume()
+void FAudio_Output::resume()
 {
     if (!initialized || failed)
         return;
@@ -585,7 +585,7 @@ void XAudio2_Output::resume()
     }
 }
 
-void XAudio2_Output::reset()
+void FAudio_Output::reset()
 {
     if (!initialized || failed)
         return;
@@ -600,7 +600,7 @@ void XAudio2_Output::reset()
     playing = true;
 }
 
-void XAudio2_Output::setThrottle(unsigned short throttle_)
+void FAudio_Output::setThrottle(unsigned short throttle_)
 {
     if (!initialized || failed)
         return;
@@ -612,14 +612,14 @@ void XAudio2_Output::setThrottle(unsigned short throttle_)
     assert(hr == S_OK);
 }
 
-void xaudio2_device_changed(XAudio2_Output* instance)
+void faudio_device_changed(FAudio_Output* instance)
 {
     instance->device_change();
 }
 
-SoundDriver* newXAudio2_Output()
+SoundDriver* newFAudio_Output()
 {
-    return new XAudio2_Output();
+    return new FAudio_Output();
 }
 
-#endif // #ifndef NO_XAUDIO2
+#endif // #ifndef NO_FAUDIO

@@ -13,6 +13,8 @@ if( WIN32 )
   option( ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ON )
 endif( WIN32 )
 
+option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" ON)
+
 option(ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" OFF)
 
 IF(APPLE)
@@ -22,6 +24,10 @@ ENDIF(APPLE)
 if( NOT ENABLE_XAUDIO2 )
     ADD_DEFINITIONS (-DNO_XAUDIO2)
 endif( NOT ENABLE_XAUDIO2 )
+
+if( NOT ENABLE_FAUDIO )
+    ADD_DEFINITIONS (-DNO_FAUDIO)
+endif( NOT ENABLE_FAUDIO )
 
 if(NOT ENABLE_DIRECT3D)
    ADD_DEFINITIONS(-DNO_D3D)
@@ -551,6 +557,10 @@ ENDIF(ENABLE_OPENAL)
 IF(ENABLE_XAUDIO2)
 	SET( SRC_WX ${SRC_WX} xaudio2.cpp )
 ENDIF(ENABLE_XAUDIO2)
+
+IF(ENABLE_FAUDIO)
+	SET( SRC_WX ${SRC_WX} faudio.cpp )
+ENDIF(ENABLE_FAUDIO)
 
 IF( WIN32 )
     SET( SRC_WX ${SRC_WX} wxvbam.rc dsound.cpp )
