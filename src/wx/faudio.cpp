@@ -10,7 +10,6 @@
 
 // Faudio
 #include <faudio.h>
-#endif
 
 // MMDevice API
 #include <mmdeviceapi.h>
@@ -60,7 +59,7 @@ bool GetFA2Devices(wxArrayString& names, wxArrayString& ids)
 #ifdef _DEBUG
     flags = FAUDIO_DEBUG_ENGINE;
 #endif
-    hr = FAudioreate(&xa, flags);
+    hr = FAudioreate(&fa, flags);
 
     if (hr != S_OK) {
         wxLogError(_("The FAudio interface failed to initialize!"));
