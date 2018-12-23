@@ -121,6 +121,13 @@
                     <border>5</border>
                   </object>
                   <object class="sizeritem">
+                    <object class="wxRadioButton" name="FAudio">
+                      <label>FAudio</label>
+                    </object>
+                    <flag>wxALL|wxEXPAND</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
                     <object class="wxRadioButton" name="DirectSound">
                       <label>DirectSound</label>
                     </object>
