@@ -285,7 +285,7 @@ debian_installdeps() {
 
         glew_lib=$(apt-cache search libglew | grep '^libglew[0-9]' | sed 's/ - .*//')
 
-        check sudo apt-get -qy install build-essential g++ nasm cmake gettext zlib1g-dev libgl1-mesa-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libpng-dev libsdl2-dev libsdl2-2.0 libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev $sfml_libs $glew_lib libopenal-dev libwxgtk3.0-dev libwxgtk3.0 libgtk2.0-dev libgtk-3-dev ccache zip
+        check sudo apt-get -qy install build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libavcodec-dev libavformat-dev libswscale-dev libavutil-dev libgettextpo-dev libpng-dev libsdl2-dev libsdl2-2.0 libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev $sfml_libs $glew_lib libopenal-dev libwxgtk3.0-dev libwxgtk3.0 libgtk2.0-dev libgtk-3-dev ccache zip
     else
         case "$target" in
             mingw-w64-i686)
@@ -319,7 +319,7 @@ debian_installdeps() {
         done
         check sudo apt-get -qq update
         # native wx-common needed for wxrc executable
-        check sudo apt-get -qy install build-essential cmake wx-common "$@"
+        check sudo apt-get -qy install build-essential cmake ccache wx-common "$@"
     fi
 
     build_instructions
@@ -375,7 +375,7 @@ fedora_installdeps() {
     fi
 
     # non-multiarch packages first
-    check sudo dnf -y --nogpgcheck --best --allowerasing install gcc gcc-c++ make cmake git nasm redhat-rpm-config pkgconfig ccache
+    check sudo dnf -y --nogpgcheck --best --allowerasing install gcc gcc-c++ make cmake ccache git nasm redhat-rpm-config pkgconfig ccache
 
     # try to install multiarch libgcc, glibc-devel and pkgconfig if available
     if [ -n "$amd64" ]; then
@@ -507,7 +507,7 @@ suse_installdeps() {
     check_cross
     installing
 
-    check sudo zypper in -y gcc gcc-c++ binutils make cmake nasm gettext-tools libpng16-devel pkg-config \
+    check sudo zypper in -y gcc gcc-c++ binutils make cmake ccache nasm gettext-tools libpng16-devel pkg-config \
                             libSDL2-devel openal-soft-devel sfml2-devel wxWidgets-3_0-devel ccache zip # ffmpeg2-devel
     # ffmpeg requires packman repos
 
@@ -552,7 +552,7 @@ archlinux_installdeps() {
 
     # common needed dev packages
     # not using the base-devel group because it can break gcc-multilib
-    check $pacman --noconfirm --needed -S binutils file grep gawk gzip libtool make patch sed util-linux nasm cmake pkg-config git ccache zip
+    check $pacman --noconfirm --needed -S binutils file grep gawk gzip libtool make patch sed util-linux nasm cmake ccache pkg-config git ccache zip
 
     libs="zlib mesa gettext libpng sdl2 openal wxgtk3 gtk3 sfml ffmpeg"
 
@@ -734,7 +734,7 @@ gentoo_installdeps() {
     installing
 
     check sudo emerge-webrsync
-    check sudo emerge -vuDUa gcc make cmake binutils libsdl2 libsfml wxGTK zlib dev-util/pkgconfig nasm
+    check sudo emerge -vuDUa gcc make cmake ccache binutils libsdl2 libsfml wxGTK zlib dev-util/pkgconfig nasm
 
     build_instructions
 }
@@ -749,7 +749,7 @@ windows_installdeps() {
     check pacman -Sy
 
     set --
-    for p in SDL2 ffmpeg openal sfml wxWidgets zlib binutils cmake crt-git extra-cmake-modules gcc gcc-libs gdb headers-git make pkg-config tools-git windows-default-manifest libmangle-git nasm; do
+    for p in SDL2 ffmpeg openal sfml wxWidgets zlib binutils cmake ccache crt-git extra-cmake-modules gcc gcc-libs gdb headers-git make pkg-config tools-git windows-default-manifest libmangle-git nasm; do
         set -- "$@" "${target}-${p}"
     done
 
@@ -803,7 +803,7 @@ brew_installdeps() {
     check brew -v update
 
     set --
-    for f in nasm cmake ffmpeg gettext libpng pkg-config sdl2 sfml wxmac ccache; do
+    for f in nasm cmake ccache ffmpeg gettext libpng pkg-config sdl2 sfml wxmac ccache; do
         if brew info "$f" | grep -Eq '^Not installed$'; then
             set -- "$@" "$f"
         fi
@@ -820,7 +820,7 @@ macports_installdeps() {
     installing
 
     check sudo port -v selfupdate
-    check sudo port -v install cmake nasm ffmpeg gettext libpng pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv ccache
+    check sudo port -v install cmake ccache nasm ffmpeg gettext libpng pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv ccache
     check sudo port select wxWidgets wxWidgets-3.0
 
     build_instructions
@@ -831,7 +831,7 @@ fink_installdeps() {
     installing
 
     check sudo fink -vy selfupdate
-    check sudo fink -vy install cmake nasm ffmpeg libgettext8-dev gettext-tools libpng16 pkgconfig sdl2 wxwidgets300-osxcocoa libiconv-dev sfml24-dev ccache
+    check sudo fink -vy install cmake ccache nasm ffmpeg libgettext8-dev gettext-tools libpng16 pkgconfig sdl2 wxwidgets300-osxcocoa libiconv-dev sfml24-dev ccache
 
     build_instructions
 }
