@@ -304,7 +304,7 @@ void FAudio_Output::close()
 
     if (sVoice) {
         if (playing) {
-            HRESULT hr = FAudioSourceVoice_Stop(sVoice, 0);
+            HRESULT hr = FAudioSourceVoice_Stop(sVoice, 0, FAUDIO_COMMIT_NOW);
             assert(hr == S_OK);
         }
 
@@ -387,7 +387,7 @@ bool FAudio_Output::init(long sampleRate)
     // create sound emitter
     //This should be  FAudio_CreateSourceVoice()
     //hr = faud->CreateSourceVoice(&sVoice, &wfx, 0, 4.0f, &notify);
-     hr = FAudio_CreateSourceVoice(faud, &sVoice, &wfx, 0, 4.0f, &notify);
+     hr = FAudio_CreateSourceVoice(faud, &sVoice, (const FAudioWaveFormatEx*)&wfx, 0, 4.0f, &notify);
 
     if (hr != S_OK) {
         wxLogError(_("FAudio: Creating source voice failed!"));
@@ -496,7 +496,7 @@ bool FAudio_Output::init(long sampleRate)
         }
 
         if (matrixAvailable) {
-            hr = FAudioVoice_SetOutputMatrix(sVoice, NULL, 2, dd.OutputFormat.Format.nChannels, matrix);
+            hr = FAudioVoice_SetOutputMatrix(sVoice, NULL, 2, dd.OutputFormat.Format.nChannels, matrix, FAUDIO_DEFAULT_CHANNELS); //What I have here for the OperationSet maybe wrong...
             assert(hr == S_OK);
         }
 
@@ -504,7 +504,7 @@ bool FAudio_Output::init(long sampleRate)
         matrix = NULL;
     }
 
-    hr = FAudioSourceVoice_Start(sVoice, 0);
+    hr = FAudioSourceVoice_Start(sVoice, 0, FAUDIO_COMMIT_NOW);
     assert(hr == S_OK);
     playing = true;
     currentBuffer = 0;
@@ -515,6 +515,7 @@ bool FAudio_Output::init(long sampleRate)
 
 void FAudio_Output::write(uint16_t* finalWave, int length)
 {
+    UINT32 flags = 0;
     if (!initialized || failed)
         return;
 
@@ -526,7 +527,7 @@ void FAudio_Output::write(uint16_t* finalWave, int length)
                 return;
         }
 
-        FAudioSourceVoice_GetState(sVoice, &vState);
+        FAudioSourceVoice_GetState(sVoice, &vState, flags);
         assert(vState.BuffersQueued <= bufferCount);
 
         if (vState.BuffersQueued < bufferCount) {
@@ -560,7 +561,7 @@ void FAudio_Output::write(uint16_t* finalWave, int length)
     buf.pAudioData = &buffers[currentBuffer * soundBufferLen];
     currentBuffer++;
     currentBuffer %= (bufferCount + 1); // + 1 because we need one temporary buffer
-    HRESULT hr = FAudioSourceVoice_SubmitSourceBuffer(sVoice, &buf); // send buffer to queue
+    HRESULT hr = FAudioSourceVoice_SubmitSourceBuffer(sVoice, &buf); // send buffer to queue.
     assert(hr == S_OK);
 }
 
@@ -570,7 +571,7 @@ void FAudio_Output::pause()
         return;
 
     if (playing) {
-        HRESULT hr = FAudioSourceVoice_Stop(sVoice, 0);
+        HRESULT hr = FAudioSourceVoice_Stop(sVoice, 0, FAUDIO_COMMIT_NOW);
         assert(hr == S_OK);
         playing = false;
     }
@@ -582,7 +583,7 @@ void FAudio_Output::resume()
         return;
 
     if (!playing) {
-        HRESULT hr = FAudioSourceVoice_Start(sVoice, 0);
+        HRESULT hr = FAudioSourceVoice_Start(sVoice, 0, FAUDIO_COMMIT_NOW);
         assert(hr == S_OK);
         playing = true;
     }
@@ -594,12 +595,12 @@ void FAudio_Output::reset()
         return;
 
     if (playing) {
-        HRESULT hr = FAudioSourceVoice_Stop(sVoice, 0);
+        HRESULT hr = FAudioSourceVoice_Stop(sVoice, 0, FAUDIO_COMMIT_NOW);
         assert(hr == S_OK);
     }
 
     FAudioSourceVoice_FlushSourceBuffers(sVoice);
-    FAudioSourceVoice_Start(sVoice, 0);
+    FAudioSourceVoice_Start(sVoice, 0, FAUDIO_COMMIT_NOW);
     playing = true;
 }
 
@@ -611,7 +612,7 @@ void FAudio_Output::setThrottle(unsigned short throttle_)
     if (throttle_ == 0)
         throttle_ = 100;
 
-    HRESULT hr = FAudioSourceVoice_SetFrequencyRatio(sVoice, (float)throttle_ / 100.0f);
+    HRESULT hr = FAudioSourceVoice_SetFrequencyRatio(sVoice, (float)throttle_ / 100.0f, FAUDIO_MAX_FILTER_FREQUENCY);
     assert(hr == S_OK);
 }
 
