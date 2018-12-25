@@ -67,7 +67,8 @@ bool GetFADevices(wxArrayString& names, wxArrayString& ids)
     }
 
     GetFADevices(fa, &names, &ids, NULL);
-    fa->Release();
+    //fa->Release();
+    FAudio_Release(fa);
     return true;
 }
 
