@@ -40,7 +40,7 @@ int GetFADevices(FAudio* fa, wxArrayString* names, wxArrayString* ids,
                 continue;
             } else {
                 if (ids) {
-                    ids->push_back((wchar_t*) dd.DeviceID);
+                    ids->push_back((wchar_t*) dd.DeviceID); //FAudio is an interesting beast, but not that hard to adapt... once you get used to it, XAudio2 wouldn't need this, but FAudio declares FAudioDeviceDetails as int32_t
                     names->push_back((wchar_t*) dd.DisplayName);
                 } else if (*match == dd.DeviceID)
                     return i;
@@ -59,7 +59,7 @@ bool GetFADevices(wxArrayString& names, wxArrayString& ids)
 #ifdef _DEBUG
     flags = FAUDIO_DEBUG_ENGINE;
 #endif
-    hr = FAudioCreate(&fa, flags);
+    hr = FAudioCreate(&fa, flags, FAUDIO_DEFAULT_PROCESSOR); //Apparently this needs 3 parameters, the processor.
 
     if (hr != S_OK) {
         wxLogError(_("The FAudio interface failed to initialize!"));
