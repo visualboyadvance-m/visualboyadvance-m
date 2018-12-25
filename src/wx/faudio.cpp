@@ -8,7 +8,7 @@
 #include "../common/ConfigManager.h"
 #include "../common/SoundDriver.h"
 
-// Faudio
+// FAudio
 #include <faudio.h>
 
 // MMDevice API
@@ -25,23 +25,23 @@ int GetFADevices(FAudio* fa, wxArrayString* names, wxArrayString* ids,
 {
     HRESULT hr;
     UINT32 dev_count = 0;
-    hr = fa->FAudio_GetDeviceCount(&dev_count);
+    hr = FAudio_GetDeviceCount(fa, &dev_count);
 
     if (hr != S_OK) {
         wxLogError(_("FAudio: Enumerating devices failed!"));
         return true;
     } else {
-        FaudioDeviceDetails dd;
+        FAudioDeviceDetails dd;
 
         for (UINT32 i = 0; i < dev_count; i++) {
-            hr = fa->GetDeviceDetails(i, &dd);
+            hr = FAudio_GetDeviceDetails(fa, i, &dd);
 
             if (hr != S_OK) {
                 continue;
             } else {
                 if (ids) {
-                    ids->push_back(dd.DeviceID);
-                    names->push_back(dd.DisplayName);
+                    ids->push_back((wchar_t*) dd.DeviceID);
+                    names->push_back((wchar_t*) dd.DisplayName);
                 } else if (*match == dd.DeviceID)
                     return i;
             }
