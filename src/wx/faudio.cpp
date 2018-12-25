@@ -304,11 +304,11 @@ void FAudio_Output::close()
 
     if (sVoice) {
         if (playing) {
-            HRESULT hr = sVoice->Stop(0);
+            HRESULT hr = sVoice->FAudioSourceVoice_Stop(0);
             assert(hr == S_OK);
         }
 
-        sVoice->DestroyVoice();
+        sVoice->FAudioVoice_DestroyVoice();
         sVoice = NULL;
     }
 
@@ -318,12 +318,12 @@ void FAudio_Output::close()
     }
 
     if (mVoice) {
-        mVoice->DestroyVoice();
+        mVoice->FAudioVoice_DestroyVoice();
         mVoice = NULL;
     }
 
     if (faud) {
-        faud->Release();
+        FAudio_Release(faud);
         faud = NULL;
     }
 }
@@ -344,7 +344,7 @@ bool FAudio_Output::init(long sampleRate)
     //#ifdef _DEBUG
     //	flags = FAUDIO_DEBUG_ENGINE;
     //#endif
-    hr = FAudioCreate(&faud, flags);
+    hr = FAudioCreate(&faud, flags, FAUDIO_DEFAULT_CHANNELS);
 
     if (hr != S_OK) {
         wxLogError(_("The FAudio interface failed to initialize!"));
@@ -369,7 +369,7 @@ bool FAudio_Output::init(long sampleRate)
     wfx.nBlockAlign = wfx.nChannels * (wfx.wBitsPerSample / 8);
     wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
     // create sound receiver
-    hr = faud->CreateMasteringVoice(
+    hr = faud->FAudio_CreateMasteringVoice(
         &mVoice,
         FAUDIO_DEFAULT_CHANNELS,
         FAUDIO_DEFAULT_SAMPLERATE,
@@ -384,7 +384,9 @@ bool FAudio_Output::init(long sampleRate)
     }
 
     // create sound emitter
-    hr = faud->CreateSourceVoice(&sVoice, &wfx, 0, 4.0f, &notify);
+    //This should be  FAudio_CreateSourceVoice()
+    //hr = faud->CreateSourceVoice(&sVoice, &wfx, 0, 4.0f, &notify);
+     hr = faud->FAudio_CreateSourceVoice(&sVoice, &wfx, 0, 4.0f, &notify);
 
     if (hr != S_OK) {
         wxLogError(_("FAudio: Creating source voice failed!"));
@@ -493,7 +495,7 @@ bool FAudio_Output::init(long sampleRate)
         }
 
         if (matrixAvailable) {
-            hr = sVoice->SetOutputMatrix(NULL, 2, dd.OutputFormat.Format.nChannels, matrix);
+            hr = sVoice->FAudioVoice_SetOutputMatrix(NULL, 2, dd.OutputFormat.Format.nChannels, matrix);
             assert(hr == S_OK);
         }
 
@@ -501,7 +503,7 @@ bool FAudio_Output::init(long sampleRate)
         matrix = NULL;
     }
 
-    hr = sVoice->Start(0);
+    hr = sVoice->FAudioSourceVoice_Start(0);
     assert(hr == S_OK);
     playing = true;
     currentBuffer = 0;
@@ -523,7 +525,7 @@ void FAudio_Output::write(uint16_t* finalWave, int length)
                 return;
         }
 
-        sVoice->GetState(&vState);
+        sVoice->FAudioSourceVoice_GetState(&vState);
         assert(vState.BuffersQueued <= bufferCount);
 
         if (vState.BuffersQueued < bufferCount) {
@@ -567,7 +569,7 @@ void FAudio_Output::pause()
         return;
 
     if (playing) {
-        HRESULT hr = sVoice->Stop(0);
+        HRESULT hr = sVoice->FAudioSourceVoice_Stop(0);
         assert(hr == S_OK);
         playing = false;
     }
@@ -579,7 +581,7 @@ void FAudio_Output::resume()
         return;
 
     if (!playing) {
-        HRESULT hr = sVoice->Start(0);
+        HRESULT hr = sVoice->FAudioSourceVoice_Start(0);
         assert(hr == S_OK);
         playing = true;
     }
@@ -591,12 +593,12 @@ void FAudio_Output::reset()
         return;
 
     if (playing) {
-        HRESULT hr = sVoice->Stop(0);
+        HRESULT hr = sVoice->FAudioSourceVoice_Stop(0);
         assert(hr == S_OK);
     }
 
     sVoice->FlushSourceBuffers();
-    sVoice->Start(0);
+    sVoice->FAudioSourceVoice_Start(0);
     playing = true;
 }
 
