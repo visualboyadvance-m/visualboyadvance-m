@@ -1535,6 +1535,14 @@ public:
 
             break;
 #endif
+#ifndef NO_FAUDIO
+
+        case AUD_FAUDIO:
+            if (!GetFADevices(names, dev_ids))
+                return false;
+
+            break;
+#endif
 #endif
         }
 
