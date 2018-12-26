@@ -13,7 +13,7 @@ if( WIN32 )
   option( ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ON )
 endif( WIN32 )
 
-option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" ON)
+option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" OFF)
 
 option(ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" OFF)
 
@@ -605,7 +605,6 @@ TARGET_LINK_LIBRARIES (
     ${DIRECTX_LIBRARIES}
     ${GTK_LIBRARIES}
     ${OPENAL_LIBRARY}
-    faudio
 )
 
 if(ENABLE_FFMPEG)
