@@ -3442,6 +3442,10 @@ bool MainFrame::BindControls()
 #if !defined(__WXMSW__) || defined(NO_XAUDIO2)
             rb->Hide();
 #endif
+            audapi_rb("Faudio", AUD_FAUDIO);
+#ifdef NO_FAUDIO
+            rb->Hide();
+#endif
             sound_config_handler.dev = SafeXRCCTRL<wxChoice>(d, "Device");
             sound_config_handler.dev->SetValidator(SoundConfigLoad());
             getcbb("Upmix", gopts.upmix);
