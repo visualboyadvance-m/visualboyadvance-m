@@ -286,11 +286,7 @@ const int num_opts = sizeof(opts) / sizeof(opts[0]);
 opts_t::opts_t()
 {
     frameSkip = -1;
-#ifdef __WXMSW__
     audio_api = AUD_SDL;
-#elif !defined(NO_OAL) && (defined(__WXMAC__) || defined(__WXGTK__))
-    audio_api = AUD_SDL;
-#endif
 #ifndef NO_OGL
     render_method = RND_OPENGL;
 #endif
