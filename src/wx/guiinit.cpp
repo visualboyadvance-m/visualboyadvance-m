@@ -3442,7 +3442,7 @@ bool MainFrame::BindControls()
 #if !defined(__WXMSW__) || defined(NO_XAUDIO2)
             rb->Hide();
 #endif
-            audapi_rb("Faudio", AUD_FAUDIO);
+            audapi_rb("FAudio", AUD_FAUDIO);
 #ifdef NO_FAUDIO
             rb->Hide();
 #endif

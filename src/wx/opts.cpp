@@ -254,18 +254,29 @@ opt_desc opts[] = {
     INTOPT("preferences/vsync", "VSync", wxTRANSLATE("Wait for vertical sync"), vsync, 0, 1),
 
 /// Sound
+
+#define OAL_SOUND "openal|"
+
 #ifdef NO_OAL
- #ifdef __WXMSW__
-    ENUMOPT("Sound/AudioAPI", "", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl|directsound|faudio|xaudio2")),
- #else
-    ENUMOPT("Sound/AudioAPI", "", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl")),
- #endif
+#   define OAL_SOUND ""
+#endif
+
+#define XAUDIO2_SOUND "xaudio2|"
+
+#ifdef NO_XAUDIO2
+#   define XAUDIO2_SOUND ""
+#endif
+
+#define FAUDIO_SOUND "faudio|"
+
+#ifdef NO_FAUDIO
+#   define FAUDIO_SOUND ""
+#endif
+
+#ifdef __WXMSW__
+    ENUMOPT("Sound/AudioAPI", "", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl|" OAL_SOUND "directsound|" FAUDIO_SOUND "xaudio2")),
 #else
- #ifdef __WXMSW__
-    ENUMOPT("Sound/AudioAPI", "", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl|openal|directsound|faudio|xaudio2")),
- #else
-    ENUMOPT("Sound/AudioAPI", "", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl|openal")),
- #endif
+    ENUMOPT("Sound/AudioAPI", "", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl" OAL_SOUND FAUDIO_SOUND)),
 #endif
     INTOPT("Sound/Buffers", "", wxTRANSLATE("Number of sound buffers"), gopts.audio_buffers, 2, 10),
     INTOPT("Sound/Enable", "", wxTRANSLATE("Bit mask of sound channels to enable"), gopts.sound_en, 0, 0x30f),

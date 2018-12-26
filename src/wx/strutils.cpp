@@ -5,12 +5,18 @@
 #include "strutils.h"
 
 // From: https://stackoverflow.com/a/7408245/262458
+//
+// modified to ignore empty tokens
 std::vector<wxString> str_split(const wxString& text, const wxString& sep) {
     std::vector<wxString> tokens;
     std::size_t start = 0, end = 0;
 
     while ((end = text.find(sep, start)) != std::string::npos) {
-	tokens.push_back(text.substr(start, end - start));
+        wxString token = text.substr(start, end - start);
+
+        if (token.length())
+	    tokens.push_back(token);
+
 	start = end + 1;
     }
 
