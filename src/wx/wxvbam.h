@@ -449,8 +449,8 @@ enum renderer {
 enum audioapi { AUD_SDL,
     AUD_OPENAL,
     AUD_DIRECTSOUND,
-    AUD_FAUDIO,
-    AUD_XAUDIO2 };
+    AUD_XAUDIO2,
+    AUD_FAUDIO };
 
 // an unfortunate legacy default; should have a non-digit preceding %d
 // the only reason to keep it is that user can set slotdir to old dir
@@ -703,11 +703,15 @@ private:
 
 #include "opts.h"
 
-class SoundDriver;
-extern SoundDriver* newOpenAL();
 // I should add this to SoundDriver, but wxArrayString is wx-specific
 // I suppose I could make subclass wxSoundDriver.  maybe later.
+
+#ifndef NO_OAL
+class SoundDriver;
+extern SoundDriver* newOpenAL();
 extern bool GetOALDevices(wxArrayString& names, wxArrayString& ids);
+#endif
+
 #ifdef __WXMSW__
 extern SoundDriver* newDirectSound();
 extern bool GetDSDevices(wxArrayString& names, wxArrayString& ids);
