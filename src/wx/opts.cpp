@@ -133,9 +133,9 @@ wxJoyKeyBinding defkeys[NUM_KEYS * 2] = {
     { wxT('X') }, { 0, WXJB_BUTTON, 1 }, { wxT('Z') }, { 1, WXJB_BUTTON, 1 },
     { wxT('A') }, { 2, WXJB_BUTTON, 1 }, { wxT('S') }, { 3, WXJB_BUTTON, 1 },
     { WXK_BACK }, { 4, WXJB_BUTTON, 1 }, { WXK_RETURN }, { 5, WXJB_BUTTON, 1 },
-    { WXK_NUMPAD_UP }, { 2, WXJB_AXIS_PLUS, 1 }, { WXK_NUMPAD_DOWN }, { 2, WXJB_AXIS_MINUS, 1 },
-    { WXK_NUMPAD_LEFT }, { 3, WXJB_AXIS_MINUS, 1 }, { WXK_NUMPAD_RIGHT }, { 3, WXJB_AXIS_PLUS, 1 },
-    { WXK_NUMPAD_PAGEUP }, { 4, WXJB_AXIS_PLUS, 1 }, { WXK_NUMPAD_PAGEDOWN }, { 4, WXJB_AXIS_MINUS, 1 },
+    { WXK_NUMPAD_UP }, { 0 }, { WXK_NUMPAD_DOWN }, { 0 },
+    { WXK_NUMPAD_LEFT }, { 0 }, { WXK_NUMPAD_RIGHT }, { 0 },
+    { WXK_NUMPAD_PAGEUP }, { 0 }, { WXK_NUMPAD_PAGEDOWN }, { 0 },
     { wxT('W') }, { 0 }, { wxT('Q') }, { 0 },
     { WXK_SPACE }, { 0 }, { 0 }, { 0 },
     { 0 }, { 0 }
