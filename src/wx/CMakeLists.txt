@@ -44,6 +44,10 @@ else(ENABLE_OPENAL)
     ADD_DEFINITIONS (-DNO_OAL)
 endif(ENABLE_OPENAL)
 
+if(ENABLE_FAUDIO)
+    find_package(FAudio REQUIRED)
+endif()
+
 IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
     SET(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
 ENDIF()
@@ -605,6 +609,7 @@ TARGET_LINK_LIBRARIES (
     ${DIRECTX_LIBRARIES}
     ${GTK_LIBRARIES}
     ${OPENAL_LIBRARY}
+    FAudio
 )
 
 if(ENABLE_FFMPEG)

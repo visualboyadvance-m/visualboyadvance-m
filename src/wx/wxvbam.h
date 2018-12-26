@@ -711,10 +711,16 @@ extern bool GetOALDevices(wxArrayString& names, wxArrayString& ids);
 #ifdef __WXMSW__
 extern SoundDriver* newDirectSound();
 extern bool GetDSDevices(wxArrayString& names, wxArrayString& ids);
+
+#ifndef NO_XAUDIO2
 extern SoundDriver* newXAudio2_Output();
 extern bool GetXA2Devices(wxArrayString& names, wxArrayString& ids);
+#endif
+
+#ifndef NO_FAUDIO
 extern SoundDriver* newFAudio_Output();
-extern bool GetFSDevices(wxArrayString& names, wxArrayString& ids);
+extern bool GetFADevices(wxArrayString& names, wxArrayString& ids);
+#endif
 #endif
 
 extern bool debugger;
