@@ -387,7 +387,7 @@ bool FAudio_Output::init(long sampleRate)
     // create sound emitter
     //This should be  FAudio_CreateSourceVoice()
     //hr = faud->CreateSourceVoice(&sVoice, &wfx, 0, 4.0f, &notify);
-     hr = FAudio_CreateSourceVoice(faud, &sVoice, (const FAudioWaveFormatEx*)&wfx, 0, 4.0f, &notify);
+     hr = FAudio_CreateSourceVoice(faud, &sVoice, (const FAudioWaveFormatEx*)&wfx, 0, 4.0f, &notify, NULL, NULL);
 
     if (hr != S_OK) {
         wxLogError(_("FAudio: Creating source voice failed!"));
@@ -561,7 +561,7 @@ void FAudio_Output::write(uint16_t* finalWave, int length)
     buf.pAudioData = &buffers[currentBuffer * soundBufferLen];
     currentBuffer++;
     currentBuffer %= (bufferCount + 1); // + 1 because we need one temporary buffer
-    HRESULT hr = FAudioSourceVoice_SubmitSourceBuffer(sVoice, &buf); // send buffer to queue.
+    HRESULT hr = FAudioSourceVoice_SubmitSourceBuffer(sVoice, &buf, NULL); // send buffer to queue.
     assert(hr == S_OK);
 }
 
