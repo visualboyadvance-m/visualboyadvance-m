@@ -449,6 +449,7 @@ enum renderer {
 enum audioapi { AUD_SDL,
     AUD_OPENAL,
     AUD_DIRECTSOUND,
+    AUD_FAUDIO,
     AUD_XAUDIO2 };
 
 // an unfortunate legacy default; should have a non-digit preceding %d
@@ -712,6 +713,8 @@ extern SoundDriver* newDirectSound();
 extern bool GetDSDevices(wxArrayString& names, wxArrayString& ids);
 extern SoundDriver* newXAudio2_Output();
 extern bool GetXA2Devices(wxArrayString& names, wxArrayString& ids);
+extern SoundDriver* newFAudio_Output();
+extern bool GetFSDevices(wxArrayString& names, wxArrayString& ids);
 #endif
 
 extern bool debugger;

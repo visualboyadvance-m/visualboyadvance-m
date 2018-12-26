@@ -2336,7 +2336,7 @@ EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
         // otherwise reload if API changes
         (oapi != gopts.audio_api || odev != gopts.audio_dev ||
             // or init-only options
-            (oapi == AUD_XAUDIO2 && oupmix != gopts.upmix) || (oapi == AUD_DIRECTSOUND && ohw != gopts.dsound_hw_accel))) {
+            (oapi == AUD_XAUDIO2 && oupmix != gopts.upmix) || (oapi == AUD_FAUDIO && oupmix != gopts.upmix) || (oapi == AUD_DIRECTSOUND && ohw != gopts.dsound_hw_accel))) {
         soundShutdown();
         soundInit();
     }

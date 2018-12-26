@@ -1096,6 +1096,10 @@ SoundDriver* systemSoundInit()
     case AUD_XAUDIO2:
         return newXAudio2_Output();
 #endif
+#ifndef NO_FAUDIO
+    case AUD_FAUDIO:
+        return newFAudio_Output();
+#endif
 #endif
 
     default:
