@@ -44,8 +44,10 @@ else(ENABLE_OPENAL)
     ADD_DEFINITIONS (-DNO_OAL)
 endif(ENABLE_OPENAL)
 
+unset(FAUDIO_LIBS)
 if(ENABLE_FAUDIO)
     find_package(FAudio REQUIRED)
+    set(FAUDIO_LIBS FAudio)
 endif()
 
 IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -601,6 +603,7 @@ ADD_EXECUTABLE (
     ${CM_STUFF}
 )
 
+
 TARGET_LINK_LIBRARIES (
     visualboyadvance-m
     ${VBAMCORE_LIBS}
@@ -609,7 +612,7 @@ TARGET_LINK_LIBRARIES (
     ${DIRECTX_LIBRARIES}
     ${GTK_LIBRARIES}
     ${OPENAL_LIBRARY}
-    FAudio
+    ${FAUDIO_LIBS}
 )
 
 if(ENABLE_FFMPEG)
