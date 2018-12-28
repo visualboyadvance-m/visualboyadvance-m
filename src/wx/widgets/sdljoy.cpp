@@ -135,9 +135,11 @@ void wxSDLJoy::Notify()
                 val = SDL_JoystickGetAxis(dev, j);
 
                 // trigger axes always return max negative value, we ignore these
+#if SDL_VERSION_ATLEAST(2, 0, 6)
                 int16_t initial_state;
                 if (SDL_JoystickGetAxisInitialState(dev, j, &initial_state) && val == initial_state)
                     continue;
+#endif
 
                 if (digital) {
                     if (val > 0x3fff)
