@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <cstring>
+#include <vector>
 #include <wx/dcbuffer.h>
 #include <SDL_joystick.h>
 
@@ -1120,18 +1121,27 @@ static uint32_t bmask[NUM_KEYS] = {
 
 static wxJoyKeyBinding_v keys_pressed;
 
-static bool game_key_pressed()
+struct game_key {
+    int player;
+    int key_num;
+    int bind_num;
+    wxJoyKeyBinding_v& b;
+};
+
+static std::vector<game_key>* game_keys_pressed(int key, int mod, int joy)
 {
-    bool game_key_pressed = false;
+    auto vec = new std::vector<game_key>;
 
-    for (int i = 0; i < 4; i++) {
-        if (joypress[i] != 0) {
-            game_key_pressed = true;
-            break;
+    for (int player = 0; player < 4; player++)
+        for (int key_num = 0; key_num < NUM_KEYS; key_num++) {
+            wxJoyKeyBinding_v& b = gopts.joykey_bindings[player][key_num];
+
+            for (int bind_num = 0; bind_num < b.size(); bind_num++)
+                if (b[bind_num].key == key && b[bind_num].mod == mod && b[bind_num].joy == joy)
+                    vec->push_back({player, key_num, bind_num, b});
         }
-    }
 
-    return game_key_pressed;
+    return vec;
 }
 
 static bool process_key_press(bool down, int key, int mod, int joy = 0)
@@ -1162,72 +1172,55 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
         if (keys_pressed[kpno].key == key && keys_pressed[kpno].mod == mod && keys_pressed[kpno].joy == joy)
             break;
 
+    auto game_keys = game_keys_pressed(key, mod, joy);
+
+    const bool is_game_key = game_keys->size();
+
     if (kpno < keys_pressed.size()) {
         // double press is noop
         if (down)
-            return game_key_pressed();
+            return is_game_key;
 
-        // otherwise forget it
+        // if released, forget it
         keys_pressed.erase(keys_pressed.begin() + kpno);
     } else {
         // double release is noop
         if (!down)
-            // we will just mark it processed so it is ignored, this is not entirely correct
-            return true;
+            return is_game_key;
 
         // otherwise remember it
-        // c++0x
-        // keys_pressed.push_back({ key, mod, joy });
-        wxJoyKeyBinding jb = { key, mod, joy };
-        keys_pressed.push_back(jb);
+        keys_pressed.push_back({key, mod, joy});
     }
 
-    bool game_key_released = false;
-
-    // find all game keys this is bound to
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < NUM_KEYS; j++) {
-            wxJoyKeyBinding_v& b = gopts.joykey_bindings[i][j];
-
-            for (int k = 0; k < b.size(); k++)
-                if (b[k].key == key && b[k].mod == mod && b[k].joy == joy) {
-                    if (down) {
-                        // press button
-                        joypress[i] |= bmask[j];
-                    }
-                    else {
-                        // only release if no others pressed
-                        int k2;
-
-                        for (k2 = 0; k2 < b.size(); k2++) {
-                            if (k == k2 || (b[k2].key == key && b[k2].mod == mod && b[k2].joy == joy))
-                                continue;
-
-                            for (kpno = 0; kpno < keys_pressed.size(); kpno++)
-                                if (keys_pressed[kpno].key == b[k2].key && keys_pressed[kpno].mod == b[k2].mod && keys_pressed[kpno].joy == b[k2].joy)
-                                    break;
-
-                            if (kpno < keys_pressed.size())
-                                break;
-                        }
-
-                        if (k2 == b.size()) {
-                            // release button
-                            joypress[i] &= ~bmask[j];
-                            game_key_released = true;
-                        }
-                    }
-
-                    break;
-                }
+    for (auto&& game_key : *game_keys) {
+        if (down) {
+            // press button
+            joypress[game_key.player] |= bmask[game_key.key_num];
         }
+        else {
+            // only release if no others pressed
+            int bind2;
+            auto b = game_key.b;
 
-    if (down) {
-        return game_key_pressed();
+            for (bind2 = 0; bind2 < game_key.b.size(); bind2++) {
+                if (game_key.bind_num == bind2 || (b[bind2].key == key && b[bind2].mod == mod && b[bind2].joy == joy))
+                    continue;
+
+                for (kpno = 0; kpno < keys_pressed.size(); kpno++)
+                    if (keys_pressed[kpno].key == b[bind2].key && keys_pressed[kpno].mod == b[bind2].mod && keys_pressed[kpno].joy == b[bind2].joy)
+                        break;
+            }
+
+            if (bind2 == b.size()) {
+                // release button
+                joypress[game_key.player] &= ~bmask[game_key.key_num];
+            }
+        }
     }
-    else {
-        return game_key_released;
-    }
+
+    delete game_keys;
+
+    return is_game_key;
 }
 
 static void draw_black_background(wxWindow* win) {
