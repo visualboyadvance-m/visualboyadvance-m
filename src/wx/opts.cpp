@@ -276,7 +276,7 @@ opt_desc opts[] = {
 #ifdef __WXMSW__
     ENUMOPT("Sound/AudioAPI", "", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl|" OAL_SOUND "directsound|" FAUDIO_SOUND "xaudio2")),
 #else
-    ENUMOPT("Sound/AudioAPI", "", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl" OAL_SOUND FAUDIO_SOUND)),
+    ENUMOPT("Sound/AudioAPI", "", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl|" OAL_SOUND FAUDIO_SOUND)),
 #endif
     INTOPT("Sound/Buffers", "", wxTRANSLATE("Number of sound buffers"), gopts.audio_buffers, 2, 10),
     INTOPT("Sound/Enable", "", wxTRANSLATE("Bit mask of sound channels to enable"), gopts.sound_en, 0, 0x30f),
