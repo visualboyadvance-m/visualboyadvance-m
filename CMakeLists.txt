@@ -25,6 +25,7 @@ option(ENABLE_SDL "Build the SDL port" OFF)
 option(ENABLE_WX "Build the wxWidgets port" ON)
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
 option(ENABLE_NLS "Enable translations" ON)
+option(ENABLE_ASAN "Enable -fsanitize=<option>, address by default, requires debug build" OFF)
 
 option(VBAM_STATIC "Try to link all libraries statically" OFF)
 
@@ -389,12 +390,25 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     if(X86_32 OR AMD64)
         set(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -mtune=generic)
     endif()
-
+ 
     # common debug flags
     if(CMAKE_COMPILER_IS_GNUCXX)
-        set(MY_C_DBG_FLAGS -ggdb3 -Og)
+        set(MY_C_DBG_FLAGS -ggdb3 -Og -fno-omit-frame-pointer)
     else()
-        set(MY_C_DBG_FLAGS -g)
+        set(MY_C_DBG_FLAGS -g -fno-omit-frame-pointer)
+    endif()
+
+    if(ENABLE_ASAN)
+        string(TOLOWER ${CMAKE_BUILD_TYPE} build)
+        if(NOT build STREQUAL "debug")
+            message(FATAL_ERROR "asan requires debug build, set -DCMAKE_BUILD_TYPE=Debug")
+        endif()
+
+        string(TOLOWER ${ENABLE_ASAN} SANITIZER)
+        if(SANITIZER STREQUAL "on" OR SANITIZER STREQUAL "true")
+            set(SANITIZER address)
+        endif()
+        set(MY_C_DBG_FLAGS ${MY_C_DBG_FLAGS} -fsanitize=${SANITIZER} -lasan)
     endif()
 
     # common flags

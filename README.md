@@ -147,6 +147,7 @@ Here is the complete list:
 | ENABLE_XAUDIO2        | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
 | ENABLE_OPENAL         | Enable OpenAL for the wxWidgets port                                 | OFF                   |
 | ENABLE_SSP            | Enable gcc stack protector support (gcc only)                        | OFF                   |
+| ENABLE_ASAN           | Enable libasan sanitizers (by default address, only in debug mode)   | OFF                   |
 | VBAM_STATIC           | Try link all libs statically (the following are set to ON if ON)     | OFF                   |
 | SDL2_STATIC           | Try to link static SDL2 libraries                                    | OFF                   |
 | SFML_STATIC_LIBRARIES | Try to link static SFML libraries                                    | OFF                   |
