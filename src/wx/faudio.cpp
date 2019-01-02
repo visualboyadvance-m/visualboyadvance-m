@@ -26,8 +26,6 @@ int GetFADevices(FAudio* fa, wxArrayString* names, wxArrayString* ids,
     HRESULT hr;
     UINT32 dev_count = 0;
 
-    wxLogDebug("IN FAUDIO INIT");
-
     hr = FAudio_GetDeviceCount(fa, &dev_count);
 
     if (hr != S_OK) {
@@ -62,6 +60,7 @@ bool GetFADevices(wxArrayString& names, wxArrayString& ids)
 #ifdef _DEBUG
     flags = FAUDIO_DEBUG_ENGINE;
 #endif
+
     hr = FAudioCreate(&fa, flags, FAUDIO_DEFAULT_PROCESSOR); //Apparently this needs 3 parameters, the processor.
 
     if (hr != S_OK) {
@@ -347,7 +346,7 @@ bool FAudio_Output::init(long sampleRate)
     //#ifdef _DEBUG
     //	flags = FAUDIO_DEBUG_ENGINE;
     //#endif
-    hr = FAudioCreate(&faud, flags, FAUDIO_DEFAULT_CHANNELS);
+    hr = FAudioCreate(&faud, flags, FAUDIO_DEFAULT_PROCESSOR);
 
     if (hr != S_OK) {
         wxLogError(_("The FAudio interface failed to initialize!"));
