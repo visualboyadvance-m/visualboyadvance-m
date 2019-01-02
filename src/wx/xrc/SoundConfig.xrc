@@ -109,20 +109,7 @@
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="OpenAL">
                       <label>OpenAL</label>
-                    </object>
-                    <flag>wxALL|wxEXPAND</flag>
-                    <border>5</border>
-                  </object>
-                  <object class="sizeritem">
-                    <object class="wxRadioButton" name="XAudio2">
-                      <label>XAudio2</label>
-                    </object>
-                    <flag>wxALL|wxEXPAND</flag>
-                    <border>5</border>
-                  </object>
-                  <object class="sizeritem">
-                    <object class="wxRadioButton" name="FAudio">
-                      <label>FAudio</label>
+                      <style>wxRB_GROUP</style>
                     </object>
                     <flag>wxALL|wxEXPAND</flag>
                     <border>5</border>
@@ -130,8 +117,25 @@
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="DirectSound">
                       <label>DirectSound</label>
+                      <style>wxRB_GROUP</style>
                     </object>
                     <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="XAudio2">
+                      <label>XAudio2</label>
+                      <style>wxRB_GROUP</style>
+                    </object>
+                    <flag>wxALL|wxEXPAND</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="FAudio">
+                      <label>FAudio</label>
+                      <style>wxRB_GROUP</style>
+                    </object>
+                    <flag>wxALL|wxEXPAND</flag>
                     <border>5</border>
                   </object>
                   <orient>wxHORIZONTAL</orient>

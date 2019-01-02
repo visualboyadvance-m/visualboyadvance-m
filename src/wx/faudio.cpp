@@ -25,6 +25,9 @@ int GetFADevices(FAudio* fa, wxArrayString* names, wxArrayString* ids,
 {
     HRESULT hr;
     UINT32 dev_count = 0;
+
+    wxLogDebug("IN FAUDIO INIT");
+
     hr = FAudio_GetDeviceCount(fa, &dev_count);
 
     if (hr != S_OK) {
