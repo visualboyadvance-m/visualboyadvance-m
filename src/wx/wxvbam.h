@@ -102,7 +102,7 @@ public:
     };
 #endif
     // without this, global accels don't always work
-    int FilterEvent(wxEvent& event);
+    //int FilterEvent(wxEvent& event);
     wxAcceleratorEntry_v accels;
 
     // the main configuration

@@ -1048,23 +1048,23 @@ void MainFrame::IdentifyRom()
 // ctrl-w does not work for close).  It's possible another entity is
 // grabbing those keys, but I can't track it down.
 // FIXME: move this to MainFrame
-int wxvbamApp::FilterEvent(wxEvent& event)
-{
-    //if(frame && frame->IsPaused(true))
-    return -1;
-
-    if (event.GetEventType() == wxEVT_KEY_DOWN) {
-        wxKeyEvent& ke = (wxKeyEvent&)event;
-
-        for (int i = 0; i < accels.size(); i++) {
-            if (accels[i].GetKeyCode() == ke.GetKeyCode() && accels[i].GetFlags() == ke.GetModifiers()) {
-                wxCommandEvent ev(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
-                ev.SetEventObject(this);
-                frame->GetEventHandler()->ProcessEvent(ev);
-                return 1;
-            }
-        }
-    }
-
-    return -1;
-}
+//int wxvbamApp::FilterEvent(wxEvent& event)
+//{
+//    //if(frame && frame->IsPaused(true))
+//    return -1;
+//
+//    if (event.GetEventType() == wxEVT_KEY_DOWN) {
+//        wxKeyEvent& ke = (wxKeyEvent&)event;
+//
+//        for (int i = 0; i < accels.size(); i++) {
+//            if (accels[i].GetKeyCode() == ke.GetKeyCode() && accels[i].GetFlags() == ke.GetModifiers()) {
+//                wxCommandEvent ev(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
+//                ev.SetEventObject(this);
+//                frame->GetEventHandler()->ProcessEvent(ev);
+//                return 1;
+//            }
+//        }
+//    }
+//
+//    return -1;
+//}

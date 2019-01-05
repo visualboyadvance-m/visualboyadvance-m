@@ -45,8 +45,13 @@ const wxAcceleratorEntry default_accels[] = {
     // maybe make alt-f4 universal as well...
     // FIXME: ctrl-Q does not work on wxMSW
     // FIXME: esc does not work on wxMSW
-    wxAcceleratorEntry(wxMOD_NONE, WXK_ESCAPE, wxID_EXIT),
-    wxAcceleratorEntry(wxMOD_CMD, wxT('X'), wxID_EXIT),
+
+    // this was annoying people A LOT #334
+    //wxAcceleratorEntry(wxMOD_NONE, WXK_ESCAPE, wxID_EXIT),
+
+    // this was annoying people #298
+    //wxAcceleratorEntry(wxMOD_CMD, wxT('X'), wxID_EXIT),
+
     wxAcceleratorEntry(wxMOD_CMD, wxT('Q'), wxID_EXIT),
     // FIXME: ctrl-W does not work on wxMSW
     wxAcceleratorEntry(wxMOD_CMD, wxT('W'), wxID_CLOSE),
