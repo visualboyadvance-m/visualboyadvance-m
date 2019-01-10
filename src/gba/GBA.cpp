@@ -3351,7 +3351,6 @@ void SetSaveType(int st)
         cpuSaveGameFunc = flashSaveDecide;
         break;
     case 1: // EEPROM
-        eepromReset();
         cpuSramEnabled = false;
         cpuFlashEnabled = false;
         cpuEEPROMEnabled = true;
@@ -3368,7 +3367,6 @@ void SetSaveType(int st)
         gbaSaveType = 1;
         break;
     case 3: // FLASH
-        flashReset();
         cpuSramEnabled = false;
         cpuFlashEnabled = true;
         cpuEEPROMEnabled = false;
@@ -3633,6 +3631,8 @@ void CPUReset()
             BIOS_RegisterRamReset(0xfe);
     }
 
+    flashReset();
+    eepromReset();
     SetSaveType(saveType);
 
     ARM_PREFETCH;
