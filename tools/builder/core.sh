@@ -176,7 +176,6 @@ DISTS=$DISTS'
     libgcrypt       https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.2.tar.bz2                          lib/libgcrypt.a
     libsecret       http://ftp.gnome.org/pub/gnome/sources/libsecret/0.18/libsecret-0.18.5.tar.xz               lib/libsecret-1.a
     sdl2            https://www.libsdl.org/release/SDL2-2.0.9.tar.gz                                            lib/libSDL2.a
-    faudio          https://github.com/FNA-XNA/FAudio/archive/19.01.tar.gz                                      lib/libfaudio.dll.a
     flac            https://github.com/xiph/flac/archive/f7cd466c24fb5d1966943f3ea36a1f4a37858597.tar.gz        lib/libFLAC.a
     libogg          http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.xz                                  lib/libogg.a
     libvorbis       https://github.com/xiph/vorbis/archive/v1.3.5.tar.gz                                        lib/libvorbis.a
