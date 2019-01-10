@@ -96,11 +96,6 @@ static Stereo_Buffer* stereo_buffer;
 
 static Blip_Synth<blip_best_quality, 1> pcm_synth[3]; // 32 kHz, 16 kHz, 8 kHz
 
-static inline blip_time_t blip_time(void)
-{
-    return soundTicks;
-}
-
 void Gba_Pcm::init()
 {
     output = 0;
@@ -133,7 +128,7 @@ void Gba_Pcm::apply_control(int idx)
     if (output != out) {
         if (output) {
             output->set_modified();
-            pcm_synth[0].offset(blip_time(), -last_amp, output);
+            pcm_synth[0].offset(soundTicks, -last_amp, output);
         }
         last_amp = 0;
         output = out;
@@ -153,7 +148,7 @@ void Gba_Pcm::end_frame(blip_time_t time)
 void Gba_Pcm::update(int dac)
 {
     if (output) {
-        blip_time_t time = blip_time();
+        blip_time_t time = soundTicks;
 
         dac = (int8_t)dac >> shift;
         int delta = dac - last_amp;
@@ -261,7 +256,7 @@ void soundEvent(uint32_t address, uint8_t data)
     int gb_addr = gba_to_gb_sound(address);
     if (gb_addr) {
         ioMem[address] = data;
-        gb_apu->write_register(blip_time(), gb_addr, data);
+        gb_apu->write_register(soundTicks, gb_addr, data);
 
         if (address == NR52)
             apply_control();
