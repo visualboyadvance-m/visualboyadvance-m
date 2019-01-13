@@ -126,38 +126,6 @@ static bool gb_hasrtc(void)
     return false;
 }
 
-static void* gba_savedata_ptr(void)
-{
-    if ((saveType == 1) | (saveType == 4))
-        return eepromData;
-    if ((saveType == 2) | (saveType == 3))
-        return flashSaveMemory;
-    return 0;
-}
-
-static size_t gba_savedata_size(void)
-{
-    if ((saveType == 1) | (saveType == 4))
-        return eepromSize;
-    if ((saveType == 2) | (saveType == 3))
-        return flashSize;
-    return 0;
-}
-
-static void* gb_savedata_ptr(void)
-{
-    if (gb_hasbattery())
-        return gbRam;
-    return 0;
-}
-
-static size_t gb_savedata_size(void)
-{
-    if (gb_hasbattery())
-        return gbRamSize;
-    return 0;
-}
-
 static void* gb_rtcdata_prt(void)
 {
     if (gb_hasrtc()) {
@@ -170,7 +138,7 @@ static void* gb_rtcdata_prt(void)
             return &gbDataTAMA5.mapperSeconds;
         }
     }
-    return 0;
+    return NULL;
 }
 
 static size_t gb_rtcdata_size(void)
@@ -190,80 +158,9 @@ static size_t gb_rtcdata_size(void)
     return 0;
 }
 
-static void* savedata_ptr(void)
-{
-    if (type == IMAGE_GBA)
-        return gba_savedata_ptr();
-    if (type == IMAGE_GB)
-        return gb_savedata_ptr();
-    return 0;
-}
-
-static size_t savedata_size(void)
-{
-    if (type == IMAGE_GBA)
-        return gba_savedata_size();
-    if (type == IMAGE_GB)
-        return gb_savedata_size();
-    return 0;
-}
-
-static void* rtcdata_ptr(void)
-{
-    if (type == IMAGE_GB)
-        return gb_rtcdata_prt();
-    return 0;
-}
-
-static size_t rtcdata_size(void)
-{
-    if (type == IMAGE_GB)
-        return gb_rtcdata_size();
-    return 0;
-}
-
-static void* wram_ptr(void)
-{
-    if (type == IMAGE_GBA)
-        return workRAM;
-    if (type == IMAGE_GB)
-        return gbMemoryMap[0x0c];
-    return 0;
-}
-
-static size_t wram_size(void)
-{
-    if (type == IMAGE_GBA)
-        return 0x40000;
-    if (type == IMAGE_GB)
-        // only use 1st bank of wram,  libretro doesnt seem to handle
-        // the switching bank properly in GBC mode. This is to avoid possible incorrect reads.
-        // For cheevos purposes, this bank is accessed using retro_memory_descriptor instead.
-        return gbCgbMode ? 0x1000 : 0x2000;
-    return 0;
-}
-
-static void* vram_ptr(void)
-{
-    if (type == IMAGE_GBA)
-        return vram;
-    if (type == IMAGE_GB)
-        return gbMemoryMap[0x08] ;
-    return 0;
-}
-
-static size_t vram_size(void)
-{
-    if (type == IMAGE_GBA)
-        return 0x20000;
-    if (type == IMAGE_GB)
-        return 0x2000;;
-    return 0;
-}
-
 static void gbUpdateRTC(void)
 {
-    if (gb_hasbattery()) {
+    if (gb_hasrtc()) {
         struct tm* lt;
         time_t rawtime;
         time(&rawtime);
@@ -315,27 +212,65 @@ static void gbUpdateRTC(void)
 
 void* retro_get_memory_data(unsigned id)
 {
-    if (id == RETRO_MEMORY_SAVE_RAM)
-        return savedata_ptr();
-    //if (id == RETRO_MEMORY_RTC)
-        //return rtcdata_ptr();
-    if (id == RETRO_MEMORY_SYSTEM_RAM)
-        return wram_ptr();
-    if (id == RETRO_MEMORY_VIDEO_RAM)
-        return vram_ptr();
-    return 0;
+    if (type == IMAGE_GBA) {
+        switch (id) {
+        case RETRO_MEMORY_SAVE_RAM:
+            if ((saveType == 1) | (saveType == 4))
+                return eepromData;
+            if ((saveType == 2) | (saveType == 3))
+                return flashSaveMemory;
+            return NULL;
+        case RETRO_MEMORY_SYSTEM_RAM:
+            return workRAM;
+        case RETRO_MEMORY_VIDEO_RAM:
+            return vram;
+        }
+    }
+    else if (type == IMAGE_GB) {
+        switch (id) {
+        case RETRO_MEMORY_SAVE_RAM:
+            if (gb_hasbattery())
+                return gbRam;
+            return NULL;
+        case RETRO_MEMORY_SYSTEM_RAM:
+            return gbMemoryMap[0x0c];
+        case RETRO_MEMORY_VIDEO_RAM:
+            return gbMemoryMap[0x08] ;
+        }
+    }
+
+    return NULL;
 }
 
 size_t retro_get_memory_size(unsigned id)
 {
-    if (id == RETRO_MEMORY_SAVE_RAM)
-        return savedata_size();
-    //if (id == RETRO_MEMORY_RTC)
-        //return rtcdata_size();
-    if (id == RETRO_MEMORY_SYSTEM_RAM)
-        return wram_size();
-    if (id == RETRO_MEMORY_VIDEO_RAM)
-        return vram_size();
+    if (type == IMAGE_GBA) {
+        switch (id) {
+        case RETRO_MEMORY_SAVE_RAM:
+            if ((saveType == 1) | (saveType == 4))
+                return eepromSize;
+            if ((saveType == 2) | (saveType == 3))
+                return flashSize;
+            return 0;
+        case RETRO_MEMORY_SYSTEM_RAM:
+            return 0x40000;
+        case RETRO_MEMORY_VIDEO_RAM:
+            return 0x20000;
+        }
+    }
+    else if (type == IMAGE_GB) {
+        switch (id) {
+        case RETRO_MEMORY_SAVE_RAM:
+            if (gb_hasbattery())
+                return gbRamSize;
+            return 0;
+        case RETRO_MEMORY_SYSTEM_RAM:
+            return gbCgbMode ? 0x1000 : 0x2000;
+        case RETRO_MEMORY_VIDEO_RAM:
+            return 0x2000;
+        }
+    }
+
     return 0;
 }
 
@@ -427,7 +362,7 @@ void retro_set_environment(retro_environment_t cb)
    };
 
    static const struct retro_controller_description port_1[] = {
-      { "GBA Joypad", RETRO_DEVICE_GBA },
+      { "GBA Joypad", RETRO_DEVICE_JOYPAD },
       { "Alt Joypad YB", RETRO_DEVICE_GBA_ALT1 },
       { "Alt Joypad AB", RETRO_DEVICE_GBA_ALT2 },
       { NULL, 0 },
@@ -690,7 +625,7 @@ static void load_image_preferences(void)
         utilGBAFindSave(romSize);
     }
 
-    log("romSize         : %dKB)\n", (romSize + 1023) / 1024);
+    log("romSize         : %dKB\n", (romSize + 1023) / 1024);
     log("has RTC         : %s.\n", rtcEnabled ? "Yes" : "No");
     log("cpuSaveType     : %s.\n", savetype[cpuSaveType]);
     if (cpuSaveType == 3)
