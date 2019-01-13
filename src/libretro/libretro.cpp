@@ -240,6 +240,7 @@ static size_t wram_size(void)
         // the switching bank properly in GBC mode. This is to avoid possible incorrect reads.
         // For cheevos purposes, this bank is accessed using retro_memory_descriptor instead.
         return gbCgbMode ? 0x1000 : 0x2000;
+    return 0;
 }
 
 static void* vram_ptr(void)
