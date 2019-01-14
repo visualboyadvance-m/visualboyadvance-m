@@ -427,6 +427,9 @@ void retro_init(void)
     if (environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &rgb8888) && log_cb)
         log_cb(RETRO_LOG_INFO, "Frontend supports XRGB8888 - will use that instead of XRGB1555.\n");
 #endif
+
+   bool yes = true;
+   environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
 }
 
 static const char *gbGetCartridgeType(void)
@@ -1263,67 +1266,47 @@ bool retro_load_game(const struct retro_game_info *game)
 
       gb_init();
 
-      struct retro_memory_descriptor desc[8];
+      unsigned addr, i;
+      struct retro_memory_descriptor desc[16];
+      struct retro_memory_map retromap;
+
       memset(desc, 0, sizeof(desc));
+      // the GB's memory is divided into 16 parts with 4096 bytes each == 65536
+      for (addr = 0, i = 0; addr < 16; addr++) {
+         if (gbMemoryMap[addr] != NULL) {
+            // $FFFF        Interrupt Enable Flag
+            // $FF80-$FFFE  Zero Page - 127 bytes
+            // $FF00-$FF7F  Hardware I/O Registers
+            // $FEA0-$FEFF  Unusable Memory
+            // $FE00-$FE9F  OAM - Object Attribute Memory
+            // $E000-$FDFF  Echo RAM - Reserved, Do Not Use
+            // $D000-$DFFF  Internal RAM - Bank 1-7 (switchable - CGB only)
+            // $C000-$CFFF  Internal RAM - Bank 0 (fixed)
+            // $A000-$BFFF  Cartridge RAM (If Available)
+            // $9C00-$9FFF  BG Map Data 2
+            // $9800-$9BFF  BG Map Data 1
+            // $8000-$97FF  Character RAM
+            // $4000-$7FFF  Cartridge ROM - Switchable Banks 1-xx
+            // $0150-$3FFF  Cartridge ROM - Bank 0 (fixed)
+            // $0100-$014F  Cartridge Header Area
+            // $0000-$00FF  Restart and Interrupt Vectors
+            // http://gameboy.mongenel.com/dmg/asmmemmap.html
 
-      // workram bank 0 0xc000-0xcfff / bank 1-7 0xd000-0xdfff
-      desc[0].ptr   = &gbMemory[0xc000];
-      desc[0].start = 0xc000;
-      desc[0].len   = 0x1000;
+            desc[i].ptr    = gbMemoryMap[addr];
+            desc[i].start  = addr * 0x1000;
+            desc[i].len    = 4096;
+            if (addr < 4)  desc[i].flags  = RETRO_MEMDESC_CONST;
+            i++;
+         }
+      }
 
-      // workram bank 1-7 switchable (switchable-CGB only)
-      desc[1].ptr   = gbCgbMode ? &gbWram[0x1000] : &gbMemory[0xd000];
-      desc[1].start = 0xd000;
-      desc[1].len   = 0x1000;
-
-      // high ram area
-      desc[2].ptr   = &gbMemory[0xff80];
-      desc[2].start = 0xff80;
-      desc[2].len   = 0x0080;
-
-      // save ram or cartridge ram area
-      desc[3].ptr   = gbRamSize ? &gbRam[0] : 0;
-      desc[3].start = 0xa000;
-      desc[3].len   = gbRamSize ? gbRamSize : 0;
-
-      // vram (chr ram, gb map data 1 - 2)
-      desc[4].ptr   = gbCgbMode ? &gbVram[0] : &gbMemory[0x8000];
-      desc[4].start = 0x8000;
-      desc[4].len   = 0x2000;
-
-      // oam
-      desc[5].ptr   = &gbMemory[0xfe00];
-      desc[5].start = 0xfe00;
-      desc[5].len   = 0x00a0;
-
-      // http://gameboy.mongenel.com/dmg/asmmemmap.html
-      // $4000-$7FFF    Cartridge ROM - Switchable Banks 1-xx
-      // $0150-$3FFF    Cartridge ROM - Bank 0 (fixed)
-      // $0100-$014F    Cartridge Header Area
-      // $0000-$00FF    Restart and Interrupt Vectors
-      desc[6].ptr   = gbMemoryMap[0x00];
-      desc[6].start = 0x0000;
-      desc[6].len   = 0x4000;
-      desc[6].flags = RETRO_MEMDESC_CONST;
-
-      desc[7].ptr   = gbMemoryMap[0x04];
-      desc[7].start = 0x4000;
-      desc[7].len   = 0x4000;
-      desc[7].flags = RETRO_MEMDESC_CONST;
-
-      struct retro_memory_map retromap = {
-          desc,
-          sizeof(desc) / sizeof(desc[0])
-      };
-
+      retromap.descriptors = desc;
+      retromap.num_descriptors = i;
       environ_cb(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &retromap);
    }
 
    if (!core)
        return false;
-
-   bool yes = true;
-   environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
 
    uint8_t* state_buf = (uint8_t*)malloc(2000000);
    serialize_size = core->emuWriteState(state_buf, 2000000);
