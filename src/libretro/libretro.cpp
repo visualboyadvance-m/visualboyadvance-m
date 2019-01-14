@@ -80,6 +80,49 @@ int emulating = 0;
 void (*dbgOutput)(const char* s, uint32_t addr);
 void (*dbgSignal)(int sig, int number);
 
+// Dummy vars/funcs for serial io emulation without LINK communication related stuff
+#ifndef NO_LINK
+#include "../gba/GBALink.h"
+uint8_t gbSIO_SC;
+bool LinkIsWaiting;
+bool LinkFirstTime;
+bool EmuReseted;
+int winGbPrinterEnabled;
+bool gba_joybus_active = false;
+
+LinkMode GetLinkMode()
+{
+    return LINK_DISCONNECTED;
+}
+
+void StartGPLink(uint16_t value)
+{
+}
+
+void LinkUpdate(int ticks)
+{
+}
+
+void StartLink(uint16_t siocnt)
+{
+}
+
+void CheckLinkConnection()
+{
+}
+
+void gbInitLink()
+{
+   LinkIsWaiting = false;
+   LinkFirstTime = true;
+}
+
+uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
+{
+   return (b << 8);
+}
+#endif
+
 #define GS555(x) (x | (x << 5) | (x << 10))
 uint16_t systemGbPalette[24] = {
     GS555(0x1f), GS555(0x15), GS555(0x0c), 0,
