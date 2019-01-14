@@ -308,7 +308,7 @@ size_t retro_get_memory_size(unsigned id)
                 return gbRamSize;
             return 0;
         case RETRO_MEMORY_SYSTEM_RAM:
-            return gbCgbMode ? 0x1000 : 0x2000;
+            return 0x2000;
         case RETRO_MEMORY_VIDEO_RAM:
             return 0x2000;
         }

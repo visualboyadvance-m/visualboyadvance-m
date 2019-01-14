@@ -1282,7 +1282,7 @@ void gbWriteMemory(register uint16_t address, register uint8_t value)
         if ((gbHardware & 5)
             && (((!gbInt48Signal) && (gbLcdMode < 2) && (register_LCDC & 0x80))
             || (register_LY == register_LYC))) {
-            
+
             gbMemory[0xff0f] = register_IF |=2;
         }
 
@@ -2744,7 +2744,15 @@ void gbReset()
         gbMemoryMap[0x09] = &gbVram[0x1000];
         gbMemoryMap[0x0a] = &gbMemory[0xa000];
         gbMemoryMap[0x0b] = &gbMemory[0xb000];
+
+        // TODO: 2019/1/15
+        // Should we be using gbWram[] on $C000 as well
+        // for a continouos mem block?
+#ifndef __LIBRETRO__
         gbMemoryMap[0x0c] = &gbMemory[0xc000];
+#else
+        gbMemoryMap[0x0c] = &gbWram[0x0000];
+#endif
         gbMemoryMap[0x0d] = &gbWram[0x1000];
         gbMemoryMap[0x0e] = &gbMemory[0xe000];
         gbMemoryMap[0x0f] = &gbMemory[0xf000];
@@ -5662,6 +5670,7 @@ bool gbReadSaveState(const uint8_t* data, unsigned)
 
         gbMemoryMap[0x08] = &gbVram[register_VBK * 0x2000];
         gbMemoryMap[0x09] = &gbVram[register_VBK * 0x2000 + 0x1000];
+        gbMemoryMap[0x0c] = &gbWram[0x0000];
         gbMemoryMap[0x0d] = &gbWram[value * 0x1000];
     }
 
