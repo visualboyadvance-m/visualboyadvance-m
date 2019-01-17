@@ -2575,10 +2575,8 @@ static INSN_REGPARM void arm9F0(uint32_t opcode)
 // B <offset>
 static INSN_REGPARM void armA00(uint32_t opcode)
 {
-    int offset = opcode & 0x00FFFFFF;
-    if (offset & 0x00800000)
-        offset |= 0xFF000000; // negative offset
-    reg[15].I += offset << 2;
+    int32_t offset = ((int32_t)(opcode & 0x00FFFFFF) << 8) >> 6;
+    reg[15].I += offset;
     armNextPC = reg[15].I;
     reg[15].I += 4;
     ARM_PREFETCH;
@@ -2590,11 +2588,9 @@ static INSN_REGPARM void armA00(uint32_t opcode)
 // BL <offset>
 static INSN_REGPARM void armB00(uint32_t opcode)
 {
-    int offset = opcode & 0x00FFFFFF;
-    if (offset & 0x00800000)
-        offset |= 0xFF000000; // negative offset
+    int32_t offset = ((int32_t)(opcode & 0x00FFFFFF) << 8) >> 6;
     reg[14].I = reg[15].I - 4;
-    reg[15].I += offset << 2;
+    reg[15].I += offset;
     armNextPC = reg[15].I;
     reg[15].I += 4;
     ARM_PREFETCH;

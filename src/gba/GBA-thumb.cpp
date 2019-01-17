@@ -1700,215 +1700,102 @@ static INSN_REGPARM void thumbC8(uint32_t opcode)
 }
 
 // Conditional branches ///////////////////////////////////////////////////
+#define THUMB_CONDITIONAL_BRANCH(COND)                                  \
+    UPDATE_OLDREG;                                                      \
+    clockTicks = codeTicksAccessSeq16(armNextPC) + 1;                   \
+    if (COND) {                                                         \
+        uint32_t offset = (uint32_t)((int8_t)(opcode & 0xFF)) << 1;     \
+        reg[15].I += offset;                                            \
+        armNextPC = reg[15].I;                                          \
+        reg[15].I += 2;                                                 \
+        THUMB_PREFETCH;                                                 \
+        clockTicks += codeTicksAccessSeq16(armNextPC)                   \
+            + codeTicksAccess16(armNextPC) + 2;                         \
+        busPrefetchCount = 0;                                           \
+    }
 
 // BEQ offset
 static INSN_REGPARM void thumbD0(uint32_t opcode)
 {
-    UPDATE_OLDREG;
-    clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
-    if (Z_FLAG) {
-        reg[15].I += ((int8_t)(opcode & 0xFF)) << 1;
-        armNextPC = reg[15].I;
-        reg[15].I += 2;
-        THUMB_PREFETCH;
-        clockTicks += codeTicksAccessSeq16(armNextPC) + codeTicksAccess16(armNextPC) + 2;
-        busPrefetchCount = 0;
-    }
+    THUMB_CONDITIONAL_BRANCH(Z_FLAG);
 }
 
 // BNE offset
 static INSN_REGPARM void thumbD1(uint32_t opcode)
 {
-    UPDATE_OLDREG;
-    clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
-    if (!Z_FLAG) {
-        reg[15].I += ((int8_t)(opcode & 0xFF)) << 1;
-        armNextPC = reg[15].I;
-        reg[15].I += 2;
-        THUMB_PREFETCH;
-        clockTicks += codeTicksAccessSeq16(armNextPC) + codeTicksAccess16(armNextPC) + 2;
-        busPrefetchCount = 0;
-    }
+    THUMB_CONDITIONAL_BRANCH(!Z_FLAG);
 }
 
 // BCS offset
 static INSN_REGPARM void thumbD2(uint32_t opcode)
 {
-    UPDATE_OLDREG;
-    clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
-    if (C_FLAG) {
-        reg[15].I += ((int8_t)(opcode & 0xFF)) << 1;
-        armNextPC = reg[15].I;
-        reg[15].I += 2;
-        THUMB_PREFETCH;
-        clockTicks += codeTicksAccessSeq16(armNextPC) + codeTicksAccess16(armNextPC) + 2;
-        busPrefetchCount = 0;
-    }
+    THUMB_CONDITIONAL_BRANCH(C_FLAG);
 }
 
 // BCC offset
 static INSN_REGPARM void thumbD3(uint32_t opcode)
 {
-    UPDATE_OLDREG;
-    clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
-    if (!C_FLAG) {
-        reg[15].I += ((int8_t)(opcode & 0xFF)) << 1;
-        armNextPC = reg[15].I;
-        reg[15].I += 2;
-        THUMB_PREFETCH;
-        clockTicks += codeTicksAccessSeq16(armNextPC) + codeTicksAccess16(armNextPC) + 2;
-        busPrefetchCount = 0;
-    }
+    THUMB_CONDITIONAL_BRANCH(!C_FLAG);
 }
 
 // BMI offset
 static INSN_REGPARM void thumbD4(uint32_t opcode)
 {
-    UPDATE_OLDREG;
-    clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
-    if (N_FLAG) {
-        reg[15].I += ((int8_t)(opcode & 0xFF)) << 1;
-        armNextPC = reg[15].I;
-        reg[15].I += 2;
-        THUMB_PREFETCH;
-        clockTicks += codeTicksAccessSeq16(armNextPC) + codeTicksAccess16(armNextPC) + 2;
-        busPrefetchCount = 0;
-    }
+    THUMB_CONDITIONAL_BRANCH(N_FLAG);
 }
 
 // BPL offset
 static INSN_REGPARM void thumbD5(uint32_t opcode)
 {
-    UPDATE_OLDREG;
-    clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
-    if (!N_FLAG) {
-        reg[15].I += ((int8_t)(opcode & 0xFF)) << 1;
-        armNextPC = reg[15].I;
-        reg[15].I += 2;
-        THUMB_PREFETCH;
-        clockTicks += codeTicksAccessSeq16(armNextPC) + codeTicksAccess16(armNextPC) + 2;
-        busPrefetchCount = 0;
-    }
+    THUMB_CONDITIONAL_BRANCH(!N_FLAG);
 }
 
 // BVS offset
 static INSN_REGPARM void thumbD6(uint32_t opcode)
 {
-    UPDATE_OLDREG;
-    clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
-    if (V_FLAG) {
-        reg[15].I += ((int8_t)(opcode & 0xFF)) << 1;
-        armNextPC = reg[15].I;
-        reg[15].I += 2;
-        THUMB_PREFETCH;
-        clockTicks += codeTicksAccessSeq16(armNextPC) + codeTicksAccess16(armNextPC) + 2;
-        busPrefetchCount = 0;
-    }
+    THUMB_CONDITIONAL_BRANCH(V_FLAG);
 }
 
 // BVC offset
 static INSN_REGPARM void thumbD7(uint32_t opcode)
 {
-    UPDATE_OLDREG;
-    clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
-    if (!V_FLAG) {
-        reg[15].I += ((int8_t)(opcode & 0xFF)) << 1;
-        armNextPC = reg[15].I;
-        reg[15].I += 2;
-        THUMB_PREFETCH;
-        clockTicks += codeTicksAccessSeq16(armNextPC) + codeTicksAccess16(armNextPC) + 2;
-        busPrefetchCount = 0;
-    }
+    THUMB_CONDITIONAL_BRANCH(!V_FLAG);
 }
 
 // BHI offset
 static INSN_REGPARM void thumbD8(uint32_t opcode)
 {
-    UPDATE_OLDREG;
-    clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
-    if (C_FLAG && !Z_FLAG) {
-        reg[15].I += ((int8_t)(opcode & 0xFF)) << 1;
-        armNextPC = reg[15].I;
-        reg[15].I += 2;
-        THUMB_PREFETCH;
-        clockTicks += codeTicksAccessSeq16(armNextPC) + codeTicksAccess16(armNextPC) + 2;
-        busPrefetchCount = 0;
-    }
+    THUMB_CONDITIONAL_BRANCH(C_FLAG && !Z_FLAG);
 }
 
 // BLS offset
 static INSN_REGPARM void thumbD9(uint32_t opcode)
 {
-    UPDATE_OLDREG;
-    clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
-    if (!C_FLAG || Z_FLAG) {
-        reg[15].I += ((int8_t)(opcode & 0xFF)) << 1;
-        armNextPC = reg[15].I;
-        reg[15].I += 2;
-        THUMB_PREFETCH;
-        clockTicks += codeTicksAccessSeq16(armNextPC) + codeTicksAccess16(armNextPC) + 2;
-        busPrefetchCount = 0;
-    }
+    THUMB_CONDITIONAL_BRANCH(!C_FLAG || Z_FLAG);
 }
 
 // BGE offset
 static INSN_REGPARM void thumbDA(uint32_t opcode)
 {
-    UPDATE_OLDREG;
-    clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
-    if (N_FLAG == V_FLAG) {
-        reg[15].I += ((int8_t)(opcode & 0xFF)) << 1;
-        armNextPC = reg[15].I;
-        reg[15].I += 2;
-        THUMB_PREFETCH;
-        clockTicks += codeTicksAccessSeq16(armNextPC) + codeTicksAccess16(armNextPC) + 2;
-        busPrefetchCount = 0;
-    }
+    THUMB_CONDITIONAL_BRANCH(N_FLAG == V_FLAG);
 }
 
 // BLT offset
 static INSN_REGPARM void thumbDB(uint32_t opcode)
 {
-    UPDATE_OLDREG;
-    clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
-    if (N_FLAG != V_FLAG) {
-        reg[15].I += ((int8_t)(opcode & 0xFF)) << 1;
-        armNextPC = reg[15].I;
-        reg[15].I += 2;
-        THUMB_PREFETCH;
-        clockTicks += codeTicksAccessSeq16(armNextPC) + codeTicksAccess16(armNextPC) + 2;
-        busPrefetchCount = 0;
-    }
+    THUMB_CONDITIONAL_BRANCH(N_FLAG != V_FLAG);
 }
 
 // BGT offset
 static INSN_REGPARM void thumbDC(uint32_t opcode)
 {
-    UPDATE_OLDREG;
-    clockTicks = codeTicksAccessSeq16(armNextPC) + 1;
-    if (!Z_FLAG && (N_FLAG == V_FLAG)) {
-        reg[15].I += ((int8_t)(opcode & 0xFF)) << 1;
-        armNextPC = reg[15].I;
-        reg[15].I += 2;
-        THUMB_PREFETCH;
-        clockTicks += codeTicksAccessSeq16(armNextPC) + codeTicksAccess16(armNextPC) + 2;
-        busPrefetchCount = 0;
-    }
+    THUMB_CONDITIONAL_BRANCH(!Z_FLAG && (N_FLAG == V_FLAG));
 }
 
 // BLE offset
 static INSN_REGPARM void thumbDD(uint32_t opcode)
 {
-    UPDATE_OLDREG;
-    clockTicks = codeTicksAccessSeq16(armNextPC);
-    if (Z_FLAG || (N_FLAG != V_FLAG)) {
-        reg[15].I += ((int8_t)(opcode & 0xFF)) << 1;
-        armNextPC = reg[15].I;
-        reg[15].I += 2;
-        THUMB_PREFETCH;
-        clockTicks += codeTicksAccessSeq16(armNextPC) + codeTicksAccess16(armNextPC) + 2;
-        busPrefetchCount = 0;
-    }
+    THUMB_CONDITIONAL_BRANCH(Z_FLAG || (N_FLAG != V_FLAG));
 }
 
 // SWI, B, BL /////////////////////////////////////////////////////////////
