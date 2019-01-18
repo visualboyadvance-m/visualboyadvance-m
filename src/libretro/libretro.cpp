@@ -31,10 +31,6 @@
 #include "../gb/gbSGB.h"
 #include "../gb/gbSound.h"
 
-#define RETRO_DEVICE_GBA             RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 0)
-#define RETRO_DEVICE_GBA_ALT1        RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 1)
-#define RETRO_DEVICE_GBA_ALT2        RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 2)
-
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
 static retro_input_poll_t poll_cb;
@@ -48,7 +44,7 @@ static float sndFiltering = 0.5f;
 static bool sndInterpolation = true;
 static bool can_dupe = false;
 static bool usebios = false;
-static unsigned retropad_layout = 1;
+static unsigned retropad_device[4] = {0};
 
 static const double FramesPerSecond =  (16777216.0 / 280896.0); // 59.73
 static const long SampleRate = 32768;
@@ -348,30 +344,116 @@ void retro_set_input_state(retro_input_state_t cb)
 
 static void update_input_descriptors(void);
 
+static struct retro_input_descriptor input_gba[] = {
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP, "D-Pad Up" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,  "B" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,  "A" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,  "L" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,  "R" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,  "Turbo B" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,  "Turbo A" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2, "Solar Sensor (Darker)" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2, "Solar Sensor (Lighter)" },
+    { 0, 0, 0, 0, NULL },
+};
+
+static struct retro_input_descriptor input_gb[] = {
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP, "D-Pad Up" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,  "B" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,  "A" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,  "Turbo B" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,  "Turbo A" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+    { 0, 0, 0, 0, NULL },
+};
+
+static struct retro_input_descriptor input_sgb[] = {
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP, "D-Pad Up" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,  "B" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,  "A" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,  "Turbo B" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,  "Turbo A" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+    { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+    { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+    { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP, "D-Pad Up" },
+    { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+    { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+    { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,  "B" },
+    { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,  "A" },
+    { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,  "Turbo B" },
+    { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,  "Turbo A" },
+    { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+    { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+    { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+    { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP, "D-Pad Up" },
+    { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+    { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+    { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,  "B" },
+    { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,  "A" },
+    { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,  "Turbo B" },
+    { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,  "Turbo A" },
+    { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+    { 2, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+    { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
+    { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP, "D-Pad Up" },
+    { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
+    { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
+    { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,  "B" },
+    { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,  "A" },
+    { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,  "Turbo B" },
+    { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,  "Turbo A" },
+    { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+    { 3, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+    { 0, 0, 0, 0, NULL },
+};
+
+static const struct retro_controller_description port_gba[] = {
+    { "GBA Joypad", RETRO_DEVICE_JOYPAD },
+    { NULL, 0 },
+};
+
+static const struct retro_controller_description port_gb[] = {
+    { "GB Joypad", RETRO_DEVICE_JOYPAD },
+    { NULL, 0 },
+};
+
+static const struct retro_controller_info ports_gba[] = {
+    { port_gba, 1},
+    { NULL, 0 }
+};
+
+static const struct retro_controller_info ports_gb[] = {
+    { port_gb, 1},
+    { NULL, 0 }
+};
+
+static const struct retro_controller_info ports_sgb[] = {
+    { port_gb, 1},
+    { port_gb, 1},
+    { port_gb, 1},
+    { port_gb, 1},
+    { NULL, 0 }
+};
+
 void retro_set_controller_port_device(unsigned port, unsigned device)
 {
-    if (port > 0) return; // GBA Only supports 1 controller
+    if (port > 3) return;
 
-    log_cb(RETRO_LOG_INFO, "Controller %d'\n", device);
-    switch (device) {
-
-    case RETRO_DEVICE_JOYPAD:
-    case RETRO_DEVICE_GBA:
-    default:
-        retropad_layout = 1;
-        break;
-    case RETRO_DEVICE_GBA_ALT1:
-        retropad_layout = 2;
-        break;
-    case RETRO_DEVICE_GBA_ALT2:
-        retropad_layout = 3;
-        break;
-    case RETRO_DEVICE_NONE:
-        retropad_layout = 0;
-        break;
-    }
-
-    update_input_descriptors();
+    retropad_device[port] = device;
+    log_cb(RETRO_LOG_INFO, "Controller %d device: %d\n", port + 1, device);
 }
 
 void retro_set_environment(retro_environment_t cb)
@@ -404,20 +486,7 @@ void retro_set_environment(retro_environment_t cb)
       { NULL, NULL },
    };
 
-   static const struct retro_controller_description port_1[] = {
-      { "GBA Joypad", RETRO_DEVICE_JOYPAD },
-      { "Alt Joypad YB", RETRO_DEVICE_GBA_ALT1 },
-      { "Alt Joypad AB", RETRO_DEVICE_GBA_ALT2 },
-      { NULL, 0 },
-   };
-
-   static const struct retro_controller_info ports[] = {
-        {port_1, 3},
-        { NULL, 0 }
-    };
-
    cb(RETRO_ENVIRONMENT_SET_VARIABLES, variables);
-   cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void*)ports);
 }
 
 void retro_get_system_info(struct retro_system_info *info)
@@ -700,7 +769,6 @@ static void update_colormaps(void)
     log("Color Depth = %d\n", systemColorDepth);
 }
 
-
 #ifdef _WIN32
 static const char SLASH = '\\';
 #else
@@ -796,14 +864,14 @@ static void gb_init(void)
     crc16 -= gbRom[0x14e] + gbRom[0x14f];
     log("Checksum       : %04x (%04x)\n", crc16, gbRom[0x14e] * 256 + gbRom[0x14f]);
 
-    if (gb_hasbattery)
-        log(": Game supports battery save ram.\n");
+    if (gb_hasbattery())
+        log("Game supports battery save ram.\n");
     if (gbRom[0x143] == 0xc0)
-        log(": Game works on CGB only\n");
+        log("Game works on CGB only\n");
     else if (gbRom[0x143] == 0x80)
-        log(": Game supports GBC functions, GB compatible.\n");
+        log("Game supports GBC functions, GB compatible.\n");
     if (gbRom[0x146] == 0x03)
-        log(": Game supports SGB functions\n");
+        log("Game supports SGB functions\n");
 }
 
 static void gba_soundchanged(void)
@@ -827,66 +895,28 @@ void retro_reset(void)
     eepromSize = tmp;
 }
 
+#define MAX_PLAYERS 4
 #define MAX_BUTTONS 10
-static const unsigned binds[4][MAX_BUTTONS] = {
-    {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // placeholder for no input
-    {
-        RETRO_DEVICE_ID_JOYPAD_A,
-        RETRO_DEVICE_ID_JOYPAD_B,
-        RETRO_DEVICE_ID_JOYPAD_SELECT,
-        RETRO_DEVICE_ID_JOYPAD_START,
-        RETRO_DEVICE_ID_JOYPAD_RIGHT,
-        RETRO_DEVICE_ID_JOYPAD_LEFT,
-        RETRO_DEVICE_ID_JOYPAD_UP,
-        RETRO_DEVICE_ID_JOYPAD_DOWN,
-        RETRO_DEVICE_ID_JOYPAD_R,
-        RETRO_DEVICE_ID_JOYPAD_L
-    },
-    {
-        RETRO_DEVICE_ID_JOYPAD_B,
-        RETRO_DEVICE_ID_JOYPAD_Y,
-        RETRO_DEVICE_ID_JOYPAD_SELECT,
-        RETRO_DEVICE_ID_JOYPAD_START,
-        RETRO_DEVICE_ID_JOYPAD_RIGHT,
-        RETRO_DEVICE_ID_JOYPAD_LEFT,
-        RETRO_DEVICE_ID_JOYPAD_UP,
-        RETRO_DEVICE_ID_JOYPAD_DOWN,
-        RETRO_DEVICE_ID_JOYPAD_R,
-        RETRO_DEVICE_ID_JOYPAD_L
-    },
-    {
-        RETRO_DEVICE_ID_JOYPAD_B,
-        RETRO_DEVICE_ID_JOYPAD_A,
-        RETRO_DEVICE_ID_JOYPAD_SELECT,
-        RETRO_DEVICE_ID_JOYPAD_START,
-        RETRO_DEVICE_ID_JOYPAD_RIGHT,
-        RETRO_DEVICE_ID_JOYPAD_LEFT,
-        RETRO_DEVICE_ID_JOYPAD_UP,
-        RETRO_DEVICE_ID_JOYPAD_DOWN,
-        RETRO_DEVICE_ID_JOYPAD_R,
-        RETRO_DEVICE_ID_JOYPAD_L
-    }
-};
-
 #define TURBO_BUTTONS 2
 static bool turbo_enable = false;
-static int turbo_delay = 3;
-static int turbo_delay_counter[TURBO_BUTTONS] = {0};
+static unsigned turbo_delay = 3;
+static unsigned turbo_delay_counter[MAX_PLAYERS][TURBO_BUTTONS] = {{0}, {0}};
+static const unsigned binds[MAX_BUTTONS] = {
+    RETRO_DEVICE_ID_JOYPAD_A,
+    RETRO_DEVICE_ID_JOYPAD_B,
+    RETRO_DEVICE_ID_JOYPAD_SELECT,
+    RETRO_DEVICE_ID_JOYPAD_START,
+    RETRO_DEVICE_ID_JOYPAD_RIGHT,
+    RETRO_DEVICE_ID_JOYPAD_LEFT,
+    RETRO_DEVICE_ID_JOYPAD_UP,
+    RETRO_DEVICE_ID_JOYPAD_DOWN,
+    RETRO_DEVICE_ID_JOYPAD_R,
+    RETRO_DEVICE_ID_JOYPAD_L
+};
 
-static const unsigned turbo_binds[4][TURBO_BUTTONS] = {
-    { 0, 0 }, // placeholder for no input
-    {
-        RETRO_DEVICE_ID_JOYPAD_X,
-        RETRO_DEVICE_ID_JOYPAD_Y
-    },
-    {
-        RETRO_DEVICE_ID_JOYPAD_A,
-        RETRO_DEVICE_ID_JOYPAD_X
-    },
-    {
-        RETRO_DEVICE_ID_JOYPAD_Y,
-        RETRO_DEVICE_ID_JOYPAD_X
-    }
+static const unsigned turbo_binds[TURBO_BUTTONS] = {
+    RETRO_DEVICE_ID_JOYPAD_X,
+    RETRO_DEVICE_ID_JOYPAD_Y
 };
 
 static void systemGbBorderOff(void);
@@ -894,7 +924,7 @@ static void systemUpdateSolarSensor(int level);
 static uint8_t sensorDarkness = 0xE8;
 static uint8_t sensorDarknessLevel = 0; // so we can adjust sensor from gamepad
 
-static void update_variables(void)
+static void update_variables(bool startup)
 {
     bool sound_changed = false;
     char key[256];
@@ -921,7 +951,7 @@ static void update_variables(void)
         key[strlen("vbam_sound_")] = '1' + i;
         var.value = NULL;
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd') {
-            unsigned which = (i < 4) ? (1 << i) : (0x100 << (i - 4));
+            int which = (i < 4) ? (1 << i) : (0x100 << (i - 4));
             sound_enabled &= ~(which);
         }
     }
@@ -990,7 +1020,8 @@ static void update_variables(void)
             gbBorderAutomatic = 0;
         }
 
-        if ((type == IMAGE_GB) && (oldval != ((gbBorderOn << 1) | gbBorderAutomatic))) {
+        if ((type == IMAGE_GB) &&
+            (oldval != ((gbBorderOn << 1) | gbBorderAutomatic)) && !startup) {
             if (gbBorderOn) {
                 systemGbBorderOn();
                 gbSgbRenderBorder();
@@ -1040,8 +1071,9 @@ void retro_run(void)
 {
     bool updated = false;
     static bool buttonpressed = false;
+
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
-        update_variables();
+        update_variables(false);
 
     poll_cb();
 
@@ -1175,82 +1207,22 @@ void retro_cheat_set(unsigned index, bool enabled, const char* code)
 
 static void update_input_descriptors(void)
 {
-   struct retro_input_descriptor input_gba[] = {
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "B" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "A" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "L" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "R" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "Turbo B" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,     "Turbo A" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,    "Solar Sensor (Darker)" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2,    "Solar Sensor (Lighter)" },
-
-      { 0, 0, 0, 0, NULL },
-   };
-
-   struct retro_input_descriptor input_gba_alt1[] = {
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "B" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "A" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "L" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "R" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,     "Turbo B" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "Turbo A" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,    "Solar Sensor (Darker)" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2,    "Solar Sensor (Lighter)" },
-
-      { 0, 0, 0, 0, NULL },
-   };
-
-   struct retro_input_descriptor input_gba_alt2[] = {
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "D-Pad Left" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "D-Pad Up" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "D-Pad Down" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "D-Pad Right" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "B" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "A" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L,     "L" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R,     "R" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,     "Turbo B" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y,     "Turbo A" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,    "Solar Sensor (Darker)" },
-      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2,    "Solar Sensor (Lighter)" },
-
-      { 0, 0, 0, 0, NULL },
-   };
-
-   switch (retropad_layout)
-   {
-   case 1:
-      environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_gba);
-      break;
-   case 2:
-      environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_gba_alt1);
-      break;
-   case 3:
-      environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_gba_alt2);
-      break;
-   }
+    if (type == IMAGE_GB) {
+        if (gbSgbMode) {
+            environ_cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void*)ports_sgb);
+            environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_sgb);
+        } else {
+            environ_cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void*)ports_gb);
+            environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_gb);
+        }
+    } else if (type == IMAGE_GBA) {
+        environ_cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void*)ports_gba);
+        environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, input_gba);
+    }
 }
 
 bool retro_load_game(const struct retro_game_info *game)
 {
-   update_variables();
-   update_input_descriptors();
-
    type = utilFindType((const char *)game->path);
 
    if (type == IMAGE_UNKNOWN) {
@@ -1258,6 +1230,7 @@ bool retro_load_game(const struct retro_game_info *game)
       return false;
    }
 
+   update_variables(true);
    update_colormaps();
    soundInit();
 
@@ -1315,26 +1288,25 @@ bool retro_load_game(const struct retro_game_info *game)
 
       memset(desc, 0, sizeof(desc));
       // the GB's memory is divided into 16 parts with 4096 bytes each == 65536
+      // $FFFF        Interrupt Enable Flag
+      // $FF80-$FFFE  Zero Page - 127 bytes
+      // $FF00-$FF7F  Hardware I/O Registers
+      // $FEA0-$FEFF  Unusable Memory
+      // $FE00-$FE9F  OAM - Object Attribute Memory
+      // $E000-$FDFF  Echo RAM - Reserved, Do Not Use
+      // $D000-$DFFF  Internal RAM - Bank 1-7 (switchable - CGB only)
+      // $C000-$CFFF  Internal RAM - Bank 0 (fixed)
+      // $A000-$BFFF  Cartridge RAM (If Available)
+      // $9C00-$9FFF  BG Map Data 2
+      // $9800-$9BFF  BG Map Data 1
+      // $8000-$97FF  Character RAM
+      // $4000-$7FFF  Cartridge ROM - Switchable Banks 1-xx
+      // $0150-$3FFF  Cartridge ROM - Bank 0 (fixed)
+      // $0100-$014F  Cartridge Header Area
+      // $0000-$00FF  Restart and Interrupt Vectors
+      // http://gameboy.mongenel.com/dmg/asmmemmap.html
       for (addr = 0, i = 0; addr < 16; addr++) {
          if (gbMemoryMap[addr] != NULL) {
-            // $FFFF        Interrupt Enable Flag
-            // $FF80-$FFFE  Zero Page - 127 bytes
-            // $FF00-$FF7F  Hardware I/O Registers
-            // $FEA0-$FEFF  Unusable Memory
-            // $FE00-$FE9F  OAM - Object Attribute Memory
-            // $E000-$FDFF  Echo RAM - Reserved, Do Not Use
-            // $D000-$DFFF  Internal RAM - Bank 1-7 (switchable - CGB only)
-            // $C000-$CFFF  Internal RAM - Bank 0 (fixed)
-            // $A000-$BFFF  Cartridge RAM (If Available)
-            // $9C00-$9FFF  BG Map Data 2
-            // $9800-$9BFF  BG Map Data 1
-            // $8000-$97FF  Character RAM
-            // $4000-$7FFF  Cartridge ROM - Switchable Banks 1-xx
-            // $0150-$3FFF  Cartridge ROM - Bank 0 (fixed)
-            // $0100-$014F  Cartridge Header Area
-            // $0000-$00FF  Restart and Interrupt Vectors
-            // http://gameboy.mongenel.com/dmg/asmmemmap.html
-
             desc[i].ptr    = gbMemoryMap[addr];
             desc[i].start  = addr * 0x1000;
             desc[i].len    = 4096;
@@ -1351,6 +1323,8 @@ bool retro_load_game(const struct retro_game_info *game)
    if (!core)
        return false;
 
+   update_input_descriptors();    // Initialize input descriptors and info
+   update_variables(false);
    uint8_t* state_buf = (uint8_t*)malloc(2000000);
    serialize_size = core->emuWriteState(state_buf, 2000000);
    free(state_buf);
@@ -1470,29 +1444,29 @@ int systemGetSensorZ(void)
 
 uint32_t systemReadJoypad(int which)
 {
+    uint32_t J = 0;
+    unsigned i, buttons = MAX_BUTTONS - ((type == IMAGE_GB) ? 2 : 0); // gb only has 8 buttons
+
     if (which == -1)
         which = 0;
 
-    uint32_t J = 0;
-
-    if (retropad_layout) {
-        int i;
-        for (i = 0; i < MAX_BUTTONS; i++)
-            J |= input_cb(which, RETRO_DEVICE_JOYPAD, 0, binds[retropad_layout][i]) << i;
+    if (retropad_device[which] == RETRO_DEVICE_JOYPAD) {
+        for (i = 0; i < buttons; i++)
+            J |= input_cb(which, RETRO_DEVICE_JOYPAD, 0, binds[i]) << i;
 
         if (turbo_enable) {
             /* Handle Turbo A & B buttons */
             for (i = 0; i < TURBO_BUTTONS; i++) {
-                if (input_cb(which, RETRO_DEVICE_JOYPAD, 0, turbo_binds[retropad_layout][i])) {
-                    if (!turbo_delay_counter[i])
+                if (input_cb(which, RETRO_DEVICE_JOYPAD, 0, turbo_binds[i])) {
+                    if (!turbo_delay_counter[which][i])
                         J |= 1 << i;
-                    turbo_delay_counter[i]++;
-                    if (turbo_delay_counter[i] > turbo_delay)
+                    turbo_delay_counter[which][i]++;
+                    if (turbo_delay_counter[which][i] > turbo_delay)
                         /* Reset the toggle if delay value is reached */
-                        turbo_delay_counter[i] = 0;
+                        turbo_delay_counter[which][i] = 0;
                 } else
                     /* If the button is not pressed, just reset the toggle */
-                    turbo_delay_counter[i] = 0;
+                    turbo_delay_counter[which][i] = 0;
             }
         }
     }
