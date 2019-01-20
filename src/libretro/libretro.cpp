@@ -37,6 +37,7 @@ static retro_input_poll_t poll_cb;
 static retro_input_state_t input_cb;
 static retro_environment_t environ_cb;
 retro_audio_sample_batch_t audio_batch_cb;
+static retro_set_rumble_state_t rumble_cb;
 
 static char retro_system_directory[4096];
 static char biosfile[4096];
@@ -463,12 +464,16 @@ void retro_set_environment(retro_environment_t cb)
    struct retro_variable variables[] = {
       { "vbam_solarsensor", "Solar Sensor Level; 0|1|2|3|4|5|6|7|8|9|10" },
       { "vbam_usebios", "Use BIOS file (Restart); disabled|enabled" },
-      { "vbam_soundinterpolation", "Sound Interpolation; disabled|enabled" },
+      { "vbam_soundinterpolation", "Sound Interpolation; enabled|disabled" },
       { "vbam_soundfiltering", "Sound Filtering; 5|6|7|8|9|10|0|1|2|3|4" },
-      { "vbam_gbHardware", "(GB) Emulated Hardware; Automatic|Game Boy Color|Super Game Boy|Game Boy|Game Boy Advance|Super Game Boy 2" },
+      { "vbam_gbHardware", "(GB) Emulated Hardware; Game Boy Color|Automatic|Super Game Boy|Game Boy|Game Boy Advance|Super Game Boy 2" },
       { "vbam_showborders", "(GB) Show Borders; disabled|enabled|auto" },
       { "vbam_turboenable", "Enable Turbo Buttons; disabled|enabled" },
       { "vbam_turbodelay", "Turbo Delay (in frames); 3|4|5|6|7|8|9|10|11|12|13|14|15|1|2" },
+      { "vbam_astick_deadzone", "Sensors Deadzone (%); 15|20|25|30|0|5|10"},
+      { "vbam_gyro_sensitivity", "Sensor Sensitivity (Gyroscope) (%); 100|105|110|115|120|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95"},
+      { "vbam_tilt_sensitivity", "Sensor Sensitivity (Tilt) (%); 100|105|110|115|120|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95"},
+      { "vbam_swap_astick", "Swap Left/Right Analog; disabled|enabled" },
       { "vbam_layer_1", "Show layer 1; enabled|disabled" },
       { "vbam_layer_2", "Show layer 2; enabled|disabled" },
       { "vbam_layer_3", "Show layer 3; enabled|disabled" },
@@ -520,6 +525,8 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 void retro_init(void)
 {
    struct retro_log_callback log;
+   struct retro_rumble_interface rumble;
+
    environ_cb(RETRO_ENVIRONMENT_GET_CAN_DUPE, &can_dupe);
    if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
       log_cb = log.log;
@@ -542,6 +549,12 @@ void retro_init(void)
 
    bool yes = true;
    environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_RUMBLE_INTERFACE, &rumble)) {
+      rumble_cb = rumble.set_rumble_state;
+   } else
+      rumble_cb = NULL;
+
 }
 
 static const char *gbGetCartridgeType(void)
@@ -923,6 +936,9 @@ static void systemGbBorderOff(void);
 static void systemUpdateSolarSensor(int level);
 static uint8_t sensorDarkness = 0xE8;
 static uint8_t sensorDarknessLevel = 0; // so we can adjust sensor from gamepad
+static int astick_deadzone;
+static int gyro_sensitivity, tilt_sensitivity;
+static bool swap_astick;
 
 static void update_variables(bool startup)
 {
@@ -1063,21 +1079,109 @@ static void update_variables(bool startup)
     {
         turbo_delay = atoi(var.value);
     }
+
+    var.key = "vbam_astick_deadzone";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        astick_deadzone = (int)(atoi(var.value) * 0.01f * 0x8000);
+    }
+
+    var.key = "vbam_tilt_sensitivity";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        tilt_sensitivity = atoi(var.value);
+    }
+
+    var.key = "vbam_gyro_sensitivity";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        gyro_sensitivity = atoi(var.value);
+    }
+
+    var.key = "vbam_swap_astick";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        swap_astick = (bool)(!strcmp(var.value, "enabled"));
+    }
+
 }
 
-static unsigned has_frame;
+// System analog stick range is -0x7fff to 0x7fff
+// Implementation from mupen64plus-libretro
+#include <math.h>
+#define ROUND(x)    floor((x) + 0.5)
+#define ASTICK_MAX  0x8000
+static int analog_x, analog_y, analog_z;
 
-void retro_run(void)
+static void updateInput_MotionSensors(void)
 {
-    bool updated = false;
+    int16_t analog[3], astick_data[3];
+    double scaled_range, radius, angle;
+    unsigned tilt_retro_device_index =
+        swap_astick ? RETRO_DEVICE_INDEX_ANALOG_LEFT : RETRO_DEVICE_INDEX_ANALOG_RIGHT;
+    unsigned gyro_retro_device_index =
+        swap_astick ? RETRO_DEVICE_INDEX_ANALOG_RIGHT : RETRO_DEVICE_INDEX_ANALOG_LEFT;
+
+    // Tilt sensor section
+    analog[0] = input_cb(0, RETRO_DEVICE_ANALOG,
+        tilt_retro_device_index, RETRO_DEVICE_ID_ANALOG_X);
+    analog[1] = input_cb(0, RETRO_DEVICE_ANALOG,
+        tilt_retro_device_index, RETRO_DEVICE_ID_ANALOG_Y);
+
+    // Convert cartesian coordinate analog stick to polar coordinates
+    radius = sqrt(analog[0] * analog[0] + analog[1] * analog[1]);
+    angle = atan2(analog[1], analog[0]);
+
+    if (radius > astick_deadzone) {
+        // Re-scale analog stick range to negate deadzone (makes slow movements possible)
+        radius = (radius - astick_deadzone) *
+            ((float)ASTICK_MAX/(ASTICK_MAX - astick_deadzone));
+        // Tilt sensor range is from  from 1897 to 2197
+        radius *= 150.0 / ASTICK_MAX * (tilt_sensitivity / 100.0);
+        // Convert back to cartesian coordinates
+        astick_data[0] = +(int16_t)ROUND(radius * cos(angle));
+        astick_data[1] = -(int16_t)ROUND(radius * sin(angle));
+    } else
+        astick_data[0] = astick_data[1] = 0;
+
+    analog_x = astick_data[0];
+    analog_y = astick_data[1];
+
+    // Gyro sensor section
+    analog[3] = input_cb(0, RETRO_DEVICE_ANALOG,
+        gyro_retro_device_index, RETRO_DEVICE_ID_ANALOG_X);
+
+    if ( analog[3] < -astick_deadzone ) {
+        // Re-scale analog stick range
+        scaled_range = (-analog[3] - astick_deadzone) *
+            ((float)ASTICK_MAX / (ASTICK_MAX - astick_deadzone));
+        // Gyro sensor range is +/- 1800
+        scaled_range *= 1800.0 / ASTICK_MAX * (gyro_sensitivity / 100.0);
+        astick_data[3] = -(int16_t)ROUND(scaled_range);
+    } else if ( analog[3] > astick_deadzone ) {
+        scaled_range = (analog[3] - astick_deadzone) *
+            ((float)ASTICK_MAX / (ASTICK_MAX - astick_deadzone));
+        scaled_range *= (1800.0 / ASTICK_MAX * (gyro_sensitivity / 100.0));
+        astick_data[3] = +(int16_t)ROUND(scaled_range);
+    } else
+        astick_data[3] = 0;
+
+    analog_z = astick_data[3];
+}
+
+// Update solar sensor level by gamepad buttons, default L2/R2
+void updateInput_SolarSensor(void)
+{
     static bool buttonpressed = false;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
-        update_variables(false);
-
-    poll_cb();
-
-    // Update solar sensor level by gamepad buttons, default L2/R2
     if (buttonpressed) {
         buttonpressed = input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2) ||
             input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2);
@@ -1094,7 +1198,22 @@ void retro_run(void)
             systemUpdateSolarSensor(sensorDarknessLevel);
             buttonpressed = true;
         }
-    } // end of solar sensor update
+    }
+}
+
+static unsigned has_frame;
+
+void retro_run(void)
+{
+    bool updated = false;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
+        update_variables(false);
+
+    poll_cb();
+
+    updateInput_SolarSensor();
+    updateInput_MotionSensors();
 
     has_frame = 0;
 
@@ -1427,20 +1546,7 @@ void systemMessage(int, const char* fmt, ...)
     va_end(ap);
 }
 
-int systemGetSensorX(void)
-{
-    return 0;
-}
-
-int systemGetSensorY(void)
-{
-    return 0;
-}
-
-int systemGetSensorZ(void)
-{
-    return 0;
-}
+static int rumble_state, rumble_down;
 
 uint32_t systemReadJoypad(int which)
 {
@@ -1505,8 +1611,21 @@ bool systemReadJoypads(void)
     return true;
 }
 
-void systemUpdateMotionSensor(void)
+static int sensor_tilt[2], sensor_gyro;
+
+int systemGetSensorX()
 {
+    return sensor_tilt[0];
+}
+
+int systemGetSensorY()
+{
+    return sensor_tilt[1];
+}
+
+int systemGetSensorZ()
+{
+    return sensor_gyro / 10;
 }
 
 uint8_t systemGetSensorDarkness(void)
@@ -1514,8 +1633,51 @@ uint8_t systemGetSensorDarkness(void)
     return sensorDarkness;
 }
 
-void systemCartridgeRumble(bool)
+void systemUpdateMotionSensor(void)
 {
+    // Max ranges as set in VBAM
+    static const int tilt_max    = 2197;
+    static const int tilt_min    = 1897;
+    static const int tilt_center = 2047;
+    static const int gyro_thresh = 1800;
+
+    if (!sensor_tilt[0])
+        sensor_tilt[0] = tilt_center;
+
+    if (!sensor_tilt[1])
+        sensor_tilt[1] = tilt_center;
+
+    sensor_tilt[0] = (-analog_x) + tilt_center;
+    if (sensor_tilt[0] > tilt_max)
+        sensor_tilt[0] = tilt_max;
+    else if (sensor_tilt[0] < tilt_min)
+        sensor_tilt[0] = tilt_min;
+
+    sensor_tilt[1] = analog_y + tilt_center;
+    if (sensor_tilt[1] > tilt_max)
+        sensor_tilt[1] = tilt_max;
+    else if (sensor_tilt[1] < tilt_min)
+        sensor_tilt[1] = tilt_min;
+
+    sensor_gyro = analog_z;
+    if (sensor_gyro > gyro_thresh)
+        sensor_gyro = gyro_thresh;
+    else if (sensor_gyro < -gyro_thresh)
+        sensor_gyro = -gyro_thresh;
+}
+
+void systemCartridgeRumble(bool e)
+{
+    if (!rumble_cb)
+        return;
+
+    if (e) {
+        rumble_cb(0, RETRO_RUMBLE_WEAK, 0xffff);
+        rumble_cb(0, RETRO_RUMBLE_STRONG, 0xffff);
+    } else {
+        rumble_cb(0, RETRO_RUMBLE_WEAK, 0);
+        rumble_cb(0, RETRO_RUMBLE_STRONG, 0);
+    }
 }
 
 bool systemPauseOnFrame(void)
