@@ -193,6 +193,7 @@ uint32_t gbTimeNow = 0;
 int gbSynchronizeTicks = GBSYNCHRONIZE_CLOCK_TICKS;
 // emulator features
 int gbBattery = 0;
+int gbRumble = 0;
 bool gbBatteryError = false;
 int gbCaptureNumber = 0;
 bool gbCapture = false;
@@ -2713,6 +2714,7 @@ void gbReset()
 
     memset(&gbDataMBC5, 0, sizeof(gbDataMBC5));
     gbDataMBC5.mapperROMBank = 1;
+    gbDataMBC5.isRumbleCartridge = gbRumble;
 
     memset(&gbDataHuC1, 0, sizeof(gbDataHuC1));
     gbDataHuC1.mapperROMBank = 1;
@@ -4335,6 +4337,8 @@ bool gbUpdateSizes()
         memset(gbRam, gbRamFill, gbRamSize);
     }
 
+    gbBattery = gbRumble = 0;
+
     switch (gbRomType) {
     case 0x03:
     case 0x06:
@@ -4351,16 +4355,14 @@ bool gbUpdateSizes()
         break;
     }
 
-    gbInit();
-
-    //gbReset();
-
     switch (gbRomType) {
     case 0x1c:
     case 0x1d:
     case 0x1e:
-        gbDataMBC5.isRumbleCartridge = 1;
+        gbRumble = 1;
     }
+
+    gbInit();
 
     return true;
 }

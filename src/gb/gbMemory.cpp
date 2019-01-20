@@ -560,9 +560,10 @@ void mapperMBC5ROM(uint16_t address, uint8_t value)
         }
         break;
     case 0x4000: // RAM bank select
-        if (gbDataMBC5.isRumbleCartridge)
+        if (gbDataMBC5.isRumbleCartridge) {
+            systemCartridgeRumble(value & 8);
             value &= 0x07;
-        else
+        } else
             value &= 0x0f;
         if (value == gbDataMBC5.mapperRAMBank)
             break;
