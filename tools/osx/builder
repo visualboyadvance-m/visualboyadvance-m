@@ -35,10 +35,10 @@ export COMMAND_MODE=unix2003
 export CC=clang
 export CXX=clang++
 export CPPFLAGS="-DICONV_CONST="
-export CFLAGS="-m${target_bits} -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export CFLAGS="-m${target_bits} -framework Carbon -framework Foundation -framework CoreServices -stdlib=libc++ -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
 export CXXFLAGS="-m${target_bits} -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
 export OBJCXXFLAGS="-m${target_bits} -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
-export LDFLAGS="-m${target_bits} -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
+export LDFLAGS="-m${target_bits} -framework Carbon -framework Foundation -framework CoreServices -stdlib=libc++ -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
 
 export UUID_CFLAGS="-I\$BUILD_ROOT/root/stow/libuuid/include"
 export UUID_LIBS="-L\$BUILD_ROOT/root/stow/libuuid/lib -luuid"
