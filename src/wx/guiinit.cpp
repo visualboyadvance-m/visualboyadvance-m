@@ -1571,6 +1571,7 @@ public:
         if (newapi == lastapi)
             return;
 
+        gopts.audio_dev = "";
         FillDev(newapi);
     }
 } sound_config_handler;
