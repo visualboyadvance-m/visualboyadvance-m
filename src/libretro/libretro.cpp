@@ -59,6 +59,7 @@ static unsigned width = 240;
 static unsigned height = 160;
 static EmulatedSystem* core = NULL;
 static IMAGE_TYPE type = IMAGE_UNKNOWN;
+static unsigned current_gbPalette;
 
 uint16_t systemColorMap16[0x10000];
 uint32_t systemColorMap32[0x10000];
@@ -129,6 +130,56 @@ uint16_t systemGbPalette[24] = {
     GS555(0x1f), GS555(0x15), GS555(0x0c), 0,
     GS555(0x1f), GS555(0x15), GS555(0x0c), 0
 };
+
+static const uint16_t defaultGBPalettes[][8] = {
+    {
+        // Standard
+        0x7FFF, 0x56B5, 0x318C, 0x0000, 0x7FFF, 0x56B5, 0x318C, 0x0000,
+    },
+    {
+        // Blue Sea
+        0x6200, 0x7E10, 0x7C10, 0x5000, 0x6200, 0x7E10, 0x7C10, 0x5000,
+    },
+    {
+        // Dark Night
+        0x4008, 0x4000, 0x2000, 0x2008, 0x4008, 0x4000, 0x2000, 0x2008,
+    },
+    {
+        // Green Forest
+        0x43F0, 0x03E0, 0x4200, 0x2200, 0x43F0, 0x03E0, 0x4200, 0x2200,
+    },
+    {
+        // Hot Desert
+        0x43FF, 0x03FF, 0x221F, 0x021F, 0x43FF, 0x03FF, 0x221F, 0x021F,
+    },
+    {
+        // Pink Dreams
+        0x621F, 0x7E1F, 0x7C1F, 0x2010, 0x621F, 0x7E1F, 0x7C1F, 0x2010,
+    },
+    {
+        // Weird Colors
+        0x621F, 0x401F, 0x001F, 0x2010, 0x621F, 0x401F, 0x001F, 0x2010,
+    },
+    {
+        // Real GB Colors
+        0x1B8E, 0x02C0, 0x0DA0, 0x1140, 0x1B8E, 0x02C0, 0x0DA0, 0x1140,
+    },
+    {
+        // Real 'GB on GBASP' Colors
+        0x7BDE, /*0x23F0*/ 0x5778, /*0x5DC0*/ 0x5640, 0x0000, 0x7BDE, /*0x3678*/ 0x529C, /*0x0980*/ 0x2990, 0x0000,
+    }
+};
+
+static void set_gbPalette(void)
+{
+    const uint16_t *pal = defaultGBPalettes[current_gbPalette];
+
+    if (gbCgbMode || gbSgbMode)
+        return;
+
+    for (int i = 0; i < 8; i++)
+        gbPalette[i] = pal[i];
+}
 
 extern int gbRomType; // gets type from header 0x147
 extern int gbBattery; // enabled when gbRamSize != 0
@@ -467,6 +518,7 @@ void retro_set_environment(retro_environment_t cb)
       { "vbam_soundinterpolation", "Sound Interpolation; enabled|disabled" },
       { "vbam_soundfiltering", "Sound Filtering; 5|6|7|8|9|10|0|1|2|3|4" },
       { "vbam_gbHardware", "(GB) Emulated Hardware; Game Boy Color|Automatic|Super Game Boy|Game Boy|Game Boy Advance|Super Game Boy 2" },
+      { "vbam_palettes", "(GB) Color Palette; Standard|Blue Sea|Dark Knight|Green Forest|Hot Desert|Pink Dreams|Wierd Colors|Original|GBA SP" },
       { "vbam_showborders", "(GB) Show Borders; disabled|enabled|auto" },
       { "vbam_turboenable", "Enable Turbo Buttons; disabled|enabled" },
       { "vbam_turbodelay", "Turbo Delay (in frames); 3|4|5|6|7|8|9|10|11|12|13|14|15|1|2" },
@@ -906,6 +958,8 @@ void retro_reset(void)
     int tmp = eepromSize;
     core->emuReset();
     eepromSize = tmp;
+
+    set_gbPalette();
 }
 
 #define MAX_PLAYERS 4
@@ -1112,6 +1166,35 @@ static void update_variables(bool startup)
         swap_astick = (bool)(!strcmp(var.value, "enabled"));
     }
 
+    var.key = "vbam_palettes";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        int lastpal = current_gbPalette;
+
+        if (!strcmp(var.value, "Standard"))
+            current_gbPalette = 0;
+        else if (!strcmp(var.value, "Blue Sea"))
+            current_gbPalette = 1;
+        else if (!strcmp(var.value, "Dark Knight"))
+            current_gbPalette = 2;
+        else if (!strcmp(var.value, "Green Forest"))
+            current_gbPalette = 3;
+        else if (!strcmp(var.value, "Hot Desert"))
+            current_gbPalette = 4;
+        else if (!strcmp(var.value, "Pink Dreams"))
+            current_gbPalette = 5;
+        else if (!strcmp(var.value, "Wierd Colors"))
+            current_gbPalette = 6;
+        else if (!strcmp(var.value, "Original"))
+            current_gbPalette = 7;
+        else if (!strcmp(var.value, "GBA SP"))
+            current_gbPalette = 8;
+
+        if (lastpal != current_gbPalette)
+            set_gbPalette();
+    }
 }
 
 // System analog stick range is -0x7fff to 0x7fff
