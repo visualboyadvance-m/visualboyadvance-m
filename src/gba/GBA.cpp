@@ -4141,7 +4141,7 @@ void CPULoop(int ticks)
 
 #ifndef NO_LINK
             // shuffle2: what's the purpose?
-            if (GetLinkMode() != LINK_DISCONNECTED || gba_joybus_active)
+            if (gba_joybus_active)
                 cpuNextEvent = 1;
 #endif
 
