@@ -2398,8 +2398,14 @@ static void UpdateRFUSocket(int ticks)
 
 void gbInitLink()
 {
-LinkIsWaiting = false;
-LinkFirstTime = true;
+    if (GetLinkMode() == LINK_GAMEBOY_IPC) {
+#if (defined __WIN32__ || defined _WIN32)
+        gbInitLinkIPC();
+#endif
+    } else {
+        LinkIsWaiting = false;
+        LinkFirstTime = true;
+    }
 }
 
 uint8_t gbStartLink(uint8_t b) //used on internal clock
@@ -2413,6 +2419,13 @@ uint8_t gbStartLink(uint8_t b) //used on internal clock
     if (!gba_link_enabled)
         return 0xff;
 
+    //Single Computer
+    if (GetLinkMode() == LINK_GAMEBOY_IPC) {
+#if (defined __WIN32__ || defined _WIN32)
+        dat = gbStartLinkIPC(b);
+#endif
+    } else {
+        if (lanlink.numslaves == 1) {
             if (lanlink.server) {
                 cable_gb_data[0] = b;
                 ls.SendGB();
@@ -2431,7 +2444,8 @@ uint8_t gbStartLink(uint8_t b) //used on internal clock
             LinkFirstTime = true;
             if (dat != 0xff /*||b==0x00||dat==0x00*/)
                 LinkFirstTime = false;
-    
+        }
+    }
     return dat;
 }
 
@@ -2445,6 +2459,13 @@ uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
 
     if (gbSerialOn) {
         if (gba_link_enabled)
+            //Single Computer
+            if (GetLinkMode() == LINK_GAMEBOY_IPC) {
+#if (defined __WIN32__ || defined _WIN32)
+                return gbLinkUpdateIPC(b, gbSerialOn);
+#endif
+            } else {
+                if (lanlink.numslaves == 1) {
                     if (lanlink.server) {
                         recvd = ls.RecvGB() ? 1 : 0;
                         if (recvd) {
@@ -2470,7 +2491,8 @@ uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
                             lc.SendGB();
                         }
                     }
-            
+                }
+            }
 
         if (dat == 0xff /*||dat==0x00||b==0x00*/) //dat==0xff||dat==0x00
             LinkFirstTime = true;
