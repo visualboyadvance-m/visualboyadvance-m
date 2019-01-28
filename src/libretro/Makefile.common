@@ -26,6 +26,8 @@ SOURCES_CXX += \
 	$(CORE_DIR)/gba/Mode3.cpp \
 	$(CORE_DIR)/gba/Mode5.cpp \
 	$(CORE_DIR)/gba/Mode2.cpp \
+	$(CORE_DIR)/gba/GBALink.cpp \
+	$(CORE_DIR)/gba/GBASockClient.cpp \
 	$(CORE_DIR)/gba/ereader.cpp \
 	$(CORE_DIR)/gba/GBA-arm.cpp \
 	$(CORE_DIR)/gba/bios.cpp \
@@ -45,4 +47,5 @@ SOURCES_CXX += \
 	$(CORE_DIR)/gb/gbGlobals.cpp \
 	$(CORE_DIR)/gb/gbMemory.cpp \
 	$(CORE_DIR)/gb/gbSGB.cpp \
+	$(CORE_DIR)/gb/gbPrinter.cpp \
 	$(CORE_DIR)/gb/gbSound.cpp
