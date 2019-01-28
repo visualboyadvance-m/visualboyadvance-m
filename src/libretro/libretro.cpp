@@ -78,47 +78,14 @@ int emulating = 0;
 void (*dbgOutput)(const char* s, uint32_t addr);
 void (*dbgSignal)(int sig, int number);
 
-// Dummy vars/funcs for serial io emulation without LINK communication related stuff
 #ifndef NO_LINK
-#include "../gba/GBALink.h"
-uint8_t gbSIO_SC;
-bool LinkIsWaiting;
-bool LinkFirstTime;
-bool EmuReseted;
-int winGbPrinterEnabled;
-bool gba_joybus_active = false;
-
-LinkMode GetLinkMode()
-{
-    return LINK_DISCONNECTED;
-}
-
-void StartGPLink(uint16_t value)
-{
-}
-
-void LinkUpdate(int ticks)
-{
-}
-
-void StartLink(uint16_t siocnt)
-{
-}
-
-void CheckLinkConnection()
-{
-}
-
-void gbInitLink()
-{
-   LinkIsWaiting = false;
-   LinkFirstTime = true;
-}
-
-uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
-{
-   return (b << 8);
-}
+    #include "../gba/GBALink.h"
+    #include "../gb/gbPrinter.h"
+    int winGbPrinterEnabled = 1;
+    static std::string ipserver;
+    bool server;
+    int link_cable_type = -1;
+    bool config_link=false;
 #endif
 
 #define GS555(x) (x | (x << 5) | (x << 10))
@@ -515,6 +482,7 @@ void retro_set_environment(retro_environment_t cb)
    struct retro_variable variables[] = {
       { "vbam_solarsensor", "Solar Sensor Level; 0|1|2|3|4|5|6|7|8|9|10" },
       { "vbam_usebios", "Use BIOS file (Restart); disabled|enabled" },
+      { "vbam_gbprinter", "Enable GB Printer; enabled|disabled" },
       { "vbam_soundinterpolation", "Sound Interpolation; enabled|disabled" },
       { "vbam_soundfiltering", "Sound Filtering; 5|6|7|8|9|10|0|1|2|3|4" },
       { "vbam_gbHardware", "(GB) Emulated Hardware; Game Boy Color|Automatic|Super Game Boy|Game Boy|Game Boy Advance|Super Game Boy 2" },
@@ -540,6 +508,13 @@ void retro_set_environment(retro_environment_t cb)
       { "vbam_sound_4", "Sound channel 4; enabled|disabled" },
       { "vbam_sound_5", "Direct Sound A; enabled|disabled" },
       { "vbam_sound_6", "Direct Sound B; enabled|disabled" },
+      { "vbam_link_mode", "GBA Mode (needs restart); Not Connected|2P Network Server|3P Network Server|4P Network Server|Network Client" },
+      { "vbam_link_mode_type", "GBA Link type (needs restart); GB/GBC|GBA" },	  
+      { "vbam_link_timeout", "Timeout (ms) (needs restart); 0|50|100|150|200|250|300|350|400|450|500|550|600|650|700|750|800|850|900|950|1000" },
+      { "vbam_link_network_server_ip_octet1", "Network link server address part 1 (client only) (needs restart); 0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60|61|62|63|64|65|66|67|68|69|70|71|72|73|74|75|76|77|78|79|80|81|82|83|84|85|86|87|88|89|90|91|92|93|94|95|96|97|98|99|100|101|102|103|104|105|106|107|108|109|110|111|112|113|114|115|116|117|118|119|120|121|122|123|124|125|126|127|128|129|130|131|132|133|134|135|136|137|138|139|140|141|142|143|144|145|146|147|148|149|150|151|152|153|154|155|156|157|158|159|160|161|162|163|164|165|166|167|168|169|170|171|172|173|174|175|176|177|178|179|180|181|182|183|184|185|186|187|188|189|190|191|192|193|194|195|196|197|198|199|200|201|202|203|204|205|206|207|208|209|210|211|212|213|214|215|216|217|218|219|220|221|222|223|224|225|226|227|228|229|230|231|232|233|234|235|236|237|238|239|240|241|242|243|244|245|246|247|248|249|250|251|252|253|254|255" },
+      { "vbam_link_network_server_ip_octet2", "Network link server address part 2 (client only) (needs restart); 0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60|61|62|63|64|65|66|67|68|69|70|71|72|73|74|75|76|77|78|79|80|81|82|83|84|85|86|87|88|89|90|91|92|93|94|95|96|97|98|99|100|101|102|103|104|105|106|107|108|109|110|111|112|113|114|115|116|117|118|119|120|121|122|123|124|125|126|127|128|129|130|131|132|133|134|135|136|137|138|139|140|141|142|143|144|145|146|147|148|149|150|151|152|153|154|155|156|157|158|159|160|161|162|163|164|165|166|167|168|169|170|171|172|173|174|175|176|177|178|179|180|181|182|183|184|185|186|187|188|189|190|191|192|193|194|195|196|197|198|199|200|201|202|203|204|205|206|207|208|209|210|211|212|213|214|215|216|217|218|219|220|221|222|223|224|225|226|227|228|229|230|231|232|233|234|235|236|237|238|239|240|241|242|243|244|245|246|247|248|249|250|251|252|253|254|255" },
+      { "vbam_link_network_server_ip_octet3", "Network link server address part 3 (client only) (needs restart); 0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60|61|62|63|64|65|66|67|68|69|70|71|72|73|74|75|76|77|78|79|80|81|82|83|84|85|86|87|88|89|90|91|92|93|94|95|96|97|98|99|100|101|102|103|104|105|106|107|108|109|110|111|112|113|114|115|116|117|118|119|120|121|122|123|124|125|126|127|128|129|130|131|132|133|134|135|136|137|138|139|140|141|142|143|144|145|146|147|148|149|150|151|152|153|154|155|156|157|158|159|160|161|162|163|164|165|166|167|168|169|170|171|172|173|174|175|176|177|178|179|180|181|182|183|184|185|186|187|188|189|190|191|192|193|194|195|196|197|198|199|200|201|202|203|204|205|206|207|208|209|210|211|212|213|214|215|216|217|218|219|220|221|222|223|224|225|226|227|228|229|230|231|232|233|234|235|236|237|238|239|240|241|242|243|244|245|246|247|248|249|250|251|252|253|254|255" },
+      { "vbam_link_network_server_ip_octet4", "Network link server address part 4 (client only) (needs restart); 0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60|61|62|63|64|65|66|67|68|69|70|71|72|73|74|75|76|77|78|79|80|81|82|83|84|85|86|87|88|89|90|91|92|93|94|95|96|97|98|99|100|101|102|103|104|105|106|107|108|109|110|111|112|113|114|115|116|117|118|119|120|121|122|123|124|125|126|127|128|129|130|131|132|133|134|135|136|137|138|139|140|141|142|143|144|145|146|147|148|149|150|151|152|153|154|155|156|157|158|159|160|161|162|163|164|165|166|167|168|169|170|171|172|173|174|175|176|177|178|179|180|181|182|183|184|185|186|187|188|189|190|191|192|193|194|195|196|197|198|199|200|201|202|203|204|205|206|207|208|209|210|211|212|213|214|215|216|217|218|219|220|221|222|223|224|225|226|227|228|229|230|231|232|233|234|235|236|237|238|239|240|241|242|243|244|245|246|247|248|249|250|251|252|253|254|255" },
       { NULL, NULL },
    };
 
@@ -1195,6 +1170,120 @@ static void update_variables(bool startup)
         if (lastpal != current_gbPalette)
             set_gbPalette();
     }
+    
+   var.key = "vbam_gbprinter";
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+        bool val = !strcmp(var.value, "enabled");
+        if (val) winGbPrinterEnabled = 1;
+        else winGbPrinterEnabled = 0;
+   }
+
+   if (winGbPrinterEnabled)
+		gbSerialFunction = gbPrinterSend;
+   else
+		gbSerialFunction = NULL;
+   
+   var.key = "vbam_link_mode";
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+      if (!strcmp(var.value, "Not Connected")) {
+		gba_link_enabled=false;
+		lanlink.numslaves = 0;
+		server=false;
+      } else if (!strcmp(var.value, "2P Network Server")) {
+         gba_link_enabled=true;
+		 lanlink.server = 1;
+		 lanlink.numslaves = 2 - 1;
+		 server=true;
+      } else if (!strcmp(var.value, "3P Network Server")) {
+         gba_link_enabled=true;
+		 lanlink.server = 1;
+		 lanlink.numslaves = 3 - 1;
+		 server=true;
+      } else if (!strcmp(var.value, "4P Network Server")) {
+		 gba_link_enabled=true;
+		 lanlink.server = 1;
+		 lanlink.numslaves = 4 - 1;
+		 server=true;
+	  } else if (!strcmp(var.value, "Network Client")) {
+		 gba_link_enabled=true;
+		 lanlink.server = 0;
+		 lanlink.numslaves = 0;
+		 server=false;
+      }
+   }
+   
+   var.key = "vbam_link_mode_type";
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+      if (!strcmp(var.value, "GB/GBC")) {
+         link_cable_type = 0;
+      } else if (!strcmp(var.value, "GBA")) {
+         link_cable_type = 1;
+	  }
+   }
+   
+   var.key = "vbam_link_timeout";
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+      linktimeout=atoi(var.value);
+   }
+   
+   ipserver = "";
+   var.key = "vbam_link_network_server_ip_octet1";
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+      ipserver += std::string(var.value);
+   }
+   var.key = "vbam_link_network_server_ip_octet2";
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+      ipserver += "." + std::string(var.value);
+   }
+   var.key = "vbam_link_network_server_ip_octet3";
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+      ipserver += "." + std::string(var.value);
+   }
+   var.key = "vbam_link_network_server_ip_octet4";
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+      ipserver += "." + std::string(var.value);
+   }
+   
+   if(config_link==false && gba_link_enabled==true){
+   
+   if (!server)
+		{
+        bool valid = SetLinkServerHost(ipserver.c_str());
+        if (!valid) {
+			printf("Error : You must enter a valid IP\n");
+                return;
+            }
+		}
+   
+   SetLinkTimeout(linktimeout);
+   EnableSpeedHacks(false);
+   EnableLinkServer(server, lanlink.numslaves);
+
+   if (server) {
+		char host[256];
+        GetLinkServerHost(host, 256);
+        printf("Waiting for clients...\n");
+        }
+
+	ConnectionState state;
+	if (link_cable_type==0)
+		state = InitLink(LINK_GAMEBOY_SOCKET); //GB/GBC : LINK_GAMEBOY_SOCKET
+	else 
+		state = InitLink(LINK_CABLE_SOCKET); //GBA : LINK_CABLE_SOCKET
+		
+	if (state == LINK_NEEDS_UPDATE) 
+		{
+        while (state == LINK_NEEDS_UPDATE) {
+			// Ask the core for updates
+            char message[256];
+            state = ConnectLinkUpdate(message, 256);
+            }
+		}
+	}
+	
+	config_link = true;
 }
 
 // System analog stick range is -0x7fff to 0x7fff
@@ -1302,6 +1391,9 @@ void retro_run(void)
 
     do {
         core->emuMain(core->emuCount);
+#ifndef NO_LINK
+        CheckLinkConnection();
+#endif
     } while (!has_frame);
 }
 
