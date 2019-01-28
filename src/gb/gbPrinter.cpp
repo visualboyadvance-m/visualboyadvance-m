@@ -2,6 +2,11 @@
 #include <memory.h>
 #include <stdio.h>
 
+#ifdef __LIBRETRO__
+	#include <stdlib.h>
+	#include <time.h>
+#endif
+
 uint8_t gbPrinterStatus = 0;
 int gbPrinterState = 0;
 uint8_t gbPrinterData[0x280 * 9];
@@ -36,32 +41,10 @@ void gbPrinterReset()
 
 void gbPrinterShowData()
 {
-    systemGbPrint(gbPrinterData,
-        gbPrinterDataCount,
-        gbPrinterPacket[6],
-        gbPrinterPacket[7],
-        gbPrinterPacket[8],
-        gbPrinterPacket[9]);
-    /*
-  allegro_init();
-  install_keyboard();
-  set_gfx_mode(GFX_AUTODETECT, 160, 144, 0, 0);
-  PALETTE pal;
-  pal[0].r = 255;
-  pal[0].g = 255;
-  pal[0].b = 255;
-  pal[1].r = 168;
-  pal[1].g = 168;
-  pal[1].b = 168;
-  pal[2].r = 96;
-  pal[2].g = 96;
-  pal[2].b = 96;
-  pal[3].r = 0;
-  pal[3].g = 0;
-  pal[3].b = 0;
-  set_palette(pal);
-  acquire_screen();
+#ifdef __LIBRETRO__
+  int image[144][160]; //GB Printer = 160x144
   uint8_t *data = gbPrinterData;
+  
   for(int y = 0; y < 0x12; y++) {
     for(int x = 0; x < 0x14; x++) {
       for(int k = 0; k < 8; k++) {
@@ -74,15 +57,57 @@ void gbPrinterShowData()
             c++;
           if(b & mask)
             c+=2;
-          putpixel(screen, x*8+j, y*8+k, c);
+          
+          image[y*8+k][x*8+j] = 255-85*c;    
         }
       }
     }
   }
-  release_screen();
-  while(!keypressed()) {
-  }
-  */
+  
+  time_t t = time(NULL);
+  struct tm tm = *localtime(&t);
+  
+  char filename[4096];
+  
+  char homedir[4096];
+#ifdef _WIN32
+  snprintf(homedir, 4096, "%s%s/", getenv("HOMEDRIVE"), getenv("HOMEPATH"));
+#else
+  snprintf(homedir, 4096, "%s/", getenv("HOME"));
+#endif
+  
+  sprintf(filename, "%s%d_%d_%d-%d_%d_%d.pgm",homedir,tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+  //printf("%s\n", filename);
+  
+  FILE* pgmimg = fopen(filename, "wb"); 
+  
+  // Writing Magic Number to the File 
+  fprintf(pgmimg, "P2\n");  
+  
+  // Writing Width and Height 
+  fprintf(pgmimg, "%d %d\n", 160, 144);  
+  
+  // Writing the maximum gray value 
+  fprintf(pgmimg, "255\n");  
+  int temp = 0; 
+  for (int i = 0; i < 144; i++) { 
+      for (int j = 0; j < 160; j++) { 
+          temp = image[i][j]; 
+  
+          // Writing the gray values in the 2D array to the file 
+          fprintf(pgmimg, "%d ", temp); 
+      } 
+      fprintf(pgmimg, "\n"); 
+  } 
+  fclose(pgmimg); 
+#else
+	systemGbPrint(gbPrinterData,
+        gbPrinterDataCount,
+        gbPrinterPacket[6],
+        gbPrinterPacket[7],
+        gbPrinterPacket[8],
+		gbPrinterPacket[9]);
+#endif
 }
 
 void gbPrinterReceiveData()
