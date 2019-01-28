@@ -1,5 +1,6 @@
 // This file was written by denopqrihg
 // with major changes by tjm
+// Added some changes by Jackobo Le Chocobo
 #include <stdio.h>
 #include <string.h>
 
@@ -104,8 +105,6 @@ bool speedhack = true;
 #include "GBA.h"
 #include "GBALink.h"
 #include "GBASockClient.h"
-
-#include <SFML/Network.hpp>
 
 #ifdef ENABLE_NLS
 #include <libintl.h>
@@ -263,70 +262,6 @@ static void UpdateRFUSocket(int ticks);
 #define RFU_SEND 2
 #define RFU_RECV 3
 
-typedef struct {
-    uint16_t linkdata[5];
-    uint16_t linkcmd[4];
-    uint16_t numtransfers;
-    int32_t lastlinktime;
-    uint8_t numgbas; //# of GBAs (max vbaid value plus 1), used in Single computer
-    uint8_t trgbas;
-    uint8_t linkflags;
-
-    uint8_t rfu_proto[5]; // 0=UDP-like, 1=TCP-like protocols to see whether the data important or not (may or may not be received successfully by the other side)
-    uint16_t rfu_qid[5];
-    int32_t rfu_q[5];
-    uint32_t rfu_signal[5];
-    uint8_t rfu_is_host[5]; //request to join
-    //uint8_t rfu_joined[5]; //bool //currenlty joined
-    uint16_t rfu_reqid[5]; //id to join
-    uint16_t rfu_clientidx[5]; //only used by clients
-    int32_t rfu_linktime[5];
-    uint32_t rfu_broadcastdata[5][7]; //for 0x16/0x1d/0x1e?
-    uint32_t rfu_gdata[5]; //for 0x17/0x19?/0x1e?
-    int32_t rfu_state[5]; //0=none, 1=waiting for ACK
-    uint8_t rfu_listfront[5];
-    uint8_t rfu_listback[5];
-    rfu_datarec rfu_datalist[5][256];
-
-    /*uint16_t rfu_qidlist[5][256];
-	uint16_t rfu_qlist[5][256];
-	uint32_t rfu_datalist[5][256][255];
-	uint32_t rfu_timelist[5][256];*/
-} LINKDATA;
-
-class RFUServer {
-    int numbytes;
-    sf::SocketSelector fdset;
-    int counter;
-    int done;
-    uint8_t current_host;
-
-public:
-    sf::TcpSocket tcpsocket[5];
-    sf::IpAddress udpaddr[5];
-    RFUServer(void);
-    sf::Packet& Serialize(sf::Packet& packet, int slave);
-    void DeSerialize(sf::Packet& packet, int slave);
-    void Send(void);
-    void Recv(void);
-};
-
-class RFUClient {
-    sf::SocketSelector fdset;
-    int numbytes;
-
-public:
-    sf::IpAddress serveraddr;
-    unsigned short serverport;
-    bool transferring;
-    RFUClient(void);
-    void Send(void);
-    void Recv(void);
-    sf::Packet& Serialize(sf::Packet& packet);
-    void DeSerialize(sf::Packet& packet);
-    void CheckConn(void);
-};
-
 // RFU crap (except for numtransfers note...should probably check that out)
 static LINKDATA* linkmem = NULL;
 static LINKDATA rfu_data;
@@ -422,66 +357,13 @@ enum {
     JOY_CMD_WRITE = 0x15
 };
 
-typedef struct {
-    sf::TcpSocket tcpsocket;
-    sf::TcpListener tcplistener;
-    int numslaves;
-    int connectedSlaves;
-    int type;
-    bool server;
-    bool speed; //speedhack
-} LANLINKDATA;
-
-class CableServer {
-    int numbytes;
-    sf::SocketSelector fdset;
-    //timeval udptimeout;
-    char inbuffer[256], outbuffer[256];
-    int32_t* intinbuffer;
-    uint16_t* uint16_tinbuffer;
-    int32_t* intoutbuffer;
-    uint16_t* uint16_toutbuffer;
-    int counter;
-    int done;
-
-public:
-    sf::TcpSocket tcpsocket[4];
-    sf::IpAddress udpaddr[4];
-    CableServer(void);
-    void Send(void);
-    void Recv(void);
-    void SendGB(void);
-    bool RecvGB(void);
-};
-
-class CableClient {
-    sf::SocketSelector fdset;
-    char inbuffer[256], outbuffer[256];
-    int32_t* intinbuffer;
-    uint16_t* uint16_tinbuffer;
-    int32_t* intoutbuffer;
-    uint16_t* uint16_toutbuffer;
-    int numbytes;
-
-public:
-    sf::IpAddress serveraddr;
-    unsigned short serverport;
-    bool transferring;
-    CableClient(void);
-    void Send(void);
-    void Recv(void);
-    void SendGB(void);
-    bool RecvGB(void);
-    void CheckConn(void);
-};
-
-static int i, j;
-static int linktimeout = 1;
-static LANLINKDATA lanlink;
-static uint16_t cable_data[4];
-static uint8_t cable_gb_data[4];
-static CableServer ls;
-static CableClient lc;
+int i, j;
+int linktimeout = 1;
+LANLINKDATA lanlink;
+uint16_t cable_data[4];
+uint8_t cable_gb_data[4];
+CableServer ls;
+CableClient lc;
 
 // time to end of single GBA's transfer, in 16.78 MHz clock ticks
 // first index is GBA #
@@ -739,6 +621,18 @@ void StartGPLink(uint16_t value)
 #if (defined __WIN32__ || defined _WIN32)
         if (GetLinkMode() == LINK_RFU_IPC)
             rfu_state = RFU_INIT;
+        else 
+			{
+#endif
+			//General Purpose Mode : Fixes FFTA Multiplayer
+			UPDATE_REG(0x134, value);
+			if(value==0x8055) value=0x8052;
+			else if(value==0x8022) value=0x8025;
+			else if(value==0x8050) value=0x8050;	
+			else if(value==0x8020) value=0x8020;
+			UPDATE_REG(0x134, value);
+#if (defined __WIN32__ || defined _WIN32)
+			}
 #endif
         break;
     }
@@ -1122,6 +1016,7 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size)
                 ls.tcpsocket[nextSlave].send(packet);
 
                 snprintf(message, size, N_("Player %d connected"), nextSlave);
+                printf("Player %d connected\n", nextSlave);
 
                 lanlink.connectedSlaves++;
             }
@@ -1136,6 +1031,7 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size)
             }
 
             snprintf(message, size, N_("All players connected"));
+            printf("All players connected\n");
             newState = LINK_OK;
         }
     } else {
@@ -1158,6 +1054,7 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size)
 
                     snprintf(message, size, N_("Connected as #%d, Waiting for %d players to join"),
                         linkid + 1, lanlink.numslaves - linkid);
+                    printf("Connected as Player #%d\n", linkid + 1);
                 }
             } else {
                 bool gameReady;
@@ -1166,6 +1063,7 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size)
                 if (packet && gameReady) {
                     newState = LINK_OK;
                     snprintf(message, size, N_("All players joined."));
+                    printf("All players joined.\n");
                 }
             }
 
@@ -2500,14 +2398,8 @@ static void UpdateRFUSocket(int ticks)
 
 void gbInitLink()
 {
-    if (GetLinkMode() == LINK_GAMEBOY_IPC) {
-#if (defined __WIN32__ || defined _WIN32)
-        gbInitLinkIPC();
-#endif
-    } else {
-        LinkIsWaiting = false;
-        LinkFirstTime = true;
-    }
+LinkIsWaiting = false;
+LinkFirstTime = true;
 }
 
 uint8_t gbStartLink(uint8_t b) //used on internal clock
@@ -2521,13 +2413,6 @@ uint8_t gbStartLink(uint8_t b) //used on internal clock
     if (!gba_link_enabled)
         return 0xff;
 
-    //Single Computer
-    if (GetLinkMode() == LINK_GAMEBOY_IPC) {
-#if (defined __WIN32__ || defined _WIN32)
-        dat = gbStartLinkIPC(b);
-#endif
-    } else {
-        if (lanlink.numslaves == 1) {
             if (lanlink.server) {
                 cable_gb_data[0] = b;
                 ls.SendGB();
@@ -2546,8 +2431,7 @@ uint8_t gbStartLink(uint8_t b) //used on internal clock
             LinkFirstTime = true;
             if (dat != 0xff /*||b==0x00||dat==0x00*/)
                 LinkFirstTime = false;
-        }
-    }
+    
     return dat;
 }
 
@@ -2561,13 +2445,6 @@ uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
 
     if (gbSerialOn) {
         if (gba_link_enabled)
-            //Single Computer
-            if (GetLinkMode() == LINK_GAMEBOY_IPC) {
-#if (defined __WIN32__ || defined _WIN32)
-                return gbLinkUpdateIPC(b, gbSerialOn);
-#endif
-            } else {
-                if (lanlink.numslaves == 1) {
                     if (lanlink.server) {
                         recvd = ls.RecvGB() ? 1 : 0;
                         if (recvd) {
@@ -2593,8 +2470,7 @@ uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
                             lc.SendGB();
                         }
                     }
-                }
-            }
+            
 
         if (dat == 0xff /*||dat==0x00||b==0x00*/) //dat==0xff||dat==0x00
             LinkFirstTime = true;
