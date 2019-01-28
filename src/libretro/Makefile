@@ -338,7 +338,7 @@ $(TARGET): $(OBJS)
 ifeq ($(STATIC_LINKING), 1)
 	$(AR) rcs $@ $(OBJS)
 else
-	$(LD)  $(LINKOUT)$@ $(SHARED) $(OBJS) $(LDFLAGS) $(LIBS)
+	$(LD)  $(LINKOUT)$@ $(SHARED) $(OBJS) $(LDFLAGS) -pthread -lrt -lsfml-network -lsfml-system $(LIBS)
 endif
 
 clean:
