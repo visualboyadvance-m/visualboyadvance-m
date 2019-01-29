@@ -206,7 +206,7 @@ int rewindSaveNeeded = 0;
 int rewindTimer = 0;
 int rewindTopPos;
 int rtcEnabled;
-int saveType = 0;
+int saveType = GBA_SAVE_AUTO;
 int screenMessage;
 int sensorX;
 int sensorY;

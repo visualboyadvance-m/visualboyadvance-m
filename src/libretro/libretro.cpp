@@ -174,6 +174,9 @@ static void set_gbPalette(void)
 {
     const uint16_t *pal = defaultGBPalettes[current_gbPalette];
 
+    if (type != IMAGE_GB)
+        return;
+
     if (gbCgbMode || gbSgbMode)
         return;
 
@@ -306,9 +309,9 @@ void* retro_get_memory_data(unsigned id)
     if (type == IMAGE_GBA) {
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
-            if ((saveType == 1) | (saveType == 4))
+            if ((saveType == GBA_SAVE_EEPROM) | (saveType == GBA_SAVE_EEPROM_SENSOR))
                 return eepromData;
-            if ((saveType == 2) | (saveType == 3))
+            if ((saveType == GBA_SAVE_SRAM) | (saveType == GBA_SAVE_FLASH))
                 return flashSaveMemory;
             return NULL;
         case RETRO_MEMORY_SYSTEM_RAM:
@@ -338,15 +341,15 @@ size_t retro_get_memory_size(unsigned id)
     if (type == IMAGE_GBA) {
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
-            if ((saveType == 1) | (saveType == 4))
+            if ((saveType == GBA_SAVE_EEPROM) | (saveType == GBA_SAVE_EEPROM_SENSOR))
                 return eepromSize;
-            if ((saveType == 2) | (saveType == 3))
-                return flashSize;
+            if ((saveType == GBA_SAVE_SRAM) | (saveType == GBA_SAVE_FLASH))
+                return (saveType == GBA_SAVE_SRAM) ? 0x8000 : flashSize;
             return 0;
         case RETRO_MEMORY_SYSTEM_RAM:
             return 0x40000;
         case RETRO_MEMORY_VIDEO_RAM:
-            return 0x20000;
+            return 0x18000;
         }
     }
     else if (type == IMAGE_GB) {
@@ -866,11 +869,7 @@ static void gba_init(void)
     width = GBAWidth;
     height = GBAHeight;
 
-    // CPUReset() will reset eepromSize to 512.
-    // Save current eepromSize override then restore after CPUReset()
-    int tmp = eepromSize;
     CPUReset();
-    eepromSize = tmp;
 }
 
 static void gb_init(void)
@@ -954,11 +953,7 @@ void retro_deinit(void)
 
 void retro_reset(void)
 {
-    // save current eepromSize
-    int tmp = eepromSize;
     core->emuReset();
-    eepromSize = tmp;
-
     set_gbPalette();
 }
 

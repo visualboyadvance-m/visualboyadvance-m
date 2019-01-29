@@ -1468,7 +1468,7 @@ public:
         utilGBAFindSave(sz);
         type->SetSelection(saveType);
 
-        if (saveType == 3) {
+        if (saveType == GBA_SAVE_FLASH) {
             size->SetSelection(flashSize == 0x20000 ? 1 : 0);
             size->Enable();
         } else {

@@ -361,19 +361,19 @@ void GameArea::LoadGame(const wxString& name)
                 switch (bat.GetSize().GetValue()) {
                 case 0x200:
                 case 0x2000:
-                    saveType = 1;
+                    saveType = GBA_SAVE_EEPROM;
                     break;
 
                 case 0x8000:
-                    saveType = 2;
+                    saveType = GBA_SAVE_SRAM;
                     break;
 
                 case 0x10000:
-                    if (saveType == 1 || saveType == 2)
+                    if (saveType == GBA_SAVE_EEPROM || saveType == GBA_SAVE_SRAM)
                         break;
 
                 case 0x20000:
-                    saveType = 3;
+                    saveType = GBA_SAVE_FLASH;
                     flashSetSize(bat.GetSize().GetValue());
                     break;
 

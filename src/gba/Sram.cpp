@@ -9,7 +9,7 @@ uint8_t sramRead(uint32_t address)
 }
 void sramDelayedWrite(uint32_t address, uint8_t byte)
 {
-    saveType = 2;
+    saveType = GBA_SAVE_SRAM;
     cpuSaveGameFunc = sramWrite;
     sramWrite(address, byte);
 }

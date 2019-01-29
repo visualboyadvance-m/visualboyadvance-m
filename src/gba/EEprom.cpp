@@ -30,6 +30,8 @@ variable_desc eepromSaveData[] = {
 
 void eepromInit()
 {
+    eepromInUse = false;
+    eepromSize = 512;
     memset(eepromData, 255, sizeof(eepromData));
 }
 
@@ -39,8 +41,6 @@ void eepromReset()
     eepromByte = 0;
     eepromBits = 0;
     eepromAddress = 0;
-    eepromInUse = false;
-    eepromSize = 512;
 }
 
 #ifdef __LIBRETRO__
