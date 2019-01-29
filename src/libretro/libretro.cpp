@@ -745,7 +745,7 @@ static void load_image_preferences(void)
     buffer[3] = rom[0xaf];
     buffer[4] = 0;
 
-    cpuSaveType = 0;
+    cpuSaveType = GBA_SAVE_AUTO;
     flashSize = 0x10000;
     eepromSize = 512;
     rtcEnabled = false;
@@ -768,24 +768,35 @@ static void load_image_preferences(void)
         log("Found ROM in vba-over list.\n");
         log("Name            : %s\n", gbaover[found_no].romtitle);
 
+        rtcEnabled = gbaover[found_no].rtcEnabled;
         cpuSaveType = gbaover[found_no].saveType;
 
-        if (gbaover[found_no].saveSize != 0) {
-            unsigned size = gbaover[found_no].saveSize;
-            if ((cpuSaveType == 3) && ((size == 65536) || (size == 131072)))
-                flashSize = size;
-            else if ((cpuSaveType == 1) && (size == 8192))
-                eepromSize = 0x2000;
-        }
-
-        rtcEnabled = gbaover[found_no].rtcEnabled;
-
-        mirroringEnable = gbaover[found_no].mirroringEnabled;
+        unsigned size = gbaover[found_no].saveSize;
+        if (cpuSaveType == GBA_SAVE_SRAM)
+            flashSize = 32768;
+        else if (cpuSaveType == GBA_SAVE_FLASH)
+            flashSize = size ? size : 65536;
+        else if ((cpuSaveType == GBA_SAVE_EEPROM) || (cpuSaveType == GBA_SAVE_EEPROM_SENSOR))
+            eepromSize = size ? size : 512;
     }
+
+    // gameID that starts with 'F' are classic/famicom games
+    mirroringEnable = (buffer[0] == 0x46) ? true : false;
 
     if (!cpuSaveType) {
+        log("Scrapping ROM for save type.\n");
         utilGBAFindSave(romSize);
     }
+
+    saveType = cpuSaveType;
+
+    if (flashSize == 0x10000 || flashSize == 0x20000)
+        flashSetSize(flashSize);
+
+    rtcEnable(rtcEnabled);
+    rtcEnableRumble(!rtcEnabled);
+
+    doMirroring(mirroringEnable);
 
     log("romSize         : %dKB\n", (romSize + 1023) / 1024);
     log("has RTC         : %s.\n", rtcEnabled ? "Yes" : "No");
@@ -794,7 +805,7 @@ static void load_image_preferences(void)
         log("flashSize       : %d.\n", flashSize);
     if (cpuSaveType == 1)
         log("eepromSize      : %d.\n", eepromSize);
-    log("mirroringEnable : %d.\n", mirroringEnable);
+    log("mirroringEnable : %s.\n", mirroringEnable ? "Yes" : "No");
 }
 
 static void update_colormaps(void)
@@ -827,16 +838,6 @@ static void gba_init(void)
     log("Loading VBA-M Core (GBA)...\n");
 
     load_image_preferences();
-
-    saveType = cpuSaveType;
-
-    if (flashSize == 0x10000 || flashSize == 0x20000)
-        flashSetSize(flashSize);
-
-    rtcEnable(rtcEnabled);
-    rtcEnableRumble(!rtcEnabled);
-
-    doMirroring(mirroringEnable);
     soundSetSampleRate(SampleRate);
 
     if (usebios) {
