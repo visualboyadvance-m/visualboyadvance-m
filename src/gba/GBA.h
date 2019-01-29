@@ -18,6 +18,15 @@ const uint64_t TICKS_PER_SECOND = 16777216;
 #define SAVE_GAME_VERSION_10 10
 #define SAVE_GAME_VERSION SAVE_GAME_VERSION_10
 
+enum {
+    GBA_SAVE_AUTO = 0,
+    GBA_SAVE_EEPROM,
+    GBA_SAVE_SRAM,
+    GBA_SAVE_FLASH,
+    GBA_SAVE_EEPROM_SENSOR,
+    GBA_SAVE_NONE
+};
+
 typedef struct {
     uint8_t* address;
     uint32_t mask;
