@@ -746,7 +746,7 @@ static void load_image_preferences(void)
     buffer[4] = 0;
 
     cpuSaveType = GBA_SAVE_AUTO;
-    flashSize = 0x10000;
+    flashSize = 65536;
     eepromSize = 512;
     rtcEnabled = false;
     mirroringEnable = false;
@@ -790,7 +790,7 @@ static void load_image_preferences(void)
 
     saveType = cpuSaveType;
 
-    if (flashSize == 0x10000 || flashSize == 0x20000)
+    if (flashSize == 65536 || flashSize == 131072)
         flashSetSize(flashSize);
 
     rtcEnable(rtcEnabled);
