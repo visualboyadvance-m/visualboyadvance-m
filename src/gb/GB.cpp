@@ -4342,6 +4342,7 @@ bool gbUpdateSizes()
     switch (gbRomType) {
     case 0x03:
     case 0x06:
+    case 0x0d:
     case 0x0f:
     case 0x10:
     case 0x13:

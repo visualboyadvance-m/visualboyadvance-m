@@ -187,27 +187,6 @@ static void set_gbPalette(void)
 extern int gbRomType; // gets type from header 0x147
 extern int gbBattery; // enabled when gbRamSize != 0
 
-static bool gb_hasbattery(void)
-{
-    switch (gbRomType) {
-    case 0x03: // MBC1
-    case 0xff: // MBC1
-    case 0x0d: // MM01
-    case 0x0f:
-    case 0x10: // MBC3 + extended
-    case 0x13:
-    case 0xfc: // MBC3
-    case 0x1b:
-    case 0x1e: // MBC5
-    //incomplete, does not save gbTAMA5ram
-    case 0xfd: // TAMA5 + extended
-    case 0x06: // MBC2
-    case 0x22: // MBC7
-        return true;
-    }
-    return false;
-}
-
 static bool gb_hasrtc(void)
 {
     switch (gbRomType) {
@@ -323,7 +302,7 @@ void* retro_get_memory_data(unsigned id)
     else if (type == IMAGE_GB) {
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
-            if (gb_hasbattery())
+            if (gbBattery)
                 return gbRam;
             return NULL;
         case RETRO_MEMORY_SYSTEM_RAM:
@@ -355,7 +334,7 @@ size_t retro_get_memory_size(unsigned id)
     else if (type == IMAGE_GB) {
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
-            if (gb_hasbattery())
+            if (gbBattery)
                 return gbRamSize;
             return 0;
         case RETRO_MEMORY_SYSTEM_RAM:
@@ -928,7 +907,7 @@ static void gb_init(void)
     crc16 -= gbRom[0x14e] + gbRom[0x14f];
     log("Checksum       : %04x (%04x)\n", crc16, gbRom[0x14e] * 256 + gbRom[0x14f]);
 
-    if (gb_hasbattery())
+    if (gbBattery)
         log("Game supports battery save ram.\n");
     if (gbRom[0x143] == 0xc0)
         log("Game works on CGB only\n");
