@@ -2575,14 +2575,14 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
         if (cpuIsMultiBoot) {
             unsigned effective_address = address - 0x2000000;
 
-            if (effective_address + section_size < WORK_RAM_SIZE) {
+            if (effective_address + section_size < SIZE_WRAM) {
                 memcpy(&workRAM[effective_address], source, section_size);
                 size += section_size;
             }
         } else {
             unsigned effective_address = address - 0x8000000;
 
-            if (effective_address + section_size < ROM_SIZE) {
+            if (effective_address + section_size < SIZE_ROM) {
                 memcpy(&rom[effective_address], source, section_size);
                 size += section_size;
             }

@@ -27,6 +27,30 @@ enum {
     GBA_SAVE_NONE
 };
 
+enum {
+    SIZE_SRAM      = 32768,
+    SIZE_FLASH512   = 65536,
+    SIZE_FLASH1M   = 131072,
+    SIZE_EEPROM_512 = 512,
+    SIZE_EEPROM_8K = 8192
+};
+
+enum {
+    SIZE_ROM   = 0x2000000,
+    SIZE_BIOS  = 0x0004000,
+    SIZE_IRAM  = 0x0008000,
+    SIZE_WRAM  = 0x0040000,
+    SIZE_PRAM  = 0x0000400,
+    SIZE_VRAM  = 0x0020000,
+    SIZE_OAM   = 0x0000400,
+    SIZE_IOMEM = 0x0000400,
+#ifndef __LIBRETRO__
+    SIZE_PIX   = (4 * 241 * 162)
+#else
+    SIZE_PIX   = (4 * 240 * 160)
+#endif
+};
+
 typedef struct {
     uint8_t* address;
     uint32_t mask;
@@ -161,9 +185,6 @@ extern struct EmulatedSystem GBASystem;
 #define R13_FIQ 42
 #define R14_FIQ 43
 #define SPSR_FIQ 44
-
-#define WORK_RAM_SIZE 0x40000
-#define ROM_SIZE      0x2000000
 
 #include "Cheats.h"
 #include "EEprom.h"

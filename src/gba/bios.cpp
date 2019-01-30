@@ -852,7 +852,7 @@ void BIOS_RegisterRamReset(uint32_t flags)
     if (flags) {
         if (flags & 0x01) {
             // clear work RAM
-            memset(workRAM, 0, WORK_RAM_SIZE);
+            memset(workRAM, 0, SIZE_WRAM);
         }
         if (flags & 0x02) {
             // clear internal RAM

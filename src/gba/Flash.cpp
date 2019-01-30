@@ -18,11 +18,11 @@
 #define FLASH_PROGRAM 8
 #define FLASH_SETBANK 9
 
-uint8_t flashSaveMemory[FLASH_128K_SZ];
+uint8_t flashSaveMemory[SIZE_FLASH1M];
 
 int flashState = FLASH_READ_ARRAY;
 int flashReadState = FLASH_READ_ARRAY;
-int flashSize = 0x10000;
+int flashSize = SIZE_FLASH512;
 int flashDeviceID = 0x1b;
 int flashManufacturerID = 0x32;
 int flashBank = 0;
@@ -30,7 +30,7 @@ int flashBank = 0;
 static variable_desc flashSaveData[] = {
     { &flashState, sizeof(int) },
     { &flashReadState, sizeof(int) },
-    { &flashSaveMemory[0], 0x10000 },
+    { &flashSaveMemory[0], SIZE_FLASH512 },
     { NULL, 0 }
 };
 
@@ -38,7 +38,7 @@ static variable_desc flashSaveData2[] = {
     { &flashState, sizeof(int) },
     { &flashReadState, sizeof(int) },
     { &flashSize, sizeof(int) },
-    { &flashSaveMemory[0], 0x20000 },
+    { &flashSaveMemory[0], SIZE_FLASH1M },
     { NULL, 0 }
 };
 
@@ -47,7 +47,7 @@ static variable_desc flashSaveData3[] = {
     { &flashReadState, sizeof(int) },
     { &flashSize, sizeof(int) },
     { &flashBank, sizeof(int) },
-    { &flashSaveMemory[0], 0x20000 },
+    { &flashSaveMemory[0], SIZE_FLASH1M },
     { NULL, 0 }
 };
 
@@ -109,7 +109,7 @@ void flashReadGameSkip(gzFile gzFile, int version)
 void flashSetSize(int size)
 {
     //  log("Setting flash size to %d\n", size);
-    if (size == 0x10000) {
+    if (size == SIZE_FLASH512) {
         flashDeviceID = 0x1b;
         flashManufacturerID = 0x32;
     } else {
@@ -118,8 +118,8 @@ void flashSetSize(int size)
     }
     // Added to make 64k saves compatible with 128k ones
     // (allow wrongfuly set 64k saves to work for Pokemon games)
-    if ((size == 0x20000) && (flashSize == 0x10000))
-        memcpy((uint8_t*)(flashSaveMemory + 0x10000), (uint8_t*)(flashSaveMemory), 0x10000);
+    if ((size == SIZE_FLASH1M) && (flashSize == SIZE_FLASH512))
+        memcpy((uint8_t*)(flashSaveMemory + SIZE_FLASH512), (uint8_t*)(flashSaveMemory), SIZE_FLASH512);
     flashSize = size;
 }
 
@@ -208,7 +208,7 @@ void flashWrite(uint32_t address, uint8_t byte)
                 flashReadState = FLASH_READ_ARRAY;
             } else if (byte == 0xA0) {
                 flashState = FLASH_PROGRAM;
-            } else if (byte == 0xB0 && flashSize == 0x20000) {
+            } else if (byte == 0xB0 && flashSize == SIZE_FLASH1M) {
                 flashState = FLASH_SETBANK;
             } else {
                 flashState = FLASH_READ_ARRAY;
