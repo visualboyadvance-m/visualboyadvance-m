@@ -438,7 +438,13 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
             endif()
         endif()
 
-        set(MYU_C_FLAGS ${MY_C_FLAGS} -fopenmp)
+
+        set(MY_C_FLAGS ${MY_C_FLAGS} -fopenmp)
+    endif()
+
+    check_cxx_compiler_flag(-fdiagnostics-color=auto COMPILER_COLOR_OUTPUT)
+    if(COMPILER_COLOR_OUTPUT)
+        add_compile_options(-fdiagnostics-color=auto)
     endif()
 
     if(MINGW)
