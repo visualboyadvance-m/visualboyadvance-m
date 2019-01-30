@@ -322,13 +322,15 @@ size_t retro_get_memory_size(unsigned id)
         case RETRO_MEMORY_SAVE_RAM:
             if ((saveType == GBA_SAVE_EEPROM) | (saveType == GBA_SAVE_EEPROM_SENSOR))
                 return eepromSize;
-            if ((saveType == GBA_SAVE_SRAM) | (saveType == GBA_SAVE_FLASH))
-                return (saveType == GBA_SAVE_SRAM) ? 0x8000 : flashSize;
+            if (saveType == GBA_SAVE_FLASH)
+                return flashSize;
+            if (saveType == GBA_SAVE_SRAM)
+                return SIZE_SRAM;
             return 0;
         case RETRO_MEMORY_SYSTEM_RAM:
-            return 0x40000;
+            return SIZE_WRAM;
         case RETRO_MEMORY_VIDEO_RAM:
-            return 0x18000;
+            return SIZE_VRAM - 0x2000; // usuable vram is only 0x18000
         }
     }
     else if (type == IMAGE_GB) {
@@ -746,8 +748,8 @@ static void load_image_preferences(void)
     buffer[4] = 0;
 
     cpuSaveType = GBA_SAVE_AUTO;
-    flashSize = 65536;
-    eepromSize = 512;
+    flashSize = SIZE_FLASH512;
+    eepromSize = SIZE_EEPROM_512;
     rtcEnabled = false;
     mirroringEnable = false;
 
@@ -773,11 +775,11 @@ static void load_image_preferences(void)
 
         unsigned size = gbaover[found_no].saveSize;
         if (cpuSaveType == GBA_SAVE_SRAM)
-            flashSize = 32768;
+            flashSize = SIZE_SRAM;
         else if (cpuSaveType == GBA_SAVE_FLASH)
-            flashSize = size ? size : 65536;
+            flashSize = (size == SIZE_FLASH1M) ? SIZE_FLASH1M : SIZE_FLASH512;
         else if ((cpuSaveType == GBA_SAVE_EEPROM) || (cpuSaveType == GBA_SAVE_EEPROM_SENSOR))
-            eepromSize = size ? size : 512;
+            eepromSize = (size == SIZE_EEPROM_8K) ? SIZE_EEPROM_8K : SIZE_EEPROM_512;
     }
 
     // gameID that starts with 'F' are classic/famicom games
@@ -790,7 +792,7 @@ static void load_image_preferences(void)
 
     saveType = cpuSaveType;
 
-    if (flashSize == 65536 || flashSize == 131072)
+    if (flashSize == SIZE_FLASH512 || flashSize == SIZE_FLASH1M)
         flashSetSize(flashSize);
 
     rtcEnable(rtcEnabled);

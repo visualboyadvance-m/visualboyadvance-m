@@ -11,11 +11,11 @@ int eepromByte = 0;
 int eepromBits = 0;
 int eepromAddress = 0;
 
-uint8_t eepromData[0x2000];
+uint8_t eepromData[SIZE_EEPROM_8K];
 
 uint8_t eepromBuffer[16];
 bool eepromInUse = false;
-int eepromSize = 512;
+int eepromSize = SIZE_EEPROM_512;
 
 variable_desc eepromSaveData[] = {
     { &eepromMode, sizeof(int) },
@@ -23,7 +23,7 @@ variable_desc eepromSaveData[] = {
     { &eepromBits, sizeof(int) },
     { &eepromAddress, sizeof(int) },
     { &eepromInUse, sizeof(bool) },
-    { &eepromData[0], 512 },
+    { &eepromData[0], SIZE_EEPROM_512 },
     { &eepromBuffer[0], 16 },
     { NULL, 0 }
 };
@@ -31,7 +31,7 @@ variable_desc eepromSaveData[] = {
 void eepromInit()
 {
     eepromInUse = false;
-    eepromSize = 512;
+    eepromSize = SIZE_EEPROM_512;
     memset(eepromData, 255, sizeof(eepromData));
 }
 
@@ -48,7 +48,7 @@ void eepromSaveGame(uint8_t*& data)
 {
     utilWriteDataMem(data, eepromSaveData);
     utilWriteIntMem(data, eepromSize);
-    utilWriteMem(data, eepromData, 0x2000);
+    utilWriteMem(data, eepromData, SIZE_EEPROM_8K);
 }
 
 void eepromReadGame(const uint8_t*& data, int version)
@@ -56,10 +56,10 @@ void eepromReadGame(const uint8_t*& data, int version)
     utilReadDataMem(data, eepromSaveData);
     if (version >= SAVE_GAME_VERSION_3) {
         eepromSize = utilReadIntMem(data);
-        utilReadMem(eepromData, data, 0x2000);
+        utilReadMem(eepromData, data, SIZE_EEPROM_8K);
     } else {
         // prior to 0.7.1, only 4K EEPROM was supported
-        eepromSize = 512;
+        eepromSize = SIZE_EEPROM_512;
     }
 }
 
@@ -69,7 +69,7 @@ void eepromSaveGame(gzFile gzFile)
 {
     utilWriteData(gzFile, eepromSaveData);
     utilWriteInt(gzFile, eepromSize);
-    utilGzWrite(gzFile, eepromData, 0x2000);
+    utilGzWrite(gzFile, eepromData, SIZE_EEPROM_8K);
 }
 
 void eepromReadGame(gzFile gzFile, int version)
@@ -77,10 +77,10 @@ void eepromReadGame(gzFile gzFile, int version)
     utilReadData(gzFile, eepromSaveData);
     if (version >= SAVE_GAME_VERSION_3) {
         eepromSize = utilReadInt(gzFile);
-        utilGzRead(gzFile, eepromData, 0x2000);
+        utilGzRead(gzFile, eepromData, SIZE_EEPROM_8K);
     } else {
         // prior to 0.7.1, only 4K EEPROM was supported
-        eepromSize = 512;
+        eepromSize = SIZE_EEPROM_512;
     }
 }
 
@@ -90,7 +90,7 @@ void eepromReadGameSkip(gzFile gzFile, int version)
     utilReadDataSkip(gzFile, eepromSaveData);
     if (version >= SAVE_GAME_VERSION_3) {
         utilGzSeek(gzFile, sizeof(int), SEEK_CUR);
-        utilGzSeek(gzFile, 0x2000, SEEK_CUR);
+        utilGzSeek(gzFile, SIZE_EEPROM_8K, SEEK_CUR);
     }
 }
 #endif
@@ -150,7 +150,7 @@ void eepromWrite(uint32_t /* address */, uint8_t value)
         if (cpuDmaCount == 0x11 || cpuDmaCount == 0x51) {
             if (eepromBits == 0x11) {
                 eepromInUse = true;
-                eepromSize = 0x2000;
+                eepromSize = SIZE_EEPROM_8K;
                 eepromAddress = ((eepromBuffer[0] & 0x3F) << 8) | ((eepromBuffer[1] & 0xFF));
                 if (!(eepromBuffer[0] & 0x40)) {
                     eepromBuffer[0] = bit;

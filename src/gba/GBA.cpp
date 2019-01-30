@@ -75,11 +75,11 @@ static profile_segment* profilSegment = NULL;
 #endif
 
 #ifdef BKPT_SUPPORT
-uint8_t freezeWorkRAM[WORK_RAM_SIZE];
-uint8_t freezeInternalRAM[0x8000];
+uint8_t freezeWorkRAM[SIZE_WRAM];
+uint8_t freezeInternalRAM[SIZE_IRAM];
 uint8_t freezeVRAM[0x18000];
-uint8_t freezePRAM[0x400];
-uint8_t freezeOAM[0x400];
+uint8_t freezePRAM[SIZE_PRAM];
+uint8_t freezeOAM[SIZE_OAM];
 bool debugger_last;
 #endif
 
@@ -458,7 +458,7 @@ variable_desc saveGameStruct[] = {
     { NULL, 0 }
 };
 
-static int romSize = ROM_SIZE;
+static int romSize = SIZE_ROM;
 
 #ifdef PROFILING
 void cpuProfil(profile_segment* seg)
@@ -593,13 +593,13 @@ unsigned int CPUWriteState(uint8_t* data, unsigned size)
     utilWriteIntMem(data, stopState);
     utilWriteIntMem(data, IRQTicks);
 
-    utilWriteMem(data, internalRAM, 0x8000);
-    utilWriteMem(data, paletteRAM, 0x400);
-    utilWriteMem(data, workRAM, WORK_RAM_SIZE);
-    utilWriteMem(data, vram, 0x20000);
-    utilWriteMem(data, oam, 0x400);
-    utilWriteMem(data, pix, 4 * 240 * 160);
-    utilWriteMem(data, ioMem, 0x400);
+    utilWriteMem(data, internalRAM, SIZE_IRAM);
+    utilWriteMem(data, paletteRAM, SIZE_PRAM);
+    utilWriteMem(data, workRAM, SIZE_WRAM);
+    utilWriteMem(data, vram, SIZE_VRAM);
+    utilWriteMem(data, oam, SIZE_OAM);
+    utilWriteMem(data, pix, SIZE_PIX);
+    utilWriteMem(data, ioMem, SIZE_IOMEM);
 
     eepromSaveGame(data);
     flashSaveGame(data);
@@ -643,13 +643,13 @@ bool CPUReadState(const uint8_t* data, unsigned size)
         IRQTicks = 0;
     }
 
-    utilReadMem(internalRAM, data, 0x8000);
-    utilReadMem(paletteRAM, data, 0x400);
-    utilReadMem(workRAM, data, WORK_RAM_SIZE);
-    utilReadMem(vram, data, 0x20000);
-    utilReadMem(oam, data, 0x400);
-    utilReadMem(pix, data, 4 * 240 * 160);
-    utilReadMem(ioMem, data, 0x400);
+    utilReadMem(internalRAM, data, SIZE_IRAM);
+    utilReadMem(paletteRAM, data, SIZE_PRAM);
+    utilReadMem(workRAM, data, SIZE_WRAM);
+    utilReadMem(vram, data, SIZE_VRAM);
+    utilReadMem(oam, data, SIZE_OAM);
+    utilReadMem(pix, data, SIZE_PIX);
+    utilReadMem(ioMem, data, SIZE_IOMEM);
 
     eepromReadGame(data, version);
     flashReadGame(data, version);
@@ -705,13 +705,13 @@ static bool CPUWriteState(gzFile gzFile)
     // new to version 0.8
     utilWriteInt(gzFile, IRQTicks);
 
-    utilGzWrite(gzFile, internalRAM, 0x8000);
-    utilGzWrite(gzFile, paletteRAM, 0x400);
-    utilGzWrite(gzFile, workRAM, WORK_RAM_SIZE);
-    utilGzWrite(gzFile, vram, 0x20000);
-    utilGzWrite(gzFile, oam, 0x400);
-    utilGzWrite(gzFile, pix, 4 * 241 * 162);
-    utilGzWrite(gzFile, ioMem, 0x400);
+    utilGzWrite(gzFile, internalRAM, SIZE_IRAM);
+    utilGzWrite(gzFile, paletteRAM, SIZE_PRAM);
+    utilGzWrite(gzFile, workRAM, SIZE_WRAM);
+    utilGzWrite(gzFile, vram, SIZE_VRAM);
+    utilGzWrite(gzFile, oam, SIZE_OAM);
+    utilGzWrite(gzFile, pix, SIZE_PIX);
+    utilGzWrite(gzFile, ioMem, SIZE_IOMEM);
 
     eepromSaveGame(gzFile);
     flashSaveGame(gzFile);
@@ -819,16 +819,16 @@ static bool CPUReadState(gzFile gzFile)
         }
     }
 
-    utilGzRead(gzFile, internalRAM, 0x8000);
-    utilGzRead(gzFile, paletteRAM, 0x400);
-    utilGzRead(gzFile, workRAM, WORK_RAM_SIZE);
-    utilGzRead(gzFile, vram, 0x20000);
-    utilGzRead(gzFile, oam, 0x400);
+    utilGzRead(gzFile, internalRAM, SIZE_IRAM);
+    utilGzRead(gzFile, paletteRAM, SIZE_PRAM);
+    utilGzRead(gzFile, workRAM, SIZE_WRAM);
+    utilGzRead(gzFile, vram, SIZE_VRAM);
+    utilGzRead(gzFile, oam, SIZE_OAM);
     if (version < SAVE_GAME_VERSION_6)
         utilGzRead(gzFile, pix, 4 * 240 * 160);
     else
-        utilGzRead(gzFile, pix, 4 * 241 * 162);
-    utilGzRead(gzFile, ioMem, 0x400);
+        utilGzRead(gzFile, pix, SIZE_PIX);
+    utilGzRead(gzFile, ioMem, SIZE_IOMEM);
 
     if (skipSaveGameBattery) {
         // skip eeprom data
@@ -1448,20 +1448,20 @@ void SetMapMasks()
 
 int CPULoadRom(const char* szFile)
 {
-    romSize = ROM_SIZE;
+    romSize = SIZE_ROM;
     if (rom != NULL) {
         CPUCleanUp();
     }
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    rom = (uint8_t*)malloc(romSize);
+    rom = (uint8_t*)malloc(SIZE_ROM);
     if (rom == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "ROM");
         return 0;
     }
-    workRAM = (uint8_t*)calloc(1, WORK_RAM_SIZE);
+    workRAM = (uint8_t*)calloc(1, SIZE_WRAM);
     if (workRAM == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "WRAM");
@@ -1513,35 +1513,35 @@ int CPULoadRom(const char* szFile)
         temp++;
     }
 
-    bios = (uint8_t*)calloc(1, 0x4000);
+    bios = (uint8_t*)calloc(1, SIZE_BIOS);
     if (bios == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "BIOS");
         CPUCleanUp();
         return 0;
     }
-    internalRAM = (uint8_t*)calloc(1, 0x8000);
+    internalRAM = (uint8_t*)calloc(1, SIZE_IRAM);
     if (internalRAM == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "IRAM");
         CPUCleanUp();
         return 0;
     }
-    paletteRAM = (uint8_t*)calloc(1, 0x400);
+    paletteRAM = (uint8_t*)calloc(1, SIZE_PRAM);
     if (paletteRAM == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "PRAM");
         CPUCleanUp();
         return 0;
     }
-    vram = (uint8_t*)calloc(1, 0x20000);
+    vram = (uint8_t*)calloc(1, SIZE_VRAM);
     if (vram == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "VRAM");
         CPUCleanUp();
         return 0;
     }
-    oam = (uint8_t*)calloc(1, 0x400);
+    oam = (uint8_t*)calloc(1, SIZE_OAM);
     if (oam == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "OAM");
@@ -1556,7 +1556,7 @@ int CPULoadRom(const char* szFile)
         CPUCleanUp();
         return 0;
     }
-    ioMem = (uint8_t*)calloc(1, 0x400);
+    ioMem = (uint8_t*)calloc(1, SIZE_IOMEM);
     if (ioMem == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "IO");
@@ -1574,20 +1574,20 @@ int CPULoadRom(const char* szFile)
 
 int CPULoadRomData(const char* data, int size)
 {
-    romSize = ROM_SIZE;
+    romSize = SIZE_ROM;
     if (rom != NULL) {
         CPUCleanUp();
     }
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    rom = (uint8_t*)malloc(romSize);
+    rom = (uint8_t*)malloc(SIZE_ROM);
     if (rom == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "ROM");
         return 0;
     }
-    workRAM = (uint8_t*)calloc(1, WORK_RAM_SIZE);
+    workRAM = (uint8_t*)calloc(1, SIZE_WRAM);
     if (workRAM == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "WRAM");
@@ -1606,35 +1606,35 @@ int CPULoadRomData(const char* data, int size)
         temp++;
     }
 
-    bios = (uint8_t*)calloc(1, 0x4000);
+    bios = (uint8_t*)calloc(1, SIZE_BIOS);
     if (bios == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "BIOS");
         CPUCleanUp();
         return 0;
     }
-    internalRAM = (uint8_t*)calloc(1, 0x8000);
+    internalRAM = (uint8_t*)calloc(1, SIZE_IRAM);
     if (internalRAM == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "IRAM");
         CPUCleanUp();
         return 0;
     }
-    paletteRAM = (uint8_t*)calloc(1, 0x400);
+    paletteRAM = (uint8_t*)calloc(1, SIZE_PRAM);
     if (paletteRAM == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "PRAM");
         CPUCleanUp();
         return 0;
     }
-    vram = (uint8_t*)calloc(1, 0x20000);
+    vram = (uint8_t*)calloc(1, SIZE_VRAM);
     if (vram == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "VRAM");
         CPUCleanUp();
         return 0;
     }
-    oam = (uint8_t*)calloc(1, 0x400);
+    oam = (uint8_t*)calloc(1, SIZE_OAM);
     if (oam == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "OAM");
@@ -1649,7 +1649,7 @@ int CPULoadRomData(const char* data, int size)
         CPUCleanUp();
         return 0;
     }
-    ioMem = (uint8_t*)calloc(1, 0x400);
+    ioMem = (uint8_t*)calloc(1, SIZE_IOMEM);
     if (ioMem == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "IO");
@@ -3381,15 +3381,15 @@ void CPUReset()
     // clean registers
     memset(&reg[0], 0, sizeof(reg));
     // clean OAM
-    memset(oam, 0, 0x400);
+    memset(oam, 0, SIZE_OAM);
     // clean palette
-    memset(paletteRAM, 0, 0x400);
+    memset(paletteRAM, 0, SIZE_PRAM);
     // clean picture
-    memset(pix, 0, 4 * 160 * 240);
+    memset(pix, 0, SIZE_PIX);
     // clean vram
-    memset(vram, 0, 0x20000);
+    memset(vram, 0, SIZE_VRAM);
     // clean io memory
-    memset(ioMem, 0, 0x400);
+    memset(ioMem, 0, SIZE_IOMEM);
 
     DISPCNT = 0x0080;
     DISPSTAT = 0x0000;
