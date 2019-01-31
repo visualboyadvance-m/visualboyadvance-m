@@ -1019,7 +1019,10 @@ void GameArea::OnIdle(wxIdleEvent& event)
         w->Connect(wxEVT_KEY_UP,           wxKeyEventHandler(GameArea::OnKeyUp),           NULL, this);
         w->Connect(wxEVT_PAINT,            wxPaintEventHandler(GameArea::PaintEv),         NULL, this);
         w->Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(GameArea::EraseBackground), NULL, this);
-        w->Connect(wxEVT_SIZE,             wxSizeEventHandler(GameArea::OnSize),           NULL, this);
+
+        // set userdata so we know it's the panel and not the frame being resized
+        // the userdata is freed on disconnect/destruction
+        w->Connect(wxEVT_SIZE,             wxSizeEventHandler(GameArea::OnSize),           new wxObject, this);
         this->Connect(wxEVT_SIZE,          wxSizeEventHandler(GameArea::OnSize),           NULL, this);
 
         w->SetBackgroundStyle(wxBG_STYLE_CUSTOM);
@@ -1033,7 +1036,10 @@ void GameArea::OnIdle(wxIdleEvent& event)
         AdjustMinSize();
         AdjustSize(false);
 
-        GetSizer()->Add(w, 1, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER) : wxEXPAND);
+        // add spacers on top and bottom to center panel vertically
+        GetSizer()->Add(0, 0, 1, wxEXPAND);
+        GetSizer()->Add(w,    0, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER | wxEXPAND) : wxEXPAND);
+        GetSizer()->Add(0, 0, 1, wxEXPAND);
         Layout();
 
         if (pointer_blanked)
@@ -1269,9 +1275,16 @@ void GameArea::EraseBackground(wxEraseEvent& ev)
 
 void GameArea::OnSize(wxSizeEvent& ev)
 {
-    draw_black_background(this);
+    if (!ev.GetEventUserData()) { // is frame
+        draw_black_background(this);
+        Layout();
+    }
+
+    // panel may resize
     if (panel)
         panel->OnSize(ev);
+
+    ev.Skip(true);
 }
 
 void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
