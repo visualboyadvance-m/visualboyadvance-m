@@ -408,11 +408,12 @@ void gbDrawSpriteTile(int tile, int x, int y, int t, int flags,
         bank1 = NULL;
     }
 
-    int init = 0x0000;
+    int SpritesTicks = gbSpritesTicks[x + 8] * (gbSpeed ? 2 : 4);
+    int index = x + 11 + SpritesTicks;
 
     for (int i = 0; i < 4; i++) {
-        gbObp0[i] = (gbObp0Line[x + 11 + gbSpritesTicks[x] * (gbSpeed ? 2 : 4)] >> (i << 1)) & 3;
-        gbObp1[i] = (gbObp1Line[x + 11 + gbSpritesTicks[x] * (gbSpeed ? 2 : 4)] >> (i << 1)) & 3;
+        gbObp0[i] = (gbObp0Line[index] >> (i << 1)) & 3;
+        gbObp1[i] = (gbObp1Line[index] >> (i << 1)) & 3;
     }
     uint8_t* pal = gbObp0;
 
@@ -428,7 +429,7 @@ void gbDrawSpriteTile(int tile, int x, int y, int t, int flags,
 
     int prio = flags & 0x80;
 
-    int address = init + tile * 16 + 2 * t;
+    int address = tile * 16 + 2 * t;
     int a = 0;
     int b = 0;
 
