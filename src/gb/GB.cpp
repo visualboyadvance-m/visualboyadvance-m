@@ -127,7 +127,7 @@ int gbSerialOn = 0;
 int gbSerialTicks = 0;
 int gbSerialBits = 0;
 // timer
-bool gbTimerOn = false;
+int gbTimerOn = 0;
 int gbTimerTicks = GBTIMER_MODE_0_CLOCK_TICKS;
 int gbTimerClockTicks = GBTIMER_MODE_0_CLOCK_TICKS;
 int gbTimerMode = 0;
@@ -1065,7 +1065,7 @@ void gbWriteMemory(register uint16_t address, register uint8_t value)
         gbTimerModeChange = (((value & 3) != (register_TAC & 3)) && (value & register_TAC & 4)) ? true : false;
         gbTimerOnChange = (((value ^ register_TAC) & 4) == 4) ? true : false;
 
-        gbTimerOn = (value & 4) ? true : false;
+        gbTimerOn = (value & 4);
 
         if (gbTimerOnChange || gbTimerModeChange) {
             gbTimerMode = value & 3;
@@ -2533,7 +2533,7 @@ void gbReset()
 
     gbTimerModeChange = false;
     gbTimerOnChange = false;
-    gbTimerOn = false;
+    gbTimerOn = 0;
 
     if (gbCgbMode) {
         for (i = 0; i < 0x20; i++)
@@ -2677,7 +2677,7 @@ void gbReset()
     gbSerialBits = 0;
     gbSerialOn = 0;
     gbWindowLine = -1;
-    gbTimerOn = false;
+    gbTimerOn = 0;
     gbTimerMode = 0;
     gbSpeed = 0;
     gbJoymask[0] = gbJoymask[1] = gbJoymask[2] = gbJoymask[3] = 0;
