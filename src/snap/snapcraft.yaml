@@ -16,7 +16,7 @@ parts:
       - make
       - cmake
       - libwxgtk3.0-dev
-      - libsdl2.0-dev
+      - libsdl2-dev
       - libsfml-dev
       - libgtk-3-dev
     configflags:
