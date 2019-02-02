@@ -15,10 +15,10 @@ parts:
       - gcc
       - make
       - cmake
-      - libwxgtk3.0-gtk3-dev
+      - libwxgtk3.0-dev
       - libsdl2-dev
       - libsfml-dev
-      - libgtk-3-dev
+      - libgtk2.0-dev
     configflags:
       - -DCMAKE_INSTALL_PREFIX=/
 
