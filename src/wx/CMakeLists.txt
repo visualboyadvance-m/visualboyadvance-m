@@ -432,6 +432,7 @@ SET(XRC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/xrc/PaletteViewer.xrc
     ${CMAKE_CURRENT_SOURCE_DIR}/xrc/SoundConfig.xrc
     ${CMAKE_CURRENT_SOURCE_DIR}/xrc/TileViewer.xrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/SpeedupConfig.xrc
 )
 
 # wxrc does not support xrs files in -c output (> 10x compression)

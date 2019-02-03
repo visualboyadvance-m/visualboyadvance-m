@@ -17,6 +17,7 @@
 #include <wx/filepicker.h>
 #include <wx/progdlg.h>
 #include <wx/spinctrl.h>
+#include <wx/valnum.h>
 #include <wx/stockitem.h>
 #include <wx/tokenzr.h>
 #include <wx/txtstrm.h>
@@ -2221,70 +2222,23 @@ public:
         DoSetThrottleSel(thr->GetValue());
     }
 
-    void DoSetThrottleSel(int val)
+    void DoSetThrottleSel(uint32_t val)
     {
-        switch (val) {
-        case 0:
-            thrsel->SetSelection(1);
-            break;
-
-        case 25:
-            thrsel->SetSelection(2);
-            break;
-
-        case 50:
-            thrsel->SetSelection(3);
-            break;
-
-        case 100:
-            thrsel->SetSelection(4);
-            break;
-
-        case 150:
-            thrsel->SetSelection(5);
-            break;
-
-        case 200:
-            thrsel->SetSelection(6);
-            break;
-
-        default:
-            thrsel->SetSelection(0);
-            break;
-        }
+        if (val <= 600)
+            thrsel->SetSelection(std::round((double)val / 25));
+        else
+            thrsel->SetSelection(100 / 25);
     }
 
     // set thr from thrsel
     void SetThrottle(wxCommandEvent& evt)
     {
-        switch (thrsel->GetSelection()) {
-        case 0: // blank; leave it alone
-            break;
+        uint32_t val = thrsel->GetSelection() * 25;
 
-        case 1:
-            thr->SetValue(0);
-            break;
-
-        case 2:
-            thr->SetValue(25);
-            break;
-
-        case 3:
-            thr->SetValue(50);
-            break;
-
-        case 4:
+        if (val <= 600)
+            thr->SetValue(val);
+        else
             thr->SetValue(100);
-            break;
-
-        case 5:
-            thr->SetValue(150);
-            break;
-
-        case 6:
-            thr->SetValue(200);
-            break;
-        }
     }
 
     // since this is not the actual dialog, derived from wxDialog, which is
@@ -2297,6 +2251,102 @@ public:
         DoSetThrottleSel(throttle);
     }
 } throttle_ctrl;
+
+// manage speedup key frame skip spinctrl/canned setting choice interaction
+static class SpeedupFrameSkipCtrl_t : public wxEvtHandler {
+public:
+    wxSpinCtrl* speedup_frame_skip_spin;
+    wxChoice* speedup_frame_skip_sel;
+    void SetSpeedupFrameSkipSel(wxSpinEvent& evt);
+    void DoSetSpeedupFrameSkipSel(uint32_t val);
+    void SetSpeedupFrameSkip(wxCommandEvent& evt);
+    void Init(wxShowEvent& ev);
+} speedup_frame_skip_ctrl;
+
+// manage speedup key throttle spinctrl/canned setting choice interaction
+static class SpeedupThrottleCtrl_t : public wxEvtHandler {
+public:
+    wxSpinCtrl* speedup_throttle_spin;
+    wxChoice* speedup_throttle_sel;
+
+    // set speedup_throttle_sel from speedup_throttle
+    void SetSpeedupThrottleSel(wxSpinEvent& evt)
+    {
+        DoSetSpeedupThrottleSel(speedup_throttle_spin->GetValue());
+    }
+
+    void DoSetSpeedupThrottleSel(uint32_t val)
+    {
+        if (val > 0 && val <= 600) {
+            speedup_throttle_sel->SetSelection(std::round((double)val / 25));
+            speedup_frame_skip_ctrl.DoSetSpeedupFrameSkipSel(0);
+            wxCommandEvent nil;
+            speedup_frame_skip_ctrl.SetSpeedupFrameSkip(nil);
+        }
+        else
+            speedup_throttle_sel->SetSelection(0);
+    }
+
+    // set speedup_throttle from speedup_throttle_sel
+    void SetSpeedupThrottle(wxCommandEvent& evt)
+    {
+        uint32_t val = speedup_throttle_sel->GetSelection() * 25;
+
+        if (val > 0 && val <= 600) {
+            speedup_throttle_spin->SetValue(val);
+            speedup_frame_skip_ctrl.DoSetSpeedupFrameSkipSel(0);
+            wxCommandEvent nil;
+            speedup_frame_skip_ctrl.SetSpeedupFrameSkip(nil);
+        }
+        else
+            speedup_throttle_spin->SetValue(0);
+    }
+
+    void Init(wxShowEvent& ev)
+    {
+        ev.Skip();
+        DoSetSpeedupThrottleSel(speedup_throttle);
+    }
+} speedup_throttle_ctrl;
+
+// set speedup_frame_skip_sel from speedup_frame_skip
+void SpeedupFrameSkipCtrl_t::SetSpeedupFrameSkipSel(wxSpinEvent& evt)
+{
+    DoSetSpeedupFrameSkipSel(speedup_frame_skip_spin->GetValue());
+}
+
+void SpeedupFrameSkipCtrl_t::DoSetSpeedupFrameSkipSel(uint32_t val)
+{
+    if (val > 0 && val <= 30) {
+        speedup_frame_skip_sel->SetSelection(val);
+        speedup_throttle_ctrl.DoSetSpeedupThrottleSel(0);
+        wxCommandEvent nil;
+        speedup_throttle_ctrl.SetSpeedupThrottle(nil);
+    }
+    else
+        speedup_frame_skip_sel->SetSelection(0);
+}
+
+// set speedup_frame_skip from speedup_frame_skip_sel
+void SpeedupFrameSkipCtrl_t::SetSpeedupFrameSkip(wxCommandEvent& evt)
+{
+    uint32_t val = speedup_frame_skip_sel->GetSelection();
+
+    if (val > 0 && val <= 30) {
+        speedup_frame_skip_spin->SetValue(val);
+        speedup_throttle_ctrl.DoSetSpeedupThrottleSel(0);
+        wxCommandEvent nil;
+        speedup_throttle_ctrl.SetSpeedupThrottle(nil);
+    }
+    else
+        speedup_frame_skip_spin->SetValue(0);
+}
+
+void SpeedupFrameSkipCtrl_t::Init(wxShowEvent& ev)
+{
+    ev.Skip();
+    DoSetSpeedupFrameSkipSel(speedup_frame_skip);
+}
 
 /////////////////////////////
 //Check if a pointer from the XRC file is valid. If it's not, throw an error telling the user.
@@ -3207,6 +3257,11 @@ bool MainFrame::BindControls()
         sc = SafeXRCCTRL<wxSpinCtrl>(d, n);       \
         sc->SetValidator(wxGenericValidator(&o)); \
     } while (0)
+#define getsc_uint(n, o)                               \
+    do {                                          \
+        sc = SafeXRCCTRL<wxSpinCtrl>(d, n);       \
+        sc->SetValidator(wxUIntValidator(&o)); \
+    } while (0)
         {
             // Online Auto Update check frequency
             getrbi("UpdateNever", gopts.onlineupdates, 0);
@@ -3215,7 +3270,7 @@ bool MainFrame::BindControls()
             getrbi("PNG", captureFormat, 0);
             getrbi("BMP", captureFormat, 1);
             getsc("RewindInterval", gopts.rewind_interval);
-            getsc("Throttle", throttle);
+            getsc_uint("Throttle", throttle);
             throttle_ctrl.thr = sc;
             throttle_ctrl.thrsel = SafeXRCCTRL<wxChoice>(d, "ThrottleSel");
             throttle_ctrl.thr->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED,
@@ -3226,6 +3281,35 @@ bool MainFrame::BindControls()
                 NULL, &throttle_ctrl);
             d->Connect(wxEVT_SHOW, wxShowEventHandler(ThrottleCtrl_t::Init),
                 NULL, &throttle_ctrl);
+            d->Fit();
+        }
+        // SpeedUp Key Config
+        d = LoadXRCDialog("SpeedupConfig");
+        {
+            getsc_uint("SpeedupThrottle", speedup_throttle);
+            speedup_throttle_ctrl.speedup_throttle_spin = sc;
+            speedup_throttle_ctrl.speedup_throttle_sel = SafeXRCCTRL<wxChoice>(d, "SpeedupThrottleSel");
+            speedup_throttle_ctrl.speedup_throttle_spin->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED,
+                wxSpinEventHandler(SpeedupThrottleCtrl_t::SetSpeedupThrottleSel),
+                NULL, &speedup_throttle_ctrl);
+            speedup_throttle_ctrl.speedup_throttle_sel->Connect(wxEVT_COMMAND_CHOICE_SELECTED,
+                wxCommandEventHandler(SpeedupThrottleCtrl_t::SetSpeedupThrottle),
+                NULL, &speedup_throttle_ctrl);
+            d->Connect(wxEVT_SHOW, wxShowEventHandler(SpeedupThrottleCtrl_t::Init),
+                NULL, &speedup_throttle_ctrl);
+            d->Fit();
+
+            getsc_uint("SpeedupFrameSkip", speedup_frame_skip);
+            speedup_frame_skip_ctrl.speedup_frame_skip_spin = sc;
+            speedup_frame_skip_ctrl.speedup_frame_skip_sel = SafeXRCCTRL<wxChoice>(d, "SpeedupFrameSkipSel");
+            speedup_frame_skip_ctrl.speedup_frame_skip_spin->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED,
+                wxSpinEventHandler(SpeedupFrameSkipCtrl_t::SetSpeedupFrameSkipSel),
+                NULL, &speedup_frame_skip_ctrl);
+            speedup_frame_skip_ctrl.speedup_frame_skip_sel->Connect(wxEVT_COMMAND_CHOICE_SELECTED,
+                wxCommandEventHandler(SpeedupFrameSkipCtrl_t::SetSpeedupFrameSkip),
+                NULL, &speedup_frame_skip_ctrl);
+            d->Connect(wxEVT_SHOW, wxShowEventHandler(SpeedupFrameSkipCtrl_t::Init),
+                NULL, &speedup_frame_skip_ctrl);
             d->Fit();
         }
 #define getcbbe(n, o) getbe(n, o, cb, wxCheckBox, CB)

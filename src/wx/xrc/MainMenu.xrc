@@ -457,6 +457,9 @@
         <object class="wxMenuItem" name="GeneralConfigure">
           <label>_General ...</label>
         </object>
+        <object class="wxMenuItem" name="SpeedupConfigure">
+          <label>_Speedup / Turbo ...</label>
+        </object>
         <object class="wxMenuItem" name="EmulatorDirectories">
           <label>D_irectories ...</label>
         </object>

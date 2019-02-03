@@ -1,6 +1,7 @@
 // utility widgets
 #include "wx/wxmisc.h"
 #include <wx/wx.h>
+#include <wx/spinctrl.h>
 
 wxFarRadio::wxFarRadio()
     : wxCheckBox()
@@ -428,4 +429,51 @@ bool wxPositiveDoubleValidator::Validate(wxWindow* parent)
 wxObject* wxPositiveDoubleValidator::Clone() const
 {
     return new wxPositiveDoubleValidator(double_val);
+}
+
+
+wxUIntValidator::wxUIntValidator(uint32_t* _val)
+    : uint_val(_val)
+{
+    if (uint_val)
+        TransferToWindow();
+}
+
+bool wxUIntValidator::TransferToWindow()
+{
+    wxSpinCtrl* ctrl = wxDynamicCast(GetWindow(), wxSpinCtrl);
+    if (ctrl && uint_val) {
+        ctrl->SetValue(*uint_val);
+        return true;
+    }
+    return false;
+}
+
+bool wxUIntValidator::TransferFromWindow()
+{
+    wxSpinCtrl* ctrl = wxDynamicCast(GetWindow(), wxSpinCtrl);
+    if (ctrl && uint_val) {
+        *uint_val = ctrl->GetValue();
+        return true;
+    }
+    return false;
+}
+
+bool wxUIntValidator::Validate(wxWindow* parent)
+{
+    wxSpinCtrl* ctrl = wxDynamicCast(GetWindow(), wxSpinCtrl);
+
+    if (ctrl) {
+        if (ctrl->GetValue() >= 0) {
+            return true;
+        }
+        return false;
+    }
+
+    return false;
+}
+
+wxObject* wxUIntValidator::Clone() const
+{
+    return new wxUIntValidator(uint_val);
 }

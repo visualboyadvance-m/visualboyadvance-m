@@ -72,6 +72,17 @@ protected:
     wxString str_val;
 };
 
+class wxUIntValidator : public wxValidator {
+public:
+    wxUIntValidator(uint32_t* _val);
+    bool TransferToWindow();
+    bool TransferFromWindow();
+    bool Validate(wxWindow* parent);
+    wxObject* Clone() const;
+protected:
+    uint32_t* uint_val;
+};
+
 // boolean copy-only validator with reversed value
 // may be attached to radio button or checkbox
 class wxBoolRevValidator : public wxValidator {

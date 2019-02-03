@@ -26,6 +26,10 @@
     {                                                        \
         wxT(c), (n), d, NULL, NULL, wxT(""), min, max, NULL, &v \
     }
+#define UINTOPT(c, n, d, v, min, max)                      \
+    {                                                        \
+        wxT(c), (n), d, NULL, NULL, wxT(""), min, max, NULL, NULL, &v \
+    }
 #define BOOLOPT(c, n, d, v)                        \
     {                                              \
         wxT(c), (n), d, NULL, NULL, wxT(""), 0, 0, &v \
@@ -252,7 +256,9 @@ opt_desc opts[] = {
     INTOPT("preferences/skipBios", "SkipIntro", wxTRANSLATE("Skip BIOS initialization"), skipBios, 0, 1),
     INTOPT("preferences/skipSaveGameCheats", "", wxTRANSLATE("Do not overwrite cheat list when loading state"), skipSaveGameCheats, 0, 1),
     INTOPT("preferences/skipSaveGameBattery", "", wxTRANSLATE("Do not overwrite native (battery) save when loading state"), skipSaveGameBattery, 0, 1),
-    INTOPT("preferences/throttle", "", wxTRANSLATE("Throttle game speed, even when accelerated (0-1000%, 0 = disabled)"), throttle, 0, 1000),
+    UINTOPT("preferences/throttle", "", wxTRANSLATE("Throttle game speed, even when accelerated (0-500%, 0 = no throttle)"), throttle, 0, 600),
+    UINTOPT("preferences/speedupThrottle", "", wxTRANSLATE("Set throttle for speedup key (0-600%, 0 = no throttle)"), speedup_throttle, 0, 600),
+    UINTOPT("preferences/speedupFrameSkip", "", wxTRANSLATE("Set frame skip for speedup key (0-30)"), speedup_frame_skip, 0, 30),
     INTOPT("preferences/useBiosGB", "BootRomGB", wxTRANSLATE("Use the specified BIOS file for GB"), useBiosFileGB, 0, 1),
     INTOPT("preferences/useBiosGBA", "BootRomEn", wxTRANSLATE("Use the specified BIOS file"), useBiosFileGBA, 0, 1),
     INTOPT("preferences/useBiosGBC", "BootRomGBC", wxTRANSLATE("Use the specified BIOS file for GBC"), useBiosFileGBC, 0, 1),
@@ -525,6 +531,15 @@ void load_opts()
                 wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), opt.curdouble, opt.opt, opt.min, opt.max);
             } else
                 *opt.doubleopt = opt.curdouble;
+        } else if (opt.uintopt) {
+            int val;
+            cfg->Read(opt.opt, &val, *opt.uintopt);
+            opt.curuint = val;
+
+            if (opt.curuint < opt.min || opt.curuint > opt.max) {
+                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), opt.curuint, opt.opt, opt.min, opt.max);
+            } else
+                *opt.uintopt = opt.curuint;
         } else if (opt.boolopt) {
             cfg->Read(opt.opt, opt.boolopt, *opt.boolopt);
             opt.curbool = *opt.boolopt;
@@ -648,6 +663,9 @@ void update_opts()
         } else if (opt.doubleopt) {
             if (*opt.doubleopt != opt.curdouble)
                 cfg->Write(opt.opt, (opt.curdouble = *opt.doubleopt));
+        } else if (opt.uintopt) {
+            if (*opt.uintopt != opt.curuint)
+                cfg->Write(opt.opt, (opt.curuint = *opt.uintopt));
         } else if (opt.boolopt) {
             if (*opt.boolopt != opt.curbool)
                 cfg->Write(opt.opt, (opt.curbool = *opt.boolopt));
@@ -802,6 +820,14 @@ bool opt_set(const wxString& name, const wxString& val)
                 wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), dval, name, opt->min, opt->max);
             else
                 *opt->doubleopt = dval;
+        } else if (opt->uintopt) {
+            const wxString s(val);
+            unsigned long uival;
+
+            if (!s.ToULong(&uival) || uival < opt->min || uival > opt->max)
+                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), uival, name, opt->min, opt->max);
+            else
+                *opt->uintopt = (uint32_t)uival;
         } else {
             // GB/Palette[0-2] is virtual
             for (int i = 0; i < 3; i++) {

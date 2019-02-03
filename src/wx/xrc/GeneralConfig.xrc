@@ -149,14 +149,33 @@
               <object class="sizeritem">
                 <object class="wxChoice" name="ThrottleSel">
                   <content>
-                    <item/>
-                    <item>No throttle</item>
+                    <item>None</item>
                     <item>25%</item>
                     <item>50%</item>
+                    <item>75%</item>
                     <item>100%</item>
+                    <item>125%</item>
                     <item>150%</item>
+                    <item>175%</item>
                     <item>200%</item>
+                    <item>225%</item>
+                    <item>250%</item>
+                    <item>275%</item>
+                    <item>300%</item>
+                    <item>325%</item>
+                    <item>350%</item>
+                    <item>375%</item>
+                    <item>400%</item>
+                    <item>425%</item>
+                    <item>450%</item>
+                    <item>475%</item>
+                    <item>500%</item>
+                    <item>525%</item>
+                    <item>550%</item>
+                    <item>575%</item>
+                    <item>600%</item>
                   </content>
+                  <size>40,-1d</size>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>

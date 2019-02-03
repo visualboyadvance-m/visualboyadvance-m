@@ -3756,8 +3756,31 @@ void CPULoop(int ticks)
                     }
                 } else {
                     int framesToSkip = systemFrameSkip;
-                    if (speedup)
-                        framesToSkip = 9; // try 6 FPS during speedup
+                    static bool speedup_throttle_set = false;
+                    static uint32_t last_throttle;
+
+                    if ((joy >> 10) & 1) {
+                        if (speedup_throttle != 0) {
+                            if (!speedup_throttle_set && throttle != speedup_throttle) {
+                                last_throttle = throttle;
+                                throttle = speedup_throttle;
+                                soundSetThrottle(speedup_throttle);
+                                speedup_throttle_set = true;
+                            }
+                        }
+                        else {
+                            if (speedup_frame_skip)
+                                framesToSkip = speedup_frame_skip;
+
+                            speedup_throttle_set = false;
+                        }
+                    }
+                    else if (speedup_throttle_set) {
+                        throttle = last_throttle;
+                        soundSetThrottle(last_throttle);
+
+                        speedup_throttle_set = false;
+                    }
 
                     if (DISPSTAT & 2) {
                         // if in H-Blank, leave it and move to drawing mode
@@ -3788,7 +3811,12 @@ void CPULoop(int ticks)
                             // If no (m) code is enabled, apply the cheats at each LCDline
                             if ((cheatsEnabled) && (mastercode == 0))
                                 remainingTicks += cheatsCheckKeys(P1 ^ 0x3FF, ext);
-                            speedup = (ext & 1) ? true : false;
+
+                            speedup = false;
+
+                            if (ext & 1 && speedup_throttle == 0)
+                                speedup = true;
+
                             capture = (ext & 2) ? true : false;
 
                             if (capture && !capturePrevious) {

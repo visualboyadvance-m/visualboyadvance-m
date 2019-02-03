@@ -93,10 +93,12 @@ extern struct opt_desc {
     double min, max;
     bool* boolopt;
     double* doubleopt;
+    uint32_t* uintopt;
     // current configured value
     wxString curstr;
     int curint;
     double curdouble;
+    uint32_t curuint;
 #define curbool curint
 } opts[];
 extern const int num_opts;

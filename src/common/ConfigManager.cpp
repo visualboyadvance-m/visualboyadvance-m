@@ -104,8 +104,9 @@ enum named_opts
 	OPT_THREAD_PRIORITY,
 	OPT_VIDEO_OPTION,
 	OPT_WINDOW_POSITION_X,
-	OPT_WINDOW_POSITION_Y
-
+	OPT_WINDOW_POSITION_Y,
+	OPT_SPEEDUP_THROTTLE,
+	OPT_SPEEDUP_FRAME_SKIP
 };
 
 #define SOUND_MAX_VOLUME 2.0
@@ -242,7 +243,9 @@ int* rewindSerials = NULL;
 uint32_t autoFrameSkipLastTime;
 uint32_t movieLastJoypad;
 uint32_t movieNextJoypad;
-int throttle;
+uint32_t throttle = 100;
+uint32_t speedup_throttle = 0;
+uint32_t speedup_frame_skip = 9;
 
 const char* preparedCheatCodes[MAX_CHEATS];
 
@@ -374,6 +377,8 @@ struct option argOptions[] = {
 	{ "synchronize", required_argument, 0, OPT_SYNCHRONIZE },
 	{ "thread-priority", required_argument, 0, OPT_THREAD_PRIORITY },
 	{ "throttle", required_argument, 0, 'T' },
+	{ "speedup_throttle", required_argument, 0, OPT_SPEEDUP_THROTTLE },
+	{ "speedup_frame_skip", required_argument, 0, OPT_SPEEDUP_FRAME_SKIP },
 	{ "triple-buffering", no_argument, &tripleBuffering, 1 },
 	{ "use-bios", no_argument, &useBios, 1 },
 	{ "use-bios-file-gb", no_argument, &useBiosFileGB, 1 },
@@ -527,6 +532,8 @@ void LoadConfig()
 	soundRecordDir = ReadPrefString("soundRecordDir");
 	threadPriority = ReadPref("priority", 2);
 	throttle = ReadPref("throttle", 100);
+        speedup_throttle = ReadPref("speedup_throttle", 0);
+        speedup_frame_skip = ReadPref("speedup_frame_skip", 9);
 	tripleBuffering = ReadPref("tripleBuffering", 0);
 	useBios = ReadPrefHex("useBiosGBA");
 	useBiosFileGB = ReadPref("useBiosGB", 0);
@@ -971,6 +978,10 @@ int ReadOpts(int argc, char ** argv)
 				filter = kStretch2x;
 			}
 			break;
+                case 'T':
+                        if (optarg)
+                            throttle = atoi(optarg);
+                        break;
 		case 'I':
 			if (optarg) {
 				ifbType = (IFBFilter)atoi(optarg);
@@ -1339,6 +1350,14 @@ int ReadOpts(int argc, char ** argv)
 			// --dotcode-file-name-save
 			saveDotCodeFile = optarg;
 			break;
+                case OPT_SPEEDUP_THROTTLE:
+                        if (optarg)
+                            speedup_throttle = atoi(optarg);
+                        break;
+                case OPT_SPEEDUP_FRAME_SKIP:
+                        if (optarg)
+                            speedup_frame_skip = atoi(optarg);
+                        break;
 		}
 	}
 	return op;
