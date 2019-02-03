@@ -3756,6 +3756,8 @@ void CPULoop(int ticks)
                     }
                 } else {
                     int framesToSkip = systemFrameSkip;
+
+#ifndef __LIBRETRO__
                     static bool speedup_throttle_set = false;
                     static uint32_t last_throttle;
 
@@ -3781,6 +3783,10 @@ void CPULoop(int ticks)
 
                         speedup_throttle_set = false;
                     }
+#else
+                    if ((joy >> 10) & 1)
+                        framesToSkip = 9;
+#endif
 
                     if (DISPSTAT & 2) {
                         // if in H-Blank, leave it and move to drawing mode
@@ -3814,7 +3820,11 @@ void CPULoop(int ticks)
 
                             speedup = false;
 
+#ifndef __LIBRETRO__
                             if (ext & 1 && speedup_throttle == 0)
+#else
+                            if (ext & 1)
+#endif
                                 speedup = true;
 
                             capture = (ext & 2) ? true : false;

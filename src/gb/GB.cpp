@@ -4843,6 +4843,8 @@ void gbEmulate(int ticksToStop)
 
                 if ((gbLcdTicksDelayed <= 0) && (gbLCDChangeHappened)) {
                     int framesToSkip = systemFrameSkip;
+
+#ifndef __LIBRETRO__
                     static bool speedup_throttle_set = false;
                     static uint32_t last_throttle;
 
@@ -4868,6 +4870,10 @@ void gbEmulate(int ticksToStop)
 
                         speedup_throttle_set = false;
                     }
+#else
+                    if ((gbJoymask[0] >> 10) & 1)
+                        framesToSkip = 9;
+#endif
 
                     //gbLcdTicksDelayed = gbLcdTicks+1;
                     gbLCDChangeHappened = false;
@@ -4946,7 +4952,11 @@ void gbEmulate(int ticksToStop)
 
                             speedup = false;
 
+#ifndef __LIBRETRO__
                             if (newmask & 1 && speedup_throttle == 0)
+#else
+                            if (newmask & 1)
+#endif
                                 speedup = true;
 
                             gbCapture = (newmask & 2) ? true : false;
