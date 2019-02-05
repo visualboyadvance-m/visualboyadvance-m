@@ -2604,18 +2604,18 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
     sh = (ELFSectionHeader**)
         malloc(sizeof(ELFSectionHeader*) * count);
 
-    stringTable = (char*)elfReadSection(data, sh[READ16LE(&eh->e_shstrndx)]);
-
-    elfSectionHeaders            = sh;
-    elfSectionHeadersStringTable = stringTable;
-    elfSectionHeadersCount       = count;
-
     for (i = 0; i < count; i++) {
         sh[i] = (ELFSectionHeader*)p;
         p += sizeof(ELFSectionHeader);
         if (READ16LE(&eh->e_shentsize) != sizeof(ELFSectionHeader))
             p += READ16LE(&eh->e_shentsize) - sizeof(ELFSectionHeader);
     }
+	
+	stringTable = (char*)elfReadSection(data, sh[READ16LE(&eh->e_shstrndx)]);
+
+    elfSectionHeaders            = sh;
+    elfSectionHeadersStringTable = stringTable;
+    elfSectionHeadersCount       = count;
 
     for (i = 0; i < count; i++) {
         //    printf("SH %d %-20s %08x %08x %08x %08x %08x %08x %08x %08x\n",
