@@ -250,9 +250,10 @@ check_cross() {
             # get the necessary win32 headers
             check git submodule update --remote --recursive
             ;;
-        m32)
-            if [ -z "$msys2" -a -z "$fedora" -a -z "$arch_linux" -a -z "$solus" ]; then
-                error '32 bit builds are only supported on Fedora, Arch, Solus and MSYS2 at the moment'
+        m32|-m32)
+            target=m32
+            if [ -z "$msys2" -a -z "$fedora" -a -z "$arch_linux" -a -z "$solus" -a -z "$suse" ]; then
+                error '32 bit builds are only supported on Fedora, OpenSUSE, Arch, Solus and MSYS2 at the moment'
             fi
 
             if [ -n "$msys2" ]; then
@@ -504,12 +505,25 @@ fedora_installdeps() {
 }
 
 suse_installdeps() {
+    suse=1
     check_cross
     installing
 
-    check sudo zypper in -y gcc gcc-c++ binutils make cmake ccache nasm gettext-tools libpng16-devel pkg-config \
-                            libSDL2-devel openal-soft-devel sfml2-devel wxWidgets-3_0-devel ccache zip # ffmpeg2-devel
+    tools="\
+make cmake ccache nasm gettext-tools pkg-config ccache zip sfml2-devel\
+" # ffmpeg-devel
+
+    libs="\
+gcc gcc-c++ libpng16-devel libSDL2-devel openal-soft-devel wxWidgets-3_0-devel\
+" # ffmpeg-devel
     # ffmpeg requires packman repos
+
+    if [ "$target" = m32 ]; then
+        libs=$(echo "$libs" | sed -E 's/([^ ]) ([^ ])/\1-32bit \2/g; s/$/-32bit/;')
+        cmake_flags="$cmake_flags -DENABLE_LINK=NO"
+    fi
+
+    check sudo zypper in -y $tools $libs
 
     build_instructions
 }
