@@ -466,6 +466,9 @@
         <object class="wxMenuItem" name="Customize">
           <label>_Key Shortcuts ...</label>
         </object>
+        <object class="wxMenuItem" name="FactoryReset">
+          <label>_Factory Reset...</label>
+        </object>
     </object>
     <object class="wxMenu">
       <label>_Tools</label>

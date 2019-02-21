@@ -13,6 +13,7 @@
 #include <wx/sstream.h>
 #include <wx/url.h>
 #include <wx/wfstream.h>
+#include <wx/msgdlg.h>
 
 #ifndef NO_FFMPEG
 extern "C" {
@@ -2379,6 +2380,21 @@ EVT_HANDLER(Customize, "Customize UI...")
 
     if (ShowModal(dlg) == wxID_OK)
         update_opts();
+}
+
+EVT_HANDLER(FactoryReset, "Factory Reset...")
+{
+    wxMessageDialog dlg(NULL, wxString(wxT(
+"YOUR CONFIGURATION WILL BE DELETED!\n\n")) + wxString(wxT(
+"Are you sure?")),
+                        wxT("FACTORY RESET"), wxYES_NO | wxNO_DEFAULT | wxCENTRE);
+
+    if (dlg.ShowModal() == wxID_YES) {
+        wxGetApp().cfg->DeleteAll();
+
+        wxExecute(wxStandardPaths::Get().GetExecutablePath(), wxEXEC_ASYNC);
+        Close(true);
+    }
 }
 
 EVT_HANDLER(BugReport, "Report bugs...")
