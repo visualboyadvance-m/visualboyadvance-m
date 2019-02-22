@@ -5,6 +5,7 @@ src/wx/cmdhandlers.h
 src/wx/cmdtab.cpp
 src/wx/wxvbam.xrs
 build/*
+build32/*
 dependencies/*
 .vs/*
 *.o
