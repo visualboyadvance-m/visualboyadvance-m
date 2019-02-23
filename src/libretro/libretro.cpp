@@ -220,11 +220,11 @@ static size_t gb_rtcdata_size(void)
         switch (gbRomType) {
         case 0x0f:
         case 0x10: // MBC3 + extended
-            return (10 * sizeof(int) + sizeof(time_t));
+            return MBC3_RTC_DATA_SIZE;
             break;
         case 0x13:
         case 0xfd: // TAMA5 + extended
-            return (14 * sizeof(int) + sizeof(time_t));
+            return TAMA5_RTC_DATA_SIZE;
             break;
         }
     }

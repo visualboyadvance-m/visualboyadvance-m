@@ -2847,7 +2847,7 @@ void gbWriteSaveMBC3(const char* name, bool extendedSave)
         if (extendedSave)
             fwrite(&gbDataMBC3.mapperSeconds,
                 1,
-                10 * sizeof(int) + sizeof(time_t),
+                MBC3_RTC_DATA_SIZE,
                 gzFile);
 
         fclose(gzFile);
@@ -2914,7 +2914,7 @@ void gbWriteSaveTAMA5(const char* name, bool extendedSave)
     if (extendedSave)
         fwrite(&gbDataTAMA5.mapperSeconds,
             1,
-            14 * sizeof(int) + sizeof(time_t),
+            TAMA5_RTC_DATA_SIZE,
             gzFile);
 
     fclose(gzFile);
@@ -3049,20 +3049,17 @@ bool gbReadSaveMBC3(const char* name)
             N_("Battery file's size incompatible with the rom settings %s (%d).\nWarning : save of the battery file is now disabled !"), name, read);
         gbBatteryError = true;
         res = false;
-    } else if ((gbRomType == 0xf) || (gbRomType == 0x10)) {
+    } else if ((gbRomType == 0xf) || (gbRomType == 0x10)) { // read RTC data
         read = gzread(gzFile,
             &gbDataMBC3.mapperSeconds,
-            sizeof(int) * 10 + sizeof(time_t));
+            MBC3_RTC_DATA_SIZE);
 
-        if (read != (sizeof(int) * 10 + sizeof(time_t)) && read != 0) {
+        if (!read || (read != MBC3_RTC_DATA_SIZE && read != MBC3_RTC_DATA_SIZE - 4)) { // detect old 32 bit saves
             systemMessage(MSG_FAILED_TO_READ_RTC, N_("Failed to read RTC from save game %s (continuing)"),
                 name);
             res = false;
-        } else if (read == 0) {
-            systemMessage(MSG_FAILED_TO_READ_RTC, N_("Failed to read RTC from save game %s (continuing)"),
-                name);
-            res = false;
-        } else {
+        }
+        else {
             // Also checks if the battery file it bigger than gbRamSizeMask+1+RTC !
             uint8_t data[1];
             data[0] = 0;
@@ -3200,13 +3197,9 @@ bool gbReadSaveTAMA5(const char* name)
     } else {
         read = gzread(gzFile,
             &gbDataTAMA5.mapperSeconds,
-            sizeof(int) * 14 + sizeof(time_t));
+            TAMA5_RTC_DATA_SIZE);
 
-        if (read != (sizeof(int) * 14 + sizeof(time_t)) && read != 0) {
-            systemMessage(MSG_FAILED_TO_READ_RTC, N_("Failed to read RTC from save game %s (continuing)"),
-                name);
-            res = false;
-        } else if (read == 0) {
+        if (!read || (read != TAMA5_RTC_DATA_SIZE && read != TAMA5_RTC_DATA_SIZE - 4)) { // detect old 32 bit saves
             systemMessage(MSG_FAILED_TO_READ_RTC, N_("Failed to read RTC from save game %s (continuing)"),
                 name);
             res = false;
@@ -3736,13 +3729,7 @@ static bool gbReadSaveState(gzFile gzFile)
     else
         utilGzRead(gzFile, &gbDataMBC1, sizeof(gbDataMBC1));
     utilGzRead(gzFile, &gbDataMBC2, sizeof(gbDataMBC2));
-    if (version < GBSAVE_GAME_VERSION_4)
-        // prior to version 4, there was no adjustment for the time the game
-        // was last played, so we have less to read. This needs update if the
-        // structure changes again.
-        utilGzRead(gzFile, &gbDataMBC3, sizeof(gbDataMBC3) - sizeof(time_t));
-    else
-        utilGzRead(gzFile, &gbDataMBC3, sizeof(gbDataMBC3));
+    utilGzRead(gzFile, &gbDataMBC3, sizeof(gbDataMBC3));
     utilGzRead(gzFile, &gbDataMBC5, sizeof(gbDataMBC5));
     utilGzRead(gzFile, &gbDataHuC1, sizeof(gbDataHuC1));
     utilGzRead(gzFile, &gbDataHuC3, sizeof(gbDataHuC3));

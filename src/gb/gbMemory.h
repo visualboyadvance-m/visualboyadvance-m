@@ -36,7 +36,10 @@ struct mapperMBC3 {
     int mapperLHours;
     int mapperLDays;
     int mapperLControl;
-    time_t mapperLastTime;
+    union {
+        time_t mapperLastTime;
+        uint64_t _time_pad; /* so that 32bit and 64bit saves are compatible */
+    };
 };
 
 struct mapperMBC5 {
@@ -118,7 +121,10 @@ struct mapperTAMA5 {
     int mapperLMonths;
     int mapperLYears;
     int mapperLControl;
-    time_t mapperLastTime;
+    union {
+        time_t mapperLastTime;
+        uint64_t _time_pad; /* so that 32bit and 64bit saves are compatible */
+    };
 };
 
 struct mapperMMM01 {
@@ -185,5 +191,9 @@ extern void memoryUpdateMapHuC3();
 extern void memoryUpdateMapTAMA5();
 extern void memoryUpdateMapMMM01();
 extern void memoryUpdateMapGS3();
+
+#define MBC3_RTC_DATA_SIZE  sizeof(int) * 10 + sizeof(uint64_t)
+
+#define TAMA5_RTC_DATA_SIZE sizeof(int) * 14 + sizeof(uint64_t)
 
 #endif // GBMEMORY_H
