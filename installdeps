@@ -568,7 +568,11 @@ archlinux_installdeps() {
     # not using the base-devel group because it can break gcc-multilib
     check $pacman --noconfirm --needed -S binutils file grep gawk gzip libtool make patch sed util-linux nasm cmake ccache pkg-config git ccache zip
 
-    libs="zlib mesa gettext libpng sdl2 openal wxgtk3 gtk3 sfml ffmpeg"
+    gtk=gtk3
+
+    $pacman -Q gtk3-classic >/dev/null 2>&1 && gtk=gtk3-classic
+
+    libs="zlib mesa gettext libpng sdl2 openal wxgtk3 $gtk sfml ffmpeg"
 
     if [ -z "$target" -o "$target" = m32 ]; then
         if [ -z "$target" -o -z "$amd64" ]; then
