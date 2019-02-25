@@ -565,6 +565,8 @@ public:
     GBMapViewer()
         : GfxViewer(wxT("GBMapViewer"), 256, 256)
     {
+        charbase = 0x0000;
+        mapbase = 0x1800;
         getradio(, "CharBase0", charbase, 0x0000);
         getradio(, "CharBase1", charbase, 0x0800);
         getradio(, "MapBase0", mapbase, 0x1800);
