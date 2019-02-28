@@ -32,16 +32,30 @@
 IMPLEMENT_APP(wxvbamApp)
 IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
 
+// Get XDG_CONFIG_HOME dir manually
+// only native support for XDG config when wxWidgets >= 3.1
+static wxString get_xdg_user_config_home()
+{
+    wxString path;
+    char *xdg_config_home = getenv("XDG_CONFIG_HOME");
+    // Default for XDG_CONFIG_HOME is '$HOME/.config'
+    if (!xdg_config_home || !*xdg_config_home)
+    {
+	wxString xdg_default(getenv("HOME"));
+	xdg_default += "/.config";
+	path = xdg_default;
+    }
+    else
+    {
+	path = xdg_config_home;
+    }
+    return path + "/";
+}
+
 // generate config file path
 static void get_config_path(wxPathList& path, bool exists = true)
 {
-    // we want paths with "visualboyadvance-m" not "vbam", so change appname temporarily
     wxString current_app_name = wxGetApp().GetAppName();
-
-    // keep config path as ~/.vbam on UNIX for now for backcompat
-#if defined(__WXMSW__) || defined(__WXMAC__)
-    wxGetApp().SetAppName(_("visualboyadvance-m"));
-#endif
 
     //   local config dir first, then global
     //   locale-specific res first, then main
@@ -65,9 +79,29 @@ static void get_config_path(wxPathList& path, bool exists = true)
         wxLogDebug(wxT("GetDataDir(): %s"), stdp.GetDataDir().mb_str());
         wxLogDebug(wxT("GetLocalDataDir(): %s"), stdp.GetLocalDataDir().mb_str());
         wxLogDebug(wxT("GetPluginsDir(): %s"), stdp.GetPluginsDir().mb_str());
-        
+#if defined(__LINUX__)
+        wxLogDebug(wxT("XdgConfigDir: %s"), get_xdg_user_config_home() + current_app_name);
+#endif
         debug_dumped = true;
     }
+
+// When native support for XDG dirs is available (wxWidgets >= 3.1),
+// this will be no longer necessary
+#if defined(__LINUX__)
+    // XDG spec manual support
+    // ${XDG_CONFIG_HOME:-$HOME/.config}/`appname`
+    wxString old_config = wxString(getenv("HOME")) + "/.vbam";
+    wxString new_config = get_xdg_user_config_home();
+    if (!wxDirExists(old_config) && wxIsWritable(new_config))
+    {
+        path.Add(new_config + current_app_name);
+    }
+    else
+    {
+	// config is in $HOME/.vbam/vbam.conf
+	path.Add(old_config);
+    }
+#endif
 
     // NOTE: this does not support XDG (freedesktop.org) paths
     add_path(GetUserLocalDataDir());
@@ -77,8 +111,6 @@ static void get_config_path(wxPathList& path, bool exists = true)
     add_path(GetDataDir());
     add_path(GetLocalDataDir());
     add_path(GetPluginsDir());
-
-    wxGetApp().SetAppName(current_app_name);
 }
 
 static void tack_full_path(wxString& s, const wxString& app = wxEmptyString)
@@ -93,13 +125,18 @@ static void tack_full_path(wxString& s, const wxString& app = wxEmptyString)
 
 wxString wxvbamApp::GetConfigurationPath()
 {
+#if defined(__WXMSW__) || defined(__APPLE__)
+    wxString config("vbam.ini");
+#else
+    wxString config("vbam.conf");
+#endif
     // first check if config files exists in reverse order
     // (from system paths to more local paths.)
     if (data_path.empty()) {
         get_config_path(config_path);
 
         for (int i = config_path.size() - 1; i >= 0; i--) {
-            wxFileName fn(config_path[i], wxT("vbam.ini"));
+            wxFileName fn(config_path[i], config);
 
             if (fn.FileExists() && fn.IsFileWritable()) {
                 data_path = config_path[i];
@@ -162,7 +199,7 @@ bool wxvbamApp::OnInit()
     using_wayland = IsItWayland();
 
     // use consistent names for config
-    SetAppName(_("vbam"));
+    SetAppName(_("visualboyadvance-m"));
 #if (wxMAJOR_VERSION >= 3)
     SetAppDisplayName(_T("VisualBoyAdvance-M"));
 #endif
@@ -217,16 +254,14 @@ bool wxvbamApp::OnInit()
 // but subdir flag behaves differently 2.8 vs. 2.9.  Oh well.
 // NOTE: this does not support XDG (freedesktop.org) paths
 #if defined(__WXMSW__) || defined(__APPLE__)
-    wxFileName vbamconf(GetConfigurationPath(), _T("vbam.ini"));
+    wxString confname("vbam.ini");
+#else
+    wxString confname("vbam.conf");
+#endif
+    wxFileName vbamconf(GetConfigurationPath(), confname);
     cfg = new wxFileConfig(wxT("vbam"), wxEmptyString,
         vbamconf.GetFullPath(),
         wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
-#else
-    cfg = new wxFileConfig(wxEmptyString, wxEmptyString, wxEmptyString,
-        wxEmptyString,
-        // style =
-        wxCONFIG_USE_GLOBAL_FILE | wxCONFIG_USE_LOCAL_FILE | wxCONFIG_USE_SUBDIR);
-#endif
     // set global config for e.g. Windows font mapping
     wxFileConfig::Set(cfg);
     // yet another bug/deficiency in wxConfig: dirs are not created if needed

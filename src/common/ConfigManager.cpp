@@ -718,14 +718,7 @@ const char* FindConfigFile(const char *name)
 void LoadConfigFile()
 {
 #if !defined(_WIN32) && !defined(__APPLE__)
-	// Get home dir
-	char buf[1024];
-	struct stat s;
 	homeDir = getenv("HOME");
-	snprintf(buf, 1024, "%s/%s", homeDir, DOT_DIR);
-	// Make dot dir if not existent
-	if (stat(buf, &s) == -1 || !S_ISDIR(s.st_mode))
-		mkdir(buf, 0755);
 #else
 	homeDir = 0;
 #endif
@@ -746,14 +739,7 @@ void LoadConfigFile()
 void SaveConfigFile()
 {
 #if !defined(_WIN32) && !defined(__APPLE__)
-	// Get home dir
-	char buf[1024];
-	struct stat s;
 	homeDir = getenv("HOME");
-	snprintf(buf, 1024, "%s/%s", homeDir, DOT_DIR);
-	// Make dot dir if not existent
-	if (stat(buf, &s) == -1 || !S_ISDIR(s.st_mode))
-		mkdir(buf, 0755);
 #else
 	homeDir = 0;
 #endif
