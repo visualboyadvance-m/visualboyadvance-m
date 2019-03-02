@@ -466,9 +466,6 @@
         <object class="wxMenuItem" name="Customize">
           <label>_Key Shortcuts ...</label>
         </object>
-        <object class="wxMenuItem" name="FactoryReset">
-          <label>_Factory Reset...</label>
-        </object>
     </object>
     <object class="wxMenu">
       <label>_Tools</label>
@@ -640,6 +637,9 @@
         <label>Check for updates</label>
       </object>
       -->
+      <object class="wxMenuItem" name="FactoryReset">
+        <label>_Factory Reset...</label>
+      </object>
       <object class="separator"/>
       <object class="wxMenuItem" name="wxID_ABOUT"/>
     </object>
