@@ -503,7 +503,7 @@ void GameArea::UnloadGame(bool destruct)
     // if timer was counting down for save, go ahead and save
     // this might not be safe, though..
     if (systemSaveUpdateCounter > SYSTEM_SAVE_NOT_UPDATED) {
-        SaveBattery(destruct);
+        SaveBattery();
     }
 
     MainFrame* mf = wxGetApp().frame;
@@ -633,7 +633,7 @@ bool GameArea::SaveState(const wxFileName& fname)
     return ret;
 }
 
-void GameArea::SaveBattery(bool quiet)
+void GameArea::SaveBattery()
 {
     // MakeInstanceFilename doesn't do wxString, so just add slave ID here
     wxString bname = game_name();
@@ -653,20 +653,14 @@ void GameArea::SaveBattery(bool quiet)
     // auto-conversion of wxCharBuffer to const char * seems broken
     // so save underlying wxCharBuffer (or create one of none is used)
     wxCharBuffer fnb = fn.mb_fn_str();
-    wxString msg;
 
     // FIXME: add option to support ring of backups
     // of course some games just write battery way too often for such
     // a thing to be useful
-    if (emusys->emuWriteBattery(fnb.data()))
-        msg.Printf(_("Wrote battery %s"), fn.mb_str());
-    else
-        msg.Printf(_("Error writing battery %s"), fn.mb_str());
+    if (!emusys->emuWriteBattery(fnb.data()))
+        wxLogError(wxT("Error writing battery %s"), fn);
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
-
-    if (!quiet)
-        systemScreenMessage(msg);
 }
 
 void GameArea::AddBorder()

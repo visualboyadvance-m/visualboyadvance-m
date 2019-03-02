@@ -513,7 +513,7 @@ public:
     bool SaveState(const wxFileName& fname);
 
     // save to default location
-    void SaveBattery(bool quiet = false);
+    void SaveBattery();
 
     // true if file at default location may not match memory
     bool cheats_dirty;
