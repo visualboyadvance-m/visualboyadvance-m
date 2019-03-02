@@ -658,7 +658,7 @@ void GameArea::SaveBattery()
     // of course some games just write battery way too often for such
     // a thing to be useful
     if (!emusys->emuWriteBattery(fnb.data()))
-        wxLogError(wxT("Error writing battery %s"), fn);
+        wxLogError(_("Error writing battery %s"), fn);
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 }
