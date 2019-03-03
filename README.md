@@ -28,9 +28,12 @@ Windows and Mac builds are in the [releases tab](https://github.com/visualboyadv
 
 Daily Ubuntu packages here: https://code.launchpad.net/~sergio-br2/+archive/ubuntu/vbam-trunk
 
-Your distribution may have packages available as well, search for "vbam".
+Your distribution may have packages available as well, search for "vbam" or "visualboyadvance-m".
 
 It is also generally very easy to build from source, see below.
+
+If you are using the windows binary release and you need localization, unzip
+the `translations.zip` to the same directory as the executable.
 
 ## Note for Windows Users
 
