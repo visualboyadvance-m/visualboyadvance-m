@@ -79,7 +79,7 @@ static void get_config_path(wxPathList& path, bool exists = true)
         wxLogDebug(wxT("GetDataDir(): %s"), stdp.GetDataDir().mb_str());
         wxLogDebug(wxT("GetLocalDataDir(): %s"), stdp.GetLocalDataDir().mb_str());
         wxLogDebug(wxT("GetPluginsDir(): %s"), stdp.GetPluginsDir().mb_str());
-#if defined(__LINUX__)
+#if defined(__WXGTK__)
         wxLogDebug(wxT("XdgConfigDir: %s"), get_xdg_user_config_home() + current_app_name);
 #endif
         debug_dumped = true;
@@ -87,7 +87,7 @@ static void get_config_path(wxPathList& path, bool exists = true)
 
 // When native support for XDG dirs is available (wxWidgets >= 3.1),
 // this will be no longer necessary
-#if defined(__LINUX__)
+#if defined(__WXGTK__)
     // XDG spec manual support
     // ${XDG_CONFIG_HOME:-$HOME/.config}/`appname`
     wxString old_config = wxString(getenv("HOME")) + "/.vbam";
