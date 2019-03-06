@@ -74,7 +74,7 @@ std::string get_xdg_user_config_home()
 #ifdef __APPLE__
     std::string home(getenv("HOME"));
     path = home + "/Library/Application Support/";
-#elseif _WIN32
+#elif _WIN32
     std::string app_data(getenv("LOCALAPPDATA"));
     path = app_data + '\\';
 #else // Unix
@@ -104,7 +104,7 @@ std::string get_xdg_user_data_home()
 #ifdef __APPLE__
     std::string home(getenv("HOME"));
     path = home + "/Library/Application Support/";
-#elseif _WIN32
+#elif _WIN32
     std::string app_data(getenv("LOCALAPPDATA"));
     path = app_data + '\\';
 #else // Unix
