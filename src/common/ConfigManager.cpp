@@ -38,6 +38,9 @@ extern "C" {
 #include <direct.h>
 #define GETCWD _getcwd
 #define snprintf sprintf
+#define stat _stat
+#define mkdir(X,Y) (_mkdir(X))
+#define S_ISDIR _S_IFDIR
 #endif // _WIN32
 
 #ifndef __GNUC__
@@ -717,15 +720,11 @@ const char* FindConfigFile(const char *name)
 
 void LoadConfigFile()
 {
-#if !defined(_WIN32) && !defined(__APPLE__)
 	struct stat s;
 	std::string homeDirTmp = get_xdg_user_config_home() + FILE_SEP + DOT_DIR;
 	homeDir = (char *)homeDirTmp.c_str();
 	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
 		mkdir(homeDir, 0755);
-#else
-	homeDir = 0;
-#endif
 
 	if (preferences == NULL)
 	{
@@ -742,15 +741,11 @@ void LoadConfigFile()
 
 void SaveConfigFile()
 {
-#if !defined(_WIN32) && !defined(__APPLE__)
 	struct stat s;
 	std::string homeDirTmp = get_xdg_user_config_home() + FILE_SEP + DOT_DIR;
 	homeDir = (char *)homeDirTmp.c_str();
 	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
 		mkdir(homeDir, 0755);
-#else
-	homeDir = 0;
-#endif
 
 	const char* configFile = FindConfigFile("vbam.ini");
 

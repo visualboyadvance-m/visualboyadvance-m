@@ -71,6 +71,9 @@
 #include <direct.h>
 #define GETCWD _getcwd
 #define snprintf sprintf
+#define stat _stat
+#define mkdir(X,Y) (_mkdir(X))
+#define S_ISDIR _S_IFDIR
 #endif // _WIN32
 
 #ifndef __GNUC__
@@ -1641,11 +1644,9 @@ void handleRewinds()
 void SetHomeDataDir()
 {
     sprintf(homeDataDir, "%s%s", get_xdg_user_data_home().c_str(), DOT_DIR);
-#if !defined(_WIN32) && !defined(__APPLE__)
     struct stat s;
     if (stat(homeDataDir, &s) == -1 || !S_ISDIR(s.st_mode))
 	mkdir(homeDataDir, 0755);
-#endif
 }
 
 int main(int argc, char** argv)
