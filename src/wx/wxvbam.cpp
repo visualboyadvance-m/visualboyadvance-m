@@ -233,12 +233,20 @@ bool wxvbamApp::OnInit()
 // this needs to be in a subdir to support other config as well
 // but subdir flag behaves differently 2.8 vs. 2.9.  Oh well.
 // NOTE: this does not support XDG (freedesktop.org) paths
-#if defined(__WXMSW__) || defined(__APPLE__)
     wxString confname("vbam.ini");
-#else
-    wxString confname("vbam.conf");
-#endif
     wxFileName vbamconf(GetConfigurationPath(), confname);
+// /MIGRATION
+// migrate from 'vbam.conf' to 'vbam.ini' to manage a single config
+// file for all platforms.
+#if !defined(__WXMSW__) && !defined(__APPLE__)
+    wxString oldConf(GetConfigurationPath() + "/vbam.conf");
+    wxString newConf(GetConfigurationPath() + "/vbam.ini");
+    if (wxFileExists(oldConf))
+    {
+	wxRenameFile(oldConf, newConf, false);
+    }
+#endif
+// /END_MIGRATION
     cfg = new wxFileConfig(wxT("vbam"), wxEmptyString,
         vbamconf.GetFullPath(),
         wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
