@@ -647,7 +647,7 @@ const char* FindConfigFile(const char *name)
 	}
 
 	if (homeDir) {
-		sprintf(path, "%s%c%s%c%s", homeDir, FILE_SEP, DOT_DIR, FILE_SEP, name);
+		sprintf(path, "%s%c%s", homeDir, FILE_SEP, name);
 		if (FileExists(path))
 		{
 			return path;
@@ -718,7 +718,11 @@ const char* FindConfigFile(const char *name)
 void LoadConfigFile()
 {
 #if !defined(_WIN32) && !defined(__APPLE__)
-	homeDir = getenv("HOME");
+	struct stat s;
+	std::string homeDirTmp = get_xdg_user_config_home() + FILE_SEP + DOT_DIR;
+	homeDir = (char *)homeDirTmp.c_str();
+	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
+		mkdir(homeDir, 0755);
 #else
 	homeDir = 0;
 #endif
@@ -739,7 +743,11 @@ void LoadConfigFile()
 void SaveConfigFile()
 {
 #if !defined(_WIN32) && !defined(__APPLE__)
-	homeDir = getenv("HOME");
+	struct stat s;
+	std::string homeDirTmp = get_xdg_user_config_home() + FILE_SEP + DOT_DIR;
+	homeDir = (char *)homeDirTmp.c_str();
+	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
+		mkdir(homeDir, 0755);
 #else
 	homeDir = 0;
 #endif

@@ -202,6 +202,7 @@ int sdlMirroringEnable = 1;
 void systemConsoleMessage(const char*);
 
 char* home;
+char homeDataDir[2048];
 
 char screenMessageBuffer[21];
 uint32_t screenMessageTime = 0;
@@ -246,7 +247,7 @@ void StartLirc(void)
         fprintf(stdout, "Success\n");
         //read the config file
         char LIRCConfigLoc[2048];
-        sprintf(LIRCConfigLoc, "%s/%s/%s", homeDir, DOT_DIR, "lircrc");
+        sprintf(LIRCConfigLoc, "%s/%s", homeDataDir, "lircrc");
         fprintf(stdout, "LIRC Config file:");
         if (lirc_readconfig(LIRCConfigLoc, &LIRCConfigInfo, NULL) == 0) {
             //check vbam dir for lircrc
@@ -366,8 +367,8 @@ FILE* sdlFindFile(const char* name)
     }
 
     if (homeDir) {
-        fprintf(stdout, "Searching home directory: %s%c%s\n", homeDir, FILE_SEP, DOT_DIR);
-        sprintf(path, "%s%c%s%c%s", homeDir, FILE_SEP, DOT_DIR, FILE_SEP, name);
+        fprintf(stdout, "Searching home directory: %s\n", homeDataDir);
+        sprintf(path, "%s%c%s", homeDataDir, FILE_SEP, name);
         f = fopen(path, "r");
         if (f != NULL)
             return f;
@@ -659,7 +660,7 @@ static char* sdlStateName(int num)
         sprintf(stateName, "%s/%s%d.sgm", saveDir, sdlGetFilename(filename),
             num + 1);
     else if (homeDir)
-        sprintf(stateName, "%s/%s/%s%d.sgm", homeDir, DOT_DIR, sdlGetFilename(filename), num + 1);
+        sprintf(stateName, "%s/%s%d.sgm", homeDataDir, sdlGetFilename(filename), num + 1);
     else
         sprintf(stateName, "%s%d.sgm", filename, num + 1);
 
@@ -758,7 +759,7 @@ void sdlWriteBattery()
     if (batteryDir)
         sprintf(buffer, "%s/%s.sav", batteryDir, sdlGetFilename(filename));
     else if (homeDir)
-        sprintf(buffer, "%s/%s/%s.sav", homeDir, DOT_DIR, sdlGetFilename(filename));
+        sprintf(buffer, "%s/%s.sav", homeDataDir, sdlGetFilename(filename));
     else
         sprintf(buffer, "%s.sav", filename);
 
@@ -774,7 +775,7 @@ void sdlReadBattery()
     if (batteryDir)
         sprintf(buffer, "%s/%s.sav", batteryDir, sdlGetFilename(filename));
     else if (homeDir)
-        sprintf(buffer, "%s/%s/%s.sav", homeDir, DOT_DIR, sdlGetFilename(filename));
+        sprintf(buffer, "%s/%s.sav", homeDataDir, sdlGetFilename(filename));
     else
         sprintf(buffer, "%s.sav", filename);
 
@@ -1637,12 +1638,23 @@ void handleRewinds()
     }
 }
 
+void SetHomeDataDir()
+{
+    sprintf(homeDataDir, "%s%s", get_xdg_user_data_home().c_str(), DOT_DIR);
+#if !defined(_WIN32) && !defined(__APPLE__)
+    struct stat s;
+    if (stat(homeDataDir, &s) == -1 || !S_ISDIR(s.st_mode))
+	mkdir(homeDataDir, 0755);
+#endif
+}
+
 int main(int argc, char** argv)
 {
     fprintf(stdout, "%s\n", VBA_NAME_AND_SUBVERSION);
 
     home = argv[0];
     SetHome(home);
+    SetHomeDataDir();
 
     frameSkip = 2;
     gbBorderOn = 0;
@@ -2213,7 +2225,7 @@ void systemScreenCapture(int a)
         if (screenShotDir)
             sprintf(buffer, "%s/%s%02d.bmp", screenShotDir, sdlGetFilename(filename), a);
         else if (homeDir)
-            sprintf(buffer, "%s/%s/%s%02d.bmp", homeDir, DOT_DIR, sdlGetFilename(filename), a);
+            sprintf(buffer, "%s/%s%02d.bmp", homeDataDir, sdlGetFilename(filename), a);
         else
             sprintf(buffer, "%s%02d.bmp", filename, a);
 
@@ -2222,7 +2234,7 @@ void systemScreenCapture(int a)
         if (screenShotDir)
             sprintf(buffer, "%s/%s%02d.png", screenShotDir, sdlGetFilename(filename), a);
         else if (homeDir)
-            sprintf(buffer, "%s/%s/%s%02d.png", homeDir, DOT_DIR, sdlGetFilename(filename), a);
+            sprintf(buffer, "%s/%s%02d.png", homeDataDir, sdlGetFilename(filename), a);
         else
             sprintf(buffer, "%s%02d.png", filename, a);
         emulator.emuWritePNG(buffer);

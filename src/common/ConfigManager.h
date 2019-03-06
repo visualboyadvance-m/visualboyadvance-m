@@ -164,7 +164,7 @@ extern const char *saveDir;
 extern const char *batteryDir;
 
 // Directory within homedir to use for default save location.
-#define DOT_DIR ".vbam"
+#define DOT_DIR "visualboyadvance-m"
 
 void SetHome(char *_arg0);
 void SaveConfigFile();

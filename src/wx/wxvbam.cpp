@@ -32,26 +32,6 @@
 IMPLEMENT_APP(wxvbamApp)
 IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
 
-// Get XDG_CONFIG_HOME dir manually
-// only native support for XDG config when wxWidgets >= 3.1
-static wxString get_xdg_user_config_home()
-{
-    wxString path;
-    char *xdg_config_home = getenv("XDG_CONFIG_HOME");
-    // Default for XDG_CONFIG_HOME is '$HOME/.config'
-    if (!xdg_config_home || !*xdg_config_home)
-    {
-	wxString xdg_default(getenv("HOME"));
-	xdg_default += "/.config";
-	path = xdg_default;
-    }
-    else
-    {
-	path = xdg_config_home;
-    }
-    return path + "/";
-}
-
 // generate config file path
 static void get_config_path(wxPathList& path, bool exists = true)
 {
@@ -91,7 +71,7 @@ static void get_config_path(wxPathList& path, bool exists = true)
     // XDG spec manual support
     // ${XDG_CONFIG_HOME:-$HOME/.config}/`appname`
     wxString old_config = wxString(getenv("HOME")) + "/.vbam";
-    wxString new_config = get_xdg_user_config_home();
+    wxString new_config(get_xdg_user_config_home());
     if (!wxDirExists(old_config) && wxIsWritable(new_config))
     {
         path.Add(new_config + current_app_name);
