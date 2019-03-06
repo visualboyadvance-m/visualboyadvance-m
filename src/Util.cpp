@@ -64,6 +64,66 @@ bool FileExists(const char *filename)
 #endif
 }
 
+// Get user-specific config dir manually.
+// apple:   ~/Library/Application Support/
+// windows: %APPDATA%
+// unix:    ${XDG_CONFIG_HOME:-~/.config}
+std::string get_xdg_user_config_home()
+{
+    std::string path;
+#ifdef __APPLE__
+    std::string home(getenv("HOME"));
+    path = home + "/Library/Application Support/";
+#elif _WIN32
+    std::string app_data(getenv("LOCALAPPDATA"));
+    path = app_data + '\\';
+#else // Unix
+    char *xdg_var = getenv("XDG_CONFIG_HOME");
+    if (!xdg_var || !*xdg_var)
+    {
+	std::string xdg_default(getenv("HOME"));
+	xdg_default += "/.config";
+	path = xdg_default;
+    }
+    else
+    {
+	path = xdg_var;
+    }
+    path += '/';
+#endif
+    return path;
+}
+
+// Get user-specific data dir manually.
+// apple:   ~/Library/Application Support/
+// windows: %APPDATA%
+// unix:    ${XDG_DATA_HOME:-~/.local/share}
+std::string get_xdg_user_data_home()
+{
+    std::string path;
+#ifdef __APPLE__
+    std::string home(getenv("HOME"));
+    path = home + "/Library/Application Support/";
+#elif _WIN32
+    std::string app_data(getenv("LOCALAPPDATA"));
+    path = app_data + '\\';
+#else // Unix
+    char *xdg_var = getenv("XDG_DATA_HOME");
+    if (!xdg_var || !*xdg_var)
+    {
+	std::string xdg_default(getenv("HOME"));
+	xdg_default += "/.local/share";
+	path = xdg_default;
+    }
+    else
+    {
+	path = xdg_var;
+    }
+    path += '/';
+#endif
+    return path;
+}
+
 void utilReadScreenPixels(uint8_t *dest, int w, int h)
 {
         uint8_t *b = dest;

@@ -1,6 +1,7 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <string>
 #include "System.h"
 
 enum IMAGE_TYPE { IMAGE_UNKNOWN = -1, IMAGE_GBA = 0, IMAGE_GB = 1 };
@@ -12,6 +13,9 @@ typedef struct {
 } variable_desc;
 
 bool FileExists(const char *filename);
+
+std::string get_xdg_user_config_home();
+std::string get_xdg_user_data_home();
 
 void utilReadScreenPixels(uint8_t *dest, int w, int h);
 bool utilWritePNGFile(const char *, int, int, uint8_t *);
