@@ -87,6 +87,7 @@ public:
     virtual void OnInitCmdLine(wxCmdLineParser&);
     virtual bool OnCmdLineParsed(wxCmdLineParser&);
     wxString GetConfigurationPath();
+    const wxString GetPluginsDir();
     wxString GetAbsolutePath(wxString path);
     // name of a file to load at earliest opportunity
     wxString pending_load;

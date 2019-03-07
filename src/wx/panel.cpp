@@ -1336,7 +1336,7 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
                 break;
 
             wxFileName fpn(gopts.filter_plugin);
-            fpn.MakeAbsolute(wxStandardPaths::Get().GetPluginsDir());
+            fpn.MakeAbsolute(wxGetApp().GetPluginsDir());
 
             if (!filt_plugin.Load(fpn.GetFullPath(), wxDL_VERBATIM | wxDL_NOW))
                 break;

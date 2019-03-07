@@ -1775,8 +1775,8 @@ public:
         ch->Clear();
         ch->Append(_("None"));
         plugins.clear();
-        const wxString& plpath = wxStandardPaths::Get().GetPluginsDir();
-        wxDir::GetAllFiles(plpath, &plugins, wxT("*.rpi"));
+        const wxString plpath = wxGetApp().GetPluginsDir();
+        wxDir::GetAllFiles(plpath, &plugins, wxT("*.rpi"), wxDIR_FILES | wxDIR_DIRS);
 
         for (int i = 0; i < plugins.size(); i++) {
             wxDynamicLibrary dl(plugins[i], wxDL_VERBATIM | wxDL_NOW);
@@ -1798,7 +1798,7 @@ public:
                 s += wxT(": ");
                 s += wxString(rpi->Name, wxConvUTF8, sizeof(rpi->Name));
                 fn.MakeRelativeTo(plpath);
-                plugins[i] = fn.GetFullName();
+                plugins[i] = fn.GetFullPath();
                 ch->Append(s);
 
                 if (plugins[i] == gopts.filter_plugin)

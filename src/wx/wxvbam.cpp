@@ -48,6 +48,14 @@ static void get_config_path(wxPathList& path, bool exists = true)
         if ((wxDirExists(s) && wxIsWritable(s)) || ((!exists || !wxDirExists(s)) && parent.IsDirWritable())) \
             path.Add(s);                                                                                     \
     } while (0)
+#define add_nonstandard_path(p)                                                                                          \
+    do {                                                                                                     \
+        const wxString& s = p;                                                                          \
+        wxFileName parent = wxFileName::DirName(s + wxT("//.."));                                            \
+        parent.MakeAbsolute();                                                                               \
+        if ((wxDirExists(s) && wxIsWritable(s)) || ((!exists || !wxDirExists(s)) && parent.IsDirWritable())) \
+            path.Add(s);                                                                                     \
+    } while (0)
 
     static bool debug_dumped = false;
 
@@ -58,10 +66,8 @@ static void get_config_path(wxPathList& path, bool exists = true)
         wxLogDebug(wxT("GetResourcesDir(): %s"), stdp.GetResourcesDir().mb_str());
         wxLogDebug(wxT("GetDataDir(): %s"), stdp.GetDataDir().mb_str());
         wxLogDebug(wxT("GetLocalDataDir(): %s"), stdp.GetLocalDataDir().mb_str());
-        wxLogDebug(wxT("GetPluginsDir(): %s"), stdp.GetPluginsDir().mb_str());
-#if defined(__WXGTK__)
+        wxLogDebug(wxT("plugins_dir: %s"), wxGetApp().GetPluginsDir().mb_str());
         wxLogDebug(wxT("XdgConfigDir: %s"), get_xdg_user_config_home() + current_app_name);
-#endif
         debug_dumped = true;
     }
 
@@ -74,12 +80,16 @@ static void get_config_path(wxPathList& path, bool exists = true)
     wxString new_config(get_xdg_user_config_home());
     if (!wxDirExists(old_config) && wxIsWritable(new_config))
     {
-        path.Add(new_config + current_app_name);
+        wxFileName new_path(new_config, wxEmptyString);
+        new_path.AppendDir(current_app_name);
+        new_path.MakeAbsolute();
+
+        add_nonstandard_path(new_path.GetFullPath());
     }
     else
     {
 	// config is in $HOME/.vbam/vbam.conf
-	path.Add(old_config);
+	add_nonstandard_path(old_config);
     }
 #endif
 
@@ -90,7 +100,7 @@ static void get_config_path(wxPathList& path, bool exists = true)
     add_path(GetResourcesDir());
     add_path(GetDataDir());
     add_path(GetLocalDataDir());
-    add_path(GetPluginsDir());
+    add_nonstandard_path(wxGetApp().GetPluginsDir());
 }
 
 static void tack_full_path(wxString& s, const wxString& app = wxEmptyString)
@@ -101,6 +111,11 @@ static void tack_full_path(wxString& s, const wxString& app = wxEmptyString)
 
     for (int i = 0; i < full_config_path.size(); i++)
         s += wxT("\n\t") + full_config_path[i] + app;
+}
+
+const wxString wxvbamApp::GetPluginsDir()
+{
+    return wxStandardPaths::Get().GetPluginsDir();
 }
 
 wxString wxvbamApp::GetConfigurationPath()
