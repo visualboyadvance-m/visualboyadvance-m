@@ -142,7 +142,7 @@ protected:
 
 private:
     wxPathList config_path;
-    char* home;
+    char* home = NULL;
 };
 
 DECLARE_APP(wxvbamApp);
