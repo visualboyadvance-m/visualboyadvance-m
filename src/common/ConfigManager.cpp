@@ -40,7 +40,10 @@ extern "C" {
 #define snprintf sprintf
 #define stat _stat
 #define mkdir(X,Y) (_mkdir(X))
-#define S_ISDIR _S_IFDIR
+// from: https://www.linuxquestions.org/questions/programming-9/porting-to-win32-429334/
+#ifndef S_ISDIR
+    #define S_ISDIR(mode)  (((mode) & _S_IFMT) == _S_IFDIR)
+#endif
 #endif // _WIN32
 
 #ifndef __GNUC__
@@ -679,7 +682,7 @@ const char* FindConfigFile(const char *name)
 			while (tok) {
 				sprintf(path, "%s%c%s", tok, FILE_SEP, EXE_NAME);
 				if (FileExists(path)) {
-					char path2[2048];
+					static char path2[2048];
 					sprintf(path2, "%s%c%s", tok, FILE_SEP, name);
 					if (FileExists(path2)) {
 						return path2;

@@ -73,7 +73,10 @@
 #define snprintf sprintf
 #define stat _stat
 #define mkdir(X,Y) (_mkdir(X))
-#define S_ISDIR _S_IFDIR
+// from: https://www.linuxquestions.org/questions/programming-9/porting-to-win32-429334/
+#ifndef S_ISDIR
+    #define S_ISDIR(mode)  (((mode) & _S_IFMT) == _S_IFDIR)
+#endif
 #endif // _WIN32
 
 #ifndef __GNUC__
