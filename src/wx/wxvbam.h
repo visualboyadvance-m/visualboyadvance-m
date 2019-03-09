@@ -356,6 +356,9 @@ private:
     void OnDropFile(wxDropFilesEvent&);
     // pop up menu in fullscreen mode
     void OnMenu(wxContextMenuEvent&);
+    // window geometry
+    void OnMove(wxMoveEvent& event);
+    void OnSize(wxSizeEvent& event);
     // Load a named wxDialog from the XRC file
     wxDialog* LoadXRCDialog(const char* name);
     // Load a named wxDialog from the XRC file
