@@ -280,7 +280,7 @@ debian_installdeps() {
     installing
 
     if [ -z "$target" ]; then
-        sudo apt-get -qq update
+        sudo apt-get -qq -y update
 
         sfml_libs=$(apt-cache search libsfml | grep -E 'graphics|window|network' | sed 's/ - .*//')
 
@@ -302,23 +302,43 @@ debian_installdeps() {
                 ;;
         esac
 
+        # if on the travis ubuntu trusty, add xenial sources for newer gnutls
+        # otherwise the mxe pkg server does not work
+        if [ -n "$TRAVIS" ]; then
+            if grep -q trusty /etc/apt/sources.list 2>/dev/null; then
+                sudo sh -c "sed 's/trusty/xenial/g' /etc/apt/sources.list > /etc/apt/sources.list.d/xenial.list"
+            fi
+        fi
+
+        sudo apt-get -qq -y update
+
+        curl_gnutls_lib=$(apt-cache search libcurl | grep -E '^libcurl[0-9]+-gnutls - ' | sed 's/ - .*//' | sort | tail -1)
+
+        sudo apt-get -qy install apt apt-transport-https ca-certificates $curl_gnutls_lib curl
+
+        # this is necessary to upgrade libcurl from trusty to xenial on travis
+        sudo apt-get -qy -f install
+
         debian_rel=stretch
 
         apt_ssl_exceptions=/etc/apt/apt.conf.d/80ssl-exceptions
 
-        if ! grep -q 'pkg\.mxe\.cc' $apt_ssl_exceptions 2>/dev/null; then
+        if ! grep -Eq '(pkg|mirror)\.mxe\.cc' $apt_ssl_exceptions 2>/dev/null; then
             sudo sh -c "cat >> $apt_ssl_exceptions" <<EOF
-Acquire::https::${debian_rel}.mxe.cc::Verify-Peer "false";
-Acquire::https::${debian_rel}.mxe.cc::Verify-Host "false";
+Acquire::https::pkg.mxe.cc::Verify-Peer "false";
+Acquire::https::pkg.mxe.cc::Verify-Host "false";
+Acquire::https::mirror.mxe.cc::Verify-Peer "false";
+Acquire::https::mirror.mxe.cc::Verify-Host "false";
 EOF
         fi
 
         mxe_apt_sources=/etc/apt/sources.list.d/mxeapt.list
 
-        sudo apt-get -qq update
+        sudo apt-get -qq -y update
+
         if [ -z "$(apt-cache search '^mxe-source$')" ]; then
             if [ ! -f "$mxe_apt_sources" ]; then
-                echo "deb https://pkg.mxe.cc/repos/apt/dists $debian_rel main" | sudo -- sh -c "cat > $mxe_apt_sources"
+                echo "deb https://pkg.mxe.cc/repos/apt $debian_rel main" | sudo -- sh -c "cat > $mxe_apt_sources"
                 check sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D43A795B73B16ABE9643FE1AFD8FFF16DB45C6AB
             else
                 error "$mxe_apt_sources exists but mxe packages are not found in apt, either delete it or fix it"
@@ -329,7 +349,7 @@ EOF
         for dep in gcc zlib ffmpeg gettext sdl2 sfml openal wxwidgets; do
             set -- "$@" "mxe-${target}-$dep"
         done
-        check sudo apt-get -qq update
+        check sudo apt-get -qq -y update
         # native wx-common needed for wxrc executable
         check sudo apt-get -qy install build-essential cmake ccache wx-common "$@"
     fi
