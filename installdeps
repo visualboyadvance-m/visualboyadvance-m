@@ -319,7 +319,7 @@ debian_installdeps() {
         # this is necessary to upgrade libcurl from trusty to xenial on travis
         sudo apt-get -qy -f install
 
-        debian_rel=stretch
+        debian_rel=trusty
 
         apt_ssl_exceptions=/etc/apt/apt.conf.d/80ssl-exceptions
 
