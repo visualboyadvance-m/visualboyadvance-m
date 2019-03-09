@@ -1,6 +1,9 @@
 ---
 sudo: required
 
+services:
+    - xvfb
+
 matrix:
     fast_finish: true
     include:
@@ -15,7 +18,7 @@ matrix:
               - cd build
               - cmake ..
               - make -j2
-              - ./visualboyadvance-m --help
+              - xvfb-run ./visualboyadvance-m --help
           cache:
               directories:
                   - "$HOME/.ccache"

@@ -306,7 +306,7 @@ debian_installdeps() {
 
         apt_ssl_exceptions=/etc/apt/apt.conf.d/80ssl-exceptions
 
-        if ! grep -q 'pkg\.mxe\.cc' $apt_ssl_exceptions; then
+        if ! grep -q 'pkg\.mxe\.cc' $apt_ssl_exceptions 2>/dev/null; then
             sudo sh -c "cat >> $apt_ssl_exceptions" <<EOF
 Acquire::https::${debian_rel}.mxe.cc::Verify-Peer "false";
 Acquire::https::${debian_rel}.mxe.cc::Verify-Host "false";
@@ -318,7 +318,7 @@ EOF
         sudo apt-get -qq update
         if [ -z "$(apt-cache search '^mxe-source$')" ]; then
             if [ ! -f "$mxe_apt_sources" ]; then
-                echo "deb http://pkg.mxe.cc/repos/apt/dists $debian_rel main" | sudo -- sh -c "cat > $mxe_apt_sources"
+                echo "deb https://pkg.mxe.cc/repos/apt/dists $debian_rel main" | sudo -- sh -c "cat > $mxe_apt_sources"
                 check sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D43A795B73B16ABE9643FE1AFD8FFF16DB45C6AB
             else
                 error "$mxe_apt_sources exists but mxe packages are not found in apt, either delete it or fix it"
