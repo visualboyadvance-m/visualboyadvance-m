@@ -351,7 +351,7 @@ EOF
         done
         check sudo apt-get -qq -y update
         # native wx-common needed for wxrc executable
-        check sudo apt-get -qy install build-essential cmake ccache wx-common "$@"
+        check sudo apt-get -qy --allow-unauthenticated install build-essential cmake ccache wx-common "$@"
     fi
 
     build_instructions
