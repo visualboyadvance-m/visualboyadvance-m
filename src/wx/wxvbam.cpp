@@ -398,6 +398,8 @@ bool wxvbamApp::OnInit()
     }
 
     // create the main window
+    int x = windowPositionX;
+    int y = windowPositionX;
     int width = windowWidth;
     int height = windowHeight;
     int isFullscreen = fullScreen;
@@ -412,9 +414,11 @@ bool wxvbamApp::OnInit()
     if (!frame->BindControls())
         return false;
 
-    if (!isFullscreen)
-	frame->SetSize(windowPositionX, windowPositionY, width, height);
-    frame->ShowFullScreen(isFullscreen);
+    if (x >= 0 && y >= 0 && width > 0 && height > 0)
+	frame->SetSize(x, y, width, height);
+
+    if (isFullscreen && wxGetApp().pending_load != wxEmptyString)
+	frame->ShowFullScreen(isFullscreen);
     frame->Show(true);
     return true;
 }
@@ -702,11 +706,11 @@ void MainFrame::OnMove(wxMoveEvent& event)
 {
     wxRect pos = GetRect();
     int x = pos.GetX(), y = pos.GetY();
-    bool isFullscreen = IsFullScreen();
-    if (x < 0 || isFullscreen) x = 0;
-    if (y < 0 || isFullscreen) y = 0;
-    windowPositionX = x;
-    windowPositionY = y;
+    if (x >= 0 && y >= 0 && !IsFullScreen())
+    {
+	windowPositionX = x;
+	windowPositionY = y;
+    }
 }
 
 void MainFrame::OnSize(wxSizeEvent& event)
@@ -714,9 +718,18 @@ void MainFrame::OnSize(wxSizeEvent& event)
     wxFrame::OnSize(event);
     wxRect pos = GetRect();
     int height = pos.GetHeight(), width = pos.GetWidth();
+    int x = pos.GetX(), y = pos.GetY();
     bool isFullscreen = IsFullScreen();
-    if (height > 0 && !isFullscreen) windowHeight = height;
-    if (windowWidth > 0 && !isFullscreen) windowWidth = width;
+    if (height > 0 && width > 0 && !isFullscreen)
+    {
+	windowHeight = height;
+	windowWidth = width;
+    }
+    if (x >= 0 && y >= 0 && !isFullscreen)
+    {
+	windowPositionX = x;
+	windowPositionY = y;
+    }
     fullScreen = isFullscreen;
 }
 

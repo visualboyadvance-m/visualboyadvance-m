@@ -241,10 +241,10 @@ int useBiosFileGBC;
 int videoOption;
 int vsync;
 int wasPaused = 0;
-int windowHeight;
+uint32_t windowHeight;
 int windowPositionX;
 int windowPositionY;
-int windowWidth;
+uint32_t windowWidth;
 int winFlashSize;
 int winGbBorderOn;
 int winGbPrinterEnabled;
@@ -398,10 +398,10 @@ struct option argOptions[] = {
 	{ "video-option", required_argument, 0, OPT_VIDEO_OPTION },
 	{ "vsync", no_argument, &vsync, 1 },
 	{ "win-gb-printer-enabled", no_argument, &winGbPrinterEnabled, 1 },
-	{ "window-height", required_argument, &windowHeight, OPT_WINDOW_HEIGHT },
+	{ "window-height", required_argument, 0, OPT_WINDOW_HEIGHT },
 	{ "window-position-x", required_argument, 0, OPT_WINDOW_POSITION_X },
 	{ "window-position-y", required_argument, 0, OPT_WINDOW_POSITION_Y },
-	{ "window-width", required_argument, &windowWidth, OPT_WINDOW_WIDTH },
+	{ "window-width", required_argument, 0, OPT_WINDOW_WIDTH },
 
 
 	{ NULL, no_argument, NULL, 0 }
@@ -553,10 +553,10 @@ void LoadConfig()
 	useBiosFileGBC = ReadPref("useBiosGBC", 0);
 	videoOption = ReadPref("video", 2); // VIDEO_3X = 2
 	vsync = ReadPref("vsync", false);
-	windowHeight = ReadPref("windowHeight", 600);
-	windowPositionX = ReadPref("windowX", 0);
-	windowPositionY = ReadPref("windowY", 0);
-	windowWidth = ReadPref("windowWidth", 800);
+	windowHeight = ReadPref("windowHeight", 0);
+	windowPositionX = ReadPref("windowX", -1);
+	windowPositionY = ReadPref("windowY", -1);
+	windowWidth = ReadPref("windowWidth", 0);
 	winFlashSize = ReadPref("flashSize", 0x10000);
 	winGbBorderOn = ReadPref("borderOn", 0);
 	winGbPrinterEnabled = ReadPref("gbPrinter", 0);

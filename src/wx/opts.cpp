@@ -265,10 +265,10 @@ opt_desc opts[] = {
 
     /// Geometry
     INTOPT("geometry/fullScreen", "Fullscreen", wxTRANSLATE("Enter fullscreen mode at startup"), fullScreen, 0, 1),
-    INTOPT("geometry/windowHeight", "Height", wxTRANSLATE("Window height at startup"), windowHeight, 0, 99999),
-    INTOPT("geometry/windowWidth", "Width", wxTRANSLATE("Window width at startup"), windowWidth, 0, 99999),
-    INTOPT("geometry/windowX", "X", wxTRANSLATE("Window axis X position at startup"), windowPositionX, 0, 99999),
-    INTOPT("geometry/windowY", "Y", wxTRANSLATE("Window axis Y position at startup"), windowPositionY, 0, 99999),
+    UINTOPT("geometry/windowHeight", "Height", wxTRANSLATE("Window height at startup"), windowHeight, 0, 99999),
+    UINTOPT("geometry/windowWidth", "Width", wxTRANSLATE("Window width at startup"), windowWidth, 0, 99999),
+    INTOPT("geometry/windowX", "X", wxTRANSLATE("Window axis X position at startup"), windowPositionX, -1, 99999),
+    INTOPT("geometry/windowY", "Y", wxTRANSLATE("Window axis Y position at startup"), windowPositionY, -1, 99999),
 
     /// Sound
     ENUMOPT("Sound/AudioAPI", "", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl|openal|directsound|xaudio2|faudio")),
