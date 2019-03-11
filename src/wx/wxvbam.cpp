@@ -630,7 +630,6 @@ MainFrame::MainFrame()
 
 MainFrame::~MainFrame()
 {
-    update_opts();
 #ifndef NO_LINK
     CloseLink();
 #endif
@@ -710,6 +709,7 @@ void MainFrame::OnMove(wxMoveEvent& event)
     {
 	windowPositionX = x;
 	windowPositionY = y;
+	update_opts();
     }
 }
 
@@ -731,6 +731,7 @@ void MainFrame::OnSize(wxSizeEvent& event)
 	windowPositionY = y;
     }
     fullScreen = isFullscreen;
+    update_opts();
 }
 
 wxString MainFrame::GetGamePath(wxString path)
