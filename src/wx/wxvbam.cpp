@@ -398,6 +398,11 @@ bool wxvbamApp::OnInit()
     }
 
     // create the main window
+    int x = windowPositionX;
+    int y = windowPositionX;
+    int width = windowWidth;
+    int height = windowHeight;
+    int isFullscreen = fullScreen;
     frame = wxDynamicCast(xr->LoadFrame(NULL, wxT("MainFrame")), MainFrame);
 
     if (!frame) {
@@ -409,6 +414,11 @@ bool wxvbamApp::OnInit()
     if (!frame->BindControls())
         return false;
 
+    if (x >= 0 && y >= 0 && width > 0 && height > 0)
+	frame->SetSize(x, y, width, height);
+
+    if (isFullscreen && wxGetApp().pending_load != wxEmptyString)
+	frame->ShowFullScreen(isFullscreen);
     frame->Show(true);
     return true;
 }
@@ -633,6 +643,9 @@ EVT_ACTIVATE(MainFrame::OnActivate)
 // requires DragAcceptFiles(true); even then may not do anything
 EVT_DROP_FILES(MainFrame::OnDropFile)
 
+// for window geometry
+EVT_MOVE(MainFrame::OnMove)
+EVT_SIZE(MainFrame::OnSize)
 // pause game if menu pops up
 //
 // This is a feature most people don't like, and it causes problems with
@@ -686,6 +699,39 @@ void MainFrame::OnMenu(wxContextMenuEvent& event)
 #endif
         PopupMenu(ctx_menu, p);
     }
+}
+
+void MainFrame::OnMove(wxMoveEvent& event)
+{
+    wxRect pos = GetRect();
+    int x = pos.GetX(), y = pos.GetY();
+    if (x >= 0 && y >= 0 && !IsFullScreen())
+    {
+	windowPositionX = x;
+	windowPositionY = y;
+	update_opts();
+    }
+}
+
+void MainFrame::OnSize(wxSizeEvent& event)
+{
+    wxFrame::OnSize(event);
+    wxRect pos = GetRect();
+    int height = pos.GetHeight(), width = pos.GetWidth();
+    int x = pos.GetX(), y = pos.GetY();
+    bool isFullscreen = IsFullScreen();
+    if (height > 0 && width > 0 && !isFullscreen)
+    {
+	windowHeight = height;
+	windowWidth = width;
+    }
+    if (x >= 0 && y >= 0 && !isFullscreen)
+    {
+	windowPositionX = x;
+	windowPositionY = y;
+    }
+    fullScreen = isFullscreen;
+    update_opts();
 }
 
 wxString MainFrame::GetGamePath(wxString path)
