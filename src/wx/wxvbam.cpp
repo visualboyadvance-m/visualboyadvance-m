@@ -399,7 +399,7 @@ bool wxvbamApp::OnInit()
 
     // create the main window
     int x = windowPositionX;
-    int y = windowPositionX;
+    int y = windowPositionY;
     int width = windowWidth;
     int height = windowHeight;
     int isFullscreen = fullScreen;
