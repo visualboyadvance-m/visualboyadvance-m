@@ -339,7 +339,7 @@ EOF
         if [ -z "$(apt-cache search '^mxe-source$')" ]; then
             if [ ! -f "$mxe_apt_sources" ]; then
                 echo "deb https://pkg.mxe.cc/repos/apt $debian_rel main" | sudo -- sh -c "cat > $mxe_apt_sources"
-                check sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D43A795B73B16ABE9643FE1AFD8FFF16DB45C6AB
+                check sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C6BF758A33A3A276
             else
                 error "$mxe_apt_sources exists but mxe packages are not found in apt, either delete it or fix it"
             fi
@@ -351,7 +351,7 @@ EOF
         done
         check sudo apt-get -qq -y update
         # native wx-common needed for wxrc executable
-        check sudo apt-get -qy --allow-unauthenticated install build-essential cmake ccache wx-common "$@"
+        check sudo apt-get -qy install build-essential cmake ccache wx-common "$@"
     fi
 
     build_instructions
