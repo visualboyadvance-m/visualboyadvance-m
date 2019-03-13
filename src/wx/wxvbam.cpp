@@ -614,7 +614,10 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
 
 wxvbamApp::~wxvbamApp() {
     if (home != NULL)
+    {
 	free(home);
+	home = NULL;
+    }
 }
 
 MainFrame::MainFrame()
