@@ -31,6 +31,8 @@
 #include "../gb/gbSGB.h"
 #include "../gb/gbSound.h"
 
+#define VBA_CURRENT_VERSION "2.1.1"
+
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
 static retro_input_poll_t poll_cb;
@@ -536,9 +538,9 @@ void retro_get_system_info(struct retro_system_info *info)
    info->need_fullpath = false;
    info->valid_extensions = "dmg|gb|gbc|cgb|sgb|gba";
 #ifdef GIT_VERSION
-   info->library_version = "2.1.0" GIT_VERSION;
+   info->library_version = VBA_CURRENT_VERSION GIT_VERSION;
 #else
-   info->library_version = "2.1.0-GIT";
+   info->library_version = VBA_CURRENT_VERSION;
 #endif
    info->library_name = "VBA-M";
    info->block_extract = false;
