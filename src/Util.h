@@ -4,6 +4,12 @@
 #include <string>
 #include "System.h"
 
+#ifdef _WIN32
+#define FILE_SEP '\\'
+#else // MacOS, Unix
+#define FILE_SEP '/'
+#endif
+
 enum IMAGE_TYPE { IMAGE_UNKNOWN = -1, IMAGE_GBA = 0, IMAGE_GB = 1 };
 
 // save game

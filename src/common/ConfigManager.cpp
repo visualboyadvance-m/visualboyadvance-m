@@ -644,11 +644,9 @@ const char* FindConfigFile(const char *name)
 
 #ifdef _WIN32
 #define PATH_SEP ";"
-#define FILE_SEP '\\'
 #define EXE_NAME "vbam.exe"
 #else // ! _WIN32
 #define PATH_SEP ":"
-#define FILE_SEP '/'
 #define EXE_NAME "vbam"
 #endif // ! _WIN32
 
@@ -732,7 +730,7 @@ const char* FindConfigFile(const char *name)
 void LoadConfigFile()
 {
 	struct stat s;
-	std::string homeDirTmp = get_xdg_user_config_home() + FILE_SEP + DOT_DIR;
+	std::string homeDirTmp = get_xdg_user_config_home() + DOT_DIR;
 	homeDir = (char *)homeDirTmp.c_str();
 	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
 		mkdir(homeDir, 0755);
@@ -742,28 +740,17 @@ void LoadConfigFile()
 		const char* configFile = FindConfigFile("vbam.ini");
 		OpenPreferences(configFile);
 	}
-
-	if (preferences == NULL)
-	{
-		const char* configFile = FindConfigFile("vbam.cfg");
-		OpenPreferences(configFile);
-	}
 }
 
 void SaveConfigFile()
 {
 	struct stat s;
-	std::string homeDirTmp = get_xdg_user_config_home() + FILE_SEP + DOT_DIR;
+	std::string homeDirTmp = get_xdg_user_config_home() + DOT_DIR;
 	homeDir = (char *)homeDirTmp.c_str();
 	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
 		mkdir(homeDir, 0755);
 
 	const char* configFile = FindConfigFile("vbam.ini");
-
-	if (configFile == NULL)
-	{
-		configFile = FindConfigFile("vbam.cfg");
-	}
 
 	if (configFile != NULL)
 	{
