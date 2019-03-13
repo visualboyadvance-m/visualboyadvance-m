@@ -76,7 +76,7 @@ static void get_config_path(wxPathList& path, bool exists = true)
 #if defined(__WXGTK__)
     // XDG spec manual support
     // ${XDG_CONFIG_HOME:-$HOME/.config}/`appname`
-    wxString old_config = wxString(getenv("HOME")) + "/.vbam";
+    wxString old_config = wxString(getenv("HOME")) + FILE_SEP + ".vbam";
     wxString new_config(get_xdg_user_config_home());
     if (!wxDirExists(old_config) && wxIsWritable(new_config))
     {
@@ -88,7 +88,7 @@ static void get_config_path(wxPathList& path, bool exists = true)
     }
     else
     {
-	// config is in $HOME/.vbam/vbam.conf
+	// config is in $HOME/.vbam/
 	add_nonstandard_path(old_config);
     }
 #endif
@@ -120,11 +120,7 @@ const wxString wxvbamApp::GetPluginsDir()
 
 wxString wxvbamApp::GetConfigurationPath()
 {
-#if defined(__WXMSW__) || defined(__APPLE__)
     wxString config("vbam.ini");
-#else
-    wxString config("vbam.conf");
-#endif
     // first check if config files exists in reverse order
     // (from system paths to more local paths.)
     if (data_path.empty()) {
@@ -251,16 +247,18 @@ bool wxvbamApp::OnInit()
     wxString confname("vbam.ini");
     wxFileName vbamconf(GetConfigurationPath(), confname);
 // /MIGRATION
-// migrate from 'vbam.conf' to 'vbam.ini' to manage a single config
+// migrate from 'vbam.{cfg,conf}' to 'vbam.ini' to manage a single config
 // file for all platforms.
 #if !defined(__WXMSW__) && !defined(__APPLE__)
-    wxString oldConf(GetConfigurationPath() + "/vbam.conf");
-    wxString newConf(GetConfigurationPath() + "/vbam.ini");
+    wxString oldConf(GetConfigurationPath() + FILE_SEP + "vbam.conf");
+#else
+    wxString oldConf(GetConfigurationPath() + FILE_SEP + "vbam.cfg");
+#endif
+    wxString newConf(GetConfigurationPath() + FILE_SEP + "vbam.ini");
     if (wxFileExists(oldConf))
     {
 	wxRenameFile(oldConf, newConf, false);
     }
-#endif
 // /END_MIGRATION
     cfg = new wxFileConfig(wxT("vbam"), wxEmptyString,
         vbamconf.GetFullPath(),
