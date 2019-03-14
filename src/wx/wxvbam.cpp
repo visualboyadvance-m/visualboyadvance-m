@@ -421,6 +421,26 @@ bool wxvbamApp::OnInit()
     return true;
 }
 
+int wxvbamApp::OnRun()
+{
+    if (console_mode)
+    {
+	// we could check for our own error codes here...
+	return EXIT_SUCCESS;
+    }
+    else
+    {
+	return wxApp::OnRun();
+    }
+}
+
+bool wxvbamApp::OnCmdLineHelp(wxCmdLineParser& parser)
+{
+    wxApp::OnCmdLineHelp(parser);
+    console_mode = true;
+    return true;
+}
+
 void wxvbamApp::OnInitCmdLine(wxCmdLineParser& cl)
 {
     wxApp::OnInitCmdLine(cl);
@@ -505,7 +525,8 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
             s.mb_str());
         tack_full_path(lm);
         wxLogMessage(lm);
-        return false;
+        console_mode = true;
+        return true;
     }
 
     if (cl.Found(wxT("print-cfg-path"))) {
@@ -515,7 +536,8 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
         wxString lm(_("Configuration is read from, in order:"));
         tack_full_path(lm);
         wxLogMessage(lm);
-        return false;
+        console_mode = true;
+        return true;
     }
 
     if (cl.Found(wxT("save-over"), &s)) {
@@ -533,7 +555,8 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
         tack_full_path(lm, oi);
         lm.append(_("\n\tbuilt-in"));
         wxLogMessage(lm);
-        return false;
+        console_mode = true;
+        return true;
     }
 
     if (cl.Found(wxT("f"))) {
@@ -567,7 +590,8 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
         for (int i = 0; i < ncmds; i++)
             wxPrintf(wxT("%s (%s)\n"), cmdtab[i].cmd, cmdtab[i].name);
 
-        return false;
+        console_mode = true;
+        return true;
     }
 
 #if !defined(NO_LINK) && !defined(__WXMSW__)

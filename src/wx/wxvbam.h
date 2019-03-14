@@ -83,6 +83,8 @@ public:
     {
     }
     virtual bool OnInit();
+    virtual int OnRun();
+    virtual bool OnCmdLineHelp(wxCmdLineParser&);
     virtual bool UsingWayland() { return using_wayland; }
     virtual void OnInitCmdLine(wxCmdLineParser&);
     virtual bool OnCmdLineParsed(wxCmdLineParser&);
@@ -140,6 +142,7 @@ public:
 
 protected:
     bool using_wayland;
+    bool console_mode = false;
 
 private:
     wxPathList config_path;
