@@ -339,7 +339,7 @@ EOF
         if [ -z "$(apt-cache search '^mxe-source$')" ]; then
             if [ ! -f "$mxe_apt_sources" ]; then
                 echo "deb https://pkg.mxe.cc/repos/apt $debian_rel main" | sudo -- sh -c "cat > $mxe_apt_sources"
-                check sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C6BF758A33A3A276
+                sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C6BF758A33A3A276 || :
             else
                 error "$mxe_apt_sources exists but mxe packages are not found in apt, either delete it or fix it"
             fi
@@ -349,9 +349,9 @@ EOF
         for dep in gcc zlib ffmpeg gettext sdl2 sfml openal wxwidgets; do
             set -- "$@" "mxe-${target}-$dep"
         done
-        check sudo apt-get -qq -y update
+        check sudo apt-get --allow-unauthenticated -qq -y update
         # native wx-common needed for wxrc executable
-        check sudo apt-get -qy install build-essential cmake ccache wx-common "$@"
+        check sudo apt-get --allow-unauthenticated -qy install build-essential cmake ccache wx-common "$@"
     fi
 
     build_instructions
