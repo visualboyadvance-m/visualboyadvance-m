@@ -69,9 +69,14 @@
 #define GETCWD getcwd
 #else // _WIN32
 #include <direct.h>
+#include <io.h>
 #define GETCWD _getcwd
 #define snprintf sprintf
 #define stat _stat
+#define access _access
+#ifndef W_OK
+    #define W_OK 2
+#endif
 #define mkdir(X,Y) (_mkdir(X))
 // from: https://www.linuxquestions.org/questions/programming-9/porting-to-win32-429334/
 #ifndef S_ISDIR
@@ -208,7 +213,8 @@ int sdlMirroringEnable = 1;
 void systemConsoleMessage(const char*);
 
 char* home;
-char homeDataDir[2048];
+char homeConfigDir[1024];
+char homeDataDir[1024];
 
 char screenMessageBuffer[21];
 uint32_t screenMessageTime = 0;
@@ -253,7 +259,7 @@ void StartLirc(void)
         fprintf(stdout, "Success\n");
         //read the config file
         char LIRCConfigLoc[2048];
-        sprintf(LIRCConfigLoc, "%s/%s", homeDataDir, "lircrc");
+        sprintf(LIRCConfigLoc, "%s%c%s", homeConfigDir, FILE_SEP, "lircrc");
         fprintf(stdout, "LIRC Config file:");
         if (lirc_readconfig(LIRCConfigLoc, &LIRCConfigInfo, NULL) == 0) {
             //check vbam dir for lircrc
@@ -343,6 +349,32 @@ char* sdlGetFilename(char* name)
         strcpy(filebuffer, name);
     else
         strcpy(filebuffer, p);
+    return filebuffer;
+}
+
+char* sdlGetFilePath(char* name)
+{
+    static char filebuffer[2048];
+
+    int len = strlen(name);
+
+    char* p = name + len - 1;
+
+    while (true) {
+        if (*p == FILE_SEP) {
+            break;
+        }
+        len--;
+        p--;
+        if (len == 0)
+            break;
+    }
+
+    if (len == 0)
+	sprintf(filebuffer, ".%c", FILE_SEP);
+    else
+        strncpy(filebuffer, name, len);
+
     return filebuffer;
 }
 
@@ -661,14 +693,15 @@ static int sdlCalculateShift(uint32_t mask)
 static char* sdlStateName(int num)
 {
     static char stateName[2048];
+    char *gameDir = sdlGetFilePath(filename);
+    char *gameFile = sdlGetFilename(filename);
 
     if (saveDir)
-        sprintf(stateName, "%s/%s%d.sgm", saveDir, sdlGetFilename(filename),
-            num + 1);
-    else if (homeDir)
-        sprintf(stateName, "%s/%s%d.sgm", homeDataDir, sdlGetFilename(filename), num + 1);
+        sprintf(stateName, "%s%c%s%d.sgm", saveDir, FILE_SEP, gameFile, num + 1);
+    else if (access(gameDir, W_OK) == 0)
+        sprintf(stateName, "%s%c%s%d.sgm", gameDir, FILE_SEP, gameFile, num + 1);
     else
-        sprintf(stateName, "%s%d.sgm", filename, num + 1);
+        sprintf(stateName, "%s%c%s%d.sgm", homeDataDir, FILE_SEP, gameFile, num + 1);
 
     return stateName;
 }
@@ -760,36 +793,39 @@ void sdlWriteBackupStateExchange(int from, int to, int backup)
 
 void sdlWriteBattery()
 {
-    char buffer[1048];
+    char buffer[2048];
+    char *gameDir = sdlGetFilePath(filename);
+    char *gameFile = sdlGetFilename(filename);
 
     if (batteryDir)
-        sprintf(buffer, "%s/%s.sav", batteryDir, sdlGetFilename(filename));
-    else if (homeDir)
-        sprintf(buffer, "%s/%s.sav", homeDataDir, sdlGetFilename(filename));
+        sprintf(buffer, "%s%c%s.sav", batteryDir, FILE_SEP, gameFile);
+    else if (access(gameDir, W_OK) == 0)
+        sprintf(buffer, "%s%c%s.sav", gameDir, FILE_SEP, gameFile);
     else
-        sprintf(buffer, "%s.sav", filename);
+        sprintf(buffer, "%s%c%s.sav", homeDataDir, FILE_SEP, gameFile);
 
-    emulator.emuWriteBattery(buffer);
+    bool result = emulator.emuWriteBattery(buffer);
 
-    systemScreenMessage("Wrote battery");
+    if (result)
+	systemScreenMessage("Wrote battery");
 }
 
 void sdlReadBattery()
 {
-    char buffer[1048];
+    char buffer[2048];
+    char *gameDir = sdlGetFilePath(filename);
+    char *gameFile = sdlGetFilename(filename);
 
     if (batteryDir)
-        sprintf(buffer, "%s/%s.sav", batteryDir, sdlGetFilename(filename));
-    else if (homeDir)
-        sprintf(buffer, "%s/%s.sav", homeDataDir, sdlGetFilename(filename));
+        sprintf(buffer, "%s%c%s.sav", batteryDir, FILE_SEP, gameFile);
+    else if (access(gameDir, W_OK) == 0)
+        sprintf(buffer, "%s%c%s.sav", gameDir, FILE_SEP, gameFile);
     else
-        sprintf(buffer, "%s.sav", filename);
+        sprintf(buffer, "%s%c%s.sav", homeDataDir, FILE_SEP, gameFile);
 
-    bool res = false;
+    bool result = emulator.emuReadBattery(buffer);;
 
-    res = emulator.emuReadBattery(buffer);
-
-    if (res)
+    if (result)
         systemScreenMessage("Loaded battery");
 }
 
@@ -1644,6 +1680,14 @@ void handleRewinds()
     }
 }
 
+void SetHomeConfigDir()
+{
+    sprintf(homeConfigDir, "%s%s", get_xdg_user_config_home().c_str(), DOT_DIR);
+    struct stat s;
+    if (stat(homeDataDir, &s) == -1 || !S_ISDIR(s.st_mode))
+	mkdir(homeDataDir, 0755);
+}
+
 void SetHomeDataDir()
 {
     sprintf(homeDataDir, "%s%s", get_xdg_user_data_home().c_str(), DOT_DIR);
@@ -1658,6 +1702,7 @@ int main(int argc, char** argv)
 
     home = argv[0];
     SetHome(home);
+    SetHomeConfigDir();
     SetHomeDataDir();
 
     frameSkip = 2;
@@ -2224,27 +2269,32 @@ void system10Frames(int rate)
 void systemScreenCapture(int a)
 {
     char buffer[2048];
+    bool result = false;
+    char *gameDir = sdlGetFilePath(filename);
+    char *gameFile = sdlGetFilename(filename);
 
     if (captureFormat) {
         if (screenShotDir)
-            sprintf(buffer, "%s/%s%02d.bmp", screenShotDir, sdlGetFilename(filename), a);
-        else if (homeDir)
-            sprintf(buffer, "%s/%s%02d.bmp", homeDataDir, sdlGetFilename(filename), a);
+            sprintf(buffer, "%s%c%s%02d.bmp", screenShotDir, FILE_SEP, gameFile, a);
+        else if (access(gameDir, W_OK) == 0)
+            sprintf(buffer, "%s%c%s%02d.bmp", gameDir, FILE_SEP, gameFile, a);
         else
-            sprintf(buffer, "%s%02d.bmp", filename, a);
+            sprintf(buffer, "%s%c%s%02d.bmp", homeDataDir, FILE_SEP, gameFile, a);
 
-        emulator.emuWriteBMP(buffer);
+        result = emulator.emuWriteBMP(buffer);
     } else {
         if (screenShotDir)
-            sprintf(buffer, "%s/%s%02d.png", screenShotDir, sdlGetFilename(filename), a);
-        else if (homeDir)
-            sprintf(buffer, "%s/%s%02d.png", homeDataDir, sdlGetFilename(filename), a);
+            sprintf(buffer, "%s%c%s%02d.png", screenShotDir, FILE_SEP, gameFile, a);
+        else if (access(gameDir, W_OK) == 0)
+            sprintf(buffer, "%s%c%s%02d.png", gameDir, FILE_SEP, gameFile, a);
         else
-            sprintf(buffer, "%s%02d.png", filename, a);
-        emulator.emuWritePNG(buffer);
+            sprintf(buffer, "%s%c%s%02d.png", homeDataDir, FILE_SEP, gameFile, a);
+
+        result = emulator.emuWritePNG(buffer);
     }
 
-    systemScreenMessage("Screen capture");
+    if (result)
+	systemScreenMessage("Screen capture");
 }
 
 void systemSaveOldest()
