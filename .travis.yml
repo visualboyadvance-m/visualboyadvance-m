@@ -18,7 +18,7 @@ matrix:
               - cd build
               - cmake ..
               - make -j2
-              - xvfb-run ./visualboyadvance-m --help
+#              - xvfb-run ./visualboyadvance-m --help
           cache:
               directories:
                   - "$HOME/.ccache"
@@ -73,7 +73,7 @@ matrix:
               - cd build
               - cmake ..
               - make -j2
-              - ./visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m --help
+#              - ./visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m --help
           cache:
               directories:
                   - "$HOME/.ccache"
