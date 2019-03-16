@@ -223,6 +223,15 @@ uint32_t screenMessageTime = 0;
 #define SOUND_ECHO 0.2
 #define SOUND_STEREO 0.15
 
+void freeSafe(void *ptr)
+{
+    if (ptr != NULL)
+    {
+	free(ptr);
+	ptr = NULL;
+    }
+}
+
 static void sdlChangeVolume(float d)
 {
     float oldVolume = soundGetVolume();
@@ -297,85 +306,47 @@ void StopLirc(void)
 
 bool sdlCheckDirectory(const char* dir)
 {
-    bool res = false;
-
-    if (!dir || !dir[0]) {
-        return false;
-    }
-
     struct stat buf;
 
-    int len = strlen(dir);
+    if (!dir || !dir[0])
+        return false;
 
-    char* p = (char*)dir + len - 1;
-
-    while (p != dir && (*p == '/' || *p == '\\')) {
-        *p = 0;
-        p--;
+    if (stat(dir, &buf) == 0)
+    {
+	if (!(buf.st_mode & S_IFDIR))
+	{
+	    fprintf(stderr, "Error: %s is not a directory\n", dir);
+	    return false;
+	}
+	return true;
     }
-
-    if (stat(dir, &buf) == 0) {
-        if (!(buf.st_mode & S_IFDIR)) {
-            fprintf(stderr, "Error: %s is not a directory\n", dir);
-        }
-        res = true;
-    } else {
-        fprintf(stderr, "Error: %s does not exist\n", dir);
+    else
+    {
+	fprintf(stderr, "Error: %s does not exist\n", dir);
+	return false;
     }
-
-    return res;
 }
 
 char* sdlGetFilename(char* name)
 {
-    static char filebuffer[2048];
-
-    int len = strlen(name);
-
-    char* p = name + len - 1;
-
-    while (true) {
-        if (*p == '/' || *p == '\\') {
-            p++;
-            break;
-        }
-        len--;
-        p--;
-        if (len == 0)
-            break;
-    }
-
-    if (len == 0)
-        strcpy(filebuffer, name);
+    char path[1024] = ""; // avoid warning about uninitialised value
+    char *filename = strrchr(name, FILE_SEP);
+    if (filename)
+        strncpy(path, filename + 1, strlen(filename));
     else
-        strcpy(filebuffer, p);
-    return filebuffer;
+        sprintf(path, "%s", name);
+    return strdup(path);
 }
 
 char* sdlGetFilePath(char* name)
 {
-    static char filebuffer[2048];
-
-    int len = strlen(name);
-
-    char* p = name + len - 1;
-
-    while (true) {
-        if (*p == FILE_SEP) {
-            break;
-        }
-        len--;
-        p--;
-        if (len == 0)
-            break;
-    }
-
-    if (len == 0)
-	sprintf(filebuffer, ".%c", FILE_SEP);
+    char path[1024] = ""; // avoid warning about uninitialised value
+    char *filename = strrchr(name, FILE_SEP);
+    if (filename)
+        strncpy(path, name, strlen(name) - strlen(filename));
     else
-        strncpy(filebuffer, name, len);
-
-    return filebuffer;
+        sprintf(path, "%c%c", '.', FILE_SEP);
+    return strdup(path);
 }
 
 FILE* sdlFindFile(const char* name)
@@ -703,6 +674,8 @@ static char* sdlStateName(int num)
     else
         sprintf(stateName, "%s%c%s%d.sgm", homeDataDir, FILE_SEP, gameFile, num + 1);
 
+    freeSafe(gameDir);
+    freeSafe(gameFile);
     return stateName;
 }
 
@@ -807,7 +780,10 @@ void sdlWriteBattery()
     bool result = emulator.emuWriteBattery(buffer);
 
     if (result)
-	systemScreenMessage("Wrote battery");
+	systemMessage(0, "Wrote battery '%s'", buffer);
+
+    freeSafe(gameFile);
+    freeSafe(gameDir);
 }
 
 void sdlReadBattery()
@@ -823,10 +799,13 @@ void sdlReadBattery()
     else
         sprintf(buffer, "%s%c%s.sav", homeDataDir, FILE_SEP, gameFile);
 
-    bool result = emulator.emuReadBattery(buffer);;
+    bool result = emulator.emuReadBattery(buffer);
 
     if (result)
-        systemScreenMessage("Loaded battery");
+        systemMessage(0, "Loaded battery '%s'", buffer);
+
+    freeSafe(gameFile);
+    freeSafe(gameDir);
 }
 
 void sdlReadDesktopVideoMode()
@@ -2295,6 +2274,9 @@ void systemScreenCapture(int a)
 
     if (result)
 	systemScreenMessage("Screen capture");
+
+    freeSafe(gameFile);
+    freeSafe(gameDir);
 }
 
 void systemSaveOldest()

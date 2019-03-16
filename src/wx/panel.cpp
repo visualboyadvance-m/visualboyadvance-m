@@ -462,7 +462,7 @@ void GameArea::recompute_dirs()
     }
 
     if (!wxIsWritable(batdir)) {
-        batdir = wxGetApp().GetAbsolutePath(get_xdg_user_data_home() + DOT_DIR);
+        batdir = wxGetApp().GetDataDir();
     }
 
     statedir = gopts.state_dir;
@@ -474,7 +474,7 @@ void GameArea::recompute_dirs()
     }
 
     if (!wxIsWritable(statedir)) {
-        statedir = wxGetApp().GetAbsolutePath(get_xdg_user_data_home() + DOT_DIR);
+        statedir = wxGetApp().GetDataDir();
     }
 }
 

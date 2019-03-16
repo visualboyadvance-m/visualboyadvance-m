@@ -612,6 +612,16 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
     return true;
 }
 
+wxString wxvbamApp::GetConfigDir()
+{
+    return GetAbsolutePath(get_xdg_user_config_home() + DOT_DIR);
+}
+
+wxString wxvbamApp::GetDataDir()
+{
+    return GetAbsolutePath(get_xdg_user_data_home() + DOT_DIR);
+}
+
 wxvbamApp::~wxvbamApp() {
     if (home != NULL)
     {
