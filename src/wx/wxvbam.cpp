@@ -206,6 +206,9 @@ bool wxvbamApp::OnInit()
     if (!wxApp::OnInit())
         return false;
 
+    if (console_mode)
+	return true;
+
     // prepare for loading xrc files
     wxXmlResource* xr = wxXmlResource::Get();
     // note: if linking statically, next 2 pull in lot of unused code
@@ -437,6 +440,13 @@ int wxvbamApp::OnRun()
 bool wxvbamApp::OnCmdLineHelp(wxCmdLineParser& parser)
 {
     wxApp::OnCmdLineHelp(parser);
+    console_mode = true;
+    return true;
+}
+
+bool wxvbamApp::OnCmdLineError(wxCmdLineParser& parser)
+{
+    wxApp::OnCmdLineError(parser);
     console_mode = true;
     return true;
 }
