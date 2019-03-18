@@ -429,7 +429,7 @@ int wxvbamApp::OnRun()
     if (console_mode)
     {
 	// we could check for our own error codes here...
-	return EXIT_SUCCESS;
+	return console_status;
     }
     else
     {
@@ -448,6 +448,7 @@ bool wxvbamApp::OnCmdLineError(wxCmdLineParser& parser)
 {
     wxApp::OnCmdLineError(parser);
     console_mode = true;
+    console_status = 1;
     return true;
 }
 

@@ -144,6 +144,7 @@ public:
 protected:
     bool using_wayland;
     bool console_mode = false;
+    int console_status = 0;
 
 private:
     wxPathList config_path;
