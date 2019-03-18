@@ -461,6 +461,10 @@ void GameArea::recompute_dirs()
         batdir = wxGetApp().GetAbsolutePath(gopts.battery_dir);
     }
 
+    if (!wxIsWritable(batdir)) {
+        batdir = wxGetApp().GetDataDir();
+    }
+
     statedir = gopts.state_dir;
 
     if (!statedir.size()) {
@@ -469,11 +473,9 @@ void GameArea::recompute_dirs()
         statedir = wxGetApp().GetAbsolutePath(gopts.state_dir);
     }
 
-    if (!wxIsWritable(batdir))
-        batdir = wxGetApp().GetConfigurationPath();
-
-    if (!wxIsWritable(statedir))
-        statedir = wxGetApp().GetConfigurationPath();
+    if (!wxIsWritable(statedir)) {
+        statedir = wxGetApp().GetDataDir();
+    }
 }
 
 void GameArea::UnloadGame(bool destruct)

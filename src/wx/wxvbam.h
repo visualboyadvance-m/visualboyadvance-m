@@ -88,6 +88,8 @@ public:
     virtual bool UsingWayland() { return using_wayland; }
     virtual void OnInitCmdLine(wxCmdLineParser&);
     virtual bool OnCmdLineParsed(wxCmdLineParser&);
+    virtual wxString GetConfigDir();
+    virtual wxString GetDataDir();
     wxString GetConfigurationPath();
     const wxString GetPluginsDir();
     wxString GetAbsolutePath(wxString path);
