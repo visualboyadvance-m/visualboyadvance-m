@@ -64,6 +64,9 @@
 #include "inputSDL.h"
 #include "text.h"
 
+// from: https://stackoverflow.com/questions/7608714/why-is-my-pointer-not-null-after-free
+#define freeSafe(ptr) free(ptr); ptr = NULL;
+
 #ifndef _WIN32
 #include <unistd.h>
 #define GETCWD getcwd
@@ -222,15 +225,6 @@ uint32_t screenMessageTime = 0;
 #define SOUND_MAX_VOLUME 2.0
 #define SOUND_ECHO 0.2
 #define SOUND_STEREO 0.15
-
-void freeSafe(void *ptr)
-{
-    if (ptr != NULL)
-    {
-	free(ptr);
-	ptr = NULL;
-    }
-}
 
 static void sdlChangeVolume(float d)
 {
