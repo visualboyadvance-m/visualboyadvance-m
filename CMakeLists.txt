@@ -359,7 +359,11 @@ endif()
 include(ProcessorCount)
 ProcessorCount(num_cpus)
 
-# Compiler flags
+# Compiler stuff
+
+if(CMAKE_C_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+    include(LLVMToolchain)
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     set(LTO_FLAGS "")
