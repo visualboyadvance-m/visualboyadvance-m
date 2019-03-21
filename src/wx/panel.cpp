@@ -999,7 +999,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
             panel = new GLDrawingPanel(this, basic_width, basic_height);
             break;
 #endif
-#ifdef __WXMSW__
+#if defined(__WXMSW__) && !defined(NO_D3D)
         case RND_DIRECT3D:
             panel = new DXDrawingPanel(this, basic_width, basic_height);
             break;
@@ -1034,7 +1034,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
         // add spacers on top and bottom to center panel vertically
         GetSizer()->Add(0, 0, 1, wxEXPAND);
-        GetSizer()->Add(w,    0, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER | wxEXPAND) : wxEXPAND);
+        GetSizer()->Add(w,    0, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER) : wxEXPAND);
         GetSizer()->Add(0, 0, 1, wxEXPAND);
         Layout();
 

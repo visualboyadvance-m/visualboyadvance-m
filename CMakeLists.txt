@@ -1,3 +1,17 @@
+if(COMMAND cmake_policy)
+    cmake_policy(SET CMP0003 NEW) # link to full path of libs
+    cmake_policy(SET CMP0005 NEW) # escapes in add_definitions
+endif()
+
+option(ENABLE_VCPKG "Use dependencies for Visual Studio from vcpkg" ON)
+
+set(NLS_DEFAULT ON)
+
+# get win32 deps before project declaration, because toolchain is set for vcpkg
+set(VCPKG_DEPS zlib libpng SDL2 SFML gettext wxWidgets)
+
+include(${CMAKE_SOURCE_DIR}/cmake/Win32Deps.cmake)
+
 project(VBA-M C CXX)
 
 cmake_minimum_required(VERSION 2.8.12)
@@ -12,19 +26,13 @@ endif()
 
 set(ALL_TARGETS fex visualboyadvance-m vbamcore vbam)
 
-if(COMMAND cmake_policy)
-    cmake_policy(SET CMP0003 NEW) # link to full path of libs
-    cmake_policy(SET CMP0005 NEW) # escapes in add_definitions
-endif()
-
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 #Output all binaries at top level
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
 option(ENABLE_SDL "Build the SDL port" OFF)
 option(ENABLE_WX "Build the wxWidgets port" ON)
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
-option(ENABLE_NLS "Enable translations" ON)
 option(ENABLE_ASAN "Enable -fsanitize=<option>, address by default, requires debug build" OFF)
 
 option(VBAM_STATIC "Try to link all libraries statically" OFF)
@@ -37,7 +45,15 @@ if(VBAM_STATIC)
     set(OPENAL_STATIC ON)
 endif()
 
-set(ASM_DEFAULT OFF)
+set(ENABLE_BUNDLED_LIBS_DEFAULT OFF)
+
+# on visual studio use all bundled stuff
+if(MSVC)
+    set(ENABLE_BUNDLED_LIBS_DEFAULT ON)
+endif()
+
+# XXX: do some stuff with this
+#option(ENABLE_BUNDLED_LIBS "Use bundled libraries instead of system libraries" ${ENABLE_BUNDLED_LIBS_DEFAULT})
 
 # use ccache if available, and not already enabled on the command line
 # but not with ninja and msys ccache on msys2
@@ -51,31 +67,13 @@ if(NOT (WIN32 AND (NOT $ENV{MSYSTEM} STREQUAL "") AND CMAKE_GENERATOR STREQUAL N
     endif()
 endif()
 
-if(NOT CMAKE_SYSTEM_PROCESSOR)
-    if(NOT CMAKE_TOOLCHAIN_FILE AND CMAKE_HOST_SYSTEM_PROCESSOR)
-        set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_HOST_SYSTEM_PROCESSOR})
-    elseif(CMAKE_TOOLCHAIN_FILE MATCHES mxe)
-        if(CMAKE_TOOLCHAIN_FILE MATCHES "i[3-9]86")
-            set(CMAKE_SYSTEM_PROCESSOR i686)
-        else()
-            set(CMAKE_SYSTEM_PROCESSOR x86_64)
-        endif()
-    endif()
-endif()
-
-# turn asm on by default on 32bit x86
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "[xX]86|i[3-9]86|[aA][mM][dD]64")
-    if(CMAKE_C_SIZEOF_DATA_PTR EQUAL 4) # 32 bit
-        set(ASM_DEFAULT ON)
-        set(X86_32 ON)
-    else()
-        set(AMD64 ON)
-    endif()
-endif()
-
 set(SSP_DEFAULT OFF)
 
 option(ENABLE_SSP "Enable gcc stack protector support" ${SSP_DEFAULT})
+
+set(ASM_DEFAULT OFF)
+
+include(Architecture)
 
 option(ENABLE_ASM "Enable x86 ASM related options" ${ASM_DEFAULT})
 
@@ -132,6 +130,13 @@ endif()
 # The SDL port can't be built without debugging support
 if(NOT ENABLE_DEBUGGER AND ENABLE_SDL)
         message(SEND_ERROR "The SDL port can't be built without debugging support")
+endif()
+
+# this has to run after the toolchain is initialized so it can't be in
+# Win32deps.cmake
+if(MINGW)
+    include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-include")
+    include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
 endif()
 
 find_package(Git)
@@ -204,7 +209,7 @@ add_definitions(${SDL2_DEFINITIONS})
 if(ENABLE_LINK)
     # msys2 does not have static sfml libs atm
     # while on mxe we use static libs
-    if(WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe))
+    if(WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe) AND NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
         set(SFML_STATIC_LIBRARIES TRUE)
     endif()
     find_package(SFML 2 COMPONENTS network system REQUIRED)
@@ -297,6 +302,8 @@ if(NOT ENABLE_ASM_CORE)
     add_definitions(-DC_CORE)
 endif()
 
+option(ENABLE_NLS "Enable translations" ${NLS_DEFAULT})
+
 # Enable internationalization
 if(ENABLE_NLS)
     set(LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale)
@@ -329,30 +336,6 @@ if(ENABLE_NLS)
             message(FATAL_ERROR "NLS requires libintl/gettext")
         endif()
         include_directories(${LIBINTL_INC})
-    endif()
-endif()
-
-# Win32 deps submodule
-if(WIN32)
-    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
-        set(git_checkout FALSE)
-        find_package(Git)
-        if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
-            set(git_checkout TRUE)
-            execute_process(COMMAND "${GIT_EXECUTABLE}" submodule update --init --remote --recursive RESULT_VARIABLE git_status WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-        endif()
-
-        if(NOT (git_checkout AND git_status EQUAL 0))
-            message(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --remote --recursive")
-        endif()
-    endif()
-
-    if(MINGW)
-        include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-include")
-        include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
-    elseif(MSVC)
-        set(DEPS_MSVC "${CMAKE_SOURCE_DIR}/dependencies/msvc")
-        include_directories("${DEPS_MSVC}") # for GL/glext.h and getopt.h
     endif()
 endif()
 

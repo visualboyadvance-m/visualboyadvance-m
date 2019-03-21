@@ -7,11 +7,16 @@ ENDIF()
 
 include(VbamFunctions)
 
-if( WIN32 )
-  # not yet implemented
-  option( ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" ON )
-  option( ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ON )
-endif( WIN32 )
+if(WIN32)
+    # not yet implemented
+    option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" OFF)
+
+    if(NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
+        option(ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ON)
+    else()
+        option(ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" OFF)
+    endif()
+endif()
 
 option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" OFF)
 
@@ -50,115 +55,169 @@ if(ENABLE_FAUDIO)
     set(FAUDIO_LIBS FAudio)
 endif()
 
-IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    SET(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
-ENDIF()
+# on VS with vcpkg we can't use FindwxWidgets, we have to set everything up
+# manually because the package is broken
+if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
+    # set up wxwidgets stuff
+    add_definitions(-D_UNICODE -DUNICODE -DWXUSINGDLL -DwxUSE_GUI=1 -D__WXMSW__)
+    if("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
+        add_definitions(-D_DEBUG)
+        include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/debug/lib/mswud)
+        include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/include)
+        set(wxWidgets_LIB_DIR ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/debug/lib)
+        set(wxWidgets_LIBRARIES
+            ${wxWidgets_LIB_DIR}/wxbase31ud_net.lib
+            ${wxWidgets_LIB_DIR}/wxbase31ud_xml.lib
+            ${wxWidgets_LIB_DIR}/wxmsw31ud_core.lib
+            ${wxWidgets_LIB_DIR}/wxmsw31ud_gl.lib
+            ${wxWidgets_LIB_DIR}/wxmsw31ud_xrc.lib
+            ${wxWidgets_LIB_DIR}/wxbase31ud.lib
+            winmm comctl32 oleacc rpcrt4 shlwapi version wsock32 opengl32
+        )
 
-# on e.g. msys2 add a couple of libraries wx needs
-#if(WIN32 AND (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang))
-#    set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -luuid -lwinspool")
-#endif()
+        file(COPY ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows-dbg/lib/wxrc.exe DESTINATION ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/debug/bin)
+        set(WXRC ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/debug/bin/wxrc.exe)
+    elseif("${CMAKE_BUILD_TYPE}" MATCHES "Release")
+        include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/lib/mswu)
+        include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/include)
+        set(wxWidgets_LIB_DIR ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/lib)
+        set(wxWidgets_LIBRARIES
+            ${wxWidgets_LIB_DIR}/wxbase31u_net.lib
+            ${wxWidgets_LIB_DIR}/wxbase31u_xml.lib
+            ${wxWidgets_LIB_DIR}/wxmsw31u_core.lib
+            ${wxWidgets_LIB_DIR}/wxmsw31u_gl.lib
+            ${wxWidgets_LIB_DIR}/wxmsw31ud_xrc.lib
+            ${wxWidgets_LIB_DIR}/wxbase31u.lib
+            winmm comctl32 oleacc rpcrt4 shlwapi version wsock32 opengl32
+        )
 
-# convert msys paths like /c/foo to windows paths like c:/foo
-# for variables set by FindWxWidgets
-function(normalize_wx_paths)
-    if(MSYS)
-        unset(new_paths)
-        foreach(p ${wxWidgets_LIBRARY_DIRS})
-            execute_process(COMMAND cygpath -m "${p}" OUTPUT_VARIABLE p_win OUTPUT_STRIP_TRAILING_WHITESPACE)
-            list(APPEND new_paths "${p_win}")
-        endforeach()
-
-        set(wxWidgets_LIBRARY_DIRS ${new_paths} PARENT_SCOPE)
-
-        string(REGEX REPLACE "((^| )[^/]*)/([a-zA-Z])/" "\\1\\3:/" new_libs "${wxWidgets_LIBRARIES}")
-
-        set(wxWidgets_LIBRARIES ${new_libs} PARENT_SCOPE)
+        file(COPY ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows-rel/lib/wxrc.exe DESTINATION ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/bin)
+        set(WXRC ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/bin/wxrc.exe)
     endif()
-endfunction()
 
-macro(cleanup_wx_vars)
-    if(wxWidgets_CXX_FLAGS)
-        list(REMOVE_ITEM wxWidgets_CXX_FLAGS -fpermissive)
+    if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
+        # get zip binary for wxrc
+        file(DOWNLOAD "https://www.willus.com/archive/zip64/infozip_binaries_win32.zip" ${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip)
+        # unzip it
+        execute_process(
+            COMMAND powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip', '${CMAKE_CURRENT_BINARY_DIR}'); }"
+        )
     endif()
-endmacro()
 
-if(CMAKE_PREFIX_PATH)
-    set(wxWidgets_CONFIG_OPTIONS "--prefix=${CMAKE_PREFIX_PATH}")
-endif()
-
-SET(wxWidgets_USE_UNICODE ON)
-# adv is for wxAboutBox
-# xml, html is for xrc
-# do not include gl at first
-set(wxWidgets_USE_LIBS xrc xml html adv net core base)
-#list(APPEND wxWidgets_CONFIG_OPTIONS --version=2.8)
-
-# Check for gtk4 then gtk3 packages first, some dists like arch rename the
-# wx-config utility for these packages to e.g. wx-config-gtk3
-#
-# Do not do the check if the WX_CONFIG env var is set.
-if(NOT WIN32 AND NOT APPLE AND "$ENV{WX_CONFIG}" STREQUAL "")
-    find_program(wxWidgets_CONFIG_EXECUTABLE NAMES wx-config-gtk4 wx-config-gtk3 wx-config)
-endif()
-
-# the gl lib may not be available, and if it looks like it is we still have to
-# do a compile test later
-list(APPEND wxWidgets_USE_LIBS gl)
-find_package(wxWidgets QUIET)
-cleanup_wx_vars()
-normalize_wx_paths()
-
-SET(CHECK_WX_OPENGL FALSE)
-
-IF(wxWidgets_FOUND)
-    SET(CHECK_WX_OPENGL TRUE)
-ELSE()
-    SET(WX_HAS_OPENGL   FALSE)
-    # the requirement check is later after the opengl compile test
-ENDIF()
-
-INCLUDE_DIRECTORIES(${wxWidgets_INCLUDE_DIRS})
-
-IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    # tell wx to enable debug mode if possible, if the cmake module did not do it for us
-    EXECUTE_PROCESS(COMMAND "${wxWidgets_CONFIG_EXECUTABLE} --debug=yes" RESULT_VARIABLE WX_CONFIG_DEBUG OUTPUT_QUIET ERROR_QUIET)
-
-    IF(WX_CONFIG_DEBUG EQUAL 0)
-        ADD_DEFINITIONS(-DwxDEBUG_LEVEL=1)
+    # SDL2.dll does not get copied to build dir
+    if(NOT EXISTS ${CMAKE_BINARY_DIR}/SDL2.dll)
+        file(COPY ${_VCPKG_ROOT_DIR}/installed/${WINARCH}-windows/bin/SDL2.dll DESTINATION ${CMAKE_BINARY_DIR})
+    endif()
+else()
+    IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        SET(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
     ENDIF()
 
-    # this one should be safe in non-debug builds too
-    ADD_DEFINITIONS(-DWXDEBUG)
-ENDIF()
+    # on e.g. msys2 add a couple of libraries wx needs
+    #if(WIN32 AND (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang))
+    #    set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -luuid -lwinspool")
+    #endif()
 
-FOREACH(DEF ${wxWidgets_DEFINITIONS})
-    ADD_DEFINITIONS("-D${DEF}")
-ENDFOREACH()
+    # convert msys paths like /c/foo to windows paths like c:/foo
+    # for variables set by FindWxWidgets
+    function(normalize_wx_paths)
+        if(MSYS)
+            unset(new_paths)
+            foreach(p ${wxWidgets_LIBRARY_DIRS})
+                execute_process(COMMAND cygpath -m "${p}" OUTPUT_VARIABLE p_win OUTPUT_STRIP_TRAILING_WHITESPACE)
+                list(APPEND new_paths "${p_win}")
+            endforeach()
 
-# check if this build of wx actually has OpenGL support
+            set(wxWidgets_LIBRARY_DIRS ${new_paths} PARENT_SCOPE)
 
-SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${MY_CXX_FLAGS} ${MY_C_FLAGS} ${MY_CXX_LINKER_FLAGS} ${MY_C_LINKER_FLAGS} ${wxWidgets_LIBRARIES})
-SET(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS} ${wxWidgets_CXX_FLAGS} ${MY_CXX_FLAGS} ${MY_C_FLAGS})
+            string(REGEX REPLACE "((^| )[^/]*)/([a-zA-Z])/" "\\1\\3:/" new_libs "${wxWidgets_LIBRARIES}")
 
-IF(WIN32)
-    SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} "-Wl,--subsystem,console")
-    SET(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   "-Wl,--subsystem,console")
-ENDIF()
+            set(wxWidgets_LIBRARIES ${new_libs} PARENT_SCOPE)
+        endif()
+    endfunction()
 
-SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${wxWidgets_INCLUDE_DIRS})
+    macro(cleanup_wx_vars)
+        if(wxWidgets_CXX_FLAGS)
+            list(REMOVE_ITEM wxWidgets_CXX_FLAGS -fpermissive)
+        endif()
+    endmacro()
 
-FOREACH(DEF ${wxWidgets_DEFINITIONS})
-    SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} "-D${DEF}")
-ENDFOREACH()
+    if(CMAKE_PREFIX_PATH)
+        set(wxWidgets_CONFIG_OPTIONS "--prefix=${CMAKE_PREFIX_PATH}")
+    endif()
 
-# CheckCXXSourceCompiles ignores compiler flags, so we have to stuff them into the definitions
-SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_FLAGS} ${CMAKE_REQUIRED_DEFINITIONS})
+    SET(wxWidgets_USE_UNICODE ON)
+    # adv is for wxAboutBox
+    # xml, html is for xrc
+    # do not include gl at first
+    set(wxWidgets_USE_LIBS xrc xml html adv net core base)
+    #list(APPEND wxWidgets_CONFIG_OPTIONS --version=2.8)
 
-INCLUDE(CheckCXXSourceCompiles)
+    # Check for gtk4 then gtk3 packages first, some dists like arch rename the
+    # wx-config utility for these packages to e.g. wx-config-gtk3
+    #
+    # Do not do the check if the WX_CONFIG env var is set.
+    if(NOT WIN32 AND NOT APPLE AND "$ENV{WX_CONFIG}" STREQUAL "")
+        find_program(wxWidgets_CONFIG_EXECUTABLE NAMES wx-config-gtk4 wx-config-gtk3 wx-config)
+    endif()
 
-IF(CHECK_WX_OPENGL)
-    CHECK_CXX_SOURCE_COMPILES("
+    # the gl lib may not be available, and if it looks like it is we still have to
+    # do a compile test later
+    list(APPEND wxWidgets_USE_LIBS gl)
+    find_package(wxWidgets QUIET)
+    cleanup_wx_vars()
+    normalize_wx_paths()
+
+    SET(CHECK_WX_OPENGL FALSE)
+
+    IF(wxWidgets_FOUND)
+        SET(CHECK_WX_OPENGL TRUE)
+    ELSE()
+        SET(WX_HAS_OPENGL   FALSE)
+        # the requirement check is later after the opengl compile test
+    ENDIF()
+
+    INCLUDE_DIRECTORIES(${wxWidgets_INCLUDE_DIRS})
+
+    IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        # tell wx to enable debug mode if possible, if the cmake module did not do it for us
+        EXECUTE_PROCESS(COMMAND "${wxWidgets_CONFIG_EXECUTABLE} --debug=yes" RESULT_VARIABLE WX_CONFIG_DEBUG OUTPUT_QUIET ERROR_QUIET)
+
+        IF(WX_CONFIG_DEBUG EQUAL 0)
+            ADD_DEFINITIONS(-DwxDEBUG_LEVEL=1)
+        ENDIF()
+
+        # this one should be safe in non-debug builds too
+        ADD_DEFINITIONS(-DWXDEBUG)
+    ENDIF()
+
+    FOREACH(DEF ${wxWidgets_DEFINITIONS})
+        ADD_DEFINITIONS("-D${DEF}")
+    ENDFOREACH()
+
+    # check if this build of wx actually has OpenGL support
+
+    SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${MY_CXX_FLAGS} ${MY_C_FLAGS} ${MY_CXX_LINKER_FLAGS} ${MY_C_LINKER_FLAGS} ${wxWidgets_LIBRARIES})
+    SET(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS} ${wxWidgets_CXX_FLAGS} ${MY_CXX_FLAGS} ${MY_C_FLAGS})
+
+    IF(WIN32)
+        SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} "-Wl,--subsystem,console")
+        SET(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   "-Wl,--subsystem,console")
+    ENDIF()
+
+    SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${wxWidgets_INCLUDE_DIRS})
+
+    FOREACH(DEF ${wxWidgets_DEFINITIONS})
+        SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} "-D${DEF}")
+    ENDFOREACH()
+
+    # CheckCXXSourceCompiles ignores compiler flags, so we have to stuff them into the definitions
+    SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_FLAGS} ${CMAKE_REQUIRED_DEFINITIONS})
+
+    INCLUDE(CheckCXXSourceCompiles)
+
+    IF(CHECK_WX_OPENGL)
+        CHECK_CXX_SOURCE_COMPILES("
 #include <wx/wxprec.h>
 #include <wx/config.h>
 #include <wx/glcanvas.h>
@@ -167,22 +226,22 @@ int main(int argc, char** argv) {
     wxGLCanvas canvas(NULL, wxID_ANY, NULL, wxPoint(0, 0), wxSize(300, 300), 0);
     return 0;
 }" WX_HAS_OPENGL)
-ENDIF()
+    ENDIF()
 
-IF(NOT WX_HAS_OPENGL)
-    ADD_DEFINITIONS(-DNO_OGL)
-    LIST(REMOVE_ITEM wxWidgets_USE_LIBS gl)
-    find_package(wxWidgets REQUIRED)
-    normalize_wx_paths()
-    cleanup_wx_vars()
-ENDIF()
+    IF(NOT WX_HAS_OPENGL)
+        ADD_DEFINITIONS(-DNO_OGL)
+        LIST(REMOVE_ITEM wxWidgets_USE_LIBS gl)
+        find_package(wxWidgets REQUIRED)
+        normalize_wx_paths()
+        cleanup_wx_vars()
+    ENDIF()
 
-IF(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_CROSSCOMPILING)
-    SET(WX_ABI_FOUND_MATCH FALSE)
+    IF(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_CROSSCOMPILING)
+        SET(WX_ABI_FOUND_MATCH FALSE)
 
-    INCLUDE(CheckCXXSourceRuns)
+        INCLUDE(CheckCXXSourceRuns)
 
-    SET(WX_TEST_CONSOLE_APP "
+        SET(WX_TEST_CONSOLE_APP "
 #include <cstdlib>
 #include <iostream>
 #include <wx/wxprec.h>
@@ -251,140 +310,150 @@ int main(int argc, char** argv)
 }
 ")
 
-    # on windows we need the trampoline library from dependencies
-    IF(WIN32)
-        # minhook requires -fpermissive unfortunately
-        set(CMAKE_REQUIRED_FLAGS       ${CMAKE_REQUIRED_FLAGS}       -fpermissive)
-        SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} -fpermissive -w "-I${CMAKE_SOURCE_DIR}/dependencies/minhook/include")
-        SET(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   -Wl,--subsystem,console)
+        # on windows we need the trampoline library from dependencies
+        IF(WIN32)
+            # minhook requires -fpermissive unfortunately
+            set(CMAKE_REQUIRED_FLAGS       ${CMAKE_REQUIRED_FLAGS}       -fpermissive)
+            SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} -fpermissive -w "-I${CMAKE_SOURCE_DIR}/dependencies/minhook/include")
+            SET(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   -Wl,--subsystem,console)
 
-        IF(AMD64)
-            SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook_64.a")
-        ELSE() # assume 32 bit windows
-            SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook.a")
-        ENDIF()
-    ENDIF()
-
-    CHECK_CXX_SOURCE_RUNS("${WX_TEST_CONSOLE_APP}" WX_DEFAULT_ABI_VERSION_COMPATIBLE)
-
-    # remove -fpermissive set for minhook
-    list(REMOVE_ITEM CMAKE_REQUIRED_FLAGS       -fpermissive)
-    list(REMOVE_ITEM CMAKE_REQUIRED_DEFINITIONS -fpermissive)
-
-    IF(NOT WX_DEFAULT_ABI_VERSION_COMPATIBLE)
-        # currently goes up to 11 with gcc7, but we give it some room
-        SET(WX_ABI_VERSION 15)
-
-        SET(CURRENT_DEFS ${CMAKE_REQUIRED_DEFINITIONS})
-        SET(CURRENT_LIBS ${CMAKE_REQUIRED_LIBRARIES})
-
-        WHILE(NOT WX_ABI_VERSION EQUAL -1)
-            SET(CMAKE_REQUIRED_DEFINITIONS ${CURRENT_DEFS} "-fabi-version=${WX_ABI_VERSION}")
-            SET(CMAKE_REQUIRED_LIBRARIES   ${CURRENT_LIBS} "-fabi-version=${WX_ABI_VERSION}")
-
-            SET(WX_ABI_VAR "WX_ABI_VERSION_${WX_ABI_VERSION}")
-
-            CHECK_CXX_SOURCE_RUNS("${WX_TEST_CONSOLE_APP}" ${WX_ABI_VAR})
-
-            IF(${${WX_ABI_VAR}})
-                SET(WX_ABI_FOUND_MATCH TRUE)
-                BREAK()
+            IF(AMD64)
+                SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook_64.a")
+            ELSE() # assume 32 bit windows
+                SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook.a")
             ENDIF()
-
-            MATH(EXPR WX_ABI_VERSION "${WX_ABI_VERSION} - 1")
-        ENDWHILE()
-
-        SET(CMAKE_REQUIRED_DEFINITIONS ${CURRENT_DEFS})
-        SET(CMAKE_REQUIRED_LIBRARIES   ${CURRENT_LIBS})
-    ENDIF()
-
-    IF(WX_ABI_FOUND_MATCH)
-        # add C++ flags
-        STRING(REGEX REPLACE "<FLAGS>" "<FLAGS> -fabi-version=${WX_ABI_VERSION} " CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
-        SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -fabi-version=${WX_ABI_VERSION}")
-    ENDIF()
-ENDIF()
-
-# end of wx compile checks
-
-FOREACH(CXX_COMPILE_FLAG ${wxWidgets_CXX_FLAGS})
-    ADD_COMPILE_OPTIONS(${CXX_COMPILE_FLAG})
-ENDFOREACH()
-
-#EXECUTE_PROCESS(COMMAND sh "${wxWidgets_CONFIG_EXECUTABLE}" --cxxflags)
-INCLUDE( ${wxWidgets_USE_FILE} )
-FIND_PACKAGE ( Gettext REQUIRED )
-FIND_PROGRAM(XGETTEXT xgettext)
-FIND_PROGRAM(MSGINIT msginit)
-if(ENABLE_NLS AND (NOT XGETTEXT OR NOT MSGINIT))
-   message(SEND_ERROR "Cannot find gettext ${XGETTEXT} ${MSGINIT}")
-endif(ENABLE_NLS AND (NOT XGETTEXT OR NOT MSGINIT))
-IF(WIN32 AND ENABLE_DIRECTX)
-    FIND_PACKGE ( DirectX REQUIRED )
-ENDIF(WIN32 AND ENABLE_DIRECTX)
-
-# we make some direct gtk/gdk calls on linux and such
-# so need to link the gtk that wx was built with
-IF(NOT WIN32 AND NOT APPLE)
-    FIND_PACKAGE(PkgConfig REQUIRED)
-
-    FIND_PATH(WX_CONFIG_H NAMES wx/config.h PATHS ${wxWidgets_INCLUDE_DIRS})
-    IF(NOT WX_CONFIG_H)
-        MESSAGE(FATAL_ERROR "Could not find wx/config.h in ${wxWidgets_INCLUDE_DIRS}")
-    ENDIF()
-    SET(WX_CONFIG_H "${WX_CONFIG_H}/wx/config.h")
-
-    INCLUDE(CheckCXXSymbolExists)
-    CHECK_CXX_SYMBOL_EXISTS(__WXGTK4__ ${WX_CONFIG_H} WX_USING_GTK4)
-    CHECK_CXX_SYMBOL_EXISTS(__WXGTK3__ ${WX_CONFIG_H} WX_USING_GTK3)
-    IF(WX_USING_GTK4)
-        PKG_CHECK_MODULES(GTK4 REQUIRED gtk+-4.0)
-        IF(NOT GTK4_INCLUDE_DIRS)
-            MESSAGE(FATAL_ERROR "Could not find gtk4")
         ENDIF()
-        INCLUDE_DIRECTORIES(${GTK4_INCLUDE_DIRS})
-        LINK_DIRECTORIES(${GTK4_LIBRARY_DIRS})
-        ADD_COMPILE_OPTIONS(${GTK4_CFLAGS_OTHER})
-        SET(GTK_LIBRARIES ${GTK4_LIBRARIES})
-    ELSEIF(WX_USING_GTK3)
-        PKG_CHECK_MODULES(GTK3 REQUIRED gtk+-3.0)
-        IF(NOT GTK3_INCLUDE_DIRS)
-            MESSAGE(FATAL_ERROR "Could not find gtk3")
-        ENDIF()
-        INCLUDE_DIRECTORIES(${GTK3_INCLUDE_DIRS})
-        LINK_DIRECTORIES(${GTK3_LIBRARY_DIRS})
-        ADD_COMPILE_OPTIONS(${GTK3_CFLAGS_OTHER})
-        SET(GTK_LIBRARIES ${GTK3_LIBRARIES})
-    ELSE()
-        CHECK_CXX_SYMBOL_EXISTS(__WXGTK20__ ${WX_CONFIG_H} WX_USING_GTK2)
-        IF(WX_USING_GTK2)
-            # try to use pkg-config to find gtk2 first
-            PKG_CHECK_MODULES(GTK2 REQUIRED gtk+-2.0)
-            IF(GTK2_INCLUDE_DIRS)
-                INCLUDE_DIRECTORIES(${GTK2_INCLUDE_DIRS})
-                LINK_DIRECTORIES(${GTK2_LIBRARY_DIRS})
-                ADD_COMPILE_OPTIONS(${GTK2_CFLAGS_OTHER})
-                SET(GTK_LIBRARIES ${GTK2_LIBRARIES})
-            ELSE()
-                # and if that fails, use the cmake module
-                FIND_PACKAGE(GTK2 REQUIRED gtk)
-                IF(NOT GTK2_INCLUDE_DIRS)
-                    MESSAGE(FATAL_ERROR "Could not find gtk2")
+
+        CHECK_CXX_SOURCE_RUNS("${WX_TEST_CONSOLE_APP}" WX_DEFAULT_ABI_VERSION_COMPATIBLE)
+
+        # remove -fpermissive set for minhook
+        list(REMOVE_ITEM CMAKE_REQUIRED_FLAGS       -fpermissive)
+        list(REMOVE_ITEM CMAKE_REQUIRED_DEFINITIONS -fpermissive)
+
+        IF(NOT WX_DEFAULT_ABI_VERSION_COMPATIBLE)
+            # currently goes up to 11 with gcc7, but we give it some room
+            SET(WX_ABI_VERSION 15)
+
+            SET(CURRENT_DEFS ${CMAKE_REQUIRED_DEFINITIONS})
+            SET(CURRENT_LIBS ${CMAKE_REQUIRED_LIBRARIES})
+
+            WHILE(NOT WX_ABI_VERSION EQUAL -1)
+                SET(CMAKE_REQUIRED_DEFINITIONS ${CURRENT_DEFS} "-fabi-version=${WX_ABI_VERSION}")
+                SET(CMAKE_REQUIRED_LIBRARIES   ${CURRENT_LIBS} "-fabi-version=${WX_ABI_VERSION}")
+
+                SET(WX_ABI_VAR "WX_ABI_VERSION_${WX_ABI_VERSION}")
+
+                CHECK_CXX_SOURCE_RUNS("${WX_TEST_CONSOLE_APP}" ${WX_ABI_VAR})
+
+                IF(${${WX_ABI_VAR}})
+                    SET(WX_ABI_FOUND_MATCH TRUE)
+                    BREAK()
                 ENDIF()
-                INCLUDE_DIRECTORIES(${GTK2_INCLUDE_DIRS})
-                ADD_COMPILE_OPTIONS(${GTK2_DEFINITIONS})
-                SET(GTK_LIBRARIES ${GTK2_LIBRARIES})
-            ENDIF()
-        ELSE()
-            FIND_PACKAGE(GTK REQUIRED gtk)
-            IF(NOT GTK_INCLUDE_DIRS)
-                MESSAGE(FATAL_ERROR "Could not find gtk")
-            ENDIF()
-            INCLUDE_DIRECTORIES(${GTK_INCLUDE_DIRS})
-            ADD_COMPILE_OPTIONS(${GTK_DEFINITIONS})
+
+                MATH(EXPR WX_ABI_VERSION "${WX_ABI_VERSION} - 1")
+            ENDWHILE()
+
+            SET(CMAKE_REQUIRED_DEFINITIONS ${CURRENT_DEFS})
+            SET(CMAKE_REQUIRED_LIBRARIES   ${CURRENT_LIBS})
+        ENDIF()
+
+        IF(WX_ABI_FOUND_MATCH)
+            # add C++ flags
+            STRING(REGEX REPLACE "<FLAGS>" "<FLAGS> -fabi-version=${WX_ABI_VERSION} " CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
+            SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -fabi-version=${WX_ABI_VERSION}")
         ENDIF()
     ENDIF()
-ENDIF()
+
+    # end of wx compile checks
+
+    FOREACH(CXX_COMPILE_FLAG ${wxWidgets_CXX_FLAGS})
+        ADD_COMPILE_OPTIONS(${CXX_COMPILE_FLAG})
+    ENDFOREACH()
+
+    # we make some direct gtk/gdk calls on linux and such
+    # so need to link the gtk that wx was built with
+    IF(NOT WIN32 AND NOT APPLE)
+        FIND_PACKAGE(PkgConfig REQUIRED)
+
+        FIND_PATH(WX_CONFIG_H NAMES wx/config.h PATHS ${wxWidgets_INCLUDE_DIRS})
+        IF(NOT WX_CONFIG_H)
+            MESSAGE(FATAL_ERROR "Could not find wx/config.h in ${wxWidgets_INCLUDE_DIRS}")
+        ENDIF()
+        SET(WX_CONFIG_H "${WX_CONFIG_H}/wx/config.h")
+
+        INCLUDE(CheckCXXSymbolExists)
+        CHECK_CXX_SYMBOL_EXISTS(__WXGTK4__ ${WX_CONFIG_H} WX_USING_GTK4)
+        CHECK_CXX_SYMBOL_EXISTS(__WXGTK3__ ${WX_CONFIG_H} WX_USING_GTK3)
+        IF(WX_USING_GTK4)
+            PKG_CHECK_MODULES(GTK4 REQUIRED gtk+-4.0)
+            IF(NOT GTK4_INCLUDE_DIRS)
+                MESSAGE(FATAL_ERROR "Could not find gtk4")
+            ENDIF()
+            INCLUDE_DIRECTORIES(${GTK4_INCLUDE_DIRS})
+            LINK_DIRECTORIES(${GTK4_LIBRARY_DIRS})
+            ADD_COMPILE_OPTIONS(${GTK4_CFLAGS_OTHER})
+            SET(GTK_LIBRARIES ${GTK4_LIBRARIES})
+        ELSEIF(WX_USING_GTK3)
+            PKG_CHECK_MODULES(GTK3 REQUIRED gtk+-3.0)
+            IF(NOT GTK3_INCLUDE_DIRS)
+                MESSAGE(FATAL_ERROR "Could not find gtk3")
+            ENDIF()
+            INCLUDE_DIRECTORIES(${GTK3_INCLUDE_DIRS})
+            LINK_DIRECTORIES(${GTK3_LIBRARY_DIRS})
+            ADD_COMPILE_OPTIONS(${GTK3_CFLAGS_OTHER})
+            SET(GTK_LIBRARIES ${GTK3_LIBRARIES})
+        ELSE()
+            CHECK_CXX_SYMBOL_EXISTS(__WXGTK20__ ${WX_CONFIG_H} WX_USING_GTK2)
+            IF(WX_USING_GTK2)
+                # try to use pkg-config to find gtk2 first
+                PKG_CHECK_MODULES(GTK2 REQUIRED gtk+-2.0)
+                IF(GTK2_INCLUDE_DIRS)
+                    INCLUDE_DIRECTORIES(${GTK2_INCLUDE_DIRS})
+                    LINK_DIRECTORIES(${GTK2_LIBRARY_DIRS})
+                    ADD_COMPILE_OPTIONS(${GTK2_CFLAGS_OTHER})
+                    SET(GTK_LIBRARIES ${GTK2_LIBRARIES})
+                ELSE()
+                    # and if that fails, use the cmake module
+                    FIND_PACKAGE(GTK2 REQUIRED gtk)
+                    IF(NOT GTK2_INCLUDE_DIRS)
+                        MESSAGE(FATAL_ERROR "Could not find gtk2")
+                    ENDIF()
+                    INCLUDE_DIRECTORIES(${GTK2_INCLUDE_DIRS})
+                    ADD_COMPILE_OPTIONS(${GTK2_DEFINITIONS})
+                    SET(GTK_LIBRARIES ${GTK2_LIBRARIES})
+                ENDIF()
+            ELSE()
+                FIND_PACKAGE(GTK REQUIRED gtk)
+                IF(NOT GTK_INCLUDE_DIRS)
+                    MESSAGE(FATAL_ERROR "Could not find gtk")
+                ENDIF()
+                INCLUDE_DIRECTORIES(${GTK_INCLUDE_DIRS})
+                ADD_COMPILE_OPTIONS(${GTK_DEFINITIONS})
+            ENDIF()
+        ENDIF()
+    ENDIF()
+
+    if (wxWidgets_USE_FILE)
+        INCLUDE(${wxWidgets_USE_FILE})
+    endif()
+endif() # wxWidgets checks
+
+if(CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
+    find_package(unofficial-gettext REQUIRED)
+else()
+    find_package(Gettext REQUIRED)
+
+    find_program(XGETTEXT xgettext)
+    find_program(MSGINIT msginit)
+
+    if(ENABLE_NLS AND (NOT XGETTEXT OR NOT MSGINIT))
+       message(SEND_ERROR "Cannot find gettext ${XGETTEXT} ${MSGINIT}")
+    endif()
+endif()
+
+if(WIN32 AND ENABLE_DIRECTX)
+    find_packge(DirectX REQUIRED)
+endif()
 
 # contrib widgets
 include_directories(widgets)
