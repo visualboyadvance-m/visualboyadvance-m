@@ -1034,7 +1034,16 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
         // add spacers on top and bottom to center panel vertically
         GetSizer()->Add(0, 0, 1, wxEXPAND);
-        GetSizer()->Add(w,    0, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER) : wxEXPAND);
+
+        // On windows with the vcpkg version of wxWidgets which is 3.1.2, the
+        // wxEXPAND flag throws an XRC error, but everything works fine without it.
+        // On GTK however, the flag is necessary.
+#if defined(__WXMSW__)
+        GetSizer()->Add(w,    0, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER_HORIZONTAL) : wxEXPAND);
+#else
+        GetSizer()->Add(w,    0, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER_HORIZONTAL | wxEXPAND) : wxEXPAND);
+#endif
+
         GetSizer()->Add(0, 0, 1, wxEXPAND);
         Layout();
 
