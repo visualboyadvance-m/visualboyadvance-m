@@ -651,6 +651,17 @@ IF( WIN32 )
     ENDIF(ENABLE_DEBUGGER)
 ENDIF( WIN32 )
 
+unset(EXTRA_X11_LIBS)
+if(NOT WIN32 AND NOT APPLE)
+    find_package(X11)
+
+    if(X11_X11_LIB AND X11_Xscreensaver_LIB)
+        include_directories(${X11_INCLUDE_DIR})
+        set(EXTRA_X11_LIBS ${X11_X11_LIB} ${X11_Xscreensaver_LIB})
+        add_definitions(-DHAVE_XSS)
+    endif()
+endif()
+
 link_directories( ${CMAKE_BINARY_DIR} )
 
 SET(VBAM_ICON vbam.icns)
@@ -683,6 +694,7 @@ TARGET_LINK_LIBRARIES (
     ${GTK_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${FAUDIO_LIBS}
+    ${EXTRA_X11_LIBS}
 )
 
 if(ENABLE_FFMPEG)

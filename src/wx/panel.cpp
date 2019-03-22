@@ -1292,6 +1292,14 @@ void GameArea::OnSize(wxSizeEvent& ev)
     ev.Skip(true);
 }
 
+#if defined(__WXGTK__) && defined(HAVE_XSS)
+    #include <X11/Xlib.h>
+    #define Status int
+    #include <X11/extensions/scrnsaver.h>
+    #include <gdk/gdkx.h>
+    #include <gtk/gtk.h>
+#endif
+
 void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
 {
     int key = ev.GetControlIndex();
@@ -1313,6 +1321,16 @@ void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
         process_key_press(value & SDL_HAT_LEFT, key, WXJB_HAT_W, joy);
     } else
         process_key_press(ev.GetControlValue() != 0, key, mod, joy);
+
+    // tell Linux to turn off the screensaver/screen-blank if joystick button was pressed
+    // this shouldn't be necessary of course
+#if defined(__WXGTK__) && defined(HAVE_XSS)
+    if (!wxGetApp().UsingWayland()) {
+        Display* display = GDK_WINDOW_XDISPLAY(gtk_widget_get_window(wxGetApp().frame->GetHandle()));
+        XResetScreenSaver(display);
+        XFlush(display);
+    }
+#endif
 }
 
 BEGIN_EVENT_TABLE(GameArea, wxPanel)
