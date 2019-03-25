@@ -19,8 +19,8 @@ struct wxSDLJoyState {
 wxSDLJoy::wxSDLJoy(bool analog)
     : wxTimer()
     , digital(!analog)
-    , evthandler(0)
     , joystate(0)
+    , evthandler(0)
     , nosticks(true)
 {
     // Start up joystick if not already started
@@ -37,7 +37,7 @@ wxSDLJoy::wxSDLJoy(bool analog)
         return;
 
     joystate = new wxSDLJoyState_t[njoy];
-    memset(joystate, 0, njoy * sizeof(*joystate));
+    memset(static_cast<void*>(joystate), 0, njoy * sizeof(*joystate));
 
     for (int i = 0; i < njoy; i++) {
         SDL_Joystick* dev = joystate[i].dev = SDL_JoystickOpen(i);

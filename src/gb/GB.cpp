@@ -2189,7 +2189,7 @@ static void gbSelectColorizationPalette()
         }
 
         // Check if the checksum is in the list.
-        int idx;
+        size_t idx;
         for (idx = 0; idx < sizeof(gbColorizationChecksums); idx++) {
             if (gbColorizationChecksums[idx] == checksum) {
                 break;
@@ -2201,7 +2201,7 @@ static void gbSelectColorizationPalette()
             // Indexes above 0x40 have to be disambiguated.
             if (idx > 0x40) {
                 // No idea how that works. But it works.
-                for (int i = idx - 0x41, j = 0; i < sizeof(gbColorizationDisambigChars); i += 14, j += 14) {
+                for (size_t i = idx - 0x41, j = 0; i < sizeof(gbColorizationDisambigChars); i += 14, j += 14) {
                     if (gbRom[0x0137] == gbColorizationDisambigChars[i]) {
                         infoIdx = idx + j;
                         break;
@@ -3430,7 +3430,7 @@ bool gbReadGSASnapshot(const char* fileName)
     fseek(file, 0x4, SEEK_SET);
     char buffer[16];
     char buffer2[16];
-    fread(buffer, 1, 15, file);
+    FREAD_UNCHECKED(buffer, 1, 15, file);
     buffer[15] = 0;
     memcpy(buffer2, &gbRom[0x134], 15);
     buffer2[15] = 0;
@@ -3443,8 +3443,8 @@ bool gbReadGSASnapshot(const char* fileName)
         return false;
     }
     fseek(file, 0x13, SEEK_SET);
-    size_t read = 0;
-    int toRead = 0;
+    //size_t read = 0;
+    //int toRead = 0;
     switch (gbRomType) {
     case 0x03:
     case 0x0f:
@@ -3453,13 +3453,15 @@ bool gbReadGSASnapshot(const char* fileName)
     case 0x1b:
     case 0x1e:
     case 0xff:
-        read = fread(gbRam, 1, (gbRamSizeMask + 1), file);
-        toRead = (gbRamSizeMask + 1);
+        //read = fread(gbRam, 1, (gbRamSizeMask + 1), file);
+        FREAD_UNCHECKED(gbRam, 1, (gbRamSizeMask + 1), file);
+        //toRead = (gbRamSizeMask + 1);
         break;
     case 0x06:
     case 0x22:
-        read = fread(&gbMemory[0xa000], 1, 256, file);
-        toRead = 256;
+        //read = fread(&gbMemory[0xa000], 1, 256, file);
+        FREAD_UNCHECKED(&gbMemory[0xa000], 1, 256, file);
+        //toRead = 256;
         break;
     default:
         systemMessage(MSG_UNSUPPORTED_SNAPSHOT_FILE,

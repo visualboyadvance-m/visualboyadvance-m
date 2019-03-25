@@ -1141,7 +1141,7 @@ int yyparse()
 #if YYERROR_VERBOSE
     /* Buffer for error messages, and its allocated size.  */
     char yymsgbuf[128];
-    char* yymsg = yymsgbuf;
+    char* yymsg = (char *)yymsgbuf;
     YYSIZE_T yymsg_alloc = sizeof yymsgbuf;
 #endif
 
@@ -1518,7 +1518,7 @@ yyerrlab:
     if (!yyerrstatus) {
         ++yynerrs;
 #if !YYERROR_VERBOSE
-        yyerror(YY_("syntax error"));
+        yyerror((char *)YY_("syntax error"));
 #else
         {
             YYSIZE_T yysize = yysyntax_error(0, yystate, yychar);
@@ -1541,7 +1541,7 @@ yyerrlab:
                 (void)yysyntax_error(yymsg, yystate, yychar);
                 yyerror(yymsg);
             } else {
-                yyerror(YY_("syntax error"));
+                yyerror((char *)YY_("syntax error"));
                 if (yysize != 0)
                     goto yyexhaustedlab;
             }
@@ -1645,7 +1645,7 @@ yyabortlab:
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
 yyexhaustedlab:
-    yyerror(YY_("memory exhausted"));
+    yyerror((char *)YY_("memory exhausted"));
     yyresult = 2;
 /* Fall through.  */
 #endif

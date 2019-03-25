@@ -45,7 +45,7 @@ protected:
 private:
         RingBuffer<uint16_t> samples_buf;
 
-        SDL_AudioDeviceID sound_device = -1;
+        SDL_AudioDeviceID sound_device = 0;
 
         SDL_mutex* mutex;
         SDL_sem* data_available;

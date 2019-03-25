@@ -3,6 +3,7 @@
 
 #include "../common/Types.h"
 #include "../System.h"
+#include "../Util.h"
 
 const uint64_t TICKS_PER_SECOND = 16777216;
 

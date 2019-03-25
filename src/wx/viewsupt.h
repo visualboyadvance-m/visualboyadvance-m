@@ -141,6 +141,7 @@ protected:
     // assigned to textctrl to avoid mouse input
     void MouseEvent(wxMouseEvent& ev)
     {
+	(void)ev; // unused param
     }
     // the subwidgets
     wxTextCtrl tc;
@@ -412,6 +413,7 @@ public:
     }
     void MouseEvent(wxMouseEvent& ev)
     {
+	(void)ev; // unused param
     }
     DECLARE_EVENT_TABLE()
     DECLARE_DYNAMIC_CLASS(DispCheckBox)

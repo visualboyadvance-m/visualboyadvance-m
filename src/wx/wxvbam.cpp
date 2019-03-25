@@ -109,7 +109,7 @@ static void tack_full_path(wxString& s, const wxString& app = wxEmptyString)
     wxPathList full_config_path;
     get_config_path(full_config_path, false);
 
-    for (int i = 0; i < full_config_path.size(); i++)
+    for (size_t i = 0; i < full_config_path.size(); i++)
         s += wxT("\n\t") + full_config_path[i] + app;
 }
 
@@ -140,7 +140,7 @@ wxString wxvbamApp::GetConfigurationPath()
     // dir or parent to create it in in OnInit in normal order
     // (from user paths to system paths.)
     if (data_path.empty()) {
-        for (int i = 0; i < config_path.size(); i++) {
+        for (size_t i = 0; i < config_path.size(); i++) {
             // Check if path is writeable
             if (wxIsWritable(config_path[i])) {
                 data_path = config_path[i];
@@ -221,7 +221,7 @@ bool wxvbamApp::OnInit()
     // 2.9 has LoadAllFiles(), but this is 2.8, so we'll do it manually
     wxString cwd = wxGetCwd();
 
-    for (int i = 0; i < config_path.size(); i++)
+    for (size_t i = 0; i < config_path.size(); i++)
         if (wxDirExists(config_path[i]) && wxSetWorkingDirectory(config_path[i])) {
             // *.xr[cs] doesn't work (double the number of scans)
             // 2.9 gives errors for no files found, so manual precheck needed
@@ -299,7 +299,7 @@ bool wxvbamApp::OnInit()
     }
 
     // process command-line options
-    for (int i = 0; i < pending_optset.size(); i++) {
+    for (size_t i = 0; i < pending_optset.size(); i++) {
         auto parts = str_split(pending_optset[i], wxT('='));
         opt_set(parts[0], parts[1]);
     }
@@ -470,28 +470,33 @@ void wxvbamApp::OnInitCmdLine(wxCmdLineParser& cl)
     // locale
     static wxCmdLineEntryDesc opttab[] = {
         { wxCMD_LINE_OPTION, NULL, t("save-xrc"),
-            N_("Save built-in XRC file and exit") },
+            N_("Save built-in XRC file and exit"),
+	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
         { wxCMD_LINE_OPTION, NULL, t("save-over"),
-            N_("Save built-in vba-over.ini and exit") },
+            N_("Save built-in vba-over.ini and exit"),
+	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
         { wxCMD_LINE_SWITCH, NULL, t("print-cfg-path"),
-            N_("Print configuration path and exit") },
+            N_("Print configuration path and exit"),
+	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
         { wxCMD_LINE_SWITCH, t("f"), t("fullscreen"),
-            N_("Start in full-screen mode") },
+            N_("Start in full-screen mode"), 
+	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
 #if !defined(NO_LINK) && !defined(__WXMSW__)
         { wxCMD_LINE_SWITCH, t("s"), t("delete-shared-state"),
-            N_("Delete shared link state first, if it exists") },
+            N_("Delete shared link state first, if it exists"),
+	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
 #endif
         // stupid wx cmd line parser doesn't support duplicate options
         //	{ wxCMD_LINE_OPTION, t("o"),  t("option"),
         //		_("Set configuration option; <opt>=<value> or help for list"),
-        {
-            wxCMD_LINE_SWITCH, t("o"), t("list-options"),
-            N_("List all settable options and exit") },
+        { wxCMD_LINE_SWITCH, t("o"), t("list-options"),
+            N_("List all settable options and exit"),
+	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
         { wxCMD_LINE_PARAM, NULL, NULL,
             N_("ROM file"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
         { wxCMD_LINE_PARAM, NULL, NULL,
             N_("<config>=<value>"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE | wxCMD_LINE_PARAM_OPTIONAL },
-        { wxCMD_LINE_NONE }
+        { wxCMD_LINE_NONE, NULL, NULL, NULL, wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE }
     };
 // 2.9 automatically translates desc, but 2.8 doesn't
 #if !wxCHECK_VERSION(2, 9, 0)
@@ -667,10 +672,10 @@ wxvbamApp::~wxvbamApp() {
 
 MainFrame::MainFrame()
     : wxFrame()
-    , focused(false)
     , paused(false)
     , menus_opened(0)
     , dialog_opened(0)
+    , focused(false)
 {
 }
 
@@ -749,6 +754,7 @@ void MainFrame::OnMenu(wxContextMenuEvent& event)
 
 void MainFrame::OnMove(wxMoveEvent& event)
 {
+    (void)event; // unused params
     wxRect pos = GetRect();
     int x = pos.GetX(), y = pos.GetY();
     if (x >= 0 && y >= 0 && !IsFullScreen())
@@ -815,7 +821,7 @@ void MainFrame::SetJoystick()
         for (int j = 0; j < NUM_KEYS; j++) {
             wxJoyKeyBinding_v b = gopts.joykey_bindings[i][j];
 
-            for (int k = 0; k < b.size(); k++) {
+            for (size_t k = 0; k < b.size(); k++) {
                 int jn = b[k].joy;
 
                 if (jn) {
@@ -884,7 +890,7 @@ void MainFrame::update_state_ts(bool force)
                 wxString df = fts.Format(wxT("0&0 %x %X"));
 
                 if (!ts.IsValid())
-                    for (int j = 0; j < df.size(); j++)
+                    for (size_t j = 0; j < df.size(); j++)
                         if (wxIsdigit(df[j]))
                             df[j] = wxT('-');
 

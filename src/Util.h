@@ -10,6 +10,8 @@
 #define FILE_SEP '/'
 #endif
 
+#define FREAD_UNCHECKED(A,B,C,D) (void)(fread(A,B,C,D) + 1)
+
 enum IMAGE_TYPE { IMAGE_UNKNOWN = -1, IMAGE_GBA = 0, IMAGE_GB = 1 };
 
 // save game

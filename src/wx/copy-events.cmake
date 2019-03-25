@@ -18,7 +18,7 @@ SET(EVLINES )
 FOREACH(EV ${MW})
     # stripping the wxID_ makes it look better, but it's still all-caps
     STRING(REGEX REPLACE "^[^\"]*\\((wxID_|)([^,]*),[^\"]*(\"[^\"]*\")[^,)]*(,[^)]*|).*"
-                         "    {wxT(\"\\2\"), wxTRANSLATE(\\3), XRCID(\"\\1\\2\")\\4 }"
+                         "    new_cmditem(wxT(\"\\2\"), wxTRANSLATE(\\3), XRCID(\"\\1\\2\")\\4 )"
 			 EV "${EV}")
     STRING(REGEX REPLACE "XRCID\\(\"(wxID_[^\"]*)\"\\)" "\\1" EV ${EV})
     LIST(APPEND EVLINES "${EV},\n")

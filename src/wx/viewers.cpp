@@ -82,11 +82,13 @@ public:
     }
     void Next(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         CPULoop(1);
         GotoPC();
     }
     void Goto(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         wxString as = goto_addr->GetValue();
 
         if (!as.size())
@@ -100,6 +102,7 @@ public:
     // wx-2.8.4 or MacOSX compiler can't resolve overloads in evt table
     void GotoPCEv(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         GotoPC();
     }
     void GotoPC()
@@ -120,6 +123,7 @@ public:
     }
     void RefreshCmd(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         UpdateDis();
     }
     void UpdateDis()
@@ -143,6 +147,7 @@ public:
 
     void RefillListEv(wxCommandEvent& ev)
     {
+        (void)ev; // unused params
         // what an unsafe calling convention
         // examination of disArm shows that max len is 69 chars
         // (e.g. 0x081cb6db), and I assume disThumb is shorter
@@ -221,11 +226,13 @@ public:
     }
     void Next(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         gbEmulate(1);
         GotoPC();
     }
     void Goto(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         wxString as = goto_addr->GetValue();
 
         if (!as.size())
@@ -239,6 +246,7 @@ public:
     // wx-2.8.4 or MacOSX compiler can't resolve overloads in evt table
     void GotoPCEv(wxCommandEvent& ev)
     {
+        (void)ev; // unused params
         GotoPC();
     }
     void GotoPC()
@@ -248,6 +256,7 @@ public:
     }
     void RefreshCmd(wxCommandEvent& ev)
     {
+        (void)ev; // unused params
         UpdateDis();
     }
     void UpdateDis()
@@ -278,6 +287,7 @@ public:
 
     void RefillListEv(wxCommandEvent& ev)
     {
+        (void)ev; // unused params
         // what an unsafe calling convention
         // examination of gbDis shows that max len is 26 chars
         // (e.g. 0xe2)
@@ -322,6 +332,10 @@ void MainFrame::Disassemble(void)
     case IMAGE_GB:
         LoadXRCViewer(GBDisassemble);
         break;
+
+    case IMAGE_UNKNOWN:
+        // do nothing
+        break;
     }
 }
 
@@ -357,7 +371,7 @@ public:
         wxString longline = lline;
         int lwidth = 0;
 
-        for (int i = 0; i < NUM_IOREGS; i++) {
+        for (long unsigned int i = 0; i < NUM_IOREGS; i++) {
             addr->Append(wxGetTranslation(ioregs[i].name));
 
             // find longest label
@@ -391,6 +405,7 @@ public:
 
     void SelectEv(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         Select(addr->GetSelection());
     }
 
@@ -450,11 +465,13 @@ public:
 
     void RefreshEv(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         Update();
     }
 
     void Apply(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         int sel = addr->GetSelection();
         uint16_t* addr = ioregs[sel].address ? ioregs[sel].address : (uint16_t*)&ioMem[ioregs[sel].offset];
         uint16_t mask, reg = *addr;
@@ -534,6 +551,7 @@ void LogDialog::Update()
 
 void LogDialog::Save(wxCommandEvent& ev)
 {
+    (void)ev; // unused params
     static wxString logdir = wxEmptyString, def_name = wxEmptyString;
 
     if (def_name.empty())
@@ -560,6 +578,7 @@ void LogDialog::Save(wxCommandEvent& ev)
 
 void LogDialog::Clear(wxCommandEvent& ev)
 {
+    (void)ev; // unused params
     wxGetApp().log.clear();
     Update();
 }
@@ -641,12 +660,14 @@ public:
     }
     void BlockStart(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         unsigned long l;
         bs->GetStringSelection().ToULong(&l, 0);
         Goto(l);
     }
     void GotoEv(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         unsigned long l;
         wxString v = goto_addr->GetValue();
 
@@ -662,6 +683,7 @@ public:
     }
     void RefreshCmd(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         Update();
     }
 
@@ -669,6 +691,7 @@ public:
 
     void Load(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         if (memsave_fn.empty())
             memsave_fn = wxGetApp().frame->GetPanel()->game_name() + wxT(".dmp");
 
@@ -720,6 +743,7 @@ public:
 
     void Save(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         wxString s;
         s.Printf(addrlen == 4 ? wxT("%04X") : wxT("%08X"), mv->GetAddr());
         selreg_addr->SetValue(s);
@@ -802,6 +826,7 @@ public:
     // wx-2.8.4 or MacOSX compiler can't resolve overloads in evt table
     void RefillListEv(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         Update();
     }
 
@@ -823,6 +848,7 @@ public:
 
     void WriteVal(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         switch (mv->fmt) {
         case 0:
             CPUWriteByteQuick(mv->writeaddr, mv->writeval);
@@ -849,7 +875,7 @@ public:
         while (len > 0) {
             memoryMap m = map[addr >> 24];
             uint32_t off = addr & m.mask;
-            uint32_t wlen = (off + len) > m.mask ? m.mask + 1 - off : len;
+            int wlen = (off + len) > m.mask ? m.mask + 1 - off : len;
             wlen = f.Read(m.address + off, wlen);
 
             if (wlen < 0)
@@ -871,7 +897,7 @@ public:
         while (len > 0) {
             memoryMap m = map[addr >> 24];
             uint32_t off = addr & m.mask;
-            uint32_t wlen = (off + len) > m.mask ? m.mask + 1 - off : len;
+            int wlen = (off + len) > m.mask ? m.mask + 1 - off : len;
             wlen = f.Write(m.address + off, wlen);
 
             if (wlen < 0)
@@ -910,6 +936,7 @@ public:
     // wx-2.8.4 or MacOSX compiler can't resolve overloads in evt table
     void RefillListEv(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         Update();
     }
 
@@ -931,6 +958,7 @@ public:
 
     void WriteVal(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         switch (mv->fmt) {
         case 0:
             GBWriteByteQuick(mv->writeaddr, mv->writeval);
@@ -957,7 +985,7 @@ public:
         while (len > 0) {
             uint8_t* maddr = gbMemoryMap[addr >> 12];
             uint32_t off = addr & 0xfff;
-            uint32_t wlen = (off + len) > 0xfff ? 0x1000 - off : len;
+            int wlen = (off + len) > 0xfff ? 0x1000 - off : len;
             wlen = f.Read(maddr + off, wlen);
 
             if (wlen < 0)
@@ -979,7 +1007,7 @@ public:
         while (len > 0) {
             uint8_t* maddr = gbMemoryMap[addr >> 12];
             uint32_t off = addr & 0xfff;
-            uint32_t wlen = (off + len) > 0xfff ? 0x1000 - off : len;
+            int wlen = (off + len) > 0xfff ? 0x1000 - off : len;
             wlen = f.Write(maddr + off, wlen);
 
             if (wlen < 0)
@@ -1008,6 +1036,9 @@ void MainFrame::MemViewer()
 
     case IMAGE_GB:
         LoadXRCViewer(GBMem);
+        break;
+
+    default:
         break;
     }
 }

@@ -15,6 +15,12 @@ typedef struct wxJoyKeyBinding {
     // if joy is non-0, key = control number, and mod = control type
 } wxJoyKeyBinding;
 
+wxJoyKeyBinding newWxJoyKeyBinding(int key = 0, int mod = 0, int joy = 0)
+{
+    struct wxJoyKeyBinding tmp = {key, mod, joy};
+    return tmp;
+}
+
 typedef std::vector<wxJoyKeyBinding> wxJoyKeyBinding_v;
 
 // joystick control types
@@ -87,6 +93,7 @@ public:
     bool TransferFromWindow();
     bool Validate(wxWindow* p)
     {
+        (void)p; // unused params
         return true;
     }
 

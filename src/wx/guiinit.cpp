@@ -73,10 +73,12 @@ public:
     wxButton* okb;
     void ServerOKButton(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         okb->SetLabel(_("Start!"));
     }
     void ClientOKButton(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         okb->SetLabel(_("Connect"));
     }
     // attached to OK, so skip when OK
@@ -306,7 +308,7 @@ public:
         } break;
 
         case wxID_REMOVE: {
-            bool asked = false, restore;
+            bool asked = false, restore = false;
 
             for (int i = list->GetItemCount() - 1; i >= 0; i--)
                 if (list->GetItemState(i, wxLIST_STATE_SELECTED)) {
@@ -705,10 +707,14 @@ public:
     CheatListFill(const CheatListFill& e)
         : wxValidator()
     {
+	(void)e; // unused params
     }
     wxObject* Clone() const { return new CheatListFill(*this); }
     bool TransferFromWindow() { return true; }
-    bool Validate(wxWindow* p) { return true; }
+    bool Validate(wxWindow* p) {
+	(void)p; // unused params
+	return true;
+    }
     bool TransferToWindow()
     {
         CheatList_t& clh = cheat_list_handler;
@@ -886,6 +892,7 @@ public:
 
     void UpdateVals(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         if (cheatSearchData.count) {
             cheatSearchUpdateValues(&cheatSearchData);
 
@@ -898,6 +905,7 @@ public:
 
     void ResetSearch(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         if (!cheatSearchData.count) {
             CheatSearchBlock* block = cheatSearchData.blocks;
 
@@ -989,6 +997,7 @@ public:
 
     void AddCheatB(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         int idx = list->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 
         if (idx >= 0)
@@ -1195,6 +1204,7 @@ public:
 
     void UpdateView(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         dlg->TransferDataFromWindow();
 
         if (ofmt != fmt && !val_s.empty()) {
@@ -1283,10 +1293,14 @@ public:
     CheatFindFill(const CheatFindFill& e)
         : wxValidator()
     {
+	(void)e; // unused params
     }
     wxObject* Clone() const { return new CheatFindFill(*this); }
     bool TransferFromWindow() { return true; }
-    bool Validate(wxWindow* p) { return true; }
+    bool Validate(wxWindow* p) {
+	(void)p; // unused params
+	return true;
+    }
     bool TransferToWindow()
     {
         CheatFind_t& cfh = cheat_find_handler;
@@ -1314,7 +1328,7 @@ wxString CheatListCtrl::OnGetItemText(long item, long column) const
         off = (item & ((1 << (cap_size - size)) - 1)) << size;
         item >>= cap_size - size;
     } else if (cap_size < size) {
-        for (int i = 0; i < addrs.size(); i++) {
+        for (size_t i = 0; i < addrs.size(); i++) {
             if (!(addrs[i] & ((1 << size) - 1)) && !item--) {
                 item = i;
                 break;
@@ -1419,6 +1433,7 @@ public:
     }
     void ColorReset(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         const uint16_t* color = &systemGbPalette[pno * 8];
 
         for (int i = 0; i < 8; i++, color++)
@@ -1429,6 +1444,7 @@ public:
 
     void ColorButton(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         c->SetSelection(0);
     }
 } GBColorConfigHandler[3];
@@ -1443,10 +1459,14 @@ public:
     GBACtrlEnabler(const GBACtrlEnabler& e)
         : wxValidator()
     {
+	(void)e; // unused params
     }
     wxObject* Clone() const { return new GBACtrlEnabler(*this); }
     bool TransferFromWindow() { return true; }
-    bool Validate(wxWindow* p) { return true; }
+    bool Validate(wxWindow* p) {
+	(void)p; // unused params
+	return true;
+    }
     bool TransferToWindow()
     {
         GetWindow()->Enable(wxGetApp().frame->GetPanel()->game_type() == IMAGE_GBA);
@@ -1465,6 +1485,7 @@ public:
     }
     void Detect(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         uint32_t sz = wxGetApp().frame->GetPanel()->game_size();
         utilGBAFindSave(sz);
         type->SetSelection(saveType);
@@ -1490,6 +1511,7 @@ public:
 
     void FullVol(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         vol->SetValue(100);
     }
     void AdjustFrames(int count)
@@ -1500,6 +1522,7 @@ public:
     }
     void AdjustFramesEv(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         AdjustFrames(bufs->GetValue());
     }
 
@@ -1549,7 +1572,7 @@ public:
 
         dev->SetSelection(0);
 
-        for (int i = 0; i < names.size(); i++) {
+        for (size_t i = 0; i < names.size(); i++) {
             dev->Append(names[i]);
 
             if (api == gopts.audio_api && gopts.audio_dev == dev_ids[i])
@@ -1587,9 +1610,13 @@ public:
     SoundConfigLoad(const SoundConfigLoad& e)
         : wxValidator()
     {
+	(void)e; // unused params
     }
     wxObject* Clone() const { return new SoundConfigLoad(*this); }
-    bool Validate(wxWindow* p) { return true; }
+    bool Validate(wxWindow* p) {
+	(void)p; // unused params
+	return true;
+    }
     bool TransferToWindow()
     {
         SoundConfig_t& sch = sound_config_handler;
@@ -1650,9 +1677,13 @@ public:
     ScreenModeList(const ScreenModeList& e)
         : wxValidator()
     {
+	(void)e; // unused params
     }
     wxObject* Clone() const { return new ScreenModeList(*this); }
-    bool Validate(wxWindow* p) { return true; }
+    bool Validate(wxWindow* p) {
+	(void)p; // unused params
+	return true;
+    }
     bool TransferToWindow()
     {
         wxChoice* c = wxStaticCast(GetWindow(), wxChoice);
@@ -1666,7 +1697,7 @@ public:
         vm = d.GetModes();
         wxString s;
 
-        for (int i = 0; i < vm.size(); i++) {
+        for (size_t i = 0; i < vm.size(); i++) {
             s.Printf(_("%d x %d - %dbpp @ %dHz"), vm[i].w, vm[i].h, vm[i].bpp, vm[i].refresh);
             c->Append(s);
 
@@ -1724,10 +1755,14 @@ public:
     PluginEnabler(const PluginEnabler& e)
         : wxValidator()
     {
+	(void)e; // unused params
     }
     wxObject* Clone() const { return new PluginEnabler(*this); }
     bool TransferFromWindow() { return true; }
-    bool Validate(wxWindow* p) { return true; }
+    bool Validate(wxWindow* p) {
+	(void)p; // unused params
+	return true;
+    }
     bool TransferToWindow()
     {
         GetWindow()->Enable(gopts.filter == FF_PLUGIN);
@@ -1752,22 +1787,25 @@ class PluginListFiller : public PluginEnabler {
 public:
     PluginListFiller(wxDialog* parent, wxControl* lab, wxChoice* ch)
         : PluginEnabler()
+	, dlg(parent)
         , txt(lab)
-        , dlg(parent)
-        , plugins()
         , filtch(ch)
+        , plugins()
     {
     }
     PluginListFiller(const PluginListFiller& e)
         : PluginEnabler()
+	, dlg(e.dlg)
         , txt(e.txt)
-        , dlg(e.dlg)
-        , plugins(e.plugins)
         , filtch(e.filtch)
+        , plugins(e.plugins)
     {
     }
     wxObject* Clone() const { return new PluginListFiller(*this); }
-    bool Validate(wxWindow* p) { return true; }
+    bool Validate(wxWindow* p) {
+	(void)p; // unused params
+	return true;
+    }
     bool TransferToWindow()
     {
         PluginEnabler::TransferToWindow();
@@ -1778,10 +1816,10 @@ public:
         const wxString plpath = wxGetApp().GetPluginsDir();
         wxDir::GetAllFiles(plpath, &plugins, wxT("*.rpi"), wxDIR_FILES | wxDIR_DIRS);
 
-        for (int i = 0; i < plugins.size(); i++) {
+        for (size_t i = 0; i < plugins.size(); i++) {
             wxDynamicLibrary dl(plugins[i], wxDL_VERBATIM | wxDL_NOW);
             RENDPLUG_GetInfo GetInfo;
-            const RENDER_PLUGIN_INFO* rpi;
+            const RENDER_PLUGIN_INFO* rpi = NULL;
 
             if (dl.IsLoaded() && (GetInfo = (RENDPLUG_GetInfo)dl.GetSymbol(wxT("RenderPluginGetInfo"))) &&
                 // note that in actual kega fusion plugins, rpi->Output is
@@ -1803,8 +1841,10 @@ public:
 
                 if (plugins[i] == gopts.filter_plugin)
                     ch->SetSelection(i + 1);
-            } else
+            }
+	    else {
                 plugins.RemoveAt(i--);
+	    }
         }
 
         if (ch->GetCount() == 1) {
@@ -1994,7 +2034,7 @@ public:
         asb->Enable(!key->GetValue().empty());
         int cmd = id->val;
 
-        for (int i = 0; i < accels.size(); i++)
+        for (size_t i = 0; i < accels.size(); i++)
             if (accels[i].GetCommand() == cmdtab[cmd].cmd_id)
                 lb->Append(wxKeyTextCtrl::ToString(accels[i].GetFlags(),
                     accels[i].GetKeyCode()));
@@ -2003,12 +2043,14 @@ public:
     // after selecting a key in key list, enable Remove button
     void KeySel(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         remb->Enable(lb->GetSelection() != wxNOT_FOUND);
     }
 
     // remove selected binding
     void Remove(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         int lsel = lb->GetSelection();
 
         if (lsel == wxNOT_FOUND)
@@ -2039,7 +2081,7 @@ public:
         // if it's a system accel, disable by assigning to NOOP
         wxAcceleratorEntry_v& sys_accels = wxGetApp().frame->sys_accels;
 
-        for (int i = 0; i < sys_accels.size(); i++)
+        for (size_t i = 0; i < sys_accels.size(); i++)
             if (sys_accels[i].GetFlags() == selmod && sys_accels[i].GetKeyCode() == selkey) {
                 wxAcceleratorEntry ne(selmod, selkey, XRCID("NOOP"));
                 user_accels.push_back(ne);
@@ -2057,6 +2099,7 @@ public:
     // wipe out all user bindings
     void ResetAll(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         if (user_accels.empty() || wxMessageBox(_("This will clear all user-defined accelerators.  Are you sure?"), _("Confirm"), wxYES_NO) != wxYES)
             return;
 
@@ -2072,6 +2115,7 @@ public:
     // remove old key binding, add new key binding, and update GUI
     void Assign(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         wxTreeItemId csel = tc->GetSelection();
         wxString accel = key->GetValue();
 
@@ -2083,7 +2127,7 @@ public:
         if (!wxKeyTextCtrl::FromString(accel, acmod, ackey))
             return; // this should never happen
 
-        for (int i = 0; i < lb->GetCount(); i++)
+        for (unsigned int i = 0; i < lb->GetCount(); i++)
             if (lb->GetString(i) == accel)
                 return; // ignore attempts to add twice
 
@@ -2112,6 +2156,7 @@ public:
     // update curas and maybe enable asb
     void CheckKey(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         wxString nkey = key->GetValue();
 
         if (nkey.empty()) {
@@ -2132,7 +2177,7 @@ public:
         asb->Enable(tc->GetSelection().IsOk());
         int cmd = -1;
 
-        for (int i = 0; i < accels.size(); i++)
+        for (size_t i = 0; i < accels.size(); i++)
             if (accels[i].GetFlags() == acmod && accels[i].GetKeyCode() == ackey) {
                 int cmdid = accels[i].GetCommand();
 
@@ -2219,6 +2264,7 @@ public:
     // set thrsel from thr
     void SetThrottleSel(wxSpinEvent& evt)
     {
+	(void)evt; // unused params
         DoSetThrottleSel(thr->GetValue());
     }
 
@@ -2233,6 +2279,7 @@ public:
     // set thr from thrsel
     void SetThrottle(wxCommandEvent& evt)
     {
+	(void)evt; // unused params
         uint32_t val = thrsel->GetSelection() * 25;
 
         if (val <= 600)
@@ -2272,6 +2319,7 @@ public:
     // set speedup_throttle_sel from speedup_throttle
     void SetSpeedupThrottleSel(wxSpinEvent& evt)
     {
+	(void)evt; // unused params
         DoSetSpeedupThrottleSel(speedup_throttle_spin->GetValue());
     }
 
@@ -2290,6 +2338,7 @@ public:
     // set speedup_throttle from speedup_throttle_sel
     void SetSpeedupThrottle(wxCommandEvent& evt)
     {
+	(void)evt; // unused params
         uint32_t val = speedup_throttle_sel->GetSelection() * 25;
 
         if (val > 0 && val <= 600) {
@@ -2312,6 +2361,7 @@ public:
 // set speedup_frame_skip_sel from speedup_frame_skip
 void SpeedupFrameSkipCtrl_t::SetSpeedupFrameSkipSel(wxSpinEvent& evt)
 {
+    (void)evt; // unused params
     DoSetSpeedupFrameSkipSel(speedup_frame_skip_spin->GetValue());
 }
 
@@ -2330,6 +2380,7 @@ void SpeedupFrameSkipCtrl_t::DoSetSpeedupFrameSkipSel(uint32_t val)
 // set speedup_frame_skip from speedup_frame_skip_sel
 void SpeedupFrameSkipCtrl_t::SetSpeedupFrameSkip(wxCommandEvent& evt)
 {
+    (void)evt; // unused params
     uint32_t val = speedup_frame_skip_sel->GetSelection();
 
     if (val > 0 && val <= 30) {
@@ -2451,7 +2502,7 @@ wxAcceleratorEntry_v MainFrame::get_accels(wxAcceleratorEntry_v user_accels)
     // then user overrides
     // silently keep only last defined binding
     // same horribly inefficent O(n*m) search for duplicates as above..
-    for (int i = 0; i < user_accels.size(); i++) {
+    for (size_t i = 0; i < user_accels.size(); i++) {
         const wxAcceleratorEntry& ae = user_accels[i];
 
         for (wxAcceleratorEntry_v::iterator e = accels.begin(); e < accels.end(); ++e)
@@ -2477,7 +2528,7 @@ void MainFrame::set_global_accels()
     // the menus will be added now
 
     // first, zero out menu item on all accels
-    for (int i = 0; i < accels.size(); i++)
+    for (size_t i = 0; i < accels.size(); i++)
         accels[i].Set(accels[i].GetFlags(), accels[i].GetKeyCode(),
             accels[i].GetCommand());
 
@@ -2495,7 +2546,7 @@ void MainFrame::set_global_accels()
         int cmd = cmdtab[i].cmd_id;
         int last_accel = -1;
 
-        for (int j = 0; j < accels.size(); j++)
+        for (size_t j = 0; j < accels.size(); j++)
             if (cmd == accels[j].GetCommand())
                 last_accel = j;
 
@@ -2512,14 +2563,14 @@ void MainFrame::set_global_accels()
     // Finally, install a global accelerator table for any non-menu accels
     int len = 0;
 
-    for (int i = 0; i < accels.size(); i++)
+    for (size_t i = 0; i < accels.size(); i++)
         if (!accels[i].GetMenuItem())
             len++;
 
     if (len) {
         wxAcceleratorEntry tab[1000];
 
-        for (int i = 0, j = 0; i < accels.size(); i++)
+        for (size_t i = 0, j = 0; i < accels.size(); i++)
             if (!accels[i].GetMenuItem())
                 tab[j++] = accels[i];
 
@@ -2534,7 +2585,7 @@ void MainFrame::set_global_accels()
     for (int i = 0; i < 10; i++)
         recent_accel[i] = wxAcceleratorEntry();
 
-    for (int i = 0; i < accels.size(); i++)
+    for (size_t i = 0; i < accels.size(); i++)
         if (accels[i].GetCommand() >= wxID_FILE1 && accels[i].GetCommand() <= wxID_FILE10)
             recent_accel[accels[i].GetCommand() - wxID_FILE1] = accels[i];
 
@@ -2545,7 +2596,7 @@ void MainFrame::MenuOptionBool(const char* menuName, bool& field)
 {
     int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
 
-    for (int i = 0; i < checkable_mi.size(); i++) {
+    for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (checkable_mi[i].cmd != id)
             continue;
 
@@ -2560,7 +2611,7 @@ void MainFrame::MenuOptionIntMask(const char* menuName, int& field, int mask)
     int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
     int value = mask;
 
-    for (int i = 0; i < checkable_mi.size(); i++) {
+    for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (checkable_mi[i].cmd != id)
             continue;
 
@@ -2576,7 +2627,7 @@ void MainFrame::MenuOptionIntRadioValue(const char* menuName, int& field, int va
 {
     int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
 
-    for (int i = 0; i < checkable_mi.size(); i++) {
+    for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (checkable_mi[i].cmd != id)
             continue;
 
@@ -2794,7 +2845,7 @@ bool MainFrame::BindControls()
 
                 // store checkable items
                 if (mi->IsCheckable()) {
-                    checkable_mi_t cmi = { cmdtab[i].cmd_id, mi };
+                    checkable_mi_t cmi = { cmdtab[i].cmd_id, mi, NULL, NULL, 0, 0 };
                     checkable_mi.push_back(cmi);
 
                     for (int j = 0; j < num_opts; j++) {
@@ -2877,7 +2928,7 @@ bool MainFrame::BindControls()
         MenuOptionIntRadioValue("LinkType4Gameboy", gopts.gba_link_type, 4);
     }
 
-    for (int i = 0; i < checkable_mi.size(); i++)
+    for (size_t i = 0; i < checkable_mi.size(); i++)
         if (!checkable_mi[i].boolopt && !checkable_mi[i].intopt) {
             wxLogError(_("Invalid menu item %s; removing"),
                 checkable_mi[i].mi->GetItemLabelText().mb_str());
@@ -3314,6 +3365,7 @@ bool MainFrame::BindControls()
         }
 #define getcbbe(n, o) getbe(n, o, cb, wxCheckBox, CB)
         wxBoolIntEnValidator* bienval;
+	(void)bienval; // not used yet
 #define getbie(n, o, v, cv, t, wt)                                        \
     do {                                                                  \
         cv = SafeXRCCTRL<t>(d, n);                                        \
@@ -3656,7 +3708,7 @@ bool MainFrame::BindControls()
             if (menubar) {
                 wxTreeItemId mid = tc->AppendItem(rid, _("Menu commands"));
 
-                for (int i = 0; i < menubar->GetMenuCount(); i++) {
+                for (size_t i = 0; i < menubar->GetMenuCount(); i++) {
 #if wxCHECK_VERSION(2, 8, 8)
                     wxTreeItemId id = tc->AppendItem(mid, menubar->GetMenuLabelText(i));
 #else

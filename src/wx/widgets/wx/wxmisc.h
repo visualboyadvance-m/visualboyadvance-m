@@ -33,16 +33,16 @@ class wxBoolIntValidator : public wxValidator {
 public:
     wxBoolIntValidator(int* _vptr, int _val, int _mask = ~0)
         : wxValidator()
-        , vptr(_vptr)
         , val(_val)
         , mask(_mask)
+        , vptr(_vptr)
     {
     }
     wxBoolIntValidator(const wxBoolIntValidator& v)
         : wxValidator()
-        , vptr(v.vptr)
         , val(v.val)
         , mask(v.mask)
+        , vptr(v.vptr)
     {
     }
     wxObject* Clone() const
@@ -53,6 +53,7 @@ public:
     bool TransferFromWindow();
     bool Validate(wxWindow* p)
     {
+        (void)p; // unused params
         return true;
     }
 
@@ -105,6 +106,7 @@ public:
     bool TransferFromWindow();
     bool Validate(wxWindow* p)
     {
+        (void)p; // unused params
         return true;
     }
 
@@ -133,6 +135,7 @@ public:
     bool TransferFromWindow();
     bool Validate(wxWindow* p)
     {
+        (void)p; // unused params
         return true;
     }
 
@@ -156,8 +159,8 @@ public:
     }
     wxColorValidator(uint16_t* vptr)
         : wxValidator()
-        , ptr16(vptr)
         , ptr32(0)
+        , ptr16(vptr)
     {
     }
     wxColorValidator(const wxColorValidator& v)
@@ -174,6 +177,7 @@ public:
     bool TransferFromWindow();
     bool Validate(wxWindow* p)
     {
+        (void)p; // unused params
         return true;
     }
 

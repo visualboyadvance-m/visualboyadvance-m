@@ -5,6 +5,7 @@
 namespace Viewers {
 void Viewer::CloseDlg(wxCloseEvent& ev)
 {
+    (void)ev; // unused params
     // stop tracking dialog
     MainFrame* f = wxGetApp().frame;
 
@@ -76,12 +77,12 @@ IMPLEMENT_DYNAMIC_CLASS(DisList, wxPanel)
 
 DisList::DisList()
     : wxPanel()
+    , nlines(0)
+    , topaddr(0)
     , tc()
     , sb()
     , didinit(false)
-    , nlines(0)
     , issel(false)
-    , topaddr(0)
 {
 }
 
@@ -191,7 +192,7 @@ void DisList::Refill()
     MoveSB();
     wxString val;
 
-    for (int i = 0; i < nlines && i < strings.size(); i++) {
+    for (size_t i = 0; i < (size_t)nlines && i < strings.size(); i++) {
         val += strings[i];
         val += wxT('\n');
     }
@@ -203,6 +204,7 @@ void DisList::Refill()
 // on resize, recompute shown lines and refill if necessary
 void DisList::Resize(wxSizeEvent& ev)
 {
+    (void)ev; // unused params
     if (!didinit) // prevent crash on win32
         return;
 
@@ -215,10 +217,10 @@ void DisList::Resize(wxSizeEvent& ev)
     wxString val;
     tc.SetSize(sz.GetWidth(), (nlines + 1) * lineheight + extraheight);
 
-    if (nlines > strings.size())
+    if ((size_t)nlines > strings.size())
         RefillNeeded();
     else {
-        for (int i = 0; i < nlines && i < strings.size(); i++) {
+        for (size_t i = 0; i < (size_t)nlines && i < strings.size(); i++) {
             val += strings[i];
             val += wxT('\n');
         }
@@ -236,7 +238,7 @@ void DisList::SetSel()
     if (!issel)
         return;
 
-    if (nlines > addrs.size() || (uint32_t)addrs[0] > seladdr || (uint32_t)addrs[nlines - 1] <= seladdr)
+    if ((size_t)nlines > addrs.size() || (uint32_t)addrs[0] > seladdr || (uint32_t)addrs[nlines - 1] <= seladdr)
         return;
 
     for (int i = 0, start = 0; i < nlines; i++) {
@@ -262,7 +264,7 @@ void DisList::SetSel(uint32_t addr)
     seladdr = addr;
     issel = true;
 
-    if (addrs.size() < 4 || addrs.size() < nlines || topaddr > addr || (uint32_t)addrs[addrs.size() - 4] < addr) {
+    if (addrs.size() < 4 || addrs.size() < (size_t)nlines || topaddr > addr || (uint32_t)addrs[addrs.size() - 4] < addr) {
         topaddr = addr;
         strings.clear();
         addrs.clear();
@@ -282,13 +284,13 @@ IMPLEMENT_DYNAMIC_CLASS(MemView, wxPanel)
 
 MemView::MemView()
     : wxPanel()
+    , nlines(0)
+    , topaddr(0)
+    , addrlab(0)
     , disp()
     , sb()
     , didinit(false)
-    , nlines(0)
     , selnib(-1)
-    , topaddr(0)
-    , addrlab(0)
 {
 }
 
@@ -370,7 +372,7 @@ void MemView::MouseEvent(wxMouseEvent& ev)
 
 void MemView::ShowCaret()
 {
-    if (seladdr < topaddr || seladdr >= topaddr + nlines * 16)
+    if (seladdr < (int)topaddr || seladdr >= (int)topaddr + nlines * 16)
         selnib = -1;
 
     if (selnib < 0) {
@@ -429,7 +431,7 @@ void MemView::KeyEvent(wxKeyEvent& ev)
             selnib--;
 
         if (selnib >= 32) {
-            if (seladdr == maxaddr - 16)
+            if (seladdr == (int)maxaddr - 16)
                 selnib = 32 - nnib;
             else {
                 selnib -= 32;
@@ -461,7 +463,7 @@ void MemView::KeyEvent(wxKeyEvent& ev)
 
     case WXK_DOWN:
     case WXK_NUMPAD_DOWN:
-        if (seladdr < maxaddr - 16)
+        if (seladdr < (int)maxaddr - 16)
             seladdr += 16;
 
         break;
@@ -493,7 +495,7 @@ void MemView::KeyEvent(wxKeyEvent& ev)
             selnib--;
 
         if (selnib >= 32) {
-            if (seladdr == maxaddr - 16)
+            if (seladdr == (int)maxaddr - 16)
                 selnib = 32 - nnib;
             else {
                 selnib -= 32;
@@ -507,7 +509,7 @@ void MemView::KeyEvent(wxKeyEvent& ev)
             mask = 0xff << bno * 8;
             val = k << bno * 8;
         } else {
-            mask = 0xf << bno * 8 + nibno * 4;
+            mask = 8 * (0xf << bno) + 4 * nibno;
             val = isdigit(k) ? k - '0' : tolower(k) + 10 - 'a';
             val <<= bno * 8 + nibno * 4;
         }
@@ -515,7 +517,7 @@ void MemView::KeyEvent(wxKeyEvent& ev)
         if ((words[wno] & mask) == val)
             break;
 
-        words[wno] = words[wno] & ~mask | val;
+        words[wno] = ((words[wno] & ~mask) | val);
         writeaddr = topaddr + 4 * wno;
         val = words[wno];
 
@@ -631,6 +633,7 @@ void MemView::Repaint()
 
 void MemView::RepaintEv(wxPaintEvent& ev)
 {
+    (void)ev; // unused params
     wxPaintDC dc(&disp);
     dc.SetBackgroundMode(wxSOLID);
     Refill(dc);
@@ -644,7 +647,7 @@ void MemView::Refill(wxDC& dc)
     // doesn't seem to inherit font properly
     dc.SetFont(GetFont());
 
-    for (int i = 0; i < nlines && i < words.size() / 4; i++) {
+    for (size_t i = 0; i < (size_t)nlines && i < words.size() / 4; i++) {
         wxString line, word;
         line.Printf(maxaddr > 0xffff ? wxT("%08X   ") : wxT("%04X   "), topaddr + i * 16);
 
@@ -693,6 +696,7 @@ void MemView::Refill(wxDC& dc)
 // on resize, recompute shown lines and refill if necessary
 void MemView::Resize(wxSizeEvent& ev)
 {
+    (void)ev; // unused params
     if (!didinit) // prevent crash on win32
         return;
 
@@ -705,7 +709,7 @@ void MemView::Resize(wxSizeEvent& ev)
     wxString val;
     disp.SetSize(sz.GetWidth(), (nlines + 1) * charheight);
 
-    if (nlines > words.size() / 4) {
+    if ((size_t)nlines > words.size() / 4) {
         if (topaddr + nlines * 16 > maxaddr)
             topaddr = maxaddr - nlines * 16 + 1;
 
@@ -889,6 +893,7 @@ void PixView::SetSel(int x, int y, bool desel_cview_update)
 
 void PixView::Redraw(wxPaintEvent& ev)
 {
+    (void)ev; // unused params
     if (!bm)
         return;
 
@@ -988,6 +993,7 @@ void PixViewEvt::click()
 IMPLEMENT_DYNAMIC_CLASS(GfxPanel, wxPanel)
 void GfxPanel::DrawBitmap(wxPaintEvent& ev)
 {
+    (void)ev; // unused params
     if (!bm)
         return;
 
@@ -1122,6 +1128,7 @@ void GfxViewer::BMPSize(int w, int h)
 
 void GfxViewer::StretchTog(wxCommandEvent& ev)
 {
+    (void)ev; // unused params
     wxSize sz;
 
     if (str->GetValue()) {
@@ -1138,6 +1145,7 @@ void GfxViewer::StretchTog(wxCommandEvent& ev)
 
 void GfxViewer::SaveBMP(wxCommandEvent& ev)
 {
+    (void)ev; // unused params
     GameArea* panel = wxGetApp().frame->GetPanel();
     bmp_save_dir = wxGetApp().frame->GetGamePath(gopts.scrshot_dir);
     // no attempt is made here to translate the dialog type name
@@ -1175,6 +1183,7 @@ void GfxViewer::SaveBMP(wxCommandEvent& ev)
 
 void GfxViewer::RefreshEv(wxCommandEvent& ev)
 {
+    (void)ev; // unused params
     Update();
 }
 

@@ -289,7 +289,7 @@ bool wxColorValidator::TransferFromWindow()
 
 static void enable(wxWindow_v controls, std::vector<int> reverse, bool en)
 {
-    for (int i = 0; i < controls.size(); i++)
+    for (size_t i = 0; i < controls.size(); i++)
         controls[i]->Enable(reverse.size() <= i || !reverse[i] ? en : !en);
 }
 
@@ -461,6 +461,7 @@ bool wxUIntValidator::TransferFromWindow()
 
 bool wxUIntValidator::Validate(wxWindow* parent)
 {
+    (void)parent; // unused params
     wxSpinCtrl* ctrl = wxDynamicCast(GetWindow(), wxSpinCtrl);
 
     if (ctrl) {

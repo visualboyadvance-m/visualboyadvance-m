@@ -66,7 +66,7 @@ bool FileExists(const char *filename)
 
 // Get user-specific config dir manually.
 // apple:   ~/Library/Application Support/
-// windows: %APPDATA%\
+// windows: %APPDATA%/
 // unix:    ${XDG_CONFIG_HOME:-~/.config}/
 std::string get_xdg_user_config_home()
 {
@@ -94,7 +94,7 @@ std::string get_xdg_user_config_home()
 
 // Get user-specific data dir manually.
 // apple:   ~/Library/Application Support/
-// windows: %APPDATA%\
+// windows: %APPDATA%/
 // unix:    ${XDG_DATA_HOME:-~/.local/share}/
 std::string get_xdg_user_data_home()
 {

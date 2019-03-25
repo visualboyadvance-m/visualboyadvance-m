@@ -264,7 +264,7 @@ IFBFilterFunc ifbFunction = 0;
 
 // allow up to 100 IPS/UPS/PPF patches given on commandline
 int	patchNum = 0;
-char *(patchNames[PATCH_MAX_NUM]) = { NULL }; // and so on
+char *patchNames[PATCH_MAX_NUM] = { NULL }; // and so on
 
 void(*dbgMain)() = remoteStubMain;
 void(*dbgSignal)(int, int) = remoteStubSignal;

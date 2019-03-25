@@ -99,6 +99,7 @@ public:
     bool TransferFromWindow();
     bool Validate(wxWindow* p)
     {
+        p = p;
         return true;
     }
 

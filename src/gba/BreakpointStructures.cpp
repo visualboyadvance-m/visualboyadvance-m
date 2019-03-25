@@ -774,16 +774,19 @@ uint8_t parseConditionOperand(char* type)
             return flag | 0x3;
         if (tolower(type[1]) == 't')
             return flag | 0x2;
+	break;
 
     case 'e':
         if (tolower(type[1]) == 'q')
             return flag | 0x1;
         if (type[1] == '\0')
             return flag | 0x1;
+	break;
     case 'n':
         if (tolower(type[1]) == 'e')
             return flag | 0x6;
-    default:;
+    default:
+	break;
     }
     return flag;
 }

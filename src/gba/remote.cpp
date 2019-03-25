@@ -349,6 +349,7 @@ void debuggerDontBreak(int n, char** args)
 
 void debuggerDontBreakClear(int n, char** args)
 {
+    (void)args; // unused params
     if (n == 1) {
         debuggerNumOfDontBreak = 0;
         {
@@ -782,7 +783,7 @@ unsigned int AddressToGBA(uint8_t* mem)
 
 void debuggerDoSearch()
 {
-    int count = 0;
+    unsigned int count = 0;
 
     while (true) {
         unsigned int final = SearchStart + SearchLength - 1;
@@ -1882,6 +1883,8 @@ void debuggerSymbols(int argc, char** argv)
 
 void debuggerWhere(int n, char** args)
 {
+    (void)n; // unused params
+    (void)args; // unused params
     void elfPrintCallChain(uint32_t);
     elfPrintCallChain(armNextPC);
 }
@@ -1958,6 +1961,7 @@ void debuggerVar(int n, char** args)
 
 bool debuggerBreakOnExecution(uint32_t address, uint8_t state)
 {
+    (void)state; // unused params
     if (dontBreakNow)
         return false;
     if (debuggerInDB(address))
@@ -1975,6 +1979,7 @@ bool debuggerBreakOnExecution(uint32_t address, uint8_t state)
 
 bool debuggerBreakOnRead(uint32_t address, int size)
 {
+    (void)size; // unused params
     if (dontBreakNow)
         return false;
     if (debuggerInDB(armState ? reg[15].I - 4 : reg[15].I - 2))
@@ -1996,6 +2001,8 @@ bool debuggerBreakOnRead(uint32_t address, int size)
 
 bool debuggerBreakOnWrite(uint32_t address, uint32_t value, int size)
 {
+    (void)value; // unused params
+    (void)size; // unused params
     if (dontBreakNow)
         return false;
     if (debuggerInDB(armState ? reg[15].I - 4 : reg[15].I - 2))
@@ -2019,6 +2026,8 @@ bool debuggerBreakOnWrite(uint32_t address, uint32_t value, int size)
 
 void debuggerBreakOnWrite(uint32_t address, uint32_t oldvalue, uint32_t value, int size, int t)
 {
+    (void)oldvalue; // unused params
+    (void)t; // unused params
     debuggerBreakOnWrite(address, value, size);
     //uint32_t lastValue;
     //dexp_eval("old_value", &lastValue);
@@ -2677,6 +2686,8 @@ void deleteBreak(uint32_t address, uint8_t flags, char** expression, int howToDe
 }
 void clearBreaks(uint32_t address, uint8_t flags, char** expression, int howToClear)
 {
+    (void)address; // unused params
+    (void)expression; // unused params
     if (howToClear == 2) {
         removeConditionalWithFlag(flags, true);
         removeConditionalWithFlag(flags << 4, true);
@@ -2692,6 +2703,7 @@ void clearBreaks(uint32_t address, uint8_t flags, char** expression, int howToCl
 
 void listBreaks(uint32_t address, uint8_t flags, char** expression, int howToList)
 {
+    (void)expression; // unused params
     flags |= (flags << 4);
     if (howToList) {
         printAllFlagConditionalsWithAddress(address, flags, true);
@@ -2896,8 +2908,7 @@ void executeBreakCommands(int n, char** cmd)
         operation(address, flag, cmd + 1, n - 1);
         return;
     }
-
-brkcmd_special_register:
+//brkcmd_special_register:
     switch (command[4]) {
     case 'l':
         debuggerBreakRegisterList((n > 0) && (tolower(cmd[0][0]) == 'v'));
@@ -3779,7 +3790,7 @@ void remoteSetBreakPoint(char* p)
 
 void remoteClearBreakPoint(char* p)
 {
-    int result;
+    int result = 0;
     uint32_t address;
     int count;
     sscanf(p, ",%x,%x#", &address, &count);
@@ -3968,6 +3979,7 @@ void remoteReadRegister(char* p)
 
 void remoteReadRegisters(char* p)
 {
+    (void)p; // unused params
     char buffer[1024];
 
     char* s = buffer;
@@ -4226,6 +4238,7 @@ void remoteStubMain()
 
 void remoteStubSignal(int sig, int number)
 {
+    (void)number; // unused params
     remoteSignal = sig;
     remoteResumed = false;
     remoteSendStatus();

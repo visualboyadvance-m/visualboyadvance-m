@@ -39,6 +39,7 @@ bool soundBufferLow;
 
 void systemMessage(int id, const char* fmt, ...)
 {
+    (void)id; // unused params
     static char* buf = NULL;
     static int buflen = 80;
     va_list args;
@@ -359,7 +360,7 @@ void system10Frames(int rate)
         static int speedadj = 0;
         uint32_t t = systemGetClock();
 
-        if (!panel->was_paused && prevclock && (t - prevclock) != 10000 / rate) {
+        if (!panel->was_paused && prevclock && (t - prevclock) != (uint32_t)(10000 / rate)) {
             int speed = t == prevclock ? 100 * 10000 / rate - (t - prevclock) : 100;
 
             // why 98??
@@ -691,11 +692,11 @@ private:
 
 IMPLEMENT_CLASS(PrintDialog, wxEvtHandler)
 
-PrintDialog::PrintDialog(const uint16_t* data, int lines, bool cont)
-    : img(160, lines)
-    , npw(1)
-    , nph(1)
-    , wxPrintout(wxGetApp().frame->GetPanel()->game_name() + wxT(" Printout"))
+PrintDialog::PrintDialog(const uint16_t* data, int lines, bool cont):
+    wxPrintout(wxGetApp().frame->GetPanel()->game_name() + wxT(" Printout")),
+    img(160, lines),
+    npw(1),
+    nph(1)
 {
     dlg = wxStaticCast(wxGetApp().frame->FindWindow(XRCID("GBPrinter")), wxDialog);
     p = XRCCTRL(*dlg, "Preview", wxPanel);
@@ -769,6 +770,7 @@ void PrintDialog::ShowImg(wxPaintEvent& evt)
 
 void PrintDialog::ChangeMag(wxCommandEvent& evt)
 {
+    (void)evt; // unused params
     int m = mag->GetSelection() + 1;
     wxScrolledWindow* pp = wxStaticCast(p->GetParent(), wxScrolledWindow);
     wxSize sz(m * 160, m * img.GetHeight());
@@ -891,6 +893,8 @@ void PrintDialog::DoPrint(wxCommandEvent&)
 
 void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int cont)
 {
+    (void)pages; // unused params
+    (void)cont; // unused params
     ModalPause mp; // this might take a while, so signal a pause
     GameArea* panel = wxGetApp().frame->GetPanel();
     static uint16_t* accum_prdata;
@@ -1111,6 +1115,8 @@ SoundDriver* systemSoundInit()
 
 void systemOnWriteDataToSoundBuffer(const uint16_t* finalWave, int length)
 {
+    (void)finalWave; // unused params
+    (void)length; // unused params
 #ifndef NO_FFMPEG
     GameArea* panel = wxGetApp().frame->GetPanel();
 

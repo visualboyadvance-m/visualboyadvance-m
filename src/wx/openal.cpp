@@ -27,7 +27,8 @@
 #ifdef winlog
 #undef winlog
 #endif
-#define winlog //
+// https://stackoverflow.com/a/1306690/262458
+#define winlog(x,...) do {} while(0)
 #define debugState() //
 #endif
 
@@ -107,31 +108,33 @@ void OpenAL::debugState()
     ALint value = 0;
     alGetSourcei(source, AL_SOURCE_STATE, &value);
     ASSERT_SUCCESS;
+
     winlog(" soundPaused = %i\n", soundPaused);
     winlog(" Source:\n");
     winlog("  State: ");
-
+    
     switch (value) {
     case AL_INITIAL:
         winlog("AL_INITIAL\n");
         break;
-
+    
     case AL_PLAYING:
         winlog("AL_PLAYING\n");
         break;
-
+    
     case AL_PAUSED:
         winlog("AL_PAUSED\n");
         break;
-
+    
     case AL_STOPPED:
         winlog("AL_STOPPED\n");
         break;
-
+    
     default:
         winlog("!unknown!\n");
         break;
     }
+
 
     alGetSourcei(source, AL_BUFFERS_QUEUED, &value);
     ASSERT_SUCCESS;
@@ -252,6 +255,7 @@ void OpenAL::reset()
 
 void OpenAL::write(uint16_t* finalWave, int length)
 {
+    length = length;
     if (!initialized)
         return;
 

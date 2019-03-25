@@ -991,8 +991,17 @@ mapperHuC3 gbDataHuC3 = {
     1, // ROM bank
     0, // RAM bank
     0, // RAM address
+    0, // Address
     0, // RAM flag
-    0 // RAM read value
+    0, // RAM read value
+    0, // Register 1
+    0, // Register 2
+    0, // Register 3
+    0, // Register 4
+    0, // Register 5
+    0, // Register 6
+    0, // Register 7
+    0  // Register 8
 };
 
 // HuC3 ROM write registers

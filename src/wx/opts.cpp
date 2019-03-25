@@ -15,29 +15,26 @@
 
 /* not sure how well other compilers support field-init syntax */
 #define STROPT(c, n, d, v) \
-    {                      \
-        wxT(c), (n), d, &v \
-    }
-#define INTOPT(c, n, d, v, min, max)             \
-    {                                            \
-        wxT(c), (n), d, NULL, &v, wxT(""), min, max \
-    }
-#define DOUBLEOPT(c, n, d, v, min, max)                      \
-    {                                                        \
-        wxT(c), (n), d, NULL, NULL, wxT(""), min, max, NULL, &v \
-    }
-#define UINTOPT(c, n, d, v, min, max)                      \
-    {                                                        \
-        wxT(c), (n), d, NULL, NULL, wxT(""), min, max, NULL, NULL, &v \
-    }
-#define BOOLOPT(c, n, d, v)                        \
-    {                                              \
-        wxT(c), (n), d, NULL, NULL, wxT(""), 0, 0, &v \
-    }
-#define ENUMOPT(c, n, d, v, e)      \
-    {                               \
-        wxT(c), (n), d, NULL, &v, e \
-    }
+    new_opt_desc(wxT(c), (n), d, &v)
+
+#define INTOPT(c, n, d, v, min, max) \
+    new_opt_desc(wxT(c), (n), d, NULL, &v, wxT(""), min, max)
+
+#define DOUBLEOPT(c, n, d, v, min, max) \
+    new_opt_desc(wxT(c), (n), d, NULL, NULL, wxT(""), min, max, NULL, &v)
+
+#define UINTOPT(c, n, d, v, min, max) \
+    new_opt_desc(wxT(c), (n), d, NULL, NULL, wxT(""), min, max, NULL, NULL, &v)
+
+#define BOOLOPT(c, n, d, v) \
+    new_opt_desc(wxT(c), (n), d, NULL, NULL, wxT(""), 0, 0, &v)
+
+#define ENUMOPT(c, n, d, v, e) \
+    new_opt_desc(wxT(c), (n), d, NULL, &v, e)
+
+#define NOOPT(c, n, d) \
+    new_opt_desc(c, (n), d)
+
 
 opts_t gopts;
 
@@ -137,17 +134,27 @@ const wxString joynames[NUM_KEYS] = {
 };
 
 wxJoyKeyBinding defkeys[NUM_KEYS * 2] = {
-    { WXK_UP }, { 1, WXJB_AXIS_MINUS, 1 }, { WXK_DOWN }, { 1, WXJB_AXIS_PLUS, 1 },
-    { WXK_LEFT }, { 0, WXJB_AXIS_MINUS, 1 }, { WXK_RIGHT }, { 0, WXJB_AXIS_PLUS, 1 },
-    { wxT('X') }, { 0, WXJB_BUTTON, 1 }, { wxT('Z') }, { 1, WXJB_BUTTON, 1 },
-    { wxT('A') }, { 2, WXJB_BUTTON, 1 }, { wxT('S') }, { 3, WXJB_BUTTON, 1 },
-    { WXK_BACK }, { 4, WXJB_BUTTON, 1 }, { WXK_RETURN }, { 5, WXJB_BUTTON, 1 },
-    { WXK_NUMPAD_UP }, { 0 }, { WXK_NUMPAD_DOWN }, { 0 },
-    { WXK_NUMPAD_LEFT }, { 0 }, { WXK_NUMPAD_RIGHT }, { 0 },
-    { WXK_NUMPAD_PAGEUP }, { 0 }, { WXK_NUMPAD_PAGEDOWN }, { 0 },
-    { wxT('W') }, { 0 }, { wxT('Q') }, { 0 },
-    { WXK_SPACE }, { 0 }, { 0 }, { 0 },
-    { 0 }, { 0 }
+    newWxJoyKeyBinding(WXK_UP), newWxJoyKeyBinding(1, WXJB_AXIS_MINUS, 1),
+    newWxJoyKeyBinding(WXK_DOWN), newWxJoyKeyBinding(1, WXJB_AXIS_PLUS, 1),
+    newWxJoyKeyBinding(WXK_LEFT), newWxJoyKeyBinding(0, WXJB_AXIS_MINUS, 1),
+    newWxJoyKeyBinding(WXK_RIGHT), newWxJoyKeyBinding(0, WXJB_AXIS_PLUS, 1),
+    newWxJoyKeyBinding(wxT('X')), newWxJoyKeyBinding(0, WXJB_BUTTON, 1),
+    newWxJoyKeyBinding(wxT('Z')), newWxJoyKeyBinding(1, WXJB_BUTTON, 1),
+    newWxJoyKeyBinding(wxT('A')), newWxJoyKeyBinding(2, WXJB_BUTTON, 1),
+    newWxJoyKeyBinding(wxT('S')), newWxJoyKeyBinding(3, WXJB_BUTTON, 1),
+    newWxJoyKeyBinding(WXK_BACK), newWxJoyKeyBinding(4, WXJB_BUTTON, 1),
+    newWxJoyKeyBinding(WXK_RETURN), newWxJoyKeyBinding(5, WXJB_BUTTON, 1),
+    newWxJoyKeyBinding(WXK_NUMPAD_UP), newWxJoyKeyBinding(0),
+    newWxJoyKeyBinding(WXK_NUMPAD_DOWN), newWxJoyKeyBinding(0),
+    newWxJoyKeyBinding(WXK_NUMPAD_LEFT), newWxJoyKeyBinding(0),
+    newWxJoyKeyBinding(WXK_NUMPAD_RIGHT), newWxJoyKeyBinding(0),
+    newWxJoyKeyBinding(WXK_NUMPAD_PAGEUP), newWxJoyKeyBinding(0),
+    newWxJoyKeyBinding(WXK_NUMPAD_PAGEDOWN), newWxJoyKeyBinding(0),
+    newWxJoyKeyBinding(wxT('W')), newWxJoyKeyBinding(0),
+    newWxJoyKeyBinding(wxT('Q')), newWxJoyKeyBinding(0),
+    newWxJoyKeyBinding(WXK_SPACE), newWxJoyKeyBinding(0),
+    newWxJoyKeyBinding(0), newWxJoyKeyBinding(0),
+    newWxJoyKeyBinding(0), newWxJoyKeyBinding(0)
 };
 
 wxAcceleratorEntry_v sys_accels;
@@ -178,9 +185,9 @@ opt_desc opts[] = {
     /// GB
     STROPT("GB/BiosFile", "", wxTRANSLATE("BIOS file to use for GB, if enabled"), gopts.gb_bios),
     STROPT("GB/GBCBiosFile", "", wxTRANSLATE("BIOS file to use for GBC, if enabled"), gopts.gbc_bios),
-    { wxT("GB/Palette0"), "", wxTRANSLATE("The default palette, as 8 comma-separated 4-digit hex integers (rgb555).") },
-    { wxT("GB/Palette1"), "", wxTRANSLATE("The first user palette, as 8 comma-separated 4-digit hex integers (rgb555).") },
-    { wxT("GB/Palette2"), "", wxTRANSLATE("The second user palette, as 8 comma-separated 4-digit hex integers (rgb555).") },
+    NOOPT(wxT("GB/Palette0"), "", wxTRANSLATE("The default palette, as 8 comma-separated 4-digit hex integers (rgb555).")),
+    NOOPT(wxT("GB/Palette1"), "", wxTRANSLATE("The first user palette, as 8 comma-separated 4-digit hex integers (rgb555).")),
+    NOOPT(wxT("GB/Palette2"), "", wxTRANSLATE("The second user palette, as 8 comma-separated 4-digit hex integers (rgb555).")),
     BOOLOPT("GB/PrintAutoPage", "PrintGather", wxTRANSLATE("Automatically gather a full page before printing"), gopts.print_auto_page),
     BOOLOPT("GB/PrintScreenCap", "PrintSnap", wxTRANSLATE("Automatically save printouts as screen captures with -print suffix"), gopts.print_screen_cap),
     STROPT("GB/ROMDir", "", wxTRANSLATE("Directory to look for ROM files"), gopts.gb_rom_dir),
@@ -210,14 +217,14 @@ opt_desc opts[] = {
     INTOPT("General/StatusBar", "StatusBar", wxTRANSLATE("Enable status bar"), gopts.statusbar, 0, 1),
 
     /// Joypad
-    { wxT("Joypad/*/*"), "", wxTRANSLATE("The parameter Joypad/<n>/<button> contains a comma-separated list of key names which map to joypad #<n> button <button>.  Button is one of Up, Down, Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Speed, Capture, GS") },
+    NOOPT(wxT("Joypad/*/*"), "", wxTRANSLATE("The parameter Joypad/<n>/<button> contains a comma-separated list of key names which map to joypad #<n> button <button>.  Button is one of Up, Down, Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Speed, Capture, GS")),
     INTOPT("Joypad/AutofireThrottle", "", wxTRANSLATE("The autofire toggle period, in frames (1/60 s)"), gopts.autofire_rate, 1, 1000),
 
     /// Keyboard
     INTOPT("Joypad/Default", "", wxTRANSLATE("The number of the stick to use in single-player mode"), gopts.default_stick, 1, 4),
 
     /// Keyboard
-    { wxT("Keyboard/*"), "", wxTRANSLATE("The parameter Keyboard/<cmd> contains a comma-separated list of key names (e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is executed.") },
+    NOOPT(wxT("Keyboard/*"), "", wxTRANSLATE("The parameter Keyboard/<cmd> contains a comma-separated list of key names (e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is executed.")),
 
     // Core
     INTOPT("preferences/agbPrint", "AGBPrinter", wxTRANSLATE("Enable AGB debug print"), agbPrint, 0, 1),
@@ -344,7 +351,6 @@ bool opt_lt(const opt_desc& opt1, const opt_desc& opt2)
 }
 
 // FIXME: simulate MakeInstanceFilename(vbam.ini) using subkeys (Slave%d/*)
-
 void load_opts()
 {
     // just for sanity...
@@ -449,7 +455,7 @@ void load_opts()
              cont = cfg->GetNextEntry(e, entry_idx)) {
             // kb options come from a different list
             if (s == wxT("Keyboard")) {
-                const cmditem dummy = { e };
+                const cmditem dummy = new_cmditem(e);
 
                 if (!std::binary_search(&cmdtab[0], &cmdtab[ncmds], dummy, cmditem_lt)) {
                     s.append(wxT('/'));
@@ -461,7 +467,7 @@ void load_opts()
             } else {
                 s.append(wxT('/'));
                 s.append(e);
-                const opt_desc dummy = { s };
+                opt_desc dummy = new_opt_desc(s);
                 wxString opt_name(dummy.opt);
 
                 if (!std::binary_search(&opts[0], &opts[num_opts], dummy, opt_lt) && opt_name != wxT("General/LastUpdated") && opt_name != wxT("General/LastUpdatedFileName")) {
@@ -476,10 +482,10 @@ void load_opts()
         cfg->SetPath(wxT("/"));
     }
 
-    for (int i = 0; i < item_del.size(); i++)
+    for (size_t i = 0; i < item_del.size(); i++)
         cfg->DeleteEntry(item_del[i]);
 
-    for (int i = 0; i < grp_del.size(); i++)
+    for (size_t i = 0; i < grp_del.size(); i++)
         cfg->DeleteGroup(grp_del[i]);
 
     // now read actual values and set to default if unset
@@ -500,7 +506,7 @@ void load_opts()
 
             if (gotit && !s.empty()) {
                 const auto found_pos = vec_find(enum_opts, s);
-                const bool matched   = found_pos != wxNOT_FOUND;
+                const bool matched   = ((int)found_pos != wxNOT_FOUND);
 
                 if (!matched) {
                     opt.curint = 0;
@@ -556,7 +562,7 @@ void load_opts()
         wxString optn;
         optn.Printf(wxT("GB/Palette%d"), i);
         wxString val;
-        const opt_desc dummy = { optn };
+        const opt_desc dummy = new_opt_desc(optn);
         opt_desc* opt = std::lower_bound(&opts[0], &opts[num_opts], dummy, opt_lt);
         wxString entry;
 
@@ -574,7 +580,7 @@ void load_opts()
             int start = cpos;
             cpos = val.find(wxT(','), cpos);
 
-            if (cpos == wxString::npos)
+            if ((size_t)cpos == wxString::npos)
                 cpos = val.size();
 
             long ival;
@@ -585,7 +591,7 @@ void load_opts()
             entry.ToLong(&ival, 16);
             systemGbPalette[i * 8 + j] = ival;
 
-            if (cpos != val.size())
+            if ((size_t)cpos != val.size())
                 cpos++;
         }
     }
@@ -624,7 +630,7 @@ void load_opts()
             if (!val.size())
                 wxLogWarning(_("Invalid key binding %s for %s"), s.mb_str(), kbopt.mb_str());
             else {
-                for (int j = 0; j < val.size(); j++)
+                for (size_t j = 0; j < val.size(); j++)
                     val[j].Set(val[j].GetFlags(), val[j].GetKeyCode(),
                         cmdtab[i].cmd_id);
 
@@ -682,7 +688,7 @@ void update_opts()
     for (int i = 0; i < 3; i++) {
         wxString optn;
         optn.Printf(wxT("GB/Palette%d"), i);
-        const opt_desc dummy = { optn };
+        const opt_desc dummy = new_opt_desc(optn);
         opt_desc* opt = std::lower_bound(&opts[0], &opts[num_opts], dummy, opt_lt);
         wxString val;
         wxString entry;
@@ -726,9 +732,9 @@ void update_opts()
 
         for (bool cont = cfg->GetFirstEntry(s, entry_idx); cont;
              cont = cfg->GetNextEntry(s, entry_idx)) {
-            const cmditem dummy = { s };
+            const cmditem dummy = new_cmditem(s);
             cmditem* cmd = std::lower_bound(&cmdtab[0], &cmdtab[ncmds], dummy, cmditem_lt);
-            int i;
+            size_t i;
 
             for (i = 0; i < gopts.accels.size(); i++)
                 if (gopts.accels[i].GetCommand() == cmd->cmd_id)
@@ -738,7 +744,7 @@ void update_opts()
                 item_del.push_back(s);
         }
 
-        for (int i = 0; i < item_del.size(); i++)
+        for (size_t i = 0; i < item_del.size(); i++)
             cfg->DeleteEntry(item_del[i]);
     }
 
@@ -777,7 +783,7 @@ void update_opts()
 
 bool opt_set(const wxString& name, const wxString& val)
 {
-    const opt_desc dummy = { name };
+    const opt_desc dummy = new_opt_desc(name);
     const opt_desc* opt = std::lower_bound(&opts[0], &opts[num_opts], dummy, opt_lt);
 
     if (!wxStrcmp(name, opt->opt)) {
@@ -795,7 +801,7 @@ bool opt_set(const wxString& name, const wxString& val)
             auto enum_opts = str_split(ev, wxT("|"));
 
             const std::size_t found_pos = vec_find(enum_opts, s);
-            const bool matched          = found_pos != wxNOT_FOUND;
+            const bool matched          = ((int)found_pos != wxNOT_FOUND);
 
             if (!matched) {
                 const wxString evx = wxGetTranslation(opt->enumvals);
@@ -844,7 +850,7 @@ bool opt_set(const wxString& name, const wxString& val)
 
                 wxString vals(val);
 
-                for (int j = 0, cpos = 0; j < 8; j++) {
+                for (size_t j = 0, cpos = 0; j < 8; j++) {
                     int start = cpos;
                     cpos = vals.find(wxT(','), cpos);
 
@@ -873,7 +879,7 @@ bool opt_set(const wxString& name, const wxString& val)
         auto parts = str_split(name, wxT("/"));
 
         if (parts[0] != wxT("Keyboard")) {
-            cmditem* cmd = std::lower_bound(&cmdtab[0], &cmdtab[ncmds], cmditem{parts[1]}, cmditem_lt);
+            cmditem* cmd = std::lower_bound(&cmdtab[0], &cmdtab[ncmds], cmditem{parts[1],wxString(),0,0,NULL}, cmditem_lt);
 
             if (cmd == &cmdtab[ncmds] || wxStrcmp(parts[1], cmd->cmd))
                 return false;
@@ -894,7 +900,7 @@ bool opt_set(const wxString& name, const wxString& val)
             if (!val.empty()) {
                 auto aval = wxKeyTextCtrl::FromString(val);
 
-                for (int i = 0; i < aval.size(); i++)
+                for (size_t i = 0; i < aval.size(); i++)
                     aval[i].Set(aval[i].GetFlags(), aval[i].GetKeyCode(),
                         cmd->cmd_id);
 
