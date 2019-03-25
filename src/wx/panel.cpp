@@ -22,17 +22,17 @@ IMPLEMENT_DYNAMIC_CLASS(GameArea, wxPanel)
 
 GameArea::GameArea()
     : wxPanel()
-    , loaded(IMAGE_UNKNOWN)
     , panel(NULL)
     , emusys(NULL)
-    , basic_width(GBAWidth)
-    , basic_height(GBAHeight)
-    , fullscreen(false)
-    , paused(false)
     , was_paused(false)
     , rewind_time(0)
     , do_rewind(false)
     , rewind_mem(0)
+    , loaded(IMAGE_UNKNOWN)
+    , basic_width(GBAWidth)
+    , basic_height(GBAHeight)
+    , fullscreen(false)
+    , paused(false)
     , pointer_blanked(false)
     , mouse_active_time(0)
 {
@@ -155,7 +155,7 @@ void GameArea::LoadGame(const wxString& name)
             wxCharBuffer pfnb(pfn.GetFullPath().mb_fn_str());
             applyPatch(pfnb.data(), &gbRom, &size);
 
-            if (size != rom_size)
+            if (size != (int)rom_size)
                 gbUpdateSizes();
 
             rom_size = size;
@@ -372,6 +372,7 @@ void GameArea::LoadGame(const wxString& name)
                 case 0x10000:
                     if (saveType == GBA_SAVE_EEPROM || saveType == GBA_SAVE_SRAM)
                         break;
+                    break;
 
                 case 0x20000:
                     saveType = GBA_SAVE_FLASH;
@@ -843,7 +844,7 @@ void GameArea::ShowFullScreen(bool full)
                 // in particular, unix does Matches() in wrong direction
                 wxArrayVideoModes vm = d.GetModes();
                 int best_mode = -1;
-                int i;
+                size_t i;
 
                 for (i = 0; i < vm.size(); i++) {
                     if (vm[i].w != gopts.fs_mode.w || vm[i].h != gopts.fs_mode.h)
@@ -1156,9 +1157,9 @@ static std::vector<game_key>* game_keys_pressed(int key, int mod, int joy)
         for (int key_num = 0; key_num < NUM_KEYS; key_num++) {
             wxJoyKeyBinding_v& b = gopts.joykey_bindings[player][key_num];
 
-            for (int bind_num = 0; bind_num < b.size(); bind_num++)
+            for (size_t bind_num = 0; bind_num < b.size(); bind_num++)
                 if (b[bind_num].key == key && b[bind_num].mod == mod && b[bind_num].joy == joy)
-                    vec->push_back({player, key_num, bind_num, b});
+                    vec->push_back({player, key_num, (int)bind_num, b});
         }
 
     return vec;
@@ -1186,7 +1187,7 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
     }
 
     // check if key is already pressed
-    int kpno;
+    size_t kpno;
 
     for (kpno = 0; kpno < keys_pressed.size(); kpno++)
         if (keys_pressed[kpno].key == key && keys_pressed[kpno].mod == mod && keys_pressed[kpno].joy == joy)
@@ -1219,11 +1220,11 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
         }
         else {
             // only release if no others pressed
-            int bind2;
+            size_t bind2;
             auto b = game_key.b;
 
             for (bind2 = 0; bind2 < game_key.b.size(); bind2++) {
-                if (game_key.bind_num == bind2 || (b[bind2].key == key && b[bind2].mod == mod && b[bind2].joy == joy))
+                if ((size_t)game_key.bind_num == bind2 || (b[bind2].key == key && b[bind2].mod == mod && b[bind2].joy == joy))
                     continue;
 
                 for (kpno = 0; kpno < keys_pressed.size(); kpno++)
@@ -1356,8 +1357,8 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
     , todraw(0)
     , pixbuf1(0)
     , pixbuf2(0)
-    , rpi(0)
     , nthreads(0)
+    , rpi(0)
 {
     memset(delta, 0xff, sizeof(delta));
 
@@ -1453,6 +1454,7 @@ void DrawingPanelBase::DrawingPanelInit()
 
 void DrawingPanelBase::PaintEv(wxPaintEvent& ev)
 {
+    (void)ev; // unused params
     wxPaintDC dc(GetWindow());
 
     if (!todraw) {
@@ -1470,6 +1472,7 @@ void DrawingPanelBase::PaintEv(wxPaintEvent& ev)
 
 void DrawingPanelBase::EraseBackground(wxEraseEvent& ev)
 {
+    (void)ev; // unused params
     // do nothing, do not allow propagation
 }
 
@@ -1911,7 +1914,7 @@ void DrawingPanelBase::DrawOSD(wxWindowDC& dc)
             // find amt of text that will fit on a line is to search
             wxArrayInt llen; // length of each line, in chars
 
-            for (int off = 0; off < msg.size();) {
+            for (size_t off = 0; off < msg.size();) {
 // One way would be to bsearch on GetTextExtent() looking for
 // best fit.
 // Another would be to use GetPartialTextExtents and search
@@ -2238,6 +2241,7 @@ void GLDrawingPanel::AdjustViewport()
 
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 {
+    (void)dc; // unused params
 #ifndef wxGL_IMPLICIT_CONTEXT
     SetCurrent(*ctx);
 #else

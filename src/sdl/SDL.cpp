@@ -492,7 +492,8 @@ static void sdlOpenGLVideoResize()
 
 void sdlOpenGLInit(int w, int h)
 {
-
+    (void)w; // unused params
+    (void)h; // unused params
 #if 0
   float screenAspect = (float) sizeX / sizeY,
         windowAspect = (float) w / h;
@@ -2058,6 +2059,7 @@ int main(int argc, char** argv)
 
 void systemMessage(int num, const char* msg, ...)
 {
+    (void)num; // unused params
     va_list valist;
 
     va_start(valist, msg);
@@ -2290,6 +2292,12 @@ uint32_t systemGetClock()
 
 void systemGbPrint(uint8_t* data, int len, int pages, int feed, int palette, int contrast)
 {
+    (void)data; // unused params
+    (void)len; // unused params
+    (void)pages; // unused params
+    (void)feed; // unused params
+    (void)palette; // unused params
+    (void)contrast; // unused params
 }
 
 /* xKiv: added timestamp */
@@ -2412,6 +2420,8 @@ void systemOnSoundShutdown()
 
 void systemOnWriteDataToSoundBuffer(const uint16_t* finalWave, int length)
 {
+    (void)finalWave; // unused params
+    (void)length; // unused params
 }
 
 void log(const char* defaultMsg, ...)

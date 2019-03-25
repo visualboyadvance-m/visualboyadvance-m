@@ -16,6 +16,7 @@ void wxKeyTextCtrl::OnKeyDown(wxKeyEvent& event)
 
 void wxKeyTextCtrl::OnKeyUp(wxKeyEvent& event)
 {
+    (void)event; // unused param
     int mod = lastmod;
     int key = lastkey;
     lastmod = lastkey = 0;
@@ -30,7 +31,7 @@ void wxKeyTextCtrl::OnKeyUp(wxKeyEvent& event)
     // if blank or backspace is modified, add normally instead
     if (clearable && !mod && key == WXK_BACK && !GetValue().empty()) {
         wxString val = GetValue();
-        int lastkey = val.rfind(multikey);
+        size_t lastkey = val.rfind(multikey);
 
         if (lastkey && lastkey != wxString::npos) {
             // if this was actually a ,-accel, delete instead
@@ -79,7 +80,7 @@ wxString wxKeyTextCtrl::ToString(int mod, int key)
     wxString s = ae.ToString();
 
     if (char_override || mod_override) {
-        int l = s.rfind(wxT('-'));
+        size_t l = s.rfind(wxT('-'));
 
         if (l == wxString::npos)
             l = 0;
@@ -150,7 +151,7 @@ wxString wxKeyTextCtrl::ToString(wxAcceleratorEntry_v keys, wxChar sep)
 {
     wxString ret;
 
-    for (int i = 0; i < keys.size(); i++) {
+    for (size_t i = 0; i < keys.size(); i++) {
         if (i > 0)
             ret += sep;
 
@@ -176,16 +177,16 @@ bool wxKeyTextCtrl::ParseString(const wxString& s, int len, int& mod, int& key)
     a.Append(s.Left(len));
     wxAcceleratorEntry ae;
 #ifndef __WXMAC__
-#define check_meta(str)                                                     \
-    do {                                                                    \
-        wxString meta = str;                                                \
-        for (int ml = 0; (ml = a.find(meta, ml)) != wxString::npos; ml++) { \
-            if (!ml || a[ml - 1] == wxT('-') || a[ml - 1] == wxT('+')) {    \
-                mod |= wxMOD_META;                                          \
-                a.erase(ml, meta.size());                                   \
-                ml = -1;                                                    \
-            }                                                               \
-        }                                                                   \
+#define check_meta(str)                                                        \
+    do {                                                                       \
+        wxString meta = str;                                                   \
+        for (size_t ml = 0; (ml = a.find(meta, ml)) != wxString::npos; ml++) { \
+            if (!ml || a[ml - 1] == wxT('-') || a[ml - 1] == wxT('+')) {       \
+                mod |= wxMOD_META;                                             \
+                a.erase(ml, meta.size());                                      \
+                ml = -1;                                                       \
+            }                                                                  \
+        }                                                                      \
     } while (0)
     check_meta(wxT("Meta-"));
     check_meta(wxT("Meta+"));
@@ -252,9 +253,9 @@ wxAcceleratorEntry_v wxKeyTextCtrl::FromString(const wxString& s, wxChar sep)
 {
     wxAcceleratorEntry_v ret, empty;
     int mod, key;
-    int len = s.size();
+    size_t len = s.size();
 
-    for (int lastkey = len - 1; (lastkey = s.rfind(sep, lastkey)) != wxString::npos; lastkey--) {
+    for (size_t lastkey = len - 1; (lastkey = s.rfind(sep, lastkey)) != wxString::npos; lastkey--) {
         if (lastkey == len - 1) {
             // sep as accel
             if (!lastkey)

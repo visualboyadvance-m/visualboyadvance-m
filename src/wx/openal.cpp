@@ -27,7 +27,8 @@
 #ifdef winlog
 #undef winlog
 #endif
-#define winlog //
+// https://stackoverflow.com/a/1306690/262458
+#define winlog(x,...) do {} while(0)
 #define debugState() //
 #endif
 
@@ -132,6 +133,7 @@ void OpenAL::debugState()
         winlog("!unknown!\n");
         break;
     }
+
 
     alGetSourcei(source, AL_BUFFERS_QUEUED, &value);
     ASSERT_SUCCESS;
@@ -252,6 +254,7 @@ void OpenAL::reset()
 
 void OpenAL::write(uint16_t* finalWave, int length)
 {
+    (void)length; // unused param
     if (!initialized)
         return;
 

@@ -192,7 +192,7 @@ uint8_t *utilLoad(const char *file, bool (*accept)(const char *), uint8_t *data,
 		}
 	}
 
-   fread(image, 1, size, fp); // read into buffer
+        FREAD_UNCHECKED(image, 1, size, fp); // read into buffer
 	fclose(fp);
 	return image;
 }

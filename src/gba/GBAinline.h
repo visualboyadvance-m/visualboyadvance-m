@@ -56,7 +56,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
         }
     }
 #endif
-    uint32_t value;
+    uint32_t value = 0;
     uint32_t oldAddress = address;
 
     if (address & 3) {

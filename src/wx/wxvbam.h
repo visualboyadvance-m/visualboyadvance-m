@@ -656,6 +656,11 @@ extern struct cmditem {
     wxMenuItem* mi; // the menu item to invoke command, if present
 } cmdtab[];
 extern const int ncmds;
+
+// Initializer for struct cmditem
+cmditem new_cmditem(const wxString cmd = "", const wxString name = "",
+                    int cmd_id = 0, int mask_flags = 0, wxMenuItem* mi = NULL);
+
 // for binary search
 extern bool cmditem_lt(const struct cmditem& cmd1, const struct cmditem& cmd2);
 

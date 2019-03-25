@@ -137,7 +137,7 @@ bool SoundSDL::init(long sampleRate) {
 
     sound_device = SDL_OpenAudioDevice(NULL, 0, &audio, &audio_spec, SDL_AUDIO_ALLOW_ANY_CHANGE);
 
-    if(sound_device < 0) {
+    if(sound_device == 0) {
         std::cerr << "Failed to open audio: " << SDL_GetError() << std::endl;
         return false;
     }

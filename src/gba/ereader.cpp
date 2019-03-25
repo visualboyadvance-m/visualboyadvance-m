@@ -222,6 +222,7 @@ void BIOS_EReader_ScanCard(int swi_num)
 
     FILE* f;
 
+    i = j = k = 0;
     //Open dotcode bin/raw
 
     if (swi_num == 0xE0) {
@@ -259,7 +260,7 @@ void BIOS_EReader_ScanCard(int swi_num)
             reg[0].I = 0x303;
             return;
         }
-        fread(DotCodeData, 1, i, f);
+        FREAD_UNCHECKED(DotCodeData, 1, i, f);
         fclose(f);
 
         if (dotcodetype == 0) {

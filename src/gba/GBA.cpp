@@ -1007,21 +1007,21 @@ bool CPUReadGSASnapshot(const char* fileName)
 
     // long size = ftell(file);
     fseek(file, 0x0, SEEK_SET);
-    fread(&i, 1, 4, file);
+    FREAD_UNCHECKED(&i, 1, 4, file);
     fseek(file, i, SEEK_CUR); // Skip SharkPortSave
     fseek(file, 4, SEEK_CUR); // skip some sort of flag
-    fread(&i, 1, 4, file); // name length
+    FREAD_UNCHECKED(&i, 1, 4, file); // name length
     fseek(file, i, SEEK_CUR); // skip name
-    fread(&i, 1, 4, file); // desc length
+    FREAD_UNCHECKED(&i, 1, 4, file); // desc length
     fseek(file, i, SEEK_CUR); // skip desc
-    fread(&i, 1, 4, file); // notes length
+    FREAD_UNCHECKED(&i, 1, 4, file); // notes length
     fseek(file, i, SEEK_CUR); // skip notes
     int saveSize;
-    fread(&saveSize, 1, 4, file); // read length
+    FREAD_UNCHECKED(&saveSize, 1, 4, file); // read length
     saveSize -= 0x1c; // remove header size
     char buffer[17];
     char buffer2[17];
-    fread(buffer, 1, 16, file);
+    FREAD_UNCHECKED(buffer, 1, 16, file);
     buffer[16] = 0;
     for (i = 0; i < 16; i++)
         if (buffer[i] < 32)
@@ -1074,7 +1074,7 @@ bool CPUReadGSASPSnapshot(const char* fileName)
 
     // read save name
     fseek(file, namepos, SEEK_SET);
-    fread(savename, 1, namesz, file);
+    FREAD_UNCHECKED(savename, 1, namesz, file);
     savename[namesz] = 0;
 
     memcpy(romname, &rom[0xa0], namesz);
@@ -1091,7 +1091,7 @@ bool CPUReadGSASPSnapshot(const char* fileName)
 
     // read footer tag
     fseek(file, footerpos, SEEK_SET);
-    fread(footer, 1, footersz, file);
+    FREAD_UNCHECKED(footer, 1, footersz, file);
     footer[footersz] = 0;
 
     if (memcmp(footer, gsvfooter, footersz)) {
@@ -1106,7 +1106,7 @@ bool CPUReadGSASPSnapshot(const char* fileName)
     }
 
     // Read up to 128k save
-    fread(flashSaveMemory, 1, FLASH_128K_SZ, file);
+    FREAD_UNCHECKED(flashSaveMemory, 1, FLASH_128K_SZ, file);
 
     fclose(file);
     CPUReset();
