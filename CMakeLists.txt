@@ -357,7 +357,7 @@ if(CMAKE_C_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-    set(LTO_FLAGS "")
+    unset(LTO_FLAGS)
     if(ENABLE_LTO)
         if(CMAKE_COMPILER_IS_GNUCXX)
             if(num_cpus GREATER 1)
@@ -367,6 +367,21 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
             endif()
         else()
             set(LTO_FLAGS -flto)
+        endif()
+
+        # check that LTO is not broken before enabling it
+        set(ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
+        set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${LTO_FLAGS}")
+
+        include(CheckCXXSourceCompiles)
+        check_cxx_source_compiles("int main(int argc, char** argv) { return 0; }" LTO_WORKS)
+
+        set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
+
+        if(NOT LTO_WORKS)
+            message(WARNING "LTO does not seem to be working on your system, if using clang make sure LLVMGold is installed")
+            unset(LTO_FLAGS)
+            set(ENABLE_LTO OFF)
         endif()
     endif()
 
