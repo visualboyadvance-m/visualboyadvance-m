@@ -1,6 +1,11 @@
 if(COMMAND cmake_policy)
     cmake_policy(SET CMP0003 NEW) # link to full path of libs
     cmake_policy(SET CMP0005 NEW) # escapes in add_definitions
+    cmake_policy(SET CMP0077 NEW) # use vars for options
+
+    if(NOT CMAKE_VERSION VERSION_LESS 3.0)
+        cmake_policy(SET CMP0043 NEW) # for wxWidgets, use generator expressions
+    endif()
 endif()
 
 option(ENABLE_VCPKG "Use dependencies for Visual Studio from vcpkg" ON)
@@ -432,9 +437,24 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         set(MY_C_FLAGS ${MY_C_FLAGS} -fopenmp)
     endif()
 
-    check_cxx_compiler_flag(-fdiagnostics-color=auto COMPILER_COLOR_OUTPUT)
-    if(COMPILER_COLOR_OUTPUT)
-        add_compile_options(-fdiagnostics-color=auto)
+    if(CMAKE_CXX_COMPILER_ID STREQUAL GNU)
+        unset(COMPILER_COLOR_DIAGNOSTICS)
+        check_cxx_compiler_flag(-fdiagnostics-color=always COMPILER_COLOR_DIAGNOSTICS)
+        if(COMPILER_COLOR_DIAGNOSTICS)
+            add_compile_options(-fdiagnostics-color=always)
+        else()
+            unset(COMPILER_COLOR_DIAGNOSTICS)
+            check_cxx_compiler_flag(-fdiagnostics-color COMPILER_COLOR_DIAGNOSTICS)
+            if(COMPILER_COLOR_DIAGNOSTICS)
+                add_compile_options(-fdiagnostics-color)
+            endif()
+        endif()
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+        unset(COMPILER_COLOR_DIAGNOSTICS)
+        check_cxx_compiler_flag(-fcolor-diagnostics COMPILER_COLOR_DIAGNOSTICS)
+        if(COMPILER_COLOR_DIAGNOSTICS)
+            add_compile_options(-fcolor-diagnostics)
+        endif()
     endif()
 
     if(MINGW)
