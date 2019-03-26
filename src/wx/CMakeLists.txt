@@ -3,7 +3,10 @@
 if(COMMAND cmake_policy)
     cmake_policy(SET CMP0003 NEW) # link to full path of libs
     cmake_policy(SET CMP0005 NEW) # escapes in add_definitions
-    cmake_policy(SET CMP0077 NEW) # use vars for options
+
+    if(POLICY CMP0077)
+        cmake_policy(SET CMP0077 NEW) # use vars for options
+    endif()
 
     if(NOT CMAKE_VERSION VERSION_LESS 3.0)
         cmake_policy(SET CMP0043 NEW) # for wxWidgets, use generator expressions
