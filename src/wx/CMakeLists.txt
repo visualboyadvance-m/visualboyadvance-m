@@ -30,32 +30,32 @@ option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" OFF)
 
 option(ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" OFF)
 
-IF(APPLE)
-    ADD_DEFINITIONS(-DwxMAC_USE_CORE_GRAPHICS)
-ENDIF(APPLE)
+if(APPLE)
+    add_definitions(-DwxMAC_USE_CORE_GRAPHICS)
+endif()
 
-if( NOT ENABLE_XAUDIO2 )
-    ADD_DEFINITIONS (-DNO_XAUDIO2)
-endif( NOT ENABLE_XAUDIO2 )
+if(NOT ENABLE_XAUDIO2)
+    add_definitions(-DNO_XAUDIO2)
+endif()
 
-if( NOT ENABLE_FAUDIO )
-    ADD_DEFINITIONS (-DNO_FAUDIO)
-endif( NOT ENABLE_FAUDIO )
+if(NOT ENABLE_FAUDIO)
+    add_definitions(-DNO_FAUDIO)
+endif()
 
 if(NOT ENABLE_DIRECT3D)
-   ADD_DEFINITIONS(-DNO_D3D)
-endif(NOT ENABLE_DIRECT3D)
+    add_definitions(-DNO_D3D)
+endif()
 
 if(ENABLE_OPENAL)
-    FIND_PACKAGE(OpenAL REQUIRED)
-    INCLUDE_DIRECTORIES(${OPENAL_INCLUDE_DIR})
+    find_package(OpenAL REQUIRED)
+    include_directories(${OPENAL_INCLUDE_DIR})
 
-    IF(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
-        ADD_DEFINITIONS(-DAL_LIBTYPE_STATIC)
-    ENDIF()
+    if(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
+        add_definitions(-DAL_LIBTYPE_STATIC)
+    endif()
 else(ENABLE_OPENAL)
-    ADD_DEFINITIONS (-DNO_OAL)
-endif(ENABLE_OPENAL)
+    add_definitions(-DNO_OAL)
+endif()
 
 unset(FAUDIO_LIBS)
 if(ENABLE_FAUDIO)
@@ -117,9 +117,9 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
         file(COPY ${_VCPKG_ROOT_DIR}/installed/${WINARCH}-windows/bin/SDL2.dll DESTINATION ${CMAKE_BINARY_DIR})
     endif()
 else()
-    IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        SET(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
-    ENDIF()
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
+    endif()
 
     # on e.g. msys2 add a couple of libraries wx needs
     #if(WIN32 AND (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang))
@@ -154,12 +154,7 @@ else()
         set(wxWidgets_CONFIG_OPTIONS "--prefix=${CMAKE_PREFIX_PATH}")
     endif()
 
-    SET(wxWidgets_USE_UNICODE ON)
-    # adv is for wxAboutBox
-    # xml, html is for xrc
-    # do not include gl at first
-    set(wxWidgets_USE_LIBS xrc xml html adv net core base)
-    #list(APPEND wxWidgets_CONFIG_OPTIONS --version=2.8)
+    set(wxWidgets_USE_UNICODE ON)
 
     # Check for gtk4 then gtk3 packages first, some dists like arch rename the
     # wx-config utility for these packages to e.g. wx-config-gtk3
@@ -169,87 +164,67 @@ else()
         find_program(wxWidgets_CONFIG_EXECUTABLE NAMES wx-config-gtk4 wx-config-gtk3 wx-config)
     endif()
 
+    # adv is for wxAboutBox
+    # xml, html is for xrc
     # the gl lib may not be available, and if it looks like it is we still have to
     # do a compile test later
-    list(APPEND wxWidgets_USE_LIBS gl)
-    find_package(wxWidgets QUIET)
+    find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl)
+
+    if(NOT wxWidgets_FOUND)
+        set(WX_HAS_OPENGL FALSE)
+        find_package(wxWidgets COMPONENTS xrc xml html adv net core base REQUIRED)
+    endif()
+
     cleanup_wx_vars()
     normalize_wx_paths()
 
-    SET(CHECK_WX_OPENGL FALSE)
+    include_directories(${wxWidgets_INCLUDE_DIRS})
 
-    IF(wxWidgets_FOUND)
-        SET(CHECK_WX_OPENGL TRUE)
-    ELSE()
-        SET(WX_HAS_OPENGL   FALSE)
-        # the requirement check is later after the opengl compile test
-    ENDIF()
-
-    INCLUDE_DIRECTORIES(${wxWidgets_INCLUDE_DIRS})
-
-    IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         # tell wx to enable debug mode if possible, if the cmake module did not do it for us
-        EXECUTE_PROCESS(COMMAND "${wxWidgets_CONFIG_EXECUTABLE} --debug=yes" RESULT_VARIABLE WX_CONFIG_DEBUG OUTPUT_QUIET ERROR_QUIET)
+        execute_process(COMMAND "${wxWidgets_CONFIG_EXECUTABLE} --debug=yes" RESULT_VARIABLE WX_CONFIG_DEBUG OUTPUT_QUIET ERROR_QUIET)
 
-        IF(WX_CONFIG_DEBUG EQUAL 0)
-            ADD_DEFINITIONS(-DwxDEBUG_LEVEL=1)
-        ENDIF()
+        if(WX_CONFIG_DEBUG EQUAL 0)
+            add_definitions(-DwxDEBUG_LEVEL=1)
+        endif()
 
         # this one should be safe in non-debug builds too
-        ADD_DEFINITIONS(-DWXDEBUG)
-    ENDIF()
+        add_definitions(-DWXDEBUG)
+    endif()
 
-    FOREACH(DEF ${wxWidgets_DEFINITIONS})
-        ADD_DEFINITIONS("-D${DEF}")
-    ENDFOREACH()
+    foreach(DEF ${wxWidgets_DEFINITIONS})
+        add_definitions("-D${DEF}")
+    endforeach()
 
-    # check if this build of wx actually has OpenGL support
+    foreach(CXX_COMPILE_FLAG ${wxWidgets_CXX_FLAGS})
+        add_compile_options(${CXX_COMPILE_FLAG})
+    endforeach()
 
-    SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${MY_CXX_FLAGS} ${MY_C_FLAGS} ${MY_CXX_LINKER_FLAGS} ${MY_C_LINKER_FLAGS} ${wxWidgets_LIBRARIES})
-    SET(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS} ${wxWidgets_CXX_FLAGS} ${MY_CXX_FLAGS} ${MY_C_FLAGS})
+    # set up variables for some compile/run checks for wxWidgets
+    set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${MY_CXX_FLAGS} ${MY_C_FLAGS} ${MY_CXX_LINKER_FLAGS} ${MY_C_LINKER_FLAGS} ${wxWidgets_LIBRARIES})
+    set(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS} ${wxWidgets_CXX_FLAGS} ${MY_CXX_FLAGS} ${MY_C_FLAGS})
 
-    IF(WIN32)
-        SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} "-Wl,--subsystem,console")
-        SET(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   "-Wl,--subsystem,console")
-    ENDIF()
+    if(WIN32)
+        set(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} "-Wl,--subsystem,console")
+        set(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   "-Wl,--subsystem,console")
+    endif()
 
-    SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${wxWidgets_INCLUDE_DIRS})
+    set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${wxWidgets_INCLUDE_DIRS})
 
-    FOREACH(DEF ${wxWidgets_DEFINITIONS})
-        SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} "-D${DEF}")
-    ENDFOREACH()
+    foreach(DEF ${wxWidgets_DEFINITIONS})
+        set(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} "-D${DEF}")
+    endforeach()
 
     # CheckCXXSourceCompiles ignores compiler flags, so we have to stuff them into the definitions
-    SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_FLAGS} ${CMAKE_REQUIRED_DEFINITIONS})
+    set(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_FLAGS} ${CMAKE_REQUIRED_DEFINITIONS})
 
-    INCLUDE(CheckCXXSourceCompiles)
+    # find the right C++ ABI version for wxWidgets, this is also necessary for the OpenGL check following
+    if((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang) AND NOT CMAKE_CROSSCOMPILING)
+        set(WX_ABI_FOUND_MATCH FALSE)
 
-    IF(CHECK_WX_OPENGL)
-        CHECK_CXX_SOURCE_COMPILES("
-#include <wx/wxprec.h>
-#include <wx/config.h>
-#include <wx/glcanvas.h>
+        include(CheckCXXSourceRuns)
 
-int main(int argc, char** argv) {
-    wxGLCanvas canvas(NULL, wxID_ANY, NULL, wxPoint(0, 0), wxSize(300, 300), 0);
-    return 0;
-}" WX_HAS_OPENGL)
-    ENDIF()
-
-    IF(NOT WX_HAS_OPENGL)
-        ADD_DEFINITIONS(-DNO_OGL)
-        LIST(REMOVE_ITEM wxWidgets_USE_LIBS gl)
-        find_package(wxWidgets REQUIRED)
-        normalize_wx_paths()
-        cleanup_wx_vars()
-    ENDIF()
-
-    IF(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_CROSSCOMPILING)
-        SET(WX_ABI_FOUND_MATCH FALSE)
-
-        INCLUDE(CheckCXXSourceRuns)
-
-        SET(WX_TEST_CONSOLE_APP "
+        set(WX_TEST_CONSOLE_APP "
 #include <cstdlib>
 #include <iostream>
 #include <wx/wxprec.h>
@@ -319,130 +294,155 @@ int main(int argc, char** argv)
 ")
 
         # on windows we need the trampoline library from dependencies
-        IF(WIN32)
+        if(WIN32)
             # minhook requires -fpermissive unfortunately
             set(CMAKE_REQUIRED_FLAGS       ${CMAKE_REQUIRED_FLAGS}       -fpermissive)
-            SET(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} -fpermissive -w "-I${CMAKE_SOURCE_DIR}/dependencies/minhook/include")
-            SET(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   -Wl,--subsystem,console)
+            set(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} -fpermissive -w "-I${CMAKE_SOURCE_DIR}/dependencies/minhook/include")
+            set(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   -Wl,--subsystem,console)
 
-            IF(AMD64)
-                SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook_64.a")
-            ELSE() # assume 32 bit windows
-                SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook.a")
-            ENDIF()
-        ENDIF()
+            if(AMD64)
+                set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook_64.a")
+            else() # assume 32 bit windows
+                set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook.a")
+            endif()
+        endif()
 
-        CHECK_CXX_SOURCE_RUNS("${WX_TEST_CONSOLE_APP}" WX_DEFAULT_ABI_VERSION_COMPATIBLE)
+        check_cxx_source_runs("${WX_TEST_CONSOLE_APP}" WX_DEFAULT_ABI_VERSION_COMPATIBLE)
 
         # remove -fpermissive set for minhook
         list(REMOVE_ITEM CMAKE_REQUIRED_FLAGS       -fpermissive)
         list(REMOVE_ITEM CMAKE_REQUIRED_DEFINITIONS -fpermissive)
 
-        IF(NOT WX_DEFAULT_ABI_VERSION_COMPATIBLE)
+        if(NOT WX_DEFAULT_ABI_VERSION_COMPATIBLE)
             # currently goes up to 11 with gcc7, but we give it some room
-            SET(WX_ABI_VERSION 15)
+            set(WX_ABI_VERSION 15)
 
-            SET(CURRENT_DEFS ${CMAKE_REQUIRED_DEFINITIONS})
-            SET(CURRENT_LIBS ${CMAKE_REQUIRED_LIBRARIES})
+            set(CURRENT_DEFS ${CMAKE_REQUIRED_DEFINITIONS})
+            set(CURRENT_LIBS ${CMAKE_REQUIRED_LIBRARIES})
 
-            WHILE(NOT WX_ABI_VERSION EQUAL -1)
-                SET(CMAKE_REQUIRED_DEFINITIONS ${CURRENT_DEFS} "-fabi-version=${WX_ABI_VERSION}")
-                SET(CMAKE_REQUIRED_LIBRARIES   ${CURRENT_LIBS} "-fabi-version=${WX_ABI_VERSION}")
+            while(NOT WX_ABI_VERSION EQUAL -1)
+                if(CMAKE_COMPILER_IS_GNUCXX)
+                    set(CMAKE_REQUIRED_DEFINITIONS ${CURRENT_DEFS} "-fabi-version=${WX_ABI_VERSION}")
+                    set(CMAKE_REQUIRED_LIBRARIES   ${CURRENT_LIBS} "-fabi-version=${WX_ABI_VERSION}")
+                elseif(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+                    set(CMAKE_REQUIRED_DEFINITIONS ${CURRENT_DEFS} "-D__GXX_ABI_VERSION=10${WX_ABI_VERSION}")
+                    set(CMAKE_REQUIRED_LIBRARIES   ${CURRENT_LIBS} "-D__GXX_ABI_VERSION=10${WX_ABI_VERSION}")
+                endif()
 
-                SET(WX_ABI_VAR "WX_ABI_VERSION_${WX_ABI_VERSION}")
+                set(WX_ABI_VAR "WX_ABI_VERSION_${WX_ABI_VERSION}")
 
-                CHECK_CXX_SOURCE_RUNS("${WX_TEST_CONSOLE_APP}" ${WX_ABI_VAR})
+                check_cxx_source_runs("${WX_TEST_CONSOLE_APP}" ${WX_ABI_VAR})
 
-                IF(${${WX_ABI_VAR}})
-                    SET(WX_ABI_FOUND_MATCH TRUE)
-                    BREAK()
-                ENDIF()
+                if(${${WX_ABI_VAR}})
+                    set(WX_ABI_FOUND_MATCH TRUE)
+                    break()
+                endif()
 
-                MATH(EXPR WX_ABI_VERSION "${WX_ABI_VERSION} - 1")
-            ENDWHILE()
+                math(EXPR WX_ABI_VERSION "${WX_ABI_VERSION} - 1")
+            endwhile()
 
-            SET(CMAKE_REQUIRED_DEFINITIONS ${CURRENT_DEFS})
-            SET(CMAKE_REQUIRED_LIBRARIES   ${CURRENT_LIBS})
-        ENDIF()
+            set(CMAKE_REQUIRED_DEFINITIONS ${CURRENT_DEFS})
+            set(CMAKE_REQUIRED_LIBRARIES   ${CURRENT_LIBS})
+        endif()
 
-        IF(WX_ABI_FOUND_MATCH)
+        if(WX_ABI_FOUND_MATCH)
             # add C++ flags
-            STRING(REGEX REPLACE "<FLAGS>" "<FLAGS> -fabi-version=${WX_ABI_VERSION} " CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
-            SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -fabi-version=${WX_ABI_VERSION}")
-        ENDIF()
-    ENDIF()
+            if(CMAKE_COMPILER_IS_GNUCXX)
+                string(REGEX REPLACE "<FLAGS>" "<FLAGS> -fabi-version=${WX_ABI_VERSION} " CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
+                set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -fabi-version=${WX_ABI_VERSION}")
+            elseif(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+                string(REGEX REPLACE "<FLAGS>" "<FLAGS> -D__GXX_ABI_VERSION=10${WX_ABI_VERSION} " CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
+                set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -D__GXX_ABI_VERSION=10${WX_ABI_VERSION}")
+            endif()
+        endif()
+    endif()
+
+    # now check for OpenGL
+    include(CheckCXXSourceCompiles)
+
+    if(NOT DEFINED WX_HAS_OPENGL)
+        check_cxx_source_compiles("
+#include <wx/wxprec.h>
+#include <wx/config.h>
+#include <wx/glcanvas.h>
+
+int main(int argc, char** argv) {
+    wxGLCanvas canvas(NULL, wxID_ANY, NULL, wxPoint(0, 0), wxSize(300, 300), 0);
+    return 0;
+}" WX_HAS_OPENGL)
+    endif()
+
+    if(NOT WX_HAS_OPENGL)
+        add_definitions(-DNO_OGL)
+    endif()
 
     # end of wx compile checks
 
-    FOREACH(CXX_COMPILE_FLAG ${wxWidgets_CXX_FLAGS})
-        ADD_COMPILE_OPTIONS(${CXX_COMPILE_FLAG})
-    ENDFOREACH()
-
     # we make some direct gtk/gdk calls on linux and such
     # so need to link the gtk that wx was built with
-    IF(NOT WIN32 AND NOT APPLE)
-        FIND_PACKAGE(PkgConfig REQUIRED)
+    if(NOT WIN32 AND NOT APPLE)
+        find_package(PkgConfig REQUIRED)
 
-        FIND_PATH(WX_CONFIG_H NAMES wx/config.h PATHS ${wxWidgets_INCLUDE_DIRS})
-        IF(NOT WX_CONFIG_H)
-            MESSAGE(FATAL_ERROR "Could not find wx/config.h in ${wxWidgets_INCLUDE_DIRS}")
-        ENDIF()
-        SET(WX_CONFIG_H "${WX_CONFIG_H}/wx/config.h")
+        find_path(WX_CONFIG_H NAMES wx/config.h PATHS ${wxWidgets_INCLUDE_DIRS})
+        if(NOT WX_CONFIG_H)
+            message(FATAL_ERROR "Could not find wx/config.h in ${wxWidgets_INCLUDE_DIRS}")
+        endif()
+        set(WX_CONFIG_H "${WX_CONFIG_H}/wx/config.h")
 
-        INCLUDE(CheckCXXSymbolExists)
-        CHECK_CXX_SYMBOL_EXISTS(__WXGTK4__ ${WX_CONFIG_H} WX_USING_GTK4)
-        CHECK_CXX_SYMBOL_EXISTS(__WXGTK3__ ${WX_CONFIG_H} WX_USING_GTK3)
-        IF(WX_USING_GTK4)
-            PKG_CHECK_MODULES(GTK4 REQUIRED gtk+-4.0)
-            IF(NOT GTK4_INCLUDE_DIRS)
-                MESSAGE(FATAL_ERROR "Could not find gtk4")
-            ENDIF()
-            INCLUDE_DIRECTORIES(${GTK4_INCLUDE_DIRS})
-            LINK_DIRECTORIES(${GTK4_LIBRARY_DIRS})
-            ADD_COMPILE_OPTIONS(${GTK4_CFLAGS_OTHER})
-            SET(GTK_LIBRARIES ${GTK4_LIBRARIES})
-        ELSEIF(WX_USING_GTK3)
-            PKG_CHECK_MODULES(GTK3 REQUIRED gtk+-3.0)
-            IF(NOT GTK3_INCLUDE_DIRS)
-                MESSAGE(FATAL_ERROR "Could not find gtk3")
-            ENDIF()
-            INCLUDE_DIRECTORIES(${GTK3_INCLUDE_DIRS})
-            LINK_DIRECTORIES(${GTK3_LIBRARY_DIRS})
-            ADD_COMPILE_OPTIONS(${GTK3_CFLAGS_OTHER})
-            SET(GTK_LIBRARIES ${GTK3_LIBRARIES})
-        ELSE()
-            CHECK_CXX_SYMBOL_EXISTS(__WXGTK20__ ${WX_CONFIG_H} WX_USING_GTK2)
-            IF(WX_USING_GTK2)
+        include(CheckCXXSymbolExists)
+        check_cxx_symbol_exists(__WXGTK4__ ${WX_CONFIG_H} WX_USING_GTK4)
+        check_cxx_symbol_exists(__WXGTK3__ ${WX_CONFIG_H} WX_USING_GTK3)
+        if(WX_USING_GTK4)
+            pkg_check_modules(GTK4 REQUIRED gtk+-4.0)
+            if(NOT GTK4_INCLUDE_DIRS)
+                message(FATAL_ERROR "Could not find gtk4")
+            endif()
+            include_directories(${GTK4_INCLUDE_DIRS})
+            link_directories(${GTK4_LIBRARY_DIRS})
+            add_compile_options(${GTK4_CFLAGS_OTHER})
+            set(GTK_LIBRARIES ${GTK4_LIBRARIES})
+        elseif(WX_USING_GTK3)
+            pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+            if(NOT GTK3_INCLUDE_DIRS)
+                message(FATAL_ERROR "Could not find gtk3")
+            endif()
+            include_directories(${GTK3_INCLUDE_DIRS})
+            link_directories(${GTK3_LIBRARY_DIRS})
+            add_compile_options(${GTK3_CFLAGS_OTHER})
+            set(GTK_LIBRARIES ${GTK3_LIBRARIES})
+        else()
+            check_cxx_symbol_exists(__WXGTK20__ ${WX_CONFIG_H} WX_USING_GTK2)
+            if(WX_USING_GTK2)
                 # try to use pkg-config to find gtk2 first
-                PKG_CHECK_MODULES(GTK2 REQUIRED gtk+-2.0)
-                IF(GTK2_INCLUDE_DIRS)
-                    INCLUDE_DIRECTORIES(${GTK2_INCLUDE_DIRS})
-                    LINK_DIRECTORIES(${GTK2_LIBRARY_DIRS})
-                    ADD_COMPILE_OPTIONS(${GTK2_CFLAGS_OTHER})
-                    SET(GTK_LIBRARIES ${GTK2_LIBRARIES})
-                ELSE()
+                pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
+                if(GTK2_INCLUDE_DIRS)
+                    include_directories(${GTK2_INCLUDE_DIRS})
+                    link_directories(${GTK2_LIBRARY_DIRS})
+                    add_compile_options(${GTK2_CFLAGS_OTHER})
+                    set(GTK_LIBRARIES ${GTK2_LIBRARIES})
+                else()
                     # and if that fails, use the cmake module
-                    FIND_PACKAGE(GTK2 REQUIRED gtk)
-                    IF(NOT GTK2_INCLUDE_DIRS)
-                        MESSAGE(FATAL_ERROR "Could not find gtk2")
-                    ENDIF()
-                    INCLUDE_DIRECTORIES(${GTK2_INCLUDE_DIRS})
-                    ADD_COMPILE_OPTIONS(${GTK2_DEFINITIONS})
-                    SET(GTK_LIBRARIES ${GTK2_LIBRARIES})
-                ENDIF()
-            ELSE()
-                FIND_PACKAGE(GTK REQUIRED gtk)
-                IF(NOT GTK_INCLUDE_DIRS)
-                    MESSAGE(FATAL_ERROR "Could not find gtk")
-                ENDIF()
-                INCLUDE_DIRECTORIES(${GTK_INCLUDE_DIRS})
-                ADD_COMPILE_OPTIONS(${GTK_DEFINITIONS})
-            ENDIF()
-        ENDIF()
-    ENDIF()
+                    find_package(GTK2 REQUIRED gtk)
+                    if(NOT GTK2_INCLUDE_DIRS)
+                        message(FATAL_ERROR "Could not find gtk2")
+                    endif()
+                    include_directories(${GTK2_INCLUDE_DIRS})
+                    add_compile_options(${GTK2_DEFINITIONS})
+                    set(GTK_LIBRARIES ${GTK2_LIBRARIES})
+                endif()
+            else()
+                find_package(GTK REQUIRED gtk)
+                if(NOT GTK_INCLUDE_DIRS)
+                    message(FATAL_ERROR "Could not find gtk")
+                endif()
+                include_directories(${GTK_INCLUDE_DIRS})
+                add_compile_options(${GTK_DEFINITIONS})
+            endif()
+        endif()
+    endif()
 
-    if (wxWidgets_USE_FILE)
-        INCLUDE(${wxWidgets_USE_FILE})
+    if(wxWidgets_USE_FILE)
+        include(${wxWidgets_USE_FILE})
     endif()
 endif() # wxWidgets checks
 
@@ -459,10 +459,6 @@ else()
     endif()
 endif()
 
-if(WIN32 AND ENABLE_DIRECTX)
-    find_packge(DirectX REQUIRED)
-endif()
-
 # contrib widgets
 include_directories(widgets)
 
@@ -470,7 +466,7 @@ include_directories(widgets)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-SET(XRC_SOURCES
+set(XRC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/xrc/AccelConfig.xrc
     ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatAdd.xrc
     ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatCreate.xrc
@@ -510,16 +506,16 @@ SET(XRC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/xrc/SoundConfig.xrc
     ${CMAKE_CURRENT_SOURCE_DIR}/xrc/TileViewer.xrc
     ${CMAKE_CURRENT_SOURCE_DIR}/xrc/SpeedupConfig.xrc
-)
+    )
 
 # wxrc does not support xrs files in -c output (> 10x compression)
 # we do it using the bin2c.c utility
 
-SET(BIN2C ${CMAKE_BINARY_DIR}/bin2c)
+set(BIN2C ${CMAKE_BINARY_DIR}/bin2c)
 
-INCLUDE(HostCompile)
+include(HostCompile)
 
-HOST_COMPILE(${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c ${BIN2C})
+host_compile(${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c ${BIN2C})
 
 if(WXRC)
     separate_arguments(WXRC UNIX_COMMAND "${WXRC}")
@@ -529,7 +525,6 @@ endif()
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL CYGWIN)
     # pass xrc sources through cygpath in case we only have native wxrc
-
     set(new_xrc_sources)
 
     foreach(xrc ${XRC_SOURCES})
@@ -540,126 +535,135 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL CYGWIN)
     set(XRC_SOURCES ${new_xrc_sources})
 endif()
 
-ADD_CUSTOM_COMMAND(OUTPUT wxvbam.xrs
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                   COMMAND ${WXRC} ${XRC_SOURCES} "--output=wxvbam.xrs"
-                   DEPENDS ${XRC_SOURCES})
+add_custom_command(
+    OUTPUT wxvbam.xrs
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${WXRC} ${XRC_SOURCES} "--output=wxvbam.xrs"
+    DEPENDS ${XRC_SOURCES}
+)
 
-ADD_CUSTOM_COMMAND(OUTPUT builtin-xrc.h
-                   COMMAND ${BIN2C} wxvbam.xrs builtin-xrc.h builtin_xrs
-                   DEPENDS wxvbam.xrs)
+add_custom_command(
+    OUTPUT builtin-xrc.h
+    COMMAND ${BIN2C} wxvbam.xrs builtin-xrc.h builtin_xrs
+    DEPENDS wxvbam.xrs
+)
 
 # use a built-in vba-over.ini if no config file present
-ADD_CUSTOM_COMMAND(OUTPUT builtin-over.h
-                   COMMAND ${BIN2C} ${CMAKE_CURRENT_SOURCE_DIR}/../vba-over.ini builtin-over.h builtin_over
-                   DEPENDS ../vba-over.ini)
+add_custom_command(
+    OUTPUT builtin-over.h
+    COMMAND ${BIN2C} ${CMAKE_CURRENT_SOURCE_DIR}/../vba-over.ini builtin-over.h builtin_over
+    DEPENDS ../vba-over.ini
+)
 
 # I don't like duplicating/triplicating code, so I only declare
 # event handlers once, and copy them in other places they are needed
 # all using portable cmake code
-ADD_CUSTOM_COMMAND(OUTPUT cmdtab.cpp cmdhandlers.h cmd-evtable.h
-                   COMMAND
-		      ${CMAKE_COMMAND} -D OUTDIR=${CMAKE_CURRENT_BINARY_DIR} -P copy-events.cmake
-		   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		   DEPENDS cmdevents.cpp)
+add_custom_command(
+    OUTPUT cmdtab.cpp cmdhandlers.h cmd-evtable.h
+    COMMAND ${CMAKE_COMMAND} -D OUTDIR=${CMAKE_CURRENT_BINARY_DIR} -P copy-events.cmake
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDS cmdevents.cpp
+)
 
-#
+
 # the following should be in the main file for consistency with
 # other front ends, but can't due to cmake issues
 # then again, the main file should be split up into separate dirs anyway
-#
 
-SET( SRC_WX
-   wxvbam.cpp
-   guiinit.cpp
-   viewers.cpp
-   gfxviewers.cpp
-   cmdevents.cpp
-   opts.cpp
-   sys.cpp
-   panel.cpp
-   viewsupt.cpp
-   wayland.cpp
-   strutils.cpp
-   widgets/keyedit.cpp
-   widgets/joyedit.cpp
-   widgets/sdljoy.cpp
-   widgets/wxmisc.cpp
-   # probably ought to be in common
-   ../sdl/text.cpp
-   # from external source with minor modifications
-   widgets/checkedlistctrl.cpp
-   # generated
-   cmdtab.cpp
-   # generated includes must be explicitly listed
-   builtin-xrc.h
-   builtin-over.h
-   cmdhandlers.h
-   cmd-evtable.h
-   #Icon File
-   xrc/vbam.xpm
+set(
+    SRC_WX
+    wxvbam.cpp
+    guiinit.cpp
+    viewers.cpp
+    gfxviewers.cpp
+    cmdevents.cpp
+    opts.cpp
+    sys.cpp
+    panel.cpp
+    viewsupt.cpp
+    wayland.cpp
+    strutils.cpp
+    widgets/keyedit.cpp
+    widgets/joyedit.cpp
+    widgets/sdljoy.cpp
+    widgets/wxmisc.cpp
+    # probably ought to be in common
+    ../sdl/text.cpp
+    # from external source with minor modifications
+    widgets/checkedlistctrl.cpp
+    # generated
+    cmdtab.cpp
+    # generated includes must be explicitly listed
+    builtin-xrc.h
+    builtin-over.h
+    cmdhandlers.h
+    cmd-evtable.h
+    # icon File
+    xrc/vbam.xpm
 )
 
-IF(APPLE)
-    SET(SRC_WX ${SRC_WX} macsupport.mm)
-ENDIF(APPLE)
+if(APPLE)
+    set(SRC_WX ${SRC_WX} macsupport.mm)
+endif()
 
-SET( HDR_WX
-   wxvbam.h
-   drawing.h
-   filters.h
-   ioregs.h
-   opts.h
-   viewsupt.h
-   wxhead.h
-   wayland.h
-   widgets/wx/keyedit.h
-   widgets/wx/joyedit.h
-   widgets/wx/sdljoy.h
-   widgets/wx/webupdatedef.h
-   widgets/wx/wxmisc.h
-   # probably ought to be in common
-   ../sdl/text.h
-   # from external source with minor modifications
-   widgets/wx/checkedlistctrl.h
+set(
+    HDR_WX
+    wxvbam.h
+    drawing.h
+    filters.h
+    ioregs.h
+    opts.h
+    viewsupt.h
+    wxhead.h
+    wayland.h
+    widgets/wx/keyedit.h
+    widgets/wx/joyedit.h
+    widgets/wx/sdljoy.h
+    widgets/wx/webupdatedef.h
+    widgets/wx/wxmisc.h
+    # probably ought to be in common
+    ../sdl/text.h
+    # from external source with minor modifications
+    widgets/wx/checkedlistctrl.h
 )
 
-SET( RES_WX
+set(
+    RES_WX
     ${XRC_SOURCES}
     ../vba-over.ini
 )
 
-SET( CM_STUFF
+set(
+    CM_STUFF
     copy-events.cmake
 )
 
-IF(ENABLE_OPENAL)
-    SET( SRC_WX ${SRC_WX} openal.cpp )
-    SET( HDR_WX ${HDR_WX} openal.h )
-ENDIF(ENABLE_OPENAL)
+if(ENABLE_OPENAL)
+    set(SRC_WX ${SRC_WX} openal.cpp)
+    set(HDR_WX ${HDR_WX} openal.h)
+endif()
 
-IF(ENABLE_XAUDIO2)
-	SET( SRC_WX ${SRC_WX} xaudio2.cpp )
-ENDIF(ENABLE_XAUDIO2)
+if(ENABLE_XAUDIO2)
+    set(SRC_WX ${SRC_WX} xaudio2.cpp)
+endif()
 
-IF(ENABLE_FAUDIO)
-	SET( SRC_WX ${SRC_WX} faudio.cpp )
-ENDIF(ENABLE_FAUDIO)
+if(ENABLE_FAUDIO)
+    set(SRC_WX ${SRC_WX} faudio.cpp)
+endif()
 
-IF( WIN32 )
-    SET( SRC_WX ${SRC_WX} wxvbam.rc dsound.cpp )
-    SET(DIRECTX_LIBRARIES dxguid dsound ws2_32)
-    IF(MSVC)
+if(WIN32)
+    set(SRC_WX ${SRC_WX} wxvbam.rc dsound.cpp)
+    set(DIRECTX_LIBRARIES dxguid dsound ws2_32)
+    if(MSVC)
         # workaround for some symbols needed by static SDL2.lib
-        SET(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} imm32 version)
-    ENDIF(MSVC)
+        set(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} imm32 version)
+    endif()
     # not strictly directx, but win32-related
-    IF(ENABLE_DEBUGGER)
-        SET(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} wsock32)
-    ENDIF(ENABLE_DEBUGGER)
-ENDIF( WIN32 )
+    if(ENABLE_DEBUGGER)
+        set(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} wsock32)
+    endif()
+endif()
 
-unset(EXTRA_X11_LIBS)
 if(NOT WIN32 AND NOT APPLE)
     find_package(X11)
 
@@ -670,18 +674,18 @@ if(NOT WIN32 AND NOT APPLE)
     endif()
 endif()
 
-link_directories( ${CMAKE_BINARY_DIR} )
+link_directories(${CMAKE_BINARY_DIR})
 
-SET(VBAM_ICON vbam.icns)
+set(VBAM_ICON vbam.icns)
 
-SET(VBAM_ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icons/${VBAM_ICON})
+set(VBAM_ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icons/${VBAM_ICON})
 
-IF(APPLE)
-    SET(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
-    SET(CMAKE_INSTALL_RPATH "@loader_path/../Frameworks")
-ENDIF(APPLE)
+if(APPLE)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+    set(CMAKE_INSTALL_RPATH "@loader_path/../Frameworks")
+endif()
 
-ADD_EXECUTABLE (
+add_executable(
     visualboyadvance-m
     WIN32
     MACOSX_BUNDLE
@@ -693,7 +697,7 @@ ADD_EXECUTABLE (
 )
 
 
-TARGET_LINK_LIBRARIES (
+target_link_libraries(
     visualboyadvance-m
     ${VBAMCORE_LIBS}
     ${wxWidgets_LIBRARIES}
@@ -746,33 +750,36 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     endif()
 endif()
 
-IF(WIN32)
-    INSTALL(PROGRAMS ${PROJECT_BINARY_DIR}/visualboyadvance-m${CMAKE_EXECUTABLE_SUFFIX} DESTINATION ${CMAKE_BINARY_DIR})
-ENDIF(WIN32)
-IF(NOT WIN32 AND NOT APPLE)
-    INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/wxvbam.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
-ENDIF(NOT WIN32 AND NOT APPLE)
+if(WIN32)
+    install(PROGRAMS ${PROJECT_BINARY_DIR}/visualboyadvance-m${CMAKE_EXECUTABLE_SUFFIX} DESTINATION ${CMAKE_BINARY_DIR})
+endif()
+
+if(NOT WIN32 AND NOT APPLE)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/wxvbam.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+endif()
 
 if(APPLE)
     # this should set ROM file types correctly
-    SET_PROPERTY(TARGET visualboyadvance-m APPEND PROPERTY MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/wxplist.in)
-    SET(MACOSX_BUNDLE_ICON_FILE ${VBAM_ICON})
-    SET_SOURCE_FILES_PROPERTIES(${VBAM_ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set_property(TARGET visualboyadvance-m APPEND PROPERTY MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/wxplist.in)
+    set(MACOSX_BUNDLE_ICON_FILE ${VBAM_ICON})
+    set_source_files_properties(${VBAM_ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
     # bundle dylibs and relink them for releasing .app
     # also install translations into the .app
     # but only in Release mode
-    IF(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-        ADD_CUSTOM_COMMAND(TARGET visualboyadvance-m POST_BUILD
+    if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_custom_command(
+            TARGET visualboyadvance-m POST_BUILD
             COMMAND ${CMAKE_SOURCE_DIR}/tools/osx/third_party_libs_tool ./visualboyadvance-m.app
             WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
         )
 
-        add_custom_command(TARGET visualboyadvance-m POST_BUILD
+        add_custom_command(
+            TARGET visualboyadvance-m POST_BUILD
             COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/mac-translations.cmake
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
-    ENDIF()
-endif(APPLE)
+    endif()
+endif()
 
-SET(WX_EXE_NAME visualboyadvance-m-wx${CMAKE_EXECUTABLE_SUFFIX})
+set(WX_EXE_NAME visualboyadvance-m-wx${CMAKE_EXECUTABLE_SUFFIX})

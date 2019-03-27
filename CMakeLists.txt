@@ -129,15 +129,15 @@ endif()
 
 option(ENABLE_GBA_LOGGING "Enable extended GBA logging" ON)
 if(ENABLE_GBA_LOGGING)
-   add_definitions(-DGBA_LOGGING )
+    add_definitions(-DGBA_LOGGING )
 endif()
 if(ENABLE_MMX)
-  add_definitions(-DMMX)
+    add_definitions(-DMMX)
 endif()
 
 # The SDL port can't be built without debugging support
 if(NOT ENABLE_DEBUGGER AND ENABLE_SDL)
-        message(SEND_ERROR "The SDL port can't be built without debugging support")
+    message(SEND_ERROR "The SDL port can't be built without debugging support")
 endif()
 
 # this has to run after the toolchain is initialized so it can't be in
@@ -224,7 +224,8 @@ if(ENABLE_LINK)
 endif()
 
 # set the standard libraries all ports use
-set(VBAMCORE_LIBS
+set(
+    VBAMCORE_LIBS
     vbamcore
     fex
     ${SDL2_LIBRARY}
@@ -257,9 +258,9 @@ if(NOT ENABLE_FFMPEG)
 endif()
 
 if(ENABLE_LIRC)
-        set(WITHLIRC 1)
+    set(WITHLIRC 1)
 else()
-        set(WITHLIRC 0)
+    set(WITHLIRC 0)
 endif()
 
 include(GNUInstallDirs)
@@ -451,7 +452,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
             endif()
         endif()
 
-
         set(MY_C_FLAGS ${MY_C_FLAGS} -fopenmp)
     endif()
 
@@ -562,7 +562,8 @@ endif()
 
 add_subdirectory (fex)
 
-set(SRC_MAIN
+set(
+    SRC_MAIN
     src/Util.cpp
     src/common/ConfigManager.cpp
     src/common/dictionary.c
@@ -576,7 +577,8 @@ if(MSVC)
 	set(SRC_MAIN ${SRC_MAIN} "dependencies/msvc/getopt.c")
 endif()
 
-set(HDR_MAIN
+set(
+    HDR_MAIN
     src/System.h
     src/Util.h
     src/common/array.h
@@ -602,7 +604,8 @@ if(ENABLE_NLS)
     set(HDR_MAIN ${HDR_MAIN} src/NLS.h)
 endif()
 
-set(SRC_GBA
+set(
+    SRC_GBA
     src/gba/agbprint.cpp
     src/gba/bios.cpp
     src/gba/BreakpointStructures.cpp
@@ -632,7 +635,8 @@ set(SRC_GBA
     src/gba/Sram.cpp
 )
 
-set(HDR_GBA
+set(
+    HDR_GBA
     src/gba/agbprint.h
     src/gba/bios.h
     src/gba/BreakpointStructures.h
@@ -655,7 +659,8 @@ set(HDR_GBA
     src/gba/Sram.h
 )
 
-set(SRC_GB
+set(
+    SRC_GB
     src/gb/GB.cpp
     src/gb/gbCheats.cpp
     src/gb/gbDis.cpp
@@ -667,7 +672,8 @@ set(SRC_GB
     src/gb/gbSound.cpp
 )
 
-set(HDR_GB
+set(
+    HDR_GB
     src/gb/gb.h
     src/gb/gbCheats.h
     src/gb/gbCodes.h
@@ -679,7 +685,8 @@ set(HDR_GB
     src/gb/gbSound.h
 )
 
-set(SRC_APU
+set(
+    SRC_APU
     src/apu/Blip_Buffer.cpp
     src/apu/Effects_Buffer.cpp
     src/apu/Gb_Apu.cpp
@@ -688,7 +695,8 @@ set(SRC_APU
     src/apu/Multi_Buffer.cpp
 )
 
-set(HDR_APU
+set(
+    HDR_APU
     src/apu/blargg_common.h #Unused(?) but in the VS projects
     src/apu/blargg_config.h #Unused(?) but in the VS projects
     src/apu/blargg_source.h
@@ -699,7 +707,8 @@ set(HDR_APU
     src/apu/Multi_Buffer.h
 )
 
-set(SRC_SDL
+set(
+    SRC_SDL
     src/sdl/SDL.cpp
     src/sdl/filters.cpp
     src/sdl/text.cpp
@@ -709,7 +718,8 @@ set(SRC_SDL
     src/sdl/expr-lex.cpp
 )
 
-set(HDR_SDL
+set(
+    HDR_SDL
     src/sdl/filters.h
     src/sdl/text.h
     src/sdl/inputSDL.h
@@ -717,7 +727,8 @@ set(HDR_SDL
     src/sdl/exprNode.h
 )
 
-set(SRC_FILTERS
+set(
+    SRC_FILTERS
     src/filters/2xSaI.cpp
     src/filters/admame.cpp
     src/filters/bilinear.cpp
@@ -730,7 +741,8 @@ set(SRC_FILTERS
     src/filters/xBRZ/xbrz.cpp
 )
 
-set(HDR_FILTERS
+set(
+    HDR_FILTERS
     src/filters/hq2x.h
     src/filters/interp.h
     src/filters/lq2x.h
@@ -738,18 +750,21 @@ set(HDR_FILTERS
     src/filters/xBRZ/xbrz.h
 )
 
-set(SRC_HQ_C
+set(
+    SRC_HQ_C
     src/filters/hq/c/hq_implementation.cpp
 )
 
-set(HDR_HQ_C
+set(
+    HDR_HQ_C
     src/filters/hq/c/hq3x_pattern.h
     src/filters/hq/c/hq4x_pattern.h
     src/filters/hq/c/hq_base.h
     src/filters/hq/c/hq_shared.h
 )
 
-set(SRC_HQ_ASM
+set(
+    SRC_HQ_ASM
     src/filters/hq/asm/hq3x_16.asm
     src/filters/hq/asm/hq3x_32.asm
     src/filters/hq/asm/hq4x_16.asm
@@ -769,12 +784,14 @@ else()
 endif()
 
 if(ENABLE_DEBUGGER)
-    set(SRC_DEBUGGER
+    set(
+        SRC_DEBUGGER
         src/gba/armdis.cpp
         src/gba/elf.cpp
         src/gba/remote.cpp
     )
-    set(HDR_DEBUGGER
+    set(
+        HDR_DEBUGGER
         src/gba/armdis.h
         src/gba/elf.h
         src/gba/remote.h
@@ -841,13 +858,17 @@ if(ENABLE_SDL)
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam${CMAKE_EXECUTABLE_SUFFIX} DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 
     if(WIN32)
-        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
-                DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}
-                RENAME vbam.cfg)
+        install(
+            FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
+            DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}
+            RENAME vbam.cfg
+        )
     else()
-        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
-                DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}
-                RENAME vbam.cfg)
+        install(
+            FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
+            DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}
+            RENAME vbam.cfg
+        )
     endif()
 endif()
 
@@ -889,4 +910,5 @@ set(CPACK_PACKAGE_VERSION_MAJOR "2")
 set(CPACK_PACKAGE_VERSION_MINOR "0")
 set(CPACK_PACKAGE_VERSION_PATCH "0-Git-" ${COMMITHASH})
 list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
+list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg")
 include(CPack)
