@@ -613,7 +613,7 @@ rhel_installdeps() {
         warning='RHEL does not currently have SFML packages, LINK support will be disabled'
         cmake_flags="$cmake_flags -DENABLE_LINK=NO"
 
-        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libpng-devel SDL2-devel openal-soft-devel wxGTK3-devel gtk3-devel wxGTK-devel; do
+        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libpng-devel SDL2-devel openal-soft-devel wxGTK3-devel gtk3-devel; do
             case $pkg in
                 *ffmpeg*)
                     [ -n "$no_ffmpeg" ] && continue
