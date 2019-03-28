@@ -17,7 +17,6 @@
 #include <wx/filepicker.h>
 #include <wx/progdlg.h>
 #include <wx/spinctrl.h>
-#include <wx/valnum.h>
 #include <wx/stockitem.h>
 #include <wx/tokenzr.h>
 #include <wx/txtstrm.h>
@@ -88,7 +87,7 @@ public:
             return;
 
         if (!server) {
-            bool valid = SetLinkServerHost(gopts.link_host.mb_str());
+            bool valid = SetLinkServerHost(gopts.link_host.c_str());
 
             if (!valid) {
                 wxMessageBox(_("You must enter a valid host name"),
@@ -111,10 +110,10 @@ public:
             char host[length];
             GetLinkServerHost(host, length);
             title.Printf(_("Waiting for clients..."));
-            connmsg.Printf(_("Server IP address is: %s\n"), wxString(host, wxConvLibc).mb_str());
+            connmsg.Printf(_("Server IP address is: %s\n"), wxString(host, wxConvLibc).c_str());
         } else {
             title.Printf(_("Waiting for connection..."));
-            connmsg.Printf(_("Connecting to %s\n"), gopts.link_host.mb_str());
+            connmsg.Printf(_("Connecting to %s\n"), gopts.link_host.c_str());
         }
 
         // Init link
@@ -436,9 +435,9 @@ public:
 
             if (isgb) {
                 if (!ce_type)
-                    gbAddGsCheat(tok.mb_str(), ce_desc.mb_str());
+                    gbAddGsCheat(tok.utf8_str(), ce_desc.utf8_str());
                 else
-                    gbAddGgCheat(tok.mb_str(), ce_desc.mb_str());
+                    gbAddGgCheat(tok.utf8_str(), ce_desc.utf8_str());
             } else {
                 // Flashcart CHT format
                 if (tok.Contains(wxT("="))) {
@@ -446,16 +445,16 @@ public:
                 }
                 // Generic Code
                 else if (tok.Contains(wxT(":")))
-                    cheatsAddCheatCode(tok.mb_str(), ce_desc.mb_str());
+                    cheatsAddCheatCode(tok.utf8_str(), ce_desc.utf8_str());
                 // following determination of type by lengths is
                 // same used by win32 and gtk code
                 // and like win32/gtk code, user-chosen fmt is ignored
                 else if (tok.size() == 12) {
                     tok = tok.substr(0, 8) + wxT(' ') + tok.substr(8);
-                    cheatsAddCBACode(tok.mb_str(), ce_desc.mb_str());
+                    cheatsAddCBACode(tok.utf8_str(), ce_desc.utf8_str());
                 } else if (tok.size() == 16)
                     // not sure why 1-tok is !v3 and 2-tok is v3..
-                    cheatsAddGSACode(tok.mb_str(), ce_desc.mb_str(), false);
+                    cheatsAddGSACode(tok.utf8_str(), ce_desc.utf8_str(), false);
                 // CBA codes are assumed to be N+4, and anything else
                 // is assumed to be GSA v3 (although I assume the
                 // actual formats should be 8+4 and 8+8)
@@ -463,18 +462,18 @@ public:
                     if (!tk.HasMoreTokens()) {
                         // throw an error appropriate to chosen type
                         if (ce_type == 1) // GSA
-                            cheatsAddGSACode(tok.mb_str(), ce_desc.mb_str(), false);
+                            cheatsAddGSACode(tok.utf8_str(), ce_desc.utf8_str(), false);
                         else
-                            cheatsAddCBACode(tok.mb_str(), ce_desc.mb_str());
+                            cheatsAddCBACode(tok.utf8_str(), ce_desc.utf8_str());
                     } else {
                         wxString tok2 = tk.GetNextToken();
 
                         if (tok2.size() == 4) {
                             tok += wxT(' ') + tok2;
-                            cheatsAddCBACode(tok.mb_str(), ce_desc.mb_str());
+                            cheatsAddCBACode(tok.utf8_str(), ce_desc.utf8_str());
                         } else {
                             tok += tok2;
-                            cheatsAddGSACode(tok.mb_str(), ce_desc.mb_str(), true);
+                            cheatsAddGSACode(tok.utf8_str(), ce_desc.utf8_str(), true);
                         }
                     }
                 }
@@ -624,7 +623,7 @@ public:
         } else if (ce_desc != odesc) {
             *dirty = true;
             char* p = isgb ? gbCheatList[id].cheatDesc : cheatsList[id].desc;
-            strncpy(p, ce_desc.mb_str(), sizeof(cheatsList[0].desc));
+            strncpy(p, ce_desc.utf8_str(), sizeof(cheatsList[0].desc));
             p[sizeof(cheatsList[0].desc) - 1] = 0;
             item1.SetId(id);
             item1.SetText(wxString(p, wxConvUTF8));
@@ -674,7 +673,7 @@ void CheatList_t::ParseChtLine(wxString desc, wxString tok)
         wxString cheat_value;
         uint32_t address = 0;
         uint32_t value = 0;
-        sscanf(cheat_addr.mb_str(), "%8x", &address);
+        sscanf(cheat_addr.utf8_str(), "%8x", &address);
 
         if (address < 0x40000)
             address += 0x2000000;
@@ -685,11 +684,11 @@ void CheatList_t::ParseChtLine(wxString desc, wxString tok)
 
         while (value_tk.HasMoreTokens()) {
             wxString value_token = value_tk.GetNextToken();
-            sscanf(value_token.mb_str(), "%2x", &value);
+            sscanf(value_token.utf8_str(), "%2x", &value);
             cheat_line.Printf(wxT("%08X"), address);
             cheat_value.Printf(wxT("%02X"), value);
             cheat_line = cheat_line + wxT(":") + cheat_value;
-            cheatsAddCheatCode(cheat_line.mb_str(), cheat_desc.mb_str());
+            cheatsAddCheatCode(cheat_line.utf8_str(), cheat_desc.utf8_str());
             address++;
         }
     }
@@ -1070,7 +1069,7 @@ public:
             for (int i = 0; i < (1 << size); i++) {
                 addr_s.Printf(wxT("%02X%02X%02X%02X"), bank, val & 0xff,
                     addr & 0xff, addr >> 8);
-                gbAddGsCheat(addr_s.mb_str(), ca_desc.mb_str());
+                gbAddGsCheat(addr_s.utf8_str(), ca_desc.utf8_str());
                 val >>= 8;
                 addr++;
             }
@@ -1092,7 +1091,7 @@ public:
             }
 
             addr_s.append(s);
-            cheatsAddCheatCode(addr_s.mb_str(), ca_desc.mb_str());
+            cheatsAddCheatCode(addr_s.utf8_str(), ca_desc.utf8_str());
         }
     }
 
@@ -1572,7 +1571,7 @@ public:
         if (newapi == lastapi)
             return;
 
-        gopts.audio_dev = "";
+        gopts.audio_dev = wxT("");
         FillDev(newapi);
     }
 } sound_config_handler;
@@ -1812,7 +1811,7 @@ public:
             // to put the plugins...  it depends on where program was
             // installed, and of course OS
             wxString msg;
-            msg.Printf(_("No usable rpi plugins found in %s"), plpath.mb_str());
+            msg.Printf(_("No usable rpi plugins found in %s"), plpath.c_str());
             systemScreenMessage(msg);
             ch->Hide();
             txt->Hide();
@@ -2357,7 +2356,7 @@ void CheckThrowXRCError(T pointer, const wxString& name)
         std::string errormessage = "Unable to load a \"";
         errormessage += typeid(pointer).name();
         errormessage += "\" from the builtin xrc file: ";
-        errormessage += name.mb_str();
+        errormessage += name.utf8_str();
         throw std::runtime_error(errormessage);
     }
 }
@@ -2760,9 +2759,9 @@ bool MainFrame::BindControls()
                         if (a->GetFlags() == e->GetFlags() && a->GetKeyCode() == e->GetKeyCode()) {
                             if (e->GetMenuItem()) {
                                 wxLogInfo(_("Duplicate menu accelerator: %s for %s and %s; keeping first"),
-                                    wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).mb_str(),
-                                    e->GetMenuItem()->GetItemLabelText().mb_str(),
-                                    mi->GetItemLabelText().mb_str());
+                                    wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).c_str(),
+                                    e->GetMenuItem()->GetItemLabelText().c_str(),
+                                    mi->GetItemLabelText().c_str());
                                 delete a;
                                 a = 0;
                             } else {
@@ -2774,9 +2773,9 @@ bool MainFrame::BindControls()
                                             break;
 
                                     wxLogInfo(_("Menu accelerator %s for %s overrides default for %s ; keeping menu"),
-                                        wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).mb_str(),
-                                        mi->GetItemLabelText().mb_str(),
-                                        cmdtab[cmd].cmd);
+                                        wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).c_str(),
+                                        mi->GetItemLabelText().c_str(),
+                                        cmdtab[cmd].cmd.c_str());
                                 }
 
                                 sys_accels.erase(e);
@@ -2880,7 +2879,7 @@ bool MainFrame::BindControls()
     for (int i = 0; i < checkable_mi.size(); i++)
         if (!checkable_mi[i].boolopt && !checkable_mi[i].intopt) {
             wxLogError(_("Invalid menu item %s; removing"),
-                checkable_mi[i].mi->GetItemLabelText().mb_str());
+                checkable_mi[i].mi->GetItemLabelText().c_str());
             checkable_mi[i].mi->GetMenu()->Remove(checkable_mi[i].mi);
             checkable_mi[i].mi = NULL;
         }
@@ -3784,7 +3783,7 @@ bool MainFrame::BindControls()
         bool isv = !gopts.link_host.empty();
 
         if (isv) {
-            isv = SetLinkServerHost(gopts.link_host.mb_str());
+            isv = SetLinkServerHost(gopts.link_host.c_str());
         }
 
         if (!isv) {

@@ -68,7 +68,7 @@ endif()
 if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
     # set up wxwidgets stuff
     add_definitions(-D_UNICODE -DUNICODE -DWXUSINGDLL -DwxUSE_GUI=1 -D__WXMSW__)
-    if("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
         add_definitions(-D_DEBUG)
         include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/debug/lib/mswud)
         include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/include)
@@ -117,7 +117,7 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
         file(COPY ${_VCPKG_ROOT_DIR}/installed/${WINARCH}-windows/bin/SDL2.dll DESTINATION ${CMAKE_BINARY_DIR})
     endif()
 else()
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
         set(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
     endif()
 
@@ -156,12 +156,42 @@ else()
 
     set(wxWidgets_USE_UNICODE ON)
 
+    function(find_wx_util var util)
+        foreach(conf_suffix gtk4 gtk3 "")
+            foreach(major_version 4 3 2 "")
+                foreach(minor_version RANGE 0 101)
+                    unset(suffix)
+                    if(conf_suffix)
+                        set(suffix "-${conf_suffix}")
+                    endif()
+                    if(major_version)
+                        set(suffix "${suffix}-${major_version}")
+                    endif()
+                    if(NOT minor_version EQUAL 101)
+                        set(suffix "${suffix}.${minor_version}")
+                    endif()
+
+                    find_program(${var} NAMES "${util}${suffix}")
+
+                    if(${${var}})
+                        return()
+                    endif()
+                endforeach()
+            endforeach()
+        endforeach()
+    endfunction()
+
     # Check for gtk4 then gtk3 packages first, some dists like arch rename the
     # wx-config utility for these packages to e.g. wx-config-gtk3
     #
-    # Do not do the check if the WX_CONFIG env var is set.
-    if(NOT WIN32 AND NOT APPLE AND "$ENV{WX_CONFIG}" STREQUAL "")
-        find_program(wxWidgets_CONFIG_EXECUTABLE NAMES wx-config-gtk4 wx-config-gtk3 wx-config)
+    # Do not do the check if the WX_CONFIG env var is set or the cmake variable
+    # is set
+    if(NOT wxWidgets_CONFIG_EXECUTABLE)
+        if(DEFINED ENV{WX_CONFIG})
+            separate_arguments(wxWidgets_CONFIG_EXECUTABLE UNIX_COMMAND $ENV{WX_CONFIG})
+        else()
+            find_wx_util(wxWidgets_CONFIG_EXECUTABLE wx-config)
+        endif()
     endif()
 
     # adv is for wxAboutBox
@@ -180,7 +210,7 @@ else()
 
     include_directories(${wxWidgets_INCLUDE_DIRS})
 
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
         # tell wx to enable debug mode if possible, if the cmake module did not do it for us
         execute_process(COMMAND "${wxWidgets_CONFIG_EXECUTABLE} --debug=yes" RESULT_VARIABLE WX_CONFIG_DEBUG OUTPUT_QUIET ERROR_QUIET)
 
@@ -257,13 +287,19 @@ int WINAPI DetourMessageBoxA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uT
 class MyApp : public wxAppConsole {
 public:
     virtual bool OnInit();
+    // this is necessary for 2.8 to make the class non-abstract
+    virtual int OnRun() { return 0; }
 };
 
 bool MyApp::OnInit() {
     exit(0);
 }
 
+#if wxCHECK_VERSION(2, 9, 0)
 wxIMPLEMENT_APP_NO_MAIN(MyApp);
+#else
+IMPLEMENT_APP_NO_MAIN(MyApp);
+#endif
 
 int main(int argc, char** argv)
 {
@@ -518,8 +554,27 @@ include(HostCompile)
 host_compile(${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c ${BIN2C})
 
 if(WXRC)
-    separate_arguments(WXRC UNIX_COMMAND "${WXRC}")
-else()
+    separate_arguments(WXRC UNIX_COMMAND ${WXRC})
+elseif(DEFINED ENV{WXRC})
+    separate_arguments(WXRC UNIX_COMMAND $ENV{WXRC})
+elseif(wxWidgets_CONFIG_EXECUTABLE)
+    execute_process(
+        COMMAND ${wxWidgets_CONFIG_EXECUTABLE} --utility=wxrc
+        OUTPUT_VARIABLE WXRC
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    # check if the path from wx-config is good
+    if(NOT EXISTS ${WXRC})
+        unset(WXRC)
+    endif()
+endif()
+
+if(NOT WXRC)
+    find_wx_util(WXRC wxrc)
+endif()
+
+if(NOT WXRC)
+    message(WARNING "could not find your wxrc executable")
     set(WXRC wxrc)
 endif()
 
@@ -723,7 +778,7 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCXX)
     if(WIN32)
         # Build a console app in debug mode on Windows
-        if(CMAKE_BUILD_TYPE STREQUAL Debug)
+        if(CMAKE_BUILD_TYPE MATCHES Debug)
             set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,console")
         else()
             set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,windows")
@@ -767,7 +822,7 @@ if(APPLE)
     # bundle dylibs and relink them for releasing .app
     # also install translations into the .app
     # but only in Release mode
-    if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if(NOT CMAKE_BUILD_TYPE MATCHES Debug)
         add_custom_command(
             TARGET visualboyadvance-m POST_BUILD
             COMMAND ${CMAKE_SOURCE_DIR}/tools/osx/third_party_libs_tool ./visualboyadvance-m.app

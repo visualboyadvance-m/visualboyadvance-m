@@ -374,7 +374,7 @@ void load_opts()
 
     for (cont = cfg->GetFirstEntry(s, grp_idx); cont;
          cont = cfg->GetNextEntry(s, grp_idx)) {
-        //wxLogWarning(_("Invalid option %s present; removing if possible"), s.mb_str());
+        //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
         item_del.push_back(s);
     }
 
@@ -412,7 +412,7 @@ void load_opts()
                 for (cont = cfg->GetFirstGroup(e, key_idx); cont;
                      cont = cfg->GetNextGroup(e, key_idx)) {
                     s.append(e);
-                    //wxLogWarning(_("Invalid option group %s present; removing if possible"), s.mb_str());
+                    //wxLogWarning(_("Invalid option group %s present; removing if possible"), s.c_str());
                     grp_del.push_back(s);
                     s.resize(poff2);
                 }
@@ -427,7 +427,7 @@ void load_opts()
 
                     if (i == NUM_KEYS) {
                         s.append(e);
-                        //wxLogWarning(_("Invalid option %s present; removing if possible"), s.mb_str());
+                        //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
                         item_del.push_back(s);
                         s.resize(poff2);
                     }
@@ -439,7 +439,7 @@ void load_opts()
             } else {
                 s.append(wxT('/'));
                 s.append(e);
-                //wxLogWarning(_("Invalid option group %s present; removing if possible"), s.mb_str());
+                //wxLogWarning(_("Invalid option group %s present; removing if possible"), s.c_str());
                 grp_del.push_back(s);
                 s.resize(poff);
             }
@@ -454,7 +454,7 @@ void load_opts()
                 if (!std::binary_search(&cmdtab[0], &cmdtab[ncmds], dummy, cmditem_lt)) {
                     s.append(wxT('/'));
                     s.append(e);
-                    //wxLogWarning(_("Invalid option %s present; removing if possible"), s.mb_str());
+                    //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
                     item_del.push_back(s);
                     s.resize(poff);
                 }
@@ -465,7 +465,7 @@ void load_opts()
                 wxString opt_name(dummy.opt);
 
                 if (!std::binary_search(&opts[0], &opts[num_opts], dummy, opt_lt) && opt_name != wxT("General/LastUpdated") && opt_name != wxT("General/LastUpdatedFileName")) {
-                    //wxLogWarning(_("Invalid option %s present; removing if possible"), s.mb_str());
+                    //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
                     item_del.push_back(s);
                 }
 
@@ -510,9 +510,9 @@ void load_opts()
                     // technically, the translation for this string could incorproate
                     // the equals sign if necessary instead of doing it this way
                     wxLogWarning(_("Invalid value %s for option %s; valid values are %s%s%s"),
-                        s, opt.opt, ev,
+                        s.c_str(), opt.opt.c_str(), ev.c_str(),
                         isx ? wxT(" = ") : wxT(""),
-                        isx ? evx : wxT(""));
+                        isx ? evx.c_str() : wxT(""));
                     // write first option
                     cfg->Write(opt.opt, enum_opts[0]);
                 } else
@@ -526,14 +526,14 @@ void load_opts()
             cfg->Read(opt.opt, &opt.curint, *opt.intopt);
 
             if (opt.curint < opt.min || opt.curint > opt.max) {
-                wxLogWarning(_("Invalid value %d for option %s; valid values are %d - %d"), opt.curint, opt.opt, opt.min, opt.max);
+                wxLogWarning(_("Invalid value %d for option %s; valid values are %d - %d"), opt.curint, opt.opt.c_str(), opt.min, opt.max);
             } else
                 *opt.intopt = opt.curint;
         } else if (opt.doubleopt) {
             cfg->Read(opt.opt, &opt.curdouble, *opt.doubleopt);
 
             if (opt.curdouble < opt.min || opt.curdouble > opt.max) {
-                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), opt.curdouble, opt.opt, opt.min, opt.max);
+                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), opt.curdouble, opt.opt.c_str(), opt.min, opt.max);
             } else
                 *opt.doubleopt = opt.curdouble;
         } else if (opt.uintopt) {
@@ -542,7 +542,7 @@ void load_opts()
             opt.curuint = val;
 
             if (opt.curuint < opt.min || opt.curuint > opt.max) {
-                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), opt.curuint, opt.opt, opt.min, opt.max);
+                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), opt.curuint, opt.opt.c_str(), opt.min, opt.max);
             } else
                 *opt.uintopt = opt.curuint;
         } else if (opt.boolopt) {
@@ -594,14 +594,14 @@ void load_opts()
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < NUM_KEYS; j++) {
             wxString optname;
-            optname.Printf(wxT("Joypad/%d/%s"), i + 1, joynames[j]);
+            optname.Printf(wxT("Joypad/%d/%s"), i + 1, joynames[j].c_str());
             bool gotit = cfg->Read(optname, &s);
 
             if (gotit) {
                 gopts.joykey_bindings[i][j] = wxJoyKeyTextCtrl::FromString(s);
 
                 if (s.size() && !gopts.joykey_bindings[i][j].size())
-                    wxLogWarning(_("Invalid key binding %s for %s"), s.mb_str(), optname.mb_str());
+                    wxLogWarning(_("Invalid key binding %s for %s"), s.c_str(), optname.c_str());
             } else {
                 s = wxJoyKeyTextCtrl::ToString(gopts.joykey_bindings[i][j]);
                 cfg->Write(optname, s);
@@ -622,7 +622,7 @@ void load_opts()
             wxAcceleratorEntry_v val = wxKeyTextCtrl::FromString(s);
 
             if (!val.size())
-                wxLogWarning(_("Invalid key binding %s for %s"), s.mb_str(), kbopt.mb_str());
+                wxLogWarning(_("Invalid key binding %s for %s"), s.c_str(), kbopt.c_str());
             else {
                 for (int j = 0; j < val.size(); j++)
                     val[j].Set(val[j].GetFlags(), val[j].GetKeyCode(),
@@ -670,7 +670,7 @@ void update_opts()
                 cfg->Write(opt.opt, (opt.curdouble = *opt.doubleopt));
         } else if (opt.uintopt) {
             if (*opt.uintopt != opt.curuint)
-                cfg->Write(opt.opt, (opt.curuint = *opt.uintopt));
+                cfg->Write(opt.opt, (long)(opt.curuint = *opt.uintopt));
         } else if (opt.boolopt) {
             if (*opt.boolopt != opt.curbool)
                 cfg->Write(opt.opt, (opt.curbool = *opt.boolopt));
@@ -708,7 +708,7 @@ void update_opts()
         for (int j = 0; j < NUM_KEYS; j++) {
             wxString s, o;
             wxString optname;
-            optname.Printf(wxT("Joypad/%d/%s"), i + 1, joynames[j]);
+            optname.Printf(wxT("Joypad/%d/%s"), i + 1, joynames[j].c_str());
             s = wxJoyKeyTextCtrl::ToString(gopts.joykey_bindings[i][j]);
             cfg->Read(optname, &o);
 
@@ -786,7 +786,7 @@ bool opt_set(const wxString& name, const wxString& val)
         else if (opt->boolopt) {
             if (!(val == wxT('0') || val == wxT('1')))
                 wxLogWarning(_("Invalid flag option %s - %s ignored"),
-                    name, val);
+                    name.c_str(), val.c_str());
             else
                 *opt->boolopt = val == wxT('1');
         } else if (!opt->enumvals.empty()) {
@@ -803,9 +803,9 @@ bool opt_set(const wxString& name, const wxString& val)
                 // technically, the translation for this string could incorproate
                 // the equals sign if necessary instead of doing it this way
                 wxLogWarning(_("Invalid value %s for option %s; valid values are %s%s%s"),
-                    s, opt->opt, opt->enumvals,
+                    s.c_str(), opt->opt.c_str(), opt->enumvals.c_str(),
                     isx ? wxT(" = ") : wxT(""),
-                    isx ? evx : wxT(""));
+                    isx ? evx.c_str() : wxT(""));
             } else {
                 *opt->intopt = found_pos;
             }
@@ -814,7 +814,7 @@ bool opt_set(const wxString& name, const wxString& val)
             long ival;
 
             if (!s.ToLong(&ival) || ival < opt->min || ival > opt->max)
-                wxLogWarning(_("Invalid value %d for option %s; valid values are %d - %d"), ival, name, opt->min, opt->max);
+                wxLogWarning(_("Invalid value %d for option %s; valid values are %d - %d"), ival, name.c_str(), opt->min, opt->max);
             else
                 *opt->intopt = ival;
         } else if (opt->doubleopt) {
@@ -822,7 +822,7 @@ bool opt_set(const wxString& name, const wxString& val)
             double dval;
 
             if (!s.ToDouble(&dval) || dval < opt->min || dval > opt->max)
-                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), dval, name, opt->min, opt->max);
+                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), dval, name.c_str(), opt->min, opt->max);
             else
                 *opt->doubleopt = dval;
         } else if (opt->uintopt) {
@@ -830,7 +830,7 @@ bool opt_set(const wxString& name, const wxString& val)
             unsigned long uival;
 
             if (!s.ToULong(&uival) || uival < opt->min || uival > opt->max)
-                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), uival, name, opt->min, opt->max);
+                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), uival, name.c_str(), opt->min, opt->max);
             else
                 *opt->uintopt = (uint32_t)uival;
         } else {
@@ -899,7 +899,7 @@ bool opt_set(const wxString& name, const wxString& val)
                         cmd->cmd_id);
 
                 if (!aval.size())
-                    wxLogWarning(_("Invalid key binding %s for %s"), val, name);
+                    wxLogWarning(_("Invalid key binding %s for %s"), val.c_str(), name.c_str());
                 else
                     gopts.accels.insert(gopts.accels.end(), aval.begin(), aval.end());
             }
@@ -925,7 +925,7 @@ bool opt_set(const wxString& name, const wxString& val)
                 auto b = wxJoyKeyTextCtrl::FromString(val);
 
                 if (!b.size())
-                    wxLogWarning(_("Invalid key binding %s for %s"), val, name);
+                    wxLogWarning(_("Invalid key binding %s for %s"), val.c_str(), name.c_str());
                 else
                     gopts.joykey_bindings[jno][kno] = b;
             }

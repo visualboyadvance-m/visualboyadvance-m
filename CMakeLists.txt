@@ -116,8 +116,9 @@ option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
 
 set(LTO_DEFAULT ON)
 
-if(WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND AMD64)
-    # lto produces buggy binaries for 64 bit win32
+# lto produces buggy binaries for 64 bit win32
+# and we generally don't want it when debugging because it makes linking slow
+if((WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND AMD64) OR CMAKE_BUILD_TYPE MATCHES Debug)
     set(LTO_DEFAULT OFF)
 endif()
 
@@ -168,7 +169,7 @@ endif()
 include_directories(${CMAKE_BINARY_DIR})
 configure_file("${CMAKE_SOURCE_DIR}/src/version.h.in" "${CMAKE_BINARY_DIR}/version.h" @ONLY)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(CMAKE_BUILD_TYPE MATCHES Debug)
     add_definitions(-DDEBUG)
 else()
     add_definitions(-DNDEBUG)
@@ -196,7 +197,11 @@ endif()
 
 # Look for some dependencies using CMake scripts
 find_package(ZLIB REQUIRED)
+
+set(OpenGL_GL_PREFERENCE GLVND)
+
 find_package(OpenGL REQUIRED)
+
 find_package(PNG REQUIRED)
 
 if(EXISTS /etc/redhat-release)
@@ -220,7 +225,13 @@ if(ENABLE_LINK)
     if(WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe) AND NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
         set(SFML_STATIC_LIBRARIES TRUE)
     endif()
-    find_package(SFML 2 COMPONENTS network system REQUIRED)
+
+    find_package(SFML 2 COMPONENTS network system)
+
+    if(NOT SFML_FOUND)
+        message(WARNING "SFML not found, LINK will be disabled")
+        set(ENABLE_LINK NO)
+    endif()
 endif()
 
 # set the standard libraries all ports use
@@ -479,7 +490,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         set(MY_C_FLAGS ${MY_C_FLAGS} -static-libgcc -static-libstdc++)
     endif()
 
-    if(CMAKE_BUILD_TYPE STREQUAL Debug)
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
         set(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_DBG_FLAGS} -Wall -Wextra)
     else()
         set(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_OPT_FLAGS} -Wno-error)

@@ -60,8 +60,8 @@ cmake ..
 make -j`nproc`
 ```
 
-`./installdeps` is supported on MSys2, Linux (Debian/Ubuntu, Fedora, Arch or
-Solus) and Mac OS X (homebrew, macports or fink.)
+`./installdeps` is supported on MSys2, Linux (Debian/Ubuntu, Fedora, Arch,
+Solus and RHEL/CentOS) and Mac OS X (homebrew, macports or fink.)
 
 The Ninja cmake generator is also now supported, including on msys2 and Visual Studio.
 
