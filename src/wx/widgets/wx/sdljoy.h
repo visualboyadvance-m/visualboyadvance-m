@@ -13,7 +13,7 @@
 #include <wx/event.h>
 #include <wx/timer.h>
 
-typedef struct wxSDLJoyState wxSDLJoyState_t;
+struct wxSDLJoyState;
 
 class wxSDLJoy : public wxTimer {
 public:
@@ -61,7 +61,7 @@ public:
 protected:
     bool digital;
     int njoy;
-    wxSDLJoyState_t* joystate;
+    wxSDLJoyState* joystate;
     wxEvtHandler* evthandler;
     bool nosticks;
     void Notify();
