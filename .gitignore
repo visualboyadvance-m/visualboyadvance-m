@@ -12,6 +12,7 @@ vcpkg/*
 .vs/*
 *.o
 *.so
+*.dll
 *.exe
 
 # vim swap files
