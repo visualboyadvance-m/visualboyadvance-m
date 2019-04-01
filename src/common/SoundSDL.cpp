@@ -60,11 +60,12 @@ void SoundSDL::read(uint16_t* stream, int length) {
     if (!initialized || !emulating)
         return;
 
-    if (!buffer_size())
+    if (!buffer_size()) {
         if (should_wait())
             SDL_SemWait(data_available);
         else
             return;
+    }
 
     SDL_LockMutex(mutex);
 
