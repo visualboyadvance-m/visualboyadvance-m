@@ -2240,6 +2240,7 @@ void GLDrawingPanel::AdjustViewport()
 
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 {
+    (void)dc; // unused params
 #ifndef wxGL_IMPLICIT_CONTEXT
     SetCurrent(*ctx);
 #else

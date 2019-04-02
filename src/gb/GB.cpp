@@ -3443,8 +3443,6 @@ bool gbReadGSASnapshot(const char* fileName)
         return false;
     }
     fseek(file, 0x13, SEEK_SET);
-    //size_t read = 0;
-    //int toRead = 0;
     switch (gbRomType) {
     case 0x03:
     case 0x0f:
@@ -3453,15 +3451,11 @@ bool gbReadGSASnapshot(const char* fileName)
     case 0x1b:
     case 0x1e:
     case 0xff:
-        //read = fread(gbRam, 1, (gbRamSizeMask + 1), file);
         FREAD_UNCHECKED(gbRam, 1, (gbRamSizeMask + 1), file);
-        //toRead = (gbRamSizeMask + 1);
         break;
     case 0x06:
     case 0x22:
-        //read = fread(&gbMemory[0xa000], 1, 256, file);
         FREAD_UNCHECKED(&gbMemory[0xa000], 1, 256, file);
-        //toRead = 256;
         break;
     default:
         systemMessage(MSG_UNSUPPORTED_SNAPSHOT_FILE,

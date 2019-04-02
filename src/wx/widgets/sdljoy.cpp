@@ -14,6 +14,12 @@ struct wxSDLJoyState {
         if (dev)
             SDL_JoystickClose(dev);
     }
+    wxSDLJoyState()
+    {
+	dev = NULL;
+	nax = nhat = nbut = 0;
+	curval = NULL;
+    }
 };
 
 wxSDLJoy::wxSDLJoy(bool analog)
@@ -37,7 +43,6 @@ wxSDLJoy::wxSDLJoy(bool analog)
         return;
 
     joystate = new wxSDLJoyState[njoy];
-    memset(joystate, 0, njoy * sizeof(*joystate));
 
     for (int i = 0; i < njoy; i++) {
         SDL_Joystick* dev = joystate[i].dev = SDL_JoystickOpen(i);

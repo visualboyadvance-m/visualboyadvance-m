@@ -67,7 +67,7 @@ void gbSgbReset()
     gbSgbNextController = 0x0f;
     gbSgbReadingController = 0;
 
-    //memset(gbSgbSCPPalette, 0, 512 * 4 * sizeof(uint16_t));
+    memset(gbSgbSCPPalette, 0, 512 * 4 * sizeof(uint16_t));
     memset(gbSgbATF, 0, 20 * 18);
     memset(gbSgbATFList, 0, 45 * 20 * 18);
     memset(gbSgbPacket, 0, 16 * 7);
