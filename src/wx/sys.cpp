@@ -45,7 +45,7 @@ void systemMessage(int id, const char* fmt, ...)
     va_list args;
     // auto-conversion of wxCharBuffer to const char * seems broken
     // so save underlying wxCharBuffer (or create one of none is used)
-    wxCharBuffer _fmt(wxString(wxGetTranslation(wxString(fmt, wxConvLibc))).mb_str());
+    wxCharBuffer _fmt(wxString(wxGetTranslation(wxString(fmt, wxConvLibc))).utf8_str());
 
     if (!buf) {
         buf = (char*)malloc(buflen);
@@ -72,7 +72,7 @@ void systemMessage(int id, const char* fmt, ...)
             exit(1);
     }
 
-    wxLogError(wxT("%s"), wxString(buf, wxConvLibc).mb_str());
+    wxLogError(wxT("%s"), wxString(buf, wxConvLibc).c_str());
 }
 
 static int frames = 0;
@@ -130,7 +130,7 @@ void systemStartGameRecording(const wxString& fname)
     uint32_t version = 1;
 
     if (!game_file.Open(fn, wxT("wb")) || game_file.Write(&version, sizeof(version)) != sizeof(version)) {
-        wxLogError(_("Cannot open output file %s"), fname.mb_str());
+        wxLogError(_("Cannot open output file %s"), fname.c_str());
         return;
     }
 
@@ -191,7 +191,7 @@ void systemStartGamePlayback(const wxString& fname)
     uint32_t version;
 
     if (!game_file.Open(fn, wxT("rb")) || game_file.Read(&version, sizeof(version)) != sizeof(version) || wxUINT32_SWAP_ON_BE(version) != 1) {
-        wxLogError(_("Cannot open recording file %s"), fname.mb_str());
+        wxLogError(_("Cannot open recording file %s"), fname.c_str());
         return;
     }
 
@@ -416,7 +416,7 @@ void systemScreenCapture(int num)
 
     do {
         wxString bfn;
-        bfn.Printf(wxT("%s%02d"), panel->game_name().mb_str(),
+        bfn.Printf(wxT("%s%02d"), panel->game_name().c_str(),
             num++);
 
         if (captureFormat == 0)
@@ -435,7 +435,7 @@ void systemScreenCapture(int num)
         panel->emusys->emuWriteBMP(fn.GetFullPath().mb_fn_str());
 
     wxString msg;
-    msg.Printf(_("Wrote snapshot %s"), fn.GetFullPath().mb_str());
+    msg.Printf(_("Wrote snapshot %s"), fn.GetFullPath().c_str());
     systemScreenMessage(msg);
 }
 
@@ -807,7 +807,7 @@ void PrintDialog::DoSave(wxCommandEvent&)
 
     if (scimg.SaveFile(of)) {
         wxString msg;
-        msg.Printf(_("Wrote printer output to %s"), of.mb_str());
+        msg.Printf(_("Wrote printer output to %s"), of.c_str());
         systemScreenMessage(msg);
         wxButton* cb = wxStaticCast(dlg->FindWindow(wxID_CANCEL), wxButton);
 
@@ -967,7 +967,7 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
 
         do {
             wxString bfn;
-            bfn.Printf(wxT("%s-print%02d"), panel->game_name().mb_str(),
+            bfn.Printf(wxT("%s-print%02d"), panel->game_name().c_str(),
                 num++);
 
             if (captureFormat == 0)
@@ -990,7 +990,7 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
 
         if (ret) {
             wxString msg;
-            msg.Printf(_("Wrote printer output to %s"), of.mb_str());
+            msg.Printf(_("Wrote printer output to %s"), of.c_str());
             systemScreenMessage(msg);
         }
 
@@ -1180,7 +1180,7 @@ bool debugOpenPty()
     if ((pty_master = posix_openpt(O_RDWR | O_NOCTTY)) < 0 || grantpt(pty_master) < 0 || unlockpt(pty_master) < 0 || !(slave_name = ptsname(pty_master))) {
         wxLogError(_("Error opening pseudo tty: %s"), wxString(strerror(errno),
                                                           wxConvLibc)
-                                                          .mb_str());
+                                                          .c_str());
 
         if (pty_master >= 0) {
             close(pty_master);
@@ -1317,7 +1317,7 @@ void log(const char* defaultMsg, ...)
     if (out == NULL) {
         // FIXME: this should be an option
         wxFileName trace_log(wxGetApp().GetConfigurationPath(), wxT("trace.log"));
-        out = fopen(trace_log.GetFullPath().mb_str(), "w");
+        out = fopen(trace_log.GetFullPath().utf8_str(), "w");
 
         if (!out)
             return;

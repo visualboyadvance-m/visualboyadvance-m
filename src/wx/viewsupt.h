@@ -58,7 +58,7 @@ protected:
 // on errors, abort program
 #define baddialog()                                                      \
     do {                                                                 \
-        wxLogError(_("Unable to load dialog %s from resources"), dname); \
+        wxLogError(_("Unable to load dialog %s from resources"), dname.c_str()); \
         wxGetApp().frame->Close(true);                                   \
         return;                                                          \
     } while (0)

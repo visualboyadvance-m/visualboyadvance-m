@@ -709,7 +709,7 @@ public:
         wxFileName fn(memsave_fn);
 
         if (!fn.IsFileReadable()) {
-            wxLogError(wxT("Can't open file %s"), memsave_fn.mb_str());
+            wxLogError(wxT("Can't open file %s"), memsave_fn.c_str());
             return;
         }
 

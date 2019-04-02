@@ -60,14 +60,14 @@ static void get_config_path(wxPathList& path, bool exists = true)
     static bool debug_dumped = false;
 
     if (!debug_dumped) {
-        wxLogDebug(wxT("GetUserLocalDataDir(): %s"), stdp.GetUserLocalDataDir().mb_str());
-        wxLogDebug(wxT("GetUserDataDir(): %s"), stdp.GetUserDataDir().mb_str());
-        wxLogDebug(wxT("GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()): %s"), stdp.GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()).mb_str());
-        wxLogDebug(wxT("GetResourcesDir(): %s"), stdp.GetResourcesDir().mb_str());
-        wxLogDebug(wxT("GetDataDir(): %s"), stdp.GetDataDir().mb_str());
-        wxLogDebug(wxT("GetLocalDataDir(): %s"), stdp.GetLocalDataDir().mb_str());
-        wxLogDebug(wxT("plugins_dir: %s"), wxGetApp().GetPluginsDir().mb_str());
-        wxLogDebug(wxT("XdgConfigDir: %s"), get_xdg_user_config_home() + current_app_name);
+        wxLogDebug(wxT("GetUserLocalDataDir(): %s"), stdp.GetUserLocalDataDir().c_str());
+        wxLogDebug(wxT("GetUserDataDir(): %s"), stdp.GetUserDataDir().c_str());
+        wxLogDebug(wxT("GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()): %s"), stdp.GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()).c_str());
+        wxLogDebug(wxT("GetResourcesDir(): %s"), stdp.GetResourcesDir().c_str());
+        wxLogDebug(wxT("GetDataDir(): %s"), stdp.GetDataDir().c_str());
+        wxLogDebug(wxT("GetLocalDataDir(): %s"), stdp.GetLocalDataDir().c_str());
+        wxLogDebug(wxT("plugins_dir: %s"), wxGetApp().GetPluginsDir().c_str());
+        wxLogDebug(wxT("XdgConfigDir: %s"), (wxString(get_xdg_user_config_home().c_str(), wxConvLibc) + current_app_name).c_str());
         debug_dumped = true;
     }
 
@@ -76,8 +76,8 @@ static void get_config_path(wxPathList& path, bool exists = true)
 #if defined(__WXGTK__)
     // XDG spec manual support
     // ${XDG_CONFIG_HOME:-$HOME/.config}/`appname`
-    wxString old_config = wxString(getenv("HOME")) + FILE_SEP + ".vbam";
-    wxString new_config(get_xdg_user_config_home());
+    wxString old_config = wxString(getenv("HOME"), wxConvLibc) + wxT(FILE_SEP) + wxT(".vbam");
+    wxString new_config(get_xdg_user_config_home().c_str(), wxConvLibc);
     if (!wxDirExists(old_config) && wxIsWritable(new_config))
     {
         wxFileName new_path(new_config, wxEmptyString);
@@ -120,7 +120,7 @@ const wxString wxvbamApp::GetPluginsDir()
 
 wxString wxvbamApp::GetConfigurationPath()
 {
-    wxString config("vbam.ini");
+    wxString config(wxT("vbam.ini"));
     // first check if config files exists in reverse order
     // (from system paths to more local paths.)
     if (data_path.empty()) {
@@ -247,17 +247,17 @@ bool wxvbamApp::OnInit()
 // this needs to be in a subdir to support other config as well
 // but subdir flag behaves differently 2.8 vs. 2.9.  Oh well.
 // NOTE: this does not support XDG (freedesktop.org) paths
-    wxString confname("vbam.ini");
+    wxString confname(wxT("vbam.ini"));
     wxFileName vbamconf(GetConfigurationPath(), confname);
 // /MIGRATION
 // migrate from 'vbam.{cfg,conf}' to 'vbam.ini' to manage a single config
 // file for all platforms.
 #if !defined(__WXMSW__) && !defined(__APPLE__)
-    wxString oldConf(GetConfigurationPath() + FILE_SEP + "vbam.conf");
+    wxString oldConf(GetConfigurationPath() + wxT(FILE_SEP) + wxT("vbam.conf"));
 #else
-    wxString oldConf(GetConfigurationPath() + FILE_SEP + "vbam.cfg");
+    wxString oldConf(GetConfigurationPath() + wxT(FILE_SEP) + wxT("vbam.cfg"));
 #endif
-    wxString newConf(GetConfigurationPath() + FILE_SEP + "vbam.ini");
+    wxString newConf(GetConfigurationPath() + wxT(FILE_SEP) + wxT("vbam.ini"));
     if (wxFileExists(oldConf))
     {
 	wxRenameFile(oldConf, newConf, false);
@@ -538,7 +538,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
                     "To override, remove all but changed root node(s).  "
                     "First found root node of correct name in any .xrc or "
                     ".xrs files in following search path overrides built-in:"),
-            s.mb_str());
+            s.c_str());
         tack_full_path(lm);
         wxLogMessage(lm);
         console_mode = true;
@@ -565,7 +565,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
         wxString lm;
         lm.Printf(_("Wrote built-in override file to %s\n"
                     "To override, delete all but changed section.  First found section is used from search path:"),
-            s.mb_str());
+            s.c_str());
         wxString oi = wxFileName::GetPathSeparator();
         oi += wxT("vba-over.ini");
         tack_full_path(lm, oi);
@@ -585,17 +585,17 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
                    "For flag options, true and false are specified as 1 and 0, respectively.\n\n"));
 
         for (int i = 0; i < num_opts; i++) {
-            wxPrintf(wxT("%s (%s"), opts[i].opt,
-                opts[i].boolopt ? wxT("flag") : opts[i].stropt ? wxT("string") : !opts[i].enumvals.empty() ? opts[i].enumvals : (wxString)(opts[i].intopt ? wxT("int") : opts[i].doubleopt ? wxT("decimal") : wxT("string")));
+            wxPrintf(wxT("%s (%s"), opts[i].opt.c_str(),
+                opts[i].boolopt ? wxT("flag") : opts[i].stropt ? wxT("string") : !opts[i].enumvals.empty() ? opts[i].enumvals.c_str() : (opts[i].intopt ? wxT("int") : opts[i].doubleopt ? wxT("decimal") : wxT("string")));
 
             if (!opts[i].enumvals.empty()) {
                 const wxString evx = wxGetTranslation(opts[i].enumvals);
 
                 if (wxStrcmp(evx, opts[i].enumvals))
-                    wxPrintf(wxT(" = %s"), evx);
+                    wxPrintf(wxT(" = %s"), evx.c_str());
             }
 
-            wxPrintf(wxT(")\n\t%s\n\n"), opts[i].desc);
+            wxPrintf(wxT(")\n\t%s\n\n"), opts[i].desc.c_str());
 
             if (!opts[i].enumvals.empty())
                 opts[i].enumvals = wxGetTranslation(opts[i].enumvals);
@@ -604,7 +604,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
         wxPrintf(_("The commands available for the Keyboard/* option are:\n\n"));
 
         for (int i = 0; i < ncmds; i++)
-            wxPrintf(wxT("%s (%s)\n"), cmdtab[i].cmd, cmdtab[i].name);
+            wxPrintf(wxT("%s (%s)\n"), cmdtab[i].cmd.c_str(), cmdtab[i].name.c_str());
 
         console_mode = true;
         return true;
@@ -636,11 +636,11 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
             } else {
                 if (!complained) {
                     wxFprintf(stderr, _("Bad configuration option or multiple ROM files given:\n"));
-                    wxFprintf(stderr, wxT("%s\n"), pending_load.mb_str());
+                    wxFprintf(stderr, wxT("%s\n"), pending_load.c_str());
                     complained = true;
                 }
 
-                wxFprintf(stderr, wxT("%s\n"), p);
+                wxFprintf(stderr, wxT("%s\n"), p.c_str());
             }
         }
     }
@@ -654,12 +654,12 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
 
 wxString wxvbamApp::GetConfigDir()
 {
-    return GetAbsolutePath(get_xdg_user_config_home() + DOT_DIR);
+    return GetAbsolutePath(wxString((get_xdg_user_config_home() + DOT_DIR).c_str(), wxConvLibc));
 }
 
 wxString wxvbamApp::GetDataDir()
 {
-    return GetAbsolutePath(get_xdg_user_data_home() + DOT_DIR);
+    return GetAbsolutePath(wxString((get_xdg_user_data_home() + DOT_DIR).c_str(), wxConvLibc));
 }
 
 wxvbamApp::~wxvbamApp() {
@@ -802,7 +802,7 @@ wxString MainFrame::GetGamePath(wxString path)
 
     if (!wxIsWritable(game_path))
     {
-	game_path = wxGetApp().GetAbsolutePath(get_xdg_user_data_home() + DOT_DIR);
+	game_path = wxGetApp().GetAbsolutePath(wxString((get_xdg_user_data_home() + DOT_DIR).c_str(), wxConvLibc));
 	wxFileName::Mkdir(game_path, 0777, wxPATH_MKDIR_FULL);
     }
 
@@ -871,7 +871,7 @@ void MainFrame::update_state_ts(bool force)
 
         if (panel->game_type() != IMAGE_UNKNOWN) {
             wxString fn;
-            fn.Printf(SAVESLOT_FMT, panel->game_name().mb_str(), i + 1);
+            fn.Printf(SAVESLOT_FMT, panel->game_name().c_str(), i + 1);
             wxFileName fp(panel->state_dir(), fn);
             wxDateTime ts; // = wxInvalidDateTime
 

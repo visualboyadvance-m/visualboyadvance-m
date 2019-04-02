@@ -151,7 +151,7 @@ bool OpenAL::init(long sampleRate)
     assert(initialized == false);
 
     if (!gopts.audio_dev.empty()) {
-        device = alcOpenDevice(gopts.audio_dev.mb_str());
+        device = alcOpenDevice(gopts.audio_dev.utf8_str());
     } else {
         device = alcOpenDevice(NULL);
     }

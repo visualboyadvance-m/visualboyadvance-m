@@ -6,10 +6,13 @@ src/wx/cmdtab.cpp
 src/wx/wxvbam.xrs
 build/*
 build32/*
+vsbuild/*
 dependencies/*
+vcpkg/*
 .vs/*
 *.o
 *.so
+*.dll
 *.exe
 
 # vim swap files

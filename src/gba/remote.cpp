@@ -3539,7 +3539,7 @@ void remotePutPacket(const char* packet)
     const char* hex = "0123456789abcdef";
 
     size_t count = strlen(packet);
-    char buffer[count + 5];
+    char* buffer = new char[count + 5];
 
     unsigned char csum = 0;
 
@@ -3559,10 +3559,15 @@ void remotePutPacket(const char* packet)
     char c = 0;
     while (c != '+') {
         remoteSendFnc(buffer, (int)count + 4);
-        if (remoteRecvFnc(&c, 1) < 0)
+
+        if (remoteRecvFnc(&c, 1) < 0) {
+            delete buffer;
             return;
+        }
         //    fprintf(stderr,"sent:%s recieved:%c\n",buffer,c);
     }
+
+    delete buffer;
 }
 
 void remoteOutput(const char* s, uint32_t addr)
@@ -3695,7 +3700,7 @@ void remoteMemoryRead(char* p)
     sscanf(p, "%x,%x:", &address, &count);
     //  monprintf("Memory read for %08x %d\n", address, count);
 
-    char buffer[(count*2)+1];
+    char* buffer = new char[(count*2)+1];
 
     char* s = buffer;
     for (int i = 0; i < count; i++) {
@@ -3706,6 +3711,8 @@ void remoteMemoryRead(char* p)
     }
     *s = 0;
     remotePutPacket(buffer);
+
+    delete buffer;
 }
 
 void remoteQuery(char* p)

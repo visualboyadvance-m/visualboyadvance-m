@@ -60,10 +60,23 @@ cmake ..
 make -j`nproc`
 ```
 
-`./installdeps` is supported on MSys2, Linux (Debian/Ubuntu, Fedora, Arch or
-Solus) and Mac OS X (homebrew, macports or fink.)
+`./installdeps` is supported on MSys2, Linux (Debian/Ubuntu, Fedora, Arch,
+Solus and RHEL/CentOS) and Mac OS X (homebrew, macports or fink.)
 
-The Ninja cmake generator is also now supported, including on msys2.
+The Ninja cmake generator is also now supported, including on msys2 and Visual Studio.
+
+### Visual Studio Support
+
+For visual studio, dependency management is handled automatically with vcpkg,
+just clone the repository with git and build with cmake. You can do this from
+the developer command line as well. 2019 will not work yet for building
+dependencies, but you can build the dependencies in 2017 and then use the
+project from 2019.
+
+Using your own user-wide installation of vcpkg is supported, just make sure the
+environment variable `VCPKG_ROOT` is set.
+
+### Dependencies
 
 If your OS is not supported, you will need the following:
 
