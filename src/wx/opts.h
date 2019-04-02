@@ -105,17 +105,12 @@ extern struct opt_desc {
 #define curbool curint
 } opts[];
 
-opt_desc new_opt_desc (wxString opt = "", const char* cmd = NULL, wxString desc = "",
-                       wxString* stropt = NULL, int* intopt = NULL, wxString enumvals = "",
-                       double min = 0, double max = 0, bool* boolopt = NULL,
-                       double* doubleopt = NULL, uint32_t* uintopt = NULL, wxString curstr = "",
-                       int curint = 0, double curdouble = 0, uint32_t curuint = 0)
-{
-    struct opt_desc new_opt = {opt, cmd, desc, stropt, intopt, enumvals,
-	                       min, max, boolopt, doubleopt, uintopt,
-			       curstr, curint, curdouble, curuint};
-    return new_opt;
-}
+// Initializer for struct opt_desc
+opt_desc new_opt_desc(wxString opt = "", const char* cmd = NULL, wxString desc = "",
+                      wxString* stropt = NULL, int* intopt = NULL, wxString enumvals = "",
+                      double min = 0, double max = 0, bool* boolopt = NULL,
+                      double* doubleopt = NULL, uint32_t* uintopt = NULL, wxString curstr = "",
+                      int curint = 0, double curdouble = 0, uint32_t curuint = 0);
 
 extern const int num_opts;
 

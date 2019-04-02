@@ -32,6 +32,14 @@
 IMPLEMENT_APP(wxvbamApp)
 IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
 
+// Initializer for struct cmditem
+cmditem new_cmditem(const wxString cmd, const wxString name, int cmd_id,
+                    int mask_flags, wxMenuItem* mi)
+{
+    struct cmditem tmp = {cmd, name, cmd_id, mask_flags, mi};
+    return tmp;
+}
+
 // generate config file path
 static void get_config_path(wxPathList& path, bool exists = true)
 {

@@ -159,6 +159,19 @@ wxJoyKeyBinding defkeys[NUM_KEYS * 2] = {
 
 wxAcceleratorEntry_v sys_accels;
 
+// Initializer for struct opt_desc
+opt_desc new_opt_desc(wxString opt, const char* cmd, wxString desc,
+                      wxString* stropt, int* intopt, wxString enumvals,
+                      double min, double max, bool* boolopt,
+                      double* doubleopt, uint32_t* uintopt, wxString curstr,
+                      int curint, double curdouble, uint32_t curuint)
+{
+    struct opt_desc new_opt = {opt, cmd, desc, stropt, intopt, enumvals,
+	                       min, max, boolopt, doubleopt, uintopt,
+			       curstr, curint, curdouble, curuint};
+    return new_opt;
+}
+
 // Note: this table must be sorted in option name order
 // Both for better user display and for (fast) searching by name
 opt_desc opts[] = {

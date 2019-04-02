@@ -657,12 +657,9 @@ extern struct cmditem {
 } cmdtab[];
 extern const int ncmds;
 
-cmditem new_cmditem(const wxString cmd = "", const wxString name = "", int cmd_id = 0,
-                    int mask_flags = 0, wxMenuItem* mi = NULL)
-{
-    struct cmditem tmp = {cmd, name, cmd_id, mask_flags, mi};
-    return tmp;
-}
+// Initializer for struct cmditem
+cmditem new_cmditem(const wxString cmd = "", const wxString name = "",
+                    int cmd_id = 0, int mask_flags = 0, wxMenuItem* mi = NULL);
 
 // for binary search
 extern bool cmditem_lt(const struct cmditem& cmd1, const struct cmditem& cmd2);
