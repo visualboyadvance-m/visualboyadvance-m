@@ -15,11 +15,8 @@ typedef struct wxJoyKeyBinding {
     // if joy is non-0, key = control number, and mod = control type
 } wxJoyKeyBinding;
 
-wxJoyKeyBinding newWxJoyKeyBinding(int key = 0, int mod = 0, int joy = 0)
-{
-    struct wxJoyKeyBinding tmp = {key, mod, joy};
-    return tmp;
-}
+// Initializer for struct wxJoyKeyBinding
+wxJoyKeyBinding newWxJoyKeyBinding(int key = 0, int mod = 0, int joy = 0);
 
 typedef std::vector<wxJoyKeyBinding> wxJoyKeyBinding_v;
 

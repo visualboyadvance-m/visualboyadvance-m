@@ -8,6 +8,13 @@ BEGIN_EVENT_TABLE(wxJoyKeyTextCtrl, wxKeyTextCtrl)
 EVT_SDLJOY(wxJoyKeyTextCtrl::OnJoy)
 END_EVENT_TABLE()
 
+// Initializer for struct wxJoyKeyBinding
+wxJoyKeyBinding newWxJoyKeyBinding(int key, int mod, int joy)
+{
+    struct wxJoyKeyBinding tmp = {key, mod, joy};
+    return tmp;
+}
+
 int wxJoyKeyTextCtrl::DigitalButton(wxSDLJoyEvent& event)
 {
     int sdlval = event.GetControlValue();
