@@ -53,7 +53,7 @@ void SoundRetro::reset()
 {
 }
 
-void setThrottle(unsigned short throttle)
+void SoundRetro::setThrottle(unsigned short throttle)
 {
     (void)throttle; // unused param
 }
