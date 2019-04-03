@@ -37,7 +37,7 @@ uint8_t gbSoundRead(uint16_t address)
     return gbMemory[address];
 }
 
-void gbSoundEvent(register uint16_t address, register int data)
+void gbSoundEvent(uint16_t address, int data)
 {
     gbMemory[address] = data;
 

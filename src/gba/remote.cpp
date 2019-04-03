@@ -3561,13 +3561,13 @@ void remotePutPacket(const char* packet)
         remoteSendFnc(buffer, (int)count + 4);
 
         if (remoteRecvFnc(&c, 1) < 0) {
-            delete buffer;
+            delete[] buffer;
             return;
         }
         //    fprintf(stderr,"sent:%s recieved:%c\n",buffer,c);
     }
 
-    delete buffer;
+    delete[] buffer;
 }
 
 void remoteOutput(const char* s, uint32_t addr)
@@ -3712,7 +3712,7 @@ void remoteMemoryRead(char* p)
     *s = 0;
     remotePutPacket(buffer);
 
-    delete buffer;
+    delete[] buffer;
 }
 
 void remoteQuery(char* p)
