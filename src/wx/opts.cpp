@@ -522,8 +522,8 @@ void load_opts()
                     // the equals sign if necessary instead of doing it this way
                     wxLogWarning(_("Invalid value %s for option %s; valid values are %s%s%s"),
                         s.c_str(), opt.opt.c_str(), ev.c_str(),
-                        isx ? wxT(" = ") : wxT(""),
-                        isx ? evx.c_str() : wxT(""));
+                        isx ? wxT(" = ") : wxEmptyString,
+                        isx ? evx.c_str() : wxEmptyString);
                     // write first option
                     cfg->Write(opt.opt, enum_opts[0]);
                 } else
@@ -815,8 +815,8 @@ bool opt_set(const wxString& name, const wxString& val)
                 // the equals sign if necessary instead of doing it this way
                 wxLogWarning(_("Invalid value %s for option %s; valid values are %s%s%s"),
                     s.c_str(), opt->opt.c_str(), opt->enumvals.c_str(),
-                    isx ? wxT(" = ") : wxT(""),
-                    isx ? evx.c_str() : wxT(""));
+                    isx ? wxT(" = ") : wxEmptyString,
+                    isx ? evx.c_str() : wxEmptyString);
             } else {
                 *opt->intopt = found_pos;
             }

@@ -152,7 +152,7 @@ inline unsigned int RGBtoYUV_32(unsigned int c)
 {
         // Division through 3 slows down the emulation about 10% !!!
 
-        register unsigned char r, g, b;
+        unsigned char r, g, b;
         b = c & 0x0000FF;
         g = (c & 0x00FF00) >> 8;
         r = c >> 16;
@@ -254,7 +254,7 @@ inline unsigned int RGBtoYUV_16(unsigned short c)
 {
         // Division through 3 slows down the emulation about 10% !!!
 
-        register unsigned char r, g, b;
+        unsigned char r, g, b;
 #ifdef RGB555
         r = (c & 0x7C00) >> 7;
         g = (c & 0x03E0) >> 2;
