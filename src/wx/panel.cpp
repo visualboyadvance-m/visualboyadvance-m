@@ -302,7 +302,8 @@ void GameArea::LoadGame(const wxString& name)
     loaded = t;
     SetFrameTitle();
     SetFocus();
-    AdjustSize(true);
+    // Use custom geometry
+    AdjustSize(false);
     emulating = true;
     was_paused = true;
     MainFrame* mf = wxGetApp().frame;
