@@ -99,9 +99,6 @@ extern struct opt_desc {
     int curint;
     double curdouble;
     uint32_t curuint;
-//    opt_desc():opt(""),cmd(NULL),desc(""),stropt(NULL),intopt(NULL),
-//               enumvals(""),min(0),max(0),boolopt(NULL),doubleopt(NULL),
-//	       uintopt(NULL),curstr(""),curint(0),curdouble(0),curuint(0){}
 #define curbool curint
 } opts[];
 

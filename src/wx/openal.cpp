@@ -108,28 +108,27 @@ void OpenAL::debugState()
     ALint value = 0;
     alGetSourcei(source, AL_SOURCE_STATE, &value);
     ASSERT_SUCCESS;
-
     winlog(" soundPaused = %i\n", soundPaused);
     winlog(" Source:\n");
     winlog("  State: ");
-    
+
     switch (value) {
     case AL_INITIAL:
         winlog("AL_INITIAL\n");
         break;
-    
+
     case AL_PLAYING:
         winlog("AL_PLAYING\n");
         break;
-    
+
     case AL_PAUSED:
         winlog("AL_PAUSED\n");
         break;
-    
+
     case AL_STOPPED:
         winlog("AL_STOPPED\n");
         break;
-    
+
     default:
         winlog("!unknown!\n");
         break;
@@ -255,7 +254,7 @@ void OpenAL::reset()
 
 void OpenAL::write(uint16_t* finalWave, int length)
 {
-    length = length;
+    (void)length; // unused params
     if (!initialized)
         return;
 

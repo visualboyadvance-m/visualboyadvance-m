@@ -13,6 +13,8 @@
       -p/--profile=hz
 */
 
+#define WJKB newWxJoyKeyBinding
+
 /* not sure how well other compilers support field-init syntax */
 #define STROPT(c, n, d, v) \
     new_opt_desc(wxT(c), (n), d, &v)
@@ -134,27 +136,17 @@ const wxString joynames[NUM_KEYS] = {
 };
 
 wxJoyKeyBinding defkeys[NUM_KEYS * 2] = {
-    newWxJoyKeyBinding(WXK_UP), newWxJoyKeyBinding(1, WXJB_AXIS_MINUS, 1),
-    newWxJoyKeyBinding(WXK_DOWN), newWxJoyKeyBinding(1, WXJB_AXIS_PLUS, 1),
-    newWxJoyKeyBinding(WXK_LEFT), newWxJoyKeyBinding(0, WXJB_AXIS_MINUS, 1),
-    newWxJoyKeyBinding(WXK_RIGHT), newWxJoyKeyBinding(0, WXJB_AXIS_PLUS, 1),
-    newWxJoyKeyBinding(wxT('X')), newWxJoyKeyBinding(0, WXJB_BUTTON, 1),
-    newWxJoyKeyBinding(wxT('Z')), newWxJoyKeyBinding(1, WXJB_BUTTON, 1),
-    newWxJoyKeyBinding(wxT('A')), newWxJoyKeyBinding(2, WXJB_BUTTON, 1),
-    newWxJoyKeyBinding(wxT('S')), newWxJoyKeyBinding(3, WXJB_BUTTON, 1),
-    newWxJoyKeyBinding(WXK_BACK), newWxJoyKeyBinding(4, WXJB_BUTTON, 1),
-    newWxJoyKeyBinding(WXK_RETURN), newWxJoyKeyBinding(5, WXJB_BUTTON, 1),
-    newWxJoyKeyBinding(WXK_NUMPAD_UP), newWxJoyKeyBinding(0),
-    newWxJoyKeyBinding(WXK_NUMPAD_DOWN), newWxJoyKeyBinding(0),
-    newWxJoyKeyBinding(WXK_NUMPAD_LEFT), newWxJoyKeyBinding(0),
-    newWxJoyKeyBinding(WXK_NUMPAD_RIGHT), newWxJoyKeyBinding(0),
-    newWxJoyKeyBinding(WXK_NUMPAD_PAGEUP), newWxJoyKeyBinding(0),
-    newWxJoyKeyBinding(WXK_NUMPAD_PAGEDOWN), newWxJoyKeyBinding(0),
-    newWxJoyKeyBinding(wxT('W')), newWxJoyKeyBinding(0),
-    newWxJoyKeyBinding(wxT('Q')), newWxJoyKeyBinding(0),
-    newWxJoyKeyBinding(WXK_SPACE), newWxJoyKeyBinding(0),
-    newWxJoyKeyBinding(0), newWxJoyKeyBinding(0),
-    newWxJoyKeyBinding(0), newWxJoyKeyBinding(0)
+    WJKB(WXK_UP), WJKB(1, WXJB_AXIS_MINUS, 1), WJKB(WXK_DOWN), WJKB(1, WXJB_AXIS_PLUS, 1),
+    WJKB(WXK_LEFT), WJKB(0, WXJB_AXIS_MINUS, 1), WJKB(WXK_RIGHT), WJKB(0, WXJB_AXIS_PLUS, 1),
+    WJKB(wxT('X')), WJKB(0, WXJB_BUTTON, 1), WJKB(wxT('Z')), WJKB(1, WXJB_BUTTON, 1),
+    WJKB(wxT('A')), WJKB(2, WXJB_BUTTON, 1), WJKB(wxT('S')), WJKB(3, WXJB_BUTTON, 1),
+    WJKB(WXK_BACK), WJKB(4, WXJB_BUTTON, 1), WJKB(WXK_RETURN), WJKB(5, WXJB_BUTTON, 1),
+    WJKB(WXK_NUMPAD_UP), WJKB(0), WJKB(WXK_NUMPAD_DOWN), WJKB(0),
+    WJKB(WXK_NUMPAD_LEFT), WJKB(0), WJKB(WXK_NUMPAD_RIGHT), WJKB(0),
+    WJKB(WXK_NUMPAD_PAGEUP), WJKB(0), WJKB(WXK_NUMPAD_PAGEDOWN), WJKB(0),
+    WJKB(wxT('W')), WJKB(0), WJKB(wxT('Q')), WJKB(0),
+    WJKB(WXK_SPACE), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0)
 };
 
 wxAcceleratorEntry_v sys_accels;

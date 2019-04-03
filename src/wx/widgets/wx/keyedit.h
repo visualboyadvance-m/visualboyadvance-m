@@ -99,7 +99,7 @@ public:
     bool TransferFromWindow();
     bool Validate(wxWindow* p)
     {
-        p = p;
+        (void)p; // unused params
         return true;
     }
 
