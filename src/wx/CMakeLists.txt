@@ -156,28 +156,94 @@ else()
 
     set(wxWidgets_USE_UNICODE ON)
 
+    function(cygpath var path)
+        execute_process(
+            COMMAND cygpath -m ${path}
+            OUTPUT_VARIABLE cyg_path
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+        )
+        set(${var} ${cyg_path} PARENT_SCOPE)
+    endfunction()
+
+    function(check_clean_exit var)
+        execute_process(
+            COMMAND ${ARGN}
+            RESULT_VARIABLE exit_status
+            OUTPUT_QUIET
+            ERROR_QUIET
+        )
+
+        if(NOT ${exit_status} EQUAL 0)
+            # special case for msys2, where programs might complain about
+            # not being win32 programs
+            unset(cmd_str)
+            foreach(param IN LISTS ARGN)
+                set(cmd_str "${cmd_str} ${param}")
+            endforeach()
+            string(STRIP "${cmd_str}" cmd_str)
+
+            execute_process(
+                COMMAND sh -c "${cmd_str}"
+                RESULT_VARIABLE exit_status
+                OUTPUT_QUIET
+                ERROR_QUIET
+            )
+        endif()
+
+        set(${var} ${exit_status} PARENT_SCOPE)
+    endfunction()
+
     function(find_wx_util var util)
-        foreach(conf_suffix gtk4 gtk3 "")
-            foreach(major_version 4 3 2 "")
-                foreach(minor_version RANGE 0 101)
+        # on win32, including cross builds we prefer the plain utility name first from PATH
+        if(WIN32)
+            set(conf_suffixes  "" gtk4 gtk3)
+            set(major_versions "" 4 3 2)
+        else()
+            set(conf_suffixes  gtk4 gtk3 "")
+            set(major_versions 4 3 2 "")
+        endif()
+
+        foreach(conf_suffix IN LISTS conf_suffixes)
+            foreach(major_version IN LISTS major_versions)
+                foreach(minor_version RANGE 100 0 -1)
                     unset(suffix)
                     if(conf_suffix)
                         set(suffix "-${conf_suffix}")
                     endif()
                     if(major_version)
                         set(suffix "${suffix}-${major_version}")
-                    endif()
-                    if(NOT minor_version EQUAL 101)
-                        set(suffix "${suffix}.${minor_version}")
+
+                        if(NOT minor_version EQUAL 0)
+                            set(suffix "${suffix}.${minor_version}")
+                        endif()
                     endif()
 
-                    find_program(${var} NAMES "${util}${suffix}")
+                    # find_program caches the result
+                    set(exe NOTFOUND CACHE INTERNAL "" FORCE)
+                    find_program(exe NAMES "${util}${suffix}")
 
-                    if(${${var}})
-                        return()
+                    if(EXISTS ${exe})
+                        # check that the utility can be executed cleanly
+                        # in case we find e.g. the wrong architecture binary
+                        # when cross-compiling
+                        check_clean_exit(exit_status ${exe} --help)
+
+                        if(exit_status EQUAL 0)
+                            set(${var} ${exe} PARENT_SCOPE)
+                            return()
+                        endif()
+                    endif()
+
+                    # don't iterate over minor versions for empty major version
+                    if(major_version STREQUAL "")
+                        break()
                     endif()
                 endforeach()
             endforeach()
+
+            # default to util name if not found, so the error is more clear
+            set(${var} ${util} PARENT_SCOPE)
         endforeach()
     endfunction()
 
@@ -560,12 +626,40 @@ elseif(DEFINED ENV{WXRC})
 elseif(wxWidgets_CONFIG_EXECUTABLE)
     execute_process(
         COMMAND ${wxWidgets_CONFIG_EXECUTABLE} --utility=wxrc
-        OUTPUT_VARIABLE WXRC
+        OUTPUT_VARIABLE wxrc
         OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
     )
+
+    # this is necessary on msys2
+    if(NOT wxrc)
+        execute_process(
+            COMMAND sh -c "${wxWidgets_CONFIG_EXECUTABLE} --utility=wxrc"
+            OUTPUT_VARIABLE wxrc
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+        )
+    endif()
+
     # check if the path from wx-config is good
-    if(NOT EXISTS ${WXRC})
-        unset(WXRC)
+    # and not e.g. an incompatible binary when cross-compiling
+    if(EXISTS ${wxrc})
+        check_clean_exit(exit_status ${wxrc} --help)
+
+        if(exit_status EQUAL 0)
+            set(WXRC ${wxrc})
+        endif()
+    elseif(wxrc)
+        # this is necessary on msys2
+        cygpath(cyg_path ${wxrc})
+
+        if(EXISTS ${cyg_path})
+            check_clean_exit(exit_status ${cyg_path} --help)
+
+            if(exit_status EQUAL 0)
+                set(WXRC ${cyg_path})
+            endif()
+        endif()
     endif()
 endif()
 
