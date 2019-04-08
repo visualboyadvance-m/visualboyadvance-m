@@ -1046,9 +1046,9 @@ void GameArea::OnIdle(wxIdleEvent& event)
         // On windows with the vcpkg version of wxWidgets which is 3.1.2, the
         // wxEXPAND flag throws an XRC error, but it is necessary on earlier versions of wxWidgets
 #if defined(__WXMSW__) && wxCHECK_VERSION(3, 1, 2)
-        GetSizer()->Add(w,    frame_priority, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER_HORIZONTAL) : wxEXPAND);
+        GetSizer()->Add(w,    frame_priority, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER) : wxEXPAND);
 #else
-        GetSizer()->Add(w,    frame_priority, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER_HORIZONTAL | wxEXPAND) : wxEXPAND);
+        GetSizer()->Add(w,    frame_priority, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER | wxEXPAND) : wxEXPAND);
 #endif
 
 #if wxCHECK_VERSION(2, 9, 0)
