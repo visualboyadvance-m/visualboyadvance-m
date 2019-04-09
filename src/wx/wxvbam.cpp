@@ -763,22 +763,23 @@ void MainFrame::OnMenu(wxContextMenuEvent& event)
 void MainFrame::OnMove(wxMoveEvent& event)
 {
     (void)event; // unused params
-    wxRect pos = GetRect();
-    int x = pos.GetX(), y = pos.GetY();
+    wxPoint pos = GetScreenPosition();
+    int x = pos.x, y = pos.y;
     if (x >= 0 && y >= 0 && !IsFullScreen())
     {
 	windowPositionX = x;
 	windowPositionY = y;
-	update_opts();
     }
+    update_opts();
 }
 
 void MainFrame::OnSize(wxSizeEvent& event)
 {
     wxFrame::OnSize(event);
     wxRect pos = GetRect();
+    wxPoint windowPos = GetScreenPosition();
     int height = pos.GetHeight(), width = pos.GetWidth();
-    int x = pos.GetX(), y = pos.GetY();
+    int x = windowPos.x, y = windowPos.y;
     bool isFullscreen = IsFullScreen();
     if (height > 0 && width > 0 && !isFullscreen)
     {
