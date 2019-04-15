@@ -219,6 +219,10 @@ endif()
 find_package(SDL2 REQUIRED)
 add_definitions(${SDL2_DEFINITIONS})
 
+if(WIN32)
+    set(SDL2_LIBRARY ${SDL2_LIBRARY} -lSetupAPI)
+endif()
+
 if(ENABLE_LINK)
     # msys2 does not have static sfml libs atm
     # while on mxe we use static libs
