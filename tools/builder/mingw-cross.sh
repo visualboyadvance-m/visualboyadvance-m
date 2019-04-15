@@ -63,6 +63,52 @@ export REQUIRED_CMAKE_ARGS="$REQUIRED_CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE='$(perl 
 
 . "${0%/*}/../builder/mingw.sh"
 
+installing_cross_deps() {
+    puts "${NL}[32mInstalling cross dependencies for your OS...[0m${NL}${NL}"
+}
+
+fedora_install_cross_deps() {
+    pkg_prefix="mingw${target_bits}"
+
+    set --
+    for p in gcc cpp gcc-c++ binutils headers crt filesystem winpthreads-static; do
+        set -- "$@" "${pkg_prefix}-${p}"
+    done
+
+    sudo dnf install -y --nogpgcheck --best --allowerasing "$@" gettext-devel wxGTK3-devel python
+}
+
+suse_install_cross_deps() {
+    suse_dist=$(. /etc/os-release; echo $PRETTY_NAME | sed 's/ /_/g')
+
+    sudo zypper ar -f https://download.opensuse.org/repositories/windows:/mingw:/win64/${suse_dist}/windows:mingw:win64.repo || :
+    sudo zypper ar -f https://download.opensuse.org/repositories/windows:/mingw:/win32/${suse_dist}/windows:mingw:win32.repo || :
+
+    sudo zypper refresh
+
+    pkg_prefix="mingw${target_bits}"
+
+    set --
+    for p in cross-gcc cross-cpp cross-gcc-c++ cross-binutils headers filesystem winpthreads-devel; do
+        set -- "$@" "${pkg_prefix}-${p}"
+    done
+
+    sudo zypper in -y "$@" gettext-tools wxGTK3-3_2-devel python
+}
+
+case "$linux_distribution" in
+    fedora)
+        installing_cross_deps
+        fedora_install_cross_deps
+        done_msg
+        ;;
+    suse)
+        installing_cross_deps
+        suse_install_cross_deps
+        done_msg
+        ;;
+esac
+
 openssl_host=mingw
 [ "$target_bits" -eq 64 ] && openssl_host=mingw64
 

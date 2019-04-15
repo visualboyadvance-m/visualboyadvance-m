@@ -613,17 +613,7 @@ linux_install_core_deps() {
             ;;
     esac
 
-    if [ -f /etc/debian_version ]; then
-        debian_install_core_deps
-    elif [ -f /etc/fedora-release ]; then
-        fedora_install_core_deps
-    elif [ -f /etc/arch-release ]; then
-        archlinux_install_core_deps
-    elif [ -f /etc/solus-release ]; then
-        solus_install_core_deps
-    elif path_exists /etc/os-release && [ "$(. /etc/os-release; puts "$ID_LIKE")" = suse ]; then
-        suse_install_core_deps
-    fi
+    eval "${linux_distribution}_install_core_deps"
 }
 
 debian_install_core_deps() {
@@ -647,7 +637,7 @@ suse_install_core_deps() {
     sudo zypper in -y gcc gcc-c++ binutils glibc-devel-static make curl perl ccache file patch
 }
 
-archlinux_install_core_deps() {
+arch_install_core_deps() {
     installing_core_deps
 
     # check for gcc-multilib
@@ -809,6 +799,22 @@ detect_os() {
     if ld -v 2>/dev/null | grep -Eq GNU; then
         LD_START_GROUP='-Wl,--start-group'
         LD_END_GROUP='-Wl,--end-group'
+    fi
+
+    # detect linux distribution
+    linux_distribution=unknown
+    if [ $os = linux ]; then
+        if [ -f /etc/debian_version ]; then
+            linux_distribution=debian
+        elif [ -f /etc/fedora-release ]; then
+            linux_distribution=fedora
+        elif [ -f /etc/arch-release ]; then
+            linux_distribution=arch
+        elif [ -f /etc/solus-release ]; then
+            linux_distribution=solus
+        elif path_exists /etc/os-release && (. /etc/os-release; puts "$ID_LIKE") | grep -q suse; then
+            linux_distribution=suse
+        fi
     fi
 }
 

@@ -4,20 +4,4 @@ set -e
 
 . "${0%/*}/../builder/mingw-cross.sh"
 
-# install cross deps on fedora
-if [ $# -eq 0 ] && [ -f /etc/fedora-release ]; then
-    puts "${NL}[32mInstalling cross dependencies for your OS...[0m${NL}${NL}"
-
-    pkg_prefix="mingw${target_bits}"
-
-    set --
-    for p in gcc cpp gcc-c++ binutils headers crt filesystem winpthreads-static; do
-        set -- "$@" "${pkg_prefix}-${p}"
-    done
-
-    sudo dnf install -y --nogpgcheck --best --allowerasing "$@" gettext-devel wxGTK3-devel python
-
-    set --
-fi
-
 builder "$@"
