@@ -78,15 +78,12 @@ void GameArea::LoadGame(const wxString& name)
         }
     }
 
-    // auto-conversion of wxCharBuffer to const char * seems broken
-    // so save underlying wxCharBuffer (or create one of none is used)
-    wxCharBuffer fnb(fnfn.GetFullPath().mb_fn_str());
-    const char* fn = fnb.data();
+    const char* fn = fnfn.GetFullPath().mb_str();
     IMAGE_TYPE t = badfile ? IMAGE_UNKNOWN : utilFindType(fn);
 
     if (t == IMAGE_UNKNOWN) {
         wxString s;
-        s.Printf(_("%s is not a valid ROM file"), name.c_str());
+        s.Printf(_("%s is not a valid ROM file"), name.mb_str());
         wxMessageDialog dlg(GetParent(), s, _("Problem loading file"), wxOK | wxICON_ERROR);
         dlg.ShowModal();
         return;
@@ -143,7 +140,7 @@ void GameArea::LoadGame(const wxString& name)
     if (t == IMAGE_GB) {
         if (!gbLoadRom(fn)) {
             wxString s;
-            s.Printf(_("Unable to load Game Boy ROM %s"), name.c_str());
+            s.Printf(_("Unable to load Game Boy ROM %s"), name.mb_str());
             wxMessageDialog dlg(GetParent(), s, _("Problem loading file"), wxOK | wxICON_ERROR);
             dlg.ShowModal();
             return;
@@ -153,10 +150,7 @@ void GameArea::LoadGame(const wxString& name)
 
         if (loadpatch) {
             int size = rom_size;
-            // auto-conversion of wxCharBuffer to const char * seems broken
-            // so save underlying wxCharBuffer (or create one of none is used)
-            wxCharBuffer pfnb(pfn.GetFullPath().mb_fn_str());
-            applyPatch(pfnb.data(), &gbRom, &size);
+            applyPatch(pfn.GetFullPath().mb_str(), &gbRom, &size);
 
             if (size != (int)rom_size)
                 gbUpdateSizes();
@@ -177,25 +171,14 @@ void GameArea::LoadGame(const wxString& name)
         // this **MUST** be called **AFTER** setting sample rate because the core calls soundInit()
         soundSetThrottle(throttle);
         gbGetHardwareType();
-        bool use_bios = false;
-        // auto-conversion of wxCharBuffer to const char * seems broken
-        // so save underlying wxCharBuffer (or create one of none is used)
-        const char* fn = NULL;
-        wxCharBuffer fnb;
 
-        if (gbCgbMode) {
-            use_bios = useBiosFileGBC;
-            fnb = gopts.gbc_bios.mb_fn_str();
-        } else {
-            use_bios = useBiosFileGB;
-            fnb = gopts.gb_bios.mb_fn_str();
-        }
+        bool use_bios  =  gbCgbMode ? useBiosFileGBC : useBiosFileGB;
+        const char* fn = (gbCgbMode ? gopts.gbc_bios : gopts.gb_bios).mb_str();
 
-        fn = fnb.data();
         gbCPUInit(fn, use_bios);
 
         if (use_bios && !useBios) {
-            wxLogError(_("Could not load BIOS %s"), (gbCgbMode ? gopts.gbc_bios : gopts.gb_bios).c_str());
+            wxLogError(_("Could not load BIOS %s"), (gbCgbMode ? gopts.gbc_bios : gopts.gb_bios).mb_str());
             // could clear use flag & file name now, but better to force
             // user to do it
         }
@@ -218,7 +201,7 @@ void GameArea::LoadGame(const wxString& name)
     {
         if (!(rom_size = CPULoadRom(fn))) {
             wxString s;
-            s.Printf(_("Unable to load Game Boy Advance ROM %s"), name.c_str());
+            s.Printf(_("Unable to load Game Boy Advance ROM %s"), name.mb_str());
             wxMessageDialog dlg(GetParent(), s, _("Problem loading file"), wxOK | wxICON_ERROR);
             dlg.ShowModal();
             return;
@@ -230,10 +213,7 @@ void GameArea::LoadGame(const wxString& name)
             // don't use real rom size or it might try to resize rom[]
             // instead, use known size of rom[]
             int size = 0x2000000;
-            // auto-conversion of wxCharBuffer to const char * seems broken
-            // so save underlying wxCharBuffer (or create one of none is used)
-            wxCharBuffer pfnb(pfn.GetFullPath().mb_fn_str());
-            applyPatch(pfnb.data(), &rom, &size);
+            applyPatch(pfn.GetFullPath().mb_str(), &rom, &size);
             // that means we no longer really know rom_size either <sigh>
         }
 
@@ -288,7 +268,7 @@ void GameArea::LoadGame(const wxString& name)
         CPUInit(gopts.gba_bios.mb_fn_str(), useBiosFileGBA);
 
         if (useBiosFileGBA && !useBios) {
-            wxLogError(_("Could not load BIOS %s"), gopts.gba_bios.c_str());
+            wxLogError(_("Could not load BIOS %s"), gopts.gba_bios.mb_str());
             // could clear use flag & file name now, but better to force
             // user to do it
         }
@@ -354,11 +334,10 @@ void GameArea::LoadGame(const wxString& name)
 #endif
         bname.append(wxT(".sav"));
         wxFileName bat(batdir, bname);
-        fnb = bat.GetFullPath().mb_fn_str();
 
-        if (emusys->emuReadBattery(fnb.data())) {
+        if (emusys->emuReadBattery(bat.GetFullPath().mb_str())) {
             wxString msg;
-            msg.Printf(_("Loaded battery %s"), bat.GetFullPath().c_str());
+            msg.Printf(_("Loaded battery %s"), bat.GetFullPath().mb_str());
             systemScreenMessage(msg);
 
             if (cpuSaveType == 0 && ovSaveType == 0 && t == IMAGE_GBA) {
@@ -577,7 +556,7 @@ bool GameArea::LoadState()
 bool GameArea::LoadState(int slot)
 {
     wxString fname;
-    fname.Printf(SAVESLOT_FMT, game_name().c_str(), slot);
+    fname.Printf(SAVESLOT_FMT, game_name().mb_str(), slot);
     return LoadState(wxFileName(statedir, fname));
 }
 
@@ -611,7 +590,7 @@ bool GameArea::LoadState(const wxFileName& fname)
 
     wxString msg;
     msg.Printf(ret ? _("Loaded state %s") : _("Error loading state %s"),
-        fname.GetFullPath().c_str());
+        fname.GetFullPath().mb_str());
     systemScreenMessage(msg);
     return ret;
 }
@@ -624,7 +603,7 @@ bool GameArea::SaveState()
 bool GameArea::SaveState(int slot)
 {
     wxString fname;
-    fname.Printf(SAVESLOT_FMT, game_name().c_str(), slot);
+    fname.Printf(SAVESLOT_FMT, game_name().mb_str(), slot);
     return SaveState(wxFileName(statedir, fname));
 }
 
@@ -635,7 +614,7 @@ bool GameArea::SaveState(const wxFileName& fname)
     wxGetApp().frame->update_state_ts(true);
     wxString msg;
     msg.Printf(ret ? _("Saved state %s") : _("Error saving state %s"),
-        fname.GetFullPath().c_str());
+        fname.GetFullPath().mb_str());
     systemScreenMessage(msg);
     return ret;
 }
@@ -657,15 +636,12 @@ void GameArea::SaveBattery()
     wxFileName bat(batdir, bname);
     bat.Mkdir(0777, wxPATH_MKDIR_FULL);
     wxString fn = bat.GetFullPath();
-    // auto-conversion of wxCharBuffer to const char * seems broken
-    // so save underlying wxCharBuffer (or create one of none is used)
-    wxCharBuffer fnb = fn.mb_fn_str();
 
     // FIXME: add option to support ring of backups
     // of course some games just write battery way too often for such
     // a thing to be useful
-    if (!emusys->emuWriteBattery(fnb.data()))
-        wxLogError(_("Error writing battery %s"), fn.c_str());
+    if (!emusys->emuWriteBattery(fn.mb_str()))
+        wxLogError(_("Error writing battery %s"), fn.mb_str());
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 }
@@ -1853,7 +1829,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
         if (panel->osdstat.size())
             drawText(todraw + outstride * (systemColorDepth != 24), outstride,
-                10, 20, panel->osdstat.utf8_str(), showSpeedTransparent);
+                10, 20, panel->osdstat.mb_str(), showSpeedTransparent);
 
         if (!disableStatusMessages && !panel->osdtext.empty()) {
             if (systemGetClock() - panel->osdtime < OSD_TIME) {
@@ -1861,7 +1837,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                 int linelen = std::ceil(width * scale - 20) / 8;
                 int nlines = (message.size() + linelen - 1) / linelen;
                 int cury = height - 14 - nlines * 10;
-                char* buf = strdup(message.utf8_str());
+                char* buf = strdup(message.mb_str());
                 char* ptr = buf;
 
                 while (nlines > 1) {
@@ -2357,15 +2333,12 @@ static const wxString media_err(MediaRet ret)
 
 void GameArea::StartVidRecording(const wxString& fname)
 {
-    // auto-conversion of wxCharBuffer to const char * seems broken
-    // so save underlying wxCharBuffer (or create one of none is used)
-    wxCharBuffer fnb(fname.mb_fn_str());
     MediaRet ret;
 
-    if ((ret = vid_rec.Record(fnb.data(), basic_width, basic_height,
+    if ((ret = vid_rec.Record(fname.mb_str(), basic_width, basic_height,
              systemColorDepth))
         != MRET_OK)
-        wxLogError(_("Unable to begin recording to %s (%s)"), fname.c_str(),
+        wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
             media_err(ret));
     else {
         MainFrame* mf = wxGetApp().frame;
@@ -2390,13 +2363,10 @@ void GameArea::StopVidRecording()
 
 void GameArea::StartSoundRecording(const wxString& fname)
 {
-    // auto-conversion of wxCharBuffer to const char * seems broken
-    // so save underlying wxCharBuffer (or create one of none is used)
-    wxCharBuffer fnb(fname.mb_fn_str());
     MediaRet ret;
 
-    if ((ret = snd_rec.Record(fnb.data())) != MRET_OK)
-        wxLogError(_("Unable to begin recording to %s (%s)"), fname.c_str(),
+    if ((ret = snd_rec.Record(fname.mb_str())) != MRET_OK)
+        wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
             media_err(ret));
     else {
         MainFrame* mf = wxGetApp().frame;

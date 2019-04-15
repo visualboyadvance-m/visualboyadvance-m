@@ -43,9 +43,6 @@ void systemMessage(int id, const char* fmt, ...)
     static char* buf = NULL;
     static int buflen = 80;
     va_list args;
-    // auto-conversion of wxCharBuffer to const char * seems broken
-    // so save underlying wxCharBuffer (or create one of none is used)
-    wxCharBuffer _fmt(wxString(wxGetTranslation(wxString(fmt, wxConvLibc))).utf8_str());
 
     if (!buf) {
         buf = (char*)malloc(buflen);
@@ -56,7 +53,7 @@ void systemMessage(int id, const char* fmt, ...)
 
     while (1) {
         va_start(args, fmt);
-        int needsz = vsnprintf(buf, buflen, _fmt.data(), args);
+        int needsz = vsnprintf(buf, buflen, fmt, args);
         va_end(args);
 
         if (needsz < buflen)
@@ -1296,13 +1293,11 @@ bool debugWaitSocket()
 
 void log(const char* defaultMsg, ...)
 {
-    static FILE* out = NULL;
     va_list valist;
-    char buf[2048];
     va_start(valist, defaultMsg);
-    vsnprintf(buf, 2048, defaultMsg, valist);
+    wxString msg = wxString::Format(defaultMsg, valist);
     va_end(valist);
-    wxGetApp().log.append(wxString(buf, wxConvLibc));
+    wxGetApp().log.append(msg);
 
     if (wxGetApp().IsMainLoopRunning()) {
         LogDialog* d = wxGetApp().frame->logdlg;
@@ -1311,19 +1306,6 @@ void log(const char* defaultMsg, ...)
             d->Update();
         }
 
-        systemScreenMessage(buf);
+        systemScreenMessage(msg);
     }
-
-    if (out == NULL) {
-        // FIXME: this should be an option
-        wxFileName trace_log(wxGetApp().GetConfigurationPath(), wxT("trace.log"));
-        out = fopen(trace_log.GetFullPath().utf8_str(), "w");
-
-        if (!out)
-            return;
-    }
-
-    va_start(valist, defaultMsg);
-    vfprintf(out, defaultMsg, valist);
-    va_end(valist);
 }
