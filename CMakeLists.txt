@@ -220,7 +220,11 @@ find_package(SDL2 REQUIRED)
 add_definitions(${SDL2_DEFINITIONS})
 
 if(WIN32)
-    set(SDL2_LIBRARY ${SDL2_LIBRARY} -lSetupAPI)
+    find_library(SETUPAPI_LIBRARY SetupAPI)
+
+    if(SETUPAPI_LIBRARY)
+        set(SDL2_LIBRARY ${SDL2_LIBRARY} ${SETUPAPI_LIBRARY})
+    endif()
 endif()
 
 if(ENABLE_LINK)
