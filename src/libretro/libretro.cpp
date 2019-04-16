@@ -535,7 +535,7 @@ void retro_get_system_info(struct retro_system_info *info)
    info->need_fullpath = false;
    info->valid_extensions = "dmg|gb|gbc|cgb|sgb|gba";
 #ifdef GIT_COMMIT
-   info->library_version = VBAM_VERSION GIT_COMMIT;
+   info->library_version = VBAM_VERSION " " GIT_COMMIT;
 #else
    info->library_version = VBAM_VERSION;
 #endif
