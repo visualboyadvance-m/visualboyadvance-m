@@ -146,7 +146,7 @@ DISTS=$DISTS'
     libtiff         http://download.osgeo.org/libtiff/tiff-4.0.9.tar.gz                                         lib/libtiff.a
 #    libcroco        http://ftp.gnome.org/pub/gnome/sources/libcroco/0.6/libcroco-0.6.12.tar.xz                  lib/libcroco-0.6.a
     libuuid         https://downloads.sourceforge.net/project/libuuid/libuuid-1.0.3.tar.gz                      lib/libuuid.a
-    freetype        http://download.savannah.gnu.org/releases/freetype/freetype-2.9.1.tar.bz2                   lib/libfreetype.a
+    freetype        http://download.savannah.gnu.org/releases/freetype/freetype-2.10.0.tar.bz2                  lib/libfreetype.a
     fontconfig      https://freedesktop.org/software/fontconfig/release/fontconfig-2.13.1.tar.bz2               lib/libfontconfig.a
     libgd           https://github.com/libgd/libgd/releases/download/gd-2.2.5/libgd-2.2.5.tar.xz                lib/libgd.a
     dejavu          https://downloads.sourceforge.net/project/dejavu/dejavu/2.37/dejavu-fonts-ttf-2.37.tar.bz2  share/fonts/dejavu/DejaVuSansMono.ttf
@@ -2625,7 +2625,7 @@ build_project() {
 
     # FIXME: turn LTO back on when everything works
     echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=OFF $PROJECT_ARGS $CMAKE_BASE_ARGS $@
-    echo_run make -j$NUM_CPUS
+    echo_run make -j$NUM_CPUS VERBOSE=1
 
     if [ "$target_os" = mac ]; then
         $STRIP visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m
