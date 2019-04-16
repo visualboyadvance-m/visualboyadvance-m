@@ -1,4 +1,4 @@
-if(WIN32)
+if(WIN32 OR CMAKE_TOOLCHAIN_FILE MATCHES "[Mm][Ii][Nn][Gg][Ww]")
     # compiler has not been detected yet maybe
     if(CMAKE_C_COMPILER MATCHES "cl\\.exe" OR CMAKE_CXX_COMPILER MATCHES "cl\\.exe" OR MSVC OR DEFINED ENV{VisualStudioVersion})
         set(VS TRUE)
@@ -12,11 +12,14 @@ if(WIN32)
     # Win32 deps submodules (dependencies and vcpkg)
     if(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include" OR NOT EXISTS "${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake")
         set(git_checkout FALSE)
-        #        find_package(Git)
-        #if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+
         if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
             set(git_checkout TRUE)
-            execute_process(COMMAND git submodule update --init --remote --recursive RESULT_VARIABLE git_status WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+            execute_process(
+                COMMAND git submodule update --init --remote --recursive
+                RESULT_VARIABLE git_status
+                WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+            )
         endif()
 
         if(NOT (git_checkout AND git_status EQUAL 0))
