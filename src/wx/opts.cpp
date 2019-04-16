@@ -13,31 +13,30 @@
       -p/--profile=hz
 */
 
+#define WJKB newWxJoyKeyBinding
+
 /* not sure how well other compilers support field-init syntax */
 #define STROPT(c, n, d, v) \
-    {                      \
-        wxT(c), (n), d, &v \
-    }
-#define INTOPT(c, n, d, v, min, max)             \
-    {                                            \
-        wxT(c), (n), d, NULL, &v, wxT(""), min, max \
-    }
-#define DOUBLEOPT(c, n, d, v, min, max)                      \
-    {                                                        \
-        wxT(c), (n), d, NULL, NULL, wxT(""), min, max, NULL, &v \
-    }
-#define UINTOPT(c, n, d, v, min, max)                      \
-    {                                                        \
-        wxT(c), (n), d, NULL, NULL, wxT(""), min, max, NULL, NULL, &v \
-    }
-#define BOOLOPT(c, n, d, v)                        \
-    {                                              \
-        wxT(c), (n), d, NULL, NULL, wxT(""), 0, 0, &v \
-    }
-#define ENUMOPT(c, n, d, v, e)      \
-    {                               \
-        wxT(c), (n), d, NULL, &v, e \
-    }
+    new_opt_desc(wxT(c), (n), d, &v)
+
+#define INTOPT(c, n, d, v, min, max) \
+    new_opt_desc(wxT(c), (n), d, NULL, &v, wxT(""), min, max)
+
+#define DOUBLEOPT(c, n, d, v, min, max) \
+    new_opt_desc(wxT(c), (n), d, NULL, NULL, wxT(""), min, max, NULL, &v)
+
+#define UINTOPT(c, n, d, v, min, max) \
+    new_opt_desc(wxT(c), (n), d, NULL, NULL, wxT(""), min, max, NULL, NULL, &v)
+
+#define BOOLOPT(c, n, d, v) \
+    new_opt_desc(wxT(c), (n), d, NULL, NULL, wxT(""), 0, 0, &v)
+
+#define ENUMOPT(c, n, d, v, e) \
+    new_opt_desc(wxT(c), (n), d, NULL, &v, e)
+
+#define NOOPT(c, n, d) \
+    new_opt_desc(c, (n), d)
+
 
 opts_t gopts;
 
@@ -137,20 +136,33 @@ const wxString joynames[NUM_KEYS] = {
 };
 
 wxJoyKeyBinding defkeys[NUM_KEYS * 2] = {
-    { WXK_UP }, { 1, WXJB_AXIS_MINUS, 1 }, { WXK_DOWN }, { 1, WXJB_AXIS_PLUS, 1 },
-    { WXK_LEFT }, { 0, WXJB_AXIS_MINUS, 1 }, { WXK_RIGHT }, { 0, WXJB_AXIS_PLUS, 1 },
-    { wxT('X') }, { 0, WXJB_BUTTON, 1 }, { wxT('Z') }, { 1, WXJB_BUTTON, 1 },
-    { wxT('A') }, { 2, WXJB_BUTTON, 1 }, { wxT('S') }, { 3, WXJB_BUTTON, 1 },
-    { WXK_BACK }, { 4, WXJB_BUTTON, 1 }, { WXK_RETURN }, { 5, WXJB_BUTTON, 1 },
-    { WXK_NUMPAD_UP }, { 0 }, { WXK_NUMPAD_DOWN }, { 0 },
-    { WXK_NUMPAD_LEFT }, { 0 }, { WXK_NUMPAD_RIGHT }, { 0 },
-    { WXK_NUMPAD_PAGEUP }, { 0 }, { WXK_NUMPAD_PAGEDOWN }, { 0 },
-    { wxT('W') }, { 0 }, { wxT('Q') }, { 0 },
-    { WXK_SPACE }, { 0 }, { 0 }, { 0 },
-    { 0 }, { 0 }
+    WJKB(WXK_UP), WJKB(1, WXJB_AXIS_MINUS, 1), WJKB(WXK_DOWN), WJKB(1, WXJB_AXIS_PLUS, 1),
+    WJKB(WXK_LEFT), WJKB(0, WXJB_AXIS_MINUS, 1), WJKB(WXK_RIGHT), WJKB(0, WXJB_AXIS_PLUS, 1),
+    WJKB(wxT('X')), WJKB(0, WXJB_BUTTON, 1), WJKB(wxT('Z')), WJKB(1, WXJB_BUTTON, 1),
+    WJKB(wxT('A')), WJKB(2, WXJB_BUTTON, 1), WJKB(wxT('S')), WJKB(3, WXJB_BUTTON, 1),
+    WJKB(WXK_BACK), WJKB(4, WXJB_BUTTON, 1), WJKB(WXK_RETURN), WJKB(5, WXJB_BUTTON, 1),
+    WJKB(WXK_NUMPAD_UP), WJKB(0), WJKB(WXK_NUMPAD_DOWN), WJKB(0),
+    WJKB(WXK_NUMPAD_LEFT), WJKB(0), WJKB(WXK_NUMPAD_RIGHT), WJKB(0),
+    WJKB(WXK_NUMPAD_PAGEUP), WJKB(0), WJKB(WXK_NUMPAD_PAGEDOWN), WJKB(0),
+    WJKB(wxT('W')), WJKB(0), WJKB(wxT('Q')), WJKB(0),
+    WJKB(WXK_SPACE), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0)
 };
 
 wxAcceleratorEntry_v sys_accels;
+
+// Initializer for struct opt_desc
+opt_desc new_opt_desc(wxString opt, const char* cmd, wxString desc,
+                      wxString* stropt, int* intopt, wxString enumvals,
+                      double min, double max, bool* boolopt,
+                      double* doubleopt, uint32_t* uintopt, wxString curstr,
+                      int curint, double curdouble, uint32_t curuint)
+{
+    struct opt_desc new_opt = {opt, cmd, desc, stropt, intopt, enumvals,
+	                       min, max, boolopt, doubleopt, uintopt,
+			       curstr, curint, curdouble, curuint};
+    return new_opt;
+}
 
 // Note: this table must be sorted in option name order
 // Both for better user display and for (fast) searching by name
@@ -178,9 +190,9 @@ opt_desc opts[] = {
     /// GB
     STROPT("GB/BiosFile", "", wxTRANSLATE("BIOS file to use for GB, if enabled"), gopts.gb_bios),
     STROPT("GB/GBCBiosFile", "", wxTRANSLATE("BIOS file to use for GBC, if enabled"), gopts.gbc_bios),
-    { wxT("GB/Palette0"), "", wxTRANSLATE("The default palette, as 8 comma-separated 4-digit hex integers (rgb555).") },
-    { wxT("GB/Palette1"), "", wxTRANSLATE("The first user palette, as 8 comma-separated 4-digit hex integers (rgb555).") },
-    { wxT("GB/Palette2"), "", wxTRANSLATE("The second user palette, as 8 comma-separated 4-digit hex integers (rgb555).") },
+    NOOPT(wxT("GB/Palette0"), "", wxTRANSLATE("The default palette, as 8 comma-separated 4-digit hex integers (rgb555).")),
+    NOOPT(wxT("GB/Palette1"), "", wxTRANSLATE("The first user palette, as 8 comma-separated 4-digit hex integers (rgb555).")),
+    NOOPT(wxT("GB/Palette2"), "", wxTRANSLATE("The second user palette, as 8 comma-separated 4-digit hex integers (rgb555).")),
     BOOLOPT("GB/PrintAutoPage", "PrintGather", wxTRANSLATE("Automatically gather a full page before printing"), gopts.print_auto_page),
     BOOLOPT("GB/PrintScreenCap", "PrintSnap", wxTRANSLATE("Automatically save printouts as screen captures with -print suffix"), gopts.print_screen_cap),
     STROPT("GB/ROMDir", "", wxTRANSLATE("Directory to look for ROM files"), gopts.gb_rom_dir),
@@ -210,14 +222,14 @@ opt_desc opts[] = {
     INTOPT("General/StatusBar", "StatusBar", wxTRANSLATE("Enable status bar"), gopts.statusbar, 0, 1),
 
     /// Joypad
-    { wxT("Joypad/*/*"), "", wxTRANSLATE("The parameter Joypad/<n>/<button> contains a comma-separated list of key names which map to joypad #<n> button <button>.  Button is one of Up, Down, Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Speed, Capture, GS") },
+    NOOPT(wxT("Joypad/*/*"), "", wxTRANSLATE("The parameter Joypad/<n>/<button> contains a comma-separated list of key names which map to joypad #<n> button <button>.  Button is one of Up, Down, Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Speed, Capture, GS")),
     INTOPT("Joypad/AutofireThrottle", "", wxTRANSLATE("The autofire toggle period, in frames (1/60 s)"), gopts.autofire_rate, 1, 1000),
 
     /// Keyboard
     INTOPT("Joypad/Default", "", wxTRANSLATE("The number of the stick to use in single-player mode"), gopts.default_stick, 1, 4),
 
     /// Keyboard
-    { wxT("Keyboard/*"), "", wxTRANSLATE("The parameter Keyboard/<cmd> contains a comma-separated list of key names (e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is executed.") },
+    NOOPT(wxT("Keyboard/*"), "", wxTRANSLATE("The parameter Keyboard/<cmd> contains a comma-separated list of key names (e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is executed.")),
 
     // Core
     INTOPT("preferences/agbPrint", "AGBPrinter", wxTRANSLATE("Enable AGB debug print"), agbPrint, 0, 1),
@@ -239,7 +251,6 @@ opt_desc opts[] = {
     INTOPT("preferences/fsFrequency", "", wxTRANSLATE("Fullscreen mode frequency (0 = any)"), fsFrequency, 0, 999),
     INTOPT("preferences/fsHeight", "", wxTRANSLATE("Fullscreen mode height (0 = desktop)"), fsHeight, 0, 99999),
     INTOPT("preferences/fsWidth", "", wxTRANSLATE("Fullscreen mode width (0 = desktop)"), fsWidth, 0, 99999),
-    INTOPT("preferences/fullScreen", "Fullscreen", wxTRANSLATE("Enter fullscreen mode at startup"), fullScreen, 0, 1),
     INTOPT("preferences/gbPaletteOption", "", wxTRANSLATE("The palette to use"), gbPaletteOption, 0, 2),
     INTOPT("preferences/gbPrinter", "Printer", wxTRANSLATE("Enable printer emulation"), winGbPrinterEnabled, 0, 1),
     INTOPT("preferences/gdbBreakOnLoad", "DebugGDBBreakOnLoad", wxTRANSLATE("Break into GDB after loading the game."), gdbBreakOnLoad, 0, 1),
@@ -264,8 +275,14 @@ opt_desc opts[] = {
     INTOPT("preferences/useBiosGBC", "BootRomGBC", wxTRANSLATE("Use the specified BIOS file for GBC"), useBiosFileGBC, 0, 1),
     INTOPT("preferences/vsync", "VSync", wxTRANSLATE("Wait for vertical sync"), vsync, 0, 1),
 
-/// Sound
+    /// Geometry
+    INTOPT("geometry/fullScreen", "Fullscreen", wxTRANSLATE("Enter fullscreen mode at startup"), fullScreen, 0, 1),
+    UINTOPT("geometry/windowHeight", "Height", wxTRANSLATE("Window height at startup"), windowHeight, 0, 99999),
+    UINTOPT("geometry/windowWidth", "Width", wxTRANSLATE("Window width at startup"), windowWidth, 0, 99999),
+    INTOPT("geometry/windowX", "X", wxTRANSLATE("Window axis X position at startup"), windowPositionX, -1, 99999),
+    INTOPT("geometry/windowY", "Y", wxTRANSLATE("Window axis Y position at startup"), windowPositionY, -1, 99999),
 
+    /// Sound
     ENUMOPT("Sound/AudioAPI", "", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl|openal|directsound|xaudio2|faudio")),
     STROPT("Sound/AudioDevice", "", wxTRANSLATE("Device ID of chosen audio device for chosen driver"), gopts.audio_dev),
     INTOPT("Sound/Buffers", "", wxTRANSLATE("Number of sound buffers"), gopts.audio_buffers, 2, 10),
@@ -339,7 +356,6 @@ bool opt_lt(const opt_desc& opt1, const opt_desc& opt2)
 }
 
 // FIXME: simulate MakeInstanceFilename(vbam.ini) using subkeys (Slave%d/*)
-
 void load_opts()
 {
     // just for sanity...
@@ -369,7 +385,7 @@ void load_opts()
 
     for (cont = cfg->GetFirstEntry(s, grp_idx); cont;
          cont = cfg->GetNextEntry(s, grp_idx)) {
-        //wxLogWarning(_("Invalid option %s present; removing if possible"), s.mb_str());
+        //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
         item_del.push_back(s);
     }
 
@@ -407,7 +423,7 @@ void load_opts()
                 for (cont = cfg->GetFirstGroup(e, key_idx); cont;
                      cont = cfg->GetNextGroup(e, key_idx)) {
                     s.append(e);
-                    //wxLogWarning(_("Invalid option group %s present; removing if possible"), s.mb_str());
+                    //wxLogWarning(_("Invalid option group %s present; removing if possible"), s.c_str());
                     grp_del.push_back(s);
                     s.resize(poff2);
                 }
@@ -422,7 +438,7 @@ void load_opts()
 
                     if (i == NUM_KEYS) {
                         s.append(e);
-                        //wxLogWarning(_("Invalid option %s present; removing if possible"), s.mb_str());
+                        //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
                         item_del.push_back(s);
                         s.resize(poff2);
                     }
@@ -434,7 +450,7 @@ void load_opts()
             } else {
                 s.append(wxT('/'));
                 s.append(e);
-                //wxLogWarning(_("Invalid option group %s present; removing if possible"), s.mb_str());
+                //wxLogWarning(_("Invalid option group %s present; removing if possible"), s.c_str());
                 grp_del.push_back(s);
                 s.resize(poff);
             }
@@ -444,23 +460,23 @@ void load_opts()
              cont = cfg->GetNextEntry(e, entry_idx)) {
             // kb options come from a different list
             if (s == wxT("Keyboard")) {
-                const cmditem dummy = { e };
+                const cmditem dummy = new_cmditem(e);
 
                 if (!std::binary_search(&cmdtab[0], &cmdtab[ncmds], dummy, cmditem_lt)) {
                     s.append(wxT('/'));
                     s.append(e);
-                    //wxLogWarning(_("Invalid option %s present; removing if possible"), s.mb_str());
+                    //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
                     item_del.push_back(s);
                     s.resize(poff);
                 }
             } else {
                 s.append(wxT('/'));
                 s.append(e);
-                const opt_desc dummy = { s };
+                opt_desc dummy = new_opt_desc(s);
                 wxString opt_name(dummy.opt);
 
                 if (!std::binary_search(&opts[0], &opts[num_opts], dummy, opt_lt) && opt_name != wxT("General/LastUpdated") && opt_name != wxT("General/LastUpdatedFileName")) {
-                    //wxLogWarning(_("Invalid option %s present; removing if possible"), s.mb_str());
+                    //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
                     item_del.push_back(s);
                 }
 
@@ -471,10 +487,10 @@ void load_opts()
         cfg->SetPath(wxT("/"));
     }
 
-    for (int i = 0; i < item_del.size(); i++)
+    for (size_t i = 0; i < item_del.size(); i++)
         cfg->DeleteEntry(item_del[i]);
 
-    for (int i = 0; i < grp_del.size(); i++)
+    for (size_t i = 0; i < grp_del.size(); i++)
         cfg->DeleteGroup(grp_del[i]);
 
     // now read actual values and set to default if unset
@@ -495,7 +511,7 @@ void load_opts()
 
             if (gotit && !s.empty()) {
                 const auto found_pos = vec_find(enum_opts, s);
-                const bool matched   = found_pos != wxNOT_FOUND;
+                const bool matched   = ((int)found_pos != wxNOT_FOUND);
 
                 if (!matched) {
                     opt.curint = 0;
@@ -505,9 +521,9 @@ void load_opts()
                     // technically, the translation for this string could incorproate
                     // the equals sign if necessary instead of doing it this way
                     wxLogWarning(_("Invalid value %s for option %s; valid values are %s%s%s"),
-                        s, opt.opt, ev,
-                        isx ? wxT(" = ") : wxT(""),
-                        isx ? evx : wxT(""));
+                        s.c_str(), opt.opt.c_str(), ev.c_str(),
+                        isx ? wxT(" = ") : wxEmptyString,
+                        isx ? evx.c_str() : wxEmptyString);
                     // write first option
                     cfg->Write(opt.opt, enum_opts[0]);
                 } else
@@ -521,14 +537,14 @@ void load_opts()
             cfg->Read(opt.opt, &opt.curint, *opt.intopt);
 
             if (opt.curint < opt.min || opt.curint > opt.max) {
-                wxLogWarning(_("Invalid value %d for option %s; valid values are %d - %d"), opt.curint, opt.opt, opt.min, opt.max);
+                wxLogWarning(_("Invalid value %d for option %s; valid values are %d - %d"), opt.curint, opt.opt.c_str(), opt.min, opt.max);
             } else
                 *opt.intopt = opt.curint;
         } else if (opt.doubleopt) {
             cfg->Read(opt.opt, &opt.curdouble, *opt.doubleopt);
 
             if (opt.curdouble < opt.min || opt.curdouble > opt.max) {
-                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), opt.curdouble, opt.opt, opt.min, opt.max);
+                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), opt.curdouble, opt.opt.c_str(), opt.min, opt.max);
             } else
                 *opt.doubleopt = opt.curdouble;
         } else if (opt.uintopt) {
@@ -537,7 +553,7 @@ void load_opts()
             opt.curuint = val;
 
             if (opt.curuint < opt.min || opt.curuint > opt.max) {
-                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), opt.curuint, opt.opt, opt.min, opt.max);
+                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), opt.curuint, opt.opt.c_str(), opt.min, opt.max);
             } else
                 *opt.uintopt = opt.curuint;
         } else if (opt.boolopt) {
@@ -551,7 +567,7 @@ void load_opts()
         wxString optn;
         optn.Printf(wxT("GB/Palette%d"), i);
         wxString val;
-        const opt_desc dummy = { optn };
+        const opt_desc dummy = new_opt_desc(optn);
         opt_desc* opt = std::lower_bound(&opts[0], &opts[num_opts], dummy, opt_lt);
         wxString entry;
 
@@ -569,7 +585,7 @@ void load_opts()
             int start = cpos;
             cpos = val.find(wxT(','), cpos);
 
-            if (cpos == wxString::npos)
+            if ((size_t)cpos == wxString::npos)
                 cpos = val.size();
 
             long ival;
@@ -580,7 +596,7 @@ void load_opts()
             entry.ToLong(&ival, 16);
             systemGbPalette[i * 8 + j] = ival;
 
-            if (cpos != val.size())
+            if ((size_t)cpos != val.size())
                 cpos++;
         }
     }
@@ -589,14 +605,14 @@ void load_opts()
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < NUM_KEYS; j++) {
             wxString optname;
-            optname.Printf(wxT("Joypad/%d/%s"), i + 1, joynames[j]);
+            optname.Printf(wxT("Joypad/%d/%s"), i + 1, joynames[j].c_str());
             bool gotit = cfg->Read(optname, &s);
 
             if (gotit) {
                 gopts.joykey_bindings[i][j] = wxJoyKeyTextCtrl::FromString(s);
 
                 if (s.size() && !gopts.joykey_bindings[i][j].size())
-                    wxLogWarning(_("Invalid key binding %s for %s"), s.mb_str(), optname.mb_str());
+                    wxLogWarning(_("Invalid key binding %s for %s"), s.c_str(), optname.c_str());
             } else {
                 s = wxJoyKeyTextCtrl::ToString(gopts.joykey_bindings[i][j]);
                 cfg->Write(optname, s);
@@ -617,9 +633,9 @@ void load_opts()
             wxAcceleratorEntry_v val = wxKeyTextCtrl::FromString(s);
 
             if (!val.size())
-                wxLogWarning(_("Invalid key binding %s for %s"), s.mb_str(), kbopt.mb_str());
+                wxLogWarning(_("Invalid key binding %s for %s"), s.c_str(), kbopt.c_str());
             else {
-                for (int j = 0; j < val.size(); j++)
+                for (size_t j = 0; j < val.size(); j++)
                     val[j].Set(val[j].GetFlags(), val[j].GetKeyCode(),
                         cmdtab[i].cmd_id);
 
@@ -665,7 +681,7 @@ void update_opts()
                 cfg->Write(opt.opt, (opt.curdouble = *opt.doubleopt));
         } else if (opt.uintopt) {
             if (*opt.uintopt != opt.curuint)
-                cfg->Write(opt.opt, (opt.curuint = *opt.uintopt));
+                cfg->Write(opt.opt, (long)(opt.curuint = *opt.uintopt));
         } else if (opt.boolopt) {
             if (*opt.boolopt != opt.curbool)
                 cfg->Write(opt.opt, (opt.curbool = *opt.boolopt));
@@ -677,7 +693,7 @@ void update_opts()
     for (int i = 0; i < 3; i++) {
         wxString optn;
         optn.Printf(wxT("GB/Palette%d"), i);
-        const opt_desc dummy = { optn };
+        const opt_desc dummy = new_opt_desc(optn);
         opt_desc* opt = std::lower_bound(&opts[0], &opts[num_opts], dummy, opt_lt);
         wxString val;
         wxString entry;
@@ -703,7 +719,7 @@ void update_opts()
         for (int j = 0; j < NUM_KEYS; j++) {
             wxString s, o;
             wxString optname;
-            optname.Printf(wxT("Joypad/%d/%s"), i + 1, joynames[j]);
+            optname.Printf(wxT("Joypad/%d/%s"), i + 1, joynames[j].c_str());
             s = wxJoyKeyTextCtrl::ToString(gopts.joykey_bindings[i][j]);
             cfg->Read(optname, &o);
 
@@ -721,9 +737,9 @@ void update_opts()
 
         for (bool cont = cfg->GetFirstEntry(s, entry_idx); cont;
              cont = cfg->GetNextEntry(s, entry_idx)) {
-            const cmditem dummy = { s };
+            const cmditem dummy = new_cmditem(s);
             cmditem* cmd = std::lower_bound(&cmdtab[0], &cmdtab[ncmds], dummy, cmditem_lt);
-            int i;
+            size_t i;
 
             for (i = 0; i < gopts.accels.size(); i++)
                 if (gopts.accels[i].GetCommand() == cmd->cmd_id)
@@ -733,7 +749,7 @@ void update_opts()
                 item_del.push_back(s);
         }
 
-        for (int i = 0; i < item_del.size(); i++)
+        for (size_t i = 0; i < item_del.size(); i++)
             cfg->DeleteEntry(item_del[i]);
     }
 
@@ -772,7 +788,7 @@ void update_opts()
 
 bool opt_set(const wxString& name, const wxString& val)
 {
-    const opt_desc dummy = { name };
+    const opt_desc dummy = new_opt_desc(name);
     const opt_desc* opt = std::lower_bound(&opts[0], &opts[num_opts], dummy, opt_lt);
 
     if (!wxStrcmp(name, opt->opt)) {
@@ -781,7 +797,7 @@ bool opt_set(const wxString& name, const wxString& val)
         else if (opt->boolopt) {
             if (!(val == wxT('0') || val == wxT('1')))
                 wxLogWarning(_("Invalid flag option %s - %s ignored"),
-                    name, val);
+                    name.c_str(), val.c_str());
             else
                 *opt->boolopt = val == wxT('1');
         } else if (!opt->enumvals.empty()) {
@@ -790,7 +806,7 @@ bool opt_set(const wxString& name, const wxString& val)
             auto enum_opts = str_split(ev, wxT("|"));
 
             const std::size_t found_pos = vec_find(enum_opts, s);
-            const bool matched          = found_pos != wxNOT_FOUND;
+            const bool matched          = ((int)found_pos != wxNOT_FOUND);
 
             if (!matched) {
                 const wxString evx = wxGetTranslation(opt->enumvals);
@@ -798,9 +814,9 @@ bool opt_set(const wxString& name, const wxString& val)
                 // technically, the translation for this string could incorproate
                 // the equals sign if necessary instead of doing it this way
                 wxLogWarning(_("Invalid value %s for option %s; valid values are %s%s%s"),
-                    s, opt->opt, opt->enumvals,
-                    isx ? wxT(" = ") : wxT(""),
-                    isx ? evx : wxT(""));
+                    s.c_str(), opt->opt.c_str(), opt->enumvals.c_str(),
+                    isx ? wxT(" = ") : wxEmptyString,
+                    isx ? evx.c_str() : wxEmptyString);
             } else {
                 *opt->intopt = found_pos;
             }
@@ -809,7 +825,7 @@ bool opt_set(const wxString& name, const wxString& val)
             long ival;
 
             if (!s.ToLong(&ival) || ival < opt->min || ival > opt->max)
-                wxLogWarning(_("Invalid value %d for option %s; valid values are %d - %d"), ival, name, opt->min, opt->max);
+                wxLogWarning(_("Invalid value %d for option %s; valid values are %d - %d"), ival, name.c_str(), opt->min, opt->max);
             else
                 *opt->intopt = ival;
         } else if (opt->doubleopt) {
@@ -817,7 +833,7 @@ bool opt_set(const wxString& name, const wxString& val)
             double dval;
 
             if (!s.ToDouble(&dval) || dval < opt->min || dval > opt->max)
-                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), dval, name, opt->min, opt->max);
+                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), dval, name.c_str(), opt->min, opt->max);
             else
                 *opt->doubleopt = dval;
         } else if (opt->uintopt) {
@@ -825,7 +841,7 @@ bool opt_set(const wxString& name, const wxString& val)
             unsigned long uival;
 
             if (!s.ToULong(&uival) || uival < opt->min || uival > opt->max)
-                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), uival, name, opt->min, opt->max);
+                wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), uival, name.c_str(), opt->min, opt->max);
             else
                 *opt->uintopt = (uint32_t)uival;
         } else {
@@ -839,7 +855,7 @@ bool opt_set(const wxString& name, const wxString& val)
 
                 wxString vals(val);
 
-                for (int j = 0, cpos = 0; j < 8; j++) {
+                for (size_t j = 0, cpos = 0; j < 8; j++) {
                     int start = cpos;
                     cpos = vals.find(wxT(','), cpos);
 
@@ -868,7 +884,7 @@ bool opt_set(const wxString& name, const wxString& val)
         auto parts = str_split(name, wxT("/"));
 
         if (parts[0] != wxT("Keyboard")) {
-            cmditem* cmd = std::lower_bound(&cmdtab[0], &cmdtab[ncmds], cmditem{parts[1]}, cmditem_lt);
+            cmditem* cmd = std::lower_bound(&cmdtab[0], &cmdtab[ncmds], cmditem{parts[1],wxString(),0,0,NULL}, cmditem_lt);
 
             if (cmd == &cmdtab[ncmds] || wxStrcmp(parts[1], cmd->cmd))
                 return false;
@@ -889,12 +905,12 @@ bool opt_set(const wxString& name, const wxString& val)
             if (!val.empty()) {
                 auto aval = wxKeyTextCtrl::FromString(val);
 
-                for (int i = 0; i < aval.size(); i++)
+                for (size_t i = 0; i < aval.size(); i++)
                     aval[i].Set(aval[i].GetFlags(), aval[i].GetKeyCode(),
                         cmd->cmd_id);
 
                 if (!aval.size())
-                    wxLogWarning(_("Invalid key binding %s for %s"), val, name);
+                    wxLogWarning(_("Invalid key binding %s for %s"), val.c_str(), name.c_str());
                 else
                     gopts.accels.insert(gopts.accels.end(), aval.begin(), aval.end());
             }
@@ -920,7 +936,7 @@ bool opt_set(const wxString& name, const wxString& val)
                 auto b = wxJoyKeyTextCtrl::FromString(val);
 
                 if (!b.size())
-                    wxLogWarning(_("Invalid key binding %s for %s"), val, name);
+                    wxLogWarning(_("Invalid key binding %s for %s"), val.c_str(), name.c_str());
                 else
                     gopts.joykey_bindings[jno][kno] = b;
             }

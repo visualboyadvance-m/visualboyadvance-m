@@ -97,6 +97,9 @@ Node* exprNodeNumber()
 
 bool exprNodeNumberResolve(Node* n, Function* f, CompileUnit* u)
 {
+    (void)n; // unused params
+    (void)f; // unused params
+    (void)u; // unused params
     return true;
 }
 

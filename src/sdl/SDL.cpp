@@ -64,13 +64,27 @@
 #include "inputSDL.h"
 #include "text.h"
 
+// from: https://stackoverflow.com/questions/7608714/why-is-my-pointer-not-null-after-free
+#define freeSafe(ptr) free(ptr); ptr = NULL;
+
 #ifndef _WIN32
 #include <unistd.h>
 #define GETCWD getcwd
 #else // _WIN32
 #include <direct.h>
+#include <io.h>
 #define GETCWD _getcwd
 #define snprintf sprintf
+#define stat _stat
+#define access _access
+#ifndef W_OK
+    #define W_OK 2
+#endif
+#define mkdir(X,Y) (_mkdir(X))
+// from: https://www.linuxquestions.org/questions/programming-9/porting-to-win32-429334/
+#ifndef S_ISDIR
+    #define S_ISDIR(mode)  (((mode) & _S_IFMT) == _S_IFDIR)
+#endif
 #endif // _WIN32
 
 #ifndef __GNUC__
@@ -202,6 +216,8 @@ int sdlMirroringEnable = 1;
 void systemConsoleMessage(const char*);
 
 char* home;
+char homeConfigDir[1024];
+char homeDataDir[1024];
 
 char screenMessageBuffer[21];
 uint32_t screenMessageTime = 0;
@@ -246,7 +262,7 @@ void StartLirc(void)
         fprintf(stdout, "Success\n");
         //read the config file
         char LIRCConfigLoc[2048];
-        sprintf(LIRCConfigLoc, "%s/%s/%s", homeDir, DOT_DIR, "lircrc");
+        sprintf(LIRCConfigLoc, "%s%c%s", homeConfigDir, FILE_SEP, "lircrc");
         fprintf(stdout, "LIRC Config file:");
         if (lirc_readconfig(LIRCConfigLoc, &LIRCConfigInfo, NULL) == 0) {
             //check vbam dir for lircrc
@@ -284,59 +300,47 @@ void StopLirc(void)
 
 bool sdlCheckDirectory(const char* dir)
 {
-    bool res = false;
-
-    if (!dir || !dir[0]) {
-        return false;
-    }
-
     struct stat buf;
 
-    int len = strlen(dir);
+    if (!dir || !dir[0])
+        return false;
 
-    char* p = (char*)dir + len - 1;
-
-    while (p != dir && (*p == '/' || *p == '\\')) {
-        *p = 0;
-        p--;
+    if (stat(dir, &buf) == 0)
+    {
+	if (!(buf.st_mode & S_IFDIR))
+	{
+	    fprintf(stderr, "Error: %s is not a directory\n", dir);
+	    return false;
+	}
+	return true;
     }
-
-    if (stat(dir, &buf) == 0) {
-        if (!(buf.st_mode & S_IFDIR)) {
-            fprintf(stderr, "Error: %s is not a directory\n", dir);
-        }
-        res = true;
-    } else {
-        fprintf(stderr, "Error: %s does not exist\n", dir);
+    else
+    {
+	fprintf(stderr, "Error: %s does not exist\n", dir);
+	return false;
     }
-
-    return res;
 }
 
 char* sdlGetFilename(char* name)
 {
-    static char filebuffer[2048];
-
-    int len = strlen(name);
-
-    char* p = name + len - 1;
-
-    while (true) {
-        if (*p == '/' || *p == '\\') {
-            p++;
-            break;
-        }
-        len--;
-        p--;
-        if (len == 0)
-            break;
-    }
-
-    if (len == 0)
-        strcpy(filebuffer, name);
+    char path[1024] = ""; // avoid warning about uninitialised value
+    char *filename = strrchr(name, FILE_SEP);
+    if (filename)
+        strncpy(path, filename + 1, strlen(filename));
     else
-        strcpy(filebuffer, p);
-    return filebuffer;
+        sprintf(path, "%s", name);
+    return strdup(path);
+}
+
+char* sdlGetFilePath(char* name)
+{
+    char path[1024] = ""; // avoid warning about uninitialised value
+    char *filename = strrchr(name, FILE_SEP);
+    if (filename)
+        strncpy(path, name, strlen(name) - strlen(filename));
+    else
+        sprintf(path, "%c%c", '.', FILE_SEP);
+    return strdup(path);
 }
 
 FILE* sdlFindFile(const char* name)
@@ -366,8 +370,8 @@ FILE* sdlFindFile(const char* name)
     }
 
     if (homeDir) {
-        fprintf(stdout, "Searching home directory: %s%c%s\n", homeDir, FILE_SEP, DOT_DIR);
-        sprintf(path, "%s%c%s%c%s", homeDir, FILE_SEP, DOT_DIR, FILE_SEP, name);
+        fprintf(stdout, "Searching home directory: %s\n", homeDataDir);
+        sprintf(path, "%s%c%s", homeDataDir, FILE_SEP, name);
         f = fopen(path, "r");
         if (f != NULL)
             return f;
@@ -488,7 +492,8 @@ static void sdlOpenGLVideoResize()
 
 void sdlOpenGLInit(int w, int h)
 {
-
+    (void)w; // unused params
+    (void)h; // unused params
 #if 0
   float screenAspect = (float) sizeX / sizeY,
         windowAspect = (float) w / h;
@@ -654,15 +659,18 @@ static int sdlCalculateShift(uint32_t mask)
 static char* sdlStateName(int num)
 {
     static char stateName[2048];
+    char *gameDir = sdlGetFilePath(filename);
+    char *gameFile = sdlGetFilename(filename);
 
     if (saveDir)
-        sprintf(stateName, "%s/%s%d.sgm", saveDir, sdlGetFilename(filename),
-            num + 1);
-    else if (homeDir)
-        sprintf(stateName, "%s/%s/%s%d.sgm", homeDir, DOT_DIR, sdlGetFilename(filename), num + 1);
+        sprintf(stateName, "%s%c%s%d.sgm", saveDir, FILE_SEP, gameFile, num + 1);
+    else if (access(gameDir, W_OK) == 0)
+        sprintf(stateName, "%s%c%s%d.sgm", gameDir, FILE_SEP, gameFile, num + 1);
     else
-        sprintf(stateName, "%s%d.sgm", filename, num + 1);
+        sprintf(stateName, "%s%c%s%d.sgm", homeDataDir, FILE_SEP, gameFile, num + 1);
 
+    freeSafe(gameDir);
+    freeSafe(gameFile);
     return stateName;
 }
 
@@ -753,37 +761,46 @@ void sdlWriteBackupStateExchange(int from, int to, int backup)
 
 void sdlWriteBattery()
 {
-    char buffer[1048];
+    char buffer[2048];
+    char *gameDir = sdlGetFilePath(filename);
+    char *gameFile = sdlGetFilename(filename);
 
     if (batteryDir)
-        sprintf(buffer, "%s/%s.sav", batteryDir, sdlGetFilename(filename));
-    else if (homeDir)
-        sprintf(buffer, "%s/%s/%s.sav", homeDir, DOT_DIR, sdlGetFilename(filename));
+        sprintf(buffer, "%s%c%s.sav", batteryDir, FILE_SEP, gameFile);
+    else if (access(gameDir, W_OK) == 0)
+        sprintf(buffer, "%s%c%s.sav", gameDir, FILE_SEP, gameFile);
     else
-        sprintf(buffer, "%s.sav", filename);
+        sprintf(buffer, "%s%c%s.sav", homeDataDir, FILE_SEP, gameFile);
 
-    emulator.emuWriteBattery(buffer);
+    bool result = emulator.emuWriteBattery(buffer);
 
-    systemScreenMessage("Wrote battery");
+    if (result)
+	systemMessage(0, "Wrote battery '%s'", buffer);
+
+    freeSafe(gameFile);
+    freeSafe(gameDir);
 }
 
 void sdlReadBattery()
 {
-    char buffer[1048];
+    char buffer[2048];
+    char *gameDir = sdlGetFilePath(filename);
+    char *gameFile = sdlGetFilename(filename);
 
     if (batteryDir)
-        sprintf(buffer, "%s/%s.sav", batteryDir, sdlGetFilename(filename));
-    else if (homeDir)
-        sprintf(buffer, "%s/%s/%s.sav", homeDir, DOT_DIR, sdlGetFilename(filename));
+        sprintf(buffer, "%s%c%s.sav", batteryDir, FILE_SEP, gameFile);
+    else if (access(gameDir, W_OK) == 0)
+        sprintf(buffer, "%s%c%s.sav", gameDir, FILE_SEP, gameFile);
     else
-        sprintf(buffer, "%s.sav", filename);
+        sprintf(buffer, "%s%c%s.sav", homeDataDir, FILE_SEP, gameFile);
 
-    bool res = false;
+    bool result = emulator.emuReadBattery(buffer);
 
-    res = emulator.emuReadBattery(buffer);
+    if (result)
+        systemMessage(0, "Loaded battery '%s'", buffer);
 
-    if (res)
-        systemScreenMessage("Loaded battery");
+    freeSafe(gameFile);
+    freeSafe(gameDir);
 }
 
 void sdlReadDesktopVideoMode()
@@ -1637,12 +1654,30 @@ void handleRewinds()
     }
 }
 
+void SetHomeConfigDir()
+{
+    sprintf(homeConfigDir, "%s%s", get_xdg_user_config_home().c_str(), DOT_DIR);
+    struct stat s;
+    if (stat(homeDataDir, &s) == -1 || !S_ISDIR(s.st_mode))
+	mkdir(homeDataDir, 0755);
+}
+
+void SetHomeDataDir()
+{
+    sprintf(homeDataDir, "%s%s", get_xdg_user_data_home().c_str(), DOT_DIR);
+    struct stat s;
+    if (stat(homeDataDir, &s) == -1 || !S_ISDIR(s.st_mode))
+	mkdir(homeDataDir, 0755);
+}
+
 int main(int argc, char** argv)
 {
     fprintf(stdout, "%s\n", VBA_NAME_AND_SUBVERSION);
 
     home = argv[0];
     SetHome(home);
+    SetHomeConfigDir();
+    SetHomeDataDir();
 
     frameSkip = 2;
     gbBorderOn = 0;
@@ -2024,6 +2059,7 @@ int main(int argc, char** argv)
 
 void systemMessage(int num, const char* msg, ...)
 {
+    (void)num; // unused params
     va_list valist;
 
     va_start(valist, msg);
@@ -2208,27 +2244,35 @@ void system10Frames(int rate)
 void systemScreenCapture(int a)
 {
     char buffer[2048];
+    bool result = false;
+    char *gameDir = sdlGetFilePath(filename);
+    char *gameFile = sdlGetFilename(filename);
 
     if (captureFormat) {
         if (screenShotDir)
-            sprintf(buffer, "%s/%s%02d.bmp", screenShotDir, sdlGetFilename(filename), a);
-        else if (homeDir)
-            sprintf(buffer, "%s/%s/%s%02d.bmp", homeDir, DOT_DIR, sdlGetFilename(filename), a);
+            sprintf(buffer, "%s%c%s%02d.bmp", screenShotDir, FILE_SEP, gameFile, a);
+        else if (access(gameDir, W_OK) == 0)
+            sprintf(buffer, "%s%c%s%02d.bmp", gameDir, FILE_SEP, gameFile, a);
         else
-            sprintf(buffer, "%s%02d.bmp", filename, a);
+            sprintf(buffer, "%s%c%s%02d.bmp", homeDataDir, FILE_SEP, gameFile, a);
 
-        emulator.emuWriteBMP(buffer);
+        result = emulator.emuWriteBMP(buffer);
     } else {
         if (screenShotDir)
-            sprintf(buffer, "%s/%s%02d.png", screenShotDir, sdlGetFilename(filename), a);
-        else if (homeDir)
-            sprintf(buffer, "%s/%s/%s%02d.png", homeDir, DOT_DIR, sdlGetFilename(filename), a);
+            sprintf(buffer, "%s%c%s%02d.png", screenShotDir, FILE_SEP, gameFile, a);
+        else if (access(gameDir, W_OK) == 0)
+            sprintf(buffer, "%s%c%s%02d.png", gameDir, FILE_SEP, gameFile, a);
         else
-            sprintf(buffer, "%s%02d.png", filename, a);
-        emulator.emuWritePNG(buffer);
+            sprintf(buffer, "%s%c%s%02d.png", homeDataDir, FILE_SEP, gameFile, a);
+
+        result = emulator.emuWritePNG(buffer);
     }
 
-    systemScreenMessage("Screen capture");
+    if (result)
+	systemScreenMessage("Screen capture");
+
+    freeSafe(gameFile);
+    freeSafe(gameDir);
 }
 
 void systemSaveOldest()
@@ -2248,6 +2292,12 @@ uint32_t systemGetClock()
 
 void systemGbPrint(uint8_t* data, int len, int pages, int feed, int palette, int contrast)
 {
+    (void)data; // unused params
+    (void)len; // unused params
+    (void)pages; // unused params
+    (void)feed; // unused params
+    (void)palette; // unused params
+    (void)contrast; // unused params
 }
 
 /* xKiv: added timestamp */
@@ -2370,6 +2420,8 @@ void systemOnSoundShutdown()
 
 void systemOnWriteDataToSoundBuffer(const uint16_t* finalWave, int length)
 {
+    (void)finalWave; // unused params
+    (void)length; // unused params
 }
 
 void log(const char* defaultMsg, ...)

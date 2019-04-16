@@ -67,7 +67,7 @@ void gbSgbReset()
     gbSgbNextController = 0x0f;
     gbSgbReadingController = 0;
 
-    memset(gbSgbSCPPalette, 0, 512 * 4);
+    memset(gbSgbSCPPalette, 0, 512 * 4 * sizeof(uint16_t));
     memset(gbSgbATF, 0, 20 * 18);
     memset(gbSgbATFList, 0, 45 * 20 * 18);
     memset(gbSgbPacket, 0, 16 * 7);
@@ -119,7 +119,7 @@ void gbSgbFillScreen(uint16_t color)
             int yLine = (y + gbBorderRowSkip + 1) * (gbBorderLineSkip + 2) + gbBorderColumnSkip;
 #endif
             uint16_t* dest = (uint16_t*)pix + yLine;
-            for (register int x = 0; x < 160; x++)
+            for (int x = 0; x < 160; x++)
                 gbSgbDraw16Bit(dest++, color);
         }
     } break;
@@ -127,7 +127,7 @@ void gbSgbFillScreen(uint16_t color)
         for (int y = 0; y < 144; y++) {
             int yLine = (y + gbBorderRowSkip) * gbBorderLineSkip + gbBorderColumnSkip;
             uint8_t* dest = (uint8_t*)pix + yLine * 3;
-            for (register int x = 0; x < 160; x++) {
+            for (int x = 0; x < 160; x++) {
                 gbSgbDraw24Bit(dest, color);
                 dest += 3;
             }
@@ -141,7 +141,7 @@ void gbSgbFillScreen(uint16_t color)
             int yLine = (y + gbBorderRowSkip + 1) * (gbBorderLineSkip + 1) + gbBorderColumnSkip;
 #endif
             uint32_t* dest = (uint32_t*)pix + yLine;
-            for (register int x = 0; x < 160; x++) {
+            for (int x = 0; x < 160; x++) {
                 gbSgbDraw32Bit(dest++, color);
             }
         }

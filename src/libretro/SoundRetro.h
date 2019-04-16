@@ -30,6 +30,7 @@ public:
     virtual void reset();
     virtual void resume();
     virtual void write(uint16_t* finalWave, int length);
+    virtual void setThrottle(unsigned short throttle);
 };
 
 #endif // __VBA_SOUND_RETRO_H__

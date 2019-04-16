@@ -5,7 +5,7 @@
 
 extern int RGB_LOW_BITS_MASK;
 
-static void Init();
+void InterframeFilterInit();
 
 // call ifc to ignore previous frame / when starting new
 void InterframeCleanup();

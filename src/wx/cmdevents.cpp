@@ -50,7 +50,7 @@ void MainFrame::GetMenuOptionBool(const char* menuName, bool& field)
     field = !field;
     int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
 
-    for (int i = 0; i < checkable_mi.size(); i++) {
+    for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (checkable_mi[i].cmd != id)
             continue;
 
@@ -65,7 +65,7 @@ void MainFrame::GetMenuOptionInt(const char* menuName, int& field, int mask)
     bool is_checked = ((field) & (mask)) != (value);
     int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
 
-    for (int i = 0; i < checkable_mi.size(); i++) {
+    for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (checkable_mi[i].cmd != id)
             continue;
 
@@ -80,7 +80,7 @@ void MainFrame::SetMenuOption(const char* menuName, int value)
 {
     int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
 
-    for (int i = 0; i < checkable_mi.size(); i++) {
+    for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (checkable_mi[i].cmd != id)
             continue;
 
@@ -506,6 +506,7 @@ static bool maker_lt(const rom_maker& r1, const rom_maker& r2)
 
 void SetDialogLabel(wxDialog* dlg, const wxString& id, wxString ts, size_t l)
 {
+    (void)l; // unused params
     ts.Replace(wxT("&"), wxT("&&"), true);
     (dynamic_cast<wxControl*>((*dlg).FindWindow(wxXmlResource::GetXRCID(id))))->SetLabel(ts);
 }
@@ -527,7 +528,7 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
     } while (0)
 #define setblabs(id, b, ts)                              \
     do {                                                 \
-        s.Printf(wxT("%02x (%s)"), (unsigned int)b, ts); \
+        s.Printf(wxT("%02x (%s)"), (unsigned int)b, ts.c_str()); \
         setlab(id);                                      \
     } while (0)
 #define setlabs(id, ts, l)                               \
@@ -548,7 +549,7 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
             s.Printf(wxT("%02x"), gbRom[0x14b]);
 
         setlab("MakerCode");
-        const rom_maker m = { s }, *rm;
+        const rom_maker m = { s, wxString() }, *rm;
         rm = std::lower_bound(&makers[0], &makers[num_makers], m, maker_lt);
 
         if (rm < &makers[num_makers] && !wxStrcmp(m.code, rm->code))
@@ -776,7 +777,7 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
         SetDialogLabel(dlg, wxT("CRC32"), rom_crc32, 8);
         setlabs("GameCode", rom[0xac], 4);
         setlabs("MakerCode", rom[0xb0], 2);
-        const rom_maker m = { s }, *rm;
+        const rom_maker m = { s, wxString() }, *rm;
         rm = std::lower_bound(&makers[0], &makers[num_makers], m, maker_lt);
 
         if (rm < &makers[num_makers] && !wxStrcmp(m.code, rm->code))
@@ -804,6 +805,9 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
         dlg->Fit();
         ShowModal(dlg);
     } break;
+
+    default:
+	break;
     }
 }
 
@@ -865,9 +869,9 @@ EVT_HANDLER_MASK(ImportBatteryFile, "Import battery file...", CMDEN_GB | CMDEN_G
         wxString msg;
 
         if (panel->emusys->emuReadBattery(fn.mb_fn_str()))
-            msg.Printf(_("Loaded battery %s"), fn.mb_str());
+            msg.Printf(_("Loaded battery %s"), fn.c_str());
         else
-            msg.Printf(_("Error loading battery %s"), fn.mb_str());
+            msg.Printf(_("Error loading battery %s"), fn.c_str());
 
         systemScreenMessage(msg);
     }
@@ -903,7 +907,7 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN
             wxFFile f(fn, wxT("rb"));
 
             if (!f.IsOpened()) {
-                wxLogError(_("Cannot open file %s"), fn.mb_str());
+                wxLogError(_("Cannot open file %s"), fn.c_str());
                 return;
             }
 
@@ -913,7 +917,7 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN
             char buf[14];
 
             if (f.Read(&len, sizeof(len)) != sizeof(len) || wxUINT32_SWAP_ON_BE(len) != 14 || f.Read(buf, 14) != 14 || memcmp(buf, "SharkPortCODES", 14)) {
-                wxLogError(_("Unsupported code file %s"), fn.mb_str());
+                wxLogError(_("Unsupported code file %s"), fn.c_str());
                 return;
             }
 
@@ -971,7 +975,7 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN
 
                 game = lst->GetSelection();
 
-                if (game == wxNOT_FOUND)
+                if ((int)game == wxNOT_FOUND)
                     game = 0;
             }
 
@@ -983,9 +987,9 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN
         }
 
         if (res)
-            msg.Printf(_("Loaded code file %s"), fn.mb_str());
+            msg.Printf(_("Loaded code file %s"), fn.c_str());
         else
-            msg.Printf(_("Error loading code file %s"), fn.mb_str());
+            msg.Printf(_("Error loading code file %s"), fn.c_str());
 
         systemScreenMessage(msg);
     }
@@ -1031,9 +1035,9 @@ EVT_HANDLER_MASK(ImportGamesharkActionReplaySnapshot,
         }
 
         if (res)
-            msg.Printf(_("Loaded snapshot file %s"), fn.mb_str());
+            msg.Printf(_("Loaded snapshot file %s"), fn.c_str());
         else
-            msg.Printf(_("Error loading snapshot file %s"), fn.mb_str());
+            msg.Printf(_("Error loading snapshot file %s"), fn.c_str());
 
         systemScreenMessage(msg);
     }
@@ -1056,9 +1060,9 @@ EVT_HANDLER_MASK(ExportBatteryFile, "Export battery file...", CMDEN_GB | CMDEN_G
     wxString msg;
 
     if (panel->emusys->emuWriteBattery(fn.mb_fn_str()))
-        msg.Printf(_("Wrote battery %s"), fn.mb_str());
+        msg.Printf(_("Wrote battery %s"), fn.c_str());
     else
-        msg.Printf(_("Error writing battery %s"), fn.mb_str());
+        msg.Printf(_("Error writing battery %s"), fn.c_str());
 
     systemScreenMessage(msg);
 }
@@ -1097,11 +1101,11 @@ EVT_HANDLER_MASK(ExportGamesharkSnapshot, "Export GameShark snapshot...", CMDEN_
     // FIXME: this will fail on big-endian machines if file format is
     // little-endian
     // fix in GBA.cpp
-    if (CPUWriteGSASnapshot(fn.mb_str(), tit->GetValue().mb_str(),
-            dsc->GetValue().mb_str(), n->GetValue().mb_str()))
-        msg.Printf(_("Saved snapshot file %s"), fn.mb_str());
+    if (CPUWriteGSASnapshot(fn.utf8_str(), tit->GetValue().utf8_str(),
+            dsc->GetValue().utf8_str(), n->GetValue().utf8_str()))
+        msg.Printf(_("Saved snapshot file %s"), fn.c_str());
     else
-        msg.Printf(_("Error saving snapshot file %s"), fn.mb_str());
+        msg.Printf(_("Error saving snapshot file %s"), fn.c_str());
 
     systemScreenMessage(msg);
 }
@@ -1141,7 +1145,7 @@ EVT_HANDLER_MASK(ScreenCapture, "Screen capture...", CMDEN_GB | CMDEN_GBA)
         panel->emusys->emuWriteBMP(fn.mb_fn_str());
 
     wxString msg;
-    msg.Printf(_("Wrote snapshot %s"), fn.mb_str());
+    msg.Printf(_("Wrote snapshot %s"), fn.c_str());
     systemScreenMessage(msg);
 }
 
@@ -1606,7 +1610,7 @@ EVT_HANDLER_MASK(Rewind, "Rewind", CMDEN_REWIND)
     // if within 5 seconds of last one, and > 1 state, delete last state & move back
     // FIXME: 5 should actually be user-configurable
     // maybe instead of 5, 10% of rewind_interval
-    if (panel->num_rewind_states > 1 && (gopts.rewind_interval <= 5 || panel->rewind_time / 6 > gopts.rewind_interval - 5)) {
+    if (panel->num_rewind_states > 1 && (gopts.rewind_interval <= 5 || (int)panel->rewind_time / 6 > gopts.rewind_interval - 5)) {
         --panel->num_rewind_states;
         panel->next_rewind_state = rew_st;
 
@@ -1713,7 +1717,7 @@ EVT_HANDLER_MASK(VideoLayersReset, "Show all video layers", CMDEN_GB | CMDEN_GBA
 #define set_vl(s)                                     \
     do {                                              \
         int id = XRCID(s);                            \
-        for (int i = 0; i < checkable_mi.size(); i++) \
+        for (size_t i = 0; i < checkable_mi.size(); i++) \
             if (checkable_mi[i].cmd == id) {          \
                 checkable_mi[i].mi->Check(true);      \
                 break;                                \
@@ -1937,7 +1941,7 @@ void MainFrame::GDBBreak()
                 if (!debugOpenPty())
                     return;
 
-                msg.Printf(_("Waiting for connection at %s"), debugGetSlavePty().mb_str());
+                msg.Printf(_("Waiting for connection at %s"), debugGetSlavePty().c_str());
             } else
 #endif
             {
@@ -2242,7 +2246,7 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
             vba_over.append(wxTextFile::GetEOL());
             fn.Mkdir(0777, wxPATH_MKDIR_FULL);
             wxTempFileOutputStream fos(fn.GetFullPath());
-            fos.Write(vba_over.mb_str(), vba_over.size());
+            fos.Write(vba_over.c_str(), vba_over.size());
             fos.Commit();
         }
     }
@@ -2291,7 +2295,7 @@ EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
 {
     int filt = gopts.filter;
 
-    if (filt == FF_PLUGIN || ++gopts.filter == FF_PLUGIN && gopts.filter_plugin.empty()) {
+    if ((filt == FF_PLUGIN || ++gopts.filter == FF_PLUGIN) && gopts.filter_plugin.empty()) {
         gopts.filter = 0;
     }
 

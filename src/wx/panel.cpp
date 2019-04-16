@@ -22,17 +22,17 @@ IMPLEMENT_DYNAMIC_CLASS(GameArea, wxPanel)
 
 GameArea::GameArea()
     : wxPanel()
-    , loaded(IMAGE_UNKNOWN)
     , panel(NULL)
     , emusys(NULL)
-    , basic_width(GBAWidth)
-    , basic_height(GBAHeight)
-    , fullscreen(false)
-    , paused(false)
     , was_paused(false)
     , rewind_time(0)
     , do_rewind(false)
     , rewind_mem(0)
+    , loaded(IMAGE_UNKNOWN)
+    , basic_width(GBAWidth)
+    , basic_height(GBAHeight)
+    , fullscreen(false)
+    , paused(false)
     , pointer_blanked(false)
     , mouse_active_time(0)
 {
@@ -83,7 +83,7 @@ void GameArea::LoadGame(const wxString& name)
 
     if (t == IMAGE_UNKNOWN) {
         wxString s;
-        s.Printf(_("%s is not a valid ROM file"), name.mb_str());
+        s.Printf(_("%s is not a valid ROM file"), name.c_str());
         wxMessageDialog dlg(GetParent(), s, _("Problem loading file"), wxOK | wxICON_ERROR);
         dlg.ShowModal();
         return;
@@ -140,7 +140,7 @@ void GameArea::LoadGame(const wxString& name)
     if (t == IMAGE_GB) {
         if (!gbLoadRom(fn)) {
             wxString s;
-            s.Printf(_("Unable to load Game Boy ROM %s"), name.mb_str());
+            s.Printf(_("Unable to load Game Boy ROM %s"), name.c_str());
             wxMessageDialog dlg(GetParent(), s, _("Problem loading file"), wxOK | wxICON_ERROR);
             dlg.ShowModal();
             return;
@@ -155,7 +155,7 @@ void GameArea::LoadGame(const wxString& name)
             wxCharBuffer pfnb(pfn.GetFullPath().mb_fn_str());
             applyPatch(pfnb.data(), &gbRom, &size);
 
-            if (size != rom_size)
+            if (size != (int)rom_size)
                 gbUpdateSizes();
 
             rom_size = size;
@@ -192,7 +192,7 @@ void GameArea::LoadGame(const wxString& name)
         gbCPUInit(fn, use_bios);
 
         if (use_bios && !useBios) {
-            wxLogError(_("Could not load BIOS %s"), (gbCgbMode ? gopts.gbc_bios : gopts.gb_bios).mb_str());
+            wxLogError(_("Could not load BIOS %s"), (gbCgbMode ? gopts.gbc_bios : gopts.gb_bios).c_str());
             // could clear use flag & file name now, but better to force
             // user to do it
         }
@@ -215,7 +215,7 @@ void GameArea::LoadGame(const wxString& name)
     {
         if (!(rom_size = CPULoadRom(fn))) {
             wxString s;
-            s.Printf(_("Unable to load Game Boy Advance ROM %s"), name.mb_str());
+            s.Printf(_("Unable to load Game Boy Advance ROM %s"), name.c_str());
             wxMessageDialog dlg(GetParent(), s, _("Problem loading file"), wxOK | wxICON_ERROR);
             dlg.ShowModal();
             return;
@@ -285,7 +285,7 @@ void GameArea::LoadGame(const wxString& name)
         CPUInit(gopts.gba_bios.mb_fn_str(), useBiosFileGBA);
 
         if (useBiosFileGBA && !useBios) {
-            wxLogError(_("Could not load BIOS %s"), gopts.gba_bios.mb_str());
+            wxLogError(_("Could not load BIOS %s"), gopts.gba_bios.c_str());
             // could clear use flag & file name now, but better to force
             // user to do it
         }
@@ -302,7 +302,8 @@ void GameArea::LoadGame(const wxString& name)
     loaded = t;
     SetFrameTitle();
     SetFocus();
-    AdjustSize(true);
+    // Use custom geometry
+    AdjustSize(false);
     emulating = true;
     was_paused = true;
     MainFrame* mf = wxGetApp().frame;
@@ -354,7 +355,7 @@ void GameArea::LoadGame(const wxString& name)
 
         if (emusys->emuReadBattery(fnb.data())) {
             wxString msg;
-            msg.Printf(_("Loaded battery %s"), bat.GetFullPath().mb_str());
+            msg.Printf(_("Loaded battery %s"), bat.GetFullPath().c_str());
             systemScreenMessage(msg);
 
             if (cpuSaveType == 0 && ovSaveType == 0 && t == IMAGE_GBA) {
@@ -371,6 +372,7 @@ void GameArea::LoadGame(const wxString& name)
                 case 0x10000:
                     if (saveType == GBA_SAVE_EEPROM || saveType == GBA_SAVE_SRAM)
                         break;
+                    break;
 
                 case 0x20000:
                     saveType = GBA_SAVE_FLASH;
@@ -461,6 +463,10 @@ void GameArea::recompute_dirs()
         batdir = wxGetApp().GetAbsolutePath(gopts.battery_dir);
     }
 
+    if (!wxIsWritable(batdir)) {
+        batdir = wxGetApp().GetDataDir();
+    }
+
     statedir = gopts.state_dir;
 
     if (!statedir.size()) {
@@ -469,11 +475,9 @@ void GameArea::recompute_dirs()
         statedir = wxGetApp().GetAbsolutePath(gopts.state_dir);
     }
 
-    if (!wxIsWritable(batdir))
-        batdir = wxGetApp().GetConfigurationPath();
-
-    if (!wxIsWritable(statedir))
-        statedir = wxGetApp().GetConfigurationPath();
+    if (!wxIsWritable(statedir)) {
+        statedir = wxGetApp().GetDataDir();
+    }
 }
 
 void GameArea::UnloadGame(bool destruct)
@@ -570,7 +574,7 @@ bool GameArea::LoadState()
 bool GameArea::LoadState(int slot)
 {
     wxString fname;
-    fname.Printf(SAVESLOT_FMT, game_name().mb_str(), slot);
+    fname.Printf(SAVESLOT_FMT, game_name().c_str(), slot);
     return LoadState(wxFileName(statedir, fname));
 }
 
@@ -604,7 +608,7 @@ bool GameArea::LoadState(const wxFileName& fname)
 
     wxString msg;
     msg.Printf(ret ? _("Loaded state %s") : _("Error loading state %s"),
-        fname.GetFullPath().mb_str());
+        fname.GetFullPath().c_str());
     systemScreenMessage(msg);
     return ret;
 }
@@ -617,7 +621,7 @@ bool GameArea::SaveState()
 bool GameArea::SaveState(int slot)
 {
     wxString fname;
-    fname.Printf(SAVESLOT_FMT, game_name().mb_str(), slot);
+    fname.Printf(SAVESLOT_FMT, game_name().c_str(), slot);
     return SaveState(wxFileName(statedir, fname));
 }
 
@@ -628,7 +632,7 @@ bool GameArea::SaveState(const wxFileName& fname)
     wxGetApp().frame->update_state_ts(true);
     wxString msg;
     msg.Printf(ret ? _("Saved state %s") : _("Error saving state %s"),
-        fname.GetFullPath().mb_str());
+        fname.GetFullPath().c_str());
     systemScreenMessage(msg);
     return ret;
 }
@@ -658,7 +662,7 @@ void GameArea::SaveBattery()
     // of course some games just write battery way too often for such
     // a thing to be useful
     if (!emusys->emuWriteBattery(fnb.data()))
-        wxLogError(_("Error writing battery %s"), fn);
+        wxLogError(_("Error writing battery %s"), fn.c_str());
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 }
@@ -840,7 +844,7 @@ void GameArea::ShowFullScreen(bool full)
                 // in particular, unix does Matches() in wrong direction
                 wxArrayVideoModes vm = d.GetModes();
                 int best_mode = -1;
-                int i;
+                size_t i;
 
                 for (i = 0; i < vm.size(); i++) {
                     if (vm[i].w != gopts.fs_mode.w || vm[i].h != gopts.fs_mode.h)
@@ -997,7 +1001,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
             panel = new GLDrawingPanel(this, basic_width, basic_height);
             break;
 #endif
-#ifdef __WXMSW__
+#if defined(__WXMSW__) && !defined(NO_D3D)
         case RND_DIRECT3D:
             panel = new DXDrawingPanel(this, basic_width, basic_height);
             break;
@@ -1016,7 +1020,6 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
         // set userdata so we know it's the panel and not the frame being resized
         // the userdata is freed on disconnect/destruction
-        w->Connect(wxEVT_SIZE,             wxSizeEventHandler(GameArea::OnSize),           new wxObject, this);
         this->Connect(wxEVT_SIZE,          wxSizeEventHandler(GameArea::OnSize),           NULL, this);
 
         w->SetBackgroundStyle(wxBG_STYLE_CUSTOM);
@@ -1030,10 +1033,28 @@ void GameArea::OnIdle(wxIdleEvent& event)
         AdjustMinSize();
         AdjustSize(false);
 
+        unsigned frame_priority = 0;
+
         // add spacers on top and bottom to center panel vertically
+        // but not on 2.8 which does not handle this correctly
+#if wxCHECK_VERSION(2, 9, 0)
         GetSizer()->Add(0, 0, 1, wxEXPAND);
-        GetSizer()->Add(w,    0, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER | wxEXPAND) : wxEXPAND);
+#else
+        frame_priority = 1;
+#endif
+
+        // On windows with the vcpkg version of wxWidgets which is 3.1.2, the
+        // wxEXPAND flag throws an XRC error, but it is necessary on earlier versions of wxWidgets
+#if defined(__WXMSW__) && wxCHECK_VERSION(3, 1, 2)
+        GetSizer()->Add(w,    frame_priority, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER_HORIZONTAL) : wxEXPAND);
+#else
+        GetSizer()->Add(w,    frame_priority, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER_HORIZONTAL | wxEXPAND) : wxEXPAND);
+#endif
+
+#if wxCHECK_VERSION(2, 9, 0)
         GetSizer()->Add(0, 0, 1, wxEXPAND);
+#endif
+
         Layout();
 
         if (pointer_blanked)
@@ -1136,9 +1157,9 @@ static std::vector<game_key>* game_keys_pressed(int key, int mod, int joy)
         for (int key_num = 0; key_num < NUM_KEYS; key_num++) {
             wxJoyKeyBinding_v& b = gopts.joykey_bindings[player][key_num];
 
-            for (int bind_num = 0; bind_num < b.size(); bind_num++)
+            for (size_t bind_num = 0; bind_num < b.size(); bind_num++)
                 if (b[bind_num].key == key && b[bind_num].mod == mod && b[bind_num].joy == joy)
-                    vec->push_back({player, key_num, bind_num, b});
+                    vec->push_back({player, key_num, (int)bind_num, b});
         }
 
     return vec;
@@ -1166,7 +1187,7 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
     }
 
     // check if key is already pressed
-    int kpno;
+    size_t kpno;
 
     for (kpno = 0; kpno < keys_pressed.size(); kpno++)
         if (keys_pressed[kpno].key == key && keys_pressed[kpno].mod == mod && keys_pressed[kpno].joy == joy)
@@ -1199,11 +1220,11 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
         }
         else {
             // only release if no others pressed
-            int bind2;
+            size_t bind2;
             auto b = game_key.b;
 
             for (bind2 = 0; bind2 < game_key.b.size(); bind2++) {
-                if (game_key.bind_num == bind2 || (b[bind2].key == key && b[bind2].mod == mod && b[bind2].joy == joy))
+                if ((size_t)game_key.bind_num == bind2 || (b[bind2].key == key && b[bind2].mod == mod && b[bind2].joy == joy))
                     continue;
 
                 for (kpno = 0; kpno < keys_pressed.size(); kpno++)
@@ -1269,10 +1290,8 @@ void GameArea::EraseBackground(wxEraseEvent& ev)
 
 void GameArea::OnSize(wxSizeEvent& ev)
 {
-    if (!ev.GetEventUserData()) { // is frame
-        draw_black_background(this);
-        Layout();
-    }
+    draw_black_background(this);
+    Layout();
 
     // panel may resize
     if (panel)
@@ -1280,6 +1299,14 @@ void GameArea::OnSize(wxSizeEvent& ev)
 
     ev.Skip(true);
 }
+
+#if defined(__WXGTK__) && defined(HAVE_XSS)
+    #include <X11/Xlib.h>
+    #define Status int
+    #include <X11/extensions/scrnsaver.h>
+    #include <gdk/gdkx.h>
+    #include <gtk/gtk.h>
+#endif
 
 void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
 {
@@ -1302,6 +1329,16 @@ void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
         process_key_press(value & SDL_HAT_LEFT, key, WXJB_HAT_W, joy);
     } else
         process_key_press(ev.GetControlValue() != 0, key, mod, joy);
+
+    // tell Linux to turn off the screensaver/screen-blank if joystick button was pressed
+    // this shouldn't be necessary of course
+#if defined(__WXGTK__) && defined(HAVE_XSS)
+    if (!wxGetApp().UsingWayland()) {
+        Display* display = GDK_WINDOW_XDISPLAY(gtk_widget_get_window(wxGetApp().frame->GetHandle()));
+        XResetScreenSaver(display);
+        XFlush(display);
+    }
+#endif
 }
 
 BEGIN_EVENT_TABLE(GameArea, wxPanel)
@@ -1320,8 +1357,8 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
     , todraw(0)
     , pixbuf1(0)
     , pixbuf2(0)
-    , rpi(0)
     , nthreads(0)
+    , rpi(0)
 {
     memset(delta, 0xff, sizeof(delta));
 
@@ -1336,7 +1373,7 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
                 break;
 
             wxFileName fpn(gopts.filter_plugin);
-            fpn.MakeAbsolute(wxStandardPaths::Get().GetPluginsDir());
+            fpn.MakeAbsolute(wxGetApp().GetPluginsDir());
 
             if (!filt_plugin.Load(fpn.GetFullPath(), wxDL_VERBATIM | wxDL_NOW))
                 break;
@@ -1417,6 +1454,7 @@ void DrawingPanelBase::DrawingPanelInit()
 
 void DrawingPanelBase::PaintEv(wxPaintEvent& ev)
 {
+    (void)ev; // unused params
     wxPaintDC dc(GetWindow());
 
     if (!todraw) {
@@ -1434,6 +1472,7 @@ void DrawingPanelBase::PaintEv(wxPaintEvent& ev)
 
 void DrawingPanelBase::EraseBackground(wxEraseEvent& ev)
 {
+    (void)ev; // unused params
     // do nothing, do not allow propagation
 }
 
@@ -1783,7 +1822,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
         if (panel->osdstat.size())
             drawText(todraw + outstride * (systemColorDepth != 24), outstride,
-                10, 20, panel->osdstat.mb_str(), showSpeedTransparent);
+                10, 20, panel->osdstat.utf8_str(), showSpeedTransparent);
 
         if (!disableStatusMessages && !panel->osdtext.empty()) {
             if (systemGetClock() - panel->osdtime < OSD_TIME) {
@@ -1791,7 +1830,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                 int linelen = std::ceil(width * scale - 20) / 8;
                 int nlines = (message.size() + linelen - 1) / linelen;
                 int cury = height - 14 - nlines * 10;
-                char* buf = strdup(message.mb_str());
+                char* buf = strdup(message.utf8_str());
                 char* ptr = buf;
 
                 while (nlines > 1) {
@@ -1875,7 +1914,7 @@ void DrawingPanelBase::DrawOSD(wxWindowDC& dc)
             // find amt of text that will fit on a line is to search
             wxArrayInt llen; // length of each line, in chars
 
-            for (int off = 0; off < msg.size();) {
+            for (size_t off = 0; off < msg.size();) {
 // One way would be to bsearch on GetTextExtent() looking for
 // best fit.
 // Another would be to use GetPartialTextExtents and search
@@ -2202,6 +2241,7 @@ void GLDrawingPanel::AdjustViewport()
 
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 {
+    (void)dc; // unused params
 #ifndef wxGL_IMPLICIT_CONTEXT
     SetCurrent(*ctx);
 #else
@@ -2294,7 +2334,7 @@ void GameArea::StartVidRecording(const wxString& fname)
     if ((ret = vid_rec.Record(fnb.data(), basic_width, basic_height,
              systemColorDepth))
         != MRET_OK)
-        wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
+        wxLogError(_("Unable to begin recording to %s (%s)"), fname.c_str(),
             media_err(ret));
     else {
         MainFrame* mf = wxGetApp().frame;
@@ -2325,7 +2365,7 @@ void GameArea::StartSoundRecording(const wxString& fname)
     MediaRet ret;
 
     if ((ret = snd_rec.Record(fnb.data())) != MRET_OK)
-        wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
+        wxLogError(_("Unable to begin recording to %s (%s)"), fname.c_str(),
             media_err(ret));
     else {
         MainFrame* mf = wxGetApp().frame;

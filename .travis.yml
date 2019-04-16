@@ -1,6 +1,9 @@
 ---
 sudo: required
 
+services:
+    - xvfb
+
 matrix:
     fast_finish: true
     include:
@@ -15,38 +18,38 @@ matrix:
               - cd build
               - cmake ..
               - make -j2
-#              - ./visualboyadvance-m --help
+#              - xvfb-run ./visualboyadvance-m --help
           cache:
               directories:
                   - "$HOME/.ccache"
-#        - env: BUILD_ENV=mingw-w64
-#          language: cpp
-#          os: linux
-#          dist: trusty
-#          before_script:
-#              - ./installdeps MinGW-w64-x86_64
-#          script:
-#              - mkdir build
-#              - cd build
-#              - /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-cmake ..
-#              - make -j2
-#          cache:
-#              directories:
-#                  - "$HOME/.ccache"
-#        - env: BUILD_ENV=mingw-w32
-#          language: cpp
-#          os: linux
-#          dist: trusty
-#          before_script:
-#              - ./installdeps MinGW-w64-i686
-#          script:
-#              - mkdir build
-#              - cd build
-#              - /usr/lib/mxe/usr/bin/i686-w64-mingw32.static-cmake ..
-#              - make -j2
-#          cache:
-#              directories:
-#                  - "$HOME/.ccache"
+        - env: BUILD_ENV=mingw-w64
+          language: cpp
+          os: linux
+          dist: trusty
+          before_script:
+              - ./installdeps MinGW-w64-x86_64
+          script:
+              - mkdir build
+              - cd build
+              - /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-cmake ..
+              - make -j2
+          cache:
+              directories:
+                  - "$HOME/.ccache"
+        - env: BUILD_ENV=mingw-w32
+          language: cpp
+          os: linux
+          dist: trusty
+          before_script:
+              - ./installdeps MinGW-w64-i686
+          script:
+              - mkdir build
+              - cd build
+              - /usr/lib/mxe/usr/bin/i686-w64-mingw32.static-cmake ..
+              - make -j2
+          cache:
+              directories:
+                  - "$HOME/.ccache"
         - env: BUILD_ENV=libretro
           language: cpp
           os: linux

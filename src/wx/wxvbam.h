@@ -83,10 +83,16 @@ public:
     {
     }
     virtual bool OnInit();
+    virtual int OnRun();
+    virtual bool OnCmdLineHelp(wxCmdLineParser&);
+    virtual bool OnCmdLineError(wxCmdLineParser&);
     virtual bool UsingWayland() { return using_wayland; }
     virtual void OnInitCmdLine(wxCmdLineParser&);
     virtual bool OnCmdLineParsed(wxCmdLineParser&);
+    virtual wxString GetConfigDir();
+    virtual wxString GetDataDir();
     wxString GetConfigurationPath();
+    const wxString GetPluginsDir();
     wxString GetAbsolutePath(wxString path);
     // name of a file to load at earliest opportunity
     wxString pending_load;
@@ -139,10 +145,12 @@ public:
 
 protected:
     bool using_wayland;
+    bool console_mode = false;
+    int console_status = 0;
 
 private:
     wxPathList config_path;
-    char* home;
+    char* home = NULL;
 };
 
 DECLARE_APP(wxvbamApp);
@@ -355,6 +363,9 @@ private:
     void OnDropFile(wxDropFilesEvent&);
     // pop up menu in fullscreen mode
     void OnMenu(wxContextMenuEvent&);
+    // window geometry
+    void OnMove(wxMoveEvent& event);
+    void OnSize(wxSizeEvent& event);
     // Load a named wxDialog from the XRC file
     wxDialog* LoadXRCDialog(const char* name);
     // Load a named wxDialog from the XRC file
@@ -645,6 +656,11 @@ extern struct cmditem {
     wxMenuItem* mi; // the menu item to invoke command, if present
 } cmdtab[];
 extern const int ncmds;
+
+// Initializer for struct cmditem
+cmditem new_cmditem(const wxString cmd = "", const wxString name = "",
+                    int cmd_id = 0, int mask_flags = 0, wxMenuItem* mi = NULL);
+
 // for binary search
 extern bool cmditem_lt(const struct cmditem& cmd1, const struct cmditem& cmd2);
 

@@ -416,10 +416,10 @@ bool gbCheatReadGSCodeFile(const char* fileName)
     char code[9];
     int i;
     for (i = 0; i < count; i++) {
-        fread(&dummy, 1, 2, file);
-        fread(desc, 1, 12, file);
+        FREAD_UNCHECKED(&dummy, 1, 2, file);
+        FREAD_UNCHECKED(desc, 1, 12, file);
         desc[12] = 0;
-        fread(code, 1, 8, file);
+        FREAD_UNCHECKED(code, 1, 8, file);
         code[8] = 0;
         gbAddGsCheat(code, desc);
     }

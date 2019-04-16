@@ -38,6 +38,12 @@ extern "C" {
 #include <direct.h>
 #define GETCWD _getcwd
 #define snprintf sprintf
+#define stat _stat
+#define mkdir(X,Y) (_mkdir(X))
+// from: https://www.linuxquestions.org/questions/programming-9/porting-to-win32-429334/
+#ifndef S_ISDIR
+    #define S_ISDIR(mode)  (((mode) & _S_IFMT) == _S_IFDIR)
+#endif
 #endif // _WIN32
 
 #ifndef __GNUC__
@@ -103,8 +109,10 @@ enum named_opts
 	OPT_SYNCHRONIZE,
 	OPT_THREAD_PRIORITY,
 	OPT_VIDEO_OPTION,
+	OPT_WINDOW_HEIGHT,
 	OPT_WINDOW_POSITION_X,
 	OPT_WINDOW_POSITION_Y,
+	OPT_WINDOW_WIDTH,
 	OPT_SPEEDUP_THROTTLE,
 	OPT_SPEEDUP_FRAME_SKIP
 };
@@ -233,8 +241,10 @@ int useBiosFileGBC;
 int videoOption;
 int vsync;
 int wasPaused = 0;
+uint32_t windowHeight;
 int windowPositionX;
 int windowPositionY;
+uint32_t windowWidth;
 int winFlashSize;
 int winGbBorderOn;
 int winGbPrinterEnabled;
@@ -254,7 +264,7 @@ IFBFilterFunc ifbFunction = 0;
 
 // allow up to 100 IPS/UPS/PPF patches given on commandline
 int	patchNum = 0;
-char *(patchNames[PATCH_MAX_NUM]) = { NULL }; // and so on
+char *patchNames[PATCH_MAX_NUM] = { NULL }; // and so on
 
 void(*dbgMain)() = remoteStubMain;
 void(*dbgSignal)(int, int) = remoteStubSignal;
@@ -388,8 +398,10 @@ struct option argOptions[] = {
 	{ "video-option", required_argument, 0, OPT_VIDEO_OPTION },
 	{ "vsync", no_argument, &vsync, 1 },
 	{ "win-gb-printer-enabled", no_argument, &winGbPrinterEnabled, 1 },
+	{ "window-height", required_argument, 0, OPT_WINDOW_HEIGHT },
 	{ "window-position-x", required_argument, 0, OPT_WINDOW_POSITION_X },
 	{ "window-position-y", required_argument, 0, OPT_WINDOW_POSITION_Y },
+	{ "window-width", required_argument, 0, OPT_WINDOW_WIDTH },
 
 
 	{ NULL, no_argument, NULL, 0 }
@@ -541,8 +553,10 @@ void LoadConfig()
 	useBiosFileGBC = ReadPref("useBiosGBC", 0);
 	videoOption = ReadPref("video", 2); // VIDEO_3X = 2
 	vsync = ReadPref("vsync", false);
-	windowPositionX = ReadPref("windowX", 0);
-	windowPositionY = ReadPref("windowY", 0);
+	windowHeight = ReadPref("windowHeight", 0);
+	windowPositionX = ReadPref("windowX", -1);
+	windowPositionY = ReadPref("windowY", -1);
+	windowWidth = ReadPref("windowWidth", 0);
 	winFlashSize = ReadPref("flashSize", 0x10000);
 	winGbBorderOn = ReadPref("borderOn", 0);
 	winGbPrinterEnabled = ReadPref("gbPrinter", 0);
@@ -630,11 +644,9 @@ const char* FindConfigFile(const char *name)
 
 #ifdef _WIN32
 #define PATH_SEP ";"
-#define FILE_SEP '\\'
 #define EXE_NAME "vbam.exe"
 #else // ! _WIN32
 #define PATH_SEP ":"
-#define FILE_SEP '/'
 #define EXE_NAME "vbam"
 #endif // ! _WIN32
 
@@ -647,7 +659,7 @@ const char* FindConfigFile(const char *name)
 	}
 
 	if (homeDir) {
-		sprintf(path, "%s%c%s%c%s", homeDir, FILE_SEP, DOT_DIR, FILE_SEP, name);
+		sprintf(path, "%s%c%s", homeDir, FILE_SEP, name);
 		if (FileExists(path))
 		{
 			return path;
@@ -676,7 +688,7 @@ const char* FindConfigFile(const char *name)
 			while (tok) {
 				sprintf(path, "%s%c%s", tok, FILE_SEP, EXE_NAME);
 				if (FileExists(path)) {
-					char path2[2048];
+					static char path2[2048];
 					sprintf(path2, "%s%c%s", tok, FILE_SEP, name);
 					if (FileExists(path2)) {
 						return path2;
@@ -717,39 +729,28 @@ const char* FindConfigFile(const char *name)
 
 void LoadConfigFile()
 {
-#if !defined(_WIN32) && !defined(__APPLE__)
-	homeDir = getenv("HOME");
-#else
-	homeDir = 0;
-#endif
+	struct stat s;
+	std::string homeDirTmp = get_xdg_user_config_home() + DOT_DIR;
+	homeDir = (char *)homeDirTmp.c_str();
+	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
+		mkdir(homeDir, 0755);
 
 	if (preferences == NULL)
 	{
 		const char* configFile = FindConfigFile("vbam.ini");
 		OpenPreferences(configFile);
 	}
-
-	if (preferences == NULL)
-	{
-		const char* configFile = FindConfigFile("vbam.cfg");
-		OpenPreferences(configFile);
-	}
 }
 
 void SaveConfigFile()
 {
-#if !defined(_WIN32) && !defined(__APPLE__)
-	homeDir = getenv("HOME");
-#else
-	homeDir = 0;
-#endif
+	struct stat s;
+	std::string homeDirTmp = get_xdg_user_config_home() + DOT_DIR;
+	homeDir = (char *)homeDirTmp.c_str();
+	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
+		mkdir(homeDir, 0755);
 
 	const char* configFile = FindConfigFile("vbam.ini");
-
-	if (configFile == NULL)
-	{
-		configFile = FindConfigFile("vbam.cfg");
-	}
 
 	if (configFile != NULL)
 	{
@@ -1324,6 +1325,20 @@ int ReadOpts(int argc, char ** argv)
 			// --opt-flash-size
 			if (optarg) {
 				optFlashSize = atoi(optarg);
+			}
+			break;
+
+		case OPT_WINDOW_HEIGHT:
+			// --window-height
+			if (optarg) {
+				windowHeight = atoi(optarg);
+			}
+			break;
+
+		case OPT_WINDOW_WIDTH:
+			// --window-width
+			if (optarg) {
+				windowWidth = atoi(optarg);
 			}
 			break;
 

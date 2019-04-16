@@ -1,3 +1,25 @@
+if(COMMAND cmake_policy)
+    cmake_policy(SET CMP0003 NEW) # link to full path of libs
+    cmake_policy(SET CMP0005 NEW) # escapes in add_definitions
+
+    if(POLICY CMP0077)
+        cmake_policy(SET CMP0077 NEW) # use vars for options
+    endif()
+
+    if(NOT CMAKE_VERSION VERSION_LESS 3.0)
+        cmake_policy(SET CMP0043 NEW) # for wxWidgets, use generator expressions
+    endif()
+endif()
+
+option(ENABLE_VCPKG "Use dependencies for Visual Studio from vcpkg" ON)
+
+set(NLS_DEFAULT ON)
+
+# get win32 deps before project declaration, because toolchain is set for vcpkg
+set(VCPKG_DEPS zlib libpng SDL2 SFML gettext wxWidgets)
+
+include(${CMAKE_SOURCE_DIR}/cmake/Win32Deps.cmake)
+
 project(VBA-M C CXX)
 
 cmake_minimum_required(VERSION 2.8.12)
@@ -12,19 +34,13 @@ endif()
 
 set(ALL_TARGETS fex visualboyadvance-m vbamcore vbam)
 
-if(COMMAND cmake_policy)
-    cmake_policy(SET CMP0003 NEW) # link to full path of libs
-    cmake_policy(SET CMP0005 NEW) # escapes in add_definitions
-endif()
-
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 #Output all binaries at top level
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
 option(ENABLE_SDL "Build the SDL port" OFF)
 option(ENABLE_WX "Build the wxWidgets port" ON)
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
-option(ENABLE_NLS "Enable translations" ON)
 option(ENABLE_ASAN "Enable -fsanitize=<option>, address by default, requires debug build" OFF)
 
 option(VBAM_STATIC "Try to link all libraries statically" OFF)
@@ -37,7 +53,15 @@ if(VBAM_STATIC)
     set(OPENAL_STATIC ON)
 endif()
 
-set(ASM_DEFAULT OFF)
+set(ENABLE_BUNDLED_LIBS_DEFAULT OFF)
+
+# on visual studio use all bundled stuff
+if(MSVC)
+    set(ENABLE_BUNDLED_LIBS_DEFAULT ON)
+endif()
+
+# XXX: do some stuff with this
+#option(ENABLE_BUNDLED_LIBS "Use bundled libraries instead of system libraries" ${ENABLE_BUNDLED_LIBS_DEFAULT})
 
 # use ccache if available, and not already enabled on the command line
 # but not with ninja and msys ccache on msys2
@@ -51,31 +75,13 @@ if(NOT (WIN32 AND (NOT $ENV{MSYSTEM} STREQUAL "") AND CMAKE_GENERATOR STREQUAL N
     endif()
 endif()
 
-if(NOT CMAKE_SYSTEM_PROCESSOR)
-    if(NOT CMAKE_TOOLCHAIN_FILE AND CMAKE_HOST_SYSTEM_PROCESSOR)
-        set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_HOST_SYSTEM_PROCESSOR})
-    elseif(CMAKE_TOOLCHAIN_FILE MATCHES mxe)
-        if(CMAKE_TOOLCHAIN_FILE MATCHES "i[3-9]86")
-            set(CMAKE_SYSTEM_PROCESSOR i686)
-        else()
-            set(CMAKE_SYSTEM_PROCESSOR x86_64)
-        endif()
-    endif()
-endif()
-
-# turn asm on by default on 32bit x86
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "[xX]86|i[3-9]86|[aA][mM][dD]64")
-    if(CMAKE_C_SIZEOF_DATA_PTR EQUAL 4) # 32 bit
-        set(ASM_DEFAULT ON)
-        set(X86_32 ON)
-    else()
-        set(AMD64 ON)
-    endif()
-endif()
-
 set(SSP_DEFAULT OFF)
 
 option(ENABLE_SSP "Enable gcc stack protector support" ${SSP_DEFAULT})
+
+set(ASM_DEFAULT OFF)
+
+include(Architecture)
 
 option(ENABLE_ASM "Enable x86 ASM related options" ${ASM_DEFAULT})
 
@@ -110,8 +116,9 @@ option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
 
 set(LTO_DEFAULT ON)
 
-if(WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND AMD64)
-    # lto produces buggy binaries for 64 bit win32
+# lto produces buggy binaries for 64 bit win32
+# and we generally don't want it when debugging because it makes linking slow
+if((WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND AMD64) OR CMAKE_BUILD_TYPE MATCHES Debug)
     set(LTO_DEFAULT OFF)
 endif()
 
@@ -123,15 +130,22 @@ endif()
 
 option(ENABLE_GBA_LOGGING "Enable extended GBA logging" ON)
 if(ENABLE_GBA_LOGGING)
-   add_definitions(-DGBA_LOGGING )
+    add_definitions(-DGBA_LOGGING )
 endif()
 if(ENABLE_MMX)
-  add_definitions(-DMMX)
+    add_definitions(-DMMX)
 endif()
 
 # The SDL port can't be built without debugging support
 if(NOT ENABLE_DEBUGGER AND ENABLE_SDL)
-        message(SEND_ERROR "The SDL port can't be built without debugging support")
+    message(SEND_ERROR "The SDL port can't be built without debugging support")
+endif()
+
+# this has to run after the toolchain is initialized so it can't be in
+# Win32deps.cmake
+if(MINGW)
+    include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-include")
+    include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
 endif()
 
 find_package(Git)
@@ -155,7 +169,7 @@ endif()
 include_directories(${CMAKE_BINARY_DIR})
 configure_file("${CMAKE_SOURCE_DIR}/src/version.h.in" "${CMAKE_BINARY_DIR}/version.h" @ONLY)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(CMAKE_BUILD_TYPE MATCHES Debug)
     add_definitions(-DDEBUG)
 else()
     add_definitions(-DNDEBUG)
@@ -183,7 +197,11 @@ endif()
 
 # Look for some dependencies using CMake scripts
 find_package(ZLIB REQUIRED)
+
+set(OpenGL_GL_PREFERENCE GLVND)
+
 find_package(OpenGL REQUIRED)
+
 find_package(PNG REQUIRED)
 
 if(EXISTS /etc/redhat-release)
@@ -204,14 +222,21 @@ add_definitions(${SDL2_DEFINITIONS})
 if(ENABLE_LINK)
     # msys2 does not have static sfml libs atm
     # while on mxe we use static libs
-    if(WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe))
+    if(WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe) AND NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
         set(SFML_STATIC_LIBRARIES TRUE)
     endif()
-    find_package(SFML 2 COMPONENTS network system REQUIRED)
+
+    find_package(SFML 2 COMPONENTS network system)
+
+    if(NOT SFML_FOUND)
+        message(WARNING "SFML not found, LINK will be disabled")
+        set(ENABLE_LINK NO)
+    endif()
 endif()
 
 # set the standard libraries all ports use
-set(VBAMCORE_LIBS
+set(
+    VBAMCORE_LIBS
     vbamcore
     fex
     ${SDL2_LIBRARY}
@@ -244,9 +269,9 @@ if(NOT ENABLE_FFMPEG)
 endif()
 
 if(ENABLE_LIRC)
-        set(WITHLIRC 1)
+    set(WITHLIRC 1)
 else()
-        set(WITHLIRC 0)
+    set(WITHLIRC 0)
 endif()
 
 include(GNUInstallDirs)
@@ -297,6 +322,8 @@ if(NOT ENABLE_ASM_CORE)
     add_definitions(-DC_CORE)
 endif()
 
+option(ENABLE_NLS "Enable translations" ${NLS_DEFAULT})
+
 # Enable internationalization
 if(ENABLE_NLS)
     set(LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale)
@@ -332,37 +359,17 @@ if(ENABLE_NLS)
     endif()
 endif()
 
-# Win32 deps submodule
-if(WIN32)
-    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
-        set(git_checkout FALSE)
-        find_package(Git)
-        if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
-            set(git_checkout TRUE)
-            execute_process(COMMAND "${GIT_EXECUTABLE}" submodule update --init --remote --recursive RESULT_VARIABLE git_status WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-        endif()
-
-        if(NOT (git_checkout AND git_status EQUAL 0))
-            message(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --remote --recursive")
-        endif()
-    endif()
-
-    if(MINGW)
-        include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-include")
-        include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
-    elseif(MSVC)
-        set(DEPS_MSVC "${CMAKE_SOURCE_DIR}/dependencies/msvc")
-        include_directories("${DEPS_MSVC}") # for GL/glext.h and getopt.h
-    endif()
-endif()
-
 include(ProcessorCount)
 ProcessorCount(num_cpus)
 
-# Compiler flags
+# Compiler stuff
+
+if(CMAKE_C_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+    include(LLVMToolchain)
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-    set(LTO_FLAGS "")
+    unset(LTO_FLAGS)
     if(ENABLE_LTO)
         if(CMAKE_COMPILER_IS_GNUCXX)
             if(num_cpus GREATER 1)
@@ -372,6 +379,21 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
             endif()
         else()
             set(LTO_FLAGS -flto)
+        endif()
+
+        # check that LTO is not broken before enabling it
+        set(ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
+        set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${LTO_FLAGS}")
+
+        include(CheckCXXSourceCompiles)
+        check_cxx_source_compiles("int main(int argc, char** argv) { return 0; }" LTO_WORKS)
+
+        set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
+
+        if(NOT LTO_WORKS)
+            message(WARNING "LTO does not seem to be working on your system, if using clang make sure LLVMGold is installed")
+            unset(LTO_FLAGS)
+            set(ENABLE_LTO OFF)
         endif()
     endif()
 
@@ -441,20 +463,34 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
             endif()
         endif()
 
-
         set(MY_C_FLAGS ${MY_C_FLAGS} -fopenmp)
     endif()
 
-    check_cxx_compiler_flag(-fdiagnostics-color=auto COMPILER_COLOR_OUTPUT)
-    if(COMPILER_COLOR_OUTPUT)
-        add_compile_options(-fdiagnostics-color=auto)
+    if(CMAKE_CXX_COMPILER_ID STREQUAL GNU)
+        unset(COMPILER_COLOR_DIAGNOSTICS)
+        check_cxx_compiler_flag(-fdiagnostics-color=always COMPILER_COLOR_DIAGNOSTICS)
+        if(COMPILER_COLOR_DIAGNOSTICS)
+            add_compile_options(-fdiagnostics-color=always)
+        else()
+            unset(COMPILER_COLOR_DIAGNOSTICS)
+            check_cxx_compiler_flag(-fdiagnostics-color COMPILER_COLOR_DIAGNOSTICS)
+            if(COMPILER_COLOR_DIAGNOSTICS)
+                add_compile_options(-fdiagnostics-color)
+            endif()
+        endif()
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+        unset(COMPILER_COLOR_DIAGNOSTICS)
+        check_cxx_compiler_flag(-fcolor-diagnostics COMPILER_COLOR_DIAGNOSTICS)
+        if(COMPILER_COLOR_DIAGNOSTICS)
+            add_compile_options(-fcolor-diagnostics)
+        endif()
     endif()
 
     if(MINGW)
         set(MY_C_FLAGS ${MY_C_FLAGS} -static-libgcc -static-libstdc++)
     endif()
 
-    if(CMAKE_BUILD_TYPE STREQUAL Debug)
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
         set(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_DBG_FLAGS} -Wall -Wextra)
     else()
         set(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_OPT_FLAGS} -Wno-error)
@@ -537,7 +573,8 @@ endif()
 
 add_subdirectory (fex)
 
-set(SRC_MAIN
+set(
+    SRC_MAIN
     src/Util.cpp
     src/common/ConfigManager.cpp
     src/common/dictionary.c
@@ -551,7 +588,8 @@ if(MSVC)
 	set(SRC_MAIN ${SRC_MAIN} "dependencies/msvc/getopt.c")
 endif()
 
-set(HDR_MAIN
+set(
+    HDR_MAIN
     src/System.h
     src/Util.h
     src/common/array.h
@@ -577,7 +615,8 @@ if(ENABLE_NLS)
     set(HDR_MAIN ${HDR_MAIN} src/NLS.h)
 endif()
 
-set(SRC_GBA
+set(
+    SRC_GBA
     src/gba/agbprint.cpp
     src/gba/bios.cpp
     src/gba/BreakpointStructures.cpp
@@ -607,7 +646,8 @@ set(SRC_GBA
     src/gba/Sram.cpp
 )
 
-set(HDR_GBA
+set(
+    HDR_GBA
     src/gba/agbprint.h
     src/gba/bios.h
     src/gba/BreakpointStructures.h
@@ -630,7 +670,8 @@ set(HDR_GBA
     src/gba/Sram.h
 )
 
-set(SRC_GB
+set(
+    SRC_GB
     src/gb/GB.cpp
     src/gb/gbCheats.cpp
     src/gb/gbDis.cpp
@@ -642,7 +683,8 @@ set(SRC_GB
     src/gb/gbSound.cpp
 )
 
-set(HDR_GB
+set(
+    HDR_GB
     src/gb/gb.h
     src/gb/gbCheats.h
     src/gb/gbCodes.h
@@ -654,7 +696,8 @@ set(HDR_GB
     src/gb/gbSound.h
 )
 
-set(SRC_APU
+set(
+    SRC_APU
     src/apu/Blip_Buffer.cpp
     src/apu/Effects_Buffer.cpp
     src/apu/Gb_Apu.cpp
@@ -663,7 +706,8 @@ set(SRC_APU
     src/apu/Multi_Buffer.cpp
 )
 
-set(HDR_APU
+set(
+    HDR_APU
     src/apu/blargg_common.h #Unused(?) but in the VS projects
     src/apu/blargg_config.h #Unused(?) but in the VS projects
     src/apu/blargg_source.h
@@ -674,7 +718,8 @@ set(HDR_APU
     src/apu/Multi_Buffer.h
 )
 
-set(SRC_SDL
+set(
+    SRC_SDL
     src/sdl/SDL.cpp
     src/sdl/filters.cpp
     src/sdl/text.cpp
@@ -684,7 +729,8 @@ set(SRC_SDL
     src/sdl/expr-lex.cpp
 )
 
-set(HDR_SDL
+set(
+    HDR_SDL
     src/sdl/filters.h
     src/sdl/text.h
     src/sdl/inputSDL.h
@@ -692,7 +738,8 @@ set(HDR_SDL
     src/sdl/exprNode.h
 )
 
-set(SRC_FILTERS
+set(
+    SRC_FILTERS
     src/filters/2xSaI.cpp
     src/filters/admame.cpp
     src/filters/bilinear.cpp
@@ -705,7 +752,8 @@ set(SRC_FILTERS
     src/filters/xBRZ/xbrz.cpp
 )
 
-set(HDR_FILTERS
+set(
+    HDR_FILTERS
     src/filters/hq2x.h
     src/filters/interp.h
     src/filters/lq2x.h
@@ -713,18 +761,21 @@ set(HDR_FILTERS
     src/filters/xBRZ/xbrz.h
 )
 
-set(SRC_HQ_C
+set(
+    SRC_HQ_C
     src/filters/hq/c/hq_implementation.cpp
 )
 
-set(HDR_HQ_C
+set(
+    HDR_HQ_C
     src/filters/hq/c/hq3x_pattern.h
     src/filters/hq/c/hq4x_pattern.h
     src/filters/hq/c/hq_base.h
     src/filters/hq/c/hq_shared.h
 )
 
-set(SRC_HQ_ASM
+set(
+    SRC_HQ_ASM
     src/filters/hq/asm/hq3x_16.asm
     src/filters/hq/asm/hq3x_32.asm
     src/filters/hq/asm/hq4x_16.asm
@@ -744,12 +795,14 @@ else()
 endif()
 
 if(ENABLE_DEBUGGER)
-    set(SRC_DEBUGGER
+    set(
+        SRC_DEBUGGER
         src/gba/armdis.cpp
         src/gba/elf.cpp
         src/gba/remote.cpp
     )
-    set(HDR_DEBUGGER
+    set(
+        HDR_DEBUGGER
         src/gba/armdis.h
         src/gba/elf.h
         src/gba/remote.h
@@ -816,13 +869,17 @@ if(ENABLE_SDL)
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam${CMAKE_EXECUTABLE_SUFFIX} DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 
     if(WIN32)
-        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
-                DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}
-                RENAME vbam.cfg)
+        install(
+            FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
+            DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}
+            RENAME vbam.cfg
+        )
     else()
-        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
-                DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}
-                RENAME vbam.cfg)
+        install(
+            FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
+            DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}
+            RENAME vbam.cfg
+        )
     endif()
 endif()
 
@@ -864,4 +921,5 @@ set(CPACK_PACKAGE_VERSION_MAJOR "2")
 set(CPACK_PACKAGE_VERSION_MINOR "0")
 set(CPACK_PACKAGE_VERSION_PATCH "0-Git-" ${COMMITHASH})
 list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
+list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg")
 include(CPack)

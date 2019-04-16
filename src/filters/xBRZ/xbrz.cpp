@@ -1031,6 +1031,7 @@ struct ColorDistanceRGB
 {
     static double dist(uint32_t pix1, uint32_t pix2, double luminanceWeight)
     {
+        (void)luminanceWeight; // unused param
         return distYCbCrBuffer.dist(pix1, pix2);
 
         //if (pix1 == pix2) //about 4% perf boost
@@ -1043,6 +1044,7 @@ struct ColorDistanceARGB
 {
     static double dist(uint32_t pix1, uint32_t pix2, double luminanceWeight)
     {
+        (void)luminanceWeight; // unused param
         const double a1 = getAlpha(pix1) / 255.0 ;
         const double a2 = getAlpha(pix2) / 255.0 ;
         /*

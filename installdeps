@@ -155,6 +155,8 @@ linux_installdeps() {
         debian_installdeps
     elif [ -f /etc/fedora-release ]; then
         fedora_installdeps
+    elif [ -f /etc/redhat-release ] || [ -f /etc/centos-release ]; then
+        rhel_installdeps
     elif [ -f /etc/arch-release ]; then
         archlinux_installdeps
     elif [ -f /etc/solus-release ]; then
@@ -280,7 +282,7 @@ debian_installdeps() {
     installing
 
     if [ -z "$target" ]; then
-        sudo apt-get -qq update
+        sudo apt-get -qq -y update
 
         sfml_libs=$(apt-cache search libsfml | grep -E 'graphics|window|network' | sed 's/ - .*//')
 
@@ -302,13 +304,44 @@ debian_installdeps() {
                 ;;
         esac
 
-        mxe_apt_sources='/etc/apt/sources.list.d/mxeapt.list'
+        # if on the travis ubuntu trusty, add xenial sources for newer gnutls
+        # otherwise the mxe pkg server does not work
+        if [ -n "$TRAVIS" ]; then
+            if grep -q trusty /etc/apt/sources.list 2>/dev/null; then
+                sudo sh -c "sed 's/trusty/xenial/g' /etc/apt/sources.list > /etc/apt/sources.list.d/xenial.list"
+            fi
+        fi
 
-        sudo apt-get -qq update
+        sudo apt-get -qq -y update
+
+        curl_gnutls_lib=$(apt-cache search libcurl | grep -E '^libcurl[0-9]+-gnutls - ' | sed 's/ - .*//' | sort | tail -1)
+
+        sudo apt-get -qy install apt apt-transport-https ca-certificates $curl_gnutls_lib curl
+
+        # this is necessary to upgrade libcurl from trusty to xenial on travis
+        sudo apt-get -qy -f install
+
+        debian_rel=trusty
+
+        apt_ssl_exceptions=/etc/apt/apt.conf.d/80ssl-exceptions
+
+        if ! grep -Eq '(pkg|mirror)\.mxe\.cc' $apt_ssl_exceptions 2>/dev/null; then
+            sudo sh -c "cat >> $apt_ssl_exceptions" <<EOF
+Acquire::https::pkg.mxe.cc::Verify-Peer "false";
+Acquire::https::pkg.mxe.cc::Verify-Host "false";
+Acquire::https::mirror.mxe.cc::Verify-Peer "false";
+Acquire::https::mirror.mxe.cc::Verify-Host "false";
+EOF
+        fi
+
+        mxe_apt_sources=/etc/apt/sources.list.d/mxeapt.list
+
+        sudo apt-get -qq -y update
+
         if [ -z "$(apt-cache search '^mxe-source$')" ]; then
             if [ ! -f "$mxe_apt_sources" ]; then
-                echo "deb http://pkg.mxe.cc/repos/apt/debian wheezy main" | sudo -- sh -c "cat > $mxe_apt_sources"
-                check sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D43A795B73B16ABE9643FE1AFD8FFF16DB45C6AB
+                echo "deb https://pkg.mxe.cc/repos/apt $debian_rel main" | sudo -- sh -c "cat > $mxe_apt_sources"
+                sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C6BF758A33A3A276 || :
             else
                 error "$mxe_apt_sources exists but mxe packages are not found in apt, either delete it or fix it"
             fi
@@ -318,9 +351,9 @@ debian_installdeps() {
         for dep in gcc zlib ffmpeg gettext sdl2 sfml openal wxwidgets; do
             set -- "$@" "mxe-${target}-$dep"
         done
-        check sudo apt-get -qq update
+        check sudo apt-get --allow-unauthenticated -qq -y update
         # native wx-common needed for wxrc executable
-        check sudo apt-get -qy install build-essential cmake ccache wx-common "$@"
+        check sudo apt-get --allow-unauthenticated -qy install build-essential cmake ccache wx-common "$@"
     fi
 
     build_instructions
@@ -376,7 +409,7 @@ fedora_installdeps() {
     fi
 
     # non-multiarch packages first
-    check sudo dnf -y --nogpgcheck --best --allowerasing install gcc gcc-c++ make cmake ccache git nasm redhat-rpm-config pkgconfig ccache
+    check sudo dnf -y --nogpgcheck --best --allowerasing install gcc gcc-c++ make cmake ccache git nasm redhat-rpm-config pkgconfig ccache ninja-build
 
     # try to install multiarch libgcc, glibc-devel and pkgconfig if available
     if [ -n "$amd64" ]; then
@@ -396,7 +429,7 @@ fedora_installdeps() {
             # this is sometimes necessary for rawhide
             set -- --exclude='glibc32*'
         fi
-        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libpng-devel SDL2-devel SFML-devel openal-soft-devel wxGTK3-devel gtk2-devel gtk3-devel; do
+        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libpng-devel SDL2-devel SFML-devel openal-soft-devel wxGTK3-devel gtk3-devel; do
             case $pkg in
                 *ffmpeg*)
                     [ -n "$no_ffmpeg" ] && continue
@@ -493,6 +526,190 @@ fedora_installdeps() {
     fi
 
     [ -z "$rpms_installed" ] && check sudo dnf -y --nogpgcheck --best --allowerasing install "$@"
+
+    if ! rpm -q $ffmpeg >/dev/null 2>&1; then
+        warning 'ffmpeg failed to install (probably due to conflicts)'
+        cmake_flags="$cmake_flags -DENABLE_FFMPEG=NO"
+    fi
+
+    [ -n "$warning" ] && warning "$warning"
+
+    build_instructions
+}
+
+rhel_installdeps() {
+    rhel=1
+    ffmpeg=ffmpeg-devel
+    no_ffmpeg=
+    rpms_installed=
+
+    check_cross
+    installing
+
+    warning=
+
+    rhel_release=$(rpm -E %rhel)
+    tries=3
+    curdir=$(pwd)
+
+    # this source is necessary for mingw packages on rhel, and may be for other things in the future
+    check sudo yum -y install epel-release
+
+    # make sure rpmfusion is installed for ffmpeg
+    while [ $tries -gt 0 ]; do
+        mkdir -p "${tmp}/fusion"
+        cd "${tmp}/fusion"
+        if ! curl -fLO https://download1.rpmfusion.org/free/el/rpmfusion-free-release-${rhel_release}.noarch.rpm; then
+            rhel_release=$((rhel_release - 1))
+            tries=$((tries - 1))
+            continue
+        fi
+        if ! curl -fLO https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-${rhel_release}.noarch.rpm; then
+            tries=0
+            break
+        fi
+        # check if already installed
+        if rpm -q rpmfusion-free-release-${rhel_release} >/dev/null 2>&1 && rpm -q rpmfusion-nonfree-release-${rhel_release} >/dev/null 2>&1; then
+            info_msg 'rpmfusion already installed, good'
+            break
+        fi
+        # otherwise try to install
+        if ! sudo rpm --nodeps -Uvh ./rpmfusion-*.rpm; then
+            tries=0
+            break
+        fi
+        break
+    done
+    cd "$curdir"
+    if [ $tries -eq 0 ]; then
+        warning 'installing rpmfusion repos failed, continuing without ffmpeg'
+        no_ffmpeg=1
+        cmake_flags="$cmake_flags -DENABLE_FFMPEG=NO"
+    fi
+
+    # non-multiarch packages first
+    CMAKE=cmake3
+    check sudo yum -y install gcc gcc-c++ make cmake3 ccache git nasm redhat-rpm-config pkgconfig ccache ninja-build
+
+    # try to install multiarch libgcc, glibc-devel and pkgconfig if available
+    if [ -n "$amd64" ]; then
+        for pkg in pkgconfig libgcc glibc-devel; do
+            if [ "$target" = m32 ]; then
+                sudo yum -y install "$pkg".i686
+            else
+                sudo yum -y install "$pkg".x86_64
+            fi
+        done
+    fi
+
+    set --
+    if [ -z "$target" -o "$target" = m32 ]; then
+        # try to install both 64 bit and 32 bit versions on 64 bit hosts (see below)
+        if [ -n "$amd64" ]; then
+            # this is sometimes necessary for rawhide
+            set -- --exclude='glibc32*'
+        fi
+
+        warning='RHEL does not currently have SFML packages, LINK support will be disabled'
+        cmake_flags="$cmake_flags -DENABLE_LINK=NO"
+
+        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libpng-devel SDL2-devel openal-soft-devel wxGTK3-devel gtk3-devel; do
+            case $pkg in
+                *ffmpeg*)
+                    [ -n "$no_ffmpeg" ] && continue
+                    ;;
+            esac
+
+            if [ -n "$amd64" ]; then
+                if [ "$target" = m32 ]; then
+                    set -- "$@" "${pkg}.i686"
+                else
+                    set -- "$@" "${pkg}.x86_64"
+                fi
+            else
+                set -- "$@" "$pkg"
+            fi
+        done
+
+        # redhat has a bug where all necessary -devel packages are not pulled in for 32 bit direct -devel deps
+        # this hack adds them to the list
+        if [ -n "$amd64" -a "$target" = m32 ]; then
+            info_msg 'Calculating dependencies, this will take a while..'
+            curdeps=
+            newdeps=$@
+            while [ "$curdeps" != "$newdeps" ]; do
+                curdeps=$newdeps
+                set -- $(echo "$@" $(repoquery --deplist "$@" 2>/dev/null | sed -n 's/\.x86_64$/.i686/; s/^ *provider: *\([^ ]*-devel-.*\)$/\1/p' | sort -u) | sed 's/  */\n/g' | sort -u)
+                newdeps=$@
+                printf '%s' .
+            done
+
+            echo
+            info_msg 'Done'
+
+            ## install the RPMs with rpm --force get around file conflicts
+
+            host_rpms=$(echo "$@" | sed 's/\.i686//g')
+
+            # first update the host arch versions to reduce chances of conflicts
+            check sudo yum -y install $host_rpms
+
+            oldcwd=$PWD
+            mkdir "$tmp/rpms"
+            cd "$tmp/rpms"
+
+            check sudo yum -y download "$@"
+
+            # first try installing with yum to pull in deps
+            check sudo yum -y --skip-broken install *.rpm
+
+            # follow up with rpm --force to ignore conflicts
+            check sudo rpm -Uvh --force *.rpm
+
+            rm -f *.rpm
+
+            # reinstall the host rpms to make sure any overwritten files are the host version
+            check sudo yum -y download $host_rpms
+
+            check sudo yum -y --skip-broken install *.rpm
+
+            check sudo rpm -Uvh --force *.rpm
+
+            cd "$oldcwd"
+            rm -rf "$tmp/rpms"
+
+            ffmpeg=ffmpeg-devel.i686
+
+            rpms_installed=1
+        fi
+    else # mingw build
+        set -- "$@" pkgconfig
+        case "$target" in
+            mingw-w64-i686)
+                target=mingw32
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-i686.cmake -DENABLE_LINK=NO"
+                ;;
+            mingw-w64-x86_64)
+                target=mingw64
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-x86_64.cmake -DENABLE_LINK=NO"
+                ;;
+            *)
+                error 'unknown cross target (this should not happen)'
+                ;;
+        esac
+        # install static deps
+        for pkg in zlib gettext libpng SDL2 wxWidgets; do
+            set -- "$@" "${target}-${pkg}-static"
+        done
+        # install deps that are not available as static
+        for pkg in openal-soft; do
+            set -- "$@" "${target}-${pkg}"
+        done
+
+        warning='SFML is required for LINK support, RHEL/EPEL does not currently have a MinGW SFML package, if you want LINK support you will need to install it manually'
+    fi
+
+    [ -z "$rpms_installed" ] && check sudo yum -y install "$@"
 
     if ! rpm -q $ffmpeg >/dev/null 2>&1; then
         warning 'ffmpeg failed to install (probably due to conflicts)'

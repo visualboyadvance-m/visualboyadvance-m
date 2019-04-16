@@ -8,6 +8,13 @@ BEGIN_EVENT_TABLE(wxJoyKeyTextCtrl, wxKeyTextCtrl)
 EVT_SDLJOY(wxJoyKeyTextCtrl::OnJoy)
 END_EVENT_TABLE()
 
+// Initializer for struct wxJoyKeyBinding
+wxJoyKeyBinding newWxJoyKeyBinding(int key, int mod, int joy)
+{
+    struct wxJoyKeyBinding tmp = {key, mod, joy};
+    return tmp;
+}
+
 int wxJoyKeyTextCtrl::DigitalButton(wxSDLJoyEvent& event)
 {
     int sdlval = event.GetControlValue();
@@ -151,7 +158,7 @@ wxString wxJoyKeyTextCtrl::ToString(wxJoyKeyBinding_v keys, wxChar sep)
 {
     wxString ret;
 
-    for (int i = 0; i < keys.size(); i++) {
+    for (size_t i = 0; i < keys.size(); i++) {
         if (i > 0)
             ret += sep;
 
@@ -213,7 +220,7 @@ static bool ParseJoy(const wxString& s, int len, int& mod, int& key, int& joy)
         return false;
 
     const wxString p = s.Mid(l);
-    int alen = len - l;
+    size_t alen = len - l;
     joyre.GetMatch(&b, &l, 1);
     joy = simple_atoi(s.Mid(b), l);
 #define is_ctrl(re) re.Matches(p) && re.GetMatch(&b, &l) && l == alen && !b
@@ -268,12 +275,12 @@ wxJoyKeyBinding_v wxJoyKeyTextCtrl::FromString(const wxString& s, wxChar sep)
 {
     wxJoyKeyBinding_v ret, empty;
     int mod, key, joy;
-    int len = s.size();
+    size_t len = s.size();
 
     if (!len)
         return empty;
 
-    for (int lastkey = len - 1; (lastkey = s.rfind(sep, lastkey)) != wxString::npos; lastkey--) {
+    for (size_t lastkey = len - 1; (lastkey = s.rfind(sep, lastkey)) != wxString::npos; lastkey--) {
         if (lastkey == len - 1) {
             // sep as accel
             if (!lastkey)

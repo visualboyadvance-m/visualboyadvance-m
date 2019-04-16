@@ -132,8 +132,10 @@ extern int useBiosFileGBC;
 extern int videoOption;
 extern int vsync;
 extern int wasPaused;
+extern uint32_t windowHeight;
 extern int windowPositionX;
 extern int windowPositionY;
+extern uint32_t windowWidth;
 extern int winFlashSize;
 extern int winGbBorderOn;
 extern int winGbPrinterEnabled;
@@ -164,7 +166,7 @@ extern const char *saveDir;
 extern const char *batteryDir;
 
 // Directory within homedir to use for default save location.
-#define DOT_DIR ".vbam"
+#define DOT_DIR "visualboyadvance-m"
 
 void SetHome(char *_arg0);
 void SaveConfigFile();

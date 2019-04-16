@@ -2055,15 +2055,15 @@ bool cheatsImportGSACodeFile(const char* name, int game, bool v3)
             found = true;
             break;
         }
-        fread(&len, 1, 4, f);
+        FREAD_UNCHECKED(&len, 1, 4, f);
         fseek(f, len, SEEK_CUR);
         int codes = 0;
-        fread(&codes, 1, 4, f);
+        FREAD_UNCHECKED(&codes, 1, 4, f);
         while (codes > 0) {
-            fread(&len, 1, 4, f);
+            FREAD_UNCHECKED(&len, 1, 4, f);
             fseek(f, len, SEEK_CUR);
             fseek(f, 8, SEEK_CUR);
-            fread(&len, 1, 4, f);
+            FREAD_UNCHECKED(&len, 1, 4, f);
             fseek(f, len * 12, SEEK_CUR);
             codes--;
         }
@@ -2073,26 +2073,26 @@ bool cheatsImportGSACodeFile(const char* name, int game, bool v3)
     if (found) {
         char desc[256];
         char code[17];
-        fread(&len, 1, 4, f);
+        FREAD_UNCHECKED(&len, 1, 4, f);
         fseek(f, len, SEEK_CUR);
         int codes = 0;
-        fread(&codes, 1, 4, f);
+        FREAD_UNCHECKED(&codes, 1, 4, f);
         while (codes > 0) {
-            fread(&len, 1, 4, f);
+            FREAD_UNCHECKED(&len, 1, 4, f);
 	    if (len > 255)
 		    goto evil_gsa_code_file;	//XXX: this functione needs a rewrite in general, so for the short this is better than nothing
-            fread(desc, 1, len, f);
+            FREAD_UNCHECKED(desc, 1, len, f);
             desc[len] = 0;
             desc[31] = 0;
-            fread(&len, 1, 4, f);
+            FREAD_UNCHECKED(&len, 1, 4, f);
             fseek(f, len, SEEK_CUR);
             fseek(f, 4, SEEK_CUR);
-            fread(&len, 1, 4, f);
+            FREAD_UNCHECKED(&len, 1, 4, f);
             while (len) {
                 fseek(f, 4, SEEK_CUR);
-                fread(code, 1, 8, f);
+                FREAD_UNCHECKED(code, 1, 8, f);
                 fseek(f, 4, SEEK_CUR);
-                fread(&code[8], 1, 8, f);
+                FREAD_UNCHECKED(&code[8], 1, 8, f);
                 code[16] = 0;
                 cheatsAddGSACode(code, desc, v3);
                 len -= 2;
@@ -2734,16 +2734,16 @@ bool cheatsLoadCheatList(const char* file)
         }
     } else if (type == 0) {
         for (int i = 0; i < count; i++) {
-            fread(&cheatsList[i].code, 1, sizeof(int), f);
-            fread(&cheatsList[i].size, 1, sizeof(int), f);
-            fread(&cheatsList[i].status, 1, sizeof(int), f);
-            fread(&cheatsList[i].enabled, 1, sizeof(int), f);
+            FREAD_UNCHECKED(&cheatsList[i].code, 1, sizeof(int), f);
+            FREAD_UNCHECKED(&cheatsList[i].size, 1, sizeof(int), f);
+            FREAD_UNCHECKED(&cheatsList[i].status, 1, sizeof(int), f);
+            FREAD_UNCHECKED(&cheatsList[i].enabled, 1, sizeof(int), f);
             cheatsList[i].enabled = cheatsList[i].enabled ? true : false;
-            fread(&cheatsList[i].address, 1, sizeof(uint32_t), f);
+            FREAD_UNCHECKED(&cheatsList[i].address, 1, sizeof(uint32_t), f);
             cheatsList[i].rawaddress = cheatsList[i].address;
-            fread(&cheatsList[i].value, 1, sizeof(uint32_t), f);
-            fread(&cheatsList[i].oldValue, 1, sizeof(uint32_t), f);
-            fread(&cheatsList[i].codestring, 1, 20 * sizeof(char), f);
+            FREAD_UNCHECKED(&cheatsList[i].value, 1, sizeof(uint32_t), f);
+            FREAD_UNCHECKED(&cheatsList[i].oldValue, 1, sizeof(uint32_t), f);
+            FREAD_UNCHECKED(&cheatsList[i].codestring, 1, 20 * sizeof(char), f);
             if (fread(&cheatsList[i].desc, 1, 32 * sizeof(char), f) != 32 * sizeof(char)) {
                 fclose(f);
                 return false;

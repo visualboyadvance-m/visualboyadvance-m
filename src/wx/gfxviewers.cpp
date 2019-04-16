@@ -229,7 +229,7 @@ public:
             s.Printf(wxT("0x%08X"), address);
             addr->SetLabel(s);
 
-            if (!mode || (mode < 3 || mode > 5) && bg < 2) {
+            if ((!mode || (mode < 3 || mode > 5)) && bg < 2) {
                 uint16_t value = *((uint16_t*)&vram[address - 0x6000000]);
                 s.Printf(wxT("%d"), value & 1023);
                 tile->SetLabel(s);
@@ -738,6 +738,10 @@ void MainFrame::MapViewer()
     case IMAGE_GB:
         LoadXRCViewer(GBMap);
         break;
+
+    case IMAGE_UNKNOWN:
+	// do nothing
+	break;
     }
 }
 
@@ -1113,6 +1117,10 @@ void MainFrame::OAMViewer()
     case IMAGE_GB:
         LoadXRCViewer(GBOAM);
         break;
+
+    case IMAGE_UNKNOWN:
+	// do nothing
+	break;
     }
 }
 
@@ -1233,11 +1241,13 @@ public:
     }
     void SelBG(wxMouseEvent& ev)
     {
+	(void)ev; // unused params
         spv->SetSel(-1, -1, false);
         ShowSel();
     }
     void SelSprite(wxMouseEvent& ev)
     {
+	(void)ev; // unused params
         bpv->SetSel(-1, -1, false);
         ShowSel();
     }
@@ -1273,14 +1283,17 @@ public:
     }
     void SaveBG(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         savepal(this, colbmp, 16 * 16, wxT("bg"));
     }
     void SaveOBJ(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         savepal(this, colbmp + 16 * 16 * 3, 16 * 16, wxT("obj"));
     }
     void ChangeBackdrop(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         // FIXME: this should really be a preference
         // should also have some way of indicating selection
         // perhaps replace w/ checkbox + colorpickerctrl
@@ -1294,7 +1307,7 @@ public:
             *cd = dlg.GetColourData();
             wxColour c = cd->GetColour();
             //Binary or the upper 5 bits of each color choice
-            customBackdropColor = (c.Red() >> 3) || ((c.Green() >> 3) << 5) || ((c.Blue() >> 3) << 10);
+            customBackdropColor = ((c.Red() >> 3) != 0) || (((c.Green() >> 3) << 5) != 0) || (((c.Blue() >> 3) << 10) != 0);
         } else
             // kind of an unintuitive way to turn it off...
             customBackdropColor = -1;
@@ -1347,11 +1360,13 @@ public:
     }
     void SelBG(wxMouseEvent& ev)
     {
+	(void)ev; // unused params
         spv->SetSel(-1, -1, false);
         ShowSel();
     }
     void SelSprite(wxMouseEvent& ev)
     {
+	(void)ev; // unused params
         bpv->SetSel(-1, -1, false);
         ShowSel();
     }
@@ -1386,10 +1401,12 @@ public:
     }
     void SaveBG(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         savepal(this, colbmp, 4 * 8, wxT("bg"));
     }
     void SaveOBJ(wxCommandEvent& ev)
     {
+	(void)ev; // unused params
         savepal(this, colbmp + 4 * 8 * 3, 4 * 8, wxT("obj"));
     }
 
@@ -1419,6 +1436,10 @@ void MainFrame::PaletteViewer()
     case IMAGE_GB:
         LoadXRCViewer(GBPalette);
         break;
+
+    case IMAGE_UNKNOWN:
+	// do nothing
+	break;
     }
 }
 
@@ -1687,5 +1708,9 @@ void MainFrame::TileViewer()
     case IMAGE_GB:
         LoadXRCViewer(GBTile);
         break;
+
+    case IMAGE_UNKNOWN:
+	// do nothing
+	break;
     }
 }

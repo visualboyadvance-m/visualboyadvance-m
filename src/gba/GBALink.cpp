@@ -609,6 +609,7 @@ void EnableSpeedHacks(bool enable)
 
 void BootLink(int m_type, const char* hostAddr, int timeout, bool m_hacks, int m_numplayers)
 {
+    (void)m_numplayers; // unused param
     if (linkDriver) {
         // Connection has already been established
         return;
@@ -888,7 +889,7 @@ bool CableServer::RecvGB(void)
     if (counter == 1)
         return false;
 
-    int numbytes;
+    int numbytes = 0;
     if (lanlink.type == 0) { // TCP
         fdset.clear();
 
@@ -1230,6 +1231,7 @@ void StartCableSocket(uint16_t value)
 
 static void UpdateCableSocket(int ticks)
 {
+    (void)ticks; // unused param
     if (linkid && transfer_direction == SENDING && lc.transferring && linktime >= transfer_start_time_from_master) {
         cable_data[linkid] = READ16LE(&ioMem[COMM_SIODATA8]);
 
@@ -2199,7 +2201,8 @@ static void StartRFUSocket(uint16_t value)
                         case 0x24: // send [non-important] data (used by server often)
                             rfu_data.rfu_linktime[linkid] = linktime; //save the ticks before reseted to zero
 
-                            if (rfu_cansend && rfu_qsend2 >= 0) {
+			    // rfu_qsend2 >= 0 due to being `uint8_t`
+                            if (rfu_cansend) {
                                 if (rfu_ishost) {
                                     for (int j = 0; j < rfu_data.numgbas; j++)
                                         if (j != linkid) {
@@ -2560,7 +2563,7 @@ uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
     rfu_enabled = false;
 
     if (gbSerialOn) {
-        if (gba_link_enabled)
+        if (gba_link_enabled) {
             //Single Computer
             if (GetLinkMode() == LINK_GAMEBOY_IPC) {
 #if (defined __WIN32__ || defined _WIN32)
@@ -2595,7 +2598,7 @@ uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
                     }
                 }
             }
-
+	}
         if (dat == 0xff /*||dat==0x00||b==0x00*/) //dat==0xff||dat==0x00
             LinkFirstTime = true;
     }

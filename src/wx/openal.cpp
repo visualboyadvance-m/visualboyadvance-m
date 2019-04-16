@@ -27,7 +27,8 @@
 #ifdef winlog
 #undef winlog
 #endif
-#define winlog //
+// https://stackoverflow.com/a/1306690/262458
+#define winlog(x,...) do {} while(0)
 #define debugState() //
 #endif
 
@@ -133,6 +134,7 @@ void OpenAL::debugState()
         break;
     }
 
+
     alGetSourcei(source, AL_BUFFERS_QUEUED, &value);
     ASSERT_SUCCESS;
     winlog("  Buffers in queue: %i\n", value);
@@ -148,7 +150,7 @@ bool OpenAL::init(long sampleRate)
     assert(initialized == false);
 
     if (!gopts.audio_dev.empty()) {
-        device = alcOpenDevice(gopts.audio_dev.mb_str());
+        device = alcOpenDevice(gopts.audio_dev.utf8_str());
     } else {
         device = alcOpenDevice(NULL);
     }
@@ -252,6 +254,7 @@ void OpenAL::reset()
 
 void OpenAL::write(uint16_t* finalWave, int length)
 {
+    (void)length; // unused param
     if (!initialized)
         return;
 

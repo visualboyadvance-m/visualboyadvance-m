@@ -101,6 +101,14 @@ extern struct opt_desc {
     uint32_t curuint;
 #define curbool curint
 } opts[];
+
+// Initializer for struct opt_desc
+opt_desc new_opt_desc(wxString opt = "", const char* cmd = NULL, wxString desc = "",
+                      wxString* stropt = NULL, int* intopt = NULL, wxString enumvals = "",
+                      double min = 0, double max = 0, bool* boolopt = NULL,
+                      double* doubleopt = NULL, uint32_t* uintopt = NULL, wxString curstr = "",
+                      int curint = 0, double curdouble = 0, uint32_t curuint = 0);
+
 extern const int num_opts;
 
 extern const wxAcceleratorEntry default_accels[];

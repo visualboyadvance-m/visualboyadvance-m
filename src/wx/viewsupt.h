@@ -58,7 +58,7 @@ protected:
 // on errors, abort program
 #define baddialog()                                                      \
     do {                                                                 \
-        wxLogError(_("Unable to load dialog %s from resources"), dname); \
+        wxLogError(_("Unable to load dialog %s from resources"), dname.c_str()); \
         wxGetApp().frame->Close(true);                                   \
         return;                                                          \
     } while (0)
@@ -141,6 +141,7 @@ protected:
     // assigned to textctrl to avoid mouse input
     void MouseEvent(wxMouseEvent& ev)
     {
+	(void)ev; // unused param
     }
     // the subwidgets
     wxTextCtrl tc;
@@ -412,6 +413,7 @@ public:
     }
     void MouseEvent(wxMouseEvent& ev)
     {
+	(void)ev; // unused param
     }
     DECLARE_EVENT_TABLE()
     DECLARE_DYNAMIC_CLASS(DispCheckBox)

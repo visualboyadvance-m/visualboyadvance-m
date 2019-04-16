@@ -14,13 +14,19 @@ struct wxSDLJoyState {
         if (dev)
             SDL_JoystickClose(dev);
     }
+    wxSDLJoyState()
+    {
+	dev = NULL;
+	nax = nhat = nbut = 0;
+	curval = NULL;
+    }
 };
 
 wxSDLJoy::wxSDLJoy(bool analog)
     : wxTimer()
     , digital(!analog)
-    , evthandler(0)
     , joystate(0)
+    , evthandler(0)
     , nosticks(true)
 {
     // Start up joystick if not already started
@@ -36,8 +42,7 @@ wxSDLJoy::wxSDLJoy(bool analog)
     if (!njoy)
         return;
 
-    joystate = new wxSDLJoyState_t[njoy];
-    memset(joystate, 0, njoy * sizeof(*joystate));
+    joystate = new wxSDLJoyState[njoy];
 
     for (int i = 0; i < njoy; i++) {
         SDL_Joystick* dev = joystate[i].dev = SDL_JoystickOpen(i);
@@ -45,7 +50,17 @@ wxSDLJoy::wxSDLJoy(bool analog)
         nctrl += joystate[i].nax = SDL_JoystickNumAxes(dev);
         nctrl += joystate[i].nhat = SDL_JoystickNumHats(dev);
         nctrl += joystate[i].nbut = SDL_JoystickNumButtons(dev);
-        joystate[i].curval = new short[nctrl];
+        joystate[i].curval = new short[nctrl]{0};
+
+        // initialize axis previous value to initial state
+#if SDL_VERSION_ATLEAST(2, 0, 6)
+        for (int j = 0; j < joystate[i].nax; j++) {
+            int16_t initial_state = 0;
+            SDL_JoystickGetAxisInitialState(dev, j, &initial_state);
+            joystate[i].curval[j] = initial_state;
+        }
+#endif
+
         memset(joystate[i].curval, 0, sizeof(short) * nctrl);
     }
 }
@@ -133,13 +148,6 @@ void wxSDLJoy::Notify()
 
             for (int j = 0; j < nax; j++) {
                 val = SDL_JoystickGetAxis(dev, j);
-
-                // trigger axes always return max negative value, we ignore these
-#if SDL_VERSION_ATLEAST(2, 0, 6)
-                int16_t initial_state;
-                if (SDL_JoystickGetAxisInitialState(dev, j, &initial_state) && val == initial_state)
-                    continue;
-#endif
 
                 if (digital) {
                     if (val > 0x3fff)
