@@ -28,9 +28,16 @@ endif
 endif
 
 TARGET_NAME = vbam
-GIT_VERSION := " $(shell git rev-parse --short HEAD || echo unknown)"
-ifneq ($(GIT_VERSION)," unknown")
-	CXXFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
+
+VBAM_VERSION := $(shell sed -En 's/.*\[([0-9]+[^]]+).*/\1/p; T; q' ../../CHANGELOG.md 2>/dev/null)
+
+CXXFLAGS += -DVBAM_VERSION=\"$(VBAM_VERSION)\"
+
+TAG_COMMIT     := $(shell git rev-list -n 1 v$(VBAM_VERSION) --abbrev-commit 2>/dev/null)
+CURRENT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null)
+
+ifneq ($(CURRENT_COMMIT),$(TAG_COMMIT))
+	CXXFLAGS += -DGIT_COMMIT=\"$(CURRENT_COMMIT)\"
 endif
 
 ifeq ($(platform), unix)
