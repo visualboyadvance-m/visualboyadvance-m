@@ -93,7 +93,7 @@ suse_install_cross_deps() {
         set -- "$@" "${pkg_prefix}-${p}"
     done
 
-    sudo zypper in -y "$@" gettext-tools wxGTK3-3_2-devel python
+    sudo zypper in -y "$@" gettext-tools wxGTK3-3_2-devel python3-pip
 }
 
 case "$linux_distribution" in
@@ -122,6 +122,8 @@ table_line_append DIST_ARGS libicu-target "--with-cross-build=\$BUILD_ROOT/dists
 table_line_append DIST_PATCHES openal '-p0 https://gist.githubusercontent.com/rkitover/d371d199ee0ac67864d0940aa7e7c12c/raw/29f3bc4afaba41b35b3fcbd9d18d1f0a22e3dc13/openal-cross-no-cmake-for-native-tools.patch'
 
 table_line_replace DIST_POST_BUILD harfbuzz "$(table_line DIST_POST_BUILD harfbuzz | sed 's/rebuild_dist freetype /rebuild_dist freetype-target /')"
+
+table_line_append DIST_ARGS glib --with-python=/usr/bin/python3
 
 table_line_replace DIST_POST_BUILD glib     "$(table_line DIST_POST_BUILD glib     | sed 's/rebuild_dist gettext /rebuild_dist gettext-target /')"
 
