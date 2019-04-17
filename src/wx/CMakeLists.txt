@@ -67,41 +67,34 @@ endif()
 # manually because the package is broken
 if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
     # set up wxwidgets stuff
-    add_definitions(-D_UNICODE -DUNICODE -DWXUSINGDLL -DwxUSE_GUI=1 -D__WXMSW__)
+    set(libtype u)
+    set(suffix -rel)
+    unset(path_prefix)
+
     if(CMAKE_BUILD_TYPE MATCHES Debug)
+        set(libtype ud)
+        set(suffix -dbg)
+        set(path_prefix debug)
+
         add_definitions(-D_DEBUG)
-        include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/debug/lib/mswud)
-        include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/include)
-        set(wxWidgets_LIB_DIR ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/debug/lib)
-        set(wxWidgets_LIBRARIES
-            ${wxWidgets_LIB_DIR}/wxbase31ud_net.lib
-            ${wxWidgets_LIB_DIR}/wxbase31ud_xml.lib
-            ${wxWidgets_LIB_DIR}/wxmsw31ud_core.lib
-            ${wxWidgets_LIB_DIR}/wxmsw31ud_gl.lib
-            ${wxWidgets_LIB_DIR}/wxmsw31ud_xrc.lib
-            ${wxWidgets_LIB_DIR}/wxbase31ud.lib
-            winmm comctl32 oleacc rpcrt4 shlwapi version wsock32 opengl32
-        )
-
-        file(COPY ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows-dbg/lib/wxrc.exe DESTINATION ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/debug/bin)
-        set(WXRC ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/debug/bin/wxrc.exe)
-    elseif("${CMAKE_BUILD_TYPE}" MATCHES "Release")
-        include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/lib/mswu)
-        include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/include)
-        set(wxWidgets_LIB_DIR ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/lib)
-        set(wxWidgets_LIBRARIES
-            ${wxWidgets_LIB_DIR}/wxbase31u_net.lib
-            ${wxWidgets_LIB_DIR}/wxbase31u_xml.lib
-            ${wxWidgets_LIB_DIR}/wxmsw31u_core.lib
-            ${wxWidgets_LIB_DIR}/wxmsw31u_gl.lib
-            ${wxWidgets_LIB_DIR}/wxmsw31ud_xrc.lib
-            ${wxWidgets_LIB_DIR}/wxbase31u.lib
-            winmm comctl32 oleacc rpcrt4 shlwapi version wsock32 opengl32
-        )
-
-        file(COPY ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows-rel/lib/wxrc.exe DESTINATION ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/bin)
-        set(WXRC ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/bin/wxrc.exe)
     endif()
+
+    add_definitions(-D_UNICODE -DUNICODE -DWXUSINGDLL -DwxUSE_GUI=1 -D__WXMSW__)
+    include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/lib/msw${libtype})
+    include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/include)
+    set(wxWidgets_LIB_DIR ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/lib)
+    set(wxWidgets_LIBRARIES
+        ${wxWidgets_LIB_DIR}/wxbase31${libtype}_net.lib
+        ${wxWidgets_LIB_DIR}/wxbase31${libtype}_xml.lib
+        ${wxWidgets_LIB_DIR}/wxmsw31${libtype}_core.lib
+        ${wxWidgets_LIB_DIR}/wxmsw31${libtype}_gl.lib
+        ${wxWidgets_LIB_DIR}/wxmsw31${libtype}_xrc.lib
+        ${wxWidgets_LIB_DIR}/wxbase31${libtype}.lib
+        winmm comctl32 oleacc rpcrt4 shlwapi version wsock32 opengl32
+    )
+
+    file(COPY ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows${suffix}/lib/wxrc.exe DESTINATION ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/bin)
+    set(WXRC ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/bin/wxrc.exe)
 
     if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
         # get zip binary for wxrc
@@ -114,7 +107,7 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
 
     # SDL2.dll does not get copied to build dir
     if(NOT EXISTS ${CMAKE_BINARY_DIR}/SDL2.dll)
-        file(COPY ${_VCPKG_ROOT_DIR}/installed/${WINARCH}-windows/bin/SDL2.dll DESTINATION ${CMAKE_BINARY_DIR})
+        file(COPY ${_VCPKG_ROOT_DIR}/installed/${WINARCH}-windows${suffix}/${path_prefix}/bin/SDL2.dll DESTINATION ${CMAKE_BINARY_DIR})
     endif()
 else()
     if(CMAKE_BUILD_TYPE MATCHES Debug)
