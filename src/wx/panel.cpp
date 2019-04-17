@@ -1038,21 +1038,16 @@ void GameArea::OnIdle(wxIdleEvent& event)
         // add spacers on top and bottom to center panel vertically
         // but not on 2.8 which does not handle this correctly
 #if wxCHECK_VERSION(2, 9, 0)
-        GetSizer()->Add(0, 0, 1, wxEXPAND);
+        GetSizer()->Add(0, 0, wxEXPAND);
 #else
         frame_priority = 1;
 #endif
 
-        // On windows with the vcpkg version of wxWidgets which is 3.1.2, the
-        // wxEXPAND flag throws an XRC error, but it is necessary on earlier versions of wxWidgets
-#if defined(__WXMSW__) && wxCHECK_VERSION(3, 1, 2)
-        GetSizer()->Add(w,    frame_priority, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER) : wxEXPAND);
-#else
-        GetSizer()->Add(w,    frame_priority, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER | wxEXPAND) : wxEXPAND);
-#endif
+        // this triggers an assertion dialog in <= 3.1.2 in debug mode
+        GetSizer()->Add(w, frame_priority, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER | wxEXPAND) : wxEXPAND);
 
 #if wxCHECK_VERSION(2, 9, 0)
-        GetSizer()->Add(0, 0, 1, wxEXPAND);
+        GetSizer()->Add(0, 0, wxEXPAND);
 #endif
 
         Layout();
