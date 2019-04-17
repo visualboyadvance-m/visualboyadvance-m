@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.1.3] Windows Geometry Fix
+=======================
+* ac35e37c - fix game geometry on windows (4 hours ago)
+* 9fa544d1 - cmake: wxWidgets Release config for visual studio (4 hours ago)
+* 3cacb363 - libretro: put " " between version and git sha (25 hours ago)
+* c2656f13 - libretro: remove "-" between version and git sha (26 hours ago)
+* 4203bb53 - libretro: set version with git sha (27 hours ago)
+* 8abbb070 - cmake: use Win32Deps when mingw cross compiling (28 hours ago)
+* ffc93092 - builder: freetype 2.9.1 -> 2.10.0, verbose make (28 hours ago)
+* d08dd6cd - builder: opensuse update 2 (2 days ago)
+* 9b38a384 - builder: updates for opensuse, refactor cross deps (2 days ago)
+* d28fd302 - cmake: only link SetupAPI on win32 if it's found (2 days ago)
+* af63a119 - cmake: add -lSetupAPI to SDL2 libs for win32 (3 days ago)
+* 04c77a26 - update win32 dependencies submodule (4 days ago)
+* 5dfb36ad - remove .clang-format, update .travis.yml (4 days ago)
+* ed16d625 - add unistd.h compat header for visual studio (4 days ago)
+* 5019a201 - [SDL Front] MSVC doesn't have an unistd.h system file, closest is io.h, this will fix building the SDL frontend with msvc again. (7 days ago)
+* 2ae72f38 - fix starting game pos and geometry #406 (8 days ago)
+* 2beb5618 - cmake: move wx funcs and macros into separate file (9 days ago)
+* 468fe266 - fix lang in changelog, add bios to issue template (11 days ago)
+
 ## [2.1.2] Analog stick fix
 =======================
 * 95433f6c - release v2.1.2 (81 minutes ago)
