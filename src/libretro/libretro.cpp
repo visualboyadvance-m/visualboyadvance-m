@@ -95,6 +95,7 @@ LinkMode GetLinkMode()
 
 void StartGPLink(uint16_t value)
 {
+    WRITE16LE(((uint16_t*)&ioMem[COMM_RCNT]), value);
 }
 
 void LinkUpdate(int ticks)
