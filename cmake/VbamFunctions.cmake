@@ -70,16 +70,16 @@ endfunction()
 function(find_wx_util var util)
     # on win32, including cross builds we prefer the plain utility name first from PATH
     if(WIN32)
-        set(conf_suffixes  "" gtk4 gtk3)
+        set(conf_suffixes  "" gtk4u gtk4 gtk3u gtk3 gtk2u gtk2)
         set(major_versions "" 4 3 2)
     else()
-        set(conf_suffixes  gtk4 gtk3 "")
+        set(conf_suffixes  gtk4u gtk4 gtk3u gtk3 gtk2u gtk2"")
         set(major_versions 4 3 2 "")
     endif()
 
     foreach(conf_suffix IN LISTS conf_suffixes)
         foreach(major_version IN LISTS major_versions)
-            foreach(minor_version RANGE 100 0 -1)
+            foreach(minor_version RANGE 100 -1 -1)
                 unset(suffix)
                 if(conf_suffix)
                     set(suffix "-${conf_suffix}")
@@ -87,7 +87,7 @@ function(find_wx_util var util)
                 if(major_version)
                     set(suffix "${suffix}-${major_version}")
 
-                    if(NOT minor_version EQUAL 0)
+                    if(NOT minor_version EQUAL -1)
                         set(suffix "${suffix}.${minor_version}")
                     endif()
                 endif()
@@ -95,6 +95,16 @@ function(find_wx_util var util)
                 # find_program caches the result
                 set(exe NOTFOUND CACHE INTERNAL "" FORCE)
                 find_program(exe NAMES "${util}${suffix}")
+
+                # try infix variant, as on FreeBSD
+                if(NOT EXISTS ${exe})
+                    string(REGEX REPLACE "^-" "" suffix "${suffix}")
+
+                    string(REGEX REPLACE "-" "${suffix}-" try ${util})
+
+                    set(exe NOTFOUND CACHE INTERNAL "" FORCE)
+                    find_program(exe NAMES ${try})
+                endif()
 
                 if(EXISTS ${exe})
                     # check that the utility can be executed cleanly

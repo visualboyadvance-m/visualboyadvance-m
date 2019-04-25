@@ -7,6 +7,7 @@
 
 #include "wxvbam.h"
 
+#include <cmath>
 #include <algorithm>
 #include <stdexcept>
 #include <typeinfo>
@@ -89,7 +90,7 @@ public:
             return;
 
         if (!server) {
-            bool valid = SetLinkServerHost(gopts.link_host.c_str());
+            bool valid = SetLinkServerHost(gopts.link_host.utf8_str());
 
             if (!valid) {
                 wxMessageBox(_("You must enter a valid host name"),
@@ -3835,7 +3836,7 @@ bool MainFrame::BindControls()
         bool isv = !gopts.link_host.empty();
 
         if (isv) {
-            isv = SetLinkServerHost(gopts.link_host.c_str());
+            isv = SetLinkServerHost(gopts.link_host.utf8_str());
         }
 
         if (!isv) {

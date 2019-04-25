@@ -118,7 +118,7 @@ set(LTO_DEFAULT ON)
 
 # lto produces buggy binaries for 64 bit win32
 # and we generally don't want it when debugging because it makes linking slow
-if((WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND AMD64) OR CMAKE_BUILD_TYPE MATCHES Debug)
+if(CMAKE_BUILD_TYPE MATCHES Debug OR (WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND AMD64))
     set(LTO_DEFAULT OFF)
 endif()
 
@@ -198,7 +198,7 @@ endif()
 # Look for some dependencies using CMake scripts
 find_package(ZLIB REQUIRED)
 
-set(OpenGL_GL_PREFERENCE GLVND)
+set(OpenGL_GL_PREFERENCE LEGACY)
 
 find_package(OpenGL REQUIRED)
 
@@ -502,6 +502,11 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         set(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_DBG_FLAGS} -Wall -Wextra)
     else()
         set(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_OPT_FLAGS} -Wno-error)
+    endif()
+
+    # for some reason this is necessary
+    if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
+        set(MY_C_FLAGS -I/usr/local/include ${MY_C_FLAGS})
     endif()
 
     foreach(C_COMPILE_FLAG ${MY_C_FLAGS})

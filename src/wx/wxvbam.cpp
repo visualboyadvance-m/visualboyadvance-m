@@ -479,32 +479,32 @@ void wxvbamApp::OnInitCmdLine(wxCmdLineParser& cl)
     static wxCmdLineEntryDesc opttab[] = {
         { wxCMD_LINE_OPTION, NULL, t("save-xrc"),
             N_("Save built-in XRC file and exit"),
-	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
+	    wxCMD_LINE_VAL_STRING, 0 },
         { wxCMD_LINE_OPTION, NULL, t("save-over"),
             N_("Save built-in vba-over.ini and exit"),
-	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
+	    wxCMD_LINE_VAL_STRING, 0 },
         { wxCMD_LINE_SWITCH, NULL, t("print-cfg-path"),
             N_("Print configuration path and exit"),
-	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
+	    wxCMD_LINE_VAL_NONE, 0 },
         { wxCMD_LINE_SWITCH, t("f"), t("fullscreen"),
             N_("Start in full-screen mode"), 
-	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
+	    wxCMD_LINE_VAL_NONE, 0 },
 #if !defined(NO_LINK) && !defined(__WXMSW__)
         { wxCMD_LINE_SWITCH, t("s"), t("delete-shared-state"),
             N_("Delete shared link state first, if it exists"),
-	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
+	    wxCMD_LINE_VAL_NONE, 0 },
 #endif
         // stupid wx cmd line parser doesn't support duplicate options
         //	{ wxCMD_LINE_OPTION, t("o"),  t("option"),
         //		_("Set configuration option; <opt>=<value> or help for list"),
         { wxCMD_LINE_SWITCH, t("o"), t("list-options"),
             N_("List all settable options and exit"),
-	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
+	    wxCMD_LINE_VAL_NONE, 0 },
         { wxCMD_LINE_PARAM, NULL, NULL,
             N_("ROM file"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
         { wxCMD_LINE_PARAM, NULL, NULL,
             N_("<config>=<value>"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE | wxCMD_LINE_PARAM_OPTIONAL },
-        { wxCMD_LINE_NONE, NULL, NULL, NULL, wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE }
+        { wxCMD_LINE_NONE, NULL, NULL, NULL, wxCMD_LINE_VAL_NONE, 0 }
     };
 // 2.9 automatically translates desc, but 2.8 doesn't
 #if !wxCHECK_VERSION(2, 9, 0)

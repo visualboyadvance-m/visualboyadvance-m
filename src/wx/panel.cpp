@@ -1051,8 +1051,10 @@ void GameArea::OnIdle(wxIdleEvent& event)
 #endif
 
         Layout();
-        SendSizeEvent();
 
+#if wxCHECK_VERSION(2, 9, 0)
+        SendSizeEvent();
+#endif
 
         if (pointer_blanked)
             w->SetCursor(wxCursor(wxCURSOR_BLANK));

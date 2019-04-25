@@ -63,6 +63,18 @@ if(ENABLE_FAUDIO)
     set(FAUDIO_LIBS FAudio)
 endif()
 
+# on unix we have to check for X11 before we overwrite all the compile/link
+# flags with the wx tests
+if(NOT WIN32 AND NOT APPLE)
+    find_package(X11)
+
+    if(X11_X11_LIB AND X11_Xscreensaver_LIB)
+        include_directories(${X11_INCLUDE_DIR})
+        set(EXTRA_X11_LIBS ${X11_X11_LIB} ${X11_Xscreensaver_LIB})
+        add_definitions(-DHAVE_XSS)
+    endif()
+endif()
+
 # on VS with vcpkg we can't use FindwxWidgets, we have to set everything up
 # manually because the package is broken
 if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
@@ -193,7 +205,19 @@ else()
     set(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_FLAGS} ${CMAKE_REQUIRED_DEFINITIONS})
 
     # find the right C++ ABI version for wxWidgets, this is also necessary for the OpenGL check following
-    if((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang) AND NOT CMAKE_CROSSCOMPILING)
+
+    # on FreeBSD the ABI check segfaults and always fails, and we don't
+    # need it because everything is built with clang
+    set(ABI_CHECK FALSE)
+
+    if((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+        AND NOT CMAKE_CROSSCOMPILING
+        AND NOT CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
+
+        set(ABI_CHECK TRUE)
+    endif()
+
+    if(ABI_CHECK)
         set(WX_ABI_FOUND_MATCH FALSE)
 
         include(CheckCXXSourceRuns)
@@ -688,16 +712,6 @@ if(WIN32)
     # not strictly directx, but win32-related
     if(ENABLE_DEBUGGER)
         set(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} wsock32)
-    endif()
-endif()
-
-if(NOT WIN32 AND NOT APPLE)
-    find_package(X11)
-
-    if(X11_X11_LIB AND X11_Xscreensaver_LIB)
-        include_directories(${X11_INCLUDE_DIR})
-        set(EXTRA_X11_LIBS ${X11_X11_LIB} ${X11_Xscreensaver_LIB})
-        add_definitions(-DHAVE_XSS)
     endif()
 endif()
 

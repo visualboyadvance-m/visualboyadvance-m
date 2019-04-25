@@ -103,10 +103,10 @@ extern struct opt_desc {
 } opts[];
 
 // Initializer for struct opt_desc
-opt_desc new_opt_desc(wxString opt = "", const char* cmd = NULL, wxString desc = "",
-                      wxString* stropt = NULL, int* intopt = NULL, wxString enumvals = "",
+opt_desc new_opt_desc(wxString opt = wxT(""), const char* cmd = NULL, wxString desc = wxT(""),
+                      wxString* stropt = NULL, int* intopt = NULL, wxString enumvals = wxT(""),
                       double min = 0, double max = 0, bool* boolopt = NULL,
-                      double* doubleopt = NULL, uint32_t* uintopt = NULL, wxString curstr = "",
+                      double* doubleopt = NULL, uint32_t* uintopt = NULL, wxString curstr = wxT(""),
                       int curint = 0, double curdouble = 0, uint32_t curuint = 0);
 
 extern const int num_opts;

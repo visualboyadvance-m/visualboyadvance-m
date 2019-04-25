@@ -16,6 +16,7 @@ extern "C" {
 #include <sys/stat.h>
 #include <cmath>
 #include <cerrno>
+#include <unistd.h>
 
 #include "../common/Patch.h"
 #include "../common/ConfigManager.h"

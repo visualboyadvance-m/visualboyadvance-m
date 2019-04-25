@@ -7,12 +7,14 @@
 
 #include "Patch.h"
 
+#if defined(__FreeBSD__) || defined(__NetBSD__)
+#include <sys/param.h>
+#include "BSD.h"
+#endif
+
 #ifndef __LIBRETRO__
 
 #ifdef __GNUC__
-#if defined(BSD) || defined(__NetBSD__)
-#include <sys/param.h>
-#endif
 #if defined(__APPLE__) || defined(BSD) || defined(__NetBSD__)
 typedef off_t __off64_t; /* off_t is 64 bits on BSD. */
 #define fseeko64 fseeko

@@ -658,7 +658,7 @@ extern struct cmditem {
 extern const int ncmds;
 
 // Initializer for struct cmditem
-cmditem new_cmditem(const wxString cmd = "", const wxString name = "",
+cmditem new_cmditem(const wxString cmd = wxT(""), const wxString name = wxT(""),
                     int cmd_id = 0, int mask_flags = 0, wxMenuItem* mi = NULL);
 
 // for binary search
