@@ -73,7 +73,7 @@ function(find_wx_util var util)
         set(conf_suffixes  "" gtk4u gtk4 gtk3u gtk3 gtk2u gtk2)
         set(major_versions "" 4 3 2)
     else()
-        set(conf_suffixes  gtk4u gtk4 gtk3u gtk3 gtk2u gtk2"")
+        set(conf_suffixes  gtk4u gtk4 gtk3u gtk3 gtk2u gtk2 "")
         set(major_versions 4 3 2 "")
     endif()
 
