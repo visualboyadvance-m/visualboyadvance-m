@@ -198,7 +198,11 @@ endif()
 # Look for some dependencies using CMake scripts
 find_package(ZLIB REQUIRED)
 
-set(OpenGL_GL_PREFERENCE LEGACY)
+set(OpenGL_GL_PREFERENCE GLVND)
+
+if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
+    set(OpenGL_GL_PREFERENCE LEGACY)
+endif()
 
 find_package(OpenGL REQUIRED)
 
