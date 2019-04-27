@@ -22,7 +22,7 @@
                 <object class="wxSlider" name="Volume">
                   <value>100</value>
                   <min>0</min>
-                  <max>400</max>
+                  <max>200</max>
                 </object>
                 <flag>wxALL|wxEXPAND</flag>
                 <border>5</border>
