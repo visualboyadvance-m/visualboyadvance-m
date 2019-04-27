@@ -2632,8 +2632,12 @@ build_project() {
 
         codesign -s "Developer ID Application" --deep ./visualboyadvance-m.app || :
 
-        rm -f ./visualboyadvance-m-Mac.zip
-        zip -9r ./visualboyadvance-m-Mac.zip ./visualboyadvance-m.app
+        zip=./visualboyadvance-m-Mac-${target_bits:-$bits}bit.zip
+
+        rm -f $zip
+        zip -9r $zip ./visualboyadvance-m.app
+
+        gpg --detach-sign -a $zip
     elif [ "$target_os" != windows ] && path_exists visualboyadvance-m; then
         $STRIP visualboyadvance-m
     elif [ "$target_os" = windows ] && path_exists visualboyadvance-m.exe; then
