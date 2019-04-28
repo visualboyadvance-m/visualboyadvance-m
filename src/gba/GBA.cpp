@@ -2849,8 +2849,8 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
     case 0x7c:
     case 0x80:
     case 0x84:
-        soundEvent(address & 0xFF, (uint8_t)(value & 0xFF));
-        soundEvent((address & 0xFF) + 1, (uint8_t)(value >> 8));
+        soundEvent8(address & 0xFF, (uint8_t)(value & 0xFF));
+        soundEvent8((address & 0xFF) + 1, (uint8_t)(value >> 8));
         break;
     case 0x82:
     case 0x88:
@@ -2866,7 +2866,7 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
     case 0x9a:
     case 0x9c:
     case 0x9e:
-        soundEvent(address & 0xFF, value);
+        soundEvent16(address & 0xFF, value);
         break;
     case 0xB0:
         DM0SAD_L = value;

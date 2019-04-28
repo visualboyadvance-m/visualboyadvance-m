@@ -50,8 +50,8 @@ int soundTicks = SOUND_CLOCK_TICKS_;
 
 static float soundVolume = 1.0f;
 static int soundEnableFlag = 0x3ff; // emulator channels enabled
-static float soundFiltering_ = -1;
-static float soundVolume_ = -1;
+static float soundFiltering_ = -1.0f;
+static float soundVolume_ = -1.0f;
 
 void interp_rate() { /* empty for now */}
 
@@ -161,7 +161,7 @@ void Gba_Pcm::update(int dac)
                 int period = time - last_time;
 
                 int idx = (unsigned)period / 512;
-                if (idx >= 3)
+                if (idx > 3)
                     idx = 3;
 
                 static int const filters[4] = { 0, 0, 1, 2 };
@@ -188,8 +188,8 @@ void Gba_Pcm_Fifo::timer_overflowed(int which_timer)
                 // Not filled by DMA, so fill with 16 bytes of silence
                 int reg = which ? FIFOB_L : FIFOA_L;
                 for (int n = 8; n--;) {
-                    soundEvent(reg, (uint16_t)0);
-                    soundEvent(reg + 2, (uint16_t)0);
+                    soundEvent16(reg, (uint16_t)0);
+                    soundEvent16(reg + 2, (uint16_t)0);
                 }
             }
         }
@@ -237,21 +237,21 @@ static void apply_control()
 static int gba_to_gb_sound(int addr)
 {
     static const int table[0x40] = {
-        0xFF10, 0, 0xFF11, 0xFF12, 0xFF13, 0xFF14, 0, 0,
-        0xFF16, 0xFF17, 0, 0, 0xFF18, 0xFF19, 0, 0,
-        0xFF1A, 0, 0xFF1B, 0xFF1C, 0xFF1D, 0xFF1E, 0, 0,
-        0xFF20, 0xFF21, 0, 0, 0xFF22, 0xFF23, 0, 0,
-        0xFF24, 0xFF25, 0, 0, 0xFF26, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0xFF30, 0xFF31, 0xFF32, 0xFF33, 0xFF34, 0xFF35, 0xFF36, 0xFF37,
-        0xFF38, 0xFF39, 0xFF3A, 0xFF3B, 0xFF3C, 0xFF3D, 0xFF3E, 0xFF3F,
+        0xFF10,      0, 0xFF11, 0xFF12, 0xFF13, 0xFF14,      0,      0, // 0x60
+        0xFF16, 0xFF17,      0,      0, 0xFF18, 0xFF19,      0,      0, // 0x68
+        0xFF1A,      0, 0xFF1B, 0xFF1C, 0xFF1D, 0xFF1E,      0,      0, // 0x70
+        0xFF20, 0xFF21,      0,      0, 0xFF22, 0xFF23,      0,      0, // 0x78
+        0xFF24, 0xFF25,      0,      0, 0xFF26,      0,      0,      0, // 0x80
+             0,      0,      0,      0,      0,      0,      0,      0, // 0x88
+        0xFF30, 0xFF31, 0xFF32, 0xFF33, 0xFF34, 0xFF35, 0xFF36, 0xFF37, // 0x90
+        0xFF38, 0xFF39, 0xFF3A, 0xFF3B, 0xFF3C, 0xFF3D, 0xFF3E, 0xFF3F, // 0x98
     };
     if (addr >= 0x60 && addr < 0xA0)
         return table[addr - 0x60];
     return 0;
 }
 
-void soundEvent(uint32_t address, uint8_t data)
+void soundEvent8(uint32_t address, uint8_t data)
 {
     int gb_addr = gba_to_gb_sound(address);
     if (gb_addr) {
@@ -271,13 +271,15 @@ static void apply_volume(bool apu_only = false)
         soundVolume_ = soundVolume;
 
     if (gb_apu) {
-        static float const apu_vols[4] = { 0.25, 0.5, 1, 0.25 };
+        static float const apu_vols[4] = { 0.25f, 0.5f, 1.0f, 0.25f };
         gb_apu->volume(soundVolume_ * apu_vols[ioMem[SGCNT0_H] & 3]);
     }
 
     if (!apu_only) {
-        for (int i = 0; i < 3; i++)
-            pcm_synth[i].volume(0.66 / 256 * soundVolume_);
+        double synth_vol = 0.66 / 256.0 * soundVolume_;
+        pcm_synth[0].volume(synth_vol);
+        pcm_synth[1].volume(synth_vol);
+        pcm_synth[2].volume(synth_vol);
     }
 }
 
@@ -289,7 +291,7 @@ static void write_SGCNT0_H(int data)
     apply_volume(true);
 }
 
-void soundEvent(uint32_t address, uint16_t data)
+void soundEvent16(uint32_t address, uint16_t data)
 {
     switch (address) {
     case SGCNT0_H:
@@ -308,14 +310,14 @@ void soundEvent(uint32_t address, uint16_t data)
         WRITE16LE(&ioMem[address], data);
         break;
 
-    case 0x88:
+    case SOUNDBIAS:
         data &= 0xC3FF;
         WRITE16LE(&ioMem[address], data);
         break;
 
     default:
-        soundEvent(address & ~1, (uint8_t)(data)); // even
-        soundEvent(address | 1, (uint8_t)(data >> 8)); // odd
+        soundEvent8(address & ~1, (uint8_t)(data)); // even
+        soundEvent8(address | 1, (uint8_t)(data >> 8)); // odd
         break;
     }
 }
@@ -523,7 +525,7 @@ void soundReset()
     soundPaused = true;
     soundTicks = 0;
 
-    soundEvent(NR52, (uint8_t)0x80);
+    soundEvent8(NR52, (uint8_t)0x80);
 }
 
 bool soundInit()
