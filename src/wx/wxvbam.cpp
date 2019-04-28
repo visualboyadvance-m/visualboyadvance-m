@@ -260,17 +260,13 @@ bool wxvbamApp::OnInit()
 // /MIGRATION
 // migrate from 'vbam.{cfg,conf}' to 'vbam.ini' to manage a single config
 // file for all platforms.
-#if !defined(__WXMSW__) && !defined(__APPLE__)
     wxString oldConf(GetConfigurationPath() + wxT(FILE_SEP) + wxT("vbam.conf"));
-#else
-    wxString oldConf(GetConfigurationPath() + wxT(FILE_SEP) + wxT("vbam.cfg"));
-#endif
     wxString newConf(GetConfigurationPath() + wxT(FILE_SEP) + wxT("vbam.ini"));
-    if (wxFileExists(oldConf))
-    {
-	wxRenameFile(oldConf, newConf, false);
-    }
+
+    if (!wxFileExists(newConf) && wxFileExists(oldConf))
+        wxRenameFile(oldConf, newConf, false);
 // /END_MIGRATION
+
     cfg = new wxFileConfig(wxT("vbam"), wxEmptyString,
         vbamconf.GetFullPath(),
         wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
