@@ -48,18 +48,19 @@ extern float soundFiltering; // 0.0 = none, 1.0 = max
 //// GBA sound emulation
 
 // GBA sound registers
-#define SGCNT0_H 0x82
-#define FIFOA_L 0xa0
-#define FIFOA_H 0xa2
-#define FIFOB_L 0xa4
-#define FIFOB_H 0xa6
+#define SGCNT0_H  0x82
+#define SOUNDBIAS 0x88
+#define FIFOA_L   0xa0
+#define FIFOA_H   0xa2
+#define FIFOB_L   0xa4
+#define FIFOB_H   0xa6
 
 // Resets emulated sound hardware
 void soundReset();
 
 // Emulates write to sound hardware
-void soundEvent(uint32_t addr, uint8_t data);
-void soundEvent(uint32_t addr, uint16_t data); // TODO: error-prone to overload like this
+void soundEvent8(uint32_t addr, uint8_t data);
+void soundEvent16(uint32_t addr, uint16_t data); // TODO: error-prone to overload like this
 
 // Notifies emulator that a timer has overflowed
 void soundTimerOverflow(int which);
