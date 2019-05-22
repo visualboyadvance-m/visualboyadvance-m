@@ -71,12 +71,13 @@ matrix:
           script:
               - mkdir build
               - cd build
-              - cmake .. -DENABLE_SDL=ON -DENABLE_OPENAL=ON
+              - cmake .. -DENABLE_SDL=ON -DENABLE_OPENAL=ON -DENABLE_LINK=OFF
               - make -j2
               - ./visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m --help
           cache:
               directories:
                   - "$HOME/.ccache"
+                  - /usr/local
 
 notifications:
     webhooks:
