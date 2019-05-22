@@ -1183,6 +1183,9 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
             mod |= wxMOD_RAW_CONTROL;
             break;
 #endif
+        default:
+            mod = 0;
+            break;
     }
 
     // check if key is already pressed
