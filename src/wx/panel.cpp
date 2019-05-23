@@ -1184,7 +1184,7 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
             break;
 #endif
         default:
-            mod = 0;
+            if (joy == 0) mod = 0;
             break;
     }
 
