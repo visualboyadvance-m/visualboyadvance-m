@@ -16,6 +16,9 @@
 #include "filters.h"
 #include "wxvbam.h"
 
+// release all buttons currently pressed
+static void clear_input_press();
+
 int emulating;
 
 IMPLEMENT_DYNAMIC_CLASS(GameArea, wxPanel)
@@ -919,6 +922,12 @@ GameArea::~GameArea()
     }
 }
 
+void GameArea::OnKillFocus(wxFocusEvent& ev)
+{
+    clear_input_press();
+    ev.Skip(true);
+}
+
 void GameArea::Pause()
 {
     if (paused)
@@ -931,6 +940,11 @@ void GameArea::Pause()
 #endif
 
     paused = was_paused = true;
+
+    // when the game is paused like this, we should not allow any
+    // input to remain pressed, because they could be released
+    // outside of the game zone and we would not know about it. 
+    clear_input_press();
 
     if (loaded != IMAGE_UNKNOWN)
         soundPause();
@@ -1021,6 +1035,9 @@ void GameArea::OnIdle(wxIdleEvent& event)
         // set userdata so we know it's the panel and not the frame being resized
         // the userdata is freed on disconnect/destruction
         this->Connect(wxEVT_SIZE,          wxSizeEventHandler(GameArea::OnSize),           NULL, this);
+
+	// we need to check if the buttons stayed pressed when focus the panel
+	w->Connect(wxEVT_KILL_FOCUS,       wxFocusEventHandler(GameArea::OnKillFocus),     NULL, this);
 
         w->SetBackgroundStyle(wxBG_STYLE_CUSTOM);
         w->SetSize(wxSize(basic_width, basic_height));
@@ -1141,6 +1158,16 @@ static uint32_t bmask[NUM_KEYS] = {
 
 static wxJoyKeyBinding_v keys_pressed;
 
+static void clear_input_press()
+{
+    int i;
+    for (i = 0; i < 4; ++i)
+    {
+	joypress[i] = 0;
+    }
+    keys_pressed.clear();
+}
+
 struct game_key {
     int player;
     int key_num;
@@ -1257,7 +1284,8 @@ static void draw_black_background(wxWindow* win) {
 
 void GameArea::OnKeyDown(wxKeyEvent& ev)
 {
-    if (process_key_press(true, ev.GetKeyCode(), ev.GetModifiers())) {
+    wxKeyCode keyCode = (wxKeyCode)ev.GetKeyCode();
+    if (wxGetKeyState(keyCode) && process_key_press(true, ev.GetKeyCode(), ev.GetModifiers())) {
         ev.Skip(false);
         ev.StopPropagation();
         wxWakeUpIdle();
