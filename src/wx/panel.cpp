@@ -1284,6 +1284,7 @@ static void draw_black_background(wxWindow* win) {
 
 void GameArea::OnKeyDown(wxKeyEvent& ev)
 {
+    // check if the key is pressed indeed and then process it
     wxKeyCode keyCode = (wxKeyCode)ev.GetKeyCode();
     if (wxGetKeyState(keyCode) && process_key_press(true, ev.GetKeyCode(), ev.GetModifiers())) {
         ev.Skip(false);

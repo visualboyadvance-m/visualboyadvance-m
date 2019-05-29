@@ -621,7 +621,6 @@ protected:
     void PaintEv(wxPaintEvent& ev);
     void EraseBackground(wxEraseEvent& ev);
     void OnSize(wxSizeEvent& ev);
-
     void OnKillFocus(wxFocusEvent& ev);
 
 #ifndef NO_FFMPEG
