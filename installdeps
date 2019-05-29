@@ -1054,9 +1054,9 @@ brew_installdeps() {
     brews="nasm cmake ccache ffmpeg gettext libpng pkg-config sdl2 wxmac ccache"
 
     # sfml brew currently broken in the travis mac environment
-    if [ -z "$TRAVIS" ]; then
+#    if [ -z "$TRAVIS" ]; then
         brews="$brews sfml"
-    fi
+#    fi
 
     set --
     for f in $brews; do

@@ -66,12 +66,13 @@ matrix:
         - env: BUILD_ENV=mac
           language: cpp
           os: osx
+          osx_image: xcode10.2
           before_script:
               - ./installdeps
           script:
               - mkdir build
               - cd build
-              - cmake .. -DENABLE_SDL=ON -DENABLE_OPENAL=ON -DENABLE_LINK=OFF
+              - cmake .. -DENABLE_SDL=ON -DENABLE_OPENAL=ON -DENABLE_LINK=ON
               - make -j2
               - ./visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m --help
           cache:
