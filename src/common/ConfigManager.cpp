@@ -267,9 +267,11 @@ IFBFilterFunc ifbFunction = 0;
 int	patchNum = 0;
 char *patchNames[PATCH_MAX_NUM] = { NULL }; // and so on
 
+#ifndef NO_DEBUGGER
 void(*dbgMain)() = remoteStubMain;
 void(*dbgSignal)(int, int) = remoteStubSignal;
 void(*dbgOutput)(const char *, uint32_t) = debuggerOutput;
+#endif
 
 char* homeDir = NULL;
 char* arg0 = NULL;
@@ -918,6 +920,7 @@ int ReadOpts(int argc, char ** argv)
 				patchNum++;
 			}
 			break;
+#ifndef NO_DEBUGGER
 		case 'G':
 			dbgMain = remoteStubMain;
 			dbgSignal = remoteStubSignal;
@@ -946,6 +949,7 @@ int ReadOpts(int argc, char ** argv)
 				remoteSetProtocol(0);
 			}
 			break;
+#endif
 		case 'N':
 			parseDebug = false;
 			break;

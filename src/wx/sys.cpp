@@ -1134,6 +1134,8 @@ void systemOnSoundShutdown()
 {
 }
 
+#ifndef NO_DEBUGGER
+
 extern int (*remoteSendFnc)(char*, int);
 extern int (*remoteRecvFnc)(char*, int);
 extern void (*remoteCleanUpFnc)();
@@ -1297,6 +1299,8 @@ bool debugWaitSocket()
     debug_remote = debug_server->Accept(false);
     return debug_remote != NULL;
 }
+
+#endif
 
 void log(const char* defaultMsg, ...)
 {

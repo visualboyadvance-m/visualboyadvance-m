@@ -103,13 +103,13 @@ set(ENABLE_LINK_DEFAULT OFF)
 # msys2 does not have static sfml libs atm
 # while on mxe we use static libs
 if(WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe) AND NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
-	set(SFML_STATIC_LIBRARIES TRUE)
+    set(SFML_STATIC_LIBRARIES TRUE)
 endif()
 
 find_package(SFML 2 COMPONENTS network system)
 
 if(SFML_FOUND)
-	set(ENABLE_LINK_DEFAULT ON)
+    set(ENABLE_LINK_DEFAULT ON)
 endif()
 
 option(ENABLE_LINK "Enable GBA linking functionality" ${ENABLE_LINK_DEFAULT})
@@ -697,7 +697,6 @@ set(
     SRC_GBA
     src/gba/agbprint.cpp
     src/gba/bios.cpp
-    src/gba/BreakpointStructures.cpp
     src/gba/Cheats.cpp
     src/gba/CheatSearch.cpp
     src/gba/debugger-expr-lex.cpp
@@ -723,6 +722,12 @@ set(
     src/gba/Sound.cpp
     src/gba/Sram.cpp
 )
+
+if(ENABLE_DEBUGGER)
+    list(APPEND SRC_GBA
+        src/gba/BreakpointStructures.cpp
+    )
+endif()
 
 set(
     HDR_GBA
@@ -873,17 +878,28 @@ else()
     add_definitions(-DNO_ASM)
 endif()
 
+
+set(
+    SRC_DEBUGGER
+    src/gba/armdis.cpp
+    src/gba/elf.cpp
+)
+
+set(
+    HDR_DEBUGGER
+    src/gba/armdis.h
+    src/gba/elf.h
+)
+
 if(ENABLE_DEBUGGER)
     set(
         SRC_DEBUGGER
-        src/gba/armdis.cpp
-        src/gba/elf.cpp
+        ${SRC_DEBUGGER}
         src/gba/remote.cpp
     )
     set(
         HDR_DEBUGGER
-        src/gba/armdis.h
-        src/gba/elf.h
+        ${HDR_DEBUGGER}
         src/gba/remote.h
     )
 endif()
