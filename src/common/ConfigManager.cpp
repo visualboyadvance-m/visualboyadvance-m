@@ -659,6 +659,12 @@ const char* FindConfigFile(const char *name)
 		return name;
 	}
 
+	struct stat s;
+	std::string homeDirTmp = get_xdg_user_config_home() + DOT_DIR;
+	homeDir = (char *)homeDirTmp.c_str();
+	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
+		mkdir(homeDir, 0755);
+
 	if (homeDir) {
 		sprintf(path, "%s%c%s", homeDir, FILE_SEP, name);
 		if (FileExists(path))
@@ -730,12 +736,6 @@ const char* FindConfigFile(const char *name)
 
 void LoadConfigFile()
 {
-	struct stat s;
-	std::string homeDirTmp = get_xdg_user_config_home() + DOT_DIR;
-	homeDir = (char *)homeDirTmp.c_str();
-	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
-		mkdir(homeDir, 0755);
-
 	if (preferences == NULL)
 	{
 		const char* configFile = FindConfigFile("vbam.ini");
@@ -745,12 +745,6 @@ void LoadConfigFile()
 
 void SaveConfigFile()
 {
-	struct stat s;
-	std::string homeDirTmp = get_xdg_user_config_home() + DOT_DIR;
-	homeDir = (char *)homeDirTmp.c_str();
-	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
-		mkdir(homeDir, 0755);
-
 	const char* configFile = FindConfigFile("vbam.ini");
 
 	if (configFile != NULL)
