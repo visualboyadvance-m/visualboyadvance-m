@@ -2816,6 +2816,20 @@ bool MainFrame::BindControls()
             }
 
 #endif
+#ifdef NO_DEBUGGER
+
+	    if (cmdtab[i].cmd_id == XRCID("DebugGDBBreak") || cmdtab[i].cmd_id == XRCID("DebugGDBDisconnect") || cmdtab[i].cmd_id == XRCID("DebugGDBBreakOnLoad") || cmdtab[i].cmd_id == XRCID("DebugGDBPort"))
+	    {
+		if (mi)
+		{
+		    mi->GetMenu()->Enable(mi->GetId(), false);
+		    //mi->GetMenu()->Remove(mi);
+		}
+		cmdtab[i].cmd_id = XRCID("NOOP");
+                cmdtab[i].mi = NULL;
+                continue;
+	    }
+#endif
 
             if (mi) {
                 // wxgtk provides no way to retrieve stock label/accel
@@ -2889,6 +2903,12 @@ bool MainFrame::BindControls()
                 }
             }
         }
+
+#ifdef NO_DEBUGGER
+        // remove this item from the menu completely
+        wxMenuItem* gdbmi = XRCITEM("GDBMenu");
+        gdbmi->GetMenu()->Remove(gdbmi);
+#endif
 
         // if a recent menu is present, save its location
         wxMenuItem* recentmi = XRCITEM("RecentMenu");

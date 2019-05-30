@@ -536,7 +536,7 @@
         </object>
       </object>
       <object class="separator"/>
-      <object class="wxMenu">
+      <object class="wxMenu" name="GDBMenu">
         <object class="wxMenuItem" name="DebugGDBBreak">
           <label>_Break into GDB</label>
         </object>

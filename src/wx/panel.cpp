@@ -503,9 +503,12 @@ void GameArea::UnloadGame(bool destruct)
 #endif
     systemStopGameRecording();
     systemStopGamePlayback();
+
+#ifndef NO_DEBUGGER
     debugger = false;
     remoteCleanUp();
     mf->cmd_enable |= CMDEN_NGDB_ANY;
+#endif
 
     if (loaded == IMAGE_GB) {
         gbCleanUp();
@@ -955,6 +958,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
         LoadGame(pl);
         MainFrame* mf = wxGetApp().frame;
 
+#ifndef NO_DEBUGGER
         if (gdbBreakOnLoad)
             mf->GDBBreak();
 
@@ -962,6 +966,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
             wxLogError(_("Not a valid GBA cartridge"));
             UnloadGame();
         }
+#endif
     }
 
     // stupid wx doesn't resize to screen size
@@ -1064,6 +1069,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
         HidePointer();
         event.RequestMore();
 
+#ifndef NO_DEBUGGER
         if (debugger) {
             was_paused = true;
             dbgMain();
@@ -1075,6 +1081,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
             return;
         }
+#endif
 
         emusys->emuMain(emusys->emuCount);
 #ifndef NO_LINK

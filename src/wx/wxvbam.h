@@ -752,6 +752,7 @@ extern bool GetFADevices(wxArrayString& names, wxArrayString& ids);
 #endif
 #endif
 
+#ifndef NO_DEBUGGER
 extern bool debugger;
 extern void (*dbgMain)();
 extern void (*dbgSignal)(int, int);
@@ -766,6 +767,7 @@ extern const wxString& debugGetSlavePty();
 extern bool debugWaitPty();
 extern bool debugStartListen(int port);
 extern bool debugWaitSocket();
+#endif
 
 // perhaps these functions should not be called systemXXX
 // perhaps they should move to panel.cpp/GameArea

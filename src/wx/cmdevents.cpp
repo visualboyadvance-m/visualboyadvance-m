@@ -204,80 +204,100 @@ EVT_HANDLER(wxID_FILE1, "Load recent ROM 1")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(0));
 
+#ifndef NO_DEBUGGER
     if (gdbBreakOnLoad)
         GDBBreak();
+#endif
 }
 
 EVT_HANDLER(wxID_FILE2, "Load recent ROM 2")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(1));
 
+#ifndef NO_DEBUGGER
     if (gdbBreakOnLoad)
         GDBBreak();
+#endif
 }
 
 EVT_HANDLER(wxID_FILE3, "Load recent ROM 3")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(2));
 
+#ifndef NO_DEBUGGER
     if (gdbBreakOnLoad)
         GDBBreak();
+#endif
 }
 
 EVT_HANDLER(wxID_FILE4, "Load recent ROM 4")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(3));
 
+#ifndef NO_DEBUGGER
     if (gdbBreakOnLoad)
         GDBBreak();
+#endif
 }
 
 EVT_HANDLER(wxID_FILE5, "Load recent ROM 5")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(4));
 
+#ifndef NO_DEBUGGER
     if (gdbBreakOnLoad)
         GDBBreak();
+#endif
 }
 
 EVT_HANDLER(wxID_FILE6, "Load recent ROM 6")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(5));
 
+#ifndef NO_DEBUGGER
     if (gdbBreakOnLoad)
         GDBBreak();
+#endif
 }
 
 EVT_HANDLER(wxID_FILE7, "Load recent ROM 7")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(6));
 
+#ifndef NO_DEBUGGER
     if (gdbBreakOnLoad)
         GDBBreak();
+#endif
 }
 
 EVT_HANDLER(wxID_FILE8, "Load recent ROM 8")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(7));
 
+#ifndef NO_DEBUGGER
     if (gdbBreakOnLoad)
         GDBBreak();
+#endif
 }
 
 EVT_HANDLER(wxID_FILE9, "Load recent ROM 9")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(8));
 
+#ifndef NO_DEBUGGER
     if (gdbBreakOnLoad)
         GDBBreak();
+#endif
 }
 
 EVT_HANDLER(wxID_FILE10, "Load recent ROM 10")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(9));
 
+#ifndef NO_DEBUGGER
     if (gdbBreakOnLoad)
         GDBBreak();
+#endif
 }
 
 static const struct rom_maker {
@@ -2032,6 +2052,7 @@ EVT_HANDLER_MASK(TileViewer, "Tile Viewer...", CMDEN_GB | CMDEN_GBA)
     TileViewer();
 }
 
+#ifndef NO_DEBUGGER
 extern int remotePort;
 
 int GetGDBPort(MainFrame* mf)
@@ -2052,23 +2073,29 @@ int GetGDBPort(MainFrame* mf)
 #endif
         65535, mf);
 }
+#endif
 
 EVT_HANDLER(DebugGDBPort, "Configure port...")
 {
+#ifndef NO_DEBUGGER
     int port_selected = GetGDBPort(this);
 
     if (port_selected != -1) {
         gdbPort = port_selected;
         update_opts();
     }
+#endif
 }
 
 EVT_HANDLER(DebugGDBBreakOnLoad, "Break on load")
 {
+#ifndef NO_DEBUGGER
     GetMenuOptionInt("DebugGDBBreakOnLoad", gdbBreakOnLoad, 1);
     update_opts();
+#endif
 }
 
+#ifndef NO_DEBUGGER
 void MainFrame::GDBBreak()
 {
     ModalPause mp;
@@ -2147,14 +2174,18 @@ void MainFrame::GDBBreak()
         }
     }
 }
+#endif
 
 EVT_HANDLER_MASK(DebugGDBBreak, "Break into GDB", CMDEN_NGDB_GBA | CMDEN_GDB)
 {
+#ifndef NO_DEBUGGER
     GDBBreak();
+#endif
 }
 
 EVT_HANDLER_MASK(DebugGDBDisconnect, "Disconnect GDB", CMDEN_GDB)
 {
+#ifndef NO_DEBUGGER
     debugger = false;
     dbgMain = NULL;
     dbgSignal = NULL;
@@ -2164,6 +2195,7 @@ EVT_HANDLER_MASK(DebugGDBDisconnect, "Disconnect GDB", CMDEN_GDB)
     cmd_enable &= ~CMDEN_GDB;
     cmd_enable |= CMDEN_NGDB_GBA | CMDEN_NGDB_ANY;
     enable_menus();
+#endif
 }
 
 // Options menu
