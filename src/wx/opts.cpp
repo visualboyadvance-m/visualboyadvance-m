@@ -277,6 +277,7 @@ opt_desc opts[] = {
 
     /// Geometry
     INTOPT("geometry/fullScreen", "Fullscreen", wxTRANSLATE("Enter fullscreen mode at startup"), fullScreen, 0, 1),
+    INTOPT("geometry/isMaximized", "Maximized", wxTRANSLATE("Window maximized"), windowMaximized, 0, 1),
     UINTOPT("geometry/windowHeight", "Height", wxTRANSLATE("Window height at startup"), windowHeight, 0, 99999),
     UINTOPT("geometry/windowWidth", "Width", wxTRANSLATE("Window width at startup"), windowWidth, 0, 99999),
     INTOPT("geometry/windowX", "X", wxTRANSLATE("Window axis X position at startup"), windowPositionX, -1, 99999),

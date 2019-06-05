@@ -408,6 +408,7 @@ bool wxvbamApp::OnInit()
     int width = windowWidth;
     int height = windowHeight;
     int isFullscreen = fullScreen;
+    int isMaximized = windowMaximized;
     frame = wxDynamicCast(xr->LoadFrame(NULL, wxT("MainFrame")), MainFrame);
 
     if (!frame) {
@@ -422,9 +423,13 @@ bool wxvbamApp::OnInit()
     if (x >= 0 && y >= 0 && width > 0 && height > 0)
 	frame->SetSize(x, y, width, height);
 
+    if (isMaximized)
+        frame->Maximize();
+
     if (isFullscreen && wxGetApp().pending_load != wxEmptyString)
 	frame->ShowFullScreen(isFullscreen);
     frame->Show(true);
+
     return true;
 }
 
@@ -706,7 +711,7 @@ EVT_SIZE(MainFrame::OnSize)
 // This is a feature most people don't like, and it causes problems with
 // keyboard game keys on mac, so we will disable it for now.
 //
-// On Winodws, there will still be a pause because of how the windows event
+// On Windows, there will still be a pause because of how the windows event
 // model works, in addition the audio will loop with SDL, so we still pause on
 // Windows, TODO: this needs to be fixed properly
 //
@@ -761,10 +766,20 @@ void MainFrame::OnMove(wxMoveEvent& event)
     (void)event; // unused params
     wxPoint pos = GetScreenPosition();
     int x = pos.x, y = pos.y;
-    if (x >= 0 && y >= 0 && !IsFullScreen())
+    if (!IsFullScreen() && !IsMaximized())
     {
-	windowPositionX = x;
-	windowPositionY = y;
+        if (x >= 0 && y >= 0)
+        {
+            bkpPosX = windowPositionX;
+            bkpPosY = windowPositionY;
+            windowPositionX = x;
+            windowPositionY = y;
+        }
+    }
+    else
+    {
+        windowPositionX = bkpPosX;
+        windowPositionY = bkpPosY;
     }
     update_opts();
 }
@@ -777,16 +792,26 @@ void MainFrame::OnSize(wxSizeEvent& event)
     int height = pos.GetHeight(), width = pos.GetWidth();
     int x = windowPos.x, y = windowPos.y;
     bool isFullscreen = IsFullScreen();
-    if (height > 0 && width > 0 && !isFullscreen)
+    bool isMaximized = IsMaximized();
+    if (!isFullscreen && !isMaximized)
     {
-	windowHeight = height;
-	windowWidth = width;
+	if (height > 0 && width > 0)
+	{
+	    windowHeight = height;
+	    windowWidth = width;
+	}
+	if (x >= 0 && y >= 0)
+	{
+	    windowPositionX = x;
+	    windowPositionY = y;
+	}
     }
-    if (x >= 0 && y >= 0 && !isFullscreen)
+    else
     {
-	windowPositionX = x;
-	windowPositionY = y;
+        windowPositionX = bkpPosX;
+        windowPositionY = bkpPosY;
     }
+    windowMaximized = isMaximized;
     fullScreen = isFullscreen;
     update_opts();
 }

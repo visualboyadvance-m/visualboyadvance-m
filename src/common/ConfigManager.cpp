@@ -243,8 +243,9 @@ int videoOption;
 int vsync;
 int wasPaused = 0;
 uint32_t windowHeight;
-int windowPositionX;
-int windowPositionY;
+int windowMaximized;
+int windowPositionX, bkpPosX = 0;
+int windowPositionY, bkpPosY = 0;
 uint32_t windowWidth;
 int winFlashSize;
 int winGbBorderOn;
@@ -555,6 +556,7 @@ void LoadConfig()
 	videoOption = ReadPref("video", 2); // VIDEO_3X = 2
 	vsync = ReadPref("vsync", false);
 	windowHeight = ReadPref("windowHeight", 0);
+	windowMaximized = ReadPref("windowMaximized", 0);
 	windowPositionX = ReadPref("windowX", -1);
 	windowPositionY = ReadPref("windowY", -1);
 	windowWidth = ReadPref("windowWidth", 0);
