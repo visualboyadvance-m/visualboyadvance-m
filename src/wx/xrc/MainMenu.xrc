@@ -37,7 +37,6 @@
       <object class="wxMenu">
         <object class="wxMenuItem" name="LoadGameRecent">
           <label>Most _recent</label>
-          <accel>Ctrl+L</accel>
         </object>
         <object class="wxMenuItem" name="LoadGameAutoLoad">
           <label>_Auto load most recent</label>
@@ -46,43 +45,33 @@
         <object class="separator"/>
         <object class="wxMenuItem" name="LoadGame01">
           <label>_1</label>
-          <accel>F1</accel>
         </object>
         <object class="wxMenuItem" name="LoadGame02">
           <label>_2</label>
-          <accel>F2</accel>
         </object>
         <object class="wxMenuItem" name="LoadGame03">
           <label>_3</label>
-          <accel>F3</accel>
         </object>
         <object class="wxMenuItem" name="LoadGame04">
           <label>_4</label>
-          <accel>F4</accel>
         </object>
         <object class="wxMenuItem" name="LoadGame05">
           <label>_5</label>
-          <accel>F5</accel>
         </object>
         <object class="wxMenuItem" name="LoadGame06">
           <label>_6</label>
-          <accel>F6</accel>
         </object>
         <object class="wxMenuItem" name="LoadGame07">
           <label>_7</label>
-          <accel>F7</accel>
         </object>
         <object class="wxMenuItem" name="LoadGame08">
           <label>_8</label>
-          <accel>F8</accel>
         </object>
         <object class="wxMenuItem" name="LoadGame09">
           <label>_9</label>
-          <accel>F9</accel>
         </object>
         <object class="wxMenuItem" name="LoadGame10">
           <label>1_0</label>
-          <accel>F10</accel>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="Load">
@@ -102,48 +91,37 @@
       <object class="wxMenu">
         <object class="wxMenuItem" name="SaveGameOldest">
           <label>_Oldest slot</label>
-          <accel>Ctrl+S</accel>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="SaveGame01">
           <label>_1</label>
-          <accel>Shift+F1</accel>
         </object>
         <object class="wxMenuItem" name="SaveGame02">
           <label>_2</label>
-          <accel>Shift+F2</accel>
         </object>
         <object class="wxMenuItem" name="SaveGame03">
           <label>_3</label>
-          <accel>Shift+F3</accel>
         </object>
         <object class="wxMenuItem" name="SaveGame04">
           <label>_4</label>
-          <accel>Shift+F4</accel>
         </object>
         <object class="wxMenuItem" name="SaveGame05">
           <label>_5</label>
-          <accel>Shift+F5</accel>
         </object>
         <object class="wxMenuItem" name="SaveGame06">
           <label>_6</label>
-          <accel>Shift+F6</accel>
         </object>
         <object class="wxMenuItem" name="SaveGame07">
           <label>_7</label>
-          <accel>Shift+F7</accel>
         </object>
         <object class="wxMenuItem" name="SaveGame08">
           <label>_8</label>
-          <accel>Shift+F8</accel>
         </object>
         <object class="wxMenuItem" name="SaveGame09">
           <label>_9</label>
-          <accel>Shift+F9</accel>
         </object>
         <object class="wxMenuItem" name="SaveGame10">
           <label>1_0</label>
-          <accel>Shift+F10</accel>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="Save">
@@ -215,16 +193,13 @@
       <label>_Emulation</label>
       <object class="wxMenuItem" name="Pause">
         <label>_Pause</label>
-        <accel>Ctrl+P</accel>
         <checkable>1</checkable>
       </object>
       <object class="wxMenuItem" name="NextFrame">
         <label>_Next frame</label>
-        <accel>Ctrl+N</accel>
       </object>
       <object class="wxMenuItem" name="Rewind">
         <label>Re_wind</label>
-        <accel>Ctrl+B</accel>
       </object>
       <object class="separator"/>
       <object class="wxMenuItem" name="ToggleFullscreen">
@@ -262,7 +237,6 @@
       <object class="separator"/>
       <object class="wxMenuItem" name="Reset">
         <label>_Reset</label>
-        <accel>Ctrl+R</accel>
       </object>
     </object>
     <object class="wxMenu">
@@ -389,22 +363,18 @@
           <label>_Autofire</label>
           <object class="wxMenuItem" name="JoypadAutofireA">
             <label>_A</label>
-            <accel>Alt+1</accel>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutofireB">
             <label>_B</label>
-            <accel>Alt+2</accel>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutofireL">
             <label>_L</label>
-            <accel>Alt+3</accel>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutofireR">
             <label>_R</label>
-            <accel>Alt+4</accel>
             <checkable>1</checkable>
           </object>
         </object>
@@ -475,11 +445,9 @@
         <label>_Cheats</label>
         <object class="wxMenuItem" name="CheatsList">
           <label>List _cheats ...</label>
-          <accel>Ctrl+C</accel>
         </object>
         <object class="wxMenuItem" name="CheatsSearch">
           <label>Find c_heat ...</label>
-          <accel>Ctrl+F</accel>
         </object>
         <object class="separator"/>        
         <object class="wxMenuItem" name="CheatsAutoSaveLoad">
@@ -538,49 +506,41 @@
       <object class="wxMenu">
         <object class="wxMenuItem" name="VideoLayersBG0">
           <label>BG _0</label>
-          <accel>Ctrl+1</accel>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersBG1">
           <label>BG _1</label>
-          <accel>Ctrl+2</accel>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersBG2">
           <label>BG _2</label>
-          <accel>Ctrl+3</accel>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersBG3">
           <label>BG _3</label>
-          <accel>Ctrl+4</accel>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersOBJ">
           <label>_OBJ</label>
-          <accel>Ctrl+5</accel>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersWIN0">
           <label>_WIN 0</label>
-          <accel>Ctrl+6</accel>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersWIN1">
           <label>W_IN 1</label>
-          <accel>Ctrl+7</accel>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersOBJWIN">
           <label>O_BJ WIN</label>
-          <accel>Ctrl+8</accel>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
