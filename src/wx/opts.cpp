@@ -762,9 +762,11 @@ void update_opts()
     if (gopts.accels.size())
         cfg->SetPath(wxT("/Keyboard"));
 
+    int cmd_id = -1;
     for (wxAcceleratorEntry_v::iterator i = gopts.accels.begin();
          i < gopts.accels.end(); ++i) {
-        int cmd_id = i->GetCommand();
+        if (cmd_id == i->GetCommand()) continue;
+        cmd_id = i->GetCommand();
         int cmd;
 
         for (cmd = 0; cmd < ncmds; cmd++)
