@@ -791,6 +791,26 @@ void MainFrame::OnSize(wxSizeEvent& event)
     update_opts();
 }
 
+int MainFrame::FilterEvent(wxEvent& event)
+{
+    if (!IsPaused() && event.GetEventType() == wxEVT_KEY_DOWN)
+    {
+        wxKeyEvent& ke = (wxKeyEvent&)event;
+        int keyCode = ke.GetKeyCode();
+        int keyMod = ke.GetModifiers();
+        wxAcceleratorEntry_v accels = wxGetApp().GetAccels();
+        for (size_t i = 0; i < accels.size(); ++i)
+             if (keyCode == accels[i].GetKeyCode() && keyMod == accels[i].GetFlags())
+             {
+                 wxCommandEvent evh(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
+                 evh.SetEventObject(this);
+                 GetEventHandler()->ProcessEvent(evh);
+                 return true;
+	     }
+    }
+    return -1;
+}
+
 wxString MainFrame::GetGamePath(wxString path)
 {
     wxString game_path = path;
@@ -1192,24 +1212,9 @@ void MainFrame::IdentifyRom()
 // a few keys (e.g. only ctrl-x works for exit, but not esc & ctrl-q;
 // ctrl-w does not work for close).  It's possible another entity is
 // grabbing those keys, but I can't track it down.
-// FIXME: move this to MainFrame
-//int wxvbamApp::FilterEvent(wxEvent& event)
-//{
-//    //if(frame && frame->IsPaused(true))
-//    return -1;
-//
-//    if (event.GetEventType() == wxEVT_KEY_DOWN) {
-//        wxKeyEvent& ke = (wxKeyEvent&)event;
-//
-//        for (int i = 0; i < accels.size(); i++) {
-//            if (accels[i].GetKeyCode() == ke.GetKeyCode() && accels[i].GetFlags() == ke.GetModifiers()) {
-//                wxCommandEvent ev(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
-//                ev.SetEventObject(this);
-//                frame->GetEventHandler()->ProcessEvent(ev);
-//                return 1;
-//            }
-//        }
-//    }
-//
-//    return -1;
-//}
+int wxvbamApp::FilterEvent(wxEvent& event)
+{
+    if (frame)
+        return frame->FilterEvent(event);
+    return wxApp::FilterEvent(event);
+}
