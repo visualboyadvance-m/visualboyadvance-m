@@ -108,8 +108,13 @@ public:
     };
 #endif
     // without this, global accels don't always work
-    //int FilterEvent(wxEvent& event);
+    int FilterEvent(wxEvent&);
     wxAcceleratorEntry_v accels;
+
+    wxAcceleratorEntry_v GetAccels()
+    {
+	return accels;
+    }
 
     // the main configuration
     wxFileConfig* cfg;
@@ -229,6 +234,8 @@ public:
     void SetMenuOption(const char* menuName, int value);
 
     void SetJoystick();
+
+    int FilterEvent(wxEvent& event);
 
     GameArea* GetPanel()
     {
