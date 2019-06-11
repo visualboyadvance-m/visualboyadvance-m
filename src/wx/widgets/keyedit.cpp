@@ -124,10 +124,12 @@ wxString wxKeyTextCtrl::ToString(int mod, int key)
 
 #endif
 
-    if (s.empty() || (key != wxT('-') && s[s.size() - 1] == wxT('-'))
-                  || (key != wxT('+') && s[s.size() - 1] == wxT('+')))
+    if (s.empty() || (key != wxT('-') && s[s.size() - 1] == wxT('-') && s != wxT("Num -"))
+                  || (key != wxT('+') && s[s.size() - 1] == wxT('+') && s != wxT("Num +")))
+    {
         // bad key combo; probably also generates an assertion in wx
         return wxEmptyString;
+    }
 
 // hacky workaround for bug in wx 3.1+ not parsing key display names, or
 // parsing modifiers that aren't a combo correctly
