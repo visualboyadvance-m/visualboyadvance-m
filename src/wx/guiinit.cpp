@@ -1654,11 +1654,11 @@ public:
             else {
                 wxJoyKeyBinding_v a;
 
-                if (defkeys[i * 2].key)
-                    a.push_back(defkeys[i * 2]);
+                if (defkeys_keyboard[i].key)
+                    a.push_back(defkeys_keyboard[i]);
 
-                if (defkeys[i * 2 + 1].joy)
-                    a.push_back(defkeys[i * 2 + 1]);
+                if (defkeys_joystick[i].joy)
+                    a.push_back(defkeys_joystick[i]);
 
                 tc->SetValue(wxJoyKeyTextCtrl::ToString(a));
             }

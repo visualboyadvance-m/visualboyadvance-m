@@ -135,18 +135,22 @@ const wxString joynames[NUM_KEYS] = {
     wxT("Speed"), wxT("Capture"), wxT("GS")
 };
 
-wxJoyKeyBinding defkeys[NUM_KEYS * 2] = {
-    WJKB(WXK_UP), WJKB(1, WXJB_AXIS_MINUS, 1), WJKB(WXK_DOWN), WJKB(1, WXJB_AXIS_PLUS, 1),
-    WJKB(WXK_LEFT), WJKB(0, WXJB_AXIS_MINUS, 1), WJKB(WXK_RIGHT), WJKB(0, WXJB_AXIS_PLUS, 1),
-    WJKB(wxT('X')), WJKB(0, WXJB_BUTTON, 1), WJKB(wxT('Z')), WJKB(1, WXJB_BUTTON, 1),
-    WJKB(wxT('A')), WJKB(2, WXJB_BUTTON, 1), WJKB(wxT('S')), WJKB(3, WXJB_BUTTON, 1),
-    WJKB(WXK_BACK), WJKB(4, WXJB_BUTTON, 1), WJKB(WXK_RETURN), WJKB(5, WXJB_BUTTON, 1),
-    WJKB(WXK_NUMPAD_UP), WJKB(0), WJKB(WXK_NUMPAD_DOWN), WJKB(0),
-    WJKB(WXK_NUMPAD_LEFT), WJKB(0), WJKB(WXK_NUMPAD_RIGHT), WJKB(0),
-    WJKB(WXK_NUMPAD_PAGEUP), WJKB(0), WJKB(WXK_NUMPAD_PAGEDOWN), WJKB(0),
-    WJKB(wxT('W')), WJKB(0), WJKB(wxT('Q')), WJKB(0),
-    WJKB(WXK_SPACE), WJKB(0), WJKB(0), WJKB(0),
-    WJKB(0), WJKB(0)
+wxJoyKeyBinding defkeys_keyboard[NUM_KEYS] = {
+    WJKB(WXK_UP), WJKB(WXK_DOWN), WJKB(WXK_LEFT), WJKB(WXK_RIGHT),
+    WJKB(wxT('Z')), WJKB(wxT('X')), WJKB(wxT('A')), WJKB(wxT('S')),
+    WJKB(wxT('C')), WJKB(wxT('V')),
+    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(WXK_SPACE), WJKB(0), WJKB(0)
+};
+
+wxJoyKeyBinding defkeys_joystick[NUM_KEYS] = {
+    WJKB(1, WXJB_AXIS_MINUS, 1), WJKB(1, WXJB_AXIS_PLUS, 1), WJKB(0, WXJB_AXIS_MINUS, 1), WJKB(0, WXJB_AXIS_PLUS, 1),
+    WJKB(0, WXJB_BUTTON, 1), WJKB(1, WXJB_BUTTON, 1), WJKB(2, WXJB_BUTTON, 1), WJKB(3, WXJB_BUTTON, 1),
+    WJKB(4, WXJB_BUTTON, 1), WJKB(5, WXJB_BUTTON, 1),
+    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0), WJKB(0)
 };
 
 wxAcceleratorEntry_v sys_accels;
@@ -335,11 +339,10 @@ opts_t::opts_t()
     default_stick = 1;
 
     for (int i = 0; i < NUM_KEYS; i++) {
-        if (defkeys[i * 2].key)
-            joykey_bindings[0][i].push_back(defkeys[i * 2]);
-
-        if (defkeys[i * 2 + 1].joy)
-            joykey_bindings[0][i].push_back(defkeys[i * 2 + 1]);
+        if (defkeys_keyboard[i].key)
+            joykey_bindings[0][i].push_back(defkeys_keyboard[i]);
+        if (defkeys_joystick[i].key)
+            joykey_bindings[0][i].push_back(defkeys_joystick[i]);
     }
 
     recent = new wxFileHistory(10);
