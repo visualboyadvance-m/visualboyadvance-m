@@ -78,7 +78,10 @@ void GameArea::LoadGame(const wxString& name)
         }
     }
 
-    const char* fn = fnfn.GetFullPath().mb_str();
+    // auto-conversion of wxCharBuffer to const char * seems broken
+    // so save underlying wxCharBuffer (or create one of none is used)
+    wxCharBuffer fnb(fnfn.GetFullPath().mb_str(wxConvUTF8));
+    const char* fn = fnb.data();
     IMAGE_TYPE t = badfile ? IMAGE_UNKNOWN : utilFindType(fn);
 
     if (t == IMAGE_UNKNOWN) {
