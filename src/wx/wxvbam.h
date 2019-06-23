@@ -44,7 +44,7 @@
     #undef  wxLogDebug
     #define wxLogDebug(...)                                                                                                           \
     do {                                                                                                                              \
-        fputs(wxString::Format(wxDateTime::UNow().Format(wxT("%X")) + wxT(": Debug: ") + __VA_ARGS__).mb_str(), VBAM_DEBUG_STREAM); \
+        fputs(wxString::Format(wxDateTime::UNow().Format(wxT("%X")) + wxT(": Debug: ") + __VA_ARGS__).utf8_str(), VBAM_DEBUG_STREAM); \
         fputc('\n', VBAM_DEBUG_STREAM);                                                                                               \
     } while(0)
 #endif
