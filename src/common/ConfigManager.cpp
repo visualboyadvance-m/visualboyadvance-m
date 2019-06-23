@@ -663,7 +663,7 @@ const char* FindConfigFile(const char *name)
 
 	struct stat s;
 	std::string homeDirTmp = get_xdg_user_config_home() + DOT_DIR;
-	homeDir = (char *)homeDirTmp.c_str();
+	homeDir = strdup(homeDirTmp.c_str());
 	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
 		mkdir(homeDir, 0755);
 
