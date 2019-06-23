@@ -517,7 +517,7 @@ void LoadConfig()
 	languageOption = ReadPref("language", 1);
 	linkAuto = ReadPref("LinkAuto", 1);
 	linkHacks = ReadPref("LinkHacks", 0);
-	linkHostAddr = ReadPrefString("LinkHostAddr", "localhost");
+	linkHostAddr = ReadPrefString("LinkHost", "localhost");
 	linkMode = ReadPref("LinkMode", 0); // LINK_DISCONNECTED = 0
 	linkNumPlayers = ReadPref("LinkNumPlayers", 2);
 	linkTimeout = ReadPref("LinkTimeout", 1);

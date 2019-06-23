@@ -348,6 +348,8 @@ opts_t::opts_t()
     print_auto_page = true;
     autoPatch = true;
     onlineupdates = 1;
+    // quick fix for issues #48 and #445
+    link_host = "127.0.0.1";
 }
 
 // for binary_search() and friends
