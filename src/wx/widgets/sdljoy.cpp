@@ -9,16 +9,20 @@ struct wxSDLJoyState {
     SDL_Joystick* dev;
     int nax, nhat, nbut;
     short* curval;
+    bool is_valid;
     ~wxSDLJoyState()
     {
         if (dev)
             SDL_JoystickClose(dev);
+        if (curval)
+            delete[] curval;
     }
     wxSDLJoyState()
     {
 	dev = NULL;
 	nax = nhat = nbut = 0;
 	curval = NULL;
+        is_valid = true;
     }
 };
 
@@ -46,11 +50,25 @@ wxSDLJoy::wxSDLJoy(bool analog)
 
     for (int i = 0; i < njoy; i++) {
         SDL_Joystick* dev = joystate[i].dev = SDL_JoystickOpen(i);
+
         int nctrl = 0;
-        nctrl += joystate[i].nax = SDL_JoystickNumAxes(dev);
+        nctrl += joystate[i].nax  = SDL_JoystickNumAxes(dev);
         nctrl += joystate[i].nhat = SDL_JoystickNumHats(dev);
         nctrl += joystate[i].nbut = SDL_JoystickNumButtons(dev);
+
+        if (!nctrl) {
+            joystate[i].is_valid = false;
+
+            SDL_JoystickClose(dev);
+            joystate[i].dev = NULL;
+
+            continue;
+        }
+
         joystate[i].curval = new short[nctrl]{0};
+
+	// clear controls
+        memset(joystate[i].curval, 0, sizeof(short) * nctrl);
 
         // initialize axis previous value to initial state
 #if SDL_VERSION_ATLEAST(2, 0, 6)
@@ -60,8 +78,6 @@ wxSDLJoy::wxSDLJoy(bool analog)
             joystate[i].curval[j] = initial_state;
         }
 #endif
-
-        memset(joystate[i].curval, 0, sizeof(short) * nctrl);
     }
 }
 
@@ -139,6 +155,8 @@ void wxSDLJoy::Notify()
     wxEvtHandler* handler = evthandler ? evthandler : wxWindow::FindFocus();
 
     for (int i = 0; i < njoy; i++) {
+        if (!joystate[i].is_valid) continue;
+
         SDL_Joystick* dev = joystate[i].dev;
 
         if (dev) {
