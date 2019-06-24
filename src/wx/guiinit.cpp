@@ -2244,11 +2244,12 @@ void MainFrame::add_menu_accels(wxTreeCtrl* tc, wxTreeItemId& parent, wxMenu* me
             // but then if the user overides main menu, that req. is broken..
             wxString txt = (*mi)->GetItemLabelText();
 
-            for (int i = 0; i < 10; i++)
-                if (*mi == loadst_mi[i] || *mi == savest_mi[i]) {
-                    txt = cmdtab[i].name;
-                    break;
-                }
+            // It is not necessary unless we want the full description.
+            //for (int i = 0; i < 10; i++)
+            //    if (*mi == loadst_mi[i] || *mi == savest_mi[i]) {
+            //        txt = cmdtab[i].name;
+            //        break;
+            //    }
 
             tc->AppendItem(parent, txt, -1, -1, val);
         }
