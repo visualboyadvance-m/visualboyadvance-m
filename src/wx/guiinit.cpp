@@ -2244,13 +2244,28 @@ void MainFrame::add_menu_accels(wxTreeCtrl* tc, wxTreeItemId& parent, wxMenu* me
             // but then if the user overides main menu, that req. is broken..
             wxString txt = (*mi)->GetItemLabelText();
 
-            // It is not necessary unless we want the full description.
-            //for (int i = 0; i < 10; i++)
-            //    if (*mi == loadst_mi[i] || *mi == savest_mi[i]) {
-            //        txt = cmdtab[i].name;
-            //        break;
-            //    }
-
+            // we could probably have a global hashmap:
+            // cmdtab[i].cmd -> cmdtab[i]
+            for (int i = 0; i < 10; i++) {
+                wxString slot;
+                if (*mi == loadst_mi[i]) {
+                    slot.Printf(wxT("LoadGame%02d"), wxAtoi(txt));
+                }
+                else if (*mi == savest_mi[i]) {
+                    slot.Printf(wxT("SaveGame%02d"), wxAtoi(txt));
+                }
+                else {
+                    continue;
+                }
+                for (int j = 0; j < ncmds; ++j) {
+                    if (cmdtab[j].cmd == slot) {
+                        txt = cmdtab[j].name;
+                        break;
+                    }
+                }
+                // no need to look further
+                break;
+            }
             tc->AppendItem(parent, txt, -1, -1, val);
         }
     }
