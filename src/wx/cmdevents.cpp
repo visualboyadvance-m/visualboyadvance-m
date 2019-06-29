@@ -1353,7 +1353,20 @@ EVT_HANDLER(wxID_EXIT, "Exit")
 // Emulation menu
 EVT_HANDLER(Pause, "Pause (toggle)")
 {
-    GetMenuOptionBool("Pause", paused);
+    bool menuPress;
+    GetMenuOptionBool("Pause", menuPress);
+
+    if (paused == menuPress)
+    {
+	// used accelerator
+	paused = !paused;
+	SetMenuOption("Pause", paused ? 1 : 0);
+    }
+    else
+    {
+	// used menu item
+	paused = menuPress;
+    }
 
     if (paused)
         panel->Pause();
