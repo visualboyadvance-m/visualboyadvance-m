@@ -295,6 +295,27 @@
           <label>_Start in full screen</label>
           <checkable>1</checkable>
         </object>
+        <object class="wxMenu">
+          <label>_Quick resize</label>
+          <object class="wxMenuItem" name="SetSize1x">
+            <label>_1x</label>
+          </object>
+          <object class="wxMenuItem" name="SetSize2x">
+            <label>_2x</label>
+          </object>
+          <object class="wxMenuItem" name="SetSize3x">
+            <label>_3x</label>
+          </object>
+          <object class="wxMenuItem" name="SetSize4x">
+            <label>_4x</label>
+          </object>
+          <object class="wxMenuItem" name="SetSize5x">
+            <label>_5x</label>
+          </object>
+          <object class="wxMenuItem" name="SetSize6x">
+            <label>_6x</label>
+          </object>
+        </object>
         <object class="wxMenuItem" name="RetainAspect">
           <label>_Retain aspect ratio</label>
           <checkable>1</checkable>

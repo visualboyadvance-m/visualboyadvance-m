@@ -74,6 +74,13 @@ const wxAcceleratorEntry default_accels[] = {
     wxAcceleratorEntry(wxMOD_NONE, WXK_PAUSE, XRCID("Pause")),
     wxAcceleratorEntry(wxMOD_CMD, wxT('P'), XRCID("Pause")),
     wxAcceleratorEntry(wxMOD_CMD, wxT('R'), XRCID("Reset")),
+    // add shortcuts for original size multiplier #415
+    wxAcceleratorEntry(wxMOD_NONE, wxT('1'), XRCID("SetSize1x")),
+    wxAcceleratorEntry(wxMOD_NONE, wxT('2'), XRCID("SetSize2x")),
+    wxAcceleratorEntry(wxMOD_NONE, wxT('3'), XRCID("SetSize3x")),
+    wxAcceleratorEntry(wxMOD_NONE, wxT('4'), XRCID("SetSize4x")),
+    wxAcceleratorEntry(wxMOD_NONE, wxT('5'), XRCID("SetSize5x")),
+    wxAcceleratorEntry(wxMOD_NONE, wxT('6'), XRCID("SetSize6x")),
     // save oldest is more commonly used than save other
     //wxAcceleratorEntry(wxMOD_CMD, wxT('S'), XRCID("Save")),
     wxAcceleratorEntry(wxMOD_CMD, wxT('S'), XRCID("SaveGameOldest")),
