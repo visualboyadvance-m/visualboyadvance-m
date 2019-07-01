@@ -31,6 +31,7 @@ GameArea::GameArea()
     , rewind_time(0)
     , do_rewind(false)
     , rewind_mem(0)
+    , num_rewind_states(0)
     , loaded(IMAGE_UNKNOWN)
     , basic_width(GBAWidth)
     , basic_height(GBAHeight)
@@ -1860,6 +1861,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                     showSpeedTransparent);
 
                 free(buf);
+                buf = NULL;
             } else
                 panel->osdtext.clear();
         }
@@ -1978,9 +1980,11 @@ void DrawingPanelBase::OnSize(wxSizeEvent& ev)
 DrawingPanelBase::~DrawingPanelBase()
 {
     // pixbuf1 freed by emulator
-    if (pixbuf2)
+    if (pixbuf1 != pixbuf2 && pixbuf2)
+    {
         free(pixbuf2);
-
+        pixbuf2 = NULL;
+    }
     InterframeCleanup();
 
     if (nthreads) {
@@ -2004,7 +2008,7 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
     // 16 or 32, though
     if (gopts.filter == FF_NONE && gopts.ifb == IFB_NONE)
         // changing from 32 to 24 does not require regenerating color tables
-        systemColorDepth = 24;
+        systemColorDepth = 32;
     if (!did_init) DrawingPanelInit();
 }
 
