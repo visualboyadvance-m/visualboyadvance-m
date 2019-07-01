@@ -179,18 +179,14 @@ wxString wxJoyKeyTextCtrl::ToString(wxJoyKeyBinding_v keys, wxChar sep)
 // Note: wx translates unconditionally (2.8.12, 2.9.1)!
 // So any strings added below must also be translated unconditionally
 // \1 is joy #
-static wxRegEx joyre(_("^Joy([0-9]+)[-+]"), wxRE_EXTENDED | wxRE_ICASE);
+static wxRegEx joyre;
 // \1 is axis# and \2 is + or -
-static wxRegEx axre(_("Axis([0-9]+)([+-])"), wxRE_EXTENDED | wxRE_ICASE);
+static wxRegEx axre;
 // \1 is button#
-static wxRegEx butre(_("Button([0-9]+)"), wxRE_EXTENDED | wxRE_ICASE);
+static wxRegEx butre;
 // \1 is hat#, \3 is N, \4 is S, \5 is E, \6 is W, \7 is NE, \8 is SE,
 // \9 is SW, \10 is NW
-static wxRegEx hatre(_("Hat([0-9]+)((N|North|U|Up)|(S|South|D|Down)|"
-                       "(E|East|R|Right)|(W|West|L|Left)|"
-                       "(NE|NorthEast|UR|UpRight)|(SE|SouthEast|DR|DownRight)|"
-                       "(SW|SouthWest|DL|DownLeft)|(NW|NorthWest|UL|UpLeft))"),
-    wxRE_EXTENDED | wxRE_ICASE);
+static wxRegEx hatre;
 // use of static wxRegeEx is not thread-safe
 static wxCriticalSection recs;
 
@@ -206,6 +202,23 @@ static int simple_atoi(const wxString& s, int len)
     return ret;
 }
 
+static void CompileRegex()
+{
+    // \1 is joy #
+    joyre.Compile(_("^Joy([0-9]+)[-+]"), wxRE_EXTENDED | wxRE_ICASE);
+    // \1 is axis# and \2 is + or -
+    axre.Compile(_("Axis([0-9]+)([+-])"), wxRE_EXTENDED | wxRE_ICASE);
+    // \1 is button#
+    butre.Compile(_("Button([0-9]+)"), wxRE_EXTENDED | wxRE_ICASE);
+    // \1 is hat#, \3 is N, \4 is S, \5 is E, \6 is W, \7 is NE,
+    // \8 is SE, \9 is SW, \10 is NW
+    hatre.Compile(_("Hat([0-9]+)((N|North|U|Up)|(S|South|D|Down)|"
+                    "(E|East|R|Right)|(W|West|L|Left)|"
+                    "(NE|NorthEast|UR|UpRight)|(SE|SouthEast|DR|DownRight)|"
+                    "(SW|SouthWest|DL|DownLeft)|(NW|NorthWest|UL|UpLeft))"),
+                  wxRE_EXTENDED | wxRE_ICASE);
+}
+
 static bool ParseJoy(const wxString& s, int len, int& mod, int& key, int& joy)
 {
     mod = key = joy = 0;
@@ -216,6 +229,7 @@ static bool ParseJoy(const wxString& s, int len, int& mod, int& key, int& joy)
     wxCriticalSectionLocker lk(recs);
     size_t b, l;
 
+    CompileRegex();
     if (!joyre.Matches(s) || !joyre.GetMatch(&b, &l) || b)
         return false;
 
