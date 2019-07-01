@@ -7,9 +7,11 @@ src/wx/wxvbam.xrs
 build/*
 build32/*
 vsbuild/*
+cmake-build*
 dependencies/*
 vcpkg/*
 .vs/*
+.idea
 *.o
 *.so
 *.dll

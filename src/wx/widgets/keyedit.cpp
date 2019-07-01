@@ -124,8 +124,8 @@ wxString wxKeyTextCtrl::ToString(int mod, int key)
 
 #endif
 
-    if (s.empty() || (key != wxT('-') && s[s.size() - 1] == wxT('-') && s != wxT("Num -"))
-                  || (key != wxT('+') && s[s.size() - 1] == wxT('+') && s != wxT("Num +")))
+    if (s.empty() || (key != wxT('-') && s[s.size() - 1] == wxT('-') && s != _("Num") + wxT(" -"))
+                  || (key != wxT('+') && s[s.size() - 1] == wxT('+') && s != _("Num") + wxT(" +")))
     {
         // bad key combo; probably also generates an assertion in wx
         return wxEmptyString;
@@ -138,8 +138,8 @@ wxString wxKeyTextCtrl::ToString(int mod, int key)
     int keys_el_size = sizeof(keys_with_display_names)/sizeof(keys_with_display_names[0]);
 
     for (int i = 0; i < keys_el_size; i++) {
-        wxString name(keys_with_display_names[i].name);
-        wxString display_name(keys_with_display_names[i].display_name);
+        wxString name(_(keys_with_display_names[i].name));
+        wxString display_name(_(keys_with_display_names[i].display_name));
         name.MakeUpper();
         display_name.MakeUpper();
 
