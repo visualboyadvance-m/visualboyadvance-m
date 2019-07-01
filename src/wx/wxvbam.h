@@ -79,6 +79,7 @@ public:
     wxvbamApp()
         : wxApp()
         , pending_fullscreen(false)
+        , frame(NULL)
         , using_wayland(false)
     {
     }

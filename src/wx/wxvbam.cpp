@@ -677,6 +677,7 @@ wxvbamApp::~wxvbamApp() {
 	free(home);
 	home = NULL;
     }
+    delete overrides;
 }
 
 MainFrame::MainFrame()
