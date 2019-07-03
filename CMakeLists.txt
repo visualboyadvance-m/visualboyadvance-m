@@ -11,14 +11,11 @@ if(COMMAND cmake_policy)
     endif()
 endif()
 
-option(ENABLE_VCPKG "Use dependencies for Visual Studio from vcpkg" ON)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-set(NLS_DEFAULT ON)
-
-# get win32 deps before project declaration, because toolchain is set for vcpkg
 set(VCPKG_DEPS zlib libpng SDL2 SFML gettext wxWidgets)
 
-include(${CMAKE_SOURCE_DIR}/cmake/Win32Deps.cmake)
+include(Set-Toolchain-vcpkg)
 
 project(VBA-M C CXX)
 
@@ -34,7 +31,6 @@ endif()
 
 set(ALL_TARGETS fex visualboyadvance-m vbamcore vbam)
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 #Output all binaries at top level
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
@@ -124,7 +120,28 @@ endif()
 
 option(ENABLE_LTO "Compile with Link Time Optimization (gcc and clang only)" ${LTO_DEFAULT})
 
+if(WIN32 OR CMAKE_TOOLCHAIN_FILE MATCHES "[Mm][Ii][Nn][Gg][Ww]")
+    # Win32 deps submodule
+    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
+        set(git_checkout FALSE)
+
+        if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+            set(git_checkout TRUE)
+            execute_process(
+                COMMAND git submodule update --init --remote --recursive
+                RESULT_VARIABLE git_status
+                WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+            )
+        endif()
+
+        if(NOT (git_checkout AND git_status EQUAL 0))
+            message(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --remote --recursive")
+        endif()
+    endif()
+endif()
+
 if(MSVC)
+    include_directories("${CMAKE_SOURCE_DIR}/dependencies/msvc")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
@@ -938,5 +955,4 @@ set(CPACK_PACKAGE_VERSION_MAJOR "2")
 set(CPACK_PACKAGE_VERSION_MINOR "0")
 set(CPACK_PACKAGE_VERSION_PATCH "0-Git-" ${COMMITHASH})
 list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
-list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg")
 include(CPack)

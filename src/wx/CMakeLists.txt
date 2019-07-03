@@ -119,7 +119,7 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
 
     # SDL2.dll does not get copied to build dir
     if(NOT EXISTS ${CMAKE_BINARY_DIR}/SDL2.dll)
-        file(COPY ${_VCPKG_ROOT_DIR}/installed/${WINARCH}-windows${suffix}/${path_prefix}/bin/SDL2.dll DESTINATION ${CMAKE_BINARY_DIR})
+        file(COPY ${_VCPKG_ROOT_DIR}/installed/${WINARCH}-windows/${path_prefix}/bin/SDL2.dll DESTINATION ${CMAKE_BINARY_DIR})
     endif()
 else()
     if(CMAKE_BUILD_TYPE MATCHES Debug)
