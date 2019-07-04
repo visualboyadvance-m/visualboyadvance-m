@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-02 17:22-0800\n"
-"PO-Revision-Date: 2019-07-04 01:53+0000\n"
-"Last-Translator: bgK\n"
+"POT-Creation-Date: 2019-07-04 04:47+0000\n"
+"PO-Revision-Date: 2019-07-04 04:50+0000\n"
+"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Chinese Simplified (http://www.transifex.com/bgk/vba-m/language/zh-Hans/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +24,7 @@ msgstr ""
 "Language: zh-Hans\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../src/wx/cmdevents.cpp:101
+#: ../src/wx/cmdevents.cpp:102
 msgid ""
 "GameBoy Advance Files "
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
@@ -32,376 +32,378 @@ msgid ""
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "GBA 文件\n(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GB文件\n(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: ../src/wx/cmdevents.cpp:113
+#: ../src/wx/cmdevents.cpp:114
 msgid "Open ROM file"
 msgstr "打开 ROM 文件"
 
-#: ../src/wx/cmdevents.cpp:130
+#: ../src/wx/cmdevents.cpp:131
 msgid ""
 "GameBoy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "GB 文件 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: ../src/wx/cmdevents.cpp:137
+#: ../src/wx/cmdevents.cpp:138
 msgid "Open GB ROM file"
 msgstr "打开 GB ROM 文件"
 
-#: ../src/wx/cmdevents.cpp:154
+#: ../src/wx/cmdevents.cpp:155
 msgid ""
 "GameBoy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "GBC 文件\n(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: ../src/wx/cmdevents.cpp:161
+#: ../src/wx/cmdevents.cpp:162
 msgid "Open GBC ROM file"
 msgstr "打开 GBC ROM 文件"
 
-#: ../src/wx/cmdevents.cpp:556 ../src/wx/cmdevents.cpp:672
-#: ../src/wx/cmdevents.cpp:711 ../src/wx/cmdevents.cpp:784
+#: ../src/wx/cmdevents.cpp:558 ../src/wx/cmdevents.cpp:674
+#: ../src/wx/cmdevents.cpp:713 ../src/wx/cmdevents.cpp:786
 msgid "Unknown"
 msgstr "未知"
 
-#: ../src/wx/cmdevents.cpp:564
+#: ../src/wx/cmdevents.cpp:566
 msgid "ROM"
 msgstr "ROM"
 
-#: ../src/wx/cmdevents.cpp:568
+#: ../src/wx/cmdevents.cpp:570
 msgid "ROM+MBC1"
 msgstr "ROM+MBC1"
 
-#: ../src/wx/cmdevents.cpp:572
+#: ../src/wx/cmdevents.cpp:574
 msgid "ROM+MBC1+RAM"
 msgstr "ROM+MBC1+RAM"
 
-#: ../src/wx/cmdevents.cpp:576
+#: ../src/wx/cmdevents.cpp:578
 msgid "ROM+MBC1+RAM+BATT"
 msgstr "ROM+MBC1+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:580
+#: ../src/wx/cmdevents.cpp:582
 msgid "ROM+MBC2"
 msgstr "ROM+MBC2"
 
-#: ../src/wx/cmdevents.cpp:584
+#: ../src/wx/cmdevents.cpp:586
 msgid "ROM+MBC2+BATT"
 msgstr "ROM+MBC2+BATT"
 
-#: ../src/wx/cmdevents.cpp:588
+#: ../src/wx/cmdevents.cpp:590
 msgid "ROM+MMM01"
 msgstr "ROM+MMM01"
 
-#: ../src/wx/cmdevents.cpp:592
+#: ../src/wx/cmdevents.cpp:594
 msgid "ROM+MMM01+RAM"
 msgstr "ROM+MMM01+RAM"
 
-#: ../src/wx/cmdevents.cpp:596
+#: ../src/wx/cmdevents.cpp:598
 msgid "ROM+MMM01+RAM+BATT"
 msgstr "ROM+MMM01+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:600
+#: ../src/wx/cmdevents.cpp:602
 msgid "ROM+MBC3+TIMER+BATT"
 msgstr "ROM+MBC3+TIMER+BATT"
 
-#: ../src/wx/cmdevents.cpp:604
+#: ../src/wx/cmdevents.cpp:606
 msgid "ROM+MBC3+TIMER+RAM+BATT"
 msgstr "ROM+MBC3+TIMER+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:608
+#: ../src/wx/cmdevents.cpp:610
 msgid "ROM+MBC3"
 msgstr "ROM+MBC3"
 
-#: ../src/wx/cmdevents.cpp:612
+#: ../src/wx/cmdevents.cpp:614
 msgid "ROM+MBC3+RAM"
 msgstr "ROM+MBC3+RAM"
 
-#: ../src/wx/cmdevents.cpp:616
+#: ../src/wx/cmdevents.cpp:618
 msgid "ROM+MBC3+RAM+BATT"
 msgstr "ROM+MBC3+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:620
+#: ../src/wx/cmdevents.cpp:622
 msgid "ROM+MBC5"
 msgstr "ROM+MBC5"
 
-#: ../src/wx/cmdevents.cpp:624
+#: ../src/wx/cmdevents.cpp:626
 msgid "ROM+MBC5+RAM"
 msgstr "ROM+MBC5+RAM"
 
-#: ../src/wx/cmdevents.cpp:628
+#: ../src/wx/cmdevents.cpp:630
 msgid "ROM+MBC5+RAM+BATT"
 msgstr "ROM+MBC5+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:632
+#: ../src/wx/cmdevents.cpp:634
 msgid "ROM+MBC5+RUMBLE"
 msgstr "ROM+MBC5+RUMBLE"
 
-#: ../src/wx/cmdevents.cpp:636
+#: ../src/wx/cmdevents.cpp:638
 msgid "ROM+MBC5+RUMBLE+RAM"
 msgstr "ROM+MBC5+RUMBLE+RAM"
 
-#: ../src/wx/cmdevents.cpp:640
+#: ../src/wx/cmdevents.cpp:642
 msgid "ROM+MBC5+RUMBLE+RAM+BATT"
 msgstr "ROM+MBC5+RUMBLE+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:644
+#: ../src/wx/cmdevents.cpp:646
 msgid "ROM+MBC7+BATT"
 msgstr "ROM+MBC7+BATT"
 
-#: ../src/wx/cmdevents.cpp:648 ../src/wx/guiinit.cpp:727
+#: ../src/wx/cmdevents.cpp:650 ../src/wx/guiinit.cpp:734
 msgid "GameGenie"
 msgstr "GameGenie"
 
-#: ../src/wx/cmdevents.cpp:652
+#: ../src/wx/cmdevents.cpp:654
 msgid "GameShark V3.0"
 msgstr "GameShark V3.0"
 
-#: ../src/wx/cmdevents.cpp:656
+#: ../src/wx/cmdevents.cpp:658
 msgid "ROM+POCKET CAMERA"
 msgstr "ROM+POCKET CAMERA"
 
-#: ../src/wx/cmdevents.cpp:660
+#: ../src/wx/cmdevents.cpp:662
 msgid "ROM+BANDAI TAMA5"
 msgstr "ROM+BANDAI TAMA5"
 
-#: ../src/wx/cmdevents.cpp:664
+#: ../src/wx/cmdevents.cpp:666
 msgid "ROM+HuC-3"
 msgstr "ROM+HuC-3"
 
-#: ../src/wx/cmdevents.cpp:668
+#: ../src/wx/cmdevents.cpp:670
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: ../src/wx/cmdevents.cpp:718 ../src/wx/guiinit.cpp:1774
+#: ../src/wx/cmdevents.cpp:720 ../src/wx/guiinit.cpp:1814
 #: ../src/wx/xrc/DisplayConfig.xrc:85 ../src/wx/xrc/DisplayConfig.xrc:135
 #: ../src/wx/xrc/DisplayConfig.xrc:221
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:183
-#: ../src/wx/xrc/SoundConfig.xrc:223 ../src/wx/xrc/SoundConfig.xrc:313
+#: ../src/wx/xrc/GeneralConfig.xrc:152 ../src/wx/xrc/SoundConfig.xrc:219
+#: ../src/wx/xrc/SoundConfig.xrc:309 ../src/wx/xrc/SpeedupConfig.xrc:45
+#: ../src/wx/xrc/SpeedupConfig.xrc:120
 msgid "None"
 msgstr "无"
 
-#: ../src/wx/cmdevents.cpp:814 ../src/wx/cmdevents.cpp:830
+#: ../src/wx/cmdevents.cpp:819 ../src/wx/cmdevents.cpp:835
 msgid "Select Dot Code file"
 msgstr "选择点代码文件"
 
-#: ../src/wx/cmdevents.cpp:816 ../src/wx/cmdevents.cpp:832
+#: ../src/wx/cmdevents.cpp:821 ../src/wx/cmdevents.cpp:837
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr "电子阅读器点代码 (*.bin;*.raw)|*.bin;*.raw"
 
-#: ../src/wx/cmdevents.cpp:851 ../src/wx/cmdevents.cpp:1046
+#: ../src/wx/cmdevents.cpp:856 ../src/wx/cmdevents.cpp:1051
 msgid "Select battery file"
 msgstr "选择电池文件"
 
-#: ../src/wx/cmdevents.cpp:852 ../src/wx/cmdevents.cpp:1047
+#: ../src/wx/cmdevents.cpp:857 ../src/wx/cmdevents.cpp:1052
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "电池文件 (*.sav)|*.sav|记忆文件(*.dat)|*.dat"
 
-#: ../src/wx/cmdevents.cpp:860
+#: ../src/wx/cmdevents.cpp:865
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr "导入电池文件将删除之前保存的游戏进度 (直到下次写入前)。你确定要继续吗？"
 
-#: ../src/wx/cmdevents.cpp:861 ../src/wx/cmdevents.cpp:889
-#: ../src/wx/cmdevents.cpp:1009
+#: ../src/wx/cmdevents.cpp:866 ../src/wx/cmdevents.cpp:894
+#: ../src/wx/cmdevents.cpp:1014
 msgid "Confirm import"
 msgstr "确认导入"
 
-#: ../src/wx/cmdevents.cpp:867 ../src/wx/panel.cpp:357
+#: ../src/wx/cmdevents.cpp:872 ../src/wx/panel.cpp:344
 #, c-format
 msgid "Loaded battery %s"
 msgstr "读取电池 %s"
 
-#: ../src/wx/cmdevents.cpp:869
+#: ../src/wx/cmdevents.cpp:874
 #, c-format
 msgid "Error loading battery %s"
 msgstr "读取电池错误 %s"
 
-#: ../src/wx/cmdevents.cpp:878
+#: ../src/wx/cmdevents.cpp:883
 msgid "Select code file"
 msgstr "选择代码文件"
 
-#: ../src/wx/cmdevents.cpp:879
+#: ../src/wx/cmdevents.cpp:884
 msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr "Gameshark 代码文件 (*.spc;*.xpc)|*.spc;*.xpc"
 
-#: ../src/wx/cmdevents.cpp:879
+#: ../src/wx/cmdevents.cpp:884
 msgid "Gameshark Code File (*.gcf)|*.gcf"
 msgstr "Gameshark 代码文件 (*.gcf)|*.gcf"
 
-#: ../src/wx/cmdevents.cpp:888
+#: ../src/wx/cmdevents.cpp:893
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
 msgstr "导入代码将会重置之前已经读取的所有金手指代码。你确定要继续吗？"
 
-#: ../src/wx/cmdevents.cpp:905
+#: ../src/wx/cmdevents.cpp:910
 #, c-format
 msgid "Cannot open file %s"
 msgstr "无法打开文件 %s"
 
-#: ../src/wx/cmdevents.cpp:915
+#: ../src/wx/cmdevents.cpp:920
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "不支持的代码文件 %s"
 
-#: ../src/wx/cmdevents.cpp:985
+#: ../src/wx/cmdevents.cpp:990
 #, c-format
 msgid "Loaded code file %s"
 msgstr "已读取的代码文件 %s"
 
-#: ../src/wx/cmdevents.cpp:987
+#: ../src/wx/cmdevents.cpp:992
 #, c-format
 msgid "Error loading code file %s"
 msgstr "读取代码文件错误 %s"
 
-#: ../src/wx/cmdevents.cpp:998 ../src/wx/cmdevents.cpp:1074
+#: ../src/wx/cmdevents.cpp:1003 ../src/wx/cmdevents.cpp:1079
 msgid "Select snapshot file"
 msgstr "选择快照文件"
 
-#: ../src/wx/cmdevents.cpp:999
+#: ../src/wx/cmdevents.cpp:1004
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots "
 "(*.gsv)|*.gsv"
 msgstr "GS & PAC 快照 (*.sps;*.xps)|*.sps;*.xps|GameShark SP 快照 (*.gsv)|*.gsv"
 
-#: ../src/wx/cmdevents.cpp:999
+#: ../src/wx/cmdevents.cpp:1004
 msgid "Gameboy Snapshot (*.gbs)|*.gbs"
 msgstr "Gameboy 快照 (*.gbs)|*.gbs"
 
-#: ../src/wx/cmdevents.cpp:1008
+#: ../src/wx/cmdevents.cpp:1013
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr "导入快照将删除之前保存的游戏进度 (直到下次保存前)。你确定要继续吗？ "
 
-#: ../src/wx/cmdevents.cpp:1033
+#: ../src/wx/cmdevents.cpp:1038
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "已读取的快照文件 %s"
 
-#: ../src/wx/cmdevents.cpp:1035
+#: ../src/wx/cmdevents.cpp:1040
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "快照文件读取错误 %s"
 
-#: ../src/wx/cmdevents.cpp:1058 ../src/wx/panel.cpp:662
+#: ../src/wx/cmdevents.cpp:1063
 #, c-format
 msgid "Wrote battery %s"
 msgstr "写入电池 %s"
 
-#: ../src/wx/cmdevents.cpp:1060 ../src/wx/panel.cpp:664
+#: ../src/wx/cmdevents.cpp:1065 ../src/wx/panel.cpp:648
 #, c-format
 msgid "Error writing battery %s"
 msgstr "写入电池错误 %s"
 
-#: ../src/wx/cmdevents.cpp:1068
+#: ../src/wx/cmdevents.cpp:1073
 msgid "EEPROM saves cannot be exported"
 msgstr "EEPROM 存档无法导出"
 
-#: ../src/wx/cmdevents.cpp:1075
+#: ../src/wx/cmdevents.cpp:1080
 msgid "Gameshark Snapshot (*.sps)|*.sps"
 msgstr "Gameshark 快照 (*.sps)|*.sps"
 
-#: ../src/wx/cmdevents.cpp:1089
+#: ../src/wx/cmdevents.cpp:1094
 msgid "Exported from VisualBoyAdvance-M"
 msgstr "从 VBA-M 导出"
 
-#: ../src/wx/cmdevents.cpp:1101
+#: ../src/wx/cmdevents.cpp:1106
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "保存快照文件 %s "
 
-#: ../src/wx/cmdevents.cpp:1103
+#: ../src/wx/cmdevents.cpp:1108
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "保存快照文件错误 %s"
 
-#: ../src/wx/cmdevents.cpp:1118 ../src/wx/cmdevents.cpp:1199
-#: ../src/wx/cmdevents.cpp:1272 ../src/wx/cmdevents.cpp:1299
-#: ../src/wx/viewers.cpp:544 ../src/wx/viewers.cpp:748
-#: ../src/wx/viewsupt.cpp:1153
+#: ../src/wx/cmdevents.cpp:1123 ../src/wx/cmdevents.cpp:1204
+#: ../src/wx/cmdevents.cpp:1277 ../src/wx/cmdevents.cpp:1304
+#: ../src/wx/viewers.cpp:562 ../src/wx/viewers.cpp:772
+#: ../src/wx/viewsupt.cpp:1161
 msgid "Select output file"
 msgstr "选择输出文件"
 
-#: ../src/wx/cmdevents.cpp:1119 ../src/wx/viewsupt.cpp:1154
+#: ../src/wx/cmdevents.cpp:1124 ../src/wx/viewsupt.cpp:1162
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG 图片|*.png|BMP 图片|*.bmp"
 
-#: ../src/wx/cmdevents.cpp:1143 ../src/wx/sys.cpp:437
+#: ../src/wx/cmdevents.cpp:1148 ../src/wx/sys.cpp:435
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "写入快照 %s"
 
-#: ../src/wx/cmdevents.cpp:1167 ../src/wx/cmdevents.cpp:1240
+#: ../src/wx/cmdevents.cpp:1172 ../src/wx/cmdevents.cpp:1245
 msgid " files ("
 msgstr "文件 ("
 
-#: ../src/wx/cmdevents.cpp:1300 ../src/wx/cmdevents.cpp:1321
+#: ../src/wx/cmdevents.cpp:1305 ../src/wx/cmdevents.cpp:1326
 msgid "VBA Movie files|*.vmv"
 msgstr "VBA 影片文件|*.vmv"
 
-#: ../src/wx/cmdevents.cpp:1320
+#: ../src/wx/cmdevents.cpp:1325
 msgid "Select file"
 msgstr "选择文件"
 
-#: ../src/wx/cmdevents.cpp:1470 ../src/wx/cmdevents.cpp:1555
+#: ../src/wx/cmdevents.cpp:1488 ../src/wx/cmdevents.cpp:1573
 msgid "Select state file"
 msgstr "选择状态文件"
 
-#: ../src/wx/cmdevents.cpp:1471 ../src/wx/cmdevents.cpp:1556
+#: ../src/wx/cmdevents.cpp:1489 ../src/wx/cmdevents.cpp:1574
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "VisualBoyAdvance 保存游戏文件|*.sgm"
 
-#: ../src/wx/cmdevents.cpp:1788
+#: ../src/wx/cmdevents.cpp:1806
 msgid "Sound enabled"
 msgstr "开启声音"
 
-#: ../src/wx/cmdevents.cpp:1788
+#: ../src/wx/cmdevents.cpp:1806
 msgid "Sound disabled"
 msgstr "静音"
 
-#: ../src/wx/cmdevents.cpp:1801 ../src/wx/cmdevents.cpp:1815
+#: ../src/wx/cmdevents.cpp:1819 ../src/wx/cmdevents.cpp:1833
 #, c-format
 msgid "Volume: %d%%"
 msgstr "音量 %d%%"
 
-#: ../src/wx/cmdevents.cpp:1889
+#: ../src/wx/cmdevents.cpp:1907
 msgid "Set to 0 for pseudo tty"
 msgstr "给伪 tty 设置成 0"
 
-#: ../src/wx/cmdevents.cpp:1891
+#: ../src/wx/cmdevents.cpp:1909
 msgid "Port to wait for connection:"
 msgstr "准备连接的端口"
 
-#: ../src/wx/cmdevents.cpp:1892
+#: ../src/wx/cmdevents.cpp:1910
 msgid "GDB Connection"
 msgstr "GDB 连接"
 
-#: ../src/wx/cmdevents.cpp:1939
+#: ../src/wx/cmdevents.cpp:1957
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "准备连接到 %s"
 
-#: ../src/wx/cmdevents.cpp:1946
+#: ../src/wx/cmdevents.cpp:1964
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "准备连接的端口 %d"
 
-#: ../src/wx/cmdevents.cpp:1949
+#: ../src/wx/cmdevents.cpp:1967
 msgid "Waiting for GDB..."
 msgstr "等待 GDB..."
 
-#: ../src/wx/cmdevents.cpp:2412
+#: ../src/wx/cmdevents.cpp:2489
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "任天堂 GameBoy (+Color+Advance) 模拟器。"
 
-#: ../src/wx/cmdevents.cpp:2413
+#: ../src/wx/cmdevents.cpp:2490
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "版权 (C) 1999-2003 Forgotten\n版权 (C) 2004-2006 VBA 开发团队\n版权 (C) 2007-2017 VBA-M 开发团队"
 
-#: ../src/wx/cmdevents.cpp:2414
+#: ../src/wx/cmdevents.cpp:2491
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -417,11 +419,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "本程序是自由软件: 你可以在自由软件基金会公布的 GNU 通用发布\n许可证条款下重新分发和/或修改此软件，依自己意愿许可证 V2 版或\n任意更新版许可证选其一即可。\n\n本程序希望是能有作用的分发出去，但【无任何担保】；甚至没有隐含\n的【可销售性】或【特定用途的适用性】保证。请查阅 GNU 通用发布\n许可证了解更多信息。\n\n你应该已经收到 GNU 通用发布许可证的副本以及本程序。\n如果没有，请查看 http://www.gnu.org/licenses 。"
 
-#: ../src/wx/cmdevents.cpp:2673
+#: ../src/wx/cmdevents.cpp:2751
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "局域网连接已激活，禁用连接模式即可断开联网。"
 
-#: ../src/wx/cmdevents.cpp:2679
+#: ../src/wx/cmdevents.cpp:2757
 msgid "Network is not supported in local mode."
 msgstr "本地模式不支持网络"
 
@@ -481,626 +483,623 @@ msgstr ""
 msgid "FAudio: Creating source voice failed!"
 msgstr ""
 
-#: ../src/wx/gfxviewers.cpp:1131
+#: ../src/wx/gfxviewers.cpp:1141
 msgid "Select output file and type"
 msgstr "选择输出文件类型"
 
-#: ../src/wx/gfxviewers.cpp:1132
+#: ../src/wx/gfxviewers.cpp:1142
 msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
 msgstr "Windows 调色板 (*.pal)|*.pal|PaintShop 调色板 (*.pal)|*.pal|Adobe 色表 (*.act)|*.act"
 
-#: ../src/wx/guiinit.cpp:75
+#: ../src/wx/guiinit.cpp:77
 msgid "Start!"
 msgstr "开始！"
 
-#: ../src/wx/guiinit.cpp:79 ../src/wx/xrc/NetLink.xrc:86
+#: ../src/wx/guiinit.cpp:82 ../src/wx/xrc/NetLink.xrc:86
 msgid "Connect"
 msgstr "连接"
 
-#: ../src/wx/guiinit.cpp:93
+#: ../src/wx/guiinit.cpp:96
 msgid "You must enter a valid host name"
 msgstr "请输入正确的ip或域名"
 
-#: ../src/wx/guiinit.cpp:94
+#: ../src/wx/guiinit.cpp:97
 msgid "Host name invalid"
 msgstr "无效地址"
 
-#: ../src/wx/guiinit.cpp:112
+#: ../src/wx/guiinit.cpp:115
 msgid "Waiting for clients..."
 msgstr "等待客户端"
 
-#: ../src/wx/guiinit.cpp:113
+#: ../src/wx/guiinit.cpp:116
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr "服务器ip: %s\n"
 
-#: ../src/wx/guiinit.cpp:115
+#: ../src/wx/guiinit.cpp:118
 msgid "Waiting for connection..."
 msgstr "等待连接"
 
-#: ../src/wx/guiinit.cpp:116
+#: ../src/wx/guiinit.cpp:119
 #, c-format
 msgid "Connecting to %s\n"
 msgstr "正在连接 %s\n"
 
-#: ../src/wx/guiinit.cpp:149
+#: ../src/wx/guiinit.cpp:152
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "连接错误\n请重试"
 
-#: ../src/wx/guiinit.cpp:216 ../src/wx/guiinit.cpp:269
+#: ../src/wx/guiinit.cpp:219 ../src/wx/guiinit.cpp:272
 msgid "Select cheat file"
 msgstr "选择金手指"
 
-#: ../src/wx/guiinit.cpp:217
+#: ../src/wx/guiinit.cpp:220
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA 金手指列表 (*.clt)|*.clt|CHT 金手指列表 (*.cht)|*.cht"
 
-#: ../src/wx/guiinit.cpp:236 ../src/wx/panel.cpp:413
+#: ../src/wx/guiinit.cpp:239 ../src/wx/panel.cpp:401
 msgid "Loaded cheats"
 msgstr "打开金手指"
 
-#: ../src/wx/guiinit.cpp:270
+#: ../src/wx/guiinit.cpp:273
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "VBA 金手指列表 (*.clt)|*.clt"
 
-#: ../src/wx/guiinit.cpp:288
+#: ../src/wx/guiinit.cpp:291
 msgid "Saved cheats"
 msgstr "保存金手指"
 
-#: ../src/wx/guiinit.cpp:319 ../src/wx/guiinit.cpp:338
+#: ../src/wx/guiinit.cpp:322 ../src/wx/guiinit.cpp:341
 msgid "Restore old values?"
 msgstr "保存原有数值？"
 
-#: ../src/wx/guiinit.cpp:320 ../src/wx/guiinit.cpp:339
+#: ../src/wx/guiinit.cpp:323 ../src/wx/guiinit.cpp:342
 msgid "Removing cheats"
 msgstr "移除金手指"
 
-#: ../src/wx/guiinit.cpp:726 ../src/wx/xrc/JoyPanel.xrc:244
+#: ../src/wx/guiinit.cpp:733 ../src/wx/xrc/JoyPanel.xrc:244
 msgid "GameShark"
 msgstr "GameShark"
 
-#: ../src/wx/guiinit.cpp:729
+#: ../src/wx/guiinit.cpp:736
 msgid "Generic Code"
 msgstr "通用代码"
 
-#: ../src/wx/guiinit.cpp:730
+#: ../src/wx/guiinit.cpp:737
 msgid "GameShark Advance"
 msgstr "GameShark Advance"
 
-#: ../src/wx/guiinit.cpp:731
+#: ../src/wx/guiinit.cpp:738
 msgid "CodeBreaker Advance"
 msgstr "CodeBreaker Advance"
 
-#: ../src/wx/guiinit.cpp:732
+#: ../src/wx/guiinit.cpp:739
 msgid "Flashcart CHT"
 msgstr "Flashcart CHT"
 
-#: ../src/wx/guiinit.cpp:800 ../src/wx/guiinit.cpp:1052
+#: ../src/wx/guiinit.cpp:807 ../src/wx/guiinit.cpp:1062
 msgid "Number cannot be empty"
 msgstr "数字不能为空"
 
-#: ../src/wx/guiinit.cpp:838
+#: ../src/wx/guiinit.cpp:845
 #, c-format
 msgid "Search produced %d results.  Please refine better"
 msgstr "搜索到 %d 个结果，请继续"
 
-#: ../src/wx/guiinit.cpp:850
+#: ../src/wx/guiinit.cpp:857
 msgid "Search produced no results"
 msgstr "搜索不到结果"
 
-#: ../src/wx/guiinit.cpp:1010
+#: ../src/wx/guiinit.cpp:1020
 msgid "8-bit "
 msgstr "8 位"
 
-#: ../src/wx/guiinit.cpp:1014
+#: ../src/wx/guiinit.cpp:1024
 msgid "16-bit "
 msgstr "16 位"
 
-#: ../src/wx/guiinit.cpp:1018
+#: ../src/wx/guiinit.cpp:1028
 msgid "32-bit "
 msgstr "32 位"
 
-#: ../src/wx/guiinit.cpp:1024
+#: ../src/wx/guiinit.cpp:1034
 msgid "signed decimal"
 msgstr "十进制-有符号"
 
-#: ../src/wx/guiinit.cpp:1028
+#: ../src/wx/guiinit.cpp:1038
 msgid "unsigned decimal"
 msgstr "十进制-无符号"
 
-#: ../src/wx/guiinit.cpp:1032
+#: ../src/wx/guiinit.cpp:1042
 msgid "unsigned hexadecimal"
 msgstr "十六进制-无符号"
 
-#: ../src/wx/guiinit.cpp:1497
+#: ../src/wx/guiinit.cpp:1520
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr "%d frames = %.2f ms"
 
-#: ../src/wx/guiinit.cpp:1508
+#: ../src/wx/guiinit.cpp:1532
 msgid "Default device"
 msgstr "默认设备"
 
-#: ../src/wx/guiinit.cpp:1661
+#: ../src/wx/guiinit.cpp:1694
 msgid "Desktop mode"
 msgstr "窗口模式"
 
-#: ../src/wx/guiinit.cpp:1668
+#: ../src/wx/guiinit.cpp:1701
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: ../src/wx/guiinit.cpp:1813
+#: ../src/wx/guiinit.cpp:1855
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "在 %s 中没有可用插件"
 
-#: ../src/wx/guiinit.cpp:1833 ../src/wx/xrc/DisplayConfig.xrc:107
+#: ../src/wx/guiinit.cpp:1875 ../src/wx/xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "插件"
 
-#: ../src/wx/guiinit.cpp:1861
+#: ../src/wx/guiinit.cpp:1903
 msgid "Please select a plugin or a different filter"
 msgstr "请选择一个插件或过滤器"
 
-#: ../src/wx/guiinit.cpp:1862
+#: ../src/wx/guiinit.cpp:1904
 msgid "Plugin selection error"
 msgstr "插件选择错误"
 
-#: ../src/wx/guiinit.cpp:2058
+#: ../src/wx/guiinit.cpp:2103
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "将清除所有自定义加速，是否继续？"
 
-#: ../src/wx/guiinit.cpp:2058
+#: ../src/wx/guiinit.cpp:2103
 msgid "Confirm"
 msgstr "确定"
 
-#: ../src/wx/guiinit.cpp:2579
+#: ../src/wx/guiinit.cpp:2697
 msgid "Main icon not found"
 msgstr "未找到主图标"
 
-#: ../src/wx/guiinit.cpp:2597
+#: ../src/wx/guiinit.cpp:2715
 msgid "Main display panel not found"
 msgstr "未找到主显示面板"
 
-#: ../src/wx/guiinit.cpp:2711
+#: ../src/wx/guiinit.cpp:2829
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "复写菜单加速器：%s 对应 %s 和 %s; 保持优先"
 
-#: ../src/wx/guiinit.cpp:2725
+#: ../src/wx/guiinit.cpp:2843
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "菜单加速器 %s 为 %s 覆盖 %s 的默认值 ; 保留菜单"
 
-#: ../src/wx/guiinit.cpp:2831
+#: ../src/wx/guiinit.cpp:2949
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "无效的菜单项目 %s; 正在移除"
 
-#: ../src/wx/guiinit.cpp:3026
+#: ../src/wx/guiinit.cpp:3144
 msgid "Code"
 msgstr "代码"
 
-#: ../src/wx/guiinit.cpp:3035
+#: ../src/wx/guiinit.cpp:3153
 msgid "Description"
 msgstr "描述"
 
-#: ../src/wx/guiinit.cpp:3109 ../src/wx/xrc/CheatAdd.xrc:31
+#: ../src/wx/guiinit.cpp:3227 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "地址"
 
-#: ../src/wx/guiinit.cpp:3110
+#: ../src/wx/guiinit.cpp:3228
 msgid "Old Value"
 msgstr "原有数值"
 
-#: ../src/wx/guiinit.cpp:3111
+#: ../src/wx/guiinit.cpp:3229
 msgid "New Value"
 msgstr "新数值"
 
-#: ../src/wx/guiinit.cpp:3572
+#: ../src/wx/guiinit.cpp:3725
 msgid "Menu commands"
 msgstr "菜单命令"
 
-#: ../src/wx/guiinit.cpp:3595
+#: ../src/wx/guiinit.cpp:3748
 msgid "Other commands"
 msgstr "其他命令"
 
-#: ../src/wx/guiinit.cpp:3706
+#: ../src/wx/guiinit.cpp:3859
 msgid "JoyBus host invalid; disabling"
 msgstr "JoyBus 主机无效; 正在禁用"
 
-#: ../src/wx/opts.cpp:495 ../src/wx/opts.cpp:776
+#: ../src/wx/opts.cpp:536 ../src/wx/opts.cpp:831
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "无效的数值 %s 于选项 %s，合法数值类型为 %s%s%s"
 
-#: ../src/wx/opts.cpp:512 ../src/wx/opts.cpp:788
+#: ../src/wx/opts.cpp:553 ../src/wx/opts.cpp:843
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "无效的数值 %d 于选项 %s，合法数值类型为 %d - %d"
 
-#: ../src/wx/opts.cpp:519 ../src/wx/opts.cpp:796
+#: ../src/wx/opts.cpp:560 ../src/wx/opts.cpp:569 ../src/wx/opts.cpp:851
+#: ../src/wx/opts.cpp:859
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "无效的数值 %f 于选项 %s; 合法数值类型为 %f - %f"
 
-#: ../src/wx/opts.cpp:578 ../src/wx/opts.cpp:599 ../src/wx/opts.cpp:865
-#: ../src/wx/opts.cpp:891
+#: ../src/wx/opts.cpp:628 ../src/wx/opts.cpp:649 ../src/wx/opts.cpp:928
+#: ../src/wx/opts.cpp:954
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "%s 键不能绑定为 %s"
 
-#: ../src/wx/opts.cpp:759
+#: ../src/wx/opts.cpp:814
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "无效设置 %s - %s 已忽略"
 
-#: ../src/wx/panel.cpp:86
+#: ../src/wx/panel.cpp:90
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s 不是有效的 ROM 文件"
 
-#: ../src/wx/panel.cpp:87 ../src/wx/panel.cpp:144 ../src/wx/panel.cpp:219
+#: ../src/wx/panel.cpp:91 ../src/wx/panel.cpp:148 ../src/wx/panel.cpp:209
 msgid "Problem loading file"
 msgstr "载入文件错误"
 
-#: ../src/wx/panel.cpp:143
+#: ../src/wx/panel.cpp:147
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "无法载入 Game Boy ROM %s"
 
-#: ../src/wx/panel.cpp:195 ../src/wx/panel.cpp:288
+#: ../src/wx/panel.cpp:185 ../src/wx/panel.cpp:275
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "无法载入 BIOS %s"
 
-#: ../src/wx/panel.cpp:218
+#: ../src/wx/panel.cpp:208
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "无法载入 Game Boy Advance ROM %s"
 
-#: ../src/wx/panel.cpp:446
+#: ../src/wx/panel.cpp:434
 msgid " player "
 msgstr "玩家"
 
-#: ../src/wx/panel.cpp:606
+#: ../src/wx/panel.cpp:596
 #, c-format
 msgid "Loaded state %s"
 msgstr "载入状态 %s"
 
-#: ../src/wx/panel.cpp:606
+#: ../src/wx/panel.cpp:596
 #, c-format
 msgid "Error loading state %s"
 msgstr "载入状态错误 %s"
 
-#: ../src/wx/panel.cpp:630
+#: ../src/wx/panel.cpp:620
 #, c-format
 msgid "Saved state %s"
 msgstr "保存状态 %s"
 
-#: ../src/wx/panel.cpp:630
+#: ../src/wx/panel.cpp:620
 #, c-format
 msgid "Error saving state %s"
 msgstr "保存状态错误 %s"
 
-#: ../src/wx/panel.cpp:843
+#: ../src/wx/panel.cpp:824
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "不支持 %dx%d-%d@%d 全屏模式，选择其他模式"
 
-#: ../src/wx/panel.cpp:881
+#: ../src/wx/panel.cpp:862
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "不支持 %dx%d-%d@%d 全屏模式"
 
-#: ../src/wx/panel.cpp:886
+#: ../src/wx/panel.cpp:867
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "有效模式: %dx%d-%d@%d"
 
-#: ../src/wx/panel.cpp:894
+#: ../src/wx/panel.cpp:875
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "选择模式 %dx%d-%d@%d"
 
-#: ../src/wx/panel.cpp:898
+#: ../src/wx/panel.cpp:879
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "切换模式失败 %dx%d-%d@%d"
 
-#: ../src/wx/panel.cpp:970
+#: ../src/wx/panel.cpp:962
 msgid "Not a valid GBA cartridge"
 msgstr "无效 GBA 卡带"
 
-#: ../src/wx/panel.cpp:1083
+#: ../src/wx/panel.cpp:1100
 msgid "No memory for rewinding"
 msgstr "没有用于回退的内存"
 
-#: ../src/wx/panel.cpp:1093
+#: ../src/wx/panel.cpp:1110
 msgid "Error writing rewind state"
 msgstr "回写状态错误"
 
-#: ../src/wx/panel.cpp:2262
+#: ../src/wx/panel.cpp:2323
 msgid "memory allocation error"
 msgstr "内存分配错误"
 
-#: ../src/wx/panel.cpp:2265
+#: ../src/wx/panel.cpp:2326
 msgid "error initializing codec"
 msgstr "初始化代码错误"
 
-#: ../src/wx/panel.cpp:2268
+#: ../src/wx/panel.cpp:2329
 msgid "error writing to output file"
 msgstr "回写输出文件错误"
 
-#: ../src/wx/panel.cpp:2271
+#: ../src/wx/panel.cpp:2332
 msgid "can't guess output format from file name"
 msgstr "无法从文件名猜测输出格式"
 
-#: ../src/wx/panel.cpp:2276
+#: ../src/wx/panel.cpp:2337
 msgid "programming error; aborting!"
 msgstr "程序错误!"
 
-#: ../src/wx/panel.cpp:2290 ../src/wx/panel.cpp:2321
+#: ../src/wx/panel.cpp:2348 ../src/wx/panel.cpp:2376
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能开始录制到 %s (%s)"
 
-#: ../src/wx/panel.cpp:2349
+#: ../src/wx/panel.cpp:2404
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "录制音频/视频时错误 (%s); 正在中止"
 
-#: ../src/wx/panel.cpp:2355
+#: ../src/wx/panel.cpp:2410
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "录制音频时错误 (%s); 正在中止"
 
-#: ../src/wx/panel.cpp:2365
+#: ../src/wx/panel.cpp:2420
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "录制视频时错误 (%s); 正在中止"
 
-#: ../src/wx/sys.cpp:119 ../src/wx/sys.cpp:175
+#: ../src/wx/sys.cpp:117 ../src/wx/sys.cpp:173
 msgid "No game in progress to record"
 msgstr "没有游戏在进行录制"
 
-#: ../src/wx/sys.cpp:132
+#: ../src/wx/sys.cpp:130
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "无法打开输出文件 %s"
 
-#: ../src/wx/sys.cpp:139 ../src/wx/sys.cpp:159 ../src/wx/sys.cpp:298
+#: ../src/wx/sys.cpp:137 ../src/wx/sys.cpp:157 ../src/wx/sys.cpp:296
 msgid "Error writing game recording"
 msgstr "回写游戏录像错误"
 
-#: ../src/wx/sys.cpp:180
+#: ../src/wx/sys.cpp:178
 msgid "Cannot play game recording while recording"
 msgstr "在录制时无法播放游戏录像"
 
-#: ../src/wx/sys.cpp:193
+#: ../src/wx/sys.cpp:191
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "无法打开录像文件 %s"
 
-#: ../src/wx/sys.cpp:200 ../src/wx/sys.cpp:210
+#: ../src/wx/sys.cpp:198 ../src/wx/sys.cpp:208
 msgid "Error reading game recording"
 msgstr "读取游戏录像错误"
 
-#: ../src/wx/sys.cpp:309
+#: ../src/wx/sys.cpp:307
 msgid "Playback ended"
 msgstr "回放已结束"
 
-#: ../src/wx/sys.cpp:328
+#: ../src/wx/sys.cpp:326
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: ../src/wx/sys.cpp:336
+#: ../src/wx/sys.cpp:334
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: ../src/wx/sys.cpp:752 ../src/wx/xrc/GBPrinter.xrc:65
+#: ../src/wx/sys.cpp:750 ../src/wx/xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "丢弃(&D)"
 
-#: ../src/wx/sys.cpp:785
+#: ../src/wx/sys.cpp:784
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "图像文件 (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: ../src/wx/sys.cpp:794
+#: ../src/wx/sys.cpp:793
 msgid "Save printer image to"
 msgstr "保存打印图像到"
 
-#: ../src/wx/sys.cpp:808 ../src/wx/sys.cpp:989
+#: ../src/wx/sys.cpp:807 ../src/wx/sys.cpp:990
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "回写打印输出到 %s"
 
-#: ../src/wx/sys.cpp:813 ../src/wx/sys.cpp:884
+#: ../src/wx/sys.cpp:812 ../src/wx/sys.cpp:883
 msgid "&Close"
 msgstr "关闭(&C)"
 
-#: ../src/wx/sys.cpp:879
+#: ../src/wx/sys.cpp:878
 msgid "Printed"
 msgstr "印发了"
 
-#: ../src/wx/sys.cpp:1175
+#: ../src/wx/sys.cpp:1178
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "打开伪 tty 错误: %s"
 
-#: ../src/wx/sys.cpp:1274
+#: ../src/wx/sys.cpp:1277
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "设置服务器接口错误 (%d)"
 
-#: ../src/wx/viewers.cpp:542
+#: ../src/wx/viewers.cpp:560
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "文本文件 (*.txt;*.log)|*.txt;*.log|"
 
-#: ../src/wx/viewers.cpp:675 ../src/wx/viewers.cpp:746
+#: ../src/wx/viewers.cpp:698 ../src/wx/viewers.cpp:770
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
 msgstr "内存转储 (*.dmp;*.bin)|*.dmp;*.bin|"
 
-#: ../src/wx/viewers.cpp:677
+#: ../src/wx/viewers.cpp:700
 msgid "Select memory dump file"
 msgstr "选择内存转储文件"
 
-#: ../src/wx/viewers.cpp:790
+#: ../src/wx/viewers.cpp:814
 msgid "0x00000000 - BIOS"
 msgstr "0x00000000 - BIOS"
 
-#: ../src/wx/viewers.cpp:791
+#: ../src/wx/viewers.cpp:815
 msgid "0x02000000 - WRAM"
 msgstr "0x02000000 - WRAM"
 
-#: ../src/wx/viewers.cpp:792
+#: ../src/wx/viewers.cpp:816
 msgid "0x03000000 - IRAM"
 msgstr "0x03000000 - IRAM"
 
-#: ../src/wx/viewers.cpp:793
+#: ../src/wx/viewers.cpp:817
 msgid "0x04000000 - I/O"
 msgstr "0x04000000 - I/O"
 
-#: ../src/wx/viewers.cpp:794
+#: ../src/wx/viewers.cpp:818
 msgid "0x05000000 - PALETTE"
 msgstr "0x05000000 - 调色板"
 
-#: ../src/wx/viewers.cpp:795
+#: ../src/wx/viewers.cpp:819
 msgid "0x06000000 - VRAM"
 msgstr "0x06000000 - VRAM"
 
-#: ../src/wx/viewers.cpp:796
+#: ../src/wx/viewers.cpp:820
 msgid "0x07000000 - OAM"
 msgstr "0x07000000 - OAM"
 
-#: ../src/wx/viewers.cpp:797
+#: ../src/wx/viewers.cpp:821
 msgid "0x08000000 - ROM"
 msgstr "0x08000000 - ROM"
 
-#: ../src/wx/viewers.cpp:898
+#: ../src/wx/viewers.cpp:924
 msgid "0x0000 - ROM"
 msgstr "0x0000 - ROM"
 
-#: ../src/wx/viewers.cpp:899
+#: ../src/wx/viewers.cpp:925
 msgid "0x4000 - ROM"
 msgstr "0x4000 - ROM"
 
-#: ../src/wx/viewers.cpp:900
+#: ../src/wx/viewers.cpp:926
 msgid "0x8000 - VRAM"
 msgstr "0x8000 - VRAM"
 
-#: ../src/wx/viewers.cpp:901
+#: ../src/wx/viewers.cpp:927
 msgid "0xA000 - SRAM"
 msgstr "0xA000 - SRAM"
 
-#: ../src/wx/viewers.cpp:902
+#: ../src/wx/viewers.cpp:928
 msgid "0xC000 - RAM"
 msgstr "0xC000 - RAM"
 
-#: ../src/wx/viewers.cpp:903
+#: ../src/wx/viewers.cpp:929
 msgid "0xD000 - WRAM"
 msgstr "0xD000 - WRAM"
 
-#: ../src/wx/viewers.cpp:904
+#: ../src/wx/viewers.cpp:930
 msgid "0xFF00 - I/O"
 msgstr "0xFF00 - I/O"
 
-#: ../src/wx/viewers.cpp:905
+#: ../src/wx/viewers.cpp:931
 msgid "0xFF80 - RAM"
 msgstr "0xFF80 - RAM"
 
-#: ../src/wx/viewsupt.cpp:765
+#: ../src/wx/viewsupt.cpp:769
 msgid "R:"
 msgstr "R:"
 
-#: ../src/wx/viewsupt.cpp:770
+#: ../src/wx/viewsupt.cpp:774
 msgid "G:"
 msgstr "G:"
 
-#: ../src/wx/viewsupt.cpp:775
+#: ../src/wx/viewsupt.cpp:779
 msgid "B:"
 msgstr "B:"
 
-#: ../src/wx/wxvbam.cpp:43
+#: ../src/wx/wxvbam.cpp:201
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: ../src/wx/wxvbam.cpp:165
-msgid "vbam"
-msgstr "  vbam"
-
-#: ../src/wx/wxvbam.cpp:366
+#: ../src/wx/wxvbam.cpp:415
 msgid "Could not create main window"
 msgstr "无法创建主窗口"
 
-#: ../src/wx/wxvbam.cpp:396
+#: ../src/wx/wxvbam.cpp:482
 msgid "Save built-in XRC file and exit"
 msgstr "保存内置 XRC 文件并退出"
 
-#: ../src/wx/wxvbam.cpp:398
+#: ../src/wx/wxvbam.cpp:485
 msgid "Save built-in vba-over.ini and exit"
 msgstr "保存内置 vba-over.ini 文件并退出"
 
-#: ../src/wx/wxvbam.cpp:400
+#: ../src/wx/wxvbam.cpp:488
 msgid "Print configuration path and exit"
 msgstr "打印配置路径并退出"
 
-#: ../src/wx/wxvbam.cpp:402
+#: ../src/wx/wxvbam.cpp:491
 msgid "Start in full-screen mode"
 msgstr "以全屏模式启动"
 
-#: ../src/wx/wxvbam.cpp:405
+#: ../src/wx/wxvbam.cpp:495
 msgid "Delete shared link state first, if it exists"
 msgstr "请先删除共享链接状态，如果存在的话"
 
-#: ../src/wx/wxvbam.cpp:412
+#: ../src/wx/wxvbam.cpp:502
 msgid "List all settable options and exit"
 msgstr "列出所有可设置的选项并退出"
 
-#: ../src/wx/wxvbam.cpp:414
+#: ../src/wx/wxvbam.cpp:505
 msgid "ROM file"
 msgstr "ROM 文件"
 
-#: ../src/wx/wxvbam.cpp:416
+#: ../src/wx/wxvbam.cpp:507
 msgid "<config>=<value>"
 msgstr "<设置>=<值>"
 
-#: ../src/wx/wxvbam.cpp:447
+#: ../src/wx/wxvbam.cpp:538
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr "配置/建构错误：无法找到内置 xrc 文件"
 
-#: ../src/wx/wxvbam.cpp:455
+#: ../src/wx/wxvbam.cpp:546
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "将内置配置写入到 %s。\n如要覆盖，请删除所有未更改的根节点。首先在以下搜索覆盖内置路径里找到任意 .xrc 或 .xrs 文件中正确名称的根节点："
 
-#: ../src/wx/wxvbam.cpp:469
+#: ../src/wx/wxvbam.cpp:561
 msgid "Configuration is read from, in order:"
 msgstr "配置按顺序从中读取："
 
-#: ../src/wx/wxvbam.cpp:482
+#: ../src/wx/wxvbam.cpp:575
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
 msgstr "将内置覆盖文件写入到 %s\n 如要覆盖，请删除所有未更改的部分。首个找到的部分从以下搜索路径使用："
 
-#: ../src/wx/wxvbam.cpp:488
+#: ../src/wx/wxvbam.cpp:581
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\t内置"
 
-#: ../src/wx/wxvbam.cpp:498
+#: ../src/wx/wxvbam.cpp:592
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1108,13 +1107,13 @@ msgid ""
 "\n"
 msgstr "如果在用户界面中进行了任何配置更改，则保存从命令行设置的选项。\n\n对于标志选项，true 和 false 分别指定为 1 和 0。\n\n"
 
-#: ../src/wx/wxvbam.cpp:519
+#: ../src/wx/wxvbam.cpp:613
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "可用于键盘 /* 选项的命令是:\n\n"
 
-#: ../src/wx/wxvbam.cpp:552
+#: ../src/wx/wxvbam.cpp:647
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "错误的配置选项或多个 ROM 文件被指定:\n"
 
@@ -1139,120 +1138,47 @@ msgstr "XAudio2: 创建源语音失败！"
 msgid "Unable to load dialog %s from resources"
 msgstr "无法从源加载对话框 %s "
 
-#: ../src/wx/widgets/joyedit.cpp:97
-#, c-format
-msgid "Joy%d-"
-msgstr "Joy%d-"
-
-#: ../src/wx/widgets/joyedit.cpp:102
-#, c-format
-msgid "Axis%d+"
-msgstr "Axis%d+"
-
-#: ../src/wx/widgets/joyedit.cpp:106
-#, c-format
-msgid "Axis%d-"
-msgstr "Axis%d-"
-
-#: ../src/wx/widgets/joyedit.cpp:110
-#, c-format
-msgid "Button%d"
-msgstr "Button%d"
-
-#: ../src/wx/widgets/joyedit.cpp:114
-#, c-format
-msgid "Hat%dN"
-msgstr "Hat%dN"
-
-#: ../src/wx/widgets/joyedit.cpp:118
-#, c-format
-msgid "Hat%dS"
-msgstr "Hat%dS"
-
-#: ../src/wx/widgets/joyedit.cpp:122
-#, c-format
-msgid "Hat%dW"
-msgstr "Hat%dW"
-
-#: ../src/wx/widgets/joyedit.cpp:126
-#, c-format
-msgid "Hat%dE"
-msgstr "Hat%dE"
-
-#: ../src/wx/widgets/joyedit.cpp:130
-#, c-format
-msgid "Hat%dNW"
-msgstr "Hat%dNW"
-
-#: ../src/wx/widgets/joyedit.cpp:134
-#, c-format
-msgid "Hat%dNE"
-msgstr "Hat%dNE"
-
-#: ../src/wx/widgets/joyedit.cpp:138
-#, c-format
-msgid "Hat%dSW"
-msgstr "Hat%dSW"
-
-#: ../src/wx/widgets/joyedit.cpp:142
-#, c-format
-msgid "Hat%dSE"
-msgstr "Hat%dSE"
-
-#: ../src/wx/widgets/joyedit.cpp:175
-msgid "^Joy([0-9]+)[-+]"
-msgstr "^Joy([0-9]+)[-+]"
-
-#: ../src/wx/widgets/joyedit.cpp:177
-msgid "Axis([0-9]+)([+-])"
-msgstr "Axis([0-9]+)([+-])"
-
-#: ../src/wx/widgets/joyedit.cpp:179
-msgid "Button([0-9]+)"
-msgstr "Button([0-9]+)"
-
-#: ../src/wx/widgets/joyedit.cpp:182
-msgid ""
-"Hat([0-9]+)((N|North|U|Up)|(S|South|D|Down)|(E|East|R|Right)|(W|West|L|Left)|(NE|NorthEast|UR|UpRight)|(SE|SouthEast|DR|DownRight)|(SW|SouthWest|DL|DownLeft)|(NW|NorthWest|UL|UpLeft))"
-msgstr "Hat([0-9]+)((N|North|U|Up)|(S|South|D|Down)|(E|East|R|Right)|(W|West|L|Left)|(NE|NorthEast|UR|UpRight)|(SE|SouthEast|DR|DownRight)|(SW|SouthWest|DL|DownLeft)|(NW|NorthWest|UL|UpLeft))"
-
-#: ../src/wx/widgets/keyedit.cpp:93 ../src/wx/widgets/keyedit.cpp:224
+#: ../src/wx/widgets/keyedit.cpp:94 ../src/wx/widgets/keyedit.cpp:232
 msgid "SHIFT"
 msgstr "SHIFT"
 
-#: ../src/wx/widgets/keyedit.cpp:97 ../src/wx/widgets/keyedit.cpp:223
+#: ../src/wx/widgets/keyedit.cpp:98 ../src/wx/widgets/keyedit.cpp:231
 msgid "ALT"
 msgstr "ALT"
 
-#: ../src/wx/widgets/keyedit.cpp:101 ../src/wx/widgets/keyedit.cpp:231
+#: ../src/wx/widgets/keyedit.cpp:102 ../src/wx/widgets/keyedit.cpp:239
 msgid "CTRL"
 msgstr "CTRL"
 
-#: ../src/wx/widgets/keyedit.cpp:107 ../src/wx/widgets/keyedit.cpp:225
+#: ../src/wx/widgets/keyedit.cpp:108 ../src/wx/widgets/keyedit.cpp:233
 msgid "RAWCTRL"
 msgstr "RAWCTRL"
 
-#: ../src/wx/widgets/keyedit.cpp:121 ../src/wx/widgets/keyedit.cpp:192
+#: ../src/wx/widgets/keyedit.cpp:122 ../src/wx/widgets/keyedit.cpp:200
 msgid "Meta-"
 msgstr "Meta-"
 
-#: ../src/wx/widgets/keyedit.cpp:193
+#: ../src/wx/widgets/keyedit.cpp:127 ../src/wx/widgets/keyedit.cpp:128
+msgid "Num"
+msgstr ""
+
+#: ../src/wx/widgets/keyedit.cpp:201
 msgid "Meta+"
 msgstr "Meta+"
 
-#: ../src/wx/widgets/keyedit.cpp:226
+#: ../src/wx/widgets/keyedit.cpp:234
 msgid "RAW_CTRL"
 msgstr "RAW_CTRL"
 
-#: ../src/wx/widgets/keyedit.cpp:227
+#: ../src/wx/widgets/keyedit.cpp:235
 msgid "RAWCONTROL"
 msgstr "RAWCONTROL"
 
-#: ../src/wx/widgets/keyedit.cpp:228
+#: ../src/wx/widgets/keyedit.cpp:236
 msgid "RAW_CONTROL"
 msgstr "RAW_CONTROL"
 
-#: ../src/wx/widgets/keyedit.cpp:232
+#: ../src/wx/widgets/keyedit.cpp:240
 msgid "CONTROL"
 msgstr "CONTROL"
 
@@ -1400,7 +1326,7 @@ msgstr "添加金手指(&A)"
 msgid "Edit Cheat"
 msgstr "编辑金手指"
 
-#: ../src/wx/xrc/CheatEdit.xrc:31 ../src/wx/xrc/MainMenu.xrc:276
+#: ../src/wx/xrc/CheatEdit.xrc:31 ../src/wx/xrc/MainMenu.xrc:250
 msgid "&Type"
 msgstr "类型(&T)"
 
@@ -1967,11 +1893,11 @@ msgstr "Game Boy Color"
 msgid "Super Game Boy"
 msgstr "Super Game Boy"
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:32 ../src/wx/xrc/SoundConfig.xrc:294
+#: ../src/wx/xrc/GameBoyConfig.xrc:32 ../src/wx/xrc/SoundConfig.xrc:290
 msgid "Game Boy"
 msgstr "Game Boy"
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:33 ../src/wx/xrc/SoundConfig.xrc:339
+#: ../src/wx/xrc/GameBoyConfig.xrc:33 ../src/wx/xrc/SoundConfig.xrc:335
 msgid "Game Boy Advance"
 msgstr "Game Boy Advance"
 
@@ -2355,8 +2281,8 @@ msgstr "校验和:"
 msgid "&0"
 msgstr "&0"
 
-#: ../src/wx/xrc/GBTileViewer.xrc:20 ../src/wx/xrc/MainMenu.xrc:48
-#: ../src/wx/xrc/MainMenu.xrc:109
+#: ../src/wx/xrc/GBTileViewer.xrc:20 ../src/wx/xrc/MainMenu.xrc:47
+#: ../src/wx/xrc/MainMenu.xrc:97
 msgid "&1"
 msgstr "&1"
 
@@ -2424,7 +2350,7 @@ msgstr "秒 (0-600); 0 = 禁用"
 msgid "&Throttle"
 msgstr "节流器(&T)"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:134
+#: ../src/wx/xrc/GeneralConfig.xrc:134 ../src/wx/xrc/SpeedupConfig.xrc:27
 #, c-format
 msgid "% of normal:"
 msgstr "% 正常:"
@@ -2433,29 +2359,102 @@ msgstr "% 正常:"
 msgid "0 = no throttle"
 msgstr "0 = 无节流器"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:153
-msgid "No throttle"
-msgstr "无节流器"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:154
+#: ../src/wx/xrc/GeneralConfig.xrc:153 ../src/wx/xrc/SpeedupConfig.xrc:46
 msgid "25%"
 msgstr "25%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:155
+#: ../src/wx/xrc/GeneralConfig.xrc:154 ../src/wx/xrc/SpeedupConfig.xrc:47
 msgid "50%"
 msgstr "50%"
 
+#: ../src/wx/xrc/GeneralConfig.xrc:155 ../src/wx/xrc/SpeedupConfig.xrc:48
+msgid "75%"
+msgstr ""
+
 #: ../src/wx/xrc/GeneralConfig.xrc:156 ../src/wx/xrc/SoundConfig.xrc:45
+#: ../src/wx/xrc/SpeedupConfig.xrc:49
 msgid "100%"
 msgstr "100%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:157
+#: ../src/wx/xrc/GeneralConfig.xrc:157 ../src/wx/xrc/SpeedupConfig.xrc:50
+msgid "125%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:158 ../src/wx/xrc/SpeedupConfig.xrc:51
 msgid "150%"
 msgstr "150%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:158
+#: ../src/wx/xrc/GeneralConfig.xrc:159 ../src/wx/xrc/SpeedupConfig.xrc:52
+msgid "175%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:160 ../src/wx/xrc/SpeedupConfig.xrc:53
 msgid "200%"
 msgstr "200%"
+
+#: ../src/wx/xrc/GeneralConfig.xrc:161 ../src/wx/xrc/SpeedupConfig.xrc:54
+msgid "225%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:162 ../src/wx/xrc/SpeedupConfig.xrc:55
+msgid "250%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:163 ../src/wx/xrc/SpeedupConfig.xrc:56
+msgid "275%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:164 ../src/wx/xrc/SpeedupConfig.xrc:57
+msgid "300%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:165 ../src/wx/xrc/SpeedupConfig.xrc:58
+msgid "325%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:166 ../src/wx/xrc/SpeedupConfig.xrc:59
+msgid "350%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:167 ../src/wx/xrc/SpeedupConfig.xrc:60
+msgid "375%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:168 ../src/wx/xrc/SpeedupConfig.xrc:61
+msgid "400%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:169 ../src/wx/xrc/SpeedupConfig.xrc:62
+msgid "425%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:170 ../src/wx/xrc/SpeedupConfig.xrc:63
+msgid "450%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:171 ../src/wx/xrc/SpeedupConfig.xrc:64
+msgid "475%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:172 ../src/wx/xrc/SpeedupConfig.xrc:65
+msgid "500%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:173 ../src/wx/xrc/SpeedupConfig.xrc:66
+msgid "525%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:174 ../src/wx/xrc/SpeedupConfig.xrc:67
+msgid "550%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:175 ../src/wx/xrc/SpeedupConfig.xrc:68
+msgid "575%"
+msgstr ""
+
+#: ../src/wx/xrc/GeneralConfig.xrc:176 ../src/wx/xrc/SpeedupConfig.xrc:69
+msgid "600%"
+msgstr ""
 
 #: ../src/wx/xrc/IOViewer.xrc:4
 msgid "IO Viewer"
@@ -2760,464 +2759,504 @@ msgstr "保存点代码...(&S)"
 msgid "Most &recent"
 msgstr "最常用"
 
-#: ../src/wx/xrc/MainMenu.xrc:43
+#: ../src/wx/xrc/MainMenu.xrc:42
 msgid "&Auto load most recent"
 msgstr "自动载入最常用文件(&A)"
 
-#: ../src/wx/xrc/MainMenu.xrc:52 ../src/wx/xrc/MainMenu.xrc:113
+#: ../src/wx/xrc/MainMenu.xrc:50 ../src/wx/xrc/MainMenu.xrc:100
 msgid "&2"
 msgstr "&2"
 
-#: ../src/wx/xrc/MainMenu.xrc:56 ../src/wx/xrc/MainMenu.xrc:117
+#: ../src/wx/xrc/MainMenu.xrc:53 ../src/wx/xrc/MainMenu.xrc:103
 msgid "&3"
 msgstr "&3"
 
-#: ../src/wx/xrc/MainMenu.xrc:60 ../src/wx/xrc/MainMenu.xrc:121
+#: ../src/wx/xrc/MainMenu.xrc:56 ../src/wx/xrc/MainMenu.xrc:106
 msgid "&4"
 msgstr "&4"
 
-#: ../src/wx/xrc/MainMenu.xrc:64 ../src/wx/xrc/MainMenu.xrc:125
+#: ../src/wx/xrc/MainMenu.xrc:59 ../src/wx/xrc/MainMenu.xrc:109
 msgid "&5"
 msgstr "&5"
 
-#: ../src/wx/xrc/MainMenu.xrc:68 ../src/wx/xrc/MainMenu.xrc:129
+#: ../src/wx/xrc/MainMenu.xrc:62 ../src/wx/xrc/MainMenu.xrc:112
 msgid "&6"
 msgstr "&6"
 
-#: ../src/wx/xrc/MainMenu.xrc:72 ../src/wx/xrc/MainMenu.xrc:133
+#: ../src/wx/xrc/MainMenu.xrc:65 ../src/wx/xrc/MainMenu.xrc:115
 msgid "&7"
 msgstr "&7"
 
-#: ../src/wx/xrc/MainMenu.xrc:76 ../src/wx/xrc/MainMenu.xrc:137
+#: ../src/wx/xrc/MainMenu.xrc:68 ../src/wx/xrc/MainMenu.xrc:118
 msgid "&8"
 msgstr "&8"
 
-#: ../src/wx/xrc/MainMenu.xrc:80 ../src/wx/xrc/MainMenu.xrc:141
+#: ../src/wx/xrc/MainMenu.xrc:71 ../src/wx/xrc/MainMenu.xrc:121
 msgid "&9"
 msgstr "&9"
 
-#: ../src/wx/xrc/MainMenu.xrc:84 ../src/wx/xrc/MainMenu.xrc:145
+#: ../src/wx/xrc/MainMenu.xrc:74 ../src/wx/xrc/MainMenu.xrc:124
 msgid "1&0"
 msgstr "1&0"
 
-#: ../src/wx/xrc/MainMenu.xrc:89
+#: ../src/wx/xrc/MainMenu.xrc:78
 msgid "From &File ..."
 msgstr "来自文件...(&F)"
 
-#: ../src/wx/xrc/MainMenu.xrc:93
+#: ../src/wx/xrc/MainMenu.xrc:82
 msgid "Do not change &battery save"
 msgstr "不更改电池存档(&B)"
 
-#: ../src/wx/xrc/MainMenu.xrc:97
+#: ../src/wx/xrc/MainMenu.xrc:86
 msgid "Do not change &cheat list"
 msgstr "不更改金手指列表(&C)"
 
-#: ../src/wx/xrc/MainMenu.xrc:100
+#: ../src/wx/xrc/MainMenu.xrc:89
 msgid "&Load state"
 msgstr "载入状态(&L)"
 
-#: ../src/wx/xrc/MainMenu.xrc:104
+#: ../src/wx/xrc/MainMenu.xrc:93
 msgid "&Oldest slot"
 msgstr "最近插槽(&O)"
 
-#: ../src/wx/xrc/MainMenu.xrc:150
+#: ../src/wx/xrc/MainMenu.xrc:128
 msgid "To &File ..."
 msgstr "到文件...(&F)"
 
-#: ../src/wx/xrc/MainMenu.xrc:152
+#: ../src/wx/xrc/MainMenu.xrc:130
 msgid "&Save state"
 msgstr "保存状态(&S)"
 
-#: ../src/wx/xrc/MainMenu.xrc:157 ../src/wx/xrc/MainMenu.xrc:169
+#: ../src/wx/xrc/MainMenu.xrc:135 ../src/wx/xrc/MainMenu.xrc:147
 msgid "&Battery file..."
 msgstr "电池文件...(&B)"
 
-#: ../src/wx/xrc/MainMenu.xrc:160
+#: ../src/wx/xrc/MainMenu.xrc:138
 msgid "Gameshark &code file..."
 msgstr "Gameshark 代码文件...(&C)"
 
-#: ../src/wx/xrc/MainMenu.xrc:163 ../src/wx/xrc/MainMenu.xrc:172
+#: ../src/wx/xrc/MainMenu.xrc:141 ../src/wx/xrc/MainMenu.xrc:150
 msgid "&Gameshark snapshot..."
 msgstr "Gameshark 快照...(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:165
+#: ../src/wx/xrc/MainMenu.xrc:143
 msgid "&Import"
 msgstr "导入(&I)"
 
-#: ../src/wx/xrc/MainMenu.xrc:174
+#: ../src/wx/xrc/MainMenu.xrc:152
 msgid "&Export"
 msgstr "导出(&E)"
 
-#: ../src/wx/xrc/MainMenu.xrc:178
+#: ../src/wx/xrc/MainMenu.xrc:156
 msgid "Screen capt&ure..."
 msgstr "屏幕捕获...(&U)"
 
-#: ../src/wx/xrc/MainMenu.xrc:182
+#: ../src/wx/xrc/MainMenu.xrc:160
 msgid "Start &sound recording..."
 msgstr "开始录制声音...(&S)"
 
-#: ../src/wx/xrc/MainMenu.xrc:185
+#: ../src/wx/xrc/MainMenu.xrc:163
 msgid "Stop s&ound recording"
 msgstr "停止录制声音(&O)"
 
-#: ../src/wx/xrc/MainMenu.xrc:188
+#: ../src/wx/xrc/MainMenu.xrc:166
 msgid "Start &video recording..."
 msgstr "开始录制视频...(&V)"
 
-#: ../src/wx/xrc/MainMenu.xrc:191
+#: ../src/wx/xrc/MainMenu.xrc:169
 msgid "Stop v&ideo recording"
 msgstr "停止录制视频(&I)"
 
-#: ../src/wx/xrc/MainMenu.xrc:194
+#: ../src/wx/xrc/MainMenu.xrc:172
 msgid "Start &game recording..."
 msgstr "开始录制游戏...(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:197
+#: ../src/wx/xrc/MainMenu.xrc:175
 msgid "Stop g&ame recording"
 msgstr "停止录制游戏(&A)"
 
-#: ../src/wx/xrc/MainMenu.xrc:199
+#: ../src/wx/xrc/MainMenu.xrc:177
 msgid "&Record"
 msgstr "录制(&R)"
 
-#: ../src/wx/xrc/MainMenu.xrc:203
+#: ../src/wx/xrc/MainMenu.xrc:181
 msgid "Start playing &movie..."
 msgstr "开始播放影片...(&M)"
 
-#: ../src/wx/xrc/MainMenu.xrc:206
+#: ../src/wx/xrc/MainMenu.xrc:184
 msgid "Stop playing m&ovie"
 msgstr "停止播放影片(&O)"
 
-#: ../src/wx/xrc/MainMenu.xrc:208
+#: ../src/wx/xrc/MainMenu.xrc:186
 msgid "&Play"
 msgstr "播放(&P)"
 
-#: ../src/wx/xrc/MainMenu.xrc:215
+#: ../src/wx/xrc/MainMenu.xrc:193
 msgid "&Emulation"
 msgstr "模拟(&E)"
 
-#: ../src/wx/xrc/MainMenu.xrc:217
+#: ../src/wx/xrc/MainMenu.xrc:195
 msgid "&Pause"
 msgstr "暂停(&P)"
 
-#: ../src/wx/xrc/MainMenu.xrc:222
+#: ../src/wx/xrc/MainMenu.xrc:199
 msgid "&Next frame"
 msgstr "下一帧(&N)"
 
-#: ../src/wx/xrc/MainMenu.xrc:226
+#: ../src/wx/xrc/MainMenu.xrc:202
 msgid "Re&wind"
 msgstr "回退(&W)"
 
-#: ../src/wx/xrc/MainMenu.xrc:231
+#: ../src/wx/xrc/MainMenu.xrc:206
 msgid "Toggle &full screen"
 msgstr "切换全屏(&F)"
 
-#: ../src/wx/xrc/MainMenu.xrc:238
+#: ../src/wx/xrc/MainMenu.xrc:213
 msgid "&Turbo mode"
 msgstr "加速模式(&T)"
 
-#: ../src/wx/xrc/MainMenu.xrc:242
+#: ../src/wx/xrc/MainMenu.xrc:217
 msgid "&VSync"
 msgstr "垂直同步(&V)"
 
-#: ../src/wx/xrc/MainMenu.xrc:246
+#: ../src/wx/xrc/MainMenu.xrc:221
 msgid "&Auto skip frames"
 msgstr "自动跳帧(&A)"
 
-#: ../src/wx/xrc/MainMenu.xrc:251
+#: ../src/wx/xrc/MainMenu.xrc:226
 msgid "&Skip BIOS"
 msgstr "跳过 BIOS(&S)"
 
-#: ../src/wx/xrc/MainMenu.xrc:255
+#: ../src/wx/xrc/MainMenu.xrc:230
 msgid "&Auto IPS/UPS/IPF patch"
 msgstr "自动 IPS/UPS/IPF 补丁(&A)"
 
-#: ../src/wx/xrc/MainMenu.xrc:259
+#: ../src/wx/xrc/MainMenu.xrc:234
 msgid "&Pause when inactive"
 msgstr "非激活状态时暂停(&P)"
 
-#: ../src/wx/xrc/MainMenu.xrc:264
+#: ../src/wx/xrc/MainMenu.xrc:239
 msgid "&Reset"
 msgstr "重置(&R)"
 
-#: ../src/wx/xrc/MainMenu.xrc:269
+#: ../src/wx/xrc/MainMenu.xrc:243
 msgid "&Options"
 msgstr "选项(&O)"
 
-#: ../src/wx/xrc/MainMenu.xrc:271
+#: ../src/wx/xrc/MainMenu.xrc:245
 msgid "&Link"
 msgstr "连接(&L)"
 
-#: ../src/wx/xrc/MainMenu.xrc:273
+#: ../src/wx/xrc/MainMenu.xrc:247
 msgid "Start &Network Link ..."
 msgstr "开始网络连接 ...(&N)"
 
-#: ../src/wx/xrc/MainMenu.xrc:278
+#: ../src/wx/xrc/MainMenu.xrc:252
 msgid "&Nothing"
 msgstr "无(&N)"
 
-#: ../src/wx/xrc/MainMenu.xrc:282
+#: ../src/wx/xrc/MainMenu.xrc:256
 msgid "&Cable"
 msgstr "有线(&C)"
 
-#: ../src/wx/xrc/MainMenu.xrc:286
+#: ../src/wx/xrc/MainMenu.xrc:260
 msgid "&Wireless"
 msgstr "无线(&W)"
 
-#: ../src/wx/xrc/MainMenu.xrc:290
+#: ../src/wx/xrc/MainMenu.xrc:264
 msgid "&GameCube"
 msgstr "GameCube(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:294 ../src/wx/xrc/MainMenu.xrc:430
+#: ../src/wx/xrc/MainMenu.xrc:268 ../src/wx/xrc/MainMenu.xrc:435
 msgid "&Game Boy"
 msgstr "Game Boy(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:299
+#: ../src/wx/xrc/MainMenu.xrc:273
 msgid "&Local mode"
 msgstr "本地模式(&L)"
 
-#: ../src/wx/xrc/MainMenu.xrc:303
+#: ../src/wx/xrc/MainMenu.xrc:277
 msgid "&Link at boot"
 msgstr "启动时连接(&L)"
 
-#: ../src/wx/xrc/MainMenu.xrc:307
+#: ../src/wx/xrc/MainMenu.xrc:281
 msgid "&Speed hack"
 msgstr "速度破解(&S)"
 
-#: ../src/wx/xrc/MainMenu.xrc:311 ../src/wx/xrc/MainMenu.xrc:317
-#: ../src/wx/xrc/MainMenu.xrc:359 ../src/wx/xrc/MainMenu.xrc:383
+#: ../src/wx/xrc/MainMenu.xrc:285 ../src/wx/xrc/MainMenu.xrc:291
+#: ../src/wx/xrc/MainMenu.xrc:356 ../src/wx/xrc/MainMenu.xrc:392
 msgid "&Configure ..."
 msgstr "配置 ...(&C)"
 
-#: ../src/wx/xrc/MainMenu.xrc:315
+#: ../src/wx/xrc/MainMenu.xrc:289
 msgid "&Video"
 msgstr "视频(&V)"
 
-#: ../src/wx/xrc/MainMenu.xrc:321
+#: ../src/wx/xrc/MainMenu.xrc:295
 msgid "&Start in full screen"
 msgstr "启动时全屏(&S)"
 
-#: ../src/wx/xrc/MainMenu.xrc:325
+#: ../src/wx/xrc/MainMenu.xrc:299
+msgid "&Quick resize"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:301
+msgid "&1x"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:304
+msgid "&2x"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:307
+msgid "&3x"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:310
+msgid "&4x"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:313
+msgid "&5x"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:316
+msgid "&6x"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:320
 msgid "&Retain aspect ratio"
 msgstr "保持宽高比(&R)"
 
-#: ../src/wx/xrc/MainMenu.xrc:330
+#: ../src/wx/xrc/MainMenu.xrc:325
 msgid "&Bilinear filter"
 msgstr "双线性过滤(&B)"
 
-#: ../src/wx/xrc/MainMenu.xrc:334
-msgid "&Multithread filter"
-msgstr "多线程过滤(&M)"
-
-#: ../src/wx/xrc/MainMenu.xrc:339
+#: ../src/wx/xrc/MainMenu.xrc:336
 msgid "&Keep window on top"
 msgstr "保持窗口在最前(&K)"
 
-#: ../src/wx/xrc/MainMenu.xrc:344
+#: ../src/wx/xrc/MainMenu.xrc:341
 msgid "&Status bar"
 msgstr "状态栏(&S)"
 
-#: ../src/wx/xrc/MainMenu.xrc:348
+#: ../src/wx/xrc/MainMenu.xrc:345
 msgid "&Disable on-screen display"
 msgstr "禁用屏幕显示信息(&D)"
 
-#: ../src/wx/xrc/MainMenu.xrc:352
+#: ../src/wx/xrc/MainMenu.xrc:349
 msgid "&Transparent on-screen display"
 msgstr "透明屏幕显示信息(&T)"
 
-#: ../src/wx/xrc/MainMenu.xrc:357
+#: ../src/wx/xrc/MainMenu.xrc:354
 msgid "&Audio"
 msgstr "音频(&A)"
 
+#: ../src/wx/xrc/MainMenu.xrc:359
+msgid "&Increase volume"
+msgstr ""
+
 #: ../src/wx/xrc/MainMenu.xrc:363
+msgid "&Decrease volume"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:367
+msgid "&Toggle sound"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:372
 msgid "&GBA sound interpolation"
 msgstr "GBA 声音插值(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:368
+#: ../src/wx/xrc/MainMenu.xrc:377
 msgid "&GB sound enhancement"
 msgstr "GB 声音插值(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:372
+#: ../src/wx/xrc/MainMenu.xrc:381
 msgid "&GB surround sound effect"
 msgstr "GB 环绕音效(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:376
+#: ../src/wx/xrc/MainMenu.xrc:385
 msgid "&GB sound declicking"
 msgstr "GB 声音降噪(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:381
+#: ../src/wx/xrc/MainMenu.xrc:390
 msgid "&Input"
 msgstr "输入(&I)"
 
-#: ../src/wx/xrc/MainMenu.xrc:387
+#: ../src/wx/xrc/MainMenu.xrc:396
 msgid "&Autofire"
 msgstr "连发(&A)"
 
-#: ../src/wx/xrc/MainMenu.xrc:389
+#: ../src/wx/xrc/MainMenu.xrc:398
 msgid "&A"
 msgstr "&A"
 
-#: ../src/wx/xrc/MainMenu.xrc:394
+#: ../src/wx/xrc/MainMenu.xrc:402
 msgid "&B"
 msgstr "&B"
 
-#: ../src/wx/xrc/MainMenu.xrc:399
+#: ../src/wx/xrc/MainMenu.xrc:406
 msgid "&L"
 msgstr "&L"
 
-#: ../src/wx/xrc/MainMenu.xrc:404
+#: ../src/wx/xrc/MainMenu.xrc:410
 msgid "&R"
 msgstr "&R"
 
-#: ../src/wx/xrc/MainMenu.xrc:411
+#: ../src/wx/xrc/MainMenu.xrc:416
 msgid "&Game Boy Advance"
 msgstr "Game Boy Advance(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:413 ../src/wx/xrc/MainMenu.xrc:432
+#: ../src/wx/xrc/MainMenu.xrc:418 ../src/wx/xrc/MainMenu.xrc:437
 msgid "Configure ..."
 msgstr "设置 ..."
 
-#: ../src/wx/xrc/MainMenu.xrc:417
+#: ../src/wx/xrc/MainMenu.xrc:422
 msgid "&Real-time clock"
 msgstr "实时时钟(&R)"
 
-#: ../src/wx/xrc/MainMenu.xrc:421
+#: ../src/wx/xrc/MainMenu.xrc:426
 msgid "&Use BIOS file"
 msgstr "使用 BIOS 文件(&U)"
 
-#: ../src/wx/xrc/MainMenu.xrc:425
+#: ../src/wx/xrc/MainMenu.xrc:430
 msgid "&Debug print"
 msgstr "调试打印(&D)"
 
-#: ../src/wx/xrc/MainMenu.xrc:436
+#: ../src/wx/xrc/MainMenu.xrc:441
 msgid "&GB printer"
 msgstr "GB 打印机(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:440
+#: ../src/wx/xrc/MainMenu.xrc:445
 msgid "&Gather a full page before printing"
 msgstr "在打印前聚集整个页面(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:444
+#: ../src/wx/xrc/MainMenu.xrc:449
 msgid "&Save printouts as screen captures"
 msgstr "将打印输出保存为截图(&S)"
 
-#: ../src/wx/xrc/MainMenu.xrc:449
+#: ../src/wx/xrc/MainMenu.xrc:454
 msgid "&Use GB BIOS file"
 msgstr "使用 GB BIOS 文件(&U)"
 
-#: ../src/wx/xrc/MainMenu.xrc:453
+#: ../src/wx/xrc/MainMenu.xrc:458
 msgid "&Use GBC BIOS file"
 msgstr "使用 GBC BIOS 文件(&U)"
 
-#: ../src/wx/xrc/MainMenu.xrc:458
+#: ../src/wx/xrc/MainMenu.xrc:463
 msgid "&General ..."
 msgstr "通用(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:461
+#: ../src/wx/xrc/MainMenu.xrc:466
+msgid "&Speedup / Turbo ..."
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:469
 msgid "D&irectories ..."
 msgstr "目录(&I)"
 
-#: ../src/wx/xrc/MainMenu.xrc:464
+#: ../src/wx/xrc/MainMenu.xrc:472
 msgid "&Key Shortcuts ..."
 msgstr "快捷键(&K)"
 
-#: ../src/wx/xrc/MainMenu.xrc:468
+#: ../src/wx/xrc/MainMenu.xrc:476
 msgid "&Tools"
 msgstr "工具(&T)"
 
-#: ../src/wx/xrc/MainMenu.xrc:470
+#: ../src/wx/xrc/MainMenu.xrc:478
 msgid "&Cheats"
 msgstr "金手指(&C)"
 
-#: ../src/wx/xrc/MainMenu.xrc:472
+#: ../src/wx/xrc/MainMenu.xrc:480
 msgid "List &cheats ..."
 msgstr "金手指列表 ...(&C)"
 
-#: ../src/wx/xrc/MainMenu.xrc:476
+#: ../src/wx/xrc/MainMenu.xrc:483
 msgid "Find c&heat ..."
 msgstr "搜索金手指 ...(&H)"
 
-#: ../src/wx/xrc/MainMenu.xrc:481
+#: ../src/wx/xrc/MainMenu.xrc:487
 msgid "A&utomatically save/load cheats"
 msgstr "自动保存/载入金手指(&U)"
 
-#: ../src/wx/xrc/MainMenu.xrc:485
+#: ../src/wx/xrc/MainMenu.xrc:491
 msgid "&Enable cheats"
 msgstr "启用金手指(&E)"
 
-#: ../src/wx/xrc/MainMenu.xrc:492
+#: ../src/wx/xrc/MainMenu.xrc:498
 msgid "&Break into GDB"
 msgstr "切入 GDB(&B)"
 
-#: ../src/wx/xrc/MainMenu.xrc:496
+#: ../src/wx/xrc/MainMenu.xrc:502
 msgid "&Configure port..."
 msgstr "配置端口...(&C)"
 
-#: ../src/wx/xrc/MainMenu.xrc:499
+#: ../src/wx/xrc/MainMenu.xrc:505
 msgid "&Break on load"
 msgstr "加载时切入(&B)"
 
-#: ../src/wx/xrc/MainMenu.xrc:504
+#: ../src/wx/xrc/MainMenu.xrc:510
 msgid "&Disconnect"
 msgstr "断开连接(&D)"
 
-#: ../src/wx/xrc/MainMenu.xrc:506
+#: ../src/wx/xrc/MainMenu.xrc:512
 msgid "&GDB"
 msgstr "GDB(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:509
+#: ../src/wx/xrc/MainMenu.xrc:515
 msgid "&Disassemble..."
 msgstr "反编译...(&D)"
 
-#: ../src/wx/xrc/MainMenu.xrc:512
+#: ../src/wx/xrc/MainMenu.xrc:518
 msgid "&Logging..."
 msgstr "日志...(&L)"
 
-#: ../src/wx/xrc/MainMenu.xrc:515
+#: ../src/wx/xrc/MainMenu.xrc:521
 msgid "&IO Viewer..."
 msgstr "IO 查看器...(&I)"
 
-#: ../src/wx/xrc/MainMenu.xrc:518
+#: ../src/wx/xrc/MainMenu.xrc:524
 msgid "&Map Viewer..."
 msgstr "图层查看器...(&M)"
 
-#: ../src/wx/xrc/MainMenu.xrc:521
+#: ../src/wx/xrc/MainMenu.xrc:527
 msgid "M&emory Viewer..."
 msgstr "内存查看器...(&E)"
 
-#: ../src/wx/xrc/MainMenu.xrc:524
+#: ../src/wx/xrc/MainMenu.xrc:530
 msgid "&OAM Viewer..."
 msgstr "OAM 查看器...(&O)"
 
-#: ../src/wx/xrc/MainMenu.xrc:527
+#: ../src/wx/xrc/MainMenu.xrc:533
 msgid "&Palette Viewer..."
 msgstr "调色板查看器...(&P)"
 
-#: ../src/wx/xrc/MainMenu.xrc:530
+#: ../src/wx/xrc/MainMenu.xrc:536
 msgid "&Tile Viewer..."
 msgstr "碎片查看器...(&T)"
 
-#: ../src/wx/xrc/MainMenu.xrc:535
+#: ../src/wx/xrc/MainMenu.xrc:541
 msgid "BG &0"
 msgstr "BG &0"
 
-#: ../src/wx/xrc/MainMenu.xrc:541
+#: ../src/wx/xrc/MainMenu.xrc:546
 msgid "BG &1"
 msgstr "BG &1"
 
-#: ../src/wx/xrc/MainMenu.xrc:547
+#: ../src/wx/xrc/MainMenu.xrc:551
 msgid "BG &2"
 msgstr "BG &2"
 
-#: ../src/wx/xrc/MainMenu.xrc:553
+#: ../src/wx/xrc/MainMenu.xrc:556
 msgid "BG &3"
 msgstr "BG &3"
 
-#: ../src/wx/xrc/MainMenu.xrc:559
+#: ../src/wx/xrc/MainMenu.xrc:561
 msgid "&OBJ"
 msgstr "&OBJ"
 
-#: ../src/wx/xrc/MainMenu.xrc:565
+#: ../src/wx/xrc/MainMenu.xrc:566
 msgid "&WIN 0"
 msgstr "&WIN 0"
 
@@ -3225,57 +3264,61 @@ msgstr "&WIN 0"
 msgid "W&IN 1"
 msgstr "W&IN 1"
 
-#: ../src/wx/xrc/MainMenu.xrc:577
+#: ../src/wx/xrc/MainMenu.xrc:576
 msgid "O&BJ WIN"
 msgstr "O&BJ WIN"
 
-#: ../src/wx/xrc/MainMenu.xrc:582
+#: ../src/wx/xrc/MainMenu.xrc:580
 msgid "&View Layers"
 msgstr "查看图层(&V)"
 
-#: ../src/wx/xrc/MainMenu.xrc:586
+#: ../src/wx/xrc/MainMenu.xrc:584
 msgid "Channel &1"
 msgstr "Channel &1"
 
-#: ../src/wx/xrc/MainMenu.xrc:591
+#: ../src/wx/xrc/MainMenu.xrc:589
 msgid "Channel &2"
 msgstr "Channel &2"
 
-#: ../src/wx/xrc/MainMenu.xrc:596
+#: ../src/wx/xrc/MainMenu.xrc:594
 msgid "Channel &3"
 msgstr "Channel &3"
 
-#: ../src/wx/xrc/MainMenu.xrc:601
+#: ../src/wx/xrc/MainMenu.xrc:599
 msgid "Channel &4"
 msgstr "Channel &4"
 
-#: ../src/wx/xrc/MainMenu.xrc:606
+#: ../src/wx/xrc/MainMenu.xrc:604
 msgid "Direct Sound &A"
 msgstr "Direct Sound &A"
 
-#: ../src/wx/xrc/MainMenu.xrc:611
+#: ../src/wx/xrc/MainMenu.xrc:609
 msgid "Direct Sound &B"
 msgstr "Direct Sound &B"
 
-#: ../src/wx/xrc/MainMenu.xrc:615
+#: ../src/wx/xrc/MainMenu.xrc:613
 msgid "&Sound Channels"
 msgstr "&声道"
 
-#: ../src/wx/xrc/MainMenu.xrc:619
+#: ../src/wx/xrc/MainMenu.xrc:617
 msgid "&Help"
 msgstr "&帮助"
 
-#: ../src/wx/xrc/MainMenu.xrc:621
+#: ../src/wx/xrc/MainMenu.xrc:619
 msgid "Report &Bugs"
 msgstr "反馈"
 
-#: ../src/wx/xrc/MainMenu.xrc:624
+#: ../src/wx/xrc/MainMenu.xrc:622
 msgid "VBA-M Support &Forum"
 msgstr "VBA-M 支持论坛(&F)"
 
-#: ../src/wx/xrc/MainMenu.xrc:627
+#: ../src/wx/xrc/MainMenu.xrc:625
 msgid "Translations"
 msgstr "翻译"
+
+#: ../src/wx/xrc/MainMenu.xrc:636
+msgid "&Factory Reset..."
+msgstr ""
 
 #: ../src/wx/xrc/MapViewer.xrc:4
 msgid "Map Viewer"
@@ -3374,15 +3417,15 @@ msgstr "客户端"
 msgid "Players:"
 msgstr "玩家:"
 
-#: ../src/wx/xrc/NetLink.xrc:41
+#: ../src/wx/xrc/NetLink.xrc:41 ../src/wx/xrc/SpeedupConfig.xrc:122
 msgid "2"
 msgstr "2"
 
-#: ../src/wx/xrc/NetLink.xrc:49
+#: ../src/wx/xrc/NetLink.xrc:49 ../src/wx/xrc/SpeedupConfig.xrc:123
 msgid "3"
 msgstr "3"
 
-#: ../src/wx/xrc/NetLink.xrc:56
+#: ../src/wx/xrc/NetLink.xrc:56 ../src/wx/xrc/SpeedupConfig.xrc:124
 msgid "4"
 msgstr "4"
 
@@ -3418,7 +3461,7 @@ msgstr "音量"
 msgid "Mute"
 msgstr "静音"
 
-#: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:324
+#: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:320
 msgid "Maximum"
 msgstr "最大"
 
@@ -3450,61 +3493,185 @@ msgstr "SDL"
 msgid "OpenAL"
 msgstr "OpenAL"
 
-#: ../src/wx/xrc/SoundConfig.xrc:119
+#: ../src/wx/xrc/SoundConfig.xrc:118
 msgid "DirectSound"
 msgstr "DirectSound"
 
-#: ../src/wx/xrc/SoundConfig.xrc:127
+#: ../src/wx/xrc/SoundConfig.xrc:125
 msgid "XAudio2"
 msgstr "XAudio2"
 
-#: ../src/wx/xrc/SoundConfig.xrc:135
+#: ../src/wx/xrc/SoundConfig.xrc:132
 msgid "FAudio"
 msgstr ""
 
-#: ../src/wx/xrc/SoundConfig.xrc:150
+#: ../src/wx/xrc/SoundConfig.xrc:146
 msgid "Device"
 msgstr "设备"
 
-#: ../src/wx/xrc/SoundConfig.xrc:158
+#: ../src/wx/xrc/SoundConfig.xrc:154
 msgid "Enable stereo upmixing"
 msgstr "启用立体声上混响"
 
-#: ../src/wx/xrc/SoundConfig.xrc:165
+#: ../src/wx/xrc/SoundConfig.xrc:161
 msgid "Enable hardware acceleration"
 msgstr "启用硬件加速"
 
-#: ../src/wx/xrc/SoundConfig.xrc:194
+#: ../src/wx/xrc/SoundConfig.xrc:190
 msgid "Number of sound buffers:"
 msgstr " 声音缓冲区数:"
 
-#: ../src/wx/xrc/SoundConfig.xrc:202
+#: ../src/wx/xrc/SoundConfig.xrc:198
 msgid "Advanced"
 msgstr "高级"
 
-#: ../src/wx/xrc/SoundConfig.xrc:234
+#: ../src/wx/xrc/SoundConfig.xrc:230
 msgid "Lots"
 msgstr "Lots"
 
-#: ../src/wx/xrc/SoundConfig.xrc:243
+#: ../src/wx/xrc/SoundConfig.xrc:239
 msgid "Echo"
 msgstr "呼应"
 
-#: ../src/wx/xrc/SoundConfig.xrc:251
+#: ../src/wx/xrc/SoundConfig.xrc:247
 msgid "Stereo"
 msgstr "立体声"
 
-#: ../src/wx/xrc/SoundConfig.xrc:262
+#: ../src/wx/xrc/SoundConfig.xrc:258
 msgid "Center"
 msgstr "中间"
 
-#: ../src/wx/xrc/SoundConfig.xrc:273
+#: ../src/wx/xrc/SoundConfig.xrc:269
 msgid "Left/Right"
 msgstr "左/右"
 
-#: ../src/wx/xrc/SoundConfig.xrc:302
+#: ../src/wx/xrc/SoundConfig.xrc:298
 msgid "Sound filtering"
 msgstr "声音过滤"
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:4
+msgid "SpeedUp / Turbo Settings"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:9
+msgid "Speedup Throttle"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:84
+msgid "Speedup Frame Skip"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:102
+msgid "# of frames:"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:121
+msgid "1"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:125
+msgid "5"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:126
+msgid "6"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:127
+msgid "7"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:128
+msgid "8"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:129
+msgid "9"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:130
+msgid "10"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:131
+msgid "11"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:132
+msgid "12"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:133
+msgid "13"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:134
+msgid "14"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:135
+msgid "15"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:136
+msgid "16"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:137
+msgid "17"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:138
+msgid "18"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:139
+msgid "19"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:140
+msgid "20"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:141
+msgid "21"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:142
+msgid "22"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:143
+msgid "23"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:144
+msgid "24"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:145
+msgid "25"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:146
+msgid "26"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:147
+msgid "27"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:148
+msgid "28"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:149
+msgid "29"
+msgstr ""
+
+#: ../src/wx/xrc/SpeedupConfig.xrc:150
+msgid "30"
+msgstr ""
 
 #: ../src/wx/xrc/TileViewer.xrc:4
 msgid "Tile Viewer"
