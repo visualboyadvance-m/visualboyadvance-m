@@ -101,52 +101,52 @@ wxString wxJoyKeyTextCtrl::ToString(int mod, int key, int joy)
     wxString s;
     // Note: wx translates unconditionally (2.8.12, 2.9.1)!
     // So any strings added below must also be translated unconditionally
-    s.Printf(_("Joy%d-"), joy);
+    s.Printf(("Joy%d-"), joy);
     wxString mk;
 
     switch (mod) {
     case WXJB_AXIS_PLUS:
-        mk.Printf(_("Axis%d+"), key);
+        mk.Printf(("Axis%d+"), key);
         break;
 
     case WXJB_AXIS_MINUS:
-        mk.Printf(_("Axis%d-"), key);
+        mk.Printf(("Axis%d-"), key);
         break;
 
     case WXJB_BUTTON:
-        mk.Printf(_("Button%d"), key);
+        mk.Printf(("Button%d"), key);
         break;
 
     case WXJB_HAT_N:
-        mk.Printf(_("Hat%dN"), key);
+        mk.Printf(("Hat%dN"), key);
         break;
 
     case WXJB_HAT_S:
-        mk.Printf(_("Hat%dS"), key);
+        mk.Printf(("Hat%dS"), key);
         break;
 
     case WXJB_HAT_W:
-        mk.Printf(_("Hat%dW"), key);
+        mk.Printf(("Hat%dW"), key);
         break;
 
     case WXJB_HAT_E:
-        mk.Printf(_("Hat%dE"), key);
+        mk.Printf(("Hat%dE"), key);
         break;
 
     case WXJB_HAT_NW:
-        mk.Printf(_("Hat%dNW"), key);
+        mk.Printf(("Hat%dNW"), key);
         break;
 
     case WXJB_HAT_NE:
-        mk.Printf(_("Hat%dNE"), key);
+        mk.Printf(("Hat%dNE"), key);
         break;
 
     case WXJB_HAT_SW:
-        mk.Printf(_("Hat%dSW"), key);
+        mk.Printf(("Hat%dSW"), key);
         break;
 
     case WXJB_HAT_SE:
-        mk.Printf(_("Hat%dSE"), key);
+        mk.Printf(("Hat%dSE"), key);
         break;
     }
 
@@ -205,14 +205,14 @@ static int simple_atoi(const wxString& s, int len)
 static void CompileRegex()
 {
     // \1 is joy #
-    joyre.Compile(_("^Joy([0-9]+)[-+]"), wxRE_EXTENDED | wxRE_ICASE);
+    joyre.Compile(("^Joy([0-9]+)[-+]"), wxRE_EXTENDED | wxRE_ICASE);
     // \1 is axis# and \2 is + or -
-    axre.Compile(_("Axis([0-9]+)([+-])"), wxRE_EXTENDED | wxRE_ICASE);
+    axre.Compile(("Axis([0-9]+)([+-])"), wxRE_EXTENDED | wxRE_ICASE);
     // \1 is button#
-    butre.Compile(_("Button([0-9]+)"), wxRE_EXTENDED | wxRE_ICASE);
+    butre.Compile(("Button([0-9]+)"), wxRE_EXTENDED | wxRE_ICASE);
     // \1 is hat#, \3 is N, \4 is S, \5 is E, \6 is W, \7 is NE,
     // \8 is SE, \9 is SW, \10 is NW
-    hatre.Compile(_("Hat([0-9]+)((N|North|U|Up)|(S|South|D|Down)|"
+    hatre.Compile(("Hat([0-9]+)((N|North|U|Up)|(S|South|D|Down)|"
                     "(E|East|R|Right)|(W|West|L|Left)|"
                     "(NE|NorthEast|UR|UpRight)|(SE|SouthEast|DR|DownRight)|"
                     "(SW|SouthWest|DL|DownLeft)|(NW|NorthWest|UL|UpLeft))"),
