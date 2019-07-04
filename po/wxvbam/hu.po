@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-11 16:01-0700\n"
-"PO-Revision-Date: 2018-12-19 20:03+0000\n"
-"Last-Translator: Model T800\n"
+"POT-Creation-Date: 2019-01-02 17:22-0800\n"
+"PO-Revision-Date: 2019-07-04 01:53+0000\n"
+"Last-Translator: bgK\n"
 "Language-Team: Hungarian (http://www.transifex.com/bgk/vba-m/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -164,12 +164,12 @@ msgstr "ROM+HuC-3"
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: ../src/wx/cmdevents.cpp:718 ../src/wx/guiinit.cpp:1766
+#: ../src/wx/cmdevents.cpp:718 ../src/wx/guiinit.cpp:1774
 #: ../src/wx/xrc/DisplayConfig.xrc:85 ../src/wx/xrc/DisplayConfig.xrc:135
 #: ../src/wx/xrc/DisplayConfig.xrc:221
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:183
-#: ../src/wx/xrc/SoundConfig.xrc:212 ../src/wx/xrc/SoundConfig.xrc:302
+#: ../src/wx/xrc/SoundConfig.xrc:223 ../src/wx/xrc/SoundConfig.xrc:313
 msgid "None"
 msgstr "Üres"
 
@@ -200,7 +200,7 @@ msgstr "Egy battery fájl importálása töröl minden játékállás mentést (
 msgid "Confirm import"
 msgstr "Importálás megerősítése"
 
-#: ../src/wx/cmdevents.cpp:867 ../src/wx/panel.cpp:356
+#: ../src/wx/cmdevents.cpp:867 ../src/wx/panel.cpp:357
 #, c-format
 msgid "Loaded battery %s"
 msgstr "%s battery betöltve"
@@ -278,12 +278,12 @@ msgstr "A %s pillanatkép fájl betöltve"
 msgid "Error loading snapshot file %s"
 msgstr "A %s pillanatkép fájl betöltése sikertelen"
 
-#: ../src/wx/cmdevents.cpp:1058 ../src/wx/panel.cpp:661
+#: ../src/wx/cmdevents.cpp:1058 ../src/wx/panel.cpp:662
 #, c-format
 msgid "Wrote battery %s"
 msgstr "%s battery megírva"
 
-#: ../src/wx/cmdevents.cpp:1060 ../src/wx/panel.cpp:663
+#: ../src/wx/cmdevents.cpp:1060 ../src/wx/panel.cpp:664
 #, c-format
 msgid "Error writing battery %s"
 msgstr "A %s battery írása sikertelen"
@@ -385,18 +385,18 @@ msgstr "Kapcsolódás fogadása a %d porton"
 msgid "Waiting for GDB..."
 msgstr "Várakozás a GDB-re"
 
-#: ../src/wx/cmdevents.cpp:2411
+#: ../src/wx/cmdevents.cpp:2412
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Nintendo GameBoy (+Color+Advance) emulátor."
 
-#: ../src/wx/cmdevents.cpp:2412
+#: ../src/wx/cmdevents.cpp:2413
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA fejlesztői csapat\nCopyright (C) 2007-2017 VBA-M fejlesztői csapat"
 
-#: ../src/wx/cmdevents.cpp:2413
+#: ../src/wx/cmdevents.cpp:2414
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -412,11 +412,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Ez a program ingyenes alkalmazás: terjesztheti és/vagy módosíthatja\na Free Software Foundation által kiadott GNU Általános Nyilvános\nLincenc előírásaival összhangban, legyen szó annak második, vagy\n(tetszés szerinti) bármely későbbi változatáról.\n\nA program azért készült, hogy remélhetőleg hasznos legyen, de nincs\nSEMMIFÉLE GARANCIA rá, még a feltételezhető HELYES MŰKÖDÉSRE és arra\nsem, hogy bármely EGYEDI CÉLNAK megfelel. További részletekért\ntekintse meg a GNU Általános Nyilvános Lincenct.\n\nA programhoz mellékelve kell legyen a Licenc egy példánya. Ha\nmégsem, itt megtalálja: http://gnu.hu/gpl.html ."
 
-#: ../src/wx/cmdevents.cpp:2672
+#: ../src/wx/cmdevents.cpp:2673
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "A LAN összeköttetés már aktív. Kapcsold ki az összekötés módot a bontáshoz."
 
-#: ../src/wx/cmdevents.cpp:2678
+#: ../src/wx/cmdevents.cpp:2679
 msgid "Network is not supported in local mode."
 msgstr "Helyi módban hálózat nem támogatott."
 
@@ -459,6 +459,22 @@ msgstr "Az elsődleges hang nem játszható le %08x"
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
 msgstr "dsbSecondary->Lock() sikertelen: %08x"
+
+#: ../src/wx/faudio.cpp:32
+msgid "FAudio: Enumerating devices failed!"
+msgstr ""
+
+#: ../src/wx/faudio.cpp:67 ../src/wx/faudio.cpp:352
+msgid "The FAudio interface failed to initialize!"
+msgstr ""
+
+#: ../src/wx/faudio.cpp:384
+msgid "FAudio: Creating mastering voice failed!"
+msgstr ""
+
+#: ../src/wx/faudio.cpp:395
+msgid "FAudio: Creating source voice failed!"
+msgstr ""
 
 #: ../src/wx/gfxviewers.cpp:1131
 msgid "Select output file and type"
@@ -518,7 +534,7 @@ msgstr "Válassz csalás fájlt"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA csaláslista (*.clt)|*.clt|CHT csaláslista (*.cht)|*.cht"
 
-#: ../src/wx/guiinit.cpp:236 ../src/wx/panel.cpp:412
+#: ../src/wx/guiinit.cpp:236 ../src/wx/panel.cpp:413
 msgid "Loaded cheats"
 msgstr "Betöltött csalások"
 
@@ -604,242 +620,242 @@ msgstr "%d képkocka = %.2f ms"
 msgid "Default device"
 msgstr "Alapértelmezett eszköz"
 
-#: ../src/wx/guiinit.cpp:1653
+#: ../src/wx/guiinit.cpp:1661
 msgid "Desktop mode"
 msgstr "Asztali mód"
 
-#: ../src/wx/guiinit.cpp:1660
+#: ../src/wx/guiinit.cpp:1668
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: ../src/wx/guiinit.cpp:1805
+#: ../src/wx/guiinit.cpp:1813
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "A %s helyen nincs használható RPI bővítmény"
 
-#: ../src/wx/guiinit.cpp:1825 ../src/wx/xrc/DisplayConfig.xrc:107
+#: ../src/wx/guiinit.cpp:1833 ../src/wx/xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "Bővítmény"
 
-#: ../src/wx/guiinit.cpp:1853
+#: ../src/wx/guiinit.cpp:1861
 msgid "Please select a plugin or a different filter"
 msgstr "Válassz bővítményt, vagy másféle szűrőt"
 
-#: ../src/wx/guiinit.cpp:1854
+#: ../src/wx/guiinit.cpp:1862
 msgid "Plugin selection error"
 msgstr "Hiba a bővítmény választásnál"
 
-#: ../src/wx/guiinit.cpp:2050
+#: ../src/wx/guiinit.cpp:2058
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "Ez eltávolít minden felhasználói gyorsítót. Biztosan vagy benne?"
 
-#: ../src/wx/guiinit.cpp:2050
+#: ../src/wx/guiinit.cpp:2058
 msgid "Confirm"
 msgstr "Megerősít"
 
-#: ../src/wx/guiinit.cpp:2568
+#: ../src/wx/guiinit.cpp:2579
 msgid "Main icon not found"
 msgstr "A főikon nem található"
 
-#: ../src/wx/guiinit.cpp:2586
+#: ../src/wx/guiinit.cpp:2597
 msgid "Main display panel not found"
 msgstr "A főkijelző nem található"
 
-#: ../src/wx/guiinit.cpp:2700
+#: ../src/wx/guiinit.cpp:2711
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "A %s menü-gyorsgomb duplán csatolt: %s és %s; az első lesz megtartva"
 
-#: ../src/wx/guiinit.cpp:2714
+#: ../src/wx/guiinit.cpp:2725
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "A %s menü-gyorsgomb ehhez: %s, felülírja az eredetit ehhez: %s ; menü megtartása"
 
-#: ../src/wx/guiinit.cpp:2820
+#: ../src/wx/guiinit.cpp:2831
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "A %s érvénytelen menüelem; eltávolítás"
 
-#: ../src/wx/guiinit.cpp:3015
+#: ../src/wx/guiinit.cpp:3026
 msgid "Code"
 msgstr "Kód"
 
-#: ../src/wx/guiinit.cpp:3024
+#: ../src/wx/guiinit.cpp:3035
 msgid "Description"
 msgstr "Leírás"
 
-#: ../src/wx/guiinit.cpp:3098 ../src/wx/xrc/CheatAdd.xrc:31
+#: ../src/wx/guiinit.cpp:3109 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Cím"
 
-#: ../src/wx/guiinit.cpp:3099
+#: ../src/wx/guiinit.cpp:3110
 msgid "Old Value"
 msgstr "Régi Érték"
 
-#: ../src/wx/guiinit.cpp:3100
+#: ../src/wx/guiinit.cpp:3111
 msgid "New Value"
 msgstr "Új Érték"
 
-#: ../src/wx/guiinit.cpp:3557
+#: ../src/wx/guiinit.cpp:3572
 msgid "Menu commands"
 msgstr "Menü parancsok"
 
-#: ../src/wx/guiinit.cpp:3580
+#: ../src/wx/guiinit.cpp:3595
 msgid "Other commands"
 msgstr "Egyéb parancsok"
 
-#: ../src/wx/guiinit.cpp:3691
+#: ../src/wx/guiinit.cpp:3706
 msgid "JoyBus host invalid; disabling"
 msgstr "A JoyBus gazda érvénytelen; letiltás"
 
-#: ../src/wx/opts.cpp:502 ../src/wx/opts.cpp:783
+#: ../src/wx/opts.cpp:495 ../src/wx/opts.cpp:776
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "A %s érvénytelen érték a %s opcióhoz; használható értékek: %s%s%s"
 
-#: ../src/wx/opts.cpp:519 ../src/wx/opts.cpp:795
+#: ../src/wx/opts.cpp:512 ../src/wx/opts.cpp:788
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "A %d érvénytelen érték a %s opcióhoz; használható értékek: %d - %d"
 
-#: ../src/wx/opts.cpp:526 ../src/wx/opts.cpp:803
+#: ../src/wx/opts.cpp:519 ../src/wx/opts.cpp:796
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "A %f érvénytelen érték a %s opcióhoz; használható értékek: %f - %f"
 
-#: ../src/wx/opts.cpp:585 ../src/wx/opts.cpp:606 ../src/wx/opts.cpp:872
-#: ../src/wx/opts.cpp:898
+#: ../src/wx/opts.cpp:578 ../src/wx/opts.cpp:599 ../src/wx/opts.cpp:865
+#: ../src/wx/opts.cpp:891
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "A %s - %s érvénytelen billentyű hozzárendelés"
 
-#: ../src/wx/opts.cpp:766
+#: ../src/wx/opts.cpp:759
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Az érvénytelen jelölőopció %s - %s elutasítva"
 
-#: ../src/wx/panel.cpp:85
+#: ../src/wx/panel.cpp:86
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s nem létező ROM fájl"
 
-#: ../src/wx/panel.cpp:86 ../src/wx/panel.cpp:143 ../src/wx/panel.cpp:218
+#: ../src/wx/panel.cpp:87 ../src/wx/panel.cpp:144 ../src/wx/panel.cpp:219
 msgid "Problem loading file"
 msgstr "Probléma a fájl betöltésénél"
 
-#: ../src/wx/panel.cpp:142
+#: ../src/wx/panel.cpp:143
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "A %s Game Boy ROM nem tölthető be"
 
-#: ../src/wx/panel.cpp:194 ../src/wx/panel.cpp:287
+#: ../src/wx/panel.cpp:195 ../src/wx/panel.cpp:288
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "A %s BIOS nem tölthető be"
 
-#: ../src/wx/panel.cpp:217
+#: ../src/wx/panel.cpp:218
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "A %s Game Boy Advance ROM nem tölthető be"
 
-#: ../src/wx/panel.cpp:445
+#: ../src/wx/panel.cpp:446
 msgid " player "
 msgstr " játékos "
 
-#: ../src/wx/panel.cpp:605
+#: ../src/wx/panel.cpp:606
 #, c-format
 msgid "Loaded state %s"
 msgstr "A %s játékállás betöltve"
 
-#: ../src/wx/panel.cpp:605
+#: ../src/wx/panel.cpp:606
 #, c-format
 msgid "Error loading state %s"
 msgstr "Hiba a %s játékállás betöltésekor"
 
-#: ../src/wx/panel.cpp:629
+#: ../src/wx/panel.cpp:630
 #, c-format
 msgid "Saved state %s"
 msgstr "A %s játékállás mentve"
 
-#: ../src/wx/panel.cpp:629
+#: ../src/wx/panel.cpp:630
 #, c-format
 msgid "Error saving state %s"
 msgstr "Hiba a %s játékállás mentésekor"
 
-#: ../src/wx/panel.cpp:842
+#: ../src/wx/panel.cpp:843
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "A teljesképernyős mód %dx%d-%d@%d nem támogatott; másik keresése"
 
-#: ../src/wx/panel.cpp:880
+#: ../src/wx/panel.cpp:881
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "A teljesképernyős mód %dx%d-%d@%d nem támogatott"
 
-#: ../src/wx/panel.cpp:885
+#: ../src/wx/panel.cpp:886
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Érvényes mód: %dx%d-%d@%d"
 
-#: ../src/wx/panel.cpp:893
+#: ../src/wx/panel.cpp:894
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "%dx%d-%d@%d mód választva"
 
-#: ../src/wx/panel.cpp:897
+#: ../src/wx/panel.cpp:898
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Nem sikerült %dx%d-%d@%d módra váltani"
 
-#: ../src/wx/panel.cpp:969
+#: ../src/wx/panel.cpp:970
 msgid "Not a valid GBA cartridge"
 msgstr "Érvénytelen GBA bővítőkártya"
 
-#: ../src/wx/panel.cpp:1082
+#: ../src/wx/panel.cpp:1083
 msgid "No memory for rewinding"
 msgstr "Visszajátszáshoz kevés a memória"
 
-#: ../src/wx/panel.cpp:1092
+#: ../src/wx/panel.cpp:1093
 msgid "Error writing rewind state"
 msgstr "Hiba a visszajátszás-állás írásakor"
 
-#: ../src/wx/panel.cpp:2268
+#: ../src/wx/panel.cpp:2262
 msgid "memory allocation error"
 msgstr "memóriakioszási hiba"
 
-#: ../src/wx/panel.cpp:2271
+#: ../src/wx/panel.cpp:2265
 msgid "error initializing codec"
 msgstr "hiba a kodek inicializálásnál"
 
-#: ../src/wx/panel.cpp:2274
+#: ../src/wx/panel.cpp:2268
 msgid "error writing to output file"
 msgstr "hiba a kimeneti fájl írásakor"
 
-#: ../src/wx/panel.cpp:2277
+#: ../src/wx/panel.cpp:2271
 msgid "can't guess output format from file name"
 msgstr "a fájlnévből nem állapítható meg a kimenet formátuma"
 
-#: ../src/wx/panel.cpp:2282
+#: ../src/wx/panel.cpp:2276
 msgid "programming error; aborting!"
 msgstr "programhiba; megszakítás!"
 
-#: ../src/wx/panel.cpp:2296 ../src/wx/panel.cpp:2327
+#: ../src/wx/panel.cpp:2290 ../src/wx/panel.cpp:2321
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Nem lehet megkezdeni a rögzítést ide: %s (%s)"
 
-#: ../src/wx/panel.cpp:2355
+#: ../src/wx/panel.cpp:2349
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Hiba a hang/videó rögzítésekor (%s); megszakítás"
 
-#: ../src/wx/panel.cpp:2361
+#: ../src/wx/panel.cpp:2355
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Hiba a hangrögzítéskor (%s); megszakítás"
 
-#: ../src/wx/panel.cpp:2371
+#: ../src/wx/panel.cpp:2365
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Hiba a videórögzítéskor (%s); megszakítás"
@@ -909,12 +925,12 @@ msgstr "Bezár"
 msgid "Printed"
 msgstr "Kinyomtatva"
 
-#: ../src/wx/sys.cpp:1171
+#: ../src/wx/sys.cpp:1175
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Hiba az ál-TTY megnyitásakor: %s"
 
-#: ../src/wx/sys.cpp:1270
+#: ../src/wx/sys.cpp:1274
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Hiba a szerver socket beállításakor (%d)"
@@ -1097,19 +1113,19 @@ msgstr "A billentyűzethez rendelkezésre álló parancsok:\n\n"
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Hibás konfigurációs beállítás, vagy több ROM fájl lett megadva:\n"
 
-#: ../src/wx/xaudio2.cpp:31
+#: ../src/wx/xaudio2.cpp:35
 msgid "XAudio2: Enumerating devices failed!"
 msgstr "XAudio2: Az eszközök felismerése sikertelen!"
 
-#: ../src/wx/xaudio2.cpp:65 ../src/wx/xaudio2.cpp:349
+#: ../src/wx/xaudio2.cpp:69 ../src/wx/xaudio2.cpp:353
 msgid "The XAudio2 interface failed to initialize!"
 msgstr "Sikertelen az XAudio2 felület inicializálása!"
 
-#: ../src/wx/xaudio2.cpp:380
+#: ../src/wx/xaudio2.cpp:384
 msgid "XAudio2: Creating mastering voice failed!"
 msgstr "XAudio2: A főhang létrehozása sikertelen!"
 
-#: ../src/wx/xaudio2.cpp:389
+#: ../src/wx/xaudio2.cpp:393
 msgid "XAudio2: Creating source voice failed!"
 msgstr "XAudio2: A forráshang létrehozása sikertelen!"
 
@@ -1946,11 +1962,11 @@ msgstr "Game Boy Color"
 msgid "Super Game Boy"
 msgstr "Super Game Boy"
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:32 ../src/wx/xrc/SoundConfig.xrc:283
+#: ../src/wx/xrc/GameBoyConfig.xrc:32 ../src/wx/xrc/SoundConfig.xrc:294
 msgid "Game Boy"
 msgstr "Game Boy"
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:33 ../src/wx/xrc/SoundConfig.xrc:328
+#: ../src/wx/xrc/GameBoyConfig.xrc:33 ../src/wx/xrc/SoundConfig.xrc:339
 msgid "Game Boy Advance"
 msgstr "Game Boy Advance"
 
@@ -3397,7 +3413,7 @@ msgstr "Hangerő :"
 msgid "Mute"
 msgstr "Némítás"
 
-#: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:313
+#: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:324
 msgid "Maximum"
 msgstr "Maximum"
 
@@ -3429,55 +3445,59 @@ msgstr "SDL"
 msgid "OpenAL"
 msgstr "OpenAL"
 
-#: ../src/wx/xrc/SoundConfig.xrc:118
-msgid "XAudio2"
-msgstr "XAudio2"
-
-#: ../src/wx/xrc/SoundConfig.xrc:125
+#: ../src/wx/xrc/SoundConfig.xrc:119
 msgid "DirectSound"
 msgstr "DirectSound"
 
-#: ../src/wx/xrc/SoundConfig.xrc:139
+#: ../src/wx/xrc/SoundConfig.xrc:127
+msgid "XAudio2"
+msgstr "XAudio2"
+
+#: ../src/wx/xrc/SoundConfig.xrc:135
+msgid "FAudio"
+msgstr ""
+
+#: ../src/wx/xrc/SoundConfig.xrc:150
 msgid "Device"
 msgstr "Eszköz"
 
-#: ../src/wx/xrc/SoundConfig.xrc:147
+#: ../src/wx/xrc/SoundConfig.xrc:158
 msgid "Enable stereo upmixing"
 msgstr "Sztereó felkonvertálás engedélyezése"
 
-#: ../src/wx/xrc/SoundConfig.xrc:154
+#: ../src/wx/xrc/SoundConfig.xrc:165
 msgid "Enable hardware acceleration"
 msgstr "Hardveres gyorsítás engedélyezése"
 
-#: ../src/wx/xrc/SoundConfig.xrc:183
+#: ../src/wx/xrc/SoundConfig.xrc:194
 msgid "Number of sound buffers:"
 msgstr "Ideiglenes hangtárolók száma:"
 
-#: ../src/wx/xrc/SoundConfig.xrc:191
+#: ../src/wx/xrc/SoundConfig.xrc:202
 msgid "Advanced"
 msgstr "Haladó"
 
-#: ../src/wx/xrc/SoundConfig.xrc:223
+#: ../src/wx/xrc/SoundConfig.xrc:234
 msgid "Lots"
 msgstr "Sok"
 
-#: ../src/wx/xrc/SoundConfig.xrc:232
+#: ../src/wx/xrc/SoundConfig.xrc:243
 msgid "Echo"
 msgstr "Visszhang"
 
-#: ../src/wx/xrc/SoundConfig.xrc:240
+#: ../src/wx/xrc/SoundConfig.xrc:251
 msgid "Stereo"
 msgstr "Sztereó"
 
-#: ../src/wx/xrc/SoundConfig.xrc:251
+#: ../src/wx/xrc/SoundConfig.xrc:262
 msgid "Center"
 msgstr "Közép"
 
-#: ../src/wx/xrc/SoundConfig.xrc:262
+#: ../src/wx/xrc/SoundConfig.xrc:273
 msgid "Left/Right"
 msgstr "Bal/Jobb"
 
-#: ../src/wx/xrc/SoundConfig.xrc:291
+#: ../src/wx/xrc/SoundConfig.xrc:302
 msgid "Sound filtering"
 msgstr "Hangszűrők"
 

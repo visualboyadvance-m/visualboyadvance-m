@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-11 16:01-0700\n"
-"PO-Revision-Date: 2018-08-11 23:38+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"POT-Creation-Date: 2019-01-02 17:22-0800\n"
+"PO-Revision-Date: 2019-07-04 01:53+0000\n"
+"Last-Translator: bgK\n"
 "Language-Team: German (http://www.transifex.com/bgk/vba-m/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -167,12 +167,12 @@ msgstr "ROM+HuC-3"
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: ../src/wx/cmdevents.cpp:718 ../src/wx/guiinit.cpp:1766
+#: ../src/wx/cmdevents.cpp:718 ../src/wx/guiinit.cpp:1774
 #: ../src/wx/xrc/DisplayConfig.xrc:85 ../src/wx/xrc/DisplayConfig.xrc:135
 #: ../src/wx/xrc/DisplayConfig.xrc:221
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:183
-#: ../src/wx/xrc/SoundConfig.xrc:212 ../src/wx/xrc/SoundConfig.xrc:302
+#: ../src/wx/xrc/SoundConfig.xrc:223 ../src/wx/xrc/SoundConfig.xrc:313
 msgid "None"
 msgstr "Nichts"
 
@@ -203,7 +203,7 @@ msgstr "Das Importieren einer Batterie-Datei löscht alle Speicherstände (nach 
 msgid "Confirm import"
 msgstr "Import bestätigen"
 
-#: ../src/wx/cmdevents.cpp:867 ../src/wx/panel.cpp:356
+#: ../src/wx/cmdevents.cpp:867 ../src/wx/panel.cpp:357
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Batterie geladen %s"
@@ -281,12 +281,12 @@ msgstr "Snapshot-Datei %s geladen"
 msgid "Error loading snapshot file %s"
 msgstr "Fehler beim Laden der Snapshot-Datei %s"
 
-#: ../src/wx/cmdevents.cpp:1058 ../src/wx/panel.cpp:661
+#: ../src/wx/cmdevents.cpp:1058 ../src/wx/panel.cpp:662
 #, c-format
 msgid "Wrote battery %s"
 msgstr "Batterie %s geschrieben"
 
-#: ../src/wx/cmdevents.cpp:1060 ../src/wx/panel.cpp:663
+#: ../src/wx/cmdevents.cpp:1060 ../src/wx/panel.cpp:664
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Fehler beim Schreiben der Batterie %s"
@@ -388,18 +388,18 @@ msgstr "Warte auf Verbindung auf Port %d"
 msgid "Waiting for GDB..."
 msgstr "Warte auf GDB..."
 
-#: ../src/wx/cmdevents.cpp:2411
+#: ../src/wx/cmdevents.cpp:2412
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Nintendo Game Boy (+Color +Advance) Emulator."
 
-#: ../src/wx/cmdevents.cpp:2412
+#: ../src/wx/cmdevents.cpp:2413
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA Entwicklerteam\nCopyright (C) 2007-2011 VBA-M Entwicklerteam"
 
-#: ../src/wx/cmdevents.cpp:2413
+#: ../src/wx/cmdevents.cpp:2414
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -415,11 +415,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, entweder gemäß Version 2 der Lizenz oder (Ihrer Entscheidung nach) jeder späteren Version.\n\nDie Veröffentlichung dieses Programms erfolgt in der Hoffnung, dass es Ihnen von Nutzen sein wird, aber OHNE JEGLICHE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.\n\nSie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, gehen Sie auf http://www.gnu.de/documents/index.de.html ."
 
-#: ../src/wx/cmdevents.cpp:2672
+#: ../src/wx/cmdevents.cpp:2673
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN-Link ist bereits aktiv. Deaktivieren Sie den Linkmodus zum Trennen der Verbindung."
 
-#: ../src/wx/cmdevents.cpp:2678
+#: ../src/wx/cmdevents.cpp:2679
 msgid "Network is not supported in local mode."
 msgstr "Netzwerk wird in lokalem Modus nicht unterstützt."
 
@@ -462,6 +462,22 @@ msgstr "Kann primären Sound nicht abspielen %08x"
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
 msgstr "dsbSecondary->Lock() fehlgeschlagen: %08x"
+
+#: ../src/wx/faudio.cpp:32
+msgid "FAudio: Enumerating devices failed!"
+msgstr ""
+
+#: ../src/wx/faudio.cpp:67 ../src/wx/faudio.cpp:352
+msgid "The FAudio interface failed to initialize!"
+msgstr ""
+
+#: ../src/wx/faudio.cpp:384
+msgid "FAudio: Creating mastering voice failed!"
+msgstr ""
+
+#: ../src/wx/faudio.cpp:395
+msgid "FAudio: Creating source voice failed!"
+msgstr ""
 
 #: ../src/wx/gfxviewers.cpp:1131
 msgid "Select output file and type"
@@ -521,7 +537,7 @@ msgstr "Cheat-Datei auswählen"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA Cheat-Liste (*.clt)|*.clt|CHT Cheat-Liste (*.cht)|*.cht"
 
-#: ../src/wx/guiinit.cpp:236 ../src/wx/panel.cpp:412
+#: ../src/wx/guiinit.cpp:236 ../src/wx/panel.cpp:413
 msgid "Loaded cheats"
 msgstr "Cheats geladen"
 
@@ -607,242 +623,242 @@ msgstr "%d Frames = %.2f ms"
 msgid "Default device"
 msgstr "Standardgerät"
 
-#: ../src/wx/guiinit.cpp:1653
+#: ../src/wx/guiinit.cpp:1661
 msgid "Desktop mode"
 msgstr "Desktopmodus"
 
-#: ../src/wx/guiinit.cpp:1660
+#: ../src/wx/guiinit.cpp:1668
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: ../src/wx/guiinit.cpp:1805
+#: ../src/wx/guiinit.cpp:1813
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Es wurden keine anwendbaren RPI-Plugins in %s gefunden."
 
-#: ../src/wx/guiinit.cpp:1825 ../src/wx/xrc/DisplayConfig.xrc:107
+#: ../src/wx/guiinit.cpp:1833 ../src/wx/xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "Plugin"
 
-#: ../src/wx/guiinit.cpp:1853
+#: ../src/wx/guiinit.cpp:1861
 msgid "Please select a plugin or a different filter"
 msgstr "Bitte wähle ein Plugin oder einen anderen Filter aus"
 
-#: ../src/wx/guiinit.cpp:1854
+#: ../src/wx/guiinit.cpp:1862
 msgid "Plugin selection error"
 msgstr "Fehler bei Plugin-Auswahl"
 
-#: ../src/wx/guiinit.cpp:2050
+#: ../src/wx/guiinit.cpp:2058
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "Dies wird alle benutzerdefinierten Schnelltasten zurücksetzen. Fortfahren?"
 
-#: ../src/wx/guiinit.cpp:2050
+#: ../src/wx/guiinit.cpp:2058
 msgid "Confirm"
 msgstr "Bestätigen"
 
-#: ../src/wx/guiinit.cpp:2568
+#: ../src/wx/guiinit.cpp:2579
 msgid "Main icon not found"
 msgstr "Haupt-Icon nicht gefunden"
 
-#: ../src/wx/guiinit.cpp:2586
+#: ../src/wx/guiinit.cpp:2597
 msgid "Main display panel not found"
 msgstr "Haupt-Display nicht gefunden"
 
-#: ../src/wx/guiinit.cpp:2700
+#: ../src/wx/guiinit.cpp:2711
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Doppelt belegte Schnelltaste: %s für %s und %s. Erste wird beibehalten."
 
-#: ../src/wx/guiinit.cpp:2714
+#: ../src/wx/guiinit.cpp:2725
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Menü-Schnelltaste %s für %s überschreibt Standardzuweisung für %s. Menü wird beibehalten."
 
-#: ../src/wx/guiinit.cpp:2820
+#: ../src/wx/guiinit.cpp:2831
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Ungültiges Menüelement %s; wird entfernt."
 
-#: ../src/wx/guiinit.cpp:3015
+#: ../src/wx/guiinit.cpp:3026
 msgid "Code"
 msgstr "Code"
 
-#: ../src/wx/guiinit.cpp:3024
+#: ../src/wx/guiinit.cpp:3035
 msgid "Description"
 msgstr "Beschreibung"
 
-#: ../src/wx/guiinit.cpp:3098 ../src/wx/xrc/CheatAdd.xrc:31
+#: ../src/wx/guiinit.cpp:3109 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Adresse"
 
-#: ../src/wx/guiinit.cpp:3099
+#: ../src/wx/guiinit.cpp:3110
 msgid "Old Value"
 msgstr "Ursprünglicher Wert"
 
-#: ../src/wx/guiinit.cpp:3100
+#: ../src/wx/guiinit.cpp:3111
 msgid "New Value"
 msgstr "Neuer Wert"
 
-#: ../src/wx/guiinit.cpp:3557
+#: ../src/wx/guiinit.cpp:3572
 msgid "Menu commands"
 msgstr "Menükommandos"
 
-#: ../src/wx/guiinit.cpp:3580
+#: ../src/wx/guiinit.cpp:3595
 msgid "Other commands"
 msgstr "Andere Kommandos"
 
-#: ../src/wx/guiinit.cpp:3691
+#: ../src/wx/guiinit.cpp:3706
 msgid "JoyBus host invalid; disabling"
 msgstr "JoyBus-Host ungültig; wird deaktiviert."
 
-#: ../src/wx/opts.cpp:502 ../src/wx/opts.cpp:783
+#: ../src/wx/opts.cpp:495 ../src/wx/opts.cpp:776
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Ungültiger Wert %s für Option %s; gültige Werte sind %s%s%s."
 
-#: ../src/wx/opts.cpp:519 ../src/wx/opts.cpp:795
+#: ../src/wx/opts.cpp:512 ../src/wx/opts.cpp:788
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Ungültiger Wert %d für Option %s; gültige Werte sind %d -%d."
 
-#: ../src/wx/opts.cpp:526 ../src/wx/opts.cpp:803
+#: ../src/wx/opts.cpp:519 ../src/wx/opts.cpp:796
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Ungültiger Wert 1 %f für Option 2 %s; gültige Werte sind 1 %f-1 %f"
 
-#: ../src/wx/opts.cpp:585 ../src/wx/opts.cpp:606 ../src/wx/opts.cpp:872
-#: ../src/wx/opts.cpp:898
+#: ../src/wx/opts.cpp:578 ../src/wx/opts.cpp:599 ../src/wx/opts.cpp:865
+#: ../src/wx/opts.cpp:891
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Ungültige Tastenkombination %s für %s."
 
-#: ../src/wx/opts.cpp:766
+#: ../src/wx/opts.cpp:759
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Ungültiges Flag %s - %s wird ignoriert."
 
-#: ../src/wx/panel.cpp:85
+#: ../src/wx/panel.cpp:86
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s ist keine gültige ROM-Datei"
 
-#: ../src/wx/panel.cpp:86 ../src/wx/panel.cpp:143 ../src/wx/panel.cpp:218
+#: ../src/wx/panel.cpp:87 ../src/wx/panel.cpp:144 ../src/wx/panel.cpp:219
 msgid "Problem loading file"
 msgstr "Problem beim Laden der Datei"
 
-#: ../src/wx/panel.cpp:142
+#: ../src/wx/panel.cpp:143
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Konnte Game Boy-ROM %s nicht laden."
 
-#: ../src/wx/panel.cpp:194 ../src/wx/panel.cpp:287
+#: ../src/wx/panel.cpp:195 ../src/wx/panel.cpp:288
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Konnte BIOS %s nicht laden"
 
-#: ../src/wx/panel.cpp:217
+#: ../src/wx/panel.cpp:218
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Konnte Game Boy Advance ROM %s nicht laden."
 
-#: ../src/wx/panel.cpp:445
+#: ../src/wx/panel.cpp:446
 msgid " player "
 msgstr "Spieler"
 
-#: ../src/wx/panel.cpp:605
+#: ../src/wx/panel.cpp:606
 #, c-format
 msgid "Loaded state %s"
 msgstr "Savestate %s geladen"
 
-#: ../src/wx/panel.cpp:605
+#: ../src/wx/panel.cpp:606
 #, c-format
 msgid "Error loading state %s"
 msgstr "Fehler beim Laden von Savestate %s"
 
-#: ../src/wx/panel.cpp:629
+#: ../src/wx/panel.cpp:630
 #, c-format
 msgid "Saved state %s"
 msgstr "Savestate %s gespeichert"
 
-#: ../src/wx/panel.cpp:629
+#: ../src/wx/panel.cpp:630
 #, c-format
 msgid "Error saving state %s"
 msgstr "Fehler beim Speichern von Savestate %s"
 
-#: ../src/wx/panel.cpp:842
+#: ../src/wx/panel.cpp:843
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Vollbildmodus %dx%d-%d@%d wird nicht unterstützt; probiere einen anderen aus."
 
-#: ../src/wx/panel.cpp:880
+#: ../src/wx/panel.cpp:881
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Vollbildmodus %dx%d-%d@%d wird nicht unterstützt."
 
-#: ../src/wx/panel.cpp:885
+#: ../src/wx/panel.cpp:886
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Gültiger Modus: %dx%d-%d@%d"
 
-#: ../src/wx/panel.cpp:893
+#: ../src/wx/panel.cpp:894
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Modus %dx%d-%d@%d ausgewählt"
 
-#: ../src/wx/panel.cpp:897
+#: ../src/wx/panel.cpp:898
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Konnte Anzeigemodus nicht auf %dx%d-%d@%d umstellen."
 
-#: ../src/wx/panel.cpp:969
+#: ../src/wx/panel.cpp:970
 msgid "Not a valid GBA cartridge"
 msgstr "Keine gültige GBA-Steckkarte"
 
-#: ../src/wx/panel.cpp:1082
+#: ../src/wx/panel.cpp:1083
 msgid "No memory for rewinding"
 msgstr "Kein freier Speicher für Zurückspuhl-Datei"
 
-#: ../src/wx/panel.cpp:1092
+#: ../src/wx/panel.cpp:1093
 msgid "Error writing rewind state"
 msgstr "Fehler beim Speichern von Zurückspuhl-Datei"
 
-#: ../src/wx/panel.cpp:2268
+#: ../src/wx/panel.cpp:2262
 msgid "memory allocation error"
 msgstr "Fehler bei Speicherzuweisung"
 
-#: ../src/wx/panel.cpp:2271
+#: ../src/wx/panel.cpp:2265
 msgid "error initializing codec"
 msgstr "Fehler bei Initialisierung von Codec"
 
-#: ../src/wx/panel.cpp:2274
+#: ../src/wx/panel.cpp:2268
 msgid "error writing to output file"
 msgstr "Fehler beim Schreiben in Ausgabedatei"
 
-#: ../src/wx/panel.cpp:2277
+#: ../src/wx/panel.cpp:2271
 msgid "can't guess output format from file name"
 msgstr "Konnte Ausgabeformat nicht von Dateiendung ableiten"
 
-#: ../src/wx/panel.cpp:2282
+#: ../src/wx/panel.cpp:2276
 msgid "programming error; aborting!"
 msgstr "Programmierfehler! Abbruch!"
 
-#: ../src/wx/panel.cpp:2296 ../src/wx/panel.cpp:2327
+#: ../src/wx/panel.cpp:2290 ../src/wx/panel.cpp:2321
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Konnte nicht mit Aufnahme nach %s beginnen (%s)"
 
-#: ../src/wx/panel.cpp:2355
+#: ../src/wx/panel.cpp:2349
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Fehler bei Audio/Video-Aufnahme (%s). Abbruch!"
 
-#: ../src/wx/panel.cpp:2361
+#: ../src/wx/panel.cpp:2355
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Fehler bei Audio-Aufnahme (%s). Abbruch!"
 
-#: ../src/wx/panel.cpp:2371
+#: ../src/wx/panel.cpp:2365
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Fehler bei Video-Aufnahme (%s). Abbruch!"
@@ -912,12 +928,12 @@ msgstr "S&chließen"
 msgid "Printed"
 msgstr "Ausdruck fertig"
 
-#: ../src/wx/sys.cpp:1171
+#: ../src/wx/sys.cpp:1175
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Fehler beim Öffnen von Pseudo-TTY: %s"
 
-#: ../src/wx/sys.cpp:1270
+#: ../src/wx/sys.cpp:1274
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Fehler beim Einrichten von Server-Socket (%d)"
@@ -1100,19 +1116,19 @@ msgstr "Die verfügbaren Tastaturkommandos sind:\n\n"
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Fehlerhafte Konfiguration oder mehrere ROM-Dateien übergeben:\n"
 
-#: ../src/wx/xaudio2.cpp:31
+#: ../src/wx/xaudio2.cpp:35
 msgid "XAudio2: Enumerating devices failed!"
 msgstr "XAudio2: Erkennen von Geräten fehlgeschlagen!"
 
-#: ../src/wx/xaudio2.cpp:65 ../src/wx/xaudio2.cpp:349
+#: ../src/wx/xaudio2.cpp:69 ../src/wx/xaudio2.cpp:353
 msgid "The XAudio2 interface failed to initialize!"
 msgstr "Die XAudio2-Schnittstelle konnte nicht initialisiert werden!"
 
-#: ../src/wx/xaudio2.cpp:380
+#: ../src/wx/xaudio2.cpp:384
 msgid "XAudio2: Creating mastering voice failed!"
 msgstr "XAudio2: Erstellen von Mastering-Voice fehlgeschlagen!"
 
-#: ../src/wx/xaudio2.cpp:389
+#: ../src/wx/xaudio2.cpp:393
 msgid "XAudio2: Creating source voice failed!"
 msgstr "XAudio2: Erstellen von Source-Voice fehlgeschlagen!"
 
@@ -1949,11 +1965,11 @@ msgstr "Game Boy Color"
 msgid "Super Game Boy"
 msgstr "Super Game Boy"
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:32 ../src/wx/xrc/SoundConfig.xrc:283
+#: ../src/wx/xrc/GameBoyConfig.xrc:32 ../src/wx/xrc/SoundConfig.xrc:294
 msgid "Game Boy"
 msgstr "Game Boy"
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:33 ../src/wx/xrc/SoundConfig.xrc:328
+#: ../src/wx/xrc/GameBoyConfig.xrc:33 ../src/wx/xrc/SoundConfig.xrc:339
 msgid "Game Boy Advance"
 msgstr "Game Boy Advance"
 
@@ -3400,7 +3416,7 @@ msgstr "Lautstärke:"
 msgid "Mute"
 msgstr "Stumm schalten"
 
-#: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:313
+#: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:324
 msgid "Maximum"
 msgstr "Maximum"
 
@@ -3432,55 +3448,59 @@ msgstr "SDL"
 msgid "OpenAL"
 msgstr "OpenAL"
 
-#: ../src/wx/xrc/SoundConfig.xrc:118
-msgid "XAudio2"
-msgstr "XAudio2"
-
-#: ../src/wx/xrc/SoundConfig.xrc:125
+#: ../src/wx/xrc/SoundConfig.xrc:119
 msgid "DirectSound"
 msgstr "DirectSound"
 
-#: ../src/wx/xrc/SoundConfig.xrc:139
+#: ../src/wx/xrc/SoundConfig.xrc:127
+msgid "XAudio2"
+msgstr "XAudio2"
+
+#: ../src/wx/xrc/SoundConfig.xrc:135
+msgid "FAudio"
+msgstr ""
+
+#: ../src/wx/xrc/SoundConfig.xrc:150
 msgid "Device"
 msgstr "Gerät"
 
-#: ../src/wx/xrc/SoundConfig.xrc:147
+#: ../src/wx/xrc/SoundConfig.xrc:158
 msgid "Enable stereo upmixing"
 msgstr "Stereo-Upmixing aktivieren"
 
-#: ../src/wx/xrc/SoundConfig.xrc:154
+#: ../src/wx/xrc/SoundConfig.xrc:165
 msgid "Enable hardware acceleration"
 msgstr "Hardware-Beschleunigung aktivieren"
 
-#: ../src/wx/xrc/SoundConfig.xrc:183
+#: ../src/wx/xrc/SoundConfig.xrc:194
 msgid "Number of sound buffers:"
 msgstr "Anzahl der Sound-Buffer:"
 
-#: ../src/wx/xrc/SoundConfig.xrc:191
+#: ../src/wx/xrc/SoundConfig.xrc:202
 msgid "Advanced"
 msgstr "Erweitert"
 
-#: ../src/wx/xrc/SoundConfig.xrc:223
+#: ../src/wx/xrc/SoundConfig.xrc:234
 msgid "Lots"
 msgstr "Viele"
 
-#: ../src/wx/xrc/SoundConfig.xrc:232
+#: ../src/wx/xrc/SoundConfig.xrc:243
 msgid "Echo"
 msgstr "Echo"
 
-#: ../src/wx/xrc/SoundConfig.xrc:240
+#: ../src/wx/xrc/SoundConfig.xrc:251
 msgid "Stereo"
 msgstr "Stereo"
 
-#: ../src/wx/xrc/SoundConfig.xrc:251
+#: ../src/wx/xrc/SoundConfig.xrc:262
 msgid "Center"
 msgstr "Center"
 
-#: ../src/wx/xrc/SoundConfig.xrc:262
+#: ../src/wx/xrc/SoundConfig.xrc:273
 msgid "Left/Right"
 msgstr "Links/Rechts"
 
-#: ../src/wx/xrc/SoundConfig.xrc:291
+#: ../src/wx/xrc/SoundConfig.xrc:302
 msgid "Sound filtering"
 msgstr "Tonfilterung"
 

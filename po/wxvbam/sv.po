@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Claes-Göran Nydahl <goldug@gmail.com>, 2019
 # [deleted], 2015
 # [deleted], 2015
 # Sebastian Rasmussen <sebras@gmail.com>, 2018
@@ -12,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-11 16:01-0700\n"
-"PO-Revision-Date: 2018-10-23 21:36+0000\n"
-"Last-Translator: Sebastian Rasmussen <sebras@gmail.com>\n"
+"POT-Creation-Date: 2019-01-02 17:22-0800\n"
+"PO-Revision-Date: 2019-07-04 01:53+0000\n"
+"Last-Translator: bgK\n"
 "Language-Team: Swedish (http://www.transifex.com/bgk/vba-m/language/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -167,12 +168,12 @@ msgstr "ROM+HuC-3"
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: ../src/wx/cmdevents.cpp:718 ../src/wx/guiinit.cpp:1766
+#: ../src/wx/cmdevents.cpp:718 ../src/wx/guiinit.cpp:1774
 #: ../src/wx/xrc/DisplayConfig.xrc:85 ../src/wx/xrc/DisplayConfig.xrc:135
 #: ../src/wx/xrc/DisplayConfig.xrc:221
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:183
-#: ../src/wx/xrc/SoundConfig.xrc:212 ../src/wx/xrc/SoundConfig.xrc:302
+#: ../src/wx/xrc/SoundConfig.xrc:223 ../src/wx/xrc/SoundConfig.xrc:313
 msgid "None"
 msgstr "Inga"
 
@@ -203,7 +204,7 @@ msgstr "Importen av en batterifil kommer att radera alla sparade spel (permanent
 msgid "Confirm import"
 msgstr "Bekräfta import"
 
-#: ../src/wx/cmdevents.cpp:867 ../src/wx/panel.cpp:356
+#: ../src/wx/cmdevents.cpp:867 ../src/wx/panel.cpp:357
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Laddade batteri %s"
@@ -253,40 +254,40 @@ msgstr "Fel vid laddning av kodfil %s"
 
 #: ../src/wx/cmdevents.cpp:998 ../src/wx/cmdevents.cpp:1074
 msgid "Select snapshot file"
-msgstr "Välj snapshotfil"
+msgstr "Välj ögonblicksfil"
 
 #: ../src/wx/cmdevents.cpp:999
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots "
 "(*.gsv)|*.gsv"
-msgstr "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots (*.gsv)|*.gsv"
+msgstr "GS & PAC Ögonblicksfiler (*.sps;*.xps)|*.sps;*.xps|GameShark SP Ögonblicksfiler (*.gsv)|*.gsv"
 
 #: ../src/wx/cmdevents.cpp:999
 msgid "Gameboy Snapshot (*.gbs)|*.gbs"
-msgstr "Gameboy Snapshot (*.gbs)|*.gbs"
+msgstr "Gameboy Ögonblicksfil (*.gbs)|*.gbs"
 
 #: ../src/wx/cmdevents.cpp:1008
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
-msgstr "Importen av en snapshotfil kommer att radera alla sparade spel (permanent efter nästa skrivning). Vill du fortsätta?"
+msgstr "Importen av en ögonblicksfil kommer att radera alla sparade spel (permanent efter nästa skrivning). Vill du fortsätta?"
 
 #: ../src/wx/cmdevents.cpp:1033
 #, c-format
 msgid "Loaded snapshot file %s"
-msgstr "Laddade snapshotfil %s"
+msgstr "Laddade ögonblicksfil %s"
 
 #: ../src/wx/cmdevents.cpp:1035
 #, c-format
 msgid "Error loading snapshot file %s"
-msgstr "Fel vid laddning av snapshotfil %s"
+msgstr "Fel vid laddning av ögonblicksfil %s"
 
-#: ../src/wx/cmdevents.cpp:1058 ../src/wx/panel.cpp:661
+#: ../src/wx/cmdevents.cpp:1058 ../src/wx/panel.cpp:662
 #, c-format
 msgid "Wrote battery %s"
 msgstr "Skrev batteri %s"
 
-#: ../src/wx/cmdevents.cpp:1060 ../src/wx/panel.cpp:663
+#: ../src/wx/cmdevents.cpp:1060 ../src/wx/panel.cpp:664
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Fel vid skrivning av batteri %s"
@@ -306,12 +307,12 @@ msgstr "Exporterat från VisualBoyAdvance-M"
 #: ../src/wx/cmdevents.cpp:1101
 #, c-format
 msgid "Saved snapshot file %s"
-msgstr "Sparade snapshotfil %s"
+msgstr "Sparade ögonblicksfil %s"
 
 #: ../src/wx/cmdevents.cpp:1103
 #, c-format
 msgid "Error saving snapshot file %s"
-msgstr "Fel vid sparandet av snapshotfil %s"
+msgstr "Fel vid sparandet av ögonblicksfil%s"
 
 #: ../src/wx/cmdevents.cpp:1118 ../src/wx/cmdevents.cpp:1199
 #: ../src/wx/cmdevents.cpp:1272 ../src/wx/cmdevents.cpp:1299
@@ -327,11 +328,11 @@ msgstr "PNG bilder|*.png|BMP bilder|*.bmp"
 #: ../src/wx/cmdevents.cpp:1143 ../src/wx/sys.cpp:437
 #, c-format
 msgid "Wrote snapshot %s"
-msgstr "Skrev snapshot %s"
+msgstr "Skrev ögonblicksfil %s"
 
 #: ../src/wx/cmdevents.cpp:1167 ../src/wx/cmdevents.cpp:1240
 msgid " files ("
-msgstr "filer ("
+msgstr " filer ("
 
 #: ../src/wx/cmdevents.cpp:1300 ../src/wx/cmdevents.cpp:1321
 msgid "VBA Movie files|*.vmv"
@@ -388,18 +389,18 @@ msgstr "Väntar på anslutning vid port %d"
 msgid "Waiting for GDB..."
 msgstr "Väntar på GDB..."
 
-#: ../src/wx/cmdevents.cpp:2411
+#: ../src/wx/cmdevents.cpp:2412
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Nintendo GameBoy (+Color+Advance) emulator."
 
-#: ../src/wx/cmdevents.cpp:2412
+#: ../src/wx/cmdevents.cpp:2413
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA-utvecklingsgrupp\nCopyright (C) 2007-2017 VBA-M-utvecklingsgrupp"
 
-#: ../src/wx/cmdevents.cpp:2413
+#: ../src/wx/cmdevents.cpp:2414
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -415,11 +416,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Det här programmet är fri mjukvara: du kan omdistribuera det och/eller modifiera\ndet under villkoren av GNU General Public License som publiceras av\nthe Free Software Foundation, antingen version 2 av licensen, eller\n(om du så vill) vilken som helst senare version. \n\nDet här programmet distribueras i förhoppningen om att det kommer att fylla sin funktion,\nmen UTAN NÅGON FORM AV GARANTI; till och med utan den antydda garantin av\nSÄLJBARHET eller LÄMPLIGHET FÖR ETT VISST ÄNDAMÅL. Se\nGNU General Public License för mer detaljer.\n\nDu skall ha fått en kopia av GNU General Public License\ntillsammans med detta program. Om inte, se http://www.gnu.org/licenses ."
 
-#: ../src/wx/cmdevents.cpp:2672
+#: ../src/wx/cmdevents.cpp:2673
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN länk är redan aktiv. Inaktivera länkläge för att koppla ifrån."
 
-#: ../src/wx/cmdevents.cpp:2678
+#: ../src/wx/cmdevents.cpp:2679
 msgid "Network is not supported in local mode."
 msgstr "Nätverk stöds inte i lokalläge."
 
@@ -462,6 +463,22 @@ msgstr "Kan inte spela primary %08x"
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
 msgstr "dsbSecondary->Lock() misslyckades: %08x"
+
+#: ../src/wx/faudio.cpp:32
+msgid "FAudio: Enumerating devices failed!"
+msgstr ""
+
+#: ../src/wx/faudio.cpp:67 ../src/wx/faudio.cpp:352
+msgid "The FAudio interface failed to initialize!"
+msgstr ""
+
+#: ../src/wx/faudio.cpp:384
+msgid "FAudio: Creating mastering voice failed!"
+msgstr ""
+
+#: ../src/wx/faudio.cpp:395
+msgid "FAudio: Creating source voice failed!"
+msgstr ""
 
 #: ../src/wx/gfxviewers.cpp:1131
 msgid "Select output file and type"
@@ -521,7 +538,7 @@ msgstr "Välj fuskfil"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA fusklistor (*.clt)|*.clt|CHT fusklistor (*.cht)|*.cht"
 
-#: ../src/wx/guiinit.cpp:236 ../src/wx/panel.cpp:412
+#: ../src/wx/guiinit.cpp:236 ../src/wx/panel.cpp:413
 msgid "Loaded cheats"
 msgstr "Laddade fusk"
 
@@ -572,19 +589,19 @@ msgstr "Sökning producerade %d resultat. Var vänlig förfina bättre."
 
 #: ../src/wx/guiinit.cpp:850
 msgid "Search produced no results"
-msgstr "Sökning producerade inga resultat."
+msgstr "Sökning producerade inga resultat"
 
 #: ../src/wx/guiinit.cpp:1010
 msgid "8-bit "
-msgstr "8-bit"
+msgstr "8-bit "
 
 #: ../src/wx/guiinit.cpp:1014
 msgid "16-bit "
-msgstr "16-bit"
+msgstr "16-bit "
 
 #: ../src/wx/guiinit.cpp:1018
 msgid "32-bit "
-msgstr "32-bit"
+msgstr "32-bit "
 
 #: ../src/wx/guiinit.cpp:1024
 msgid "signed decimal"
@@ -607,242 +624,242 @@ msgstr "%d frames = %.2f ms"
 msgid "Default device"
 msgstr "Standardenhet"
 
-#: ../src/wx/guiinit.cpp:1653
+#: ../src/wx/guiinit.cpp:1661
 msgid "Desktop mode"
 msgstr "Skrivbordsläge"
 
-#: ../src/wx/guiinit.cpp:1660
+#: ../src/wx/guiinit.cpp:1668
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: ../src/wx/guiinit.cpp:1805
+#: ../src/wx/guiinit.cpp:1813
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Inga användbara rpi plugins funna i %s"
 
-#: ../src/wx/guiinit.cpp:1825 ../src/wx/xrc/DisplayConfig.xrc:107
+#: ../src/wx/guiinit.cpp:1833 ../src/wx/xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "Plugin"
 
-#: ../src/wx/guiinit.cpp:1853
+#: ../src/wx/guiinit.cpp:1861
 msgid "Please select a plugin or a different filter"
-msgstr "Var vänlig välj ett plugin eller ett annat filter."
+msgstr "Var vänlig välj ett plugin eller ett annat filter"
 
-#: ../src/wx/guiinit.cpp:1854
+#: ../src/wx/guiinit.cpp:1862
 msgid "Plugin selection error"
 msgstr "Fel vid val av plugin"
 
-#: ../src/wx/guiinit.cpp:2050
+#: ../src/wx/guiinit.cpp:2058
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "Det här kommer att rensa alla användardefinierade acceleratorer. Är du säker?"
 
-#: ../src/wx/guiinit.cpp:2050
+#: ../src/wx/guiinit.cpp:2058
 msgid "Confirm"
 msgstr "Bekräfta"
 
-#: ../src/wx/guiinit.cpp:2568
+#: ../src/wx/guiinit.cpp:2579
 msgid "Main icon not found"
 msgstr "Huvudikon ej funnen"
 
-#: ../src/wx/guiinit.cpp:2586
+#: ../src/wx/guiinit.cpp:2597
 msgid "Main display panel not found"
 msgstr "Huvudvisningspanel ej funnen"
 
-#: ../src/wx/guiinit.cpp:2700
+#: ../src/wx/guiinit.cpp:2711
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Duplicera menyaccelerator: %s för %s och %s; behåller första"
 
-#: ../src/wx/guiinit.cpp:2714
+#: ../src/wx/guiinit.cpp:2725
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Menyaccelerator %s för %s överskrider standard för %s ; behåller meny"
 
-#: ../src/wx/guiinit.cpp:2820
+#: ../src/wx/guiinit.cpp:2831
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Ogiltigt menyföremål %s; tar bort"
 
-#: ../src/wx/guiinit.cpp:3015
+#: ../src/wx/guiinit.cpp:3026
 msgid "Code"
 msgstr "Kod"
 
-#: ../src/wx/guiinit.cpp:3024
+#: ../src/wx/guiinit.cpp:3035
 msgid "Description"
 msgstr "Beskrivning"
 
-#: ../src/wx/guiinit.cpp:3098 ../src/wx/xrc/CheatAdd.xrc:31
+#: ../src/wx/guiinit.cpp:3109 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Adress"
 
-#: ../src/wx/guiinit.cpp:3099
+#: ../src/wx/guiinit.cpp:3110
 msgid "Old Value"
 msgstr "Gammalt värde"
 
-#: ../src/wx/guiinit.cpp:3100
+#: ../src/wx/guiinit.cpp:3111
 msgid "New Value"
 msgstr "Nytt värde"
 
-#: ../src/wx/guiinit.cpp:3557
+#: ../src/wx/guiinit.cpp:3572
 msgid "Menu commands"
 msgstr "Menykommandon"
 
-#: ../src/wx/guiinit.cpp:3580
+#: ../src/wx/guiinit.cpp:3595
 msgid "Other commands"
 msgstr "Andra kommandon"
 
-#: ../src/wx/guiinit.cpp:3691
+#: ../src/wx/guiinit.cpp:3706
 msgid "JoyBus host invalid; disabling"
 msgstr "JoyBus värd ogiltig; inaktiverar"
 
-#: ../src/wx/opts.cpp:502 ../src/wx/opts.cpp:783
+#: ../src/wx/opts.cpp:495 ../src/wx/opts.cpp:776
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Ogiltigt värde %s för alternativet %s; giltiga värden är %s%s%s"
 
-#: ../src/wx/opts.cpp:519 ../src/wx/opts.cpp:795
+#: ../src/wx/opts.cpp:512 ../src/wx/opts.cpp:788
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Ogiltigt värde %d för alternativet %s; giltiga värden är %d - %d"
 
-#: ../src/wx/opts.cpp:526 ../src/wx/opts.cpp:803
+#: ../src/wx/opts.cpp:519 ../src/wx/opts.cpp:796
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Ogiltigt värde %f för alternativ %s; giltiga värden är %f - %f"
 
-#: ../src/wx/opts.cpp:585 ../src/wx/opts.cpp:606 ../src/wx/opts.cpp:872
-#: ../src/wx/opts.cpp:898
+#: ../src/wx/opts.cpp:578 ../src/wx/opts.cpp:599 ../src/wx/opts.cpp:865
+#: ../src/wx/opts.cpp:891
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Ogiltig tangentbindning %s för %s"
 
-#: ../src/wx/opts.cpp:766
+#: ../src/wx/opts.cpp:759
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Ogiltigt flaggalternativ %s - %s ignoreras"
 
-#: ../src/wx/panel.cpp:85
+#: ../src/wx/panel.cpp:86
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s är inte en giltig ROM fil"
 
-#: ../src/wx/panel.cpp:86 ../src/wx/panel.cpp:143 ../src/wx/panel.cpp:218
+#: ../src/wx/panel.cpp:87 ../src/wx/panel.cpp:144 ../src/wx/panel.cpp:219
 msgid "Problem loading file"
 msgstr "Problem vid laddning av fil"
 
-#: ../src/wx/panel.cpp:142
+#: ../src/wx/panel.cpp:143
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Oförmögen att ladda Game Boy ROM %s"
 
-#: ../src/wx/panel.cpp:194 ../src/wx/panel.cpp:287
+#: ../src/wx/panel.cpp:195 ../src/wx/panel.cpp:288
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Kunde inte ladda BIOS %s"
 
-#: ../src/wx/panel.cpp:217
+#: ../src/wx/panel.cpp:218
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Oförmögen att ladda Game Boy Advance ROM %s"
 
-#: ../src/wx/panel.cpp:445
+#: ../src/wx/panel.cpp:446
 msgid " player "
-msgstr "spelare"
+msgstr " spelare "
 
-#: ../src/wx/panel.cpp:605
+#: ../src/wx/panel.cpp:606
 #, c-format
 msgid "Loaded state %s"
 msgstr "Laddade tillstånd %s"
 
-#: ../src/wx/panel.cpp:605
+#: ../src/wx/panel.cpp:606
 #, c-format
 msgid "Error loading state %s"
 msgstr "Fel vid laddning av tillstånd %s"
 
-#: ../src/wx/panel.cpp:629
+#: ../src/wx/panel.cpp:630
 #, c-format
 msgid "Saved state %s"
 msgstr "Sparade tillstånd %s"
 
-#: ../src/wx/panel.cpp:629
+#: ../src/wx/panel.cpp:630
 #, c-format
 msgid "Error saving state %s"
 msgstr "Fel vid sparande av tillstånd %s"
 
-#: ../src/wx/panel.cpp:842
+#: ../src/wx/panel.cpp:843
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Helskärmsläge %dx%d-%d@%d stöds inte; letar efter annan"
 
-#: ../src/wx/panel.cpp:880
+#: ../src/wx/panel.cpp:881
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Helskärmsläge %dx%d-%d@%d stöds inte"
 
-#: ../src/wx/panel.cpp:885
+#: ../src/wx/panel.cpp:886
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Giltigt läge: %dx%d-%d@%d"
 
-#: ../src/wx/panel.cpp:893
+#: ../src/wx/panel.cpp:894
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Välj läge %dx%d-%d@%d"
 
-#: ../src/wx/panel.cpp:897
+#: ../src/wx/panel.cpp:898
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Misslyckades att ändra läge till %dx%d-%d@%d"
 
-#: ../src/wx/panel.cpp:969
+#: ../src/wx/panel.cpp:970
 msgid "Not a valid GBA cartridge"
 msgstr "Inte en giltig GBA kassett"
 
-#: ../src/wx/panel.cpp:1082
+#: ../src/wx/panel.cpp:1083
 msgid "No memory for rewinding"
 msgstr "Inget minne för återspolning"
 
-#: ../src/wx/panel.cpp:1092
+#: ../src/wx/panel.cpp:1093
 msgid "Error writing rewind state"
 msgstr "Fel vid skrivande av återspolningstillstånd"
 
-#: ../src/wx/panel.cpp:2268
+#: ../src/wx/panel.cpp:2262
 msgid "memory allocation error"
 msgstr "Minnesfördelningsfel"
 
-#: ../src/wx/panel.cpp:2271
+#: ../src/wx/panel.cpp:2265
 msgid "error initializing codec"
 msgstr "Fel vid initialisering av kodek"
 
-#: ../src/wx/panel.cpp:2274
+#: ../src/wx/panel.cpp:2268
 msgid "error writing to output file"
 msgstr "Fel vid skrivande till utdatafil"
 
-#: ../src/wx/panel.cpp:2277
+#: ../src/wx/panel.cpp:2271
 msgid "can't guess output format from file name"
 msgstr "Kan inte gissa utdataformat från filnamn"
 
-#: ../src/wx/panel.cpp:2282
+#: ../src/wx/panel.cpp:2276
 msgid "programming error; aborting!"
-msgstr "Programmeringsfel; avbryter!"
+msgstr "programmeringsfel; avbryter!"
 
-#: ../src/wx/panel.cpp:2296 ../src/wx/panel.cpp:2327
+#: ../src/wx/panel.cpp:2290 ../src/wx/panel.cpp:2321
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Oförmögen att börja inspelning till %s (%s)"
 
-#: ../src/wx/panel.cpp:2355
+#: ../src/wx/panel.cpp:2349
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Fel i ljud/videoinspelning (%s); avbryter"
 
-#: ../src/wx/panel.cpp:2361
+#: ../src/wx/panel.cpp:2355
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Fel i ljudinspelning (%s); avbryter"
 
-#: ../src/wx/panel.cpp:2371
+#: ../src/wx/panel.cpp:2365
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Fel i videoinspelning (%s); avbryter"
@@ -906,18 +923,18 @@ msgstr "Skrev skrivarutdata till %s"
 
 #: ../src/wx/sys.cpp:813 ../src/wx/sys.cpp:884
 msgid "&Close"
-msgstr "&Close"
+msgstr "&Stäng"
 
 #: ../src/wx/sys.cpp:879
 msgid "Printed"
 msgstr "Tryckt"
 
-#: ../src/wx/sys.cpp:1171
+#: ../src/wx/sys.cpp:1175
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Fel vid öppnande av pseudo tty: %s"
 
-#: ../src/wx/sys.cpp:1270
+#: ../src/wx/sys.cpp:1274
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Fel vid inrättande av server sockel (%d)"
@@ -1100,19 +1117,19 @@ msgstr "De tillgängliga kommandona för Tangentbord/* alternativ är:\n\n"
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Dåligt konfigurationsalternativ eller flera ROM-filer angivna:\n"
 
-#: ../src/wx/xaudio2.cpp:31
+#: ../src/wx/xaudio2.cpp:35
 msgid "XAudio2: Enumerating devices failed!"
 msgstr "XAudio2: Uppräknande av enheter misslyckades!"
 
-#: ../src/wx/xaudio2.cpp:65 ../src/wx/xaudio2.cpp:349
+#: ../src/wx/xaudio2.cpp:69 ../src/wx/xaudio2.cpp:353
 msgid "The XAudio2 interface failed to initialize!"
 msgstr "XAudio2 gränssnittet gick inte att initiera!"
 
-#: ../src/wx/xaudio2.cpp:380
+#: ../src/wx/xaudio2.cpp:384
 msgid "XAudio2: Creating mastering voice failed!"
 msgstr "XAudio2: Att skapa masteringröst misslyckades!"
 
-#: ../src/wx/xaudio2.cpp:389
+#: ../src/wx/xaudio2.cpp:393
 msgid "XAudio2: Creating source voice failed!"
 msgstr "XAudio2: Att skapa källröst misslyckades!"
 
@@ -1949,11 +1966,11 @@ msgstr "Game Boy Color"
 msgid "Super Game Boy"
 msgstr "Super Game Boy"
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:32 ../src/wx/xrc/SoundConfig.xrc:283
+#: ../src/wx/xrc/GameBoyConfig.xrc:32 ../src/wx/xrc/SoundConfig.xrc:294
 msgid "Game Boy"
 msgstr "Game Boy"
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:33 ../src/wx/xrc/SoundConfig.xrc:328
+#: ../src/wx/xrc/GameBoyConfig.xrc:33 ../src/wx/xrc/SoundConfig.xrc:339
 msgid "Game Boy Advance"
 msgstr "Game Boy Advance"
 
@@ -2270,7 +2287,7 @@ msgstr "Spara &sprite…"
 
 #: ../src/wx/xrc/GBPaletteViewer.xrc:67
 msgid "Index:"
-msgstr "Index"
+msgstr "Index:"
 
 #: ../src/wx/xrc/GBPaletteViewer.xrc:79 ../src/wx/xrc/IOViewer.xrc:21
 #: ../src/wx/xrc/PaletteViewer.xrc:62
@@ -2852,7 +2869,7 @@ msgstr "Avs&luta videoinspelning"
 
 #: ../src/wx/xrc/MainMenu.xrc:194
 msgid "Start &game recording..."
-msgstr "Påbörja s&pelinspelning"
+msgstr "Påbörja s&pelinspelning..."
 
 #: ../src/wx/xrc/MainMenu.xrc:197
 msgid "Stop g&ame recording"
@@ -2864,7 +2881,7 @@ msgstr "&Spela in"
 
 #: ../src/wx/xrc/MainMenu.xrc:203
 msgid "Start playing &movie..."
-msgstr "Påbörja f&ilminspelning"
+msgstr "Påbörja f&ilminspelning..."
 
 #: ../src/wx/xrc/MainMenu.xrc:206
 msgid "Stop playing m&ovie"
@@ -3121,7 +3138,7 @@ msgstr "Hitta f&usk…"
 
 #: ../src/wx/xrc/MainMenu.xrc:481
 msgid "A&utomatically save/load cheats"
-msgstr "Spara/läs a&utomatiskt in fusk…"
+msgstr "Spara/läs a&utomatiskt in fusk"
 
 #: ../src/wx/xrc/MainMenu.xrc:485
 msgid "&Enable cheats"
@@ -3400,7 +3417,7 @@ msgstr "Volym :"
 msgid "Mute"
 msgstr "Tyst"
 
-#: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:313
+#: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:324
 msgid "Maximum"
 msgstr "Maximal"
 
@@ -3432,55 +3449,59 @@ msgstr "SDL"
 msgid "OpenAL"
 msgstr "OpenAL"
 
-#: ../src/wx/xrc/SoundConfig.xrc:118
-msgid "XAudio2"
-msgstr "XAudio2"
-
-#: ../src/wx/xrc/SoundConfig.xrc:125
+#: ../src/wx/xrc/SoundConfig.xrc:119
 msgid "DirectSound"
 msgstr "DirectSound"
 
-#: ../src/wx/xrc/SoundConfig.xrc:139
+#: ../src/wx/xrc/SoundConfig.xrc:127
+msgid "XAudio2"
+msgstr "XAudio2"
+
+#: ../src/wx/xrc/SoundConfig.xrc:135
+msgid "FAudio"
+msgstr ""
+
+#: ../src/wx/xrc/SoundConfig.xrc:150
 msgid "Device"
 msgstr "Enhet"
 
-#: ../src/wx/xrc/SoundConfig.xrc:147
+#: ../src/wx/xrc/SoundConfig.xrc:158
 msgid "Enable stereo upmixing"
 msgstr "Aktivera stereouppmixning"
 
-#: ../src/wx/xrc/SoundConfig.xrc:154
+#: ../src/wx/xrc/SoundConfig.xrc:165
 msgid "Enable hardware acceleration"
 msgstr "Aktivera hårdvaruacceleration"
 
-#: ../src/wx/xrc/SoundConfig.xrc:183
+#: ../src/wx/xrc/SoundConfig.xrc:194
 msgid "Number of sound buffers:"
 msgstr "Antal ljudbuffertar:"
 
-#: ../src/wx/xrc/SoundConfig.xrc:191
+#: ../src/wx/xrc/SoundConfig.xrc:202
 msgid "Advanced"
 msgstr "Avancerat"
 
-#: ../src/wx/xrc/SoundConfig.xrc:223
+#: ../src/wx/xrc/SoundConfig.xrc:234
 msgid "Lots"
 msgstr "Massor"
 
-#: ../src/wx/xrc/SoundConfig.xrc:232
+#: ../src/wx/xrc/SoundConfig.xrc:243
 msgid "Echo"
 msgstr "Eko"
 
-#: ../src/wx/xrc/SoundConfig.xrc:240
+#: ../src/wx/xrc/SoundConfig.xrc:251
 msgid "Stereo"
 msgstr "Stereo"
 
-#: ../src/wx/xrc/SoundConfig.xrc:251
+#: ../src/wx/xrc/SoundConfig.xrc:262
 msgid "Center"
 msgstr "Center"
 
-#: ../src/wx/xrc/SoundConfig.xrc:262
+#: ../src/wx/xrc/SoundConfig.xrc:273
 msgid "Left/Right"
 msgstr "Vänster/höger"
 
-#: ../src/wx/xrc/SoundConfig.xrc:291
+#: ../src/wx/xrc/SoundConfig.xrc:302
 msgid "Sound filtering"
 msgstr "Ljudfiltrering"
 
