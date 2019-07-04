@@ -1066,6 +1066,8 @@ brew_installdeps() {
     done
     [ $# -gt 0 ] && check brew -v install "$@"
 
+    brew link gettext --force
+
     brew -v cleanup
 
     build_instructions
