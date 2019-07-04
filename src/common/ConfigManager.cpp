@@ -663,12 +663,12 @@ const char* FindConfigFile(const char *name)
 
 	struct stat s;
 	std::string homeDirTmp = get_xdg_user_config_home() + DOT_DIR;
-	homeDir = strdup(homeDirTmp.c_str());
-	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
-		mkdir(homeDir, 0755);
+	char *fullDir = (char *)homeDirTmp.c_str();
+	if (stat(fullDir, &s) == -1 || !S_ISDIR(s.st_mode))
+		mkdir(fullDir, 0755);
 
-	if (homeDir) {
-		sprintf(path, "%s%c%s", homeDir, FILE_SEP, name);
+	if (fullDir) {
+		sprintf(path, "%s%c%s", fullDir, FILE_SEP, name);
 		if (FileExists(path))
 		{
 			return path;
