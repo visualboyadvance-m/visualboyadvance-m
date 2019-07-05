@@ -144,8 +144,8 @@ const wxString joynames[NUM_KEYS] = {
 
 wxJoyKeyBinding defkeys_keyboard[NUM_KEYS] = {
     WJKB(WXK_UP), WJKB(WXK_DOWN), WJKB(WXK_LEFT), WJKB(WXK_RIGHT),
-    WJKB(wxT('Z')), WJKB(wxT('X')), WJKB(wxT('A')), WJKB(wxT('S')),
-    WJKB(wxT('C')), WJKB(wxT('V')),
+    WJKB(wxT('A')), WJKB(wxT('S')), WJKB(wxT('Q')), WJKB(wxT('W')),
+    WJKB(wxT('Z')), WJKB(wxT('X')),
     WJKB(0), WJKB(0), WJKB(0), WJKB(0),
     WJKB(0), WJKB(0), WJKB(0), WJKB(0),
     WJKB(WXK_SPACE), WJKB(0), WJKB(0)
@@ -153,8 +153,8 @@ wxJoyKeyBinding defkeys_keyboard[NUM_KEYS] = {
 
 wxJoyKeyBinding defkeys_joystick[NUM_KEYS] = {
     WJKB(1, WXJB_AXIS_MINUS, 1), WJKB(1, WXJB_AXIS_PLUS, 1), WJKB(0, WXJB_AXIS_MINUS, 1), WJKB(0, WXJB_AXIS_PLUS, 1),
-    WJKB(0, WXJB_BUTTON, 1), WJKB(1, WXJB_BUTTON, 1), WJKB(2, WXJB_BUTTON, 1), WJKB(3, WXJB_BUTTON, 1),
-    WJKB(4, WXJB_BUTTON, 1), WJKB(5, WXJB_BUTTON, 1),
+    WJKB(0, WXJB_BUTTON, 1), WJKB(1, WXJB_BUTTON, 1), WJKB(4, WXJB_BUTTON, 1), WJKB(5, WXJB_BUTTON, 1),
+    WJKB(6, WXJB_BUTTON, 1), WJKB(7, WXJB_BUTTON, 1),
     WJKB(0), WJKB(0), WJKB(0), WJKB(0),
     WJKB(0), WJKB(0), WJKB(0), WJKB(0),
     WJKB(0), WJKB(0), WJKB(0)
@@ -346,13 +346,6 @@ opts_t::opts_t()
     bilinear = true;
     default_stick = 1;
 
-    for (int i = 0; i < NUM_KEYS; i++) {
-        if (defkeys_keyboard[i].key)
-            joykey_bindings[0][i].push_back(defkeys_keyboard[i]);
-        if (defkeys_joystick[i].key)
-            joykey_bindings[0][i].push_back(defkeys_joystick[i]);
-    }
-
     recent = new wxFileHistory(10);
     autofire_rate = 1;
     print_auto_page = true;
@@ -366,6 +359,17 @@ opts_t::opts_t()
 bool opt_lt(const opt_desc& opt1, const opt_desc& opt2)
 {
     return wxStrcmp(opt1.opt, opt2.opt) < 0;
+}
+
+// set default input keys
+void set_default_keys()
+{
+    for (int i = 0; i < NUM_KEYS; i++) {
+        if (defkeys_keyboard[i].key)
+            gopts.joykey_bindings[0][i].push_back(defkeys_keyboard[i]);
+        if (defkeys_joystick[i].joy)
+            gopts.joykey_bindings[0][i].push_back(defkeys_joystick[i]);
+    }
 }
 
 // FIXME: simulate MakeInstanceFilename(vbam.ini) using subkeys (Slave%d/*)
