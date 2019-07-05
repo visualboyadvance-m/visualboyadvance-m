@@ -165,6 +165,8 @@ wxString wxvbamApp::GetConfigurationPath()
                 break;
             }
         }
+        // use default keys for input.
+        set_default_keys();
     }
 
     return data_path;
@@ -488,7 +490,7 @@ void wxvbamApp::OnInitCmdLine(wxCmdLineParser& cl)
             N_("Print configuration path and exit"),
 	    wxCMD_LINE_VAL_NONE, 0 },
         { wxCMD_LINE_SWITCH, t("f"), t("fullscreen"),
-            N_("Start in full-screen mode"), 
+            N_("Start in full-screen mode"),
 	    wxCMD_LINE_VAL_NONE, 0 },
 #if !defined(NO_LINK) && !defined(__WXMSW__)
         { wxCMD_LINE_SWITCH, t("s"), t("delete-shared-state"),
