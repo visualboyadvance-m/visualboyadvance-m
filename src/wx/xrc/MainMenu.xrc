@@ -296,7 +296,7 @@
           <checkable>1</checkable>
         </object>
         <object class="wxMenu">
-          <label>_Quick resize</label>
+          <label>_Scaled resize</label>
           <object class="wxMenuItem" name="SetSize1x">
             <label>_1x</label>
           </object>
@@ -357,11 +357,11 @@
         </object>
         <object class="wxMenuItem" name="IncreaseVolume">
           <label>_Increase volume</label>
-          <checkable>0</checkable>
+          <enabled>0</enabled>
         </object>
         <object class="wxMenuItem" name="DecreaseVolume">
           <label>_Decrease volume</label>
-          <checkable>0</checkable>
+          <enabled>0</enabled>
         </object>
 	<object class="wxMenuItem" name="ToggleSound">
           <label>_Toggle sound</label>
@@ -372,7 +372,7 @@
           <label>_GBA sound interpolation</label>
           <checkable>1</checkable>
         </object>
-        <object class="separator"/>        
+        <object class="separator"/>
         <object class="wxMenuItem" name="GBEnhanceSound">
           <label>_GB sound enhancement</label>
           <checkable>1</checkable>
@@ -391,7 +391,7 @@
         <object class="wxMenuItem" name="JoypadConfigure">
           <label>_Configure ...</label>
         </object>
-        <object class="separator"/>        
+        <object class="separator"/>
         <object class="wxMenu">
           <label>_Autofire</label>
           <object class="wxMenuItem" name="JoypadAutofireA">
@@ -417,7 +417,7 @@
         <object class="wxMenuItem" name="GameBoyAdvanceConfigure">
           <label>Configure ...</label>
         </object>
-        <object class="separator"/>        
+        <object class="separator"/>
         <object class="wxMenuItem" name="RTC">
           <label>_Real-time clock</label>
           <checkable>1</checkable>
@@ -482,7 +482,7 @@
         <object class="wxMenuItem" name="CheatsSearch">
           <label>Find c_heat ...</label>
         </object>
-        <object class="separator"/>        
+        <object class="separator"/>
         <object class="wxMenuItem" name="CheatsAutoSaveLoad">
           <label>A_utomatically save/load cheats</label>
           <checkable>1</checkable>
