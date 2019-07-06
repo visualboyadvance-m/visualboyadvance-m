@@ -3324,10 +3324,10 @@ bool MainFrame::BindControls()
         sc = SafeXRCCTRL<wxSpinCtrl>(d, n);       \
         sc->SetValidator(wxGenericValidator(&o)); \
     } while (0)
-#define getsc_uint(n, o)                               \
+#define getsc_uint(n, o)                          \
     do {                                          \
         sc = SafeXRCCTRL<wxSpinCtrl>(d, n);       \
-        sc->SetValidator(wxUIntValidator(&o)); \
+        sc->SetValidator(wxUIntValidator(&o));    \
     } while (0)
         {
             // Online Auto Update check frequency
