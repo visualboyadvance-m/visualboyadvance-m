@@ -56,9 +56,9 @@ static void get_config_path(wxPathList& path, bool exists = true)
         if ((wxDirExists(s) && wxIsWritable(s)) || ((!exists || !wxDirExists(s)) && parent.IsDirWritable())) \
             path.Add(s);                                                                                     \
     } while (0)
-#define add_nonstandard_path(p)                                                                                          \
+#define add_nonstandard_path(p)                                                                              \
     do {                                                                                                     \
-        const wxString& s = p;                                                                          \
+        const wxString& s = p;                                                                               \
         wxFileName parent = wxFileName::DirName(s + wxT("//.."));                                            \
         parent.MakeAbsolute();                                                                               \
         if ((wxDirExists(s) && wxIsWritable(s)) || ((!exists || !wxDirExists(s)) && parent.IsDirWritable())) \
