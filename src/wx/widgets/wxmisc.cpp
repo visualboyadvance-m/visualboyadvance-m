@@ -230,6 +230,7 @@ bool wxFileDirPickerValidator::TransferFromWindow()
 
     if (fp) {
         *vptr = fp->GetPath();
+        if (vlabel) vlabel->SetLabel(*vptr);
         return true;
     }
 
@@ -237,6 +238,7 @@ bool wxFileDirPickerValidator::TransferFromWindow()
 
     if (dp) {
         *vptr = dp->GetPath();
+        if (vlabel) vlabel->SetLabel(*vptr);
         return true;
     }
 

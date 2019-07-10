@@ -3405,10 +3405,10 @@ bool MainFrame::BindControls()
     } while (0)
 #define getcbie(n, o, v) getbie(n, o, v, cb, wxCheckBox, CB)
         wxFilePickerCtrl* fp;
-#define getfp(n, o)                                     \
-    do {                                                \
-        fp = SafeXRCCTRL<wxFilePickerCtrl>(d, n);       \
-        fp->SetValidator(wxFileDirPickerValidator(&o)); \
+#define getfp(n, o, l)                                     \
+    do {                                                   \
+        fp = SafeXRCCTRL<wxFilePickerCtrl>(d, n);          \
+        fp->SetValidator(wxFileDirPickerValidator(&o, l)); \
     } while (0)
         d = LoadXRCropertySheetDialog("GameBoyConfig");
         {
@@ -3418,10 +3418,15 @@ bool MainFrame::BindControls()
             // in command handler.  Plus making changes might require resizing
             // game area.  Validation only here.
             SafeXRCCTRL<wxChoice>(d, "Borders");
-            /// Boot ROM
-            getfp("BootRom", gopts.gb_bios);
+            /// GB Boot ROM
+            wxStaticText *label = SafeXRCCTRL<wxStaticText>(d, "BiosFile");
+            if (!gopts.gb_bios.empty()) label->SetLabel(gopts.gb_bios);
+            getfp("BootRom", gopts.gb_bios, label);
             getlab("BootRomLab");
-            getfp("CBootRom", gopts.gbc_bios);
+            /// GBC
+            wxStaticText *clabel = SafeXRCCTRL<wxStaticText>(d, "CBiosFile");
+            if (!gopts.gbc_bios.empty()) clabel->SetLabel(gopts.gbc_bios);
+            getfp("CBootRom", gopts.gbc_bios, clabel);
             getlab("CBootRomLab");
             /// Custom Colors
             //getcbi("Color", gbColorOption);
@@ -3492,7 +3497,9 @@ bool MainFrame::BindControls()
                 wxCommandEventHandler(BatConfig_t::Detect),
                 NULL, &BatConfigHandler);
             /// Boot ROM
-            getfp("BootRom", gopts.gba_bios);
+            wxStaticText *label = SafeXRCCTRL<wxStaticText>(d, "BiosFile");
+            if (!gopts.gba_bios.empty()) label->SetLabel(gopts.gba_bios);
+            getfp("BootRom", gopts.gba_bios, label);
             getlab("BootRomLab");
             /// Game Overrides
             getgbaw("GameSettings");
