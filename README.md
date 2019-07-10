@@ -166,6 +166,7 @@ Here is the complete list:
 | ENABLE_LINK           | Enable GBA linking functionality (requires SFML)                     | ON                    |
 | ENABLE_LIRC           | Enable LIRC support                                                  | OFF                   |
 | ENABLE_FFMPEG         | Enable ffmpeg A/V recording                                          | OFF                   |
+| ENABLE_ONLINEUPDATES  | Enable online update checks                                          | ON                    |
 | ENABLE_LTO            | Compile with Link Time Optimization (gcc and clang only)             | ON for release build  |
 | ENABLE_GBA_LOGGING    | Enable extended GBA logging                                          | ON                    |
 | ENABLE_DIRECT3D       | Direct3D rendering for wxWidgets (Windows, **NOT IMPLEMENTED!!!**)   | ON                    |
