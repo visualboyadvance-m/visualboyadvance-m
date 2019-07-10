@@ -225,7 +225,9 @@ opt_desc opts[] = {
     BOOLOPT("General/AutoLoadLastState", "", wxTRANSLATE("Automatically load last saved state"), gopts.autoload_state),
     STROPT("General/BatteryDir", "", wxTRANSLATE("Directory to store game save files (relative paths are relative to ROM; blank is config dir)"), gopts.battery_dir),
     BOOLOPT("General/FreezeRecent", "", wxTRANSLATE("Freeze recent load list"), gopts.recent_freeze),
+#ifndef NO_ONLINEUPDATES
     ENUMOPT("General/OnlineUpdates", "", wxTRANSLATE("Automatically check for online updates"), gopts.onlineupdates, wxTRANSLATE("never|daily|weekly")),
+#endif // NO_ONLINEUPDATES
     STROPT("General/RecordingDir", "", wxTRANSLATE("Directory to store A/V and game recordings (relative paths are relative to ROM)"), gopts.recording_dir),
     INTOPT("General/RewindInterval", "", wxTRANSLATE("Number of seconds between rewind snapshots (0 to disable)"), gopts.rewind_interval, 0, 600),
     STROPT("General/ScreenshotDir", "", wxTRANSLATE("Directory to store screenshots (relative paths are relative to ROM)"), gopts.scrshot_dir),
@@ -350,7 +352,9 @@ opts_t::opts_t()
     autofire_rate = 1;
     print_auto_page = true;
     autoPatch = true;
+#ifndef NO_ONLINEUPDATES
     onlineupdates = 1;
+#endif // NO_ONLINEUPDATES
     // quick fix for issues #48 and #445
     link_host = "127.0.0.1";
 }

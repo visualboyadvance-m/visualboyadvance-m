@@ -42,7 +42,9 @@ extern struct opts_t {
     /// General
     bool autoload_state, autoload_cheats;
     wxString battery_dir;
+#ifndef NO_ONLINEUPDATES
     int onlineupdates;
+#endif // NO_ONLINEUPDATES
     long last_update;
     wxString last_updated_filename;
     bool recent_freeze;
