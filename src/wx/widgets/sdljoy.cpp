@@ -51,12 +51,13 @@ wxSDLJoy::wxSDLJoy(bool analog)
     for (int i = 0; i < njoy; i++) {
         SDL_Joystick* dev = joystate[i].dev = SDL_JoystickOpen(i);
 
-        int nctrl = 0;
-        nctrl += joystate[i].nax  = SDL_JoystickNumAxes(dev);
-        nctrl += joystate[i].nhat = SDL_JoystickNumHats(dev);
-        nctrl += joystate[i].nbut = SDL_JoystickNumButtons(dev);
+        int nctrl = 0, axes = 0, hats = 0, buttons = 0;
 
-        if (!nctrl) {
+        axes    = SDL_JoystickNumAxes(dev);
+        hats    = SDL_JoystickNumHats(dev);
+        buttons = SDL_JoystickNumButtons(dev);
+
+        if (buttons <= 0 && axes <= 0 && hats <= 0) {
             joystate[i].is_valid = false;
 
             SDL_JoystickClose(dev);
@@ -64,6 +65,10 @@ wxSDLJoy::wxSDLJoy(bool analog)
 
             continue;
         }
+
+        nctrl += joystate[i].nax  = axes    < 0 ? 0 : axes;
+        nctrl += joystate[i].nhat = hats    < 0 ? 0 : hats;
+        nctrl += joystate[i].nbut = buttons < 0 ? 0 : buttons;
 
         joystate[i].curval = new short[nctrl]{0};
 
