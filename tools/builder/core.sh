@@ -457,7 +457,7 @@ builder() {
     unpack_needed_dists $DOWNLOADED_DISTS
     build_needed_dists  $UNPACKED_DISTS
 
-    build_project
+    build_project "$@"
 }
 
 read_command_line() {
@@ -2624,7 +2624,7 @@ build_project() {
     cd "$BUILD_ROOT/project"
 
     # FIXME: turn LTO back on when everything works
-    echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=OFF $PROJECT_ARGS $CMAKE_BASE_ARGS $@
+    echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=OFF $CMAKE_BASE_ARGS $PROJECT_ARGS $@
     echo_run make -j$NUM_CPUS VERBOSE=1
 
     if [ "$target_os" = mac ]; then
@@ -2642,6 +2642,13 @@ build_project() {
         $STRIP visualboyadvance-m
     elif [ "$target_os" = windows ] && path_exists visualboyadvance-m.exe; then
         $STRIP visualboyadvance-m.exe
+
+        zip=./visualboyadvance-m-Win-${target_bits:-$bits}bit.zip
+
+        rm -f $zip
+        zip -9 $zip ./visualboyadvance-m.exe
+
+        gpg --detach-sign -a $zip
     fi
 
     dist_post_build project
@@ -2878,7 +2885,7 @@ ln() {
 }
 
 cygpath() {
-    if sh -c 'command -v cygpath' >/dev/null; then
+    if command -v cygpath >/dev/null; then
         command cygpath "$@"
     else
         case "$1" in
@@ -2889,6 +2896,20 @@ cygpath() {
 
         echo "$@"
     fi
+}
+
+gpg() {
+    if command -v gpg >/dev/null; then
+        command gpg "$@"
+    elif command -v gpg2 >/dev/null; then
+        command gpg2 "$@"
+    else
+        warn 'GPG not available'
+    fi
+}
+
+command() {
+    /bin/command "$@"
 }
 
 fully_resolve_link() {
