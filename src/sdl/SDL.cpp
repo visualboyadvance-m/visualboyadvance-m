@@ -1689,6 +1689,9 @@ int main(int argc, char** argv)
     gb_effects_config.surround = false;
     gb_effects_config.enabled = false;
 
+    ReadOpts(argc, argv);
+    LoadConfig(); // Parse command line arguments (overrides ini)
+
     inputSetKeymap(PAD_1, KEY_LEFT, ReadPrefHex("Joy0_Left"));
     inputSetKeymap(PAD_1, KEY_RIGHT, ReadPrefHex("Joy0_Right"));
     inputSetKeymap(PAD_1, KEY_UP, ReadPrefHex("Joy0_Up"));
@@ -1749,9 +1752,6 @@ int main(int argc, char** argv)
     inputSetMotionKeymap(KEY_RIGHT, ReadPrefHex("Motion_Right"));
     inputSetMotionKeymap(KEY_UP, ReadPrefHex("Motion_Up"));
     inputSetMotionKeymap(KEY_DOWN, ReadPrefHex("Motion_Down"));
-
-    LoadConfig(); // Parse command line arguments (overrides ini)
-    ReadOpts(argc, argv);
 
     if (!sdlCheckDirectory(screenShotDir))
         screenShotDir = NULL;
