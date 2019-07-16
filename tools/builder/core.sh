@@ -133,7 +133,7 @@ DISTS=$DISTS'
     yasm            http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz                             bin/yasm
     pcre            https://ftp.pcre.org/pub/pcre/pcre-8.41.tar.bz2                                             lib/libpcre.a
     libffi          ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz                                         lib/libffi.a
-    c2man           http://www.ciselant.de/c2man/c2man-2.0@42.tar.gz                                            bin/c2man
+    c2man           https://github.com/fribidi/c2man/archive/577ed4095383ef5284225d45709e6b5f0598a064.tar.gz    bin/c2man
     libxml2         ftp://xmlsoft.org/libxml2/libxml2-2.9.8.tar.gz                                              lib/libxml2.a
     libxslt         https://github.com/GNOME/libxslt/archive/v1.1.33-rc2.tar.gz                                 lib/libxslt.a
     XML-NamespaceSupport https://cpan.metacpan.org/authors/id/P/PE/PERIGRIN/XML-NamespaceSupport-1.12.tar.gz    perl5/lib/perl5/XML/NamespaceSupport.pm
@@ -2914,7 +2914,7 @@ command() {
     elif [ -x /usr/bin/command ]; then
         /usr/bin/command "$@"
     else
-        /bin/sh -c "command $*"
+        /bin/sh -c 'command "$@"' -- "$@"
     fi
 }
 
