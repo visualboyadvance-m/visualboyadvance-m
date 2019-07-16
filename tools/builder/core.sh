@@ -2909,7 +2909,13 @@ gpg() {
 }
 
 command() {
-    /bin/command "$@"
+    if [ -x /bin/command ]; then
+        /bin/command "$@"
+    elif [ -x /usr/bin/command ]; then
+        /usr/bin/command "$@"
+    else
+        /bin/sh -c "command $*"
+    fi
 }
 
 fully_resolve_link() {
