@@ -1463,7 +1463,7 @@ bool retro_load_game(const struct retro_game_info *game)
       gb_init();
 
       unsigned addr, i;
-      struct retro_memory_descriptor desc[16];
+      struct retro_memory_descriptor desc[17];
       struct retro_memory_map retromap;
 
       memset(desc, 0, sizeof(desc));
@@ -1493,6 +1493,15 @@ bool retro_load_game(const struct retro_game_info *game)
             if (addr < 4)  desc[i].flags  = RETRO_MEMDESC_CONST;
             i++;
          }
+      }
+
+      if (gbCgbMode) { // banks 2-7 of GBC work ram banks at $10000
+            desc[i].ptr    = (void*)gbWram;
+            desc[i].offset = 0x2000;
+            desc[i].start  = 0x10000;
+            desc[i].select = 0xFFFF0000;
+            desc[i].len    = 0x6000;
+            i++;
       }
 
       retromap.descriptors = desc;
