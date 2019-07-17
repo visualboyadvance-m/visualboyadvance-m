@@ -1220,25 +1220,25 @@ static void updateInput_MotionSensors(void)
     analog_y = astick_data[1];
 
     // Gyro sensor section
-    analog[3] = input_cb(0, RETRO_DEVICE_ANALOG,
+    analog[2] = input_cb(0, RETRO_DEVICE_ANALOG,
         gyro_retro_device_index, RETRO_DEVICE_ID_ANALOG_X);
 
-    if ( analog[3] < -astick_deadzone ) {
+    if ( analog[2] < -astick_deadzone ) {
         // Re-scale analog stick range
-        scaled_range = (-analog[3] - astick_deadzone) *
+        scaled_range = (-analog[2] - astick_deadzone) *
             ((float)ASTICK_MAX / (ASTICK_MAX - astick_deadzone));
         // Gyro sensor range is +/- 1800
         scaled_range *= 1800.0 / ASTICK_MAX * (gyro_sensitivity / 100.0);
-        astick_data[3] = -(int16_t)ROUND(scaled_range);
-    } else if ( analog[3] > astick_deadzone ) {
-        scaled_range = (analog[3] - astick_deadzone) *
+        astick_data[2] = -(int16_t)ROUND(scaled_range);
+    } else if ( analog[2] > astick_deadzone ) {
+        scaled_range = (analog[2] - astick_deadzone) *
             ((float)ASTICK_MAX / (ASTICK_MAX - astick_deadzone));
         scaled_range *= (1800.0 / ASTICK_MAX * (gyro_sensitivity / 100.0));
-        astick_data[3] = +(int16_t)ROUND(scaled_range);
+        astick_data[2] = +(int16_t)ROUND(scaled_range);
     } else
-        astick_data[3] = 0;
+        astick_data[2] = 0;
 
-    analog_z = astick_data[3];
+    analog_z = astick_data[2];
 }
 
 // Update solar sensor level by gamepad buttons, default L2/R2
