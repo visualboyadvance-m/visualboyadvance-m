@@ -7,6 +7,7 @@
 
 #include "SoundRetro.h"
 #include "libretro.h"
+#include "libretro_core_options.h"
 
 #include "../System.h"
 #include "../Util.h"
@@ -502,8 +503,8 @@ void retro_set_environment(retro_environment_t cb)
       { "vbam_usebios", "Use BIOS file (Restart); disabled|enabled" },
       { "vbam_soundinterpolation", "Sound Interpolation; enabled|disabled" },
       { "vbam_soundfiltering", "Sound Filtering; 5|6|7|8|9|10|0|1|2|3|4" },
-      { "vbam_gbHardware", "(GB) Emulated Hardware; Game Boy Color|Automatic|Super Game Boy|Game Boy|Game Boy Advance|Super Game Boy 2" },
-      { "vbam_palettes", "(GB) Color Palette; Standard|Blue Sea|Dark Knight|Green Forest|Hot Desert|Pink Dreams|Wierd Colors|Original|GBA SP" },
+      { "vbam_gbHardware", "(GB) Emulated Hardware; gbc|auto|sgb|gb|gba|sgb2" },
+      { "vbam_palettes", "(GB) Color Palette; black and white|blue sea|dark knight|green forest|hot desert|pink dreams|wierd colors|original gameboy|gba sp" },
       { "vbam_showborders", "(GB) Show Borders; disabled|enabled|auto" },
       { "vbam_turboenable", "Enable Turbo Buttons; disabled|enabled" },
       { "vbam_turbodelay", "Turbo Delay (in frames); 3|4|5|6|7|8|9|10|11|12|13|14|15|1|2" },
@@ -528,7 +529,9 @@ void retro_set_environment(retro_environment_t cb)
       { NULL, NULL },
    };
 
-   cb(RETRO_ENVIRONMENT_SET_VARIABLES, variables);
+   // cb(RETRO_ENVIRONMENT_SET_VARIABLES, variables);
+
+   libretro_set_core_options(environ_cb);
 }
 
 void retro_get_system_info(struct retro_system_info *info)
@@ -1083,17 +1086,17 @@ static void update_variables(bool startup)
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        if (strcmp(var.value, "Automatic") == 0)
+        if (strcmp(var.value, "auto") == 0)
             gbEmulatorType = 0;
-        else if (strcmp(var.value, "Game Boy Color") == 0)
+        else if (strcmp(var.value, "gbc") == 0)
             gbEmulatorType = 1;
-        else if (strcmp(var.value, "Super Game Boy") == 0)
+        else if (strcmp(var.value, "sgb") == 0)
             gbEmulatorType = 2;
-        else if (strcmp(var.value, "Game Boy") == 0)
+        else if (strcmp(var.value, "gb") == 0)
             gbEmulatorType = 3;
-        else if (strcmp(var.value, "Game Boy Advance") == 0)
+        else if (strcmp(var.value, "gba") == 0)
             gbEmulatorType = 4;
-        else if (strcmp(var.value, "Super Game Boy 2") == 0)
+        else if (strcmp(var.value, "sgb2") == 0)
             gbEmulatorType = 5;
     }
 
@@ -1151,23 +1154,23 @@ static void update_variables(bool startup)
     {
         int lastpal = current_gbPalette;
 
-        if (!strcmp(var.value, "Standard"))
+        if (!strcmp(var.value, "black and white"))
             current_gbPalette = 0;
-        else if (!strcmp(var.value, "Blue Sea"))
+        else if (!strcmp(var.value, "blue sea"))
             current_gbPalette = 1;
-        else if (!strcmp(var.value, "Dark Knight"))
+        else if (!strcmp(var.value, "dark knight"))
             current_gbPalette = 2;
-        else if (!strcmp(var.value, "Green Forest"))
+        else if (!strcmp(var.value, "green forest"))
             current_gbPalette = 3;
-        else if (!strcmp(var.value, "Hot Desert"))
+        else if (!strcmp(var.value, "hot desert"))
             current_gbPalette = 4;
-        else if (!strcmp(var.value, "Pink Dreams"))
+        else if (!strcmp(var.value, "pink dreams"))
             current_gbPalette = 5;
-        else if (!strcmp(var.value, "Wierd Colors"))
+        else if (!strcmp(var.value, "wierd colors"))
             current_gbPalette = 6;
-        else if (!strcmp(var.value, "Original"))
+        else if (!strcmp(var.value, "original gameboy"))
             current_gbPalette = 7;
-        else if (!strcmp(var.value, "GBA SP"))
+        else if (!strcmp(var.value, "gba sp"))
             current_gbPalette = 8;
 
         if (lastpal != current_gbPalette)
