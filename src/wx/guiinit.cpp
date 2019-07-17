@@ -3359,6 +3359,7 @@ bool MainFrame::BindControls()
             {
                 delete forDeletion[i];
             }
+            std::vector<wxWindow*>().swap(forDeletion);
 #endif // NO_ONLINEUPDATES
             getrbi("PNG", captureFormat, 0);
             getrbi("BMP", captureFormat, 1);
