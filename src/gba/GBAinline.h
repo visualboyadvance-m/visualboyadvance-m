@@ -723,7 +723,7 @@ static inline void CPUWriteByte(uint32_t address, uint8_t b)
             case 0x9d:
             case 0x9e:
             case 0x9f:
-                soundEvent(address & 0xFF, b);
+                soundEvent8(address & 0xFF, b);
                 break;
             case 0x301: // HALTCNT, undocumented
                 if (b == 0x80)

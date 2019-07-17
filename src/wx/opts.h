@@ -3,7 +3,8 @@
 
 #define NUM_KEYS 21
 extern const wxString joynames[NUM_KEYS];
-extern wxJoyKeyBinding defkeys[NUM_KEYS * 2]; // keyboard + joystick defaults
+extern wxJoyKeyBinding defkeys_keyboard[NUM_KEYS]; // keyboard defaults
+extern wxJoyKeyBinding defkeys_joystick[NUM_KEYS]; // joystick defaults
 
 extern struct opts_t {
     opts_t();
@@ -103,10 +104,10 @@ extern struct opt_desc {
 } opts[];
 
 // Initializer for struct opt_desc
-opt_desc new_opt_desc(wxString opt = "", const char* cmd = NULL, wxString desc = "",
-                      wxString* stropt = NULL, int* intopt = NULL, wxString enumvals = "",
+opt_desc new_opt_desc(wxString opt = wxT(""), const char* cmd = NULL, wxString desc = wxT(""),
+                      wxString* stropt = NULL, int* intopt = NULL, wxString enumvals = wxT(""),
                       double min = 0, double max = 0, bool* boolopt = NULL,
-                      double* doubleopt = NULL, uint32_t* uintopt = NULL, wxString curstr = "",
+                      double* doubleopt = NULL, uint32_t* uintopt = NULL, wxString curstr = wxT(""),
                       int curint = 0, double curdouble = 0, uint32_t curuint = 0);
 
 extern const int num_opts;

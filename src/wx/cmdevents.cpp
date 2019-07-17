@@ -1353,7 +1353,20 @@ EVT_HANDLER(wxID_EXIT, "Exit")
 // Emulation menu
 EVT_HANDLER(Pause, "Pause (toggle)")
 {
-    GetMenuOptionBool("Pause", paused);
+    bool menuPress;
+    GetMenuOptionBool("Pause", menuPress);
+
+    if (paused == menuPress)
+    {
+	// used accelerator
+	paused = !paused;
+	SetMenuOption("Pause", paused ? 1 : 0);
+    }
+    else
+    {
+	// used menu item
+	paused = menuPress;
+    }
 
     if (paused)
         panel->Pause();
@@ -2102,6 +2115,42 @@ EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
     update_opts();
 }
 
+EVT_HANDLER(SetSize1x, "1x")
+{
+    gopts.video_scale = 1;
+    panel->AdjustSize(true);
+}
+
+EVT_HANDLER(SetSize2x, "2x")
+{
+    gopts.video_scale = 2;
+    panel->AdjustSize(true);
+}
+
+EVT_HANDLER(SetSize3x, "3x")
+{
+    gopts.video_scale = 3;
+    panel->AdjustSize(true);
+}
+
+EVT_HANDLER(SetSize4x, "4x")
+{
+    gopts.video_scale = 4;
+    panel->AdjustSize(true);
+}
+
+EVT_HANDLER(SetSize5x, "5x")
+{
+    gopts.video_scale = 5;
+    panel->AdjustSize(true);
+}
+
+EVT_HANDLER(SetSize6x, "6x")
+{
+    gopts.video_scale = 6;
+    panel->AdjustSize(true);
+}
+
 EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
 {
     wxDialog* dlg = GetXRCDialog("GameBoyAdvanceConfig");
@@ -2594,7 +2643,8 @@ EVT_HANDLER(StatusBar, "Enable status bar")
         mf->GetStatusBar()->Hide();
 
     mf->SendSizeEvent();
-    panel->AdjustSize(true);
+    panel->AdjustSize(false);
+    mf->SendSizeEvent();
 }
 
 EVT_HANDLER(NoStatusMsg, "Disable on-screen status messages")

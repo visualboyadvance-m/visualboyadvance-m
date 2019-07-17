@@ -369,7 +369,7 @@ FILE* sdlFindFile(const char* name)
         return f;
     }
 
-    if (homeDir) {
+    if (homeDataDir) {
         fprintf(stdout, "Searching home directory: %s\n", homeDataDir);
         sprintf(path, "%s%c%s", homeDataDir, FILE_SEP, name);
         f = fopen(path, "r");

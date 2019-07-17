@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
-// malloc.h does not seem to exist on Mac OS 10.7
-#ifdef __APPLE__
+// malloc.h does not seem to exist on Mac OS 10.7 and is an error on FreeBSD
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__)
 #include <stdlib.h>
 #else
 #include <malloc.h>

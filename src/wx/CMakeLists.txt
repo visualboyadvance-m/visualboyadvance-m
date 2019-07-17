@@ -63,45 +63,50 @@ if(ENABLE_FAUDIO)
     set(FAUDIO_LIBS FAudio)
 endif()
 
+# on unix we have to check for X11 before we overwrite all the compile/link
+# flags with the wx tests
+if(NOT WIN32 AND NOT APPLE)
+    find_package(X11)
+
+    if(X11_X11_LIB AND X11_Xscreensaver_LIB)
+        include_directories(${X11_INCLUDE_DIR})
+        set(EXTRA_X11_LIBS ${X11_X11_LIB} ${X11_Xscreensaver_LIB})
+        add_definitions(-DHAVE_XSS)
+    endif()
+endif()
+
 # on VS with vcpkg we can't use FindwxWidgets, we have to set everything up
 # manually because the package is broken
 if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
     # set up wxwidgets stuff
-    add_definitions(-D_UNICODE -DUNICODE -DWXUSINGDLL -DwxUSE_GUI=1 -D__WXMSW__)
+    set(libtype u)
+    set(suffix -rel)
+    unset(path_prefix)
+
     if(CMAKE_BUILD_TYPE MATCHES Debug)
+        set(libtype ud)
+        set(suffix -dbg)
+        set(path_prefix debug)
+
         add_definitions(-D_DEBUG)
-        include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/debug/lib/mswud)
-        include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/include)
-        set(wxWidgets_LIB_DIR ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/debug/lib)
-        set(wxWidgets_LIBRARIES
-            ${wxWidgets_LIB_DIR}/wxbase31ud_net.lib
-            ${wxWidgets_LIB_DIR}/wxbase31ud_xml.lib
-            ${wxWidgets_LIB_DIR}/wxmsw31ud_core.lib
-            ${wxWidgets_LIB_DIR}/wxmsw31ud_gl.lib
-            ${wxWidgets_LIB_DIR}/wxmsw31ud_xrc.lib
-            ${wxWidgets_LIB_DIR}/wxbase31ud.lib
-            winmm comctl32 oleacc rpcrt4 shlwapi version wsock32 opengl32
-        )
-
-        file(COPY ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows-dbg/lib/wxrc.exe DESTINATION ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/debug/bin)
-        set(WXRC ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/debug/bin/wxrc.exe)
-    elseif("${CMAKE_BUILD_TYPE}" MATCHES "Release")
-        include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/lib/mswu)
-        include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/include)
-        set(wxWidgets_LIB_DIR ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/lib)
-        set(wxWidgets_LIBRARIES
-            ${wxWidgets_LIB_DIR}/wxbase31u_net.lib
-            ${wxWidgets_LIB_DIR}/wxbase31u_xml.lib
-            ${wxWidgets_LIB_DIR}/wxmsw31u_core.lib
-            ${wxWidgets_LIB_DIR}/wxmsw31u_gl.lib
-            ${wxWidgets_LIB_DIR}/wxmsw31ud_xrc.lib
-            ${wxWidgets_LIB_DIR}/wxbase31u.lib
-            winmm comctl32 oleacc rpcrt4 shlwapi version wsock32 opengl32
-        )
-
-        file(COPY ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows-rel/lib/wxrc.exe DESTINATION ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/bin)
-        set(WXRC ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/bin/wxrc.exe)
     endif()
+
+    add_definitions(-D_UNICODE -DUNICODE -DWXUSINGDLL -DwxUSE_GUI=1 -D__WXMSW__)
+    include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/lib/msw${libtype})
+    include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/include)
+    set(wxWidgets_LIB_DIR ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/lib)
+    set(wxWidgets_LIBRARIES
+        ${wxWidgets_LIB_DIR}/wxbase31${libtype}_net.lib
+        ${wxWidgets_LIB_DIR}/wxbase31${libtype}_xml.lib
+        ${wxWidgets_LIB_DIR}/wxmsw31${libtype}_core.lib
+        ${wxWidgets_LIB_DIR}/wxmsw31${libtype}_gl.lib
+        ${wxWidgets_LIB_DIR}/wxmsw31${libtype}_xrc.lib
+        ${wxWidgets_LIB_DIR}/wxbase31${libtype}.lib
+        winmm comctl32 oleacc rpcrt4 shlwapi version wsock32 opengl32
+    )
+
+    file(COPY ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows${suffix}/lib/wxrc.exe DESTINATION ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/bin)
+    set(WXRC ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/bin/wxrc.exe)
 
     if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
         # get zip binary for wxrc
@@ -114,7 +119,7 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
 
     # SDL2.dll does not get copied to build dir
     if(NOT EXISTS ${CMAKE_BINARY_DIR}/SDL2.dll)
-        file(COPY ${_VCPKG_ROOT_DIR}/installed/${WINARCH}-windows/bin/SDL2.dll DESTINATION ${CMAKE_BINARY_DIR})
+        file(COPY ${_VCPKG_ROOT_DIR}/installed/${WINARCH}-windows/${path_prefix}/bin/SDL2.dll DESTINATION ${CMAKE_BINARY_DIR})
     endif()
 else()
     if(CMAKE_BUILD_TYPE MATCHES Debug)
@@ -126,126 +131,11 @@ else()
     #    set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -luuid -lwinspool")
     #endif()
 
-    # convert msys paths like /c/foo to windows paths like c:/foo
-    # for variables set by FindWxWidgets
-    function(normalize_wx_paths)
-        if(MSYS)
-            unset(new_paths)
-            foreach(p ${wxWidgets_LIBRARY_DIRS})
-                execute_process(COMMAND cygpath -m "${p}" OUTPUT_VARIABLE p_win OUTPUT_STRIP_TRAILING_WHITESPACE)
-                list(APPEND new_paths "${p_win}")
-            endforeach()
-
-            set(wxWidgets_LIBRARY_DIRS ${new_paths} PARENT_SCOPE)
-
-            string(REGEX REPLACE "((^| )[^/]*)/([a-zA-Z])/" "\\1\\3:/" new_libs "${wxWidgets_LIBRARIES}")
-
-            set(wxWidgets_LIBRARIES ${new_libs} PARENT_SCOPE)
-        endif()
-    endfunction()
-
-    macro(cleanup_wx_vars)
-        if(wxWidgets_CXX_FLAGS)
-            list(REMOVE_ITEM wxWidgets_CXX_FLAGS -fpermissive)
-        endif()
-    endmacro()
-
     if(CMAKE_PREFIX_PATH)
         set(wxWidgets_CONFIG_OPTIONS "--prefix=${CMAKE_PREFIX_PATH}")
     endif()
 
     set(wxWidgets_USE_UNICODE ON)
-
-    function(cygpath var path)
-        execute_process(
-            COMMAND cygpath -m ${path}
-            OUTPUT_VARIABLE cyg_path
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-            ERROR_QUIET
-        )
-        set(${var} ${cyg_path} PARENT_SCOPE)
-    endfunction()
-
-    function(check_clean_exit var)
-        execute_process(
-            COMMAND ${ARGN}
-            RESULT_VARIABLE exit_status
-            OUTPUT_QUIET
-            ERROR_QUIET
-        )
-
-        if(NOT ${exit_status} EQUAL 0)
-            # special case for msys2, where programs might complain about
-            # not being win32 programs
-            unset(cmd_str)
-            foreach(param IN LISTS ARGN)
-                set(cmd_str "${cmd_str} ${param}")
-            endforeach()
-            string(STRIP "${cmd_str}" cmd_str)
-
-            execute_process(
-                COMMAND sh -c "${cmd_str}"
-                RESULT_VARIABLE exit_status
-                OUTPUT_QUIET
-                ERROR_QUIET
-            )
-        endif()
-
-        set(${var} ${exit_status} PARENT_SCOPE)
-    endfunction()
-
-    function(find_wx_util var util)
-        # on win32, including cross builds we prefer the plain utility name first from PATH
-        if(WIN32)
-            set(conf_suffixes  "" gtk4 gtk3)
-            set(major_versions "" 4 3 2)
-        else()
-            set(conf_suffixes  gtk4 gtk3 "")
-            set(major_versions 4 3 2 "")
-        endif()
-
-        foreach(conf_suffix IN LISTS conf_suffixes)
-            foreach(major_version IN LISTS major_versions)
-                foreach(minor_version RANGE 100 0 -1)
-                    unset(suffix)
-                    if(conf_suffix)
-                        set(suffix "-${conf_suffix}")
-                    endif()
-                    if(major_version)
-                        set(suffix "${suffix}-${major_version}")
-
-                        if(NOT minor_version EQUAL 0)
-                            set(suffix "${suffix}.${minor_version}")
-                        endif()
-                    endif()
-
-                    # find_program caches the result
-                    set(exe NOTFOUND CACHE INTERNAL "" FORCE)
-                    find_program(exe NAMES "${util}${suffix}")
-
-                    if(EXISTS ${exe})
-                        # check that the utility can be executed cleanly
-                        # in case we find e.g. the wrong architecture binary
-                        # when cross-compiling
-                        check_clean_exit(exit_status ${exe} --help)
-
-                        if(exit_status EQUAL 0)
-                            set(${var} ${exe} PARENT_SCOPE)
-                            return()
-                        endif()
-                    endif()
-
-                    # don't iterate over minor versions for empty major version
-                    if(major_version STREQUAL "")
-                        break()
-                    endif()
-                endforeach()
-            endforeach()
-
-            # default to util name if not found, so the error is more clear
-            set(${var} ${util} PARENT_SCOPE)
-        endforeach()
-    endfunction()
 
     # Check for gtk4 then gtk3 packages first, some dists like arch rename the
     # wx-config utility for these packages to e.g. wx-config-gtk3
@@ -315,7 +205,19 @@ else()
     set(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_FLAGS} ${CMAKE_REQUIRED_DEFINITIONS})
 
     # find the right C++ ABI version for wxWidgets, this is also necessary for the OpenGL check following
-    if((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang) AND NOT CMAKE_CROSSCOMPILING)
+
+    # on FreeBSD the ABI check segfaults and always fails, and we don't
+    # need it because everything is built with clang
+    set(ABI_CHECK FALSE)
+
+    if((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+        AND NOT CMAKE_CROSSCOMPILING
+        AND NOT CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
+
+        set(ABI_CHECK TRUE)
+    endif()
+
+    if(ABI_CHECK)
         set(WX_ABI_FOUND_MATCH FALSE)
 
         include(CheckCXXSourceRuns)
@@ -810,16 +712,6 @@ if(WIN32)
     # not strictly directx, but win32-related
     if(ENABLE_DEBUGGER)
         set(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} wsock32)
-    endif()
-endif()
-
-if(NOT WIN32 AND NOT APPLE)
-    find_package(X11)
-
-    if(X11_X11_LIB AND X11_Xscreensaver_LIB)
-        include_directories(${X11_INCLUDE_DIR})
-        set(EXTRA_X11_LIBS ${X11_X11_LIB} ${X11_Xscreensaver_LIB})
-        add_definitions(-DHAVE_XSS)
     endif()
 endif()
 

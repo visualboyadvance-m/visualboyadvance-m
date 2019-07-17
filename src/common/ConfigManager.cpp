@@ -16,6 +16,7 @@ extern "C" {
 #include <sys/stat.h>
 #include <cmath>
 #include <cerrno>
+#include <unistd.h>
 
 #include "../common/Patch.h"
 #include "../common/ConfigManager.h"
@@ -242,8 +243,9 @@ int videoOption;
 int vsync;
 int wasPaused = 0;
 uint32_t windowHeight;
-int windowPositionX;
-int windowPositionY;
+int windowMaximized;
+int windowPositionX, bkpPosX = 0;
+int windowPositionY, bkpPosY = 0;
 uint32_t windowWidth;
 int winFlashSize;
 int winGbBorderOn;
@@ -515,7 +517,7 @@ void LoadConfig()
 	languageOption = ReadPref("language", 1);
 	linkAuto = ReadPref("LinkAuto", 1);
 	linkHacks = ReadPref("LinkHacks", 0);
-	linkHostAddr = ReadPrefString("LinkHostAddr", "localhost");
+	linkHostAddr = ReadPrefString("LinkHost", "localhost");
 	linkMode = ReadPref("LinkMode", 0); // LINK_DISCONNECTED = 0
 	linkNumPlayers = ReadPref("LinkNumPlayers", 2);
 	linkTimeout = ReadPref("LinkTimeout", 1);
@@ -554,6 +556,7 @@ void LoadConfig()
 	videoOption = ReadPref("video", 2); // VIDEO_3X = 2
 	vsync = ReadPref("vsync", false);
 	windowHeight = ReadPref("windowHeight", 0);
+	windowMaximized = ReadPref("windowMaximized", 0);
 	windowPositionX = ReadPref("windowX", -1);
 	windowPositionY = ReadPref("windowY", -1);
 	windowWidth = ReadPref("windowWidth", 0);
@@ -658,8 +661,14 @@ const char* FindConfigFile(const char *name)
 		return name;
 	}
 
-	if (homeDir) {
-		sprintf(path, "%s%c%s", homeDir, FILE_SEP, name);
+	struct stat s;
+	std::string homeDirTmp = get_xdg_user_config_home() + DOT_DIR;
+	char *fullDir = (char *)homeDirTmp.c_str();
+	if (stat(fullDir, &s) == -1 || !S_ISDIR(s.st_mode))
+		mkdir(fullDir, 0755);
+
+	if (fullDir) {
+		sprintf(path, "%s%c%s", fullDir, FILE_SEP, name);
 		if (FileExists(path))
 		{
 			return path;
@@ -729,12 +738,6 @@ const char* FindConfigFile(const char *name)
 
 void LoadConfigFile()
 {
-	struct stat s;
-	std::string homeDirTmp = get_xdg_user_config_home() + DOT_DIR;
-	homeDir = (char *)homeDirTmp.c_str();
-	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
-		mkdir(homeDir, 0755);
-
 	if (preferences == NULL)
 	{
 		const char* configFile = FindConfigFile("vbam.ini");
@@ -744,12 +747,6 @@ void LoadConfigFile()
 
 void SaveConfigFile()
 {
-	struct stat s;
-	std::string homeDirTmp = get_xdg_user_config_home() + DOT_DIR;
-	homeDir = (char *)homeDirTmp.c_str();
-	if (stat(homeDir, &s) == -1 || !S_ISDIR(s.st_mode))
-		mkdir(homeDir, 0755);
-
 	const char* configFile = FindConfigFile("vbam.ini");
 
 	if (configFile != NULL)

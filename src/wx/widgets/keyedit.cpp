@@ -124,10 +124,12 @@ wxString wxKeyTextCtrl::ToString(int mod, int key)
 
 #endif
 
-    if (s.empty() || (key != wxT('-') && s[s.size() - 1] == wxT('-'))
-                  || (key != wxT('+') && s[s.size() - 1] == wxT('+')))
+    if (s.empty() || (key != wxT('-') && s[s.size() - 1] == wxT('-') && s != _("Num") + wxT(" -"))
+                  || (key != wxT('+') && s[s.size() - 1] == wxT('+') && s != _("Num") + wxT(" +")))
+    {
         // bad key combo; probably also generates an assertion in wx
         return wxEmptyString;
+    }
 
 // hacky workaround for bug in wx 3.1+ not parsing key display names, or
 // parsing modifiers that aren't a combo correctly
@@ -136,12 +138,17 @@ wxString wxKeyTextCtrl::ToString(int mod, int key)
     int keys_el_size = sizeof(keys_with_display_names)/sizeof(keys_with_display_names[0]);
 
     for (int i = 0; i < keys_el_size; i++) {
-        wxString name(keys_with_display_names[i].name);
-        wxString display_name(keys_with_display_names[i].display_name);
+        wxString name_tr(_(keys_with_display_names[i].name));
+        wxString display_name_tr(_(keys_with_display_names[i].display_name));
+        name_tr.MakeUpper();
+        display_name_tr.MakeUpper();
+        wxString name(_(keys_with_display_names[i].name));
+        wxString display_name(_(keys_with_display_names[i].display_name));
         name.MakeUpper();
         display_name.MakeUpper();
 
-        s.Replace(display_name, name, true);
+        s.Replace(display_name_tr, name_tr, true);
+        s.Replace(display_name,    name,    true);
     }
 
     return s;

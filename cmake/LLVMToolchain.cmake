@@ -14,6 +14,18 @@ function(use_llvm_toolchain)
             OUTPUT_STRIP_TRAILING_WHITESPACE
         )
 
+        # for FreeBSD
+        if(NOT prog_path MATCHES "^/")
+            get_filename_component(
+                abs_path ${prog_path} ABSOLUTE
+                BASE_DIR /usr/local/llvm-devel/bin
+            )
+
+            if(EXISTS ${abs_path})
+                set(prog_path ${abs_path})
+            endif()
+        endif()
+
         if(prog_path MATCHES "^/")
             if(tool STREQUAL ld)
                 set(tool linker)

@@ -76,6 +76,15 @@ project from 2019.
 Using your own user-wide installation of vcpkg is supported, just make sure the
 environment variable `VCPKG_ROOT` is set.
 
+To build in the visual studio command prompt, use something like this:
+
+```
+mkdir vsbuild
+cd vsbuild
+cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows
+msbuild /m .\ALL_BUILD.vcxproj
+```
+
 ### Dependencies
 
 If your OS is not supported, you will need the following:

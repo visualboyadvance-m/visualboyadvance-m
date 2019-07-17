@@ -6,19 +6,16 @@ if(COMMAND cmake_policy)
         cmake_policy(SET CMP0077 NEW) # use vars for options
     endif()
 
-    if(NOT CMAKE_VERSION VERSION_LESS 3.0)
+    if(POLICY CMP0043)
         cmake_policy(SET CMP0043 NEW) # for wxWidgets, use generator expressions
     endif()
 endif()
 
-option(ENABLE_VCPKG "Use dependencies for Visual Studio from vcpkg" ON)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-set(NLS_DEFAULT ON)
-
-# get win32 deps before project declaration, because toolchain is set for vcpkg
 set(VCPKG_DEPS zlib libpng SDL2 SFML gettext wxWidgets)
 
-include(${CMAKE_SOURCE_DIR}/cmake/Win32Deps.cmake)
+include(Set-Toolchain-vcpkg)
 
 project(VBA-M C CXX)
 
@@ -34,7 +31,6 @@ endif()
 
 set(ALL_TARGETS fex visualboyadvance-m vbamcore vbam)
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 #Output all binaries at top level
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
@@ -118,13 +114,34 @@ set(LTO_DEFAULT ON)
 
 # lto produces buggy binaries for 64 bit win32
 # and we generally don't want it when debugging because it makes linking slow
-if((WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND AMD64) OR CMAKE_BUILD_TYPE MATCHES Debug)
+if(CMAKE_BUILD_TYPE MATCHES Debug OR (WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND AMD64))
     set(LTO_DEFAULT OFF)
 endif()
 
 option(ENABLE_LTO "Compile with Link Time Optimization (gcc and clang only)" ${LTO_DEFAULT})
 
+if(WIN32 OR CMAKE_TOOLCHAIN_FILE MATCHES "[Mm][Ii][Nn][Gg][Ww]")
+    # Win32 deps submodule
+    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
+        set(git_checkout FALSE)
+
+        if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+            set(git_checkout TRUE)
+            execute_process(
+                COMMAND git submodule update --init --remote --recursive
+                RESULT_VARIABLE git_status
+                WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+            )
+        endif()
+
+        if(NOT (git_checkout AND git_status EQUAL 0))
+            message(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --remote --recursive")
+        endif()
+    endif()
+endif()
+
 if(MSVC)
+    include_directories("${CMAKE_SOURCE_DIR}/dependencies/msvc")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
@@ -200,6 +217,10 @@ find_package(ZLIB REQUIRED)
 
 set(OpenGL_GL_PREFERENCE GLVND)
 
+if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
+    set(OpenGL_GL_PREFERENCE LEGACY)
+endif()
+
 find_package(OpenGL REQUIRED)
 
 find_package(PNG REQUIRED)
@@ -218,6 +239,14 @@ endif()
 
 find_package(SDL2 REQUIRED)
 add_definitions(${SDL2_DEFINITIONS})
+
+if(WIN32)
+    find_library(SETUPAPI_LIBRARY SetupAPI)
+
+    if(SETUPAPI_LIBRARY)
+        set(SDL2_LIBRARY ${SDL2_LIBRARY} ${SETUPAPI_LIBRARY})
+    endif()
+endif()
 
 if(ENABLE_LINK)
     # msys2 does not have static sfml libs atm
@@ -494,6 +523,11 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         set(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_DBG_FLAGS} -Wall -Wextra)
     else()
         set(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_OPT_FLAGS} -Wno-error)
+    endif()
+
+    # for some reason this is necessary
+    if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
+        set(MY_C_FLAGS -I/usr/local/include ${MY_C_FLAGS})
     endif()
 
     foreach(C_COMPILE_FLAG ${MY_C_FLAGS})
@@ -921,5 +955,4 @@ set(CPACK_PACKAGE_VERSION_MAJOR "2")
 set(CPACK_PACKAGE_VERSION_MINOR "0")
 set(CPACK_PACKAGE_VERSION_PATCH "0-Git-" ${COMMITHASH})
 list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
-list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg")
 include(CPack)

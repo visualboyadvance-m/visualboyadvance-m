@@ -63,6 +63,52 @@ export REQUIRED_CMAKE_ARGS="$REQUIRED_CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE='$(perl 
 
 . "${0%/*}/../builder/mingw.sh"
 
+installing_cross_deps() {
+    puts "${NL}[32mInstalling cross dependencies for your OS...[0m${NL}${NL}"
+}
+
+fedora_install_cross_deps() {
+    pkg_prefix="mingw${target_bits}"
+
+    set --
+    for p in gcc cpp gcc-c++ binutils headers crt filesystem winpthreads-static; do
+        set -- "$@" "${pkg_prefix}-${p}"
+    done
+
+    sudo dnf install -y --nogpgcheck --best --allowerasing "$@" gettext-devel wxGTK3-devel python
+}
+
+suse_install_cross_deps() {
+    suse_dist=$(. /etc/os-release; echo $PRETTY_NAME | sed 's/ /_/g')
+
+    sudo zypper ar -f https://download.opensuse.org/repositories/windows:/mingw:/win64/${suse_dist}/windows:mingw:win64.repo || :
+    sudo zypper ar -f https://download.opensuse.org/repositories/windows:/mingw:/win32/${suse_dist}/windows:mingw:win32.repo || :
+
+    sudo zypper refresh
+
+    pkg_prefix="mingw${target_bits}"
+
+    set --
+    for p in cross-gcc cross-cpp cross-gcc-c++ cross-binutils headers filesystem winpthreads-devel; do
+        set -- "$@" "${pkg_prefix}-${p}"
+    done
+
+    sudo zypper in -y "$@" gettext-tools wxGTK3-3_2-devel python3-pip
+}
+
+case "$linux_distribution" in
+    fedora)
+        installing_cross_deps
+        fedora_install_cross_deps
+        done_msg
+        ;;
+    suse)
+        installing_cross_deps
+        suse_install_cross_deps
+        done_msg
+        ;;
+esac
+
 openssl_host=mingw
 [ "$target_bits" -eq 64 ] && openssl_host=mingw64
 
@@ -76,6 +122,8 @@ table_line_append DIST_ARGS libicu-target "--with-cross-build=\$BUILD_ROOT/dists
 table_line_append DIST_PATCHES openal '-p0 https://gist.githubusercontent.com/rkitover/d371d199ee0ac67864d0940aa7e7c12c/raw/29f3bc4afaba41b35b3fcbd9d18d1f0a22e3dc13/openal-cross-no-cmake-for-native-tools.patch'
 
 table_line_replace DIST_POST_BUILD harfbuzz "$(table_line DIST_POST_BUILD harfbuzz | sed 's/rebuild_dist freetype /rebuild_dist freetype-target /')"
+
+table_line_append DIST_ARGS glib --with-python=/usr/bin/python3
 
 table_line_replace DIST_POST_BUILD glib     "$(table_line DIST_POST_BUILD glib     | sed 's/rebuild_dist gettext /rebuild_dist gettext-target /')"
 

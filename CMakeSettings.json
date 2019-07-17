@@ -2,51 +2,47 @@
   "configurations": [
     {
       "name": "x64-Debug",
-      "generator": "Ninja",
+      "generator": "Visual Studio 15 2017",
       "configurationType": "Debug",
       "inheritEnvironments": [
         "msvc_x64"
       ],
       "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
       "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "-v",
+      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x64-windows",
       "ctestCommandArgs": ""
     }, {
       "name": "x64-Release",
-      "generator": "Ninja",
+      "generator": "Visual Studio 15 2017",
       "configurationType": "Release",
       "inheritEnvironments": [
         "msvc_x64"
       ],
       "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
       "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "-v",
+      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x64-windows",
       "ctestCommandArgs": ""
     }, {
       "name": "x86-Debug",
-      "generator": "Ninja",
+      "generator": "Visual Studio 15 2017",
       "configurationType": "Debug",
       "inheritEnvironments": [
         "msvc_x86"
       ],
       "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
       "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "-v",
+      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x86-windows",
       "ctestCommandArgs": ""
     }, {
       "name": "x86-Release",
-      "generator": "Ninja",
+      "generator": "Visual Studio 15 2017",
       "configurationType": "Release",
       "inheritEnvironments": [
         "msvc_x86"
       ],
       "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
       "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "-v",
+      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x86-windows",
       "ctestCommandArgs": ""
     }
   ]

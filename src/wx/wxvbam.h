@@ -44,7 +44,7 @@
     #undef  wxLogDebug
     #define wxLogDebug(...)                                                                                                           \
     do {                                                                                                                              \
-        fputs(wxString::Format(wxDateTime::UNow().Format(wxT("%X")) + wxT(": Debug: ") + __VA_ARGS__).mb_str(), VBAM_DEBUG_STREAM); \
+        fputs(wxString::Format(wxDateTime::UNow().Format(wxT("%X")) + wxT(": Debug: ") + __VA_ARGS__).utf8_str(), VBAM_DEBUG_STREAM); \
         fputc('\n', VBAM_DEBUG_STREAM);                                                                                               \
     } while(0)
 #endif
@@ -79,6 +79,7 @@ public:
     wxvbamApp()
         : wxApp()
         , pending_fullscreen(false)
+        , frame(NULL)
         , using_wayland(false)
     {
     }
@@ -108,8 +109,13 @@ public:
     };
 #endif
     // without this, global accels don't always work
-    //int FilterEvent(wxEvent& event);
+    int FilterEvent(wxEvent&);
     wxAcceleratorEntry_v accels;
+
+    wxAcceleratorEntry_v GetAccels()
+    {
+	return accels;
+    }
 
     // the main configuration
     wxFileConfig* cfg;
@@ -229,6 +235,8 @@ public:
     void SetMenuOption(const char* menuName, int value);
 
     void SetJoystick();
+
+    int FilterEvent(wxEvent& event);
 
     GameArea* GetPanel()
     {
@@ -621,6 +629,7 @@ protected:
     void PaintEv(wxPaintEvent& ev);
     void EraseBackground(wxEraseEvent& ev);
     void OnSize(wxSizeEvent& ev);
+    void OnKillFocus(wxFocusEvent& ev);
 
 #ifndef NO_FFMPEG
     MediaRecorder snd_rec, vid_rec;
@@ -658,7 +667,7 @@ extern struct cmditem {
 extern const int ncmds;
 
 // Initializer for struct cmditem
-cmditem new_cmditem(const wxString cmd = "", const wxString name = "",
+cmditem new_cmditem(const wxString cmd = wxT(""), const wxString name = wxT(""),
                     int cmd_id = 0, int mask_flags = 0, wxMenuItem* mi = NULL);
 
 // for binary search

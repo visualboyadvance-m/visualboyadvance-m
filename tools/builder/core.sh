@@ -133,7 +133,7 @@ DISTS=$DISTS'
     yasm            http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz                             bin/yasm
     pcre            https://ftp.pcre.org/pub/pcre/pcre-8.41.tar.bz2                                             lib/libpcre.a
     libffi          ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz                                         lib/libffi.a
-    c2man           http://www.ciselant.de/c2man/c2man-2.0@42.tar.gz                                            bin/c2man
+    c2man           https://github.com/fribidi/c2man/archive/577ed4095383ef5284225d45709e6b5f0598a064.tar.gz    bin/c2man
     libxml2         ftp://xmlsoft.org/libxml2/libxml2-2.9.8.tar.gz                                              lib/libxml2.a
     libxslt         https://github.com/GNOME/libxslt/archive/v1.1.33-rc2.tar.gz                                 lib/libxslt.a
     XML-NamespaceSupport https://cpan.metacpan.org/authors/id/P/PE/PERIGRIN/XML-NamespaceSupport-1.12.tar.gz    perl5/lib/perl5/XML/NamespaceSupport.pm
@@ -146,7 +146,7 @@ DISTS=$DISTS'
     libtiff         http://download.osgeo.org/libtiff/tiff-4.0.9.tar.gz                                         lib/libtiff.a
 #    libcroco        http://ftp.gnome.org/pub/gnome/sources/libcroco/0.6/libcroco-0.6.12.tar.xz                  lib/libcroco-0.6.a
     libuuid         https://downloads.sourceforge.net/project/libuuid/libuuid-1.0.3.tar.gz                      lib/libuuid.a
-    freetype        http://download.savannah.gnu.org/releases/freetype/freetype-2.9.1.tar.bz2                   lib/libfreetype.a
+    freetype        http://download.savannah.gnu.org/releases/freetype/freetype-2.10.0.tar.bz2                  lib/libfreetype.a
     fontconfig      https://freedesktop.org/software/fontconfig/release/fontconfig-2.13.1.tar.bz2               lib/libfontconfig.a
     libgd           https://github.com/libgd/libgd/releases/download/gd-2.2.5/libgd-2.2.5.tar.xz                lib/libgd.a
     dejavu          https://downloads.sourceforge.net/project/dejavu/dejavu/2.37/dejavu-fonts-ttf-2.37.tar.bz2  share/fonts/dejavu/DejaVuSansMono.ttf
@@ -457,7 +457,7 @@ builder() {
     unpack_needed_dists $DOWNLOADED_DISTS
     build_needed_dists  $UNPACKED_DISTS
 
-    build_project
+    build_project "$@"
 }
 
 read_command_line() {
@@ -613,17 +613,7 @@ linux_install_core_deps() {
             ;;
     esac
 
-    if [ -f /etc/debian_version ]; then
-        debian_install_core_deps
-    elif [ -f /etc/fedora-release ]; then
-        fedora_install_core_deps
-    elif [ -f /etc/arch-release ]; then
-        archlinux_install_core_deps
-    elif [ -f /etc/solus-release ]; then
-        solus_install_core_deps
-    elif path_exists /etc/os-release && [ "$(. /etc/os-release; puts "$ID_LIKE")" = suse ]; then
-        suse_install_core_deps
-    fi
+    eval "${linux_distribution}_install_core_deps"
 }
 
 debian_install_core_deps() {
@@ -647,7 +637,7 @@ suse_install_core_deps() {
     sudo zypper in -y gcc gcc-c++ binutils glibc-devel-static make curl perl ccache file patch
 }
 
-archlinux_install_core_deps() {
+arch_install_core_deps() {
     installing_core_deps
 
     # check for gcc-multilib
@@ -809,6 +799,22 @@ detect_os() {
     if ld -v 2>/dev/null | grep -Eq GNU; then
         LD_START_GROUP='-Wl,--start-group'
         LD_END_GROUP='-Wl,--end-group'
+    fi
+
+    # detect linux distribution
+    linux_distribution=unknown
+    if [ $os = linux ]; then
+        if [ -f /etc/debian_version ]; then
+            linux_distribution=debian
+        elif [ -f /etc/fedora-release ]; then
+            linux_distribution=fedora
+        elif [ -f /etc/arch-release ]; then
+            linux_distribution=arch
+        elif [ -f /etc/solus-release ]; then
+            linux_distribution=solus
+        elif path_exists /etc/os-release && (. /etc/os-release; puts "$ID_LIKE") | grep -q suse; then
+            linux_distribution=suse
+        fi
     fi
 }
 
@@ -2618,20 +2624,31 @@ build_project() {
     cd "$BUILD_ROOT/project"
 
     # FIXME: turn LTO back on when everything works
-    echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=OFF $PROJECT_ARGS $CMAKE_BASE_ARGS $@
-    echo_run make -j$NUM_CPUS
+    echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=OFF $CMAKE_BASE_ARGS $PROJECT_ARGS $@
+    echo_run make -j$NUM_CPUS VERBOSE=1
 
     if [ "$target_os" = mac ]; then
         $STRIP visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m
 
         codesign -s "Developer ID Application" --deep ./visualboyadvance-m.app || :
 
-        rm -f ./visualboyadvance-m-Mac.zip
-        zip -9r ./visualboyadvance-m-Mac.zip ./visualboyadvance-m.app
+        zip=./visualboyadvance-m-Mac-${target_bits:-$bits}bit.zip
+
+        rm -f $zip
+        zip -9r $zip ./visualboyadvance-m.app
+
+        gpg --detach-sign -a $zip
     elif [ "$target_os" != windows ] && path_exists visualboyadvance-m; then
         $STRIP visualboyadvance-m
     elif [ "$target_os" = windows ] && path_exists visualboyadvance-m.exe; then
         $STRIP visualboyadvance-m.exe
+
+        zip=./visualboyadvance-m-Win-${target_bits:-$bits}bit.zip
+
+        rm -f $zip
+        zip -9 $zip ./visualboyadvance-m.exe
+
+        gpg --detach-sign -a $zip
     fi
 
     dist_post_build project
@@ -2868,7 +2885,7 @@ ln() {
 }
 
 cygpath() {
-    if sh -c 'command -v cygpath' >/dev/null; then
+    if command -v cygpath >/dev/null; then
         command cygpath "$@"
     else
         case "$1" in
@@ -2878,6 +2895,26 @@ cygpath() {
         esac
 
         echo "$@"
+    fi
+}
+
+gpg() {
+    if command -v gpg >/dev/null; then
+        command gpg "$@"
+    elif command -v gpg2 >/dev/null; then
+        command gpg2 "$@"
+    else
+        warn 'GPG not available'
+    fi
+}
+
+command() {
+    if [ -x /bin/command ]; then
+        /bin/command "$@"
+    elif [ -x /usr/bin/command ]; then
+        /usr/bin/command "$@"
+    else
+        /bin/sh -c 'command "$@"' -- "$@"
     fi
 }
 

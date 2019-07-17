@@ -569,7 +569,8 @@ IMAGE_TYPE utilFindType(const char *file, char (&buffer)[2048])
                 return IMAGE_UNKNOWN;
         }
         MultiByteToWideChar(CP_ACP, 0, file, -1, pwText, dwNum);
-        char *file_conv = fex_wide_to_path(pwText);
+        //char *file_conv = fex_wide_to_path(file);
+        char *file_conv = (char *)file;
         //	if ( !utilIsImage( file_conv ) ) // TODO: utilIsArchive() instead?
         //	{
         fex_t *fe = scan_arc(file_conv, utilIsImage, buffer);
@@ -578,7 +579,7 @@ IMAGE_TYPE utilFindType(const char *file, char (&buffer)[2048])
         fex_close(fe);
         file = buffer;
         //	}
-        free(file_conv);
+        //free(file_conv);
 #else
         //	if ( !utilIsImage( file ) ) // TODO: utilIsArchive() instead?
         //	{
@@ -612,12 +613,13 @@ uint8_t *utilLoad(const char *file, bool (*accept)(const char *), uint8_t *data,
                 return NULL;
         }
         MultiByteToWideChar(CP_ACP, 0, file, -1, pwText, dwNum);
-        char *file_conv = fex_wide_to_path(pwText);
+        //char *file_conv = fex_wide_to_path(file);
+        char *file_conv = (char *)file;
         delete[] pwText;
         fex_t *fe = scan_arc(file_conv, accept, buffer);
         if (!fe)
                 return NULL;
-        free(file_conv);
+        //free(file_conv);
 #else
         fex_t *fe = scan_arc(file, accept, buffer);
         if (!fe)

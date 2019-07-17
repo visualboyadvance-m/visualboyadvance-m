@@ -1,4 +1,6 @@
-INCFLAGS := -I$(CORE_DIR)
+LIBRETRO_COMMON := $(CORE_DIR)/libretro/libretro-common/include
+
+INCFLAGS := -I$(CORE_DIR) -I$(LIBRETRO_COMMON)
 SOURCES_CXX :=
 
 SOURCES_CXX += \

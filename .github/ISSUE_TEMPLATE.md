@@ -22,6 +22,8 @@ Which games, if any, are NOT affected by the issue (please state if GBA or GB ga
 
 Include screenshots of ROM Information (File > ROM Information):
 
+If you are using a BIOS file, please say which one.
+
 ### Option details
 
 Video driver (simple, opengl):

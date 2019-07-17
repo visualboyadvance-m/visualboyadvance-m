@@ -260,17 +260,13 @@ bool wxvbamApp::OnInit()
 // /MIGRATION
 // migrate from 'vbam.{cfg,conf}' to 'vbam.ini' to manage a single config
 // file for all platforms.
-#if !defined(__WXMSW__) && !defined(__APPLE__)
     wxString oldConf(GetConfigurationPath() + wxT(FILE_SEP) + wxT("vbam.conf"));
-#else
-    wxString oldConf(GetConfigurationPath() + wxT(FILE_SEP) + wxT("vbam.cfg"));
-#endif
     wxString newConf(GetConfigurationPath() + wxT(FILE_SEP) + wxT("vbam.ini"));
-    if (wxFileExists(oldConf))
-    {
-	wxRenameFile(oldConf, newConf, false);
-    }
+
+    if (!wxFileExists(newConf) && wxFileExists(oldConf))
+        wxRenameFile(oldConf, newConf, false);
 // /END_MIGRATION
+
     cfg = new wxFileConfig(wxT("vbam"), wxEmptyString,
         vbamconf.GetFullPath(),
         wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
@@ -412,6 +408,7 @@ bool wxvbamApp::OnInit()
     int width = windowWidth;
     int height = windowHeight;
     int isFullscreen = fullScreen;
+    int isMaximized = windowMaximized;
     frame = wxDynamicCast(xr->LoadFrame(NULL, wxT("MainFrame")), MainFrame);
 
     if (!frame) {
@@ -426,9 +423,13 @@ bool wxvbamApp::OnInit()
     if (x >= 0 && y >= 0 && width > 0 && height > 0)
 	frame->SetSize(x, y, width, height);
 
+    if (isMaximized)
+        frame->Maximize();
+
     if (isFullscreen && wxGetApp().pending_load != wxEmptyString)
 	frame->ShowFullScreen(isFullscreen);
     frame->Show(true);
+
     return true;
 }
 
@@ -479,32 +480,32 @@ void wxvbamApp::OnInitCmdLine(wxCmdLineParser& cl)
     static wxCmdLineEntryDesc opttab[] = {
         { wxCMD_LINE_OPTION, NULL, t("save-xrc"),
             N_("Save built-in XRC file and exit"),
-	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
+	    wxCMD_LINE_VAL_STRING, 0 },
         { wxCMD_LINE_OPTION, NULL, t("save-over"),
             N_("Save built-in vba-over.ini and exit"),
-	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
+	    wxCMD_LINE_VAL_STRING, 0 },
         { wxCMD_LINE_SWITCH, NULL, t("print-cfg-path"),
             N_("Print configuration path and exit"),
-	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
+	    wxCMD_LINE_VAL_NONE, 0 },
         { wxCMD_LINE_SWITCH, t("f"), t("fullscreen"),
             N_("Start in full-screen mode"), 
-	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
+	    wxCMD_LINE_VAL_NONE, 0 },
 #if !defined(NO_LINK) && !defined(__WXMSW__)
         { wxCMD_LINE_SWITCH, t("s"), t("delete-shared-state"),
             N_("Delete shared link state first, if it exists"),
-	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
+	    wxCMD_LINE_VAL_NONE, 0 },
 #endif
         // stupid wx cmd line parser doesn't support duplicate options
         //	{ wxCMD_LINE_OPTION, t("o"),  t("option"),
         //		_("Set configuration option; <opt>=<value> or help for list"),
         { wxCMD_LINE_SWITCH, t("o"), t("list-options"),
             N_("List all settable options and exit"),
-	    wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE },
+	    wxCMD_LINE_VAL_NONE, 0 },
         { wxCMD_LINE_PARAM, NULL, NULL,
             N_("ROM file"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
         { wxCMD_LINE_PARAM, NULL, NULL,
             N_("<config>=<value>"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE | wxCMD_LINE_PARAM_OPTIONAL },
-        { wxCMD_LINE_NONE, NULL, NULL, NULL, wxCMD_LINE_VAL_NONE, wxCMD_LINE_VAL_NONE }
+        { wxCMD_LINE_NONE, NULL, NULL, NULL, wxCMD_LINE_VAL_NONE, 0 }
     };
 // 2.9 automatically translates desc, but 2.8 doesn't
 #if !wxCHECK_VERSION(2, 9, 0)
@@ -676,6 +677,7 @@ wxvbamApp::~wxvbamApp() {
 	free(home);
 	home = NULL;
     }
+    delete overrides;
 }
 
 MainFrame::MainFrame()
@@ -710,7 +712,7 @@ EVT_SIZE(MainFrame::OnSize)
 // This is a feature most people don't like, and it causes problems with
 // keyboard game keys on mac, so we will disable it for now.
 //
-// On Winodws, there will still be a pause because of how the windows event
+// On Windows, there will still be a pause because of how the windows event
 // model works, in addition the audio will loop with SDL, so we still pause on
 // Windows, TODO: this needs to be fixed properly
 //
@@ -730,7 +732,7 @@ void MainFrame::OnActivate(wxActivateEvent& event)
         panel->SetFocus();
 
     if (pauseWhenInactive) {
-        if (panel && focused) {
+        if (panel && focused && !paused) {
             panel->Resume();
         }
         else if (panel && !focused) {
@@ -763,35 +765,76 @@ void MainFrame::OnMenu(wxContextMenuEvent& event)
 void MainFrame::OnMove(wxMoveEvent& event)
 {
     (void)event; // unused params
-    wxRect pos = GetRect();
-    int x = pos.GetX(), y = pos.GetY();
-    if (x >= 0 && y >= 0 && !IsFullScreen())
+    wxPoint pos = GetScreenPosition();
+    int x = pos.x, y = pos.y;
+    if (!IsFullScreen() && !IsMaximized())
     {
-	windowPositionX = x;
-	windowPositionY = y;
-	update_opts();
+        if (x >= 0 && y >= 0)
+        {
+            bkpPosX = windowPositionX;
+            bkpPosY = windowPositionY;
+            windowPositionX = x;
+            windowPositionY = y;
+        }
     }
+    else
+    {
+        windowPositionX = bkpPosX;
+        windowPositionY = bkpPosY;
+    }
+    update_opts();
 }
 
 void MainFrame::OnSize(wxSizeEvent& event)
 {
     wxFrame::OnSize(event);
     wxRect pos = GetRect();
+    wxPoint windowPos = GetScreenPosition();
     int height = pos.GetHeight(), width = pos.GetWidth();
-    int x = pos.GetX(), y = pos.GetY();
+    int x = windowPos.x, y = windowPos.y;
     bool isFullscreen = IsFullScreen();
-    if (height > 0 && width > 0 && !isFullscreen)
+    bool isMaximized = IsMaximized();
+    if (!isFullscreen && !isMaximized)
     {
-	windowHeight = height;
-	windowWidth = width;
+	if (height > 0 && width > 0)
+	{
+	    windowHeight = height;
+	    windowWidth = width;
+	}
+	if (x >= 0 && y >= 0)
+	{
+	    windowPositionX = x;
+	    windowPositionY = y;
+	}
     }
-    if (x >= 0 && y >= 0 && !isFullscreen)
+    else
     {
-	windowPositionX = x;
-	windowPositionY = y;
+        windowPositionX = bkpPosX;
+        windowPositionY = bkpPosY;
     }
+    windowMaximized = isMaximized;
     fullScreen = isFullscreen;
     update_opts();
+}
+
+int MainFrame::FilterEvent(wxEvent& event)
+{
+    if (event.GetEventType() == wxEVT_KEY_DOWN)
+    {
+        wxKeyEvent& ke = (wxKeyEvent&)event;
+        int keyCode = ke.GetKeyCode();
+        int keyMod = ke.GetModifiers();
+        wxAcceleratorEntry_v accels = wxGetApp().GetAccels();
+        for (size_t i = 0; i < accels.size(); ++i)
+             if (keyCode == accels[i].GetKeyCode() && keyMod == accels[i].GetFlags())
+             {
+                 wxCommandEvent evh(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
+                 evh.SetEventObject(this);
+                 GetEventHandler()->ProcessEvent(evh);
+                 return true;
+	     }
+    }
+    return -1;
 }
 
 wxString MainFrame::GetGamePath(wxString path)
@@ -1195,24 +1238,9 @@ void MainFrame::IdentifyRom()
 // a few keys (e.g. only ctrl-x works for exit, but not esc & ctrl-q;
 // ctrl-w does not work for close).  It's possible another entity is
 // grabbing those keys, but I can't track it down.
-// FIXME: move this to MainFrame
-//int wxvbamApp::FilterEvent(wxEvent& event)
-//{
-//    //if(frame && frame->IsPaused(true))
-//    return -1;
-//
-//    if (event.GetEventType() == wxEVT_KEY_DOWN) {
-//        wxKeyEvent& ke = (wxKeyEvent&)event;
-//
-//        for (int i = 0; i < accels.size(); i++) {
-//            if (accels[i].GetKeyCode() == ke.GetKeyCode() && accels[i].GetFlags() == ke.GetModifiers()) {
-//                wxCommandEvent ev(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
-//                ev.SetEventObject(this);
-//                frame->GetEventHandler()->ProcessEvent(ev);
-//                return 1;
-//            }
-//        }
-//    }
-//
-//    return -1;
-//}
+int wxvbamApp::FilterEvent(wxEvent& event)
+{
+    if (frame)
+        return frame->FilterEvent(event);
+    return wxApp::FilterEvent(event);
+}

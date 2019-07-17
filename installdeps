@@ -45,6 +45,9 @@ check_os() {
         Darwin)
             os=mac
             ;;
+        FreeBSD)
+            os=freebsd
+            ;;
         MINGW*|MSYS*)
             os=windows
             ;;
@@ -174,6 +177,17 @@ linux_installdeps() {
     fi
 }
 
+freebsd_installdeps() {
+    installing
+
+    check sudo pkg update
+
+    # currently the wx30 and wx31 packages produce GTK errors on CURRENT (as of 04/2019)
+    check sudo pkg install -y llvm-devel cmake ccache nasm ffmpeg gettext-tools gettext png pkgconf sdl2 sfml wx31-gtk3 iconv zip ninja
+
+    build_instructions
+}
+
 # the -j flag for make parameter, empty if 1
 jobs_flag() {
     if [ $(num_cpus) -gt 1 ]; then
@@ -197,7 +211,7 @@ num_cpus() {
         _num_cpus=$(nproc)
     elif [ $os = linux -o $os = windows ]; then
         _num_cpus=$(grep '^processor		*:' /proc/cpuinfo | wc -l)
-    elif [ $os = mac ]; then
+    elif [ $os = mac ] || [ $os = freebsd ]; then
         _num_cpus=$(sysctl -n hw.ncpu)
     fi
 
@@ -1037,13 +1051,22 @@ brew_installdeps() {
 
     check brew -v update
 
+    brews="nasm cmake ccache ffmpeg gettext libpng pkg-config sdl2 wxmac ccache"
+
+    # sfml brew currently broken in the travis mac environment
+#    if [ -z "$TRAVIS" ]; then
+        brews="$brews sfml"
+#    fi
+
     set --
-    for f in nasm cmake ccache ffmpeg gettext libpng pkg-config sdl2 sfml wxmac ccache; do
+    for f in $brews; do
         if brew info "$f" | grep -Eq '^Not installed$'; then
             set -- "$@" "$f"
         fi
     done
     [ $# -gt 0 ] && check brew -v install "$@"
+
+    brew link gettext --force
 
     brew -v cleanup
 
@@ -1055,7 +1078,7 @@ macports_installdeps() {
     installing
 
     check sudo port -v selfupdate
-    check sudo port -v install cmake ccache nasm ffmpeg gettext libpng pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv ccache
+    check sudo port -v install cmake ccache nasm ffmpeg gettext libpng pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv
     check sudo port select wxWidgets wxWidgets-3.0
 
     build_instructions

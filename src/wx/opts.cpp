@@ -74,6 +74,13 @@ const wxAcceleratorEntry default_accels[] = {
     wxAcceleratorEntry(wxMOD_NONE, WXK_PAUSE, XRCID("Pause")),
     wxAcceleratorEntry(wxMOD_CMD, wxT('P'), XRCID("Pause")),
     wxAcceleratorEntry(wxMOD_CMD, wxT('R'), XRCID("Reset")),
+    // add shortcuts for original size multiplier #415
+    wxAcceleratorEntry(wxMOD_NONE, wxT('1'), XRCID("SetSize1x")),
+    wxAcceleratorEntry(wxMOD_NONE, wxT('2'), XRCID("SetSize2x")),
+    wxAcceleratorEntry(wxMOD_NONE, wxT('3'), XRCID("SetSize3x")),
+    wxAcceleratorEntry(wxMOD_NONE, wxT('4'), XRCID("SetSize4x")),
+    wxAcceleratorEntry(wxMOD_NONE, wxT('5'), XRCID("SetSize5x")),
+    wxAcceleratorEntry(wxMOD_NONE, wxT('6'), XRCID("SetSize6x")),
     // save oldest is more commonly used than save other
     //wxAcceleratorEntry(wxMOD_CMD, wxT('S'), XRCID("Save")),
     wxAcceleratorEntry(wxMOD_CMD, wxT('S'), XRCID("SaveGameOldest")),
@@ -135,18 +142,22 @@ const wxString joynames[NUM_KEYS] = {
     wxT("Speed"), wxT("Capture"), wxT("GS")
 };
 
-wxJoyKeyBinding defkeys[NUM_KEYS * 2] = {
-    WJKB(WXK_UP), WJKB(1, WXJB_AXIS_MINUS, 1), WJKB(WXK_DOWN), WJKB(1, WXJB_AXIS_PLUS, 1),
-    WJKB(WXK_LEFT), WJKB(0, WXJB_AXIS_MINUS, 1), WJKB(WXK_RIGHT), WJKB(0, WXJB_AXIS_PLUS, 1),
-    WJKB(wxT('X')), WJKB(0, WXJB_BUTTON, 1), WJKB(wxT('Z')), WJKB(1, WXJB_BUTTON, 1),
-    WJKB(wxT('A')), WJKB(2, WXJB_BUTTON, 1), WJKB(wxT('S')), WJKB(3, WXJB_BUTTON, 1),
-    WJKB(WXK_BACK), WJKB(4, WXJB_BUTTON, 1), WJKB(WXK_RETURN), WJKB(5, WXJB_BUTTON, 1),
-    WJKB(WXK_NUMPAD_UP), WJKB(0), WJKB(WXK_NUMPAD_DOWN), WJKB(0),
-    WJKB(WXK_NUMPAD_LEFT), WJKB(0), WJKB(WXK_NUMPAD_RIGHT), WJKB(0),
-    WJKB(WXK_NUMPAD_PAGEUP), WJKB(0), WJKB(WXK_NUMPAD_PAGEDOWN), WJKB(0),
-    WJKB(wxT('W')), WJKB(0), WJKB(wxT('Q')), WJKB(0),
-    WJKB(WXK_SPACE), WJKB(0), WJKB(0), WJKB(0),
-    WJKB(0), WJKB(0)
+wxJoyKeyBinding defkeys_keyboard[NUM_KEYS] = {
+    WJKB(WXK_UP), WJKB(WXK_DOWN), WJKB(WXK_LEFT), WJKB(WXK_RIGHT),
+    WJKB(wxT('Z')), WJKB(wxT('X')), WJKB(wxT('A')), WJKB(wxT('S')),
+    WJKB(wxT('C')), WJKB(wxT('V')),
+    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(WXK_SPACE), WJKB(0), WJKB(0)
+};
+
+wxJoyKeyBinding defkeys_joystick[NUM_KEYS] = {
+    WJKB(1, WXJB_AXIS_MINUS, 1), WJKB(1, WXJB_AXIS_PLUS, 1), WJKB(0, WXJB_AXIS_MINUS, 1), WJKB(0, WXJB_AXIS_PLUS, 1),
+    WJKB(0, WXJB_BUTTON, 1), WJKB(1, WXJB_BUTTON, 1), WJKB(2, WXJB_BUTTON, 1), WJKB(3, WXJB_BUTTON, 1),
+    WJKB(4, WXJB_BUTTON, 1), WJKB(5, WXJB_BUTTON, 1),
+    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0), WJKB(0)
 };
 
 wxAcceleratorEntry_v sys_accels;
@@ -277,6 +288,7 @@ opt_desc opts[] = {
 
     /// Geometry
     INTOPT("geometry/fullScreen", "Fullscreen", wxTRANSLATE("Enter fullscreen mode at startup"), fullScreen, 0, 1),
+    INTOPT("geometry/isMaximized", "Maximized", wxTRANSLATE("Window maximized"), windowMaximized, 0, 1),
     UINTOPT("geometry/windowHeight", "Height", wxTRANSLATE("Window height at startup"), windowHeight, 0, 99999),
     UINTOPT("geometry/windowWidth", "Width", wxTRANSLATE("Window width at startup"), windowWidth, 0, 99999),
     INTOPT("geometry/windowX", "X", wxTRANSLATE("Window axis X position at startup"), windowPositionX, -1, 99999),
@@ -295,7 +307,7 @@ opt_desc opts[] = {
     INTOPT("Sound/GBStereo", "", wxTRANSLATE("GB stereo effect (%)"), gopts.gb_stereo, 0, 100),
     BOOLOPT("Sound/GBSurround", "GBSurround", wxTRANSLATE("GB surround sound effect (%)"), gopts.gb_effects_config_surround),
     ENUMOPT("Sound/Quality", "", wxTRANSLATE("Sound sample rate (kHz)"), gopts.sound_qual, wxTRANSLATE("48|44|22|11")),
-    INTOPT("Sound/Volume", "", wxTRANSLATE("Sound volume (%)"), gopts.sound_vol, 0, 400)
+    INTOPT("Sound/Volume", "", wxTRANSLATE("Sound volume (%)"), gopts.sound_vol, 0, 200)
 };
 const int num_opts = sizeof(opts) / sizeof(opts[0]);
 
@@ -335,11 +347,10 @@ opts_t::opts_t()
     default_stick = 1;
 
     for (int i = 0; i < NUM_KEYS; i++) {
-        if (defkeys[i * 2].key)
-            joykey_bindings[0][i].push_back(defkeys[i * 2]);
-
-        if (defkeys[i * 2 + 1].joy)
-            joykey_bindings[0][i].push_back(defkeys[i * 2 + 1]);
+        if (defkeys_keyboard[i].key)
+            joykey_bindings[0][i].push_back(defkeys_keyboard[i]);
+        if (defkeys_joystick[i].key)
+            joykey_bindings[0][i].push_back(defkeys_joystick[i]);
     }
 
     recent = new wxFileHistory(10);
@@ -347,6 +358,8 @@ opts_t::opts_t()
     print_auto_page = true;
     autoPatch = true;
     onlineupdates = 1;
+    // quick fix for issues #48 and #445
+    link_host = "127.0.0.1";
 }
 
 // for binary_search() and friends
@@ -759,9 +772,11 @@ void update_opts()
     if (gopts.accels.size())
         cfg->SetPath(wxT("/Keyboard"));
 
+    int cmd_id = -1;
     for (wxAcceleratorEntry_v::iterator i = gopts.accels.begin();
          i < gopts.accels.end(); ++i) {
-        int cmd_id = i->GetCommand();
+        if (cmd_id == i->GetCommand()) continue;
+        cmd_id = i->GetCommand();
         int cmd;
 
         for (cmd = 0; cmd < ncmds; cmd++)
