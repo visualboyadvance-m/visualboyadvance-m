@@ -142,8 +142,6 @@ const uint8_t gamepakWaitState[4] = { 4, 3, 2, 8 };
 const uint8_t gamepakWaitState0[2] = { 2, 1 };
 const uint8_t gamepakWaitState1[2] = { 4, 1 };
 const uint8_t gamepakWaitState2[2] = { 8, 1 };
-const bool isInRom[16] = { false, false, false, false, false, false, false, false,
-    true, true, true, true, true, true, false, false };
 
 uint8_t memoryWait[16] = { 0, 0, 2, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 0 };
 uint8_t memoryWait32[16] = { 0, 0, 5, 0, 0, 1, 1, 0, 7, 7, 9, 9, 13, 13, 4, 0 };
