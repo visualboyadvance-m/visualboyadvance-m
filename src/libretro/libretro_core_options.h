@@ -146,6 +146,17 @@ struct retro_core_option_definition option_defs_us[] = {
         "disabled"
     },
     {
+        "vbam_gbcoloroption",
+        "(GB) Color Correction",
+        "Applies color correction which fixes colors in some games games.",
+        {
+            { "disabled",  NULL },
+            { "enabled",   NULL },
+            { NULL, NULL },
+        },
+        "disabled"
+    },
+    {
         "vbam_turboenable",
         "Enable Turbo Buttons",
         "Enable or disable gamepad turbo buttons.",

@@ -187,6 +187,11 @@ static void set_gbPalette(void)
         gbPalette[i] = pal[i];
 }
 
+static void set_gbColorCorrection(int value)
+{
+    gbColorOption = value;
+}
+
 extern int gbRomType; // gets type from header 0x147
 extern int gbBattery; // enabled when gbRamSize != 0
 
@@ -1193,6 +1198,15 @@ static void update_variables(bool startup)
 
         if (lastpal != current_gbPalette)
             set_gbPalette();
+    }
+
+    var.key = "vbam_gbcoloroption";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        int val = (!strcmp(var.value, "enabled")) ? 1 : 0;
+        set_gbColorCorrection(val);
     }
 }
 
