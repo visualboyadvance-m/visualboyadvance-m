@@ -50,6 +50,10 @@ bool gbReadGSASnapshot(const char*);
 
 bool gbLoadRomData(const char* data, unsigned size);
 
+// Allows invalid vram/palette access needed for Colorizer hacked games in GBC/GBA hardware
+void setColorizerHack(bool value);
+bool allowColorizerHack(void);
+
 extern int gbHardware;
 
 extern struct EmulatedSystem GBSystem;

@@ -61,6 +61,7 @@ static unsigned height = 160;
 static EmulatedSystem* core = NULL;
 static IMAGE_TYPE type = IMAGE_UNKNOWN;
 static unsigned current_gbPalette;
+static bool opt_colorizer_hack = false;
 
 uint16_t systemColorMap16[0x10000];
 uint32_t systemColorMap32[0x10000];
@@ -866,6 +867,12 @@ static void gb_init(void)
 
     gbGetHardwareType();
 
+    setColorizerHack(opt_colorizer_hack);
+
+    // Disable bios loading when using Colorizer hack
+    if (opt_colorizer_hack)
+        usebios = false;
+
     if (usebios) {
         snprintf(biosfile, sizeof(biosfile), "%s%c%s",
             retro_system_directory, SLASH, biosname[gbCgbMode]);
@@ -1098,6 +1105,16 @@ static void update_variables(bool startup)
             gbEmulatorType = 4;
         else if (strcmp(var.value, "sgb2") == 0)
             gbEmulatorType = 5;
+    }
+
+    var.key = "vbam_allowcolorizerhack";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        if (strcmp(var.value, "enabled") == 0)
+            opt_colorizer_hack = true;
+        else
+            opt_colorizer_hack = false;
     }
 
     var.key = "vbam_turboenable";
