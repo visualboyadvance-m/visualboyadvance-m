@@ -90,21 +90,6 @@ struct retro_core_option_definition option_defs_us[] = {
         "5"
     },
     {
-        "vbam_gbHardware",
-        "(GB) Emulated Hardware",
-        "Sets the Game Boy hardware type to emulate.",
-        {
-            { "gbc",  "Game Boy Color" },
-            { "auto", "Automatic" },
-            { "sgb",  "Super Game Boy" },
-            { "gb",   "Game Boy" },
-            { "gba",  "Game Boy Advance" },
-            { "sgb2", "Super Game Boy 2" },
-            { NULL, NULL },
-        },
-        "gbc"
-    },
-    {
         "vbam_palettes",
         "(GB) Color Palette",
         "Set Game Boy palettes.",
@@ -121,6 +106,32 @@ struct retro_core_option_definition option_defs_us[] = {
             { NULL, NULL },
         },
         "standard"
+    },
+    {
+        "vbam_gbHardware",
+        "(GB) Emulated Hardware",
+        "Sets the Game Boy hardware type to emulate.",
+        {
+            { "gbc",  "Game Boy Color" },
+            { "auto", "Automatic" },
+            { "sgb",  "Super Game Boy" },
+            { "gb",   "Game Boy" },
+            { "gba",  "Game Boy Advance" },
+            { "sgb2", "Super Game Boy 2" },
+            { NULL, NULL },
+        },
+        "gbc"
+    },
+    {
+        "vbam_allowcolorizerhack",
+        "(GB) Enable Colorizer Hack (Needs Restart)",
+        "Allows Colorizer hacked GB games (e.g. DX patched games) to normally run in GBC/GBA hardware type. This also disables the use of bios file. NOT RECOMMENDED for use on non-colorized games.",
+        {
+            { "disabled",  NULL },
+            { "enabled",   NULL },
+            { NULL, NULL },
+        },
+        "disabled"
     },
     {
         "vbam_showborders",
