@@ -143,9 +143,9 @@ const wxString joynames[NUM_KEYS] = {
 };
 
 wxJoyKeyBinding defkeys_keyboard[NUM_KEYS] = {
-    WJKB(WXK_UP), WJKB(WXK_DOWN), WJKB(WXK_LEFT), WJKB(WXK_RIGHT),
-    WJKB(wxT('A')), WJKB(wxT('S')), WJKB(wxT('Q')), WJKB(wxT('W')),
-    WJKB(wxT('Z')), WJKB(wxT('X')),
+    WJKB(wxT('W')), WJKB(wxT('S')), WJKB(wxT('A')), WJKB(wxT('D')),
+    WJKB(wxT('L')), WJKB(wxT('K')), WJKB(wxT('I')), WJKB(wxT('O')),
+    WJKB(WXK_BACK), WJKB(WXK_RETURN),
     WJKB(0), WJKB(0), WJKB(0), WJKB(0),
     WJKB(0), WJKB(0), WJKB(0), WJKB(0),
     WJKB(WXK_SPACE), WJKB(0), WJKB(0)
