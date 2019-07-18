@@ -503,40 +503,6 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
 void retro_set_environment(retro_environment_t cb)
 {
    environ_cb = cb;
-
-   struct retro_variable variables[] = {
-      { "vbam_solarsensor", "Solar Sensor Level; 0|1|2|3|4|5|6|7|8|9|10" },
-      { "vbam_usebios", "Use BIOS file (Restart); disabled|enabled" },
-      { "vbam_soundinterpolation", "Sound Interpolation; enabled|disabled" },
-      { "vbam_soundfiltering", "Sound Filtering; 5|6|7|8|9|10|0|1|2|3|4" },
-      { "vbam_gbHardware", "(GB) Emulated Hardware; gbc|auto|sgb|gb|gba|sgb2" },
-      { "vbam_palettes", "(GB) Color Palette; black and white|blue sea|dark knight|green forest|hot desert|pink dreams|wierd colors|original gameboy|gba sp" },
-      { "vbam_showborders", "(GB) Show Borders; disabled|enabled|auto" },
-      { "vbam_turboenable", "Enable Turbo Buttons; disabled|enabled" },
-      { "vbam_turbodelay", "Turbo Delay (in frames); 3|4|5|6|7|8|9|10|11|12|13|14|15|1|2" },
-      { "vbam_astick_deadzone", "Sensors Deadzone (%); 15|20|25|30|0|5|10"},
-      { "vbam_gyro_sensitivity", "Sensor Sensitivity (Gyroscope) (%); 100|105|110|115|120|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95"},
-      { "vbam_tilt_sensitivity", "Sensor Sensitivity (Tilt) (%); 100|105|110|115|120|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95"},
-      { "vbam_swap_astick", "Swap Left/Right Analog; disabled|enabled" },
-      { "vbam_layer_1", "Show layer 1; enabled|disabled" },
-      { "vbam_layer_2", "Show layer 2; enabled|disabled" },
-      { "vbam_layer_3", "Show layer 3; enabled|disabled" },
-      { "vbam_layer_4", "Show layer 4; enabled|disabled" },
-      { "vbam_layer_5", "Show sprite layer; enabled|disabled" },
-      { "vbam_layer_6", "Show window layer 1; enabled|disabled" },
-      { "vbam_layer_7", "Show window layer 2; enabled|disabled" },
-      { "vbam_layer_8", "Show sprite window layer; enabled|disabled" },
-      { "vbam_sound_1", "Sound channel 1; enabled|disabled" },
-      { "vbam_sound_2", "Sound channel 2; enabled|disabled" },
-      { "vbam_sound_3", "Sound channel 3; enabled|disabled" },
-      { "vbam_sound_4", "Sound channel 4; enabled|disabled" },
-      { "vbam_sound_5", "Direct Sound A; enabled|disabled" },
-      { "vbam_sound_6", "Direct Sound B; enabled|disabled" },
-      { NULL, NULL },
-   };
-
-   // cb(RETRO_ENVIRONMENT_SET_VARIABLES, variables);
-
    libretro_set_core_options(environ_cb);
 }
 
@@ -1650,8 +1616,6 @@ void systemMessage(int, const char* fmt, ...)
         log_cb(RETRO_LOG_INFO, "%s\n", buffer);
     va_end(ap);
 }
-
-static int rumble_state, rumble_down;
 
 uint32_t systemReadJoypad(int which)
 {
