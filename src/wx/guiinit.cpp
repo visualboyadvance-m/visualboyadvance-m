@@ -1646,6 +1646,18 @@ public:
     {
         bool clear = ev.GetId() == XRCID("Clear");
 
+        // For the individual clear buttons, we assume their name is
+        // "Clear" + joynames[i]
+        // ClearUp for Up; ClearR for R etc
+        for (int i = 0; i < NUM_KEYS; ++i) {
+            wxJoyKeyTextCtrl* tc = XRCCTRL_D(*p, joynames[i], wxJoyKeyTextCtrl);
+            wxString singleClearButton("Clear" + joynames[i]);
+            if (ev.GetId() == XRCID(singleClearButton)) {
+                tc->SetValue(wxEmptyString);
+                return;
+            }
+        }
+
         for (int i = 0; i < NUM_KEYS; i++) {
             wxJoyKeyTextCtrl* tc = XRCCTRL_D(*p, joynames[i], wxJoyKeyTextCtrl);
 
@@ -3725,6 +3737,12 @@ bool MainFrame::BindControls()
             w->Connect(XRCID("Clear"), wxEVT_COMMAND_BUTTON_CLICKED,
                 wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
                 NULL, &JoyPadConfigHandler[i]);
+            for (int j = 0; j < NUM_KEYS; ++j) {
+                w->Connect(XRCID(wxString("Clear" + joynames[j])),
+                    wxEVT_COMMAND_BUTTON_CLICKED,
+                    wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
+                    NULL, &JoyPadConfigHandler[i]);
+            }
             joyDialog->Fit();
         }
 
