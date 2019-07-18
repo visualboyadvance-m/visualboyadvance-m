@@ -1270,6 +1270,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
         //register_STAT = (register_STAT & 0x87) |
         //      (value & 0x7c);
         gbMemory[0xff41] = register_STAT = (value & 0xf8) | (register_STAT & 0x07); // fix ?
+        // TODO:
         // GB bug from Devrs FAQ
         // http://www.devrs.com/gb/files/faqs.html#GBBugs
         // 2018-7-26 Backported STAT register bug behavior
@@ -1280,12 +1281,15 @@ void gbWriteMemory(uint16_t address, uint8_t value)
         // Games below relies on this bug, , and are incompatible with the GBC.
         // - Road Rash: crash after player screen
         // - Zerg no Densetsu: crash right after showing a small portion of intro
+        // - 2019-07-18 - Speedy Gonzalez status bar relies on this as well.
 
         if ((gbHardware & 5)
             && (((!gbInt48Signal) && (gbLcdMode < 2) && (register_LCDC & 0x80))
             || (register_LY == register_LYC))) {
 
-            gbMemory[0xff0f] = register_IF |=2;
+            // send LCD interrupt only if no interrupt 48h signal...
+            if (!gbInt48Signal)
+                gbMemory[0xff0f] = register_IF |= 2;
         }
 
         gbInt48Signal &= ((register_STAT >> 3) & 0xF);
@@ -1307,7 +1311,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
                 if (!gbInt48Signal) {
                     gbMemory[0xff0f] = register_IF |= 2;
                 }
-                gbInt48Signal |= 4;
+                //gbInt48Signal |= 4;
             }
             gbCompareLYToLYC();
 
