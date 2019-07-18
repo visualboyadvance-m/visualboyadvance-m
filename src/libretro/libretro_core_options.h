@@ -110,7 +110,7 @@ struct retro_core_option_definition option_defs_us[] = {
     {
         "vbam_gbHardware",
         "(GB) Emulated Hardware",
-        "Sets the Game Boy hardware type to emulate.",
+        "Sets the Game Boy hardware type to emulate. Restart core to apply.",
         {
             { "gbc",  "Game Boy Color" },
             { "auto", "Automatic" },

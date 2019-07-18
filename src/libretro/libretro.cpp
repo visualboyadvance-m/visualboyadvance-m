@@ -896,6 +896,7 @@ static void gb_init(void)
     gbSoundSetDeclicking(1);
 
     gbReset(); // also resets sound;
+    set_gbPalette();
 
     // VBA-M always updates time based on current time and not in-game time.
     // No need to add RTC data to RETRO_MEMORY_RTC, so its safe to place this here.
@@ -1092,7 +1093,7 @@ static void update_variables(bool startup)
     var.key = "vbam_gbHardware";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && startup) {
         if (strcmp(var.value, "auto") == 0)
             gbEmulatorType = 0;
         else if (strcmp(var.value, "gbc") == 0)
