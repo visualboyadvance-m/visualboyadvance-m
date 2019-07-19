@@ -7,6 +7,7 @@
 
 #include "SoundRetro.h"
 #include "libretro.h"
+#include "libretro_core_options.h"
 
 #include "../System.h"
 #include "../Util.h"
@@ -60,6 +61,7 @@ static unsigned height = 160;
 static EmulatedSystem* core = NULL;
 static IMAGE_TYPE type = IMAGE_UNKNOWN;
 static unsigned current_gbPalette;
+static bool opt_colorizer_hack = false;
 
 uint16_t systemColorMap16[0x10000];
 uint32_t systemColorMap32[0x10000];
@@ -183,6 +185,11 @@ static void set_gbPalette(void)
 
     for (int i = 0; i < 8; i++)
         gbPalette[i] = pal[i];
+}
+
+static void set_gbColorCorrection(int value)
+{
+    gbColorOption = value;
 }
 
 extern int gbRomType; // gets type from header 0x147
@@ -496,39 +503,7 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
 void retro_set_environment(retro_environment_t cb)
 {
    environ_cb = cb;
-
-   struct retro_variable variables[] = {
-      { "vbam_solarsensor", "Solar Sensor Level; 0|1|2|3|4|5|6|7|8|9|10" },
-      { "vbam_usebios", "Use BIOS file (Restart); disabled|enabled" },
-      { "vbam_soundinterpolation", "Sound Interpolation; enabled|disabled" },
-      { "vbam_soundfiltering", "Sound Filtering; 5|6|7|8|9|10|0|1|2|3|4" },
-      { "vbam_gbHardware", "(GB) Emulated Hardware; Game Boy Color|Automatic|Super Game Boy|Game Boy|Game Boy Advance|Super Game Boy 2" },
-      { "vbam_palettes", "(GB) Color Palette; Standard|Blue Sea|Dark Knight|Green Forest|Hot Desert|Pink Dreams|Wierd Colors|Original|GBA SP" },
-      { "vbam_showborders", "(GB) Show Borders; disabled|enabled|auto" },
-      { "vbam_turboenable", "Enable Turbo Buttons; disabled|enabled" },
-      { "vbam_turbodelay", "Turbo Delay (in frames); 3|4|5|6|7|8|9|10|11|12|13|14|15|1|2" },
-      { "vbam_astick_deadzone", "Sensors Deadzone (%); 15|20|25|30|0|5|10"},
-      { "vbam_gyro_sensitivity", "Sensor Sensitivity (Gyroscope) (%); 100|105|110|115|120|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95"},
-      { "vbam_tilt_sensitivity", "Sensor Sensitivity (Tilt) (%); 100|105|110|115|120|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95"},
-      { "vbam_swap_astick", "Swap Left/Right Analog; disabled|enabled" },
-      { "vbam_layer_1", "Show layer 1; enabled|disabled" },
-      { "vbam_layer_2", "Show layer 2; enabled|disabled" },
-      { "vbam_layer_3", "Show layer 3; enabled|disabled" },
-      { "vbam_layer_4", "Show layer 4; enabled|disabled" },
-      { "vbam_layer_5", "Show sprite layer; enabled|disabled" },
-      { "vbam_layer_6", "Show window layer 1; enabled|disabled" },
-      { "vbam_layer_7", "Show window layer 2; enabled|disabled" },
-      { "vbam_layer_8", "Show sprite window layer; enabled|disabled" },
-      { "vbam_sound_1", "Sound channel 1; enabled|disabled" },
-      { "vbam_sound_2", "Sound channel 2; enabled|disabled" },
-      { "vbam_sound_3", "Sound channel 3; enabled|disabled" },
-      { "vbam_sound_4", "Sound channel 4; enabled|disabled" },
-      { "vbam_sound_5", "Direct Sound A; enabled|disabled" },
-      { "vbam_sound_6", "Direct Sound B; enabled|disabled" },
-      { NULL, NULL },
-   };
-
-   cb(RETRO_ENVIRONMENT_SET_VARIABLES, variables);
+   libretro_set_core_options(environ_cb);
 }
 
 void retro_get_system_info(struct retro_system_info *info)
@@ -863,6 +838,12 @@ static void gb_init(void)
 
     gbGetHardwareType();
 
+    setColorizerHack(opt_colorizer_hack);
+
+    // Disable bios loading when using Colorizer hack
+    if (opt_colorizer_hack)
+        usebios = false;
+
     if (usebios) {
         snprintf(biosfile, sizeof(biosfile), "%s%c%s",
             retro_system_directory, SLASH, biosname[gbCgbMode]);
@@ -886,6 +867,7 @@ static void gb_init(void)
     gbSoundSetDeclicking(1);
 
     gbReset(); // also resets sound;
+    set_gbPalette();
 
     // VBA-M always updates time based on current time and not in-game time.
     // No need to add RTC data to RETRO_MEMORY_RTC, so its safe to place this here.
@@ -1082,19 +1064,29 @@ static void update_variables(bool startup)
     var.key = "vbam_gbHardware";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        if (strcmp(var.value, "Automatic") == 0)
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && startup) {
+        if (strcmp(var.value, "auto") == 0)
             gbEmulatorType = 0;
-        else if (strcmp(var.value, "Game Boy Color") == 0)
+        else if (strcmp(var.value, "gbc") == 0)
             gbEmulatorType = 1;
-        else if (strcmp(var.value, "Super Game Boy") == 0)
+        else if (strcmp(var.value, "sgb") == 0)
             gbEmulatorType = 2;
-        else if (strcmp(var.value, "Game Boy") == 0)
+        else if (strcmp(var.value, "gb") == 0)
             gbEmulatorType = 3;
-        else if (strcmp(var.value, "Game Boy Advance") == 0)
+        else if (strcmp(var.value, "gba") == 0)
             gbEmulatorType = 4;
-        else if (strcmp(var.value, "Super Game Boy 2") == 0)
+        else if (strcmp(var.value, "sgb2") == 0)
             gbEmulatorType = 5;
+    }
+
+    var.key = "vbam_allowcolorizerhack";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        if (strcmp(var.value, "enabled") == 0)
+            opt_colorizer_hack = true;
+        else
+            opt_colorizer_hack = false;
     }
 
     var.key = "vbam_turboenable";
@@ -1151,27 +1143,36 @@ static void update_variables(bool startup)
     {
         int lastpal = current_gbPalette;
 
-        if (!strcmp(var.value, "Standard"))
+        if (!strcmp(var.value, "black and white"))
             current_gbPalette = 0;
-        else if (!strcmp(var.value, "Blue Sea"))
+        else if (!strcmp(var.value, "blue sea"))
             current_gbPalette = 1;
-        else if (!strcmp(var.value, "Dark Knight"))
+        else if (!strcmp(var.value, "dark knight"))
             current_gbPalette = 2;
-        else if (!strcmp(var.value, "Green Forest"))
+        else if (!strcmp(var.value, "green forest"))
             current_gbPalette = 3;
-        else if (!strcmp(var.value, "Hot Desert"))
+        else if (!strcmp(var.value, "hot desert"))
             current_gbPalette = 4;
-        else if (!strcmp(var.value, "Pink Dreams"))
+        else if (!strcmp(var.value, "pink dreams"))
             current_gbPalette = 5;
-        else if (!strcmp(var.value, "Wierd Colors"))
+        else if (!strcmp(var.value, "wierd colors"))
             current_gbPalette = 6;
-        else if (!strcmp(var.value, "Original"))
+        else if (!strcmp(var.value, "original gameboy"))
             current_gbPalette = 7;
-        else if (!strcmp(var.value, "GBA SP"))
+        else if (!strcmp(var.value, "gba sp"))
             current_gbPalette = 8;
 
         if (lastpal != current_gbPalette)
             set_gbPalette();
+    }
+
+    var.key = "vbam_gbcoloroption";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+    {
+        int val = (!strcmp(var.value, "enabled")) ? 1 : 0;
+        set_gbColorCorrection(val);
     }
 }
 
@@ -1217,25 +1218,25 @@ static void updateInput_MotionSensors(void)
     analog_y = astick_data[1];
 
     // Gyro sensor section
-    analog[3] = input_cb(0, RETRO_DEVICE_ANALOG,
+    analog[2] = input_cb(0, RETRO_DEVICE_ANALOG,
         gyro_retro_device_index, RETRO_DEVICE_ID_ANALOG_X);
 
-    if ( analog[3] < -astick_deadzone ) {
+    if ( analog[2] < -astick_deadzone ) {
         // Re-scale analog stick range
-        scaled_range = (-analog[3] - astick_deadzone) *
+        scaled_range = (-analog[2] - astick_deadzone) *
             ((float)ASTICK_MAX / (ASTICK_MAX - astick_deadzone));
         // Gyro sensor range is +/- 1800
         scaled_range *= 1800.0 / ASTICK_MAX * (gyro_sensitivity / 100.0);
-        astick_data[3] = -(int16_t)ROUND(scaled_range);
-    } else if ( analog[3] > astick_deadzone ) {
-        scaled_range = (analog[3] - astick_deadzone) *
+        astick_data[2] = -(int16_t)ROUND(scaled_range);
+    } else if ( analog[2] > astick_deadzone ) {
+        scaled_range = (analog[2] - astick_deadzone) *
             ((float)ASTICK_MAX / (ASTICK_MAX - astick_deadzone));
         scaled_range *= (1800.0 / ASTICK_MAX * (gyro_sensitivity / 100.0));
-        astick_data[3] = +(int16_t)ROUND(scaled_range);
+        astick_data[2] = +(int16_t)ROUND(scaled_range);
     } else
-        astick_data[3] = 0;
+        astick_data[2] = 0;
 
-    analog_z = astick_data[3];
+    analog_z = astick_data[2];
 }
 
 // Update solar sensor level by gamepad buttons, default L2/R2
@@ -1463,7 +1464,7 @@ bool retro_load_game(const struct retro_game_info *game)
       gb_init();
 
       unsigned addr, i;
-      struct retro_memory_descriptor desc[16];
+      struct retro_memory_descriptor desc[17];
       struct retro_memory_map retromap;
 
       memset(desc, 0, sizeof(desc));
@@ -1493,6 +1494,15 @@ bool retro_load_game(const struct retro_game_info *game)
             if (addr < 4)  desc[i].flags  = RETRO_MEMDESC_CONST;
             i++;
          }
+      }
+
+      if (gbCgbMode) { // banks 2-7 of GBC work ram banks at $10000
+            desc[i].ptr    = (void*)gbWram;
+            desc[i].offset = 0x2000;
+            desc[i].start  = 0x10000;
+            desc[i].select = 0xFFFF0000;
+            desc[i].len    = 0x6000;
+            i++;
       }
 
       retromap.descriptors = desc;
@@ -1606,8 +1616,6 @@ void systemMessage(int, const char* fmt, ...)
         log_cb(RETRO_LOG_INFO, "%s\n", buffer);
     va_end(ap);
 }
-
-static int rumble_state, rumble_down;
 
 uint32_t systemReadJoypad(int which)
 {

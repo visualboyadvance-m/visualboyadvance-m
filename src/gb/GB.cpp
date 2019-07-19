@@ -200,6 +200,7 @@ int gbCaptureNumber = 0;
 bool gbCapture = false;
 bool gbCapturePrevious = false;
 int gbJoymask[4] = { 0, 0, 0, 0 };
+static bool allow_colorizer_hack;
 
 uint8_t gbRamFill = 0xff;
 
@@ -776,6 +777,51 @@ static const uint16_t gbColorizationPaletteData[32][3][4] = {
 #define GBSAVE_GAME_VERSION_12 12
 #define GBSAVE_GAME_VERSION GBSAVE_GAME_VERSION_12
 
+void setColorizerHack(bool value)
+{
+    allow_colorizer_hack = value;
+}
+
+bool allowColorizerHack(void)
+{
+    if (gbHardware & 0xA)
+        return (allow_colorizer_hack);
+    return false;
+}
+
+static inline bool gbVramReadAccessValid(void)
+{
+    // A lot of 'ugly' checks... But only way to emulate this particular behaviour...
+    if (allowColorizerHack()||
+        ((gbHardware & 0xa) && ((gbLcdModeDelayed != 3) || (((register_LY == 0) && (gbScreenOn == false) && (register_LCDC & 0x80)) && (gbLcdLYIncrementTicksDelayed == (GBLY_INCREMENT_CLOCK_TICKS - GBLCD_MODE_2_CLOCK_TICKS))))) ||
+        ((gbHardware & 0x5) && (gbLcdModeDelayed != 3) && ((gbLcdMode != 3) || ((register_LY == 0) && ((gbScreenOn == false) && (register_LCDC & 0x80)) && (gbLcdLYIncrementTicks == (GBLY_INCREMENT_CLOCK_TICKS - GBLCD_MODE_2_CLOCK_TICKS))))))
+        return true;
+    return false;
+}
+
+static inline bool gbVramWriteAccessValid(void)
+{
+    if (allowColorizerHack() ||
+        // No access to Vram during mode 3
+        // (used to emulate the gfx differences between GB & GBC-GBA/SP in Stunt Racer)
+        (gbLcdModeDelayed != 3) ||
+        // This part is used to emulate a small difference between hardwares
+        // (check 8-in-1's arrow on GBA/GBC to verify it)
+        ((register_LY == 0) && ((gbHardware & 0xa) && (gbScreenOn == false) && (register_LCDC & 0x80)) && (gbLcdLYIncrementTicksDelayed == (GBLY_INCREMENT_CLOCK_TICKS - GBLCD_MODE_2_CLOCK_TICKS))))
+        return true;
+    return false;
+}
+
+static inline bool gbCgbPaletteAccessValid(void)
+{
+    // No access to gbPalette during mode 3 (Color Panel Demo)
+    if (allowColorizerHack() ||
+        ((gbLcdModeDelayed != 3) && (!((gbLcdMode == 0) && (gbLcdTicks >= (GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299] - 1)))) && (!gbSpeed)) ||
+        (gbSpeed && ((gbLcdMode == 1) || (gbLcdMode == 2) || ((gbLcdMode == 3) && (gbLcdTicks > (GBLCD_MODE_3_CLOCK_TICKS - 2))) || ((gbLcdMode == 0) && (gbLcdTicks <= (GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299] - 2))))))
+        return true;
+    return false;
+}
+
 int inline gbGetValue(int min, int max, int v)
 {
     return (int)(min + (float)(max - min) * (2.0 * (v / 31.0) - (v / 31.0) * (v / 31.0)));
@@ -919,12 +965,8 @@ void gbWriteMemory(uint16_t address, uint8_t value)
     }
 
     if (address < 0xa000) {
-        // No access to Vram during mode 3
-        // (used to emulate the gfx differences between GB & GBC-GBA/SP in Stunt Racer)
-        if ((gbLcdModeDelayed != 3) ||
-            // This part is used to emulate a small difference between hardwares
-            // (check 8-in-1's arrow on GBA/GBC to verify it)
-            ((register_LY == 0) && ((gbHardware & 0xa) && (gbScreenOn == false) && (register_LCDC & 0x80)) && (gbLcdLYIncrementTicksDelayed == (GBLY_INCREMENT_CLOCK_TICKS - GBLCD_MODE_2_CLOCK_TICKS))))
+
+        if (gbVramWriteAccessValid())
             gbMemoryMap[address >> 12][address & 0x0fff] = value;
         return;
     }
@@ -1270,6 +1312,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
         //register_STAT = (register_STAT & 0x87) |
         //      (value & 0x7c);
         gbMemory[0xff41] = register_STAT = (value & 0xf8) | (register_STAT & 0x07); // fix ?
+        // TODO:
         // GB bug from Devrs FAQ
         // http://www.devrs.com/gb/files/faqs.html#GBBugs
         // 2018-7-26 Backported STAT register bug behavior
@@ -1280,12 +1323,15 @@ void gbWriteMemory(uint16_t address, uint8_t value)
         // Games below relies on this bug, , and are incompatible with the GBC.
         // - Road Rash: crash after player screen
         // - Zerg no Densetsu: crash right after showing a small portion of intro
+        // - 2019-07-18 - Speedy Gonzalez status bar relies on this as well.
 
         if ((gbHardware & 5)
             && (((!gbInt48Signal) && (gbLcdMode < 2) && (register_LCDC & 0x80))
             || (register_LY == register_LYC))) {
 
-            gbMemory[0xff0f] = register_IF |=2;
+            // send LCD interrupt only if no interrupt 48h signal...
+            if (!gbInt48Signal)
+                gbMemory[0xff0f] = register_IF |= 2;
         }
 
         gbInt48Signal &= ((register_STAT >> 3) & 0xF);
@@ -1307,7 +1353,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
                 if (!gbInt48Signal) {
                     gbMemory[0xff0f] = register_IF |= 2;
                 }
-                gbInt48Signal |= 4;
+                //gbInt48Signal |= 4;
             }
             gbCompareLYToLYC();
 
@@ -1617,8 +1663,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
             int paletteIndex = (v & 0x3f) >> 1;
             int paletteHiLo = (v & 0x01);
 
-            // No access to gbPalette during mode 3 (Color Panel Demo)
-            if (((gbLcdModeDelayed != 3) && (!((gbLcdMode == 0) && (gbLcdTicks >= (GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299] - 1)))) && (!gbSpeed)) || (gbSpeed && ((gbLcdMode == 1) || (gbLcdMode == 2) || ((gbLcdMode == 3) && (gbLcdTicks > (GBLCD_MODE_3_CLOCK_TICKS - 2))) || ((gbLcdMode == 0) && (gbLcdTicks <= (GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299] - 2)))))) {
+            if (gbCgbPaletteAccessValid()) {
                 gbMemory[0xff69] = value;
                 gbPalette[paletteIndex] = (paletteHiLo ? ((value << 8) | (gbPalette[paletteIndex] & 0xff)) : ((gbPalette[paletteIndex] & 0xff00) | (value))) & 0x7fff;
             }
@@ -1658,8 +1703,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
 
             paletteIndex += 32;
 
-            // No access to gbPalette during mode 3 (Color Panel Demo)
-            if (((gbLcdModeDelayed != 3) && (!((gbLcdMode == 0) && (gbLcdTicks >= (GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299] - 1)))) && (!gbSpeed)) || (gbSpeed && ((gbLcdMode == 1) || (gbLcdMode == 2) || ((gbLcdMode == 3) && (gbLcdTicks > (GBLCD_MODE_3_CLOCK_TICKS - 2))) || ((gbLcdMode == 0) && (gbLcdTicks <= (GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299] - 2)))))) {
+            if (gbCgbPaletteAccessValid()) {
                 gbMemory[0xff6b] = value;
                 gbPalette[paletteIndex] = (paletteHiLo ? ((value << 8) | (gbPalette[paletteIndex] & 0xff)) : ((gbPalette[paletteIndex] & 0xff00) | (value))) & 0x7fff;
             }
@@ -1729,13 +1773,8 @@ uint8_t gbReadMemory(uint16_t address)
         return gbMemoryMap[address >> 12][address & 0x0fff];
 
     if (address < 0xa000) {
-        // A lot of 'ugly' checks... But only way to emulate this particular behaviour...
-        if (
-            (
-                (gbHardware & 0xa) && ((gbLcdModeDelayed != 3) || (((register_LY == 0) && (gbScreenOn == false) && (register_LCDC & 0x80)) && (gbLcdLYIncrementTicksDelayed == (GBLY_INCREMENT_CLOCK_TICKS - GBLCD_MODE_2_CLOCK_TICKS)))))
-            || ((gbHardware & 0x5) && (gbLcdModeDelayed != 3) && ((gbLcdMode != 3) || ((register_LY == 0) && ((gbScreenOn == false) && (register_LCDC & 0x80)) && (gbLcdLYIncrementTicks == (GBLY_INCREMENT_CLOCK_TICKS - GBLCD_MODE_2_CLOCK_TICKS))))))
+        if (gbVramReadAccessValid())
             return gbMemoryMap[address >> 12][address & 0x0fff];
-
         return 0xff;
     }
 
@@ -1977,8 +2016,7 @@ uint8_t gbReadMemory(uint16_t address)
         case 0x69:
         case 0x6b:
             if (gbCgbMode) {
-                // No access to gbPalette during mode 3 (Color Panel Demo)
-                if (((gbLcdModeDelayed != 3) && (!((gbLcdMode == 0) && (gbLcdTicks >= (GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299] - 1)))) && (!gbSpeed)) || (gbSpeed && ((gbLcdMode == 1) || (gbLcdMode == 2) || ((gbLcdMode == 3) && (gbLcdTicks > (GBLCD_MODE_3_CLOCK_TICKS - 2))) || ((gbLcdMode == 0) && (gbLcdTicks <= (GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299] - 2))))))
+                if (gbCgbPaletteAccessValid())
                     return (gbMemory[address]);
                 else
                     return 0xff;
@@ -3271,6 +3309,7 @@ void gbInit()
 {
     gbGenFilter();
     gbSgbInit();
+    setColorizerHack(false);
 
     gbMemory = (uint8_t*)malloc(65536);
 
@@ -5421,7 +5460,6 @@ bool gbLoadRomData(const char* data, unsigned size)
         bios = NULL;
     }
     bios = (uint8_t*)calloc(1, 0x900);
-
     return gbUpdateSizes();
 }
 
