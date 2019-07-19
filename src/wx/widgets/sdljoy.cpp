@@ -9,6 +9,7 @@ struct wxSDLJoyState {
     SDL_Joystick* dev;
     int nax, nhat, nbut;
     short* curval;
+    short* initial_val;
     bool is_valid;
     ~wxSDLJoyState()
     {
@@ -16,12 +17,15 @@ struct wxSDLJoyState {
             SDL_JoystickClose(dev);
         if (curval)
             delete[] curval;
+        if (initial_val)
+            delete[] initial_val;
     }
     wxSDLJoyState()
     {
 	dev = NULL;
 	nax = nhat = nbut = 0;
 	curval = NULL;
+        initial_val = NULL;
         is_valid = true;
     }
 };
@@ -70,17 +74,19 @@ wxSDLJoy::wxSDLJoy(bool analog)
         nctrl += joystate[i].nhat = hats    < 0 ? 0 : hats;
         nctrl += joystate[i].nbut = buttons < 0 ? 0 : buttons;
 
-        joystate[i].curval = new short[nctrl]{0};
+        joystate[i].curval = new short[nctrl]{};
 
-	// clear controls
-        memset(joystate[i].curval, 0, sizeof(short) * nctrl);
-
-        // initialize axis previous value to initial state
+        // set initial values array
+	// see below for 360 trigger handling
 #if SDL_VERSION_ATLEAST(2, 0, 6)
+        joystate[i].initial_val = new short[nctrl]{};
+
         for (int j = 0; j < joystate[i].nax; j++) {
             int16_t initial_state = 0;
             SDL_JoystickGetAxisInitialState(dev, j, &initial_state);
-            joystate[i].curval[j] = initial_state;
+            joystate[i].initial_val[j] = initial_state;
+
+            // curval is 0 which is what initial state maps to ATM
         }
 #endif
     }
@@ -180,6 +186,13 @@ void wxSDLJoy::Notify()
                     else
                         val = 0;
                 }
+
+                // This is for the 360 and similar triggers which return a
+                // value on initial state of the trigger axis. This hack may be
+                // insufficient, we may need to expand the joy event API to
+                // support initial values.
+                if (joystate[i].initial_val && val == joystate[i].initial_val[j])
+                    val = 0;
 
                 if (handler && val != joystate[i].curval[j]) {
                     wxSDLJoyEvent ev(wxEVT_SDLJOY, GetId());
