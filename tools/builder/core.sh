@@ -696,7 +696,7 @@ msys2_install_core_deps() {
     done
 
     # install
-    pacman --noconfirm --needed -S make tar patch diffutils ccache perl msys2-w32api-headers msys2-runtime-devel gcc gcc-libs mpfr windows-default-manifest python2 "$@"
+    pacman --noconfirm --needed -S make tar patch diffutils ccache perl msys2-w32api-headers msys2-runtime-devel gcc gcc-libs mpfr windows-default-manifest python python2 "$@"
 
     # make sure msys perl takes precedence over mingw perl if the latter is installed
     mkdir -p "$BUILD_ROOT/root/bin"
