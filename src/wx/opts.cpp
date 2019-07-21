@@ -160,6 +160,15 @@ wxJoyKeyBinding defkeys_joystick[NUM_KEYS] = {
     WJKB(0), WJKB(0), WJKB(0)
 };
 
+wxJoyKeyBinding extrakeys_joystick[NUM_KEYS] = {
+    WJKB(1, WXJB_AXIS_MINUS, 1), WJKB(1, WXJB_AXIS_PLUS, 1), WJKB(0, WXJB_AXIS_MINUS, 1), WJKB(0, WXJB_AXIS_PLUS, 1),
+    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0), WJKB(0)
+};
+
 wxAcceleratorEntry_v sys_accels;
 
 // Initializer for struct opt_desc
@@ -373,6 +382,8 @@ void set_default_keys()
             gopts.joykey_bindings[0][i].push_back(defkeys_keyboard[i]);
         if (defkeys_joystick[i].joy)
             gopts.joykey_bindings[0][i].push_back(defkeys_joystick[i]);
+        if (extrakeys_joystick[i].joy)
+            gopts.joykey_bindings[0][i].push_back(extrakeys_joystick[i]);
     }
 }
 
