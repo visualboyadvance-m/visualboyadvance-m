@@ -60,7 +60,7 @@ perl_dists="$perl_dists XML-NamespaceSupport XML-SAX-Base XML-SAX"
 perl_dists=$(list_remove_duplicates $perl_dists)
 
 host_dists="$host_dists autoconf autoconf-archive automake m4 gsed bison \
-                        flex-2.6.3 flex c2man docbook2x ccache"
+                        flex-2.6.3 flex c2man docbook2x ccache ninja"
 host_dists=$(list_remove_duplicates $host_dists)
 
 both_dists="$both_dists openssl zlib bzip2 libiconv"
@@ -200,7 +200,7 @@ for dist in $both_dists; do
     table_line_replace DIST_POST_BUILD $dist "eval \"\$(target_env)\"; $(table_line DIST_POST_BUILD $dist)"
 done
 
-remove_dists='graphviz python2 python3 swig libxml2-python doxygen bakefile setuptools pip meson XML-Parser intltool ninja libsecret shared-mime-info'
+remove_dists='graphviz python2 python3 meson swig libxml2-python doxygen bakefile setuptools pip XML-Parser intltool libsecret shared-mime-info'
 
 for dist in $remove_dists; do
     if ! list_contains $dist $do_not_remove_dists; then
@@ -340,8 +340,9 @@ table_line_append DIST_ARGS gettext "--enable-threads=windows"
 table_line_append DIST_ARGS glib "--with-threads=posix --disable-libelf"
 
 table_line_append  DIST_PATCHES glib "\
-    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-glib2/0001-Use-CreateFile-on-Win32-to-make-sure-g_unlink-always.patch \
+    https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-glib2/0001-Update-g_fopen-g_open-and-g_creat-to-open-with-FILE_.patch \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-glib2/0001-win32-Make-the-static-build-work-with-MinGW-when-pos.patch \
+    https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-glib2/0001-disable-some-tests-when-static.patch \
     https://gist.githubusercontent.com/rkitover/2edaf9583fb3068bb14016571e6f7d01/raw/ece80116d5618f372464f02392a9bcab670ce6c1/glib-mingw-no-strerror_s.patch \
 "
 
