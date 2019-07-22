@@ -718,8 +718,8 @@ static variable_desc gba_state[] = {
 
     // Emulator
     LOAD(int, soundEnableFlag),
-
-    SKIP(int[15], room_for_expansion),
+    LOAD(int, soundTicks),
+    SKIP(int[14], room_for_expansion),
 
     { NULL, 0 }
 };
@@ -806,10 +806,10 @@ void soundReadGame(gzFile in, int version)
     reset_apu();
     gb_apu->save_state(&state.apu);
 
-    if (version > SAVE_GAME_VERSION_9)
 #ifdef __LIBRETRO__
-        utilReadDataMem(in, gba_state);
+    utilReadDataMem(in, gba_state);
 #else
+    if (version > SAVE_GAME_VERSION_9)
         utilReadData(in, gba_state);
     else
         soundReadGameOld(in, version);
