@@ -1,8 +1,3 @@
-#ifndef NO_FFMPEG
-#define __STDC_LIMIT_MACROS // required for ffmpeg
-#define __STDC_CONSTANT_MACROS // required for ffmpeg
-#endif
-
 #include "wxvbam.h"
 #include <algorithm>
 #include <wx/aboutdlg.h>
@@ -15,16 +10,6 @@
 #include <wx/wfstream.h>
 #include <wx/msgdlg.h>
 
-#ifndef NO_FFMPEG
-extern "C" {
-#include <libavformat/avformat.h>
-}
-// For compatibility with 3.0+ ffmpeg
-#include <libavcodec/version.h>
-#if LIBAVCODEC_VERSION_MAJOR >= 56
-#define CODEC_ID_NONE AV_CODEC_ID_NONE
-#endif
-#endif
 #include "version.h"
 #include "../common/ConfigManager.h"
 #include "../gb/gbPrinter.h"
@@ -828,7 +813,7 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
     } break;
 
     default:
-	break;
+        break;
     }
 }
 
@@ -1179,23 +1164,20 @@ EVT_HANDLER_MASK(RecordSoundStartRecording, "Start sound recording...", CMDEN_NS
 
     if (!sound_exts.size()) {
         sound_extno = -1;
-        int extno;
-        AVOutputFormat* fmt;
+        int extno = 0;
 
-        for (fmt = NULL, extno = 0; (fmt = av_oformat_next(fmt));) {
-            if (!fmt->extensions)
-                continue;
+        std::vector<char *> fmts = recording::getSupAudNames();
+        std::vector<char *> exts = recording::getSupAudExts();
 
-            if (fmt->audio_codec == CODEC_ID_NONE)
-                continue;
-
-            sound_exts.append(wxString(fmt->long_name ? fmt->long_name : fmt->name, wxConvLibc));
+        for (size_t i = 0; i < fmts.size(); ++i)
+        {
+            sound_exts.append(wxString(fmts[i], wxConvLibc));
             sound_exts.append(_(" files ("));
-            wxString ext(fmt->extensions, wxConvLibc);
+            wxString ext(exts[i], wxConvLibc);
             ext.Replace(wxT(","), wxT(";*."));
             ext.insert(0, wxT("*."));
 
-            if (sound_extno < 0 && ext.find(wxT("*.wav")) != wxString::npos)
+            if (sound_extno < 0 && ext.find(wxT("*.mp3")) != wxString::npos)
                 sound_extno = extno;
 
             sound_exts.append(ext);
@@ -1252,19 +1234,16 @@ EVT_HANDLER_MASK(RecordAVIStartRecording, "Start video recording...", CMDEN_NVRE
 
     if (!vid_exts.size()) {
         vid_extno = -1;
-        int extno;
-        AVOutputFormat* fmt;
+        int extno = 0;
 
-        for (fmt = NULL, extno = 0; (fmt = av_oformat_next(fmt));) {
-            if (!fmt->extensions)
-                continue;
+        std::vector<char *> fmts = recording::getSupVidNames();
+        std::vector<char *> exts = recording::getSupVidExts();
 
-            if (fmt->video_codec == CODEC_ID_NONE)
-                continue;
-
-            vid_exts.append(wxString(fmt->long_name ? fmt->long_name : fmt->name, wxConvLibc));
+        for (size_t i = 0; i < fmts.size(); ++i)
+        {
+            vid_exts.append(wxString(fmts[i], wxConvLibc));
             vid_exts.append(_(" files ("));
-            wxString ext(fmt->extensions, wxConvLibc);
+            wxString ext(exts[i], wxConvLibc);
             ext.Replace(wxT(","), wxT(";*."));
             ext.insert(0, wxT("*."));
 

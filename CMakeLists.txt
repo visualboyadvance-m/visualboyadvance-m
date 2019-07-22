@@ -280,7 +280,7 @@ set(
 if(ENABLE_FFMPEG)
     find_package(PkgConfig REQUIRED)
 
-    pkg_check_modules(FFMPEG REQUIRED libavcodec libavformat libswscale libavutil)
+    pkg_check_modules(FFMPEG REQUIRED libavcodec libavformat libswscale libavutil libswresample)
 
     if(FFMPEG_STATIC)
         set(FFMPEG_LIBRARIES ${FFMPEG_STATIC_LIBRARIES})
@@ -625,7 +625,7 @@ set(
 )
 
 if(MSVC)
-	set(SRC_MAIN ${SRC_MAIN} "dependencies/msvc/getopt.c")
+        set(SRC_MAIN ${SRC_MAIN} "dependencies/msvc/getopt.c")
 endif()
 
 set(
@@ -643,7 +643,7 @@ set(
 )
 
 if(MSVC)
-	set(HDR_MAIN ${HDR_MAIN} "dependencies/msvc/getopt.h")
+        set(HDR_MAIN ${HDR_MAIN} "dependencies/msvc/getopt.h")
 endif()
 
 if(ENABLE_FFMPEG)

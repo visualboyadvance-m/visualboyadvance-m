@@ -1016,8 +1016,8 @@ void GameArea::OnIdle(wxIdleEvent& event)
         // the userdata is freed on disconnect/destruction
         this->Connect(wxEVT_SIZE,          wxSizeEventHandler(GameArea::OnSize),           NULL, this);
 
-	// we need to check if the buttons stayed pressed when focus the panel
-	w->Connect(wxEVT_KILL_FOCUS,       wxFocusEventHandler(GameArea::OnKillFocus),     NULL, this);
+        // we need to check if the buttons stayed pressed when focus the panel
+        w->Connect(wxEVT_KILL_FOCUS,       wxFocusEventHandler(GameArea::OnKillFocus),     NULL, this);
 
         w->SetBackgroundStyle(wxBG_STYLE_CUSTOM);
         w->SetSize(wxSize(basic_width, basic_height));
@@ -1143,7 +1143,7 @@ static void clear_input_press()
     int i;
     for (i = 0; i < 4; ++i)
     {
-	joypress[i] = 0;
+        joypress[i] = 0;
     }
     keys_pressed.clear();
 }
@@ -2179,15 +2179,15 @@ void GLDrawingPanel::DrawingPanelInit()
 #define tex_fmt out_16 ? GL_BGRA : GL_RGBA, \
                 out_16 ? GL_UNSIGNED_SHORT_1_5_5_5_REV : GL_UNSIGNED_BYTE
 #if 0
-	texsize = width > height ? width : height;
-	texsize = std::ceil(texsize * scale);
-	// texsize = 1 << ffs(texsize);
-	texsize = texsize | (texsize >> 1);
-	texsize = texsize | (texsize >> 2);
-	texsize = texsize | (texsize >> 4);
-	texsize = texsize | (texsize >> 8);
-	texsize = (texsize >> 1) + 1;
-	glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, texsize, texsize, 0, tex_fmt, NULL);
+        texsize = width > height ? width : height;
+        texsize = std::ceil(texsize * scale);
+        // texsize = 1 << ffs(texsize);
+        texsize = texsize | (texsize >> 1);
+        texsize = texsize | (texsize >> 2);
+        texsize = texsize | (texsize >> 4);
+        texsize = texsize | (texsize >> 8);
+        texsize = (texsize >> 1) + 1;
+        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, texsize, texsize, 0, tex_fmt, NULL);
 #else
     // but really, most cards support non-p2 and rect
     // if not, use cairo or wx renderer
@@ -2311,22 +2311,22 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 #endif
 
 #ifndef NO_FFMPEG
-static const wxString media_err(MediaRet ret)
+static const wxString media_err(recording::MediaRet ret)
 {
     switch (ret) {
-    case MRET_OK:
+    case recording::MRET_OK:
         return wxT("");
 
-    case MRET_ERR_NOMEM:
+    case recording::MRET_ERR_NOMEM:
         return _("memory allocation error");
 
-    case MRET_ERR_NOCODEC:
+    case recording::MRET_ERR_NOCODEC:
         return _("error initializing codec");
 
-    case MRET_ERR_FERR:
+    case recording::MRET_ERR_FERR:
         return _("error writing to output file");
 
-    case MRET_ERR_FMTGUESS:
+    case recording::MRET_ERR_FMTGUESS:
         return _("can't guess output format from file name");
 
     default:
@@ -2338,11 +2338,11 @@ static const wxString media_err(MediaRet ret)
 
 void GameArea::StartVidRecording(const wxString& fname)
 {
-    MediaRet ret;
+    recording::MediaRet ret;
 
     if ((ret = vid_rec.Record(fname.mb_str(), basic_width, basic_height,
              systemColorDepth))
-        != MRET_OK)
+        != recording::MRET_OK)
         wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
             media_err(ret));
     else {
@@ -2368,9 +2368,9 @@ void GameArea::StopVidRecording()
 
 void GameArea::StartSoundRecording(const wxString& fname)
 {
-    MediaRet ret;
+    recording::MediaRet ret;
 
-    if ((ret = snd_rec.Record(fname.mb_str())) != MRET_OK)
+    if ((ret = snd_rec.Record(fname.mb_str())) != recording::MRET_OK)
         wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
             media_err(ret));
     else {
@@ -2396,15 +2396,15 @@ void GameArea::StopSoundRecording()
 
 void GameArea::AddFrame(const uint16_t* data, int length)
 {
-    MediaRet ret;
+    recording::MediaRet ret;
 
-    if ((ret = vid_rec.AddFrame(data)) != MRET_OK) {
+    if ((ret = vid_rec.AddFrame(data, length)) != recording::MRET_OK) {
         wxLogError(_("Error in audio/video recording (%s); aborting"),
             media_err(ret));
         vid_rec.Stop();
     }
 
-    if ((ret = snd_rec.AddFrame(data)) != MRET_OK) {
+    if ((ret = snd_rec.AddFrame(data, length)) != recording::MRET_OK) {
         wxLogError(_("Error in audio recording (%s); aborting"), media_err(ret));
         snd_rec.Stop();
     }
@@ -2412,9 +2412,9 @@ void GameArea::AddFrame(const uint16_t* data, int length)
 
 void GameArea::AddFrame(const uint8_t* data)
 {
-    MediaRet ret;
+    recording::MediaRet ret;
 
-    if ((ret = vid_rec.AddFrame(data)) != MRET_OK) {
+    if ((ret = vid_rec.AddFrame(data)) != recording::MRET_OK) {
         wxLogError(_("Error in video recording (%s); aborting"), media_err(ret));
         vid_rec.Stop();
     }
