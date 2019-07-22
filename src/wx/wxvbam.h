@@ -114,7 +114,7 @@ public:
 
     wxAcceleratorEntry_v GetAccels()
     {
-	return accels;
+        return accels;
     }
 
     // the main configuration
@@ -632,7 +632,7 @@ protected:
     void OnKillFocus(wxFocusEvent& ev);
 
 #ifndef NO_FFMPEG
-    MediaRecorder snd_rec, vid_rec;
+    recording::MediaRecorder snd_rec, vid_rec;
 #endif
 
 public:

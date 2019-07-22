@@ -3,19 +3,36 @@
 
 // simplified interface for recording audio and/or video from emulator
 
-// unlike the rest of the wx code, this has no wx dependency at all, and
-// could be used by other front ends as well.
+// required for ffmpeg
+#define __STDC_LIMIT_MACROS
+#define __STDC_CONSTANT_MACROS
 
-// this only supports selecting output format via file name extensions;
-// maybe some future version will support specifying a format.  wx-2.9
-// has an extra widget for the file selector, but 2.8 doesn't.
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libavutil/avassert.h>
+#include <libavutil/channel_layout.h>
+#include <libavutil/opt.h>
+#include <libavutil/mathematics.h>
+#include <libavutil/timestamp.h>
+#include <libavutil/imgutils.h>
+#include <libswscale/swscale.h>
+#include <libswresample/swresample.h>
+}
 
-// the only missing piece that I couldn't figure out how to do generically
-// is the code to find the available formats & associated extensions for
-// the file dialog.
+#include <vector>
+#include <string>
+
+namespace recording {
+
+
+// get supported audio/video codecs
+std::vector<char *> getSupVidNames();
+std::vector<char *> getSupVidExts();
+std::vector<char *> getSupAudNames();
+std::vector<char *> getSupAudExts();
+
 
 // return codes
-// probably ought to put in own namespace, but this is good enough
 enum MediaRet {
         MRET_OK,            // no errors
         MRET_ERR_NOMEM,     // error allocating buffers or structures
@@ -40,41 +57,62 @@ class MediaRecorder
         void Stop();
         bool IsRecording()
         {
-                return oc != NULL;
+                return isRecording;
         }
         // add a frame of video; width+height+depth already given
         // assumes a 1-pixel border on top & right
         // always assumes being passed 1/60th of a second of video
         MediaRet AddFrame(const uint8_t *vid);
         // add a frame of audio; uses current sample rate to know length
-        // always assumes being passed 1/60th of a second of audio.
-        MediaRet AddFrame(const uint16_t *aud);
+        // always assumes being passed 1/60th of a second of audio;
+        // single sample, though (we need one for each channel).
+        MediaRet AddFrame(const uint16_t *aud, int length);
+        // set sampleRate; we need this to remove the GBA file header
+        // include.
+        void SetSampleRate(int newSampleRate)
+        {
+                sampleRate = newSampleRate;
+        }
 
         private:
-        static bool did_init;
+        bool isRecording;
+        int sampleRate;
+        AVFormatContext *oc;
+        AVOutputFormat *fmt;
+        // pic info
+        AVPixelFormat pixfmt;
+        int pixsize, linesize;
+        int tbord, rbord;
+        struct SwsContext *sws;
+        // stream info
+        AVStream *st;
+        AVCodec *vcodec;
+        AVCodecContext *enc;
+        int64_t npts; // for video frame pts
+        AVFrame *frameIn;
+        AVFrame *frameOut;
+        // audio
+        bool audioOnlyRecording;
+        struct SwrContext *swr;
+        AVCodec *acodec;
+        AVStream *ast;
+        AVCodecContext *aenc;
+        int samplesCount; // for audio frame pts generation
+        AVFrame *audioframe;
+        AVFrame *audioframeTmp;
+        // audio buffer
+        uint16_t *audioBuffer;
+        int posInAudioBuffer;
+        int samplesInAudioBuffer;
+        int audioBufferSize;
 
-// these are to avoid polluting things with avcodec includes
-#ifndef priv_AVFormatContext
-#define priv_AVFormatContext void
-#define priv_AVStream void
-#define priv_AVOutputFormat void
-#define priv_AVFrame void
-#define priv_SwsContext void
-#define priv_PixelFormat int
-#endif
-        priv_AVFormatContext *oc;
-        priv_AVStream *vid_st, *aud_st;
-        uint8_t *audio_buf, *video_buf;
-        uint16_t *audio_buf2;
-        int frame_len, sample_len, in_audio_buf2;
-        int linesize, pixsize;
-        priv_PixelFormat pixfmt;
-        priv_AVFrame *pic, *convpic;
-        priv_SwsContext *converter;
-
-        MediaRet setup_sound_stream(const char *fname, priv_AVOutputFormat *fmt);
-        MediaRet setup_video_stream(const char *fname, int w, int h, int d);
+        MediaRet setup_common(const char *fname);
+        MediaRet setup_video_stream_info(int width, int height, int depth);
+        MediaRet setup_video_stream(int width, int height);
+        MediaRet setup_audio_stream();
         MediaRet finish_setup(const char *fname);
 };
+
+}
 
 #endif /* WX_FFMPEG_H */
