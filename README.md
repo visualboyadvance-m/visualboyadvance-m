@@ -65,6 +65,17 @@ Solus and RHEL/CentOS) and Mac OS X (homebrew, macports or fink.)
 
 The Ninja cmake generator is also now supported, including on msys2 and Visual Studio.
 
+## Building a Libretro core
+
+```
+Clone this repo and then,
+$ cd src
+$ cd libretro
+$ make
+
+Copy vbam_libretro.so to your RetroArch cores directory.
+```
+
 ### Visual Studio Support
 
 For visual studio, dependency management is handled automatically with vcpkg,
