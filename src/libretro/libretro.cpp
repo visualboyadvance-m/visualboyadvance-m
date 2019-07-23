@@ -90,6 +90,8 @@ bool EmuReseted;
 int winGbPrinterEnabled;
 bool gba_joybus_active = false;
 
+#define UPDATE_REG(address, value) WRITE16LE(((uint16_t*)&ioMem[address]), value)
+
 LinkMode GetLinkMode()
 {
     return LINK_DISCONNECTED;
@@ -97,7 +99,10 @@ LinkMode GetLinkMode()
 
 void StartGPLink(uint16_t value)
 {
-    WRITE16LE(((uint16_t*)&ioMem[COMM_RCNT]), value);
+    if (!ioMem)
+        return;
+
+    UPDATE_REG(COMM_RCNT, value);
 }
 
 void LinkUpdate(int ticks)
@@ -106,6 +111,23 @@ void LinkUpdate(int ticks)
 
 void StartLink(uint16_t siocnt)
 {
+/*    log("'s' siocnt = %04x\n", siocnt); */
+
+    if (!ioMem)
+        return;
+
+    if(siocnt & 0x80)
+    {
+        siocnt &= 0xff7f;
+        if(siocnt & 1 && (siocnt & 0x4000))
+        {
+            UPDATE_REG(COMM_SIOCNT, 0xFF);
+            IF |= 0x80;
+            UPDATE_REG(0x202, IF);
+            siocnt &= 0x7f7f;
+        }
+    }
+    UPDATE_REG(COMM_SIOCNT, siocnt);
 }
 
 void CheckLinkConnection()
