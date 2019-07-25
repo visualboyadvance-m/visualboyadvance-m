@@ -24,25 +24,20 @@ static bool declicking = false;
 int const chan_count = 4;
 int const ticks_to_time = 2 * GB_APU_OVERCLOCK;
 
-static inline blip_time_t blip_time()
-{
-    return (SOUND_CLOCK_TICKS - soundTicks) * ticks_to_time;
-}
-
-uint8_t gbSoundRead(uint16_t address)
+uint8_t gbSoundRead(int st, uint16_t address)
 {
     if (gb_apu && address >= NR10 && address <= 0xFF3F)
-        return gb_apu->read_register(blip_time(), address);
+        return gb_apu->read_register((blip_time_t)(st * ticks_to_time), address);
 
     return gbMemory[address];
 }
 
-void gbSoundEvent(uint16_t address, int data)
+void gbSoundEvent(int st, uint16_t address, int data)
 {
     gbMemory[address] = data;
 
     if (gb_apu && address >= NR10 && address <= 0xFF3F)
-        gb_apu->write_register(blip_time(), address, data);
+        gb_apu->write_register((blip_time_t)(st * ticks_to_time), address, data);
 }
 
 static void end_frame(blip_time_t time)
@@ -83,11 +78,11 @@ static void apply_volume()
         gb_apu->volume(soundVolume_);
 }
 
-void gbSoundTick()
+void gbSoundTick(int st)
 {
     if (gb_apu && stereo_buffer) {
         // Run sound hardware to present
-        end_frame(SOUND_CLOCK_TICKS * ticks_to_time);
+        end_frame((blip_time_t)(st * ticks_to_time));
 
         flush_samples(stereo_buffer);
 
@@ -100,6 +95,8 @@ void gbSoundTick()
         if (soundVolume_ != soundGetVolume())
             apply_volume();
     }
+
+    soundTicks = 0;
 }
 
 static void reset_apu()
@@ -115,7 +112,7 @@ static void reset_apu()
     if (stereo_buffer)
         stereo_buffer->clear();
 
-    soundTicks = SOUND_CLOCK_TICKS;
+    soundTicks = 0;
 }
 
 static void remake_stereo_buffer()
@@ -171,42 +168,42 @@ bool gbSoundGetDeclicking()
 
 void gbSoundReset()
 {
-    SOUND_CLOCK_TICKS = 20000; // 1/100 second
+    SOUND_CLOCK_TICKS = 35112;
 
     remake_stereo_buffer();
     reset_apu();
 
     soundPaused = 1;
 
-    gbSoundEvent(0xff10, 0x80);
-    gbSoundEvent(0xff11, 0xbf);
-    gbSoundEvent(0xff12, 0xf3);
-    gbSoundEvent(0xff14, 0xbf);
-    gbSoundEvent(0xff16, 0x3f);
-    gbSoundEvent(0xff17, 0x00);
-    gbSoundEvent(0xff19, 0xbf);
+    gbSoundEvent(0, 0xff10, 0x80);
+    gbSoundEvent(0, 0xff11, 0xbf);
+    gbSoundEvent(0, 0xff12, 0xf3);
+    gbSoundEvent(0, 0xff14, 0xbf);
+    gbSoundEvent(0, 0xff16, 0x3f);
+    gbSoundEvent(0, 0xff17, 0x00);
+    gbSoundEvent(0, 0xff19, 0xbf);
 
-    gbSoundEvent(0xff1a, 0x7f);
-    gbSoundEvent(0xff1b, 0xff);
-    gbSoundEvent(0xff1c, 0xbf);
-    gbSoundEvent(0xff1e, 0xbf);
+    gbSoundEvent(0, 0xff1a, 0x7f);
+    gbSoundEvent(0, 0xff1b, 0xff);
+    gbSoundEvent(0, 0xff1c, 0xbf);
+    gbSoundEvent(0, 0xff1e, 0xbf);
 
-    gbSoundEvent(0xff20, 0xff);
-    gbSoundEvent(0xff21, 0x00);
-    gbSoundEvent(0xff22, 0x00);
-    gbSoundEvent(0xff23, 0xbf);
-    gbSoundEvent(0xff24, 0x77);
-    gbSoundEvent(0xff25, 0xf3);
+    gbSoundEvent(0, 0xff20, 0xff);
+    gbSoundEvent(0, 0xff21, 0x00);
+    gbSoundEvent(0, 0xff22, 0x00);
+    gbSoundEvent(0, 0xff23, 0xbf);
+    gbSoundEvent(0, 0xff24, 0x77);
+    gbSoundEvent(0, 0xff25, 0xf3);
 
     if (gbHardware & 0x4)
-        gbSoundEvent(0xff26, 0xf0);
+        gbSoundEvent(0, 0xff26, 0xf0);
     else
-        gbSoundEvent(0xff26, 0xf1);
+        gbSoundEvent(0, 0xff26, 0xf1);
 
     /* workaround for game Beetlejuice */
     if (gbHardware & 0x1) {
-        gbSoundEvent(0xff24, 0x77);
-        gbSoundEvent(0xff25, 0xf3);
+        gbSoundEvent(0, 0xff24, 0x77);
+        gbSoundEvent(0, 0xff25, 0xf3);
     }
 
     int addr = 0xff30;
@@ -399,7 +396,6 @@ static void gbSoundReadGameOld(int version, gzFile gzFile)
 #endif
 
 // New state format
-
 static variable_desc gb_state[] = {
     LOAD(int, state.version), // room_for_expansion will be used by later versions
 
@@ -427,7 +423,8 @@ static variable_desc gb_state[] = {
     SKIP(int[13], room_for_expansion),
 
     // Emulator
-    SKIP(int[16], room_for_expansion),
+    LOAD(int, soundTicks),
+    SKIP(int[15], room_for_expansion),
 
     { NULL, 0 }
 };
@@ -445,7 +442,7 @@ void gbSoundSaveGame(gzFile out)
 
     state.version = 1;
 #ifdef __LIBRETRO__
-	utilWriteDataMem(out, gb_state);
+    utilWriteDataMem(out, gb_state);
 #else
     utilWriteData(out, gb_state);
 #endif
@@ -461,10 +458,10 @@ void gbSoundReadGame(int version, gzFile in)
     reset_apu();
     gb_apu->save_state(&state.apu);
 
-    if (version > 11)
 #ifdef __LIBRETRO__
-		utilReadDataMem(in, gb_state);
+    utilReadDataMem(in, gb_state);
 #else
+    if (version > 11)
         utilReadData(in, gb_state);
     else
         gbSoundReadGameOld(version, in);

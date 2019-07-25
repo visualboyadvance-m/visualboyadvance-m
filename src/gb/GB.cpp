@@ -1232,7 +1232,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
     case 0x3e:
     case 0x3f:
         // Sound registers handled by blargg
-        gbSoundEvent(address, value);
+        gbSoundEvent(soundTicks, address, value);
         //gbMemory[address] = value;
         return;
 
@@ -1967,7 +1967,7 @@ uint8_t gbReadMemory(uint16_t address)
         case 0x3e:
         case 0x3f:
             // Sound registers read
-            return gbSoundRead(address);
+            return gbSoundRead(soundTicks, address);
         case 0x40:
             return register_LCDC;
         case 0x41:
@@ -4535,11 +4535,36 @@ void gbDrawLine()
     }
 }
 
+static void gbUpdateJoypads(bool readSensors)
+{
+    if (systemReadJoypads()) {
+        // read joystick
+        if (gbSgbMode && gbSgbMultiplayer) {
+            if (gbSgbFourPlayers) {
+                gbJoymask[0] = systemReadJoypad(0);
+                gbJoymask[1] = systemReadJoypad(1);
+                gbJoymask[2] = systemReadJoypad(2);
+                gbJoymask[3] = systemReadJoypad(3);
+            } else {
+                gbJoymask[0] = systemReadJoypad(0);
+                gbJoymask[1] = systemReadJoypad(1);
+            }
+        } else {
+            gbJoymask[0] = systemReadJoypad(-1);
+        }
+    }
+
+    if (readSensors && gbRomType == 0x22) {
+        systemUpdateMotionSensor();
+    }
+}
+
 void gbEmulate(int ticksToStop)
 {
     gbRegister tempRegister;
     uint8_t tempValue;
     int8_t offset;
+
 
     clockTicks = 0;
     gbDmaTicks = 0;
@@ -4549,6 +4574,9 @@ void gbEmulate(int ticksToStop)
     int opcode1 = 0;
     int opcode2 = 0;
     bool execute = false;
+    bool frameDone = false;
+
+    gbUpdateJoypads(true);
 
     while (1) {
         uint16_t oldPCW = PC.W;
@@ -4661,6 +4689,8 @@ void gbEmulate(int ticksToStop)
         }
 
         ticksToStop -= clockTicks;
+        soundTicks += clockTicks;
+         if (!gbSpeed) soundTicks += clockTicks;
 
         // DIV register emulation
         gbDivTicks -= clockTicks;
@@ -4930,6 +4960,7 @@ void gbEmulate(int ticksToStop)
 
                             gbFrameCount++;
                             systemFrame();
+                            gbSoundTick(soundTicks);
 
                             if ((gbFrameCount % 10) == 0)
                                 system10Frames(60);
@@ -4944,27 +4975,7 @@ void gbEmulate(int ticksToStop)
                                 gbFrameCount = 0;
                             }
 
-                            if (systemReadJoypads()) {
-                                // read joystick
-                                if (gbSgbMode && gbSgbMultiplayer) {
-                                    if (gbSgbFourPlayers) {
-                                        gbJoymask[0] = systemReadJoypad(0);
-                                        gbJoymask[1] = systemReadJoypad(1);
-                                        gbJoymask[2] = systemReadJoypad(2);
-                                        gbJoymask[3] = systemReadJoypad(3);
-                                    } else {
-                                        gbJoymask[0] = systemReadJoypad(0);
-                                        gbJoymask[1] = systemReadJoypad(1);
-                                    }
-                                } else {
-                                    gbJoymask[0] = systemReadJoypad(-1);
-                                }
-                            }
                             int newmask = gbJoymask[0] & 255;
-
-                            if (gbRomType == 0x22) {
-                                systemUpdateMotionSensor();
-                            }
 
                             if (newmask) {
                                 gbMemory[0xff0f] = register_IF |= 16;
@@ -5002,6 +5013,8 @@ void gbEmulate(int ticksToStop)
                                 gbFrameSkipCount = 0;
                             } else
                                 gbFrameSkipCount++;
+
+                            frameDone = true;
 
                         } else {
                             // go the the OAM being accessed mode
@@ -5151,25 +5164,11 @@ void gbEmulate(int ticksToStop)
                                     ticksToStop = 0;
                             }
                         }
-                        if (systemReadJoypads()) {
-                            // read joystick
-                            if (gbSgbMode && gbSgbMultiplayer) {
-                                if (gbSgbFourPlayers) {
-                                    gbJoymask[0] = systemReadJoypad(0);
-                                    gbJoymask[1] = systemReadJoypad(1);
-                                    gbJoymask[2] = systemReadJoypad(2);
-                                    gbJoymask[3] = systemReadJoypad(3);
-                                } else {
-                                    gbJoymask[0] = systemReadJoypad(0);
-                                    gbJoymask[1] = systemReadJoypad(1);
-                                }
-                            } else {
-                                gbJoymask[0] = systemReadJoypad(-1);
-                            }
-                        }
+
                         gbFrameCount++;
 
                         systemFrame();
+                        gbSoundTick(soundTicks);
 
                         if ((gbFrameCount % 10) == 0)
                             system10Frames(60);
@@ -5183,6 +5182,7 @@ void gbEmulate(int ticksToStop)
                             gbLastTime = currentTime;
                             gbFrameCount = 0;
                         }
+                        frameDone = true;
                     }
                 }
             }
@@ -5279,15 +5279,14 @@ void gbEmulate(int ticksToStop)
 #endif
             }
 #endif
-
-        soundTicks -= clockTicks;
-        if (!gbSpeed)
-            soundTicks -= clockTicks;
-
-        while (soundTicks < 0) {
-            soundTicks += SOUND_CLOCK_TICKS;
-
-            gbSoundTick();
+        // TODO: evaluate and fix this
+        // On VBA-M (gb core running twice as fast?), each vblank is uses 35112 cycles.
+        // on some cases no vblank is generated causing sound ticks to keep accumulating causing core to crash.
+        // This forces core to flush sound buffers when expected sound ticks has passed and no frame is done yet.which then ends cpuloop
+        if ((soundTicks > SOUND_CLOCK_TICKS) && !frameDone) {
+            int last_st = soundTicks;
+            gbSoundTick(soundTicks);
+            soundTicks = (last_st - SOUND_CLOCK_TICKS);
         }
 
         // timer emulation
@@ -5413,25 +5412,7 @@ void gbEmulate(int ticksToStop)
 
         gbBlackScreen = false;
 
-        if ((ticksToStop <= 0)) {
-            if (!(register_LCDC & 0x80)) {
-                if (systemReadJoypads()) {
-                    // read joystick
-                    if (gbSgbMode && gbSgbMultiplayer) {
-                        if (gbSgbFourPlayers) {
-                            gbJoymask[0] = systemReadJoypad(0);
-                            gbJoymask[1] = systemReadJoypad(1);
-                            gbJoymask[2] = systemReadJoypad(2);
-                            gbJoymask[3] = systemReadJoypad(3);
-                        } else {
-                            gbJoymask[0] = systemReadJoypad(0);
-                            gbJoymask[1] = systemReadJoypad(1);
-                        }
-                    } else {
-                        gbJoymask[0] = systemReadJoypad(-1);
-                    }
-                }
-            }
+        if (ticksToStop <= 0 || frameDone) { // Stop loop
             return;
         }
     }
@@ -5821,7 +5802,7 @@ struct EmulatedSystem GBSystem = {
     false,
     // emuCount
 #ifdef FINAL_VERSION
-    70000 / 4,
+    72000,
 #else
     1000,
 #endif
