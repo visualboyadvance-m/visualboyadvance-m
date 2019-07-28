@@ -22,7 +22,7 @@
           <object class="sizeritem">
             <object class="wxBoxSizer">
               <object class="sizeritem">
-                <object class="wxStaticText">
+                <object class="wxStaticText" name="OnlineUpdates">
                   <label>Check for updates:</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>

@@ -42,7 +42,9 @@ extern struct opts_t {
     /// General
     bool autoload_state, autoload_cheats;
     wxString battery_dir;
+#ifndef NO_ONLINEUPDATES
     int onlineupdates;
+#endif // NO_ONLINEUPDATES
     long last_update;
     wxString last_updated_filename;
     bool recent_freeze;
@@ -115,6 +117,8 @@ extern const int num_opts;
 extern const wxAcceleratorEntry default_accels[];
 extern const int num_def_accels;
 
+// call to setup default keys.
+void set_default_keys();
 // call to load config (once)
 // will write defaults for options not present and delete bad opts
 // will also initialize opts[] array translations

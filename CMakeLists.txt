@@ -110,6 +110,8 @@ endif()
 
 option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
 
+option(ENABLE_ONLINEUPDATES "Enable online update checks" ON)
+
 set(LTO_DEFAULT ON)
 
 # lto produces buggy binaries for 64 bit win32
@@ -293,6 +295,10 @@ if(ENABLE_FFMPEG)
     endif()
 endif()
 
+if(NOT ENABLE_ONLINEUPDATES)
+  add_definitions(-DNO_ONLINEUPDATES)
+endif()
+
 if(NOT ENABLE_FFMPEG)
   add_definitions(-DNO_FFMPEG)
 endif()
@@ -444,7 +450,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     if(X86_32 OR AMD64)
         set(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -mtune=generic)
     endif()
- 
+
     # common debug flags
     if(CMAKE_COMPILER_IS_GNUCXX)
         set(MY_C_DBG_FLAGS -ggdb3 -Og -fno-omit-frame-pointer)

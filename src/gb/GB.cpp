@@ -4830,16 +4830,16 @@ void gbEmulate(int ticksToStop)
                             //(fixes a part of Carmaggedon problem)
                             if ((register_LCDC & 0x01 || gbCgbMode) && (register_LCDC & 0x20) && (gbWindowLine != -2)) {
 
-                                int inUseRegister_WY = 0;
+                                int tempinUseRegister_WY = inUseRegister_WY;
                                 int tempgbWindowLine = gbWindowLine;
 
                                 if ((tempgbWindowLine == -1) || (tempgbWindowLine > 144)) {
-                                    inUseRegister_WY = oldRegister_WY;
+                                    tempinUseRegister_WY = oldRegister_WY;
                                     if (register_LY > oldRegister_WY)
                                         tempgbWindowLine = 146;
                                 }
 
-                                if (register_LY >= inUseRegister_WY) {
+                                if (register_LY >= tempinUseRegister_WY) {
 
                                     if (tempgbWindowLine == -1)
                                         tempgbWindowLine = 0;

@@ -923,7 +923,7 @@ void GameArea::Pause()
 
     // when the game is paused like this, we should not allow any
     // input to remain pressed, because they could be released
-    // outside of the game zone and we would not know about it. 
+    // outside of the game zone and we would not know about it.
     clear_input_press();
 
     if (loaded != IMAGE_UNKNOWN)
@@ -2296,12 +2296,10 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanel(parent, _width, _height)
 {
     // FIXME: implement
-
 }
 
 void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 {
-	
     // FIXME: implement
     if (!did_init) {
       DrawingPanelInit();

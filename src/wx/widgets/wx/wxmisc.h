@@ -114,22 +114,26 @@ protected:
     bool* vptr;
 };
 
+#include <wx/stattext.h>
+
 // wxFilePickerCtrl/wxDirPickerCtrl copy-only vvalidator
 class wxFileDirPickerValidator : public wxValidator {
 public:
-    wxFileDirPickerValidator(wxString* _vptr)
+    wxFileDirPickerValidator(wxString* _vptr, wxStaticText* _label = NULL)
         : wxValidator()
         , vptr(_vptr)
+        , vlabel(_label)
     {
     }
     wxFileDirPickerValidator(const wxFileDirPickerValidator& v)
         : wxValidator()
         , vptr(v.vptr)
+        , vlabel(v.vlabel)
     {
     }
     wxObject* Clone() const
     {
-        return new wxFileDirPickerValidator(vptr);
+        return new wxFileDirPickerValidator(vptr, vlabel);
     }
     bool TransferToWindow();
     bool TransferFromWindow();
@@ -141,6 +145,7 @@ public:
 
 protected:
     wxString* vptr;
+    wxStaticText* vlabel;
 };
 
 // color copy-only validator that supports either 32-bit or 16-bit color

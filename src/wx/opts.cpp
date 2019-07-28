@@ -143,18 +143,27 @@ const wxString joynames[NUM_KEYS] = {
 };
 
 wxJoyKeyBinding defkeys_keyboard[NUM_KEYS] = {
-    WJKB(WXK_UP), WJKB(WXK_DOWN), WJKB(WXK_LEFT), WJKB(WXK_RIGHT),
-    WJKB(wxT('Z')), WJKB(wxT('X')), WJKB(wxT('A')), WJKB(wxT('S')),
-    WJKB(wxT('C')), WJKB(wxT('V')),
+    WJKB(wxT('W')), WJKB(wxT('S')), WJKB(wxT('A')), WJKB(wxT('D')),
+    WJKB(wxT('L')), WJKB(wxT('K')), WJKB(wxT('I')), WJKB(wxT('O')),
+    WJKB(WXK_BACK), WJKB(WXK_RETURN),
     WJKB(0), WJKB(0), WJKB(0), WJKB(0),
     WJKB(0), WJKB(0), WJKB(0), WJKB(0),
     WJKB(WXK_SPACE), WJKB(0), WJKB(0)
 };
 
 wxJoyKeyBinding defkeys_joystick[NUM_KEYS] = {
+    WJKB(0, WXJB_HAT_N, 1), WJKB(0, WXJB_HAT_S, 1), WJKB(0, WXJB_HAT_W, 1), WJKB(0, WXJB_HAT_E, 1),
+    WJKB(0, WXJB_BUTTON, 1), WJKB(1, WXJB_BUTTON, 1), WJKB(4, WXJB_BUTTON, 1), WJKB(5, WXJB_BUTTON, 1),
+    WJKB(6, WXJB_BUTTON, 1), WJKB(7, WXJB_BUTTON, 1),
+    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0), WJKB(0)
+};
+
+wxJoyKeyBinding extrakeys_joystick[NUM_KEYS] = {
     WJKB(1, WXJB_AXIS_MINUS, 1), WJKB(1, WXJB_AXIS_PLUS, 1), WJKB(0, WXJB_AXIS_MINUS, 1), WJKB(0, WXJB_AXIS_PLUS, 1),
-    WJKB(0, WXJB_BUTTON, 1), WJKB(1, WXJB_BUTTON, 1), WJKB(2, WXJB_BUTTON, 1), WJKB(3, WXJB_BUTTON, 1),
-    WJKB(4, WXJB_BUTTON, 1), WJKB(5, WXJB_BUTTON, 1),
+    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
+    WJKB(0), WJKB(0),
     WJKB(0), WJKB(0), WJKB(0), WJKB(0),
     WJKB(0), WJKB(0), WJKB(0), WJKB(0),
     WJKB(0), WJKB(0), WJKB(0)
@@ -225,7 +234,9 @@ opt_desc opts[] = {
     BOOLOPT("General/AutoLoadLastState", "", wxTRANSLATE("Automatically load last saved state"), gopts.autoload_state),
     STROPT("General/BatteryDir", "", wxTRANSLATE("Directory to store game save files (relative paths are relative to ROM; blank is config dir)"), gopts.battery_dir),
     BOOLOPT("General/FreezeRecent", "", wxTRANSLATE("Freeze recent load list"), gopts.recent_freeze),
+#ifndef NO_ONLINEUPDATES
     ENUMOPT("General/OnlineUpdates", "", wxTRANSLATE("Automatically check for online updates"), gopts.onlineupdates, wxTRANSLATE("never|daily|weekly")),
+#endif // NO_ONLINEUPDATES
     STROPT("General/RecordingDir", "", wxTRANSLATE("Directory to store A/V and game recordings (relative paths are relative to ROM)"), gopts.recording_dir),
     INTOPT("General/RewindInterval", "", wxTRANSLATE("Number of seconds between rewind snapshots (0 to disable)"), gopts.rewind_interval, 0, 600),
     STROPT("General/ScreenshotDir", "", wxTRANSLATE("Directory to store screenshots (relative paths are relative to ROM)"), gopts.scrshot_dir),
@@ -346,18 +357,13 @@ opts_t::opts_t()
     bilinear = true;
     default_stick = 1;
 
-    for (int i = 0; i < NUM_KEYS; i++) {
-        if (defkeys_keyboard[i].key)
-            joykey_bindings[0][i].push_back(defkeys_keyboard[i]);
-        if (defkeys_joystick[i].key)
-            joykey_bindings[0][i].push_back(defkeys_joystick[i]);
-    }
-
     recent = new wxFileHistory(10);
     autofire_rate = 1;
     print_auto_page = true;
     autoPatch = true;
+#ifndef NO_ONLINEUPDATES
     onlineupdates = 1;
+#endif // NO_ONLINEUPDATES
     // quick fix for issues #48 and #445
     link_host = "127.0.0.1";
 }
@@ -366,6 +372,19 @@ opts_t::opts_t()
 bool opt_lt(const opt_desc& opt1, const opt_desc& opt2)
 {
     return wxStrcmp(opt1.opt, opt2.opt) < 0;
+}
+
+// set default input keys
+void set_default_keys()
+{
+    for (int i = 0; i < NUM_KEYS; i++) {
+        if (defkeys_keyboard[i].key)
+            gopts.joykey_bindings[0][i].push_back(defkeys_keyboard[i]);
+        if (defkeys_joystick[i].joy)
+            gopts.joykey_bindings[0][i].push_back(defkeys_joystick[i]);
+        if (extrakeys_joystick[i].joy)
+            gopts.joykey_bindings[0][i].push_back(extrakeys_joystick[i]);
+    }
 }
 
 // FIXME: simulate MakeInstanceFilename(vbam.ini) using subkeys (Slave%d/*)

@@ -89,6 +89,24 @@ void MainFrame::SetMenuOption(const char* menuName, int value)
     }
 }
 
+static void toggleBooleanVar(bool *menuValue, bool *globalVar)
+{
+    if (*menuValue == *globalVar) // used accelerator
+        *globalVar = !(*globalVar);
+    else // used menu item
+        *globalVar = *menuValue;
+}
+
+static void toggleBitVar(bool *menuValue, int *globalVar, int mask)
+{
+    bool isEnabled = ((*globalVar) & (mask)) != (mask);
+    if (*menuValue == isEnabled)
+        *globalVar = ((*globalVar) & ~(mask)) | (!isEnabled ? (mask) : 0);
+    else
+        *globalVar = ((*globalVar) & ~(mask)) | (*menuValue ? (mask) : 0);
+    *menuValue = ((*globalVar) & (mask)) != (mask);
+}
+
 //// File menu
 
 static int open_ft = 0;
@@ -188,7 +206,10 @@ EVT_HANDLER(RecentReset, "Reset recent ROM list")
 
 EVT_HANDLER(RecentFreeze, "Freeze recent ROM list (toggle)")
 {
-    GetMenuOptionBool("RecentFreeze", gopts.recent_freeze);
+    bool menuPress;
+    GetMenuOptionBool("RecentFreeze", menuPress);
+    toggleBooleanVar(&menuPress, &gopts.recent_freeze);
+    SetMenuOption("RecentFreeze", gopts.recent_freeze ? 1 : 0);
     update_opts();
 }
 
@@ -1355,18 +1376,8 @@ EVT_HANDLER(Pause, "Pause (toggle)")
 {
     bool menuPress;
     GetMenuOptionBool("Pause", menuPress);
-
-    if (paused == menuPress)
-    {
-	// used accelerator
-	paused = !paused;
-	SetMenuOption("Pause", paused ? 1 : 0);
-    }
-    else
-    {
-	// used menu item
-	paused = menuPress;
-    }
+    toggleBooleanVar(&menuPress, &paused);
+    SetMenuOption("Pause", paused ? 1 : 0);
 
     if (paused)
         panel->Pause();
@@ -1383,7 +1394,10 @@ EVT_HANDLER(Pause, "Pause (toggle)")
 // new
 EVT_HANDLER_MASK(EmulatorSpeedupToggle, "Turbo mode (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    GetMenuOptionBool("EmulatorSpeedupToggle", turbo);
+    bool menuPress;
+    GetMenuOptionBool("EmulatorSpeedupToggle", menuPress);
+    toggleBooleanVar(&menuPress, &turbo);
+    SetMenuOption("EmulatorSpeedupToggle", turbo ? 1 : 0);
 }
 
 EVT_HANDLER_MASK(Reset, "Reset", CMDEN_GB | CMDEN_GBA)
@@ -1399,21 +1413,37 @@ EVT_HANDLER(ToggleFullscreen, "Full screen (toggle)")
 
 EVT_HANDLER(JoypadAutofireA, "Autofire A (toggle)")
 {
+    bool menuPress;
+    GetMenuOptionBool("JoypadAutofireA", menuPress);
+    toggleBitVar(&menuPress, &autofire, KEYM_A);
+    SetMenuOption("JoypadAutofireA", menuPress ? 1 : 0);
     GetMenuOptionInt("JoypadAutofireA", autofire, KEYM_A);
 }
 
 EVT_HANDLER(JoypadAutofireB, "Autofire B (toggle)")
 {
+    bool menuPress;
+    GetMenuOptionBool("JoypadAutofireB", menuPress);
+    toggleBitVar(&menuPress, &autofire, KEYM_B);
+    SetMenuOption("JoypadAutofireB", menuPress ? 1 : 0);
     GetMenuOptionInt("JoypadAutofireB", autofire, KEYM_B);
 }
 
 EVT_HANDLER(JoypadAutofireL, "Autofire L (toggle)")
 {
+    bool menuPress;
+    GetMenuOptionBool("JoypadAutofireL", menuPress);
+    toggleBitVar(&menuPress, &autofire, KEYM_LEFT);
+    SetMenuOption("JoypadAutofireL", menuPress ? 1 : 0);
     GetMenuOptionInt("JoypadAutofireL", autofire, KEYM_LEFT);
 }
 
 EVT_HANDLER(JoypadAutofireR, "Autofire R (toggle)")
 {
+    bool menuPress;
+    GetMenuOptionBool("JoypadAutofireR", menuPress);
+    toggleBitVar(&menuPress, &autofire, KEYM_RIGHT);
+    SetMenuOption("JoypadAutofireR", menuPress ? 1 : 0);
     GetMenuOptionInt("JoypadAutofireR", autofire, KEYM_RIGHT);
 }
 
@@ -1424,7 +1454,10 @@ EVT_HANDLER_MASK(LoadGameRecent, "Load most recent save", CMDEN_SAVST)
 
 EVT_HANDLER(LoadGameAutoLoad, "Auto load most recent save (toggle)")
 {
-    GetMenuOptionBool("LoadGameAutoLoad", gopts.autoload_state);
+    bool menuPress;
+    GetMenuOptionBool("LoadGameAutoLoad", menuPress);
+    toggleBooleanVar(&menuPress, &gopts.autoload_state);
+    SetMenuOption("LoadGameAutoLoad", gopts.autoload_state ? 1 : 0);
     update_opts();
 }
 
@@ -1499,6 +1532,10 @@ EVT_HANDLER_MASK(Load, "Load state...", CMDEN_GB | CMDEN_GBA)
 // new
 EVT_HANDLER(KeepSaves, "Do not load battery saves (toggle)")
 {
+    bool menuPress;
+    GetMenuOptionBool("KeepSaves", menuPress);
+    toggleBitVar(&menuPress, &skipSaveGameBattery, 1);
+    SetMenuOption("KeepSaves", menuPress ? 1 : 0);
     GetMenuOptionInt("KeepSaves", skipSaveGameBattery, 1);
     update_opts();
 }
@@ -1506,6 +1543,10 @@ EVT_HANDLER(KeepSaves, "Do not load battery saves (toggle)")
 // new
 EVT_HANDLER(KeepCheats, "Do not change cheat list (toggle)")
 {
+    bool menuPress;
+    GetMenuOptionBool("KeepCheats", menuPress);
+    toggleBitVar(&menuPress, &skipSaveGameCheats, 1);
+    SetMenuOption("KeepCheats", menuPress ? 1 : 0);
     GetMenuOptionInt("KeepCheats", skipSaveGameCheats, 1);
     update_opts();
 }
@@ -1655,7 +1696,10 @@ EVT_HANDLER_MASK(CheatsSearch, "Create cheat...", CMDEN_GB | CMDEN_GBA)
 // new
 EVT_HANDLER(CheatsAutoSaveLoad, "Auto save/load cheats (toggle)")
 {
-    GetMenuOptionBool("CheatsAutoSaveLoad", gopts.autoload_cheats);
+    bool menuPress;
+    GetMenuOptionBool("CheatsAutoSaveLoad", menuPress);
+    toggleBooleanVar(&menuPress, &gopts.autoload_cheats);
+    SetMenuOption("CheatsAutoSaveLoad", gopts.autoload_cheats ? 1 : 0);
     update_opts();
 }
 
@@ -1663,6 +1707,10 @@ EVT_HANDLER(CheatsAutoSaveLoad, "Auto save/load cheats (toggle)")
 // changed for convenience to match internal variable functionality
 EVT_HANDLER(CheatsEnable, "Enable cheats (toggle)")
 {
+    bool menuPress;
+    GetMenuOptionBool("CheatsEnable", menuPress);
+    toggleBitVar(&menuPress, &cheatsEnabled, 1);
+    SetMenuOption("CheatsEnable", menuPress ? 1 : 0);
     GetMenuOptionInt("CheatsEnable", cheatsEnabled, 1);
     update_opts();
 }

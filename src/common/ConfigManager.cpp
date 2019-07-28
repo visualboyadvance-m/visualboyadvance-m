@@ -38,7 +38,6 @@ extern "C" {
 #else // _WIN32
 #include <direct.h>
 #define GETCWD _getcwd
-#define snprintf sprintf
 #define stat _stat
 #define mkdir(X,Y) (_mkdir(X))
 // from: https://www.linuxquestions.org/questions/programming-9/porting-to-win32-429334/

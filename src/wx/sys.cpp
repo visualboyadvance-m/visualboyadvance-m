@@ -1294,8 +1294,10 @@ bool debugWaitSocket()
 void log(const char* defaultMsg, ...)
 {
     va_list valist;
+    char buf[2048];
     va_start(valist, defaultMsg);
-    wxString msg = wxString::Format(defaultMsg, valist);
+    vsnprintf(buf, 2048, defaultMsg, valist);
+    wxString msg = wxString(buf, wxConvLibc);
     va_end(valist);
     wxGetApp().log.append(msg);
 
