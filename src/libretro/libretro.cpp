@@ -197,9 +197,7 @@ static struct palettes_t defaultGBPalettes[] = {
     {
         "Real GB on GBASP Colors",
         { 0x7BDE, 0x5778, 0x5640, 0x0000, 0x7BDE, 0x529C, 0x2990, 0x0000 },
-    },
-
-    { NULL, { 0, 0, 0, 0, 0, 0, 0, 0 } }
+    }
 };
 
 static void set_gbPalette(void)
@@ -1496,7 +1494,7 @@ bool retro_load_game(const struct retro_game_info *game)
       gb_init();
 
       unsigned addr, i;
-      struct retro_memory_descriptor desc[17];
+      struct retro_memory_descriptor desc[18];
       struct retro_memory_map retromap;
 
       memset(desc, 0, sizeof(desc));
@@ -1519,22 +1517,39 @@ bool retro_load_game(const struct retro_game_info *game)
       // $0000-$00FF  Restart and Interrupt Vectors
       // http://gameboy.mongenel.com/dmg/asmmemmap.html
       for (addr = 0, i = 0; addr < 16; addr++) {
-         if (gbMemoryMap[addr] != NULL) {
-            desc[i].ptr    = gbMemoryMap[addr];
-            desc[i].start  = addr * 0x1000;
-            desc[i].len    = 4096;
-            if (addr < 4)  desc[i].flags  = RETRO_MEMDESC_CONST;
+         if (addr == 13) continue;
+         if (addr == 14) continue;
+         if (addr == 12) {                               // WRAM, bank 0-1
+            if (!gbCgbMode) {                            // WRAM-GB
+               if (!gbMemory) continue;
+               desc[i].ptr      = gbMemory + 0xC000;
+            } else {                                     // WRAM GBC
+               if (!gbWram) continue;
+               desc[i].ptr      = gbWram;
+            }
+            desc[i].start       = addr * 0x1000;
+            desc[i].len         = 0x2000;
             i++;
+            continue;
+         } else {                                        // Everything else map
+            if (gbMemoryMap[addr]) {
+               desc[i].ptr      = gbMemoryMap[addr];
+               desc[i].start    = addr * 0x1000;
+               desc[i].len      = 0x1000;
+               if (addr < 4)
+                  desc[i].flags = RETRO_MEMDESC_CONST;
+               i++;
+            }
          }
       }
 
-      if (gbCgbMode) { // banks 2-7 of GBC work ram banks at $10000
-            desc[i].ptr    = (void*)gbWram;
-            desc[i].offset = 0x2000;
-            desc[i].start  = 0x10000;
-            desc[i].select = 0xFFFFA000;
-            desc[i].len    = 0x6000;
-            i++;
+      if (gbWram && gbCgbMode) { // banks 2-7 of GBC work ram banks at $10000
+         desc[i].ptr    = gbWram;
+         desc[i].offset = 0x2000;
+         desc[i].start  = 0x10000;
+         desc[i].select = 0xFFFFA000;
+         desc[i].len    = 0x6000;
+         i++;
       }
 
       retromap.descriptors = desc;
