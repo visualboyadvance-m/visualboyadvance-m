@@ -50,7 +50,7 @@ struct retro_core_option_definition option_defs_us[] = {
     {
         "vbam_usebios",
         "Use BIOS file if available (Restart)",
-        "Use official bios when available. Core needs to be restarted for changes to apply.",
+        "Use official BIOS when available. Core needs to be restarted for changes to apply.",
         {
             { "disabled",  NULL },
             { "enabled",   NULL },
@@ -72,7 +72,7 @@ struct retro_core_option_definition option_defs_us[] = {
     {
         "vbam_soundfiltering",
         "Sound Filtering",
-        "Sets the amount filtering to use. Higher value reduces more high frequencies.",
+        "Sets the amount of filtering to use. Higher value reduces higher frequencies.",
         {
             { "0",  NULL },
             { "1",  NULL },
@@ -136,7 +136,7 @@ struct retro_core_option_definition option_defs_us[] = {
     {
         "vbam_showborders",
         "(GB) Show Borders",
-        "When enabled, if loaded content is SGB compatible, this will show the border from game if available.",
+        "When enabled, if loaded content is SGB compatible, this will show the border from the game if available.",
         {
             { "disabled",  NULL },
             { "enabled",   NULL },
@@ -148,7 +148,7 @@ struct retro_core_option_definition option_defs_us[] = {
     {
         "vbam_gbcoloroption",
         "(GB) Color Correction",
-        "Applies color correction which fixes colors in some games games.",
+        "Applies color correction which fixes colors in some games.",
         {
             { "disabled",  NULL },
             { "enabled",   NULL },
