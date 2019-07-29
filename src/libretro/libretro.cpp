@@ -1204,6 +1204,41 @@ static void update_variables(bool startup)
         int val = (!strcmp(var.value, "enabled")) ? 1 : 0;
         set_gbColorCorrection(val);
     }
+
+    // Hide some core options depending on rom image type
+    if (startup) {
+        unsigned i;
+        struct retro_core_option_display option_display;
+        char gb_options[5][25] = {
+            "vbam_palettes",
+            "vbam_gbHardware",
+            "vbam_allowcolorizerhack",
+            "vbam_showborders",
+            "vbam_gbcoloroption"
+        };
+        char gba_options[4][22] = {
+            "vbam_solarsensor",
+            "vbam_sound_5",
+            "vbam_sound_6",
+            "vbam_gyro_sensitivity"
+        };
+
+        // Show or hide GB/GBC only options
+        option_display.visible = (type == IMAGE_GB) ? 1 : 0;
+        for (i = 0; i < 5; i++)
+        {
+            option_display.key = gb_options[i];
+            environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
+        }
+
+        // Show or hide GBA only options
+        option_display.visible = (type == IMAGE_GBA) ? 1 : 0;
+        for (i = 0; i < 4; i++)
+        {
+            option_display.key = gba_options[i];
+            environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
+        }
+    }
 }
 
 // System analog stick range is -0x7fff to 0x7fff
