@@ -11,12 +11,14 @@ struct supportedCodecs {
 };
 
 const supportedCodecs audioSupported[] = {
-    { AV_CODEC_ID_MP3, "MP3 (MPEG audio layer 3)", "mp3" }
+    { AV_CODEC_ID_MP3, "MP3 (MPEG audio layer 3)", "mp3" },
+    { AV_CODEC_ID_AAC, "ADTS AAC (Advanced Audio Coding)", "aac,adts" }
 };
 
 const supportedCodecs videoSupported[] = {
     { AV_CODEC_ID_MPEG4, "AVI (Audio Video Interleaved)", "avi" },
-    { AV_CODEC_ID_MPEG4, "raw MPEG-4 video", "m4v" }
+    { AV_CODEC_ID_MPEG4, "raw MPEG-4 video", "m4v" },
+    { AV_CODEC_ID_FLV1, "FLV (Flash Video)", "flv" }
 };
 
 std::vector<char *> recording::getSupVidNames()
