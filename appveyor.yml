@@ -1,0 +1,32 @@
+version: '{build}'
+branches:
+  only:
+  - master
+
+image: 
+  - Visual Studio 2017
+
+configuration:
+  - Debug
+
+#let's start with 64bit
+
+platform:
+  - x64
+
+environment:
+  matrix:
+    - arch: Win64
+
+matrix:
+  fast_finish: true
+
+before_build:
+- cmd: |-
+    mkdir build
+    git submodule update --init --recursive
+    cd build
+    cmake .. -G "Visual Studio 15 2017" -DVCPKG_TARGET_TRIPLET=x64-windows
+
+build_script:
+  - cmake --build .
