@@ -179,8 +179,8 @@ opt_desc new_opt_desc(wxString opt, const char* cmd, wxString desc,
                       int curint, double curdouble, uint32_t curuint)
 {
     struct opt_desc new_opt = {opt, cmd, desc, stropt, intopt, enumvals,
-	                       min, max, boolopt, doubleopt, uintopt,
-			       curstr, curint, curdouble, curuint};
+                               min, max, boolopt, doubleopt, uintopt,
+                               curstr, curint, curdouble, curuint};
     return new_opt;
 }
 
@@ -634,6 +634,7 @@ void load_opts()
     }
 
     // joypad is special
+    set_default_keys();
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < NUM_KEYS; j++) {
             wxString optname;
