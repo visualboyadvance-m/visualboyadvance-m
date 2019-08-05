@@ -27,30 +27,6 @@ int flashDeviceID = 0x1b;
 int flashManufacturerID = 0x32;
 int flashBank = 0;
 
-static variable_desc flashSaveData[] = {
-    { &flashState, sizeof(int) },
-    { &flashReadState, sizeof(int) },
-    { &flashSaveMemory[0], SIZE_FLASH512 },
-    { NULL, 0 }
-};
-
-static variable_desc flashSaveData2[] = {
-    { &flashState, sizeof(int) },
-    { &flashReadState, sizeof(int) },
-    { &flashSize, sizeof(int) },
-    { &flashSaveMemory[0], SIZE_FLASH1M },
-    { NULL, 0 }
-};
-
-static variable_desc flashSaveData3[] = {
-    { &flashState, sizeof(int) },
-    { &flashReadState, sizeof(int) },
-    { &flashSize, sizeof(int) },
-    { &flashBank, sizeof(int) },
-    { &flashSaveMemory[0], SIZE_FLASH1M },
-    { NULL, 0 }
-};
-
 void flashInit()
 {
     memset(flashSaveMemory, 0xff, sizeof(flashSaveMemory));
@@ -62,49 +38,6 @@ void flashReset()
     flashReadState = FLASH_READ_ARRAY;
     flashBank = 0;
 }
-
-#ifdef __LIBRETRO__
-void flashSaveGame(uint8_t*& data)
-{
-    utilWriteDataMem(data, flashSaveData3);
-}
-
-void flashReadGame(const uint8_t*& data, int)
-{
-    utilReadDataMem(data, flashSaveData3);
-}
-
-#else // !__LIBRETRO__
-void flashSaveGame(gzFile gzFile)
-{
-    utilWriteData(gzFile, flashSaveData3);
-}
-
-void flashReadGame(gzFile gzFile, int version)
-{
-    if (version < SAVE_GAME_VERSION_5)
-        utilReadData(gzFile, flashSaveData);
-    else if (version < SAVE_GAME_VERSION_7) {
-        utilReadData(gzFile, flashSaveData2);
-        flashBank = 0;
-        flashSetSize(flashSize);
-    } else {
-        utilReadData(gzFile, flashSaveData3);
-    }
-}
-
-void flashReadGameSkip(gzFile gzFile, int version)
-{
-    // skip the flash data in a save game
-    if (version < SAVE_GAME_VERSION_5)
-        utilReadDataSkip(gzFile, flashSaveData);
-    else if (version < SAVE_GAME_VERSION_7) {
-        utilReadDataSkip(gzFile, flashSaveData2);
-    } else {
-        utilReadDataSkip(gzFile, flashSaveData3);
-    }
-}
-#endif
 
 void flashSetSize(int size)
 {
@@ -279,3 +212,70 @@ void flashWrite(uint32_t address, uint8_t byte)
         break;
     }
 }
+
+static variable_desc flashSaveData3[] = {
+    { &flashState, sizeof(int) },
+    { &flashReadState, sizeof(int) },
+    { &flashSize, sizeof(int) },
+    { &flashBank, sizeof(int) },
+    { &flashSaveMemory[0], SIZE_FLASH1M },
+    { NULL, 0 }
+};
+
+#ifdef __LIBRETRO__
+void flashSaveGame(uint8_t*& data)
+{
+    utilWriteDataMem(data, flashSaveData3);
+}
+
+void flashReadGame(const uint8_t*& data, int)
+{
+    utilReadDataMem(data, flashSaveData3);
+}
+
+#else // !__LIBRETRO__
+static variable_desc flashSaveData[] = {
+    { &flashState, sizeof(int) },
+    { &flashReadState, sizeof(int) },
+    { &flashSaveMemory[0], SIZE_FLASH512 },
+    { NULL, 0 }
+};
+
+static variable_desc flashSaveData2[] = {
+    { &flashState, sizeof(int) },
+    { &flashReadState, sizeof(int) },
+    { &flashSize, sizeof(int) },
+    { &flashSaveMemory[0], SIZE_FLASH1M },
+    { NULL, 0 }
+};
+
+void flashSaveGame(gzFile gzFile)
+{
+    utilWriteData(gzFile, flashSaveData3);
+}
+
+void flashReadGame(gzFile gzFile, int version)
+{
+    if (version < SAVE_GAME_VERSION_5)
+        utilReadData(gzFile, flashSaveData);
+    else if (version < SAVE_GAME_VERSION_7) {
+        utilReadData(gzFile, flashSaveData2);
+        flashBank = 0;
+        flashSetSize(flashSize);
+    } else {
+        utilReadData(gzFile, flashSaveData3);
+    }
+}
+
+void flashReadGameSkip(gzFile gzFile, int version)
+{
+    // skip the flash data in a save game
+    if (version < SAVE_GAME_VERSION_5)
+        utilReadDataSkip(gzFile, flashSaveData);
+    else if (version < SAVE_GAME_VERSION_7) {
+        utilReadDataSkip(gzFile, flashSaveData2);
+    } else {
+        utilReadDataSkip(gzFile, flashSaveData3);
+    }
+}
+#endif
