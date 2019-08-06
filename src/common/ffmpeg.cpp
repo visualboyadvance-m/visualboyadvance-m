@@ -106,15 +106,21 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
     aenc->sample_fmt = acodec->sample_fmts ? acodec->sample_fmts[0] : AV_SAMPLE_FMT_FLTP;
     aenc->bit_rate = 128000; // mp3
     aenc->sample_rate = sampleRate;
+    // this might be useful to check if the codec suports the
+    // sample rate, but it is not strictly needed for now
+    bool isSupported = false;
     if (acodec->supported_samplerates)
     {
-        aenc->sample_rate = acodec->supported_samplerates[0];
         for (int i = 0; acodec->supported_samplerates[i]; ++i)
         {
-            if (acodec->supported_samplerates[i] == 44100)
-                aenc->sample_rate = 44100;
+            if (acodec->supported_samplerates[i] == sampleRate)
+            {
+                isSupported = true;
+                break;
+            }
         }
     }
+    if (!isSupported) return MRET_ERR_NOCODEC;
     aenc->channels = av_get_channel_layout_nb_channels(aenc->channel_layout);
     aenc->channel_layout = AV_CH_LAYOUT_STEREO;
     if (acodec->channel_layouts)
