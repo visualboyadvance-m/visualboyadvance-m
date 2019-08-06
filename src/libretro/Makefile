@@ -43,11 +43,11 @@ else ifneq ($(findstring MINGW,$(shell uname -a)),)
 	system_platform = win
 endif
 
-CORE_DIR := ..
+CORE_DIR     := ..
 LIBRETRO_DIR := $(CORE_DIR)/libretro
-TARGET_NAME := vbam
+TARGET_NAME  := vbam
 
-VBAM_VERSION := $(shell sed -En 's/.*\[([0-9]+[^]]+).*/\1/p; T; q' ../../CHANGELOG.md 2>/dev/null)
+VBAM_VERSION   := $(shell sed -En 's/.*\[([0-9]+[^]]+).*/\1/p; T; q' ../../CHANGELOG.md 2>/dev/null)
 TAG_COMMIT     := $(shell git rev-list -n 1 v$(VBAM_VERSION) --abbrev-commit 2>/dev/null)
 CURRENT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null)
 
@@ -77,7 +77,7 @@ else ifeq ($(platform), classic_armv7_a7)
 	-flto=4 -fwhole-program -fuse-linker-plugin \
 	-fdata-sections -ffunction-sections -Wl,--gc-sections \
 	-fno-stack-protector -fno-ident -fomit-frame-pointer \
-	-falign-functions=1  -falign-jumps=1  -falign-loops=1  \
+	-falign-functions=1 -falign-jumps=1 -falign-loops=1 \
 	-fno-unwind-tables -fno-asynchronous-unwind-tables -fno-unroll-loops \
 	-fmerge-all-constants -fno-math-errno \
 	-marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
@@ -110,7 +110,7 @@ else ifeq ($(platform), classic_armv8_a35)
 	-flto=4 -fwhole-program -fuse-linker-plugin \
 	-fdata-sections -ffunction-sections -Wl,--gc-sections \
 	-fno-stack-protector -fno-ident -fomit-frame-pointer \
-	-falign-functions=1  -falign-jumps=1  -falign-loops=1  \
+	-falign-functions=1 -falign-jumps=1 -falign-loops=1 \
 	-fno-unwind-tables -fno-asynchronous-unwind-tables -fno-unroll-loops \
 	-fmerge-all-constants -fno-math-errno \
 	-marm -mtune=cortex-a35 -mfpu=neon-fp-armv8 -mfloat-abi=hard
@@ -138,7 +138,7 @@ else ifeq ($(platform), osx)
 	endif
 	OSXVER = `sw_vers -productVersion | cut -d. -f 2`
 	OSX_LT_MAVERICKS = `(( $(OSXVER) <= 9)) && echo "YES"`
-	fpic += -mmacosx-version-min=1 0.2
+	fpic += -mmacosx-version-min=10.2
 	SHARED := -dynamiclib
 	TILED_RENDERING=1
 
@@ -230,7 +230,7 @@ else ifeq ($(platform), psp1)
 	CC = psp-gcc$(EXE_EXT)
 	CXX = psp-g++$(EXE_EXT)
 	AR = psp-ar$(EXE_EXT)
-	PLATFORM_DEFINES :=  -DPSP
+	PLATFORM_DEFINES := -DPSP
 	CFLAGS += -G0
 	CXXFLAGS += -G0
 	STATIC_LINKING=1
@@ -242,7 +242,7 @@ else ifeq ($(platform), vita)
 	CC = arm-vita-eabi-gcc$(EXE_EXT)
 	CXX = arm-vita-eabi-g++$(EXE_EXT)
 	AR = arm-vita-eabi-ar$(EXE_EXT)
-	PLATFORM_DEFINES :=  -DVITA
+	PLATFORM_DEFINES := -DVITA
 	__FLAGS := -marm -mfpu=neon -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=hard -mword-relocations
 	__FLAGS += -fno-optimize-sibling-calls -fno-strict-aliasing -fno-partial-inlining -fno-tree-vrp
 	__FLAGS += -ffast-math -fsingle-precision-constant -funroll-loops -ftracer
@@ -310,11 +310,11 @@ else ifeq ($(platform), wiiu)
 else ifeq ($(platform), libnx)
 	include $(DEVKITPRO)/libnx/switch_rules
 	TARGET := $(TARGET_NAME)_libretro_$(platform).a
-	DEFINES := -DSWITCH=1  -U__linux__ -U__linux -DRARCH_INTERNAL -DHAVE_THREADS=1
+	DEFINES := -DSWITCH=1 -U__linux__ -U__linux -DRARCH_INTERNAL -DHAVE_THREADS=1
 	CFLAGS := $(DEFINES) -g -O3 \
 		      -fPIE -I$(LIBNX)/include/ -ffunction-sections -fdata-sections -ftls-model=local-exec -Wl,--allow-multiple-definition -specs=$(LIBNX)/switch.specs
 	CFLAGS += $(INCDIRS)
-	CFLAGS += $(INCLUDE)  -D__SWITCH__ -DHAVE_LIBNX
+	CFLAGS += $(INCLUDE) -D__SWITCH__ -DHAVE_LIBNX
 	CXXFLAGS := $(ASFLAGS) $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
 	CFLAGS += -std=gnu11
 	STATIC_LINKING=1
@@ -357,8 +357,8 @@ else ifeq ($(platform), emscripten)
 else ifeq ($(platform), xbox1_msvc2003)
 	TARGET := $(TARGET_NAME)_libretro_xdk1.lib
 	CC  = CL.exe
-	CXX  = CL.exe
-	LD   = lib.exe
+	CXX = CL.exe
+	LD  = lib.exe
 	export INCLUDE := $(XDK)\xbox\include
 	export LIB := $(XDK)\xbox\lib
 	PATH := $(call unixcygpath,$(XDK)/xbox/bin/vc71):$(PATH)
@@ -374,8 +374,8 @@ else ifeq ($(platform), xbox360_msvc2010)
 	TARGET := $(TARGET_NAME)_libretro_xdk360.lib
 	MSVCBINDIRPREFIX = $(XEDK)/bin/win32
 	CC  = "$(MSVCBINDIRPREFIX)/cl.exe"
-	CXX  = "$(MSVCBINDIRPREFIX)/cl.exe"
-	LD   = "$(MSVCBINDIRPREFIX)/lib.exe"
+	CXX = "$(MSVCBINDIRPREFIX)/cl.exe"
+	LD  = "$(MSVCBINDIRPREFIX)/lib.exe"
 	export INCLUDE := $(XEDK)/include/xbox
 	export LIB := $(XEDK)/lib/xbox
 	PSS_STYLE :=2
@@ -521,7 +521,7 @@ else
 	TILED_RENDERING=1
 endif
 
-include $(CORE_DIR)/libretro/Makefile.common
+include Makefile.common
 
 OBJS := $(SOURCES_CXX:.cpp=.o)
 
@@ -544,8 +544,8 @@ else
 	CXXFLAGS += -O2 -DNDEBUG
 endif
 
-CFLAGS += $(fpic) $(VBA_DEFINES) $(ENDIANNESS_DEFINES) $(PLATFORM_DEFINES)
-CXXFLAGS += $(fpic) $(VBA_DEFINES) $(ENDIANNESS_DEFINES) $(PLATFORM_DEFINES)
+CFLAGS += -Wall $(fpic) $(VBA_DEFINES) $(ENDIANNESS_DEFINES) $(PLATFORM_DEFINES)
+CXXFLAGS += -Wall $(fpic) $(VBA_DEFINES) $(ENDIANNESS_DEFINES) $(PLATFORM_DEFINES)
 
 OBJOUT   = -o
 LINKOUT  = -o
