@@ -2340,6 +2340,7 @@ void GameArea::StartVidRecording(const wxString& fname)
 {
     recording::MediaRet ret;
 
+    vid_rec.SetSampleRate(soundGetSampleRate());
     if ((ret = vid_rec.Record(fname.mb_str(), basic_width, basic_height,
              systemColorDepth))
         != recording::MRET_OK)
@@ -2370,6 +2371,7 @@ void GameArea::StartSoundRecording(const wxString& fname)
 {
     recording::MediaRet ret;
 
+    snd_rec.SetSampleRate(soundGetSampleRate());
     if ((ret = snd_rec.Record(fname.mb_str())) != recording::MRET_OK)
         wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
             media_err(ret));
