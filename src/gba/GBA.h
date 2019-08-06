@@ -19,6 +19,9 @@ const uint64_t TICKS_PER_SECOND = 16777216;
 #define SAVE_GAME_VERSION_10 10
 #define SAVE_GAME_VERSION SAVE_GAME_VERSION_10
 
+#define gbaWidth  240
+#define gbaHeight 160
+
 enum {
     GBA_SAVE_AUTO = 0,
     GBA_SAVE_EEPROM,

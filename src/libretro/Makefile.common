@@ -6,8 +6,7 @@ SOURCES_CXX :=
 SOURCES_CXX += \
 	$(CORE_DIR)/libretro/libretro.cpp \
 	$(CORE_DIR)/libretro/UtilRetro.cpp \
-	$(CORE_DIR)/libretro/SoundRetro.cpp \
-	$(CORE_DIR)/libretro/scrc32.cpp
+	$(CORE_DIR)/libretro/SoundRetro.cpp
 
 SOURCES_CXX += \
 	$(CORE_DIR)/apu/Gb_Oscs.cpp \

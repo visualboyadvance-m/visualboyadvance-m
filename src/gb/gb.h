@@ -1,6 +1,11 @@
 #ifndef GB_H
 #define GB_H
 
+#define gbWidth   160
+#define gbHeight  144
+#define sgbWidth  256
+#define sgbHeight 224
+
 const int GB_C_FLAG = 0x10;
 const int GB_H_FLAG = 0x20;
 const int GB_N_FLAG = 0x40;
@@ -55,6 +60,8 @@ void setColorizerHack(bool value);
 bool allowColorizerHack(void);
 
 extern int gbHardware;
+extern int gbRomType; // gets type from header 0x147
+extern int gbBattery; // enabled when gbRamSize != 0
 
 extern struct EmulatedSystem GBSystem;
 

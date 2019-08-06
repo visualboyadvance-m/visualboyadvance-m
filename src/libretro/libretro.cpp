@@ -8,6 +8,7 @@
 #include "SoundRetro.h"
 #include "libretro.h"
 #include "libretro_core_options.h"
+#include "scrc32.h"
 
 #include "../System.h"
 #include "../Util.h"
@@ -40,27 +41,20 @@ static retro_environment_t environ_cb;
 retro_audio_sample_batch_t audio_batch_cb;
 static retro_set_rumble_state_t rumble_cb;
 
-static char retro_system_directory[4096];
+static char retro_system_directory[2048];
 static char biosfile[4096];
 static float sndFiltering = 0.5f;
 static bool sndInterpolation = true;
 static bool can_dupe = false;
 static bool usebios = false;
 static unsigned retropad_device[4] = {0};
-
 static const double FramesPerSecond =  (16777216.0 / 280896.0); // 59.73
 static const long SampleRate = 32768;
-static const int GBWidth = 160;
-static const int GBHeight = 144;
-static const int SGBWidth = 256;
-static const int SGBHeight = 224;
-static const int GBAWidth = 240;
-static const int GBAHeight = 160;
-static unsigned width = 240;
-static unsigned height = 160;
+static unsigned width = gbaWidth;
+static unsigned height = gbaHeight;
 static EmulatedSystem* core = NULL;
 static IMAGE_TYPE type = IMAGE_UNKNOWN;
-static unsigned current_gbPalette;
+static unsigned current_gbPalette = 0;
 static bool opt_colorizer_hack = false;
 
 uint16_t systemColorMap16[0x10000];
@@ -219,9 +213,6 @@ static void set_gbColorCorrection(int value)
 {
     gbColorOption = value;
 }
-
-extern int gbRomType; // gets type from header 0x147
-extern int gbBattery; // enabled when gbRamSize != 0
 
 static bool gb_hasrtc(void)
 {
@@ -745,13 +736,11 @@ static void load_image_preferences(void)
         "NONE"
     };
 
-    char buffer[5];
-
-    buffer[0] = rom[0xac];
-    buffer[1] = rom[0xad];
-    buffer[2] = rom[0xae];
-    buffer[3] = rom[0xaf];
-    buffer[4] = 0;
+    bool found = false;
+    bool hasRumble = false;
+    char buffer[12];
+    unsigned i = 0, found_no = 0;
+    unsigned long romCrc32 = crc32(0, rom, romSize);
 
     cpuSaveType = GBA_SAVE_AUTO;
     flashSize = SIZE_FLASH512;
@@ -759,12 +748,26 @@ static void load_image_preferences(void)
     rtcEnabled = false;
     mirroringEnable = false;
 
-    log("GameID in ROM is: %s\n", buffer);
+    log("File CRC32      : 0x%08X\n", romCrc32);
 
-    bool found = false;
-    int found_no = 0;
+    buffer[0] = 0;
+    for (i = 0; i < 12; i++) {
+        if (rom[0xa0 + i] == 0)
+            break;
+        buffer[i] = rom[0xa0 + i];
+    }
 
-    for (int i = 0; i < 512; i++) {
+    buffer[i] = 0;
+    log("Game Title      : %s\n", buffer);
+
+    buffer[0] = rom[0xac];
+    buffer[1] = rom[0xad];
+    buffer[2] = rom[0xae];
+    buffer[3] = rom[0xaf];
+    buffer[4] = 0;
+    log("Game Code       : %s\n", buffer);
+
+    for (i = 0; i < 512; i++) {
         if (!strcmp(gbaover[i].romid, buffer)) {
             found = true;
             found_no = i;
@@ -773,7 +776,6 @@ static void load_image_preferences(void)
     }
 
     if (found) {
-        log("Found ROM in vba-over list.\n");
         log("Name            : %s\n", gbaover[found_no].romtitle);
 
         rtcEnabled = gbaover[found_no].rtcEnabled;
@@ -789,12 +791,10 @@ static void load_image_preferences(void)
     }
 
     // gameID that starts with 'F' are classic/famicom games
-    mirroringEnable = (buffer[0] == 0x46) ? true : false;
+    mirroringEnable = (buffer[0] == 'F') ? true : false;
 
-    if (!cpuSaveType) {
-        log("Scrapping ROM for save type.\n");
+    if (!cpuSaveType)
         utilGBAFindSave(romSize);
-    }
 
     saveType = cpuSaveType;
 
@@ -802,7 +802,12 @@ static void load_image_preferences(void)
         flashSetSize(flashSize);
 
     rtcEnable(rtcEnabled);
-    rtcEnableRumble(!rtcEnabled);
+
+    // game code starting with 'R' or 'V' has rumble support
+    if ((buffer[0] == 'R') || (buffer[0] == 'V'))
+        hasRumble = true;
+
+    rtcEnableRumble(!rtcEnabled && hasRumble);
 
     doMirroring(mirroringEnable);
 
@@ -811,7 +816,7 @@ static void load_image_preferences(void)
     log("cpuSaveType     : %s.\n", savetype[cpuSaveType]);
     if (cpuSaveType == 3)
         log("flashSize       : %d.\n", flashSize);
-    if (cpuSaveType == 1)
+    else if (cpuSaveType == 1)
         log("eepromSize      : %d.\n", eepromSize);
     log("mirroringEnable : %s.\n", mirroringEnable ? "Yes" : "No");
 }
@@ -854,8 +859,8 @@ static void gba_init(void)
     }
     CPUInit(biosfile, usebios);
 
-    width = GBAWidth;
-    height = GBAHeight;
+    width = gbaWidth;
+    height = gbaHeight;
 
     CPUReset();
 }
@@ -883,13 +888,13 @@ static void gb_init(void)
     gbCPUInit(biosfile, usebios);
 
     if (gbBorderOn) {
-        width = gbBorderLineSkip = SGBWidth;
-        height = SGBHeight;
-        gbBorderColumnSkip = (SGBWidth - GBWidth) >> 1;
-        gbBorderRowSkip = (SGBHeight - GBHeight) >> 1;
+        width = gbBorderLineSkip = sgbWidth;
+        height = sgbHeight;
+        gbBorderColumnSkip = (sgbWidth - gbWidth) >> 1;
+        gbBorderRowSkip = (sgbHeight - gbHeight) >> 1;
     } else {
-        width = gbBorderLineSkip = GBWidth;
-        height = GBHeight;
+        width = gbBorderLineSkip = gbWidth;
+        height = gbHeight;
         gbBorderColumnSkip = gbBorderRowSkip = 0;
     }
 
@@ -1171,7 +1176,7 @@ static void update_variables(bool startup)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
     {
-        int lastpal = current_gbPalette;
+        unsigned lastpal = current_gbPalette;
 
         if (!strcmp(var.value, "black and white"))
             current_gbPalette = 0;
@@ -1443,6 +1448,7 @@ void retro_cheat_set(unsigned index, bool enabled, const char* code)
                     memset(codeLine, 0, codeLineSize);
                 }
                 break;
+            default: break;
             }
             if (!code[cursor])
                 break;
@@ -1646,11 +1652,11 @@ void systemFrame(void)
 
 void systemGbBorderOn(void)
 {
-    bool changed = ((width != SGBWidth) || (height != SGBHeight));
-    width = gbBorderLineSkip = SGBWidth;
-    height = SGBHeight;
-    gbBorderColumnSkip = (SGBWidth - GBWidth) >> 1;
-    gbBorderRowSkip = (SGBHeight - GBHeight) >> 1;
+    bool changed = ((width != sgbWidth) || (height != sgbHeight));
+    width = gbBorderLineSkip = sgbWidth;
+    height = sgbHeight;
+    gbBorderColumnSkip = (sgbWidth - gbWidth) >> 1;
+    gbBorderRowSkip = (sgbHeight - gbHeight) >> 1;
 
     struct retro_system_av_info avinfo;
     retro_get_system_av_info(&avinfo);
@@ -1663,9 +1669,9 @@ void systemGbBorderOn(void)
 
 static void systemGbBorderOff(void)
 {
-    bool changed = ((width != GBWidth) || (height != GBHeight));
-    width = gbBorderLineSkip = GBWidth;
-    height = GBHeight;
+    bool changed = ((width != gbWidth) || (height != gbHeight));
+    width = gbBorderLineSkip = gbWidth;
+    height = gbHeight;
     gbBorderColumnSkip = gbBorderRowSkip = 0;
 
     struct retro_system_av_info avinfo;

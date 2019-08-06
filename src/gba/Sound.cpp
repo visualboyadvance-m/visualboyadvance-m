@@ -588,6 +588,7 @@ static struct {
     int soundDSBValue;
 } state;
 
+#ifndef __LIBRETRO__
 // Old GBA sound state format
 static variable_desc old_gba_state[] = {
     SKIP(int, soundPaused),
@@ -673,6 +674,7 @@ variable_desc old_gba_state2[] = {
     SKIP(int, sound3ForcedOutput),
     { NULL, 0 }
 };
+#endif
 
 // New state format
 static variable_desc gba_state[] = {
