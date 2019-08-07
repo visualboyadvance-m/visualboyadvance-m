@@ -111,6 +111,9 @@ class MediaRecorder
         MediaRet setup_video_stream(int width, int height);
         MediaRet setup_audio_stream();
         MediaRet finish_setup(const char *fname);
+        // flush last frames to avoid
+        // "X frames left in the queue on closing"
+        void flush_frames();
 };
 
 }
