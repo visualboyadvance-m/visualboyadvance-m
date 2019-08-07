@@ -5150,8 +5150,8 @@ void gbEmulate(int ticksToStop)
                         gbDrawLine();
                     } else if ((register_LY == 144) && (!systemFrameSkip)) {
                         int framesToSkip = systemFrameSkip;
-                        if (speedup)
-                            framesToSkip = 9; // try 6 FPS during speedup
+                        //if (speedup)
+                        //    framesToSkip = 9; // try 6 FPS during speedup
                         if ((gbFrameSkipCount >= framesToSkip) || (gbWhiteScreen == 1)) {
                             gbWhiteScreen = 2;
 

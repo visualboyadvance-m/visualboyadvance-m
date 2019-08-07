@@ -2336,10 +2336,15 @@ static const wxString media_err(recording::MediaRet ret)
     }
 }
 
+int save_speedup_frame_skip;
+
 void GameArea::StartVidRecording(const wxString& fname)
 {
     recording::MediaRet ret;
 
+    // do not skip frames when recording
+    save_speedup_frame_skip = speedup_frame_skip;
+    speedup_frame_skip = 0;
     vid_rec.SetSampleRate(soundGetSampleRate());
     if ((ret = vid_rec.Record(fname.mb_str(), basic_width, basic_height,
              systemColorDepth))
@@ -2357,6 +2362,8 @@ void GameArea::StartVidRecording(const wxString& fname)
 void GameArea::StopVidRecording()
 {
     vid_rec.Stop();
+    // allow to skip frames again
+    speedup_frame_skip = save_speedup_frame_skip;
     MainFrame* mf = wxGetApp().frame;
     mf->cmd_enable &= ~CMDEN_VREC;
     mf->cmd_enable |= CMDEN_NVREC;
