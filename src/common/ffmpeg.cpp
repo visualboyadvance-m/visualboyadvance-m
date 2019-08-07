@@ -450,6 +450,7 @@ void recording::MediaRecorder::Stop()
     npts = 0;
     if (oc)
     {
+        flush_frames();
         // close the output file
         if (!(fmt->flags & AVFMT_NOFILE))
         {
@@ -622,4 +623,17 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
         samplesInAudioBuffer = (cp / 2);
     }
     return MRET_OK;
+}
+
+// flush last frames to avoid
+// "X frames left in the queue on closing"
+void recording::MediaRecorder::flush_frames()
+{
+    AVPacket pkt;
+    av_init_packet(&pkt);
+    pkt.data = NULL;
+    pkt.size = 0;
+    // flush last audio frames
+    while (avcodec_receive_packet(aenc, &pkt) >= 0)
+        avcodec_send_frame(aenc, NULL);
 }
