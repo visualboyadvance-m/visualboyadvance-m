@@ -56,6 +56,7 @@ static EmulatedSystem* core = NULL;
 static IMAGE_TYPE type = IMAGE_UNKNOWN;
 static unsigned current_gbPalette = 0;
 static bool opt_colorizer_hack = false;
+static bool opt_forceRTCenable = false;
 
 uint16_t systemColorMap16[0x10000];
 uint32_t systemColorMap32[0x10000];
@@ -801,6 +802,9 @@ static void load_image_preferences(void)
     if (flashSize == SIZE_FLASH512 || flashSize == SIZE_FLASH1M)
         flashSetSize(flashSize);
 
+    if (opt_forceRTCenable)
+        rtcEnabled = true;
+
     rtcEnable(rtcEnabled);
 
     // game code starting with 'R' or 'V' has rumble support
@@ -1059,6 +1063,14 @@ static void update_variables(bool startup)
         usebios = newval;
     }
 
+    var.key = "vbam_forceRTCenable";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        bool newval = (strcmp(var.value, "enabled") == 0) ? true : false;
+        opt_forceRTCenable = newval;
+    }
+
     var.key = "vbam_solarsensor";
     var.value = NULL;
 
@@ -1221,11 +1233,12 @@ static void update_variables(bool startup)
             "vbam_showborders",
             "vbam_gbcoloroption"
         };
-        char gba_options[4][22] = {
+        char gba_options[5][22] = {
             "vbam_solarsensor",
             "vbam_sound_5",
             "vbam_sound_6",
-            "vbam_gyro_sensitivity"
+            "vbam_gyro_sensitivity",
+            "vbam_forceRTCenable"
         };
 
         // Show or hide GB/GBC only options
@@ -1238,7 +1251,7 @@ static void update_variables(bool startup)
 
         // Show or hide GBA only options
         option_display.visible = (type == IMAGE_GBA) ? 1 : 0;
-        for (i = 0; i < 4; i++)
+        for (i = 0; i < 5; i++)
         {
             option_display.key = gba_options[i];
             environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
