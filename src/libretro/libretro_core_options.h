@@ -29,7 +29,7 @@ extern "C" {
 struct retro_core_option_definition option_defs_us[] = {
     {
         "vbam_solarsensor",
-        "Solar sensor level",
+        "Solar Sensor Level",
         "Adjusts simulated solar level in Boktai games. L2/R2 buttons can also be used to quickly change levels.",
         {
             { "0",  NULL },
@@ -49,7 +49,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_usebios",
-        "Use BIOS file if available (Restart)",
+        "Use Official BIOS (If Available)",
         "Use official BIOS when available. Core needs to be restarted for changes to apply.",
         {
             { "disabled",  NULL },
@@ -60,7 +60,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_forceRTCenable",
-        "Force enable RTC",
+        "Force-Enable RTC",
         "Forces the internal real-time clock to be enabled regardless of rom. Usuable for rom patches that requires clock to be enabled (aka Pokemon).",
         {
             { "disabled",  NULL },
@@ -103,7 +103,7 @@ struct retro_core_option_definition option_defs_us[] = {
     {
         "vbam_palettes",
         "(GB) Color Palette",
-        "Set Game Boy palettes.",
+        "Set Game Boy palettes to use.",
         {
             { "black and white", NULL },
             { "blue sea",     NULL },
@@ -120,7 +120,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_gbHardware",
-        "(GB) Emulated Hardware",
+        "(GB) Emulated Hardware (Needs Restart)",
         "Sets the Game Boy hardware type to emulate. Restart core to apply.",
         {
             { "gbc",  "Game Boy Color" },
@@ -294,8 +294,19 @@ struct retro_core_option_definition option_defs_us[] = {
         "disabled"
     },
     {
+        "vbam_show_advanced_options",
+        "Show Advanced Options",
+        "Show advanced options which can enable or disable sound channels and graphics layers.",
+        {
+            { "disabled", NULL },
+            { "enabled",  NULL },
+            { NULL, NULL },
+        },
+        "disabled"
+    },
+    {
         "vbam_sound_1",
-        "Sound channel 1",
+        "Sound Channel 1",
         "Enables or disables tone & sweep sound channel.",
         {
             { "disabled", NULL },
@@ -304,9 +315,9 @@ struct retro_core_option_definition option_defs_us[] = {
         },
         "enabled"
     },
-{
+    {
         "vbam_sound_2",
-        "Sound channel 2",
+        "Sound Channel 2",
         "Enables or disables tone sound channel.",
         {
             { "disabled", NULL },
@@ -317,7 +328,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_sound_3",
-        "Sound channel 3",
+        "Sound Channel 3",
         "Enables or disables wave output sound channel.",
         {
             { "disabled", NULL },
@@ -328,7 +339,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_sound_4",
-        "Sound channel 4",
+        "Sound Channel 4",
         "Enables or disables noise audio channel.",
         {
             { "disabled", NULL },
@@ -339,7 +350,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_sound_5",
-        "Sound DMA channel A",
+        "Sound DMA Channel A",
         "Enables or disables DMA sound channel A.",
         {
             { "disabled", NULL },
@@ -350,7 +361,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_sound_6",
-        "Sound DMA channel B",
+        "Sound DMA Channel B",
         "Enables or disables DMA sound channel B.",
         {
             { "disabled", NULL },
@@ -361,7 +372,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_1",
-        "Show background layer 1",
+        "Show Background Layer 1",
         "Shows or hides background layer 1.",
         {
             { "disabled", NULL },
@@ -372,7 +383,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_2",
-        "Show background layer 2",
+        "Show Background Layer 2",
         "Shows or hides background layer 2.",
         {
             { "disabled", NULL },
@@ -383,7 +394,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_3",
-        "Show background layer 3",
+        "Show Background Layer 3",
         "Shows or hides background layer 3.",
         {
             { "disabled", NULL },
@@ -394,7 +405,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_4",
-        "Show background layer 4",
+        "Show Background Layer 4",
         "Shows or hides background layer 4.",
         {
             { "disabled", NULL },
@@ -405,7 +416,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_5",
-        "Show sprite layer",
+        "Show Sprite Layer",
         "Shows or hides sprite layer.",
         {
             { "disabled", NULL },
@@ -416,7 +427,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_6",
-        "Show window layer 1",
+        "Show Window Layer 1",
         "Shows or hides window layer 1.",
         {
             { "disabled", NULL },
@@ -427,7 +438,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_7",
-        "Show window layer 2",
+        "Show Window Layer 2",
         "Shows or hides window layer 2.",
         {
             { "disabled", NULL },
@@ -438,7 +449,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_8",
-        "Show sprite window layer",
+        "Show Sprite Window Layer",
         "Shows or hides sprite window layer.",
         {
             { "disabled", NULL },
