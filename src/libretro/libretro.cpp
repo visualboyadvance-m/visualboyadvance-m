@@ -312,6 +312,35 @@ static void gbUpdateRTC(void)
     }
 }
 
+static void SetGBBorder(unsigned val)
+{
+    struct retro_system_av_info avinfo;
+    unsigned _changed = 0;
+
+    switch (val) {
+        case 0:
+            _changed = ((systemWidth != gbWidth) || (systemHeight != gbHeight)) ? 1 : 0;
+            systemWidth = gbBorderLineSkip = gbWidth;
+            systemHeight = gbHeight;
+            gbBorderColumnSkip = gbBorderRowSkip = 0;
+            break;
+        case 1:
+            _changed = ((systemWidth != sgbWidth) || (systemHeight != sgbHeight)) ? 1 : 0;
+            systemWidth = gbBorderLineSkip = sgbWidth;
+            systemHeight = sgbHeight;
+            gbBorderColumnSkip = (sgbWidth - gbWidth) >> 1;
+            gbBorderRowSkip = (sgbHeight - gbHeight) >> 1;
+            break;
+    }
+
+    retro_get_system_av_info(&avinfo);
+
+    if (!_changed)
+        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
+    else
+        environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
+}
+
 void* retro_get_memory_data(unsigned id)
 {
     if (type == IMAGE_GBA) {
@@ -974,7 +1003,6 @@ static const unsigned turbo_binds[TURBO_BUTTONS] = {
     RETRO_DEVICE_ID_JOYPAD_Y
 };
 
-static void systemGbBorderOff(void);
 static void systemUpdateSolarSensor(int level);
 static uint8_t sensorDarkness = 0xE8;
 static uint8_t sensorDarknessLevel = 0; // so we can adjust sensor from gamepad
@@ -1069,9 +1097,7 @@ static void update_variables(bool startup)
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        int oldval = (gbBorderOn << 1) | gbBorderAutomatic;
         if (strcmp(var.value, "auto") == 0) {
-            gbBorderOn = 0;
             gbBorderAutomatic = 1;
         }
         else if (!strcmp(var.value, "enabled")) {
@@ -1082,14 +1108,8 @@ static void update_variables(bool startup)
             gbBorderAutomatic = 0;
         }
 
-        if ((type == IMAGE_GB) &&
-            (oldval != ((gbBorderOn << 1) | gbBorderAutomatic)) && !startup) {
-            if (gbBorderOn) {
-                systemGbBorderOn();
-                gbSgbRenderBorder();
-            } else
-                systemGbBorderOff();
-        }
+        if ((type == IMAGE_GB) && !startup)
+            SetGBBorder(gbBorderOn);
     }
 
     var.key = "vbam_gbHardware";
@@ -1641,6 +1661,8 @@ unsigned retro_get_region(void)
     return RETRO_REGION_NTSC;
 }
 
+// system callbacks
+
 void systemOnWriteDataToSoundBuffer(const uint16_t*, int)
 {
 }
@@ -1667,35 +1689,7 @@ void systemFrame(void)
 
 void systemGbBorderOn(void)
 {
-    bool changed = ((systemWidth != sgbWidth) || (systemHeight != sgbHeight));
-    systemWidth = gbBorderLineSkip = sgbWidth;
-    systemHeight = sgbHeight;
-    gbBorderColumnSkip = (sgbWidth - gbWidth) >> 1;
-    gbBorderRowSkip = (sgbHeight - gbHeight) >> 1;
-
-    struct retro_system_av_info avinfo;
-    retro_get_system_av_info(&avinfo);
-
-    if (!changed)
-        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
-    else
-        environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
-}
-
-static void systemGbBorderOff(void)
-{
-    bool changed = ((systemWidth != gbWidth) || (systemHeight != gbHeight));
-    systemWidth = gbBorderLineSkip = gbWidth;
-    systemHeight = gbHeight;
-    gbBorderColumnSkip = gbBorderRowSkip = 0;
-
-    struct retro_system_av_info avinfo;
-    retro_get_system_av_info(&avinfo);
-
-    if (!changed)
-        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
-    else
-        environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
+    SetGBBorder(1);
 }
 
 void systemMessage(const char* fmt, ...)
