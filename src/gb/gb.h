@@ -62,6 +62,7 @@ bool allowColorizerHack(void);
 extern int gbHardware;
 extern int gbRomType; // gets type from header 0x147
 extern int gbBattery; // enabled when gbRamSize != 0
+extern int gbRTCPresent;  // gbROM has RTC support
 
 extern struct EmulatedSystem GBSystem;
 

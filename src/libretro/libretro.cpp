@@ -216,99 +216,76 @@ static void set_gbPalette(void)
     }
 }
 
-static bool gb_hasrtc(void)
+static void* gb_rtcdata_prt(void)
 {
     switch (gbRomType) {
     case 0x0f:
     case 0x10: // MBC3 + extended
-    case 0x13:
+        return &gbDataMBC3.mapperSeconds;
     case 0xfd: // TAMA5 + extended
-        return true;
-    }
-    return false;
-}
-
-static void* gb_rtcdata_prt(void)
-{
-    if (gb_hasrtc()) {
-        switch (gbRomType) {
-        case 0x0f:
-        case 0x10: // MBC3 + extended
-            return &gbDataMBC3.mapperSeconds;
-        case 0x13:
-        case 0xfd: // TAMA5 + extended
-            return &gbDataTAMA5.mapperSeconds;
-        }
+        return &gbDataTAMA5.mapperSeconds;
     }
     return NULL;
 }
 
 static size_t gb_rtcdata_size(void)
 {
-    if (gb_hasrtc()) {
-        switch (gbRomType) {
-        case 0x0f:
-        case 0x10: // MBC3 + extended
-            return MBC3_RTC_DATA_SIZE;
-            break;
-        case 0x13:
-        case 0xfd: // TAMA5 + extended
-            return TAMA5_RTC_DATA_SIZE;
-            break;
-        }
+    switch (gbRomType) {
+    case 0x0f:
+    case 0x10: // MBC3 + extended
+        return MBC3_RTC_DATA_SIZE;
+    case 0xfd: // TAMA5 + extended
+        return TAMA5_RTC_DATA_SIZE;
     }
     return 0;
 }
 
-static void gbUpdateRTC(void)
+static void gbInitRTC(void)
 {
-    if (gb_hasrtc()) {
-        struct tm* lt;
-        time_t rawtime;
-        time(&rawtime);
-        lt = localtime(&rawtime);
+    struct tm* lt;
+    time_t rawtime;
+    time(&rawtime);
+    lt = localtime(&rawtime);
 
-        switch (gbRomType) {
-        case 0x0f:
-        case 0x10: {
-                gbDataMBC3.mapperSeconds = lt->tm_sec;
-                gbDataMBC3.mapperMinutes = lt->tm_min;
-                gbDataMBC3.mapperHours = lt->tm_hour;
-                gbDataMBC3.mapperDays = lt->tm_yday & 255;
-                gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
-                gbDataMBC3.mapperLastTime = rawtime;
-            }
-            break;
-        case 0xfd: {
-                uint8_t gbDaysinMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-                gbDataTAMA5.mapperSeconds = lt->tm_sec;
-                gbDataTAMA5.mapperMinutes = lt->tm_min;
-                gbDataTAMA5.mapperHours = lt->tm_hour;
-                gbDataTAMA5.mapperDays = 1;
-                gbDataTAMA5.mapperMonths = 1;
-                gbDataTAMA5.mapperYears = 1970;
-                gbDataTAMA5.mapperLastTime = rawtime;
-                int days = lt->tm_yday + 365 * 3;
-                while (days) {
-                    gbDataTAMA5.mapperDays++;
-                    days--;
-                    if (gbDataTAMA5.mapperDays > gbDaysinMonth[gbDataTAMA5.mapperMonths - 1]) {
-                        gbDataTAMA5.mapperDays = 1;
-                        gbDataTAMA5.mapperMonths++;
-                        if (gbDataTAMA5.mapperMonths > 12) {
-                            gbDataTAMA5.mapperMonths = 1;
-                            gbDataTAMA5.mapperYears++;
-                            if ((gbDataTAMA5.mapperYears & 3) == 0)
-                                gbDaysinMonth[1] = 29;
-                            else
-                                gbDaysinMonth[1] = 28;
-                        }
+    switch (gbRomType) {
+    case 0x0f:
+    case 0x10:
+        gbDataMBC3.mapperSeconds = lt->tm_sec;
+        gbDataMBC3.mapperMinutes = lt->tm_min;
+        gbDataMBC3.mapperHours = lt->tm_hour;
+        gbDataMBC3.mapperDays = lt->tm_yday & 255;
+        gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
+        gbDataMBC3.mapperLastTime = rawtime;
+        break;
+    case 0xfd: {
+        uint8_t gbDaysinMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        int days = lt->tm_yday + 365 * 3;
+        gbDataTAMA5.mapperSeconds = lt->tm_sec;
+        gbDataTAMA5.mapperMinutes = lt->tm_min;
+        gbDataTAMA5.mapperHours = lt->tm_hour;
+        gbDataTAMA5.mapperDays = 1;
+        gbDataTAMA5.mapperMonths = 1;
+        gbDataTAMA5.mapperYears = 1970;
+        gbDataTAMA5.mapperLastTime = rawtime;
+        while (days) {
+            gbDataTAMA5.mapperDays++;
+            days--;
+                if (gbDataTAMA5.mapperDays > gbDaysinMonth[gbDataTAMA5.mapperMonths - 1]) {
+                    gbDataTAMA5.mapperDays = 1;
+                    gbDataTAMA5.mapperMonths++;
+                    if (gbDataTAMA5.mapperMonths > 12) {
+                        gbDataTAMA5.mapperMonths = 1;
+                        gbDataTAMA5.mapperYears++;
+                        if ((gbDataTAMA5.mapperYears & 3) == 0)
+                            gbDaysinMonth[1] = 29;
+                        else
+                            gbDaysinMonth[1] = 28;
                     }
                 }
-                gbDataTAMA5.mapperControl = (gbDataTAMA5.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
             }
-            break;
+            gbDataTAMA5.mapperControl = (gbDataTAMA5.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
         }
+        break;
     }
 }
 
@@ -343,70 +320,91 @@ static void SetGBBorder(unsigned val)
 
 void* retro_get_memory_data(unsigned id)
 {
-    if (type == IMAGE_GBA) {
+    void *data = NULL;
+
+    switch (type) {
+    case IMAGE_GBA:
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
             if ((saveType == GBA_SAVE_EEPROM) | (saveType == GBA_SAVE_EEPROM_SENSOR))
-                return eepromData;
-            if ((saveType == GBA_SAVE_SRAM) | (saveType == GBA_SAVE_FLASH))
-                return flashSaveMemory;
-            return NULL;
+                data =  eepromData;
+            else if ((saveType == GBA_SAVE_SRAM) | (saveType == GBA_SAVE_FLASH))
+                data = flashSaveMemory;
+            break;
         case RETRO_MEMORY_SYSTEM_RAM:
-            return workRAM;
+            data = workRAM;
+            break;
         case RETRO_MEMORY_VIDEO_RAM:
-            return vram;
+            data = vram;
+            break;
         }
-    }
 
-    if (type == IMAGE_GB) {
+    case IMAGE_GB:
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
             if (gbBattery)
-                return gbRam;
-            return NULL;
+                data = gbRam;
+            break;
         case RETRO_MEMORY_SYSTEM_RAM:
-            return (gbCgbMode ? gbWram : (gbMemory + 0xC000));
+            data = (gbCgbMode ? gbWram : (gbMemory + 0xC000));
+            break;
         case RETRO_MEMORY_VIDEO_RAM:
-            return (gbCgbMode ? gbVram : (gbMemory + 0x8000));
+            data = (gbCgbMode ? gbVram : (gbMemory + 0x8000));
+            break;
+        case RETRO_MEMORY_RTC:
+            if (gbBattery && gbRTCPresent)
+                data = gb_rtcdata_prt();
+            break;
         }
-    }
 
-    return NULL;
+    default: break;
+    }
+    return data;
 }
 
 size_t retro_get_memory_size(unsigned id)
 {
-    if (type == IMAGE_GBA) {
+    size_t size = 0;
+
+    switch (type) {
+    case IMAGE_GBA:
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
             if ((saveType == GBA_SAVE_EEPROM) | (saveType == GBA_SAVE_EEPROM_SENSOR))
-                return eepromSize;
-            if (saveType == GBA_SAVE_FLASH)
-                return flashSize;
-            if (saveType == GBA_SAVE_SRAM)
-                return SIZE_SRAM;
-            return 0;
+                size = eepromSize;
+            else if (saveType == GBA_SAVE_FLASH)
+                size = flashSize;
+            else if (saveType == GBA_SAVE_SRAM)
+                size = SIZE_SRAM;
+            break;
         case RETRO_MEMORY_SYSTEM_RAM:
-            return SIZE_WRAM;
+            size = SIZE_WRAM;
+            break;
         case RETRO_MEMORY_VIDEO_RAM:
-            return SIZE_VRAM - 0x2000; // usuable vram is only 0x18000
+            size = SIZE_VRAM - 0x2000; // usuable vram is only 0x18000
+            break;
         }
-    }
 
-    if (type == IMAGE_GB) {
+    case IMAGE_GB:
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
             if (gbBattery)
-                return gbRamSize;
-            return 0;
+                size = gbRamSize;
+            break;
         case RETRO_MEMORY_SYSTEM_RAM:
-            return gbCgbMode ? 0x8000 : 0x2000;
+            size = gbCgbMode ? 0x8000 : 0x2000;
+            break;
         case RETRO_MEMORY_VIDEO_RAM:
-            return gbCgbMode ? 0x4000 : 0x2000;
+            size = gbCgbMode ? 0x4000 : 0x2000;
+            break;
+        case RETRO_MEMORY_RTC:
+            size = gb_rtcdata_size();
+            break;
         }
-    }
 
-    return 0;
+    default: break;
+    }
+    return size;
 }
 
 unsigned retro_api_version(void)
@@ -932,10 +930,6 @@ static void gb_init(void)
     gbReset(); // also resets sound;
     set_gbPalette();
 
-    // VBA-M always updates time based on current time and not in-game time.
-    // No need to add RTC data to RETRO_MEMORY_RTC, so its safe to place this here.
-    gbUpdateRTC();
-
     log("Rom size       : %02x (%dK)\n", gbRom[0x148], (romSize + 1023) / 1024);
     log("Cartridge type : %02x (%s)\n", gbRom[0x147], gbGetCartridgeType());
     log("Ram size       : %02x (%s)\n", gbRom[0x149], gbGetSaveRamSize());
@@ -1368,11 +1362,36 @@ void updateInput_SolarSensor(void)
     }
 }
 
+static bool firstrun = true;
 static unsigned has_frame;
 
 void retro_run(void)
 {
     bool updated = false;
+
+    if (firstrun) {
+        bool initRTC = false;
+        firstrun = false;
+        /* Check if GB game has RTC data. Has to be check here since this is where the data will be
+         * available when using libretro api. */
+        if ((type == IMAGE_GB) && gbRTCPresent) {
+            switch (gbRomType) {
+            case 0x0f:
+            case 0x10:
+                /* Check if any RTC has been loaded, zero value means nothing has been loaded. */
+                if (!gbDataMBC3.mapperSeconds && !gbDataMBC3.mapperLSeconds && !gbDataMBC3.mapperLastTime)
+                    initRTC = true;
+                break;
+            case 0xfd:
+                if (!gbDataTAMA5.mapperSeconds && !gbDataTAMA5.mapperLSeconds && !gbDataTAMA5.mapperLastTime)
+                    initRTC = true;
+                break;
+            }
+            /* Initialize RTC using local time if needed */
+            if (initRTC)
+                gbInitRTC();
+        }
+    }
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
         update_variables(false);
@@ -1384,9 +1403,8 @@ void retro_run(void)
 
     has_frame = 0;
 
-    do {
+    while (!has_frame)
         core->emuMain(core->emuCount);
-    } while (!has_frame);
 }
 
 static unsigned serialize_size = 0;
