@@ -727,24 +727,14 @@ void MemView::Resize(wxSizeEvent& ev)
 
 void MemView::Show(uint32_t addr, bool force_update)
 {
-    // go forward 1 line when clicking bottom
     if (addr < topaddr || addr >= topaddr + (nlines - 1) * 16) {
         // align to nearest 16-byte block
         // note that mfc interface only aligns to nearest (1<<fmt)-byte
-        //uint32_t newtopaddr = addr & ~0xf;
-        uint32_t newtopaddr = topaddr + 16;
+        uint32_t newtopaddr = addr & ~0xf;
 
         if (newtopaddr + nlines * 16 > maxaddr)
             newtopaddr = maxaddr - nlines * 16 + 1;
 
-        force_update = newtopaddr != topaddr;
-        topaddr = newtopaddr;
-    }
-    // go back 1 line when clicking top
-    else if (addr >= topaddr && addr <= topaddr + 16 && topaddr > 0)
-    {
-        uint32_t newtopaddr = addr & ~0xf;
-        newtopaddr -= 16;
         force_update = newtopaddr != topaddr;
         topaddr = newtopaddr;
     }
