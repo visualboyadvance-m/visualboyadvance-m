@@ -389,7 +389,7 @@ void mapperMBC3ROM(uint16_t address, uint8_t value)
             gbDataMBC3.mapperRAMBank = value;
             gbDataMBC3.mapperRAMAddress = tmpAddress;
         } else {
-            if (gbDataMBC3.mapperRAMEnable) {
+            if (gbRTCPresent && gbDataMBC3.mapperRAMEnable) {
                 gbDataMBC3.mapperRAMBank = -1;
 
                 gbDataMBC3.mapperClockRegister = value;
@@ -397,16 +397,18 @@ void mapperMBC3ROM(uint16_t address, uint8_t value)
         }
         break;
     case 0x6000: // clock latch
-        if (gbDataMBC3.mapperClockLatch == 0 && value == 1) {
-            memoryUpdateMBC3Clock();
-            gbDataMBC3.mapperLSeconds = gbDataMBC3.mapperSeconds;
-            gbDataMBC3.mapperLMinutes = gbDataMBC3.mapperMinutes;
-            gbDataMBC3.mapperLHours = gbDataMBC3.mapperHours;
-            gbDataMBC3.mapperLDays = gbDataMBC3.mapperDays;
-            gbDataMBC3.mapperLControl = gbDataMBC3.mapperControl;
+        if (gbRTCPresent) {
+            if (gbDataMBC3.mapperClockLatch == 0 && value == 1) {
+                memoryUpdateMBC3Clock();
+                gbDataMBC3.mapperLSeconds = gbDataMBC3.mapperSeconds;
+                gbDataMBC3.mapperLMinutes = gbDataMBC3.mapperMinutes;
+                gbDataMBC3.mapperLHours = gbDataMBC3.mapperHours;
+                gbDataMBC3.mapperLDays = gbDataMBC3.mapperDays;
+                gbDataMBC3.mapperLControl = gbDataMBC3.mapperControl;
+            }
+            if (value == 0x00 || value == 0x01)
+                gbDataMBC3.mapperClockLatch = value;
         }
-        if (value == 0x00 || value == 0x01)
-            gbDataMBC3.mapperClockLatch = value;
         break;
     }
 }
@@ -415,12 +417,12 @@ void mapperMBC3ROM(uint16_t address, uint8_t value)
 void mapperMBC3RAM(uint16_t address, uint8_t value)
 {
     if (gbDataMBC3.mapperRAMEnable) {
-        if (gbDataMBC3.mapperRAMBank != -1) {
+        if (gbDataMBC3.mapperRAMBank >= 0) {
             if (gbRamSize) {
                 gbMemoryMap[address >> 12][address & 0x0fff] = value;
                 systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
             }
-        } else {
+        } else if (gbRTCPresent) {
             time(&gbDataMBC3.mapperLastTime);
             switch (gbDataMBC3.mapperClockRegister) {
             case 0x08:
@@ -450,25 +452,25 @@ void mapperMBC3RAM(uint16_t address, uint8_t value)
 uint8_t mapperMBC3ReadRAM(uint16_t address)
 {
     if (gbDataMBC3.mapperRAMEnable) {
-        if (gbDataMBC3.mapperRAMBank != -1) {
+        if (gbDataMBC3.mapperRAMBank >= 0) {
             return gbMemoryMap[address >> 12][address & 0x0fff];
-        }
-
-        switch (gbDataMBC3.mapperClockRegister) {
-        case 0x08:
-            return gbDataMBC3.mapperLSeconds;
-            break;
-        case 0x09:
-            return gbDataMBC3.mapperLMinutes;
-            break;
-        case 0x0a:
-            return gbDataMBC3.mapperLHours;
-            break;
-        case 0x0b:
-            return gbDataMBC3.mapperLDays;
-            break;
-        case 0x0c:
-            return gbDataMBC3.mapperLControl;
+        } else if (gbRTCPresent) {
+            switch (gbDataMBC3.mapperClockRegister) {
+            case 0x08:
+                return gbDataMBC3.mapperLSeconds;
+                break;
+            case 0x09:
+                return gbDataMBC3.mapperLMinutes;
+                break;
+            case 0x0a:
+                return gbDataMBC3.mapperLHours;
+                break;
+            case 0x0b:
+                return gbDataMBC3.mapperLDays;
+                break;
+            case 0x0c:
+                return gbDataMBC3.mapperLControl;
+            }
         }
     }
 
