@@ -33,31 +33,37 @@
 #include "../gb/gbSGB.h"
 #include "../gb/gbSound.h"
 
+#define FRAMERATE  (16777216.0 / 280896.0) // 59.73
+#define SAMPLERATE 32768.0
+
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
 static retro_input_poll_t poll_cb;
 static retro_input_state_t input_cb;
 static retro_environment_t environ_cb;
-retro_audio_sample_batch_t audio_batch_cb;
 static retro_set_rumble_state_t rumble_cb;
+retro_audio_sample_batch_t audio_batch_cb;
 
 static char retro_system_directory[2048];
 static char biosfile[4096];
-static float sndFiltering = 0.5f;
-static bool sndInterpolation = true;
 static bool can_dupe = false;
-static bool usebios = false;
+
+// core options
+static bool option_sndInterpolation = true;
+static bool option_useBios = false;
+static bool option_colorizerHack = false;
+static bool option_forceRTCenable = false;
+static bool option_showAdvancedOptions = false;
+static double option_sndFiltering = 0.5;
+static unsigned option_gbPalette = 0;
+
 static unsigned retropad_device[4] = {0};
-static const double FramesPerSecond =  (16777216.0 / 280896.0); // 59.73
-static const long SampleRate = 32768;
-static unsigned width = gbaWidth;
-static unsigned height = gbaHeight;
+static unsigned systemWidth = gbaWidth;
+static unsigned systemHeight = gbaHeight;
 static EmulatedSystem* core = NULL;
 static IMAGE_TYPE type = IMAGE_UNKNOWN;
-static unsigned current_gbPalette = 0;
-static bool opt_colorizer_hack = false;
-static bool opt_forceRTCenable = false;
 
+// global vars
 uint16_t systemColorMap16[0x10000];
 uint32_t systemColorMap32[0x10000];
 int RGB_LOW_BITS_MASK = 0;
@@ -203,180 +209,202 @@ static void set_gbPalette(void)
     if (gbCgbMode || gbSgbMode)
         return;
 
-    const uint16_t *pal = defaultGBPalettes[current_gbPalette].data;
+    const uint16_t *pal = defaultGBPalettes[option_gbPalette].data;
     for (int i = 0; i < 8; i++) {
         uint16_t val = pal[i];
         gbPalette[i] = val;
     }
 }
 
-static void set_gbColorCorrection(int value)
-{
-    gbColorOption = value;
-}
-
-static bool gb_hasrtc(void)
+static void* gb_rtcdata_prt(void)
 {
     switch (gbRomType) {
     case 0x0f:
     case 0x10: // MBC3 + extended
-    case 0x13:
+        return &gbDataMBC3.mapperSeconds;
     case 0xfd: // TAMA5 + extended
-        return true;
-    }
-    return false;
-}
-
-static void* gb_rtcdata_prt(void)
-{
-    if (gb_hasrtc()) {
-        switch (gbRomType) {
-        case 0x0f:
-        case 0x10: // MBC3 + extended
-            return &gbDataMBC3.mapperSeconds;
-        case 0x13:
-        case 0xfd: // TAMA5 + extended
-            return &gbDataTAMA5.mapperSeconds;
-        }
+        return &gbDataTAMA5.mapperSeconds;
     }
     return NULL;
 }
 
 static size_t gb_rtcdata_size(void)
 {
-    if (gb_hasrtc()) {
-        switch (gbRomType) {
-        case 0x0f:
-        case 0x10: // MBC3 + extended
-            return MBC3_RTC_DATA_SIZE;
-            break;
-        case 0x13:
-        case 0xfd: // TAMA5 + extended
-            return TAMA5_RTC_DATA_SIZE;
-            break;
-        }
+    switch (gbRomType) {
+    case 0x0f:
+    case 0x10: // MBC3 + extended
+        return MBC3_RTC_DATA_SIZE;
+    case 0xfd: // TAMA5 + extended
+        return TAMA5_RTC_DATA_SIZE;
     }
     return 0;
 }
 
-static void gbUpdateRTC(void)
+static void gbInitRTC(void)
 {
-    if (gb_hasrtc()) {
-        struct tm* lt;
-        time_t rawtime;
-        time(&rawtime);
-        lt = localtime(&rawtime);
+    struct tm* lt;
+    time_t rawtime;
+    time(&rawtime);
+    lt = localtime(&rawtime);
 
-        switch (gbRomType) {
-        case 0x0f:
-        case 0x10: {
-                gbDataMBC3.mapperSeconds = lt->tm_sec;
-                gbDataMBC3.mapperMinutes = lt->tm_min;
-                gbDataMBC3.mapperHours = lt->tm_hour;
-                gbDataMBC3.mapperDays = lt->tm_yday & 255;
-                gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
-                gbDataMBC3.mapperLastTime = rawtime;
-            }
-            break;
-        case 0xfd: {
-                uint8_t gbDaysinMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-                gbDataTAMA5.mapperSeconds = lt->tm_sec;
-                gbDataTAMA5.mapperMinutes = lt->tm_min;
-                gbDataTAMA5.mapperHours = lt->tm_hour;
-                gbDataTAMA5.mapperDays = 1;
-                gbDataTAMA5.mapperMonths = 1;
-                gbDataTAMA5.mapperYears = 1970;
-                gbDataTAMA5.mapperLastTime = rawtime;
-                int days = lt->tm_yday + 365 * 3;
-                while (days) {
-                    gbDataTAMA5.mapperDays++;
-                    days--;
-                    if (gbDataTAMA5.mapperDays > gbDaysinMonth[gbDataTAMA5.mapperMonths - 1]) {
-                        gbDataTAMA5.mapperDays = 1;
-                        gbDataTAMA5.mapperMonths++;
-                        if (gbDataTAMA5.mapperMonths > 12) {
-                            gbDataTAMA5.mapperMonths = 1;
-                            gbDataTAMA5.mapperYears++;
-                            if ((gbDataTAMA5.mapperYears & 3) == 0)
-                                gbDaysinMonth[1] = 29;
-                            else
-                                gbDaysinMonth[1] = 28;
-                        }
+    switch (gbRomType) {
+    case 0x0f:
+    case 0x10:
+        gbDataMBC3.mapperSeconds = lt->tm_sec;
+        gbDataMBC3.mapperMinutes = lt->tm_min;
+        gbDataMBC3.mapperHours = lt->tm_hour;
+        gbDataMBC3.mapperDays = lt->tm_yday & 255;
+        gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
+        gbDataMBC3.mapperLastTime = rawtime;
+        break;
+    case 0xfd: {
+        uint8_t gbDaysinMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        int days = lt->tm_yday + 365 * 3;
+        gbDataTAMA5.mapperSeconds = lt->tm_sec;
+        gbDataTAMA5.mapperMinutes = lt->tm_min;
+        gbDataTAMA5.mapperHours = lt->tm_hour;
+        gbDataTAMA5.mapperDays = 1;
+        gbDataTAMA5.mapperMonths = 1;
+        gbDataTAMA5.mapperYears = 1970;
+        gbDataTAMA5.mapperLastTime = rawtime;
+        while (days) {
+            gbDataTAMA5.mapperDays++;
+            days--;
+                if (gbDataTAMA5.mapperDays > gbDaysinMonth[gbDataTAMA5.mapperMonths - 1]) {
+                    gbDataTAMA5.mapperDays = 1;
+                    gbDataTAMA5.mapperMonths++;
+                    if (gbDataTAMA5.mapperMonths > 12) {
+                        gbDataTAMA5.mapperMonths = 1;
+                        gbDataTAMA5.mapperYears++;
+                        if ((gbDataTAMA5.mapperYears & 3) == 0)
+                            gbDaysinMonth[1] = 29;
+                        else
+                            gbDaysinMonth[1] = 28;
                     }
                 }
-                gbDataTAMA5.mapperControl = (gbDataTAMA5.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
             }
-            break;
+            gbDataTAMA5.mapperControl = (gbDataTAMA5.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
         }
+        break;
     }
+}
+
+static void SetGBBorder(unsigned val)
+{
+    struct retro_system_av_info avinfo;
+    unsigned _changed = 0;
+
+    switch (val) {
+        case 0:
+            _changed = ((systemWidth != gbWidth) || (systemHeight != gbHeight)) ? 1 : 0;
+            systemWidth = gbBorderLineSkip = gbWidth;
+            systemHeight = gbHeight;
+            gbBorderColumnSkip = gbBorderRowSkip = 0;
+            break;
+        case 1:
+            _changed = ((systemWidth != sgbWidth) || (systemHeight != sgbHeight)) ? 1 : 0;
+            systemWidth = gbBorderLineSkip = sgbWidth;
+            systemHeight = sgbHeight;
+            gbBorderColumnSkip = (sgbWidth - gbWidth) >> 1;
+            gbBorderRowSkip = (sgbHeight - gbHeight) >> 1;
+            break;
+    }
+
+    retro_get_system_av_info(&avinfo);
+
+    if (!_changed)
+        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
+    else
+        environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
 }
 
 void* retro_get_memory_data(unsigned id)
 {
-    if (type == IMAGE_GBA) {
+    void *data = NULL;
+
+    switch (type) {
+    case IMAGE_GBA:
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
             if ((saveType == GBA_SAVE_EEPROM) | (saveType == GBA_SAVE_EEPROM_SENSOR))
-                return eepromData;
-            if ((saveType == GBA_SAVE_SRAM) | (saveType == GBA_SAVE_FLASH))
-                return flashSaveMemory;
-            return NULL;
+                data =  eepromData;
+            else if ((saveType == GBA_SAVE_SRAM) | (saveType == GBA_SAVE_FLASH))
+                data = flashSaveMemory;
+            break;
         case RETRO_MEMORY_SYSTEM_RAM:
-            return workRAM;
+            data = workRAM;
+            break;
         case RETRO_MEMORY_VIDEO_RAM:
-            return vram;
+            data = vram;
+            break;
         }
-    }
 
-    if (type == IMAGE_GB) {
+    case IMAGE_GB:
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
             if (gbBattery)
-                return gbRam;
-            return NULL;
+                data = gbRam;
+            break;
         case RETRO_MEMORY_SYSTEM_RAM:
-            return (gbCgbMode ? gbWram : (gbMemory + 0xC000));
+            data = (gbCgbMode ? gbWram : (gbMemory + 0xC000));
+            break;
         case RETRO_MEMORY_VIDEO_RAM:
-            return (gbCgbMode ? gbVram : (gbMemory + 0x8000));
+            data = (gbCgbMode ? gbVram : (gbMemory + 0x8000));
+            break;
+        case RETRO_MEMORY_RTC:
+            if (gbBattery && gbRTCPresent)
+                data = gb_rtcdata_prt();
+            break;
         }
-    }
 
-    return NULL;
+    default: break;
+    }
+    return data;
 }
 
 size_t retro_get_memory_size(unsigned id)
 {
-    if (type == IMAGE_GBA) {
+    size_t size = 0;
+
+    switch (type) {
+    case IMAGE_GBA:
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
             if ((saveType == GBA_SAVE_EEPROM) | (saveType == GBA_SAVE_EEPROM_SENSOR))
-                return eepromSize;
-            if (saveType == GBA_SAVE_FLASH)
-                return flashSize;
-            if (saveType == GBA_SAVE_SRAM)
-                return SIZE_SRAM;
-            return 0;
+                size = eepromSize;
+            else if (saveType == GBA_SAVE_FLASH)
+                size = flashSize;
+            else if (saveType == GBA_SAVE_SRAM)
+                size = SIZE_SRAM;
+            break;
         case RETRO_MEMORY_SYSTEM_RAM:
-            return SIZE_WRAM;
+            size = SIZE_WRAM;
+            break;
         case RETRO_MEMORY_VIDEO_RAM:
-            return SIZE_VRAM - 0x2000; // usuable vram is only 0x18000
+            size = SIZE_VRAM - 0x2000; // usuable vram is only 0x18000
+            break;
         }
-    }
 
-    if (type == IMAGE_GB) {
+    case IMAGE_GB:
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
             if (gbBattery)
-                return gbRamSize;
-            return 0;
+                size = gbRamSize;
+            break;
         case RETRO_MEMORY_SYSTEM_RAM:
-            return gbCgbMode ? 0x8000 : 0x2000;
+            size = gbCgbMode ? 0x8000 : 0x2000;
+            break;
         case RETRO_MEMORY_VIDEO_RAM:
-            return gbCgbMode ? 0x4000 : 0x2000;
+            size = gbCgbMode ? 0x4000 : 0x2000;
+            break;
+        case RETRO_MEMORY_RTC:
+            size = gb_rtcdata_size();
+            break;
         }
-    }
 
-    return 0;
+    default: break;
+    }
+    return size;
 }
 
 unsigned retro_api_version(void)
@@ -543,17 +571,23 @@ void retro_get_system_info(struct retro_system_info *info)
 
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
-   float aspect = (3.0f / 2.0f);
-   if (type == IMAGE_GB)
-      aspect = !gbBorderOn ? (10.0 / 9.0) : (8.0 / 7.0);
+   double aspect = (3.0f / 2.0f);
+   unsigned maxWidth  = gbaWidth;
+   unsigned maxHeight = gbaHeight;
 
-   info->geometry.base_width = width;
-   info->geometry.base_height = height;
-   info->geometry.max_width = width;
-   info->geometry.max_height = height;
+   if (type == IMAGE_GB) {
+      aspect = !gbBorderOn ? (10.0 / 9.0) : (8.0 / 7.0);
+      maxWidth = sgbWidth;
+      maxHeight = sgbHeight;
+   }
+
+   info->geometry.base_width = systemWidth;
+   info->geometry.base_height = systemHeight;
+   info->geometry.max_width = maxWidth;
+   info->geometry.max_height = maxHeight;
    info->geometry.aspect_ratio = aspect;
-   info->timing.fps = FramesPerSecond;
-   info->timing.sample_rate = (double)SampleRate;
+   info->timing.fps = FRAMERATE;
+   info->timing.sample_rate = SAMPLERATE;
 }
 
 void retro_init(void)
@@ -572,10 +606,18 @@ void retro_init(void)
        snprintf(retro_system_directory, sizeof(retro_system_directory), "%s", dir);
 
 #ifdef FRONTEND_SUPPORTS_RGB565
+    systemColorDepth = 16;
+    systemRedShift = 11;
+    systemGreenShift = 6;
+    systemBlueShift = 0;
     enum retro_pixel_format rgb565 = RETRO_PIXEL_FORMAT_RGB565;
     if (environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &rgb565) && log_cb)
         log_cb(RETRO_LOG_INFO, "Frontend supports RGB565 - will use that instead of XRGB1555.\n");
 #else
+    systemColorDepth = 32;
+    systemRedShift = 19;
+    systemGreenShift = 11;
+    systemBlueShift = 3;
     enum retro_pixel_format rgb8888 = RETRO_PIXEL_FORMAT_XRGB8888;
     if (environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &rgb8888) && log_cb)
         log_cb(RETRO_LOG_INFO, "Frontend supports XRGB8888 - will use that instead of XRGB1555.\n");
@@ -588,7 +630,6 @@ void retro_init(void)
       rumble_cb = rumble.set_rumble_state;
    } else
       rumble_cb = NULL;
-
 }
 
 static const char *gbGetCartridgeType(void)
@@ -802,7 +843,7 @@ static void load_image_preferences(void)
     if (flashSize == SIZE_FLASH512 || flashSize == SIZE_FLASH1M)
         flashSetSize(flashSize);
 
-    if (opt_forceRTCenable)
+    if (option_forceRTCenable)
         rtcEnabled = true;
 
     rtcEnable(rtcEnabled);
@@ -825,25 +866,6 @@ static void load_image_preferences(void)
     log("mirroringEnable : %s.\n", mirroringEnable ? "Yes" : "No");
 }
 
-static void update_colormaps(void)
-{
-#ifdef FRONTEND_SUPPORTS_RGB565
-    systemColorDepth = 16;
-    systemRedShift = 11;
-    systemGreenShift = 6;
-    systemBlueShift = 0;
-#else
-    systemColorDepth = 32;
-    systemRedShift = 19;
-    systemGreenShift = 11;
-    systemBlueShift = 3;
-#endif
-
-    utilUpdateSystemColorMaps(false);
-
-    log("Color Depth = %d\n", systemColorDepth);
-}
-
 #ifdef _WIN32
 static const char SLASH = '\\';
 #else
@@ -855,16 +877,16 @@ static void gba_init(void)
     log("Loading VBA-M Core (GBA)...\n");
 
     load_image_preferences();
-    soundSetSampleRate(SampleRate);
+    soundSetSampleRate(SAMPLERATE);
 
-    if (usebios) {
+    if (option_useBios) {
         snprintf(biosfile, sizeof(biosfile), "%s%c%s", retro_system_directory, SLASH, "gba_bios.bin");
         log("Loading bios: %s\n", biosfile);
     }
-    CPUInit(biosfile, usebios);
+    CPUInit(biosfile, option_useBios);
 
-    width = gbaWidth;
-    height = gbaHeight;
+    systemWidth = gbaWidth;
+    systemHeight = gbaHeight;
 
     CPUReset();
 }
@@ -877,40 +899,36 @@ static void gb_init(void)
 
     gbGetHardwareType();
 
-    setColorizerHack(opt_colorizer_hack);
+    setColorizerHack(option_colorizerHack);
 
     // Disable bios loading when using Colorizer hack
-    if (opt_colorizer_hack)
-        usebios = false;
+    if (option_colorizerHack)
+        option_useBios = false;
 
-    if (usebios) {
+    if (option_useBios) {
         snprintf(biosfile, sizeof(biosfile), "%s%c%s",
             retro_system_directory, SLASH, biosname[gbCgbMode]);
         log("Loading bios: %s\n", biosfile);
     }
 
-    gbCPUInit(biosfile, usebios);
+    gbCPUInit(biosfile, option_useBios);
 
     if (gbBorderOn) {
-        width = gbBorderLineSkip = sgbWidth;
-        height = sgbHeight;
+        systemWidth = gbBorderLineSkip = sgbWidth;
+        systemHeight = sgbHeight;
         gbBorderColumnSkip = (sgbWidth - gbWidth) >> 1;
         gbBorderRowSkip = (sgbHeight - gbHeight) >> 1;
     } else {
-        width = gbBorderLineSkip = gbWidth;
-        height = gbHeight;
+        systemWidth = gbBorderLineSkip = gbWidth;
+        systemHeight = gbHeight;
         gbBorderColumnSkip = gbBorderRowSkip = 0;
     }
 
-    gbSoundSetSampleRate(SampleRate);
+    gbSoundSetSampleRate(SAMPLERATE);
     gbSoundSetDeclicking(1);
 
     gbReset(); // also resets sound;
     set_gbPalette();
-
-    // VBA-M always updates time based on current time and not in-game time.
-    // No need to add RTC data to RETRO_MEMORY_RTC, so its safe to place this here.
-    gbUpdateRTC();
 
     log("Rom size       : %02x (%dK)\n", gbRom[0x148], (romSize + 1023) / 1024);
     log("Cartridge type : %02x (%s)\n", gbRom[0x147], gbGetCartridgeType());
@@ -942,12 +960,6 @@ static void gb_init(void)
         log("Game supports SGB functions\n");
 }
 
-static void gba_soundchanged(void)
-{
-    soundInterpolation = sndInterpolation;
-    soundFiltering     = sndFiltering;
-}
-
 void retro_deinit(void)
 {
     emulating = 0;
@@ -964,8 +976,8 @@ void retro_reset(void)
 #define MAX_PLAYERS 4
 #define MAX_BUTTONS 10
 #define TURBO_BUTTONS 2
-static bool turbo_enable = false;
-static unsigned turbo_delay = 3;
+static bool option_turboEnable = false;
+static unsigned option_turboDelay = 3;
 static unsigned turbo_delay_counter[MAX_PLAYERS][TURBO_BUTTONS] = {{0}, {0}};
 static const unsigned binds[MAX_BUTTONS] = {
     RETRO_DEVICE_ID_JOYPAD_A,
@@ -985,23 +997,22 @@ static const unsigned turbo_binds[TURBO_BUTTONS] = {
     RETRO_DEVICE_ID_JOYPAD_Y
 };
 
-static void systemGbBorderOff(void);
 static void systemUpdateSolarSensor(int level);
 static uint8_t sensorDarkness = 0xE8;
 static uint8_t sensorDarknessLevel = 0; // so we can adjust sensor from gamepad
-static int astick_deadzone;
-static int gyro_sensitivity, tilt_sensitivity;
-static bool swap_astick;
+static int option_analogDeadzone;
+static int option_gyroSensitivity, option_tiltSensitivity;
+static bool option_swapAnalogSticks;
 
 static void update_variables(bool startup)
 {
+    struct retro_variable var = {0};
+    char key[256] = {0};
+    int disabled_layers = 0;
+    int sound_enabled = 0x30F;
     bool sound_changed = false;
-    char key[256];
-    struct retro_variable var;
+
     var.key = key;
-
-    int disabled_layers=0;
-
     strcpy(key, "vbam_layer_x");
     for (int i = 0; i < 8; i++) {
         key[strlen("vbam_layer_")] = '1' + i;
@@ -1014,7 +1025,6 @@ static void update_variables(bool startup)
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 
-    int sound_enabled = 0x30F;
     strcpy(key, "vbam_sound_x");
     for (unsigned i = 0; i < 6; i++) {
         key[strlen("vbam_sound_")] = '1' + i;
@@ -1032,9 +1042,9 @@ static void update_variables(bool startup)
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        bool newval = (strcmp(var.value, "enabled") == 0);
-        if (sndInterpolation != newval) {
-            sndInterpolation = newval;
+        bool newval = (!strcmp(var.value, "enabled"));
+        if (option_sndInterpolation != newval) {
+            option_sndInterpolation = newval;
             sound_changed = true;
         }
     }
@@ -1043,32 +1053,30 @@ static void update_variables(bool startup)
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        float newval = atof(var.value) * 0.1f;
-        if (sndFiltering != newval) {
-            sndFiltering = newval;
+        double newval = atof(var.value) * 0.1f;
+        if (option_sndFiltering != newval) {
+            option_sndFiltering = newval;
             sound_changed = true;
         }
     }
 
     if (sound_changed) {
-        //Update interpolation and filtering values
-        gba_soundchanged();
+        soundInterpolation = option_sndInterpolation;
+        soundFiltering     = option_sndFiltering;
     }
 
     var.key = "vbam_usebios";
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        bool newval = (strcmp(var.value, "enabled") == 0);
-        usebios = newval;
+        option_useBios = (!strcmp(var.value, "enabled")) ? true : false;
     }
 
     var.key = "vbam_forceRTCenable";
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        bool newval = (strcmp(var.value, "enabled") == 0) ? true : false;
-        opt_forceRTCenable = newval;
+        option_forceRTCenable = (!strcmp(var.value, "enabled")) ? true : false;
     }
 
     var.key = "vbam_solarsensor";
@@ -1083,29 +1091,19 @@ static void update_variables(bool startup)
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        int oldval = (gbBorderOn << 1) | gbBorderAutomatic;
         if (strcmp(var.value, "auto") == 0) {
-            gbBorderOn = 0;
             gbBorderAutomatic = 1;
         }
-        else if (strcmp(var.value, "enabled") == 0) {
+        else if (!strcmp(var.value, "enabled")) {
             gbBorderAutomatic = 0;
             gbBorderOn = 1;
-        }
-        else { // disabled
+        } else { // disabled
             gbBorderOn = 0;
             gbBorderAutomatic = 0;
         }
 
-        if ((type == IMAGE_GB) &&
-            (oldval != ((gbBorderOn << 1) | gbBorderAutomatic)) && !startup) {
-            if (gbBorderOn) {
-                systemGbBorderOn();
-                gbSgbRenderBorder();
-            }
-            else
-                systemGbBorderOff();
-        }
+        if ((type == IMAGE_GB) && !startup)
+            SetGBBorder(gbBorderOn);
     }
 
     var.key = "vbam_gbHardware";
@@ -1130,96 +1128,116 @@ static void update_variables(bool startup)
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        if (strcmp(var.value, "enabled") == 0)
-            opt_colorizer_hack = true;
-        else
-            opt_colorizer_hack = false;
+        option_colorizerHack = (!strcmp(var.value, "enabled")) ? true : false;
     }
 
     var.key = "vbam_turboenable";
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
-        bool val = !strcmp(var.value, "enabled");
-        turbo_enable = val;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_turboEnable = (!strcmp(var.value, "enabled")) ? true : false;
     }
 
     var.key = "vbam_turbodelay";
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
-        turbo_delay = atoi(var.value);
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_turboDelay = atoi(var.value);
     }
 
     var.key = "vbam_astick_deadzone";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
-        astick_deadzone = (int)(atoi(var.value) * 0.01f * 0x8000);
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_analogDeadzone = (int)(atof(var.value) * 0.01 * 0x8000);
     }
 
     var.key = "vbam_tilt_sensitivity";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
-        tilt_sensitivity = atoi(var.value);
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_tiltSensitivity = atoi(var.value);
     }
 
     var.key = "vbam_gyro_sensitivity";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
-        gyro_sensitivity = atoi(var.value);
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_gyroSensitivity = atoi(var.value);
     }
 
     var.key = "vbam_swap_astick";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
-        swap_astick = (bool)(!strcmp(var.value, "enabled"));
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_swapAnalogSticks = (!strcmp(var.value, "enabled")) ? true : false;
     }
 
     var.key = "vbam_palettes";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
-        unsigned lastpal = current_gbPalette;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        unsigned lastpal = option_gbPalette;
 
         if (!strcmp(var.value, "black and white"))
-            current_gbPalette = 0;
+            option_gbPalette = 0;
         else if (!strcmp(var.value, "blue sea"))
-            current_gbPalette = 1;
+            option_gbPalette = 1;
         else if (!strcmp(var.value, "dark knight"))
-            current_gbPalette = 2;
+            option_gbPalette = 2;
         else if (!strcmp(var.value, "green forest"))
-            current_gbPalette = 3;
+            option_gbPalette = 3;
         else if (!strcmp(var.value, "hot desert"))
-            current_gbPalette = 4;
+            option_gbPalette = 4;
         else if (!strcmp(var.value, "pink dreams"))
-            current_gbPalette = 5;
+            option_gbPalette = 5;
         else if (!strcmp(var.value, "wierd colors"))
-            current_gbPalette = 6;
+            option_gbPalette = 6;
         else if (!strcmp(var.value, "original gameboy"))
-            current_gbPalette = 7;
+            option_gbPalette = 7;
         else if (!strcmp(var.value, "gba sp"))
-            current_gbPalette = 8;
+            option_gbPalette = 8;
 
-        if (lastpal != current_gbPalette)
+        if (lastpal != option_gbPalette)
             set_gbPalette();
     }
 
     var.key = "vbam_gbcoloroption";
     var.value = NULL;
 
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-    {
-        int val = (!strcmp(var.value, "enabled")) ? 1 : 0;
-        set_gbColorCorrection(val);
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        gbColorOption = (!strcmp(var.value, "enabled")) ? 1 : 0;
+    }
+
+    var.key = "vbam_show_advanced_options";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        bool newval = (!strcmp(var.value, "enabled")) ? true : false;
+        if ((option_showAdvancedOptions != newval) || startup) {
+            option_showAdvancedOptions = newval;
+            struct retro_core_option_display option_display;
+            unsigned i;
+            char options[][13] = {
+                "vbam_sound_1",
+                "vbam_sound_2",
+                "vbam_sound_3",
+                "vbam_sound_4",
+                "vbam_sound_5",
+                "vbam_sound_6",
+                "vbam_layer_1",
+                "vbam_layer_2",
+                "vbam_layer_3",
+                "vbam_layer_4",
+                "vbam_layer_5",
+                "vbam_layer_6",
+                "vbam_layer_7",
+                "vbam_layer_8"
+            };
+            option_display.visible = option_showAdvancedOptions;
+            for (i = 0; i < (sizeof(options) / sizeof(options[0])); i++) {
+                option_display.key = options[i];
+                environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
+            }
+        }
     }
 
     // Hide some core options depending on rom image type
@@ -1233,10 +1251,8 @@ static void update_variables(bool startup)
             "vbam_showborders",
             "vbam_gbcoloroption"
         };
-        char gba_options[5][22] = {
+        char gba_options[3][22] = {
             "vbam_solarsensor",
-            "vbam_sound_5",
-            "vbam_sound_6",
             "vbam_gyro_sensitivity",
             "vbam_forceRTCenable"
         };
@@ -1251,7 +1267,7 @@ static void update_variables(bool startup)
 
         // Show or hide GBA only options
         option_display.visible = (type == IMAGE_GBA) ? 1 : 0;
-        for (i = 0; i < 5; i++)
+        for (i = 0; i < 3; i++)
         {
             option_display.key = gba_options[i];
             environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
@@ -1271,9 +1287,9 @@ static void updateInput_MotionSensors(void)
     int16_t analog[3], astick_data[3];
     double scaled_range, radius, angle;
     unsigned tilt_retro_device_index =
-        swap_astick ? RETRO_DEVICE_INDEX_ANALOG_LEFT : RETRO_DEVICE_INDEX_ANALOG_RIGHT;
+        option_swapAnalogSticks ? RETRO_DEVICE_INDEX_ANALOG_LEFT : RETRO_DEVICE_INDEX_ANALOG_RIGHT;
     unsigned gyro_retro_device_index =
-        swap_astick ? RETRO_DEVICE_INDEX_ANALOG_RIGHT : RETRO_DEVICE_INDEX_ANALOG_LEFT;
+        option_swapAnalogSticks ? RETRO_DEVICE_INDEX_ANALOG_RIGHT : RETRO_DEVICE_INDEX_ANALOG_LEFT;
 
     // Tilt sensor section
     analog[0] = input_cb(0, RETRO_DEVICE_ANALOG,
@@ -1285,12 +1301,12 @@ static void updateInput_MotionSensors(void)
     radius = sqrt(analog[0] * analog[0] + analog[1] * analog[1]);
     angle = atan2(analog[1], analog[0]);
 
-    if (radius > astick_deadzone) {
+    if (radius > option_analogDeadzone) {
         // Re-scale analog stick range to negate deadzone (makes slow movements possible)
-        radius = (radius - astick_deadzone) *
-            ((float)ASTICK_MAX/(ASTICK_MAX - astick_deadzone));
+        radius = (radius - option_analogDeadzone) *
+            ((float)ASTICK_MAX/(ASTICK_MAX - option_analogDeadzone));
         // Tilt sensor range is from  from 1897 to 2197
-        radius *= 150.0 / ASTICK_MAX * (tilt_sensitivity / 100.0);
+        radius *= 150.0 / ASTICK_MAX * (option_tiltSensitivity / 100.0);
         // Convert back to cartesian coordinates
         astick_data[0] = +(int16_t)ROUND(radius * cos(angle));
         astick_data[1] = -(int16_t)ROUND(radius * sin(angle));
@@ -1304,17 +1320,17 @@ static void updateInput_MotionSensors(void)
     analog[2] = input_cb(0, RETRO_DEVICE_ANALOG,
         gyro_retro_device_index, RETRO_DEVICE_ID_ANALOG_X);
 
-    if ( analog[2] < -astick_deadzone ) {
+    if ( analog[2] < -option_analogDeadzone ) {
         // Re-scale analog stick range
-        scaled_range = (-analog[2] - astick_deadzone) *
-            ((float)ASTICK_MAX / (ASTICK_MAX - astick_deadzone));
+        scaled_range = (-analog[2] - option_analogDeadzone) *
+            ((float)ASTICK_MAX / (ASTICK_MAX - option_analogDeadzone));
         // Gyro sensor range is +/- 1800
-        scaled_range *= 1800.0 / ASTICK_MAX * (gyro_sensitivity / 100.0);
+        scaled_range *= 1800.0 / ASTICK_MAX * (option_gyroSensitivity / 100.0);
         astick_data[2] = -(int16_t)ROUND(scaled_range);
-    } else if ( analog[2] > astick_deadzone ) {
-        scaled_range = (analog[2] - astick_deadzone) *
-            ((float)ASTICK_MAX / (ASTICK_MAX - astick_deadzone));
-        scaled_range *= (1800.0 / ASTICK_MAX * (gyro_sensitivity / 100.0));
+    } else if ( analog[2] > option_analogDeadzone ) {
+        scaled_range = (analog[2] - option_analogDeadzone) *
+            ((float)ASTICK_MAX / (ASTICK_MAX - option_analogDeadzone));
+        scaled_range *= (1800.0 / ASTICK_MAX * (option_gyroSensitivity / 100.0));
         astick_data[2] = +(int16_t)ROUND(scaled_range);
     } else
         astick_data[2] = 0;
@@ -1346,11 +1362,36 @@ void updateInput_SolarSensor(void)
     }
 }
 
+static bool firstrun = true;
 static unsigned has_frame;
 
 void retro_run(void)
 {
     bool updated = false;
+
+    if (firstrun) {
+        bool initRTC = false;
+        firstrun = false;
+        /* Check if GB game has RTC data. Has to be check here since this is where the data will be
+         * available when using libretro api. */
+        if ((type == IMAGE_GB) && gbRTCPresent) {
+            switch (gbRomType) {
+            case 0x0f:
+            case 0x10:
+                /* Check if any RTC has been loaded, zero value means nothing has been loaded. */
+                if (!gbDataMBC3.mapperSeconds && !gbDataMBC3.mapperLSeconds && !gbDataMBC3.mapperLastTime)
+                    initRTC = true;
+                break;
+            case 0xfd:
+                if (!gbDataTAMA5.mapperSeconds && !gbDataTAMA5.mapperLSeconds && !gbDataTAMA5.mapperLastTime)
+                    initRTC = true;
+                break;
+            }
+            /* Initialize RTC using local time if needed */
+            if (initRTC)
+                gbInitRTC();
+        }
+    }
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
         update_variables(false);
@@ -1362,9 +1403,8 @@ void retro_run(void)
 
     has_frame = 0;
 
-    do {
+    while (!has_frame)
         core->emuMain(core->emuCount);
-    } while (!has_frame);
 }
 
 static unsigned serialize_size = 0;
@@ -1496,7 +1536,7 @@ bool retro_load_game(const struct retro_game_info *game)
    }
 
    update_variables(true);
-   update_colormaps();
+   utilUpdateSystemColorMaps(false);
    soundInit();
 
    if (type == IMAGE_GBA) {
@@ -1639,6 +1679,8 @@ unsigned retro_get_region(void)
     return RETRO_REGION_NTSC;
 }
 
+// system callbacks
+
 void systemOnWriteDataToSoundBuffer(const uint16_t*, int)
 {
 }
@@ -1654,8 +1696,8 @@ bool systemCanChangeSoundQuality(void)
 
 void systemDrawScreen(void)
 {
-    unsigned pitch = width * (systemColorDepth >> 3);
-    video_cb(pix, width, height, pitch);
+    unsigned pitch = systemWidth * (systemColorDepth >> 3);
+    video_cb(pix, systemWidth, systemHeight, pitch);
 }
 
 void systemFrame(void)
@@ -1665,35 +1707,7 @@ void systemFrame(void)
 
 void systemGbBorderOn(void)
 {
-    bool changed = ((width != sgbWidth) || (height != sgbHeight));
-    width = gbBorderLineSkip = sgbWidth;
-    height = sgbHeight;
-    gbBorderColumnSkip = (sgbWidth - gbWidth) >> 1;
-    gbBorderRowSkip = (sgbHeight - gbHeight) >> 1;
-
-    struct retro_system_av_info avinfo;
-    retro_get_system_av_info(&avinfo);
-
-    if (!changed)
-        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
-    else
-        environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
-}
-
-static void systemGbBorderOff(void)
-{
-    bool changed = ((width != gbWidth) || (height != gbHeight));
-    width = gbBorderLineSkip = gbWidth;
-    height = gbHeight;
-    gbBorderColumnSkip = gbBorderRowSkip = 0;
-
-    struct retro_system_av_info avinfo;
-    retro_get_system_av_info(&avinfo);
-
-    if (!changed)
-        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
-    else
-        environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
+    SetGBBorder(1);
 }
 
 void systemMessage(const char* fmt, ...)
@@ -1730,14 +1744,14 @@ uint32_t systemReadJoypad(int which)
         for (i = 0; i < buttons; i++)
             J |= input_cb(which, RETRO_DEVICE_JOYPAD, 0, binds[i]) << i;
 
-        if (turbo_enable) {
+        if (option_turboEnable) {
             /* Handle Turbo A & B buttons */
             for (i = 0; i < TURBO_BUTTONS; i++) {
                 if (input_cb(which, RETRO_DEVICE_JOYPAD, 0, turbo_binds[i])) {
                     if (!turbo_delay_counter[which][i])
                         J |= 1 << i;
                     turbo_delay_counter[which][i]++;
-                    if (turbo_delay_counter[which][i] > turbo_delay)
+                    if (turbo_delay_counter[which][i] > option_turboDelay)
                         /* Reset the toggle if delay value is reached */
                         turbo_delay_counter[which][i] = 0;
                 } else
