@@ -780,7 +780,7 @@ static void load_image_preferences(void)
 
     bool found = false;
     bool hasRumble = false;
-    char buffer[12];
+    char buffer[12 + 1];
     unsigned i = 0, found_no = 0;
     unsigned long romCrc32 = crc32(0, rom, romSize);
 
