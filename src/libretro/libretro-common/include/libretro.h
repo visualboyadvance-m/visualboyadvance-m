@@ -1117,7 +1117,7 @@ enum retro_mod
                                             * This may be still be done regardless of the core options
                                             * interface version.
                                             *
-                                            * If version is 1 however, core options may instead be set by
+                                            * If version is >= 1 however, core options may instead be set by
                                             * passing an array of retro_core_option_definition structs to
                                             * RETRO_ENVIRONMENT_SET_CORE_OPTIONS, or a 2D array of
                                             * retro_core_option_definition structs to RETRO_ENVIRONMENT_SET_CORE_OPTIONS_INTL.
@@ -1132,8 +1132,8 @@ enum retro_mod
                                             * GET_VARIABLE.
                                             * This allows the frontend to present these variables to
                                             * a user dynamically.
-                                            * This should only be called if RETRO_ENVIRONMENT_GET_ENHANCED_CORE_OPTIONS
-                                            * returns an API version of 1.
+                                            * This should only be called if RETRO_ENVIRONMENT_GET_CORE_OPTIONS_VERSION
+                                            * returns an API version of >= 1.
                                             * This should be called instead of RETRO_ENVIRONMENT_SET_VARIABLES.
                                             * This should be called the first time as early as
                                             * possible (ideally in retro_set_environment).
@@ -1169,14 +1169,12 @@ enum retro_mod
                                             * i.e. it should be feasible to cycle through options
                                             * without a keyboard.
                                             *
-                                            * First entry should be treated as a default.
-                                            *
                                             * Example entry:
                                             * {
                                             *     "foo_option",
                                             *     "Speed hack coprocessor X",
                                             *     "Provides increased performance at the expense of reduced accuracy",
-                                            * 	  {
+                                            *     {
                                             *         { "false",    NULL },
                                             *         { "true",     NULL },
                                             *         { "unstable", "Turbo (Unstable)" },
@@ -1196,8 +1194,8 @@ enum retro_mod
                                             * GET_VARIABLE.
                                             * This allows the frontend to present these variables to
                                             * a user dynamically.
-                                            * This should only be called if RETRO_ENVIRONMENT_GET_ENHANCED_CORE_OPTIONS
-                                            * returns an API version of 1.
+                                            * This should only be called if RETRO_ENVIRONMENT_GET_CORE_OPTIONS_VERSION
+                                            * returns an API version of >= 1.
                                             * This should be called instead of RETRO_ENVIRONMENT_SET_VARIABLES.
                                             * This should be called the first time as early as
                                             * possible (ideally in retro_set_environment).
@@ -1384,17 +1382,17 @@ typedef int (RETRO_CALLCONV *retro_vfs_closedir_t)(struct retro_vfs_dir_handle *
 struct retro_vfs_interface
 {
    /* VFS API v1 */
-	retro_vfs_get_path_t get_path;
-	retro_vfs_open_t open;
-	retro_vfs_close_t close;
-	retro_vfs_size_t size;
-	retro_vfs_tell_t tell;
-	retro_vfs_seek_t seek;
-	retro_vfs_read_t read;
-	retro_vfs_write_t write;
-	retro_vfs_flush_t flush;
-	retro_vfs_remove_t remove;
-	retro_vfs_rename_t rename;
+   retro_vfs_get_path_t get_path;
+   retro_vfs_open_t open;
+   retro_vfs_close_t close;
+   retro_vfs_size_t size;
+   retro_vfs_tell_t tell;
+   retro_vfs_seek_t seek;
+   retro_vfs_read_t read;
+   retro_vfs_write_t write;
+   retro_vfs_flush_t flush;
+   retro_vfs_remove_t remove;
+   retro_vfs_rename_t rename;
    /* VFS API v2 */
    retro_vfs_truncate_t truncate;
    /* VFS API v3 */
@@ -1422,11 +1420,11 @@ struct retro_vfs_interface_info
 
 enum retro_hw_render_interface_type
 {
-	RETRO_HW_RENDER_INTERFACE_VULKAN = 0,
-	RETRO_HW_RENDER_INTERFACE_D3D9   = 1,
-	RETRO_HW_RENDER_INTERFACE_D3D10  = 2,
-	RETRO_HW_RENDER_INTERFACE_D3D11  = 3,
-	RETRO_HW_RENDER_INTERFACE_D3D12  = 4,
+   RETRO_HW_RENDER_INTERFACE_VULKAN = 0,
+   RETRO_HW_RENDER_INTERFACE_D3D9   = 1,
+   RETRO_HW_RENDER_INTERFACE_D3D10  = 2,
+   RETRO_HW_RENDER_INTERFACE_D3D11  = 3,
+   RETRO_HW_RENDER_INTERFACE_D3D12  = 4,
    RETRO_HW_RENDER_INTERFACE_GSKIT_PS2  = 5,
    RETRO_HW_RENDER_INTERFACE_DUMMY  = INT_MAX
 };
@@ -2504,8 +2502,20 @@ struct retro_core_option_display
 };
 
 /* Maximum number of values permitted for a core option
- * NOTE: This may be increased on a core-by-core basis
- * if required (doing so has no effect on the frontend) */
+ * > Note: We have to set a maximum value due the limitations
+ *   of the C language - i.e. it is not possible to create an
+ *   array of structs each containing a variable sized array,
+ *   so the retro_core_option_definition values array must
+ *   have a fixed size. The size limit of 128 is a balancing
+ *   act - it needs to be large enough to support all 'sane'
+ *   core options, but setting it too large may impact low memory
+ *   platforms. In practise, if a core option has more than
+ *   128 values then the implementation is likely flawed.
+ *   To quote the above API reference:
+ *      "The number of possible options should be very limited
+ *       i.e. it should be feasible to cycle through options
+ *       without a keyboard."
+ */
 #define RETRO_NUM_CORE_OPTION_VALUES_MAX 128
 
 struct retro_core_option_value
