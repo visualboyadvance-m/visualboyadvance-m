@@ -1,10 +1,6 @@
 #ifndef _S_CRC32_H
 #define _S_CRC32_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 static const unsigned long crc_table[256] = {
     0x00000000L, 0x77073096L, 0xee0e612cL, 0x990951baL, 0x076dc419L,
     0x706af48fL, 0xe963a535L, 0x9e6495a3L, 0x0edb8832L, 0x79dcb8a4L,
@@ -86,9 +82,5 @@ unsigned long crc32(unsigned long crc, const unsigned char* buf, unsigned int le
         } while (--len);
     return crc ^ 0xffffffffL;
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

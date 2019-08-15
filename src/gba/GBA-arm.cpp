@@ -1235,6 +1235,7 @@ DEFINE_ALU_INSN_C(1F, 3F, MVNS, YES)
     int mult = (opcode & 0x0F);                                        \
     uint32_t rs = reg[(opcode >> 8) & 0x0F].I;                         \
     int acc = (opcode >> 12) & 0x0F; /* or destLo */                   \
+    maybe_unused(acc);                                                 \
     int dest = (opcode >> 16) & 0x0F; /* or destHi */                  \
     OP;                                                                \
     SETCOND;                                                           \

@@ -246,6 +246,7 @@ static char dummy_state[735 * 2];
         &name, sizeof(type) \
     }
 
+#ifndef __LIBRETRO__
 // Old save state support
 
 static variable_desc gbsound_format[] = {
@@ -355,7 +356,6 @@ enum {
     nr52
 };
 
-#ifndef __LIBRETRO__
 static void gbSoundReadGameOld(int version, gzFile gzFile)
 {
     if (version == 11) {

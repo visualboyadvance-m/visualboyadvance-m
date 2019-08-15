@@ -195,6 +195,7 @@ int gbSynchronizeTicks = GBSYNCHRONIZE_CLOCK_TICKS;
 // emulator features
 int gbBattery = 0;
 int gbRumble = 0;
+int gbRTCPresent = 0;
 bool gbBatteryError = false;
 int gbCaptureNumber = 0;
 bool gbCapture = false;
@@ -4360,8 +4361,6 @@ bool gbUpdateSizes()
         memset(gbRam, gbRamFill, gbRamSize);
     }
 
-    gbBattery = gbRumble = 0;
-
     switch (gbRomType) {
     case 0x03:
     case 0x06:
@@ -4377,6 +4376,9 @@ bool gbUpdateSizes()
     case 0xff:
         gbBattery = 1;
         break;
+    default:
+        gbBattery = 0;
+        break;
     }
 
     switch (gbRomType) {
@@ -4384,6 +4386,21 @@ bool gbUpdateSizes()
     case 0x1d:
     case 0x1e:
         gbRumble = 1;
+        break;
+    default:
+        gbRumble = 0;
+        break;
+    }
+
+    switch (gbRomType) {
+    case 0x0f:
+    case 0x10: // mbc3
+    case 0xfd: // tama5
+        gbRTCPresent = 1;
+        break;
+    default:
+        gbRTCPresent = 0;
+        break;
     }
 
     gbInit();

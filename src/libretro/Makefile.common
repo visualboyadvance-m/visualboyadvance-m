@@ -1,13 +1,24 @@
-LIBRETRO_COMMON := $(CORE_DIR)/libretro/libretro-common/include
+LIBRETRO_COMMON := $(CORE_DIR)/libretro/libretro-common
+INCFLAGS        := -I$(CORE_DIR) -I$(LIBRETRO_COMMON)/include
+VBA_DEFINES     := -D__LIBRETRO__ -DFINAL_VERSION -DC_CORE -DNO_DEBUGGER
 
-INCFLAGS := -I$(CORE_DIR) -I$(LIBRETRO_COMMON)
+ifeq ($(TILED_RENDERING), 1)
+VBA_DEFINES += -DTILED_RENDERING
+endif
+
+ifeq ($(FRONTEND_SUPPORTS_RGB565),1)
+VBA_DEFINES += -DFRONTEND_SUPPORTS_RGB565
+endif
+
+ifeq ($(NO_LINK),1)
+VBA_DEFINES += -DNO_LINK
+endif
+
 SOURCES_CXX :=
-
 SOURCES_CXX += \
 	$(CORE_DIR)/libretro/libretro.cpp \
 	$(CORE_DIR)/libretro/UtilRetro.cpp \
-	$(CORE_DIR)/libretro/SoundRetro.cpp \
-	$(CORE_DIR)/libretro/scrc32.cpp
+	$(CORE_DIR)/libretro/SoundRetro.cpp
 
 SOURCES_CXX += \
 	$(CORE_DIR)/apu/Gb_Oscs.cpp \

@@ -7,6 +7,28 @@
 #include <libretro.h>
 #include <retro_inline.h>
 
+#ifndef HAVE_NO_LANGEXTRA
+#include "libretro_core_options_intl.h"
+#endif
+
+/*
+ ********************************
+ * VERSION: 1.3
+ ********************************
+ *
+ * - 1.3: Move translations to libretro_core_options_intl.h
+ *        - libretro_core_options_intl.h includes BOM and utf-8
+ *          fix for MSVC 2010-2013
+ *        - Added HAVE_NO_LANGEXTRA flag to disable translations
+ *          on platforms/compilers without BOM support
+ * - 1.2: Use core options v1 interface when
+ *        RETRO_ENVIRONMENT_GET_CORE_OPTIONS_VERSION is >= 1
+ *        (previously required RETRO_ENVIRONMENT_GET_CORE_OPTIONS_VERSION == 1)
+ * - 1.1: Support generation of core options v0 retro_core_option_value
+ *        arrays containing options with a single value
+ * - 1.0: First commit
+*/
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,7 +51,7 @@ extern "C" {
 struct retro_core_option_definition option_defs_us[] = {
     {
         "vbam_solarsensor",
-        "Solar sensor level",
+        "Solar Sensor Level",
         "Adjusts simulated solar level in Boktai games. L2/R2 buttons can also be used to quickly change levels.",
         {
             { "0",  NULL },
@@ -49,8 +71,19 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_usebios",
-        "Use BIOS file if available (Restart)",
+        "Use Official BIOS (If Available)",
         "Use official BIOS when available. Core needs to be restarted for changes to apply.",
+        {
+            { "disabled",  NULL },
+            { "enabled",   NULL },
+            { NULL, NULL },
+        },
+        "disabled"
+    },
+    {
+        "vbam_forceRTCenable",
+        "Force-Enable RTC",
+        "Forces the internal real-time clock to be enabled regardless of rom. Usuable for rom patches that requires clock to be enabled (aka Pokemon).",
         {
             { "disabled",  NULL },
             { "enabled",   NULL },
@@ -92,7 +125,7 @@ struct retro_core_option_definition option_defs_us[] = {
     {
         "vbam_palettes",
         "(GB) Color Palette",
-        "Set Game Boy palettes.",
+        "Set Game Boy palettes to use.",
         {
             { "black and white", NULL },
             { "blue sea",     NULL },
@@ -109,7 +142,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_gbHardware",
-        "(GB) Emulated Hardware",
+        "(GB) Emulated Hardware (Needs Restart)",
         "Sets the Game Boy hardware type to emulate. Restart core to apply.",
         {
             { "gbc",  "Game Boy Color" },
@@ -283,8 +316,19 @@ struct retro_core_option_definition option_defs_us[] = {
         "disabled"
     },
     {
+        "vbam_show_advanced_options",
+        "Show Advanced Options",
+        "Show advanced options which can enable or disable sound channels and graphics layers.",
+        {
+            { "disabled", NULL },
+            { "enabled",  NULL },
+            { NULL, NULL },
+        },
+        "disabled"
+    },
+    {
         "vbam_sound_1",
-        "Sound channel 1",
+        "Sound Channel 1",
         "Enables or disables tone & sweep sound channel.",
         {
             { "disabled", NULL },
@@ -293,9 +337,9 @@ struct retro_core_option_definition option_defs_us[] = {
         },
         "enabled"
     },
-{
+    {
         "vbam_sound_2",
-        "Sound channel 2",
+        "Sound Channel 2",
         "Enables or disables tone sound channel.",
         {
             { "disabled", NULL },
@@ -306,7 +350,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_sound_3",
-        "Sound channel 3",
+        "Sound Channel 3",
         "Enables or disables wave output sound channel.",
         {
             { "disabled", NULL },
@@ -317,7 +361,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_sound_4",
-        "Sound channel 4",
+        "Sound Channel 4",
         "Enables or disables noise audio channel.",
         {
             { "disabled", NULL },
@@ -328,7 +372,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_sound_5",
-        "Sound DMA channel A",
+        "Sound DMA Channel A",
         "Enables or disables DMA sound channel A.",
         {
             { "disabled", NULL },
@@ -339,7 +383,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_sound_6",
-        "Sound DMA channel B",
+        "Sound DMA Channel B",
         "Enables or disables DMA sound channel B.",
         {
             { "disabled", NULL },
@@ -350,7 +394,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_1",
-        "Show background layer 1",
+        "Show Background Layer 1",
         "Shows or hides background layer 1.",
         {
             { "disabled", NULL },
@@ -361,7 +405,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_2",
-        "Show background layer 2",
+        "Show Background Layer 2",
         "Shows or hides background layer 2.",
         {
             { "disabled", NULL },
@@ -372,7 +416,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_3",
-        "Show background layer 3",
+        "Show Background Layer 3",
         "Shows or hides background layer 3.",
         {
             { "disabled", NULL },
@@ -383,7 +427,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_4",
-        "Show background layer 4",
+        "Show Background Layer 4",
         "Shows or hides background layer 4.",
         {
             { "disabled", NULL },
@@ -394,7 +438,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_5",
-        "Show sprite layer",
+        "Show Sprite Layer",
         "Shows or hides sprite layer.",
         {
             { "disabled", NULL },
@@ -405,7 +449,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_6",
-        "Show window layer 1",
+        "Show Window Layer 1",
         "Shows or hides window layer 1.",
         {
             { "disabled", NULL },
@@ -416,7 +460,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_7",
-        "Show window layer 2",
+        "Show Window Layer 2",
         "Shows or hides window layer 2.",
         {
             { "disabled", NULL },
@@ -427,7 +471,7 @@ struct retro_core_option_definition option_defs_us[] = {
     },
     {
         "vbam_layer_8",
-        "Show sprite window layer",
+        "Show Sprite Window Layer",
         "Shows or hides sprite window layer.",
         {
             { "disabled", NULL },
@@ -440,48 +484,13 @@ struct retro_core_option_definition option_defs_us[] = {
     { NULL, NULL, NULL, {{0}}, NULL }
 };
 
-/* RETRO_LANGUAGE_JAPANESE */
-
-/* RETRO_LANGUAGE_FRENCH */
-
-/* RETRO_LANGUAGE_SPANISH */
-
-/* RETRO_LANGUAGE_GERMAN */
-
-/* RETRO_LANGUAGE_ITALIAN */
-
-/* RETRO_LANGUAGE_DUTCH */
-
-/* RETRO_LANGUAGE_PORTUGUESE_BRAZIL */
-
-/* RETRO_LANGUAGE_PORTUGUESE_PORTUGAL */
-
-/* RETRO_LANGUAGE_RUSSIAN */
-
-/* RETRO_LANGUAGE_KOREAN */
-
-/* RETRO_LANGUAGE_CHINESE_TRADITIONAL */
-
-/* RETRO_LANGUAGE_CHINESE_SIMPLIFIED */
-
-/* RETRO_LANGUAGE_ESPERANTO */
-
-/* RETRO_LANGUAGE_POLISH */
-
-/* RETRO_LANGUAGE_VIETNAMESE */
-
-/* RETRO_LANGUAGE_ARABIC */
-
-/* RETRO_LANGUAGE_GREEK */
-
-/* RETRO_LANGUAGE_TURKISH */
-
 /*
  ********************************
  * Language Mapping
  ********************************
 */
 
+#ifndef HAVE_NO_LANGEXTRA
 struct retro_core_option_definition *option_defs_intl[RETRO_LANGUAGE_LAST] = {
    option_defs_us, /* RETRO_LANGUAGE_ENGLISH */
    NULL,           /* RETRO_LANGUAGE_JAPANESE */
@@ -501,8 +510,9 @@ struct retro_core_option_definition *option_defs_intl[RETRO_LANGUAGE_LAST] = {
    NULL,           /* RETRO_LANGUAGE_VIETNAMESE */
    NULL,           /* RETRO_LANGUAGE_ARABIC */
    NULL,           /* RETRO_LANGUAGE_GREEK */
-   NULL,           /* RETRO_LANGUAGE_TURKISH */
+   option_defs_tr, /* RETRO_LANGUAGE_TURKISH */
 };
+#endif
 
 /*
  ********************************
@@ -511,7 +521,8 @@ struct retro_core_option_definition *option_defs_intl[RETRO_LANGUAGE_LAST] = {
 */
 
 /* Handles configuration/setting of core options.
- * Should only be called inside retro_set_environment().
+ * Should be called as early as possible - ideally inside
+ * retro_set_environment(), and no later than retro_load_game()
  * > We place the function body in the header to avoid the
  *   necessity of adding more .c files (i.e. want this to
  *   be as painless as possible for core devs)
@@ -524,8 +535,9 @@ static INLINE void libretro_set_core_options(retro_environment_t environ_cb)
    if (!environ_cb)
       return;
 
-   if (environ_cb(RETRO_ENVIRONMENT_GET_CORE_OPTIONS_VERSION, &version) && (version == 1))
+   if (environ_cb(RETRO_ENVIRONMENT_GET_CORE_OPTIONS_VERSION, &version) && (version >= 1))
    {
+#ifndef HAVE_NO_LANGEXTRA
       struct retro_core_options_intl core_options_intl;
       unsigned language = 0;
 
@@ -537,6 +549,9 @@ static INLINE void libretro_set_core_options(retro_environment_t environ_cb)
          core_options_intl.local = option_defs_intl[language];
 
       environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_INTL, &core_options_intl);
+#else
+      environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS, &option_defs_us);
+#endif
    }
    else
    {
@@ -595,7 +610,7 @@ static INLINE void libretro_set_core_options(retro_environment_t environ_cb)
             }
 
             /* Build values string */
-            if (num_values > 1)
+            if (num_values > 0)
             {
                size_t j;
 
