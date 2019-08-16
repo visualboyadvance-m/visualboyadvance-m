@@ -1652,7 +1652,7 @@ public:
         for (int i = 0; i < NUM_KEYS; ++i) {
             wxJoyKeyTextCtrl* tc = XRCCTRL_D(*p, joynames[i], wxJoyKeyTextCtrl);
             wxString singleClearButton("Clear" + joynames[i]);
-            if (ev.GetId() == XRCID(singleClearButton)) {
+            if (ev.GetId() == XRCID(singleClearButton.c_str())) {
                 tc->SetValue(wxEmptyString);
                 return;
             }
@@ -3738,7 +3738,7 @@ bool MainFrame::BindControls()
                 wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
                 NULL, &JoyPadConfigHandler[i]);
             for (int j = 0; j < NUM_KEYS; ++j) {
-                w->Connect(XRCID(wxString("Clear" + joynames[j])),
+                w->Connect(XRCID(wxString("Clear" + joynames[j]).c_str()),
                     wxEVT_COMMAND_BUTTON_CLICKED,
                     wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
                     NULL, &JoyPadConfigHandler[i]);
