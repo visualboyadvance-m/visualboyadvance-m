@@ -338,6 +338,7 @@ void* retro_get_memory_data(unsigned id)
             data = vram;
             break;
         }
+        break;
 
     case IMAGE_GB:
         switch (id) {
@@ -356,6 +357,7 @@ void* retro_get_memory_data(unsigned id)
                 data = gb_rtcdata_prt();
             break;
         }
+        break;
 
     default: break;
     }
@@ -384,6 +386,7 @@ size_t retro_get_memory_size(unsigned id)
             size = SIZE_VRAM - 0x2000; // usuable vram is only 0x18000
             break;
         }
+        break;
 
     case IMAGE_GB:
         switch (id) {
@@ -401,6 +404,7 @@ size_t retro_get_memory_size(unsigned id)
             size = gb_rtcdata_size();
             break;
         }
+        break;
 
     default: break;
     }
