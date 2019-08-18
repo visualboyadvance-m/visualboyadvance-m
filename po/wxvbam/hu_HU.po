@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-07-04 04:47+0000\n"
-"PO-Revision-Date: 2019-07-04 16:01+0000\n"
+"PO-Revision-Date: 2019-07-12 18:14+0000\n"
 "Last-Translator: Model T800\n"
 "Language-Team: Hungarian (Hungary) (http://www.transifex.com/bgk/vba-m/language/hu_HU/)\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +30,7 @@ msgstr "GameBoy Advance Fájlok (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|
 
 #: ../src/wx/cmdevents.cpp:114
 msgid "Open ROM file"
-msgstr "ROM fájl megnyitás"
+msgstr "ROM fájl megnyitása"
 
 #: ../src/wx/cmdevents.cpp:131
 msgid ""
@@ -40,7 +40,7 @@ msgstr "GameBoy Fájlok (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.
 
 #: ../src/wx/cmdevents.cpp:138
 msgid "Open GB ROM file"
-msgstr "GB ROM fájl megnyitás"
+msgstr "GB ROM fájl megnyitása"
 
 #: ../src/wx/cmdevents.cpp:155
 msgid ""
@@ -50,7 +50,7 @@ msgstr "GameBoy Color Fájlok (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.
 
 #: ../src/wx/cmdevents.cpp:162
 msgid "Open GBC ROM file"
-msgstr "GBC ROM fájl megnyitás"
+msgstr "GBC ROM fájl megnyitása"
 
 #: ../src/wx/cmdevents.cpp:558 ../src/wx/cmdevents.cpp:674
 #: ../src/wx/cmdevents.cpp:713 ../src/wx/cmdevents.cpp:786
@@ -174,7 +174,7 @@ msgstr "ROM+HuC-1"
 #: ../src/wx/xrc/SoundConfig.xrc:309 ../src/wx/xrc/SpeedupConfig.xrc:45
 #: ../src/wx/xrc/SpeedupConfig.xrc:120
 msgid "None"
-msgstr "Üres"
+msgstr "Nincs"
 
 #: ../src/wx/cmdevents.cpp:819 ../src/wx/cmdevents.cpp:835
 msgid "Select Dot Code file"
@@ -377,12 +377,12 @@ msgstr "GDB Kapcsolat"
 #: ../src/wx/cmdevents.cpp:1957
 #, c-format
 msgid "Waiting for connection at %s"
-msgstr "Kapcsolódás fogadása ennél: %s"
+msgstr "Várakozás a kapcsolódásra itt: %s"
 
 #: ../src/wx/cmdevents.cpp:1964
 #, c-format
 msgid "Waiting for connection on port %d"
-msgstr "Kapcsolódás fogadása a %d porton"
+msgstr "Kapcsolódás kezdeményezése a %d porton"
 
 #: ../src/wx/cmdevents.cpp:1967
 msgid "Waiting for GDB..."
@@ -579,7 +579,7 @@ msgstr "Flashcart CHT"
 
 #: ../src/wx/guiinit.cpp:807 ../src/wx/guiinit.cpp:1062
 msgid "Number cannot be empty"
-msgstr "A szám nem lehet üres"
+msgstr "A szám mező nem lehet üres"
 
 #: ../src/wx/guiinit.cpp:845
 #, c-format
@@ -1399,7 +1399,7 @@ msgstr "Felvételek"
 
 #: ../src/wx/xrc/Disassemble.xrc:4
 msgid "Disassemble"
-msgstr "Szétszedés"
+msgstr "Szétbontás"
 
 #: ../src/wx/xrc/Disassemble.xrc:15
 msgid "&Automatic"
@@ -1416,7 +1416,7 @@ msgstr "&THUMB"
 #: ../src/wx/xrc/Disassemble.xrc:45 ../src/wx/xrc/GBDisassemble.xrc:18
 #: ../src/wx/xrc/MemViewer.xrc:47
 msgid "&Go"
-msgstr "&Kezd"
+msgstr "&Kezdés"
 
 #: ../src/wx/xrc/Disassemble.xrc:73
 msgid "R0:"
@@ -1725,7 +1725,7 @@ msgstr "Alapértelmezett nagyítás :"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:266
 msgid "Maximum magnification factor :"
-msgstr "Maximális nagyítási tényező :"
+msgstr "Maximális nagyítási érték :"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:267
 msgid "0 = no maximum"
@@ -1737,7 +1737,7 @@ msgstr "0 = nincs korlát"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:285
 msgid "Zoom"
-msgstr "Közelítés"
+msgstr "Nagyítás"
 
 #: ../src/wx/xrc/ExportSPS.xrc:10
 msgid "Title:"
@@ -1757,7 +1757,7 @@ msgstr "Game Boy Advance beállítások"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type :"
-msgstr "Mentés típus :"
+msgstr "Mentés típusa :"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:27
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:178
@@ -1800,7 +1800,7 @@ msgstr "128K"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
-msgstr "Észlelés Azonnal"
+msgstr "Azonnali Felismerés"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:69
 msgid "Cartridge"
@@ -1915,7 +1915,7 @@ msgstr "Mindig"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:72
 msgid "System"
-msgstr "Rendszer által"
+msgstr "Rendszer"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:84
 msgid "Boot &ROM file :"
@@ -2349,7 +2349,7 @@ msgstr "Gyorsí&tás"
 #: ../src/wx/xrc/GeneralConfig.xrc:134 ../src/wx/xrc/SpeedupConfig.xrc:27
 #, c-format
 msgid "% of normal:"
-msgstr "a normál ennyi %-a:"
+msgstr "normálhoz képest(%):"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:144
 msgid "0 = no throttle"
@@ -2697,7 +2697,7 @@ msgstr "DMA &3"
 
 #: ../src/wx/xrc/Logging.xrc:69
 msgid "&Undefined instruction"
-msgstr "Meghatározatlan &utasítás"
+msgstr "Azonosíthatatlan &utasítás"
 
 #: ../src/wx/xrc/Logging.xrc:76
 msgid "&AGBPrint"
@@ -2709,7 +2709,7 @@ msgstr "Hangkimenet"
 
 #: ../src/wx/xrc/Logging.xrc:88
 msgid "Verbose"
-msgstr "Részletes"
+msgstr "Részletek"
 
 #: ../src/wx/xrc/MainMenu.xrc:5
 msgid "&File"
@@ -2725,7 +2725,7 @@ msgstr "GB&C megnyitása..."
 
 #: ../src/wx/xrc/MainMenu.xrc:14
 msgid "Open rece&nt"
-msgstr "Legutóbbi meg&nyitása"
+msgstr "Legutóbbiak meg&nyitása"
 
 #: ../src/wx/xrc/MainMenu.xrc:16
 msgid "&Reset recent list"
@@ -2813,7 +2813,7 @@ msgstr "Játéká&llás betöltése"
 
 #: ../src/wx/xrc/MainMenu.xrc:93
 msgid "&Oldest slot"
-msgstr "Legrégebbi hely"
+msgstr "Legkorábbi helyére"
 
 #: ../src/wx/xrc/MainMenu.xrc:128
 msgid "To &File ..."
@@ -2845,7 +2845,7 @@ msgstr "&Exportálás"
 
 #: ../src/wx/xrc/MainMenu.xrc:156
 msgid "Screen capt&ure..."
-msgstr "Kép rögzítése..."
+msgstr "Képernyőkép mentése..."
 
 #: ../src/wx/xrc/MainMenu.xrc:160
 msgid "Start &sound recording..."
@@ -2949,11 +2949,11 @@ msgstr "Hálózati kapcsolat kezdeményezés..."
 
 #: ../src/wx/xrc/MainMenu.xrc:252
 msgid "&Nothing"
-msgstr "Semmi"
+msgstr "Nincs"
 
 #: ../src/wx/xrc/MainMenu.xrc:256
 msgid "&Cable"
-msgstr "Kábel"
+msgstr "Kábeles"
 
 #: ../src/wx/xrc/MainMenu.xrc:260
 msgid "&Wireless"
@@ -3062,11 +3062,11 @@ msgstr "Hang ki/be"
 
 #: ../src/wx/xrc/MainMenu.xrc:372
 msgid "&GBA sound interpolation"
-msgstr "&GBA hang kiegészítés"
+msgstr "&GBA hangkiegészítés"
 
 #: ../src/wx/xrc/MainMenu.xrc:377
 msgid "&GB sound enhancement"
-msgstr "&GB hang kiemelés"
+msgstr "&GB hangkiemelés"
 
 #: ../src/wx/xrc/MainMenu.xrc:381
 msgid "&GB surround sound effect"
@@ -3074,7 +3074,7 @@ msgstr "&GB surround hangeffektus"
 
 #: ../src/wx/xrc/MainMenu.xrc:385
 msgid "&GB sound declicking"
-msgstr "&GB kattogó hang tompítás"
+msgstr "&GB kattogó hang tompítása"
 
 #: ../src/wx/xrc/MainMenu.xrc:390
 msgid "&Input"
@@ -3266,7 +3266,7 @@ msgstr "O&BJ WIN"
 
 #: ../src/wx/xrc/MainMenu.xrc:580
 msgid "&View Layers"
-msgstr "Rétegek megtekintése"
+msgstr "Képrétegek"
 
 #: ../src/wx/xrc/MainMenu.xrc:584
 msgid "Channel &1"
@@ -3391,7 +3391,7 @@ msgstr "&32-bit"
 
 #: ../src/wx/xrc/MemViewer.xrc:83
 msgid "Current address:"
-msgstr "Pillanatnyi cím:"
+msgstr "Jelenlegi cím:"
 
 #: ../src/wx/xrc/MemViewer.xrc:108
 msgid "&Load..."
@@ -3455,11 +3455,11 @@ msgstr "Hangerő :"
 
 #: ../src/wx/xrc/SoundConfig.xrc:34
 msgid "Mute"
-msgstr "Némítás"
+msgstr "Néma"
 
 #: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:320
 msgid "Maximum"
-msgstr "Maximum"
+msgstr "Maximális"
 
 #: ../src/wx/xrc/SoundConfig.xrc:71
 msgid "Sample rate :"
@@ -3543,7 +3543,7 @@ msgstr "Bal/Jobb"
 
 #: ../src/wx/xrc/SoundConfig.xrc:298
 msgid "Sound filtering"
-msgstr "Hangszűrők"
+msgstr "Hangszűrés"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
