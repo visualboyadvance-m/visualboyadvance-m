@@ -2611,6 +2611,7 @@ build_project() {
     puts "${NL}[32mBuilding project: [1;34m$CHECKOUT[0m${NL}${NL}"
 
     target_os=${CROSS_OS:-$os}
+    target_bits=${target_bits:-$bits}
 
     dist_pre_build project
 
@@ -2619,8 +2620,14 @@ build_project() {
 
     rm -f visualboyadvance-m.exe
 
-    # FIXME: turn LTO back on when everything works
-    echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=ON $CMAKE_BASE_ARGS $PROJECT_ARGS $@
+    lto=ON
+
+    # FIXME: LTO still broken on 64 bit mingw
+    if [ "$target_os" = windows ] && [ "$target_bits" = 64 ]; then
+        lto=OFF
+    fi
+
+    echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=${lto} $CMAKE_BASE_ARGS $PROJECT_ARGS $@
     echo_run make -j$NUM_CPUS VERBOSE=1
 
     if [ "$target_os" = mac ]; then
